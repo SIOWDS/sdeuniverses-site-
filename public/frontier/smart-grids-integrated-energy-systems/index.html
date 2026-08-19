@@ -1,0 +1,289 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能电网与综合能源系统 · 新思想前沿 · SDE Universes</title>
+<meta name="description" content="从同步相量、需求响应、智能计量与能源枢纽到虚拟电厂、并网队列、成网型逆变器和动态输电，审计智能电网的物理闭环。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:2rem 0 .35rem}
+h2 .en{display:block;font-size:.8rem;font-weight:500;color:var(--muted);letter-spacing:.02em;margin-top:.15rem;font-family:Georgia,serif}
+p{margin:0 0 1.1rem;text-align:justify}
+.src{font-size:.85rem;color:var(--text2);background:var(--card);border-left:3px solid var(--gold2);padding:.5rem .8rem;margin:0 0 .9rem;line-height:1.8}
+.src i{font-style:normal;color:var(--gold2);font-weight:600;margin-right:.4em}
+.era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+
+.act{margin:2.6rem 0 .2rem;padding:.5rem .9rem;background:var(--card);border-left:4px solid var(--gold);font-size:1.02rem;font-weight:600;color:var(--gold)}
+.refs{font-size:.82rem;color:var(--text2);line-height:1.85}
+.refs ol{padding-left:1.4rem;margin:0}
+.refs li{margin-bottom:.45rem}
+h3.sec{font-size:1.1rem;font-weight:600;color:var(--gold);margin:2.2rem 0 .6rem;padding-top:1rem;border-top:1px solid var(--border)}
+.col{font-size:.83rem;color:var(--text2);background:rgba(138,104,23,0.07);border-left:3px solid var(--muted);padding:.5rem .8rem;margin:0 0 1.4rem;line-height:1.8}
+.col i{font-style:normal;color:var(--gold2);font-weight:600;margin-right:.35em}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">智能电网 · 能源系统</span></div>
+<main><div class="kicker">新思想前沿 · 智能电网 · 能源系统</div>
+<h1>智能电网与综合能源系统</h1>
+<div class="meta">第 566 号 · 近二十年 · <b>两幕 · 20 个新思想</b> · 约 26,147 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">智能电网不是把更多表计连上云，而是在秒、小时、季节和多年扩建四种时间尺度上，让电源、网络、负荷、储能与热氢系统共同守住频率、电压、容量和恢复能力。本面板把通信可见性与可执行控制分开，也把局部灵活性放回网络约束。</p>
+<div class="act">【第一幕】上一个十年 · 约 2006–2016</div>
+<p>第一幕追踪智能电网与综合能源系统如何把旧问题变成可执行、可测量的对象；判断标准始终是智能电网成立的决定性机制是把可观测状态转成受网络与安全约束的实时协调动作，而不是传感器、平台账号或分布式资源名义容量增加。</p>
+<h2>甲、同步相量测量<span class="en">Synchrophasors</span></h2>
+<div class="src"><i>提出</i>Phadke, Thorp &amp; Adamiak, IEEE Transactions on Power Delivery 1, 233–238 (1986); NASPI launched 2007　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>以统一时钟测量跨区电压电流相角</div>
+<p>Phadke, Thorp &amp; Adamiak, IEEE Transactions on Power Delivery 1, 233–238 (1986); NASPI launched 2007把同步相量测量从愿景改写为可失败的工程对象。它针对的是高速同相测量能否在通信丢包下形成可信全网状态；北美同步相量计划推动PMU大规模部署，使秒以下跨区域动态首次可同时观察则说明旧体系为何无法再用一项峰值或一次投运交差。对照未采用者时，补列未采用和失败样本；同步相量测量局部增益不得冒充系统收益（Phadke 2007）。</p>
+<p>可反驳命题写得很窄：只有以统一时钟测量跨区电压电流相角能使同步相量测量保持原方向。增加预算与样本不能替代这一步，反之若北美同步相量计划推动PMU大规模部署，使秒以下跨区域动态首次可同时观察由其他机制同样产生，本条必须撤回单因。在跨场址复现之前，固定服务基线再做消融；同步相量测量记录须回到全量分母（International Energy Agency 2023）。</p>
+<p>Phadke 2007的硬证据是北美同步相量计划推动PMU大规模部署，使秒以下跨区域动态首次可同时观察；实际兑现数／全部候选与中止数才可复算。当平均值被拆开，最低记录还须给出原始分子、总体分母、观察期与退出原因；一旦结果反号就应撤回原来的充分性主张。沿责任链继续追问，公开分子分母与退出；同步相量测量投运后仍保留责任主体（Phadke 2007；International Energy Agency 2025）。</p>
+<p>International Energy Agency 2023把边界写成可见性不等于控制，时钟异常、数据质量和模型拓扑错误会制造虚假稳定或误报警；此时局部收益可能翻成系统损失。沿责任链继续追问，应分开常态与极端样本，并把反号结论收窄到实际适用区间；同步相量测量把观察记录接回问责链。以同一服务单位复算，分列常态极端与反号；同步相量测量须连同不确定性报告结果（Phadke 2007）。</p>
+<p>International Energy Agency, Building the Future Transmission Grid (2025).把近期进展概括为广域测量进入振荡监测、事件重放与自适应保护。对同步相量测量的制度含义，是合同须规定数据归属、失效报告与长期责任，并按北美同步相量计划推动PMU大规模部署，使秒以下跨区域动态首次可同时观察复核撤场后的证据链。以同一服务单位复算，保存许可维护与责任版本；同步相量测量分母改变便重算结论（International Energy Agency 2023）。</p>
+<p>同步相量测量与外部面板共享的是“可测代理等于真实服务”这一预设，分歧点则在北美同步相量计划推动PMU大规模部署，使秒以下跨区域动态首次可同时观察。把可见性不等于控制，时钟异常、数据质量和模型拓扑错误会制造虚假稳定或误报警加入共同分母后，两个领域原本一致的排序可能交换。面对分布外情形，统一单位时间窗和边界；同步相量测量投运后仍保留责任主体（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>S——以统一时钟测量跨区电压电流相角足够驱动　<i>单因</i>只认以统一时钟测量跨区电压电流相角　<i>预设</i>〔01 谁进入分母〕默认高速同相测量能否在通信丢包下形成可信全网状态　<i>量纲</i>以统一时钟测量跨区电压电流相角兑现数／全部候选与中止数　<i>失效</i>当可见性不等于控制时，以统一时钟测量跨区电压电流相角越高，净收益反而越低　<i>自曝</i>对象清单独立核验：主证据先把自己的纳入边界暴露出来：北美同步相量计划推动PMU大规模部署；独立撤回检查落在对象清单　<i>空栏</i>未列可见性不等于控制引起的退出与转移成本　<i>异名</i>应急管理称“AI快速制图把静态灾情图改写为版本化决策底图”；另见第 208 号第十九条“AI快速制图把静态灾情图改写为版本化决策底图”</div>
+<h2>乙、智能电网法定框架<span class="en">Smart Grid in EISA</span></h2>
+<div class="src"><i>提出</i>US Congress, Energy Independence and Security Act Title XIII (2007)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>把数字通信需求响应和分布式资源列为电网现代化方向</div>
+<p>US Congress 2007改写了法定现代化目标能否变成互操作投资而非设备采购清单；法律明确智能电网特征并要求协调标准、试点和成本回收让旧默认有了可查裂缝。在跨场址复现之前，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；智能电网法定局部增益不得冒充系统收益。当平均值被拆开，补列未采用和失败样本；智能电网法定把观察记录接回问责链（US Congress 2007）。</p>
+<p>本条只承认把数字通信需求响应和分布式资源列为电网现代化方向；移除后若法律明确智能电网特征并要求协调标准、试点和成本回收仍出现，立场即撤回。当平均值被拆开，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；智能电网法定记录须回到全量分母。沿责任链继续追问，固定服务基线再做消融；智能电网法定分母改变便重算结论（International Energy Agency 2023）。</p>
+<p>US Congress 2007报告法律明确智能电网特征并要求协调标准、试点和成本回收；智能电网法定以兑现数／候选与中止总数结算。沿责任链继续追问，最低记录还须给出原始分子、总体分母、观察期与退出原因；一旦结果反号就应撤回原来的充分性主张。以同一服务单位复算，公开分子分母与退出；智能电网法定投运后仍保留责任主体。面对分布外情形，公开分子分母与退出；智能电网法定由此留下可执行否证入口（US Congress 2007；International Energy Agency 2025）。</p>
+<p>International Energy Agency 2023保留宽泛定义可让任何升级自称智能；智能电网法定越界后须重判方向。以同一服务单位复算，应分开常态与极端样本，并把反号结论收窄到实际适用区间；智能电网法定把观察记录接回问责链。面对分布外情形，应分开常态与极端样本，并把反号结论收窄到实际适用区间；智能电网法定须连同不确定性报告结果。为防止事后改口，分列常态极端与反号；智能电网法定局部增益不得冒充系统收益（US Congress 2007）。</p>
+<p>International Energy Agency 2025记录NIST互操作框架和州级部署持续细化标准；维护账须继续追踪法律明确智能电网特征并要求协调标准、试点和成本回收。面对分布外情形，还须把许可、维护、责任主体和退出条件按版本保存；智能电网法定分母改变便重算结论。为防止事后改口，保存许可维护与责任版本；智能电网法定醒目纪录仍须排除筛选效应。在下一轮独立复核里，保存许可维护与责任版本；智能电网法定记录须回到全量分母（International Energy Agency 2023）。</p>
+<p>跨域比较以宽泛定义可让任何升级自称智能划界，并用法律明确智能电网特征并要求协调标准、试点和成本回收重算把数字通信需求响应和分布式资源列为电网现代化方向。为防止事后改口，先统一功能单位与时间窗，再把边界条件作为共同反例；智能电网法定须分开验收常态与压力场景。在下一轮独立复核里，统一单位时间窗和边界；缺少这一列就无法判断方向有没有翻转（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>E——智能电网法定框架主机制足够驱动　<i>单因</i>只认智能电网法定框架主机制　<i>预设</i>〔01 谁进入分母〕默认法定现代化目标能否变成互操作投资而非设备采购清单　<i>量纲</i>智能电网法定框架主机制兑现数／全部候选与中止数　<i>失效</i>当宽泛定义可让任何升级自称智能时，智能电网法定框架主机制越高，净收益反而越低　<i>自曝</i>事件时间轴独立核验：运行日志没有替路线遮掩这一点：智能电网法定框架主证据；独立撤回检查落在事件时间轴　<i>空栏</i>未列宽泛定义可让任何升级自称智能引起的退出与转移成本　<i>异名</i>表示论称“对称性神经网络：群表示决定可学习层的形状”；另见第 212 号第十一条“对称性神经网络：群表示决定可学习层的形状”</div>
+<h2>丙、OpenADR自动需求响应<span class="en">OpenADR</span></h2>
+<div class="src"><i>提出</i>Lawrence Berkeley National Laboratory, OpenADR 1.0 specification (2009)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>用开放信号自动触发价格或事件响应</div>
+<p>Lawrence Berkeley National Laboratory, OpenADR 1.0 specification (2009)出现以前，讨论常把瓶颈压成投入不足；但标准消息能否让负荷在关键时刻真实响应。协议把电网事件与终端控制接口标准化，降低每个公用事业定制楼宇集成的成本把原先藏在背景里的对象、基线和失败时段推到台前，旧说法因而第一次有了可查的裂缝。当平均值被拆开，补列未采用和失败样本；自动需求响应局部增益不得冒充系统收益（Lawrence Berkeley National Laboratory 2009）。</p>
+<p>OpenADR自动需求响应把立场锁在一个动作上：决定方向的只有用开放信号自动触发价格或事件响应。协议把电网事件与终端控制接口标准化，降低每个公用事业定制楼宇集成的成本若可在移除这一动作后照旧出现，Lawrence Berkeley National Laboratory, OpenADR 1.0 specification (2009)所代表的转折便不成立；规模、补贴或设备更新不能替它作因。沿责任链继续追问，固定服务基线再做消融；自动需求响应记录须回到全量分母（International Energy Agency 2023）。</p>
+<p>Lawrence Berkeley National Laboratory, OpenADR 1.0 specification (2009)给出的关键证据是协议把电网事件与终端控制接口标准化，降低每个公用事业定制楼宇集成的成本。这笔读数须和全部适用对象、运行周期及未完成事件同列；只摘用开放信号自动触发价格或事件响应的最好值，会把样本选择误写成性能跃升。以同一服务单位复算，公开分子分母与退出；一旦结果反号就应撤回原来的充分性主张；复算值固定为实际兑现数／全部候选与中止数（Lawrence Berkeley National Laboratory 2009；International Energy Agency 2025）。</p>
+<p>最强边界不是一句谨慎声明，而是设备收到信号不等于负荷减少，舒适、占用和本地控制会改变响应方向，必须测量反事实基线。International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).从系统侧追问标准消息能否让负荷在关键时刻真实响应，使这一条件具有令收益翻转的实质力量，而非可以移到脚注的例外。面对分布外情形，分列常态极端与反号；自动需求响应把观察记录接回问责链（Lawrence Berkeley National Laboratory 2009）。</p>
+<p>International Energy Agency 2025记录OpenADR 2.0成为建筑和充电设施互操作协议；采购与监管须把协议把电网事件与终端控制接口标准化，降低每个公用事业定制楼宇集成的成本写进维护账。为防止事后改口，还须把许可、维护、责任主体和退出条件按版本保存；自动需求响应据此与邻域同尺度对撞。在下一轮独立复核里，保存许可维护与责任版本；自动需求响应醒目纪录仍须排除筛选效应（International Energy Agency 2023）。</p>
+<p>外部接口由设备收到信号不等于负荷减少，舒适、占用和本地控制会改变响应方向，必须测量反事实基线划定；加入协议把电网事件与终端控制接口标准化，降低每个公用事业定制楼宇集成的成本后，用开放信号自动触发价格或事件响应才可跨域比较。在下一轮独立复核里，统一单位时间窗和边界；自动需求响应须分开验收常态与压力场景（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>D——用开放信号自动触发价格或事件响应足够驱动　<i>单因</i>只认用开放信号自动触发价格或事件响应　<i>预设</i>〔01 谁进入分母〕默认标准消息能否让负荷在关键时刻真实响应　<i>量纲</i>用开放信号自动触发价格或事件响应兑现数／全部候选与中止数　<i>失效</i>当设备收到信号不等于负荷减少时，用开放信号自动触发价格或事件响应越高，净收益反而越低　<i>自曝</i>装置边界独立核验：作者在误差讨论里留下了反证入口：协议把电网事件与终端控制接口标准化；独立撤回检查落在装置边界　<i>空栏</i>未列设备收到信号不等于负荷减少引起的退出与转移成本　<i>异名</i>绿色化学与循环化学称“E因子与PMI把废物写进合成分母”；另见第 221 号乙“E因子与PMI把废物写进合成分母”</div>
+<h2>丁、高级计量基础设施<span class="en">Advanced Metering Infrastructure</span></h2>
+<div class="src"><i>提出</i>US Department of Energy, Smart Grid Investment Grant AMI projects (2009–2016)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>双向计量让配网与用户负荷可见</div>
+<p>领域曾把高级计量基础设施当作一项可独立扩大的部件，US Department of Energy, Smart Grid Investment Grant AMI projects (2009–2016)却从大规模投资把远程抄表、停复电和时段价格接入配网运营，为精细负荷管理提供数据底座切入。由此可见，真正卡住旧框架的是十五分钟电量数据能否自动带来节能和可靠性，而不是同类项目还不够多。沿责任链继续追问，补列未采用和失败样本；高级计量基础局部增益不得冒充系统收益（US Department of Energy 2016）。</p>
+<p>本条只承认双向计量让配网与用户负荷可见是充分改变方向的那一样。大规模投资把远程抄表、停复电和时段价格接入配网运营，为精细负荷管理提供数据底座说明该机制怎样进入结果；若把它拿掉仍能复制趋势，高级计量基础设施就只是同期变化的标签，不是因果解释。以同一服务单位复算，固定服务基线再做消融；高级计量基础记录须回到全量分母（International Energy Agency 2023）。</p>
+<p>证据锚点由US Department of Energy, Smart Grid Investment Grant AMI projects (2009–2016)承担：大规模投资把远程抄表、停复电和时段价格接入配网运营，为精细负荷管理提供数据底座。核算时分子是实际兑现的双向计量让配网与用户负荷可见，分母是全部名义运行与适用对象；停运、退出和未接入者不能从统计里蒸发。面对分布外情形，公开分子分母与退出；一旦结果反号就应撤回原来的充分性主张；复算值固定为实际兑现数／全部候选与中止数（US Department of Energy 2016；International Energy Agency 2025）。</p>
+<p>表计本身不会改变用电，隐私、通信故障和不公平费率会把数字收益转成用户成本构成高级计量基础设施的反号条件。International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).把十五分钟电量数据能否自动带来节能和可靠性保留为开放争议，意味着平均改善越大，未入账的转移成本反而可能越难被看见。为防止事后改口，分列常态极端与反号；高级计量基础还须公开未完成与退出事件（US Department of Energy 2016）。</p>
+<p>International Energy Agency, Building the Future Transmission Grid (2025).记录的当下状态是智能表计覆盖扩大并用于停电定位和动态费率。制度责任因此延伸到许可、供应、维护和退役，不再止于US Department of Energy, Smart Grid Investment Grant AMI projects (2009–2016)展示的首个成功场景。在下一轮独立复核里，还须把许可、维护、责任主体和退出条件按版本保存；高级计量基础据此与邻域同尺度对撞。若要把这一判断写进合同，保存许可维护与责任版本；高级计量基础醒目纪录仍须排除筛选效应（International Energy Agency 2023）。</p>
+<p>外部接口由表计本身不会改变用电，隐私、通信故障和不公平费率会把数字收益转成用户成本划定；加入大规模投资把远程抄表、停复电和时段价格接入配网运营，为精细负荷管理提供数据底座后，双向计量让配网与用户负荷可见才可跨域比较。若要把这一判断写进合同，统一单位时间窗和边界；高级计量基础须分开验收常态与压力场景（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>D——双向计量让配网与用户负荷可见足够驱动　<i>单因</i>只认双向计量让配网与用户负荷可见　<i>预设</i>〔07 效果可由参与者自己评定〕默认十五分钟电量数据能否自动带来节能和可靠性　<i>量纲</i>双向计量让配网与用户负荷可见兑现数／全部候选与中止数　<i>失效</i>当表计本身不会改变用电时，双向计量让配网与用户负荷可见越高，净收益反而越低　<i>自曝</i>样本分层独立核验：同一组数据其实还记录了不利方向：高级计量基础设施主证据；独立撤回检查落在样本分层　<i>空栏</i>未列表计本身不会改变用电引起的退出与转移成本　<i>异名</i>公共管理与政府治理称“数字公共基础设施：共享数字底座重组政府能力”；另见第 267 号第十九条“数字公共基础设施：共享数字底座重组政府能力”</div>
+<h2>戊、FERC 745需求响应补偿<span class="en">Demand Response Compensation</span></h2>
+<div class="src"><i>提出</i>Federal Energy Regulatory Commission, Order No. 745 (2011)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>让可验证减负荷与发电同场竞价</div>
+<p>Federal Energy Regulatory Commission, Order No. 745 (2011)把FERC 745需求响应补偿从愿景改写为可失败的工程对象。它针对的是按市场边际价补偿减负荷是否会被基线操纵；命令要求满足净收益条件的需求响应获得节点边际电价，承认不消费也能提供系统价值则说明旧体系为何无法再用一项峰值或一次投运交差。以同一服务单位复算，补列未采用和失败样本；需求响应补偿局部增益不得冒充系统收益（Federal Energy Regulatory Commission 2011）。</p>
+<p>可反驳命题写得很窄：只有让可验证减负荷与发电同场竞价能使FERC 745需求响应补偿保持原方向。增加预算与样本不能替代这一步，反之若命令要求满足净收益条件的需求响应获得节点边际电价，承认不消费也能提供系统价值由其他机制同样产生，本条必须撤回单因。面对分布外情形，固定服务基线再做消融；需求响应补偿记录须回到全量分母（International Energy Agency 2023）。</p>
+<p>第三段的硬账来自Federal Energy Regulatory Commission, Order No. 745 (2011)所报告的命令要求满足净收益条件的需求响应获得节点边际电价，承认不消费也能提供系统价值。应同时记录成功数／全部尝试数、实际周期／设计周期以及边界内外的差值，才能知道让可验证减负荷与发电同场竞价是否真的兑现。为防止事后改口，公开分子分母与退出；需求响应补偿补阴性账胜过追加佳例（Federal Energy Regulatory Commission 2011；International Energy Agency 2025）。</p>
+<p>反方最有力的一刀是基线不可直接观测，策略性抬高预期用电会制造假减负；极端事件中的持续性也可能低于承诺。在International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).的系统口径下，按市场边际价补偿减负荷是否会被基线操纵仍未收敛；这会使名义增益随着规模放大而转为资源或公平损失。在下一轮独立复核里，分列常态极端与反号；需求响应补偿还须公开未完成与退出事件（Federal Energy Regulatory Commission 2011）。</p>
+<p>International Energy Agency, Building the Future Transmission Grid (2025).把近期进展概括为批发市场继续以容量、辅助服务和聚合规则使用需求响应。对FERC 745需求响应补偿的制度含义，是合同须规定数据归属、失效报告与长期责任，并按命令要求满足净收益条件的需求响应获得节点边际电价，承认不消费也能提供系统价值复核撤场后的证据链。若要把这一判断写进合同，保存许可维护与责任版本；需求响应补偿据此与邻域同尺度对撞（International Energy Agency 2023）。</p>
+<p>外部接口由基线不可直接观测，策略性抬高预期用电会制造假减负；极端事件中的持续性也可能低于承诺划定；加入命令要求满足净收益条件的需求响应获得节点边际电价，承认不消费也能提供系统价值后，让可验证减负荷与发电同场竞价才可跨域比较。从失败样本回看，统一单位时间窗和边界；需求响应补偿须分开验收常态与压力场景（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>S——让可验证减负荷与发电同场竞价足够驱动　<i>单因</i>只认让可验证减负荷与发电同场竞价　<i>预设</i>〔07 效果可由参与者自己评定〕默认按市场边际价补偿减负荷是否会被基线操纵　<i>量纲</i>让可验证减负荷与发电同场竞价兑现数／全部候选与中止数　<i>失效</i>当基线不可直接观测时，让可验证减负荷与发电同场竞价越高，净收益反而越低　<i>自曝</i>版本登记独立核验：项目年报承认名义值与交付值并不相等：FERC 745需求响应补偿主证据；独立撤回检查落在版本登记　<i>空栏</i>未列基线不可直接观测引起的退出与转移成本　<i>异名</i>泛函分析与算子代数称“强渐近自由：谱分布收敛还不够”；另见第 301 号庚“强渐近自由：谱分布收敛还不够”</div>
+<h2>己、CERTS微电网<span class="en">CERTS Microgrid</span></h2>
+<div class="src"><i>提出</i>Lasseter et al., CERTS Microgrid Laboratory Test Bed, IEEE Transactions on Power Delivery 26, 325–332 (2011)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>以本地下垂控制实现即插即用孤岛</div>
+<p>在Lasseter et al., CERTS Microgrid Laboratory Test Bed, IEEE Transactions on Power Delivery 26, 325–332 (2011)之前，CERTS微电网多按设备或项目是否存在来计数。CERTS试验台展示分布式电源无需高速中央通信也能分担功率并孤岛运行，改变微电网控制架构迫使研究者改问无缝孤岛是否能在真实负荷与保护系统中稳定，也把未投运、未覆盖和无法维持的部分重新放回历史现场。面对分布外情形，补列未采用和失败样本；微电网局部增益不得冒充系统收益（Lasseter et al. 2011）。</p>
+<p>CERTS微电网的主张不以“多因素”退场：只有以本地下垂控制实现即插即用孤岛决定这次转向。CERTS试验台展示分布式电源无需高速中央通信也能分担功率并孤岛运行，改变微电网控制架构是它可以被消融的抓手；若冻结其他条件后方向不变，单因解释即告失败。为防止事后改口，固定服务基线再做消融；微电网记录同时划定外推边界（International Energy Agency 2023）。</p>
+<p>Lasseter et al., CERTS Microgrid Laboratory Test Bed, IEEE Transactions on Power Delivery 26, 325–332 (2011)提供了可复算起点——CERTS试验台展示分布式电源无需高速中央通信也能分担功率并孤岛运行，改变微电网控制架构。分子必须是经实际运行确认的结果，分母必须包含全部候选、周期与中止；二者的比才是以本地下垂控制实现即插即用孤岛的量纲。在下一轮独立复核里，公开分子分母与退出；微电网补阴性账胜过追加佳例；复算值固定为实际兑现数／全部候选与中止数（Lasseter et al. 2011；International Energy Agency 2025）。</p>
+<p>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).没有替CERTS微电网消除争议，而是把无缝孤岛是否能在真实负荷与保护系统中稳定固定为检验问题。实验负荷和故障条件受控，商业保护、接地、燃料和长时孤岛资源不足会令恢复承诺失效出现时，性能越被优化，系统账面之外的损害越可能上升。若要把这一判断写进合同，分列常态极端与反号；微电网还须公开未完成与退出事件（Lasseter et al. 2011）。</p>
+<p>截至International Energy Agency, Building the Future Transmission Grid (2025).，社区和关键设施微电网扩展到韧性与黑启动。这要求把CERTS微电网的采购规格从铭牌参数改成全程服务：CERTS试验台展示分布式电源无需高速中央通信也能分担功率并孤岛运行，改变微电网控制架构要在独立场址和维护期后仍可重现。从失败样本回看，保存许可维护与责任版本；微电网据此与邻域同尺度对撞。把观察窗拉长以后，保存许可维护与责任版本；微电网醒目纪录仍须排除筛选效应（International Energy Agency 2023）。</p>
+<p>外部接口由实验负荷和故障条件受控，商业保护、接地、燃料和长时孤岛资源不足会令恢复承诺失效划线，而不是由学科名划线。另一个领域若只报告局部以本地下垂控制实现即插即用孤岛，便会与CERTS微电网共享同一盲点；加入CERTS试验台展示分布式电源无需高速中央通信也能分担功率并孤岛运行，改变微电网控制架构后，两边才有可通约的对手（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>E——以本地下垂控制实现即插即用孤岛足够驱动　<i>单因</i>只认以本地下垂控制实现即插即用孤岛　<i>预设</i>〔07 效果可由参与者自己评定〕默认无缝孤岛是否能在真实负荷与保护系统中稳定　<i>量纲</i>以本地下垂控制实现即插即用孤岛兑现数／全部候选与中止数　<i>失效</i>当实验负荷和故障条件受控时，以本地下垂控制实现即插即用孤岛越高，净收益反而越低　<i>自曝</i>失败谱独立核验：后续复测把首篇最强叙事削弱为：CERTS微电网主证据；独立撤回检查落在失败谱　<i>空栏</i>未列实验负荷和故障条件受控引起的退出与转移成本　<i>异名</i>遗传学与人类遗传称“多样化生物库：规模不再替代代表性”；另见第 331 号第十六条“多样化生物库：规模不再替代代表性”</div>
+<h2>庚、车网互动<span class="en">Vehicle-to-Grid</span></h2>
+<div class="src"><i>提出</i>Kempton &amp; Tomić, Journal of Power Sources 144, 268–279 (2005), doi:10.1016/j.jpowsour.2004.12.025　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>聚合停放车辆提供调频与峰值功率</div>
+<p>Kempton &amp; Tomić, Journal of Power Sources 144, 268–279 (2005)出现以前，讨论常把瓶颈压成投入不足；但车队可调容量能否抵消出行不确定与电池衰减。早期模型量化车辆长时间停放和高功率接口的市场价值，使交通电气化成为电网资源把原先藏在背景里的对象、基线和失败时段推到台前，旧说法因而第一次有了可查的裂缝。为防止事后改口，补列未采用和失败样本；车网互动据此拆开相关变化与机制效应（Kempton &amp; Tomić 2004）。</p>
+<p>车网互动把立场锁在一个动作上：决定方向的只有聚合停放车辆提供调频与峰值功率。早期模型量化车辆长时间停放和高功率接口的市场价值，使交通电气化成为电网资源若可在移除这一动作后照旧出现，Kempton &amp; Tomić, Journal of Power Sources 144, 268–279 (2005)所代表的转折便不成立；规模、补贴或设备更新不能替它作因。在下一轮独立复核里，固定服务基线再做消融；车网互动记录同时划定外推边界（International Energy Agency 2023）。</p>
+<p>Kempton &amp; Tomić, Journal of Power Sources 144, 268–279 (2005)给出的关键证据是早期模型量化车辆长时间停放和高功率接口的市场价值，使交通电气化成为电网资源。这笔读数须和全部适用对象、运行周期及未完成事件同列；只摘聚合停放车辆提供调频与峰值功率的最好值，会把样本选择误写成性能跃升。若要把这一判断写进合同，公开分子分母与退出；车网互动补阴性账胜过追加佳例；复算值固定为实际兑现数／全部候选与中止数（Kempton &amp; Tomić 2004；International Energy Agency 2025）。</p>
+<p>最强边界不是一句谨慎声明，而是名义电池容量不能全调用，接入率、车主需求、逆变器和保修约束会大幅缩小可靠容量。International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).从系统侧追问车队可调容量能否抵消出行不确定与电池衰减，使这一条件具有令收益翻转的实质力量，而非可以移到脚注的例外。从失败样本回看，分列常态极端与反号；车网互动还须公开未完成与退出事件（Kempton &amp; Tomić 2004）。</p>
+<p>到International Energy Agency, Building the Future Transmission Grid (2025).时，双向充电标准和校车车队开始提供实际电网服务。这使车网互动进入采购、监管或规划后必须保存版本、运维与退出记录；否则前端的早期模型量化车辆长时间停放和高功率接口的市场价值，使交通电气化成为电网资源无法和末端结果对账。把观察窗拉长以后，保存许可维护与责任版本；车网互动据此与邻域同尺度对撞（International Energy Agency 2023）。</p>
+<p>外部接口由名义电池容量不能全调用，接入率、车主需求、逆变器和保修约束会大幅缩小可靠容量划定；加入早期模型量化车辆长时间停放和高功率接口的市场价值，使交通电气化成为电网资源后，聚合停放车辆提供调频与峰值功率才可跨域比较。对照未采用者时，统一单位时间窗和边界；车网互动须分开验收常态与压力场景（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>E——聚合停放车辆提供调频与峰值功率足够驱动　<i>单因</i>只认聚合停放车辆提供调频与峰值功率　<i>预设</i>〔11 可复现等于可重做〕默认车队可调容量能否抵消出行不确定与电池衰减　<i>量纲</i>聚合停放车辆提供调频与峰值功率兑现数／全部候选与中止数　<i>失效</i>当名义电池容量不能全调用时，聚合停放车辆提供调频与峰值功率越高，净收益反而越低　<i>自曝</i>机构接口独立核验：设备说明中的校准条件反过来限定了结论：车网互动主证据；独立撤回检查落在机构接口　<i>空栏</i>未列名义电池容量不能全调用引起的退出与转移成本　<i>异名</i>生物地球化学循环称“土壤激发效应让新增碳反而释放旧碳”；另见第 347 号乙“土壤激发效应让新增碳反而释放旧碳”</div>
+<h2>辛、IEEE 1547并网规则更新<span class="en">IEEE 1547-2018</span></h2>
+<div class="src"><i>提出</i>IEEE, Standard 1547-2018 (2018)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>要求逆变资源具备电压频率穿越和互操作</div>
+<p>IEEE 2018改写了分布式资源从被动脱网转向支撑电网会不会增加协调复杂度；新版标准让DER在扰动时不再立即脱网让旧默认有了可查裂缝。在下一轮独立复核里，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；并网规则更新据此拆开相关变化与机制效应。若要把这一判断写进合同，补列未采用和失败样本；并网规则更新还须公开未完成与退出事件（IEEE 2018）。</p>
+<p>本条只承认要求逆变资源具备电压频率穿越和互操作；移除后若新版标准让DER在扰动时不再立即脱网仍出现，立场即撤回。若要把这一判断写进合同，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；并网规则更新记录同时划定外推边界。从失败样本回看，固定服务基线再做消融；并网规则更新据此与邻域同尺度对撞（International Energy Agency 2023）。</p>
+<p>IEEE 2018报告新版标准让DER在扰动时不再立即脱网；并网规则更新以兑现数／候选与中止总数结算。从失败样本回看，最低记录还须给出原始分子、总体分母、观察期与退出原因；并网规则更新补阴性账胜过追加佳例。把观察窗拉长以后，公开分子分母与退出；并网规则更新须分开验收常态与压力场景。对照未采用者时，公开分子分母与退出；缺少这一列就无法判断方向有没有翻转（IEEE 2018；International Energy Agency 2025）。</p>
+<p>International Energy Agency 2023把边界写成具备功能不等于正确启用，默认参数、聚合相互作用和旧设备混合会造成新稳定风险；此时局部收益可能翻成系统损失。把观察窗拉长以后，应分开常态与极端样本，并把反号结论收窄到实际适用区间；并网规则更新还须公开未完成与退出事件。对照未采用者时，分列常态极端与反号；并网规则更新据此区分设备存在与服务兑现（IEEE 2018）。</p>
+<p>International Energy Agency 2025记录各州实施曲线、通信与测试要求持续推进；维护账须继续追踪新版标准让DER在扰动时不再立即脱网。对照未采用者时，还须把许可、维护、责任主体和退出条件按版本保存；并网规则更新据此与邻域同尺度对撞。在跨场址复现之前，保存许可维护与责任版本；并网规则更新醒目纪录仍须排除筛选效应。当平均值被拆开，保存许可维护与责任版本；并网规则更新记录须回到全量分母（International Energy Agency 2023）。</p>
+<p>跨域比较以具备功能不等于正确启用划界，并用新版标准让DER在扰动时不再立即脱网重算要求逆变资源具备电压频率穿越和互操作。在跨场址复现之前，先统一功能单位与时间窗，再把边界条件作为共同反例；并网规则更新须分开验收常态与压力场景。当平均值被拆开，统一单位时间窗和边界；缺少这一列就无法判断方向有没有翻转（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>D——IEEE 1547并网规则更新主机制足够驱动　<i>单因</i>只认IEEE 1547并网规则更新主机制　<i>预设</i>〔11 可复现等于可重做〕默认分布式资源从被动脱网转向支撑电网会不会增加协调复杂度　<i>量纲</i>IEEE 1547并网规则更新主机制兑现数／全部候选与中止数　<i>失效</i>当具备功能不等于正确启用时，IEEE 1547并网规则更新主机制越高，净收益反而越低　<i>自曝</i>资源预算独立核验：政策文本自己列出的豁免说明：新版标准让DER在扰动时不再立即脱网；独立撤回检查落在资源预算　<i>空栏</i>未列具备功能不等于正确启用引起的退出与转移成本　<i>异名</i>古气候与环境考古称“贝叶斯年代模型替代逐点校年”；另见第 350 号丙“贝叶斯年代模型替代逐点校年”</div>
+<div class="act">【第二幕】这十年 · 约 2016–2026</div>
+<p>第二幕转向规模、闭环与责任。最新纪录只有在失败和资源进入分母后，才足以支持“智能电网成立的决定性机制是把可观测状态转成受网络与安全约束的实时协调动作，而不是传感器、平台账号或分布式资源名义容量增加”。</p>
+<h2>一、虚拟电厂<span class="en">Virtual Power Plants</span></h2>
+<div class="src"><i>提出</i>US Department of Energy, Pathways to Commercial Liftoff: Virtual Power Plants (2023)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>用软件协调大量小资源形成可调组合</div>
+<p>US Department of Energy, Pathways to Commercial Liftoff: Virtual Power Plants (2023)把虚拟电厂从愿景改写为可失败的工程对象。它针对的是聚合平台注册容量能否在网格位置和事件时长上兑现；VPP把分散储能、负荷和发电按市场产品聚合，可减少峰值投资并提高现有资产利用则说明旧体系为何无法再用一项峰值或一次投运交差。若要把这一判断写进合同，补列未采用和失败样本；虚拟电厂据此拆开相关变化与机制效应（US Department of Energy 2023）。</p>
+<p>可反驳命题写得很窄：只有用软件协调大量小资源形成可调组合能使虚拟电厂保持原方向。增加预算与样本不能替代这一步，反之若VPP把分散储能、负荷和发电按市场产品聚合，可减少峰值投资并提高现有资产利用由其他机制同样产生，本条必须撤回单因。从失败样本回看，固定服务基线再做消融；虚拟电厂记录同时划定外推边界（International Energy Agency 2023）。</p>
+<p>第三段的硬账来自US Department of Energy, Pathways to Commercial Liftoff: Virtual Power Plants (2023)所报告的VPP把分散储能、负荷和发电按市场产品聚合，可减少峰值投资并提高现有资产利用。应同时记录成功数／全部尝试数、实际周期／设计周期以及边界内外的差值，才能知道用软件协调大量小资源形成可调组合是否真的兑现。把观察窗拉长以后，公开分子分母与退出；虚拟电厂补阴性账胜过追加佳例（US Department of Energy 2023；International Energy Agency 2025）。</p>
+<p>反方最有力的一刀是设备异构、客户退出和通信依赖会让可靠容量小于名义总和，聚合商基线也需独立审计。在International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).的系统口径下，聚合平台注册容量能否在网格位置和事件时长上兑现仍未收敛；这会使名义增益随着规模放大而转为资源或公平损失。对照未采用者时，分列常态极端与反号；虚拟电厂还须公开未完成与退出事件（US Department of Energy 2023）。</p>
+<p>International Energy Agency, Building the Future Transmission Grid (2025).把近期进展概括为住宅电池、恒温器和电动车聚合进入容量与辅助服务市场。对虚拟电厂的制度含义，是合同须规定数据归属、失效报告与长期责任，并按VPP把分散储能、负荷和发电按市场产品聚合，可减少峰值投资并提高现有资产利用复核撤场后的证据链。在跨场址复现之前，保存许可维护与责任版本；虚拟电厂据此与邻域同尺度对撞（International Energy Agency 2023）。</p>
+<p>虚拟电厂与外部面板共享的是“可测代理等于真实服务”这一预设，分歧点则在VPP把分散储能、负荷和发电按市场产品聚合，可减少峰值投资并提高现有资产利用。把设备异构、客户退出和通信依赖会让可靠容量小于名义总和，聚合商基线也需独立审计加入共同分母后，两个领域原本一致的排序可能交换。当平均值被拆开，统一单位时间窗和边界；虚拟电厂须分开验收常态与压力场景（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>S——用软件协调大量小资源形成可调组合足够驱动　<i>单因</i>只认用软件协调大量小资源形成可调组合　<i>预设</i>〔11 可复现等于可重做〕默认聚合平台注册容量能否在网格位置和事件时长上兑现　<i>量纲</i>用软件协调大量小资源形成可调组合兑现数／全部候选与中止数　<i>失效</i>当虚拟电厂反号边界时，用软件协调大量小资源形成可调组合越高，净收益反而越低　<i>自曝</i>外部复算独立核验：成本模型的敏感性表揭开了这一弱处：VPP把分散储能、负荷和发电按市场产品聚合；独立撤回检查落在外部复算　<i>空栏</i>未列虚拟电厂反号边界引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>二、分布式能源资源管理系统<span class="en">DERMS</span></h2>
+<div class="src"><i>提出</i>Electric Power Research Institute, DERMS functional requirements and demonstrations (2017–2022)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>把分布式资源可用性映射到配网控制</div>
+<p>在Electric Power Research Institute, DERMS functional requirements and demonstrations (2017–2022)之前，分布式能源资源管理系统多按设备或项目是否存在来计数。DERMS连接网络模型、预测、约束与设备调度，使配网从被动接入转向主动管理迫使研究者改问中央优化能否处理百万设备和局部电压约束，也把未投运、未覆盖和无法维持的部分重新放回历史现场。从失败样本回看，补列未采用和失败样本；分布式能源资据此拆开相关变化与机制效应（Electric Power Research Institute 2022）。</p>
+<p>分布式能源资源管理系统的主张不以“多因素”退场：只有把分布式资源可用性映射到配网控制决定这次转向。DERMS连接网络模型、预测、约束与设备调度，使配网从被动接入转向主动管理是它可以被消融的抓手；若冻结其他条件后方向不变，单因解释即告失败。把观察窗拉长以后，固定服务基线再做消融；分布式能源资记录同时划定外推边界（International Energy Agency 2023）。</p>
+<p>Electric Power Research Institute, DERMS functional requirements and demonstrations (2017–2022)提供了可复算起点——DERMS连接网络模型、预测、约束与设备调度，使配网从被动接入转向主动管理。分子必须是经实际运行确认的结果，分母必须包含全部候选、周期与中止；二者的比才是把分布式资源可用性映射到配网控制的量纲。对照未采用者时，公开分子分母与退出；分布式能源资补阴性账胜过追加佳例。在跨场址复现之前，公开分子分母与退出；分布式能源资须分开验收常态与压力场景；复算值固定为实际兑现数／全部候选与中止数（Electric Power Research Institute 2022；International Energy Agency 2025）。</p>
+<p>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).没有替分布式能源资源管理系统消除争议，而是把中央优化能否处理百万设备和局部电压约束固定为检验问题。模型拓扑和客户设备状态更新不及时会使最优指令不可行，集中平台故障还会放大影响出现时，性能越被优化，系统账面之外的损害越可能上升。在跨场址复现之前，分列常态极端与反号；分布式能源资还须公开未完成与退出事件（Electric Power Research Institute 2022）。</p>
+<p>International Energy Agency 2025记录配网运营商转向分层聚合与标准接口；采购与监管须把DERMS连接网络模型、预测、约束与设备调度，使配网从被动接入转向主动管理写进维护账。当平均值被拆开，还须把许可、维护、责任主体和退出条件按版本保存；分布式能源资据此与邻域同尺度对撞。沿责任链继续追问，保存许可维护与责任版本；分布式能源资醒目纪录仍须排除筛选效应（International Energy Agency 2023）。</p>
+<p>外部接口由模型拓扑和客户设备状态更新不及时会使最优指令不可行，集中平台故障还会放大影响划线，而不是由学科名划线。另一个领域若只报告局部把分布式资源可用性映射到配网控制，便会与分布式能源资源管理系统共享同一盲点；加入DERMS连接网络模型、预测、约束与设备调度，使配网从被动接入转向主动管理后，两边才有可通约的对手（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>S——把分布式资源可用性映射到配网控制足够驱动　<i>单因</i>只认把分布式资源可用性映射到配网控制　<i>预设</i>〔16 稀有与常见服从同一机制〕默认中央优化能否处理百万设备和局部电压约束　<i>量纲</i>把分布式资源可用性映射到配网控制兑现数／全部候选与中止数　<i>失效</i>当分布式能源资源管理系统反号边界时，把分布式资源可用性映射到配网控制越高，净收益反而越低　<i>自曝</i>反号压力独立核验：场址比较没有支持一刀切外推，因为：DERMS连接网络模型、预测、约束与设备调度；独立撤回检查落在反号压力　<i>空栏</i>未列分布式能源资源管理系统反号边界引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>三、成网型逆变器<span class="en">Grid-Forming Inverters</span></h2>
+<div class="src"><i>提出</i>National Renewable Energy Laboratory, Research Roadmap on Grid-Forming Inverters (2020)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>逆变器以内部电压源形成并支撑电网</div>
+<p>National Renewable Energy Laboratory, Research Roadmap on Grid-Forming Inverters (2020)出现以前，讨论常把瓶颈压成投入不足；但电子电源能否在低惯量系统中稳定建立电压频率。路线图把同步机退役后的黑启动、弱网稳定和快速控制问题转为成网型逆变器研究议程把原先藏在背景里的对象、基线和失败时段推到台前，旧说法因而第一次有了可查的裂缝。把观察窗拉长以后，补列未采用和失败样本；成网型逆变器据此拆开相关变化与机制效应（National Renewable Energy Laboratory 2020）。</p>
+<p>成网型逆变器把立场锁在一个动作上：决定方向的只有逆变器以内部电压源形成并支撑电网。路线图把同步机退役后的黑启动、弱网稳定和快速控制问题转为成网型逆变器研究议程若可在移除这一动作后照旧出现，National Renewable Energy Laboratory, Research Roadmap on Grid-Forming Inverters (2020)所代表的转折便不成立；规模、补贴或设备更新不能替它作因。对照未采用者时，固定服务基线再做消融；成网型逆变器记录同时划定外推边界（International Energy Agency 2023）。</p>
+<p>National Renewable Energy Laboratory, Research Roadmap on Grid-Forming Inverters (2020)给出的关键证据是路线图把同步机退役后的黑启动、弱网稳定和快速控制问题转为成网型逆变器研究议程。这笔读数须和全部适用对象、运行周期及未完成事件同列；只摘逆变器以内部电压源形成并支撑电网的最好值，会把样本选择误写成性能跃升。在跨场址复现之前，公开分子分母与退出；成网型逆变器补阴性账胜过追加佳例；复算值固定为实际兑现数／全部候选与中止数（National Renewable Energy Laboratory 2020；International Energy Agency 2025）。</p>
+<p>最强边界不是一句谨慎声明，而是单机稳定不保证多厂商并联稳定，控制参数、限流和保护在大扰动下会改变理论行为。International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).从系统侧追问电子电源能否在低惯量系统中稳定建立电压频率，使这一条件具有令收益翻转的实质力量，而非可以移到脚注的例外。当平均值被拆开，分列常态极端与反号；成网型逆变器还须公开未完成与退出事件（National Renewable Energy Laboratory 2020）。</p>
+<p>到International Energy Agency, Building the Future Transmission Grid (2025).时，多国并网规范和实机示范开始要求成网能力。这使成网型逆变器进入采购、监管或规划后必须保存版本、运维与退出记录；否则前端的路线图把同步机退役后的黑启动、弱网稳定和快速控制问题转为成网型逆变器研究议程无法和末端结果对账。沿责任链继续追问，保存许可维护与责任版本；成网型逆变器据此与邻域同尺度对撞（International Energy Agency 2023）。</p>
+<p>外部接口由单机稳定不保证多厂商并联稳定，控制参数、限流和保护在大扰动下会改变理论行为划定；加入路线图把同步机退役后的黑启动、弱网稳定和快速控制问题转为成网型逆变器研究议程后，逆变器以内部电压源形成并支撑电网才可跨域比较。以同一服务单位复算，统一单位时间窗和边界；成网型逆变器须分开验收常态与压力场景（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>D——逆变器以内部电压源形成并支撑电网足够驱动　<i>单因</i>只认逆变器以内部电压源形成并支撑电网　<i>预设</i>〔16 稀有与常见服从同一机制〕默认电子电源能否在低惯量系统中稳定建立电压频率　<i>量纲</i>逆变器以内部电压源形成并支撑电网兑现数／全部候选与中止数　<i>失效</i>当单机稳定不保证多厂商并联稳定时，逆变器以内部电压源形成并支撑电网越高，净收益反而越低　<i>自曝</i>责任链独立核验：规模化以后首先出现的并非同方向增益，而是：成网型逆变器主证据；独立撤回检查落在责任链　<i>空栏</i>未列单机稳定不保证多厂商并联稳定引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>四、FERC 2222分布式资源入市<span class="en">FERC Order 2222</span></h2>
+<div class="src"><i>提出</i>Federal Energy Regulatory Commission, Order No. 2222 (2020)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>允许小型分布式资源聚合参加批发市场</div>
+<p>领域曾把FERC 2222分布式资源入市当作一项可独立扩大的部件，Federal Energy Regulatory Commission, Order No. 2222 (2020)却从命令移除分布式资源聚合的市场壁垒，使储能、负荷、电动车和小型发电能组合提供容量与服务切入。由此可见，真正卡住旧框架的是开放聚合入市能否同时尊重配网安全和州级权限，而不是同类项目还不够多。对照未采用者时，补列未采用和失败样本；分布式资源入据此拆开相关变化与机制效应（Federal Energy Regulatory Commission 2020）。</p>
+<p>本条只承认允许小型分布式资源聚合参加批发市场是充分改变方向的那一样。命令移除分布式资源聚合的市场壁垒，使储能、负荷、电动车和小型发电能组合提供容量与服务说明该机制怎样进入结果；若把它拿掉仍能复制趋势，FERC 2222分布式资源入市就只是同期变化的标签，不是因果解释。在跨场址复现之前，固定服务基线再做消融；分布式资源入记录同时划定外推边界（International Energy Agency 2023）。</p>
+<p>证据锚点由Federal Energy Regulatory Commission, Order No. 2222 (2020)承担：命令移除分布式资源聚合的市场壁垒，使储能、负荷、电动车和小型发电能组合提供容量与服务。核算时分子是实际兑现的允许小型分布式资源聚合参加批发市场，分母是全部名义运行与适用对象；停运、退出和未接入者不能从统计里蒸发。当平均值被拆开，公开分子分母与退出；分布式资源入补阴性账胜过追加佳例；复算值固定为实际兑现数／全部候选与中止数（Federal Energy Regulatory Commission 2020；International Energy Agency 2025）。</p>
+<p>批发指令与配网约束可能冲突，遥测成本和双重补偿规则会排除小用户或制造套利构成FERC 2222分布式资源入市的反号条件。International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).把开放聚合入市能否同时尊重配网安全和州级权限保留为开放争议，意味着平均改善越大，未入账的转移成本反而可能越难被看见。沿责任链继续追问，分列常态极端与反号；分布式资源入还须公开未完成与退出事件（Federal Energy Regulatory Commission 2020）。</p>
+<p>International Energy Agency, Building the Future Transmission Grid (2025).记录的当下状态是各区域市场正在实施最小规模、遥测和协调规则。全程责任因此延伸到许可、供应、维护和退役，不再止于Federal Energy Regulatory Commission, Order No. 2222 (2020)展示的首个成功场景。以同一服务单位复算，还须把许可、维护、责任主体和退出条件按版本保存；分布式资源入据此与邻域同尺度对撞。面对分布外情形，保存许可维护与责任版本；分布式资源入醒目纪录仍须排除筛选效应（International Energy Agency 2023）。</p>
+<p>与相邻领域对撞时，本条不搬运FERC 2222分布式资源入市这个名称，只搬运命令移除分布式资源聚合的市场壁垒，使储能、负荷、电动车和小型发电能组合提供容量与服务所对应的比率。若对手在批发指令与配网约束可能冲突，遥测成本和双重补偿规则会排除小用户或制造套利下仍声称同方向，两边便共同暴露了未被计量的第三变量（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>E——FERC 2222分布式资源入市主机制足够驱动　<i>单因</i>只认FERC 2222分布式资源入市主机制　<i>预设</i>〔16 稀有与常见服从同一机制〕默认开放聚合入市能否同时尊重配网安全和州级权限　<i>量纲</i>FERC 2222分布式资源入市主机制兑现数／全部候选与中止数　<i>失效</i>当批发指令与配网约束可能冲突时，FERC 2222分布式资源入市主机制越高，净收益反而越低　<i>自曝</i>排除规则独立核验：供应链清单把演示阶段漏掉的依赖列为：命令移除分布式资源聚合的市场壁垒；独立撤回检查落在排除规则　<i>空栏</i>未列批发指令与配网约束可能冲突引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>五、综合能源系统协同<span class="en">Integrated Energy Systems</span></h2>
+<div class="src"><i>提出</i>International Energy Agency, Energy System Integration topic reports (2020–2024)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>用电气化和储能连接原本分开的终端</div>
+<p>International Energy Agency, Energy System Integration topic reports (2020–2024)把综合能源系统协同从愿景改写为可失败的工程对象。它针对的是跨部门耦合是增加灵活性还是扩散故障；综合规划可让热储能、智能充电和工业负荷吸收可再生波动，减少只靠电池和燃气调峰则说明旧体系为何无法再用一项峰值或一次投运交差。在跨场址复现之前，补列未采用和失败样本；综合能源系统据此拆开相关变化与机制效应（International Energy Agency 2024）。</p>
+<p>可反驳命题写得很窄：只有用电气化和储能连接原本分开的终端能使综合能源系统协同保持原方向。增加预算与样本不能替代这一步，反之若综合规划可让热储能、智能充电和工业负荷吸收可再生波动，减少只靠电池和燃气调峰由其他机制同样产生，本条必须撤回单因。当平均值被拆开，固定服务基线再做消融；综合能源系统记录同时划定外推边界（International Energy Agency 2023）。</p>
+<p>第三段的硬账来自International Energy Agency, Energy System Integration topic reports (2020–2024)所报告的综合规划可让热储能、智能充电和工业负荷吸收可再生波动，减少只靠电池和燃气调峰。应同时记录成功数／全部尝试数、实际周期／设计周期以及边界内外的差值，才能知道用电气化和储能连接原本分开的终端是否真的兑现。沿责任链继续追问，公开分子分母与退出；综合能源系统补阴性账胜过追加佳例（International Energy Agency 2024；International Energy Agency 2025）。</p>
+<p>International Energy Agency 2023把边界写成每次能量转换都有损耗且基础设施寿命不同，过度耦合会把电网故障传播到供热和交通；此时局部收益可能翻成系统损失。以同一服务单位复算，应分开常态与极端样本，并把反号结论收窄到实际适用区间；综合能源系统还须公开未完成与退出事件。面对分布外情形，分列常态极端与反号；综合能源系统据此区分设备存在与服务兑现（International Energy Agency 2024）。</p>
+<p>International Energy Agency, Building the Future Transmission Grid (2025).把近期进展概括为热泵、电动车、氢与区域供热进入统一规划。对综合能源系统协同的制度含义，是合同须规定数据归属、失效报告与长期责任，并按综合规划可让热储能、智能充电和工业负荷吸收可再生波动，减少只靠电池和燃气调峰复核撤场后的证据链。面对分布外情形，保存许可维护与责任版本；综合能源系统据此与邻域同尺度对撞（International Energy Agency 2023）。</p>
+<p>外部接口由每次能量转换都有损耗且基础设施寿命不同，过度耦合会把电网故障传播到供热和交通划定；加入综合规划可让热储能、智能充电和工业负荷吸收可再生波动，减少只靠电池和燃气调峰后，用电气化和储能连接原本分开的终端才可跨域比较。为防止事后改口，统一单位时间窗和边界；综合能源系统须连同不确定性报告结果（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>D——用电气化和储能连接原本分开的终端足够驱动　<i>单因</i>只认用电气化和储能连接原本分开的终端　<i>预设</i>〔21 制度采纳不改变指标含义〕默认跨部门耦合是增加灵活性还是扩散故障　<i>量纲</i>用电气化和储能连接原本分开的终端兑现数／全部候选与中止数　<i>失效</i>当每次能量转换都有损耗且基础设施寿命不同时，用电气化和储能连接原本分开的终端越高，净收益反而越低　<i>自曝</i>基线冻结独立核验：参与者退出分布对漂亮均值提出了内部质疑：综合能源系统协同主证据；独立撤回检查落在基线冻结　<i>空栏</i>未列每次能量转换都有损耗且基础设施寿命不同引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>六、动态线路额定<span class="en">Dynamic Line Rating</span></h2>
+<div class="src"><i>提出</i>US Department of Energy, Grid Enhancing Technologies reports (2022–2024)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>按导线温度风速而非保守静态值计算容量</div>
+<p>在US Department of Energy, Grid Enhancing Technologies reports (2022–2024)之前，动态线路额定多按设备或项目是否存在来计数。实时额定可在凉爽多风时释放既有线路额外输送能力，并与风电出力具有有利相关性迫使研究者改问实时气象提额能否在传感失败和预测误差下安全运行，也把未投运、未覆盖和无法维持的部分重新放回历史现场。当平均值被拆开，补列未采用和失败样本；动态线路额定据此拆开相关变化与机制效应（US Department of Energy 2024）。</p>
+<p>动态线路额定的主张不以“多因素”退场：只有按导线温度风速而非保守静态值计算容量决定这次转向。实时额定可在凉爽多风时释放既有线路额外输送能力，并与风电出力具有有利相关性是它可以被消融的抓手；若冻结其他条件后方向不变，单因解释即告失败。沿责任链继续追问，固定服务基线再做消融；动态线路额定记录同时划定外推边界（International Energy Agency 2023）。</p>
+<p>US Department of Energy, Grid Enhancing Technologies reports (2022–2024)提供了可复算起点——实时额定可在凉爽多风时释放既有线路额外输送能力，并与风电出力具有有利相关性。分子必须是经实际运行确认的结果，分母必须包含全部候选、周期与中止；二者的比才是按导线温度风速而非保守静态值计算容量的量纲。以同一服务单位复算，公开分子分母与退出；动态线路额定补阴性账胜过追加佳例；复算值固定为实际兑现数／全部候选与中止数（US Department of Energy 2024；International Energy Agency 2025）。</p>
+<p>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).没有替动态线路额定消除争议，而是把实时气象提额能否在传感失败和预测误差下安全运行固定为检验问题。极端无风热浪时容量反而下降，通信和传感故障必须回退到保守值，不能替代长期扩网出现时，性能越被优化，系统账面之外的损害越可能上升。面对分布外情形，分列常态极端与反号；动态线路额定还须公开未完成与退出事件（US Department of Energy 2024）。</p>
+<p>International Energy Agency 2025记录动态额定与潮流控制进入输电规划和激励政策；采购与监管须把实时额定可在凉爽多风时释放既有线路额外输送能力，并与风电出力具有有利相关性写进维护账。为防止事后改口，还须把许可、维护、责任主体和退出条件按版本保存；动态线路额定投运后仍保留责任主体。在下一轮独立复核里，保存许可维护与责任版本；动态线路额定由此留下可执行否证入口（International Energy Agency 2023）。</p>
+<p>外部接口由极端无风热浪时容量反而下降，通信和传感故障必须回退到保守值，不能替代长期扩网划线，而不是由学科名划线。另一个领域若只报告局部按导线温度风速而非保守静态值计算容量，便会与动态线路额定共享同一盲点；加入实时额定可在凉爽多风时释放既有线路额外输送能力，并与风电出力具有有利相关性后，两边才有可通约的对手（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>E——动态线路额定主机制足够驱动　<i>单因</i>只认动态线路额定主机制　<i>预设</i>〔21 制度采纳不改变指标含义〕默认实时气象提额能否在传感失败和预测误差下安全运行　<i>量纲</i>动态线路额定主机制兑现数／全部候选与中止数　<i>失效</i>当极端无风热浪时容量反而下降时，只适用于已观察对象，不能外推　<i>自曝</i>异常运行独立核验：极端事件记录直接推翻了常态假设：动态线路额定主证据；独立撤回检查落在异常运行　<i>空栏</i>未列极端无风热浪时容量反而下降引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>七、并网队列拥堵<span class="en">Interconnection Queues</span></h2>
+<div class="src"><i>提出</i>Lawrence Berkeley National Laboratory, Queued Up reports (2023–2025)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>把并网等待从项目问题提升为系统瓶颈</div>
+<p>Lawrence Berkeley National Laboratory 2025改写了排队项目总容量能否代表即将投运的清洁电源；美国排队数据揭示数太瓦发电与储能申请积压、等待时间延长和高退出率让旧默认有了可查裂缝。沿责任链继续追问，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；并网队列拥堵据此拆开相关变化与机制效应。以同一服务单位复算，补列未采用和失败样本；并网队列拥堵还须公开未完成与退出事件（Lawrence Berkeley National Laboratory 2025）。</p>
+<p>本条只承认把并网等待从项目问题提升为系统瓶颈；移除后若美国排队数据揭示数太瓦发电与储能申请积压、等待时间延长和高退出率仍出现，立场即撤回。以同一服务单位复算，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；并网队列拥堵记录同时划定外推边界。面对分布外情形，固定服务基线再做消融；并网队列拥堵据此与邻域同尺度对撞（International Energy Agency 2023）。</p>
+<p>Lawrence Berkeley National Laboratory 2025报告美国排队数据揭示数太瓦发电与储能申请积压、等待时间延长和高退出率；并网队列拥堵以兑现数／候选与中止总数结算。面对分布外情形，最低记录还须给出原始分子、总体分母、观察期与退出原因；并网队列拥堵补阴性账胜过追加佳例。为防止事后改口，公开分子分母与退出；并网队列拥堵须连同不确定性报告结果。在下一轮独立复核里，公开分子分母与退出；并网队列拥堵下一次更新可追到原始版本（Lawrence Berkeley National Laboratory 2025；International Energy Agency 2025）。</p>
+<p>International Energy Agency 2023保留队列包含重复和投机项目；并网队列拥堵越界后须重判方向。为防止事后改口，应分开常态与极端样本，并把反号结论收窄到实际适用区间；并网队列拥堵分母改变便重算结论。在下一轮独立复核里，应分开常态与极端样本，并把反号结论收窄到实际适用区间；并网队列拥堵据此区分证据与宣传。若要把这一判断写进合同，分列常态极端与反号；并网队列拥堵据此拆开相关变化与机制效应（Lawrence Berkeley National Laboratory 2025）。</p>
+<p>International Energy Agency 2025记录改革转向集群研究、准备度保证与主动输电规划；维护账须继续追踪美国排队数据揭示数太瓦发电与储能申请积压、等待时间延长和高退出率。在下一轮独立复核里，还须把许可、维护、责任主体和退出条件按版本保存；并网队列拥堵投运后仍保留责任主体。若要把这一判断写进合同，保存许可维护与责任版本；并网队列拥堵由此留下可执行否证入口（International Energy Agency 2023）。</p>
+<p>跨域比较以队列包含重复和投机项目划界，并用美国排队数据揭示数太瓦发电与储能申请积压、等待时间延长和高退出率重算把并网等待从项目问题提升为系统瓶颈。若要把这一判断写进合同，先统一功能单位与时间窗，再把边界条件作为共同反例；并网队列拥堵须连同不确定性报告结果。从失败样本回看，统一单位时间窗和边界；并网队列拥堵下一次更新可追到原始版本（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>S——并网队列拥堵主机制足够驱动　<i>单因</i>只认并网队列拥堵主机制　<i>预设</i>〔21 制度采纳不改变指标含义〕默认排队项目总容量能否代表即将投运的清洁电源　<i>量纲</i>并网队列拥堵主机制兑现数／全部候选与中止数　<i>失效</i>当队列包含重复和投机项目时，只适用于已观察对象，不能外推　<i>自曝</i>人工接管独立核验：维护账本显示峰值之外还有一项主导量：并网队列拥堵主证据；独立撤回检查落在人工接管　<i>空栏</i>未列队列包含重复和投机项目引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>八、八千万公里电网扩建<span class="en">Grids and Secure Energy Transitions</span></h2>
+<div class="src"><i>提出</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>到2040年新增或翻修超过八千万公里电网</div>
+<p>领域曾把八千万公里电网扩建当作一项可独立扩大的部件，International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)却从IEA估算全球需在二十年内建设和更新相当于现有全部网络的线路规模，令电网从配套变成转型主线切入。由此可见，真正卡住旧框架的是线路长度目标能否同时解决位置、设备和许可短缺，而不是同类项目还不够多。以同一服务单位复算，补列未采用和失败样本；八千万公里电据此拆开相关变化与机制效应（International Energy Agency 2023）。</p>
+<p>本条只承认到2040年新增或翻修超过八千万公里电网是充分改变方向的那一样。IEA估算全球需在二十年内建设和更新相当于现有全部网络的线路规模，令电网从配套变成转型主线说明该机制怎样进入结果；若把它拿掉仍能复制趋势，八千万公里电网扩建就只是同期变化的标签，不是因果解释。面对分布外情形，固定服务基线再做消融；八千万公里电记录同时划定外推边界（Federal Energy Regulatory Commission 2020）。</p>
+<p>证据锚点由International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)承担：IEA估算全球需在二十年内建设和更新相当于现有全部网络的线路规模，令电网从配套变成转型主线。核算时分子是实际兑现的到2040年新增或翻修超过八千万公里电网，分母是全部名义运行与适用对象；停运、退出和未接入者不能从统计里蒸发。为防止事后改口，公开分子分母与退出；八千万公里电把观察记录接回问责链（International Energy Agency 2023；International Energy Agency 2025）。</p>
+<p>公里数不表示输送能力与可靠性，低压更新、跨区输电和数字改造的作用不可直接相加构成八千万公里电网扩建的反号条件。Federal Energy Regulatory Commission, Order No. 2222 (2020).把线路长度目标能否同时解决位置、设备和许可短缺保留为开放争议，意味着平均改善越大，未入账的转移成本反而可能越难被看见。在下一轮独立复核里，分列常态极端与反号；八千万公里电分母改变便重算结论（International Energy Agency 2023）。</p>
+<p>International Energy Agency, Building the Future Transmission Grid (2025).记录的当下状态是各国加快长期情景规划和供应链投资。许可责任因此延伸到许可、供应、维护和退役，不再止于International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)展示的首个成功场景。若要把这一判断写进合同，还须把许可、维护、责任主体和退出条件按版本保存；八千万公里电投运后仍保留责任主体。从失败样本回看，保存许可维护与责任版本；八千万公里电由此留下可执行否证入口（Federal Energy Regulatory Commission 2020）。</p>
+<p>与相邻领域对撞时，本条不搬运八千万公里电网扩建这个名称，只搬运IEA估算全球需在二十年内建设和更新相当于现有全部网络的线路规模，令电网从配套变成转型主线所对应的比率。若对手在公里数不表示输送能力与可靠性，低压更新、跨区输电和数字改造的作用不可直接相加下仍声称同方向，两边便共同暴露了未被计量的第三变量（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>E——八千万公里电网扩建主机制足够驱动　<i>单因</i>只认八千万公里电网扩建主机制　<i>预设</i>〔28 记录存在即可核对〕默认线路长度目标能否同时解决位置、设备和许可短缺　<i>量纲</i>八千万公里电网扩建主机制兑现数／全部候选与中止数　<i>失效</i>当公里数不表示输送能力与可靠性时，只适用于已观察对象，不能外推　<i>自曝</i>撤回门槛独立核验：法规的监测条款等于承认此前证据缺了：八千万公里电网扩建主证据；独立撤回检查落在撤回门槛　<i>空栏</i>未列公里数不表示输送能力与可靠性引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>九、三千吉瓦并网等待<span class="en">Renewables Awaiting Connection</span></h2>
+<div class="src"><i>提出</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)　<i>争议</i>Federal Energy Regulatory Commission, Order No. 2222 (2020)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>用全球队列量级显示电网延迟</div>
+<p>International Energy Agency 2023改写了项目管线是否被电网瓶颈系统性截断；IEA汇总约三千吉瓦可再生能源项目等待并网让旧默认有了可查裂缝。面对分布外情形，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；三千吉瓦并网据此拆开相关变化与机制效应。为防止事后改口，补列未采用和失败样本；三千吉瓦并网分母改变便重算结论。在下一轮独立复核里，补列未采用和失败样本；三千吉瓦并网据此区分证据与宣传（International Energy Agency 2023）。</p>
+<p>本条只承认用全球队列量级显示电网延迟；移除后若IEA汇总约三千吉瓦可再生能源项目等待并网仍出现，立场即撤回。为防止事后改口，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；一旦结果反号就应撤回原来的充分性主张。在下一轮独立复核里，固定服务基线再做消融；三千吉瓦并网投运后仍保留责任主体（Federal Energy Regulatory Commission 2020）。</p>
+<p>International Energy Agency 2023报告IEA汇总约三千吉瓦可再生能源项目等待并网；三千吉瓦并网以兑现数／候选与中止总数结算。在下一轮独立复核里，最低记录还须给出原始分子、总体分母、观察期与退出原因；三千吉瓦并网把观察记录接回问责链。若要把这一判断写进合同，公开分子分母与退出；三千吉瓦并网须连同不确定性报告结果。从失败样本回看，公开分子分母与退出；三千吉瓦并网下一次更新可追到原始版本（International Energy Agency 2023；International Energy Agency 2025）。</p>
+<p>Federal Energy Regulatory Commission 2020保留各国统计口径不同且队列可能重叠；三千吉瓦并网越界后须重判方向。若要把这一判断写进合同，应分开常态与极端样本，并把反号结论收窄到实际适用区间；三千吉瓦并网分母改变便重算结论。从失败样本回看，分列常态极端与反号；三千吉瓦并网据此区分证据与宣传。把观察窗拉长以后，分列常态极端与反号；三千吉瓦并网据此拆开相关变化与机制效应（International Energy Agency 2023）。</p>
+<p>International Energy Agency 2025记录约一千五百吉瓦项目已处于较先进开发阶段；维护账须继续追踪IEA汇总约三千吉瓦可再生能源项目等待并网。从失败样本回看，还须把许可、维护、责任主体和退出条件按版本保存；三千吉瓦并网投运后仍保留责任主体。把观察窗拉长以后，保存许可维护与责任版本；三千吉瓦并网由此留下可执行否证入口。对照未采用者时，保存许可维护与责任版本；三千吉瓦并网记录同时划定外推边界（Federal Energy Regulatory Commission 2020）。</p>
+<p>跨域比较以各国统计口径不同且队列可能重叠划界，并用IEA汇总约三千吉瓦可再生能源项目等待并网重算用全球队列量级显示电网延迟。把观察窗拉长以后，先统一功能单位与时间窗，再把边界条件作为共同反例；三千吉瓦并网须连同不确定性报告结果。对照未采用者时，统一单位时间窗和边界；三千吉瓦并网下一次更新可追到原始版本（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>S——用全球队列量级显示电网延迟足够驱动　<i>单因</i>只认用全球队列量级显示电网延迟　<i>预设</i>〔28 记录存在即可核对〕默认项目管线是否被电网瓶颈系统性截断　<i>量纲</i>用全球队列量级显示电网延迟兑现数／全部候选与中止数　<i>失效</i>当各国统计口径不同且队列可能重叠时，只适用于已观察对象，不能外推　<i>自曝</i>跨域外推独立核验：跨区域结果的方向差异由本领域自己报告为：IEA汇总约三千吉瓦可再生能源项目等待并网；独立撤回检查落在跨域外推　<i>空栏</i>未列各国统计口径不同且队列可能重叠引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>十、输电设备供应链<span class="en">Transmission Supply Chains</span></h2>
+<div class="src"><i>提出</i>International Energy Agency, Building the Future Transmission Grid (2025)　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Electricity 2025: Analysis and forecast to 2027 (2025).。　<i>关键</i>把设备交货周期纳入输电路线</div>
+<p>在International Energy Agency, Building the Future Transmission Grid (2025)之前，输电设备供应链多按设备或项目是否存在来计数。IEA梳理变压器、电缆、导线和电工钢需求，指出扩网速度受制造和采购而非只受资本约束迫使研究者改问规划批准后能否及时获得变压器电缆导线和熟练工，也把未投运、未覆盖和无法维持的部分重新放回历史现场。为防止事后改口，补列未采用和失败样本；输电设备供应记录须回到全量分母（International Energy Agency 2025）。</p>
+<p>输电设备供应链的主张不以“多因素”退场：只有把设备交货周期纳入输电路线决定这次转向。IEA梳理变压器、电缆、导线和电工钢需求，指出扩网速度受制造和采购而非只受资本约束是它可以被消融的抓手；若冻结其他条件后方向不变，单因解释即告失败。在下一轮独立复核里，固定服务基线再做消融；一旦结果反号就应撤回原来的充分性主张（International Energy Agency 2023）。</p>
+<p>International Energy Agency 2025的硬证据是IEA梳理变压器、电缆、导线和电工钢需求，指出扩网速度受制造和采购而非只受资本约束；实际兑现数／全部候选与中止数才可复算。若要把这一判断写进合同，最低记录还须给出原始分子、总体分母、观察期与退出原因；输电设备供应把观察记录接回问责链。从失败样本回看，公开分子分母与退出；输电设备供应须连同不确定性报告结果（International Energy Agency 2025；International Energy Agency 2025）。</p>
+<p>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).没有替输电设备供应链消除争议，而是把规划批准后能否及时获得变压器电缆导线和熟练工固定为检验问题。扩大工厂需要稳定订单，短期抢购和规格碎片化会提高成本并形成新闲置产能出现时，性能越被优化，系统账面之外的损害越可能上升。从失败样本回看，分列常态极端与反号；输电设备供应分母改变便重算结论（International Energy Agency 2025）。</p>
+<p>International Energy Agency 2025记录制造提前期与原材料约束进入国家电网计划；采购与监管须把IEA梳理变压器、电缆、导线和电工钢需求，指出扩网速度受制造和采购而非只受资本约束写进维护账。把观察窗拉长以后，还须把许可、维护、责任主体和退出条件按版本保存；输电设备供应投运后仍保留责任主体。对照未采用者时，保存许可维护与责任版本；输电设备供应由此留下可执行否证入口（International Energy Agency 2023）。</p>
+<p>外部接口由扩大工厂需要稳定订单，短期抢购和规格碎片化会提高成本并形成新闲置产能划线，而不是由学科名划线。另一个领域若只报告局部把设备交货周期纳入输电路线，便会与输电设备供应链共享同一盲点；加入IEA梳理变压器、电缆、导线和电工钢需求，指出扩网速度受制造和采购而非只受资本约束后，两边才有可通约的对手（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>D——把设备交货周期纳入输电路线足够驱动　<i>单因</i>只认把设备交货周期纳入输电路线　<i>预设</i>〔28 记录存在即可核对〕默认规划批准后能否及时获得变压器电缆导线和熟练工　<i>量纲</i>把设备交货周期纳入输电路线兑现数／全部候选与中止数　<i>失效</i>当扩大工厂需要稳定订单时，只适用于已观察对象，不能外推　<i>自曝</i>盲法复核独立核验：寿命试验让短期纪录失去充分性，原因是：IEA梳理变压器、电缆、导线和电工钢需求；独立撤回检查落在盲法复核　<i>空栏</i>未列扩大工厂需要稳定订单引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>十一、电网灵活性翻倍<span class="en">Power System Flexibility</span></h2>
+<div class="src"><i>提出</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)　<i>争议</i>Federal Energy Regulatory Commission, Order No. 2222 (2020)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>到2030年系统灵活性需求约为2022年两倍</div>
+<p>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)出现以前，讨论常把瓶颈压成投入不足；但灵活性总量能否区分秒级稳定、小时调峰与季节充足性。IEA把电源、网络、储能和需求响应放进共同灵活性框架，显示高比例风光需要多时间尺度资源把原先藏在背景里的对象、基线和失败时段推到台前，旧说法因而第一次有了可查的裂缝。在下一轮独立复核里，补列未采用和失败样本；电网灵活性翻记录须回到全量分母（International Energy Agency 2023）。</p>
+<p>电网灵活性翻倍把立场锁在一个动作上：决定方向的只有到2030年系统灵活性需求约为2022年两倍。IEA把电源、网络、储能和需求响应放进共同灵活性框架，显示高比例风光需要多时间尺度资源若可在移除这一动作后照旧出现，International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)所代表的转折便不成立；规模、补贴或设备更新不能替它作因。若要把这一判断写进合同，固定服务基线再做消融；一旦结果反号就应撤回原来的充分性主张（Federal Energy Regulatory Commission 2020）。</p>
+<p>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)给出的关键证据是IEA把电源、网络、储能和需求响应放进共同灵活性框架，显示高比例风光需要多时间尺度资源。这笔读数须和全部适用对象、运行周期及未完成事件同列；只摘到2030年系统灵活性需求约为2022年两倍的最好值，会把样本选择误写成性能跃升。从失败样本回看，公开分子分母与退出；电网灵活性翻把观察记录接回问责链（International Energy Agency 2023；International Energy Agency 2025）。</p>
+<p>最强边界不是一句谨慎声明，而是把不同服务折成单一吉瓦会重复计算，同一电池不能在极端时刻同时提供全部服务。Federal Energy Regulatory Commission, Order No. 2222 (2020).从系统侧追问灵活性总量能否区分秒级稳定、小时调峰与季节充足性，使这一条件具有令收益翻转的实质力量，而非可以移到脚注的例外。把观察窗拉长以后，分列常态极端与反号；电网灵活性翻分母改变便重算结论（International Energy Agency 2023）。</p>
+<p>到International Energy Agency, Building the Future Transmission Grid (2025).时，市场设计开始按响应速度、持续时间和位置采购服务。这使电网灵活性翻倍进入采购、监管或规划后必须保存版本、运维与退出记录；否则前端的IEA把电源、网络、储能和需求响应放进共同灵活性框架，显示高比例风光需要多时间尺度资源无法和末端结果对账。对照未采用者时，保存许可维护与责任版本；电网灵活性翻投运后仍保留责任主体（Federal Energy Regulatory Commission 2020）。</p>
+<p>外部接口由把不同服务折成单一吉瓦会重复计算，同一电池不能在极端时刻同时提供全部服务划定；加入IEA把电源、网络、储能和需求响应放进共同灵活性框架，显示高比例风光需要多时间尺度资源后，到2030年系统灵活性需求约为2022年两倍才可跨域比较。在跨场址复现之前，统一单位时间窗和边界；电网灵活性翻须连同不确定性报告结果（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>S——电网灵活性翻倍主机制足够驱动　<i>单因</i>只认电网灵活性翻倍主机制　<i>预设</i>〔19 类别互斥且穷尽〕默认灵活性总量能否区分秒级稳定、小时调峰与季节充足性　<i>量纲</i>电网灵活性翻倍主机制兑现数／全部候选与中止数　<i>失效</i>当把不同服务折成单一吉瓦会重复计算时，只适用于已观察对象，不能外推　<i>自曝</i>结果分母独立核验：反事实核算把原先归功于技术的部分改写成：电网灵活性翻倍主证据；独立撤回检查落在结果分母　<i>空栏</i>未列把不同服务折成单一吉瓦会重复计算引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>十二、智能电网闭环验收<span class="en">Closed-Loop Grid Acceptance</span></h2>
+<div class="src"><i>提出</i>IEA grid reports; IEEE 1547-2018; FERC Order 2222　<i>争议</i>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)。　<i>最新</i>（2025年文献）International Energy Agency, Building the Future Transmission Grid (2025)。　<i>关键</i>以物理服务结果替代联网设备数量</div>
+<p>IEA grid reports; IEEE 1547-2018; FERC Order 2222 2018以前，旧框架没有回答数据平台能否用可追踪动作证明停电风险和弃电真实下降；闭环验收要求每个预测、指令、设备响应和网络结果在同一时间线上对账，并保留未响应与人工干预把问题改成可核验对象。若要把这一判断写进合同，补列未采用和失败样本；智能电网闭环记录须回到全量分母。从失败样本回看，补列未采用和失败样本；智能电网闭环分母改变便重算结论（IEA grid reports; IEEE 1547-2018; FERC Order 2222 2018）。</p>
+<p>智能电网闭环验收只认以物理服务结果替代联网设备数量为决定因素；若移除它仍有闭环验收要求每个预测、指令、设备响应和网络结果在同一时间线上对账，并保留未响应与人工干预，单因即被证伪。从失败样本回看，固定服务基线再做消融；一旦结果反号就应撤回原来的充分性主张。把观察窗拉长以后，固定服务基线再做消融；智能电网闭环投运后仍保留责任主体（International Energy Agency 2023）。</p>
+<p>证据锚点由IEA grid reports; IEEE 1547-2018; FERC Order 2222承担：闭环验收要求每个预测、指令、设备响应和网络结果在同一时间线上对账，并保留未响应与人工干预。核算时分子是实际兑现的以物理服务结果替代联网设备数量，分母是全部名义运行与适用对象；停运、退出和未接入者不能从统计里蒸发。把观察窗拉长以后，公开分子分母与退出；智能电网闭环把观察记录接回问责链；复算值固定为实际兑现数／全部候选与中止数（IEA grid reports; IEEE 1547-2018; FERC Order 2222 2018；International Energy Agency 2025）。</p>
+<p>International Energy Agency 2023把边界写成反事实电网状态无法直接观察，模型若由平台自证会高估贡献，需用事件和独立潮流复算；此时局部收益可能翻成系统损失。对照未采用者时，应分开常态与极端样本，并把反号结论收窄到实际适用区间；智能电网闭环分母改变便重算结论。在跨场址复现之前，分列常态极端与反号；智能电网闭环据此区分证据与宣传（IEA grid reports; IEEE 1547-2018; FERC Order 2222 2018）。</p>
+<p>International Energy Agency, Building the Future Transmission Grid (2025).记录的当下状态是运营指标转向位置化灵活性、恢复时间和约束解除。工程责任因此延伸到许可、供应、维护和退役，不再止于IEA grid reports; IEEE 1547-2018; FERC Order 2222展示的首个成功场景。在跨场址复现之前，还须把许可、维护、责任主体和退出条件按版本保存；智能电网闭环投运后仍保留责任主体。当平均值被拆开，保存许可维护与责任版本；智能电网闭环由此留下可执行否证入口（International Energy Agency 2023）。</p>
+<p>与相邻领域对撞时，本条不搬运智能电网闭环验收这个名称，只搬运闭环验收要求每个预测、指令、设备响应和网络结果在同一时间线上对账，并保留未响应与人工干预所对应的比率。若对手在反事实电网状态无法直接观察，模型若由平台自证会高估贡献，需用事件和独立潮流复算下仍声称同方向，两边便共同暴露了未被计量的第三变量（International Energy Agency 2025）。</p>
+<div class="col"><i>位置</i>D——以物理服务结果替代联网设备数量足够驱动　<i>单因</i>只认以物理服务结果替代联网设备数量　<i>预设</i>〔30 未被计价的东西不影响结算〕默认数据平台能否用可追踪动作证明停电风险和弃电真实下降　<i>量纲</i>以物理服务结果替代联网设备数量兑现数／全部候选与中止数　<i>失效</i>当反事实电网状态无法直接观察时，只适用于已观察对象，不能外推　<i>自曝</i>未覆盖项独立核验：最新综述保留了一笔无法并入平均值的余数：智能电网闭环验收主证据；独立撤回检查落在未覆盖项　<i>空栏</i>未列反事实电网状态无法直接观察引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h3 class="sec">◎ 二十年连起来看</h3>
+<p>&lt;b&gt;智能电网与综合能源系统最清楚的第一条线，是从“有没有部件”改到“是否兑现服务”。&lt;/b&gt;同步相量测量以北美同步相量计划推动PMU大规模部署，使秒以下跨区域动态首次可同时观察打开旧账，虚拟电厂又把VPP把分散储能、负荷和发电按市场产品聚合，可减少峰值投资并提高现有资产利用送进第二幕，二十年间真正变化的是分母。</p>
+<p>&lt;b&gt;第二条线把规模从答案降为待解释现象。&lt;/b&gt;高级计量基础设施与动态线路额定都显示，双向计量让配网与用户负荷可见只有越过极端无风热浪时容量反而下降，通信和传感故障必须回退到保守值，不能替代长期扩网才可外推；2024至2026年的新纪录因此仍须接受全链核算。</p>
+<p>&lt;b&gt;第三条线是责任开始跟着对象走完生命周期。&lt;/b&gt;车网互动留下早期模型量化车辆长时间停放和高功率接口的市场价值，使交通电气化成为电网资源，智能电网闭环验收则把反事实电网状态无法直接观察，模型若由平台自证会高估贡献，需用事件和独立潮流复算变成验收条件；这正是“智能电网成立的决定性机制是把可观测状态转成受网络与安全约束的实时协调动作，而不是传感器、平台账号或分布式资源名义容量增加”的历史含义。</p>
+<h3 class="sec">◎ 三个常见误解</h3>
+<p>误解一是把智能电网法定框架的峰值当成智能电网与综合能源系统整体成效。它之所以诱人，是法律明确智能电网特征并要求协调标准、试点和成本回收，使电力数字化从零散项目转为制度议程容易做成单一数字；正确表述必须同时纳入宽泛定义可让任何升级自称智能，若停电、损耗和灵活性未改善，投资额不等于系统成效。</p>
+<p>误解二是把成网型逆变器的名义容量直接当作实际交付。路线图把同步机退役后的黑启动、弱网稳定和快速控制问题转为成网型逆变器研究议程确实说明路线可运行，却不能回答单机稳定不保证多厂商并联稳定，控制参数、限流和保护在大扰动下会改变理论行为；分子与分母必须分别公开。</p>
+<p>误解三是认为规模会自动消除偏差。输电设备供应链恰好相反：IEA梳理变压器、电缆、导线和电工钢需求，指出扩网速度受制造和采购而非只受资本约束若在扩大工厂需要稳定订单，短期抢购和规格碎片化会提高成本并形成新闲置产能下扩张，原先的小误差会变成系统性转移。</p>
+<h3 class="sec">◎ 与相邻领域的接口</h3>
+<p>与第 208 号《应急管理》的分工在对象：本块的OpenADR自动需求响应核算用开放信号自动触发价格或事件响应，对方“AI快速制图把静态灾情图改写为版本化决策底图”核算网络中的传播；共同判据是退出者是否进入分母。</p>
+<p>与第 267 号《公共管理与政府治理》相接时，IEEE 1547并网规则更新负责新版标准让DER在扰动时不再立即脱网，并规定无功、频率响应和通信能力，承认高渗透配网需要主动设备，对方“数字公共基础设施：共享数字底座重组政府能力”追问制度与空间后果；两者不能用同一平均值互相代替。</p>
+<p>第 347 号《生物地球化学循环》提供远端接口“土壤激发效应让新增碳反而释放旧碳”。本块以八千万公里电网扩建检验到2040年新增或翻修超过八千万公里电网，它则检查同一动作是否把成本推到另一群体或另一时段。</p>
+<h3 class="sec">◎ 争议现场</h3>
+<p>争议一围绕FERC 745需求响应补偿：支持方凭命令要求满足净收益条件的需求响应获得节点边际电价，承认不消费也能提供系统价值主张已可扩大，反方以基线不可直接观测，策略性抬高预期用电会制造假减负；极端事件中的持续性也可能低于承诺拒绝外推。要收敛，须在两个独立场址预注册同一分母并公开中止记录。</p>
+<p>争议二落在FERC 2222分布式资源入市的长期性。只有把设计周期延长到维护和退役，并在批发指令与配网约束可能冲突，遥测成本和双重补偿规则会排除小用户或制造套利出现时仍报告结果，允许小型分布式资源聚合参加批发市场才不再只是窗口内优势。</p>
+<p>争议三是电网灵活性翻倍能否跨地区复制。裁决不靠支持者数量，而靠2026年前后同一量纲的外部复算：IEA把电源、网络、储能和需求响应放进共同灵活性框架，显示高比例风光需要多时间尺度资源若换区即反号，结论就应收窄。</p>
+<h3 class="sec">◎ 往下五年看什么</h3>
+<p>第一项可观测量是分布式能源资源管理系统的实际交付数／全部公告项目数；它直接检验未来五年要看并网队列能否转成输电建设，成网型资源能否按系统服务验收，灵活负荷是否在极端天气仍可用，以及电热氢协同是否公开全链转换损耗，不能以签约额替代。</p>
+<p>第二项是并网队列拥堵在极端条件后的服务保持率／常态服务率。若队列包含重复和投机项目，不能把全部容量当作供给预测；改革若只加保证金也会排除小开发者持续出现，路线排序应在下一版面板中翻转。</p>
+<p>第三项是智能电网闭环验收公开的失败、中止与维护事件数／全部运行事件数。这个比例若始终不可得，智能电网与综合能源系统仍未完成从宣传到工程的转向。</p>
+<h3 class="sec">◎ 可与哪些领域对撞</h3>
+<p>同步相量测量可与第 419 号“氢能从颜色标签转向全链排放”对撞：两者都默认局部改善可代表系统，但前者以以统一时钟测量跨区电压电流相角增益，后者警告成本沿网络回写；若两边皆真，空间位置就是第三变量。</p>
+<p>综合能源系统协同与第 267 号“数字公共基础设施：共享数字底座重组政府能力”共享“记录存在即可核对”的预设。这里的每次能量转换都有损耗且基础设施寿命不同，过度耦合会把电网故障传播到供热和交通与对方的数据盲区方向相反，推出的检验是把未记录对象单独设分母。</p>
+<p>三千吉瓦并网等待再与第 347 号“土壤激发效应让新增碳反而释放旧碳”相撞：前者追求用全球队列量级显示电网延迟，后者追踪被转移的风险。若二者同时成立，制度必须为各国统计口径不同且队列可能重叠，容量数字必须与完工概率、网络位置和时间结合建立独立责任账户。</p>
+<h3 class="sec">◎ 十条可做的研究命题</h3>
+<p>命题一：同步相量测量的净收益只来自以统一时钟测量跨区电压电流相角；在同预算消融中移除该机制，若方向不变即证伪。</p>
+<p>命题二：OpenADR自动需求响应的失败分母大于公开分母；逐项恢复设备收到信号不等于负荷减少，舒适、占用和本地控制会改变响应方向，必须测量反事实基线相关记录，若两者相等即证伪。</p>
+<p>命题三：FERC 745需求响应补偿的跨区差异由让可验证减负荷与发电同场竞价解释；冻结其他条件比较两地，若残差仍系统偏移即证伪。</p>
+<p>命题四：车网互动的短期读数不能预测寿命结果；延长到退役并盲判，若预测误差不增加即证伪。</p>
+<p>命题五：虚拟电厂在极端条件下排序会反转；按设备异构、客户退出和通信依赖会让可靠容量小于名义总和，聚合商基线也需独立审计施压，若仍保持同一优势即证伪。</p>
+<p>命题六：成网型逆变器的公告量系统高于交付量；以全部项目建队列，若投运率不低于既定基线即证伪。</p>
+<p>命题七：综合能源系统协同存在未计价转移成本；把每次能量转换都有损耗且基础设施寿命不同，过度耦合会把电网故障传播到供热和交通货币化，若净效益不变即证伪。</p>
+<p>命题八：并网队列拥堵的维护事件决定长期性能；比较相同设备不同维护，若寿命差与事件率无关即证伪。</p>
+<p>命题九：三千吉瓦并网等待的公平差异来自分母排除；补入未覆盖者后，若组间差不扩大即证伪。</p>
+<p>命题十：智能电网闭环验收能以统一量纲重排全块路线；用以物理服务结果替代联网设备数量复算二十条，若排序完全不变即证伪。</p>
+<h3 class="sec">◎ 资料核验</h3>
+<div class="refs"><ol>
+<li>Phadke, Thorp &amp; Adamiak, IEEE Transactions on Power Delivery 1, 233–238 (1986); NASPI launched 2007</li>
+<li>US Congress, Energy Independence and Security Act Title XIII (2007)</li>
+<li>Lawrence Berkeley National Laboratory, OpenADR 1.0 specification (2009)</li>
+<li>US Department of Energy, Smart Grid Investment Grant AMI projects (2009–2016)</li>
+<li>Federal Energy Regulatory Commission, Order No. 745 (2011)</li>
+<li>Lasseter et al., CERTS Microgrid Laboratory Test Bed, IEEE Transactions on Power Delivery 26, 325–332 (2011)</li>
+<li>Kempton &amp; Tomić, Journal of Power Sources 144, 268–279 (2005), doi:10.1016/j.jpowsour.2004.12.025</li>
+<li>IEEE, Standard 1547-2018 (2018)</li>
+<li>US Department of Energy, Pathways to Commercial Liftoff: Virtual Power Plants (2023)</li>
+<li>Electric Power Research Institute, DERMS functional requirements and demonstrations (2017–2022)</li>
+<li>National Renewable Energy Laboratory, Research Roadmap on Grid-Forming Inverters (2020)</li>
+<li>Federal Energy Regulatory Commission, Order No. 2222 (2020)</li>
+<li>International Energy Agency, Energy System Integration topic reports (2020–2024)</li>
+<li>US Department of Energy, Grid Enhancing Technologies reports (2022–2024)</li>
+<li>Lawrence Berkeley National Laboratory, Queued Up reports (2023–2025)</li>
+<li>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)</li>
+<li>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)</li>
+<li>International Energy Agency, Building the Future Transmission Grid (2025)</li>
+<li>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023)</li>
+<li>IEA grid reports; IEEE 1547-2018; FERC Order 2222</li>
+<li>International Energy Agency, Electricity Grids and Secure Energy Transitions (2023).</li>
+<li>International Energy Agency, Building the Future Transmission Grid (2025).</li>
+<li>Federal Energy Regulatory Commission, Order No. 2222 (2020).</li>
+<li>International Energy Agency, Electricity 2025: Analysis and forecast to 2027 (2025).</li>
+</ol></div>
+<p class="end"><b>SDEUniverses.com · 新思想前沿</b>　｜　第 566 号　｜　王德生 亲撰</p>
+</main><script src="/wds-mode.js?v=20260819a" defer></script></body></html>

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>四道刻度：把一次失败放在分离线上量一量 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="这不是一份「如何从失败中学习」的通用建议——恰恰相反，本篇的四道刻度会把绝大多数失败排除出去。它交付的是：一张四刻度检查表（用尽／撞的是墙／认了／剩下的说不出来）与逐条的操作定义、一份失败复盘的三栏写法（区别于常规复盘）、事前可做的三项安排（不留退路、标出边界、不许中途改口）、四类误用（把懒惰的失败">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="四道刻度：把一次失败放在分离线上量一量 · 方法实践文">
+<meta property="og:description" content="这不是一份「如何从失败中学习」的通用建议——恰恰相反，本篇的四道刻度会把绝大多数失败排除出去。它交付的是：一张四刻度检查表（用尽／撞的是墙／认了／剩下的说不出来）与逐条的操作定义、一份失败复盘的三栏写法（区别于常规复盘）、事前可做的三项安排（不留退路、标出边界、不许中途改口）、四类误用（把懒惰的失败">
+<link rel="canonical" href="https://sdeuniverses.com/students/qin-li/line-of-separation/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/qin-li/line-of-separation/">← 回母文《失败所逼出的，不是痕迹，而是一条分离线》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《失败所逼出的，不是痕迹，而是一条分离线》</div>
+  <h1 class="art-title">四道刻度：把一次失败放在分离线上量一量</h1>
+  <div class="art-subtitle">母文的判断是「失败内部的差异才是真正的事件」。这一篇把那四个条件落成可执行的检查工序，用来在事后分辨哪一次撞出了东西、哪一次只是白费。</div>
+  <div class="art-meta">SDE 学员专栏 · 配套读物 · 2026年8月 · 约 4915 字</div>
+  <div class="swap">
+    <a href="/students/qin-li/line-of-separation/"><b>← 母文 · 失败所逼出的，不是痕迹，而是一条分离线</b><span>完整论证在这里</span></a>
+    <a href="/students/qin-li/line-of-separation/explain.html"><b>🌱 白话解释文 · 拓印拓不全，可纸上留下了凹凸</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　这不是一份「如何从失败中学习」的通用建议——恰恰相反，本篇的四道刻度会把绝大多数失败排除出去。它交付的是：一张四刻度检查表（用尽／撞的是墙／认了／剩下的说不出来）与逐条的操作定义、一份失败复盘的三栏写法（区别于常规复盘）、事前可做的三项安排（不留退路、标出边界、不许中途改口）、四类误用（把懒惰的失败镀金、追求失败、把凹凸说成心得、拿它给半途而废找理由），以及一张一页纸操作卡。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">这一篇要解决的问题，以及它明确不做的事</a></li><li><a href="#s2">四道刻度：检查表与操作定义</a></li><li><a href="#s3">怎么用这张表：一次读数，四种常见结果</a></li><li><a href="#s4">事前能做的三件事（不是为了成功，是为了不白撞）</a></li><li><a href="#s5">失败复盘的三栏写法（和常规复盘的区别）</a></li><li><a href="#s6">一个完整的例子</a></li><li><a href="#s7">用在带人和评审上</a></li><li><a href="#s8">误用一：拿它给懒惰的失败镀金</a></li><li><a href="#s9">误用二：追求失败</a></li><li><a href="#s10">误用三与误用四：把凹凸说成心得，和拿它替半途而废辩护</a></li><li><a href="#s11">跨出创作：这套刻度在别的地方怎么用</a></li><li><a href="#s12">六个常见问题的直接回答</a></li><li><a href="#s13">把它做成一个长期的本子</a></li><li><a href="#s14">一页纸操作卡</a></li><li><a href="#s15">最后一条纪律</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>这一篇要解决的问题，以及它明确不做的事</h2>
+<p>母文的判断是：改编（以及一切跨边界的尝试）中的失败不是一个整块的东西。有一类失败纯粹是损失；另一类失败会在人身上压出一个不带内容、只带形状的剩余物。分开这两类的那条线，才是真正值得研究的事件。</p>
+<p>从这个判断出发，最自然的实践问题是：<b>我怎么知道自己刚经历的这一次是哪一类？</b></p>
+<p><b>先说这一篇不做的事：</b></p>
+<ul class="pts"><li>它不是「如何从失败中学习」。那类方法要的是可复述的教训，而母文说的剩余物恰恰不可复述。</li><li>它不教你怎么增加失败的价值。四道刻度是<b>筛子</b>，不是<b>增效器</b>。</li><li>它尤其不鼓励失败。第一道刻度就要求你真的想做到——<b>想要失败的人，从定义上过不了第一关</b>。</li></ul>
+<p><b>它做的只有一件事：</b> 在事后，把一次失败放到四道刻度上量一量，得出一个诚实的读数。</p>
+<h2 id="s2"><span class="no">02</span>四道刻度：检查表与操作定义</h2>
+<p>四条必须<b>同时</b>成立。缺任何一条，读数就是「白费」，而这个读数没什么可羞耻的——绝大多数失败本来就落在这里。</p>
+<p><b>刻度一：用尽。</b></p>
+<ul class="pts"><li>操作定义：你在这件事上是否走到了「再也想不出别的办法」的位置？</li><li>反向信号：你能轻易说出三个当时没试但本来可以试的方向 → 没用尽。</li><li>注意：用尽不等于耗时长。有人拖了半年，其实一直在同一个方案里打转。<b>用尽的标志是方案数，不是时长。</b></li></ul>
+<p><b>刻度二：撞的是墙，不是自己。</b></p>
+<ul class="pts"><li>操作定义：拦住你的，是这件事本身的边界，还是你当时的熟练度／资源／准备？</li><li>检验方法：<b>假设换一个比你强得多的人来做同一件事，他能做到吗？</b> 能 → 那是你的短板（好事，练就是了，但不留形状）。他也做不到，而且做不到的原因是同一个 → 那是墙。</li></ul>
+<p><b>刻度三：认了。</b></p>
+<ul class="pts"><li>操作定义：在最后，你有没有把标准往回调、然后宣布成功？</li><li>反向信号：出现过「其实我本来想要的就是这个效果」这句话（哪怕只在心里说过）。</li><li>这一条最容易破，因为改口是本能的自我保护。<b>而形状恰恰是在承认没做到的那一刻压下去的。</b></li></ul>
+<p><b>刻度四：剩下的说不出来。</b></p>
+<ul class="pts"><li>操作定义：你从这次带出来的东西，能不能完整地讲给别人听？</li><li>能讲清楚的是<b>内容</b>（收获、教训、经验）——那是另一回事，也很好，但不是这里说的东西。</li><li>讲不清楚、却确实在，而且会在不相干的时刻自己冒出来的 → 那是形状。</li></ul>
+<h2 id="s3"><span class="no">03</span>怎么用这张表：一次读数，四种常见结果</h2>
+<p>量完之后，通常会落在四种情形里。每一种对应不同的处置。</p>
+<p><b>四条全中（很少见）。</b> 这一次撞出了东西。<b>处置：什么也不用做。</b> 不要试图把它总结成方法，不要写成心得，不要急着告诉别人。它会自己在往后的某个时刻起作用。你现在能做的最好的事，是<b>不去打扰它</b>。</p>
+<p><b>刻度一没过（最常见）。</b> 你没有真的用尽。<b>处置：这不是一次可以计入的失败，它是一次未完成的尝试。</b> 如果这件事还能做，回去把没试的那几条试完；如果不能，就把它记成「没做完」，而不是「做不到」。这两个词的差别，会影响你此后很多年对自己的判断。</p>
+<p><b>刻度二没过。</b> 拦住你的是你自己的短板。<b>处置：好消息——这是可以解决的。去练、去补、去找资源。</b> 别把它当成「命中注定做不到」，那是把一次能力问题误读成了边界问题，代价是你会提前放弃一个本来能做成的方向。</p>
+<p><b>刻度三没过。</b> 你在最后改口了。<b>处置：现在还来得及补。</b> 回去把那句实话说出来——对自己说就行：那件事我没做到。不需要公开，不需要道歉，只需要在心里把标准调回原来的位置。改口的代价不是面子，是那次撞击被取消了。</p>
+<h2 id="s4"><span class="no">04</span>事前能做的三件事（不是为了成功，是为了不白撞）</h2>
+<p>四道刻度是事后的量具。但有三件事必须在事前安排，否则事后一定量不出东西。</p>
+<p><b>第一，不给自己留退路。</b> 退路的具体形状是：一开始就想好「如果不行就改成 B 方案」。B 方案存在本身没问题，问题是它会让你在还没撞上墙的时候就转弯——而转弯之后，刻度一就永远过不了了。<b>可执行的做法：</b> 明确一个「不许换方案的期限」。在这个期限之内，只能在当前方向里找办法。期限到了再谈换不换。</p>
+<p><b>第二，事前写下你认为的边界在哪。</b> 一句话就够：「我预计做不到的是 ×××，因为 ×××。」<b>为什么要事前写：</b> 因为事后写的边界，十有八九是给失败找的理由。事前写的那句话，是刻度二唯一可靠的证据。</p>
+<p><b>第三，事前给自己一句禁语。</b> 就是那句「其实我本来想要的就是这个效果」。把它写下来，标明：这句话在这个项目里禁止使用。<b>这一条听起来幼稚，但它是四条里最有效的一条</b>，因为改口发生得又快又自然，几乎不经过意识。</p>
+<h2 id="s5"><span class="no">05</span>失败复盘的三栏写法（和常规复盘的区别）</h2>
+<p>常规复盘问的是「哪里做错了、下次怎么改」。那种复盘是必要的，但它只处理内容，处理不了形状——而且它有一个副作用：<b>它会把还没成形的东西提前翻译成教训。</b></p>
+<p>所以建议做两份，分开写。</p>
+<p><b>第一份是常规复盘。</b> 照常做，不必改。</p>
+<p><b>第二份是三栏，五分钟内写完：</b></p>
+<p><b>第一栏：我试过的所有方案，逐条列。</b> 只列事实，不评价。这一栏是刻度一的证据。列出来往往会让人尴尬——你以为试了很多，写下来只有三条。</p>
+<p><b>第二栏：拦住我的到底是什么。</b> 分两行写：「我当时以为是……」和「现在看可能是……」。不要求得出结论，两行都写就行。这一栏是刻度二的证据。</p>
+<p><b>第三栏：我有没有在最后说过那句话。</b> 只回答有或没有，以及那句话具体是怎么说的。这一栏是刻度三的证据。</p>
+<p><b>关于刻度四：不写。</b> 因为它需要时间，而且一写就容易被翻译成内容。<b>做法是标一个日期——半年后、一年后</b>，到期只问一句：有没有什么东西，我到现在还说不清、但它确实在？</p>
+<h2 id="s6"><span class="no">06</span>一个完整的例子</h2>
+<p><b>场景：</b> 你花了四个月，想把一件极难的事做成——比如把一份高度依赖现场感的手艺，做成一套能远程教的课程。最后没做成，课程上线了但效果不对，你自己知道核心的那样东西没搬过去。</p>
+<p><b>刻度一（用尽）。</b> 三栏第一栏列下来：改过七版结构，试过跟拍、试过第一视角、试过让学员先做再看、试过把课时拆到极碎。<b>七条，而且你想不出第八条。</b> 过。</p>
+<p><b>刻度二（撞的是墙）。</b> 事前写过一句：「我预计做不到的是那种手上的分寸感，因为它需要旁边有人随时纠正一毫米。」四个月后，拦住你的正是这一条。<b>换一个比你强的人来，他能不能做到？</b> 你的判断是：他能做得更好看，但同一堵墙还在那儿。过。</p>
+<p><b>刻度三（认了）。</b> 上线时你有没有说过「其实远程课本来就该是这样」？你说过一次，在发布会上。<b>这一条破了。</b> 处置：回去对自己把话说清楚——那样东西我没搬过去。不必公开更正。</p>
+<p><b>刻度四（说不出来）。</b> 标一个日期，一年后再看。</p>
+<p><b>读数：</b> 这一次三过一破，破的那条已经补上。它有可能撞出了东西，但要等一年后才知道。<b>而这个“不知道”是诚实的，比立刻给自己一个结论有用。</b></p>
+<h2 id="s7"><span class="no">07</span>用在带人和评审上</h2>
+<p>如果你带人或者做评审，这套刻度有一个很实际的用处：<b>区分两种「没做成」，然后给出完全不同的反馈。</b></p>
+<p><b>对刻度一没过的人（最常见）：</b> 不要说「你失败了」，说「你还没做完」。然后具体问：你还有哪几条没试？多数人被这样问一次，会自己回去把它做完。</p>
+<p><b>对刻度二没过的人：</b> 明确告诉他这是能力问题，不是命。<b>这句话很重要</b>，因为把短板误认成边界，会让人提前放弃一个本来能成的方向。</p>
+<p><b>对四条全中的人：</b> 什么也别说，尤其别夸。<b>夸奖会把那个还没成形的东西立刻变成一个可炫耀的故事，而故事是内容，不是形状。</b> 你能做的是给他时间，别催他总结。</p>
+<p><b>评审时的一个替换：</b> 把「你为什么没做成」换成「你试过哪几条路」。前者收获的是解释，后者收获的是刻度一的读数。</p>
+<h2 id="s8"><span class="no">08</span>误用一：拿它给懒惰的失败镀金</h2>
+<p>最常见、也最需要防的一种。这套讲法一旦传开，任何一次半途而废都可以被说成「我撞上了媒介的边界」。</p>
+<p><b>防法就是刻度一和刻度二，而且必须按顺序问：</b></p>
+<ul class="pts"><li>先问「你试过哪几条」——列不出五条以上的，直接判白费，不进入下一问。</li><li>再问「换个更强的人能不能做到」——这一问必须诚实，而诚实的标志是<b>答案让你不舒服</b>。</li></ul>
+<p><b>一条经验：</b> 真正撞过墙的人，说起那堵墙时是具体的（“就是那一毫米的分寸”）；给自己镀金的人，说起来是抽象的（“媒介本身的局限性”）。<b>具体的才可信。</b></p>
+<h2 id="s9"><span class="no">09</span>误用二：追求失败</h2>
+<p>第二种更隐蔽：读完之后，人开始有意识地去挑注定做不成的事，因为那样“能撞出东西”。</p>
+<p><b>这在结构上是自相矛盾的。</b> 刻度一要求你<b>真的想做到</b>。一个从一开始就打算失败的人，不可能用尽全力——他心里那条退路是内置的。</p>
+<p><b>这不是道德要求，是机制上的限制：</b> 那道凹凸只在真正的用力和真正的边界相遇时才形成。你可以选一件很难的事去做（那没问题，甚至值得鼓励），但你必须<b>真心想把它做成</b>。</p>
+<p><b>自查一句：</b> 如果这件事出乎意料地成了，你会高兴还是会有点失落？会失落，说明你要的不是这件事，是那个形状——而那个形状不会来。</p>
+<h2 id="s10"><span class="no">10</span>误用三与误用四：把凹凸说成心得，和拿它替半途而废辩护</h2>
+<p><b>误用三：急着把它说清楚。</b> 一次撞出东西的失败之后，人会很想给它一个说法——写一篇复盘、总结三条经验、发一段感悟。这些动作会把还没成形的东西提前压成内容，而内容是可以被复述的、被消耗的、被结清的。<b>处置：给它一年不被翻译的时间。</b> 一年之内不总结、不发表、不当成故事讲。</p>
+<p><b>误用四：拿它对别人辩护。</b> 「我这次虽然没做成，但按那套讲法，这属于有价值的失败。」——这句话一说出口，就同时破了刻度三（在为自己的没做到辩护）和刻度四（把它变成了可复述的东西）。</p>
+<p><b>处置：这四道刻度只对自己用，而且只在心里用。</b> 它不是一套可以拿出去说的话，它是一个私下的量具。<b>量完就收起来。</b></p>
+<h2 id="s11"><span class="no">11</span>跨出创作：这套刻度在别的地方怎么用</h2>
+<p>母文自己把这条分离线推到了几个跟改编毫无关系的领域。这一节把它们变成可操作的用法。</p>
+<p><b>学一门外语，或者做翻译。</b> 你在某个意思上卡住了，怎么说都差一点。</p>
+<ul class="pts"><li>刻度一：你试了几种说法？三种以下不算用尽。</li><li>刻度二：是你词汇量不够（短板），还是这门语言里确实没有那个位置（墙）？<b>检验：问一个母语者，他能不能说出来。</b></li><li>刻度三：最后有没有用一句「其实意思差不多」把它盖过去？</li><li><b>过了四关的那些卡点，值得单独记一个本子。</b> 不写理解，只记那句说不出来的话是什么。</li></ul>
+<p><b>搬到一个新地方生活。</b> 适应期里那些说不出的别扭。</p>
+<ul class="pts"><li>刻度二在这里特别有用：它区分「我还没学会本地的做法」（短板，会过去）和「这里没有我原来那种做法的位置」（墙，不会过去）。</li><li><b>实用价值：</b> 分清之后，第一类可以去学，第二类可以停止自责。很多人把第二类误当成第一类，然后责怪自己五年还没融入。</li></ul>
+<p><b>一次说不下去的重要谈话。</b></p>
+<ul class="pts"><li>刻度三在这里最要紧：那句「算了，也没什么」就是标准的改口。它会把整段谈话的效力抹掉。</li><li><b>可执行的替换：</b> 说不下去的时候，不要说「算了」，说「这件事我现在说不清楚，但它对我很重要」。这一句既承认了没做到，又没有把它取消。</li><li><b>然后允许沉默。</b> 那段沉默常常比任何说清楚的话留得更久。</li></ul>
+<p><b>一个长期项目的中止。</b></p>
+<ul class="pts"><li>四道刻度全走一遍，得出读数，然后按读数处置。<b>最要紧的是别把「没做完」记成「做不到」</b>——后者会关掉一整个方向，而且往往关错。</li></ul>
+<h2 id="s12"><span class="no">12</span>六个常见问题的直接回答</h2>
+<p><b>问：刻度一要求「列得出五条」，这个数字是硬的吗？</b>答：不是数字硬，是「想不出下一条」这件事硬。五条只是一个经验门槛——多数人以为自己试了很多，写下来只有两三条。真正的判准是：你现在还能不能想出一条没试过的路？能，就还没到。</p>
+<p><b>问：刻度二那个「换个更强的人」，我怎么知道他做不做得到？</b>答：不必真的知道，这是一个思想动作，用来把注意力从自己身上挪开。而且有一条很好用的辅助判据：<b>你说得出那堵墙的具体形状吗？</b> 说得出具体的（“就是那一毫米的分寸”），多半是墙；只说得出抽象的（“媒介的局限”），多半是在给自己找台阶。</p>
+<p><b>问：刻度三我确实改口了，是不是这次就彻底作废了？</b>答：不一定。改口发生得越晚、越浅，越容易补。<b>处置就是回去把实话对自己说一遍</b>——那件事我没做到。不需要公开，不需要更正任何已经说出去的话。要紧的是你心里那把尺子回到原位。</p>
+<p><b>问：为什么四条全中之后反而「什么也别做」？</b>答：因为刻度四要的是一个不带内容的东西。任何总结、复盘、分享，都是在把它翻译成内容。翻译一次，它就少一点。<b>能做的最好的事，确实是不去打扰它。</b></p>
+<p><b>问：这套东西会不会让人更容易放弃？</b>答：正相反，风险在另一边。四道刻度里有两道（用尽、认了）都在要求你<b>别提前撤</b>。真正的风险是有人拿它给半途而废镀金——所以刻度一必须先问，而且必须列出具体的方案清单。</p>
+<p><b>问：我能不能用这套去评价别人的作品？</b>答：不能。刻度一、二、三全都发生在创作者内部，你从外面看不见——你看见的只有成品，而母文说得很清楚，撞过墙的失败和没撞的失败，在成品上可能一模一样。<b>这套刻度只对自己用，而且只在心里用。</b></p>
+<h2 id="s13"><span class="no">13</span>把它做成一个长期的本子</h2>
+<p>最后给一个成本极低、但要靠时间才见效的做法：<b>开一个「撞过的墙」的本子。</b></p>
+<p><b>记什么：</b> 每一次四条全中（或者三过一破且已补）的经历，只记三样——</p>
+<ul class="pts"><li>那件事是什么（一句话）</li><li>那堵墙的<b>具体形状</b>（越具体越好，不许写抽象词）</li><li>日期，以及一个一年后的复核日期</li></ul>
+<p><b>不记什么：</b> 不记感受，不记教训，不记「我学到了」。这三样都是内容，一写进去就开始替换那个形状。</p>
+<p><b>为什么值得记：</b> 因为刻度四要靠时间才能量。当下你无法判断这一次有没有留下东西；一年后翻开这个本子，你会发现有些条目已经完全淡了，有些条目一看就把你拉回现场——<b>而后者，就是那些真的压出了形状的。</b></p>
+<p><b>一个附带的好处：</b> 这个本子写上两三年之后，你会看见自己反复撞的是同几堵墙。那几堵墙的位置，比任何职业规划都更准确地说明了你在做什么、以及你为什么做不成某些事——不是因为你不行，是因为你一直在往同一个方向顶。</p>
+<p><b>唯一的纪律：</b> 这个本子不给别人看。一旦它有了读者，它就会开始往好看的方向写，而好看的东西是内容。</p>
+<h2 id="s14"><span class="no">14</span>一页纸操作卡</h2>
+<p><b>事前三件事</b></p>
+<ul class="pts"><li>定一个「不许换方案的期限」</li><li>写一句「我预计做不到的是 ×××，因为 ×××」</li><li>立一句禁语：「其实我本来想要的就是这个效果」</li></ul>
+<p><b>事后四道刻度（须同时成立）</b>1. <b>用尽</b> —— 列得出五条以上试过的方案，且想不出下一条2. <b>撞的是墙</b> —— 换个更强的人来，同一堵墙还在3. <b>认了</b> —— 最后没有把标准调低然后宣布成功4. <b>说不出来</b> —— 剩下的东西无法完整复述（此条留到半年／一年后再量）</p>
+<p><b>三栏复盘（五分钟，与常规复盘分开写）</b></p>
+<ul class="pts"><li>试过的所有方案（只列事实）</li><li>拦住我的：我当时以为是…／现在看可能是…</li><li>我有没有说过那句禁语，原话是什么</li></ul>
+<p><b>四种读数的处置</b></p>
+<ul class="pts"><li>全中 → 什么也别做，别总结，等它自己起作用</li><li>一没过 → 记成「没做完」，不是「做不到」</li><li>二没过 → 好消息，去练</li><li>三没过 → 现在补一句实话，对自己说就行</li></ul>
+<p><b>四条红线</b></p>
+<ul class="pts"><li>别给懒惰的失败镀金／别追求失败／别急着把它说成心得／别拿它对外辩护</li></ul>
+<p><b>一句话总纲：</b> 这套刻度不是用来安慰失败的，是用来<b>在几万次白费里认出极少的那几次</b>——而认出来之后，唯一该做的事是不去打扰它。</p>
+<h2 id="s15"><span class="no">15</span>最后一条纪律</h2>
+<p>如果这一整篇你只带走一条，带走这一条：</p>
+<p><b>「没做到」和「没去做」，账面上一样，身上留下的东西天差地别。</b></p>
+<p>这套刻度的全部工作，就是把这两件事分开。分开之后，两个方向的错误都会少很多——你不会再因为一次真正的撞击而全盘否定自己那段用力，也不会再拿一次没撞就转弯的经历，给自己写一份漂亮的失败报告。</p>
+<p>而在这两者之间，还有一条更朴素的提醒：<b>去做那件你真的想做成的事，别留退路，做到想不出办法为止。</b> 剩下的交给时间——它自己会告诉你，那一次到底留下了什么。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/qin-li/line-of-separation/">《失败所逼出的，不是痕迹，而是一条分离线》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/qin-li/line-of-separation/explain.html">🌱 白话解释文《拓印拓不全，可纸上留下了凹凸》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/qin-li/line-of-separation/">回母文</a> ·
+  <a href="/students/qin-li/works/">秦莉 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

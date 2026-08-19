@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="sde-page-kind" content="channel">
+<title>中介频道 · 胡敏 · SDE Universes</title>
+<meta name="description" content="胡敏《中介》九篇：中介与抽成的分界、去中介化的次序、交易成本悖论。三道题，九门与经济学无关的成熟学问，每篇从三门互相说不里逼出一条三家共同持有而从未说出口的假定。">
+<style>
+:root{--gold:#4E9A94;--gold2:#6FB8B0;--ink:#E7EBF0;--muted:#7C8794;--bg:#0A0C0F;--panel:#111519;--line:rgba(126,143,166,.26);--jade:#B0724A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.9;
+background-image:radial-gradient(880px 500px at 12% -6%,rgba(169,188,208,.13),transparent 60%),radial-gradient(720px 460px at 90% 6%,rgba(176,114,74,.10),transparent 62%);background-attachment:fixed}
+a{color:inherit;text-decoration:none}
+.w{max-width:980px;margin:0 auto;padding:0 22px}
+nav{border-bottom:1px solid var(--line);padding:14px 0;font-size:14px}
+nav .w{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+nav .r a{color:var(--muted);margin-left:16px}
+nav .r a:hover{color:var(--gold2)}
+header.hero{padding:66px 0 34px;text-align:center}
+.en{font-size:11.5px;letter-spacing:.36em;color:var(--muted)}
+h1{font-size:clamp(34px,6vw,54px);color:var(--gold2);margin:14px 0 4px;font-weight:600;letter-spacing:.04em}
+.sub{margin:20px auto 0;max-width:760px;color:#CFC4A8;font-size:15.5px}
+.rule{width:60px;height:1px;background:var(--gold);margin:26px auto 0;opacity:.6}
+.stats{display:flex;justify-content:center;gap:34px;flex-wrap:wrap;margin:34px 0 6px}
+.stat{text-align:center}
+.stat b{display:block;font-size:30px;color:var(--gold2);font-weight:600}
+.stat span{font-size:11.5px;letter-spacing:.2em;color:var(--muted)}
+main{padding:24px 0 70px}
+.q{border:1px solid var(--line);background:linear-gradient(180deg,rgba(126,143,166,.07),transparent);border-radius:14px;padding:24px 26px;margin:30px 0 10px}
+.q h2{font-size:18px;color:var(--gold2);margin-bottom:8px}
+.q p{color:#CBC0A2;font-size:15px}
+.grp{margin:44px 0 8px;padding-bottom:9px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.grp .n{font-size:12px;letter-spacing:.22em;color:var(--muted)}
+.grp h2{font-size:23px;color:var(--gold2);font-weight:600}
+.grp .cnt{font-size:12px;color:var(--muted);margin-left:auto}
+.grpd{color:#C0B597;font-size:14.5px;margin:12px 0 22px}
+.card{display:block;border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:22px 24px 18px;margin-bottom:16px;transition:.2s}
+.card:hover{border-color:var(--gold2);transform:translateY(-2px);background:#161B21}
+.ct{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.tag{font-size:11px;letter-spacing:.18em;color:var(--muted)}
+.fin{font-size:11px;color:#0A0C0F;background:var(--gold2);border-radius:20px;padding:2px 10px;letter-spacing:.1em}
+.iq{font-size:11.5px;color:var(--gold);border:1px solid var(--line);border-radius:20px;padding:2px 10px;white-space:nowrap}
+.card h3{font-size:19.5px;line-height:1.55;margin-bottom:7px}
+.card .m{font-size:12.5px;color:var(--muted);margin-bottom:9px}
+.card p{color:#C6BB9C;font-size:14.5px}
+.card .cut{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line);font-size:13.5px;color:#B3A88B}
+.card .cut b{color:var(--gold2)}
+.note{border-left:3px solid var(--jade);background:rgba(176,114,74,.08);padding:16px 18px;border-radius:0 10px 10px 0;color:#BFB69C;font-size:13.5px;margin:34px 0 0}
+footer{border-top:1px solid var(--line);padding:28px 0 46px;text-align:center;color:var(--muted);font-size:13px}
+footer a{color:var(--gold)}
+</style>
+<link rel="stylesheet" href="/sde-read.css">
+</head>
+<body class="sde-read">
+<nav><div class="w">
+  <a href="/browse/" style="letter-spacing:.14em;color:var(--gold2)">SDE Universes</a>
+  <div class="r"><a href="/students/hu-min/cancer/">癌症</a><a href="/students/hu-min/chronic-disease/">慢性病</a><a href="/students/hu-min/tcm-philosophy/">中医哲思</a><a href="/students/hu-min/works/">胡敏 · 全部作品</a><a href="/students/">学员专栏</a></div>
+</div></nav>
+
+<header class="hero">
+  <div class="en">MEDIATION &middot; NINE CUTS</div>
+  <h1>中介</h1>
+  <p class="sub">九篇论文，三道题，九门与经济学无关的成熟学问。每一篇的做法相同：逼三门互相说不，找出三家共同持有而从未说出口的那条假定，再从<b>三门中某一家自己的教科书里</b>找到推翻它的材料。九篇全部预注册真跑，并把不利结果照登。</p>
+  <div class="rule"></div>
+</header>
+
+<main class="w">
+
+<div class="stats">
+  <div class="stat"><b>9</b><span>论　文</span></div>
+  <div class="stat"><b>18.0</b><span>万　字</span></div>
+  <div class="stat"><b>9</b><span>新命名</span></div>
+  <div class="stat"><b>9</b><span>预注册真跑</span></div>
+  <div class="stat"><b>142</b><span>均分</span></div>
+</div>
+
+<div class="q">
+  <h2>这个频道在追问什么</h2>
+  <p>三条追问，各成一组。<b>分界在哪</b>——一个环节被叫抽成还是创造，三种当场判法共享一个从未说出的假定，本组三篇各把它掀开，而给出的三条分界互不相容。<b>怎么走得出去</b>——每一次去中介都反复出现同一个结局：链条变短了而问题换了个位置；三篇追问第二条路、新先到者、与那层包在链外的壳。<b>为什么反而更强</b>——交易成本每降一次中介反而更硬，四十年三种解释之外的第四种，三篇分别落在判断的起点、终点、原料。</p>
+</div>
+
+<div class="note">
+  <b>编者按 · 三件必须说在前面的事。</b><br>
+  <b>一、这批稿的方法可复核，作者把不利结果照登了。</b>九篇全部预注册真跑，并据不利结果改写承重命题——《往据》一条假设判伪且方向相反，逼作者把阈值来源从「数据量」改写为「问题粒度」；《壳存》自曝核心主张在现有公开记录里还没被真正检验；《归首》四假设三条判负。把跑不通的地方照登，是这批稿最扎实的地方。<br>
+  <b>二、第一组（分界）三篇互相不相容。</b>《凭基》说分界在「换一套合法基准后增值还守不守恒」，《退计》说在「归属有没有一个生效的闭合期限」，《阶功》说在「内容账为零而删除代价跨不跨量级」。三条是三个候选判据，谁也没有资格代表另外两个；本站不替作者裁，三条一并放出。<br>
+  <b>三、九篇里六篇经编者增补，三篇为原稿认证分，页面逐篇标明。</b>《凭基》《退计》《往据》为投稿原稿全文盲评、正文一字未改，标认证分；《阶功》《异至》《归首》《壳存》《起算约》《止查线》六篇各含一节<b>编者增补的主张推进</b>（置于正文末、参考文献前），故标「盲评 → 修改设计目标 · 待独立复核」，不是认证分。这份区分留在每一页上。
+</div>
+
+<div class="grp"><span class="n">壹</span><h2>中介与抽成在哪里分开</h2><span class="cnt">3 篇</span></div>
+<p class="grpd">一个环节被叫「抽成」还是「创造」，有三种当场就能判的办法——看它自己站不站得住、看它在路上把东西改成了什么、看它在结构里占什么位置。三种判法共享一个从未说出口的假定，本组三篇各把它掀开一角；而三篇给出的分界互不相容，是同一个问题的三个候选判据，不是一个答案的三个部分。</p>
+
+<a class="card" href="/students/hu-min/gauge-basis/">
+  <div class="ct"><span class="tag">凭 基</span><span class="iq">盲评 143 · 原稿一字未改</span></div>
+  <h3>凭基：一个环节的增值凭什么算它的——换一套同样合法的结算基准，抽成与创造会互相交换位置</h3>
+  <div class="m">约 2.1 万字 · 读数：凭基幅 δ</div>
+  <p>一张控制网的全部边长与角度加起来也定不出网的整体位置；一条链的全部交易记录加起来，也定不出各环节各自创造了多少。定不出的那一份仍被某套约定摊派给某些环节，在账面上显示为高增值。</p>
+  <div class="cut">三门源头学问：<b>测量科学的可估与不可估函数、内分泌学的外周脱碘转化、符号学的符码次序</b>。真跑：六个公开代码仓，三假设两成立一被推翻；一个极端例 δ＝2.000——同一个人在两套同样合法的口径下，一套记为「活跃参与者」，另一套记为「零」。</div>
+</a>
+
+<a class="card" href="/students/hu-min/retro-decount/">
+  <div class="ct"><span class="tag">退 计</span><span class="iq">盲评 142 · 原稿一字未改</span></div>
+  <h3>退计：一份贡献要过多久才算真的是你的——分界不在交付的那一刻，在归属闭合的那一刻</h3>
+  <div class="m">约 2.0 万字 · 读数：退计率</div>
+  <p>生物命名法里，一个用了一百四十年的名字可以因一次归并被判为无效异名，作者当年的工作被追溯退出计量。把这条工序搬到价值链上：一份已结清的贡献，可以在此后一次归并中被追溯退出，既不在有效栏也不在损失栏。</p>
+  <div class="cut">三门源头学问：<b>分类学的模式标本、声学的直达声与反射窗、民俗学的传承次序</b>。真跑：六仓 4,628 次交付，四假设两条被推翻，其中一条直接改写了读数的计量单位，并成为本文伦理条款的实测依据。</div>
+</a>
+
+<a class="card" href="/students/hu-min/stage-cost/">
+  <div class="ct"><span class="tag">阶 功</span><span class="iq">盲评 141 → 修改设计目标 142 · 待独立复核</span></div>
+  <h3>阶功：一个环节在成品里一个字也没添，为什么删掉它整件事就贵了十倍</h3>
+  <div class="m">约 2.0 万字 · 读数：阶差 g</div>
+  <p>一个内容增量严格为零的环节，可以决定达成同一结果的代价属于哪一个量级。在十二个可复算样本里，不进入交付物的那一类吸收了约三分之二的全部投入，而在任何内容账上，这三分之二读数为零。</p>
+  <div class="cut">三门源头学问：<b>逻辑学的多余公理、光学的传递函数级联、战略学的威慑</b>。编者增补一节主张推进：把 g 从「一类环节的性质」推到「记账法为闭合而必须生产的一个零」——任何以内容增益为唯一记账基的系统，都必然在吸收投入最多处记下零。</div>
+</a>
+
+<div class="grp"><span class="n">贰</span><h2>去中介化怎样才走得出去</h2><span class="cnt">3 篇</span></div>
+<p class="grpd">每一次去中介都反复出现同一个结局：链条变短了，而问题换了个位置。三篇分别追问三件不同的事——走出去要先建成什么、为什么总有新环节站到最前、被动的那样东西到底是链上的一节还是包在链外的一层。</p>
+
+<a class="card" href="/students/hu-min/second-arrival/">
+  <div class="ct"><span class="tag">异 至</span><span class="iq">盲评 140 → 修改设计目标 142 · 待独立复核</span></div>
+  <h3>异至：去中介化真正走得出去的那条次序——第二条到达路必须先于断连建成</h3>
+  <div class="m">约 2.0 万字 · 读数：先至率</div>
+  <p>链条变短了，而问题换了个位置：从前那条链是闭合的，测回来必须回到起点，闭合差超限就报错；撤掉中间点之后，出错照样发生，只是再没有任何东西会对不上。</p>
+  <div class="cut">三门源头学问：<b>大地测量学的多余观测、化工过程工程的可操作性、符号学的无限衍义</b>。编者增补一节主张推进：第二条到达路的功能不是备份，是承载这条链的可否证性——单路径的读数无法被任何东西否定，去中介化把多路径压成单路径，消灭的是纠错能力。</div>
+</a>
+
+<a class="card" href="/students/hu-min/merge-window/">
+  <div class="ct"><span class="tag">归 首</span><span class="iq">盲评 139 → 修改设计目标 142 · 待独立复核</span></div>
+  <h3>归首：去中介化为什么总是换一个人站到最前——先到者通吃的合并窗，与那条先分记再断连的次序</h3>
+  <div class="m">约 2.1 万字 · 读数：分记阈</div>
+  <p>被取消的那个人走了，位置还在，账本一个字没改。一个新环节出现在两端之间——更快、更便宜、界面更好；通常的说法是「中介又长出来了」，而被并入者的贡献一直记在别人名下。</p>
+  <div class="cut">三门源头学问：<b>声学的先到效应、血液学与输血医学的合并窗、民族学的传承名录</b>。编者增补一节主张推进：先到者通吃的从来不是市场份额，是记账窗——「位置总有人占」不是市场规律，是归账规则在链条变短后的不变量。</div>
+</a>
+
+<a class="card" href="/students/hu-min/shell-held-stock/">
+  <div class="ct"><span class="tag">壳 存</span><span class="iq">盲评 140 → 修改设计目标 142 · 待独立复核</span></div>
+  <h3>壳存：中介不一定在链上——去掉一节与打破一层是两个动作，而改造方案普遍不加区分</h3>
+  <div class="m">约 2.0 万字 · 读数：释放曲线 · 破壳点</div>
+  <p>土壤有机碳的很大一部分之所以留存，不是化学上难分解，是被包在团聚体内部、分解者够不着；团聚体不吃碳、不放碳、不转化碳，它在任何流量表上贡献恰好是零，而它决定这条链走多快。</p>
+  <div class="cut">三门源头学问：<b>土壤学的团聚体保护、寄生虫学的中间宿主与传播阈值、文学叙事学的不可取消的中介性</b>。真跑坦承核心主张在现有公开记录里尚未被真正检验（作者照登）。编者增补一节主张推进：壳看不见不是没测，是流程图的基元（节点＋转化）里缺「隔离」这一种关系。</div>
+</a>
+
+<div class="grp"><span class="n">叁</span><h2>交易成本每降低一次，中介为什么反而更强</h2><span class="cnt">3 篇</span></div>
+<p class="grpd">同一个读数四十年反复出现：撮合、匹配、结算、核验的单位成本每下一个台阶，处在两端之间的那个环节反而更硬。既有三种解释（成本没真降、信息优势、通路占据）之外，三篇提出第四种，分别落在判断的起点、终点、与原料三处。</p>
+
+<a class="card" href="/students/hu-min/datum-covenant/">
+  <div class="ct"><span class="tag">起算约</span><span class="iq">盲评 141 → 修改设计目标 142 · 待独立复核</span></div>
+  <h3>起算约：交易成本每降低一次，中介为什么反而更强——撤换一项对接约定所需重算的条目，落在谁的账上</h3>
+  <div class="m">约 1.9 万字 · 读数：重算比 ω</div>
+  <p>中介的不可省略，不由它在总成本里的份额供给，不由它掌握的信息供给，也不由它保有的关系供给，而由撤换它所持的对接约定时、必须重算的条目落在谁的账上供给。它自身几乎不消耗不产出，在按投入产出的任何账上都没有栏目。</p>
+  <div class="cut">三门源头学问：<b>心理测量学的量表等值、会计与标识体系标准、集装箱与提单</b>。编者增补一节主张推进：起算约的强度是一个随交易成本下降单调上升的量——成本下降在结构上只作用于分母（持有者自己那侧），分子（要别人重算的条目）不动。</div>
+</a>
+
+<a class="card" href="/students/hu-min/scrutiny-line/">
+  <div class="ct"><span class="tag">止查线</span><span class="iq">盲评 140 → 修改设计目标 142 · 待独立复核</span></div>
+  <h3>止查线：查到哪里为止，其余按未出现处理——重画那条界线的人始终是同一个</h3>
+  <div class="m">约 1.9 万字 · 读数：补线迟滞 Λ</div>
+  <p>任何一次放行的依据都由两部分构成：查到了什么，以及查到哪里为止、其余按未出现处理。后一部分需要一条界线；成本下降使可查范围扩大，界线必须重画，而重画有迟滞，迟滞里谁持有界线谁就是唯一有权声明「未出现」的位置。</p>
+  <div class="cut">三门源头学问：<b>输血医学的常规配型范围、航空的最低设备清单、食品安全抽检项目表</b>。真跑：141 个包，中位迟滞 25.1 个月，最长 113.4 个月。编者增补一节主张推进：止查线不是检查能力的边缘，是免检范围的定义权，成本下降扩大的正是这个定义权的辖域。</div>
+</a>
+
+<a class="card" href="/students/hu-min/prior-evidence/">
+  <div class="ct"><span class="tag">往 据</span><span class="iq">盲评 142 · 原稿一字未改</span></div>
+  <h3>往据：一个判断所缺的那一项，本次观测在原理上不携带——可自备阈在上升，而每个人的积累在下降</h3>
+  <div class="m">约 1.9 万字 · 读数：可自备阈 n*</div>
+  <p>任何判断都由两类依据构成：本次可观测到的，与来自已完成的别的事的。后者不是「更多信息」，是本次观测在原理上不携带的那一类。成本下降同时使往据需求上升、个体积累份额下降，缺口就是中介的位置。</p>
+  <div class="cut">三门源头学问：<b>晶体学的相位问题、保险精算的经验费率、信用征信</b>。真跑：141 个参与者、19,643 件已完成事件，可自备阈 1,850 件而个体累计中位数 79 件，缺口 23.4 倍，只有 2 个跨过阈值且属同一持有者；一条假设判伪且方向相反，逼作者把阈值来源从「数据量」改写为「问题粒度」。</div>
+</a>
+
+</main>
+<footer>
+  <p><a href="/students/hu-min/works/">胡敏 · 全部作品</a> &nbsp;·&nbsp; <a href="/students/hu-min/cancer/">癌症频道</a> &nbsp;·&nbsp; <a href="/students/hu-min/chronic-disease/">慢性病频道</a> &nbsp;·&nbsp; <a href="/students/hu-min/tcm-philosophy/">中医哲思频道</a> &nbsp;·&nbsp; <a href="/students/">学员专栏</a></p>
+</footer>
+</body></html>

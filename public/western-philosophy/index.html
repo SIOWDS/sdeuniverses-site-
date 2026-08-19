@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>西方哲学专栏 | Western Philosophy | SDE Universes</title>
+<meta name="description" content="西方哲学专栏——把每一次“发现”显形为一场“发生”。十万字总纲《否定序列》＋解构西方哲学家系列。王德生 · 德麦国际。">
+<meta property="og:title" content="西方哲学专栏 | SDE Universes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --clay:#8C3B32;
+  --clay-deep:#6E2C25;
+  --ink:#231A12;
+  --bone:#F2EBDC;
+  --card:#FAF6EC;
+  --line:#D8CDB8;
+  --dim:#7A6C58;
+  --blue:#2E5090;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bone);color:var(--ink);font-family:Georgia,"Noto Serif SC","Songti SC",serif;line-height:1.85}
+body.zh .en-only{display:none}
+body.en .zh-only{display:none}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+
+nav{background:var(--card);border-bottom:1px solid var(--line)}
+nav .w{max-width:1080px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.nav-logo{font-family:'Playfair Display',serif;font-weight:700;font-size:1.1rem;color:var(--clay);text-decoration:none;letter-spacing:0.04em}
+.nav-r{display:flex;align-items:center;gap:16px}
+.nav-back{font-size:0.9rem;color:var(--dim);text-decoration:none;letter-spacing:0.06em}
+.nav-back:hover{color:var(--clay)}
+.lang-toggle{display:flex;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bone)}
+.lang-btn{border:0;background:none;font:inherit;font-size:0.8rem;padding:4px 12px;cursor:pointer;color:var(--dim)}
+.lang-btn.active{background:var(--clay);color:var(--card)}
+
+.meander{height:16px;background:var(--clay);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 16'%3E%3Cpath fill='none' stroke='black' stroke-width='2.6' d='M0 2 h30 v12 h-12 v-7 h5 M40 14 h-8'/%3E%3C/svg%3E") repeat-x left center/40px 16px;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 16'%3E%3Cpath fill='none' stroke='black' stroke-width='2.6' d='M0 2 h30 v12 h-12 v-7 h5 M40 14 h-8'/%3E%3C/svg%3E") repeat-x left center/40px 16px;
+  opacity:0.85}
+
+.hero{background:var(--card);padding:64px 22px 46px;text-align:center;position:relative;overflow:hidden}
+.eyebrow{font-size:0.78rem;letter-spacing:0.5em;color:var(--clay);margin-bottom:18px}
+.hero h1{font-size:clamp(2.3rem,6vw,3.6rem);letter-spacing:0.12em;font-weight:700;line-height:1.3}
+.hero h1 .en{font-family:'Playfair Display',serif;display:block;font-size:0.34em;letter-spacing:0.32em;color:var(--dim);font-weight:600;margin-top:10px}
+.thesis{margin:30px auto 10px;font-size:clamp(1.15rem,2.6vw,1.5rem);letter-spacing:0.05em}
+.thesis .found{position:relative;color:var(--dim);padding:0 2px;white-space:nowrap}
+.thesis .found::after{content:"";position:absolute;left:0;top:54%;height:2.5px;background:var(--clay);width:0;animation:strike 0.7s 0.5s ease forwards}
+@keyframes strike{to{width:100%}}
+.thesis .arrow{color:var(--clay);padding:0 6px}
+.thesis .seal{display:inline-block;border:2.5px solid var(--clay);color:var(--clay);padding:1px 10px;font-weight:700;transform:rotate(-2deg) scale(0.6);opacity:0;animation:stamp 0.45s 1.15s cubic-bezier(.2,1.6,.4,1) forwards;white-space:nowrap}
+@keyframes stamp{to{transform:rotate(-2deg) scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){
+  .thesis .found::after{animation:none;width:100%}
+  .thesis .seal{animation:none;transform:rotate(-2deg);opacity:1}
+}
+.hero .sub{max-width:640px;margin:18px auto 0;color:var(--dim);font-size:0.98rem}
+.stats{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;margin:30px auto 0;font-size:0.86rem;letter-spacing:0.12em;color:var(--ink)}
+.stats b{color:var(--clay);font-size:1.05rem;margin-right:4px}
+
+.routeband{background:var(--ink);padding:22px 0 26px}
+.routeband .cap{color:var(--bone);text-align:center;font-size:0.78rem;letter-spacing:0.42em;opacity:0.75;margin-bottom:14px}
+.stones{display:flex;gap:0;overflow-x:auto;padding:0 22px;scrollbar-width:thin;max-width:1180px;margin:0 auto}
+.stone{flex:0 0 auto;display:flex;align-items:center}
+.stone .s{border:1px solid rgba(242,235,220,0.45);color:var(--bone);padding:8px 14px;font-size:0.86rem;letter-spacing:0.14em;white-space:nowrap;background:rgba(242,235,220,0.05)}
+.stone .s small{display:block;font-size:0.62rem;letter-spacing:0.28em;opacity:0.55;margin-bottom:1px}
+.stone .a{color:#C9836A;padding:0 8px;font-size:0.95rem}
+.routeband .note{color:var(--bone);opacity:0.6;text-align:center;font-size:0.76rem;letter-spacing:0.1em;margin-top:12px}
+.routeband .note a{color:inherit}
+
+main{max-width:1080px;margin:0 auto;padding:0 22px}
+section{padding:56px 0 8px}
+.sec-eyebrow{font-size:0.74rem;letter-spacing:0.46em;color:var(--clay);margin-bottom:8px}
+.sec-title{font-size:1.5rem;letter-spacing:0.1em;margin-bottom:26px}
+.sec-title .en{font-family:'Playfair Display',serif;font-size:0.62em;color:var(--dim);letter-spacing:0.2em;margin-left:14px}
+
+.master{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--clay);padding:34px 34px 30px;display:block;text-decoration:none;transition:box-shadow .2s, transform .2s}
+.master:hover{box-shadow:0 10px 30px rgba(35,26,18,0.12);transform:translateY(-2px)}
+.master .k{font-size:0.76rem;letter-spacing:0.2em;color:var(--clay)}
+.master h3{font-size:clamp(1.3rem,3vw,1.7rem);letter-spacing:0.06em;margin:10px 0 14px;line-height:1.5}
+.strokes{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.stk{font-size:0.76rem;font-weight:700;letter-spacing:0.14em;padding:3px 11px;border:1px solid;border-radius:2px}
+.k1{color:#6B5B44;border-color:#6B5B44;background:#F3EFE7}.k2{color:#2E5090;border-color:#2E5090;background:#EDF1F8}
+.k3{color:#8C3B32;border-color:#8C3B32;background:#F7ECE9}.k4{color:#A0651F;border-color:#A0651F;background:#F8F1E5}
+.k5{color:#2A6B4A;border-color:#2A6B4A;background:#EAF2ED}.k6{color:#6B4A8C;border-color:#6B4A8C;background:#F1EDF6}
+.master p{color:#4A4235;font-size:0.95rem}
+.modebtns{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.mbtn{font:inherit;font-size:0.88rem;letter-spacing:0.1em;padding:10px 20px;border:1.5px solid var(--clay);color:var(--clay);text-decoration:none;background:none;transition:background .15s,color .15s}
+.mbtn:hover{background:var(--clay);color:var(--card)}
+.mbtn.solid{background:var(--clay);color:var(--card)}
+.mbtn.solid:hover{background:var(--clay-deep)}
+
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.path{background:var(--card);border:1px solid var(--line);padding:24px 24px 20px}
+.path .pk{font-size:0.72rem;letter-spacing:0.3em;color:var(--clay)}
+.path h4{font-size:1.08rem;letter-spacing:0.08em;margin:8px 0 4px}
+.path .t{font-size:0.78rem;color:var(--dim);letter-spacing:0.1em;margin-bottom:10px}
+.path p{font-size:0.9rem;color:#4A4235}
+.path a{display:inline-block;margin-top:12px;font-size:0.82rem;letter-spacing:0.12em;color:var(--clay);text-decoration:none}
+.path a:hover{text-decoration:underline;text-underline-offset:4px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.art{background:var(--card);border:1px solid var(--line);padding:24px;display:block;text-decoration:none;transition:box-shadow .2s,transform .2s}
+.art:hover{box-shadow:0 8px 24px rgba(35,26,18,0.1);transform:translateY(-2px)}
+.art .k{font-size:0.72rem;letter-spacing:0.2em;color:var(--clay)}
+.art h4{font-size:1.05rem;letter-spacing:0.04em;line-height:1.6;margin:8px 0 8px}
+.art p{font-size:0.88rem;color:#4A4235}
+.art .rd{display:inline-block;margin-top:12px;font-size:0.8rem;letter-spacing:0.14em;color:var(--clay)}
+.art.next{border:1.5px dashed var(--clay);background:transparent}
+.art.next .q{font-style:italic;color:var(--dim);font-size:0.9rem;margin-top:6px}
+
+.tailnote{margin:52px 0 0;padding:18px 22px;background:var(--card);border-left:3px solid var(--blue);font-size:0.86rem;color:#4A4235}
+.tailnote b{color:var(--blue)}
+footer{margin-top:56px;background:var(--ink);color:var(--bone)}
+footer .w{max-width:1080px;margin:0 auto;padding:26px 22px;font-size:0.82rem;letter-spacing:0.08em;text-align:center;opacity:0.85}
+footer a{color:inherit}
+</style>
+</head>
+<body class="zh">
+<nav><div class="w">
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-r">
+    <a class="nav-back" href="/browse/"><span class="zh-only">← 返回首页</span><span class="en-only">← Home</span></a>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div></nav>
+
+<div class="meander" aria-hidden="true"></div>
+
+<header class="hero">
+  <div class="eyebrow">SDE UNIVERSES · WESTERN PHILOSOPHY</div>
+  <h1>西方哲学专栏<span class="en">A Column on Western Philosophy</span></h1>
+  <div class="thesis">
+    <span class="zh-only">把每一次<span class="found">「发现」</span><span class="arrow">→</span>显形为一场<span class="seal">发 生</span></span>
+    <span class="en-only">Every claimed <span class="found">“discovery”</span><span class="arrow">→</span>unveiled as a <span class="seal">GENESIS</span></span>
+  </div>
+  <p class="sub"><span class="zh-only">三十位哲学家，同一台机器：宣称发现磐石——被解构为发生——又偷运新磐石。本栏以十万字总纲立骨，以逐人解构续刀，序列常开。</span><span class="en-only">Thirty philosophers, one machine: claim a bedrock — get deconstructed into genesis — smuggle a new bedrock. One master essay, then one philosopher at a time.</span></p>
+  <div class="stats">
+    <span><b>10万</b><span class="zh-only">字总纲</span><span class="en-only">chars master essay</span></span>
+    <span><b>30</b><span class="zh-only">环节</span><span class="en-only">links</span></span>
+    <span><b>6</b><span class="zh-only">步过机</span><span class="en-only">strokes each</span></span>
+    <span><b>80</b><span class="zh-only">页精排PDF</span><span class="en-only">-page PDF</span></span>
+    <span><b>25</b><span class="zh-only">问答</span><span class="en-only">Q&amp;As</span></span>
+  </div>
+</header>
+
+<div class="routeband">
+  <div class="cap"><span class="zh-only">磐 石 后 退 航 线</span><span class="en-only">THE RETREAT ROUTE OF BEDROCK</span></div>
+  <div class="stones" id="stones"></div>
+  <div class="note"><span class="zh-only">两千五百年，同一笔赌注的十二次挪窝 · <a href="/column/negation-sequence/">十二站日常解说见总纲第九章</a> · <a href="/western-philosophy/readings/"><b>六篇选读 →</b></a></span><span class="en-only">Twelve moves of the same wager · <a href="/column/negation-sequence/">plain guide in ch. 9</a></span></div>
+</div>
+
+<div class="meander" aria-hidden="true"></div>
+
+<main>
+<section id="master">
+  <div class="sec-eyebrow"><span class="zh-only">总 纲</span><span class="en-only">MASTER ESSAY</span></div>
+  <div class="sec-title"><span class="zh-only">全栏脊梁 · 一篇立骨</span><span class="en">The spine of the column</span></div>
+  <a class="master" href="/column/negation-sequence/">
+    <span class="k"><span class="zh-only">约十万字 · 十四章 · 三十环节总表 · 三十份SDE猜想 · 80页精排PDF · 三种阅读模式</span><span class="en-only">~100K CHARS · 14 CHAPTERS · 30 LINKS · 30 SDE CONJECTURES · 3 READING MODES</span></span>
+    <h3><span class="zh-only">西方哲学2500年：发生对发现的否定序列</span><span class="en-only">Western Philosophy, 2500 Years: The Negation Sequence of Genesis against Discovery</span></h3>
+    <div class="strokes"><span class="stk k1">磐石</span><span class="stk k2">显形</span><span class="stk k3">众刃</span><span class="stk k4">偷运</span><span class="stk k5">日常</span><span class="stk k6">猜想·SDE</span></div>
+    <p><span class="zh-only">每环六步过机：磐石陈列他宣称的发现，显形给出主刀，众刃陈列历代多把刀，偷运点出他免检的私货，日常用邻居听得懂的话讲透，猜想为他的SDE系统建一份发生模型。另有航线十二站日常解说、五种偷运海关、五个逃逸测试（含科学与数学）、显形刀法六式、三十环速查表、磐石再就业名录、二十五问二十五答与证伪条件。</span><span class="en-only">Six strokes per link — bedrock, unveiling, blades of the ages, smuggling, plain-life retelling, SDE conjecture — plus the customs catalogue, five escape tests, six knife techniques, a quick-reference table, a re-employment roster, 25 Q&amp;As and falsification terms.</span></p>
+  </a>
+  <div class="modebtns">
+    <a class="mbtn solid" href="/column/negation-sequence/"><span class="zh-only">📖 长文分页阅读</span><span class="en-only">📖 Read online</span></a>
+    <a class="mbtn" href="/column/negation-sequence/"><span class="zh-only">📄 在线翻页 PDF</span><span class="en-only">📄 Page-flip PDF</span></a>
+    <a class="mbtn" href="/column/pdf/negation-sequence.pdf" download><span class="zh-only">⬇ 下载 PDF（80页）</span><span class="en-only">⬇ Download PDF</span></a>
+    <a class="mbtn solid" href="/column/pdf/negation-sequence-supplement.pdf" download style="background:#2E5090"><span class="zh-only">⬇ 增补卷·原典物证（247页 · ISBN 978-1-970820-60-7）</span><span class="en-only">⬇ Supplement: The Textual Evidence (247pp)</span></a>
+    <a class="mbtn solid" href="/books/negation-sequence/" style="background:#1C1610"><span class="zh-only">📕 专著页 · 三十条接缝一屏看完</span><span class="en-only">📕 The Book · Thirty Seams</span></a>
+    <a class="mbtn solid" href="/western-philosophy/readings/" style="background:#8C3B32"><span class="zh-only">★ 六篇选读 · 从原典里抓现行</span><span class="en-only">★ Six Selected Readings</span></a>
+  </div>
+</section>
+
+<section id="paths">
+  <div class="sec-eyebrow"><span class="zh-only">读 法</span><span class="en-only">READING PATHS</span></div>
+  <div class="sec-title"><span class="zh-only">三种读者，三条路线</span><span class="en">Three readers, three routes</span></div>
+  <div class="paths">
+    <div class="path">
+      <div class="pk"><span class="zh-only">路线一</span><span class="en-only">ROUTE 1</span></div>
+      <h4><span class="zh-only">通俗直达</span><span class="en-only">The Plain Route</span></h4>
+      <div class="t"><span class="zh-only">约两小时</span><span class="en-only">~2 HOURS</span></div>
+      <p><span class="zh-only">只读每环【日常】＋三十环速查表＋二十五问二十五答——全部结论的家常版，足够识别生活里的免检品。</span><span class="en-only">Read only the plain-life retellings, the quick table and the 25 Q&amp;As.</span></p>
+      <a href="/column/negation-sequence/"><span class="zh-only">从第一章日常总讲进入 →</span><span class="en-only">Start →</span></a>
+    </div>
+    <div class="path">
+      <div class="pk"><span class="zh-only">路线二</span><span class="en-only">ROUTE 2</span></div>
+      <h4><span class="zh-only">正典精读</span><span class="en-only">The Full Reading</span></h4>
+      <div class="t"><span class="zh-only">约两天</span><span class="en-only">~2 DAYS</span></div>
+      <p><span class="zh-only">十四章顺读，【众刃】与【猜想】不跳——一部可核对出处的哲学史重述，每个判断都附拆迁地址。</span><span class="en-only">All fourteen chapters in order, blades and conjectures included.</span></p>
+      <a href="/column/negation-sequence/"><span class="zh-only">从摘要开始 →</span><span class="en-only">Start →</span></a>
+    </div>
+    <div class="path">
+      <div class="pk"><span class="zh-only">路线三</span><span class="en-only">ROUTE 3</span></div>
+      <h4><span class="zh-only">武器拆装</span><span class="en-only">The Toolsmith Route</span></h4>
+      <div class="t"><span class="zh-only">研究者</span><span class="en-only">FOR RESEARCHERS</span></div>
+      <p><span class="zh-only">直取四规则、海关名录、五测试、刀法六式与证伪条件，把机器拆到你自己的领域试车。</span><span class="en-only">Rules, customs, tests, knife techniques and falsification terms — run the machine on your own field.</span></p>
+      <a href="/column/negation-sequence/"><span class="zh-only">从第二章规则进入 →</span><span class="en-only">Start →</span></a>
+    </div>
+  </div>
+</section>
+
+<section id="series">
+  <div class="sec-eyebrow"><span class="zh-only">解 构</span><span class="en-only">DECONSTRUCTIONS</span></div>
+  <div class="sec-title"><span class="zh-only">解构西方哲学家 · 逐人系列</span><span class="en">One philosopher at a time</span></div>
+    <div class="tailnote" style="margin:0 0 26px"><span class="zh-only"><b>这十一个人不是并列的。</b>前四位把稳定错读成先在——柏拉图的理念、亚里士多德的实体、笛卡尔的我思、康德的范畴，四种先在，一个动作。后七位越来越近：黑格尔造出了那台引擎，却把它锁进一个圆；尼采是最凶的拆迁队长，留下两根没炸的柱子；海德格尔把回忆说放大到文明尺度，管它叫存在的遗忘；德勒兹倒转了柏拉图主义，却把源头做成了倒影；福柯站到了悬崖边，没有桥；德里达那一拳，砸在一堵本来就要倒的墙上；阿多诺离得最近——他几乎看见了全部该看见的，然后下令不许看，并且为了给这道令找根据，造了一块永不显露的石头。<b>离得最近的那几个，差的不是力气，是同一样东西。</b>按生年排，读起来是一条线；按发表序读，见「往期全集」。</span><span class="en-only"><b>These eleven are not a list.</b> The first four misread stability as pre-existence — Idea, Substance, Cogito, Category: four pre-existences, one move. The last six come closer and closer: Hegel built the engine and locked it in a circle; Nietzsche, the fiercest demolisher, left two pillars standing; Heidegger scaled recollection up to a civilisation and called it the forgetting of Being; Deleuze inverted Platonism and made the source a reflection; Foucault stood at the cliff edge with no bridge; Derrida spent an exquisite punch on a wall already falling; Adorno came closest of all — he saw nearly everything there was to see, then forbade the seeing. <b>The ones who came closest lacked not force but the same one thing.</b> Ordered by birth here; by publication in the Archive.</span></div>
+<div class="grid">
+    <a class="art" href="/column/honesty-exemption/" style="border-top:3px solid #8A6817">
+      <span class="k"><span class="zh-only">今日热点 · 综论 · 2026-07-21 · 约 1.9 万字</span><span class="en-only">TODAY'S HOTSPOT · SYNTHESIS</span></span>
+      <h4><span class="zh-only">单维度不可究竟与诚实豁免权：那“同一样东西”，是什么</span><span class="en-only">The Honesty Exemption: What the Closest Ones All Lacked</span></h4>
+      <p><span class="zh-only">上面那句“离得最近的那几个，差的是同一样东西”——本篇给它命名。每一位奠基者走到“反身之墙”前都够不到自己的底，于是二选一：把伤口敞着（未完成的诚实），或盖一枚“我承认有限”的章把改写豁免掉（诚实豁免权）。含四齿轮解剖、可复算的“封顶诊断”五步判据与可证伪的母题，并以康德·维特根斯坦·蒯因当众验证。</span><span class="en-only">The one thing the closest ones all lacked — here named. At the reflexivity wall every founder seals the wound with a confession instead of a rewrite.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/honesty-exemption-paper/" style="border-top:3px solid #6B1717">
+      <span class="k"><span class="zh-only">学术论文 · 机制研究 · 约 2 万字</span><span class="en-only">PAPER · MECHANISM STUDY</span></span>
+      <h4><span class="zh-only">诚实豁免权：自限声明如何转化为理论免疫</span><span class="en-only">The Honesty Exemption: How Self-Limitation Becomes Immunity</span></h4>
+      <p><span class="zh-only">上一篇的学术论文版：把“诚实豁免权”锻成一条可证伪的判定程序——限度承认·核心威胁·核心未改写·限制中和四项必要条件，加六条失败标准，对柏拉图·笛卡尔·黑格尔·尼采分级定级，以亚里士多德为排除、皮尔士与晚期维特根斯坦为反例，附判定矩阵与复核规范。基于 SDE 三维本体论（显露·差异·纠缠）。</span><span class="en-only">The academic paper: four falsifiable necessary conditions plus six failure criteria, graded cases, negative controls and a judgment matrix — grounded in SDE ontology.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/plato-idea-genesis/">
+      <span class="k"><span class="zh-only">柏拉图 · 前 427—347 · 约一万字</span><span class="en-only">PLATO · 427–347 BC</span></span>
+      <h4><span class="zh-only">理念，不是被回忆的，而是被发生的</span><span class="en-only">Ideas: Not Recollected but Generated</span></h4>
+      <p><span class="zh-only">理念不是先在的，是一束被稳定到"符号态封顶"的纠缠；回忆说、洞穴、分有难题，都是发现范式把"稳定"错读成"先在"。</span><span class="en-only">The Idea is a stabilized entanglement misread as pre-existence.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/aristotle-substance-genesis/">
+      <span class="k"><span class="zh-only">亚里士多德 · 前 384—322 · 长文</span><span class="en-only">ARISTOTLE · 384–322 BC</span></span>
+      <h4><span class="zh-only">实体，不是万物的地基，而是被冻住的发生</span><span class="en-only">Substance: Not Bedrock but Frozen Genesis</span></h4>
+      <p><span class="zh-only">一位御医之子把解剖台的语法投射成了宇宙的宪法；四因、潜能现实、不动的动者，逐一还原为被冻住的发生。</span><span class="en-only">A physician's son projected the grammar of the dissection table onto the constitution of the cosmos.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/descartes-cogito-genesis/">
+      <span class="k"><span class="zh-only">笛卡尔 · 1596—1650 · 长文</span><span class="en-only">DESCARTES · 1596–1650</span></span>
+      <h4><span class="zh-only">我思，不是找到的地基，而是清场后的房东</span><span class="en-only">The Cogito: Not Bedrock Found but a Landlord Crowned</span></h4>
+      <p><span class="zh-only">那场著名的大火是一场按剧本演出的清场，火恰好熄灭在"我"的门槛前；无可怀疑的只是"思在发生"。</span><span class="en-only">The famous fire was a scripted clearing, and it stopped precisely at the threshold of the "I".</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/kant-categories-genesis/">
+      <span class="k"><span class="zh-only">康德 · 1724—1804 · 约一万字</span><span class="en-only">KANT · 1724–1804</span></span>
+      <h4><span class="zh-only">范畴，不是先天的模具，而是沉淀的纠缠</span><span class="en-only">Categories: Sedimented Entanglement</span></h4>
+      <p><span class="zh-only">哥白尼式革命只革了一半：打倒了"对象先在"，却把认知框架立成新的先天；因果、时空、物自体逐一还原为发生。</span><span class="en-only">The Copernican revolution went only halfway.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/western-philosophy/hegel/" style="border-top:3px solid var(--blue)">
+      <span class="k"><span class="zh-only">黑格尔 · 1770—1831 · 频道 · 七卷 · 约 52 万字</span><span class="en-only">HEGEL · 1770–1831 · CHANNEL</span></span>
+      <h4><span class="zh-only">造出了那台引擎，却把它锁进了一个圆</span><span class="en-only">Built the Engine, Then Locked It in a Circle</span></h4>
+      <p><span class="zh-only">西方传统里最像"发生"的人：矛盾驱动、自我推进，说对了"生成高于存在"——却在最后一步把开放的引擎锁进封闭的圆。<b style="color:var(--blue)">现已扩为完整频道</b>：总论＋逐卷解构《精神现象学》《逻辑学》《法哲学》《历史哲学》与晚期四卷。</span><span class="en-only">The closest thing to genesis in the Western canon — and it ends in a closed circle. <b style="color:var(--blue)">Now a full channel</b> — a master essay plus seven volumes.</span></p>
+      <span class="rd"><span class="zh-only">进入黑格尔频道 →</span><span class="en-only">Enter the Hegel Channel →</span></span>
+    </a>
+    <a class="art" href="/column/nietzsche-perspective-genesis/">
+      <span class="k"><span class="zh-only">尼采 · 1844—1900 · 约一万字</span><span class="en-only">NIETZSCHE · 1844–1900</span></span>
+      <h4><span class="zh-only">视角，不是主体选择的，而是发生出来的</span><span class="en-only">Perspective: Generated, Not Chosen</span></h4>
+      <p><span class="zh-only">"先在"最凶的拆迁队长，留下两根没炸的柱子——先在的主体、作为实体的权力意志；视角与主体是同一道差异的双生子。</span><span class="en-only">The fiercest demolisher of pre-existence left two pillars standing.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/heidegger-being-genesis/">
+      <span class="k"><span class="zh-only">海德格尔 · 1889—1976 · 长文</span><span class="en-only">HEIDEGGER · 1889–1976</span></span>
+      <h4><span class="zh-only">存在，不是失而复得的，而是当场铸成的</span><span class="en-only">Being: Not Recovered but Cast on the Spot</span></h4>
+      <p><span class="zh-only">"存在的遗忘"不是历史的病，是他铸的钟——回忆说被放大到文明尺度；词根矿井、转向的失败改写、还不上的神学债。</span><span class="en-only">"The forgetting of Being" is not history's illness but his own bell — recollection scaled up to a civilisation.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/adorno-nonidentical-genesis/" style="border-top:3px solid var(--col)">
+      <span class="k"><span class="zh-only">阿多诺 · 1903—1969 · 逐人长文 · 约两万字 · 另有频道</span><span class="en-only">ADORNO · 1903–1969 · ~20K CHARS</span></span>
+      <h4><span class="zh-only">非同一者，不是被保护的剩余，而是偷运进来的物自体</span><span class="en-only">The Non-Identical: A Smuggled Thing-in-Itself</span></h4>
+      <p><span class="zh-only">序列里他四次拿刀，这次刀转向他自己。他拆掉了一切先在者，却造了一个永不显露的东西来当禁令的根据——物自体的三项职能，它一条不差地继承。四步走完：磐石·显形·偷运·猜想。<b>另有同题学术论文与阿多诺频道。</b></span><span class="en-only">Four times he held the knife in the sequence; here it turns on him. He demolished every pre-existent, then built one that can never appear to ground his ban — inheriting, item for item, the three offices of the thing-in-itself.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/deleuze-virtual-genesis/">
+      <span class="k"><span class="zh-only">德勒兹 · 1925—1995 · 长文</span><span class="en-only">DELEUZE · 1925–1995</span></span>
+      <h4><span class="zh-only">潜在，不是发生的源头，而是发生的倒影</span><span class="en-only">The Virtual: Not the Source but the Reflection</span></h4>
+      <p><span class="zh-only">一个看起来不该在名单上的人——生成高于存在、倒转柏拉图主义、公开承认概念是被创造的。咬合点在"潜在"这间地下室。</span><span class="en-only">The one name that should not be on this list — and the catch is a basement called the virtual.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/deconstructing-foucault/">
+      <span class="k"><span class="zh-only">福柯 · 1926—1984 · 约三万字</span><span class="en-only">FOUCAULT · 1926–1984</span></span>
+      <h4><span class="zh-only">站到了悬崖边，却没有桥</span><span class="en-only">Stood at the Cliff Edge, With No Bridge</span></h4>
+      <p><span class="zh-only">离"发生"最近的人：把权力从王座拉到身体，证明主体是被生产的结果。他缺三样——判定的尺子、组织的坐标，和那座桥。</span><span class="en-only">He dragged power from the throne to the body, and lacked three things — a ruler, a coordinate, and the bridge.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/derrida-deconstruction/">
+      <span class="k"><span class="zh-only">德里达 · 1930—2004 · 约一万字</span><span class="en-only">DERRIDA · 1930–2004</span></span>
+      <h4><span class="zh-only">那一拳，为何砸空？</span><span class="en-only">Why Did That Punch Hit Nothing?</span></h4>
+      <p><span class="zh-only">用最精巧的力气推倒了一堵本来就要倒的墙；后现代从"没有静态基础"滑向"没有任何基础"——而流沙之下有岩床。</span><span class="en-only">The most exquisite force, spent on a wall that was already falling. Beneath the quicksand there is bedrock.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+    <a class="art" href="/column/deconstruction-master/">
+      <span class="k"><span class="zh-only">系列全集 · 存档</span><span class="en-only">SERIES ARCHIVE</span></span>
+      <h4><span class="zh-only">解构大师 · 往期全集</span><span class="en-only">Deconstruction Master · Archive</span></h4>
+      <p><span class="zh-only">逐人解构系列的完整存档页——新的一环上线，先在这里陈列。</span><span class="en-only">The full archive of the one-by-one series.</span></p>
+      <span class="rd"><span class="zh-only">进入全集 →</span><span class="en-only">Enter →</span></span>
+    </a>
+    <a class="art next" href="/column/negation-sequence/">
+      <span class="k"><span class="zh-only">第三十一环 · 正在磨刀</span><span class="en-only">LINK 31 · BEING SHARPENED</span></span>
+      <h4><span class="zh-only">下一环，可能是你</span><span class="en-only">The next link might be you</span></h4>
+      <p class="q"><span class="zh-only">"机器不朽，不因它对，因它诚实地把每一代的不服气都变成了燃料。现在，轮到你的了。"——总纲·致第三十一环的公开信</span><span class="en-only">"The machine endures not because it is right, but because it honestly turns every generation's defiance into fuel." — Open letter to Link 31</span></p>
+      <span class="rd"><span class="zh-only">读公开信与开工材料 →</span><span class="en-only">Read the open letter →</span></span>
+    </a>
+  </div>
+  <div class="tailnote"><span class="zh-only"><b>互通说明</b>　本栏与「每日头条」「发现VS发生」互通：总纲发表于每日头条（2026-07-17），序列篇同时陈列于发现VS发生专栏；"发现／发生"是全站公用语汇，十词家用定义见总纲语汇表。</span><span class="en-only"><b>Cross-listing</b>　The master essay is also the Daily Headline of Jul 17, 2026, and is cross-listed in the Discovery vs Genesis column.</span></div>
+</section>
+
+<section id="subs">
+  <div class="sec-eyebrow"><span class="zh-only">本 栏 六 目</span><span class="en-only">SIX CHANNELS</span></div>
+  <div class="sec-title"><span class="zh-only">六个频道 · 一条序列的六个切面</span><span class="en-only">Six channels, six faces of one sequence</span></div>
+  <div class="grid">
+    <a class="art" href="/western-philosophy/postmodern/">
+      <span class="k"><span class="zh-only">新 · 四症一诊三步一收官</span><span class="en-only">Postmodern Vertigo & the Way Through</span></span>
+      <h4><span class="zh-only">后现代的迷茫与救赎　<b style="color:#5E7E3E">← 入门专著已发表</b></span><span class="en-only">Postmodern Vertigo & the Way Through</span></h4>
+      <p><span class="zh-only">后现代的全部力量来自一个真判断：没有任何东西是先验地在那儿的。它的全部虚无来自后面那一步——<b>而那一步是空的。</b>四症（解释·权力·文本·对话）共享同一个结构；一诊指出跳跃发生在哪儿；三步把"发生"填进那个空格；收官回到七万英寻深的水。</span><span class="en-only">Postmodern Vertigo & the Way Through</span></p>
+      <span class="go"><span class="zh-only">进入本栏 →</span><span class="en-only">Enter →</span></span>
+    </a>
+    <a class="art" href="/western-philosophy/predicament/">
+      <span class="k"><span class="zh-only">四重困境＋出路</span><span class="en-only">The Predicament Today</span></span>
+      <h4><span class="zh-only">西方哲学今日的困境</span><span class="en-only">The Predicament Today</span></h4>
+      <p><span class="zh-only">哲学没有死，但它确实病了：分裂（分析与欧陆两种物种）· 职业化（论文工业）· 被科学接管（心灵给了认知科学，语言给了语言学）· GPT 冲击（当机器写得出哲学论文）。四重困境，一个病根。</span><span class="en-only">The Predicament Today</span></p>
+      <span class="go"><span class="zh-only">进入本栏 →</span><span class="en-only">Enter →</span></span>
+    </a>
+    <a class="art" href="/western-philosophy/epistemology/">
+      <span class="k"><span class="zh-only">新频道 · 总纲已上线</span><span class="en-only">New · Programme published</span></span>
+      <h4><span class="zh-only">知识论</span><span class="en-only">Epistemology</span></h4>
+      <p><span class="zh-only">两千年来问的是：一条信念凭什么算真的。本栏问一个更靠前的问题——<b>一条知识凭什么能被别人再走一遍</b>。知识不是状态，是装置：它说清在什么条件下、经过什么路径、能稳定显露什么结构，说不清的那几格，正是它日后先坏掉的地方。总纲三万九千字已上线，另附与柏拉图、葛梯尔、笛卡尔的逐条对勘。</span><span class="en-only">Not what makes a belief true, but what makes a piece of knowledge runnable again — by someone else.</span></p>
+      <span class="go"><span class="zh-only">进入本栏 →</span><span class="en-only">Enter →</span></span>
+    </a>
+    <a class="art" href="/western-philosophy/masters/">
+      <span class="k"><span class="zh-only">逐人立传</span><span class="en-only">50 Masters</span></span>
+      <h4><span class="zh-only">西方哲学 50 大师</span><span class="en-only">50 Masters</span></h4>
+      <p><span class="zh-only">五十位大师，一人一节：他站在哪块石头上，那块石头是谁的，他给下一个人留了哪条裂缝。</span><span class="en-only">50 Masters</span></p>
+      <span class="go"><span class="zh-only">进入本栏 →</span><span class="en-only">Enter →</span></span>
+    </a>
+    <a class="art" href="/western-philosophy/currents/">
+      <span class="k"><span class="zh-only">思潮的水系图</span><span class="en-only">The Great Currents</span></span>
+      <h4><span class="zh-only">西方哲学洪流</span><span class="en-only">The Great Currents</span></h4>
+      <p><span class="zh-only">不看人，看水：一条思潮从哪儿起源、在哪儿分叉、被什么地形改道、最后流进了谁的池子。</span><span class="en-only">The Great Currents</span></p>
+      <span class="go"><span class="zh-only">进入本栏 →</span><span class="en-only">Enter →</span></span>
+    </a>
+    <a class="art" href="/western-philosophy/science/">
+      <span class="k"><span class="zh-only">两千年的分家与欠账</span><span class="en-only">Philosophy & Science</span></span>
+      <h4><span class="zh-only">西方哲学与科学</span><span class="en-only">Philosophy & Science</span></h4>
+      <p><span class="zh-only">科学从哲学里分出去时带走了什么，又留下了什么账没还——以及"哲学向科学退让"这个叙述本身是怎么被写出来的。</span><span class="en-only">Philosophy & Science</span></p>
+      <span class="go"><span class="zh-only">进入本栏 →</span><span class="en-only">Enter →</span></span>
+    </a>
+    <a class="art" href="/western-philosophy/east-west/">
+      <span class="k"><span class="zh-only">两条腿与第三条腿</span><span class="en-only">West Meets East</span></span>
+      <h4><span class="zh-only">西方与东方对话</span><span class="en-only">West Meets East</span></h4>
+      <p><span class="zh-only">西方把 S 的刀和 D 的刀锻到极利，而每一环都在自己的 E 前收刀；东方天然握着发生学的直觉，却缺把它说成可操作坐标的分析精度。</span><span class="en-only">West Meets East</span></p>
+      <span class="go"><span class="zh-only">进入本栏 →</span><span class="en-only">Enter →</span></span>
+    </a>
+  </div>
+</section>
+</main>
+
+<footer><div class="w">© 2026 德麦国际 · SDE Universes · <span class="zh-only">王德生</span><span class="en-only">Wang Desheng</span> · <a href="/headline/"><span class="zh-only">每日头条</span><span class="en-only">Daily Headline</span></a> · <a href="/discovery-vs-genesis/"><span class="zh-only">发现VS发生</span><span class="en-only">Discovery vs Genesis</span></a> · <a href="/browse/"><span class="zh-only">首页</span><span class="en-only">Home</span></a></div></footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en'));});
+  document.documentElement.lang=lang;
+}
+(function(){
+  var zh=[['I','本原'],['II','神'],['III','我思'],['IV','范畴'],['V','精神·历史'],['VI','意志'],['VII','逻辑·语言'],['VIII','存在'],['IX','权力·范式'],['X','文本'],['XI','对话'],['XII','偶然性']];
+  var en=['Arche','God','Cogito','Categories','Spirit / History','Will','Logic / Language','Being','Power / Paradigm','Text','Conversation','Contingency'];
+  var host=document.getElementById('stones');
+  zh.forEach(function(st,i){
+    var d=document.createElement('div'); d.className='stone';
+    d.innerHTML='<span class="s"><small>'+st[0]+'</small><span class="zh-only">'+st[1]+'</span><span class="en-only">'+en[i]+'</span></span>'+(i<zh.length-1?'<span class="a">→</span>':'');
+    host.appendChild(d);
+  });
+})();
+</script>
+
+<script>window.WDS_READ={selector:"main"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

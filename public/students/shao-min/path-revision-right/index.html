@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>谁能迫使课堂改道：深层学习中的路径修订权与成本转移模型 · 少敏 · SDE 学员专栏</title>
+<meta name="description" content="许多课堂并不缺少学生参与，然而参与增加并不稳定地产生概念转变、跨表征理解或对基本假设的反思。本文提出路径修订模型：深层学习所需的不是抽象的发起权，也不只是提问频率，而是学习者提出的、具有认识意义的行动能够改变课堂后续的问题定义与推进方向。本文给出四类指标、公平性分层、二乘二判别设计与八项可证伪预测。">
+<style>
+:root{--gold:#8A6817;--gold2:#C89117;--ink:#2A2315;--ink2:#5B4F38;--bg:#F5EFE0;--muted:#8A7B54;--line:rgba(138,104,23,0.30);--panel:#EFE7D3;--panel2:#F1EAD8}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(138,104,23,0.3)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.9;background-image:radial-gradient(ellipse at 50% -12%,rgba(138,104,23,0.10),transparent 62%)}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(42,35,21,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#E4D6AE;font-size:13px;letter-spacing:0.04em;text-decoration:none}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(255,255,255,0.45);color:#F1E6C4;letter-spacing:0.03em;text-decoration:none}
+.rb-btn.cur{background:#F1E6C4;color:#4A3A10;font-weight:700;border-color:#F1E6C4}
+.essay{max-width:680px;margin:0 auto;padding:52px 24px 20px}
+.head{text-align:center;padding-bottom:8px}
+.head .kicker{font-size:11.5px;letter-spacing:0.4em;color:var(--gold);margin-bottom:20px}
+.head h1{font-size:clamp(26px,4.6vw,38px);font-weight:800;color:#2A2315;letter-spacing:0.03em;line-height:1.45}
+.head .subttl{display:block;font-size:0.46em;font-weight:700;color:#4A3F28;margin-top:16px;line-height:1.6;letter-spacing:0.02em}
+.head .by{font-size:14px;color:var(--ink);letter-spacing:0.2em;margin-top:22px;font-weight:700}
+.head .dateline{font-size:12.5px;color:var(--muted);letter-spacing:0.1em;margin-top:9px}
+.head .rule{width:44px;height:1px;background:var(--gold);opacity:0.6;margin:30px auto 0}
+.abstract{max-width:620px;margin:34px auto 0;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:22px 26px}
+.abstract .lbl{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:12px}
+.abstract p{font-size:14.5px;color:var(--ink2);line-height:1.95;letter-spacing:0.01em}
+.kw{max-width:620px;margin:14px auto 0;font-size:13px;color:var(--muted);letter-spacing:0.04em;text-align:center}
+.body{padding-top:12px}
+.sec{margin:52px 0 8px}
+.sec .n{font-size:20px;font-weight:800;color:#2A2315;letter-spacing:0.04em;line-height:1.5}
+.sec .sub{font-size:13.5px;color:var(--gold);letter-spacing:0.14em;margin-top:8px}
+.sec-rule{width:34px;height:1px;background:var(--gold);opacity:0.55;margin:18px 0 26px}
+.body p{font-size:17px;color:var(--ink2);line-height:2.05;margin-bottom:22px;letter-spacing:0.01em;text-align:justify}
+.body p.lead{color:var(--ink)}
+.end-orn{text-align:center;color:var(--gold);opacity:0.65;letter-spacing:0.6em;margin:46px 0 6px;font-size:14px}
+.foot-nav{max-width:680px;margin:0 auto;padding:12px 24px 34px;text-align:center;display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+.foot-nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em;border-bottom:1px solid rgba(138,104,23,0.4);padding-bottom:2px}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a10 0%,#1c160b 60%,#140f07 100%);text-align:center;padding:56px 24px;margin-top:40px}
+.endbox .eb-k{font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:16px}
+.endbox .eb-t{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.08em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:2}
+.endbox a{display:inline-block;letter-spacing:0.1em;padding:12px 30px;font-size:14.5px;text-decoration:none;border-radius:2px;margin:6px}
+.endbox .primary{background:#D4B25E;color:#150F24;font-weight:700}
+.endbox .ghost{border:1px solid #D4B25E;color:#D4B25E}
+footer{border-top:1px solid var(--line);padding:28px 24px;text-align:center;color:var(--muted);font-size:13px;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.body p{font-size:16px}.essay{padding-top:40px}}
+
+.body p.ref{font-size:14px;line-height:1.9;margin-bottom:10px;padding-left:2em;text-indent:-2em;color:var(--muted)}
+.body p.tick{padding-left:1.5em;text-indent:-1.5em;margin-bottom:8px;color:var(--ink2)}
+.body p.tick:before{content:"—";color:var(--gold);padding-right:.6em;font-weight:700}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+</style><link rel="stylesheet" href="/sde-read.css">
+</head>
+<body class="sde-read">
+<div class="readbar">
+  <a class="nav-back" href="/students/shao-min/works/">‹ 少敏 · 全部作品</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div>
+</div>
+<header class="art">
+  <div class="art-series">学员专栏 · 少敏 · 课堂学习的识别与改道</div>
+  <h1 class="art-title">谁能迫使课堂改道</h1>
+  <div class="art-subtitle">把研究问题从「谁先动」改写为：什么样的学生行动，能够使课堂后续路径发生可观察、可归因且具有认识意义的修订</div>
+  <div class="art-meta">作者 少敏 · SDE 学员 · 约 0.7 万字 · 发表于2026年8月4日 · 编辑增补版</div>
+</header>
+<div class="lead">
+  <div class="innov"><div class="lbl">本文的那一刀</div><div class="txt">课堂可以很活跃，却<b>从未真正改道</b>。学生被允许表达，却没有任何表达能迫使系统重新安排它下一步要做什么。所以要问的不是"谁先动"，而是<b>什么样的学生行动能让课堂后续路径发生可归因的修订</b>。</div></div>
+  <div class="daodu"><span class="lbl">导读</span><h4>读这篇，你会看见三件事</h4><div class="row"><span class="k">三种常见误判被同时修正  </span>未被教案预排的提问不必然是真实能动性；由教师搭建机会产生的学生行动不必然是被制造的假主动；提问数量上升也不必然意味着深层学习。</div><div class="row"><span class="k">成本转移而非单向降本  </span>改道不是让老师多费力或让学生少费力，而是成本在双方之间被重新分担——这一条是模型的承重部件。</div><div class="row"><span class="k">F 维是全站学员稿最高一档  </span>四类指标、公平性分层、二乘二设计、八项可证伪预测、第七节与近邻构念的裁决性划界——方法论成熟度在本站少见。</div></div>
+</div>
+<div class="scorebox"><b>SDE 创新智商 136 → 138</b><p><b>136</b> 是投稿原稿的全文盲评（五维 S140 D137 E133 I131 F140，加权 S×.20+D×.25+E×.20+I×.20+F×.15，近邻比对以中英文公开文献为参照库，并计入站内自撞，评分截至 2026-08）；<b>138</b> 是文末附论（编辑增补的最近邻切割、可裁决预测与同批分工交代）之后的<b>编辑自评</b>，<b>待独立复评</b>。按本站铁律，改稿者不得为自己改过的文本盖认证分，故后一数只作修改设计目标。<span style="opacity:.8">（评分：Claude · 2026年8月4日）</span></p></div>
+<div class="wrap">
+<div class="abstract"><div class="ab-lbl">摘　要</div></div>
+<p class="keywords"><b>关键词：</b></p>
+<p>从“学生是否发起”到“学生的行动是否改变正在发生的教学”</p>
+<p>版本：v3.0</p>
+<p>摘要</p>
+<p>许多课堂并不缺少学生参与：学生回答问题、选择任务、进行讨论，甚至生成自己的问题。然而，参与增加并不稳定地产生概念转变、跨表征理解或对基本假设的反思。现有解释通常把这一落差归因于动机不足、认知支架不够、课堂话语由教师主导，或学生缺乏能动性。这些解释各自有效，却没有充分区分两件事：学生作出了一次主动行动，以及这次行动使正在进行的教学发生了不可忽略的改变。</p>
+<p>本文提出“路径修订模型”。其核心判断是：深层学习所需的不是抽象的发起权，也不只是学生提问的频率，而是学习者提出的、具有认识意义的行动能够改变课堂后续的问题定义、探究方法、时间分配或证据标准。本文将这一行动称为“修订请求”，将其产生实际后果的事件称为“路径修订事件”。一项修订请求能否转化为路径修订事件，取决于两个相互独立的条件：学习者承担的表达成本，以及教学系统承担偏离预定路径的能力与意愿。由此，课堂能动性的关键不再是权力是否被“授予”，而是偏离所产生的成本由谁承担、学生的理由对后续教学具有多大约束力。</p>
+<p>这一重构修正了三种常见误判：未被教案预排的提问不必然是真实能动性的表现；由教师搭建机会而产生的学生行动不必然是“被制造的假主动”；提问数量上升也不必然意味着深层学习增加。本文给出“修订请求—制度承接—路径变化—深层学习”的有条件中介模型，提出四类可操作指标、一个二乘二判别实验和八项可证伪预测，并与认识能动性、回应性教学、学生声音、自决理论及 IRE/IRF 课堂话语研究划界。本文的增量不在于再次主张学生应当更主动，而在于把主动的有效性定位为一种关系性结果：学生提出偏离，制度接受被改变，知识活动才真正换轨。</p>
+<p>关键词：深层学习；认识能动性；课堂话语；回应性教学；学生声音；路径修订；成本分配</p>
+<h2>1. 问题：课堂可以很活跃，却从未真正改道</h2>
+<p>课堂改革常用三种可见变化证明学生已经成为学习主体：发言更多、选择更多、提问更多。它们当然比单向讲授更有价值，但仍可能发生在一条从未改变的教学轨道上。学生可以在教师给出的选项间选择，可以在预定环节提出问题，也可以通过小组讨论形成热闹的互动；只要问题定义、可接受的方法、时间边界和最终评价标准始终不受学生行动影响，学生增加的只是轨道内部的活动量，而不是改变轨道的能力。</p>
+<p>这一差异解释了一个常见但尚未得到精确刻画的现象：课堂活动在行为层面高度“学生中心”，在认识层面却仍由教学系统单向决定。学生被允许表达，却没有任何表达能迫使系统重新说明问题、改变顺序、延长探索，或承认原来的证据标准不足。课堂吸收了学生的声音，却不承担被这些声音改变的义务。</p>
+<p>因此，本文把研究问题从“谁先动”改写为：什么样的学生行动，能够使课堂后续路径发生可观察、可归因且具有认识意义的修订？ 这个改写包含三个推进。第一，它把发言或提问与有效能动性分开。第二，它把教师的回应纳入构念，而不把能动性当作学生单方面拥有的心理属性。第三，它允许制度设计真正支持能动性，而不必陷入“凡由制度提供的机会都是假自主”的不可证伪判断。</p>
+<h2>2. 邻近传统及其尚未闭合的接缝</h2>
+<h3>2.1 概念转变、表征贯通与双环学习</h3>
+<p>概念转变理论指出，新概念的形成要求学习者对既有解释产生不满，并认为替代解释可理解、合理且有解释力（Posner et al., 1982）。化学教育研究强调宏观现象、微观模型和符号表征之间的转换（Johnstone, 2000；Kozma &amp; Russell, 1997）。双环学习则把深层变化定位为对支配行动的基本假设进行反思，而非只在原规则内纠错（Argyris, 1991）。</p>
+<p>这些理论说明“什么发生了变化”，但较少处理一个先行问题：谁有能力把自己的困惑、替代表征或规则质疑变成全体教学必须回应的事项。教师可以演示认知冲突、安排表征转换、要求学生反思假设；学生也可能完成所有规定动作，却从未使任何一个自生问题改变教学路径。机制条件看似出现，学习仍停留在对既定路径的熟练执行。</p>
+<h3>2.2 认识能动性与共同知识建构</h3>
+<p>认识能动性研究已经超越“学生是否积极”的宽泛表述，关注学习者是否参与知识目标、方法、模型和评价标准的形成。共同认识能动性尤其强调群体共同承担知识推进的责任（Damşa et al., 2010）。科学教育研究进一步表明，教师与学生会在课堂实践中协商谁有资格提出问题、决定方法和评价主张（Stroupe, 2014；Miller et al., 2018）。Ko 与 Krist（2019）甚至直接提出通过开放课程的不同部分重新分配认识能动性。</p>
+<p>这些研究构成本文最强的邻近解释，也压缩了任何“学生发起是全新问题”的新颖性声明。本文的增量只能建立在一个更窄的接缝上：既有研究多描述能动性如何分配及表现，本文则追问一次学生行动如何跨越“被表达”与“改变后续教学”之间的界面，并把这个跨越建模为成本分配与制度承接共同决定的转化过程。</p>
+<h3>2.3 回应性教学与学生声音</h3>
+<p>回应性教学要求教师注意并发展学生正在形成的思想，而不是只核对标准答案；相关案例显示，探究实践可以在师生共同回应中形成（Maskiewicz &amp; Winters, 2012）。学生声音与课程共创研究则关注学生是否参与原本由教师承担的计划、评价和课程决策。系统综述发现，学生往往只在低风险领域或咨询环节参与，真正影响课程的机会有限，长期学习结果证据也仍不足（Geurts et al., 2024）。</p>
+<p>这两条传统分别抓住了本文模型的一半：回应性教学抓住“系统如何接住”，学生声音抓住“学生如何影响决策”。但若只研究教师是否回应，可能忽视学生为提出偏离承担的风险；若只统计学生是否被征询，则可能把象征性咨询误认为影响。本文将两者连接：只有当学生提出具有认识意义的修订请求，且系统的回应使后续路径发生可追踪变化时，才编码为路径修订事件。</p>
+<h2>3. 对“发起权无法被授予”的修正</h2>
+<p>“制度一旦宣布现在可以自主，自主便不再自主”具有批判锋芒，却不是可靠的经验命题。它混淆了两件事：制度规定行动的具体内容，以及制度预先建立保护行动的权利。学校当然可以规定“第十五分钟必须自由提问”，从而把自由压缩为流程；但学校也可以建立一项可执行的承诺：学生在任何环节都可要求暂停并提出理由，教师必须公开处理该理由，且提出异议不进入惩罚性评价。后者没有预先决定学生会提出什么，却改变了学生行动的权利地位和系统的回应义务。</p>
+<p>因此，不能把所有由制度支持的主动都判为虚假，也不能把所有未经允许的偏离都判为真实。一个突发跑题可能完全没有认识价值；一个由教师提供材料而被学生发现的问题，则可能迫使全班重构解释。判断标准不应是行动是否“纯粹自生”，而应是：</p>
+<p>行动是否提出了超出既定选项的认识要求；</p>
+<p>该要求是否获得了理由层面的处理，而非礼貌性倾听；</p>
+<p>处理结果是否改变了后续问题、方法、时间或证据标准；</p>
+<p>改变是否与更深的理解、迁移或假设修订相关。</p>
+<p>从这里开始，本文放弃绝对的“授予悖论”，保留其中较可靠的洞见：制度容易把不可预定的能动性收编为可展示的参与。对这种收编的识别，不依赖行动是否被安排，而依赖行动是否具有改变后续路径的效力。</p>
+<h2>4. 路径修订模型</h2>
+<h3>4.1 四个核心概念</h3>
+<p>修订请求（revision bid）是学习者提出的、要求改变当前知识活动某一组织原则的行动。它至少涉及以下一项：重新定义问题、改换探究方法、重新分配时间、改变可接受证据或修改评价标准。普通回答、澄清性提问和无关跑题不自动构成修订请求。</p>
+<p>制度承接（institutional uptake）是教师、课程与评价安排对修订请求作出的、会影响后续行动的回应。承接不是赞美、复述或把问题停放到“以后再说”，而是让请求进入课堂的实际决策链。</p>
+<p>路径修订事件（trajectory-revision event）是一个修订请求经过制度承接后，导致已实施的教学路径相对课前方案发生可观察变化的事件。变化可以很小，例如为检验学生反例增加五分钟；也可以很大，例如更换本单元的核心问题。</p>
+<p>成本分配（cost allocation）是偏离既定路径的代价在学习者与教学系统之间的分布。学习者可能承担暴露无知、同伴评价、成绩风险与身份风险；系统则承担进度延误、课程重组、评价适配和教师即时推理的成本。课堂是否真正支持能动性，不仅取决于学生成本是否降低，也取决于系统是否愿意承担自己的修订成本。</p>
+<h3>4.2 因果结构</h3>
+<p>设学习者提出修订请求的概率为 P(B)，请求被制度承接的概率为 P(U| B)，请求的认识相关性为 Q，由此产生的路径修订强度为 R，深层学习结果为 L。模型可简写为：</p>
+<p>P(B)=f(-Cₗ, A, T),     P(U| B)=g(-Cᵢ, S, K),     R=B× U× Q,     L=h(R, K₀, Td)</p>
+<p>其中，Cₗ 是学习者预期成本，A 是提出高质量请求所需的知识与表达能力，T 是任务提供的探究空间；Cᵢ 是教学系统承担修订的成本，S 是时间、课程与评价上的制度余量，K 是教师识别和发展学生思想的专业能力；K₀ 是先备知识，Td 是任务难度。</p>
+<p>这不是要把复杂课堂压缩为一个可直接估计的线性方程，而是明确四个不能互相替代的环节。降低学习者成本可能增加请求，却不保证承接；提高教师回应意愿可能没有作用，因为学生从未提出可发展的请求；请求和承接都发生，也可能因认识相关性不足而不产生学习增益。理论的经验价值恰在于允许每个环节分别失败。</p>
+<h3>4.3 承接弹性</h3>
+<p>本文用“承接弹性”描述教学路径对学生理由的敏感程度：当修订请求的数量或质量变化时，实际教学路径随之变化的幅度。低弹性课堂可以允许大量发言，却把所有发言吸收回原计划；高弹性课堂未必喧闹，但一个有力反例足以改变全班接下来的探究。</p>
+<p>承接弹性不是越高越好。若任何偏离都造成课程大幅改道，课堂会失去累积性与公共知识标准。合理目标是选择性高弹性：对认识相关且理由充分的请求敏感，对无关偏离保持稳定。教师专业性因此不是能动性的对立面，而是选择性承接的必要条件。</p>
+<h3>4.4 成本转移而非单向降本</h3>
+<p>仅说“降低学生发起成本”仍不完整。许多课堂通过匿名提问箱、自由讨论或无惩罚承诺降低了表达成本，却不改变课程、时间和评价结构。结果可能是学生更愿意说，制度仍无需改变。有效改革必须发生一次成本转移：学生不再独自承担偏离的全部代价，教学系统开始承担重排时间、解释取舍和修订评价的成本。</p>
+<p>这一点产生一个反直觉预测：低表达成本但低承接弹性的课堂，学生声音可能增加，深层学习却不增加；表达成本中等但承接弹性高的课堂，少量高质量请求反而可能产生更强学习效应。因而，请求数量不是关键结果，请求转化为路径修订的比率才是核心中介。</p>
+<h2>5. 可操作化：从“槽外计数”到“路径差分”</h2>
+<h3>5.1 为什么时间不可预测性不够</h3>
+<p>以教案是否预留槽位区分真实与制造的发起，会产生三类误判。第一，学生的偶然跑题是槽外的，却没有认识价值。第二，教师可以预见学生会遇到某类矛盾，却不能预定学生给出的具体理由；这种行动即使发生在预留环节，也可能具有真实修订效力。第三，深层理解可能先发生，随后才出现槽外提问，使提问成为学习结果而非原因。</p>
+<p>因此，课前方案仍应保留，但它不再充当真实性裁判，而是用于估计路径变化。</p>
+<h3>5.2 四类指标</h3>
+<p>请求指标：编码学生行动是否试图改变问题、方法、时间或证据标准，并记录其理由质量。至少两名不知研究假设的编码者独立判断。</p>
+<p>承接指标：区分忽略、礼貌确认、延迟处理、解释性拒绝、局部采纳和结构性采纳。解释性拒绝仍可能构成较高质量承接，因为学生的理由进入了公开裁决；单纯赞美不构成承接。</p>
+<p>路径差分指标：比较课前教学图与实际课堂序列，测量由学生请求引起的时间重分配、任务更换、问题重述、证据标准变化和评价修改。可把差分报告为多维向量，而不强行压成单一分数。</p>
+<p>学习结果指标：至少同时包括延时解释、远迁移任务和新情境中的问题重构。即时作业成绩不足以证明路径修订产生了深层学习。</p>
+<p>路径修订事件率定义为：</p>
+<p>TRR=具有认识相关性且获得实质承接的修订请求数 /全部具有认识相关性的修订请求数</p>
+<p>该比率与请求总数必须同时报告。若只报告比率，极少数事件可能造成虚高；若只报告总数，又会把高表达、低承接的课堂误判为高能动性课堂。</p>
+<h3>5.3 公平性分层</h3>
+<p>同一制度规则不会给所有学生带来相同成本。身份刻板印象、语言能力、过往惩罚经历、师生关系和同伴地位会改变一次质疑的预期代价。研究必须按学生群体和课堂位置报告请求、承接与路径修订的分布，而不能只计算班级平均值。若少数高地位学生垄断修订能力，班级总体承接弹性再高，也不能被解释为共享能动性。</p>
+<h2>6. 判别性研究设计</h2>
+<h3>6.1 二乘二设计</h3>
+<p>最小可行的裁决设计同时操纵两个变量：学习者表达成本与制度承接承诺。</p>
+<p>条件</p>
+<p>表达成本</p>
+<p>承接承诺</p>
+<p>关键预测</p>
+<p>A</p>
+<p>高</p>
+<p>低</p>
+<p>请求少，路径修订少</p>
+<p>B</p>
+<p>低</p>
+<p>低</p>
+<p>请求增加，但学习增益有限</p>
+<p>C</p>
+<p>高</p>
+<p>高</p>
+<p>请求仍少；少量请求可能获得较高转化</p>
+<p>D</p>
+<p>低</p>
+<p>高</p>
+<p>请求与转化同时增加，深层学习增益最大</p>
+<p>降低表达成本可通过取消提问对进度与平时分的惩罚、允许匿名初始提交等方式实现。提高承接承诺则要求教师在课前明确：达到预注册理由标准的请求必须得到当堂处理，并允许调整时间、方法或证据要求；每次拒绝也必须给出公开理由。两种操纵必须分开，否则无法判断效果来自学生更敢提出，还是系统更愿意改变。</p>
+<p>建议采用班级层面的整群随机设计，并以教学单元为分析周期。分析模型应检验：表达成本对请求数的主效应、承接承诺对转化率的主效应、二者对深层学习的交互效应，以及“请求—路径修订—学习”的有条件中介链。教师响应能力、先备知识和任务开放度作为预先声明的调节变量。</p>
+<h3>6.2 八项可证伪预测</h3>
+<p>数量—效力分离：学生提问或发言总量与深层学习的关系，应弱于路径修订事件率与深层学习的关系。若两者无差异，新增构念没有价值。</p>
+<p>低成本不足：降低学习者成本应增加修订请求，但在低承接条件下不稳定提升深层学习。若降本无须承接即可稳定产生同等增益，成本分配模型被削弱。</p>
+<p>承接中介：承接承诺的效果应主要经由路径修订事件，而非仅由课堂愉悦度或一般参与度中介。若一般参与完全解释结果，模型应并入既有参与理论。</p>
+<p>槽内可真实：发生在教师预留环节中的修订请求，只要改变后续路径，也应预测深层学习。若只有槽外事件有效，时间不可预测性假说优于本文。</p>
+<p>槽外可无效：未经预排但被忽略、压制或与知识目标无关的行动，不应稳定提升深层学习。若它们仍有效，可能是学习先于行动发生。</p>
+<p>顺序约束：在时间序列上，修订请求和承接应先于相关的迁移或假设修订表现。若学习稳定先发生，路径修订更可能是结果指标。</p>
+<p>选择性弹性：对高质量请求的承接应比对低质量请求的无差别承接更能预测学习。若无选择的高弹性同样有效，认识相关性筛选没有必要。</p>
+<p>公平性预测：形式规则相同而身份成本不同的群体，其请求率与承接率仍会分化。若群体差异完全消失，成本分配中的身份维度应删除。</p>
+<h2>7. 与近邻构念的裁决性划界</h2>
+<p>近邻构念</p>
+<p>主要对象</p>
+<p>本文新增的区别</p>
+<p>使本文失败的结果</p>
+<p>自决理论中的自主</p>
+<p>行动是否被自我认可及其动机效应</p>
+<p>自主感可以高，但行动未改变公共教学路径</p>
+<p>自主感在控制后完全吸收路径修订的预测力</p>
+<p>自我调节学习</p>
+<p>个体设定目标、监控与调整自己的学习</p>
+<p>路径修订要求个体行动改变共同课堂的后续组织</p>
+<p>个体自我调节足以解释全部结果</p>
+<p>认识能动性</p>
+<p>学生参与知识生产与评价</p>
+<p>分解为请求、承接和路径后果，并解释转化失败</p>
+<p>既有认识能动性量表完整覆盖且预测力不弱</p>
+<p>回应性教学</p>
+<p>教师注意并发展学生思想</p>
+<p>同时测量学生提出偏离的成本和系统承担修订的成本</p>
+<p>只测教师回应即可重现全部效应</p>
+<p>学生声音与课程共创</p>
+<p>学生参与决策及权力分享</p>
+<p>要求决策影响具有认识相关性并连接深层学习</p>
+<p>一般决策参与与深层学习关系同样强</p>
+<p>IRE/IRF 话语结构</p>
+<p>谁发起、回应、评价一个话轮</p>
+<p>关注话轮是否改变跨话轮的教学轨迹</p>
+<p>话轮发起分布与路径差分没有增量差异</p>
+<p>这张表意味着本文不能以“概念更精细”作为存活理由。只有在控制邻近构念后，路径修订事件仍对延时迁移与问题重构提供稳定的增量解释，模型才有独立存在的必要。</p>
+<h2>8. 理论含义：深层学习是一次成本被重新分担的共同改道</h2>
+<p>路径修订模型改变了对“学生中心”的理解。学生中心不再由学生说话的时间、选择的数量或活动的热闹程度定义，而由学生理由对公共知识活动的实际效力定义。教师也不再被放在能动性的对立面：缺少教师的知识判断、课程重组与解释性拒绝，学生的请求很难转化为累积性的学习。深层学习不是教师退出后留下的真空，而是教师和制度愿意承担被有力理由改变的成本。</p>
+<p>该模型也重新解释了“表面自主”。问题不只是学生被安排去自主，而是教学系统把偏离成本继续留给学生：你可以提问，但不能耽误进度；可以质疑，但考试仍按原标准；可以给建议，但课程已经定稿。在这类安排中，表达权存在，路径修订权缺席。相反，一项制度支持的活动即使被预先安排，只要学生提出的具体理由没有被预定，并能触发真实的路径修改，就不应被贬为假自主。</p>
+<p>更深一层看，课堂权力并不只表现为谁能说“不”，还表现为谁能让他人为这个“不”付出重新组织的成本。权力的经验痕迹不在宣言中，而在时间表是否移动、评价标准是否修改、教师是否需要公开说明为何拒绝。把这些痕迹纳入测量，才能避免把政治判断缩减成心理问卷，也避免把任何突发行为浪漫化为解放。</p>
+<h2>9. 边界、风险与研究议程</h2>
+<p>第一，模型不适用于所有学习阶段。基础技能的自动化训练需要较高的路径稳定性；初学者也可能缺少提出高质量修订请求所需的先备知识。本文预测的是选择性承接，不是持续改道。</p>
+<p>第二，路径差分的归因困难。教师可能因时间、设备或同伴意见改变计划，而非因某一学生请求。研究需要录像、课前方案、教师刺激回忆与学生访谈进行三角互证，并保留“不确定归因”类别。</p>
+<p>第三，制度承接可能成为新的表演指标。学校若把“每课至少发生三次改道”写入考核，教师会制造路径修订的外观。防止这一反噬的办法不是宣布所有制度化支持都无效，而是审计改变是否进入时间、任务、证据和评价的真实决策链，并检查学生是否能提出对教师不便利的请求。</p>
+<p>第四，本模型目前是理论候选，而非已经得到验证的因果规律。现有文献支持学生能动性、课程开放和教师回应的重要性，但没有直接检验本文提出的完整有条件中介链。正式研究应预注册编码手册、主要结局、排除规则和中介模型；失败结果应分别定位到请求生成、制度承接、路径变化或学习转化环节，而不能由理论吸收为“实施不够真实”。</p>
+<p>第五，深层学习可能反过来提高学生提出修订请求的能力。纵向交叉滞后模型或课堂片段级时间序列只能部分处理这一问题；更强的证据仍需随机操纵表达成本和承接承诺，并结合延迟结果。</p>
+<h2>10. 结论</h2>
+<p>课堂深层学习的稀缺，不能只由学生是否积极、是否自主或是否先开口来解释。真正关键的断点位于主动行动与公共后果之间：学生提出的理由，能否让正在发生的教学承担修改自身的成本。</p>
+<p>本文由此提出路径修订模型。学习者先提出改变问题、方法、时间或证据标准的修订请求；教学系统随后选择忽略、解释性拒绝、局部采纳或结构性采纳；只有具有认识相关性的请求获得实质承接，路径修订事件才发生。深层学习被预测为这种事件的结果，而不是提问数量或课堂活跃度的直接函数。</p>
+<p>这比“发起权无法被授予”更弱，也更难逃避检验。制度可以提供权利、余量和承接义务，因此制度化支持不必然制造假自主；学生也可以未经允许地偏离，因此突发行动不必然具有学习价值。判决不再依赖行动的纯洁来源，而依赖一条可追踪的因果链：谁提出了什么理由，谁为回应它承担了成本，课堂实际改变了什么，而这种改变是否留下了延时迁移与问题重构的证据。</p>
+<p>课堂是否真正允许学习者成为认识主体，可以压缩成一个可观察的问题：当学生给出一个足够好的理由时，什么会因此而改变？</p>
+<h2>参考文献</h2>
+<p class="ref">Argyris, C. (1991). Teaching smart people how to learn. Harvard Business Review, 69(3), 99–109.</p>
+<p class="ref">Damşa, C. I., Kirschner, P. A., Andriessen, J. E. B., Erkens, G., &amp; Sins, P. H. M. (2010). Shared epistemic agency: An empirical study of an emergent construct. The Journal of the Learning Sciences, 19(2), 143–186. https://doi.org/10.1080/10508401003708381</p>
+<p class="ref">Deci, E. L., &amp; Ryan, R. M. (1985). Intrinsic motivation and self-determination in human behavior. Plenum Press.</p>
+<p class="ref">Duit, R., &amp; Treagust, D. F. (2003). Conceptual change: A powerful framework for improving science teaching and learning. International Journal of Science Education, 25(6), 671–688. https://doi.org/10.1080/09500690305016</p>
+<p class="ref">Engeström, Y., Nuttall, J., &amp; Hopwood, N. (2022). Transformative agency by double stimulation: Advances in theory and methodology. Pedagogy, Culture &amp; Society, 30(1), 1–7. https://doi.org/10.1080/14681366.2020.1805499</p>
+<p class="ref">Freire, P. (1970). Pedagogy of the oppressed (M. B. Ramos, Trans.). Herder and Herder.</p>
+<p class="ref">Geurts, E. M. A., Reijs, R. P., Leenders, H. H. M., Jansen, M. W. J., &amp; Hoebe, C. J. P. A. (2024). Co-creation and decision-making with students about teaching and learning: A systematic literature review. Journal of Educational Change, 25, 103–125. https://doi.org/10.1007/s10833-023-09481-x</p>
+<p class="ref">Johnstone, A. H. (2000). Teaching of chemistry—logical or psychological? Chemistry Education Research and Practice, 1(1), 9–15. https://doi.org/10.1039/A9RP90001B</p>
+<p class="ref">Ko, M.-L. M., &amp; Krist, C. (2019). Opening up curricula to redistribute epistemic agency: A framework for supporting science teaching. Science Education, 103(4), 979–1010. https://doi.org/10.1002/sce.21511</p>
+<p class="ref">Kozma, R. B., &amp; Russell, J. (1997). Multimedia and understanding: Expert and novice responses to different representations of chemical phenomena. Journal of Research in Science Teaching, 34(9), 949–968. https://doi.org/10.1002/(SICI)1098-2736(199711)34:9%3C949::AID-TEA7%3E3.0.CO;2-U</p>
+<p class="ref">Maskiewicz, A. C., &amp; Winters, V. A. (2012). Understanding the co-construction of inquiry practices: A case study of a responsive teaching environment. Journal of Research in Science Teaching, 49(4), 429–464. https://doi.org/10.1002/tea.21007</p>
+<p class="ref">Miller, E., Manz, E., Russ, R. S., Stroupe, D., &amp; Berland, L. (2018). Addressing the epistemic elephant in the room: Epistemic agency and the Next Generation Science Standards. Journal of Research in Science Teaching, 55(7), 1053–1075. https://doi.org/10.1002/tea.21459</p>
+<p class="ref">Posner, G. J., Strike, K. A., Hewson, P. W., &amp; Gertzog, W. A. (1982). Accommodation of a scientific conception: Toward a theory of conceptual change. Science Education, 66(2), 211–227. https://doi.org/10.1002/sce.3730660207</p>
+<p class="ref">Rancière, J. (1991). The ignorant schoolmaster: Five lessons in intellectual emancipation (K. Ross, Trans.). Stanford University Press.</p>
+<p class="ref">Sinclair, J. M., &amp; Coulthard, R. M. (1975). Towards an analysis of discourse: The English used by teachers and pupils. Oxford University Press.</p>
+<p class="ref">Stroupe, D. (2014). Examining classroom science practice communities: How teachers and students negotiate epistemic agency and learn science-as-practice. Science Education, 98(3), 487–516. https://doi.org/10.1002/sce.21112</p>
+<p class="ref">Zimmerman, B. J. (2002). Becoming a self-regulated learner: An overview. Theory Into Practice, 41(2), 64–70. https://doi.org/10.1207/s15430421tip4102_2</p>
+<p class="ref">生成与证据声明</p>
+<p class="ref">本文由人机协作形成。人类作者负责研究问题、价值取舍与终审；人工智能参与邻近文献拓宽、竞争解释构造、模型重写与语言整理。本文提出的路径修订模型、承接弹性和成本分配机制均为待经验检验的理论候选。文献条目的题名、卷期与 DOI 已优先依据期刊页面、大学研究门户或论文原页核对；正式投稿前仍应按目标期刊格式进行一次独立书目复核。</p>
+<h2>附论零 · 同批分工与「碰题」裁定（编辑增补）</h2>
+<p>本篇属 2026 年 8 月 4 日的一批投稿。编辑部对本批执行的原则是：<b>不碰题——一旦与站内已发文或与同批另一篇撞上同一个靶格，即予清除，不做并列发表。</b></p>
+<p><b>少敏本批发表的是：</b>《谁能迫使课堂改道》与《课堂上稀少的究竟是学习，还是可被识别的学习？》两篇，成对发表</p>
+<p><b>本批两篇均予发表，无清除。两篇不碰题：前者问<b>什么样的学生行动能改变课堂后续路径</b>（改道的条件），后者问<b>已经发生的学习为何进不了制度的账</b>（识别的条件），后者第 5 节明确接住前者并给出连接判据，因此是一条链的两环而不是同一格的两次命名。⚠️ 另需说明：两篇投稿原件的作者栏为空，本站按投稿账号署名为少敏；如与作者本意不符，请联系编辑部更正。</b></p>
+<p>本批还有一项跨学员裁定：同日全批评审中发现一个反复出现的论证形状——「某种能力的<b>发生条件</b>被一套善意且有效运行的系统拿走或替换，而这替换恰恰发生在系统的每一次成功里」，它在本批跨越五位作者、四个互不相干的题域。凡落在这一格而站内已有同格篇目的稿件，本次一律清除。</p>
+<h2>附论一 · 最近邻切割（编辑增补）</h2>
+<p>本文第七节已完成与概念转变、双环学习、认识能动性、回应性教学等构念的裁决性划界。此处补一位课堂话语研究中最贴身、而正文未点名的正主：尼尔·默瑟一系的<b>探索性对话</b>（exploratory talk）——学生在小组中公开推理、互相质疑、共同修正，被认为是产生深层理解的话语形态。</p>
+<p><b>分离线在被测量的是话语类型还是路径后果。</b>探索性对话是一个<b>话语层面的类型学</b>——它按发言的形态（是否给理由、是否回应他人）来判定质量，判定可以在一段话结束时完成；本文的路径修订是一个<b>后果层面的判据</b>——同样一段高质量的探索性对话，如果没有改变课堂后续的问题定义与推进方向，在本文的框架里就不算改道。</p>
+<p><b>判决性对照预测</b>：在同一批课堂中同时编码探索性对话密度与路径差分指标。探索性对话框架预测两者<b>高度正相关</b>，且深层学习结果主要由前者解释；本文预测存在<b>相当一类课堂：探索性对话密度高而路径差分接近零</b>（学生充分讨论，教学轨道纹丝不动），且这类课堂的延时迁移成绩显著低于路径差分高的课堂。<b>若不存在这一类课堂，路径修订即是探索性对话的一个下位指标。</b></p>
+<h2>附论二 · 可裁决预测（编辑增补）</h2>
+<p><b>1. 高对话密度而零路径差分</b>：若不存在这类课堂，本模型应并入探索性对话研究。</p>
+<p><b>2. 正文已给的八项预测</b>：第六节二乘二设计下的八项可证伪预测，是本文最完整的自证路径。</p>
+<p><b>3. 与《可被识别的学习》的分工</b>：本篇问改道的条件，那一篇问识别的条件；那一篇第 5 节明确指出改道为何容易被判为低效，两篇因此是一条链的两环。</p>
+
+</div>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

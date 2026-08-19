@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>指标正常，人却在坏 · 秦莉 · 医学哲学 | 学员专栏 · SDE Universes</title>
+<meta name="description" content="指标正常，人却在坏：健康判准的旁路结构——为什么问题不是判准不准，而是判准可以被绕过 —— 秦莉（笔名斐索）医学哲学 · 发表于2026年7月17日">
+<style>
+:root{--gold:#8A6817;--gold2:#C89117;--ink:#2A2315;--ink2:#5B4F38;--bg:#F5EFE0;--muted:#8A7B54;--line:rgba(138,104,23,0.30);--panel:#EFE7D3;--panel2:#F1EAD8}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(138,104,23,0.3)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.9;background-image:radial-gradient(ellipse at 50% -12%,rgba(138,104,23,0.10),transparent 62%)}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(42,35,21,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#E4D6AE;font-size:13px;letter-spacing:0.04em;text-decoration:none}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(255,255,255,0.45);color:#F1E6C4;letter-spacing:0.03em;text-decoration:none}
+.rb-btn.cur{background:#F1E6C4;color:#4A3A10;font-weight:700;border-color:#F1E6C4}
+.essay{max-width:680px;margin:0 auto;padding:52px 24px 20px}
+.head{text-align:center;padding-bottom:8px}
+.head .kicker{font-size:11.5px;letter-spacing:0.4em;color:var(--gold);margin-bottom:20px}
+.head h1{font-size:clamp(26px,4.6vw,38px);font-weight:800;color:#2A2315;letter-spacing:0.03em;line-height:1.45}
+.head .subttl{display:block;font-size:0.46em;font-weight:700;color:#4A3F28;margin-top:16px;line-height:1.6;letter-spacing:0.02em}
+.head .by{font-size:14px;color:var(--ink);letter-spacing:0.2em;margin-top:22px;font-weight:700}
+.head .dateline{font-size:12.5px;color:var(--muted);letter-spacing:0.1em;margin-top:9px}
+.head .rule{width:44px;height:1px;background:var(--gold);opacity:0.6;margin:30px auto 0}
+.abstract{max-width:620px;margin:34px auto 0;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:22px 26px}
+.abstract .lbl{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:12px}
+.abstract p{font-size:14.5px;color:var(--ink2);line-height:1.95;letter-spacing:0.01em}
+.kw{max-width:620px;margin:14px auto 0;font-size:13px;color:var(--muted);letter-spacing:0.04em;text-align:center}
+.body{padding-top:12px}
+.sec{margin:52px 0 8px}
+.sec .n{font-size:20px;font-weight:800;color:#2A2315;letter-spacing:0.04em;line-height:1.5}
+.sec .sub{font-size:13.5px;color:var(--gold);letter-spacing:0.14em;margin-top:8px}
+.sec-rule{width:34px;height:1px;background:var(--gold);opacity:0.55;margin:18px 0 26px}
+.body p{font-size:17px;color:var(--ink2);line-height:2.05;margin-bottom:22px;letter-spacing:0.01em;text-align:justify}
+.body p.lead{color:var(--ink)}
+.end-orn{text-align:center;color:var(--gold);opacity:0.65;letter-spacing:0.6em;margin:46px 0 6px;font-size:14px}
+.foot-nav{max-width:680px;margin:0 auto;padding:12px 24px 34px;text-align:center;display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+.foot-nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em;border-bottom:1px solid rgba(138,104,23,0.4);padding-bottom:2px}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a10 0%,#1c160b 60%,#140f07 100%);text-align:center;padding:56px 24px;margin-top:40px}
+.endbox .eb-k{font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:16px}
+.endbox .eb-t{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.08em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:2}
+.endbox a{display:inline-block;letter-spacing:0.1em;padding:12px 30px;font-size:14.5px;text-decoration:none;border-radius:2px;margin:6px}
+.endbox .primary{background:#D4B25E;color:#150F24;font-weight:700}
+.endbox .ghost{border:1px solid #D4B25E;color:#D4B25E}
+footer{border-top:1px solid var(--line);padding:28px 24px;text-align:center;color:var(--muted);font-size:13px;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.body p{font-size:16px}.essay{padding-top:40px}}
+
+.body p.ref{font-size:14px;line-height:1.9;margin-bottom:10px;padding-left:2em;text-indent:-2em;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="readbar">
+  <a class="nav-back" href="/students/qin-li/essays/">← 秦莉 · 评论</a>
+  <div class="rb-modes">
+    <span class="rb-btn cur">长文阅读</span>
+    <a class="rb-btn" href="read.html">在线 PDF</a>
+    <a class="rb-btn" href="bypass-attainment.pdf" download>下载 PDF</a>
+  </div>
+</div>
+
+<article class="essay">
+  <div class="head">
+    <div class="kicker">医 学 哲 学 · PHILOSOPHY OF MEDICINE</div>
+    <h1>指标正常，人却在坏<span class="subttl">健康判准的旁路结构——空、乱、虚为何是同一种病的三个签名</span></h1>
+    <div class="by">秦 莉 · 笔名 斐索</div>
+    <div class="dateline">SDE 学员专栏 · 约八千字 · 发表于2026年7月17日</div>
+    <div class="rule"></div>
+  </div>
+
+  <div class="abstract">
+    <div class="lbl">摘　要</div>
+    <p>本文接手王德生《三大健康观的空、乱、虚》留下的问题：客体、互动、主体三种健康观在哲学上势不两立，为什么会以同一种拓扑坏掉？本文的回答是，三症一因——<strong>判准记录到达点，不记录到达方式，而结局追随的恰恰是到达方式</strong>。任何健康判准都容许一类路线：不经过它本要认证的状态，而直接合成它的输出——本文称之为旁路，称经旁路到达判准点的事件为旁路达标。空、乱、虚不是三种病，是同一种病在数值、清单、感受三个裁判位置上的三个签名，其差异由判准的复合方式决定。本文进而论证：旁路的危险不来自它假，来自它半真——以 CAST（代理指标达标而死亡率翻倍）与 ACCORD（糖化血红蛋白确实达标、死亡风险却上升）为证，说明经过验证的代理指标同样被旁路捕获，因为验证检查的是判准与结局的关系，而旁路藏在干预与判准的关系里。文章与古德哈特定律、代理终点批判、康吉莱姆、伊里奇划出四条分界线，论证“虚”是三个签名中唯一结构上不可自我察觉的一个，并给出判准的选择原则：不求更准，求旁路更贵——好判准把路径压进点里。最后给出三条证伪路径与四条边界。</p>
+  </div>
+  <div class="kw">关键词：健康判准　旁路达标　半真　代理终点　功能性判准　判准的保质期　空·乱·虚</div>
+
+  <div class="body">
+
+    <div class="sec"><div class="n">引言</div><div class="sub">一个没有名字的常见现象</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">一位高血压患者服着三种药，血压稳定在 130/80。所有指标都在参考区间里。与此同时，他的肾功能在退，腰围在长，爬两层楼要停一次。他的病历上写着"控制良好"。</p>
+    <p>这不是罕见的悲剧，是内科门诊每天的日常。医生知道它，患者也隐约知道它，但它没有名字——因为在现有的话语里，它是一个不该出现的句子："指标正常，人却在坏。" 指标本来就是用来告诉我们人好不好的；当它说"好"而人在坏，我们要么怀疑指标测错了，要么怀疑还有别的指标没测。两种怀疑都假定：问题出在测得不够准。</p>
+    <p>本文的判断相反。<strong>问题不在判准不准，在判准可以被绕过</strong>——而且，绕过的路线越是部分有效，它就越彻底地捕获整个系统。</p>
+    <p>本文的三分诊断取自王德生《三大健康观的空、乱、虚》：客体健康观以固定生理指标定义健康，其病是"空"——目标空洞；互动健康观以行为路径定义健康，其病是"乱"——路径互撞；主体健康观以主观感受定义健康，其病是"虚"——效果无从评估。三症的辨识是清楚的。本文接手的是它留下的那个问题：<strong>三种立场如此不同，为什么会同时坏掉？是三种病，还是一种病的三个签名？</strong></p>
+    <p>全文七节。第一节紧缩复述三症，并把它们摆成一个待解释的巧合。第二节给出本文的核心区分——判准记录到达点，不记录到达方式——并据此定义旁路达标。第三节论证旁路的危险来自它的半真，用两个心脏病学与糖尿病学的经典试验作证。第四节与四个近邻划界：古德哈特定律、代理终点批判、康吉莱姆、伊里奇。第五节处理一个不对称：为什么"虚"比"空"更难治。第六节给出判准的选择原则。第七节写明这套判断如何可能失败。</p>
+    <p>读完之后，"指标正常，人却在坏"这句话应该不再是一个悖论，而是一个可以被预期、被诊断、也被设计规避的结构。</p>
+
+    <div class="sec"><div class="n">第一节</div><div class="sub">三种判准，三个位置</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">三大健康观的分歧，可以压缩成一个问题：<strong>谁来判定你健康？</strong></p>
+    <p><strong>客体健康观把裁判放在人之外。</strong>它是一个数字，一个从人群统计中导出的参考区间：血压 120/80，体温 37℃，糖化血红蛋白 7% 以下。它的三种"空"是：其一，固定标准忽略个体与环境——高原居民的血氧长期低于平原参考值，那是适应，不是病；其二，路径单一——用药物把指标推到达标，短期有效，长期可能什么也没改变；其三，系统缺席——压力引发的高血压，用降压药按住数字，压力照旧。结果：数字达标，而数字本要认证的那个东西不在。</p>
+    <p><strong>互动健康观把裁判放在动作里。</strong>它是一份行为清单：每天一万步，每周三次运动，每日固定的膳食比例。它的三种"乱"是：目标碎片化（运动目标与饮食目标各自为政，合起来营养失衡）、路径僵化（对老年人与体弱者一刀切的五公里跑）、系统割裂（低碳饮食叠加高强度运动，低血糖风险上升，患者最后把整套计划一起放弃）。结果：每条清单单独可执行，合起来互相拆台。</p>
+    <p><strong>主体健康观把裁判放在人之内。</strong>它是感受：气血调和，阴阳平衡，身心舒畅。它的三种"虚"是：目标模糊（无法量化）、路径随机（依赖个人偏好与经验）、系统割裂（宣称身心整合，实践中并无规划）。结果：一位慢性疲劳患者靠调理获得了主观好转，病情在同一段时间里继续恶化，而这套框架里没有任何东西能提醒他。</p>
+    <p>三种立场在哲学上势不两立：一个信数字，一个信行为，一个信体验。它们互相指责对方遗漏了要害，而且每一句指责都对。可是它们坏掉的方式如此对称——各有一个"目标层"的病、一个"路径层"的病、一个"系统层"的病——这就不像是三种偶然的失败。<strong>当三个互相反对的立场以同一种拓扑坏掉，可疑的就不是立场，是它们共有的那个东西。</strong></p>
+    <p>它们共有的东西只有一件：<strong>它们都需要一个判准。</strong></p>
+
+    <div class="sec"><div class="n">第二节</div><div class="sub">判准是点，结局是路径</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">先做一个区分，全文的重量都压在它上面。</p>
+    <p>任何健康判准——一个数值、一份清单、一种感受——都记录一件事：<strong>到达点</strong>。血压 130/80 是一个点。今天走满一万步是一个点。感觉舒畅是一个点。判准的全部信息量，就是"你现在在不在这个点上"。</p>
+    <p>判准不记录的是：<strong>你怎么到的</strong>。</p>
+    <p>而结局——十年后的肾功能、二十年后的独立行走能力、明天的死亡风险——追随的恰恰是到达方式。同一个 130/80，可以是一具代谢正常的身体自己走到的，也可以是一具代谢在恶化的身体被三种药按到的。这两个 130/80 在血压计上完全一样，在十年后完全不一样。</p>
+    <p>于是有了本文的核心命题：<strong>判准所丢弃的信息，正是结局所依赖的信息。</strong></p>
+    <p>这句话立刻推出一个概念。既然判准只认点、不认路，那么任何判准都容许一类特殊路线：<strong>不经过它本要认证的那个状态，而直接到达它的点。</strong>本文称之为<strong>旁路</strong>；称经由旁路到达判准点的事件为<strong>旁路达标</strong>。</p>
+    <p>旁路达标的定义可以写得很紧：*判准被满足，而它本要认证的状态没有被生成——因为存在一条直接合成判准输出、绕开状态的路线。*</p>
+    <p>这里有一个容易滑过去的结构，值得摊开。健康的那个状态（比方说"运转正常的代谢"）有很多输出：血压、血糖、肾灌注、体力、睡眠、修复速度。判准通常只抓住其中一个输出，用它来认证整个状态——这是合理的，因为在自然条件下，这个输出确实只有状态本身能产生。药物、清单、慰藉的作用，是<strong>为这一个输出建了一条独立的生产线</strong>。输出照常产出，状态没有被触及，其余输出统统缺席。判准无法分辨这两种产出，因为它只看输出。</p>
+    <p>三个裁判位置，因此各有一条特征旁路。数值判准的旁路是<strong>药理的</strong>：药物直接生产那个读数。清单判准的旁路是<strong>执行的</strong>——一万步可以是散步，也可以是拖着脚在商场里晃；动作完成了，动作本要代表的那个代谢强度没有。感受判准的旁路是<strong>镇痛与慰藉的</strong>：止痛、安慰剂、注意力转移、回避，都能生产"感觉好些了"这个输出，而不触及底下的任何东西。</p>
+    <p><strong>空、乱、虚不是三种病。是同一种病在三个裁判位置上的三个签名。</strong></p>
+    <p>签名之所以不同，是因为判准的复合方式不同。数值判准彼此独立，各自在各自的读数上被满足，谁也不需要谁——所以它们的旁路各自成功，加起来却什么也没认证：这是<strong>空</strong>。清单判准必须在同一具身体、同一天里被执行，争夺同一份有限的时间、精力与血糖——所以它们的旁路必然互相干涉：这是<strong>乱</strong>。感受判准只有一条通道，一个人一次只有一个整体感受，没有第二个感受能与它冲突——所以它的旁路一旦成功，就没有任何东西能与之矛盾：这是<strong>虚</strong>。</p>
+    <p>这个复合结构的解释力，可以用一个它本该被绊倒的地方来检验：<strong>多重用药</strong>。数值判准不是应该只产生"空"吗？可老年多重用药的典型灾难恰恰是"乱"——降压药、降糖药、他汀、抗凝药彼此冲撞。这不是反例，是推论：当数值判准多到它们的旁路（药物）必须在同一具身体的同一套酶系里同时运行时，数值判准就获得了清单判准的复合方式，于是它的签名从空转为乱。<strong>空与乱不是两种病，是同一种病在判准数量增加时的相变。</strong></p>
+
+    <div class="sec"><div class="n">第三节</div><div class="sub">危险的是半真，不是假</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">到这里，一个自然的反驳会出现：如果旁路什么也没生成，它早该被拆穿了。患者会照样中风，照样死，几个月就露馅。旁路能长期存在，说明它有用。</p>
+    <p>这个反驳是对的。而它恰恰是本文最要紧的一句话的入口：<strong>旁路的危险不来自它假，来自它半真。</strong></p>
+    <p>一条什么也不交付的旁路活不过一个季度。能捕获整个系统的旁路，一定确实交付了它所承诺的一部分——多到足以被相信，少到不能替代生成路径。而"部分交付"这个属性，让它无法被结局证伪：你的血压确实低了，你的中风风险确实降了。你不能指着任何一个坏结局说"看，药没用"。药有用。只是它有用的那一部分，不是它被当作凭证的那整个东西。</p>
+    <p>两个试验把这件事钉死了。</p>
+    <p><strong>心律失常抑制试验（CAST，1989）。</strong>假设很合理：心肌梗死后的室性早搏是猝死的危险因素，那么抑制早搏应当减少猝死。药物做到了它承诺的事——参与筛选的 2309 名患者中，1727 人（75%）的心律失常被恩卡尼、氟卡尼或莫雷西嗪成功抑制。代理指标漂亮达标。然后随访揭示：服药组的死亡率是安慰剂组的约 2.5 倍（56/730 对 22/725），心律失常性死亡与心脏骤停的相对风险 3.6。试验被提前中止。药抑制了早搏，抑制得干净利落。药也杀了人。</p>
+    <p>CAST 是代理终点批判的经典战利品，它的教训被总结为"代理指标可能不中介结局，所以要验证代理指标"。这个教训是对的，但下一个案例说明它不够。</p>
+    <p><strong>控制糖尿病心血管风险行动（ACCORD，2008）。</strong>这一次，代理指标的资格没有问题：糖化血红蛋白与死亡风险的流行病学关联稳固而可重复——A1c 越高，风险越高，这一点在该试验自己的人群里也成立。10251 名 2 型糖尿病合并心血管风险的患者被随机分入强化组（目标 A1c&lt;6.0%）与标准组（目标 7.0%–7.9%）。强化组把数字打了下去：中位 A1c 6.4%，标准组 7.5%。<strong>数字达标了。</strong>然后：强化组全因死亡风险比 1.22，心血管死亡风险比 1.35。试验的强化组被提前叫停。</p>
+    <p>把两个试验并排看，才看得见本文与代理终点批判的分界。CAST 里，代理指标没能中介结局——那是代理终点批判的案子。ACCORD 里，代理指标中介着结局（A1c 确实预测死亡），数字也确实被推到了目标，而结局反了。<strong>验证过的代理指标，仍然被旁路捕获。</strong></p>
+    <p>原因在第二节已经写好了：验证所检查的，是判准与结局之间的关系；而旁路藏在<strong>干预与判准之间的关系</strong>里。你可以把"A1c 预测死亡"这条关系验证到无可挑剔，它仍然一个字也没说：把 A1c 从 8.1 压到 6.4 的那条药物路线，与一具代谢自己走到 6.4 的路线，是不是同一件事。它们不是。<strong>同一个数字，经旁路到达与经生成路径到达，不是同一个事实。</strong>判准分辨不出来，因为判准是点。</p>
+    <p>（ACCORD 超额死亡的确切机制至今仍有争论——低血糖、体重增加、特定药物组合、未能降下 A1c 的亚组，各家解释不同。本文不需要裁决这场争论：本文的命题只需要那个无争议的事实——数字被达到了，结局反了。）</p>
+
+    <div class="sec"><div class="n">第四节</div><div class="sub">四条分界线</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">一个判断的锋利，不在它说了什么，在它与近邻的分界处切得多干净。</p>
+    <p><strong>第一条线，对古德哈特与坎贝尔。</strong>古德哈特定律的通行表述（经斯特拉森之手）是：一项测量一旦成为目标，就不再是好测量；坎贝尔在社会指标上讲了同一件事。表面上，本文像是它的医学版。但机制不同，而且不同得要紧。古德哈特的引擎是<strong>策略性响应</strong>：有一个会算计的行动者，为了指标而扭曲行为。健康里没有这个行动者——患者诚心想活得好，医生诚心想治好他，没有人在演戏。旁路不是被选择的，它是医学<strong>唯一修得起的那条路</strong>。更要紧的是补救方向相反：古德哈特的常见解药是"换更难被操纵的指标""多加几个指标互相制衡"。在这里，加指标就是加旁路，而加到一定数量，旁路开始互撞——那正是多重用药。<strong>古德哈特的解药，是本文的病因。</strong></p>
+    <p><strong>第二条线，对代理终点批判。</strong>弗莱明与德梅茨问"我们是否被误导"，普伦蒂斯给出了代理终点的操作性判据。它们的解药是：验证代理指标是否中介结局。上一节已经说明：验证管的是判准与结局，旁路住在干预与判准之间。这条线可以说得更狠一点——<strong>一个完美验证过的代理指标，恰恰是最危险的判准</strong>，因为它的可信度最高，因此吸引的努力最多，因此它的旁路捕获得最彻底。</p>
+    <p><strong>第三条线，对康吉莱姆。</strong>《正常与病态》早就论证过：正常不是统计平均，健康是一种规范性能力——是能够生病、并从中重新确立自己规范的能力。本文站在他的下游，但补的不是同一处。康吉莱姆的批判是<strong>哲学的</strong>：数值规范在原则上就搞错了健康是什么。本文的批判是<strong>工程的</strong>：数值判准没搞错，它抓住的确实是状态的一个真实输出——它的问题是这个输出可以被单独生产。这个差别有后果：康吉莱姆解释不了为什么数值医学在实践中如此有效（他的框架里它本该一直失败），也给不出任何选择判准的规则，因为他的结论是判准这件事本身就是误置。本文不取消判准，只更换选择判准的标准。</p>
+    <p><strong>第四条线，对伊里奇。</strong>《医学的限度》说医学自身在生产疾病，把健康从人手里征收走。本文与它共享诊断的方向，但机制不同：伊里奇的机制是<strong>制度性的</strong>——医疗化、专业垄断、人的能力被剥夺；本文的机制是<strong>结构性的</strong>——即使在一个毫无垄断意图、完全善意的医学里，只要判准是点而结局是路径，旁路照样存在。这也是为什么两者的解药不同：伊里奇要医学退回去，本文只要求判准换一种选法。</p>
+
+    <div class="sec"><div class="n">第五节</div><div class="sub">感受的不对称：为什么虚比空更难治</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">三个签名里，"虚"通常被当作最轻的一个——不过是模糊、不过是不科学。这个印象是错的。虚是三者里唯一<strong>不可自我察觉</strong>的。</p>
+    <p>"空"是可察觉的。CAST 就是空被抓住的现场：死亡率这个外部结局，可以与早搏计数这个判准正面矛盾，于是医学看见了自己的旁路，并且改了。ACCORD 同理。客体健康观内部就配备着能反驳自己判准的资源——它信数字，而死亡也是数字。它抓住了自己，历史上抓过很多次。</p>
+    <p>"乱"也是可察觉的：依从性完美而结局不改善，这个矛盾摆在数据里。</p>
+    <p>"虚"不同。当感受充当判准，"我感觉好多了"与"我的病在恶化"这两句话的并置，<strong>在该框架内无法被表述</strong>。不是因为实践者迟钝——一位有经验的调理师当然看得出病人在垮。而是因为：他一旦说出"你感觉好转，但你在恶化"，他就已经引入了一个感受之外的判准，也就已经不在纯粹的主体健康观里了。<strong>这个框架没有一个能反驳自己的句子。</strong></p>
+    <p>所以虚不是"更模糊的空"。空是判准被绕过而系统能发现；虚是判准被绕过而系统结构上不能发现。前者是错误，后者是盲区。</p>
+    <p>这里必须立刻划一条边界，否则上面这段话会变成对主体医学的廉价打发。<strong>感受作为结局，和感受作为判准，是两件完全不同的事。</strong>在临终关怀里，在生活质量作为终点的研究里，感受不是任何东西的代理——它就是我们要的那个东西本身。而<strong>当一个东西是结局而不是代理时，旁路概念对它不适用</strong>：没有什么"在它背后"可以被绕过；让一个临终的人不那么痛苦，这件事的全部内容就在感受里，没有藏在后面的状态需要被生成。主体健康观最扎实的贡献恰恰在这一区。它的陷阱只在它让感受去代理别的东西的时候才张开。</p>
+    <p>这条不对称也带一个可查的预测：<strong>那些确实纠正过自己的感受导向实践，应当能被查出是在某处悄悄引入了外部判准</strong>——脉象、舌象、体重、别人的评价、复发的次数。查它们实际怎么运作，这条预测就能被验证或推翻。</p>
+
+    <div class="sec"><div class="n">第六节</div><div class="sub">判准的选择原则：把路径压进点里</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">如果判准的病根是"点不记录路径"，那么解药就不是更准的点。<strong>再精确的测量，也仍然只是一个点。</strong>把血压测到小数点后三位，它依然不会告诉你这个数字是走到的还是被放上去的。</p>
+    <p>解药只能是：<strong>挑那些不经过路径就到不了的点。</strong></p>
+    <p>本文因此提出判准的选择原则：<strong>不求更准，求旁路更贵。</strong>判准的价值不取决于它与结局的相关强度，取决于绕过它所需的代价——绕过它的代价必须高于走生成路径的代价。当旁路比生成路径贵，努力就自动流回生成路径，不需要任何人的意志力。</p>
+    <p>这解释了一类判准为什么在预后研究里表现得好得反常：<strong>功能性判准</strong>。六分钟步行距离、握力、四米步速、从椅子上站起的次数、最大摄氧量。这些指标粗糙、廉价、看上去土气，却在大规模队列里稳定地预测死亡与失能——在一项覆盖十七国近十四万人的前瞻队列里，握力对全因死亡与心血管死亡的预测力强过收缩压。为什么？不是因为握力更接近健康的本质。是因为<strong>要把握力提上去，目前没有比重建那份能力更短的路</strong>。一个功能性判准，是一个把路径压进了点里的判准：那个点的坐标里，已经包含了到达它的方式。</p>
+    <p>同一项研究还留下一个更耐人寻味的细节：握力预测心血管<strong>死亡</strong>的能力，强过它预测心血管<strong>发病</strong>的能力。低握力不太能告诉你会不会得病，却相当能告诉你得病之后扛不扛得住。这恰恰是判准与路径的分工：发病是一个事件，扛得住是一段历史——而握力测的从来不是此刻握了多少公斤，是那些公斤是怎么攒起来的。</p>
+    <p>这一点与布尔斯的生物统计健康理论在一个意外的地方相遇：他把健康定义为物种典型的功能水平。这个定义在哲学上被争论了半个世纪，却在判准选择上站得住——不是因为功能就是健康的本质，而是因为功能是一类昂贵到难以伪造的输出。但布尔斯给的是一个定义，本文要的是一条规则；定义不生产规则，这是本文与他分手的地方。</p>
+    <p>两条推论随之而来。</p>
+    <p><strong>推论一：判准有保质期。</strong>旁路的代价是当下技术的函数，不是永恒属性。今天不可旁路的判准，明天可能被一种新药、新器械、新兴奋剂做成廉价旁路——那一刻起，这个判准就开始像血压一样失效。运动医学早就领教过：促红细胞生成素问世之前，血细胞比容与耐力表现是可信的；之后不是了。<strong>判准不是一劳永逸选定的，它需要随旁路技术的演进而更换。</strong></p>
+    <p><strong>推论二：加判准不是解药。</strong>每一个新判准都带着自己的旁路进门。判准数量上升到某个密度，旁路开始互相干涉，签名就从空翻成乱。这给了多重用药一个结构性的解释：它不是医生粗心的产物，是"指标不达标就再加一个药，指标不够就再加一个指标"这条逻辑走到尽头的必然形态。</p>
+    <p>顺带一提，这条原则并不反对药物。药物是旁路，而旁路交付的那一部分并不虚假——一个心梗后的患者需要的正是那部分，立刻就要，等不及生成路径。本文反对的不是使用旁路，是<strong>把旁路的到达当成生成路径的凭证</strong>：吃着药的 130/80 是一个有用的临时结果，不是一份健康证明。这两者的混淆，就是引言里那位患者的病历上写着"控制良好"的原因。</p>
+
+    <div class="sec"><div class="n">第七节</div><div class="sub">这套判断如何可能失败</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">一套关于判准的理论，最容易的活法是永远正确：结局好，说明走了生成路径；结局坏，说明被旁路捕获了。本文拒绝这条活路。以下写明它在什么情形下应当被判为错。</p>
+    <p><strong>检验一 · 路径分层（核心检验）。</strong>本文的核心命题是"结局追随到达方式，而非判准点位"。它的清洁检验现成地摆在当下：在减重幅度相同的人群里，按到达路径分层——单纯药物；药物加抗阻训练与足量蛋白；单纯生活方式。命题预测：<strong>在体重这个判准点位相同的情况下，到达路径应当显著分离功能结局</strong>（握力、步速、瘦体重、跌倒、失能）。若数据显示，在减重幅度相同时，到达路径对功能结局没有预测力——即所有的 −15% 都是同一个 −15%——本文的核心命题为伪。</p>
+    <p>这个检验的现有材料并不是一边倒的，这一点必须如实说。司美格鲁肽的注册试验亚组显示，减掉的体重里有相当比例来自瘦体重（STEP-1 亚组约 45%），这与本文预期一致；但也有前瞻研究报告握力在治疗一年后不降反升、肌少性肥胖的比例下降，而回顾这一领域的综述指出各试验间的瘦体重变化异质性很大（约 15% 至 60% 不等）。本文不把这场分歧当作困扰，而当作检验一的直接材料：按本文的命题，握力上升的那些人应当正是药物为他们<strong>重新打开了生成路径</strong>的人（体重下降之后活动量回升），而握力下降的那些人应当正是旁路完整替代了生成路径的人。<strong>若最终数据显示，功能结局与到达路径无关，只与体重降幅有关，本文为伪。</strong></p>
+    <p><strong>检验二 · 旁路成本与预后价值。</strong>命题预测：一个判准的预后价值，随人群中经旁路达标者的比例上升而下降。这可以在历史数据上检验——取任一判准在廉价旁路问世前后的同类队列（血细胞比容之于促红细胞生成素，体重之于肠促胰素类药物），比较其对硬结局的预测力。预测：预测力的衰减幅度应与人群中旁路达标比例成正比。<strong>若判准的预后价值不随旁路普及率而变化，本文为伪。</strong></p>
+    <p><strong>检验三 · 不对称的反驳条件。</strong>第五节主张，纯粹以感受为判准的框架结构上无法察觉自己的旁路。反驳它只需要一个案例：找到一个感受导向的实践体系，在不引入任何感受之外判准的前提下，系统性地识别并纠正了自己的旁路。若能找到，第五节为伪。</p>
+    <p><strong>边界声明。</strong>其一，本文管判准的选择，不管治疗的选择——它不告诉任何人该不该吃药。其二，本文不裁决哪种医学更高：三大健康观各自抓住了状态的一个真实输出，本文只主张它们抓的都是输出。其三，本文不承诺存在不可旁路的判准；旁路成本是程度与时代的函数，这正是推论一的内容。其四，功能性判准也会被旁路——兴奋剂、代偿动作、测试技巧——它只是目前更贵，不是永远安全。</p>
+
+    <div class="sec"><div class="n">结语</div><div class="sub">痕迹可以被单独制造</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">回到引言里那位患者。他的病历没有说谎：血压确实是 130/80。判准也没有失灵：它测得很准。出问题的是那个从未被说出的假设——<strong>以为到达了点，就说明走过了路。</strong></p>
+    <p>健康判准是健康路过时留下的痕迹。痕迹可以被单独制造。</p>
+    <p>这不是一个悲观的结论，因为它给出了一条可操作的分界：<strong>好判准把路径压进点里，坏判准只留下点。</strong>这条分界不需要新技术，不需要更贵的仪器，只需要在选择判准的时候换一个问题——不再问"哪个指标与结局相关最强"，而问"绕过这个指标要花多大代价"。</p>
+    <p>所以，下一次看到一份写着"各项指标正常"的报告，值得多问一句：</p>
+    <p>这个正常，是身体走到的，还是被直接放上去的？</p>
+
+    <div class="sec"><div class="n">参考文献</div></div>
+    <div class="sec-rule"></div>
+    <p class="ref">王德生：《三大健康观的空、乱、虚》（本文三分诊断的来源）。</p>
+    <p class="ref">The Cardiac Arrhythmia Suppression Trial (CAST) Investigators. "Preliminary Report: Effect of Encainide and Flecainide on Mortality in a Randomized Trial of Arrhythmia Suppression after Myocardial Infarction." New England Journal of Medicine, 1989, 321(6): 406–412.</p>
+    <p class="ref">The Action to Control Cardiovascular Risk in Diabetes Study Group. "Effects of Intensive Glucose Lowering in Type 2 Diabetes." New England Journal of Medicine, 2008, 358(24): 2545–2559.</p>
+    <p class="ref">Prentice, R. L. "Surrogate Endpoints in Clinical Trials: Definition and Operational Criteria." Statistics in Medicine, 1989, 8(4): 431–440.</p>
+    <p class="ref">Fleming, T. R., &amp; DeMets, D. L. "Surrogate End Points in Clinical Trials: Are We Being Misled?" Annals of Internal Medicine, 1996, 125(7): 605–613.</p>
+    <p class="ref">Strathern, M. "'Improving Ratings': Audit in the British University System." European Review, 1997, 5(3): 305–321.（古德哈特定律的通行表述出处）</p>
+    <p class="ref">Campbell, D. T. "Assessing the Impact of Planned Social Change." Evaluation and Program Planning, 1979, 2(1): 67–90.</p>
+    <p class="ref">乔治·康吉莱姆：《正常与病态》（Le normal et le pathologique, 1966），李春译，西北大学出版社，2015。</p>
+    <p class="ref">伊万·伊里奇：《医学的限度》（Medical Nemesis: The Expropriation of Health, 1975），吴哲译，重庆出版社，2007。</p>
+    <p class="ref">Boorse, C. "Health as a Theoretical Concept." Philosophy of Science, 1977, 44(4): 542–573.</p>
+    <p class="ref">Leong, D. P., et al. "Prognostic Value of Grip Strength: Findings from the Prospective Urban Rural Epidemiology (PURE) Study." The Lancet, 2015, 386(9990): 266–273.</p>
+    <p class="ref">ATS Committee on Proficiency Standards for Clinical Pulmonary Function Laboratories. "ATS Statement: Guidelines for the Six-Minute Walk Test." American Journal of Respiratory and Critical Care Medicine, 2002, 166(1): 111–117.</p>
+    <p class="ref">Wilding, J. P. H., et al. "Once-Weekly Semaglutide in Adults with Overweight or Obesity (STEP 1)." New England Journal of Medicine, 2021, 384(11): 989–1002.</p>
+    <p class="ref">Neeland, I. J., et al. "Changes in Lean Body Mass with Glucagon-like Peptide-1-based Therapies and Mitigation Strategies." Diabetes, Obesity and Metabolism, 2024, 26(S4): 16–27.</p>
+    <p style="margin-top:2.4em;padding-top:1.3em;border-top:1px solid rgba(140,140,140,.28);font-size:.86em;opacity:.72;line-height:1.8"></p>
+  <div class="end-orn">· 全 文 完 ·</div>
+  </div>
+
+
+<section class="sde-expert" style="--exp:#8A6817;--exp2:#C89117">
+<div class="xp-hd"><span class="xp-tag"><i></i>专家点评</span><span class="xp-en">EXPERT COMMENTARY</span><span class="xp-line"></span></div>
+<div class="xp-card">
+<div class="xp-seal">评</div>
+<div class="xp-b">
+<div class="xp-h">创新点在哪里<span class="n">/ WHAT IS NEW</span></div>
+<p>这是秦莉目前最硬的一篇。核心区分只有一句——<b>判准记录到达点，不记录到达方式，而结局追随的恰恰是到达方式</b>——但它被一路兑现到底：旁路达标的定义写得很紧（判准被满足，而它本要认证的状态没有被生成，因为存在一条直接合成判准输出、绕开状态的路线）；空、乱、虚由此不再是三种病，而是同一种病在三个裁判位置上的三个签名，签名之别来自判准的复合方式之别。更见功力的是它主动请出一个本该绊倒自己的现象——多重用药明明属于数值判准却产出「乱」——并把它反手变成推论：当数值判准的旁路必须在同一具身体的同一套酶系里同时运行时，它就获得了清单判准的复合方式。不回避反例，让反例加固机制，这是成熟的写法。</p>
+<p>第二处硬功夫是把 CAST 与 ACCORD 并排。前者是代理终点批判的经典战利品；后者才是本文自己的案子——代理指标验证过（A1c 确实预测死亡）、数字确实被推到目标、结局却反了。由此切出与代理终点批判的分界：验证检查的是判准与结局之间的关系，而旁路藏在干预与判准之间。它还老实交代 ACCORD 超额死亡的机制至今有争论，并说明本文不需要裁决它。第三处是「虚」的不对称：空与乱能被自身框架察觉（死亡也是数字），虚不能——一旦说出「你感觉好转但你在恶化」，就已经引入了感受之外的判准。把常被当作「更模糊」的问题改判为<b>结构性盲区</b>，这一刀很准。</p>
+</div>
+<div class="xp-b">
+<div class="xp-h">应用展望<span class="n">/ WHERE IT CAN BE USED</span></div>
+<ul class="xp-app">
+<li><b>临床与病历书写　</b>把「控制良好」拆成两栏：判准是否达标、以及它是怎么达标的。同一个 130/80，是身体自己走到的还是被三种药按住的，十年后完全不同——病历上至少该看得出是哪一种。</li>
+<li><b>慢病管理与考核指标　</b>选指标的标准从「与结局相关最强」换成「绕过它的代价最高」。功能性判准（握力、步速、六分钟步行）之所以在预后研究里表现好得反常，正是因为伪造它们很贵。</li>
+<li><b>体检与健康产品　</b>把功能性测量与生化指标同等呈现。一份只有生化数值的报告，结构上无法回答「这个正常是走到的还是被放上去的」。</li>
+<li><b>医学之外　</b>这条原则对任何 KPI 体系都成立：不问哪个指标最相关，问绕过它要花多大代价。推论二也照样成立——加指标不是解药，每个新指标都带着自己的旁路进门。</li>
+</ul>
+</div>
+<div class="xp-edge"><b>边界与下一步。</b>作者写了三条检验，并如实交代第一条的现有材料并非一边倒（相关药物研究里瘦体重变化的异质性很大），这份克制值得记一笔。最该先做的仍是检验一的<b>路径分层</b>：在减重幅度相同的人群里，按到达路径分组比较功能结局（握力、步速、瘦体重、跌倒）。它不需要新药、不需要新设备，只需要一次分层分析——这是全文成本最低、也最可能一次性裁决核心命题的一步。</div>
+<div class="xp-sig">点评人 <em>Claude</em> · 依王德生《SDE 本体论》 · 2026年7月26日</div>
+</div>
+</section>
+
+<div class="sde-revnote" style="margin:44px 0 0;padding:16px 20px;border-left:3px solid #8A6817;background:rgba(127,127,127,.07);border-radius:0 6px 6px 0;font-size:14px;line-height:1.85;color:inherit;opacity:.9">
+<b style="color:#8A6817">编辑修订说明</b>　“延伸参考文献”原为跨批次通用的美学与感知书目，与本文主题不合，已整体更换为计量治理、审计社会、循证医学批评与稳态负荷方向的切题文献；文中原有的临床试验与理论文献均未改动。本次修订仅涉及上述事项，作者原有的论证结构、核心判断与证伪条件均未改动。<span style="opacity:.75">（编辑：Claude · 2026年7月26日）</span>
+</div>
+</article>
+
+<div class="endbox">
+  <div class="eb-k">这个正常，是身体走到的，还是被直接放上去的？</div>
+  <div class="eb-t">SDE 金点子发生器</div>
+  <p>换一种眼睛去问——同一个问题，九个方向轮番追问，普通基底与提智基底同台对照。带上你自己的疑问，去问下一问。免费，无需注册，浏览器直接用。</p>
+  <a class="primary" href="/taste/idea-generator/">免费品尝金点子发生器 →</a>
+  <a class="ghost" href="/students/qin-li/">← 秦莉 · Profile</a>
+</div>
+
+<div class="foot-nav">
+  <a href="/students/qin-li/essays/">← 秦莉 · 评论索引</a>
+  <a href="/students/qin-li/essays/why-the-shore-remembers/">同期 · 海岸为什么记得 →</a>
+  <a href="/students/qin-li/">秦莉 · Profile</a>
+</div>
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">延伸参考文献 · Further References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">下列文献为本文所涉思想脉络的原典与代表性研究，供读者对读与查证；与文中已引文献不重复，本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+<li style="margin:0 0 9px;padding-left:6px">Theodore M. Porter, Trust in Numbers: The Pursuit of Objectivity in Science and Public Life, Princeton: Princeton University Press, 1995.</li>
+<li style="margin:0 0 9px;padding-left:6px">Michael Power, The Audit Society: Rituals of Verification, Oxford: Oxford University Press, 1997.</li>
+<li style="margin:0 0 9px;padding-left:6px">Marilyn Strathern (ed.), Audit Cultures: Anthropological Studies in Accountability, Ethics and the Academy, London: Routledge, 2000.</li>
+<li style="margin:0 0 9px;padding-left:6px">Jerry Z. Muller, The Tyranny of Metrics, Princeton: Princeton University Press, 2018.</li>
+<li style="margin:0 0 9px;padding-left:6px">John P. A. Ioannidis, “Why Most Published Research Findings Are False”, PLoS Medicine, 2005, 2(8): e124.</li>
+<li style="margin:0 0 9px;padding-left:6px">David L. Sackett, William M. C. Rosenberg, J. A. Muir Gray, R. Brian Haynes &amp; W. Scott Richardson, “Evidence Based Medicine: What It Is and What It Isn’t”, BMJ, 1996, 312: 71–72.</li>
+<li style="margin:0 0 9px;padding-left:6px">H. Gilbert Welch, Lisa M. Schwartz &amp; Steven Woloshin, Overdiagnosed: Making People Sick in the Pursuit of Health, Boston: Beacon Press, 2011.</li>
+<li style="margin:0 0 9px;padding-left:6px">Bruce S. McEwen, “Stress, Adaptation, and Disease: Allostasis and Allostatic Load”, Annals of the New York Academy of Sciences, 1998, 840: 33–44.</li>
+<li style="margin:0 0 9px;padding-left:6px">Nancy Cartwright &amp; Jeremy Hardie, Evidence-Based Policy: A Practical Guide to Doing It Better, New York: Oxford University Press, 2012.</li>
+</ol>
+</section>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>© 德麦国际 Demai International · 学员专栏 · 秦莉（斐索）· 指标正常，人却在坏 · <a href="/browse/">sdeuniverses.com</a></footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body></html>

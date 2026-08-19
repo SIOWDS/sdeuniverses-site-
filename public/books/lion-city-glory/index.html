@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>狮城荣耀 · 长篇小说 | 专著栏目 · SDE Universes</title>
+<meta name="description" content="狮城荣耀 · 斐索（秦莉）著 · 五卷三十章，约 21.6 万字。一个国际学校少年把帝国理工的录取延后两年，剃头登船，两年国民服役一天都不能少。德麦国际出版社 · ISBN 978-1-970820-59-1 · 全书在线翻页阅读，不提供下载。">
+<style>
+/* ── 丛林夜：橄榄黑地、红土赭为主色、阅兵白、卡其，单点狮城红只用在 ORD ── */
+:root{
+  --ground:#12160E; --ground2:#191E13; --plate:#1D2317;
+  --laterite:#A8763C; --laterite2:#C79350;
+  --parade:#EFEBDF; --khaki:#8A8B70; --khaki2:#6E7059;
+  --ord:#C4382E;
+  --rule:rgba(168,118,60,0.26);
+  --disp:"Arial Narrow","Helvetica Neue Condensed","PingFang SC","Hiragino Sans GB",sans-serif;
+  --body:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+  --util:ui-monospace,SFMono-Regular,"Menlo",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+::selection{background:rgba(168,118,60,0.34);color:var(--parade)}
+body{background:var(--ground);color:var(--parade);font-family:var(--body);line-height:1.95;
+  background-image:
+    radial-gradient(120% 60% at 78% -6%, rgba(168,118,60,0.13), transparent 60%),
+    radial-gradient(90% 50% at 8% 104%, rgba(110,112,89,0.12), transparent 62%);
+  background-attachment:fixed}
+a{color:var(--laterite2);text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid var(--laterite2);outline-offset:3px}
+
+/* 顶栏 */
+.topbar{position:sticky;top:0;z-index:30;background:rgba(18,22,14,0.90);backdrop-filter:blur(9px);
+  border-bottom:1px solid var(--rule)}
+.topbar .w{max-width:1000px;margin:0 auto;padding:12px 26px;display:flex;justify-content:space-between;
+  align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-family:var(--disp);font-size:12px;letter-spacing:.42em;color:var(--laterite);text-transform:uppercase}
+.topbar nav{display:flex;gap:20px;font-family:var(--disp);font-size:13px;letter-spacing:.13em}
+
+/* 英雄区：书的论点先行，而不是封面先行 */
+.hero{max-width:1000px;margin:0 auto;padding:74px 26px 8px}
+.hero .stamp{font-family:var(--util);font-size:11px;letter-spacing:.30em;color:var(--khaki);
+  border:1px solid var(--rule);display:inline-block;padding:5px 11px}
+.thesis{margin:30px 0 0;max-width:23em}
+.thesis q{quotes:none;display:block;font-family:var(--body);font-size:clamp(22px,3.5vw,34px);
+  line-height:1.62;color:var(--parade);font-weight:600;letter-spacing:.01em}
+.thesis .attr{display:block;margin-top:16px;font-family:var(--disp);font-size:12.5px;
+  letter-spacing:.20em;color:var(--laterite)}
+
+/* 书名版：封面 + 题名，封面偏置不居中 */
+.plate{max-width:1000px;margin:52px auto 0;padding:0 26px;
+  display:grid;grid-template-columns:minmax(0,232px) minmax(0,1fr);gap:clamp(24px,4vw,52px);align-items:end}
+.plate img{width:100%;display:block;border:1px solid rgba(168,118,60,0.34);
+  box-shadow:0 26px 60px rgba(0,0,0,0.62), 0 2px 0 rgba(239,235,223,0.06) inset}
+.tt .kicker{font-family:var(--disp);font-size:11.5px;letter-spacing:.44em;color:var(--laterite)}
+.tt h1{font-family:var(--disp);font-size:clamp(42px,9vw,86px);line-height:.98;letter-spacing:.06em;
+  font-weight:700;margin:16px 0 0;color:var(--parade)}
+.tt .en{font-family:var(--disp);font-size:clamp(11px,1.5vw,14px);letter-spacing:.34em;color:var(--khaki);margin-top:14px}
+.tt .by{margin-top:22px;font-size:15.5px;color:var(--khaki);letter-spacing:.06em}
+.tt .by b{color:var(--parade);font-weight:600}
+
+/* 数据条 */
+.spec{max-width:1000px;margin:34px auto 0;padding:0 26px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule)}
+.spec div{background:var(--ground2);padding:14px 16px}
+.spec .k{font-family:var(--disp);font-size:10.5px;letter-spacing:.26em;color:var(--khaki2)}
+.spec .v{font-family:var(--util);font-size:19px;color:var(--laterite2);margin-top:6px;font-variant-numeric:tabular-nums}
+.spec .v small{font-family:var(--body);font-size:12.5px;color:var(--khaki);letter-spacing:.04em}
+
+/* 读法 */
+.cta{max-width:1000px;margin:40px auto 0;padding:0 26px;display:flex;gap:13px;flex-wrap:wrap;align-items:center}
+.btn{font-family:var(--disp);font-size:14.5px;letter-spacing:.10em;padding:14px 30px;display:inline-block;
+  border:1px solid var(--laterite);transition:background .16s,color .16s}
+.btn.solid{background:var(--laterite);color:#12160E;font-weight:700}
+.btn.solid:hover{background:var(--laterite2)}
+.btn.ghost{color:var(--laterite2)}
+.btn.ghost:hover{background:rgba(168,118,60,0.14)}
+.nodl{font-family:var(--util);font-size:11.5px;letter-spacing:.14em;color:var(--khaki2);
+  border-left:2px solid var(--khaki2);padding-left:11px;line-height:1.6}
+
+/* 正文区 */
+.wrap{max-width:1000px;margin:0 auto;padding:0 26px 96px}
+.sec{margin-top:78px}
+.sec>h2{font-family:var(--disp);font-size:12px;letter-spacing:.40em;color:var(--laterite);
+  padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.prose{max-width:36em;margin-top:26px}
+.prose p{text-indent:2em;text-align:justify;font-size:16.5px;margin-top:16px;color:#DCD8C8}
+.prose p:first-child{text-indent:0}
+.prose p.lead{text-indent:0;font-size:18px;color:var(--parade);line-height:1.9}
+
+/* ── 签名元素：服役进程条 ────────────────────────────────
+   五卷是一条真实的进程：新兵 → 第十二章拿到第一颗星 → 少尉 → 第二十八章 ORD 退役。
+   编号与标记承载这个事实，不是装饰。 */
+.record{margin-top:30px;position:relative;padding-left:clamp(46px,7vw,72px)}
+.record::before{content:"";position:absolute;left:clamp(15px,2.4vw,26px);top:8px;bottom:34px;width:1px;
+  background:linear-gradient(180deg,var(--khaki2),var(--laterite) 42%,var(--laterite2))}
+.vol{position:relative;padding:20px 0 22px;border-bottom:1px solid rgba(168,118,60,0.14)}
+.vol:last-of-type{border-bottom:0}
+.vol .node{position:absolute;left:calc(clamp(15px,2.4vw,26px) - clamp(46px,7vw,72px) - 5px);top:26px;
+  width:11px;height:11px;border:1px solid var(--laterite);background:var(--ground);border-radius:50%}
+.vol[data-rank="1"] .node{background:var(--laterite);box-shadow:0 0 0 4px rgba(168,118,60,0.16)}
+.vol .no{font-family:var(--disp);font-size:11px;letter-spacing:.30em;color:var(--khaki2)}
+.vol h3{font-family:var(--disp);font-size:clamp(20px,3vw,27px);letter-spacing:.05em;font-weight:700;margin:7px 0 0}
+.vol .chs{margin-top:12px;display:flex;flex-wrap:wrap;gap:7px 18px}
+.vol .chs span{font-size:13.5px;color:var(--khaki);letter-spacing:.02em}
+.vol .chs span i{font-family:var(--util);font-style:normal;color:var(--khaki2);margin-right:6px;
+  font-variant-numeric:tabular-nums}
+.vol .mark{margin-top:14px;font-family:var(--disp);font-size:11.5px;letter-spacing:.16em;
+  display:inline-block;padding:4px 10px;border:1px solid var(--rule);color:var(--laterite2)}
+.vol .mark.ord{color:var(--ord);border-color:rgba(196,56,46,0.5)}
+
+/* 出版信息 */
+.pub{margin-top:26px;border:1px solid var(--rule)}
+.pub div{display:flex;gap:16px;padding:12px 18px;font-size:14.5px;border-bottom:1px solid rgba(168,118,60,0.13)}
+.pub div:last-child{border-bottom:0}
+.pub div:nth-child(odd){background:var(--ground2)}
+.pub b{flex:0 0 8.5em;font-family:var(--disp);font-weight:400;letter-spacing:.16em;color:var(--khaki2);font-size:12.5px}
+.pub span{color:#DCD8C8;font-family:var(--util);font-size:13.5px}
+.pub span.zh{font-family:var(--body);font-size:14.5px}
+
+footer{border-top:1px solid var(--rule);padding:34px 26px 48px;text-align:center;color:var(--khaki2);font-size:13px}
+footer a{color:var(--laterite)}
+
+@media (max-width:720px){
+  .plate{grid-template-columns:minmax(0,1fr);align-items:start}
+  .plate img{width:min(200px,56vw)}
+  .hero{padding-top:52px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style></head>
+<body>
+
+<div class="topbar"><div class="w">
+  <a class="brand" href="/browse/">SDE Universes</a>
+  <nav>
+    <a href="/monographs/">专著栏目</a>
+    <a href="/students/qin-li/">作者专栏</a>
+    <a href="read.html">在线阅读</a>
+  </nav>
+</div></div>
+
+<header class="hero">
+  <span class="stamp">长篇小说 · 全书在线阅读</span>
+  <blockquote class="thesis">
+    <q>一个系统会失败两次。第一次，是它给出错误答案；第二次，是使用者希望这个答案是对的。</q>
+    <span class="attr">拉詹少校 · 第十章 算法误判</span>
+  </blockquote>
+</header>
+
+<section class="plate">
+  <img src="/students/qin-li/lion-city-glory/lcg-cover.jpg" alt="《狮城荣耀》封面">
+  <div class="tt">
+    <div class="kicker">德麦国际出版社</div>
+    <h1>狮城荣耀</h1>
+    <div class="en">GLORY OF THE LION CITY</div>
+    <p class="by"><b>斐索（秦莉）</b> 著　·　五卷三十章　·　发表于 2026 年 7 月 26 日</p>
+  </div>
+</section>
+
+<div class="spec">
+  <div><div class="k">卷</div><div class="v">5</div></div>
+  <div><div class="k">章</div><div class="v">30</div></div>
+  <div><div class="k">字数</div><div class="v">21.6<small> 万</small></div></div>
+  <div><div class="k">页数</div><div class="v">412</div></div>
+  <div><div class="k">计分</div><div class="v">20<small> 篇当量</small></div></div>
+</div>
+
+<div class="cta">
+  <a class="btn solid" href="read.html">翻页阅读全书</a>
+  <a class="btn ghost" href="/students/qin-li/lion-city-glory/preview.html">选读前三章</a>
+  <p class="nodl">本书仅提供在线阅读。<br>不提供 PDF 或文档下载。</p>
+</div>
+
+<main class="wrap">
+
+<section class="sec">
+  <h2>故事</h2>
+  <div class="prose">
+    <p class="lead">秦语十八岁那年，抽屉里压着一封帝国理工学院的录取通知。他把它延后两年，剃光头，登上开往海岛的渡轮——两年国民服役，一天都不能少。</p>
+    <p>他以为自己带去的是优势：漂亮的成绩、流利的英文、一个国际学校少年的从容。海岛用两个星期告诉他，这里没人关心这些。口令是马来语的，玩笑是快得抓不住的 Singlish，而他的口音，是一道所有人一听就听得出来的界线。</p>
+    <p>他和父亲写了两年的语音识别系统也跟着进了军营。它能在暴雨里把噪声一层层剥开，把一句听不清的口令译成一个身体动作，能在夜间演习中提前半秒让人卧倒。它越来越好用，越来越像“答案”。然后是那一场城市山脊救援演习：地形数据过期二十三天，屏幕上跳出一条置信度七十八的捷径，旁边一行灰字写着“需要现场确认”。他按下了确认。伤员没有等到。</p>
+    <p>后半程，是三个人带着这道疤走进三军军官学校，走进澳洲荒野的联合演训、蓬莱雨林的雷区、圣海沙别墅的收网夜，最后走进一个跨境洗钱与人口贩运交织的雨夜——在一个他们没有执法权的国家，两个刚认识两天的女孩被拖进包厢，而三个人手里只有一部手机、一份定位，和一句反复压在头顶的话：没有管辖权，就不要演英雄。</p>
+    <p>从海岛到军官学校，从新兵到少尉，他们学到的不是怎么赢，是怎么在系统给出答案之后，仍然自己去确认一次。</p>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>服役进程 · 五卷三十章</h2>
+  <div class="record">
+
+    <article class="vol"><span class="node"></span>
+      <div class="no">第一卷 · 第一至六章 · p1</div>
+      <h3>海岛的菜鸟风暴</h3>
+      <div class="chs">
+        <span><i>01</i>局外人的第一天</span><span><i>02</i>深夜五公里</span><span><i>03</i>鸡腿的温度</span>
+        <span><i>04</i>战场不分贵贱</span><span><i>05</i>初代 SDE 与黑夜演习</span><span><i>06</i>二十四公里与白衣启航</span>
+      </div>
+      <span class="mark">列兵</span>
+    </article>
+
+    <article class="vol"><span class="node"></span>
+      <div class="no">第二卷 · 第七至十二章 · p85</div>
+      <h3>军官学校的信任雷区</h3>
+      <div class="chs">
+        <span><i>07</i>陆、海、空的下马威</span><span><i>08</i>澳洲荒野与外部尊重</span><span><i>09</i>蓬莱雷区</span>
+        <span><i>10</i>算法误判</span><span><i>11</i>圣诞后的眼泪</span><span><i>12</i>肩膀上的第一颗星</span>
+      </div>
+      <span class="mark">学员 · 第十二章授衔</span>
+    </article>
+
+    <article class="vol" data-rank="1"><span class="node"></span>
+      <div class="no">第三卷 · 第十三至十八章 · p173</div>
+      <h3>本土风云：黑金天网</h3>
+      <div class="chs">
+        <span><i>13</i>新官上任的小大人</span><span><i>14</i>商场里的异动</span><span><i>15</i>绝密报告</span>
+        <span><i>16</i>圣海沙收网</span><span><i>17</i>第七本护照与西海岸口袋阵</span><span><i>18</i>授勋与行囊里的责任</span>
+      </div>
+      <span class="mark">少尉 · 一颗星</span>
+    </article>
+
+    <article class="vol" data-rank="1"><span class="node"></span>
+      <div class="no">第四卷 · 第十九至二十四章 · p251</div>
+      <h3>澜塔惊魂：跨国救援</h3>
+      <div class="chs">
+        <span><i>19</i>三万英尺的相遇</span><span><i>20</i>霓虹魔窟</span><span><i>21</i>澜京雨夜的合法边界</span>
+        <span><i>22</i>暗夜审讯</span><span><i>23</i>渤湾废弃仓库</span><span><i>24</i>天网黎明</span>
+      </div>
+      <span class="mark">少尉 · 境外无管辖权</span>
+    </article>
+
+    <article class="vol" data-rank="1"><span class="node"></span>
+      <div class="no">第五卷 · 第二十五至三十章 · p336</div>
+      <h3>荣耀卸甲，奔向未来</h3>
+      <div class="chs">
+        <span><i>25</i>使馆灯火</span><span><i>26</i>归营之后</span><span><i>27</i>最后一批新兵</span>
+        <span><i>28</i>ORD 那一天</span><span><i>29</i>山城火锅与新的互动</span><span><i>30</i>下一站，星辰大海</span>
+      </div>
+      <span class="mark ord">第二十八章 · ORD 退役</span>
+    </article>
+
+  </div>
+</section>
+
+<section class="sec">
+  <h2>出版信息</h2>
+  <div class="pub">
+    <div><b>书名</b><span class="zh">狮城荣耀（Glory of the Lion City）</span></div>
+    <div><b>作者</b><span class="zh">斐索（秦莉）</span></div>
+    <div><b>出版发行</b><span class="zh">德麦国际出版社（Demai International Press）</span></div>
+    <div><b>ISBN</b><span>978-1-970820-59-1</span></div>
+    <div><b>体量</b><span class="zh">五卷 · 三十章 · 约 21.6 万字 · 412 页</span></div>
+    <div><b>阅读方式</b><span class="zh">全书在线翻页阅读 · 前三章长文选读 · 不提供下载</span></div>
+    <div><b>学员计分</b><span class="zh">按 20 篇标准论文当量计入作者发表活跃分</span></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  © 德麦国际 Demai International · 专著栏目 ·
+  <a href="/students/qin-li/">秦莉学员专栏</a> ·
+  <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

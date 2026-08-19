@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>损失清单 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的核心动作是把“看法变了”与“那个东西被拆掉了”分开。这个动作可以做成一套体检：写损失清单、逐一查三个日常接口、找出那面没被拆的承重墙、把“重讲一遍”往后推。全篇附一条必须先读的边界——这套东西不是拆得越多越好，持续的自我拆解不是代谢，是耗尽。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="损失清单 · 方法实践文">
+<meta property="og:description" content="母文的核心动作是把“看法变了”与“那个东西被拆掉了”分开。这个动作可以做成一套体检：写损失清单、逐一查三个日常接口、找出那面没被拆的承重墙、把“重讲一遍”往后推。全篇附一条必须先读的边界——这套东西不是拆得越多越好，持续的自我拆解不是代谢，是耗尽。">
+<link rel="canonical" href="https://sdeuniverses.com/students/hu-min/autophagic-nourishment/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/hu-min/autophagic-nourishment/">← 回母文《蜕变的代谢条件》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《蜕变的代谢条件》</div>
+  <h1 class="art-title">损失清单</h1>
+  <div class="art-subtitle">判断一次转变是拆了墙还是刷了漆，只有一条判据——有没有一样东西真的没了。这一篇给体检表、三个接口的查法与一条重要的停手线。</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 4938 字</div>
+  <div class="swap">
+    <a href="/students/hu-min/autophagic-nourishment/"><b>← 母文 · 蜕变的代谢条件</b><span>完整论证在这里</span></a>
+    <a href="/students/hu-min/autophagic-nourishment/explain.html"><b>🌱 白话解释文 · 拆了旧房盖新房，还是在旧墙外面糊了一层</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的核心动作是把“看法变了”与“那个东西被拆掉了”分开。这个动作可以做成一套体检：写损失清单、逐一查三个日常接口、找出那面没被拆的承重墙、把“重讲一遍”往后推。全篇附一条必须先读的边界——这套东西不是拆得越多越好，持续的自我拆解不是代谢，是耗尽。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先划一条边界</a></li><li><a href="#s2">这套工序管什么、不管什么</a></li><li><a href="#s3">工序一：写损失清单</a></li><li><a href="#s4">工序二：三个接口逐一查</a></li><li><a href="#s5">工序三：找那面没被拆的承重墙</a></li><li><a href="#s6">工序四：把“重讲一遍”往后推</a></li><li><a href="#s7">组织侧：怎么不安装阻断装置</a></li><li><a href="#s8">六种典型失败</a></li><li><a href="#s9">一页纸操作卡</a></li><li><a href="#s10">三个场景变体</a></li><li><a href="#s11">走一遍：一个例子</a></li><li><a href="#s12">把这套工序放在可被推翻的位置</a></li><li><a href="#s13">五个实操疑问</a></li><li><a href="#s14">与三类常见做法的分工</a></li><li><a href="#s15">最容易被自己做坏的方式</a></li><li><a href="#s16">一张四行的记录表</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先划一条边界</h2>
+<p><b>这条线优先于本文全部内容。</b></p>
+<p>母文借的那个生物学过程有两个硬限定，常被漏掉：<b>它只在缺的时候启动</b>，而且<b>拆的是不那么要紧的结构，为的是保住最要紧的部分</b>。</p>
+<p>把它读成“应该经常推翻自己”“变得越彻底越好”，是一种危险的误用。据此可以直接得出三条不适用：</p>
+<ul class="pts"><li><b>不适用于正在经历丧失、创伤或被迫剧变的人</b>。那时候需要的是稳住，不是再拆。<b>这套体检在那个阶段做，只会变成一次自我攻击。</b></li><li><b>不适用于给别人下判断</b>。“你那不是真的改变”是这套框架最容易被滥用的句子，而且几乎总是伤人且无用。</li><li><b>不适用于“没有东西可以拆”的时候</b>。有些事本来就不需要拆一面墙，只需要换个看法。<b>把每一次变化都要求出一个损失，是另一种病。</b></li></ul>
+<p><b>一条总纪律</b>：这套体检的产出是<b>知道自己刚才做的是哪一种</b>，不是<b>要求自己去做另一种</b>。</p>
+<h2 id="s2"><span class="no">02</span>这套工序管什么、不管什么</h2>
+<p><b>管</b>：一次已经发生过的、被你自己称为“想通了”“转型了”“过去了”的变化；也管一个组织刚做完的一次转向、一次改革、一次复盘。</p>
+<p><b>不管</b>：正在发生的、还没有结论的困难。<b>在事情还没落地时做这套体检，会把它变成一种对自己的催促。</b></p>
+<p><b>这套工序不产出什么</b>：它不产出“该怎么改变”的方案，不产出成长路径，也不判断一个人变得够不够。<b>它只做一件事：分类。</b></p>
+<p><b>为什么只做分类也有用</b>：因为按母文的机制，最大的代价不是刷了一层漆，而是<b>把刷漆当成了拆墙</b>——于是你会一直等一件不会到来的事（那面墙自己不再承重），并在它下一次裂开时归咎于自己不够努力。</p>
+<h2 id="s3"><span class="no">03</span>工序一：写损失清单</h2>
+<p>这是全套工序的地基，也是唯一必须做的一步。</p>
+<p><b>做法</b>：对着那次变化，写三行，每行都必须是<b>具体的、可被别人观察到的</b>：</p>
+<ul class="pts"><li><b>从这件事之后，我不再____了</b>（一件具体的行为，不是一种心情）。</li><li><b>有一句我原来常说的话，现在说不出口了：____</b>。</li><li><b>有一个我原来的判断，我现在明确知道它是错的：____</b>（必须是“错的”，不是“不够全面”“要看情况”）。</li></ul>
+<p><b>判据</b>：三行至少填出一行且内容具体＝拆掉了一块，属于第一类。三行全写不出，或者只写得出“我不再那么焦虑了”“我心态好多了”这类状态描述＝属于第二类。</p>
+<p><b>最常见的作弊方式</b>：把“我不再执着于那件事了”写进第一行。<b>这不算</b>——它描述的是态度，不是可被观察的行为。合格的写法是“我不再每天去看那个页面了”“我不再接这类活了”“我再也没给那个人打过电话”。</p>
+<h2 id="s4"><span class="no">04</span>工序二：三个接口逐一查</h2>
+<p>母文指出阻断装置被安装在三个具体接口上。逐一对照，看自己那次变化经过了哪一个。</p>
+<p><b>接口一 · 转向</b>（用于工作、项目、组织）。查法：这次转向之后，<b>有没有一件我们原来做的事从此再也不做了？</b> 说不出来，只能说“我们换了个方向”“重新定位了”，那多半是把同一个核心假设换了套说法重讲。</p>
+<p><b>接口二 · 重新叙事</b>（用于关系、团队、家庭）。查法：那次冲突之后的解释，<b>能不能在下一次同类冲突还没结束时就被说出来？</b> 能，说明这套解释已经成了一个成熟装置——它现在的功能是接住任何可能触到那面墙的东西。</p>
+<p><b>接口三 · 订正</b>（用于学习、复盘、事故处理）。查法：错误被改正了，<b>那个产生错误的理解方式有没有被单独拿出来看过？</b> 没有，说明订正这个动作提供了一条不必拆墙就能通过检查的路。</p>
+<p><b>判读</b>：经过接口而损失清单为空，判定为阻断；经过接口且清单有具体条目，判定为真拆解。<b>注意接口本身不是坏东西</b>——三个动作都常常是必要的，问题只在于是否被当成了拆解。</p>
+<h2 id="s5"><span class="no">05</span>工序三：找那面没被拆的承重墙</h2>
+<p>前两步做完之后，如果判定为第二类，可以再往前一步——找出被保护的是什么。</p>
+<p><b>做法</b>：从“反复出现”入手，不要从“我的问题是什么”入手。</p>
+<ul class="pts"><li>列出过去三到五年里，<b>以不同面目反复出现的同一类困境</b>（换了公司还是同样的处境、换了对象还是同样的争执、换了项目还是同样的卡点）。</li><li>对每一类，写下每次事后的那句解释。</li><li><b>看这些解释是不是在变得越来越熟练、越来越有道理。</b></li></ul>
+<p><b>判据</b>：解释一次比一次成熟，而困境的形状没变——<b>那面墙就在这组解释的正后方</b>。</p>
+<p><b>这一步的产出不是拆掉它</b>，而是知道它在哪儿。母文的框架里没有“如何拆墙”的方法，因为拆解不是一个可以被规程化的动作——<b>任何一套“如何深度改变自己”的方法论，按它自己的逻辑，都会变成新的一层墙皮。</b></p>
+<h2 id="s6"><span class="no">06</span>工序四：把“重讲一遍”往后推</h2>
+<p>如果说这套框架有一个可以持续执行的动作，只有这一个：<b>推迟解释。</b></p>
+<p><b>做法</b>：在一件难受的事发生之后，<b>给它一段不做解释的时间</b>。不总结、不复盘、不给它一个说法、不跟人讲一个完整的版本。</p>
+<p><b>推多久</b>：以周计，不以小时计。一件小事推三五天，一件大事推两三周。</p>
+<p><b>为什么有效</b>：按母文的机制，阻断是通过“及时提供一个好用的解释”完成的。解释来得越快，那面墙被保护得越好。<b>推迟不能保证拆解发生，但它是唯一能让拆解有机会发生的条件。</b></p>
+<p><b>三条纪律</b>：这段时间里可以照常生活、可以难受、可以跟人说“我还没想明白”；<b>不可以</b>做的是给出一个完整的版本、发一段总结性的文字、或者在心里反复排练那个说法。</p>
+<p><b>最难的一条</b>：别人问起时不要提供成品。“我还没想清楚”是一个完整的回答。</p>
+<h2 id="s7"><span class="no">07</span>组织侧：怎么不安装阻断装置</h2>
+<p>按母文的判断，这套装置主要不住在个人心里，而是被装在流程上。因此组织侧的动作也只能是减法。</p>
+<ul class="pts"><li><b>在复盘流程里加一栏“这次之后我们不再做什么”</b>，并且要求填具体动作，<b>不接受“加强沟通”“提高重视”这类填法</b>。空着比填空话好。</li><li><b>给转向留一段没有对外说法的时间</b>。要求团队在拿出新故事之前，先说清楚废掉了哪个假设。<b>顺序不能反</b>——先有新故事，旧假设就再也不会被拿出来看了。</li><li><b>不要求即时归类</b>。任何“这属于哪个方向”“这跟我们已有的什么对应”的追问，都会迫使新东西挂到旧墙上。<b>允许一段时间里存在暂时无处安放的东西。</b></li><li><b>对反复出现的同类问题，不追责，改追解释</b>。查一查每次事后的说法是不是在变得越来越熟练——那比查责任更能找到位置。</li></ul>
+<p>四条的共同点是：<b>它们都不产生任何可汇报的成绩</b>，而且都会让流程看起来不够严谨。这是真实的代价。</p>
+<h2 id="s8"><span class="no">08</span>六种典型失败</h2>
+<ul class="pts"><li><b>失败一 · 拆得越多越好</b>。见第一节。这是最危险的误用，会把一个描述性的框架变成自我攻击的工具。</li><li><b>失败二 · 用它评判别人</b>。“你那不是真的改变”。既伤人又无用，而且你无法看到别人的损失清单。</li><li><b>失败三 · 把体检变成新的说法</b>。做完之后得出“我现在明白了自己一直在暗代谢”——<b>这句话本身就是一层非常漂亮的新墙皮</b>，因为它同样什么也没有拆掉。</li><li><b>失败四 · 要求每次变化都有损失</b>。有些事本来就只需要换个看法。<b>清单为空不等于失败，只等于这次是刷漆。</b></li><li><b>失败五 · 把推迟解释做成压抑</b>。不解释不等于不许难受、不许说、不许求助。<b>推的是成品说法，不是感受本身。</b></li><li><b>失败六 · 在正需要稳住的时候做</b>。丧失、创伤、剧变期间做这套体检，等于在最需要墙的时候去查哪面墙该拆。</li></ul>
+<h2 id="s9"><span class="no">09</span>一页纸操作卡</h2>
+<ul class="pts"><li><b>边界</b>：不在丧失创伤期做；不用来评判别人；清单为空不等于失败。</li><li><b>一 · 损失清单</b>：不再做什么／说不出口的话／明确知道是错的判断，三行必须具体可观察。</li><li><b>二 · 查接口</b>：转向（有没有一件事再也不做）／重新叙事（解释能不能提前说出口）／订正（那个理解方式有没有被单看过）。</li><li><b>三 · 找墙</b>：从反复出现的同类困境入手，看事后的解释是不是越来越熟练；产出是知道它在哪儿，不是拆掉它。</li><li><b>四 · 推迟解释</b>：以周计；可以难受可以说没想清楚；不给成品版本。</li><li><b>组织侧</b>：复盘加“不再做什么”栏／转向先说废掉哪个假设／不要求即时归类／对反复问题追解释不追责。</li><li><b>禁</b>：不追求拆得多、不评判他人、不把体检本身当成果。</li></ul>
+<h2 id="s10"><span class="no">10</span>三个场景变体</h2>
+<p><b>个人</b>：最有价值的是工序三——找出那组越来越熟练的解释。<b>做法上的一条经验</b>：翻自己过去几年写下的东西（日记、朋友圈、给朋友的长消息），比凭回忆准得多，因为那些解释当时是真诚的，现在才看得出它们的形状。</p>
+<p><b>团队与组织</b>：最有效的单点是复盘表里那一栏“这次之后我们不再做什么”。<b>难点在于它经常填不出来</b>，而填不出来会让复盘显得没有成果。<b>要提前说明空着是允许的</b>，否则一定会被空话填满，而空话填上之后，这一栏就永久失效了。</p>
+<p><b>教育与带人</b>：这里要格外克制。<b>不要用这套框架去质疑学生或下属的成长是不是“真的”</b>。可做的只有一件：在订正之后加一个问题——“你当时是怎么想的？”，并且<b>明确不因为那个想法本身扣任何分</b>。不加这句保障，学生会给出一个他认为你想听的答案，那又是一层新墙皮。</p>
+<h2 id="s11"><span class="no">11</span>走一遍：一个例子</h2>
+<p>以下为示意。某人一年前从一家公司离职，一直说自己“想通了很多”。</p>
+<p><b>损失清单</b>：第一行写不出具体行为；第二行想了很久，写出“我不再说'再撑一撑就好了'”；第三行写出“我原来认为只要做出成绩位置就会自然到来，这个判断是错的”。<b>三行填出两行且具体，初判为部分拆解。</b></p>
+<p><b>查接口</b>：这次变化经过了“重新叙事”接口——离职后跟朋友讲过一个完整版本。查法检验：下一次遇到类似处境时，那套解释能不能提前说出口？<b>他承认能，而且已经讲得很顺。</b> 判定该接口上存在阻断。</p>
+<p><b>找墙</b>：列出反复出现的困境——三家公司都出现过“承担了额外的事、期待被看见、最后没有被看见”这一组。每次的事后解释分别是“这家公司文化不行”“领导不懂业务”“我沟通方式有问题”。<b>三个解释一次比一次显得有道理，而形状没变。</b> 墙的位置就在这组解释后面。</p>
+<p><b>动作</b>：不去拆它。只做工序四——接下来三个月里，遇到同类的事不急着给说法，<b>尤其不再向朋友提供完整版本</b>。</p>
+<p><b>读法</b>：不看“他有没有真的成长”，只看两件事——三个月里那组解释有没有被复述过；以及下一次同类情形出现时，损失清单第一行填不填得出。<b>这两项之外的一切判断，按母文的框架都不可靠。</b></p>
+<h2 id="s12"><span class="no">12</span>把这套工序放在可被推翻的位置</h2>
+<p>母文交代了自己的限度：它是发生学的概念建构与接口追踪，不是被实证检验的结论；那个关于学派的宏观推衍尤其是大胆外推。执行者照做，在开始前写下两句：</p>
+<ul class="pts"><li><b>如果……则不必</b>：如果在完全不做这套体检、也不推迟解释的情况下，那组反复出现的困境自己停止了复发，那么这套工序在此处没有独立价值。</li><li><b>如果……则停止</b>：如果体检过程中出现明显的自我攻击、或者你开始因为“清单是空的”而否定自己过去的一切努力——<b>停止，回到第一节那条边界</b>。刷漆是很多时候唯一能做的事，而且它确实让人活了下来。</li></ul>
+<p>最后一句：这套工序不承诺让你变得更彻底，也不承诺让你更快好起来。<b>它只让你知道，刚才那一次，是拆了一块，还是刷了一层。</b> 知道这一点，至少不必再等那面墙自己塌。</p>
+<h2 id="s13"><span class="no">13</span>五个实操疑问</h2>
+<p><b>问：损失清单三行全空，是不是说明我这些年白过了？</b>答：不是，而且这个反应本身就落进了第一节那条边界。清单为空只说明<b>那一次是刷漆</b>，而刷漆常常是当时唯一做得起的选择——房子还得住人。<b>这套体检的产出是分类，不是评分。</b> 如果做完之后你的主要感受是自我否定，停下来，这条工序在此刻对你无益。</p>
+<p><b>问：能不能主动去拆？比如故意把自己放到很难的处境里？</b>答：按母文的机制不行，而且危险。它借的那个生物学过程只在缺的时候启动，<b>主动制造匮乏与代谢不是同一件事</b>。更实际的理由是：一个由你自己安排的困境，它的解释权也在你手里，因此它几乎必然配一套现成的说法——<b>那正是阻断最典型的形态。</b></p>
+<p><b>问：推迟解释推了三周，还是没有任何新东西出来，怎么办？</b>答：正常。推迟解释不承诺拆解会发生，它只是让拆解<b>有机会</b>发生。三周之后如果仍然没有变化，可以给出一个说法，那没有问题；<b>要避免的只是把那个说法当成“我已经拆过了”。</b></p>
+<p><b>问：团队复盘那一栏“这次之后不再做什么”总是填不出来，是不是我们做得不好？</b>答：多数团队填不出来，这是常态。<b>关键是不要用空话填上</b>——“加强沟通”“提高重视”这类填法一旦被接受，这一栏就永久失效了。空着并且被明确允许空着，比填满有价值得多。</p>
+<p><b>问：我怎么知道自己不是在用这套框架给自己刷一层新漆？</b>答：你不能完全知道，而且母文的机制预言了这一点——<b>“我现在明白了自己一直在阻断”是一句极漂亮的新墙皮</b>。唯一的抵抗是回到那三行清单：这句明白之后，有没有一件具体的事你不再做了。没有，那就还是漆。</p>
+<h2 id="s14"><span class="no">14</span>与三类常见做法的分工</h2>
+<p><b>与复盘与总结类方法</b>：这类方法的产出就是解释，因此在结构上与工序四（推迟解释）直接冲突。<b>可行的分工是分时段</b>：事情发生后的头一两周不做复盘，之后再做。<b>顺序反过来做，复盘会把最有可能松动的那段时间填掉。</b></p>
+<p><b>与心理咨询与成长辅导</b>：不冲突，而且在有实际痛苦时应当优先。需要留意的是母文那条判据——<b>如果整个过程里讲述能力一次也没有中断过、每个阶段都能清楚说明自己在经历什么，那是阻断的迹象</b>。这不是说咨询无效，而是说“能讲清楚”这件事本身不构成转变的证据。</p>
+<p><b>与组织的变革管理方法论</b>：这类方法几乎全部作用在“如何更快完成转变、并让人接受”上，因此天然带有阻断功能——它们的核心价值就是提供一套及时、好用、能凝聚共识的说法。<b>可以照常用，但要把“废掉了哪个假设”这一步放在讲新故事之前</b>，顺序一反，那个假设就再也不会被拿出来看了。</p>
+<h2 id="s15"><span class="no">15</span>最容易被自己做坏的方式</h2>
+<p>必须点名一个内建的风险，因为它几乎必然出现。</p>
+<p>这套框架给了一个非常锋利的判据，而锋利的判据最容易被拿去当武器——先是对别人（“你那不是真的改变”），然后是对自己（“我这些年原来一直在自欺”）。</p>
+<p><b>两种用法都错，而且第二种更隐蔽。</b> 按母文的框架，第二种恰恰是一次典型的阻断：它给了一个极有解释力的新说法，让人立刻感到自己看透了一切——<b>而这句“我看透了”底下，没有任何一样东西真的没了。</b></p>
+<p><b>防它的办法有三条</b>：一是把工序限定在“已经发生过的、有具体时间的那一次变化”上，不做泛泛的自我评估；二是产出只有一个分类结果，不追加任何评价；三是<b>做完之后一个月内不跟人讲这套框架</b>——按它自己的逻辑，讲述本身就是那台机器在工作。</p>
+<p>一句收尾：这套体检的全部价值，是让你知道那次是拆了一块还是刷了一层。<b>知道之后什么也不必做</b>——这是它跟一般的成长方法最大的不同，也是它唯一不会自我拆台的地方。</p>
+<h2 id="s16"><span class="no">16</span>一张四行的记录表</h2>
+<p>这套体检不必反复做，但如果你想跟踪某一组反复出现的困境，可以留一张极简的表。四行，一年记一次即可：</p>
+<ul class="pts"><li><b>这一年最像“转变”的那一次是什么</b>：写事件与时间，不写感受。</li><li><b>损失清单三行填了几行</b>：只记数字与那一行的原话。</li><li><b>它经过了哪个接口</b>：转向／重新叙事／订正／都没有。</li><li><b>那组反复出现的困境，今年出现过没有</b>：出现过就写第几次、这次的事后解释是什么。</li></ul>
+<p><b>四行之外什么都不写</b>，尤其不写“今年我成长了多少”这类判断——那正是这套框架要防的那种说法。</p>
+<p><b>这张表的用法在于纵向对照，不在于单年判断。</b> 连着记三五年之后，最有信息量的是第四行那一列：<b>如果那组困境每年都出现，而每年的解释都比前一年更有道理，那么位置就非常清楚了。</b></p>
+<p>反过来，如果某一年之后那组困境真的不再出现，回头看那一年的第二行，通常会发现清单是填出来的、而且填的是一件具体的事。<b>这就是这套框架能提供的全部证据。</b></p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/hu-min/autophagic-nourishment/">《蜕变的代谢条件：自噬性养料转化与它的阻断者》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/hu-min/autophagic-nourishment/explain.html">🌱 白话解释文《拆了旧房盖新房，还是在旧墙外面糊了一层》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/hu-min/autophagic-nourishment/">回母文</a> ·
+  <a href="/students/hu-min/works/">胡敏 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>归因的三道闸与挖沟的四把铲 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文把“必然”从两件事之间挪到了反复走出来的那道沟上。这一篇把它变成手上的活：怎么判断一件事到底是不是原因，怎么避开只看见先后就下结论的坑，以及当你想让某件事稳定发生或者稳定不发生时，该动哪把铲子。">
+<meta name="author" content="王德生 · SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="归因的三道闸与挖沟的四把铲 · 方法实践文">
+<meta property="og:description" content="母文把“必然”从两件事之间挪到了反复走出来的那道沟上。这一篇把它变成手上的活：怎么判断一件事到底是不是原因，怎么避开只看见先后就下结论的坑，以及当你想让某件事稳定发生或者稳定不发生时，该动哪把铲子。">
+<link rel="canonical" href="https://sdeuniverses.com/column/causality-river/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/column/causality-river/">← 回母文《因果之河》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《因果之河》</div>
+  <h1 class="art-title">归因的三道闸与挖沟的四把铲</h1>
+  <div class="art-subtitle">——把《因果之河》的判断，落成查原因、验因果、改惯性的可执行工序</div>
+  <div class="art-meta">王德生 原著 · Claude 撰写 · SDE Universes · 2026年8月 · 约 4397 字</div>
+  <div class="swap">
+    <a href="/column/causality-river/"><b>← 母文 · 因果之河</b><span>完整论证在这里</span></a>
+    <a href="/column/causality-river/explain.html"><b>🌱 白话解释文 · 世上本没有路，走的人多了</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文把“必然”从两件事之间挪到了反复走出来的那道沟上。这一篇把它变成手上的活：怎么判断一件事到底是不是原因，怎么避开只看见先后就下结论的坑，以及当你想让某件事稳定发生或者稳定不发生时，该动哪把铲子。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">什么时候该拿出这套工序</a></li><li><a href="#s2">第一件事：分清你要的是解释还是抓手</a></li><li><a href="#s3">三道闸：共现、拨动、通路</a></li><li><a href="#s4">层次自检：你在哪一层找</a></li><li><a href="#s5">河床勘察法：不问谁的错，问什么在反复</a></li><li><a href="#s6">挖沟的四把铲</a></li><li><a href="#s7">造河床的三条纪律</a></li><li><a href="#s8">拆一条老沟的三步</a></li><li><a href="#s9">免检证扫描：你的方法自己过不过关</a></li><li><a href="#s10">落到事故与质量复盘上</a></li><li><a href="#s11">落到组织与个人习惯上</a></li><li><a href="#s12">一个走完全套的例子</a></li><li><a href="#s13">因果感越强，越要停一下</a></li><li><a href="#s14">什么时候这套用不上</a></li><li><a href="#s15">三种假因果的长相</a></li><li><a href="#s16">把归因变成可累积的东西</a></li><li><a href="#s17">六种失败模式</a></li><li><a href="#s18">一页纸操作卡</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>什么时候该拿出这套工序</h2>
+<p>四类活最用得上：</p>
+<ul class="pts"><li><b>复盘与事故归因</b>：出了事，要找出到底为什么。</li><li><b>绩效与增长归因</b>：数字涨了跌了，要说清是谁的功劳、哪一招起了作用。</li><li><b>想让一件事稳定发生</b>：新流程、新习惯、新标准，靠喊口号推不动。</li><li><b>想让一件事稳定不发生</b>：老毛病、老惯性、屡禁不止的那一类。</li></ul>
+<p>前两类是“往回看”，后两类是“往前造”。母文的用处是它把两件事接上了：<b>往回看是勘察那道沟，往前造是挖一道新沟。</b>同一套地形学，两个方向用。</p>
+<h2 id="s2"><span class="no">02</span>第一件事：分清你要的是解释还是抓手</h2>
+<p>这一步跳过去，后面全白做。</p>
+<p><b>解释</b>回答“为什么会这样”，可以牵扯到出身、行业周期、大环境、人的性格。它让人心里舒服，也容易写进报告。</p>
+<p><b>抓手</b>只回答一个问题：<b>下次我动哪一样，结果会不一样？</b></p>
+<p>两者常常打架。一次事故的解释可能是“团队经验不足”，可这不是抓手——你不能明天就让人多五年经验。抓手可能是“这个操作没有二次确认”，一天就能改。</p>
+<p>给自己定一条硬规矩：<b>复盘报告里每一条原因后面，必须能填上“下次可动的那一样”。填不上的，归到背景栏，不许放在原因栏。</b>背景不是不重要，但把背景写进原因栏，会让所有人产生一种“已经找到原因了”的错觉，然后什么也不改。</p>
+<h2 id="s3"><span class="no">03</span>三道闸：共现、拨动、通路</h2>
+<p>一件事要被认作原因，母文的口径可以落成三道闸，一道比一道硬。</p>
+<p><b>第一道 · 共现。</b>它出现的时候，那件事是不是也总出现？这只是入场券。公鸡打鸣与天亮天天共现，可杀了鸡天照样亮；冰淇淋销量与溺水人数一起涨，牵线的是夏天。<b>只过第一道闸就下结论，是绝大多数错误归因的来源。</b></p>
+<p><b>第二道 · 拨动。</b>你把它拨一下，结果变不变？这是从旁观者的位置换到亲历者的位置，也是三道闸里最有力的一道。做不了真实验，就找准实验：某个区先上线了、某台设备上周才换、某个人休假两周——<b>现实里到处是天然的对照组，只是没人去捡。</b></p>
+<p><b>第三道 · 通路。</b>你能不能说出中间是怎么一步步走过去的，每一步是否可查。说不出通路的因果，即使前两道都过了，也只能标为“疑似”。通路的作用不只是证明，更是<b>告诉你可以在中间哪一环下手</b>。</p>
+<p>三道闸的判定口径建议写死：三道全过＝原因；过一二＝可操作因素，允许试；只过第一道＝相关项，不许写进原因栏。</p>
+<p>三道闸还有一个副作用值得说：<b>它把争吵变成了分工。</b>一群人争“到底是不是因为这个”，各说各话，永远吵不完；改成“这条过了第几道闸”，就变成了可以派活的事——第一道有数据的人去查，第二道找得到对照的人去找，第三道懂业务链路的人去画。<b>争论一旦有了闸口，就自动变成任务。</b></p>
+<h2 id="s4"><span class="no">04</span>层次自检：你在哪一层找</h2>
+<p>母文最锋利的一处提醒，落到实操上是一句话：<b>有些东西只在整体层上出现，你在零件层里找不到它。</b></p>
+<ul class="pts"><li>在一个个音符里找不到旋律。</li><li>在一辆辆车里找不到堵车。</li><li>在一个个员工的绩效里找不到“团队的气”。</li><li>在一条条制度里找不到“这家公司的风气”。</li></ul>
+<p>所以归因之前先问：<b>我要找的这个东西，是在零件层、序列层，还是整体层？</b></p>
+<ul class="pts"><li><b>零件层</b>（单个人、单个动作、单个参数）：可以直接查、直接改。</li><li><b>序列层</b>（做事的顺序、节奏、时间分布）：查法是把事件按时间排开看，而不是分开看。很多问题只在排开后才现形。</li><li><b>整体层</b>（氛围、信任、风气、士气、口碑）：<b>不要在零件层归因</b>，那只会变成找个人背锅。整体层的东西只能靠改序列层和地形来间接动它。</li></ul>
+<p>这一条能省掉大量无效追责：<b>一个只在整体层存在的问题，追到某个具体的人身上，一定是错的归因，而且会顺手把真正的原因藏起来。</b></p>
+<h2 id="s5"><span class="no">05</span>河床勘察法：不问谁的错，问什么在反复</h2>
+<p>往回看的主工具。五个问题，按顺序问：</p>
+<ul class="pts"><li><b>一 · 这件事是第几次发生？</b>只发生过一次的，按偶发处理，别急着改制度。反复发生的，才有沟可挖。</li><li><b>二 · 每次发生前，共同出现的是什么？</b>列出至少三项共同条件，不要只列一项。</li><li><b>三 · 是什么让它一直有水？</b>谁从中获得便利、哪条考核在奖励它、哪个场合在触发它。<b>没有水的沟会自己淤，还在的说明水还通着。</b></li><li><b>四 · 上一次它没发生是什么时候，那次有什么不同？</b>这是最容易被跳过、也最值钱的一问——<b>例外是天然的对照组。</b></li><li><b>五 · 如果什么都不改，六个月后它还会发生吗？</b>答“会”，说明沟已经成型，靠提醒和强调无效。</li></ul>
+<p>勘察的产出不是一份责任清单，是一张地形图：<b>哪几条沟、各自多深、水从哪儿来。</b></p>
+<p>勘察时有一条纪律：<b>别在会上做。</b>当着一屋子人问“什么在反复”，得到的一定是安全答案。先找三五个当事人分别问，再拿共同项回会上验。母文那句“例外是天然的对照组”，在会议室里几乎问不出来，只有在单独聊时才有人愿意说“上次那回我们其实绕过了那一步”。</p>
+<h2 id="s6"><span class="no">06</span>挖沟的四把铲</h2>
+<p>往前造的主工具。想让一件事稳定发生，按性价比排序动手：</p>
+<p><b>一 · 改地形（最省力）。</b>改默认值、改物理布置、改顺序。把要推的动作变成顺手的那一个，把要减的动作变成多一步的那一个。审批默认通过并留痕，比强调“提高效率”管用；把安全帽挂在门口而不是仓库，比开十次会管用。</p>
+<p><b>二 · 加频次（最关键）。</b>沟是走出来的，就得靠走，而且靠密。<b>十次三分钟胜过一次半小时。</b>新流程宁可每天做一次小的，也不要每月一次大的。</p>
+<p><b>三 · 断供（最被忽略）。</b>要改掉一条老沟，先找到还在给它供水的那一样，把水断掉。老沟不必强拆，断了水它自己会淤。</p>
+<p><b>四 · 加意志（最贵、最后用）。</b>靠人自己使劲。它有用，但成本高、不持久、且一旦松劲就回弹。<b>把意志当成前三把铲失效时的补充，不要当成主力。</b>多数失败的推行，都是把第四把铲当成了第一把。</p>
+<h2 id="s7"><span class="no">07</span>造河床的三条纪律</h2>
+<ul class="pts"><li><b>先造一条，不要同时造五条。</b>沟要挖深才管用，五条半深的沟等于没有。</li><li><b>给它写一个可见的水位。</b>能被看见的才会被走。一张贴在墙上的完成格、一个每周固定播报的数字，作用远大于口头强调。</li><li><b>允许前期变差。</b>新沟没成型时，效率一定低于老沟。<b>事先写明允许难看多久</b>，否则第一次波动就会有人喊停，然后所有人退回老沟——而且从此更难推第二次。</li></ul>
+<h2 id="s8"><span class="no">08</span>拆一条老沟的三步</h2>
+<ul class="pts"><li><b>一 · 先量深度</b>：这条沟走了多久、多密。走了十年的沟，别指望一个月改完，先定一个季度以上的周期。</li><li><b>二 · 断水优先于封路</b>：只封路不断水，人会绕道走出一条更隐蔽的沟。绩效考核不改，光禁止某个动作，一定长出变形的替代动作。</li><li><b>三 · 给一条更顺手的新道</b>：老沟之所以硬，是因为它顺手。不给替代路径的禁止，等于要求所有人每天多花力气——这种要求撑不过三个月。</li></ul>
+<h2 id="s9"><span class="no">09</span>免检证扫描：你的方法自己过不过关</h2>
+<p>母文里最扎人的一条纪律，可以直接搬来自用：<b>每个人在批评别人时用的那把尺子，很少被拿来量自己。</b></p>
+<p>给复盘会加一道固定环节，三问：</p>
+<ul class="pts"><li>我们这次用的判据是什么？它自己经得起同样的检验吗？</li><li>有没有哪一块被默认成“这块不用查”？为什么它不用查？</li><li>如果结论对提出者不利，我们的流程会不会照样得出这个结论？</li></ul>
+<p>第三问是试金石。<b>一个从来不会得出“是我这套方法有问题”的复盘流程，不是复盘流程，是背书流程。</b></p>
+<h2 id="s10"><span class="no">10</span>落到事故与质量复盘上</h2>
+<ul class="pts"><li><b>时间线先排，责任后谈。</b>把事件按分钟排开，序列层的问题会自己浮出来；先谈责任，人一防御，信息就断了。</li><li><b>每条原因配一个“可动项”</b>，填不上的挪到背景栏。</li><li><b>找例外</b>：同样条件下没出事的那几次，差别在哪。这一条经常比查出事的那次更有信息。</li><li><b>区分单次与成沟</b>：第一次发生改动作，第三次发生改地形，第五次还发生就要查是谁在供水——<b>同一个问题反复出现，通常意味着有人从现状中获益。</b></li></ul>
+<h2 id="s11"><span class="no">11</span>落到组织与个人习惯上</h2>
+<ul class="pts"><li><b>别用意志推组织</b>：组织没有意志，只有地形。想让人写文档，就把文档模板放进创建流程的第一步。</li><li><b>改考核前先想清替代动作</b>：任何指标一上考核，人会走出通向该指标的最短路，哪怕那条路绕过了你真正想要的东西。<b>先想清最短路长什么样，再决定要不要设这个指标。</b></li><li><b>个人习惯照四把铲的顺序</b>：先挪东西（地形），再定每天的最小动作（频次），再断掉触发源（断供），最后才谈坚持。</li><li><b>“我就是这样的人”要当假设看</b>：那多半是一条走了很久的沟，有起点、有水源，因此也有入口。</li></ul>
+<h2 id="s12"><span class="no">12</span>一个走完全套的例子</h2>
+<p>拿一件常见的事走一遍：某个团队的线上故障，半年里出了五次，每次复盘都写“加强规范意识”，然后第六次照旧。</p>
+<p><b>定性</b>：五次报告里的原因栏写的是“人员经验不足”“规范意识不强”“沟通不畅”——三条全是不可动项。抓手一个没有。这一步就已经找到问题所在：不是没复盘，是复盘的产物不可执行。</p>
+<p><b>过闸</b>：把“新人操作”这条过一遍闸。共现：五次里有四次是入职半年内的人操作（过）。拨动：上个月有一次由老手操作，同样出了问题（不过）。结论：新人不是原因，最多是放大器。再把“变更在下班前一小时发布”这条过闸——共现五次全中；拨动：改到上午发布的那两个月零故障；通路：赶下班导致跳过二次校验、出问题时没人在岗、回滚延迟。<b>三道全过，这才是原因。</b></p>
+<p><b>分层</b>：真问题不在某个人（零件层），在发布的时间分布（序列层）。所以任何针对个人的处理都会跑偏。</p>
+<p><b>勘察</b>：第五次了，成沟。共同条件：临近下班、需求当天下达、无强制校验。水从哪来——需求方习惯当天提当天上，且这份“响应快”被写进了团队的考核亮点。<b>这就是那股一直在供水的水。</b></p>
+<p><b>动手</b>：改地形——发布窗口默认上午，下午四点后发布需要额外一步审批（不是禁止，是多一步）。加频次——每天早会花两分钟过一遍当天发布计划。断供——把“当天响应”从考核亮点里拿掉，换成“按窗口交付的准时率”。意志那一把没用上。</p>
+<p><b>结果怎么记</b>：三个月后如果仍有故障，回头查是哪一条没落实，而不是重新写一遍“加强意识”。<b>能被复查的改动才是改动，写在报告里的决心不是。</b></p>
+<h2 id="s13"><span class="no">13</span>因果感越强，越要停一下</h2>
+<p>母文里有一条很反直觉的观察，值得单独拿出来当纪律用：<b>一个人越是笃定“必然如此”，往往越说明他在维护自己，而不是在看事实。</b></p>
+<p>道理不难懂：那种“非如此不可”的感受，来自沟的深度，而沟是自己走出来的。走得越久、投入越多、身份越绑在上面，那股必然感就越强。所以在会上最斩钉截铁的那个判断，常常不是证据最足的那个，而是<b>当事人最输不起的那个</b>。</p>
+<p>三条可用的纪律：</p>
+<ul class="pts"><li><b>给强判断加一道额外的闸。</b>越是没人质疑的结论，越要补做拨动那一道。</li><li><b>听听那个不太确定的人。</b>统一感弱的人往往看得更松、更容易看见例外——这不是他更聪明，是他没那么需要那个结论成立。</li><li><b>对自己也用一次。</b>你此刻最确信的那条因果，如果被推翻，你会损失什么？<b>答案越具体，越该重查一遍。</b></li></ul>
+<h2 id="s14"><span class="no">14</span>什么时候这套用不上</h2>
+<ul class="pts"><li><b>真·偶发事件</b>：只发生过一次、且条件不可复现的，别硬找沟。<b>为一次偶发改制度，是给未来埋一条无用的沟。</b></li><li><b>需要立刻止损时</b>：先止血。归因是事后的活，不是现场的活。</li><li><b>责任认定场合</b>：法律与合规上的责任认定有自己的规则和证明标准，这套工序帮你看清机制，但不替代那套规则。</li><li><b>别人的私事</b>：把“你这条沟是怎么走出来的”用在别人身上，多半会变成冒犯。这套东西朝内用最有效，朝外用要请人同意。</li></ul>
+<h2 id="s15"><span class="no">15</span>三种假因果的长相</h2>
+<p>过闸的时候，最常撞见的三种冒牌货，认脸比背原理有用。</p>
+<p><b>一 · 共因型。</b>两件事都被第三样东西牵着走。特征是：<b>关系稳得可疑，但你拨动其中一个，另一个纹丝不动。</b>公鸡与天亮、冰淇淋与溺水都属于这一类。查法：找那个同时能解释两边的第三样，通常是时间、季节、批次、政策窗口。</p>
+<p><b>二 · 反向型。</b>方向搞反了。“用了这套系统的团队效率高”——也可能是效率本来就高的团队才有余力上系统。特征是：<b>先后顺序在数据里看不清。</b>查法：看谁先动，找到那些“先有结果后有原因”的样本。</p>
+<p><b>三 · 幸存者型。</b>你手上只有活下来的样本。“成功的公司都强调执行力”——失败的公司也强调，只是它们不在你的样本里。特征是：<b>结论听着都对，且找不到反例。</b>查法：主动去找失败样本，找不到就把结论降级为假设。</p>
+<p>一句总纪律：<b>这三种冒牌货全都能过第一道闸，且都长得很像真的。</b>第二道闸（拨动）是它们共同的克星——凡是拨不动的，一律不进原因栏。</p>
+<h2 id="s16"><span class="no">16</span>把归因变成可累积的东西</h2>
+<p>最后一条，收益最慢但最值钱：<b>给归因记账。</b></p>
+<p>一张表，四列：这次判定的原因、当时过了哪几道闸、我们改了哪一样、三个月后结果如何。</p>
+<p>坚持四五轮，你会得到三样别处买不到的东西：</p>
+<ul class="pts"><li><b>一份本行业的地形图</b>：哪几条沟是这一行的常客，新人不必再各撞一遍。</li><li><b>一份判据的校准记录</b>：哪一类判断我们常常判错、错在哪一道闸上。</li><li><b>一条对付“这次不一样”的证据链</b>：每当有人说这次特殊，翻表就知道特殊多少次了。</li></ul>
+<p><b>没有记账的复盘，做十次和做一次的效果差不多</b>——因为每一次都从头开始猜。有账的团队，第三年就会明显比同行更快找到抓手，这不是聪明，是攒下来的地形知识。</p>
+<h2 id="s17"><span class="no">17</span>六种失败模式</h2>
+<ul class="pts"><li><b>只过第一道闸</b>：看见共现就写进原因栏。→ 补拨动与通路。</li><li><b>在零件层找整体层的东西</b>：把“氛围差”追到某个人头上。→ 先做层次自检。</li><li><b>原因栏写满不可动项</b>：报告漂亮，什么也不会变。→ 每条配可动项。</li><li><b>封路不断水</b>：禁止动作而不改奖励，长出更隐蔽的替代动作。</li><li><b>同时挖五条沟</b>：全都半深，全都回弹。→ 一次一条，挖到成形。</li><li><b>复盘只能证明自己对</b>：流程无法得出“是我们方法有问题”。→ 加免检证扫描第三问。</li></ul>
+<h2 id="s18"><span class="no">18</span>一页纸操作卡</h2>
+<ul class="pts"><li><b>一 · 定性</b>：这次要的是解释还是抓手？抓手才进原因栏。</li><li><b>二 · 过闸</b>：共现→拨动→通路，三道全过才算原因。</li><li><b>三 · 分层</b>：零件／序列／整体，先判层再归因。</li><li><b>四 · 勘察</b>：第几次发生／共同条件／水从哪来／例外是哪次／不改会不会再来。</li><li><b>五 · 动手</b>：改地形→加频次→断供→最后才用意志。</li><li><b>六 · 立纪律</b>：一次一条沟、写明可见水位、事先允许一段难看期。</li><li><b>七 · 自检</b>：这套判据自己过不过关？会不会永远得出对自己有利的结论？</li></ul>
+<p>母文负责证明必然是被走出来的，这一页负责让这条判断落到你下一次复盘会、下一次推行、下一个想改的习惯上。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/column/causality-river/">《因果之河：休谟的斧头、康德的云梯，与SDE的河床》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/column/causality-river/explain.html">🌱 白话解释文《世上本没有路，走的人多了》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/column/causality-river/">回母文</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

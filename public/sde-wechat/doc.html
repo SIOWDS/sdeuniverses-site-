@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>阅读 · SDE 社区</title>
+<style>
+:root{--bg:#0E0B08;--panel:#161109;--gold:#C9A84C;--gold2:#E7D9A6;--ink:#E7DFC8;--muted:#9A906F;--line:rgba(201,168,76,.28)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+a{color:var(--gold);text-decoration:none}
+#bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 14px;background:rgba(14,11,8,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+#bar .nm{flex:1 1 160px;min-width:0;font-size:14px;color:var(--gold2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{font-size:13px;padding:5px 11px;border-radius:4px;border:1px solid var(--line);color:#D9CDA0;background:none;cursor:pointer}
+.btn:hover{background:rgba(201,168,76,.12)}
+.btn:disabled{opacity:.4;cursor:default}
+#pgw{display:none;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+#pg{width:46px;text-align:center;background:#0b0906;border:1px solid var(--line);color:var(--ink);border-radius:4px;padding:4px}
+#stage{display:block;text-align:center;padding:14px 10px 40px;overflow:auto;touch-action:pan-x pan-y}
+canvas{max-width:none;background:#fff;box-shadow:0 2px 18px rgba(0,0,0,.5);margin:0 auto 14px;display:block}
+#doc{max-width:820px;margin:0 auto;padding:26px 22px 60px;text-align:left;line-height:1.95;font-size:16.5px;color:#EDE6D2}
+#doc h1{font-size:26px;line-height:1.5;color:#F5EFE0;margin:.6em 0 .5em}
+#doc h2{font-size:20px;color:var(--gold2);margin:1.5em 0 .5em}
+#doc h3{font-size:17px;color:var(--gold2);margin:1.2em 0 .4em}
+#doc p{margin:0 0 1em;text-align:justify}
+#doc table{border-collapse:collapse;width:100%;margin:1em 0;font-size:14.5px}
+#doc td,#doc th{border:1px solid var(--line);padding:7px 9px}
+#doc img{max-width:100%;height:auto;border-radius:4px}
+#doc blockquote{margin:1em 0;padding:.4em 0 .4em 14px;border-left:3px solid var(--gold);color:#CFC5A4}
+#doc ol,#doc ul{padding-left:1.6em;margin:0 0 1em}
+#msg{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;line-height:2}
+#msg b{color:var(--gold2)}
+iframe{width:100%;height:calc(100vh - 52px);border:0;background:#fff}
+</style>
+</head>
+<body>
+<div id="bar">
+  <a class="btn" href="/sde-wechat/">‹ 返回</a>
+  <span class="nm" id="nm">正在打开…</span>
+  <span id="pgw">
+    <button class="btn" id="prev">‹</button>
+    <input id="pg" value="1"><span id="pgt">/ –</span>
+    <button class="btn" id="next">›</button>
+    <button class="btn" id="zo">－</button>
+    <button class="btn" id="zl">100%</button>
+    <button class="btn" id="zi">＋</button>
+  </span>
+  <a class="btn" id="dl" href="#" download>⬇ 下载</a>
+</div>
+<div id="stage"><div id="msg">正在加载…</div></div>
+
+<script>
+/* 社区动态文章阅读器。
+   两个库都自托管在 /assets/lib/ ——站内既有的 read.html 走 cdnjs 外链，
+   大陆学员每次都要在那条外链上等超时；这一页不重复那个错误。
+   PDF 用 pdf.js 翻页＋重渲染缩放（与站内翻页版同一套做法：s = fit × zoom，
+   不是 CSS 拉伸位图，所以放大后字是锋利的）；Word 用 mammoth 转 HTML。 */
+(function(){
+  var Q=new URLSearchParams(location.search);
+  var K=(Q.get("k")||"").toLowerCase(), T=(Q.get("t")||"").toLowerCase(), N=Q.get("n")||"";
+  var stage=document.getElementById("stage"), msg=document.getElementById("msg");
+  function say(h){ stage.innerHTML='<div id="msg">'+h+'</div>'; }
+  if(!/^[0-9a-f]{16}$/.test(K)||(T!=="pdf"&&T!=="docx")){ say("这个阅读链接不完整。<br>请回到社区动态重新点开。"); return; }
+  var SRC="/api/im/doc?k="+encodeURIComponent(K);
+  document.getElementById("nm").textContent=N||("文章."+T);
+  document.title=(N||"文章")+" · SDE 社区";
+  var dl=document.getElementById("dl"); dl.href=SRC; dl.setAttribute("download",N||("文章."+T));
+
+  function load(src,cb,err){ var s=document.createElement("script"); s.src=src; s.onload=cb; s.onerror=err; document.head.appendChild(s); }
+
+  /* ---------- Word ---------- */
+  if(T==="docx"){
+    say("正在载入阅读器…");
+    load("/assets/lib/mammoth.browser.min.js?v=20260817c",function(){
+      say("正在转换文档…");
+      fetch(SRC).then(function(r){ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+      .then(function(buf){
+        return window.mammoth.convertToHtml({arrayBuffer:buf},{
+          styleMap:["p[style-name='Title'] => h1:fresh","p[style-name='Heading 1'] => h2:fresh","p[style-name='Heading 2'] => h3:fresh"]
+        });
+      })
+      .then(function(res){
+        var html=(res&&res.value||"").trim();
+        if(!html){ say("这份 Word 文档里没有可显示的正文。<br><a href='"+SRC+"' download>点这里下载原件</a>"); return; }
+        stage.innerHTML='<div id="doc"></div>';
+        /* mammoth 的输出是它自己从 docx 生成的，不含脚本；仍只接 innerHTML，不 eval 任何东西 */
+        document.getElementById("doc").innerHTML=html;
+      })
+      .catch(function(){ say("这份文档没能转换成网页。<br><a href='"+SRC+"' download>点这里下载原件用 Word 打开</a>"); });
+    },function(){ say("阅读器没能载入。<br><a href='"+SRC+"' download>点这里下载原件</a>"); });
+    return;
+  }
+
+  /* ---------- PDF ---------- */
+  var pdf=null,page=1,total=0,zoom=1,busy=false,pending=null;
+  try{ var z=parseFloat(localStorage.getItem("sde_wxdoc_zoom")); if(z>=.5&&z<=4) zoom=z; }catch(e){}
+  var el=function(i){return document.getElementById(i)};
+
+  function fallback(){ stage.innerHTML='<iframe src="'+SRC+'#view=FitH"></iframe>'; }
+
+  function fit(p){
+    var vw=Math.max(280,stage.clientWidth-24);
+    var v=p.getViewport({scale:1});
+    return Math.min(vw/v.width, 2.2);
+  }
+  function render(){
+    if(!pdf) return;
+    if(busy){ pending=1; return; }
+    busy=true;
+    pdf.getPage(page).then(function(p){
+      var s=fit(p)*zoom, dpr=Math.min(window.devicePixelRatio||1,2.5);
+      var v=p.getViewport({scale:s});
+      var pix=v.width*dpr*v.height*dpr, MAX=1.6e7;      /* 画布像素封顶，防手机内存爆 */
+      if(pix>MAX) dpr=dpr*Math.sqrt(MAX/pix);
+      var c=document.createElement("canvas");
+      c.width=Math.floor(v.width*dpr); c.height=Math.floor(v.height*dpr);
+      c.style.width=Math.floor(v.width)+"px"; c.style.height=Math.floor(v.height)+"px";
+      var ctx=c.getContext("2d"); ctx.scale(dpr,dpr);
+      return p.render({canvasContext:ctx,viewport:p.getViewport({scale:s})}).promise.then(function(){
+        stage.innerHTML=""; stage.appendChild(c); stage.scrollTop=0;
+        el("pg").value=page; el("pgt").textContent="/ "+total;
+        el("zl").textContent=Math.round(zoom*100)+"%";
+        el("prev").disabled=(page<=1); el("next").disabled=(page>=total);
+        busy=false; if(pending){ pending=null; render(); }
+      });
+    }).catch(function(){ busy=false; fallback(); });
+  }
+  function go(n){ n=Math.max(1,Math.min(total,n|0)); if(n!==page){ page=n; render(); } }
+  function setZoom(z){ zoom=Math.max(.5,Math.min(4,z)); try{localStorage.setItem("sde_wxdoc_zoom",String(zoom))}catch(e){} render(); }
+
+  say("正在载入阅读器…");
+  load("/assets/lib/pdf.min.js?v=20260817c",function(){
+    if(!window.pdfjsLib){ fallback(); return; }
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc="/assets/lib/pdf.worker.min.js?v=20260817c";
+    say("正在打开文章…");
+    window.pdfjsLib.getDocument(SRC).promise.then(function(d){
+      pdf=d; total=d.numPages; el("pgw").style.display="inline-flex"; render();
+    }).catch(function(){ fallback(); });
+  },function(){ fallback(); });
+
+  el("prev").onclick=function(){go(page-1)};
+  el("next").onclick=function(){go(page+1)};
+  el("pg").onchange=function(){go(parseInt(this.value,10)||1)};
+  el("zi").onclick=function(){setZoom(zoom+.2)};
+  el("zo").onclick=function(){setZoom(zoom-.2)};
+  el("zl").onclick=function(){setZoom(1)};
+  document.addEventListener("keydown",function(e){
+    if(e.target&&e.target.tagName==="INPUT") return;
+    if(e.key==="ArrowLeft"||e.key==="PageUp"){go(page-1);e.preventDefault();}
+    else if(e.key==="ArrowRight"||e.key==="PageDown"){go(page+1);e.preventDefault();}
+    else if(e.key==="+"||e.key==="="){setZoom(zoom+.2);}
+    else if(e.key==="-"){setZoom(zoom-.2);}
+    else if(e.key==="0"){setZoom(1);}
+  });
+  var rt=null;
+  window.addEventListener("resize",function(){ clearTimeout(rt); rt=setTimeout(render,180); });
+})();
+</script>
+</body>
+</html>

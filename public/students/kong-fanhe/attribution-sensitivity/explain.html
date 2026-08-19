@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>为了把蝴蝶留住，你得先把它钉死 · 白话解释文 | SDE Universes</title>
+<meta name="description" content="母文说的是一件让人不太舒服的事：有一类真实发生过的治愈，永远进不了证据库。不是因为没人研究，也不是因为研究得不够仔细，而是因为登记这个动作本身，会把它最要紧的那部分弄没。这一篇不用任何专业词汇，只用蝴蝶标本、被拆开解释的笑话、奶奶做菜的一把盐、医院报销单上不存在的那一栏，把这个判断讲清楚——以及它为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为了把蝴蝶留住，你得先把它钉死 · 白话解释文">
+<meta property="og:description" content="母文说的是一件让人不太舒服的事：有一类真实发生过的治愈，永远进不了证据库。不是因为没人研究，也不是因为研究得不够仔细，而是因为登记这个动作本身，会把它最要紧的那部分弄没。这一篇不用任何专业词汇，只用蝴蝶标本、被拆开解释的笑话、奶奶做菜的一把盐、医院报销单上不存在的那一栏，把这个判断讲清楚——以及它为">
+<link rel="canonical" href="https://sdeuniverses.com/students/kong-fanhe/attribution-sensitivity/explain.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#A8813C;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#FBF6EA;border-left:4px solid #A8813C;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#8C6A3A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#A8813C;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#A8813C;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#8C6A3A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#A8813C}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#FBF6EA;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#8C6A3A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/kong-fanhe/attribution-sensitivity/">← 回母文《疗愈的归因敏感度》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 白话解释文 · 母文《疗愈的归因敏感度》</div>
+  <h1 class="art-title">为了把蝴蝶留住，你得先把它钉死</h1>
+  <div class="art-subtitle">奶奶的菜、拆开的笑话、报销单上没有的那一栏——不用一个术语，把《疗愈的归因敏感度》讲一遍</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 4999 字</div>
+  <div class="swap">
+    <a href="/students/kong-fanhe/attribution-sensitivity/"><b>← 母文 · 疗愈的归因敏感度</b><span>完整论证在这里</span></a>
+    <a href="/students/kong-fanhe/attribution-sensitivity/practice.html"><b>🛠 技术与方法实践文 · 不把它钉死的十三种做法：高归因敏感事件的记录、训练、研究与制度设计</b><span>把母文的判断落成可上手的步骤、判据与检查表</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文说的是一件让人不太舒服的事：有一类真实发生过的治愈，永远进不了证据库。不是因为没人研究，也不是因为研究得不够仔细，而是因为登记这个动作本身，会把它最要紧的那部分弄没。这一篇不用任何专业词汇，只用蝴蝶标本、被拆开解释的笑话、奶奶做菜的一把盐、医院报销单上不存在的那一栏，把这个判断讲清楚——以及它为什么不是在替玄学说话，而是在描述一台机器的筛选规则。<br><br><b>读法</b>　这一篇写给：读母文时被术语挡在门外、但想真正弄懂它在说什么的人。全篇不假设你读过任何理论书，也不要求你记住任何术语。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先从一个不太起眼的事实开始</a></li><li><a href="#s2">蝴蝶标本：为了保存，先得钉住</a></li><li><a href="#s3">拆开的笑话，和奶奶的那把盐</a></li><li><a href="#s4">那句最要紧、也最容易被误读的话</a></li><li><a href="#s5">它跟旧货市场那个说法差在哪</a></li><li><a href="#s6">它跟说不出来的手艺差在哪</a></li><li><a href="#s7">报销单上没有的那一栏</a></li><li><a href="#s8">那这不就成了万能挡箭牌吗</a></li><li><a href="#s9">那还能做什么：三条不摧毁它的做法</a></li><li><a href="#s10">一个更大的推论：不止治疗室</a></li><li><a href="#s11">一个更贴身的场景：那次说不清的会议</a></li><li><a href="#s12">那我们还能相信证据吗</a></li><li><a href="#s13">收尾：给那阵风留一个位置</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先从一个不太起眼的事实开始</h2>
+<p>几乎每个做过多年临床的人手里，都有那么一两个说不清楚的例子：某个来访者困了很多年，某一次谈话之后忽然松了，之后就一直好着。问他是哪一句话起了作用，他说不上来；问治疗师用了什么技术，治疗师也说不上来——那天他其实什么都没做，只是坐在那儿，恰好没有急着解释。这样的例子，在任何一份疗效报告里都不会出现。它们不是被忽视了，是根本没有一个格子可以填。报告要求填的是：用了什么方法、做了几次、量表分数变化多少。上面那件事，每一栏都填不进去。于是它就消失了。不是消失在事实里，是消失在记录里。而所有关于什么方法有效的知识，都是从记录里长出来的。母文追的就是这个落差：为什么最深的那一类治愈，恰恰是最不可能进入证据库的那一类。这不是运气不好，是有结构的。</p>
+<p>还要补一句：这类例子不是罕见的边角料。多数资深从业者被私下问起最有把握的一次改变时，讲出来的往往正是这一类。也就是说，被记录系统整体删除的，恰恰是这一行自己认为最珍贵的那部分经验。这个落差本身就值得追问。</p>
+<h2 id="s2"><span class="no">02</span>蝴蝶标本：为了保存，先得钉住</h2>
+<p>最贴切的比方是做标本。你想把一只蝴蝶留下来，方法是把它钉在板上、展平翅膀、贴上标签。标本做得越好，形态保存得越完整。但有一样东西，无论技术多高明都留不下来——飞。飞不是蝴蝶身上的一个部件，它是蝴蝶与空气、与光、与那一刻的风共同发生的事。钉住它的那一刻，飞就没了。证据库对治愈做的事，结构上跟做标本一样。它要求把一次治愈拆开：哪一部分归于技术，哪一部分归于关系，哪一部分归于来访者本人的努力，哪一部分归于时间。拆得越清楚，越能进入知识体系，越能被传授、被复制、被认证。问题在于，有一类治愈的关键成分，恰恰就是那个不能被拆的整体——它由此人、此时、此语境、此一次偶然的相遇共同构成。拆开，它就不在了。所以这不是证据库偏心，也不是研究者水平不够。这是保存方式与对象性质之间的一次结构性错配：能被保存下来的，只能是本来就能被钉住的那些。</p>
+<p>还有一个细节值得注意：做标本的人并不觉得自己在破坏什么。在他看来，他保存下来的是这只蝴蝶的全部——形态、颜色、翅脉，一样不少。飞之所以没被算作损失，是因为它从来就不在清单上。归因体系对那一部分治愈的态度也是如此：不是判它无效，是根本没有它的栏目。</p>
+<h2 id="s3"><span class="no">03</span>拆开的笑话，和奶奶的那把盐</h2>
+<p>再举两个日常的例子。一个笑话之所以好笑，靠的是节奏、语气、听的人此刻的状态、前面十分钟的气氛。有人没听懂，你拆开给他解释：这里是双关，这里是反转。解释得完全正确，他也点头说懂了——但他不会笑。笑那部分，在拆解的过程中蒸发了。另一个是奶奶做的菜。你想学，问她放多少盐，她说一把。你追问一把是多少克，她想了想说，看情况。你最后精确到克把菜谱写下来，照着做，味道对不上。不是她藏私，是那个决定放多少的判断，本来就是跟当天的食材、火候、天气、要吃的人一起做出来的，脱离了那一次，它没有确定值。这两件事有个共同点：把它写下来的动作，本身在改变它。写下来的版本不是原版的简化，是另一样东西。母文说的归因敏感度，指的就是一件事对这种拆解有多敏感。有的事不敏感——一颗药、一次手术、一个明确步骤，怎么拆都还在。有的事极其敏感，一拆就散。麻烦的是，越深的治愈，往往越靠后面这一类。</p>
+<p>顺着这个思路还能看清一件事：为什么按标准手册做出来的治疗，往往稳定、安全、可复制，却很少产生那种一次性的深刻转变。手册保证的是下限，代价是把那些依赖当下判断的余地全部收走。这不是手册的错，是手册这个形式的必然结果。</p>
+<h2 id="s4"><span class="no">04</span>那句最要紧、也最容易被误读的话</h2>
+<p>母文有一个判断听上去很玄，其实很实在：在那一类事件里，起作用的东西不属于任何一个人。不是治疗师的功劳，也不是来访者的功劳，甚至不是两个人合起来的功劳——它是那个人的状态、这个人的在场、以及那一刻恰好如此的时机三者同时凑齐时发生的事。这听起来像在推卸责任，其实不是。类比一下：一场庄稼得救的雨。你不会说这是云的功劳，也不会说是风的功劳，更不会说是农民的功劳。雨下在恰好需要它的时刻，这件事真实发生了，但它没有一个可以领奖的主体。承认这一点很难，因为整个专业世界建立在相反的假设上：任何有效的东西，一定可以被追溯到某个人的某个动作，否则就无法传授、无法收费、无法问责。母文的狠处在于：它不否认这个假设在大多数情形下有用，它只指出这个假设本身就是一台筛子。凡是不能被归给某个人某个动作的效果，都会在筛子这一步被漏掉——不管它有多真实、多常见、多重要。</p>
+<p>也要说清它不适用的地方：绝大多数临床改变是有主的——一次准确的解释、一段稳定的暴露训练、一份合适的药物，功劳确实可以归给某个人某个动作。母文的判断只覆盖那一小类。把它推广到全部治疗，是对它最快的败坏。</p>
+<h2 id="s5"><span class="no">05</span>它跟旧货市场那个说法差在哪</h2>
+<p>有人会想到那个经典的旧车市场道理：买家分不出好车坏车，于是好车卖不出价，最后市场上只剩坏车。这两件事看着很像，但差在最要紧的一处：旧车市场的问题是信息没传到——好车的好是客观在那儿的，只是买家看不见。而母文说的是另一回事：那个好并不是藏在某处等着被看见，它在被观看、被登记的过程中会改变性质。不是信息不对称，是对象本身不耐观察。这个差别决定了对策完全不同。信息不对称的解法是加强检验、发认证、给保证书——让好的能被看见。而对不耐观察的东西，加强检验只会加速它的消失，因为检验就是那个把它弄没的动作。所以母文才说，这不是一个可以靠更好的评估工具解决的问题。工具越精密，筛掉的越干净。</p>
+<p>两者还有一个实际后果上的差别。信息不对称的市场，坏消息是好东西卖不出价；而这里的坏消息更重一层：好东西不但卖不出价，还会因为长期得不到承认，在从业者自己的经验里被慢慢降级为不算数的东西。市场失灵是外部的，这一层的失灵发生在人自己的判断里。</p>
+<h2 id="s6"><span class="no">06</span>它跟说不出来的手艺差在哪</h2>
+<p>另一个近亲是那个著名的说法：熟练的人知道的总是多于他能说的。骑车、辨认人脸、老医生一眼看出不对劲——这些都说不出来。这个说法非常对，但它停在说不出来。母文往前推了一步：不只是说不出来，而是一说出来就被破坏。这两者差得很远。说不出来的东西可以慢慢琢磨、可以靠师徒相传、可以想办法找到更好的表达方式——问题在表达能力上。而一说就坏的东西，不管表达能力多强，都没有出路，因为破坏来自表达这个动作本身，不来自表达得好不好。用一个生活例子分辨：一个人不会描述自己怎么骑车，这是说不出来；一个人在被要求描述自己怎么骑车的同时骑车，会立刻摔倒，这才是一说就坏。母文关心的是后一种。它比前一种少见，但正是在那少见的地方，藏着治愈里最深的那一部分。</p>
+<p>把这两者分开还有一个操作上的用处：它决定了该往哪个方向使劲。如果只是说不出来，正确的投入是找更好的语言、更好的示范、更长的师徒相处。如果是一说就坏，那么再多的语言都没用，正确的投入是改环境——让那件事更容易发生，然后不去碰它。</p>
+<h2 id="s7"><span class="no">07</span>报销单上没有的那一栏</h2>
+<p>把视线从治疗室挪到制度上，这件事会变得非常好懂。一家医院的报销制度，只报能开出票据的项目：检查、药品、手术、床位。护士在夜里多陪一个病人说了二十分钟话，这件事没有编号，开不出票，因此在这套系统里等于没发生。时间一长会发生两件事。第一，医院不会为它安排人手，因为它不产生任何可记账的价值。第二，更隐蔽的是，年轻人会从制度的行为里学到什么才算工作——于是那二十分钟不只是不被算，还会被视为不专业、不高效。心理治疗行业的处境是同一个模子：培训按流派设置，认证按技术项目发放，研究经费按可测量的特异因子分配。所有资源都流向能被归因的那一侧，而不能被归因的那一侧不只是拿不到资源，还会逐渐被从行业的自我理解中删掉。母文那句行业建在归因机器上，说的就是这件事：不是有人在打压什么，是整套激励结构的开关，只对一种东西起反应。</p>
+<p>这里还有一个容易被忽略的连锁反应：一旦某类工作在制度上不存在，为它辩护的人就会显得在讲情怀。于是讨论从这件事该不该被算，滑向你是不是在为低效找借口。母文之所以坚持要给出可被推翻的条件，正是为了把讨论从情怀拉回到判断上来。</p>
+<h2 id="s8"><span class="no">08</span>那这不就成了万能挡箭牌吗</h2>
+<p>这是必须正面回答的质疑，母文也确实回答了。如果一个人说我的疗效不可被归因、不可被测量、不可被检验，那他就获得了一张永久豁免券：任何失败都可以说成你不懂，任何质疑都可以说成你在用错误的尺子。这显然不能接受。母文的防线是给出了明确的反面条件——什么情况下这套判断就应当被判为错。比如：如果研究发现，来访者事后指认的关键转折点，与治疗师对同一事件的事后归因，在技术成分上能稳定地达成一致，而且这种一致不受敏感度高低影响，那么这个概念就没有存在的必要。这一步很要紧。一个说不可被完全测量的判断，如果同时说出了自己在什么条件下算错，它就仍然是一个可以讨论的判断，而不是一句不可反驳的口号。换句话说，母文不是在为不可测量辩护，而是在为一个特定的、有边界的、可以被推翻的说法辩护。这两者之间隔着专业与神秘主义的整条界线。</p>
+<p>还有一条更硬的自我约束：凡是主张自己在做这一类工作的人，都必须同时接受某一种间接检验。可以不接受直接测量，但不能什么都不接受。这条约束听起来苛刻，其实是保护——它让这个说法留在专业讨论里，而不是被赶到玄学那一边去。</p>
+<h2 id="s9"><span class="no">09</span>那还能做什么：三条不摧毁它的做法</h2>
+<p>第一条，改记录方式：不记功劳，记条件。与其填这次是什么技术起了作用，不如填那天的状态是什么、之前发生了什么、房间里的气氛如何、有没有被打断。功劳无法记录，条件可以。而知识的传递，其实靠条件就够了。第二条，改培训重心：从教动作转到教环境。既然关键扰动不能被拆成可复制的技术，那么可以教的就是怎样让它更容易发生——怎样不着急、怎样忍住不解释、怎样让一次谈话有余地。这些不是技术清单，是可以言传身教的条件。第三条，改评价口径：给那些不产生记录的工作留出正式的位置。哪怕只是在排班表上留一段不计件的时间、在评价体系里留一栏无法量化的贡献，也比没有强。位置一旦存在，它就不会被当成偷懒。这三条都不试图去测量那件不可测量的事，它们只是不再把它从系统里挤出去。这大概是母文能给出的最实在的建议。</p>
+<p>这三条有一个共同点：都不试图去证明那件事存在。它们做的是更谦逊也更可行的事——不再主动把它挤出去。区分这两种目标很重要：追求证明会把人引回归因的老路，而不再挤出去只需要在制度上腾出一小块沉默的空间。</p>
+<h2 id="s10"><span class="no">10</span>一个更大的推论：不止治疗室</h2>
+<p>这个道理一旦看懂，会在别的地方反复认出来。教育里：真正改变一个学生的，往往是某位老师在某个下午说的一句话，而这件事进不了任何一份教学评估。评估能测的是课时、进度、分数，于是资源全部流向可测的那一半。科研里：一个实验室真正的产出，常常来自几次不在计划里的闲聊，而考核只认论文与项目。管理里：一个团队从涣散变得有劲，往往说不清是哪一次会议起的作用，于是复盘时人们只好把功劳安在某个可指认的举措上。凡是复杂系统的成功重组，都要面对同一个难题：它必须被事后归因才能进入组织的记忆，而归因这个动作会重写它。于是组织记住的，永远是那个被改写过的版本。这就是母文最后那句话的意思：越是要紧的东西，越容易在被登记的那一刻走样。知道这一点，不能让它不走样，但至少能让人对着记录多留一分怀疑。</p>
+<p>还有一个更日常的版本：家庭。一个孩子后来回想起改变自己的事，往往不是父母精心安排的那些，而是某次随口的话或某个不经意的下午。而家庭内部的自我叙述，几乎总是把功劳记在那些精心安排的事情上——因为只有它们有名字、有过程、有可复述的形状。</p>
+<h2 id="s11"><span class="no">11</span>一个更贴身的场景：那次说不清的会议</h2>
+<p>把治疗室换成办公室，同样的事天天发生。一个团队僵了半年，某次会议之后忽然顺了。事后复盘，有人说是因为换了目标，有人说是因为那天大家都很累所以没吵，有人说是因为某人先松了口。谁也说不准，但所有人都同意那天确实是转折点。接下来发生的事很典型：复盘报告必须写出原因，于是最能讲得通的那个说法被写了进去，成了正式版本。半年后新人培训时，学到的就是那个版本。真实发生的那件事，从此只活在几个亲历者的记忆里，而且他们自己也会慢慢被那个正式版本覆盖。这个过程里没有人撒谎。每个人都在诚实地回忆，只是回忆必须被塑成一个有主语的句子才能被写下来。而那件事本来没有主语。所以母文说的不是某个行业的毛病，是所有需要把经验写下来的地方共有的一道工序损耗。知道有这道损耗，比试图消除它更实际。</p>
+<p>这个场景还有一个变体值得留意：当那个正式版本足够好用，它甚至会反过来改变亲历者的记忆。几年之后，连当时在场的人也开始按报告的说法回忆那天。到了这一步，原始事件就彻底没有了——不是被遗忘，是被覆盖。</p>
+<h2 id="s12"><span class="no">12</span>那我们还能相信证据吗</h2>
+<p>最后要防一个过头的读法：既然证据库会漏掉最好的东西，那是不是干脆不信证据了。这个推论是错的，而且很危险。母文自己反复强调，绝大多数临床判断仍然应该依据可归因、可复制的证据——它讨论的是被漏掉的那一小块，不是整座库。更准确的态度是这样：证据库告诉你的，是那些经得起被拆开的东西里，哪些有效。这个信息非常有用，而且不可替代。它没告诉你的，是那些一拆就没的东西里发生了什么——这一栏它是空的，而空不等于零。把这两句话同时记住，是最难的部分。人习惯于要么全信要么全不信，而这里要求的是知道一台仪器的量程，用它的时候相信它，越过量程时不假装它还在测。所以这篇文章的实际用处，可能就是让人在读到任何一份效果报告时，多一个念头：这份报告里没有的那一栏，装的是什么。</p>
+<h2 id="s13"><span class="no">13</span>收尾：给那阵风留一个位置</h2>
+<p>母文自己写了一句很坦白的话：这篇讲不可归因的文章，也会因为写得有说服力，被将来的知识话语无主地吸收——它的判断会被更精确地重述、被归进某个谱系，而源头会被忘掉。作者说他接受这个结局。这句话不是自怜，它是这套判断的最后一块拼图：如果这件事是普遍的，那它必然也适用于说出它的这个人。一个只适用于别人的规律，多半不是规律。所以整篇文章最后能落到的，其实是一个非常朴素的态度：知道有些好事没法被记账，知道记账系统会安静地把它们删掉，然后在自己能做主的那一小块地方，给它们留一个不必交代的位置。风不会因为没人相信就不吹。做记录的人能做的，是别把窗户关上。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。完整的论证、边界与反驳都在母文里：<a href="/students/kong-fanhe/attribution-sensitivity/">《疗愈的归因敏感度：为什么最深的治愈进不了证据库》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/kong-fanhe/attribution-sensitivity/practice.html">🛠 技术与方法实践文《不把它钉死的十三种做法：高归因敏感事件的记录、训练、研究与制度设计》</a>——把母文的判断落成可上手的步骤、判据与检查表。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/kong-fanhe/attribution-sensitivity/">回母文</a> ·
+  <a href="/students/kong-fanhe/works/">全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

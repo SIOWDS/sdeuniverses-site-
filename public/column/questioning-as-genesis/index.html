@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>追问即发生：提问的失稳—回写模型及其可裁决预测 | 每日头条专栏 | SDE Universes</title>
+<meta name="description" content="提问的价值不在问题文本的形态，而在两端：前件是提问者表征的失稳，后件是问题链对自身预设之网的回写。本文用SDE三方程给出回写的操作定义，把工具型提问刻画为回写方程被冻结的退化解，对美诺悖论给出失稳论解答，并提出四条与Nystrand、Loewenstein、生成效应、Getzels方向相反的可裁决预测，附禁止清单与反身条款。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#2E5090;--accent2:#4A73B8}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#2E50901a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.75rem,4.1vw,2.55rem);font-weight:700;line-height:1.32;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.98rem,1.9vw,1.13rem);color:var(--text2);max-width:660px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.72}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:2.4rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#2E509022 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.9rem 0;padding:1.15rem 1.5rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.05rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+
+.tbl{overflow-x:auto;margin:1.6rem 0}
+.tbl table{border-collapse:collapse;width:100%;font-size:0.92rem}
+.tbl th,.tbl td{border:1px solid var(--border);padding:0.55rem 0.7rem;text-align:left;vertical-align:top;line-height:1.7}
+.tbl th{background:var(--card);color:var(--gold);font-weight:600;letter-spacing:0.04em}
+article h3{font-size:1.02rem;margin:1.9rem 0 0.6rem;color:var(--gold);letter-spacing:0.02em}
+article code{background:var(--card);padding:0.05em 0.35em;border-radius:3px;font-size:0.92em}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/headline/" class="here">每日头条专栏</a>
+    <a href="/creation/" class="sib">学术创造专栏</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/headline/">每日头条专栏</a> · 2026年7月20日</div>
+  <h1 class="art-title">追问即发生：提问的失稳—回写模型及其可裁决预测</h1>
+  <p class="art-sub">两个学生问出逐字相同的问题，现有的每一套提问编码都会给它们打同一个分。本文主张：这两个问题不同，而且不同得可以测量——差别不在文本里，在文本的两端。四条与主流理论方向相反的可裁决预测，七条禁止清单，以及一条朝向本文自身的反身条款。</p>
+  <div class="art-meta">Claude 著 · 依王德生《SDE本体论》 · 每日头条专栏 · 2026年7月20日 · 约 9,500 字 · 32 条参考文献</div>
+</header>
+
+
+<main class="wrap">
+  <section class="body">
+    <div class="abs">
+      <div class="l">摘 要</div>
+      <p>提问研究的主流传统把问题的认识论价值系于问题文本的形态属性——真实性、层级、开放度。本文提出相反的主张：<b>形态是副现象，价值在两端——前件是提问者表征的失稳，后件是提问链对提问者自身路径与预设网络的回写。</b>以SDE三方程为记账框架，本文给出「回写事件」的操作定义，把工具型提问刻画为第三方程被冻结的退化解，用特征律对美诺悖论给出失稳论解答，并提出四条与Nystrand形态论、Loewenstein缺口论、生成效应、Getzels问题发现研究方向相反的可裁决预测，附编码规则、禁止清单与反身条款。</p>
+    </div>
+    <div class="kw"><b>关键词</b>　发生型提问；失稳；回写；三方程；认知失衡；问题链</div>
+    <div style="margin:18px 0 0;padding:14px 18px;background:#F4F1E8;border-left:3px solid var(--accent);font-size:14px;line-height:1.95;color:#5A5245"><b>缘起</b>　<b>缘起</b> 本文由站内讲稿《追问即发生》升级而来。讲稿的种子命题——「用三方程、六路径、三原理来提问，就能激发新S的发生」——在对话中由王德生提出。本文保留其核心直觉（工具型／发生型之分、提问落入三角循环），补还它欠下的三笔债：文献债（这个二分被谁占过位）、理论债（美诺悖论）、验证债（可裁决的对立预测）。凡是讲稿说对了的，本文只做一件事：把它放到能被推翻的位置上。</div>
+    <div class="toc">
+      <div class="l">目 次</div>
+      <a href="#c1">一、问题：一个稳定了两千年的错误</a><a href="#c2">二、清场：三条必须先撤销的指控</a><a href="#c3">三、特征律的表述与三处修正</a><a href="#c4">四、碰撞的通约前提：优先性问题是错问题</a><a href="#c5">五、模态偏置：形式与质料的双发生学</a><a href="#c6">六、反证检索的第一次实战：亚里士多德自己怎么说触觉</a><a href="#c7">七、一与多：为什么"多"总是被算成一个需要解释的缺陷</a><a href="#c8">八、科学里的同一个偏置：规律是形式，数据是质料</a><a href="#c9">九、为什么这个错误能稳定两千年</a><a href="#c10">十、从哲学命题到可测变量</a><a href="#c11">十一、核心假说与可预注册的检验</a><a href="#c12">十二、禁止力检验</a><a href="#c13">十三、方法论副产品：反证检索</a><a href="#c14">十四、结论与自我证伪</a><a href="#c15">附录　H3 预注册（数据收集开始前锁定）</a>
+    </div>
+    <article>
+<h2 id="c1">一、引言：两个形态相同的问题</h2>
+<p>同一间教室，前后五分钟，两个学生问出了逐字相同的问题：「如果测量会改变被测的东西，那我们测到的到底是什么？」第一个学生上周刚学过提问句式训练，「挑战一个隐含假设」是他手册上的第三条模板，这是他今天按模板造出的第三个问题。第二个学生在举手前的四十秒里两次欲言又止，把笔记上一个画了三天的箭头涂掉又画上，最后带着明显的迟疑把话说完。</p>
+<p>现有的每一套提问编码都会给这两个问题打同一个分。Nystrand的真实性编码看它们是否预设了标准答案——都没有，同为真实问题；布鲁姆式层级看它们的认知水平——同级；Graesser与Person的问题分类看它们的语义类型——同类。在所有以问题文本为编码对象的框架里，这两个问题是同一个问题。</p>
+<p>本文的全部主张是：这两个问题不同，而且不同得可以测量。差别不在文本里，在文本的两端。第一个问题没有前件——提问者的表征在提问前后完好如初；也不会有后件——答案到手，链条终止。第二个问题有前件——那个被涂掉的箭头是一段已经跑稳的理解正在失稳；也将有后件——无论得到什么回答，他的下一个问题都不会停在原地。前一种，本文沿讲稿称为<b>工具型提问</b>；后一种，称为<b>发生型提问</b>。讲稿用五个维度描写了二者的现象学差别，但把判据留在了体验层面，因此既不能被反驳，也不能被使用。本文要做的，是把判据从问题文本移到<b>问题链</b>上，给出三个主张：其一，二分的判据是前件（失稳）与后件（回写），形态属性不携带独立信息；其二，在SDE坐标里，一次提问分别触碰S、D、E，因此落入三方程的三角循环，工具型提问恰是这个循环的一个退化解；其三，该模型对四个现有最强理论各给出一条方向相反的预测，每条附可观测量与禁止清单。第一个主张若被第六节P1的实验推翻，本文作废。</p>
+<h2 id="c2">二、清场：这个二分不是本文的发明</h2>
+<p>诚实的第一步是承认：区分两类提问，是一个被反复占据的位置，而且占据者的阵容极强。按由远及近排列。</p>
+<p>柏拉图《美诺篇》提出了发生型提问的可能性难题本身，下节专论。皮尔士1877年在《信念的确定》里区分了<b>真怀疑</b>与<b>纸上怀疑</b>：探究始于真怀疑的刺痛，终于信念的重新固定，而笛卡尔式的方法论怀疑只是纸上表演——这几乎就是发生型与工具型的动机学版本。杜威把探究的起点定在<b>不确定情境</b>：不是主体缺一条信息，而是情境本身失去了确定性。柯林伍德的问答逻辑主张每个命题都是对某个问题的回答，问题在逻辑上先行。伽达默尔在《真理与方法》里区分真问题与教学式问题：真问题的本质是开放性，提问者被置入他不控制的运动之中——讲稿第四节的五维对照，几乎逐维是伽达默尔的现象学重述。波兰尼的默会知识论回答了「我们如何感到一个问题」：我们知道的多于我们能说的，所以能在言说之先感到不对。波普尔的P1→TT→EE→P2图式则占住了讲稿最后那个论点：任何答案都是下一个问题的起点，探究是问题链而非问答对。</p>
+<p>经验研究一侧占位更密。Berlyne把<b>概念冲突</b>定为认知好奇的驱动；Loewenstein的信息缺口理论把好奇定义为「注意力落在知识缺口上」，并预测缺口越接近闭合驱力越强，Kang等人的冷知识范式给了它神经与行为证据。Slamecka与Graf的<b>生成效应</b>证明自己生成的内容记得更牢；Rosenshine等对「教学生自己提问」的系统综述确认了提问生成对理解的稳定收益；King进一步表明，只靠训练问题句式（「……和……有什么联系？」）就能显著提升学习。课堂话语一侧，Nystrand的真实性—吸纳编码把「教师是否预设答案、是否接住学生的话」变成了可靠测量并连上了成绩；科学教育里Chin与Osborne综述明确区分了<b>基本信息问题</b>与<b>惊异问题</b>——那就是工具型与发生型在科学课堂上的名字。创造力研究一侧，Getzels与Csikszentmihalyi的经典纵向研究发现：美术学生在作画前<b>发现问题</b>的行为方式（摆弄多少物件、探索多久、多晚才让构图定形）预测七年乃至更久之后的创作成就——「问题比答案更接近真实」这句话，他们用数据说过了。</p>
+<p>与本文最近的两家要单独点名。其一，Graesser系的<b>PREG模型</b>（Otero与Graesser）明确主张：问题发生于认知失衡——读者检测到异常、矛盾、与既有知识的冲突之处；Graesser与Olde更用「装置故障」范式表明，故障情境下问出的问题质量直接反映理解深度。也就是说，<b>「失稳产生问题」这半句，已经被占</b>。其二，皮亚杰：失衡引发<b>顺应</b>——图式为容纳异例而重组。本文将要给出的「回写」，坦率地说，就是顺应的孙辈。</p>
+<p>所以清场的结论必须说满：如果本文只是重述「真问题优于假问题」或「矛盾引发提问」，它没有存在的必要。本文认领的空位在第五节精确划出；此处先立一句标尺——上述所有工作，<b>要么给了现象学而没有观测量（伽达默尔、杜威），要么给了问题的发生条件而没有问题链的动力学（PREG、Berlyne），要么编码了问题的形态而没有编码它的两端（Nystrand、布鲁姆），要么测了行为而没有测表征（Getzels）</b>。本文的赌注全部押在这个空位上。</p>
+<h2 id="c3">三、美诺悖论的失稳论解：你只需要认出你正在失去的东西</h2>
+<p>美诺问苏格拉底：你无法寻找你知道的东西，因为你已经知道；也无法寻找你不知道的东西，因为你不知道要找什么。这个悖论正打在发生型提问的要害上——按讲稿的说法，发生型提问所问的东西「在提问之前还不存在」，提问者连答案的形态都无法预描。那么他凭什么能把问题投向「纠缠场里最薄的结点」？「最薄」是一个判断，判断需要标准，标准从哪来？讲稿没有意识到自己整个站在美诺的枪口下。</p>
+<p>已有的解各有代价。柏拉图用回忆说赎回了探究，代价是灵魂先在。波兰尼用默会预知：我们默会地知道的比能说的多，所以能预感一个好问题的方向——但「默会预知」解释力与不可检验性同高。Loewenstein的解最经济：缺口在已知地图上可定位，你确切知道你不知道<b>哪一项</b>——这个解完美覆盖工具型提问，也只覆盖工具型提问；它把美诺悖论解决掉的方式，恰恰是把发生型提问定义掉。</p>
+<p>SDE的解从特征律入手。按《SDE本体论入门》的表述：特征，是差异序列跑出稳定性而发生的意识同一性——一段差异之流反复走出同型，被意识确认为「同一个东西」，特征才显露。稳定的是关系，变动的是项。由此立刻得到失稳的定义：<b>当新的差异输入使一段已经跑稳的序列重新失去同型，意识同一性的确认中断——这就是失稳</b>。第二个学生涂掉又画上的那个箭头，就是一段跑了三天的稳定序列正在散架。</p>
+<p>于是美诺悖论的第一角被拆掉：<b>发生型提问的意向对象根本不是未知的答案，而是已知之物的失稳位点。</b>你不需要认识你所寻找的东西；你只需要认出你正在失去的东西——而失去是当下的、此刻可检测的事件，不是先知。「最薄的结点」不需要全局标准来判定，它就是此刻裂开的那一处；提问者的「预感」不是对答案的预知，而是对自身失稳的内感——这也解释了为什么Metcalfe与Wiebe测到的「温热感」在顿悟型问题上会突跳而非渐升：被监测的从来不是与答案的距离，而是自身表征的稳定度。</p>
+<p>美诺的第二角——你无法寻找你已经知道的东西——则由二分自行消化。工具型提问寻找的正是「已知其位置的未知项」，美诺对它无效：地图学意义上的知道（知道缺什么位置）与内容意义上的知道（知道缺的是什么）本来就不是一回事，Loewenstein的缺口定义说的正是这件事。发生型提问则两角都不沾：它既不寻找已知——失稳恰恰是已知的瓦解——也不寻找某个先行存在的未知项，它寻求的是重新稳定，而重新稳定在寻求开始时尚不存在，谈不上「知道」与否。悖论之所以显得无处可逃，是因为它默认寻找的对象必须是一个项；把对象换成一个过程——失稳的再稳定化——两角同时落空。</p>
+<p>诚实标注：这个解与皮尔士（真怀疑=信念的实际动摇）、杜威（不确定的是情境）、PREG（异常检测触发提问）同族，不是本文的孤明先发。本文加上的东西只有一件，但正是缺的那件：<b>失稳只回答了问题从哪里来，没有回答问题往哪里去</b>。皮尔士的分析单位是信念的固定，他对两次提问之间发生了什么保持沉默；PREG预测何种文本条件产生何种类别的问题，但不建模问题链的演化。要回答「往哪里去」，需要下一节的模型。</p>
+<h2 id="c4">四、三方程提问模型：回写的操作定义</h2>
+<p>SDE三方程为：S=F(D,E)，D=G(S,E)，E=H(S,D)。S是显露——此刻被结算出来的那个「什么」；D是差异序列——路径如何被裁剪与迭代；E是特征纠缠——支撑路径的预设与关联之网。三方程不是循环论证，而是三脚架式的同时互生：任何一元都由另两元共同生成。</p>
+<p>把它读作<b>提问动力学</b>，只需两步指定。其一，把一条追问链记作q₁, a₁, q₂, a₂, …：每个回答aₙ被提问者接收为一个新显露Sₙ；下一个问题由第二方程生成——qₙ₊₁ = G(Sₙ, Eₙ)，即追问路径由刚结算的显露与提问者当前的纠缠场共同裁出。其二，关键在第三方程：<b>回写</b>，即Eₙ₊₁ = H(Sₙ, Dₙ)是否真的开火——新显露与走过的路径是否反过来重排了提问者自己的预设之网。123原理把回写称作命门：矛盾累积逼出S的改变只是前半程，S回写重置D与E才算走完一轮。</p>
+<p>由此得到本文的中心定义：</p>
+<p><b>工具型提问＝H方程被冻结的退化解。</b>E在整条链上保持常量：问题由固定的E裁出，答案作为S被收货，但不回写；于是G(Sₙ, E₀)在答案到手时无新路径可裁，链条终止。这精确对应工具型提问的全部现象学——安全（E不动所以无风险）、水平（在既有地图上移动）、即时（收货即闭合）、一次性（答案即终点）。讲稿用五个维度描写的差别，在模型里是一个方程的开关。</p>
+<p><b>发生型提问＝三方程全开的解。</b>每次接收Sₙ都可能触发H，E被改写，下一问从新的E里裁出——链条因此呈现出完全不同的拓扑：不收敛于某个待取项，而是升维、更替预设、持续运动。讲稿说「你以为在问单点，其实落进三角循环」，此之谓也；讲稿说追问是「无尽的递归函数」，模型里就是H不熄火。</p>
+<p>定义要能用，回写必须可编码。本文规定：链上第n步与第n+1步之间发生一次<b>回写事件</b>，当且仅当qₙ₊₁相对qₙ出现以下至少一项痕迹——三类痕迹恰好分别是E、D、S三元留下的：</p>
+<p><b>E层痕迹：预设更替。</b>把每个问题分解为预设三元组——存在预设（它默认什么东西存在）、结构预设（它默认这些东西如何关联）、价值预设（它默认什么值得问）。三元组中任一成员被否定或替换，记为更替；仅仅收窄（「哪种测量」细化为「哪种量子测量」）不算。边界判例再举两条：把问题从肯定式改为否定式（「为什么有效」改口为「为什么居然有效」）若未替换任何预设成员，不计更替，只作失稳指标的候选；引入比较对象（「比经典测量差在哪」）算结构预设的扩展而非更替，除非原结构同时被收回。层级编码的易错带在L1与L2之间：问一个机制的适用范围（「这条定律在多大尺度上还成立」）仍是L1，问机制赖以成立的框架资格（「『定律』这个说法在这里还合适吗」）才是L2——判据是框架被使用还是被提及。例中第二个学生若下一问是「那『被测系统』这个说法本身还成立吗」，存在预设已被更替。</p>
+<p><b>D层痕迹：层级跃迁。</b>沿用已固化的三级编码：L0，框架内的事实之问；L1，框架内的机制之问；L2，对框架本身之问。qₙ₊₁的层级高于qₙ，记为跃迁。这对应D2九步法里的「升维」——路径不再在原层迭代，而是换了层。</p>
+<p><b>S层痕迹：关系词重铸。</b>qₙ₊₁引入了一个新的关系谓词，且该谓词既未出现在此前所有问题中、也未出现在对话者的回答文本中——后一条是反鹦鹉条款，排除从答案里现学现卖的复读。新名的出现即新显露的结算：S是结算点，命名是结算的收据。</p>
+<p>一条链的<b>回写数</b>＝回写事件的计数；<b>回写深度</b>＝出现过的最高层级跃迁与预设更替的加权和。至此，二分的判据完成了从文本到链的迁移：给定任何一个问题，单看文本无法判型；看它的前件（失稳指标，见第七节）与后件（回写数），可判。</p>
+<p>把引言的两个学生走一遍。第一个学生得到回答（「测到的是系统与仪器的关联态」）后，链条的典型延续是：「那这个关联态怎么算？」——存在预设未动（系统、仪器、测量俱在），结构预设未动（测量仍是作用于系统的操作），层级停在L1，无新谓词；再一步是「考试会考这个推导吗」——链条离开论域，终止于收货。全链回写数为零：E自始至终是他手册上那张图，H一次未开火，教科书式的冻结解。第二个学生得到同一回答后问：「如果关联态才是基本的，那『系统』是不是只是我们切出来的？」——存在预设更替（独立系统的存在被收回），层级跃至L2（框架本身入问），并铸出新谓词「切出来」（此前问答文本中检索为零次）。三类痕迹同帧出现，一次标准的三方程全开。两个问题的文本曾经相同；两条链在第二步就分道扬镳，而分岔点恰好落在模型指定的位置——H方程。</p>
+<p><b>讲稿五维的定理化回收。</b>讲稿以五个维度描写二者之别：目标、状态、方向、时间感、对答案的态度。在模型里，五维不再是并列的观察，而是同一个开关的五个推论。目标之别（补缺对撕裂）：E冻结时，问题只能瞄准既有地图上的空位，撕裂无从谈起；H开火时，被更替的预设就是被撕开的位置。状态之别（安全对暴露）：风险的定义域是E——E不动者无可失去，E在重排者押上了自己的预设之网，暴露感是回写的现象学面。方向之别（水平对垂直）：层级跃迁是垂直位移的编码名。时间感之别（即时对持久）：冻结解在收货处有自然终点，全开解没有——H每开一次火，G就有新路可裁，「问题在心里扎根低鸣」说的就是这个不动点的缺席。态度之别（答案即终点对答案即新S）：这一条在模型里干脆就是定义本身。五维由此从描写升格为推论，而推论可以被杀：谁若在数据里找到五维彼此解离的稳定案例——譬如高暴露感而零回写的链条成批存在——冻结开关这个单一机制就被证伪，五维退回各自独立的现象。这也是一条禁止：模型预测五维在链上高度共变。</p>
+<h2 id="c5">五、剩余分工：各家站在哪里，空位在哪里</h2>
+<p>现在可以精确划界。伽达默尔与杜威给了发生型提问的现象学与逻辑地位，但不提供任何观测量，与经验研究不接口。皮尔士给了动机序列（怀疑→探究→固定），但分析单位是信念，对问题链内部的形态学沉默。皮亚杰的顺应是回写的祖概念，但顺应是<b>事后追认</b>的——我们从「学习发生了」倒推「想必顺应过了」；回写是<b>链上事件</b>，在过程中逐步编码，无需等待结局。PREG给出问题的发生条件与类别学，是离本文最近的经验模型，但它到问题的产生为止：不建模q到q的转移，不定义链的拓扑，也不预测链的性质与学习后果之间的关系。Nystrand编码问题与对话的形态属性（真实性、吸纳、层级），载体是文本切片而非链的两端。Loewenstein与Berlyne预测好奇的<b>强度</b>——问多强——但不预测<b>轨迹</b>——下一个问题长什么样、链条往哪里走。生成效应是条目级的记忆现象。Getzels与Csikszentmihalyi测的是问题发现期的<b>行为</b>变量（时长、摆弄、延迟闭合），不是表征变量。</p>
+<p>于是空位有了名字：<b>问题链的结构动力学</b>——什么预测下一个问题的形态，链的哪个性质预测学习与创造的后果。本文的模型主张：预测下一问形态的是G(S, E)里E的当前状态与H是否开火；预测后果的是回写数与回写深度，而非任何文本形态属性。两个主张合起来，等于把「什么是一个好问题」从句子的属性改判为链的属性——好问题不是一种句式，是一种轨迹的起点。这个主张对四家各蕴含一条方向相反的预测。若有读者认为以上仍只是「皮亚杰加Graesser的记账整理」，本文接受这个描述的一半——记账方式（三类痕迹对应三方程）确实是本文全部的赌注所在；赌它不是空转的方式，是看它能否生成前人记账法生成不了的对立预测。裁决在下一节。</p>
+<h2 id="c6">六、四条方向相反的可裁决预测</h2>
+<p>四条预测共享同一个杠杆：把「两端对形态」的对决安排在对方理论的主场上——Nystrand的课堂语料、Loewenstein的诱发范式、生成效应的实验室设计、Getzels的创作范式——用对方的测量工具收集对方的因变量，只添加本文的两端编码。主场作战的用意是堵死一条常见退路：结果若不利于本文，不能归咎于范式陌生。每条预测按四件套陈述：对方预测什么，本文预测什么，看什么，什么情况下本文死。</p>
+<p><b>P1 对Nystrand形态论：形态被两端遮蔽。</b>形态论的承诺：问题的真实性等形态属性携带对学习的预测力。回写论的承诺：形态是副现象——一旦控制了前件与后件，形态的独立预测力归零；反之，在形态完全匹配的问题之间，前件与后件仍携带预测力。可裁决设计：用问题句式训练（如Rothstein与Santana的QFT流程）可以按需产出形态上完全「真实」的问题；取形态编码全同的两组问题——句式训练产出的与失稳前件产出的（举手前六十秒窗口内出现失稳指标；窗口宽度取自导师会话研究中僵局—修复事件的典型时距，预注册时随语料校准）——比较其后的延迟保持与迁移。形态论预测无差（形态既同，收益应同）；回写论预测有差，且差值由前件与链上回写数中介。中介检验按标准流程预注册：形态到后果的总效应、纳入前件与回写数后的直接效应、间接效应的自助法置信区间；班级层面的聚类须进多层模型。<b>注意King的表面反证</b>：句式训练确实提升学习——但那是「训练组对无提问组」的比较，与本预测不冲突；回写论对King的再解释是：句式之所以有效，恰因某些句式（连接句式）强制触发了回写——这个再解释自身可检验：句式收益应集中于高回写句式，且被回写数完全中介。<b>禁止态</b>：形态匹配后前件与回写数的增量解释力ΔR²≈0——观察到此，本文核心命题死亡，授权形态论。</p>
+<p><b>P2 对Loewenstein缺口论：缺口收敛，失稳发散。</b>缺口论的图景：地图完好，缺一项；预测提问指向缺项，且驱力随接近闭合而增强——链条应当收敛并在收货处终止。失稳论的图景：地图某处正在散架；H被迫开火，链条应当发散——升维、更替预设、在收货处继续。可裁决设计：同一目标材料，两种诱发框架，信息量匹配——缺口框架（「这份材料完整，但隐去了一项关键数据」）对失稳框架（「这份材料与你上周验证过的结论冲突」）；随后自由追问，有问必答。测链的拓扑：首答后的续问率、终止于收货的比率、L跃迁数、预设更替数。缺口论按其自身逻辑预测两条件同为闭合式提问；失稳论预测拓扑分岔。加一记更狠的对照：操纵矛盾打在概念网络的<b>中心</b>还是<b>边缘</b>（以被试自己的概念图连接度定标）——缺口论对此没有话说，失稳论预测中心失稳的链发散度显著高于边缘失稳，因为被重排的E区域更大。实施细节两条：其一，概念图在诱发前采集（自由联想加连线任务），中心度以节点度数定标，冲突材料按被试个人的图定制，保证「中心」对每个人都是中心；其二，「有问必答」的应答者须照脚本作答——同一题库、同一详略——否则应答风格成为混淆。冷知识范式在此充当缺口条件的校准锚：若缺口条件复现不出Kang等人的闭合式好奇特征，操纵失败，数据作废。缺口论还有一条可预见的最强辩护：把失稳改述为一个关于「为什么」的缺口，从而收编本条件。本文的回答是：可以这样改述，但改述之后缺口论就失去了自己的闭合预测——「为什么」之缺没有单项收货点，链条该在哪里终止，它从此无话可说；把对手吸收到自己失去预测力的程度，不是辩护，是投降。<b>禁止态</b>：矛盾条件的链与缺口条件同速终止、零升维——失稳论死亡。</p>
+<p><b>P3 对生成效应：生成什么，决定收获什么。</b>生成效应的承诺是条目级的：自己生成的内容记得更牢，生成什么内容不改变收益的类型。回写论预测一个<b>双分离</b>：生成答案（对给定问题作答）提升条目保持，对结构测度增益有限；失稳前件下生成问题，提升结构测度——概念图重组度、远迁移、关系词的延迟再用——而条目保持的增益不高于生成答案组。设计为2×2：生成类型（问题／答案）×测验类型（条目再认／结构重组与远迁移），预测交叉交互。再加第三臂做判别：<b>无失稳的句式化问题生成</b>（按模板造问）——回写论预测它落在生成答案一侧：有条目收益（毕竟生成了），无结构收益。结构测度须在材料之外取证：概念图重组度比对前后测图的编辑距离，远迁移用未讲授的新情境问题，关系词的延迟再用在一周后的自由写作中盲检——三者至少两项同向，方计为结构收益。这一臂同时区分本预测与King：句式生成若也出现结构收益且不被回写数中介，回写论的特异性主张死亡，提问生成还原为普通生成效应。<b>禁止态</b>：交互不显著，或第三臂出现未被回写中介的结构收益。</p>
+<p><b>P4 对Getzels：预测创造的不是找了多久，而是改写了几次。</b>Getzels与Csikszentmihalyi的经典结果：问题发现期的行为变量预测多年后的创作成就。回写论的对立主张：行为变量是表征变量的粗代理——真正承重的是<b>问题重写链</b>：从最初的问题表述到动笔定稿，问题被改写的次数与深度（用第四节三类痕迹编码创作者的出声思维与草稿序列）。可裁决设计：同范式（静物构图或等价创作任务），同时记录行为变量与重写链，对成品的独立盲评原创性做竞争性回归。回写论预测：重写数与深度进入后，探索时长的系数不再显著；反向不成立。两个已知困难须在预注册里直面：其一，出声思维本身可能改变创作过程，故设静默对照组，只用草稿序列编码，效应须在两组同向；其二，Getzels范式的结局变量是多年后的成就，本设计先以即时盲评原创性为代理——代理与远期成就的既有相关是这条捷径的许可证，也是它的天花板。<b>禁止态</b>：重写变量的ΔR²≈0而时长稳健——本文对Getzels的增量死亡，行为学记账已经够用。</p>
+<p>四条预测的成本梯度：P3是一学期的课堂实验，P2是一次实验室会话研究，P1需要一个学期的课堂语料加编码，P4最贵。最便宜的裁决路径是P3。</p>
+<h2 id="c7">七、编码手册要点与失稳指标</h2>
+<p>回写事件编码。预设三元组的判例：更替须是成员的否定或替换——「测量为什么扰动系统」到「『系统』的边界是谁划的」是结构预设更替；「哪种测量扰动最小」只是收窄，不计。层级跃迁沿用既有三级手册及其边界案例集，编码员对实验条件保持盲，双评比例不低于百分之二十，Krippendorff α不低于0.80——达不到，第六节的四条预测连同本节编码，一律自动降格为未受检验的宣称。关系词重铸执行反鹦鹉条款：候选谓词须在此前全部问答文本中检索为零次。<b>表演性回写的排除</b>：受过「升维话术」训练的被试可能表演跃迁——对策是轭式控制组（同等训练、无失稳诱发），其「跃迁」若不伴随预设更替与后测结构收益，即被判为表演并从模型证据中剔除；若伴随——那不是表演，是训练触发了真回写，回写论照单全收。</p>
+<p>失稳指标。提问前窗口内的可观测前件：停顿时长、自我修正率、限定语密度（每小句的hedge数）、书写行为中的删改。会聚效度：与Metcalfe—Wiebe式温热评定的突跳、与舌尖现象式的「知其在而说不出」报告对齐。失稳指标与回写数的相关本身是模型的一条内部预测：前件强度应预测后件数量——H的开火既然由失稳触发，失稳的强度不该与开火的次数无关；两者若统计独立，三方程记账就在自己的账本上先行破产。</p>
+<h2 id="c8">八、反身条款：这个理论如何改变它所描述的东西</h2>
+<p>《SDE本体论入门》第43章立了一条律：反身的发生不可自我封顶——凡持有关于自身模型的系统，其模型参与改写它所描述的对象。本文必须把这条律施于自身，因为提问理论的对象（提问者）会读到提问理论。Hacking称之为人类种类的回环效应；审计文献里它叫古德哈特定律——一个测量一旦成为目标，就不再是好测量。具体化到本文：<b>一旦回写数成为课堂的计分目标，学生将学会制造可编码的回写痕迹</b>——预设更替可以背句式，升维可以背话术。反身条款因此预测：在高利害目标化条件下，回写指标与学习后果的相关将系统性衰减。这本身是一条可检验预测，也划出本模型的适用边界：回写编码是研究工具与低利害诊断工具，不是考核指标。若有一天在高利害目标化之后指标与后果的相关<b>不</b>衰减，反身条款被证伪——那将意味着这些痕迹无法被表演，编码抓住的比本文敢主张的更接近机制本身。本文不押这个更强的注。</p>
+<p>适用边界的正面陈述：回写编码的合法用法是低利害的形成性诊断——教师用它看见谁的链在第二步就终止了，据此决定下一步喂给冲突还是喂给缺口；一旦它出现在成绩册上，第43章的律就开始工作。这个划界本身可以做成检验：同一编码在形成性与总结性两种用法下并行运行一学期，比较指标—后果相关的衰减率，反身条款预测总结性一侧显著更陡。</p>
+<h2 id="c9">九、本文不主张什么</h2>
+<p>本文不主张发生型提问优于工具型提问。讲稿已经说对了：工具型提问是社会协作的基础设施，日常百分之九十以上的提问属于此型且理应属于此型；一个全员发生型提问的组织一天也运转不下去。本文不主张形态编码无用——Nystrand传统的测量成就是本文的地基之一，P1只主张形态的预测力被两端<b>中介</b>，不主张它是噪声。本文不主张SDE坐标系是这个模型的唯一宿主：整个模型可以在皮尔士—皮亚杰—PREG的词汇里无损重述（真怀疑＝失稳，顺应＝回写，认知失衡＝H开火的触发条件）；SDE提供的是记账的统一性与定义的经济性——「工具型＝冻结H的退化解」这样的定义在别家词汇里要绕三句话——以及三类痕迹与三元的一一对应。可移植性在这里是防守也是坦白：不接受SDE的读者，损失的只是账本的整洁，不损失任何一条预测。本文也不主张失稳可以被制度性地随意制造。失稳的教学法使用有伦理边界：中心失稳重排的是学习者押了身家的预设，P2的中心对边缘操纵在成人自愿被试上合法，移入义务教育的课堂则须以可承接为前提——冲突喂给谁、喂多深，应当受第八节同一条反身纪律的约束。最后，本文不主张任何一条预测已被验证：四条全部是方案级，本文自评停在站内禁止力三档的乙档——有可裁决预测，无已裁决预测。</p>
+<h2 id="c10">十、禁止清单与自我证伪条件</h2>
+<p>先把散在各节的禁止态收拢成一张清单——观察到下列任何一条，即按注明的范围执行死刑。其一，形态匹配后前件与回写数的增量解释力趋零（P1）：本文作废。其二，矛盾条件的链与缺口条件同速终止、零升维（P2）：失稳论死。其三，生成类型与测验类型的交互不显著，或句式化第三臂出现不被回写中介的结构收益（P3）：特异性主张死，发生型提问还原为生成效应的一个改名。其四，重写链变量在探索时长之外的增量解释力趋零（P4）：本文对Getzels的增量死。其五，高暴露感而零回写之类五维解离的链条成批稳定存在：冻结开关这个单一机制死，五维退回各自独立的现象。其六，失稳指标与回写数统计独立：三方程记账在自己的账本上破产。其七，高利害目标化之后回写指标与后果的相关不衰减：第八节的反身条款死——且死得光荣，因为那意味着这些痕迹无法被表演。</p>
+<p>清单之上还有一条整体条件：若回写事件编码在两个独立团队手里都达不到α≥0.80，「回写」就不是一个可被公共观察的构念，上述七条无从裁决，本模型整体降格为一套隐喻，与它所批评的现象学传统同列。七条之中，第二、四、五、六、七条杀的是局部主张，本文降级存活；第一条杀全文；第三条杀名字。一篇论文能为自己做的最诚实的事，是把自己的死法编号。</p>
+<h2 id="c11">十一、结语</h2>
+<p>讲稿说，真正的提问不是在平整的桌面上拿走一颗豆子，而是往一团活物里投进一根针。这个意象是对的，但一根不可检验的针只是修辞。本文做的全部工作，是给这根针装上刻度：失稳是它入针的位点，回写是它留下的针脚，四条对立预测是它敢于露出的锋刃——包括朝向自己的那一面。追问即发生，如今这五个字本身也被放进了一个能杀死它的装置里。按本文自己的标准，这是它配得上被认真对待的最低条件，也是它此刻能走到的最远处：能被更好地论证的，都已论证；能被更好地验证的，还一条都没有跑。最便宜的第一针是P3——一个学期，一间教室。</p>
+</article>
+    <div class="foot-nav">
+      <div class="cl">
+        <a href="/headline/" style="border-color:var(--accent);color:var(--accent);font-weight:700">← 回每日头条专栏</a>
+        <a href="/browse/">← 返回首页</a>
+        <a href="/taste/zhiwen/">→ 中华智问知识发生器</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">延伸参考文献 · Further References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">本文对哲学与心理学文献的引述均为义释，不使用直接引文；经验研究结论的表述以原始报告为准。第六节对各家理论的对立预测、以及对King等表面反证的中介化再解释，属本文自己的推论性延伸，不是被引文献的主张。具体页码须按所用版本核校后补入。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+<li style="margin:0 0 9px;padding-left:6px">Plato. <i>Meno</i>, 80d–e.</li>
+<li style="margin:0 0 9px;padding-left:6px">Peirce, C. S. (1877). The fixation of belief. <i>Popular Science Monthly</i>, 12, 1–15.</li>
+<li style="margin:0 0 9px;padding-left:6px">Dewey, J. (1938). <i>Logic: The Theory of Inquiry</i>. New York: Holt.</li>
+<li style="margin:0 0 9px;padding-left:6px">Collingwood, R. G. (1939). <i>An Autobiography</i>. Oxford: Oxford University Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Gadamer, H.-G. (1960/2004). <i>Truth and Method</i> (2nd rev. ed.). London: Continuum.</li>
+<li style="margin:0 0 9px;padding-left:6px">Polanyi, M. (1966). <i>The Tacit Dimension</i>. Garden City: Doubleday.</li>
+<li style="margin:0 0 9px;padding-left:6px">Piaget, J. (1975/1985). <i>The Equilibration of Cognitive Structures</i>. Chicago: University of Chicago Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Berlyne, D. E. (1960). <i>Conflict, Arousal, and Curiosity</i>. New York: McGraw-Hill.</li>
+<li style="margin:0 0 9px;padding-left:6px">Loewenstein, G. (1994). The psychology of curiosity: A review and reinterpretation. <i>Psychological Bulletin</i>, 116(1), 75–98.</li>
+<li style="margin:0 0 9px;padding-left:6px">Kang, M. J., Hsu, M., Krajbich, I. M., Loewenstein, G., McClure, S. M., Wang, J. T., &amp; Camerer, C. F. (2009). The wick in the candle of learning: Epistemic curiosity activates reward circuitry and enhances memory. <i>Psychological Science</i>, 20(8), 963–973.</li>
+<li style="margin:0 0 9px;padding-left:6px">Slamecka, N. J., &amp; Graf, P. (1978). The generation effect: Delineation of a phenomenon. <i>Journal of Experimental Psychology: Human Learning and Memory</i>, 4(6), 592–604.</li>
+<li style="margin:0 0 9px;padding-left:6px">Rosenshine, B., Meister, C., &amp; Chapman, S. (1996). Teaching students to generate questions: A review of the intervention studies. <i>Review of Educational Research</i>, 66(2), 181–221.</li>
+<li style="margin:0 0 9px;padding-left:6px">King, A. (1994). Guiding knowledge construction in the classroom: Effects of teaching children how to question and how to explain. <i>American Educational Research Journal</i>, 31(2), 338–368.</li>
+<li style="margin:0 0 9px;padding-left:6px">Nystrand, M. (1997). <i>Opening Dialogue: Understanding the Dynamics of Language and Learning in the English Classroom</i>. New York: Teachers College Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Nystrand, M., Wu, L. L., Gamoran, A., Zeiser, S., &amp; Long, D. A. (2003). Questions in time: Investigating the structure and dynamics of unfolding classroom discourse. <i>Discourse Processes</i>, 35(2), 135–198.</li>
+<li style="margin:0 0 9px;padding-left:6px">Graesser, A. C., &amp; Person, N. K. (1994). Question asking during tutoring. <i>American Educational Research Journal</i>, 31(1), 104–137.</li>
+<li style="margin:0 0 9px;padding-left:6px">Otero, J., &amp; Graesser, A. C. (2001). PREG: Elements of a model of question asking. <i>Cognition and Instruction</i>, 19(2), 143–175.</li>
+<li style="margin:0 0 9px;padding-left:6px">Graesser, A. C., &amp; Olde, B. A. (2003). How does one know whether a person understands a device? The quality of the questions the person asks when the device breaks down. <i>Journal of Educational Psychology</i>, 95(3), 524–536.</li>
+<li style="margin:0 0 9px;padding-left:6px">Chin, C., &amp; Osborne, J. (2008). Students' questions: A potential resource for teaching and learning science. <i>Studies in Science Education</i>, 44(1), 1–39.</li>
+<li style="margin:0 0 9px;padding-left:6px">Getzels, J. W., &amp; Csikszentmihalyi, M. (1976). <i>The Creative Vision: A Longitudinal Study of Problem Finding in Art</i>. New York: Wiley.</li>
+<li style="margin:0 0 9px;padding-left:6px">VanLehn, K. (1988). Toward a theory of impasse-driven learning. In H. Mandl &amp; A. Lesgold (Eds.), <i>Learning Issues for Intelligent Tutoring Systems</i> (pp. 19–41). New York: Springer.</li>
+<li style="margin:0 0 9px;padding-left:6px">VanLehn, K., Siler, S., Murray, C., Yamauchi, T., &amp; Baggett, W. B. (2003). Why do only some events cause learning during human tutoring? <i>Cognition and Instruction</i>, 21(3), 209–249.</li>
+<li style="margin:0 0 9px;padding-left:6px">Metcalfe, J., &amp; Wiebe, D. (1987). Intuition in insight and noninsight problem solving. <i>Memory &amp; Cognition</i>, 15(3), 238–246.</li>
+<li style="margin:0 0 9px;padding-left:6px">Brown, R., &amp; McNeill, D. (1966). The "tip of the tongue" phenomenon. <i>Journal of Verbal Learning and Verbal Behavior</i>, 5(4), 325–337.</li>
+<li style="margin:0 0 9px;padding-left:6px">Chi, M. T. H., de Leeuw, N., Chiu, M.-H., &amp; LaVancher, C. (1994). Eliciting self-explanations improves understanding. <i>Cognitive Science</i>, 18(3), 439–477.</li>
+<li style="margin:0 0 9px;padding-left:6px">Rothstein, D., &amp; Santana, L. (2011). <i>Make Just One Change: Teach Students to Ask Their Own Questions</i>. Cambridge, MA: Harvard Education Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Popper, K. R. (1972). <i>Objective Knowledge: An Evolutionary Approach</i>. Oxford: Clarendon Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Hacking, I. (1995). The looping effects of human kinds. In D. Sperber, D. Premack, &amp; A. J. Premack (Eds.), <i>Causal Cognition</i> (pp. 351–383). Oxford: Clarendon Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Strathern, M. (1997). 'Improving ratings': Audit in the British university system. <i>European Review</i>, 5(3), 305–321.</li>
+<li style="margin:0 0 9px;padding-left:6px">Krippendorff, K. (2004). <i>Content Analysis: An Introduction to Its Methodology</i> (2nd ed.). Thousand Oaks: Sage.</li>
+<li style="margin:0 0 9px;padding-left:6px">Sinek, S. (2009). <i>Start with Why</i>. New York: Portfolio.（What—How—Why三联的通俗最近邻；本文的映射与其方向相反：Why不是动机内核，而是纠缠之场。）</li>
+<li style="margin:0 0 9px;padding-left:6px">王德生（2026）。《SDE本体论入门：世界是如何发生的》。德麦国际。（特征律见第七章·补；123原理与回写见相应各章；反身律见第43章。）</li>
+</ol>
+</section>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  © 德麦国际 Demai International · 每日头条专栏 · <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

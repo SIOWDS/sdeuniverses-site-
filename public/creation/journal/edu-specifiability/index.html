@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>可规格化性：能力本位课程的隐蔽筛选器及其自我取消 | 学术创造专栏 · 期刊论文 | SDE Universes</title>
+<meta name="description" content="能力本位课程改革以可观测、可测量的目标表述取代模糊的教育宗旨，这一技术动作在提升课程透明度与可问责性上成效显著，其正当性长期未受根本挑战。本文提出，该动作同时执行了一项从未被识别的筛选：一项能力能够被写成可测量的目标，当且仅当我们能明确陈述"何种表现算作达成"，而这一陈述即是该能力的输出规格；现代生">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#17706B;--accent2:#2A9A93}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:780px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#17706B1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.1rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.6rem,3.7vw,2.3rem);font-weight:700;line-height:1.4;color:var(--text);max-width:820px;margin:0 auto}
+.title-en{position:relative;font-family:'EB Garamond',Georgia,serif;font-size:clamp(0.9rem,1.7vw,1.05rem);color:var(--text2);max-width:700px;margin:0.85rem auto 0;font-style:italic;line-height:1.5}
+.art-sub{position:relative;font-size:clamp(0.95rem,1.8vw,1.08rem);color:var(--text2);max-width:670px;margin:1.15rem auto 0;font-style:italic;font-weight:300;line-height:1.75}
+.degree{position:relative;display:inline-block;margin-top:1.4rem;padding:0.4rem 1.1rem;border:1px solid var(--accent);border-radius:20px;font-size:0.75rem;letter-spacing:0.14em;color:var(--accent)}
+.art-meta{position:relative;margin-top:0.85rem;font-size:0.78rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:0.9rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.93rem;line-height:1.9;color:var(--text2);text-align:justify}
+.abs.en p{font-family:'EB Garamond',Georgia,serif;font-size:0.95rem;line-height:1.75}
+.kw{font-size:0.84rem;color:var(--muted);margin-bottom:1.5rem}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.08em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.3rem 1.6rem;margin:1.6rem 0 3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.8rem}
+.toc a{display:block;text-decoration:none;padding:0.2rem 0;transition:color .18s,padding-left .18s;color:var(--text2)}
+.toc a.t2{font-size:0.92rem;font-weight:700;margin-top:0.45rem}
+.toc a.t3{font-size:0.85rem;padding-left:1.5rem;color:var(--muted)}
+.toc a:hover{color:var(--accent);padding-left:5px}
+.toc a.t3:hover{padding-left:1.8rem}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.32rem;font-weight:700;color:var(--text);margin:3.3rem 0 1.2rem;padding-bottom:0.55rem;border-bottom:2px solid var(--accent);scroll-margin-top:5.5rem;line-height:1.45}
+article h3{font-family:'Noto Serif SC',serif;font-size:1.08rem;font-weight:700;color:var(--accent);margin:2.2rem 0 0.9rem;scroll-margin-top:5.5rem;line-height:1.5}
+article p{font-size:1.01rem;line-height:2.05;color:var(--text);margin-bottom:1.1rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#17706B22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.8rem 0;padding:1.1rem 1.45rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.03rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.5rem 0}
+.tw{overflow-x:auto;margin:1.6rem 0}
+table{border-collapse:collapse;width:100%;font-size:0.88rem;background:var(--card)}
+th,td{border:1px solid var(--border2);padding:0.6rem 0.8rem;text-align:left;line-height:1.7;vertical-align:top}
+th{background:#17706B15;font-weight:700;color:var(--accent);white-space:nowrap}
+.refs{margin-top:1rem}
+.refs ol{padding-left:1.4rem}
+.refs li{font-size:0.85rem;line-height:1.8;color:var(--text2);margin-bottom:0.5rem;padding-left:0.3rem}
+.foot-nav{margin:3.2rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.18rem;margin:2.6rem 0 1rem}
+  article h3{font-size:1.02rem}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/creation/" class="sib">学术创造专栏</a>
+    <a href="/creation/journal/" class="here">期刊论文</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/creation/">学术创造专栏</a> · <a href="/creation/journal/">期刊论文</a></div>
+  <h1 class="art-title">可规格化性：能力本位课程的隐蔽筛选器及其自我取消</h1>
+  <p class="title-en">Specifiability: The Hidden Filter of Competency-Based Curriculum and Its Self-Cancellation</p>
+  <p class="art-sub">一项能力若能被清晰地写成可测量的目标，就意味着我们说得出"什么算做到了"。而说得出"什么算做到了"，正是把这件事交给机器所需要的全部条件。测量学对信度的要求与自动化学对规格的要求，是同一个要求——这一点在机器不够强的年代没有后果，现在有了。</p>
+  <div class="degree">中图分类号：G423　文献标识码：A</div>
+  <div class="art-meta">王德生 著 · 学术创造专栏 · 期刊论文频道 · CSSCI 规格</div>
+</header>
+
+<div style="max-width:780px;margin:1.6rem auto -1.2rem;padding:0 2rem;text-align:center">
+  <a href="/creation/pdf/edu-specifiability.pdf" download style="display:inline-block;font-size:0.82rem;letter-spacing:0.06em;color:var(--accent);text-decoration:none;border:1px solid var(--border);border-radius:20px;padding:0.4rem 1.1rem;background:var(--card)">⬇ 下载 PDF · A4 学术版 · 11 页</a>
+</div>
+
+<main class="wrap">
+  <section class="body">
+    <div class="abs">
+      <div class="l">摘 要</div>
+      <p>能力本位课程改革以可观测、可测量的目标表述取代模糊的教育宗旨，这一技术动作在提升课程透明度与可问责性上成效显著，其正当性长期未受根本挑战。本文提出，该动作同时执行了一项从未被识别的筛选：一项能力能够被写成可测量的目标，当且仅当我们能明确陈述"何种表现算作达成"，而这一陈述即是该能力的输出规格；现代生成技术的工作方式恰恰是由输出规格反向生成满足该规格的输出。因此，可测量性与可规格化性在操作上是同一件事，而可规格化性正是可自动化程度的上界。由此得到本文的核心命题：能力本位课程的目标写得越清晰、评价的信度越高、改革越彻底，课程所指定的就越是那些最不需要长在人身上的能力——改革的成功程度与课程内容的可外包程度正相关，此即自我取消。本文进一步论证，高阶思维不构成避难所：布卢姆分类学的高层次一旦被写入可评分的标准，即完成了规格化，其可自动化程度不低于低阶目标；真正逃脱规格化的不是"更高阶"的能力，而是那些可被识别却无法被陈述判定程序的能力——它们因测不了而进不了课程，却因进不了课程而无人负责。文章检验了三种可能的回应（表现性评价、隐性课程、技术局限论），指出前两者分别失败于评分规则本身即规格、以及可问责性要求与不可规格化性之间的真实两难；并回应艾斯纳、斯滕豪斯与比斯塔的经典批评：他们对目标模式的反对是对的，但其理由——测量窄化了教育价值——不足以支撑本文的结论，因为本文主张的不是价值被替换，而是一个结构事实：可测者恰为可不长在人身上者。文末给出可规格化性作为课程设计第二维度的操作方案与四项可证伪推论。</p>
+    </div>
+    <div class="kw"><b>关键词</b>　能力本位课程；课程目标；可规格化性；可测量性；教育评价；生成式人工智能；默会知识</div>
+    <div class="abs en">
+      <div class="l">ABSTRACT</div>
+      <p>Competency-based curriculum reform replaces vague educational aims with observable, measurable objectives — a technical move whose gains in transparency and accountability are real and whose legitimacy has gone largely unchallenged. This paper argues that the same move performs an unrecognised act of selection. A competency can be written as a measurable objective if and only if we can state explicitly what performance counts as attainment, and that statement is the competency's output specification; contemporary generative technology works precisely by generating output to satisfy such a specification. Measurability and specifiability are therefore operationally the same property, and specifiability is the upper bound of automatability. Hence the central proposition: the more clearly a competency-based curriculum states its objectives, the higher its assessment reliability, and the more thoroughly the reform succeeds, the more exactly the curriculum designates those capabilities that least need to reside in a person. The degree of reform success correlates with the degree of curricular outsourceability — self-cancellation. Higher-order thinking offers no refuge: once Bloom's upper levels are written into scorable criteria, specification is complete. What escapes specification is not the higher-order but the recognisable-yet-unstatable — and it is excluded from the curriculum precisely because it cannot be measured. Three responses are tested (performance assessment, the hidden curriculum, the argument from present technical limits); the first fails because a rubric is itself a specification, the second surfaces a genuine dilemma between accountability and unspecifiability. The paper answers Eisner, Stenhouse and Biesta: their case against the objectives model is right, but their reason — that measurement narrows educational value — cannot carry this conclusion, because what is claimed here is not a substitution of values but a structural fact.</p>
+    </div>
+    <div class="kw"><b>Keywords</b>　competency-based curriculum; curricular objectives; specifiability; measurability; educational assessment; generative AI; tacit knowledge</div>
+    <div class="toc">
+      <div class="l">目 录</div>
+      <a href="#c1" class="t2">一、问题的提出：一场每一步都对的改革</a><a href="#c2" class="t2">二、能力本位课程的技术核心：信度要求</a><a href="#c3" class="t2">三、可规格化性：一个未被识别的维度</a><a href="#s3" class="t3">（一）评分标准就是输出规格</a><a href="#s4" class="t3">（二）从可测量到可规格化</a><a href="#s5" class="t3">（三）高阶思维不是避难所</a><a href="#c4" class="t2">四、自我取消</a><a href="#c5" class="t2">五、三种回应及其检验</a><a href="#s8" class="t3">（一）"表现性评价可以救"</a><a href="#s9" class="t3">（二）"不可规格化的东西可以靠隐性课程"</a><a href="#s10" class="t3">（三）"这只是当前的技术局限"</a><a href="#c6" class="t2">六、核心素养框架是否逃脱</a><a href="#c7" class="t2">七、可规格化性作为课程设计的第二维度</a><a href="#c8" class="t2">八、四项可证伪推论</a><a href="#c9" class="t2">九、结论与限度</a>
+      <a href="#refs" class="t2">参考文献</a>
+    </div>
+    <article>
+<h2 id="c1">一、问题的提出：一场每一步都对的改革</h2>
+<p>课程目标应当写得清楚——这句话在今天的教育学里近乎一条公理。</p>
+<p>它的正当性来自一段真实的历史。在泰勒（Tyler, 1949）确立课程编制的目标原理之前，课程目标的典型写法是"培养学生的爱国情操""发展学生的科学精神"。这类表述有一个致命的操作后果：<b>没有人能判断它有没有实现</b>。因而无法评估，无法改进，无法问责，也无法防止任何东西以它的名义被塞进课堂。</p>
+<p>马杰（Mager, 1962）给出的解决方案是行为目标：一个合格的目标必须写明可观察的行为、条件与标准。斯佩迪（Spady, 1994）的结果本位教育、以及此后席卷全球的能力本位课程改革，都是这条路线的推进。它们的共同技术动作只有一个：</p>
+<blockquote><b>把课程目标写成可观测、可测量的能力表述。</b></blockquote>
+<p>这个动作的收益是真实的，且不应被廉价地贬低。它使教育第一次可以被问责；它使不同学校的学生获得可比的保障；它使"我教了但他没学会"这句话不再能成立；它切断了以模糊宗旨为掩护的任意性。任何对能力本位的批评，若不先承认这些收益，都是不严肃的。</p>
+<p>批评从未停止。艾斯纳（Eisner, 1979）提出表现性目标，主张教育中最有价值的遭遇恰恰不能被事先指定；斯滕豪斯（Stenhouse, 1975）提出过程模式，反对以目标统摄课程；比斯塔（Biesta, 2010）在测量时代的诊断中给出了那句被广泛引用的话：我们重视我们所能测量的，而非测量我们所重视的。</p>
+<p>这些批评是深刻的。<b>而它们六十年没有撼动能力本位改革的推进。</b></p>
+<p>本文认为，这不是因为改革者充耳不闻，而是因为这些批评共享一个结构：<b>它们诉诸价值</b>。它们说，测量窄化了教育的价值，遗漏了重要的东西。而对这类批评，改革者有一个一直有效的回应：<b>那你把那些重要的东西也写成可测量的目标不就行了。</b> 六十年来，课程标准的目标表述确实在不断扩容——从知识与技能，到过程与方法，到情感态度价值观，到核心素养、批判性思维、创造力、协作能力。<b>每一次批评，都被吸收为一次目标清单的扩容。</b></p>
+<p>本文提出一个不同类型的论证。它不诉诸价值，它诉诸一个结构事实：</p>
+<blockquote><b>一项能力能够被写成可测量的目标，当且仅当我们说得出"什么算做到了"。而说得出"什么算做到了"，恰好是把这件事交给机器所需要的全部条件。</b></blockquote>
+<p>若此命题成立，则能力本位改革的每一次成功——把目标写得更清楚、把信度提得更高、把标准做得更细——都在更精确地指定那些最不需要长在人身上的能力。<b>这不是价值遗漏，这是自我取消。</b></p>
+<h2 id="c2">二、能力本位课程的技术核心：信度要求</h2>
+<p>先把被审查的对象说准。能力本位课程的技术核心不是"重视能力"，而是一条测量学要求：</p>
+<blockquote><b>目标必须写到使不同的评价者对同一份表现作出一致判定。</b></blockquote>
+<p>这就是信度。信度不是一个可有可无的技术指标，它是能力本位全部正当性的支点：若两位教师对同一份作业给出相反判定，那么"达标"就不是关于学生的陈述，而是关于阅卷者的陈述——问责随之落空，可比性随之落空，改革的全部收益随之落空。</p>
+<p>因此改革的技术推进史，就是一部提高信度的历史：从模糊宗旨到行为目标，从行为目标到表现标准，从表现标准到分级评分规则（rubric），从评分规则到锚定样例。每一步都在做同一件事：<b>减少判定的裁量空间。</b></p>
+<p>而减少裁量空间的唯一办法，是<b>把判定条件说得更明确</b>。</p>
+<p>这里就到了本文的入口。请注意"说得更明确"这个动作的产物是什么。它的产物是一份文本，这份文本回答了一个问题：<b>满足什么条件，就算达成这项能力。</b></p>
+<p>在测量学里，这份文本叫评分标准。</p>
+<p>在工程学里，同一份文本有另一个名字。</p>
+<h2 id="c3">三、可规格化性：一个未被识别的维度</h2>
+<h3 id="s3">（一）评分标准就是输出规格</h3>
+<p>工程学里，这份文本叫<b>规格说明</b>（specification）：它规定了一个产物需要满足哪些条件才算合格。</p>
+<p>评分标准与规格说明的同一性不是比喻。两者的功能定义完全一致：<b>给定一个产物，判定它是否合格；且该判定不依赖于判定者是谁。</b> 一份好的评分标准，与一份好的规格说明，满足的是同一个质量条件——明确、无歧义、可独立复核。</p>
+<p>这个同一性在过去没有后果，因为规格说明与产物之间隔着人的劳动：你写清了规格，还得有人去把它做出来。</p>
+<p><b>现在这一段被接通了。</b> 当代生成技术的工作方式，正是由规格反向生成满足规格的产物：给定条件，产出符合条件的东西。它不需要理解，不需要经历，不需要成长——它需要的是一份足够明确的规格。</p>
+<p>于是：</p>
+<blockquote><b>评分标准是判定的工具，同时是生成的蓝图。它是同一份文本的两次使用。</b></blockquote>
+<p>一位教师把评分标准写得越好——越明确、越无歧义、越能保证两位阅卷者一致——他就越是在同时写出一份可以直接交给机器执行的规格。<b>他不是在做两件事，他是在做一件事，而这件事有两个后果，其中一个他从未被告知。</b></p>
+<h3 id="s4">（二）从可测量到可规格化</h3>
+<p>据此可以给出本文的核心概念：</p>
+<blockquote><b>可规格化性（specifiability）</b>：一项能力的输出条件能够被明确陈述、且该陈述足以支撑独立判定的程度。</blockquote>
+<p>以及两条关系：</p>
+<blockquote><b>命题一（同一性）</b>：在能力本位框架内，一项能力的可测量性等于其可规格化性。因为可测量性的操作定义就是"存在一个可独立复核的判定程序"，而该程序即是规格。</blockquote>
+<p>></p>
+<blockquote><b>命题二（上界）</b>：一项能力的可规格化性，是其可自动化程度的上界。规格越完整，自动化越彻底；规格不完整之处，自动化必然留下缺口。</blockquote>
+<p>命题二需要一处澄清：可规格化是可自动化的<b>上界</b>而非充要条件。有些能力可规格化却难以自动化（如需要物理身体的运动技能），因为规格之外还有实现问题。<b>因此本文的射程限定在知识型课程目标——即那些其达成表现为符号产物（文本、论证、代码、方案、分析）的目标。</b> 这一限定必须写在最显眼处，它排除了体育、部分艺术实践与临床操作。但它并不构成一个小的例外：当代课程标准中的绝大多数目标，都在这个射程里。</p>
+<h3 id="s5">（三）高阶思维不是避难所</h3>
+<p>教育界对自动化冲击的标准回应是：<b>机器只能做低阶的东西，我们转向高阶思维就好了。</b> 布卢姆分类学（Bloom, 1956）的顶层——分析、评价、创造——被广泛当作安全区。</p>
+<p>这个回应错在把"高阶"当成了"不可规格化"。<b>两者不是一回事。</b></p>
+<p>考察一个高阶目标："能够评价两个相互冲突的论证的相对优劣，并陈述理由。"这是标准的高阶目标。要把它纳入能力本位课程，必须给它评分标准。评分标准必然要说明：什么样的评价算好？大概是——识别出双方的核心分歧；指出至少两处证据强度差异；给出一个不诉诸权威的判定理由；……</p>
+<p><b>写到这里，规格已经完成了。</b> 而一个由这份规格驱动的生成程序，完全能产出满足全部条目的文本，且质量高于中位数学生。</p>
+<p><b>高阶目标不但不是避难所，它反而是最容易被规格化的一类</b>——因为高阶目标的评分标准通常被写得最详细（正因为它们抽象，教师才必须写得更细，否则无法保证信度）。<b>评分标准的详细程度与目标的抽象程度正相关，因而与可规格化程度正相关。</b></p>
+<p>这里出现一个反直觉的推论：</p>
+<blockquote>在能力本位框架内，<b>越是被认为"高阶""重要""不可替代"的目标，其评分标准写得越细，因而它的规格越完整，因而它越可被自动化。</b> 教育界为保护高阶思维所做的每一次努力——把标准写得更清楚，让教师更好把握——都在加速它的可外包。</blockquote>
+<p>那么什么逃脱了规格化？</p>
+<p>不是"更高阶"的东西。是<b>那些可被识别却无法被陈述判定程序的东西</b>。</p>
+<p>一位有经验的教师读一份学生论文，会说"他没抓住重点"。他能认出这件事，稳定地认出，而且与另一位有经验的教师大体一致。<b>但他说不出"抓住重点"的判定程序。</b> 若逼他写成评分标准，他会写出"能识别核心问题"——而这条标准无法判定任何东西，因为"核心"本身正是待判定的。</p>
+<p>这类能力的特征是<b>可识别、不可陈述</b>——赖尔（Ryle, 1949）的"知道如何"与"知道什么"之分、波兰尼（Polanyi, 1966）的"我们知道的比我们能说的多"、德雷福斯兄弟（Dreyfus & Dreyfus, 1986）关于专长逃脱规则化的论证，都指向这一片区域。</p>
+<p>而在能力本位框架下，这类能力有一个精确的命运：<b>它们测不了，因此进不了课程目标；进不了课程目标，就没有课时、没有评价、没有问责、没有人负责。</b> 它们并没有被反对，它们只是不在名单上。</p>
+<h2 id="c4">四、自我取消</h2>
+<p>把前三节接起来，本文的核心命题就成立了：</p>
+<blockquote><b>能力本位课程的成功程度，与其课程内容的可外包程度正相关。</b></blockquote>
+<p>推导链条是直的：</p>
+<p>1. 改革的技术核心是提高信度（第二节）。</p>
+<p>2. 提高信度的唯一途径是把判定条件说得更明确（第二节）。</p>
+<p>3. 判定条件的明确陈述即规格（三·一）。</p>
+<p>4. 可规格化性是可自动化的上界（三·二）。</p>
+<p>5. 故：<b>改革越成功 → 规格越完整 → 课程所指定的能力越可被自动化。</b></p>
+<p>6. 而不可规格化的能力，因测不了而始终在名单之外（三·三）。</p>
+<p>7. 故：<b>一个改革得越彻底的课程，其全部内容越是那些不需要长在人身上的东西；而必须长在人身上的那些，一条也不在里面。</b></p>
+<p>这就是自我取消：<b>改革的每一次成功，都是朝着自己被取消的方向迈的一步。</b> 它不需要任何人失职，不需要任何一个环节出错。相反，它要求每个环节都做对——标准写得越好，取消得越彻底。</p>
+<p>必须强调这个命题的性质：<b>它不是说能力本位课程教的东西没有价值。</b> 计算、写作规范、文献检索、论证结构——这些都是真实的、有价值的能力。命题说的是另一件事：<b>它们的价值不构成"必须由这个学生自己长出来"的理由，而课程的正当性恰恰需要后者。</b> 一件有价值的事，不等于一件必须由人来做的事。能力本位课程从未区分过这两者，因为在过去，凡是有价值的事都得由人来做。</p>
+<h2 id="c5">五、三种回应及其检验</h2>
+<h3 id="s8">（一）"表现性评价可以救"</h3>
+<p>最强的回应来自评价改革内部：真实性评价、表现性评价、档案袋评价（Wiggins, 1998）——这些方法要求学生在复杂、真实、开放的情境中表现，而非完成结构化任务。它们看起来逃脱了规格化。</p>
+<p><b>它们没有。</b> 表现性评价同样需要评分规则，否则它的信度会低到无法承担问责功能——而这恰恰是它一直被诟病的地方，也是它二十年来一直在改进的方向：更细的量表、更明确的水平描述、更多的锚定样例。<b>它的改进方向，就是规格化的方向。</b></p>
+<p>这里有一个内在紧张，值得指出：表现性评价的支持者一方面强调它捕捉了标准化测验捕捉不到的东西，另一方面又必须不断提高它的评分一致性以证明其正当性。<b>而每提高一分一致性，它就更规格化一分，也就更接近它本来要逃离的那个东西。</b> 它不是一个可以通过努力解决的技术难题，它是这条路径的内在结构。</p>
+<h3 id="s9">（二）"不可规格化的东西可以靠隐性课程"</h3>
+<p>第二种回应承认那些东西测不了，但主张它们可以通过师生互动、校园文化、榜样示范来传递——即隐性课程。</p>
+<p>这个回应有历史证据支持：那些东西过去确实是这样传下来的。</p>
+<p>但它撞上一个真正的两难，而这个两难不是本文制造的：</p>
+<p><b>能力本位改革的正当性理由之一，恰恰是反对隐性课程的任意性。</b> 隐性课程不透明、不可问责、依赖于个别教师的品质、且是教育不平等的经典再生产机制——同一所学校里，教师会把那些说不出的东西传给他喜欢的学生。这不是猜测，这是课程社会学几十年的发现。</p>
+<p>于是：</p>
+<blockquote><b>可问责性要求规格化；规格化排除不可规格化者；而不可规格化者只能靠不可问责的方式传递。</b></blockquote>
+<p>这是一个真两难，不是一方犯了错。本文不假装解决它。本文只主张：<b>这个两难此前没有被看见，因为它的两端在过去不冲突——那时候不可规格化的东西即使只能靠师徒传递，也没有别的东西来跟它抢课时；现在，规格化的那一半正在被整体接管，而两难第一次要求做出选择。</b></p>
+<h3 id="s10">（三）"这只是当前的技术局限"</h3>
+<p>第三种回应是乐观主义的：也许再过几年，机器也能做那些不可规格化的事，那么本文的整个论证就无关紧要了。</p>
+<p><b>这个回应恰好把本文的结论加强了，而不是削弱。</b> 若机器最终也能做不可规格化的事，那么课程的正当性就完全不能建立在"这个能力有用"之上——因为一切有用的能力都可被外包。届时需要回答的问题是：<b>为什么还要让一个人自己长出任何能力？</b> 这个问题不在本文射程内，但它不会因为技术进步而消失，它只会变得更尖锐。</p>
+<p>而在此之前——在机器尚不能做不可规格化的事的这段时间里——本文的命题给出了一个可操作的判断，这段时间正是课程必须用它的时候。</p>
+<h2 id="c6">六、核心素养框架是否逃脱</h2>
+<p>上述论证若成立，一个绕不开的追问是：中国自二〇一六年以来推进的学生发展核心素养框架，是否逃脱了它？</p>
+<p>有理由认为逃脱了。核心素养的表述——批判性思维、创新实践、责任担当、审美情趣——<b>恰恰是刻意抽象的</b>，它们与马杰式的行为目标（"在三十分钟内，不查资料，正确解出五道题中的四道"）在形态上截然不同。框架的设计者明确反对把素养还原为行为清单，这一立场在文献中是清楚的。</p>
+<p><b>本文认为它没有逃脱，而它未能逃脱的方式，恰好是本文命题最好的一次演示。</b></p>
+<p>理由在于一个不可回避的政策力学：<b>一个进入课程标准的东西，必须能被评价，否则它无法落地。</b> 这不是某种官僚惰性，这是问责制的内在要求——一项无法评价的素养，其命运只有两个：要么在课堂里不发生任何事（因为没有人需要为它负责），要么以任意的方式发生（因为没有人能检查）。而后者正是泰勒当年要清除的东西。</p>
+<p>于是核心素养一旦进入课程标准，就必须配套<b>学业质量标准</b>——即对"达到何种水平算作具备该素养"的分级描述。这一配套不是可选项，它是这套框架能够运转的必要条件。</p>
+<p><b>而学业质量标准就是规格。</b> 它的每一次改进——描述更明确、水平划分更细、增加典型表现示例、提供评分样例——都在提高它作为规格的完整度。</p>
+<p>因此：</p>
+<blockquote><b>核心素养框架不是逃脱了规格化，它是把规格化推迟了一步：素养的表述层保持抽象，而抽象层不可能独自落地，落地必然经由学业质量标准，规格化就在那一层完成。</b></blockquote>
+<p>这个推迟有一个可观察的后果，且它已经在发生：<b>同一个素养，在不同学科、不同学段的学业质量标准里被具体化为不同的表现描述，而这些描述一旦足够明确到可以支撑评价，它们与本文第三节所分析的那类规格没有任何区别。</b> "能够识别论证中的隐含前提"——这是一条好的学业质量标准，它明确、可判定、评价者之间一致性高。<b>它也是一份可以直接交给生成程序执行的规格。</b></p>
+<p>这里出现一个尖锐的两难，它比第五节（二）的那个更具体：</p>
+<p><b>若把核心素养的表述保持在抽象层不下沉</b>——它就无法评价，无法问责，因而在实践中会退化为标语：写在课程标准的开头，与课堂里实际发生的事情无关。这是许多国家素养改革的实际结局，且它有充分的经验证据。</p>
+<p><b>若把它下沉到学业质量标准</b>——它就完成了规格化，进入本文第四节的自我取消。</p>
+<p><b>两条路都走不通，而且这不是设计缺陷，这是"进入课程必须可评价"这一前提的直接后果。</b></p>
+<p>本文由此得到一个具体的政策判断，它可以被检验也可以被反驳：<b>素养改革的落地程度与其内容的可外包程度正相关。</b> 一个"落实得很好"的核心素养课程——学业质量标准细致、评价工具成熟、教师把握准确——恰恰是一个把最可外包的能力指定得最清楚的课程。而一个"落实得不好"的素养课程，其内容可能反而保留了更多象限二的东西——<b>不是因为它做对了，而是因为它没做成，那些东西侥幸留在了标准的模糊地带，靠师生之间那些说不清的东西传下去。</b></p>
+<p><b>这是一个令人非常不适的结论，本文不为它开脱：它在字面上等于说"改革失败反而保住了要紧的东西"。</b> 而这个说法一旦被断章取义，就会成为任何反对问责、反对透明、反对评价的人的护身符——这是本文最不愿意提供的服务。</p>
+<p>因此必须把话说完整：<b>本文不是主张不要落实，而是主张落实的对象需要被区分</b>。第七节的四象限给出了这个区分的操作方案：象限一的目标应当落实，且必须重写（从产出侧移到判定侧）；象限二的东西不应当被强行写成学业质量标准，而应当被承认为一片需要另一套机制的领域——<b>承认它不可被规格化，并不等于承认它可以不被负责。</b> 这两者的区分，是这场改革接下来唯一要紧的事，而本文只能指出它，给不出那套机制。</p>
+<h2 id="c7">七、可规格化性作为课程设计的第二维度</h2>
+<p>若上述成立，课程设计需要一个此前不存在的维度。</p>
+<p>传统的课程内容选择只有一个维度：<b>价值</b>（斯宾塞之问：何种知识最有价值）。能力本位改革没有改变这个维度，它只是让价值的表述变得可测量。</p>
+<p>本文提出第二个维度：<b>可规格化性</b>。两个维度交叉出四象限：</p>
+<div class="tw"><table><tr><th></th><th>高可规格化</th><th>低可规格化</th></tr><tr><td><b>高价值</b></td><td>象限一：应当教，但教的方式必须改变——目标不是让学生自己产出，而是让他能够验证机器的产出</td><td>象限二：<b>课程的真正腹地</b>，而它在当前课程标准中几乎不存在，因为写不出目标</td></tr><tr><td><b>低价值</b></td><td>象限三：应当移出课程（这正是过去一百年课程改革做的事，做得很好）</td><td>象限四：本来就不在课程里</td></tr></table></div>
+<p>三条设计含义：</p>
+<p><b>其一，象限一的目标必须重写。</b>"能够撰写一份合规的研究方案"——这个目标在今天已经错了，它指定的是一件可以被外包的事。它应当被改写为："能够判定一份研究方案在何处不成立"。<b>注意这不是把目标提得更高阶，而是把它从产出侧移到判定侧</b>——因为判定一个具体产物的不成立之处，恰恰是那类可识别而不可陈述的能力（三·三）。</p>
+<p><b>其二，象限二必须被正名。</b>当前它不在课程里，不是因为有人反对它，是因为写不出目标。若继续要求"进课程必须先写成可测量目标"，象限二永远进不来。<b>这意味着能力本位框架必须被限定为课程的一部分，而不是课程的全部——它对象限一有效，对象限二无效。</b> 这是一个政策级的结论。</p>
+<p><b>其三，一条自我保护条款。</b>上述主张有一个明显的滥用风险：任何教不好、评不了的东西，都可以自称"属于象限二"。因此象限二的准入必须有一道硬门槛：<b>该能力必须是可识别的</b>——即有经验者能稳定地、跨评价者一致地认出它的缺席，哪怕说不出判定程序。<b>可识别但不可陈述，是准入条件；不可识别，则它只是含混。</b> 这道门槛把象限二与"以模糊宗旨为掩护的任意性"分开——而后者正是泰勒当年要清除的东西，本文无意为它翻案。</p>
+<h2 id="c8">八、四项可证伪推论</h2>
+<p>一个不能被杀死的命题什么也没说。以下四项各自独立可失败。</p>
+<p><b>推论一</b>：在同一学科内，目标表述的规格完整度（以评分标准的条目数、水平描述的明确性、锚定样例数量操作化）与该目标被生成技术满足的成功率正相关。<b>证伪</b>：若无相关，命题一（同一性）失效。</p>
+<p><b>推论二</b>：布卢姆分类学高层次目标的规格完整度不低于低层次目标；因而其被自动满足的成功率不低于低层次目标。<b>证伪</b>：若高层次目标的成功率显著更低，则"高阶不是避难所"失效——这将是本文最重要的一条被推翻。</p>
+<p><b>推论三</b>：教师能稳定识别却写不进评分标准的判断（如"没抓住重点"），其评价者间一致性显著高于随机，但其形成的书面标准的判别力显著低于教师本人的判别力。<b>证伪</b>：若书面标准的判别力与教师本人相当，则象限二不存在，本文的整个建构归零。</p>
+<p><b>推论四</b>：课程标准的目标表述明确度越高的国家／学段，其毕业生在"判定产物不成立之处"这类任务上的表现不高于、甚至低于明确度较低者。<b>证伪</b>：若正相关，自我取消命题在经验上失效。</p>
+<p>推论三是本文的存亡所系，且它最便宜——它只需要一次评分实验，不需要任何新技术。</p>
+<h2 id="c9">九、结论与限度</h2>
+<p>本文论证：能力本位课程改革的技术核心是信度要求；提高信度只能通过把判定条件说得更明确；而这份明确陈述即是输出规格；可规格化性是可自动化的上界。因此改革越成功，课程所指定的能力越是那些最不需要长在人身上的——此即自我取消。</p>
+<p>本文与艾斯纳、斯滕豪斯、比斯塔的经典批评方向一致而理由不同：<b>他们说测量窄化了教育的价值，这是一个价值主张，因而六十年来一直可以被"那就把重要的也写成目标"所吸收。本文主张的是一个结构事实——可测者恰为可不长在人身上者——它不能被目标清单的扩容所吸收，因为扩容正是它的加速器。</b></p>
+<p>限度必须说清：</p>
+<p><b>其一，射程限于知识型课程目标。</b>其达成表现为符号产物者。体育、部分艺术实践、临床操作不在其内，而这些领域恰恰可能保存着象限二最完整的传承方式——它们值得被单独研究，本文没有能力做。</p>
+<p><b>其二，命题二只是上界，不是充要条件。</b>可规格化不等于已经可自动化。本文的紧迫性依赖于当前技术已经把这个上界逼得很紧这一经验判断，而这个判断本身可能失准。</p>
+<p><b>其三，两难无解。</b>第五节（二）的可问责性与不可规格化性之两难，本文只是指出它，没有解决它。任何声称解决了它的方案，都应当先回答它是如何同时满足两端的。</p>
+<p><b>其四，最大的风险是被滥用。</b>"这属于不可规格化的部分"可以成为任何教不好、评不了、不愿被问责的东西的护身符。第七节的可识别性门槛是本文能给出的唯一防线，而研究者不确定这道防线在现实的课程政治中守得住。</p>
+<p>最后留一个本文无力回答的问题：</p>
+<blockquote>若课程的正当性不能再建立在"这个能力有用"之上——因为一切有用的能力都可被购买——那么它只能建立在"这个能力必须长在这个人身上"之上。</blockquote>
+<blockquote>而"必须"从何而来？它不可能来自效率，效率永远指向外包。它只能来自某种关于人应当是什么样子的判断——<b>而这正是泰勒的目标原理在一九四九年宣布要驱逐出课程学的那种东西。</b></blockquote>
+    <h2 id="refs">参考文献</h2>
+    <div class="refs"><ol><li>Biesta, G. J. J. Good Education in an Age of Measurement: Ethics, Politics, Democracy[M]. Boulder: Paradigm Publishers, 2010.</li><li>Bloom, B. S. (ed.). Taxonomy of Educational Objectives: The Classification of Educational Goals, Handbook I: Cognitive Domain[M]. New York: David McKay, 1956.</li><li>Collins, H. Tacit and Explicit Knowledge[M]. Chicago: University of Chicago Press, 2010.</li><li>Dreyfus, H. L., Dreyfus, S. E. Mind over Machine: The Power of Human Intuition and Expertise in the Era of the Computer[M]. New York: Free Press, 1986.</li><li>Eisner, E. W. The Educational Imagination: On the Design and Evaluation of School Programs[M]. New York: Macmillan, 1979.</li><li>Mager, R. F. Preparing Instructional Objectives[M]. Palo Alto: Fearon Publishers, 1962.</li><li>Polanyi, M. The Tacit Dimension[M]. New York: Doubleday, 1966.</li><li>Popham, W. J. Objectives and instruction[A]. In: Instructional Objectives, AERA Monograph Series on Curriculum Evaluation, No.3[C]. Chicago: Rand McNally, 1969.</li><li>Ryle, G. The Concept of Mind[M]. London: Hutchinson, 1949.</li><li>Spady, W. G. Outcome-Based Education: Critical Issues and Answers[M]. Arlington: American Association of School Administrators, 1994.</li><li>Stenhouse, L. An Introduction to Curriculum Research and Development[M]. London: Heinemann, 1975.</li><li>Tyler, R. W. Basic Principles of Curriculum and Instruction[M]. Chicago: University of Chicago Press, 1949.</li><li>Wiggins, G. Educative Assessment: Designing Assessments to Inform and Improve Student Performance[M]. San Francisco: Jossey-Bass, 1998.</li></ol></div>
+    </article>
+    <div class="foot-nav">
+      <div class="cl">
+        <a href="/creation/pdf/edu-specifiability.pdf" download style="border-color:var(--accent);color:var(--accent);font-weight:700">⬇ 下载 PDF · 11 页</a>
+        <a href="/creation/journal/">← 回期刊论文频道</a>
+        <a href="/creation/">← 学术创造专栏</a>
+        <a href="/taste/zhiwen/">→ 中华智问知识发生器</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">延伸参考文献 · Further References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">下列文献为本文所涉思想脉络的原典与代表性研究，供读者对读与查证；与文中已引文献不重复，本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+    <li style="margin:0 0 9px;padding-left:6px">Oliver E. Williamson, The Economic Institutions of Capitalism, New York: Free Press, 1985.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Elinor Ostrom, Governing the Commons, Cambridge University Press, 1990；中译《公共事物的治理之道》，余逊达、陈旭东译，上海三联书店，2000。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Teresa M. Amabile, Creativity in Context, Boulder: Westview, 1996.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Dean Keith Simonton, Origins of Genius, New York: Oxford University Press, 1999.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Margaret A. Boden, The Creative Mind: Myths and Mechanisms, London: Weidenfeld & Nicolson, 1990.</li>
+    <li style="margin:0 0 9px;padding-left:6px">J. P. Guilford, "Creativity", American Psychologist, Vol. 5 (1950).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Donald A. Schön, The Reflective Practitioner, New York: Basic Books, 1983.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Michael Polanyi, Personal Knowledge, University of Chicago Press, 1958；中译《个人知识》，许泽民译，贵州人民出版社，2000。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Albert Bandura, Self-Efficacy: The Exercise of Control, New York: Freeman, 1997.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Edward L. Deci & Richard M. Ryan, "The 'What' and 'Why' of Goal Pursuits", Psychological Inquiry, Vol. 11 (2000).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Mark R. Lepper, David Greene & Richard E. Nisbett, "Undermining Children's Intrinsic Interest with Extrinsic Reward", Journal of Personality and Social Psychology, Vol. 28 (1973).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Susan Michie et al., "The Behaviour Change Technique Taxonomy (v1)", Annals of Behavioral Medicine, Vol. 46 (2013).</li>
+    <li style="margin:0 0 9px;padding-left:6px">R. Brian Haynes et al., "Interventions for Enhancing Medication Adherence", Cochrane Database of Systematic Reviews, 2008.</li>
+    <li style="margin:0 0 9px;padding-left:6px">World Health Organization, Adherence to Long-Term Therapies: Evidence for Action, Geneva: WHO, 2003.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Kate Lorig & Halsted Holman, "Self-Management Education: History, Definition, Outcomes, and Mechanisms", Annals of Behavioral Medicine, Vol. 26 (2003).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Annemarie Mol, The Logic of Care, London: Routledge, 2008.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Carl May & Tracy Finch, "Implementing, Embedding, and Integrating Practices: An Outline of Normalization Process Theory", Sociology, Vol. 43 (2009).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Victor R. Montori, Why We Revolt: A Patient Revolution for Careful and Kind Care, Rochester: Mayo Clinic Press, 2017.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Geoffrey C. Bowker & Susan Leigh Star, Sorting Things Out, Cambridge, MA: MIT Press, 1999.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Lisa Gitelman (ed.), "Raw Data" Is an Oxymoron, Cambridge, MA: MIT Press, 2013.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Karl Popper, The Logic of Scientific Discovery (1934/1959), London: Routledge；中译《科学发现的逻辑》，查汝强等译，中国美术学院出版社，2008。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Karl Popper, Conjectures and Refutations, London: Routledge, 1963；中译《猜想与反驳》，傅季重等译，上海译文出版社，1986。</li>
+  </ol>
+</section>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  © 德麦国际 Demai International · 学术创造专栏 · 期刊论文 · <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

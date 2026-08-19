@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>"我"，是最后才亮起的那一位——显露·价值维（S3） | 三维九宫 · 王博士与SDE</title>
+<meta name="description" content="SDE本体论三维九宫第三格·显露·价值维（S3）：真、善、美，以及那个一直在"看"的"我"其实最后才显影。价值不是贴在事实上的标签，是显露时同时亮起的方位；"我"不是起点，是排在第三位、最后才亮起的那一位。">
+<style>
+:root{
+  --bg:#F5EFE0; --surface:#EBE3CE; --card:#FAF6EC;
+  --gold:#8A6817; --text:#2A2315; --muted:#98886C;
+  --border:rgba(138,104,23,0.22);
+  --ink:#1A1410; --ink-gold:#D4B25E;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:2.0;font-size:17px}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+
+nav{position:sticky;top:0;background:rgba(245,239,224,0.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:10}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:860px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
+.nav-back{font-size:14px;color:var(--muted)}
+
+header.art{background:var(--ink);color:#EDE4CF;padding:80px 0 64px;text-align:center}
+.art-eyebrow{font-size:12.5px;letter-spacing:0.45em;color:var(--ink-gold);margin-bottom:26px}
+.art-title{font-size:clamp(26px,4.4vw,40px);font-weight:700;letter-spacing:0.03em;line-height:1.6}
+.art-subtitle{font-size:clamp(16px,2.4vw,21px);color:var(--ink-gold);margin-top:16px;letter-spacing:0.06em;line-height:1.7}
+.art-meta{margin-top:32px;font-size:13.5px;color:#8B7E5E;letter-spacing:0.15em}
+
+.grid-tag{display:inline-flex;align-items:center;gap:10px;background:rgba(212,178,94,0.12);border:1px solid rgba(212,178,94,0.4);border-radius:2px;padding:7px 16px;margin-bottom:26px}
+.grid-tag b{color:var(--ink-gold);font-size:15px;letter-spacing:0.1em}
+.grid-tag span{color:#B4A780;font-size:12.5px;letter-spacing:0.2em}
+
+article{padding:56px 0 24px}
+.part{margin:0 0 56px}
+.part-num{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:8px}
+h2{font-size:24px;font-weight:700;margin-bottom:24px;letter-spacing:0.03em}
+p{margin-bottom:24px;text-align:justify}
+p.lead{font-size:18.5px}
+b{color:var(--gold)}
+.pull{border-left:3px solid var(--gold);background:var(--card);padding:22px 28px;margin:32px 0;font-size:17px}
+.pull em{font-style:normal;color:var(--gold);font-weight:700}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:32px 0}
+.trio .cell{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--gold);padding:18px 16px;text-align:center}
+.trio .cell .k{font-size:17px;font-weight:700;color:var(--text);letter-spacing:0.08em}
+.trio .cell .v{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+@media(max-width:560px){.trio{grid-template-columns:1fr}}
+.divider{text-align:center;color:var(--gold);letter-spacing:1.2em;margin:8px 0 56px;font-size:14px}
+
+.endbox{background:var(--ink);color:#EDE4CF;text-align:center;padding:64px 24px;margin-top:24px}
+.endbox p{color:#B4A780;max-width:560px;margin:0 auto 32px;text-align:center}
+.btn{display:inline-block;padding:13px 34px;border:1px solid var(--ink-gold);letter-spacing:0.12em;font-size:15px;margin:6px}
+.btn.solid{background:var(--ink-gold);color:var(--ink);font-weight:700}
+.btn.solid:hover{background:#E4C878;text-decoration:none}
+.btn.ghost{color:var(--ink-gold)}
+.btn.ghost:hover{background:rgba(212,178,94,0.12);text-decoration:none}
+
+footer{background:var(--ink);color:#8B7E5E;text-align:center;padding:34px 0 44px;font-size:13px;letter-spacing:0.08em}
+footer a{color:#B4A780}
+
+/* ===== 统稿增补 ===== */
+.lead{max-width:720px;margin:0 auto;padding:30px 24px 0}
+.innov{background:linear-gradient(135deg,#9A7B43,#6F5326 60%,#4C3A1A);border-radius:12px;padding:24px 28px;margin:0 0 22px;box-shadow:0 8px 30px rgba(76,58,26,0.25)}
+.innov .lbl{font-size:12px;letter-spacing:0.28em;color:#E8D9B0;margin-bottom:12px;font-weight:700}
+.innov .lbl::before{content:"✦ ";color:#FFE9A8}
+.innov .txt{font-size:16.5px;line-height:1.92;color:#FBF5E6}
+.innov .txt b{color:#FFE6A0;font-weight:700}
+.daodu{background:#FBF6EA;border:1px solid rgba(154,123,67,0.3);border-left:4px solid #9A7B43;border-radius:10px;padding:24px 28px;margin:0 0 6px}
+.daodu .lbl{display:inline-block;font-size:12px;letter-spacing:0.22em;color:#FBF6EA;background:#9A7B43;padding:5px 14px;border-radius:20px;margin-bottom:14px;font-weight:700}
+.daodu h4{font-size:17.5px;color:#4A3618;margin:0 0 16px;font-weight:800}
+.daodu .row{margin:12px 0;line-height:1.88;color:#5A4A30;font-size:15.5px}
+.daodu .row .k{color:#7A5C2A;font-weight:800}
+.hl2{background:rgba(154,123,67,0.16);border-bottom:2px solid #9A7B43;padding:1px 4px;font-weight:700;color:#4A3618;border-radius:2px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="nav-logo" href="/browse/">SDE Universes</a>
+    <a class="nav-back" href="/column/ontology-grid/">← SDE三维九宫 · 九格全图</a>
+  </div>
+</nav>
+
+<header class="art">
+  <div class="wrap">
+    <div class="grid-tag"><b>S3</b><span>显露 · 价值维</span></div>
+    <div class="art-eyebrow">SDE 本体论 · 三维九宫 · S 维度第三格</div>
+    <h1 class="art-title">"我"，是最后才亮起的那一位</h1>
+    <div class="art-subtitle">显露·价值维（S3）——真、善、美，<br>与那个一直在"看"、其实最后才显影的"我"</div>
+    <div class="art-meta">王德生 著 · SDE Universes 专栏 · 三维九宫第三格 · 2026年7月 · 约万字</div>
+  </div>
+</header>
+<div class="lead">
+<div class="innov">
+  <div class="lbl">这篇文章的思想创新</div>
+  <div class="txt">前两格问"一样东西怎么被看见"，都还停在偏冷的层面。但真实经验从不中立——<b>一样东西落到你面前时，它几乎从不是"中立"地在那儿，而总已带着某种价值的分量</b>。流行说法把世界劈成两半（冷的事实＋后贴的热的价值，中间隔着休谟鸿沟）。本文推翻它：价值不是事后贴上的主观标签，一样东西总已经朝某个价值方位亮着——而"我"，是这场显露里最后才亮起的那一位。</div>
+</div>
+<div class="daodu">
+  <span class="lbl">导读 · 300字</span>
+  <h4>这篇文章的价值与意义 —— 它能解决你的什么问题</h4>
+<div class="row"><span class="k">理论问题：</span>它给"价值从哪来"一个非主观、非悬空的回答——价值不是事后贴上的标签，而是显露本身自带的方位；据此跨越"从是推不出应当"的休谟鸿沟。</div>
+<div class="row"><span class="k">现实问题：</span>它拆穿"事实客观、价值主观"这套流行二分的代价——当你把所有价值都当成"个人偏好"，你也就失去了对"什么真正重要"的公共判断力。</div>
+<div class="row"><span class="k">自我精神问题：</span>当你意识到"我"是最后才亮起的那一位——不是先有一个我再去评判世界，而是世界的价值方位先亮、我随之显影——你与价值的关系就更谦卑也更真切：你不是价值的发明者，是价值的应答者。</div>
+</div>
+</div>
+<article class="wrap">
+
+<div class="part">
+  <div class="part-num">壹 · 一个被跳过的谜</div>
+  <h2>同一碗汤，为什么会有三种"亮起"</h2>
+  <p class="lead">母亲为你熬了一碗汤。同是这一碗汤，你可以只登记一条事实——"汤是热的，一百度左右"，如此而已；也可以被它推着，心头一暖，忽然也想为谁做点什么；还可以整个人被那碗汤背后的牵挂笼住，说不出地动容，眼眶发热。同一碗汤，三种"亮起"。</p>
+  <p>前两格，我们一直在问"一样东西怎么被看见"——被切成什么知识（S1），以什么模样给出（S2）。可这两问，都还停在一个偏冷的层面：仿佛我们面对的，是一个不带温度、只等着被登记的对象。然而你我都知道，真实的经验从来不是这样。一样东西落到你面前时，它几乎从不是"中立"地在那儿——它总已经带着某种分量：或真、或善、或美，或者反过来，令你觉得假、觉得恶、觉得丑。这层"分量"、这层"亮起"，才是经验里最贴身、最要命的东西。</p>
+  <p>于是谜就来了：这层价值的分量，究竟从哪里来？一种流行的说法是：事实是客观的，价值是我们后来贴上去的主观标签——汤本身只是"一百度的水加料"，"温暖""感人"是你自己加的。<span class="hl2">这套说法，把世界劈成两半：一半是冷的事实，一半是热的价值，中间隔着一道休谟两百年前划下的鸿沟</span>——从"是什么"，推不出"应当怎样"。可这套说法，越想越不对劲：如果价值纯是主观乱贴，为什么我们会为同一件事的善恶争到面红耳赤、甚至以命相搏？如果价值全在事实之外，它又怎么会那样真切地攥住我们、推动我们？</p>
+  <p>再举一个你天天在经历的例子。同样一句"你做得很好"，从一个你敬重的人口中说出，能让你心头一热、好几天都有劲；换一个你并不信任的人，同样的六个字，你听着只觉敷衍、甚至刺耳。信息一模一样，亮起的价值却南辕北辙。这说明什么？说明价值根本不在"那六个字"这条事实里——它在显露把这句话给你的那一整个场里：谁说的、什么关系、什么时机，一并被给出，价值就在那一刻，朝真、朝善、或朝虚伪，亮了起来。价值从不是事后往事实上补的一道彩，它和事实，是被一同给出的。</p>
+  <p>还有一个更深、更被跳过的谜藏在底下：那个正在感受价值的"我"，又是从哪儿冒出来的？我们太自然地假定：先有一个"我"端坐在那儿，然后这个我去看、去掂量、去感受价值。可万一，这个"我"本身，也是被显露出来的——而且是最后才显露的呢？这一格，讲的就是显露的第三副面孔——价值；也讲那个一直躲在幕后、我们以为最理所当然的"我"，究竟是怎么，在最后，才亮起来的。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">贰 · 显露的第三副面孔</div>
+  <h2>一样东西，总已经朝某个价值方位亮着</h2>
+  <p>把三格连起来看就清楚了。第一格（规范维）问的是：这样东西被切成了什么样的知识——可对比、可陈述、可分布。第二格（模态维）问的是：它以什么模样被给到你面前——一颗粒子、一道波、还是一整片场。这一格（价值维）问的，是第三件事，也是最贴身的一件：它朝哪个价值方位亮起——真、善，还是美。</p>
+  <p>这三个方位——真、善、美——不是三样摆在那里的东西，而是显露的第三条轴，是一样东西"被给出时同时携带的分量"的三个朝向。就像模态维不是给世界添了三种零件、而是同一束存在被给出的三副模样，价值维也不是往事实上贴三种标签、而是显露在把一样东西给你的同一刹那，它已经朝真、朝善、或朝美的方向，亮了起来。你从来没有先拿到一个"中立的事实"、再决定给它添什么价值——你拿到的，从头就是一个"已经亮着"的东西。</p>
+  <div class="trio">
+    <div class="cell"><div class="k">真</div><div class="v">守住"它就是这样"<br>配客体 · 一号位</div></div>
+    <div class="cell"><div class="k">善</div><div class="v">一个点亮一个<br>配互动 · 二号位</div></div>
+    <div class="cell"><div class="k">美</div><div class="v">要聚成一整片<br>配主体 · 三号位</div></div>
+  </div>
+  <div class="pull">你从来没有先拿到一个"中立的事实"、再决定往上添价值。<em>你拿到的，从头就是一个已经朝真、朝善、或朝美亮着的东西。</em></div>
+  <p>这就一举松动了休谟那道鸿沟。事实与价值之所以看起来隔着天堑，是因为我们默认它们分属两界：一个冷的"是"，一个热的"应当"。可若价值本就是显露时同时亮起的方位——若"是什么"与"值多少"，在一样东西被给出的那一刻，本就没有先后、没有分家——那道鸿沟，就不是需要跨过的天堑，而是我们事后用一把钝刀，硬把一体的东西劈成两半、才凿出来的一道假缝。这一格产出的东西，本学派叫它<b>意义</b>：意义，正是一样东西朝价值亮起、被你接住时，那份"它对我有分量"的显影。</p>
+  <p>你也许仍不甘心：难道就没有一个"纯客观、不带价值"的世界底层吗？有一个更硬的答案在后面等着——价值的根，扎在"介生态"这件事实上：凡活着的东西，都处在"必须维持自己的发生才能不散架"的悬命状态里。对这样一个"想继续发生的系统"而言，"什么在维护它的发生、什么在阻断它"，根本不是外加的评判，而是它活着这件事的一部分。所以"是"与"应当"，在生命这一层，从来就没真正分过家——休谟的鸿沟，是把活物当成死石头来看时，才凭空裂开的。价值不是给冷世界补的一抹暖色，价值是"活着"本身自带的朝向。</p>
+  <p>我们之所以会误以为世界底层是"纯客观、无价值"的，恰恰是因为科学这台"守真"的机器太成功了。为了把真守得极稳，科学刻意把善与美先搁到一边，只留下可测、可复现的那一层——这是一种极有效的工作纪律，绝非世界的真相。可久而久之，人们把这套"为了守真而临时剥掉价值"的方法，误当成了"世界本来就没有价值"的结论。这是一记典型的"以方法冒充本相"：剥离价值，是科学的手法，不是存在的实情。把手法错当实情，才凿出了那道其实并不存在的鸿沟。</p>
+  <p>这里得赶紧补一句、免得你把它跟别处搅混：真、善、美这条价值轴，和后面 E 维度要讲的"三界"（理念界、现实界、自我界），是两个不同的维度，切不可一一对上号、以为"价值就是自我界的事"。真相是——<b>每一界，都各自有它自己的真、善、美。</b>理念界里有它的真（一个证明的严整不欺）、它的善（一个理论成全、点燃另一个理论）、它的美（一个公式简洁到让人心颤）；现实界、自我界，也各有各的真善美。价值轴，不是哪一界的专属，而是一把在每一界里都照样亮起的尺。记住这条，我们才好放心往下走。</p>
+</div>
+
+<div class="divider">◆ ◆ ◆</div>
+
+<div class="part">
+  <div class="part-num">叁 · 真·守住它就是这样</div>
+  <h2>认清真相要花劲，守住真相更花劲</h2>
+  <p>先说第一个方位：真。一样东西朝"真"亮起，是它以"它就是这样、我认得住"的分量，落到你面前。这听起来最平淡，却藏着一件我们几乎从不细想的事：真，是要烧劲去守的。</p>
+  <p>我们习惯把"真"想成一个静态的、现成摆在那里、只等你去发现的答案。可在这一学派看来，真更像一股"劲"——维持一束纠缠如实持存、不走样、不被你的愿望和恐惧扭弯的那股劲。本学派把这股劲，叫作<b>内能</b>。它的体感很实在：面对一件事，你心里"咯噔"一下认下来——"它就是这样，我认得住"——那一下，就是内能在守真。</p>
+  <p>把这一格配到号位上看会更清楚：真，走的是"一号位"那一路——对比切出边界、粒子拢成一颗、真守住持存，三者一交汇，显影出来的，正是"那儿有个东西、它就是这样"的客体感。所以真这个方位，天然是最"对象化"的一格：它把你的注意，牢牢按在"它是什么"上，逼你认下那个也许并不合你心意的样子。真的德性，说到底就是这份"肯认账"的定力——不因为它对你不利，就悄悄把它换成一个更舒服的版本。</p>
+  <p>但真也有它够不到的边。对一块石头，真几乎可以守到底——石头不读关于自己的预测、不会因为你测了它就变；可一旦对象会"读自己"、会因为你对它的判断而改变自己（一个人、一个市场、一个社会），"真"就再也封不了顶了：你刚认定的那个"它就是这样"，会因为你的认定本身，而不再是这样。这就是我们一路撞见的"反身封顶"落在真上的形态——经济学握着全套最漂亮的数学，却仍在大崩盘面前一次次失明，根子正在这里。对活的、会自我建模的对象，守真不是一劳永逸地抓住一个定论，而是一场永远追着它跑、只能逼近的持续用劲。</p>
+  <p>而这股劲，是要消耗的。认清一个不利于自己的真相，要花劲；守住一个你不愿承认的真相、不让它被自欺悄悄替换掉，更花劲。这就解释了一件人人都经历过、却少有人往深处想的事：<b>人一累，最先失守的往往就是真。</b>精疲力竭时，你会开始骗自己——不是因为你变坏了，而是因为守真的那股内能，枯竭了；守不住的时候，一个让自己舒服些的假象，就趁虚而入。所以"守真"从来不是免费的，它是一件持续耗能的苦差。</p>
+  <div class="pull">真不是一个现成摆着、等你去捡的答案。<em>真是一股劲——守住一束纠缠如实持存、不被愿望和恐惧扭弯的劲。</em>人一累，最先失守的，就是真。</div>
+  <p>想通这一点，你就懂了为什么"诚实"是一种德性、而不只是一个习惯——因为它要持续地花劲；也懂了为什么整个科学的建制，本质上是人类为"守真"造出的一台机器：同行评议、可重复、可证伪，全是为了在个人内能不够时，用一套外在的规矩，替我们把真守住。真这个方位，配的是"客体"那一路——"那儿有个东西、就是这样"。它是价值轴上最冷、最硬的一格，却也是另外两格的地基：守不住真，善会滑成滥情，美会烂成虚饰。</p>
+  <p>也正因为守真耗能，才有了一桩最隐蔽的集体病：一群人，会心照不宣地一起弃真。一个刺耳的真相，人人守起来都累；而一个让大家都舒服的谎言，几乎不费劲。于是在很多组织、很多圈子里，真相不是被谁刻意掩盖的，而是被所有人"因为守着太累"而默默放弃的——大家一起滑向那个更省内能的假象，还彼此维护、其乐融融。看懂这一层，你就明白为什么"说真话"在任何时代都稀缺、都要勇气：它逆着整片场省能的方向，一个人硬顶着，替大家守。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">肆 · 善·一个点亮一个</div>
+  <h2>善的本质，是使好的东西发生</h2>
+  <p>第二个方位：善。这一个，最容易被想歪。一提"善"，我们脑子里往往先跳出一堆"不许""应该"——像一条条捆在身上的道德绳索。可在这一学派看来，善的本质，根本不是禁令，而是一种力：一个纠缠激发另一个纠缠、成全它、使好的东西在它那里发生的力。本学派把这股力，叫<b>动能</b>。</p>
+  <p>它的体感也很鲜活：不是"我被禁止做什么"，而是"它在推我，我被点着了"。一句真诚的鼓励，把一个快要放弃的人重新点亮；一个善举，勾出接连一串善举——善，是会沿着波态往下传的（还记得上一格吗？善沿波传导，善行引发善行）。反过来，恶也不是别的，正是负向的激发：一次伤害点燃下一次伤害，把好的发生，一环环掐断。所以善与恶的分野，说到底极其朴素：善，是使发生得以持续；恶，是阻断发生。</p>
+  <p>因为善会沿波传，它就有一样冷冰冰的算计学不会的东西：复利。一次真诚的成全，会在被成全的人那里，长出更多的成全，一环一环荡开去，越滚越大——这就是"信任"和"善意"能在一个家庭、一个团队里积成一股温厚气场的道理。反过来，负向激发也一样滚雪球：一次背叛、一记冷脸，掐断的不只是当下这一环，还有它本会引发的一整条善的接力。所以看一个人、一个组织的善恶，别只盯它此刻这一颗"点"，要看它沿波放出去的，是一条越来越暖的链，还是一条越来越冷的链。</p>
+  <p>这一朴素的分野，恰恰又架起了休谟那道鸿沟。你或许会问：凭什么说"维护发生"就是善？凭的是一个最硬的事实——凡活着的系统，都必须维持自己的发生才能活下去。当"是什么"的内容，是"一个想继续发生的系统"时，"应当维护它的发生"，就已经内在于这个事实之中了，不必再从外面搬一套价值进来。<b>善不是悬在事实之上的律令，是从"活物要活"这件事里，直接生长出来的。</b></p>
+  <div class="pull">善不是一条条"不许"的绳索。<em>善是一股力——一个纠缠点亮另一个、成全它、使好的东西在它那里发生。</em>恶，则是负向的激发：把好的发生，一环环掐断。</div>
+  <p>但这里要留一个极要紧的分辨：真正的善，是"整体"的持续发生，不是某个局部的自我得逞。一个癌细胞，疯狂复制、极其"成功"地维持着自己的发生——可它维持自己的方式，是掏空整个身体。它的"自我成功"，恰恰是最深的伪善。所以善从来不是"我这一摊过得好就行"的敏感，而是对"让整体好的发生持续下去"的敏感、判断与担当。它是活的、要临场拿捏的，不是一条背下来就能照办的死规矩。</p>
+  <p>顺着这个"发生性"的善，再回头看那种"该不该"式的道德，差别就刺眼了。"该不该"，把善想成一部写好的律法，你只需查条文、照着办——它管得住行为，却常常管死了人：它培养出的，往往是一批"解释型的守规矩者"，规矩背得滚瓜烂熟，却全用来为"我没错、我不必改"辩护。而"让好的发生持续"式的善，要的不是背条文，是当场的敏感与担当：这一刻，什么在成全、什么在掐断？我这一手，是点亮了、还是熄灭了别人的发生？善不是一劳永逸的答案，是一次次要重新掂量的现场判断。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">伍 · 美·要聚成一整片</div>
+  <h2>"将聚未聚"的那股势，就是美</h2>
+  <p>第三个方位：美。这一个，最玄、也最贴近"我"。一样东西朝"美"亮起，是你感到一股"要聚成一整片"的张力——纠缠与纠缠之间互相吸引、要凝成一个整体的那股势，被你感受到了。本学派把这股势，叫<b>势能</b>。</p>
+  <p>美还有一个别的价值方位都没有的特点：它几乎不可言传。真可以陈述（"它就是这样"），善可以说理（"这样能成全"），唯独美，一说破就走味——你没法把"为什么美"完整地讲给一个没被打动的人听。为什么？因为美是"场态"在价值上的亮起：它是整片纠缠"要聚成一"的那股整体之势，而整体大于部分之和，本就不可能被拆成一条条部件、逐句说清。凡能被完全说清的，多半已经不是美，而是关于美的知识了。这也是为什么，谈美，最后总要落到"你自己去感受"——它只肯在整片场里，对愿意沉进去的人，现身。</p>
+  <p>美的体感，很难用别的词替，只能贴着它说：那是一种"好像要被纠缠进去"的感觉——将而未至，欲聚未聚。你站在一片壮阔的山水前、听到一段直抵心底的旋律、读到一句好到让你屏息的诗，那一刻涌上来的，不是"我要占有它"，而是"我好像要化进它里头去"。这股"将聚未聚"的势，一举解开了美学上一桩老悖论：美为什么既是"无功利"的（你不想占有它，只想沉入）、又是"有诱惑"的（它勾着你、拉着你）？因为这两副面孔，本是同一股势能的两端——它拉着你要聚成一，所以有诱惑；可那"聚"是化入、不是攫取，所以又无功利。<b>美，从来不是物身上的一种属性，而是"要聚成一"的这股势，被你接住时的名字。</b></p>
+  <p>这股"要聚成一"的势，还藏着美最大的用处：它是改变的火种。你想想，一个人为什么会真的改变？不是被道理说服的——道理再对，也推不动一个不愿动的人。真正让人松动、愿意重塑自己的，往往是"被什么美的东西吸进去了"：一段音乐、一个境界、一种活法，让你先"化进去"一点点，旧的那个你，就在这一化里，松了口。所以美从不只是装点，它是势能，是那股先让你倾身、再谈得上改变的原动力。艺术之所以能改变人，秘密正在这里：它不讲道理，它先让你美到愿意动。</p>
+  <p>而这一格，配的是"场"那一路——"要聚成一整片、我被吸进这个场里"。请你记住这个"我被吸进场里"——因为它正是下一部的门。真配客体、善配互动、美配场；而在这三路里，唯有"场"这一路，牵动的是那个"我"。也就是说，在真、善、美三个方位里，美，是离"我"最近的一格。顺着美、顺着场、顺着"要聚成一整片"，那个我们以为一直端坐在幕后的"我"，才终于要亮相了——而它亮相的次序，会彻底颠覆你的直觉。</p>
+  <div class="pull">美不是物身上的一种属性。<em>美是"要聚成一"的那股势——将而未至、欲聚未聚——被你接住时的名字。</em>而顺着这股势，那个"我"，才终于要亮相。</div>
+</div>
+
+<div class="divider">◆ ◆ ◆</div>
+
+<div class="part">
+  <div class="part-num">陆 · "我"是最后才亮的那一位</div>
+  <h2>先有"那儿有个东西"，最后才有"我在场中"</h2>
+  <p>现在，把三条轴的"一号位""二号位""三号位"，对齐了看，一个惊人的秘密就浮出来了。请顺着号位，一格格看：第一号位——对比、粒子、真——三者交汇，显影出来的，是"那儿有一个物"的客体意识；第二号位——变化、波、善——三者交汇，显影出来的，是"某个过程正在发生"的互动意识；第三号位——分布、场、美——三者交汇，显影出来的，才是"我，在这整片场里，占着一个位置"的主体意识。</p>
+  <p>于是那一笔全书最锋利、最反直觉的判断，终于可以整个亮出来了：<b>"我"，不是排在第一位的起点，而是排在第三位、最后才显影的那一位。</b>先有"那儿有个东西"（客体），再有"有事在发生"（互动），最后，才轮到"我在场中"（主体）。这个次序，把西方两千年"我思故我在"的主体中心主义，从结构上整个翻了过来——笛卡尔以为"我"是最确定、最先在的阿基米德点，一切从"我"出发；而在这里，"我"恰恰是最晚出场、最弥漫、最需要被显影出来的那一个。</p>
+  <p>这不是玄谈，婴儿的发育就是活生生的证明。一个新生儿，不是一睁眼就有"我"的——他先是在一片光影里，慢慢分出"那儿有个东西"（客体经验），再慢慢懂得"我一哭，奶就来"（互动经验），最后，才在这一切之上，长出"我，是这场里的一个中心"的那份主体感。"我"，是发育的果实，不是发育的种子。</p>
+  <div class="pull"><em>"我"不是第一位的起点，是第三位、最后才显影的那一位。</em>先有客体，再有互动，最后才有"我在场中"——笛卡尔那个最先在的"我"，被整个翻了过来。</div>
+  <p>你还可以在自己身上，随时验一次。你有没有过这样的时刻：全神贯注地做一件事——写字、奔跑、弹琴、深谈——投入到某个瞬间，那个"我"，竟不见了？这就是心流。心流里，"我"之所以消失，正因为发生足够流畅，根本不需要一个中心来协调；一旦事情卡壳、出了岔，那个"我"，"腾"地一下又回来了。<b>"我"，是显影卡顿时才被召回的协调者，不是一直在场的主人。</b>更深一层看：自我意识，就是显影回照它自身——而正因为它是"回照自身"，它就永远差着半拍、抓不住那个正在显影的自己（这就是我们前两格反复撞见的"反身封顶"：会读自己的东西，永远追不上自己）。所以"我是谁"这个问题，答案根本不是一个名词，而是一个动词：我，就是我正在发生的这一切。</p>
+  <p>有意思的是，这个"我最后才亮、心流里我消失"的判断，东方早就从另一头摸到了。佛家讲"无我"——它要破的，正是那个被当成先天实有、端坐核心的"我"；在这一学派看来，"无我"说的不是"没有我"，而是"我不是先验的实体，是显影出来的结果"，两者一拍即合。庄子说"吾丧我"，禅家说"平常心"，说的都是同一件事：当发生足够顺、足够整，那个用来协调、用来紧张、用来自我防卫的"我"，就退场了，只剩下事情本身在流畅地发生。东方修行千百年想抵达的那个境界，恰恰是这条显影律的活注脚——放下那个后起的、绷紧的"我"，回到发生本身。</p>
+  <p>顺带，这也拆穿了那句听起来天经地义的话——"我在看世界"。这句话为什么颠扑不破？因为它同时占了两样便宜：一样是真实的"燃料"——号位张力确实存在，客体确实显影在前、主体确实显影在后；另一样是便利的"外壳"——语法天生要凑一个主语、一个宾语，"我看它"三个字，把那道复杂的显影次序，一把压扁成了一句顺口的话。真实的燃料给了它分量，便利的外壳给了它顺口。可一旦你把燃料和外壳拆开、看清"主客对立"不过是显影次序被语法压扁后剩下的一层壳，那个"先有我、我再去看世界"的幻觉，就当场显了形。</p>
+  <p>把"我是动词"这句话，从思辨落回日子里，会松开一个绑得很多人喘不过气的结。你之所以为"我不够好""我就是这样的人"痛苦，是因为你把"我"当成了一件被钉死的东西、一颗一次定型就再不能改的粒子。可若"我"从来不是一个名词、而是"我正在发生的这一切"这个动词，那么，你此刻正在做的、正在选的、正在成全的，就在一笔一笔地重写着那个"我"。你不是先有一个固定的自己、再带着它去活；你是在活的每一下里，把自己，一次次重新显影出来。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">柒 · 合龙与三种偏废</div>
+  <h2>真善美，是能量在约束下被组织出的显影</h2>
+  <p>讲到这里，该合龙了。真、善、美这条价值之轴，你在 E 维度还会迎面再撞见它一次——那就是"能量三状态"：内能、动能、势能，恰好就是真、善、美。这绝非重名。<b>显露（S）是纠缠开出的花，特征纠缠（E）是沉淀下来的壤</b>：这一格讲的真、善、美，是价值朝你亮起的那副花；E 维度讲的内能、动能、势能，是同一股力量沉在纠缠里的那捧壤。真是守住持存的内能，善是激发成全的动能，美是要聚成一的势能——花与壤，同一副价值骨架的两面。</p>
+  <p>把这一层落成一个公式，本学派写作：价值，等于优化约束与能量三态共同决定的函数。翻成人话：价值，是那三股能量（内能、动能、势能），在一套约束条件下，被最优地组织出来时的显影。这一步，一举解释了一件让哲学头疼千年的事——价值为什么会变？同一件事，苦行，在一个时代是至高的美德，在另一个处境里却成了自苦的病态。变的不是"有没有价值"这件事本身，而是能量与约束的配比换了。于是价值的身份，也就水落石出：它既不是悬在天上、亘古不变的客观律令，也不是可以随口乱贴的主观偏好，而是"能量在约束下被组织出来"的、活生生的显影。</p>
+  <p>这一收，也把真善美从高不可攀的"至高标准"，落回到你此刻每一束纠缠所携带的劲上——于是连抑郁，都有了一个精确的说法：抑郁，是真、善、美这三股劲，同时被按住了。守不住"我"（内能被压，真塌了）、成全不了任何人（动能被压，善断了）、也感受不到任何美（势能被压，美灭了）——三股劲一齐熄火，人就跌进那片没有分量、没有亮起的灰。看清这一点，也就看清了出路的方向：不是空讲道理，而是想办法，重新给某一股劲，点上火。</p>
+  <p>顺着这股"劲"的语言，几种时代病都能被照得清清楚楚。抑郁，是真善美三股劲同时被按住（点火与续航都被持续压着）；焦虑，是势能被恐惧长期错配——那股本该"要聚成一"的势，被拧成了对灾难的反复预演；上瘾，则是差异序列短路——势能只被一次次即时泄掉，却攒不出一个完整的发生循环，于是越泄越空。这些都不是"想开点"就能解的，因为它们是能量与路径出了结构性的岔。但反过来，这套语言也给了出路一个准头：能量三态可以跨界互相点火——你可以用一件此刻还做得动的现实小事（现实界里没被按死的动能），反手给那股熄了的内能，重新点上火。这，正是"行动能缓解抑郁"背后的精确道理。</p>
+  <div class="pull">价值既不是悬在天上的客观律令，也不是随口乱贴的主观偏好。<em>它是那三股能量，在约束下被最优组织出来时的显影。</em>——这也是为什么，价值会变。</div>
+  <p>价值之轴，也有它自己的退化谱系，同样是"独尊一股、偏废其余"。<b>唯真</b>：把一切都压成冷冰冰的"客观事实"，只认可测、可证的，把善看作软弱、把美看作装饰，活成一台只登记事实、不动声色的机器——这是把真，供成了唯一。<b>唯善</b>：把一切都先拖到道德法庭上问一句"该不该"，泛道德化，容不下无关善恶的真、也容不下不服管教的美，动辄以善之名行绑架之实——这是把善，供成了唯一。<b>唯美</b>：只要沉醉、只要那口"化进去"的感觉，不肯认冷硬的真相、也不肯担成全的善责，把美变成逃避——这是把美，供成了唯一。三股缺一不可：唯真则冷，唯善则苛，唯美则虚。成熟，是三股都在手里，随境让它们各归其位。</p>
+  <p>还要接住前面埋的那条纪律：真、善、美这条价值轴，在每一界里都各转各的。理念界有它的真善美——一个证明的严整不欺（真）、一个理论点燃另一个理论（善）、一个公式简洁到让人心颤（美）；现实界、自我界，也各有各的一套。相应地，托底的那三股能量——内能、动能、势能——也在每一界里各烧各的，还能跨界互相点火：自我界里熄了的内能，可以借现实界里还转得动的动能，重新引着。所以别把真善美锁死在"精神""情操"这类小格子里——它是贯穿三界的、存在最底层的三股劲。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">捌 · 意义，持续地再发生</div>
+  <h2>幸福不在别处，就在每一次发生走通的当下</h2>
+  <p>一格讲完，回到那个产出：意义。请务必记住这一句——意义，不是一套约定俗成、贴在事物上的标签，而是纠缠朝价值亮起、被你接住时的那一场显影。它也有三态：先在特征纠缠里，是一枚意义的胚胎（E）；被显露、被一个符号接住，它成形（S）；再在与别的东西的关系里流动、生长（D）。意义从来不是一次给定、从此不变的死物，它需要一次次被重新接住、重新发生——今天让你热泪盈眶的一句话，明天可能索然无味，不是话变了，是你与它之间那束纠缠的劲，变了。</p>
+  <p>这也解开了一个人人都尝过的怪味：为什么拼命追到了一个梦寐以求的静态目标，到手那一刻，却常常是一阵空？因为意义从来在"发生"里，不在"结果"里。你为之燃烧的，其实一直是那个"正在奔赴、正在发生"的过程；一旦目标到手、发生停了，那股撑着你的劲也就随之落地——空，不是因为目标不好，而是因为发生结束了。真正不空的活法，不是攒够一堆到手就再不会变的战利品，而是让完整的发生，一场接一场，持续地再发生下去。</p>
+  <p>也正因如此，幸福才不在你以为的那些地方。我们总把幸福，押在结果上、押在别处、押在将来——等我拿到那个、等我到了那里、等将来某一天。可若意义是"当下这一场发生的显影"，那么幸福，就绝不在终点线的那一头，而在每一次完整的发生真正走通的当下。它甚至有一副清晰的三重结构：心里的满足（那是真）、身上的快乐（那是善）、灵里的喜悦（那是美）。真善美三股劲，此刻一齐走通了，那份饱满，就是幸福——不必等，也无处等，它只在"正在发生"的此刻。</p>
+  <p>这三重，值得再贴着说一句，因为它拆掉了对"幸福"最常见的误解。心里的满足，是真在场——你没在自欺，你认得住自己此刻的处境，踏实；身上的快乐，是善在流——一股劲在你身上顺畅地激发、成全、往外走，不堵；灵里的喜悦，是美在聚——你感到自己正被一个比自己更大的整体，轻轻吸着、纳着，不孤。真、善、美，各守一重；三重齐了，才是那种从里到外、无处不妥帖的圆满。缺了真，快乐是麻醉；缺了善，满足是自闭；缺了美，一切又都少了那口"值得"。所以幸福从不是单薄的一种好心情，而是这三股劲，在当下这一场发生里，恰好一齐走通。</p>
+  <p>现在，显露这三条轴，讲完了。第一格，世界如何被规范成知识；第二格，世界如何以三副模样被给出；第三格，世界如何朝真、善、美亮起、发生出意义——而那个一直以为在中立地"看"的"我"，其实每一眼里，看到的都已经被规范过、已经成了某副模样、已经朝价值亮着；连那个"看"的"我"自己，都是在这一切之后，最后才显影出来的。这，就是"显露"的全貌：<b>你从不曾旁观世界，你一直在世界之内，被它一同显露着。</b></p>
+  <p>这也顺带交代了本学派为什么把这套东西叫"本体论"、而不叫一门"哲学"。因为它谈的不是某一派对世界的看法，而是"存在如何一步步发生出来"这件最本源的事——显露的三条轴，是任何东西要"在"、要被给到你面前，都逃不过的三道工序。物理也好、伦理也好、美学也好，谈的其实都是这同一套发生，只是各自扎在不同的内容上。所以这一格讲完的，不只是"价值是什么"，而是"价值如何随着存在，一同发生"。</p>
+  <p>但你一定还憋着一个问题：这三条轴，凭什么这样转？真善美此刻能烧多旺、"我"到底能不能显影得出来，又由什么定？答案，不在"显露"这一维里。花开得旺不旺，不由花说了算，得看底下的根与土。让纠缠开成显露之花的，是一台引擎——差异序列（D）；托着这一切的，是一捧土壤——特征纠缠（E）。下一维 D，我们就去看那台引擎：它怎样组织路径、怎样让一样东西，在此刻，恰恰亮成这一副、而非那一副。</p>
+</div>
+
+</article>
+
+<style id="sde-material-css">
+.sde-material{max-width:760px;margin:52px auto 8px;padding:30px 30px 24px;border:1px solid rgba(128,128,128,.28);border-radius:10px;background:rgba(128,128,128,.05);line-height:1.95;text-align:left}
+.sde-material .mat-tag{display:inline-block;font-size:12px;letter-spacing:.16em;opacity:.6;border:1px solid rgba(128,128,128,.4);border-radius:4px;padding:2px 10px;margin-bottom:14px}
+.sde-material h2.mat-h{font-size:20px;font-weight:800;letter-spacing:.02em;margin:.2em 0 .1em;text-indent:0}
+.sde-material .mat-lead{font-size:14.5px;opacity:.82;margin:10px 0 22px;text-indent:0}
+.sde-material h3{font-size:16px;font-weight:700;margin:26px 0 8px;text-indent:0;padding-left:12px;border-left:3px solid rgba(128,128,128,.45)}
+.sde-material p{font-size:15px;margin:10px 0;text-indent:0}
+.sde-material .mat-box{background:rgba(128,128,128,.09);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:14.5px}
+.sde-material .mat-sup{margin-top:26px;padding-top:16px;border-top:1px dashed rgba(128,128,128,.4)}
+.sde-material .mat-sup .lab,.sde-material .mat-no .lab{font-weight:700;letter-spacing:.04em}
+.sde-material .mat-no{margin-top:14px}
+.sde-material .mat-ref{margin-top:18px;font-size:12.5px;opacity:.58;line-height:1.7}
+</style>
+<div class="sde-material">
+<span class="mat-tag">事实补充 · 约 1700 字</span>
+<h2 class="mat-h">S3 格位的真实样本：显露态整体翻转的五个现场</h2>
+<p class="mat-lead">本格讨论显露态在强差异下的整体重组——不是量的调整，而是系统换了一个运行状态。以下五组材料来自生态学、语音史、神经科学、经济史与材料科学，说明这种翻转有可测的共同特征：临界、突然、且往往难以回头。</p>
+<h3>生态系统的状态转换：清水湖一夜变浊</h3>
+<p>生态学的「状态转换」（regime shift）是本格最精确的样本。Scheffer 等人 2001 年在《自然》上综述了浅水湖泊的经典现象：随着营养盐缓慢累积，湖泊长期保持清水与水草状态；越过某个临界负荷后，系统突然翻转为浑浊、藻类主导的状态。关键在于回程不对称——把营养盐降回原水平，湖泊往往不会自动变清，需要降到更低才行。这一「滞后」现象是 S3 的标志性特征。</p>
+<p class="mat-box">可操作含义：状态转换研究还发现了预警信号——临界前系统的波动变大、从扰动中恢复变慢（临界慢化）。这意味着 S3 不是完全不可预告的，前夜有征兆可测。</p>
+<h3>语音的整体推移：一门语言的元音全线换位</h3>
+<p>语言史提供了人文尺度的样本。英语的大元音推移（Great Vowel Shift，大致 15 至 18 世纪）不是某个词的读法改变，而是长元音系统整体上移换位，导致今日英语拼写与读音的大面积脱节——time、house、name 的现代读法都是这场推移的产物。整个音位系统作为一个结构重排，而非逐词累加，正是 S3 所说的「显露态作为整体重组」。</p>
+<h3>大脑的皮层重组：地图被重新画过</h3>
+<p>神经科学的样本来自可塑性研究。Merzenich 等人在灵长类上的实验显示，切断或改变外周输入后，对应的体感皮层区域会被相邻区域接管，皮层地图在数周内重新划界。人类截肢者的幻肢现象与面部触摸引发手部感觉的报告，被解释为同类重组的表现。输入的强差异逼出了皮层表征的整体改画，而不是局部微调。</p>
+<p class="mat-box">边界标注：皮层重组的程度与年龄、损伤类型高度相关，且不同实验的解释仍有争论。此处只取其结构含义——强差异可触发表征系统的重新划界。</p>
+<h3>制度的危机重构：规则在断裂处被重写</h3>
+<p>经济史给出社会尺度样本。1930 年代大萧条后美国金融监管的整体重建（存款保险与证券监管体系的建立）、以及 1944 年布雷顿森林体系的确立，都是在旧秩序失效的强差异下，规则体系被整体重写而非渐进修补。这类重构的共同点是：窗口短、幅度大、且新结构会在其后数十年约束所有参与者——重组一旦完成，就成为新的 S1。</p>
+<h3>材料的屈服点：形变从可逆到不可逆</h3>
+<p>最干净的物理样本是材料的屈服。金属在小应力下发生弹性形变，撤力即复原；应力越过屈服强度后进入塑性形变，撤力也回不到原形。同一根材料，同一种施力方式，只因跨过一个阈值，其显露行为的性质就变了。这为 S3 提供了最朴素的模型：不是变得更多，而是变成另一类。</p>
+<p class="mat-box">五个样本合看，S3 的共同特征浮现：存在临界点、翻转迅速、回程不对称（滞后），且新状态自带稳定性——这正是它随后会变成新 S1 的原因。</p>
+<h3>翻转之后：新状态如何自我加固</h3>
+<p>第六个观察是关于翻转的下半场：新状态不会悬在半空，它会迅速长出自己的稳定机制。浅水湖翻转为浑浊态后，藻类遮光抑制水草生长，底泥扰动进一步释放营养盐，这套正反馈把新状态锁住——这正是恢复需要把营养盐降到比翻转时更低水平的原因。同样的逻辑在制度重构后出现：新规则一旦运行，配套的组织、职业与利益结构随之成形，把新格局固化。</p>
+<p class="mat-box">这一节把九宫格接成了闭环：S3 的产物不是永久的动荡，而是下一轮的 S1。理解这一点，才不会把重组误当成解放——重组只是换了一套需要被理解的稳定机制。</p>
+<p class="mat-sup"><span class="lab">这些材料如何支撑正文的判断：</span>五组材料给出 S3 的可测特征：临界（湖泊营养阈值、材料屈服点）、整体性（元音推移、皮层地图、制度体系）、不可逆或难逆（生态滞后、塑性形变）、以及重组后的再稳定（新制度成为新常规）。用记号写，S=F(D,E) 在此格出现分岔：同一 D 的连续增长，越过阈值后把 S 送入另一个吸引域。理解 S3 的关键不是变化的幅度，而是它是否跨过了那个使回程失效的点。还有一点值得单独记下：本格的五个样本分属物理、生物、语言、神经与制度，彼此没有共同的物质机制，却共享同一套形式特征。这种跨域的形式重现，正是把它当作一个格位而非一堆巧合来处理的理由——判断一个系统是否正在逼近 S3，看的不是它属于哪个领域，而是它是否已显出临界、滞后与波动放大这三项指征。</p>
+<p class="mat-no"><span class="lab">本篇不主张什么：</span>本篇不主张五个案例有共同的物理机制，也不主张所有翻转都不可逆（部分生态系统可通过强干预恢复）。这里只锚定一组可观测的共同特征，并特别标出「临界慢化」这类预警信号确有实证支持，但预测精度仍有限。</p>
+<p class="mat-ref">出处：Scheffer et al., Nature 2001（状态转换与滞后）；临界慢化预警信号研究；英语大元音推移的历史语言学通说；Merzenich 等皮层可塑性实验；1930s 美国金融监管重建与 1944 布雷顿森林体系史实；材料力学屈服现象。归并解读为作者建模。</p>
+</div>
+<div class="endbox">
+  <p>你从不曾旁观世界——你一直在世界之内，与它一同被显露着，包括那个最后才亮起的"我"。</p>
+  <a class="btn solid" href="/column/ontology-grid/">← 回到九格全图</a>
+  <a class="btn ghost" href="/column/ontology-grid/s2/">重读上一格 · S2 显露·模态维</a>
+</div>
+
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">延伸参考文献 · Further References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">下列文献为本文所涉思想脉络的原典与代表性研究，供读者对读与查证；与文中已引文献不重复，本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+    <li style="margin:0 0 9px;padding-left:6px">Norbert Wiener, Cybernetics, Cambridge, MA: MIT Press, 1948.</li>
+    <li style="margin:0 0 9px;padding-left:6px">W. Ross Ashby, An Introduction to Cybernetics, London: Chapman & Hall, 1956（必要多样性定律）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Heinz von Foerster, Understanding Understanding: Essays on Cybernetics and Cognition, New York: Springer, 2003（二阶控制论）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Niklas Luhmann, Soziale Systeme (1984)；英译 Social Systems, Stanford University Press, 1995。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Mario Bunge, Treatise on Basic Philosophy, Vol. 3: Ontology I — The Furniture of the World, Dordrecht: Reidel, 1977.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Thomas R. Gruber, "A Translation Approach to Portable Ontology Specifications", Knowledge Acquisition, Vol. 5, No. 2 (1993).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Nicola Guarino (ed.), Formal Ontology in Information Systems, Amsterdam: IOS Press, 1998.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Barry Smith, "Beyond Concepts: Ontology as Reality Representation", Proceedings of FOIS 2004.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Manuel DeLanda, Intensive Science and Virtual Philosophy, London: Continuum, 2002.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Manuel DeLanda, A New Philosophy of Society: Assemblage Theory and Social Complexity, London: Continuum, 2006.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Bruno Latour, We Have Never Been Modern, Cambridge, MA: Harvard University Press, 1993；中译《我们从未现代过》，刘鹏、安涅思译，苏州大学出版社，2010。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Bruno Latour, Reassembling the Social, Oxford University Press, 2005.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Karen Barad, Meeting the Universe Halfway, Durham: Duke University Press, 2007（能动实在论与内-作用）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Nelson Goodman, Ways of Worldmaking, Indianapolis: Hackett, 1978；中译《构造世界的多种方式》，姬志闯译，上海译文出版社，2008。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Ian Hacking, The Social Construction of What?, Cambridge, MA: Harvard University Press, 1999.</li>
+    <li style="margin:0 0 9px;padding-left:6px">F. William Lawvere & Stephen Schanuel, Conceptual Mathematics: A First Introduction to Categories, Cambridge University Press, 1997.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Saunders Mac Lane, Categories for the Working Mathematician, New York: Springer, 1971.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Kurt Gödel, "Über formal unentscheidbare Sätze der Principia Mathematica und verwandter Systeme I" (1931).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Claude E. Shannon, "A Mathematical Theory of Communication", Bell System Technical Journal, Vol. 27 (1948).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Karl Friston, "The Free-Energy Principle: A Unified Brain Theory?", Nature Reviews Neuroscience, Vol. 11 (2010).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Andy Clark & David Chalmers, "The Extended Mind", Analysis, Vol. 58, No. 1 (1998).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Michael Polanyi, The Tacit Dimension, London: Routledge, 1966；中译《默会的维度》，许泽民译，上海人民出版社，2000。</li>
+  </ol>
+</section>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  <div class="wrap">SDE Universes · 德麦国际 · 王德生 著 · SDE三维九宫 · 价值维（S3） · <a href="/browse/">返回首页</a></div>
+</footer>
+
+
+<!-- SDE 陪读浮层 -->
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

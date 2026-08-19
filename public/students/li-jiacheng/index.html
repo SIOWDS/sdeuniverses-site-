@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>李佳城 · 学员专栏 | SDE Universes</title>
+<meta name="description" content="李佳城 · 教育学硕士、基督教传道人，《人生的真谛》合作者之一 · SDE 学员专栏 · Students' Column, SDE Universes">
+<style>
+:root{
+  --yuebai:#E9EBF2;      /* 月白 · 底 */
+  --xuan:#F6F7FB;        /* 素宣 · 面 */
+  --dai:#26304A;         /* 黛 · 字 */
+  --yuan:#5B6580;        /* 远山 · 次字 */
+  --ou:#8E5C74;          /* 藕荷 · 唯一暖色 */
+  --line:rgba(38,48,74,0.16);
+  --serif:"Songti SC","Noto Serif SC",Georgia,"Source Han Serif SC",serif;
+  --sans:"PingFang SC","Noto Sans SC","Hiragino Sans GB",-apple-system,"Helvetica Neue",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(142,92,116,0.20)}
+html{scroll-behavior:smooth}
+body{
+  color:var(--dai);font-family:var(--serif);line-height:1.95;
+  background:
+    radial-gradient(1100px 720px at 8% -10%, rgba(142,92,116,0.075), transparent 60%),
+    radial-gradient(980px 820px at 106% 6%, rgba(63,110,134,0.070), transparent 58%),
+    linear-gradient(180deg,#F2F3F8 0%, var(--yuebai) 46%, #E2E5EE 100%);
+  background-attachment:fixed;
+}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9998;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  background-size:160px 160px;opacity:0.026;mix-blend-mode:multiply}
+body.zh .en-only{display:none!important}
+body.en .zh-only{display:none!important}
+a{color:var(--ou);text-decoration:none}
+a:focus-visible{outline:2px solid var(--ou);outline-offset:3px;border-radius:2px}
+
+/* 导航 */
+nav{position:sticky;top:0;z-index:20;background:rgba(240,242,247,0.90);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
+nav .w{max-width:940px;margin:0 auto;padding:13px 26px;display:flex;justify-content:space-between;align-items:center}
+nav a{color:var(--dai);font-family:var(--sans);font-size:12.5px;letter-spacing:0.16em}
+nav a:hover{color:var(--ou)}
+.nav-right{display:flex;align-items:center;gap:16px}
+.lang-toggle{display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.lang-btn{background:transparent;border:none;color:var(--yuan);font-family:var(--sans);font-size:11.5px;letter-spacing:0.14em;padding:5px 12px;cursor:pointer}
+.lang-btn.active{background:var(--dai);color:#F3F4F8}
+
+/* 签名线：一段实线走完这一轮，虚线走出这一轮，末端还有一笔没有结清 */
+.eyebrow{max-width:940px;margin:0 auto;padding:0 26px;display:flex;align-items:center;gap:15px}
+.eyebrow .lbl{font-family:var(--sans);font-size:11px;letter-spacing:0.42em;color:var(--ou);white-space:nowrap;text-transform:uppercase}
+.eyebrow .solid{flex:0 0 76px;height:1px;background:var(--dai);opacity:0.5}
+.eyebrow .dash{flex:1;height:1px;opacity:0.42;
+  background-image:linear-gradient(90deg,var(--dai) 0 7px,transparent 7px 16px);background-size:16px 1px;background-repeat:repeat-x;
+  transform-origin:left center;animation:carry 1.5s cubic-bezier(.22,.7,.25,1) both}
+.eyebrow .dot{flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:var(--ou);animation:settle 0.7s ease-out 1.15s both}
+@keyframes carry{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes settle{from{opacity:0;transform:scale(0.3)}to{opacity:1;transform:scale(1)}}
+
+/* 头部 */
+.hero{max-width:940px;margin:0 auto;padding:54px 26px 6px;display:grid;grid-template-columns:1fr 236px 46px;gap:34px;align-items:end}
+.verse{writing-mode:vertical-rl;text-orientation:upright;font-size:15px;letter-spacing:0.32em;color:var(--yuan);
+  height:272px;justify-self:center;border-left:1px solid var(--line);padding-left:14px}
+.verse-en{font-size:14.5px;letter-spacing:0.12em;color:var(--yuan);margin-top:15px;font-style:italic}
+body.en .hero{grid-template-columns:1fr 236px}
+.name{font-size:clamp(36px,6.2vw,56px);font-weight:500;letter-spacing:0.2em;line-height:1.25;color:var(--dai);text-indent:0.2em}
+.credential{font-family:var(--sans);font-size:12.5px;letter-spacing:0.16em;color:var(--yuan);margin-top:16px}
+.role{font-family:var(--sans);font-size:11px;letter-spacing:0.36em;color:var(--ou);margin-top:9px;text-transform:uppercase}
+.gate{position:relative;width:236px;justify-self:end}
+.gate .frame{position:relative;height:272px;border-radius:118px 118px 6px 6px;overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 26px 54px rgba(38,48,74,0.16)}
+.gate .frame img{width:100%;height:100%;object-fit:cover;object-position:center 18%;display:block}
+.gate:after{content:"";position:absolute;left:-9px;right:-9px;top:-9px;bottom:-9px;border:1px solid rgba(142,92,116,0.32);
+  border-radius:127px 127px 10px 10px;pointer-events:none}
+
+/* 正文 */
+.prose{max-width:940px;margin:0 auto;padding:20px 26px 4px}
+.prose p{max-width:720px;font-size:16.5px;line-height:2.08;color:#323C58;margin-top:18px}
+.prose p:first-child{margin-top:22px}
+.prose b{font-weight:600;color:var(--dai);background:linear-gradient(180deg,transparent 74%,rgba(142,92,116,0.20) 74%)}
+
+/* 著作 */
+.works{max-width:940px;margin:0 auto;padding:16px 26px 10px}
+.book{display:flex;gap:26px;align-items:flex-start;background:linear-gradient(160deg,var(--xuan),rgba(255,255,255,0.55));
+  border:1px solid var(--line);border-radius:3px;padding:26px 28px;margin-top:22px;transition:transform .2s ease, box-shadow .2s ease}
+.book:hover{transform:translateY(-2px);box-shadow:0 20px 44px rgba(38,48,74,0.12)}
+.book img{width:112px;flex:0 0 112px;border-radius:2px;box-shadow:0 10px 26px rgba(38,48,74,0.22);display:block}
+.book .no{font-family:var(--sans);font-size:11px;letter-spacing:0.3em;color:var(--ou);text-transform:uppercase}
+.book h2{font-size:24px;font-weight:600;letter-spacing:0.1em;margin-top:9px}
+.book h2 .t2{font-size:0.66em;font-weight:400;color:var(--yuan);letter-spacing:0.06em}
+.book h2 a{color:var(--dai)}
+.book h2 a:hover{color:var(--ou)}
+.book .sub{font-size:15px;color:var(--yuan);margin-top:8px;line-height:1.85}
+.book .motif{font-size:15px;color:#323C58;margin-top:13px;line-height:1.95;border-left:2px solid rgba(142,92,116,0.5);padding-left:14px}
+.book .meta{font-family:var(--sans);font-size:11.5px;letter-spacing:0.08em;color:var(--yuan);margin-top:14px}
+.book .links{font-family:var(--sans);font-size:12.5px;letter-spacing:0.06em;margin-top:12px;display:flex;flex-wrap:wrap;gap:8px 16px}
+.book .links a{border-bottom:1px solid rgba(142,92,116,0.4);padding-bottom:1px}
+.book .links a:hover{color:var(--dai);border-color:var(--dai)}
+
+/* 还有一笔 */
+.pending{max-width:940px;margin:0 auto;padding:14px 26px 4px}
+.pending .box{border:1px dashed rgba(38,48,74,0.30);border-radius:3px;padding:26px 28px;background:rgba(255,255,255,0.30)}
+.pending p{font-size:15px;color:var(--yuan);line-height:1.95;max-width:660px}
+
+.back{text-align:center;margin:44px auto 0}
+.back a{font-family:var(--sans);font-size:12.5px;letter-spacing:0.16em;color:var(--dai);border-bottom:1px solid var(--line);padding-bottom:3px}
+.back a:hover{color:var(--ou);border-color:var(--ou)}
+footer{border-top:1px solid var(--line);margin-top:56px;padding:30px 26px;text-align:center;color:var(--yuan);font-family:var(--sans);font-size:11.5px;letter-spacing:0.1em}
+footer a{color:var(--ou)}
+
+@media(max-width:760px){
+  .hero{grid-template-columns:1fr;gap:24px;padding-top:38px;justify-items:center;text-align:center}
+  .gate{order:-1;width:186px;justify-self:center}
+  .ident{order:0}
+  .verse{order:1}
+  .gate .frame{height:214px;border-radius:93px 93px 6px 6px}
+  .gate:after{border-radius:102px 102px 10px 10px}
+  .verse{writing-mode:horizontal-tb;height:auto;border-left:none;padding-left:0;border-top:1px solid var(--line);padding-top:14px;letter-spacing:0.2em;font-size:14.5px}
+  .credential{font-size:12px;letter-spacing:0.1em}
+  .name{text-indent:0}
+  .prose p{margin-left:auto;margin-right:auto}
+  .book{flex-direction:column;align-items:center;text-align:center}
+  .book .motif{border-left:none;border-top:2px solid rgba(142,92,116,0.5);padding-left:0;padding-top:12px}
+  .book .links{justify-content:center}
+  .eyebrow .lbl{letter-spacing:0.3em}
+}
+@media(prefers-reduced-motion:reduce){
+  .eyebrow .dash,.eyebrow .dot{animation:none}
+  .book{transition:none}
+  html{scroll-behavior:auto}
+}
+</style></head>
+<body class="zh">
+<nav><div class="w">
+  <a href="/browse/">SDE Universes</a>
+  <div class="nav-right">
+    <a href="/students/"><span class="zh-only">← 学员专栏</span><span class="en-only">← Students</span></a>
+    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+  </div>
+</div></nav>
+
+<div class="eyebrow" style="padding-top:34px">
+  <span class="lbl zh-only">其 人</span><span class="lbl en-only">Who he is</span>
+  <i class="solid"></i><i class="dash"></i><b class="dot"></b>
+</div>
+
+<header class="hero">
+  <div class="ident">
+    <h1 class="name">李佳城</h1>
+    <div class="credential zh-only">教育学硕士 · 基督教传道人 · 《人生的真谛》合作者之一</div>
+    <div class="credential en-only">Li Jiacheng · M.Ed. · Christian minister · Co-author of <i>The True Meaning of Life</i></div>
+    <div class="role zh-only">SDE 学员 · 教育 · 牧养 · 生命关怀</div>
+    <div class="role en-only">SDE trainee · Education · Ministry · Care of persons</div>
+    <div class="verse-en en-only">What this round cannot settle still counts</div>
+  </div>
+  <div class="gate">
+    <div class="frame"><img src="/students/li-jiacheng/lijiacheng.jpg" alt="李佳城"></div>
+  </div>
+  <div class="verse zh-only">这一轮结清不了的，都还算数</div>
+</header>
+
+<div class="eyebrow" style="margin-top:46px">
+  <span class="lbl zh-only">简 述</span><span class="lbl en-only">In brief</span>
+  <i class="solid"></i><i class="dash"></i><b class="dot"></b>
+</div>
+<section class="prose">
+  <p class="zh-only">长期从事教育、牧养与生命关怀相关工作。多年来，他持续扎根真实的教育与家庭现场，关注不同年龄阶段的人在成长、关系与信仰中的内在需要，尤其重视家庭对生命塑造的基础性作用。他认为，教育并非知识与规范的简单传递，而是<b>一个人被理解、被引导，并在真实关系与生活中逐渐长起来</b>的过程。</p>
+  <p class="zh-only">在系统学习并实践 SDE 发生学体系的过程中，他把多年的教育与牧养经验纳入更清晰的结构，持续探索教育、家庭与生命成长背后的<b>发生机制</b>。其为人朴实，重实践而少言说，致力于让思想重新进入真实生活，并在具体关系中承担责任。</p>
+  <p class="en-only">A long-time worker in education, pastoral ministry and the care of persons. For years he has stayed close to real classrooms and real families, attending to what people of different ages need as they grow — in their relationships and in their faith — and holding that the family is the ground on which a life is shaped. Education, in his view, is not the plain transfer of knowledge and norms, but the slow growth of <b>a person who is understood, guided, and formed inside real relationships and ordinary life</b>.</p>
+  <p class="en-only">Studying and practising the SDE framework has let him bring years of educational and pastoral experience into a clearer structure, and he keeps looking for the <b>mechanisms of genesis</b> beneath education, family and the growth of a life. Plain in manner, longer on practice than on talk, he works to let thought re-enter real life and to carry responsibility inside concrete relationships.</p>
+</section>
+
+<div class="eyebrow" style="margin-top:46px">
+  <span class="lbl zh-only">著 作</span><span class="lbl en-only">Books</span>
+  <i class="solid"></i><i class="dash"></i><b class="dot"></b>
+</div>
+<section class="works">
+  <article class="book">
+    <img src="/books/m/95/cover.jpg" alt="《沟通初探》封面">
+    <div>
+      <div class="no zh-only">德麦国际出版社 · 专著第 95 号</div>
+      <div class="no en-only">Demai International Press · Monograph No. 95</div>
+      <h2><a href="/books/m/95/">沟通初探<span class="t2 zh-only">　当轮结清的那一刻</span><span class="t2 en-only">　A First Inquiry into Communication</span></a></h2>
+      <p class="sub zh-only">九种把沟通结算点后移的办法 · 四编十章</p>
+      <p class="sub en-only">Nine ways of moving the settlement point of a conversation later · Four parts, ten chapters</p>
+      <p class="motif zh-only">沟通的账不在当轮结清。原话与原人退场以后，还有什么必须被算进去，才是这次沟通真正发生过的部分。</p>
+      <p class="motif en-only">The account of a conversation is not settled in the round it happens. What still has to be counted after the original words and the original speaker have left is what really took place.</p>
+      <div class="meta">228 页 · 约 20 万汉字 · ISBN 979-8-90690-054-8</div>
+      <div class="links">
+        <a href="/students/li-jiacheng/communication-first-inquiry/"><span class="zh-only">学员专栏页</span><span class="en-only">Column page</span></a>
+        <a href="/books/m/95/text/"><span class="zh-only">网页版全书</span><span class="en-only">Read on the web</span></a>
+        <a href="/books/m/95/read.html"><span class="zh-only">在线翻阅</span><span class="en-only">Page-turning reader</span></a>
+        <a href="/books/m/95/communication-first-inquiry.pdf"><span class="zh-only">下载 PDF</span><span class="en-only">Download PDF</span></a>
+      </div>
+    </div>
+  </article>
+
+  <article class="book">
+    <div>
+      <div class="no zh-only">德麦国际出版社 · 专著第 39 号 · 合作者之一</div>
+      <div class="no en-only">Demai International Press · Monograph No. 39 · Co-author</div>
+      <h2><a href="/books/m/39/">人生的真谛<span class="en-only">　The True Meaning of Life</span></a></h2>
+      <p class="sub zh-only">与王德生、王雅丽合著 · 2026 年 1 月 · ISBN 978-1-970820-26-3</p>
+      <p class="sub en-only">With Wang Desheng and Wang Yali · January 2026 · ISBN 978-1-970820-26-3</p>
+    </div>
+  </article>
+</section>
+
+<div class="eyebrow" style="margin-top:46px">
+  <span class="lbl zh-only">还 有 一 笔</span><span class="lbl en-only">Still to come</span>
+  <i class="solid"></i><i class="dash"></i><b class="dot"></b>
+</div>
+<section class="pending">
+  <div class="box">
+    <p class="zh-only">教育与牧养的现场每天都在结账，而账目多半在当场之外。这一栏留给后续的文章：借一双「事物如何发生」的眼睛，在教育、家庭与生命成长的本行语言里落笔，通过合宪性审读后署名发表于此。</p>
+    <p class="en-only">Classrooms and pastoral work settle their accounts every day, and most of the account falls outside the room. This section is kept for the writing still to come: work done with an eye trained on how things come to be, written in the working language of education, family and the growth of a life, and published here once it passes its constitutionality review.</p>
+  </div>
+  <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
+</section>
+
+<footer>
+  <span class="zh-only">© 德麦国际 Demai International · 学员专栏 · <a href="/browse/">sdeuniverses.com</a></span>
+  <span class="en-only">© Demai International · Students’ Column · <a href="/browse/">sdeuniverses.com</a></span>
+</footer>
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+</script>
+
+<script>window.WDS_READ={};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body></html>

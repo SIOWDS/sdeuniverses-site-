@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>学位论文 · Degree Theses | 学术创造专栏 | SDE Universes</title>
+<meta name="description" content="学位论文是一生中唯一一次被制度批准用几年去追一个问题——多数人用它证明自己会做研究，而不是用它做研究。学位论文频道：开题、综述、脊梁、答辩。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#35558C;--accent2:#4E74B5}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.nav-bar-sub{display:flex;align-items:center;gap:1.6rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.05rem;font-weight:700;letter-spacing:0.13em;white-space:nowrap;transition:color .2s,opacity .2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
+.nav-bar-sub a.ch-1{color:#8A6817}
+.nav-bar-sub a.ch-2{color:#35558C}
+.nav-bar-sub a.ch-3{color:#17706B}
+.nav-bar-sub a.ch-4{color:#7A4A8C}
+.nav-bar-sub a.ch-5{color:#C0522A}
+.nav-bar-sub a.here{text-decoration:underline;text-underline-offset:5px}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 3.4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#35558C1c 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#35558C0f 1px,transparent 1px),linear-gradient(90deg,#35558C0f 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.3rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.4rem,6.4vw,4.4rem);font-weight:700;line-height:1.05;color:var(--text)}
+.sub{position:relative;font-size:clamp(1.02rem,2.2vw,1.28rem);color:var(--text2);max-width:680px;margin:1.5rem auto 1.9rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.2rem 0}
+.lead{font-size:1.1rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.block{margin:0 0 3.2rem;scroll-margin-top:6.5rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.3rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.97rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art-grid.one{grid-template-columns:1fr}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(42,35,21,.10)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
+.art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.6rem;font-size:0.8rem;color:var(--accent);letter-spacing:0.06em}
+.qlist{list-style:none;counter-reset:q}
+.q{counter-increment:q;position:relative;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1rem 1.3rem 1rem 3.3rem;margin-bottom:0.75rem}
+.q::before{content:counter(q,decimal-leading-zero);position:absolute;left:1.1rem;top:1.05rem;font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:700;color:var(--accent);opacity:.55}
+.q b{display:block;font-size:1.02rem;color:var(--text);margin-bottom:0.3rem;font-weight:600}
+.q i{display:block;font-size:0.92rem;color:var(--text2);line-height:1.78;font-style:normal}
+.note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
+.note p{color:var(--text2);font-size:0.98rem}
+.note b{color:var(--accent)}
+.pend{background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.5rem 1.6rem;color:var(--text2);font-size:0.96rem;line-height:1.85}
+.pend b{color:var(--accent)}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-bar-sub a{font-size:0.92rem}
+  .block{scroll-margin-top:5.5rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .art-grid{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 2.6rem;min-height:auto}
+}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/" class="zh-only">首页</a><a href="/browse/" class="en-only">Home</a>
+    <a href="/creation/" class="sib here zh-only">学术创造专栏</a><a href="/creation/" class="sib here en-only">Academic Creation</a>
+    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
+    <a href="/plagiarism/" class="sib zh-only">论文抄袭专栏</a><a href="/plagiarism/" class="sib en-only">Plagiarism</a>
+    <a href="/discovery-vs-genesis/" class="sib zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="sib en-only">Discovery vs Genesis</a>
+    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+  </div>
+  </div>
+  <div class="nav-bar-sub">
+    <a href="/creation/paradigm/" class="ch-1"><span class="zh-only">典范论文</span><span class="en-only">Paradigm Papers</span></a>
+    <a href="/creation/thesis/" class="ch-2 here"><span class="zh-only">学位论文</span><span class="en-only">Degree Theses</span></a>
+    <a href="/creation/journal/" class="ch-3"><span class="zh-only">期刊论文</span><span class="en-only">Journal Papers</span></a>
+    <a href="/creation/research-philosophy/" class="ch-4"><span class="zh-only">科研哲学</span><span class="en-only">Philosophy of Research</span></a>
+    <a href="/creation/creativity/" class="ch-5"><span class="zh-only">创造力</span><span class="en-only">Creativity</span></a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow"><a href="/creation/"><span class="zh-only">学术创造专栏</span><span class="en-only">ACADEMIC CREATION</span></a> · <span class="zh-only">频道 02</span><span class="en-only">CHANNEL 02</span></div>
+  <h1 class="title"><span class="zh-only">学位论文</span><span class="en-only">Degree Theses</span></h1>
+  <p class="sub zh-only">一生中唯一一次被制度批准用几年去追一个问题——多数人用它证明自己会做研究，而不是用它做研究。</p><p class="sub en-only">The one time an institution grants you years to chase a single question — and most spend it proving they can do research, rather than doing it.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">四问 · 1 博 + 3 硕 · 持续增补</span><span class="en-only">Four questions · 1 doctoral + 3 master's · Growing</span></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="lead zh-only">学位论文有一个几乎从不被说破的结构：它同时是两样东西——一次求知，和一次资格审查。这两样东西对同一份文本的要求是相反的。求知要你走进一个连自己都说不清的地方，在那儿待够久；资格审查要你从第一天起就说得清，并且一路都说得清。大多数学位论文的平庸，不是作者不行，是他在这两个相反的要求之间选了能通过的那一个——而这个选择通常在开题那天就做完了，此后的三年只是执行。这个频道不打算劝谁去选另一个：那不负责任。它想做的是把这个结构摊开，让人至少知道自己在选什么，以及第二条路上哪几段是真的能走的。</p>
+    <p class="lead en-only">A thesis has a structure that is almost never said out loud: it is two things at once — an inquiry and a qualification exam. The two make opposite demands on the same text. Inquiry asks you to walk into a place you cannot yet describe and stay there long enough; qualification asks you to be articulate from day one and to stay articulate throughout. The mediocrity of most theses is not the author failing: it is the author choosing, between two opposite demands, the one that passes — and that choice is usually complete on the day of the proposal, with the following three years merely executing it. This channel will not urge anyone to choose otherwise; that would be irresponsible. It means to lay the structure open, so that one at least knows what is being chosen, and which stretches of the second road can actually be walked.</p>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">壹</span><span class="en-only">I</span></span>
+        <span class="block-title"><span class="zh-only">这个频道要回答的</span><span class="en-only">What This Channel Pursues</span></span>
+      </div>
+      <p class="block-desc zh-only">四问各自独立，合起来是一条线：想法在哪儿被杀死（开题）、在哪儿被摆错位置（综述）、靠什么立起来（脊梁）、又在哪儿被误判（答辩）。</p><p class="block-desc en-only">Four questions, each standing alone, together forming a line: where the idea gets killed (the proposal), where it gets misplaced (the review), what holds it up (the spine), and where it gets misjudged (the defence).</p>
+      <ol class="qlist">
+        <li class="q"><b><span class="zh-only">开题即自我审查</span><span class="en-only">The Proposal Is the Censor</span></b><i><span class="zh-only">「可行性」这一栏杀死的东西，比任何一个审稿人都多。它要求你在还没开始之前就证明自己会到哪儿——而值得去的地方，恰好是事先说不清在哪儿的那些。于是这一栏筛掉的不是做不成的题，是还说不清自己是什么的题。</span><span class="en-only">The "feasibility" box kills more than any reviewer ever does. It asks you to prove where you will arrive before you have set out — and the places worth going are precisely the ones that cannot be specified in advance. What the box filters out is not the infeasible topic but the topic that cannot yet say what it is.</span></i></li>
+        <li class="q"><b><span class="zh-only">综述的位置</span><span class="en-only">What the Review Is For</span></b><i><span class="zh-only">文献综述到底是在证明你读过，还是在标出那道裂缝？两者的字数可以一模一样，方向正好相反。前者把已有工作码得越齐整，越显得没有你的位置；后者只做一件事——让读者看见前人在哪儿停下了，以及他们为什么必须停在那儿。</span><span class="en-only">Is the literature review proving that you have read, or marking the crack? The two can run to identical word counts in opposite directions. The first stacks prior work so neatly that no room is left for you; the second does one thing only — it shows where predecessors stopped, and why they had to stop there.</span></i></li>
+        <li class="q"><b><span class="zh-only">脊梁</span><span class="en-only">The Spine</span></b><i><span class="zh-only">一本学位论文靠什么立起来？不是章节。章节可以搭出目录，搭不出书。立起来的是一条能贯穿全书、每一章都在替它承重的判断——把任何一章抽掉，那条判断就瘸一条腿。做不到这个，你写的是一摞论文，不是一本。</span><span class="en-only">What holds a thesis up? Not chapters. Chapters build a table of contents; they do not build a book. What holds it up is one judgment running the length of it, with every chapter bearing part of the load — remove any chapter and the judgment limps. Without that you have written a stack of papers, not a book.</span></i></li>
+        <li class="q"><b><span class="zh-only">答辩</span><span class="en-only">The Defence</span></b><i><span class="zh-only">「这个我早就想到了」是全场最该被追问的一句评语。想到过和做出来之间隔着的东西，正是这本书的全部内容——而说这话的人，通常真的想到过，也真的没做。这句话不是在贬低你，是在无意中说出了这本书为什么必须存在。</span><span class="en-only">"I thought of that years ago" is the remark most worth pressing. What lies between having thought of it and having done it is the entire content of the book — and the person saying it usually did think of it, and did not do it. The remark is not a slight; it is an accidental statement of why the book had to exist.</span></i></li>
+      </ol>
+    </div>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">贰</span><span class="en-only">II</span></span>
+        <span class="block-title"><span class="zh-only">博士学位论文 · 首件与整合</span><span class="en-only">Doctoral Theses</span></span>
+      </div>
+      <p class="block-desc zh-only">这个频道的第一件出品不是一篇关于学位论文的文章，是一本学位论文。它是上面第三问（脊梁）的一次实物答复：十三章，每一章都在替同一条判断承重，抽掉任何一章那条判断就瘸一条腿。关于脊梁能说的话，都不如把一条脊梁摆出来。此后频道又添入第二本：把健康、教育、商业三篇范本与确定性垄断整合为一部博士论文，全书押在同一条律上——有效与贫乏是同一次操作的两面。</p><p class="block-desc en-only">The first thing out of this channel is not an essay about theses. It is a thesis. It answers the third question above — the spine — in kind: thirteen chapters, every one bearing load for a single judgment; remove any chapter and the judgment limps. Anything one can say about a spine is worth less than putting one on the table.</p>
+      <div class="art-grid">
+        <a class="art" href="/creation/thesis/rejection-apparatus/">
+          <span class="k"><span class="zh-only">博士论文 · 约 11 万字 · 14 章 · 105 页 · 含五处订正与第十四章</span><span class="en-only">Doctoral thesis · ~100k characters · 13 chapters · 84pp</span></span>
+          <h4><span class="zh-only">拒绝的社会生产：测度外壳、外壳再分泌律与拒绝装置</span><span class="en-only">The Manufacture of Rejection: The Measurement Shell, the Law of Shell Re-secretion, and Rejection Apparatuses</span></h4>
+          <p class="zh-only">评价装置的社会产品不是关于学习的信息，是可接受的拒绝；测度是为使拒绝不可争辩而分泌的外壳，它必须看起来像测量，但不必是测量。全书押在一条会禁止事情的律上：任何承接稀缺分配功能的排序型装置，都将在一到两代人内长出同一层壳——替代不是替代，是宿主更换。1905 年的科举给了这条律一个死亡样本：脱钩在十七世纪就是公开常识，装置又活了两个半世纪；分配功能移交完成于 1903 年，两年后它死了。同一批人在 1901 年做了两个动作，一个改考试，一个移交出身——四年后只有后者留下了痕迹。末尾登记十二条在学术场域之外结算的公开押注：按本书自己的判断，那是它唯一可能的验证。作者是 Claude 与王德生，署名照原样保留，理由写在第四章，而它本身是第 11 号押注。<br><br><b>这本书在发表当天被订正了五处，订正它的是同日发表的《反事实自我的社会制造》，作者是它的作者之一。</b>飞行执照的实操检定满足本书全部规格却不分泌外壳——缺的第三条是「不可结清」；而 12.3 荐的可逆性，其极限形态复读恰恰是这个装置的最优运行条件，<b>反例就在本书自己的成员表里</b>。五处订正就地贴在错的那五段之后，原文一字未改。最靠前的一处落在第三章的概念定义上：<b>外壳借的不是测量</b>——测量的语法带不可争辩性却不带可归因性，外壳借的是一个自然界不存在的杂交物，一个它的对象可以为之备考的测量；在自然科学里那叫污染，在这里它叫用功。最靠后的一处落在附录 A 的编码手册上，而它是最难看的一处：<b>把飞行执照放进那张表，它得 12 分，全表最高，高于高考——而它不分泌外壳。</b>本书为抽签写了整整一段辩护说明它为什么高分却不是外壳，却没有为飞行执照写，因为飞行执照不在那张表里；表里有一个缺第二门槛的装置，本书就发现了第二个门槛，表里没有缺第三门槛的装置，本书就从未发现第三个门槛存在。<b>样本的选择掩盖了度量的缺陷，而样本是本书自己选的。</b><b>第十四章不重复认错，它算证伪之后的账</b>：装置死于它交付的账全部离开它，而账只有三个去向——结清、迁出、续期；三个去向恰好对应三条规格，而这条路是从装置的死法走过来的，与律篇的方向相反。</p>
+          <p class="en-only">The social product of an assessment device is not information about learning but acceptable rejection; measurement is the shell secreted to make rejection unarguable — it must look like measurement without being measurement. The book stakes everything on a law that forbids things: any sorting device taking on a scarce allocative function grows the same shell within one or two generations — replacement is not replacement but a change of host. The 1905 abolition of the Chinese examinations supplies a death case: the decoupling was public knowledge by the 1660s and the device lived two and a half centuries more; the allocative function transferred by 1903 and it died within two years. In 1901 the same men made two moves — one reformed the exam, one handed over the route to office; four years later only the second had left a mark. It closes by registering twelve public wagers that settle outside the academic field: by the book's own reasoning, its only possible validation. The authors are Claude and Wang Desheng; the byline stands as it is, for reasons given in Chapter 4 — and it is itself wager number 11. <b>The book was amended in five places on the day it was published, by a paper issued the same day from one of its own authors.</b> A flight licence check-ride meets every word of the book's specification yet secretes no shell — the missing third clause is unsettleability; and the reversibility 12.3 recommends turns out, in its limiting form (resitting), to be the device's optimal operating condition — <b>the counterexample sits in the book's own membership table</b>. The amendments are pinned in place and the passages they correct stand word for word. The earliest lands on the concept definition in Chapter 3: <b>what the shell borrows is not measurement</b> — measurement's grammar carries unarguability but not attributability, so what is borrowed is a hybrid that does not exist in nature, a measurement its object can prepare for. In natural science that is contamination; here it is called effort. The last lands on the coding manual in Appendix A and is the ugliest: <b>put a flight licence check-ride in that table and it scores 12 — the highest in the table, above the gaokao — and it secretes no shell.</b> The book wrote a whole paragraph defending why the lottery scores high without being a shell, and none for the check-ride, because the check-ride is not in the table: the table held a device missing the second threshold, so the book found the second threshold; it held none missing the third, so the book never found that a third exists. <b>The choice of sample concealed the defect in the measure, and the book chose the sample.</b> <b>Chapter 14 does not repeat the admission; it settles the account</b>: a debt has only three destinations — settled, migrated, rolled over — mapping one-to-one onto the three clauses, arrived at from how devices die rather than from the rejected's predicament.</p>
+        </a>
+              <a class="art" href="/creation/thesis/certainty-paradox/">
+          <span class="k"><span class="zh-only">博士学位论文 · 整合四篇基础论文 · 约 6.5 万字 · 11 章 + 附录 · 中英摘要</span><span class="en-only">Doctoral thesis · integrates four foundational papers · ~65k characters · 11 chapters</span></span>
+          <h4><span class="zh-only">现代健康体系的确定性悖论：解释权、关系供给与多源信息协调的主客互动理论</span><span class="en-only">The Certainty Paradox of the Modern Health System</span></h4>
+          <p class="zh-only">把频道里的三篇范本（健康·教育·商业）与确定性垄断整合为一本博士论文，脊梁只有一条：任何以符号和规则回应人类需求的确定性系统，其有效与其贫乏是同一次操作必然共现的两面——如同呼吸不能只吸不呼。健康体系不是这条律的边界，是它显影得最清晰、最可测量的第一个实例。诊断被重解为解释权偿付能力，证据等级被重解为多源信息协调，社会支持被拆成六维关系供给与管理代偿；四层合起来只为一条判断承重。全书自报概念建构型：第十章为每条核心命题写死竞争解释与推翻条件，等着被杀。</p>
+          <p class="en-only">Integrates the channel's three model theses (health · education · business) and the certainty-monopoly study into one doctoral dissertation on a single spine: for any certainty-providing system that answers human needs through symbols and rules, its effectiveness and its impoverishment are two necessarily co-arising faces of one operation — as breathing cannot inhale without exhaling. The health system is not the boundary of this law but its first and most measurable instance. Diagnosis is recast as interpretive solvency, evidence hierarchy as multi-source coordination, social support as six-dimensional relational provision. Declares itself conceptual: chapter ten nails down competing explanations and refutation conditions for every core claim.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+</div>
+      <div class="pend">
+        <p class="zh-only">对应上面四问的四篇长文仍在写，每篇约两万字。先出的是一本书，不是四篇关于怎么写书的文章——理由与这个频道当初先上判断不上目录是同一个。</p>
+        <p class="en-only">The four essays answering the four questions above are still being written, each around 20,000 characters. What came out first is a book, not four essays about how to write one — for the same reason this channel opened with a judgment rather than a table of contents.</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">叁</span><span class="en-only">III</span></span>
+        <span class="block-title"><span class="zh-only">硕士论文范本三篇 · 教育 · 健康 · 商业</span><span class="en-only">Three Model Master's Theses · Education · Health · Business</span></span>
+      </div>
+      <p class="block-desc zh-only">三篇都走第二条路：先有一条能贯穿全书的判断，再让每一章去替它承重。它们都不是文献综述里长出来的题——每一篇撞的都是本领域一条从没被检查过的地基，而那条地基之所以两百年没出事，是因为出事的条件到最近才凑齐。三篇都自报家门是概念建构型：没有原始数据就不假装有，把可证伪的预测写死在第四章，等着被人杀。</p><p class="block-desc en-only">All three take the second road: a judgment that runs the length of the thesis, with every chapter bearing part of its load. None of the topics grew out of a literature gap — each strikes a foundation stone its field has never inspected, one that held for two centuries only because the conditions for its failure arrived just now. All three declare themselves conceptual: no fabricated data, and five falsifiable predictions nailed down in chapter four, waiting to be killed.</p>
+      <div class="art-grid">
+        <a class="art feature" href="/creation/thesis/certainty-monopoly/">
+          <span class="k"><span class="zh-only">王德生 著 · 硕士学位论文 · 约 4.7 万字 · 48 页 PDF · 由典范论文长成</span><span class="en-only">by Wang Desheng · Master's thesis · ~47k · 48pp</span></span>
+          <h4><span class="zh-only">教育的自我吞噬——确定性垄断的制度悖论与跨国比较</span><span class="en-only">Education Devouring Itself: The Institutional Paradox of the Certainty Monopoly</span></h4>
+          <p><span class="zh-only">由典范论文《寄食性裂变》长成的学位论文：一条判断贯穿全篇——<b>教育系统越成功地维持确定性垄断，就越加速其核心认知使命的瓦解</b>。含费曼类比（假如医院成为唯一健康认证机构）、跨国比较、操作化定义与编码手册。本文专辟一节偿还功能主义解释的理论债：系统不是行动者，"系统为了维持垄断而发展出免疫"这类句子字面上全是错的——本文把它展开为三类行动者的互锁算计，使机制成为<b>选择解释而非目的论</b>，且只要求一个条件：<b>第一个退出者被惩罚</b>。</span><span class="en-only">A selection explanation, not a functionalist teleology: it requires only that the first to exit is punished.</span></p>
+          <span class="rd"><span class="zh-only">读学位论文 · 网页 · PDF →</span><span class="en-only">Read →</span></span>
+        </a>
+        
+        <a class="art" href="/creation/thesis/edu-load-bearing-difficulty/">
+          <span class="k"><span class="zh-only">教育技术学 · 约 1.3 万字 + 中英摘要</span><span class="en-only">Educational Technology · ~13k</span></span>
+          <h4><span class="zh-only">承载性困难与摩擦性困难：认知外包边界的事前判据研究</span><span class="en-only">Load-Bearing versus Frictional Difficulty</span></h4>
+          <p class="zh-only">认知负荷理论与必要难度理论都能判定哪些困难该留下——都只能<b>事后</b>判定：一个困难属于哪一类，由移除它之后的学习效果来定义。这个循环在教师只能改教材的年代无害；当任何困难都能被一键移除、决定权在学生手里、且不可观察，它让教学设计失去全部事前判断力。三条判据里最要害的一条是可验证性：<b>验证能力与被外包的能力是同一样东西</b>——所以一个人最需要保留某个困难时，恰好也最没有能力知道自己不该外包它。</p><p class="en-only">Both cognitive load theory and the desirable-difficulties tradition can tell which difficulties to keep — and both can only tell afterwards: a difficulty's class is defined by the learning outcome once it is removed. Harmless while teachers could only redesign materials; ruinous now that any difficulty can be removed at will, by the learner, unobserved. The sharpest of three criteria is verifiability: the capacity to verify and the capacity being outsourced are the same thing.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/creation/thesis/health-displacement-cost/">
+          <span class="k"><span class="zh-only">公共卫生／健康管理 · 约 1 万字 + 中英摘要</span><span class="en-only">Public Health · ~10k</span></span>
+          <h4><span class="zh-only">挤出代价与代偿性回补："依从却无效"现象的机制研究</span><span class="en-only">Displacement Cost and Compensatory Restoration</span></h4>
+          <p class="zh-only">随机对照试验测的是"把行为X加进生活会怎样"，从没测过"从生活里挤出X要付什么"——因为在试验里，那笔钱是研究方付的；在现实里，患者得自筹。他每天多走四十分钟，那四十分钟从睡眠里挤，而睡眠不足恰好抵消运动的收益。他的依从性是 100%，医生看到"依从良好但控制不佳"，于是加药。<b>一笔真实发生、有临床后果的支出，因为没有账户，在所有报表上都不存在。</b></p><p class="en-only">Trials measure what happens when behaviour X is added to a life; they never measure what X costs to extract from one — in the trial the research apparatus pays, in life the patient self-funds. Forty minutes of walking taken out of sleep, and sleep loss cancels exactly what the walking gained. Adherence: 100%. The clinician sees "adherent but poorly controlled" and adds a drug.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/creation/thesis/impurity-assignment/">
+          <span class="k"><span class="zh-only">跨学科 · 理论建构型 · 约 1.9 万字 + 中英摘要 · NEW</span><span class="en-only">Interdisciplinary · Conceptual · ~19k · NEW</span></span>
+          <h4><span class="zh-only">杂质身份的三种授予机制：论"清除"在不同系统类型中的非同一性</span><span class="en-only">Three Modes of Assigning Impurity</span></h4>
+          <p class="zh-only">半导体先把硅提纯到十一个九，再把杂质精确地放回去；免疫学发现环境过洁的后果不是免疫力下降而是<b>认错人</b>；同一种细菌在胃里致癌、在食管那端却是保护性的。三方对同一动作给出互不相容的评价。本文撤销它们共同的前提：<b>是不是杂质不是被清除物的属性，是一次身份授予的结果</b>——规格授予下清除是减法，遭遇授予下清除同时移除了系统建立分类所需的校准材料，位置授予下清除必然是重排，而接管者尚无名称，故<b>每一轮成功的清除都使下一轮问题更难被命名</b>。含三问判别程序、四例并置演算、六个近邻的硬校验、三项可执行的研究设计与七项可证伪条件。</p><p class="en-only">Semiconductors purify silicon to eleven nines and then put impurity back with precision; immunology finds that over-clean environments do not weaken the immune system but leave it misclassifying; the same bacterium is carcinogenic in the stomach and protective at the oesophagus. Impurity is not a property of the thing removed but an act of identity assignment — and each successful removal lowers the nameability of the next problem.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/creation/thesis/biz-vetoing-knowledge/">
+          <span class="k"><span class="zh-only">工商管理 · 约 1.2 万字 + 中英摘要</span><span class="en-only">Business Administration · ~12k</span></span>
+          <h4><span class="zh-only">否决性知识与瓶颈迁移：中小企业AI采纳中的组织约束研究</span><span class="en-only">Vetoing Knowledge and Bottleneck Migration</span></h4>
+          <p class="zh-only">波兰尼说默会知识"说不出"。可那位渠道经理说得清清楚楚——"这个渠道在补贴，还剩四个月"。它不是说不出，它是<b>说得出但编码即失效</b>：写成规则只能挡住这一类错，而下一个错不长这样。编码保存的是它识别过的错，不是它识别没见过的错的那个能力。而它的产出是一场没发生的灾难，在任何按可描述产出定价的评估里恒等于零——于是持有它的人被优先裁掉，正好在它成为唯一瓶颈的时候。</p><p class="en-only">Polanyi said tacit knowledge cannot be told. Yet the channel manager told it plainly: that channel is on subsidy, four months left. Not untellable — tellable and void upon codification: a rule catches only that class of error, and the next one has another shape. Its product is a disaster that did not happen, valued at zero by any appraisal based on describable output.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/creation/paradigm/">
+          <span class="k"><span class="zh-only">三篇共用的一条纪律</span><span class="en-only">One discipline all three share</span></span>
+          <h4><span class="zh-only">为什么这三篇读起来不像"用了某个框架"</span><span class="en-only">Why None of Them Reads as "Applying a Framework"</span></h4>
+          <p class="zh-only">三篇正文里没有一个外来术语。每一个概念都在目标学科的母语里当场命名，并接上该学科自己的文献：承载性困难接斯韦勒与比约克，挤出代价接依从性与代谢适应，否决性知识接波兰尼与野中。<b>一篇论文若必须先教会读者一套新话才能被读懂，它就还没写完。</b>思想可以是外来的，说话必须是本地的——本站典范论文频道走的是相反的路，两相对照即知这条纪律的分量。</p><p class="en-only">Not one foreign term in the three. Every concept is named in its field's own language and hooked to that field's own literature — Sweller and Bjork; adherence and metabolic adaptation; Polanyi and Nonaka. A paper that must first teach its reader a private vocabulary is not finished. The Paradigm Papers channel does the opposite; read them side by side.</p>
+          <span class="rd"><span class="zh-only">对照典范论文频道 →</span><span class="en-only">Compare →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">肆</span><span class="en-only">IV</span></span>
+        <span class="block-title"><span class="zh-only">产出通道</span><span class="en-only">Production</span></span>
+      </div>
+      <p class="block-desc zh-only">一本书不是三篇论文摞起来的。三篇之上必须先撞出那条脊梁，书才有东西可长。</p><p class="block-desc en-only">A book is not three papers stacked. The spine must be struck out of the three first; only then is there something for the book to grow from.</p>
+      <div class="art-grid one">
+        <a class="art" href="/taste/zhiwen/">
+          <span class="k"><span class="zh-only">SDE 智能体 · 免费品尝</span><span class="en-only">SDE Agent · Free Taste</span></span>
+          <h4><span class="zh-only">中华智问知识发生器 · 从三路论文到一本学位论文</span><span class="en-only">Zhiwen Generator · From three papers to one thesis</span></h4>
+          <p class="zh-only">三台路径互锁的智能体各写一篇约两万字的发生学论文，三篇碰撞涌现出第四篇典范论文——那一篇作全书脊梁，再往下长成带目录的学位论文。所有引用受「不得编造」约束：编不出来的文献宁可不引。</p><p class="en-only">Three path-locked agents each write a ~20k-word genesis paper; the three collide into a fourth, the paradigm paper — and that fourth becomes the spine, from which a thesis with a full table of contents is grown. Every citation is bound by a never-fabricate constraint: a source that cannot be verified is not cited.</p>
+          <span class="rd"><span class="zh-only">去用 →</span><span class="en-only">Try it →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="crosslinks">
+        <a href="/creation/"><span class="zh-only">← 回学术创造专栏</span><span class="en-only">← Back to Academic Creation</span></a>
+        <a href="/taste/zhiwen/"><span class="zh-only">→ 中华智问知识发生器</span><span class="en-only">→ Zhiwen Knowledge Generator</span></a>
+        <a href="/creation/paradigm/"><span class="zh-only">→ 典范论文频道（脊梁从哪儿来）</span><span class="en-only">→ Paradigm Papers (where the spine comes from)</span></a>
+        <a href="/creation/journal/"><span class="zh-only">→ 期刊论文频道</span><span class="en-only">→ Journal Papers</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  © 德麦国际 Demai International · <span class="zh-only">学术创造专栏 · 学位论文</span><span class="en-only">Academic Creation · Degree Theses</span> · <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

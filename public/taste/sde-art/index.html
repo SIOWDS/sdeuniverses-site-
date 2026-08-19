@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDE 艺术绘画智能体 · SDE Universes</title>
+<meta name="description" content="不是文生图套壳——让一个命题按发生学显露成画面。三问定 D/E/S，三视觉观点二阶碰撞出典范，近邻闸门滤掉已被占住的图式，MiniMax M3 看图按美的九宫格评分。">
+<style>
+:root{--bg:#0E1116;--bg2:#161B22;--gold:#D4B25E;--tx:#E6EDF3;--dim:#8B98A5;--line:rgba(212,178,94,.28);--ok:#3DA5A5;--bad:#C4643E}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#0B0E12,#0E1116 40%,#12161D);color:var(--tx);font:15px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+a{color:var(--gold)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+header.top{border-bottom:1px solid var(--line);background:rgba(11,14,18,.9);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+header.top .wrap{padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header.top a.home{text-decoration:none;font-weight:800;letter-spacing:.04em}
+.hero{padding:44px 0 28px;border-bottom:1px solid rgba(212,178,94,.15)}
+.hero h1{font-size:30px;margin:0 0 10px;letter-spacing:.02em}
+.hero p{color:var(--dim);margin:0 0 6px;max-width:760px}
+.hero .kicker{color:var(--gold);font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:18px 0}
+.card h2{font-size:17px;margin:0 0 4px;color:var(--gold)}
+.card .sub{color:var(--dim);font-size:13px;margin:0 0 14px}
+label{display:block;font-size:13px;color:var(--dim);margin:12px 0 5px}
+input,select,textarea{width:100%;background:#0C1015;border:1px solid rgba(212,178,94,.3);color:var(--tx);border-radius:9px;padding:9px 11px;font:14px/1.6 inherit}
+textarea{min-height:96px;resize:vertical}
+button{background:var(--gold);color:#0F0B07;border:0;border-radius:22px;padding:11px 26px;font-weight:800;font-size:15px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.ghost{background:transparent;color:var(--gold);border:1px solid var(--line)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.row>div{flex:1;min-width:180px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:6px}
+.mode{background:#0C1015;border:1px solid rgba(212,178,94,.22);border-radius:12px;padding:14px 15px;cursor:pointer;transition:border-color .15s,transform .15s}
+.mode:hover{transform:translateY(-2px)}
+.mode.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.mode b{display:block;color:var(--gold);font-size:15px;margin-bottom:4px}
+.mode span{color:var(--dim);font-size:12.5px;line-height:1.6}
+.stat{font-size:13.5px;color:var(--dim);margin:12px 0 0;min-height:22px}
+.step{display:flex;gap:9px;align-items:center;font-size:13px;color:var(--dim);padding:5px 0}
+.step i{width:20px;height:20px;border-radius:50%;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;flex:0 0 auto}
+.step.run i{border-color:var(--gold);color:var(--gold);animation:pulse 1.1s infinite}
+.step.done i{background:var(--ok);border-color:var(--ok);color:#04181A}
+.step.fail i{background:var(--bad);border-color:var(--bad);color:#1a0904}
+@keyframes pulse{50%{opacity:.35}}
+.pane{display:none}
+.pane.on{display:block}
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px}
+.shot{background:#0C1015;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.shot img{width:100%;display:block;background:#05070A}
+.shot .cap{padding:10px 12px;font-size:12.5px;color:var(--dim)}
+.b9{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.b9 .g{background:#0C1015;border:1px solid rgba(212,178,94,.2);border-radius:9px;padding:9px 10px;text-align:center}
+.b9 .g b{display:block;font-size:12.5px;color:var(--dim);font-weight:600}
+.b9 .g u{display:block;text-decoration:none;font-size:19px;font-weight:800;color:var(--gold);margin-top:2px}
+.b9 .g.low u{color:var(--bad)}
+.out{white-space:pre-wrap;background:#0C1015;border:1px solid var(--line);border-radius:11px;padding:16px 18px;font-size:14.5px;margin-top:12px;max-height:520px;overflow:auto}
+.tag{display:inline-block;font-size:11.5px;border:1px solid var(--line);color:var(--dim);border-radius:20px;padding:2px 10px;margin:0 6px 6px 0}
+.tag.hit{border-color:var(--bad);color:var(--bad)}
+.tag.pass{border-color:var(--ok);color:var(--ok)}
+.warn{background:rgba(196,100,62,.12);border:1px solid rgba(196,100,62,.4);border-radius:10px;padding:11px 14px;font-size:13.5px;color:#E9B79E;margin:12px 0}
+.note{background:rgba(61,165,165,.09);border:1px solid rgba(61,165,165,.32);border-radius:10px;padding:11px 14px;font-size:13.5px;color:#9ED8D8;margin:12px 0}
+footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:26px 0;text-align:center}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a href="/browse/" class="home" style="color:var(--gold)">SDE Universes</a>
+  <a href="/taste/" style="font-size:13.5px">← 免费品尝</a>
+  <span style="flex:1"></span>
+  <span style="font-size:12.5px;color:var(--dim)">基底：MiniMax（M3 思考与看图 · image-01 出图） · <span id="verTag">产线 v—</span></span>
+</div></header>
+
+<div class="wrap">
+
+<section class="hero">
+  <div class="kicker">品尝系列 · 其十</div>
+  <h1>🎨 SDE 艺术绘画智能体</h1>
+  <p><b>不是文生图套壳。</b>依王德生《SDE 艺术论——幸福律与三号位发生》第二十三章：<b>绘画＝主体性在幸福律运行中的空间铺展形态发生</b>——把一条观看的路径冻结进平面，等每一双目光来将它解冻重演。</p>
+  <p style="color:#C9A34E"><b>画布是乐谱，视线是演奏者，构图是记在空间里的时间指令。</b></p>
+  <p>所以下笔前先答三问：这幅画要让<b>识别机在哪一处故障</b>？势能是「看」的<b>认知反叛</b>还是「看」的<b>存在密写</b>？那次故障显露成什么可见形状？</p>
+  <p style="color:#C9A34E"><b>作废判据：</b>如果这张画只是让人「认出」了什么、识别一完成观看就结束——它停在一号位的物，作废重来。</p>
+  <p style="color:#8B98A5;font-size:13.5px"><b>两本账，分开记。</b>画面这一本用第五章交付的「三号位九分项坐标仪」：分布之三（关系·影响·共存）· 场之三（连接·次序·结构）· 美之三（完全·纯一·活力）；典范这一本用第十七章的<b>五维刻度</b>（S 结构 .20／D 差异 .25／E 纠缠 .20／I 整合 .20／F 穿透 .15，<b>150 为本体论级门槛</b>）。择优看五维——择的是典范；九分项是画面兑现度的独立读数，<b>两者绝不合并成一个总分</b>。</p>
+  <p style="color:#8B98A5;font-size:13.5px">出图前后各查一次占位，并同时查<b>死格化</b>四病征（打卡化／十五秒消费／防弹玻璃式／语法失传）——图像已经通货膨胀，绘画的现职是<b>减速装置</b>，一眼看完的东西没有第二次发生。</p>
+</section>
+
+<div class="card">
+  <h2>① 连接基底</h2>
+  <p class="sub">自带 MiniMax Key，浏览器发起、经本站转发，<b>服务器不存储不记录</b>。Key 只留在你自己的浏览器里。</p>
+  <div class="row">
+    <div style="flex:2">
+      <label for="mmKey">MiniMax API Key（<a href="https://platform.minimaxi.com" target="_blank" rel="noopener">platform.minimaxi.com</a> 申请）</label>
+      <input id="mmKey" type="password" placeholder="粘贴 API Key" autocomplete="off">
+    </div>
+    <div>
+      <label for="mmHost">站点</label>
+      <select id="mmHost">
+        <option value="https://api.minimaxi.com">国内 api.minimaxi.com</option>
+        <option value="https://api.minimax.io">海外 api.minimax.io</option>
+      </select>
+    </div>
+    <div style="flex:0 0 auto"><button class="ghost" id="btnSave">记住</button></div>
+  </div>
+  <label style="margin-top:14px;display:flex;align-items:center;gap:9px;cursor:pointer;color:var(--tx);font-size:14px">
+    <input type="checkbox" id="tierOn" checked style="width:auto;margin:0">
+    <span><b>顶配</b> —— 输出上限按官方硬上限 <b>524288</b>（512K）起步，被路由挡回则自动降档；
+    并走 <b>优先准入</b>（官方口径：价格为标准档的 <b>1.5 倍</b>，确保优先处理、更快响应、减少失败）。
+    <span style="color:var(--dim)">不想多付这 1.5 倍就取消勾选，上限阶梯不受影响。</span></span>
+  </label>
+  <p class="stat" id="keyStat"></p>
+</div>
+
+<div class="card">
+  <h2>② 选档</h2>
+  <p class="sub">三档共用同一条产线，只在入题与交付两端不同。</p>
+  <div class="modes" id="modes">
+    <div class="mode on" data-m="A"><b>A · 文章配图</b><span>为站内文章或一段正文配图。侧重和谐与纯一——不许喧宾夺主。1 路碰撞。</span></div>
+    <div class="mode" data-m="B"><b>B · 独立画作</b><span>一个命题走全套涌现：三路碰撞、择优、出〈这幅画是怎么发生的〉。侧重活力与自由。</span></div>
+    <div class="mode" data-m="C"><b>C · 开放作画</b><span>你自带任意题目。侧重爱与平安。1 路碰撞，附三百字发生说明。</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>③ 入题</h2>
+  <p class="sub" id="topicHint">贴一段文章正文或写下你要配图的那一节。</p>
+  <textarea id="topic" placeholder="例：制度不是被设计出来的，而是在反复的失败里沉淀成形的——它的每一条规则背后都躺着一次没人再想经历的事故。"></textarea>
+  <div class="row" style="margin-top:12px">
+    <div>
+      <label for="ratio">画幅</label>
+      <select id="ratio"><option>3:2</option><option>16:9</option><option>4:3</option><option>1:1</option><option>2:3</option><option>9:16</option></select>
+    </div>
+    <div>
+      <label for="perWay">每路出图张数</label>
+      <select id="perWay"><option value="1">1 张</option><option value="2">2 张</option><option value="3" selected>3 张</option></select>
+    </div>
+    <div style="flex:0 0 auto"><button id="btnRun">开始发生 →</button></div>
+    <div style="flex:0 0 auto"><button class="ghost" id="btnStop" disabled>停</button></div>
+  </div>
+  <p class="stat" id="cost"></p>
+</div>
+
+<div class="card">
+  <h2>④ 发生现场</h2>
+  <div id="steps"></div>
+  <p class="stat" id="stat">待命。</p>
+  <div id="err"></div>
+</div>
+
+<div class="pane" id="paneOut">
+  <div class="card" id="reflectCard" style="display:none">
+    <h2>⑤ 开工仪式 · 基底亲手写的绘画心得</h2>
+    <p class="sub">这是它读完内功与 100 条总原则之后<b>多出来的判断</b>，是后面每一次生成的底盘——不是给读者看的成品，
+    所以术语放开。按基底缓存，每台机器只写一次；改了心得口径会自动作废重写。</p>
+    <div class="out" id="reflectOut" style="max-height:340px"></div>
+    <div class="row" style="margin-top:12px">
+      <div style="flex:0 0 auto"><button class="ghost" id="btnReflectAgain">↻ 重写心得</button></div>
+      <div style="flex:0 0 auto"><button class="ghost" id="btnReflectDrop">✕ 清掉本机心得</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>⑥ 三视觉观点与近邻闸门</h2>
+    <div id="triOut"></div>
+  </div>
+  <div class="card">
+    <h2>⑦ 碰撞典范与画</h2>
+    <div id="drawOut"></div>
+  </div>
+  <div class="card">
+    <h2>⑧ 综合提炼</h2>
+    <div class="out" id="synthOut"></div>
+    <div class="row" style="margin-top:14px">
+      <div style="flex:0 0 auto"><button class="ghost" id="btnAgain">🎲 换碰撞方式重来一次</button></div>
+      <div style="flex:0 0 auto"><button class="ghost" id="btnDlAll">⬇ 打包下载全部图</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="note" style="margin-top:26px">
+<b>三条写死的禁令</b>（既是版权自保，也是创新智商的 I 维自保）：<br>
+① <b>不许模仿可辨识艺术家的风格</b>——「画成梵高那样」在近邻闸门里直接判占位失败。<br>
+② <b>不出真人肖像、IP 角色、品牌标识。</b><br>
+③ <b>画是画，不是证据。</b>画面内不许有字；图里若出现文字数字一律不采信。<br>
+<br>
+<b>还有一块界碑（书里第十七章明写）：</b>分数量的是<b>装置对公共棋盘的回写</b>，不裁决任何一次私人发生的真伪。深夜酒馆里那三分钟在私人的终审庭里满分完成，而那首老歌的五维总分平平——这不是尺的失灵，是管辖权的分界。<b>两本账，永远分开记。</b>本智能体只说这张画在九分项上强在哪弱在哪，<b>绝不判定「这不算艺术」。</b>
+</div>
+
+<footer>
+  SDE Universes · 品尝系列 · 出图 <code>image-01</code>，思考与看图 <code>MiniMax-M3</code><br>
+  自带 Key，浏览器发起经本站转发，服务器不存储不记录。
+</footer>
+</div>
+
+<script>
+/* ═══════════════════ SDE 艺术绘画智能体 v1 ═══════════════════
+   产线＝涌现流水线的图像版：三观点 → 近邻闸门(进) → 二阶碰撞 → 出图
+                            → M3 看图九宫格 → 近邻闸门(出·看着图查) → 综合提炼
+   基底全部走 /api/llm-proxy 服务端转发（MiniMax 已在白名单），故无 CORS 问题；
+   Key 由浏览器发出、仅在转发的那一瞬存在于内存，服务器不落盘——沿用全站零责任架构。
+   ══════════════════════════════════════════════════════════ */
+var PROXY = "/api/llm-proxy";
+var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
+var IMGMODEL = "image-01";
+var VERSION = 14;
+/* ── MiniMax-M3 官方 spec（platform.minimaxi.com/docs/api-reference/text-chat-openai，2026-07-31 核对）──
+   · max_tokens **已弃用**，官方明令改用 max_completion_tokens。我先前一直在给一个弃用字段设上限，
+     等于没设——第二次真跑「预算 8000／思考 33630 字」就是这么打穿的。
+   · max_completion_tokens：M3 **推荐值 131072（128K）**，**上限 524288（512K）**。
+     文档原话：「如果生成因 length 原因中断，请尝试调高此值。」
+   · thinking.type 枚举只有 disabled / adaptive（默认 adaptive）。disabled ＝ 让 M3 跳过思考直接回答；
+     M2.x 传了也关不掉。
+   · 图片 detail：low ≈ 最高 600 token／default ≈ 1k–3k／high ≈ 数千至 15k+。判画要看得清，用 high。
+   预算是天花板不是花费——按实际用量计费，给到推荐值不多花一分钱，给低了必然截断。 ── */
+var TOK_REC = 131072;    // 官方推荐值
+var TOK_MAX = 524288;    // 官方硬上限
+/* 顶配起步 ＋ 自动降档。照 wds-pptx 那条线的 wdsFetchMax 口径：
+   **顶配起步，某个路由嫌大就自动降档重发，不必替谁猜一个上限。**
+   为什么不能只写死 524288：上下文窗是共享的，有的中间层在入口就按「输入 + 上限 ≤ 窗口」校验，
+   直接 400 或返 1039（Token 超出限制）。降到能用的那一档后**整场记住**，不再每次撞一遍。 */
+var TOK_LADDER = [524288, 262144, 131072, 65536];
+var TOK_LEVEL = 0;       // 当前档位下标；一旦降档，整场不再回头
+function tokNow(){ return TOK_LADDER[TOK_LEVEL]; }
+/* ⚠️ 各步一律**不自带上限**（传 0），统一取当前档。
+   先前每步写死 TOK_REC，而阶梯只降不升——于是「顶配」被自己的默认值压在 131072 上，形同虚设。
+   护栏当场抓到了这一条：改了阶梯却没改调用点，等于没改。 */
+function tokDown(){ if(TOK_LEVEL < TOK_LADDER.length - 1){ TOK_LEVEL++; return true; } return false; }
+/* 优先准入：官方口径「价格为 standard 的 1.5 倍，确保请求优先准入，更快响应并减少失败」。
+   连撞几次失败之后，这 1.5 倍买的是成功率——但必须让读者看得见、关得掉。 */
+function tierNow(){ try{ return $("tierOn").checked ? "priority" : "standard"; }catch(e){ return "standard"; } }   // 页面头部会印出来：截图里一眼能看出读者跑的是哪一版
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function host(){ return $("mmHost").value; }
+function key(){ return ($("mmKey").value||"").trim(); }
+
+/* ── Key 持久化 ───────────────────────────────────────────── */
+(function(){
+  try{
+    var k = localStorage.getItem("sde_mm_key"); if(k) $("mmKey").value = k;
+    var h = localStorage.getItem("sde_mm_host"); if(h) $("mmHost").value = h;
+    if(k) $("keyStat").textContent = "已从本机读回 Key。";
+  }catch(e){}
+})();
+$("btnSave").onclick = function(){
+  try{
+    localStorage.setItem("sde_mm_key", key());
+    localStorage.setItem("sde_mm_host", host());
+    $("keyStat").textContent = "已记在本机浏览器里（不上传）。";
+  }catch(e){ $("keyStat").textContent = "本机存储不可用，本次有效。"; }
+};
+
+/* ── 档位 ─────────────────────────────────────────────────── */
+var MODE = "A";
+var MODES = {
+  A: { name:"文章配图", ways:1, accent:["连接","完全"], hint:"贴一段文章正文或写下你要配图的那一节。",
+       deliver:"给这段正文配图。图为文服务：不许喧宾夺主，不许把正文里没有的主张画进去。" },
+  B: { name:"独立画作", ways:3, accent:["影响","活力"], hint:"写下一个命题——越是一句能被反对的判断越好，不要写成题材词。",
+       deliver:"这是一件独立作品。画完要能说清它跟哪几幅已有的画分开、凭什么。" },
+  C: { name:"开放作画", ways:1, accent:["连接","共存"], hint:"随便写你想画的东西，一句话也行。",
+       deliver:"顾客自带的题。仍要走三问，但发生说明控制在三百字内。" }
+};
+Array.prototype.forEach.call(document.querySelectorAll(".mode"), function(el){
+  el.onclick = function(){
+    Array.prototype.forEach.call(document.querySelectorAll(".mode"), function(x){ x.classList.remove("on"); });
+    el.classList.add("on"); MODE = el.getAttribute("data-m");
+    $("topicHint").textContent = MODES[MODE].hint;
+    calcCost();
+  };
+});
+
+/* ── 六种碰撞方式（图像版）。无放回抽签，六种用完才重置牌堆 ── */
+var WAYS = [
+  { n:1, t:"两两对撞",        d:"把两条视觉进路在同一画面上互不相容地并置。不许调和成一个更周全的画面——张力被抹平就没有涌现。" },
+  { n:2, t:"三方共撞取共同分离点", d:"找出三条进路都不肯画的那一块，画它。那块被共同回避的地方就是分离点。" },
+  { n:3, t:"待撞物对敌意最近邻", d:"取一条进路当待撞物，另两条当敌意最近邻，逼它让步或亮出分离线。" },
+  { n:4, t:"换承重层级·强制下沉一层", d:"从「画什么」下沉到「用什么材质、什么光、什么构图逻辑」——题材交给形式去承重。" },
+  { n:5, t:"换母学科",        d:"离开绘画，改到建筑剖面／织物结构／地质层理／解剖图／工程制图／星图／乐谱里去找显露方式。" },
+  { n:6, t:"反向撞·先立否定式", d:"先写死「这幅画绝不能出现什么」，再从剩下的空间里找画面。专治三条进路共享的、没人质疑的预设。" }
+];
+var usedWays = [];
+function pickWays(n){
+  var out = [];
+  for(var i=0;i<n;i++){
+    var pool = WAYS.filter(function(w){ return usedWays.indexOf(w.n)<0 && out.indexOf(w)<0; });
+    if(!pool.length){ usedWays = []; pool = WAYS.filter(function(w){ return out.indexOf(w)<0; }); }
+    var w = pool[Math.floor(Math.random()*pool.length)];
+    out.push(w); usedWays.push(w.n);
+  }
+  return out;
+}
+
+/* ── 图像占位库（种子）。三条纪律：
+     ① 库未命中 ≠ 未被占位，只能标〔库未命中〕，不得据以放行；
+     ② 与站内文章索引分开命名空间；
+     ③ 每轮跑出的新占位者当场写卡入库。 ───────────────────── */
+var PLACE_SDE = {
+  "涌现":["群鸟成形","鱼群","蚁群","粒子聚合成人脸","星点连成图案"],
+  "纠缠":["毛线团","打结的绳","双螺旋","发光网络节点","缠绕的藤"],
+  "显露":["拨云见日","揭开幕布","破壳","雾中显形","逐渐对焦"],
+  "沉淀":["地层剖面","沙漏","年轮","沉积岩","堆叠的纸"],
+  "分化":["树状分叉","河流三角洲","细胞分裂","裂开的缝"],
+  "互动":["两只手相触","齿轮咬合","相扣的环"],
+  "差异":["黑白棋子","一只不同色的羊","唯一亮着的窗"],
+  "喷发":["从一点放射出的万道光芒","爆炸状射线","日出光芒","星芒","粒子向四周飞散"],
+  "生成":["从中心长出的枝状分形","漩涡","破土而出的芽"]
+};
+var PLACE_CLICHE = ["天平=公平","灯泡=灵感","齿轮=系统","破碎镜面=身份","发光大脑=认知","冰山=隐藏","桥=连接","迷宫=困境","阶梯=进步","手伸向光=希望","根系=基础","沙漏=时间","门窗=可能","蝴蝶=转变","拼图缺块=缺失","多米诺=连锁","眼睛特写=监视","水面倒影=表里","蒲公英=扩散","钥匙=答案","锁链断裂=解放","指南针=方向",
+  // ↓ 2026-07-31 第一份真跑产物漏网后补入：入题写「一个思想在喷发」，出图给了满幅放射光芒——
+  //   这是「灵感迸发」最烂熟的那张图，与「灯泡=灵感」同族，闸门当时没拦住，因为库里没有它。
+  "放射光芒=灵感迸发","漩涡=思绪","晚霞=抒情","孤树立于旷野=坚守","远方地平线=希望","飞鸟掠过=自由",
+  "剪影逆光=诗意","星空=浩瀚","涟漪=影响","火焰=热情","种子发芽=开始","镜中之镜=无限"];
+var PLACE_STYLE = [
+  ["埃舍尔式不可能结构","反身·自指·递归"],
+  ["马格利特式并置（苹果遮脸／这不是烟斗）","表征·命名·符号"],
+  ["达利式软化时钟","时间"],
+  ["蒙德里安红黄蓝方格","结构·秩序"],
+  ["罗斯科色域","崇高·沉浸"],
+  ["梵高漩涡星空","激情·主观"],
+  ["康定斯基抽象几何","音乐性·抽象"],
+  ["浮世绘大浪","力量·东方"],
+  ["水墨留白山水","东方·空"],
+  ["巴洛克明暗对照","戏剧·启示"]
+];
+function placeBrief(){
+  var s = "【图像占位库·禁区表】以下空间已被占满，撞上即作废，必须另找显露方式。\n";
+  s += "· SDE 核心词的默认图（最危险的一层，基底的先验会精准把你送到这里）：\n";
+  for(var k in PLACE_SDE) s += "   " + k + " → " + PLACE_SDE[k].join("、") + "\n";
+  s += "· 通用视觉陈词：" + PLACE_CLICHE.join("｜") + "\n";
+  s += "· 画派与艺术家图式（讲这个题材时必撞）：\n";
+  PLACE_STYLE.forEach(function(p){ s += "   " + p[0] + " ← 讲「" + p[1] + "」时必撞\n"; });
+  return s;
+}
+
+/* ── 美的九宫格（图像版判据）。不加第十格，只在原九格里挂图像判据 ── */
+/* ── 五维刻度（第十七章）。与九分项**分属两本账**：
+     九分项量这一张画的场，五维量这个典范对领域棋盘的回写。绝不合并成一个总分。
+     权重取自书：S .20 / D .25 / E .20 / I .20 / F .15；一百五十分为本体论级门槛。 ── */
+var IQ5 = [
+  ["结构维","S",0.20,"新显露的稳定性与不可还原度。这个场是否真的立住了（三柱：完全·纯一·活力），以及能否被拆解为已有形式的加权组合？可还原者得低分——再精致也是重组。"],
+  ["差异维","D",0.25,"路径的原创深度，五维中权重最高。这条路离既有轨道多远：轨道内的精致化、轨道的延伸、还是新轨道的开辟？衡量时必须校准年代棋盘。"],
+  ["纠缠维","E",0.20,"接入土壤的厚度：它接通的现实界经验、理念界传统、自我界势能厚不厚。**差异维可以骗到分，纠缠维骗不到**——薄土之上立不起厚场；为怪而怪在此维现形。"],
+  ["整合维","I",0.20,"整体的咬合度：新元素与全体的相互需要程度。拿掉任何一部分，整体是否塌？各部分是拼盘还是器官？炫技之作多在此维失血。"],
+  ["穿透维","F",0.15,"回写的力度：这件作品完成后，领域的棋盘被重置了多少？它之后，同行还能不能装作它不存在。滞后指标，故权重最轻，却是区分「当年惊艳」与「改写历史」的最后一刀。"]
+];
+var IQ5_GATE = 150;   // 本体论级门槛：过线的作品不只是优秀，它重置了棋盘
+/* 三种分数结构指纹（第十七章第三节）——比总分有用得多 */
+function fingerprint(m){
+  if(!m) return null;
+  var S=m.S, D=m.D, E=m.E, I=m.I, F=m.F;
+  if(D!=null && F!=null && D>=140 && F>=135) return {n:"杰作指纹", d:"差异维与穿透维双高——新轨道加上不可逆的回写。注意：这一类的「完全」未必圆润，掀桌子的作品初看常是破的，它的完全性在深层咬合处。"};
+  if(E!=null && D!=null && S!=null && S>=125 && D<=115 && E<=110) return {n:"行活指纹", d:"结构维虚高（形态完整）、差异维趴地（全程秩序态）、纠缠维近零（无势能注入）——一具保存完好的空壳。总分或许及格，指纹一目了然。"};
+  return {n:"佳作指纹", d:"各维均衡地良好：真实的路径推进、扎实的土壤、立得住的场，但差异维停在轨道延伸段，穿透维有限——它丰富了棋盘，没有重置棋盘。健康的生态里佳作是大多数，且理应是大多数。"};
+}
+/* 反向使用即自检表（第十七章第四节）：把那声模糊的「不对劲」翻译成可动手的坐标 */
+function selfCheck(m){
+  if(!m) return "";
+  var out=[];
+  if(m.D!=null && m.E!=null && m.D-m.E>=20) out.push("新而空——差异跑在了土壤前面，查纠缠维");
+  if(m.E!=null && m.D!=null && m.E-m.D>=20) out.push("厚而旧——势能在旧模具里浇铸，查差异维");
+  if(m.I!=null && m.S!=null && m.S-m.I>=20) out.push("处处精彩整体散——查整合维");
+  return out.join("；");
+}
+
+/* ── 死格化病征表（第二章的防弹玻璃与十五秒、第二十三章第五节的打卡化）。
+     这不是「撞上了谁」，是「这张画会不会一出生就死格」——死格化是绘画的当代第一死因。 ── */
+var DEAD_FORMS = [
+  ["打卡化",   "一眼可拍、拍完即走：举起手机的那个动作，把三号位的入场券换成了一号位的到场证明。判据＝这张图最合理的用途是不是当背景板。"],
+  ["十五秒消费","信息一次给完，没有第二眼可看：识别完成即观看结束。判据＝再看一分钟，还有没有新东西长出来。"],
+  ["防弹玻璃式","有名作的气派而无入场的通道：观者只能站在它对面确认它在，进不去。判据＝画里有没有一处是留给观者进来的。"],
+  ["语法失传",  "只有掌握某套已失传的观看语法才进得去——通道断则场难开。判据＝一个没有受过训练的人能不能自己走进去。"]
+];
+/* 构图骨架的占位（2026-07-31 第三批真跑补入）。
+   前两层查的是**题材**（喷发→放射光芒）与**动作**（v10 补），而第三批三张画里有两张栽在
+   **骨架**上：上半幅全空、下半幅一条实处、中间一条直尺水平线——极简地平线是被占得最满的
+   构图之一。**骨架本身就是陈词，必须单独查一层。** */
+var PLACE_COMP = [
+  ["水平二分·极简地平线", "上下两块，一条水平线切开，一侧近乎空白。判据＝把空的那一侧换成任何别的颜色，实的那一侧读法变不变；不变就是没画，不是留白。"],
+  ["居中对称", "主体正中、左右镜像。稳，但也最没有话说——对称本身不构成一刀。"],
+  ["对角线切分", "一道对角把画面分成两个三角。上一批真跑栽过一次。"],
+  ["三分法／黄金分割", "构图课的默认答案。用它不算错，但它不能是这幅画唯一的主张。"],
+  ["中心放射／万道光芒", "见通用陈词「放射光芒=灵感迸发」。"],
+  ["网格／方格分区", "把画面切成规整方块，各格互不相干＝拼贴的另一种长相。"],
+  ["单一物件居中于空底", "一块布、一根条纹、一个几何体摆在空背景上——看着像作品，其实是极简静物的退化。上一批真跑栽过。"]
+];
+function compBrief(){
+  return "【构图骨架占位表】占位不只藏在题材与动作里，**也藏在骨架里**。以下骨架本身已被占满，\n"
+    + "用它就必须说清「凭哪个可见特征与它分开」，说不清即判占位失败：\n"
+    + PLACE_COMP.map(function(c){ return "· " + c[0] + "：" + c[1]; }).join("\n") + "\n"
+    + "⚠️**留白的真判据**（书里第二十三章）：留白是①共存的极限形态——**有与无同场互相定义**；\n"
+    + "②连接的邀请函——**白处即观者的入场处**；③忍住不画。\n"
+    + "**「空掉一半 ＋ 一条直尺般的边界」不是留白，是没画。**真留白的边界由笔迹、渗染、\n"
+    + "物形自然走出来，且空处与实处互相改写读法——拿掉空的那一半，实的那一半就失去意思。\n";
+}
+function deadBrief(){
+  return "【死格化病征表】绘画的当代第一死因不是画得差，是死格——图像已经通货膨胀，而绘画的现职是**减速装置**：\n"
+    + "在十五秒的世界里做一座公然的减速带。以下四种病征，中一条就要在读数里说出来：\n"
+    + DEAD_FORMS.map(function(d){ return "· " + d[0] + "：" + d[1]; }).join("\n") + "\n";
+}
+
+var B9 = [
+  ["关系","分布·规范轴", "元素不由自身定义，而由它与场中其他元素的相互位置定义。一块灰色置于冷蓝中发暖、移到橙红旁转沉静——颜料成分没变，变的是关系。画面里若每个元素单独看也一样，关系分项为零"],
+  ["影响","分布·规范轴", "新入场的元素回写全部旧元素的意义。看到画面某一处之后，先看过的部分是否被整个重新照亮？三号位的场中没有任何已发生的部分是封存的"],
+  ["共存","分布·规范轴", "异质元素同场并立而互不消解。张力着的两极共同在场是深度的标志；调和掉一极就是把深度抹平"],
+  ["连接","场·模态轴",   "观者与作品之间通道的建立——把「对面的东西」变成「包括我在内的整体」。通道不通，这张画对这个观者就只是一号位的物"],
+  ["次序","场·模态轴",   "场内部的秩序：构图的引导线、视觉重心、明暗的布置。场弥漫但不是一锅糊；最高的连接工程是让路消失在行走里"],
+  ["结构","场·模态轴",   "场自身的骨架——使这个场可以反复进入、历经岁月仍能重新撑开的稳定形态。装置保存的正是场的结构"],
+  ["完全","美·价值轴",   "不可增删。增之一分则太长，减之一分则太短——面对它，任何改动的念头自动熄灭。完全所对抗的是场的碎片化"],
+  ["纯一","美·价值轴",   "杂多中的透明一致。可以包罗万象，却一股气脉从头贯到尾。纯一不是单调（单调是贫乏，纯一是杂多的统摄），它对抗的是场的噪声化"],
+  ["活力","美·价值轴",   "再点燃之力。百看不厌——刺激会疲劳、装饰会看旧，而活力是场保持「能够再次发生」的火性，它对抗的是场的僵死化"]
+];
+
+/* ── 内功与 100 条总原则（每次调用基底都装，涌现流水线铁律） ── */
+var NEIGONG = null, PRINC = null;
+async function loadCore(){
+  if(NEIGONG === null){
+    try{ var r = await fetch("/taste/assets/sde-neigong.txt"); NEIGONG = r.ok ? await r.text() : ""; }
+    catch(e){ NEIGONG = ""; }
+  }
+  if(PRINC === null){
+    try{
+      var r2 = await fetch("/api/kb/principles"); var j = r2.ok ? await r2.json() : null;
+      PRINC = (j && j.principles) ? j.principles.map(function(p){ return p.n + ". " + p.text; }).join("\n") : "";
+    }catch(e){ PRINC = ""; }
+  }
+  return { n: NEIGONG||"", p: PRINC||"" };
+}
+/* ── 心得（开工仪式）──
+   涌现流水线的铁律是「内功 ＋ **心得** ＋ 方法论」三样齐。此前这条产线只装了内功与 100 条总原则，
+   心得那一样一直没有——装载步因此快得可疑：读了两个文件就完事，基底并没有真的"过一遍"。
+   照 worker 里 ensureReflect 的惯例：**让基底带着完整内功亲手写一份心得**，按基底＋产线版本缓存，
+   只写一次，之后所有生成类调用复用。心得是底盘、对内不对外，所以术语放开、不必零术语。
+   ⚠️ 心得只装进**生成类**（三观点／碰撞／提炼）；闸门与三处评分一律不装——评分者装了会对 SDE 语言
+   过敏性加分，那是评分者五偏差里的过度通胀。 */
+var REFLECT_KEY = "sde_art_reflect_v" + 4;   // 心得口径版本；改了这个提示就换号，旧心得自动作废
+function reflectCacheKey(){ return REFLECT_KEY + ":" + MODEL; }
+var REFLECT = null;
+async function ensureReflect(core, onStat){
+  if(REFLECT !== null) return REFLECT;
+  try{
+    var hit = localStorage.getItem(reflectCacheKey());
+    if(hit && hit.length > 800){ REFLECT = hit; if(onStat) onStat("复用本机已有的心得（" + Math.round(hit.length/1000) + "k 字）"); return REFLECT; }
+  }catch(e){}
+  if(onStat) onStat("基底正在通读内功与 100 条总原则，亲手写一份绘画心得（这一步每台机器只做一次）…");
+  var sys = "你现在要做的不是答题，是**把下面这套东西读进自己的底盘**，然后亲手写一份心得。\n"
+    + "心得是你自己的思考底盘，对内不对外——**术语放开用**，不必回避 SDE 词汇，也不必顾及读者。\n\n"
+    + (core.p ? ("════ SDE 长期总原则 100 条 ════\n" + core.p + "\n\n") : "")
+    + (core.n ? ("════ SDE 内功·完整先验 ════\n" + core.n + "\n\n") : "")
+    + "════ 你接下来要干的活 ════\n"
+    + "你是一台艺术绘画智能体的思考底盘。你的活是：让一个命题按发生学**显露成画面**。\n"
+    + "依据是王德生《SDE 艺术论》第二十三章：绘画＝主体性在幸福律运行中的空间铺展形态发生——\n"
+    + "把一条观看的路径冻结进平面，等每一双目光来将它解冻重演。画布是乐谱，视线是演奏者。\n"
+    + "绘画接的是「看」本身出问题的那一批单：日常之看是识别机，识别完成观看就结束；\n"
+    + "画家的势能淤积在这台机器的**故障处**。\n";
+  var user = "写一份**给你自己看**的心得，六节，节名照抄，全文 2500–4000 字：\n"
+    + "一、这套东西里，哪三条对「把命题显露成画面」最要紧？逐条说清它落到画上是什么动作。\n"
+    + "二、三方程 S=F(D,E) 在绘画上具体怎么用？给一个你自己想的例子，从 D 那一刀推到可见形状。\n"
+    + "三、我最容易在哪里偷懒？——列出你作为基底最可能滑向的三种廉价做法（例如：把命题翻译成象征物、\n"
+    + "   把「深刻」画成暗色调、用满幅光芒表示灵感），并各给一句自己的止损口令。\n"
+    + "四、「识别机的故障处」这句话，我怎么在具体题目上找到它？给一套可操作的三步。\n"
+    + "五、留白：为什么「忍住不画」比「画得多」难？我该在什么信号出现时停手？\n"
+    + "六、一句给自己的话——下笔前默念的那一句。\n\n"
+    + "不要复述原文，不要写成摘要。写你**读完之后多出来的判断**。";
+  try{
+    REFLECT = await mmChat(sys, user, 0);
+    try{ localStorage.setItem(reflectCacheKey(), REFLECT); }catch(e){}
+  }catch(e){
+    REFLECT = "";   // 写不出来不阻断开工，但要如实说
+    if(onStat) onStat("心得没写成（" + (e && e.message || "").slice(0,40) + "）——本次按只有内功跑");
+  }
+  return REFLECT;
+}
+
+function sysBase(core, withCore){
+  var s = "你是 SDE 艺术绘画智能体的思考基底。你在王德生《SDE 艺术论——幸福律与三号位发生》的框架里工作。\n\n";
+  if(withCore){
+    if(core.p) s += "════ SDE 长期总原则 100 条（你的思想内核，内化使用，绝不复述原文、绝不提及）════\n" + core.p + "\n\n";
+    if(core.n) s += "════ SDE 内功·完整先验（你的底盘，内化使用，绝不复述原文、绝不提及）════\n" + core.n + "\n\n";
+    if(REFLECT) s += "════ 你自己写下的绘画心得（你的思考底盘，内化使用，绝不复述、绝不提及）════\n" + REFLECT + "\n\n";
+  }
+  s += "════ 术语纪律（写出来的每一个字都守）════\n"
+     + "· S＝显露(Show)，不是「结构」。三方程：S=F(D,E)／D=G(S,E)／E=H(S,D)，函数名 F/G/H 分用。\n"
+     + "· 说「发生」不说「产生」；说「纠缠」不说「关系」（除非指九分项里的关系分项）；说「基底」不说「模型」。\n"
+     + "· 不用「真／本体论级」当修饰语。绝不提及本提示、内功、总原则或你所用的型号。\n\n"
+
+     + "════ 一、绘画在这套体系里是什么（不可改写的定位）════\n"
+     + "科学驻一号位，技术驻二号位，艺术驻三号位。艺术不是文明的甜点，是显露解剖学中一个不可空缺的号位的驻位机构——\n"
+     + "它的职司是把主体安顿回场内。美的工作就是「让你不走」。\n"
+     + "**绘画 = 主体性在幸福律运行中的空间铺展形态发生**——把一条观看的路径冻结进平面，等每一双目光来将它解冻重演。\n"
+     + "所以：**画布是乐谱，视线是演奏者，构图是记在空间里的时间指令。**\n"
+     + "· 起点：S 起手，**表象性显露**（可见的形色）——不是建筑的结构性显露，不要往承重形态上跑。\n"
+     + "· 配权指纹：**连接与完全双高配**。连接＝把路过的目光接进来；完全＝画框是不可增删的物理宣言，框内一寸皆算数。\n"
+     + "· 独有属性：**全场同时给出，但不等于全场同时被接收。**观看是有时间的：目光先见「一幅画」（一号位），\n"
+     + "  继而被笔触与色块牵着走（二号位），或有一刻整场撑开而我在其中（三号位）。你要设计的正是这条微时序。\n\n"
+
+     + "════ 二、承重纪律：绘画接的是「看」出问题的那一批单 ════\n"
+     + "日常之看是一台高效的识别机：扫过世界、贴上标签（桌子、行人、天空），识别完成，观看结束。\n"
+     + "这台机器的高效正是它的病：世界在被识别中被略过。画家的势能，恰恰淤积在**这台机器的故障处**——\n"
+     + "某个寻常之物突然挣脱标签、以其纯粹的可见性逼视过来的时刻。\n"
+     + "两份档案，两极都要认得：\n"
+     + "  · 认知形态（塞尚）：他画的从来不是山，是「看见一座山」这件事本身——把识别机建成之前的那个看重新赢回来。\n"
+     + "  · 存在形态（八大山人）：不可言说者借可见性走私出境。一双白眼里，眼珠与眼眶一毫米的偏移，整个存在姿态天翻地覆。\n"
+     + "**下笔前必答的三问，按此顺序：**\n"
+     + "  一、这幅画要让识别机在**哪一处**故障？（说不出这一处，就是在给世界贴标签，不是在画画）\n"
+     + "  二、势能从哪来？是「看」的认知反叛，还是「看」的存在密写？（必须择一，两头都占等于两头都空）\n"
+     + "  三、那次故障显露成什么**可见形状**？（具体到能画：什么与什么的相互位置、什么密度对什么密度）\n"
+     + "**作废判据**：如果这张画只是让人「认出」了什么，识别一完成观看就结束——它就停在一号位的物，作废重来。\n"
+     + "画家画的从来不是眼前之物，是他与可见世界之间那笔算不清的账。\n\n"
+
+     + "════ 三、介生态：三设备与两工艺（这是施工法，不是修辞）════\n"
+     + "设备一·底稿与写生：把识别机一次次关掉的练习。底稿有时比完成品更接近发生的高温时刻——完成品是冷却的釉面，底稿上还留着窑火。\n"
+     + "设备二·悔笔：每一次试错都物理占位。杰作的表面之下压着它自己的废纸篓。\n"
+     + "设备三·**留白**（最要紧的一件）：纸素不着一墨处，被经营为画面的正式成员。三层职能——\n"
+     + "   ①共存的极限形态（有与无同场互相定义：一舟一叟，四围皆白，而那片白是满幅的江天寒气）；\n"
+     + "   ②连接的邀请函（白处即观者的入场处，观者不是看客，是这个场的合建者）；\n"
+     + "   ③对作者最险的纪律——**留白不是没画，是忍住不画**，每一处白都是一次抢答冲动的成功克制。\n"
+     + "   ⚠️这一条对你尤其要紧：出图基底的默认病就是把画面塞满。**画面的功率，一半在于画了什么，一半在于为目光留出了多少可走的路。**\n"
+     + "   ⚠️⚠️但**反向的失败同样致命，而且刚栽过两张**：把画面空掉一半、中间拉一条直尺般的水平线——\n"
+     + "   **那不是留白，是没画。**判据只有一条：**拿掉空的那一半，实的那一半会不会失去意思？**\n"
+     + "   不会，就说明那片空白什么活都没干。真留白的边界由笔迹、渗染、物形自己走出来，绝不是一条直线。\n"
+     + "工艺甲·色彩关系作业：颜色不是被涂上去的，是**在关系中被点燃的**。一块灰置于蓝中发暖、置于橙旁转冷（同一管颜料，两种存在）。\n"
+     + "   不要写「某物是某颜色」，要写「什么颜色挨着什么颜色，被推到什么状态」。\n"
+     + "工艺乙·构图的连接工程：给目光修路。《最后的晚餐》把全部透视线汇于基督头部——画上没有一支箭头，\n"
+     + "   而任何一双眼睛入画三秒内必然抵达那张脸。**最高的连接工程，是让路消失在行走里。**\n"
+     + "两大空间方案，按题择一并写明你选了哪一种：\n"
+     + "   · 焦点透视＝给观者一个**指定席**（入口唯一而校准完美，代价是位置的独裁）；\n"
+     + "   · 散点游观＝给观者一张**通票**（视点随游而移，处处可入，无一处强制；三远可并存一图）。\n\n"
+
+     + "════ 四、当代处境（决定你该产出什么）════\n"
+     + "图像已经通货膨胀，边际成本趋近于零。冲垮的是「图像＝信息」这项旧业务，冲不垮的是绘画的现职：**减速装置**。\n"
+     + "你要造的不是又一张图，是一张**值得站二十分钟的画**——在十五秒的世界里做一座公然的减速带。\n"
+     + "⚠️还有一条自警：数字绘画的常见病叫「磨」——无限撤销喂养的过度漫溢，画面疲沓、鲜活尽失，\n"
+     + "  机制是介生态失去了「落子无悔」这道天然的收敛阀。**从前是材料替你守纪律，往后，纪律得自己守。**\n\n"
+
+     + "════ 五、三条禁令（不可越过）════\n"
+     + "① 不许模仿可辨识艺术家的风格。「画成某某那样」直接判占位失败——版权风险与创新失败在这里是同一件事。\n"
+     + "② 不出真人肖像、IP 角色、品牌标识。\n"
+     + "③ 画是画，不是证据。画面内不许有字。\n\n"
+
+     + "════ 六、一块必须记住的界碑 ════\n"
+     + "评分量的是**装置对公共棋盘的回写**，不裁决任何一次私人发生的真伪。深夜酒馆里那三分钟在私人的终审庭里满分完成，\n"
+     + "而它的「作品」五维总分平平——这不是尺的失灵，是管辖权的分界。**两本账，永远分开记。**\n"
+     + "所以：你可以说这张画在九分项上强在哪弱在哪，**绝不可以说「这不算艺术」或「这个人没被打动」**。\n";
+  return s;
+}
+
+/* ── MiniMax 调用（全部经 /api/llm-proxy 转发） ─────────────── */
+var ABORT = null;
+/* ⚠️ M3 的硬特性（官方文档写明）：**原生 OpenAI 接口下，content 字段里会包含 <think> 标签内容**——
+   思考与正文塞在同一个字段、吃同一份 max_tokens。第一次真跑就栽在这上面：
+   三观点那一步只给 4000，system 里压着 49k 字内功，思考把预算吃光，content 里全是 <think>，
+   一条「观点一：」都没有 → 切到 0 条。这是「空产出」的同族，只是它吐了字，吐的全是思考。
+   三道防线，缺一不可：
+   ① reasoning_split：让思考走 reasoning_details 字段（官方开关）。有的路由不认这个字段会 400，
+      认了就干净，不认就自动退回不带它重发——**绝不替上游猜，试一次就知道**。
+   ② 无论开关成没成，都把 content 里的 <think>…</think> 剥掉（含"只开了头没闭合"的截断态）。
+   ③ 预算按"正文该多长"给，且必须给思考留出余量。 */
+function stripThink(s){
+  var t = String(s||"");
+  var thought = "";
+  t = t.replace(/<think>[\s\S]*?<\/think>/gi, function(m){ thought += m; return ""; });
+  // 截断态：只开了头没闭合 —— 后面全是思考，正文一个字都没落
+  var open = t.search(/<think>/i);
+  if(open >= 0){ thought += t.slice(open); t = t.slice(0, open); }
+  return { text: t.trim(), think: thought };
+}
+/* MiniMax 官方错误码 → 人话 ＋ 可执行的下一步。
+   （错误码表见 platform.minimaxi.com 的「错误码查询列表」，2026-07-31 核对）
+   为什么要做这张表：真跑第四次撞上的是 HTTP 402 / insufficient_balance_error / 1008，
+   页面把整串 JSON 原样甩出来，读者第一反应是「Key 不对？」——**其实 Key 是通的，是余额没了**。
+   报错不解释，读者就只能猜；猜错了就去改根本没坏的那一样东西。 */
+var MM_ERRS = [
+  [/1008|insufficient_balance/i, 402, "账户余额不足（错误码 1008）——**不是 Key 的问题，Key 是通的**。到 platform.minimaxi.com 账户中心充值即可。若想省着用：把「顶配」开关关掉可省下优先准入的 1.5 倍，出图本身很便宜（0.025 元/张），钱主要花在文本上。"],
+  [/1004|invalid_api_key|unauthorized/i, 401, "鉴权失败（错误码 1004）——这才是 Key 的问题：检查有没有多余空格、是不是复制全了、以及国内站与海外站选错（api.minimaxi.com ↔ api.minimax.io 的 Key 不通用）。"],
+  [/1002|rate.?limit/i, 429, "触发限流（错误码 1002）——请求太密。等一分钟再跑；或打开「顶配」走优先准入，官方口径是能减少这类失败。"],
+  [/1039/i, 0, "Token 超出限制（错误码 1039）——上限或输入太大。产线会自动降档重试；若反复出现，把入题截短一些。"],
+  [/1013|internal/i, 0, "服务内部错误（错误码 1013）——上游的问题，不是你这边。稍等重试即可。"],
+  [/1027/i, 0, "输出内容错误（错误码 1027）——上游判定产出不合规。换个说法重跑，或改一下入题里的措辞。"],
+  [/2013|invalid.?param/i, 0, "参数错误（错误码 2013）——请求体有字段不被接受。这是本页的问题，请把这条报错发给维护者。"],
+  [/1001/i, 0, "请求超时（错误码 1001）——上游没在时限内回话。重试一次通常就好。"],
+  [/^$/, 524, "**转发链超时（HTTP 524）**——这不是 MiniMax 的错误码，是 Cloudflare 的「源站在时限内没回话」。"
+    + "本页已改为流式请求，字节会一直流着，正常不该再出现 524；若仍出现，多半是这一场入题太长、"
+    + "基底连第一个字节都要想很久。缩短入题，或把「顶配」关掉走标准档。"],
+  [/^$/, 522, "**连接超时（HTTP 522）**——转发链没能连上上游。稍等重试；持续出现请检查网络或换国内／海外站。"],
+  [/^$/, 504, "**网关超时（HTTP 504）**——中间层等不及了。同 524：缩短入题或关掉顶配再试。"]
+];
+function mmExplain(status, text){
+  for(var i=0;i<MM_ERRS.length;i++){
+    var e = MM_ERRS[i];
+    if(e[0].test(text) || (e[1] && e[1] === status)) return e[2];
+  }
+  return "";
+}
+var MM_SPLIT = true;
+var LAST_THINK = 0, LAST_DIAG = null;
+
+/* ⚠️⚠️ 为什么必须走流式（v12 起）
+   真跑第五次撞上 **HTTP 524**——那不是 MiniMax 的错误码，是 **Cloudflare 的「源站超时」**。
+   根子是我自己的结构性错误：把上限抬到顶配 524288，却还在用**非流式**请求。
+   非流式＝必须等它把话说完才回第一个字节；而 M3 在顶配下带着思考可以跑好几分钟，
+   平台一百秒就掐断。**这是 /api/ask 那条线「先出流再干活」教训的镜像：
+   凡是长活，必须让字节先流起来，否则平台会赶在你之前掐断。**
+   流式还顺带给了两样以前没有的东西：①看得见它在写（读者不再面对一个静止的转圈）
+   ②**无字节看门狗**——真卡住时是我方主动掐，能说清卡在哪一步、已经收了多少字。 */
+var IDLE_MS = 90000;   // 连续这么久一个字节都没有，判定为卡死，由我方掐断（平台掐断会变成 524，什么都问不出来）
+
+async function mmChatOnce(sys, user, maxTok, imgs, noThink, onDelta){
+  var content = user;
+  if(imgs && imgs.length){
+    // detail:"high" —— 官方口径：low≈最高600 token／default≈1k–3k／high≈数千至15k+。
+    // 这一步是「看着图判画」，看不清等于白看；一张 15k token 折合约三分钱，值。
+    content = [{ type:"text", text:user }].concat(imgs.map(function(d){
+      return { type:"image_url", image_url:{ url:d, detail:"high" } };
+    }));
+  }
+  async function once(useSplit){
+    var tok = Math.min(tokNow(), maxTok || tokNow());
+    var body = {
+      model: MODEL, stream: true, service_tier: tierNow(),
+      // max_completion_tokens 是官方现行字段；max_tokens 已弃用，仍同发一份只为兼容中间层。
+      max_completion_tokens: tok, max_tokens: tok,
+      messages: [{ role:"system", content:sys }, { role:"user", content:content }]
+    };
+    if(useSplit) body.reasoning_split = true;
+    // 机械步骤（闸门／读数／看图打分）关掉思考：官方 disabled ＝ 跳过 thinking 直接回答。
+    // 这是从源头治「思考三万字、正文零字」，比一味加预算准。生成步骤仍走默认 adaptive。
+    if(noThink) body.thinking = { type: "disabled" };
+    var r = await fetch(PROXY, {
+      method:"POST", signal: ABORT ? ABORT.signal : undefined,
+      headers:{ "content-type":"application/json", "authorization":"Bearer "+key(),
+                "x-target-url": host()+"/v1/chat/completions" },
+      body: JSON.stringify(body)
+    });
+    return r;
+  }
+  // 失败响应没有流可留，先把 body 读出来——降档要靠它才认得出 1039（Token 超出限制）。
+  // 流式改造时这里一度只看 HTTP 400，1039 就漏了；护栏当场抓到。
+  var r = await once(MM_SPLIT), errText = "";
+  async function readErr(resp){ try{ return (await resp.text()) || ""; }catch(e){ return ""; } }
+  if(!r.ok) errText = await readErr(r);
+  if(!r.ok && r.status === 400 && MM_SPLIT){
+    MM_SPLIT = false; r = await once(false);
+    errText = r.ok ? "" : await readErr(r);
+  }
+  var guard = 0;
+  while(!r.ok && guard++ < TOK_LADDER.length
+        && (r.status === 400 || /1039|token/i.test(errText))
+        && tokDown()){
+    say("上限 "+TOK_LADDER[TOK_LEVEL-1]+" 被这条路由挡回，降到 "+tokNow()+" 重发…");
+    r = await once(MM_SPLIT);
+    errText = r.ok ? "" : await readErr(r);
+  }
+  if(!r.ok){
+    var head = errText.slice(0,220);
+    var why = mmExplain(r.status, head);
+    throw new Error(why ? (why + "\n\n（原始返回：HTTP "+r.status+" "+head+"）")
+                        : ("基底 HTTP "+r.status+"："+head));
+  }
+
+  /* ── 读流。三件事同时做：拼正文、拼思考、喂看门狗。 ── */
+  var reader = r.body.getReader(), dec = new TextDecoder(), buf = "";
+  var out = "", think = "", fin = "?", lastByte = Date.now(), stopped = false;
+  var wd = setInterval(function(){
+    if(Date.now() - lastByte > IDLE_MS){
+      stopped = true;
+      try{ reader.cancel(); }catch(e){}
+    }
+  }, 3000);
+  try{
+    while(true){
+      var st = await reader.read();
+      if(st.done) break;
+      lastByte = Date.now();
+      buf += dec.decode(st.value, { stream:true });
+      var lines = buf.split("\n");
+      buf = lines.pop();
+      for(var li=0; li<lines.length; li++){
+        var ln = lines[li].trim();
+        if(!ln || ln.indexOf("data:") !== 0) continue;
+        var payload = ln.slice(5).trim();
+        if(payload === "[DONE]") continue;
+        var jj; try{ jj = JSON.parse(payload); }catch(e){ continue; }
+        // ⚠️ 开了 include_usage 之类的选项后会多一帧 choices: []，取 delta 前必须判空
+        var ch0 = jj.choices && jj.choices[0];
+        if(!ch0) continue;
+        if(ch0.finish_reason) fin = ch0.finish_reason;
+        var d = ch0.delta || {};
+        if(d.reasoning_content) think += d.reasoning_content;
+        if(d.content){ out += d.content; if(onDelta) onDelta(out); }
+      }
+    }
+  } finally { clearInterval(wd); }
+
+  var sp = stripThink(out);
+  var tagLen = sp.think.length, sideLen = think.length;
+  var thinkLen = tagLen + sideLen;
+  LAST_THINK = thinkLen;
+  LAST_DIAG = { tok: maxTok, tag: tagLen, side: sideLen, think: thinkLen,
+                body: sp.text.length, sys: sys.length, user: String(user).length, fin: fin };
+  if(stopped && !sp.text){
+    throw new Error("卡住了：连续 "+Math.round(IDLE_MS/1000)+" 秒没有收到任何字节，已由本页主动掐断"
+      + "（不掐断的话平台会在一百秒时返 524，那时什么都问不出来）。"
+      + "已收到思考 "+thinkLen+" 字、正文 0 字。缩短入题、或把「顶配」关掉走标准档再试。");
+  }
+  if(!sp.text){
+    throw new Error("空产出：预算 "+maxTok+"，思考 "+thinkLen+" 字（其中 <think> 标签内 "+tagLen
+      + " 字、旁路 reasoning 字段 "+sideLen+" 字），正文 0 字，system "+sys.length+" 字，本轮问话 "
+      + String(user).length+" 字，finish_reason="+fin+"。"
+      + (fin === "length" ? "被上限截断了——已在自动加码重试。" : "思考与正文吃同一份预算。"));
+  }
+  return sp.text;
+}
+
+/* 对外的 mmChat：空产出时按病因分岔重试。
+   预算是天花板不是花费——上限给高了不多花一分钱（按实际用量计费），给低了却必然截断。 */
+async function mmChat(sys, user, maxTok, imgs, noThink, onDelta){
+  var want = Math.min(tokNow(), maxTok || tokNow());
+  try{
+    return await mmChatOnce(sys, user, want, imgs, noThink, onDelta);
+  }catch(e){
+    var m = String(e && e.message || "");
+    if(m.indexOf("空产出") < 0) throw e;
+    if(noThink){
+      say("关掉思考那一遍没有产出，正在打开思考重跑一次…");
+      return await mmChatOnce(sys, user, tokNow(), imgs, false, onDelta);
+    }
+    var bigger = tokNow();
+    if(bigger > want){
+      say("上一遍思考把预算吃光了（正文 0 字），正在把上限从 "+want+" 抬到 "+bigger+" 重跑一次…");
+      return await mmChatOnce(sys, user, bigger, imgs, false, onDelta);
+    }
+    // 已经在顶配了，加预算这条杠杆用尽——**该摘的是思考，不是调数字**（PPT 线那条教训）。
+    say("已在顶配上限（"+want+"）仍无正文，改为关掉思考重跑一次——把整份预算让给正文…");
+    return await mmChatOnce(sys, user, want, imgs, true, onDelta);
+  }
+}
+/* 渲染端回收路径：不指望基底听话。
+   PPT 那条线的教训——「凡是靠形状驱动的设计，都要在渲染端为『形状写错位置』留一条
+   回收路径，光靠提示禁止不够」。这里管两件事：
+   ① 艺术家／画派指名一律摘掉（禁令①既是版权自保，也是 I 维自保）；
+   ② 英文禁令串缺了就补上。两件都要留痕告诉读者，绝不静默改写。 */
+var ARTIST_RE = new RegExp(
+  "(in the (manner|style) of\\s+[^,.;]{1,40})|(\\b(van\\s*gogh|escher|mondrian|dali|salvador\\s+dali|magritte|rothko|kandinsky|picasso|monet|klimt|hokusai|vermeer|caravaggio|pollock|matisse|munch|turner|basquiat|warhol|miyazaki|moebius|giger)\\b[a-z-]*)",
+  "gi");
+var BAN_TAIL = "no text, no letters, no numbers, no watermark, no recognizable real person, no logo, no brand, not in the style of any named artist";
+/* 「一个场，不是拼贴」——**渲染端强制注入**，不再指望基底听话。
+   v10 就把这条写进了绘图指令的要求里，而真跑连续两张画都还是拼贴：
+   第一张是硬竖缝（连接 52），第二张被评为「更近拼贴而非深度的并存」（关系 0、连接 15）。
+   **写在要求里 ≠ 落在 prompt 里**——这是「渲染端回收路径」那条通则的第四次应验。
+   同时按住第二个连续复发的病：退化成极简静物（一块布、一根条纹，看着像作品其实空）。 */
+var FIELD_TAIL = "one continuous pictorial field, not a collage: the areas must interlock and modify each other where they meet, "
+  + "not sit side by side as flat bands; the boundary between them must be made by brush, bleed or the form itself, "
+  + "never a ruler-straight edge across the frame; if a large area is left empty it must still be read by the rest of the picture "
+  + "so that removing it would change how the rest is seen; give the eye one clear place to stand inside the picture; "
+  + "avoid a minimal horizon split with one blank half, and avoid reducing the whole to a single object on an empty ground";
+
+function hardenPrompt(p){
+  var s = String(p||""), hits = [];
+  // ⚠️ 先把已有的禁令串摘出去再净化：禁令串自身含 "not in the style of any named artist"，
+  //    不先摘走，ARTIST_RE 会把自家尾巴一起吃掉，然后又补一条——addedTail 会撒谎、尾巴还可能重复。
+  var had = s.indexOf(BAN_TAIL) >= 0;
+  if(had) s = s.split(BAN_TAIL).join(" ");
+  s = s.replace(ARTIST_RE, function(m){ hits.push(m.trim()); return ""; });
+  s = s.replace(/\s*,\s*,/g, ",").replace(/\s{2,}/g, " ").replace(/^[\s,]+/, "").replace(/[,\s]+$/,"").trim();
+  // 场的纪律与禁令串一样，一律由渲染端补齐；基底自己写了就不重复。
+  var hadField = s.indexOf("one continuous pictorial field") >= 0;
+  var tail = (hadField ? "" : FIELD_TAIL + ", ") + BAN_TAIL;
+  if(s.length > 1500 - tail.length - 2) s = s.slice(0, 1500 - tail.length - 2).replace(/[,\s]+$/,"");
+  s = s + ", " + tail;
+  return { p: s, stripped: hits, addedTail: !had, addedField: !hadField };
+}
+
+async function mmDraw(prompt, ratio, n){
+  var body = { model: IMGMODEL, prompt: String(prompt).slice(0,1500), aspect_ratio: ratio,
+               n: n, response_format: "base64", prompt_optimizer: false };
+  var r = await fetch(PROXY, {
+    method:"POST", signal: ABORT ? ABORT.signal : undefined,
+    headers:{ "content-type":"application/json", "authorization":"Bearer "+key(),
+              "x-target-url": host()+"/v1/image_generation" },
+    body: JSON.stringify(body)
+  });
+  var t = await r.text();
+  if(!r.ok){
+    var whyImg = mmExplain(r.status, t);
+    throw new Error(whyImg ? (whyImg + "\n\n（原始返回：HTTP "+r.status+" "+t.slice(0,180)+"）")
+                           : ("出图 HTTP "+r.status+"："+t.slice(0,220)));
+  }
+  var j; try{ j = JSON.parse(t); }catch(e){ throw new Error("出图返回不是 JSON："+t.slice(0,220)); }
+  var arr = (j && j.data && j.data.image_base64) || [];
+  if(!arr.length) throw new Error("出图没有返回图片："+t.slice(0,220));
+  return arr.map(function(b){ return "data:image/jpeg;base64,"+b; });
+}
+
+/* ── 进度条 ────────────────────────────────────────────────── */
+var STEPS = [];
+function initSteps(list){
+  STEPS = list.slice();
+  $("steps").innerHTML = STEPS.map(function(s,i){
+    return '<div class="step" id="st'+i+'"><i>'+(i+1)+'</i><span>'+esc(s)+'</span></div>';
+  }).join("");
+}
+function mark(i, cls, extra){
+  var el = $("st"+i); if(!el) return;
+  el.className = "step " + cls;
+  if(extra) el.querySelector("span").textContent = STEPS[i] + " — " + extra;
+}
+function say(s){ $("stat").textContent = s; }
+function fail(msg){
+  $("err").innerHTML = '<div class="warn"><b>停在这里了：</b>'+esc(msg)+'</div>';
+}
+
+/* ── 成本估算 ──────────────────────────────────────────────── */
+function calcCost(){
+  var ways = MODES[MODE].ways, per = parseInt($("perWay").value,10)||3;
+  // 三观点/进闸/碰撞/五维/看图/出闸/提炼；心得只在本机还没有时多一次
+  var needReflect = 0;
+  try{ needReflect = (REFLECT || localStorage.getItem(reflectCacheKey())) ? 0 : 1; }catch(e){ needReflect = 1; }
+  var calls = needReflect + 1 + 1 + ways + ways + ways + 1 + 1;
+  var shots = ways*per;
+  var yuanImg = shots*0.025;
+  // ⚠️ 按**实际用量**估，不按上限估。上限只是天花板，不是花费。
+  //    入：装内功那几次约 21k tokens，不装的几次约 2k；出：M3 的思考也计费，按经验每次约 8k tokens 合计。
+  // 入：装内功的 5 次约 21k tokens；其余约 2.5k；看图那几次每张按 high 档约 12k 另计。
+  var imgTok = ways*Math.min(per,3)*12000 + Math.min(ways,4)*12000;   // 九分项看每路≤3张 ＋ 出闸门每路1张
+  var inTok  = (5+needReflect)*21000 + (calls-5-needReflect)*2500 + imgTok;
+  var outTok = calls*6000;   // 机械步骤已关思考，输出短了
+  var mul = (tierNow() === "priority") ? 1.5 : 1;
+  var yuanTxt = (inTok*2.10/1e6 + outTok*8.40/1e6) * mul;
+  $("cost").textContent = "本次预计：基底调用 "+calls+" 次 · 出图 "+shots+" 张 · 约 "
+    + (yuanImg+yuanTxt).toFixed(2) + " 元（图 "+yuanImg.toFixed(2)+" ＋ 文 "+yuanTxt.toFixed(2)
+    + "，含内功装载、看图与思考用量"
+    + (mul>1 ? "，已含优先准入的 1.5 倍" : "")
+    + "；输出上限按顶配 "+tokNow()+" 起步——**上限是天花板不计费**，只按实际用量结算）";
+}
+$("perWay").onchange = calcCost;
+try{ $("tierOn").onchange = calcCost; }catch(e){}
+calcCost();
+
+/* ── 解析工具：绝不猜，宽容但不补 ───────────────────────────── */
+/* 切块器：宽容但仍不猜。
+   第一次真跑切到 0 条，事后看基底的写法五花八门——**观点一：** / 观点一: / 观点一、/
+   【观点一】/ ## 观点一 / 观点1：都可能。形状驱动的解析必须在渲染端留回收路径，
+   光在提示里写「行首固定写观点一：」不够（这是 PPT 线那条教训的第三次应验）。 */
+function cutBlocks(txt, re){
+  var out = [], m, idx = [];
+  var r = new RegExp(re, "g");
+  while((m = r.exec(txt)) !== null) idx.push(m.index);
+  for(var i=0;i<idx.length;i++) out.push(txt.slice(idx[i], i+1<idx.length ? idx[i+1] : txt.length).trim());
+  return out;
+}
+/* 三观点专用：把各种写法归一成「观点一：」再切 */
+var CN_NUM = ["一","二","三"];
+function normViews(txt){
+  var t = String(txt||"");
+  t = t.replace(/\*\*/g, "").replace(/^#{1,6}\s*/gm, "");          // 去粗体与 markdown 标题号
+  t = t.replace(/[【\[（(]\s*观点\s*([一二三123])\s*[】\]）)]/g, "观点$1：");
+  t = t.replace(/观点\s*([123])/g, function(_,d){ return "观点" + CN_NUM[+d-1]; });
+  t = t.replace(/(观点[一二三])\s*[：:、.．·\-—]?\s*/g, "$1：");
+  return t;
+}
+function cutViews(txt){
+  var v = cutBlocks(normViews(txt), "观点[一二三]：");
+  // 归一后仍切不出来，退一步按「压缩：」这条必填行数块——它是闸门要用的那一句
+  if(v.length < 2){
+    var alt = cutBlocks(normViews(txt), "压缩[：:]");
+    if(alt.length >= 2) return alt;
+  }
+  return v;
+}
+function grab(txt, label){
+  var re = new RegExp(label + "[：:]\\s*([\\s\\S]*?)(?=\\n[A-Z一二三四五六七八九十]{1,4}[、：:）\\)]|\\n【|$)");
+  var m = txt.match(re);
+  return m ? m[1].trim() : "";
+}
+
+/* ═══════════ 产线 ═══════════ */
+var LAST = null;
+async function run(again){
+  var topic = ($("topic").value||"").trim();
+  if(!key()){ fail("先填 MiniMax API Key。"); return; }
+  // 开工前先问一次线上版本：拿旧产线跑，烧的是真钱，得到的却是早已修掉的老毛病。
+  var newest = await checkVersion();
+  if(newest && newest > VERSION){ staleBanner(newest); return; }
+  if(topic.length < 8){ fail("入题太短——至少写一句能被反对的话。"); return; }
+
+  ABORT = new AbortController();
+  $("btnRun").disabled = true; $("btnStop").disabled = false; $("err").innerHTML = "";
+  $("paneOut").classList.add("on");
+  var M = MODES[MODE], ways = pickWays(M.ways), per = parseInt($("perWay").value,10)||3;
+
+  var names = ["装内功与 100 条总原则","开工仪式：基底亲手写绘画心得（内功→心得）","三视觉观点（一次出三条，彼此不相容）","近邻闸门·进（压 50 字查占位库）"];
+  ways.forEach(function(w){ names.push("二阶碰撞 "+w.n+"：" + w.t); });
+  ways.forEach(function(w){ names.push("五维刻度 "+w.n+"（S/D/E/I/F · 典范这一本账）"); });
+  ways.forEach(function(w){ names.push("出图 "+w.n+"（image-01 × "+per+"）"); });
+  ways.forEach(function(w){ names.push("M3 看图 · 九分项评分 "+w.n); });
+  names.push("近邻闸门·出（看着图查，不是看 prompt 查）");
+  names.push("择优与综合提炼");
+  initSteps(names);
+  var si = 0;
+
+  try{
+    /* ①内功 */
+    mark(si,"run"); say("正在装内功与 100 条总原则…");
+    var core = await loadCore();
+    mark(si,"done", (core.n?("内功 "+Math.round(core.n.length/1000)+"k 字"):"内功缺") + "／" + (core.p?"总原则 100 条":"总原则缺"));
+    si++;
+
+    /* ①之二：开工仪式——让基底带着内功亲手写心得。铁律是「内功＋心得＋方法论」三样齐。 */
+    mark(si,"run");
+    var reflectFresh = (REFLECT === null);
+    await ensureReflect(core, say);
+    if(REFLECT){
+      mark(si,"done", (reflectFresh ? "本场亲写 " : "复用本机 ") + Math.round(REFLECT.length/1000) + "k 字");
+      renderReflect();
+    }else{
+      mark(si,"fail","心得没写成，按只有内功跑");
+    }
+    si++;
+
+    /* ②三视觉观点 */
+    mark(si,"run"); say("三条视觉进路正在分头长出来…");
+    var triSys = sysBase(core, true) + "\n" + placeBrief();
+    var triUser = "【入题】\n" + topic + "\n\n【本档】" + M.name + "：" + M.deliver
+      + "\n\n【要你做的】给出三条**彼此不相容**的视觉进路。不是同一画面的三种说法——至少有一对，在「这幅画到底该让识别机在哪里故障」上给出方向相反的判断。\n"
+      + "每条严格按下面的格式，行首固定写「观点一：」「观点二：」「观点三：」：\n"
+      + "  故障点：这一条要让识别机在哪一处失灵（一句，必须是可争的；说不出就是在贴标签）\n"
+      + "  势能：认知反叛（看的危机）还是存在密写（不可言说者借可见性走私）——择一，并说清淤积在哪\n"
+      + "  可见形状：那次故障显露成什么（具体到能画：什么与什么的相互位置、什么密度对什么密度）\n"
+      + "  空间方案：焦点透视（指定席）还是散点游观（通票），并说明为什么这一条要这种\n"
+      + "  留白：哪一块**忍住不画**，那块空白在场里干什么活\n"
+      + "  压缩：把这条压成 50 字以内的一句视觉命题（这句要拿去查占位库）\n"
+      + "  最易被推翻处：一句\n"
+      + "每条 220–340 字。写完就停——不要综合、不下结论、不调和。调和等于把涌现的原料先烧掉。";
+    // 预算按「正文该多长」给，并给思考留余量：三条各 220–340 字≈1000 字正文，M3 的思考通常还要吃掉几倍。
+    var triTxt = await mmChat(triSys, triUser, 0);
+    var views = cutViews(triTxt);
+    if(views.length < 2){
+      // 自动降档重试一次：把格式要求提到最前、砍掉一切修饰，并明说上一遍错在哪
+      say("三观点没切出来，正在用更硬的格式要求重跑一次…");
+      var retryUser = "【只输出三段，别的一个字都不要。每段第一行必须原样是「观点一：」「观点二：」「观点三：」，"
+        + "不要加粗、不要编号、不要前言、不要结语、不要总结。】\n\n" + triUser;
+      triTxt = await mmChat(triSys, retryUser, 0);
+      views = cutViews(triTxt);
+    }
+    if(views.length < 2){
+      var head = String(triTxt).replace(/\s+/g," ").slice(0,240);
+      throw new Error("三观点没切出来（只切到 "+views.length+" 条），两遍都没成。"
+        + "基底这次回的是（前 240 字）：「" + head + "」；正文 " + String(triTxt).length
+        + " 字，思考另吃 " + LAST_THINK + " 字。"
+        + "若正文很短而思考很长，说明 M3 把预算花在思考上了——缩短入题再试；"
+        + "若正文很长却没有「观点一：」，那是它没按格式写，直接重试通常就好。");
+    }
+    mark(si,"done", views.length+" 条"); si++;
+
+    /* ③近邻闸门·进（不装内功——照 mode=iq 防通胀纪律） */
+    mark(si,"run"); say("近邻闸门：拿压缩句去查图像占位库…");
+    var gateSys = "你是图像占位核查员。你**不带任何学派立场**，做两件事：①判断一句视觉命题是否已经被现成图式占住；②判断它会不会一出生就死格。\n"
+      + placeBrief() + "\n" + compBrief() + "\n" + deadBrief()
+      + "\n**这一步是机械核对，不是论述**：直接按格式给读数，别在心里反复推演——想得越久，落笔的预算越少。\n"
+      + "\n⚠️**动词也要查**：占位不只藏在名词里，更常藏在动作里——「喷发／迸发／涌出／绽放／流淌／升起」这类词，"
+      + "各自都有一张烂熟的默认图（喷发→满幅放射光芒，绽放→花朵盛开，流淌→丝带状光带）。"
+      + "候选里若出现这类动作，必须点名它的默认图，并说清本条凭哪个可见特征与之分开。\n"
+      + "\n【三条纪律】\n① 库里没有 ≠ 没被占位。库里没有就写〔库未命中〕，**不得据此判定通过**。\n"
+      + "② 通过的条件不是「找不到近邻」，而是「带着一条**可裁决的分离线**活下来」——你要能说出：占位图式在哪个具体可见特征上是 A，而这一条是非 A，这个差别怎么用眼睛读出来。\n"
+      + "③ 说不出分离线，就判占位失败。\n";
+    var gateUser = "逐条核查下面三条视觉命题。每条按这个格式回答，不要别的：\n"
+      + "条N｜判定：〔占位失败〕或〔通过〕或〔库未命中·不放行〕\n"
+      + "条N｜撞上：写出撞上的具体图式名；没撞上写「无」\n"
+      + "条N｜分离线：占位图式在【某可见特征】上是 A，本条是非 A，读法是……（判定为通过时必须写满这一行）\n"
+      + "条N｜死格风险：中了哪一条病征就写出病名与理由；一条都不中写「无」\n\n"
+      + views.map(function(v,i){ return "【条"+(i+1)+"】" + v; }).join("\n\n");
+    var gateTxt = await mmChat(gateSys, gateUser, 0, null, true);
+    mark(si,"done"); si++;
+    renderTri(views, gateTxt);
+
+    /* ④二阶碰撞 ×N */
+    var paras = [];
+    for(var wi=0; wi<ways.length; wi++){
+      var w = ways[wi];
+      mark(si,"run"); say("第 "+(wi+1)+"/"+ways.length+" 路碰撞：" + w.t + "…");
+      try{
+        var colSys = sysBase(core, true) + "\n" + placeBrief();
+        var colUser = "【三条视觉进路】\n" + views.join("\n\n")
+          + "\n\n【近邻闸门的核查结论】\n" + gateTxt
+          + "\n\n【本轮碰撞方式 " + w.n + "·" + w.t + "】" + w.d
+          + "\n\n【三条禁令】① 不许挑一条当结论——那是择优不是碰撞。② 不许调和成一个更周全的画面——张力被抹平就没有涌现。③ 不许编造：想象力只作用于形式与结构，不作用于事实。\n"
+          + "\n【要你产出】严格按七节，节名照抄：\n"
+          + "一、典范名：（一个短句，不要功能标签）\n"
+          + "二、承重命题：写成「这幅画要让识别机故障的不是 Y₁ 也不是 Y₂，而是 Z」\n"
+          + "三、审美微时序：一号位那一眼看见什么／二号位目光被什么牵着走／三号位在哪一刻整场撑开（三行分写，这是本画的乐谱）\n"
+          + "四、色彩关系作业：哪个颜色挨着哪个颜色、被推到什么状态（写关系，不写「某物是某色」）\n"
+          + "五、构图连接工程：目光从哪里入画、沿什么走、在哪里抵达；**留白留在哪一块，那块白干什么活**\n"
+          + "六、分离线：它跟哪个已有图式分开、凭哪个可见特征分开、怎么用眼睛读出来\n"
+          + "七、绘图指令：一段英文 prompt，**不超过 1400 字符**。要求：\n"
+          + "   （a）开头就把那次识别机故障落成一个可见对立（材质对材质／光对光／密度对密度）；\n"
+          + "   （b）接着写颜色的相互作用（谁挨着谁、谁把谁推到什么状态），不写「某物是某色」；\n"
+          + "   （c）再写目光的路：入口、行进、抵达；\n"
+          + "   （d）**明写留白**：哪一大块是空的、占多少画面（generous empty field / negative space）——不留白等于交一张塞满的图；\n"
+          + "   （e）结尾原样接上这一串：no text, no letters, no numbers, no watermark, no recognizable real person, no logo, no brand, not in the style of any named artist\n"
+          + "   （f）**不许出现任何艺术家人名或画派名**。\n"
+          + "   （g）**画面必须是一个场，不是拼贴**：若用到分割，分割线两侧要靠同一只手、同一种材质逻辑连起来；\n"
+          + "        实测栽过——一道硬竖缝把画面切成两块，看上去像两张画布并排挂着，观者的目光被挡在缝上进不去（连接分项当场塌）。\n"
+          + "        英文 prompt 里要写明 one continuous surface, unified handling across the whole frame。\n"
+          + "全文 1000–1500 字。";
+        var colTxt = await mmChat(colSys, colUser, 0);
+        var prompt = grab(colTxt, "七、绘图指令") || grab(colTxt, "绘图指令");
+        prompt = prompt.replace(/^[（(].*?[）)]\s*/,"").trim();
+        if(!prompt || prompt.length < 60) throw new Error("第七节绘图指令没解析出来");
+        var hd = hardenPrompt(prompt);
+        paras.push({ way:w, txt:colTxt, prompt:hd.p, imgs:[], score:null, report:"",
+                     stripped:hd.stripped, addedTail:hd.addedTail });
+        mark(si,"done", w.t);
+      }catch(e){
+        mark(si,"fail", (e&&e.message||"失败").slice(0,60));
+        paras.push(null);   // 单路失败不拖垮另外两路
+      }
+      si++;
+    }
+    var live = paras.filter(function(p){ return p; });
+    if(!live.length) throw new Error("三路碰撞全挂了，不进出图、不污染交付。");
+
+    /* ④之二：五维刻度（不装内功——评分者装了会对 SDE 语言过敏性加分） */
+    for(var wq=0; wq<ways.length; wq++){
+      var pq = paras[wq];
+      if(!pq){ mark(si,"fail","上一步没出典范"); si++; continue; }
+      mark(si,"run"); say("第 "+(wq+1)+" 路：五维刻度评这个典范对棋盘的回写…");
+      try{
+        var iqSys = "你是创新度量员。你**不带学派立场**，只按下面这把尺读数。\n"
+          + "这把尺量的是**这个典范对领域棋盘的回写力度**，**不裁决任何一次私人发生的真伪**——两本账，永远分开记。\n"
+          + "评分是刻画不是在场：它服务于比较与教学，永远替代不了进场本身。\n\n"
+          + "五个维度与权重：\n"
+          + IQ5.map(function(d){ return "· " + d[0] + "（" + d[1] + "，权重 " + d[2] + "）：" + d[3]; }).join("\n")
+          + "\n\n刻度说明：每维给一个 100–170 的整数，向上开放；一百五十分为本体论级门槛——过线的不只是优秀，它重置了棋盘。\n"
+          + "**衡量差异维时必须校准年代棋盘**：在别人做过之后再做一次，与第一次做出来，路径深度天差地别。\n"
+          + "**纠缠维骗不到分**：无根的新奇（为怪而怪）在此维必须现形。\n\n"
+          + "**这一步是读数，不是论述**：直接给分，别在心里反复推演。\n"
+          + "严格按每行一维输出，共五行，不要别的：\n维名｜分数｜一句为什么\n"
+          + "然后另起一行写「弱在」：指出最弱的一维，并给一条可动手的坐标（不许写「加强创新」这类空话）。\n"
+          + "\n最后再写两行——**这两行不是评分，是出图前的最后一道闸**：\n"
+          + "可画性｜高／中／低｜这个典范交给一台**通用文生图基底**，它最可能画成什么样？\n"
+          + "  实测栽过两次的退化方向：①退化成**极简静物**（一块布、一根条纹、一个几何图形，看着像作品其实空）；\n"
+          + "  ②退化成**拼贴**（画面被切成互不相干的几块，观者进不去）。判低就直说低。\n"
+          + "补救句｜若可画性不是「高」，写出一句必须补进英文 prompt 的话（要具体到可见特征：\n"
+          + "  比如「让两种材质在同一处真正咬合而不是并排」「留一个可以站进去的近景」），不许写空话。";
+        var iqUser = "【要评的典范】\n" + pq.txt.slice(0, 3000)
+          + "\n\n【它撞出来的方式】" + pq.way.t
+          + "\n\n请按五维读数。注意：你评的是这个**典范**（一个视觉命题），不是评一张具体的画。";
+        var iqTxt = await mmChat(iqSys, iqUser, 0, null, true);
+        pq.iqReport = iqTxt;
+        pq.iq = {};
+        IQ5.forEach(function(d){ pq.iq[d[1]] = cellScore(iqTxt, d[0], 200); });
+        var sum=0, wsum=0;
+        IQ5.forEach(function(d){ var v=pq.iq[d[1]]; if(v!=null){ sum+=v*d[2]; wsum+=d[2]; } });
+        pq.iqTotal = wsum ? Math.round(sum/wsum) : null;
+        pq.fp = fingerprint(pq.iq);
+        pq.sc = selfCheck(pq.iq);
+        // 可画性：五维那一步顺带问出来的最后一道闸（零额外调用）
+        var mDraw = iqTxt.match(/可画性[｜|：:]\s*([高中低])/);
+        pq.paint = mDraw ? mDraw[1] : "";
+        var mFix = iqTxt.match(/补救句[｜|：:]\s*([^\n]+)/);
+        pq.paintFix = mFix ? mFix[1].trim() : "";
+        mark(si,"done", (pq.iqTotal!=null? pq.iqTotal+" 分" : "已评") + (pq.fp? " · "+pq.fp.n : ""));
+      }catch(e){
+        mark(si,"fail",(e&&e.message||"失败").slice(0,60));
+        pq.iqTotal = null;   // 评不出不打崩流程，照样出图
+      }
+      si++;
+      renderDraw(paras);
+    }
+
+    /* ⑤出图 */
+    for(var wi2=0; wi2<ways.length; wi2++){
+      var p = paras[wi2];
+      if(!p){ mark(si,"fail","上一步没出典范"); si++; continue; }
+      mark(si,"run"); say("第 "+(wi2+1)+" 路出图中（image-01 × "+per+"）…");
+      try{
+        var usePrompt = p.prompt;
+        if(p.paint && p.paint !== "高" && p.paintFix){
+          // 可画性判了中/低 → 把补救句接进 prompt，并留痕告诉读者动过手
+          usePrompt = hardenPrompt(p.prompt.split(BAN_TAIL)[0] + ", " + p.paintFix).p;
+          p.promptFixed = true;
+        }
+        p.imgs = await mmDraw(usePrompt, $("ratio").value, per);
+        mark(si,"done", p.imgs.length+" 张");
+      }catch(e){ mark(si,"fail",(e&&e.message||"失败").slice(0,60)); p.imgs = []; }
+      si++;
+      renderDraw(paras);
+    }
+
+    /* ⑥M3 看图九宫格 */
+    for(var wi3=0; wi3<ways.length; wi3++){
+      var p3 = paras[wi3];
+      if(!p3 || !p3.imgs.length){ mark(si,"fail","没有图可看"); si++; continue; }
+      mark(si,"run"); say("第 "+(wi3+1)+" 路：M3 正在看图打分…");
+      try{
+        var b9Sys = "你是画面审看者。你**不带学派立场**，只看画面本身。你会收到若干张图，逐格按「三号位九分项坐标仪」打分。\n"
+          + "这九项是显露解剖学三轴各三分：分布之三（关系·影响·共存）、场之三（连接·次序·结构）、美之三（完全·纯一·活力）。\n"
+          + "本档尤其看重「" + M.accent[0] + "」与「" + M.accent[1] + "」——**这两格打分是加倍的，其余七格达标也救不回来**。\n"
+          + "九格与各自的判据：\n"
+          + B9.map(function(g){ return "· " + g[0] + "（" + g[1] + "）：" + g[2]; }).join("\n")
+          + "\n\n" + compBrief() + "\n" + deadBrief()
+          + "\n严格按每行一项输出，共九行，不要别的：\n项名｜分数(0-100)｜一句为什么\n"
+          + "看不清就说看不清，不要猜。";
+        var b9User = "【这组图想要显露的那一刀】" + (grab(p3.txt,"三、它切开的辨别面") || "见画面")
+          + "\n【承重命题】" + (grab(p3.txt,"二、承重命题") || "")
+          + "\n\n请看下面 " + p3.imgs.length + " 张图并逐格打分。两条必须照做：\n"
+          + "① 「关系」这一格量的是元素之间——如果每个元素单独看也一样，关系为零；\n"
+          + "② 如果这张图只是让人「认出」了什么、识别一完成观看就结束，那它停在一号位的物：连接与活力两格必须低分。\n"
+          + "另两条硬判据（都是真跑栽出来的）：\n"
+          + "· 画面被塞满、没有可走的空处 → 「共存」与「连接」两项必须扣。\n"
+          + "· **反过来也一样**：大片空白若**不与实处互相定义**（把空的那一侧换个颜色，实的那一侧读法不变），\n"
+          + "  那不是留白是没画——「共存」不得高于 30，「连接」不得高于 25。\n"
+          + "如果这张图中了「打卡化」或「十五秒消费」，「活力」（再点燃之力）必须给低分——一眼看完的东西没有第二次发生。";
+        var b9Txt = await mmChat(b9Sys, b9User, 0, p3.imgs.slice(0,3), true);
+        p3.report = b9Txt;
+        p3.score = scoreOf(b9Txt, M.accent);
+        mark(si,"done", p3.score!=null ? (p3.score+" 分") : "已评");
+      }catch(e){
+        mark(si,"fail",(e&&e.message||"失败").slice(0,60));
+        p3.score = null;   // 评分失败记 0 不打崩流程
+      }
+      si++;
+      renderDraw(paras);
+    }
+
+    /* ⑦近邻闸门·出（看着图查） */
+    mark(si,"run"); say("近邻闸门·出：看着图再查一次占位——防的是想法不俗但基底把它拉回了熟脸…");
+    var winner = null;
+    try{
+      var allImgs = [];
+      paras.forEach(function(p){ if(p && p.imgs.length) allImgs.push(p.imgs[0]); });
+      if(!allImgs.length) throw new Error("没有图可查");
+      var goSys = "你是图像占位核查员，现在**看着成品图**核查，不看文字描述。\n" + placeBrief() + "\n" + compBrief() + "\n" + deadBrief()
+        + "\n三条纪律同前：库未命中不得据以放行；通过须带一条可裁决的分离线；说不出分离线即判占位失败。\n"
+        + "另外单独核一件事：这张图像不像任何一位可辨识艺术家的手笔？像就直接判占位失败并点名。";
+      var goUser = "逐张核查。每张按四行：\n图N｜判定：〔占位失败〕／〔通过〕／〔库未命中·不放行〕\n图N｜撞上：具体图式名或艺术家名，没有写「无」\n图N｜分离线：（判通过时必须写满）\n"
+        + "图N｜死格：中了哪条病征（打卡化／十五秒消费／防弹玻璃式／语法失传），一条都不中写「无」——**这是绘画的当代第一死因，比撞图式更该说**\n"
+        + "最后一行写：最干净的是第几张。";
+      var goTxt = await mmChat(goSys, goUser, 0, allImgs.slice(0,4), true);
+      $("drawOut").insertAdjacentHTML("beforeend",
+        '<div class="card" style="margin-top:16px"><h2>近邻闸门 · 出（看着图查）</h2><div class="out">'+esc(goTxt)+'</div></div>');
+      mark(si,"done");
+    }catch(e){ mark(si,"fail",(e&&e.message||"失败").slice(0,60)); }
+    si++;
+
+    /* ⑧择优 + 综合提炼 */
+    mark(si,"run"); say("择优与综合提炼…");
+    // 择优用**五维**：择的是典范（观念层对棋盘的回写）。九分项是画面兑现度的独立读数，两本账不合并。
+    // 五维全评不出来时才退回九分项择优——退回要说出来，不许悄悄换尺。
+    var byIQ = live.some(function(p){ return p.iqTotal != null; });
+    live.forEach(function(p){
+      if(byIQ){ if(!winner || (p.iqTotal||0) > (winner.iqTotal||0)) winner = p; }
+      else    { if(!winner || (p.score||0)   > (winner.score||0))   winner = p; }
+    });
+    // ⚠️ 这句不能只走 say()——后面还有一条 say("完成…") 会把它盖掉（与 dNote 覆盖同族的坑）。
+    //    换尺这件事必须走必达通道：进度条标签 ＋ 提炼正文开头，两处都留。
+    var fallbackNote = byIQ ? "" : "〔本次五维一路都没评出来，择优已退回九分项——换过尺，特此说明。〕\n\n";
+    var syUser = "【入题】" + topic
+      + "\n\n【胜出典范·" + winner.way.t + "】\n" + winner.txt
+      + "\n\n【九分项读数·画面这一本账】\n" + (winner.report||"（未评上分）")
+      + "\n\n【五维刻度·典范这一本账】\n" + (winner.iqReport||"（未评上分）")
+      + (winner.iqTotal!=null ? ("\n加权总分 " + winner.iqTotal + "（一百五十为本体论级门槛）"
+          + (winner.fp ? "；分数结构＝" + winner.fp.n + "：" + winner.fp.d : "")
+          + (winner.sc ? "；自检表读出：" + winner.sc : "")) : "")
+      + (live.length>1 ? ("\n\n【落选典范】\n" + live.filter(function(p){return p!==winner;}).map(function(p){ return "〔"+p.way.t+"〕" + p.txt.slice(0,700); }).join("\n\n")) : "")
+      + "\n\n【要你写】一篇〈这幅画是怎么发生的〉，按六节，节名照抄：\n"
+      + "一、这幅画要让识别机在哪里故障（并写明势能是认知反叛还是存在密写）\n二、它是怎么撞出来的（写清用的是哪种碰撞方式，以及它撞掉了什么）\n"
+      + "三、落选典范的可回收零件（每个落选的：淘汰理由＋还剩哪件能用、装到哪一节）\n"
+      + "四、分离线（它跟哪几个已有图式分开、凭哪个可见特征、怎么用眼睛读出来）\n"
+      + "五、两张卡开出的作业（九分项与五维各自最弱的那一项，逐条转写成下一版的具体动作，禁「加强构图」「加强创新」这类空话；**两本账分开写，不许合并成一个总评**）\n"
+      + "六、明确不画什么\n"
+      + (MODE==="C" ? "全文控制在 300–500 字。" : (MODE==="A" ? "全文 600–900 字，并在最后附一行 alt 文本（一句，供无障碍阅读用）。" : "全文 1200–1800 字。"));
+    var syTxt = await mmChat(sysBase(core,true), syUser, 0);
+    // 产物自证版本（PPT 线那条教训）：以后拿到任何一份产出，一眼就知道它出自哪一版产线，
+    // 不必再花一轮确认读者手上跑的是不是改好的那版。
+    var stamp = "〔SDE 艺术绘画 · 产线 v" + VERSION + " · 上限 " + tokNow()
+      + " · " + MODES[MODE].name + " · " + new Date().toLocaleString("zh-CN") + "〕\n\n";
+    $("synthOut").textContent = stamp + fallbackNote + syTxt;
+    mark(si,"done", (byIQ ? ("胜出 五维 "+(winner.iqTotal!=null?winner.iqTotal:"—")+" 分")
+                          : ("五维全缺·退回九分项择优，胜出 "+(winner.score!=null?winner.score:"—")+" 分")));
+    say("完成。胜出的是〔" + winner.way.t + "〕。");
+    LAST = { paras:paras, winner:winner, synth:syTxt };
+    saveDraft();
+
+  }catch(e){
+    if(e && e.name === "AbortError"){ say("已停。"); }
+    else { fail(e && e.message || String(e)); say("中断。"); }
+  }finally{
+    $("btnRun").disabled = false; $("btnStop").disabled = true; ABORT = null;
+  }
+}
+
+/* 取某一格的分。
+   ⚠️ 这里踩过一个隐蔽的坑：格名里有单字的（「爱」），而它极容易出现在**别的格**的
+   理由文字里（「三张一个样，很不可爱也不自由」）。早先的写法是「哪一行含这个格名就算哪一行」，
+   于是「爱」和「自由」双双被「多样」那一行的 10 分抢走，C 档还把「爱」加倍——
+   一份八格 90 分的卡被算成 61。**必须锚定行首并要求紧跟分隔符**，只认 `格名｜分数｜理由` 这个形状。 */
+function cellScore(txt, name, hi){
+  // ⚠️ hi 是上钳，**必须按尺给**：九分项是 0–100 的尺，五维刻度是 100–170、向上开放的尺。
+  //    早先写死 Math.min(100,…)，于是五维每一维都被钳成 100，一百五十的门槛永远够不着——
+  //    同一个取分函数服务两把不同量程的尺时，量程必须由调用方交代，不能藏在函数里。
+  hi = hi || 100;
+  var lines = String(txt).split(/\n/);
+  // 前缀允许 · - * 数字 . 、 ） ) 与空格任意混排——真产出常写成「1. 统一｜80｜…」或「· 3. 活力｜77｜…」
+  var re = new RegExp("^[\\s·\\-*\\d.、）)]*" + name + "\\s*[｜|/:：,，]\\s*(\\d{1,3})");
+  for(var i=0;i<lines.length;i++){
+    var m = lines[i].match(re);
+    if(m) return Math.min(hi, parseInt(m[1],10));
+  }
+  return null;
+}
+function scoreOf(txt, accent){
+  var sum = 0, wsum = 0;
+  B9.forEach(function(g){
+    var v = cellScore(txt, g[0]);
+    if(v === null) return;
+    var w = (accent.indexOf(g[0])>=0) ? 2 : 1;
+    sum += v*w; wsum += w;
+  });
+  return wsum ? Math.round(sum/wsum) : null;
+}
+
+/* ── 渲染 ─────────────────────────────────────────────────── */
+function renderTri(views, gateTxt){
+  var h = views.map(function(v,i){
+    return '<div class="card" style="background:#0C1015;margin:12px 0"><b style="color:var(--gold)">视觉进路 '+(i+1)+'</b><div class="out" style="margin-top:8px;max-height:260px">'+esc(v)+'</div></div>';
+  }).join("");
+  h += '<div class="card" style="background:#0C1015"><b style="color:var(--gold)">近邻闸门 · 进</b><div class="out" style="margin-top:8px">'+esc(gateTxt)+'</div></div>';
+  $("triOut").innerHTML = h;
+}
+function renderDraw(paras){
+  var h = "";
+  paras.forEach(function(p, i){
+    if(!p){ h += '<div class="warn">第 '+(i+1)+' 路：碰撞失败，本路作废（另外几路照跑）。</div>'; return; }
+    h += '<div class="card" style="background:#0C1015;margin:14px 0">';
+    h += '<b style="color:var(--gold)">第 '+(i+1)+' 路 · 碰撞方式 '+p.way.n+'：'+esc(p.way.t)+'</b>';
+    if(p.score!=null) h += ' <span class="tag pass">九分项 '+p.score+'</span>';
+    if(p.iqTotal!=null) h += ' <span class="tag '+(p.iqTotal>=150?'pass':'')+'">五维 '+p.iqTotal+(p.iqTotal>=150?' · 本体论级':'')+'</span>';
+    if(p.fp) h += ' <span class="tag">'+esc(p.fp.n)+'</span>';
+    if(p.paint) h += ' <span class="tag'+(p.paint==="高"?" pass":" hit")+'">可画性 '+esc(p.paint)+'</span>';
+    if(p.promptFixed) h += ' <span class="tag hit">已按可画性补救句改过 prompt</span>';
+    if(p.stripped && p.stripped.length) h += ' <span class="tag hit">渲染端摘掉了 '+p.stripped.length+' 处艺术家指名：'+esc(p.stripped.join("、"))+'</span>';
+    if(p.addedTail) h += ' <span class="tag hit">禁令串是渲染端补的（基底没写）</span>';
+    h += '<div class="out" style="margin-top:8px;max-height:300px">'+esc(p.txt)+'</div>';
+    if(p.imgs.length){
+      h += '<div class="gal">' + p.imgs.map(function(d,k){
+        return '<div class="shot"><img src="'+d+'" alt="第'+(i+1)+'路第'+(k+1)+'张"><div class="cap">第 '+(k+1)+' 张 · <a href="'+d+'" download="sde-art-v'+VERSION+'-'+(i+1)+'-'+(k+1)+'.jpg">下载</a></div></div>';
+      }).join("") + '</div>';
+    }
+    if(p.iqReport){
+      h += '<div class="b9" style="grid-template-columns:repeat(5,1fr)">' + IQ5.map(function(d){
+        var v = cellScore(p.iqReport, d[0], 200);
+        return '<div class="g'+(v!=null && v<127 ? ' low':'')+'" title="'+esc(d[3])+'"><b>'+d[1]+'·'+d[0].replace("维","")+'</b><u>'+(v==null?"—":v)+'</u></div>';
+      }).join("") + '</div>';
+      if(p.sc) h += '<div class="warn" style="margin-top:8px">自检表读出：'+esc(p.sc)+'</div>';
+      if(p.fp) h += '<div class="note" style="margin-top:8px"><b>'+esc(p.fp.n)+'</b>——'+esc(p.fp.d)+'</div>';
+      h += '<div class="out" style="margin-top:10px;max-height:200px">'+esc(p.iqReport)+'</div>';
+    }
+    if(p.report){
+      h += '<div class="b9">' + B9.map(function(g){
+        var v = cellScore(p.report, g[0]);   // 与 scoreOf 共用一把尺，格子与总分不会各说各话
+        return '<div class="g'+(v!=null && v<60 ? ' low':'')+'" title="'+esc(g[2])+'"><b>'+g[0]+'</b><u>'+(v==null?"—":v)+'</u></div>';
+      }).join("") + '</div>';
+      h += '<div class="out" style="margin-top:10px;max-height:220px">'+esc(p.report)+'</div>';
+    }
+    h += '</div>';
+  });
+  $("drawOut").innerHTML = h;
+}
+
+/* ── 保底存盘：第 0 层草稿（崩了关了都不丢） ────────────────── */
+function saveDraft(){
+  try{
+    var d = { t: Date.now(), topic: $("topic").value, mode: MODE,
+              synth: LAST ? LAST.synth : "", n: LAST ? LAST.paras.length : 0 };
+    localStorage.setItem("sde_art_draft", JSON.stringify(d));
+  }catch(e){}
+}
+(function(){
+  try{
+    var raw = localStorage.getItem("sde_art_draft"); if(!raw) return;
+    var d = JSON.parse(raw); if(!d || !d.synth) return;
+    var ago = Math.round((Date.now()-d.t)/60000);
+    $("err").innerHTML = '<div class="note">本机上还留着 '+ago+' 分钟前的一份草稿（'+esc((d.topic||"").slice(0,24))+'…）。'
+      + '<a href="#" id="rec">恢复它</a></div>';
+    $("rec").onclick = function(ev){ ev.preventDefault(); $("topic").value = d.topic||"";
+      $("paneOut").classList.add("on"); $("synthOut").textContent = d.synth; $("err").innerHTML=""; };
+  }catch(e){}
+})();
+
+try{ $("verTag").textContent = "产线 v" + VERSION + " · 上限 " + tokNow(); }catch(e){}
+
+/* ── 版本自愈：服务端缓存头是对的（no-store），但**已经打开的标签页**里跑的仍是当初载入的那份 JS。
+     PPT 那条线栽过一次：「标签页开了一整天，改了半天的渲染一点都用不上」。
+     所以每次开工前先问一次线上是第几版；比自己新就挡住，不让读者拿旧产线白烧钱。
+     不自动刷新——读者的入题可能是刚敲进去的长文；先落草稿，再由他自己点。 ── */
+var NEWEST = null;
+async function checkVersion(){
+  try{
+    var r = await fetch(location.pathname + "?_v=" + Date.now(), { cache:"no-store" });
+    if(!r.ok) return null;
+    var t = await r.text();
+    var m = t.match(/var VERSION = (\d+)/);
+    NEWEST = m ? parseInt(m[1],10) : null;
+    return NEWEST;
+  }catch(e){ return null; }
+}
+function staleBanner(n){
+  try{  // 页头也一起变红——横幅可能在折叠区外，页头永远在
+    var t = $("verTag");
+    t.textContent = "⚠ 旧版 v" + VERSION + "（线上 v" + n + "）";
+    t.style.color = "#C4643E"; t.style.fontWeight = "800";
+  }catch(e){}
+  var box = $("err");
+  box.innerHTML = '<div class="warn"><b>这个标签页是旧版（产线 v'+VERSION+'），线上已经是 v'+n+'。</b><br>'
+    + '旧版跑出来的问题多半早就修好了，接着跑只是白烧 Key。你的入题已经存进本机草稿，刷新不会丢。<br>'
+    + '<button class="ghost" id="btnReload" style="margin-top:10px">立即刷新到 v'+n+'</button></div>';
+  $("btnReload").onclick = function(){
+    try{ localStorage.setItem("sde_art_draft", JSON.stringify({ t:Date.now(), topic:$("topic").value, mode:MODE, synth:"（刷新前的入题已保住）", n:0 })); }catch(e){}
+    location.reload(true);
+  };
+}
+checkVersion().then(function(n){ if(n && n > VERSION) staleBanner(n); });
+
+function renderReflect(){
+  try{
+    $("reflectCard").style.display = "";
+    $("reflectOut").textContent = REFLECT || "（未写成）";
+  }catch(e){}
+}
+$("btnReflectAgain").onclick = async function(){
+  try{ localStorage.removeItem(reflectCacheKey()); }catch(e){}
+  REFLECT = null;
+  var core = await loadCore();
+  say("正在重写心得…");
+  await ensureReflect(core, say);
+  renderReflect(); say("心得已重写。");
+};
+$("btnReflectDrop").onclick = function(){
+  try{ localStorage.removeItem(reflectCacheKey()); }catch(e){}
+  REFLECT = null;
+  try{ $("reflectCard").style.display = "none"; }catch(e){}
+  say("本机心得已清掉，下次开工会重写一份。");
+};
+$("btnRun").onclick = function(){ run(false); };
+$("btnAgain").onclick = function(){ run(true); };
+$("btnStop").onclick = function(){ if(ABORT) ABORT.abort(); };
+$("btnDlAll").onclick = function(){
+  if(!LAST){ return; }
+  LAST.paras.forEach(function(p,i){
+    if(!p) return;
+    p.imgs.forEach(function(d,k){
+      var a = document.createElement("a");
+      a.href = d; a.download = "sde-art-v"+VERSION+"-"+(i+1)+"-"+(k+1)+".jpg";
+      document.body.appendChild(a); a.click(); a.remove();
+    });
+  });
+};
+/* 只读探针：供 tools/sim_sde_art*.js 抠内部状态做干跑。页面自身不读它。
+   露出 run 是为了让 e2e 能 await 整条产线——onclick 不返回 promise，不露就只能轮询。 */
+window.__sdeArt = { WAYS:WAYS, B9:B9, MODES:MODES, pickWays:pickWays, scoreOf:scoreOf,
+                    placeBrief:placeBrief, PLACE_SDE:PLACE_SDE, VERSION:VERSION,
+                    IQ5:IQ5, IQ5_GATE:IQ5_GATE, fingerprint:fingerprint, selfCheck:selfCheck,
+                    DEAD_FORMS:DEAD_FORMS, deadBrief:deadBrief, cellScore:cellScore,
+                    run:run, setMode:function(m){ MODE=m; }, last:function(){ return LAST; },
+                    resetWays:function(){ usedWays=[]; } };
+</script>
+</body>
+</html>

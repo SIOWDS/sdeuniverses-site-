@@ -1,0 +1,6 @@
+# 索引生成物不再进 git —— 由 .github/workflows/search-index.yml 每日重建并上传 R2
+# （桶 sdeuniverses-pdf 的 search/ 前缀）。此目录在 git 里只应留 index.html 这一个页面。
+# 2026-07-29 用 filter-repo 剔历史时，就是漏看了这一层，把页面连同生成物一起剔掉了。
+*.json
+doc/
+kw/

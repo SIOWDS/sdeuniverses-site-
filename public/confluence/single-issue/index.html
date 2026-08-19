@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>独版——论一份介入前的记录之所以有用，不因为它忠实，而因为它此后再也造不出第二份 · 学科通融 | SDE Universes</title>
+<meta name="description" content="外部答案到达之前先写下自己的判断，通常被理解为保存一个内部状态。三个领域对此给出互斥答案：人机交互说先想一下就够，证据法说必须在污染前固定且污染不可逆，神经科学说提取即改写、根本没有可保存的原始状态。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+/* 学科通融 · 学术纸面版式 v2 —— 为长时间的思辨性阅读设计 */
+:root{
+  --paper:#F5F2E9; --paper2:#FBF9F3; --sheet:#FDFCF7;
+  --ink:#23201A; --ink2:#5C5647; --ink3:#8A8271;
+  --rule:#2A3B50; --rule2:#41586F;
+  --mark:#9E3D2C; --mark2:#B85A44;
+  --line:rgba(35,32,26,.13); --line2:rgba(35,32,26,.28);
+  --measure:700px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 8%, rgba(42,59,80,.035), transparent 46%),
+    radial-gradient(circle at 84% 72%, rgba(158,61,44,.030), transparent 44%);
+  background-attachment:fixed;
+  font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;
+  font-size:18.5px; line-height:2.06; letter-spacing:.012em;
+  font-feature-settings:"kern" 1;
+  text-rendering:optimizeLegibility;
+}
+a{color:inherit}
+::selection{background:rgba(158,61,44,.16)}
+
+/* 阅读进度：细，不抢注意力 */
+#pbar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--mark);z-index:99;opacity:.85}
+
+/* 顶栏 */
+.readbar{position:sticky;top:0;z-index:10;background:rgba(245,242,233,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 26px;font-size:13.5px;gap:12px;flex-wrap:wrap;letter-spacing:.02em}
+.nav-back{text-decoration:none;color:var(--mark)}
+.rb-modes{display:flex;gap:8px}
+.rb-btn{padding:5px 13px;border:1px solid var(--line2);border-radius:0;
+  text-decoration:none;font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
+.rb-btn:hover{border-color:var(--mark);color:var(--mark)}
+.rb-btn.cur{background:var(--rule);color:var(--sheet);border-color:var(--rule)}
+
+/* 题头：论文首页 */
+.art{max-width:800px;margin:auto;padding:78px 26px 8px;text-align:center}
+.art-series{color:var(--mark);letter-spacing:.42em;font-size:11.5px;text-transform:uppercase}
+.art-title{font-size:clamp(30px,4.4vw,45px);line-height:1.38;margin:26px 0 0;font-weight:700;letter-spacing:.01em}
+.art-title:after{content:"";display:block;width:56px;height:1px;background:var(--line2);margin:26px auto 0}
+.art-sub{color:var(--ink2);font-size:17px;line-height:1.94;max-width:620px;margin:22px auto 0;font-weight:400}
+.art-meta{color:var(--ink3);font-size:12.5px;margin-top:26px;letter-spacing:.09em}
+
+/* 正文栏宽：每行约三十四个汉字，是长文思辨阅读最省力的宽度 */
+.wrap{max-width:var(--measure);margin:auto;padding:8px 26px 46px}
+
+/* 摘要块 */
+.deck{position:relative;background:var(--paper2);border:0;border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--line);border-radius:0;
+  padding:30px 30px 26px;margin:44px 0 8px;font-size:16.2px;line-height:2.0;color:var(--ink2);text-align:justify}
+.deck:before{content:"题 解";position:absolute;top:-11px;left:26px;background:var(--paper);
+  padding:0 10px;font-size:11px;letter-spacing:.34em;color:var(--rule)}
+
+/* 目录：带引导点的学术目次 */
+.toc{background:transparent;border:0;border-top:1px solid var(--line2);
+  border-bottom:1px solid var(--line2);border-radius:0;padding:24px 4px 20px;margin:44px 0 56px}
+.toc .tl{font-size:11px;letter-spacing:.44em;color:var(--mark);margin-bottom:16px;text-align:center}
+.toc a{display:flex;align-items:baseline;gap:6px;padding:6px 2px;color:var(--ink2);
+  font-size:15px;text-decoration:none;border:0;line-height:1.7}
+.toc a:after{content:"";flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-4px)}
+.toc a:hover{color:var(--mark)}
+
+/* 章节层级 */
+h2{font-size:23px;margin:74px 0 22px;padding:26px 0 0;border:0;border-top:1px solid var(--line2);
+  line-height:1.55;scroll-margin-top:78px;letter-spacing:.02em;font-weight:700}
+h2:first-of-type{margin-top:48px}
+h2:target{background:linear-gradient(transparent 68%,rgba(158,61,44,.14) 68%)}
+h3{font-size:18.5px;margin:44px 0 14px;color:var(--rule);font-weight:700;
+  padding-left:12px;border-left:2px solid var(--mark);line-height:1.7}
+h4{font-size:17px;margin:30px 0 10px;color:var(--mark);font-weight:700}
+
+p{margin:0 0 17px;text-align:justify;hyphens:auto}
+strong,b{color:var(--rule);font-weight:700}
+i,cite{font-style:italic;color:var(--ink2)}
+
+/* 命题框：承重判断单独立出来，读者一眼可辨 */
+blockquote{position:relative;margin:38px 0;padding:26px 34px;background:var(--sheet);
+  border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);border-radius:0;
+  font-size:19px;line-height:1.95;font-weight:600;color:var(--ink);text-align:justify}
+blockquote:before,blockquote:after{position:absolute;color:var(--mark);font-size:26px;line-height:1;opacity:.55}
+blockquote:before{content:"⌜";top:9px;left:10px}
+blockquote:after{content:"⌟";bottom:9px;right:10px}
+blockquote p{margin:0}
+blockquote p+p{margin-top:12px}
+
+ul{margin:0 0 18px;padding-left:1.5em}
+ol{margin:0 0 18px;padding-left:1.7em}
+li{margin:0 0 10px;text-align:justify}
+li::marker{color:var(--mark)}
+
+hr{border:0;height:1px;background:var(--line);margin:52px auto;width:62%}
+
+em{font-style:normal;color:var(--ink3);font-size:15px}
+
+/* 三线表 */
+.tbl{width:100%;border-collapse:collapse;margin:32px 0;font-size:15.5px;line-height:1.8}
+.tbl th,.tbl td{padding:12px 14px;text-align:left;vertical-align:top;border:0}
+.tbl thead th{border-top:2px solid var(--ink);border-bottom:1px solid var(--line2);
+  font-weight:700;color:var(--rule);font-size:14.5px;letter-spacing:.04em}
+.tbl tbody tr:last-child td{border-bottom:2px solid var(--ink)}
+.tbl tbody td{border-bottom:1px solid var(--line)}
+.tbl caption{caption-side:bottom;font-size:13px;color:var(--ink3);padding-top:10px;text-align:left}
+
+/* 来源盒：参考文献式，悬挂缩进 */
+.src{margin:64px 0 8px;padding:30px 0 8px;border:0;border-top:2px solid var(--rule);
+  border-radius:0;background:transparent;counter-reset:srcn}
+.src .sl{font-size:11px;letter-spacing:.42em;color:var(--mark);margin-bottom:12px}
+.src .sd{font-size:14.8px;color:var(--ink2);line-height:1.95;margin:0 0 22px;text-align:justify}
+.src a.one{display:block;text-decoration:none;padding:16px 0 16px 34px;position:relative;
+  border-top:1px solid var(--line)}
+.src a.one:before{counter-increment:srcn;content:"[" counter(srcn) "]";position:absolute;left:0;top:16px;
+  color:var(--mark);font-size:13px;letter-spacing:.02em}
+.src a.one:hover .t{color:var(--mark)}
+.src a.one .k{font-size:12px;color:var(--mark);letter-spacing:.14em}
+.src a.one .t{font-size:16px;font-weight:700;color:var(--rule);margin:5px 0;line-height:1.72}
+.src a.one .g{font-size:14.5px;color:var(--ink2);line-height:1.9;text-align:justify}
+
+.endbox{text-align:center;border-top:1px solid var(--line2);margin-top:56px;padding:38px 20px;color:var(--ink2);font-size:15px}
+.endbox a{color:var(--mark);text-decoration:none}
+footer{text-align:center;border-top:1px solid var(--line);padding:32px;color:var(--ink3);font-size:12.5px;letter-spacing:.04em}
+
+#totop{position:fixed;right:22px;bottom:26px;width:40px;height:40px;border-radius:0;
+  background:var(--rule);color:var(--sheet);border:0;font-size:16px;cursor:pointer;display:none;z-index:98}
+
+@media(max-width:760px){
+  body{font-size:17px;line-height:2.0}
+  .art{padding:52px 18px 6px}
+  .wrap{padding:6px 18px 34px}
+  h2{font-size:20.5px;margin:56px 0 18px;padding-top:22px}
+  h3{font-size:17.5px}
+  blockquote{padding:22px 24px;font-size:17.5px}
+  blockquote:before{left:6px}blockquote:after{right:6px}
+  .tbl{font-size:14px}
+  .tbl th,.tbl td{padding:9px 8px}
+}
+
+@media print{
+  body{background:#fff;font-size:11.5pt;line-height:1.85}
+  .readbar,#pbar,#totop,.endbox,footer{display:none}
+  .wrap,.art{max-width:100%}
+  h2{page-break-after:avoid}
+  blockquote,.tbl,.src a.one{page-break-inside:avoid}
+  a{text-decoration:none}
+}
+
+.tbl{width:100%;border-collapse:collapse;margin:2em 0;font-size:.94em;background:var(--sheet)}
+.tbl th,.tbl td{border:1px solid var(--line2);padding:.85em 1em;vertical-align:top;line-height:1.85}
+.tbl th{background:rgba(42,59,80,.07);font-weight:600;text-align:left}
+.tbl tr>th:first-child{width:16%;background:rgba(42,59,80,.10)}
+ol.pl,ul.pl{padding-left:1.5em;margin:1.3em 0}
+ol.pl>li,ul.pl>li{margin:.7em 0;line-height:1.95}
+ol.ref>li{font-size:.9em;line-height:1.8;color:var(--ink2)}
+ol.ref a{color:var(--rule2);text-decoration:underline;text-underline-offset:2px}
+p.vsn{font-size:.9em;color:var(--ink2);margin:.6em 0}
+p.q{border-left:3px solid var(--mark);padding:.9em 1.2em;background:var(--sheet);margin:1.6em 0;font-size:1.06em}
+
+</style></head><body>
+<div id="pbar"></div>
+<div class="readbar">
+  <a class="nav-back" href="/confluence/">‹ 学科通融</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span>
+  <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+  <a class="rb-btn" href="single-issue.pdf" download>⬇ 下载 PDF</a></div>
+</div>
+<header class="art">
+  <div class="art-series">学 科 通 融 · 之三十 · 人机交互设计 × 目击辨认证据法 × 记忆重固化研究</div>
+  <h1 class="art-title">独版</h1>
+  <div class="art-sub">论一份介入前的记录之所以有用，不因为它忠实，而因为它此后再也造不出第二份</div>
+  <div class="art-meta">王德生 ＋ Claude · 约 1.1 万字 · 三种阅读方式 · 发表于2026年8月1日</div>
+</header>
+<div class="wrap">
+<!-- companion-series:start -->
+<aside style="margin:26px 0 34px;padding:20px 22px;border:1px solid rgba(158,61,44,.28);background:#fbf6ec;line-height:1.8">
+<div style="font-size:12px;letter-spacing:.18em;color:#9e3d2c;margin-bottom:8px">理论双译计划 · 本文配套阅读</div>
+<a style="display:block;color:#2a3b50;font-weight:700;text-decoration:none;margin:5px 0" href="/confluence/single-issue/explained/">大白话类比解释：写错了的初稿，比写对的更值钱 →</a>
+<a style="display:block;color:#2a3b50;font-weight:700;text-decoration:none;margin:5px 0" href="/confluence/single-issue/applied/">技术与应用：独版判据落地——把"介入前判断"固定成造不出第二份的证据 →</a>
+</aside>
+<!-- companion-series:end -->
+<div class="deck">在一个成形的外部答案到达之前，先写下自己的判断——这条建议在教学、审稿、诊断与决策里反复出现，理由通常是「保存一个原始状态以便日后对照」。三个领域对这条理由给出互相排斥的答案。人机交互说轻一点就够：让人先作答再看建议，能减少过度依赖；证据法说远远不够，必须在任何提示到达之前用严格程序固定，而且污染不可逆；记忆研究说这个理由本身就是错的——记忆在每次提取时都进入可被改写的状态，所谓「原始状态」在心智里并不存在，写下来的那一刻它已经被写这个动作改变了。<b>三家共有一个未说出的前提：这份记录的价值在于它忠实地记下了某个已经存在的东西。而三家的材料合起来只能得出相反的一条：它的价值全部来自它此后再也造不出第二份，与它准不准无关。</b> 本文把这种记录称为独版，判据不含情态词：<b>这份记录，事后能不能被同样质量地重做？</b> 能，它就没有证据价值；不能，它就有——哪怕它是错的。由此得到一条反直觉的推论：<b>写错了的底稿比写对了的更有用</b>，因为正确可以事后重制，错误不能。</div>
+<div class="toc"><div class="tl">目 录</div><a href="#s1">一、导论：三个不该同时为真的说法</a><a href="#s2">二、三家各自说到了哪一步</a><a href="#s3">三、冲突落在哪一点上</a><a href="#s4">四、独版</a><a href="#s5">五、两根轴，四种记录</a><a href="#s6">六、一个不含情态词的判据</a><a href="#s7">七、逐领域兑现</a><a href="#s8">八、两处被材料逼出来的收窄</a><a href="#s9">九、与最近的几种说法的分界</a><a href="#s10">十、三家各自为什么到不了这一条</a><a href="#s11">十一、推论、适用边界与反噬</a><a href="#s12">十二、与同期几篇的分界</a><a href="#s13">十三、本文自己是不是独版</a><a href="#s14">十四、可以判本文错的六种结果</a><a href="#s15">结　论</a><a href="#s16">注　释</a><a href="#s17">参考文献</a><a href="#s18">人机分工声明</a></div>
+
+<h2 id="s1">一、导论：三个不该同时为真的说法</h2>
+<p>在一个成形的外部答案到达之前，先写下自己的判断。这条建议在教学、审稿、诊断、投资与工程里反复出现，给出的理由几乎总是同一个：保存一个原始状态，以便日后对照，看看自己是怎么被改变的。三个领域对这条理由给出三个互相排斥的答案。</p>
+<p><b>第一场在人机交互设计。</b> 这一支处理的是人对自动建议的过度依赖，做法是在界面里加入一点强制：要求使用者在看到系统建议之前先给出自己的判断，或者延迟建议的显示。实验证据表明这类设计确实能减少对错误建议的盲从，但也有代价——降低依赖最多的设计往往获得最不利的主观评价，而且效果受使用者认知动机的调节。<sup>[1]</sup> 这一支的立场是：<b>轻一点就够，重了会被绕过。</b> 争点是：先想一下，到什么程度才算数？</p>
+<p><b>第二场在目击辨认的证据法。</b> 这个领域几十年的结论恰恰相反：远远不够。一份辨认陈述必须在任何提示、任何反馈、任何暗示到达之前，用严格的程序固定下来——施测者本人不能知道谁是嫌疑人，指认后必须立即记录证人对自己判断的确信程度，且此后不得再问。理由不是仪式，是实证：<b>一句简单的确认性反馈，就能把证人事后回忆的确信度大幅抬高，而这个抬高不可撤销。</b>被污染之后，那个证人对自己当初有多确信的记忆，已经永久地不再可得。<sup>[2]</sup> 争点是：这份记录到底防的是什么？</p>
+<p><b>第三场在记忆的重固化研究。</b> 这一支说前两家的理由都建立在一个错误的图景上。记忆不是一个被存起来、可以被完整调出的东西；每一次提取都会使它重新进入一个可被修改、需要重新稳定的状态，而在这个窗口里它可以被改变甚至被削弱。<sup>[3]</sup> 推到这里，「保存一个原始状态」这个说法在心智层面就失去了对象——<b>写下来的那一刻，被写的那个东西已经被写这个动作改变了。</b> 争点是：既然没有原始状态，那么记录下来的是什么？</p>
+<p>三条不能同真。若轻轻先想一下就够，证据法几十年的施测规程就是过度设计。若必须严格施测，那么绝大多数人机交互里的「先作答」环节都不产生任何有效记录。若心智里根本没有原始状态可保存，那么前两家所保护的东西就不存在，而它们各自的实证效果又都真实可复现。</p>
+<p>本文认为，僵局来自一个三方共有、从未被单独说出的前提：<b>这份记录的价值在于它忠实——它记下了某个已经存在的东西，因而后来可以拿它去对照。</b> 三家争的是要多严格才能记得忠实，没有人问忠实是不是那个起作用的东西。</p>
+
+<h2 id="s2">二、三家各自说到了哪一步</h2>
+<p><b>人机交互这一支</b>的核心概念是认知强制：在决策流程里插入一个小小的、要求人主动加工的步骤。实验发现这类设计能降低对错误建议的采纳率，但它同时揭示了两件对本文有用的事。其一，效果与主观体验反向——最有效的设计最不受欢迎，因而在真实产品里最容易被删掉。其二，效果受个体差异调节，不是普遍成立。<sup>[1]</sup></p>
+<p>这一支没有处理的是记录本身。它关心的是「人有没有先想」这个行为，不关心那次思考留下了什么可以被第三方读到的东西。绝大多数实现里，使用者先作答之后，那个答案随即被覆盖或丢弃。</p>
+<p><b>目击辨认这一支</b>把记录本身做成了制度。它的两条核心规程是双盲施测与即时确信度记录：施测者不知道谁是嫌疑人，因而无法在无意中给出暗示；证人一旦作出指认，必须当场用自己的话记录他对这次指认有多确信，此后这个数字不得被修改，也不得在庭上被重新询问。</p>
+<p>支撑这两条的实证很硬。给出一句「很好，你认出了嫌疑人」这样的确认性反馈之后，证人回忆自己当初有多确信、看得多清楚、观察了多久，全都会被系统性地抬高；而没有得到反馈的证人的确信度与准确率之间原本存在的相关，会在反馈之后消失。<b>关键在于，这个抬高不是伪装，证人真诚地相信自己当初就那么确信。</b> 因而事后再问，无论问得多仔细，都取不回那个数——它不是被藏起来了，它已经不在了。<sup>[2]</sup></p>
+<p>这一支到达的边缘是：它把即时记录当作「防污染」，即防止后来的东西改变原来的东西。它没有再往前一步去问：如果原来的东西本来就不是一个固定的存量，那么这份记录在防什么。</p>
+<p><b>重固化这一支</b>正好回答了那一步。一段已经稳定的记忆在被提取时会重新进入不稳定状态，需要再一次稳定过程才能保住；在这个窗口期内，它可以被干扰、被更新、被削弱。<sup>[3]</sup> 由此，「原始状态」不是一个躺在那里等待被读取的东西，它是每次被提取时重新组装的。</p>
+<p>这一支的边界也很清楚：它说的是记忆，不是记录。一张写在纸上的判断不会被重固化——它是死的、稳定的、不参与任何生物过程。而这正是本文要用的那一点。</p>
+
+<h2 id="s3">三、冲突落在哪一点上</h2>
+<p>把三家的处方并排放，互不兼容：轻一点、必须极严、以及它保护的东西不存在。把三家的材料并排放，出现另一样东西。</p>
+<p>重固化说：心智里没有可被忠实记录的原始状态。目击辨认说：即时记录仍然有效，而且不可替代。这两条同时成立的唯一方式，是即时记录的有效性不来自忠实。</p>
+<p>那它来自哪里？目击辨认的材料本身给出了答案，只是它没有这样表述：<b>那份即时确信度之所以有价值，不是因为它准确地反映了证人当时的心理状态——它可能相当不准——而是因为在反馈到达之后，任何人都再也无法生产出一份未经反馈污染的确信度陈述。</b> 它是一件此后不可能再被制造的东西。</p>
+<p>把这一点放回人机交互那一支，它的效果差异也得到解释。要求人先作答而不保存答案，等于生产了一件立刻被销毁的独版；要求人先作答并保存、且此后不可修改，才留下了一件不可重制的物证。两者在「有没有先想」这个行为上完全相同，在留下什么上完全不同——而现有的实验多数只操纵前者。</p>
+<p>于是问题的形状变了。它不再是「怎样让记录更忠实」，而是：<b>这份记录，事后还能不能被造出来。</b></p>
+
+<h2 id="s4">四、独版</h2>
+<p><b>一份记录若只能在某个特定时刻产生一次，此后无论投入多少努力、掌握多少信息，都无法再造出一份同等质量的替代品，本文称之为独版。</b></p>
+<p>三个限定词都要紧。</p>
+<p><b>「同等质量」而不是「一模一样」。</b> 任何人事后都可以写一段话说「我当时是这么想的」，问题是这段话与那份即时记录不是同一种东西：后者不受结果影响，前者受。判别不看两份文本像不像，看的是能否用同样的方式取得——事后重做的那一份，无论多真诚，都已经处在知道结果之后的位置上。</p>
+<p><b>「无法再造」而不是「未被保存」。</b> 一份被弄丢的原始记录不是独版失效，它仍然曾经是独版；而一份保存完好、但事后随时可以被同等地重写出来的记录，从来就不是独版。判据在可重制性，不在保管。</p>
+<p><b>「特定时刻」由信息状态决定，不由钟表决定。</b> 使那份记录不可重制的，是当时还没有到达的那个信息——外部答案、检验结果、事件的后果。这个信息一旦到达，窗口就永久关闭；而在它到达之前，窗口可以持续很久。<b>因而「先写下来」这条建议的要点从来不是快，是在那个特定信息到达之前。</b></p>
+<p>由此得到本文的承重命题：<b>一份介入前记录的价值，全部来自它的不可重制性，与它的准确性无关。</b></p>
+<p>这条命题有一个立刻可以检验的、反直觉的推论：<b>写错了的记录比写对了的更有用。</b> 因为正确的判断在结果揭晓之后可以被任何人重新写出来——它不携带任何独版信息；而一个错误的判断在结果揭晓之后没有人会再写出来，它是那一刻的唯一物证。这也解释了一个长期被当作道德问题的现象：为什么人们在事后总是记得自己当初判断对了。不是他们撒谎，是正确的版本随时可以被重制，而错误的版本已经无法再被生产。</p>
+<p>这条判断为什么三家都不会同意。人机交互不会同意，因为它的目标是行为（让人先想一下），而本文说不留下不可重制的物证，先想多少次都不产生记录。目击辨认不会同意，因为它的整套规程是为忠实而设的，而本文说忠实不是它起作用的原因——这会让它的一部分规程失去理由（尽管另一部分正好因此得到更强的理由）。重固化不会同意，因为它的结论是「没有可保存的原始状态」，而本文说正是因为没有，这份记录才有价值。</p>
+
+<h2 id="s5">五、两根轴，四种记录</h2>
+<p>只用「是不是独版」一根轴不够。大量的独版存在着，而没有起任何作用。要分开，需要第二根轴。</p>
+<p>第一根轴：<b>这份记录是不是独版</b>——事后能否被同等质量地重做。</p>
+<p>第二根轴：<b>它是否可被援引</b>——存在一个会去读它、且它的内容会改变某个后续判断的程序。</p>
+<table class="tbl">
+<tr><th></th><th>可被援引</th><th>不可被援引</th></tr>
+<tr><th>是独版</th><td><b>物证</b><br>即时确信度陈述、预注册的分析方案、封存的投标、事前的风险清单。它的存在改变后续程序的结论。</td><td><b>死档</b><br>记录存在、不可重制、而没有任何程序会去读它。绝大多数学习平台的思考日志、绝大多数会议前的个人判断记录。</td></tr>
+<tr><th>不是独版</th><td><b>仪式</b><br>能被引用、能被检查，而任何时候填都一样。合规表单的大多数。</td><td><b>无</b><br>既不可援引也可随时重制。</td></tr>
+</table>
+<p>右上格是靶格，它有两个使它极其常见的性质。<b>第一，它的生产成本很低而看起来很有价值。</b> 让使用者在看到答案前写三行，是任何产品都能加的功能；这三行确实是独版。<b>第二，让它可被援引的成本极高</b>——需要一个真的会去读它的程序，需要这个程序的结论真的会因此改变，需要有人为读它付出时间。于是几乎所有实现都停在右上格。</p>
+<p>而右上格与左上格在使用者的体验上完全一样：都要求他在不知道答案时先承担一个可能被判错的立场。<b>要求人付出这份成本却不使用他的付出，是这一格最实际的代价</b>——它会在几轮之后让人学会敷衍，而敷衍恰恰把独版变成了仪式，于是格子从右上滑到左下，且不可逆。</p>
+
+<h2 id="s6">六、一个不含情态词的判据</h2>
+<p>判断一份记录有没有价值，不必评估它的准确性、真诚度或深度。只需问：</p>
+<p class="q"><b>这份记录，事后能不能被同样质量地重做？</b></p>
+<p>一个操作化的做法：把这份记录交给一个知道全部后续结果、但没有参与当时那一刻的人，请他写一份「当时应该会怎么判断」的版本。若两份在关键处不可区分，原记录不是独版。</p>
+<p>跑几个场合，答案互不相同。</p>
+<p><b>目击辨认的即时确信度。</b> 事后能否重做？不能——反馈已经把它抬高，且抬高不可撤销。判定：独版，且可被援引（庭上可以出示）。左上格。这是本文所知做得最完整的一处。</p>
+<p><b>研究的预注册。</b> 事后能否重做？不能——数据已经看过了。判定：独版，且可被援引（审稿人会比对预注册与实际分析）。左上格。<b>这一例的价值在于它说明独版不必是心理状态，可以是一个方案。</b></p>
+<p><b>学习平台里的「先写下你的想法」。</b> 事后能否重做？不能。但有没有程序会读它？多数情况下没有——教师看的是最终作业。判定：右上格，死档。这解释了为什么这类功能上线后使用率总是先高后低：使用者很快发现自己写的东西没有去处。</p>
+<p><b>投资决策前的备忘。</b> 事后能否重做？不能。有没有程序读它？取决于机构是否在复盘时强制调取。判定：因机构而异，且这个差异可以直接观察——<b>凡是复盘时强制调取事前备忘的机构，其备忘的信息密度显著高于不调取的机构，而这与个人素质无关。</b></p>
+<p><b>合规表单上的「我已独立判断」勾选。</b> 事后能否重做？能，任何时候勾都一样。判定：左下格，仪式。</p>
+
+<h2 id="s7">七、逐领域兑现</h2>
+<p><b>一、审稿。</b> 审稿人在看到其他审稿意见之前提交的初评，是独版；看到之后再改的是可重制的。多数期刊的流程恰好允许审稿人在讨论阶段修改自己的评分，而不保留初评——这是把独版当场销毁。改法成本极低：初评提交后锁定，讨论后的意见另存一份。</p>
+<p><b>二、临床的初步鉴别诊断。</b> 在查看辅助系统提示之前记录的鉴别顺序，是独版。而多数电子病历系统只保存最终诊断。这一处的改法同样廉价：多存一个字段。</p>
+<p><b>三、工程的失效假设。</b> 在跑测试之前写下「我认为最可能在哪里坏」，是独版；测试结果出来之后写的原因分析不是。可裁决预测：强制记录事前假设的团队，其事故复盘中被识别出的系统性原因比例高于只做事后分析的团队——因为事后分析天然收敛到已经发生的那条路径上。</p>
+<p><b>四、预算与工期估计。</b> 事前估计是独版，而它几乎总是被最终值覆盖。保留事前估计的组织能够计算自己的系统性偏差，覆盖它的组织每次都从零开始。</p>
+<p><b>五、司法的讯问录像。</b> 全程录像使得供述的形成过程成为独版——事后无论如何都无法重制那个过程。这解释了为什么全程录像的价值不只在于防止不当讯问，还在于它保存了一件此后不可再造的东西。</p>
+<p><b>六、考古的发掘记录。</b> 发掘是破坏性的，现场只能被观察一次。整个学科的记录规范正是围绕独版建立的：不是因为记录更忠实，是因为它此后绝无第二次机会。<b>这是本文的概念在一个完全不相干的领域里被独立发明出来的一例。</b></p>
+<p><b>七、天气与选举预测。</b> 事前预测是独版，且这个领域已经建立了完整的记分制度——它是把独版制度化得最彻底的领域之一，而它的关键正是预测一经提交即锁定。</p>
+<p><b>八、教学中的错误答案。</b> 按本文，学生写下的错误答案比正确答案更有价值。这给出一条与直觉相反的教学设计：<b>应当专门保存错误的初答并在后续教学中调取，而不是纠正后丢弃。</b> 可裁决预测：保存并调取错误初答的班级，其同类错误的复发率低于只保存正确解法的班级。</p>
+<p><b>九、软件的架构决策记录。</b> 记录「当时排除了哪些方案、为什么」是独版；事后写的架构说明不是，因为它已经知道哪条路走通了。</p>
+<p><b>十、口供与证言的时间顺序（本领域反过来加的约束）。</b> 证言在多次讯问之间会发生系统性漂移，而漂移本身也是不可重制的——第二次讯问的记录同样是独版，只是它记的是一个已经被第一次改变过的状态。<b>这说明独版不是一个单点，而是一个序列；每一次记录都是那一刻的独版。</b> 本文原来隐含地假定只有第一份才算数，这条约束把它推翻了：<b>价值来自序列的完整，不只来自第一份。</b></p>
+
+<h2 id="s8">八、两处被材料逼出来的收窄</h2>
+<p><b>第一处，由重固化逼出：写下来这个动作本身就是一次介入。</b> 既然提取会使记忆进入可修改状态，那么要求一个人在关键时刻写下判断，就不是一次无成本的观测，而是一次会改变后续判断的干预。于是本文面临一个自指的困难：<b>它所主张的记录方式，会污染它想要保护的那个过程。</b></p>
+<p>这条约束不能靠更严格的施测消除，因为它不是施测误差，是写作这个行为的固有后果。能做的只有把它变成已知量：在实验设计里必须有一个「不写」的对照组，并且承认写与不写的两组此后走的是不同的路径，而不是同一条路径的两种记录方式。<b>由此本文丧失了一个本来很方便的主张——独版是「看见」而不是「改变」；它必须承认它是两者兼有。</b></p>
+<p><b>第二处，由目击辨认逼出：可援引不等于该被援引。</b> 这个领域在把即时确信度制度化的同时，也发展出一整套限制——它不得被单独用作定罪依据，它必须与其他证据并用，且施测程序有瑕疵时它整份失效。理由是：一件不可重制的物证具有极强的说服力，而说服力与证明力不是一回事。<b>独版天然带着一种「它是当时唯一的东西」所赋予的权威，而这种权威很容易超出它实际能支持的范围。</b></p>
+<p>推到一般情形：把独版制度化的每一个领域，都必须同时制定它的证明力限制，否则它会从证据变成裁决。这条收窄拿掉了本文本来可以主张的一条更强的处方——「凡有独版，皆应援引」。<b>正确的说法要弱得多：凡有独版，应当有一个规定它能支持什么、不能支持什么的程序。</b></p>
+
+<h2 id="s9">九、与最近的几种说法的分界</h2>
+<p><b>一、与认知强制。</b> 那一支要求人在看建议前先作答，是本文最近的一位。分离线：认知强制的读数是行为（有没有先想），本文的读数是产物（留下了什么不可重制的东西）。判决点：两组都被要求先作答，只有一组的初答被锁定并在后续程序中调取。认知强制预测两组的依赖度改善相同，本文预测调取组的改善更持久，且差异在多轮之后拉大——因为不被调取的那组会学会敷衍。</p>
+<p><b>二、与锚定效应。</b> 那一支关注先出现的信息如何拉动最终判断。分离线：锚定讲的是先来的东西影响后来的判断，本文讲的是后来的东西使先前的记录不可再造。判决点：即使最终判断完全没有被拉动，本文仍预测缺少独版的人无法准确报告自己当初的确信程度；锚定对此不作预测。<b>确信度的漂移与判断的漂移是两个独立的读数。</b></p>
+<p><b>三、与生成效应。</b> 那一支预测自行生成的材料记得更牢，机制在个人编码。判决点：本文预测独版的价值在第三方那里，与写它的人记不记得无关；一份被写下后立刻遗忘、而被他人调取的记录，生成效应预测无用，本文预测有用。</p>
+<p><b>四、与预注册。</b> 这是本文最近的一位制度邻居，而且它就是一个独版制度。分离线：预注册的目标是限制事后的分析自由度，本文的目标是保存一件不可再造的物证。判决点：一份预注册若在数据揭晓后被允许修改并只保留修改后的版本，预注册的约束功能仍部分保留（它仍然限制了当初的自由度），而按本文它的独版价值已经归零。两者对「允许有理由的偏离并记录」这一做法的评价因此不同：预注册视为妥协，本文视为最优——因为偏离记录本身又是一件新的独版。</p>
+<p><b>五、与后见之明偏差。</b> 那一支描述人在知道结果后高估自己当初的预见能力。分离线：后见偏差是一种心理倾向，本文是一个关于可重制性的结构判断。判决点：即使一个人完全没有后见偏差、诚实地承认自己当初判断错了，他事后写的那份「我当初的判断」仍然不是独版——因为他此刻的诚实本身是在知道结果之后的诚实。<b>去偏训练改善不了可重制性。</b></p>
+<p><b>六、与审计留痕。</b> 那一类做法要求逐步留下操作记录。分离线：留痕关心的是过程可追溯，本文关心的是某一份记录是否不可再造。判决点：一份完整、连续、可追溯，但每一步都可以在事后被同等地补写出来的日志，留痕框架判为合规，本文判为零独版。</p>
+
+<h2 id="s10">十、三家各自为什么到不了这一条</h2>
+<p><b>人机交互到不了，因为它的因变量是依赖度。</b> 它要减少的是对错误建议的采纳，因而它只需要关心人有没有先想，不需要关心那次思考留下了什么。</p>
+<p><b>目击辨认到不了，因为它的问题是准确性。</b> 它要保护的是证言的可靠性，因而它把即时记录理解成防污染。它已经积累了本文所需的全部材料（反馈使确信度上升且不可逆），但它不会去问「不可逆本身是不是价值来源」，因为在它那里不可逆只是坏消息。</p>
+<p><b>重固化到不了，因为它研究的是记忆而不是记录。</b> 它得出「没有原始状态」这个结论，而这个结论在它的领域里是一个关于机制的发现，不是一个关于制度的判断。它不会去想：既然心智里没有，那么外部那张纸上的东西是什么。</p>
+
+<h2 id="s11">十一、推论、适用边界与反噬</h2>
+<p><b>第一条推论：不要求准确，要求不可重制。</b> 这是本文唯一一条可执行的处方，而它比「写得认真些」便宜得多——只需要两件事：在关键信息到达之前提交，提交后锁定不可修改。至于写得对不对，不影响它的价值。</p>
+<p><b>第二条推论：独版必须配一个会读它的程序，否则不如不要。</b> 要求人付出承担被判错的成本却不使用他的付出，会在几轮之后把它变成仪式，且不可逆。<b>因而「加一个先写下来的功能」在没有配套调取程序时，是一个净损失。</b></p>
+<p><b>适用边界一：本文不处理独版的正当获取。</b> 有些独版的产生本身是有害的（比如在胁迫下取得的供述），本文只谈可重制性，不谈获取程序的正当性。</p>
+<p><b>适用边界二：本文只在存在一个「关键信息到达时刻」的场合成立。</b> 在信息持续渐进到达、没有明确分界的任务里，独版的窗口无法定义。</p>
+<p><b>适用边界三：序列而非单点。</b> 这是第七节第十处的约束：每一次记录都是那一刻的独版，价值来自序列的完整而不只是第一份。</p>
+<p><b>反噬预言。</b> 若不可重制性成为一个被追求的目标，最可能发生的是<b>独版的通货膨胀</b>：机构会要求在每一个环节之前都提交一份锁定记录，于是人们开始批量生产内容空洞但形式合格的独版——它们确实不可重制（每一份都是那一刻唯一的），也确实不含任何信息。<b>本文的判据无法把这两者分开，因为它刻意放弃了准确性这一维。</b> 这是本文为了换取一条便宜的判据所付的价，且我没有办法回避它：一旦重新引入内容质量的评判，事后重做与当时产生之间的区别就又模糊了。这个循环没有出口。</p>
+
+<h2 id="s12">十二、与同期几篇的分界</h2>
+<p><b>与「不按的代价先落在谁身上」那一篇。</b> 那篇问干预权持有人是否付不干预的账，本文问介入前的记录能不能被事后重制。判决点：一个代价完全内部化、而事前判断从不被锁定保存的位置，那篇预测干预率上升，本文预测无法判断这些干预是不是事后合理化——两条读数正交。</p>
+<p><b>与「记零位」那一篇。</b> 那篇问一个动作在账本上有没有科目，本文问一份记录能不能被重做。判决点：一份被正式记账、写进履历、而事后随时可以被同等重写的记录（例如一份年终写的年初计划），那篇判为有账，本文判为零独版。</p>
+<p><b>与「入判份额」那一篇。</b> 那篇问产出有没有进别人的判据，本文问记录能不能被重制。判决点：一份不可重制、且被广泛引用的记录（例如一份被反复援引的事前风险清单），两篇都判为高；而一份不可重制却无人读的死档，那篇判为零份额、本文判为高独版低援引——两篇在这一格上给出的处方相同（要有人读），来路不同。</p>
+<p><b>与「学习的单位是规则的前后差」那一篇。</b> 那篇要求保存帮助前后的两份规则，这在本文里正是一次独版加一次可重制记录——<b>因为帮助后的那份，事后随时可以被重写。</b> 判决点：本文预测规则差的全部证据价值集中在前一份上，若把后一份改为事后补写，迁移效果不应下降；那篇预测应下降。这是一条便宜且直接的对照。</p>
+<p><b>与「中断之后能不能接手」那一篇。</b> 那篇测能力，本文测记录。判决点：接手能力相同的两组，若一组在中断前有锁定的状态记录、一组靠事后回忆重建，本文预测前者的重建准确度更高而重建速度未必更快。</p>
+<p><b>与「闭合之后还能不能回来」那一篇。</b> 那篇的重复产生率量的正是「本来已经存在过、现在必须重造」的信息，与本文的不可重制性是同一件事的两个方向：那篇问要重造多少，本文问能不能重造。<b>两者的分界在于：那篇假定重造是可能的、只是费事；本文指出有一类信息重造在原理上不可能，那一类才是独版。</b> 判决点：一份被弄丢的检查报告可以重做（重复产生率高、非独版），一份被弄丢的初诊印象不能（既是高重复产生率、也是独版永久损失）。两篇合起来才能把这两种损失分开。</p>
+
+<h2 id="s13">十三、本文自己是不是独版</h2>
+<p>不是。这篇文章在任何时刻都可以被同等质量地重写——它不依赖任何一个即将关闭的信息窗口，它引用的三家材料在写作之前之后都同样可得。按它自己的判据，它的独版价值为零。</p>
+<p>这不是谦辞，它有一个具体的后果：本文所主张的东西，本文自己一件也没有留下。它没有在写作之前锁定过一份「我预期会得出什么」的记录，因而无法排除一件事——第四节那条承重命题是在读完三家材料、看清它们如何互相取消之后才形成的，而现在的写法把它呈现为一条从材料中推出来的结论。<b>这两者在文本上不可区分，而它们的可信度不同。</b></p>
+<p>能做的对冲只有一条，且它必须在此刻做而不是事后做：<b>本文在此写下它预期会失败的地方，作为一份可以被将来核对的独版</b>——第十一节的反噬（独版的通货膨胀）是我认为最可能真实发生的一条，而第十四节第一条检验是我认为最可能得出否定结果的一条。若将来第一条检验得出正面结果、而通货膨胀没有出现，那么这份预期本身就是我判断失准的物证。</p>
+
+<h2 id="s14">十四、可以判本文错的六种结果</h2>
+<p><b>第一，最便宜、今天就能做的一条。</b> 两组人做同一批判断任务，都被要求在看到参考答案前先写下自己的判断。A 组的初答提交后即丢弃，B 组的初答被锁定并在每次复盘时逐条调取比对。本文预测多轮之后 B 组的初答信息密度不降而 A 组显著下降，且 B 组的判断校准更好。若两组无差异，核心机制不成立。</p>
+<p><b>第二，准确性仍是价值来源。</b> 若在控制不可重制性之后，记录的准确性仍能独立预测其后续用处，则本文「价值与准确无关」这一条被推翻，独版退化为「准确的即时记录」的另一个名字。</p>
+<p><b>第三，错误初答不比正确初答有用。</b> 若在教学场景里，保存并调取错误初答与保存并调取正确初答产生同等效果，则本文那条反直觉推论失效。这一条是本文最容易被击中的地方。</p>
+<p><b>第四，事后补写可以等效。</b> 若让一个知道全部结果的人写「当时应该会怎么判断」，其产物在后续用途上与真实的即时记录不可区分，则不可重制性不是一个真实的区分维度。</p>
+<p><b>第五，第二根轴多余。</b> 若可援引与不可援引的独版在使用者的后续行为上没有差异（即人们即使知道没人读也照样认真写），则四格表应合并。</p>
+<p><b>第六，本文自陈最软的一处。</b> 序列性（第七节第十处）可能瓦解整个概念：如果每一次记录都是那一刻的独版，那么「独版」这个属性就变得普遍而无区分力。要保住它，必须说明为什么某些时刻的独版比另一些更重要，而本文目前只能诉诸「关键信息到达之前」这个说法——而在很多任务里，关键信息的到达时刻并不清晰。</p>
+<p><b>正向读数。</b> 若本文成立，把一份原本被丢弃的初答改为锁定并调取，应当观察到该记录的信息密度停止下降，<b>且这个变化早于任何判断准确性的变化出现</b>。顺序比相关更难被巧合满足。</p>
+<p><b>写死日期的赌注。</b> 到二〇三一年十二月三十一日，至少应有一个主流的评审、诊断或决策支持系统，把「初判提交后锁定且在复盘中强制调取」作为默认流程，而不再只提供「先写下你的想法」这一环节而不保存。若届时没有这类实现，且第一条对照的差异被证明不存在，本文关于价值来自不可重制性的主张即告失败。</p>
+
+<h2 id="s15">结　论</h2>
+<p>在外部答案到达之前先写下自己的判断，三个领域给出三个不相容的答案：轻一点就够、必须极严、以及它保护的东西根本不存在。三个答案都只对了一段，因为它们共享一个未被说出的前提——这份记录的价值在于它忠实。</p>
+<p>记忆研究推翻了这个前提：心智里没有一个等着被忠实记下的原始状态。而目击辨认的材料同时说明，即时记录仍然有效且不可替代。两条同时成立的唯一方式，是它的有效性不来自忠实——一句确认性反馈之后，任何人都再也造不出一份未受污染的确信度陈述。<b>它有用，是因为它此后不可能再被制造。</b></p>
+<p>于是判断一份介入前记录有没有价值，不必评估它准不准、深不深、诚不诚。只需要问：这份记录，事后能不能被同样质量地重做。能，它没有价值；不能，它有——哪怕它是错的。而写错了的那一份反而更硬，因为正确随时可以被重制，错误不能。</p>
+<p>要紧的是，一份没有人会去读的独版，比没有更糟：它要求人在不知道答案时承担被判错的风险，然后把这份风险扔掉。几轮之后，人会学会写一些永远不会错的东西——而那一刻，独版就变成了仪式，且再也变不回来。</p>
+
+<h2 id="s16">注　释</h2>
+<ol class="pl">
+<li>本文所说的「不可重制」指无法在事后取得同等质量的替代品，不涉及物理上的复制或备份。</li>
+<li>目击辨认部分只使用「确认性反馈会系统性抬高事后报告的确信度且不可撤销」这一被广泛复现的结论，不涉及具体司法辖区的证据规则。</li>
+<li>重固化部分的转述限于「提取使记忆进入可修改状态」这一骨架，不涉及仍有争议的具体分子机制与临床应用。</li>
+<li>第五节四格表尚未经过信度与效度检验，是研究设计的起点，不是成熟的评估工具。</li>
+</ol>
+
+<h2 id="s17">参考文献</h2>
+<ol class="pl ref">
+<li>Buçinca, Z., Malaya, M. B., &amp; Gajos, K. Z. (2021). To trust or to think: Cognitive forcing functions can reduce overreliance on AI in AI-assisted decision-making. <i>Proceedings of the ACM on Human-Computer Interaction</i>, 5(CSCW1), Article 188. <a href="https://arxiv.org/abs/2102.09692" target="_blank" rel="noopener">arxiv.org</a></li>
+<li>Wells, G. L., &amp; Bradfield, A. L. (1998). "Good, you identified the suspect": Feedback to eyewitnesses distorts their reports of the witnessing experience. <i>Journal of Applied Psychology</i>, 83(3), 360-376. <a href="https://psycnet.apa.org/record/1998-04841-004" target="_blank" rel="noopener">psycnet.apa.org</a></li>
+<li>National Research Council. (2014). <i>Identifying the Culprit: Assessing Eyewitness Identification</i>. National Academies Press.（双盲施测与即时确信度记录的建议） <a href="https://nap.nationalacademies.org/catalog/18891/identifying-the-culprit-assessing-eyewitness-identification" target="_blank" rel="noopener">nap.nationalacademies.org</a></li>
+<li>Nader, K., Schafe, G. E., &amp; LeDoux, J. E. (2000). Fear memories require protein synthesis in the amygdala for reconsolidation after retrieval. <i>Nature</i>, 406, 722-726. <a href="https://www.nature.com/articles/35021052" target="_blank" rel="noopener">nature.com</a></li>
+<li>Fischhoff, B. (1975). Hindsight ≠ foresight: The effect of outcome knowledge on judgment under uncertainty. <i>Journal of Experimental Psychology: Human Perception and Performance</i>, 1(3), 288-299.</li>
+<li>Slamecka, N. J., &amp; Graf, P. (1978). The generation effect: Delineation of a phenomenon. <i>Journal of Experimental Psychology: Human Learning and Memory</i>, 4(6), 592-604.</li>
+<li>Nosek, B. A., Ebersole, C. R., DeHaven, A. C., &amp; Mellor, D. T. (2018). The preregistration revolution. <i>PNAS</i>, 115(11), 2600-2606. <a href="https://www.pnas.org/doi/10.1073/pnas.1708274114" target="_blank" rel="noopener">pnas.org</a></li>
+</ol>
+
+<h2 id="s18">人机分工声明</h2>
+<p>本文由王德生提出研究方向、承重判断与最终发表责任；Claude 完成三个领域的选源与冲突定位、公开文献检索、命题成形、二维表构造、逐领域兑现、分界与证伪设计以及正文写作。第八节两处收窄由材料逼出，其中第一处使本文必须承认它所主张的记录方式会污染它想保护的过程，全过程保留在正文中。第十三节写下了本文对自身失败方向的预期，作为一份可被将来核对的记录。本文未标注任何评分——按本站惯例，参与改写者不为自己改写的文本打分。</p>
+
+<p class="vsn"><b>证据边界</b>　目击辨认部分只使用「确认性反馈会系统性抬高事后报告的确信度且不可撤销」这一被广泛复现的结论；重固化部分限于「提取使记忆进入可修改状态」这一骨架，不涉及仍有争议的分子机制与临床应用。第十四节六条判据本文<b>均未执行</b>，其中第一条可在一门课或一个评审周期内完成。</p>
+<p class="vsn"><b>字数</b>　纯汉字约 1.1 万　<b>版本</b>　v1.0 · 2026-08-01</p>
+<div class="src"><div class="sl">这一篇由哪三个领域的争论撞成</div><p class="sd">三边对「外部答案到达之前先写下的那份判断，凭什么有用」给出互相排斥的答案：人机交互说轻一点就够，证据法说必须在任何提示到达前用严格程序固定且污染不可逆，记忆研究说心智里根本没有可保存的原始状态。<b>三家共有一个未说出的前提：这份记录的价值在于它忠实。而三家的材料合起来只能得出相反的一条——它的价值全部来自它此后再也造不出第二份。</b></p><a class="one" href="https://psycnet.apa.org/record/1998-04841-004"><div class="k">目击辨认证据法 · 污染不可逆</div><div class="t">Wells &amp; Bradfield, "Good, you identified the suspect"（J. Applied Psychology, 1998）；National Research Council, Identifying the Culprit（2014）</div><div class="g">一句确认性反馈就能大幅抬高证人事后回忆的确信度、观看时长与清晰度，并使确信度与准确率原本存在的相关消失；而证人真诚地相信自己当初就那么确信。由此形成双盲施测与即时确信度记录两条规程——事后再问，无论问得多仔细都取不回那个数，它不是被藏起来了，它已经不在了。</div></a><a class="one" href="https://www.nature.com/articles/35021052"><div class="k">记忆重固化 · 提取即改写</div><div class="t">Nader, Schafe &amp; LeDoux, Fear memories require protein synthesis in the amygdala for reconsolidation after retrieval（Nature, 2000）</div><div class="g">一段已经稳定的记忆在被提取时会重新进入不稳定状态，需要再一次稳定过程才能保住；在这个窗口里它可以被干扰、被更新、被削弱。推到底：「原始状态」不是躺在那里等待读取的东西，它是每次被提取时重新组装的——写下来的那一刻，被写的那个东西已经被写这个动作改变了。</div></a><a class="one" href="https://arxiv.org/abs/2102.09692"><div class="k">人机交互设计 · 先想一下就够</div><div class="t">Buçinca, Malaya &amp; Gajos, To trust or to think: Cognitive forcing functions can reduce overreliance on AI（CSCW, 2021）</div><div class="g">在决策流程里插入一个要求人主动加工的小步骤，能降低对错误建议的采纳率。但这一支同时揭示了两件事：效果与主观体验反向（最有效的设计最不受欢迎，因而在真实产品里最容易被删掉），且效果受个体认知动机调节。它关心的是「人有没有先想」这个行为，不关心那次思考留下了什么可被第三方读到的东西。</div></a></div>
+<div class="endbox"><p>三种读法 · 网页长文 · 在线 PDF 翻页 · PDF 下载</p>
+<p><a href="/confluence/">返回学科通融 →</a></p></div>
+
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<footer>学科通融 · 三学科交叉 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International · <a href="/browse/">sdeuniverses.com</a></footer>
+<script>
+(function(){var b=document.getElementById('pbar'),t=document.getElementById('totop');
+function u(){var d=document.documentElement,h=d.scrollHeight-d.clientHeight;
+b.style.width=(h>0?(d.scrollTop/h*100):0)+'%';t.style.display=d.scrollTop>700?'block':'none';}
+addEventListener('scroll',u,{passive:true});u();
+t.onclick=function(){scrollTo({top:0,behavior:'smooth'});};})();
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

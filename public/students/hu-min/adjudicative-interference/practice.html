@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>别在半夜验收 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的判断是：在某些自组织的过程里，亲自执行「我恢复得怎么样」这次判决，本身就要收费。这篇文章把它落成可以上手的东西：怎么分清哪些事经得起查，怎么划静默窗，怎么把裁定交出去，以及什么时候必须立刻停手去查。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="别在半夜验收 · 方法实践文">
+<meta property="og:description" content="母文的判断是：在某些自组织的过程里，亲自执行「我恢复得怎么样」这次判决，本身就要收费。这篇文章把它落成可以上手的东西：怎么分清哪些事经得起查，怎么划静默窗，怎么把裁定交出去，以及什么时候必须立刻停手去查。">
+<link rel="canonical" href="https://sdeuniverses.com/students/hu-min/adjudicative-interference/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/hu-min/adjudicative-interference/">← 回母文《裁定性干扰》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《裁定性干扰》</div>
+  <h1 class="art-title">别在半夜验收</h1>
+  <div class="art-subtitle">——把「查」这个动作放回它该在的位置</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 3628 字</div>
+  <div class="swap">
+    <a href="/students/hu-min/adjudicative-interference/"><b>← 母文 · 裁定性干扰</b><span>完整论证在这里</span></a>
+    <a href="/students/hu-min/adjudicative-interference/explain.html"><b>🌱 白话解释文 · 越想知道自己睡着没有，就越睡不着</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的判断是：在某些自组织的过程里，亲自执行「我恢复得怎么样」这次判决，本身就要收费。这篇文章把它落成可以上手的东西：怎么分清哪些事经得起查，怎么划静默窗，怎么把裁定交出去，以及什么时候必须立刻停手去查。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先划三条线</a></li><li><a href="#s2">第一步：把手头的事分成两类</a></li><li><a href="#s3">分不清的时候，用这三个判据</a></li><li><a href="#s4">第二步：给 A 类划一个静默窗</a></li><li><a href="#s5">第三步：把裁定交出去</a></li><li><a href="#s6">第四步：把「查」降级成「记」</a></li><li><a href="#s7">第五步：设一条不需要判断的硬线</a></li><li><a href="#s8">三种最容易做坏的方式</a></li><li><a href="#s9">五个实操疑问</a></li><li><a href="#s10">用在别人身上的时候</a></li><li><a href="#s11">一页纸操作卡</a></li><li><a href="#s12">一个走完全套的例子</a></li><li><a href="#s13">与三种常见做法的分工</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先划三条线</h2>
+<p>这一节必须放在最前面，因为下面所有的方法，只在这三条线以内才成立。</p>
+<p><b>第一条，急性事件不在此列。</b>摔倒后听见响声、突发的剧痛、胸闷气短、突然的无力或麻木、伤口红肿流脓、发烧不退——这些时候不要用本文的任何一条，直接就医。「让它自己长」在急性期是一句会害人的话。</p>
+<p><b>第二条，医嘱规定的监测不在此列。</b>血糖、血压、抗凝指标、术后复查、用药反应——医生要求你按时测的，照测。那种监测是治疗的一部分，不是本文说的那种自我裁定。</p>
+<p><b>第三条，本文只能用在自己身上，不能用来劝别人「你别老查了」。</b>这一条尤其重要。母文说的是「你不必亲自当自己的法官」，不是「你的感觉不算数」。把它用成后者，就变成了让人闭嘴的工具。</p>
+<p>在这三条线以内，下面的东西才可以用。</p>
+<h2 id="s2"><span class="no">02</span>第一步：把手头的事分成两类</h2>
+<p>拿一张纸，写下你最近正在「等它好起来」的三到五件事。可以是一条恢复中的韧带、一次时差调整、一段睡眠的重建、一个正在摸索方向的项目、一段刚刚开始修补的关系。</p>
+<p>对每一件，问一个问题：<b>我去查它的进度，这个动作本身会不会改变它？</b></p>
+<p>会的，划到 A 类。不会的，划到 B 类。</p>
+<p>B 类的例子：伤口的拆线日期、体重的长期趋势、账户里的余额、项目的交付日期。这些东西你看多少眼都不会变，想查随便查。</p>
+<p>A 类的例子：入睡、深度修复、创造性工作的中段、还没成形的想法、正在重新建立信任的关系。这些东西一被拿出来评估，就会从那个状态里退出来。</p>
+<p>大多数人的问题不是查得太多，是<b>把 A 类当成 B 类查</b>。</p>
+<h2 id="s3"><span class="no">03</span>分不清的时候，用这三个判据</h2>
+<p>有些事一眼看不出属于哪一类。用下面三条，中一条就按 A 类处理。</p>
+<p><b>判据一：查它需要我先中断它吗？</b>要知道自己睡着没有，得先醒；要知道那个想法成不成立，得先把它从半成品状态里拽出来。凡是「查」和「做」不能同时进行的，都是 A 类。</p>
+<p><b>判据二：它有没有一个不能从中断处续上的轮次？</b>发酵、深睡、结痂、一段完整的专注，都有轮次。被打断不是损失几分钟，是这一轮作废。有轮次的，一律 A 类。</p>
+<p><b>判据三：它的进度能不能被一个数字如实表示？</b>能被数字如实表示的，通常经得起查（体重、里程、余额）。凡是你一说数字就觉得「不太对，没那么简单」的，说明它的真实状态不在那个数字里——查那个数字既没用，还要收费。</p>
+<h2 id="s4"><span class="no">04</span>第二步：给 A 类划一个静默窗</h2>
+<p>对每一件 A 类的事，划出一段明确的时间，在这段时间里不做任何评估。</p>
+<p>窗要划得具体到可以被别人核对。「晚上少想」不算，「二十三点到次日七点之间不看时间、不做恢复评估」才算。</p>
+<p>三个参数要定死：</p>
+<p><b>起止点。</b>不是「感觉差不多的时候」，是钟点、是日期、是某个客观事件（比如「到下周三复查之前」）。</p>
+<p><b>窗内允许做什么。</b>允许记录（写下今天跑了多少、睡了几点到几点），不允许结算（不允许拿这些数据得出「所以我恢复得怎么样」的结论）。</p>
+<p><b>窗的出口在哪里。</b>每个窗都必须有一个明确的、在窗外的裁定时刻。否则这套东西就变成了逃避——你不是把判决推迟了，你是把它取消了。</p>
+<h2 id="s5"><span class="no">05</span>第三步：把裁定交出去</h2>
+<p>这是母文最有用的一条，也是最容易被跳过的一条。</p>
+<p>母文回答「顶尖运动员被全方位监控却没事」这个反驳时给的答案是：<b>判决被搬到了他身体外面。</b>他躺着，别人算账。你要抄的就是这一手。</p>
+<p>可交的对象有四种，按可得性排序：</p>
+<p><b>交给时间。</b>把裁定绑在一个固定的复查日上。窗内所有「我到底怎么样了」的念头，统一回答：下周三再说。</p>
+<p><b>交给一个人。</b>教练、医生、理疗师、同事、伴侣。约定由他来读数据、由他来说进度。你只负责报告事实，不负责下结论。</p>
+<p><b>交给一份文件。</b>预先写好一份判据表（见第五步），到期照表打勾。表说了算，不是你当时的感觉说了算。</p>
+<p><b>交给设备。</b>手环、体重秤、日志软件。它们记，你不看；到期一起看。</p>
+<p>交出去这件事有个心理门槛：会觉得自己在放弃责任。要提醒自己的是，你交出去的是<b>判决权</b>，不是<b>照做的义务</b>。该做的康复、该睡的觉，一样都不少。</p>
+<h2 id="s6"><span class="no">06</span>第四步：把「查」降级成「记」</h2>
+<p>如果实在做不到完全不管，那就把裁定降级成记录。这一步的成本最低，收益也很实在。</p>
+<p>记录和裁定的差别，可以用三条纪律钉死：</p>
+<p><b>只写事实，不写评价。</b>写「今晨起床时膝盖有紧感，走了十分钟后消失」，不写「今天状态不太好」。前者是数据，后者是判决。</p>
+<p><b>不当场比较。</b>不去翻昨天那条、上周那条。翻一次就是开一次庭。</p>
+<p><b>不改计划。</b>记录不产生动作。当天的训练、当天的作息，按之前定好的做完。要改，等到窗外的裁定日再改。</p>
+<p>做满这三条，「查」就从一次判决降级成了一次抄写。抄写不收费。</p>
+<h2 id="s7"><span class="no">07</span>第五步：设一条不需要判断的硬线</h2>
+<p>静默窗不能是没有出口的。你必须预先设好一条线，越过它就立刻停手，而且这条线不能依赖你当时的判断。</p>
+<p>好的硬线长这样：</p>
+<ul class="pts"><li>疼痛持续超过四十八小时不缓解</li><li>同一部位出现三次以上打软或失稳</li><li>静息心率连续三天高于基线十次以上</li><li>连续两晚完全无法入睡</li><li>出现任何新的、没有出现过的症状</li></ul>
+<p>它们的共同特点是：<b>不含程度词，不需要你评估自己。</b>「感觉不太对」不是硬线，「同一部位三次打软」是硬线。</p>
+<p>线要在划窗的同一天就写好，写在纸上，压在看得见的地方。等到真出事的时候再想「这算不算严重」，那已经是在开庭了。</p>
+<h2 id="s8"><span class="no">08</span>三种最容易做坏的方式</h2>
+<p><b>做坏一：把静默窗变成不管。</b>这是最常见的。窗的意思是「在这段时间里不评估」，不是「在这段时间里什么都不做」。该做的照做，只是不结算。判断标准很简单：你的动作清单有没有变短？变短了就是做坏了。</p>
+<p><b>做坏二：把它用来压别人的话。</b>「你别老查了，母文说了查本身就是干扰」——这句话一旦出口，就已经用坏了。别人报告他的感受，那是信号先动、你接住；你回一句让他别查，是在替他关掉一个通道。</p>
+<p><b>做坏三：偷偷查。</b>表面上遵守静默窗，实际上一天二十次在心里飞快地过一遍「我现在怎么样」。这比明着查更贵，因为它不留记录、无法核对，你会以为自己做到了。对治的办法是把它外化：想查的时候，在纸上划一道，别的什么都不做。一天下来看划了几道。</p>
+<h2 id="s9"><span class="no">09</span>五个实操疑问</h2>
+<p><b>一、静默窗要多长？</b>跟那件事的轮次对齐。睡眠对齐一夜，深层修复对齐一周，项目的探索期对齐一个交付节点。宁短勿长——一个能做到的三天窗，比一个做不到的三十天窗有用得多。</p>
+<p><b>二、如果窗内心里冒出结论怎么办？</b>不追它，也不反驳它。记一笔「今天冒出一次判断」，然后回到手上的事。冒出来是免费的，你去追它才要钱。</p>
+<p><b>三、把裁定交给伴侣或家人，会不会变成他们焦虑？</b>会，所以交出去的同时要把判据表一起交出去。交的是一张表，不是一份担忧。表上写清楚看什么、什么算过关、什么时候通知你。</p>
+<p><b>四、我做的是脑力活，不是康复，这套还成立吗？</b>成立，而且更明显。一个还没成形的方案，最怕的就是被反复要求「给个进度百分比」。做法完全一样：划窗、只记不评、把裁定绑在评审日上。</p>
+<p><b>五、怎么知道这套东西对我有没有用？</b>用四周做一次对照：前两周照旧，后两周划窗，比较的不是「感觉好不好」，而是三个客观量——完整轮次的数量（比如整夜不醒的次数）、硬线被触发的次数、到期裁定时的实际读数。感觉不作数，因为感觉本身也是被查出来的。</p>
+<h2 id="s10"><span class="no">10</span>用在别人身上的时候</h2>
+<p>如果你是教练、医生、管理者、家长，这套东西会反过来指向你。</p>
+<p>因为在别人的过程里，<b>那个不停敲门的人是你</b>。</p>
+<p>三条可以立刻做：</p>
+<p><b>把你的查改成定时的、公开的。</b>不定时地随机推门，成本最高。定在每周二上午十点，团队就能围绕它安排自己的轮次。</p>
+<p><b>接管裁定，不要转嫁裁定。</b>「你自己觉得恢复得怎么样？」这句话听起来很尊重，实际上是把开庭的活儿摊给了对方。要么你来判，要么等到复查日一起判，别在中途让他自己判。</p>
+<p><b>给出一个明确的静默承诺。</b>「这周我不会再问进度」——说出口，并且做到。这句话的价值远高于任何一次鼓励。</p>
+<h2 id="s11"><span class="no">11</span>一页纸操作卡</h2>
+<p>1. 列出正在等它好起来的三到五件事2. 逐件问：查它会不会改变它？会→A 类3. 分不清就用三判据：需要中断吗／有没有轮次／数字说得清吗4. 给每件 A 类划静默窗：写死起止点、窗内只记不评、窗外定一个裁定日5. 把裁定交出去：交给时间／交给一个人／交给一份表／交给设备6. 写下不含程度词的硬线，压在看得见的地方7. 窗内想查就在纸上划一道，别的不做8. 到期照表裁定，改不改计划一次改完9. 四周后用三个客观量做对照：完整轮次数、硬线触发数、到期读数10. 三条边界随时优先：急性事件、医嘱监测、别人的感受</p>
+<h2 id="s12"><span class="no">12</span>一个走完全套的例子</h2>
+<p>老周，四十六岁，半月板术后第九周。医生说三个月后复查，可以逐步恢复慢跑。</p>
+<p>他第一个月做的事是这样的：每天早上下地第一步，先感受一下膝盖；上下楼时刻意试探哪一级台阶会不舒服；晚上睡前坐在床边，把腿伸直、弯曲，各做几次，判断今天比昨天好还是差；每周三还要拿软尺量一次大腿围，跟健侧比。</p>
+<p>他没有偷懒，也不焦虑，他觉得自己非常配合治疗。但他一直有个感觉：好像卡住了。</p>
+<p>按上面的步骤重排，是这样：</p>
+<p><b>分类</b>。他列了四件事：伤口愈合（B 类，看得见，查了不变）、大腿围恢复（B 类，长期趋势，一周量一次没问题）、关节内部修复（A 类，看不见，只能靠试探去查，而试探本身就是加载）、走路时的稳定感（A 类，一去检验就会改变动作模式）。</p>
+<p>问题当场就清楚了：他每天做的那些试探——下地第一步的感受、上下楼的刻意测试、睡前的伸直弯曲——全都落在 A 类上，而且一天三到五次。</p>
+<p><b>划窗</b>。他把窗定在「每天全天不做主动试探，只在早晚各一次的康复训练里正常活动」，出口定在「每周日晚上，由太太读一遍这一周的记录」。</p>
+<p><b>交出去</b>。裁定交给两个：一是三个月后的复查，二是他太太每周日的那次读表。他自己不再下结论。</p>
+<p><b>降级</b>。每天只记三件事实：训练做了几组、走了多少步、有没有出现明确的疼（有／无，不写程度）。不写「今天感觉不如昨天」。</p>
+<p><b>硬线</b>。写在冰箱上：疼痛超过四十八小时不缓解／同一部位三次打软／关节明显肿胀／夜间痛醒。任一条出现，立刻停训并联系医生。</p>
+<p>四周后对照：明确疼痛的天数从十一天降到四天，硬线一次都没触发，太太读表时发现他的日均步数其实一直在稳定上升——只是他每天都在用试探把这个上升重新打开一次，所以自己从来没感觉到。</p>
+<h2 id="s13"><span class="no">13</span>与三种常见做法的分工</h2>
+<p>这套东西不是要取代别的方法，它和它们各管一段，说清楚了才不会打架。</p>
+<p><b>和「正念/放松训练」的分工。</b>正念处理的是情绪的强度，本文处理的是判决的次数。一个人可以非常平静地每小时判决一次，那些判决照样收费。两者可以叠加：正念让你在窗内更容易不去追那个冒出来的念头，但它替代不了划窗这个动作本身。</p>
+<p><b>和「数据化自我管理」的分工。</b>手环、日志、量表都是好东西，问题不在它们记，在<b>谁读、什么时候读</b>。本文不反对采集，只要求把读数和结论移到窗外、最好移到别人手里。一个只记不看的手环，和一个每小时看八次的手环，是两个完全不同的工具。</p>
+<p><b>和「完全不管」的分工。</b>这是最需要划清的一条。完全不管意味着没有硬线、没有裁定日、没有记录，出了事没有人知道。本文要求的恰恰相反：记录一天都不能停，硬线必须写在纸上，裁定日必须落在日历里。它减少的只有一样东西——<b>你在过程中间自己给自己下结论的次数</b>。</p>
+<p>一句话记住三者的分界：正念管强度，数据管采集，本文管<b>开庭的次数和地点</b>。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/hu-min/adjudicative-interference/">《裁定性干扰：为什么修复的判决动作本身即构成修复的结构性减损》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/hu-min/adjudicative-interference/explain.html">🌱 白话解释文《越想知道自己睡着没有，就越睡不着》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/hu-min/adjudicative-interference/">回母文</a> ·
+  <a href="/students/hu-min/works/">胡敏 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>思想宇宙 · Philosophy | SDE Universes</title>
+<meta name="description" content="SDE本体论（显露·差异·纠缠）· 发生范式 · 意义三律 · 五十余部跨域专著 · 《SDE本体论入门》· 王德生思想体系">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F5EFE0;
+  --surface:#EBE3CE;
+  --card:#FAF6EC;
+  --card2:#F0E8D3;
+  --gold:#8A6817;
+  --gold2:#A88233;
+  --text:#2A2315;
+  --text2:#6B5D47;
+  --muted:#98886C;
+  --border:rgba(138,104,23,0.22);
+  --border2:rgba(138,104,23,0.10);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.7;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(245,239,224,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;transition:color 0.2s}
+.nav-links a:hover{color:var(--gold)}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;letter-spacing:0.05em;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit}
+.lang-btn.active{background:var(--gold);color:#070B16;font-weight:600}
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(138,104,23,0.08) 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(138,104,23,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(138,104,23,0.05) 1px,transparent 1px);background-size:60px 60px}
+.hero-eyebrow{font-size:0.7rem;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;opacity:0.8}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(3rem,8vw,7rem);font-weight:700;line-height:1.05;color:var(--text);margin-bottom:0.5rem}
+.hero-title span{color:var(--gold)}
+.hero-subtitle{font-size:clamp(1.1rem,2.5vw,1.5rem);color:var(--text2);margin:1.5rem 0 2.5rem;font-style:italic;font-weight:300}
+.hero-formula{display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:0.6rem 1.5rem;font-size:1rem;letter-spacing:0.1em;color:var(--gold2);margin-bottom:3rem}
+.hero-formula .op{color:var(--muted);font-size:0.8em;margin:0 0.2rem}
+.hero-stats{display:flex;gap:3rem;margin-top:1rem;flex-wrap:wrap;justify-content:center}
+.stat{text-align:center}
+.stat-n{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;color:var(--gold);display:block;line-height:1}
+.stat-l{font-size:0.7rem;letter-spacing:0.15em;color:var(--text2);margin-top:0.3rem;display:block}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;color:var(--muted);font-size:0.7rem;letter-spacing:0.2em}
+.scroll-arrow{width:1px;height:40px;background:linear-gradient(var(--gold),transparent);animation:scrollpulse 2s ease-in-out infinite}
+@keyframes scrollpulse{0%,100%{opacity:0.3;transform:scaleY(0.8)}50%{opacity:1;transform:scaleY(1)}}
+/* ── SECTIONS ── */
+section{padding:5rem 2rem}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-label{font-size:0.65rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+h2.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;color:var(--text);line-height:1.2;margin-bottom:1rem}
+.section-divider{width:60px;height:2px;background:var(--gold);margin:1.5rem 0}
+/* ── ABOUT ── */
+#about{background:var(--surface)}
+.about-grid{display:grid;grid-template-columns:1fr 2fr;gap:4rem;align-items:start;margin-top:3rem}
+.about-portrait{position:relative}
+.portrait-frame{width:100%;aspect-ratio:3/4;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.portrait-frame::before{content:'王德生\A Wang Desheng';white-space:pre;text-align:center;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold);opacity:0.4;letter-spacing:0.1em}
+.portrait-corner{position:absolute;width:20px;height:20px;border-color:var(--gold);border-style:solid}
+.portrait-corner.tl{top:8px;left:8px;border-width:1px 0 0 1px}
+.portrait-corner.tr{top:8px;right:8px;border-width:1px 1px 0 0}
+.portrait-corner.bl{bottom:8px;left:8px;border-width:0 0 1px 1px}
+.portrait-corner.br{bottom:8px;right:8px;border-width:0 1px 1px 0}
+.about-info{display:flex;flex-direction:column;gap:0.5rem;margin-top:1rem;font-size:0.75rem;color:var(--text2)}
+.about-info span{display:flex;align-items:center;gap:0.5rem}
+.about-info span::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.about-text p{font-size:1.05rem;line-height:1.9;color:var(--text);margin-bottom:1.2rem}
+.about-text p:first-child{font-size:1.15rem;color:var(--text)}
+.tag-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1.5rem}
+.tag{padding:0.3rem 0.8rem;border:1px solid var(--border);color:var(--gold);font-size:0.7rem;letter-spacing:0.1em;border-radius:2px}
+/* ── SDE FRAMEWORK ── */
+#sde .sde-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:3rem}
+.sde-card{padding:2.5rem;background:var(--card);position:relative;overflow:hidden}
+.sde-card::before{content:attr(data-letter);position:absolute;top:-0.2em;right:0.2em;font-family:'Playfair Display',serif;font-size:8rem;font-weight:700;color:rgba(138,104,23,0.08);line-height:1;pointer-events:none}
+.sde-letter{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:0.5rem}
+.sde-name-zh{font-size:1.1rem;font-weight:500;color:var(--text);margin-bottom:0.25rem}
+.sde-name-en{font-size:0.75rem;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase;margin-bottom:1.2rem}
+.sde-desc{font-size:0.9rem;color:var(--text2);line-height:1.8}
+.sde-formula{margin-top:3rem;text-align:center;padding:2rem;background:var(--card2);border:1px solid var(--border)}
+.sde-formula p{font-size:0.85rem;color:var(--text2);margin-bottom:0.8rem;letter-spacing:0.1em}
+.formula-line{font-family:'EB Garamond','Playfair Display',serif;font-size:1.3rem;color:var(--gold2);letter-spacing:0.2em;font-style:italic}
+/* ── BOOKS ── */
+#books{background:var(--surface)}
+.books-filter{display:flex;flex-wrap:wrap;gap:0.5rem;margin:2rem 0;border-bottom:1px solid var(--border2);padding-bottom:1.5rem}
+.filter-btn{padding:0.35rem 1rem;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:inherit;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;border-radius:2px}
+.filter-btn:hover,.filter-btn.active{background:var(--gold);color:#070B16;border-color:var(--gold)}
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1.5rem;margin-top:1.5rem}
+.book-card{cursor:default;transition:transform 0.2s}
+.book-card:hover{transform:translateY(-4px)}
+a.book-card-link{text-decoration:none;color:inherit;display:block;transition:transform .16s ease,box-shadow .16s ease}a.book-card-link:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,0.28)}a.book-card-link:hover .book-title{text-decoration:underline}.book-cover{width:100%;aspect-ratio:2/3;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;text-align:center;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+.book-cover-title{font-size:0.8rem;font-weight:500;color:#fff;line-height:1.4;z-index:1;position:relative;word-break:break-all}
+.book-cover-num{position:absolute;bottom:0.5rem;right:0.6rem;font-size:0.6rem;color:rgba(255,255,255,0.25);font-family:'Playfair Display',serif;font-style:italic}
+.book-info{padding:0.6rem 0}
+.book-title{font-size:0.75rem;color:var(--text);line-height:1.4;margin-bottom:0.2rem;font-weight:500}
+.book-desc{font-size:0.65rem;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.book-domain{display:inline-block;font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);border:1px solid rgba(200,164,74,0.3);padding:0.1rem 0.4rem;margin-bottom:0.3rem;border-radius:1px}
+/* domain colors — 7 clusters */
+.d-core{background:linear-gradient(135deg,#1A2545,#0E1830)}   /* deep navy — ontology core */
+.d-civ{background:linear-gradient(135deg,#3A1820,#220E14)}    /* burgundy — civilization & humanities */
+.d-gov{background:linear-gradient(135deg,#102A24,#0A1A16)}    /* forest — governance & social */
+.d-edu{background:linear-gradient(135deg,#3A2810,#22180A)}    /* amber — education */
+.d-life{background:linear-gradient(135deg,#1A2A10,#0E1A0A)}   /* olive — health & life */
+.d-cre{background:linear-gradient(135deg,#2A1840,#180E2A)}    /* violet — creativity */
+.d-ai{background:linear-gradient(135deg,#102828,#0A1818)}     /* teal — AI frontier */
+.d-ph{background:linear-gradient(135deg,#3A352A,#22201A)}     /* muted brown — forthcoming */
+/* ── PLATFORM ── */
+#platform{position:relative;overflow:hidden}
+.platform-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 50% 50%,rgba(200,164,74,0.05) 0%,transparent 70%)}
+.platform-inner{position:relative;z-index:1;text-align:center;max-width:800px;margin:0 auto}
+.platform-badge{display:inline-block;background:rgba(200,164,74,0.1);border:1px solid var(--border);color:var(--gold);font-size:0.7rem;letter-spacing:0.2em;padding:0.4rem 1rem;margin-bottom:2rem;border-radius:2px}
+.platform-modules{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin:3rem 0}
+.module{padding:0.8rem 1.5rem;background:var(--card);border:1px solid var(--border2);font-size:0.8rem;color:var(--text2);border-radius:2px;transition:all 0.2s}
+.module:hover{border-color:var(--gold);color:var(--gold)}
+.cta-btn{display:inline-block;padding:0.9rem 2.5rem;background:var(--gold);color:#070B16;font-size:0.85rem;font-weight:600;letter-spacing:0.1em;text-decoration:none;border-radius:2px;transition:background 0.2s}
+.cta-btn:hover{background:var(--gold2)}
+/* ── FOOTER ── */
+footer{background:var(--surface);border-top:1px solid var(--border2);padding:3rem 2rem}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem}
+.footer-brand p{font-size:0.85rem;color:var(--text2);margin-top:0.8rem;line-height:1.7;max-width:280px}
+.footer-col h4{font-size:0.7rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:0.5rem}
+.footer-col ul li a{color:var(--text2);text-decoration:none;font-size:0.8rem;transition:color 0.2s}
+.footer-col ul li a:hover{color:var(--gold)}
+.footer-bottom{max-width:1100px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--muted)}
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem}
+  .nav-links a{display:none}
+  .about-grid{grid-template-columns:1fr}
+  .sde-grid{grid-template-columns:1fr}
+  .books-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .footer-inner{grid-template-columns:1fr}
+}
+/* ── LANGUAGE VISIBILITY ── */
+.zh-only,.en-only{transition:opacity 0.2s}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+
+/* ── MEANING LAWS (意义三律) ── */
+#laws{background:var(--surface)}
+.laws-intro{max-width:680px;color:var(--text2);font-size:0.95rem;margin:0.5rem 0 0;line-height:1.8}
+.laws-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:3rem}
+.law-card{position:relative;padding:2.5rem 2rem;background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--gold);transition:transform .25s,border-color .25s}
+.law-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.law-num{font-family:'Playfair Display',serif;font-size:0.75rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase}
+.law-icon{font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--gold);margin:0.4rem 0 0.8rem;font-style:italic;line-height:1}
+.law-name-zh{font-size:1.35rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;letter-spacing:0.05em}
+.law-name-en{font-size:0.7rem;letter-spacing:0.2em;color:var(--text2);text-transform:uppercase;margin-bottom:1.2rem}
+.law-desc{font-size:0.9rem;color:var(--text2);line-height:1.85}
+.law-keyword{display:inline-block;margin-top:1.2rem;padding:0.2rem 0.6rem;font-size:0.7rem;letter-spacing:0.1em;border:1px solid var(--border);color:var(--gold);border-radius:2px}
+
+/* ── CLUSTER OVERVIEW (7 集群) ── */
+.clusters-overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin:2rem 0 2.5rem}
+.cluster-card{padding:1.2rem 1rem;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--gold);cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:0.4rem}
+.cluster-card:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 8px 24px rgba(138,104,23,0.10)}
+.cluster-count{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--gold);line-height:1}
+.cluster-name{font-size:0.95rem;color:var(--text);font-weight:500;letter-spacing:0.02em}
+.cluster-tag{font-size:0.7rem;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase}
+/* cluster swatches */
+.cluster-card[data-d="core"]{border-left-color:#1A2545}
+.cluster-card[data-d="civ"] {border-left-color:#3A1820}
+.cluster-card[data-d="gov"] {border-left-color:#102A24}
+.cluster-card[data-d="edu"] {border-left-color:#3A2810}
+.cluster-card[data-d="life"]{border-left-color:#1A2A10}
+.cluster-card[data-d="cre"] {border-left-color:#2A1840}
+.cluster-card[data-d="ai"]  {border-left-color:#102828}
+
+/* ── VISION (意义文明) ── */
+#vision{background:var(--surface);text-align:center;padding:6rem 2rem}
+.vision-inner{max-width:900px;margin:0 auto}
+.vision-eyebrow{font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem}
+.vision-quote{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:600;color:var(--text);line-height:1.4;font-style:italic;margin:1rem 0 2rem;letter-spacing:0.02em}
+.vision-quote::before,.vision-quote::after{content:'"';color:var(--gold);font-family:'Playfair Display',serif;font-weight:700;opacity:0.6;font-style:normal;margin:0 0.15em}
+.vision-body{color:var(--text2);font-size:1rem;line-height:1.9;max-width:680px;margin:0 auto}
+.vision-axis{display:flex;justify-content:center;gap:2rem;margin-top:2.5rem;flex-wrap:wrap}
+.vision-axis-item{padding:0.5rem 1.2rem;border:1px solid var(--border);color:var(--gold);font-size:0.8rem;letter-spacing:0.1em;border-radius:2px;background:var(--card)}
+
+/* ── TIMELINE (学术轨迹) ── */
+.timeline{margin-top:2.5rem;position:relative;padding-left:2rem;border-left:1px solid var(--border)}
+.timeline-item{position:relative;padding-bottom:1.8rem}
+.timeline-item:last-child{padding-bottom:0}
+.timeline-item::before{content:'';position:absolute;left:-2.4rem;top:0.45rem;width:9px;height:9px;background:var(--gold);border-radius:50%;border:2px solid var(--bg)}
+.timeline-period{font-family:'Playfair Display',serif;font-size:0.75rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase}
+.timeline-title{font-size:1rem;font-weight:600;color:var(--text);margin:0.2rem 0 0.4rem}
+.timeline-desc{font-size:0.85rem;color:var(--text2);line-height:1.7}
+
+@media(max-width:768px){
+  .laws-grid{grid-template-columns:1fr}
+  .clusters-overview{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body class="zh">
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/drwang/" class="zh-only" style="color:var(--gold)">← 王博士与 SDE</a><a href="/drwang/" class="en-only" style="color:var(--gold)">← Dr. Wang &amp; SDE</a><a href="/browse/" class="zh-only">平台</a><a href="/browse/" class="en-only">Platform</a>
+    <a href="#about" class="zh-only">关于</a><a href="#about" class="en-only">About</a>
+    <a href="#sde" class="zh-only">SDE</a><a href="#sde" class="en-only">SDE</a>
+    <a href="#laws" class="zh-only">三律</a><a href="#laws" class="en-only">Axioms</a>
+    <a href="#books" class="zh-only">专著</a><a href="#books" class="en-only">Works</a>
+    <a href="#vision" class="zh-only">愿景</a><a href="#vision" class="en-only">Vision</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow zh-only"><a href="/drwang/" style="color:inherit;text-decoration:none;border-bottom:1px solid currentColor">王博士与 SDE</a> · 频道 · 思想宇宙</div>
+  <div class="hero-eyebrow en-only"><a href="/drwang/" style="color:inherit;text-decoration:none;border-bottom:1px solid currentColor">DR. WANG &amp; SDE</a> · CHANNEL · PHILOSOPHY</div>
+  <div class="hero-eyebrow zh-only" style="opacity:.72">跨域知识发生学 · 超级个体研究体系</div>
+  <div class="hero-eyebrow en-only" style="opacity:.72">Cross-Domain Knowledge Generativics · Super-Individual Research System</div>
+  <h1 class="hero-title">SDE <span>Universes</span></h1>
+  <p class="hero-subtitle zh-only">在纠缠中，经由差异，显露而成</p>
+  <p class="hero-subtitle en-only">In entanglement, through difference, being shows forth</p>
+  <div class="hero-formula">
+    <span>S</span><span class="op">·</span>
+    <span>D</span><span class="op">·</span>
+    <span>E</span>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-n">55+</span><span class="stat-l zh-only">已出版专著</span><span class="stat-l en-only">MONOGRAPHS</span></div>
+    <div class="stat"><span class="stat-n">20</span><span class="stat-l zh-only">覆盖学科</span><span class="stat-l en-only">DISCIPLINES</span></div>
+    <div class="stat"><span class="stat-n">∞</span><span class="stat-l zh-only">发生可能</span><span class="stat-l en-only">GENERATIVE POTENTIAL</span></div>
+  </div>
+  <div class="scroll-hint" style="margin-top:2rem">
+    <span class="zh-only">向下探索</span><span class="en-only">EXPLORE</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+<!-- ABOUT -->
+<section id="about">
+<div class="section-inner">
+  <div class="section-label zh-only">关于作者</div>
+  <div class="section-label en-only">About the Author</div>
+  <h2 class="section-title zh-only">王德生</h2>
+  <h2 class="section-title en-only">Wang Desheng</h2>
+  <div class="section-divider"></div>
+  <div class="about-grid">
+    <div>
+      <div class="portrait-frame">
+        <div class="portrait-corner tl"></div>
+        <div class="portrait-corner tr"></div>
+        <div class="portrait-corner bl"></div>
+        <div class="portrait-corner br"></div>
+      </div>
+      <div class="about-info">
+        <span class="zh-only">计算数学博士 · 中国科学院</span><span class="en-only">PhD Computational Mathematics · CAS</span>
+        <span class="zh-only">中国科学院博士后</span><span class="en-only">CAS Postdoc</span>
+        <span class="zh-only">南洋理工大学 · 德麦国际有限公司</span><span class="en-only">NTU · Demai International Pte. Ltd.</span>
+        <span>Singapore · ORCID 0009-0009-8196-0030</span>
+      </div>
+    </div>
+    <div class="about-text">
+      <p class="zh-only">王德生，数学博士、哲学家，<strong style="color:var(--text)">SDE 本体论（显露—差异—纠缠）</strong>的创立者，新加坡德麦国际出版公司（Demai International Pte. Ltd.）创始人。以三十余年的学术探索，完成了从计算数学家到跨域思想家的根本转向——构筑了一座以数学精度承载哲学抱负的思想建筑。</p>
+      <p class="en-only">Wang Desheng — mathematician (PhD), philosopher, founder of <strong style="color:var(--text)">SDE Ontology (Show–Difference–Entanglement)</strong>, founder of Demai International Pte. Ltd. (Singapore). Over three decades, he completed a fundamental turn from computational mathematician to cross-domain thinker — constructing a rare intellectual architecture that carries philosophical ambition with mathematical precision.</p>
+      <p class="zh-only">核心命题：<em>"世界不是被发现的，而是发生的。"</em> 把人类的根本追问从"世界是什么"（发现范式）转向"世界如何发生"（发生范式）。存在公式：<em>在 E 中，经 D，成 S</em> —— 在特征纠缠的土壤中，经差异序列的路径，成为显露的结构。三维互生，由三大方程 S=F(D,E)、D=G(S,E)、E=H(S,D) 闭合；SIO 27 宫格作为 S 维度的内部精细地图，与意义三律（特征律 · 自由律 · 幸福律）、六路径、三态与成熟态判断共同构成完整骨架。</p>
+      <p class="en-only">Core proposition: <em>"The world is not discovered — it comes to be."</em> The fundamental question shifts from "what the world is" (paradigm of discovery) to "how the world comes to be" (paradigm of genesis). The formula of being: <em>within E, through D, into S</em> — within feature entanglement, through difference sequences, into shown structure. The three dimensions co-generate, closed by S=F(D,E), D=G(S,E), E=H(S,D); together with the SIO 27-cell map of the S dimension, the Three Axioms of Meaning, the six pathways, the three states and the maturity thesis, they form the complete skeleton.</p>
+      <p class="zh-only">已出版五十余部跨域专著（每部约 20 万字，全部 Bowker ISBN 注册），覆盖哲学、数学、人工智能、医学、教育、艺术、文明研究等约二十个学科。2026 年 7 月推出面向公众读者的体系入门之作<a href="/books/sde-ontology-intro/" style="color:var(--gold)">《SDE本体论入门：世界是如何发生的》</a>（约 39 万字，14 篇 63 章）。此前在计算数学与计算机图形学领域发表 47 篇国际顶刊论文。</p>
+      <p class="en-only">Fifty-plus cross-domain monographs published (~200,000 characters each, all Bowker ISBN registered), spanning some twenty disciplines from philosophy, mathematics and AI to medicine, education, art and civilization studies. In July 2026, the public-facing introduction <a href="/books/sde-ontology-intro/" style="color:var(--gold)"><em>Introduction to SDE Ontology: How the World Comes to Be</em></a> (~390,000 characters, 14 parts, 63 chapters) was released. Previously, 47 papers in top international journals in computational mathematics and computer graphics.</p>
+      <div class="tag-row">
+        <span class="tag">SDE Ontology · Show–Difference–Entanglement</span>
+        <span class="tag zh-only">发生范式</span><span class="tag en-only">Paradigm of Genesis</span>
+        <span class="tag zh-only">意义三律</span><span class="tag en-only">Three Axioms of Meaning</span>
+        <span class="tag">Dragon Claw 龙爪手</span>
+        <span class="tag zh-only">超级个体</span><span class="tag en-only">Super-Individual</span>
+        <span class="tag">GCG Framework</span>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-period zh-only">1990 – 2014 · 数学筋骨</div>
+          <div class="timeline-period en-only">1990 – 2014 · MATHEMATICAL SINEW</div>
+          <div class="timeline-title zh-only">计算数学的结构训练</div>
+          <div class="timeline-title en-only">Structural Training in Computational Mathematics</div>
+          <p class="timeline-desc zh-only">湘潭大学数学系（学/硕）→ 中科院数学所（博士，导师梁国平）→ 中科院计算数学所博士后→ 英国威尔士大学斯旺西分校 → 新加坡南洋理工大学十三年（博导）。47 篇国际顶刊论文锻造了对"差异如何在结构约束下自组织为稳定秩序"的数学直觉。</p>
+          <p class="timeline-desc en-only">Xiangtan Univ. (BS/MS) → CAS Institute of Mathematics (PhD, advisor Liang Guoping) → CAS Computational Mathematics Postdoc → Univ. of Wales Swansea → Nanyang Technological Univ. (13 years, PhD supervisor). 47 top-tier journal papers forged a mathematical intuition for "how difference self-organizes into stable order under structural constraint."</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-period zh-only">2015 – 2021 · 形式理性</div>
+          <div class="timeline-period en-only">2015 – 2021 · FORMAL REASON</div>
+          <div class="timeline-title zh-only">三视角方法论的跨域展开</div>
+          <div class="timeline-title en-only">Cross-Domain Unfolding of the Three-Perspective Method</div>
+          <p class="timeline-desc zh-only">以 John Frame 三视角分析法为起点，构建三视角教育学/管理学/心理学/美学等十部专著。讲学数百场。但形式的优雅带来了结构的寒冷——"若结构不能生成意义，它就只是一具理性的外壳。"</p>
+          <p class="timeline-desc en-only">Beginning from John Frame's three-perspective method, built ten three-perspective monographs across education, management, psychology, aesthetics. Hundreds of lectures. Yet the elegance of form brought the coldness of structure — "if structure cannot generate meaning, it is merely a shell of reason."</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-period zh-only">2022 – 2023 · 内容张力</div>
+          <div class="timeline-period en-only">2022 – 2023 · CONTENT TENSION</div>
+          <div class="timeline-title zh-only">321 智慧与意义的混沌</div>
+          <div class="timeline-title en-only">321 Wisdom and the Chaos of Meaning</div>
+          <p class="timeline-desc zh-only">为突破形式僵化，提出 321 智慧——存在（1）、矛盾（2）、视角（3）。思想重新充满生命力，也带来了新的混乱："内容的极致是虚无，形式的极致是僵死。"</p>
+          <p class="timeline-desc en-only">To break formal rigidity, the 321 Wisdom emerged — Being (1), Contradiction (2), Perspective (3). Thought regained vitality but brought new chaos: "the extreme of content is nothingness; the extreme of form is rigor mortis."</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-period zh-only">2024 – 至今 · 本体革命</div>
+          <div class="timeline-period en-only">2024 – PRESENT · ONTOLOGICAL REVOLUTION</div>
+          <div class="timeline-title zh-only">SDE 本体论的诞生与正名</div>
+          <div class="timeline-title en-only">Birth &amp; Rectification of SDE Ontology</div>
+          <p class="timeline-desc zh-only">2024 年实现"0→1 突破"，经 SIO 本体论阶段，演化为以三大方程、123 原理、六路径、意义三律、三态与成熟态判断为骨架的完整三维发生学体系；SIO 收口为 S 维度的内部精细结构（27 宫格）。四个月内（2025.12 – 2026.3）密集出版 52 部跨域专著；2026 年 7 月《SDE本体论入门》出版，完成"结构→显露"正名——S 是 Show，把人类根本追问从"世界是什么"换成"世界如何发生"。</p>
+          <p class="timeline-desc en-only">The 2024 "0→1 breakthrough": through the SIO stage, the system matured into a complete three-dimensional generativics — three equations, the 123 principle, six pathways, the Three Axioms of Meaning, three states and the maturity thesis — with SIO folded into the fine structure of the S dimension (the 27-cell map). After 52 monographs in four months (Dec 2025 – Mar 2026), the July 2026 <em>Introduction to SDE Ontology</em> completed the rectification: S is Show, and the fundamental question shifts from "what the world is" to "how the world comes to be."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- SDE FRAMEWORK -->
+<section id="sde">
+<div class="section-inner">
+  <div class="section-label zh-only">核心体系</div>
+  <div class="section-label en-only">Core Framework</div>
+  <h2 class="section-title zh-only">显露 · 差异 · 纠缠</h2>
+  <h2 class="section-title en-only">Show · Difference · Entanglement</h2>
+  <div class="section-divider"></div>
+  <p style="color:var(--text2);font-size:0.95rem;max-width:600px;margin-top:0.5rem" class="zh-only">SDE不是框架，而是知识的发生机制。它解释新知识结构在什么条件下生长出来。</p>
+  <p style="color:var(--muted);font-size:0.85rem;max-width:600px;margin-top:0.8rem;border-left:2px solid var(--border);padding-left:12px" class="zh-only">正名 · S 是 Show（显露），不是 Structure（结构）——结构只是显露最稳定的特例。早期通俗旧称"结构—差异—纠缠"，自《SDE本体论入门》（2026）起不再使用。</p>
+  <p style="color:var(--muted);font-size:0.85rem;max-width:600px;margin-top:0.8rem;border-left:2px solid var(--border);padding-left:12px" class="en-only">Rectification · S stands for Show, not Structure — structure is only the most stable special case of showing. The early rendering "Structure–Difference–Entanglement" is retired as of the 2026 monograph.</p>
+  <p style="color:var(--text2);font-size:0.95rem;max-width:600px;margin-top:0.5rem" class="en-only">SDE is not a framework but a generative mechanism of knowledge — explaining the conditions under which new knowledge structures come into being.</p>
+  <div class="sde-grid" style="margin-top:2.5rem">
+    <div class="sde-card" data-letter="S">
+      <div class="sde-letter">S</div>
+      <div class="sde-name-zh zh-only">显露</div>
+      <div class="sde-name-en">Show</div>
+      <p class="sde-desc zh-only">存在被看见、被维持、被识别的样子。显露是一条连续谱——从模糊直觉到清晰概念再到可计算形式；"结构"只是显露最稳定的特例。S 是一轮发生的结算点，也是下一轮发生的起点。</p>
+      <p class="sde-desc en-only">The way being becomes visible, sustained, and recognizable. Show is a continuous spectrum — from vague intuition to clear concept to computable form; "structure" is only its most stable special case. S settles one genesis and seeds the next.</p>
+    </div>
+    <div class="sde-card" data-letter="D">
+      <div class="sde-letter">D</div>
+      <div class="sde-name-zh zh-only">差异</div>
+      <div class="sde-name-en">Difference</div>
+      <p class="sde-desc zh-only">驱动结构发生的动力源。差异不是简单的不同，而是具有方向性的差异流——正是它的流动方式决定了新结构的形态与路径。</p>
+      <p class="sde-desc en-only">The motive force driving structural genesis. Difference is not mere distinction but directional difference-flow — its mode of movement determines the form and pathway of new structure.</p>
+    </div>
+    <div class="sde-card" data-letter="E">
+      <div class="sde-letter">E</div>
+      <div class="sde-name-zh zh-only">纠缠</div>
+      <div class="sde-name-en">Entanglement</div>
+      <p class="sde-desc zh-only">发生的场域条件。纠缠是元素之间深层的相互作用网络——它决定哪些差异流能被激活，哪些结构发生具有可能性。</p>
+      <p class="sde-desc en-only">The field condition of genesis. Entanglement is the deep network of interaction among elements — it determines which difference-flows can be activated and which structural emergences are possible.</p>
+    </div>
+  </div>
+  <div class="sde-formula">
+    <p class="zh-only">核心公式 · Core Formula</p>
+    <div class="formula-line">S = F(D, E) &nbsp;·&nbsp; D = G(S, E) &nbsp;·&nbsp; E = H(S, D)</div>
+    <p style="font-size:0.75rem;color:var(--muted);margin-top:0.8rem;letter-spacing:0.05em" class="zh-only">在 E 中，经 D，成 S —— 在纠缠的土壤中，经差异的路径，成为显露的结构 · In entanglement, through difference, structure shows forth</p>
+  </div>
+</div>
+</section>
+<!-- MEANING LAWS (意义三律) -->
+<section id="laws">
+<div class="section-inner">
+  <div class="section-label zh-only">意义三律</div>
+  <div class="section-label en-only">Three Axioms of Meaning</div>
+  <h2 class="section-title zh-only">特征 · 自由 · 幸福</h2>
+  <h2 class="section-title en-only">Feature · Freedom · Happiness</h2>
+  <div class="section-divider"></div>
+  <p class="laws-intro zh-only">SDE 本体论的意义法则。在发生范式里，意义不是等着被找到的现成之物，而是持续再发生的东西。三律共同回答：意义如何发生、如何持续？特征律校准显露的稳定，自由律鼓励创新突变，幸福律统整文明目标。</p>
+  <p class="laws-intro en-only">The laws of meaning in SDE ontology. In the paradigm of genesis, meaning is not a ready-made thing waiting to be found but something that keeps coming to be. Together the three laws answer: how does meaning arise and endure? Feature Law calibrates the stability of showing, Freedom Law encourages innovative mutation, Happiness Law integrates civilizational purpose.</p>
+  <div class="laws-grid">
+    <div class="law-card">
+      <div class="law-num zh-only">第 一 律</div><div class="law-num en-only">AXIOM I</div>
+      <div class="law-icon">F</div>
+      <div class="law-name-zh zh-only">特征律</div>
+      <div class="law-name-en">Feature Law</div>
+      <p class="law-desc zh-only">意义的有限发生律。特征不是无中生有，必须在已有纠缠条件下经差异序列推进而显露——这是科学的本体根基。</p>
+      <p class="law-desc en-only">The finite-genesis law of meaning. Features do not arise ex nihilo; they emerge only through difference-sequences advancing within existing entanglement — the ontological ground of science.</p>
+      <span class="law-keyword zh-only">校准结构稳定</span><span class="law-keyword en-only">CALIBRATES STABILITY</span>
+      <a href="/philosophy/laws/feature-law/" style="display:block;margin-top:16px;font-size:13px;letter-spacing:0.12em;color:#D4B25E;text-decoration:none"><span class="zh-only">读全文 · 约 1.2 万字 →</span><span class="en-only">Read the essay →</span></a>
+    </div>
+    <div class="law-card">
+      <div class="law-num zh-only">第 二 律</div><div class="law-num en-only">AXIOM II</div>
+      <div class="law-icon">L</div>
+      <div class="law-name-zh zh-only">自由律</div>
+      <div class="law-name-en">Freedom Law</div>
+      <p class="law-desc zh-only">差异序列得以推进的必要条件。自由不是无限选择，而是结构允许新差异进入并被锻造为新结构的开放度——这是创新的本体根基。</p>
+      <p class="law-desc en-only">The necessary condition for difference-sequences to advance. Freedom is not infinite choice but the openness allowing new differences to enter and be forged into new structure — the ontological ground of innovation.</p>
+      <span class="law-keyword zh-only">鼓励创新突变</span><span class="law-keyword en-only">ENABLES MUTATION</span>
+      <a href="/philosophy/laws/freedom-law/" style="display:block;margin-top:16px;font-size:13px;letter-spacing:0.12em;color:#D4B25E;text-decoration:none"><span class="zh-only">读全文 →</span><span class="en-only">Read the essay →</span></a>
+    </div>
+    <div class="law-card">
+      <div class="law-num zh-only">第 三 律</div><div class="law-num en-only">AXIOM III</div>
+      <div class="law-icon">H</div>
+      <div class="law-name-zh zh-only">幸福律</div>
+      <div class="law-name-en">Happiness Law</div>
+      <p class="law-desc zh-only">意义在主体经验中的回响。幸福不是欲望满足，而是 SDE 三维联动的成熟态在主体上的显露——这是文明的本体目标。</p>
+      <p class="law-desc en-only">The reverberation of meaning in subject-experience. Happiness is not desire-satisfaction but the manifestation in the subject of S-D-E coupled maturity — the ontological purpose of civilization.</p>
+      <span class="law-keyword zh-only">统整文明目标</span><span class="law-keyword en-only">INTEGRATES PURPOSE</span>
+      <a href="/philosophy/laws/happiness-law/" style="display:block;margin-top:16px;font-size:13px;letter-spacing:0.12em;color:#D4B25E;text-decoration:none"><span class="zh-only">读全文 →</span><span class="en-only">Read the essay →</span></a>
+    </div>
+  </div>
+</div>
+</section>
+<!-- BOOKS -->
+<section id="books">
+<div class="section-inner">
+  <div class="section-label zh-only">学术著作</div>
+  <div class="section-label en-only">Publications</div>
+  <h2 class="section-title zh-only">五十余部跨域专著</h2>
+  <h2 class="section-title en-only">55+ Cross-Domain Monographs</h2>
+  <div class="section-divider"></div>
+  <p style="color:var(--text2);font-size:0.85rem;margin-top:0.5rem" class="zh-only">每部约20万字 · 2025年12月–2026年3月密集出版 · Bowker ISBN authorId 26927366 · 19部独著 · 33部与26位合作者共著 · 出版方：德麦国际有限公司</p>
+  <p style="color:var(--text2);font-size:0.85rem;margin-top:0.5rem" class="en-only">~200,000 characters each · Published Dec 2025–Mar 2026 · Bowker ISBN authorId 26927366 · 19 sole-authored · 33 co-authored with 26 collaborators · Demai International Pte. Ltd.</p>
+  <p style="color:var(--gold);font-size:0.85rem;margin-top:0.6rem" class="zh-only">最新 · <a href="/books/sde-ontology-intro/" style="color:var(--gold);text-decoration:underline">《SDE本体论入门：世界是如何发生的》</a>（2026年7月）— 摘要导读与509页试读版已上线</p>
+  <p style="color:var(--muted);font-size:0.75rem;margin-top:0.4rem;font-style:italic" class="zh-only">已收录 40 部书名与简介（含 ISBN）· 全部 Bowker 可查 · 余下陆续录入</p>
+  <p style="color:var(--muted);font-size:0.75rem;margin-top:0.4rem;font-style:italic" class="en-only">40 titles catalogued with descriptions & ISBNs · all verifiable on Bowker · more being added</p>
+  <div class="life-trilogy-nav" style="margin:6px 0 18px;padding:24px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(138,104,23,0.06)">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">人 生 三 部 曲 · 据《人生的真谛》写成</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">LIFE TRILOGY · THREE LONG READS</div>
+    <p class="zh-only" style="color:var(--text2);font-size:0.86rem;margin:8px 0 16px;text-align:center">三篇各约五千字的长文，分取本书三编——生命、生活、生存——正面回应「人生如梦」。<a href="/books/m/39/" style="color:var(--gold);text-decoration:underline">→ 这本书</a></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      <a href="/column/life-is-not-a-dream/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">人生不是梦</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">「浮生若梦」的破解——梦不留足迹、不带饱足、不生成关系，而生命是可发生、可重来、可再发生的真实整体。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/health-is-not-slogans/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">健康，不是那些口号</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">西方说习惯、中华说饮食、印度说心态——三大文明的三场健康幻觉，与正解：健康是差异在三逻辑上的运行。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/learning-is-survival/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">学习力就是生存力</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">学习不是背单词是建立纠缠;一个不会学习的人路越走越窄，一个善于学习的文明能穿越千年。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+    </div>
+  </div>
+  <div class="edu-trilogy-nav" style="margin:6px 0 18px;padding:24px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(138,104,23,0.06)">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">教 育 三 部 曲 · 据《基于 GPT 的中国教育改革》写成</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">EDUCATION TRILOGY · THREE LONG READS</div>
+    <p class="zh-only" style="color:var(--text2);font-size:0.86rem;margin:8px 0 16px;text-align:center">三篇各约五千字的长文，分取本书三个核心板块——课堂改革方法论、创造力匮乏诊断、大学的终结与重生——细读，可独立阅读，也互为呼应。<a href="/books/m/18/" style="color:var(--gold);text-decoration:underline">→ 这本书</a></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      <a href="/column/gpt-classroom-ignition/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">课堂里的三次点火</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">诊断越拧越紧的教育循环，给出破解——三阶段课堂循环（混沌激发·路径探索·冲突整合）。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/why-high-scores-low-creativity/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">高分为什么低创</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">拆开在课堂内部织成、系统性压制创造力的隐形网——八根线，根根都合情合理。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/university-twilight/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">大学的黄昏</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">大学作为知识看门人的终结，与它向「创业母机与知识平台」的重生。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+    </div>
+  </div>
+  <div class="mutation-trilogy-nav" style="margin:6px 0 18px;padding:24px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(138,104,23,0.06)">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">突 变 三 部 曲 · 据《在突变中发生》写成</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">MUTATION TRILOGY · THREE LONG READS</div>
+    <p class="zh-only" style="color:var(--text2);font-size:0.86rem;margin:8px 0 16px;text-align:center">三篇各约五千字的长文，分取本书三编——生活·艺术·哲学，从「生活的呼吸」到「艺术的眼睛」再到「哲学的语言」。<a href="/books/m/40/" style="color:var(--gold);text-decoration:underline">→ 这本书</a></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      <a href="/column/mutation-as-friend/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">把突变当朋友</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">平安的日子不会被记住,痛是意识的刻痕;当GPT掀翻确定性,与其筑墙不如把未来当协作者。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/art-does-not-comfort/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">艺术不负责让你舒服</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">艺术不是对平静生活的描摹,而是敢于凝视混沌的灵魂探险;艺术史本质是一部突变史。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/stability-is-not-stillness/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">稳定不是不变</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">真正的稳定不是凝固而像呼吸——SIO本体论与意义三律,一种「变中之恒」的新理解。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+    </div>
+  </div>
+  <div class="language-trilogy-nav" style="margin:6px 0 18px;padding:24px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(138,104,23,0.06)">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">语 言 三 部 曲 · 据《语言发生学》写成</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">LANGUAGE TRILOGY · THREE LONG READS</div>
+    <p class="zh-only" style="color:var(--text2);font-size:0.86rem;margin:8px 0 16px;text-align:center">三篇各约五千字的长文，分取本书三编——语言的哲学转向·语言的三律动力·语言的自由与文明再生。<a href="/books/m/41/" style="color:var(--gold);text-decoration:underline">→ 这本书</a></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      <a href="/column/language-not-learned/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">语言不是学来的，是长出来的</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">乔姆斯基UG为何倒塌、习得理论为何错误——儿童的语言不是模仿,而是自由律的自我展开。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/subject-verb-object-kills-chinese/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">主谓宾，切死了中文</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">语法即文明的气质:东方以幸福律求圆融、西方以特征律重界定;用主谓宾切中文,切掉的是中文的呼吸。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/language-is-the-breath-of-the-world/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">语言是世界的呼吸</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">从「发现学」到「发生学」——语言不是描述世界的镜子,而是世界自我显影的机制。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+    </div>
+  </div>
+  <div class="logic-trilogy-nav" style="margin:6px 0 18px;padding:24px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(138,104,23,0.06)">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">逻 辑 三 部 曲 · 据《SIO逻辑学导论》写成</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">LOGIC TRILOGY · THREE LONG READS</div>
+    <p class="zh-only" style="color:var(--text2);font-size:0.86rem;margin:8px 0 16px;text-align:center">三篇各约五千字的长文，分取本书三大块——三公理立宪·原创的发生机制·行动的内耗诊断。<a href="/books/m/14/" style="color:var(--gold);text-decoration:underline">→ 这本书</a></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      <a href="/column/logic-is-civilizations-constitution/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">逻辑不是推理规则，是文明的宪法</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">文明危机的病根是理性失位;三公理——影子回归本体、发现回归发生、价值回归意义——给理性立宪。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/originality-is-forced/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">原创为什么总是被逼出来的</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">优化是1→1′、翻滚是1→N,都不是0→1;新生的真实机制是死结—临界—突入。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/efficiency-breeds-burnout/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">越提效，越内耗</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">内耗不是人不行,是层级错配:目标锁死→路径加密→规则内卷→张力永动;反噬是信号。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+    </div>
+  </div>
+  <div class="psych-trilogy-nav" style="margin:6px 0 18px;padding:24px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(138,104,23,0.06)">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">心 理 三 部 曲 · 据《SIO心理学》写成</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">PSYCHOLOGY TRILOGY · THREE LONG READS</div>
+    <p class="zh-only" style="color:var(--text2);font-size:0.86rem;margin:8px 0 16px;text-align:center">三篇各约五千字的长文，分取本书三编——人格与心理·学习·创造力心理学。<a href="/books/m/16/" style="color:var(--gold);text-decoration:underline">→ 这本书</a></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      <a href="/column/no-iq-no-eq/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">人没有智商，也没有情商</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">IQ/EQ测的是静态幻象;人格的内核是知格·意格·情格,是三律在生命历程中的长期沉淀。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/classroom-kills-meaning/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">课堂，正在批量销毁意义</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">课堂已成意义结构的死亡车间:压抑差异、切断互动、用分数伪造意义;重建靠张力·混沌·纠缠教育。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/fake-happiness-kills-creativity/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">假幸福，正在杀死创造力</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">撤走张力、消灭混沌、切断纠缠→幸福幻觉→创造力死亡;真幸福不是舒适,是顿悟。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+    </div>
+  </div>
+  <div class="university-trilogy-nav" style="margin:6px 0 18px;padding:24px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(138,104,23,0.06)">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">大 学 三 部 曲 · 据《大学的终结与重生》写成</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">UNIVERSITY TRILOGY · THREE LONG READS</div>
+    <p class="zh-only" style="color:var(--text2);font-size:0.86rem;margin:8px 0 16px;text-align:center">三篇各约五千字的长文，分取本书三大块——大学的终结·学习的重构·大学的未来使命。<a href="/books/m/42/" style="color:var(--gold);text-decoration:underline">→ 这本书</a></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      <a href="/column/gpt-is-not-here-to-kill-the-university/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">GPT不是来杀死大学的</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">GPT是本体显影镜:大学早已「意义节奏缺席」,它只是让崩塌显形;五大根基如何逐一失守。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/how-do-you-learn-what-you-dont-know/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">你如何学会你不知道的东西？</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">苏格拉底之问悬置两千五百年;回忆说与归纳说全部落入悖论——认知不是发现,而是发生。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+      <a href="/column/university-immortal-meaning-undying/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">大学不灭，意义不死</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">在一切都能被生成的时代,只有节奏与判断无法被替代;节奏协同大学六大原则。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约 5000 字）→</div>
+      </a>
+    </div>
+  </div>
+  <div class="critical-trilogy-nav" style="margin:6px 0 18px;padding:24px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(138,104,23,0.06)">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">批 判 三 部 曲 · 据《GPT时代的SDE批判性思维》· 各约两万字</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:6px;text-align:center">CRITICAL-THINKING TRILOGY · THREE 20K LONG READS</div>
+    <p class="zh-only" style="color:var(--text2);font-size:0.86rem;margin:8px 0 16px;text-align:center">三篇各约两万字的深度长文，每篇均提供网页长文·PDF在线阅读·PDF下载三种模式。从「旧批判为何失灵」，到「批判即显影」，再到「思想操作系统」。<a href="/books/m/23/" style="color:var(--gold);text-decoration:underline">→ 这本书</a></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      <a href="/column/why-old-critical-thinking-fails/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">为什么GPT时代，旧的批判性思维失灵了</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">旧式批判失灵不是因为它变笨,而是对象被GPT改写:多元E—D压缩体让前提/逻辑/证据/判断的检测整体失配。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约两万字 · 网页/PDF）→</div>
+      </a>
+      <a href="/column/critique-is-first-an-unveiling/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">真正的批判，首先是一种显影</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">在你说它对或错之前,先用S/D/E三重揭示看清它怎么长出来;判断=真善美的条件化,而非对错裁决。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约两万字 · 网页/PDF）→</div>
+      </a>
+      <a href="/column/sde-critical-thinking-os/" style="display:block;background:var(--surface);border:1px solid rgba(138,104,23,0.3);border-left:3px solid var(--gold);border-radius:4px;padding:16px 18px;text-decoration:none;text-align:left">
+        <div style="font-size:16px;font-weight:700;color:var(--text);line-height:1.5">SDE批判性思维：GPT时代的思想操作系统</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.7">四要素从发现升级为揭示;GPT阅读/写作/判断/教育为何须先经SDE批判;三案例+AEI阅读革命。</div>
+        <div style="font-size:12.5px;color:var(--gold);font-weight:700;margin-top:9px">读全文（约两万字 · 网页/PDF）→</div>
+      </a>
+    </div>
+  </div>
+  <div class="clusters-deepread-nav" style="margin:6px 0 30px;padding:24px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(201,161,90,0.06);text-align:center">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:6px">七 群 深 读 · 每 个 功 能 块 一 篇 五 千 字 导 读</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:6px">SEVEN CLUSTERS · IN-DEPTH READS</div>
+    <p class="zh-only" style="color:var(--text2);font-size:0.86rem;margin:8px 0 16px">五十余部专著按七个功能块编组，每一群都有一篇独立长文，讲清它颠覆了什么、七群如何互相咬合。</p>
+    <div style="line-height:2.4"><a href="/philosophy/clusters/core/" style="display:inline-block;padding:8px 16px;margin:5px;border-radius:3px;font-size:13.5px;letter-spacing:0.04em;text-decoration:none;background:#C9A15A;color:#160F08;font-weight:700">本体论核心 深读 →</a><a href="/philosophy/clusters/civ/" style="display:inline-block;padding:8px 16px;margin:5px;border-radius:3px;font-size:13.5px;letter-spacing:0.04em;text-decoration:none;background:#C97A5A;color:#160F08;font-weight:700">文明与人文 深读 →</a><a href="/philosophy/clusters/gov/" style="display:inline-block;padding:8px 16px;margin:5px;border-radius:3px;font-size:13.5px;letter-spacing:0.04em;text-decoration:none;background:#3FA88C;color:#160F08;font-weight:700">治理与社科 深读 →</a><a href="/philosophy/clusters/edu/" style="display:inline-block;padding:8px 16px;margin:5px;border-radius:3px;font-size:13.5px;letter-spacing:0.04em;text-decoration:none;background:#C69A3A;color:#160F08;font-weight:700">教育革命 深读 →</a><a href="/philosophy/clusters/life/" style="display:inline-block;padding:8px 16px;margin:5px;border-radius:3px;font-size:13.5px;letter-spacing:0.04em;text-decoration:none;background:#5FA84A;color:#160F08;font-weight:700">健康与生命 深读 →</a><a href="/philosophy/clusters/cre/" style="display:inline-block;padding:8px 16px;margin:5px;border-radius:3px;font-size:13.5px;letter-spacing:0.04em;text-decoration:none;background:#9A6AD0;color:#160F08;font-weight:700">创造力 深读 →</a><a href="/philosophy/clusters/ai/" style="display:inline-block;padding:8px 16px;margin:5px;border-radius:3px;font-size:13.5px;letter-spacing:0.04em;text-decoration:none;background:#3FA0A0;color:#160F08;font-weight:700">AI 时代前沿 深读 →</a></div>
+  </div>
+  <div class="clusters-overview" id="clustersOverview"></div>
+  <div class="books-filter" id="booksFilter"></div>
+  <div id="deepreadBanner"></div>
+  <div class="books-grid" id="booksGrid"></div>
+</div>
+</section>
+<!-- VISION (意义文明) -->
+<section id="vision">
+<div class="vision-inner">
+  <div class="vision-eyebrow zh-only">意 义 文 明 · CIVILIZATION OF MEANING</div>
+  <div class="vision-eyebrow en-only">CIVILIZATION OF MEANING · 意 义 文 明</div>
+  <h2 class="vision-quote zh-only">让意义成为文明的第一生产力</h2>
+  <h2 class="vision-quote en-only">Let Meaning Become the Prime Productive Force of Civilization</h2>
+  <p class="vision-body zh-only">底层判词只有一句：世界不是被发现的，而是发生的。从"价值文明"向"意义文明"的转型——以生成逻辑为文明核心，以意义三律为社会算法。在 AI 时代，这不仅是哲学命题，更是文明结构重组的操作纲领：以特征律守住科学的真，以自由律打开创新的可能，以幸福律托起主体的存在。</p>
+  <p class="vision-body en-only">One verdict underlies it all: the world is not discovered — it comes to be. A transition from "civilization of value" to "civilization of meaning" — with generative logic as the civilizational core and the Three Axioms of Meaning as the social algorithm. In the AI era, this is not merely a philosophical proposition but an operational program for civilizational restructuring: hold the truth of science through Feature Law, open the possibility of innovation through Freedom Law, sustain the existence of the subject through Happiness Law.</p>
+  <div class="vision-axis">
+    <div class="vision-axis-item zh-only">特征律 · 守科学之真</div><div class="vision-axis-item en-only">FEATURE · TRUTH OF SCIENCE</div>
+    <div class="vision-axis-item zh-only">自由律 · 开创新之机</div><div class="vision-axis-item en-only">FREEDOM · OPENING OF NOVELTY</div>
+    <div class="vision-axis-item zh-only">幸福律 · 托主体之在</div><div class="vision-axis-item en-only">HAPPINESS · GROUND OF BEING</div>
+  </div>
+</div>
+</section>
+<!-- PLATFORM -->
+<section id="platform">
+<div class="platform-bg"></div>
+<div class="platform-inner">
+  <div class="platform-badge zh-only">SDE 龙爪手平台</div>
+  <div class="platform-badge en-only">SDE DRAGON CLAW PLATFORM</div>
+  <h2 class="section-title zh-only" style="text-align:center">龙爪手 · 知识创新引擎</h2>
+  <h2 class="section-title en-only" style="text-align:center">Dragon Claw · Knowledge Innovation Engine</h2>
+  <div class="section-divider" style="margin:1.5rem auto"></div>
+  <p style="color:var(--text2);font-size:1rem;line-height:1.8" class="zh-only">基于SDE发生学的六模块科研自动化平台。全程零拷贝，一键流转——从课题到成果，龙爪手在每一个关键节点把SDE智慧注入你的研究过程。</p>
+  <p style="color:var(--text2);font-size:1rem;line-height:1.8" class="en-only">A six-module research automation platform built on SDE generativics. Zero-copy throughout, one-click flow — from topic to output, Dragon Claw injects SDE wisdom at every critical node of your research process.</p>
+  <div class="platform-modules">
+    <div class="module zh-only">① 课题诊断</div><div class="module en-only">① Topic Diagnosis</div>
+    <div class="module zh-only">② 文献解析</div><div class="module en-only">② Literature Analysis</div>
+    <div class="module zh-only">③ SDE发生</div><div class="module en-only">③ SDE Genesis</div>
+    <div class="module zh-only">④ 论文生成</div><div class="module en-only">④ Paper Generation</div>
+    <div class="module zh-only">⑤ 质量审查</div><div class="module en-only">⑤ Quality Review</div>
+    <div class="module zh-only">⑥ 期刊匹配</div><div class="module en-only">⑥ Journal Match</div>
+  </div>
+  <a href="#" class="cta-btn zh-only">进入龙爪手平台 →</a>
+  <a href="#" class="cta-btn en-only">Enter Dragon Claw Platform →</a>
+</div>
+</section>
+<!-- FOOTER -->
+<footer>
+<div class="footer-inner">
+  <div class="footer-brand">
+    <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-weight:700">SDE Universes</div>
+    <p style="margin-top:10px;font-size:0.8rem;letter-spacing:0.08em;color:var(--muted)"><span class="zh-only">访问总次数 </span><span class="en-only">Total visits </span><span id="visitCount" style="color:var(--gold);font-weight:700">—</span></p>
+    <p class="zh-only">跨域知识发生学研究平台。SDE体系由王德生创立，由德麦国际有限公司运营，以新加坡为基地，面向全球。</p>
+    <p class="en-only">A cross-domain knowledge-genesis research platform. The SDE system was founded by Wang Desheng, operated by Demai International Pte. Ltd., based in Singapore.</p>
+  </div>
+  <div class="footer-col">
+    <h4 class="zh-only">导航</h4><h4 class="en-only">Navigation</h4>
+    <ul>
+      <li><a href="#about" class="zh-only">关于作者</a><a href="#about" class="en-only">About the Author</a></li>
+      <li><a href="#sde" class="zh-only">SDE 发生学</a><a href="#sde" class="en-only">SDE Generativics</a></li>
+      <li><a href="#laws" class="zh-only">意义三律</a><a href="#laws" class="en-only">Three Axioms</a></li>
+      <li><a href="#books" class="zh-only">专著系列</a><a href="#books" class="en-only">Publications</a></li>
+      <li><a href="#vision" class="zh-only">意义文明愿景</a><a href="#vision" class="en-only">Civilization Vision</a></li>
+      <li><a href="#platform" class="zh-only">龙爪手平台</a><a href="#platform" class="en-only">Dragon Claw</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4 class="zh-only">联系</h4><h4 class="en-only">Contact</h4>
+    <ul>
+      <li><a href="mailto:desheng@sdeuniverses.com">desheng@sdeuniverses.com</a></li>
+      <li><a href="https://www.myidentifiers.com" target="_blank">Bowker #26927366</a></li>
+      <li><a href="#">ORCID 0009-0009-8196-0030</a></li>
+    </ul>
+  </div>
+</div>
+<div class="footer-bottom">
+  <span>© 2026 Demai International Pte. Ltd. · Singapore</span>
+  <span>SDE Universes · sdeuniverses.com</span>
+</div>
+</footer>
+<script>
+// ── LANGUAGE TOGGLE
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===lang||b.textContent==='中'&&lang==='zh'));
+  document.documentElement.lang=lang==='zh'?'zh':'en';
+}
+// ── BOOK DATA
+const domainMeta={
+  core:{zh:'本体论核心',en:'Ontology Core',cls:'d-core'},
+  civ: {zh:'文明与人文',en:'Civilization & Humanities',cls:'d-civ'},
+  gov: {zh:'治理与社科',en:'Governance & Social',cls:'d-gov'},
+  edu: {zh:'教育革命',en:'Education Revolution',cls:'d-edu'},
+  life:{zh:'健康与生命',en:'Health & Life',cls:'d-life'},
+  cre: {zh:'创造力',en:'Creativity & Originality',cls:'d-cre'},
+  ai:  {zh:'AI 时代前沿',en:'AI Frontier',cls:'d-ai'},
+  ph:  {zh:'信息待补',en:'Forthcoming',cls:'d-ph'}
+};
+const books=[
+  // ── A · 本体论核心
+  {id:1, zh:'SIO哲学导论', en:'An Introduction to SIO Philosophy', d:'core', zhDesc:'SIO（主体-互动-客体）整体本体论的系统入门读本，奠定"存在即生成整体"的第一性命题。', enDesc:'Systematic introduction to SIO (Subject–Interaction–Object) holistic ontology, establishing the first-principle proposition that "existence is generative wholeness."'},
+  {id:2, zh:'SIO本体论', en:'SIO Ontology', d:'core', zhDesc:'SIO本体论的完整理论建构：主体、互动、客体不是分立部分，而是同一生成整体的三个面向。', enDesc:'Complete theoretical construction of SIO ontology: S, I, O are not separable parts but three facets of the same generative whole.'},
+  {id:3, zh:'SIO三大公理', en:'The Three Axioms of SIO', d:'core', zhDesc:'意义三律的奠基之作：特征律、自由律、幸福律，构成意义文明的社会算法。', enDesc:'Foundational treatise on the Three Axioms of Meaning — Feature Law, Freedom Law, Happiness Law — as the social algorithm of the Civilization of Meaning.'},
+  {id:0, zh:'SDE本体论入门（新著·2026.7）', en:'Introduction to SDE Ontology (New)', d:'core', zhDesc:'世界是如何发生的——面向公众的体系入门之作。39万字，14篇63章：从发现范式的黄昏到三维发生学地基、伞模型、儒佛道归乡与AI时代判词。试读版已上线。', enDesc:'How the World Comes to Be — the public-facing introduction. 390k characters, 14 parts, 63 chapters. Preview edition available on this site.'},
+  {id:4, zh:'SDE发生学', en:'SDE Genealogics', d:'core', zhDesc:'回答"存在如何发生"的操作系统：S（显露）-D（差异序列）-E（特征纠缠）三维引擎与六步迭代环。', enDesc:'The operational system answering "how existence comes to be": the S-D-E three-dimensional engine and six-step iterative loop.'},
+  {id:5, zh:'特征纠缠解码', en:'Decoding Feature Entanglement', d:'core', zhDesc:'深入解析E维度——特征如何通过构建、稳定、触发、释放的循环成为可行动的模块。', enDesc:'In-depth analysis of the E-dimension: how features become actionable modules through build–stabilize–trigger–release cycles.'},
+
+  // ── B · 文明与人文重构（5）
+  {id:6, zh:'西方哲学大解构', en:'The Great Deconstruction of Western Philosophy', d:'civ', zhDesc:'从发现幻觉到节奏发生——以"同一性寿命"重写西方哲学的整部历程：每个哲学体系都是同一性张力的一次特定显露，兴起于张力的敞开，终结于张力的耗尽。（西方哲学大解构：从发现幻觉到节奏发生，王德生）', enDesc:'The Great Deconstruction of Western Philosophy: From the Illusion of Discovery to the Genesis of Rhythm. Demai International. Rewriting the whole course of Western philosophy through identity-lifespan — each system as one particular showing-forth of identity-tension.'},
+  {id:7, zh:'中华文化导论', en:'Introduction to Chinese Culture', d:'civ', zhDesc:'以"第三位文化"框架重建中华文明诊断，超越东西二元对立的文化定位。', enDesc:'Rebuilding the diagnosis of Chinese civilization through the "Third-Position Culture" framework, beyond East-West binary opposition.'},
+  {id:8, zh:'中华文明之气', en:'The Qi of Chinese Civilization', d:'civ', zhDesc:'将"气"重新定义为文明节律逻辑——文明如何在张弛、聚散中维持其结构活性。', enDesc:'Redefining "Qi" as the rhythmic logic of civilization — how a civilization maintains structural vitality through tension and release.'},
+  {id:9, zh:'论艺术', en:'On Art', d:'civ', zhDesc:'以SIO/SDE对艺术进行发生学重建，揭示艺术从发现已有到发生新结构的根本跃迁。', enDesc:'Generative reconstruction of art through SIO/SDE, revealing the fundamental leap from "discovery of the given" to "genesis of the new."'},
+  {id:10, zh:'论自由', en:'On Freedom', d:'civ', zhDesc:'自由律的深度展开：自由不是无限选择，而是差异序列得以推进的必要条件。', enDesc:'Deep unfolding of the Freedom Law: freedom is not infinite choice but the necessary condition for difference-sequences to advance.'},
+
+  // ── C · 治理与社会科学（7）
+  {id:11, zh:'三律治理', en:'Three-Law Governance', d:'gov', zhDesc:'以意义三律重建治理理论：从控制范式转向意义生成范式的制度建构。', enDesc:'Rebuilding governance theory through the Three Axioms of Meaning: institutional construction shifting from control paradigm to meaning-generation paradigm.'},
+  {id:12, zh:'意义管理学', en:'Meaning Management', d:'gov', zhDesc:'管理学的根本转向：从控制效率转向意义生成，组织即意义场的设计与运营。', enDesc:'A fundamental turn in management: from control-of-efficiency to generation-of-meaning; the organization as a designed meaning-field.'},
+  {id:13, zh:'三元法学', en:'Triadic Law', d:'gov', zhDesc:'以SIO三元结构重写法学基础：法律不是规则集合，而是社会S-D-E三维的稳定机制。', enDesc:'Rewriting the foundations of jurisprudence through the SIO triad: law not as rule-set but as stabilization mechanism of the social S-D-E.'},
+  {id:14, zh:'SIO逻辑学导论', en:'An Introduction to SIO Logic', d:'gov', zhDesc:'逻辑学的本体论重建：推理不是符号演算，而是显露-差异-纠缠的合法推进。', enDesc:'Ontological reconstruction of logic: inference is not symbolic calculus but the legitimate advance of show-difference-entanglement.'},
+  {id:15, zh:'生成认识论', en:'Generative Epistemology', d:'gov', zhDesc:'知识不是对预存对象的发现，而是在E中经D成S的发生过程——认识论的根本转向。', enDesc:'Knowledge is not discovery of pre-existing objects but the generative process "in E, through D, becomes S" — a fundamental epistemological turn.'},
+  {id:16, zh:'SIO心理学', en:'SIO Psychology', d:'gov', zhDesc:'心理学的本体论重写：心理不是内在状态，而是主体-互动-客体的动态平衡。', enDesc:'Ontological rewriting of psychology: the psyche is not inner-state but the dynamic equilibrium of subject-interaction-object.'},
+  {id:17, zh:'SIO经济学导论', en:'An Introduction to SIO Economics', d:'gov', zhDesc:'经济学的范式重建：经济活动作为意义生成场，价值即特征纠缠的可传态结晶。', enDesc:'Paradigm reconstruction of economics: economic activity as meaning-generation field; value as transmittable crystallization of feature-entanglement.'},
+
+  // ── D · 教育革命（6 部 — 标题待录入）
+  {id:18, zh:'基于GPT的中国教育改革', en:'Educational Reform in China Based on GPT', d:'edu', zhDesc:'新时代、新课堂、新未来——面向GPT时代重构基础教育的完整方案。（Educational Reform in China Based on GPT，ISBN 978-1-970820-34-8）', enDesc:'Educational Reform in China Based on GPT. Demai International. ISBN 978-1-970820-34-8.'},
+  {id:20, zh:'GPT时代的大学革命', en:'The University Revolution in the GPT Era', d:'edu', zhDesc:'把阅读与创业焊接进大学——知识平台化时代的大学新定位。（The University Revolution in the GPT Era，ISBN 978-1-970820-50-8）', enDesc:'The University Revolution in the GPT Era. Demai International. ISBN 978-1-970820-50-8.'},
+  {id:21, zh:'AI时代的数学教育转型', en:'The Transformation of Mathematics Education in the Age of AI', d:'edu', zhDesc:'数学教育从解题训练转向发生训练，在AI时代重建数学的学习方式。（The Transformation of Mathematics Education in the Age of AI，ISBN 978-1-970820-37-9）', enDesc:'The Transformation of Mathematics Education in the Age of AI. Demai International. ISBN 978-1-970820-37-9.'},
+  {id:22, zh:'学习发生学导论', en:'Introduction to Learning Generativics', d:'edu', zhDesc:'学习不是知识传递而是意义生成——GPT时代教育重生的地基之作。（Introduction to Learning Generativics，ISBN 978-1-970820-17-1）', enDesc:'Introduction to Learning Generativics. Demai International. ISBN 978-1-970820-17-1.'},
+  {id:23, zh:'GPT时代的SDE批判性思维', en:'SDE Critical Thinking in the GPT Era', d:'edu', zhDesc:'在答案唾手可得的时代，把批判性思维从技巧升级为发生学能力。（SDE Critical Thinking in the GPT Era，ISBN 978-1-970820-51-5）', enDesc:'SDE Critical Thinking in the GPT Era. Demai International. ISBN 978-1-970820-51-5.'},
+
+  // ── E · 健康与生命科学（7 部 — 标题待录入）
+  {id:24, zh:'SDE交互医学', en:'SDE Interactive Medicine', d:'life', zhDesc:'面向慢性病的发生学治疗工程——从修理零件转向重建互动，全系列总纲。（SDE Interactive Medicine，ISBN 978-1-970820-44-7）', enDesc:'SDE Interactive Medicine. Demai International. ISBN 978-1-970820-44-7.'},
+  {id:25, zh:'心血管健康的发生学重建', en:'The Generative Reconstruction of Cardiovascular Health', d:'life', zhDesc:'"三高"的逆转——从血管壁修复到生命节律重建的SIO视角。（The Generative Reconstruction of Cardiovascular Health，ISBN 978-1-970820-33-1）', enDesc:'The Generative Reconstruction of Cardiovascular Health. Demai International. ISBN 978-1-970820-33-1.'},
+  {id:26, zh:'逆转糖尿病', en:'Reversing Diabetes', d:'life', zhDesc:'从指标管控转向路径工程——把糖尿病从"血糖病"重新诊断为能量循环病。（Reversing Diabetes，ISBN 978-1-970820-43-0）', enDesc:'Reversing Diabetes. Demai International. ISBN 978-1-970820-43-0.'},
+  {id:27, zh:'逆转高血压之路', en:'The Path to Reversing Hypertension', d:'life', zhDesc:'从指标控制到SDE重生——不再终身摁数字，而是修复让身体升压的失衡互动。（The Path to Reversing Hypertension，ISBN 978-1-970820-41-6）', enDesc:'The Path to Reversing Hypertension. Demai International. ISBN 978-1-970820-41-6.'},
+  {id:28, zh:'穿越抑郁', en:'Crossing Depression', d:'life', zhDesc:'在SDE框架下以场—流—力重建生命——抑郁是发生系统被长期按压的纠缠态。（Crossing Depression，ISBN 978-1-970820-29-4）', enDesc:'Crossing Depression. Demai International. ISBN 978-1-970820-29-4.'},
+  {id:29, zh:'返青', en:'Rejuvenation', d:'life', zhDesc:'从衰老机制到发生工程——把"变年轻"从愿望还原为可操作的结构重建。（Rejuvenation，ISBN 978-1-970820-48-5）', enDesc:'Rejuvenation. Demai International. ISBN 978-1-970820-48-5.'},
+  {id:30, zh:'跑步与健康', en:'Running and Health', d:'life', zhDesc:'为身体返青而做的结构重建——把跑步讲成一套发生学的身体训练。（Running and Health，ISBN 978-1-970820-47-8）', enDesc:'Running and Health. Demai International. ISBN 978-1-970820-47-8.'},
+
+  // ── F · 创造力与原创性（4 部 — 标题待录入）
+  {id:31, zh:'创造力发生机制解码', en:'Decoding the Generative Mechanisms of Creativity', d:'cre', zhDesc:'把创造力从天赋/灵感拆解为可诊断、可训练的发生学机制。（Decoding the Generative Mechanisms of Creativity，ISBN 978-1-970820-20-1）', enDesc:'Decoding the Generative Mechanisms of Creativity. Demai International. ISBN 978-1-970820-20-1.'},
+  {id:32, zh:'原创力动力学解码', en:'Decoding Originality Dynamics', d:'cre', zhDesc:'原创不是凭空独创，而是在旧纠缠的裂缝处缠出新结——原创力的动力解剖。（Decoding Originality Dynamics，ISBN 978-1-970820-22-5）', enDesc:'Decoding Originality Dynamics. Demai International. ISBN 978-1-970820-22-5.'},
+  {id:33, zh:'突破抵达原创', en:'Breakthrough to Originality', d:'cre', zhDesc:'从卡点到突破的完整动作链——把"想到好点子"锻造成"造出好武器"。（Breakthrough to Originality，ISBN 978-1-970820-23-2）', enDesc:'Breakthrough to Originality. Demai International. ISBN 978-1-970820-23-2.'},
+
+  // ── G · AI 时代前沿（4 部 — 标题待录入）
+  {id:35, zh:'AGI：人工智能的巴别塔', en:'AGI: the Babel Tower of Artificial Intelligence', d:'ai', zhDesc:'诊断通用人工智能的结构性困境——E2极强而E1为空、E3不存在的本体缺陷。（AGI: the Babel Tower of Artificial Intelligence，ISBN 978-1-970820-02-7）', enDesc:'AGI: the Babel Tower of Artificial Intelligence. Demai International. ISBN 978-1-970820-02-7.'},
+  {id:36, zh:'人—GPT超级复合智能', en:'Human-GPT Super Composite Intelligence', d:'ai', zhDesc:'碳基—硅基协作的新智能范式——让机器补人的枚举之力，人守机器进不来的两端。（Human-GPT Super Composite Intelligence，ISBN 978-1-970820-32-4）', enDesc:'Human-GPT Super Composite Intelligence. Demai International. ISBN 978-1-970820-32-4.'},
+  {id:37, zh:'未来人类做什么？', en:'What Will Future Humans Do?', d:'ai', zhDesc:'AI新产业的大爆发——当机器接管可回答的一切，人的价值整体迁移到提问。（What Will Future Humans Do?，ISBN 978-1-970820-52-2）', enDesc:'What Will Future Humans Do?. Demai International. ISBN 978-1-970820-52-2.'},
+  {id:38, zh:'内卷与突围', en:'Involution and the Way Out', d:'ai', zhDesc:'内卷的结构性诊断与突围路径——从SDE视角看高维S牵引的缺失。（Involution and the Way Out，ISBN 978-1-970820-49-2）', enDesc:'Involution and the Way Out. Demai International. ISBN 978-1-970820-49-2.'},
+  {id:39, zh:'人生的真谛', en:'The True Meaning of Life', d:'core', zhDesc:'用SIO发生学正面回应「人生如梦」——生命是整体，生活是差异，生存是纠缠。人生不是梦，而是创造、幸福、自由的螺旋上升。（The True Meaning of Life，ISBN 978-1-970820-26-3）', enDesc:'The True Meaning of Life. Demai International. ISBN 978-1-970820-26-3.'},
+  {id:40, zh:'在突变中发生', en:'In Mutation, Becoming', d:'cre', zhDesc:'GPT时代的风暴与花开——用SIO本体论与意义三律，把「突变」立为21世纪哲学的新起点。突变不是混乱，是新秩序出生的呼吸声。生活·艺术·哲学三编。（在突变中发生，王德生·林凡旻）', enDesc:'In Mutation, Becoming. Demai International. Storm and blossom of the GPT era — mutation as the new starting point of 21st-century philosophy.'},
+  {id:41, zh:'语言发生学', en:'Language Occurrence', d:'civ', zhDesc:'超越符号与规则的语言学新范式——把语言学从「发现学」转向「发生学」。语言不是符号或规则，而是生命与世界在张力中共同发生的事件。语言是世界的呼吸。（语言发生学，王德生·胡志英）', enDesc:'Language Occurrence. Demai International. Beyond sign and rule — a new paradigm moving linguistics from discovery to occurrence.'},
+  {id:42, zh:'大学的终结与重生', en:'The End and Rebirth of the University', d:'edu', zhDesc:'基于GPT的教学和科研之变——GPT不是外部威胁,而是本体显影镜:大学早已「意义节奏缺席」。六编二十六章,从大学的终结到节奏协同大学。在一切都能被生成的时代,只有节奏与判断无法被替代。（大学的终结与重生,王德生）', enDesc:'The End and Rebirth of the University. Demai International. From the ontological end of the university to the Rhythm-Synergy University.'},
+  {id:43, zh:'Palantir 的 SDE 解构', en:'An SDE Deconstruction of Palantir', d:'ai', zhDesc:'把 Palantir 从「企业数据语义层／数字孪生」重新界定为固定 S、E 条件下的企业 D3 实现器、企业最优运行智能体——它在秩序态里预测·调度·审批·执行无出其右，却照不见旧秩序如何失效、新秩序如何发生，因而缺少完整的企业发生学智慧。导论加三十五章。（Palantir Ontology 的 SDE 解构，王德生）', enDesc:'An SDE Deconstruction of Palantir Ontology. Demai International. Palantir as an enterprise D3 implementer and optimal-operation agent — masterful in the ordered state, blind to how new enterprise orders are generated.'},
+  {id:44, zh:'SDE 智能体导论', en:'An Introduction to SDE Agents', d:'ai', zhDesc:'从语言模型到发生世界模型的智能体革命——大语言模型不是完整智能，而是世界模型发生的语言材料场：E2 极强、E1 悬空、E3 缺位，信息发生不等于知识发生。由 SDE 本体论指挥语言模型，先为具体问题临时建造三界发生世界模型，再在其中显露新结构；智能体的高阶使命不是完成任务，而是发生新世界。导论加六编二十八章、补论五篇、附录十八篇。（SDE 智能体导论，王德生）', enDesc:'An Introduction to SDE Agents: From Language Models to Genesis World-Models. Demai International. The LLM as material field, the SDE ontology as command system, the human as center of direction — agents that build temporary genesis world-models rather than merely completing tasks.'},
+  {id:48, zh:'三律心理学', en:'Three-Law Psychology', d:'gov', zhDesc:'意识、人格与学习的本体论革命——心理不是主体的内在属性，而是主体—互动—客体整体在特征律、自由律、幸福律运行中的显影。六编三十二篇约七十万字：SIO 本体论奠基，行为主义·认知主义·人本主义的三律解构，意识与人格的发生学重建，课堂作为「意义结构的死亡车间」，直到创造力的诅咒与破解。人没有智商、情商、意商，只有知格、意格、情格。（三律心理学，王德生）', enDesc:'Three-Law Psychology: An Ontological Revolution in Consciousness, Personality and Learning. Demai International. The psyche as the showing-forth of an SIO whole running under the laws of feature, freedom and happiness — six parts, thirty-two essays.'},
+  {id:49, zh:'互动医学入门', en:'An Introduction to Interactive Medicine', d:'life', zhDesc:'慢性病治疗的发生学纲领——慢性病不是「某个点坏了」，而是「运行方式坏了」。全书把慢性病重定义为二号位（变化·波·过程）失能所致的生理 SIO 效率低下，并指出其根因既不在混沌、纠缠、张力这些起始端状态，也不在涌现、激发、释放这些终端结果，而在三条发生律的中间段：自组织不足、选择失灵、转换失败。三编八篇：总论（发生学纲领·三律方法论·SDE 解构入门）、三大病种解构（糖尿病·高血压·高血脂）、终局判据（年轻的三原理·重返年轻）。', enDesc:'An Introduction to Interactive Medicine: A Generative Programme for the Treatment of Chronic Disease. Demai International. Chronic illness is redefined as a failure at the second position — change, wave, process — and treatment is reoriented from suppressing readings to repairing the middle segment of three generative laws. Three parts, eight essays, including deconstructions of diabetes, hypertension and hyperlipidaemia, and a final criterion: the return to youth.'},
+  {id:50, zh:'师德发生学导论', en:'An Introduction to the Genesis of Teacher Virtue', d:'edu', zhDesc:'从规范传递到成师之道——把师德从静态德目清单还原为在具体教师与教育事件中不断发生的活过程，提出「合格的不在」与师德评价的完善度悖论。', enDesc:'From norm-transmission to the making of a teacher: teacher virtue recovered as a living process, with the concepts of qualified absence and the completeness paradox of evaluation.'},
+  {id:52, zh:'六路径方法论入门', en:'Introduction to the Six-Path Methodology', d:'core', zhDesc:'从三维发生学到知识智能体：区分SDE本体论、三原理、六路径与三方程的四层责任，建立任务诊断、选路、切换、误判修复与跨领域应用框架。31章、7附录、176页，ISBN 978-1-970820-65-2。', enDesc:'From three-dimensional generativics to knowledge agents: four layers of responsibility, task diagnosis, path selection and switching, error repair, and cross-domain application. 31 chapters, 7 appendices, 176 pages.'},
+  {id:53, zh:'SDE数学导论（修订版）', en:'Introduction to SDE Mathematics (Revised Edition)', d:'core', zhDesc:'从网格生成到数学的本体论。诊断计算数学隐含的「相容性公理」六重约束并以Santos定理给出其不完备性；提出伞模型三参数（半径r、重叠度ω、传播速度v）与无量纲SDE数，把有限元、无网格、peridynamics与分数阶微积分统一为同一方法谱，传统数学是其三重退化极限。修订版新增第四十二章「最近邻交手」与附录F「本书的死法·七条编号证伪条件」。43章、6附录、328页。', enDesc:'From mesh generation to the ontology of mathematics. Diagnoses the six hidden constraints of the compatibility axiom and uses Santos theorem for its incompleteness; introduces the umbrella model (radius r, overlap w, propagation speed v) and the dimensionless SDE number, unifying FEM, meshfree, peridynamics and fractional calculus on one spectrum. The revised edition adds a prior-art confrontation chapter and seven numbered falsification conditions. 43 chapters, 6 appendices, 328 pages.'},
+  {id:51, zh:'SDE三方程导论', en:'Introduction to the Three SDE Equations', d:'core', zhDesc:'全体系的方程级奠基：以 S=F(D,E)、D=G(S,E)、E=H(S,D) 闭合显露、差异序列与特征纠缠，贯通理论地位、操作化、可证伪研究设计、智能体应用与反例修订宪法。42章、9附录、181页，ISBN 978-1-970820-66-9，并开放三章选读。', enDesc:'A foundational equation-level account of SDE: three mutually conditioning equations, operationalization, falsifiable research design, agent applications, counterexamples, and a constitution for theory revision. 42 chapters, 9 appendices, 181 pages. ISBN 978-1-970820-66-9.'},
+  {id:45, zh:'一的总装师 · 董仲舒的 SDE 解构', en:'The Assembler of One: An SDE Deconstruction of Dong Zhongshu', d:'civ', zhDesc:'用「总装」与发生学的眼睛，把董仲舒对中国意义世界的一次总装拆成可读的图纸：天是底盘，阴阳五行是操作系统，灾异谴告是审计协议，三代改制是热更新接口。母题——帝制两千年不倒，因为每次倒掉的都是天子，从来不是天。（王德生·高鹏）', enDesc:'The Assembler of One: An SDE Deconstruction of Dong Zhongshu. Demai International. Heaven as chassis, yin-yang and five phases as operating system, portent-admonition as audit protocol, dynastic reform as hot-update interface.'},
+  {id:46, zh:'健康管理的代偿困境', en:'The Compensatory Dilemma of Health Management', d:'life', zhDesc:'基于形态、条件与演化视角的批判分析——为什么「越管理越衰退」不是管理不足，而是确定性供给的形式本身：用标准化外部数据替代自体感知，在同一动作里挤出内感受与关系耐受力。核心原语——健康是三源信号可被监测的协调结构，代偿的终末病理是「协调度沉默」。（王德生）', enDesc:'The Compensatory Dilemma of Health Management. Demai International. Why more management yields more decline: standardized external data displaces self-sensing, squeezing out interoception and relational tolerance in the same motion.'},
+  {id:47, zh:'SDE教育发生学导论', en:'An Introduction to the SDE Genesis of Education', d:'edu', zhDesc:'发生命名学的教育实例化奠基——提出一条跨学科的「发生命名律」：任何学科的「本体发现」本质上都是对某类重复发生的命名，教育学是这条律的第一个完整案例。为每条承重命题写出可预注册的证伪条件，并在生物学与经济学两门与教育无关的学科上演示同一条律。（王德生）', enDesc:'An Introduction to the SDE Genesis of Education. Demai International. A cross-disciplinary law of genesis-naming, with pre-registrable falsification conditions and demonstrations in biology and economics.'},
+];
+// ── RENDER BOOKS
+const filterEl=document.getElementById('booksFilter');
+const gridEl=document.getElementById('booksGrid');
+let activeDomain='all';
+const allDomains=['all',...new Set(books.map(b=>b.d))];
+allDomains.forEach(d=>{
+  const btn=document.createElement('button');
+  btn.className='filter-btn'+(d==='all'?' active':'');
+  const isZh=document.body.classList.contains('zh');
+  btn.innerHTML=d==='all'?(isZh?`全部 (${books.length})`:`All (${books.length})`):(domainMeta[d]?.zh||d);
+  btn.dataset.domain=d;
+  btn.onclick=()=>{
+    activeDomain=d;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.domain===d));
+    renderBooks();
+  };
+  filterEl.appendChild(btn);
+});
+const COVER_IDS=new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53]);
+function renderBooks(){
+  const isZh=document.body.classList.contains('zh');
+  const filtered=activeDomain==='all'?books:books.filter(b=>b.d===activeDomain);
+  (function(){
+    var DR={core:'本体论核心',civ:'文明与人文',gov:'治理与社科',edu:'教育革命',life:'健康与生命',cre:'创造力',ai:'AI 时代前沿'};
+    var bn=document.getElementById('deepreadBanner'); if(!bn) return;
+    if(activeDomain!=='all' && DR[activeDomain]){
+      var nm=DR[activeDomain];
+      bn.innerHTML='<a href="/philosophy/clusters/'+activeDomain+'/" style="display:block;margin:0 0 22px;padding:18px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(201,161,90,0.08);text-decoration:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px">'
+        +'<span style="font-size:11px;letter-spacing:0.3em;color:var(--gold)">'+(isZh?'这一群 · 五千字深读':'IN-DEPTH READ')+'</span>'
+        +'<span style="flex:1;min-width:200px;color:var(--text);font-size:15.5px;font-weight:700">'+(isZh?'读《'+nm+'》这一群到底颠覆了什么 →':nm+' — read the full essay →')+'</span>'
+        +'<span style="color:var(--gold);font-weight:700;font-size:14px;white-space:nowrap">'+(isZh?'阅读全文':'Read')+' →</span></a>';
+    } else { bn.innerHTML=''; }
+  })();
+  gridEl.innerHTML=filtered.map(b=>{
+    const dm=domainMeta[b.d]||{zh:b.d,en:b.d,cls:'d-ph'};
+    const hasCover=COVER_IDS.has(b.id);
+    const coverInner=hasCover
+      ? `<img src="/books/covers/${b.id}.jpg" alt="${(isZh?b.zh:b.en).replace(/"/g,'')} 封面" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`
+      : `<div class="book-cover-title">${isZh?b.zh:b.en}</div><div class="book-cover-num">${String(b.id).padStart(2,'0')}</div>`;
+    const SPECIAL={0:'/books/sde-ontology-intro/'};
+    const href=SPECIAL[b.id]||(hasCover?`/books/m/${b.id}/`:null);
+    const openA=href?`<a class="book-card book-card-link" href="${href}">`:`<div class="book-card">`;
+    const closeA=href?`</a>`:`</div>`;
+    return`${openA}
+      <div class="book-cover ${hasCover?'':dm.cls}">
+        ${coverInner}
+      </div>
+      <div class="book-info">
+        <div class="book-domain">${isZh?dm.zh:dm.en}</div>
+        <div class="book-title">${isZh?b.zh:b.en}</div>
+        <div class="book-desc">${isZh?b.zhDesc:b.enDesc}</div>
+      </div>
+    ${closeA}`;
+  }).join('');
+}
+renderBooks();
+
+// ── RENDER 7-CLUSTER OVERVIEW
+const clusterTagline={
+  core:{zh:'存在的第一性原理',en:'First principles of being'},
+  civ: {zh:'文明的发生学重写',en:'Genetic rewriting of civilization'},
+  gov: {zh:'治理与社会的范式重建',en:'Paradigm rebuild of governance'},
+  edu: {zh:'学习作为意义生成',en:'Learning as meaning-genesis'},
+  life:{zh:'健康作为结构重建',en:'Health as structural reconstruction'},
+  cre: {zh:'原创性的发生学机制',en:'Generative mechanics of originality'},
+  ai:  {zh:'人机复合智能的本体根基',en:'Ontological ground of hybrid intelligence'}
+};
+const clustersEl=document.getElementById('clustersOverview');
+function renderClusters(){
+  const isZh=document.body.classList.contains('zh');
+  const order=['core','civ','gov','edu','life','cre','ai'];
+  clustersEl.innerHTML=order.map(d=>{
+    const dm=domainMeta[d]; if(!dm) return '';
+    const count=books.filter(b=>b.d===d).length;
+    const tag=clusterTagline[d]||{zh:'',en:''};
+    return`<div class="cluster-card" data-d="${d}" onclick="selectCluster('${d}')">
+      <div class="cluster-count">${count}</div>
+      <div class="cluster-name">${isZh?dm.zh:dm.en}</div>
+      <div class="cluster-tag">${isZh?tag.zh:tag.en}</div>
+    </div>`;
+  }).join('');
+}
+window.selectCluster=function(d){
+  activeDomain=d;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.domain===d));
+  renderBooks();
+  document.getElementById('booksGrid').scrollIntoView({behavior:'smooth',block:'start'});
+};
+renderClusters();
+
+// Update filter labels on lang change
+const origSetLang=window.setLang;
+window.setLang=function(lang){
+  origSetLang(lang);
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    const d=btn.dataset.domain;
+    if(d==='all') btn.innerHTML=lang==='zh'?`全部 (${books.length})`:`All (${books.length})`;
+    else if(domainMeta[d]) btn.innerHTML=lang==='zh'?domainMeta[d].zh:domainMeta[d].en;
+  });
+  renderBooks();
+  renderClusters();
+};
+(async function(){try{var el=document.getElementById('visitCount');if(!el)return;var c=sessionStorage.getItem('sde_visit_counted');var r=await fetch('/api/visits',{method:c?'GET':'POST'});if(!c)sessionStorage.setItem('sde_visit_counted','1');var d=await r.json();el.textContent=d.total.toLocaleString('zh-Hans-CN');}catch(e){}})();
+</script>
+
+<script>window.WDS_READ={};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

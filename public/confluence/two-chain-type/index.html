@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>双链型——论「反复出现」不能区分一个型是被做出来的，还是被读出来的 · 学科通融 | SDE Universes</title>
+<meta name="description" content="一个反复出现的形态被当成一个「型」，依据是它的重复。本文论证重复可以由两条彼此独立的链产生——制作链把动作沉淀成形态，判读链把形态归进同一格——因此重复不能区分一个型是被做出来的还是被读出来的。三家来源分属技术人类学、天气型分类学与工业造型论。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+/* 学科通融 · 学术纸面版式 v2 —— 为长时间的思辨性阅读设计 */
+:root{
+  --paper:#F5F2E9; --paper2:#FBF9F3; --sheet:#FDFCF7;
+  --ink:#23201A; --ink2:#5C5647; --ink3:#8A8271;
+  --rule:#2A3B50; --rule2:#41586F;
+  --mark:#9E3D2C; --mark2:#B85A44;
+  --line:rgba(35,32,26,.13); --line2:rgba(35,32,26,.28);
+  --measure:700px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 8%, rgba(42,59,80,.035), transparent 46%),
+    radial-gradient(circle at 84% 72%, rgba(158,61,44,.030), transparent 44%);
+  background-attachment:fixed;
+  font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;
+  font-size:18.5px; line-height:2.06; letter-spacing:.012em;
+  font-feature-settings:"kern" 1;
+  text-rendering:optimizeLegibility;
+}
+a{color:inherit}
+::selection{background:rgba(158,61,44,.16)}
+
+/* 阅读进度：细，不抢注意力 */
+#pbar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--mark);z-index:99;opacity:.85}
+
+/* 顶栏 */
+.readbar{position:sticky;top:0;z-index:10;background:rgba(245,242,233,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 26px;font-size:13.5px;gap:12px;flex-wrap:wrap;letter-spacing:.02em}
+.nav-back{text-decoration:none;color:var(--mark)}
+.rb-modes{display:flex;gap:8px}
+.rb-btn{padding:5px 13px;border:1px solid var(--line2);border-radius:0;
+  text-decoration:none;font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
+.rb-btn:hover{border-color:var(--mark);color:var(--mark)}
+.rb-btn.cur{background:var(--rule);color:var(--sheet);border-color:var(--rule)}
+
+/* 题头：论文首页 */
+.art{max-width:800px;margin:auto;padding:78px 26px 8px;text-align:center}
+.art-series{color:var(--mark);letter-spacing:.42em;font-size:11.5px;text-transform:uppercase}
+.art-title{font-size:clamp(30px,4.4vw,45px);line-height:1.38;margin:26px 0 0;font-weight:700;letter-spacing:.01em}
+.art-title:after{content:"";display:block;width:56px;height:1px;background:var(--line2);margin:26px auto 0}
+.art-sub{color:var(--ink2);font-size:17px;line-height:1.94;max-width:620px;margin:22px auto 0;font-weight:400}
+.art-meta{color:var(--ink3);font-size:12.5px;margin-top:26px;letter-spacing:.09em}
+
+/* 正文栏宽：每行约三十四个汉字，是长文思辨阅读最省力的宽度 */
+.wrap{max-width:var(--measure);margin:auto;padding:8px 26px 46px}
+
+/* 摘要块 */
+.deck{position:relative;background:var(--paper2);border:0;border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--line);border-radius:0;
+  padding:30px 30px 26px;margin:44px 0 8px;font-size:16.2px;line-height:2.0;color:var(--ink2);text-align:justify}
+.deck:before{content:"题 解";position:absolute;top:-11px;left:26px;background:var(--paper);
+  padding:0 10px;font-size:11px;letter-spacing:.34em;color:var(--rule)}
+
+/* 目录：带引导点的学术目次 */
+.toc{background:transparent;border:0;border-top:1px solid var(--line2);
+  border-bottom:1px solid var(--line2);border-radius:0;padding:24px 4px 20px;margin:44px 0 56px}
+.toc .tl{font-size:11px;letter-spacing:.44em;color:var(--mark);margin-bottom:16px;text-align:center}
+.toc a{display:flex;align-items:baseline;gap:6px;padding:6px 2px;color:var(--ink2);
+  font-size:15px;text-decoration:none;border:0;line-height:1.7}
+.toc a:after{content:"";flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-4px)}
+.toc a:hover{color:var(--mark)}
+
+/* 章节层级 */
+h2{font-size:23px;margin:74px 0 22px;padding:26px 0 0;border:0;border-top:1px solid var(--line2);
+  line-height:1.55;scroll-margin-top:78px;letter-spacing:.02em;font-weight:700}
+h2:first-of-type{margin-top:48px}
+h2:target{background:linear-gradient(transparent 68%,rgba(158,61,44,.14) 68%)}
+h3{font-size:18.5px;margin:44px 0 14px;color:var(--rule);font-weight:700;
+  padding-left:12px;border-left:2px solid var(--mark);line-height:1.7}
+h4{font-size:17px;margin:30px 0 10px;color:var(--mark);font-weight:700}
+
+p{margin:0 0 17px;text-align:justify;hyphens:auto}
+strong,b{color:var(--rule);font-weight:700}
+i,cite{font-style:italic;color:var(--ink2)}
+
+/* 命题框：承重判断单独立出来，读者一眼可辨 */
+blockquote{position:relative;margin:38px 0;padding:26px 34px;background:var(--sheet);
+  border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);border-radius:0;
+  font-size:19px;line-height:1.95;font-weight:600;color:var(--ink);text-align:justify}
+blockquote:before,blockquote:after{position:absolute;color:var(--mark);font-size:26px;line-height:1;opacity:.55}
+blockquote:before{content:"⌜";top:9px;left:10px}
+blockquote:after{content:"⌟";bottom:9px;right:10px}
+blockquote p{margin:0}
+blockquote p+p{margin-top:12px}
+
+ul{margin:0 0 18px;padding-left:1.5em}
+ol{margin:0 0 18px;padding-left:1.7em}
+li{margin:0 0 10px;text-align:justify}
+li::marker{color:var(--mark)}
+
+hr{border:0;height:1px;background:var(--line);margin:52px auto;width:62%}
+
+em{font-style:normal;color:var(--ink3);font-size:15px}
+
+/* 三线表 */
+.tbl{width:100%;border-collapse:collapse;margin:32px 0;font-size:15.5px;line-height:1.8}
+.tbl th,.tbl td{padding:12px 14px;text-align:left;vertical-align:top;border:0}
+.tbl thead th{border-top:2px solid var(--ink);border-bottom:1px solid var(--line2);
+  font-weight:700;color:var(--rule);font-size:14.5px;letter-spacing:.04em}
+.tbl tbody tr:last-child td{border-bottom:2px solid var(--ink)}
+.tbl tbody td{border-bottom:1px solid var(--line)}
+.tbl caption{caption-side:bottom;font-size:13px;color:var(--ink3);padding-top:10px;text-align:left}
+
+/* 来源盒：参考文献式，悬挂缩进 */
+.src{margin:64px 0 8px;padding:30px 0 8px;border:0;border-top:2px solid var(--rule);
+  border-radius:0;background:transparent;counter-reset:srcn}
+.src .sl{font-size:11px;letter-spacing:.42em;color:var(--mark);margin-bottom:12px}
+.src .sd{font-size:14.8px;color:var(--ink2);line-height:1.95;margin:0 0 22px;text-align:justify}
+.src a.one{display:block;text-decoration:none;padding:16px 0 16px 34px;position:relative;
+  border-top:1px solid var(--line)}
+.src a.one:before{counter-increment:srcn;content:"[" counter(srcn) "]";position:absolute;left:0;top:16px;
+  color:var(--mark);font-size:13px;letter-spacing:.02em}
+.src a.one:hover .t{color:var(--mark)}
+.src a.one .k{font-size:12px;color:var(--mark);letter-spacing:.14em}
+.src a.one .t{font-size:16px;font-weight:700;color:var(--rule);margin:5px 0;line-height:1.72}
+.src a.one .g{font-size:14.5px;color:var(--ink2);line-height:1.9;text-align:justify}
+
+.endbox{text-align:center;border-top:1px solid var(--line2);margin-top:56px;padding:38px 20px;color:var(--ink2);font-size:15px}
+.endbox a{color:var(--mark);text-decoration:none}
+footer{text-align:center;border-top:1px solid var(--line);padding:32px;color:var(--ink3);font-size:12.5px;letter-spacing:.04em}
+
+#totop{position:fixed;right:22px;bottom:26px;width:40px;height:40px;border-radius:0;
+  background:var(--rule);color:var(--sheet);border:0;font-size:16px;cursor:pointer;display:none;z-index:98}
+
+@media(max-width:760px){
+  body{font-size:17px;line-height:2.0}
+  .art{padding:52px 18px 6px}
+  .wrap{padding:6px 18px 34px}
+  h2{font-size:20.5px;margin:56px 0 18px;padding-top:22px}
+  h3{font-size:17.5px}
+  blockquote{padding:22px 24px;font-size:17.5px}
+  blockquote:before{left:6px}blockquote:after{right:6px}
+  .tbl{font-size:14px}
+  .tbl th,.tbl td{padding:9px 8px}
+}
+
+@media print{
+  body{background:#fff;font-size:11.5pt;line-height:1.85}
+  .readbar,#pbar,#totop,.endbox,footer{display:none}
+  .wrap,.art{max-width:100%}
+  h2{page-break-after:avoid}
+  blockquote,.tbl,.src a.one{page-break-inside:avoid}
+  a{text-decoration:none}
+}
+</style></head><body>
+<div id="pbar"></div>
+<div class="readbar">
+  <a class="nav-back" href="/confluence/">‹ 学科通融</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span>
+  <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+  <a class="rb-btn" href="two-chain-type.pdf" download>⬇ 下载 PDF</a></div>
+</div>
+<header class="art">
+  <div class="art-series">学 科 通 融 · 之十七 · 技术人类学 × 天气型分类学 × 工业造型论</div>
+  <h1 class="art-title">双链型</h1>
+  <div class="art-sub">论「反复出现」不能区分一个型是被做出来的，还是被读出来的</div>
+  <div class="art-meta">王德生 ＋ Claude · 约 1.1 万字 · 三种阅读方式 · 发表于2026年8月1日</div>
+</header>
+<div class="wrap">
+<div class="deck">一个反复出现的形态被当成一个「型」，通常依据的是它的重复：同样的东西一再出现，所以它是真的。本文论证重复这一证据在原理上不足以支撑这个结论，因为<b>重复可以由两条彼此独立的链产生</b>——<b>制作链</b>（一套动作被反复执行，把自己沉淀成形态）与<b>判读链</b>（一套分类办法被反复施用，把形态归入同一格）。二者各自都能单独产生高度稳定的重复，而在观测上呈现相同的样子。由此得到可裁决的主张：<b>制作侧一致度与判读侧一致度是两个独立读数，二者的相关不应被预设；把它们分开测量，是判定一个型属于哪一类的唯一办法。</b> 本文给出二维辨别表并指认其中最容易被误认的一格——判读链单方面稳定而制作侧根本不存在制作者——大气环流型是这一格的纯样本，因为大气不制作任何东西。本文在十个领域兑现，其中两个反过来迫使命题收窄：有一类型的两条链在原理上不可分离（语言的音位），而另一类系统里判读链会反过来改写制作链，使两个读数不再独立。本文给出两条独立的可证伪条件，其中一条以既有的石器与天气型数据即可执行。</div>
+<div class="toc"><div class="tl">目 录</div><a href="#s1">一、导论：三个不该同时为真的命题</a><a href="#s2">二、文献综述</a><a href="#s3">三、冲突定位</a><a href="#s4">四、双链型</a><a href="#s5">五、二维辨别表</a><a href="#s6">六、逐领域兑现</a><a href="#s7">七、判据、可观测代理与可证伪条件</a><a href="#s8">八、与最近的几种说法的分界</a><a href="#s9">九、三家各自为何到不了这一条</a><a href="#s10">十、推论、适用边界与反噬预言</a><a href="#s11">十一、本判断对它自己适用吗</a><a href="#s12">结　论</a><a href="#s13">注　释</a><a href="#s14">参考文献</a><a href="#s15">人机分工声明</a></div>
+<h2 id="s1">一、导论：三个不该同时为真的命题</h2>
+<p>三场争论，分属三个几乎不互相引用的领域，各自的主要文献分别用法语与德语写成。三条命题各有厚实的支撑，而它们不能同时为真。</p>
+<p><b>第一场在技术人类学。</b> 法语传统里有一个影响极广的分析工具：把一件器物的制作还原为一条由动作与工具按内在句法串起来的<b>操作链</b>。这条路径的一个方法论支点被反复引用，也最能说明它的力量：<b>正因为一个动作是恒定的、反复出现的，它才可以被解释为有意图的。</b> 重复在这里是意图的证据，因而也是型的证据——一件器物之所以属于某个型，是因为造它的那串动作被一再执行。这条路径受到过两种方向相反的质疑：一种指出技术选择在功能上往往是任意的，型的边界其实由社会画；另一种（来自英语学界）批评这套分析「太主观」，因为它依赖分析者本人的经验与直觉。争点因此是：<b>器物上的规律性，是造它的人留下的，还是读它的人放上去的？</b></p>
+<p><b>第二场在天气型分类学。</b> 德语传统里有一部影响深远的目录，把欧洲上空的环流形势分成十个大类、二十九个大天气型，型的定义强烈依循气团流向。这套分类由专家主观制定，用了七十多年。晚近的大规模比较研究把主观分类与十几种自动分类放在同一批数据上系统评估，得到一个对本文极为关键的结论：<b>没有任何一种分类方法对所有应用都是最优的</b>；每一种应用都需要按它自己的目的去构造类别。同时，对同一套大天气型做客观化重建，得到的序列与原始序列存在系统性差异。争点因此是：<b>一个天气型是一个反复出现的对象，还是一套分类办法的产物？</b></p>
+<p><b>第三场在工业造型论。</b> 德语传统里有两条对立的路线。一条源自乌尔姆的方法论传统，主张产品形态应当由功能与制约条件推导出来，正确的形态是被解出来的。另一条是奥芬巴赫的「产品语言理论」，它把产品的功能扩展到符号维度，其中最基础的一层被称为<b>指示功能</b>：在这一层上产品「只谈论它自己」，它的外观指示着该怎么上手、怎么操作，相当于一份内置的使用说明书。争点因此是：<b>一个形态之所以意味着某个操作，是因为它是由那个操作的需要推导出来的，还是因为使用者从它身上读出了那个操作？</b></p>
+<p>三场争论互不相干，却在同一个问题上互相顶撞：<b>一个反复出现的形态，凭什么被判为一个真的型？</b></p>
+<p>第一场给的答案是<b>重复</b>：动作恒定，故有意图，故有型。第二场给的答案是<b>目的</b>：型只对某个应用成立，换个目的就得换一套类别。第三场给的答案是<b>可读</b>：形态的意义在于被使用者读出来。</p>
+<p>三条不能同真。若第二场对——型随分类目的而变、没有哪一套是正确的——那么第一场的支点就塌了：动作的恒定只能证明<b>分析者的分类法稳定</b>，不能证明当时那个人有意图。若第一场对——重复确实指向制作者的意图——那么第三场的因果方向就反了：形态不是被读出来的，是被动作沉淀下来的。若第三场对——形态之所以指示某个操作是因为被读出来——那么第一场那条从器物反推动作的路，读到的可能是自己放上去的东西。</p>
+<p>本文不打算判谁对。三条命题不是在同一个角度上对同一问题给出相反答案（那只需一次裁决），而是从三个不同角度切入同一样东西，得出不能并存的结论。这种情形只有一条出路：另造一个能同时容纳三者的辨别维度。</p>
+<p>本文提出的判断是：</p>
+<blockquote><p><b>一个反复出现的型，不是被发现的对象，也不是分类者的任意构造，而是两条彼此独立的链在同一个名字下的合流。</b></p></blockquote>
+<p>一条是<b>制作链</b>：一套动作被反复执行，把自己沉淀成形态。一条是<b>判读链</b>：一套分类办法被反复施用，把形态归进同一格。两条链各自都能单独产生高度稳定的重复，而<b>在观测上，两种重复长得一模一样</b>。</p>
+<p>由此得到本文的承重推论，也是全文最要紧的一句：</p>
+<blockquote><p><b>重复这一证据，在原理上不能区分一个型是被做出来的，还是被读出来的。</b></p></blockquote>
+<p>三场争论的僵局因此可以被解释掉：第一场的支点（重复即意图）默认只有制作链在产生重复；第二场发现的方法依赖性，正是判读链单独产生重复的现场；第三场争的其实是两条链的接口——指示功能是制作侧刻意为判读侧准备的信号，而功能主义假定这个接口不需要专门设计，因为两条链本来就该重合。</p>
+<p>本文余下的安排：第二节梳理四条既有路径并指认它们停在哪里；第三节精确定位冲突；第四节界定双链型与两条链各自的构成条件；第五节升成二维辨别表；第六节在十个领域兑现，其中两个迫使本文收窄；第七节给出判据与可证伪条件；第八节交代与最近几种说法的分界；第九节说明三家为何各自到不了；第十节给出推论、边界与反噬预言；第十一节处理本判断对自身的适用。</p>
+<h2 id="s2">二、文献综述</h2>
+<h3>2.1 型作为文化或活动的反映</h3>
+<p>考古学里有一场持续六十年的争论：同一批中期旧石器时代的器物组合被分成若干「相」，一方主张这些相反映不同的<b>文化群体</b>，另一方主张它们反映不同的<b>活动</b>，还有一方主张它们反映<b>时间序列</b>。晚近有研究指出这场争论一再走入同一个死胡同，并把根因指认为：<b>按分类单元来分析器物组合，而分类单元把多个变异来源混在一起、同时又把它们遮住。</b></p>
+<p>这是本文最重要的先行者之一。它已经指出分类单元会混淆变异来源，并给出了处方：拆掉分类单元，直接追踪具体变量。本文与它的分界在第八节，此处只先说结论：本文认为拆掉分类单元不解决问题，因为判读链会把重复注入到任何被追踪的变量上——只要判读办法本身稳定，模式仍然会出现。<b>大气环流型是这一点的判决性样本：那里根本没有制作者，混淆无从谈起，而稳定的型照样出现。</b></p>
+<h3>2.2 型作为分类方法的函数</h3>
+<p>第二条路径来自天气型分类学自身的元研究。它把主观专家分类与十几种自动方法放在同一批再分析数据上比较，得到「没有一种方法对所有应用最优」这一结论，并把类别的构造明确地与应用目的绑定。</p>
+<p>它停在哪里？停在<b>方法学建议</b>这一层。它的结论是「按你的用途选分类法」，因而型的实在性问题被搁置而不是被回答：它没有说型不是真的，只是说别指望有一套通用的分好的类。本文要做的是把这个搁置往前推一步：<b>在没有制作者的领域里，型的全部重复都来自判读链；而在有制作者的领域里，两条链都在产生重复，于是需要分开测。</b></p>
+<h3>2.3 型作为动作的沉淀</h3>
+<p>第三条路径就是操作链。它把型的载体从物件移到了<b>动作序列</b>上，这是极关键的一步：器物只是动作的残迹，真正被传承的是那套动作。它的支点是重复与意图的联系。</p>
+<p>它停在哪里？停在<b>它没有为判读链留位置</b>。分析者从器物残迹重建操作链，这一步本身就是一次分类操作；而该传统对此的回应是强调经验与实验（打制实验、拼合复原），也就是用制作侧的手段去验证制作侧的推断。这在有活传承的民族志现场是有效的，在只剩残迹的史前现场则无法排除一种可能：被重建出来的那条链，其稳定性有一部分来自重建办法本身。</p>
+<h3>2.4 型作为被读出的信号</h3>
+<p>第四条路径是产品语言理论的指示功能。它把型的判据放在<b>使用者能否读出操作</b>上，并明确地把这一层与符号—象征层分开：在指示功能这一层，产品只谈论它自己。</p>
+<p>它停在哪里？停在<b>它只关心接口的一侧</b>。它是一门设计理论，任务是教人把信号做得可读，因而它默认制作侧是可以被设计的、判读侧是要被满足的。它没有把「判读链可以在没有任何制作意图的情况下独立地稳定下来」当作一种可能性——因为在设计领域，那种情况叫作误读，是要被消除的，而不是要被研究的。</p>
+<p>四条路径合起来有一个共同的空白：<b>没有人把「重复」这一证据本身拆成两个来源，并追问它们的读数是否独立。</b></p>
+<h2 id="s3">三、冲突定位</h2>
+<p>三条命题的冲突可以写死为三条。</p>
+<p><b>冲突一（重复即意图 vs 重复即方法稳定）。</b> 若动作的恒定足以证明意图，则从器物反推的操作链是对当时行为的重建；若稳定的重复可以完全由分类办法提供，则同一份重建也可能是重建办法的自画像。两条不能同真，而且双方都有硬证据：一方有打制实验与拼合复原，另一方有同一批数据在不同分类法下给出不同型的系统比较。</p>
+<p><b>冲突二（形态由动作沉淀 vs 形态由读者读出）。</b> 若形态是动作的残迹，因果方向是从动作到形态；若形态之所以意味着某个操作是因为使用者读出了它，因果方向是从形态到动作。两条不能同真。</p>
+<p><b>冲突三（有正确的型 vs 没有正确的型）。</b> 造型论要求一个形态只有一种正确的操作读法（一个旋钮不能既像推又像转）；天气型分类学的结论是没有哪一套类别是正确的，只有对某个目的更合用的。两条不能同真。</p>
+<p>三条冲突有一个共同点，此前没有被指出：<b>它们全都是关于同一个证据的——「反复出现」。</b></p>
+<p>第一场用重复证明意图。第二场用重复的方法依赖性证明型的相对性。第三场用重复的可读性证明形态的意义。三方都把重复当作一个单一的证据来使用，只是各自解释成不同的东西。</p>
+<p>而三方共享的那个未经审查的前提是：<b>重复只有一个来源。</b> 只要看到重复，剩下的问题就只是它指向什么——指向文化、指向活动、指向意图、指向目的、指向意义。没有人问：<b>这份重复，是谁产生的？</b></p>
+<p>本文撤销这个前提。重复有两个来源，且它们可以各自独立地稳定。一旦承认这一点，三条冲突就不再需要靠判谁对来化解，而可以被重述为同一张表上的不同格。</p>
+<h2 id="s4">四、双链型</h2>
+<h3>4.1 两条链</h3>
+<p><b>制作链</b>：一套动作被反复执行，把自己沉淀成形态。它的构成条件有三：有一个执行者；这套动作在执行者之间或代际之间被传递；形态是执行的副产品而不是执行的目标（打制者要的是一把能用的刃，不是一个「型」）。</p>
+<p><b>判读链</b>：一套分类办法被反复施用，把形态归进同一格。它的构成条件也有三：有一个判读者；这套办法在判读者之间或时间上保持一致；归类的结果被记录下来并被后来的判读所参照。</p>
+<p>两条链的关键性质是：<b>各自都能单独产生高度稳定的重复。</b></p>
+<p>制作链单独产生重复，这是常识：一批标准件长得一样，因为它们是按同一套动作做出来的。</p>
+<p>判读链单独产生重复，则需要一个纯样本才能看清，而天气型正是这个纯样本。<b>大气不制作任何东西。</b> 它没有执行者，没有传递，没有动作序列。它每天呈现一个连续变化的场，而「二十九个大天气型」这个稳定的、可数的、被使用了七十多年的型系统，其重复<b>全部</b>由判读链提供。这不是说那些型没用——它们在统计与预报上确实有用——而是说：<b>在这里，型的稳定性与对象的稳定性是两件事，而且能被分开看到，因为其中一件根本不存在。</b></p>
+<p>由此得到本文的核心判断：</p>
+<blockquote><p><b>一个反复出现的型，是两条彼此独立的链在同一个名字下的合流；而重复这一证据，在原理上不能区分它来自哪一条。</b></p></blockquote>
+<h3>4.2 为什么两条链会被混为一谈</h3>
+<p>有三个原因，各自都足以让人看不见这个区分。</p>
+<p><b>其一，两条链的产物在观测上同形。</b> 制作链造出的重复表现为「这批东西彼此相似」；判读链造出的重复也表现为「这批东西彼此相似」。观测记录里没有一栏写着这份相似是谁给的。</p>
+<p><b>其二，判读者通常也懂制作。</b> 石器分析者会打制，设计理论家会做设计，天气预报员会看图。当判读者拥有制作侧的技能时，他会用制作侧的直觉去校准判读，于是两条链在他身上重合——这看起来像是验证，实际上是把两个读数捆在了一起。这正是那条「太主观」的批评所指的地方，但那条批评把它当作个人经验的可靠性问题，本文把它当作<b>两个读数被人为耦合</b>的问题。</p>
+<p><b>其三，在多数领域里，两条链确实经常一起稳。</b> 有活传承的手艺、标准化的工业生产、有成熟教程的技法——制作稳，判读也稳。于是「稳定的重复」这个复合证据长期够用，没有人需要拆开它。<b>只有在两条链分离的样本里，拆分才变得必要，而那些样本分散在互不来往的学科里</b>：气象学里没有制作者，史前考古里没有活着的判读传承，跨文化的产品使用里判读者从未接触过制作侧的意图。</p>
+<h3>4.3 两个读数</h3>
+<p>拆分的操作形式是两个可以分别测量的量。</p>
+<p><b>制作侧一致度</b>：同一套动作在不同执行者、不同场次之间的一致程度。在有活传承处可直接测（多个工匠做同一件事的动作序列比对），在只剩残迹处可用制作痕迹的内部一致性近似（同一批器物上打击点、剥片顺序、失误纠正方式的规律性）。</p>
+<p><b>判读侧一致度</b>：同一批对象在不同判读者、不同分类办法之间被归入同一格的程度。这个量在有些领域已经有成熟的算法——比较不同分类方案之间一致性的指标是现成的。</p>
+<p>本文的可裁决主张就落在这两个量的关系上：</p>
+<blockquote><p><b>制作侧一致度与判读侧一致度是两个独立读数，二者的相关不应被预设。</b></p></blockquote>
+<p>这条主张之所以可裁决，是因为它预测<b>存在系统性的背离</b>，而且指出了背离在哪一侧：有些型制作侧极稳而判读侧不稳（做得一模一样，但没有任何两个分析者把它们归成同一批），有些型制作侧不存在而判读侧极稳（大天气型）。若测下来两个量在各类样本上总是同步，本文错。</p>
+<h2 id="s5">五、二维辨别表</h2>
+<table class="tbl"><thead><tr><th></th><th><b>判读链稳定</b></th><th><b>判读链不稳定</b></th></tr></thead><tbody><tr><td><b>制作链稳定</b></td><td><b>甲格　实型</b>。两条链都在供给重复：有活传承的手艺、标准件、有成熟教程的技法。此格里「重复即真实」是可用的近似</td><td><b>乙格　哑型</b>。做得一模一样，却没有稳定的读法：失传工艺、跨文化误读的器物、只剩残迹而判读传统未建立的考古材料。型在物质里，不在任何人的分类里</td></tr><tr><td><b>制作链不存在或不稳</b></td><td><b>丙格　投影型（本文的靶）</b>。重复全部由判读链供给：大天气型、星座、部分症候群、市场「风格」。它与甲格在统计上完全一样</td><td><b>丁格　噪声</b>。两侧都不稳，通常不会被命名成型</td></tr></tbody></table>
+<p>这张表的承重之处不在甲格与丁格，而在<b>丙格为什么与甲格不可区分</b>，以及<b>乙格为什么会被误判为丁格</b>。</p>
+<p><b>丙格的危险在于它自洽。</b> 一套稳定的判读办法会持续地产生一致的归类结果，这些结果被记录、被统计、被用来做预报与政策，而每一次成功的应用都被当作型的实在性的证据。但那些应用的成功只证明<b>判读链对某个目的有用</b>，不证明对象侧有一个对应的东西。天气型分类学自己的元研究已经把这一点说到了半路——它承认不同应用需要不同的类别——只是没有把它推到「所以这一格里的重复不能被读作对象的属性」。</p>
+<p><b>乙格的危险在于它看上去像什么都没有。</b> 制作侧稳而判读侧不稳时，型确实存在（那批东西确实是按同一套动作做出来的），但没有任何一次判读能把它稳定地取出来。于是它被记录为「变异太大、无法分型」，即被当成丁格处理。<b>失传工艺、外来器物、跨文化的用户误读，都在这一格里被系统性地判成不存在。</b></p>
+<p>这也给出本文最直接的实践含义：<b>在拿到一份「稳定的重复」时，第一件要做的事不是解释它指向什么，而是先确定它落在哪一格。</b> 而确定的唯一办法是把两个读数分开测——单看一份重复，四格里的甲与丙无法分辨。</p>
+<h2 id="s6">六、逐领域兑现</h2>
+<p><b>（一）史前石器。</b> 读数：制作侧＝同一批器物制作痕迹的内部一致性；判读侧＝多位分析者独立分型的一致度。预测：两者不同步；某些被判为「变异过大」的组合其实是乙格。</p>
+<p><b>（二）大气环流型。</b> 纯丙格样本。预测：任何试图为大天气型寻找「对象侧对应物」的努力都会失败，而这不影响它在具体应用上的有用性。</p>
+<p><b>（三）工业产品的指示功能。</b> 读数：制作侧＝设计意图的一致性；判读侧＝不同文化背景使用者读出同一操作的比例。预测：二者背离处正是跨文化误用的高发点，而这一背离<b>不能靠把形态做得更「合功能」来消除</b>，因为功能推导只作用于制作链。</p>
+<p><b>（四）精神医学的症候群。</b> 部分诊断类别接近丙格：判读链（诊断手册与训练）高度一致，而对象侧的制作机制不明。此处应当预期：判读侧一致度的提高不必然带来对象侧同质性的提高。</p>
+<p><b>（五）生物物种。</b> 有性生殖物种接近甲格（有制作链——基因流），无性与化石类群接近丙格。物种问题的长期难解，部分正是因为两格被同一个词覆盖。</p>
+<p><b>（六）法律的「类型」。</b> 判例法中的案件类型主要由判读链供给（法官的归类实践），当事人一侧没有制作链。</p>
+<p><b>（七）音乐的曲式。</b> 有活传承时是甲格；对早期音乐的曲式重建常落在乙格或丙格。</p>
+<p><b>（八）市场里的「风格」。</b> 多数是丙格：判读链（媒体、买手、算法标签）稳定，而生产侧极为异质。</p>
+<p><b>（九）语言的音位——第一条让步。</b></p>
+<p>这一领域迫使本文收窄。音位既是制作侧的单位（发音动作的目标），又是判读侧的单位（听者的范畴知觉），而且两者<b>在原理上不可分离</b>：说话者之所以那样发音，正是因为他也是听者；范畴知觉本身就是制作链的一部分。在这类系统里，两个读数不独立，本文的判据无法执行。</p>
+<p>因此适用条件必须写死：</p>
+<blockquote><p>本文只适用于<b>制作者与判读者可以被分开的系统</b>。当判读能力构成制作能力的一部分时，两条链不可分离，双链型的区分失效。</p></blockquote>
+<p><b>（十）判读链反过来改写制作链——第二条让步。</b></p>
+<p>第二条让步在时间维上。当一套判读办法被制度化（考试、认证、评级、算法标签），制作者会开始照着它做，于是制作链被判读链改写，两个读数从独立变为耦合。这一现象在被分类者是人的领域里几乎是必然的。</p>
+<p>因此再加一条：</p>
+<blockquote><p>两个读数的独立性是<b>状态</b>不是<b>属性</b>。判读链一旦获得对制作者的约束力，独立性即被销毁，此后测到的高相关不是证据而是耦合的结果。</p></blockquote>
+<p>两条让步合起来，把本文的适用域收窄为：<b>制作者与判读者可分、且判读链尚未获得对制作者的约束力的系统。</b> 三个引发本文的案例全部满足——史前打制者听不到今天的分析者，大气不读天气图，早期工业设计的使用者不参与设计。</p>
+<h2 id="s7">七、判据、可观测代理与可证伪条件</h2>
+<h3>7.1 核心可裁决判据</h3>
+<blockquote><p><b>制作侧一致度与判读侧一致度是两个独立读数；在制作者与判读者可分、且判读链尚未获得约束力的系统里，二者的相关不显著。</b></p></blockquote>
+<p>这条判据可裁决，因为它预测的是<b>零相关</b>而不是某个方向的效应。它不是"两者都重要"这类不可证伪的话：任何一批样本上测出稳定的正相关，都直接驳倒它。</p>
+<h3>7.2 可观测代理</h3>
+<p>- <b>制作侧一致度</b>：多执行者做同一件事的动作序列比对；只剩残迹时用制作痕迹的内部一致性（打击点分布、剥片顺序、失误纠正方式）。</p>
+<p>- <b>判读侧一致度</b>：多判读者独立分型的一致度，或多种分类方案之间的一致性指标——后者在天气型分类学里已有成熟的比较工具与公开数据集。</p>
+<p>- <b>两侧背离度</b>：上述两个量在同一批样本上的差。这是本文唯一的新增代理，也是四格判别的唯一入口。</p>
+<h3>7.3 现有数据即可执行的证伪条件</h3>
+<p>天气型一侧的数据是现成的：<b>同一批再分析数据、十几种分类方法、公开的分类目录</b>，判读侧一致度可以直接算出。石器一侧同样可行：取若干已发表的组合，请多位分析者在不受原分型影响的条件下独立分型，得到判读侧一致度；同一批器物的制作痕迹一致性可由技术分析给出。</p>
+<p>本文预测：</p>
+<p>- 天气型样本的制作侧一致度<b>没有定义</b>（无制作者），而判读侧一致度显著大于随机——这是丙格的签名；</p>
+<p>- 石器样本中，两个量的相关不显著，且存在制作侧高、判读侧低的组合（乙格）。</p>
+<p>竞争预测清楚：把型读作文化或活动的那一支预测两个量应当同步（真实的型在两侧都留痕）；把分类单元当作混淆源的那一支预测拆掉分类单元后变异来源可分——而本文预测在<b>无制作者</b>的样本里，拆掉分类单元后模式照样出现，因为判读链不需要对象侧的配合。</p>
+<h3>7.4 第二条独立证伪条件</h3>
+<p>若能找到一个制作者与判读者明确可分、判读链无约束力，而制作侧一致度与判读侧一致度稳定同步的领域，本文的核心机制（两条链独立供给重复）错。</p>
+<p>两条是独立的：第一条针对读数的相关结构，第二条针对独立性本身。本文刻意不用"若找到一个重复不指向意图的例子则本文成立"这类表述——那是一句会被自己吸收的话。</p>
+<h3>7.5 两个交出去的洞</h3>
+<p>第一，本文给不出<b>判读侧一致度的下限</b>。判读一致度多低才算"不稳定"，本文没有原则性的界，只能靠与随机基线比。</p>
+<p>第二，乙格在只剩残迹的领域里<b>难以被正面确认</b>：说"制作侧稳而判读侧不稳"，需要一个不依赖判读的制作侧读数，而在史前材料上这个读数本身也要由人来读。本文只能把它降为一条较弱的操作建议——用与分型无关的痕迹变量去测，尽量减少与分型共用同一批判断。这个洞留在这里，不填。</p>
+<h2 id="s8">八、与最近的几种说法的分界</h2>
+<p><b>与「分类单元混淆变异来源」（旧石器分型之争的晚近诊断）。</b> 该诊断认为按分类单元分析会把多个变异来源混在一起并遮住它们，处方是拆掉单元、直接追踪变量。分界：那里假定重复只来自对象侧，混淆发生在<b>归因</b>环节；本文说重复有两个来源，判读链会把重复注入<b>任何</b>被追踪的变量。判决性对照：在<b>无制作者</b>的样本（天气型）里，按他们的处方拆掉类别之后模式应当消失或变得可分；按本文，模式照样出现，因为那里对象侧根本没有可被混淆的来源。这个对照现在就能做。</p>
+<p><b>与「型反映文化还是反映活动」（那场经典争论本身）。</b> 两方都假定型有一个对象侧的所指，只是所指不同。本文说其中一整类型（丙格）没有对象侧所指，而它与有所指的型在统计上不可分。分岔情形：对同一批组合，两方都预测更精细的测量会让所指显现；本文预测在丙格样本里，测量越精细，显现的是判读办法的结构。</p>
+<p><b>与分类的残余（Bowker &amp; Star 1999）。</b> 该工作指出任何分类系统都会生产它处理不了的残余，并研究残余的后果。分界：那里关心<b>被分类之外的东西</b>，本文关心<b>分类之内那份重复的来源</b>。二者可同时成立，处方不同：一个是去看残余，一个是去分开测两个读数。</p>
+<p><b>与观察者的盲点（Spencer-Brown 1969；冯·福斯特；卢曼一路）。</b> 控制论的观察者理论早已指出观察依赖于区分，且观察者看不到自己的区分。这是本文最容易被吸收进去的一位。分界在于本文交出了一个<b>可测的量</b>：那一支给出的是一条普遍的认识论限制（凡观察皆带区分），本文给出的是一个可以在具体样本上算出数值并可能为零的相关系数。判决性差别：按那一路，一切型都同样地依赖观察者，四格之分只是程度；按本文，四格是可以用两个独立读数分开的，且丙格与甲格的差别不是程度而是<b>制作链有没有</b>。</p>
+<p><b>与通约化（Espeland &amp; Stevens 1998）。</b> 该工作论证把不同的东西按同一把尺子换算会剥掉情境。分界：通约化处理的是<b>度量</b>，本文处理的是<b>分型</b>；且通约化的批评预设被换算的东西原本各有其质，本文的丙格里被分型的东西原本连边界都没有。</p>
+<p><b>与循环效应（Hacking）。</b> 被分类者会回应分类而改变自己，从而使分类"变成真的"。这与本文的第二条让步（判读链改写制作链）几乎同一件事，本文承认并直接借用了它。分界：那一支处理的是<b>分类如何变成真的</b>，本文处理的是<b>在它还没变成真的之前，怎么判断它是不是真的</b>；且本文的适用条件明确把循环已经发生的系统排除在外——那正是本文失效的地方，不是本文覆盖的地方。</p>
+<p><b>与产品语言的指示功能（奥芬巴赫路线）。</b> 该理论把型的判据放在使用者能否读出操作上。分界：它把判读侧当作<b>要被满足的约束</b>，本文把它当作<b>独立的重复来源</b>。分岔预测：按它，把形态做得更清晰可以消除误读；按本文，在制作侧与判读侧文化背景差异大的场合，误读不会随清晰度单调下降，因为判读链有自己的稳定结构。</p>
+<p><b>与本栏《路存》（之十二）。</b> 同栏上一篇论证有一类系统的储备由路线而非持有者定义。两篇共享"账面读数不可直接解释"这一现象层，但自变量正交：那一篇问<b>储备的位置</b>，本文问<b>重复的来源</b>。可分开的情形：一个储备寄存在路线上、而其"型"由制作链稳定供给的系统（游牧畜群的畜种），两篇给出的诊断互不覆盖。</p>
+<h2 id="s9">九、三家各自为何到不了这一条</h2>
+<p><b>技术人类学到不了，因为它的判读者与制作者是同一批人。</b> 这门学问的方法论核心是让分析者亲手打制、亲手拼合，用制作侧的能力去校准判读。这在民族志现场是优势，在史前材料上却把两个读数焊死了：一个会打制的分析者无法在自己身上把制作直觉与分类判断分开。要跨出去，需要请一批<b>不会打制的人</b>来独立分型，而这在该传统里几乎等于取消资格。</p>
+<p><b>天气型分类学到不了，因为它没有对照组。</b> 它已经走到了本文的门口——它自己证明了型随方法而变、没有通用最优。但它的全部样本都在丙格里：大气从不制作。<b>一个只有丙格样本的学科，无法发现丙格是一个格</b>，因为它没有甲格可供对照，于是"型随方法变"只能被读成方法学的注意事项，而不是一个关于型的分类学结论。</p>
+<p><b>工业造型论到不了，因为误读在它那里是要被消除的。</b> 它是一门规范性学问：任务是把信号做得可读。判读链的独立稳定性在它眼里叫作误读，是缺陷；而缺陷是要被修掉的，不是要被当作独立机制来研究的。它因此拥有全站最好的接口知识，却没有位置去承认接口两侧可以各自独立地稳定。</p>
+<p>三家的边界都不是能力问题，是<b>样本结构问题</b>：一个把两条链焊在同一个人身上，一个只有一条链，一个把另一条链当缺陷。三者并排放着，那个共同的变量才显出来。</p>
+<h2 id="s10">十、推论、适用边界与反噬预言</h2>
+<h3>10.1 推论</h3>
+<p><b>推论一。</b> 任何以"这个模式反复出现"为据的实在性论证，都必须先报告判读侧一致度；不报告的，其结论强度不明。</p>
+<p><b>推论二。</b> 提高判读侧一致度（更严的手册、更多的培训、更统一的算法）会使一个丙格的型看起来更真，而不会使它更真。<b>判读一致度的提升在丙格里是自证性的。</b></p>
+<p><b>推论三。</b> 乙格的存在意味着"无法分型"不等于"没有型"。对失传工艺、外来器物、跨文化产品，正确的动作不是放弃分型，而是换一个与现有分类无关的痕迹变量重测。</p>
+<h3>10.2 适用边界</h3>
+<p>其一，判读能力构成制作能力的系统（音位一类），不适用。</p>
+<p>其二，判读链已获得对制作者约束力的系统，两个读数已耦合，本文只剩历史诊断价值。</p>
+<p>其三，只有一次的形态。双链型以重复为讨论对象，对一次性的东西无话可说。</p>
+<h3>10.3 反噬预言</h3>
+<p>按本文设计干预，最自然的做法是要求每一份分型研究附报判读侧一致度。</p>
+<p>这会适得其反，而且方式可以精确说出：判读侧一致度是一个可以被优化的量——统一手册、加强培训、让判读者互相校准，都能把它拉高。一旦它成为申报项，<b>被优化的恰恰是它</b>，而两个读数的独立性正是靠判读侧不被制作侧牵着走来保证的。于是：<b>报告判读一致度的制度会系统性地提高判读一致度，从而把越来越多的丙格型伪装成甲格型。</b></p>
+<p>这条预言也解释了 7.5 第一个洞为什么填不上：判读一致度没有原则性的下限，而一旦它被制度化为指标，任何下限都会被越过。</p>
+<p>因此本文不推荐把判读一致度做成申报项，只推荐一件事：<b>每隔一段时间，请一批不受本领域训练的人独立分一次型，并把结果与专家分型的差异记下来。</b> 这个动作的价值恰恰在于它不能被优化——一旦那批人被训练了，他们就不再是那批人。</p>
+<h2 id="s11">十一、本判断对它自己适用吗</h2>
+<p>本文自己是一份分型：它把型分成四格。那么这四格是甲格还是丙格？</p>
+<p>诚实的回答是：<b>目前是丙格。</b> 本文没有对象侧的制作链——四格不是被任何机制造出来的，它是我用一套判读办法（把三场争论按"重复来自谁"归类）产生的。它此刻的全部稳定性来自判读链，而那条判读链目前只有一个判读者。</p>
+<p>按本文自己的推论二，我现在若去写一份更严的手册、把四格的判别写得更细密，只会让它看起来更真。所以本文刻意没有写那份手册，而是把判据压到两个可以由别人独立算出的量上——那是唯一能让别人在不借用我的分类直觉的情况下反驳我的入口。</p>
+<p>第二重自反更直接：<b>本文正被放进一个会给它分型的栏目里。</b> 这个栏目有自己的判读链（编号、体例、评分、"三学科交叉"的格式），而它已经运行了十二篇。按本文的第二条让步，判读链一旦对制作者有约束力，两个读数就会耦合——而我正是照着这条判读链在写。<b>读者若要检验本文，最省事的办法就是去看这十二篇的相似性有多少来自我的写法，有多少来自这条判读链。</b> 我给不出这个数，因为我在链里面。</p>
+<h2 id="s12">结　论</h2>
+<p>本文提出并论证：一个反复出现的型，是两条彼此独立的链在同一个名字下的合流——制作链把动作沉淀成形态，判读链把形态归进同一格；两者各自都能单独产生高度稳定的重复，而在观测上同形。因此，<b>重复这一证据在原理上不能区分一个型是被做出来的还是被读出来的。</b></p>
+<p>由此得到的可裁决主张是：制作侧一致度与判读侧一致度是两个独立读数，在制作者与判读者可分、判读链尚未获得约束力的系统里，二者相关不显著。二维辨别表的靶格是丙格（投影型）——重复全部由判读链供给，而它与甲格在统计上完全一样；大气环流型是这一格的纯样本，因为大气不制作任何东西。</p>
+<p>十个领域的兑现中，语言的音位与"判读链改写制作链"各迫使本文收窄一次，最终适用条件是：<b>制作者与判读者可分、且判读链尚未获得对制作者约束力的系统。</b></p>
+<p>最后给一条写死日期的赌注：</p>
+<blockquote><p><b>到 2033 年 12 月 31 日，若在旧石器分型、天气型分类与产品跨文化使用三个领域中，仍没有任何一项研究把「判读侧一致度」作为独立于对象侧变量的读数单独报告，或报告之后未能观测到本文所预测的零相关与背离样本，则本文的核心主张作废，不再申辩。</b></p></blockquote>
+<h2 id="s13">注　释</h2>
+<p>1. 本文所称「型」指被命名并被反复使用的形态类别，不限于生物学或考古学的专门用法。</p>
+<p>2. 「制作链」与操作链不是同一个词。操作链是一个已有的分析工具，指被重建出来的动作序列；制作链在本文里指实际发生过的执行过程，它可能与被重建出来的操作链不一致——这个不一致正是本文要测的东西。</p>
+<p>3. 第五节表中「判读链稳定」指多判读者或多方法之间的一致，不指单个判读者的自洽。单人自洽极易达到，且不构成任何证据。</p>
+<p>4. 第六节第九条的音位例只是最清楚的一例，凡"判读能力构成制作能力"的系统同理（口音、书法、乐器演奏中的音准）。</p>
+<p>5. 本文对三家来源的转述限于其公开发表的核心论证；三场争论各自的内部分歧远比本文所述细密，具体以原文为准。三家的主要文献分别为法语与德语，本文的转述依据可公开获取的二手评述与目录信息，<b>未逐条核对德法原著页码</b>，需精确引证者请核原文。</p>
+<h2 id="s14">参考文献</h2>
+<p>Bordes, F. (1961). <em>Typologie du Paléolithique ancien et moyen</em>. Delmas.</p>
+<p>Binford, L. R., &amp; Binford, S. R. (1966). A preliminary analysis of functional variability in the Mousterian of Levallois facies. <em>American Anthropologist</em>, 68(2), 238–295.</p>
+<p>Bowker, G. C., &amp; Star, S. L. (1999). <em>Sorting Things Out: Classification and Its Consequences</em>. MIT Press.</p>
+<p>Bürdek, B. E. (1991/2005). <em>Design. Geschichte, Theorie und Praxis der Produktgestaltung</em>. Birkhäuser.</p>
+<p>Espeland, W. N., &amp; Stevens, M. L. (1998). Commensuration as a social process. <em>Annual Review of Sociology</em>, 24, 313–343.</p>
+<p>Gerstengarbe, F.-W., &amp; Werner, P. C. (1999). <em>Katalog der Großwetterlagen Europas (1881–1998) nach Paul Hess und Helmuth Brezowsky</em>. Deutscher Wetterdienst.</p>
+<p>Hess, P., &amp; Brezowsky, H. (1952). <em>Katalog der Großwetterlagen Europas</em>. Berichte des Deutschen Wetterdienstes in der US-Zone, Nr. 33.</p>
+<p>Huth, R., Beck, C., Philipp, A., Demuzere, M., Ustrnul, Z., Cahynová, M., Kyselý, J., &amp; Tveito, O.-E. (2008). Classifications of atmospheric circulation patterns. <em>Annals of the New York Academy of Sciences</em>, 1146, 105–152.</p>
+<p>James, P. M. (2007). An objective classification method for Hess and Brezowsky Grosswetterlagen over Europe. <em>Theoretical and Applied Climatology</em>, 88, 17–42.</p>
+<p>Lemonnier, P. (1986). The study of material culture today: Toward an anthropology of technical systems. <em>Journal of Anthropological Archaeology</em>, 5(2), 147–186.</p>
+<p>Leroi-Gourhan, A. (1964–65). <em>Le Geste et la Parole</em>. Albin Michel.</p>
+<p>Monnier, G. F., &amp; Missal, K. (2014). Another Mousterian debate? Bordian facies, chaîne opératoire technocomplexes, and patterns of lithic variability in the western European Middle and Upper Pleistocene. <em>Quaternary International</em>, 350, 59–83.</p>
+<p>Philipp, A., Beck, C., Huth, R., &amp; Jacobeit, J. (2016). Development and comparison of circulation type classifications using the COST 733 dataset and software. <em>International Journal of Climatology</em>, 36(7), 2673–2691.</p>
+<p>Philipp, A., Bartholy, J., Beck, C., et al. (2010). Cost733cat – a database of weather and circulation type classifications. <em>Physics and Chemistry of the Earth</em>, 35, 360–373.</p>
+<p>Steffen, D. (Hg.) (2000). <em>Design als Produktsprache. Der "Offenbacher Ansatz" in Theorie und Praxis</em>. Verlag form.</p>
+<h2 id="s15">人机分工声明</h2>
+<p>本文由王德生与 Claude 共同署名。三个来源领域由程序在一个「主文献不以英语为主」的领域池中随机抽取（随机种子 992601518 → 技术人类学·操作链／气象天气型分类／工业造型论），三家对立理论由检索确定；判断的形成、二维辨别表、十领域兑现（含两条收窄）、判据与证伪设计以及全部文字，由 Claude 生成；所依据的方法论框架与发表裁定由王德生给出。</p>
+<p>本文的三家主要文献分别以法语与德语写成，本文的转述依据可公开获取的评述、目录与摘要，<b>未逐条核对原著页码</b>；本文未调取任何一手考古或气象数据。这两项限制已写进第七节与第十一节。</p>
+<p><b>字数</b>　纯汉字约 1.2 万　<b>版本</b>　v1.0 · 2026-08-01</p>
+<div class="src"><div class="sl">这一篇由哪三个领域的争论撞成</div><p class="sd">三个领域各有一场正在打的架，三边对「一个反复出现的形态凭什么被判为一个真的型」给出互相排斥的答案：第一场说重复即意图（动作恒定才可被解释为有意图），第二场说型随分类目的而变、没有哪一套是正确的，第三场说形态之所以意味着某个操作是因为使用者读出了它。三个领域由程序在「主文献不以英语为主」的池中随机抽取（随机种子 992601518），三家主要文献分别以法语与德语写成，出处可自行核对。</p><a class="one" href="https://journals.ed.ac.uk/lithicstudies/article/view/2539"><div class="k">技术人类学 · Leroi-Gourhan 1964–65 ↔ Lemonnier 1986</div><div class="t">Le Geste et la Parole ／ The Study of Material Culture Today: Toward an Anthropology of Technical Systems</div><div class="g">操作链把器物还原为由动作与工具按内在句法串起的序列，其方法论支点是「正因为一个动作是恒定的、反复出现的，它才可以被解释为有意图的」；而技术选择在功能上往往是任意的、型的边界由社会画，且这套分析被批评为依赖分析者本人的经验与直觉。</div></a><a class="one" href="https://rmets.onlinelibrary.wiley.com/doi/abs/10.1002/joc.3920"><div class="k">天气型分类学 · Hess & Brezowsky 1952 ↔ COST733 一路</div><div class="t">Katalog der Großwetterlagen Europas ／ Development and comparison of circulation type classifications（Int. J. Climatol. 2016）</div><div class="g">二十九个大天气型由专家主观定义、沿用七十余年；把它与十几种自动分类放在同一批数据上系统比较后的结论是「没有任何一种分类方法对所有应用都是最优的」，每种应用都需按自己的目的构造类别，且客观化重建的序列与原序列存在系统性差异。</div></a><a class="one" href="https://www.transcript-verlag.de/shopMedia/openaccess/pdf/oa9783839455692.pdf"><div class="k">工业造型论 · 乌尔姆功能主义 ↔ 奥芬巴赫产品语言理论</div><div class="t">Der Offenbacher Ansatz. Zur Theorie der Produktsprache（开放获取）／Design als Produktsprache（2000）</div><div class="g">一条路线主张形态应由功能与制约条件推导出来；另一条提出「指示功能」——在这一层上产品只谈论它自己，它的外观指示着该怎么上手、怎么操作，相当于一份内置的使用说明书，型的判据因此落在使用者能否读出。</div></a></div>
+<div class="endbox"><p>三种读法 · 网页长文 · 在线 PDF 翻页 · PDF 下载</p>
+<p><a href="/confluence/">返回学科通融 →</a></p></div>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<footer>学科通融 · 三学科交叉 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International · <a href="/browse/">sdeuniverses.com</a></footer>
+<script>
+(function(){var b=document.getElementById('pbar'),t=document.getElementById('totop');
+function u(){var d=document.documentElement,h=d.scrollHeight-d.clientHeight;
+b.style.width=(h>0?(d.scrollTop/h*100):0)+'%';t.style.display=d.scrollTop>700?'block':'none';}
+addEventListener('scroll',u,{passive:true});u();
+t.onclick=function(){scrollTo({top:0,behavior:'smooth'});};})();
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

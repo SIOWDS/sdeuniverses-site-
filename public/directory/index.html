@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>栏目总目录 · 全站哪一栏在哪儿 | 爱思乐园 SDE Universes</title>
+<meta name="description" content="爱思乐园全站栏目总目录：今日文章、每日必读、学科通融、新思想前沿、SDE 智能体、专著栏目、主题专栏、学员专栏、社区与平台——一页看清所有栏目在哪儿。">
+<link rel="canonical" href="https://sdeuniverses.com/directory/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{
+  --bg:#F5EFE0;
+  --surface:#EBE3CE;
+  --card:#FAF6EC;
+  --card2:#F0E8D3;
+  --gold:#8A6817;
+  --gold2:#A88233;
+  --text:#2A2315;
+  --text2:#6B5D47;
+  --muted:#98886C;
+  --border:rgba(138,104,23,0.22);
+  --border2:rgba(138,104,23,0.10);
+  --claw-bg:#1A1410;
+  --claw-gold:#D4B25E;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.7;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.55rem;background:rgba(245,239,224,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-bar-main{display:flex;align-items:center;justify-content:flex-start;gap:1.9rem;width:100%}
+.nav-bar-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.55rem 1.5rem;width:100%;margin-top:0.6rem;padding-top:0.7rem;border-top:1px solid var(--border2)}
+.nav-bar-sub.nbs-grid{flex-direction:column;flex-wrap:nowrap;gap:0.30rem}
+.nbs-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:100%;max-width:1140px;margin:0 auto}
+.nbs-row a{text-align:center;padding:3px 4px;white-space:nowrap}
+.nav-bar-sub.nbs-grid .nbs-row a{font-size:0.82rem;letter-spacing:0.10em}
+@media(max-width:1180px){.nbs-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:620px){.nbs-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+.nbs-row a{white-space:normal}
+}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:600;letter-spacing:0.14em;transition:color 0.2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.78}
+.nav-logo{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;line-height:1.12;color:var(--gold);text-decoration:none}
+.nav-logo .nl-en{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;text-align:justify;text-align-last:justify;-moz-text-align-last:justify}
+.nav-logo .nl-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:0.95rem;font-weight:700;opacity:.97;text-align:justify;text-align-last:justify;-moz-text-align-last:justify;letter-spacing:0;text-indent:0}
+@media(max-width:520px){.nav-logo .nl-en{font-size:1rem}
+.nav-logo .nl-cn{font-size:0.84rem}
+}
+.nav-links{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;flex:1 1 auto;gap:0.7rem 1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;transition:color 0.2s}
+.nav-links a:hover{color:var(--gold)}
+.nav-links a.primary{color:var(--gold);font-weight:600}
+@keyframes navFlow{0%{color:#E23B3B}12.5%{color:#111111}25%{color:#E8590C}37.5%{color:#C9A000}50%{color:#1F9E3D}62.5%{color:#0C8F8F}75%{color:#1E6FD9}87.5%{color:#7C3AED}100%{color:#E23B3B}}.nav-logo{animation:navFlow 4.5s linear infinite}
+.nav-links a{animation:navFlow 4.5s linear infinite}
+.nav-links a:nth-child(1){animation-delay:-0.0s}
+.nav-links a:nth-child(2){animation-delay:-0.0s}
+.nav-links a:nth-child(3){animation-delay:-0.346s}
+.nav-links a:nth-child(4){animation-delay:-0.346s}
+.nav-links a:nth-child(5){animation-delay:-0.692s}
+.nav-links a:nth-child(6){animation-delay:-0.692s}
+.nav-links a:nth-child(7){animation-delay:-1.038s}
+.nav-links a:nth-child(8){animation-delay:-1.038s}
+.nav-links a:nth-child(9){animation-delay:-1.385s}
+.nav-links a:nth-child(10){animation-delay:-1.385s}
+.nav-links a:nth-child(11){animation-delay:-1.731s}
+.nav-links a:nth-child(12){animation-delay:-1.731s}
+.nav-links a:nth-child(13){animation-delay:-2.077s}
+.nav-links a:nth-child(14){animation-delay:-2.077s}
+.nav-links a:nth-child(15){animation-delay:-2.423s}
+.nav-links a:nth-child(16){animation-delay:-2.423s}
+.nav-links a:nth-child(17){animation-delay:-2.769s}
+.nav-links a:nth-child(18){animation-delay:-2.769s}
+.nav-links a:nth-child(19){animation-delay:-3.115s}
+.nav-links a:nth-child(20){animation-delay:-3.115s}
+.nav-links a:nth-child(21){animation-delay:-3.462s}
+.nav-links a:nth-child(22){animation-delay:-3.462s}
+.nav-links a:nth-child(23){animation-delay:-3.808s}
+.nav-links a:nth-child(24){animation-delay:-3.808s}
+.nav-links a:nth-child(25){animation-delay:-4.154s}
+.nav-links a:nth-child(26){animation-delay:-4.154s}
+.nav-links a:hover{animation-play-state:paused;text-decoration:underline;text-underline-offset:4px}
+@media(prefers-reduced-motion:reduce){.nav-logo,.nav-links a,.nav-bar-sub a{animation:none}}
+.nav-bar-sub a{animation:none}
+.nav-bar-sub a.col-hdl{color:#2E5090;font-weight:700}
+.nav-bar-sub a.col-wph{color:#8C3B32;font-weight:700}
+.nav-bar-sub a.col-crt{color:#2A6B4A}
+.nav-bar-sub a.col-edu{color:#336699}
+.nav-bar-sub a.col-hea{color:#2E8B57}
+.nav-bar-sub a.col-biz{color:#A0651F}
+.col-ent{color:#2E4B78}
+.nav-bar-sub a.col-dvg{color:#7A4A8C}
+.nav-bar-sub a.col-ai{color:#1B6E7A}
+.nav-bar-sub a.col-cht{color:#9D2933}
+.nav-bar-sub a.col-mtg{color:#0F766E;font-weight:700}
+.nav-bar-sub a.col-tap{color:#8A6A1E;font-weight:700}
+.nav-bar-sub a.col-disc{color:#3B4E9C;font-weight:700}
+.nav-bar-sub a.col-eys{color:#9A6E12;font-weight:700}
+.nav-bar-sub a.col-fic{color:#8C2F39;font-weight:700}
+.nav-bar-sub a.col-fai{color:#6A4C93;font-weight:700}
+.nav-bar-sub a.col-fam{color:#7C4A3A;font-weight:700}
+.col-art{color:#8C6A3A;font-weight:700}
+.col-how{color:#1F7A72;font-weight:700}
+.col-par{color:#B5714A;font-weight:700}
+.nav-bar-sub a.col-bgy{color:#8A6A1E;font-weight:700}
+.nav-bar-sub a.col-inv{color:#1F7A72;font-weight:700}
+.col-crt{color:#2A6B4A}
+.col-plg{color:#A32E4E}
+/* ── SDE 智能体 · Token之火 frame (wraps the two agent nav links) ── */
+@property --afang{syntax:'<angle>';initial-value:0deg;inherits:false}
+/* ===== AGENT STRIP · 每个智能体一个不同形状的框，内里烧 TOKEN ===== */
+.agent-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.7rem 1rem;width:100%;margin:.55rem 0 .2rem;padding:.6rem .4rem}
+.agent-strip-tag{font-size:.72rem;font-weight:800;letter-spacing:.18em;color:#FF8A3C;text-shadow:0 0 10px rgba(255,120,20,.5);align-self:center;white-space:nowrap}
+/* chip = 一整块 accent 色（即"框"的颜色），内里用 ::before 深色填充留出一圈边 */
+.ag-chip{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:9px 20px;text-decoration:none;isolation:isolate;background:var(--acc);transition:transform .15s,filter .2s;--acc:#E7C349;filter:drop-shadow(0 0 7px rgba(255,150,40,.35))}
+.ag-chip:hover{transform:translateY(-2px);filter:drop-shadow(0 0 11px rgba(255,170,50,.6)) brightness(1.08)}
+.ag-chip::before{content:"";position:absolute;inset:1.7px;z-index:1;background:linear-gradient(180deg,#241812 0%,#130c07 100%);clip-path:inherit;border-radius:inherit}
+/* 烧 TOKEN：火焰底光 + 上升火星，裁进内层形状 */
+.ag-flame{position:absolute;inset:1.7px;z-index:2;pointer-events:none;overflow:hidden;clip-path:inherit;border-radius:inherit}
+.ag-flame::before{content:"";position:absolute;left:0;right:0;bottom:-45%;height:130%;background:radial-gradient(60% 80% at 28% 100%,rgba(255,110,0,.6),transparent 62%),radial-gradient(55% 80% at 60% 100%,rgba(255,190,60,.55),transparent 62%),radial-gradient(55% 80% at 86% 100%,rgba(255,70,0,.55),transparent 60%);filter:blur(3px);animation:agFlick 1.6s ease-in-out infinite}
+.ag-ember{position:absolute;bottom:2px;width:4px;height:4px;border-radius:1.4px;background:linear-gradient(180deg,#fff1b0,#ff6a00);box-shadow:0 0 6px 1px rgba(255,150,0,.9);opacity:0;animation:agEmber 2.4s ease-in infinite}
+.ag-label{position:relative;z-index:3;font-size:.83rem;font-weight:800;letter-spacing:.03em;white-space:nowrap;color:#F3ECDA;text-shadow:0 0 8px var(--acc),0 1px 2px rgba(0,0,0,.7)}
+}
+/* ---- 六种不同形状（chip 与内层同一 clip-path/圆角，边自然描出形状）---- */
+.ag-pill{border-radius:999px}
+.ag-hex{clip-path:polygon(15% 0,85% 0,100% 50%,85% 100%,15% 100%,0 50%);padding:9px 30px}
+.ag-notch{clip-path:polygon(11px 0,100% 0,100% calc(100% - 11px),calc(100% - 11px) 100%,0 100%,0 11px)}
+.ag-slant{clip-path:polygon(13px 0,100% 0,calc(100% - 13px) 100%,0 100%);padding:9px 24px}
+.ag-round{border-radius:10px}
+.ag-tag{clip-path:polygon(0 0,calc(100% - 15px) 0,100% 50%,calc(100% - 15px) 100%,0 100%);padding-right:30px}
+/* ---- 六种强调（框）色 ---- */
+.ag-c1{--acc:#E7C349}
+.ag-c2{--acc:#7FC8FF}
+.ag-c3{--acc:#8FE0A0}
+.ag-c4{--acc:#82E0D3}
+.ag-c5{--acc:#4CC6C6}
+.ag-c6{--acc:#FF9A3C}
+.ag-c7{--acc:#9B7BD4}
+@media(max-width:640px){.agent-strip{gap:.5rem .55rem}
+.ag-label{font-size:.75rem}
+.ag-chip{padding:8px 14px}
+.ag-hex{padding:8px 22px}
+}
+/* the two links — escape the rainbow navFlow, glow on the dark plaque */
+.agent-fire .af-link{animation:none !important;position:relative;z-index:3;font-weight:800 !important;font-size:.82rem;line-height:1.18;letter-spacing:.03em;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer}
+.nav-links a.reg-entry{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#FAF6EC;padding:7px 16px;border-radius:20px;box-shadow:0 2px 10px rgba(138,104,23,0.35);text-decoration:none;font-weight:700;letter-spacing:0.14em;animation:none;transition:filter .15s}
+.nav-links a.reg-entry:hover{color:#FFF3D6;filter:brightness(1.08)}
+.lang-btn{padding:0.3rem 0.42rem;font-size:0.75rem;letter-spacing:0.05em;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit}
+.lang-btn.active{background:var(--gold);color:#F5EFE0;font-weight:600}
+/* 中／EN 两枚必须连着：把相邻那一侧的内边距收掉，只留外侧 —— 王德生 2026-08-18 令 */
+.lang-toggle .lang-btn:first-child{padding-right:0.16rem}
+.lang-toggle .lang-btn:last-child{padding-left:0.16rem}
+.claw-body{font-size:0.95rem;color:#C7BB9E;line-height:1.85;margin-bottom:2rem}
+}
+@media(max-width:640px){
+  nav{padding:0.6rem 1.5rem}
+.nav-bar-sub{gap:0.4rem 0.9rem;margin-top:0.5rem;padding-top:0.55rem}
+.nav-bar-sub a{font-size:0.76rem;letter-spacing:0.06em}
+.nav-links{gap:1rem}
+.nav-links a{display:none}
+.nav-links a.primary,.nav-links .lang-toggle,.nav-links a.reg-entry{display:inline-flex}
+.nav-links a.reg-entry{padding:5px 12px;letter-spacing:0.06em}
+}
+
+/* ── LANGUAGE VISIBILITY ── */
+.zh-only,.en-only{transition:opacity 0.2s}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+
+/* ── 目录页自己的版式（2026-08-18）──
+   一页目录，不是一张长卷：卡片只放去处与一句话，条目一律不进这一页。 */
+main.dir{max-width:1180px;margin:0 auto;padding:0 2rem 5rem}
+.dir-hero{padding:2.2rem 0 1.4rem;border-bottom:1px solid var(--border2)}
+.dir-hero .eyebrow{font-size:0.72rem;letter-spacing:0.34em;color:var(--gold2);margin-bottom:0.7rem}
+.dir-hero h1{font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;letter-spacing:0.02em}
+.dir-hero p{color:var(--text2);margin-top:0.7rem;max-width:56ch}
+.dir-hero .qbar{margin-top:1.3rem;display:flex;flex-wrap:wrap;gap:0.5rem}
+.dir-hero .qbar a{display:inline-block;padding:5px 14px;border:1px solid var(--border);border-radius:18px;
+  text-decoration:none;color:var(--text);font-size:0.86rem;background:var(--card)}
+.dir-hero .qbar a:hover{background:var(--card2);border-color:var(--gold2)}
+section.grp{padding:2.1rem 0 0.4rem;border-bottom:1px solid var(--border2);scroll-margin-top:150px}
+section.grp>.eyebrow{font-size:0.68rem;letter-spacing:0.3em;color:var(--gold2)}
+section.grp>h2{font-size:1.42rem;font-weight:600;margin:0.35rem 0 0.3rem}
+section.grp>.lede{color:var(--text2);font-size:0.94rem;max-width:62ch;margin-bottom:1.1rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:0.85rem;padding-bottom:1.6rem}
+a.card-l{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--border2);
+  border-left:3px solid var(--gold2);padding:0.85rem 1rem;transition:background .16s,border-color .16s;scroll-margin-top:150px}
+a.card-l:hover{background:var(--card2);border-color:var(--border)}
+a.card-l b{display:block;font-size:1.02rem;font-weight:600;margin-bottom:0.28rem}
+a.card-l span{display:block;font-size:0.85rem;color:var(--text2);line-height:1.62}
+.dir-foot{padding:2rem 0 0;color:var(--text2);font-size:0.88rem}
+.dir-foot a{color:var(--gold);text-decoration:none}
+.dir-foot a:hover{text-decoration:underline}
+.dir-foot .scroll-note{margin-top:0.9rem;padding:0.9rem 1rem;background:var(--card);border:1px dashed var(--border);font-size:0.86rem}
+@media(max-width:760px){main.dir{padding:0 1.1rem 4rem}.cards{grid-template-columns:1fr}}
+
+body{padding-top:150px}
+@media(max-width:900px){body{padding-top:190px}}
+</style>
+</head>
+<body class="zh">
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/browse/"><span class="nl-en">SDE Universes</span><span class="nl-cn">爱思乐园</span></a>
+  <div class="nav-links">
+    <a href="/search/" class="primary zh-only" style="border:1px solid var(--gold);border-radius:16px;padding:3px 13px">🔍 搜索</a><a href="/search/" class="primary en-only" style="border:1px solid var(--gold);border-radius:16px;padding:3px 13px">🔍 Search</a><a href="/taste/chatsde/" class="zh-only wdsm-navbtn wdsm-static" style="border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700;text-decoration:none">✦ ChatSDE</a><a href="/taste/chatsde/" class="en-only wdsm-navbtn wdsm-static" style="border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700;text-decoration:none">✦ ChatSDE</a>
+    
+    <a href="/paradigm/" class="zh-only" style="color:#B5714A;font-weight:700" title="站内碰撞 —— 三篇站内学员论文撞出的典范文">每日必读</a><a href="/paradigm/" class="en-only" style="color:#B5714A;font-weight:700" title="In-house collisions — three site papers collided">Must Read</a>
+    <a href="/confluence/" class="zh-only" style="color:#7E9A55;font-weight:700" title="站外碰撞 —— 三个不同学科的外部理论体系撞出的典范文">学科通融</a><a href="/confluence/" class="en-only" style="color:#7E9A55;font-weight:700" title="Cross-discipline collisions — three external theories collided">Confluence</a><a href="/frontier/" class="zh-only" style="color:#4B3FA0;font-weight:700" title="近十年各主要领域最新思想摘要 · 100 学科面板 · 王德生亲撰">新思想前沿</a><a href="/frontier/" class="en-only" style="color:#4B3FA0;font-weight:700" title="Frontier of new ideas across 100 disciplines">Frontier</a>
+    <a href="/drwang/" class="zh-only">王博士与SDE</a><a href="/drwang/" class="en-only">Dr. Wang &amp; SDE</a>
+    
+    
+    
+    
+    
+    <a href="/students/" class="zh-only">学员专栏</a><a href="/students/" class="en-only">Students</a>
+    <a href="https://huazhi-sde.com" target="_blank" rel="noopener" class="zh-only">娄底华智</a><a href="https://huazhi-sde.com" target="_blank" rel="noopener" class="en-only">Loudi Huazhi</a>
+    <a href="/recruit/" class="zh-only" style="color:#C9A227;font-weight:700" title="河源数元 · 智能体平台合作开发学徒招募 · 仅招5人 · 9月10日开班">学徒招募 · 仅5人</a><a href="/recruit/" class="en-only" style="color:#C9A227;font-weight:700" title="Agent Platform Apprenticeship · 5 seats only">Apprenticeship</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <a class="reg-entry" href="/register/" title="注册进入学员名录：社区发言 · 文章留言 · 投稿 · 开专栏"><span class="zh-only">注册入口</span><span class="en-only">REGISTER</span></a>
+  </div>
+  </div>
+  <!-- AGENT STRIP · 每个智能体一个不同形状的框、内里烧 TOKEN -->
+<div class="agent-strip" aria-label="SDE 智能体（烧 TOKEN 的活体智能体）">
+  <span class="agent-strip-tag zh-only">🔥 智能体</span><span class="agent-strip-tag en-only">🔥 Agents</span>
+  <a href="/taste/idea-generator/" class="ag-chip ag-hex ag-c2" role="group" aria-label="SDE金点子"><span class="ag-flame" aria-hidden="true"><i class="ag-ember" style="left:22%;animation-delay:0s"></i><i class="ag-ember" style="left:50%;animation-delay:0.5s"></i><i class="ag-ember" style="left:78%;animation-delay:1.0s"></i></span><span class="ag-label zh-only">✦ SDE金点子</span><span class="ag-label en-only">✦ SDE Idea Gen</span></a>
+  <a href="/taste/zhiwen/" class="ag-chip ag-notch ag-c3" role="group" aria-label="中华智问"><span class="ag-flame" aria-hidden="true"><i class="ag-ember" style="left:22%;animation-delay:0s"></i><i class="ag-ember" style="left:50%;animation-delay:0.5s"></i><i class="ag-ember" style="left:78%;animation-delay:1.0s"></i></span><span class="ag-label zh-only">⟁ 中华智问</span><span class="ag-label en-only">⟁ Zhiwen</span></a>
+  <a href="/taste/iq-scorer/" class="ag-chip ag-slant ag-c1" role="group" aria-label="SDE创新智商评分官"><span class="ag-flame" aria-hidden="true"><i class="ag-ember" style="left:22%;animation-delay:0s"></i><i class="ag-ember" style="left:50%;animation-delay:0.5s"></i><i class="ag-ember" style="left:78%;animation-delay:1.0s"></i></span><span class="ag-label zh-only">◈ 创新智商测试</span><span class="ag-label en-only">◈ Innovation IQ</span></a>
+  <a href="/taste/" class="ag-chip ag-tag ag-c6" role="group" aria-label="SDE智能体免费品尝"><span class="ag-flame" aria-hidden="true"><i class="ag-ember" style="left:22%;animation-delay:0s"></i><i class="ag-ember" style="left:50%;animation-delay:0.5s"></i><i class="ag-ember" style="left:78%;animation-delay:1.0s"></i></span><span class="ag-label zh-only">免费品尝全部 →</span><span class="ag-label en-only">Taste all agents →</span></a>
+</div>
+<div class="nav-bar-sub nbs-grid">
+    <div class="nbs-row">
+      <a href="/today/" class="col-tap zh-only">今日文章</a><a href="/today/" class="col-tap en-only">Today</a>
+      <a href="/monographs/" class="col-tap zh-only">专著栏目</a><a href="/monographs/" class="col-tap en-only">Monographs</a>
+      <a href="/creation/" class="col-crt zh-only">学术创造</a><a href="/creation/" class="col-crt en-only">Academic Creation</a>
+      <a href="/thought/" class="col-wph zh-only">哲学与思想</a><a href="/thought/" class="col-wph en-only">Thought</a>
+      <a href="/discovery-vs-genesis/" class="col-dvg zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="col-dvg en-only">Discovery vs Genesis</a>
+      <a href="/ai/" class="col-ai zh-only">AI 专栏</a><a href="/ai/" class="col-ai en-only">AI</a>
+    </div>
+    <div class="nbs-row">
+      <a href="/education/" class="col-edu zh-only">教育专栏</a><a href="/education/" class="col-edu en-only">Education</a>
+      <a href="/health/" class="col-hea zh-only">健康专栏</a><a href="/health/" class="col-hea en-only">Health</a>
+      <a href="/life/" class="col-fam zh-only">人生与家庭</a><a href="/life/" class="col-fam en-only">Life &amp; Family</a>
+      <a href="/business/" class="col-biz zh-only">商业与经济</a><a href="/business/" class="col-biz en-only">Business</a>
+      <a href="/culture/" class="col-art zh-only">文化与艺术</a><a href="/culture/" class="col-art en-only">Culture &amp; Art</a>
+      <a href="/how/" class="col-how zh-only">怎么做</a><a href="/how/" class="col-how en-only">How To</a>
+    </div>
+  </div>
+</nav>
+<main class="dir">
+  <div class="dir-hero">
+    <p class="eyebrow">BROWSE · SITE DIRECTORY</p>
+    <h1>浏览 · 栏目总目录</h1>
+    <p>这一页只回答一个问题：<b>哪一栏在哪儿。</b>条目不在这里——各栏自己的页里才有。要找具体某一篇，用<a href="/search/" style="color:var(--gold)">全站检索</a>比翻目录快得多。</p>
+    <div class="qbar">
+      <a href="/today/">今日文章</a><a href="/paradigm/">每日必读</a><a href="/confluence/">学科通融</a><a href="/frontier/">新思想前沿</a><a href="/taste/chatsde/">ChatSDE</a><a href="/students/">学员专栏</a><a href="/search/">🔍 全站检索</a>
+    </div>
+  </div>
+  <section class="grp" id="today-articles">
+    <p class="eyebrow">TODAY</p>
+    <h2>今日文章</h2>
+    <p class="lede">每天在这里更新的一切。两条 feed 都在 /today/ 里——长文一条，动态一条。</p>
+    <div class="cards">
+      <a class="card-l" id="today-longread" href="/today/#today-longread"><b>今日长文</b><span>当天发布的万字长文，按日期倒序，最新一篇在最上面。</span></a>
+      <a class="card-l" id="daily" href="/today/#daily"><b>每日更新</b><span>这个宇宙今天又长出了什么：新论文、新频道、新专著，逐条记。</span></a>
+      <a class="card-l" id="feed" href="/today/"><b>两条一起看</b><span>今日文章总页，长文与动态在同一页。</span></a>
+      <a class="card-l" id="daily-quotes" href="/quotes/"><b>今日三句</b><span>每天从已发表专栏正文里抽三句承重句；池子里还有往日全部。</span></a>
+    </div>
+  </section>
+  <section class="grp" id="must-read">
+    <p class="eyebrow">COLLISION</p>
+    <h2>三条主力栏目</h2>
+    <p class="lede">站里最新的思想都从这三条出：站内碰撞、站外碰撞、各学科前沿摘要。</p>
+    <div class="cards">
+      <a class="card-l" href="/paradigm/"><b>每日必读 · 典范文</b><span>Claude 在王德生指导下把三篇站内论文正面撞在一起，撞出任何一篇单看都看不见的判断。</span></a>
+      <a class="card-l" href="/confluence/"><b>学科通融</b><span>撞的是站外三个不同学科的理论体系——先找到它们在同一问题上互相排斥的地方，再撞。</span></a>
+      <a class="card-l" href="/frontier/"><b>新思想前沿</b><span>近十年各主要领域最新思想摘要，六百余块学科面板，王德生亲撰。</span></a>
+    </div>
+  </section>
+  <section class="grp" id="taste">
+    <p class="eyebrow">AGENTS</p>
+    <h2>SDE 智能体 · 免费品尝</h2>
+    <p class="lede">用你自己的 API Key，浏览器直连厂商，服务器不经手；不注册、不留痕。</p>
+    <div class="cards">
+      <a class="card-l" href="/taste/chatsde/"><b>ChatSDE</b><span>全站问答与 SDE 对谈：站内三千余篇随问随引。</span></a>
+      <a class="card-l" href="/taste/idea-generator/"><b>SDE 金点子</b><span>把一个具体问题喂进去，长出可以被推翻的新命题。</span></a>
+      <a class="card-l" href="/taste/zhiwen/"><b>中华智问</b><span>用发生学的眼读中华典籍。</span></a>
+      <a class="card-l" href="/taste/iq-scorer/"><b>创新智商评分官</b><span>五维盲评一段思想文本走得多深。</span></a>
+      <a class="card-l" href="/taste/confluence/"><b>学科通融机</b><span>三门学问进，一个新读数出。</span></a>
+      <a class="card-l" href="/taste/"><b>全部智能体 →</b><span>品尝系列总入口。</span></a>
+    </div>
+  </section>
+  <section class="grp" id="drwang">
+    <p class="eyebrow">DR. WANG</p>
+    <h2>王博士与 SDE</h2>
+    <p class="lede">一个具体的问题，长成一套新地基。</p>
+    <div class="cards">
+      <a class="card-l" href="/drwang/"><b>专栏总页</b><span>从九十年代那间机房到 SDE 发生学，一条线读下来。</span></a>
+      <a class="card-l" id="grid" href="/column/ontology-grid/"><b>三维九宫</b><span>一套本体论的九个入口：在 E 中，经 D，成 S。</span></a>
+      <a class="card-l" id="master" href="/master/"><b>解构大师</b><span>用发生学的眼，解构思想史上的巨人。</span></a>
+      <a class="card-l" href="/philosophy/"><b>SDE 哲学</b><span>三大方程、123 原理、意义三律。</span></a>
+    </div>
+  </section>
+  <section class="grp" id="monograph">
+    <p class="eyebrow">BOOKS</p>
+    <h2>专著栏目</h2>
+    <p class="lede">德麦国际出版的跨域专著，与各书的摘要导读。</p>
+    <div class="cards">
+      <a class="card-l" href="/monographs/"><b>专著导读</b><span>每部书一页摘要，先读导读再决定读哪本。</span></a>
+      <a class="card-l" id="books" href="/books/"><b>德麦国际专著</b><span>全部已出版专著书架。</span></a>
+      <a class="card-l" href="/books/sde-ontology-intro/"><b>《SDE 本体论入门》</b><span>把根本追问从「世界是什么」换成「世界如何发生」。</span></a>
+    </div>
+  </section>
+  <section class="grp" id="columns">
+    <p class="eyebrow">COLUMNS</p>
+    <h2>主题专栏</h2>
+    <p class="lede">按题分栏，每一栏都是一个持续在长的方向。</p>
+    <div class="cards">
+      <a class="card-l" href="/creation/"><b>学术创造</b><span>研究哲学、创造力、写作发生学。</span></a>
+      <a class="card-l" href="/thought/"><b>哲学与思想</b><span>西方哲学解构与思想史。</span></a>
+      <a class="card-l" href="/discovery-vs-genesis/"><b>发现 VS 发生</b><span>这套理论最锋利的那条分界。</span></a>
+      <a class="card-l" href="/ai/"><b>AI 专栏</b><span>大模型、智能体，与人还剩下什么。</span></a>
+      <a class="card-l" href="/education/"><b>教育专栏</b><span>从应试到发生：教育被什么卡住。</span></a>
+      <a class="card-l" href="/health/"><b>健康专栏</b><span>健康发生学与医学频道。</span></a>
+      <a class="card-l" href="/life/"><b>人生与家庭</b><span>婚姻、家庭、信仰、时间。</span></a>
+      <a class="card-l" href="/business/"><b>商业与经济</b><span>企业本体论与经济发生学。</span></a>
+      <a class="card-l" href="/culture/"><b>文化与艺术</b><span>我文化、艺术裁决、中华典籍。</span></a>
+      <a class="card-l" href="/how/"><b>怎么做</b><span>落到操作那一层的实践文。</span></a>
+    </div>
+  </section>
+  <section class="grp" id="features">
+    <p class="eyebrow">CHANNELS</p>
+    <h2>特色频道</h2>
+    <p class="lede">近期新开的专栏与频道，每一个都是一整套写完的。</p>
+    <div class="cards">
+      <a class="card-l" href="/exam-education/"><b>应试教育</b><span>划线、清点、算账：应试与教育的分界落在哪个可查的地方。</span></a>
+      <a class="card-l" href="/students/hu-min/mediation/"><b>中介</b><span>中介与抽成在哪里分开，去中介化怎样才走得出去。</span></a>
+      <a class="card-l" href="/marriage-happiness/"><b>婚姻幸福</b><span>幸福不是没有裂缝，而是两个人仍能在裂缝中生成共同生活。</span></a>
+      <a class="card-l" href="/students/chen-xiaoyan/precision-medicine/"><b>精准医疗与慢病发生学</b><span>自组织权被接管之后，身体还剩哪一段是自己的。</span></a>
+      <a class="card-l" href="/family-ethics/"><b>家庭与伦理</b><span>功能被一样样接走之后，家没有散——痛苦替下了它们。</span></a>
+      <a class="card-l" href="/faith-and-life/"><b>信仰与人生</b><span>当算法替我们解释世界，信仰从确定性退回承担。</span></a>
+      <a class="card-l" href="/art/"><b>艺术专栏</b><span>艺术被剩在那个还要求人亲自踩下去的位置上。</span></a>
+      <a class="card-l" href="/sde-education/"><b>SDE 教育学</b><span>「传道授业」里那个「传」字，从未被拿出来检查过。</span></a>
+      <a class="card-l" href="/involution/"><b>内卷与出路</b><span>内卷不是竞争太狠，是 0—1 的发生窗口缺席。</span></a>
+      <a class="card-l" href="/i-culture/"><b>我文化</b><span>人情稳「时」、面子稳「位」、关系稳「势」。</span></a>
+    </div>
+  </section>
+  <section class="grp" id="students">
+    <p class="eyebrow">STUDENTS</p>
+    <h2>学员与师范</h2>
+    <p class="lede">学员的论文、专著与专栏——站上大部分新思想是从这里长出来的。</p>
+    <div class="cards">
+      <a class="card-l" href="/students/"><b>学员专栏</b><span>全部学员名册、作品与排名。</span></a>
+      <a class="card-l" href="/mentor/"><b>师范文</b><span>怎么带一个人从提问走到成篇。</span></a>
+      <a class="card-l" href="/students/submit/"><b>投稿</b><span>把你的稿子投进来。</span></a>
+      <a class="card-l" href="/recruit/"><b>学徒招募</b><span>智能体平台合作开发学徒，仅招 5 人。</span></a>
+    </div>
+  </section>
+  <section class="grp" id="brain-gym">
+    <p class="eyebrow">DAILY</p>
+    <h2>健脑三件日课</h2>
+    <p class="lede">智能体是给你跑产线的，这三件是给你自己练的。不烧 Key、不注册，记录只存在你自己的浏览器里。</p>
+    <div class="cards">
+      <a class="card-l" href="/brain-gym/"><b>健脑专栏</b><span>三件日课总入口。</span></a>
+      <a class="card-l" href="/challenge/"><b>每日挑战</b><span>一天一道，练的是提问不是答题。</span></a>
+      <a class="card-l" href="/training/"><b>训练场</b><span>把一个念头逐步锻造成命题。</span></a>
+      <a class="card-l" href="/growth-tree/"><b>成长树</b><span>看自己这半年长到哪儿了。</span></a>
+    </div>
+  </section>
+  <section class="grp" id="community">
+    <p class="eyebrow">COMMUNITY</p>
+    <h2>社区与平台</h2>
+    <p class="lede">人在的地方。会议、广场、微信群，以及这个平台到底是个什么地方。</p>
+    <div class="cards">
+      <a class="card-l" href="/meeting/"><b>SDE 会议</b><span>大教室、答疑室、讨论室，输入会议号即入。</span></a>
+      <a class="card-l" href="/sde-talk/"><b>SDE 广场</b><span>全站公共聊天室。</span></a>
+      <a class="card-l" href="/discussions/"><b>讨论区</b><span>按篇讨论，实名登录。</span></a>
+      <a class="card-l" href="/sde-wechat/"><b>SDE 微信</b><span>群聊、私聊、通讯录。</span></a>
+      <a class="card-l" href="/about/"><b>平台介绍</b><span>这里到底是个什么地方，两万字讲清楚。</span></a>
+      <a class="card-l" href="/search/"><b>全站检索</b><span>三千余篇、八千余万字，一个框里问。</span></a>
+    </div>
+  </section>
+  <div class="dir-foot">
+    <p class="scroll-note">要一页滚完全站的旧版长卷（今日三句、智能体集群、各专栏预告依次排下来）仍在：<a href="/overview/">总览长卷 →</a></p>
+    <p style="margin-top:1.2rem">© 德麦国际 · <a href="/browse/">回首页</a> · <a href="/home/">回系统入口</a></p>
+  </div>
+</main>
+<script>
+// 中英切换：这一页自带一份最小实现（首页那份绑在 renderMatrix 上，搬不过来）
+function setLang(lang){
+  var cl=document.body.classList; cl.remove('zh'); cl.remove('en'); cl.add(lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.classList.toggle('active', b.textContent.toLowerCase()===lang || (b.textContent==='中'&&lang==='zh'));
+  });
+  document.documentElement.lang = lang==='zh' ? 'zh' : 'en';
+  try{ localStorage.setItem('sde_wds_lang', lang); }catch(e){}
+}
+try{ var _l=localStorage.getItem('sde_wds_lang'); if(_l==='en') setLang('en'); }catch(e){}
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

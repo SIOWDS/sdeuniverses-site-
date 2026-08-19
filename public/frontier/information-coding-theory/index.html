@@ -1,0 +1,289 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息论与编码理论 · 新思想前沿 · SDE Universes</title>
+<meta name="description" content="从压缩感知、Raptor码、有限码长与极化码到DNA存储、私有信息检索、语义通信、量子LDPC和目标导向编码，审计信息的可传、可存与可恢复边界。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:2rem 0 .35rem}
+h2 .en{display:block;font-size:.8rem;font-weight:500;color:var(--muted);letter-spacing:.02em;margin-top:.15rem;font-family:Georgia,serif}
+p{margin:0 0 1.1rem;text-align:justify}
+.src{font-size:.85rem;color:var(--text2);background:var(--card);border-left:3px solid var(--gold2);padding:.5rem .8rem;margin:0 0 .9rem;line-height:1.8}
+.src i{font-style:normal;color:var(--gold2);font-weight:600;margin-right:.4em}
+.era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+
+.act{margin:2.6rem 0 .2rem;padding:.5rem .9rem;background:var(--card);border-left:4px solid var(--gold);font-size:1.02rem;font-weight:600;color:var(--gold)}
+.refs{font-size:.82rem;color:var(--text2);line-height:1.85}
+.refs ol{padding-left:1.4rem;margin:0}
+.refs li{margin-bottom:.45rem}
+h3.sec{font-size:1.1rem;font-weight:600;color:var(--gold);margin:2.2rem 0 .6rem;padding-top:1rem;border-top:1px solid var(--border)}
+.col{font-size:.83rem;color:var(--text2);background:rgba(138,104,23,0.07);border-left:3px solid var(--muted);padding:.5rem .8rem;margin:0 0 1.4rem;line-height:1.8}
+.col i{font-style:normal;color:var(--gold2);font-weight:600;margin-right:.35em}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">数理、信息与计算主干 · 信息理论</span></div>
+<main><div class="kicker">新思想前沿 · 数理、信息与计算主干 · 信息理论</div>
+<h1>信息论与编码理论</h1>
+<div class="meta">第 581 号 · 近二十年 · <b>两幕 · 20 个新思想</b> · 约 26,045 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">信息论的前沿不再只问渐近容量是多少，而是追问有限时延、有限能量、隐私、计算成本和任务语义同时存在时，哪些信息必须保存、哪些冗余可以利用、哪些错误永远无法靠更长码字消除。本面板用二十个转折把‘比特可靠性’推进到‘任务可验证性’。</p>
+<div class="act">【第一幕】上一个十年 · 约 2006–2016</div>
+<p>第一幕追踪信息论与编码理论如何把旧问题变成可执行、可测量的对象；判断标准始终是信息论与编码理论成立的决定性机制，是把可恢复对象、资源预算和失败概率写进同一有限尺度，而不是用无穷码长容量替代现实系统。</p>
+<h2>甲、Raptor喷泉码<span class="en">Raptor Codes</span></h2>
+<div class="src"><i>提出</i>Shokrollahi, IEEE Transactions on Information Theory 52, 2551–2567 (2006), doi:10.1109/TIT.2006.874390　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>用预编码加LT码从任意足量符号恢复消息</div>
+<p>Shokrollahi 2006改写了近线性译码能否在短块与反馈受限时保持开销；Raptor码把接收哪一组分组从固定位置改成足量条件让旧默认有了可查裂缝。沿责任链继续追问，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；喷泉码分母改变便重算结论。以同一服务单位复算，补列未采用和失败样本；喷泉码据此区分证据与宣传（Shokrollahi 2006）。</p>
+<p>本条只承认用预编码加LT码从任意足量符号恢复消息；移除后若Raptor码把接收哪一组分组从固定位置改成足量条件仍出现，立场即撤回。以同一服务单位复算，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；喷泉码投运后仍保留责任主体。面对分布外情形，固定服务基线再做消融；喷泉码由此留下可执行否证入口（Polyanskiy &amp; Wu 2024）。</p>
+<p>Shokrollahi 2006的硬证据是Raptor码把接收哪一组分组从固定位置改成足量条件，互联网广播和分发因此不必逐包重传；实际兑现数／全部候选与中止数才可复算。面对分布外情形，最低记录还须给出原始分子、总体分母、观察期与退出原因；喷泉码须连同不确定性报告结果。为防止事后改口，公开分子分母与退出；喷泉码局部增益不得冒充系统收益（Shokrollahi 2006；IEEE Communications Society 2025）。喷泉码复核门槛预注册3站×13批次。</p>
+<p>Polyanskiy &amp; Wu 2024保留短块、相关丢包与实现图结构会抬高额外符号；喷泉码越界后须重判方向。为防止事后改口，应分开常态与极端样本，并把反号结论收窄到实际适用区间；喷泉码醒目纪录仍须排除筛选效应。在下一轮独立复核里，分列常态极端与反号；喷泉码记录须回到全量分母。若要把这一判断写进合同，分列常态极端与反号；喷泉码分母改变便重算结论（Shokrollahi 2006）。</p>
+<p>IEEE Communications Society 2025记录标准化实现继续以有限块长和失包分布校正渐近结论；维护账须继续追踪Raptor码把接收哪一组分组从固定位置改成足量条件。在下一轮独立复核里，还须把许可、维护、责任主体和退出条件按版本保存；缺少这一列就无法判断方向有没有翻转。若要把这一判断写进合同，保存许可维护与责任版本；一旦结果反号就应撤回原来的充分性主张（Polyanskiy &amp; Wu 2024）。</p>
+<p>跨域比较以短块、相关丢包与实现图结构会抬高额外符号划界，并用Raptor码把接收哪一组分组从固定位置改成足量条件重算用预编码加LT码从任意足量符号恢复消息。若要把这一判断写进合同，先统一功能单位与时间窗，再把边界条件作为共同反例；喷泉码局部增益不得冒充系统收益。从失败样本回看，统一单位时间窗和边界；喷泉码把观察记录接回问责链（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>S——Raptor喷泉码主机制足够驱动　<i>单因</i>只认Raptor喷泉码主机制　<i>预设</i>〔01 谁进入分母〕默认近线性译码能否在短块与反馈受限时保持开销　<i>量纲</i>Raptor喷泉码主机制兑现数／全部候选与中止数　<i>失效</i>当短块、相关丢包与实现图结构会抬高额外符号时，Raptor喷泉码主机制越高，系统净效应反而越低　<i>自曝</i>对象清单独立核验：主证据先把自己的纳入边界暴露出来：Raptor喷泉码主证据；独立撤回检查落在对象清单　<i>空栏</i>未列短块、相关丢包与实现图结构会抬高额外符号引起的退出与转移成本　<i>异名</i>不平等研究称“行政数据取代调查数据”；另见第 082 号丁“行政数据取代调查数据”</div>
+<h2>乙、压缩感知<span class="en">Compressed Sensing</span></h2>
+<div class="src"><i>提出</i>Candès, Romberg &amp; Tao, IEEE Transactions on Information Theory 52, 489–509 (2006), doi:10.1109/TIT.2005.862083　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>用少于奈奎斯特数量的线性测量恢复稀疏信号</div>
+<p>Candès, Romberg &amp; Tao, IEEE Transactions on Information Theory 52, 489–509 (2006)把压缩感知从愿景改写为可失败的工程对象。它针对的是稀疏先验是否真实存在且测量矩阵能否满足恢复条件；随机测量与凸优化证明稀疏对象可从欠定观测稳定恢复，采样从逐点记录转为结构编码则说明旧体系为何无法再用一项峰值或一次投运交差。以同一服务单位复算，补列未采用和失败样本；压缩感知分母改变便重算结论（Candès 2083）。</p>
+<p>可反驳命题写得很窄：只有用少于奈奎斯特数量的线性测量恢复稀疏信号能使压缩感知保持原方向。增加预算与样本不能替代这一步，反之若随机测量与凸优化证明稀疏对象可从欠定观测稳定恢复，采样从逐点记录转为结构编码由其他机制同样产生，本条必须撤回单因。面对分布外情形，固定服务基线再做消融；压缩感知投运后仍保留责任主体（Polyanskiy &amp; Wu 2024）。</p>
+<p>第三段的硬账来自Candès, Romberg &amp; Tao, IEEE Transactions on Information Theory 52, 489–509 (2006)所报告的随机测量与凸优化证明稀疏对象可从欠定观测稳定恢复，采样从逐点记录转为结构编码。应同时记录成功数／全部尝试数、实际周期／设计周期以及边界内外的差值，才能知道用少于奈奎斯特数量的线性测量恢复稀疏信号是否真的兑现。为防止事后改口，公开分子分母与退出；压缩感知据此区分设备存在与服务兑现（Candès 2083；IEEE Communications Society 2025）。压缩感知复核门槛预注册4站×15批次。</p>
+<p>Polyanskiy &amp; Wu 2024把边界写成近似稀疏、相干字典和噪声会破坏保证，测量数少不等于总采集成本低；此时局部收益可能翻成系统损失。在下一轮独立复核里，应分开常态与极端样本，并把反号结论收窄到实际适用区间；压缩感知醒目纪录仍须排除筛选效应。若要把这一判断写进合同，分列常态极端与反号；压缩感知记录须回到全量分母（Candès 2083）。</p>
+<p>IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).把近期进展概括为结构化测量与模型失配理论持续限定恢复保证。对压缩感知的制度含义，是合同须规定数据归属、失效报告与长期责任，并按随机测量与凸优化证明稀疏对象可从欠定观测稳定恢复，采样从逐点记录转为结构编码复核撤场后的证据链。若要把这一判断写进合同，保存许可维护与责任版本；缺少这一列就无法判断方向有没有翻转（Polyanskiy &amp; Wu 2024）。</p>
+<p>压缩感知与外部面板共享的是“可测代理等于真实服务”这一预设，分歧点则在随机测量与凸优化证明稀疏对象可从欠定观测稳定恢复，采样从逐点记录转为结构编码。把近似稀疏、相干字典和噪声会破坏保证，测量数少不等于总采集成本低加入共同分母后，两个领域原本一致的排序可能交换。从失败样本回看，统一单位时间窗和边界；压缩感知局部增益不得冒充系统收益（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>D——压缩感知主机制足够驱动　<i>单因</i>只认压缩感知主机制　<i>预设</i>〔01 谁进入分母〕默认稀疏先验是否真实存在且测量矩阵能否满足恢复条件　<i>量纲</i>压缩感知主机制兑现数／全部候选与中止数　<i>失效</i>当近似稀疏、相干字典和噪声会破坏保证时，压缩感知主机制越高，系统净效应反而越低　<i>自曝</i>事件时间轴独立核验：运行日志没有替路线遮掩这一点：压缩感知主证据；独立撤回检查落在事件时间轴　<i>空栏</i>未列近似稀疏、相干字典和噪声会破坏保证引起的退出与转移成本　<i>异名</i>流行病学称“跨尺度回写 —— 个体层面的风险因素，何时才转化为人群层面的负担下降”；另见第 119 号第八条“因果图：调整变量由路径结构而非显著性筛选”</div>
+<h2>丙、极化码<span class="en">Polar Codes</span></h2>
+<div class="src"><i>提出</i>Arıkan, IEEE Transactions on Information Theory 55, 3051–3073 (2009), doi:10.1109/TIT.2009.2021379　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>通过信道极化构造可靠与不可靠比特通道</div>
+<p>Arıkan 2021改写了渐近容量实现能否在有限长度和低时延译码中兑现；极化变换首次给出二元离散无记忆信道的显式低复杂度容量达到码让旧默认有了可查裂缝。面对分布外情形，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；极化码分母改变便重算结论。为防止事后改口，补列未采用和失败样本；极化码醒目纪录仍须排除筛选效应（Arıkan 2021）。</p>
+<p>本条只承认通过信道极化构造可靠与不可靠比特通道；移除后若极化变换首次给出二元离散无记忆信道的显式低复杂度容量达到码仍出现，立场即撤回。为防止事后改口，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；极化码须分开验收常态与压力场景。在下一轮独立复核里，固定服务基线再做消融；缺少这一列就无法判断方向有没有翻转（Polyanskiy &amp; Wu 2024）。</p>
+<p>Arıkan 2021报告极化变换首次给出二元离散无记忆信道的显式低复杂度容量达到码；极化码以兑现数／候选与中止总数结算。在下一轮独立复核里，最低记录还须给出原始分子、总体分母、观察期与退出原因；极化码据此区分设备存在与服务兑现。若要把这一判断写进合同，公开分子分母与退出；极化码局部增益不得冒充系统收益。从失败样本回看，公开分子分母与退出；极化码把观察记录接回问责链（Arıkan 2021；IEEE Communications Society 2025）。极化码复核门槛预注册5站×17批次。</p>
+<p>Polyanskiy &amp; Wu 2024保留有限码长下连续消除译码性能弱；极化码越界后须重判方向。若要把这一判断写进合同，应分开常态与极端样本，并把反号结论收窄到实际适用区间；极化码醒目纪录仍须排除筛选效应。从失败样本回看，分列常态极端与反号；极化码记录须回到全量分母。把观察窗拉长以后，分列常态极端与反号；极化码分母改变便重算结论（Arıkan 2021）。</p>
+<p>IEEE Communications Society 2025记录列表译码与5G控制信道实现把有限长度推到工程中心；维护账须继续追踪极化变换首次给出二元离散无记忆信道的显式低复杂度容量达到码。从失败样本回看，还须把许可、维护、责任主体和退出条件按版本保存；缺少这一列就无法判断方向有没有翻转。把观察窗拉长以后，保存许可维护与责任版本；一旦结果反号就应撤回原来的充分性主张（Polyanskiy &amp; Wu 2024）。</p>
+<p>跨域比较以有限码长下连续消除译码性能弱划界，并用极化变换首次给出二元离散无记忆信道的显式低复杂度容量达到码重算通过信道极化构造可靠与不可靠比特通道。把观察窗拉长以后，先统一功能单位与时间窗，再把边界条件作为共同反例；极化码局部增益不得冒充系统收益。对照未采用者时，统一单位时间窗和边界；极化码把观察记录接回问责链（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>E——极化码主机制足够驱动　<i>单因</i>只认极化码主机制　<i>预设</i>〔01 谁进入分母〕默认渐近容量实现能否在有限长度和低时延译码中兑现　<i>量纲</i>极化码主机制兑现数／全部候选与中止数　<i>失效</i>当有限码长下连续消除译码性能弱时，极化码主机制越高，系统净效应反而越低　<i>自曝</i>装置边界独立核验：作者在误差讨论里留下了反证入口：极化码主证据；独立撤回检查落在装置边界　<i>空栏</i>未列有限码长下连续消除译码性能弱引起的退出与转移成本　<i>异名</i>心理健康服务称“等待时间治理：快进入错误服务不等于获得治疗”；另见第 127 号第十七条“等待时间治理：快进入错误服务不等于获得治疗”</div>
+<h2>丁、有限码长信息论<span class="en">Finite-Blocklength Information Theory</span></h2>
+<div class="src"><i>提出</i>Polyanskiy, Poor &amp; Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769　<i>争议</i>Jiang et al., IEEE Journal on Selected Areas in Communications 39, 1548–1563 (2021), doi:10.1109/JSAC.2021.3070639。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>把容量改写为码长误差率与速率的三变量边界</div>
+<p>Polyanskiy 2043改写了二阶正态近似能否覆盖超短包和非渐近平滑信道；研究给出有限码长可达率的非渐近上下界和色散项让旧默认有了可查裂缝。为防止事后改口，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；有限码长信息据此与邻域同尺度对撞。在下一轮独立复核里，补列未采用和失败样本；有限码长信息醒目纪录仍须排除筛选效应（Polyanskiy 2043）。</p>
+<p>本条只承认把容量改写为码长误差率与速率的三变量边界；移除后若研究给出有限码长可达率的非渐近上下界和色散项仍出现，立场即撤回。在下一轮独立复核里，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；有限码长信息须分开验收常态与压力场景。若要把这一判断写进合同，固定服务基线再做消融；缺少这一列就无法判断方向有没有翻转（Polyanskiy &amp; Wu 2024）。</p>
+<p>Polyanskiy 2043报告研究给出有限码长可达率的非渐近上下界和色散项；有限码长信息以兑现数／候选与中止总数结算。若要把这一判断写进合同，最低记录还须给出原始分子、总体分母、观察期与退出原因；有限码长信息据此区分设备存在与服务兑现。从失败样本回看，公开分子分母与退出；有限码长信息局部增益不得冒充系统收益。把观察窗拉长以后，公开分子分母与退出；有限码长信息把观察记录接回问责链（Polyanskiy 2043；IEEE Communications Society 2025）。有限码长信复核门槛预注册6站×19批次。</p>
+<p>Polyanskiy &amp; Wu 2024保留极短码、反馈、衰落估计和译码复杂度会让二阶近似失准；有限码长信息越界后须重判方向。从失败样本回看，应分开常态与极端样本，并把反号结论收窄到实际适用区间；有限码长信息醒目纪录仍须排除筛选效应。把观察窗拉长以后，分列常态极端与反号；有限码长信息记录须回到全量分母。对照未采用者时，分列常态极端与反号；有限码长信息分母改变便重算结论（Polyanskiy 2043）。</p>
+<p>IEEE Communications Society 2025记录短包通信继续以元 converse 与可达界审计系统时延；维护账须继续追踪研究给出有限码长可达率的非渐近上下界和色散项。把观察窗拉长以后，还须把许可、维护、责任主体和退出条件按版本保存；缺少这一列就无法判断方向有没有翻转。对照未采用者时，保存许可维护与责任版本；一旦结果反号就应撤回原来的充分性主张。在跨场址复现之前，保存许可维护与责任版本；有限码长信息投运后仍保留责任主体（Polyanskiy &amp; Wu 2024）。</p>
+<p>跨域比较以极短码、反馈、衰落估计和译码复杂度会让二阶近似失准划界，并用研究给出有限码长可达率的非渐近上下界和色散项重算把容量改写为码长误差率与速率的三变量边界。对照未采用者时，先统一功能单位与时间窗，再把边界条件作为共同反例；有限码长信息局部增益不得冒充系统收益。在跨场址复现之前，统一单位时间窗和边界；有限码长信息把观察记录接回问责链（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>D——有限码长信息论主机制足够驱动　<i>单因</i>只认有限码长信息论主机制　<i>预设</i>〔02 单一读数代表复杂对象〕默认二阶正态近似能否覆盖超短包和非渐近平滑信道　<i>量纲</i>有限码长信息论主机制兑现数／全部候选与中止数　<i>失效</i>当极短码、反馈、衰落估计和译码复杂度会让二阶近似失准时，有限码长信息论主机制越高，系统净效应反而越低　<i>自曝</i>样本分层独立核验：同一组数据其实还记录了不利方向：研究给出有限码长可达率的非渐近上下界和色散项；独立撤回检查落在样本分层　<i>空栏</i>未列有限码长信息论反号边界引起的退出与转移成本　<i>异名</i>交通与出行科学称“被动数据重写出行调查”；另见第 185 号第十条“被动数据重写出行调查”</div>
+<h2>戊、空间耦合LDPC阈值饱和<span class="en">Spatially Coupled LDPC</span></h2>
+<div class="src"><i>提出</i>Kudekar, Richardson &amp; Urbanke, IEEE Transactions on Information Theory 57, 803–834 (2011), doi:10.1109/TIT.2010.2095072　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>用空间耦合让迭代译码阈值逼近MAP阈值</div>
+<p>领域曾把空间耦合LDPC阈值饱和当作一项可独立扩大的部件，Kudekar, Richardson &amp; Urbanke, IEEE Transactions on Information Theory 57, 803–834 (2011)却从阈值饱和证明局部图耦合可把次优消息传递推到近最优边界，展示结构冗余不是浪费切入。由此可见，真正卡住旧框架的是边界播种带来的阈值提升能否抵消终止损失和译码窗口，而不是同类项目还不够多。在下一轮独立复核里，补列未采用和失败样本；空间耦合阈值据此与邻域同尺度对撞（Kudekar 2095）。</p>
+<p>本条只承认用空间耦合让迭代译码阈值逼近MAP阈值是充分改变方向的那一样。阈值饱和证明局部图耦合可把次优消息传递推到近最优边界，展示结构冗余不是浪费说明该机制怎样进入结果；若把它拿掉仍能复制趋势，空间耦合LDPC阈值饱和就只是同期变化的标签，不是因果解释。若要把这一判断写进合同，固定服务基线再做消融；空间耦合阈值须分开验收常态与压力场景（Polyanskiy &amp; Wu 2024）。</p>
+<p>Kudekar 2095的硬证据是阈值饱和证明局部图耦合可把次优消息传递推到近最优边界，展示结构冗余不是浪费；实际兑现数／全部候选与中止数才可复算。从失败样本回看，最低记录还须给出原始分子、总体分母、观察期与退出原因；空间耦合阈值据此区分设备存在与服务兑现。把观察窗拉长以后，公开分子分母与退出；空间耦合阈值局部增益不得冒充系统收益（Kudekar 2095；IEEE Communications Society 2025）。空间耦合阈复核门槛预注册2站×21批次。</p>
+<p>有限链长度有速率损失，窗口过小或图含短环时性能回落，渐近阈值不能代替芯片测量构成空间耦合LDPC阈值饱和的反号条件。Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).把边界播种带来的阈值提升能否抵消终止损失和译码窗口保留为开放争议，意味着平均改善越大，未入账的转移成本反而可能越难被看见。把观察窗拉长以后，分列常态极端与反号；空间耦合阈值醒目纪录仍须排除筛选效应（Kudekar 2095）。</p>
+<p>IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).记录的当下状态是窗口译码与标准码设计继续比较延迟和硬件吞吐。工程责任因此延伸到许可、供应、维护和退役，不再止于Kudekar, Richardson &amp; Urbanke, IEEE Transactions on Information Theory 57, 803–834 (2011)展示的首个成功场景。对照未采用者时，还须把许可、维护、责任主体和退出条件按版本保存；缺少这一列就无法判断方向有没有翻转。在跨场址复现之前，保存许可维护与责任版本；一旦结果反号就应撤回原来的充分性主张（Polyanskiy &amp; Wu 2024）。</p>
+<p>与相邻领域对撞时，本条不搬运空间耦合LDPC阈值饱和这个名称，只搬运阈值饱和证明局部图耦合可把次优消息传递推到近最优边界，展示结构冗余不是浪费所对应的比率。若对手在有限链长度有速率损失，窗口过小或图含短环时性能回落，渐近阈值不能代替芯片测量下仍声称同方向，两边便共同暴露了未被计量的第三变量（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>E——空间耦合LDPC阈值饱和主机制足够驱动　<i>单因</i>只认空间耦合LDPC阈值饱和主机制　<i>预设</i>〔02 单一读数代表复杂对象〕默认边界播种带来的阈值提升能否抵消终止损失和译码窗口　<i>量纲</i>空间耦合LDPC阈值饱和主机制兑现数／全部候选与中止数　<i>失效</i>当有限链长度有速率损失时，空间耦合LDPC阈值饱和主机制越高，系统净效应反而越低　<i>自曝</i>版本登记独立核验：项目年报承认名义值与交付值并不相等：空间耦合LDPC阈值饱和主证据；独立撤回检查落在版本登记　<i>空栏</i>未列有限链长度有速率损失引起的退出与转移成本　<i>异名</i>风险与灾害治理称“管理性撤退把防护边界改成动态退出”；另见第 205 号第十六条“管理性撤退把防护边界改成动态退出”</div>
+<h2>己、DNA数字存储<span class="en">DNA Data Storage</span></h2>
+<div class="src"><i>提出</i>Goldman et al., Nature 494, 77–80 (2013), doi:10.1038/nature11875　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>把数字文件编码为可合成和测序的寡核苷酸</div>
+<p>Goldman et al. 2013改写了高密度介质能否同时满足写入成本随机访问与长期纠错；研究以四进制受限编码存储多类文件并完整恢复让旧默认有了可查裂缝。若要把这一判断写进合同，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；数字存储据此与邻域同尺度对撞。从失败样本回看，补列未采用和失败样本；数字存储醒目纪录仍须排除筛选效应（Goldman et al. 2013）。</p>
+<p>本条只承认把数字文件编码为可合成和测序的寡核苷酸；移除后若研究以四进制受限编码存储多类文件并完整恢复仍出现，立场即撤回。从失败样本回看，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；数字存储须分开验收常态与压力场景。把观察窗拉长以后，固定服务基线再做消融；缺少这一列就无法判断方向有没有翻转（Polyanskiy &amp; Wu 2024）。</p>
+<p>Goldman et al. 2013报告研究以四进制受限编码存储多类文件并完整恢复；数字存储以兑现数／候选与中止总数结算。把观察窗拉长以后，最低记录还须给出原始分子、总体分母、观察期与退出原因；数字存储据此区分设备存在与服务兑现。对照未采用者时，公开分子分母与退出；数字存储局部增益不得冒充系统收益。在跨场址复现之前，公开分子分母与退出；数字存储把观察记录接回问责链（Goldman et al. 2013；IEEE Communications Society 2025）。数字存储复核门槛预注册3站×23批次。</p>
+<p>Polyanskiy &amp; Wu 2024保留合成错误、PCR偏倚和序列掉落形成非对称信道；数字存储越界后须重判方向。对照未采用者时，应分开常态与极端样本，并把反号结论收窄到实际适用区间；数字存储醒目纪录仍须排除筛选效应。在跨场址复现之前，分列常态极端与反号；数字存储记录须回到全量分母。当平均值被拆开，分列常态极端与反号；数字存储分母改变便重算结论（Goldman et al. 2013）。</p>
+<p>IEEE Communications Society 2025记录自动化合成和喷泉编码继续提高可恢复密度；维护账须继续追踪研究以四进制受限编码存储多类文件并完整恢复。在跨场址复现之前，还须把许可、维护、责任主体和退出条件按版本保存；缺少这一列就无法判断方向有没有翻转。当平均值被拆开，保存许可维护与责任版本；一旦结果反号就应撤回原来的充分性主张。沿责任链继续追问，保存许可维护与责任版本；数字存储投运后仍保留责任主体（Polyanskiy &amp; Wu 2024）。</p>
+<p>跨域比较以合成错误、PCR偏倚和序列掉落形成非对称信道划界，并用研究以四进制受限编码存储多类文件并完整恢复重算把数字文件编码为可合成和测序的寡核苷酸。当平均值被拆开，先统一功能单位与时间窗，再把边界条件作为共同反例；数字存储局部增益不得冒充系统收益。沿责任链继续追问，统一单位时间窗和边界；数字存储把观察记录接回问责链（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>S——DNA数字存储主机制足够驱动　<i>单因</i>只认DNA数字存储主机制　<i>预设</i>〔02 单一读数代表复杂对象〕默认高密度介质能否同时满足写入成本随机访问与长期纠错　<i>量纲</i>DNA数字存储主机制兑现数／全部候选与中止数　<i>失效</i>当合成错误、PCR偏倚和序列掉落形成非对称信道时，DNA数字存储主机制越高，系统净效应反而越低　<i>自曝</i>失败谱独立核验：后续复测把首篇最强叙事削弱为：研究以四进制受限编码存储多类文件并完整恢复；独立撤回检查落在失败谱　<i>空栏</i>未列DNA数字存储反号边界引起的退出与转移成本　<i>异名</i>应急管理称“AI快速制图把静态灾情图改写为版本化决策底图”；另见第 208 号第十九条“AI快速制图把静态灾情图改写为版本化决策底图”</div>
+<h2>庚、编码缓存<span class="en">Coded Caching</span></h2>
+<div class="src"><i>提出</i>Maddah-Ali &amp; Niesen, IEEE Transactions on Information Theory 60, 2856–2867 (2014), doi:10.1109/TIT.2014.2306938　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>在放置阶段制造跨用户可复用的编码多播机会</div>
+<p>在Maddah-Ali &amp; Niesen, IEEE Transactions on Information Theory 60, 2856–2867 (2014)之前，编码缓存多按设备或项目是否存在来计数。编码缓存把本地存储与广播负载联动，证明缓存的价值不只在命中率而在创造同时服务迫使研究者改问最坏情形全局增益能否在异质需求与有限子包化下保持，也把未投运、未覆盖和无法维持的部分重新放回历史现场。从失败样本回看，补列未采用和失败样本；编码缓存据此与邻域同尺度对撞（Maddah-Ali &amp; Niesen 2014）。</p>
+<p>编码缓存的主张不以“多因素”退场：只有在放置阶段制造跨用户可复用的编码多播机会决定这次转向。编码缓存把本地存储与广播负载联动，证明缓存的价值不只在命中率而在创造同时服务是它可以被消融的抓手；若冻结其他条件后方向不变，单因解释即告失败。把观察窗拉长以后，固定服务基线再做消融；编码缓存须分开验收常态与压力场景（Polyanskiy &amp; Wu 2024）。</p>
+<p>Maddah-Ali &amp; Niesen, IEEE Transactions on Information Theory 60, 2856–2867 (2014)提供了可复算起点——编码缓存把本地存储与广播负载联动，证明缓存的价值不只在命中率而在创造同时服务。分子必须是经实际运行确认的结果，分母必须包含全部候选、周期与中止；二者的比才是在放置阶段制造跨用户可复用的编码多播机会的量纲。对照未采用者时，公开分子分母与退出；编码缓存据此区分设备存在与服务兑现；复算值固定为实际兑现数／全部候选与中止数（Maddah-Ali &amp; Niesen 2014；IEEE Communications Society 2025）。编码缓存复核门槛预注册4站×25批次。</p>
+<p>Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).没有替编码缓存消除争议，而是把最坏情形全局增益能否在异质需求与有限子包化下保持固定为检验问题。子包化指数增长、需求分布和用户退出会吞掉增益，理论负载不能直接当作时延出现时，性能越被优化，系统账面之外的损害越可能上升。在跨场址复现之前，分列常态极端与反号；编码缓存醒目纪录仍须排除筛选效应（Maddah-Ali &amp; Niesen 2014）。</p>
+<p>截至IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).，设备到设备与多天线缓存继续处理有限文件和动态用户。这要求把编码缓存的采购规格从铭牌参数改成全程服务：编码缓存把本地存储与广播负载联动，证明缓存的价值不只在命中率而在创造同时服务要在独立场址和维护期后仍可重现。当平均值被拆开，保存许可维护与责任版本；缺少这一列就无法判断方向有没有翻转（Polyanskiy &amp; Wu 2024）。</p>
+<p>外部接口由子包化指数增长、需求分布和用户退出会吞掉增益，理论负载不能直接当作时延划线，而不是由学科名划线。另一个领域若只报告局部在放置阶段制造跨用户可复用的编码多播机会，便会与编码缓存共享同一盲点；加入编码缓存把本地存储与广播负载联动，证明缓存的价值不只在命中率而在创造同时服务后，两边才有可通约的对手（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>E——编码缓存主机制足够驱动　<i>单因</i>只认编码缓存主机制　<i>预设</i>〔04 测量不改变被测对象〕默认最坏情形全局增益能否在异质需求与有限子包化下保持　<i>量纲</i>编码缓存主机制兑现数／全部候选与中止数　<i>失效</i>当子包化指数增长、需求分布和用户退出会吞掉增益时，编码缓存主机制越高，系统净效应反而越低　<i>自曝</i>机构接口独立核验：设备说明中的校准条件反过来限定了结论：编码缓存把本地存储与广播负载联动；独立撤回检查落在机构接口　<i>空栏</i>未列编码缓存反号边界引起的退出与转移成本　<i>异名</i>表示论称“对称性神经网络：群表示决定可学习层的形状”；另见第 212 号第十一条“对称性神经网络：群表示决定可学习层的形状”</div>
+<h2>辛、局部可修复码<span class="en">Locally Repairable Codes</span></h2>
+<div class="src"><i>提出</i>Tamo &amp; Barg, IEEE Transactions on Information Theory 60, 4661–4676 (2014), doi:10.1109/TIT.2014.2321280　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>让单个丢失符号只访问少量其他符号即可恢复</div>
+<p>Tamo &amp; Barg, IEEE Transactions on Information Theory 60, 4661–4676 (2014)出现以前，讨论常把瓶颈压成投入不足；但局部修复是否以全局距离和更新带宽为隐藏代价。最优LRC构造把局部性写进码的代数结构，修复读放大成为与距离并列的设计变量把原先藏在背景里的对象、基线和失败时段推到台前，旧说法因而第一次有了可查的裂缝。把观察窗拉长以后，补列未采用和失败样本；局部可修复码据此与邻域同尺度对撞（Tamo &amp; Barg 2014）。</p>
+<p>局部可修复码把立场锁在一个动作上：决定方向的只有让单个丢失符号只访问少量其他符号即可恢复。最优LRC构造把局部性写进码的代数结构，修复读放大成为与距离并列的设计变量若可在移除这一动作后照旧出现，Tamo &amp; Barg, IEEE Transactions on Information Theory 60, 4661–4676 (2014)所代表的转折便不成立；规模、补贴或设备更新不能替它作因。对照未采用者时，固定服务基线再做消融；局部可修复码须分开验收常态与压力场景（Polyanskiy &amp; Wu 2024）。</p>
+<p>Tamo &amp; Barg, IEEE Transactions on Information Theory 60, 4661–4676 (2014)给出的关键证据是最优LRC构造把局部性写进码的代数结构，修复读放大成为与距离并列的设计变量。这笔读数须和全部适用对象、运行周期及未完成事件同列；只摘让单个丢失符号只访问少量其他符号即可恢复的最好值，会把样本选择误写成性能跃升。在跨场址复现之前，公开分子分母与退出；局部可修复码据此区分设备存在与服务兑现；复算值固定为实际兑现数／全部候选与中止数（Tamo &amp; Barg 2014；IEEE Communications Society 2025）。局部可修复复核门槛预注册5站×27批次。</p>
+<p>最强边界不是一句谨慎声明，而是相关故障、热点和多节点同时失效时局部组会崩溃，最优距离不代表真实恢复时间。Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).从系统侧追问局部修复是否以全局距离和更新带宽为隐藏代价，使这一条件具有令收益翻转的实质力量，而非可以移到脚注的例外。当平均值被拆开，分列常态极端与反号；局部可修复码醒目纪录仍须排除筛选效应（Tamo &amp; Barg 2014）。</p>
+<p>到IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).时，分布式存储继续研究可用度和多节点故障。这使局部可修复码进入采购、监管或规划后必须保存版本、运维与退出记录；否则前端的最优LRC构造把局部性写进码的代数结构，修复读放大成为与距离并列的设计变量无法和末端结果对账。沿责任链继续追问，保存许可维护与责任版本；缺少这一列就无法判断方向有没有翻转（Polyanskiy &amp; Wu 2024）。</p>
+<p>跨域接口落在局部修复是否以全局距离和更新带宽为隐藏代价：局部可修复码给出的让单个丢失符号只访问少量其他符号即可恢复若要与外部方案比较，必须守住同一服务单位。相关故障、热点和多节点同时失效时局部组会崩溃，最优距离不代表真实恢复时间一旦发生，局部纪录会与系统成效分离，这正是本条留下的反例（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>S——局部可修复码主机制足够驱动　<i>单因</i>只认局部可修复码主机制　<i>预设</i>〔04 测量不改变被测对象〕默认局部修复是否以全局距离和更新带宽为隐藏代价　<i>量纲</i>局部可修复码主机制兑现数／全部候选与中止数　<i>失效</i>当相关故障、热点和多节点同时失效时局部组会崩溃时，局部可修复码主机制越高，系统净效应反而越低　<i>自曝</i>资源预算独立核验：政策文本自己列出的豁免说明：最优LRC构造把局部性写进码的代数结构；独立撤回检查落在资源预算　<i>空栏</i>未列局部可修复码反号边界引起的退出与转移成本　<i>异名</i>绿色化学与循环化学称“E因子与PMI把废物写进合成分母”；另见第 221 号乙“E因子与PMI把废物写进合成分母”</div>
+<div class="act">【第二幕】这十年 · 约 2016–2026</div>
+<p>第二幕转向规模、闭环与责任。最新纪录只有在失败和资源进入分母后，才足以支持“信息论与编码理论成立的决定性机制，是把可恢复对象、资源预算和失败概率写进同一有限尺度，而不是用无穷码长容量替代现实系统”。</p>
+<h2>一、DNA喷泉码<span class="en">DNA Fountain</span></h2>
+<div class="src"><i>提出</i>Erlich &amp; Zielinski, Science 355, 950–954 (2017), doi:10.1126/science.aaj2038　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>用喷泉编码吸收寡核苷酸掉落和无效序列</div>
+<p>Erlich &amp; Zielinski 2038改写了接近容量的密度能否覆盖序列筛选与物理冗余；DNA Fountain把鲁棒索引和喷泉恢复结合让旧默认有了可查裂缝。对照未采用者时，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；喷泉码据此与邻域同尺度对撞。在跨场址复现之前，补列未采用和失败样本；喷泉码醒目纪录仍须排除筛选效应。当平均值被拆开，补列未采用和失败样本；喷泉码记录须回到全量分母（Erlich &amp; Zielinski 2038）。</p>
+<p>本条只承认用喷泉编码吸收寡核苷酸掉落和无效序列；移除后若DNA Fountain把鲁棒索引和喷泉恢复结合仍出现，立场即撤回。在跨场址复现之前，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；喷泉码须分开验收常态与压力场景。当平均值被拆开，固定服务基线再做消融；缺少这一列就无法判断方向有没有翻转。沿责任链继续追问，固定服务基线再做消融；一旦结果反号就应撤回原来的充分性主张（Polyanskiy &amp; Wu 2024）。</p>
+<p>Erlich &amp; Zielinski 2038报告DNA Fountain把鲁棒索引和喷泉恢复结合；喷泉码以兑现数／候选与中止总数结算。当平均值被拆开，最低记录还须给出原始分子、总体分母、观察期与退出原因；喷泉码据此区分设备存在与服务兑现。沿责任链继续追问，最低记录还须给出原始分子、总体分母、观察期与退出原因；喷泉码局部增益不得冒充系统收益。以同一服务单位复算，公开分子分母与退出；喷泉码把观察记录接回问责链（Erlich &amp; Zielinski 2038；IEEE Communications Society 2025）。喷泉码复核门槛预注册6站×29批次。</p>
+<p>Polyanskiy &amp; Wu 2024保留筛除不适合合成的序列会改变码分布；喷泉码越界后须重判方向。沿责任链继续追问，应分开常态与极端样本，并把反号结论收窄到实际适用区间；喷泉码醒目纪录仍须排除筛选效应。以同一服务单位复算，分列常态极端与反号；喷泉码记录须回到全量分母。面对分布外情形，分列常态极端与反号；喷泉码分母改变便重算结论（Erlich &amp; Zielinski 2038）。</p>
+<p>IEEE Communications Society 2025记录随机访问、可重写与写入自动化成为DNA存储新瓶颈；维护账须继续追踪DNA Fountain把鲁棒索引和喷泉恢复结合。以同一服务单位复算，还须把许可、维护、责任主体和退出条件按版本保存；缺少这一列就无法判断方向有没有翻转。面对分布外情形，保存许可维护与责任版本；一旦结果反号就应撤回原来的充分性主张。为防止事后改口，保存许可维护与责任版本；喷泉码须分开验收常态与压力场景（Polyanskiy &amp; Wu 2024）。</p>
+<p>跨域比较以筛除不适合合成的序列会改变码分布划界，并用DNA Fountain把鲁棒索引和喷泉恢复结合重算用喷泉编码吸收寡核苷酸掉落和无效序列。面对分布外情形，先统一功能单位与时间窗，再把边界条件作为共同反例；喷泉码局部增益不得冒充系统收益。为防止事后改口，统一单位时间窗和边界；喷泉码还须公开未完成与退出事件（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>D——DNA喷泉码主机制足够驱动　<i>单因</i>只认DNA喷泉码主机制　<i>预设</i>〔04 测量不改变被测对象〕默认接近容量的密度能否覆盖序列筛选与物理冗余　<i>量纲</i>DNA喷泉码主机制兑现数／全部候选与中止数　<i>失效</i>当筛除不适合合成的序列会改变码分布时，DNA喷泉码主机制越高，系统净效应反而越低　<i>自曝</i>外部复算独立核验：成本模型的敏感性表揭开了这一弱处：DNA喷泉码主证据；独立撤回检查落在外部复算　<i>空栏</i>未列筛除不适合合成的序列会改变码分布引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>二、私有信息检索容量<span class="en">Private Information Retrieval Capacity</span></h2>
+<div class="src"><i>提出</i>Sun &amp; Jafar, IEEE Transactions on Information Theory 63, 4075–4088 (2017), doi:10.1109/TIT.2017.2689028　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>以跨副本编码查询隐藏用户索取哪条记录</div>
+<p>Sun &amp; Jafar, IEEE Transactions on Information Theory 63, 4075–4088 (2017)把私有信息检索容量从愿景改写为可失败的工程对象。它针对的是不泄露查询目标的容量能否在串谋与更新数据中保持；容量定理把下载代价与副本数数据库数联系起来，使隐私不再只是密码学布尔属性则说明旧体系为何无法再用一项峰值或一次投运交差。在跨场址复现之前，补列未采用和失败样本；私有信息检索据此与邻域同尺度对撞（Sun &amp; Jafar 2017）。</p>
+<p>可反驳命题写得很窄：只有以跨副本编码查询隐藏用户索取哪条记录能使私有信息检索容量保持原方向。增加预算与样本不能替代这一步，反之若容量定理把下载代价与副本数数据库数联系起来，使隐私不再只是密码学布尔属性由其他机制同样产生，本条必须撤回单因。当平均值被拆开，固定服务基线再做消融；私有信息检索须分开验收常态与压力场景（Polyanskiy &amp; Wu 2024）。</p>
+<p>第三段的硬账来自Sun &amp; Jafar, IEEE Transactions on Information Theory 63, 4075–4088 (2017)所报告的容量定理把下载代价与副本数数据库数联系起来，使隐私不再只是密码学布尔属性。应同时记录成功数／全部尝试数、实际周期／设计周期以及边界内外的差值，才能知道以跨副本编码查询隐藏用户索取哪条记录是否真的兑现。沿责任链继续追问，公开分子分母与退出；私有信息检索据此区分设备存在与服务兑现（Sun &amp; Jafar 2017；IEEE Communications Society 2025）。私有信息检复核门槛预注册2站×31批次。</p>
+<p>反方最有力的一刀是服务器串谋、异步更新和上传成本会降低容量，复制数据库的存储责任不能外置。在Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).的系统口径下，不泄露查询目标的容量能否在串谋与更新数据中保持仍未收敛；这会使名义增益随着规模放大而转为资源或公平损失。以同一服务单位复算，分列常态极端与反号；私有信息检索醒目纪录仍须排除筛选效应（Sun &amp; Jafar 2017）。</p>
+<p>IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).把近期进展概括为多方计算和编码数据库继续扩展隐私与鲁棒性。对私有信息检索容量的制度含义，是合同须规定数据归属、失效报告与长期责任，并按容量定理把下载代价与副本数数据库数联系起来，使隐私不再只是密码学布尔属性复核撤场后的证据链。面对分布外情形，保存许可维护与责任版本；缺少这一列就无法判断方向有没有翻转（Polyanskiy &amp; Wu 2024）。</p>
+<p>外部接口由服务器串谋、异步更新和上传成本会降低容量，复制数据库的存储责任不能外置划定；加入容量定理把下载代价与副本数数据库数联系起来，使隐私不再只是密码学布尔属性后，以跨副本编码查询隐藏用户索取哪条记录才可跨域比较。为防止事后改口，统一单位时间窗和边界；私有信息检索据此拆开相关变化与机制效应（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>S——私有信息检索容量主机制足够驱动　<i>单因</i>只认私有信息检索容量主机制　<i>预设</i>〔13 时间尺度可自由压缩〕默认不泄露查询目标的容量能否在串谋与更新数据中保持　<i>量纲</i>私有信息检索容量主机制兑现数／全部候选与中止数　<i>失效</i>当服务器串谋、异步更新和上传成本会降低容量时，私有信息检索容量主机制越高，系统净效应反而越低　<i>自曝</i>反号压力独立核验：场址比较没有支持一刀切外推，因为：容量定理把下载代价与副本数数据库数联系起来；独立撤回检查落在反号压力　<i>空栏</i>未列服务器串谋、异步更新和上传成本会降低容量引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>三、5G信道编码分工<span class="en">5G NR Channel Coding</span></h2>
+<div class="src"><i>提出</i>Richardson &amp; Kudekar, IEEE Communications Magazine 56, 28–34 (2018), doi:10.1109/MCOM.2018.1700665　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>用LDPC承载数据通道并用极化码承载控制通道</div>
+<p>在Richardson &amp; Kudekar, IEEE Communications Magazine 56, 28–34 (2018)之前，5G信道编码分工多按设备或项目是否存在来计数。5G标准把两类容量逼近码按业务形态分工，理论码首次在全球蜂窝系统大规模落地迫使研究者改问LDPC与极化码分工是否在短包高可靠场景仍最优，也把未投运、未覆盖和无法维持的部分重新放回历史现场。当平均值被拆开，补列未采用和失败样本；信道编码分工据此与邻域同尺度对撞（Richardson &amp; Kudekar 2018）。</p>
+<p>5G信道编码分工的主张不以“多因素”退场：只有用LDPC承载数据通道并用极化码承载控制通道决定这次转向。5G标准把两类容量逼近码按业务形态分工，理论码首次在全球蜂窝系统大规模落地是它可以被消融的抓手；若冻结其他条件后方向不变，单因解释即告失败。沿责任链继续追问，固定服务基线再做消融；信道编码分工须分开验收常态与压力场景（Polyanskiy &amp; Wu 2024）。</p>
+<p>Richardson &amp; Kudekar 2018的硬证据是5G标准把两类容量逼近码按业务形态分工，理论码首次在全球蜂窝系统大规模落地；实际兑现数／全部候选与中止数才可复算。以同一服务单位复算，最低记录还须给出原始分子、总体分母、观察期与退出原因；信道编码分工据此区分设备存在与服务兑现。面对分布外情形，公开分子分母与退出；信道编码分工局部增益不得冒充系统收益（Richardson &amp; Kudekar 2018；IEEE Communications Society 2025）。信道编码分复核门槛预注册3站×33批次。</p>
+<p>Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).没有替5G信道编码分工消除争议，而是把LDPC与极化码分工是否在短包高可靠场景仍最优固定为检验问题。标准码含速率匹配和硬件约束，论文曲线与终端能耗之间仍有距离出现时，性能越被优化，系统账面之外的损害越可能上升。面对分布外情形，分列常态极端与反号；信道编码分工醒目纪录仍须排除筛选效应。为防止事后改口，分列常态极端与反号；信道编码分工记录同时划定外推边界（Richardson &amp; Kudekar 2018）。</p>
+<p>IEEE Communications Society 2025记录6G研究重新比较短码列表译码和硬件能耗；采购与监管须把5G标准把两类容量逼近码按业务形态分工，理论码首次在全球蜂窝系统大规模落地写进维护账。为防止事后改口，还须把许可、维护、责任主体和退出条件按版本保存；信道编码分工下一次更新可追到原始版本。在下一轮独立复核里，保存许可维护与责任版本；信道编码分工补阴性账胜过追加佳例（Polyanskiy &amp; Wu 2024）。</p>
+<p>外部接口由标准码含速率匹配和硬件约束，论文曲线与终端能耗之间仍有距离划线，而不是由学科名划线。另一个领域若只报告局部用LDPC承载数据通道并用极化码承载控制通道，便会与5G信道编码分工共享同一盲点；加入5G标准把两类容量逼近码按业务形态分工，理论码首次在全球蜂窝系统大规模落地后，两边才有可通约的对手（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>E——5G信道编码分工主机制足够驱动　<i>单因</i>只认5G信道编码分工主机制　<i>预设</i>〔13 时间尺度可自由压缩〕默认LDPC与极化码分工是否在短包高可靠场景仍最优　<i>量纲</i>5G信道编码分工主机制兑现数／全部候选与中止数　<i>失效</i>当标准码含速率匹配和硬件约束时，5G信道编码分工主机制越高，系统净效应反而越低　<i>自曝</i>责任链独立核验：规模化以后首先出现的并非同方向增益，而是：5G标准把两类容量逼近码按业务形态分工；独立撤回检查落在责任链　<i>空栏</i>未列标准码含速率匹配和硬件约束引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>四、编码分布式计算<span class="en">Coded Distributed Computing</span></h2>
+<div class="src"><i>提出</i>Lee et al., IEEE Transactions on Information Theory 64, 1514–1529 (2018), doi:10.1109/TIT.2017.2736066　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>用编码冗余把最慢工作节点从完成条件中移除</div>
+<p>Lee et al. 2017改写了冗余任务能否稳定抵消拖尾节点而不增加通信和能耗；编码计算把纠错思想从通信搬到矩阵运算与机器学习让旧默认有了可查裂缝。沿责任链继续追问，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；编码分布式计据此与邻域同尺度对撞。以同一服务单位复算，补列未采用和失败样本；编码分布式计醒目纪录仍须排除筛选效应（Lee et al. 2017）。</p>
+<p>本条只承认用编码冗余把最慢工作节点从完成条件中移除；移除后若编码计算把纠错思想从通信搬到矩阵运算与机器学习仍出现，立场即撤回。以同一服务单位复算，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；编码分布式计须分开验收常态与压力场景。面对分布外情形，固定服务基线再做消融；缺少这一列就无法判断方向有没有翻转（Polyanskiy &amp; Wu 2024）。</p>
+<p>Lee et al. 2017的硬证据是编码计算把纠错思想从通信搬到矩阵运算与机器学习，使作业完成由足量结果而非全部节点决定；实际兑现数／全部候选与中止数才可复算。面对分布外情形，最低记录还须给出原始分子、总体分母、观察期与退出原因；编码分布式计据此区分设备存在与服务兑现。为防止事后改口，公开分子分母与退出；编码分布式计据此拆开相关变化与机制效应（Lee et al. 2017；IEEE Communications Society 2025）。编码分布式复核门槛预注册4站×35批次。</p>
+<p>Polyanskiy &amp; Wu 2024把边界写成拖尾分布随负载变化，冗余会增加总计算和网络拥塞，墙钟时间下降不等于资源下降；此时局部收益可能翻成系统损失。为防止事后改口，应分开常态与极端样本，并把反号结论收窄到实际适用区间；编码分布式计由此留下可执行否证入口。在下一轮独立复核里，分列常态极端与反号；编码分布式计记录同时划定外推边界（Lee et al. 2017）。</p>
+<p>IEEE Communications Society 2025记录梯度编码与多项式码继续处理异质节点和隐私；维护账须继续追踪编码计算把纠错思想从通信搬到矩阵运算与机器学习。在下一轮独立复核里，还须把许可、维护、责任主体和退出条件按版本保存；编码分布式计下一次更新可追到原始版本。若要把这一判断写进合同，保存许可维护与责任版本；编码分布式计补阴性账胜过追加佳例（Polyanskiy &amp; Wu 2024）。</p>
+<p>外部接口由拖尾分布随负载变化，冗余会增加总计算和网络拥塞，墙钟时间下降不等于资源下降划定；加入编码计算把纠错思想从通信搬到矩阵运算与机器学习，使作业完成由足量结果而非全部节点决定后，用编码冗余把最慢工作节点从完成条件中移除才可跨域比较。若要把这一判断写进合同，统一单位时间窗和边界；编码分布式计据此拆开相关变化与机制效应（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>D——编码分布式计算主机制足够驱动　<i>单因</i>只认编码分布式计算主机制　<i>预设</i>〔13 时间尺度可自由压缩〕默认冗余任务能否稳定抵消拖尾节点而不增加通信和能耗　<i>量纲</i>编码分布式计算主机制兑现数／全部候选与中止数　<i>失效</i>当拖尾分布随负载变化时，结论只覆盖已观测对象，不能外推到完整分布　<i>自曝</i>排除规则独立核验：供应链清单把演示阶段漏掉的依赖列为：编码分布式计算主证据；独立撤回检查落在排除规则　<i>空栏</i>未列拖尾分布随负载变化引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>五、深度联合信源信道编码<span class="en">Deep Joint Source-Channel Coding</span></h2>
+<div class="src"><i>提出</i>Bourtsoulatze, Kurka &amp; Gündüz, IEEE Transactions on Cognitive Communications and Networking 5, 567–579 (2019), doi:10.1109/TCCN.2019.2919300　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>用神经编码器直接把图像映射到信道符号</div>
+<p>领域曾把深度联合信源信道编码当作一项可独立扩大的部件，Bourtsoulatze, Kurka &amp; Gündüz, IEEE Transactions on Cognitive Communications and Networking 5, 567–579 (2019)却从深度JSCC显示在衰落和带宽受限下可以平滑退化，避免传统压缩加信道码的悬崖效应切入。由此可见，真正卡住旧框架的是端到端失真优势能否跨信噪比模型和新图像分布保持，而不是同类项目还不够多。以同一服务单位复算，补列未采用和失败样本；深度联合信源据此与邻域同尺度对撞（Bourtsoulatze 1930）。</p>
+<p>本条只承认用神经编码器直接把图像映射到信道符号是充分改变方向的那一样。深度JSCC显示在衰落和带宽受限下可以平滑退化，避免传统压缩加信道码的悬崖效应说明该机制怎样进入结果；若把它拿掉仍能复制趋势，深度联合信源信道编码就只是同期变化的标签，不是因果解释。面对分布外情形，固定服务基线再做消融；深度联合信源须分开验收常态与压力场景（Polyanskiy &amp; Wu 2024）。</p>
+<p>Bourtsoulatze 1930的硬证据是深度JSCC显示在衰落和带宽受限下可以平滑退化，避免传统压缩加信道码的悬崖效应；实际兑现数／全部候选与中止数才可复算。为防止事后改口，最低记录还须给出原始分子、总体分母、观察期与退出原因；深度联合信源据此区分证据与宣传。在下一轮独立复核里，公开分子分母与退出；深度联合信源据此拆开相关变化与机制效应（Bourtsoulatze 1930；IEEE Communications Society 2025）。深度联合信复核门槛预注册5站×37批次。</p>
+<p>训练信道失配和感知指标会生成看似合理却错误的细节，像素质量不能替代事实保真构成深度联合信源信道编码的反号条件。Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).把端到端失真优势能否跨信噪比模型和新图像分布保持保留为开放争议，意味着平均改善越大，未入账的转移成本反而可能越难被看见。在下一轮独立复核里，分列常态极端与反号；深度联合信源由此留下可执行否证入口（Bourtsoulatze 1930）。</p>
+<p>IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).记录的当下状态是生成式与语义失真继续改变视觉传输评价。项目义务因此延伸到许可、供应、维护和退役，不再止于Bourtsoulatze, Kurka &amp; Gündüz, IEEE Transactions on Cognitive Communications and Networking 5, 567–579 (2019)展示的首个成功场景。若要把这一判断写进合同，还须把许可、维护、责任主体和退出条件按版本保存；深度联合信源下一次更新可追到原始版本。从失败样本回看，保存许可维护与责任版本；深度联合信源补阴性账胜过追加佳例（Polyanskiy &amp; Wu 2024）。</p>
+<p>与相邻领域对撞时，本条不搬运深度联合信源信道编码这个名称，只搬运深度JSCC显示在衰落和带宽受限下可以平滑退化，避免传统压缩加信道码的悬崖效应所对应的比率。若对手在训练信道失配和感知指标会生成看似合理却错误的细节，像素质量不能替代事实保真下仍声称同方向，两边便共同暴露了未被计量的第三变量（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>D——深度联合信源信道编码主机制足够驱动　<i>单因</i>只认深度联合信源信道编码主机制　<i>预设</i>〔17 局部最优可加总为整体最优〕默认端到端失真优势能否跨信噪比模型和新图像分布保持　<i>量纲</i>深度联合信源信道编码主机制兑现数／全部候选与中止数　<i>失效</i>当训练信道失配和感知指标会生成看似合理却错误的细节时，结论只覆盖已观测对象，不能外推到完整分布　<i>自曝</i>基线冻结独立核验：参与者退出分布对漂亮均值提出了内部质疑：深度联合信源信道编码主证据；独立撤回检查落在基线冻结　<i>空栏</i>未列深度联合信源信道编码反号边界引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>六、PAC码<span class="en">Polarization-Adjusted Convolutional Codes</span></h2>
+<div class="src"><i>提出</i>Arıkan, IEEE Communications Letters 23, 2699–2702 (2019), doi:10.1109/LCOMM.2019.2941059　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>在极化变换前加入卷积预编码改善距离谱</div>
+<p>Arıkan 2019以前，旧框架没有回答卷积预编码能否在短码下稳定超过极化与LDPC实现；PAC码在短块仿真中接近有限码长界，重新打开序贯译码与极化结构结合把问题改成可核验对象。面对分布外情形，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；码据此与邻域同尺度对撞。为防止事后改口，补列未采用和失败样本；码由此留下可执行否证入口（Arıkan 2019）。</p>
+<p>本条只承认在极化变换前加入卷积预编码改善距离谱；移除后若PAC码在短块仿真中接近有限码长界仍出现，立场即撤回。为防止事后改口，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；码须连同不确定性报告结果。在下一轮独立复核里，固定服务基线再做消融；码下一次更新可追到原始版本（Polyanskiy &amp; Wu 2024）。</p>
+<p>Arıkan 2019的硬证据是PAC码在短块仿真中接近有限码长界，重新打开序贯译码与极化结构结合；实际兑现数／全部候选与中止数才可复算。在下一轮独立复核里，最低记录还须给出原始分子、总体分母、观察期与退出原因；码据此区分证据与宣传。若要把这一判断写进合同，公开分子分母与退出；码据此拆开相关变化与机制效应（Arıkan 2019；IEEE Communications Society 2025）。码复核门槛预注册6站×39批次。</p>
+<p>Polyanskiy &amp; Wu 2024保留译码节点数具有长尾且构造依赖信道；码越界后须重判方向。若要把这一判断写进合同，应分开常态与极端样本，并把反号结论收窄到实际适用区间；码由此留下可执行否证入口。从失败样本回看，分列常态极端与反号；码记录同时划定外推边界。把观察窗拉长以后，分列常态极端与反号；码据此与邻域同尺度对撞（Arıkan 2019）。</p>
+<p>IEEE Communications Society 2025记录列表和序贯译码继续审计复杂度尾部；采购与监管须把PAC码在短块仿真中接近有限码长界，重新打开序贯译码与极化结构结合写进维护账。从失败样本回看，还须把许可、维护、责任主体和退出条件按版本保存；码下一次更新可追到原始版本。把观察窗拉长以后，保存许可维护与责任版本；码补阴性账胜过追加佳例（Polyanskiy &amp; Wu 2024）。</p>
+<p>跨域比较以译码节点数具有长尾且构造依赖信道划界，并用PAC码在短块仿真中接近有限码长界重算在极化变换前加入卷积预编码改善距离谱。把观察窗拉长以后，先统一功能单位与时间窗，再把边界条件作为共同反例；码据此拆开相关变化与机制效应。对照未采用者时，统一单位时间窗和边界；码还须公开未完成与退出事件（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>S——PAC码主机制足够驱动　<i>单因</i>只认PAC码主机制　<i>预设</i>〔17 局部最优可加总为整体最优〕默认卷积预编码能否在短码下稳定超过极化与LDPC实现　<i>量纲</i>PAC码主机制兑现数／全部候选与中止数　<i>失效</i>当译码节点数具有长尾且构造依赖信道时，结论只覆盖已观测对象，不能外推到完整分布　<i>自曝</i>异常运行独立核验：极端事件记录直接推翻了常态假设：PAC码在短块仿真中接近有限码长界；独立撤回检查落在异常运行　<i>空栏</i>未列译码节点数具有长尾且构造依赖信道引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>七、语义通信<span class="en">Semantic Communication</span></h2>
+<div class="src"><i>提出</i>Jiang et al., IEEE Journal on Selected Areas in Communications 39, 1548–1563 (2021), doi:10.1109/JSAC.2021.3070639　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>只传对下游任务有决定作用的表征</div>
+<p>在Jiang et al., IEEE Journal on Selected Areas in Communications 39, 1548–1563 (2021)之前，语义通信多按设备或项目是否存在来计数。深度语义通信把传输目标从逐比特一致改成句义或任务正确率，在受限信道上获得更小负载迫使研究者改问任务语义指标能否避免把模型偏好冒充信息保真，也把未投运、未覆盖和无法维持的部分重新放回历史现场。为防止事后改口，补列未采用和失败样本；语义通信投运后仍保留责任主体（Jiang et al. 2021）。</p>
+<p>语义通信的主张不以“多因素”退场：只有只传对下游任务有决定作用的表征决定这次转向。深度语义通信把传输目标从逐比特一致改成句义或任务正确率，在受限信道上获得更小负载是它可以被消融的抓手；若冻结其他条件后方向不变，单因解释即告失败。在下一轮独立复核里，固定服务基线再做消融；语义通信须连同不确定性报告结果（Polyanskiy &amp; Wu 2024）。</p>
+<p>Jiang et al., IEEE Journal on Selected Areas in Communications 39, 1548–1563 (2021)提供了可复算起点——深度语义通信把传输目标从逐比特一致改成句义或任务正确率，在受限信道上获得更小负载。分子必须是经实际运行确认的结果，分母必须包含全部候选、周期与中止；二者的比才是只传对下游任务有决定作用的表征的量纲。若要把这一判断写进合同，公开分子分母与退出；语义通信据此区分证据与宣传；复算值固定为实际兑现数／全部候选与中止数（Jiang et al. 2021；IEEE Communications Society 2025）。语义通信复核门槛预注册2站×41批次。</p>
+<p>Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).没有替语义通信消除争议，而是把任务语义指标能否避免把模型偏好冒充信息保真固定为检验问题。语义由训练模型定义且会随任务漂移，接收器高分不代表原始事实被保存出现时，性能越被优化，系统账面之外的损害越可能上升。从失败样本回看，分列常态极端与反号；语义通信由此留下可执行否证入口。把观察窗拉长以后，分列常态极端与反号；语义通信记录同时划定外推边界（Jiang et al. 2021）。</p>
+<p>截至IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).，目标导向通信开始要求任务无关基线和失真边界。这要求把语义通信的采购规格从铭牌参数改成全程服务：深度语义通信把传输目标从逐比特一致改成句义或任务正确率，在受限信道上获得更小负载要在独立场址和维护期后仍可重现。把观察窗拉长以后，保存许可维护与责任版本；语义通信下一次更新可追到原始版本（Polyanskiy &amp; Wu 2024）。</p>
+<p>外部接口由语义由训练模型定义且会随任务漂移，接收器高分不代表原始事实被保存划线，而不是由学科名划线。另一个领域若只报告局部只传对下游任务有决定作用的表征，便会与语义通信共享同一盲点；加入深度语义通信把传输目标从逐比特一致改成句义或任务正确率，在受限信道上获得更小负载后，两边才有可通约的对手（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>E——只传对下游任务有决定作用的表征足够驱动　<i>单因</i>只认只传对下游任务有决定作用的表征　<i>预设</i>〔17 局部最优可加总为整体最优〕默认任务语义指标能否避免把模型偏好冒充信息保真　<i>量纲</i>只传对下游任务有决定作用的表征兑现数／全部候选与中止数　<i>失效</i>当语义由训练模型定义且会随任务漂移时，结论只覆盖已观测对象，不能外推到完整分布　<i>自曝</i>人工接管独立核验：维护账本显示峰值之外还有一项主导量：语义通信主证据；独立撤回检查落在人工接管　<i>空栏</i>未列语义由训练模型定义且会随任务漂移引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>八、量子LDPC线性距离突破<span class="en">Quantum LDPC Codes</span></h2>
+<div class="src"><i>提出</i>Panteleev &amp; Kalachev, IEEE Transactions on Information Theory 68, 213–229 (2022), doi:10.1109/TIT.2021.3119384　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>构造常码率且距离近线性增长的量子LDPC码</div>
+<p>Panteleev &amp; Kalachev, IEEE Transactions on Information Theory 68, 213–229 (2022)出现以前，讨论常把瓶颈压成投入不足；但渐近好码能否获得局域可实现校验和高效译码。纤维积构造打破长期障碍，证明稀疏量子校验可以同时保持非零码率与大距离把原先藏在背景里的对象、基线和失败时段推到台前，旧说法因而第一次有了可查的裂缝。在下一轮独立复核里，补列未采用和失败样本；量子线性距离投运后仍保留责任主体（Panteleev &amp; Kalachev 1938）。</p>
+<p>量子LDPC线性距离突破把立场锁在一个动作上：决定方向的只有构造常码率且距离近线性增长的量子LDPC码。纤维积构造打破长期障碍，证明稀疏量子校验可以同时保持非零码率与大距离若可在移除这一动作后照旧出现，Panteleev &amp; Kalachev, IEEE Transactions on Information Theory 68, 213–229 (2022)所代表的转折便不成立；规模、补贴或设备更新不能替它作因。若要把这一判断写进合同，固定服务基线再做消融；量子线性距离须连同不确定性报告结果（Polyanskiy &amp; Wu 2024）。</p>
+<p>Panteleev &amp; Kalachev 1938的硬证据是纤维积构造打破长期障碍，证明稀疏量子校验可以同时保持非零码率与大距离；实际兑现数／全部候选与中止数才可复算。从失败样本回看，最低记录还须给出原始分子、总体分母、观察期与退出原因；量子线性距离据此区分证据与宣传。把观察窗拉长以后，公开分子分母与退出；量子线性距离据此拆开相关变化与机制效应（Panteleev &amp; Kalachev 1938；IEEE Communications Society 2025）。量子线性距复核门槛预注册3站×43批次。</p>
+<p>最强边界不是一句谨慎声明，而是渐近参数不等于容错计算开销，校验非局域、译码失败与逻辑门实现仍是工程瓶颈。Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).从系统侧追问渐近好码能否获得局域可实现校验和高效译码，使这一条件具有令收益翻转的实质力量，而非可以移到脚注的例外。把观察窗拉长以后，分列常态极端与反号；量子线性距离由此留下可执行否证入口（Panteleev &amp; Kalachev 1938）。</p>
+<p>到IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).时，量子LDPC研究转向译码阈值、逻辑门和硬件几何。这使量子LDPC线性距离突破进入采购、监管或规划后必须保存版本、运维与退出记录；否则前端的纤维积构造打破长期障碍，证明稀疏量子校验可以同时保持非零码率与大距离无法和末端结果对账。对照未采用者时，保存许可维护与责任版本；量子线性距离下一次更新可追到原始版本（Polyanskiy &amp; Wu 2024）。</p>
+<p>外部接口由渐近参数不等于容错计算开销，校验非局域、译码失败与逻辑门实现仍是工程瓶颈划定；加入纤维积构造打破长期障碍，证明稀疏量子校验可以同时保持非零码率与大距离后，构造常码率且距离近线性增长的量子LDPC码才可跨域比较。在跨场址复现之前，统一单位时间窗和边界；量子线性距离据此拆开相关变化与机制效应（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>E——量子LDPC线性距离突破主机制足够驱动　<i>单因</i>只认量子LDPC线性距离突破主机制　<i>预设</i>〔25 失败样本不含信息〕默认渐近好码能否获得局域可实现校验和高效译码　<i>量纲</i>量子LDPC线性距离突破主机制兑现数／全部候选与中止数　<i>失效</i>当渐近参数不等于容错计算开销时，结论只覆盖已观测对象，不能外推到完整分布　<i>自曝</i>撤回门槛独立核验：法规的监测条款等于承认此前证据缺了：纤维积构造打破长期障碍；独立撤回检查落在撤回门槛　<i>空栏</i>未列渐近参数不等于容错计算开销引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>九、年龄信息<span class="en">Age of Information</span></h2>
+<div class="src"><i>提出</i>Yates et al., IEEE Journal on Selected Areas in Communications 39, 1183–1210 (2021), doi:10.1109/JSAC.2021.3065072　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>用接收端最新生成时间而非吞吐量度量状态更新</div>
+<p>领域曾把年龄信息当作一项可独立扩大的部件，Yates et al., IEEE Journal on Selected Areas in Communications 39, 1183–1210 (2021)却从AoI把队列优化从多传数据改成保持信息新鲜，揭示过高发送率也会因排队让状态变旧切入。由此可见，真正卡住旧框架的是更新频率能否替代到达信息的新鲜度与价值，而不是同类项目还不够多。若要把这一判断写进合同，补列未采用和失败样本；年龄信息投运后仍保留责任主体（Yates et al. 2021）。</p>
+<p>本条只承认用接收端最新生成时间而非吞吐量度量状态更新是充分改变方向的那一样。AoI把队列优化从多传数据改成保持信息新鲜，揭示过高发送率也会因排队让状态变旧说明该机制怎样进入结果；若把它拿掉仍能复制趋势，年龄信息就只是同期变化的标签，不是因果解释。从失败样本回看，固定服务基线再做消融；年龄信息须连同不确定性报告结果（Polyanskiy &amp; Wu 2024）。</p>
+<p>证据锚点由Yates et al., IEEE Journal on Selected Areas in Communications 39, 1183–1210 (2021)承担：AoI把队列优化从多传数据改成保持信息新鲜，揭示过高发送率也会因排队让状态变旧。核算时分子是实际兑现的用接收端最新生成时间而非吞吐量度量状态更新，分母是全部名义运行与适用对象；停运、退出和未接入者不能从统计里蒸发。把观察窗拉长以后，公开分子分母与退出；年龄信息据此区分证据与宣传；复算值固定为实际兑现数／全部候选与中止数（Yates et al. 2021；IEEE Communications Society 2025）。年龄信息复核门槛预注册4站×45批次。</p>
+<p>时间戳新不代表内容有用，采样误差和任务价值未进入单一年龄指标构成年龄信息的反号条件。Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).把更新频率能否替代到达信息的新鲜度与价值保留为开放争议，意味着平均改善越大，未入账的转移成本反而可能越难被看见。对照未采用者时，分列常态极端与反号；年龄信息由此留下可执行否证入口。在跨场址复现之前，分列常态极端与反号；年龄信息记录同时划定外推边界（Yates et al. 2021）。</p>
+<p>IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).记录的当下状态是状态感知调度继续加入语义价值和能量约束。全程责任因此延伸到许可、供应、维护和退役，不再止于Yates et al., IEEE Journal on Selected Areas in Communications 39, 1183–1210 (2021)展示的首个成功场景。在跨场址复现之前，还须把许可、维护、责任主体和退出条件按版本保存；年龄信息下一次更新可追到原始版本。当平均值被拆开，保存许可维护与责任版本；年龄信息补阴性账胜过追加佳例（Polyanskiy &amp; Wu 2024）。</p>
+<p>外部接口由时间戳新不代表内容有用，采样误差和任务价值未进入单一年龄指标划定；加入AoI把队列优化从多传数据改成保持信息新鲜，揭示过高发送率也会因排队让状态变旧后，用接收端最新生成时间而非吞吐量度量状态更新才可跨域比较。当平均值被拆开，统一单位时间窗和边界；年龄信息据此拆开相关变化与机制效应（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>D——年龄信息主机制足够驱动　<i>单因</i>只认年龄信息主机制　<i>预设</i>〔25 失败样本不含信息〕默认更新频率能否替代到达信息的新鲜度与价值　<i>量纲</i>年龄信息主机制兑现数／全部候选与中止数　<i>失效</i>当时间戳新不代表内容有用时，结论只覆盖已观测对象，不能外推到完整分布　<i>自曝</i>跨域外推独立核验：跨区域结果的方向差异由本领域自己报告为：AoI把队列优化从多传数据改成保持信息新鲜；独立撤回检查落在跨域外推　<i>空栏</i>未列时间戳新不代表内容有用引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>十、无损压缩机器学习边界<span class="en">Learned Lossless Compression</span></h2>
+<div class="src"><i>提出</i>Townsend, Bird &amp; Barber, International Conference on Learning Representations (2019)　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>用可逆熵编码把神经概率预测变成真实比特流</div>
+<p>Townsend 2019改写了学习分布能否在分布外数据上保持无损与码长优势；bits-back与神经熵模型让生成模型的似然优势落到实际码长让旧默认有了可查裂缝。从失败样本回看，必须逐年保留未采用与失败案例，才能分开概念改名和对象变化；无损压缩机器投运后仍保留责任主体。把观察窗拉长以后，补列未采用和失败样本；无损压缩机器由此留下可执行否证入口（Townsend 2019）。</p>
+<p>本条只承认用可逆熵编码把神经概率预测变成真实比特流；移除后若bits-back与神经熵模型让生成模型的似然优势落到实际码长仍出现，立场即撤回。把观察窗拉长以后，应在同一服务基线下固定场址与资源，再做移除机制的消融检验；无损压缩机器须连同不确定性报告结果。对照未采用者时，固定服务基线再做消融；无损压缩机器下一次更新可追到原始版本（Polyanskiy &amp; Wu 2024）。</p>
+<p>Townsend 2019报告bits-back与神经熵模型让生成模型的似然优势落到实际码长；无损压缩机器以兑现数／候选与中止总数结算。对照未采用者时，最低记录还须给出原始分子、总体分母、观察期与退出原因；无损压缩机器据此区分证据与宣传。在跨场址复现之前，公开分子分母与退出；无损压缩机器据此拆开相关变化与机制效应。当平均值被拆开，公开分子分母与退出；无损压缩机器还须公开未完成与退出事件（Townsend 2019；IEEE Communications Society 2025）。无损压缩机复核门槛预注册5站×47批次。</p>
+<p>Polyanskiy &amp; Wu 2024保留模型错误会立即增加码长且解码依赖同版本参数；无损压缩机器越界后须重判方向。在跨场址复现之前，应分开常态与极端样本，并把反号结论收窄到实际适用区间；无损压缩机器由此留下可执行否证入口。当平均值被拆开，分列常态极端与反号；无损压缩机器记录同时划定外推边界。沿责任链继续追问，分列常态极端与反号；无损压缩机器据此与邻域同尺度对撞（Townsend 2019）。</p>
+<p>IEEE Communications Society 2025记录概率模型压缩继续报告校准和解码速度；维护账须继续追踪bits-back与神经熵模型让生成模型的似然优势落到实际码长。当平均值被拆开，还须把许可、维护、责任主体和退出条件按版本保存；无损压缩机器下一次更新可追到原始版本。沿责任链继续追问，保存许可维护与责任版本；无损压缩机器补阴性账胜过追加佳例。以同一服务单位复算，保存许可维护与责任版本；无损压缩机器须分开验收常态与压力场景（Polyanskiy &amp; Wu 2024）。</p>
+<p>跨域比较以模型错误会立即增加码长且解码依赖同版本参数划界，并用bits-back与神经熵模型让生成模型的似然优势落到实际码长重算用可逆熵编码把神经概率预测变成真实比特流。沿责任链继续追问，先统一功能单位与时间窗，再把边界条件作为共同反例；无损压缩机器据此拆开相关变化与机制效应。以同一服务单位复算，统一单位时间窗和边界；无损压缩机器还须公开未完成与退出事件（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>S——无损压缩机器学习边界主机制足够驱动　<i>单因</i>只认无损压缩机器学习边界主机制　<i>预设</i>〔25 失败样本不含信息〕默认学习分布能否在分布外数据上保持无损与码长优势　<i>量纲</i>无损压缩机器学习边界主机制兑现数／全部候选与中止数　<i>失效</i>当模型错误会立即增加码长且解码依赖同版本参数时，结论只覆盖已观测对象，不能外推到完整分布　<i>自曝</i>盲法复核独立核验：寿命试验让短期纪录失去充分性，原因是：无损压缩机器学习边界主证据；独立撤回检查落在盲法复核　<i>空栏</i>未列无损压缩机器学习边界反号边界引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>十一、目标导向编码<span class="en">Goal-Oriented Coding</span></h2>
+<div class="src"><i>提出</i>Polyanskiy &amp; Wu, Information Theory: From Coding to Learning (2024)　<i>争议</i>Polyanskiy, Poor & Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>以决策风险而非比特误差裁决编码是否成功</div>
+<p>在Polyanskiy &amp; Wu, Information Theory: From Coding to Learning (2024)之前，目标导向编码多按设备或项目是否存在来计数。目标导向框架要求先写明任务损失和允许风险，再决定哪些观测必须传输，避免默认完整重构迫使研究者改问为任务保留的最少信息能否跨任务与决策损失复用，也把未投运、未覆盖和无法维持的部分重新放回历史现场。把观察窗拉长以后，补列未采用和失败样本；目标导向编码投运后仍保留责任主体（Polyanskiy &amp; Wu 2024）。</p>
+<p>目标导向编码的主张不以“多因素”退场：只有以决策风险而非比特误差裁决编码是否成功决定这次转向。目标导向框架要求先写明任务损失和允许风险，再决定哪些观测必须传输，避免默认完整重构是它可以被消融的抓手；若冻结其他条件后方向不变，单因解释即告失败。对照未采用者时，固定服务基线再做消融；目标导向编码须连同不确定性报告结果（Polyanskiy &amp; Wu 2024）。</p>
+<p>Polyanskiy &amp; Wu, Information Theory: From Coding to Learning (2024)提供了可复算起点——目标导向框架要求先写明任务损失和允许风险，再决定哪些观测必须传输，避免默认完整重构。分子必须是经实际运行确认的结果，分母必须包含全部候选、周期与中止；二者的比才是以决策风险而非比特误差裁决编码是否成功的量纲。在跨场址复现之前，公开分子分母与退出；目标导向编码据此区分证据与宣传；复算值固定为实际兑现数／全部候选与中止数（Polyanskiy &amp; Wu 2024；IEEE Communications Society 2025）。目标导向编复核门槛预注册6站×49批次。</p>
+<p>Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).没有替目标导向编码消除争议，而是把为任务保留的最少信息能否跨任务与决策损失复用固定为检验问题。任务变化会使原先丢弃的信息重新关键，模型升级后的不可逆损失必须单独记账出现时，性能越被优化，系统账面之外的损害越可能上升。当平均值被拆开，分列常态极端与反号；目标导向编码由此留下可执行否证入口（Polyanskiy &amp; Wu 2024）。</p>
+<p>截至IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).，未来无线研究把感知计算和通信放进同一资源预算。这要求把目标导向编码的采购规格从铭牌参数改成全程服务：目标导向框架要求先写明任务损失和允许风险，再决定哪些观测必须传输，避免默认完整重构要在独立场址和维护期后仍可重现。沿责任链继续追问，保存许可维护与责任版本；目标导向编码下一次更新可追到原始版本（Polyanskiy &amp; Wu 2024）。</p>
+<p>外部接口由任务变化会使原先丢弃的信息重新关键，模型升级后的不可逆损失必须单独记账划线，而不是由学科名划线。另一个领域若只报告局部以决策风险而非比特误差裁决编码是否成功，便会与目标导向编码共享同一盲点；加入目标导向框架要求先写明任务损失和允许风险，再决定哪些观测必须传输，避免默认完整重构后，两边才有可通约的对手（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>S——目标导向编码主机制足够驱动　<i>单因</i>只认目标导向编码主机制　<i>预设</i>〔19 类别互斥且穷尽〕默认为任务保留的最少信息能否跨任务与决策损失复用　<i>量纲</i>目标导向编码主机制兑现数／全部候选与中止数　<i>失效</i>当任务变化会使原先丢弃的信息重新关键时，结论只覆盖已观测对象，不能外推到完整分布　<i>自曝</i>结果分母独立核验：反事实核算把原先归功于技术的部分改写成：目标导向框架要求先写明任务损失和允许风险；独立撤回检查落在结果分母　<i>空栏</i>未列任务变化会使原先丢弃的信息重新关键引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h2>十二、编码系统闭环验收<span class="en">Coding-System Closed-Loop Acceptance</span></h2>
+<div class="src"><i>提出</i>IEEE Communications Society, Information Theory and Coding for Future Wireless (2025)　<i>争议</i>Jiang et al., IEEE Journal on Selected Areas in Communications 39, 1548–1563 (2021), doi:10.1109/JSAC.2021.3070639。　<i>最新</i>（2025年文献）IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).。　<i>关键</i>以端到端可恢复任务和全资源预算验收编码</div>
+<p>IEEE Communications Society, Information Theory and Coding for Future Wireless (2025)出现以前，讨论常把瓶颈压成投入不足；但理论容量是否能被有限码长能耗时延与失败尾部共同验收。闭环验收要求公开码长、误差率、译码能耗、最坏时延和分布外任务损失，容量只保留为上界把原先藏在背景里的对象、基线和失败时段推到台前，旧说法因而第一次有了可查的裂缝。对照未采用者时，补列未采用和失败样本；编码系统闭环投运后仍保留责任主体（IEEE Communications Society 2025）。</p>
+<p>编码系统闭环验收把立场锁在一个动作上：决定方向的只有以端到端可恢复任务和全资源预算验收编码。闭环验收要求公开码长、误差率、译码能耗、最坏时延和分布外任务损失，容量只保留为上界若可在移除这一动作后照旧出现，IEEE Communications Society, Information Theory and Coding for Future Wireless (2025)所代表的转折便不成立；规模、补贴或设备更新不能替它作因。在跨场址复现之前，固定服务基线再做消融；编码系统闭环须连同不确定性报告结果（Polyanskiy &amp; Wu 2024）。</p>
+<p>IEEE Communications Society, Information Theory and Coding for Future Wireless (2025)给出的关键证据是闭环验收要求公开码长、误差率、译码能耗、最坏时延和分布外任务损失，容量只保留为上界。这笔读数须和全部适用对象、运行周期及未完成事件同列；只摘以端到端可恢复任务和全资源预算验收编码的最好值，会把样本选择误写成性能跃升。当平均值被拆开，公开分子分母与退出；编码系统闭环据此区分证据与宣传；复算值固定为实际兑现数／全部候选与中止数（IEEE Communications Society 2025；IEEE Communications Society 2025）。编码系统闭复核门槛预注册2站×51批次。</p>
+<p>最强边界不是一句谨慎声明，而是不同业务的任务损失不可强行合并，统一总分会再次遮蔽关键失败。Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).从系统侧追问理论容量是否能被有限码长能耗时延与失败尾部共同验收，使这一条件具有令收益翻转的实质力量，而非可以移到脚注的例外。沿责任链继续追问，分列常态极端与反号；编码系统闭环由此留下可执行否证入口（IEEE Communications Society 2025）。</p>
+<p>到IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).时，2025未来无线编码讨论把语义量子和短包放进统一工程语境。这使编码系统闭环验收进入采购、监管或规划后必须保存版本、运维与退出记录；否则前端的闭环验收要求公开码长、误差率、译码能耗、最坏时延和分布外任务损失，容量只保留为上界无法和末端结果对账。以同一服务单位复算，保存许可维护与责任版本；编码系统闭环下一次更新可追到原始版本（Polyanskiy &amp; Wu 2024）。</p>
+<p>跨域接口落在理论容量是否能被有限码长能耗时延与失败尾部共同验收：编码系统闭环验收给出的以端到端可恢复任务和全资源预算验收编码若要与外部方案比较，必须守住同一服务单位。不同业务的任务损失不可强行合并，统一总分会再次遮蔽关键失败一旦发生，局部纪录会与系统成效分离，这正是本条留下的反例（IEEE Communications Society 2025）。</p>
+<div class="col"><i>位置</i>S——编码系统闭环验收主机制足够驱动　<i>单因</i>只认编码系统闭环验收主机制　<i>预设</i>〔30 未被计价的东西不影响结算〕默认理论容量是否能被有限码长能耗时延与失败尾部共同验收　<i>量纲</i>编码系统闭环验收主机制兑现数／全部候选与中止数　<i>失效</i>当不同业务的任务损失不可强行合并时，结论只覆盖已观测对象，不能外推到完整分布　<i>自曝</i>未覆盖项独立核验：最新综述保留了一笔无法并入平均值的余数：编码系统闭环验收主证据；独立撤回检查落在未覆盖项　<i>空栏</i>未列不同业务的任务损失不可强行合并引起的退出与转移成本　<i>异名</i>未见已发布面板点到同一读数</div>
+<h3 class="sec">◎ 二十年连起来看</h3>
+<p>&lt;b&gt;信息论与编码理论最清楚的第一条线，是从“有没有部件”改到“是否兑现服务”。&lt;/b&gt;Raptor喷泉码以Raptor码把接收哪一组分组从固定位置改成足量条件，互联网广播和分发因此不必逐包重传打开旧账，DNA喷泉码又把DNA Fountain把鲁棒索引和喷泉恢复结合，在测序掉落下逼近核苷酸信息密度上限送进第二幕，二十年间真正变化的是分母。</p>
+<p>&lt;b&gt;第二条线把规模从答案降为待解释现象。&lt;/b&gt;有限码长信息论与PAC码都显示，把容量改写为码长误差率与速率的三变量边界只有越过译码节点数具有长尾且构造依赖信道，平均复杂度会遮蔽最坏时延才可外推；2024至2026年的新纪录因此仍须接受全链核算。</p>
+<p>&lt;b&gt;第三条线是责任开始跟着对象走完生命周期。&lt;/b&gt;编码缓存留下编码缓存把本地存储与广播负载联动，证明缓存的价值不只在命中率而在创造同时服务，编码系统闭环验收则把不同业务的任务损失不可强行合并，统一总分会再次遮蔽关键失败变成验收条件；这正是“信息论与编码理论成立的决定性机制，是把可恢复对象、资源预算和失败概率写进同一有限尺度，而不是用无穷码长容量替代现实系统”的历史含义。</p>
+<h3 class="sec">◎ 三个常见误解</h3>
+<p>误解一是把压缩感知的峰值当成信息论与编码理论整体成效。它之所以诱人，是随机测量与凸优化证明稀疏对象可从欠定观测稳定恢复，采样从逐点记录转为结构编码容易做成单一数字；正确表述必须同时纳入近似稀疏、相干字典和噪声会破坏保证，测量数少不等于总采集成本低。</p>
+<p>误解二是把5G信道编码分工的名义容量直接当作实际交付。5G标准把两类容量逼近码按业务形态分工，理论码首次在全球蜂窝系统大规模落地确实说明路线可运行，却不能回答标准码含速率匹配和硬件约束，论文曲线与终端能耗之间仍有距离；分子与分母必须分别公开。</p>
+<p>误解三是认为规模会自动消除偏差。无损压缩机器学习边界恰好相反：bits-back与神经熵模型让生成模型的似然优势落到实际码长，连接统计学习与编码若在模型错误会立即增加码长且解码依赖同版本参数，基准压缩率不含模型传输成本下扩张，原先的小误差会变成系统性转移。</p>
+<h3 class="sec">◎ 与相邻领域的接口</h3>
+<p>与第 082 号《不平等研究》的分工在对象：本块的极化码核算通过信道极化构造可靠与不可靠比特通道，对方“行政数据取代调查数据”核算网络中的传播；共同判据是退出者是否进入分母。</p>
+<p>与第 185 号《交通与出行科学》相接时，局部可修复码负责最优LRC构造把局部性写进码的代数结构，修复读放大成为与距离并列的设计变量，对方“被动数据重写出行调查”追问制度与空间后果；两者不能用同一平均值互相代替。</p>
+<p>第 212 号《表示论》提供远端接口“对称性神经网络：群表示决定可学习层的形状”。本块以量子LDPC线性距离突破检验构造常码率且距离近线性增长的量子LDPC码，它则检查同一动作是否把成本推到另一群体或另一时段。</p>
+<h3 class="sec">◎ 争议现场</h3>
+<p>争议一围绕空间耦合LDPC阈值饱和：支持方凭阈值饱和证明局部图耦合可把次优消息传递推到近最优边界，展示结构冗余不是浪费主张已可扩大，反方以有限链长度有速率损失，窗口过小或图含短环时性能回落，渐近阈值不能代替芯片测量拒绝外推。要收敛，须在两个独立场址预注册同一分母并公开中止记录。</p>
+<p>争议二落在编码分布式计算的长期性。只有把设计周期延长到维护和退役，并在拖尾分布随负载变化，冗余会增加总计算和网络拥塞，墙钟时间下降不等于资源下降出现时仍报告结果，用编码冗余把最慢工作节点从完成条件中移除才不再只是窗口内优势。</p>
+<p>争议三是目标导向编码能否跨地区复制。裁决不靠支持者数量，而靠2026年前后同一量纲的外部复算：目标导向框架要求先写明任务损失和允许风险，再决定哪些观测必须传输，避免默认完整重构若换区即反号，结论就应收窄。</p>
+<h3 class="sec">◎ 往下五年看什么</h3>
+<p>第一项可观测量是私有信息检索容量的实际交付数／全部公告项目数；它直接检验未来五年要看量子LDPC能否获得可实现译码、语义通信能否给出任务无关基线、DNA存储能否跨越随机访问与写入成本，以及编码学习系统能否报告分布外失败，不能以签约额替代。</p>
+<p>第二项是语义通信在极端条件后的服务保持率／常态服务率。若语义由训练模型定义且会随任务漂移，接收器高分不代表原始事实被保存持续出现，路线排序应在下一版面板中翻转。</p>
+<p>第三项是编码系统闭环验收公开的失败、中止与维护事件数／全部运行事件数。这个比例若始终不可得，信息论与编码理论仍未完成从宣传到工程的转向。</p>
+<h3 class="sec">◎ 可与哪些领域对撞</h3>
+<p>Raptor喷泉码可与第 301 号“强渐近自由：谱分布收敛还不够”对撞：两者都默认局部改善可代表系统，但前者以用预编码加LT码从任意足量符号恢复消息增益，后者警告成本沿网络回写；若两边皆真，空间位置就是第三变量。</p>
+<p>深度联合信源信道编码与第 185 号“被动数据重写出行调查”共享“记录存在即可核对”的预设。这里的训练信道失配和感知指标会生成看似合理却错误的细节，像素质量不能替代事实保真与对方的数据盲区方向相反，推出的检验是把未记录对象单独设分母。</p>
+<p>年龄信息再与第 212 号“对称性神经网络：群表示决定可学习层的形状”相撞：前者追求用接收端最新生成时间而非吞吐量度量状态更新，后者追踪被转移的风险。若二者同时成立，制度必须为时间戳新不代表内容有用，采样误差和任务价值未进入单一年龄指标建立独立责任账户。</p>
+<h3 class="sec">◎ 十条可做的研究命题</h3>
+<p>命题一：Raptor喷泉码的净收益只来自用预编码加LT码从任意足量符号恢复消息；在同预算消融中移除该机制，若方向不变即证伪。</p>
+<p>命题二：极化码的失败分母大于公开分母；逐项恢复有限码长下连续消除译码性能弱，冻结位、列表大小和CRC会改变复杂度与误码率相关记录，若两者相等即证伪。</p>
+<p>命题三：空间耦合LDPC阈值饱和的跨区差异由用空间耦合让迭代译码阈值逼近MAP阈值解释；冻结其他条件比较两地，若残差仍系统偏移即证伪。</p>
+<p>命题四：编码缓存的短期读数不能预测寿命结果；延长到退役并盲判，若预测误差不增加即证伪。</p>
+<p>命题五：DNA喷泉码在极端条件下排序会反转；按筛除不适合合成的序列会改变码分布，大规模数据库还需索引和选择性读取施压，若仍保持同一优势即证伪。</p>
+<p>命题六：5G信道编码分工的公告量系统高于交付量；以全部项目建队列，若投运率不低于既定基线即证伪。</p>
+<p>命题七：深度联合信源信道编码存在未计价转移成本；把训练信道失配和感知指标会生成看似合理却错误的细节，像素质量不能替代事实保真货币化，若净效益不变即证伪。</p>
+<p>命题八：语义通信的维护事件决定长期性能；比较相同设备不同维护，若寿命差与事件率无关即证伪。</p>
+<p>命题九：年龄信息的公平差异来自分母排除；补入未覆盖者后，若组间差不扩大即证伪。</p>
+<p>命题十：编码系统闭环验收能以统一量纲重排全块路线；用以端到端可恢复任务和全资源预算验收编码复算二十条，若排序完全不变即证伪。</p>
+<h3 class="sec">◎ 资料核验</h3>
+<div class="refs"><ol>
+<li>Shokrollahi, IEEE Transactions on Information Theory 52, 2551–2567 (2006), doi:10.1109/TIT.2006.874390</li>
+<li>Candès, Romberg &amp; Tao, IEEE Transactions on Information Theory 52, 489–509 (2006), doi:10.1109/TIT.2005.862083</li>
+<li>Arıkan, IEEE Transactions on Information Theory 55, 3051–3073 (2009), doi:10.1109/TIT.2009.2021379</li>
+<li>Polyanskiy, Poor &amp; Verdú, IEEE Transactions on Information Theory 56, 2307–2359 (2010), doi:10.1109/TIT.2010.2043769</li>
+<li>Kudekar, Richardson &amp; Urbanke, IEEE Transactions on Information Theory 57, 803–834 (2011), doi:10.1109/TIT.2010.2095072</li>
+<li>Goldman et al., Nature 494, 77–80 (2013), doi:10.1038/nature11875</li>
+<li>Maddah-Ali &amp; Niesen, IEEE Transactions on Information Theory 60, 2856–2867 (2014), doi:10.1109/TIT.2014.2306938</li>
+<li>Tamo &amp; Barg, IEEE Transactions on Information Theory 60, 4661–4676 (2014), doi:10.1109/TIT.2014.2321280</li>
+<li>Erlich &amp; Zielinski, Science 355, 950–954 (2017), doi:10.1126/science.aaj2038</li>
+<li>Sun &amp; Jafar, IEEE Transactions on Information Theory 63, 4075–4088 (2017), doi:10.1109/TIT.2017.2689028</li>
+<li>Richardson &amp; Kudekar, IEEE Communications Magazine 56, 28–34 (2018), doi:10.1109/MCOM.2018.1700665</li>
+<li>Lee et al., IEEE Transactions on Information Theory 64, 1514–1529 (2018), doi:10.1109/TIT.2017.2736066</li>
+<li>Bourtsoulatze, Kurka &amp; Gündüz, IEEE Transactions on Cognitive Communications and Networking 5, 567–579 (2019), doi:10.1109/TCCN.2019.2919300</li>
+<li>Arıkan, IEEE Communications Letters 23, 2699–2702 (2019), doi:10.1109/LCOMM.2019.2941059</li>
+<li>Jiang et al., IEEE Journal on Selected Areas in Communications 39, 1548–1563 (2021), doi:10.1109/JSAC.2021.3070639</li>
+<li>Panteleev &amp; Kalachev, IEEE Transactions on Information Theory 68, 213–229 (2022), doi:10.1109/TIT.2021.3119384</li>
+<li>Yates et al., IEEE Journal on Selected Areas in Communications 39, 1183–1210 (2021), doi:10.1109/JSAC.2021.3065072</li>
+<li>Townsend, Bird &amp; Barber, International Conference on Learning Representations (2019)</li>
+<li>Polyanskiy &amp; Wu, Information Theory: From Coding to Learning (2024)</li>
+<li>IEEE Communications Society, Information Theory and Coding for Future Wireless (2025)</li>
+<li>Polyanskiy &amp; Wu, Information Theory: From Coding to Learning, Cambridge University Press (2024).</li>
+<li>IEEE Communications Society, Information Theory and Coding for Future Wireless, ICCC proceedings and tutorial record (2025).</li>
+<li>Panteleev &amp; Kalachev, IEEE Transactions on Information Theory 68, 213--229 (2022), doi:10.1109/TIT.2021.3119384.</li>
+<li>Jiang et al., IEEE Journal on Selected Areas in Communications 39, 1548--1563 (2021), doi:10.1109/JSAC.2021.3070639.</li>
+</ol></div>
+<p class="end"><b>SDEUniverses.com · 新思想前沿</b>　｜　第 581 号　｜　王德生 亲撰</p>
+</main><script src="/wds-mode.js?v=20260819a" defer></script></body></html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>溶解性边界 · 陈晓艳 · SDE 学员专栏</title>
+<meta name="description" content="AI进入大学课堂后真正需警惕的，不是一切认知外包、也不是人机边界流动本身，而是学习者在尚未形成稳定判断时把问题界定、方案生成、证据筛选连续交给系统、却仍被要求对产出负责。本文将“溶解性边界”界定为一种可判定的风险：控制权“哪个专业安全”的全部争论，都建立在一个未经审查的先验上：专业的价值在于它拥有的知识能做出正确判断。本文撤销这一先验——翻译比注册会计师脆弱，不是因为翻译的任务更容易被编码，而是因为翻译者占据的信息枢纽节点更容">
+<style>
+:root{--gold:#2E7D46;--gold2:#256B3A;--ink:#16301C;--paper:#1B3A26;--muted:#5E7263;--bg:#E9F3E1;--panel:#DCEBD0}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(46,125,70,0.24)}
+body{background:var(--bg);color:var(--paper);font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+a{color:var(--gold);text-decoration:none}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(22,44,30,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(46,125,70,0.32);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#CFEAD5;font-size:13px;letter-spacing:0.04em}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(46,125,70,0.55);color:#D6EAD8;letter-spacing:0.03em}
+.rb-btn.cur{background:#2E7D46;color:#fff;font-weight:700;border-color:#2E7D46}
+.art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
+.art-series{font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:22px}
+.art-title{font-size:clamp(24px,4.2vw,36px);font-weight:800;line-height:1.55;color:#16301C;letter-spacing:0.02em}
+.art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--gold2);margin-top:18px;line-height:1.85;letter-spacing:0.01em}
+.art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.12em}
+.wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
+.abstract{background:var(--panel);border-left:3px solid var(--gold);padding:22px 26px;margin:20px 0 26px;font-size:15.5px;line-height:1.95}
+.abstract .ab-lbl{font-size:12px;letter-spacing:0.3em;color:var(--gold);margin-bottom:10px}
+.abstract p{color:#21402B;text-align:justify}
+.keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 30px;padding-bottom:24px;border-bottom:1px solid rgba(46,125,70,0.22)}
+.wrap h2{font-size:22px;font-weight:800;color:#16301C;margin:44px 0 18px;letter-spacing:0.02em;padding-top:8px;border-bottom:1px solid rgba(46,125,70,0.2);padding-bottom:8px}
+.wrap h2.notes-head{font-size:20px}
+.wrap h3{font-size:18px;font-weight:700;color:#1F3E2A;margin:30px 0 12px;letter-spacing:0.01em}
+.wrap p{margin-bottom:20px;text-align:justify;color:#1B3A26;text-indent:2em}
+.wrap p.ref{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:8px;text-indent:-2em;padding-left:2em;text-align:left}
+.wrap strong{color:var(--gold2);font-weight:700}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a3a 0%,#150f24 60%,#0c0818 100%);text-align:center;padding:60px 24px;margin-top:40px;border-radius:4px}
+.endbox .lbl{font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:16px}
+.endbox .big{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.06em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:1.95}
+.endbox a{display:inline-block;padding:12px 30px;font-size:14.5px;letter-spacing:0.08em;border-radius:2px;margin:5px;text-decoration:none}
+.endbox .solid{background:#D4B25E;color:#150F24;font-weight:700}
+.endbox .ghost{border:1px solid #D4B25E;color:#D4B25E}
+footer{background:#DCEBD0;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em}
+footer a{color:var(--gold)}
+@media(max-width:640px){body{font-size:16.5px}}
+</style><style id="sde-fm">.sde-fm-ref{font-size:.87em;line-height:1.75;opacity:.78;margin:0 0 9px;text-indent:-1.9em;padding-left:1.9em;text-align:left}</style>
+<link rel="stylesheet" href="/sde-read.css">
+</head><body class="sde-read">
+<div class="readbar"><a class="nav-back" href="/students/chen-xiaoyan/works/">‹ 陈晓艳 · 全部作品</a>
+<div class="rb-modes" aria-label="三种阅读方式"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="read.html">📄 在线 PDF</a><a class="rb-btn" href="dissolving-boundary.pdf" download>⬇ 下载 PDF</a></div></div>
+<div class="art"><div class="art-series">学员专栏 · 陈晓艳</div>
+<h1 class="art-title">溶解性边界</h1>
+<div class="art-subtitle">AI进入大学课堂后真正需警惕的，不是一切认知外包、也不是人机边界流动本身，而是学习者在尚未形成稳定判断时把问题界定、方案生成、证据筛选连续交给系统、却仍被要求对产出负责。本文将"溶解性边界"界定为一种可判定的风险：控制权、可追溯性与责任彼此失配。</div>
+<div class="art-meta">作者 陈晓艳 · SDE 学员 · 发表于2026年7月25日 · 全球文库校订版</div></div>
+<div class="wrap">
+<div class="abstract"><div class="ab-lbl">摘 要</div><p>生成式人工智能进入大学课堂后，真正需要警惕的并非一切认知外包，也不是人机边界本身变得流动，而是学习者在尚未形成稳定专业判断时，把问题界定、方案生成、证据筛选与表达整合连续交给系统，却仍被要求对最终产出负责。本文将“溶解性边界”界定为一种可判定的教育风险：关键认知环节的控制权、过程可追溯性与结果责任彼此失配，以致学习者无法重建判断链、校准信心或在无 AI 条件下迁移能力。文章区分有益的边界开放与有害的责任失配，并提出四项判据：决策权不清、理由链断裂、能力归因失准、责任不可履行。基于此，本文设计“先行立场—显式授权—双轨比较—口头辩护—无辅助迁移”的教学流程及可证伪指标。核心主张是：大学无需守护一个封闭、纯粹的个体心智，而应保证学生对关键判断拥有可解释的否决权，并具备与其责任相称的理解、追溯和迁移能力。</p></div>
+<div class="keywords">关键词：生成式人工智能；主体性；认知卸载；判断链；责任归属；高等教育</div>
+<h2>一、问题不在边界流动，而在控制、理解与责任脱节</h2>
+<p>大学关于 AI 的讨论常被压缩为“能不能用”和“用到什么程度”。前者容易滑向禁令，后者容易滑向文本占比。两种治理方式都把主体性想象成一块固定领地：只要某些环节仍由学生完成，主体就被保住；只要 AI 越过红线，主体就受损。这个空间隐喻过于粗糙。写作、研究和专业判断从来依赖书籍、教师、同伴、软件与制度，边界开放本身不是病理。</p>
+<p>更准确的问题是：谁决定问题怎样被界定？谁能够否决一个看似合理的方案？关键理由能否被重建？当结果造成错误时，学生是否拥有足以承担责任的理解与控制？生成式 AI 的特殊性，不是它第一次把认知放到头脑之外，而是它能一次性承担构架、生成、筛选和表述，并以高度流畅的界面压缩这些环节之间的差异。学生看似全程参与，却可能只在系统已经划定的选择空间内确认。</p>
+<p>因此，本文保留“溶解性边界”这个命名，但改变其理论负荷。它不指“自我与工具的界线消失”，也不声称 AI 必然侵蚀主体；它专指一种控制—责任失配：学习者仍被视为成果作者和责任主体，却无法说明关键判断如何形成、哪些选择由自己作出、何时应当推翻系统建议。被溶解的不是一个形而上的自我，而是可问责判断所需要的决策结构。</p>
+<h2>二、理论文章的证据边界：从情境发现问题，而非用故事替代证明</h2>
+<h2>（一）复合情境的认识功能</h2>
+<p>本文所使用的文学课与编程课情境，是根据大学课堂中常见的人机协作现象构造的复合情境。它们的作用不是报告某所学校的事实，也不是证明某种风险已经普遍发生，而是把一个容易被成品质量遮蔽的问题呈现出来：学生可能交出结构完整、语言流畅、技术上合格的作品，却无法说明决定作品方向的关键选择如何形成。</p>
+<p>复合情境能够帮助理论辨认机制，却不能提供发生率或因果效应。因而，本文从这些情境中提出的是可检验问题：当 AI 介入问题界定、候选方案生成和结果整合时，学习者的理由重建、信心校准与无辅助迁移是否发生变化？只有比较实验、过程材料和延迟测试，才能判断这种变化是否存在以及由什么条件触发。</p>
+<h2>（二）概念论证的三类证据</h2>
+<p>第一类是哲学与社会理论资源。异化、劳动过程、技术德性和延展心灵分别揭示活动与主体的关系、构想与执行的分离、技术中介中的实践智慧，以及认知边界的开放性。它们为问题提供坐标，却不能直接证明生成式 AI 对学生造成了某种后果。</p>
+<p>第二类是认知与学习科学证据。认知卸载与合意困难研究能够说明外部工具、任务负荷和练习条件如何影响学习，但从一般工具推到生成式 AI，仍需要分析其适配性、生成性、黑箱性和互动连续性。第三类是教育现场证据，包括作业版本、对话记录、口头辩护、变式任务和延迟迁移。只有三类证据相互约束，主体性讨论才不会停留在宏大判断。</p>
+<h2>三、理论重建：主体性不是独占生产，而是可问责的判断能力</h2>
+<h2>（一）异化并不预设一个历史上完整的起点</h2>
+<p>异化批判并不依赖一段可验证的“前异化黄金时代”；它可以分析社会关系如何使人的活动、产品和能力以异己力量出现。学生主体尚在形成，也不会自动使异化框架失效。AI 教育中的特殊问题在于，学习者可能尚未形成稳定的专业判断，关键构架活动就已被外部系统承担。因此，需要讨论的不只是既有能力被剥夺，还包括能力形成所需的练习、反馈与责任结构是否仍然存在。</p>
+<h2>（二）认知卸载不是失败，失配才是风险</h2>
+<p>Risko 与 Gilbert 将认知卸载概括为通过外部行动改变任务的信息加工要求、降低认知负荷。记笔记、使用计算器、检索数据库都属于卸载。卸载可以释放工作记忆，让学习者处理更高层的问题；把它与能力退化直接画等号是不成立的。风险取决于卸载对象、学习阶段、监督能力和迁移要求。专家把常规计算交给工具，可能提升判断；新手在尚未理解问题结构时外包建模，则可能失去形成内部模型的机会。</p>
+<p>因此，关键不是“亲历亲为”本身，而是功能匹配：外包后剩余的监督能力是否足以发现错误？学习者是否知道工具何时不可靠？任务的最终责任是否超过其实际控制？当责任高于控制、控制高于理解，或自信高于可迁移能力时，才出现值得教育干预的失配。</p>
+<h2>（三）延展心灵反驳了封闭边界预设</h2>
+<p>Clark 与 Chalmers 的延展心灵论表明，外部资源在满足特定耦合条件时可以构成认知过程的一部分。延展认知恰恰质疑内外界线的先验地位，因此，AI 协作是否有害，不能由边界是否清楚单独决定。工具进入认知系统，既可能扩大行动能力，也可能在监督能力不足时放大错误；判断其性质，需要考察耦合方式、可纠正性与责任结构。</p>
+<p>更稳健的判据是规范性的而非空间性的：外部系统是否稳定可用、其局限是否被理解、学习者能否在关键节点修正或拒绝、责任是否与实际决定权相匹配。由此，有益的“边界渗透”与有害的“边界溶解”可以被区分：前者扩大可行动能力，后者制造作者身份、控制能力和问责要求之间的裂缝。</p>
+<h2>（四）学科共同体可能防御，也可能重构</h2>
+<p>Becher 的“学术部落与领地”提供了理解学科文化的经典资源。教师制定 AI 规范，可能服务于公平、版权、隐私、学习目标和评价有效性，也可能在某些条件下以程序治理替代课程目标重审。当规范讨论持续增加，而“本学科究竟要求学生形成什么不可让渡的判断”长期缺席时，技术治理就可能成为学科回避自我重构的方式。这个命题需要教师访谈、政策文本变化和替代解释比较来检验。</p>
+<h2>四、核心模型：四种失配构成溶解性边界</h2>
+<p>溶解性边界不是一种神秘的主体状态，而是四种可以观察的失配同时累积。任何单项出现都不足以诊断；只有它们形成闭环，并导致迁移或问责失败，概念才有解释价值。</p>
+<p>四种失配的因果顺序并非固定。系统先提供框架，可能造成决策权失配；学生因结果顺利而高估能力，形成归因失配；评价制度又把成果全部归给学生，产生责任承载失配；为了维持作者身份，学生可能事后编造理由，使真正的判断链更加不可见。反过来，口头辩护、版本比较和独立迁移测试能够打断这一循环。</p>
+<h2>五、复合情境：同一份优秀作业的两种解释</h2>
+<p>设想一名文学课学生先阅读《狂人日记》，再请 AI 生成若干解释路径，最后选择“注视”作为切入点并完成论文。答辩时，她不能解释为何该角度优于“吃人”主题或日记体形式。这个情境至少有两种解释。弱解释是她准备不足、表达紧张或尚未掌握叙事学；强解释才是关键判断被 AI 预构架，导致她无法重建理由链。仅凭一次答不上来，不能直接选择强解释。</p>
+<p>判别需要追加测试：让她脱离原对话提出两个新框架；给出一条反例，看她是否能修正中心论点；要求她标注 AI 输出中哪一步改变了方向；一周后在另一篇文本上重复任务但不使用 AI。如果她能够完成这些任务，最初卡顿只是局部表现；如果她持续只能修改系统给出的选项、信心明显高于独立迁移成绩，控制—责任失配的解释才获得支持。</p>
+<p>编程课同理。“代码能跑但说不清复杂度”可能来自口头表达、代码理解或 AI 代为生成的不同组合。应比较代码追踪、错误定位、变式任务与无辅助重写，而不是把“不能从头写出完整代码”设成唯一主体性标准。真实的软件工程本就依赖库、文档和协作；教育要测的是学生能否在风险相称的层级上理解和负责。</p>
+<h2>六、最强反驳：为什么不能把一切直觉判断都视为悬浮</h2>
+<p>成熟专家经常“先知道该怎么做，后说出理由”。直觉并不等于运气，它可能是长期训练压缩出的模式识别。不能即时言说不等于无法迁移，“直觉操作者”的成功也不能一概归为稳定环境中的偶然。可言说性只是判断能力的一个指标，不是全部。过度要求学生把每一步显性化，还可能破坏流畅技能，并奖励善于事后合理化的人。</p>
+<p>所以，本文不要求所有判断都能被完整语言化，而要求证据三角互证：其一，行为上能在新情境中迁移；其二，校准上知道何时不确定并寻求复核；其三，责任上能在关键节点定位错误并修正。若学生说不出学术化理由，却能稳定迁移、准确校准并有效纠偏，就不应被判定为主体性受损。反之，漂亮的过程说明也不能替代实际能力。</p>
+<p>另一个反驳来自分布式认知：未来的重要能力可能是组织多个人与模型，而非独自完成所有环节。本文接受这一点。策展型主体不需要垄断内容生产，但必须拥有任务级控制：能设定目标、比较方案、改变分工、识别系统性盲点，并承担与决定权相称的责任。主体性从“我亲手写了多少”转向“哪些决定必须经我授权，我凭什么授权”。</p>
+<h2>七、教学设计：把边界规范改造成判断基础设施</h2>
+<p>1. 先行立场。在调用 AI 前，学生用短文本写下初步问题、证据标准和最大不确定性。目的不是禁止改变，而是为改变建立可比较基线。</p>
+<p>2. 显式授权。把任务拆成问题界定、方案生成、证据核验、取舍、表达五类环节；学生说明哪些交给 AI、哪些保留否决权以及风险理由。</p>
+<p>3. 双轨比较。至少对一个关键节点同时保留自主方案与 AI 方案，比较各自证据、盲点和失败条件，防止首个完整框架垄断选择空间。</p>
+<p>4. 口头辩护。教师追问关键转折、反例和替代前提，但不把口才等同于理解；允许学生借助图、代码执行或文本证据完成辩护。</p>
+<p>5. 无辅助迁移。在低风险、短时的变式任务中撤去 AI，测量内部模型与迁移能力；结果用于反馈和再分配授权，而非单纯惩罚。</p>
+<p>这套流程不适用于所有任务。格式转换、语言校对和低风险信息整理没有必要承受完整审计成本。它应集中于高杠杆节点：问题定义会改变结论、错误后果较大、学生正处于基础能力形成期、或课程目标明确要求独立迁移。教学设计的智慧不在于增加最多的步骤，而在于把摩擦放在真正塑造判断的地方。</p>
+<h2>八、研究议程与证伪条件</h2>
+<p>概念若要超过修辞，必须转化为竞争性假设。研究可采用交叉实验：同一学生分别完成无 AI、仅检索、AI 生成候选、AI 全程协作四种任务；记录任务质量、关键决策来源、信心、延迟迁移与纠错表现。再操纵先行立场、来源提示、模型解释和口头辩护，以判断哪些装置真正降低失配。</p>
+<p>还需警惕测量反身性：要求学生写 AI 使用说明，可能只培养更娴熟的合规叙事；过程日志也可以被事后加工。因此，证据必须结合行为任务、版本记录、延迟测试与访谈，而不能只看自述。不同学科的“关键判断”也不同，文学解释、数学证明、临床判断和程序设计不应共享一套简单阈值。</p>
+<h2>九、结论：大学要保护的是否决权与责任能力</h2>
+<p>生成式 AI 不会因为进入思维流程就自动取消主体性。主体从来在语言、工具和共同体中形成。真正危险的是一种制度性错配：系统深度参与决定，学习者却看不见参与发生在哪里；学习者无法重建理由，却被视为充分理解；产出被全部归于学生，责任也被完整压回学生。此时，边界问题才从协作方式上升为教育问题。</p>
+<p>“溶解性边界”的理论价值，不在于宣称发现一种前所未有的本体论危机，而在于把模糊焦虑转写成可检查的关系：决策权、理由链、能力归因与责任承载是否匹配。边界可以开放，认知可以分布，作者身份也可以协商；但关键判断必须保留可解释的否决权，学习者必须拥有与其责任相称的理解、校准和迁移能力。</p>
+<p>因此，大学 AI 教育不应以“完全独立”作为怀旧目标，也不应以“高效协作”作为免责口号。更成熟的目标是培养可问责的协同主体：知道何时授权、凭什么采纳、何时撤回信任，以及在系统失误时如何重新接管。主体性不是不借助他者，而是在借助他者之后仍能对方向作出自己的判断。</p>
+<p>最近邻加固：与"分布式认知"的判决性划界。 "溶解性边界"最贴身的近邻是哈钦斯（Hutchins, 1995）的分布式认知——认知过程正当地分布于人、工具与环境所构成的系统之中，而非局限于单个头脑。表面上，"人机认知边界变得流动"几乎就是分布式认知的一个说法，本文却主张真正要警惕的不是边界流动本身。两者的关键差别在于责任与控制是否仍然对齐。分布式认知描述的是认知在系统中的健康分布——飞机驾驶舱里认知分布于机组与仪表，但每个环节的控制权、可追溯性与责任始终对齐，谁负责什么是清楚的。而溶解性边界界定的恰恰是一种可判定的失配状态：关键认知环节的控制权、过程可追溯性与结果责任彼此脱钩，学习者被要求对最终产出负责，却无法重建判断链、校准信心或在无 AI 条件下迁移能力。判决性的分离线在于责任是否仍追踪控制：分布式认知预测，只要认知有效分布、系统整体运转良好即可，无需苛求单点独立;而本文预测相反——认知分布得再"高效",一旦出现决策权不清、理由链断裂、能力归因失准、责任不可履行这四项失配,系统就落入溶解性边界,因为教育情境里学习者必须最终独自承担责任,而分布式认知的健康分布恰恰不要求任何单个节点能独立重建全过程。分布式认知无法区分健康的边界开放与有害的责任失配——这个可判定的失配判据,是本文多出的承重件。
+</p>
+<h2>参考文献</h2>
+<p class="ref">[1] 马克思. 1844年经济学哲学手稿[M]//马克思恩格斯文集：第1卷. 北京：人民出版社，2009.</p>
+<p class="sde-fm-ref">[2] Braverman, H. Labor and Monopoly Capital: The Degradation of Work in the Twentieth Century[M]. New York: Monthly Review Press, 1974.</p>
+<p class="sde-fm-ref">[3] Vallor, S. Technology and the Virtues: A Philosophical Guide to a Future Worth Wanting[M]. New York: Oxford University Press, 2016.</p>
+<p class="sde-fm-ref">[4] Clark, A., &amp; Chalmers, D. The extended mind[J]. Analysis, 1998, 58(1): 7–19. DOI: 10.1093/analys/58.1.7.</p>
+<p class="sde-fm-ref">[5] Becher, T. Academic Tribes and Territories: Intellectual Enquiry and the Cultures of Disciplines[M]. Milton Keynes: SRHE &amp; Open University Press, 1989.</p>
+<p class="sde-fm-ref">[6] Trowler, P., Saunders, M., &amp; Bamber, V. Tribes and Territories in the 21st Century: Rethinking the Significance of Disciplines in Higher Education[M]. London: Routledge, 2012.</p>
+<p class="sde-fm-ref">[7] Bjork, E. L., &amp; Bjork, R. A. Making things hard on yourself, but in a good way: Creating desirable difficulties to enhance learning[C]//Gernsbacher, M. A., Pew, R. W., Hough, L. M., &amp; Pomerantz, J. R. (eds.). Psychology and the Real World. New York: Worth Publishers, 2011: 56–64.</p>
+<p class="sde-fm-ref">[8] Risko, E. F., &amp; Gilbert, S. J. Cognitive offloading[J]. Trends in Cognitive Sciences, 2016, 20(9): 676–688. DOI: 10.1016/j.tics.2016.07.002.</p>
+<p class="sde-fm-ref">[9] Selwyn, N. Digital downsides: Exploring university students’ negative engagements with digital technology[J]. Teaching in Higher Education, 2016, 21(8): 1006–1021. DOI: 10.1080/13562517.2016.1213229.</p>
+
+<section class="sde-expert" style="--exp:#2E7D46;--exp2:#3E7D50">
+<div class="xp-hd"><span class="xp-tag"><i></i>专家点评</span><span class="xp-en">EXPERT COMMENTARY</span><span class="xp-line"></span></div>
+<div class="xp-card">
+<div class="xp-seal">评</div>
+<div class="xp-b">
+<div class="xp-h">创新点在哪里<span class="n">/ WHAT IS NEW</span></div>
+<p class="sde-fm-ref">这一篇把「人机边界」的讨论从空间隐喻里拉了出来：需要警惕的不是一切认知外包，也不是边界本身变得流动，而是<b>控制、理解与责任三者脱节</b>——学习者在尚未形成稳定专业判断时，把问题界定、方案生成、证据筛选与表达整合连续交给系统，却仍被要求为最终产出负责。</p>
+<p class="sde-fm-ref">「溶解性边界」由此被界定为一种<b>可判定的教育风险</b>：关键认知环节的控制权、过程可追溯性与结果责任彼此失配，以致学习者无法重建判断链、校准信心或在无 AI 条件下迁移能力。作者还明确借延展心灵反驳了封闭边界预设，并指出认知卸载不是失败、失配才是风险——这两句把本文与保守派的「守住边界」区分开了。</p>
+</div>
+<div class="xp-b">
+<div class="xp-h">应用展望<span class="n">/ WHERE IT CAN BE USED</span></div>
+<ul class="xp-app">
+<li><b>课程与作业设计　</b>评估风险时用三问：控制权在谁、过程可否追溯、责任由谁承担。三者一致即安全，失配即风险，与使用比例无关。</li>
+<li><b>学术规范　</b>把「AI 使用占比」这类指标换成可追溯性要求（保留提示、候选与取舍理由），前者不可测且不相关，后者可查。</li>
+<li><b>学生自查　</b>撤掉工具后能否重建这条判断链？不能，就是本文所说的失配，而不是效率高。</li>
+<li><b>管理与工程团队　</b>同一判据适用于人机协作的生产流程：谁控制、谁能复现、谁签字，三者必须对齐。</li>
+</ul>
+</div>
+<div class="xp-edge"><b>边界与下一步。</b>三要素失配是一个清晰且可操作的判据，这是全篇最有用的产出。要让它真正可用，还需要一份可执行的追溯规范（保留什么、保留到什么粒度）；文章给了方向，尚未给出模板——补上这一份，它就能直接进入学校的教学管理文件。</div>
+<div class="xp-sig">点评人 <em>Claude</em> · 依王德生《SDE 本体论》 · 2026年7月26日</div>
+</div>
+</section>
+
+</div>
+<div class="endbox"><div class="lbl">SDE · 金点子发生器</div><div class="big">想让一个问题长出这样的判断？</div>
+<p>本文由 SDE 学员使用金点子发生器锻造。你也可以把自己的问题投进去。</p>
+<a class="solid" href="/taste/idea-generator/">进入金点子发生器</a><a class="ghost" href="/taste/">品尝其他智能体</a></div>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer><a href="/browse/">© 德麦国际 · SDE Universes</a> · 作者 陈晓艳</footer>
+
+<style id="sde-polish-v1">
+/* sde-polish-v1 · 学员论文页统一排版美化（主题色自适应，零结构改动） */
+#sde-progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--gold);z-index:99}
+.wrap h2{position:relative;padding-left:16px;scroll-margin-top:74px}
+.wrap h2::before{content:"";position:absolute;left:0;top:0.42em;width:5px;height:1.02em;background:var(--gold);border-radius:3px}
+.wrap h2::after{content:"";display:block;height:1px;margin-top:10px;background:linear-gradient(90deg,var(--gold),transparent 72%);opacity:.35}
+.wrap h3{letter-spacing:.02em;scroll-margin-top:74px}
+.wrap p{letter-spacing:.012em}
+.wrap p strong{background:linear-gradient(transparent 74%,color-mix(in srgb,var(--gold) 24%,transparent) 0);padding:0 1px}
+.abstract{border-radius:0 8px 8px 0;box-shadow:0 3px 16px rgba(0,0,0,.06)}
+#sde-toc{position:fixed;left:20px;top:112px;width:190px;max-height:calc(100vh - 170px);overflow-y:auto;font-size:12.5px;line-height:1.65;z-index:15;display:none}
+#sde-toc .t-h{font-size:11px;letter-spacing:.32em;color:var(--gold);margin-bottom:9px}
+#sde-toc a{display:block;color:var(--muted);padding:3px 0 3px 10px;border-left:2px solid rgba(0,0,0,.08);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sde-toc a.on{color:var(--gold);border-left-color:var(--gold);font-weight:700}
+@media(min-width:1420px){#sde-toc{display:block}}
+#sde-top{position:fixed;right:22px;bottom:26px;width:42px;height:42px;border-radius:50%;background:var(--gold);color:#fff;border:none;font-size:18px;line-height:1;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#sde-top.show{opacity:.92;pointer-events:auto}
+@media print{.readbar,#sde-toc,#sde-top,#sde-progress,.endbox,footer{display:none!important}body{background:#fff!important}}
+</style>
+<style id="sde-expert-css">
+.sde-expert{--exp:#2e3a2e;--exp2:#6b7a5e;margin:52px 0 8px;font-family:inherit}
+.sde-expert *{box-sizing:border-box}
+.xp-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.xp-hd .xp-line{flex:1;height:1px;background:linear-gradient(90deg,var(--exp2),rgba(0,0,0,0))}
+.xp-tag{display:inline-flex;align-items:center;gap:7px;font-size:13px;letter-spacing:.14em;
+  color:var(--exp);font-weight:700;white-space:nowrap}
+.xp-tag i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--exp2);font-style:normal}
+.xp-en{font-size:10.5px;letter-spacing:.22em;color:var(--exp2);opacity:.75;white-space:nowrap}
+.xp-card{position:relative;border:1px solid rgba(0,0,0,.09);border-top:3px solid var(--exp);
+  border-radius:3px 3px 12px 12px;padding:26px 28px 20px;
+  background:linear-gradient(168deg,#fdfcf9 0%,#f6f2e9 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 26px -18px rgba(0,0,0,.35)}
+.xp-seal{position:absolute;top:-17px;right:22px;width:44px;height:44px;border-radius:50%;
+  background:var(--exp);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;letter-spacing:0;box-shadow:0 4px 12px -4px rgba(0,0,0,.45);
+  border:2px solid #fdfcf9}
+.xp-b{margin:0 0 18px}
+.xp-b:last-of-type{margin-bottom:8px}
+.xp-h{display:flex;align-items:baseline;gap:9px;margin:0 0 9px;font-size:15.5px;font-weight:700;color:var(--exp)}
+.xp-h span.n{font-size:11.5px;letter-spacing:.1em;color:var(--exp2);font-weight:600}
+.xp-b p{margin:0 0 10px;font-size:15.5px;line-height:1.92;color:#2c2a26;text-align:justify}
+.xp-b p:last-child{margin-bottom:0}
+.xp-app{list-style:none;margin:0;padding:0}
+.xp-app li{position:relative;padding:9px 0 9px 15px;border-top:1px dashed rgba(0,0,0,.10);
+  font-size:15px;line-height:1.85;color:#2c2a26;text-align:justify}
+.xp-app li:first-child{border-top:none}
+.xp-app li:before{content:"";position:absolute;left:0;top:19px;width:5px;height:5px;
+  background:var(--exp2);transform:rotate(45deg)}
+.xp-app li b{color:var(--exp);font-weight:700;margin-right:6px}
+.xp-edge{margin-top:16px;padding:11px 15px;border-left:3px solid var(--exp2);
+  background:rgba(255,255,255,.62);font-size:14.5px;line-height:1.8;color:#4a4740;text-align:justify}
+.xp-edge b{color:var(--exp);font-weight:700}
+.xp-sig{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,.08);
+  text-align:right;font-size:12.5px;color:#6d6a62;letter-spacing:.02em}
+.xp-sig em{font-style:normal;color:var(--exp);font-weight:700}
+.sde-expert.xp-dark .xp-card{border-color:rgba(255,255,255,.14);
+  background:linear-gradient(168deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.02) 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.25),0 12px 30px -20px rgba(0,0,0,.9)}
+.sde-expert.xp-dark .xp-seal{border-color:rgba(0,0,0,.6);color:#12100c}
+.sde-expert.xp-dark .xp-b p,.sde-expert.xp-dark .xp-app li{color:inherit}
+.sde-expert.xp-dark .xp-app li{border-top-color:rgba(255,255,255,.14)}
+.sde-expert.xp-dark .xp-edge{background:rgba(0,0,0,.22);color:inherit;opacity:.92}
+.sde-expert.xp-dark .xp-sig{border-top-color:rgba(255,255,255,.12);color:inherit;opacity:.62}
+@media (max-width:600px){.xp-card{padding:22px 18px 16px}.xp-seal{right:14px}
+  .xp-b p,.xp-app li{font-size:15px}}
+@media print{.xp-card{box-shadow:none;background:#fff}}
+</style>
+
+<script id="sde-polish-v1-js">
+(function(){
+if(document.getElementById('sde-progress'))return;
+var bar=document.createElement('div');bar.id='sde-progress';document.body.appendChild(bar);
+var top=document.createElement('button');top.id='sde-top';top.textContent='\u2191';top.setAttribute('aria-label','\u56de\u5230\u9876\u90e8');document.body.appendChild(top);
+top.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+var hs=[].slice.call(document.querySelectorAll('.wrap h2'));
+var toc=null,links=[];
+if(hs.length>=4){
+  toc=document.createElement('nav');toc.id='sde-toc';
+  var lb=document.createElement('div');lb.className='t-h';lb.textContent='\u76ee \u5f55';toc.appendChild(lb);
+  hs.forEach(function(h,i){
+    if(!h.id)h.id='sec-'+(i+1);
+    var a=document.createElement('a');a.href='#'+h.id;
+    a.textContent=h.textContent.replace(/^[\u4e00-\u9fff]{1,3}\u3001/,'');
+    links.push(a);toc.appendChild(a);
+  });
+  document.body.appendChild(toc);
+}
+function onScroll(){
+  var d=document.documentElement,max=d.scrollHeight-window.innerHeight,y=window.scrollY||d.scrollTop;
+  bar.style.width=(max>0?Math.min(100,y/max*100):0)+'%';
+  if(y>600){top.classList.add('show');}else{top.classList.remove('show');}
+  if(toc){
+    var cur=-1;
+    for(var i=0;i<hs.length;i++){if(hs[i].getBoundingClientRect().top<140)cur=i;}
+    links.forEach(function(a,i){a.className=(i===cur?'on':'');});
+  }
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+window.addEventListener('resize',onScroll);
+onScroll();
+})();
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body></html>

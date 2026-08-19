@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>复推率——论学会了没有，不看现在能不能说出那条规则，而看换一个表面不同的情境能不能重新推出同一条 · 学科通融 | SDE Universes</title>
+<meta name="description" content="学习的最小单位是什么？教育心理学说是规则的前后差，运动学习说学的是内隐模型且语言化会挤掉它，组织例程研究说根本没有可保存的规则、每次执行都是重新推断。三家共有一个前提：存在一条可在两个时点之间比较的同一规则。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+/* 学科通融 · 学术纸面版式 v2 —— 为长时间的思辨性阅读设计 */
+:root{
+  --paper:#F5F2E9; --paper2:#FBF9F3; --sheet:#FDFCF7;
+  --ink:#23201A; --ink2:#5C5647; --ink3:#8A8271;
+  --rule:#2A3B50; --rule2:#41586F;
+  --mark:#9E3D2C; --mark2:#B85A44;
+  --line:rgba(35,32,26,.13); --line2:rgba(35,32,26,.28);
+  --measure:700px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 8%, rgba(42,59,80,.035), transparent 46%),
+    radial-gradient(circle at 84% 72%, rgba(158,61,44,.030), transparent 44%);
+  background-attachment:fixed;
+  font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;
+  font-size:18.5px; line-height:2.06; letter-spacing:.012em;
+  font-feature-settings:"kern" 1;
+  text-rendering:optimizeLegibility;
+}
+a{color:inherit}
+::selection{background:rgba(158,61,44,.16)}
+
+/* 阅读进度：细，不抢注意力 */
+#pbar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--mark);z-index:99;opacity:.85}
+
+/* 顶栏 */
+.readbar{position:sticky;top:0;z-index:10;background:rgba(245,242,233,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 26px;font-size:13.5px;gap:12px;flex-wrap:wrap;letter-spacing:.02em}
+.nav-back{text-decoration:none;color:var(--mark)}
+.rb-modes{display:flex;gap:8px}
+.rb-btn{padding:5px 13px;border:1px solid var(--line2);border-radius:0;
+  text-decoration:none;font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
+.rb-btn:hover{border-color:var(--mark);color:var(--mark)}
+.rb-btn.cur{background:var(--rule);color:var(--sheet);border-color:var(--rule)}
+
+/* 题头：论文首页 */
+.art{max-width:800px;margin:auto;padding:78px 26px 8px;text-align:center}
+.art-series{color:var(--mark);letter-spacing:.42em;font-size:11.5px;text-transform:uppercase}
+.art-title{font-size:clamp(30px,4.4vw,45px);line-height:1.38;margin:26px 0 0;font-weight:700;letter-spacing:.01em}
+.art-title:after{content:"";display:block;width:56px;height:1px;background:var(--line2);margin:26px auto 0}
+.art-sub{color:var(--ink2);font-size:17px;line-height:1.94;max-width:620px;margin:22px auto 0;font-weight:400}
+.art-meta{color:var(--ink3);font-size:12.5px;margin-top:26px;letter-spacing:.09em}
+
+/* 正文栏宽：每行约三十四个汉字，是长文思辨阅读最省力的宽度 */
+.wrap{max-width:var(--measure);margin:auto;padding:8px 26px 46px}
+
+/* 摘要块 */
+.deck{position:relative;background:var(--paper2);border:0;border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--line);border-radius:0;
+  padding:30px 30px 26px;margin:44px 0 8px;font-size:16.2px;line-height:2.0;color:var(--ink2);text-align:justify}
+.deck:before{content:"题 解";position:absolute;top:-11px;left:26px;background:var(--paper);
+  padding:0 10px;font-size:11px;letter-spacing:.34em;color:var(--rule)}
+
+/* 目录：带引导点的学术目次 */
+.toc{background:transparent;border:0;border-top:1px solid var(--line2);
+  border-bottom:1px solid var(--line2);border-radius:0;padding:24px 4px 20px;margin:44px 0 56px}
+.toc .tl{font-size:11px;letter-spacing:.44em;color:var(--mark);margin-bottom:16px;text-align:center}
+.toc a{display:flex;align-items:baseline;gap:6px;padding:6px 2px;color:var(--ink2);
+  font-size:15px;text-decoration:none;border:0;line-height:1.7}
+.toc a:after{content:"";flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-4px)}
+.toc a:hover{color:var(--mark)}
+
+/* 章节层级 */
+h2{font-size:23px;margin:74px 0 22px;padding:26px 0 0;border:0;border-top:1px solid var(--line2);
+  line-height:1.55;scroll-margin-top:78px;letter-spacing:.02em;font-weight:700}
+h2:first-of-type{margin-top:48px}
+h2:target{background:linear-gradient(transparent 68%,rgba(158,61,44,.14) 68%)}
+h3{font-size:18.5px;margin:44px 0 14px;color:var(--rule);font-weight:700;
+  padding-left:12px;border-left:2px solid var(--mark);line-height:1.7}
+h4{font-size:17px;margin:30px 0 10px;color:var(--mark);font-weight:700}
+
+p{margin:0 0 17px;text-align:justify;hyphens:auto}
+strong,b{color:var(--rule);font-weight:700}
+i,cite{font-style:italic;color:var(--ink2)}
+
+/* 命题框：承重判断单独立出来，读者一眼可辨 */
+blockquote{position:relative;margin:38px 0;padding:26px 34px;background:var(--sheet);
+  border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);border-radius:0;
+  font-size:19px;line-height:1.95;font-weight:600;color:var(--ink);text-align:justify}
+blockquote:before,blockquote:after{position:absolute;color:var(--mark);font-size:26px;line-height:1;opacity:.55}
+blockquote:before{content:"⌜";top:9px;left:10px}
+blockquote:after{content:"⌟";bottom:9px;right:10px}
+blockquote p{margin:0}
+blockquote p+p{margin-top:12px}
+
+ul{margin:0 0 18px;padding-left:1.5em}
+ol{margin:0 0 18px;padding-left:1.7em}
+li{margin:0 0 10px;text-align:justify}
+li::marker{color:var(--mark)}
+
+hr{border:0;height:1px;background:var(--line);margin:52px auto;width:62%}
+
+em{font-style:normal;color:var(--ink3);font-size:15px}
+
+/* 三线表 */
+.tbl{width:100%;border-collapse:collapse;margin:32px 0;font-size:15.5px;line-height:1.8}
+.tbl th,.tbl td{padding:12px 14px;text-align:left;vertical-align:top;border:0}
+.tbl thead th{border-top:2px solid var(--ink);border-bottom:1px solid var(--line2);
+  font-weight:700;color:var(--rule);font-size:14.5px;letter-spacing:.04em}
+.tbl tbody tr:last-child td{border-bottom:2px solid var(--ink)}
+.tbl tbody td{border-bottom:1px solid var(--line)}
+.tbl caption{caption-side:bottom;font-size:13px;color:var(--ink3);padding-top:10px;text-align:left}
+
+/* 来源盒：参考文献式，悬挂缩进 */
+.src{margin:64px 0 8px;padding:30px 0 8px;border:0;border-top:2px solid var(--rule);
+  border-radius:0;background:transparent;counter-reset:srcn}
+.src .sl{font-size:11px;letter-spacing:.42em;color:var(--mark);margin-bottom:12px}
+.src .sd{font-size:14.8px;color:var(--ink2);line-height:1.95;margin:0 0 22px;text-align:justify}
+.src a.one{display:block;text-decoration:none;padding:16px 0 16px 34px;position:relative;
+  border-top:1px solid var(--line)}
+.src a.one:before{counter-increment:srcn;content:"[" counter(srcn) "]";position:absolute;left:0;top:16px;
+  color:var(--mark);font-size:13px;letter-spacing:.02em}
+.src a.one:hover .t{color:var(--mark)}
+.src a.one .k{font-size:12px;color:var(--mark);letter-spacing:.14em}
+.src a.one .t{font-size:16px;font-weight:700;color:var(--rule);margin:5px 0;line-height:1.72}
+.src a.one .g{font-size:14.5px;color:var(--ink2);line-height:1.9;text-align:justify}
+
+.endbox{text-align:center;border-top:1px solid var(--line2);margin-top:56px;padding:38px 20px;color:var(--ink2);font-size:15px}
+.endbox a{color:var(--mark);text-decoration:none}
+footer{text-align:center;border-top:1px solid var(--line);padding:32px;color:var(--ink3);font-size:12.5px;letter-spacing:.04em}
+
+#totop{position:fixed;right:22px;bottom:26px;width:40px;height:40px;border-radius:0;
+  background:var(--rule);color:var(--sheet);border:0;font-size:16px;cursor:pointer;display:none;z-index:98}
+
+@media(max-width:760px){
+  body{font-size:17px;line-height:2.0}
+  .art{padding:52px 18px 6px}
+  .wrap{padding:6px 18px 34px}
+  h2{font-size:20.5px;margin:56px 0 18px;padding-top:22px}
+  h3{font-size:17.5px}
+  blockquote{padding:22px 24px;font-size:17.5px}
+  blockquote:before{left:6px}blockquote:after{right:6px}
+  .tbl{font-size:14px}
+  .tbl th,.tbl td{padding:9px 8px}
+}
+
+@media print{
+  body{background:#fff;font-size:11.5pt;line-height:1.85}
+  .readbar,#pbar,#totop,.endbox,footer{display:none}
+  .wrap,.art{max-width:100%}
+  h2{page-break-after:avoid}
+  blockquote,.tbl,.src a.one{page-break-inside:avoid}
+  a{text-decoration:none}
+}
+
+.tbl{width:100%;border-collapse:collapse;margin:2em 0;font-size:.94em;background:var(--sheet)}
+.tbl th,.tbl td{border:1px solid var(--line2);padding:.85em 1em;vertical-align:top;line-height:1.85}
+.tbl th{background:rgba(42,59,80,.07);font-weight:600;text-align:left}
+.tbl tr>th:first-child{width:16%;background:rgba(42,59,80,.10)}
+ol.pl,ul.pl{padding-left:1.5em;margin:1.3em 0}
+ol.pl>li,ul.pl>li{margin:.7em 0;line-height:1.95}
+ol.ref>li{font-size:.9em;line-height:1.8;color:var(--ink2)}
+ol.ref a{color:var(--rule2);text-decoration:underline;text-underline-offset:2px}
+p.vsn{font-size:.9em;color:var(--ink2);margin:.6em 0}
+p.q{border-left:3px solid var(--mark);padding:.9em 1.2em;background:var(--sheet);margin:1.6em 0;font-size:1.06em}
+
+</style></head><body>
+<div id="pbar"></div>
+<div class="readbar">
+  <a class="nav-back" href="/confluence/">‹ 学科通融</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span>
+  <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+  <a class="rb-btn" href="re-derivation.pdf" download>⬇ 下载 PDF</a></div>
+</div>
+<header class="art">
+  <div class="art-series">学 科 通 融 · 之三十一 · 教育心理学 × 运动学习 × 组织例程研究</div>
+  <h1 class="art-title">复推率</h1>
+  <div class="art-sub">论学会了没有，不看现在能不能说出那条规则，而看换一个表面不同的情境能不能重新推出同一条</div>
+  <div class="art-meta">王德生 ＋ Claude · 约 1.1 万字 · 三种阅读方式 · 发表于2026年8月1日</div>
+</header>
+<div class="wrap">
+<div class="deck">当一个成形的答案随时可得，学会了没有就无法再从作品上看出来。一个流行的处方是记录判断规则的前后变化：帮助前写下你依据什么，帮助后指出哪一条被改了。三个领域对这个处方给出互相排斥的答案。教育心理学说这正是学习的证据；运动学习说不对——真正承担适应的是无法语言化的内隐系统，而要求把规则说出来反而会挤掉它；组织例程研究说更不对——规则从来不被存储，它在每一次执行时被参与者重新推断出来，两个时点之间根本没有「同一条规则」可供比较。<b>三家共有一个未说出的前提：存在一条被存在某处、可以在两个时点之间被取出来比对的规则。三家的材料合起来只能得出：规则不被存储，它每次被重新生成；学会了，就是重新生成的可靠性上升。</b> 本文把这个可靠性称为复推率，判据不含情态词：<b>换一个表面不同、结构相同的情境，他会不会推出同一条？</b> 而且必须至少测两次——一次推对可能只是记住了。由此得到一条与直觉相反的推论：<b>能把规则说得越清楚的人，复推率未必越高</b>；说得清楚是复述的证据，不是复推的证据。</div>
+<div class="toc"><div class="tl">目 录</div><a href="#s1">一、导论：三个不该同时为真的说法</a><a href="#s2">二、三家各自说到了哪一步</a><a href="#s3">三、冲突落在哪一点上</a><a href="#s4">四、复推率</a><a href="#s5">五、两根轴，四种局面</a><a href="#s6">六、一个不含情态词的判据</a><a href="#s7">七、逐领域兑现</a><a href="#s8">八、两处被材料逼出来的收窄</a><a href="#s9">九、与最近的几种说法的分界</a><a href="#s10">十、三家各自为什么到不了这一条</a><a href="#s11">十一、推论、适用边界与反噬</a><a href="#s12">十二、与同期几篇的分界</a><a href="#s13">十三、本文自己的复推率</a><a href="#s14">十四、可以判本文错的六种结果</a><a href="#s15">结　论</a><a href="#s16">注　释</a><a href="#s17">参考文献</a><a href="#s18">人机分工声明</a></div>
+
+<h2 id="s1">一、导论：三个不该同时为真的说法</h2>
+<p>当一个完整、流畅、通常正确的答案随时可得，一份作品就不再能证明作者会什么。于是一个处方反复出现：不要看作品，看规则的前后变化——帮助到达之前先写下你依据什么判断，帮助之后指出哪一条依据被改了、为什么改。三个领域对这个处方给出三个互相排斥的答案。</p>
+<p><b>第一场在教育心理学。</b> 这一支的判断是：这正是学习的证据。自己先生成一个判断，比直接读一个正确判断更有利于后续保持；在结构不良的问题上先行尝试并失败，可以为后续教学准备出更好的结构；而把前后两个版本配成一对，可以把「作品改善」与「人的判断改善」分开。争点是：<b>规则的前后差，是不是学习的最小单位？</b></p>
+<p><b>第二场在运动学习。</b> 这一支给出的答案是：真正承担适应的那一部分，根本不在规则里。在感觉运动适应任务中可以把两个系统分开：一个是使用者能说出来的显式策略，一个是他说不出来、也无法主动关闭的内隐适应；两者相加构成总的行为改变。更要紧的是，两者会互相竞争——当显式策略把误差消掉时，驱动内隐适应的那个信号也被消掉了，于是<b>把规则说出来并加以运用，会挤掉那一部分真正稳固的学习。</b><sup>[1]</sup> 争点是：<b>要求人语言化他的规则，是在测量学习，还是在改变学习？</b></p>
+<p><b>第三场在组织例程研究。</b> 这一支说前两家的前提都不成立。一项例程不是一个被存在某处的程序，它有两面：参与者关于「这件事该怎么做」的抽象理解，以及每一次实际执行。而抽象的那一面并不是被存起来后取出执行的模板——它在每一次执行中被参与者重新推断、重新说出、也因此不断改变；不同的参与者从同一批执行里推断出的抽象面并不相同。<sup>[2]</sup> 推到底：<b>两个时点之间根本没有「同一条规则」可供比较，因为每一次拿出来的都是刚刚被造出来的。</b> 争点是：<b>规则的前后差，比较的是两个什么东西？</b></p>
+<p>三条不能同真。若前后差是学习的单位，运动学习那边的分离实验就该显示语言化只有好处而无代价，而它显示的是竞争。若语言化只有代价，那么大量以规则表述为核心的专业训练就该是无效的，而它们不是。若根本没有同一条规则可比，那么教育心理学几十年里靠前后对照得出的结论就都失去了对象，而那些结论可复现。</p>
+<p>本文认为，僵局来自一个三方共有、从未被单独说出的前提：<b>规则是一个被存放在某处、可以被取出、被比较、被改写的东西。</b> 教育心理学要比较它的两个版本，运动学习要问它由哪个系统持有，例程研究说它不在任何地方——三家争的是它放在哪儿、由谁持有，没有人问「学会」是不是就等于「持有一条规则」。</p>
+
+<h2 id="s2">二、三家各自说到了哪一步</h2>
+<p><b>教育心理学这一支</b>的两块基石很老也很硬：自行生成的材料比被动接受的记得更牢；在直接教学之前先行探索、即使失败，也可能改善后续的迁移。近年被推到人机协作里，形成的处方是把帮助前后的判断配成一对，用这一对的差来判断学习是否发生。</p>
+<p>这一支还有一位更近、也更容易被忽略的邻居：先测效应。在还不知道答案的时候先试着回答——哪怕几乎必然答错——之后再看正确答案，其保持效果优于同样时间的直接学习。<sup>[3]</sup> 这条结论对本文很要紧，因为它说明先行判断的价值不依赖那份判断的内容质量；而这一点恰恰是「前后差」框架无法解释的：如果起作用的是差，那么一个纯粹瞎猜的初答应当不产生任何有用的差。</p>
+<p><b>运动学习这一支</b>提供了最硬的反向证据。在标准的视觉旋转适应任务里，用一个简单的办法可以把两个成分分开：要求参与者报告他打算瞄准哪里，实际落点与瞄准点之间的差就是内隐部分，瞄准点与目标之间的差就是显式部分。结果是两者的时间进程与稳定性都不同，且总误差被显式策略迅速消掉时，内隐部分的增长会停下来——因为驱动它的那个误差信号已经不存在了。<sup>[1]</sup></p>
+<p>推论很直接：<b>在这类任务上，要求人说出规则并按规则行动，会系统性地减少那一部分不需要说出来、也不会随注意力涣散而消失的学习。</b> 这一支的边界同样清楚：它的实验对象是感觉运动适应，把结论直接搬到概念推理上没有依据。但它至少确立了一件事——语言化不是中性的观测手段。</p>
+<p><b>组织例程研究这一支</b>把规则的存在方式整个改写了。一项例程被分成两面：一面是参与者对「这件事一般怎么做」的抽象理解，另一面是具体的每一次执行。关键在于抽象面不是模板：它由执行被反复推断出来，不同的人推断出的版本不同，同一个人在不同时候推断出的版本也不同；例程的变化正是在这个反复推断里发生的，而不是靠有人去修改一份文件。<sup>[2]</sup></p>
+<p>这一支到达的边缘是：它得出了「没有可保存的规则」，但它的问题是例程如何变化与如何稳定，它不问一个人学会了没有。</p>
+
+<h2 id="s3">三、冲突落在哪一点上</h2>
+<p>把三家的处方并排放，互不兼容：记录前后差、不要语言化、没有可比的东西。把三家的材料并排放，出现另一样东西。</p>
+<p>例程研究说：抽象规则每次被重新推断。运动学习说：有一部分学习不经过语言。先测效应说：先行判断的价值不依赖它的内容。</p>
+<p>三条串起来只能得出一件事：<b>学会了，不等于持有一条规则，而等于在需要的时候能把那条规则重新推出来。</b> 规则不是一个存量，它是一个每次被重新生成的产物；学习不是这个存量的改变，是重新生成这件事的可靠性上升。</p>
+<p>这一步同时解释了三家各自的现象。它解释了为什么先测有效而与初答质量无关——先测练的不是记住某条规则，是走一遍从情境到规则的那条推导路径，走过的路径下次更好走。它解释了为什么语言化会有代价——把规则说出来并直接套用，等于跳过了推导，下次仍然要从头推；而如果推导被一个现成的表述代替，那条路径就得不到练习。它也解释了为什么例程研究找不到被存起来的规则——因为本来就没有，每次拿出来的都是刚推出来的。</p>
+<p>于是问题的形状变了。它不再是「怎样记录规则的变化」，而是：<b>下一次，他还能不能把它推出来。</b></p>
+
+<h2 id="s4">四、复推率</h2>
+<p><b>在一个表面不同而结构相同的新情境里，一个人能够重新推出同一条判断依据的可靠程度，本文称之为复推率。</b></p>
+<p>四件事需要说清。</p>
+<p><b>「重新推出」而不是「说出」。</b> 说出只需要检索一段话，重新推出需要从这个具体情境走到那条依据。两者可以完全分离：一个人可以流利地背出「相关不等于因果」，而在一个新的案例前照样把相关读成因果。判别办法是把情境的表面特征全部换掉——换领域、换数字、换叙述方式，只保留结构。</p>
+<p><b>「同一条」由功能定义，不由措辞定义。</b> 两次推出的表述可以完全不同，只要它们在这两个情境里作出同样的区分，就算同一条。这一点使复推率可以在完全不语言化的任务上测量——只看行为上的区分，不看陈述。</p>
+<p><b>「可靠程度」是一个比率，必须至少测两次。</b> 一次推对可能是记住了那个情境；两次以上、且情境之间表面差异足够大，才开始区分复推与复述。这是本文与几乎所有现行做法的一个操作差别：现行做法多数只测一次迁移。</p>
+<p><b>「新情境」的结构相同性必须事先由第三方判定</b>，不能由被试事后确认，也不能由出题者凭直觉认定——否则整个测量会滑向「他答对了所以这两题结构相同」。</p>
+<p>由此得到本文的承重命题：<b>学习不是规则从一个版本变成另一个版本，是从情境到规则那条推导路径的可靠性上升。规则本身在每一次判断时被重新造出来，因而没有一个可以被存起来、被比较、被改写的东西。</b></p>
+<p>这条命题有一个立刻可检验的、与直觉相反的推论：<b>能把规则说得越清楚的人，复推率未必越高。</b> 说得清楚是检索的证据；而一个流畅的现成表述恰恰可以代替推导，使那条路径得不到练习。这解释了一个在教学里长期被当作个体差异的现象——有些学生的复述完美而迁移糟糕，通常被归因为「死记硬背」，而按本文这不是态度问题，是路径没有被走过。</p>
+<p>这条判断为什么三家都不会同意。教育心理学不会同意，因为它的整个测量框架建立在规则可比对之上，而本文说没有可比对的东西。运动学习不会同意，因为它把显式与内隐当作两个并列的系统，而本文说显式的那一份也不是存量，它同样是每次被推出来的。例程研究不会同意，因为它的结论是关于集体的抽象面，而本文把它用到了个人身上，且给了一个它没有的量化读数。</p>
+
+<h2 id="s5">五、两根轴，四种局面</h2>
+<p>只用复推率一根轴不够。复推率相近的两种局面结局不同：一种能说清自己推的是什么，一种说不清。要分开，需要第二根轴。</p>
+<p>第一根轴：<b>复推率高不高</b>——换一个表面不同、结构相同的情境，能不能重新作出同样的区分。第二根轴：<b>这次复推能不能被说出来</b>——不是能不能复述一段现成的话，是能不能说明这一次为什么这样判断。</p>
+<table class="tbl">
+<tr><th></th><th>能说明</th><th>不能说明</th></tt></tr>
+<tr><th>复推率高</th><td><b>可教的行家</b><br>既能在新情境作出区分，也能说明凭什么。稀缺，且这是唯一能把能力传下去的一格。</td><td><b>沉默的行家</b><br>判断稳定可靠而说不出理由。老练的临床、维修、品鉴多在这里。<b>能力是真的，可传递性接近零。</b></td></tr>
+<tr><th>复推率低</th><td><b>会背的人</b><br>能把规则说得很清楚，换个情境就用不上。所有以陈述为考核方式的体系都在批量生产这一格。</td><td><b>还没学会</b><br>既推不出也说不出。</td></tr>
+</table>
+<p>左下格是靶格，而它之所以是靶格，不是因为它最严重（右下格更严重），而是因为<b>它在所有以陈述为形式的评估里都得高分</b>。笔试、面试、口头复盘、书面反思，全部测的是能不能说出来；而说得清楚与推得出来在这一格里是分离的。一个体系若只用陈述评估，会系统性地把资源导向这一格，并且看不见自己在这么做。</p>
+<p>右上格值得单说，因为它常被误判。沉默的行家不是「还没形成理论」，也不是「不愿意分享」；按本文，他的规则从来就没有以可陈述的形态存在过，每一次都是重新推出来的，而推导本身不经过语言。<b>因而要求他「把经验总结成条文」，得到的通常是一份低复推率的陈述——那是他事后为这次判断编的理由，不是他推的过程。</b> 这解释了为什么专家访谈提炼出的规则，交给新手用往往不灵。</p>
+
+<h2 id="s6">六、一个不含情态词的判据</h2>
+<p>判断一个人学会了没有，不必问他懂不懂、理解得深不深、有没有掌握本质。只需做一件事：</p>
+<p class="q"><b>换一个表面不同、结构相同的新情境，看他会不会重新推出同一条——并且至少做两次。</b></p>
+<p>三条施测要求把它变成可执行的：结构相同性由不知道被试表现的第三方事先判定；表面差异必须覆盖领域、数值与叙述方式三项；两次之间不给任何反馈，否则第二次测的是学习而不是复推。</p>
+<p>跑几个场合，答案互不相同。</p>
+<p><b>数学的变式题。</b> 换数字算不算表面差异？按上述要求，不算——只换数字，结构与叙述都没变，测的是执行不是复推。真正的表面差异要换叙述框架（把一个几何问题写成一个分配问题）。这解释了一件长期被观察到的事：换数字的变式题成绩与原题高度相关，换框架的变式题成绩与原题相关很弱，而后者才预测长期表现。</p>
+<p><b>临床的鉴别诊断。</b> 换一组症状表现不同而机制相同的病例。这个领域已经有现成的操作——用不同表现的同一疾病考察诊断者，而本文加的一条是：<b>必须至少两例，且两例之间不给反馈</b>。多数考核只用一例。</p>
+<p><b>代码的调试。</b> 换一个语言、换一个框架，注入结构相同的缺陷。这一处的复推率可以完全不经语言测量——只看他先去看哪里。</p>
+<p><b>写作的论证判断。</b> 换一个题材、换一个立场，看他会不会指出同一类的证据缺口。这里要小心一个陷阱：若两次的立场相同，测到的可能是立场而不是复推；因此第二次应当换到他不同意的一侧。</p>
+<p><b>运动技能。</b> 换一个器械、换一个场地。这里复推率与语言化完全无关，而它恰恰是本文第二根轴最纯粹的右侧样本——高复推、零陈述。</p>
+
+<h2 id="s7">七、逐领域兑现</h2>
+<p><b>一、考试设计。</b> 处方是把「一次迁移题」改成「两次以上、表面差异覆盖三项、之间不给反馈」。成本几乎为零（同样的题量，改分布），而它测的东西不同。可裁决预测：改造后的分数与原设计的分数相关将显著低于零点七，且改造后的分数对一年后的表现预测更好。</p>
+<p><b>二、专家知识的提炼。</b> 处方是不要求专家陈述规则，而是让他在一组事先构造的情境上作判断，由第三方从判断的分布里反推区分面。<b>这与传统的专家访谈方向相反：不问他怎么想，看他怎么分。</b></p>
+<p><b>三、师徒制。</b> 它之所以在很多行当里无法被课程替代，按本文有一个具体的原因：课程传的是陈述，而右上格的行家没有陈述可传；师徒制传的是大量情境，等于直接练那条推导路径。</p>
+<p><b>四、临床的病例讨论。</b> 若讨论的重点是「这个病人该怎么处理」，练的是执行；若重点是「换成另一个表现，你还会这样想吗」，练的是复推。这一条不花任何额外时间。</p>
+<p><b>五、面试。</b> 几乎全部落在左下格：问的是能不能说出来。可裁决预测：在同一批候选人上，把陈述式问题换成两次结构相同、表面不同的判断任务，两种方式给出的排序相关很低，而后者对试用期表现的预测更好。</p>
+<p><b>六、机器学习的评测。</b> 分布外泛化的测法与本文完全同构：换表面不换结构。<b>这一处的价值在于它说明复推率不是一个关于人的概念——它是关于任何学习系统的。</b> 而这个领域已经积累了大量关于「表面差异到底该怎么构造」的方法，可以直接借用。</p>
+<p><b>七、法律的案例教学。</b> 苏格拉底式追问的核心动作正是不断改变事实的表面特征，看学生的判断在哪一处翻转。这是复推率的一个古老实现。</p>
+<p><b>八、飞行与应急训练。</b> 模拟器训练的价值不在重复标准处置，而在情境的表面差异；这解释了为什么按固定脚本重复演练的效果远低于随机变式演练。</p>
+<p><b>九、语言学习。</b> 能说出语法规则与能在新句子里作出正确区分，是本文两根轴的教科书例子；而外语教学的评估几乎全在左下格。</p>
+<p><b>十、组织的复盘（本领域反过来加的约束）。</b> 例程研究指出，抽象面是由集体的执行反复推断出来的，不同的人推出的版本不同。推到复推率上：<b>一个团队的复推可能发生在团队层面而不在任何个人身上</b>——没有一个人能独自推出那条依据，而这群人在一起就能。这一条把本文的测量单位问题整个打开了，见下节。</p>
+
+<h2 id="s8">八、两处被材料逼出来的收窄</h2>
+<p><b>第一处，由运动学习逼出：测量会改变被测的东西。</b> 显式与内隐的竞争意味着，要求一个人报告他的推导，会改变他后续的学习路径——报告本身把误差信号消掉了一部分。于是复推率的测量不是无成本的观测：<b>反复测复推率，会把被试推向左侧（更依赖显式策略），而这正是本文用来诊断的那一侧。</b></p>
+<p>这条约束不能靠更好的施测消除。能做的只有两件：其一，第二根轴的测量（能不能说明）必须与第一根轴的测量分开进行，且分开的次数要少；其二，在纯行为可测的任务上，第一根轴应当完全不经语言测量。<b>由此本文丧失了一个方便的主张——复推率是一个可以随时随地反复读取的指标；它必须承认自己是一次介入。</b></p>
+<p><b>第二处，由例程研究逼出：单位可能不是个人。</b> 如果抽象面由集体执行反复推断，那么「他能不能推出来」这个问法在很多真实场合是错位的——真实的判断由一组人共同推出，而任何单个成员单独测都会得低分。</p>
+<p>这条约束比第一条更重，因为它动摇的是本文的测量对象。<b>本文因此不能主张复推率是一个个人属性；它只能主张它是一个「判断单元」的属性，而判断单元是个人还是团队，必须按具体场合确定，且这个确定本身没有一般规则。</b> 一个直接后果是：所有以个人为单位的选拔与考核，在团队复推的场合会系统性地测错东西——它测的是这个人单独时的复推率，而工作时的判断单元不是他一个人。本文只能把这个问题交出去，没有办法处理。</p>
+
+<h2 id="s9">九、与最近的几种说法的分界</h2>
+<p><b>一、与规则前后差的框架。</b> 那一支要求保存帮助前后的两份规则并比较。分离线：它假定两份规则指向同一个存量的两个版本，本文说两份都是各自当场被推出来的产物，前后差因而不是同一个东西的改变，是两次推导的结果不同。判决点：把「帮助后的那一份」改成事后补写（因而不是当场推出的），前后差框架预测迁移效果显著下降，本文预测下降很小——因为起作用的是帮助前那次真实的推导，不是两份的差。<b>这是一条便宜、直接、且两家预测相反的对照。</b></p>
+<p><b>二、与先测效应。</b> 这是本文最近的一位，因为它已经说明先行尝试的价值不依赖初答的正确性。分离线：先测效应解释的是为什么先试一下有助于后续学习，机制多被归于搜索记忆的过程或对答案的注意提升；本文提出的是一个测量量，且预测这个量本身可以被独立观测并预测迁移。判决点：两组接受同等次数的先测，其后一组被要求在两个表面不同的情境里各推一次、另一组只在一个情境里推两次。先测效应对二者不作区分，本文预测前者的迁移显著更好。</p>
+<p><b>三、与有益困难。</b> 那一支预测某些让训练变慢变难的安排改善长期保持。分离线：有益困难的自变量是难度，本文的自变量是表面差异的覆盖面。判决点：在难度、用时、错误率完全匹配的两组之间，只改变情境表面差异的覆盖面，本文预测迁移不同，有益困难预测相同。</p>
+<p><b>四、与显式—内隐分离。</b> 那一支把学习分成两个可分别测量的成分。分离线：它处理的是同一次适应中的两个成分，本文处理的是同一条判断依据在两个不同情境里的两次生成。判决点：一个纯粹内隐、完全无法报告的学习成果，在本文这里可以有很高的复推率（换器械照样做到），而在显式—内隐框架里它只落在内隐一侧、不涉及跨情境的问题。</p>
+<p><b>五、与迁移研究本身。</b> 近迁移与远迁移的区分与本文高度相邻。分离线：迁移研究测的是新任务上的成绩，本文测的是同一条依据是否被重新推出——一个人可以在新任务上成绩很好而依据的是另一条规则（比如靠一个只在这两题上碰巧成立的表面线索）。判决点：在成绩相同的两组之间，看他们在判断翻转点上的位置是否一致；不一致者按本文是不同的规则，而迁移成绩无法区分。</p>
+<p><b>六、与分布外泛化。</b> 机器学习那一侧的这个概念与本文几乎同构，且方法更成熟。本文承认这一点并明确借用它的方法论：<b>表面差异的构造必须由不接触被试表现的第三方事先完成</b>，这正是那个领域为防止基准泄漏而发展出的纪律。分离线只在对象上：那一侧不处理第二根轴（能不能说明），因为它的系统本来就不需要说明。</p>
+
+<h2 id="s10">十、三家各自为什么到不了这一条</h2>
+<p><b>教育心理学到不了，因为它的记录工具就是语言。</b> 它要比较两个版本，就必须让两个版本以可比较的形式存在，而可比较的形式就是陈述。于是它天然测到的是复述那一维。</p>
+<p><b>运动学习到不了，因为它的任务里没有情境的表面差异。</b> 视觉旋转适应是一个单一情境的任务，它可以把显式与内隐分开，但它没有第二个情境可以问「换一个还推不推得出」。</p>
+<p><b>例程研究到不了，因为它的问题是稳定与变化，不是学会没学会。</b> 它得出了「每次被重新推断」这个结论，但它关心的是例程为什么会漂移，而不是某个参与者的推断可靠性。</p>
+
+<h2 id="s11">十一、推论、适用边界与反噬</h2>
+<p><b>第一条推论：陈述式评估会系统性地把资源导向左下格，且看不见自己在这么做。</b> 因为它的读数在那一格里最高。</p>
+<p><b>第二条推论：想提高复推率，就增加情境的表面差异，而不是增加练习量或提高难度。</b> 这是本文唯一一条可执行的处方，成本近乎为零——同样的题量，改分布。</p>
+<p><b>适用边界一：测量单位不确定。</b> 见第八节第二处，这是本文最大的未解处。</p>
+<p><b>适用边界二：只适用于存在结构—表面之分的任务。</b> 有些任务的表面就是结构（比如识别一张具体的脸），那里没有可换的表面。</p>
+<p><b>适用边界三：本文不主张陈述无用。</b> 第二根轴的左侧是唯一能把能力传下去的一格；本文只主张陈述不能作为学会的证据，不主张它没有价值。</p>
+<p><b>反噬预言。</b> 若复推率成为考核指标，最可能发生的是<b>对表面差异的应试化</b>：培训会开始教「常见的表面变换有哪几类」，于是学生学会识别变换本身，而这又是一条可以被记住的现成规则。<b>本文的判据会被它所诊断的那个机制吃掉——学生将复述「这是换了框架的同一类问题」，而不是重新推。</b> 我看不到出口：任何一个足够稳定、可被公布的表面差异构造方式，都会在几轮之后变成可复述的对象。唯一能拖延的是让构造方式保持不可预测，而这与考试的公平性直接冲突。</p>
+<p><b>交出去的一个洞。</b> 「结构相同」这个判定本身没有一般标准。本文把它交给不接触被试表现的第三方，这只是防止了事后合理化，没有解决什么叫结构相同。而在很多领域里，两个情境算不算结构相同，恰恰是这个领域最难的问题本身。</p>
+
+<h2 id="s12">十二、与同期几篇的分界</h2>
+<p><b>与「独版」那一篇。</b> 那篇说帮助前那份记录的价值在于不可重制，本文说它的价值在于走了一遍推导。判决点：一份在帮助前作出、但由他人代写的判断（不可重制，却没有走过推导），那篇判为有价值，本文判为零。反过来，一次在心里默默完成、未留任何记录的推导，那篇判为零，本文判为有效。<b>两篇合起来才完整：留痕解决第三方的核对，推导解决本人的学习。</b></p>
+<p><b>与「不按的代价先落在谁身上」那一篇。</b> 那篇处理动力，本文处理能力。判决点：代价完全内部化而从未在多个表面情境里推过的人，那篇预测他会去干预，本文预测他干预时用的仍是记住的那一条，换个情境就失效。</p>
+<p><b>与「记零位」那一篇。</b> 那篇问一类动作有没有账，本文问一条依据能不能被重推。判决点：一个把「发现错误」记账很足、而考核方式全是陈述式的共同体，那篇判为健康，本文预测它招进来的全是左下格的人。</p>
+<p><b>与「入判份额」那一篇。</b> 那篇问产出进不进别人的判据，本文问依据能不能被重新推出。判决点：一个入判份额极高、而其判断从未在表面不同的情境里被检验过的人，那篇判为立法者，本文预测他所改写的标准在情境变化时会失效——两篇合起来解释一类常见的失败：一个有影响力的判断被广泛采用，然后在一个表面不同的场合集体翻车。</p>
+<p><b>与「中断之后能不能接手」那一篇。</b> 那篇测能不能从当前位置继续，本文测能不能在新情境重新开始。判决点：接手能力高而复推率低的人，能沿着已有状态往下走，却在情境变形时无法重建路线；两个量正交，可以在同一批人身上分别测。</p>
+<p><b>与「闭合之后还能不能回来」那一篇。</b> 那篇的重复产生率量的是必须重造多少已有信息，本文的复推率量的是能不能重造。判决点：一个记录完备、重复产生率极低的系统里，接手者不需要复推——材料都在。<b>因而两个量此消彼长：留痕越好，对复推的依赖越低。</b> 这给出一条两篇合起来才有的推论：一个高度依赖个人复推的组织，通常是留痕很差的组织，而它会把这个缺陷读成「我们的人经验丰富」。</p>
+
+<h2 id="s13">十三、本文自己的复推率</h2>
+<p>本文提出的这条依据——学会等于重新推出的可靠性——只在一个情境里被推出过一次，就是写作它的这一次。按它自己的判据，它的复推率不可知，因为没有第二次。</p>
+<p>更具体地说，本文有一处结构性的自指困难：它主张陈述不是学会的证据，而它本身是一份陈述。读者读完之后能把「复推率」讲得很清楚，这在本文的判据下恰恰是左下格的读数，不是学会的证据。</p>
+<p>能做的对冲只有一条，且它必须由读者完成而不是由作者完成：<b>合上本文，取一个本文没有提到的领域，构造两个表面不同、结构相同的情境，判断本文的第一根轴在那里能不能取到值。</b> 若取不到，说明这条依据没有被推出来，只被记住了。作者无法代做这件事，这也正是本文自己主张的直接后果。</p>
+
+<h2 id="s14">十四、可以判本文错的六种结果</h2>
+<p><b>第一，最便宜、今天就能做的一条。</b> 在同一批学习者上比较两种测法：一次迁移题 vs 两次表面差异覆盖三项的迁移题（总题量相同）。本文预测后者的分数与陈述式测验的相关显著低于前者，且对三个月后表现的预测更好。若两种测法给出的排序高度一致，复推率没有增量价值。</p>
+<p><b>第二，前后差框架足够。</b> 若把「帮助后的那份规则」改成事后补写之后，迁移效果显著下降，则起作用的是前后两份的比较而不是那次真实推导，本文的替代解释被推翻。</p>
+<p><b>第三，语言化没有代价。</b> 若在概念推理任务上（不只在感觉运动任务上），要求报告推导过程的组与不报告的组，其后续复推率没有差异，则第八节第一处收窄不成立，本文对陈述的整套怀疑失去根据。</p>
+<p><b>第四，说得清楚就是推得出来。</b> 若在控制练习量之后，陈述质量与复推率高度相关（相关系数稳定高于零点八），则两根轴合并，四格表退化，本文的核心区分消失。这一条是本文最容易被击中的地方。</p>
+<p><b>第五，个人单位成立。</b> 若在团队作业的场合，团队复推率可以由成员的个人复推率简单加总或取最大值预测，则第八节第二处的单位问题不存在，本文可以退回个人属性。</p>
+<p><b>第六，本文自陈最软的一处。</b> 「结构相同」若在实践中无法由第三方一致判定（不同第三方对同一对情境是否结构相同意见分歧很大），则整个测量无法执行，本文只是一个无法操作的说法。这一条应当在做任何其他检验之前先测——它是本文的前置条件。</p>
+<p><b>正向读数。</b> 若本文成立，增加情境表面差异的覆盖面应当提高复推率，<b>而这个提高应当先于陈述质量的提高出现</b>，甚至可以在陈述质量完全不变时出现。顺序比相关更难被巧合满足。</p>
+<p><b>写死日期的赌注。</b> 到二〇三二年十二月三十一日，至少应有一个主流的学业或职业能力评估体系，把「同一依据在两个以上表面不同情境中的重新推出」作为一项独立记分项，而不再只用单次迁移题与陈述式作答。若届时没有这类实现，且第一条对照的差异被证明不存在，本文关于学习单位是推导路径而非规则存量的主张即告失败。</p>
+
+<h2 id="s15">结　论</h2>
+<p>学习的最小单位是什么，三个领域给出三个不相容的答案：规则的前后差、无法语言化的内隐适应、以及根本没有可保存的规则。三个答案都只对了一段，因为它们共享一个未被说出的前提——规则是一个被存在某处、可以被取出比较的东西。</p>
+<p>例程研究推翻了它：抽象规则不是模板，它在每一次执行中被重新推断出来。运动学习补上另一半：真正稳固的那部分适应不经过语言，而把规则说出来并直接套用会挤掉它。先测效应补上第三块：先行判断的价值不依赖它的内容质量——起作用的是走了一遍推导，不是留下了什么内容。</p>
+<p>于是学会了没有，不看现在能不能说出那条规则，看换一个表面不同、结构相同的情境时，他会不会重新推出同一条，且至少要看两次。而能把规则说得越清楚的人，复推率未必越高——说得清楚是复述的证据，不是复推的证据。</p>
+<p>想提高它，也不必增加练习量或提高难度，只需增加情境表面差异的覆盖面。这条处方几乎不花钱，而它测到与练到的，是所有陈述式评估都测不到的那一维。</p>
+
+<h2 id="s16">注　释</h2>
+<ol class="pl">
+<li>本文所说的「同一条依据」由功能定义：两次判断在各自情境里作出同样的区分即为同一条，措辞不同不影响判定。</li>
+<li>运动学习部分的结论限于感觉运动适应任务，把它推广到概念推理属于本文的主张，尚未被该领域的证据直接支持。</li>
+<li>例程研究部分只使用「抽象面由执行反复推断而非被存储」这一骨架，不涉及该领域内部关于例程变化机制的争论。</li>
+<li>第五节四格表尚未经过信度与效度检验，是研究设计的起点，不是成熟的评估工具。</li>
+</ol>
+
+<h2 id="s17">参考文献</h2>
+<ol class="pl ref">
+<li>Taylor, J. A., Krakauer, J. W., &amp; Ivry, R. B. (2014). Explicit and implicit contributions to learning in a sensorimotor adaptation task. <i>Journal of Neuroscience</i>, 34(8), 3023-3032. <a href="https://www.jneurosci.org/content/34/8/3023" target="_blank" rel="noopener">jneurosci.org</a></li>
+<li>Feldman, M. S., &amp; Pentland, B. T. (2003). Reconceptualizing organizational routines as a source of flexibility and change. <i>Administrative Science Quarterly</i>, 48(1), 94-118. <a href="https://journals.sagepub.com/doi/10.2307/3556620" target="_blank" rel="noopener">sagepub.com</a></li>
+<li>Kornell, N., Hays, M. J., &amp; Bjork, R. A. (2009). Unsuccessful retrieval attempts enhance subsequent learning. <i>Journal of Experimental Psychology: Learning, Memory, and Cognition</i>, 35(4), 989-998. <a href="https://web.williams.edu/Psychology/Faculty/Kornell/Publications/Kornell.Hays.Bjork.2009.pdf" target="_blank" rel="noopener">bjorklab.psych.ucla.edu</a></li>
+<li>Richland, L. E., Kornell, N., &amp; Kao, L. S. (2009). The pretesting effect: Do unsuccessful retrieval attempts enhance learning? <i>Journal of Experimental Psychology: Applied</i>, 15(3), 243-257.</li>
+<li>Kapur, M. (2008). Productive failure. <i>Cognition and Instruction</i>, 26(3), 379-424.</li>
+<li>Bjork, E. L., &amp; Bjork, R. A. (2011). Making things hard on yourself, but in a good way: Creating desirable difficulties to enhance learning. In <i>Psychology and the Real World</i> (pp. 56-64). Worth.</li>
+<li>Gick, M. L., &amp; Holyoak, K. J. (1983). Schema induction and analogical transfer. <i>Cognitive Psychology</i>, 15(1), 1-38.</li>
+</ol>
+
+<h2 id="s18">人机分工声明</h2>
+<p>本文由王德生提出研究方向、承重判断与最终发表责任；Claude 完成三个领域的选源与冲突定位、公开文献检索、命题成形、二维表构造、逐领域兑现、分界与证伪设计以及正文写作。第八节两处收窄由材料逼出，其中第二处动摇了本文的测量单位并被明确交出。运动学习部分的结论限于感觉运动适应任务，将其推广到概念推理属于本文的主张而非该领域的既有结论，已在正文与注释中标明。本文未标注任何评分——按本站惯例，参与改写者不为自己改写的文本打分。</p>
+
+<p class="vsn"><b>证据边界</b>　运动学习部分的结论限于感觉运动适应任务，把它推广到概念推理属于本文的主张，尚未被该领域证据直接支持；例程研究部分只使用「抽象面由执行反复推断而非被存储」这一骨架。第十四节六条判据本文<b>均未执行</b>，其中第六条应当先于其余五条执行——它是本文的前置条件。</p>
+<p class="vsn"><b>字数</b>　纯汉字约 1.1 万　<b>版本</b>　v1.0 · 2026-08-01</p>
+<div class="src"><div class="sl">这一篇由哪三个领域的争论撞成</div><p class="sd">三边对「学习的最小单位是什么」给出互相排斥的答案：教育心理学说是规则的前后差，运动学习说真正承担适应的是无法语言化的内隐系统而语言化会挤掉它，组织例程研究说规则从不被存储、每次执行时被重新推断。<b>三家共有一个未说出的前提：存在一条被存在某处、可以在两个时点之间取出比对的规则。三家的材料合起来只能得出：规则每次被重新生成，学会就是重新生成的可靠性上升。</b></p><a class="one" href="https://www.jneurosci.org/content/34/8/3023"><div class="k">运动学习 · 说出来会挤掉学到的</div><div class="t">Taylor, Krakauer &amp; Ivry, Explicit and implicit contributions to learning in a sensorimotor adaptation task（J. Neuroscience, 2014）</div><div class="g">在视觉旋转适应任务里可以把两个成分分开：使用者能说出的显式策略，与他说不出、也无法主动关闭的内隐适应。两者的时间进程与稳定性不同，且会互相竞争——当显式策略迅速把误差消掉时，驱动内隐适应的信号也被消掉了。语言化不是中性的观测手段。</div></a><a class="one" href="https://journals.sagepub.com/doi/10.2307/3556620"><div class="k">组织例程研究 · 没有被存起来的规则</div><div class="t">Feldman &amp; Pentland, Reconceptualizing organizational routines as a source of flexibility and change（ASQ, 2003）</div><div class="g">例程有两面：参与者关于「这件事该怎么做」的抽象理解，与每一次具体执行。而抽象面不是模板——它由执行被反复推断出来，不同的人推断出的版本不同，同一个人在不同时候也不同。两个时点之间根本没有「同一条规则」可供比较，因为每次拿出来的都是刚被造出来的。</div></a><a class="one" href="https://web.williams.edu/Psychology/Faculty/Kornell/Publications/Kornell.Hays.Bjork.2009.pdf"><div class="k">教育心理学 · 前后差就是学习的证据</div><div class="t">Kornell, Hays &amp; Bjork, Unsuccessful retrieval attempts enhance subsequent learning（JEP:LMC, 2009）；Richland, Kornell &amp; Kao, The pretesting effect（2009）；Kapur, Productive failure（2008）</div><div class="g">自行生成优于被动接受；在直接教学前先行探索、即使失败也可能改善迁移。而先测效应给出的一条对本文最要紧：先行判断的价值不依赖那份判断的内容质量——哪怕几乎必然答错，先试一次再看答案仍优于同样时间的直接学习。这一点是「前后差」框架自己解释不了的。</div></a></div>
+<div class="endbox"><p>三种读法 · 网页长文 · 在线 PDF 翻页 · PDF 下载</p>
+<p><a href="/confluence/">返回学科通融 →</a></p></div>
+
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<footer>学科通融 · 三学科交叉 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International · <a href="/browse/">sdeuniverses.com</a></footer>
+<script>
+(function(){var b=document.getElementById('pbar'),t=document.getElementById('totop');
+function u(){var d=document.documentElement,h=d.scrollHeight-d.clientHeight;
+b.style.width=(h>0?(d.scrollTop/h*100):0)+'%';t.style.display=d.scrollTop>700?'block':'none';}
+addEventListener('scroll',u,{passive:true});u();
+t.onclick=function(){scrollTo({top:0,behavior:'smooth'});};})();
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

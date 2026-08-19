@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>闭合之后，谁还能回来——论修复的质量不由第一次闭合决定，而由第二次进入时要重新造出多少本来已经存在过的东西决定 · 学科通融 | SDE Universes</title>
+<meta name="description" content="伤口缝合、停火签署、软件艺术重新运行，都像是修复成功。医学说闭合太快会以瘢痕代替再生，政治学说没有阶段性闭合暴力根本停不下来，艺术保护说恢复功能可能把原作修掉。三家互相限制，逼出一个可在三领域通约的量：重复产生率。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+/* 学科通融 · 学术纸面版式 v2 —— 为长时间的思辨性阅读设计 */
+:root{
+  --paper:#F5F2E9; --paper2:#FBF9F3; --sheet:#FDFCF7;
+  --ink:#23201A; --ink2:#5C5647; --ink3:#8A8271;
+  --rule:#2A3B50; --rule2:#41586F;
+  --mark:#9E3D2C; --mark2:#B85A44;
+  --line:rgba(35,32,26,.13); --line2:rgba(35,32,26,.28);
+  --measure:700px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 8%, rgba(42,59,80,.035), transparent 46%),
+    radial-gradient(circle at 84% 72%, rgba(158,61,44,.030), transparent 44%);
+  background-attachment:fixed;
+  font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;
+  font-size:18.5px; line-height:2.06; letter-spacing:.012em;
+  font-feature-settings:"kern" 1;
+  text-rendering:optimizeLegibility;
+}
+a{color:inherit}
+::selection{background:rgba(158,61,44,.16)}
+
+/* 阅读进度：细，不抢注意力 */
+#pbar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--mark);z-index:99;opacity:.85}
+
+/* 顶栏 */
+.readbar{position:sticky;top:0;z-index:10;background:rgba(245,242,233,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 26px;font-size:13.5px;gap:12px;flex-wrap:wrap;letter-spacing:.02em}
+.nav-back{text-decoration:none;color:var(--mark)}
+.rb-modes{display:flex;gap:8px}
+.rb-btn{padding:5px 13px;border:1px solid var(--line2);border-radius:0;
+  text-decoration:none;font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
+.rb-btn:hover{border-color:var(--mark);color:var(--mark)}
+.rb-btn.cur{background:var(--rule);color:var(--sheet);border-color:var(--rule)}
+
+/* 题头：论文首页 */
+.art{max-width:800px;margin:auto;padding:78px 26px 8px;text-align:center}
+.art-series{color:var(--mark);letter-spacing:.42em;font-size:11.5px;text-transform:uppercase}
+.art-title{font-size:clamp(30px,4.4vw,45px);line-height:1.38;margin:26px 0 0;font-weight:700;letter-spacing:.01em}
+.art-title:after{content:"";display:block;width:56px;height:1px;background:var(--line2);margin:26px auto 0}
+.art-sub{color:var(--ink2);font-size:17px;line-height:1.94;max-width:620px;margin:22px auto 0;font-weight:400}
+.art-meta{color:var(--ink3);font-size:12.5px;margin-top:26px;letter-spacing:.09em}
+
+/* 正文栏宽：每行约三十四个汉字，是长文思辨阅读最省力的宽度 */
+.wrap{max-width:var(--measure);margin:auto;padding:8px 26px 46px}
+
+/* 摘要块 */
+.deck{position:relative;background:var(--paper2);border:0;border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--line);border-radius:0;
+  padding:30px 30px 26px;margin:44px 0 8px;font-size:16.2px;line-height:2.0;color:var(--ink2);text-align:justify}
+.deck:before{content:"题 解";position:absolute;top:-11px;left:26px;background:var(--paper);
+  padding:0 10px;font-size:11px;letter-spacing:.34em;color:var(--rule)}
+
+/* 目录：带引导点的学术目次 */
+.toc{background:transparent;border:0;border-top:1px solid var(--line2);
+  border-bottom:1px solid var(--line2);border-radius:0;padding:24px 4px 20px;margin:44px 0 56px}
+.toc .tl{font-size:11px;letter-spacing:.44em;color:var(--mark);margin-bottom:16px;text-align:center}
+.toc a{display:flex;align-items:baseline;gap:6px;padding:6px 2px;color:var(--ink2);
+  font-size:15px;text-decoration:none;border:0;line-height:1.7}
+.toc a:after{content:"";flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-4px)}
+.toc a:hover{color:var(--mark)}
+
+/* 章节层级 */
+h2{font-size:23px;margin:74px 0 22px;padding:26px 0 0;border:0;border-top:1px solid var(--line2);
+  line-height:1.55;scroll-margin-top:78px;letter-spacing:.02em;font-weight:700}
+h2:first-of-type{margin-top:48px}
+h2:target{background:linear-gradient(transparent 68%,rgba(158,61,44,.14) 68%)}
+h3{font-size:18.5px;margin:44px 0 14px;color:var(--rule);font-weight:700;
+  padding-left:12px;border-left:2px solid var(--mark);line-height:1.7}
+h4{font-size:17px;margin:30px 0 10px;color:var(--mark);font-weight:700}
+
+p{margin:0 0 17px;text-align:justify;hyphens:auto}
+strong,b{color:var(--rule);font-weight:700}
+i,cite{font-style:italic;color:var(--ink2)}
+
+/* 命题框：承重判断单独立出来，读者一眼可辨 */
+blockquote{position:relative;margin:38px 0;padding:26px 34px;background:var(--sheet);
+  border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);border-radius:0;
+  font-size:19px;line-height:1.95;font-weight:600;color:var(--ink);text-align:justify}
+blockquote:before,blockquote:after{position:absolute;color:var(--mark);font-size:26px;line-height:1;opacity:.55}
+blockquote:before{content:"⌜";top:9px;left:10px}
+blockquote:after{content:"⌟";bottom:9px;right:10px}
+blockquote p{margin:0}
+blockquote p+p{margin-top:12px}
+
+ul{margin:0 0 18px;padding-left:1.5em}
+ol{margin:0 0 18px;padding-left:1.7em}
+li{margin:0 0 10px;text-align:justify}
+li::marker{color:var(--mark)}
+
+hr{border:0;height:1px;background:var(--line);margin:52px auto;width:62%}
+
+em{font-style:normal;color:var(--ink3);font-size:15px}
+
+/* 三线表 */
+.tbl{width:100%;border-collapse:collapse;margin:32px 0;font-size:15.5px;line-height:1.8}
+.tbl th,.tbl td{padding:12px 14px;text-align:left;vertical-align:top;border:0}
+.tbl thead th{border-top:2px solid var(--ink);border-bottom:1px solid var(--line2);
+  font-weight:700;color:var(--rule);font-size:14.5px;letter-spacing:.04em}
+.tbl tbody tr:last-child td{border-bottom:2px solid var(--ink)}
+.tbl tbody td{border-bottom:1px solid var(--line)}
+.tbl caption{caption-side:bottom;font-size:13px;color:var(--ink3);padding-top:10px;text-align:left}
+
+/* 来源盒：参考文献式，悬挂缩进 */
+.src{margin:64px 0 8px;padding:30px 0 8px;border:0;border-top:2px solid var(--rule);
+  border-radius:0;background:transparent;counter-reset:srcn}
+.src .sl{font-size:11px;letter-spacing:.42em;color:var(--mark);margin-bottom:12px}
+.src .sd{font-size:14.8px;color:var(--ink2);line-height:1.95;margin:0 0 22px;text-align:justify}
+.src a.one{display:block;text-decoration:none;padding:16px 0 16px 34px;position:relative;
+  border-top:1px solid var(--line)}
+.src a.one:before{counter-increment:srcn;content:"[" counter(srcn) "]";position:absolute;left:0;top:16px;
+  color:var(--mark);font-size:13px;letter-spacing:.02em}
+.src a.one:hover .t{color:var(--mark)}
+.src a.one .k{font-size:12px;color:var(--mark);letter-spacing:.14em}
+.src a.one .t{font-size:16px;font-weight:700;color:var(--rule);margin:5px 0;line-height:1.72}
+.src a.one .g{font-size:14.5px;color:var(--ink2);line-height:1.9;text-align:justify}
+
+.endbox{text-align:center;border-top:1px solid var(--line2);margin-top:56px;padding:38px 20px;color:var(--ink2);font-size:15px}
+.endbox a{color:var(--mark);text-decoration:none}
+footer{text-align:center;border-top:1px solid var(--line);padding:32px;color:var(--ink3);font-size:12.5px;letter-spacing:.04em}
+
+#totop{position:fixed;right:22px;bottom:26px;width:40px;height:40px;border-radius:0;
+  background:var(--rule);color:var(--sheet);border:0;font-size:16px;cursor:pointer;display:none;z-index:98}
+
+@media(max-width:760px){
+  body{font-size:17px;line-height:2.0}
+  .art{padding:52px 18px 6px}
+  .wrap{padding:6px 18px 34px}
+  h2{font-size:20.5px;margin:56px 0 18px;padding-top:22px}
+  h3{font-size:17.5px}
+  blockquote{padding:22px 24px;font-size:17.5px}
+  blockquote:before{left:6px}blockquote:after{right:6px}
+  .tbl{font-size:14px}
+  .tbl th,.tbl td{padding:9px 8px}
+}
+
+@media print{
+  body{background:#fff;font-size:11.5pt;line-height:1.85}
+  .readbar,#pbar,#totop,.endbox,footer{display:none}
+  .wrap,.art{max-width:100%}
+  h2{page-break-after:avoid}
+  blockquote,.tbl,.src a.one{page-break-inside:avoid}
+  a{text-decoration:none}
+}
+
+.tbl{width:100%;border-collapse:collapse;margin:2em 0;font-size:.94em;background:var(--sheet)}
+.tbl th,.tbl td{border:1px solid var(--line2);padding:.85em 1em;vertical-align:top;line-height:1.85}
+.tbl th{background:rgba(42,59,80,.07);font-weight:600;text-align:left}
+.tbl tr>th:first-child{width:16%;background:rgba(42,59,80,.10)}
+ol.pl,ul.pl{padding-left:1.5em;margin:1.3em 0}
+ol.pl>li,ul.pl>li{margin:.7em 0;line-height:1.95}
+ol.ref>li{font-size:.9em;line-height:1.8;color:var(--ink2)}
+ol.ref a{color:var(--rule2);text-decoration:underline;text-underline-offset:2px}
+p.vsn{font-size:.9em;color:var(--ink2);margin:.6em 0}
+p.q{border-left:3px solid var(--mark);padding:.9em 1.2em;background:var(--sheet);margin:1.6em 0;font-size:1.06em}
+
+</style></head><body>
+<div id="pbar"></div>
+<div class="readbar">
+  <a class="nav-back" href="/confluence/">‹ 学科通融</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span>
+  <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+  <a class="rb-btn" href="who-can-return.pdf" download>⬇ 下载 PDF</a></div>
+</div>
+<header class="art">
+  <div class="art-series">学 科 通 融 · 之二十八 · 创伤修复医学 × 转型正义研究 × 艺术保护伦理</div>
+  <h1 class="art-title">闭合之后，谁还能回来</h1>
+  <div class="art-sub">论修复的质量不由第一次闭合决定，而由第二次进入时要重新造出多少本来已经存在过的东西决定</div>
+  <div class="art-meta">王德生 ＋ Claude · 约 1.1 万字 · 三种阅读方式 · 发表于2026年8月1日</div>
+</header>
+<div class="wrap">
+<div class="deck">伤口缝合、停火协议签署、一件失效的软件艺术重新亮起，都像是修复已经成功。三个领域却各自指出一种藏在成功底下的失败，而且三种失败互相排斥。医学说闭合太快会以瘢痕代替再生；政治学说若拒绝阶段性闭合，暴力根本停不下来，但过度封闭又会让证据与诉求失去入口；艺术保护说只追求恢复外观或功能，可能在重写中把原作痕迹一并抹掉。<b>三家互相限制之后剩下的是一个此前没有被单独测量过的东西：不是修复得多完整，而是第二次进入时要重新造出多少本来已经存在过的东西。</b> 本文把它写成一个可在三领域通约的比率——重复产生率：为了作出一次负责任的判断而不得不重新生成的信息，占曾经存在过的信息的比例。医学里是必须重做的影像与病理项数，政治里是必须重新取的证人与文件数，艺术里是必须重新推断的原始材料与代码。三处量纲不同，比率相同。本文把首次闭合能力与续修能力分成两根独立的轴，靶格是「当下很稳、而重复产生率接近一」——瘢痕式闭合，它在闭合当天与最好的修复看起来毫无分别。</div>
+<div class="toc"><div class="tl">目 录</div><a href="#s1">一、三个看起来已经结束的现场</a><a href="#s2">二、医学的警告：闭合得快，不等于恢复得好</a><a href="#s3">三、政治学的反驳：没有阶段性闭合，暴力停不下来</a><a href="#s4">四、艺术学的追问：恢复功能时，原作是不是已经被修掉了</a><a href="#s5">五、三家如何互相修改对方</a><a href="#s6">六、续修性</a><a href="#s7">七、可通约的那个量：重复产生率</a><a href="#s8">八、两根轴，四种结局</a><a href="#s9">九、为什么第一次闭合看不出差别</a><a href="#s10">十、逐领域兑现</a><a href="#s11">十一、与最近的几种说法的分界</a><a href="#s12">十二、续修性可能制造的新危险</a><a href="#s13">十三、这一判断不适用的地方</a><a href="#s14">十四、与同期几篇的分界</a><a href="#s15">十五、本文自己是不是一种瘢痕式修复</a><a href="#s16">十六、可以判本文错的六种结果</a><a href="#s17">结　论</a><a href="#s18">注　释</a><a href="#s19">参考文献</a><a href="#s20">人机分工声明</a></div>
+
+<h2 id="s1">一、三个看起来已经结束的现场</h2>
+<p>手术室里，创口已经缝合。皮肤边缘靠拢，出血停止，表面重新完整。病历上可以写：伤口闭合良好。</p>
+<p>谈判桌旁，交战双方签署协议。武器被收缴，人员开始撤离，街道恢复通行。新闻标题可以写：冲突结束。</p>
+<p>博物馆的技术室里，一件因为操作系统淘汰而无法运行的软件艺术品重新亮起。色彩、运动和声音再次出现。展览说明可以写：作品修复完成。</p>
+<p>三个现场分属医学、政治与艺术，面对的东西一个是身体组织、一个是权力关系、一个是作品材料。然而它们完成了同一个动作：把一个持续扩大的破口闭合起来。</p>
+<p>问题在于，闭合并不等于问题已经消失。若数年后需要再次手术，医生可能发现表面完整的皮肤下方是排列僵硬、血管与附属结构缺失的瘢痕组织。若多年后出现新的档案、证词或集体墓地，一个已经宣布「历史翻篇」的制度可能没有任何合法通道重新处理案件。若新一代计算环境再次变化，下一位修复者可能发现原始代码早已在上一次迁移中被删除，只剩下一个模仿原作外观的新程序。</p>
+<p>三家对同一个问题给出的答案互相排斥。<b>医学说闭合得太快是危险的；政治学说闭合得太晚是危险的；艺术保护说闭合得太干净是危险的。</b> 三条不能同真：若快是危险的，政治学几十年关于妥协必要性的论证就该被推翻；若慢是危险的，医学关于瘢痕的整套机制研究就无处安放；若干净是危险的，那么医学追求的完整愈合与政治追求的彻底和解就都成了问题。</p>
+<p>本文认为，僵局来自一个三方共有、从未被单独说出的前提：<b>修复的质量是这次闭合本身的属性——闭合得快不快、干净不干净、彻不彻底。</b> 三家争的是这个属性该往哪个方向调，没有人问它是不是那个决定质量的东西。</p>
+
+<h2 id="s2">二、医学的警告：闭合得快，不等于恢复得好</h2>
+<p>皮肤创伤并不是简单地从破损变回完整。修复通常经历止血、炎症、再上皮化以及消退与重塑等阶段，不同阶段需要不同的细胞活动、信号与组织环境。阶段转换失调时，即使创面表面闭合，仍可能形成过量、排列异常的细胞外基质与持续炎症，并导致功能受损与明显瘢痕。</p>
+<p>一条重要但仍带假说性质的判断是：创面收缩虽然能迅速减小缺损，却可能把组织引向瘢痕形成而不是结构性再生。在若干动物模型中，使用能够抑制创面收缩的特定支架之后，瘢痕减少，并出现不同程度的部分再生。<b>关键不是「慢一点一定更好」，而是闭合所采用的路径会决定闭合后留下什么样的组织。</b><sup>[1]</sup></p>
+<p>但医学同时拒绝另一种简单结论。既然过快收缩可能产生瘢痕，是否应当尽可能阻止闭合？答案同样是否定的。参与纤维化的信号通路同时参与细胞增殖、迁移、再上皮化与组织稳态；若在不恰当的时间或全身性地抑制它，可能妨碍必要的创面闭合。相应的研究方向是通过时空控制在促进闭合的同时减少瘢痕。<b>修复不是在闭合与不闭合之间二选一，而是在不同阶段精确改变介入方式。</b><sup>[2]</sup></p>
+<p>瘢痕并不是「什么都没有发生」。它是一种非常有效的紧急封口机制，可以降低开放创面持续失血、感染与暴露的危险。但它也可能用排列单一、功能有限的组织，替代原先复杂的结构。因而医学内部已经存在两种不同的成功：一种是损害停止了，另一种是组织不仅停止受损、还重新获得了进一步修复与适应的能力。两者有时同时出现，有时并不。</p>
+
+<h2 id="s3">三、政治学的反驳：没有阶段性闭合，暴力停不下来</h2>
+<p>若仅从医学出发，很容易把一切快速闭合都读成可疑的瘢痕化。政治学立刻提出反驳：有些创伤并不允许等待一个理想的、完整的、无妥协的修复方案。</p>
+<p>内战、独裁统治或大规模暴力结束时，旧政权的军事力量、警察系统、地方武装与经济网络往往仍然存在。追责、审判、真相调查、赦免、赔偿与制度改革不是在真空中进行；它们会改变原有权力集团是否愿意停止暴力，也会改变新制度能否生存。一种有争议但影响深远的主张认为，原则化追责并不必然自动产生秩序；在某些转型条件下，政治妥协、赦免或真相委员会可能通过争取掌握实际力量者的合作，为停止暴力与建立制度创造条件。<b>它准确揭示了修复中的时间难题：若第一次闭合无法发生，后续正义可能根本没有稳定的承载者。</b><sup>[3]</sup></p>
+<p>另一方面，后续的比较研究也没有证明「赦免越多越好」或「尽快翻篇就是最优」。对转型正义机制的系统比较认为，产生较好人权与民主结果的往往不是单一机制，而是审判、赦免、真相委员会等机制的特定组合及其顺序：审判提供责任，赦免可能提供稳定，单独使用与组合使用的效果并不相同。<sup>[4]</sup></p>
+<p>由此得到一条比「既要和平又要正义」更具体的约束。「和平与正义兼顾」仍可能只是一句价值宣言；「未来仍有入口」则要求制度回答一串具体问题：谁可以带着新证据回来；什么证据足以启动重新审查；重新处理能否只作用于具体案件而不使整个安排坍塌；受害者是否拥有进入权；被指控者是否拥有程序保障；重新审查之后制度如何再次形成有效结论。</p>
+
+<h2 id="s4">四、艺术学的追问：恢复功能时，原作是不是已经被修掉了</h2>
+<p>艺术保护面临的困难与前两家都不同。艺术品的价值不只存在于它当前看起来像什么，也存在于材料、技法、历史变化、创作者的选择以及后来时间留下的痕迹中。一次修复若使画面更漂亮却覆盖了原始颜料，若使雕塑重新完整却无法区分原件与补配，若使软件艺术重新运行却删除了创作者的代码，那么外观或功能上的成功可能同时构成历史与意义的损失。</p>
+<p>这个领域早就把讨论从「绝对可逆」推进到了「未来是否仍可处理」：可逆并非绝对的有或无，而有不同程度；即使某些处理事实上不可逆，也应当考察它是否允许未来重新处理。<sup>[5]</sup> 与之配套的伦理准则进一步要求：保护方法不得不当地损害未来的检查、科学研究、再次处理与功能；处理过程应形成准确、完整并尽可能永久的记录；补配应能够被检查识别，并尽量保持可逆，避免遮蔽原始材料。<b>这里的记录不是行政附属物，而是下一位保护者重新进入作品的基础设施。</b><sup>[6]</sup></p>
+<p>软件艺术把这个问题表现得尤其清楚。传统的代码迁移可能删除失效的原始程序，再用现代语言重写相似的视觉与行为结果。这样做可以让作品恢复运行，却可能消除艺术家的编程选择、注释、算法细节与未完成痕迹。一种被称为「代码重置位」的做法则尽量保留原始代码，在其外部或周围加入恢复代码，并保留原版、修复版与介入记录之间的区别。<sup>[7]</sup></p>
+
+<h2 id="s5">五、三家如何互相修改对方</h2>
+<p>三家不是三个相似的案例，它们互相修改对方的定义。删掉任何一家，剩下两家会立刻滑向一个错误的位置。</p>
+<p><b>医学阻止对「永远开放」的浪漫化。</b> 艺术与政治的讨论容易把开放、未完成与可修订直接视为善。医学提醒：开放创面意味着感染、失液、持续炎症与功能丧失；某些时刻必须迅速止血、覆盖、稳定。因此政治制度不能把「永远讨论」当作正义，艺术保护也不能把「从不介入」当作真实性。<b>真正需要保存的不是持续开放本身，而是再次开启的能力。</b></p>
+<p><b>政治学把「谁能回来」加进修复理论。</b> 生物组织不会召开听证会，作品材料也不会自行提出权利请求。政治学指出，再进入首先不是技术问题而是权力问题：同一份档案，对国家、受害者、被告、地方社区与国际机构具有不同意义；谁保管档案、谁有权申请复核、谁承担重新打开案件的风险，决定了所谓「可修订」是否真实存在。<b>续修性不能只有技术通道，还必须有正当的授权结构。</b></p>
+<p><b>艺术学把「记忆」变成修复的基础设施。</b> 政治制度常把档案保存看作事后纪念，医学系统也可能把旧记录视为行政负担。艺术保护说明，记录并非对修复的描述，而是修复的一部分——没有原作与介入的区分，后来者无法判断哪些变化属于对象自身、哪些来自前一次修复。</p>
+<p>三条互限合起来，把问题从「闭合得快不快」推到了另一个地方：<b>这次闭合之后，下一个人要重新造出多少本来已经存在过的东西。</b></p>
+
+<h2 id="s6">六、续修性</h2>
+<p><b>一个对象、制度或生命系统在完成必要的第一次闭合之后，面对新损伤、新证据、新主体或新技术时，能否以有限代价重新进入原来的修复现场，识别原物与前次介入的边界，实施局部修改，并在不重新释放原始伤害的条件下再次退出——本文把这一性质称为续修性。</b></p>
+<p>它包含四个缺一不可的条件。</p>
+<p><b>留痕性。</b> 原始状态、损伤情况、第一次介入采用的方法、材料、责任主体与不确定性必须以适当形式留下记录。没有留痕，第二次进入只能重新猜测。</p>
+<p><b>可触发性。</b> 系统必须规定何种事件可以启动再次处理，以及谁有资格提出启动请求。没有触发规则，「未来可以重新处理」只是一种抽象愿望。</p>
+<p><b>可局部化。</b> 再次介入应尽可能限于需要修改的部位。一次修订不应迫使整套制度崩塌，一处材料老化不应要求毁掉整件作品。无法局部进入的系统，会使任何修改都变成全面重启。</p>
+<p><b>可退出性。</b> 重新进入之后必须能够再次形成稳定状态。如果每次申诉都使整个安排无限期失效、每次检查都导致永久拆解、每次复查都演化为无终止的干预，那么系统拥有的不是续修性，而是慢性开放。</p>
+<p>四条合起来是一个具体的结构：<b>门能够在必要时打开，进入范围受到控制，工作完成后还能重新关上。</b></p>
+<p>要紧的是，这四条并非任何一家单独提出的。留痕性来自艺术保护，可触发性与可退出性来自政治程序，可局部化在医学与政治里各有一半。<b>三家各自都只有其中两条，而少任何一条，这个结构都会塌成它自己的病态版本：只有留痕与局部化，是一个谁也无权打开的完整档案；只有触发与退出，是一场没有原始材料可依据的重审。</b></p>
+
+<h2 id="s7">七、可通约的那个量：重复产生率</h2>
+<p>续修性若只停在概念层，三个领域各说各话，跨学科的主张就无从结算。要让它成为一个真命题，必须有一个在三个领域里量纲不同、比率相同的读数。</p>
+<p>本文提出的是：<b>为了在第二次进入时作出一次负责任的判断，不得不重新生成的信息，占这件事上曾经存在过的信息的比例。</b> 记作重复产生率。</p>
+<p>「曾经存在过」这个限定是关键。它排除了那些从来没有人知道的东西——那属于知识的边界，不属于修复的质量。它只计算一件事：某项信息在第一次介入时确实被产生过（被看到、被测量、被记录、被某个人知道），而在第二次进入时它已经不可获得，必须重新造一遍。</p>
+<p>三个领域的具体量纲不同，比率的构造方式相同：</p>
+<table class="tbl">
+<tr><th></th><th>分子：必须重新产生的</th><th>分母：曾经存在过的</th></tr>
+<tr><th>医学</th><td>修订手术前必须重做的影像、病理与功能检查项数；必须重新推断的既往植入物规格与手术边界</td><td>首次治疗全程实际产生过的检查项与操作记录总数</td></tr>
+<tr><th>政治</th><td>重新审查时必须重新取得的证人证言、必须重新查找的文件、必须重新认定的事实</td><td>首次处理时确实被取得或被记录过的证言与文件总数</td></tr>
+<tr><th>艺术</th><td>下一位修复者必须重新推断的原始材料构成、原始代码行为、前次介入的范围与理由</td><td>首次修复时确实被观察、被测量、被决定过的项目总数</td></tr>
+</table>
+<p>这个比率有四个使它可用的性质。<b>第一，它是无量纲的</b>，因而三个领域的读数可以并排比较。<b>第二，它可以事后测量</b>，只要第二次进入真的发生了——不需要预测，只需要在修订手术、重新审查、二次修复完成后回头清点。<b>第三，它把「留痕」从一个态度变成一个数</b>：留痕做得好，分子就小。<b>第四，也是最要紧的一点，它与第一次闭合的质量正交</b>——一次完美的手术可以留下极高的重复产生率（什么都没记），一次勉强的妥协可以留下极低的（档案完整）。</p>
+<p>由此得到本文的核心可检验预测：<b>在第一次闭合程度相近的对象中，重复产生率越低，第二次进入的总代价越低，且第二次修复后恢复功能的概率越高。</b> 这条预测不含任何情态词，且三个领域都能各自独立地检验它。</p>
+<p>需要说明它测不到什么。重复产生率不测原始信息的质量——一份完整但错误的记录会给出很低的分子。它也不测第二次进入的正当性——一个档案完备却无人有权打开的制度，比率很低而续修性很差。因而它只是四条件里「留痕性」的量化，其余三条仍需另行判断。本文不主张用一个数覆盖整个概念。</p>
+
+<h2 id="s8">八、两根轴，四种结局</h2>
+<p>传统的修复评价常把「是否闭合」当作主要尺度。至少需要两条彼此独立的轴：第一次闭合能力（当前损害是否被有效停止，基本功能与秩序是否恢复）与续修能力。</p>
+<table class="tbl">
+<tr><th></th><th>续修能力高</th><th>续修能力低</th></tr>
+<tr><th>第一次闭合能力高</th><td><b>可续修闭合</b><br>损害被停止，原始痕迹与介入记录保存，未来可局部重新处理。重复产生率低。</td><td><b>瘢痕式闭合</b><br>当前稳定，但修复路径被固化，未来修改代价极高。重复产生率接近一。<b>它在闭合当天与左格毫无分别。</b></td></tr>
+<tr><th>第一次闭合能力低</th><td><b>慢性开放</b><br>入口很多，却无法形成必要稳定，损害持续发生。</td><td><b>冻结式破裂</b><br>损害没有解决，进入条件也已丧失，只剩失效与废弃。</td></tr>
+</table>
+<p>这张表揭示一件容易被忽视的事：<b>开放程度高，并不等于续修性高。</b> 慢性伤口一直开放，不代表它具有良好修复能力；长期陷于清算而不能形成基本秩序，也不代表正义入口设计良好；一件始终处于未完成测试、没有稳定版本的数字作品，同样不具有可靠的未来可处理性。续修性只能在已经取得一定闭合之后讨论——它不是对闭合的否定，是对闭合方式的进一步判断。</p>
+
+<h2 id="s9">九、为什么第一次闭合看不出差别</h2>
+<p>两个创口在缝合后的第一周可能看起来同样完整；两份协议在签署后的第一个月可能都带来同样明显的暴力下降；两种软件艺术修复方案在展厅里可能产生几乎相同的画面与互动。</p>
+<p>第一次闭合回答的是：当前损害是否停止、表面功能是否恢复、系统是否暂时稳定。续修性回答的是另一组问题：原始状态是否仍可识别、前一次修复做过什么是否仍然可知、新事实能否合法地进入、修改能否局限在必要部位、修改完成后能否重新稳定。</p>
+<p><b>因而续修性是一种延迟显露的性质。</b> 它通常不会在验收时显现，而会在第二事件到来时暴露：医学中的二次损伤、复发或修订手术；政治中的新档案、新证词、新一代受害者诉求或权力结构变化；艺术中的材料老化、新检测技术、媒介淘汰或作品再次失效。</p>
+<p>而重复产生率把这个延迟缩短了一半：它虽然要等到第二次进入才能<b>结算</b>，但它的分子在第一次介入结束时就已经<b>确定</b>了——记了多少、记的是什么、能不能被下一个人读到，当天就定了。因而一个机构完全可以在闭合当天做一次预估清点，不必等第二事件。<b>这是本文所能提供的、唯一一件能在事前做的事。</b></p>
+
+<h2 id="s10">十、逐领域兑现</h2>
+<p><b>一、医学的研究指标。</b> 传统指标集中在闭合时间、感染率、疼痛与短期并发症。续修性要求增加更长期的观察：修复组织的血管、神经与附属结构是否恢复；组织结构是否允许未来手术或局部介入；植入材料与既往操作是否可识别；病历、影像与病理信息是否足以支持再次决策；第二次损伤后修复组织的反应是否优于僵硬瘢痕；再次介入是否必须破坏大范围健康组织。这会使一些「短期愈合较快」的方案接受第二层检验。</p>
+<p><b>二、医学的时间限制（本领域反过来加的第一处约束）。</b> 某种在重塑阶段有益的抗纤维化介入，在止血或再上皮化阶段可能有害。因而续修性不是要求降低所有闭合强度，而是要求治疗随阶段改变，避免一次机制长期统治整个修复过程。这一条把本文从「保留余地越多越好」拉回到「余地必须与阶段匹配」。</p>
+<p><b>三、政治的后续处理接口。</b> 对证据与档案实行独立保护；区分停止暴力的政治妥协与永久消除事实责任；为新证据设置明确的重新审查门槛；允许受害者、地方社区或法定机构提出复核；采用日落条款、阶段性审查或条件性赦免；使重新处理尽量作用于具体责任与补救，而不是自动摧毁整个安排；为重新调查后的再次结案规定程序。<b>最重要的区分是：不立即审判，不等于永远不能审查；暂时赦免，也不等于必须销毁证据。</b></p>
+<p><b>四、政治反过来加的约束。</b> 有些制度推迟重写正是目的本身——一部难以修改的宪法所提供的稳定，恰恰来自它的难以修改。因而本文不含「续修性越高越好」这一价值判断，只提供一个读数与一组代价。</p>
+<p><b>五、艺术的分层介入。</b> 对绘画、雕塑、建筑、影像与软件艺术，可以把介入设计为层次分明的结构：第一层是尽可能完整保存的原始材料或原始文件；第二层是对原始损伤的记录；第三层是本次修复增加的材料、代码或解释；第四层是运行环境、展示条件与未来照护建议。</p>
+<p><b>六、软件艺术的验收问题。</b> 由此可以提出比「是否恢复运行」更严格的验收问：原始代码还在不在；新增代码能否被识别；未来技术人员能否知道本次迁移作了哪些假设；若新的解释认为某段看似错误的代码其实具有艺术意义，能否撤销或绕开本次处理；下一次迁移是否必须重新猜测创作者意图。这五问正是艺术领域重复产生率的分子清单。</p>
+<p><b>七、基础设施的技术债。</b> 一次绕过而非修正的系统改动，若不记录为什么绕过，下一个人必须重新推断整条约束。这是重复产生率在工程领域的直接对应，且这个领域已有现成的实践（架构决策记录）——它记的正是「为什么这样决定、当时排除了什么」。</p>
+<p><b>八、法律的判决书说理。</b> 一份只写结论不写理由的判决，使后续的再审必须重新认定全部事实。说理的密度就是这里的留痕性。</p>
+<p><b>九、生态修复。</b> 一片被硬化护岸「修复」的河道，当下稳定，而恢复自然形态所需的重新勘测与重新设计几乎等于从零开始。典型的瘢痕式闭合。</p>
+<p><b>十、语言与口传传统（本领域反过来加的第三处约束）。</b> 口述传统、表演艺术与社区性遗产的「原始痕迹」可能存在于实践者、仪式关系与身体技艺中，不可数字化、不可归档。<b>若续修性只承认可归档的证据，它反而会把不依赖书面记录的传统整个排除在外</b>，并把这些传统一律判成低续修性——而它们靠师承延续了几百年。这一处逼出本文最重的一条收窄：<b>重复产生率的分母是「曾经存在过的信息」，而在这些传统里，信息的存在方式本身就是人，人在，信息就没有丢失。</b> 因而本文的读数只适用于信息可与人分离的场合。</p>
+
+<h2 id="s11">十一、与最近的几种说法的分界</h2>
+<p><b>一、与可再处理性。</b> 艺术保护已把讨论从绝对可逆推进到未来是否仍可处理，这是本文最近的一位。分离线：物理上能够再次处理，不代表真正具有续修性——一件作品的修复材料可能可以移除，但若没有处理记录、没有合法访问权、没有触发条件，未来修复者仍然无法有效进入。判决点：<b>技术上可移除但没有记录和进入程序的处理，可再处理性不低，重复产生率却接近一。</b><sup>[5]</sup></p>
+<p><b>二、与制度可修订性。</b> 那一支关注规则与制度能否持续被改变。判决点：一个国家的宪法可能容易修订，而某一批历史案件的档案已经销毁、申诉期限绝对届满——一般制度可修订性高，具体创伤的续修性仍然很低。能改一般规则，不等于能重新处理具体旧案。</p>
+<p><b>三、与适应性治理。</b> 那一支描述系统如何在变化中更新管理方式。续修性不要求制度持续处于实验状态，只要求在特定事件发生时能够准确进入需要修改的部位。判决点：一个不断学习新政策、却因旧记录丢失而无法修正过去具体决定的组织，适应能力高而续修性低。</p>
+<p><b>四、与韧性。</b> 那一支关注系统在扰动下维持关系或吸收变化的能力。判决点：瘢痕本身可能很坚固——一个权力结构可能极具韧性却长期保存不公，一个修复层可能耐久却使原作无法再检查。<b>依靠僵化结构成功抵抗第二次冲击的系统，韧性高、续修性低。</b></p>
+<p><b>五、与路径依赖。</b> 那一支解释早期选择如何通过收益递增与转换成本限制后续选择。续修性不只说明为什么难以改变，而是识别一个能够降低未来改变成本的设计变量。判决点：两个系统可以具有相同程度的历史锁定，但其中一个保存版本、接口与复核程序——路径依赖程度相近，重复产生率却相差数倍。</p>
+<p><b>六、与一般的维护与修理。</b> 那一支把注意力从新奇发明转向破损世界中的维护与照料。续修性提出的判据更具体：不是看修理是否频繁发生，而是看第一次修理有没有为下一次留下可进入的结构。判决点：一个被高频维护、却因为每次维护都覆盖旧状态而越来越难判断的对象——维护活动很多，重复产生率反而上升。</p>
+<p><b>七、与再生。</b> 再生通常指结构与功能在损伤后得到较完整恢复。续修性不要求回到原始形态。判决点：对象未恢复原状但未来能够安全修正，续修性可以很高；对象看似恢复原状却封死后续处理，续修性仍然很低。</p>
+
+<h2 id="s12">十二、续修性可能制造的新危险</h2>
+<p>为未来保留入口，本身也可能成为新的权力。医学机构可能为了「持续监测」而扩大过度检查；政治力量可能反复利用旧案打击对手，使社会永远不能形成共同生活；艺术机构可能以保存原始状态为名，把作品冻结成不允许创作者继续改变的档案对象；技术系统可能因保留过多版本与兼容层而变得沉重、脆弱、不可维护。</p>
+<p>因而续修性必须受四类限制：<b>触发门槛</b>——不是任何不满都自动启动全面重修，需要可说明的损伤、新证据或功能失效；<b>范围隔离</b>——重新处理应尽可能只影响具体组织、案件、材料或模块；<b>角色分离</b>——提出重新进入、批准重新进入、实施处理与评估结果的主体不应完全重合；<b>退出规则</b>——介入开始前就应规定观察期、完成标准、复核次数与重新闭合条件。</p>
+<p><b>续修性的完整结构不是一扇始终敞开的门，而是一套门、钥匙、门槛、记录与关闭程序。</b></p>
+
+<h2 id="s13">十三、这一判断不适用的地方</h2>
+<p>在大出血、急性感染、建筑即将坍塌或暴力正在扩散的紧急状态中，停止当前损害具有优先性，此时某些永久性处理可能无法避免。在证据本身会严重危害当事人安全的场景中，完整开放档案也可能造成二次伤害。在身份与所有权高度争议的文化对象中，「谁有权重新进入」可能比技术处理更难解决。在资源极端稀缺的环境中，保存全部版本、材料与记录可能不可行，需要区分最低必要留痕与理想状态。</p>
+<p>而最重的一条边界已在第十节第十处写明：本文的读数只适用于信息可与人分离的场合。<b>续修性不是保存所有东西，而是保存未来仍可形成负责任判断所必需的差异。</b></p>
+
+<h2 id="s14">十四、与同期几篇的分界</h2>
+<p><b>与「不按的代价先落在谁身上」那一篇。</b> 那篇问干预权的持有人是否付不干预的账，本文问二次进入所需的信息还在不在。判决点：一个留痕完备、通道畅通、而二次进入的代价全部由发起者承担的系统，本文预测重复产生率很低而进入率趋零——两篇合起来才能解释一扇造得很好却没人推的门。</p>
+<p><b>与「记零位」那一篇。</b> 那篇问二次进入这个动作有没有科目，本文问二次进入所需的材料在不在。判决点：一个档案完备（本文判为高续修）而重新打开旧案的人永远不被记入任何履历（那篇判为记零位）的制度，两篇预测同一个结果——通道空置——而修法方向不同：本文修记录，那篇修科目表。<b>两者是同一扇门的两把锁。</b></p>
+<p><b>与「谁能改下一轮的标准」那一篇。</b> 那篇处理的是判准的改写，本文处理的是现场的重入。判决点：一个允许随时改写评价标准、却不保存任何一次旧标准及其理由的制度，那篇判为健康，本文预测每一次改写都必须重新论证全部旧问题，重复产生率随改写次数线性上升。</p>
+<p><b>与「机器答案到达前留一份独立记录」那一篇。</b> 那篇的底稿是为了显露判断如何被改变，本文的留痕是为了让下一个人不必重造。判决点：一份只对本人可见、事后不可被第三方读取的底稿，那篇判为有效，本文判为零留痕。</p>
+<p><b>与「学习的单位是规则的前后差」那一篇。</b> 那篇要求保存规则的两个版本，这在本文里正是一次留痕。判决点：若规则差记录完备而下一次面对相似情境时仍必须从头推导，本文预测重复产生率并未下降——记录了变化不等于记录了理由。</p>
+<p><b>与「中断之后能不能接手」那一篇。</b> 那篇测接手者的能力，本文测接手所需材料的完整度。判决点：接手能力相同的两组，材料留痕不同者的实际重建时间不同，且差异全部落在重新产生已知信息上，与能力无关。</p>
+
+<h2 id="s15">十五、本文自己是不是一种瘢痕式修复</h2>
+<p>本文试图用一个共同概念连接医学、政治学与艺术学，这个动作本身可能犯下它所批评的错误。身体组织不是政治共同体，政治责任也不是艺术材料；三者的主体、因果机制、伦理责任与证据标准存在根本差异。若「伤口」「瘢痕」「修复」只是修辞上的相似，而不能产生可共同观测的变量，那么本文只是把三门学科压进了一个漂亮比喻。</p>
+<p>第七节的重复产生率正是为回应这一点而设的：它是本文交出的、唯一一个三领域量纲不同而比率相同的读数。<b>若这个比率在三个领域中无法采用任何具有可比性的构造，本文就应退回为三个领域的有限启发，不能继续维持跨学科总命题。</b></p>
+<p>本文也必须具有续修性：保留自己的形成记录（三处收窄都写在正文里，包括第十节第十处那条最重的、把适用范围削掉一大块的），允许新证据进入，能够局部修改，并拒绝把当前版本伪装成最终真理。</p>
+
+<h2 id="s16">十六、可以判本文错的六种结果</h2>
+<p><b>第一，最便宜、今天就能做的一条。</b> 取一批已经发生过修订手术的病例，按病历完整度分组（分组只用首次治疗的记录密度，不看疗效），比较修订手术的术前准备时长、必须重做的检查项数与健康组织牺牲范围。本文预测记录密度高的一组重复产生率低、且二次代价低。若无差异，核心读数失效。</p>
+<p><b>第二，比率不可通约。</b> 若三个领域各自构造出的重复产生率无法采用任何具有可比性的分子分母（例如政治领域的「曾经存在过的信息」在实践中不可清点），跨学科总命题即告失败，本文退回为三领域的有限启发。</p>
+<p><b>第三，留痕不降低二次代价。</b> 若保存原始资料、介入记录与版本边界，并未降低再次处理中的搜索成本与误判率，则留痕性作为核心机制的判断被直接削弱。</p>
+<p><b>第四，医学部分被反证。</b> 若在多个可重复模型中，收缩性强、结构固化程度高的快速闭合在长期功能与二次损伤恢复上始终不劣于结构保存型修复，医学部分的瘢痕式闭合命题应被撤回。</p>
+<p><b>第五，政治部分被反证。</b> 若具有档案保护、复核触发与局部补救机制的安排，并未改善错误纠正、人权或长期稳定，反而稳定增加暴力复发，则政治创伤不能以本文所设想的方式进行有界再进入。</p>
+<p><b>第六，入口本身制造进入需求。</b> 若高续修性系统在第二次事件中确实更容易重新进入，但同时显著增加第一次修复后的反复争议、过度治疗、政治不稳定或作品失真，使总损害高于低续修性系统，则本文忽视了这一反噬，四条限制不足以挡住它。</p>
+<p><b>正向读数。</b> 若命题成立，在第一次闭合能力相近的对象中，重复产生率低的一组应在第二事件后表现出更低的定位与修改成本、更高的局部修正比例与更快的再次稳定，而不会显著增加第一次闭合后的失稳频率。</p>
+<p><b>写死日期的赌注。</b> 到二〇三二年十二月三十一日，若在医学修订治疗、政治转型安排与数字艺术保护三个领域中，至少有两个领域的独立研究均未发现「在首次闭合程度相近的条件下，重复产生率低的对象具有更低的二次进入代价、更高的局部纠错能力或更快的再次稳定」，那么续修性不应继续被主张为跨学科原理，只能降格为个别领域的描述性概念。反之，即使两个领域获得支持，也不能自动证明第三个领域成立——每一领域仍需接受自己的证据标准。</p>
+
+<h2 id="s17">结　论</h2>
+<p>三门学科各自守护修复的一个不同目标：医学要求生命与功能不能继续受损；政治学要求暴力停止、同时保留责任与正义的合法入口；艺术学要求对象在延续中不失去自身的历史与差异。三者共同否定了两个极端——只要已经闭合，修复就完成了；只要保持开放，修复就更诚实。</p>
+<p>剩下的是第三种状态：在必要时闭合，但不让这次闭合垄断未来；在必要时重新进入，但不让重新进入摧毁已经获得的稳定。</p>
+<p>而要把这句话从愿望变成可以结算的东西，需要一个数：<b>第二次进入时，有多少本来已经存在过的信息必须被重新造一遍。</b> 它无量纲，因而三个领域可以并排比较；它的分子在第一次介入结束的那一天就已经定下，因而不必等到第二事件才能预估；它与第一次闭合的质量正交，因而能把两个在闭合当天完全相同的修复分开。</p>
+<p>修复的价值由此不只存在于「今天解决了什么」，还存在于「今天没有替未来消灭什么」。伤口、国家与艺术品并不相同，但它们都可能遇到同一个时刻：第一次修复已经结束，新的损伤、新的证据或新的技术站在门外。门是否还在，钥匙由谁保管，进入之后还能不能平安出来——以及，进去之后还要不要把已经知道过的一切重新知道一遍。</p>
+
+<h2 id="s18">注　释</h2>
+<ol class="pl">
+<li>医学部分包含动物与临床前研究结论，不能直接作为临床治疗建议。</li>
+<li>政治学部分涉及仍有争议的转型正义研究，本文只使用其两条被广泛讨论的判断，不主张其中任何一方为定论。</li>
+<li>「曾经存在过的信息」限于第一次介入时确实被产生、被观察或被记录过的项目；从未被任何人知道的内容不计入分母。</li>
+<li>重复产生率只量化四条件中的留痕性，不覆盖可触发、可局部与可退出三条，不应被当作续修性的总分。</li>
+</ol>
+
+<h2 id="s19">参考文献</h2>
+<ol class="pl ref">
+<li>Yannas, I. V., &amp; Tzeranis, D. S. (2021). Mammals fail to regenerate organs when wound contraction drives scar formation. <i>npj Regenerative Medicine</i>, 6, 39. <a href="https://www.nature.com/articles/s41536-021-00149-9" target="_blank" rel="noopener">nature.com</a></li>
+<li>Zhang, S. et al. (2021). A pulsatile release platform based on photo-induced imine-crosslinking hydrogel promotes scarless wound healing. <i>Nature Communications</i>, 12. <a href="https://www.nature.com/articles/s41467-021-21964-0" target="_blank" rel="noopener">nature.com</a></li>
+<li>Snyder, J., &amp; Vinjamuri, L. (2003/2004). Trials and Errors: Principle and Pragmatism in Strategies of International Justice. <i>International Security</i>, 28(3), 5-44. <a href="https://www.belfercenter.org/publication/trials-and-errors-principle-and-pragmatism-strategies-international-justice" target="_blank" rel="noopener">belfercenter.org</a></li>
+<li>Olsen, T. D., Payne, L. A., &amp; Reiter, A. G. (2010). The Justice Balance: When Transitional Justice Improves Human Rights and Democracy. <i>Human Rights Quarterly</i>, 32(4), 980-1007.</li>
+<li>Appelbaum, B. (1987). Criteria for Treatment: Reversibility. <i>Journal of the American Institute for Conservation</i>, 26(2), 65-73. <a href="https://cool.culturalheritage.org/jaic/articles/jaic26-02-001.html" target="_blank" rel="noopener">cool.culturalheritage.org</a></li>
+<li>American Institute for Conservation. (1994). <i>Code of Ethics and Guidelines for Practice</i>. <a href="https://www.culturalheritage.org/about-conservation/code-of-ethics" target="_blank" rel="noopener">culturalheritage.org</a></li>
+<li>Engel, D., &amp; Phillips, J. (2017-2018). Introducing "Code Resituation": Applying the Concept of Minimal Intervention to the Conservation Treatment of Software-based Art. <i>Electronic Media Review</i>, 5. <a href="https://resources.culturalheritage.org/emg-review/volume-5-2017-2018/engel-2/" target="_blank" rel="noopener">culturalheritage.org</a></li>
+<li>Jackson, S. J. (2014). Rethinking Repair. In <i>Media Technologies: Essays on Communication, Materiality, and Society</i>. MIT Press.</li>
+<li>Holling, C. S. (1973). Resilience and Stability of Ecological Systems. <i>Annual Review of Ecology and Systematics</i>, 4, 1-23.</li>
+<li>Pierson, P. (2000). Increasing Returns, Path Dependence, and the Study of Politics. <i>American Political Science Review</i>, 94(2), 251-267.</li>
+</ol>
+
+<h2 id="s20">人机分工声明</h2>
+<p>本文由王德生提出研究方向、承重判断与最终发表责任；Claude 完成三个领域的选源与冲突定位、公开文献检索、可通约读数的构造、二维表、逐领域兑现、分界与证伪设计以及正文写作。第十节第二、四、十三处「本领域反过来加的约束」由材料逼出，其中第十处把本文的适用范围削掉了一大块，全过程保留在正文中。医学部分含动物与临床前研究，不构成治疗建议。本文未标注任何评分——按本站惯例，参与改写者不为自己改写的文本打分。</p>
+
+<p class="vsn"><b>证据边界</b>　医学部分包含动物及临床前研究，不能直接作为临床治疗建议；政治学部分涉及仍有争议的转型正义研究；艺术学部分主要依据保护伦理、专业规范与案例研究。第十六节六条判据本文<b>均未执行</b>，其中第一条所需的病历数据在多数医疗机构的既有记录里已经存在。</p>
+<p class="vsn"><b>字数</b>　纯汉字约 1.1 万　<b>版本</b>　v1.0 · 2026-08-01</p>
+<div class="src"><div class="sl">这一篇由哪三个领域的争论撞成</div><p class="sd">三边对「一次修复什么时候算成功」给出互相排斥的答案：医学说闭合太快会以瘢痕代替再生，政治学说没有阶段性闭合暴力根本停不下来，艺术保护说恢复功能可能把原作一并修掉。<b>三家互相修改对方的定义：删医学则另两家滑向「永远开放更道德」，删政治学则只剩技术可逆性、没有「谁有权回来」，删艺术学则档案退回事后纪念碑。三家合起来才逼出一个三领域量纲不同而比率相同的读数。</b></p><a class="one" href="https://www.nature.com/articles/s41536-021-00149-9"><div class="k">创伤修复医学 · 快速闭合可能以瘢痕代替再生</div><div class="t">Yannas &amp; Tzeranis, Mammals fail to regenerate organs when wound contraction drives scar formation（npj Regenerative Medicine, 2021）；另见 Nature Communications 12（2021）关于时空控制促进无瘢痕愈合</div><div class="g">创面收缩能迅速减小缺损，却可能把组织引向瘢痕而非结构性再生；抑制收缩的支架在多种动物模型中减少瘢痕并出现部分再生。但医学同时拒绝「尽量不闭合」——同一信号通路也参与必要的再上皮化，不当时机的全身性抑制会妨碍闭合。</div></a><a class="one" href="https://www.belfercenter.org/publication/trials-and-errors-principle-and-pragmatism-strategies-international-justice"><div class="k">转型正义研究 · 没有阶段性闭合就没有承载者</div><div class="t">Snyder &amp; Vinjamuri, Trials and Errors（International Security, 2003/04）；Olsen, Payne &amp; Reiter, The Justice Balance（HRQ, 2010）</div><div class="g">原则化追责并不自动产生秩序；在某些转型条件下妥协、赦免或真相委员会可能为停止暴力创造条件。而后续比较研究也不支持「赦免越多越好」——起作用的是审判、赦免、真相委员会的特定组合与顺序。这一边把「谁能带着新证据回来」这个权力问题加进了修复理论。</div></a><a class="one" href="https://cool.culturalheritage.org/jaic/articles/jaic26-02-001.html"><div class="k">艺术保护伦理 · 记录是修复的一部分</div><div class="t">Appelbaum, Criteria for Treatment: Reversibility（JAIC, 1987）；AIC 伦理准则（1994）；Engel &amp; Phillips, Code Resituation（Electronic Media Review, 2017–18）</div><div class="g">可逆并非绝对的有或无，即使不可逆的处理也应考察是否允许未来重新处理；伦理准则要求处理不得妨碍未来的检查与再处理，并要求准确完整的记录、补配可识别。软件艺术的「代码重置位」保留原始代码而在其外加入恢复代码——记录不是修复的描述，是下一位修复者进入作品的基础设施。</div></a></div>
+<div class="endbox"><p>三种读法 · 网页长文 · 在线 PDF 翻页 · PDF 下载</p>
+<p><a href="/confluence/">返回学科通融 →</a></p></div>
+
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<footer>学科通融 · 三学科交叉 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International · <a href="/browse/">sdeuniverses.com</a></footer>
+<script>
+(function(){var b=document.getElementById('pbar'),t=document.getElementById('totop');
+function u(){var d=document.documentElement,h=d.scrollHeight-d.clientHeight;
+b.style.width=(h>0?(d.scrollTop/h*100):0)+'%';t.style.display=d.scrollTop>700?'block':'none';}
+addEventListener('scroll',u,{passive:true});u();
+t.onclick=function(){scrollTo({top:0,behavior:'smooth'});};})();
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

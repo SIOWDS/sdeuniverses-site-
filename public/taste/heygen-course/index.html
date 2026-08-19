@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDE 数字人视频造 · SDE Universes</title>
+<style>
+:root{--bg:#0d0b16;--card:#161320;--card2:#1b1726;--ink:#ECE7F5;--sub:#A79FC0;--muted:#6f6790;--line:rgba(255,255,255,0.09);--gold:#E7C349;--gold2:#F0D97A;--acc:#B98CF0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:26px 20px 90px}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--sub);font-size:13.5px;margin-bottom:22px}
+.crumb{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.crumb a{color:var(--muted);text-decoration:none}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+.panel h2{font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.step-n{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--acc);color:#140f22;font-size:12px;font-weight:800;align-items:center;justify-content:center}
+label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin:10px 0 4px}
+input[type=text],input[type=password],select,textarea{width:100%;background:#0C0A14;border:1px solid var(--line);border-radius:8px;color:inherit;padding:9px 11px;font-size:13.5px;font-family:inherit}
+textarea{min-height:120px;resize:vertical;line-height:1.7}
+.btn{background:var(--gold);color:#140f06;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn2{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:9px 15px;font-size:13px;cursor:pointer;font-family:inherit}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tip{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:6px}
+.status{font-size:12.5px;color:var(--sub);margin-top:10px;min-height:18px}
+.err{font-size:12.5px;color:#ff9b9b;margin-top:8px;min-height:16px}
+#results{margin-top:10px;display:flex;flex-direction:column;gap:7px;max-height:300px;overflow:auto}
+.hit{background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer}
+.hit:hover{border-color:var(--acc)}
+.hit .ht{font-size:13.5px;font-weight:600}
+.hit .hs{font-size:11.5px;color:var(--muted);margin-top:2px}
+.chosen{background:rgba(185,140,240,.12);border:1px solid var(--acc);border-radius:9px;padding:9px 12px;font-size:13px;margin-top:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.25);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+video{width:100%;border-radius:10px;background:#000;display:block}
+.keyguide{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--sub);line-height:1.8;margin-bottom:12px}
+.keyguide b{color:var(--gold2)}
+.keyguide a{color:var(--acc)}
+.pill{display:inline-block;font-size:11px;background:rgba(231,195,73,.15);color:var(--gold2);border-radius:20px;padding:2px 10px;margin-left:6px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+</style>
+  <script src="/assets/sde-idx-cache.js?v=20260818a"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="/browse/">SDE Universes</a> › 品尝系列 › SDE 数字人视频造</div>
+  <h1>🎬 SDE 数字人视频造 <span class="pill">真人分身讲课</span></h1>
+  <div class="sub">选一篇 SDE 文章 → 由 SDE 基底＋全站检索生成一份讲课稿 → 用你在 HeyGen 训练好的<b>真人数字分身</b>把它讲成视频课。老师训练一次分身，之后任意文章都能自动出课。</div>
+
+  <!-- 第零步：就地录制素材（浏览器直接录，下载后上传 HeyGen） -->
+  <div class="panel">
+    <h2><span class="step-n">0</span> 就地录制素材（可选，全在浏览器完成）</h2>
+    <div class="keyguide">
+      还没有 HeyGen 账户？先去 <a href="https://app.heygen.com/login" target="_blank" rel="noopener"><b>注册 / 登录 HeyGen（点这里）</b></a>（免费档也能试）。<br>
+      下面两个录制器直接用你电脑的摄像头和麦克风录素材，录完<b>下载成文件</b>，再到 HeyGen 上传训练——不用装任何软件。首次点开会请求摄像头/麦克风权限，请允许。
+    </div>
+
+    <div class="grid2">
+      <!-- 自拍视频 -->
+      <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">🎥 录自拍视频（训练形象分身）</div>
+        <div class="tip" style="margin-top:0;margin-bottom:8px">正脸对着镜头，光线充足、背景干净。<b>对着镜头自然说话录 15–30 秒</b>——可照着下方声音区取的那段文章念，边说边有自然的表情和口型，训出的分身更生动。</div>
+        <div id="camPromptText" style="display:none;background:#0C0A14;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.9;max-height:120px;overflow:auto;margin-bottom:8px"></div>
+        <video id="camPreview" muted playsinline style="width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;border-radius:8px"></video>
+        <div class="row" style="margin-top:8px">
+          <button class="btn2" id="btnCamStart" type="button">开启摄像头</button>
+          <button class="btn2" id="btnCamRec" type="button" disabled>● 开始录制</button>
+          <button class="btn2" id="btnCamStop" type="button" disabled>■ 停止</button>
+        </div>
+        <div id="camStatus" class="status" style="margin-top:6px"></div>
+        <video id="camPlayback" controls playsinline style="display:none;width:100%;margin-top:8px;border-radius:8px"></video>
+        <a id="camDownload" class="btn2" style="display:none;margin-top:8px" download="我的自拍-HeyGen形象.webm">⬇ 下载自拍视频</a>
+      </div>
+
+      <!-- 声音 -->
+      <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">🎙 录声音样本（克隆你的嗓音）</div>
+        <div class="tip" style="margin-top:0;margin-bottom:8px">照着一段 SDE 文章念，克隆出的声音最贴近你讲课的样子。<b>念满 1–2 分钟（约 300–500 字 / 3–4 段）</b>最稳，最少 30 秒。</div>
+        <div class="row" style="margin-bottom:8px">
+          <button class="btn2" id="btnPrompt" type="button">取一段文章当提词</button>
+          <span class="tip" id="promptHint" style="margin:0">先在下面第 2 步选一篇文章，再点这里</span>
+        </div>
+        <div id="promptText" style="display:none;background:#0C0A14;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:15px;line-height:2;max-height:200px;overflow:auto;margin-bottom:10px"></div>
+        <div id="micMeter" style="height:8px;background:#0C0A14;border-radius:5px;overflow:hidden;margin-bottom:8px"><div id="micBar" style="height:100%;width:0;background:var(--acc);transition:width .08s"></div></div>
+        <div class="row">
+          <button class="btn2" id="btnMicStart" type="button">开启麦克风</button>
+          <button class="btn2" id="btnMicRec" type="button" disabled>● 开始录音</button>
+          <button class="btn2" id="btnMicStop" type="button" disabled>■ 停止</button>
+        </div>
+        <div id="micStatus" class="status" style="margin-top:6px"></div>
+        <audio id="micPlayback" controls style="display:none;width:100%;margin-top:8px"></audio>
+        <a id="micDownload" class="btn2" style="display:none;margin-top:8px" download="我的声音-HeyGen克隆.wav">⬇ 下载声音样本（WAV）</a>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:10px">录好下载后：自拍视频拿去 HeyGen 训练 <b>Avatar V</b> 分身；声音样本拿去 <b>AI Studio → Voice → Instant Voice Cloning</b> 克隆你的声音。详细步骤见下一步。</div>
+  </div>
+
+  <!-- 第一步：HeyGen 密钥 -->
+  <div class="panel">
+    <h2><span class="step-n">1</span> 连接你的 HeyGen 账户</h2>
+    <div class="keyguide">
+      本工具用你自己的 HeyGen 密钥出片（<b>BYOK</b>，密钥只在你浏览器与 HeyGen 之间转发，本站不存储）。出片前，先在 HeyGen 官网准备好三样东西：<br><br>
+      <b>① 训练你的数字分身（形象）</b><br>
+      登录 <a href="https://app.heygen.com" target="_blank" rel="noopener">HeyGen</a> → Avatars（头像）→ Create → <b>Avatar V</b>，对着摄像头录一段约 15 秒的自拍（正脸、光线充足、背景干净——背景会保留在视频里，不满意要手动删）。等它训练好，就有了你的形象分身。<br><br>
+      <b>② 克隆你的声音（让分身用你自己的嗓音讲课）</b><br>
+      进 <b>AI Studio → Voice（声音）→ + New Voice → Create New Voice → Instant Voice Cloning</b>：勾选那句授权协议（同意用你的录音生成合成声音）→ 上传一段<b>你自己说话的清晰录音</b>（安静房间、好一点的麦克风，约 <b>30 秒到 2 分钟</b>，说得越自然越像；中文课就用中文录、内容尽量贴近讲课口吻）→ 处理几秒即得你的声音克隆。不满意可点「Improve this voice」调相似度/风格/稳定度。<br>
+      <span style="color:var(--muted)">小贴士：声音质量决定成片质量——录得清楚、内容贴近真实讲课，克隆才像你本人。若中文效果不理想，可在 voice 设置里选 multilingual v2 模型。</span><br><br>
+      <b>③ 复制 API Key</b><br>
+      去 <a href="https://app.heygen.com/settings?nav=API" target="_blank" rel="noopener">设置 → API</a> 复制 API Key，填入下面，点「载入我的分身与声音」——你训好的形象和克隆声音都会出现在下面的下拉里，选你自己的那份即可。<br><br>
+      计费由 HeyGen 按视频分钟数从你的额度扣：<b>标准约 $1/分钟，最逼真的 Avatar IV 约 $4/分钟</b>（$5 起充，用多少扣多少）。
+    </div>
+    <label>HeyGen API Key</label>
+    <input id="hgKey" type="password" placeholder="粘贴你的 HeyGen API Key" autocomplete="off">
+    <div class="row" style="margin-top:10px">
+      <button class="btn2" id="btnLoadAvatars" type="button">载入我的分身与声音</button>
+      <span id="keyStatus" class="status" style="margin:0"></span>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <div>
+        <label>数字分身（形象）</label>
+        <select id="hgAvatar"><option value="">先载入…</option></select>
+      </div>
+      <div>
+        <label>声音（选你克隆的那份＝用你自己的嗓音）</label>
+        <select id="hgVoice"><option value="">先载入…</option></select>
+      </div>
+    </div>
+    <div class="tip">找不到分身？确认你已在 HeyGen 训练过 Digital Twin/Avatar。这里会列出你账户里可用的形象与声音。</div>
+  </div>
+
+  <!-- 第二步：选文章 -->
+  <div class="panel">
+    <h2><span class="step-n">2</span> 选一篇 SDE 文章</h2>
+    <div class="row">
+      <input id="q" type="text" placeholder="搜索站内文章标题 / 关键词…" style="flex:1;min-width:220px">
+      <button class="btn2" id="btnSearch" type="button">搜索</button>
+    </div>
+    <div id="loadStatus" class="status">索引载入中…</div>
+    <div id="results"></div>
+    <div id="chosen" class="chosen" style="display:none"></div>
+  </div>
+
+  <!-- 第三步：生成讲课稿 -->
+  <div class="panel">
+    <h2><span class="step-n">3</span> 生成讲课稿</h2>
+    <div class="keyguide">
+      讲课稿由你选的 AI 基底生成（<b>BYOK</b>，密钥只在你浏览器与该基底之间转发）。选一个你有额度的基底、填它的 API Key。
+    </div>
+    <div class="grid2">
+      <div>
+        <label>生成基底</label>
+        <select id="baseSel">
+          <option value="deepseek">DeepSeek（国内直连 · 推荐）</option>
+          <option value="glm">智谱 GLM（国内直连）</option>
+          <option value="gpt">OpenAI GPT</option>
+          <option value="claude">Anthropic Claude</option>
+          <option value="gemini">Google Gemini</option>
+        </select>
+      </div>
+      <div>
+        <label>基底 API Key</label>
+        <input id="baseKey" type="password" placeholder="粘贴所选基底的 API Key" autocomplete="off">
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:4px">
+      <div>
+        <label>篇幅</label>
+        <select id="lenSel">
+          <option value="900">短（约 900 字 · 约 3 分钟）</option>
+          <option value="1600" selected>中（约 1600 字 · 约 5 分钟）</option>
+          <option value="2600">长（约 2600 字 · 约 8 分钟）</option>
+        </select>
+      </div>
+      <div>
+        <label>讲课口吻</label>
+        <select id="toneSel">
+          <option value="lecture" selected>老师讲课 · 深入浅出</option>
+          <option value="keynote">主题演讲 · 有感染力</option>
+          <option value="storytell">娓娓道来 · 讲故事式</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="btnScript" type="button" disabled>生成讲课稿</button>
+      <span id="scriptStatus" class="status" style="margin:0"></span>
+    </div>
+    <label style="margin-top:12px">讲课稿（可手动微调后再出视频）</label>
+    <textarea id="script" placeholder="生成的讲课稿会出现在这里，你可以直接修改。"></textarea>
+    <div class="tip" id="scriptMeta"></div>
+  </div>
+
+  <!-- 第四步：出视频 -->
+  <div class="panel">
+    <h2><span class="step-n">4</span> 生成数字人视频课</h2>
+    <div class="keyguide" style="margin-bottom:12px">
+      HeyGen 按视频<b>分钟数</b>从你的额度扣费，工具会<b>自动挑最省的出片方式</b>：数字分身若支持标准清晰档（Avatar III）约 <b>$1/分钟</b>；仅支持高逼真档（Avatar IV/V）约 <b>$4/分钟</b>；照片分身约 $3/分钟。<b>点下面按钮后会先弹出预计时长与花费，确认才扣费出片。</b>一条几分钟的课，标准档通常几美元。
+    </div>
+    <div class="row">
+      <button class="btn" id="btnVideo" type="button" disabled>用我的分身讲这一课</button>
+      <span id="videoStatus" class="status" style="margin:0"></span>
+    </div>
+    <div class="err" id="videoErr"></div>
+    <div id="playerWrap" style="display:none;margin-top:14px">
+      <video id="player" controls playsinline></video>
+      <div class="row" style="margin-top:10px">
+        <a id="dlLink" class="btn2" href="#" target="_blank" rel="noopener" download>⬇ 下载视频</a>
+        <span class="tip" id="videoDone" style="margin:0"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第五步：取回已经出好的视频（下载不用在 HeyGen 网页点、不碰它的 Upgrade 收费墙） -->
+  <div class="panel">
+    <h2><span class="step-n">5</span> 取回已出好的视频（下载）</h2>
+    <div class="keyguide" style="margin-bottom:12px">
+      已经在 HeyGen 出过的视频，<b>不用在 HeyGen 网页点下载</b>（那里会要你升级付费）。把该视频在 HeyGen 后台的链接粘到下面，点「取回并下载」——本工具用你第 1 步填的密钥，直接从 HeyGen 取到<b>视频文件本身</b>供你保存。<br>
+      链接长这样：<span style="color:var(--gold2)">app.heygen.com/videos/……-<b>一串32位编号</b></span>，把整条链接粘进来即可（也可只粘那串编号）。
+    </div>
+    <label>HeyGen 视频链接 或 视频ID</label>
+    <input id="fetchVidInput" type="text" placeholder="粘贴 app.heygen.com/videos/... 链接，或直接粘 32 位视频ID" autocomplete="off">
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="btnFetchVid" type="button">取回并下载</button>
+      <span id="fetchVidStatus" class="status" style="margin:0"></span>
+    </div>
+    <div class="err" id="fetchVidErr"></div>
+    <div id="fetchVidWrap" style="display:none;margin-top:14px">
+      <video id="fetchVidPlayer" controls playsinline></video>
+      <div class="row" style="margin-top:10px">
+        <a id="fetchVidDl" class="btn" href="#" target="_blank" rel="noopener" download>⬇ 下载这个视频</a>
+        <span class="tip" style="margin:0">点上面按钮开始下载；若浏览器只是打开了视频，在视频上右键→「视频另存为」即可。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var $=function(id){return document.getElementById(id);};
+var PROXY="/api/llm-proxy";
+var HG="https://api.heygen.com";
+var chosenDoc=null, MANIFEST=null, CHUNKS=[], SHARDS_LOADED=0, SHARDS_TOTAL=0;
+var LAST_VID=null, LAST_USEDV3=false;   // 上一次出片的视频ID/接口，供超时后「再查一次结果」取回已渲染的片子
+var AVATARS=[];   // 载入的分身清单，出片时据此判断真人分身 / 照片分身
+
+/* ============ 第零步：浏览器就地录制（摄像头 / 麦克风） ============ */
+var camStream=null, camRec=null, camChunks=[], micStream=null, micRec=null, micChunks=[], micRAF=null, micAudioCtx=null, camTimer=null, camT0=0;
+function stopTracks(st){ try{ if(st&&st.getTracks) st.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); }catch(e){} }
+function pickMime(kinds){ for(var i=0;i<kinds.length;i++){ if(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(kinds[i])) return kinds[i]; } return ''; }
+
+// 摄像头
+async function camOpen(){
+  if(camStream){ $('camStatus').textContent='摄像头已在开启状态，点「开始录制」。'; return; }
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'},audio:true});
+    $('camPreview').srcObject=camStream; $('camPreview').play().catch(function(){});
+    $('btnCamRec').disabled=false; $('camStatus').textContent='摄像头已开启，点「开始录制」。';
+  }catch(e){ $('camStatus').textContent='无法打开摄像头：'+(e&&e.message||e)+'（请在浏览器允许摄像头权限）'; }
+}
+function camStartRec(){
+  if(!camStream) return;
+  camChunks=[];
+  var mime=pickMime(['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4']);
+  try{ camRec=new MediaRecorder(camStream, mime?{mimeType:mime}:undefined); }catch(e){ camRec=new MediaRecorder(camStream); }
+  camRec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) camChunks.push(ev.data); };
+  camRec.onstop=function(){
+    var blob=new Blob(camChunks,{type:camChunks[0]&&camChunks[0].type||'video/webm'});
+    var url=URL.createObjectURL(blob);
+    $('camPlayback').src=url; $('camPlayback').style.display='block';
+    var ext=(blob.type.indexOf('mp4')>=0)?'mp4':'webm';
+    $('camDownload').href=url; $('camDownload').download='我的自拍-HeyGen形象.'+ext; $('camDownload').style.display='inline-block';
+    // 录完立即释放摄像头/麦克风，别让指示灯一直亮着
+    stopTracks(camStream); camStream=null;
+    try{ $('camPreview').srcObject=null; }catch(e){}
+    $('btnCamRec').disabled=true; $('btnCamStop').disabled=true;
+    $('camStatus').textContent='✓ 录制完成（'+(blob.size/1024/1024).toFixed(1)+'MB），摄像头已关闭。可下载后上传 HeyGen 训练 Avatar V；要重录请再点「开启摄像头」。';
+  };
+  camRec.start(); $('btnCamRec').disabled=true; $('btnCamStop').disabled=false;
+  camT0=Date.now();
+  camTimer=setInterval(function(){
+    var s=Math.floor((Date.now()-camT0)/1000);
+    var hint=(s<15)?'（至少录 15 秒）':(s<30?'（够了，30 秒左右最佳）':'（时长很好，可以停了）');
+    $('camStatus').innerHTML='<span class="spinner"></span>录制中… '+s+' 秒 '+hint;
+  },500);
+}
+function camStopRec(){ if(camRec&&camRec.state!=='inactive') camRec.stop(); $('btnCamRec').disabled=true; $('btnCamStop').disabled=true; if(camTimer){clearInterval(camTimer);camTimer=null;} }
+
+// 麦克风
+async function micOpen(){
+  if(micStream){ $('micStatus').textContent='麦克风已在开启状态，点「开始录音」。'; return; }
+  try{
+    micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+    $('btnMicRec').disabled=false; $('micStatus').textContent='麦克风已开启，点「开始录音」。';
+    // 电平表
+    micAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    var src=micAudioCtx.createMediaStreamSource(micStream), an=micAudioCtx.createAnalyser(); an.fftSize=512; src.connect(an);
+    var data=new Uint8Array(an.frequencyBinCount);
+    (function loop(){ an.getByteFrequencyData(data); var s=0; for(var i=0;i<data.length;i++) s+=data[i]; var avg=s/data.length; $('micBar').style.width=Math.min(100,avg*1.6)+'%'; micRAF=requestAnimationFrame(loop); })();
+  }catch(e){ $('micStatus').textContent='无法打开麦克风：'+(e&&e.message||e)+'（请允许麦克风权限）'; }
+}
+function micStartRec(){
+  if(!micStream) return;
+  micChunks=[];
+  var mime=pickMime(['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg']);
+  try{ micRec=new MediaRecorder(micStream, mime?{mimeType:mime}:undefined); }catch(e){ micRec=new MediaRecorder(micStream); }
+  micRec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) micChunks.push(ev.data); };
+  micRec.onstop=async function(){
+    var raw=new Blob(micChunks,{type:micChunks[0]&&micChunks[0].type||'audio/webm'});
+    // 先释放麦克风与电平表（解码转 WAV 不需要它们还开着）
+    if(micRAF){ try{cancelAnimationFrame(micRAF);}catch(e){} micRAF=null; }
+    try{ if(micAudioCtx&&micAudioCtx.close) micAudioCtx.close(); }catch(e){} micAudioCtx=null;
+    $('micBar').style.width='0';
+    stopTracks(micStream); micStream=null;
+    $('btnMicRec').disabled=true; $('btnMicStop').disabled=true;
+    $('micStatus').innerHTML='<span class="spinner"></span>转换成 WAV 格式（HeyGen 通用）…';
+    var wavBlob=null;
+    try{ wavBlob=await blobToWav(raw); }catch(e){ wavBlob=null; }
+    var out=wavBlob||raw, ext=wavBlob?'wav':'webm';
+    var url=URL.createObjectURL(out);
+    $('micPlayback').src=url; $('micPlayback').style.display='block';
+    $('micDownload').href=url; $('micDownload').download='我的声音-HeyGen克隆.'+ext; $('micDownload').style.display='inline-block';
+    $('micStatus').textContent='✓ 录音完成（'+(out.size/1024/1024).toFixed(1)+'MB · '+ext.toUpperCase()+'），麦克风已关闭。下载后到 HeyGen 上传克隆——'+(wavBlob?'WAV 格式 HeyGen 一定能收':'（转换失败，若上传被拒请换个浏览器）')+'要重录请再点「开启麦克风」。';
+  };
+  micRec.start(); $('btnMicRec').disabled=true; $('btnMicStop').disabled=false;
+  micT0=Date.now();
+  micTimer=setInterval(function(){
+    var s=Math.floor((Date.now()-micT0)/1000);
+    var hint=(s<30)?'（至少录 30 秒）':(s<60?'（够了，建议再念到 1 分钟以上更稳）':'（时长很好，可以停了）');
+    $('micStatus').innerHTML='<span class="spinner"></span>录音中… '+s+' 秒 '+hint;
+  },500);
+}
+function micStopRec(){ if(micRec&&micRec.state!=='inactive') micRec.stop(); $('btnMicRec').disabled=true; $('btnMicStop').disabled=true; if(micTimer){clearInterval(micTimer);micTimer=null;} }
+
+// 把录制的音频（webm/opus）解码后编码成标准 WAV —— HeyGen 一定能收
+async function blobToWav(blob){
+  var ab=await blob.arrayBuffer();
+  var ctx=new (window.AudioContext||window.webkitAudioContext)();
+  var audioBuf;
+  try{ audioBuf=await ctx.decodeAudioData(ab); }
+  finally{ try{ ctx.close && ctx.close(); }catch(e){} }   // 解码失败也要关掉，否则每失败一次泄漏一个 AudioContext
+  var numCh=Math.min(1, audioBuf.numberOfChannels)||1;   // 单声道足够，文件更小
+  var ch0=audioBuf.getChannelData(0);
+  var sr=audioBuf.sampleRate, len=ch0.length;
+  var buffer=new ArrayBuffer(44+len*2), view=new DataView(buffer);
+  function wstr(off,s){ for(var i=0;i<s.length;i++) view.setUint8(off+i,s.charCodeAt(i)); }
+  wstr(0,'RIFF'); view.setUint32(4,36+len*2,true); wstr(8,'WAVE');
+  wstr(12,'fmt '); view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,1,true);
+  view.setUint32(24,sr,true); view.setUint32(28,sr*2,true); view.setUint16(32,2,true); view.setUint16(34,16,true);
+  wstr(36,'data'); view.setUint32(40,len*2,true);
+  var off=44;
+  for(var i=0;i<len;i++){ var s=Math.max(-1,Math.min(1,ch0[i])); view.setInt16(off, s<0?s*0x8000:s*0x7FFF, true); off+=2; }
+  return new Blob([view],{type:'audio/wav'});
+}
+
+// 取一段文章当录音提词
+var micTimer=null, micT0=0;
+async function loadPrompt(){
+  if(!chosenDoc){ $('promptHint').textContent='请先在下面第 2 步选一篇文章'; return; }
+  $('promptHint').innerHTML='<span class="spinner"></span>取文章中…';
+  var full=await fetchArticleText(chosenDoc.url);
+  if(!full){ $('promptHint').textContent='取文章失败，换一篇或手动念。'; return; }
+  // 取开头约 500 字（够念 1–2 分钟），按句号断到整句
+  var seg=full.slice(0,520);
+  var lastStop=Math.max(seg.lastIndexOf('。'),seg.lastIndexOf('！'),seg.lastIndexOf('？'));
+  if(lastStop>300) seg=seg.slice(0,lastStop+1);
+  $('promptText').textContent=seg;
+  $('promptText').style.display='block';
+  var cp=$('camPromptText'); if(cp){ cp.textContent=seg; cp.style.display='block'; }   // 自拍也用同一段当提词
+  $('promptHint').textContent='照着念这段（约 '+seg.length+' 字，念完约 1–2 分钟正好；自拍录 15–30 秒念开头几句即可）';
+}
+
+/* ============ HeyGen：调用封装（经本站代理，BYOK） ============ */
+function hgKey(){ return ($('hgKey')&&$('hgKey').value||'').trim(); }
+async function hgCall(method, path, body, timeoutMs){
+  var headers={'x-target-url':HG+path,'x-api-key':hgKey()};
+  if(method!=='POST') headers['x-target-method']=method;
+  if(body) headers['content-type']='application/json';
+  var ac=new AbortController();
+  var killer=setTimeout(function(){ try{ac.abort();}catch(e){} }, timeoutMs||20000);
+  try{
+    var r=await fetch(PROXY,{method:'POST',headers:headers,body:body?JSON.stringify(body):undefined,signal:ac.signal});
+    clearTimeout(killer);
+    var j=null; try{ j=await r.json(); }catch(e){}
+    return {ok:r.ok,status:r.status,j:j};
+  }catch(e){
+    clearTimeout(killer);
+    return {ok:false,status:0,j:null,err:(e&&e.name==='AbortError')?'超时':(e&&e.message||String(e))};
+  }
+}
+
+/* 载入分身与声音 */
+async function loadAvatars(){
+  if(!hgKey()){ $('keyStatus').textContent='请先填 HeyGen API Key。'; return; }
+  $('keyStatus').innerHTML='<span class="spinner"></span>载入分身中…';
+  var avatars=[];
+  // 最优先：v3 数字分身 looks —— 这才是 v3 avatar_v 出片要用的 avatar_id
+  var v3=await hgCall('GET','/v3/avatars/looks?avatar_type=digital_twin&ownership=private',null,12000);
+  if(v3.ok && v3.j && v3.j.data){
+    var looks=v3.j.data.avatar_looks||v3.j.data.looks||(Array.isArray(v3.j.data)?v3.j.data:[]);
+    if(Array.isArray(looks)) looks.forEach(function(l){ if(l.id) avatars.push({id:l.id, name:'⭐ '+(l.name||l.look_name||'我的数字分身')+'（数字分身）', mine:true, v3:true, eng:(l.supported_api_engines||l.supported_engines||null)}); });
+  }
+  // 主：/v2/avatars（含你训练的 Instant Avatar），15秒超时
+  var av=await hgCall('GET','/v2/avatars',null,15000);
+  if(av.err && !avatars.length){ $('keyStatus').textContent='载入分身失败：'+av.err+'（确认 API Key 正确、网络能连 HeyGen）'; return; }
+  if(av.ok===false && !avatars.length){ $('keyStatus').textContent='HeyGen 返回错误 '+av.status+'：'+((av.j&&av.j.error&&(av.j.error.message||av.j.error))||'（多半是 API Key 无效）'); return; }
+  if(av.j && av.j.data){
+    (av.j.data.avatars||[]).forEach(function(a){ if(!avatars.some(function(x){return x.id===a.avatar_id;})) avatars.push({id:a.avatar_id, name:a.avatar_name||a.avatar_id, mine:false}); });
+    (av.j.data.talking_photos||[]).forEach(function(p){ if(!avatars.some(function(x){return x.id===p.talking_photo_id;})) avatars.push({id:p.talking_photo_id, name:'📷 '+(p.talking_photo_name||p.talking_photo_id)+'（照片分身）', mine:true, tp:true}); });
+  }
+  $('keyStatus').innerHTML='<span class="spinner"></span>已拿到 '+avatars.length+' 个分身，载入声音…';
+  AVATARS=avatars;
+  var selA=$('hgAvatar'); selA.innerHTML='';          // 必须先清掉占位项「先载入…」，否则 value 恒为空、出片按钮永远灰
+  if(!avatars.length){ selA.innerHTML='<option value="">未找到分身——请确认已训练 Avatar V</option>'; }
+  else { avatars.sort(function(a,b){return (b.mine?1:0)-(a.mine?1:0);}); avatars.forEach(function(a){ var o=document.createElement('option'); o.value=a.id; o.textContent=a.name; selA.appendChild(o); }); }
+
+  // 声音（独立超时）
+  $('keyStatus').innerHTML='<span class="spinner"></span>已载入分身，载入声音中…';
+  var vc=await hgCall('GET','/v2/voices',null,15000);
+  var selV=$('hgVoice'); selV.innerHTML='';
+  var voices=(vc.ok && vc.j && vc.j.data && vc.j.data.voices)||[];
+  if(vc.err){ selV.innerHTML='<option value="">声音载入超时，可重试</option>'; }
+  else if(!voices.length){ selV.innerHTML='<option value="">未找到声音</option>'; }
+  else {
+    voices.slice(0,400).forEach(function(v){ var o=document.createElement('option'); o.value=v.voice_id; o.textContent=(v.language||'')+' · '+(v.name||v.voice_id)+(v.gender?(' ('+v.gender+')'):''); selV.appendChild(o); });
+    for(var i=0;i<selV.options.length;i++){ if(/chinese|中文|zh|mandarin|desheng|wang/i.test(selV.options[i].textContent)){ selV.selectedIndex=i; break; } }
+  }
+
+  $('keyStatus').textContent='✓ 已载入 '+avatars.length+' 个分身、'+voices.length+' 个声音'+((av.j&&av.j.data&&(av.j.data.avatars||[]).length===0)?'（注意：分身列表为空，可能训练还没完成）':'');
+  refreshGates();
+}
+
+/* ============ 站内文章索引（复用全站搜索索引） ============ */
+(function loadIndex(){
+  var IDXV='';
+  SDEIdx.manifest().then(function(m){
+    MANIFEST=m;
+    IDXV=SDEIdx.ver(m);
+    var files=[];
+    (m.sections||[]).forEach(function(s){ (s.files||[]).forEach(function(fn){ files.push(fn); }); });
+    SHARDS_TOTAL=files.length;
+    if(!SHARDS_TOTAL){ $('loadStatus').textContent='索引为空。'; return; }
+    files.forEach(function(fn){
+      SDEIdx.shard(fn, IDXV).then(function(d){
+        (d.chunks||[]).forEach(function(c){ CHUNKS.push(c); });
+        SHARDS_LOADED++;
+        $('loadStatus').textContent='索引载入中… '+SHARDS_LOADED+'/'+SHARDS_TOTAL+' 片';
+        if(SHARDS_LOADED===SHARDS_TOTAL){ $('loadStatus').textContent='✓ 索引就绪（'+MANIFEST.docs.length+' 篇文章），可搜索'; }
+      }).catch(function(){
+        SHARDS_LOADED++;
+        if(SHARDS_LOADED===SHARDS_TOTAL) $('loadStatus').textContent=CHUNKS.length
+          ? ('✓ 索引就绪（部分分片载入失败，仅影响正文搜索深度）')
+          : ('正文索引载入失败，只能按标题搜索——刷新页面可重试。');
+      });
+    });
+  }).catch(function(){ $('loadStatus').textContent='索引载入失败，请刷新。'; });
+})();
+
+function norm(s){ return (s||'').toLowerCase(); }
+function doSearch(){
+  if(!MANIFEST){ $('results').innerHTML='<div class="tip">索引还没载入好，稍等两三秒再搜。</div>'; return; }
+  var raw=($('q').value||'').trim();
+  var box=$('results'); box.innerHTML='';
+  if(!raw){ return; }
+  // 索引未就绪提示（正文分片还没载完时，先只搜标题也能用）
+  var indexReady=(SHARDS_TOTAL>0 && SHARDS_LOADED>=SHARDS_TOTAL);
+  var keys=raw.toLowerCase().split(/\s+/).filter(Boolean);
+  var byDoc={};
+  function ent(di){ return byDoc[di]||(byDoc[di]={t:0,best:0,tot:0,bx:''}); }
+  // 搜标题
+  MANIFEST.docs.forEach(function(d,di){
+    var hay=norm((d.l||'')+' '+(d.t||'')); var s=0;
+    keys.forEach(function(k){ if(hay.indexOf(k)>=0) s++; });
+    if(s) ent(di).t = s*6;
+  });
+  // 搜正文分片
+  for(var i=0;i<CHUNKS.length;i++){
+    var ck=CHUNKS[i]; var hay=norm(ck.t||''); var s=0;
+    keys.forEach(function(k){ if(hay.indexOf(k)>=0) s++; });
+    if(!s) continue;
+    var e=ent(ck.d); e.tot+=s; if(s>e.best){ e.best=s; e.bx=ck.t; }
+  }
+  var hits=Object.keys(byDoc).map(function(k){
+    var e=byDoc[k]; var rest=Math.min(Math.max(e.tot-e.best,0), e.best*4);
+    return { di:+k, rank:e.t+e.best+0.35*rest, bx:e.bx };
+  }).filter(function(h){return h.rank>0;}).sort(function(a,b){return b.rank-a.rank;}).slice(0,25);
+  if(!hits.length){
+    box.innerHTML='<div class="tip">没找到匹配「'+esc(raw)+'」的文章'+(indexReady?'，换个词试试。':'（正文索引还在载入 '+SHARDS_LOADED+'/'+SHARDS_TOTAL+' 片，等一会儿再搜）')+'</div>';
+    return;
+  }
+  hits.forEach(function(h){
+    var d=MANIFEST.docs[h.di];
+    var el=document.createElement('div'); el.className='hit';
+    el.innerHTML='<div class="ht">'+esc(d.t||'(无题)')+'</div><div class="hs">'+esc(d.u||'')+'</div>';
+    el.onclick=function(){ chooseDoc(d); };
+    box.appendChild(el);
+  });
+}
+function chooseDoc(d){
+  chosenDoc={ t:(d.t||d.title||''), u:(d.u||d.url||''), title:(d.t||d.title||''), url:(d.u||d.url||'') };
+  $('chosen').style.display='block';
+  $('chosen').innerHTML='✓ 已选：<b>'+esc(chosenDoc.t)+'</b><br><span class="tip">'+esc(chosenDoc.u)+'</span>';
+  $('results').innerHTML='';
+  refreshGates();
+}
+function esc(s){ return String(s||'').replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];}); }
+
+async function fetchArticleText(u){
+  try{
+    var r=await fetch(u,{cache:'no-store'}); var html=await r.text();
+    var doc=new DOMParser().parseFromString(html,'text/html');
+    var el=doc.querySelector('article')||doc.querySelector('main')||doc.querySelector('.art')||doc.querySelector('.body')||doc.body;
+    var t=(el&&el.textContent||'').replace(/\s+/g,' ').trim();
+    return t.slice(0,30000);
+  }catch(e){ return ''; }
+}
+
+/* 站内 RAG */
+async function ragForArticle(title, snippet){
+  try{
+    var r=await fetch('/api/wds/rag',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({q:(title+' '+(snippet||'')).slice(0,800),k:24,cap:20000,kbn:16})});
+    if(!r.ok) return {ctx:'',srcs:[]};
+    var j=await r.json();
+    return (j&&j.ok)?{ctx:j.ctx||'',srcs:j.srcs||[]}:{ctx:'',srcs:[]};
+  }catch(e){ return {ctx:'',srcs:[]}; }
+}
+
+/* ============ 生成讲课稿（调基底，经 llm-proxy；用站内代理默认基底） ============ */
+var SCRIPT_TEXT='';
+async function genScript(){
+  if(!chosenDoc){ return; }
+  $('btnScript').disabled=true;
+  $('scriptStatus').innerHTML='<span class="spinner"></span>读取原文…';
+  var full=await fetchArticleText(chosenDoc.url);
+  if(!full){ $('scriptStatus').textContent='读取原文失败，换一篇或重试。'; $('btnScript').disabled=false; return; }
+  $('scriptStatus').innerHTML='<span class="spinner"></span>检索 SDE 全站相关资料…';
+  var rag=await ragForArticle(chosenDoc.title, full.slice(0,600));
+  $('scriptStatus').innerHTML='<span class="spinner"></span>✓ 检索到 '+(rag.srcs?rag.srcs.length:0)+' 篇 · 生成讲课稿中（约半分钟）…';
+
+  var wc=parseInt($('lenSel').value,10)||1600;
+  var tone=$('toneSel').value;
+  var toneGuide={
+    lecture:'像一位深入浅出的老师在讲台上讲课：先用一个生活化的入口把听众带进来，再一层层把这篇文章的核心洞见讲透，多用"你有没有发现""我们换个角度想"这样的引导语，讲到关键处停一停、强调一下。',
+    keynote:'像一场有感染力的主题演讲：开场就抛出一个让人心头一震的判断，中间用有力的例子和对比推进，语气笃定、有节奏，结尾升华到一个让人记住的句子。',
+    storytell:'娓娓道来、讲故事式：把这篇文章的道理编织进一个叙述里，像跟朋友聊天一样自然，有起伏、有停顿、有"后来呢"的悬念感。'
+  }[tone]||'';
+
+  var sys='你是 SDE（王德生／德麦国际）学派的资深讲者，要把一篇 SDE 文章讲成一堂对着镜头的口播视频课。\n'
+    +'【讲法】'+toneGuide+'\n'
+    +'【SDE 站内资料——这是本站的思想土壤，讲解要扎在里面】\n'+(rag.ctx||'（未检索到特别相关的段落，凭对文章本身的把握讲）')+'\n'
+    +'【要求】①这是给一个人对着镜头讲的口播稿，不是对话、没有说话人标记、没有小标题、没有 Markdown、没有编号，就是一段可以照着念的连贯讲稿；'
+    +'②约 '+wc+' 个汉字；③讲解至少两处把本文与站内相邻思想连起来（"这让我想到站里另一篇讲过…"），但资料里没有的绝不编造成"站里说过"；'
+    +'④开头一句话把今天要讲的文章点出来，结尾一句话收束、留个回味；⑤直接开始讲，不要任何前言。';
+  var userQ='请把下面这篇 SDE 文章讲成一堂口播视频课。\n\n文章标题：'+chosenDoc.title+'\n\n文章正文：\n'+full;
+
+  try{
+    var text=await callBase(sys, userQ, Math.round(wc*2.2));
+    if(!text){ throw new Error('生成为空（检查基底额度/密钥）'); }
+    SCRIPT_TEXT=text.trim();
+    $('script').value=SCRIPT_TEXT;
+    $('scriptMeta').textContent='约 '+SCRIPT_TEXT.length+' 字 · 站内检索 '+(rag.srcs?rag.srcs.length:0)+' 篇。可直接修改文本，再点下面出视频。';
+    $('scriptStatus').textContent='✓ 讲课稿已生成';
+  }catch(e){
+    $('scriptStatus').textContent='生成失败：'+(e&&e.message||e);
+  }
+  $('btnScript').disabled=false;
+  refreshGates();
+}
+
+/* 调基底：国内(DeepSeek/GLM)直连；境外(GPT/Claude/Gemini)走 llm-proxy。BYOK */
+async function callBase(sys, user, maxTok){
+  var vendor=$('baseSel').value, key=($('baseKey').value||'').trim();
+  if(key.length<8) throw new Error('请先填所选基底的 API Key');
+  var url, headers={'Content-Type':'application/json'}, body, parse;
+  if(vendor==='deepseek'){
+    url='https://api.deepseek.com/v1/chat/completions'; headers['Authorization']='Bearer '+key;
+    body={model:'deepseek-v4-pro',thinking:{type:'disabled'},messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
+    parse=function(j){return j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;};
+  } else if(vendor==='glm'){
+    url='https://open.bigmodel.cn/api/paas/v4/chat/completions'; headers['Authorization']='Bearer '+key;
+    body={model:'glm-5',messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
+    parse=function(j){return j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;};
+  } else if(vendor==='gpt'){
+    url=PROXY; headers['x-target-url']='https://api.openai.com/v1/chat/completions'; headers['Authorization']='Bearer '+key;
+    body={model:'gpt-4o',messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
+    parse=function(j){return j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;};
+  } else if(vendor==='claude'){
+    url=PROXY; headers['x-target-url']='https://api.anthropic.com/v1/messages'; headers['x-api-key']=key; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true';
+    body={model:'claude-sonnet-4-6',max_tokens:Math.min(8000,maxTok),system:sys,messages:[{role:'user',content:user}]};
+    parse=function(j){return j&&j.content&&j.content[0]&&j.content[0].text;};
+  } else { // gemini
+    url=PROXY; headers['x-target-url']='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+encodeURIComponent(key);
+    body={contents:[{role:'user',parts:[{text:user}]}],systemInstruction:{parts:[{text:sys}]},generationConfig:{maxOutputTokens:Math.min(8000,maxTok),temperature:0.8}};
+    parse=function(j){return j&&j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts&&j.candidates[0].content.parts.map(function(p){return p.text||'';}).join('');};
+  }
+  var ac=new AbortController();
+  var killer=setTimeout(function(){ try{ac.abort();}catch(e){} }, 120000);
+  var r;
+  try{ r=await fetch(url,{method:'POST',headers:headers,body:JSON.stringify(body),signal:ac.signal}); }
+  catch(e){ clearTimeout(killer); throw new Error(e&&e.name==='AbortError'?'生成超时（120秒），基底响应太慢，重试或换个基底':(e&&e.message||String(e))); }
+  clearTimeout(killer);
+  var j=null; try{ j=await r.json(); }catch(e){ throw new Error('响应非法 JSON'); }
+  if(!r.ok || (j&&j.error)){ throw new Error('基底报错 '+r.status+'：'+((j&&j.error&&(j.error.message||j.error.code||j.error))||r.statusText)); }
+  return parse(j)||'';
+}
+
+/* ============ 出视频（HeyGen Digital Twin） ============ */
+async function genVideo(){
+  var script=($('script').value||'').trim();
+  var avatarId=$('hgAvatar').value, voiceId=$('hgVoice').value;
+  if(!hgKey()){ $('videoErr').textContent='请先填 HeyGen API Key。'; return; }
+  if(!avatarId){ $('videoErr').textContent='请先载入并选择你的数字分身。'; return; }
+  if(!voiceId){ $('videoErr').textContent='请先选择声音。'; return; }
+  if(!script){ $('videoErr').textContent='讲课稿为空，先生成或填写讲稿。'; return; }
+  $('videoErr').textContent='';
+
+  // HeyGen 脚本硬上限约 5000 字符，超了会被拒——截断并提示
+  if(script.length>4800){ script=script.slice(0,4800); $('videoErr').textContent='注意：讲稿较长，已截到前 4800 字（HeyGen 单条上限）。如需完整，可分两段出。'; }
+  var vTitle=(chosenDoc&&chosenDoc.title||'SDE 视频课').replace(/[\u0000-\u001f]/g,'').slice(0,120);
+
+  var meta=null; for(var mi=0;mi<AVATARS.length;mi++){ if(AVATARS[mi].id===avatarId){ meta=AVATARS[mi]; break; } }
+  var isTP=!!(meta&&meta.tp);
+
+  // ── 选最便宜的可用出片方式 ─────────────────────────────
+  // Avatar III 数字分身 = $1/min（走 v2，最便宜）；Avatar IV/V 数字分身 = $4/min（走 v3，最逼真）。
+  // HeyGen 规定：只能用分身 supported_api_engines 里列出的引擎，没列的会被拒——所以据此挑，不硬选。
+  var engs=(meta&&meta.eng)||null;   // 该分身支持的引擎数组；null=载入时没拿到（老接口/公共分身）
+  var hasIII = engs ? engs.indexOf('avatar_iii')>=0 : false;
+  var plan;   // {rate:每分钟美元, label:档位说明, mode:'v3'|'v2iii'|'v2tp'}
+  if(isTP)          plan={rate:3.0, label:'照片分身', mode:'v2tp'};       // photo avatar，v2 talking_photo
+  else if(hasIII)   plan={rate:1.0, label:'标准清晰（Avatar III，最省）', mode:'v2iii'}; // $1/min
+  else              plan={rate:4.0, label:'高逼真（Avatar IV/V）', mode:'v3'};           // 分身只支持贵引擎时
+
+  // 估时长：中文口播约 240 字/分钟，据讲稿字数推算，下限 0.5 分钟
+  var mins=Math.max(0.5, script.replace(/\s/g,'').length/240);
+  var estUSD=(mins*plan.rate);
+  var estTxt='本次用【'+plan.label+'】，约 '+mins.toFixed(1)+' 分钟视频，预计花费约 US$'+estUSD.toFixed(2)
+    + '（按 HeyGen 官方 $'+plan.rate.toFixed(0)+'/分钟，实际以生成秒数结算）。\n\n确定要出片并扣费吗？';
+  if(!window.confirm(estTxt)){ $('videoStatus').textContent='已取消，未扣费。'; return; }
+  // ─────────────────────────────────────────────────────
+
+  $('btnVideo').disabled=true;
+  $('videoStatus').innerHTML='<span class="spinner"></span>提交到 HeyGen…';
+  var vid=null, e3='', e2='', usedV3=false;
+  try{
+    // 只有支持贵引擎的数字分身才走 v3（avatar_iv 是 v3 默认，最稳）；其余全走 v2
+    if(plan.mode==='v3'){
+      var body={ type:'avatar', avatar_id:avatarId, engine:{type:'avatar_iv'}, script:script, voice_id:voiceId, resolution:'1080p', aspect_ratio:'auto', title:vTitle };
+      var r=await hgCall('POST','/v3/videos',body,30000);
+      if(r.ok && r.j && r.j.data && (r.j.data.video_id||r.j.data.id)){ vid=r.j.data.video_id||r.j.data.id; usedV3=true; }
+      else if(r.j && (r.j.video_id||r.j.id)){ vid=r.j.video_id||r.j.id; usedV3=true; }
+      else { e3=(r.err)||(r.j&&r.j.error&&(r.j.error.message||r.j.error.code||r.j.error))||('HTTP '+r.status); }
+    } else { e3=(plan.mode==='v2iii'?'走 v2 Avatar III 省钱通道':'照片分身走 v2 通道'); }
+    // v2 通道：Avatar III 数字分身（$1/min）、照片分身，以及 v3 被拒时的兜底
+    if(!vid){
+      $('videoStatus').innerHTML='<span class="spinner"></span>'+(plan.mode==='v2iii'?'以标准清晰档提交…':(isTP?'提交照片分身到 HeyGen…':'换一种方式提交…'));
+      var ch=isTP?{type:'talking_photo',talking_photo_id:avatarId}:{type:'avatar',avatar_id:avatarId,avatar_style:'normal'};
+      // v2 数字分身出片指定 Avatar III 引擎（省钱档）；照片分身无需指定
+      var b2={ video_inputs:[{ character:ch, voice:{type:'text',input_text:script,voice_id:voiceId} }], dimension:{width:1920,height:1080} };
+      if(plan.mode==='v2iii'){ b2.video_inputs[0].character.avatar_engine='avatar_iii'; }
+      var r2=await hgCall('POST','/v2/video/generate',b2,30000);
+      if(r2.j && r2.j.data && r2.j.data.video_id) vid=r2.j.data.video_id;
+      else { e2=(r2.err)||(r2.j&&r2.j.error&&(r2.j.error.message||r2.j.error.code||r2.j.error))||('HTTP '+r2.status); }
+      if(!vid){ throw new Error('v3:'+(e3||'?')+' ｜ v2:'+(e2||'?')); }
+    }
+  }catch(e){
+    $('videoStatus').textContent='';
+    $('videoErr').textContent='提交失败：'+(e&&e.message||e);
+    $('btnVideo').disabled=false; return;
+  }
+
+  // 轮询状态：v3 建的走 GET /v3/videos/{id}；v2 建的走 /v1/video_status.get
+  LAST_VID=vid; LAST_USEDV3=usedV3;   // 存下来，超时后还能手动再查，别让已扣费的片子取不回
+  $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen 渲染中（几分钟，请勿关闭）…';
+  var t0=Date.now(), url='';
+  while(true){
+    if(Date.now()-t0>20*60*1000){
+      // 超时不放弃：视频多半还在渲染，保留 ID 给「再查一次」用，别让花了钱的片子取不回来
+      $('videoStatus').innerHTML='已等 20 分钟仍在渲染（Avatar IV 高峰期偶尔较慢）。视频没丢，仍在 HeyGen 出片——过几分钟点下面「再查一次结果」即可取回，或到 HeyGen 后台查看。';
+      showRecheck();
+      $('btnVideo').disabled=false; return;
+    }
+    await new Promise(function(r){setTimeout(r,8000);});
+    var mm=Math.floor((Date.now()-t0)/60000), ss=Math.floor((Date.now()-t0)/1000)%60;
+    var s = usedV3
+      ? await hgCall('GET','/v3/videos/'+encodeURIComponent(vid),null,15000)
+      : await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(vid),null,15000);
+    if(s.err){ continue; }   // 单次查询超时/抖动→下一轮再查，不中断
+    var d=(s.j&&s.j.data)||{};
+    var st=d.status||'';
+    if(st==='completed'){ url=(d.video_url||d.captioned_video_url||d.video_url_caption||''); break; }   // 优先无字幕的干净版
+    if(st==='failed'){ $('videoErr').textContent='HeyGen 渲染失败：'+(d.failure_message||(d.error&&(d.error.message||d.error))||'未知（可到 HeyGen 后台查看该视频的错误）'); $('videoStatus').textContent=''; $('btnVideo').disabled=false; break; }
+    $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen '+(st==='pending'?'排队中':(st==='processing'?'渲染中':(st||'处理')))+'…（已 '+mm+' 分 '+ss+' 秒，勿关闭）';
+  }
+  if(url){
+    $('player').src=url;
+    $('dlLink').href=url;
+    $('playerWrap').style.display='block';
+    $('videoStatus').textContent='✓ 视频课已生成';
+    $('videoDone').textContent='链接来自 HeyGen，尽快下载保存。';
+    try{ $('player').play().catch(function(){}); }catch(e){}
+  }
+  $('btnVideo').disabled=false;
+}
+
+/* ============ 超时后手动再查：把已渲染好的片子取回来（视频没丢，只是页面等超时了） ============ */
+function showRecheck(){
+  if(document.getElementById('btnRecheck')) return;   // 已存在则不重复加
+  var wrap=$('playerWrap');
+  var b=document.createElement('button');
+  b.id='btnRecheck'; b.className='btn'; b.type='button'; b.textContent='🔄 再查一次结果';
+  b.style.marginTop='10px';
+  b.addEventListener('click', recheckVideo);
+  // 插在出片按钮那一行后面
+  $('videoStatus').parentNode.parentNode.insertBefore(b, $('videoStatus').parentNode.nextSibling);
+}
+async function recheckVideo(){
+  if(!LAST_VID){ $('videoStatus').textContent='没有可查询的视频。'; return; }
+  var b=$('btnRecheck'); if(b) b.disabled=true;
+  $('videoErr').textContent='';
+  $('videoStatus').innerHTML='<span class="spinner"></span>正在向 HeyGen 查询这条视频的最新状态…';
+  var s = LAST_USEDV3
+    ? await hgCall('GET','/v3/videos/'+encodeURIComponent(LAST_VID),null,15000)
+    : await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(LAST_VID),null,15000);
+  if(s.err){ $('videoStatus').textContent='查询超时，网络抖动，请再点一次「再查一次结果」。'; if(b) b.disabled=false; return; }
+  var d=(s.j&&s.j.data)||{}, st=d.status||'';
+  if(st==='completed'){
+    var url=(d.video_url||d.captioned_video_url||d.video_url_caption||'');
+    if(url){
+      $('player').src=url; $('dlLink').href=url; $('playerWrap').style.display='block';
+      $('videoStatus').textContent='✓ 视频课已生成'; $('videoDone').textContent='链接来自 HeyGen，尽快下载保存。';
+      try{ $('player').play().catch(function(){}); }catch(e){}
+      if(b) b.style.display='none';
+    } else { $('videoStatus').textContent='已完成但未拿到播放地址，请到 HeyGen 后台下载。'; if(b) b.disabled=false; }
+  } else if(st==='failed'){
+    $('videoStatus').textContent=''; $('videoErr').textContent='HeyGen 渲染失败：'+(d.failure_message||'到 HeyGen 后台查看错误详情');
+    if(b) b.style.display='none';
+  } else {
+    $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen 仍在'+(st==='pending'?'排队':'渲染')+'中（'+(st||'处理')+'）——再等几分钟点一次「再查一次结果」。';
+    if(b) b.disabled=false;
+  }
+}
+
+/* ============ 取回已出好的视频（第5步）：不碰 HeyGen 网页付费墙 ============ */
+function extractVidId(s){
+  s=(s||'').trim();
+  // 从链接末段取 ID：优先 32 位十六进制（v3/v2 视频ID都是这种）
+  var m=s.match(/([0-9a-f]{32})/i);
+  if(m) return m[1];
+  // 退而求其次：URL 最后一段
+  var parts=s.split(/[\/?#]/).filter(Boolean);
+  return parts.length?parts[parts.length-1]:s;
+}
+async function fetchExistingVideo(){
+  var raw=$('fetchVidInput').value;
+  var vid=extractVidId(raw);
+  $('fetchVidErr').textContent='';
+  if(!hgKey()){ $('fetchVidErr').textContent='请先在第 1 步填 HeyGen API Key。'; return; }
+  if(!vid){ $('fetchVidErr').textContent='没识别到视频链接或ID，请把 HeyGen 后台那条视频的完整链接粘进来。'; return; }
+  var b=$('btnFetchVid'); b.disabled=true;
+  $('fetchVidStatus').innerHTML='<span class="spinner"></span>正在从 HeyGen 取视频（ID: '+vid.slice(0,8)+'…）…';
+  // v3 建的视频走 GET /v3/videos/{id}，v2 建的走 /v1/video_status.get —— 两个都试
+  var url='', st='', tried=[];
+  var s1=await hgCall('GET','/v3/videos/'+encodeURIComponent(vid),null,15000);
+  if(s1.j && s1.j.data){ var d1=s1.j.data; st=d1.status||''; if(st==='completed') url=(d1.video_url||d1.captioned_video_url||d1.video_url_caption||''); tried.push('v3:'+(st||s1.status)); }
+  if(!url){
+    var s2=await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(vid),null,15000);
+    if(s2.j && s2.j.data){ var d2=s2.j.data; var st2=d2.status||''; if(st2==='completed') url=(d2.video_url||d2.video_url_caption||''); if(!st) st=st2; tried.push('v1:'+(st2||s2.status)); }
+  }
+  b.disabled=false;
+  if(url){
+    $('fetchVidPlayer').src=url;
+    $('fetchVidDl').href=url;
+    // 用 ID 做个像样的下载文件名
+    $('fetchVidDl').download='SDE视频课-'+vid.slice(0,8)+'.mp4';
+    $('fetchVidWrap').style.display='block';
+    $('fetchVidStatus').textContent='✓ 取到了！点下面「下载这个视频」保存（链接有时效，尽快下）。';
+    try{ $('fetchVidPlayer').play().catch(function(){}); }catch(e){}
+  } else if(st==='processing'||st==='pending'){
+    $('fetchVidStatus').textContent='这条视频 HeyGen 还在'+(st==='pending'?'排队':'渲染')+'中，过几分钟再点「取回并下载」。';
+  } else if(st==='failed'){
+    $('fetchVidStatus').textContent=''; $('fetchVidErr').textContent='HeyGen 显示这条视频渲染失败了。';
+  } else {
+    $('fetchVidStatus').textContent='';
+    $('fetchVidErr').textContent='没取到视频地址（'+(tried.join(' ｜ ')||'无响应')+'）。确认：①密钥和出这条片的是同一个；②链接/ID 正确。若仍不行，把这行提示截图发我。';
+  }
+}
+
+/* ============ 门禁 ============ */
+function refreshGates(){
+  $('btnScript').disabled = !chosenDoc;
+  var ready = hgKey() && $('hgAvatar').value && $('hgVoice').value && ($('script').value||'').trim();
+  $('btnVideo').disabled = !ready;
+}
+
+/* 绑定 */
+$('btnCamStart').addEventListener('click', camOpen);
+$('btnCamRec').addEventListener('click', camStartRec);
+$('btnCamStop').addEventListener('click', camStopRec);
+$('btnMicStart').addEventListener('click', micOpen);
+$('btnMicRec').addEventListener('click', micStartRec);
+$('btnMicStop').addEventListener('click', micStopRec);
+$('btnPrompt').addEventListener('click', loadPrompt);
+$('btnLoadAvatars').addEventListener('click', loadAvatars);
+$('btnSearch').addEventListener('click', doSearch);
+$('q').addEventListener('keydown', function(e){ if(e.key==='Enter') doSearch(); });
+$('btnScript').addEventListener('click', genScript);
+$('btnVideo').addEventListener('click', genVideo);
+$('script').addEventListener('input', refreshGates);
+$('hgAvatar').addEventListener('change', refreshGates);
+$('hgVoice').addEventListener('change', refreshGates);
+$('hgKey').addEventListener('input', refreshGates);
+$('btnFetchVid').addEventListener('click', fetchExistingVideo);
+$('fetchVidInput').addEventListener('keydown', function(e){ if(e.key==='Enter') fetchExistingVideo(); });
+</script>
+</body>
+</html>

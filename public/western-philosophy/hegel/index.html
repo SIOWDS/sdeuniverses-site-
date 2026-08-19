@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>黑格尔频道 | Hegel Channel | 西方哲学 · SDE Universes</title>
+<meta name="description" content="黑格尔频道——他造出了那台由矛盾驱动、自我推进的发生引擎，却在最后一步把它锁进了一个圆。逐卷解构黑格尔全部体系：辩证法·精神现象学·逻辑学·法哲学·历史哲学·晚期四卷。王德生 · 德麦国际。">
+<meta property="og:title" content="黑格尔频道 | 西方哲学 · SDE Universes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --clay:#8C3B32;--clay-deep:#6E2C25;--ink:#231A12;--bone:#F2EBDC;
+  --card:#FAF6EC;--line:#D8CDB8;--dim:#7A6C58;--blue:#2E5090;--blue-deep:#1F3A6B;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bone);color:var(--ink);font-family:Georgia,"Noto Serif SC","Songti SC",serif;line-height:1.85}
+body.zh .en-only{display:none}
+body.en .zh-only{display:none}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+
+nav{background:var(--card);border-bottom:1px solid var(--line)}
+nav .w{max-width:1080px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.nav-logo{font-family:'Playfair Display',serif;font-weight:700;font-size:1.1rem;color:var(--clay);text-decoration:none;letter-spacing:0.04em}
+.nav-r{display:flex;align-items:center;gap:16px}
+.nav-back{font-size:0.9rem;color:var(--dim);text-decoration:none;letter-spacing:0.06em}
+.nav-back:hover{color:var(--clay)}
+.lang-toggle{display:flex;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bone)}
+.lang-btn{border:0;background:none;font:inherit;font-size:0.8rem;padding:4px 12px;cursor:pointer;color:var(--dim)}
+.lang-btn.active{background:var(--clay);color:var(--card)}
+
+.meander{height:16px;background:var(--clay);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 16'%3E%3Cpath fill='none' stroke='black' stroke-width='2.6' d='M0 2 h30 v12 h-12 v-7 h5 M40 14 h-8'/%3E%3C/svg%3E") repeat-x left center/40px 16px;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 16'%3E%3Cpath fill='none' stroke='black' stroke-width='2.6' d='M0 2 h30 v12 h-12 v-7 h5 M40 14 h-8'/%3E%3C/svg%3E") repeat-x left center/40px 16px;
+  opacity:0.85}
+
+.hero{background:var(--card);padding:60px 22px 44px;text-align:center;position:relative;overflow:hidden}
+.eyebrow{font-size:0.76rem;letter-spacing:0.44em;color:var(--clay);margin-bottom:18px}
+.hero h1{font-size:clamp(2.3rem,6vw,3.7rem);letter-spacing:0.14em;font-weight:700;line-height:1.3}
+.hero h1 .en{font-family:'Playfair Display',serif;display:block;font-size:0.32em;letter-spacing:0.34em;color:var(--dim);font-weight:600;margin-top:12px}
+.circle-mark{width:74px;height:74px;margin:26px auto 6px;display:block}
+.circle-mark .ring{fill:none;stroke:var(--blue);stroke-width:2.4;stroke-dasharray:4 5;opacity:.85}
+.circle-mark .weld{fill:none;stroke:var(--clay);stroke-width:3.2;stroke-linecap:round}
+.thesis{margin:20px auto 8px;font-size:clamp(1.12rem,2.6vw,1.46rem);letter-spacing:0.04em;max-width:760px}
+.thesis .found{position:relative;color:var(--dim);padding:0 2px;white-space:nowrap}
+.thesis .found::after{content:"";position:absolute;left:0;top:54%;height:2.5px;background:var(--clay);width:0;animation:strike 0.7s 0.5s ease forwards}
+@keyframes strike{to{width:100%}}
+.thesis .arrow{color:var(--clay);padding:0 6px}
+.thesis .seal{display:inline-block;border:2.5px solid var(--blue);color:var(--blue);padding:1px 10px;font-weight:700;transform:rotate(-2deg) scale(0.6);opacity:0;animation:stamp 0.45s 1.15s cubic-bezier(.2,1.6,.4,1) forwards;white-space:nowrap}
+@keyframes stamp{to{transform:rotate(-2deg) scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.thesis .found::after{animation:none;width:100%}.thesis .seal{animation:none;transform:rotate(-2deg);opacity:1}}
+.hero .sub{max-width:660px;margin:16px auto 0;color:var(--dim);font-size:0.98rem}
+.stats{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;margin:28px auto 0;font-size:0.86rem;letter-spacing:0.12em;color:var(--ink)}
+.stats b{color:var(--clay);font-size:1.05rem;margin-right:4px}
+
+.routeband{background:var(--ink);padding:22px 0 26px}
+.routeband .cap{color:var(--bone);text-align:center;font-size:0.76rem;letter-spacing:0.4em;opacity:0.75;margin-bottom:16px}
+.stones{display:flex;gap:0;justify-content:center;flex-wrap:wrap;padding:0 22px;max-width:1000px;margin:0 auto}
+.stone{flex:0 0 auto;display:flex;align-items:center}
+.stone .s{border:1px solid rgba(242,235,220,0.42);color:var(--bone);padding:8px 15px;font-size:0.86rem;letter-spacing:0.12em;white-space:nowrap;background:rgba(242,235,220,0.05)}
+.stone .s small{display:block;font-size:0.6rem;letter-spacing:0.26em;opacity:0.55;margin-bottom:1px}
+.stone .a{color:#C9836A;padding:0 9px;font-size:0.95rem}
+.routeband .note{color:var(--bone);opacity:0.6;text-align:center;font-size:0.76rem;letter-spacing:0.08em;margin-top:14px}
+
+main{max-width:1080px;margin:0 auto;padding:0 22px}
+section{padding:54px 0 6px}
+.sec-eyebrow{font-size:0.72rem;letter-spacing:0.44em;color:var(--clay);margin-bottom:8px}
+.sec-title{font-size:1.5rem;letter-spacing:0.09em;margin-bottom:24px}
+.sec-title .en{font-family:'Playfair Display',serif;font-size:0.6em;color:var(--dim);letter-spacing:0.2em;margin-left:14px}
+
+.master{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--blue);padding:34px 34px 30px;display:block;text-decoration:none;transition:box-shadow .2s,transform .2s}
+.master:hover{box-shadow:0 10px 30px rgba(35,26,18,0.12);transform:translateY(-2px)}
+.master .k{font-size:0.74rem;letter-spacing:0.2em;color:var(--blue)}
+.master h3{font-size:clamp(1.3rem,3vw,1.72rem);letter-spacing:0.05em;margin:10px 0 14px;line-height:1.5}
+.master p{color:#4A4235;font-size:0.96rem}
+.master .go{display:inline-block;margin-top:16px;font-size:0.84rem;letter-spacing:0.12em;color:var(--blue);font-weight:700}
+
+.spine{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:4px}
+.step{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--blue);padding:18px 20px}
+.step .n{font-family:'Playfair Display',serif;font-size:0.8rem;letter-spacing:0.2em;color:var(--blue)}
+.step h4{font-size:1.02rem;letter-spacing:0.05em;margin:6px 0 6px}
+.step p{font-size:0.86rem;color:#4A4235}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.art{background:var(--card);border:1px solid var(--line);padding:26px 26px 22px;display:block;text-decoration:none;transition:box-shadow .2s,transform .2s;position:relative}
+.art:hover{box-shadow:0 8px 24px rgba(35,26,18,0.1);transform:translateY(-2px)}
+.art .k{font-size:0.72rem;letter-spacing:0.16em;color:var(--blue)}
+.art h4{font-size:1.14rem;letter-spacing:0.03em;line-height:1.55;margin:9px 0 6px;color:var(--ink)}
+.art .wt{font-size:0.82rem;color:var(--dim);letter-spacing:0.06em;margin-bottom:12px}
+.art p{font-size:0.9rem;color:#4A4235;line-height:1.8}
+.art .rd{display:inline-block;margin-top:14px;font-size:0.8rem;letter-spacing:0.12em;color:var(--blue);font-weight:700}
+.art .idx{position:absolute;top:20px;right:22px;font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--line)}
+
+.tailnote{margin:48px 0 0;padding:18px 22px;background:var(--card);border-left:3px solid var(--blue);font-size:0.88rem;color:#4A4235}
+.tailnote b{color:var(--blue)}
+footer{margin-top:54px;background:var(--ink);color:var(--bone)}
+footer .w{max-width:1080px;margin:0 auto;padding:26px 22px;font-size:0.82rem;letter-spacing:0.08em;text-align:center;opacity:0.85}
+footer a{color:inherit}
+</style>
+</head>
+<body class="zh">
+<nav><div class="w">
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-r">
+    <a class="nav-back" href="/western-philosophy/"><span class="zh-only">← 西方哲学专栏</span><span class="en-only">← Western Philosophy</span></a>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div></nav>
+
+<div class="meander" aria-hidden="true"></div>
+
+<header class="hero">
+  <div class="eyebrow">SDE UNIVERSES · 西方哲学 · 黑格尔频道</div>
+  <h1>黑格尔频道<span class="en">The Hegel Channel</span></h1>
+  <svg class="circle-mark" viewBox="0 0 74 74" aria-hidden="true">
+    <circle class="ring" cx="37" cy="37" r="30"/>
+    <path class="weld" d="M37 7 a30 30 0 0 1 0 60"/>
+  </svg>
+  <div class="thesis">
+    <span class="zh-only">他造出了那台<span class="found">开放的引擎</span><span class="arrow">→</span>却把它锁进了一个<span class="seal">封 闭 的 圆</span></span>
+    <span class="en-only">He built an <span class="found">open engine</span><span class="arrow">→</span>then locked it in a <span class="seal">CLOSED CIRCLE</span></span>
+  </div>
+  <p class="sub"><span class="zh-only">西方传统里最像「发生」的人：矛盾驱动、自我推进、生成高于存在——他手里握着发生学几乎全部的核心零件，却在最后一步，给这台开放的引擎装上了一个先在的主人、一个注定的终点。本频道逐卷解构他的全部体系：看清那个圆是怎么焊上的，再把它打开成一条没有终点的螺旋。</span><span class="en-only">The closest thing to genesis in the Western canon — contradiction-driven, self-propelling, becoming over being — and it ends in a closed circle. One volume at a time.</span></p>
+  <div class="stats">
+    <span><b>7</b><span class="zh-only">卷逐一解构</span><span class="en-only">volumes</span></span>
+    <span><b>52万</b><span class="zh-only">字系列</span><span class="en-only">chars</span></span>
+    <span><b>1</b><span class="zh-only">篇总论</span><span class="en-only">master essay</span></span>
+    <span><b>1770–1831</b></span>
+  </div>
+</header>
+
+<div class="routeband">
+  <div class="cap"><span class="zh-only">每 一 卷 · 同 一 套 解 构 工 序</span><span class="en-only">THE SAME DIAGNOSTIC ROUTE, VOLUME BY VOLUME</span></div>
+  <div class="stones">
+    <div class="stone"><span class="s"><small>I</small><span class="zh-only">本体论装置</span><span class="en-only">Apparatus</span></span><span class="a">→</span></div>
+    <div class="stone"><span class="s"><small>II</small><span class="zh-only">整体塌缩公式</span><span class="en-only">Collapse</span></span><span class="a">→</span></div>
+    <div class="stone"><span class="s"><small>III</small><span class="zh-only">逐段E场考古</span><span class="en-only">E-field dig</span></span><span class="a">→</span></div>
+    <div class="stone"><span class="s"><small>IV</small><span class="zh-only">SDE发生学重写</span><span class="en-only">Rewrite</span></span></div>
+  </div>
+  <div class="note"><span class="zh-only">不从外部否定黑格尔，而是把他的塌缩机制完整展开——塌缩不等于错误，牛顿力学是相对论的塌缩。</span><span class="en-only">Not a refutation — an unfolding of the collapse. Collapse is not error.</span></div>
+</div>
+
+<div class="meander" aria-hidden="true"></div>
+
+<main>
+<section id="master">
+  <div class="sec-eyebrow"><span class="zh-only">总 论</span><span class="en-only">MASTER ESSAY</span></div>
+  <div class="sec-title"><span class="zh-only">先读这一篇 · 一篇看清那个圆</span><span class="en">Start here</span></div>
+  <a class="master" href="/column/deconstructing-hegel/">
+    <span class="k"><span class="zh-only">解构大师系列 · 黑格尔 · 约 3.1 万字 · 通俗长文</span><span class="en-only">DECONSTRUCTION MASTER · HEGEL · ~31K CHARS</span></span>
+    <h3><span class="zh-only">黑格尔造出了那台引擎，却把它锁进了一个圆</span><span class="en-only">Built the Engine, Then Locked It in a Circle</span></h3>
+    <p><span class="zh-only">用邻居听得懂的话，走完黑格尔那台辉煌的引擎——存在与虚无、辩证法、扬弃、主奴、苦恼意识、理性的狡计、绝对精神、正反合的僭越、三处中心主义、混沌与介生。然后，找到那个把圆焊死的焊点，把它打开。这是进入本频道最好的入口。</span><span class="en-only">The plain-language master essay: walk through the whole engine, then find the weld that closes the circle and open it. The best door into this channel.</span></p>
+    <span class="go"><span class="zh-only">读总论 →</span><span class="en-only">Read →</span></span>
+  </a>
+</section>
+
+<section id="series">
+  <div class="sec-eyebrow"><span class="zh-only">逐 卷 解 构</span><span class="en-only">VOLUME BY VOLUME</span></div>
+  <div class="sec-title"><span class="zh-only">黑格尔体系 · 七卷逐一过机</span><span class="en">The system, one volume at a time</span></div>
+  <div class="tailnote" style="margin:0 0 26px"><span class="zh-only"><b>这七卷不是并列的。</b>先立方法（辩证法这台引擎本身），再顺着黑格尔一生的著作，看这台引擎如何被逐卷装进那个圆：从意识的现象学，到最纯粹的逻辑机器，到现代性的法权，到单线的世界历史，再到宗教·哲学史·自然·精神的晚期四卷。最后一篇是把辩证法接进AI时代的发生学重写。按阅读顺序排列。</span><span class="en-only"><b>These seven are not a list.</b> Method first (the engine itself), then Hegel's works in order — phenomenology, the pure logical machine, modern right, single-line world history, and the four late volumes — closing with a genesis-rewrite for the AI age.</span></div>
+  <div class="grid">
+
+    <a class="art" href="/western-philosophy/hegel/dialectics/">
+      <span class="idx" aria-hidden="true">01</span>
+      <span class="k"><span class="zh-only">第一部 · 方法论 · 约 2.6 万字</span><span class="en-only">I · METHOD</span></span>
+      <h4><span class="zh-only">辩证法的SDE系统解构</span><span class="en-only">Dialectics</span></h4>
+      <div class="wt"><span class="zh-only">从概念三段式到发生学发动机</span><span class="en-only">From the triad to a genesis engine</span></div>
+      <p><span class="zh-only">正反合，是SDE在四重极限条件下的塌缩形态：有目标、无路径、无约束、无土壤。辩证法之于SDE，犹牛顿力学之于相对论。</span><span class="en-only">The triad as a four-fold collapse of SDE: a goal, but no path, no constraint, no soil.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+
+    <a class="art" href="/western-philosophy/hegel/phenomenology/">
+      <span class="idx" aria-hidden="true">02</span>
+      <span class="k"><span class="zh-only">第二部 · 1807 · 约 2.9 万字</span><span class="en-only">II · 1807</span></span>
+      <h4><span class="zh-only">《精神现象学》的SDE系统解构</span><span class="en-only">Phenomenology of Spirit</span></h4>
+      <div class="wt"><span class="zh-only">黑格尔运动论的发生学诊断</span><span class="en-only">A diagnosis of the motion-doctrine</span></div>
+      <p><span class="zh-only">从感觉确定性到绝对知识，一部意识的受难史。每一步「必然的上升」，都藏着一个被精神化吞并、随后被隐去的E纠缠条件。</span><span class="en-only">Consciousness's passion play — and every "necessary ascent" hides an E-condition quietly absorbed.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+
+    <a class="art" href="/western-philosophy/hegel/logic/">
+      <span class="idx" aria-hidden="true">03</span>
+      <span class="k"><span class="zh-only">第三部 · 1812–1816 · 约 3.4 万字</span><span class="en-only">III · 1812–1816</span></span>
+      <h4><span class="zh-only">《逻辑学》的SDE系统解构</span><span class="en-only">Science of Logic</span></h4>
+      <div class="wt"><span class="zh-only">黑格尔形式机器的发生学诊断</span><span class="en-only">A diagnosis of the formal machine</span></div>
+      <p><span class="zh-only">最纯粹的塌缩：把E维度全面消解，让概念纯靠自我规定推演。一台无土壤的形式机器，却在开端处藏着它不肯承认的「暗E」。</span><span class="en-only">The purest collapse: E fully dissolved, concepts self-determining — a soil-less machine haunted by a "dark E" at its opening.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+
+    <a class="art" href="/western-philosophy/hegel/philosophy-of-right/">
+      <span class="idx" aria-hidden="true">04</span>
+      <span class="k"><span class="zh-only">第四部 · 1820 · 约 10 万字</span><span class="en-only">IV · 1820</span></span>
+      <h4><span class="zh-only">《法哲学原理》的SDE系统解构</span><span class="en-only">Elements of the Philosophy of Right</span></h4>
+      <div class="wt"><span class="zh-only">现代性辩证概念化的发生学诊断</span><span class="en-only">Modernity, conceptualised</span></div>
+      <p><span class="zh-only">所有权、契约、犯罪、道德、家庭、市民社会、国家——现代性真实的发生，被压成一个理念的辩证自我展开，E1的物质与社会条件被逐层抽空。</span><span class="en-only">Property, contract, crime, morality, family, civil society, the state — the real genesis of modernity, compressed into the Idea's self-unfolding.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+
+    <a class="art" href="/western-philosophy/hegel/philosophy-of-history/">
+      <span class="idx" aria-hidden="true">05</span>
+      <span class="k"><span class="zh-only">第五部 · 讲演录 · 约 10 万字</span><span class="en-only">V · LECTURES</span></span>
+      <h4><span class="zh-only">《历史哲学讲演录》的SDE系统解构</span><span class="en-only">Lectures on the Philosophy of History</span></h4>
+      <div class="wt"><span class="zh-only">单线目的论的诊断 · 多文明并行发生论的重写</span><span class="en-only">Single-line teleology → parallel genesis</span></div>
+      <p><span class="zh-only">单线辩证目的论如何吞并多文明的并行发生。对中国、印度、波斯的「误读」不是疏忽，而是欧洲中心的结构本身——世界精神只允许一条路通向自由。</span><span class="en-only">How a single-line teleology swallows parallel civilisations. The misreadings of China, India, Persia are the structure of Eurocentrism itself.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+
+    <a class="art" href="/western-philosophy/hegel/late-system/">
+      <span class="idx" aria-hidden="true">06</span>
+      <span class="k"><span class="zh-only">第七部 · 晚期体系 · 约 20 万字</span><span class="en-only">VII · LATE SYSTEM</span></span>
+      <h4><span class="zh-only">黑格尔体系剩余四卷的SDE系统解构</span><span class="en-only">The Remaining Four Volumes</span></h4>
+      <div class="wt"><span class="zh-only">宗教哲学 · 哲学史 · 自然哲学 · 精神哲学</span><span class="en-only">Religion · History of Philosophy · Nature · Spirit</span></div>
+      <p><span class="zh-only">四卷协同诊断：绝对精神的辩证表象，如何系统地遮蔽宗教、思想史、自然与心灵背后那多元E场的真实动力学。全系列篇幅最大的一卷。</span><span class="en-only">Four volumes diagnosed together: how the Idea's self-representation masks the real dynamics of plural E-fields. The largest volume in the series.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+
+    <a class="art" href="/western-philosophy/hegel/dialectics-genesis/">
+      <span class="idx" aria-hidden="true">07</span>
+      <span class="k"><span class="zh-only">补编 · AI 时代重写 · 约 2.7 万字</span><span class="en-only">CODA · REWRITE</span></span>
+      <h4><span class="zh-only">从「正反合」到「E–D–S」</span><span class="en-only">From the Triad to E–D–S</span></h4>
+      <div class="wt"><span class="zh-only">辩证法的SDE发生学重构 · 扩充版</span><span class="en-only">A genesis-rewrite of dialectics</span></div>
+      <p><span class="zh-only">把辩证法接上介生态、意义吸引、回写机制与主体画像，并汇整康德到拉康十二家的批判——最后把辩证法重写进AI与人-AI分布式发生体的时代。</span><span class="en-only">Reconnecting dialectics to the mid-genesis state, meaning-attraction, write-back and the concrete subject — rewritten for the age of AI.</span></p>
+      <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+    </a>
+
+  </div>
+  <div class="tailnote"><span class="zh-only"><b>互通说明　</b>本频道隶属<a href="/western-philosophy/">西方哲学专栏</a>，与全栏总纲<a href="/column/negation-sequence/">《发生对发现的否定序列》</a>互通——黑格尔是那条两千五百年序列里，离「发生」最近、也最惊险的一环。</span><span class="en-only"><b>Cross-listing　</b>Part of the <a href="/western-philosophy/">Western Philosophy</a> column; cross-listed with the master essay <a href="/column/negation-sequence/">The Negation Sequence</a>.</span></div>
+</section>
+</main>
+
+<footer><div class="w">© 2026 德麦国际 · SDE Universes · <span class="zh-only">王德生</span><span class="en-only">Wang Desheng</span> · <a href="/western-philosophy/"><span class="zh-only">西方哲学专栏</span><span class="en-only">Western Philosophy</span></a> · <a href="/column/deconstructing-hegel/"><span class="zh-only">总论</span><span class="en-only">Master Essay</span></a> · <a href="/browse/"><span class="zh-only">首页</span><span class="en-only">Home</span></a></div></footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en'));});
+  document.documentElement.lang=lang;
+}
+</script>
+
+<script>window.WDS_READ={selector:"main"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

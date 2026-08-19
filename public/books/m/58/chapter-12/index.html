@@ -1,0 +1,194 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第十二章　一个最小模型 · 《健康发生学导论》专著精读</title>
+<meta name="description" content="最该被报警的人，预警期最短——这不是仪器不够好，是信号与储备共用一份预算的必然后果。">
+<style>
+:root{--ink:#211c15;--muted:#6f6658;--gold:#a9802e;--paper:#f7f1e5;--card:#fffaf0;--navy:#07182d}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Serif SC","Songti SC",serif;line-height:1.95}
+a{color:#856115;text-decoration:none}.top{position:sticky;top:0;background:#fbf6e9ed;border-bottom:1px solid #d7c59c;z-index:4}
+.topin{max-width:880px;margin:auto;padding:13px 22px;display:flex;justify-content:space-between}.hero{background:var(--navy);color:#f7efd9;padding:58px 22px;text-align:center}
+.hero .ey{color:#d9b45a;letter-spacing:.28em;font-size:12px}.hero h1{max-width:900px;margin:18px auto;font-size:clamp(28px,5vw,44px);line-height:1.4}.hero p{max-width:760px;margin:auto;color:#c6d1d7}
+main{max-width:820px;margin:auto;padding:46px 23px 74px}article p{text-align:justify;font-size:17px;margin:0 0 19px}article h2{font-size:23px;margin:45px 0 16px;border-bottom:1px solid #d8c69c;padding-bottom:8px}
+.end{margin-top:50px;background:#fffaf0;border:1px solid #d9c89f;padding:25px;text-align:center}.buttons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}.btn{border:1px solid #a9802e;padding:9px 15px}.btn.primary{background:#a9802e;color:white}
+
+article table{width:100%;border-collapse:collapse;margin:22px 0;font-size:15px}
+article th,article td{border:1px solid #d7c59c;padding:8px 10px;text-align:left;vertical-align:top}
+article th{background:#f0e6cf;font-weight:700}
+article h3{font-size:18.5px;margin:28px 0 12px;color:#5d5344}
+
+.fg{margin:26px 0;text-align:center}.fg img{max-width:100%;border:1px solid #d7c59c;background:#fff}
+.fg figcaption{font-size:13px;color:#6f6658;margin-top:8px}
+.tw{overflow-x:auto;margin:16px 0}.tw table{border-collapse:collapse;font-size:14px;min-width:100%}
+.tw th,.tw td{border:1px solid #d7c59c;padding:7px 10px;vertical-align:top}
+.tw th{background:#f2e9d5}
+
+table{border-collapse:collapse;width:100%;margin:22px 0;font-size:15px;line-height:1.7}
+th,td{border:1px solid #d8cdb4;padding:9px 11px;vertical-align:top}
+th{background:#f0e7d2;font-weight:700;text-align:left}
+blockquote{margin:20px 0;padding:14px 18px;border-left:3px solid var(--gold);background:#fffaf0;color:#4a4234}
+h3{font-size:18px;margin:26px 0 10px}
+.card{margin:22px 0;padding:16px 20px;border:1px solid var(--gold);background:#fffaf0;border-radius:2px}
+</style></head><body>
+<div class="top"><a href="/books/m/58/">← 《健康发生学导论》</a>　·　王德生　·　专著第58号</div>
+<div class="wrap">
+<h1>第十二章　一个最小模型</h1>
+<p class="lead">最该被报警的人，预警期最短——这不是仪器不够好，是信号与储备共用一份预算的必然后果。</p>
+<p class="meta">《健康发生学导论》专著精读 · 约 6 千字 · 王德生 著 · 德麦国际出版社 · ISBN 978-1-970820-93-5</p>
+<div class="card"><b>为什么选这一章</b>　这一章是全书<b>唯一能算的东西</b>，也是两次外审判定<b>风险最高</b>的一章。第一次外审指出四处数学不严谨（收敛条件写错、单调性只有数值演示、死亡阈值缺附加条件、乘积形式被当成推论而非建模假设），四处均已改正，本章定位随之从「证明了死亡的确定性版本」下调为<b>「一组明确假设下的一类充分条件」</b>；第二次外审再补一条不要求常参数的时变阈值穿越定理。收口一句：<b>一条能被验的充分条件，胜过一条不能被驳的必然性。</b></div>
+<article>
+<h2>一、九章的公式都只是记号</h2>
+<p>九章里有六处形式化：可续返域的路径集合、余路域的八维剖面、接演债的 B(j,n)、换手窗的 Λ 与 <i>C</i><sub>N</sub>、再入成本的六维向量 C(u,a,p)、回写收益的 <i>Ω</i><sub>k</sub>。它们各自都写明「不是临床评分，而是研究框架」，这一声明是诚实的，但代价也清楚：<b>六处形式化没有一处推出了正文没有说过的东西</b>。系数没有标定路径，式子只承担记号功能，不承担推导功能。</p>
+<p>本章补上这一步。方法是相反的：不追求覆盖，只取一个<b>最小</b>模型——单一角色、单一维度、常数参数——看它能不能挤出九章都没说过的结论。若一个如此贫瘠的模型都能推出非平凡的东西，那么垫付这件事就有一个不依赖具体量纲的骨架；若挤不出来，本书的形式化部分应当整体删去，只保留读数。</p>
+<h2>二、模型与它的参数域</h2>
+<p>取一项生命角色（呼吸调节、姿势控制、蛋白清除、药物管理、照护协调，任选其一）。设：</p>
+<ul><li><b><i>q</i><sub>n</sub></b> ∈ [0, 1]：第 <i>n</i> 轮开始时该角色的<b>接手准备度</b>——下一位载体已经获得材料、信息、权限与训练的比例。</li><li><b>c</b> ∈ [0, 1]：<b>垫付率</b>——本轮为维持当前正常而征用掉的准备度比例。</li><li><b>r</b> ∈ [0, 1]：<b>补充率</b>——每一轮补回缺口的比例（训练、周转、培养第二位操作者、建立替班、整理信息）。</li></ul>
+<p>一轮的收支：</p>
+<blockquote><b><i>q</i><sub>n+1</sub> = <i>q</i><sub>n</sub> − c·<i>q</i><sub>n</sub> + r·(1 − <i>q</i><sub>n</sub>) = (1 − c − r)·<i>q</i><sub>n</sub> + r</b></blockquote>
+<p>记 <b>a ≡ 1 − c − r</b>。这是一个一阶线性递推，通解为</p>
+<blockquote><b><i>q</i><sub>n</sub> = q∗ + (<i>q</i><sub>0</sub> − q∗)·<i>a</i><sup>n</sup></b>，其中 <b>q∗ = r / (c + r)</b></blockquote>
+<p><b>收敛条件必须写清，不能笼统说「必收敛」。</b>严格条件是 <b>|a| &lt; 1</b>，即</p>
+<blockquote><b>0 &lt; c + r &lt; 2</b></blockquote>
+<p>当 c = r = 1 时 a = −1，序列在两点之间永久振荡，不收敛。本书前一版把这一条写成「只要 c 与 r 不同时为零就必收敛」，是错的，此处更正。</p>
+<p>参数域还要再分一层，因为<b>后文的盲区公式用到对数求轮次，需要 a 严格为正且小于一</b>：</p>
+<div class="tw"><table>
+<tr><th>参数域</th><th>a 的取值</th><th>轨迹形状</th><th>本章哪些结论适用</th></tr>
+<tr><td><b>0 &lt; c + r &lt; 1</b></td><td>a ∈ (0, 1)</td><td>单调趋近 q∗</td><td>全部四条推论</td></tr>
+<tr><td>c + r = 1</td><td>a = 0</td><td>一步到达 q∗，无过渡</td><td>推论一、三、四；<b>盲区为零</b>，推论二退化</td></tr>
+<tr><td>1 &lt; c + r &lt; 2</td><td>a ∈ (−1, 0)</td><td>振荡趋近 q∗</td><td>推论一、三、四；<b>推论二不适用</b>（轮次不能由对数给出）</td></tr>
+<tr><td>c + r ≥ 2</td><td>|a| ≥ 1</td><td>不收敛</td><td>全部不适用</td></tr>
+</table></div>
+<p><i>c</i> + <i>r</i> 有一个直白的读法：<b>它是一轮里被动过的那部分储备的总份额</b>，可以叫周转强度。周转强度小于一，意味着每一轮总有一部分储备原封不动地留到下一轮——这正是慢变量（骨量、肌力、照护网络、隐性知识）的常态。<b>本书的全部结论限定在 0 &lt; c + r &lt; 1 这一域内</b>，并把这一限定当作可证伪条件的一部分：若在某类真实角色上实测 c + r 长期大于一，本章推论二对该类角色不成立。</p>
+<p>写成比值形式，令 <b>ρ = c / r</b>：</p>
+<blockquote><b>q∗ = 1 / (1 + ρ)</b></blockquote>
+<p>模型只有这一个式子。以下四条推论全部从它出来，各自的适用域已在上表标明。</p>
+<h2>三、推论一：准备度只由比值决定，故「多补」与「少垫」严格等价</h2>
+<p>q∗ 不由 c 决定，也不由 r 决定，只由 ρ = c/r 决定。直接后果：</p>
+<blockquote><b>把补充率翻倍（r → 2r），与把垫付率减半（c → c/2），对长期准备度 q∗ 的效果完全相同。</b></blockquote>
+<p>这条结论九章没有一章说得出，因为九章都只写单向：甲线写「不要透支」，乙线写「多建一条路」，丙线写「不要转嫁」，各自都在劝人减少 c 或增加 r，没有人说过这两件事在结构上是同一件事。</p>
+<p><b>适用范围要说准。</b>这条等价只对<b>不动点</b> q∗ 成立，不对<b>趋近速度</b>成立：a = 1 − c − r 在两种做法下不同（r 翻倍使 a 减小、收敛更快；c 减半使 a 增大、收敛更慢）。因此完整的表述是：<b>两种做法把系统带到同一个终点，但到达的快慢不同</b>——补充侧的干预到达更快。这一点在急性期有实际含义：来不及等的时候，加补充优于减负荷。</p>
+<p>可证伪形式：在同一批人中，若把休息时间翻倍与把负荷减半这两种干预，在总投入相当时对<b>最终恢复代价</b>的效果显著不同（而不只是到达时间不同），则准备度不只由比值决定，本推论为伪。</p>
+<h2>四、推论二：固定补充率时，预警盲区随垫付率上升而严格缩短</h2>
+<p>母题的第三层说：报警要用的正是被垫掉的那样东西。把它写进模型，即令可观察信号强度正比于剩余准备度：</p>
+<blockquote><b>σ_n = s · <i>q</i><sub>n</sub></b></blockquote>
+<p>而噪声是<b>加性</b>的：测量误差、日常生理波动、环境干扰不会因为储备变小而同步变小，记为常数 ν。于是信噪比 <b>SNR_n = s·<i>q</i><sub>n</sub> / ν</b> 随 q 单调下降。设可觉察阈为 κ，则信号跌破可觉察的临界准备度为 <b><i>q</i><sub>sig</sub> = κν / s</b>；功能失效的临界准备度为 <b><i>q</i><sub>min</sub></b>。当 <i>q</i><sub>sig</sub> &gt; <i>q</i><sub>min</sub> 时——也就是信号在功能出问题之前就已经先听不见了——两者之间存在一段<b>盲区</b>。</p>
+<p><b>⚠ 这里必须先声明一个经验前提，它不是模型推出来的。</b>盲区存在的前提是</p>
+<blockquote><b><i>q</i><sub>sig</sub> &gt; <i>q</i><sub>min</sub></b></blockquote>
+<p>即报警停止所对应的准备度，高于功能真正失效的阈值。<b>这一不等式不能由递推式本身推出</b>，它取决于报警通道与功能通道各自的阈值，须独立检验。模型真正推出的只有一件事：<b>在该排序成立且补充率固定时，盲区长度随垫付率上升而缩短。</b>若实测得到 <i>q</i><sub>sig</sub> &lt; <i>q</i><sub>min</sub>（信号在功能塌下来之后才消失），则不存在盲区，本推论对该类角色不适用——这不构成对模型的反驳，只界定它的适用范围。</p>
+<p>同样要标明的还有两条建模假设：<b>信号强度与剩余准备度成正比</b>（σ = s·q）与<b>噪声为加性</b>（ν 为常数）。前者可放宽为 σ = s·f(q)，f 为递增函数；此时 SNR = s·f(q)/ν 仍随 q 单调下降，盲区仍存在，但盲区长度的具体表达式要随 f 改写。本书只在线性情形下给出闭式结果。</p>
+<p>在参数域 0 &lt; c + r &lt; 1（即 a ∈ (0,1)）内，由 <i>q</i><sub>n</sub> = q∗ + (<i>q</i><sub>0</sub> − q∗)·<i>a</i><sup>n</sup> 解出两个轮次并相减：</p>
+<blockquote><b>ΔN = ln[(<i>q</i><sub>sig</sub> − q∗) / (<i>q</i><sub>min</sub> − q∗)] / |ln a|</b>，适用前提 q∗ &lt; <i>q</i><sub>min</sub> &lt; <i>q</i><sub>sig</sub> ≤ <i>q</i><sub>0</sub></blockquote>
+<p><b>严格的单调性只在固定 r 时成立，必须这样写。</b>前一版仅用两组数值演示，而那两组同时改动了 c 与 r，不足以支持一般单调性。此处给出证明与它的确切边界。</p>
+<p><b>命题。</b>固定 r，则 ΔN 关于 c 严格单调递减。</p>
+<p><b>证明。</b>分子记 f(q∗) = ln[(<i>q</i><sub>sig</sub> − q∗)/(<i>q</i><sub>min</sub> − q∗)]。求导：</p>
+<blockquote><b>df/dq∗ = 1/(<i>q</i><sub>min</sub> − q∗) − 1/(<i>q</i><sub>sig</sub> − q∗)</b></blockquote>
+<p>由 q∗ &lt; <i>q</i><sub>min</sub> &lt; <i>q</i><sub>sig</sub> 得 0 &lt; <i>q</i><sub>min</sub> − q∗ &lt; <i>q</i><sub>sig</sub> − q∗，故 df/dq∗ &gt; 0，即 <b>f 随 q∗ 单调递增</b>。固定 r 增大 c 时：q∗ = r/(c+r) 严格减小 ⇒ f 减小，分子减小；同时 a = 1 − c − r 严格减小 ⇒ |ln a| 增大，分母增大。分子减、分母增，故 ΔN 严格减小。∎</p>
+<p><b>边界必须一并写出：沿 ρ 等比值路径不保证单调。</b>固定 c 而减小 r 时，q∗ 减小使分子减小，但 a 增大使分母也减小，两个效应方向相反，ΔN 的走向由具体参数决定。因此本推论的正确陈述是：</p>
+<blockquote><b>在补充能力不变的前提下，垫得越多，从「信号已经听不见」到「功能真的塌下来」之间的距离越短。</b></blockquote>
+<p>也就是说：<b>在同等补充条件下，最需要预警的人，预警期最短。</b>这不是仪器不够好，是信号与储备共用一份预算的必然后果。</p>
+<p>固定 r = 0.06，取 <i>q</i><sub>min</sub> = 0.4、<i>q</i><sub>sig</sub> = 0.55、<i>q</i><sub>0</sub> = 0.9：</p>
+<div class="tw"><table>
+<tr><th>垫付率 c</th><th>a = 1−c−r</th><th>q∗</th><th>功能失效轮次 <i>N</i><sub>f</sub></th><th>信号失聪轮次 <i>N</i><sub>s</sub></th><th><b>盲区 ΔN</b></th></tr>
+<tr><td>0.10</td><td>0.84</td><td>0.375</td><td>17.5</td><td>6.3</td><td><b>11.2 轮</b></td></tr>
+<tr><td>0.15</td><td>0.79</td><td>0.286</td><td>7.1</td><td>3.6</td><td><b>3.6 轮</b></td></tr>
+<tr><td>0.25</td><td>0.69</td><td>0.194</td><td>3.3</td><td>1.8</td><td><b>1.5 轮</b></td></tr>
+</table></div>
+<p>三行只改动 c 一个参数，符合上述命题的前提。表中数值是形状演示，不是预测——<i>q</i><sub>min</sub>、s、ν、κ 都没有标定路径。</p>
+<p>可证伪形式（两条，均可在既有纵向数据上做）：</p>
+<ul><li><b>顺序检验</b>：在最终发生失代偿的个体中，可觉察信号（自报症状变化、可穿戴信号的信噪比、照护者察觉到的异常）的衰减应当<b>先于</b>功能读数的下降。若功能总是先降、信号随后才弱，本推论为伪，信号只是结果指标。</li><li><b>梯度检验</b>：<b>在补充条件相当的分层内</b>，把队列按垫付率代理量（同类任务恢复代价的上升速率）分层，高层的「信号失聪至功能失效」间隔应当更短。<b>必须先按补充条件分层</b>——不分层的比较落在 ρ 等比值路径上，本推论不作预测。</li></ul>
+<h2>五、推论三：一个不依赖扰动的失效阈值，以及它需要的两个附加条件</h2>
+<p>q∗ &lt; <i>q</i><sub>min</sub> 时，系统即使<b>不再遇到任何新扰动</b>，也会走向失效。由 q∗ = 1/(1+ρ) 解出：</p>
+<blockquote><b>ρ &gt; <i>ρ</i><sub>crit</sub> ≡ (1 − <i>q</i><sub>min</sub>) / <i>q</i><sub>min</sub></b></blockquote>
+<p>例如 <i>q</i><sub>min</sub> = 0.4 时，<i>ρ</i><sub>crit</sub> = 1.5：只要垫付率超过补充率的一点五倍，结局就已经写定，与后面会不会碰上感染、跌倒或失眠无关。<b>这一步是无条件的，只是不动点位置的一次代数改写。</b></p>
+<p>真正需要小心的是下一步。前一版由「r 的上界随年龄下降、c 不随年龄下降」直接推出「总存在一个年龄使 ρ 越过 <i>ρ</i><sub>crit</sub>」——<b>这个推理不成立</b>：比值可以单调上升而始终停在临界值以下（例如 <i>r</i><sub>max</sub> 从 0.10 降到 0.05 且有正下界，c 恒为 0.06，则 ρ 从 0.6 升到 1.2，永不越过 1.5）。此处按外审意见更正为一条<b>有条件的命题</b>。</p>
+<blockquote><b>命题（有条件）。</b>设 (A) 存在 <i>c</i><sub>0</sub> &gt; 0 使 c(t) ≥ <i>c</i><sub>0</sub> 对一切 t 成立——维持当前正常必须征用一个严格为正的最小份额；(B) <i>r</i><sub>max</sub>(t) 单调下降且 lim_{t→∞} <i>r</i><sub>max</sub>(t) = 0。则存在有限时刻 T，使 ρ(T) = c(T)/<i>r</i><sub>max</sub>(T) &gt; <i>ρ</i><sub>crit</sub>。<br><b>证明。</b>由 (A)(B)，ρ(t) ≥ <i>c</i><sub>0</sub> / <i>r</i><sub>max</sub>(t) → ∞，故必在有限时刻越过任何固定阈值。∎</blockquote>
+<p>两个条件的地位不同，必须分开交代。</p>
+<p><b>(A) 有较强的支持。</b>任何仍在运行的生命角色都在消耗它的下一轮准备——完全不垫付意味着完全不使用，而不使用本身会使准备度以另一条路径衰减（第一章的失用、第八章的载体退出）。因此 c 有正下界是一个温和假设。</p>
+<p><b>(B) 是本书押的那一注，不是已证事实。</b>第八章给出的是「补充必须由会衰老的维护者完成，因此 r 有上界且随年龄下降」——这只保证 <i>r</i><sub>max</sub> 单调下降，<b>不保证它趋于零</b>。把「趋于零」当作已证，是前一版最实质的一处越界。本书现在把它明写为<b>待检验前提</b>，并给出可证伪形式：</p>
+<blockquote><b>若在高龄队列中，补充能力的下降呈现明确的正渐近下界（即 <i>r</i><sub>max</sub> 收敛到某个 r_∞ &gt; 0），且 <i>c</i><sub>0</sub>/r_∞ &lt; <i>ρ</i><sub>crit</sub>，则本条推论在该人群中不成立</b>，「人为何都走向身体死亡」需要另一条机制来解释，而不能由本模型给出。</blockquote>
+<p>因此第十二章的定位也要相应下调，这是本章最重要的一处自我更正：</p>
+<blockquote>本章<b>没有</b>证明死亡的确定性版本。本章给出的是：<b>在一组明确写出的假设成立时，维护—补充系统必然越过失效阈值的一类充分条件。</b></blockquote>
+<p>这样反而更有用。它把「人终有一死」从一句无法反驳的断言，改成了一组可以被逐条检验的条件——(A) 可用「完全休息的角色其准备度是否仍衰减」来验，(B) 可用高龄队列的补充能力轨迹来验。<b>一条能被验的充分条件，胜过一条不能被驳的必然性。</b></p>
+<h3>从「比值越线」到「实际状态越线」</h3>
+<p>上面这条命题证明的是<b>不动点</b> q∗ 越过阈值。二审指出，这还不等于<b>实际状态</b> <i>q</i><sub>n</sub> 越过阈值——因为闭式解 <i>q</i><sub>n</sub> = q∗ + (<i>q</i><sub>0</sub> − q∗)<i>a</i><sup>n</sup> 建立在常参数上，而 c 与 r 本来就随年龄变化。此处补上时变版本，它比不动点论证更强。</p>
+<p>设时变递推</p>
+<blockquote><b><i>q</i><sub>n+1</sub> = (1 − <i>c</i><sub>n</sub> − <i>r</i><sub>n</sub>)·<i>q</i><sub>n</sub> + <i>r</i><sub>n</sub></b></blockquote>
+<p>并设四个条件：</p>
+<blockquote>(i) <b>0 ≤ <i>c</i><sub>n</sub> + <i>r</i><sub>n</sub> ≤ 1</b>（周转强度不越出单调域）；<br>(ii) <b><i>c</i><sub>n</sub> ≥ <i>c</i><sub>0</sub> &gt; 0</b>（垫付率有严格正下界）；<br>(iii) <b>0 ≤ <i>r</i><sub>n</sub> ≤ <i>r</i><sub>max</sub>,n</b>（补充受当期上界约束）；<br>(iv) <b><i>r</i><sub>max</sub>,n → 0</b>（补充能力上界趋于零）。</blockquote>
+<p>由 (i)(iii) 得 1 − <i>c</i><sub>n</sub> − <i>r</i><sub>n</sub> ≤ 1 − <i>c</i><sub>n</sub> − 0 ≤ 1 − <i>c</i><sub>0</sub>，故</p>
+<blockquote><b><i>q</i><sub>n+1</sub> ≤ (1 − <i>c</i><sub>0</sub>)·<i>q</i><sub>n</sub> + <i>r</i><sub>max</sub>,n</b></blockquote>
+<p>这是一个系数固定小于一的稳定线性递推，输入项 <i>r</i><sub>max</sub>,n 趋于零。由稳定线性系统对消失输入的响应亦消失，得</p>
+<blockquote><b><i>q</i><sub>n</sub> → 0</b></blockquote>
+<p>于是对任意固定的功能阈值 <i>q</i><sub>min</sub> &gt; 0，<b>存在有限的 N 使 <i>q</i><sub>N</sub> &lt; <i>q</i><sub>min</sub></b>。</p>
+<blockquote><b>定理（时变垫付—补充系统的有限阈值穿越）。</b>在条件 (i)–(iv) 下，实际准备度序列 {<i>q</i><sub>n</sub>} 收敛到零；因此对任意 <i>q</i><sub>min</sub> &gt; 0，存在有限 N 使 <i>q</i><sub>N</sub> &lt; <i>q</i><sub>min</sub>。</blockquote>
+<p>这一版比不动点版本强在两处：它处理的是<b>实际状态而非瞬时平衡值</b>，而且它<b>不要求参数恒定</b>。它弱在一处：条件 (iv) 仍是本书押的那一注——第八章给出的是「补充必须由会衰老的维护者完成，故 r 有上界且随龄下降」，<b>上界趋于零仍需独立检验</b>。若高龄队列中 <i>r</i><sub>max</sub>,n 收敛到某个 r_∞ &gt; 0，本定理的前提不成立，届时能得到的只是 <i>q</i><sub>n</sub> → r_∞/(<i>c</i><sub>0</sub> + r_∞) 这样一个正的稳态，而它是否低于 <i>q</i><sub>min</sub> 要另行判断。</p>
+<p>由此还得到一条政策含义，比前一版更精确：</p>
+<blockquote><b>一项干预若只推迟了越线的年龄，那是延后终局；只有同时抬高 <i>r</i><sub>max</sub> 的渐近下界并压住 c 的下界，才是改变死亡动力。</b></blockquote>
+<h2>六、推论四：三条线的合成是一个乘性竞争模型，不是一个推论</h2>
+<p>三条线各自对应一个<b>必要</b>条件：一个角色能在下一轮被接住，要求（甲）本轮之后还剩下足够的能力、（乙）这些能力还组织成至少一条不共因的路、（丙）这些能力确实属于本人而不是借来的。三者缺一不可。</p>
+<p>必要性只给出「三者都要大于零」，<b>不给出合成的函数形式</b>。前一版直接写 q = <i>q</i><sup>甲</sup>·<i>q</i><sup>乙</sup>·<i>q</i><sup>丙</sup> 并称之为推论，这是越界：乘积不是由第二节那个递推式推出来的，它是一个<b>独立引入的建模假设</b>。此处按外审意见改称<b>乘性竞争模型</b>，并与三种同样合理的候选并列，再给出彼此的判决性差异。</p>
+<div class="tw"><table>
+<tr><th>候选模型</th><th>形式</th><th>它对应的直觉</th><th>与乘性模型的判决性差异</th></tr>
+<tr><td><b>乘性（本书所押）</b></td><td>q = <i>q</i><sup>甲</sup>·<i>q</i><sup>乙</sup>·<i>q</i><sup>丙</sup></td><td>三条线是三道独立的关卡，串联通过</td><td>—</td></tr>
+<tr><td><b>最小值（木桶）</b></td><td>q = min{<i>q</i><sup>甲</sup>, <i>q</i><sup>乙</sup>, <i>q</i><sup>丙</sup>}</td><td>只有最短的那一块板算数</td><td><b>对非最小项做干预</b>：最小值模型预测<b>零效应</b>，乘性模型预测<b>正效应</b>（∂q/∂<i>q</i><sup>甲</sup> = <i>q</i><sup>乙</sup>·<i>q</i><sup>丙</sup> &gt; 0）</td></tr>
+<tr><td><b>加性（加权和）</b></td><td>q = w₁<i>q</i><sup>甲</sup> + w₂<i>q</i><sup>乙</sup> + w₃<i>q</i><sup>丙</sup></td><td>三条线可以互相补偿</td><td>单项干预的效应量<b>是否随其余两项读数变化</b>：加性不随（∂q/∂<i>q</i><sup>甲</sup> = w₁ 为常数），乘性随</td></tr>
+<tr><td><b>Łukasiewicz 合取</b></td><td>q = max{0, <i>q</i><sup>甲+q</sup>^乙+<i>q</i><sup>丙</sup> − 2}</td><td>三项都很高时才有余量，否则归零</td><td>三项均在中位（如 0.6）时：乘性给 0.216，Łukasiewicz 给 0，最小值给 0.6 —— <b>中位区间三者分得最开</b></td></tr>
+</table></div>
+<p><b>串联可靠度的解释</b>要说清其地位：若三条线的失效事件相互独立，则「三关全过」的概率恰为三者之积，这为乘性模型提供了一个<b>概率解释</b>，但<b>不构成证明</b>——它把假设从「合成是乘的」换成了「三线失效相互独立」，而后者恰恰是第十一章第四节预注册的相关矩阵要检验的东西。<b>两个假设互为条件，本书不掩饰这一点。</b></p>
+<h3>⚠ 现阶段不要构造全书总准备度</h3>
+<p>三个读数组的形态并不齐：g 是标量，λ 是角色向量，X 是代价向量。要写出 q = <i>q</i><sup>甲</sup>·<i>q</i><sup>乙</sup>·<i>q</i><sup>丙</sup>，就必须先定义 <i>q</i><sup>甲</sup> = 1 − g（这一步没有争议），却还要说清 <i>q</i><sup>乙</sup> 如何由多个 <i>λ</i><sub>j</sub> 得到、<i>q</i><sup>丙</sup> 如何由多个 <i>X</i><sub>m</sub> 得到——<b>目前没有唯一方式</b>，而任何一种加权合成都会重新违背本书第十一章第三节「拒绝合成总分」的原则。</p>
+<p>因此本书<b>不构造全书总准备度</b>。乘性结构真正要求的东西可以直接检验，不必先造指数：</p>
+<blockquote>乘性的实质是——<b>改善一条线的效果，会随另外两条线的状态而改变。</b></blockquote>
+<p>这可以用带交互项的回归直接查：</p>
+<blockquote><b>Y = β₀ + β_A·A + β_B·B + β_C·C + β_AB·AB + β_AC·AC + β_BC·BC + ⋯</b></blockquote>
+<p>其中 A、B、C 为三条线预先指定的标量化读数（见第十一章第四节的首轮方案）。交互项显著且方向一致，支持乘性；交互项为零，支持加性。<b>这条路径既能判决模型形态，又不需要制造一个可能再次违背本书原则的统一指数。</b></p>
+<p>在乘性模型成立的前提下，有两个与流行做法相撞的后果：</p>
+<p><b>其一，改善非瓶颈项的边际收益低于改善瓶颈项。</b>若三项分别为 0.9、0.9、0.2，把最好的那项从 0.9 提到 1.0，总量从 0.162 升到 0.180，涨 11%；把最差那项从 0.2 提到 0.4，总量翻倍。<b>在乘性候选模型成立时，「先改善最容易改善的那一项」这条几乎所有健康项目都在遵循的做法，其边际收益系统性地低于改善瓶颈项。</b>注意这是一句<b>条件性</b>陈述：它以乘性模型成立为前提，而该前提本身尚待上述交互项检验裁决。</p>
+<p><b>其二，三项中等优于一项极好两项极差。</b>0.6³ = 0.216，而 0.95 × 0.3 × 0.3 = 0.086。<b>扬长补短在这里输给平均发展</b>，而这与「发挥优势」的直觉相反，也与按单一指标做优化的健康管理相反。</p>
+<p><b>三个模型的联合判据</b>（一次设计可同时区分三者）：取三线读数分层的队列，对<b>非最小项</b>施加一次标准强度的干预，观察</p>
+<ul><li>效应量 ≈ 0 ⇒ 最小值模型；</li><li>效应量 &gt; 0 且<b>不随</b>其余两项读数变化 ⇒ 加性模型；</li><li>效应量 &gt; 0 且<b>随其余两项读数同向变化</b> ⇒ 乘性模型。</li></ul>
+<p>若实测落在加性一侧，第十章那张三乘三表就只是分类，不是结构，本书的编次应当改为并列而非交叉——这一条已写进第十一章第六节的并章规则。</p>
+<h2>七、这个模型不能做什么</h2>
+<p>四条推论都从一个极简的式子出来，因此四条都带着同一批限制，必须写在紧挨着它们的地方。</p>
+<ul><li><b>单角色、单维度、常数参数。</b>真实身体是多角色的依赖网络，c 与 r 在一轮之内就会变化，且角色之间会互相征用。本章给的是<b>关系的形状</b>，不是数值；任何把 ρ 算出来当分数用的做法都超出了它的授权。</li><li><b>参数域是硬限制。</b>推论二只在 0 &lt; c + r &lt; 1 内成立；周转强度大于一的角色（例如以分钟计的快速调节）落在振荡域，本章对其盲区不作预测。</li><li><b>三线独立性是假设，不是结果。</b>推论四的乘性建立在独立性上，而第十一章第四节已经预测第三对相关可能高达 0.7。若三线相关很高，乘积会系统性低估，需要改用带协方差的形式——那时推论四的两个反直觉后果会减弱但不消失。</li><li><b><i>q</i><sub>min</sub>、s、ν、κ 都没有标定路径。</b>推论二的盲区长度因此只有方向可用，没有绝对值可用；表中的三组数是形状演示，不是预测。</li><li><b>模型不含价值项，因此不能判断该不该垫付。</b>急救时透支未来是对的，临终时停止补充也可以是对的。模型只会算 ρ，不会说「所以你错了」。<b>把这个模型当成评价人的工具，是它最容易也最严重的误用</b>——第十四章会正面处理这件事。</li><li><b>模型假设 q 连续可分</b>，而某些角色的接手是全有全无的（一位唯一照护者要么在要么不在）。对这类角色，q 只能取 0 或 1，上述全部推论失效。这恰是第十章第三节指认的乙线盲区，本模型没有改善它。</li></ul>
+<h2>八、记号统一表与一处方向相反的记号</h2>
+<p>九章各自独立成文，因此各自建立了自己的记号。装成一本书之后，实测发现<b>四处跨章同名异义</b>：ρ、Ω、A、C 各自在不同章里指三样或两样不同的东西。本节把它们理清，并且——这才是本节存在的理由——<b>其中一处理清之后，会推出一条九章都没有的结论</b>。</p>
+<p>处置原则是：<b>只给局部量加下标，不改任何一章的论证、数值与结论</b>。改论证会让读者失去核对我是否改口径的机会。</p>
+<div class="tw"><table>
+<tr><th>记号</th><th>出现处</th><th>该处的含义</th><th>全书统一记法</th></tr>
+<tr><td>ρ</td><td>第二章</td><td>更新系数：恢复后余路域 ÷ 恢复前余路域</td><td><b>ρ余</b></td></tr>
+<tr><td>ρ</td><td>第四章</td><td><i>ρ</i><sub>j,n</sub>：第 j 种外部资源重新可用所需时间</td><td>保留（自带下标）</td></tr>
+<tr><td>ρ</td><td>第十二章</td><td>垫付率 ÷ 补充率，即 <i>c</i> / <i>r</i></td><td><b>ρ</b></td></tr>
+<tr><td>Ω</td><td>第四章</td><td>可用路径集合</td><td><b>Ω路</b></td></tr>
+<tr><td>Ω</td><td>第六章</td><td><i>Ω</i><sub>k</sub>：一次回写的收益</td><td>保留（自带下标）</td></tr>
+<tr><td>A</td><td>第四章</td><td>适应增益</td><td><b>A增</b></td></tr>
+<tr><td>A</td><td>第六章</td><td><i>A</i><sub>k+1</sub>：下一轮进入成本</td><td>保留</td></tr>
+<tr><td>A</td><td>第九章</td><td><i>A</i><sub>k</sub>：第 k 轮可用能力向量</td><td>保留</td></tr>
+<tr><td>C</td><td>第四章</td><td>下一轮恢复成本</td><td><b>C恢</b></td></tr>
+<tr><td>C</td><td>第五章</td><td>C(u,a,p)：再入成本六维向量</td><td>保留</td></tr>
+<tr><td>C</td><td>第七章</td><td><i>C</i><sub>N</sub>：发起权集中度</td><td>保留</td></tr>
+<tr><td>Λ</td><td>第七章</td><td>换手迟滞比</td><td>全书沿用</td></tr>
+<tr><td>O</td><td>第四章</td><td><i>O</i><sub>n</sub>：未结轮重叠率</td><td>全书沿用</td></tr>
+<tr><td>g</td><td>第九章</td><td>续返赤字</td><td>全书沿用（甲线读数）</td></tr>
+<tr><td>λ</td><td>第八章等</td><td>接演空窗</td><td>全书沿用（乙线读数）</td></tr>
+<tr><td>X</td><td>第三、六章</td><td>转嫁额／代价完整度</td><td>全书沿用（丙线读数）</td></tr>
+</table></div>
+<p>其余记号都自带下标或参数，不会混淆。</p>
+<h3>一处方向相反的记号，以及它推出来的东西</h3>
+<p>四处冲突里，只有 <b>ρ余 与 ρ</b> 是<b>方向相反</b>的：ρ余 越大越好（余路域在扩展），ρ 越大越差（垫得比补得多）。这不是笔误造成的巧合——两者其实测的是同一个系统的两个不同侧面，而它们的确切关系可以算出来。</p>
+<p>把第二章的更新系数写进本章的模型：ρ余 就是相邻两轮准备度之比。</p>
+<blockquote><b>ρ余 ≡ <i>q</i><sub>n+1</sub> / <i>q</i><sub>n</sub> = (1 − c − r) + r / <i>q</i><sub>n</sub></b></blockquote>
+<p>代入不动点 q∗ = r / (c + r)，右边等于 1 − c − r + c + r = 1。于是得到三条：</p>
+<blockquote><b>ρ余 = 1 ⟺ <i>q</i><sub>n</sub> = q∗</b>　　<b>ρ余 &lt; 1 ⟺ <i>q</i><sub>n</sub> &gt; q∗</b>　　<b>ρ余 &gt; 1 ⟺ <i>q</i><sub>n</sub> &lt; q∗</b></blockquote>
+<p>也就是说，<b>ρ余 不是一个「命运」读数，是一个「相对位置」读数</b>：它只告诉你当前准备度在不动点的哪一侧，不告诉你那个不动点本身在哪里。</p>
+<p>由此推出一条第二章不可能说出、本章原本也没有的结论：</p>
+<blockquote><b>ρ余 = 1 不等于安全。</b>一个系统可以稳稳地停在 q∗ 上——第二章会把它读成「路径保持」，是三种结局里的正常那一种——而这个 q∗ 完全可能低于 <i>q</i><sub>min</sub>。此时系统是稳定的，也是注定失效的。</blockquote>
+<p>这两章因此会在一类具体情形上给出<b>相反判断</b>，而这个分歧是可判的：</p>
+<p><b>判据</b>——同时测 ρ余 与 <i>q</i> 的绝对水平。若某组个体的 ρ余 长期接近 1（路径既不扩也不缩）而绝对水平低，第二章判「保持」，本书判「已在阈值之下」。用后续结局数据即可裁决。若这一组的长期结局与 ρ余 同样接近 1 但绝对水平高的那一组没有差别，<b>第二章对，本章的阈值主张为伪</b>。</p>
+<p>还有一条顺带的收获，且它有实用价值。由 q∗ = 1/(1+ρ) 反解：</p>
+<blockquote><b>ρ = 1/q∗ − 1</b></blockquote>
+<p>于是<b>只要系统已经进入稳态，测出准备度 q 就能反推垫付率与补充率之比，不必分别测量 c 与 r</b>。这一条把 ρ 从一个理论参数变成一个（在稳态假设下）可估的量，是本章四条推论之外最便宜的一次兑现——代价是它只在稳态成立，而判断一个身体是否已进入稳态，本书没有给出办法。</p>
+<p><b>这一节也说明记号统一为什么不只是体例问题。</b>如果只把 ρ 与 ρ余 当成撞名而分别加个下标了事，上面这条相反判断就永远不会被发现。<b>同名异义是麻烦，同义异名是浪费；而方向相反的同名，往往正好压在两套理论真正分歧的那一点上。</b></p>
+<p>---</p>
+</article>
+<div class="endbox"><b>本章选自专著《健康发生学导论》（第58号）。</b>全书 297 页、约 24.1 万字，含前言、导读、导论、四编十四章、结语、后记与八附录，经两次完整外审大修。
+<a href="/books/m/58/">返回落地页</a> · <a href="/books/m/58/read.html">在线翻阅</a> · <a href="/books/m/58/Health-Genesis.pdf">下载 PDF</a></div>
+</div></body></html>

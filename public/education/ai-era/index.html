@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI时代的教育 · 家庭教育四论 | 教育专栏 | SDE Universes</title>
+<meta name="description" content="AI 进入家庭学习，改变的不是「谁做了作业」，而是「亲子之间哪种接触被保留」。四篇可裁决的家庭教育理论论文：认知接触替代、双源驱动冗余、身份意义自持、制度性家庭化——每一篇都给出允许竞争理论获胜的研究设计与明确失败条件。王德生 · 德麦国际 SDE 学派。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#146C94;--accent2:#2E86AB}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:56vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 3.4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#146C941c 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#146C940f 1px,transparent 1px),linear-gradient(90deg,#146C940f 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.3rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.1rem,5.6vw,3.8rem);font-weight:700;line-height:1.08;color:var(--text)}
+.sub{position:relative;font-size:clamp(1.02rem,2.2vw,1.24rem);color:var(--text2);max-width:720px;margin:1.5rem auto 1.9rem;font-style:italic;font-weight:300;line-height:1.7}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.2rem 0}
+.lead{font-size:1.1rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.block{margin:0 0 3.2rem;scroll-margin-top:6.5rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.3rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.97rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr;gap:1rem}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.15rem 1.35rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(42,35,21,.10)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.4rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.12rem;font-weight:700;color:var(--text);margin-bottom:0.5rem;line-height:1.44}
+.art p{font-size:0.92rem;color:var(--text2);line-height:1.74}
+.art .rd{display:inline-block;margin-top:0.6rem;font-size:0.8rem;color:var(--accent);letter-spacing:0.06em}
+.pend{background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.5rem 1.6rem;color:var(--text2);font-size:0.96rem;line-height:1.85}
+.pend b{color:var(--accent)}
+.note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:0.2rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-links{gap:1rem}.nav-links a.sib{display:none}
+  .art-grid{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 2.6rem;min-height:auto}
+  .block{scroll-margin-top:5.5rem}
+}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/" class="zh-only">首页</a><a href="/browse/" class="en-only">Home</a>
+    <a href="/education/" class="sib here zh-only">教育专栏</a><a href="/education/" class="sib here en-only">Education</a>
+    <a href="/creation/" class="sib zh-only">学术创造专栏</a><a href="/creation/" class="sib en-only">Academic Creation</a>
+    <a href="/students/" class="sib zh-only">学员专栏</a><a href="/students/" class="sib en-only">Students</a>
+    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+  </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow"><a href="/education/"><span class="zh-only">教育专栏</span><span class="en-only">EDUCATION</span></a> · <span class="zh-only">新频道</span><span class="en-only">NEW CHANNEL</span></div>
+  <h1 class="title"><span class="zh-only">AI时代的教育</span><span class="en-only">Education in the Age of AI</span></h1>
+  <p class="sub zh-only">AI 进入家庭学习，最容易被看见的是效率。但真正改变的，不是「谁做了作业」，而是「亲子之间哪种接触被保留」。四篇可裁决的家庭教育理论论文——每一篇都把自己放到能被推翻的位置上。</p><p class="sub en-only">When AI enters family learning, efficiency is what everyone sees first. But what really changes is not "who did the homework" — it is which kind of contact between parent and child is preserved. Four falsifiable theories of family education, each placed where it can be overturned.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">家庭教育四论 · 王德生 · 德麦国际 SDE 学派 · 持续增补</span><span class="en-only">Four Theories of Family Education · Wang Desheng · Demai SDE School · Growing</span></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="lead zh-only">关于 AI 与家庭教育，流行的说法有两种：一种说 AI 把家长从辅导中解放出来，另一种说 AI 制造了新的数字鸿沟。两种说法都停在「任务」这一层——谁做了讲题、纠错、检索、规划。这四篇论文换一个层次发问：<b>当一项知识任务被 AI 接手，原本借由这项任务发生的亲子接触，是否仍然存在？家庭的压力、身份与责任，又如何在外部信号松动后继续自我维持？</b>四篇各attack一个环节，共用一条方法纪律——不把换名当创新，不把类比当机制，每一个新概念都必须与最邻近的既有构念划出可裁决的边界，每一篇都给出允许竞争理论获胜的研究设计与明确的失败条件。</p>
+    <p class="lead en-only">Two stories dominate talk of AI and family education: one says AI frees parents from tutoring, the other says it opens a new digital divide. Both stop at the level of the task — who explains, corrects, retrieves, plans. These four papers ask one level down: <b>when a knowledge task is taken over by AI, does the parent–child contact that used to happen through that task still occur? And how do a family's pressure, identity and responsibility keep sustaining themselves after external signals loosen?</b> Each paper attacks one link, under one shared discipline: renaming is not innovation, analogy is not mechanism; every new concept must draw a decidable boundary against its nearest existing construct, and every paper offers a design that lets a rival theory win, with explicit conditions of failure.</p>
+
+    <div class="block"><div class="block-head"><span class="block-num">头条</span><span class="block-title">教发生四论 · 续篇 · 炉膛的二阶</span></div><p class="block-desc">四论之四《当炉膛从未被建造》交出的是<b>一阶判断</b>——这件东西存在，而且它此前没有名字。一阶判断成立，不等于它可以被使用：面对一个具体的学生，我们仍然回答不了「他的炉膛是没建成、是建成后被扭曲、还是建成了但被制度盖住了」。本篇做的就是这件事——给那个判断装上<b>第二根轴</b>，把一块写着「此处有深渊」的警示牌，升维成一张能分辨深渊不同深度的地图。第二轴来自政治学的<b>非决策</b>概念，并在移植中被改造为一个新的亚型：<b>正当性型非决策</b>。</p><div class="art-grid"><a class="art feature" href="/education/ai-era/cognitive-hearth/"><span class="k">新发表 · 约 2.3 万字 · 24 条参考文献 · 三种阅读方式</span><h4>认知炉膛的消失：AI 时代教育困境的发生学诊断</h4><p>把控制变量「内部意义引力的建构空间」撞上「对裂缝的非决策屏蔽程度」，构成二维辨别格：<b>私燃之境 · 幸存之炉 · 无柴之烬 · 冰封之室</b>。认知卸载论、功绩主体论、技术垄断论、动机-自我调节理论的判断在<b>冰封之室</b>里全都成立——这正是它们长期被当作普适诊断的原因；它们看不见旁边那间<b>幸存之炉</b>，因为它们没有第二根轴。判决性判据是<b>零启动</b>：在六十分钟无指令、无评价、无干扰的独处之后，自发目标表述的计数是零，还是虽少却不为零。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a></div></div><!-- GLOBAL-OVER145-ELEVEN:START --><!-- REMAINING-THREE:START --><div class="block"><div class="block-head"><span class="block-num">新</span><span class="block-title">教发生四论</span></div><p class="block-desc">同一个原初问题——<b>当「学会如何发生」被列为教学目标，它是否已经不再是「发生」，而成了一代新的被搬运物？</b>四篇各自<b>公开裁定了这个问题</b>，并把分析单位切到四个不同的位置，串成一条完整的因果链：<b>评价系统</b>（正当的排斥）→ 内化为<b>认知姿势</b>（秩序的肌理）→ 那个能力<b>从未被安装</b>（当炉膛从未被建造）→ 而此后想去<b>看见它</b>的动作完成最后一击（目光的尸检报告）。四篇均经编辑性提升：各补最近邻切割与可裁决预测，并在文末附论零写明四论的分工线与整条链的反驳条件。</p><div class="art-grid"><a class="art" href="/education/ai-era/generative-eclipse/"><span class="k">教发生四论 · SDE 创新智商 139</span><h4>目光的尸检报告：为什么教育制度「看见生成」的那一刻，生成就已经死了</h4><p>生成的本质在于发生学身份的悬浮——在被完成之前，它自己也不知道自己是什么。而「这是生成」的识别，无论多善意，都在它完成之前赋予了一个制度预制好的身份。</p><span class="rd">网页长文 →</span></a><a class="art" href="/education/ai-era/legitimate-exclusion/"><span class="k">教发生四论 · SDE 创新智商 137</span><h4>正当的排斥：为什么教育系统越正当，越在发生学上饿死认知</h4><p>既有批判共享一条未被审查的先验：在评价系统内部，「正确」与「生成」可以相容。撤销之后：排斥不是故障，是系统保证自身正当性所必须执行的核心操作。</p><span class="rd">网页长文 →</span></a><a class="art" href="/education/ai-era/texture-of-order/"><span class="k">教发生四论 · SDE 创新智商 136</span><h4>秩序的肌理：当评价结构被内化为认知的骨骼</h4><p>学生不再「使用」评价标准审视成果，而是让认知过程本身按评价结构的逻辑组织——评价秩序沉淀为自动运转的删除程序，在念头萌生的毫秒级窗口内完成过滤。</p><span class="rd">网页长文 →</span></a><a class="art" href="/education/ai-era/meaning-gravity/"><span class="k">教发生四论 · SDE 创新智商 135</span><h4>当炉膛从未被建造：为什么「教发生」的改革会撞上沉默之墙</h4><p>不是生成热情的暂时降温，而是整个内部生成结构从未被允许完整建立。这不是任何已有能力的损伤，是一个从未被安装的能力的永久性缺失。</p><span class="rd">网页长文 →</span></a></div></div><div class="block"><div class="block-head"><span class="block-num">新</span><span class="block-title">分离线 · 一论</span></div><p class="block-desc">本频道此前三篇（认权 · 存在性赌瘾 · 被截断的弧）各自成立，却从未在同一张表上被裁决。本篇做的就是这件事：先把「家庭投入逆势上涨」这个流传甚广的说法拿去核对——它不成立，真实数据是校外补习参与率由约24%降至约17%、支出下降，而家长焦虑上升、家用学习硬件销量高速扩张。谜题因此被改写为「钱少了，盯得更紧了，也更慌了」。在这个更窄也更真的谜题上，本文把「认权」变成可测量的控制变量，把「截弧」立为第二轴，交出八条可裁决判据与三条证伪条件——包括一条针对谜题本身的证伪，和一条与整个审计社会学传统方向相反的预测。</p><div class="art-grid"><a class="art" href="/education/ai-era/betting-separation-line/"><span class="k">分离线 · 三种阅读方式</span><h4>存在性赌瘾的分离线：终审权外包度、经验弧线完整性，与AI冲击下家庭教育行为的自持</h4><p>真正需要解释的不是「家庭花了更多钱」——支出其实在下降。要解释的是：钱少了，盯得更紧了，也更慌了。焦虑从结果侧迁到了过程侧，从买服务迁到了家长亲手生产证据。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a></div></div><div class="block"><div class="block-head"><span class="block-num">新</span><span class="block-title">裁决 · 回响 · 主权 · 三论</span></div><p class="block-desc">同一族追问的第二组：焦虑不在「怕输」，而在家庭日常里某样东西先被掏空了——一是把「我合不合格」的终审权外包了出去，二是那面回应孩子存在的「活墙」被改造成了记分墙，三是能说「这不是我要的」的那个主权位置本身在蒸发。三篇均经两轮编辑性提升，一轮分别与斯科特的可读性工程、巴赫金的应答性、法兰克福的二阶意愿正面对勘，二轮各加一节「本文禁止什么」，给出可让本文失败的主判据与编码准入标准。</p><div class="art-grid"><a class="art" href="/education/ai-era/adjudication-outsourcing/"><span class="k">裁决 · 三种阅读方式</span><h4>认权：家庭教育焦虑的实质与制度性出路</h4><p>家长把「我是否合格」的终审权整体外包给了一套以孩子绩效为原料的匿名法庭。过往的批判都在更换裁决的工具，却从未动摇裁决权的归属本身——出路是把这个权认领回来。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/echo-collapse/"><span class="k">回响 · 三种阅读方式</span><h4>回响的消失：AI时代家庭教育焦虑的他者性根源</h4><p>家长曾是一面充满期待的「活墙」，孩子在凝视、皱眉、叹息里持续确认「我是谁」。当这面墙被绩效逻辑改造成记分墙，回响就坍缩了——而AI只是让坍缩显形。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/sovereignty-of-presence/"><span class="k">主权 · 三种阅读方式</span><h4>心的不在场：当教育焦虑再也无法被归责时，家庭面对的是什么</h4><p>已卸下竞争压力、甚至已获得阶层安全感的家庭反而更不安：清楚焦虑的非理性却无法抽身。丧失的不是意志的内容，是行使意志的那个位置。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a></div></div><div class="block"><div class="block-head"><span class="block-num">新</span><span class="block-title">注视 · 经验 · 资格 · 议程 · 语法 · 五论</span></div><p class="block-desc">五个不同的切口，指向同一件事：当旧的教育兑换链条断裂，家庭日常里究竟是哪一样东西先坏掉了。五篇均经两轮编辑性提升——一轮与各自最贴近的先行者（温尼科特、富里迪与罗斯、科尔曼、萨特、斯威德勒）正面对勘并交出被占位的部分，二轮各加一节「本文禁止什么」，给出可让本文失败的主判据、观测量与编码准入标准。</p><div class="art-grid"><a class="art" href="/education/ai-era/gaze-overload/"><span class="k">注视 · 三种阅读方式</span><h4>凝视的暴力：教育焦虑的注视转向论</h4><p>焦虑的本质不是“怕输”，而是注视本身在标准化评分的持续校准下，被训练成一台扫描、评估与校准装置——并在孩子身上制造出一个必须在外部视线中不断证明自己的脆弱自我。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/experiential-sovereignty/"><span class="k">经验 · 三种阅读方式</span><h4>被偷走的句号：当教育验收逻辑失效时，孩子的“偷懒”在保卫什么</h4><p>教育行动的合法性被默认归于教育者一方，于是停顿、走神与不作为被自动编码为需要干预的错误信号。本文主张：那是对一段尚未走完的经验的保卫。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/credential-servitude/"><span class="k">资格 · 三种阅读方式</span><h4>资格焦虑的侍从化：家庭教育中“知道却停不下来”的结构性起源</h4><p>锁死家长的既不是恐惧也不是信念，而是一套被改写的感知模式：停止核对，在感知层面被自动换算为放弃责任。这是“知道却停不下来”的解。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/task-parasitism/"><span class="k">议程 · 三种阅读方式</span><h4>从土壤到寄主：论亲子互动的任务寄生性与中国城市家庭教育焦虑</h4><p>亲子互动不是失去了独立生成议程的能力，而是在特定历史条件下从未被赋予发展它的机会。所以抽走学校任务系统之后，家庭得到的是时间，不是议程。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/motive-grammar/"><span class="k">语法 · 三种阅读方式</span><h4>当焦虑无家可归：AI时代家庭教育动力语法的断裂与转型</h4><p>把消耗转译为意义的那套规则不是被相信的，而是被执行的。AI 的真正冲击，是让这套规则失去了可执行性——而端口失效之后，家庭不是换工具，是空转与加倍。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a></div></div><div class="block"><div class="block-head"><span class="block-num">新</span><span class="block-title">界面与主体 · 二篇</span></div><p class="block-desc">同一个问题的两半：一半在界面上，一半在主体里。前一篇问算法界面把家长的“关心”翻译成了什么；后一篇问当记录开始回答“我是否配成为某类人”，自律怎样变成一座关不掉的法庭。两篇均经全球最近邻检索后修订，并把各自的不可约贡献收窄为可被推翻的断言。</p><div class="art-grid"><a class="art" href="/education/ai-era/monitoring-debt/"><span class="k">界面 · 三种阅读方式</span><h4>从监工到隐身：AI时代家庭教育焦虑的逆向转化机制</h4><p>家长输入的是“关心”，界面返回给她的是一整套比较序列表与未完成清单。监控债务之所以不可清偿，不是因为数额太大，而是因为清偿标准的定义权不在债务人手中。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/self-execution/"><span class="k">主体 · 三种阅读方式</span><h4>自律杀死自己：最痛苦的悖论</h4><p>自律不因存在规则就必然杀死自己。危险始于一次结构性越界：行动层面的反馈被提升为存在层面的裁决——记录不再回答“怎样更好地完成这件事”，而开始回答“我是否配成为这种人”。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a></div></div><div class="block"><div class="block-head"><span class="block-num">新</span><span class="block-title">王德生 · AI时代家庭教育新作</span></div>
+<p class="block-desc">经全球最近邻比较、证据等级校正与深度改性的关系本体论论文。</p><div class="art-grid"><a class="art" href="/education/ai-era/inscriptive-anxiety/"><span class="k">最新发表 · 三种阅读方式</span>
+<h4>焦虑的铭写：AI时代家长为何在未来失效后仍无法停止操心</h4><p>当教育行动不再可靠地兑换未来，操心可能从解决问题的手段变成维持亲职正当性的书写动作：不是为了抵达，而是为了证明自己仍在负责。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a></div></div><!-- REMAINING-THREE:END --><div class="block"><div class="block-head"><span class="block-num">新</span><span class="block-title">王德生 · AI时代家庭教育六篇</span></div><p class="block-desc">经全球最近邻比较、证据等级校正与深度改性的最新理论论文。</p><div class="art-grid"><a class="art" href="/education/ai-era/aesthetic-resource-exhaustion/"><span class="k">最新发表 · 三种阅读方式</span><h4>在意义感知的枯竭处：家庭教育审美资源的耗竭与伪转型</h4><p>为什么越正确的新教育方案，越容易被旧的绩效语法重新接管？关键可能不在方向，而在运行新方向所需的感知资源已经枯竭。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/existential-betting-addiction/"><span class="k">最新发表 · 三种阅读方式</span><h4>存在性赌瘾：AI时代家庭教育焦虑的底层动力学</h4><p>明知旧赛道可能失效，家庭为何反而投入更多？因为每一次加码都可能成为一次证明“我仍是合格家长”的存在性下注。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/attentional-redemption/"><span class="k">最新发表 · 三种阅读方式</span><h4>被迫的“好”：家庭自我消耗装置的发生学分析</h4><p>某些“为了孩子好”的投入，同时在向孩子兑换家长自身存在合法性的证据。AI冲击的，是这套证据货币的可兑换性。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/interrupted-experience-arc/"><span class="k">最新发表 · 三种阅读方式</span><h4>被截断的弧：AI时代家庭教育焦虑的结构发生学</h4><p>家庭焦虑不只来自外部竞争，还可能来自日常生活中反复被截断、永远无法完成的经验弧线。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/love-thinned-by-anxiety/"><span class="k">最新发表 · 三种阅读方式</span><h4>焦虑如何啃薄了爱：共同存在结构的挤出及其代价</h4><p>家长越用力证明自己尽责，非功利共处越可能被挤出家庭；关系变薄又反过来驱动更密集的可见劳动。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a><a class="art" href="/education/ai-era/family-visibility-crisis/"><span class="k">最新发表 · 三种阅读方式</span><h4>当“为了谁”没了证据：AI时代家庭教育的能见度危机</h4><p>问题不只是家长不知道自己是谁，而是亲子关系失去了从日常共处中感知自身状态的内部通道，只能依赖外部成绩证明。</p><span class="rd">网页长文 · 在线PDF · 下载PDF →</span></a></div></div><!-- GLOBAL-OVER145-ELEVEN:END --><div class="block">
+      <div class="block-head">
+        <span class="block-num">四</span>
+        <span class="block-title"><span class="zh-only">家庭教育四论</span><span class="en-only">Four Theories of Family Education</span></span>
+      </div>
+      <p class="block-desc zh-only">从一个孩子的书桌，到一个家庭的身份，再到整套教育责任如何被制度悄悄配置给母亲——四篇由近及远，把「AI 时代的家庭教育」拆成四个可测的机制。</p><p class="block-desc en-only">From a child's desk, to a family's identity, to how the whole burden of education is quietly assigned to mothers by institutions — four papers move from near to far, taking "family education in the age of AI" apart into four measurable mechanisms.</p>
+      <div class="art-grid">
+        <a class="art" href="/education/ai-era/cognitive-contact-substitution/">
+          <span class="k"><span class="zh-only">之一 · 机制模型与可裁决研究设计</span><span class="en-only">Paper I · Mechanism & Decidable Design</span></span>
+          <h4><span class="zh-only">认知接触替代与控制补偿锁定</span><span class="en-only">Cognitive-Contact Substitution and Compensatory-Control Lock-In</span></h4>
+          <p class="zh-only">AI 把讲题、纠错、检索、规划从亲子之间搬到人机界面。真正被改变的不是「谁完成了任务」，而是「亲子之间原本借由任务发生的接触是否还在」。当关系更新的隐性输入被切断，家长控制往往作为断供后的短期代偿而抬升——本文给出二维判别框架、可观测变量与角色分离型 AI 随机干预。</p><p class="en-only">AI moves explanation, correction, retrieval and planning off the space between parent and child. What changes is not who finishes the task but whether the contact that used to happen through it survives. When relational updating is cut off, parental control tends to rise as a short-term compensation.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span><span class="rd" style="margin-left:1.1em"><span class="zh-only">加长版已上线</span><span class="en-only">Extended edition available</span></span>
+        </a>
+        <a class="art" href="/education/ai-era/motivational-redundancy/">
+          <span class="k"><span class="zh-only">之二 · 跨层机制模型</span><span class="en-only">Paper II · Cross-Level Mechanism</span></span>
+          <h4><span class="zh-only">双源驱动冗余与干预反弹</span><span class="en-only">Dual-Source Motivational Redundancy and Intervention Rebound</span></h4>
+          <p class="zh-only">减负、评价改革、技术替代都以削弱压力源为目标，家庭反应却分裂为松弛、转隐与增压三种。本文提出「外部合法性供给—内部身份供给」双源模型：二者可代偿，故单端干预可能触发反弹。附 2×2 因子干预与自然政策纵向研究，以及明确的证伪条件。</p><p class="en-only">Policies, evaluation reforms and technologies all aim to weaken sources of pressure, yet families split three ways: they relax, go covert, or intensify. A dual-source model — external legitimacy supply and internal identity supply — explains why single-sided intervention can rebound.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span><span class="rd" style="margin-left:1.1em"><span class="zh-only">加长版已上线</span><span class="en-only">Extended edition available</span></span>
+        </a>
+        <a class="art" href="/education/ai-era/identity-meaning-autonomy/">
+          <span class="k"><span class="zh-only">之三 · 家庭身份脆弱性的理论模型</span><span class="en-only">Paper III · A Theory of Identity Vulnerability</span></span>
+          <h4><span class="zh-only">竞速依附型家庭与身份意义自持</span><span class="en-only">Competition-Dependent Families and Identity-Meaning Autonomy</span></h4>
+          <p class="zh-only">外部竞速信号松动，许多家庭并未退出，而是把竞争迁往素质、项目、「会不会用 AI」。本文区分「关系凝聚」与「身份意义自持」，追问一个尖锐问题：一个家庭的意义，能否在没有外部成就证明时继续运作？附三源独立测量与目标冲击恢复指标。</p><p class="en-only">As external competitive signals loosen, many families do not exit — they migrate competition to "quality", projects, "can you use AI". Separating relational cohesion from identity-meaning autonomy, the paper asks: can a family's meaning keep running with no external proof of achievement?</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span><span class="rd" style="margin-left:1.1em"><span class="zh-only">加长版已上线</span><span class="en-only">Extended edition available</span></span>
+        </a>
+        <a class="art" href="/education/ai-era/institutional-familialization/">
+          <span class="k"><span class="zh-only">之四 · 责任配置的多机制模型</span><span class="en-only">Paper IV · Multi-Mechanism Model</span></span>
+          <h4><span class="zh-only">制度性家庭化与教育劳动性别化</span><span class="en-only">Institutional Familialization and the Gendering of Educational Labor</span></h4>
+          <p class="zh-only">母职耗竭与父职低参与，常被归咎于观念落后。本文给出「教育责任外部化—性别吸收链」四机制，并严格定义「制度性默许」——把立法沉默、违法加班、学校责任转嫁、福利覆盖不足分辨为不同的可测环节，附家庭教育制度负荷指数与 AI 平台审计设计。</p><p class="en-only">Maternal exhaustion and low paternal involvement are usually blamed on outdated beliefs. This paper offers a four-mechanism "externalization–gender-absorption chain" and a strict definition of institutional acquiescence, separating legislative silence, illegal overtime, school offloading and welfare gaps into distinct measurable links.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span><span class="rd" style="margin-left:1.1em"><span class="zh-only">加长版已上线</span><span class="en-only">Extended edition available</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">读</span><span class="en-only">R</span></span>
+        <span class="block-title"><span class="zh-only">怎么读这四篇</span><span class="en-only">How to Read the Four</span></span>
+      </div>
+      <div class="pend">
+        <p class="zh-only">四篇可以单读，也可以连读。连读的线索是<b>「距离」</b>：之一停在一个孩子的书桌前，问的是最贴身的接触；之二退到一个家庭内部，问它为什么在压力被拿走后仍不松手；之三退到家庭与家庭之间，问竞速松动后意义靠什么撑住；之四退到家庭之外，问是谁、用哪几道制度，把这一切的成本悄悄配置给了母亲。<b>四篇都不报告已完成的经验检验</b>——它们是理论建构与研究设计，把每个命题放到可以被数据推翻的位置上。150 分以上的最终认证，仍需独立的经验数据。</p>
+        <p class="en-only">The four can be read alone or in sequence. The thread is <b>distance</b>: Paper I stops at a child's desk and the most intimate contact; Paper II steps back inside one family, asking why it won't let go after the pressure is removed; Paper III steps back between families, asking what holds meaning up once competition loosens; Paper IV steps outside the family, asking who — through which institutions — quietly assigns the cost to mothers. <b>None reports completed empirical tests</b>: they are theory-building and research design, each proposition placed where data could overturn it. Certification above 150 still requires independent empirical data.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="crosslinks">
+        <a href="/education/"><span class="zh-only">← 回教育专栏</span><span class="en-only">← Back to Education</span></a>
+        <a href="/column/education-dilemma/"><span class="zh-only">→ 教育的困境和出路</span><span class="en-only">→ Education's Predicament</span></a>
+        <a href="/students/"><span class="zh-only">→ 学员专栏</span><span class="en-only">→ Students' Column</span></a>
+        <a href="/browse/"><span class="zh-only">→ 首页</span><span class="en-only">→ Home</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © 德麦国际 Demai International · <span class="zh-only">教育专栏 · AI时代的教育</span><span class="en-only">Education · Education in the Age of AI</span> · <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>影视艺术与文学频道 · 秦莉 · SDE Universes</title>
+<meta name="description" content="秦莉（笔名斐索）影视艺术与文学频道 —— 以《追忆似水年华》与拉乌鲁兹改编为现场，八篇论文命名八个东西：摸索时间与推送时间、义务性感知作业、负片、分离线、先占与留守、影像原时、并发膜、语法生育力。">
+<style>
+:root{--gold:#8A6817;--gold2:#B5860F;--ink:#F5EFE0;--muted:#A9A18C;--bg:#0E0B08;--panel:#171310;--line:rgba(181,134,15,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(181,134,15,0.32)}
+body{background:var(--bg);color:var(--ink);font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:1.95}
+a{color:var(--gold2);text-decoration:none}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .w{max-width:960px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center;font-size:13.5px;letter-spacing:.05em}
+.hero{max-width:960px;margin:0 auto;padding:74px 24px 10px;text-align:center;position:relative}
+.hero .en{font-size:11px;letter-spacing:.52em;color:var(--gold);margin-bottom:22px}
+.hero h1{font-size:clamp(32px,6vw,56px);font-weight:800;letter-spacing:.16em;color:#F7F2E4;line-height:1.3}
+.hero .sub{margin:26px auto 0;max-width:640px;font-size:16px;color:#CFC6AE;line-height:2.05;text-align:justify;text-align-last:center}
+.hero .rule{width:64px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:34px auto 0}
+.stats{max-width:960px;margin:34px auto 0;padding:0 24px;display:flex;justify-content:center;gap:0;flex-wrap:wrap}
+.stat{padding:0 30px;text-align:center;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0}
+.stat b{display:block;font-size:27px;color:var(--gold2);font-weight:700;letter-spacing:.04em;font-family:Georgia,serif}
+.stat span{font-size:11.5px;color:var(--muted);letter-spacing:.2em}
+.map{max-width:960px;margin:56px auto 0;padding:0 24px}
+.map .lbl{font-size:11px;letter-spacing:.4em;color:var(--gold);text-align:center;margin-bottom:8px}
+.map .tip{font-size:13.5px;color:var(--muted);text-align:center;margin-bottom:26px;letter-spacing:.03em}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:12px}
+.term{background:linear-gradient(160deg,#1C1712,#141009);border:1px solid var(--line);border-radius:11px;padding:17px 19px;transition:border-color .18s}
+.term:hover{border-color:rgba(181,134,15,0.55)}
+.term .t{font-size:16px;color:var(--gold2);font-weight:700;letter-spacing:.05em;margin-bottom:7px}
+.term .g{font-size:13px;color:#BDB49B;line-height:1.8;text-align:justify}
+.body{max-width:960px;margin:0 auto;padding:16px 24px 90px}
+.grp{margin-top:62px;display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--line);padding-bottom:15px}
+.grp .n{font-size:25px;color:var(--gold);font-weight:700;letter-spacing:.1em;flex:none}
+.grp h2{font-size:21px;font-weight:800;color:#F2EBDB;letter-spacing:.04em;line-height:1.6}
+.grp .cnt{margin-left:auto;font-size:12px;color:var(--muted);letter-spacing:.16em;flex:none}
+.gd{font-size:14.5px;color:#B7AE95;margin-top:14px;line-height:2;text-align:justify}
+.it{background:linear-gradient(160deg,#1A1610,#131009);border:1px solid var(--line);border-radius:13px;padding:24px 26px 20px;margin-top:16px;transition:border-color .18s,transform .18s}
+.it:hover{border-color:rgba(181,134,15,0.5);transform:translateY(-1px)}
+.it .cc{display:inline-block;font-size:11px;letter-spacing:.18em;color:var(--gold);border:1px solid rgba(181,134,15,0.45);border-radius:20px;padding:3px 12px;margin-bottom:12px}
+.it h3{font-size:19px;font-weight:800;line-height:1.6;margin-bottom:10px}
+.it h3 a{color:#F2EBDB}
+.it h3 a:hover{color:var(--gold2)}
+.it .sc{font-size:12px;color:var(--gold);letter-spacing:.05em;margin-left:9px;white-space:nowrap;font-weight:400}
+.it .hk{font-size:14.5px;color:#B7AE95;line-height:1.98;text-align:justify;margin-bottom:14px}
+.it .m{font-size:12px;color:#8E866F;letter-spacing:.05em;margin-bottom:15px}
+.lk{display:flex;gap:9px;flex-wrap:wrap}
+.lk a{font-size:13.5px;padding:8px 15px;border-radius:6px;letter-spacing:.03em}
+.lk a.p{background:var(--gold);color:#140F07;font-weight:700}
+.lk a.p:hover{background:var(--gold2)}
+.lk a.g{background:rgba(181,134,15,0.08);border:1px solid rgba(181,134,15,0.4);color:var(--gold2)}
+.lk a.g:hover{background:rgba(181,134,15,0.18)}
+.note{margin-top:56px;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:9px;padding:22px 26px;background:rgba(181,134,15,0.045)}
+.note .h{font-size:12px;letter-spacing:.3em;color:var(--gold);margin-bottom:11px}
+.note p{font-size:14px;color:#B0A88F;line-height:2;text-align:justify}
+.back{text-align:center;margin-top:44px}
+.back a{border-bottom:1px solid rgba(181,134,15,0.4);padding-bottom:3px;font-size:14.5px}
+footer{border-top:1px solid var(--line);padding:32px 24px;text-align:center;color:#8E866F;font-size:13px}
+@media(max-width:600px){.stat{padding:0 17px}.hero h1{letter-spacing:.08em}}
+</style><link rel="stylesheet" href="/sde-read.css">
+</head>
+<body class="sde-read">
+<nav><div class="w">
+  <a href="/browse/">SDE Universes</a>
+  <a href="/students/qin-li/works/">秦莉 · 全部作品 ›</a>
+</div></nav>
+
+<div class="hero">
+  <div class="en">CINEMA · LITERATURE</div>
+  <h1>影视艺术与文学</h1>
+  <p class="sub">八篇论文，两轮碰撞，八个被命名的东西。它们处理同一个问题：当文学与影像正面相撞，撞碎的究竟是什么，又逼出了什么。</p>
+  <div class="rule"></div>
+</div>
+
+<div class="stats">
+  <div class="stat"><b>8</b><span>论　文</span></div>
+  <div class="stat"><b>22</b><span>万　字</span></div>
+  <div class="stat"><b>8</b><span>新命名</span></div>
+  <div class="stat"><b>104</b><span>PDF 页</span></div>
+</div>
+
+<div class="map">
+  <div class="lbl">本频道命名的东西</div>
+  <div class="tip">八个概念，各自处理一件此前看得见、说不出的事</div>
+  <div class="terms"><div class="term"><div class="t">摸索时间 / 推送时间</div><div class="g">接收者用自己的身体在体验流内部操控时间进程，还是时间结构在他进入前已被锁定。要害不是控制权的多少，是行使方式。</div></div><div class="term"><div class="t">义务性感知作业</div><div class="g">被文本结构约束进接受行为的强制性工序。不是锦上添花的深度，是获取意义的门槛——跨不过去，连浅度都得不到。</div></div><div class="term"><div class="t">负片</div><div class="g">改编不是回应原著，而是以原著为试剂：当文字以极端内向的感知模态拒绝合作，影像从这压强中反向逼现自己的边界。</div></div><div class="term"><div class="t">分离线</div><div class="g">把留下过痕迹的失败与从未留下痕迹的失败分开。此前所有改编理论都把失败当同一件事，从未追问失败内部的差异。</div></div><div class="term"><div class="t">先占 / 留守</div><div class="g">影像不是表现意识流，而是抢先走完了本应由观者执行的觉察运动。留守则是创作者放弃预先知道觉察的走向。</div></div><div class="term"><div class="t">影像原时</div><div class="g">影像摆脱叙事奴役后，自身物理持续所显露的那层时间质地——不由情节组织，也不由技术节奏规定。</div></div><div class="term"><div class="t">并发膜</div><div class="g">声画分轨这组物质属性，从被叙事覆盖的物理基底，转为被意识流激活的功能器官的整个过程。</div></div><div class="term"><div class="t">语法生育力</div><div class="g">扩散解决语法传得开不开，器官化解决语法能不能自己活。大师的成功，恰恰是器官化失败的证据。</div></div></div>
+</div>
+
+<div class="body">
+<div class="grp"><div class="n">壹</div>
+  <h2>普鲁斯特与鲁兹 · 一次改编的四道切口</h2><div class="cnt">4 篇</div></div>
+<div class="gd">以《追忆似水年华》与拉乌鲁兹 1999 年的同名电影为唯一现场，四篇各从一个切口进入：时间的控制权归谁、哪道工序不可代劳、影像在压力下被逼出了什么、以及失败内部的差异如何成为变量。</div>
+  <div class="it">
+    <span class="cc">摸索时间 · 推送时间</span>
+    <h3><a href="/students/qin-li/two-time-sovereignties/">时间的两种主权：论《追忆似水年华》从文字到影像的不可通约性</a><span class="sc">创新智商 145→147→141</span></h3>
+    <p class="hk">普鲁斯特的文字所生产的时间体验从来不是一个「内容」，而是读者在自己身体里、用自己的阅读动作执行的一次摸索的副产品。本文由此提出摸索时间与推送时间的区分，要害不在「接收者有没有控制权」这个量的维度——那仍是互动性的旧问题——而在控制权的行使方式是内在于体验流的肉身摸索，还是外在于体验流的界面操作。本轮补入与查特曼两条时序的分界：他告诉我们两条时序如何各自运行，本文追问其中一条由谁推动、以及这个推动本身算不算意义。</p>
+    <div class="m">约 2.8 万字 · 三种读法 · 发表于2026年7月28日</div>
+    <div class="lk"><a class="p" href="/students/qin-li/two-time-sovereignties/">📖 长文阅读</a>
+      <a class="g" href="/students/qin-li/two-time-sovereignties/read.html">📄 在线 PDF</a>
+      <a class="g" href="/students/qin-li/two-time-sovereignties/two-time-sovereignties.pdf" download>⬇ 下载 PDF</a></div>
+  </div>  <div class="it">
+    <span class="cc">义务性感知作业 · 衔接权</span>
+    <h3><a href="/students/qin-li/obligatory-perceptual-work/">工序的不可代偿性：论《追忆似水年华》改编中一道不可能被影像代劳的感知义务</a><span class="sc">创新智商 142→145</span></h3>
+    <p class="hk">普鲁斯特文本的真正要旨不是「给予读者一种时间经验」，而是强迫读者执行一组感知操作、并在执行中亲自结算出一个意义。导演对镜头衔接的控制不是「损失了某种质感」，而是把一项必须由读者亲手完成的工序替换为一个已完工的视觉结论。本轮把落点从「读者必须亲自执行」明确迁移到**衔接权的可定位性**上：本文的贡献不在于宣布读者应当主动，而在于给出一个可以被两位分析者独立标注、并指着说「就是在这里被接走的」的坐标。</p>
+    <div class="m">约 2.7 万字 · 三种读法 · 发表于2026年7月28日</div>
+    <div class="lk"><a class="p" href="/students/qin-li/obligatory-perceptual-work/">📖 长文阅读</a>
+      <a class="g" href="/students/qin-li/obligatory-perceptual-work/read.html">📄 在线 PDF</a>
+      <a class="g" href="/students/qin-li/obligatory-perceptual-work/obligatory-perceptual-work.pdf" download>⬇ 下载 PDF</a></div>
+  </div>  <div class="it">
+    <span class="cc">负片 · 感知剥离</span>
+    <h3><a href="/students/qin-li/negative-print/">负片：论改编对文学感知机制的剥离与释放</a><span class="sc">创新智商 147→148→140</span></h3>
+    <p class="hk">改编研究五十年来一直在逃离忠实性，办法是宣布改编作品自主、不必与原著相比。本文走第三条路：保留比较关系，但把原著从「标准」改成「试剂」——衡量鲁兹的不是他离普鲁斯特多近，而是普鲁斯特的抵抗把影像逼得暴露了什么。文中给出一套眼动可测的证伪设计，并据此与触感视觉划出分离线：两者到达同一种注视的路径不同，而路径之别决定了这种效果能否被一部没有文学压强的电影单独造出来。</p>
+    <div class="m">约 2.2 万字 · 三种读法 · 发表于2026年7月28日</div>
+    <div class="lk"><a class="p" href="/students/qin-li/negative-print/">📖 长文阅读</a>
+      <a class="g" href="/students/qin-li/negative-print/read.html">📄 在线 PDF</a>
+      <a class="g" href="/students/qin-li/negative-print/negative-print.pdf" download>⬇ 下载 PDF</a></div>
+  </div>  <div class="it">
+    <span class="cc">分离线 · 逼生痕迹</span>
+    <h3><a href="/students/qin-li/line-of-separation/">失败所逼出的，不是痕迹，而是一条分离线</a><span class="sc">创新智商 152→153→141</span></h3>
+    <p class="hk">此前所有的改编理论都把失败当作同一个东西——一笔亏损、一道鸿沟、或是创造的前奏——从未追问失败内部的差异。本文把「怎样失败」第一次变成可操作的变量：给出四个必须同时在场的必要条件，并以《尤利西斯》《了不起的盖茨比》的安全式失败为反例、穆索尔斯基《图画展览会》为侧面案例、AI 极限模仿人类创造为当代案例，验证这条分离线在四个独立领域中可复现。文中还对自身命题做了一次公开的回溯修正：真正的理论对象不是被命名的「痕迹」，而是那条切开失败的线。</p>
+    <div class="m">约 2.5 万字 · 三种读法 · 发表于2026年7月28日</div>
+    <div class="lk"><a class="p" href="/students/qin-li/line-of-separation/">📖 长文阅读</a>
+      <a class="g" href="/students/qin-li/line-of-separation/read.html">📄 在线 PDF</a>
+      <a class="g" href="/students/qin-li/line-of-separation/line-of-separation.pdf" download>⬇ 下载 PDF</a></div>
+  </div><div class="grp"><div class="n">贰</div>
+  <h2>意识流与影视语言 · 一门语法为何长不成器官</h2><div class="cnt">4 篇</div></div>
+<div class="gd">从单一改编案例推到文类层面：意识流进入电影一百年，留下了什么、没能长成什么。四篇分别处理觉察的被抢先、影像自身的时间、被逼出的媒介器官，以及器官化为何终未发生。</div>
+  <div class="it">
+    <span class="cc">先占 · 留守</span>
+    <h3><a href="/students/qin-li/pre-emption-and-withholding/">沉默的篡位：影像对意识流的「先占」机制与「留守」的可能</a><span class="sc">创新智商 142→146</span></h3>
+    <p class="hk">从威廉·詹姆斯提炼意识流的两条本体条件——发生者亲自在场、连接不可预判——论证影像的剪辑流替观者走完了从意象到意象的全部路径，本文称之为「先占」。与异化、缝合、回收、预先消费四重辨析后确立其独立辨别面：先占关切的不是已有之物的归属，而是那件事在发生之前就已被替代。「留守」则是翻转先占的路径——其发生条件不是留白技巧，而是创作者放弃预先知道觉察的走向。本次打磨补上最强近邻艾柯《开放的作品》并划界：凡能被设计出来的开放，都仍是被设定的剩余。</p>
+    <div class="m">约 2.9 万字 · 三种读法 · 发表于2026年7月28日</div>
+    <div class="lk"><a class="p" href="/students/qin-li/pre-emption-and-withholding/">📖 长文阅读</a>
+      <a class="g" href="/students/qin-li/pre-emption-and-withholding/read.html">📄 在线 PDF</a>
+      <a class="g" href="/students/qin-li/pre-emption-and-withholding/pre-emption-and-withholding.pdf" download>⬇ 下载 PDF</a></div>
+  </div>  <div class="it">
+    <span class="cc">影像原时 · 剥离</span>
+    <h3><a href="/students/qin-li/image-proper-time/">影像原时：意识流、媒介裂隙与电影时间主体性的重新命名</a><span class="sc">创新智商 140→142</span></h3>
+    <p class="hk">意识流入影百年，最深刻的后果不是催生了一个流派，而是逼出了一种未被命名的影像时间形态。杜拉斯以摧毁性的方式暴露了代偿的边界——她不是用声音辅助影像，而是用声音把影像从叙事时间的统一性中剥离出去；伯格曼与塔可夫斯基的减法由此被重新识别为同一结构事件的另一面向。本次打磨新增一个判例式分离点：小津的空镜中感知运动链条完好、断裂前提不成立，按德勒兹的判准不该出现时间的直接呈现，而时间质地仍在。</p>
+    <div class="m">约 3.0 万字 · 三种读法 · 发表于2026年7月28日</div>
+    <div class="lk"><a class="p" href="/students/qin-li/image-proper-time/">📖 长文阅读</a>
+      <a class="g" href="/students/qin-li/image-proper-time/read.html">📄 在线 PDF</a>
+      <a class="g" href="/students/qin-li/image-proper-time/image-proper-time.pdf" download>⬇ 下载 PDF</a></div>
+  </div>  <div class="it">
+    <span class="cc">并发膜 · 功能升华</span>
+    <h3><a href="/students/qin-li/concurrence-membrane/">意识流的银幕显影：并发膜的功能升华与电影本体论转向的重审</a><span class="sc">创新智商 137→141</span></h3>
+    <p class="hk">声画分轨、多重独立信息同步抵达——这组物质属性在电影诞生之初就已存在。「并发膜」指的不是这一技术事实，而是它被问题化、被赋予独立表达使命、从物理基底转化为功能器官的整个过程。以《对话》（科波拉，1974）为判例追问它与时间-影像的分离点。本次打磨补上声画关系的标准账希翁《视听》并划界：希翁描述器官已经在做什么，本文追问器官何时、因何成为器官。</p>
+    <div class="m">约 2.9 万字 · 三种读法 · 发表于2026年7月28日</div>
+    <div class="lk"><a class="p" href="/students/qin-li/concurrence-membrane/">📖 长文阅读</a>
+      <a class="g" href="/students/qin-li/concurrence-membrane/read.html">📄 在线 PDF</a>
+      <a class="g" href="/students/qin-li/concurrence-membrane/concurrence-membrane.pdf" download>⬇ 下载 PDF</a></div>
+  </div>  <div class="it">
+    <span class="cc">语法生育力 · 器官化</span>
+    <h3><a href="/students/qin-li/grammatical-fecundity/">语法生育力：意识流在电影中为何无法「长成」独立器官</a><span class="sc">创新智商 144→147</span></h3>
+    <p class="hk">意识流语法从未缺乏扩散能力，它已碎屑化地渗入几乎所有影像种类的呼吸；但扩散与器官化是两件事。本文提出器官化的三个必要条件，解剖摄影机、剪辑台、放映厅三个器官的结构性自闭，并论证塔可夫斯基、雷乃、马利克的成功以个人觉察充当了缺失的器官替代物。本次打磨补上《古典好莱坞电影》并划出分层：制度解释回答规范如何被推行，本文回答为何这套推得动而那套推不动——差别在同构性，不在资源。</p>
+    <div class="m">约 3.4 万字 · 三种读法 · 发表于2026年7月28日</div>
+    <div class="lk"><a class="p" href="/students/qin-li/grammatical-fecundity/">📖 长文阅读</a>
+      <a class="g" href="/students/qin-li/grammatical-fecundity/read.html">📄 在线 PDF</a>
+      <a class="g" href="/students/qin-li/grammatical-fecundity/grammatical-fecundity.pdf" download>⬇ 下载 PDF</a></div>
+  </div>
+
+<div class="note">
+  <div class="h">关于这个频道</div>
+  <p>这八篇不是八个题目，是同一台机器的八个部位。第一组把一次具体改编拆到不能再拆——普鲁斯特的句子在读者身体里做了什么，鲁兹的镜头在哪一帧把它替读者做完了。第二组把这台机器推到文类层面：意识流进入电影一百年，它扩散到了每一种影像的呼吸里，却始终没在电影媒介内部长成一个能自己活的器官。两组之间有一条线——第一组问的是「这一次为什么不行」，第二组问的是「一百年为什么都不行」。</p>
+  <p>页面上标注的创新智商为编辑自评，待独立复评。其中三篇标为「145→147→141」这样的三段式，表示它们经过了两轮打磨：第二轮由一次全球文库检索触发，补上了首轮放跑的最近邻居，同时把此前偏高的自评下修到检索后的实际位置。分数会下修，是这套评分愿意被检索裁决的证据。每篇末尾都写有可被拿去推翻它的证伪条件，那是作者自己钉上去的。</p>
+</div>
+
+<div class="back"><a href="/students/qin-li/works/">← 返回 秦莉 全部作品</a></div>
+</div>
+
+<footer>© 德麦国际 · SDE Universes · 学员专栏 · 秦莉（笔名斐索） · <a href="https://sdeuniverses.com">sdeuniverses.com</a></footer>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body></html>

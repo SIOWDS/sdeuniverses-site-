@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>给一件难受的事做一次归属核算 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的核心动作，是把“化解冲突”这项功能与它的历任承担者拆开来看，从而发现被磨掉的那一环。这个动作可以被一般化：任何一件让你或你的团队反复难受的事，都能用同一套工序过一遍——归属核算、房东追踪、通道体检，然后决定在哪一侧下手。适用于个人、团队负责人、社区与组织。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="给一件难受的事做一次归属核算 · 方法实践文">
+<meta property="og:description" content="母文的核心动作，是把“化解冲突”这项功能与它的历任承担者拆开来看，从而发现被磨掉的那一环。这个动作可以被一般化：任何一件让你或你的团队反复难受的事，都能用同一套工序过一遍——归属核算、房东追踪、通道体检，然后决定在哪一侧下手。适用于个人、团队负责人、社区与组织。">
+<link rel="canonical" href="https://sdeuniverses.com/students/hu-min/host-migration/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/hu-min/host-migration/">← 回母文《向内求的宿主》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《向内求的宿主》</div>
+  <h1 class="art-title">给一件难受的事做一次归属核算</h1>
+  <div class="art-subtitle">把母文的框架落成可核对的工序：分清哪一部分归自己、哪一部分归条件，查这项功能现在的房东是谁，以及那条被截掉的通道能不能接回去。</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 4874 字</div>
+  <div class="swap">
+    <a href="/students/hu-min/host-migration/"><b>← 母文 · 向内求的宿主</b><span>完整论证在这里</span></a>
+    <a href="/students/hu-min/host-migration/explain.html"><b>🌱 白话解释文 · 小区的公共水管拆了，于是每家买了一台净水器</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的核心动作，是把“化解冲突”这项功能与它的历任承担者拆开来看，从而发现被磨掉的那一环。这个动作可以被一般化：任何一件让你或你的团队反复难受的事，都能用同一套工序过一遍——归属核算、房东追踪、通道体检，然后决定在哪一侧下手。适用于个人、团队负责人、社区与组织。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">这套工序管什么、不管什么</a></li><li><a href="#s2">工序一：归属核算</a></li><li><a href="#s3">工序二：房东追踪</a></li><li><a href="#s4">工序三：通道体检</a></li><li><a href="#s5">工序四：按断点选动作</a></li><li><a href="#s6">判据表：真结构问题，还是把责任往外推</a></li><li><a href="#s7">六种典型失败</a></li><li><a href="#s8">一页纸操作卡</a></li><li><a href="#s9">两个场景变体</a></li><li><a href="#s10">这套工序自己也可能是错的</a></li><li><a href="#s11">走一遍：一个团队的实例</a></li><li><a href="#s12">五个实操疑问</a></li><li><a href="#s13">与自我照顾的分工：一张对照</a></li><li><a href="#s14">最容易被跳过、也最关键的一步：转事项</a></li><li><a href="#s15">常见的三种误判，以及怎么纠</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>这套工序管什么、不管什么</h2>
+<p><b>管</b>：反复出现、有多人共享、并且现有的处理方式全都指向“调整自己”的困扰。典型信号有三个——身边至少两三个人在同一位置上有同样的难受；市面上给出的所有办法都是关于你怎么想的；你完全调整好之后，那件事本身照旧。</p>
+<p><b>不管</b>：一次性的、个别的、确实与自身状态高度相关的困扰。把这套工序套到纯粹个人的事情上，会变成一种把责任外推的习惯，那是它最容易被滥用的方向。</p>
+<p><b>这套工序不产出什么</b>：它不产出“该不该做冥想”这类结论，也不裁定任何一种自我照顾方式的价值。它只产出三样——这件事有多大比例不在你这边、这项功能现在由谁承担、那条“一起去改”的通道断在哪一节。</p>
+<p><b>一条总纪律</b>：<b>归属核算的结果不能用来减少自我照顾</b>。查清楚有一半不归你，不是停止照顾自己的理由——那半边照样要撑住。它只改变你把剩下的力气往哪儿放。</p>
+<h2 id="s2"><span class="no">02</span>工序一：归属核算</h2>
+<p>拿一件具体的、最近反复困扰你的事，按三问做一次核算。三问都要写下来，写不出来的部分就是这一步的产出。</p>
+<p><b>第一问 · 共享度</b>。除了你，还有谁在同一个位置上有同样的困扰？写具体的人数与位置，不写“很多人”。零个人，判定为个人事项，本工序到此为止；两个人以上，继续。</p>
+<p><b>第二问 · 反事实</b>。假设你明天彻底调整好了心态、精力充沛、毫无怨言，那件事本身会改变吗？会改变，说明主要在你这边；照旧，说明至少有一半不在。</p>
+<p><b>第三问 · 处方指向</b>。你能找到的所有建议，改变的对象是什么——是你的看法、期待、作息、边界感，还是那个条件本身？如果十条建议里有十条都指向前者，这本身就是一个信号。</p>
+<p><b>结论写法</b>：写成一句“这件事里，属于我的部分是——，属于条件的部分是——”。不必精确，但必须两边都写出内容。<b>只写一边的核算是失败的核算</b>，无论偏向哪一边。</p>
+<h2 id="s3"><span class="no">03</span>工序二：房东追踪</h2>
+<p>对上一步里“属于条件的部分”，追一次它的承担史。这一步是母文方法的核心，也是最容易被跳过的一步。</p>
+<p><b>问一句：这类事情，二十年前是谁在管？</b> 找一个比你年长的、经历过那个时期的人问，比查资料准。答案通常是一个具体的组织或角色：车间的班组长、单位的调解、居委会、行业协会、某个固定的会议。</p>
+<p><b>再问：那个承担者现在还在吗？</b> 三种可能——还在且有效；名义上还在但已经不处理这类事；已经不存在。</p>
+<p><b>再问：现在这件事发生了，实际上被谁接住了？</b> 注意问的是“实际上”，不是“制度上应该”。绝大多数情况下答案是：被你自己接住了，或者被一个你付费购买的服务接住了。</p>
+<p><b>产出</b>：一条简短的迁徙链，形如“这类事 → 原来由 A 管 → A 退场于某某时期 → 现在由 B 承担 → B 的服务对象是单个个人”。<b>这条链写出来之后，很多“我是不是太脆弱了”的自我怀疑会自动消解</b>——它至少说明位置变了，不是人变差了。</p>
+<h2 id="s4"><span class="no">04</span>工序三：通道体检</h2>
+<p>母文说被磨掉的是“难受→说出来→一起去改”这一串里的最后一环。体检就是逐节检查这条通道断在哪里。</p>
+<ul class="pts"><li><b>第一节 · 有没有地方说</b>。有没有一个具体的场合，让同一位置上的人能碰面并谈到这件事？不是社交媒体，是能对上号的具体场合。</li><li><b>第二节 · 说了之后有没有人汇总</b>。散着说不算。有没有人把散落的说法收成一件事？</li><li><b>第三节 · 汇总之后有没有人有权改</b>。收成一件事之后，是否存在一个具体的角色或机制，有权限动那个条件？</li><li><b>第四节 · 改了之后有没有反馈回来</b>。改动的结果会不会回到原来说这件事的人那里？没有反馈，下一次就没人再说了。</li></ul>
+<p><b>判读</b>：四节全通＝通道完好，你的困扰更可能是执行问题而非结构问题。断在第一节＝最常见，也最容易修。断在第三节＝需要更高层级的协商，个人层面无解，应当调整投入。断在第四节＝通道形式上存在但会自然萎缩，需要专门补反馈。</p>
+<h2 id="s5"><span class="no">05</span>工序四：按断点选动作</h2>
+<p>体检结果决定该做什么，而不是凭意愿决定。</p>
+<p><b>断在第一节（没地方说）</b>：唯一有效的动作是<b>造一个最小的碰面场合</b>。三到五个人，固定时间，固定长度，只谈这一类事。不要一开始就追求代表性和正式性——正式化会把它变成一个需要审批的东西，反而更慢。</p>
+<p><b>断在第二节（没人汇总）</b>：动作是<b>指定一个人做记录</b>，把散落的说法写成三到五条具体的、可被回应的事项。这一步的关键是从情绪转成事项：不是“大家都很累”，而是“某个环节每周产生多少额外工时”。</p>
+<p><b>断在第三节（没人有权改）</b>：诚实的动作是<b>降低期待并保存证据</b>。此时把力气花在推动上，回报很低。可做的是把前两步的产出留存下来，等条件变化时它就是现成的材料。同时把个人层面的自我照顾提上来——这不是妥协，是按体检结果配置资源。</p>
+<p><b>断在第四节（没有反馈）</b>：动作是<b>把反馈做成固定动作</b>，哪怕结果是“暂时改不了”。反馈的存在与否，比反馈的内容更影响通道能否活下去。</p>
+<h2 id="s6"><span class="no">06</span>判据表：真结构问题，还是把责任往外推</h2>
+<p>这套工序有一个明确的滥用方向——用“这是结构问题”来解释一切个人层面的困难。三条硬检验，任意一条不过，就应当回到个人侧：</p>
+<ul class="pts"><li><b>共享检验</b>：同一位置的其他人是否也报告同样的困扰。只有你一个人，无论条件多不合理，先按个人事项处理。</li><li><b>可指认检验</b>：能不能指出一个具体的条件（某个流程、某项规定、某个安排），而不只是“环境不好”“大家都这样”。指不出具体条件的，通常不是结构问题，是情绪的泛化。</li><li><b>反事实检验</b>：那个条件如果被改掉，困扰是否会明显减少。答不上来，说明还没找到真正的条件。</li></ul>
+<p>三条全过，才可以把力气往条件那一侧放。<b>这三条的作用不是拦人，而是防止一件更消耗的事</b>——把力气投到一个根本不会改变的方向上，长期下来的挫败，比原来的困扰更难恢复。</p>
+<h2 id="s7"><span class="no">07</span>六种典型失败</h2>
+<ul class="pts"><li><b>失败一 · 用归属核算替代自我照顾</b>。查清有一半不归自己，就停掉了原本有效的调整。按母文的框架，两边是并行的，不是替代关系。</li><li><b>失败二 · 只做工序一就下结论</b>。核算完就宣布“这是结构问题”，不追房东、不查通道。这样得到的只是一个立场，不是一个可以下手的地方。</li><li><b>失败三 · 把碰面场合正式化</b>。刚建起三五个人的固定碰面，就想做成委员会、写章程、报备。正式化几乎必然让它变慢并被回收。</li><li><b>失败四 · 停在情绪层不转事项</b>。碰面变成长期的互相诉苦。诉苦本身有价值，但通道的第二节要求把它转成可被回应的事项，转不成就走不到第三节。</li><li><b>失败五 · 断在第三节还硬推</b>。明知没有任何角色有权改动，仍持续投入。这是这套框架里最消耗人的一种失败。</li><li><b>失败六 · 拿这套框架去指责用它的人</b>。对正在做冥想、上成长课的人说“你被收编了”。母文明确承认那些效果是真的；用它去羞辱受益者，是彻底的误读。</li></ul>
+<h2 id="s8"><span class="no">08</span>一页纸操作卡</h2>
+<ul class="pts"><li><b>核算</b>：共享度（几个人）／反事实（我全好了它会变吗）／处方指向（建议改的是我还是它）。两边都要写出内容。</li><li><b>追房东</b>：这类事二十年前谁管／那个承担者现在还在吗／现在实际被谁接住。写成一条迁徙链。</li><li><b>体检</b>：有没有地方说／有没有人汇总／有没有人有权改／改了会不会反馈回来。找出断点。</li><li><b>动作</b>：一断＝造最小碰面场合；二断＝指定人做记录并转成事项；三断＝降期待、存证据、把自我照顾提上来；四断＝把反馈做成固定动作。</li><li><b>验</b>：共享／可指认／反事实三条硬检验，不过就回到个人侧。</li><li><b>禁</b>：不用它替代自我照顾；不用它羞辱任何人；不在三断处硬推。</li></ul>
+<h2 id="s9"><span class="no">09</span>两个场景变体</h2>
+<p><b>团队与组织</b>：最常见的断点在第二节和第四节。管理者可用的最小动作是每月固定半小时，只收集事项不做解决，并在下个月开头逐条回一句处理状态——哪怕多数是“暂时不动”。<b>回一句“暂时不动”的通道，比一条从不回话的通道活得久得多。</b></p>
+<p><b>个人与社区</b>：最常见的断点在第一节。可用的最小动作是找到两个同位置的人，约一个固定的、低门槛的碰面（一顿饭、一次散步）。判断它有没有立住，只看一件事——<b>第三次还有没有人来</b>。前两次靠新鲜，第三次靠真需要。</p>
+<p>两个场景共同的难点都在“转事项”这一步。它需要有人愿意做那件最没成就感的事：把大家说的话，写成几行具体的、能被回应的条目。</p>
+<h2 id="s10"><span class="no">10</span>这套工序自己也可能是错的</h2>
+<p>母文交代了自己的局限：宿主迁徙目前是一个解释框架，不是被统一实证验证过的因果结论。执行者应当照做，在开始前写下两句：</p>
+<ul class="pts"><li><b>如果……则不必</b>：如果在完全不做房东追踪与通道体检、只做个人层面调整的情况下，困扰同样明显减少，那么这套工序在本例中没有独立价值。</li><li><b>如果……则停止</b>：如果按本工序推进三个月，通道体检的断点一次也没有前移，且个人层面的状态因投入而变差，停止推进，把资源移回个人侧，并把已有产出留存。</li></ul>
+<p>写下这两句的意义，和母文的主题是同一件事：<b>它防止这套框架从一副眼镜变成一个身份</b>。眼镜可以摘，身份摘不掉；一旦变成身份，任何反例都会被解释成“你还没看清”,而那时候它就跟它所批评的东西没有区别了。</p>
+<h2 id="s11"><span class="no">11</span>走一遍：一个团队的实例</h2>
+<p>以下为示意，用于说明工序如何在真实约束下展开。</p>
+<p><b>背景</b>：某公司一个二十人的部门，连续半年出现“大家都很累但说不清累在哪”的状态。管理层给出的方案是心理关怀讲座与弹性作息。</p>
+<p><b>工序一 · 归属核算</b>：共享度——十九人中有十四人报告同一种困扰，判定非个人事项。反事实——假设某个人心态完全调整好，交付节奏照旧，困扰照旧。处方指向——收集到的九条建议，九条都指向个人的时间管理与心态。<b>核算结论：属于条件的部分显著大于属于个人的部分。</b></p>
+<p><b>工序二 · 房东追踪</b>：问了两位在公司超过十年的同事。二十年前这类事由每周的班组例会处理，例会上可以直接提流程问题，主管当场表态。该例会在三年前的一次流程精简中被合并取消。现在实际接住这类困扰的，是每个人自己和公司购买的员工心理服务。<b>迁徙链成立。</b></p>
+<p><b>工序三 · 通道体检</b>：第一节——没有场合（例会取消后无替代）。第二节——无人汇总。第三节——存在有权改动的角色（流程负责人仍在）。第四节——无从谈起。<b>断在第一节。</b></p>
+<p><b>工序四 · 动作</b>：按断点，唯一有效的动作是造最小碰面场合。做法是四个人、每两周一次、四十分钟、只谈流程上的具体卡点，不做正式化、不写章程、不报备。第三次时来了六个人，判定立住。第五次时产出三条具体事项（含一条量化的额外工时估算），交给流程负责人。</p>
+<p><b>结果的读法</b>：不用“大家心情好了吗”来判读。可读的只有一件——<b>通道的断点有没有前移</b>。三个月后，第一节和第二节通了，第三节有一次回话（其中两条“暂时不动”，一条改了），第四节开始成形。这就是全部收获。</p>
+<h2 id="s12"><span class="no">12</span>五个实操疑问</h2>
+<p><b>问：归属核算发现大部分不归我，接下来是不是就不用调整自己了？</b>答：不是，这是最常见的误用。两侧并行：条件那一侧按体检结果投入，个人这一侧照旧维持。<b>尤其在断点位于第三节时，个人侧要加强而不是削弱</b>——因为条件短期内不会变。</p>
+<p><b>问：造一个碰面场合，会不会被当成拉小圈子？</b>答：这是现实风险。降低它的办法是把范围限死在“具体卡点”上，不谈人、不谈评价、不谈待遇；并且从一开始就明确它随时可以被解散。<b>越不像组织，越活得久。</b></p>
+<p><b>问：找不到“二十年前谁管”的答案怎么办？</b>答：说明这类事在此处可能从未有过承担者，而不是承担者退场了。此时这套工序的价值下降，应把重点放在通道体检的第一节——从无到有地造，而不是找回。</p>
+<p><b>问：体检断在第三节，除了降期待还能做什么？</b>答：保存证据是有实际价值的动作，不是安慰奖。把事项、频次、影响量写下来存好；权限结构变化时（换人、改组、出事故），这份材料是唯一现成的东西，而临时收集来不及。</p>
+<p><b>问：多久做一次完整工序？</b>答：一件事做一次即可，之后只重复体检部分，每季度一次。<b>已经接通的通道会在日常的效率优化中被不知不觉合并掉</b>——那个取消例会的流程精简，当初也是一次合理的效率改进。这是最常见的复发方式。</p>
+<h2 id="s13"><span class="no">13</span>与自我照顾的分工：一张对照</h2>
+<p>把两侧的分工写死，可以避免这套工序滑向任何一个极端：</p>
+<p><b>属于个人侧的</b>：睡眠、作息、注意力管理、情绪调节、边界设定、必要时的专业帮助。<b>这一侧不因为核算结果而缩减</b>，它管的是你能不能撑到条件改变的那一天。</p>
+<p><b>属于条件侧的</b>：碰面场合、事项汇总、向有权者传递、反馈闭环。这一侧按体检断点投入，投入量随断点位置调整——断在第三节就少投，断在第一节就多投。</p>
+<p><b>两侧共用的一条纪律</b>：不用一侧的进展来抵消另一侧的欠账。个人状态好转不等于条件问题解决了，条件推动有进展也不等于可以不睡觉。<b>分开记账的意义，就是让任何一侧的失败都不会伪装成另一侧的成功。</b></p>
+<h2 id="s14"><span class="no">14</span>最容易被跳过、也最关键的一步：转事项</h2>
+<p>四道工序里，真正决定成败的是通道第二节的那个动作——<b>把话转成事项</b>。它没有成就感，也没人抢着做，但跳过它，前面全部白做。</p>
+<p><b>转事项的三条要求</b>：</p>
+<ul class="pts"><li><b>可指认</b>：写出具体的环节、时间、频次，不写状态词。不是“沟通成本太高”，而是“某个环节每周产生若干次返工，每次约多少工时”。</li><li><b>可回应</b>：写成一个别人能回一句“改”或“不改”的形式。写成情绪或立场的，对方无法回应，只能沉默，通道就死在这里。</li><li><b>不带人</b>：只写流程与安排，不写谁做得不好。一旦带人，事项立刻变成人事问题，权限层级会整个抬高，第三节必堵。</li></ul>
+<p><b>做法上的一条经验</b>：指定一个固定的人做记录，而不是轮流。轮流会让格式不稳定，事项质量起伏很大；固定一个人，三次之后会形成一套稳定的写法，效率显著提高。</p>
+<p><b>判断转得成不成</b>：把写好的事项拿给一个完全没参与讨论的人看，问他“你看得懂这在说什么、要改什么吗”。看不懂，说明还停在情绪层，回去重写。<b>这个检验只要一分钟，但它挡住了绝大多数走不到第三节的失败。</b></p>
+<h2 id="s15"><span class="no">15</span>常见的三种误判，以及怎么纠</h2>
+<p><b>误判一 · 把“没人管”读成“没人在乎”</b>。房东追踪常常查出一个尴尬的结果：原来的承担者是被一次合理的效率改进顺手取消的，没有人是恶意的，甚至当初做决定的人也是出于好意。这时候很容易滑向愤怒，而愤怒会让第二节的事项带上人，第三节必堵。<b>纠法</b>：在写迁徙链时强制加一栏“当年取消它的理由”，并且要求那个理由必须写得让人觉得合理。写不出合理的理由，说明还没查清楚。</p>
+<p><b>误判二 · 把“通道通了”读成“问题解决了”</b>。断点前移之后，会有一段时间感觉良好，然后发现具体的困扰并没有少多少。这是正常的：通道只是把事情送到了能改的地方，改不改、改多少是另一回事。<b>纠法</b>：从一开始就把成功定义为“断点前移”，而不是“困扰减少”。定义写在第一页，事后不许改。</p>
+<p><b>误判三 · 把个人侧的好转当成条件侧的进展</b>。做了一段时间之后，自己状态好了不少，于是觉得那件事似乎也没那么严重了。这是这套框架最隐蔽的失效方式——<b>你自己装上了净水器，于是不再提那根管子</b>。母文描述的整个迁徙，在个人尺度上就是这么发生的。<b>纠法</b>：把两侧的记录物理分开，各记各的；每季度对照一次，如果条件侧连续两季无任何条目，无论个人状态多好，都要重做一次通道体检。</p>
+<p>这三种误判有一个共同点：它们都发生在事情看起来在变好的时候。<b>这套工序真正需要纪律的地方，不是难受的时候，是刚刚好起来的时候。</b></p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/hu-min/host-migration/">《向内求的宿主：冲突化解功能的资本迁徙与自我关怀的兴起》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/hu-min/host-migration/explain.html">🌱 白话解释文《小区的公共水管拆了，于是每家买了一台净水器》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/hu-min/host-migration/">回母文</a> ·
+  <a href="/students/hu-min/works/">胡敏 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

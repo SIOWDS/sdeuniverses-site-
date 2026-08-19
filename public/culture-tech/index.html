@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中华文化与科技创新 · Chinese Culture &amp; Tech Innovation | SDE Universes</title>
+<meta name="description" content="李约瑟之问是发现学式的追问；发生学问的是另一件事——道·儒·佛·汉语这套文明配置里，什么在助产创新，什么在锁死创新。传统不是包袱，是一座尚未被正确开采的发生学富矿。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#9D2933;--accent2:#B8434F}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:66vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#9D293314 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#9D29330d 1px,transparent 1px),linear-gradient(90deg,#9D29330d 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.4rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.3rem,6.4vw,4.4rem);font-weight:700;line-height:1.12;color:var(--text)}
+.title .en-only{color:var(--accent)}
+.sub{position:relative;font-size:clamp(1.05rem,2.3vw,1.35rem);color:var(--text2);max-width:680px;margin:1.6rem auto 2rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.5rem 0}
+.lead{font-size:1.12rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.block{margin:0 0 3.4rem;scroll-margin-top:6.5rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.32rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.98rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(157,41,51,.10)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
+.art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.55rem;font-size:0.82rem;color:var(--accent);letter-spacing:0.05em}
+.art.feature{grid-column:1 / -1;border-left-width:4px;background:linear-gradient(180deg,var(--card),var(--card2))}
+.art.feature h4{font-size:1.22rem}
+.tailnote{margin-top:1rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.5rem 1.4rem}
+.tailnote p{color:var(--text2);font-size:0.96rem}.tailnote b{color:var(--accent)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav-bar-sub{display:flex;align-items:center;justify-content:space-around;width:100%;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.05rem;font-weight:700;letter-spacing:0.13em;white-space:nowrap;transition:color .2s,opacity .2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
+.nav-bar-sub a[href="#needham"]{color:#9D2933}
+.nav-bar-sub a[href="#rufodao"]{color:#A0651F}
+.nav-bar-sub a[href="#language"]{color:#2C5F8A}
+.nav-bar-sub a[href="#shuli"]{color:#4A6741}
+.nav-bar-sub a[href="#tcm"]{color:#7A6A2E}
+.nav-bar-sub a[href="#ai-renewal"]{color:#5A3A7A}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-bar-sub a{font-size:0.92rem}
+  .block{scroll-margin-top:5.5rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .art-grid{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
+}
+
+/* ── 论文抄袭专栏：燃烧警示（sib 导航沿用全站样式） ── */
+@keyframes plg-burn{
+  0%{background-position:50% 100%}
+  100%{background-position:50% 0%}
+}
+@keyframes plg-flicker{
+  0%,100%{filter:drop-shadow(0 0 1px rgba(198,40,40,.40)) drop-shadow(0 1px 5px rgba(217,58,30,.22))}
+  28%{filter:drop-shadow(0 0 2px rgba(226,59,59,.72)) drop-shadow(0 1px 9px rgba(232,80,30,.40))}
+  46%{filter:drop-shadow(0 0 1px rgba(163,46,78,.50)) drop-shadow(0 1px 4px rgba(217,58,30,.18))}
+  63%{filter:drop-shadow(0 0 3px rgba(226,59,59,.80)) drop-shadow(0 2px 12px rgba(245,124,31,.42))}
+  81%{filter:drop-shadow(0 0 1px rgba(198,40,40,.45)) drop-shadow(0 1px 6px rgba(232,80,30,.24))}
+}
+.burn{
+  background-image:linear-gradient(0deg,
+    #4A0810 0%, #5E0A16 14%, #8C1F33 30%, #A32E4E 46%,
+    #B92B36 62%, #C62828 76%, #A32E4E 90%, #5E0A16 100%);
+  background-size:100% 340%;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  animation:plg-burn 3.6s linear infinite, plg-flicker 1.7s ease-in-out infinite;
+  font-weight:800;
+}
+@media(prefers-reduced-motion:reduce){
+  .burn{animation:none;background-image:none;color:#A32E4E;-webkit-text-fill-color:#A32E4E}
+}
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .burn{color:#A32E4E;-webkit-text-fill-color:#A32E4E;background-image:none;animation:plg-flicker 1.7s ease-in-out infinite}
+}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/" class="zh-only">首页</a><a href="/browse/" class="en-only">Home</a>
+    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
+    <a href="/health/" class="sib zh-only">健康专栏</a><a href="/health/" class="sib en-only">Health</a>
+    <a href="/business/" class="sib zh-only">商业与经济</a><a href="/business/" class="sib en-only">Business &amp; Economics</a>
+    <a href="/plagiarism/" class="sib zh-only burn">论文抄袭专栏</a><a href="/plagiarism/" class="sib en-only burn">Plagiarism</a>
+    <a href="/discovery-vs-genesis/" class="sib zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="sib en-only">Discovery vs Genesis</a>
+    <a href="/ai/" class="sib zh-only">AI专栏</a><a href="/ai/" class="sib en-only">AI</a>
+    <a href="/culture-tech/" class="sib here zh-only">中华文化与科技创新</a><a href="/culture-tech/" class="sib here en-only">Chinese Culture &amp; Tech</a>
+    <a href="/philosophy/" class="sib zh-only">思想宇宙</a><a href="/philosophy/" class="sib en-only">Philosophy</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+  <div class="nav-bar-sub">
+    <a href="#needham" class="zh-only">李约瑟之问与答</a><a href="#needham" class="en-only">Needham Q&amp;A</a>
+    <a href="#rufodao" class="zh-only">儒佛道与科学技术</a><a href="#rufodao" class="en-only">Ru · Fo · Dao &amp; Science</a>
+    <a href="#language" class="zh-only">汉语汉字与科学思维</a><a href="#language" class="en-only">Language &amp; Scientific Mind</a>
+    <a href="#shuli" class="zh-only">数理技艺与天工传统</a><a href="#shuli" class="en-only">Maths · Craft · Tiangong</a>
+    <a href="#tcm" class="zh-only">中医与生命科学</a><a href="#tcm" class="en-only">TCM &amp; Life Science</a>
+    <a href="#ai-renewal" class="zh-only">AI时代的中华文明再创新</a><a href="#ai-renewal" class="en-only">AI-era Renewal</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow zh-only">SDE 学科专栏</div><div class="eyebrow en-only">SDE SUBJECT COLUMN</div>
+  <h1 class="title"><span class="zh-only">中华文化与科技创新</span><span class="en-only">Chinese Culture &amp; Tech Innovation</span></h1>
+  <p class="sub zh-only">传统不是创新的包袱，是一座尚未被正确开采的发生学富矿——前提是把它当发生读，不当教条供。</p><p class="sub en-only">Tradition is not a burden on innovation — it is an unexcavated mine of genesis-wisdom, if read as occurrence rather than dogma.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">长文合辑 · 28 篇 / 6 子栏目 · 持续增补</span><span class="en-only">Essay Collection · 28 pieces / 6 sub-columns</span></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="lead zh-only">李约瑟问：近代科学为什么没有在中国发生？这个问题问了快一百年，答案大多是发现学式的清点——缺逻辑、缺实验、缺制度。这个专栏换一个问法：创新本来是如何发生的？道、儒、佛、汉语这套文明配置里，什么在助产新东西的诞生，什么在把它锁死？把传统当发生读，它就不再是需要被现代化甩掉的旧物，而是一套还在运行、可以被重新接通的发生装置。</p>
+    <p class="lead en-only">Needham asked: why did modern science not arise in China? For a century the answers have been discovery-style inventories — missing logic, missing experiment, missing institutions. This column asks differently: how does innovation occur in the first place? Within the configuration of Dao, Confucianism, Buddhism and the Chinese language, what midwifes the new, and what locks it down? Read as occurrence, the tradition stops being baggage and becomes a genesis-engine still running, waiting to be reconnected.</p>
+
+    <div class="block" id="needham">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">壹</span><span class="en-only">I</span></span>
+        <span class="block-title"><span class="zh-only">李约瑟之问与答</span><span class="en-only">The Needham Question &amp; Answers</span></span>
+      </div>
+      <p class="block-desc zh-only">为什么近代科学没有在中国发生？——不给第十七种"缺零件"答案，给十六种发生学的回答，每篇附证伪条件。</p><p class="block-desc en-only">Why did modern science not arise in China? Not a 13th "missing parts" answer — sixteen genesis-style answers, each ending with its own falsification clause.</p>
+      <div class="art-grid">
+        <a class="art feature" href="/culture-tech/needham/">
+          <span class="k"><span class="zh-only">子栏目 · 十六篇 · 五组切口 · 三种读法</span><span class="en-only">Sub-column · 16 essays · 5 groups · 3 reading modes</span></span>
+          <h4><span class="zh-only">十六篇合辑：从解剖提问本身，到中国之路的发生机制，到制度对身体与知域的配置，到欧洲对照，终于收官四答</span><span class="en-only">The full set: dissecting the question itself, the genesis of China's path, how institutions configure bodies and domains of knowing, and the European counterpoint</span></h4>
+          <p class="zh-only">十六个切口切进同一个八十年不死的问题——合起来读，不是十六个答案，而是一张问题的解剖图。</p><p class="en-only">Twelve incisions into one eighty-year-old question — read together, not twelve answers but one anatomy of the question.</p>
+          <span class="rd"><span class="zh-only">进入子栏目 · 全部十六篇 →</span><span class="en-only">Enter the sub-column →</span></span>
+        </a>
+        <a class="art" href="/culture-tech/needham/body-skill-domestication/">
+          <span class="k"><span class="zh-only">精选 · 约2.4万字</span><span class="en-only">Featured · ~24k chars</span></span>
+          <h4><span class="zh-only">身器驯置：认知路径的制度性生成</span><span class="en-only">Domesticating the Body-Skill</span></h4>
+          <p class="zh-only">制度锁死文明的最深处，不在塑造"信什么"，而在垄断"会什么"——一部身体技能的制度配置史。</p><p class="en-only">The deepest lock is not on what people believe, but on what their bodies are equipped to do.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/culture-tech/needham/knowing-domain-narrowing/">
+          <span class="k"><span class="zh-only">精选 · 约3.1万字</span><span class="en-only">Featured · ~31k chars</span></span>
+          <h4><span class="zh-only">知域收窄：科举如何重塑"什么值得知道"的边界</span><span class="en-only">The Narrowing Domain of the Worth-Knowing</span></h4>
+          <p class="zh-only">科举不是堵死通往自然的路，而是在千年尺度上，把那条路从读书人"值得知道"的认知地图上渐次抹去。</p><p class="en-only">The exam system did not block the road to nature — it erased that road from the cognitive map.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/culture-tech/needham/argument-circulation/">
+          <span class="k"><span class="zh-only">精选 · 约2.0万字</span><span class="en-only">Featured · ~20k chars</span></span>
+          <h4><span class="zh-only">论证环流：一个学术问题生命力的再生产机制</span><span class="en-only">The Circulation of Argument</span></h4>
+          <p class="zh-only">一个预设被反复证伪的提问为何还活着？说法与数据在同一学术体制内互证互哺。</p><p class="en-only">Why does a question outlive the demolition of its premises? Claim and data feed each other inside one institution.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/culture-tech/needham/functional-entanglement/">
+          <span class="k"><span class="zh-only">精选 · 约2.8万字</span><span class="en-only">Featured · ~28k chars</span></span>
+          <h4><span class="zh-only">科学何以存续？——论认知体系的功能性缠结</span><span class="en-only">Why Does Science Persist?</span></h4>
+          <p class="zh-only">把问题反过来：现代科学为什么没有崩解？存续韧性来自它与社会身体的历史性缠结。</p><p class="en-only">Flip the question: why has modern science never collapsed? Its resilience lies in historical entanglement with the social body.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/culture-tech/needham/perfection-paradox/">
+          <span class="k"><span class="zh-only">收官 · 之十六 · 约1.1万字</span><span class="en-only">Finale · XVI · ~11k chars</span></span>
+          <h4><span class="zh-only">圆满悖论：李约瑟之问的发生学重构</span><span class="en-only">The Perfection Paradox</span></h4>
+          <p class="zh-only">文明越圆满，越难从内部催生革命——科学的种子萌发于意义的裂痕。王德生 与 Claude 著。</p><p class="en-only">The more complete a civilization's meaning-framework, the less it can revolt from within.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block" id="rufodao">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">贰</span><span class="en-only">II</span></span>
+        <span class="block-title"><span class="zh-only">儒佛道与科学技术</span><span class="en-only">Ru · Fo · Dao &amp; Science</span></span>
+      </div>
+      <p class="block-desc zh-only">不问古人"说了什么真理"，问古人"照见了什么发生"——道、儒、佛与现代科学的交锋与接线。</p><p class="block-desc en-only">Not "what truths did the ancients state", but "what occurrences did they witness" — Dao, Confucius and Buddha in clash and connection with modern science.</p>
+      <div class="art-grid">
+<a class="art feature" href="/column/buddha-and-science/">
+          <span class="k"><span class="zh-only">王博士与SDE 专栏 · 交锋之作</span><span class="en-only">Dr. Wang &amp; SDE Column · The Clash Piece</span></span>
+          <h4><span class="zh-only">同一个空，两个方向——佛陀的破、科学的造，与一张两千年没人有的时刻表</span><span class="en-only">One Emptiness, Two Directions — Buddha's Un-making, Science's Making</span></h4>
+          <p class="zh-only">佛法与科学从同一个起点走向相反方向：分歧的根不在信不信，在退出维持还是投入维持。而发生学不折中，站在更高的循环上——造与破，是同一首曲子的两个节拍。</p><p class="en-only">Buddhism and science set out from the same emptiness in opposite directions. The genesis view does not split the difference — making and un-making are two beats of one score.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+<a class="art" href="/column/what-is-dao/">
+          <span class="k"><span class="zh-only">王博士与SDE 专栏 · 约万字</span><span class="en-only">Dr. Wang &amp; SDE Column · ~10k chars</span></span>
+          <h4><span class="zh-only">老子的道，为何物？</span><span class="en-only">What Is Laozi's Dao?</span></h4>
+          <p class="zh-only">两千五百年来最难回答的一问。发生学给出的答案：道不是一个最高的东西，而是显露、差异、纠缠的联立发生本身。</p><p class="en-only">The hardest question of 2,500 years. The genesis answer: Dao is not a highest thing, but the joint occurrence of show, difference and entanglement itself.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+<a class="art" href="/column/fuzi-yi-yiguanzhi/">
+          <span class="k"><span class="zh-only">今日长文 · 约两万字</span><span class="en-only">Long Read · ~20k chars</span></span>
+          <h4><span class="zh-only">夫子之道：一以贯之</span><span class="en-only">The Master's Way: One Thread Through All</span></h4>
+          <p class="zh-only">孔子亲口说"吾道一以贯之"，却没有正面说出那个"一"是什么。两万字沿《中庸》《论语》《大学》三条线，追问这道两千年的空白。</p><p class="en-only">Confucius said his way was threaded by One — yet never named it. Twenty thousand characters trace this two-millennia blank through the Zhongyong, the Analects and the Daxue.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+<a class="art" href="/column/buddhism-sde-intro/">
+          <span class="k"><span class="zh-only">王博士与SDE 专栏 · 约万字</span><span class="en-only">Dr. Wang &amp; SDE Column · ~10k chars</span></span>
+          <h4><span class="zh-only">佛法的SDE智慧入门：照见世界如何发生</span><span class="en-only">A Genesis Primer on Buddhist Wisdom</span></h4>
+          <p class="zh-only">缘起性空与 S=F(D,E) 的相遇，三法印的发生学重译，无明的真身——以及一个佛法没走到的地方：空之后不是归零，而是重组。</p><p class="en-only">Dependent origination meets S=F(D,E); the Three Marks re-translated — and one place Buddhism did not go: after emptiness comes not zero, but recomposition.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+<a class="art" href="/column/discovery-vs-genesis-four-masters/">
+          <span class="k"><span class="zh-only">今日长文 · 约四万字</span><span class="en-only">Long Read · ~41k chars</span></span>
+          <h4><span class="zh-only">发现还是发生？看人类几位思想大师：耶稣·孔子·老子·佛陀</span><span class="en-only">Discovery or Genesis? Four Masters Measured</span></h4>
+          <p class="zh-only">用"发现还是发生"一把尺重新丈量四位大师——他们恰恰都在反对"发现"图景：最要紧的东西不是被发现的，是发生的。</p><p class="en-only">One ruler — discovery or genesis — laid across four masters, who all resisted the discovery picture: what matters most is not found, it occurs.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block" id="language">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">叁</span><span class="en-only">III</span></span>
+        <span class="block-title"><span class="zh-only">汉语汉字与科学思维</span><span class="en-only">Language, Script &amp; the Scientific Mind</span></span>
+      </div>
+      <p class="block-desc zh-only">语法不是冰冷的规则，是文明的气质——一门语言怎样呼吸，决定它的使用者怎样让新东西成形。</p><p class="block-desc en-only">Grammar is not cold rules but a civilization's temperament — how a language breathes shapes how its speakers bring the new into form.</p>
+      <div class="art-grid">
+<a class="art" href="/column/subject-verb-object-kills-chinese/">
+          <span class="k"><span class="zh-only">据《语言发生学》</span><span class="en-only">From The Genesis of Language</span></span>
+          <h4><span class="zh-only">主谓宾，切死了中文</span><span class="en-only">Subject-Verb-Object Cuts Chinese Dead</span></h4>
+          <p class="zh-only">西方语言以特征律重逻辑界定，东方语言以幸福律求圆融含蓄。用西方的主谓宾去切中文，切掉的正是中文的呼吸——也切掉了另一种让新东西成形的语法。</p><p class="en-only">Cutting Chinese with Western subject-verb-object severs precisely its breath — and with it, another grammar for bringing the new into being.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+<a class="art" href="/column/language-is-the-breath-of-the-world/">
+          <span class="k"><span class="zh-only">据《语言发生学》</span><span class="en-only">From The Genesis of Language</span></span>
+          <h4><span class="zh-only">语言是世界的呼吸</span><span class="en-only">Language Is the Breath of the World</span></h4>
+          <p class="zh-only">从"语言是什么"到"语言如何不断成为"——语言不是描述世界的镜子，而是世界自我显影的机制。每一次发声，都是存在的一次再生。</p><p class="en-only">From "what is language" to "how language keeps becoming" — not a mirror describing the world, but the world's own mechanism of showing forth.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block" id="shuli">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">肆</span><span class="en-only">IV</span></span>
+        <span class="block-title"><span class="zh-only">数理技艺与天工传统</span><span class="en-only">Maths, Craft &amp; the Tiangong Tradition</span></span>
+      </div>
+      <p class="block-desc zh-only">刘徽割圆、秦九韶大衍、朱载堉十二平均律、《天工开物》的工艺谱系——中国的数理与技艺传统里，藏着一部尚未被正确开采的创新发生史。本子栏目在铸，长文陆续汇入。</p><p class="block-desc en-only">Liu Hui's circle-cutting, Qin Jiushao's algebra, Zhu Zaiyu's equal temperament, the craft lineages of Tiangong Kaiwu — an unexcavated genesis-history of innovation. This sub-column is being forged; essays incoming.</p>
+    </div>
+
+    <div class="block" id="tcm">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">伍</span><span class="en-only">V</span></span>
+        <span class="block-title"><span class="zh-only">中医与生命科学</span><span class="en-only">TCM &amp; Life Science</span></span>
+      </div>
+      <p class="block-desc zh-only">中医不是前科学的经验残余，也不是玄学——把它当发生学读，藏经络、气、证候里的，是一套关于身体如何自持、如何失序、如何回到有序的古典发生模型，正与现代生命科学在炎症、菌群、身心轴上相互照亮。</p><p class="block-desc en-only">Chinese medicine is neither pre-scientific residue nor mysticism — read as genesis, its meridians, qi and syndromes encode a classical model of how the body self-sustains, falls into disorder, and returns to order, now illuminating and illuminated by inflammation, microbiome and mind-body research.</p>
+      <div class="art-grid">
+        <a class="art feature" href="/column/health-is-not-slogans/">
+          <span class="k"><span class="zh-only">王博士与SDE 专栏 · 三大文明对照</span><span class="en-only">Dr. Wang &amp; SDE · Three Civilizations</span></span>
+          <h4><span class="zh-only">健康，不是那些口号——三大文明的三场幻觉</span><span class="en-only">Health Is Not Those Slogans — Three Civilizations' Three Illusions</span></h4>
+          <p class="zh-only">西方说健康是良好习惯，中华说吃得健康就是健康，印度说心态好一切都好。三句貌似天经地义的话，其实是三场幻觉——真正的健康，是差异在三种逻辑上的自由运行。</p><p class="en-only">The West says health is good habits, China says eating well is health, India says a calm mind cures all. Three self-evident sayings, three illusions — real health is difference running free across all three logics.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/chronic-inflammation/">
+          <span class="k"><span class="zh-only">健康 · 发生学重读</span><span class="en-only">Health · Re-read as Genesis</span></span>
+          <h4><span class="zh-only">慢性炎症：身体为什么向自己开火？</span><span class="en-only">Chronic Inflammation: Why the Body Fires on Itself</span></h4>
+          <p class="zh-only">炎症本是身体最忠诚的卫兵，红肿热痛是它在灭火救灾。当救火队从"来了就走"变成"常驻不撤"，它就从救你的力量变成慢慢磨损你的力量——中医"郁而化热"的古观察，在此与现代免疫学对上了话。</p><p class="en-only">Inflammation is the body's most loyal guard — but when the fire brigade never leaves, it turns from what saves you into what wears you down.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/gut-brain/">
+          <span class="k"><span class="zh-only">健康 · 发生学重读</span><span class="en-only">Health · Re-read as Genesis</span></span>
+          <h4><span class="zh-only">肠道与情绪：第二个大脑在替你做决定？</span><span class="en-only">Gut &amp; Mood: Is a Second Brain Deciding for You?</span></h4>
+          <p class="zh-only">我们以为"我"住在大脑里，是纯粹的精神主体。可肚子里那片看不见的生态，却在持续影响你的情绪、食欲甚至选择——中医"脾胃为后天之本"的老话，藏着一条被现代菌群研究重新点亮的身心轴。</p><p class="en-only">We think the "self" lives in the brain — yet the unseen ecology in the gut steers mood, appetite, even choice.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block" id="ai-renewal">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">陆</span><span class="en-only">VI</span></span>
+        <span class="block-title"><span class="zh-only">AI时代的中华文明再创新</span><span class="en-only">Renewing Chinese Civilization in the AI Era</span></span>
+      </div>
+      <p class="block-desc zh-only">大模型把人类全部公开文本吃进了权重，可它默认只会"发现"——检索、复述、组合已有。而中华文明最深的那口气，恰恰是"发生"：让新东西从裂缝里长出来。把发生学接进 AI，传统就不是被现代性甩掉的旧物，而是给这一代智能补上"如何创新"的活引擎。</p><p class="block-desc en-only">Large models have swallowed all public text into their weights, yet by default they only "discover" — retrieve, restate, recombine. The deepest breath of Chinese civilization is "genesis": letting the new grow from the cracks. Wired into AI, the tradition becomes the missing engine of creation for this generation of intelligence.</p>
+      <div class="art-grid">
+        <a class="art feature" href="/column/sde-agent-second-revolution/">
+          <span class="k"><span class="zh-only">王博士与SDE 专栏 · AI导论</span><span class="en-only">Dr. Wang &amp; SDE · On AI</span></span>
+          <h4><span class="zh-only">AI 的第二次革命：从语言模型到发生世界模型</span><span class="en-only">AI's Second Revolution: From Language Models to Genesis-World Models</span></h4>
+          <p class="zh-only">第一次革命让机器学会了说人话，第二次革命要让它学会"发生"——不是更快地复述已知，而是从矛盾的裂缝里逼出未知。这一步的引擎，来自一套发端于中华文明"生"而非"造"的发生学。</p><p class="en-only">The first revolution taught machines to speak; the second must teach them to originate — forcing the unknown out of contradictions, powered by a genesis rooted in Chinese "birthing" rather than "making".</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/taste/idea-generator/">
+          <span class="k"><span class="zh-only">在线工具 · 免费品尝</span><span class="en-only">Live Tool · Free</span></span>
+          <h4><span class="zh-only">SDE 金点子发生器</span><span class="en-only">The Idea Generator</span></h4>
+          <p class="zh-only">同一个问题，九个方向轮番追问，逼出常识背后的承重接缝——本栏十二篇李约瑟长文，就是它的产出。传统发生学如何驱动 AI 创新，点开就懂。</p><p class="en-only">One question, nine directions of relentless inquiry — the very engine behind this column's twelve Needham essays. See how a classical genesis drives AI creation.</p>
+          <span class="rd"><span class="zh-only">打开工具 →</span><span class="en-only">Open →</span></span>
+        </a>
+        <a class="art" href="/taste/zhiwen/">
+          <span class="k"><span class="zh-only">在线工具 · 免费品尝</span><span class="en-only">Live Tool · Free</span></span>
+          <h4><span class="zh-only">中华智问 · 知识发生器</span><span class="en-only">Zhiwen Knowledge Generator</span></h4>
+          <p class="zh-only">把一个学科的成见拆到承重接缝，再从裂缝里长出新判断——中华文明的"生"接进大模型，让 AI 不只答已知，而是生未知。</p><p class="en-only">Take a discipline's assumptions apart at the load-bearing seams, then grow new judgments from the cracks — Chinese "genesis" wired into a large model.</p>
+          <span class="rd"><span class="zh-only">打开工具 →</span><span class="en-only">Open →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="tailnote">
+      <p class="zh-only">长文持续增补中——李约瑟之问与答子栏目已收十二篇；更多关于中华文化如何接通科技创新的长文将陆续汇入：从易、墨、禅与工程思维的重新接线，到数理技艺与天工传统的发生学重读。</p>
+      <p class="en-only">The collection keeps growing — more essays on rewiring Chinese culture into technological innovation will gather here.</p>
+      <div class="crosslinks" style="display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem">
+        <a href="/browse/" class="zh-only" style="text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);background:var(--card)">← 返回首页</a><a href="/browse/" class="en-only" style="text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);background:var(--card)">← Back home</a>
+        <a href="/ai/" class="zh-only" style="text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);background:var(--card)">AI专栏：科技这一端的追问</a><a href="/ai/" class="en-only" style="text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);background:var(--card)">AI Column</a>
+        <a href="/discovery-vs-genesis/" class="zh-only" style="text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);background:var(--card)">发现VS发生：方法论对照实验</a><a href="/discovery-vs-genesis/" class="en-only" style="text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);background:var(--card)">Discovery vs Genesis</a>
+        <a href="/taste/idea-generator/" class="zh-only" style="text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);background:var(--card)">🔥 SDE金点子发生器免费品尝</a><a href="/taste/idea-generator/" class="en-only" style="text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);background:var(--card)">🔥 Free SDE Idea Generator</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer style="border-top:1px solid var(--border2);margin-top:4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em">
+  <div class="zh-only">SDE Universes · 显露 · 差异 · 纠缠 &nbsp;|&nbsp; 德麦国际 · 王德生 &nbsp;|&nbsp; <a href="/browse/" style="color:var(--gold);text-decoration:none">sdeuniverses.com</a></div>
+  <div class="en-only">SDE Universes · Show · Difference · Entanglement &nbsp;|&nbsp; Demai International · Desheng Wang &nbsp;|&nbsp; <a href="/browse/" style="color:var(--gold);text-decoration:none">sdeuniverses.com</a></div>
+</footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en')));
+  document.documentElement.lang=lang;
+}
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

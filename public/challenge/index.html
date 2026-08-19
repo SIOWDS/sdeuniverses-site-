@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="sde-page-kind" content="channel">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>每日思想挑战 · SDE Universes</title>
+<meta name="description" content="一天一道，十五分钟。题目从站内 168 张占位者卡与三类问题骨架里按日期取出——同一天，所有人拿到的是同一道题。写完才看得到参考读数。">
+<style>
+:root{--bg:#0F0D0A;--pa:#EFE9DD;--dim:#B9AE99;--faint:#7C7466;--ac:#C9A227;--ac2:#8FB3A0;--warn:#B4543C;--line:#2A2521;--card:#161310}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--pa);font-family:"Noto Serif CJK SC","Songti SC",Georgia,serif;line-height:1.85}
+a{color:var(--ac);text-decoration:none}
+a:hover{text-decoration:underline}
+.w{max-width:860px;margin:0 auto;padding:0 22px}
+header{border-bottom:1px solid var(--line);padding:14px 0;font-size:13px;color:var(--dim)}
+header .w{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hero{padding:52px 0 26px;border-bottom:1px solid var(--line)}
+.en{font-size:11px;letter-spacing:.22em;color:var(--faint);text-transform:uppercase}
+h1{font-size:34px;margin:12px 0 6px;letter-spacing:.04em}
+.sub{color:var(--dim);font-size:15px;max-width:54em}
+.stats{display:flex;gap:30px;flex-wrap:wrap;margin:24px 0 2px}
+.stat b{display:block;font-size:24px;color:var(--ac)}
+.stat span{font-size:12px;color:var(--faint);letter-spacing:.1em}
+.rules{margin:24px 0 0;padding:15px 18px;background:var(--card);border-left:2px solid var(--ac)}
+.rules p{margin:0 0 8px;font-size:13.8px;color:var(--dim)}
+.rules p:last-child{margin:0}
+.rules b{color:var(--pa)}
+main{padding:34px 0 60px}
+.kind{font-size:11.5px;letter-spacing:.16em;color:var(--ac2);border:1px solid var(--line);padding:2px 10px;border-radius:2px;display:inline-block}
+.date{font-size:12.5px;color:var(--faint);margin-left:10px;letter-spacing:.08em}
+.qbox{margin:18px 0 0;padding:22px 22px 20px;background:var(--card);border-left:3px solid var(--ac)}
+.qask{font-size:15px;color:var(--dim);margin:0 0 14px}
+.qmat{font-size:18px;line-height:1.8;color:var(--pa);margin:0 0 12px}
+.qnote{font-size:13.5px;color:var(--faint);margin:10px 0 0}
+textarea{width:100%;min-height:130px;background:#100E0B;color:var(--pa);border:1px solid var(--line);border-radius:4px;padding:12px 14px;font:inherit;font-size:15px;line-height:1.75;resize:vertical;margin-top:16px}
+textarea:focus{outline:none;border-color:var(--ac)}
+.row{display:flex;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap}
+button{background:var(--ac);color:#17130A;border:0;border-radius:3px;padding:9px 20px;font:inherit;font-size:14px;cursor:pointer;letter-spacing:.06em}
+button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line)}
+button:hover{opacity:.88}
+.hint{font-size:12.5px;color:var(--faint)}
+.self{margin:20px 0 0;padding:14px 16px;background:#131612;border-left:2px solid var(--ac2);font-size:14px;color:var(--dim);display:none}
+.self b{color:var(--pa)}
+.self ul{margin:8px 0 0;padding-left:20px}
+.self li{margin:4px 0}
+.ans{margin:16px 0 0;padding:16px 18px;background:var(--card);border-left:2px solid var(--warn);font-size:14.5px;color:var(--dim);display:none}
+.ans b{color:var(--pa)}
+.ans .src{font-size:13.5px;color:var(--ac2);margin-top:8px}
+.ans .sep{margin:10px 0 0;padding-left:16px;border-left:1px solid var(--line)}
+.gate{margin:14px 0 0;font-size:13.5px;color:var(--faint)}
+.done{margin:18px 0 0;padding:12px 16px;background:#12160F;border-left:2px solid var(--ac2);font-size:14px;color:var(--dim);display:none}
+.foot{border-top:1px solid var(--line);padding:26px 0 60px;font-size:13px;color:var(--faint)}
+.foot a{color:var(--dim)}
+.arc{margin:36px 0 0;border-top:1px solid var(--line);padding-top:20px}
+.arc h3{font-size:14px;letter-spacing:.14em;color:var(--faint);margin:0 0 12px;font-weight:normal}
+.arow{font-size:13.5px;color:var(--dim);padding:7px 0;border-bottom:1px solid #1C1815}
+.arow .d{color:var(--ac2);margin-right:12px;letter-spacing:.06em}
+@media(max-width:560px){h1{font-size:27px}.qmat{font-size:16.5px}}
+</style>
+</head>
+<body>
+
+<header><div class="w">
+  <span><a href="/browse/">← 爱思乐园</a></span>
+  <span><a href="/training/">30天健脑训练</a> · <a href="/growth-tree/">思想成长树</a> · <a href="/nbr/">近邻库</a></span>
+</div></header>
+
+<div class="w hero">
+  <div class="en">Daily Thinking Challenge</div>
+  <h1>每日思想挑战</h1>
+  <p class="sub">一天一道，十五到二十分钟。题目不是从题库里随机抽的，是**从站内真实材料里按日期取出**的——同一天，所有人拿到的是同一道题，所以它可以被拿去讨论。<b style="color:var(--pa)">写完才看得到参考读数</b>：先看答案的那一遍不算练。</p>
+  <div class="stats">
+    <div class="stat"><b id="s-streak">—</b><span>连续天数</span></div>
+    <div class="stat"><b id="s-total">—</b><span>累计答过</span></div>
+    <div class="stat"><b id="s-props">—</b><span>写出的命题</span></div>
+    <div class="stat"><b id="s-bank">168</b><span>占位者卡</span></div>
+  </div>
+  <div class="rules">
+    <p><b>参考读数不是标准答案。</b>它是这块地上已经有人立过的说法。你写的和它不一样，可能是错，也可能正是剩余——判据是你那条能不能被推翻，不是它像不像。</p>
+    <p><b>做不出来就写「做不出来，卡在哪一步」。</b>这比硬凑一个像模像样的答案有用得多，也是站内产线对每一道工序的同一条要求。</p>
+    <p><b>你写的东西只存在这台浏览器里</b>，一个字节都不上传。要带走或清除，见页底。</p>
+  </div>
+</div>
+
+<main class="w">
+  <div id="head"><span class="kind" id="k-name">载入中…</span><span class="date" id="k-date"></span></div>
+
+  <div class="qbox">
+    <p class="qask" id="q-ask">正在从近邻库取今天的材料…</p>
+    <p class="qmat" id="q-mat"></p>
+    <p class="qnote" id="q-note"></p>
+    <textarea id="ans" placeholder="写在这里。写不出来就写『卡在哪一步』——那也是一条读数。"></textarea>
+    <div class="row">
+      <button id="btn-submit">交卷，看参考读数</button>
+      <button class="ghost" id="btn-cand">⟡ 把它立成候选卡</button>
+      <span class="hint" id="hint">至少写 15 个字才交得了卷。</span>
+    </div>
+    <div class="self" id="self"></div>
+    <div class="ans" id="ansbox"></div>
+    <div class="gate" id="gate"></div>
+    <div class="done" id="donebox"></div>
+  </div>
+
+  <div class="arc" id="arc" style="display:none">
+    <h3>你答过的</h3>
+    <div id="arclist"></div>
+  </div>
+</main>
+
+<div class="w foot">
+  <p>数据全部在本机 <code>localStorage</code>。<a href="#" id="ex">导出为 JSON</a> · <a href="#" id="cl">清除全部记录</a></p>
+  <p style="margin-top:10px">题源：<a href="/nbr/">近邻库</a>（168 张占位者卡）与站内三类问题骨架。三件一套：<a href="/challenge/">每日思想挑战</a> · <a href="/training/">30天健脑训练</a> · <a href="/growth-tree/">思想成长树</a>。</p>
+</div>
+
+<script src="/assets/sde-growth.js"></script>
+<script src="/taste/assets/sde-cand.js?v=20260817c"></script>
+<script>
+(function () {
+  "use strict";
+  var G = window.SDEGrowth;
+  var el = function (id) { return document.getElementById(id); };
+
+  /* ══ 五类题 ══════════════════════════════════════════
+     甲 sep    给一张占位者卡的承重命题，要你划一条分离线
+     乙 who    给一条别名式说法，要你指认是谁先说的（近邻检索的手动版）
+     丙 grid   给一个含混问题，要你判类并定位到九格/六路径/三动力
+     丁 waffle 给一句万能话，要你说清它为什么永远对因而永远没用
+     戊 press  给一段现象，要你压成一句零情态词的承重命题
+     甲乙的材料来自 cards.json（168 张，真材料）；丙丁戊各有一个小题库。 */
+
+  var GRID = [
+    { q: "为什么现在的年轻人都不想上进？", a: "这题的预设有假，该走【问对反思·改切】：「都」不成立（是分布问题，属 S1 对比·变化·分布），「上进」所指已经换了（对比项变了）。先把问题改切成「在什么条件下，什么样的人不再把哪一种上进当成上进」，再答。" },
+    { q: "我们公司的流程该怎么优化？", a: "【怎么办】＝六路径。先问落点：要的是少犯错、还是要能扛住变动、还是要少亏。多数流程嘴上说最小误差、实际在最小亏损（D3），这一格没认清，优化就是把两个目标搅在一起。定了落点再选起点，写出序列。" },
+    { q: "到底是制度问题还是人的问题？", a: "【为什么】＝三条原理构成的链。这个争论永远吵不完，是因为双方各说中了链条上的不同一轮：S×E→D 这一轮里被逼动的是人，D×E→S 那一轮里被逼动的是制度。要给时序读数，指出现在在哪一轮。" },
+    { q: "什么是好的教育？", a: "【是什么】＝九格里的 S3（真·善·美）。先把这一格的具体内容答出来（好在哪个意义上：真——它是不是让人看见了实情；善——它是不是让人担得起后果；美——它是不是让人愿意继续），再点这一格看不见什么。" },
+    { q: "怎么让团队更有创造力？", a: "先判：这是【怎么办】，但问法里已经把创造力当成一个可以被「让」出来的量。六路径里若从 E 出发（E→D→S）就会先问土壤而不是先问人，往往比 D→S→E 的激励设计更接近。写出序列，别只给一条直线。" },
+    { q: "舆情该怎么应对？", a: "【是什么】先行，落 S2（粒子·波·场）。把它看成粒子（几个带头的）、看成波（一轮一轮的传播）、看成场（整个环境的张力）——三种看法给出三套完全不同的应对。没定看法就谈应对，等于三套办法混着上。" },
+    { q: "为什么越努力越焦虑？", a: "这是【为什么】不是【是什么】。要指认问题预设的那条动力（它把「努力有回报」当成了不必问的），再让三条动力各主张自己决定性、各带时序读数，最后交出翻转：回报被回写之后，下一轮先动的换成谁。" },
+    { q: "AI 会不会取代老师？", a: "问法把「取代」当成一个二值。先改切：要问的其实是哪一段功能会被接管、接管之后原来的角色回写成什么。属【为什么】的链，不属【是什么】的判定。给时序读数，别给是非题。" },
+    { q: "怎么提高学习效率？", a: "【怎么办】。但「效率」是 D3 的一格——最小误差、冗余、最小亏损，三者要的方法互相打架。先说清按落点还是按起点在讲，再写序列；只写「加强／重视／完善／优化」就是没想出来。" },
+    { q: "内卷的根源是什么？", a: "「根源」这个词把它问成了【为什么】。三条原理各跑一遍：S×D→E（人和做法把环境挤成这样）、S×E→D（环境和人把做法逼成这样）、D×E→S（做法和环境把人改成这样）。被逼动的那一个改完会回写前两个。" },
+    { q: "这个方案可行吗？", a: "「可行」不含判据就无法结算。先要一句零情态词的判别：在什么条件下、多久之后、能观测到什么，才叫可行。写不出这一句，说明还没有方案，只有意向。" },
+    { q: "我该不该转行？", a: "先判它是【怎么办】。落点有三种（想少犯错／想扛得住变／想少亏），三种落点下同一个选择给出完全不同的答案。定落点之前所有建议都是随机的。" }
+  ];
+
+  var WAFFLE = [
+    { s: "三者相互影响、共同作用。", a: "它永远对，因而永远没用——任何观测都印证它，没有任何观测能推翻它。改法：指出在这一轮里被逼动的是哪一个，另外两个是自变量；下一轮换成谁先动。有了时序，它才开始能错。" },
+    { s: "要加强重视，完善机制，优化流程。", a: "四个动词都没有落点。「加强」到什么程度算加强？没有判据就没有办法，只有把问题重复了一遍。改法：写出序列（先动什么→看到什么再动下一步），并给至少两种失败模式。" },
+    { s: "既要看到成绩，也要看到不足，辩证地看待。", a: "这是温和综合——把张力抹平之后就没有涌现了。它之所以安全，正是因为它不承担任何可被推翻的判断。改法：挑一个具体分歧，给一条方向相反的预测。" },
+    { s: "这需要具体问题具体分析。", a: "它把结算推给了未来的某个人。真话版本是「我现在还判不出来，卡在哪一步」——那是一条读数；这一句不是。" },
+    { s: "关键在于把握好一个度。", a: "「度」在哪儿没说，于是事后无论出什么结果都可以说度没把握好。它是不可证伪的护身符。改法：给出这个度的可观测代理，哪怕是粗的。" },
+    { s: "教育的本质是唤醒。", a: "「本质」＋隐喻＝挡住了追问。唤醒和不唤醒在具体场景里怎么分辨？分辨不出来，这句就只是好听。改法：写成「X 不是 Y₁ 也不是 Y₂ 而是 Z」，并给一句零情态词的判别。" },
+    { s: "科技是一把双刃剑。", a: "双刃剑对一切事物都成立，因此它对科技什么也没说。改法：指出这一刀在什么条件下砍向哪边——条件写不出来，说明还没有判断。" },
+    { s: "要从根本上解决问题。", a: "「根本」没有指认，于是任何未解决都可以归因于没到根本。这是一句自我保护的话。改法：把「根本」换成一条具体的动力链，并说它被改动之后会回写到哪里。" },
+    { s: "这体现了深层次的结构性矛盾。", a: "术语堆叠不构成判断——「深层次」「结构性」都没有增加任何可被检验的内容。改法：删掉所有形容词再念一遍，剩下什么才是你真说的。" },
+    { s: "未来已来，我们要拥抱变化。", a: "无时间戳、无主语、无对照。它在任何年份对任何行业都成立。改法：说出哪一件事在什么时候会变得不一样，且今天就能查到征兆。" },
+    { s: "人工智能将深刻改变各行各业。", a: "「各行各业」把差异全部抹掉了，而差异正是唯一有信息的部分。改法：挑两个行业，说清它们受影响的方式为什么方向相反。" },
+    { s: "这个问题很复杂，涉及方方面面。", a: "它把「我还没想清楚」说成了对象的属性。诚实版本是指出你在哪一步卡住。复杂性是描述，不是解释。" }
+  ];
+
+  var PRESS = [
+    "一个部门年年都做满意度调查，分数年年上升，但离职率也年年上升。",
+    "老师们都说要培养学生的批判性思维，可考试评分标准里没有一格给它留位置。",
+    "一个团队开会时人人都说没意见，散会之后私下里全是意见。",
+    "医院的流程越来越标准，医生反而越来越不敢做非标准的判断。",
+    "健身房的年卡卖得最好，来的人却最少，而且这正是它盈利的方式。",
+    "一份制度写得越细，执行的人越会照着字面做，越不管它原本要防的是什么。",
+    "越是承诺「随时可以退出」的组织，人越留得久。",
+    "一个人越是反复解释自己不在乎，越说明那件事在结算他。",
+    "工具做得越顺手，用它的人越说不清自己刚才做了什么。",
+    "评审意见写得越全面，作者越不知道该改哪一处。",
+    "一个岗位越是谁都能干，越没有人愿意为它的结果负责。",
+    "父母越是替孩子扫清障碍，孩子越是把顺利当作默认，把不顺当作事故。"
+  ];
+
+  var KINDS = [
+    { id: "sep",    name: "甲 · 划一条分离线" },
+    { id: "grid",   name: "丙 · 判题型并定位" },
+    { id: "who",    name: "乙 · 谁已经说过" },
+    { id: "waffle", name: "丁 · 拆一句万能话" },
+    { id: "press",  name: "戊 · 压成一句承重命题" }
+  ];
+
+  var SELF = {
+    sep:    ["你那条分离线，能不能让两边在<b>同一个具体场景</b>里给出<b>方向相反</b>的读数？做不到就还没划开。",
+             "有没有用上「更强调／更深入／视角不同」这类词？用了就等于承认没划开。",
+             "写不出来是允许的——写「他这条我推不开，卡在哪儿」比编一条强。"],
+    who:    ["你想到的那个人，说的是不是<b>同一件事的同一层</b>？只是听起来像不算。",
+             "想不出来就写「想不出来」。<b>库未命中不等于没被占</b>——这是实测出来的，不是客套。"],
+    grid:   ["你先判的是<b>他要拿到的东西是什么形状</b>（要一个东西／一条路／一个驱动），还是只看了疑问词？",
+             "定位到具体哪一格／哪一条路径／哪一条动力了吗？没定位就等于没起手。",
+             "如果判的是「改切」，有没有<b>明说</b>你改了？公开改切 ≠ 静默替换。"],
+    waffle: ["你说清它<b>为什么不可能错</b>了吗？——不是说它空洞，是说没有任何观测能推翻它。",
+             "你给的改法，有没有把它变成一句<b>今天就能查</b>的话？"],
+    press:  ["写成「X 不是 Y₁ 也不是 Y₂ 而是 Z」的形状了吗？只写「X 是 Z」是半句。",
+             "句子里还有<b>情态词</b>吗（应当／有必要／具有重要意义／实质性）？有一个就重写。",
+             "拿到三个不同场景里各跑一遍，答案是不是<b>互不相同</b>？全一样说明它太空。"]
+  };
+
+  var cards = null, cur = null, dateStr = G.today(), locked = false;
+
+  /* ── 出题：日期的纯函数。同一天在任何设备上必须同题 ── */
+  function build(cs) {
+    var h = G.seed(dateStr, "kind");
+    var k = KINDS[h % KINDS.length];
+    var o = { kind: k.id, name: k.name };
+    if (k.id === "sep" || k.id === "who") {
+      var c = cs[G.seed(dateStr, "card") % cs.length];
+      o.card = c;
+      o.ref = c.id;
+      if (k.id === "sep") {
+        o.ask = "下面这块地已经被人占着。<b>你要划出一条分离线</b>——一句能让「他那条」和「你那条」在同一个具体场景里给出方向相反读数的话。";
+        o.mat = c.prop;
+        o.note = "圈层：" + (c.ring || "—") + "　·　它占住的是：" + (c.holds || "—");
+      } else {
+        var al = (c.alias && c.alias.length) ? c.alias[G.seed(dateStr, "al") % c.alias.length] : c.prop;
+        o.ask = "下面这个说法，<b>是谁先说的？</b>写出你想到的人、书或原题；想不出来就写想不出来，并说说它让你想起哪个领域。";
+        o.mat = "「" + al + "」";
+        o.note = "这是近邻检索的手动版。占位者卡的别名是<b>刻意换过说法</b>的——词面上和原作者的原话往往一个字都不重叠，这正是词面粗筛会漏人的原因。";
+      }
+    } else if (k.id === "grid") {
+      var g = GRID[G.seed(dateStr, "g") % GRID.length];
+      o.q = g; o.ref = "grid:" + (G.seed(dateStr, "g") % GRID.length);
+      o.ask = "下面这个问题<b>属于哪一类</b>（是什么／怎么办／为什么）？判完之后<b>定位到具体哪一格、哪一条路径、哪一条动力</b>。如果它的预设有假，就明说你要怎么改切。";
+      o.mat = "「" + g.q + "」";
+      o.note = "判据不是疑问词——中文的「为什么」既可能在问本质，也可能在问动力。判据是<b>他要拿到的东西是什么形状</b>。";
+    } else if (k.id === "waffle") {
+      var v = WAFFLE[G.seed(dateStr, "v") % WAFFLE.length];
+      o.q = v; o.ref = "waffle:" + (G.seed(dateStr, "v") % WAFFLE.length);
+      o.ask = "下面这句话听起来没错。<b>说清它为什么不可能错</b>——即没有任何观测能推翻它——然后把它改成一句今天就能查的话。";
+      o.mat = "「" + v.s + "」";
+      o.note = "永远对的话，等于什么也没说。这一题练的是认出自己嘴里的这一类句子。";
+    } else {
+      var p = PRESS[G.seed(dateStr, "p") % PRESS.length];
+      o.q = { s: p }; o.ref = "press:" + (G.seed(dateStr, "p") % PRESS.length);
+      o.ask = "把下面这个现象<b>压成一句承重命题</b>，形状是「X 不是 Y₁ 也不是 Y₂ 而是 Z」，<b>不许出现情态词</b>（应当／有必要／具有重要意义／实质性）。";
+      o.mat = p;
+      o.note = "五十字级的压缩就是 I 维那把刀，也是近邻库的查询键。压不出来，就查不出谁已经占了这块地。";
+      o.noAnswer = true;   /* 这一类没有「参考读数」——压缩是你自己的，只能自检 */
+    }
+    return o;
+  }
+
+  function paint() {
+    el("k-name").innerHTML = cur.name;
+    el("k-date").textContent = dateStr;
+    el("q-ask").innerHTML = cur.ask;
+    el("q-mat").innerHTML = cur.mat;
+    el("q-note").innerHTML = cur.note;
+    var lis = (SELF[cur.kind] || []).map(function (x) { return "<li>" + x + "</li>"; }).join("");
+    el("self").innerHTML = "<b>自检</b><ul>" + lis + "</ul>";
+  }
+
+  function reveal() {
+    el("self").style.display = "block";
+    var b = el("ansbox");
+    if (cur.noAnswer) {
+      b.innerHTML = "<b>这一类没有参考读数。</b>压缩出来的那一句是你自己的，别人给不了。" +
+        "要检验它，只有两条路：拿去<a href=\"/nbr/\">近邻库</a>查一次这块地被谁占着，或者把它立成候选卡让人顶回。";
+      b.style.display = "block";
+      return;
+    }
+    if (cur.kind === "sep" && cur.card) {
+      var seps = (cur.card.sep || []).map(function (s) { return "<div class=\"sep\">" + s + "</div>"; }).join("");
+      b.innerHTML = "<b>这块地上已知的分离线</b>（不是标准答案，是别人已经划过的）：" + seps +
+        "<div class=\"src\">占位者：" + esc(cur.card.src && cur.card.src.author || "—") +
+        "《" + esc(cur.card.src && (cur.card.src.zh || cur.card.src.title) || "—") + "》" +
+        (cur.card.src && cur.card.src.year ? " " + cur.card.src.year : "") + "</div>";
+    } else if (cur.kind === "who" && cur.card) {
+      var also = (cur.card.also || []).map(function (a) { return esc(a.author) + "《" + esc(a.title) + "》" + (a.year || ""); }).join("；");
+      b.innerHTML = "<b>正主是：</b>" + esc(cur.card.src && cur.card.src.author || "—") +
+        "，《" + esc(cur.card.src && (cur.card.src.zh || cur.card.src.title) || "—") + "》" +
+        (cur.card.src && cur.card.src.year ? "，" + cur.card.src.year : "") + "。" +
+        "<div class=\"sep\">原命题：" + esc(cur.card.prop) + "</div>" +
+        (also ? "<div class=\"src\">同一块地上还有：" + also + "</div>" : "");
+    } else if (cur.q && cur.q.a) {
+      b.innerHTML = "<b>参考读数</b><div class=\"sep\">" + cur.q.a + "</div>";
+    }
+    b.style.display = "block";
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  function refreshStats() {
+    var st = G.stats();
+    el("s-streak").textContent = st.streak;
+    el("s-total").textContent = st.challenges;
+    el("s-props").textContent = st.props;
+    if (st.broken) el("hint").innerHTML = "⚠ 本机存的记录读不出来（可能被清过或被别的东西写脏），新写的照常能存。";
+    var s = G.load(), keys = Object.keys(s.ch).sort().reverse().slice(0, 12);
+    if (keys.length) {
+      el("arc").style.display = "block";
+      el("arclist").innerHTML = keys.map(function (d) {
+        var r = s.ch[d];
+        return "<div class=\"arow\"><span class=\"d\">" + d + "</span>" +
+               esc((r.ans || "").slice(0, 68)) + ((r.ans || "").length > 68 ? "…" : "") + "</div>";
+      }).join("");
+    }
+  }
+
+  function submit() {
+    var v = el("ans").value.trim();
+    if (v.length < 15) { el("hint").textContent = "还差一点——至少 15 个字。写「卡在哪一步」也算。"; return; }
+    G.logChallenge(dateStr, { kind: cur.kind, ref: cur.ref, ans: v });
+    /* 压缩题写出来的就是一条命题，直接进树；其余的不硬塞（塞了树上全是练习不是命题） */
+    if (cur.kind === "press") {
+      G.addProp({ prop: v, from: "challenge-" + dateStr, ring: "" });
+    } else if (cur.kind === "sep" && cur.card) {
+      G.addProp({ prop: v, from: "challenge-" + dateStr, ring: cur.card.ring || "" });
+    }
+    locked = true;
+    reveal();
+    el("donebox").innerHTML = "已记下（只在本机）。明天的题会自动换——<b>题目由日期决定</b>，不是随机的，所以你和别人今天拿到的是同一道。";
+    el("donebox").style.display = "block";
+    el("hint").textContent = "";
+    refreshStats();
+  }
+
+  function toCand() {
+    var v = el("ans").value.trim();
+    if (v.length < 12) { el("gate").textContent = "先写点东西，才立得成卡。"; return; }
+    if (!window.SDECand) { el("gate").textContent = "候选卡模块没装载上——不拦路，你可以直接去 /sde-wechat/ 手动立。"; return; }
+    el("gate").textContent = "正在查这块地被占了没有…";
+    try {
+      SDECand.gate(v).then(function (g) {
+        el("gate").innerHTML = (g && g.line ? esc(g.line) : "查不出来——按〔库未命中〕处理，不得据此认为没被占。") +
+          "　<a href=\"/sde-wechat/\">去社区立卡 →</a>";
+      }, function () {
+        el("gate").innerHTML = "占位查询没跑起来·按<b>库未命中</b>处理（不等于没被占）。　<a href=\"/sde-wechat/\">去社区立卡 →</a>";
+      });
+    } catch (e) {
+      el("gate").innerHTML = "占位查询没跑起来·按<b>库未命中</b>处理。　<a href=\"/sde-wechat/\">去社区立卡 →</a>";
+    }
+  }
+
+  /* ── 装载 ─────────────────────────────────────────── */
+  fetch("/nbr/cards.json").then(function (r) { return r.json(); }).then(function (j) {
+    cards = (j && j.cards) || [];
+    if (!cards.length) throw new Error("empty");
+    el("s-bank").textContent = cards.length;
+    cur = build(cards);
+    paint();
+  }).catch(function () {
+    /* 取不到卡就退到不需要卡的三类，如实说明，不空转 */
+    cur = build([]);
+    if (cur.kind === "sep" || cur.kind === "who") {
+      var g = GRID[G.seed(dateStr, "g") % GRID.length];
+      cur = { kind: "grid", name: "丙 · 判题型并定位", q: g, ref: "grid:fallback",
+        ask: "近邻库这会儿取不到，先换一道不需要它的：下面这个问题<b>属于哪一类</b>？判完定位到具体哪一格／哪条路径／哪条动力。",
+        mat: "「" + g.q + "」", note: "（今天的原题要用到近邻库，等它回来再刷新就是原题。）" };
+    }
+    paint();
+  }).then(function () {
+    var prev = G.challengeOf(dateStr);
+    if (prev && prev.ans) { el("ans").value = prev.ans; locked = true; reveal();
+      el("donebox").innerHTML = "今天这道你已经答过了。改了再交一次也行，会覆盖。"; el("donebox").style.display = "block"; }
+    refreshStats();
+  });
+
+  el("btn-submit").onclick = submit;
+  el("btn-cand").onclick = toCand;
+  el("ex").onclick = function (e) {
+    e.preventDefault();
+    var b = new Blob([G.exportJSON()], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(b); a.download = "sde-growth-" + G.today() + ".json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  };
+  el("cl").onclick = function (e) {
+    e.preventDefault();
+    if (confirm("清除本机全部记录（挑战、训练进度、写过的命题）？这一步不可撤销。")) {
+      G.reset(); location.reload();
+    }
+  };
+})();
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

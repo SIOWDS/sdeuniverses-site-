@@ -1,0 +1,118 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>传递与替代 · 每日必读 · 典范文 · 多学科碰撞 | SDE Universes</title>
+<meta name="description" content="每日必读 · 传递与替代 频道：什么搬得走、什么换个人做就变了、什么越模仿越坏。这一族问的是可迁移性的边界：哪一部分是知识，哪一部分只是这一次的现场。 每日必读：每篇典范文都由 Claude 在王德生博士指导下，把站内三篇分属不同学科、且彼此打架的文章做二阶碰撞写成。不带任何学派术语，普通人一路读得下来。作者 王德生 ＋ Claude。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+:root{--ink:#1E2A3A;--ink2:#4E5A68;--paper:#F4F1E8;--card:#FBF9F2;--indigo:#243447;
+--clay:#B5714A;--clay2:#C98A63;--line:rgba(30,42,58,.16)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Serif SC","Songti SC",serif;line-height:1.95}
+a{color:inherit}
+nav{position:sticky;top:0;z-index:10;background:rgba(244,241,232,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.navin{max-width:1080px;margin:auto;padding:13px 24px;display:flex;justify-content:space-between;font-size:14px}
+.navin a{text-decoration:none;color:var(--clay)}
+.hero{position:relative;overflow:hidden;color:#EDE7DA;padding:86px 22px 78px;text-align:center;
+background:radial-gradient(circle at 30% 28%,rgba(60,86,112,.5),transparent 42%),
+radial-gradient(circle at 72% 66%,rgba(181,113,74,.34),transparent 40%),
+linear-gradient(148deg,#161F2B,#243447 58%,#1E2A3A)}
+.hero:before{content:"";position:absolute;inset:8% 7%;border:1px solid rgba(201,138,99,.24)}
+.heroin{position:relative;z-index:1;max-width:860px;margin:auto}
+.eyebrow{font-size:12px;letter-spacing:.46em;color:#C99C7A}
+.hero h1{font-size:clamp(42px,7vw,76px);margin:20px 0 16px;line-height:1.14;text-shadow:0 6px 30px #0C1219}
+.hero p{font-size:clamp(16px,2vw,20px);color:#D8D0C0;line-height:2;margin:0 auto;max-width:700px}
+.how{display:flex;justify-content:center;gap:14px;margin-top:30px;flex-wrap:wrap}
+.how span{border:1px solid rgba(201,138,99,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#E0D6C4}
+.wrap{max-width:1080px;margin:auto;padding:64px 24px 40px}
+.lead{max-width:820px;margin:0 auto 20px;font-size:17.5px;line-height:2.08;text-align:justify}
+.lead:first-letter{float:left;font-size:52px;line-height:.86;color:var(--clay);padding:9px 10px 0 0}
+.rule{max-width:820px;margin:0 auto 50px;font-size:14.5px;color:var(--ink2);line-height:1.95;
+border-left:3px solid var(--clay);padding:4px 0 4px 16px}
+.item{display:block;background:var(--card);border:1px solid var(--line);
+border-top:4px solid var(--indigo);border-radius:11px;padding:30px 32px;margin-bottom:20px;transition:.2s}
+.item:hover{transform:translateY(-4px);box-shadow:0 15px 36px rgba(30,42,58,.12)}
+.item .n{font-size:12px;letter-spacing:.2em;color:var(--clay)}
+.item h2{font-size:27px;margin:9px 0 8px;color:var(--indigo);line-height:1.4}
+.item .sub{font-size:15.5px;color:var(--ink2);font-style:italic;margin:0 0 12px;line-height:1.8}
+.item .hk{font-size:15px;color:var(--ink2);margin:0 0 16px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 14px}
+.trio div{border:1px dashed rgba(30,42,58,.22);border-radius:8px;padding:11px 13px;font-size:13px;line-height:1.72;color:var(--ink2)}
+.trio div b{display:block;color:var(--clay);font-size:11.5px;letter-spacing:.1em;margin-bottom:4px}
+.meta{font-size:12.5px;color:var(--ink2);border-top:1px dashed var(--line);padding-top:11px}
+.item h2 a{text-decoration:none;color:inherit}
+.item h2 a:hover{color:var(--clay)}
+.trio div a{color:var(--indigo);text-decoration:none;border-bottom:1px solid rgba(30,42,58,.3)}
+.trio div a:hover{color:var(--clay);border-bottom-color:var(--clay)}
+.rdmore{display:inline-block;margin:2px 0 12px;font-size:14px;color:var(--clay);text-decoration:none;letter-spacing:.05em}
+.rdmore:hover{text-decoration:underline;text-underline-offset:4px}
+footer{text-align:center;border-top:1px solid var(--line);padding:34px;color:var(--ink2);font-size:12.5px}
+@media(max-width:760px){.trio{grid-template-columns:1fr}.wrap{padding:44px 18px 30px}}
+
+.byline{margin-top:24px;font-size:13px;letter-spacing:.28em;color:#C99C7A}
+.spec{max-width:820px;margin:0 auto 46px;background:var(--card);border:1px solid var(--line);
+border-left:4px solid var(--clay);border-radius:11px;padding:26px 30px}
+.spec .lb{display:block;color:var(--clay);letter-spacing:.28em;font-size:12.5px;margin-bottom:14px}
+.spec ol{margin:0;padding-left:1.3em}
+.spec li{font-size:15px;line-height:1.95;margin-bottom:12px;text-align:justify}
+.spec li b{color:var(--indigo)}
+.how-made{margin:16px 0 0;padding-top:14px;border-top:1px dashed var(--line);
+font-size:14px;color:var(--ink2);line-height:1.95;text-align:justify}
+.how-made b{color:var(--clay);letter-spacing:.06em;margin-right:6px}
+@media(max-width:720px){.spec{padding:20px 18px}.trio{grid-template-columns:1fr}}
+
+.chnav{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 22px}
+.chnav a{text-decoration:none;font-size:13px;letter-spacing:.06em;padding:7px 14px;border:1px solid var(--clay);border-radius:20px;color:var(--clay);background:transparent;transition:all .18s}
+.chnav a:hover{background:var(--clay);color:#fff}
+.chbox{border:1px solid rgba(181,113,74,.28);border-radius:6px;padding:20px 22px;margin:0 0 14px;background:rgba(181,113,74,.045)}
+.chbox h3{margin:0 0 6px;font-size:17px;letter-spacing:.04em;color:var(--clay)}
+.chbox .cn-lead{margin:0 0 12px;font-size:14px;line-height:1.95;color:var(--ink2);text-align:justify}
+.chbox ul{margin:0;padding-left:20px}
+.chbox li{font-size:14.5px;line-height:1.95;margin:0 0 4px}
+.chbox li a{color:var(--ink);text-decoration:none;border-bottom:1px solid rgba(181,113,74,.35)}
+.chbox li a:hover{color:var(--clay)}
+.chbox .cn-n{float:right;font-size:12.5px;color:var(--clay);opacity:.8;letter-spacing:.08em}
+</style></head><body>
+<nav><div class="navin"><a href="/browse/">SDE Universes</a><a href="/paradigm/">← 返回每日必读</a><a href="/confluence/" title="站外碰撞">学科通融 · 站外碰撞 →</a></div></nav>
+<header class="hero"><div class="heroin">
+<div class="eyebrow">每 日 必 读 · 频 道</div>
+<h1>传递与替代</h1>
+<p>什么搬得走、什么换个人做就变了、什么越模仿越坏。这一族问的是可迁移性的边界：哪一部分是知识，哪一部分只是这一次的现场。</p>
+<div class="how"><span>共 6 篇</span><span>按撞出来的判断管什么分</span><span>不按被撞三篇的学科分</span></div>
+<div class="byline">作者 · 王德生 ＋ Claude</div>
+</div></header>
+<main class="wrap">
+<p class="lead">这一族的几篇问的是同一件事的不同侧面，连起来读比单看一篇更有用。每篇的原文、编号与来源三篇都与<a href="/paradigm/">栏目主页</a>上的完全一致——这里只是换了一种进来的方式。</p>
+<div class="chnav" style="margin-bottom:26px"><a href="/paradigm/ledger/">计量与结算</a><a href="/paradigm/teach/">教与学</a><a href="/paradigm/recognize/">承认与关系</a><a href="/paradigm/channel/">通道与形式</a><a href="/paradigm/run/">运转与停止</a></div>
+<div class="item"><div class="n">之十六 · 三学科交叉：改编理论 × 照护社会学 × 中国经济史（本篇是群内碰撞：三位不同学员）</div><h2><a href="/paradigm/anyone-can-do-it/">谁来做都一样，未必是坏消息</a></h2><p class="sub">一件事里同时有三样东西——非本人做不可的、换谁做都该一样的、必须让不认识的人拿去用的；它们方向相反，而我们只有一套办法</p><p class="hk">一位说：这一步别人替你做了，就等于取消了它。一位说：正相反，有一样很要紧的东西，恰恰要靠「不是同一个人」才长得出来。一位说：你们争的不是好不好，是活不活得下去——留在个人身上的门道，压力一来会无声蒸发，连尸体都没有。三方各有硬证据，谁也说服不了谁。本文认为他们说的根本不是同一样东西：任何一件真正需要人的工作里，同时跑着**动作、规矩、记档**三样，而它们的脾气正好相反——**动作怕离开人，规矩怕离不开人，记档怕离不开我们这一拨人**。麻烦在于三样在现场长得一模一样，都表现为「这个人做得好」；于是我们用同一套办法去搬三样，搬错方向的每一种做法，当期成绩都很好看。</p><div class="trio"><div><b>改编理论 · 认知诗学 · 秦莉</b><a href="/students/qin-li/obligatory-perceptual-work/">工序的不可代偿性：论《追忆似水年华》改编中一道不可能被影像代劳的感知义务</a></div><div><b>照护社会学 · 孔凡鹤</b><a href="/students/kong-fanhe/catch-feeling/">接住感：社区换工照护不能给「托住」，但能给另一种未被命名的安全</a></div><div><b>中国经济史 · 鲍锦朝</b><a href="/students/bao-jinchao/knowledge-currency/">通货性：解释中国经济韧性的一种知识基础视角</a></div></div><a class="rdmore" href="/paradigm/anyone-can-do-it/">读全文 →</a><div class="meta">约 1.8 万字 · 11 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月29日 · 三篇来源分属<a href="/students/qin-li/" style="color:var(--clay)">秦莉</a>、<a href="/students/kong-fanhe/" style="color:var(--clay)">孔凡鹤</a>、<a href="/students/bao-jinchao/" style="color:var(--clay)">鲍锦朝</a>三位学员</div></div>
+<div class="item"><div class="n">之十七 · 三学科交叉：制度经济学 × 创新政策 × 发展经济学（本篇撞的是三位在世经济学家）</div><h2><a href="/paradigm/what-travels/">别人怎么成的，学不来；别人怎么垮的，学得来</a></h2><p class="sub">成功要一长串条件同时成立，失败只要其中一条被破坏——而我们所有的学习，都压在搬不走的那一半上</p><p class="hk">一位说看制度，一位说看方向，一位说这些问题都太大、只能一件一件做小实验。三位都还在世，都被认为是第一流的，答案互不相容，吵了二十年。本文认为他们真正在争的不是「什么造成繁荣」，而是**一个结论能走多远**。由此推出一条不对称：成功是一长串「并且」，失败是一连串「或者」；合取的东西换个地方必然缺项，而缺项在合取里等于不成立，所以成功的知识搬不走；析取的东西一条就够用，所以失败的知识搬得走。而标杆、最佳实践、成功案例、经验推广——我们几乎全部的学习制度，都建在搬不走的那一半上。</p><div class="trio"><div><b>制度经济学 · 长时段与自然实验</b><a href="https://www.ubs.com/global/en/our-firm/what-we-do/our-brand/nobel-perspectives/laureates/daron-acemoglu.html">达龙·阿西莫格鲁：制度决定繁荣，国家能力与社会力量必须同步生长</a></div><div><b>创新政策 · 使命导向</b><a href="https://issues.org/review-mission-economy-mazzucato/">玛丽安娜·马祖卡托：市场不是被修复的，是被塑造的</a></div><div><b>发展经济学 · 随机对照试验</b><a href="https://www.princeton.edu/~deaton/downloads/Deaton_Cartwright_RCTs_with_ABSTRACT_August_25.pdf">埃丝特·迪弗洛：别问大问题，一件一件做小实验</a></div></div><a class="rdmore" href="/paradigm/what-travels/">读全文 →</a><div class="meta">约 1.9 万字 · 17 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月28日 · 三篇来源分属<a href="/students/www.ubs.com/" style="color:var(--clay)">阿西莫格鲁</a>、<a href="/students/issues.org/" style="color:var(--clay)">马祖卡托</a>、<a href="/students/www.princeton.edu/" style="color:var(--clay)">迪弗洛</a>三位作者</div></div>
+<div class="item"><div class="n">之二十 · 三学科交叉：技艺传承 × 法哲学 × 伦理人类学</div>
+<h2><a href="/paradigm/unfinished-on-purpose/">传得下去的，都是没做完的</a></h2>
+<p class="sub">凝固是必要的，但凝固下来的必须是一个空模子——接手的人得亲自往里填，而且填不上就用不了</p>
+<p class="hk">一门茶道，培训体系越完整、认证越精密、传播越广，后人达到的深度反而越浅；一部法律，法条一字未改、程序无瑕扣合、判决书技术品质无可挑剔，却已经不能让任何一个执行它的人为它失眠；一句家训，把一个父亲二十年的具体挫败压缩成八个字，丢掉了两个儿子的名字与全部年份，于是一千年里的每一个人都能站进去。文章命名<b>空模子</b>：有稳定的硬形状（不凝固就传不过断裂带）＋中间留着一处没做完的地方＋<b>这处地方必须承重</b>（不填就用不了）。由此推出：<b>保存得越完整，传得越快，活得越短</b>——完善是单向的，每填一格接手者就少一次必须亲自动手的机会，几代之后所有人的本事都变成执行本事，而<b>需要改它的那一刻，恰恰是这几代人最缺训练的能力被第一次索取的时刻</b>；且<b>完整与死亡在报告上是同一份材料</b>，因为一切指标测的都是硬壳，而那个空测不出来。附留缺口的三种做法与代价、缺口消失的三条路径（被填上／被绕开／被降格为风格）、十一个现场（含手术室与软件框架两个正面样本）、十二领域、四类边界与六条纪律。</p>
+<div class="trio">
+<div><b>技艺传承 · 保存就是消耗</b><a href="/students/hu-zhiying/efficacy-attrition/">自我复制的悖论：精神实践效能衰减的内生机制</a></div>
+<div><b>法哲学 · 别去补它，它自己会活</b><a href="/students/gao-peng/fissure-self-continuation/">裂隙自续：为什么法律的死不是被推翻，而是不再生长</a></div>
+<div><b>伦理人类学 · 必须硬化，否则传不过去</b><a href="/students/zhang-qiong/sedimented-layer/">沉淀的形态：伦理生活的「过后」与「之前」</a></div>
+</div>
+<a class="rdmore" href="/paradigm/unfinished-on-purpose/">读全文 →</a>
+<div class="meta">约 1.6 万字 · 13 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月28日 · 三篇来源分属<a href="/students/hu-zhiying/" style="color:var(--clay)">胡志英</a>、<a href="/students/gao-peng/" style="color:var(--clay)">高鹏</a>、<a href="/students/zhang-qiong/" style="color:var(--clay)">张琼</a>三位作者</div></div>
+<div class="item"><div class="n">之二十五 · 三学科交叉：行动系统与临床心理 × 文化心理与教育 × 审美与感知</div><h2><a href="/paradigm/three-ways-to-die/">能改的看不见，看得见的改不了</a></h2><p class="sub">一样东西没能长出来，有三种死法，而我们只认得最后一种</p><p class="hk">一个人培训后真心认同、半年后在深夜里做出三年前的反应；一个人说不清自己想要什么，不是不敢说、是确实没有内容；一个人正看着什么、旁边一句「你觉得这个好在哪里」，正在发生的那个东西就没了。三个人在任何评估表上都是同一句「没有这个能力」。本文认为这是三种性质相反的死法——没成形、没位置、没掌权——而它们的可见性从后往前急剧递减、可改性从后往前递增：**唯一看得见的那一关，恰好是唯一改不动的；两关能改的，恰好都看不见。**更麻烦的是，用来补救第三关的每一样工具，恰好都是前两关的致病因子。</p><div class="trio"><div><b>行动系统 · 临床心理</b><a href="/students/huang-qianying/coexistence-resilience/">并存韧度：论行动系统中旧路径为何无法被消除</a></div><div><b>文化心理 · 教育</b><a href="/students/hu-min/developmental-preoccupation/">从压抑到占位：儒家文化、竞争教育与关系能力损伤的机制重判</a></div><div><b>审美 · 感知</b><a href="/students/liu-yanyan/pre-arrest-of-perception/">序前中断：审美感知为何在成形之前就已停止发生</a></div></div><a class="rdmore" href="/paradigm/three-ways-to-die/">读全文 →</a><div class="meta">约 2.0 万字 · 18 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月28日 · 三篇来源分属<a href="/students/huang-qianying/" style="color:var(--clay)">黄倩盈</a>、<a href="/students/hu-min/" style="color:var(--clay)">胡敏</a>、<a href="/students/liu-yanyan/" style="color:var(--clay)">刘言言</a>三位作者</div></div>
+<div class="item"><div class="n">之二十六 · 三领域交叉：演化生物学 × 文化演化 × 知识生产（本篇撞的是三方前沿，含站内一篇）</div>
+<h2><a href="/paradigm/who-takes-the-hit/">抄得越像，坏得越快</a></h2>
+<p class="sub">决定一次模仿是养出本事还是掏空信誉的，不是它抄了多少，是抄完之后谁挨打</p>
+<p class="hk">三方在同一个动作上正面撞车，而且撞法是本栏最硬的一种：<b>演化生物学</b>说模仿是寄生——野外实验测到，模仿者与被模仿者数量相当时拟态崩溃，捕食者更易攻击，而被模仿者多出八十四倍时两边都安全；<b>文化演化</b>说人类儿童会把因果上无关的动作也照抄、成人抄得更彻底，而这正是文明能累积的引擎，越忠实越好；<b>洗稿分析</b>说前两方都在谈"抄得多像"，可查重的失效是构造性的——你能原样搬走整条路径同时改掉每一个字。前两方在同一个变量上给出<b>相反符号</b>，第三方说这个变量无效。撞出来的判断：一次模仿是加固还是稀释一个信号，只看<b>模仿者会不会因为这件事做错而承担同样的后果</b>。挨打的抄得越全越好；不挨打的<b>抄得越像，那个信号死得越快</b>。含可估的崩溃点、"两头夹击"的诊断，以及为什么加强查验在算术上必输。</p>
+<div class="trio">
+<div><b>演化生物学 · 模仿是寄生，有阈值</b><a href="https://royalsocietypublishing.org/rspb/article/285/1876/20172786/78925/Frequency-dependence-shapes-the-adaptive-landscape" target="_blank" rel="noopener">频率依赖的贝氏拟态（Proc. R. Soc. B, 2018）</a></div>
+<div><b>文化演化 · 越忠实越好</b><a href="https://pubmed.ncbi.nlm.nih.gov/21241282/" target="_blank" rel="noopener">过度模仿：连没用的动作也照抄（Br. J. Psychol. 2011 等）</a></div>
+<div><b>知识生产 · 像不像不是变量</b><a href="/column/paraphrase-plagiarism/">洗稿的本体论——被剽窃的从来不是字句</a></div>
+</div>
+<a class="rdmore" href="/paradigm/who-takes-the-hit/">读全文 →</a>
+<div class="meta">约 2.0 万字 · 22 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月28日 · 末章写死三条到二〇三〇年的赌注</div></div>
+<div class="item"><div class="n">之三十三 · 三学科交叉：教育评价 × 宗教社会学 × 数字代理</div><h2><a href="/paradigm/handed-over/">交出去的不止那件事</a></h2><p class="sub">为什么每一次外包，都顺手外包掉了你验收它的能力</p><p class="hk">一位老师把「这学生长得怎么样」交给了分数；一个团体把「这信是不是真的」交给了可以数出来的东西；一个人把「我身体怎么样」交给了手环。三次交出去，理由都充分。本文认为每一次交出去的都不止那一样：判断这件事做得好不好的能力也跟着走了——因为那个能力本来就是「自己做」的副产品。于是每一次委托都同时委托掉了对这次委托的监督权，而这是唯一一种你不会发现的损失：一旦发生，用来发现它的那个器官已经不在了。</p><div class="trio"><div><b>教育评价 · 不可代理</b><a href="/students/huang-qianying/proxy-violence/">代理如何成为暴力：高利害评价对不可代理之物的结构性排除</a></div><div><b>宗教社会学 · 制度自持</b><a href="/students/putao/paper-p13-d01-a03/">从「撑住」到「替偿」：当代基督教形态自我维持的另一种分析</a></div><div><b>数字代理 · 基底耗散</b><a href="/students/hu-min/substrate-dissipation/">静默的荒年：数字代理依赖中「知而不动」的规范性默认机制</a></div></div><a class="rdmore" href="/paradigm/handed-over/">读全文 →</a><div class="meta">约 2.0 万字 · 18 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月28日 · 三篇来源分属<a href="/students/huang-qianying/" style="color:var(--clay)">黄倩盈</a>、<a href="/students/putao/" style="color:var(--clay)">葡萄</a>、<a href="/students/hu-min/" style="color:var(--clay)">胡敏</a>三位作者</div></div>
+<div class="spec" style="background:transparent;border-style:dashed;margin-top:26px"><span class="lb">别 的 频 道</span><div class="chnav"><a href="/paradigm/ledger/">计量与结算</a><a href="/paradigm/teach/">教与学</a><a href="/paradigm/recognize/">承认与关系</a><a href="/paradigm/channel/">通道与形式</a><a href="/paradigm/run/">运转与停止</a></div></div>
+</main>
+<footer>每日必读 · 传递与替代 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International</footer>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body></html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>挤出代价与代偿性回补：慢性病自我管理中"依从却无效"现象的机制研究 | 学术创造专栏 · 学位论文 | SDE Universes</title>
+<meta name="description" content="慢性病自我管理干预在随机对照试验中普遍有效，在真实世界中效果大幅衰减，主流解释将这一落差归因于依从性不足。本研究指出这一归因掩盖了一类结构性不同的失败：患者确实执行了推荐行为，而结局仍未改善——即"依从却无效"。研究论证，该现象的根源在于试验与现实之间一个未被记账的差异：在试验中，目标行为由研究方供">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#35558C;--accent2:#4E74B5}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:780px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#35558C1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.1rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.6rem,3.7vw,2.3rem);font-weight:700;line-height:1.4;color:var(--text);max-width:820px;margin:0 auto}
+.title-en{position:relative;font-family:'EB Garamond',Georgia,serif;font-size:clamp(0.9rem,1.7vw,1.05rem);color:var(--text2);max-width:700px;margin:0.85rem auto 0;font-style:italic;line-height:1.5}
+.art-sub{position:relative;font-size:clamp(0.95rem,1.8vw,1.08rem);color:var(--text2);max-width:670px;margin:1.15rem auto 0;font-style:italic;font-weight:300;line-height:1.75}
+.degree{position:relative;display:inline-block;margin-top:1.4rem;padding:0.4rem 1.1rem;border:1px solid var(--accent);border-radius:20px;font-size:0.75rem;letter-spacing:0.14em;color:var(--accent)}
+.art-meta{position:relative;margin-top:0.85rem;font-size:0.78rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:0.9rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.93rem;line-height:1.9;color:var(--text2);text-align:justify}
+.abs.en p{font-family:'EB Garamond',Georgia,serif;font-size:0.95rem;line-height:1.75}
+.kw{font-size:0.84rem;color:var(--muted);margin-bottom:1.5rem}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.08em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.3rem 1.6rem;margin:1.6rem 0 3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.8rem}
+.toc a{display:block;text-decoration:none;padding:0.2rem 0;transition:color .18s,padding-left .18s;color:var(--text2)}
+.toc a.t2{font-size:0.92rem;font-weight:700;margin-top:0.45rem}
+.toc a.t3{font-size:0.85rem;padding-left:1.5rem;color:var(--muted)}
+.toc a:hover{color:var(--accent);padding-left:5px}
+.toc a.t3:hover{padding-left:1.8rem}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.32rem;font-weight:700;color:var(--text);margin:3.3rem 0 1.2rem;padding-bottom:0.55rem;border-bottom:2px solid var(--accent);scroll-margin-top:5.5rem;line-height:1.45}
+article h3{font-family:'Noto Serif SC',serif;font-size:1.08rem;font-weight:700;color:var(--accent);margin:2.2rem 0 0.9rem;scroll-margin-top:5.5rem;line-height:1.5}
+article p{font-size:1.01rem;line-height:2.05;color:var(--text);margin-bottom:1.1rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#35558C22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.8rem 0;padding:1.1rem 1.45rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.03rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.5rem 0}
+.tw{overflow-x:auto;margin:1.6rem 0}
+table{border-collapse:collapse;width:100%;font-size:0.88rem;background:var(--card)}
+th,td{border:1px solid var(--border2);padding:0.6rem 0.8rem;text-align:left;line-height:1.7;vertical-align:top}
+th{background:#35558C15;font-weight:700;color:var(--accent);white-space:nowrap}
+.refs{margin-top:1rem}
+.refs ol{padding-left:1.4rem}
+.refs li{font-size:0.85rem;line-height:1.8;color:var(--text2);margin-bottom:0.5rem;padding-left:0.3rem}
+.foot-nav{margin:3.2rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.18rem;margin:2.6rem 0 1rem}
+  article h3{font-size:1.02rem}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/creation/" class="sib">学术创造专栏</a>
+    <a href="/creation/thesis/" class="here">学位论文</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/creation/">学术创造专栏</a> · <a href="/creation/thesis/">学位论文</a></div>
+  <h1 class="art-title">挤出代价与代偿性回补：慢性病自我管理中"依从却无效"现象的机制研究</h1>
+  <p class="title-en">Displacement Cost and Compensatory Restoration: A Mechanism Study of Adherent-yet-Ineffective Outcomes in Chronic Disease Self-Management</p>
+  <p class="art-sub">随机对照试验测量的是"加入行为X之后会怎样"。它从来没有测量过"从一个人的生活里挤出X要付出什么"。因为在试验里，X是研究者供养的；在现实里，X必须自筹——而自筹的那笔钱从哪一个账户扣，没有人记账。</p>
+  <div class="degree">硕士学位论文范本 · 公共卫生／健康管理</div>
+  <div class="art-meta">王德生 著 · 学术创造专栏 · 学位论文频道 · 概念建构型</div>
+</header>
+
+<div style="max-width:780px;margin:1.6rem auto -1.2rem;padding:0 2rem;text-align:center">
+  <a href="/creation/pdf/health-displacement-cost.pdf" download style="display:inline-block;font-size:0.82rem;letter-spacing:0.06em;color:var(--accent);text-decoration:none;border:1px solid var(--border);border-radius:20px;padding:0.4rem 1.1rem;background:var(--card)">⬇ 下载 PDF · A4 学术版 · 14 页</a>
+</div>
+
+<main class="wrap">
+  <section class="body">
+    <div class="abs">
+      <div class="l">摘 要</div>
+      <p>慢性病自我管理干预在随机对照试验中普遍有效，在真实世界中效果大幅衰减，主流解释将这一落差归因于依从性不足。本研究指出这一归因掩盖了一类结构性不同的失败：患者确实执行了推荐行为，而结局仍未改善——即"依从却无效"。研究论证，该现象的根源在于试验与现实之间一个未被记账的差异：在试验中，目标行为由研究方供养（提供时间安排、场地、器材、督促与随访），受试者只需执行；在现实中，同一行为必须由患者从自身有限的时间、精力、注意与意志资源中挤出，而挤出的来源从不在任何一项试验的测量清单上。本研究据此提出两个概念：挤出代价（displacement cost），指一项行为改变在真实生活系统中必须从其他环节撤出的资源及其后果；代偿性回补（compensatory restoration），指该系统通过其他环节使被改变的目标量回归原位的过程，其结果是净效应趋零或为负，而依从性测量仍记录为"依从"。研究进一步论证，代偿性回补至少有三条通路——资源挤占、生理适应与道德许可——三者机制不同、时间尺度不同，但在依从性框架下均不可见，因为该框架只测量行为的发生，不测量行为发生所需资源的来源。研究提出五项可证伪预测，给出以生态瞬时评估与 N-of-1 交叉设计为核心的研究方案，并以减重研究中的代谢适应、运动后的补偿性进食及风险补偿三组既有经验证据检验框架的解释力。第六章据此提出对自我管理支持工具的设计约束：一个不询问"这个行为从哪里挤出来"的工具，其提供的每一条建议都在开一张无人记账的支票。</p>
+    </div>
+    <div class="kw"><b>关键词</b>　慢性病自我管理；依从性；挤出代价；代偿性回补；效果衰减；生态瞬时评估；行为改变</div>
+    <div class="abs en">
+      <div class="l">ABSTRACT</div>
+      <p>Chronic disease self-management interventions are broadly effective in randomised controlled trials and substantially attenuated in the real world; the dominant account attributes this gap to poor adherence. This study argues that the attribution conceals a structurally distinct class of failure: the patient does perform the recommended behaviour, and the outcome still does not improve — adherent yet ineffective. The root of the phenomenon lies in an unbooked difference between trial and life: in trials the target behaviour is provisioned by the research apparatus (scheduling, facilities, equipment, prompting, follow-up) and the participant need only execute it; in life the same behaviour must be extracted from the patient's own finite time, energy, attention and volition — and the account it is extracted from appears on no trial's measurement list. Two concepts are proposed: displacement cost, the resources a behaviour change must withdraw from other parts of a living system and the consequences thereof; and compensatory restoration, the process by which that system returns the target quantity to its prior position through other channels, yielding a net effect at or below zero while adherence measures still record compliance. It is argued that compensatory restoration runs along at least three pathways — resource displacement, physiological adaptation, and moral licensing — differing in mechanism and timescale, yet all invisible under an adherence framework, because that framework measures whether a behaviour occurred and never where the resources for it came from. Five falsifiable predictions are advanced with an EMA and N-of-1 crossover design, and the framework's reach is tested against metabolic adaptation in weight-loss research, compensatory eating after exercise, and risk compensation. A design constraint for self-management tools follows: a tool that never asks what a recommended behaviour will be taken out of is writing cheques that nobody books.</p>
+    </div>
+    <div class="kw"><b>Keywords</b>　chronic disease self-management; adherence; displacement cost; compensatory restoration; effect attenuation; ecological momentary assessment; behaviour change</div>
+    <div class="toc">
+      <div class="l">目 录</div>
+      <a href="#c1" class="t2">第一章 绪论</a><a href="#s1" class="t3">1.1 研究背景</a><a href="#s2" class="t3">1.2 问题的提出</a><a href="#s3" class="t3">1.3 研究意义</a><a href="#s4" class="t3">1.4 研究定位与方法</a><a href="#s5" class="t3">1.5 论文结构</a><a href="#c2" class="t2">第二章 文献综述</a><a href="#s7" class="t3">2.1 依从性研究传统及其测量</a><a href="#s8" class="t3">2.2 自我管理与行为改变技术</a><a href="#s9" class="t3">2.3 补偿现象：三处零散的证据</a><a href="#s10" class="t3">2.4 文献述评：三个缺口</a><a href="#c3" class="t2">第三章 概念建构：挤出代价与代偿性回补</a><a href="#s12" class="t3">3.1 一个从未被记账的账户</a><a href="#s13" class="t3">3.2 为什么随机对照试验看不见它</a><a href="#s14" class="t3">3.3 代偿性回补的三条通路</a><a href="#s15" class="t3">3.4 概念的边界</a><a href="#c4" class="t2">第四章 可证伪预测与研究设计</a><a href="#s17" class="t3">4.1 五项可证伪预测</a><a href="#s18" class="t3">4.2 研究方案</a><a href="#s19" class="t3">4.3 效度威胁</a><a href="#c5" class="t2">第五章 解释力检验与反例扫描</a><a href="#s21" class="t3">5.1 三组既有证据的重新解读</a><a href="#s22" class="t3">5.2 反例扫描</a><a href="#c6" class="t2">第六章 讨论</a><a href="#s24" class="t3">6.1 对临床实践的含义</a><a href="#s25" class="t3">6.2 对自我管理支持工具的设计约束</a><a href="#s26" class="t3">6.3 一个不受欢迎的推论</a><a href="#c7" class="t2">第七章 结论、局限与展望</a><a href="#s28" class="t3">7.1 结论</a><a href="#s29" class="t3">7.2 局限</a><a href="#s30" class="t3">7.3 展望</a>
+      <a href="#refs" class="t2">参考文献</a>
+    </div>
+    <article>
+<h2 id="c1">第一章 绪论</h2>
+<h3 id="s1">1.1 研究背景</h3>
+<p>慢性病管理是当代医疗系统最大的一块支出，也是它最难看的一块成绩。以糖尿病为例：胰岛素、二甲双胍、连续血糖监测、结构化教育、同伴支持——每一样都经过了随机对照试验的检验，每一样都有效。把它们加起来，人群层面的血糖控制达标率在多数国家仍长期徘徊在五成以下。</p>
+<p>这个落差有一个标准解释：<b>依从性</b>。世界卫生组织的经典报告给出的估计是，长期治疗在发达国家的依从率约五成（Sabaté, 2003）。这份报告有一句被广泛引用的话：提高依从性带来的健康收益，可能超过任何一项具体治疗技术的改进。</p>
+<p>于是过去二十年，依从性成了一个产业。提醒、智能药盒、行为改变技术分类体系（Michie et al., 2013）、动机访谈、游戏化、经济激励——所有这些的共同目标是<b>让患者去做他被告知该做的事</b>。</p>
+<p>这些努力有效果，但效果的量级令人不安。多数依从性干预能把依从率提高十几个百分点，而对应的临床结局改善往往小得多，有时统计上不显著。</p>
+<p>本研究要处理的正是这个夹缝里的东西：<b>如果依从率提高了，为什么结局没有相应改善？</b></p>
+<h3 id="s2">1.2 问题的提出</h3>
+<p>主流研究把"依从"当作"有效"的中介变量：干预 → 提高依从 → 改善结局。这条链的第二段——<b>依从 → 结局</b>——被视为已经由随机对照试验证明过的、无需再验的部分。</p>
+<p>本研究要质疑的正是这第二段。</p>
+<p>随机对照试验证明了什么？它证明了：<b>在试验条件下，把行为 X 加进受试者的生活，结局会改善。</b></p>
+<p>试验条件是什么？在一项运动干预试验中，研究方通常提供：一份排定的时间表、一个场地、器材、一位指导者、每周的提醒电话、以及一个明确的随访日期。受试者要做的是<b>在指定时间到指定地点执行</b>。</p>
+<p>现实条件是什么？一位患者被告知每天要走三十分钟。<b>没有人给他这三十分钟。</b> 他必须从某个地方把它挤出来——从睡眠里，从陪孩子的时间里，从他本来用来喘口气的那半小时里。</p>
+<p>这两个"走三十分钟"，在依从性测量上是同一个事件：记录为"依从"。<b>在系统后果上，它们完全不是同一件事。</b></p>
+<p>于是本研究的核心问题是：</p>
+<blockquote>当一项行为改变必须由患者自筹资源时，那笔资源从哪里来？撤出它的地方，会发生什么？</blockquote>
+<h3 id="s3">1.3 研究意义</h3>
+<p><b>理论意义。</b>若"依从却无效"是一类真实存在且有独立机制的失败，则依从性框架的解释力边界需要被重新划定——它不是一个可以无限提高分辨率的框架，它有一整类现象在原理上看不见。</p>
+<p><b>实践意义。</b>当前所有的自我管理支持工具，其核心动作都是<b>发出建议</b>：多走路、少吃盐、按时服药、监测血糖。本研究若成立，则每一条建议都是一张支票，而工具从不询问这张支票从哪个账户扣。</p>
+<p><b>方法学意义。</b>若挤出代价真实存在且系统性地不被测量，则真实世界证据与试验证据之间的落差，其中一部分不是"执行不到位"，而是<b>试验从设计上就没有测量现实中最贵的那一项成本</b>。</p>
+<h3 id="s4">1.4 研究定位与方法</h3>
+<p>本研究属<b>概念建构型研究</b>。研究者不拥有原始数据，因此不伪装拥有：第四章给出的是可证伪预测与研究方案，第五章使用的是他人已发表的经验证据，用于检验框架能否解释既有发现。</p>
+<p>方法路径：裂缝定位（第二章）→ 概念建构（第三章）→ 可证伪化（第四章）→ 解释力检验与反例扫描（第五章）→ 含义推演与自我限定（第六、七章）。</p>
+<h3 id="s5">1.5 论文结构</h3>
+<p>（略，见目录）</p>
+<h2 id="c2">第二章 文献综述</h2>
+<h3 id="s7">2.1 依从性研究传统及其测量</h3>
+<p>依从性（adherence，早期作 compliance）指患者行为与医嘱建议的一致程度。测量手段从自我报告、药片计数、处方续开记录，到电子药盒（MEMS）与生物标志物（Sabaté, 2003; Osterberg & Blaschke, 2005）。</p>
+<p>这一传统的一个重要转向是术语本身：从 compliance（服从）改为 adherence（依从），再到 concordance（协同），意在承认患者的自主性，摆脱家长式的暗示（Horne et al., 2005）。这是一次真诚的伦理改进。</p>
+<p>但本研究要指出的是：<b>这次改进只改了道德关系，没有改测量对象。</b> 无论叫服从、依从还是协同，被测量的仍然是同一样东西：<b>这个行为发生了没有。</b> 电子药盒记录药瓶被打开的时刻，它不记录他是在什么样的一天里打开的、打开它的那一刻他放弃了什么。</p>
+<h3 id="s8">2.2 自我管理与行为改变技术</h3>
+<p>Lorig 与 Holman（2003）确立了慢性病自我管理的经典框架，其核心是三项任务（医疗管理、角色管理、情绪管理）与五项技能（问题解决、决策、资源利用、与医方建立伙伴关系、行动）。这一框架的贡献在于，它第一次把患者当作管理者而非执行者。</p>
+<p>Michie 等（2013）建立的行为改变技术分类体系（BCTTv1）包含 93 项技术，为干预设计提供了统一语言。Bandura（1977）的自我效能理论、Prochaska 与 DiClemente（1983）的跨理论模型，共同构成了这一领域的理论骨架。</p>
+<p>这些框架都很扎实。但它们共享一个结构性特征：<b>它们全部是"加法"框架</b>——它们研究如何让患者获得一项新行为、如何提高执行它的动机与信心。<b>没有一个框架追问：这项新行为将占据的那块位置上，原来放着什么。</b></p>
+<p>自我效能理论问的是"他相不相信自己能做到"；跨理论模型问的是"他准备好了没有"；BCT 问的是"用哪种技术能让他做"。<b>三个都不问：他做了这个之后，什么被挤掉了。</b></p>
+<h3 id="s9">2.3 补偿现象：三处零散的证据</h3>
+<p>补偿现象并非无人发现，但发现它的是三个互不通气的领域：</p>
+<p><b>其一，减重研究中的代谢适应。</b>Fothergill 等（2016）对《超级减肥王》参赛者的六年随访发现：参赛者在节目结束后普遍反弹，且其静息代谢率在校正体重后仍显著低于预期，这一抑制在六年后仍然存在。<b>身体把体重补了回来，而且是通过降低消耗来补的。</b></p>
+<p><b>其二，运动后的补偿性进食。</b>King 等（2007）等研究发现，运动干预带来的体重下降常低于能量赤字的理论预测，原因之一是受试者在运动后增加了进食，或在非运动时段减少了自发活动。<b>补偿发生在被测量的行为之外。</b></p>
+<p><b>其三，风险补偿。</b>Peltzman（1975）关于汽车安全法规的经典分析提出，安全设备的引入会诱导更冒险的驾驶行为，部分抵消其收益。这一效应在健康领域反复出现，且争议持续至今（Adams, 1995）。相关的还有道德许可效应（moral licensing）：做了一件好事之后，人们更可能允许自己做一件坏事（Merritt, Effron & Monin, 2010）。</p>
+<p>这三处证据的共同点是：<b>它们都是在各自领域被当作"干扰"或"混杂"发现的，而不是被当作一个统一的现象来研究的。</b> 减重研究把代谢适应当作生理学问题，运动研究把补偿性进食当作能量平衡问题，行为经济学把道德许可当作心理学问题。<b>没有人问过它们是不是同一件事。</b></p>
+<h3 id="s10">2.4 文献述评：三个缺口</h3>
+<p><b>缺口一：测量对象的空白。</b>依从性测量记录行为的发生，不记录行为所需资源的来源。这个空白不是技术限制——电子药盒完全可以同时记录时间、地点、前后事件——而是<b>框架里没有这个变量，所以没有人去测</b>。</p>
+<p><b>缺口二："依从却无效"没有名字。</b>当前的失败分类只有两类：不依从（患者没做）、以及治疗本身无效（药不行）。<b>患者做了、药也有效、结局却没改善</b>——这一类在文献中没有独立范畴，它被吸收进"依从性测量误差"或"个体差异"。<b>一个没有名字的现象，不会有人去研究它。</b></p>
+<p><b>缺口三：试验条件与现实条件的差异被当成了"实施科学"问题。</b>主流认为试验到现实的落差属于实施科学（implementation science）的范畴——即"如何把有效的干预落地"。本研究认为这个定位掩盖了问题的性质：<b>这不是落地不力，是试验测量的那个量在现实中不存在。</b> 试验测的是"被供养的行为 X 的效果"，现实中发生的是"自筹的行为 X"，两者是不同的东西，落差不是执行问题，是<b>外部效度问题</b>。</p>
+<h2 id="c3">第三章 概念建构：挤出代价与代偿性回补</h2>
+<h3 id="s12">3.1 一个从未被记账的账户</h3>
+<p>先给出核心概念。</p>
+<blockquote><b>挤出代价（displacement cost）</b>：在一个资源有限的真实生活系统中，一项新增行为所需的时间、精力、注意与意志资源必须从其他环节撤出；被撤出的那些环节所承受的后果，即为该行为的挤出代价。</blockquote>
+<p>></p>
+<blockquote><b>代偿性回补（compensatory restoration）</b>：系统通过其他环节，使被干预的目标量回归其原有水平的过程。其结果是净效应趋零或为负，而依从性测量仍记录为"依从"。</blockquote>
+<p>请注意这两个概念的关系：挤出代价是<b>成本</b>，代偿性回补是<b>结果</b>。前者解释后者的一部分，但不是全部——3.3 节将论证回补至少有三条通路，挤占只是其中之一。</p>
+<p>一个具体的例子把它说清楚：</p>
+<p>一位五十二岁的二型糖尿病患者，被建议每天步行四十分钟。他做到了，连续三个月，可穿戴设备可以作证。他的糖化血红蛋白纹丝不动。</p>
+<p>标准解释：运动量不够，或者他饮食没管住（即"部分不依从"）。</p>
+<p>本框架的解释：<b>先问那四十分钟是从哪里来的。</b></p>
+<p>在他的案例里，它来自睡眠——他每天提前四十分钟起床去走路，而他的入睡时间没有改变。于是：睡眠从六小时二十分变成五小时四十分。而睡眠限制会降低胰岛素敏感性，这一点在实验研究中是清楚的（Spiegel, Leproult & Van Cauter, 1999）。</p>
+<p><b>他执行了一项能改善胰岛素敏感性的行为，而执行它的方式恰好损害了胰岛素敏感性。</b> 净效应可能为零，也可能为负。</p>
+<p>而在整个医疗系统里，没有任何一个环节记录了这笔账。他的运动依从性是 100%。他的医生看到的是"依从良好但控制不佳"，于是加药。</p>
+<blockquote>这不是一个极端案例。<b>这是"依从却无效"的典型结构：一笔真实发生的、有临床后果的支出，因为没有对应的账户，所以在所有报表上都不存在。</b></blockquote>
+<h3 id="s13">3.2 为什么随机对照试验看不见它</h3>
+<p>这是本研究最关键的一步论证，必须精确。</p>
+<p>一项运动干预 RCT 的内部效度可以做得极高：随机分组、意向性分析、盲法结局评估。它的结论——运动组的糖化血红蛋白显著低于对照组——是可信的。</p>
+<p>问题不在内部效度，在<b>受试者执行该行为的资源从哪里来</b>。</p>
+<p>在试验中，研究方通常提供：排定的时段（因此不必从他自己的时间里找）、场地与器材（因此不必增加通勤与筹备的认知负担）、督促（因此不必消耗意志）、以及一个有终点的周期（因此可以透支）。<b>试验实际上在为目标行为支付挤出代价。</b></p>
+<p>于是试验测得的是：</p>
+<blockquote><b>效应<sub>试验</sub> = 行为 X 的直接效应 －（挤出代价 × 0）</b></blockquote>
+<p>因为挤出代价被研究方承担了，它的系数是零。</p>
+<p>现实中发生的是：</p>
+<blockquote><b>效应<sub>现实</sub> = 行为 X 的直接效应 － 挤出代价</b></blockquote>
+<p><b>两个式子测的不是同一个量。</b> 落差不是执行折扣，是<b>式子里少了一项</b>。</p>
+<p>这解释了一个长期存在却缺乏统一解释的现象：<b>行为干预的效果衰减，几乎总是随时间加剧，且随干预强度增加而加剧。</b> 在依从性框架下，这需要解释为"动机随时间衰退"——但这是一个循环解释（他为什么不做？动机不够。怎么知道动机不够？因为他不做）。</p>
+<p>在本框架下，它有一个非循环的机制：<b>挤出代价随时间累积，而直接效应不累积。</b> 第一周挤四十分钟睡眠没什么，第十二周它是一笔已经很重的债。而干预越强（要求的行为越多），挤出代价越大——<b>这预测了一个反直觉的结果：加大干预强度会在某个点之后降低净效应</b>，这是 4.2 节的预测三。</p>
+<h3 id="s14">3.3 代偿性回补的三条通路</h3>
+<p>回补不止一条路。本研究识别出三条，它们机制不同、时间尺度不同，且需要不同的应对：</p>
+<p><b>通路一：资源挤占（timescale：天—周）。</b>上述睡眠案例。目标行为占用的资源来自另一个对同一结局有影响的环节。<b>特征：可通过追问资源来源直接发现，且往往可通过重新安排来化解。</b></p>
+<p><b>通路二：生理适应（timescale：月—年）。</b>代谢适应即属此类。系统通过调节自身参数把目标量拉回。<b>特征：与行为无关，患者做什么都无法阻止它，只能预期它并调整目标。</b> Fothergill 等（2016）的六年数据说明它的持久性远超预期。</p>
+<p><b>通路三：道德许可（timescale：小时—天）。</b>执行了目标行为之后，系统在别处放松。<b>特征：它不是"意志薄弱"，它是一次内在的记账——"我今天已经走了四十分钟"这个事实，被系统当作一笔可以支取的额度。</b> 相关证据见 Merritt 等（2010）与风险补偿文献。</p>
+<p>三条通路的共同点是：<b>它们全部发生在被测量的行为之外。</b> 这就是它们在依从性框架下不可见的原因——不是测得不够准，是<b>测的地方不对</b>。</p>
+<p>三条通路的区别至关重要，因为它们的应对完全不同：通路一可以通过设计化解（换一个资源来源），通路二不能化解只能预期（把目标定成"维持"而非"持续下降"），通路三需要的是让那笔内在记账变得可见。<b>把三者混为一谈，正是当前干预失败的一个原因</b>——用对付通路三的手段（提高动机）去处理通路一的问题（资源冲突），只会让患者挤得更狠，代价更高。</p>
+<h3 id="s15">3.4 概念的边界</h3>
+<p>必须划清本框架的适用范围，否则它会变成一个万能借口。</p>
+<p><b>它不适用于真正的不依从。</b>如果患者根本没走那四十分钟，本框架无关。依从性框架在这里完全正确且不可替代。</p>
+<p><b>它不为无效干预辩护。</b>如果一项干预本身无效，那是干预的问题，不是挤出代价。区分方法在 4.2 节的预测二。</p>
+<p><b>它不能被患者用作免责理由。</b>"我的失败是因为挤出代价"这句话，若不能指出具体从哪里挤出、后果是什么、如何检验，它就只是一个更体面的借口。<b>本框架要求的是一笔具体的账，不是一个抽象的原谅。</b></p>
+<p><b>最重要的一条：它不推翻任何一项 RCT 的结论。</b>运动确实改善胰岛素敏感性——这是真的。本框架说的是：<b>在现实中执行它，还有一笔账要付，而那笔账 RCT 没测。</b> 这是对结论适用条件的限定，不是对结论的否定。</p>
+<h2 id="c4">第四章 可证伪预测与研究设计</h2>
+<h3 id="s17">4.1 五项可证伪预测</h3>
+<p><b>预测一（挤出来源的可测性与预测力）</b>：在控制目标行为执行量之后，"资源撤出来源"这一变量对结局有独立的预测力。具体地，从睡眠中挤出运动时间的患者，其糖化血红蛋白改善显著小于从久坐娱乐时间中挤出的患者，尽管两组的运动依从性无差异。</p>
+<p><b>证伪条件</b>：若两组结局无显著差异，则挤出代价在临床上不重要，本框架的核心主张失效。</p>
+<p><b>预测二（区分"依从却无效"与"干预无效"）</b>：在同一批患者中，实施一项经过挤出来源优化的干预（同样的行为量，但重新安排资源来源），结局改善显著优于未优化组。</p>
+<p><b>证伪条件</b>：若无差异，则失败源于干预本身而非挤出代价。<b>这是本框架与"干预无效"假说之间的判决性检验。</b></p>
+<p><b>预测三（强度—效应的倒U）</b>：干预要求的行为总量与净结局改善之间呈倒U关系，拐点位置随患者可支配资源量右移。</p>
+<p><b>证伪条件</b>：若关系单调递增，则挤出代价不足以在现实剂量范围内产生可观测的抵消。</p>
+<p><b>预测四（三通路的可分离性）</b>：三条通路在时间尺度上可分离——资源挤占的抵消效应在数周内出现，道德许可在数小时至数天内出现，生理适应在数月后出现。以密集追踪数据做时间序列分析，三者的特征时间常数应显著不同。</p>
+<p><b>证伪条件</b>：若三者时间常数无法区分，则"三通路"是一个未经证实的划分。</p>
+<p><b>预测五（依从性与净效应的解耦）</b>：在真实世界样本中，依从性与结局改善之间的相关系数，在控制挤出来源之后显著上升。</p>
+<p><b>证伪条件</b>：若控制后相关不上升，说明挤出来源不是那个被遗漏的变量。</p>
+<h3 id="s18">4.2 研究方案</h3>
+<p><b>研究一：N-of-1 交叉设计。</b></p>
+<p>慢性病自我管理的核心难题之一是异质性极高——同一项建议对不同患者后果不同。N-of-1 设计（在同一患者内随机化不同干预阶段）在此比组间比较更合适（Guyatt et al., 1986）。</p>
+<p>设计：同一患者，随机分配四个阶段（每阶段两周，洗脱一周）：</p>
+<p>- A：运动四十分钟，来源自选（对照，即现行做法）</p>
+<p>- B：运动四十分钟，指定从久坐娱乐时间挤出</p>
+<p>- C：运动四十分钟，指定从睡眠挤出</p>
+<p>- D：不运动（基线）</p>
+<p>结局：连续血糖监测的日均血糖、血糖变异度；睡眠时长与效率（客观测量）。</p>
+<p><b>关键</b>：A、B、C 三个阶段的运动依从性应无差异（若有差异则设计失败）。若三者结局有显著差异，预测一成立。</p>
+<p><b>研究二：生态瞬时评估（EMA）。</b></p>
+<p>采用 Shiffman、Stone 与 Hufford（2008）的 EMA 方法，每日多次随机提示，记录：当前活动、刚刚放弃了什么、主观资源余量（时间/精力/意志）。</p>
+<p>这一设计的目的是把"挤出"从一个理论构念变成一个可观测事件——<b>每一次执行目标行为的时刻，同时记录它挤掉了什么</b>。</p>
+<p><b>研究三：三通路的时间序列分离。</b></p>
+<p>在同一批患者的密集追踪数据上，对目标量（血糖）做干预中断时间序列分析，拟合三个特征时间常数，检验预测四。</p>
+<h3 id="s19">4.3 效度威胁</h3>
+<p><b>威胁一，最严重的一条：指定挤出来源本身是一次干预。</b>研究二的 B、C 条件不只是改变了资源来源，它还改变了患者对这件事的注意与意义。因此 B 优于 C 可能来自"被指定"而非"来源本身"。<b>应对：增加一个安慰剂指定条件（指定一个理论上无差异的来源），但这只能部分控制。此威胁在原理上无法完全消除。</b></p>
+<p><b>威胁二：EMA 的反应性。</b>每天多次询问"你刚刚放弃了什么"，会使患者更意识到挤出，从而改变行为。<b>这与本研究的干预目标恰好一致，因此它同时是威胁和线索</b>——若 EMA 组的结局仅因被追问就改善，那本身就是对第六章工具设计的支持，但它会污染研究一的因果推断。</p>
+<p><b>威胁三：N-of-1 的外推。</b>结论适用于该患者，不适用于人群。应对：多个 N-of-1 的合并分析（series of N-of-1 trials）。</p>
+<p><b>威胁四：睡眠条件的伦理问题。</b>主动指定患者减少睡眠，在伦理上是可疑的。<b>应对：C 条件必须改为观察性——只纳入自发选择从睡眠挤出的患者，不做随机分配。这削弱了因果推断，但这个削弱是必须接受的。</b></p>
+<h2 id="c5">第五章 解释力检验与反例扫描</h2>
+<h3 id="s21">5.1 三组既有证据的重新解读</h3>
+<p><b>代谢适应（Fothergill et al., 2016）。</b>参赛者六年后体重大幅反弹，静息代谢率在校正体重后仍显著受抑。在能量平衡框架下，这是一个生理学现象。<b>在本框架下，它是通路二的教科书案例</b>：系统通过调节自身参数把目标量拉回。而它的意义在于：<b>这是一群依从性极高的人——他们在节目里的执行强度远超任何临床干预——而系统仍然把它补回来了。</b> 这直接支持了本研究的核心主张：<b>依从性不是问题的瓶颈。</b></p>
+<p><b>运动后的补偿性进食（King et al., 2007）。</b>运动带来的体重下降低于理论预测。在能量平衡框架下这是"依从性之外的混杂"。<b>在本框架下，它是通路三与通路一的混合</b>：一部分是许可（我运动了，可以吃），一部分是挤占（运动消耗使非运动时段的自发活动下降）。<b>关键在于：这两部分需要不同的应对，而在现行框架下它们都被归为"没管住嘴"。</b></p>
+<p><b>风险补偿（Peltzman, 1975）。</b>这一效应在交通领域争议至今，但其结构在本框架下清晰：<b>一次被感知到的安全改善，被系统当作一笔可支取的额度。</b> 它是通路三在另一个领域的显形。</p>
+<p>三组证据的意义在于：<b>它们分别在三个互不通气的领域被独立发现，而本框架预测它们是同一件事的三条通路。</b> 如果本框架错了，这三者之间不应存在可检验的共同结构——预测四正是对这一点的检验。</p>
+<h3 id="s22">5.2 反例扫描</h3>
+<p><b>反例一：有些干预确实一直有效。</b>他汀的依从性与心血管结局之间的关系相当稳固，没有明显的回补。这似乎反驳本框架。</p>
+<p>回答：<b>吃一片药的挤出代价接近零。</b> 它不占用时间（十秒）、不占用精力、不占用意志（在形成习惯后）。因此本框架预测：<b>挤出代价小的干预，依从性与结局的关系应当紧密；挤出代价大的干预，两者应当解耦。</b> 他汀恰好在第一类里。<b>这个反例不但没有推翻本框架，它给出了本框架的一个自然分层，且这个分层是可检验的（预测五）。</b></p>
+<p><b>反例二：本框架可能只是"混杂变量"的另一个说法。</b>流行病学早就知道要控制混杂。挤出来源不就是一个未被控制的混杂变量吗？</p>
+<p><b>这是最强的反例。</b> 回答：如果它只是一个混杂变量，那么解决办法是"在分析中控制它"，而这不需要任何新概念。但本框架主张的更强：<b>挤出代价不是一个可以被控制掉的混杂，它是干预在现实中的构成部分。</b> 在现实里，"运动"与"运动的资源来源"不可分离——你不可能执行一个不从任何地方挤出资源的运动。因此它不是混杂（可以被随机化掉的东西），而是<b>处理变量本身的一部分</b>。</p>
+<p>不过必须承认：<b>这个区分在方法学上是精细的，而且我不确定它能经受住流行病学方法学家的审查。</b> 若它站不住，本框架的贡献将缩水为"提醒大家控制一个被忽略的混杂"——这仍然有用，但远没有那么重要。<b>这是本研究最可能失守的一处。</b></p>
+<p><b>反例三：这一切患者自己知道。</b>患者当然知道他是从睡眠里挤的时间。既然他知道，这就不是一个隐藏机制。</p>
+<p>回答：<b>知道来源，不等于知道后果。</b> 他知道自己少睡了四十分钟；他不知道少睡四十分钟会抵消掉走四十分钟的收益。<b>在这条链的两端之间，需要一个他没有的知识——而这恰是医疗系统本该提供、却因为框架里没有这个变量而从未提供的东西。</b></p>
+<h2 id="c6">第六章 讨论</h2>
+<h3 id="s24">6.1 对临床实践的含义</h3>
+<p><b>其一，问诊增加一个问题。</b>在给出任何行为建议之后，追加一句：<b>"这个时间/精力，你打算从哪里挤出来？"</b> 这句话的成本是十秒，它可能是整次问诊里信息量最大的十秒。</p>
+<p><b>其二，"依从良好但控制不佳"应当触发的不是加药，而是追问挤出来源。</b>当前的临床路径在这个节点上的默认动作是升级药物治疗。本框架提示：<b>这个节点上至少应当先排除一次回补。</b> 若不排除，加药是在为一笔没被发现的支出买单。</p>
+<p><b>其三，目标设定必须为通路二留出预算。</b>代谢适应不可避免。把目标定成"持续下降"是在与一个必然发生的过程作战。<b>为回补预留预算，不是妥协，是承认物理事实。</b></p>
+<h3 id="s25">6.2 对自我管理支持工具的设计约束</h3>
+<p>本框架对数字健康工具构成一条硬约束：</p>
+<blockquote><b>一个不询问"这个行为从哪里挤出来"的工具，其提供的每一条建议都是一张无人记账的支票。</b></blockquote>
+<p>当前工具的标准动作是：监测 → 发现异常 → 推送建议。整条链上没有一个环节涉及资源来源。一个工具告诉用户"今天还差三千步"，它不知道也不问这三千步会从哪里来——而在晚上十点半推送这条提醒，它实际上是在从睡眠里取钱。</p>
+<p>符合本框架的工具应当具备三项功能：</p>
+<p><b>其一，记账。</b>每一条被采纳的建议，同时记录它的资源来源。这在技术上完全可行——手机已经知道用户的睡眠、日程与活动，它缺的不是数据，是这个变量在产品逻辑里的位置。</p>
+<p><b>其二，显示链条而非发布数字。</b>不是"你的健康分 78"，而是"过去九十天，你每次晚间运动之后的睡眠时长平均短 47 分钟；这些日子的次日晨起血糖平均高 0.8"。<b>这句话里没有一个建议，它全是他自己的东西，而他从来没见过它。</b></p>
+<p><b>其三，把判断留给用户。</b>工具指出链条，不宣布哪一环该断。理由不是尊重，是有效性：<b>一条由工具替他断的链，会在别处被补回来</b>——这正是通路三的机制。他必须自己做出那个取舍，因为只有他知道那四十分钟的睡眠对他意味着什么，而工具不知道，也永远不会知道。</p>
+<p><b>这三项功能与当前产品的商业逻辑是冲突的。</b>一个只给链条不给建议的产品，用户留存必然低于一个每天推送鼓励的产品。<b>本研究不认为这个冲突可以在设计层面解决。</b></p>
+<h3 id="s26">6.3 一个不受欢迎的推论</h3>
+<p>本框架有一个推论，它令人不适：</p>
+<blockquote><b>可支配资源越少的人，挤出代价越高，因而同一条健康建议对他的净效应越小，甚至为负。</b></blockquote>
+<p>一个有闲暇、有余力、有人帮忙带孩子的人，他挤出四十分钟的代价接近零——他从刷手机的时间里挤。一个上两班、独自照顾老人的人，他挤出四十分钟只能从睡眠里挤。<b>同一条建议，前者受益，后者受损。</b></p>
+<p>而健康建议是普适发布的：指南对所有人说同一句话。<b>于是一条本意促进健康的普适建议，可能正在扩大健康不平等——不是因为穷人不听，恰恰是因为他们听了。</b></p>
+<p>若这个推论成立，那么"健康素养不足"这个用来解释健康不平等的主流概念，方向可能是反的：<b>问题不是他们不知道该做什么，是他们知道，做了，而做的代价把收益吃掉了。</b></p>
+<p>本研究没有数据支持这一推断。它是挤出代价概念的逻辑后果。它的检验需要一项按可支配资源分层的干预研究——<b>这是本框架最重要、也最应当被优先尝试的检验。</b></p>
+<h2 id="c7">第七章 结论、局限与展望</h2>
+<h3 id="s28">7.1 结论</h3>
+<p>本研究提出：慢性病自我管理领域存在一类没有名字、因而没有被研究的失败——依从却无效。其机制在于试验与现实之间一个未被记账的差异：<b>试验为目标行为支付挤出代价，现实要求患者自筹</b>。</p>
+<p>据此建构了挤出代价与代偿性回补两个概念，识别出回补的三条通路（资源挤占、生理适应、道德许可），论证它们机制与时间尺度不同、应对不同，且在依从性框架下全部不可见——<b>因为该框架测量行为是否发生，从不测量行为所需的资源来自何处</b>。</p>
+<p>框架被转写为五项可独立证伪的预测，并在减重研究的代谢适应、运动后的补偿性进食与风险补偿三组既有证据上通过了解释力检验。其中代谢适应的证据尤为关键：<b>那是一群依从性极高的人，而系统仍然把目标量补了回来——这说明依从性从来不是那个瓶颈。</b></p>
+<h3 id="s29">7.2 局限</h3>
+<p><b>其一，无原始数据。</b>全部经验主张为预测而非发现。</p>
+<p><b>其二，与"未控制的混杂"之区分可能站不住。</b>5.2 节的反例二是本框架最可能失守之处。若挤出代价只是一个应当被控制的混杂变量，本研究的贡献将大幅缩水。</p>
+<p><b>其三，三通路的划分未经检验。</b>预测四未实施。三者可能不是三条通路，而是同一条的三个阶段，甚至可能是一个划分错误。</p>
+<p><b>其四，伦理约束限制了最关键的检验。</b>最强的因果证据需要随机分配患者"从睡眠里挤"，而这在伦理上不可接受。因此本框架的核心主张可能永远只能靠观察性证据支持——<b>这是一个不可移除的证据强度上限。</b></p>
+<p><b>其五，框架有被滥用为免责理由的风险。</b>"我做了，是挤出代价害了我"可以成为任何失败的解释。3.4 节试图用"必须指出具体账目"来防止这一点，但研究者不确定这道防线在临床现场是否守得住。</p>
+<h3 id="s30">7.3 展望</h3>
+<p>优先顺序：（1）预测二（与"干预无效"的判决性检验，最便宜且最要害）；（2）5.2 节反例二的方法学澄清（若它站不住，后面的都不必做）；（3）6.3 节的分层检验。</p>
+<p>最后留一个本研究无力回答的问题：</p>
+<blockquote>如果挤出代价是真实的，那么"给一个人一条健康建议"这件事，就不再是一次纯粹的赠予——它同时是一次征收，而征收的税率取决于他有多少余量。</blockquote>
+<blockquote>医学至今没有一个概念来称呼这次征收，也没有任何一个环节对它负责。而每天，全世界的诊室里，这样的支票以千万计地开出去。</blockquote>
+    <h2 id="refs">参考文献</h2>
+    <div class="refs"><ol><li>Adams, J. (1995). <em>Risk</em>. UCL Press.</li><li>Bandura, A. (1977). Self-efficacy: Toward a unifying theory of behavioral change. <em>Psychological Review</em>, 84(2), 191–215.</li><li>Fothergill, E., Guo, J., Howard, L., et al. (2016). Persistent metabolic adaptation 6 years after "The Biggest Loser" competition. <em>Obesity</em>, 24(8), 1612–1619.</li><li>Guyatt, G., Sackett, D., Taylor, D. W., et al. (1986). Determining optimal therapy — randomized trials in individual patients. <em>New England Journal of Medicine</em>, 314(14), 889–892.</li><li>Horne, R., Weinman, J., Barber, N., Elliott, R., & Morgan, M. (2005). <em>Concordance, Adherence and Compliance in Medicine Taking</em>. NCCSDO.</li><li>King, N. A., Caudwell, P., Hopkins, M., et al. (2007). Metabolic and behavioral compensatory responses to exercise interventions. <em>Obesity</em>, 15(6), 1373–1383.</li><li>Lorig, K. R., & Holman, H. R. (2003). Self-management education: History, definition, outcomes, and mechanisms. <em>Annals of Behavioral Medicine</em>, 26(1), 1–7.</li><li>Merritt, A. C., Effron, D. A., & Monin, B. (2010). Moral self-licensing: When being good frees us to be bad. <em>Social and Personality Psychology Compass</em>, 4(5), 344–357.</li><li>Michie, S., Richardson, M., Johnston, M., et al. (2013). The behavior change technique taxonomy (v1) of 93 hierarchically clustered techniques. <em>Annals of Behavioral Medicine</em>, 46(1), 81–95.</li><li>Osterberg, L., & Blaschke, T. (2005). Adherence to medication. <em>New England Journal of Medicine</em>, 353(5), 487–497.</li><li>Peltzman, S. (1975). The effects of automobile safety regulation. <em>Journal of Political Economy</em>, 83(4), 677–725.</li><li>Prochaska, J. O., & DiClemente, C. C. (1983). Stages and processes of self-change of smoking. <em>Journal of Consulting and Clinical Psychology</em>, 51(3), 390–395.</li><li>Sabaté, E. (2003). <em>Adherence to Long-Term Therapies: Evidence for Action</em>. World Health Organization.</li><li>Shiffman, S., Stone, A. A., & Hufford, M. R. (2008). Ecological momentary assessment. <em>Annual Review of Clinical Psychology</em>, 4, 1–32.</li><li>Spiegel, K., Leproult, R., & Van Cauter, E. (1999). Impact of sleep debt on metabolic and endocrine function. <em>The Lancet</em>, 354(9188), 1435–1439.</li></ol></div>
+    </article>
+    <div class="foot-nav">
+      <div class="cl">
+        <a href="/creation/pdf/health-displacement-cost.pdf" download style="border-color:var(--accent);color:var(--accent);font-weight:700">⬇ 下载 PDF · 14 页</a>
+        <a href="/creation/thesis/">← 回学位论文频道</a>
+        <a href="/creation/">← 学术创造专栏</a>
+        <a href="/taste/zhiwen/">→ 中华智问知识发生器</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">延伸参考文献 · Further References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">下列文献为本文所涉思想脉络的原典与代表性研究，供读者对读与查证；与文中已引文献不重复，本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+    <li style="margin:0 0 9px;padding-left:6px">Herbert A. Simon, Administrative Behavior, New York: Macmillan, 1947（有限理性）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Herbert A. Simon, The Sciences of the Artificial, 3rd ed., Cambridge, MA: MIT Press, 1996.</li>
+    <li style="margin:0 0 9px;padding-left:6px">James G. March, "Exploration and Exploitation in Organizational Learning", Organization Science, Vol. 2 (1991).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Richard M. Cyert & James G. March, A Behavioral Theory of the Firm, Englewood Cliffs: Prentice-Hall, 1963.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Michael T. Hannan & John Freeman, "Structural Inertia and Organizational Change", American Sociological Review, Vol. 49 (1984).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Paul J. DiMaggio & Walter W. Powell, "The Iron Cage Revisited", American Sociological Review, Vol. 48 (1983).</li>
+    <li style="margin:0 0 9px;padding-left:6px">John W. Meyer & Brian Rowan, "Institutionalized Organizations: Formal Structure as Myth and Ceremony", American Journal of Sociology, Vol. 83 (1977).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Clayton M. Christensen, The Innovator's Dilemma, Boston: Harvard Business School Press, 1997；中译《创新者的窘境》，胡建桥译，中信出版社，2010。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Everett M. Rogers, Diffusion of Innovations, 5th ed., New York: Free Press, 2003.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Fred D. Davis, "Perceived Usefulness, Perceived Ease of Use, and User Acceptance of Information Technology", MIS Quarterly, Vol. 13 (1989)（技术接受模型）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Viswanath Venkatesh et al., "User Acceptance of Information Technology: Toward a Unified View", MIS Quarterly, Vol. 27 (2003).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Wanda J. Orlikowski, "The Duality of Technology", Organization Science, Vol. 3 (1992).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Erik Brynjolfsson, Daniel Rock & Chad Syverson, "Artificial Intelligence and the Modern Productivity Paradox", NBER Working Paper 24001, 2017.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Ikujiro Nonaka & Hirotaka Takeuchi, The Knowledge-Creating Company, New York: Oxford University Press, 1995.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Karl E. Weick, Sensemaking in Organizations, Thousand Oaks: Sage, 1995.</li>
+    <li style="margin:0 0 9px;padding-left:6px">David J. Teece, "Explicating Dynamic Capabilities", Strategic Management Journal, Vol. 28 (2007).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Edith Penrose, The Theory of the Growth of the Firm, Oxford: Blackwell, 1959.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Oliver E. Williamson, The Economic Institutions of Capitalism, New York: Free Press, 1985.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Elinor Ostrom, Governing the Commons, Cambridge University Press, 1990；中译《公共事物的治理之道》，余逊达、陈旭东译，上海三联书店，2000。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Teresa M. Amabile, Creativity in Context, Boulder: Westview, 1996.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Dean Keith Simonton, Origins of Genius, New York: Oxford University Press, 1999.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Margaret A. Boden, The Creative Mind: Myths and Mechanisms, London: Weidenfeld & Nicolson, 1990.</li>
+  </ol>
+</section>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  © 德麦国际 Demai International · 学术创造专栏 · 学位论文 · <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>附录F：本书的死法（七条编号证伪条件） · 《SDE数学导论》专著选读</title><meta name="description" content="修订版新增。七条编号的死法：什么样的观测会让本书的相应部分作废。每条给出判据、实施方案与作废范围，其中四条是高风险条目。"><style>
+:root{--ink:#211c15;--muted:#6f6658;--gold:#a9802e;--paper:#f7f1e5;--card:#fffaf0;--navy:#07182d}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Serif SC","Songti SC",serif;line-height:1.95}
+a{color:#856115;text-decoration:none}.top{position:sticky;top:0;background:#fbf6e9ed;border-bottom:1px solid #d7c59c;z-index:4}
+.topin{max-width:880px;margin:auto;padding:13px 22px;display:flex;justify-content:space-between}.hero{background:var(--navy);color:#f7efd9;padding:58px 22px;text-align:center}
+.hero .ey{color:#d9b45a;letter-spacing:.28em;font-size:12px}.hero h1{max-width:900px;margin:18px auto;font-size:clamp(28px,5vw,44px);line-height:1.4}.hero p{max-width:760px;margin:auto;color:#c6d1d7}
+main{max-width:820px;margin:auto;padding:46px 23px 74px}article p{text-align:justify;font-size:17px;margin:0 0 19px}article h2{font-size:23px;margin:45px 0 16px;border-bottom:1px solid #d8c69c;padding-bottom:8px}
+.end{margin-top:50px;background:#fffaf0;border:1px solid #d9c89f;padding:25px;text-align:center}.buttons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}.btn{border:1px solid #a9802e;padding:9px 15px}.btn.primary{background:#a9802e;color:white}
+</style></head><body>
+<nav class="top"><div class="topin"><a href="/books/m/53/">← 返回专著导读</a><span>《SDE数学导论》</span></div></nav>
+<header class="hero"><div class="ey">专著选读三 · NEW IN THE REVISED EDITION</div><h1>附录F：本书的死法（七条编号证伪条件）</h1><p>修订版新增。七条编号的死法：什么样的观测会让本书的相应部分作废。每条给出判据、实施方案与作废范围，其中四条是高风险条目。</p></header>
+<main><article>
+<p>一部研究纲领性著作能为自己做的最诚实的事，是把自己的死法编号。附录A的命题分级表回答的是「哪些还没证」，本附录回答的是另一个问题：什么样的观测结果会让本书的相应部分作废。两者不可互相替代——一份债务清单不构成可证伪性，因为「尚未证明」永远可以推给时间，而「若X出现则我错」不能。</p>
+<p>以下七条各自绑定本书的一个承重部分。每条给出：判据、实施方案、若成立则作废的范围。凡任一条被判定成立，作者承诺在下一版正文中公开撤回相应部分，并在版本说明中记录撤回日期与判定来源。</p>
+<p>F1 · 隧穿无收益 → 第一编的必要性论证作废</p>
+<p>判据。 在至少20组独立生成的三维点集上，分别运行（甲）只允许合法flip的优化（含任意退火调度、任意初温与降温速率、运行时长不少于乙的十倍）与（乙）允许经过退化中间态再回到合法配置的优化；若乙所达到的最优网格质量Q_max在统计上不优于甲（配对检验p&gt;0.05，或效应量小于0.02的质量单位），则F1成立。</p>
+<p>实施。 第三十一章实验一即为本条的实施方案，成本最低，可在单机数小时内完成。</p>
+<p>作废范围。 相容性公理的六重锁死作为「实际代价」的论证失效；Santos定理仍然为真，但它对计算实践没有可测后果，第一编从「诊断」降格为「观察」。第三条金句作废。</p>
+<p>F2 · 无量纲性失败 → 第六章作废</p>
+<p>判据。 保持N_SDE数值不变而单独改变r、ω、v中的两个，若在至少三组独立参数组合下，三态转变位置在N_SDE坐标上系统性移动超过标定误差的两倍，则F2成立。</p>
+<p>实施。 一维伞场参数扫描（§31.5—§31.8的框架直接可用），以功率谱形态与最大Lyapunov指数变号为转变判据。</p>
+<p>作废范围。 N_SDE作为控制参数的构造失败；三态相图、跨领域比较（大脑、互联网、市场用同一张相图定位）、以及§6.7的一切估算全部作废。本书退回为一个定性框架。</p>
+<p>F3 · 三态不可分 → 命题5.4作废</p>
+<p>判据。 在参数扫描中，功率谱不呈现「低频集中／中频尖峰／宽带」三种可区分形态，或形态边界在重复实验中不可复现（同参数下判定结果的一致率低于80%），则F3成立。</p>
+<p>作废范围。 命题5.4假；介生态失去可操作判据，退为隐喻；§31.0算法的三态切换逻辑失去依据。</p>
+<p>F4 · 退化极限不成立 → 命题5.2与包罗性叙事作废</p>
+<p>判据。 数值验证显示L_{K_ε}[u]在ε→0时不收敛到c·Δu，或收敛阶显著低于核函数光滑度所预言的ε^k，则F4成立。</p>
+<p>作废范围。 「传统数学是SDE数学的退化极限」这一包罗性主张失去数学基础；本书与传统数学的关系从「包含」退为「并列的另一种方法」，与相对论—牛顿力学的类比作废。</p>
+<p>F5 · 涌现不可靠 → 定理11.1的实践含义作废</p>
+<p>判据。 在固定benchmark上以50个不同随机种子运行三态算法，若质量度量的变异系数CV&gt;20%，或分布呈显著双峰（Hartigan倾角检验p&lt;0.05），则F5成立。</p>
+<p>作废范围。 「路径不可复现但终态可靠」作为工程承诺失效；三态轮换不能替代逐步合法性，因为它给不出可接受的方差保证。第三章的第一条范式转换作废。</p>
+<p>F6 · 触觉度量对称 → 公理T3与芬斯勒论证作废</p>
+<p>判据。 在至少两种各向异性表面上，n≥30被试以恒定压力与速度沿同一路径两个方向滑动并报告主观触觉路程，若两方向判断无系统性差异（差异的95%置信区间包含零），则F6成立。</p>
+<p>作废范围。 公理T3假，触觉几何退回黎曼框架；命题39.1与§39.13的芬斯勒形式化作废；§39.14脉诊协议中依赖路径依赖性的部分（涩脉的强路径依赖判据）需重写。</p>
+<p>F7 · 无工程增量 → SDE计算数学的工程主张作废</p>
+<p>判据。 在三个以上公认benchmark问题上（至少包含一个奇异摄动问题与一个多尺度问题），三态轮换算法在同等自由度、同等计算预算下的误差不优于该问题上当前最好的传统自适应方法，则F7成立。</p>
+<p>实施。 第三十一章实验二与实验三的完整版，需与既有方法的公开实现做同条件对比。</p>
+<p>作废范围。 本书的工程必要性主张作废——「SDE数大的系统必须用SDE方法」降为「可以尝试」。注意：F7成立不自动作废本体论部分（第四编），但它会把本书从「计算数学纲领」降为「数学哲学著作」。这是七条中风险最高的一条，也是最值得优先做的一条。</p>
+<p>关于这七条的说明</p>
+<p>第一，七条不是穷尽的。它们只覆盖A、B、C三级命题所依赖的承重结构；D级债务（H_{SDE}空间完备性、谱密度的ω依赖、Γ-收敛的g(ω)）不在此列，因为它们是未完成而非可证伪。E级研究纲领同样不在此列。</p>
+<p>第二，F1与F3的先验成功概率较高（F1几乎是Santos定理的推论），F5中等，F2、F4、F6、F7是真正冒险的。一个纲领的诚实度不由它列了几条死法衡量，而由它的高风险死法占多少比重衡量。本书的高风险条目是四条，占七分之四。</p>
+<p>第三，本附录本身可以被指控为一种更精致的免疫：把死法写下来但从不去做实验，等于用可证伪性的形式换取不被检验的实质。对此唯一的回应是时间表。作者承诺：F1与F3的实验在下一版之前完成并公布结果，无论结果对本书有利与否；F7的第一轮对比在两年内启动。若下一版仍未公布F1与F3的结果，读者有理由认为本附录是修辞而非承诺。</p>
+</article>
+<div class="end">本页节选自《SDE数学导论（修订版）——结构·差异·纠缠：数学的重新定义》，王德生著，Demai International Press。<div class="buttons"><a class="btn primary" href="/books/m/53/read.html">在线翻阅全书</a><a class="btn" href="/books/m/53/SDE-Mathematics-Introduction.pdf" target="_blank">下载PDF</a><a class="btn" href="/books/m/53/">查看另两章</a></div></div></main>
+<script src="/wds-mode.js?v=20260819a" defer></script></body></html>

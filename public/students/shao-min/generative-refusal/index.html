@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作品不能保存全部原创性：被删除的分支如何改变下一次判断 · 少敏 · SDE Universes</title>
+<meta name="description" content="一个已从作品中消失的差异，能否仍经由伙伴的回应改变行动者下一次能够作出的判断？本文提出「生成性拒绝」与「无作品表征留存的因果持续」，由此得到作品存储不完备命题，并给出非补偿门、事件图与回应签名、分支互换实验与十条死亡条件。">
+<style>
+:root{--gold:#8A6817;--gold2:#C89117;--ink:#2A2315;--ink2:#5B4F38;--bg:#F5EFE0;--muted:#8A7B54;--line:rgba(138,104,23,0.30);--panel:#EFE7D3;--panel2:#F1EAD8}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(138,104,23,0.3)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.9;background-image:radial-gradient(ellipse at 50% -12%,rgba(138,104,23,0.10),transparent 62%)}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(42,35,21,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#E4D6AE;font-size:13px;letter-spacing:0.04em;text-decoration:none}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(255,255,255,0.45);color:#F1E6C4;letter-spacing:0.03em;text-decoration:none}
+.rb-btn.cur{background:#F1E6C4;color:#4A3A10;font-weight:700;border-color:#F1E6C4}
+.essay{max-width:680px;margin:0 auto;padding:52px 24px 20px}
+.head{text-align:center;padding-bottom:8px}
+.head .kicker{font-size:11.5px;letter-spacing:0.4em;color:var(--gold);margin-bottom:20px}
+.head h1{font-size:clamp(26px,4.6vw,38px);font-weight:800;color:#2A2315;letter-spacing:0.03em;line-height:1.45}
+.head .subttl{display:block;font-size:0.46em;font-weight:700;color:#4A3F28;margin-top:16px;line-height:1.6;letter-spacing:0.02em}
+.head .by{font-size:14px;color:var(--ink);letter-spacing:0.2em;margin-top:22px;font-weight:700}
+.head .dateline{font-size:12.5px;color:var(--muted);letter-spacing:0.1em;margin-top:9px}
+.head .rule{width:44px;height:1px;background:var(--gold);opacity:0.6;margin:30px auto 0}
+.abstract{max-width:620px;margin:34px auto 0;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:22px 26px}
+.abstract .lbl{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:12px}
+.abstract p{font-size:14.5px;color:var(--ink2);line-height:1.95;letter-spacing:0.01em}
+.kw{max-width:620px;margin:14px auto 0;font-size:13px;color:var(--muted);letter-spacing:0.04em;text-align:center}
+.body{padding-top:12px}
+.sec{margin:52px 0 8px}
+.sec .n{font-size:20px;font-weight:800;color:#2A2315;letter-spacing:0.04em;line-height:1.5}
+.sec .sub{font-size:13.5px;color:var(--gold);letter-spacing:0.14em;margin-top:8px}
+.sec-rule{width:34px;height:1px;background:var(--gold);opacity:0.55;margin:18px 0 26px}
+.body p{font-size:17px;color:var(--ink2);line-height:2.05;margin-bottom:22px;letter-spacing:0.01em;text-align:justify}
+.body p.lead{color:var(--ink)}
+.end-orn{text-align:center;color:var(--gold);opacity:0.65;letter-spacing:0.6em;margin:46px 0 6px;font-size:14px}
+.foot-nav{max-width:680px;margin:0 auto;padding:12px 24px 34px;text-align:center;display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+.foot-nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em;border-bottom:1px solid rgba(138,104,23,0.4);padding-bottom:2px}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a10 0%,#1c160b 60%,#140f07 100%);text-align:center;padding:56px 24px;margin-top:40px}
+.endbox .eb-k{font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:16px}
+.endbox .eb-t{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.08em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:2}
+.endbox a{display:inline-block;letter-spacing:0.1em;padding:12px 30px;font-size:14.5px;text-decoration:none;border-radius:2px;margin:6px}
+.endbox .primary{background:#D4B25E;color:#150F24;font-weight:700}
+.endbox .ghost{border:1px solid #D4B25E;color:#D4B25E}
+footer{border-top:1px solid var(--line);padding:28px 24px;text-align:center;color:var(--muted);font-size:13px;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.body p{font-size:16px}.essay{padding-top:40px}}
+
+.body p.ref{font-size:14px;line-height:1.9;margin-bottom:10px;padding-left:2em;text-indent:-2em;color:var(--muted)}
+.body p.tick{padding-left:1.5em;text-indent:-1.5em;margin-bottom:8px;color:var(--ink2)}
+.body p.tick:before{content:"—";color:var(--gold);padding-right:.6em;font-weight:700}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+.ednote{font-size:.92em;opacity:.78;border-left:3px solid rgba(200,145,23,.45);padding:6px 0 6px 14px;margin:10px 0 18px}
+</style><link rel="stylesheet" href="/sde-read.css">
+<link rel="stylesheet" href="/students/companion-original.css?v=20260817c">
+</head>
+<style>
+.wrap .fml,.body .fml{text-align:center;font-family:"DejaVu Sans Mono",Consolas,Menlo,monospace;font-size:15px;line-height:1.9;margin:16px 0;letter-spacing:.02em;opacity:.95;overflow-x:auto}
+.wrap .figcap,.body .figcap{font-size:13.5px;opacity:.72;text-align:center;margin:6px 0 22px;letter-spacing:.02em}
+.wrap .li,.body .li{margin-left:1.4em;text-indent:0}
+.wrap .tw,.body .tw{margin:22px 0}
+.wrap .entitle,.body .entitle{font-size:15px;font-weight:700;text-align:center;margin:26px 0 6px;letter-spacing:.01em}
+.wrap .kw,.body .kw{font-size:13.5px;opacity:.8;margin:10px 0 22px;letter-spacing:.02em}
+.ednote{font-size:.93em;opacity:.8;border-left:3px solid rgba(160,130,60,.5);padding:8px 0 8px 14px;margin:12px 0 20px}
+.abstract .lb{display:block;font-size:12px;letter-spacing:.3em;opacity:.75;margin-bottom:10px}
+</style>
+
+<style>
+.wrap .fml{text-align:center;font-family:"DejaVu Sans Mono",Consolas,Menlo,monospace;font-size:15px;line-height:1.9;margin:16px 0;letter-spacing:.02em;overflow-x:auto}
+.wrap .figcap{font-size:13.5px;opacity:.72;margin:22px 0 6px;letter-spacing:.02em;font-weight:700}
+.wrap .li{margin-left:1.4em;text-indent:0}
+.wrap .tw{margin:18px 0 26px;overflow-x:auto}
+.wrap table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.7}
+.wrap th,.wrap td{border:1px solid rgba(160,130,60,.32);padding:9px 11px;text-align:left;vertical-align:top}
+.wrap th{background:rgba(160,130,60,.13);font-weight:700}
+.ednote{font-size:.93em;opacity:.82;border-left:3px solid rgba(160,130,60,.5);padding:8px 0 8px 14px;margin:12px 0 20px}
+.statement{background:var(--panel,rgba(160,130,60,.08));border:1px solid rgba(160,130,60,.32);padding:16px 20px;margin:22px 0 6px;font-size:15px;line-height:1.9}
+.abstract .lb{display:block;font-size:12px;letter-spacing:.3em;opacity:.75;margin-bottom:10px}
+</style>
+
+<body class="sde-read">
+<div class="readbar"><a class="nav-back" href="/students/shao-min/works/">‹ 少敏 · 全部作品</a>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div></div>
+<header class="art"><div class="art-series">学员专栏 · 少敏 · 人机系统的效力审计</div>
+<h1 class="art-title">作品不能保存全部原创性</h1>
+<div class="art-subtitle">被删除的分支如何改变下一次判断——人机共创中的生成性拒绝、因果持续与分支互换实验</div>
+<div class="art-meta">作者 少敏 · SDE 学员 · 约 1.0 万字 · 发表于2026年8月14日 · 编辑增补版</div></header>
+<div class="wrap">
+<div class="scorebox"><b>SDE 创新智商：盲评 148.3</b><p>盲评为投稿原稿未经任何编辑改动时评出的五维结构化评分（S 结构精确度 152 ／ D 差异锐度 148 ／ E 纠缠深度 145 ／ I 不可还原性 143 ／ F 可证伪性 155，加权 .20/.25/.20/.20/.15）。本文自设研究状态声明，按理论与研究设计论文口径评分。近邻比对按全球公开文献口径从严，并计入站内自撞。<b>文末三则附论（最近邻补切、站内划界、编辑校订说明）由编辑增补，不计入本分数</b>；正文的判断、论证结构与全部形式表达未经改动。<b>待独立复核。</b><span style="opacity:.8">（评分：Claude · 2026年8月14日）</span></p></div>
+<div class="statement">研究状态声明：本文是一篇理论与研究设计论文，不是实证结果报告。文中的真实轨迹先导仅用于检验数据捕获与编码可行性；统计模型、阈值、实验预测与死亡条件用于规定何种结果能够支持、降级或删除命题，不构成经验发现。模拟数据如被使用，只能检查功效与分析管线，不能作为现实效应证据。</div>
+<div class="abstract"><span class="lb"><b>摘 要</b></span>
+<p>原创性研究通常追问作品是否新颖、作者是否具有意图与控制、共同体是否承认某项创新。三条传统立场不同，却共享一种“正向留存偏见”：原创性的载体被放在最终留下的形式、被接受的选择或得到承认的结果中。即使研究开始保存创作轨迹，也常把拒绝理解为负例、偏好标签、未选项价值或通向成品的辅助信息。这个前提在人机共创中不再充分，因为拒绝不仅可以删去一个候选，还可能改变伙伴下一步生成什么；伙伴的回应又可能被行动者继续承接，并在原作品、原伙伴和来源标签缺席后改变其对新作品的判断。</p>
+<p>本文提出“生成性拒绝”假说，并把其理论核心收紧为“无作品表征留存的因果持续”：一个差异可以不再以可逆推出的形式留在成品中，却通过“行动者拒绝—伙伴定向回应—行动者再次承接—跨作品判断迁移”持续发挥因果作用。这里并不否认行动者内部可能形成新的倾向或策略；被否定的是“因果效力必须仍以原差异的公开表征留在作品中”。由此得到“作品存储不完备命题”：形式相同的作品不必具有相同的未来效力，因为作品可以保存决定的结果，却删除使判断能力发生改变的部分原因。该命题不能由反事实学习、共同学习、参与式意义生成、生态位建构或一般路径依赖中的任何一个单独替代；它要求同时识别被删除差异、伙伴回应、行动者回接与延迟迁移，并允许通过分支互换作因果干预。</p>
+<p>本文建立二维判决框架，分别检验伙伴是否被拒绝改变、行动者是否被伙伴的回应改变，由此区分终止型拒绝、负例学习、单向适配和生成性拒绝。研究程序分为三层：8—12条真实轨迹的可行性先导只检验事件图捕获、九维音乐编码、盲态信度与数据治理；确认性实验一采用“行动地位×回应依赖”设计，检验主动承接与本人回应的交互；确认性实验二采用“同成品—同接受项—异被拒绝分支”设计，随机交换已经从作品中消失的分支。主要终点是四周后纯人类留出作品判断中，回应签名相对于成品、接受项、简单拒绝签名、记忆和能动感的增量预测效力。</p>
+<p>本文同时给出事件数据契约、竞争模型、判决性并存预测和十条死亡条件。若回应不依赖本人拒绝、行动者不再承接、简单路径或成品吸收全部效应，或分支互换不能交换后测差异，命题必须降级或删除。若命题存活，原创性的研究对象将从“谁留下了什么”扩展到“哪一个已经消失的差异，仍经由他者回应改变了谁下一次能够看见什么”。</p>
+</div>
+<div class="keywords">关键词：人机共创；生成性拒绝；因果持续；参与式意义生成；共同学习；创作轨迹；分支互换</div>
+<h2>1. 问题：原创性研究为何总在寻找“留下来的东西”</h2>
+<p>生成式人工智能重新激活了关于原创性的三类争论。计算创造力以新颖性、价值、惊奇和概念空间变换评价作品；作者论关注意图、控制、表达与责任；社会—制度取向强调共同体的识别、评价与承认。三者分别把原创性放在作品、行动者和制度关系中，却大多以已经出现、被选择或被确认的对象为证据（Amabile, 1982；Boden, 1998）。</p>
+<p>这一共同取向可以称为“正向留存偏见”：只有进入作品、意图叙述、署名结构或社会承认的差异，才被视为原创性的有效载体。被拒绝项即使被讨论，也常只是已选项的背景、偏好推断的负标签，或通向结果的失败路径。研究因此倾向于问：成品包含了什么？作者保留了什么？共同体承认了什么？</p>
+<p>人机共创使这一偏见变得可疑。创作者说“不要这个终止式”，可能发生四件不同的事：系统删去该候选；系统把它记作负例；系统针对拒绝作定向变化；创作者在新的候选中第一次辨认出“开放”与“未完成”并非同一回事。最终成品可能完全不包含被拒绝的终止式，创作者却在以后面对一首与原作无关的乐曲时，形成了不同的选择边界。</p>
+<p>此时，被删除的差异既不在作品中，也不能仅归属于创作者原有偏好。它先改变伙伴的生成，再由伙伴的回应返回并改变行动者。若这一链条存在，作品就不是原创性效力的完备存储器。</p>
+<p>本文的核心问题因此不是“拒绝是否有影响”，而是：</p>
+<p>一个已从作品中消失的差异，能否仍经由伙伴的回应改变行动者下一次能够作出的判断？</p>
+<h2>2. 三条强近邻与一个共同盲点</h2>
+<h3>2.1 共同学习：反馈改变系统，但未必改变反馈者</h3>
+<p>共同学习（coactive learning）把人与学习系统置于连续互动中：系统提出候选，用户提供一个较优修正，系统据此更新后续预测。它不要求用户给出全局最优答案，因此特别适合从点击、编辑和纠正中学习偏好（Shivaswamy &amp; Joachims, 2015）。这一结构已经足以反驳“拒绝只是终止动作”。近期面向大语言模型的工作进一步把用户编辑视为弱但可用的隐式偏好反馈，用于模型个性化（Tucker et al., 2024）。</p>
+<p>然而，共同学习的主要被解释对象是系统：它是否从用户反馈中减少遗憾、提高排序或产生更合意的输出。即使系统被用户改变，也不能推出用户被系统的回应改变。系统适配和行动者学习可以分离：一个模型可能越来越会迎合用户，而用户的判断边界保持不变。</p>
+<h3>2.2 参与式意义生成：互动可以构成认知，但缺少可交换的删除分支</h3>
+<p>参与式意义生成认为，互动过程不是个体认知的外部背景；互动可以形成相对自主的动力，并调节参与者各自的意义生成（De Jaegher &amp; Di Paolo, 2007）。进一步的论证指出，某些社会认知过程并非先在个体内部完成后再被表达，互动本身可以成为其构成条件（De Jaegher et al., 2010）。</p>
+<p>这一传统为本文提供了重要约束：伙伴回应不能只作为信息输入，而可能改变行动者能够形成什么区别。但参与式意义生成通常以持续耦合的整体动力为分析单位，较少要求定位一条已经被删除、可以随机互换、并在互动结束后仍留下方向性后果的分支。它能够说明“互动改变了人”，却不能独自判定“是哪一个被否定的差异，通过哪次回应改变了人”。</p>
+<h3>2.3 生态位建构：行动改变反作用环境，但缺少作品中的消失问题</h3>
+<p>生态位建构理论指出，行动者并非只适应既定环境；它们也通过活动修改环境，从而改变随后作用于自身及其他行动者的选择压力。被修改的环境可形成定向、持续的反馈，甚至产生生态遗产（Laland et al., 2017）。</p>
+<p>在人机共创中，拒绝也可能修改局部“候选生态”：它改变下一轮有哪些差异可供行动，新的候选再反过来塑造创作者的选择。然而生态位建构关心环境状态如何持续，本文的问题恰恰发生在一个悖论位置：最关键的差异可以不作为环境或作品中的可见状态持续存在。它的形式被删除，因果效力却经由伙伴的回应转移到行动者。</p>
+<h3>2.4 共同前提与内生推翻</h3>
+<p>三条近邻分别解释系统更新、互动构成和反馈环境，但都倾向于通过某种可定位的“留存物”追踪效力：模型参数被更新、互动动力持续、环境状态被改变。它们共享一个未必明说的分析前提：若要追踪因果效力，就应在当前系统、互动或环境中找到仍可直接观察的状态。</p>
+<p>这一前提被它们自己的材料内在推翻。共同学习说明最优答案不必被完整保存，只需局部修正改变下一步；参与式意义生成说明意义不必预先存在于任一参与者内部，而可在关系中形成；生态位建构说明选择条件不是外在常量，而可由行动者自己的活动生成。把三者放在一起，可推出一个它们都未单独写出的候选判断：</p>
+<p>理论假说：差异的作品表征可以被删除，差异的因果效力却可能经关系转译，并在关系结束后表现为行动者判断倾向的改变。</p>
+<p>这不是把三种理论并列套用。它改变了研究单位：从仍在场的作品、模型或互动，转向一个已不再能从成品逆推出、却可通过分支互换检验其后果的差异。</p>
+<h3>2.5 三项约束如何共同生成一个新对象</h3>
+<p>三条理论不是三个“支持来源”，而是分别向命题施加一个不可互换的约束。共同学习要求后继候选定向依赖行动者的拒绝；参与式意义生成要求行动者对回应进行再次承接，否则系统变化只是外部输入；生态位建构要求这段相互作用在当次互动结束后仍有延迟回写。本文研究的不是三者交集中的一个宽泛“互动效应”，而是三项约束同时成立时才出现的路径对象：被删除差异不再留在成品中，却经一次定向回应和一次行动者回接，改变后续可作出的区分。</p>
+<div class="tw"><table>
+<tr><th>被拿掉的约束</th><th>剩余结构</th><th>理论降级</th><th>不能再主张什么</th></tr>
+<tr><td>定向依赖</td><td>参与者经历了变化与迁移</td><td>一般暴露、负例或主动学习</td><td>变化由“我的拒绝改变伙伴”所构成</td></tr>
+<tr><td>再次承接</td><td>伙伴按拒绝改变输出</td><td>个性化、共同学习或单向适配</td><td>伙伴回应进入了行动者判断结构</td></tr>
+<tr><td>延迟回写</td><td>当次互动内发生双向调节</td><td>参与式意义生成或短时协作改进</td><td>差异在原作品与关系结束后仍有效</td></tr>
+</table></div>
+<p>因此，三项约束不是相加的充分理由，而是可被分别消融的必要条件。只有它们与“作品表征已消失”共同成立，才允许进入生成性拒绝候选；任何一项失败，都必须退回相应近邻。这一消融结构也规定了理论如何被数据改写，而不只是如何被数据支持。</p>
+<h2>3. 核心命题：无作品表征留存的因果持续</h2>
+<h3>3.1 生成性拒绝</h3>
+<p>本文将“生成性拒绝”限定为：行动者对具体差异的拒绝改变了伙伴随后提供什么，伙伴的定向回应又被行动者继续承接，并在原作品、原伙伴和来源标签缺席后增量改变对新作品的判断。</p>
+<p>最小发生链包含四环：</p>
+<p>差异化拒绝：行动者拒绝的是可定位差异，而非笼统不满；</p>
+<p>回应依赖：伙伴的下一候选因该拒绝而定向改变；</p>
+<p>再次承接：行动者对回应后的候选继续接受、修订或定向拒绝；</p>
+<p>跨作品迁移：延迟后测中，这段转化仍预测对新材料的判断。</p>
+<p>少一环，结论都必须降级。只有第一环，是拒绝任务；前两环，是系统适配；第一与第四环而无回应，是负例或反事实学习；前三环而无迁移，是当次协作改进；只有四环同时成立，才进入本文主张。</p>
+<h3>3.2 无作品表征留存的因果持续</h3>
+<p>“无作品表征留存的因果持续”指：某一差异不再以可从最终作品逆推出的形式存在，却通过改变伙伴回应及行动者后续承接，对未来判断产生可识别的方向性效力。这里的“无作品表征”不等于系统中没有任何物理或心理载体。相反，命题要求载体发生转换：从被拒绝形式，转为伙伴的定向变换，再转为行动者可迁移的区分倾向。若实验只能证明参与者记住了原负例，载体并未完成这种转换，结论应降级为记忆或反事实学习。</p>
+<p>它有四个必要条件：</p>
+<p class="li">· 作品表征消失：被拒绝差异不进入最终成品，也不能由成品特征可靠逆推；</p>
+<p class="li">· 关系转译：其方向必须经过伙伴的定向回应而发生可测变换，而非仅靠看见负例；</p>
+<p class="li">· 倾向形成：行动者必须再次承接，使回应方向进入后续选择边界；</p>
+<p class="li">· 行为剩余：控制成品、接受项、简单拒绝历史、显性记忆和能动感后，仍有跨作品预测剩余。</p>
+<p>这一定义刻意排除“作品里其实偷偷留下了该特征”的解释，也排除“参与者只是记得自己不喜欢什么”的解释。它不把因果持续神秘化为“无载体的作用”，而把问题改写为：载体是否从作品形式转换为关系中的方向变化，再转换为行动者的判断倾向。</p>
+<p>为避免四个条件被总分补偿，令 zᵢ 表示作品表征消失，dᵢ 表示回应依赖，rᵢ 表示行动者再次承接，tᵢ 表示延迟迁移，则个体层生成性判决为：</p>
+<p class="fml">gᵢ = zᵢ × dᵢ × rᵢ × tᵢ</p>
+<p>这里的乘法不是效应量模型，而是逻辑合取：任一项为0，gᵢ即为0。响应很高不能补偿没有承接，迁移很强也不能补偿分支仍留在成品中。效应大小另由预注册模型估计，概念资格则由这一非补偿门决定。由此，生成性拒绝不是“反馈强度”的高分端，而是一种具有结构断点的机制类别。</p>
+<h3>3.3 作品存储不完备命题</h3>
+<p>由此可得：</p>
+<p>形式相同的作品可以具有不同的未来效力，因为作品能够保存决定的结果，却不能保证保存改变判断能力的全部原因。</p>
+<p>该命题不是宣称过程总比作品重要。它只提出一个可检验例外：当同成品、同接受项、同暴露量的轨迹只在被回应的拒绝分支上不同，而后测判断仍分化时，作品对原创性效力的存储是不完备的。若后测不分化，作品足以吸收路径差异，命题失败。</p>
+<h2>4. 二维判决：伙伴改变与行动者改变必须分开</h2>
+<p>“拒绝有用”把两个不同结果混在一起：伙伴是否改变，行动者是否改变。将二者拆开，可得到四种机制：</p>
+<div class="tw"><table>
+<tr><th>伙伴因拒绝改变下一项</th><th>行动者的未来判断改变</th><th>机制判决</th><th>允许主张</th></tr>
+<tr><td>否</td><td>否</td><td>终止型拒绝</td><td>候选被删除，无生成效力</td></tr>
+<tr><td>否</td><td>是</td><td>负例／反事实学习</td><td>行动者从被拒绝项学习，但不依赖伙伴回应</td></tr>
+<tr><td>是</td><td>否</td><td>单向适配</td><td>伙伴学会迎合，行动者未形成新判断</td></tr>
+<tr><td>是</td><td>是</td><td>生成性拒绝候选</td><td>仍须通过再次承接与跨作品迁移检验</td></tr>
+</table></div>
+<p>这一二维框架带来一个对现有共创评价的直接修正：更高的系统响应性不等于更深的人类学习；更强的人类偏好变化也不等于它由互动构成。只有双向改变且具有可追踪中介，才能把“共同”从同时发生提升为因果相互构成。</p>
+<h2>5. 九个最近邻与1∶1替换检验</h2>
+<div class="tw"><table>
+<tr><th>最近邻</th><th>已能解释什么</th><th>不能替换本文的地方</th><th>若无差异时的降级去向</th></tr>
+<tr><td>反事实学习</td><td>未选项影响估值与记忆</td><td>不要求未选项改变伙伴的下一次生成</td><td>反事实学习</td></tr>
+<tr><td>选择／拒绝模式</td><td>拒绝提高对不一致特征的加工</td><td>不要求伙伴回应及跨作品迁移</td><td>拒绝加工效应</td></tr>
+<tr><td>反应转移</td><td>量尺、价值权重或概念化改变</td><td>不提供可交换的上游拒绝分支</td><td>一般标准变化</td></tr>
+<tr><td>主动学习</td><td>自己选择比配对观看学得更深</td><td>不区分本人回应与他人回应</td><td>一般主动性</td></tr>
+<tr><td>共同学习</td><td>用户修正使系统后续输出改善</td><td>主要解释系统改变，不要求用户再改变</td><td>个性化／模型适配</td></tr>
+<tr><td>参与式意义生成</td><td>互动可构成个体意义生成</td><td>缺少对删除分支的随机互换与延迟追踪</td><td>互动构成效应</td></tr>
+<tr><td>生态位建构</td><td>行动修改随后作用于自己的环境</td><td>通常依赖环境状态或生态遗产持续</td><td>一般反馈环境</td></tr>
+<tr><td>路径依赖</td><td>过去事件通过自强化限制后续选择</td><td>不要求路径效力经过可交换的伙伴回应，也不区分固化与判断生成</td><td>一般历史依赖或锁定</td></tr>
+<tr><td>创意库存</td><td>未实现想法进入未来项目</td><td>不要求即时伙伴回应，也不要求差异已消失</td><td>想法储存／再利用</td></tr>
+<tr><td>轨迹可视化</td><td>保存并概括创意活动连接</td><td>能描写边，不自动识别哪条边有因果效力</td><td>过程记录方法</td></tr>
+</table></div>
+<p>替换实验的判据不是“是否能找到相似词”，而是用近邻替换核心命题后，是否仍能同时推出以下四点：被拒绝差异从成品中消失；伙伴回应依赖本人拒绝；行动者继续承接；交换删除分支会交换延迟判断方向。任何单一近邻目前都不能同时推出四点。但这只是敌意检索后的临时候选判断，不是“前人从未提出”的事实证明。</p>
+<p>路径依赖是本轮敌意拓宽后最危险的占位者，因为它已经主张当前状态不足以解释未来：历史路径本身会限制后续选择（Vergne &amp; Durand, 2010）。本文与它的差异不在“历史有后果”，而在后果的生成机制与价值方向。一般路径依赖可由自强化直接产生锁定；本文要求一条可交换的拒绝分支先改变伙伴、再被行动者回接，并允许结果表现为更精细的辨别或更僵硬的偏好。若“配对他人回应”与“本人回应”无差异，或无关维度伪回应也产生同样后果，生成性拒绝应被路径依赖或一般序列效应吸收。</p>
+<h2>6. 事件图、回应边与可观测表示</h2>
+<h3>6.1 为什么线性日志不够</h3>
+<p>提示—输出—选择的线性日志只能说明事件先后，不能说明后继候选是对哪一次拒绝的回应。本文把每次共创表示为有向事件图 Gᵢ＝(Vᵢ,Eᵢ)。节点包括候选、接受、拒绝、理由、修改请求、伙伴回应和成品；边分为时间相邻边、版本父子边和回应边。</p>
+<p>只有当后继候选的变化与本人拒绝理由的匹配高于配对他人理由和冻结置换理由时，才建立候选回应边。截图可以用于审计，但不能成为唯一数据源；没有稳定会话、节点、父节点和版本标识的轨迹，不可进入确认性分析。</p>
+<h3>6.2 九维音乐入口</h3>
+<p>首个受控场域使用八小节钢琴片段。每个候选 v 被编码为九维特征向量 xᵥ：</p>
+<div class="tw"><table>
+<tr><th>维度</th><th>操作定义</th><th>主要编码方式</th></tr>
+<tr><td>音符密度</td><td>每拍有效起音数</td><td>MusicXML 自动计算</td></tr>
+<tr><td>切分强度</td><td>弱位起音延续至强位的加权比例</td><td>冻结节拍权重算法</td></tr>
+<tr><td>音程离散</td><td>相邻音程绝对值均值与分布熵</td><td>自动计算并标准化</td></tr>
+<tr><td>调性偏离</td><td>非调内音比例与调性张力</td><td>自动指标＋盲态专家复核</td></tr>
+<tr><td>动机复现</td><td>二至四音型重复占比</td><td>n-gram 匹配</td></tr>
+<tr><td>乐句对称</td><td>分句长度偏离4＋4的程度</td><td>结构标注</td></tr>
+<tr><td>终止闭合</td><td>终止式闭合强度</td><td>两名盲态音乐教师编码</td></tr>
+<tr><td>音域跨度</td><td>最高与最低音的半音距离</td><td>自动计算</td></tr>
+<tr><td>动态反差</td><td>力度范围与变化次数</td><td>MusicXML 自动计算</td></tr>
+</table></div>
+<p>九维不是审美本体，而是首个可操纵的测量面。人工编码与冻结音频嵌入只作为两种预注册表示；若结论方向相反，主张保持未建立，不得在看到结果后选择更有利表示。</p>
+<h3>6.3 回应忠实度与回应签名</h3>
+<p>在第 k 回合，行动者拒绝候选 rᵢₖ，理由向量为 uᵢₖ，伙伴返回候选 nᵢ,ₖ₊₁。拒绝后的转化向量为：</p>
+<p class="fml">cᵢₖ = xₙᵢ,ₖ₊₁ − xᵣᵢₖ</p>
+<p>回应忠实度为：</p>
+<p class="fml">ρᵢₖ = cos(cᵢₖ, uᵢₖ)</p>
+<p>只有当本人理由的 ρᵢₖ 同时高于配对他人理由与随机置换理由，且两名盲态编码员判定变化针对被拒绝差异，才把该边标记为候选回应边。</p>
+<p>行动者是否继续承接由 mᵢₖ 表示：接受回应候选、沿同一差异继续修改，或作出下一项定向拒绝时 mᵢₖ＝1。个体回应签名为：</p>
+<p class="fml">qᵢ = (Σₖ mᵢₖρᵢₖcᵢₖ) / (Σₖ mᵢₖρᵢₖ)</p>
+<p>旧的简单接受—拒绝签名为：</p>
+<p class="fml">pᵢ = (1 / Kᵢ) Σₖ (xₐᵢₖ − xᵣᵢₖ)</p>
+<p>本文不预设 qᵢ 优于 pᵢ。若回应签名不能在成品、接受项和简单路径之上提高留出预测，它只是复杂编码，必须删除其理论特权。</p>
+<h2>7. 四项判决性并存预测</h2>
+<p>将命题压缩为可检验的并存关系，可得到四项比“拒绝有影响”更强的预测：</p>
+<p>成品同一可与未来判断分化并存：同成品、同接受项不保证同一延迟选择边界；</p>
+<p>高系统响应可与低人类迁移并存：伙伴准确回应拒绝，但行动者未继续承接时，系统适配不产生判断迁移；</p>
+<p>低显性记忆可与维度特异迁移并存：若效力已转移到判断策略，对原候选的再认不是必要充分条件；但若控制记忆后效应消失，结论降级为记忆中介；</p>
+<p>高主动性可与低回应依赖并存：参与者自己作出大量选择，若下一候选不依赖本人拒绝，主动性仍不足以支持生成性拒绝。</p>
+<p>这四项并存预测使最危险的近邻必须同时解释“形式相同却后果不同”“伙伴改变却人未改变”“人主动却关系未形成”等分离，而不能只用一个宽泛的学习概念吸收全部结果。</p>
+<h2>8. 真实轨迹可行性先导：先证明研究对象能够被保存</h2>
+<p>在核心效应实验之前，先进行8—12条真实人机音乐共创轨迹的可行性先导。它只回答事件图和候选回应边能否被可靠捕获与编码，不估计核心交互，不测试理论存活。</p>
+<h3>8.1 样本与任务</h3>
+<p class="li">· 招募8—12名成年人，每人一条独立轨迹；不以同一人的多次会话补足样本；</p>
+<p class="li">· 建议至少三年器乐学习经验，正式门槛在首条轨迹前冻结；</p>
+<p class="li">· 每条轨迹从冻结的八小节材料开始，进行6—10轮选择、拒绝或修改；</p>
+<p class="li">· 系统不得强迫每轮拒绝，也不得在任务中出现理论名称或暗示未来判断会改变；</p>
+<p class="li">· 伙伴模型、版本、系统提示哈希、生成参数、工具链版本和可获得随机种子必须记录。</p>
+<h3>8.2 六个可行性门</h3>
+<div class="tw"><table>
+<tr><th>ID</th><th>终点</th><th>GO门</th></tr>
+<tr><td>P1</td><td>必填字段捕获率</td><td>总体≥95%，且无会话低于90%</td></tr>
+<tr><td>P2</td><td>事件图可重建率</td><td>≥90%</td></tr>
+<tr><td>P3</td><td>回应边判断信度</td><td>Krippendorff α≥0.67</td></tr>
+<tr><td>P4</td><td>九维编码可用度</td><td>至少6／9维达到 α 或 ICC≥0.67</td></tr>
+<tr><td>P5</td><td>可承接边供给</td><td>至少60%轨迹含两条候选 (m=1) 边</td></tr>
+<tr><td>P6</td><td>隐私与退出可执行性</td><td>同意、撤回、去标识和删除演练100%完成</td></tr>
+</table></div>
+<p>P1、P2、P3、P6为硬门。P4或P5失败只说明材料、理由菜单或编码手册尚不能进入确认性研究，不构成理论死亡。超过12条轨迹仍不能过门，必须修订协议并重新做独立先导，不能继续扩样寻找有利方向。</p>
+<h3>8.3 先导的证据边界</h3>
+<p>先导只报告计数、比例、缺失模式、信度区间、技术故障和协议偏离。允许用模拟数据检查M0—M4代码、功效范围、参数恢复和误报率，但模拟输出必须与真实轨迹分账。即使P1—P6全部通过，核心命题仍保持 NOT_TESTED。</p>
+<h2>9. 确认性实验一：行动地位×回应依赖</h2>
+<h3>9.1 四组设计</h3>
+<div class="tw"><table>
+<tr><th>回应方式</th><th>主动决定</th><th>配对回放</th></tr>
+<tr><td>依赖本人拒绝</td><td>C1：伙伴按本人拒绝理由定向生成</td><td>C0：观察与C1相同的拒绝、回应、候选和成品</td></tr>
+<tr><td>配对他人回应</td><td>Y1：本人作真实选择，但后继候选来自匹配参与者轨迹</td><td>Y0：观察与Y1相同的完整轨迹</td></tr>
+</table></div>
+<p>Y1是关键对照。它保留主动选择、努力、时长、候选数量与质量，却切断“我的拒绝改变了你下一步做什么”。回应候选需按九维距离、盲态质量和基础愉悦度匹配；参与者不知道候选源于本人还是他人路径。</p>
+<p>AI伙伴与受训人类伙伴执行同一设计，作为复制因素而非原创性定义。若两种伙伴都出现同一交互，理论应归属于响应性共作；若只在AI条件出现，结论必须限制为特定系统与任务，不得提升为AI本体特权。</p>
+<h3>9.2 主要判决量</h3>
+<p>令 (Jᵢ) 为回应签名对四周延迟后测中纯人类留出作品选择的预注册增量预测指标。主要因果对比为：</p>
+<p class="fml">θ = [E(J | C1) − E(J | C0)] − [E(J | Y1) − E(J | Y0)]</p>
+<p>θ＞0 仍不足以单独支持命题；还必须同时满足：</p>
+<p class="li">· qᵢ 在留出数据上稳定优于 pᵢ、成品和接受项特征；</p>
+<p class="li">· 后测材料由未参与训练的人类创作者提供，来源盲态；</p>
+<p class="li">· 四周唯一主要终点通过，不能用即时自述挽救；</p>
+<p class="li">· M4加入记忆、能动感、投入和选择后合理化后，回应签名未被完全吸收。</p>
+<h2>10. 确认性实验二：同成品—同接受项—异被删除分支</h2>
+<p>实验二直接干预作品已经删除的部分。每对轨迹具有相同初始材料、相同接受节点、相同修改次数和相同最终成品，只随机分配一条被拒绝且得到定向回应的差异分支。</p>
+<p>例如，轨迹A曾拒绝过高切分，伙伴降低切分后返回；轨迹B曾拒绝过强终止闭合，伙伴开放终止后返回。两条轨迹随后汇合到同一接受节点。若成品和接受项是全部载体，两组后测不应不同；若删除分支具有因果持续，A组对新作品的切分差异更敏感，B组对终止闭合更敏感。</p>
+<p>实验增加三个控制：</p>
+<p>看见但不回应：看见相同负例，后继候选与拒绝无关；</p>
+<p>回应但不承接：伙伴按拒绝改变下一项，但参与者不再决定；</p>
+<p>伪回应：变化幅度匹配，却沿与拒绝理由无关的维度改变。</p>
+<p>只有“本人拒绝—定向回应—本人再承接”产生维度特异迁移，才能把负例暴露、诱饵效应与一般响应性同时排除。</p>
+<h2>11. 分析模型、功效与偏离</h2>
+<h3>11.1 模型族</h3>
+<p class="li">· M0：基线判断＋作品随机效应；</p>
+<p class="li">· M1：M0＋最终成品与累计暴露；</p>
+<p class="li">· M2：M1＋简单接受—拒绝签名 pᵢ；</p>
+<p class="li">· M3：M2＋回应签名 qᵢ；</p>
+<p class="li">· M4：M3＋记忆、能动感、投入、感知回应性与选择后合理化。</p>
+<p>确认性判决要求M3在逐参与者交叉验证留出数据上稳定优于M2，且M4不完全吸收回应签名。先验、随机效应结构、缺失处理、正则化、比较准则和稳健性分析必须在看见确认性结果前冻结。</p>
+<h3>11.2 功效与样本量</h3>
+<p>本文不预写装饰性样本量。正式样本量针对交互 θ、M3−M2留出增益、四周流失和作品层方差做模拟功效分析。真实先导只提供路径内边数、回应忠实度分布、编码信度和流失估计。模拟能够证明分析管线能否识别预设参数，不能证明现实中存在该参数。</p>
+<h3>11.3 偏离纪律</h3>
+<p>首名确认性参与者进入后，材料、阈值、排除、特征算法、嵌入模型和主要终点冻结。任何变更记录时间、原因、是否已看结果、影响范围和新版本。技术修复不得静默覆盖轨迹；缺失主终点不得用即时指标、子组或新术语挽救。</p>
+<h2>12. 十条死亡条件与降级路由</h2>
+<p>回应无关死亡：本人回应与配对他人回应无差异，删除回应依赖；</p>
+<p>主动性吸收死亡：C1−C0不大于Y1−Y0，归入一般主动学习或投入；</p>
+<p>简单路径吸收死亡：qᵢ 不优于 pᵢ，删除生成性拒绝概念；</p>
+<p>成品吸收死亡：成品和接受项完全解释后测，归入作品暴露或范畴学习；</p>
+<p>分支互换死亡：后测不随随机删除分支改变，否定作品存储不完备命题；</p>
+<p>负例学习降级：看见但不回应组与完整链条组相同，归入负例或反事实学习；</p>
+<p>承接缺失死亡：回应但不承接组与完整链条组相同，删除再次承接的构成地位；</p>
+<p>伪回应死亡：无关维度的等幅变化产生同样效应，归入新奇、唤醒或暴露；</p>
+<p>来源依赖死亡：只有披露AI来源或原伙伴在场时出现，归入来源归因或社会启动；</p>
+<p>复制死亡：独立材料、样本或伙伴来源中反向且无法解释，理论保持未建立。</p>
+<p>死亡条件的作用不是显示论文“很谨慎”，而是把概念的去向写死。任何核心死亡触发后，都必须同步削弱标题、摘要与结论；不得以探索性时间点、维度子集或更宽泛叙述保留原主张。</p>
+<h3>12.1 失败结果如何改写理论</h3>
+<p>证伪不只决定“保留或删除”，还决定哪一种关系曾被误认。下表把主要结果模式与理论修订绑定，防止数据只被用来增减置信度而不改变结构。</p>
+<div class="tw"><table>
+<tr><th>结果模式</th><th>仍成立的关系</th><th>必须删除的关系</th><th>修订后的理论对象</th></tr>
+<tr><td>d=1，r=0，t=0</td><td>拒绝改变伙伴</td><td>伙伴回应构成行动者学习</td><td>单向适配／个性化</td></tr>
+<tr><td>d=1，r=1，t=0</td><td>当次互动形成双向调节</td><td>关系结束后的因果持续</td><td>短时参与式意义生成</td></tr>
+<tr><td>d=0，t=1</td><td>历史或负例影响后续判断</td><td>本人拒绝—伙伴回应的定向中介</td><td>反事实学习／一般路径依赖</td></tr>
+<tr><td>z=0，d=1，r=1，t=1</td><td>完整链条与迁移存在</td><td>作品存储不完备</td><td>作品内线索驱动的互动学习</td></tr>
+<tr><td>z=1，d=1，r=1，t=1，且分支互换改变方向</td><td>四项约束及其方向性同时成立</td><td>暂无；仍待独立复制与跨材料检验</td><td>生成性拒绝候选</td></tr>
+</table></div>
+<p>其中 z、d、r、t 与上一节的非补偿门同义。这个修订矩阵使三种输入理论获得不同的失败回路：共同学习约束d，参与式意义生成约束r，生态位建构约束t，而作品论约束z。数据若击穿任一关系，论文必须回到对应理论重写问题，而不是用其余三项的高值补偿。</p>
+<h2>13. 理论后果：原创性可以存在于被删除差异的因果后效中</h2>
+<h3>13.1 对作品论的修正</h3>
+<p>作品仍是原创性判断的重要证据，但不是必然完备的证据。若形式相同的作品因删除分支不同而产生不同的未来判断效力，作品分析必须承认一类不可从成品逆推出的因果历史。这里的“不可逆推”不是神秘性，而由同成品分支互换实验定义。</p>
+<h3>13.2 对作者性的修正</h3>
+<p>点击拒绝不自动产生作者性，生成候选也不自动赋予伙伴作者身份。可审计的贡献发生在关系链上：谁提出了可定位否定，谁把否定转化为新的可行动差异，谁继续承接，以及哪条差异获得了跨作品效力。作者性因而不能只按字句份额结算，还需考察差异的因果承接。</p>
+<h3>13.3 对人机共同学习的修正</h3>
+<p>共同学习常用系统性能改进表示“学习发生了”。二维判决表明，系统越来越适配用户可以与用户判断没有变化并存。真正的共同学习至少需要双重结果：伙伴改变下一项生成，行动者也因回应形成可迁移区别。否则更准确的名称是个性化或单向适配。</p>
+<h3>13.4 对互动认知的修正</h3>
+<p>参与式意义生成强调互动的构成性，本文为这种构成性增加一个可干预的最小单位：不是整段互动都被假定重要，而是某条拒绝—回应—再承接边能否在交换后改变延迟判断。整体动力因此获得局部因果检验，而局部边也不再被误解为孤立刺激。</p>
+<h2>14. 实践、教育与平台治理</h2>
+<p>创作工具若只保存最终答案，就无法区分用户得到一件好作品，还是形成了可迁移判断能力。最低限度的成长记录应保存被拒绝候选、拒绝所指差异、伙伴后继回应、行动者是否继续承接和版本关系。</p>
+<p>在教育场景中，展示提示词和成品不足以证明学习。学生可以选择一条拒绝—回应边，说明它改变了什么，并在AI缺席的新材料上再次作出区分。若只能复述当时理由，却不能迁移，学习主张不成立。</p>
+<p>平台响应性同时具有风险。系统持续服从早期拒绝，可能细化判断，也可能把偶然偏好固化为狭窄判准。平台应允许用户查看哪些拒绝持续控制后续生成，提供反向候选检验偏好是否可修订，并支持对旧路径降权、悬置或撤回。</p>
+<p>研究数据治理必须遵守最小化原则。真实轨迹包含提示、拒绝理由、版本和音频，可能泄露身份与创作习惯。身份映射表应与研究数据分离，自由文本导出前去标识，撤回与删除流程须在先导中演练；预注册公开版不得包含凭据、内部系统提示或可逆推出身份的原始轨迹。</p>
+<h2>15. 局限、反噬与适用边界</h2>
+<p>第一，九维音乐特征牺牲了审美丰富性以换取操纵性。若效应只在单维微任务成立，不能推广到开放创作。</p>
+<p>第二，同成品分支互换提高内部效度，却可能制造人工轨迹。自然日志复制不可缺少，但自然日志只能增强生态效度，不能替代随机分支识别。</p>
+<p>第三，理由编码可能把事后叙述误当成真实判断。受控菜单、自由文本、行为特征和音频嵌入必须互相限制；语言流畅不能自动提高回应边可信度。</p>
+<p>第四，低显性记忆与迁移并存只是区分性预测，不是预设事实。若控制记忆后效应消失，结果应改写为记忆中介，而非坚持“无作品表征留存的因果持续”。</p>
+<p>第五，生态位建构与参与式意义生成提供结构性近邻，也提高被吸收风险。若分支互换、再次承接和跨作品迁移不能产生独立剩余，本文应退回这些更宽理论，而不是靠命名维持独立性。</p>
+<p>第六，AI伙伴的速度、一致性与可编程性可能放大回应依赖，但不构成本体特权。人类伙伴复制失败时，结论只能限定于相应系统与任务。</p>
+<p>第七，生成性拒绝不必然改善审美或自主性。它也可能形成偏见回路：系统越响应，用户越把早期拒绝误认为稳定自我。研究必须同时报告迁移区分度、跨参与者集中、反向修订能力和偏好固化风险。</p>
+<p>第八，本文尚无真实先导、确认性结果或独立复制。扩展近邻检索已经纳入共同学习、互动认知、生态反馈、拒绝加工、反事实学习和轨迹分析等强占位者，但不能证明不存在更早或更准确的等价结构。</p>
+<h2>16. 结论</h2>
+<p>理论结论（尚待经验检验）：人机共创的原创性不只可能表现于作品留下了什么，也可能表现于作品删去了什么以后，仍有什么继续发生。拒绝若只终止候选，不具有生成性；伙伴若只学会迎合，也不等于行动者学习；行动者若只因看见负例而改变，也不证明互动构成。只有否定改变伙伴的下一项生成、伙伴的回应被行动者再次承接，并在原作品与伙伴缺席后改变对新作品的判断，才形成本文所说的关系性因果剩余。</p>
+<p>这为原创性提出一个可失败的新位置：无作品表征留存的因果持续。它不在被拒绝项本身，不在最终成品的可见形式，也不自动属于任一参与者；它是否成立，取决于一个差异被删去、被他者转化、再被行动者接回的路径能否经受分支互换与延迟迁移检验。</p>
+<p>若同成品分支互换不能交换未来判断，作品仍可被视为足够的存储器，本文命题应被删除。若它能够交换，原创性研究便必须承认：作品有时保存结果，却没有保存使人下一次能够不同地判断的全部原因。</p>
+<h2>参考文献</h2>
+<p>Alós-Ferrer, C., &amp; Granic, G. D. (2023). Does choice change preferences? An incentivized test of the mere choice effect. Experimental Economics, 26(3), 499–521. https://doi.org/10.1007/s10683-021-09728-5</p>
+<p>Amabile, T. M. (1982). Social psychology of creativity: A consensual assessment technique. Journal of Personality and Social Psychology, 43(5), 997–1013. https://doi.org/10.1037/0022-3514.43.5.997</p>
+<p>Ananth, P., &amp; Harvey, S. (2023). Ideas in the space between: Stockpiling and processes for managing ideas in developing a creative portfolio. Administrative Science Quarterly, 68(2), 465–507. https://doi.org/10.1177/00018392231154909</p>
+<p>Biderman, N., &amp; Shohamy, D. (2021). Memory and decision making interact to shape the value of unchosen options. Nature Communications, 12, 4648. https://doi.org/10.1038/s41467-021-24907-x</p>
+<p>Boden, M. A. (1998). Creativity and artificial intelligence. Artificial Intelligence, 103(1–2), 347–356. https://doi.org/10.1016/S0004-3702(98)00055-1</p>
+<p>Boorman, E. D., Behrens, T. E. J., &amp; Rushworth, M. F. S. (2011). Counterfactual choice and learning in a neural network centered on human lateral frontopolar cortex. PLoS Biology, 9(6), e1001093. https://doi.org/10.1371/journal.pbio.1001093</p>
+<p>Brod, G., Holstein, E., Weindorf, L., Colantonio, J., Bonawitz, E., &amp; Theobald, M. (2025). Do it yourself: Discerning the effects of self-directed activity on conceptual learning. npj Science of Learning, 10, 70. https://doi.org/10.1038/s41539-025-00364-9</p>
+<p>De Jaegher, H., &amp; Di Paolo, E. (2007). Participatory sense-making: An enactive approach to social cognition. Phenomenology and the Cognitive Sciences, 6(4), 485–507. https://doi.org/10.1007/s11097-007-9076-9</p>
+<p>De Jaegher, H., Di Paolo, E., &amp; Gallagher, S. (2010). Can social interaction constitute social cognition? Trends in Cognitive Sciences, 14(10), 441–447. https://doi.org/10.1016/j.tics.2010.06.009</p>
+<p>Doshi, A. R., &amp; Hauser, O. P. (2024). Generative AI enhances individual creativity but reduces the collective diversity of novel content. Science Advances, 10(28), eadn5290. https://doi.org/10.1126/sciadv.adn5290</p>
+<p>Gureckis, T. M., &amp; Markant, D. B. (2012). Self-directed learning: A cognitive and computational perspective. Perspectives on Psychological Science, 7(5), 464–481. https://doi.org/10.1177/1745691612454304</p>
+<p>Laland, K., Odling-Smee, J., &amp; Endler, J. (2017). Niche construction, sources of selection and trait coevolution. Interface Focus, 7(5), 20160147. https://doi.org/10.1098/rsfs.2016.0147</p>
+<p>Laran, J., &amp; Wilcox, K. (2011). Choice, rejection, and elaboration on preference-inconsistent alternatives. Journal of Consumer Research, 38(2), 229–241. https://doi.org/10.1086/659040</p>
+<p>Luan, Y. L., Kim, Y. J., &amp; Zhou, J. (2025). Augmented learning for joint creativity in human–GenAI co-creation. Information Systems Research, Articles in Advance. https://doi.org/10.1287/isre.2024.0984</p>
+<p>Moruzzi, C., &amp; Margarido, S. (2024). A user-centered framework for human-AI co-creativity. In CHI Conference on Human Factors in Computing Systems Extended Abstracts (pp. 1–9). https://doi.org/10.1145/3613905.3650929</p>
+<p>Parikh, D. (2020). Predicting a creator’s preferences in, and from, interactive generative art. In Proceedings of the 11th International Conference on Computational Creativity. https://doi.org/10.48550/arXiv.2003.01274</p>
+<p>Shen, H., Shen, L., Wu, W., &amp; Zhang, K. (2025). IdeationWeb: Tracking the evolution of design ideas in human-AI co-creation. In Proceedings of the 2025 CHI Conference on Human Factors in Computing Systems (pp. 1–19). https://doi.org/10.1145/3706598.3713375</p>
+<p>Shivaswamy, P., &amp; Joachims, T. (2015). Coactive learning. Journal of Artificial Intelligence Research, 53, 1–40. https://doi.org/10.1613/jair.4539</p>
+<p>Smith, A., Anderson, B. R., Otto, J. T., Karth, I., Sun, Y., Chung, J. J. Y., Roemmele, M., &amp; Kreminski, M. (2025). Fuzzy linkography: Automatic graphical summarization of creative activity traces. In Proceedings of the 2025 Conference on Creativity and Cognition (pp. 637–650). https://doi.org/10.1145/3698061.3726915</p>
+<p>Sprangers, M. A. G., &amp; Schwartz, C. E. (1999). Integrating response shift into health-related quality of life research: A theoretical model. Social Science &amp; Medicine, 48(11), 1507–1515. https://doi.org/10.1016/S0277-9536(99)00045-3</p>
+<p>Tucker, A. D., Brantley, K., Cahall, A., &amp; Joachims, T. (2024). Coactive learning for large language models using implicit user feedback. In Proceedings of the 41st International Conference on Machine Learning (Vol. 235, pp. 48809–48822). https://proceedings.mlr.press/v235/tucker24a.html</p>
+<p>Urai, A. E., de Gee, J. W., Tsetsos, K., &amp; Donner, T. H. (2019). Choice history biases subsequent evidence accumulation. eLife, 8, e46331. https://doi.org/10.7554/eLife.46331</p>
+<p>Vaccaro, M., Almaatouq, A., &amp; Malone, T. W. (2024). When combinations of humans and AI are useful: A systematic review and meta-analysis. Nature Human Behaviour, 8, 2293–2303. https://doi.org/10.1038/s41562-024-02024-1</p>
+<p>Vergne, J.-P., &amp; Durand, R. (2010). The missing link between the theory and empirics of path dependence: Conceptual clarification, testability issue, and methodological implications. Journal of Management Studies, 47(4), 736–759. https://doi.org/10.1111/j.1467-6486.2009.00913.x</p>
+
+<h2>附论一 · 最近邻补切（编辑增补）</h2>
+<p class="ednote">本节由本站编辑增补，不属作者原稿，不计入本页盲评分数。原稿第五节的十项近邻替换检验是本站见过最完整的一次敌意检索；本节只补两位它未纳入、却在结构上更近的祖宗，并指出一处形式缺口。</p>
+
+<h3>一、最贵的一条缺席：内化与脚手架消退</h3>
+<p>原稿的最小发生链有四环：可定位的拒绝改变伙伴的下一项生成，伙伴的定向回应被行动者继续承接，最终在<b>原作品、原伙伴与来源标签全部缺席</b>之后仍改变对新材料的判断。这条链的形状，与维果茨基传统所说的<b>内化</b>几乎逐环对应：人际层面发生的调节先由他者承担，随后被主体接手，最后在他者退场之后作为个体内部的能力显现；而在教学研究的分支里，<b>脚手架消退</b>更是直接主张支持结构必须在最终形态中消失，学习才算成立。「载体从关系中的方向变化转为行动者的可迁移倾向」这句话，在这一传统里已是核心命题而非新说。原稿全文对此零命中。</p>
+<p>但补上这条并不威胁本文，反而是当前最能抬高其独立性的一步，因为分离线是<b>操作性的、不是概念性的</b>，共有三条。其一，<b>载体身份</b>：内化不要求消失的那一项是<b>被拒绝</b>的差异——被内化的通常正是他者提供的、被接受下来的东西；本文要求消失的恰是行动者自己否定掉的那一项，且它从未进入成品。其二，<b>可干预性</b>：内化研究无法随机化「老师当时说了什么」，因此只能观察不能交换；本文的确认性实验二正是把这一点做成了可干预量——同成品、同接受项、同修改次数，只随机分配一条已从作品中消失的被拒绝分支。<b>内化做不出分支互换，这是本文对这位祖宗唯一硬的、也是充分的分离线。</b>其三，<b>失败去向</b>：若延迟后测的效应可被「参与者记住了自己曾经不喜欢什么」完全吸收，本文自己的降级路由已写明结论应改写为记忆中介——而这恰是内化理论不需要区分的一格。</p>
+<p>建议的处置极为省力：在第五节的近邻表中增列一行「内化／脚手架消退」，「不能替换本文的地方」填「不要求消失项是被否定项，且无法对消失项作随机互换」，「若无差异时的降级去向」填「一般社会性内化」。这一行补上之后，第五节那句「任何单一近邻目前都不能同时推出四点」才真正站得住。</p>
+
+<h3>二、第二条缺席：交互记忆系统与分布式认知</h3>
+<p>原稿第三节第二小节的关键让步是：「无作品表征」不等于系统中没有任何载体，相反，命题<b>要求载体发生转换</b>——从被拒绝形式，转为伙伴的定向变换，再转为行动者可迁移的区分倾向。这一「载体在关系中而非在个体或器物中」的主张，正是交互记忆系统（Wegner）与分布式认知（Hutchins）一族的基本立场：认知功能的承载单位可以是人与人、人与工具构成的系统，而不是任何单个成员或任何单件产物。原稿对此同样零命中。</p>
+<p>分离线在<b>关系是否必须在场</b>：交互记忆系统与分布式认知的效力依赖系统<b>持续存在</b>——伙伴离开，功能即降级，这正是这一族最著名的经验预测；本文要的恰是相反的一格：原伙伴、原作品与来源标签<b>全部缺席</b>之后，效力仍在纯人类留出材料上表现出来。因此两者在同一批数据上可以一真一假：若后测必须在原伙伴在场时才出现效应，本文的「来源依赖死亡」条件触发，理论退回交互记忆；若效应在伙伴缺席后仍稳定，则这一族不能吸收本文。原稿的第九条死亡条件已经预备好了这个判决，只是没有说出它正在与谁对决。</p>
+
+<h3>三、一处形式缺口：ρ 的两个向量未被置于同一空间</h3>
+<p>第六节第三小节定义回应忠实度为拒绝后转化向量与理由向量的余弦：ρ<sub>ik</sub> = cos(c<sub>ik</sub>, u<sub>ik</sub>)。其中转化向量 c 明确定义在第六节第二小节的九维音乐特征空间；而理由向量 u 只被称为「理由向量」，其所在空间从未给出。余弦相似度要求两个向量同维，故照原稿字面，ρ 目前是未定义的。</p>
+<p>这不影响本文的任何判断，是一处可在预注册阶段低成本补齐的技术缺口，补法也已隐含在原稿之内：第六节第三小节要求「受控菜单」提供拒绝理由，第十五节第三条又要求受控菜单、自由文本、行为特征与音频嵌入互相限制。<b>只需明令受控理由菜单的每一项一一映射到九维特征中的一维或一组方向，u 即取值于同一九维空间，ρ 随之良定义。</b>附带的收益是，这样做会使「伪回应」控制组（幅度匹配但沿与拒绝理由无关的维度变化）获得精确的构造方式——无关维度就是 u 的正交补，不必再靠编码员判断。</p>
+
+<h3>四、一处未设阈值：确认性阶段的流失</h3>
+<p>先导阶段的六个门里，P1 至 P6 分别管字段捕获、事件图重建、回应边信度、九维编码可用度、可承接边供给与隐私可执行性，先导亦估计流失。但两项确认性实验的主要终点是<b>四周延迟后测</b>，而全文没有为确认性阶段的流失设定任何门槛或死亡条件。第十一节第二小节确已把四周流失写入功效模拟的参数，但模拟参数与<b>触发降级的阈值</b>是两件事：前者决定样本量，后者决定当实际流失超出预期时结论是否仍可宣告。建议在偏离纪律中增补一句：确认性样本的四周留存率低于预注册下限时，主要终点判为未检验，不得以完成者分析替代。这是十条死亡条件之外唯一一处可被事后裁量利用的入口。</p>
+
+<h2>附论二 · 与站内既发论文的划界（编辑增补）</h2>
+<p class="ednote">本节由本站编辑增补，不属作者原稿，不计入本页盲评分数。作者站上已有十五篇，本篇正文对其中任何一篇均无引述；下列第一条是正面自撞，必须先处理。</p>
+
+<h3>一、与《最后一次点击之前：人机决策中的选项承接、路径效力与责任分配》</h3>
+<p>那篇的核心命名是<b>选项承接</b>；本篇最小发生链的第三环叫<b>再次承接</b>，且「承接」一词在本篇正文出现二十余次。同一作者、同一术语、两篇之间零互引，这是本站必须替读者点破的一处。</p>
+<p>分离线在<b>被承接物的存在状态</b>，这一条足够硬：那篇问的是一个<b>仍然在场</b>的选项——它被提出、被记录、可以被指着说「就是它」——是否被决策链接住并推进；本篇问的是一个<b>已经不在场</b>的差异——它被否定、从成品中删除、不能由成品逆推——其效力是否经由他者的回应转移到了行动者。前者的因变量是选项是否进入下一环节与责任如何分配，后者的因变量是行动者在原物、原伙伴、原标签全部缺席之后能否作出新的区分。因此两文在同一批轨迹上可以一真一假：一条轨迹可以选项承接充分（每个提案都被接住并推进）而生成性拒绝为零（被拒绝的分支没有得到任何定向回应）；也可以选项承接极低（几乎所有提案都被搁置）而生成性拒绝成立（唯一被认真回应的恰是那次否定）。</p>
+<p>两篇合起来能给出各自单独给不出的一条：<b>承接是一种有限资源，它在被提出物与被否定物之间分配。</b>若一个系统把全部承接能力投向仍在场的选项，被删除分支就得不到定向回应，本篇的第二环失效；反之，若系统高度响应否定，仍在场的选项反而可能长期无人接手。这提示两文的两个指标应当在同一批日志上一起读，而不是分别读。</p>
+
+<h3>二、与《谁能迫使课堂改道》</h3>
+<p>那篇的模型是「修订请求—制度承接—路径变化—深层学习」，与本篇的四环链同形，且「承接」与「路径修订」在那篇正文合计出现七十次。分离线在<b>承接方与可剥离性</b>：那篇的承接方是课堂制度与教师，被承接物是学生提出的修订请求，而学生的行动<b>无法与学生本人剥离</b>；本篇的承接方是行动者自己（他承接的是伙伴对他的否定所作的回应），被承接物是一条可以被随机交换的分支，<b>正因为可剥离才能做实验二</b>。这一差别不是程度上的：那篇做不出分支互换，本篇的全部因果识别都建立在分支互换之上。</p>
+
+<h3>三、与《机器犹豫的地方》</h3>
+<p>那篇处理钢琴演奏转录，与本篇第六节第二小节的八小节钢琴片段落在同一题域，读者极易将两者读作同一条线的延续。分离线在<b>被观察的对象</b>：那篇看的是系统在转录中<b>迟疑与失准的位置</b>，据以反推演奏中哪些结构对机器不可见；本篇看的是<b>人在被系统回应之后的判断迁移</b>，音乐只是首个可操纵的测量面，作者已在第十五节第一条声明九维特征牺牲了审美丰富性以换取可操纵性。前者的因变量在机器一侧，后者的因变量在人一侧且发生在四周之后。</p>
+
+<h3>四、与《错误没有主人》《越审越不能改》</h3>
+<p>作者近两篇处理的是<b>效力在场而无处安放</b>——主张已被验证却仍退化为签名表，异议已经成立却没有一条替代路径能接住它。本篇处理的是相反的一格：<b>形式已经消失而效力仍在行进</b>。三篇合起来构成一条完整的效力审计谱系：一端是留下了记录却失去了作用（签名表），另一端是没有留下记录却仍在起作用（被删除的分支）。这也解释了为何本篇的方法必须是随机干预而非档案审计——前两篇的对象在档案里，本篇的对象恰恰不在。</p>
+
+<h2>附论三 · 编辑校订说明</h2>
+<p>本站在不改动作者判断、论证结构、任何数字与形式表达的前提下，作了以下技术性处理：</p>
+<p><b>一、表格归位。</b>原稿七张表按其在文档中的原位还原：第二节第五小节消融结构表、第四节二维判决表、第五节十项近邻替换表、第六节第二小节九维特征表、第八节第二小节六个可行性门、第九节第一小节四组设计、第十二节第一小节结果—修订矩阵。单元格内容逐字未改，未加表题（原稿本无表题）。</p>
+<p><b>二、形式记号。</b>非补偿门、转化向量、回应忠实度、回应签名、简单签名与主要因果对比六处表达式按原稿逐字保留，仅改为独立居中排版；下标字符沿用原稿写法。</p>
+<p><b>三、研究状态声明前置。</b>原稿把该声明置于标题之下、摘要之前，本页保留此位置并加框显示，因为它规定了全文的证据地位。</p>
+<p><b>四、未作任何内容改动。</b>本文方法论术语扫描为零泄漏；二十四条参考文献均为可核验的正式出版物，卷期、页码与 DOI 格式完整，正文标记与文献表一一对应；本站未逐条访问 DOI。附论一第三条指出的 ρ 定义缺口未在正文中改动，仅在此指明。</p>
+<p><b>五、定位提示。</b>本文属理论与研究设计论文，<b>先导与两项确认性实验均未运行</b>。作者已在文首自设研究状态声明，并在第十五节第八条写明「本文尚无真实先导、确认性结果或独立复制」，第八节第三小节更写明「即使六个可行性门全部通过，核心命题仍保持未检验」。请读者按此定位阅读：本页给出的是一个可被杀死的研究对象及其杀法，不是一项经验发现。</p>
+
+</div>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

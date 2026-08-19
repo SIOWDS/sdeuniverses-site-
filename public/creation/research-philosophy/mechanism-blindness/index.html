@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>机制齐全为什么治不好：随机化如何把病因当噪声消除 | 学术创造专栏 · 科研哲学 | SDE Universes</title>
+<meta name="description" content="现代医学在急性病上的成功，建立在一条极其有效的研究路径上：先找到那个可指认的结构异常（S），再研究它如何演变（D），最后在讨论部分提一句环境因素（E）。这条路径对肺炎、骨折、阑尾炎是完美的，因为在这些病里 E 确实只是背景。本文论证，把同一条路径搬到慢性病上，是当代医学最昂贵的一次范畴错误。依 SD">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#7A4A8C;--accent2:#9E6BB0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#7A4A8C1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.75rem,4.1vw,2.55rem);font-weight:700;line-height:1.32;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.98rem,1.9vw,1.13rem);color:var(--text2);max-width:660px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.72}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:2.4rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#7A4A8C22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.9rem 0;padding:1.15rem 1.5rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.05rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/creation/" class="sib">学术创造专栏</a>
+    <a href="/creation/research-philosophy/" class="here">科研哲学</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/creation/">学术创造专栏</a> · <a href="/creation/research-philosophy/">科研哲学</a></div>
+  <h1 class="art-title">机制齐全为什么治不好：随机化如何把病因当噪声消除</h1>
+  <p class="art-sub">靶点越找越多，通路越画越细，慢性病越治越多。这不是医学不够努力——是它在一条对急性病完全正确的路径上，走进了一类结构不同的病。而它的黄金标准，恰好把这类病的病因平均掉了。</p>
+  <div class="art-meta">王德生 著 · 学术创造专栏 · 科研哲学 · 约 7200 字</div>
+</header>
+
+<div style="max-width:780px;margin:1.6rem auto -1.2rem;padding:0 2rem;text-align:center">
+  <a href="/creation/pdf/mechanism-blindness.pdf" download style="display:inline-block;font-size:0.82rem;letter-spacing:0.06em;color:var(--accent);text-decoration:none;border:1px solid var(--border);border-radius:20px;padding:0.4rem 1.1rem;background:var(--card)">⬇ 下载 PDF · A4 学术版 · 8 页</a>
+</div>
+
+<main class="wrap">
+  <section class="body">
+    <div class="abs">
+      <div class="l">摘 要</div>
+      <p>现代医学在急性病上的成功，建立在一条极其有效的研究路径上：先找到那个可指认的结构异常（S），再研究它如何演变（D），最后在讨论部分提一句环境因素（E）。这条路径对肺炎、骨折、阑尾炎是完美的，因为在这些病里 E 确实只是背景。本文论证，把同一条路径搬到慢性病上，是当代医学最昂贵的一次范畴错误。依 SDE 三大方程，S=F(D,E)——显露态是差异序列与纠缠网络的函数，因此"找到机制"找到的是一个果，不是因；把它当因去攻，攻的是结算点而不是引擎。更严重的是随机化：随机对照试验的全部功能，是让两组的 E 在期望上相等，从而分离出干预的净效应。这对"E 是噪声"的病是黄金标准；而慢性病的 E 就是病本身——**随机化把要研究的那个东西平均掉了**，且这不是执行缺陷，是这个设计正确运行的结果。本文据此指出：医学研究不是缺证据，是起点选错了——慢性病的任务 DNA 要求 E→D→S，而整个医学建制默认 S→D→E，起点错了，后面再深也是浪费，靶点越多、通路越细，只是把一个果画得越精致。文章给出路径识别的三条判据、土壤失明的三个可观察后果、复合工具在路径选择中的正确位置，以及本框架自身的四个失效条件——其中最要紧的一条：本文不得被用于反对随机对照试验，它反对的只是把一个只对特定结构成立的方法当成对一切成立的标准。</p>
+    </div>
+    <div class="kw"><b>关键词</b>　六路径；任务DNA；三大方程；随机化；慢性病；土壤失明；SDE</div>
+    <div class="toc">
+      <div class="l">目 次</div>
+      <a href="#c1">一、"找到机制"被当成了"理解疾病"</a><a href="#c2">二、S 是果，不是因</a><a href="#c3">三、六路径：起点决定后面的一切</a><a href="#c4">四、慢性病的任务 DNA：E→D→S</a><a href="#c5">五、随机化把病因平均掉了</a><a href="#c6">六、土壤失明的三个后果</a><a href="#c7">七、复合工具在路径选择里的位置</a><a href="#c8">八、癌症：任务 DNA 不是病的属性</a><a href="#c9">九、这套东西什么时候失效</a>
+    </div>
+    <article>
+<p>一九九〇年，人类已知的与二型糖尿病相关的基因位点是零个。二〇二五年，这个数字超过了五百。</p>
+<p>一九九〇年，全球糖尿病患者约一亿。二〇二五年，超过五亿。</p>
+<p>这两组数字并排放着，看起来像一个笑话。但它不是笑话，因为那五百个位点每一个都是真的，每一篇发现它们的论文都经得起复核，每一次机制阐明都是真实的科学工作。</p>
+<p><b>这才是它最难堪的地方：这不是一个失败的故事。这是一个成功的故事，成功了三十五年，而它要治的那个东西涨了五倍。</b></p>
+<h2 id="c1">一、"找到机制"被当成了"理解疾病"</h2>
+<p>现代医学有一个从不被说破、却支配着它每一个动作的等式：</p>
+<blockquote><b>找到机制 = 理解疾病 = 找到攻击点。</b></blockquote>
+<p>这个等式的正当性来自一段辉煌的历史。结核有结核杆菌，找到它，杀掉它。阑尾炎有一个发炎的阑尾，切掉它。缺铁性贫血缺铁，补铁。<b>每一次，那个"它"都是一个可指认的、有位置、有边界的东西；找到它，病就有了一个可以被攻击的把手。</b></p>
+<p>这条路径的成功不是运气，它有一个精确的适用条件：<b>在这些病里，那个"它"确实是原因。</b> 细菌不是肺炎的结果，它是肺炎的原因；杀掉它，肺炎结束。</p>
+<p>于是医学把这条路径推广到了一切病上。二型糖尿病，找它的"它"：胰岛素抵抗。再往下：IRS-1 磷酸化异常。再往下：脂肪组织的炎症因子。再往下：肠道菌群。再往下：五百个基因位点。</p>
+<p><b>每一层都找到了。每一层都是真的。而病涨了五倍。</b></p>
+<h2 id="c2">二、S 是果，不是因</h2>
+<p>用 SDE 的话说，医学在做的事情有一个精确的名字：<b>它在找 S。</b></p>
+<p>S 是显露态——存在在一定条件下被看见、被维持、被识别的方式。一个可测的分子、一个可见的病理改变、一条可画的通路，这些全部是 S。医学的全部技术能力，是把 S 找得越来越细：从器官到组织到细胞到分子到碱基。</p>
+<p>而 SDE 的第一个方程说：</p>
+<blockquote><b>S = F(D, E)</b></blockquote>
+<p>></p>
+<blockquote><b>显露态，由差异序列与纠缠网络共同生成。</b></blockquote>
+<p>这句话在医学上的意思是：<b>你找到的那个胰岛素抵抗，不是原因，它是一个结算点。</b> 它是一整套东西——他二十年的作息、他每天几点吃饭、他和上司那种关系每周让他的皮质醇冲几次、他母亲的那个厨房——长期互相牵动之后，在分子层面被结算出来的一个显露。</p>
+<p>你把这个结算点画得再细，你画的还是结算点。<b>五百个位点，是五百个更细的结算点。</b></p>
+<p>这里必须防住一个廉价的误读：<b>本文不是在说分子机制不重要，也不是在说"整体大于部分"这类空话。</b> 它说的是一件精确的事：<b>在 S=F(D,E) 这个方程里，你可以把 S 测得无限精确，而这不会告诉你 F 是什么，更不会告诉你 D 和 E 是什么。</b> 你测的是函数的输出值。<b>输出值再精确，也解不出函数。</b></p>
+<p>而这正是三十五年发生的事：<b>输出值的测量精度提高了六个数量级，函数一个字都没有被写出来。</b></p>
+<h2 id="c3">三、六路径：起点决定后面的一切</h2>
+<p>SDE 的基本公式是"在 E 中，经 D，成 S"。但这里有一条最容易被搞错的纪律：</p>
+<blockquote><b>这是三元互生关系的最简句式，不是判断时的固定操作顺序。</b></blockquote>
+<p>判断时，S/D/E 排列出<b>六条路径</b>，按任务的性质选起点：</p>
+<p>| 路径 | 适用的任务性质 |</p>
+<p>|---|---|</p>
+<p>| S→D→E | 学科本体论建构；对象有稳定可指认的形态 |</p>
+<p>| S→E→D | 配置、选择、决策类 |</p>
+<p>| D→S→E | 过程起手：心理咨询、教练 |</p>
+<p>| D→E→S | 过程起手＋环境第二步：教育干预、家长求助 |</p>
+<p>| E→S→D | 环境起手＋显露第二步：社会学分析 |</p>
+<p>| E→D→S | 环境起手：法律、社会学、学术综述、长期形成的东西 |</p>
+<p><b>起点错了，后面再深也是浪费。</b> 这不是一句方法论的建议，它是三大方程的直接后果：<b>如果 S 是 D 和 E 的函数，那么从 S 起手就意味着你从函数的输出值出发，去反推它的输入——而这在数学上是不定的。</b> 无穷多组 (D,E) 可以产出同一个 S。</p>
+<p><b>这解释了一个医学里人尽皆知却无人解释的现象：同一个胰岛素抵抗，在不同人身上，成因完全不同，而干预效果的个体差异大到让循证医学几乎无从下手。</b> 这不是"个体差异"这个词能打发的——<b>它是从输出值反推输入的必然结果：那个方程本来就没有唯一解。</b></p>
+<h2 id="c4">四、慢性病的任务 DNA：E→D→S</h2>
+<p>那么慢性病的起点在哪？</p>
+<p><b>急性病的任务 DNA 是 S→D→E。</b>理由充分：肺炎有一个稳定的、可指认的 S（细菌），它先于这场病存在，它就是原因。E 在这里确实是背景——你住在哪、你怎么想、你妈的厨房，跟这个细菌没有关系。<b>从 S 起手是对的，而且是唯一对的。</b></p>
+<p><b>慢性病的任务 DNA 是 E→D→S。</b>因为在慢性病里没有一个先在的"它"。糖尿病不是一个东西进入了这个人，它是这个人的一整套东西——作息、关系、食物、压力、二十年——长期运行之后，在他身上稳定下来的一个形态。</p>
+<blockquote><b>急性病：E 是背景，S 是原因。</b></blockquote>
+<blockquote><b>慢性病：E 是原因，S 是账单。</b></blockquote>
+<p>这一句是本文的全部重量。而医学的全部方法论，是为第一行写的，然后被原样搬到了第二行。</p>
+<h2 id="c5">五、随机化把病因平均掉了</h2>
+<p>这是本文最尖锐的一节，必须精确，因为它触到的是循证医学的地基。</p>
+<p>随机对照试验为什么是黄金标准？因为它解决了一个真问题：混杂。你要知道药 X 有没有效，你得排除掉其他一切因素的影响。随机分组的功能就是这个：</p>
+<blockquote><b>让两组的 E 在期望上相等，从而分离出干预的净效应。</b></blockquote>
+<p>请把这句话再读一遍。<b>随机化的功能，是把 E 消掉。</b></p>
+<p>这个功能对急性病是完美的——因为在急性病里，E 确实是需要被消掉的噪声。你研究抗生素对肺炎的效果，你当然要把"住在哪""心情如何"平均掉，它们跟这件事无关。<b>随机化在这里不但正确，而且是人类方法论史上最漂亮的发明之一。</b></p>
+<p><b>而在慢性病里，E 就是病。</b></p>
+<p>于是随机化做了一件精确的、正确执行的、灾难性的事：</p>
+<blockquote><b>它把要研究的那个东西平均掉了。</b></blockquote>
+<p>这不是执行缺陷，不是样本量不够，不是随访不足。<b>这是这个设计正确运行的结果。</b> 它就是设计来消除 E 的，它做到了。</p>
+<p>后果是可推的，而且它们全部在现实中出现了：</p>
+<p><b>其一，一切与 E 有关的东西都进不了证据金字塔的顶层。</b>因为它们做不了 RCT——你不能随机分配一个人的原生家庭、他的作息二十年、他和上司的关系。于是它们只能靠观察性研究，而观察性研究在证据等级里排在下面。<b>这不是因为它们不重要，是因为衡量重要性的那把尺子是按"E 可被消除"设计的。</b></p>
+<p><b>其二，能被 RCT 检验的干预，恰好是那些可以被从 E 里切下来单独施加的东西——即药物。</b>一片药可以被随机分配，一种活法不能。<b>于是证据金字塔在结构上偏向药物，而这个偏向不来自任何利益输送，它来自方法本身。</b> 这一点比任何关于药企的阴谋论都更值得警惕，因为它不需要任何人心怀恶意。</p>
+<p><b>其三，最深的一条：那些在 RCT 里被证明有效的行为干预，在现实中效果大幅衰减，而这被归因于依从性。</b>因为在试验里，那个行为是研究方<b>供养</b>的——排好的时间、场地、督促。研究方替受试者支付了从他自己的 E 里挤出这个行为的代价。<b>而现实中他必须自筹。</b> 试验测的是"被供养的行为 X 的效果"，现实中发生的是"从一个真实的 E 里挤出来的行为 X"——<b>两者不是同一个量，而落差被记在了患者头上。</b></p>
+<h2 id="c6">六、土壤失明的三个后果</h2>
+<p>把上面几节接起来，就得到了当代医学的一个结构性症状。称之为<b>土壤失明</b>：<b>它能把花看得越来越细，而它的方法论在原理上看不见土。</b></p>
+<p><b>后果一：越努力越远。</b>每多一个靶点，就多一个可以被攻击的结算点，就多一批人去攻它，就多一批经费投向那个方向。而每一次攻击都在同一层——<b>在 S 层面上做加法，永远不会跨到 D 和 E。</b> 三十五年，五百个位点，这就是"越努力越远"的精确形态：不是走错了路，是把一条对的路走到了它管不着的地方。</p>
+<p><b>后果二：个体差异被当成噪声。</b>同一个干预，效果因人而异——这在 S→D→E 的框架下只能被读成"存在未知的调节变量，有待进一步研究"。<b>而在 E→D→S 的框架下，它根本不是噪声，它就是答案：每个人的 E 不同，所以同一个 S 由不同的 (D,E) 组合产出，所以同一个干预打在不同的位置上。</b>"个体差异"这四个字，是土壤失明的诊断书，而它被当成了免责声明。</p>
+<p><b>后果三：健康宣教的完全无效，而所有人假装不知道。</b>"要少吃多动"——这句话在 S→D→E 框架下是一条信息传递：他缺信息，我给他信息。<b>而他从来不缺这个信息。</b> 他缺的是一条能让新行为跑得起来的路径，而旧的 E 把每一次新努力都吸收掉了：他每次下决心运动，两周后回到原样。<b>这不是意志薄弱，是加进去的那点力量被旧结构全数吸收——路由器根本没变。</b> 三十年的健康教育投入，几乎没有可测的人群效应，而这件事从未引发过方法论层面的反思。</p>
+<h2 id="c7">七、复合工具在路径选择里的位置</h2>
+<p>那么该怎么办？先排掉一个诱人的错误答案：<b>更大的队列、更多的组学、更强的模型——救不了它。</b> 它们全部是在把 S 测得更细。<b>多组学是六个数量级之后的第七个数量级。</b> 你可以用它把那个结算点画到纳米级，你画的还是结算点。</p>
+<p>正确的方向是换起点：<b>从 E 起手。</b></p>
+<p>而这件事以前做不了，理由很实在：<b>E 不可测。</b> 一个人的二十年、他的作息、他的关系、他每次面对压力时那条自动跑起来的链条——这些东西没有仪器，没有量表，没有队列。<b>这就是为什么医学选了 S：不是它偏心，是那时候只有 S 测得了。</b></p>
+<p><b>这是复合工具第一次改变的东西，而且它改的正好是那个卡了一百年的地方：</b></p>
+<p><b>其一，E 第一次可测了。</b>手机知道他几点睡、几点动、去了哪；可穿戴知道他的心率变异、他的睡眠结构；日历知道他每周三下午那场会。<b>这些不是"健康数据"，这些是他的 E 的第一份可读的地图。</b> 而整个数字健康产业拿到这份地图之后做的第一件事，是把它压缩成一个健康分——<b>把 E 重新压回一个 S。</b></p>
+<p><b>其二，链条第一次可见了。</b>不是"你的风险是 12.3%"（那是一个 S），是"过去九十天，每一次你的夜间心率异常，前一天下午都有一场会；每一次这样的第二天，你都不吃早饭；每一次不吃早饭的那天，晚上你会喝酒。这条链你跑了十七次，每次结果一样。"——<b>这句话里没有一个分子，它全是 D 和 E。而它是他自己的东西，他从来没见过。</b></p>
+<p><b>其三，也是最要紧的：N-of-1 第一次可行了。</b>如果每个人的 E 不同，那么人群平均本来就不该是答案。<b>而 N-of-1 设计——在同一个人身上做随机化——恰好绕开了第五节那个死结：它不消除 E，它把 E 当常量固定住，在里面做对照。</b> 这个设计四十年前就有了，一直不可行，因为你没法密集测量一个人。<b>现在可以了。</b></p>
+<p>三件事的共同结构：<b>工具不生产结论，它把土壤铺开，让那条路径可见。</b> 而这个分工不能反过来——一旦你让它替这个人判断哪一环该断，那条链会在别处原样长回来：<b>一条由别人替他断的链，不携带能重新分配他能量的那股劲。</b> 他必须自己说出那句"这一环不对"，因为只有他说的那句才算数。</p>
+<h2 id="c8">八、癌症：任务 DNA 不是病的属性</h2>
+<p>第四节把病分成了两类：急性病走 S→D→E，慢性病走 E→D→S。这个二分立刻会撞上一个案例，而它是本文最该被质问的地方：</p>
+<p><b>癌症是哪一条？</b></p>
+<p>它两边都像。<b>它像急性病</b>：有一个可指认的 S——那个肿瘤是真的，它有位置、有边界、可以被切掉，切掉之后它就不在了。<b>它也像慢性病</b>：它是长期形成的，几十年，抽烟、炎症、修复、突变累积，那是一整套 E 的长期运行。</p>
+<p>如果本文的二分是对的，它必须能回答这个问题。而回答它，会逼出本文真正要说的那句话：</p>
+<blockquote><b>任务 DNA 不是病的属性，是问题的属性。</b></blockquote>
+<p>同一个癌症，你问不同的问题，起点不同：</p>
+<p><b>问题一："这个人身上现在有一块东西，怎么办？"</b></p>
+<p>这是一个 S 问题，它的任务 DNA 是 S→D→E。<b>手术、放疗、化疗、靶向——全部正确，而且没有替代品。</b> 这个问题上，现代医学是对的，是了不起的，而且它这五十年真实地把生存率推上去了。<b>任何拿本文去质疑肿瘤治疗的人，都是在杀人。</b></p>
+<p><b>问题二："这块东西是怎么长出来的？"</b></p>
+<p>这是一个发生问题，它的任务 DNA 是 E→D→S。而在这条路径上，"找到驱动突变"回答的仍然是 S——<b>它告诉你这块东西现在长什么样，不告诉你它为什么在这个人身上、在这个时候、以这个方式长出来。</b></p>
+<p><b>问题三："切干净了，为什么还会回来？"</b></p>
+<p>这是本文认为最要害的一个问题，而它的任务 DNA 明确是 E→D→S。</p>
+<p>因为复发的逻辑是这样的：<b>你切掉的是 S。而 S=F(D,E)。</b> 你把那个函数的输出值清零了，函数本身一个字没动。<b>土壤没变，那么在同样的土壤里，经同样的路径，长出同样的东西——这不是意外，这是那个方程还在正常运行。</b></p>
+<p>这就解释了一个所有肿瘤科医生都知道、而没有一个理论框架能容纳的现象：<b>手术极其成功，五年生存率的曲线漂亮，而复发率的下降远远慢于治疗技术的进步。</b></p>
+<p>在 S→D→E 框架下，复发只能被解释为"没切干净"（那就切得更彻底）或"有微转移灶"（那就查得更细）——<b>两条都是在 S 层面上做加法。</b> 于是切除范围越来越大，检测精度越来越高，而那个函数照常运行。</p>
+<p>在 E→D→S 框架下，复发不是失败，<b>它是那个方程的正常输出</b>：你没有动 F，没有动 D，没有动 E，你只动了一次 S——<b>而 S 是它们的函数，函数会重新求值。</b></p>
+<p>由此得到一条本文认为最有价值的推论，而它是可检验的：</p>
+<blockquote><b>治疗与预防不是同一件事的两个阶段，它们是两条不同的路径，因而需要两套不同的方法学、两套不同的证据标准、两套不同的成功定义。</b></blockquote>
+<p>></p>
+<blockquote><b>而当代肿瘤学把它们放在同一个学科、同一套评价体系、同一个证据金字塔里——于是预防被迫用治疗的方法学来证明自己，而它在那套方法学里天生输：因为预防的对象是 E，而那套方法学的核心动作正是消除 E。</b></blockquote>
+<p>这不是一个比喻。它有一个直接的可观察后果：<b>在任何一份肿瘤学证据分级表里，你都找不到一个位置来安放"这个人二十年的生活结构"——不是因为它不重要，是因为衡量它的那把尺子是按"E 可被随机化掉"设计的。</b></p>
+<h2 id="c9">九、这套东西什么时候失效</h2>
+<p><b>其一，最要紧的一条，写在最前面：本文不得被用于反对随机对照试验。</b>RCT 是人类方法论史上最重要的发明之一，它救的命以千万计。本文反对的<b>不是</b> RCT，是<b>把一个只对特定结构成立的方法，当成对一切结构都成立的标准</b>。对急性病、对药物、对任何 E 确实是噪声的问题，RCT 仍然是黄金标准，而且没有替代品。<b>谁拿这篇文章去质疑疫苗、质疑抗生素、质疑肿瘤治疗的循证基础，谁就是在杀人。</b></p>
+<p><b>其二，E→D→S 的可操作性远不如 S→D→E。</b>这是本文最大的弱点，必须说清楚。S 路径之所以统治了一百年，是因为它<b>能做</b>：可测、可控、可复现、可发表。E 路径至今没有一套成熟的方法学——本文第七节给的三条，只是它可能存在的迹象，不是它已经存在的证据。<b>一个批评者完全可以说：你指出了 S 路径的局限，但你给不出一条能走的替代路，而一条走不了的正确路径，不如一条走得了的有局限的路径。</b> 这个批评是对的，本文没有回答它。</p>
+<p><b>其三，任务 DNA 的判定本身缺乏判据。</b>本文说急性病是 S→D→E、慢性病是 E→D→S，但边界在哪？癌症是哪一条？自身免疫病是哪一条？感染后的长期症状是哪一条？<b>本文给不出一条可判定的规则，只能说"看那个'它'是先在的还是被长出来的"——而这个判断本身可能需要先做完研究才知道。这是一个循环，本文没解开它。</b></p>
+<p><b>其四，本文可能只是"生物心理社会模型"的换词。</b>恩格尔一九七七年提出的生物心理社会模型，说的似乎就是这件事：不能只看生物层面。<b>若本文只是把它换成了三个字母，那本文就是它自己批判的那种东西——一次熟练的空白填补。</b></p>
+<p>我认为不是，理由是：生物心理社会模型说的是"要同时考虑三个层面"——<b>这是一个加法，而加法不改变起点</b>。四十八年来它没有改变医学的任何一个动作，恰恰因为它是加法：它可以被完全接受（每本教科书第一章都写它），同时对第二章之后毫无影响。<b>本文说的是起点的排序，而排序不能被加法吸收：你不能"同时"从三个地方起手。</b> 但这个辩护够不够重，我不该自己判。</p>
+<hr>
+<p>回到开头那两组数字。</p>
+<p>五百个位点，五亿病人。</p>
+<p>如果本文是对的，那么第六百个位点、第七百个位点，不会改变那个五亿。它们会是真的，会发在好刊上，会有人拿它们做出更精确的风险评分——<b>而那个评分会告诉一个四十一岁的健康人，他有 12.3% 的十年风险，然后他会开始吃药，吃四十年。</b></p>
+<blockquote>医学用一百年学会了把花看清楚。它把花看得那么清楚，以至于当有人指着土说话时，它听见的是一句没有证据等级的话。</blockquote>
+<p>[REF]</p>
+<p>Engel, G. L. The need for a new medical model: A challenge for biomedicine[J]. Science, 1977, 196(4286): 129-136.</p>
+<p>Guyatt, G., Sackett, D., Taylor, D. W., et al. Determining optimal therapy — randomized trials in individual patients[J]. New England Journal of Medicine, 1986, 314(14): 889-892.</p>
+<p>Sabaté, E. Adherence to Long-Term Therapies: Evidence for Action[R]. Geneva: World Health Organization, 2003.</p>
+<p>王德生. SDE本体论入门[M]. 新加坡: 德麦国际出版社, 2026.</p>
+    </article>
+    <div class="foot-nav">
+      <div class="cl">
+        <a href="/creation/pdf/mechanism-blindness.pdf" download style="border-color:var(--accent);color:var(--accent);font-weight:700">⬇ 下载 PDF · 8 页</a>
+        <a href="/creation/research-philosophy/">← 回科研哲学频道</a>
+        <a href="/creation/">← 学术创造专栏</a>
+        <a href="/taste/zhiwen/">→ 中华智问知识发生器</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">延伸参考文献 · Further References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">下列文献为本文所涉思想脉络的原典与代表性研究，供读者对读与查证；与文中已引文献不重复，本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+    <li style="margin:0 0 9px;padding-left:6px">Robert K. Merton, "On Sociological Theories of the Middle Range", in Social Theory and Social Structure, New York: Free Press, 1968.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Barney G. Glaser & Anselm L. Strauss, The Discovery of Grounded Theory, Chicago: Aldine, 1967.</li>
+    <li style="margin:0 0 9px;padding-left:6px">John W. Creswell, Qualitative Inquiry and Research Design, 4th ed., Thousand Oaks: Sage, 2018.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Robert K. Yin, Case Study Research and Applications, 6th ed., Thousand Oaks: Sage, 2018.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Kathleen M. Eisenhardt, "Building Theories from Case Study Research", Academy of Management Review, Vol. 14 (1989).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Andrew H. Van de Ven, Engaged Scholarship: A Guide for Organizational and Social Research, Oxford University Press, 2007.</li>
+    <li style="margin:0 0 9px;padding-left:6px">John P. A. Ioannidis, "Why Most Published Research Findings Are False", PLoS Medicine, Vol. 2 (2005).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Open Science Collaboration, "Estimating the Reproducibility of Psychological Science", Science, Vol. 349 (2015).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Herbert A. Simon, Administrative Behavior, New York: Macmillan, 1947（有限理性）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Herbert A. Simon, The Sciences of the Artificial, 3rd ed., Cambridge, MA: MIT Press, 1996.</li>
+    <li style="margin:0 0 9px;padding-left:6px">James G. March, "Exploration and Exploitation in Organizational Learning", Organization Science, Vol. 2 (1991).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Richard M. Cyert & James G. March, A Behavioral Theory of the Firm, Englewood Cliffs: Prentice-Hall, 1963.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Michael T. Hannan & John Freeman, "Structural Inertia and Organizational Change", American Sociological Review, Vol. 49 (1984).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Paul J. DiMaggio & Walter W. Powell, "The Iron Cage Revisited", American Sociological Review, Vol. 48 (1983).</li>
+    <li style="margin:0 0 9px;padding-left:6px">John W. Meyer & Brian Rowan, "Institutionalized Organizations: Formal Structure as Myth and Ceremony", American Journal of Sociology, Vol. 83 (1977).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Clayton M. Christensen, The Innovator's Dilemma, Boston: Harvard Business School Press, 1997；中译《创新者的窘境》，胡建桥译，中信出版社，2010。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Everett M. Rogers, Diffusion of Innovations, 5th ed., New York: Free Press, 2003.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Fred D. Davis, "Perceived Usefulness, Perceived Ease of Use, and User Acceptance of Information Technology", MIS Quarterly, Vol. 13 (1989)（技术接受模型）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Viswanath Venkatesh et al., "User Acceptance of Information Technology: Toward a Unified View", MIS Quarterly, Vol. 27 (2003).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Wanda J. Orlikowski, "The Duality of Technology", Organization Science, Vol. 3 (1992).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Erik Brynjolfsson, Daniel Rock & Chad Syverson, "Artificial Intelligence and the Modern Productivity Paradox", NBER Working Paper 24001, 2017.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Ikujiro Nonaka & Hirotaka Takeuchi, The Knowledge-Creating Company, New York: Oxford University Press, 1995.</li>
+  </ol>
+</section>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  © 德麦国际 Demai International · 学术创造专栏 · 科研哲学 · <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

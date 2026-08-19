@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="sde-page-kind" content="channel">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>思想成长树 · SDE Universes</title>
+<meta name="description" content="它没有自己的数据——画的就是你在每日思想挑战与30天健脑训练里真写出来的东西：三程的枝、写成的命题、交手过的学科圈层。没做的地方就是暗的，不补空枝。">
+<style>
+:root{--bg:#0F0D0A;--pa:#EFE9DD;--dim:#B9AE99;--faint:#7C7466;--ac:#C9A227;--s:#7FA8C9;--d:#C98F5E;--e:#8FB3A0;--line:#2A2521;--card:#161310}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--pa);font-family:"Noto Serif CJK SC","Songti SC",Georgia,serif;line-height:1.85}
+a{color:var(--ac);text-decoration:none}
+a:hover{text-decoration:underline}
+.w{max-width:960px;margin:0 auto;padding:0 22px}
+header{border-bottom:1px solid var(--line);padding:14px 0;font-size:13px;color:var(--dim)}
+header .w{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hero{padding:52px 0 26px;border-bottom:1px solid var(--line)}
+.en{font-size:11px;letter-spacing:.22em;color:var(--faint);text-transform:uppercase}
+h1{font-size:34px;margin:12px 0 6px;letter-spacing:.04em}
+.sub{color:var(--dim);font-size:15px;max-width:54em}
+.stats{display:flex;gap:28px;flex-wrap:wrap;margin:24px 0 2px}
+.stat b{display:block;font-size:24px;color:var(--ac)}
+.stat span{font-size:12px;color:var(--faint);letter-spacing:.1em}
+main{padding:30px 0 60px}
+.treewrap{background:#0C0A08;border:1px solid var(--line);border-radius:6px;padding:10px 0 0;margin:0 0 26px}
+svg{display:block;width:100%;height:auto}
+.empty{padding:44px 24px;text-align:center;color:var(--dim);font-size:15px}
+.empty a{font-weight:bold}
+h2{font-size:19px;margin:34px 0 12px;letter-spacing:.05em;color:var(--pa);border-bottom:1px solid var(--line);padding-bottom:8px}
+.plist .p{border-bottom:1px solid #1C1815;padding:13px 0}
+.plist .pm{font-size:15.5px;color:var(--pa);margin:0 0 5px}
+.plist .pf{font-size:12.5px;color:var(--faint);letter-spacing:.05em}
+.plist .pf .pid{color:var(--ac2,#8FB3A0)}
+.rings{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.rings span{font-size:12.5px;padding:3px 12px;border:1px solid var(--line);border-radius:2px;color:var(--dim)}
+.rings span.on{border-color:var(--e);color:var(--e)}
+.note{margin:20px 0 0;padding:14px 16px;background:var(--card);border-left:2px solid var(--ac);font-size:13.8px;color:var(--dim)}
+.note b{color:var(--pa)}
+.foot{border-top:1px solid var(--line);padding:26px 0 60px;font-size:13px;color:var(--faint)}
+.foot a{color:var(--dim)}
+button{background:transparent;color:var(--dim);border:1px solid var(--line);border-radius:3px;padding:8px 18px;font:inherit;font-size:13.5px;cursor:pointer;letter-spacing:.06em}
+button:hover{opacity:.85}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--faint);padding:0 0 12px 18px}
+.leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+@media(max-width:560px){h1{font-size:27px}}
+</style>
+</head>
+<body>
+
+<header><div class="w">
+  <span><a href="/browse/">← 爱思乐园</a></span>
+  <span><a href="/challenge/">每日思想挑战</a> · <a href="/training/">30天健脑训练</a> · <a href="/nbr/">近邻库</a></span>
+</div></header>
+
+<div class="w hero">
+  <div class="en">Thought Growth Tree</div>
+  <h1>思想成长树</h1>
+  <p class="sub">这棵树<b style="color:var(--pa)">没有自己的数据</b>。它画的就是你在<a href="/challenge/">每日思想挑战</a>与<a href="/training/">30天健脑训练</a>里真写下来的东西——三程的枝、压出来的命题、交手过的学科圈层。<b style="color:var(--pa)">没做的地方就是暗的</b>：这里不补空枝，也不给你一个看起来很茂盛的假象。</p>
+  <div class="stats">
+    <div class="stat"><b id="s-done">0</b><span>训练天数 / 30</span></div>
+    <div class="stat"><b id="s-ch">0</b><span>答过的挑战</span></div>
+    <div class="stat"><b id="s-props">0</b><span>写成的命题</span></div>
+    <div class="stat"><b id="s-rings">0</b><span>交手过的圈层</span></div>
+    <div class="stat"><b id="s-days">—</b><span>第一天到现在</span></div>
+  </div>
+</div>
+
+<main class="w">
+  <div class="treewrap">
+    <div class="leg">
+      <span><i style="background:#7FA8C9"></i>显露 S · 1–10</span>
+      <span><i style="background:#C98F5E"></i>发生 D · 11–20</span>
+      <span><i style="background:#8FB3A0"></i>纠缠 E · 21–30</span>
+      <span><i style="background:#C9A227"></i>命题（果）</span>
+      <span><i style="background:#3A342C"></i>还没走到</span>
+    </div>
+    <div id="treebox"></div>
+  </div>
+
+  <div id="body"></div>
+</main>
+
+<div class="w foot">
+  <p>数据全部在本机 <code>localStorage</code>，一个字节都不上传。<a href="#" id="ex">导出为 JSON</a> · <a href="#" id="im">从 JSON 导入</a> · <a href="#" id="cl">清除全部记录</a></p>
+  <p style="margin-top:10px">三件一套：<a href="/challenge/">每日思想挑战</a> · <a href="/training/">30天健脑训练</a> · <a href="/growth-tree/">思想成长树</a>。</p>
+  <input type="file" id="file" accept="application/json" style="display:none">
+</div>
+
+<script src="/assets/sde-growth.js"></script>
+<script>
+(function () {
+  "use strict";
+  var G = window.SDEGrowth;
+  var el = function (id) { return document.getElementById(id); };
+  var COL = { S: "#7FA8C9", D: "#C98F5E", E: "#8FB3A0" };
+  var OFF = "#3A342C";
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+  function stageOf(n) { return n <= 10 ? "S" : (n <= 20 ? "D" : "E"); }
+
+  /* ── 画树 ────────────────────────────────────────────
+     主干自下而上三十节，一节＝一天；完成的一节点亮并抽一条侧枝，
+     没完成的留暗。命题结成果挂在对应那一节旁边。
+     刻意不做「预览完整的树」——看得见的茂盛必须是真做出来的。 */
+  function tree(s) {
+    var W = 900, H = 620, x0 = W / 2, yb = H - 40, yt = 56;
+    var step = (yb - yt) / 30;
+    var out = ['<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="思想成长树">'];
+    var i, n, y, c, on, side, len, px, py, rec;
+
+    /* 土与根 */
+    out.push('<line x1="' + (x0 - 150) + '" y1="' + (yb + 8) + '" x2="' + (x0 + 150) + '" y2="' + (yb + 8) + '" stroke="#241F1A" stroke-width="2"/>');
+    var chn = Object.keys(s.ch).length;
+    for (i = 0; i < Math.min(chn, 14); i++) {
+      var ang = -Math.PI * (0.15 + 0.7 * (i / 13 || 0));
+      out.push('<line x1="' + x0 + '" y1="' + (yb + 8) + '" x2="' + (x0 + Math.cos(ang) * (30 + i * 8)).toFixed(1) +
+        '" y2="' + (yb + 8 - Math.sin(ang) * 0 + 14 + (i % 3) * 5) + '" stroke="#4A4136" stroke-width="1.2"/>');
+    }
+    if (chn) out.push('<text x="' + x0 + '" y="' + (yb + 34) + '" fill="#7C7466" font-size="12" text-anchor="middle">根 · 答过 ' + chn + ' 道挑战</text>');
+
+    /* 主干 */
+    out.push('<line x1="' + x0 + '" y1="' + (yb + 8) + '" x2="' + x0 + '" y2="' + yt + '" stroke="#2A2521" stroke-width="7" stroke-linecap="round"/>');
+
+    var doneMax = 0;
+    for (n = 1; n <= 30; n++) if (s.days[String(n)]) doneMax = n;
+    if (doneMax) {
+      out.push('<line x1="' + x0 + '" y1="' + (yb + 8) + '" x2="' + x0 + '" y2="' +
+        (yb - (doneMax - 1) * step).toFixed(1) + '" stroke="#5C4E36" stroke-width="7" stroke-linecap="round"/>');
+    }
+
+    for (n = 1; n <= 30; n++) {
+      y = yb - (n - 1) * step;
+      c = COL[stageOf(n)];
+      rec = s.days[String(n)];
+      on = !!rec;
+      side = (n % 2 === 0) ? 1 : -1;
+      len = on ? (52 + (n % 5) * 16) : 20;
+      out.push('<line x1="' + x0 + '" y1="' + y.toFixed(1) + '" x2="' + (x0 + side * len).toFixed(1) +
+        '" y2="' + (y - 16).toFixed(1) + '" stroke="' + (on ? c : OFF) + '" stroke-width="' + (on ? 2.2 : 1) + '"/>');
+      out.push('<circle cx="' + (x0 + side * len).toFixed(1) + '" cy="' + (y - 16).toFixed(1) +
+        '" r="' + (on ? 4.5 : 2) + '" fill="' + (on ? c : OFF) + '"><title>第 ' + n + ' 天' +
+        (on ? '　' + esc(rec.at) + '\n' + esc((rec.out || "").slice(0, 90)) : '　还没走到') + '</title></circle>');
+      if (n % 10 === 0) {
+        out.push('<text x="' + (x0 + side * (len + 12)).toFixed(1) + '" y="' + (y - 12).toFixed(1) +
+          '" fill="' + (on ? c : "#4A4136") + '" font-size="11.5" text-anchor="' + (side > 0 ? "start" : "end") + '">第 ' + n + ' 天</text>');
+      }
+    }
+
+    /* 果：命题。挂在它产生的那一天附近；不知道哪一天的挂树冠 */
+    for (i = 0; i < s.props.length && i < 40; i++) {
+      var p = s.props[i], dn = 0, m = /training-(\d+)/.exec(p.from || "");
+      if (m) dn = parseInt(m[1], 10);
+      py = dn ? (yb - (dn - 1) * step - 30) : (yt + 18 + (i % 6) * 15);
+      px = x0 + ((i % 2) ? 1 : -1) * (86 + (i % 7) * 20);
+      out.push('<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="5.5" fill="#C9A227" fill-opacity="0.9">' +
+        '<title>' + esc(p.prop.slice(0, 120)) + '</title></circle>');
+    }
+
+    out.push('</svg>');
+    return out.join("");
+  }
+
+  function render() {
+    var s = G.load(), st = G.stats(), r = G.rings();
+    el("s-done").textContent = st.done;
+    el("s-ch").textContent = st.challenges;
+    el("s-props").textContent = st.props;
+    el("s-rings").textContent = st.rings;
+    el("s-days").textContent = st.start ? (G.daysBetween(st.start, G.today()) + 1) + " 天" : "—";
+
+    var nothing = !st.done && !st.challenges && !st.props;
+    if (nothing) {
+      el("treebox").innerHTML = '<div class="empty">这里还是空的——<b>因为它只画你真写下来的东西</b>。<br><br>' +
+        '先去 <a href="/challenge/">答一道每日思想挑战</a>（十五分钟），或 <a href="/training/">开始 30 天健脑训练</a> 的第一天。<br>' +
+        '写下第一件交付物，这棵树就有第一节。</div>';
+    } else {
+      el("treebox").innerHTML = tree(s);
+    }
+
+    var h = "";
+    if (st.broken) {
+      h += '<div class="note">⚠ <b>本机原有的记录读不出来</b>（可能被清过、被别的东西写脏，或换了浏览器）。' +
+        '如果你之前导出过 JSON，可以在页底导入回来；没导出过的话，这一份恢复不了——' +
+        '这正是「数据只在你自己手里」的另一面，说清楚比装作没事强。</div>';
+    }
+
+    /* 命题列表——树上的果，逐条摊开 */
+    h += '<h2>你写成的命题</h2>';
+    if (!s.props.length) {
+      h += '<p style="color:var(--faint);font-size:14px">还没有。命题只从两个地方来：训练的<b>第 19 天</b>（写成三重否定）与<b>第 21 天</b>（压成五十字），' +
+        '以及挑战里的<b>戊 · 压成一句承重命题</b>那一类。<br>' +
+        '别的天数写的是练习，不算命题——所以这里不会自动变多，那是故意的。</p>';
+    } else {
+      h += '<div class="plist">';
+      for (var i = s.props.length - 1; i >= 0; i--) {
+        var p = s.props[i];
+        h += '<div class="p"><p class="pm">' + esc(p.prop) + '</p><p class="pf">' +
+          esc(p.at) + '　·　来自 ' + esc(p.from || "—") +
+          (p.ring ? '　·　圈层 ' + esc(p.ring) : "") +
+          (p.pid ? '　·　<span class="pid">账本 ' + esc(p.pid) + '</span>' : "") + '</p></div>';
+      }
+      h += '</div>';
+    }
+
+    /* 圈层——树往哪些学科长过 */
+    h += '<h2>你交手过的学科圈层</h2>';
+    var ks = Object.keys(r);
+    if (!ks.length) {
+      h += '<p style="color:var(--faint);font-size:14px">还没有。圈层来自<a href="/nbr/">近邻库</a>：' +
+        '当你在挑战的「甲 · 划一条分离线」里跟某一张占位者卡交过手，那张卡的圈层就记在这里。<br>' +
+        '这一栏是这棵树上<b>最要紧的一栏</b>——它量的不是你写了多少，是你的话走出过多远。</p>';
+    } else {
+      h += '<div class="rings">';
+      ks.sort(function (a, b) { return r[b] - r[a]; });
+      for (var j = 0; j < ks.length; j++) h += '<span class="on">' + esc(ks[j]) + ' × ' + r[ks[j]] + '</span>';
+      h += '</div>';
+      h += '<div class="note"><b>圈层多不多，比条数多不多重要。</b>站内两次真跑都栽在同一个地方：' +
+        '撞得越多越收敛到自己熟的那一片，而熟的那一片正是被占满的地方。' +
+        '所以这一栏若长期只有一两个圈层，不是练得不够，是<b>取材太近</b>——' +
+        '去 <a href="/nbr/">近邻库</a> 挑一个你完全不熟的圈层，专找那里的卡来撞。</div>';
+    }
+
+    /* 账本这一层的诚实交代 */
+    h += '<h2>关于账本与血缘</h2>';
+    h += '<div class="note">站上的<b>命题账本</b>（每条命题的编号 pid、以及分叉出来的血缘链 kin）存在 SDE 社区那一侧，' +
+      '要登录才取得到，<b>这个静态页面拿不到全量</b>——所以这棵树上不会凭空长出别人的枝。' +
+      '你自己落过卡的那几条，编号会显示在上面的命题列表里。<br><br>' +
+      '要让你的命题真正长进公共那棵树，只有一条路：<a href="/sde-wechat/">立成候选卡并被人顶回</a>。' +
+      '顶回记录才是分离线的原料，而分离线是这一切唯一要的东西。</div>';
+
+    el("body").innerHTML = h;
+  }
+
+  render();
+
+  el("ex").onclick = function (e) {
+    e.preventDefault();
+    var b = new Blob([G.exportJSON()], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(b); a.download = "sde-growth-" + G.today() + ".json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  };
+  el("im").onclick = function (e) { e.preventDefault(); el("file").click(); };
+  el("file").onchange = function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      if (G.importJSON(String(rd.result))) { alert("导入成功。"); location.reload(); }
+      else alert("这个文件读不出来——只认本页导出的 JSON。原有记录没有被动过。");
+    };
+    rd.readAsText(f);
+  };
+  el("cl").onclick = function (e) {
+    e.preventDefault();
+    if (confirm("清除本机全部记录（训练进度、挑战、写过的命题）？这一步不可撤销。建议先导出。")) { G.reset(); location.reload(); }
+  };
+})();
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

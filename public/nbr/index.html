@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="sde-page-kind" content="channel">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>近邻库 · 占位者卡 · SDE Universes</title>
+<meta name="description" content="以命题空间为主键的占位者库：一个候选压成 50 字承重命题之后，先查这里——这块地被谁占着，以及要活下来必须划出哪一条分离线。">
+<style>
+:root{--bg:#0F0D0A;--pa:#EFE9DD;--dim:#B9AE99;--faint:#7C7466;--ac:#C9A227;--ac2:#8FB3A0;--line:#2A2521;--card:#161310}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--pa);
+ font-family:"Noto Serif CJK SC","Songti SC",Georgia,serif;line-height:1.85}
+a{color:var(--ac);text-decoration:none}
+a:hover{text-decoration:underline}
+.w{max-width:960px;margin:0 auto;padding:0 22px}
+header{border-bottom:1px solid var(--line);padding:14px 0;font-size:13px;color:var(--dim)}
+header .w{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hero{padding:52px 0 28px;border-bottom:1px solid var(--line)}
+.en{font-size:11px;letter-spacing:.22em;color:var(--faint);text-transform:uppercase}
+h1{font-size:34px;margin:12px 0 6px;letter-spacing:.04em}
+.sub{color:var(--dim);font-size:15px;max-width:56em}
+.stats{display:flex;gap:34px;flex-wrap:wrap;margin:26px 0 4px}
+.stat b{display:block;font-size:26px;color:var(--ac)}
+.stat span{font-size:12px;color:var(--faint);letter-spacing:.1em}
+.rules{margin:26px 0 0;padding:16px 18px;background:var(--card);border-left:2px solid var(--ac)}
+.rules p{margin:0 0 8px;font-size:14px;color:var(--dim)}
+.rules p:last-child{margin:0}
+.rules b{color:var(--pa)}
+.askbox{margin:30px 0 10px}
+textarea{width:100%;min-height:76px;background:var(--card);color:var(--pa);border:1px solid var(--line);
+ border-radius:4px;padding:12px 14px;font:inherit;font-size:15px;line-height:1.7;resize:vertical}
+textarea:focus{outline:none;border-color:var(--ac)}
+.row{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}
+button{background:var(--ac);color:#17130A;border:0;border-radius:3px;padding:9px 20px;
+ font:inherit;font-size:14px;cursor:pointer;letter-spacing:.06em}
+button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line)}
+button:hover{opacity:.88}
+.hint{font-size:12.5px;color:var(--faint)}
+#verdict{margin:20px 0 0;padding:14px 16px;background:var(--card);border-left:2px solid var(--ac2);
+ font-size:14.5px;color:var(--dim);display:none}
+#verdict.miss{border-left-color:#B4543C}
+#gate{margin:16px 0 0;display:none}
+#gate .g{padding:14px 16px;background:var(--card);border-left:2px solid var(--ac);font-size:14.5px}
+#gate .g.no{border-left-color:#B4543C}
+#gate .g b{color:var(--pa)}
+#gate .rel{margin:12px 0 0;padding-left:14px;border-left:1px solid var(--line);font-size:13.5px;color:var(--dim)}
+#gate .rel .t{color:var(--ac2)}
+#gate .rel .t.own{color:#D08A72}
+#gate .miss{margin:12px 0 0;font-size:13.5px;color:var(--dim)}
+.card{border-top:1px solid var(--line);padding:22px 0}
+.card .top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.cid{font-size:11px;color:var(--faint);letter-spacing:.1em}
+.ring{font-size:11.5px;color:var(--ac2);border:1px solid var(--line);padding:1px 8px;border-radius:2px}
+.sc{font-size:11.5px;color:var(--ac);margin-left:auto}
+.prop{font-size:17px;margin:8px 0 10px;color:var(--pa)}
+.src{font-size:13.5px;color:var(--dim);margin-bottom:8px}
+.k{font-size:11.5px;color:var(--faint);letter-spacing:.08em;margin-right:6px}
+.al{font-size:13px;color:var(--faint);margin:6px 0}
+.holds{font-size:13.5px;color:var(--dim);margin:6px 0}
+.sep{font-size:13.5px;color:var(--dim);margin:4px 0 0;padding-left:14px;border-left:1px solid var(--line)}
+.vf{font-size:11.5px;color:var(--faint);margin-top:8px}
+.grp{margin-top:40px;font-size:12px;letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+footer{border-top:1px solid var(--line);margin-top:52px;padding:26px 0 46px;font-size:13px;color:var(--faint)}
+</style>
+</head>
+<body>
+<header><div class="w"><a href="/browse/">← SDE Universes</a><span>近邻库 · 占位者卡</span></div></header>
+
+<div class="w">
+  <div class="hero">
+    <div class="en">Occupancy Library · Nearest Neighbours</div>
+    <h1>近邻库</h1>
+    <p class="sub">一个候选被压成 50 字承重命题之后，先来这里问一句：<b>这块地被谁占着</b>。
+      本库以<b>命题空间</b>为主键，不以学科或人名为主键——候选是以命题的形态到达的，不是以人名。</p>
+    <div class="stats">
+      <div class="stat"><b id="s-n">—</b><span>占位者卡</span></div>
+      <div class="stat"><b id="s-r">—</b><span>学科圈层</span></div>
+      <div class="stat"><b id="s-a">—</b><span>表述变体</span></div>
+      <div class="stat"><b id="s-b">—</b><span>建库时间</span></div>
+    </div>
+    <div class="rules">
+      <p><b>① 库未命中 ≠ 未被占位。</b>查不到只能标〔库未命中〕，<b>不得据以放行</b>。这不是谨慎，是实测：
+        用当天产线上 35 条真实候选做评测，有 4 条与它的正主<b>一个词都不共享</b>
+        （「成功之死」对「自我损耗」词面为零）。词面粗筛必然漏掉这一类。</p>
+      <p><b>② 本库与站内文章索引分属不同命名空间。</b>混在一起检索会先返回 SDE 自己的文章，
+        正好落进「只引自己人＝停在一阶」。</p>
+      <p><b>③ 每轮回写。</b>每次跑出的新占位者当场写卡入库，库自增长。</p>
+    </div>
+  </div>
+
+  <div class="askbox">
+    <div class="hint" style="margin-bottom:8px">把候选压成一句 50 字级的承重命题贴进来。
+      <b>不要贴文章标题</b>——隐喻式标题（如《划界者的拇指不在指纹里》）词面上检不出卢曼，
+      而它的承重命题（「任何划界者都无法在自己划出的界内安置自己的划界动作」）检得出。</div>
+    <textarea id="q" placeholder="例：成功结算这个动作本身消耗掉下一次判断所需的认知偿付力……"></textarea>
+    <div class="row">
+      <button id="go">① 粗筛：查这块地被谁占着</button>
+      <button class="ghost" id="fine" disabled>② 细判：判它是不是换词重述</button>
+      <button class="ghost" id="clr">看全部卡片</button>
+      <span class="hint">粗筛零调用不烧 Key；细判用你自己的 Key</span>
+    </div>
+  </div>
+
+  <div class="row" id="keyrow" style="display:none">
+    <input id="k" type="password" placeholder="你的 API Key（只存在这台浏览器里）"
+      style="flex:1;min-width:240px;background:var(--card);color:var(--pa);border:1px solid var(--line);border-radius:3px;padding:8px 12px;font:inherit;font-size:14px">
+    <select id="vd" style="background:var(--card);color:var(--pa);border:1px solid var(--line);border-radius:3px;padding:8px 10px;font:inherit;font-size:14px">
+      <option value="ds">DeepSeek</option><option value="glm">智谱 GLM</option>
+    </select>
+  </div>
+
+  <div id="verdict"></div>
+  <div id="gate"></div>
+  <div id="list"></div>
+</div>
+
+<footer><div class="w">近邻库是三大功能体系共用的一份：浏览时立候选、对话时过闸门、社区里被人顶回，问的都是同一个问题。<br>
+  SDE Universes · 德麦国际</div></footer>
+
+<script src="/assets/sde-nbr.js"></script>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var LIST=$("list"), VD=$("verdict");
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function srcLine(c){
+    var s=c.src||{}, t=[s.author, "《"+(s.zh||s.title)+"》", s.year||""].filter(Boolean).join(" ");
+    if(s.zh && s.title && s.zh!==s.title) t+= "（"+s.title+"）";
+    (c.also||[]).forEach(function(a){ t+= "　另：" + a.author + "《" + (a.zh||a.title) + "》" + (a.year||""); });
+    return t;
+  }
+  function card(c,withScore){
+    return '<div class="card"><div class="top"><span class="cid">'+esc(c.id)+'</span>'
+      +'<span class="ring">'+esc(c.ring)+'</span>'
+      +(withScore&&c.score!=null?'<span class="sc">粗筛分 '+c.score+'</span>':'')
+      +'</div>'
+      +'<div class="prop">'+esc(c.prop)+'</div>'
+      +'<div class="src">'+esc(srcLine(c))+'</div>'
+      +'<div class="al"><span class="k">表述变体</span>'+esc((c.alias||[]).join(" ／ "))+'</div>'
+      +'<div class="holds"><span class="k">它占住什么</span>'+esc(c.holds)+'</div>'
+      +(c.sep||[]).map(function(s){return '<div class="sep">'+esc(s)+'</div>'}).join("")
+      +'<div class="vf">核验 '+esc(c.verify)+' · 入库来源 '+esc(c.frm||"")+'</div></div>';
+  }
+  function showAll(){
+    VD.style.display="none";
+    SDENbr.load().then(function(db){
+      var by={}; db.cards.forEach(function(c){ (by[c.ring]=by[c.ring]||[]).push(c) });
+      var html="", rings=Object.keys(by).sort();
+      rings.forEach(function(r){
+        html+='<div class="grp">'+esc(r)+'　'+by[r].length+'</div>';
+        by[r].forEach(function(c){ html+=card(c,false) });
+      });
+      LIST.innerHTML=html;
+    });
+  }
+  SDENbr.load().then(function(db){
+    $("s-n").textContent=db.n;
+    $("s-r").textContent=(function(){var s={};db.cards.forEach(function(c){s[c.ring]=1});return Object.keys(s).length})();
+    $("s-a").textContent=db.cards.reduce(function(a,c){return a+(c.alias||[]).length},0);
+    $("s-b").textContent=(db.built||"").slice(0,10);
+    showAll();
+  }).catch(function(e){ LIST.innerHTML='<div class="card">库读不到：'+esc(e.message)+'</div>' });
+
+  $("go").onclick=function(){
+    var q=$("q").value.trim();
+    if(!q){ $("q").focus(); return; }
+    SDENbr.ask(q,12).then(function(res){
+      VD.style.display="block";
+      VD.className = res.status==="miss" ? "miss" : "";
+      VD.innerHTML = "<b>"+esc(res.status==="miss"?"〔库未命中〕":"命中 "+res.hits.length+" 张")
+                   + "</b>　" + esc(res.verdict);
+      LASTQ=q; LASTIDS=res.hits.map(function(c){return c.id}); LASTCARDS=res.hits;
+      $("fine").disabled = res.hits.length===0;
+      $("gate").style.display="none"; $("gate").innerHTML="";
+      LIST.innerHTML = res.hits.map(function(c){return card(c,true)}).join("")
+        || '<div class="card">词面上没有可比的卡。这不构成放行——见上面第 ① 条。</div>';
+      window.scrollTo({top:VD.offsetTop-80,behavior:"smooth"});
+    });
+  };
+  // ── 二级细判 ─────────────────────────────────────────
+  // Key 沿全站 BYOK 规范键：任一智能体填过一次，这里自动借到。
+  var KEYS=["sde_ds_key","sde_glm_key"], VMAP={sde_ds_key:"ds",sde_glm_key:"glm"};
+  function keyGet(){
+    var v=$("k").value.trim(); if(v) return {k:v,vd:$("vd").value};
+    for(var i=0;i<KEYS.length;i++){ var x=localStorage.getItem(KEYS[i]); if(x&&x.length>=8) return {k:x,vd:VMAP[KEYS[i]]}; }
+    return null;
+  }
+  function keySave(k,vd){ try{ localStorage.setItem(vd==="glm"?"sde_glm_key":"sde_ds_key",k); }catch(e){} }
+  var LASTQ="", LASTIDS=[], LASTCARDS=[];
+  function relName(r){ return {own:"占死",near:"近邻·带分离线活着",far:"无关",unjudged:"基底漏判"}[r]||r; }
+  $("fine").onclick=function(){
+    var kv=keyGet();
+    if(!kv){ $("keyrow").style.display="flex"; $("k").focus();
+      $("gate").style.display="block";
+      $("gate").innerHTML='<div class="g no">细判要用你自己的 Key（粗筛不用）。填在上面那一行，只存在这台浏览器里。</div>';
+      return; }
+    if($("k").value.trim()) keySave(kv.k,kv.vd);
+    var btn=this; btn.disabled=true; var old=btn.textContent; btn.textContent="判定中…";
+    $("gate").style.display="block";
+    $("gate").innerHTML='<div class="g">正在把这 '+LASTIDS.length+' 张交给基底判——它要回答的是「新命题能不能被这一张 1:1 替换」。</div>';
+    SDENbr.judge(LASTQ, LASTIDS, kv.k, kv.vd).then(function(r){
+      btn.disabled=false; btn.textContent=old;
+      if(!r.ok){ $("gate").innerHTML='<div class="g no">'+esc(r.msg||"细判没成")+'</div>'; return; }
+      var html='<div class="g'+(r.pass?"":" no")+'"><b>'+esc(r.verdict)+'</b>'
+        +(r.line?'<div style="margin-top:8px;color:var(--dim)">'+esc(r.line)+'</div>':'')+'</div>';
+      (r.v||[]).forEach(function(x){
+        var c=(LASTCARDS||[]).filter(function(c){return c.id===x.id})[0]||{};
+        html+='<div class="rel"><span class="t'+(x.rel==="own"?" own":"")+'">【'+esc(relName(x.rel))+'】</span> '
+          +esc(x.id)+'　'+esc((c.src&&c.src.author)||"")+'　'+esc(x.why||"")
+          +(x.sep?'<div style="margin-top:4px;color:var(--faint)">分离线：'+esc(x.sep)+'</div>':'')+'</div>';
+      });
+      if((r.miss||[]).length){
+        html+='<div class="miss"><b>库外还应请进来的占位者</b>（基底点的，尚未入库——按纪律③应当场写卡）：';
+        r.miss.forEach(function(m){ html+='<div class="rel">'+esc(m.who)+'《'+esc(m.title)+'》　'+esc(m.why)+'</div>'; });
+        html+='</div>';
+      }
+      $("gate").innerHTML=html;
+    }).catch(function(e){
+      btn.disabled=false; btn.textContent=old;
+      $("gate").innerHTML='<div class="g no">细判出错：'+esc(e.message)+'</div>';
+    });
+  };
+
+  $("clr").onclick=function(){ $("q").value=""; $("fine").disabled=true;
+    $("gate").style.display="none"; showAll(); window.scrollTo({top:0,behavior:"smooth"}) };
+  $("q").addEventListener("keydown",function(e){
+    if((e.metaKey||e.ctrlKey)&&e.key==="Enter") $("go").click();
+  });
+})();
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

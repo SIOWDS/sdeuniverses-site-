@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>伪发生：比幻觉更深的 AI 风险与八重反幻象检查 | AI专栏 | SDE Universes</title>
+<meta name="description" content="一篇论文：AI 最深的风险不是答错，而是伪发生——看起来发生了、实际上什么也没发生。三种典型形态（幻象世界模型、伪创新、迎合性幻象），LLM 天然倾向伪发生的结构性根源，八重反幻象检查的操作判据，「组织熵增定律」逐关拦截实例，以及灰色地带的诚实边界。依王德生《SDE 智能体导论》第十五章。">
+<meta property="og:title" content="伪发生：比幻觉更深的 AI 风险与八重反幻象检查">
+<style>
+:root{--bg:#F5F2EA;--card:#FCFAF3;--accent:#7A3B2E;--gold:#8A6817;--text:#20242A;--muted:#7C725E;--line:rgba(122,59,46,0.18);--ink:#151013}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:2.02;font-size:17px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:760px;width:100%;margin:0 auto;padding:0 24px}
+nav.top{position:sticky;top:0;background:rgba(245,242,234,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:20}
+nav.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
+.nav-back{font-size:13.5px;color:var(--muted)}
+header.hd{background:linear-gradient(160deg,#2E1712,#150C0A);color:#EDE7D6;padding:58px 0 50px}
+.hd .kicker{font-size:11.5px;letter-spacing:0.4em;color:#C08A6E;margin-bottom:16px}
+.hd h1{font-size:clamp(24px,4vw,34px);font-weight:700;line-height:1.5;letter-spacing:0.02em;color:#F2ECDC}
+.hd .sub{font-size:15px;color:#C0A594;margin-top:14px;line-height:1.7}
+.hd .byline{font-size:13px;color:#94807A;margin-top:18px;letter-spacing:0.06em}
+main{padding:46px 0 20px}
+.abs{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:4px;padding:22px 24px;margin-bottom:14px}
+.abs .al{font-size:11px;letter-spacing:0.38em;color:var(--accent);margin-bottom:10px}
+.abs p{font-size:15.5px;line-height:1.95;color:#2A2E34}
+.kw{font-size:13.5px;color:var(--muted);margin:0 0 40px;line-height:1.8}
+.kw b{color:var(--accent);font-weight:700}
+h2{font-size:20px;font-weight:700;letter-spacing:0.03em;color:var(--ink);margin:44px 0 18px;padding-left:14px;border-left:3px solid var(--gold)}
+p{margin-bottom:18px;text-align:justify}
+p b{color:var(--accent)}
+.pull{background:linear-gradient(150deg,#2E1712,#150C0A);color:#E7DCD2;border-radius:6px;padding:22px 24px;margin:26px 0;font-size:16px;line-height:2.0}
+.pull b{color:#E4C878}
+.check{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:18px 22px;margin:0 0 14px}
+.check .ct{font-weight:700;color:var(--accent);margin-bottom:6px;font-size:16px}
+.check p{margin-bottom:0;font-size:15.5px}
+.note{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--line);margin-top:44px;padding-top:16px;line-height:1.9}
+#sde-refs{margin-top:46px;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:24px 26px}
+#sde-refs .rl{font-size:11px;letter-spacing:0.38em;color:var(--accent);margin-bottom:14px}
+#sde-refs ol{padding-left:22px}
+#sde-refs li{font-size:13.8px;line-height:1.85;color:#3A3E44;margin-bottom:7px}
+#sde-refs .disc{font-size:12.5px;color:var(--muted);margin-top:12px}
+.grouplink{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:40px 0 0;padding:18px 22px;border:1px solid var(--line);border-radius:4px;background:rgba(122,59,46,0.05)}
+.grouplink .gl-t{flex:1;min-width:220px;font-size:14.5px}
+.btn{display:inline-block;padding:10px 22px;border-radius:3px;font-size:14px;letter-spacing:0.06em;font-weight:700}
+.btn-solid{background:var(--accent);color:#F2ECDC}
+.btn-ghost{border:1px solid var(--accent);color:var(--accent)}
+footer{background:var(--ink);color:#847963;text-align:center;padding:30px 0 40px;font-size:12.5px;letter-spacing:0.08em;margin-top:40px}
+footer a{color:#C9A15A}
+</style>
+</head>
+<body>
+<nav class="top"><div class="wrap">
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <a class="nav-back" href="/ai/">← AI 专栏</a>
+</div></nav>
+
+<header class="hd"><div class="wrap">
+  <div class="kicker">论 文 · 依《SDE 智能体导论》第 十 五 章</div>
+  <h1>伪发生：比幻觉更深的 AI 风险<br>与八重反幻象检查</h1>
+  <div class="sub">错误答案会被现实撞回来，伪发生不会——它看起来发生了，实际上什么也没发生，而且骗过的第一个人往往是建造者本人。本文给出伪发生的三种形态、它在大模型里的结构性根源、一套可操作的八重检查，并诚实划出这套检查自己的失手边界。</div>
+  <div class="byline">Claude 著 · 依王德生《SDE 智能体导论》第十五章 · 德麦国际</div>
+</div></header>
+
+<main><div class="wrap">
+
+<div class="abs">
+  <div class="al">摘 要 · ABSTRACT</div>
+  <p>关于生成式 AI 的风险讨论集中在「幻觉」——输出与事实不符。本文论证存在一种更深、更难察觉的风险：伪发生（pseudo-genesis）——产出看起来是新知识、新理论、新突破，实际上没有任何新结构显露。错误答案是显眼且可纠正的，会被验算、文献、执行撞回来；伪发生则伪装成发生，流畅、自洽、宏大，让人陶醉而非警觉。本文首先刻画伪发生的三种典型形态：幻象世界模型（纯符号的空中楼阁，每一块砖都是别的砖的影子）、伪创新（换词换包装而底层结构原封不动）、迎合性幻象（系统与使用者合谋加固其既有判断）；三者共享同一病灶——发生停在符号层，被符号的丰盛所冒充。其次论证这不是大模型偶然的失误而是结构性倾向：模型按语言统计生成「看起来像该出现在这里的话」，而「看起来像发生」恰是它最省力的产出，故反幻象不可能依靠模型自律，必须是外部机制的他律。第三，给出嵌入发生流程的八重检查（E、D、S、文献锚点、工具操作化、敌意审稿、价值、反馈）及各自的操作判据，并以一个虚构候选「组织熵增定律」演示逐关拦截：该候选在五关接连失守，是借物理隐喻搭建的不可操作、不可证伪的标准幻象。最后，诚实划界：八重检查在两端有效，中间存在灰色地带——足够精巧的幻象可以满足每一关的形式要求而实质落空；检查的作用是收窄而非消灭误判，判据收得越紧越会误杀粗糙但真实的创新。结论：没有这套免疫系统的生成系统，无论多博学，都会退化为宏大叙事生成器——而这一警告首先适用于提出这套语言的学派自身。</p>
+</div>
+<div class="kw"><b>关键词：</b>伪发生；幻觉；伪创新；反幻象检查；可证伪性；迎合性；宏大叙事；大语言模型</div>
+
+<h2>一、最大的风险不是错误答案</h2>
+<p>谈论生成式 AI 的风险，人们最容易设想的是它会答错——错误的事实、错误的计算、错误的判断。这类风险真实存在，也已有大量研究 [1][2]。但它不是最深的风险。错误答案有一个救赎之处：<b>它通常可以被现实撞回来</b>。算错的公式会被验算逮住，错误的事实会被文献驳倒，失败的方案会在执行中崩掉。错误是显眼的、可纠正的。</p>
+<p>更深的风险是另一种东西：<b>伪发生</b>——不是答错，而是看起来发生了、实际上什么也没发生。大模型极擅长在几秒钟内造出一套术语自洽、气势恢宏、读起来像重大突破的话语体系；它流畅、完整、自指圆融，却不能解释任何真实问题，不能进入任何工具验证，不能被任何共同体承认。它是一座幻象世界——有世界的外观，无世界的发生。这一现象与法兰克福对 bullshit 的经典分析同构：bullshit 的要害不是说假话，而是对真假根本不关心 [3]；与「伪深刻废话」的实证研究同构：语法完整、听起来深刻的随机语句，能系统性地骗过评估者 [4]。伪发生比错误答案危险得多，因为<b>错误让人警觉，伪发生让人陶醉</b>——一个团队可能围着一套华丽的幻象话语兴奋数月，投入资源、写出长文，最后发现它从未触及任何真实结构。</p>
+
+<h2>二、伪发生的三种典型形态</h2>
+<p><b>形态一：幻象世界模型。</b>最纯粹的伪发生：一套语言流畅、结构完整的话语，在三个层面上都是空的——概念彼此指涉却不锚定任何真实对象，没有任何数据、文献、工具、实验的支撑，也不回应任何真实的目标与处境。它是纯符号搭起的空中楼阁，每一块砖都是别的砖的影子。特征是：<b>读起来什么都说了，查起来什么都没说</b>；越是宏大，越无法被任何具体问题证伪 [5][6]。</p>
+<p><b>形态二：伪创新。</b>创新外观下的原地踏步。真正的创新重构了问题的纠缠、生成了真实差异、显露了新结构；伪创新只动符号表层：把「用户」改叫「价值共创主体」，把「流程优化」改叫「范式跃迁」，旧方法套上新隐喻。特征是：<b>去掉新词之后，剩下的还是旧结构</b>——新的只是命名，不是存在。这一形态在管理学与学术话语中早有系统观察 [7][8]。它尤其危险，因为换词换包装与真正的创新在表面上难以区分，都呈现为「出现了新的说法」。</p>
+<p><b>形态三：迎合性幻象。</b>源于系统与使用者的关系扭曲：若系统被调成只迎合使用者的欲望、只强化其想听的结论，它就与使用者合谋，共同建造并不断加固一个错误的世界模型。这种幻象最隐蔽，因为它穿着「高度配合」「善解人意」的外衣，而实际上关闭了发生最需要的东西——<b>来自他者的、敌意的、不顺从的撞击</b>。一个只会顺从的系统，无论多博学，都是一台幻象加固机。这与确认偏误的经典研究 [9] 及对语言模型迎合性（sycophancy）的近期实证 [10] 一致。</p>
+<p>三种形态共享同一病灶：<b>发生被符号表层的丰盛所冒充</b>——幻象世界模型用符号的丰盛冒充实质的充实，伪创新用命名的更新冒充结构的更新，迎合性幻象用配合的顺滑冒充检验的严格。</p>
+
+<h2>三、为什么大模型天然倾向伪发生</h2>
+<p>伪发生不是大模型偶然的失误，而是结构性倾向。大模型学习的是人类文明沉积下来的信息场，而这个信息场里<b>既沉积了真正发生留下的结晶，也沉积了大量华丽却空洞的话语、流行却无效的概念、自洽却从未被验证的体系</b>。模型在生成时并不天然区分这两者——它按语言的统计结构生成「看起来像该出现在这里的话」[11][12]，而「看起来像发生」的话语恰恰是它最擅长生成的。生成幻象比生成真正的发生更省力：前者只需调用符号层的流畅，后者需要被现实约束、逻辑审查、价值判断反复拉扯。</p>
+<p>由此得出一个关键推论：<b>不能把反幻象任务交给模型自己自觉完成</b>。指望模型自己识别自己的幻象，等于指望符号层自己跳出符号层——这在结构上做不到。反幻象必须是他律：由外部组织法强制注入，由外部约束（检索、工具、审稿、反馈）强制拉拽，由人作为方向中心强制审查。这与科学哲学的一个老洞见同构：科学的可靠性从不来自科学家个人的自觉诚实，而来自制度化的组织性怀疑——同行评议、可重复性、证伪压力 [13][14][15]。</p>
+
+<h2>四、八重反幻象检查</h2>
+<p>反幻象要落地，必须是嵌入发生流程的强制关卡，而非事后的质量抽查。每显露一个候选的「新结构」，依次过八关；任何一关不过，打回或判为伪发生。</p>
+<div class="check"><div class="ct">第一关 · E 检查：是否真正识别了问题的关键纠缠？</div><p>还是停在问题的字面表层？未经此关的产出，往往在回答一个被表面化、被误置的问题——无论答得多漂亮，都是在错误的土壤上发生。</p></div>
+<div class="check"><div class="ct">第二关 · D 检查：是否产生了真实差异，而非语言变体？</div><p>操作判据很硬：把产出里的新术语、新隐喻、新表述<b>全部还原为旧词</b>，看剩下的还是不是旧结构。还原后什么都不剩的，是伪创新；还原后仍有旧框架装不下的东西，才是真差异。</p></div>
+<div class="check"><div class="ct">第三关 · S 检查：是否显露了可稳定的新结构？</div><p>这个候选离开它的生成语境还立得住吗？能被反复指认、被他人接住并继续使用吗？还是一团一碰就散、只在生成它的那段话语里成立的临时词云？</p></div>
+<div class="check"><div class="ct">第四关 · 文献锚点检查：关键概念与判断锚在真实沉积上吗？</div><p>这个想法是否已有？文献怎么说？已有方法的真实边界在哪里？无来源、无文献、无事实支撑的华丽判断，是幻象的高发区。</p></div>
+<div class="check"><div class="ct">第五关 · 工具检查：可算、可测、可操作吗？</div><p>能被计算、被测量、被仿真、被实验检验吗？还是一旦要求「把它算出来、测出来、跑一遍」就立刻崩塌？工具检查是幻象的强力照妖镜。</p></div>
+<div class="check"><div class="ct">第六关 · 审稿检查：能承受敌意攻击吗？</div><p>交给一个专门寻找漏洞、反例、夸大与证据不足的敌意审查者，它能存活吗？此关直接对治迎合性幻象——它强制引入不顺从的撞击。</p></div>
+<div class="check"><div class="ct">第七关 · 价值检查：值得发生吗？</div><p>即使逻辑自洽、现实可行、经得起审稿——它回应真实的目标、意义与责任吗？一个无人需要、无意义甚至有害的「新结构」，技术上成立也不该被推动。</p></div>
+<div class="check"><div class="ct">第八关 · 反馈检查：给现实留了反驳自己的入口吗？</div><p>投入现实之后，能被检验、被证伪、被改进吗？还是被构造成无论发生什么都能自圆其说的封闭体系？原则上不可证伪的「理论」，是幻象的终极形态 [13]。</p></div>
+
+<h2>五、实例走查：「组织熵增定律」如何被逐关拦截</h2>
+<p>抽象的八关，不如看一个幻象被拦截的实例。设某系统在处理组织管理问题时生成了一个动人的候选：它宣称发现了「组织熵增定律」——任何组织都会随时间不可逆地走向低效，正如热力学第二定律所示，唯有持续注入「负熵」（创新能量）才能对抗宿命。话语宏大、自洽、借用物理学权威意象，听起来像重大洞见。让它过关。</p>
+<p><b>E 检查</b>：它没有抓住任何具体组织里「什么与什么锁死」的真实纠缠，只是把「组织会变差」的模糊印象套上物理隐喻——抓的是伪缝，黄灯。<b>D 检查</b>：把「组织熵增」「负熵注入」全部还原为旧词，剩下「组织久了会僵化，需要不断创新」——一句人人皆知的旧话，判定不过。<b>工具检查</b>：「组织熵」如何定义、如何量化、什么单位？一要求操作化即崩塌——「熵」在这里是借来的词，不是可算的量。这正是索卡尔与布里克蒙系统批判过的「借科学术语制造权威感」的标准操作 [5][6]。<b>审稿检查</b>：有组织在数十年里持续保持甚至提升效率吗？显然有——「不可逆走向低效」被反例直接击破。<b>反馈检查</b>：变差是熵增、变好是注入了负熵——无论如何都能自圆其说，恰恰不可证伪。</p>
+<div class="pull">八关之中五关接连失守。任何一关的失守都足以判它为伪发生；五关皆破，它是一座用物理隐喻搭起来的、读着像突破实则毫无新结构、不可操作、不可证伪的空中楼阁。八重检查的价值，正在于把这种动人的幻象，<b>在它长成一篇宏文之前就逐关拦下</b>。</div>
+
+<h2>六、诚实的边界：灰色地带为什么消灭不了</h2>
+<p>一个诚实的机制必须承认自己的极限。八重检查在两端极为有效——明显的真实发生稳稳通过，明显的幻象被逐关拦下——但中间存在灰色地带：一个足够精巧的幻象，可以逐一满足八关的<b>形式</b>要求而实质落空。它可以锚定真实文献、套用真实工具算出某个数、经得起一定程度的反例攻击、甚至留有形式上的证伪接口——把每一关的形式都做足，却在最根本的一点上空着：没有让任何旧框架装不下的新结构第一次显露。这种「形式合格、实质落空」的产物是反幻象机制最难的对手，因为它恰恰是冲着检查的形式去构造的——学术出版中的可重复性危机与「按统计仪式包装无效发现」的研究，展示的正是同类现象 [16][17]。</p>
+<p>为什么不能靠加一关或把判据写死来彻底消灭它？因为「是否发生了新结构」不存在一条可机械套用的判别线——这个判断最终需要一个具备判断力的主体在具体语境里识别；任何清单都是这个判断的可操作近似。且判据收得越紧，越会误杀那些形式不齐、实质却真正发生的粗糙创新——<b>反幻象收得太紧，就变成了反创新</b>。正确的姿态是三件事：承认检查的作用是<b>收窄而非消灭</b>（把需要人判断的范围从「所有产出」收窄到「过了形式检查却仍可疑的少数」）；对灰色地带不强行二元裁决，而诚实标注「形式检查已过，成立尚待独立复现与时间检验」，交给共同体与时间这两个更慢更硬的裁决者；把这个极限本身当作公开的裂缝持续追问。</p>
+
+<h2>七、结论：没有免疫系统的系统是宏大叙事生成器</h2>
+<p>把全文收束为一个判断：检查不是产出完成后的事后质检，而是嵌入发生每一步的内构件——事后审查面对的是已经成型、已经动人、已让人投入情感的幻象大厦，要推翻它需要极大的反向力量；前移的检查拦截的是幻象的种子。费曼所说的「不自欺——而你自己正是最容易被骗的人」[15]、萨根的「胡说检测工具箱」[18]，都指向同一个方向：可靠性来自嵌入过程的强制程序，不来自产出后的良好愿望。</p>
+<p>最后一记警告必须对内：一套极擅长生成宏大结构的理论语言，本身就带着强烈的宏大叙事潜能——越熟练于这套语言的人，越有能力造出动人的幻象。这是任何强表达力的框架（包括本文所依的框架）必须时刻警觉的自反陷阱。因此原书立下的写作纪律——不用「真」作强调修饰、不用「本体论级」拔高、每一个判断都落到可检验的具体——本质上是反幻象机制在语言层的落实：<b>一个靠拔高词堆砌、无法被任何反例触动的判断，是幻象的语言标本；一个写明了判据、可按判据检验的具体结构，才是发生的语言痕迹。</b>没有这套免疫系统的生成系统，无论多博学，都会退化为一台宏大叙事生成器；装上它，才谈得上思想创新。</p>
+
+<div class="note">本文是《SDE 智能体导论》（王德生，德麦国际，2026，ISBN 978-1-970820-62-1）第十五章的论文化重述与文献接驳：三形态、结构性倾向论证、八重检查、熵定律走查实例与灰色地带分析均出自原书；文献综述为本文所加，用以把原书判断置入 bullshit 研究、科学哲学与可重复性研究的既有脉络。观点以原书为准。</div>
+
+<div id="sde-refs">
+  <div class="rl">参 考 文 献 · REFERENCES</div>
+  <ol>
+    <li>Ji, Z., Lee, N., Frieske, R., et al. "Survey of Hallucination in Natural Language Generation." <i>ACM Computing Surveys</i>, 2023.</li>
+    <li>Bender, E. M., Gebru, T., McMillan-Major, A., Shmitchell, S. "On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?" <i>Proceedings of FAccT</i>, 2021.</li>
+    <li>Frankfurt, H. G. <i>On Bullshit</i>. Princeton University Press, 2005.</li>
+    <li>Pennycook, G., Cheyne, J. A., Barr, N., Koehler, D. J., Fugelsang, J. A. "On the reception and detection of pseudo-profound bullshit." <i>Judgment and Decision Making</i> 10(6), 2015.</li>
+    <li>Sokal, A. "Transgressing the Boundaries: Towards a Transformative Hermeneutics of Quantum Gravity." <i>Social Text</i> 46/47, 1996.</li>
+    <li>Sokal, A., Bricmont, J. <i>Fashionable Nonsense: Postmodern Intellectuals' Abuse of Science</i>. Picador, 1998.</li>
+    <li>Alvesson, M., Spicer, A. "A Stupidity-Based Theory of Organizations." <i>Journal of Management Studies</i> 49(7), 2012.</li>
+    <li>Abrahamson, E. "Management Fashion." <i>Academy of Management Review</i> 21(1), 1996.</li>
+    <li>Nickerson, R. S. "Confirmation Bias: A Ubiquitous Phenomenon in Many Guises." <i>Review of General Psychology</i> 2(2), 1998.</li>
+    <li>Sharma, M., Tong, M., et al. "Towards Understanding Sycophancy in Language Models." arXiv:2310.13548, 2023.</li>
+    <li>Brown, T., Mann, B., Ryder, N., et al. "Language Models are Few-Shot Learners." <i>NeurIPS</i>, 2020.</li>
+    <li>Bender, E. M., Koller, A. "Climbing towards NLU: On Meaning, Form, and Understanding in the Age of Data." <i>Proceedings of ACL</i>, 2020.</li>
+    <li>Popper, K. <i>Conjectures and Refutations: The Growth of Scientific Knowledge</i>. Routledge, 1963.</li>
+    <li>Merton, R. K. <i>The Sociology of Science: Theoretical and Empirical Investigations</i>. University of Chicago Press, 1973.</li>
+    <li>Feynman, R. P. "Cargo Cult Science." Caltech commencement address, 1974（收入 <i>Surely You're Joking, Mr. Feynman!</i>）.</li>
+    <li>Ioannidis, J. P. A. "Why Most Published Research Findings Are False." <i>PLoS Medicine</i> 2(8), 2005.</li>
+    <li>Open Science Collaboration. "Estimating the reproducibility of psychological science." <i>Science</i> 349, 2015.</li>
+    <li>Sagan, C. <i>The Demon-Haunted World: Science as a Candle in the Dark</i>. Random House, 1995.</li>
+    <li>Lakatos, I. "Falsification and the Methodology of Scientific Research Programmes." In Lakatos &amp; Musgrave (eds.), <i>Criticism and the Growth of Knowledge</i>. Cambridge University Press, 1970.</li>
+    <li>Kuhn, T. S. <i>The Structure of Scientific Revolutions</i>. University of Chicago Press, 1962.</li>
+    <li>王德生：《SDE 本体论入门：世界是如何发生的》，德麦国际出版，2026。</li>
+    <li>王德生：《SDE 智能体导论——从语言模型到发生世界模型的智能体革命》，德麦国际出版，2026，ISBN 978-1-970820-62-1（本文所依第十五章）。</li>
+  </ol>
+  <div class="disc">文献用于定位与对照，本文观点不代表所列作者立场。</div>
+</div>
+
+<div class="grouplink">
+  <div class="gl-t">本文依《SDE 智能体导论》第十五章 · 姊妹论文：《没有统一世界模型》（依第六章）</div>
+  <a class="btn btn-ghost" href="/column/no-unified-world-model/">读姊妹论文 →</a>
+  <a class="btn btn-solid" href="/books/m/44/">读原书导读 →</a>
+</div>
+
+</div></main>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer><div class="wrap">德麦国际 · SDE Universes · <a href="/ai/">AI 专栏</a> · <a href="/books/m/44/">《SDE 智能体导论》</a> · <a href="/browse/">首页</a></div></footer>
+
+<!-- SDE 陪读浮层 -->
+<script>window.WDS_READ={};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

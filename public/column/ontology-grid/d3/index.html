@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>把分寸拧太紧，会把创造一起拧死——差异·优化约束（D3） | 三维九宫 · 王博士与SDE</title>
+<meta name="description" content="SDE本体论三维九宫第六格·差异·优化约束（D3）：误差、冗余、损耗三个最小，与那把会拧死创造的双刃剑。过度优化=高效而贫血；单轴目标函数是内卷的数学根源；创造必须先松后紧。">
+<style>
+:root{
+  --bg:#F5EFE0; --surface:#EBE3CE; --card:#FAF6EC;
+  --gold:#8A6817; --text:#2A2315; --muted:#98886C;
+  --border:rgba(138,104,23,0.22);
+  --ink:#1A1410; --ink-gold:#D4B25E;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:2.0;font-size:17px}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+
+nav{position:sticky;top:0;background:rgba(245,239,224,0.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:10}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:860px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
+.nav-back{font-size:14px;color:var(--muted)}
+
+header.art{background:var(--ink);color:#EDE4CF;padding:80px 0 64px;text-align:center}
+.art-eyebrow{font-size:12.5px;letter-spacing:0.45em;color:var(--ink-gold);margin-bottom:26px}
+.art-title{font-size:clamp(26px,4.4vw,40px);font-weight:700;letter-spacing:0.03em;line-height:1.6}
+.art-subtitle{font-size:clamp(16px,2.4vw,21px);color:var(--ink-gold);margin-top:16px;letter-spacing:0.06em;line-height:1.7}
+.art-meta{margin-top:32px;font-size:13.5px;color:#8B7E5E;letter-spacing:0.15em}
+
+.grid-tag{display:inline-flex;align-items:center;gap:10px;background:rgba(212,178,94,0.12);border:1px solid rgba(212,178,94,0.4);border-radius:2px;padding:7px 16px;margin-bottom:26px}
+.grid-tag b{color:var(--ink-gold);font-size:15px;letter-spacing:0.1em}
+.grid-tag span{color:#B4A780;font-size:12.5px;letter-spacing:0.2em}
+
+article{padding:56px 0 24px}
+.part{margin:0 0 56px}
+.part-num{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:8px}
+h2{font-size:24px;font-weight:700;margin-bottom:24px;letter-spacing:0.03em}
+p{margin-bottom:24px;text-align:justify}
+p.lead{font-size:18.5px}
+b{color:var(--gold)}
+.pull{border-left:3px solid var(--gold);background:var(--card);padding:22px 28px;margin:32px 0;font-size:17px}
+.pull em{font-style:normal;color:var(--gold);font-weight:700}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:32px 0}
+.trio .cell{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--gold);padding:18px 16px;text-align:center}
+.trio .cell .k{font-size:17px;font-weight:700;color:var(--text);letter-spacing:0.08em}
+.trio .cell .v{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+@media(max-width:560px){.trio{grid-template-columns:1fr}}
+.divider{text-align:center;color:var(--gold);letter-spacing:1.2em;margin:8px 0 56px;font-size:14px}
+
+.endbox{background:var(--ink);color:#EDE4CF;text-align:center;padding:64px 24px;margin-top:24px}
+.endbox p{color:#B4A780;max-width:560px;margin:0 auto 32px;text-align:center}
+.btn{display:inline-block;padding:13px 34px;border:1px solid var(--ink-gold);letter-spacing:0.12em;font-size:15px;margin:6px}
+.btn.solid{background:var(--ink-gold);color:var(--ink);font-weight:700}
+.btn.solid:hover{background:#E4C878;text-decoration:none}
+.btn.ghost{color:var(--ink-gold)}
+.btn.ghost:hover{background:rgba(212,178,94,0.12);text-decoration:none}
+
+footer{background:var(--ink);color:#8B7E5E;text-align:center;padding:34px 0 44px;font-size:13px;letter-spacing:0.08em}
+footer a{color:#B4A780}
+
+/* ===== 统稿增补 ===== */
+.lead{max-width:720px;margin:0 auto;padding:30px 24px 0}
+.innov{background:linear-gradient(135deg,#9A7B43,#6F5326 60%,#4C3A1A);border-radius:12px;padding:24px 28px;margin:0 0 22px;box-shadow:0 8px 30px rgba(76,58,26,0.25)}
+.innov .lbl{font-size:12px;letter-spacing:0.28em;color:#E8D9B0;margin-bottom:12px;font-weight:700}
+.innov .lbl::before{content:"✦ ";color:#FFE9A8}
+.innov .txt{font-size:16.5px;line-height:1.92;color:#FBF5E6}
+.innov .txt b{color:#FFE6A0;font-weight:700}
+.daodu{background:#FBF6EA;border:1px solid rgba(154,123,67,0.3);border-left:4px solid #9A7B43;border-radius:10px;padding:24px 28px;margin:0 0 6px}
+.daodu .lbl{display:inline-block;font-size:12px;letter-spacing:0.22em;color:#FBF6EA;background:#9A7B43;padding:5px 14px;border-radius:20px;margin-bottom:14px;font-weight:700}
+.daodu h4{font-size:17.5px;color:#4A3618;margin:0 0 16px;font-weight:800}
+.daodu .row{margin:12px 0;line-height:1.88;color:#5A4A30;font-size:15.5px}
+.daodu .row .k{color:#7A5C2A;font-weight:800}
+.hl2{background:rgba(154,123,67,0.16);border-bottom:2px solid #9A7B43;padding:1px 4px;font-weight:700;color:#4A3618;border-radius:2px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="nav-logo" href="/browse/">SDE Universes</a>
+    <a class="nav-back" href="/column/ontology-grid/">← SDE三维九宫 · 九格全图</a>
+  </div>
+</nav>
+
+<header class="art">
+  <div class="wrap">
+    <div class="grid-tag"><b>D3</b><span>差异 · 优化约束</span></div>
+    <div class="art-eyebrow">SDE 本体论 · 三维九宫 · D 维度第三格</div>
+    <h1 class="art-title">把分寸拧太紧，会把创造一起拧死</h1>
+    <div class="art-subtitle">差异·优化约束（D3）——误差、冗余、损耗三最小，<br>与那把会拧死创造的双刃剑</div>
+    <div class="art-meta">王德生 著 · SDE Universes 专栏 · 三维九宫第六格 · 2026年7月 · 约万字</div>
+  </div>
+</header>
+<div class="lead">
+<div class="innov">
+  <div class="lbl">这篇文章的思想创新</div>
+  <div class="txt">你一定见过日程密不透风、每分钟都"有用"的人，和流程精简到极致、KPI 一个不落的公司。按理他们最成功，可走近常嗅到一股枯竭——<b>高效背后是一种没有余地、没有闲笔、没有生机的紧绷</b>。本文指出：把优化约束（别走偏、别啰嗦、别白烧劲）拧到极致，会把创造一起拧死——<b>那些被当成"冗余"砍掉的探索、试错、看似无用的闲功夫，恰恰是未来的种子</b>。</div>
+</div>
+<div class="daodu">
+  <span class="lbl">导读 · 300字</span>
+  <h4>这篇文章的价值与意义 —— 它能解决你的什么问题</h4>
+<div class="row"><span class="k">理论问题：</span>它给"优化"划出一条边界——约束（不走偏、不啰嗦、不白费）是必要的，但拧到极致会取消创造赖以发生的余地；优化与生机之间存在一个不可再压的下限。</div>
+<div class="row"><span class="k">现实问题：</span>它解释了为什么最"精益"的组织和最"自律"的个人反而常常长不出新东西——被砍掉的"冗余"正是种子；它提醒你为探索、试错、闲功夫留出预算。</div>
+<div class="row"><span class="k">自我精神问题：</span>如果你把自己的每一分钟都优化到"有用"、却越来越感到枯竭，这篇会告诉你：那股活气，恰恰藏在你舍不得留的那些"没用"里。</div>
+</div>
+</div>
+<article class="wrap">
+
+<div class="part">
+  <div class="part-num">壹 · 一个被跳过的谜</div>
+  <h2>为什么把效率拧到极致，会活得又高效又贫血</h2>
+  <p class="lead">"更快、更省、更精确"——这几乎是这个时代刻在每个人骨头上的信条。我们优化时间、优化流程、优化每一分投入产出。可有一个怪现象，值得你停下来想一想：为什么一个把效率拧到极致的人、一个把一切都优化到分毫不差的组织，常常活得又高效、又贫血——像一台转速极高、却毫无生气的机器？</p>
+  <p>你一定见过这样的人：日程排得密不透风，每一分钟都用在"有用"的事上，绝不容许一丝浪费；也见过这样的公司：流程精简到极致，成本压到最低，KPI 一个不落。按理说，他们该是最成功、最令人向往的。可你若走近去看，常会嗅到一股说不出的枯竭：那种高效背后，是一种没有余地、没有闲笔、没有生机的紧绷——高效是真高效，可那口"活气"，不知怎么就丢了。</p>
+  <p>这股"活气丢了"，不只是一种心情，它常常是实实在在的塌方，只是来得慢、来得晚。一家把每一分成本都优化掉、把每一个"没有直接产出"的部门都砍光的公司，<span class="hl2">短期财报会很漂亮；可几年之后，它往往发现自己再也长不出新产品了</span>——因为那些被当成"冗余"砍掉的探索、试错、看似无用的闲功夫，恰恰是它未来的种子。一个人也一样：把假期、发呆、闲逛、无目的的阅读，统统当成"浪费"优化掉，日程表是好看了，可某一天他会惊觉，自己心里那口能长出新念头、新热情的活泉，已经悄悄干涸了。贫血不是当场毙命，是慢性失血——等你察觉，往往已经流了很久。</p>
+  <p>完美主义者，是这股慢性失血最典型的病人。他把"误差最小"拧到了极致——一件事若不能做到完美，就迟迟不肯交出、甚至干脆不敢开始。表面看，这是对高标准的执着；底下却是创造力的大面积坏死：因为完美，是一个到不了的终点，于是他的许多念头，还没长出来，就被"这还不够好"给掐灭在了纸上。有句话说得极准——完美，是"完成"的敌人。一个允许自己先做出一个粗糙版本、再慢慢打磨的人，会做出一百件东西；一个非要一步到位、追求零误差的人，往往一件也交不出来。误差最小若不知节制，不是通往卓越，而是通往瘫痪。</p>
+  <p>这股枯竭，指向一个被我们集体跳过的问题：分寸，是不是有个度？"优化"这件事，是不是拧过了某个点，就会从"让事情变好"，翻转成"把事情的生机，一起拧死"？换句话说：效率，真的是越高越好、越极致越对吗？还是说，在效率的极致处，藏着一个我们从没认真对待过的陷阱？</p>
+  <p>这一格，讲的就是这件事——差异序列这台引擎的第三层，也是最容易被误解的一层：分寸。前两格，我们讲了方向如何发生（D1）、脚步如何走路（D2）；这一格，我们讲这一切该有的火候：走得多快、多准、多省，容得下多少冗余和试错，什么时候该收紧、什么时候该松开。它是一门关于"度"的学问，也藏着一把最锋利的双刃剑——用好了，事半功倍；用过了，会把创造，连同它赖以生长的一切，一起拧死。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">贰 · 分寸的三条准绳</div>
+  <h2>别走偏、别啰嗦、别白烧劲</h2>
+  <p>上一格说，差异序列分三层：D1 定方向、D2 走路径、D3 管分寸。这一格讲第三层——D3，优化约束。它管的，是每一步走得对不对、值不值、省不省。而拿捏这份分寸的，是三条准绳，本学派把它们凝成三个"最小"：误差最小、冗余最小、损耗最小。</p>
+  <p>用大白话说，这三条就是：<b>别走偏</b>（误差最小——让每一步都尽量朝目标靠，少犯错、少绕远）；<b>别啰嗦</b>（冗余最小——把多余的枝节砍掉，一件事能说清就别绕十句，这就是那把著名的"奥卡姆剃刀"）；<b>别白烧劲</b>（损耗最小——省着点力气，别为无谓的消耗空耗，把劲用在刀刃上）。这三条准绳，是任何一台引擎要跑得又稳又省，都绕不开的三道约束。</p>
+  <p>这三道约束，不是本学派拍脑袋想出来的，它们其实是任何一个"要在有限资源下把事办成"的系统，都逃不掉的三重压力。一个生物体要活下去，就得少犯致命的错（误差）、别长一堆没用的赘余结构（冗余）、别把能量白白耗光（损耗）——进化亿万年，正是在这三道约束下，雕出了一个个精巧的生命。一台工程系统、一套算法、一门手艺，莫不如此。所以这三个"最小"，是"把事做好"这件事的通用语法。可也正因为它们如此普适、如此正确，人们才最容易犯下那个致命的错：把"正确的约束"，误当成了"越极致越好的目标"。</p>
+  <div class="trio">
+    <div class="cell"><div class="k">误差最小</div><div class="v">别走偏<br>逼近目标·少犯错</div></div>
+    <div class="cell"><div class="k">冗余最小</div><div class="v">别啰嗦<br>奥卡姆剃刀·去赘</div></div>
+    <div class="cell"><div class="k">损耗最小</div><div class="v">别白烧劲<br>省能·用在刀刃上</div></div>
+  </div>
+  <div class="pull">分寸的三条准绳，说穿了就三句大白话：<em>别走偏（误差最小）、别啰嗦（冗余最小）、别白烧劲（损耗最小）。</em></div>
+  <p>单看每一条，都对得无可挑剔——谁会反对"少犯错、别啰嗦、别浪费"呢？这三条准绳本身，也确实是让一件事从"能做成"走向"做得漂亮"的必经之路。可这一格真正要讲的，不是这三条有多正确，而是一件更微妙、也更要命的事：<b>这三条准绳，一旦被无节制地推到极致，就会从"帮手"，翻脸成"杀手"。</b>分寸的智慧，从来不在"把这三个最小做到最小"，而在"知道它们该在什么时候、松到什么程度"。</p>
+  <p>这就触到了整格最反直觉的一点：这三个"最小"，名字里都带着"最"，仿佛越小越好、越极致越对；可它们的真谛，偏偏不是"追求那个最小值"，而是"拿捏那个恰当值"。误差不是越小越好——把误差压到零，意味着不许任何试错，而没有试错，就没有创造；冗余不是越少越好——把冗余砍到零，意味着毫无余量，一击即溃；损耗不是越低越好——把损耗降到零，意味着什么险都不冒、什么劲都不肯烧，那是死水。所以这三条准绳，真正该读成的，不是三道"往死里拧"的命令，而是三道"拧到恰好为止"的提醒。"最小"的智慧，藏在那个"恰好"里，而不在那个"最"里。</p>
+</div>
+
+<div class="divider">◆ ◆ ◆</div>
+
+<div class="part">
+  <div class="part-num">叁 · 三最小，各管一件事</div>
+  <h2>逼近、精简、省能</h2>
+  <p>先把这三条准绳，各自看清楚。<b>误差最小</b>，管的是"逼近"：让你走的每一步，都尽量朝着目标收敛，少走弯路、少犯偏差。它是一切"把事做准"的根基——没有它，你的脚步会散乱无章，永远到不了那个方向。一个好的反馈修正机制（还记得上一格的六步吗？），本质上就是在做误差最小：每一轮，都把偏差往回收一点，让下一步，比上一步更靠近靶心。</p>
+  <p>但请注意，误差最小也有它昂贵的一面：把误差压得越低，代价往往越高、越慢。要把一件事从"九成对"做到"九成九对"，花的功夫，可能远超从零做到九成——这就是"精确的代价"。所以真正的分寸，从不是"不计代价地把误差压到最低"，而是问一句：为这最后一点点精确，值得付出的代价，划不划算？在很多场合，一个"足够好"的、快速的近似，远胜过一个"完美"的、迟到的精确——因为世界不会停下来等你把误差磨到零。知道"何时够准了、该收手了"，和"如何做得更准"，是同样要紧的功夫。</p>
+  <p><b>冗余最小</b>，管的是"精简"：把多余的、重复的、可有可无的枝节，尽量砍掉，让结构清爽、直指要害。这就是那把七百年前就被磨亮的"奥卡姆剃刀"——如无必要，勿增实体；能用简单的，就别用复杂的。一个精悍的方案、一段干净的代码、一篇不注水的文章，背后都是冗余最小在起作用。它让好东西，褪去赘肉、露出筋骨。</p>
+  <p>但冗余最小，恰恰是三条里最凶险的一把刀，因为"冗余"和"韧性"，常常是同一样东西的两个名字。一个系统里那些"看起来多余"的部分——备份、余量、看似重复的环节——在风平浪静时，确实像是可以砍掉的赘肉；可一旦风浪来袭，正是这些"赘肉"，成了救命的缓冲。一家把库存压到零、把供应链绷到极致的公司，平时效率无敌，可一场小小的意外，就能让它整条链断裂、满盘皆输——因为它把所有的余量，都当冗余优化掉了。所以奥卡姆剃刀虽利，却绝不能乱挥：该剃的是"纯粹的赘余"，绝不能连"韧性的余量"一起剃光。分清这两者，是用好这把刀的第一道功夫。</p>
+  <p><b>损耗最小</b>，管的是"省能"：别为那些无谓的消耗、内耗、空转，白白烧掉宝贵的力气，把每一分劲，都用在真正推动事情往前的地方。一个懂得损耗最小的人，不会把精力浪费在无意义的纠结、重复的返工、和一场场毫无产出的空耗上——他省下来的那些劲，能让他在真正要紧处，使得上力。</p>
+  <p>不过损耗最小，也有它极易被误读的一面：省能，绝不等于惜力到什么都不做、什么险都不冒。真正的省能，是把力气从"无谓的消耗"里省出来，投到"关键的发生"上去——它省的是内耗，不是省的投入。一个把"省力"理解成"能不动就不动、能不试就不试"的人，看似损耗极低，实则把自己活成了一潭死水，连该烧的劲也省了——那不是省能，是熄火。所以这三个最小，条条都是这个脾气：往正确的方向用，是功夫；往极致里推、或往反面误读，就成了病。</p>
+  <p>这三条合起来，构成了"把一件事做到极致漂亮"的完整分寸：走得准（误差小）、说得净（冗余小）、用得省（损耗小）。一个能同时拿捏好这三条的人，做出来的东西，往往又准、又利落、又不费劲——这是一种极高的功夫。可也正是在这种功夫的极致处，那把双刃剑的另一面，开始显形。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">肆 · 那把双刃剑</div>
+  <h2>过度优化，"高效而贫血"</h2>
+  <p>现在，讲这一格最要命的一刀：<b>D3 是一把双刃剑。这三个"最小"，用得恰当，是把事做漂亮的功夫；一旦用过了头，就会让事情，"高效而贫血"。</b></p>
+  <p>"高效而贫血"这五个字，请你反复咂摸——它精准地画出了壹里那股枯竭的病灶。为什么过度优化，会导致贫血？因为优化的本性，是"收紧、砍掉多余、逼近单一最优"；可创造的本性，恰恰相反——它需要冗余（一堆看似没用的探索）、需要试错（一次次允许犯错的乱撞）、需要那一大片当下看不出用处的"闲地"。上一格我们已经看清：新东西，是在混沌的碰撞里、在介生态的"半成形"里，涌现出来的。而这些，在"三个最小"的眼里，全是该被砍掉的"低效""冗余""浪费"。于是，一把过度锋利的优化剪刀，会在剪掉赘肉的同时，把还没长出来的新芽，一起剪断。</p>
+  <div class="pull">优化的本性是收紧、砍掉多余；创造的本性却要冗余、要试错、要闲地。<em>一把过度锋利的优化剪刀，会把还没长出来的新芽，连同赘肉一起剪断。</em></div>
+  <p>这把双刃剑，最阴险的地方在于：它的两面，用的是同一个动作，只是时机不同，结果就天差地别。同样是"删繁就简、去芜存菁"，用在一个已经成形、需要打磨的作品上，是化腐朽为神奇的功夫；用在一个还在混沌里孕育、尚未成形的萌芽上，就是一刀致命的扼杀。所以判断"该不该优化"，关键从来不在"这个动作对不对"，而在"这个东西，此刻处在哪个火候"——它还在介生态的产房里，就该护着、松着、由它野蛮生长；它已经进了成熟的盛年，才该收着、紧着、精雕细琢。用错火候的优化，比不优化，更伤。</p>
+  <p>所以，这一格给出一条创造的铁律：<b>创造，必须先松后紧。</b>先在一片松的、允许冗余、允许犯错的场里，让新东西尽情碰撞、涌现、长成（这是"松"）；等它长成了、立住了，再拿起那三把最小的剪刀，收紧、精简、优化（这是"紧"）。次序绝不能颠倒。一旦你把次序倒过来——一上来就用最狠的效率标准，去要求那个还在襁褓里的新念头——你就等于在产房里，就把婴儿按"成年人的效率"来考核，结果只有一个：把创造，连同它赖以诞生的那间产房，一起优化掉。<b>许多组织和个人的创造力之死，不是死于懒惰，恰恰是死于"优化得太早、太狠"。</b></p>
+  <p>"先松后紧"这四个字，几乎是一切创造性活动共同的节律，你在哪儿都能认出它。写文章，头一稿要放开手写、允许啰嗦跑题、把想到的都倒出来（松），改稿时才动刀删繁、锤炼、逼近精准（紧）——若一上来就逐字计较、写一句删一句，往往一个字也写不出来。做研究，前期要广撒网、容忍大量注定失败的尝试（松），后期才收敛到那个最有希望的方向、严格求证（紧）。养一个孩子，幼时该给他大片撒野、试错、看似"没用"地玩耍的空间（松），长大了再谈规矩、效率、专精（紧）。凡把这个次序倒过来的——一上来就用最终的、最狠的标准去卡最初的、最嫩的萌芽——几乎无一例外，都会把创造，掐死在它最脆弱的起点上。</p>
+  <p>可为什么我们的直觉，总忍不住想"先紧"？因为松，是不安的：一开始就允许粗糙、允许啰嗦、允许失败，会让人觉得失控、觉得不专业、觉得"这样下去怎么得了"。于是我们本能地想赶紧上标准、上规矩、上效率，好让自己安心。这份对"松"的不安，正是许多人扼杀自己创造力的元凶——他们不是不够努力，恰恰是太急于把一切握在手里、太早地用最终的标准，去卡最初的萌芽。学会"先松"，本质上是学会一件反本能的事：在事情还乱、还糙、还看不清的阶段，忍住那只想立刻收紧的手，容许它，再野蛮生长一会儿。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">伍 · 内卷的数学根源</div>
+  <h2>别把整个生命，烧进一个数里</h2>
+  <p>过度优化里，最危险、也最普遍的一种，有一个精确的数学名字：<b>单轴目标函数</b>。说人话就是——只优化一个指标，把所有的力气，都押在这一个数的最大化上。</p>
+  <p>这听起来很专业，其实你天天在经历。一家公司只盯着一个 KPI（比如季度利润），于是所有别的东西——员工的健康、产品的口碑、长远的根基——都成了可以为这个数牺牲的代价。一个学生只盯着一个分数，于是好奇、兴趣、身心的舒展，全被压进这唯一的数字里。一个人只盯着一个目标（比如买房、升职），于是整个人生的丰富，都被拧成了通往这一个数的、单薄的直线。当你把自己交给一个单轴目标函数，你就把整个生命，烧进了这一个数里——而且，那个数，往往还是别人（老板、社会、时代）替你设定的。<b>这，正是"内卷"最深的数学根源：所有人被同一个单轴目标函数驱赶着，在同一条越来越窄的赛道上，你追我赶、彼此消磨，越努力越贵、越忙越困。</b></p>
+  <p>这种"单轴"的暴政，在越大的尺度上，就越触目惊心。一整个社会，若把"GDP 增长"当成压倒一切的单轴目标，就可能为这个数，牺牲掉环境、健康、公平、乃至人的从容——直到某一天，被牺牲的那些，反过来讨债。一个行业，若把"用户时长"当成唯一的北极星，就会不惜一切地设计让人上瘾、难以自拔的机制，把千百万人的注意力，烧进那一个数里。单轴目标函数最可怕的地方在于：它一旦被设定，就有一种冷酷的、不问代价的自我强化倾向——它会像黑洞一样，把一切别的价值，都吸进这一个数的最大化里。所以，"该不该只优化一个数"，从来不是一个技术问题，而是一个关乎"你到底想活成什么样"的根本抉择。</p>
+  <div class="pull">当你把自己交给一个单轴目标函数，<em>你就把整个生命，烧进了这一个数里——而且那个数，往往是别人替你设定的。</em>这，正是内卷最深的数学根源。</div>
+  <p>那出路在哪儿？本学派给了三味药，恰是对着这个病根开的。第一味，<b>写一个多目标的代价函数</b>——别只优化一个数，把那些同样重要、却总被单轴目标碾过的东西（健康、意义、长远、关系），也郑重地写进你要权衡的账里，让它们有资格，参与你每一步的取舍。第二味，<b>加一个停止条件</b>——给优化设一个"够了"的界：到了这里就停，别无止境地往极致里拧（因为极致本身，就是贫血的开端）。第三味，<b>留一份修复裕度</b>——别把一切都绷到百分之百、榨到极限，永远留出一点冗余、一点容错、一点回旋的余地，好让系统在出岔时，还有自我修复的空间。多目标、知停止、留裕度——这三味药合起来，才是把"分寸"从杀手，重新驯回帮手的关键。</p>
+  <p>这里有一个值得停下来品的张力：第三味药"留裕度"，要的恰恰是冗余；而前面"冗余最小"，要的却是砍掉冗余。这不是自相矛盾，而正是"分寸"二字的精髓所在——同一个"冗余"，在不同的处境下，价值截然相反。纯粹的、毫无作用的赘余，该用冗余最小去砍；而作为容错、缓冲、修复之本的"韧性余量"，则该用"留裕度"去守。真正的高手，不是一味求简、也不是一味求余，而是能在具体的当口，一眼分清：眼前这份"多出来的东西"，是该剃掉的赘肉，还是该护住的救命粮。分寸的全部艺术，就凝在这一分辨里。</p>
+  <p>把这三味药，落到自己的人生上，会有一种豁然的松动。多目标代价函数，意思是别让人生只剩"赚钱"或"成功"这一个刻度——把健康、关系、意义、从容，也郑重地写进你的账本，让它们在每一次取舍时，都有一票否决的分量。停止条件，意思是给你的追逐，设一个"够了"的线——挣到多少算够、忙到几点收工、一件事做到什么程度就放手，别让"永远还要更多"牵着你耗尽一生。留裕度，意思是永远别把自己排满、榨干——留一点看似"没用"的空白，那是你在意外和风浪来临时，唯一的缓冲和退路。这三味药合起来，其实是在教一件朴素的事：别把人生，活成一道只求单一极值的数学题。</p>
+</div>
+
+<div class="divider">◆ ◆ ◆</div>
+
+<div class="part">
+  <div class="part-num">陆 · 四种结局</div>
+  <h2>同样往里投劲，为什么有人上台阶、有人原地烧</h2>
+  <p>有了分寸这把尺，我们就能给"往一件事里投入努力"这件事，做一次硬核的诊断。同样是拼命投入（在引擎的语言里，这叫"D 加量"），结局却可能天差地别，本学派把它们分成四种。</p>
+  <p>第一种，<b>跃迁</b>：你投入的努力，真的生成了一个新的平台、一个新的结构——你上了一个全新的台阶，从此站在了一个更高的地方。这是唯一真正"算数"的结局：投入换来了质变。第二种，<b>内卷</b>：你拼命加量，可底下那套决定一切的结构（本学派叫它"E"，你可以先理解成那台看不见的"路由器"）纹丝不动——于是你越努力，成本越高，却始终困在原地打转，越忙越累、越累越困。内卷的病根，从来不是"人太多""不够拼"，而是"D 加的量，被那台没换的旧路由器，全数吸收了"。</p>
+  <p>这个"路由器"的比方，值得多说一句，因为它一举点破了"越努力越困"的死结。想象你不停地往一台老旧的路由器灌数据（拼命加量），可这台路由器的处理能力就那么大——你灌得越多，它越堵，最后全都卡死在原地，你付出的一切，都被它照单吸收、化为乌有。破局的唯一办法，不是继续灌（那只会更堵），而是换一台路由器——也就是去改动那个底层的、决定一切的结构（E），而不是在旧结构上，一味加大投入。这就解释了一个反直觉的真相：走出内卷，靠的从来不是"更拼命"，恰恰是"停下盲目的拼命，回头去换那台没人愿意碰的路由器"。</p>
+  <p>而"换路由器"之所以那么难、那么少有人做，正因为它不像"更努力"那样，能带来立竿见影的、可被看见的忙碌感。加量，是一种让人安心的姿态——至少看起来我在拼、我没偷懒；而换结构，往往意味着先停下、先承认"此路不通"、先经历一段看不到产出的、甚至被人误解为"不务正业"的重构期。多数人宁可在旧路由器上，一年年徒劳地加量到精疲力竭，也不敢停下来，去啃那块"换结构"的硬骨头。可真正的跃迁，恰恰只发生在后者身上——它属于那些敢于停下无效的忙碌、回头去动那个最根本的结构的人。</p>
+  <p>第三种，<b>轮回</b>：你确实改写了一阵、看似要突破了，可那点改写还没来得及稳定下来、扎下根，就被那个巨大的旧场，重新吸了回去——于是年年立志、岁岁重蹈，减肥、早起、改脾气，一次次开始，又一次次被打回原形。第四种，<b>耗散</b>：你一味加速、拼命透支，却因为砍光了所有的"修复裕度"（还记得上一味药吗？），磨损太快、又补不回来，最终不是上了台阶，而是散了架——燃尽、崩溃、不可持续。<b>四种结局里，只有第一种是真的往前，其余三种，都是把劲，烧在了原地。</b>而分清自己身处哪一种、病根在哪里，正是这把分寸之尺，最锋利的用处。</p>
+  <p>拿这把尺，对照一下自己，往往会有一惊。你年复一年立下的那些志向——减肥、早起、读书、改脾气——多半属于"轮回"：每一次都真的改写了一阵，却总在还没稳住时，被旧的生活场，重新吸了回去（所以不是你意志薄弱，是那个场的引力太大，你没先去松动它）。你在职场上那种"越忙越穷、越拼越累"的困，多半属于"内卷"：拼命加量，可那台决定你处境的路由器，从没换过。而那种把自己燃到崩溃、失眠、心力交瘁的透支，则是"耗散"：磨损太快，又没留一丝修复的裕度。看清自己究竟卡在哪一种，比无差别地"再努力一点"，要有用一百倍——因为四种困境，药方截然不同，唯有跃迁，才是真的向前。</p>
+  <p>那真正的"跃迁"，长什么样？它往往不轰烈，甚至一开始还显得"低效"。一个人不再在旧路上疯狂加量，而是停下来，花一段看似没有产出的时间，去学一门新本事、换一套新活法、动一动那个底层的结构——然后有一天，他忽然发现，从前拼死拼活都够不到的东西，如今轻轻松松就做到了：因为他已经不在原来那个平面上了，他上了一层新的台阶。跃迁的标志，从来不是"在旧平面上跑得更快"，而是"整个人被托到了一个新的平面，旧平面上的难题，在这里根本不再是难题"。它要的不是更多的力气，而是一次方向上的、结构上的重生。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">柒 · 合龙：分寸参与价值的发生</div>
+  <h2>苦行为何从美德变成自苦</h2>
+  <p>这一格，还要和一个你意想不到的东西合龙——价值。本学派有一个凝练的公式：<b>价值，是"优化约束"（也就是这一格讲的 D3 分寸）与"能量三态"（下一维 E 要讲的真、善、美那三股劲）共同决定的函数。</b>换句话说，一样东西有没有价值、值多少，不是天上掉下来的定论，而是"那几股能量，在这套分寸的约束下，被组织成了什么样"的结果。</p>
+  <p>这一步，解开了一桩让人费解的老事：为什么同一件事，会从美德，变成病态？就拿"苦行"来说——在某个时代、某种处境下，节制欲望、艰苦自持，是崇高的美德；可换一套处境，同样的行为，却成了折磨自己的病态"自苦"。变的是什么？不是苦行这个动作本身，而是它背后"分寸（D3）与能量（E3）的配比"，换了。当约束与能量的配比对了，苦行是美德；配比错了，它就成了自苦。<b>所以价值，既不是悬在天上、亘古不变的客观律令，也不是可以随口乱贴的主观偏好——它是能量在分寸的约束下，被组织出来的、活生生的显影。</b>分寸，因此从来不是一件"技术小事"，它直接参与着"什么有价值"这件大事的发生。</p>
+  <p>你还可以在自己身上，随手验证这个"配比决定价值"的道理。同样是"拼命工作"这件事：当它出自你内在的热爱、又留着足够的休整（能量足、约束松），它是充实的、有价值的燃烧；可当它出自恐惧的驱赶、又把休整全榨干（能量被恐惧错配、约束绷到极限），同样的拼命，就成了自我消耗的内卷。动作一模一样，价值却南辕北辙——变的，正是那个"分寸与能量的配比"。这就是为什么，别人的成功经验，照搬到你身上常常失灵：不是那套动作错了，是你和他的配比不同。看懂了这一层，你就不会再盲目地复制任何一套"高效人生"的模板，而会去调自己那份，独一无二的配比。</p>
+  <p>把这个道理放大到制度，同样成立。一套一模一样的规章制度，放进一个信任充盈、士气高昂的团队里（能量足），它是护航的轨道，让好的发生更顺畅；放进一个人心涣散、彼此提防的团队里（能量枯），同样的制度，就成了处处掣肘的枷锁，把仅剩的一点活力，也管死了。所以，"制度好不好"这个问题，本身就问错了——制度从来不是孤立地好或坏，它只有配上底下那股能量，才谈得上价值。这就是为什么，一味迷信"制度移植"、把别处成功的规矩生搬过来，常常水土不服：搬得走制度这套约束，搬不走底下那股独特的能量。</p>
+  <p>而分寸这一格，也有它自己的两种退化。一种是<b>唯效率</b>：把一切都压成可优化的指标，凡不能被量化、不能提升效率的，一律砍掉——最终把自己和组织，都优化成了那台"高效而贫血"的机器，活气尽失。另一种，是它的反面——<b>拒约束</b>：彻底不要分寸，放任一切散漫无度、毫无节制，结果是一团永远收不拢、成不了事的稀泥。这两种退化，一个把弦绷断，一个把弦彻底松掉——而真正的分寸，恰恰是那根既不绷断、也不松垮的、张弛有度的弦。</p>
+  <p>这根"张弛有度的弦"，古人早有一个极美的说法，叫"文武之道，一张一弛"。一张一弛，不是折中的和稀泥，而是一种极高的、随境而变的能力：该紧的时候能紧到极致、该松的时候能松得彻底，且知道何时紧、何时松。一个只会紧的人，会把自己和身边人都绷断；一个只会松的人，则一事无成。真正的成熟，是同时握着"松"与"紧"这两手，像一位好琴手调弦——太紧则断，太松则哑，唯有那个恰到好处的张力，才能奏出声音。分寸这一格讲到底，讲的正是这门"调弦"的功夫：不在把弦拧到最紧，而在找到那个，能让生命本身，发出声响的张力。</p>
+</div>
+
+<div class="part">
+  <div class="part-num">捌 · D 维度讲完，引擎需要一捧土</div>
+  <h2>传动看遍了，接着看那捧让它不空转的土壤</h2>
+  <p>把这一格收成一句：分寸，不是"越紧越好"，而是"张弛有度"——误差、冗余、损耗三个最小，用得恰当是把事做漂亮的功夫，用过了头就会把创造连产房一起拧死；真正的智慧，是知道何时该收紧、何时该松开，是给单轴的目标函数松绑、给绷到极限的系统留一份修复的裕度。走得准，也要活得下去。</p>
+  <p>这一格，也悄悄回应了这个时代最普遍的一种焦虑——"我是不是还不够高效、还不够优化？"。它的回答是：或许，你缺的从来不是更极致的优化，恰恰是学会在某个点上，停手；缺的不是把弦绷得更紧，而是敢于，为自己松一松那根早已绷到极限的弦。真正活得好的人，不是把每一分钟都榨干的人，而是懂得在高效与留白之间、在收紧与松开之间，拿捏那个恰到好处的"度"的人。分寸的智慧，说到底，是一种"知止"的智慧——知道什么时候该使劲，也知道什么时候，该停。</p>
+  <p>于是，差异序列这一整维（D），就在这"知止"二字里，画上了句点。回望这三格：D1 教我们，方向是长出来的，别把死目标当终点；D2 教我们，路是走出来的，别只会沿现成的路走；D3 教我们，分寸是张弛出来的，别把弦拧断。三格连起来，就是那台"让潜伏的纠缠，一步步开成显露之花"的完整引擎。可这台引擎，终究是"转化"的机关——它转化的，是底下那捧土壤里，本就埋着的东西。没有那捧土壤，再好的引擎，也无米可炊。</p>
+  <p>所以，我们终于要走向这趟旅程的最后一站，也是最深的一站——E，特征纠缠：那捧一切显露之花与差异之路，都从中生长出来的、最本源的土壤。它有三重结构：三界（理念、现实、自我，是纠缠所栖身的三个疆域）、信息的三模态（符号、逻辑、数学，是纠缠被承载的三种样子）、能量的三状态（内能、动能、势能，也就是我们在 S3 已经见过的真、善、美那三股劲）。花，我们看过了；引擎，我们拆过了；现在，让我们俯身，去看那让这一切得以发生的、沉默而丰饶的土。</p>
+  <p>讲到这里，差异序列这台引擎的三层，就都讲完了：D1 让方向自己长出来、D2 让脚步一圈圈把路走通、D3 替这一切拿捏张弛的分寸。三层合起来，就是那整台"让潜伏的纠缠，一步步开成显露之花"的传动。你现在，已经看遍了这台引擎的全部构造。</p>
+  <p>可是，再精巧的引擎，也需要燃料、需要土壤——没有那捧可供它抽取、组织、转化的东西，引擎再好，也只是空转，什么也长不出来。这台引擎脚下的那捧土壤，正是整个体系最后、也最深的一维：<b>E，特征纠缠</b>。一切显露之花所需的养分，都埋在这里。下一维，我们就走进这捧土壤，去看它的三重结构——三界（理念、现实、自我）、信息的三种模态（符号、逻辑、数学）、能量的三种状态（真、善、美这三股劲）。花讲完了、引擎讲完了，最后，我们回到那让一切得以生长的、最本源的土。</p>
+</div>
+
+</article>
+
+<style id="sde-material-css">
+.sde-material{max-width:760px;margin:52px auto 8px;padding:30px 30px 24px;border:1px solid rgba(128,128,128,.28);border-radius:10px;background:rgba(128,128,128,.05);line-height:1.95;text-align:left}
+.sde-material .mat-tag{display:inline-block;font-size:12px;letter-spacing:.16em;opacity:.6;border:1px solid rgba(128,128,128,.4);border-radius:4px;padding:2px 10px;margin-bottom:14px}
+.sde-material h2.mat-h{font-size:20px;font-weight:800;letter-spacing:.02em;margin:.2em 0 .1em;text-indent:0}
+.sde-material .mat-lead{font-size:14.5px;opacity:.82;margin:10px 0 22px;text-indent:0}
+.sde-material h3{font-size:16px;font-weight:700;margin:26px 0 8px;text-indent:0;padding-left:12px;border-left:3px solid rgba(128,128,128,.45)}
+.sde-material p{font-size:15px;margin:10px 0;text-indent:0}
+.sde-material .mat-box{background:rgba(128,128,128,.09);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:14.5px}
+.sde-material .mat-sup{margin-top:26px;padding-top:16px;border-top:1px dashed rgba(128,128,128,.4)}
+.sde-material .mat-sup .lab,.sde-material .mat-no .lab{font-weight:700;letter-spacing:.04em}
+.sde-material .mat-no{margin-top:14px}
+.sde-material .mat-ref{margin-top:18px;font-size:12.5px;opacity:.58;line-height:1.7}
+</style>
+<div class="sde-material">
+<span class="mat-tag">事实补充 · 约 2500 字</span>
+<h2 class="mat-h">D3 格位的真实样本：强差异如何逼出显露态的重组</h2>
+<p class="mat-lead">本格讨论差异（D）强烈、显露态已成形时，系统如何被逼着重组。抽象地说是强差异触发结构跃迁，具体地看，认知科学、科学史、组织研究里有一批可查证的样本。</p>
+<h3>认知冲突逼出重构：皮亚杰的失衡机制</h3>
+<p>发展心理学给了 D3 最直接的样本。皮亚杰在《儿童的智力起源》（1936）中描述的失衡-再平衡机制观察到：当新经验与既有图式强烈冲突（差异达到无法同化的程度），儿童不是微调，而是整体重构图式——他称之为顺应。守恒实验是经典证据：把水从矮杯倒进高杯，学前儿童坚持水变多了，直到七岁前后，强烈而反复的反例差异逼出数量守恒概念的整体涌现。</p>
+<p class="mat-box">这一机制在成人学习中也有对应。概念改变研究（Posner et al., 1982）指出，学习者只有在既有观念遭遇足够强、足够多的反常差异，且新观念可理解可行时，才发生概念重构——弱差异只会被同化掉。</p>
+<h3>反常累积逼出范式转换：科学史的样本</h3>
+<p>科学史把 D3 放大到知识共同体尺度。库恩在《科学革命的结构》（1962）中论证：常规科学能容忍零星反常，但当反常差异累积到危机程度，整个范式会不连续地重组。迈克尔逊-莫雷 1887 年实验测不到以太漂移，这个该有却没有的强差异，最终参与逼出狭义相对论对时空的整体重构——不是修补旧框架，而是换掉它。</p>
+<p class="mat-box">水星近日点进动每世纪多出的 43 角秒，牛顿力学怎么修补都对不上，正是这类顽固强差异，成为广义相对论替换旧时空观的推力。反常不达阈值不革命，是 D3 的历史注脚。</p>
+<h3>绩效落差逼出组织变革：问题化搜索</h3>
+<p>组织研究提供社会尺度样本。Cyert 与 March 在《企业行为理论》（1963）中提出问题化搜索：企业只有在实际绩效与期望强烈背离时才启动结构性搜索与变革——差距小则惯例照旧。柯达的案例常被引用：数码影像的差异信号早已出现，但只有当胶片业务的绩效落差大到无法用惯例吸收，重组才被逼出，而此时窗口已近关闭。</p>
+<p class="mat-sup"><span class="lab">这些材料如何支撑正文的判断：</span>三个样本从个体图式、共同体范式到组织结构，重复着同一条 D3 规律：弱差异被既有结构同化，唯有强到越过阈值的差异才逼出整体重组，且重组是不连续的。用记号写，D=G(S,E) 在此格进入非线性区——差异对结构的反作用不是渐进修正，而是达到临界后的跃迁。皮亚杰、库恩、March 分别在三个尺度上锚定了这一点。</p>
+<p class="mat-no"><span class="lab">本篇不主张什么：</span>本篇不主张一切重组都由外部差异单独触发，也不主张重组必然带来进步——柯达重组得太晚，范式转换也可能走弯路。这里只锚定强差异是结构重组的必要推力这一可观测规律，重组的方向与成败是另一个问题。</p>
+<p class="mat-ref">样本出处：Piaget《儿童的智力起源》1936；Posner et al., Science Education 1982；Kuhn《科学革命的结构》1962；Cyert &amp; March《企业行为理论》1963。案例解读为作者建模。</p>
+</div>
+<div class="endbox">
+  <p>分寸不是越紧越好，是张弛有度——拧得太紧，会把创造，连同它赖以生长的产房，一起拧死。</p>
+  <a class="btn solid" href="/column/ontology-grid/">← 回到九格全图</a>
+  <a class="btn ghost" href="/column/ontology-grid/d2/">重读上一格 · D2 差异·路径组织</a>
+</div>
+
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">延伸参考文献 · Further References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">下列文献为本文所涉思想脉络的原典与代表性研究，供读者对读与查证；与文中已引文献不重复，本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+    <li style="margin:0 0 9px;padding-left:6px">Barry Smith, "Beyond Concepts: Ontology as Reality Representation", Proceedings of FOIS 2004.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Manuel DeLanda, Intensive Science and Virtual Philosophy, London: Continuum, 2002.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Manuel DeLanda, A New Philosophy of Society: Assemblage Theory and Social Complexity, London: Continuum, 2006.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Bruno Latour, We Have Never Been Modern, Cambridge, MA: Harvard University Press, 1993；中译《我们从未现代过》，刘鹏、安涅思译，苏州大学出版社，2010。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Bruno Latour, Reassembling the Social, Oxford University Press, 2005.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Karen Barad, Meeting the Universe Halfway, Durham: Duke University Press, 2007（能动实在论与内-作用）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Nelson Goodman, Ways of Worldmaking, Indianapolis: Hackett, 1978；中译《构造世界的多种方式》，姬志闯译，上海译文出版社，2008。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Ian Hacking, The Social Construction of What?, Cambridge, MA: Harvard University Press, 1999.</li>
+    <li style="margin:0 0 9px;padding-left:6px">F. William Lawvere & Stephen Schanuel, Conceptual Mathematics: A First Introduction to Categories, Cambridge University Press, 1997.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Saunders Mac Lane, Categories for the Working Mathematician, New York: Springer, 1971.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Kurt Gödel, "Über formal unentscheidbare Sätze der Principia Mathematica und verwandter Systeme I" (1931).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Claude E. Shannon, "A Mathematical Theory of Communication", Bell System Technical Journal, Vol. 27 (1948).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Karl Friston, "The Free-Energy Principle: A Unified Brain Theory?", Nature Reviews Neuroscience, Vol. 11 (2010).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Andy Clark & David Chalmers, "The Extended Mind", Analysis, Vol. 58, No. 1 (1998).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Michael Polanyi, The Tacit Dimension, London: Routledge, 1966；中译《默会的维度》，许泽民译，上海人民出版社，2000。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Immanuel Kant, Kritik der reinen Vernunft (1781/1787)；中译《纯粹理性批判》，邓晓芒译，人民出版社，2004。</li>
+    <li style="margin:0 0 9px;padding-left:6px">G. W. F. Hegel, Wissenschaft der Logik (1812–1816)；中译《逻辑学》，杨一之译，商务印书馆，1966。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Baruch Spinoza, Ethica (1677)；中译《伦理学》，贺麟译，商务印书馆，1958。</li>
+    <li style="margin:0 0 9px;padding-left:6px">老子：《道德经》，楼宇烈校释《老子道德经注校释》，中华书局，2008。</li>
+    <li style="margin:0 0 9px;padding-left:6px">庄子：《庄子》，据郭庆藩《庄子集释》，中华书局，1961。</li>
+    <li style="margin:0 0 9px;padding-left:6px">《周易》，据高亨《周易大传今注》，齐鲁书社，1979（生生之谓易）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">王阳明：《传习录》，据《王阳明全集》，上海古籍出版社，1992。</li>
+  </ol>
+</section>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  <div class="wrap">SDE Universes · 德麦国际 · 王德生 著 · SDE三维九宫 · 优化约束（D3） · <a href="/browse/">返回首页</a></div>
+</footer>
+
+
+<!-- SDE 陪读浮层 -->
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

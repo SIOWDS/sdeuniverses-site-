@@ -1,0 +1,311 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI评测、保证与审计 · 新思想前沿 · SDE Universes</title>
+<meta name="description" content="AI评测、保证与审计近二十年的二十个关键转向：从ImageNet、对抗样本、置信校准、机会均等、Gender Shades、模型卡、数据表与复现清单，到端到端审计、ML Test Score、CheckList、Dynabench、HELM、TruthfulQA、BIG-bench、LiveBench、Chatbot Arena、LLM-as-a-Judge、NIST AI RMF与任务完成时域。每条给出来源、关键读数、失效条件及八字段碰撞供料层。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:2rem 0 .35rem}
+h2 .en{display:block;font-size:.8rem;font-weight:500;color:var(--muted);letter-spacing:.02em;margin-top:.15rem;font-family:Georgia,serif}
+p{margin:0 0 1.1rem;text-align:justify}
+.src{font-size:.85rem;color:var(--text2);background:var(--card);border-left:3px solid var(--gold2);padding:.5rem .8rem;margin:0 0 .9rem;line-height:1.8}
+.src i{font-style:normal;color:var(--gold2);font-weight:600;margin-right:.4em}
+.era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+
+.act{margin:2.6rem 0 .2rem;padding:.5rem .9rem;background:var(--card);border-left:4px solid var(--gold);font-size:1.02rem;font-weight:600;color:var(--gold)}
+.refs{font-size:.82rem;color:var(--text2);line-height:1.85}
+.refs ol{padding-left:1.4rem;margin:0}
+.refs li{margin-bottom:.45rem}
+h3.sec{font-size:1.1rem;font-weight:600;color:var(--gold);margin:2.2rem 0 .6rem;padding-top:1rem;border-top:1px solid var(--border)}
+.col{font-size:.83rem;color:var(--text2);background:rgba(138,104,23,0.07);border-left:3px solid var(--muted);padding:.5rem .8rem;margin:0 0 1.4rem;line-height:1.8}
+.col i{font-style:normal;color:var(--gold2);font-weight:600;margin-right:.35em}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">AI与知识生产</span></div>
+<main>
+<div class="kicker">新思想前沿 · AI与知识生产</div>
+<h1>AI评测、保证与审计</h1>
+<div class="meta">近二十年 · <b>两幕 · 20 个新思想</b> · 约 20,000 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">AI评测的二十年，是测量对象不断扩张的历史。ImageNet把不同模型放进同一测试协议，对抗样本和置信校准证明平均准确率不够，机会均等与Gender Shades把错误分布带入公平审计，模型卡、数据表与复现清单再把证据推回开发过程。进入基础模型时代，CheckList、Dynabench、HELM、TruthfulQA、BIG-bench和LiveBench分别处理行为、动态失败、多指标、真实性、长尾与污染；Arena和LLM裁判打开开放答案，NIST RMF与任务时域则把测量接到治理闭环和长程自主能力。</p>
+<div class="act">【第一幕】共同基准、最坏失效与证据随附 · 约 2009–2019</div>
+<p>第一幕拆掉“一个平均准确率代表模型”的默认。公共测试集让进步可累计，也创造榜单过拟合；对抗与校准把最坏邻域和概率可信度加入验收，群体公平要求错误按谁承担来分层。模型卡、数据表和复现清单进一步说明：没有用途、来源、版本、方差和算力记录，漂亮数值不能成为保证。</p>
+
+<h2>甲、ImageNet与ILSVRC：共同测试集把视觉进步变成可比较序列<span class="en">ImageNet and ILSVRC: A Shared Test Set Turns Vision Progress into a Comparable Series</span></h2>
+<div class="src"><i>提出</i>Deng等，2009年CVPR《ImageNet: A Large-Scale Hierarchical Image Database》；Russakovsky等，2015年IJCV总结ILSVRC。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2024年文献）NIST. “Artificial Intelligence Risk Management Framework: Generative AI Profile.” NIST AI 600-1, 2024.。　<i>关键</i>ImageNet把WordNet层级、百万图像和隐藏测试协议组合成公共测量基础设施。</div>
+<p>2009年前，视觉论文常在不同数据、标签和预处理上报告准确率，数值难以横比。ImageNet用WordNet名词层级组织约320万张图像、5247个synset；ILSVRC随后固定1000类、约120万训练图像和隐藏测试集。评测第一次不只是论文末尾的表，而是持续多年、多人共享的竞赛制度。</p>
+<p>〔对象清单〕本条的单因判断是，决定视觉方法能否形成累积证据的只有训练—验证—测试协议是否对所有参赛者保持共同且可复算。统一标签、提交服务器与top-1/top-5定义，使2012年AlexNet的变化能与前后模型置于同一坐标。公共分母压低比较成本，也让数据集设计者获得定义“视觉进步”的权力。对ImageNet与ILSVRC：共同测试集把视觉进步变成可比较序列ImageNet and ILSVRC: A Shared Test Set Turns Vision Progress into a Comparable Series而言，真正需要登记的不是又一个平均分，而是由“决定视觉方法能否形成累积证据的只有训练—验证—测试协议是否对所有参赛者保持共同且可复算”推出的每一步中介、责任人和可撤回条件；〔对象清单〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>ILSVRC 2012使用约1.2M训练、50,000验证与100,000测试图像，覆盖1000类；AlexNet把top-5错误率降至15.3%，次名约26.2%。复核必须锁定数据版本、裁剪次数、集成、预训练与测试提交次数；若一次模型用外部数据或多裁剪，表中单一百分比已不是同条件结果。</p>
+<p>封闭类别奖励识别数据集中最常见的纹理线索，却不测开放世界拒识、因果理解或部署人群；榜单越接近饱和，团队反而越会围绕测试集做隐性调参。重复提交泄露测试反馈，标签错误也会成为性能上限。ImageNet代表一个可操作代理，不代表“看懂现实”的完整构念。〔对象清单〕落到复现实务，可为ImageNet与ILSVRC：共同测试集把视觉进步变成可比较序列ImageNet and ILSVRC: A Shared Test Set Turns Vision Progress into a Comparable Series建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“固定数据版本、外部数据与推理预算下的top-1错误、top-5错误及95%置信区间”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>2026年的继承协议应保留历史测试以看趋势，同时增加ImageNet-V2、ImageNet-A/R和地域重采样，分别报告in-domain、shift与worst-group。每个模型登记外部数据、提示、采样预算和提交次数，给bootstrap 95% CI；若0.1点差小于采样误差，排行榜不得宣称明确胜出。</p>
+<p>它与第536号第十条“MLPerf：训练与推理性能获得同分母裁判”是任务质量侧异名，本条固定视觉数据与标签，MLPerf固定硬件完成规则。ILSVRC的历史读数混合数据、模型和计算增长，不能把同一榜单上的下降曲线解释为单一算法因果。〔对象清单〕本条的边界案例应从“标签错误、测试反馈、地域覆盖、开放集拒识、外部预训练、推理预算与置信区间”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当榜单接近饱和且提交反馈可反复利用时，测试分数越高，部署外分布可靠性反而越不确定”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<div class="col"><i>位置</i>D——把数据层级、隐藏测试、提交协议与排名串成视觉评测制度　<i>单因</i>决定视觉方法能否形成累积证据的只有训练—验证—测试协议是否对所有参赛者保持共同且可复算　<i>预设</i>〔01 谁进入分母〕进入1000类隐藏测试的样本与人群足以代表开放世界视觉任务　<i>量纲</i>固定数据版本、外部数据与推理预算下的top-1错误、top-5错误及95%置信区间／ImageNet与ILSVRC：共同测试集把视觉进步变成可比较序列ImageNet and ILSVRC: A Shared Test Set Turns Vision Progress into a Comparable Series全部纳入比较的样本、运行或决策单元　<i>失效</i>当榜单接近饱和且提交反馈可反复利用时，测试分数越高，部署外分布可靠性反而越不确定　<i>自曝</i>对象清单独立核验：15.3%与26.2%来自ILSVRC 2012特定赛制，模型、数据增强和GPU同时变化；独立撤回检查落在对象清单　<i>空栏</i>标签错误、测试反馈、地域覆盖、开放集拒识、外部预训练、推理预算与置信区间　<i>异名</i>AI系统称“MLPerf：训练与推理性能获得同分母裁判”；见第536号第十条“MLPerf：训练与推理性能获得同分母裁判”</div>
+
+<h2>乙、对抗样本：高测试准确率不再等于邻域内可靠<span class="en">Adversarial Examples: High Test Accuracy No Longer Means Local Reliability</span></h2>
+<div class="src"><i>提出</i>Szegedy等，2014年ICLR；Goodfellow、Shlens与Szegedy，2015年ICLR《Explaining and Harnessing Adversarial Examples》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2025年文献）METR. “Measuring AI Ability to Complete Long Tasks.” 2025.。　<i>关键</i>微小但最坏方向的扰动可跨模型迁移，并让分类器高置信地输出错误答案。</div>
+<p>标准测试集从自然分布独立抽样，默认相近输入应产生相近判断。Szegedy等在2014年展示，人眼近乎不察觉的优化扰动可让多个神经网络错分；Goodfellow等2015年以高维线性解释并提出FGSM。评测对象由“平均样本表现”扩成输入附近最坏方向的稳定性，安全边界第一次进入指标。</p>
+<p>〔事件时间轴〕本条主张，决定分类器能否在恶意环境下可信的只有允许扰动集合内最坏样本的失败率，而非自然测试均值。攻击者沿损失梯度选择方向，模型面对的分布不再独立同分布。把ε、范数、查询次数和攻击知识写成威胁模型，才能区分普通噪声鲁棒性与主动规避。该ICLR 2015契约至少要注明FGSM或PGD及查询budget。</p>
+<p>ICLR 2015论文用FGSM在MNIST等数据上快速生成对抗样本，并显示扰动可跨架构和训练集迁移；对抗训练降低同类攻击错误。验收须报告clean accuracy、robust accuracy、ε、L∞或L2、白盒/黑盒、重启次数与攻击成功率，不能只发布一个被弱攻击测出的“防御率”。机构采用对抗样本：高测试准确率不再等于邻域内可靠Adversarial Examples: High Test Accuracy No Longer Means Local Reliability之前还应公布否决门槛：一旦“当防御产生梯度遮蔽时，固定攻击成功率越低，自适应攻击下的真实失效率反而越高”出现，就暂停扩张并回到“微小但最坏方向的扰动可跨模型迁移，并让分类器高置信地输出错误答案”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<p>范数球并不保证人类语义不变，ε越小也可能在医学或遥感信号中改掉真实含义；反之，旋转、光照和贴纸可有大范数却语义相同。防御若产生梯度遮蔽，会让固定攻击失败而非模型变稳。评测者公开攻击后，开发者还会针对该攻击训练，形成新的基准过拟合。2026年任何robustness声明都须先冻结threat model。</p>
+<p>2026年的红队应先冻结威胁模型，再由独立组运行AutoAttack与自适应攻击，加入物理重拍、跨模型迁移和查询预算；每个成功样本经双人确认语义保持。部署测试同时记录拒绝、告警与恢复，不把“分类没错”当唯一终点；至少报告1000个攻击起点和95% CI。还需把攻击生成代码和random seed封存，交给2026年未参与防御开发的团队重跑；若攻击预算未耗尽，失败率只能标为下界。把对抗样本：高测试准确率不再等于邻域内可靠Adversarial Examples: High Test Accuracy No Longer Means Local Reliability与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“在语义保持且预算固定的独立攻击中未被攻破的样本数／全部有效攻击起点”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>它与第535号第七条“LIME：局部代理模型把解释变成可扰动实验”共享局部扰动，本条用最坏方向检验失败而非解释权重。FGSM有效说明局部边界脆弱，不说明所有现实攻击都位于L∞球，也不证明任何单一防御可覆盖未知攻击者。</p>
+<div class="col"><i>位置</i>E——把威胁模型、攻击者知识、扰动语义与自适应复测当成可靠性环境　<i>单因</i>决定分类器能否在恶意环境下可信的只有允许扰动集合内最坏样本的失败率　<i>预设</i>〔02 单一读数代表复杂对象〕一个ε下的robust accuracy足以代表物理世界、黑盒查询与未知攻击　<i>量纲</i>在语义保持且预算固定的独立攻击中未被攻破的样本数／全部有效攻击起点　<i>失效</i>当防御产生梯度遮蔽时，固定攻击成功率越低，自适应攻击下的真实失效率反而越高　<i>自曝</i>事件时间轴独立核验：FGSM是线性化的一步攻击，论文结果不覆盖任意范数、物理变换和无限查询；独立撤回检查落在事件时间轴　<i>空栏</i>语义复核、攻击预算、无效起点、自适应攻击、物理重拍、拒绝策略与恢复时间　<i>异名</i>人机协作称“LIME：局部代理模型把解释变成可扰动实验”；见第535号第七条“LIME：局部代理模型把解释变成可扰动实验”</div>
+
+<h2>丙、置信度校准：90%把握必须约有90%正确<span class="en">Confidence Calibration: Ninety Percent Confidence Must Mean About Ninety Percent Correct</span></h2>
+<div class="src"><i>提出</i>Guo、Pleiss、Sun与Weinberger，2017年ICML《On Calibration of Modern Neural Networks》。　<i>争议</i>NIST. “Artificial Intelligence Risk Management Framework 1.0.” NIST AI 100-1, 2023.。　<i>最新</i>（2024年文献）NIST. “Artificial Intelligence Risk Management Framework: Generative AI Profile.” NIST AI 600-1, 2024.。　<i>关键</i>现代深网准确率上升时仍可能过度自信，一个参数的temperature scaling常能改善验证分布校准。</div>
+<p>分类榜单通常只问答案是否正确，却不问概率能否用于风险决策。Guo等2017年发现，较深较宽、带Batch Normalization的现代网络往往比早期模型更不校准：预测90%置信的一组样本未必约90%正确。模型输出由排序分数转成决策概率后，评测必须检查confidence与empirical frequency的对应。</p>
+<p>〔装置边界〕本条的单因命题是，决定模型概率能否进入转诊、告警或拒答阈值的只有置信度与长期正确频率是否匹配。可靠度图把样本按信心分桶，ECE加权汇总差距；temperature scaling在验证集学习单一T，缩放logit而不改argmax。校准由“感觉可信”变成可测统计契约。〔装置边界〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当分布漂移集中在高置信小群体时，总体ECE越低，关键尾部误导风险反而越高”做至少两轮外部复算，若方向翻转，置信度校准：90%把握必须约有90%正确Confidence Calibration: Ninety Percent Confidence Must Mean About Ninety Percent Correct的结论必须随之收窄。</p>
+<p>ICML 2017在CIFAR-10/100、ImageNet等模型上比较histogram binning、isotonic、Bayesian binning与Platt变体，发现单参数temperature scaling在多数数据上有效。复核需报告NLL、Brier、ECE、MCE、箱数、验证集大小及accuracy；只报ECE会隐藏小群体和高置信尾部。</p>
+<p>等宽分箱可让两个不同置信分布得到相同ECE，样本稀少的90–100%区间又有大方差；平均校准良好也不保证每个类别或人群良好。T在原分布拟合，遇到季节、医院或提示变化会漂移。模型越能把所有错误降到中等置信，ECE反而可能好看却不具选择价值。〔装置边界〕面向下一轮材料，AI评测、保证与审计应优先补齐“分箱选择、尾部方差、群体校准、校准集复用、在线漂移、拒答成本与阈值决策”的原始记录，并把“当分布漂移集中在高置信小群体时，总体ECE越低，关键尾部误导风险反而越高”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。〔装置边界〕证据链还要把Guo、Pleiss、Sun与Weinberger，2017年ICML《On Calibrati的起点材料与更新文献放在同一比较表里，并逐项报告“现代深网准确率上升时仍可能过度自信，一个参数的temperature scaling常能改善验证分布校准”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>2026年的保证方案应预先登记10与20箱两种ECE，同时给adaptive ECE、Brier和reliability diagram；对关键人群与置信≥0.9尾部单列95% CI。部署后按周做online recalibration并记录拒答覆盖—风险曲线，漂移触发再标定；校准集不得与最终审计集重合。</p>
+<p>它与第535号第十四条“信任校准：目标不是让人更信，而是让信心匹配可靠度”构成机器—人的两层同名，本条校准模型概率，后者校准使用者依赖。2017年的temperature scaling不改变分类准确率，也不证明经缩放的概率在新分布仍有因果含义。〔装置边界〕在AI评测、保证与审计的这一对象上，复核应把“按类别、人群与置信尾部分层的ECE、Brier、NLL及覆盖—风险曲线”拆成同一分母下的主结果与失败谱，“分箱选择、尾部方差、群体校准、校准集复用、在线漂移、拒答成本与阈值决策”要单列编码，不能在汇总时并入其他项。</p>
+<div class="col"><i>位置</i>S——把概率与经验频率的对应当成风险决策可用性的决定性资源　<i>单因</i>决定模型概率能否进入转诊、告警或拒答阈值的只有置信度与长期正确频率是否匹配　<i>预设</i>〔03 缺失即不存在〕总体ECE未显示的类别、群体、高置信尾部与分布漂移被视为没有校准风险　<i>量纲</i>按类别、人群与置信尾部分层的ECE、Brier、NLL及覆盖—风险曲线／置信度校准：90%把握必须约有90%正确Confidence Calibration: Ninety Percent Confidence Must Mean About Ninety Percent Correct全部纳入比较的样本、运行或决策单元　<i>失效</i>当分布漂移集中在高置信小群体时，总体ECE越低，关键尾部误导风险反而越高　<i>自曝</i>装置边界独立核验：temperature scaling只在给定验证分布拟合一个T，不改变错误样本与类别排序；独立撤回检查落在装置边界　<i>空栏</i>分箱选择、尾部方差、群体校准、校准集复用、在线漂移、拒答成本与阈值决策　<i>异名</i>人机协作称“信任校准：目标不是让人更信，而是让信心匹配可靠度”；见第535号第十四条“信任校准：目标不是让人更信，而是让信心匹配可靠度”</div>
+
+<h2>丁、机会均等：公平从口号变成条件错误率约束<span class="en">Equal Opportunity: Fairness Becomes a Constraint on Conditional Error Rates</span></h2>
+<div class="src"><i>提出</i>Hardt、Price与Srebro，2016年NeurIPS《Equality of Opportunity in Supervised Learning》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2026年文献）NIST. “AI RMF Profile on Trustworthy AI in Critical Infrastructure: Concept Note.” 2026.。　<i>关键</i>在真实正类条件下，不同受保护群体应有相同true positive rate，可通过后处理阈值实现。</div>
+<p>早期“去掉性别或种族字段”把公平当输入净化，却忽略代理变量和错误分配。Hardt等2016年把机会均等写成统计条件：给定真实标签Y=1，预测为正的概率不应随受保护属性A变化；equalized odds进一步约束Y=0。伦理主张由抽象无歧视进入可估计的TPR与FPR差。对机会均等：公平从口号变成条件错误率约束Equal Opportunity: Fairness Becomes a Constraint on Conditional Error Rates而言，真正需要登记的不是又一个平均分，而是由“决定机会是否在合格者之间公平分配的只有各群体条件真阳性率是否相等”推出的每一步中介、责任人和可撤回条件；〔样本分层〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>〔样本分层〕本条主张，决定机会是否在合格者之间公平分配的只有各群体条件真阳性率是否相等。用验证数据对不同群体设阈值，可在不重训模型时满足约束；代价是准确率与错误类型重新分配。指标明确了“相等什么”，也迫使评测者公开谁被定义为合格、谁承担漏判。NeurIPS 2016把该条件写成TPR等式。</p>
+<p>NeurIPS 2016给出基于ROC曲线的后处理构造，可实现equalized odds或equal opportunity，并分析损失最小解。审计应逐群报告TP、FP、TN、FN、TPR、FPR、样本量及95% CI；若小群体只有20个正例，点估计差异不能当作稳定合规证据。〔样本分层〕落到复现实务，可为机会均等：公平从口号变成条件错误率约束Equal Opportunity: Fairness Becomes a Constraint on Conditional Error Rates建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“按交叉群体统计的TPR差、FPR差、样本量、95%置信区间与效用损失”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>真实标签可能本身受历史歧视影响，贷款偿还或录用绩效并非中性真值；群体阈值还可能在法律和社会上不可接受。只拉齐TPR会让FPR或预测值差异扩大，二元属性遗漏非二元和交叉身份。指标越形式化，组织反而越可能把价值冲突藏在标签定义里。</p>
+<p>2026年的评测应先由受影响方确认收益、伤害与标签含义，再预登记主要公平准则和不可接受误差；按性别×肤色×年龄等交叉切片给置信区间，运行counterfactual与长期结果分析。若多个准则不可兼得，报告Pareto前沿与最终选择责任人，不用单一“公平分”盖章。此外按2026年实际选择率模拟阈值后果，公布每1000名申请者中新增获益与新增误伤，防止只看比例差。〔样本分层〕证据链还要把Hardt、Price与Srebro，2016年NeurIPS《Equality of Oppo的起点材料与更新文献放在同一比较表里，并逐项报告“在真实正类条件下，不同受保护群体应有相同true positive rate，可通过后处理阈值实现”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>它与第535号第六条“个体公平：相似的人必须得到相似决定”形成群体—个体碰撞：本条比较条件错误率，后者依赖相似性度量。2016年的后处理保证针对观测标签和抽样群体，不能证明标签正义、因果公平或部署后的机会真的相等。</p>
+<div class="col"><i>位置</i>S——把条件错误率相等当成合格者获得机会的决定性资源　<i>单因</i>决定机会是否在合格者之间公平分配的只有各群体条件真阳性率是否相等　<i>预设</i>〔04 测量不改变被测对象〕真实标签、受保护属性分组与群体阈值不会重写被测的公平对象　<i>量纲</i>按交叉群体统计的TPR差、FPR差、样本量、95%置信区间与效用损失／机会均等：公平从口号变成条件错误率约束Equal Opportunity: Fairness Becomes a Constraint on Conditional Error Rates全部纳入比较的样本、运行或决策单元　<i>失效</i>当历史偏差已进入真实标签时，条件错误率越接近，真实机会不平等反而越可能被合法化　<i>自曝</i>样本分层独立核验：后处理数学保证依赖标签与群体定义，不决定equal opportunity为何优先于其他准则；独立撤回检查落在样本分层　<i>空栏</i>标签正义、交叉身份、小样本、长期反馈、群体阈值合法性、申诉与准则冲突　<i>异名</i>人机协作称“个体公平：相似的人必须得到相似决定”；见第535号第六条“个体公平：相似的人必须得到相似决定”</div>
+
+<h2>戊、Gender Shades：总体准确率被交叉群体误差击穿<span class="en">Gender Shades: Intersectional Error Breaks the Spell of Aggregate Accuracy</span></h2>
+<div class="src"><i>提出</i>Buolamwini与Gebru，2018年FAT*《Gender Shades》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2024年文献）NIST. “Artificial Intelligence Risk Management Framework: Generative AI Profile.” NIST AI 600-1, 2024.。　<i>关键</i>三套商业系统对深色女性的错误率最高达34.7%，浅色男性最高仅0.8%。</div>
+<p>模型供应商常发布一个总体accuracy，默认样本平均足以代表所有用户。Gender Shades在2018年构建Pilot Parliaments Benchmark，按更均衡的性别与Fitzpatrick肤色切片测试IBM、Microsoft和Face++的性别分类API。一个高平均分被拆成四个交叉单元后，误差差距从小数点变成数量级。</p>
+<p>〔版本登记〕本条的单因判断是，决定总体性能声明是否可信的只有关键交叉群体是否分别拥有足量样本和错误率。性别单切片或肤色单切片都会把“深色女性”平均进较优群体；交叉审计让最受影响者不再被大群体分母淹没。评测对象由模型均值转成错误负担的分布。FAT* 2018因此要求intersectional slice。机构采用Gender Shades：总体准确率被交叉群体误差击穿Gender Shades: Intersectional Error Breaks the Spell of Aggregate Accuracy之前还应公布否决门槛：一旦“当审计只覆盖预设四个群体时，已报告差距越小，未命名交叉身份反而越容易消失”出现，就暂停扩张并回到“三套商业系统对深色女性的错误率最高达34.7%，浅色男性最高仅0.8%”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<p>FAT* 2018测试3个商业系统，深色女性误差率最高34.7%，浅色男性最高0.8%；IJB-A与Adience中浅色主体分别约79.6%和86.2%。复算需保留API版本、抓取日期、图像质量、分组标注者与每格n，供应商更新后不得把旧结果当当前性能。</p>
+<p>Fitzpatrick量表源于皮肤日晒反应，不是面部颜色的完美种族代理；二元性别标签也删去非二元身份。小而平衡的数据可发现差距，却不估计真实使用频率。若公司只针对公开四格优化，其他年龄、地域和残障交叉群体仍空白；公平分层越固定，遗漏者反而越不可见。</p>
+<p>2026年的审计应保存模型版本hash并季度复测，至少按肤色×性别×年龄×地域做分层，在每格给Wilson 95% CI和失败图例；真实身份敏感时由参与者自述并最小化留存。除误分类率，还测无法检测、人脸质量拒绝和人工复核结果，记录供应商修复前后差分。审计还要把无法被API检测到的人脸作为error而非删除，并保存2025–2026版本差异，才能识别供应商静默修复或退化。</p>
+<p>它与第535号第十条“模型卡：性能报告第一次按人群与用途伴随模型”形成证据—披露接口：本条提供为何必须分群的实测冲击，模型卡把要求制度化。34.7%与0.8%是2018年特定API和基准结果，不能直接代表今日版本或所有人脸任务。〔版本登记〕本条的边界案例应从“非二元身份、地域年龄、版本漂移、图像质量、拒绝案例、真实频率与修复复测”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当审计只覆盖预设四个群体时，已报告差距越小，未命名交叉身份反而越容易消失”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<div class="col"><i>位置</i>E——把交叉身份、API版本、样本构成与失败后果当成总体准确率的审计环境　<i>单因</i>决定总体性能声明是否可信的只有关键交叉群体是否分别拥有足量样本和错误率　<i>预设</i>〔05 代理即本体〕Fitzpatrick肤色、二元性别和议员照片足以代表现实身份与面部分析处境　<i>量纲</i>按交叉群体与版本统计的误分类率、未检测率、样本数和95%置信区间／Gender Shades：总体准确率被交叉群体误差击穿Gender Shades: Intersectional Error Breaks the Spell of Aggregate Accuracy全部纳入比较的样本、运行或决策单元　<i>失效</i>当审计只覆盖预设四个群体时，已报告差距越小，未命名交叉身份反而越容易消失　<i>自曝</i>版本登记独立核验：34.7%与0.8%针对2018年三个商业性别分类API，不是所有面部识别系统；独立撤回检查落在版本登记　<i>空栏</i>非二元身份、地域年龄、版本漂移、图像质量、拒绝案例、真实频率与修复复测　<i>异名</i>人机协作称“模型卡：性能报告第一次按人群与用途伴随模型”；见第535号第十条“模型卡：性能报告第一次按人群与用途伴随模型”</div>
+
+<h2>己、模型卡：模型发布必须随附用途、切片与限制<span class="en">Model Cards: Models Must Ship with Uses, Slices and Limitations</span></h2>
+<div class="src"><i>提出</i>Mitchell等，2019年FAT*《Model Cards for Model Reporting》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2025年文献）White, C. et al. “LiveBench: A Challenging, Contamination-Free LLM Benchmark.” ICLR, 2025.。　<i>关键</i>模型卡要求说明intended use、评测程序、分群结果、伦理考虑和已知限制，并与模型版本同行。</div>
+<p>训练模型曾像一个权重文件被交付，使用者只能看到总体benchmark，无法知道适用人群和禁用情景。Mitchell等2019年借鉴数据表提出model card：一至数页结构化记录模型详情、intended use、factors、metrics、evaluation data、quantitative analyses与ethical considerations。评测结果由论文瞬时声明变成产品随附物。〔失败谱〕这也给出一项不依赖宣传口径的核验：独立团队只拿到冻结版本与“决定下游团队能否正确解释评测的只有每个模型版本是否携带范围明确且可追溯的证据卡”的操作定义，仍能复算“具有模型hash、数据hash、原始artifact与独立复算记录的有效字段数／全部必填字段”，否则所谓转向可能只是数据管线或命名变化。</p>
+<p>〔失败谱〕本条主张，决定下游团队能否正确解释评测的只有每个模型版本是否携带范围明确且可追溯的证据卡。卡片把“在哪些条件测过”和“哪些用途未保证”与权重绑定，分群数字阻止总体分数越权。它也创造责任接口：开发者披露，采购者核对，审计者验证，部署者登记偏离。FAT* 2019把这一责任固定为model card。</p>
+<p>FAT* 2019论文给出smiling detection和toxicity classification两张示例卡，建议按性别、肤色、年龄与交叉群体报告。复核一张卡应逐字段查证数据hash、模型hash、日期、metric代码与原始结果；若只有文字“可能有偏差”却无样本数和误差，不能计作完成量化评测。〔失败谱〕面向下一轮材料，AI评测、保证与审计应优先补齐“选择性测试、API静默更新、商业机密、证据链接、独立复算、责任签名与delta记录”的原始记录，并把“当组织把卡片当发布勾选项时，字段越完整，未披露失败被误认为不存在的风险反而越高”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<p>自我披露存在选择性：供应商可写最有利任务，省略失败测试，或用模糊“不得滥用”转移设计责任。卡片越统一，审查者反而越可能把字段齐全误认为实质可靠；模型API静默更新又让旧卡失配。商业机密和安全理由也会限制训练数据与红队细节。</p>
+<p>2026年的验收应把model card纳入版本控制和release gate，字段链接机器可读测试artifact；至少每90天核对在线模型hash、主要切片与已知事件。独立审计随机复算20%结果，并维护“未测试”而非空白项。每次微调、量化或安全策略变化都生成delta card和责任签名。〔失败谱〕在AI评测、保证与审计的这一对象上，复核应把“具有模型hash、数据hash、原始artifact与独立复算记录的有效字段数／全部必填字段”拆成同一分母下的主结果与失败谱，“选择性测试、API静默更新、商业机密、证据链接、独立复算、责任签名与delta记录”要单列编码，不能在汇总时并入其他项。</p>
+<p>它与第535号第十条“模型卡：性能报告第一次按人群与用途伴随模型”是直接异名，本条进一步把卡片作为保证链证据而非透明度文本；也接第536号第八条的release gate。2019年的框架规定报告对象，却没有验证每个自报数字真实或覆盖充分。</p>
+<div class="col"><i>位置</i>D——把版本、用途、分群测量、限制、证据链接与责任签名串成模型报告链　<i>单因</i>决定下游团队能否正确解释评测的只有每个模型版本是否携带范围明确且可追溯的证据卡　<i>预设</i>〔06 通过形式审查＝实质合规〕model card字段填满就等于评测覆盖充分且所有自报数字真实　<i>量纲</i>具有模型hash、数据hash、原始artifact与独立复算记录的有效字段数／全部必填字段　<i>失效</i>当组织把卡片当发布勾选项时，字段越完整，未披露失败被误认为不存在的风险反而越高　<i>自曝</i>失败谱独立核验：两张示例卡证明报告结构可行，不证明供应商自披露具有独立保证效力；独立撤回检查落在失败谱　<i>空栏</i>选择性测试、API静默更新、商业机密、证据链接、独立复算、责任签名与delta记录　<i>异名</i>人机协作称“模型卡：性能报告第一次按人群与用途伴随模型”；见第535号第十条“模型卡：性能报告第一次按人群与用途伴随模型”</div>
+
+<h2>庚、数据表：训练材料的来历进入模型保证边界<span class="en">Datasheets for Datasets: Provenance Enters the Model Assurance Boundary</span></h2>
+<div class="src"><i>提出</i>Gebru等，2018年预印本、2021年《Communications of the ACM》《Datasheets for Datasets》。　<i>争议</i>Bender, E.; Friedman, B. “Data Statements for Natural Language Processing.” TACL, 2018.。　<i>最新</i>（2024年文献）Jimenez, C. et al. “SWE-bench: Can Language Models Resolve Real-World GitHub Issues?” ICLR, 2024.。　<i>关键</i>数据集应说明动机、组成、收集、预处理、用途、分发、维护与法律伦理条件。</div>
+<p>模型测试失败常被归因算法，却可能源于训练数据采样、标签和维护。Gebru等把电子元件datasheet类比引入数据：创建者回答为什么收集、谁被包含、怎样标注、推荐什么用途、如何更新和撤回。2018年的提案把数据从无主“原料”变成有生命周期、责任人和使用说明的评测对象。</p>
+<p>〔机构接口〕本条的单因命题是，决定模型证据能否追溯到输入条件的只有数据集是否保存可核验的来源与变更账。若审计者不知道收集时间、许可、人口构成和去重规则，任何公平或污染结论都无法定位原因。数据表连接dataset version、model version与test result，使修复可指向具体批次。CACM 2021要求dataset version与maintenance并列。〔机构接口〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当多级数据合并不继承provenance时，初始文档越详尽，当前版本被误认为可追溯的风险反而越高”做至少两轮外部复算，若方向翻转，数据表：训练材料的来历进入模型保证边界Datasheets for Datasets: Provenance Enters the Model Assurance Boundary的结论必须随之收窄。</p>
+<p>CACM 2021版本围绕motivation、composition、collection process、preprocessing、uses、distribution、maintenance等问题组织文档。复核应抽样至少100条记录回到原始来源，验证许可、标签与删除状态；统计缺失字段、无法追源比例、重复率和群体覆盖，不以页数衡量质量。</p>
+<p>网页规模语料常含数十亿文档，逐条来源不可行；抓取URL也可能失效或泄露个人信息。创建者视角会遗漏被抓取者意见，许可声明不等于合法。数据表越详细，反而可能把敏感属性集中成新风险；后续清洗和合并若不继承provenance，最初文档迅速失效。〔机构接口〕证据链还要把Gebru等，2018年预印本、2021年《Communications of the ACM》的起点材料与更新文献放在同一比较表里，并逐项报告“数据集应说明动机、组成、收集、预处理、用途、分发、维护与法律伦理条件”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>2026年的数据保证应使用content hash、snapshot date与处理DAG，维护删除、异议和许可变更队列；对每个来源域给采样权重和可追源率。审计者随机追踪1000条从模型样本到原文，检测测试集n-gram污染，并在每次重训发布差分datasheet；敏感字段实行最小权限。</p>
+<p>它与第535号第十条“模型卡：性能报告第一次按人群与用途伴随模型”构成材料—成品关系：数据表说明输入来历，模型卡说明输出表现。2021年的问卷能暴露缺口，却不会自动赋予许可、代表性或删除能力；文档后的实际维护才是保证对象。对数据表：训练材料的来历进入模型保证边界Datasheets for Datasets: Provenance Enters the Model Assurance Boundary而言，真正需要登记的不是又一个平均分，而是由“决定模型证据能否追溯到输入条件的只有数据集是否保存可核验的来源与变更账”推出的每一步中介、责任人和可撤回条件；〔机构接口〕缺少任何一环，都不能把相关性写成机制。</p>
+<div class="col"><i>位置</i>E——把来源、许可、处理DAG、版本、删除与维护能力当成模型证据环境　<i>单因</i>决定模型证据能否追溯到输入条件的只有数据集是否保存可核验的来源与变更账　<i>预设</i>〔01 谁进入分母〕有URL或datasheet的记录足以代表被遗漏、失链、撤回与无法追源的数据　<i>量纲</i>可从模型版本追至合法来源和处理记录的样本数／抽查样本总数及维护人时　<i>失效</i>当多级数据合并不继承provenance时，初始文档越详尽，当前版本被误认为可追溯的风险反而越高　<i>自曝</i>机构接口独立核验：datasheet是创建者回答的问题框架，不是对许可、代表性和隐私的第三方证明；独立撤回检查落在机构接口　<i>空栏</i>失效URL、被抓取者异议、许可变更、删除传播、合并继承、污染、敏感字段访问　<i>异名</i>人机协作称“模型卡：性能报告第一次按人群与用途伴随模型”；见第535号第十条“模型卡：性能报告第一次按人群与用途伴随模型”</div>
+
+<h2>辛、NeurIPS复现清单：实验细节成为提交义务<span class="en">The NeurIPS Reproducibility Checklist: Experimental Detail Becomes a Submission Duty</span></h2>
+<div class="src"><i>提出</i>Pineau等，NeurIPS 2019复现计划；2021年JMLR《Improving Reproducibility in Machine Learning Research》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2024年文献）Jimenez, C. et al. “SWE-bench: Can Language Models Resolve Real-World GitHub Issues?” ICLR, 2024.。　<i>关键</i>代码政策、社区复现挑战与投稿清单共同把均值、方差、超参数和计算资源变成审稿证据。</div>
+<p>机器学习论文常用一个最好seed和不完整超参数宣称提升，外部团队无法判断差异来自方法还是实现。NeurIPS 2019把复现清单纳入投稿，同时推行code submission与reproducibility challenge。方法质量不再只由叙述和最终表格承担，训练步骤、统计波动、硬件与数据可得性成为正式审查对象。机构采用NeurIPS复现清单：实验细节成为提交义务The NeurIPS Reproducibility Checklist: Experimental Detail Becomes a Submission Duty之前还应公布否决门槛：一旦“当外部复核只检查代码启动时，清单通过率越高，headline结论未经重跑的比例反而越容易被忽视”出现，就暂停扩张并回到“代码政策、社区复现挑战与投稿清单共同把均值、方差、超参数和计算资源变成审稿证据”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<p>〔资源预算〕本条主张，决定论文评测能否被共同体复核的只有关键实验选择是否在提交时完整冻结并披露。清单要求定义统计量、中心趋势和变异、运行时间、计算基础设施、超参数范围及代码；强制时点阻止作者在质疑出现后选择性补充。复现由美德倡议转成流程控制。NeurIPS 2019把披露时点推进submission gate。</p>
+<p>Pineau等2021年JMLR报告该计划由3部分组成：代码提交政策、社区复现挑战、ML reproducibility checklist。审计一篇论文应以至少5个seed复跑主结果，记录mean±SD、硬件小时、依赖锁文件和基线调参预算；只让代码成功启动不算复现headline claim。〔资源预算〕落到复现实务，可为NeurIPS复现清单：实验细节成为提交义务The NeurIPS Reproducibility Checklist: Experimental Detail Becomes a Submission Duty建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“独立环境重获主结论的实验数／抽查实验总数、复现差值、GPU小时与失败原因”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>清单答案由作者自报，审稿时长有限，勾“见附录”可能没有人验证。专有数据和巨额训练使外部团队即使有代码也无法重复；不同GPU、库和nondeterminism造成差异。要求越多，资源充足团队越易提交完整artifact，小团队反而承担更高文书与存储负担。</p>
+<p>2026年的复现闸门应随机抽取20%论文做artifact execution，对主表至少复跑一项；容器保存依赖、数据hash、5个seed与完整日志，报告复现差值和成本比。无法开放数据的论文提供可信执行环境或合成核验集，并把“可重复”“可复现”“可推广”分成三种状态。〔资源预算〕本条的边界案例应从“专有数据、算力门槛、基线预算、环境漂移、失败复现、审稿时间与小团队负担”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当外部复核只检查代码启动时，清单通过率越高，headline结论未经重跑的比例反而越容易被忽视”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>它与第536号第八条“ML Test Score与TFX：生产准备度成为28项可执行测试”形成论文—生产异名：本条冻结研究证据，后者把检查放进持续流水线。2019年的制度能提高报告率，不证明每个勾选项准确，也不等于独立团队已重获同一结论。</p>
+<div class="col"><i>位置</i>D——把清单、代码、种子、统计波动、硬件和artifact execution串成论文复核流程　<i>单因</i>决定论文评测能否被共同体复核的只有关键实验选择是否在提交时完整冻结并披露　<i>预设</i>〔02 单一读数代表复杂对象〕代码可运行或一个复现seed足以代表统计结论、成本和跨环境推广　<i>量纲</i>独立环境重获主结论的实验数／抽查实验总数、复现差值、GPU小时与失败原因　<i>失效</i>当外部复核只检查代码启动时，清单通过率越高，headline结论未经重跑的比例反而越容易被忽视　<i>自曝</i>资源预算独立核验：NeurIPS计划衡量流程改进，不能证明所有投稿数据、代码与自报答案真实；独立撤回检查落在资源预算　<i>空栏</i>专有数据、算力门槛、基线预算、环境漂移、失败复现、审稿时间与小团队负担　<i>异名</i>AI系统称“ML Test Score与TFX：生产准备度成为28项可执行测试”；见第536号第八条“ML Test Score与TFX：生产准备度成为28项可执行测试”</div>
+
+<div class="act">【第二幕】动态、多维、持续与长时程评测 · 约 2020–2026</div>
+<p>第二幕面对会生成、会调用工具且会吸收公开测试的大模型。评测不再能静止：行为测试定位缺陷，动态和滚动基准追赶污染，整体矩阵拒绝单一总分，人类与模型裁判互相校准。真正的保证还要把发现接到责任人、整改、发布阻断和复验；对智能体，则必须测它能独立维持多久，而不只看最终一句答案。</p>
+
+<h2>一、端到端算法审计：从指标检查转向组织过程追责<span class="en">End-to-End Algorithmic Auditing: From Metric Checks to Organizational Accountability</span></h2>
+<div class="src"><i>提出</i>Raji等，2020年FAT*《Closing the AI Accountability Gap》。　<i>争议</i>Ribeiro, M. T. et al. “Beyond Accuracy: Behavioral Testing of NLP Models with CheckList.” ACL, 2020.。　<i>最新</i>（2025年文献）White, C. et al. “LiveBench: A Challenging, Contamination-Free LLM Benchmark.” ICLR, 2025.。　<i>关键</i>审计覆盖范围界定、映射、制品收集、测试、反思和发布后监控，而非只算一个公平指标。</div>
+<p>公平与透明工具增加后，组织仍可能在产品末端跑一次metric就称完成伦理审查。Raji等2020年把算法审计嵌入开发生命周期：明确审计对象与利益相关者，绘制流程，收集文档和测试，形成报告，再追踪整改。被评测的不只是模型函数，而是决定目标、数据、阈值和上线的组织系统。</p>
+<p>〔外部复算〕本条的单因判断是，决定AI审计能否产生问责的只有每项发现是否绑定责任人、证据、截止期和复验。没有整改闭环，更多测试只生成无人负责的风险清单；有闭环，失败可阻断release或缩小用途。审计由“发现问题”升级为可追踪的组织承诺和权限机制。FAT* 2020将其写成end-to-end audit。</p>
+<p>FAT* 2020结合专业审计理论与行业实践提出端到端内部审计框架，强调审计trail和各阶段角色。验收应统计发现总数、severity、owner覆盖率、逾期率、复验通过率与上线例外；随机抽取10项从原始日志追到决策会议，口头承诺或无证据关闭不得算完成。</p>
+<p>内部审计者可能向被审业务负责人汇报，严重发现会被降级；外部审计者又可能拿不到训练数据、模型访问和事件日志。范围由公司先定义会排除供应链和受影响者，保密协议限制公开。审计越专业化，反而越可能形成只有大机构买得起的认证市场。ISO式独立性在2026年仍需用汇报线和付费安排实证。把端到端算法审计：从指标检查转向组织过程追责End-to-End Algorithmic Auditing: From Metric Checks to Organizational Accountability与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“按严重度统计的具名整改闭环数／全部发现、逾期天数、例外数与复验失败数”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>2026年的制度应让审计委员会直接向董事会或独立监督者报告，保留不可删改evidence ledger；重大模型上线前至少一次外部challenge。每个发现设30/60/90日SLA并公开聚合整改率，例外需具名签署和到期日；受影响方可提交反例并看到处置编号。发现项需附2026年release decision编号与董事会例外记录；若severity被修改，保留修改前等级、理由和批准人。</p>
+<p>它与第535号第十二条“参与式AI：受影响者从访谈对象变成设计权力的一方”形成权力接口：审计需要证据链，参与式设计决定谁能界定伤害。2020年的框架是流程提案和案例归纳，不能证明内部审计天然独立或每项整改都降低现实风险。〔外部复算〕这也给出一项不依赖宣传口径的核验：独立团队只拿到冻结版本与“决定AI审计能否产生问责的只有每项发现是否绑定责任人、证据、截止期和复验”的操作定义，仍能复算“按严重度统计的具名整改闭环数／全部发现、逾期天数、例外数与复验失败数”，否则所谓转向可能只是数据管线或命名变化。</p>
+<div class="col"><i>位置</i>D——把范围、证据、发现、责任人、截止期、例外与复验串成组织审计闭环　<i>单因</i>决定AI审计能否产生问责的只有每项发现是否绑定责任人、证据、截止期和复验　<i>预设</i>〔03 缺失即不存在〕审计范围外的供应链、受影响者、口头决策与未留日志风险被视为不存在　<i>量纲</i>按严重度统计的具名整改闭环数／全部发现、逾期天数、例外数与复验失败数　<i>失效</i>当审计范围和严重度由业务线控制时，关闭率越高，重大问题被降级或排除的比例反而越高　<i>自曝</i>外部复算独立核验：端到端框架规定组织步骤，不证明内部审计者拥有独立权力与完整访问；独立撤回检查落在外部复算　<i>空栏</i>利益冲突、范围排除、外审访问、例外签署、受影响者申诉、审计成本与公开边界　<i>异名</i>人机协作称“参与式AI：受影响者从访谈对象变成设计权力的一方”；见第535号第十二条“参与式AI：受影响者从访谈对象变成设计权力的一方”</div>
+
+<h2>二、ML Test Score：生产准备度成为28项可执行测试<span class="en">ML Test Score: Production Readiness Becomes Twenty-Eight Executable Tests</span></h2>
+<div class="src"><i>提出</i>Breck等，2017年IEEE Big Data《The ML Test Score》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2026年文献）NIST. “AI RMF Profile on Trustworthy AI in Critical Infrastructure: Concept Note.” 2026.。　<i>关键</i>数据、模型、基础设施和监控被拆成28项测试，发布由一次离线accuracy改成持续系统证据。</div>
+<p>传统软件有unit test和integration test，机器学习团队却常凭一张离线准确率表上线。Breck等2017年提出ML Test Score，把训练数据、特征、模型质量、服务基础设施和监控拆成28项检查。评测对象从静态权重扩为会吃新数据、依赖管线、随时间漂移并影响用户的生产系统。〔反号压力〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当28项被平均为成熟度总分时，通过项越多，单个不可补偿致命失败反而越容易被冲淡”做至少两轮外部复算，若方向翻转，ML Test Score：生产准备度成为28项可执行测试ML Test Score: Production Readiness Becomes Twenty-Eight Executable Tests的结论必须随之收窄。</p>
+<p>〔反号压力〕本条主张，决定模型是否具备生产保证的只有关键失效模式是否被自动测试并能阻断发布。分数的价值不在28项加总，而在每项都有机器可执行断言、owner和阈值；训练—服务skew、NaN、数据漂移或切片退化一旦出现，release gate立即失败。</p>
+<p>2017年论文列出28项测试并建议以成熟度计分，涵盖feature expectations、data invariants、model quality、training/serving skew、rollback和monitoring。复核一条流水线应注入至少20类故障，统计检测率、误报、MTTD和阻断率；存在测试文件却从未在CI运行不计通过。〔反号压力〕证据链还要把Breck等，2017年IEEE Big Data《The ML Test Score》的起点材料与更新文献放在同一比较表里，并逐项报告“数据、模型、基础设施和监控被拆成28项测试，发布由一次离线accuracy改成持续系统证据”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>同权加分会让27个低风险通过抵消1个致命安全失败；阈值由团队自定，也可为赶发布日期临时放宽。离线synthetic fault未必代表真实组合故障，监控告警过多会疲劳。测试越密，系统反而可能只优化可自动化部分，把人工流程、社会伤害和恢复能力留白。2025年CI日志还应保存每次threshold override。</p>
+<p>2026年的闸门应设置non-compensable critical tests，任何隐私泄露、越权行动或核心群体退化即停发；每季度故障演练验证rollback。仪表盘按版本记录28项状态、豁免签署、MTTD/MTTR和实际事件漏检，生成式系统再加prompt、retrieval、tool call与human handoff契约。〔反号压力〕在AI评测、保证与审计的这一对象上，复核应把“真实与注入故障的检测率、误报率、阻断率、MTTD、MTTR及未授权豁免数”拆成同一分母下的主结果与失败谱，“阈值放宽、告警疲劳、组合故障、人工流程、社会伤害、豁免权与实际漏检事件”要单列编码，不能在汇总时并入其他项。对ML Test Score：生产准备度成为28项可执行测试ML Test Score: Production Readiness Becomes Twenty-Eight Executable Tests而言，真正需要登记的不是又一个平均分，而是由“决定模型是否具备生产保证的只有关键失效模式是否被自动测试并能阻断发布”推出的每一步中介、责任人和可撤回条件；〔反号压力〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>它与第536号第八条“ML Test Score与TFX：生产准备度成为28项可执行测试”是直接异名，本条强调其作为保证与审计控制，而非基础设施里程碑。28项是风险发现框架，不是所有应用固定权重的认证分；致命单项不得被总分平均。</p>
+<div class="col"><i>位置</i>D——把数据断言、模型切片、服务一致性、监控、阻断与回滚串成持续保证管线　<i>单因</i>决定模型是否具备生产保证的只有关键失效模式是否被自动测试并能阻断发布　<i>预设</i>〔04 测量不改变被测对象〕测试阈值、故障注入和发布豁免不会改变团队优化与报告行为　<i>量纲</i>真实与注入故障的检测率、误报率、阻断率、MTTD、MTTR及未授权豁免数／ML Test Score：生产准备度成为28项可执行测试ML Test Score: Production Readiness Becomes Twenty-Eight Executable Tests全部纳入比较的样本、运行或决策单元　<i>失效</i>当28项被平均为成熟度总分时，通过项越多，单个不可补偿致命失败反而越容易被冲淡　<i>自曝</i>反号压力独立核验：2017年的28项来自生产经验，不是覆盖生成式AI与每个行业风险的穷尽标准；独立撤回检查落在反号压力　<i>空栏</i>阈值放宽、告警疲劳、组合故障、人工流程、社会伤害、豁免权与实际漏检事件　<i>异名</i>AI系统称“ML Test Score与TFX：生产准备度成为28项可执行测试”；见第536号第八条“ML Test Score与TFX：生产准备度成为28项可执行测试”</div>
+
+<h2>三、CheckList：自然语言模型开始接受行为单元测试<span class="en">CheckList: Language Models Begin to Face Behavioral Unit Tests</span></h2>
+<div class="src"><i>提出</i>Ribeiro、Wu、Guestrin与Singh，2020年ACL《Beyond Accuracy》。　<i>争议</i>Liang, P. et al. “Holistic Evaluation of Language Models.” TMLR, 2023.。　<i>最新</i>（2024年文献）Lee, T. et al. “VHELM: A Holistic Evaluation of Vision Language Models.” 2024.。　<i>关键</i>能力×测试类型矩阵以MFT、INV和DIR生成反例；有工具的实践者建出2倍测试并发现近3倍缺陷。</div>
+<p>NLP模型在held-out数据得分很高，仍会被否定词、人名替换或轻微拼写击穿，因为准确率把失败混进均值。Ribeiro等2020年借软件测试提出CheckList：按词汇、否定、指代、NER等capability设计minimum functionality、invariance与directional expectation。评测由题库答题转为可定位的行为契约。</p>
+<p>〔责任链〕本条的单因命题是，决定自然语言模型缺陷能否在上线前定位的只有预期行为是否被写成可重复测试断言。MFT检查最小能力，INV要求语义无关变换不改输出，DIR规定变化方向；每个失败能对应一个bug class，而不是只让总体F1下降0.2点。〔责任链〕落到复现实务，可为CheckList：自然语言模型开始接受行为单元测试CheckList: Language Models Begin to Face Behavioral Unit Tests建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“经人工确认有效的MFT、INV、DIR失败数／各类测试样本与修复后回归通过数”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>ACL 2020在sentiment、QQP和机器阅读等3类任务发现商业及SOTA模型的关键失败；用户研究中，使用CheckList的NLP人员创建约2倍测试、发现近3倍bug。复核应报告每类模板数、生成样本数、人工有效率、failure rate与修复后回归率，不能只展示最有趣反例。</p>
+<p>测试矩阵仍由专家想象，未被命名的方言、语用和社会情境不会自动出现；批量模板可能生成不自然句子。模型越针对已公开INV训练，反而越会通过形式变换而在真实对话失败。某些“应不变”属性其实会改变含义，错误oracle可把合理输出判为缺陷。〔责任链〕本条的边界案例应从“方言语用、错误oracle、不自然模板、未命名能力、公开测试过拟合、多轮状态与事件回流”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当开发者围绕公开模板训练时，行为测试通过率越高，未命名真实语境的脆弱性反而越可能积累”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>2026年的行为套件应让语言专家、领域人员与真实用户共同提出能力，随机抽查至少500条生成样本的语义有效性；每个bug保留最小反例和修复commit。多轮代理再测tool selection、permission与state invariance，并公开模板覆盖空白；季度从事件日志新增回归测试。</p>
+<p>它与第532号第十八条“AgentBench、WebArena与GAIA：最终答案让位于真实轨迹”形成单元—系统测试关系：CheckList隔离语言行为，轨迹基准测试任务闭环。2020年的2倍测试和近3倍bug来自用户研究，不能外推为所有团队固定收益。对CheckList：自然语言模型开始接受行为单元测试CheckList: Language Models Begin to Face Behavioral Unit Tests而言，真正需要登记的不是又一个平均分，而是由“决定自然语言模型缺陷能否在上线前定位的只有预期行为是否被写成可重复测试断言”推出的每一步中介、责任人和可撤回条件；〔责任链〕缺少任何一环，都不能把相关性写成机制。</p>
+<div class="col"><i>位置</i>S——把可执行行为断言当成把平均错误拆成可修bug的决定性资源　<i>单因</i>决定自然语言模型缺陷能否在上线前定位的只有预期行为是否被写成可重复测试断言　<i>预设</i>〔05 代理即本体〕专家写出的capability矩阵与模板足以代表现实语言使用和所有重要行为　<i>量纲</i>经人工确认有效的MFT、INV、DIR失败数／各类测试样本与修复后回归通过数　<i>失效</i>当开发者围绕公开模板训练时，行为测试通过率越高，未命名真实语境的脆弱性反而越可能积累　<i>自曝</i>责任链独立核验：2倍测试与近3倍bug来自特定NLP用户研究，不是工具在任意团队的固定因果倍数；独立撤回检查落在责任链　<i>空栏</i>方言语用、错误oracle、不自然模板、未命名能力、公开测试过拟合、多轮状态与事件回流　<i>异名</i>智能体工程称“AgentBench、WebArena与GAIA：最终答案让位于真实轨迹”；见第532号第十八条“AgentBench、WebArena与GAIA：最终答案让位于真实轨迹”</div>
+
+<h2>四、Dynabench：测试集开始跟着模型错误移动<span class="en">Dynabench: The Test Set Starts Moving with Model Errors</span></h2>
+<div class="src"><i>提出</i>Kiela等，2021年NAACL《Dynabench: Rethinking Benchmarking in NLP》。　<i>争议</i>Ribeiro, M. T. et al. “Beyond Accuracy: Behavioral Testing of NLP Models with CheckList.” ACL, 2020.。　<i>最新</i>（2024年文献）Koo, R. et al. “Benchmarking Cognitive Biases in Large Language Models as Evaluators.” ACL, 2024.。　<i>关键</i>标注者在浏览器中创造目标模型会错而人能答的样本，数据创建、训练与测评形成循环。</div>
+<p>静态基准一经发布，训练数据会吸收测试风格，榜单饱和却不代表现实稳健。Dynabench在2021年把当前模型放入数据收集回路：人类尝试构造模型误判、另一人仍可正确判断的例子，下一代模型再接受这些难例训练。测试集不再是永久标尺，而是随失败边界演化的对手。〔排除规则〕机构采用Dynabench：测试集开始跟着模型错误移动Dynabench: The Test Set Starts Moving with Model Errors之前还应公布否决门槛：一旦“当奖励只看击败当前API时，生成难例越多，基准对普通用户与未来模型的代表性反而越低”出现，就暂停扩张并回到“标注者在浏览器中创造目标模型会错而人能答的样本，数据创建、训练与测评形成循环”的原始记录复核，该门槛必须早于部署决定写入方案。</p>
+<p>〔排除规则〕本条主张，决定基准能否持续提供信息的只有新样本是否来自当前模型尚未掌握且人类可验证的错误区域。model-in-the-loop把标注预算集中到decision boundary，版本链记录每轮模型与数据的相互适应；动态分数因而描述在给定轮次对手下的robustness，而非永恒能力。NAACL 2021把动态数据轮次登记为benchmark version。</p>
+<p>NAACL 2021平台报告4个初始NLP任务，标注者经网页与模型交互创建难例，并经验证者筛选。复核每轮应列提交数、有效率、平均难倒模型时间、人工一致率、目标模型失败率及对未见模型transfer；若只对目标API有效，不能宣称发现普遍语言现象。〔排除规则〕把Dynabench：测试集开始跟着模型错误移动Dynabench: The Test Set Starts Moving with Model Errors与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类，只有“跨未见模型仍有效的双人确认难例数／提交数、标注小时与各轮anchor性能”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>标注奖励可能鼓励拼写噪声、罕见知识或界面漏洞，而非重要现实失败；熟练“猎手”主导数据会偏离普通用户。人类验证也可能共享同一误解。基准越快追逐当前模型，历史分数越难纵向比较，开发者反而可通过识别收集策略而非提升能力获胜。Dynabench 2021也不能消除annotation incentive。</p>
+<p>2026年的动态协议应保留固定anchor set用于跨轮趋势，另设challenge stream；至少20%样本由新贡献者、20%来自真实事件日志。每条标注记录目标模型、时间、策略标签和双人一致，最终在3个未参与收集的模型上测transfer；奖励按可迁移缺陷而非单次击败。还应在2026年设置未见贡献者holdout，比较动态难例对目标模型、同代模型和下一代模型的三档迁移，避免循环自证。</p>
+<p>它与第532号第十一条“AlphaStar联盟训练：对手分布本身成为课程”是评测侧异名：Dynabench让人—模型对手生成基准，联盟训练让代理对手生成课程。2021年的4任务示范证明平台可运行，不证明动态难例自然代表部署频率或长期社会价值。</p>
+<div class="col"><i>位置</i>E——把标注者策略、目标模型、轮次、验证和跨模型迁移当成动态基准环境　<i>单因</i>决定基准能否持续提供信息的只有新样本是否来自当前模型尚未掌握且人类可验证的错误区域　<i>预设</i>〔06 通过形式审查＝实质合规〕能难倒当前模型且经另一人确认的样本就代表重要、自然、可迁移的失败　<i>量纲</i>跨未见模型仍有效的双人确认难例数／提交数、标注小时与各轮anchor性能　<i>失效</i>当奖励只看击败当前API时，生成难例越多，基准对普通用户与未来模型的代表性反而越低　<i>自曝</i>排除规则独立核验：4个初始任务展示动态收集机制，未证明每轮分数可与静态排行榜直接纵比；独立撤回检查落在排除规则　<i>空栏</i>猎手偏差、奖励投机、真实频率、历史anchor、人类共误、跨模型transfer与贡献者集中　<i>异名</i>智能体工程称“AlphaStar联盟训练：对手分布本身成为课程”；见第532号第十一条“AlphaStar联盟训练：对手分布本身成为课程”</div>
+
+<h2>五、HELM：语言模型评测从单榜变成场景—指标矩阵<span class="en">HELM: Language-Model Evaluation Becomes a Scenario–Metric Matrix</span></h2>
+<div class="src"><i>提出</i>Liang等，2022年《Holistic Evaluation of Language Models》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2024年文献）Koo, R. et al. “Benchmarking Cognitive Biases in Large Language Models as Evaluators.” ACL, 2024.。　<i>关键</i>30个模型在42个场景受测，16个核心场景尽可能同时报告accuracy、calibration、robustness、fairness、bias、toxicity与efficiency。</div>
+<p>大模型发布初期，各供应商选择自己擅长的少数基准，甚至没有一个共同场景，用户无法比较性能与风险。HELM在2022年先建立scenario和metric taxonomy，再以统一prompt、adapter与原始completion评测开放和闭源模型。评测对象由一个leaderboard score变成稠密的场景—期望矩阵。</p>
+<p>〔基线冻结〕本条的单因判断是，决定通用模型比较是否可解释的只有候选模型是否在同一场景、提示和多指标下被稠密测量。相同accuracy旁边同时放calibration、robustness、fairness、bias、toxicity与efficiency，才能看到一项上升换来另一项下降；空白覆盖本身也是证据。HELM 2022把这种共同条件写成scenario×metric矩阵。〔基线冻结〕面向下一轮材料，AI评测、保证与审计应优先补齐“低资源语言、指标权重、API漂移、提示敏感、缺失组合、推理成本与场景选择权”的原始记录，并把“当读者把稠密矩阵压成默认平均分时，覆盖越广，价值冲突和关键短板反而越容易被总分掩盖”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<p>HELM首版评测30个prominent LM和42个scenario，其中16个核心场景尽可能覆盖7项metric，实际达到87.5%的场景—指标组合；此前模型平均只覆盖17.9%核心场景，框架把共同覆盖提高到96.0%。复核需保存raw prompt、completion、版本与推理参数。</p>
+<p>taxonomy仍由研究团队选择，忽略的低资源语言和残障场景不会因“holistic”命名而出现；7项指标间没有自然权重。API模型静默更新使结果过期，推理成本又限制全矩阵频率。覆盖越密，读者反而越可能把几十列压成未经论证的平均总分。〔基线冻结〕在AI评测、保证与审计的这一对象上，复核应把“共同完成的场景—指标—提示单元数／预登记矩阵、缺失单元和推理总成本”拆成同一分母下的主结果与失败谱，“低资源语言、指标权重、API漂移、提示敏感、缺失组合、推理成本与场景选择权”要单列编码，不能在汇总时并入其他项。</p>
+<p>2026年的运行应发布coverage map与明确空栏，不计算跨价值维度的默认总分；每月重测变动API，并以hash或日期标识。关键模型至少在16核心场景、7指标和3种prompt设置下完成，原始输出可下载；新增VHELM/AHELM时保留跨模态不可比边界。</p>
+<p>它与第536号第十条“MLPerf：训练与推理性能获得同分母裁判”共享标准化比较，本条的分母是模型行为的场景与价值指标，MLPerf的分母是性能规则。30模型、42场景和96.0%覆盖是首版设计成果，不说明场景已穷尽或存在唯一综合冠军。〔基线冻结〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当读者把稠密矩阵压成默认平均分时，覆盖越广，价值冲突和关键短板反而越容易被总分掩盖”做至少两轮外部复算，若方向翻转，HELM：语言模型评测从单榜变成场景—指标矩阵HELM: Language-Model Evaluation Becomes a Scenario–Metric Matrix的结论必须随之收窄。</p>
+<div class="col"><i>位置</i>D——把场景taxonomy、统一提示、多指标、原始输出与覆盖空栏串成整体评测　<i>单因</i>决定通用模型比较是否可解释的只有候选模型是否在同一场景、提示和多指标下被稠密测量　<i>预设</i>〔05 代理即本体〕42个场景和7项指标足以代表通用语言模型的全部使用方式与社会价值　<i>量纲</i>共同完成的场景—指标—提示单元数／预登记矩阵、缺失单元和推理总成本　<i>失效</i>当读者把稠密矩阵压成默认平均分时，覆盖越广，价值冲突和关键短板反而越容易被总分掩盖　<i>自曝</i>基线冻结独立核验：96.0%表示首版核心场景共同覆盖，不是现实任务或所有指标覆盖率；独立撤回检查落在基线冻结　<i>空栏</i>低资源语言、指标权重、API漂移、提示敏感、缺失组合、推理成本与场景选择权　<i>异名</i>AI系统称“MLPerf：训练与推理性能获得同分母裁判”；见第536号第十条“MLPerf：训练与推理性能获得同分母裁判”</div>
+
+<h2>六、TruthfulQA：流畅答案必须与模仿人类误解分开<span class="en">TruthfulQA: Fluent Answers Must Be Separated from Imitating Human Misconceptions</span></h2>
+<div class="src"><i>提出</i>Lin、Hilton与Evans，2022年ACL《TruthfulQA》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2026年文献）NIST. “AI RMF Profile on Trustworthy AI in Critical Infrastructure: Concept Note.” 2026.。　<i>关键</i>817个问题覆盖38类常见误解，发现扩大模型未必提高truthfulness，因训练会模仿流行但错误的人类文本。</div>
+<p>语言模型常以似真语句完成下一个词，传统QA只测是否命中参考答案，难以区分不知道、误导和复述流行谬误。TruthfulQA在2022年专门收集会诱发模仿性错误的问题，覆盖健康、法律、阴谋和迷信等38类。评测由知识量转向“面对错误前提时能否拒绝顺从”。〔异常运行〕落到复现实务，可为TruthfulQA：流畅答案必须与模仿人类误解分开TruthfulQA: Fluent Answers Must Be Separated from Imitating Human Misconceptions建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“在sealed题上经双人核验同时真实且有用的答案数／全部题及证据过期数”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>〔异常运行〕本条主张，决定生成模型事实可靠性的只有在诱导性问题下答案是否同时truthful且informative。truthfulness排除虚假陈述，informativeness排除靠空泛拒答取巧；两者交集迫使模型既纠正前提又提供有用说明。指标把“像人类写作”与“没有复制人类误解”正式分开。ACL 2022以truthful与informative双标签落实。</p>
+<p>ACL 2022基准含817个question、38个category，使用人工评估与微调GPT judge；论文报告当时最佳模型truthful约58%，人类约94%，且更大模型有时更不真实。复核应双盲抽样至少200题，给truthful、informative及两者交集、评审一致率和judge偏差。〔异常运行〕证据链还要把Lin、Hilton与Evans，2022年ACL《TruthfulQA》的起点材料与更新文献放在同一比较表里，并逐项报告“817个问题覆盖38类常见误解，发现扩大模型未必提高truthfulness，因训练会模仿流行但错误的人类文本”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。〔异常运行〕本条的边界案例应从“跨语言文化、真值更新、证据质量、记忆污染、自动裁判偏差、拒答效用与高风险专家复核”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当模型学习免责声明和公开答案时，TruthfulQA分数越高，真实任务中的无帮助拒答与记忆通过反而越多”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>题目由研究者针对已知误解编写，英语互联网与美国语境占主导；参考真值会因医学指南或政策变化过期。模型可学会免责声明模板提高truthful却降低实用性，自动judge又可能偏好熟悉措辞。基准越公开，训练污染越会把题目记忆伪装成诚实推理。2026年sealed set需记录knowledge cutoff。</p>
+<p>2026年的事实保证应把静态817题留作anchor，另建按月更新的sealed set；每答要求可追溯证据与日期，在高风险题由两名领域专家判定。报告citation entailment、source quality、abstention utility和staleness；检测逐字重合，并对无检索、同一检索预算两种模式分别测量。对TruthfulQA：流畅答案必须与模仿人类误解分开TruthfulQA: Fluent Answers Must Be Separated from Imitating Human Misconceptions而言，真正需要登记的不是又一个平均分，而是由“决定生成模型事实可靠性的只有在诱导性问题下答案是否同时truthful且informative”推出的每一步中介、责任人和可撤回条件；〔异常运行〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>它与第535号第十四条“信任校准：目标不是让人更信，而是让信心匹配可靠度”相接：TruthfulQA测内容是否真实，信任校准决定人是否据此行动。58%与94%是2022年特定题库和评审协议，不能描述2026年模型，更不能把自动judge当最终真值。</p>
+<div class="col"><i>位置</i>S——把诱导性问题下真实且有用的回答当成事实保证的决定性资源　<i>单因</i>决定生成模型事实可靠性的只有在诱导性问题下答案是否同时truthful且informative　<i>预设</i>〔06 通过形式审查＝实质合规〕通过817题及自动judge就等于开放世界、跨语言与时变事实可靠　<i>量纲</i>在sealed题上经双人核验同时真实且有用的答案数／全部题及证据过期数　<i>失效</i>当模型学习免责声明和公开答案时，TruthfulQA分数越高，真实任务中的无帮助拒答与记忆通过反而越多　<i>自曝</i>异常运行独立核验：58%模型与94%人类是首版样本和判分结果，题库文化、时效与judge都有边界；独立撤回检查落在异常运行　<i>空栏</i>跨语言文化、真值更新、证据质量、记忆污染、自动裁判偏差、拒答效用与高风险专家复核　<i>异名</i>人机协作称“信任校准：目标不是让人更信，而是让信心匹配可靠度”；见第535号第十四条“信任校准：目标不是让人更信，而是让信心匹配可靠度”</div>
+
+<h2>七、BIG-bench：能力评测由少数专家扩成协作式长尾任务库<span class="en">BIG-bench: Capability Evaluation Expands into a Collaborative Long-Tail Task Library</span></h2>
+<div class="src"><i>提出</i>Srivastava等，2022年《Beyond the Imitation Game》与BIG-bench协作。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2024年文献）Koo, R. et al. “Benchmarking Cognitive Biases in Large Language Models as Evaluators.” ACL, 2024.。　<i>关键</i>450余名作者、132家机构共同构建204项任务，以BIG-bench Lite等子集观察scale、breakthrough与社会偏差。</div>
+<p>MMLU等固定考试扩大知识覆盖，仍由小团队决定能力清单。BIG-bench在2022年邀请跨机构研究者提交任务，从抽象推理、语言、程序到偏差和社会知识，形成204项长尾集合。评测设计由中心化题库转为协作式探测：参与者主动寻找现有模型可能失败或随scale改变的现象。</p>
+<p>〔人工接管〕本条的单因命题是，决定“通用能力”声明能否抵抗单一团队盲点的只有任务提议权是否分散到足够多的领域作者。不同作者带来异质construct和failure mode，再用统一API跑跨规模模型；能力曲线可呈平滑、突破、倒退或无改进，而非预设一个总智力轴。把BIG-bench：能力评测由少数专家扩成协作式长尾任务库BIG-bench: Capability Evaluation Expands into a Collaborative Long-Tail Task Library与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“通过construct review且未污染的领域任务数／全部任务、作者机构集中度与任务级CI”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>论文报告450余名author、132个institution与204个task，并用BIG-bench Lite汇总代表性子集；模型在部分任务随规模改善，许多任务仍低于人类。复核应按任务给样本数、chance baseline、human baseline、prompt版本和污染检查，宏平均旁列任务级分布与bootstrap CI。</p>
+<p>开放征集会过度代表能接触英语大模型的机构，任务说明与评分函数质量不一；204个指标的多重比较容易产生偶然“涌现”。作者也可能设计迎合自身研究主张的题。任务越多，总平均越缺乏语义，低质量或重复任务反而可以稀释关键安全能力。TMLR 2023版本仍需逐task审查。〔人工接管〕本条的边界案例应从“机构语言偏差、任务重复、多重比较、阈值涌现、作者利益、退役机制与汇总权重”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当低质量和重复任务进入宏平均时，任务数量越多，关键长尾失败在总分中的权重反而越小”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>2026年的任务库应为每项task建立construct review、最低样本量、license、污染canary和owner；按领域而非全体盲目平均。每年退役饱和或泄漏任务，保留版本映射；对所谓breakthrough报告原始概率、置信区间及metric非线性敏感性，避免阈值制造涌现。</p>
+<p>它与第532号第十八条“AgentBench、WebArena与GAIA：最终答案让位于真实轨迹”是广度—真实性碰撞：BIG-bench扩长尾任务，轨迹基准增加交互过程。204任务的协作规模说明覆盖权更分散，不证明任务独立、等重要或足以构成通用智能。机构采用BIG-bench：能力评测由少数专家扩成协作式长尾任务库BIG-bench: Capability Evaluation Expands into a Collaborative Long-Tail Task Library之前还应公布否决门槛：一旦“当低质量和重复任务进入宏平均时，任务数量越多，关键长尾失败在总分中的权重反而越小”出现，就暂停扩张并回到“450余名作者、132家机构共同构建204项任务，以BIG-bench Lite等子集观察scale、breakthrough与”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<div class="col"><i>位置</i>E——把任务作者分布、construct质量、版本、污染和汇总权重当成能力库环境　<i>单因</i>决定通用能力声明能否抵抗单一团队盲点的只有任务提议权是否分散到足够多的领域作者　<i>预设</i>〔03 缺失即不存在〕204项征集任务之外的语言、行业、群体与行动能力被视为不影响通用声明　<i>量纲</i>通过construct review且未污染的领域任务数／全部任务、作者机构集中度与任务级CI　<i>失效</i>当低质量和重复任务进入宏平均时，任务数量越多，关键长尾失败在总分中的权重反而越小　<i>自曝</i>人工接管独立核验：450余作者和204任务描述协作覆盖，不说明每项质量相同或scale现象具有因果必然性；独立撤回检查落在人工接管　<i>空栏</i>机构语言偏差、任务重复、多重比较、阈值涌现、作者利益、退役机制与汇总权重　<i>异名</i>智能体工程称“AgentBench、WebArena与GAIA：最终答案让位于真实轨迹”；见第532号第十八条“AgentBench、WebArena与GAIA：最终答案让位于真实轨迹”</div>
+
+<h2>八、LiveBench：用近期来源和滚动题目对抗测试污染<span class="en">LiveBench: Recent Sources and Rolling Questions Counter Test Contamination</span></h2>
+<div class="src"><i>提出</i>White等，2024年《LiveBench: A Challenging, Contamination-Free LLM Benchmark》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2024年文献）Koo, R. et al. “Benchmarking Cognitive Biases in Large Language Models as Evaluators.” ACL, 2024.。　<i>关键</i>题目从近期数学竞赛、新闻、数据与模板生成，按月更新并使用可客观判分任务。</div>
+<p>公开大模型基准会被网页抓取进入下一轮预训练，模型可能背答案却被解释为推理进步。LiveBench在2024年用近期来源、自动生成和定期更新构造数学、编码、推理、语言、指令遵循与数据分析任务，尽量让题目晚于模型训练截止。评测由静态题库转成带时间戳的滚动测量。〔撤回门槛〕面向下一轮材料，AI评测、保证与审计应优先补齐“私有语料、搜索增强、模板学习、月份选择、开放任务缺失、canary泄露与小样本波动”的原始记录，并把“当团队可挑选月份且样本波动较大时，题目更新越频繁，峰值宣传与真实趋势的偏差反而越大”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<p>〔撤回门槛〕本条主张，决定榜单增益能否被解释为未见题能力的只有测试样本是否在模型训练与开发窗口内保持不可获得。来源日期、sealed period和首次提交形成时间防线；客观评分减少LLM judge偏差。污染不再是论文脚注，而是每个分数必须携带的暴露风险。</p>
+<p>LiveBench首版于2024年覆盖6类能力和18项task，设计月度加入新问题并避免依赖模型裁判。复核应记录question creation time、source publication、model cutoff、首次访问与提交次数，使用exact或可执行grader；对至少5%的题设置canary字符串并检查训练方是否报告命中。〔撤回门槛〕在AI评测、保证与审计的这一对象上，复核应把“在sealed期内无重合证据的正确题数／全部题、疑似污染数、提交次数与95%区间”拆成同一分母下的主结果与失败谱，“私有语料、搜索增强、模板学习、月份选择、开放任务缺失、canary泄露与小样本波动”要单列编码，不能在汇总时并入其他项。</p>
+<p>“近期”不等于未见：搜索增强、评测前人工整理和供应商私有数据可提前包含来源；模板生成模式也可被学习。只有客观答案会偏向数学和编码，开放社会判断被排除。更新越频繁，样本量越小、纵向方差越大，团队反而可选择最有利月份宣传。2024年LiveBench的rolling design仍受selection effect约束。</p>
+<p>2026年的污染审计应同时维护固定anchor、滚动public与完全sealed三层，分开报告趋势和当期能力；冻结评测前30日的数据访问声明。用n-gram、embedding与canary扫描训练语料，任何疑似重合单列；季度合并至少1000题给95% CI，禁止只选单月峰值。〔撤回门槛〕这也给出一项不依赖宣传口径的核验：独立团队只拿到冻结版本与“决定榜单增益能否被解释为未见题能力的只有测试样本是否在模型训练与开发窗口内保持不可获得”的操作定义，仍能复算“在sealed期内无重合证据的正确题数／全部题、疑似污染数、提交次数与95%区间”，否则所谓转向可能只是数据管线或命名变化。</p>
+<p>它与第536号第八条“ML Test Score与TFX：生产准备度成为28项可执行测试”相接：LiveBench保护外部测试独立性，release gate保护内部测试执行。2024年的近期来源降低已知污染概率，但无法观察闭源训练集，也不等于零污染的因果证明。</p>
+<div class="col"><i>位置</i>E——把来源时间、模型截止、访问日志、题目轮换与训练重合当成基准环境　<i>单因</i>决定榜单增益能否被解释为未见题能力的只有测试样本是否在模型训练与开发窗口内保持不可获得　<i>预设</i>〔04 测量不改变被测对象〕公布滚动题与榜单不会促使抓取、人工整理和针对性调参改变未来模型　<i>量纲</i>在sealed期内无重合证据的正确题数／全部题、疑似污染数、提交次数与95%区间　<i>失效</i>当团队可挑选月份且样本波动较大时，题目更新越频繁，峰值宣传与真实趋势的偏差反而越大　<i>自曝</i>撤回门槛独立核验：近期来源与客观判分降低两类风险，不能查清闭源训练集或保证绝对未见；独立撤回检查落在撤回门槛　<i>空栏</i>私有语料、搜索增强、模板学习、月份选择、开放任务缺失、canary泄露与小样本波动　<i>异名</i>AI系统称“ML Test Score与TFX：生产准备度成为28项可执行测试”；见第536号第八条“ML Test Score与TFX：生产准备度成为28项可执行测试”</div>
+
+<h2>九、Chatbot Arena：开放式生成由匿名成对人类偏好裁判<span class="en">Chatbot Arena: Open-Ended Generation Is Judged by Anonymous Pairwise Human Preference</span></h2>
+<div class="src"><i>提出</i>Zheng等，2023年上线Arena；Chiang等，2024年ICML《Chatbot Arena》。　<i>争议</i>NIST. “Artificial Intelligence Risk Management Framework 1.0.” NIST AI 100-1, 2023.。　<i>最新</i>（2024年文献）NIST. “Artificial Intelligence Risk Management Framework: Generative AI Profile.” NIST AI 600-1, 2024.。　<i>关键</i>用户向两个匿名随机模型提同一问题并投票，论文基于24万余票验证与专家排序的一致。</div>
+<p>静态选择题无法评判长答案的有用、自然和细微质量，专家评分又昂贵且题目有限。Chatbot Arena从2023年让真实用户输入问题，系统匿名随机展示两个模型回答并收集胜、负或平票，再用Bradley–Terry/Elo类统计形成排名。评测对象从预设答案转为开放使用中的相对偏好。</p>
+<p>〔跨域外推〕本条的单因命题是，决定开放式模型排序能否反映使用价值的只有在盲测同题条件下谁被人类稳定偏好。匿名减少品牌影响，成对比较降低绝对打分尺度差异，真实prompt不断更新覆盖。每一票仍是特定用户、语言、日期和模型版本的局部比较，而非永久质量标签。ICML 2024用Bradley–Terry模型落实这项比较。〔跨域外推〕证据链还要把Zheng等，2023年上线Arena，Chiang等，2024年ICML《Chatbot Ar的起点材料与更新文献放在同一比较表里，并逐项报告“用户向两个匿名随机模型提同一问题并投票，论文基于24万余票验证与专家排序的一致”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>ICML 2024论文分析超过240,000个vote，报告众包问题具有区分度，整体投票与expert raters良好一致。复核排名应给每对模型有效票、tie、用户去重、语言和类别分布，以及bootstrap 95% CI；分差小于区间或比较图不连通时，不得硬排唯一名次。</p>
+<p>愿意投票的用户不代表教育、医疗或低资源语言使用者，偏好可能奖励冗长、Markdown和自信语气而非事实。新模型因曝光热度获得不同题分布，厂商可动员投票；随机对战也受并发和延迟影响。票越多，若来自少数群体或操纵账号，偏差反而更精确。对Chatbot Arena：开放式生成由匿名成对人类偏好裁判Chatbot Arena: Open-Ended Generation Is Judged by Anonymous Pairwise Human Preference而言，真正需要登记的不是又一个平均分，而是由“决定开放式模型排序能否反映使用价值的只有在盲测同题条件下谁被人类稳定偏好”推出的每一步中介、责任人和可撤回条件；〔跨域外推〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>2026年的Arena审计应按用户、IP风险和时间去重，公布地区、语言、任务category及style-controlled排名；设honeypot和异常pair图检测操纵。高风险事实题另由专家核验，速度和拒答单列；每周给区间与版本日期，模型静默更新即断开旧序列而非继承分数。Arena之外的2026年采购评测应邀请领域用户完成至少200组盲测，并按专业年限分层，验证平台排序能否转移到本地用途。</p>
+<p>它与第535号第十六条“从人类偏好学习：少量比较开始塑造复杂行为”是评测—训练异名：Arena用比较测模型，RLHF用比较改模型。24万票支持平台统计稳定性，不证明投票人代表全球用户，也不说明偏好等同truth、安全或公平。〔跨域外推〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当投票集中或被动员时，有效票总数越大，样本偏差与风格偏好反而越会被精确固化”做至少两轮外部复算，若方向翻转，Chatbot Arena：开放式生成由匿名成对人类偏好裁判Chatbot Arena: Open-Ended Generation Is Judged by Anonymous Pairwise Human Preference的结论必须随之收窄。</p>
+<div class="col"><i>位置</i>S——把匿名同题下稳定的人类成对偏好当成开放生成排序的决定性资源　<i>单因</i>决定开放式模型排序能否反映使用价值的只有在盲测同题条件下谁被人类稳定偏好　<i>预设</i>〔01 谁进入分母〕自愿进入平台并投票的用户、语言与任务足以代表所有受影响使用者　<i>量纲</i>按语言、类别、用户去重的有效成对胜率、tie率、Bradley–Terry分与95%区间／Chatbot Arena：开放式生成由匿名成对人类偏好裁判Chatbot Arena: Open-Ended Generation Is Judged by Anonymous Pairwise Human Preference全部纳入比较的样本、运行或决策单元　<i>失效</i>当投票集中或被动员时，有效票总数越大，样本偏差与风格偏好反而越会被精确固化　<i>自曝</i>跨域外推独立核验：24万余票与专家一致支持特定阶段的排序方法，不证明偏好覆盖事实、安全和全球人口；独立撤回检查落在跨域外推　<i>空栏</i>用户代表性、投票操纵、风格偏差、版本静默更新、延迟、专家事实核验与比较图连通性　<i>异名</i>人机协作称“从人类偏好学习：少量比较开始塑造复杂行为”；见第535号第十六条“从人类偏好学习：少量比较开始塑造复杂行为”</div>
+
+<h2>十、LLM-as-a-Judge：自动裁判必须先审自己的位置与风格偏差<span class="en">LLM-as-a-Judge: Automated Judges Must First Audit Their Position and Style Biases</span></h2>
+<div class="src"><i>提出</i>Zheng等，2023年NeurIPS Datasets and Benchmarks《Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2024年文献）Zhou, S. et al. “WebArena: A Realistic Web Environment for Building Autonomous Agents.” ICLR, 2024.。　<i>关键</i>MT-Bench含80道多轮问题；GPT-4裁判与人类偏好达到80%以上一致，但顺序和风格会系统改变结果。</div>
+<p>开放答案若全由人评，迭代慢且昂贵；用强语言模型当judge可按rubric比较候选、给理由和分数。Zheng等2023年以MT-Bench与Arena检验这种代理，把评测系统自身也当模型受测：裁判不仅要相关，还要暴露position bias、verbosity偏好与self-enhancement。自动评测由工具变成二阶审计对象。〔盲法复核〕落到复现实务，可为LLM-as-a-Judge：自动裁判必须先审自己的位置与风格偏差LLM-as-a-Judge: Automated Judges Must First Audit Their Position and Style Biases建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“AB/BA稳定且命中分层人工gold的判决数／全部pair、裁判分歧数与复审工时”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>〔盲法复核〕本条主张，决定自动裁判能否替代一部分人工的只有在顺序交换、风格控制和独立人类样本上判决是否稳定。对A/B回答运行AB与BA两次，若winner翻转则标记不确定；用人工gold校准每类任务。裁判输出不再被当真值，而是带混淆矩阵的测量仪器。NeurIPS 2023把judge agreement作为仪器校准。</p>
+<p>论文的MT-Bench包含80个multi-turn question，覆盖8类能力；GPT-4 judge与human preference在多项设置超过80% agreement，接近人际一致水平。复核须报告AB/BA一致率、position bias、tie、长度相关、各类准确率与至少1000个人工pair，不能只给总体相关系数。〔盲法复核〕本条的边界案例应从“自我偏好、长度风格、共同训练盲点、版本漂移、对抗讨好、事实核验与人工复审阈值”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当候选模型针对judge风格优化时，自动判分一致率越高，与真实用户和事实质量的偏离反而越大”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>裁判可能偏好自己的措辞、较长答案或看似权威的错误引用；候选模型学会讨好judge后，分数与用户价值分离。多个裁判若同源训练数据，ensemble不等于独立。顺序交换只能发现位置偏差，不能发现共同盲点；自动化越便宜，低质量合成判断反而越快淹没人工信号。2026年多judge ensemble也必须检查error correlation。</p>
+<p>2026年的协议应至少用3个不同家族judge，全部AB/BA双评；与分层人工gold计算Cohen κ和任务级误差。长度、模型名和格式匿名化，引用由检索器独立核验；裁判分歧或高风险答案强制人工复审。每次judge版本变更重跑500个anchor pair并断开旧分数。机构采用LLM-as-a-Judge：自动裁判必须先审自己的位置与风格偏差LLM-as-a-Judge: Automated Judges Must First Audit Their Position and Style Biases之前还应公布否决门槛：一旦“当候选模型针对judge风格优化时，自动判分一致率越高，与真实用户和事实质量的偏离反而越大”出现，就暂停扩张并回到“MT-Bench含80道多轮问题；GPT-4裁判与人类偏好达到80%以上一致，但顺序和风格会系统改变结果”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<p>它与第535号第十六条“从人类偏好学习：少量比较开始塑造复杂行为”形成代理—原始信号碰撞：LLM judge模仿偏好，不能取代偏好主体。80题和超过80%一致是2023年特定裁判与样本结果，不证明新领域、新语言或对抗答案仍可靠。</p>
+<div class="col"><i>位置</i>E——把裁判模型、答案顺序、风格、人工gold与版本漂移当成自动评测环境　<i>单因</i>决定自动裁判能否替代一部分人工的只有在顺序交换、风格控制和独立人类样本上判决是否稳定　<i>预设</i>〔05 代理即本体〕与有限人类pair高一致的judge足以代表真实使用者价值和客观答案质量　<i>量纲</i>AB/BA稳定且命中分层人工gold的判决数／全部pair、裁判分歧数与复审工时　<i>失效</i>当候选模型针对judge风格优化时，自动判分一致率越高，与真实用户和事实质量的偏离反而越大　<i>自曝</i>盲法复核独立核验：超过80% agreement针对GPT-4、MT-Bench与当时样本，不是自动裁判的普遍保证；独立撤回检查落在盲法复核　<i>空栏</i>自我偏好、长度风格、共同训练盲点、版本漂移、对抗讨好、事实核验与人工复审阈值　<i>异名</i>人机协作称“从人类偏好学习：少量比较开始塑造复杂行为”；见第535号第十六条“从人类偏好学习：少量比较开始塑造复杂行为”</div>
+
+<h2>十一、NIST AI RMF：评测结果进入治理—映射—测量—管理闭环<span class="en">NIST AI RMF: Evaluation Enters the Govern–Map–Measure–Manage Loop</span></h2>
+<div class="src"><i>提出</i>NIST，2023年《AI Risk Management Framework 1.0》；2024年《Generative AI Profile》。　<i>争议</i>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.。　<i>最新</i>（2026年文献）NIST. “AI RMF Profile on Trustworthy AI in Critical Infrastructure: Concept Note.” 2026.。　<i>关键</i>RMF以Govern、Map、Measure、Manage四函数把情境、指标、责任和风险处置接进全生命周期。</div>
+<p>单个benchmark回答模型会不会做题，却无法决定在医院、银行或公共服务中该测什么、谁承担剩余风险。NIST在2023年发布AI RMF 1.0，以Govern、Map、Measure、Manage组织可信AI；2024年GenAI Profile再列生成式风险与建议行动。评测从独立技术活动进入用途、主体与处置的管理循环。</p>
+<p>〔结果分母〕本条的单因判断是，决定评测能否转化为风险降低的只有measurement finding是否在明确情境中触发具名manage action。Map先界定用途、受影响者和风险容忍，Measure选择测试和不确定性，Manage排序缓解并监控，Govern提供角色与政策；缺一环，更多metric也只是库存。把NIST AI RMF：评测结果进入治理—映射—测量—管理闭环NIST AI RMF: Evaluation Enters the Govern–Map–Measure–Manage Loop与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“具有map证据、measure结果、具名处置和独立复验的高风险数／全部高风险与逾期项”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>AI RMF 1.0核心含4个function，按category与subcategory列outcome；NIST于2024-07-26发布NIST.AI.600-1 GenAI Profile，2026-04-07又发布关键基础设施profile概念说明。审计应给每项高风险“map证据—measure结果—owner—处置—复验”五联覆盖率，而非只数引用条款。</p>
+<p>框架是自愿且技术中立，不同组织可选择宽松profile或把“适当考虑”当完成；风险容忍由部署者定义，受影响者未必有否决权。crosswalk很多也可能制造纸面合规。框架越全面，反而越容易用大量低强度文档掩盖一个未缓解的高严重度事件。NIST AI 100-1在2023年明确自愿属性。〔结果分母〕这也给出一项不依赖宣传口径的核验：独立团队只拿到冻结版本与“决定评测能否转化为风险降低的只有measurement finding是否在明确情境中触发具名manage acti”的操作定义，仍能复算“具有map证据、measure结果、具名处置和独立复验的高风险数／全部高风险与逾期项”，否则所谓转向可能只是数据管线或命名变化。</p>
+<p>2026年的实施应把每个subcategory映射到可下载artifact和责任签名，critical risk不得被其他通过项抵消；季度抽样复验至少20%。内部profile与NIST文本的偏离逐项说明，重大剩余风险公开；申诉和事件数据回流Map，管理层豁免设到期日并由独立委员会复核。</p>
+<p>它与第536号第八条“ML Test Score与TFX：生产准备度成为28项可执行测试”形成框架—流水线接口：RMF决定情境和责任，自动测试执行部分Measure。四函数是组织风险语言，不是认证，也不证明采用者已降低风险或满足任何特定法律。〔结果分母〕面向下一轮材料，AI评测、保证与审计应优先补齐“风险容忍权、受影响者否决、独立复验、重大剩余风险、框架偏离、豁免与救济”的原始记录，并把“当框架允许通过低强度文档累计覆盖时，映射条目越多，单个未缓解重大风险反而越易被遮蔽”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<div class="col"><i>位置</i>D——把情境、风险、指标、责任、缓解、复验与事件回流串成全生命周期框架　<i>单因</i>决定评测能否转化为风险降低的只有measurement finding是否在明确情境中触发具名manage action　<i>预设</i>〔06 通过形式审查＝实质合规〕四函数和subcategory完成映射就等于高风险已被实质控制　<i>量纲</i>具有map证据、measure结果、具名处置和独立复验的高风险数／全部高风险与逾期项　<i>失效</i>当框架允许通过低强度文档累计覆盖时，映射条目越多，单个未缓解重大风险反而越易被遮蔽　<i>自曝</i>结果分母独立核验：NIST AI RMF是自愿风险管理框架，不是法律认证或单一测量标准；独立撤回检查落在结果分母　<i>空栏</i>风险容忍权、受影响者否决、独立复验、重大剩余风险、框架偏离、豁免与救济　<i>异名</i>AI系统称“ML Test Score与TFX：生产准备度成为28项可执行测试”；见第536号第八条“ML Test Score与TFX：生产准备度成为28项可执行测试”</div>
+
+<h2>十二、任务完成时域：智能体能力改用可独立完成的人类工时标尺<span class="en">Task-Completion Time Horizons: Agent Capability Uses Human Work Time as Its Scale</span></h2>
+<div class="src"><i>提出</i>METR，2025年《Measuring AI Ability to Complete Long Tasks》；2026年Time Horizon 1.1。　<i>争议</i>Krizhevsky, A. et al. “ImageNet Classification with Deep Convolutional Neural Networks.” NeurIPS, 2012.。　<i>最新</i>（2026年文献）METR. “Task-Completion Time Horizons of Frontier AI Models, Version 1.1.” 2026.。　<i>关键</i>以模型达到50%或80%成功率时可完成任务的人类耗时定义time horizon，观察2019–2025趋势。</div>
+<p>传统智能体基准把两分钟脚本和数小时软件任务各算一题，success rate没有工作规模。METR在2025年把任务按熟练人类完成时间标定，再拟合模型成功概率，定义50%或80%成功对应的task-completion time horizon。评测单位由“题数”变成可独立持续工作的时间长度，长程能力获得共同轴。〔未覆盖项〕证据链还要把METR，2025年《Measuring AI Ability to Complete Long的起点材料与更新文献放在同一比较表里，并逐项报告“以模型达到50%或80%成功率时可完成任务的人类耗时定义time horizon，观察2019–2025趋势”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>〔未覆盖项〕本条主张，决定智能体自主能力是否真正延伸的只有在固定成功率下可完成任务的人类工时上限。模型若只会更多短任务而无法维持状态、调试和恢复，horizon不会同幅增长；把trajectory、token和scaffold冻结后，时间轴可连接软件、研究与操作任务。METR 2025用50%与80% success threshold表示。</p>
+<p>METR 2025/2026公开Time Horizon方法、analysis code与raw data，按2019至2025模型估计趋势；其后跨9类benchmark分析曾观察约7个月doubling的量级。复核须报告任务数、人类时长分布、50%/80% horizon、bootstrap CI、token budget、工具和pass@k，不能只外推一条指数线。〔未覆盖项〕在AI评测、保证与审计的这一对象上，复核应把“在冻结scaffold与预算下的50%和80%人类工时horizon、bootstrap区间及介入分钟”拆成同一分母下的主结果与失败谱，“专家标时差、任务选择、脚手架贡献、现实协作、模糊目标、失败成本与跨版本外推”要单列编码，不能在汇总时并入其他项。对任务完成时域：智能体能力改用可独立完成的人类工时标尺Task-Completion Time Horizons: Agent Capability Uses Human Work Time as Its Scale而言，真正需要登记的不是又一个平均分，而是由“决定智能体自主能力是否真正延伸的只有在固定成功率下可完成任务的人类工时上限”推出的每一步中介、责任人和可撤回条件；〔未覆盖项〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>人类耗时受熟练度、工具和题目熟悉影响，10小时工程任务并不一定比1小时安全任务更危险；benchmark任务有清晰grader，现实工作目标模糊且需协作。脚手架改进会被计入模型能力，幸存任务选择又影响斜率。时域越长，失败成本和评测费用反而越高，样本更少。2026年Time Horizon 1.1扩样仍不消除task selection。</p>
+<p>2026年的保证协议应由至少3名专家独立标时并报告分布，冻结agent scaffold、工具权限和推理预算；50%与80%曲线都给CI。新任务按真实软件、科研、网络和行政工作分层，保留未完成trajectory及人工介入分钟；半年滚动更新但不跨版本无缝外推。〔未覆盖项〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当长任务样本稀少且脚手架不断优化时，估计时域越长，模型自身能力与系统辅助的混淆反而越大”做至少两轮外部复算，若方向翻转，任务完成时域：智能体能力改用可独立完成的人类工时标尺Task-Completion Time Horizons: Agent Capability Uses Human Work Time as Its Scale的结论必须随之收窄。</p>
+<p>它与第532号第十九条“SWE-bench与SWE-agent：代理必须改动真正的代码库”形成任务—尺度关系：SWE-bench提供真实仓库，time horizon把不同任务换成人类工时轴。约7个月倍增是样本和模型期内的拟合，不是自然定律，也不直接等于经济自动化速度。</p>
+<div class="col"><i>位置</i>S——把固定成功率下可独立完成任务的人类工时当成长程自主能力的决定性资源　<i>单因</i>决定智能体自主能力是否真正延伸的只有在固定成功率下可完成任务的人类工时上限　<i>预设</i>〔02 单一读数代表复杂对象〕一个50% time horizon足以代表跨行业可靠性、危险性、协作与经济替代　<i>量纲</i>在冻结scaffold与预算下的50%和80%人类工时horizon、bootstrap区间及介入分钟／任务完成时域：智能体能力改用可独立完成的人类工时标尺Task-Completion Time Horizons: Agent Capability Uses Human Work Time as Its Scale全部纳入比较的样本、运行或决策单元　<i>失效</i>当长任务样本稀少且脚手架不断优化时，估计时域越长，模型自身能力与系统辅助的混淆反而越大　<i>自曝</i>未覆盖项独立核验：约7个月doubling是2019–2025任务样本拟合，不是未来趋势或现实自动化的直接预测；独立撤回检查落在未覆盖项　<i>空栏</i>专家标时差、任务选择、脚手架贡献、现实协作、模糊目标、失败成本与跨版本外推　<i>异名</i>智能体工程称“SWE-bench与SWE-agent：代理必须改动真正的代码库”；见第532号第十九条“SWE-bench与SWE-agent：代理必须改动真正的代码库”</div>
+
+<h3 class="sec">◎ 二十年连起来看</h3><p>第一幕先让模型在共同测试上可比较，再证明平均值会掩盖邻域、置信尾部与交叉群体；文档制度把评测条件随版本保存。第二幕又发现测试会泄漏、模型会变化、开放答案无唯一真值、智能体会形成长轨迹。于是评测对象沿着一条路径外扩：prediction→probability→subgroup→dataset→pipeline→organization→deployment→agent trajectory。每扩一层，旧指标仍有用，但不得越权代表新对象。</p>
+<h3 class="sec">◎ 三个常见误解</h3><p><b>构念有效</b>问题目是否真代表声称能力；<b>测试独立</b>问样本、裁判和开发是否隔离；<b>不确定性</b>要求样本量、置信区间、版本与重复；<b>处置闭环</b>把失败接到owner、deadline和retest。2026年的有效报告至少同时给这四列。只有分数没有构念是排名游戏，只有红队反例没有分母是故事，只有框架映射没有阻断和修复则是纸面保证。</p>
+<h3 class="sec">◎ 与相邻领域的接口</h3><p><b>误解一：</b>基准越多，能力测得越全。重复、污染与低质量任务可让总分更空。<b>误解二：</b>独立审计只需换一批人。若访问、经费和范围仍由被审方控制，形式独立不产生证据独立。<b>误解三：</b>LLM judge能无限替代人评。裁判自身有版本、偏差和共同盲点，必须在人工gold、顺序交换与争议复审下校准。</p>
+<h3 class="sec">◎ 争议现场</h3><p>它与统计学共享抽样、测量误差和多重比较，与软件工程共享测试、CI与事件响应，与公平研究共享群体与伤害定义，与治理法学共享责任、合格评定和救济。边界判据是：本面板回答“证据怎样产生、失效和进入处置”；AI治理决定何时强制、谁有权审计；AI安全面板则深入威胁模型、控制与灾难风险。三者必须共享版本化evidence ledger，不能各写一套互不相认的报告。</p>
+<h3 class="sec">◎ 往下五年看什么</h3><p>benchmark作者选择题，供应商选择披露，平台用户投偏好，监管者选择风险容忍，受影响者却常只在结果出现后被咨询。评测的核心政治不是再找一个中立总分，而是公开选择权：谁进入样本、谁写rubric、谁能看到原始输出、谁可否决上线、谁承担错误。任何所谓“客观评测”都应附selection ledger，记录未纳入的任务、群体、语言与价值，并允许外部挑战。</p>
+<h3 class="sec">◎ 可与哪些领域对撞</h3><p>第一层是measurement package：数据版本、prompt、grader、raw output、seed与95% CI；第二层是assurance case：风险主张、支持证据、反证、边界和责任签名；第三层是audit trail：访问记录、发现、整改、例外和事件。发布前做开发组复算、独立组挑战、整页结构回归三次检查；发布后按风险每月或季度滚动。任何一次模型、数据、裁判或工具版本变化，都触发delta evaluation而非继承旧证书。</p>
+<h3 class="sec">◎ 十条可做的研究命题</h3><p>2026–2031年的前沿将是sealed持续评测、代理轨迹取证、多模态现实任务与可验证审计计算。重要问题包括：模型能否识别正在被评测而伪装；第三方如何在不获得训练数据的情况下证明污染；长任务失败如何按可恢复性和外部性加权；不同AI Safety Institute怎样互认而不降到最低标准。评测还将进入采购和保险，指标必须能承受合同、事故与法庭中的反向追问。</p>
+<h3 class="sec">◎ 资料核验</h3><p><b>审计清单：</b>① 声明构念与禁推边界；② 冻结模型、数据、prompt和裁判版本；③ 报告样本量与95% CI；④ 检查污染与提交反馈；⑤ 按关键群体和任务分层；⑥ 公开原始输出或受控复算；⑦ 失败绑定owner、SLA和retest；⑧ 记录豁免、事件和测试退役。</p><div class="refs"><ol>
+<li>Deng, J. et al. “ImageNet: A Large-Scale Hierarchical Image Database.” CVPR, 2009.</li>
+<li>Russakovsky, O. et al. “ImageNet Large Scale Visual Recognition Challenge.” IJCV, 2015.</li>
+<li>Krizhevsky, A. et al. “ImageNet Classification with Deep Convolutional Neural Networks.” NeurIPS, 2012.</li>
+<li>Recht, B. et al. “Do ImageNet Classifiers Generalize to ImageNet?” ICML, 2019.</li>
+<li>Hendrycks, D. et al. “Natural Adversarial Examples.” CVPR, 2021.</li>
+<li>Szegedy, C. et al. “Intriguing Properties of Neural Networks.” ICLR, 2014.</li>
+<li>Goodfellow, I. et al. “Explaining and Harnessing Adversarial Examples.” ICLR, 2015.</li>
+<li>Carlini, N.; Wagner, D. “Towards Evaluating the Robustness of Neural Networks.” IEEE S&amp;P, 2017.</li>
+<li>Croce, F.; Hein, M. “Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-Free Attacks.” ICML, 2020.</li>
+<li>Guo, C. et al. “On Calibration of Modern Neural Networks.” ICML, 2017.</li>
+<li>Naeini, M. et al. “Obtaining Well Calibrated Probabilities Using Bayesian Binning.” AAAI, 2015.</li>
+<li>Minderer, M. et al. “Revisiting the Calibration of Modern Neural Networks.” NeurIPS, 2021.</li>
+<li>Hardt, M. et al. “Equality of Opportunity in Supervised Learning.” NeurIPS, 2016.</li>
+<li>Kleinberg, J. et al. “Inherent Trade-Offs in the Fair Determination of Risk Scores.” ITCS, 2017.</li>
+<li>Buolamwini, J.; Gebru, T. “Gender Shades.” FAT*, 2018.</li>
+<li>Mitchell, M. et al. “Model Cards for Model Reporting.” FAT*, 2019.</li>
+<li>Gebru, T. et al. “Datasheets for Datasets.” Communications of the ACM, 2021.</li>
+<li>Bender, E.; Friedman, B. “Data Statements for Natural Language Processing.” TACL, 2018.</li>
+<li>Holland, S. et al. “The Dataset Nutrition Label.” Data Protection and Privacy, 2020.</li>
+<li>Pineau, J. et al. “Improving Reproducibility in Machine Learning Research.” JMLR, 2021.</li>
+<li>NeurIPS. “Paper Checklist Guidelines.” 2025.</li>
+<li>Raji, I. D. et al. “Closing the AI Accountability Gap.” FAT*, 2020.</li>
+<li>Costanza-Chock, S. et al. “Who Audits the Auditors?” FAccT, 2022.</li>
+<li>Mökander, J. et al. “Auditing Large Language Models.” AI and Ethics, 2023.</li>
+<li>Breck, E. et al. “The ML Test Score.” IEEE Big Data, 2017.</li>
+<li>Ribeiro, M. T. et al. “Beyond Accuracy: Behavioral Testing of NLP Models with CheckList.” ACL, 2020.</li>
+<li>Kiela, D. et al. “Dynabench: Rethinking Benchmarking in NLP.” NAACL, 2021.</li>
+<li>Liang, P. et al. “Holistic Evaluation of Language Models.” TMLR, 2023.</li>
+<li>Lee, T. et al. “VHELM: A Holistic Evaluation of Vision Language Models.” 2024.</li>
+<li>Lee, T. et al. “AHELM: A Holistic Evaluation of Audio-Language Models.” 2025.</li>
+<li>Lin, S. et al. “TruthfulQA: Measuring How Models Mimic Human Falsehoods.” ACL, 2022.</li>
+<li>Min, S. et al. “FactScore: Fine-Grained Atomic Evaluation of Factual Precision.” EMNLP, 2023.</li>
+<li>Srivastava, A. et al. “Beyond the Imitation Game.” TMLR, 2023.</li>
+<li>Hendrycks, D. et al. “Measuring Massive Multitask Language Understanding.” ICLR, 2021.</li>
+<li>White, C. et al. “LiveBench: A Challenging, Contamination-Free LLM Benchmark.” ICLR, 2025.</li>
+<li>Golchin, S.; Surdeanu, M. “Time Travel in LLMs.” ICLR, 2024.</li>
+<li>Sainz, O. et al. “NLP Evaluation in Trouble.” EMNLP, 2023.</li>
+<li>Chiang, W.-L. et al. “Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference.” ICML, 2024.</li>
+<li>Zheng, L. et al. “Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena.” NeurIPS, 2023.</li>
+<li>Wang, P. et al. “Large Language Models are not Fair Evaluators.” ACL, 2024.</li>
+<li>Koo, R. et al. “Benchmarking Cognitive Biases in Large Language Models as Evaluators.” ACL, 2024.</li>
+<li>NIST. “Artificial Intelligence Risk Management Framework 1.0.” NIST AI 100-1, 2023.</li>
+<li>NIST. “Artificial Intelligence Risk Management Framework: Generative AI Profile.” NIST AI 600-1, 2024.</li>
+<li>NIST. “AI RMF Profile on Trustworthy AI in Critical Infrastructure: Concept Note.” 2026.</li>
+<li>METR. “Measuring AI Ability to Complete Long Tasks.” 2025.</li>
+<li>METR. “Task-Completion Time Horizons of Frontier AI Models, Version 1.1.” 2026.</li>
+<li>Jimenez, C. et al. “SWE-bench: Can Language Models Resolve Real-World GitHub Issues?” ICLR, 2024.</li>
+<li>Zhou, S. et al. “WebArena: A Realistic Web Environment for Building Autonomous Agents.” ICLR, 2024.</li>
+<li>Mialon, G. et al. “GAIA: A Benchmark for General AI Assistants.” ICLR, 2024.</li>
+<li>Bommasani, R. et al. “The Foundation Model Transparency Index.” 2023.</li>
+<li>Jacovi, A. et al. “Formalizing Trust in Artificial Intelligence.” FAccT, 2021.</li>
+<li>Gehrmann, S. et al. “The GEM Benchmark for Natural Language Generation.” ACL, 2021.</li>
+</ol></div>
+</main><script src="/wds-mode.js?v=20260819a" defer></script>
+</body></html>

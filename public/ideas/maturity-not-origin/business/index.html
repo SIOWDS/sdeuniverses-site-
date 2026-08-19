@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>组织能力的成熟度诊断与培育：别给新业务套成熟业务的规矩 · 商业应用 | SDE Universes</title>
+<meta name="description" content="成熟公司孵化新业务，常把管成熟业务那套规矩（KPI、流程、盈利考核）套到新业务上，结果把它管死了。因为成熟业务和新业务处在不同的成熟度，需要不同的管法。本文给出「先诊断组织成熟度、再决定扶生长还是收秩序」的方法：原初/成长态给自由容试错，成熟态上规范提效率。别给幼苗套大树的支架。">
+<meta property="og:title" content="组织成熟度诊断：别给新业务套成熟规矩"><meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.loli.net"><link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
+<link href="https://fonts.loli.net/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Noto+Serif+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+ --paper:#F4F1E8; --paper2:#FBF9F3; --ink:#22222A; --ink2:#3A3A44;
+ --bronze:#8A6A1E; --bronze2:#B0892F; --bronzeSoft:#EFE7D2;
+ --edu:#33608F; --edu-bg:#EAF0F6; --hea:#2E7D54; --hea-bg:#E7F1EA; --biz:#A0651F; --biz-bg:#F4ECDF;
+ --muted:#857A66; --line:rgba(60,48,24,0.15); --line2:rgba(60,48,24,0.09);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:2.02;font-size:17.5px;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.w{max-width:800px;margin:0 auto;padding:0 26px}
+nav{position:sticky;top:0;background:rgba(244,241,232,0.92);backdrop-filter:blur(9px);border-bottom:1px solid var(--line);z-index:20}
+nav .wn{max-width:1120px;margin:0 auto;padding:0 26px;display:flex;align-items:center;justify-content:space-between;height:58px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--ink)}
+.nav-back{font-size:13.5px;color:var(--muted);letter-spacing:0.03em}.nav-back:hover{color:var(--bronze)}
+
+header.art{padding:80px 0 52px;border-bottom:1px solid var(--line);position:relative}
+.art-kicker{display:flex;align-items:center;gap:12px;margin-bottom:26px;font-size:12px;letter-spacing:0.32em;color:var(--bronze);font-weight:600}
+.art-kicker .no{font-family:"Playfair Display",serif;font-size:15px;letter-spacing:0.05em}
+.art-kicker .cl{color:var(--muted);letter-spacing:0.24em}
+.art-title{font-family:"Noto Serif SC",serif;font-size:clamp(30px,5.4vw,50px);font-weight:900;line-height:1.28;letter-spacing:0.005em;color:var(--ink)}
+.art-sub{margin-top:20px;font-size:clamp(16px,2.2vw,19px);line-height:1.75;color:var(--ink2);max-width:660px;font-weight:400}
+.art-meta{margin-top:30px;font-size:12.5px;color:var(--muted);letter-spacing:0.1em;font-family:"Playfair Display",serif}
+.art-meta .zh{font-family:"Noto Serif SC",serif;letter-spacing:0.06em}
+
+.body{padding:50px 0 20px}
+.deck{padding:22px 28px;background:var(--paper2);border-left:3px solid var(--bronze2);border-radius:0 10px 10px 0;color:var(--ink2);font-size:16px;line-height:1.95;margin-bottom:34px}
+.motif{margin:0 0 42px;padding:26px 30px;background:linear-gradient(150deg,#F2EAD6,#FBF9F3);border:1px solid var(--line);border-radius:12px;position:relative}
+.motif .ml{font-size:11px;letter-spacing:0.42em;color:var(--bronze);margin-bottom:13px;font-weight:600}
+.motif p{font-size:17px;line-height:1.92;color:var(--ink2)}.motif b{color:var(--ink);font-weight:700}
+.toc{background:var(--paper2);border:1px solid var(--line2);border-radius:12px;padding:22px 30px;margin-bottom:50px}
+.toc .tl{font-size:11.5px;letter-spacing:0.42em;color:var(--bronze);margin-bottom:15px;font-weight:600}
+.toc a{display:block;padding:6px 0;color:var(--ink2);font-size:15px;border-bottom:1px dashed var(--line2)}.toc a:last-child{border-bottom:none}
+.toc a:hover{color:var(--bronze)}.toc .tn{font-family:"Playfair Display",serif;color:var(--bronze2);margin-right:12px}
+
+article h2{font-family:"Noto Serif SC",serif;font-size:24px;font-weight:700;margin:56px 0 22px;padding-top:20px;letter-spacing:0.01em;color:var(--ink);border-top:2px solid var(--ink)}
+article h2 .hn{font-family:"Playfair Display",serif;font-weight:500;color:var(--bronze2);font-size:20px;margin-right:14px}
+article h3{font-size:18px;font-weight:700;margin:36px 0 14px;color:var(--bronze);letter-spacing:0.01em}
+article p{margin:0 0 21px;text-align:justify}
+article strong,article b{color:var(--ink);font-weight:700}
+article em{font-style:normal;background:linear-gradient(transparent 62%,var(--bronzeSoft) 62%);padding:0 2px}
+article ul{margin:0 0 22px;padding-left:0;list-style:none}
+article li{position:relative;margin:0 0 13px;padding:14px 20px 14px 22px;background:var(--paper2);border-left:3px solid var(--bronze2);border-radius:0 7px 7px 0;font-size:15.5px;line-height:1.9;color:var(--ink2)}
+article li strong{color:var(--ink)}
+article blockquote{margin:30px 0;padding:24px 30px;background:#26262C;color:#EDE7D6;border-radius:12px;font-size:18px;line-height:1.85;font-weight:500;letter-spacing:0.01em}
+article blockquote b{color:var(--bronze2)}
+.pull{margin:34px 0;padding-left:24px;border-left:4px solid var(--bronze2);font-size:20px;line-height:1.7;color:var(--ink);font-weight:700}
+.src{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--line);margin-top:46px;padding-top:22px;line-height:1.8}.src b{color:var(--ink2)}
+
+/* 三向应用区（本栏签名） */
+.apps{margin:60px 0 10px;padding-top:6px}
+.apps-head{text-align:center;margin-bottom:8px}
+.apps-head .al{font-size:11.5px;letter-spacing:0.4em;color:var(--bronze);font-weight:600}
+.apps-head h3{font-family:"Noto Serif SC",serif;font-size:23px;font-weight:900;color:var(--ink);margin-top:12px;border:none;padding:0}
+.apps-head p{font-size:15px;color:var(--muted);margin-top:8px}
+.apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.app-card{display:block;padding:24px 22px;border-radius:14px;border:1px solid var(--line);background:var(--paper2);position:relative;transition:transform .14s ease,box-shadow .14s ease}
+.app-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(60,48,24,0.12)}
+.app-card .ac-tag{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:0.14em;font-weight:600;padding:4px 12px;border-radius:16px;margin-bottom:14px}
+.app-card .ac-tag .k{width:8px;height:8px;border-radius:50%}
+.app-card.e{border-top:3px solid var(--edu)}.app-card.e .ac-tag{color:var(--edu);background:var(--edu-bg)}.app-card.e .ac-tag .k{background:var(--edu)}
+.app-card.h{border-top:3px solid var(--hea)}.app-card.h .ac-tag{color:var(--hea);background:var(--hea-bg)}.app-card.h .ac-tag .k{background:var(--hea)}
+.app-card.b{border-top:3px solid var(--biz)}.app-card.b .ac-tag{color:var(--biz);background:var(--biz-bg)}.app-card.b .ac-tag .k{background:var(--biz)}
+.app-card h4{font-size:16px;color:var(--ink);line-height:1.5;margin-bottom:8px;font-weight:700}
+.app-card p{font-size:13.5px;color:var(--ink2);line-height:1.7;margin:0}
+.app-card .go{margin-top:14px;font-size:13px;font-weight:600;letter-spacing:0.03em}
+.app-card.e .go{color:var(--edu)}.app-card.h .go{color:var(--hea)}.app-card.b .go{color:var(--biz)}
+.app-card.soon{opacity:0.62;pointer-events:none}
+.app-card.soon .go{color:var(--muted)}
+.backline{text-align:center;margin-top:36px}
+.backline a{font-size:14px;color:var(--bronze);font-weight:600;letter-spacing:0.04em}
+footer{border-top:1px solid var(--line);padding:32px 26px;text-align:center;color:var(--muted);font-size:13px;margin-top:40px}footer a{color:var(--bronze)}
+@media(max-width:720px){.apps-grid{grid-template-columns:1fr}.art-title{font-size:29px}}
+</style><style>
+.acc-e{--acc:var(--edu);--acc-bg:var(--edu-bg)}
+.acc-h{--acc:var(--hea);--acc-bg:var(--hea-bg)}
+.acc-b{--acc:var(--biz);--acc-bg:var(--biz-bg)}
+.app-kicker{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;letter-spacing:0.16em;font-weight:700;color:var(--acc);background:var(--acc-bg);padding:5px 14px;border-radius:16px;margin-bottom:20px}
+.app-kicker .k{width:8px;height:8px;border-radius:50%;background:var(--acc)}
+header.art .art-title{border-left:5px solid var(--acc);padding-left:18px}
+.backref{display:block;border:1px solid var(--line);border-left:4px solid var(--acc);background:var(--paper2);border-radius:12px;padding:16px 20px;margin:0 0 30px;transition:transform .14s ease,box-shadow .14s ease}
+.backref:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(60,48,24,0.10)}
+.backref .brl{font-size:11.5px;letter-spacing:0.14em;color:var(--acc);font-weight:700;margin-bottom:6px}
+.backref .brt{font-size:16.5px;color:var(--ink);font-weight:700;line-height:1.5}
+.backref .brg{margin-top:8px;font-size:13px;color:var(--acc);font-weight:600}
+article h2 .hn{color:var(--acc)}
+.deck{border-left-color:var(--acc)}
+blockquote{border-left-color:var(--acc)}
+.opbox{border:1px solid var(--line);border-top:3px solid var(--acc);background:var(--paper2);border-radius:12px;padding:20px 22px;margin:22px 0}
+.opbox .opl{font-size:11.5px;letter-spacing:0.14em;color:var(--acc);font-weight:700;margin-bottom:10px}
+.opbox ol{margin:0;padding-left:20px}
+.opbox li{margin:8px 0;color:var(--ink);font-size:15px;line-height:1.75}
+</style></head><body class="acc-b">
+<nav><div class="wn"><a class="nav-logo" href="/browse/">SDE Universes</a><a class="nav-back" href="/ideas/">← 思想·应用</a></div></nav>
+<header class="art"><div class="w">
+ <div class="app-kicker"><span class="k"></span>商业应用 · 思想·应用 No.03</div>
+ <h1 class="art-title">组织能力的成熟度诊断与培育：<br>别给新业务套成熟业务的规矩</h1>
+ <div class="art-sub">把管成熟业务的 KPI、流程、盈利考核，套到刚起步的新业务上，等于给幼苗套上给大树用的支架——它还没长开，就被框死了。</div>
+ <div class="art-meta"><span class="zh">王德生 著</span> · SDE UNIVERSES · 商业应用 · <span class="zh">全文约 5,000 字</span></div>
+</div></header>
+<div class="body"><div class="w">
+<a class="backref" href="/ideas/maturity-not-origin/"><div class="brl">本文所应用的思想</div><div class="brt">《完整的 SDE 是成熟态，不是原初态》</div><div class="brg">读原思想论文 →</div></a>
+<div class="deck">一个常见的悲剧：成熟公司想孵化新业务，把管成熟业务那套行之有效的规矩——严格 KPI、规范流程、盈利考核——原封不动套到刚起步的新业务上，结果这个本该野蛮生长的新苗，很快被管得动弹不得、死气沉沉。公司百思不解：明明是我们最有效的管理体系，怎么反而把新业务管死了?根子在一个错配：成熟业务和新业务处在完全不同的成熟度，需要完全不同的管法。成熟业务在成熟态，需要秩序效率;新业务在原初/成长态，需要自由试错。把成熟态的规矩套给生长态的新业务，等于给幼苗套上大树的支架。这一篇，给你一套「先诊断成熟度、再决定扶生长还是收秩序」的方法。</div>
+<div class="toc"><div class="tl">目 录</div>
+<a href="#c1"><span class="tn">一</span>一、用管成熟业务的规矩管新业务，为什么把它管死了</a>
+<a href="#c2"><span class="tn">二</span>二、组织能力也是长出来的：有成熟度，不能空降</a>
+<a href="#c3"><span class="tn">三</span>三、把一个团队或业务，拆成成熟度台阶</a>
+<a href="#c4"><span class="tn">四</span>四、诊断：这个团队/业务，处在哪一态</a>
+<a href="#c5"><span class="tn">五</span>五、原初与成长态（新业务）：扶生长，别套规矩</a>
+<a href="#c6"><span class="tn">六</span>六、成熟态（成熟业务）：收秩序，提效率</a>
+<a href="#c7"><span class="tn">七</span>七、常见误配：给新业务上 KPI 和流程，把它掐死</a>
+<a href="#c8"><span class="tn">八</span>八、先诊断成熟度，再决定扶生长还是收秩序</a>
+</div><article>
+
+<h2 id="c1"><span class="hn">Ⅰ</span>一、用管成熟业务的规矩管新业务，为什么把它管死了</h2>
+<p>一个常见的悲剧：一家成熟的公司，想孵化一项新业务。它把管成熟业务那套行之有效的规矩——严格的 KPI、规范的流程、清晰的汇报线、盈利的考核——原封不动地，套到了这个刚起步的新业务上。结果，这个本该野蛮生长的新苗，很快就被这套规矩，管得动弹不得、死气沉沉，最后无疾而终。</p>
+<p>公司百思不得其解：明明是我们最成熟、最有效的管理体系啊，怎么用到新业务上，反而把它管死了?</p>
+<p>问题的根，在一个被忽略的错配：<strong>成熟业务和新业务，处在完全不同的「成熟度」阶段，需要完全不同的管法。</strong>成熟业务已经进入了「成熟态」，需要的是秩序、规范、效率;而新业务还在「原初态、成长态」，需要的是自由、试错、生长的空间。<strong>把成熟态的规矩，套到还在生长态的新业务上，就等于给一株幼苗，套上了给参天大树用的支架和修剪——它还没长开，就被框死了。</strong>这一篇，就给你一套「先诊断组织成熟度、再决定该扶生长还是该收秩序」的方法。</p>
+
+<h2 id="c2"><span class="hn">Ⅱ</span>二、组织能力也是长出来的：有成熟度，不能空降</h2>
+<p>先把这个根本视角说透。我们常常把一套成功的管理体系，看成一个可以「复制粘贴」到任何地方的通用工具。可真相是：<strong>一个团队的能力、一项业务的运转，也是「长出来的」——它有自己的成熟度，从原初，经成长，到成熟，一阶一阶长上来;不同成熟度的组织，需要的管法截然不同。</strong></p>
+<p>一个成熟业务那套精密高效的运转（成熟态），是它多年一步步长出来的结果，不是一开始就有的样子。<strong>你把这套「成熟态」的管理，直接空降到一个还在「原初态」的新业务上，就像要求一个刚学步的婴儿，立刻按运动员的标准训练——不是帮它，是毁它。</strong>新业务此刻需要的，不是成熟业务的规矩，而是它这个阶段该有的东西：试错的空间、生长的自由、对不确定的容忍。</p>
+<p>这个视角一换，管理的思路就变了。<strong>你不再迷信「一套好体系走天下」，而是先判断「这个团队/业务，此刻长到了哪一个成熟度」，再决定该给它哪一种管法——是该给它自由、扶它生长（如果还在原初/成长态），还是该给它秩序、提它效率（如果已到成熟态）。</strong>管法要匹配成熟度，这是组织管理里，一个极其关键、却常被忽略的原则。</p>
+
+<h2 id="c3"><span class="hn">Ⅲ</span>三、把一个团队或业务，拆成成熟度台阶</h2>
+<p>要「按成熟度施管」，第一步是把一个团队或业务的成熟度，拆成清晰的阶段。大体上，可分三态。</p><div class="opbox"><div class="opl">组织成熟度的三态</div><ol><li><b>原初态（探索·高度不确定）</b>：刚起步，方向还在摸索，模式还没跑通，一切都不确定。这一态，「找到方向、验证模式」是关键，需要最大的自由和试错空间。</li><li><b>成长态（跑通·快速扩张）</b>：模式初步跑通了，开始快速成长、扩张，但还不稳定、在剧烈变化。这一态，「在扩张中保持活力、又逐步建立必要秩序」是关键。</li><li><b>成熟态（稳定·规模运营）</b>：模式成熟、规模稳定，进入了可预期的规模化运营。这一态，「效率、规范、稳定」是关键，需要秩序和精细管理。</li><li><b>警惕成熟态的僵化</b>：成熟态若一味求稳、拒绝变化，会滑向僵化。成熟组织也要主动保留一块「原初态」的试验田，防止彻底僵死。</li></ol></div>
+<p>拆成熟度台阶的意义，是让你手里有一张<strong>「这个组织此刻在哪、该怎么管」的地图</strong>。有了它，你就不会再用「一套体系管所有」，而能精确地判断：这个团队/业务此刻在哪一态、因而该给它自由还是给它秩序。<strong>管理的精准，就藏在「管法匹配成熟度」里。</strong></p>
+
+<h2 id="c4"><span class="hn">Ⅳ</span>四、诊断：这个团队/业务，处在哪一态</h2>
+<p>有了地图，第二步是诊断：这个团队/这项业务，此刻处在哪一态?</p><div class="opbox"><div class="opl">诊断组织此刻在哪一态</div><ol><li><b>看「确定性」</b>：方向、模式还在摸索、高度不确定 → 原初态;模式跑通了但在快速变化 → 成长态;模式稳定、可预期 → 成熟态。</li><li><b>看「该求什么」</b>：此刻最该做的是「找对方向、验证模式」→ 原初态;是「在扩张中保活力、建必要秩序」→ 成长态;是「提效率、上规范、保稳定」→ 成熟态。</li><li><b>看「过度管理会不会伤它」</b>：一上严格的 KPI 和流程它就动弹不得 → 说明还在原初/成长态，管早了;能承受并需要规范来提效 → 成熟态。</li><li><b>分业务、分团队地诊断</b>：一家公司里，不同业务、不同团队可能处在不同的态——别用一把尺子、一套管法管全公司，要分别诊断、分别施管。</li></ol></div>
+<p>诊断最关键的，是<strong>别把还在原初/成长态的新业务，误当成熟态来管。</strong>这是大公司做新业务最常犯、也最致命的错——习惯性地用管成熟业务的成熟体系，去管一个还需要自由生长的新苗。<strong>诊断清楚「它此刻其实还很稚嫩、还在探索」，你才不会急着给它套上成熟态的规矩，把它掐死。</strong></p>
+
+<h2 id="c5"><span class="hn">Ⅴ</span>五、原初与成长态（新业务）：扶生长，别套规矩</h2>
+<p>诊断出一个团队/业务处在原初或成长态（新业务、还在探索或快速成长），管法的核心是——<strong>扶它生长，给它自由和试错的空间，别急着套成熟业务的规矩。</strong></p><div class="opbox"><div class="opl">原初/成长态的管法</div><ol><li><b>给方向和边界，别给死流程</b>：给它一个大方向和几条不能碰的底线，然后把「怎么走」的自由留给它，让它自己探索、试错。别用详尽的流程把每一步都规定死。</li><li><b>容忍试错和不完美</b>：新业务必然会犯错、走弯路、指标难看——这是探索的正常代价，不是失败。容忍它，别用成熟业务的完美标准去卡。</li><li><b>别过早上严格的盈利/KPI 考核</b>：一个还在验证模式的新业务，过早地压盈利和硬 KPI，会逼它为短期数字扭曲、放弃探索。考核它「有没有在健康地探索、验证」，而非「赚了多少」。</li><li><b>配「能容忍不确定」的人和资源</b>：给它相对独立、灵活的资源和一个能容忍模糊、善于探索的团队，别用管成熟业务的那套人马和考核去套它。</li></ol></div>
+<p>原初/成长态的要害，是<strong>「扶生长，而非收秩序」——给自由，别套规矩。</strong>新业务这个阶段最需要的，是探索和试错的空间;而成熟业务那套规矩（严格 KPI、规范流程、盈利考核），恰恰是这个空间的杀手。<strong>你越是急着把新业务「管规范、管专业」，就越可能，把它还没长出来的生命力，一起管没了。</strong>此刻，克制你伸向它的、想要规范它的手，给它野蛮生长的自由。</p>
+
+<h2 id="c6"><span class="hn">Ⅵ</span>六、成熟态（成熟业务）：收秩序，提效率</h2>
+<p>诊断出一个业务处在成熟态（模式成熟、规模稳定），管法的核心则反过来——<strong>收秩序、提效率、上规范，把成熟业务的价值榨到最大。</strong></p><div class="opbox"><div class="opl">成熟态的管法</div><ol><li><b>建立规范和流程</b>：成熟业务需要标准化、规范化的流程，来保证大规模运营的稳定和质量。这时的流程和规范，不是束缚，而是必需。</li><li><b>用 KPI 和指标精细管理</b>：成熟业务方向已明、模式已定，正该用清晰的 KPI 和数据，去精细地管理、优化、提效——这时的严格考核，恰逢其时。</li><li><b>追求效率与成本优化</b>：把成熟态的重心，放在效率提升、成本优化、稳定运营上，把这块成熟业务的价值，充分地榨取出来。</li><li><b>但留一块「试验田」防僵化</b>：即便是成熟业务，也要主动留一块允许试错、探索的空间，防止它一味求稳、彻底僵化（详见本栏第 04、11 篇）。</li></ol></div>
+<p>成熟态的要害，是<strong>「收秩序，恰逢其时」。</strong>成熟业务和新业务恰恰相反——它需要的，正是那套规范、KPI、流程、效率管理。<strong>对一个成熟业务还一味放任、不上秩序，是另一种错配（该收不收），会让它低效、混乱、浪费。</strong>成熟态，就该大方地上秩序、提效率——只是别忘了，留一小块试验田，给未来的新生长，留个口子。</p>
+
+<h2 id="c7"><span class="hn">Ⅶ</span>七、常见误配：给新业务上 KPI 和流程，把它掐死</h2>
+<p>认识两种最常见、也最致命的「成熟度误配」。</p><div class="opbox"><div class="opl">两种致命误配与纠正</div><ol><li><b>给「新业务」套「成熟态规矩」</b>（最常见、最致命）：用管成熟业务的 KPI、流程、盈利考核，去管一个还在探索的新业务，把它的生长空间掐死。纠正：新业务给自由、给试错空间、扶生长，别套成熟规矩。</li><li><b>让「成熟业务」一直「原初态放任」</b>：一个早该规范化、提效率的成熟业务，还松松垮垮、没有秩序，导致低效浪费。纠正：成熟业务该上秩序、上规范、提效率。</li><li><b>根源都是「管法没匹配成熟度」</b>：两种误配，一个是「该松不松」、一个是「该紧不紧」，根子都是没先诊断成熟度、就凭惯性一刀切地管。</li></ol></div>
+<p>这两种误配的共同教训是：<strong>组织管理的失败，常常不是因为体系不好，而是因为「好体系用错了成熟度」——把成熟态的规矩套给新业务（掐死生长），或让成熟业务停在原初态的放任（低效混乱）。</strong>而只要先诊断清楚成熟度、再匹配管法——该扶生长时扶生长、该收秩序时收秩序——很多组织的顽疾，都会迎刃而解。</p>
+
+<h2 id="c8"><span class="hn">Ⅷ</span>八、先诊断成熟度，再决定扶生长还是收秩序</h2>
+<p>把全文收成一句可以带走的话：<strong>管一个团队或业务前，先诊断它的成熟度，再决定该扶它生长、还是该收它秩序。</strong></p>
+<p>「一套好体系管所有」，看似高效，实则是很多组织把新业务管死、把成熟业务管乱的根源——因为不同成熟度的组织，需要截然不同的管法。<strong>而这一篇给你的，是一个更清醒的管理习惯：面对一个团队/业务，先诊断它此刻的成熟度——是还在探索的原初态、快速成长的成长态、还是稳定的成熟态?——然后，给它匹配的管法：原初/成长态就扶生长（给自由、容试错、别套规矩），成熟态就收秩序（上规范、提效率、精细管理）。</strong></p>
+<p>「先诊断成熟度，再决定扶生长还是收秩序」——这个原则，把组织管理从「凭惯性一刀切」，变成了「因成熟度而异地施管」。<strong>它尤其能救那些想做新业务的成熟公司：别再用你最引以为傲的成熟体系，去掐死一个还需要自由生长的新苗了。先看它长到了哪一态，再决定，是该给它野蛮生长的自由，还是该给它规模运营的秩序。</strong>管法匹配成熟度，一株苗才能长成大树，一棵大树才能枝繁叶茂。</p>
+
+<blockquote>组织能力也是长出来的：新业务在原初/成长态，需要自由和试错;成熟业务在成熟态，需要秩序和效率。<br><b>把成熟态的规矩（KPI、流程、盈利考核）套给还在生长的新业务，等于给幼苗套上大树的支架——把它掐死。先诊断成熟度，再决定扶生长还是收秩序。</b></blockquote>
+
+<div class="src"><b>关于本文</b>　本文是「思想·应用」专栏思想论文《完整的 SDE 是成熟态，不是原初态》的<b>商业应用</b>篇，把「成熟是长出来的、需匹配成熟阶段」这一思想，落为一套「先诊断组织成熟度、再决定扶生长还是收秩序」的管理方法。文中方法与用例为管理说明，可按行业与阶段灵活调整。</div>
+
+</article></div></div>
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+<footer>© 德麦国际 · SDE Universes　·　思想·应用 · 商业应用　·　<a href="/ideas/maturity-not-origin/">回到本篇思想</a></footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body></html>

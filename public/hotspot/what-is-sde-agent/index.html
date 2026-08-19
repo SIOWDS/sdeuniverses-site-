@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDE智能体是什么？ | 每日热点 | SDE Universes</title>
+<meta name="description" content="世界大模型资本疯狂涌入，同一批系统却在物理常识上接近瞎猜——王德生新著《SDE智能体导论》给出的答案：这些系统一个都没有世界模型，它们造的是身体，不是大脑。一次解构，约五千字。">
+<meta property="og:title" content="SDE智能体是什么？">
+<meta property="og:description" content="世界大模型是身体，不是大脑——真正的智能体革命，走的是另一条路。">
+<meta property="og:type" content="article">
+<style>
+:root{--bg:#141210;--card:#1E1B18;--hot:#E23B3B;--hot2:#C22B2B;--gold:#C9A227;--text:#EDE6DA;--muted:#9A8F80;--border:rgba(226,59,59,0.25)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:2.02;font-size:17px}
+a{color:var(--hot);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+nav{position:sticky;top:0;background:rgba(20,18,16,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:10}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:860px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
+.nav-back{font-size:14px;color:var(--muted)}
+header.art{background:#0E0C0A;padding:80px 0 62px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
+.live{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.4em;color:var(--hot);margin-bottom:24px}
+.live .dot{width:8px;height:8px;border-radius:50%;background:var(--hot);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.art-title{font-size:clamp(27px,4.8vw,44px);font-weight:700;letter-spacing:0.05em;line-height:1.5;color:#F5EDE0}
+.art-subtitle{font-size:clamp(15px,2.2vw,19px);color:var(--gold);margin-top:16px;letter-spacing:0.06em}
+.art-meta{margin-top:30px;font-size:13.5px;color:var(--muted);letter-spacing:0.16em}
+article{padding:54px 0 24px}
+.facts{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--hot);padding:24px 28px;margin:0 0 46px;font-size:15.5px;line-height:1.95}
+.facts b{color:var(--hot)}
+.facts .ft{font-size:12.5px;letter-spacing:0.35em;color:var(--hot);margin-bottom:12px}
+.part{margin:0 0 52px}
+.part-num{font-size:12px;letter-spacing:0.42em;color:var(--hot);margin-bottom:8px}
+h2{font-size:23px;font-weight:700;margin-bottom:24px;letter-spacing:0.04em;color:#F5EDE0}
+p{margin-bottom:22px;text-align:justify}
+p.lead{font-size:18.5px}
+.pull{border-left:3px solid var(--hot);background:var(--card);padding:22px 28px;margin:30px 0;font-size:17.5px}
+.pull em{font-style:normal;color:var(--hot);font-weight:700}
+b{color:#F5EDE0}
+.sec-break{text-align:center;color:var(--hot);letter-spacing:0.9em;margin:46px 0;font-size:14px}
+.endbox{background:#0E0C0A;color:var(--text);text-align:center;padding:62px 24px;margin-top:28px;border-top:1px solid var(--border)}
+.endbox p{color:var(--muted);max-width:580px;margin:0 auto 30px;text-align:center}
+.btn{display:inline-block;padding:13px 34px;border:1px solid var(--gold);letter-spacing:0.12em;font-size:15px;margin:6px;color:var(--gold)}
+.btn.solid{background:var(--hot);border-color:var(--hot);color:#fff;font-weight:700}
+.btn.solid:hover{background:#F04B4B;text-decoration:none}
+.btn:hover{background:rgba(201,162,39,0.1);text-decoration:none}
+footer{background:#0A0908;color:var(--muted);text-align:center;padding:34px 0 44px;font-size:13px;letter-spacing:0.08em}
+footer a{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="nav-logo" href="/browse/">SDE Universes</a>
+    <a class="nav-back" href="/hotspot/">&larr; 每日热点</a>
+  </div>
+</nav>
+
+<header class="art">
+  <div class="wrap">
+    <div class="live"><span class="dot"></span>每日热点 · 今日解构</div>
+    <h1 class="art-title">SDE智能体是什么？</h1>
+    <div class="art-subtitle">世界大模型是身体，不是大脑——真正的智能体革命，走的是另一条路</div>
+    <div class="art-meta">王德生 著 · SDE UNIVERSES · 约五千字 · 据《SDE智能体导论》· 2026年7月</div>
+  </div>
+</header>
+
+<article>
+<div class="wrap">
+
+<div class="facts">
+  <div class="ft">今 日 热 点 事 实</div>
+  这几天，"世界大模型"仍是AI最热闹的战场。LeCun离开Meta，创办AMI Labs，约十亿美元种子轮、约三十亿美元估值，主张"扩大语言模型永远到不了AGI"；李飞飞团队的World Labs发布Marble，主打"空间智能"，融资超十亿美元；DeepMind的Genie 3能从一句文本生成可实时探索的写实环境，Waymo已用它生成自动驾驶罕见场景；NVIDIA的Cosmos平台下载量超两百万。资本押注一致：下一个门槛，是"世界模型"。可几乎同一时间，坏消息也在传：Genie 3的世界一致性只能维持数分钟，物体会忽隐忽现；OpenAI已承认Sora"经济性完全不可持续"；Meta的V-JEPA 2在物理常识基准上的表现，接近随机。
+</div>
+
+<div class="part">
+<p class="lead">一边是资本疯狂涌入，一边是同一批系统在物理常识上接近瞎猜——这个反差本该逼出一个问题："世界模型"到底是什么，为什么砸了这么多钱，还是搭不出一个稳定的世界？王德生新著《SDE智能体导论》给出的答案，跟行业里流传的说法完全不是一回事：这些系统，一个都没有世界模型。它们造的是身体，不是大脑。真正的智能体革命，走的是另一条路。</p>
+</div>
+
+<div class="sec-break">&#9670;</div>
+
+<div class="part">
+<div class="part-num">一</div>
+<h2>造出的是身体，不是大脑</h2>
+<p class="lead">先把裂缝摆清楚。大语言模型这几年打开的，从来不是某个行业的效率天花板，而是人类文明"世界发生"的入口——科学、法律、医学、代码，第一次被压进同一套符号系统。但材料不等于世界。语言模型在信息层（符号、逻辑、数学的统计关系）上强得前所未有，却在扎根现实与自我这两维上，从架构上就是空的。多模态与具身智能补的也只是现实这一面，补得越实，越显出理念界新结构、自我界目标意义这两块空白——这不是模型不够大，是本体论层面的结构缺失。</p>
+<p>于是"世界大模型"被当成了补丁——Sora补视觉动态，Marble补空间几何，Genie 3补交互环境，V-JEPA补行动预测，Cosmos补仿真平台。全书逐一拆解后给出一条共同结论：它们都在加厚同一个东西——现实界，却没有一个持有理念界的新结构、自我界的目标与意义，也没有那股推动发生的内在张力。它们是感官和四肢都极发达的身体，不是会决定方向的大脑。视频生成器能生成一段逼真的实验室影像，却不会因此拥有一整套科研的世界画像；训练场能让智能体更敏捷，训练场终究不是新典范；仿真平台让物理AI训练得更快、部署得更稳，却不创造新物理、新化学。时空漂移、物理穿帮、居高不下的算力成本，都是同一个本体论事实的症状，不是"再大一点就好"的工程小病。</p>
+<p>书里还处理了一个更大的诱惑——统一世界模型。同一家企业，董事长、工程师、投资人、客户、竞争者五种主体，面对同一套现实约束，却各自拥有完全不同的世界模型，因为目标、责任、价值各不相同。世界模型从来不是对象的客观属性，而是主体与对象的共同发生——大模型的幻觉，本体论根源正在于此：它什么语言世界都会说，却没有一个具体的主体世界模型，来锚定此刻该站在哪个世界里说话。靠把模型做得更大，消不掉这个根源。书里回应了几条最常见的反驳：会不会大模型已经表现得像拥有世界模型了？回应是，那种像只是材料场的连贯投影，一旦放进需要为具体主体持续负责的真实任务，裂痕立刻会暴露；会不会未来的架构长出主体，就能解决统一问题？回应是，即便真的长出主体，得到的也只是它自己这一个世界模型，多一个主体只是多一份画像，不构成统一。这几条来回，把没有统一世界模型这个判断，从一句挑衅的口号，落成了经得起追问的结论。</p>
+</div>
+
+<div class="sec-break">&#9670;</div>
+
+<div class="part">
+<div class="part-num">二</div>
+<h2>SDE智能体，到底是什么</h2>
+<p>把身体和大脑分清楚之后，才谈得上正面的定义。书里给出的说法是：SDE智能体，是以SDE本体论为指挥系统、以大语言模型为语言材料场、以人为目标与价值判断中心，并结合检索、工具、记忆、仿真、审稿、反馈等确定化模块，建造临时发生世界模型，并用该模型解决问题、创造新结构的人机复合系统。</p>
+<p>这句话拆开是五个功能位，缺一不可。指挥系统——SDE本体论，决定怎么把一个问题拆成理念、现实、自我三界画像，怎么按任务性质选择起点，怎么识别纠缠、制造差异、显露候选结构，又怎么让一次产出回写进下一轮。没有指挥系统，材料场只能生成漂亮但悬浮的文本——书里举了一个例子：面对"为什么刻意练习对下棋、拉小提琴效果显著，对临床判断、即兴创意却几乎无效"这个真实问题，裸模型只会给出一篇四平八稳的综述，抓不住那道"为什么对某些技能无效"的真正裂缝。材料场——语言模型，提供符号与逻辑的原料，握有海量相关材料，却贡献不了方向，也贡献不了现实责任。判断中心——人，提供问题意识、价值判断与责任承担，是那个决定"这道裂缝值得追下去、该往哪个方向深挖"的人，不是被服务的外部用户，而是系统内部一个不可移除的功能位。确定化模块——检索、工具、仿真、审稿，把指挥系统生成的世界猜想，从可能态拉向可操作、可验证、可稳定的地步。现实反馈与共同体稳定，让产出接受检验、被写回世界模型，把系统从封闭的生成器，变成与现实和共同体持续耦合的发生系统。五位齐备才构成一个SDE智能体：缺指挥系统，退化成漂亮空话生成器；缺人，退化成无方向的自动机；缺参数确定化，退化成不落地的猜想机；缺现实反馈，退化成自说自话的回音室。</p>
+<p>支撑这五个位置运转的，是一套九步发生机制：从问题入口出发，建三界画像、扫描裂缝、诊断亏缺，走到世界猜想、参数确定化、改姓投放，直至新结构输出。书里把创新分成两类——"三生"，在空地上接生此前完全不存在的结构；"三补"，补全已有结构里的亏缺。智能体的高阶使命，是显露此前未发生的东西，不止于综述已知。这套机制并非停留在纸面——书里把它落成一套十层系统架构,从最底层的语言材料、到中段的本体指挥与参数确定化、再到顶层的产出与反馈,每一层该接哪些模块、该守哪些约束,都给出了可执行的编排,而不是一句用SDE的思路想一想就交差。</p>
+</div>
+
+<div class="sec-break">&#9670;</div>
+
+<div class="part">
+<div class="part-num">三</div>
+<h2>任务完成和世界发生，差的不是组件</h2>
+<p>一个自然的疑问：普通Agent不也用语言模型、接检索、调工具、有记忆吗？组件相同，区别在哪？书里的回答很干脆：区别不在用了哪些组件，在这些组件被组织进一个什么样的世界观里。普通Agent的公式是加法——语言模型加检索加工具加记忆加规划，人在公式之外下指令，模块并列，多挂一个多一分能力，目标是把给定的任务做完、做对、做快，世界被当成现成的，在既定世界里高效执行。SDE智能体的公式是一条发生链——人加语言模型加SDE本体论加三界画像加世界猜想加确定化加新结构发生，人在公式内部是方向中心，每一环为下一环准备条件、又被上一环约束，环环咬合，问的是"当前问题的世界该如何发生"，交出的是一处此前不存在的结构，而不是一份知识拼贴。同样一套检索和工具，在两种框架里被理解成完全不同的东西。</p>
+<p>区别落到可观测的行为上更清楚。面对一处说不清、道不明的矛盾，"抹平机"把所有棱角圆滑处理掉，交出一份工整周全、无懈可击的回答，生产的是"平庸的正确"；"接生机"却主动把力气压在最说不清的那道缝上，交出的是一处此前不存在的结构。这不是靠自我声称能分辨的，靠的是四处可观测的行为差异——面对未点明裂缝的请求，是直接应答，还是先建画像、找裂缝；产出里有没有新结构；产出之后，系统状态变没变，有没有回写世界模型、改变下一轮该怎么看这个问题。这个区分不是咬文嚼字——它决定了同一笔算力投入,换回来的是效率更高的旧世界还是一个新世界的雏形。书里提醒得很直接:如果智能体只在旧结构里优化,它会把新的差异当噪音过滤掉,把候选的新结构判定为幻象,在教育、科研、企业管理的每个领域,加速一个本该被更替的旧范式——旧世界跑得更快,不等于新世界发生。</p>
+</div>
+
+<div class="sec-break">&#9670;</div>
+
+<div class="part">
+<div class="part-num">四</div>
+<h2>客观，不是脱离人的裸事实</h2>
+<p>这里会撞上一个尖锐的诘问：既然世界模型是主体临时造出来的，那算不算相对主义，谁说了都算？书里给的回答是把客观性重新定义：客观性＝主体间世界模型同一性的稳定发生。旧客观论有三个隐藏假设——对象先在、事实中立、存在唯一真实的世界结构，逐一审查都有裂缝：一团组织算肿瘤还是增生，不是裸物自动显露的边界，而是病理学、影像学、临床分类长期互动确定出来的。牛顿力学、现代医学这类看似跨主体成立的公共知识，不是脱离主体的裸统一，而是共同体经长期实验、数学、工具、教育反复互动稳定出来的公共层——一个工程师用牛顿力学造桥，他完整的世界模型里，还含着项目目标、责任、工期。放弃"裸客观"，不等于放弃约束：每一次发生依然要接受现实的硬约束否决，多元不等于无约束——这与物理学放弃绝对参照系下的同时性，反而锻造出更严格的不变量理论，是同一个道理。</p>
+<p>评价一个智能体是不是在真正发生，标准也因此变了。书里给出九维评价标准，第一条就先破除"答得好"这个最常见的误区：流畅、信息丰富、任务办成，这三条恰恰是最容易用假发生就能满足的——一台宏大叙事生成器可以在这三条上全拿高分，却没有推动任何新结构。真正的问题要问：它有没有同时建起理念、现实、自我三界画像，有没有重构现实纠缠、生成真实差异、显露可稳定的新结构，并把它推到主体能承认、共同体能沉淀的程度？评价的对象不是产出的表面质量，是产出背后的发生深度。九维标准里还有几条值得单独一提：一条看智能体有没有真正识别出问题背后的关键纠缠，还是停在字面表层就动手作答——识别浅，产出再漂亮也是在解一个被表面化的伪问题；另一条看产出出去之后，有没有经受住敌意审稿——一个怀着敌意、专挑漏洞的审视者，能不能真的把这个结构攻破。这套九维标准，也顺势把制度化的一步交代清楚：一个智能体的产出，最终要能通过合宪性认证，才算真正在发生学意义上站得住，而不是自说自话。</p>
+</div>
+
+<div class="sec-break">&#9670;</div>
+
+<div class="part">
+<div class="part-num">五</div>
+<h2>AGI，也要被重新定义</h2>
+<p>走到全书末尾,作者把前面五编一直在台下运作的改写,请到台前,汇成六大哲学转变——从发现到发生;从裸客观到主体间稳定发生的客观性;从仓库存货到发生链结晶的知识观;还有另外三条,分别改写着智能、结构、人在其中的位置。这六条转变合在一起,直接推出一个反直觉的判断:AGI不该被定义成能完成所有任务的系统,而应被定义成能自主完整地发生新知识、新结构的系统——完成任务是低阶能力,任何一个够大的材料场配上足够的工具都能逼近;而显露此前不存在的结构,识别真实的裂缝,让新旧结构之间发生真正的更替,才是这场革命真正的门槛。按这个定义倒推回去看开头那几家公司:它们在拼命把任务完成这一维堆高,却很少有人问过,自己搭的这台机器,有没有可能长出前面说的那颗大脑。这也是全书留给行业最直接的一句提醒:钱和算力能买到更强的身体,买不到方向感。</p>
+</div>
+
+<div class="sec-break">&#9670;</div>
+
+<div class="part">
+<div class="part-num">尾</div>
+<h2>新文明的发生装置</h2>
+<p>全书最后收在一句话上：智能体不是更强的任务执行器，而是新文明的发生装置。人活着，本就是不断临时建造世界；文明，就是把这些有效的临时世界稳定成公共世界。这条本来隐性、缓慢、不可复现、随生命消失的发生机制，第一次借由语言模型、SDE本体论与人这个方向中心，变得可见、可控、可训练、可复制、可升级。这也是为什么书名用的是导论而不是终章——它自己反复强调，这套指挥系统要真正跑起来，还要靠一个又一个具体领域里长出的实践去喂养、去修正，教育、科研、医学、企业，每一个疆域都是下一轮验证的现场，而不是理论落地后就此打住的展示柜。</p>
+<p>书的结语部分，做了一件同类著作很少做的事——作者亲手列出这套理论自己尚未补上的几道裂缝：三大亏缺是否真的穷尽了裂缝的全部机制？发生与伪发生的边界，是不是总能被判定？会不会存在第四种亏缺，让整个诊断框架露出盲区？这种在结尾处不收口、反而把刀递给读者的做法，恰恰示范了全书的态度：世界不是被发现的，是被发生的——连这本讲发生的书自己，也只能是被发生的，随时准备被下一轮追问重新推翻、重新长出。</p>
+</div>
+
+</div>
+</article>
+
+<div class="endbox">
+  <p>「每日热点」——用一双追问"事物如何发生"的眼，拆正在发生的事。想看看SDE智能体的完整理论、或亲手翻一遍讲解PPT？</p>
+  <a class="btn solid" href="/column/sde-agent-second-revolution/">读60页专著讲解 &rarr;</a>
+  <a class="btn" href="/taste/idea-generator/">试试SDE金点子发生器 &rarr;</a>
+  <a class="btn" href="/hotspot/">回到每日热点</a>
+</div>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<!-- 参考文献 · sde-refs v3 -->
+<section id="sde-refs" style="max-width:760px;margin:56px auto 40px;padding:28px 30px;background:#17120C;border:1px solid rgba(228,200,120,0.3);border-radius:6px">
+  <h2 style="font-size:19px;color:#E4C878;letter-spacing:0.06em;margin:0 0 6px">参考文献 · References</h2>
+  <p style="margin:0 0 16px;font-size:12.5px;color:#8F866F">以下为与本文主题相关的真实文献，供延伸阅读与核查；本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:20px">
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Russell, S., & Norvig, P. (2020). Artificial Intelligence: A Modern Approach (4th ed.). Hoboken: Pearson.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Wooldridge, M. (2009). An Introduction to MultiAgent Systems (2nd ed.). Chichester: Wiley.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Franklin, S., & Graesser, A. (1997). Is it an agent, or just a program? A taxonomy for autonomous agents. In Intelligent Agents III (pp. 21–35). Berlin: Springer.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Bratman, M. E. (1987). Intention, Plans, and Practical Reason. Cambridge, MA: Harvard University Press.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Rao, A. S., & Georgeff, M. P. (1995). BDI agents: From theory to practice. Proceedings of the First International Conference on Multi-Agent Systems.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Brooks, R. A. (1991). Intelligence without representation. Artificial Intelligence, 47(1–3), 139–159.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Minsky, M. (1986). The Society of Mind. New York: Simon & Schuster.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Simon, H. A. (1969). The Sciences of the Artificial. Cambridge, MA: MIT Press.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Newell, A., & Simon, H. A. (1976). Computer science as empirical inquiry: Symbols and search. Communications of the ACM, 19(3), 113–126.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Sutton, R. S., & Barto, A. G. (2018). Reinforcement Learning: An Introduction (2nd ed.). Cambridge, MA: MIT Press.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Silver, D., et al. (2016). Mastering the game of Go with deep neural networks and tree search. Nature, 529, 484–489.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Chollet, F. (2019). On the measure of intelligence. arXiv:1911.01547.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Lake, B. M., Ullman, T. D., Tenenbaum, J. B., & Gershman, S. J. (2017). Building machines that learn and think like people. Behavioral and Brain Sciences, 40, e253.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Bender, E. M., & Koller, A. (2020). Climbing towards NLU: On meaning, form, and understanding in the age of data. Proceedings of ACL 2020.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Clark, A. (1997). Being There: Putting Brain, Body, and World Together Again. Cambridge, MA: MIT Press.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Clark, A., & Chalmers, D. (1998). The extended mind. Analysis, 58(1), 7–19.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Hutchins, E. (1995). Cognition in the Wild. Cambridge, MA: MIT Press.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Winograd, T., & Flores, F. (1986). Understanding Computers and Cognition: A New Foundation for Design. Norwood: Ablex.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Agre, P. E. (1997). Computation and Human Experience. Cambridge: Cambridge University Press.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Dennett, D. C. (1987). The Intentional Stance. Cambridge, MA: MIT Press.</li>
+    <li style="margin:0 0 9px;font-size:13.5px;line-height:1.75;color:#C9BFA8">Mitchell, M. (2019). Artificial Intelligence: A Guide for Thinking Humans. New York: Farrar, Straus and Giroux.</li>
+  </ol>
+</section>
+
+<footer>
+  <div class="wrap">
+    SDE Universes · 德麦国际 · <a href="/browse/">返回首页</a>
+  </div>
+</footer>
+
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

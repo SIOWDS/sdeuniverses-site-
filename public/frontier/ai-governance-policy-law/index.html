@@ -1,0 +1,311 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI治理、政策与法律 · 新思想前沿 · SDE Universes</title>
+<meta name="description" content="AI治理、政策与法律近二十年的二十个关键转向：从GDPR第22条、DPIA、阿西洛马原则、多方治理、IEEE伦理标准、加拿大AIA、算法登记与采购治理，到OECD原则、UNESCO建议、欧盟AI法风险分层、合格评定、GPAI系统性风险、AI Office、监管沙盒、事故报告、广岛进程、欧洲委员会AI公约、可争议性与适应性治理。每条给出法源、关键机制、失效条件及八字段碰撞供料层。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:2rem 0 .35rem}
+h2 .en{display:block;font-size:.8rem;font-weight:500;color:var(--muted);letter-spacing:.02em;margin-top:.15rem;font-family:Georgia,serif}
+p{margin:0 0 1.1rem;text-align:justify}
+.src{font-size:.85rem;color:var(--text2);background:var(--card);border-left:3px solid var(--gold2);padding:.5rem .8rem;margin:0 0 .9rem;line-height:1.8}
+.src i{font-style:normal;color:var(--gold2);font-weight:600;margin-right:.4em}
+.era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+
+.act{margin:2.6rem 0 .2rem;padding:.5rem .9rem;background:var(--card);border-left:4px solid var(--gold);font-size:1.02rem;font-weight:600;color:var(--gold)}
+.refs{font-size:.82rem;color:var(--text2);line-height:1.85}
+.refs ol{padding-left:1.4rem;margin:0}
+.refs li{margin-bottom:.45rem}
+h3.sec{font-size:1.1rem;font-weight:600;color:var(--gold);margin:2.2rem 0 .6rem;padding-top:1rem;border-top:1px solid var(--border)}
+.col{font-size:.83rem;color:var(--text2);background:rgba(138,104,23,0.07);border-left:3px solid var(--muted);padding:.5rem .8rem;margin:0 0 1.4rem;line-height:1.8}
+.col i{font-style:normal;color:var(--gold2);font-weight:600;margin-right:.35em}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">AI与知识生产</span></div>
+<main>
+<div class="kicker">新思想前沿 · AI与知识生产</div>
+<h1>AI治理、政策与法律</h1>
+<div class="meta">近二十年 · <b>两幕 · 20 个新思想</b> · 约 20,240 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">AI治理的二十年不是从“无规则”直线走到“一部法”，而是权利、软法、标准、行政工具与市场准入逐层叠加。GDPR把重大自动决定带进个人权利，DPIA与加拿大AIA把风险前移，研究者原则、多方平台、IEEE标准、登记册和采购条款探索法律之外的控制。2019年以后，OECD与UNESCO形成国际词汇，欧盟AI法以风险分层、合格评定、GPAI义务、AI Office、沙盒与上市后监测建成生命周期制度；广岛准则与欧洲委员会公约再把前沿模型和人权底线推向跨国协同。</p>
+<div class="act">【第一幕】从数据权利到原则、标准与行政工具 · 约 2016–2019</div>
+<p>第一幕解决的是“谁能先按下暂停键”。GDPR把个人从被评分对象提升为可争议的权利主体，DPIA要求项目在设计前说明必要性。研究者原则和多方平台建立软规范，IEEE把价值翻译为工程过程；加拿大AIA、算法登记和采购合同则证明，政府即使没有横向AI法，也能通过行政流程、公开清单和买方权力配置义务。</p>
+
+<h2>甲、GDPR第22条：重大决定不得悄然变成全自动<span class="en">GDPR Article 22: Significant Decisions Must Not Quietly Become Fully Automated</span></h2>
+<div class="src"><i>提出</i>欧盟《通用数据保护条例》2016/679，第22条，2018年全面适用。　<i>争议</i>Article 29 Working Party. Guidelines on Automated Individual Decision-Making and Profiling, WP251rev.01, 2018.。　<i>最新</i>（2025年文献）Government of Canada. Guide on the Scope of the Directive on Automated Decision-Making, 2025.。　<i>关键</i>个人有权不受产生法律或类似重大影响的纯自动决定约束，并在例外中获得人工介入、表达意见与争议决定的保障。</div>
+<p>信贷、保险和福利模型曾被当作机构内部工具，个人只看到批准或拒绝，难以知道机器是否实际决定命运。GDPR于2016年通过、第22条在2018年适用后，把“纯自动且产生法律或类似重大影响的决定”设为受限制类别。治理对象由个人数据处理扩到数据怎样变成具有后果的决定。</p>
+<p>〔对象清单〕本条主张，决定自动决策能否保持人的法律主体地位的只有受影响者是否能让一个有权限的人重新审视并改变结果。形式上插入客服不等于human intervention；复核者必须获得信息、时间和授权，个人能表达观点并contest。可撤回决定权而非模型可解释图，构成最低治理资源。GDPR Article 22把该权力写成法律保障。对GDPR第22条：重大决定不得悄然变成全自动GDPR Article 22: Significant Decisions Must Not Quietly Become Fully Automated而言，真正需要登记的不是又一个平均分，而是由“决定自动决策能否保持人的法律主体地位的只有受影响者是否能让一个有权限的人重新审视并改变结果”推出的每一步中介、责任人和可撤回条件；〔对象清单〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>GDPR Article 22(1)规定原则性权利，第22(2)列合同必要、法律授权和明确同意例外，第22(3)要求适当保障。CJEU在2023年SCHUFA案认定，当概率评分对第三方决定具有决定性作用时可能构成自动决定；2025年C-203/22又具体化“meaningful information”应说明实际程序和原则。</p>
+<p>机构可把机器输出称“建议”并让人员机械点击，从而规避“solely”；复杂供应链也让控制者与评分商互相推责。全面禁用会损失一致性，过宽例外则使权利空心化。人工越多，若复核者只相信automation bias，实质可争议性反而越弱；商业秘密又与解释权冲突。CJEU 2023已检验名义建议的边界。〔对象清单〕落到复现实务，可为GDPR第22条：重大决定不得悄然变成全自动GDPR Article 22: Significant Decisions Must Not Quietly Become Fully Automated建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“获实质人工重审且在期限内结案的重大自动决定数／全部重大决定与申诉尝试”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>2026年的合规测试应抽取至少200宗拒绝决定，核查模型分数对最终结果的实际权重、人工改判率、复核时长和申诉成功率；用5个边界案例测试人员能否推翻系统。通知写明数据来源、关键程序、联系人和期限，商业秘密只遮蔽必要细节，不得阻断可理解的个案说明。另应在2026年检查外包评分商能否接受同一申诉SLA，防止控制者与processor之间形成责任断点。</p>
+<p>它与第538号第四条“机会均等：公平从口号变成条件错误率约束”形成权利—指标碰撞：错误率可显示群体差异，第22条赋予个体对重大决定的程序性保护。2016年文本与后续判决适用特定法律要件，不能简化为所有AI都有普遍“解释权”。</p>
+<div class="col"><i>位置</i>S——把可由有权限之人实质重审的决定当成自动化中的人格决定性资源　<i>单因</i>决定自动决策能否保持人的法律主体地位的只有受影响者是否能让一个有权限的人重新审视并改变结果　<i>预设</i>〔01 谁进入分母〕进入正式申诉并被记录的个案足以代表未获知、放弃或被界面阻止的受影响者　<i>量纲</i>获实质人工重审且在期限内结案的重大自动决定数／全部重大决定与申诉尝试　<i>失效</i>当人工复核者只机械接受评分时，名义人工介入越多，个人实际改变决定的机会反而越低　<i>自曝</i>对象清单独立核验：Article 22保护范围受纯自动、重大影响和例外要件限制，并非所有算法决定普遍禁令；独立撤回检查落在对象清单　<i>空栏</i>影子自动化、未通知者、复核权限、商业秘密、供应商责任、申诉成本与自动化偏见　<i>异名</i>AI评测称“机会均等：公平从口号变成条件错误率约束”；见第538号第四条“机会均等：公平从口号变成条件错误率约束”</div>
+
+<h2>乙、数据保护影响评估：高风险处理必须在部署前自证边界<span class="en">Data Protection Impact Assessments: High-Risk Processing Must Define Its Boundaries Before Deployment</span></h2>
+<div class="src"><i>提出</i>GDPR第25条data protection by design与第35条DPIA，2016年立法、2018年适用。　<i>争议</i>Kaminski, M.; Malgieri, G. “Multi-Layered Explanations from Algorithmic Impact Assessments.” FAccT, 2021.。　<i>最新</i>（2024年文献）CEN-CENELEC JTC 21. Artificial Intelligence Standardisation Work Programme, 2024.。　<i>关键</i>可能对个人权利造成高风险的处理，在开始前应描述目的、必要性、比例性、风险与缓解，残余高风险需事前咨询监管者。</div>
+<p>隐私合规曾主要在数据泄露后响应，模型项目则可能在目的和架构确定时已锁定大规模监控。GDPR Article 35把DPIA前移到“处理前”：系统说明处理操作和目的，评估必要性、比例性以及对权利自由的风险，再提出措施。法律审查从上线后的通知转成设计阶段的可阻断文档。</p>
+<p>〔事件时间轴〕本条的单因命题是，决定高风险数据处理能否被提前约束的只有DPIA是否在采购与架构不可逆前完成并可改变设计。若评估发生在合同签署、数据汇集之后，再准确也只能合理化既定方案。把risk owner、mitigation、residual risk和consultation gate接入投资决策，才产生治理效力。</p>
+<p>Article 35要求在新技术、大规模敏感数据、系统化监控等可能高风险情形开展DPIA；Article 36规定残余高风险且无充分缓解时事前咨询监管机构。审计应检查完成日期是否早于首笔采购、风险项数量、设计变更数、未缓解高风险和监管咨询记录，而非只看PDF存在。机构采用数据保护影响评估：高风险处理必须在部署前自证边界Data Protection Impact Assessments: High-Risk Processing Must Define Its Boundaries Before Deployment之前还应公布否决门槛：一旦“当评估在合同签署后补做时，文档越完整，既定设计被包装为必要的风险反而越高”出现，就暂停扩张并回到“可能对个人权利造成高风险的处理，在开始前应描述目的、必要性、比例性、风险与缓解，残余高风险需事前咨询监管者”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<p>项目团队既是收益提出者又是风险作者，可能缩小scope、夸大necessity或把供应商声明当证据；敏捷迭代后旧DPIA与当前模型失配。评估越厚，审批者反而越难发现关键假设。隐私影响也不能替代公平、安全和劳动权评估，单一法律模板容易形成管辖盲点。</p>
+<p>2026年的release gate应以data flow和model version触发DPIA delta；用途、数据源、模型家族或受影响人群任何重大变化即重开。独立隐私官抽样验证20%控制，红队测试重识别与purpose drift；残余high risk设具名接受人与90日到期，不得以“持续监控”无限延期。DPIA还要记录项目被取消的次数，避免只保存获批案例。把数据保护影响评估：高风险处理必须在部署前自证边界Data Protection Impact Assessments: High-Risk Processing Must Define Its Boundaries Before Deployment与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“在不可逆承诺前完成且导致设计改变的DPIA数／全部高风险项目与未缓解项”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>它与第538号第九条“端到端算法审计：从指标检查转向组织过程追责”形成事前—全程关系：DPIA在设计前定位权利风险，端到端审计继续追踪整改与事件。Article 35是一种数据保护法工具，不自动覆盖所有AI伤害或证明处理必要。</p>
+<div class="col"><i>位置</i>D——把目的、数据流、必要性、风险、缓解、咨询与变更触发串成事前控制　<i>单因</i>决定高风险数据处理能否被提前约束的只有DPIA是否在采购与架构不可逆前完成并可改变设计　<i>预设</i>〔02 单一读数代表复杂对象〕一份上线前DPIA足以代表后续模型版本、用途漂移和全部基本权利风险　<i>量纲</i>在不可逆承诺前完成且导致设计改变的DPIA数／全部高风险项目与未缓解项　<i>失效</i>当评估在合同签署后补做时，文档越完整，既定设计被包装为必要的风险反而越高　<i>自曝</i>事件时间轴独立核验：Article 35聚焦个人数据处理风险，不能替代安全、公平、劳动和民主影响评估；独立撤回检查落在事件时间轴　<i>空栏</i>范围缩减、供应商证据、敏捷漂移、残余风险接受、监管咨询、非隐私权利与撤项记录　<i>异名</i>AI评测称“端到端算法审计：从指标检查转向组织过程追责”；见第538号第九条“端到端算法审计：从指标检查转向组织过程追责”</div>
+
+<h2>丙、阿西洛马AI原则：研究共同体先写出能力升级的规范护栏<span class="en">Asilomar AI Principles: The Research Community Drafts Normative Guardrails for Capability Growth</span></h2>
+<div class="src"><i>提出</i>Future of Life Institute，2017年Asilomar Conference与23项AI Principles。　<i>争议</i>Veale, M.; Borgesius, F. Z. “Demystifying the Draft EU Artificial Intelligence Act.” Computer Law Review International, 2021.。　<i>最新</i>（2024年文献）OECD. Recommendation of the Council on Artificial Intelligence, OECD/LEGAL/0449, 2019, updated 2024.。　<i>关键</i>研究目标、竞赛、透明、价值对齐、人类控制、风险与共同利益被放进同一规范议程。</div>
+<p>AI伦理在2010年代中期常被拆成技术安全或科幻争论，缺少跨研究者共同语言。2017年Asilomar会议形成23项原则，分research issues、ethics and values、longer-term issues，要求研究创造有益智能、避免安全竞赛、保留人类控制并广泛共享繁荣。治理第一次追上研究议程设置。</p>
+<p>〔装置边界〕本条主张，决定新能力是否在形成早期被社会化约束的只有研究共同体能否公开承诺一组超越单实验收益的规范边界。原则虽不执法，却改变资助、会议和企业讨论的默认问题：不只问能否做，还问由谁控制、风险怎样分配、是否服务共同利益。规范资源先于法律形成。FLI 2017把它组织为23项原则。〔装置边界〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当签名不附执行后果时，支持者越多，自愿共识被用来替代强制问责的可能反而越高”做至少两轮外部复算，若方向翻转，阿西洛马AI原则：研究共同体先写出能力升级的规范护栏Asilomar AI Principles: The Research Community Drafts Normative Guardrails for Capability Growth的结论必须随之收窄。</p>
+<p>FLI于2017年发布23条Asilomar AI Principles，数千名AI/robotics研究者及其他人士签署；条目包括research funding、science-policy link、failure transparency、judicial transparency、race avoidance和recursive self-improvement控制。核验应区分签名数、机构承诺和实际政策，不能把个人赞同当执行。</p>
+<p>起草者以欧美技术专家为主，原则语言宽泛，不同公司可同时声称遵守并采取相反做法。“beneficial”“human values”没有合法决定主体，长期风险也可能挤压当下劳动和歧视。签名越多，若无budget、owner与breach consequence，象征共识反而越能延缓强制规则。2026年落实仍须外部证据。〔装置边界〕面向下一轮材料，AI治理、政策与法律应优先补齐“起草代表性、价值冲突、实际预算、违反后果、当下伤害、外部观察与退出机制”的原始记录，并把“当签名不附执行后果时，支持者越多，自愿共识被用来替代强制问责的可能反而越高”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<p>2026年的原则复核应把每条承诺映射到政策、责任人、年度预算和可公开KPI；随机挑5条核查事件与董事会记录。签署机构每年发布偏离说明和纠正期限，受影响群体可提出反例；若原则不允许外部观察其是否违反，只能标为价值宣言而非治理机制。</p>
+<p>它与第535号第十二条“参与式AI：受影响者从访谈对象变成设计权力的一方”形成专家原则—民主参与碰撞：Asilomar凝聚研究者，参与式AI追问谁缺席。23项原则的历史意义在议程设置，不等于全球授权、法律义务或实际风险降低。〔装置边界〕在AI治理、政策与法律的这一对象上，复核应把“具有政策、具名责任人、预算、公开KPI和偏离说明的落实原则数／23项原则”拆成同一分母下的主结果与失败谱，“起草代表性、价值冲突、实际预算、违反后果、当下伤害、外部观察与退出机制”要单列编码，不能在汇总时并入其他项。</p>
+<div class="col"><i>位置</i>S——把公开规范承诺当成能力竞赛中改变研究默认的决定性资源　<i>单因</i>决定新能力是否在形成早期被社会化约束的只有研究共同体能否公开承诺一组超越单实验收益的规范边界　<i>预设</i>〔03 缺失即不存在〕原则起草与签署者未代表的地区、工人和受影响群体被视为不改变价值共识　<i>量纲</i>具有政策、具名责任人、预算、公开KPI和偏离说明的落实原则数／23项原则　<i>失效</i>当签名不附执行后果时，支持者越多，自愿共识被用来替代强制问责的可能反而越高　<i>自曝</i>装置边界独立核验：2017年23项原则是研究共同体宣言，不是全球协商、标准或可执行法律；独立撤回检查落在装置边界　<i>空栏</i>起草代表性、价值冲突、实际预算、违反后果、当下伤害、外部观察与退出机制　<i>异名</i>人机协作称“参与式AI：受影响者从访谈对象变成设计权力的一方”；见第535号第十二条“参与式AI：受影响者从访谈对象变成设计权力的一方”</div>
+
+<h2>丁、Partnership on AI：治理知识由公司、学界与公民社会共同生产<span class="en">Partnership on AI: Governance Knowledge Is Co-Produced Across Firms, Academia and Civil Society</span></h2>
+<div class="src"><i>提出</i>Amazon、DeepMind/Google、Facebook、IBM与Microsoft等，2016年创建Partnership on AI，2017年扩展成员。　<i>争议</i>G7. Hiroshima Process International Code of Conduct for Organizations Developing Advanced AI Systems, 2023.。　<i>最新</i>（2025年文献）OECD. Reporting Framework for the G7 Hiroshima AI Process Code of Conduct, 2025.。　<i>关键</i>竞争企业与非营利组织在不设单一监管权的论坛中制定best practices、案例和公共教育。</div>
+<p>单家公司伦理委员会容易成为品牌工具，政府又缺少快速变化的技术细节。2016年Partnership on AI由多家竞争科技公司发起，随后纳入学界、公民社会和国际组织，建立可分享事故、研究和best practice的中介空间。AI治理知识第一次被设计成跨部门公共品，而非一方独占。对Partnership on AI：治理知识由公司、学界与公民社会共同生产Partnership on AI: Governance Knowledge Is Co-Produced Across Firms, Academia and Civil Society而言，真正需要登记的不是又一个平均分，而是由“决定多方治理能否产生比企业自律更可信知识的只有非企业成员是否拥有议程、资源和公开异议权”推出的每一步中介、责任人和可撤回条件；〔样本分层〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>〔样本分层〕本条主张，决定多方治理能否产生比企业自律更可信知识的只有非企业成员是否拥有议程、资源和公开异议权。若公民社会只能评论企业设定的问题，成员数再多也不改变权力；若其能主持项目、保留dissent并影响发布，多方平台才提供认知制衡。PAI 2016以跨部门membership检验这一点。</p>
+<p>PAI自2016年成立后扩展到100余partner的阶段，围绕fairness、safety、labor、synthetic media和responsible practices发布研究与框架。审计不应只数成员，而应统计年度议题由谁提出、工作组chair分布、资助来源、异议附录、建议被成员采纳率与退出理由。〔样本分层〕落到复现实务，可为Partnership on AI：治理知识由公司、学界与公民社会共同生产Partnership on AI: Governance Knowledge Is Co-Produced Across Firms, Academia and Civil Society建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“由非企业成员发起并保留公开异议的议题数／全部议题、资助占比与采纳记录”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>共识文本往往删除最尖锐主张，资源雄厚公司可派全职人员，小型NGO无力持续参与；保密讨论提升坦诚，也减少公众可见性。平台越成功，政府反而可能把它当行业代表并绕开正式民主程序。成员资格也不能代表未加入的全球南方劳动者和数据主体。</p>
+<p>2026年的多方机制应为非企业成员提供独立经费和至少50%议程席位，公开利益冲突、会议纪要与少数意见；每项建议记录成员采纳或拒绝。年度外部评估访谈退出者与未加入群体，检测agenda capture；企业资助不得决定报告发布，重大分歧保留可引用文本。PAI项目还应公开2026年非企业成员的差旅补贴、中途退出率和报告删改记录，以判断资源差距是否实质改变共同决策。〔样本分层〕证据链还要把Amazon、DeepMind/Google、Facebook、IBM与Microsoft等，2的起点材料与更新文献放在同一比较表里，并逐项报告“竞争企业与非营利组织在不设单一监管权的论坛中制定best practices、案例和公共教育”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>它与第535号第十二条“参与式AI：受影响者从访谈对象变成设计权力的一方”共享参与主张，本条考察机构间治理，后者考察具体设计权。多方成员表面多样不等于受影响者拥有决定权，也不自动产生监管正当性。PAI自2016年的制度实验仍非公共授权。</p>
+<div class="col"><i>位置</i>E——把资助、议程权、时间资源、共识规则与公开异议当成多方治理环境　<i>单因</i>决定多方治理能否产生比企业自律更可信知识的只有非企业成员是否拥有议程、资源和公开异议权　<i>预设</i>〔04 测量不改变被测对象〕公布成员数量与跨部门标签不会诱发声誉加入或掩盖实际权力集中　<i>量纲</i>由非企业成员发起并保留公开异议的议题数／全部议题、资助占比与采纳记录　<i>失效</i>当共识规则要求所有成员同意时，参与者越多，尖锐但重要的主张反而越容易被删去　<i>自曝</i>样本分层独立核验：PAI成员与报告显示协作能力，不证明平台代表公众或具有民主监管授权；独立撤回检查落在样本分层　<i>空栏</i>企业资助、议程俘获、NGO时间、退出者、全球南方、保密边界与政府依赖　<i>异名</i>人机协作称“参与式AI：受影响者从访谈对象变成设计权力的一方”；见第535号第十二条“参与式AI：受影响者从访谈对象变成设计权力的一方”</div>
+
+<h2>戊、IEEE伦理对齐设计：价值原则被翻译成工程标准路线<span class="en">IEEE Ethically Aligned Design: Values Are Translated into an Engineering Standards Roadmap</span></h2>
+<div class="src"><i>提出</i>IEEE Global Initiative，2016年首版、2019年《Ethically Aligned Design》第一版。　<i>争议</i>IEEE. Standard 7000-2021: Addressing Ethical Concerns during System Design.。　<i>最新</i>（2025年文献）UK Government. Algorithmic Transparency Recording Standard, v2.1, 2025.。　<i>关键</i>human rights、well-being、accountability、transparency和misuse awareness被接到系统设计与标准项目。</div>
+<p>伦理原则若停留在董事会语言，工程师无法决定需求、测试和验收。IEEE自2016年组织全球倡议，2019年发布Ethically Aligned Design第一版，并推动7000系列标准，把价值识别、透明、偏差和数据治理变成项目生命周期的工作产品。软伦理开始进入可采购、可审核的技术规范体系。</p>
+<p>〔版本登记〕本条的单因命题是，决定伦理目标能否穿过工程组织的只有价值冲突是否被转译为有owner、test和traceability的系统要求。标准化提供共同术语、process和artifact，让“尊重自主”对应权限、撤销和日志；没有需求追踪，伦理评审无法知道哪一行设计承担主张。IEEE 7000要求把价值接入工程过程。机构采用IEEE伦理对齐设计：价值原则被翻译成工程标准路线IEEE Ethically Aligned Design: Values Are Translated into an Engineering Standards Roadmap之前还应公布否决门槛：一旦“当认证被当作道德充分条件时，标准条款越完整，具体情境中的权利冲突反而越少被重新讨论”出现，就暂停扩张并回到“human rights、well-being、accountability、transparency和misuse aware”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<p>IEEE EAD 2019围绕8项general principles展开，7000-2021建立系统设计中的伦理关切过程，7001讨论自主系统透明，7003处理算法偏差。验收应从随机10项价值主张追到requirement、design decision、test result和residual concern，断链即不计合规。</p>
+<p>价值不可完全由工程规格解决：谁定义well-being、哪些权利不可权衡仍是政治问题。标准委员会成员与付费获取会限制参与，小企业可能依赖顾问。标准越细，采购者反而越会把certification当道德充分条件，忽视应用情境和受影响者反对；不同标准还会冲突。2026年认证仍须接受情境复核。把IEEE伦理对齐设计：价值原则被翻译成工程标准路线IEEE Ethically Aligned Design: Values Are Translated into an Engineering Standards Roadmap与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“可从价值主张追至测试与残余关切的完整链路数／抽查主张与断链项”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>2026年的标准采用应公开版本、适用条款和不适用理由，建立values-to-tests traceability matrix；至少两名受影响者代表参与需求评审。独立审计抽查20%链路并公布重大residual concern，认证三年到期；法律或用途变化触发重评，不得以IEEE编号替代实质说明。</p>
+<p>它与第538号第十条“ML Test Score：生产准备度成为28项可执行测试”形成价值—测试接口：IEEE过程把规范主张变成要求，ML Test Score把部分要求放进管线。2019年文档和7000系列提供方法，不决定特定价值取舍合法，也不保证认证后的现实结果。〔版本登记〕本条的边界案例应从“委员会代表性、标准付费、权利不可权衡、跨标准冲突、用途变化、认证过期与反对权”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当认证被当作道德充分条件时，标准条款越完整，具体情境中的权利冲突反而越少被重新讨论”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<div class="col"><i>位置</i>D——把价值识别、需求、设计、测试、残余关切与版本串成伦理工程路径　<i>单因</i>决定伦理目标能否穿过工程组织的只有价值冲突是否被转译为有责任人、测试和追踪的系统要求　<i>预设</i>〔05 代理即本体〕通过IEEE过程与标准条款足以代表人权、福祉和受影响者的实质实现　<i>量纲</i>可从价值主张追至测试与残余关切的完整链路数／抽查主张与断链项　<i>失效</i>当认证被当作道德充分条件时，标准条款越完整，具体情境中的权利冲突反而越少被重新讨论　<i>自曝</i>版本登记独立核验：EAD与7000系列提供工程过程，不授予价值取舍民主正当性或法律效力；独立撤回检查落在版本登记　<i>空栏</i>委员会代表性、标准付费、权利不可权衡、跨标准冲突、用途变化、认证过期与反对权　<i>异名</i>AI评测称“ML Test Score：生产准备度成为28项可执行测试”；见第538号第十条“ML Test Score：生产准备度成为28项可执行测试”</div>
+
+<h2>己、加拿大算法影响评估：行政自动化先按影响等级分配义务<span class="en">Canada’s Algorithmic Impact Assessment: Administrative Automation Gets Tiered Duties Before Use</span></h2>
+<div class="src"><i>提出</i>加拿大财政委员会，2019年《Directive on Automated Decision-Making》及Algorithmic Impact Assessment。　<i>争议</i>Kaminski, M.; Malgieri, G. “Multi-Layered Explanations from Algorithmic Impact Assessments.” FAccT, 2021.。　<i>最新</i>（2026年文献）Government of Canada. Algorithmic Impact Assessment Tool, current 2026 version.。　<i>关键</i>问卷计算I–IV影响等级，等级越高，同行评审、解释、人工介入、测试和公开要求越强。</div>
+<p>政府采购算法时，统一禁令过粗，完全自愿又无法约束高影响福利、移民和税务决定。加拿大2019年发布Automated Decision-Making Directive，要求适用系统在生产前完成AIA，按对个人、机构和社会的影响分为Level I–IV，并让义务随等级递增。风险分层由理论进入可操作行政流程。〔失败谱〕这也给出一项不依赖宣传口径的核验：独立团队只拿到冻结版本与“决定公共部门能否把有限治理资源投向最危险系统的只有影响等级是否在上线前真实区分后果严重度”的操作定义，仍能复算“经独立复算无降级且在生产前公开的AIA数／全部适用系统与错分项”，否则所谓转向可能只是数据管线或命名变化。</p>
+<p>〔失败谱〕本条主张，决定公共部门能否把有限治理资源投向最危险系统的只有影响等级是否在上线前真实区分后果严重度。等级连接notice、explanation、peer review、human intervention、testing和contingency；若高影响系统被低报，整套比例义务失效。分类权因而是治理核心，而非表单技术。AIA Level I–IV把这项差异正式化。</p>
+<p>现行官方工具于2026年说明AIA含65个risk question和41个mitigation question；指令2019-04-01生效，2020-04-01后新系统须合规。审计应重算score、核对输入证据和最终Level，统计人工改级、公开AIA日期、peer review与生产前完成率；自报截图不代替版本化答案。〔失败谱〕面向下一轮材料，AI治理、政策与法律应优先补齐“系统拆分、范围例外、供应商秘密、自评偏差、组合影响、版本重评与省级执法用途”的原始记录，并把“当部门可拆分系统或称其仅为辅助时，低等级AIA越多，组合高影响被低报的风险反而越高”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<p>部门可能把系统定义为“辅助”或拆成多个低级组件，降低总分；采购商又依赖供应商保密回答。量化score给人客观感，却把权利冲突压成权重。指令主要适用联邦行政决定，省级、执法或内部员工系统可能不在同一范围；等级越低，遗漏的组合影响反而越难被看见。2026年官方scope仍有边界。</p>
+<p>2026年的执行应由独立reviewer复算全部Level III–IV及20%的I–II，保留原答案与改动；系统功能、数据或scope变化立即重做AIA。公开页提供机器可读版本、证据链接、申诉方式和last reviewed date；组件组合另算system-level impact，避免通过拆分规避。〔失败谱〕在AI治理、政策与法律的这一对象上，复核应把“经独立复算无降级且在生产前公开的AIA数／全部适用系统与错分项”拆成同一分母下的主结果与失败谱，“系统拆分、范围例外、供应商秘密、自评偏差、组合影响、版本重评与省级执法用途”要单列编码，不能在汇总时并入其他项。</p>
+<p>它与第538号第十九条“NIST AI RMF：评测结果进入治理—映射—测量—管理闭环”形成行政—通用框架接口：加拿大AIA给强制等级和具体义务，RMF提供跨行业风险语言。65+41题与I–IV级是现行工具设计，不证明部门自评分准确或覆盖所有政府AI。</p>
+<div class="col"><i>位置</i>D——把强制问卷、影响等级、递增义务、公开与重评串成行政治理路径　<i>单因</i>决定公共部门能否把有限治理资源投向最危险系统的只有影响等级是否在上线前真实区分后果严重度　<i>预设</i>〔06 通过形式审查＝实质合规〕完成106个问题并获得I–IV等级就等于风险识别充分且义务已落实　<i>量纲</i>经独立复算无降级且在生产前公开的AIA数／全部适用系统与错分项　<i>失效</i>当部门可拆分系统或称其仅为辅助时，低等级AIA越多，组合高影响被低报的风险反而越高　<i>自曝</i>失败谱独立核验：65+41问题与等级制度适用于特定加拿大联邦行政范围，不是全球AI风险通用认证；独立撤回检查落在失败谱　<i>空栏</i>系统拆分、范围例外、供应商秘密、自评偏差、组合影响、版本重评与省级执法用途　<i>异名</i>AI评测称“NIST AI RMF：评测结果进入治理—映射—测量—管理闭环”；见第538号第十九条“NIST AI RMF：评测结果进入治理—映射—测量—管理闭环”</div>
+
+<h2>庚、算法透明登记册：公共机构必须先承认自己在用什么系统<span class="en">Algorithmic Transparency Registers: Public Bodies Must First Admit What Systems They Use</span></h2>
+<div class="src"><i>提出</i>Amsterdam与Helsinki，2020年algorithm registers；英国ATRS，2021年模板、2024年中央政府强制。　<i>争议</i>Selbst, A. D. “An Institutional View of Algorithmic Impact Assessments.” Harvard Journal of Law & Technology, 2021.。　<i>最新</i>（2026年文献）Government of Canada. Algorithmic Impact Assessment Tool, current 2026 version.。　<i>关键</i>政府主动发布工具目的、负责人、数据、供应商、决策作用、风险和申诉，而非等待信息公开请求。</div>
+<p>公众常在福利被拒或警务系统曝光后才知道政府使用算法，甚至监管者也没有完整inventory。Amsterdam与Helsinki于2020年上线登记册，英国随后制定Algorithmic Transparency Recording Standard。治理的第一步由解释单个决定前移为机构主动列出“我们在何处、为何使用算法”。</p>
+<p>〔机构接口〕本条的单因命题是，决定公共算法能否进入民主监督的只有每个实际影响决定的系统是否出现在可搜索、可更新的公开inventory。没有分母，公众无法知道漏报多少，也无法比较机构。登记把system owner、purpose、data、supplier、human role与appeal入口绑定成监管发现层。ATRS自2024年成为中央政府强制政策。〔机构接口〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当机构只发布少数示范记录时，登记册知名度越高，公众对整体透明度的高估反而越大”做至少两轮外部复算，若方向翻转，算法透明登记册：公共机构必须先承认自己在用什么系统Algorithmic Transparency Registers: Public Bodies Must First Admit What Systems They Use的结论必须随之收窄。</p>
+<p>英国ATRS模板2021年发布，中央政府自2024年实行强制政策；2025-05官方称repository新增53条、总计59条。审计应将采购、云支出、DPIA和模型endpoint清单交叉匹配，计算登记覆盖率、逾期天数和字段完整度；只数公开记录会把未知系统排出分母。</p>
+<p>部门可把算法称普通analytics、pilot或供应商功能而不登记；记录上线后不更新，公众看到旧版本。技术字段齐全也可能不可读，过度披露安全细节又有风险。登记越知名，若没有主动发现和处罚，机构反而可用少数范例证明“透明”并遮蔽大量未登记系统。2025年公开记录仍须寻找漏报分母。〔机构接口〕证据链还要把Amsterdam与Helsinki，2020年algorithm registers，英国AT的起点材料与更新文献放在同一比较表里，并逐项报告“政府主动发布工具目的、负责人、数据、供应商、决策作用、风险和申诉，而非等待信息公开请求”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>2026年的登记制度应以采购ID、模型hash和API域名自动对账，每季度扫描未匹配系统；超过30日未更新标红。每条提供plain-language摘要、决策权重、适用人群、最近审计、事件和申诉链接，保密字段给理由与到期日。年度由审计机关抽查至少20个部门并公开漏报率。</p>
+<p>它与第538号第六条“模型卡：模型发布必须随附用途、切片与限制”构成公共inventory—产品文档关系：登记册告诉公众哪些系统在用，模型卡说明特定版本性能。59条是2025年英国当时的公开数量，不等于全部中央政府算法或透明效果。对算法透明登记册：公共机构必须先承认自己在用什么系统Algorithmic Transparency Registers: Public Bodies Must First Admit What Systems They Use而言，真正需要登记的不是又一个平均分，而是由“决定公共算法能否进入民主监督的只有每个实际影响决定的系统是否出现在可搜索、可更新的公开清单”推出的每一步中介、责任人和可撤回条件；〔机构接口〕缺少任何一环，都不能把相关性写成机制。</p>
+<div class="col"><i>位置</i>E——把采购发现、分类口径、版本更新、可读性与保密例外当成公开登记环境　<i>单因</i>决定公共算法能否进入民主监督的只有每个实际影响决定的系统是否出现在可搜索、可更新的公开清单　<i>预设</i>〔01 谁进入分母〕已自愿或依法登记的系统足以代表未登记、试点、供应商嵌入与普通分析工具　<i>量纲</i>与采购和API清单匹配且30日内更新的登记系统数／全部发现系统与漏报数　<i>失效</i>当机构只发布少数示范记录时，登记册知名度越高，公众对整体透明度的高估反而越大　<i>自曝</i>机构接口独立核验：2025年59条是英国repository当时记录数，不是政府算法总量或完整率；独立撤回检查落在机构接口　<i>空栏</i>pilot漏报、供应商嵌入、analytics改名、版本陈旧、保密到期、公众可读性与处罚　<i>异名</i>AI评测称“模型卡：模型发布必须随附用途、切片与限制”；见第538号第六条“模型卡：模型发布必须随附用途、切片与限制”</div>
+
+<h2>辛、采购即治理：合同把透明、审计与退出权压到供应链<span class="en">Procurement as Governance: Contracts Push Transparency, Audit and Exit Rights Down the Supply Chain</span></h2>
+<div class="src"><i>提出</i>英国政府与World Economic Forum，2020年《Guidelines for AI Procurement》；各国公共采购随后加入算法条款。　<i>争议</i>Selbst, A. D. “An Institutional View of Algorithmic Impact Assessments.” Harvard Journal of Law & Technology, 2021.。　<i>最新</i>（2026年文献）Government of Canada. Algorithmic Impact Assessment Tool, current 2026 version.。　<i>关键</i>公共买方在招标、评分、合同、验收和续约各阶段嵌入负责AI要求，而非交付后再请求自愿合作。</div>
+<p>政府即使没有专门AI法，也是大型软件买家；一旦签下封闭系统，后续解释、审计和迁移常被商业秘密与锁定阻断。2020年前后AI procurement指南提出，从问题定义和market consultation开始写入数据、偏差、可解释、security与accountability要求。治理力量由处罚供应商扩到决定谁能获得合同。机构采用采购即治理：合同把透明、审计与退出权压到供应链Procurement as Governance: Contracts Push Transparency, Audit and Exit Rights Down the Supply Chain之前还应公布否决门槛：一旦“当机构无预算执行条款时，合同要求越多，风险已被转移给供应商的错觉反而越强”出现，就暂停扩张并回到“公共买方在招标、评分、合同、验收和续约各阶段嵌入负责AI要求，而非交付后再请求自愿合作”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<p>〔资源预算〕本条主张，决定采购能否约束AI供应链的只有核心审计与退出权是否成为付款和续约的可执行合同条件。政策指南若不进入statement of work、acceptance test、SLA和termination clause，项目经理无法执行；一旦里程碑付款绑定证据，供应商才有持续披露动力。</p>
+<p>英国与WEF 2020指南强调先评估AI是否适当、采用跨职能团队、把数据与技术问题贯穿采购生命周期。验收应核查合同是否含model/data version、subprocessor、audit access、incident notification、change control、IP许可、export format和termination assistance，并抽取10次付款看证据是否先于付款。〔资源预算〕落到复现实务，可为采购即治理：合同把透明、审计与退出权压到供应链Procurement as Governance: Contracts Push Transparency, Audit and Exit Rights Down the Supply Chain建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“经真实审计或退出演练验证的核心合同权利数／全部必需权利、付款里程碑与豁免”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>买方缺少技术人员时会复制供应商承诺，审计权因费用或通知期无法实际使用；强硬条款也可能排除小企业。国家安全和商业秘密形成例外，云模型单方更新使固定验收失效。条款越多，若没有预算和owner执行，纸面权利反而让机构误以为风险已转移。2026年SLA必须以真实调用记录验证。</p>
+<p>2026年的公共合同应设置30日重大事件通知、年度独立审计、版本变更事前批准和开放export test；至少一次演练termination。评分中为可审计性与供应商多样性单列权重，禁止以无限责任转嫁取代控制。合同register公开关键条款和豁免，续约前核对事件、性能与迁移成本。〔资源预算〕本条的边界案例应从“买方技能、小企排除、审计费用、秘密例外、云端更新、上游模型、条款豁免与退出成本”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当机构无预算执行条款时，合同要求越多，风险已被转移给供应商的错觉反而越强”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>它与第536号第七条“Kubernetes、Kubeflow与KServe：模型服务进入声明式控制面”形成合同—技术控制接口：采购规定变更与退出权，控制面执行版本和回滚。2020年指南提供采购方法，不证明所有买方有能力执行或合同能覆盖上游foundation model。</p>
+<div class="col"><i>位置</i>E——把买方能力、市场结构、商业秘密、合同执行与退出演练当成供应链治理环境　<i>单因</i>决定采购能否约束AI供应链的只有核心审计与退出权是否成为付款和续约的可执行合同条件　<i>预设</i>〔02 单一读数代表复杂对象〕合同含有审计、事件和退出条款就足以代表这些权利可被实际使用　<i>量纲</i>经真实审计或退出演练验证的核心合同权利数／全部必需权利、付款里程碑与豁免　<i>失效</i>当机构无预算执行条款时，合同要求越多，风险已被转移给供应商的错觉反而越强　<i>自曝</i>资源预算独立核验：采购指南影响招标过程，不自动创造监管权、技术能力或上游数据访问；独立撤回检查落在资源预算　<i>空栏</i>买方技能、小企排除、审计费用、秘密例外、云端更新、上游模型、条款豁免与退出成本　<i>异名</i>AI系统称“Kubernetes、Kubeflow与KServe：模型服务进入声明式控制面”；见第536号第十五条“Kubernetes、Kubeflow与KServe：模型服务进入声明式控制面”</div>
+
+<div class="act">【第二幕】从国际软法到风险分层、市场准入与跨境条约 · 约 2019–2026</div>
+<p>第二幕把原则推进机构和法律。OECD与UNESCO先提供跨国共同词汇，欧盟AI法再把用途分层、技术档案、基础模型义务、监管节点、实验空间和事件反馈接成一条链。广岛准则试图在立法时差中约束前沿开发者，欧洲委员会公约建立人权条约底线；可争议性和适应性治理则提醒，规则必须能改变个案，也必须知道自己使用的是哪一版法律。</p>
+
+<h2>一、OECD AI原则：可信AI第一次形成政府间共同词汇<span class="en">OECD AI Principles: Trustworthy AI Gains Its First Intergovernmental Vocabulary</span></h2>
+<div class="src"><i>提出</i>OECD Council Recommendation on Artificial Intelligence，2019年采纳、2024年更新。　<i>争议</i>OECD. The State of Implementation of the OECD AI Principles Four Years On, 2023.。　<i>最新</i>（2024年文献）NIST. Generative Artificial Intelligence Profile, NIST AI 600-1, 2024.。　<i>关键</i>包容增长、人权民主价值、透明、稳健安全和问责与研究投资、生态、能力、劳动力及国际合作相连。</div>
+<p>2019年前，各国AI战略使用“伦理”“可信”“负责”却含义不同，跨境公司也可选择最宽松表述。OECD成员采纳首个政府间AI标准，G20同年以其为基础背书。五项values-based principle与五项recommendation给政策制定者和AI actors一套共同语言，软法开始形成国际坐标。</p>
+<p>〔外部复算〕本条的单因命题是，决定各国规则能否在不相同的法律体系间互操作的只有核心风险与责任概念是否有稳定共同定义。共享transparency、robustness、accountability和human-centred values，才可做crosswalk、采购互认和事件交流；词汇协调是合作资源，不等于规则统一。OECD 2019因此提供10项共同原则。〔外部复算〕面向下一轮材料，AI治理、政策与法律应优先补齐“非成员声音、国内执行、术语分歧、最低标准、威权解释、预算、救济与版本迁移”的原始记录，并把“当互认只看共同签署时，adhering country越多，最低共同点被误作实质等效的风险反而越高”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<p>OECD原则2019年采纳、2024年更新，仍含5项价值原则和5项政府建议；官方资料称其为首个intergovernmental AI standard，并成为G20 2019原则基础。评估实施应逐国记录法律、机构、预算和执法案例，不以“adhering country”计作落地；更新前后条文另做version map。</p>
+<p>软法允许国家口头同意而不改法律，宽泛概念也能被威权监控和商业自律各自解释。OECD成员结构不能代表所有全球南方国家；国际共识越强，反而可能把争议价值包装成技术中性。crosswalk还可能把最低共同点当最高标准，削弱更严格人权义务。把OECD AI原则：可信AI第一次形成政府间共同词汇OECD AI Principles: Trustworthy AI Gains Its First Intergovernmental Vocabulary与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“具有约束规则、责任机构、预算和公开案例的落实原则数／10项原则与各国空白项”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>2026年的互操作审计应把10项原则映射到各国binding rule、responsible agency、budget和公开case，标明无对应项；每两年由非成员与公民社会评议。跨境互认只接受实质等效证据，不因同签原则自动放行；2024修订造成的术语变化须更新合同和标准。</p>
+<p>它与第538号第十九条“NIST AI RMF：评测结果进入治理—映射—测量—管理闭环”形成国际词汇—组织实践关系：OECD定义共同方向，RMF把风险语言接到机构流程。10项原则与G20背书证明规范扩散，不证明各国执行强度或权利保护等同。〔外部复算〕这也给出一项不依赖宣传口径的核验：独立团队只拿到冻结版本与“决定各国规则能否在不相同的法律体系间互操作的只有核心风险与责任概念是否有稳定共同定义”的操作定义，仍能复算“具有约束规则、责任机构、预算和公开案例的落实原则数／10项原则与各国空白项”，否则所谓转向可能只是数据管线或命名变化。</p>
+<div class="col"><i>位置</i>S——把政府间共同风险与责任词汇当成跨法域互操作的决定性资源　<i>单因</i>决定各国规则能否在不相同的法律体系间互操作的只有核心风险与责任概念是否有稳定共同定义　<i>预设</i>〔02 单一读数代表复杂对象〕国家采纳或背书OECD原则足以代表国内法律、预算、机构和救济已落实　<i>量纲</i>具有约束规则、责任机构、预算和公开案例的落实原则数／10项原则与各国空白项　<i>失效</i>当互认只看共同签署时，adhering country越多，最低共同点被误作实质等效的风险反而越高　<i>自曝</i>外部复算独立核验：2019/2024 OECD原则是政府间软法标准，不直接创设个人权利或制裁；独立撤回检查落在外部复算　<i>空栏</i>非成员声音、国内执行、术语分歧、最低标准、威权解释、预算、救济与版本迁移　<i>异名</i>AI评测称“NIST AI RMF：评测结果进入治理—映射—测量—管理闭环”；见第538号第十九条“NIST AI RMF：评测结果进入治理—映射—测量—管理闭环”</div>
+
+<h2>二、UNESCO AI伦理建议：全球规范把环境、文化与性别纳入治理<span class="en">UNESCO Recommendation on AI Ethics: Global Norms Add Environment, Culture and Gender</span></h2>
+<div class="src"><i>提出</i>UNESCO第41届大会，2021年通过《Recommendation on the Ethics of Artificial Intelligence》。　<i>争议</i>Kaminski, M.; Malgieri, G. “Multi-Layered Explanations from Algorithmic Impact Assessments.” FAccT, 2021.。　<i>最新</i>（2026年文献）Government of Canada. Algorithmic Impact Assessment Tool, current 2026 version.。　<i>关键</i>人权尊严、环境生态、多样性、公平、透明、人类监督与10余政策领域被放入同一全球建议。</div>
+<p>早期AI伦理多由技术公司和富裕国家聚焦隐私、公平与安全，文化多样性、环境、性别和发展能力处于边缘。UNESCO成员国在2021年第41届大会通过全球Recommendation，以values、principles和policy actions覆盖教育、劳动、健康、文化、环境与国际合作。规范对象由产品风险扩成社会发展选择。〔反号压力〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当成员国只报告成功案例时，采纳覆盖越广，未执行与被压制异议反而越容易被全球共识遮蔽”做至少两轮外部复算，若方向翻转，UNESCO AI伦理建议：全球规范把环境、文化与性别纳入治理UNESCO Recommendation on AI Ethics: Global Norms Add Environment, Culture and Gender的结论必须随之收窄。</p>
+<p>〔反号压力〕本条主张，决定全球AI治理是否超越技术出口国视角的只有环境、文化、性别与发展不平等是否成为与效率同等的政策义务。UNESCO框架让成员国做readiness和ethical impact assessment，把“谁有能力治理、谁承担资源成本”放进问题；多维价值成为纠偏资源。</p>
+<p>官方资料说明Recommendation 2021适用于UNESCO全部194 member state的表述，并以human rights、dignity、transparency、fairness、environmental sustainability和human oversight为核心；实施工具包含RAM。复核应报告完成RAM的机构数、立法/预算改变、公开EIA和被取消项目，而非仅数国家采纳。〔反号压力〕证据链还要把UNESCO第41届大会，2021年通过《Recommendation on the Ethic的起点材料与更新文献放在同一比较表里，并逐项报告“人权尊严、环境生态、多样性、公平、透明、人类监督与10余政策领域被放入同一全球建议”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>Recommendation非条约，国家可提交成功案例而回避监控用途；RAM由政府协调也会低估民主和少数群体风险。议题广泛导致每项资源稀薄，不同文化被国家代表垄断。全球采纳越接近普遍，反而越可能把未执行的共识当成问题已经解决。</p>
+<p>2026年的实施应公开RAM证据、分歧意见和行动预算，由独立学者、公民社会及原住民团体共同验证；每项policy area设两年目标。环境评估披露训练和部署能源水耗，文化评估检查语言与知识权；若建议未进入法律或采购，明确标记soft commitment而非“已合规”。〔反号压力〕在AI治理、政策与法律的这一对象上，复核应把“经独立验证并获预算的RAM行动数／全部承诺、空白政策领域与逾期目标”拆成同一分母下的主结果与失败谱，“政府自报、少数群体异议、实施预算、国家监控、文化代表权、环境数据与项目取消”要单列编码，不能在汇总时并入其他项。</p>
+<p>它与第535号第十九条“无障碍共创：残障者不是边缘测试组，而是系统共同设计者”共享包容原则，本条把包容扩到国家政策和文化生态。2021年的广泛采纳说明规范认可，不证明194个成员国实施一致或所有群体实质参与。</p>
+<div class="col"><i>位置</i>S——把环境、文化、性别与发展能力并列当成纠正技术中心治理的决定性资源　<i>单因</i>决定全球AI治理是否超越技术出口国视角的只有环境、文化、性别与发展不平等是否成为与效率同等的政策义务　<i>预设</i>〔04 测量不改变被测对象〕国家填写RAM和EIA不会诱发选择性报告、声誉管理或压低争议　<i>量纲</i>经独立验证并获预算的RAM行动数／全部承诺、空白政策领域与逾期目标　<i>失效</i>当成员国只报告成功案例时，采纳覆盖越广，未执行与被压制异议反而越容易被全球共识遮蔽　<i>自曝</i>反号压力独立核验：UNESCO Recommendation是全球软法与能力建设框架，不是可直接诉讼的统一义务；独立撤回检查落在反号压力　<i>空栏</i>政府自报、少数群体异议、实施预算、国家监控、文化代表权、环境数据与项目取消　<i>异名</i>人机协作称“无障碍共创：残障者不是边缘测试组，而是系统共同设计者”；见第535号第十九条“无障碍共创：残障者不是边缘测试组，而是系统共同设计者”</div>
+
+<h2>三、欧盟AI法风险分层：义务跟随用途风险而非算法名词<span class="en">The EU AI Act’s Risk Tiers: Duties Follow Use-Case Risk, Not Algorithm Labels</span></h2>
+<div class="src"><i>提出</i>欧盟委员会2021年AI Act提案；Regulation (EU) 2024/1689于2024年生效并分阶段适用。　<i>争议</i>Selbst, A. D. “An Institutional View of Algorithmic Impact Assessments.” Harvard Journal of Law & Technology, 2021.。　<i>最新</i>（2026年文献）Government of Canada. Algorithmic Impact Assessment Tool, current 2026 version.。　<i>关键</i>禁止实践、高风险系统、透明义务和其他低风险用途形成差异化义务，分类依据系统用途、影响与产品法规。</div>
+<p>AI规则若按“机器学习”统一许可，会把垃圾过滤与福利评分同等监管；只靠行业法又遗漏跨行业模型。欧盟委员会2021年提出、欧盟2024年通过AI Act，以unacceptable、high、transparency-related和minimal等风险逻辑配置义务。治理单位从算法技术改为用途、部署情境和受影响权利。</p>
+<p>〔责任链〕本条的单因命题是，决定横向AI法能否保持比例性的只有系统是否按实际intended purpose和可预见使用进入正确风险层。分类一旦成立，就连接禁止、风险管理、数据治理、日志、human oversight、conformity与post-market要求；因此边界事实比模型名称更重要。EU AI Act 2024把分类接上法定义务。〔责任链〕落到复现实务，可为欧盟AI法风险分层：义务跟随用途风险而非算法名词The EU AI Act’s Risk Tiers: Duties Follow Use-Case Risk, Not Algorithm Labels建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“经实际日志与独立复核确认的正确风险分类数／全部AI用途、重分类与争议项”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>Regulation (EU) 2024/1689于2024-08-01进入force；禁止实践和AI literacy自2025-02-02适用，GPAI规则自2025-08-02适用，主要规定自2026-08-02适用。审计应记录Annex III类别、Article 6依据、provider/deployer角色、分类人、法律意见与重评日期。</p>
+<p>供应商可缩窄intended purpose或称任务只是“preparatory”，部署者却扩大使用；同一模型在招聘和游戏中风险不同。清单更新慢于新用途，成员国执法也可能不一。层级越明确，企业反而越有动力做边界工程；不在高风险清单不等于无实质伤害。2026年实际用途日志是反规避证据。〔责任链〕本条的边界案例应从“用途漂移、组件责任、辅助例外、新型伤害、成员国差异、分类异议与修法版本”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当企业可用狭窄用途描述规避层级时，分类规则越清晰，边界工程投入反而越高”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>2026年的分类控制应以真实workflow而非营销文案为准，抽取日志检查20%用途；重大change、fine-tune或新客户行业触发重评。分类决定与少数意见进入register，高风险否定结论须独立法律复核；边界不确定时采用临时较高控制并在90日内请求主管机关指导。</p>
+<p>它与第538号第十九条“NIST AI RMF：评测结果进入治理—映射—测量—管理闭环”形成硬法层级—自愿框架关系：AI Act规定何时必须，RMF帮助组织怎样管理。2024/1689的时间线与分类会受后续修法和实施文本影响，2026验收必须标明法源版本。对欧盟AI法风险分层：义务跟随用途风险而非算法名词The EU AI Act’s Risk Tiers: Duties Follow Use-Case Risk, Not Algorithm Labels而言，真正需要登记的不是又一个平均分，而是由“决定横向AI法能否保持比例性的只有系统是否按实际用途和可预见使用进入正确风险层”推出的每一步中介、责任人和可撤回条件；〔责任链〕缺少任何一环，都不能把相关性写成机制。</p>
+<div class="col"><i>位置</i>D——把用途事实、风险层、角色、义务、变更与执法串成横向法律路径　<i>单因</i>决定横向AI法能否保持比例性的只有系统是否按实际用途和可预见使用进入正确风险层　<i>预设</i>〔03 缺失即不存在〕未列入高风险附件或被称为辅助用途的系统被视为不产生重大权利风险　<i>量纲</i>经实际日志与独立复核确认的正确风险分类数／全部AI用途、重分类与争议项　<i>失效</i>当企业可用狭窄用途描述规避层级时，分类规则越清晰，边界工程投入反而越高　<i>自曝</i>责任链独立核验：EU AI Act分类是法律框架，具体义务与时间须按2026有效合并文本判断；独立撤回检查落在责任链　<i>空栏</i>用途漂移、组件责任、辅助例外、新型伤害、成员国差异、分类异议与修法版本　<i>异名</i>AI评测称“NIST AI RMF：评测结果进入治理—映射—测量—管理闭环”；见第538号第十九条“NIST AI RMF：评测结果进入治理—映射—测量—管理闭环”</div>
+
+<h2>四、合格评定：高风险AI开始像受监管产品一样建立技术档案<span class="en">Conformity Assessment: High-Risk AI Builds a Technical File Like a Regulated Product</span></h2>
+<div class="src"><i>提出</i>EU AI Act第43条及New Legislative Framework路径，2024年成法。　<i>争议</i>Selbst, A. D. “An Institutional View of Algorithmic Impact Assessments.” Harvard Journal of Law & Technology, 2021.。　<i>最新</i>（2026年文献）European Commission. Guidelines for Providers of General-Purpose AI Models, 2026.。　<i>关键</i>风险管理、数据治理、技术文档、记录、透明、human oversight、accuracy、robustness与cybersecurity被汇入进入市场前的证据。</div>
+<p>伦理审查常在企业内部结束，监管者只有事故后才能追问。AI Act把部分高风险系统接入欧盟产品合格评定传统：provider建立quality management和technical documentation，完成适用程序、签署EU declaration并注册；特定情形由notified body参与。AI治理获得市场准入证据链。机构采用合格评定：高风险AI开始像受监管产品一样建立技术档案Conformity Assessment: High-Risk AI Builds a Technical File Like a Regulated Product之前还应公布否决门槛：一旦“当采购者把CE视为充分保证时，认证覆盖越广，具体部署情境验证反而越容易被取消”出现，就暂停扩张并回到“风险管理、数据治理、技术文档、记录、透明、human oversight、accuracy、robustness与cyberse”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<p>〔排除规则〕本条主张，决定高风险AI能否在进入市场前承担可验证责任的只有合格结论是否由完整、可追溯且独立性适当的technical file支持。CE标志不是理由本身，背后必须有requirements→tests→results→residual risk链；缺少原始artifact的声明无法让监管者重算。Article 43以技术档案承载这项责任。</p>
+<p>Regulation 2024/1689 Article 43规定高风险AI的conformity assessment路径，部分采用internal control，部分依相关Union harmonisation legislation或notified body。审计随机抽20项essential requirement，追到标准版本、测试样本、失败记录、签署者和market registration；只看certificate编号不计。把合格评定：高风险AI开始像受监管产品一样建立技术档案Conformity Assessment: High-Risk AI Builds a Technical File Like a Regulated Product与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“可从法定要求追至原始测试且版本未过期的证据链数／抽查要求与断链项”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>自评节省成本却有利益冲突，第三方机构又可能由受评企业付费并争夺客户；harmonised standard制定慢且被大型公司主导。模型持续更新使一次证书迅速过期，供应商还可把关键组件责任推给下游。认证越成熟，采购者反而越可能停止自己的用途审查。2026年continuous update使一次证书不足。</p>
+<p>2026年的评定应对高严重度用途设置独立challenge test，notified body公开利益冲突和收入集中；每次substantial modification触发delta assessment。档案保存model/data hash、失败样本、标准偏离和post-market事件；证书有明确版本与到期日，下游部署者仍须完成context validation。〔排除规则〕这也给出一项不依赖宣传口径的核验：独立团队只拿到冻结版本与“决定高风险AI能否在进入市场前承担可验证责任的只有合格结论是否由完整可追溯且独立性适当的技术档案支持”的操作定义，仍能复算“可从法定要求追至原始测试且版本未过期的证据链数／抽查要求与断链项”，否则所谓转向可能只是数据管线或命名变化。</p>
+<p>它与第538号第六条“模型卡：模型发布必须随附用途、切片与限制”构成法定档案—公共摘要关系：技术档案服务监管和评定，模型卡服务使用者解释。Article 43存在多条程序，不是所有high-risk AI都由外部机构逐项审查，CE也不证明零风险。</p>
+<div class="col"><i>位置</i>E——把自评利益冲突、标准制定、机构付费、持续更新与下游用途当成评定环境　<i>单因</i>决定高风险AI能否在进入市场前承担可验证责任的只有合格结论是否由完整可追溯且独立性适当的技术档案支持　<i>预设</i>〔03 缺失即不存在〕certificate与CE标志未显示的失败样本、标准偏离和更新风险被视为不存在　<i>量纲</i>可从法定要求追至原始测试且版本未过期的证据链数／抽查要求与断链项　<i>失效</i>当采购者把CE视为充分保证时，认证覆盖越广，具体部署情境验证反而越容易被取消　<i>自曝</i>排除规则独立核验：Article 43允许不同评定路径，外部notified body并非所有高风险系统必经；独立撤回检查落在排除规则　<i>空栏</i>自评冲突、机构付费、标准俘获、失败样本、证书过期、组件责任与下游验证　<i>异名</i>AI评测称“模型卡：模型发布必须随附用途、切片与限制”；见第538号第六条“模型卡：模型发布必须随附用途、切片与限制”</div>
+
+<h2>五、GPAI与系统性风险：基础模型第一次获得上游专门义务<span class="en">GPAI and Systemic Risk: Foundation Models Receive Dedicated Upstream Duties</span></h2>
+<div class="src"><i>提出</i>EU AI Act对general-purpose AI model的2023年谈判方案与2024年最终文本。　<i>争议</i>Treasury Board of Canada Secretariat. Directive on Automated Decision-Making, 2019, amended.。　<i>最新</i>（2025年文献）Government of Canada. Guide on the Scope of the Directive on Automated Decision-Making, 2025.。　<i>关键</i>一般GPAI需技术文档、下游信息、版权政策和训练内容摘要；系统性风险模型另需评测、风险缓解、事件报告与cybersecurity。</div>
+<p>传统产品法把责任放在最终招聘或医疗应用，但foundation model由上游训练后进入数百未知用途，下游无法独自获得训练和能力信息。AI Act最终文本设GPAI model类别，并对具有systemic risk者增加义务。治理单位由终端use case向供应链上游移动，承认通用能力的横向外部性。</p>
+<p>〔基线冻结〕本条的单因命题是，决定基础模型外部性是否能在源头被控制的只有上游provider是否承担与下游不可见能力相匹配的专门义务。技术文档和下游信息补knowledge asymmetry；systemic-risk层再要求model evaluation、adversarial testing、risk mitigation、serious incident和cybersecurity。GPAI自2025年获得专门规则。〔基线冻结〕面向下一轮材料，AI治理、政策与法律应优先补齐“训练拆分、算法效率、fine-tune归属、能力触发、部署规模、版权救济与阈值更新”的原始记录，并把“当企业围绕计算阈值设计训练时，阈值越明确，低报累计计算和转向不可见能力提升的激励反而越强”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<p>欧盟官方2025说明，GPAI规则自2025-08-02适用；训练计算超过10^25 FLOP的最先进或有影响模型推定具有系统性风险并须通知AI Office，委员会执法权自2026-08-02生效。审计应重算compute、记录designation、模型版本、下游包、incident和mitigation。</p>
+<p>FLOP是能力和风险的粗代理，算法效率可让低于阈值模型具高能力，超阈值模型也不必同危；provider可拆分训练或争论fine-tune归属。公开训练摘要与版权政策未必让权利人有效退出。阈值越醒目，企业反而越会围绕计量边界优化，而忽略能力触发。〔基线冻结〕在AI治理、政策与法律的这一对象上，复核应把“被正确通知或指定且按期完成评测、缓解与事件报告的系统性风险模型数／全部应纳模型”拆成同一分母下的主结果与失败谱，“训练拆分、算法效率、fine-tune归属、能力触发、部署规模、版权救济与阈值更新”要单列编码，不能在汇总时并入其他项。</p>
+<p>2026年的实施应同时使用compute、capability和deployment reach三类触发，阈值附近独立复算；训练续跑、合并和重大fine-tune计入累计。systemic-risk模型季度提交评测与事件delta，AI Office可指定未越阈值模型；下游包提供machine-readable limitation、接口改变和撤回通知。</p>
+<p>它与第538号第二十条“任务完成时域：智能体能力改用可独立完成的人类工时标尺”形成法律代理—能力测量碰撞：10^25 FLOP便于执法，time horizon更接近自主任务表现。法定推定提供起点，不证明计算量与每类系统性风险一一对应。〔基线冻结〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当企业围绕计算阈值设计训练时，阈值越明确，低报累计计算和转向不可见能力提升的激励反而越强”做至少两轮外部复算，若方向翻转，GPAI与系统性风险：基础模型第一次获得上游专门义务GPAI and Systemic Risk: Foundation Models Receive Dedicated Upstream Duties的结论必须随之收窄。</p>
+<div class="col"><i>位置</i>D——把模型定义、计算触发、能力指定、上游文档、系统评测与事件串成GPAI路径　<i>单因</i>决定基础模型外部性是否能在源头被控制的只有上游供应商是否承担与下游不可见能力相匹配的专门义务　<i>预设</i>〔04 测量不改变被测对象〕10^25 FLOP阈值不会诱发训练拆分、计量争议或算法效率规避　<i>量纲</i>被正确通知或指定且按期完成评测、缓解与事件报告的系统性风险模型数／全部应纳模型　<i>失效</i>当企业围绕计算阈值设计训练时，阈值越明确，低报累计计算和转向不可见能力提升的激励反而越强　<i>自曝</i>基线冻结独立核验：10^25 FLOP是法定推定线索，可由其他标准和个案指定补充，不是风险自然常数；独立撤回检查落在基线冻结　<i>空栏</i>训练拆分、算法效率、fine-tune归属、能力触发、部署规模、版权救济与阈值更新　<i>异名</i>AI评测称“任务完成时域：智能体能力改用可独立完成的人类工时标尺”；见第538号第二十条“任务完成时域：智能体能力改用可独立完成的人类工时标尺”</div>
+
+<h2>六、欧洲AI Office：跨境基础模型获得集中监督节点<span class="en">The European AI Office: Cross-Border Foundation Models Gain a Central Supervisory Node</span></h2>
+<div class="src"><i>提出</i>欧盟委员会2024年设立European AI Office，AI Act赋予其GPAI治理、评测与执法协调职责。　<i>争议</i>Treasury Board of Canada Secretariat. Directive on Automated Decision-Making, 2019, amended.。　<i>最新</i>（2025年文献）Government of Canada. Guide on the Scope of the Directive on Automated Decision-Making, 2025.。　<i>关键</i>对跨境GPAI由欧盟层级集中监督，同时与national competent authorities、科学小组和标准机构协作。</div>
+<p>基础模型跨欧盟部署，若只由27个成员国分别理解和调查，供应商面对重复要求，监管者也难聚集算力与评测人才。欧盟委员会于2024年设AI Office，AI Act让其成为GPAI规则实施和系统性风险监督核心。治理结构由分散数据保护式网络增加一个模型层集中节点。〔异常运行〕落到复现实务，可为欧洲AI Office：跨境基础模型获得集中监督节点The European AI Office: Cross-Border Foundation Models Gain a Central Supervisory Node建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“在SLA内完成且经科学与法律复核的GPAI案件数／全部线索、通知与管辖争议”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>〔异常运行〕本条主张，决定跨境GPAI监督能否形成一致能力的只有欧盟层级是否拥有足够技术人才、模型访问和独立执法权限。组织名称不产生能力；只有能接收notification、要求信息、协调评测、调查incident并实施sanction，中央节点才减少监管套利和知识碎片。</p>
+<p>Commission Decision C(2024)390设立AI Office；AI Act治理规则和GPAI义务自2025-08-02适用，官方说明委员会执法权自2026-08-02进入application。验收应报告staff、technical expert、model notification、information request、joint evaluation、case duration和公开决定，而非只数会议。〔异常运行〕证据链还要把欧盟委员会2024年设立European AI Office，AI Act赋予其GPAI治理、评的起点材料与更新文献放在同一比较表里，并逐项报告“对跨境GPAI由欧盟层级集中监督，同时与national competent authorities、科学小组和标准机构协作”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。〔异常运行〕本条的边界案例应从“预算技能、旋转门、未通知模型、国家机关重叠、程序救济、境外开发者与案件积压”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当中央机构资源不足时，管辖越集中，积压和单点判断错误对全市场的影响反而越大”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>集中机构可能受预算不足、旋转门和企业信息不对称制约；与国家市场监管、数据保护和行业机关责任重叠。Code共创需要产业专业知识，也增加capture风险。办公室越中央化，单点程序错误的覆盖面反而越大，非欧盟和小型开发者的参与能力也不对称。</p>
+<p>2026年的机构审计应公开人员技能矩阵、利益冲突、外部会议和案件pipeline；高风险技术结论由独立scientific panel复核。与national authorities设case allocation SLA和冲突解决，关键模型获得secure access环境；年度发布资源缺口、执法统计与被法院推翻率。对欧洲AI Office：跨境基础模型获得集中监督节点The European AI Office: Cross-Border Foundation Models Gain a Central Supervisory Node而言，真正需要登记的不是又一个平均分，而是由“决定跨境GPAI监督能否形成一致能力的只有欧盟层级是否拥有足够技术人才、模型访问和独立执法权限”推出的每一步中介、责任人和可撤回条件；〔异常运行〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>它与第538号第九条“端到端算法审计：从指标检查转向组织过程追责”形成企业—监管组织同构：两者都需证据、权限、owner与闭环，但AI Office可动用公共执法权。2024年设立和2026年权力适用不等于机构已具足够能力或所有管辖冲突解决。</p>
+<div class="col"><i>位置</i>D——把人员、模型访问、通知、调查、跨机关分工、决定与司法复核串成集中监督路径　<i>单因</i>决定跨境GPAI监督能否形成一致能力的只有欧盟层级是否拥有足够技术人才、模型访问和独立执法权限　<i>预设</i>〔01 谁进入分母〕进入AI Office正式案件的模型足以代表未通知、境外、开源和成员国边界争议　<i>量纲</i>在SLA内完成且经科学与法律复核的GPAI案件数／全部线索、通知与管辖争议　<i>失效</i>当中央机构资源不足时，管辖越集中，积压和单点判断错误对全市场的影响反而越大　<i>自曝</i>异常运行独立核验：AI Office获得法定职责不说明人员、访问与案件实践已达到同等成熟度；独立撤回检查落在异常运行　<i>空栏</i>预算技能、旋转门、未通知模型、国家机关重叠、程序救济、境外开发者与案件积压　<i>异名</i>AI评测称“端到端算法审计：从指标检查转向组织过程追责”；见第538号第九条“端到端算法审计：从指标检查转向组织过程追责”</div>
+
+<h2>七、监管沙盒：创新不再以完全豁免换速度<span class="en">Regulatory Sandboxes: Innovation No Longer Trades Speed for Total Exemption</span></h2>
+<div class="src"><i>提出</i>金融监管沙盒经验；欧盟AI Act第57–59条将AI regulatory sandbox制度化。　<i>争议</i>Hacker, P. “A Legal Framework for AI Training Data.” Law, Innovation and Technology, 2021.。　<i>最新</i>（2026年文献）European Commission. Guidelines for Providers of General-Purpose AI Models, 2026.。　<i>关键</i>在限定期限、范围、监督和退出条件下开发、训练、测试创新AI，同时不免除基本权利和责任。</div>
+<p>新型AI在规则不清时可能被禁止或无监管上线，两者都不利于学习。regulatory sandbox借鉴金融科技，让企业在主管机关监督下以限定用户、时间和目的测试，监管者同步理解技术并给合规指导。AI Act把这种临时实验空间纳入法律，而非把“创新”当长期豁免。</p>
+<p>〔人工接管〕本条的单因命题是，决定沙盒能否兼顾学习与权利的只有实验是否有可执行的范围、停止条件和退出后法律状态。边界把未知风险限制在可观察空间，stop rule允许伤害出现前中断，exit决定结果能否进入市场或必须整改；缺少三者，sandbox只是监管宽容。AI Act Article 57规定这一受控路径。把监管沙盒：创新不再以完全豁免换速度Regulatory Sandboxes: Innovation No Longer Trades Speed for Total Exemption与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“按stop rule执行且公开learning与exit决定的项目数／全部项目、事件与逾期天数”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>AI Act Articles 57–59要求成员国主管机关建立AI regulatory sandbox，并对SME和startup提供便利，监督真实世界测试另有条件。审计每个项目应记录participant selection、duration、真实用户数、consent或法源、incident、regulatory learning、stop event、exit decision和后续市场状态。</p>
+<p>入选标准可能偏向有关系或有律师的公司，未入选竞争者承担不平等；真实世界参与者未必能自由同意。监管者与企业长期共事会形成capture，失败结果又可能保密。沙盒越多，若没有公开学习，类似风险反而在多个小实验中重复，临时例外还可能变永久。2026年沙盒须保留公众救济。〔人工接管〕本条的边界案例应从“入选特惠、未入选者、真实同意、监管俘获、失败公开、跨沙盒学习与临时延长”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当沙盒标识被企业当作批准背书时，参与项目越多，公众对产品已合规的误解反而越广”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>2026年的沙盒应公开申请评分与利益冲突，为SME提供技术援助而非降低保护；每项目设最大12个月、明确kill criteria和independent ombudsperson。事故24小时报告，结项90日内发布匿名learning report；市场准入仍完成适用合格评定，沙盒参与不得被宣传为监管批准。</p>
+<p>它与第531号第十三条“自驱动实验室：AI必须在物质世界里承担下一步实验”形成政策—科学实验类比：两者都需边界、停止和可观察结果，但沙盒直接涉及公众权利。参与沙盒证明处于监督学习，不等于产品安全、合法或获市场批准。AI Act不把sandbox等同approval。机构采用监管沙盒：创新不再以完全豁免换速度Regulatory Sandboxes: Innovation No Longer Trades Speed for Total Exemption之前还应公布否决门槛：一旦“当沙盒标识被企业当作批准背书时，参与项目越多，公众对产品已合规的误解反而越广”出现，就暂停扩张并回到“在限定期限、范围、监督和退出条件下开发、训练、测试创新AI，同时不免除基本权利和责任”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<div class="col"><i>位置</i>E——把入选公平、真实参与者、监督俘获、保密、停止和退出当成政策实验环境　<i>单因</i>决定沙盒能否兼顾学习与权利的只有实验是否有可执行的范围、停止条件和退出后法律状态　<i>预设</i>〔05 代理即本体〕在沙盒内完成测试足以代表全面部署合法、安全并获得监管认可　<i>量纲</i>按stop rule执行且公开learning与exit决定的项目数／全部项目、事件与逾期天数　<i>失效</i>当沙盒标识被企业当作批准背书时，参与项目越多，公众对产品已合规的误解反而越广　<i>自曝</i>人工接管独立核验：AI Act沙盒提供受监督试验机制，不豁免基本权利、责任或后续合格要求；独立撤回检查落在人工接管　<i>空栏</i>入选特惠、未入选者、真实同意、监管俘获、失败公开、跨沙盒学习与临时延长　<i>异名</i>科学AI称“自驱动实验室：AI必须在物质世界里承担下一步实验”；见第531号第十三条“自驱动实验室：AI必须在物质世界里承担下一步实验”</div>
+
+<h2>八、事故报告与上市后监测：合规不再止于发布当天<span class="en">Incident Reporting and Post-Market Monitoring: Compliance No Longer Ends on Release Day</span></h2>
+<div class="src"><i>提出</i>EU AI Act关于post-market monitoring与serious incident reporting的义务，2024年成法。　<i>争议</i>European Commission. Proposal for an Artificial Intelligence Act, COM/2021/206.。　<i>最新</i>（2024年文献）CEN-CENELEC JTC 21. Artificial Intelligence Standardisation Work Programme, 2024.。　<i>关键</i>provider持续收集性能和风险数据，严重事件在法定期限内通知，必要时采取corrective action、withdrawal或recall。</div>
+<p>传统模型验收以测试集通过为终点，但数据、用户和攻击会在部署后改变，罕见伤害也只有大规模使用才出现。AI Act把post-market monitoring plan和serious incident reporting写入产品生命周期，要求provider主动收集、分析并纠正。治理时间轴从一次合格扩展到持续市场学习。〔撤回门槛〕面向下一轮材料，AI治理、政策与法律应优先补齐“near miss、累积伤害、首次可知、多方推责、善意保护、漏洞保密、曝光分母与复发”的原始记录，并把“当组织因处罚减少内部记录时，报告事件越少，真实未发现和未上报风险反而越高”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<p>〔撤回门槛〕本条主张，决定法律能否从现实失败中学习的只有严重事件是否在证据消失和伤害扩散前进入主管机关。timely report让跨客户线索可聚合、触发corrective action和规则更新；如果企业自行判断且迟报，监管者只看到经过公关筛选的样本，法律失去反馈传感器。GPAI事件义务在2025年开始适用。</p>
+<p>AI Act规定高风险AI的post-market monitoring和serious incident机制，GPAI systemic-risk provider也负有事件义务；具体期限依事件类型与适用条文。审计应以日志首次可知时间计算report delay，统计事件数、near miss、severity改级、主管机关通知、用户通知、修复、withdrawal和复发率。〔撤回门槛〕在AI治理、政策与法律的这一对象上，复核应把“从首次可知起在法定SLA内报告并完成纠正的事件数／全部事件、迟报与复发”拆成同一分母下的主结果与失败谱，“near miss、累积伤害、首次可知、多方推责、善意保护、漏洞保密、曝光分母与复发”要单列编码，不能在汇总时并入其他项。</p>
+<p>“严重”定义可能让差点发生的near miss和长期群体伤害不报告；供应商、部署者和组件方互相等待归因。处罚威胁也会抑制内部记录，安全披露可能暴露漏洞。报告越多不必然系统越差，可能只是文化更开放；简单按事件数排名会奖励沉默组织。2026年报告量须按exposure校正。</p>
+<p>2026年的机制应建立24小时初报、15日完整报告等按适用法律核准的SLA，并允许后续更正；保护善意near-miss披露。多主体合同明确谁汇总和通知，event taxonomy含群体累积伤害；季度公开率、迟报和复发，不公开可被利用细节。重大事件触发独立root-cause与版本撤回演练。〔撤回门槛〕这也给出一项不依赖宣传口径的核验：独立团队只拿到冻结版本与“决定法律能否从现实失败中学习的只有严重事件是否在证据消失和伤害扩散前进入主管机关”的操作定义，仍能复算“从首次可知起在法定SLA内报告并完成纠正的事件数／全部事件、迟报与复发”，否则所谓转向可能只是数据管线或命名变化。</p>
+<p>它与第538号第十条“ML Test Score：生产准备度成为28项可执行测试”形成发布前—发布后闭环：测试阻断已知失败，事件监测发现未知现实失效。事件数量受检测和报告文化影响，不能不校正曝光规模就当作跨公司安全排名。</p>
+<div class="col"><i>位置</i>E——把发现文化、严重阈值、多主体归因、披露安全与曝光规模当成市场反馈环境　<i>单因</i>决定法律能否从现实失败中学习的只有严重事件是否在证据消失和伤害扩散前进入主管机关　<i>预设</i>〔06 通过形式审查＝实质合规〕按表提交严重事件就等于near miss、累积伤害与根因均被完整捕获　<i>量纲</i>从首次可知起在法定SLA内报告并完成纠正的事件数／全部事件、迟报与复发　<i>失效</i>当组织因处罚减少内部记录时，报告事件越少，真实未发现和未上报风险反而越高　<i>自曝</i>撤回门槛独立核验：事件报告建立反馈义务，数量必须按检测努力、部署规模和分类口径解释；独立撤回检查落在撤回门槛　<i>空栏</i>near miss、累积伤害、首次可知、多方推责、善意保护、漏洞保密、曝光分母与复发　<i>异名</i>AI评测称“ML Test Score：生产准备度成为28项可执行测试”；见第538号第十条“ML Test Score：生产准备度成为28项可执行测试”</div>
+
+<h2>九、广岛进程行为准则：前沿模型治理转向跨国开发者承诺<span class="en">The Hiroshima Process Code: Frontier-Model Governance Turns to Cross-Border Developer Commitments</span></h2>
+<div class="src"><i>提出</i>G7 Hiroshima AI Process，2023年《International Guiding Principles》与《Code of Conduct for Organizations Developing Advanced AI Systems》。　<i>争议</i>Selbst, A. D. “An Institutional View of Algorithmic Impact Assessments.” Harvard Journal of Law & Technology, 2021.。　<i>最新</i>（2025年文献）OECD. Reporting Framework for the G7 Hiroshima AI Process Code of Conduct, 2025.。　<i>关键</i>开发前后识别风险、独立评测、公开能力限制、事件报告、security、内容认证和社会挑战研究被写成11项行动。</div>
+<p>基础模型跨境发布快于各国立法，单国要求又可能分裂。G7在2023年Hiroshima AI Process中形成面向advanced AI developer的国际指导原则和行为准则，以共同开发环节而非领土用途为抓手。治理从抽象国家原则推进到组织应采取的risk identification、testing和reporting行动。</p>
+<p>〔跨域外推〕本条主张，决定自愿跨国准则能否缩小监管时差的只有领先开发者是否在共同发布日期前执行可比较的11项行动。共同承诺可形成市场和同业压力，减少企业在不同国家选择性披露；若行动没有公开证据和监测，文本只会统一公关语言。G7 2023把共同承诺压成11项行动。〔跨域外推〕证据链还要把G7 Hiroshima AI Process，2023年《International Guid的起点材料与更新文献放在同一比较表里，并逐项报告“开发前后识别风险、独立评测、公开能力限制、事件报告、security、内容认证和社会挑战研究被写成11项行动”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>G7于2023年发布11项International Guiding Principles及相应Code，涵盖开发全生命周期风险识别、red-team、incident、capability limitation、security、content authentication、standards和社会挑战研究。OECD后续构建reporting framework。审计逐项查artifact、日期、模型覆盖与第三方复验。</p>
+<p>G7不代表全球多数国家，开发者自报又可能选择性隐藏security和失败；“advanced”边界随技术变化。自愿准则缺少罚则，落后企业可不参加，领先企业也可用国家安全理由减少透明。国际行动越统一，反而可能挤压发展中国家对劳动、语言和资源的不同重点。2026年仍需纳入非G7异议。对广岛进程行为准则：前沿模型治理转向跨国开发者承诺The Hiroshima Process Code: Frontier-Model Governance Turns to Cross-Border Developer Commitments而言，真正需要登记的不是又一个平均分，而是由“决定自愿跨国准则能否缩小监管时差的只有领先开发者是否在共同发布日期前执行可比较的11项行动”推出的每一步中介、责任人和可撤回条件；〔跨域外推〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>2026年的实施应由OECD式公共dashboard逐模型发布11项证据状态，允许合理保密但由可信第三方验证；未实施项给deadline。非G7国家和劳工、公民社会进入年度review，事故与新能力触发准则更新；任何“compliant”声明须注明自愿性质、模型版本和独立核验范围。</p>
+<p>它与第538号第九条“端到端算法审计：从指标检查转向组织过程追责”形成国际承诺—内部闭环接口：Hiroshima Code列行动，组织审计检查责任与整改。11项行动的共同语言缩小协调成本，不等于法律义务、全球代表或每家开发者实质执行。〔跨域外推〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当监测依赖企业自报时，报告框架越统一，选择性证据被误作可比实施的风险反而越高”做至少两轮外部复算，若方向翻转，广岛进程行为准则：前沿模型治理转向跨国开发者承诺The Hiroshima Process Code: Frontier-Model Governance Turns to Cross-Border Developer Commitments的结论必须随之收窄。</p>
+<div class="col"><i>位置</i>S——把前沿开发者跨国共同承诺当成立法时差中的决定性协调资源　<i>单因</i>决定自愿跨国准则能否缩小监管时差的只有领先开发者是否在共同发布日期前执行可比较的11项行动　<i>预设</i>〔05 代理即本体〕G7开发者的11项行动足以代表全球AI风险优先级和所有供应商责任　<i>量纲</i>有模型级公开artifact或可信第三方核验的已执行行动数／11项行动与未覆盖模型　<i>失效</i>当监测依赖企业自报时，报告框架越统一，选择性证据被误作可比实施的风险反而越高　<i>自曝</i>跨域外推独立核验：Hiroshima Process Code是自愿国际准则，不具有G7外普遍代表或直接制裁力；独立撤回检查落在跨域外推　<i>空栏</i>非G7声音、拒绝参与者、保密核验、advanced边界、劳动语言资源、独立复验与罚则　<i>异名</i>AI评测称“端到端算法审计：从指标检查转向组织过程追责”；见第538号第九条“端到端算法审计：从指标检查转向组织过程追责”</div>
+
+<h2>十、欧洲委员会AI框架公约：治理第一次成为可签署的人权条约<span class="en">The Council of Europe AI Convention: Governance Becomes a Signable Human-Rights Treaty</span></h2>
+<div class="src"><i>提出</i>Council of Europe Framework Convention on AI and Human Rights, Democracy and the Rule of Law，2024年通过并开放签署。　<i>争议</i>Treasury Board of Canada Secretariat. Directive on Automated Decision-Making, 2019, amended.。　<i>最新</i>（2025年文献）Government of Canada. Guide on the Scope of the Directive on Automated Decision-Making, 2025.。　<i>关键</i>缔约方需以分级、差异化措施确保AI生命周期符合人权、民主和法治，并提供透明、问责、补救与程序保障。</div>
+<p>国际AI文件此前多为原则和建议，无法进入条约批准与国内立法。欧洲委员会部长委员会于2024-05-17通过CETS No.225，9月5日开放签署，称为该领域首个国际法律约束条约。治理对象明确锚定human rights、democracy和rule of law，而非只讲可信创新。〔盲法复核〕落到复现实务，可为欧洲委员会AI框架公约：治理第一次成为可签署的人权条约The Council of Europe AI Convention: Governance Becomes a Signable Human-Rights Treaty建立版本化对象表：输入、基线、资源预算、异常运行和人工接管分别留痕，并用“已批准且有实施法、监管预算和公开救济案例的条约义务数／全部签署与条款”统一结算，避免换口径后仍宣称性能提高。</p>
+<p>〔盲法复核〕本条的单因命题是，决定跨国AI底线能否超越政治承诺的只有国家是否把条约义务转化为可诉或可监督的国内措施。签署表达意向，ratification产生国际义务，implementation才让透明、oversight、accountability、remedy和procedural safeguards进入机构；三者不能混算。CETS No.225把签署与批准分开。</p>
+<p>Convention规定活动全生命周期应与人权民主法治一致，措施可按潜在干预的severity和probability分级；Article 7–10涉及dignity、transparency、accountability、equality。官方记录显示2024-09-05开放签署。审计应逐国区分signed、ratified、in force和implemented条款。〔盲法复核〕本条的边界案例应从“签而未批、私营选择、国防排除、安全例外、实施预算、法院救济与独立监督”中抽样，而不是只从最容易成功的中心案例抽样，这样才能判断“当国际传播只计签署国时，签名越多，尚未批准和实施的保护空白反而越易被忽视”究竟是偶发噪声，还是足以改变结论方向的系统反例。</p>
+<p>条约允许各国选择如何处理私营部门活动，国防不在范围，国家安全有特殊空间；广泛原则需国内法具体化。签署国可能长期不批准，批准后也缺预算。首个条约的象征越强，反而越可能让公众误认为所有AI活动已受统一可诉规则保护。2026年实施必须逐国核对。</p>
+<p>2026年的条约跟踪应建立逐国matrix：签署日期、批准、保留/声明、implementing law、监管机关、预算、case和remedy；每年由独立人权机构验证。政府使用AI至少公开impact assessment与申诉路径，私营范围空白必须明示；防务和安全例外记录法律依据与监督。机构采用欧洲委员会AI框架公约：治理第一次成为可签署的人权条约The Council of Europe AI Convention: Governance Becomes a Signable Human-Rights Treaty之前还应公布否决门槛：一旦“当国际传播只计签署国时，签名越多，尚未批准和实施的保护空白反而越易被忽视”出现，就暂停扩张并回到“缔约方需以分级、差异化措施确保AI生命周期符合人权、民主和法治，并提供透明、问责、补救与程序保障”的原始记录复核；该门槛必须早于部署决定写入方案。</p>
+<p>它与第538号第四条“机会均等：公平从口号变成条件错误率约束”形成条约权利—技术指标接口：公约确立平等和救济方向，指标提供部分证据。2024年开放签署不等于所有签署方已批准，也不代表条约直接适用于每个私营或国防系统。</p>
+<div class="col"><i>位置</i>S——把可批准并转化为国内措施的人权条约当成跨国最低底线的决定性资源　<i>单因</i>决定跨国AI底线能否超越政治承诺的只有国家是否把条约义务转化为可诉或可监督的国内措施　<i>预设</i>〔06 通过形式审查＝实质合规〕签署CETS No.225就等于批准、生效、国内实施与个人救济都已完成　<i>量纲</i>已批准且有实施法、监管预算和公开救济案例的条约义务数／全部签署与条款　<i>失效</i>当国际传播只计签署国时，签名越多，尚未批准和实施的保护空白反而越易被忽视　<i>自曝</i>盲法复核独立核验：公约是首个约束性AI条约框架，但适用、批准和国内效力须逐国判断；独立撤回检查落在盲法复核　<i>空栏</i>签而未批、私营选择、国防排除、安全例外、实施预算、法院救济与独立监督　<i>异名</i>AI评测称“机会均等：公平从口号变成条件错误率约束”；见第538号第四条“机会均等：公平从口号变成条件错误率约束”</div>
+
+<h2>十一、可争议性与救济：解释必须能改变具体权利结果<span class="en">Contestability and Remedy: Explanation Must Be Able to Change a Rights-Affecting Outcome</span></h2>
+<div class="src"><i>提出</i>GDPR Articles 15、22；CJEU SCHUFA 2023与Dun &amp; Bradstreet 2025解释个案自动评分。　<i>争议</i>Wachter, S. et al. “Why a Right to Explanation of Automated Decision-Making Does Not Exist in the GDPR.” International Data Privacy Law, 2017.。　<i>最新</i>（2025年文献）Government of Canada. Guide on the Scope of the Directive on Automated Decision-Making, 2025.。　<i>关键</i>有效解释不是源码倾倒，而是让个人理解哪些信息怎样影响其结果，并据此更正数据、提出意见和获得复核。</div>
+<p>“透明AI”常被实现为隐私政策、feature importance或源代码访问，却未必帮助一个被拒贷者改变结果。GDPR访问与自动决策权在CJEU判例中逐步具体化：说明应针对实际个案，以concise、intelligible方式揭示程序和原则，让个人能够核对输入和挑战。治理焦点从知情转向有效救济。</p>
+<p>〔结果分母〕本条主张，决定解释权是否具有法律实效的只有提供的信息能否让受影响者提出一个可能改变结果的具体争点。若个人只能知道“使用AI”，却不能识别错误数据、决定因素、规则或联系人，透明没有程序价值；contestability把解释、纠错、人工复核和remedy连接。GDPR Article 15把信息接到个案。把可争议性与救济：解释必须能改变具体权利结果Contestability and Remedy: Explanation Must Be Able to Change a Rights-Affecting Outcome与相邻路线比较时，统一分母至少应包含成功、失败、弃权和未覆盖对象四类；只有“在SLA内完成且可指出争点并获实质复核的申诉数／全部尝试、费用与改判率”在这些类别上都可回查，跨研究比较才有意义。</p>
+<p>CJEU 2023 SCHUFA案处理评分是否构成Article 22决定；2025-02-27 C-203/22判决要求meaningful information说明自动使用个人数据取得具体结果的procedure and principles，且以简明透明可访问形式提供。验收应测100名普通用户能否在阅读后正确指出争点并完成申诉。</p>
+<p>完整说明可能暴露商业秘密或帮助操纵系统，复杂模型也没有单一因果理由；过多技术信息增加认知负担。申诉需要时间、语言和法律资源，弱势群体最难使用。解释越详细，若没有暂停不利后果和有权改判者，程序反而可能只延长伤害并把责任推给个人。CJEU 2025同时处理商业秘密边界。〔结果分母〕这也给出一项不依赖宣传口径的核验：独立团队只拿到冻结版本与“决定解释权是否具有法律实效的只有提供的信息能否让受影响者提出一个可能改变结果的具体争点”的操作定义，仍能复算“在SLA内完成且可指出争点并获实质复核的申诉数／全部尝试、费用与改判率”，否则所谓转向可能只是数据管线或命名变化。</p>
+<p>2026年的救济设计应提供一页个案说明、数据更正入口、free human review和明确SLA；重大福利或信贷决定在申诉期间评估是否暂缓。用至少3种语言和无障碍格式做用户测试，记录appeal attempt、completion、改判、时长和费用；商业秘密争议交独立机关而非供应商单方决定。</p>
+<p>它与第535号第十一条“算法追索：解释必须落成可行动且可实现的改变”是法律—技术异名：recourse设计可行改变，法律救济确保有人受理并有权纠正。2025年判决解释特定GDPR条款，不自动统一所有国家、领域和非个人数据决策。〔结果分母〕面向下一轮材料，AI治理、政策与法律应优先补齐“商业秘密、语言障碍、程序费用、暂停效果、复核权限、非个人数据与跨法域差异”的原始记录，并把“当解释不连接有权改判者时，披露越详细，责任被推给个人而现实结果不变的风险反而越高”作为预注册反例，这两项同时公开，才能区分暂时缺证与真正失效。</p>
+<div class="col"><i>位置</i>D——把个案说明、纠错、申诉、暂停、人工改判与外部救济串成权利路径　<i>单因</i>决定解释权是否具有法律实效的只有提供的信息能否让受影响者提出一个可能改变结果的具体争点　<i>预设</i>〔02 单一读数代表复杂对象〕披露页面阅读率或解释长度足以代表理解、可负担申诉和实际改判　<i>量纲</i>在SLA内完成且可指出争点并获实质复核的申诉数／全部尝试、费用与改判率　<i>失效</i>当解释不连接有权改判者时，披露越详细，责任被推给个人而现实结果不变的风险反而越高　<i>自曝</i>结果分母独立核验：CJEU判例具体化GDPR信息权，不等于源码公开或所有AI决定的全球规则；独立撤回检查落在结果分母　<i>空栏</i>商业秘密、语言障碍、程序费用、暂停效果、复核权限、非个人数据与跨法域差异　<i>异名</i>人机协作称“算法追索：解释必须落成可行动且可实现的改变”；见第535号第十一条“算法追索：解释必须落成可行动且可实现的改变”</div>
+
+<h2>十二、适应性治理：法律开始把模型、用途与义务都当成版本化对象<span class="en">Adaptive Governance: Law Treats Models, Uses and Duties as Versioned Objects</span></h2>
+<div class="src"><i>提出</i>AI Act的分阶段适用、delegated/implementing powers、Codes、standards与post-market更新组合；OECD原则2024修订。　<i>争议</i>Selbst, A. D. “An Institutional View of Algorithmic Impact Assessments.” Harvard Journal of Law & Technology, 2021.。　<i>最新</i>（2026年文献）Government of Canada. Algorithmic Impact Assessment Tool, current 2026 version.。　<i>关键</i>模型变更、用途漂移、事件和新能力可触发重分类、delta assessment、标准更新与义务调整。</div>
+<p>固定法条面对模型半年迭代容易过时，但不断重立法又缺乏稳定预期。2024后的AI治理形成层叠架构：基本法给权利和义务，delegated/implementing act调整细节，harmonised standard给技术路径，Code与guideline协助GPAI，post-market evidence再触发更新。法律系统本身开始版本化。〔未覆盖项〕证据链还要把AI Act的分阶段适用、delegated/implementing powers、Codes的起点材料与更新文献放在同一比较表里，并逐项报告“模型变更、用途漂移、事件和新能力可触发重分类、delta assessment、标准更新与义务调整”在哪些设备、机构或人群中没有出现，而不是只保留成功演示。</p>
+<p>〔未覆盖项〕本条主张，决定技术快速变化下规则是否仍有效的只有新能力、用途和事件能否触发有程序约束的规则更新。适应性不是监管随意，而是预先规定trigger、evidence、consultation、effective date和transition；既让义务追上现实，又给开发者和公众可预期的变更路径。2026年法源版本必须进入governance registry。</p>
+<p>AI Act于2024生效后以2025、2026、2027等节点分阶段适用，并授权多类后续文本；OECD原则也在2024更新。到2026年读取义务必须检查consolidated text、effective date、model placement date与过渡条款。审计应保存legal basis hash和每次合规判断所用版本。〔未覆盖项〕在AI治理、政策与法律的这一对象上，复核应把“在预定trigger后按程序更新并完成迁移的规则数／全部触发事件、版本冲突与逾期”拆成同一分母下的主结果与失败谱，“未观察变化、准立法权、标准俘获、中小企成本、执法拖延、旧版本选择与司法复核”要单列编码，不能在汇总时并入其他项。对适应性治理：法律开始把模型、用途与义务都当成版本化〔未覆盖项〕对象Adaptive Governance: Law Treats Models, Uses and Duties as Versioned Objects而言，真正需要登记的不是又一个平均分，而是由“决定技术快速变化下规则是否仍有效的只有新能力、用途和事件能否触发有程序约束的规则更新”推出的每一步中介、责任人和可撤回条件，〔未覆盖项〕缺少任何一环，都不能把相关性写成机制。</p>
+<p>行政更新速度快，却可能减少议会审议；标准机构和Code起草者获得准立法权，资源强者更能参与。频繁变化增加中小企业成本，监管者也可能用“将来指南”拖延执法。适应性越高，若没有版本记录，企业反而可挑选最有利旧解释，公众无法知道权利何时生效。</p>
+<p>2026年的governance registry应对每项义务保存法源、版本、生效、过渡、适用角色和替代关系；自动提醒model/use delta与legal delta双触发。重大标准和Code更新公开consultation与影响评估，至少90日迁移期但紧急风险可临时措施；争议保留司法复核和旧版本快照。〔未覆盖项〕可执行的压力测试是预先固定样本单位、时间窗口和排除规则，再针对“当版本记录不完整时，规则更新越频繁，组织选择性引用旧解释和公众权利不确定性反而越高”做至少两轮外部复算，若方向翻转，适应性治理：法律开始把模型、用途与义务都当成版本化对象Adaptive Governance: Law Treats Models, Uses and Duties as Versioned Objects的结论必须随之收窄。</p>
+<p>它与第536号第七条“Kubernetes、Kubeflow与KServe：模型服务进入声明式控制面”形成法律—软件版本同构：控制面持续reconcile系统期望状态，适应性治理持续reconcile规则与现实。类比不能抹去法律正当程序；更新更快不自动更民主或更可执行。</p>
+<div class="col"><i>位置</i>E——把技术变化、行政权限、标准参与、迁移成本、版本记录与司法复核当成规则更新环境　<i>单因</i>决定技术快速变化下规则是否仍有效的只有新能力、用途和事件能否触发有程序约束的规则更新　<i>预设</i>〔08 谁进入分母〕进入正式修订和咨询的变化足以代表监管未观察到的新能力、私有事件与灰色用途　<i>量纲</i>在预定trigger后按程序更新并完成迁移的规则数／全部触发事件、版本冲突与逾期　<i>失效</i>当版本记录不完整时，规则更新越频繁，组织选择性引用旧解释和公众权利不确定性反而越高　<i>自曝</i>未覆盖项独立核验：分层更新提高适应潜力，也把部分规范权移向行政、标准与Code过程；独立撤回检查落在未覆盖项　<i>空栏</i>未观察变化、准立法权、标准俘获、中小企成本、执法拖延、旧版本选择与司法复核　<i>异名</i>AI系统称“Kubernetes、Kubeflow与KServe：模型服务进入声明式控制面”；见第536号第十五条“Kubernetes、Kubeflow与KServe：模型服务进入声明式控制面”</div>
+
+<h3 class="sec">◎ 二十年连起来看</h3><p>第一幕的共同突破是把治理嵌入既有制度：数据保护权、影响评估、标准、采购和行政公开，不等专门AI法才行动。第二幕则把这些工具接到risk tier、market access、upstream provider、incident feedback与international treaty。真正的方向不是“软法被硬法取代”，而是每层承担不同功能：原则发现价值，标准定义证据，合同压实供应链，法律配置权力，法院和申诉让个案可以被改变。</p>
+<h3 class="sec">◎ 三个常见误解</h3><p><b>范围</b>说明哪些模型、用途和主体进入；<b>义务</b>写出必须做什么与何时做；<b>机构</b>提供人、预算、访问和制裁；<b>救济</b>让受影响者暂停、纠错、复核和获赔。2026年任何“AI已受监管”声明都应按四列审计。只有范围没有机构是纸法，只有原则没有义务是声誉承诺，只有处罚没有救济则把个人继续留在制度外。</p>
+<h3 class="sec">◎ 与相邻领域的接口</h3><p><b>误解一：</b>有AI法就比无AI法治理更强。既有数据、消费、劳动和产品法可能更可执行。<b>误解二：</b>风险分层客观。分类本身分配成本，必然诱发边界工程。<b>误解三：</b>国际一致等于全球正当。共同词汇降低协调成本，却不能替代非成员、工人、原住民和受影响社区的决定权。</p>
+<h3 class="sec">◎ 争议现场</h3><p>它与AI评测共享证据、版本和审计，与AI安全共享威胁和事件，与行政法共享程序、裁量和司法复核，与标准化共享合格评定，与政治学共享机构俘获和国际合作。边界判据是：本面板回答“谁必须做、谁能强制、谁可救济”；评测回答证据怎样测；安全回答攻击和失控怎样发生。三者共同维护model–use–law三重版本账。</p>
+<h3 class="sec">◎ 往下五年看什么</h3><p>监管争论常把innovation与protection画成零和线，但工具选择更细：沙盒可减少不确定性，标准可降低重复合规，严格采购能创造可信市场，权利救济能发现被企业测试遗漏的错误。真正冲突出现在成本和权力分配：谁为审计付费、谁等候批准、谁承担误判、谁可决定残余风险。政策应公开这些分配，而非用“平衡”两字隐藏。</p>
+<h3 class="sec">◎ 可与哪些领域对撞</h3><p>第一次做text check：法源、条号、生效、过渡和合并版本；第二次做institution check：责任机关、人员、预算、权限和案件；第三次做outcome check：分类、报告、整改、申诉和复发。三个层级必须分开，签署不等于批准，认证不等于安全，登记不等于完整。每个面板条目同样经结构、事实和整页三轮复核，保留空栏供未来事件反证。</p>
+<h3 class="sec">◎ 十条可做的研究命题</h3><p>2026–2031年关键不只是更多法案，而是执行基础设施：AI Office与国家机关能否获得secure model access；harmonised standards是否被少数企业俘获；GPAI上游信息能否真正流到下游；跨境事件能否互报；条约能否转成国内救济。另一个前沿是agent legal identity问题：不是赋予人格，而是确保工具链中provider、deployer、operator和principal的责任不会因自主轨迹而消失。</p>
+<h3 class="sec">◎ 资料核验</h3><p><b>审计清单：</b>① 核对有效法源与日期；② 记录model/use/provider/deployer版本；③ 检查真实用途而非营销目的；④ 不以签署代替批准实施；⑤ 不以证书代替原始证据；⑥ 抽查未登记和未报告分母；⑦ 验证机构预算、权限和SLA；⑧ 让申诉能够暂停并改变结果。</p><div class="refs"><ol>
+<li>European Union. Regulation (EU) 2016/679, General Data Protection Regulation, 2016.</li>
+<li>CJEU. Case C-634/21, SCHUFA Holding, Judgment of 7 December 2023.</li>
+<li>CJEU. Case C-203/22, Dun &amp; Bradstreet Austria, Judgment of 27 February 2025.</li>
+<li>Article 29 Working Party. Guidelines on Automated Individual Decision-Making and Profiling, WP251rev.01, 2018.</li>
+<li>European Data Protection Board. Guidelines on Data Protection Impact Assessment, 2017.</li>
+<li>Future of Life Institute. “Asilomar AI Principles.” 2017.</li>
+<li>Partnership on AI. Tenets and Organizational Materials, 2016–2025.</li>
+<li>IEEE. Ethically Aligned Design, First Edition, 2019.</li>
+<li>IEEE. Standard 7000-2021: Addressing Ethical Concerns during System Design.</li>
+<li>IEEE. Standard 7001-2021: Transparency of Autonomous Systems.</li>
+<li>IEEE. Standard 7003-2024: Algorithmic Bias Considerations.</li>
+<li>Treasury Board of Canada Secretariat. Directive on Automated Decision-Making, 2019, amended.</li>
+<li>Government of Canada. Algorithmic Impact Assessment Tool, current 2026 version.</li>
+<li>Government of Canada. Guide on the Scope of the Directive on Automated Decision-Making, 2025.</li>
+<li>City of Amsterdam. Algorithm Register, 2020.</li>
+<li>City of Helsinki. AI Register, 2020.</li>
+<li>UK Government. Algorithmic Transparency Recording Standard, v2.1, 2025.</li>
+<li>UK Government and World Economic Forum. Guidelines for AI Procurement, 2020.</li>
+<li>World Economic Forum. AI Procurement in a Box, 2020.</li>
+<li>OECD. Recommendation of the Council on Artificial Intelligence, OECD/LEGAL/0449, 2019, updated 2024.</li>
+<li>OECD. The State of Implementation of the OECD AI Principles Four Years On, 2023.</li>
+<li>OECD. Advancing Accountability in AI, 2023.</li>
+<li>UNESCO. Recommendation on the Ethics of Artificial Intelligence, 2021.</li>
+<li>UNESCO. Readiness Assessment Methodology, 2023.</li>
+<li>UNESCO. First Report on Implementation of the 2021 Recommendation, 2024.</li>
+<li>European Commission. Proposal for an Artificial Intelligence Act, COM/2021/206.</li>
+<li>European Union. Regulation (EU) 2024/1689, Artificial Intelligence Act.</li>
+<li>European Commission. AI Act Application Timeline, current 2026.</li>
+<li>European Commission. Guidelines for Providers of General-Purpose AI Models, 2026.</li>
+<li>European Commission. General-Purpose AI Code of Practice, 2025.</li>
+<li>European Commission. Decision C(2024)390 Establishing the European AI Office.</li>
+<li>CEN-CENELEC JTC 21. Artificial Intelligence Standardisation Work Programme, 2024.</li>
+<li>ISO/IEC 42001:2023. Artificial Intelligence Management System.</li>
+<li>ISO/IEC 23894:2023. Artificial Intelligence Risk Management.</li>
+<li>Veale, M.; Borgesius, F. Z. “Demystifying the Draft EU Artificial Intelligence Act.” Computer Law Review International, 2021.</li>
+<li>Hacker, P. “A Legal Framework for AI Training Data.” Law, Innovation and Technology, 2021.</li>
+<li>Almada, M.; Radu, A. “The Brussels Side-Effect.” German Law Journal, 2024.</li>
+<li>G7. Hiroshima Process International Guiding Principles, 2023.</li>
+<li>G7. Hiroshima Process International Code of Conduct for Organizations Developing Advanced AI Systems, 2023.</li>
+<li>OECD. Reporting Framework for the G7 Hiroshima AI Process Code of Conduct, 2025.</li>
+<li>Council of Europe. Framework Convention on Artificial Intelligence, CETS No. 225, 2024.</li>
+<li>Council of Europe. Explanatory Report to CETS No. 225, 2024.</li>
+<li>Council of Europe. HUDERIA Methodology, 2024.</li>
+<li>NIST. Artificial Intelligence Risk Management Framework 1.0, 2023.</li>
+<li>NIST. Generative Artificial Intelligence Profile, NIST AI 600-1, 2024.</li>
+<li>Raji, I. D. et al. “Closing the AI Accountability Gap.” FAccT, 2020.</li>
+<li>Metcalf, J. et al. “Algorithmic Impact Assessments and Accountability.” FAccT, 2021.</li>
+<li>Selbst, A. D. “An Institutional View of Algorithmic Impact Assessments.” Harvard Journal of Law &amp; Technology, 2021.</li>
+<li>Kaminski, M.; Malgieri, G. “Multi-Layered Explanations from Algorithmic Impact Assessments.” FAccT, 2021.</li>
+<li>Wachter, S. et al. “Why a Right to Explanation of Automated Decision-Making Does Not Exist in the GDPR.” International Data Privacy Law, 2017.</li>
+<li>Edwards, L.; Veale, M. “Slave to the Algorithm?” Duke Law &amp; Technology Review, 2017.</li>
+<li>Yeung, K. “Algorithmic Regulation.” Regulation &amp; Governance, 2018.</li>
+</ol></div>
+</main><script src="/wds-mode.js?v=20260819a" defer></script>
+</body></html>

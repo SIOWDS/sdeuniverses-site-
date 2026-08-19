@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>当警报器本身可能已经坏了 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的判断是：在受伤、手术与康复的过程里，一个人用来预警的那套感觉会被一层层剥掉，而所有的达标指标恰好都不在测它。这篇文章把它落成可上手的：怎么判断自己的警报器还灵不灵，怎么在恢复期把它练回来，以及决策者该在哪几个地方改口。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="当警报器本身可能已经坏了 · 方法实践文">
+<meta property="og:description" content="母文的判断是：在受伤、手术与康复的过程里，一个人用来预警的那套感觉会被一层层剥掉，而所有的达标指标恰好都不在测它。这篇文章把它落成可上手的：怎么判断自己的警报器还灵不灵，怎么在恢复期把它练回来，以及决策者该在哪几个地方改口。">
+<link rel="canonical" href="https://sdeuniverses.com/students/hu-min/perceptual-stripping/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/hu-min/perceptual-stripping/">← 回母文《感知剥脱》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《感知剥脱》</div>
+  <h1 class="art-title">当警报器本身可能已经坏了</h1>
+  <div class="art-subtitle">——「感知剥脱」的一套自查与补救办法</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 3511 字</div>
+  <div class="swap">
+    <a href="/students/hu-min/perceptual-stripping/"><b>← 母文 · 感知剥脱</b><span>完整论证在这里</span></a>
+    <a href="/students/hu-min/perceptual-stripping/explain.html"><b>🌱 白话解释文 · 手冻僵了，你就摸不出杯子有多烫</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的判断是：在受伤、手术与康复的过程里，一个人用来预警的那套感觉会被一层层剥掉，而所有的达标指标恰好都不在测它。这篇文章把它落成可上手的：怎么判断自己的警报器还灵不灵，怎么在恢复期把它练回来，以及决策者该在哪几个地方改口。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先说清楚这套东西的边界</a></li><li><a href="#s2">第一步：判断你的警报器还在不在岗</a></li><li><a href="#s3">第二步：把「绿灯」从外面挪回里面</a></li><li><a href="#s4">第三步：给感觉制造需要用到它的场合</a></li><li><a href="#s5">第四步：把说不出来的东西记下来</a></li><li><a href="#s6">第五步：把签字挪到正确的时刻</a></li><li><a href="#s7">如果你是决策者</a></li><li><a href="#s8">三种做坏的方式</a></li><li><a href="#s9">五个实操疑问</a></li><li><a href="#s10">一页纸操作卡</a></li><li><a href="#s11">一个走完全套的例子</a></li><li><a href="#s12">与三种常见做法的分工</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先说清楚这套东西的边界</h2>
+<p><b>第一，本文不能替代任何医学判断。</b>能不能重返运动、能不能加量、能不能停药，都由医生定。本文说的是在医生给出的范围之内，怎么把「自己的感觉」这一项重新变成可用的信息源。</p>
+<p><b>第二，本文不是在说「相信直觉就好」。</b>恰恰相反。母文的整个论点是：在特定条件下直觉已经被改变了，因此<b>不能只靠它</b>。要做的是把它修回来，同时继续用客观指标。谁把这篇读成「别管数据、跟着感觉走」，就读反了。</p>
+<p><b>第三，出现下列情况请立刻就医，不要在这里自查</b>：关节打软或卡住、明显肿胀、夜间痛醒、伤口红肿发热、任何新出现的麻木或无力。</p>
+<h2 id="s2"><span class="no">02</span>第一步：判断你的警报器还在不在岗</h2>
+<p>用三个问题，每个都只问事实，不问感觉。</p>
+<p><b>问题一：最近三个月，有没有过一次「事前」的察觉？</b>就是那种在问题真正发生之前，你先觉得不对，然后改了动作或停了下来。举得出具体一次，写下来是哪一次。举不出来，记一分。</p>
+<p><b>问题二：最近三个月，你有没有在无人评价的情况下主动叫停过一件事？</b>不是被人喊停，不是因为疼得受不了，是你自己判断「今天到这儿」。举不出来，记一分。</p>
+<p><b>问题三：你现在判断自己状态的依据，有几样是别人或设备给的？</b>把它们列出来：教练说可以、手环显示恢复度、疼痛评分、力量测试数据、理疗师点头。数一数，如果全部依据都来自外部，一样自己的都没有，记一分。</p>
+<p>三分里得两分以上，说明那套东西大概率已经离线很久了。这不是坏消息——它是闲置，闲置可以恢复。</p>
+<h2 id="s3"><span class="no">03</span>第二步：把「绿灯」从外面挪回里面</h2>
+<p>这是最核心的一步，对应母文说的那层「康复期训练出了一个不再独自判断的身体」。</p>
+<p>做法只有一条原则：<b>在每次外部反馈之前，先给出自己的判断。</b></p>
+<p>具体到动作上：</p>
+<ul class="pts"><li>做完一组，先自己说一句「这一组哪儿不对」，说完再听理疗师的</li><li>训练前，先自己预判「今天这条腿能到几成」，写下来，练完再对</li><li>每周结束，先自己写一句这一周的判断，再去看数据</li></ul>
+<p>关键在<b>顺序</b>。先听别人的再对照自己的，那是复述；先说自己的再听别人的，那是校准。顺序反了，这一步就白做。</p>
+<p>刚开始你的判断会错得很离谱，这是正常的，也正是它需要练的证明。重要的不是判断准不准，是<b>这个判断动作有没有发生</b>。</p>
+<h2 id="s4"><span class="no">04</span>第三步：给感觉制造需要用到它的场合</h2>
+<p>绘图员之所以不把分辨率调回去，是因为一直没有需要用到细节的场合。平整地面上的标准动作，粗糙的地图就够用。</p>
+<p>所以要在医生允许的范围内，制造那些「粗糙地图不够用」的条件：</p>
+<p><b>改变地面。</b>从完全平整改到有轻微起伏、有软垫、有不同摩擦系数的表面。<b>改变视觉。</b>闭眼或半闭眼做那些已经做熟的低强度动作（务必有人在旁、有扶手）。视觉一撤，身体就必须回去读关节自己的信号。<b>改变节奏。</b>不要总是可预测的节拍。加入随机口令、变速、突然的停止。<b>加入干扰。</b>一边做动作一边数数、一边接一个简单的问题。分心会逼系统从「靠注意力盯着」切换回「靠自动感觉」。</p>
+<p>四条都要在医生划定的强度范围内做，宁可强度低、条件杂，不要强度高、条件单一。</p>
+<h2 id="s5"><span class="no">05</span>第四步：把说不出来的东西记下来</h2>
+<p>被剥掉的那部分之所以永远进不了档案，是因为它没有格式。你可以自己给它一个格式。</p>
+<p>用一个最简单的三栏记录，每次训练后花一分钟：</p>
+<p><b>做了什么</b>（客观：组数、重量、时间）<b>数据怎么说</b>（如果有：心率、疼痛评分、测试结果）<b>我觉得哪儿不对</b>（一句话，允许说不清，允许写「说不上来，就是左边比右边虚」）</p>
+<p>第三栏是全部价值所在。它不需要准确，不需要有依据，也不需要给别人看。它的作用是<b>让那类判断有一个可以落脚的地方</b>——一个从不被记录的观察，人会慢慢不再去做。</p>
+<p>两个月后回头翻这一栏，你常常会发现：某个反复出现的「说不上来」，后来确实变成了具体的问题。那就是你的警报器在报告，只是当时没有词。</p>
+<h2 id="s6"><span class="no">06</span>第五步：把签字挪到正确的时刻</h2>
+<p>如果你是那个要被问「你自己感觉怎么样」的人，记住一件事：<b>这个问题在什么时刻问你，比这个问题本身重要得多。</b></p>
+<p>在所有专业意见都说完、所有指标都合格之后问，你实际上是被要求一个人对抗全场。这时候说「可以」几乎是唯一的社交出路。</p>
+<p>三个可以做的动作：</p>
+<p><b>提前作答。</b>在会议之前、在看到测试结果之前，先把自己的判断写下来，写死日期。到了会上，你念的是一份已经存在的判断，不是当场生成一个立场。</p>
+<p><b>把「感觉」换成事实。</b>不说「我感觉还不太行」（这在那个房间里没有分量），说「上周三次变向训练里，有两次落地我需要多用一下手扶」。事实有分量，感觉没有。</p>
+<p><b>要求一个不追责的暂缓。</b>明确说出：我想再要两周，不是因为哪项不达标，就是因为我还不确定。有没有人给你这个权力是另一回事，但说出口这件事本身，会把「未覆盖」这一项写进记录。</p>
+<h2 id="s7"><span class="no">07</span>如果你是决策者</h2>
+<p>这一节最有用，因为在这个结构里，能改的人是你。</p>
+<p><b>改口一：不要在最后问「你感觉怎么样」。</b>把它挪到所有测试结果出来之前问，而且分开问、私下问。同一句话，时刻不同，得到的答案完全不同。</p>
+<p><b>改口二：把问题换个形状。</b>不要问「你觉得可以吗」（这要求他给一个立场），问「如果这次出问题，你觉得最可能出在哪一下」（这只要求他指个方向）。后一个问题的回答门槛低得多，得到的信息多得多。</p>
+<p><b>改口三：在评估表上加一栏「本次未覆盖」。</b>列出这次评估确实没有测的东西——本体感觉的恢复程度、疲劳末段的动作质量、无人监督时的自我叫停能力。不给结论，只留位置。这一栏在出事之后会是唯一有用的东西。</p>
+<p><b>改口四：康复后期主动撤绿灯。</b>最后四到六周，减少即时反馈，改成让他先自评再核对。这一条会让康复过程看起来“效率下降”，但它是唯一在练那件事的环节。</p>
+<h2 id="s8"><span class="no">08</span>三种做坏的方式</h2>
+<p><b>做坏一：把它变成又一项测试。</b>「以后加一个本体感觉评分，达到八十分才能上场」——三个月后这个分数会被刷起来，而它原本要捕捉的东西又漏掉了。判断标准：凡是给它设了通过／不通过阈值的，多半已经做坏了。</p>
+<p><b>做坏二：用它来推翻医嘱。</b>「我感觉可以了，虽然测试还没过」——本文从来没有说感觉可以覆盖客观指标。它说的是<b>两者都要</b>，而现在缺的是后一个。反过来用，是拿这套说法给冒险找理由。</p>
+<p><b>做坏三：拿它去说别人「你的感觉不准」。</b>这是最伤人的用法。母文说的是「一个人在特定过程后感觉会失真」，不是「别人的感受不算数」。用它去否定他人的主观报告，正好把这篇文章要保护的东西掐掉。</p>
+<h2 id="s9"><span class="no">09</span>五个实操疑问</h2>
+<p><b>一、我不是运动员，这套有用吗？</b>有。换新岗位、大病初愈、长期依赖某个工具（导航、模板、自动化脚本）、长期在有人复核的环境里工作——这四种情形都会产生同一类剥脱。三个自查问题原样可用。</p>
+<p><b>二、练多久能回来？</b>没有统一答案，但有一个观察点：当你的自评和随后的客观数据开始出现稳定的一致性时（不是完全吻合，是同向），说明它在回来。多数人在四到八周里能看到这个转折。</p>
+<p><b>三、自评一直很不准怎么办？</b>继续做，别修正标准。不准本身是有信息的：偏乐观还是偏悲观、在哪个环节最不准。把这个偏差本身记下来，比强行准确更有用。</p>
+<p><b>四、旁边人一直在给反馈，我怎么先自评？</b>跟他约定一句话：「先别说，让我说完。」多数教练和理疗师会配合，因为这个要求听起来很上进——而它确实是。</p>
+<p><b>五、这套东西能不能用在孩子身上？</b>能，而且更要紧。一个从小所有对错都由大人当场宣判的孩子，练成的正是那个「动作正确但不独自判断」的身体。做法一样：先问他觉得怎么样，再给评价。顺序，永远是顺序。</p>
+<h2 id="s10"><span class="no">10</span>一页纸操作卡</h2>
+<p>1. 三个自查问题：有没有事前察觉／有没有主动叫停／依据是不是全在外部2. 每次外部反馈之前，先说出自己的判断——顺序不能反3. 在医生允许范围内制造需要细节的场合：改地面、撤视觉、变节奏、加干扰4. 三栏记录，重点是第三栏「我觉得哪儿不对」，允许说不清5. 被问之前先书面作答；发言时把感觉翻译成事实6. 决策者四改口：提前问、换问法、加「未覆盖」栏、后期撤绿灯7. 三条不许：不设阈值、不拿它推翻医嘱、不用它否定别人的感受8. 出现打软、肿胀、夜间痛醒、麻木无力 → 停止自查，立刻就医</p>
+<h2 id="s11"><span class="no">11</span>一个走完全套的例子</h2>
+<p>小林，二十九岁，业余足球，前交叉韧带重建术后第七个月。所有指标合格：等速力量健侧对比百分之九十三，单腿跳对称性百分之九十一，疼痛零分，医生说可以逐步回到对抗。</p>
+<p>他先做了三个自查问题。第一个：最近三个月有没有过事前察觉？——想了半天，没有，两次不舒服都是练完第二天才反应过来。第二个：有没有在无人评价时主动叫停？——没有，每次都是练到教练说停。第三个：判断状态的依据有几样来自外部？——全部五样都是外部的（教练、手环恢复度、疼痛评分、力量数据、队友的评价）。三分全中。</p>
+<p>他改了三件事。</p>
+<p><b>顺序。</b>每次训练完，先自己写一句「今天左腿哪儿不对」，写完再问教练。头两周他写的全是「说不上来」和「好像还行」，第三周开始出现具体的东西：「变向时左脚落地那一下，我是先用外侧着地的」。</p>
+<p><b>条件。</b>在教练同意下，把一部分低强度练习挪到草地边缘不太平的地方做，另外每次训练最后加五分钟闭眼单腿站（扶着栏杆）。头几次他自己都吃惊：闭上眼站左腿，晃得厉害，而右腿很稳——这个差别在任何一项测试里都没有出现过。</p>
+<p><b>记录。</b>三栏，第三栏坚持写。</p>
+<p>第六周出现了那个转折：一次训练里，他在做变向之前主动停了一下，跟教练说今天这条腿不太跟得上节奏，改做直线。当天没有任何数据支持这个判断。第二天他有明显的酸胀。</p>
+<p>这一次「事前察觉」出现之后，他把前六周的第三栏翻了一遍，发现「左脚外侧先着地」这句话，在停练之前的两周里出现过四次。</p>
+<p>他没有比之前更强壮，力量数据几乎没变。变的是那套报信的东西重新上岗了。</p>
+<h2 id="s12"><span class="no">12</span>与三种常见做法的分工</h2>
+<p><b>和「康复训练计划」的分工。</b>康复计划管的是承重和输出——力量、活动度、稳定性。本文管的是报信。两者必须同时做，而且顺序上康复计划优先：没有足够的力学基础，练感觉是危险的。本文所有的动作都必须在医生给定的强度范围之内。</p>
+<p><b>和「运动表现监控（手环、心率、恢复度）」的分工。</b>监控设备采集的是可量化的部分，它们非常有用。差别在于：设备告诉你「你的身体现在处于什么状态」，本文练的是「你自己能不能知道」。一个完全依赖设备读数的人，即使读数很准，他那套内部的东西仍然在闲置。两者的关系是：设备用来校准，不是用来替代。</p>
+<p><b>和「心理康复／信心重建」的分工。</b>心理工作处理的是恐惧和回避——不敢做那个动作。本文处理的是分辨力——做得了但分不出细微差别。两者的表现有时很像（都表现为犹豫），但方向相反：恐惧是感觉到了危险而不敢动，剥脱是感觉不到危险所以敢动。用错方向会加重问题——对一个剥脱的人做信心建设，等于让他更敢在没有预警的情况下往前冲。分辨的办法很简单：问他「你担心的是哪一下」。答得出具体动作的，是恐惧；答不出、只说「应该没事」的，是剥脱。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/hu-min/perceptual-stripping/">《感知剥脱：为什么重返赛场的运动员无法感觉到即将到来的崩溃》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/hu-min/perceptual-stripping/explain.html">🌱 白话解释文《手冻僵了，你就摸不出杯子有多烫》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/hu-min/perceptual-stripping/">回母文</a> ·
+  <a href="/students/hu-min/works/">胡敏 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

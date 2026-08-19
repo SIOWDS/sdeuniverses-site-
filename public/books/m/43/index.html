@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palantir Ontology 的 SDE 解构 · An SDE Deconstruction of Palantir Ontology | 德麦国际专著</title>
+<meta name="description" content="Palantir Ontology 的 SDE 解构（扩充增补版）· 王德生博士 著 · 把 Palantir 重新界定为固定 S、E 条件下的企业 D3 实现器、企业最优运行智能体。它在秩序态里预测、调度、审批、执行、审计无出其右，却没有内生化旧本体失效、混沌态识别、介生态候选生成与新秩序迁移——因而缺少完整的企业发生学智慧。全书导论加三十五章，附四层企业 SDE 智能体、多本体治理、发生九步法与五维企业发生智商评价体系。">
+<meta property="og:title" content="Palantir Ontology 的 SDE 解构 · An SDE Deconstruction of Palantir Ontology">
+<meta property="og:type" content="book">
+<style>
+:root{--bg:#F6F2E9;--card:#FCF9F1;--accent:#8C5A3E;--text:#241E12;--muted:#8A7C5E;--border:rgba(94,71,16,0.15);--ink:#161009}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:1.95;font-size:16.5px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:760px;width:100%;margin:0 auto;padding:0 24px}
+nav.top{position:sticky;top:0;background:rgba(246,242,233,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:20}
+nav.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
+.nav-back{font-size:13.5px;color:var(--muted)}
+header.hero{position:relative;background:linear-gradient(155deg,#1c1710,#0e0b06);color:#F3ECD9;padding:56px 0 52px;overflow:hidden}
+.st{position:absolute;background:#FFF5DC;border-radius:50%;opacity:0;box-shadow:0 0 5px 1px rgba(255,245,220,0.5);animation:tw var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes tw{0%,100%{opacity:0;transform:scale(0.5)}50%{opacity:var(--o,0.8);transform:scale(1)}}
+.hero-inner{position:relative;z-index:2;display:flex;gap:32px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:760px;margin:0 auto;padding:0 24px}
+.hero-cover{width:172px;flex:0 0 auto;border-radius:3px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,0.5);border:1px solid rgba(212,178,94,0.25)}
+.hero-cover img{width:100%;display:block}
+.hero-txt{flex:1;min-width:260px}
+.hero-domain{font-size:11.5px;letter-spacing:0.34em;color:#C9A15A;margin-bottom:14px}
+.hero-title{font-size:clamp(23px,3.8vw,32px);font-weight:700;letter-spacing:0.02em;line-height:1.4;color:#F5EFDE}
+.hero-en{font-size:15px;color:#C9BB94;margin-top:14px;font-style:italic;line-height:1.5}
+.hero-sub{font-size:13px;color:#9C8F6C;margin-top:6px;line-height:1.6}
+.hero-cta{margin-top:20px;display:flex;flex-wrap:wrap;gap:10px}
+.hero-cta a{display:inline-block;padding:10px 20px;border-radius:3px;font-size:13.5px;letter-spacing:0.05em;font-weight:700}
+.cta-read{background:#D4B25E;color:#160F08}
+.cta-dl{border:1px solid rgba(212,178,94,0.6);color:#D4B25E}
+main{padding:44px 0 20px}
+.lede{font-size:17.5px;line-height:2;color:#3A3320;border-left:3px solid var(--accent);padding:4px 0 4px 20px;margin-bottom:38px}
+.pubcard{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:22px 24px;margin-bottom:38px;font-size:14.5px;line-height:1.9}
+.pubcard .row{display:flex;gap:10px;flex-wrap:wrap;padding:3px 0}
+.pubcard .k{color:var(--muted);min-width:92px;flex:0 0 auto}
+.pubcard .v{color:var(--text);flex:1;min-width:200px}
+.sec-label{font-size:11.5px;letter-spacing:0.34em;color:var(--accent);margin:0 0 16px}
+.endesc p{margin-bottom:16px;text-align:justify;color:#3A3320;font-size:15.5px;line-height:1.95}
+.cnbody p{margin-bottom:16px;text-align:justify;color:#2E2818;font-size:16px;line-height:2.0}.cnbody p b{color:var(--accent)}
+.expand-lead{font-size:11.5px;letter-spacing:0.34em;color:var(--accent);margin:38px 0 16px}
+.thesis{background:linear-gradient(150deg,#1c1710,#100c07);border-radius:6px;padding:26px 26px;margin:0 0 38px;color:#EBE1C8}
+.thesis .tl{font-size:10.5px;letter-spacing:0.4em;color:#C9A15A;margin-bottom:12px}
+.thesis p{font-size:16px;line-height:2.0;color:#E7DCC2}.thesis p b{color:#E4C878;font-weight:600}
+.grouplink{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:40px 0 0;padding:18px 22px;border:1px solid var(--border);border-radius:4px;background:rgba(201,161,90,0.05)}
+.grouplink .gl-t{flex:1;min-width:220px;font-size:14.5px;color:var(--text)}
+.btn{display:inline-block;padding:10px 22px;border-radius:3px;font-size:14px;letter-spacing:0.06em;font-weight:700}
+.btn-solid{background:var(--accent);color:#160F08}
+.btn-ghost{border:1px solid var(--accent);color:var(--accent)}
+footer{background:var(--ink);color:#8C7E5C;text-align:center;padding:30px 0 40px;font-size:12.5px;letter-spacing:0.08em;margin-top:40px}
+footer a{color:#D4B25E}
+@media(max-width:560px){.hero-cover{width:140px}}
+</style>
+</head>
+<body>
+<nav class="top"><div class="wrap">
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <a class="nav-back" href="/philosophy/#books">← 五十余部跨域专著</a>
+</div></nav>
+
+<header class="hero">
+  <i class="st" style="left:6.2%;top:82.2%;width:1.9px;height:1.7px;--o:0.88;--d:3.0s;--dl:1.1s"></i><i class="st" style="left:50.1%;top:8.1%;width:1.2px;height:1.8px;--o:0.84;--d:3.6s;--dl:0.0s"></i><i class="st" style="left:7.1%;top:43.7%;width:2.1px;height:1.1px;--o:0.42;--d:3.1s;--dl:3.3s"></i><i class="st" style="left:77.7%;top:19.8%;width:1.5px;height:2.0px;--o:0.57;--d:3.9s;--dl:3.6s"></i><i class="st" style="left:84.2%;top:12.1%;width:1.3px;height:2.0px;--o:0.39;--d:4.6s;--dl:2.5s"></i><i class="st" style="left:84.6%;top:78.4%;width:1.6px;height:1.9px;--o:0.35;--d:2.9s;--dl:2.0s"></i><i class="st" style="left:59.9%;top:71.4%;width:2.1px;height:1.7px;--o:0.45;--d:4.4s;--dl:3.8s"></i><i class="st" style="left:80.8%;top:53.0%;width:1.5px;height:1.2px;--o:0.65;--d:3.5s;--dl:2.8s"></i><i class="st" style="left:58.0%;top:26.6%;width:2.2px;height:1.7px;--o:0.49;--d:2.6s;--dl:4.0s"></i><i class="st" style="left:66.4%;top:50.6%;width:1.1px;height:2.2px;--o:0.78;--d:3.3s;--dl:0.0s"></i><i class="st" style="left:79.6%;top:23.7%;width:1.1px;height:1.7px;--o:0.63;--d:2.4s;--dl:1.8s"></i><i class="st" style="left:78.2%;top:47.0%;width:1.4px;height:1.8px;--o:0.78;--d:2.8s;--dl:1.9s"></i><i class="st" style="left:12.6%;top:18.9%;width:1.2px;height:2.1px;--o:0.52;--d:2.8s;--dl:3.0s"></i><i class="st" style="left:16.6%;top:4.5%;width:2.1px;height:1.9px;--o:0.78;--d:3.3s;--dl:2.5s"></i><i class="st" style="left:40.9%;top:82.9%;width:1.9px;height:1.6px;--o:0.29;--d:4.3s;--dl:0.3s"></i><i class="st" style="left:27.5%;top:87.5%;width:1.1px;height:1.6px;--o:0.40;--d:4.8s;--dl:2.0s"></i><i class="st" style="left:64.9%;top:32.4%;width:1.7px;height:1.2px;--o:0.64;--d:3.1s;--dl:3.0s"></i><i class="st" style="left:32.8%;top:19.8%;width:1.6px;height:1.3px;--o:0.84;--d:4.3s;--dl:2.5s"></i><i class="st" style="left:15.6%;top:79.5%;width:1.8px;height:1.6px;--o:0.54;--d:3.2s;--dl:3.5s"></i><i class="st" style="left:23.5%;top:43.0%;width:2.1px;height:1.4px;--o:0.40;--d:3.8s;--dl:1.5s"></i><i class="st" style="left:74.2%;top:56.8%;width:2.1px;height:2.1px;--o:0.80;--d:4.5s;--dl:3.5s"></i><i class="st" style="left:22.8%;top:54.9%;width:1.6px;height:1.6px;--o:0.86;--d:5.0s;--dl:0.9s"></i><i class="st" style="left:57.7%;top:84.5%;width:1.1px;height:2.0px;--o:0.71;--d:5.3s;--dl:1.6s"></i><i class="st" style="left:43.9%;top:43.9%;width:1.9px;height:2.1px;--o:0.88;--d:5.2s;--dl:1.4s"></i><i class="st" style="left:21.6%;top:80.9%;width:1.2px;height:1.8px;--o:0.60;--d:5.4s;--dl:1.2s"></i><i class="st" style="left:8.3%;top:69.3%;width:1.6px;height:1.5px;--o:0.81;--d:4.9s;--dl:1.8s"></i><i class="st" style="left:90.9%;top:39.0%;width:1.2px;height:1.3px;--o:0.68;--d:5.0s;--dl:1.6s"></i><i class="st" style="left:36.5%;top:6.5%;width:1.2px;height:1.4px;--o:0.5;--d:3.6s;--dl:2.2s"></i><i class="st" style="left:92.1%;top:66.6%;width:1.5px;height:1.9px;--o:0.57;--d:4.9s;--dl:3.5s"></i>
+  <div class="hero-inner">
+    <div class="hero-cover"><img src="/books/covers/43.jpg" alt="Palantir Ontology 的 SDE 解构 封面"></div>
+    <div class="hero-txt">
+      <div class="hero-domain">企业本体论 · 德麦国际专著</div>
+      <h1 class="hero-title">Palantir Ontology 的 SDE 解构</h1>
+      <div class="hero-en">An SDE Deconstruction of Palantir Enterprise Ontology</div>
+      <div class="hero-sub">固定 S、E 条件下的企业 D3 实现器、企业最优运行智能体及其发生学边界 · 扩充增补版</div>
+      <div class="hero-cta">
+        <a class="cta-read" href="/books/m/43/read.html">在线读全书（355 页）→</a>
+        <a class="cta-dl" href="/books/m/43/Palantir-SDE-Deconstruction.pdf" target="_blank">下载 PDF</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="lede">Palantir 通常被讲成一层企业数据语义、一具数字孪生。这本书给出一个更靠前也更锋利的界定：它是一台把企业结构 S 与数据、规则、模型、权限环境 E 预先秩序化，再据此生成、授权、执行并反馈企业行动 D 的工程系统——它的能力中心，是 D3 最优化。它在秩序里所向披靡，却照不见旧秩序如何失效、新秩序如何发生。（Palantir Ontology 的 SDE 解构 · 王德生博士 著）</div>
+
+    <div class="thesis">
+      <div class="tl">全 书 核 心 命 题</div>
+      <p>Palantir 是<b>固定或相对固定 S、E 条件下的企业 D 实现器，尤其是 D3 最优化的实现器</b>；它的企业智能体，本质上是<b>企业「最优运行」智能体</b>。它擅长秩序态里的预测、调度、配置、审批、执行与审计，却没有把「旧本体失效、混沌态识别、介生态候选生成、新秩序迁移」内生为系统能力——<b>因而缺少完整的企业发生学智慧</b>。看清这条边界，才谈得上如何补上它。</p>
+    </div>
+
+    <div id="cn-content">
+    <div class="sec-label">内 容 简 介</div>
+    <div class="cnbody">
+<p>本书依据 Palantir 的公开文档，把它从「企业数据语义层／数字孪生」重新界定为一种<b>企业运营本体</b>：它让对象、属性、链接等语义要素，与函数、Action、动态安全、智能体工具等动力要素结合，使企业数据得以进入受治理的判断、行动、写回与反馈闭环。据此，全书把 Palantir 解构为一套<b>简化的企业 SDE 本体与简化的企业 SDE 方法论</b>——对象、关系与状态映射为企业结构显露态 S；函数、行动、工作流与智能体映射为差异序列 D；数据、规则、模型、权限与业务语境映射为特征纠缠系统 E。</p>
+<p>关键的判断在于:Palantir 隐含支持三方程，但三方程<b>并不均衡</b>。<b>D=H(S,E)</b> 得到最成熟的实现——在相对稳定的结构与环境下生成并落地企业行动;<b>S=F(D,E)</b> 主要表现为既有对象状态与关系的更新;<b>E=G(S,D)</b> 主要表现为反馈数据与模型评价。于是它把一家企业的「结构」建模到了地表最强，却把「结构本身如何被重新发生」留在了系统之外——这正是它作为「最优运行智能体」的荣耀，也是它作为「发生智能体」的亏缺。</p>
+    </div>
+    <div class="expand-lead">展 开 · 这本书在讲什么</div>
+    <div class="cnbody">
+<p>全书为<b>导论加三十五章</b>，外加三则附录。<b>前段（第一至十四章）立事实与解构</b>:先说明企业智能化为何必须进入「存在系统」，厘清 Ontology 概念在哲学、信息科学与 Palantir 三处的分化;再把 Palantir 的语义要素、动力要素与安全逐一还原为 S、E、D，完成三方程解构，并论证它为何以 D=H(S,E) 为主导、为何运行必须以「固定 S」与「固定 E」为前提、为何主要集中在 D1/D2/D3 中的 <b>D3</b>。收束于全书的核心定义——固定 S、E 条件下的企业 D3 实现器——并借六路径、三原理指出:<b>支持多路径运行，并不等于「发生」</b>。</p>
+<p><b>中段（第十五至二十三章）划三态边界</b>:把秩序态企业 SDE（Palantir 的优势领域）、混沌态企业 SDE（旧对象、旧目标、旧规则的共同失效）、介生态企业 SDE（新对象与新秩序尚未定型的发生空间）三者分开，再用三组关键辨析立住分寸——<b>动态不等于混沌、反馈不等于介生、模拟不等于发生</b>;继而剖开 Palantir 企业智能体的真实架构（情境·工具·权限·责任）与「从看见到执行」的闭环价值，回答它为何没有完整的发生学智慧，并把风险从「AI 模型风险」扩展到<b>本体风险与发生风险</b>（本体固化、指标霸权、企业定义权）。</p>
+<p><b>后段（第二十四至三十五章加结论）给建设方案</b>:提出<b>完整企业 SDE 智能体的四层架构</b>、正式世界／异常世界／候选世界的<b>双本体与多本体治理</b>、从异常到新秩序的<b>企业 SDE 发生九步法</b>，以及以创造·自由·幸福补足企业 D1 的意义三律;并以 <b>Airbus Skywise、供应链、制造、医疗、平台企业</b>五组案例展开理论与实践含义，给出「秩序层与发生层如何结合」的实施路线，最后把评价标准从「模型准确率」升级为<b>五维企业发生智商</b>。结论回到一句:从「企业最优运行智能体」走向「企业发生智能体」。</p>
+    </div>
+    </div>
+
+    <div class="sec-label">出 版 信 息 · PUBLICATION</div>
+    <div class="pubcard">
+      <div class="row"><span class="k">作者 Author</span><span class="v">王德生博士（Wang, Desheng）</span></div>
+      <div class="row"><span class="k">副标题</span><span class="v">固定 S、E 条件下的企业 D3 实现器、企业最优运行智能体及其发生学边界</span></div>
+      <div class="row"><span class="k">出版方</span><span class="v">德麦国际有限公司 · Demai International Pte. Ltd.（Singapore）· 德麦国际出版社</span></div>
+      <div class="row"><span class="k">版本</span><span class="v">扩充增补版（Expanded Edition）· 2026 年 7 月</span></div>
+      <div class="row"><span class="k">ISBN</span><span class="v">978-1-970820-61-4（Bowker authorId 26927366）</span></div>
+      <div class="row"><span class="k">篇幅</span><span class="v">约 12 万字 · 355 页 · 中英双目录 · 图表目录 · 章提要 · 术语表 · 关键词索引（统稿美编增订版）</span></div>
+      <div class="row"><span class="k">检索</span><span class="v"><a href="https://bookwire.bowker.com/" target="_blank" rel="noopener">Bowker / Bookwire</a> · 可按 ISBN 9781970820614 查询</span></div>
+    </div>
+
+    <div class="sec-label">内 容 简 介 · BOOK DESCRIPTION</div>
+    <div class="endesc">
+<p>This study interprets Palantir Ontology not merely as a semantic layer or a digital twin, but as an operational enterprise ontology that connects objects, relations, functions, actions, security, agents, write-back, and feedback. Through the SDE framework, Palantir is reconstructed as a simplified enterprise SDE ontology and methodology. Its dominant equation is D = H(S,E): enterprise actions are generated and implemented under relatively stabilized structures and environments.</p>
+<p>Palantir therefore functions primarily as a D3 optimization and implementation system — an enterprise optimal-operation agent. Its main strength lies in ordered-state operations, while its central limitation is the lack of endogenous capabilities for diagnosing ontological breakdown, navigating chaotic and interstitial states, generating candidate ontologies, and institutionalizing new enterprise orders. It models the structure of a firm better than anyone, yet leaves the re-generation of that structure outside the system.</p>
+<p>From this diagnosis, the book proposes a concrete reconstruction: a four-layer SDE enterprise-agent architecture, multi-ontology governance across formal, anomalous, and candidate worlds, a nine-step generative workflow from anomaly to new order, and a five-dimensional framework for evaluating enterprise generative intelligence — illustrated through cases in aviation (Airbus Skywise), supply chain, manufacturing, healthcare, and platform firms. Its argument moves from the enterprise optimal-operation agent toward the enterprise genesis agent.</p>
+    </div>
+
+    <div class="sec-label" style="margin-top:8px">配 套 长 文 · 企业本体论专栏</div>
+    <div class="cnbody" style="margin-bottom:10px">
+    <p style="color:#8A7C5E;font-size:14px">本书是「企业本体论」专栏背后的学术专著。下面四篇长文各取本书的一块，用一个具体行业例子讲透，可各自独立阅读。</p>
+    </div>
+    <div style="display:grid;gap:12px;margin-bottom:38px">
+      <a href="/column/palantir-ontology-explained/" style="display:block;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:4px;padding:18px 20px;text-decoration:none">
+        <div style="font-size:16.5px;font-weight:700;color:var(--text);line-height:1.5">把整座工厂装进软件：Palantir Ontology 全面详解</div>
+        <div style="font-size:13.5px;color:var(--muted);margin-top:7px;line-height:1.75">用一家中型电机厂当例子，把对象、属性、关系、动作、函数、安全与 AI 时代的 OAG 从头讲清——它把企业结构建模到地表最强，也恰恰照不见「意义如何持续再发生」。（约 1.7 万字）</div>
+        <div style="font-size:13px;color:var(--accent);font-weight:700;margin-top:10px">读全面详解 →</div>
+      </a>
+      <a href="/column/palantir-ontology-ceiling/" style="display:block;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:4px;padding:18px 20px;text-decoration:none">
+        <div style="font-size:16.5px;font-weight:700;color:var(--text);line-height:1.5">优化不是创新：Palantir 本体论的天花板</div>
+        <div style="font-size:13.5px;color:var(--muted);margin-top:7px;line-height:1.75">它造出了当今最强的运营中枢，却造不出企业创新——求解只走六步法，结构性缺失分化·重组·升维三步高阶动作，而这三步正是一切从 0 到 1 的所在。（约 2 万字）</div>
+        <div style="font-size:13px;color:var(--accent);font-weight:700;margin-top:10px">读专题解剖 →</div>
+      </a>
+      <a href="/column/why-agents-cannot-eat-raw-data/" style="display:block;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:4px;padding:18px 20px;text-decoration:none">
+        <div style="font-size:16.5px;font-weight:700;color:var(--text);line-height:1.5">为什么企业智能体不能直接吃数据</div>
+        <div style="font-size:13.5px;color:var(--muted);margin-top:7px;line-height:1.75">把公司全部数据直接丢给大模型要撞的八堵墙，以及正确做法——在模型和数据之间架一座桥。企业智能化真正的功夫，在这座沉默的桥上。（约 1.4 万字）</div>
+        <div style="font-size:13px;color:var(--accent);font-weight:700;margin-top:10px">读方法篇 →</div>
+      </a>
+      <a href="/column/enterprise-as-meaning-engine/" style="display:block;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:4px;padding:18px 20px;text-decoration:none">
+        <div style="font-size:16.5px;font-weight:700;color:var(--text);line-height:1.5">企业是一台意义发生机</div>
+        <div style="font-size:13.5px;color:var(--muted);margin-top:7px;line-height:1.75">把「企业是资源集合／契约网络／生产函数」逐一放到桌上，指出它们共享同一盲区。相反的起点是：组织随时都在散，是意义的持续再发生每天把它重新拢住。（专栏开篇）</div>
+        <div style="font-size:13px;color:var(--accent);font-weight:700;margin-top:10px">读开篇导论 →</div>
+      </a>
+    </div>
+
+    <div class="grouplink">
+      <div class="gl-t">本书属「企业本体论」群 · 从企业最优运行智能体走向企业发生智能体</div>
+      <a class="btn btn-ghost" href="/enterprise-ontology/">读企业本体论专栏 →</a>
+      <a class="btn btn-solid" href="/philosophy/#books">看全部专著 →</a>
+    </div>
+  </div>
+</main>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+<footer><div class="wrap">德麦国际 · SDE Universes · <a href="/philosophy/#books">返回专著全景</a> · <a href="/browse/">首页</a></div></footer>
+
+<!-- SDE 陪读浮层 -->
+<script>window.WDS_READ={selector:"main"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

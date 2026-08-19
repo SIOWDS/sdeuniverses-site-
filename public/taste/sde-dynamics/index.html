@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDE 动力智能体 · 一台证伪机器 | SDE Universes</title>
+<meta name="description" content="输入一个议题，它不回答，而是把议题里偷偷预设的那条动力主张挖出来，让三条动力各自主张自己是决定性的、撞到有一条撑不住为止，最后交出一组会让原主张翻车的具体观测。产物是动力证伪报告，不是答案。">
+<style>
+:root{--bg:#0B0F14;--panel:#111720;--panel2:#0E141C;--bord:rgba(255,255,255,0.09);--ink:#E6EDF3;--ink2:#AEB9C6;--muted:#7E8B99;--acc:#5FA8D3;--acc2:#8FC4E8;--warn:#E8B14C;--ok:#5FBF7F;--bad:#E8897B}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+.wrap{max-width:940px;margin:0 auto;padding:36px 20px 90px}
+h1{font-size:27px;line-height:1.4;margin:0 0 6px;font-weight:700;letter-spacing:.01em}
+.sub{color:var(--acc2);font-size:15px;margin:0 0 4px}
+.byline{color:var(--muted);font-size:12.5px;margin:0 0 24px;letter-spacing:.06em}
+.lead{background:var(--panel);border:1px solid var(--bord);border-left:3px solid var(--acc);border-radius:3px;padding:18px 20px;margin:0 0 22px;color:var(--ink2);font-size:14.5px;line-height:1.9}
+.lead b{color:var(--ink)}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 22px}
+@media(max-width:760px){.three{grid-template-columns:1fr}}
+.card{background:var(--panel2);border:1px solid var(--bord);border-radius:3px;padding:14px 15px}
+.card .k{font-size:12px;color:var(--acc);letter-spacing:.08em;margin-bottom:6px}
+.card .t{font-size:13.5px;color:var(--ink);line-height:1.7;font-weight:600;margin-bottom:5px}
+.card .g{font-size:12.5px;color:var(--muted);line-height:1.75}
+.ctl{background:var(--panel);border:1px solid var(--bord);border-radius:3px;padding:20px;margin:0 0 18px}
+label{display:block;font-size:13px;color:var(--ink2);margin:0 0 6px}
+input[type=text],input[type=password],textarea,select{width:100%;background:#0A0E13;color:var(--ink);border:1px solid var(--bord);border-radius:3px;padding:10px 12px;font:inherit;font-size:14px}
+textarea{min-height:82px;resize:vertical;line-height:1.75}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:640px){.row{grid-template-columns:1fr}}
+.egs{margin:9px 0 0;display:flex;gap:7px;flex-wrap:wrap}
+.eg{background:transparent;border:1px solid var(--bord);color:var(--muted);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.eg:hover{border-color:var(--acc);color:var(--acc2)}
+.btns{margin-top:18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button.main{background:var(--acc);color:#08131c;border:none;border-radius:3px;padding:11px 26px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+button.main:disabled{opacity:.5;cursor:default}
+button.ghost{background:transparent;color:var(--ink2);border:1px solid var(--bord);border-radius:3px;padding:10px 20px;font:inherit;font-size:14px;cursor:pointer}
+.hint{color:var(--muted);font-size:13px;margin-top:11px;min-height:19px}
+#errBox{display:none;background:rgba(232,137,123,.1);border:1px solid rgba(232,137,123,.4);color:#F2B5AC;border-radius:3px;padding:11px 14px;margin:12px 0;font-size:13.5px}
+.step{background:var(--panel);border:1px solid var(--bord);border-radius:3px;margin:0 0 14px;overflow:hidden}
+.step.final{border-color:rgba(95,168,211,.55)}
+.sh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:var(--panel2);border-bottom:1px solid var(--bord)}
+.st-t{font-size:14px;font-weight:600;color:var(--ink)}
+.step.final .st-t{color:var(--acc2)}
+.st-s{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.sb{padding:15px 18px;font-size:14px;line-height:1.9;color:var(--ink2);max-height:560px;overflow:auto}
+.sb .hd{color:var(--ink);font-weight:600;margin:13px 0 5px}
+.sb .pg{margin:7px 0}
+.sb .li{margin:4px 0 4px 12px}
+.sb .ph{color:var(--muted)}
+.sb b{color:var(--ink)}
+.spin{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--acc);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.note{color:var(--muted);font-size:12.5px;line-height:1.85;margin-top:26px;border-top:1px solid var(--bord);padding-top:18px}
+.note b{color:var(--ink2)}
+a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>SDE 动力智能体</h1>
+<p class="sub">一台证伪机器：它不回答你的问题，它去推翻你问题里那条没说出口的动力主张</p>
+<p class="byline">王德生 ＋ Claude · 动力分析与证伪 · 品尝系列</p>
+
+<div class="lead">
+几乎每一个「为什么会这样」的问题，都已经偷偷预设了一条动力：<b>某样东西驱动了另一样东西改变</b>。提问的人通常没意识到，而整场讨论都建在它上面。<br><br>
+这台机器的第一个动作不是回答，是<b>把那条预设指认出来</b>；然后让三条动力各自主张「只有我是决定性的」，一直撞到有一条自己撑不住；最后交出的不是答案，是<b>一组会让原主张翻车的具体观测</b>——看完你该知道：明天去看什么，看到什么就说明原来那个说法错了。
+</div>
+
+<div class="three">
+  <div class="card"><div class="k">动力一</div><div class="t">路径 × 土壤 → 显露</div><div class="g">走法与条件相争，逼出了现在这个样子。</div></div>
+  <div class="card"><div class="k">动力二</div><div class="t">显露 × 土壤 → 路径</div><div class="g">样子与条件对不上，逼得走法改了道。</div></div>
+  <div class="card"><div class="k">动力三</div><div class="t">显露 × 路径 → 土壤</div><div class="g">样子与走法长期对不上，逼得整片条件被换掉。</div></div>
+</div>
+
+<div class="ctl">
+  <label for="question">要分析的议题（一句话，越具体越好）</label>
+  <textarea id="question" placeholder="例如：为什么医院的绩效考核越细，医生反而越不愿意管复杂病人？"></textarea>
+  <div class="egs">
+    <button class="eg" type="button">为什么绩效考核越细，越没人愿意接复杂的活</button>
+    <button class="eg" type="button">为什么好的乡村教师留不住</button>
+    <button class="eg" type="button">为什么一个团队越是流程完备，越难出新东西</button>
+  </div>
+  <div class="row">
+    <div><label for="modelSel">基底</label><select id="modelSel">
+      <option value="ds:pro">DeepSeek V4 Pro（深度思考 · 推荐）</option>
+      <option value="ds:flash">DeepSeek V4 Flash</option>
+      <option value="glm:pro">智谱 GLM-5（深度思考）</option>
+      <option value="glm:flash">智谱 GLM-4-Flash</option>
+      <option value="kimi:pro">月之暗面 Kimi K2.6</option>
+      <option value="qwen:pro">通义千问 Qwen3.7-Max·思考</option>
+      <option value="minimax:pro">MiniMax M3</option>
+      <option value="gpt:pro">GPT-5.5</option>
+      <option value="claude:pro">Claude Opus 4.8</option>
+      <option value="gemini:pro">Gemini 3.1 Pro</option>
+    </select></div>
+    <div><label for="apiKey">你的 API Key（只存在你自己的浏览器里，不上传）</label><input id="apiKey" type="password" placeholder="sk-..." autocomplete="off"></div>
+  </div>
+  <div class="btns">
+    <button id="goBtn" class="main">开始分析动力</button>
+    <button id="stopBtn" class="ghost" style="display:none">停止</button>
+  </div>
+  <div class="hint" id="hint">五步：挖出预设的动力 → 三条动力并行主张 → 共有前提 → 三对相撞裁决谁先动 → 动力证伪报告。约 10–25 分钟。</div>
+  <div id="errBox"></div>
+</div>
+
+<div id="runArea" style="display:none">
+  <div id="steps"></div>
+  <div id="dlRow" style="display:none;margin-top:6px">
+    <button id="dlBtn" class="ghost">下载全程报告（.md）</button>
+    <button id="copyBtn" class="ghost">复制证伪报告正文</button>
+  </div>
+</div>
+
+<div class="note">
+<b>它和另外两台的分别。</b>「金点子」让三个视角各占一个静态位置，「中华智问」让三条路线各锁一个终点——那两台的三家<b>不必打架</b>，打不打得起来要看内容碰运气。本台的三家各自主张「只有我这条动力是决定性的」，<b>互斥被写进了结构本身</b>，所以它必定撞得起来；代价是它的产物更窄——只回答动力问题，不写论文。<br><br>
+<b>它会怎么错。</b>三条动力都由同一个基底扮演，所以「三家互相顶撞」始终有一层表演成分：真正的对手不在场。报告里的每一条观测都<b>未经任何实证</b>，请当作待检验的假设，不要当结论。若某个议题上三条动力都撑得住、找不到翻转，机器会如实写「未找到」——<b>那不是失败，那是这个议题目前还不能被证伪、只能被议论。</b><br><br>
+<b>你的 Key 与内容都不经过我们的服务器</b>（境外基底走一次中转，仅转发不留存）。报告只在你这台机器上，关掉页面就没了，要留请先下载。
+</div>
+
+</div>
+
+<script src="/taste/assets/sde-keyprobe.js?v=20260817c"></script>
+<script>
+/* ================================================================
+ * SDE 动力智能体（三原理二阶碰撞 / 动力二阶碰撞）
+ *
+ * 下面这一段「八家基底管道」是从中华智问 /taste/zhiwen/ 逐字复制的，
+ * 不是重写。逐字复制而不是各写一份，是为了让漂移可被检测——
+ * tools/sim_sde_dynamics.js 会断言这一段与 zhiwen 里的完全一致；
+ * 哪天在 zhiwen 修了一个基底 bug 而这边没同步，那条断言会当场失败。
+ * 改这一段之前先想清楚：要改就两边一起改。
+ * ================================================================ */
+const HARD_TIMEOUT_MS = 40*60*1000;
+const PROXY_URL = "/api/llm-proxy";
+const API_URLS = {
+  ds:  "https://api.deepseek.com/v1/chat/completions",
+  glm: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+  kimi:"https://api.moonshot.cn/v1/chat/completions",
+  qwen:"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+  minimax:"https://api.minimaxi.com/v1/chat/completions",
+  gpt:"https://api.openai.com/v1/chat/completions",
+  claude:"https://api.anthropic.com/v1/messages",
+  gemini:"https://generativelanguage.googleapis.com/v1beta/models"
+};
+const OVERSEAS = ['gpt','claude','gemini','minimax'];
+function parseModel(sel){ const [vendor, tier] = sel.split(':'); return { vendor, tier }; }
+function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
+function isOverseas(sel){ return OVERSEAS.includes(parseModel(sel).vendor); }
+function chatHeaders(model, apiKey){
+  const { vendor, tier } = parseModel(model);
+  const headers = { 'Content-Type':'application/json' };
+  if(isOverseas(model)){
+    if(vendor === 'gpt'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions'; }
+    else if(vendor === 'minimax'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions'; }
+    else if(vendor === 'claude'){ headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01'; headers['anthropic-dangerous-direct-browser-access'] = 'true'; headers['x-target-url'] = 'https://api.anthropic.com/v1/messages'; }
+    else if(vendor === 'gemini'){ const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash'; headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':generateContent?key=' + encodeURIComponent(apiKey); }
+  } else {
+    headers['Authorization'] = 'Bearer ' + apiKey;
+  }
+  return headers;
+}
+function buildPayload(sel, systemPrompt, userQ, maxTokens){
+  const { vendor, tier } = parseModel(sel);
+  const cap = (typeof maxTokens==='number' && maxTokens>0) ? maxTokens : 4000;
+  const base = { stream: false, messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}], max_tokens: cap };
+  if(vendor === 'ds'){
+    if(tier === 'pro'){ base.model='deepseek-v4-pro'; base.thinking={type:'enabled'}; base.reasoning_effort='xhigh'; }
+    else { base.model='deepseek-v4-flash'; base.thinking={type:'disabled'}; base.temperature=0.7; }
+  } else if(vendor === 'glm'){
+    if(tier === 'pro'){ base.model='glm-5'; base.thinking={type:'enabled'}; }
+    else { base.model='glm-4-flash'; base.temperature=0.7; }
+  } else if(vendor === 'kimi'){
+    if(tier === 'pro'){ base.model='kimi-k2.6'; } else { base.model='moonshot-v1-32k'; base.temperature=0.6; }
+  } else if(vendor === 'qwen'){
+    base.max_tokens = Math.min(cap, 8192);
+    if(tier === 'pro'){ base.model='qwen3.7-max'; base.temperature=0.7; base.enable_thinking=true; }
+    else { base.model='qwen-plus'; base.temperature=0.7; }
+  } else if(vendor === 'minimax'){
+    base.model = (tier === 'pro') ? 'MiniMax-M3' : 'MiniMax-M2.7-highspeed';
+    base.reasoning_split = true;
+    base.max_tokens = Math.min(cap + 32000, 131072);
+    if(base.messages && base.messages[0] && base.messages[0].role === 'system'){
+      base.messages[0].content = '【硬性要求】你的思考过程不计入正文字数；正文必须达到任务规定的篇幅要求，不得因为思考已经详尽就压缩正文。\n\n' + base.messages[0].content;
+    }
+  } else if(vendor === 'gpt'){
+    base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';
+    base.max_completion_tokens = base.max_tokens; delete base.max_tokens;
+    base.reasoning_effort = (tier === 'pro') ? 'high' : 'medium';
+  } else if(vendor === 'claude'){
+    return { model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6', max_tokens: Math.min(cap, 60000), stream: false, system: systemPrompt, messages: [{ role:'user', content: userQ }] };
+  } else if(vendor === 'gemini'){
+    return { systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role:'user', parts: [{ text: userQ }] }], generationConfig: { maxOutputTokens: Math.min(cap, 60000), temperature: 0.7 } };
+  }
+  return base;
+}
+function parseResponse(text){
+  const out = {answer:'', score:'', analysis:'', summary:'', path_choice:''};
+  if(!text) return out;
+  text = text.replace(/^\s*\*\*(回答|智商评分|评分分析|本次摘要|任务\s*DNA\s*与路径选择)\*\*\s*[:：]?/gm, '## $1');
+  text = text.replace(/^\s*(回答|智商评分|评分分析|本次摘要)\s*[:：]/gm, '## $1 ');
+  const parts = text.split(/^\s*#{1,4}\s+/m);
+  for(let p of parts){
+    p = p.trim();
+    if(p.startsWith('任务 DNA 与路径选择')) out.path_choice = p.slice('任务 DNA 与路径选择'.length).trim();
+    else if(p.startsWith('任务DNA与路径选择')) out.path_choice = p.slice('任务DNA与路径选择'.length).trim();
+    else if(p.startsWith('回答')) out.answer = p.slice(2).trim();
+    else if(p.startsWith('智商评分')){
+      const body = p.slice(4).replace(/^[\s:：]+/, '').trim();
+      const hi=[], lo=[];
+      const re = /(?<![0-9])(\d{2,3})(?![0-9])/g; let m;
+      while((m=re.exec(body))!==null){ const v=+m[1]; if(v>=100&&v<=170) hi.push(v); else if(v>=60&&v<=99) lo.push(v); }
+      out.score = hi.length ? String(hi[hi.length-1]) : (lo.length ? String(lo[lo.length-1]) : body.slice(0,100));
+    }
+    else if(p.startsWith('评分分析')) out.analysis = p.slice(4).replace(/^[\s:：]+/, '').trim();
+    else if(p.startsWith('本次摘要')) out.summary = p.slice(4).replace(/^[\s:：]+/, '').trim();
+  }
+  if(!out.answer && !out.score && !out.summary) out.answer = text;
+  if(!out.summary && out.answer) out.summary = out.answer.slice(0, 1000);
+  out.score = String(repairScore(out.score, out.analysis));
+  return out;
+}
+function extractFull(vendor, j){
+  // 从各厂商"非流式"完整响应里取：正文 / 思考字数 / 结束原因
+  let text='', think=0, fin='';
+  if(vendor === 'claude'){
+    if(j.type === 'error') throw new Error(j.error?.message || 'Anthropic 接口错误');
+    const blocks = Array.isArray(j.content) ? j.content : [];
+    text = blocks.filter(b=>b && b.type==='text').map(b=>b.text||'').join('');
+    think = blocks.filter(b=>b && b.type==='thinking').map(b=>b.thinking||'').join('').length;
+    const sr = j.stop_reason; if(sr) fin = (sr === 'max_tokens') ? 'length' : sr;
+  } else if(vendor === 'gemini'){
+    const cand = j.candidates && j.candidates[0];
+    const parts = cand && cand.content && cand.content.parts;
+    text = Array.isArray(parts) ? parts.map(p=>p.text||'').join('') : '';
+    const fr = cand && cand.finishReason; if(fr) fin = (fr === 'MAX_TOKENS') ? 'length' : String(fr).toLowerCase();
+    if(!text && j.promptFeedback && j.promptFeedback.blockReason) throw new Error('Gemini 拦截：'+j.promptFeedback.blockReason);
+  } else {
+    // OpenAI 兼容：ds / glm / kimi / qwen / gpt / minimax
+    const ch = j.choices && j.choices[0];
+    const msg = (ch && ch.message) || {};
+    text = msg.content || '';
+    think = (msg.reasoning_content || '').length;
+    if(ch && ch.finish_reason) fin = ch.finish_reason;
+  }
+  // MiniMax（及个别把思考混进正文的基底）：剥掉 <think> 段
+  if(text.indexOf('<think>') >= 0 || text.indexOf('</think>') >= 0){
+    text = text.replace(/<think>[\s\S]*?<\/think>/g, '');
+    const early = text.slice(0, 80);
+    if(early.indexOf('</think>') >= 0){ text = text.slice(text.indexOf('</think>') + 8); }
+    text = text.trim();
+  }
+  return { text, think, fin };
+}
+async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, maxTokens){
+  colEl.classList.add('generating');
+  const { vendor, tier } = parseModel(model);
+  const t0 = Date.now();
+  const deep = (tier === 'pro');
+  bodyEl.innerHTML = '<span class="placeholder">已向 '+vendorName(model)+' 发出请求。非流式模式：模型写完全文后一次性整体返回'+(deep?'（深度思考档通常需 2-15 分钟）':'')+'，生产多少文字就收多少，请保持本页开启……</span>';
+  statusEl.innerHTML = '<span class="spinner"></span> 生成中';
+  const ac = new AbortController(); RUN_ABORTS.add(ac);
+  const HARD_TIMEOUT_MS = 40*60*1000; // token 预算放开后单次可能真的写很久，超时同步放宽
+  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, HARD_TIMEOUT_MS);
+  const waitTimer = setInterval(()=>{ const s=Math.round((Date.now()-t0)/1000); const m=Math.floor(s/60); statusEl.innerHTML='<span class="spinner"></span> 生成中 · 已等待 '+(m? m+'分':'')+(s%60)+'秒'; }, 1000);
+
+  const overseas = isOverseas(model);
+  const url = overseas ? PROXY_URL : apiUrl(model);
+  const headers = chatHeaders(model, apiKey);
+
+  let resp;
+  try{
+    resp = await fetch(url, { method:'POST', headers, body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens)), signal: ac.signal });
+  }catch(e){
+    clearInterval(waitTimer); clearTimeout(killer); colEl.classList.remove('generating');
+    statusEl.textContent = '网络错误';
+    throw new Error(e.name==='AbortError' ? '超时：已中止（顶配深思档单次写作确实很慢；建议稍后重试）' : (overseas?'中转请求失败：':'网络请求失败：')+e.message);
+  }
+  if(!resp.ok){
+    clearInterval(waitTimer); clearTimeout(killer); colEl.classList.remove('generating');
+    let detail=''; try{ const raw=await resp.text(); try{ const jj=JSON.parse(raw); detail=(jj.error&&(jj.error.message||jj.error.type))||JSON.stringify(jj).slice(0,200); }catch(_){ detail=raw.slice(0,200)||resp.statusText; } }catch(_){ detail=resp.statusText; }
+    statusEl.textContent='失败'; bodyEl.innerHTML='<span class="placeholder">调用失败（'+resp.status+'）：'+escTxt(detail)+'</span>';
+    throw new Error('API '+resp.status+'：'+detail);
+  }
+  let j;
+  try{ j = await resp.json(); }
+  catch(e){
+    clearInterval(waitTimer); clearTimeout(killer); colEl.classList.remove('generating');
+    if(e.name==='AbortError'){ statusEl.textContent='超时'; throw new Error('超时：已中止（顶配深思档单次写作确实很慢；建议稍后重试）'); }
+    statusEl.textContent='解析失败'; throw new Error('响应不是合法 JSON（可能被网关截断）：'+e.message);
+  }
+  clearInterval(waitTimer); clearTimeout(killer); colEl.classList.remove('generating');
+  if(j && j.error){ statusEl.textContent='失败'; const msg=j.error.message||j.error.code||JSON.stringify(j.error).slice(0,180); bodyEl.innerHTML='<span class="placeholder">接口报错：'+escTxt(msg)+'</span>'; throw new Error('接口报错：'+msg); }
+  let out;
+  try{ out = extractFull(vendor, j); }
+  catch(e){ statusEl.textContent='失败'; bodyEl.innerHTML='<span class="placeholder">'+escTxt(e.message)+'</span>'; throw e; }
+  const secs=((Date.now()-t0)/1000).toFixed(1);
+  const acc = out.text, chars = acc.length, thinkChars = out.think, fin = out.fin;
+  if(!acc){
+    bodyEl.innerHTML='<span class="placeholder">（模型没有返回正文——可能是 Key 未开通该模型服务、额度不足或被安全策略拦截）</span>';
+    statusEl.textContent='空响应'; metaEl.textContent = secs+'s';
+    __M(model, systemPrompt, userQ, 0, thinkChars); return { text:'', chars:0, thinkChars, secs:parseFloat(secs) };
+  }
+  bodyEl.textContent = acc; bodyEl.scrollTop = 0;
+  statusEl.textContent = (fin==='length') ? '⚠ 完成(触及token上限·尾部被截)' : '✓ 完成';
+  metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars?' · 思考'+thinkChars+'字':'');
+  __M(model, systemPrompt, userQ, chars, thinkChars);
+  return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
+}
+function loadAsset(url, minLen, onOk){
+  return (async()=>{ try{
+    let resp = await fetch(url, {cache:'force-cache'});
+    if(resp.ok){ const t = await resp.text(); if(t && t.length>minLen){ onOk(t); return true; } }
+    resp = await fetch(url, {cache:'no-store'});
+    if(resp.ok){ const t = await resp.text(); if(t && t.length>minLen){ onOk(t); return true; } }
+  }catch(e){} return false; })();
+}
+function vendorName(sel){
+  const v = parseModel(sel || modelSel.value).vendor;
+  return v==='glm' ? '智谱' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : v==='minimax' ? 'MiniMax (稀宇)' : v==='gpt' ? 'GPT (OpenAI)' : v==='claude' ? 'Claude (Anthropic)' : v==='gemini' ? 'Gemini (Google)' : 'DeepSeek';
+}
+function keyStoreName(sel){
+  const v = parseModel(sel || modelSel.value).vendor;
+  return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : v==='minimax' ? 'sde_minimax_key' : v==='gpt' ? 'sde_gpt_key' : v==='claude' ? 'sde_claude_key' : v==='gemini' ? 'sde_gemini_key' : 'sde_ds_key';
+}
+
+
+// ============ SDE 动力智能体 · 心法与三条动力泳道 ============
+// 这台机器与金点子（三维度型）、中华智问（三路径型）的分别：
+//   三维度型：三家各占一个静态位置（S/D/E）——彼此不必打架，打架靠内容碰运气。
+//   三路径型：三家各锁一个终点——同上。
+//   本台（三原理型/动力型）：三家各自主张「只有我这条动力是驱动，另两样是被驱动的」——
+//     这是单因主张，三家天生互斥，**对立被写进选源结构本身，不靠运气**。
+// 也因此，它的产物不是一个答案，是一组会让原动力主张翻车的观测——它是一台证伪机器。
+
+const DYN_PRIOR = `你即将执行一件与"回答问题"相反的事：把一个议题里**隐含的动力主张**挖出来，然后设法把它推翻。
+
+【先认一件事】几乎每一个"为什么会这样"的问题，都已经偷偷预设了一条动力：**某样东西驱动了另一样东西改变**。提问者通常没意识到自己预设了它，而整场讨论都建在它上面。你的第一个动作不是回答，是**把那条预设的动力指认出来**。
+
+【三条动力，只有三条】任何发生，都可以读成三样东西之间的相互作用：
+  · **显露**：这件事当下呈现出来的样子（它现在是什么格局、什么形态、什么读数）。
+  · **路径**：把它组织成这样的那条走法（谁在推、按什么顺序、靠什么机制、经过了哪些分岔）。
+  · **土壤**：它得以如此呈现所依赖的那片条件（物质安排、制度、共同相信的东西、各人的意愿）。
+三者两两相争，各自逼动第三样，于是恰好有三条动力，不多不少：
+  **动力一**：路径 × 土壤 相争 → 逼出新的**显露**。
+  **动力二**：显露 × 土壤 相争 → 逼得**路径**改道。
+  **动力三**：显露 × 路径 相争 → 逼得**土壤**更换。
+
+【本机器的赌注】所有关于"什么导致了什么"的争论，都默认**驱动的方向是固定的**——谁驱动谁是给定的，只是大家对"是哪一条"意见不同。本机器要推翻的正是这条：**三条动力构成一个轮转，谁驱动谁取决于这一轮谁先动**。若你在某个议题上做不到推翻它，就如实说做不到——**诚实的"未推翻"远胜于硬凑的翻转**。
+
+【最致命的错误：温和综合】你的训练本能会把三条动力调和成"三者相互影响、共同作用"。**那是这台机器的死刑。** "相互影响"是一句永远为真、因而永远无用的话；它不预测任何事，也不会被任何事推翻。你要做的是让三条动力**各自主张自己是决定性的**，撞到有一条撑不住为止。
+
+【时间是这台机器的命门】每一条动力都必须给出**时序读数**：先动的是哪一样？另外两样多久跟上？在哪一步跟不上了？没有时序的动力主张，等于没有主张——因为它无法被任何观察推翻。
+
+【产物是什么】不是一个答案，不是一个漂亮的新名字，而是——**一组会让那条隐含动力主张翻车的具体观测**。看完这份东西的人，应该知道：明天该去看什么，看到什么就说明原来那个说法错了。`;
+
+const DYN_DISCIPLINE = '全程用干净的日常与学科话语,不得出现任何内部术语(不写 SDE、三视角、显露态、差异序列、特征纠缠、三大方程、123原理、二阶碰撞、提智等);不用「真X」作强调词;不写「综上所述」「相互影响」「辩证统一」这类收束套话;每一条主张都要写成能被观察推翻的样子。';
+
+const DYN_CFG = {
+  P1: { key:'P1', drive:'路径 × 土壤', target:'显露', letter:'A',
+        name:'动力一 · 路径与土壤相争，逼出新显露',
+        ask:'这件事现在这个样子，是被哪一对「走法 × 条件」的矛盾逼出来的？',
+        forbid:'不许把结论落在「路径该怎么改」或「土壤该怎么换」——那是另外两台的活；本台只回答「被逼出来的那个新样子是什么」。' },
+  P2: { key:'P2', drive:'显露 × 土壤', target:'路径', letter:'B',
+        name:'动力二 · 显露与土壤相争，逼得路径改道',
+        ask:'现在这个样子和它所处的条件对不上，于是哪一条走法被迫改了道？',
+        forbid:'不许把结论落在「它最终成了什么样子」或「土壤怎么换」——本台只回答「哪一条走法被改了、怎么改的」。' },
+  P3: { key:'P3', drive:'显露 × 路径', target:'土壤',
+        letter:'C', name:'动力三 · 显露与路径相争，逼得土壤更换',
+        ask:'现在这个样子和现有走法长期对不上，于是哪一片条件被迫整个换掉了？',
+        forbid:'不许把结论落在「它成了什么样子」或「走法怎么改」——本台只回答「哪一片条件被换了、换成了什么」。' }
+};
+
+function dynLaneSys(k, xinde){
+  const c = DYN_CFG[k];
+  const others = Object.keys(DYN_CFG).filter(x=>x!==k).map(x=>DYN_CFG[x].name).join('；');
+  let s = DYN_PRIOR + '\n\n【本台锁定 · 最高优先级】\n你是「' + c.name + '」。\n'
+    + '· 你只承认一条动力：**' + c.drive + ' 相争 → ' + c.target + ' 改变**。\n'
+    + '· 你必须主张这一条是**决定性的**——另外两条（' + others + '）在你这里只是**被驱动的结果**，不是并列的原因。\n'
+    + '· **严禁**写成「这只是其中一个因素」「三者共同作用」——那等于弃权，本台立刻作废。\n'
+    + '· 你只回答一个问题：' + c.ask + '\n'
+    + '· ' + c.forbid + '\n'
+    + '· **每一段都必须带时序读数**：先动的是哪一样／另外两样隔多久跟上／在哪一步跟不上了。给不出时序的段落，删掉重写。\n'
+    + '· 最后必须留一节【本台自己撑不住的地方】：诚实写出你这条动力在什么情形下明显不是驱动、而是被驱动。'
+    + '**这一节不是谦虚，是后面碰撞要用的材料——写得越具体越有用，写"暂无"就是没做。**\n\n'
+    + DYN_DISCIPLINE;
+  if(xinde) s += '\n\n【你自己写过的心得，带着它做事】\n' + xinde;
+  return s;
+}
+
+function dynLaneUser(q, claim){
+  return '议题：' + q + '\n\n'
+    + (claim ? ('【已从议题里挖出的隐含动力主张（供你对照，不必同意）】\n' + claim + '\n\n') : '')
+    + '请按本台锁定的那一条动力，把这个议题从头看一遍，约 2500-3500 字。结构自定，但必须包含：\n'
+    + '1. 本台的承重判断（一句话：什么与什么相争，逼出了什么改变）。\n'
+    + '2. 这条动力在本议题上的具体运作：谁先动、怎么传导、在哪一步结算。\n'
+    + '3. **时序表**：至少三行，每行＝「先动的那一样 → 隔多久 → 跟上的那一样 → 在哪一步跟不上」。\n'
+    + '4. 两条只有本台这条动力成立时才会出现、而另外两条动力预测不出来的**可观测后果**。\n'
+    + '5. 【本台自己撑不住的地方】——具体到情形，不许写"暂无"。\n'
+    + DYN_DISCIPLINE;
+}
+
+// ── 第〇步 · 从议题里挖出隐含的动力主张 ──
+function dynClaimPrompt(q){
+  return '议题：' + q + '\n\n'
+    + '这个议题本身已经偷偷预设了一条动力——**某样东西驱动了另一样东西改变**。提问的人通常没意识到。\n'
+    + '你的任务不是回答这个议题，是**把那条预设指认出来**。三步：\n\n'
+    + '【一 · 三样东西各是什么】按本议题写实，各一句：\n'
+    + '  · 显露＝这件事当下呈现出来的样子（现在是什么格局、什么读数）\n'
+    + '  · 路径＝把它组织成这样的那条走法（谁在推、按什么顺序、靠什么机制）\n'
+    + '  · 土壤＝它赖以成立的那片条件（物质安排、制度、共同相信的东西、各人的意愿）\n'
+    + '  三样若有一样写不实、只能写抽象套话，说明这个议题问得太空——如实指出，并给出一个更能切动机制的问法。\n\n'
+    + '【二 · 议题预设的那条动力】用这个句式写死：\n'
+    + '  「本议题预设了：______ 与 ______ 之间的矛盾，驱动了 ______ 改变。」\n'
+    + '  再补一句：**它把哪一样当成了不必问的、给定的？**（那一样就是这条预设的盲点所在）\n\n'
+    + '【三 · 这条预设有没有被说出来过】\n'
+    + '  在本议题所在的讨论里，有没有人明确把这条动力当作论点写出来过？\n'
+    + '  · 有 → 点名是谁的什么说法（吃不准就写"通行看法认为…"，**绝不编造人名年份**）。\n'
+    + '  · 没有 → 说明它是被默认的——**被默认的东西最难被推翻，因为没人觉得它需要辩护**。\n\n'
+    + '输出严格分三段【一】【二】【三】，不要铺垫、不要顺带回答议题本身。\n' + DYN_DISCIPLINE;
+}
+
+// ── 第二步 · 共有前提（本型的形状是给定的）──
+function dynPremisePrompt(q, A, B, C){
+  return '议题「' + q + '」上，有三台各自主张一条动力是决定性的：\n\n'
+    + '【A · 路径×土壤 → 显露】\n' + A.slice(0,16000) + '\n\n'
+    + '【B · 显露×土壤 → 路径】\n' + B.slice(0,16000) + '\n\n'
+    + '【C · 显露×路径 → 土壤】\n' + C.slice(0,16000) + '\n\n'
+    + '三台吵的是「哪一条动力说了算」。而它们共同假定了一件从没说出口的事：\n'
+    + '**驱动的方向是固定的——谁驱动谁是给定的，只是大家对"是哪一条"意见不同。**\n\n'
+    + '请做三步：\n\n'
+    + '【一 · 把这条共有前提按本议题写实】写成一句具体的话，**不许照抄上面那句通用表述**。\n'
+    + '  验收：把你写的这一条念给 A、B、C 三台听，三台都会觉得「这还用说吗」。\n'
+    + '  **若有哪一台会跳起来反对，那你写的不是共有前提，是第四种立场——重写。** 把验收结果写出来。\n\n'
+    + '【二 · 找出推翻它的那件材料 —— 必须来自 A/B/C 之一自己】\n'
+    + '  三台各自的【本台自己撑不住的地方】那一节，就是材料所在：某一台已经承认，在某种情形下\n'
+    + '  它那条动力不是驱动、而是被驱动的。**那正是"驱动方向会翻"的现场证词，而且是它自己给的。**\n'
+    + '  · 指出来自 A / B / C 哪一台，**原样引出那一句**（不要转述）。\n'
+    + '  · 说明它为什么恰好推翻「驱动方向固定」。\n'
+    + '  **从三台之外搬理由来推翻，一律不算数**——那只是加入争论，没有取消争论。\n'
+    + '  三台都写"暂无"或都撑得住，如实写"未找到"，不要编。\n\n'
+    + '【三 · 翻转的现场】若上一步找到了材料，请把那一次翻转写清楚：\n'
+    + '  **在什么条件下，原来的被驱动项变成了驱动项？** 翻转前后各一句，中间写出那个触发点。\n\n'
+    + '输出严格分三段【一】【二】【三】。\n' + DYN_DISCIPLINE;
+}
+
+// ── 第三步 · 三条动力两两相撞 ──
+function dynCollidePrompt(q, A, B, C, premise){
+  return '议题「' + q + '」上的三条动力主张（全文见上一步材料），以及已挖出的共有前提：\n\n'
+    + premise + '\n\n'
+    + '现在做三对两两相撞。**每一对都是两条动力在争同一件事：这一轮到底是谁先动。**\n'
+    + '  【A×B】A 说土壤与路径的矛盾逼出了新样子；B 说样子与土壤的矛盾逼得路径改道。\n'
+    + '        —— 二者对**路径**的地位判然相反（A 把它当驱动的一半，B 把它当被驱动的结果）。焦点在哪？\n'
+    + '  【A×C】A 把**土壤**当驱动的一半，C 把土壤当被驱动的结果。焦点在哪？\n'
+    + '  【B×C】B 把**显露**当驱动的一半，C 也把显露当驱动的一半，但二者逼动的东西不同。焦点在哪？\n\n'
+    + '每一对做四步：\n'
+    + '1. **撞击焦点**：这两条动力在本议题的哪一个具体环节上不能同时为真？一句话。是「打架」不是「互补」。\n'
+    + '   若确实无焦点，标注「无焦点」并作废这一对——**不许用"也""同时"强行拉扯**。\n'
+    + '2. **展开**：两条动力同时看这个环节，暴露了什么单看任一条都看不到的东西？\n'
+    + '3. **时序裁决**：这一对争的是「谁先动」。**在本议题上，实际先动的是哪一样？有什么可查的痕迹支持？**\n'
+    + '   两条都拿不出痕迹，就写"无法裁决"——**无法裁决本身是有信息的，它说明这个环节没人观测过**。\n'
+    + '4. **命名**：给这一对暴露出来的结构起个名，≤20 字，结构性命名，不许是三条动力的换皮。\n\n'
+    + '最后收口一段：**三对合起来，是不是同一条轮转？** 若是，把这条轮转写成一个循环（先动的顺序 + 每一步的触发条件）；\n'
+    + '若三对各不相干，如实写"否"——**硬凑出来的轮转是伪涌现，比诚实的否糟糕得多**。\n\n'
+    + '输出：三对各一节（焦点／展开／时序裁决／命名），再加收口一节。\n' + DYN_DISCIPLINE;
+}
+
+// ── 第四步 · 证伪产出（这台机器的终点）──
+function dynFalsifyPrompt(q, claim, premise, collide){
+  return '议题「' + q + '」。已有材料：\n\n'
+    + '【议题预设的动力主张】\n' + claim + '\n\n'
+    + '【共有前提与推翻它的材料】\n' + premise + '\n\n'
+    + '【三对相撞与轮转】\n' + collide + '\n\n'
+    + '现在写这台机器的**唯一产物**：一份**动力证伪报告**。\n'
+    + '它不是答案，不是综述，也不是一个漂亮的新名字。看完它的人应该知道：**明天该去看什么，看到什么就说明原来那个说法错了。**\n\n'
+    + '严格按下面六节写，每节都要具体到能拿去查，约 3000-4500 字：\n\n'
+    + '**一 · 原来那条动力主张，精确复述一遍**（用第〇步挖出的那一条，一句话），并指出它把哪一样当成了不必问的。\n\n'
+    + '**二 · 它成立的条件**：这条主张不是永远错，它在某些条件下是对的。把那些条件写清楚——\n'
+    + '  **一条永远对的主张和一条永远错的主张一样没用。**\n\n'
+    + '**三 · 会让它翻车的观测（本报告的正body，至少四条）**。每一条严格写成：\n'
+    + '  · 去看什么：具体到可以被谁、在哪里、用什么记录看到（不是"进一步研究表明"）。\n'
+    + '  · 看到什么算翻车：写成一个能分真假的读数，不许用「应当」「有意义」「实质性」这类词。\n'
+    + '  · **为什么原主张预测不出它**：说清原主张会预测什么、本报告预测什么，两者不同在哪。\n'
+    + '  · 这条观测今天做得到吗？做不到的话，卡在哪（没有数据？没有人记录？还是原理上测不了）。\n'
+    + '  **至少有一条必须是"今天就能查、数据多半已经躺在那里"的。**\n\n'
+    + '**四 · 顺序预测（本报告最硬的一条）**：动力是有先后的，所以预测要写成顺序而不是相关——\n'
+    + '  「**A 的变化应当早于 B 的变化出现**」。顺序比相关难被巧合满足得多。至少给两条顺序预测，\n'
+    + '  并说明：若顺序倒过来，说明驱动方向是反的。\n\n'
+    + '**五 · 翻转条件**：在什么条件下，驱动方向会翻？把触发点写实。\n'
+    + '  并回答一句：**这次翻转有没有被任何人记录下来过？** 没有的话，那正是这个议题上最该补的观测。\n\n'
+    + '**六 · 本报告自己会怎么错**：\n'
+    + '  · 交出一到两个本报告解释不了的洞（不许写"还需进一步研究"这种空话）。\n'
+    + '  · 写出一条**反噬**：若按本报告去干预，最省事的做法会不会恰好毁掉它想保住的东西？\n'
+    + '  · 若上面第三节四条观测**全部**做不到，如实写明——**那说明这个议题目前还不能被证伪，只能被议论。**\n\n'
+    + DYN_DISCIPLINE;
+}
+
+// ============ 运行器 ============
+const $ = id => document.getElementById(id);
+let RUNNING = false, STOPPED = false, RUN = null;
+// streamChat 用它登记在飞的请求；点停止时逐个 abort（与中华智问同一机制）
+const RUN_ABORTS = new Set();
+
+function escT(s){ return String(s==null?'':s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function showErr(m){ const e=$('errBox'); if(e){ e.textContent=m; e.style.display='block'; } }
+function hideErr(){ const e=$('errBox'); if(e) e.style.display='none'; }
+
+// 轻排版：段落 + **粗** + 【标题】高亮，正文一律走 escT 不拼原始 HTML
+function render(text){
+  const lines = String(text||'').split('\n'); let html='';
+  for(let raw of lines){
+    const t = raw.trim();
+    if(!t){ html += '<div style="height:7px"></div>'; continue; }
+    let s = escT(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+    if(/^【.+】/.test(t) || /^\*\*[一二三四五六]/.test(t) || /^[一二三四五六] · /.test(t)){
+      html += '<div class="hd">'+s+'</div>';
+    } else if(/^[·•\-\d]/.test(t)){
+      html += '<div class="li">'+s+'</div>';
+    } else {
+      html += '<div class="pg">'+s+'</div>';
+    }
+  }
+  return html;
+}
+
+function mkStep(title){
+  const wrap = $('steps');
+  const el = document.createElement('div'); el.className='step';
+  el.innerHTML = '<div class="sh"><span class="st-t"></span><span class="st-s"></span></div><div class="sb"><span class="ph">排队中…</span></div>';
+  el.querySelector('.st-t').textContent = title;
+  wrap.appendChild(el);
+  return { el, body: el.querySelector('.sb'), st: el.querySelector('.st-s'), meta: { textContent:'' } };
+}
+
+async function callStep(sys, usr, blk, tokens){
+  if(STOPPED) throw new Error('已手动停止');
+  blk.st.innerHTML = '<span class="spin"></span> 生成中…';
+  const r = await streamChat(RUN.key, RUN.sel, sys, usr, blk.body, blk.st, blk.meta, blk.el, tokens||14000);
+  const t = (r && r.text || '').trim();
+  if(t) blk.body.innerHTML = render(t);
+  blk.st.textContent = t ? '✓ 完成' : '⚠ 返回为空';
+  return t;
+}
+
+async function run(){
+  hideErr();
+  if(RUNNING) return;
+  const q = ($('question').value||'').trim();
+  if(!q){ showErr('请先填写要分析的议题。'); return; }
+  const sel = $('modelSel').value;
+  const key = ($('apiKey').value||'').trim();
+  if(!key){ showErr('请填写 '+vendorName(sel)+' 的 API Key。'); return; }
+
+  RUNNING = true; STOPPED = false;
+  $('goBtn').disabled = true; $('stopBtn').style.display='inline-block';
+  $('steps').innerHTML=''; $('runArea').style.display='block';
+  RUN = { q, sel, key, t0: Date.now(), out:{} };
+
+  try{
+    // 内功（本台与全站共用同一份底盘先验）
+    $('hint').textContent = '正在加载底盘先验…';
+    if(!window.__NEIGONG){
+      try{ const r = await fetch('/taste/assets/sde-neigong.txt?v=3.8', {cache:'force-cache'});
+           if(r.ok) window.__NEIGONG = await r.text(); }catch(e){}
+    }
+    const BASE = (window.__NEIGONG && window.__NEIGONG.length>5000) ? (window.__NEIGONG + '\n\n' + DYN_PRIOR) : DYN_PRIOR;
+    if(!window.__NEIGONG) $('hint').textContent = '（底盘先验未取到，本次只用本机心法继续）';
+
+    // 第〇步 · 挖出议题预设的动力主张
+    $('hint').textContent = '第〇步 · 正在从议题里挖出它预设的那条动力…';
+    const b0 = mkStep('第〇步 · 议题预设了哪一条动力');
+    const claim = await callStep(BASE, dynClaimPrompt(q), b0, 8000);
+    RUN.out.claim = claim;
+
+    // 第一步 · 三条动力泳道并行
+    $('hint').textContent = '第一步 · 三条动力各自主张自己是决定性的（并行）…';
+    const keys = ['P1','P2','P3'];
+    const blks = {}; keys.forEach(k=>{ blks[k] = mkStep(DYN_CFG[k].name); });
+    const lane = await Promise.allSettled(keys.map(k =>
+      callStep(dynLaneSys(k, ''), dynLaneUser(q, claim), blks[k], 16000)));
+    const L = {};
+    keys.forEach((k,i)=>{ L[k] = (lane[i].status==='fulfilled') ? lane[i].value : ''; });
+    RUN.out.lanes = L;
+    const okN = keys.filter(k=>L[k] && L[k].length>400).length;
+    if(okN < 2) throw new Error('三条动力里只成功了 '+okN+' 条，不足以相撞。请检查 Key/额度后重试。');
+    if(okN < 3) $('hint').textContent = '⚠ 有一条动力未产出，后面按两条撞（结论会弱一档）';
+
+    // 第二步 · 共有前提与推翻它的材料
+    $('hint').textContent = '第二步 · 三台共同假定了什么，以及谁自己交出了推翻它的材料…';
+    const b2 = mkStep('第二步 · 共有前提：驱动的方向是固定的吗');
+    const premise = await callStep(BASE, dynPremisePrompt(q, L.P1||'（本台未产出）', L.P2||'（本台未产出）', L.P3||'（本台未产出）'), b2, 10000);
+    RUN.out.premise = premise;
+
+    // 第三步 · 三对相撞
+    $('hint').textContent = '第三步 · 三条动力两两相撞，裁决谁先动…';
+    const b3 = mkStep('第三步 · 三对相撞 · 时序裁决 · 轮转');
+    const collide = await callStep(BASE, dynCollidePrompt(q, L.P1, L.P2, L.P3, premise), b3, 12000);
+    RUN.out.collide = collide;
+
+    // 第四步 · 动力证伪报告
+    $('hint').textContent = '第四步 · 写动力证伪报告（本台的唯一产物）…';
+    const b4 = mkStep('第四步 · 动力证伪报告');
+    b4.el.classList.add('final');
+    const report = await callStep(BASE, dynFalsifyPrompt(q, claim, premise, collide), b4, 20000);
+    RUN.out.report = report;
+
+    $('dlRow').style.display='block';
+    $('hint').textContent = '✓ 全部完成 · 用时 ' + Math.round((Date.now()-RUN.t0)/60000) + ' 分钟';
+  }catch(e){
+    if(STOPPED) $('hint').textContent = '已停止。已完成的部分保留在页面上。';
+    else { showErr('运行中断：' + String(e && e.message || e)); $('hint').textContent = '已中断。已完成的部分保留在页面上。'; }
+    if(RUN.out.report || RUN.out.collide) $('dlRow').style.display='block';
+  }finally{
+    RUNNING=false; $('goBtn').disabled=false; $('stopBtn').style.display='none';
+  }
+}
+
+function reportMd(){
+  const o = RUN && RUN.out || {};
+  let s = '# 动力证伪报告\n\n**议题**：' + (RUN&&RUN.q||'') + '\n\n';
+  s += '> 本报告由 SDE 动力智能体生成。它不是对议题的回答，是一组会让议题所预设的那条动力主张翻车的观测。\n';
+  s += '> 所有结论均未经实证，读者应把它当作待检验的假设，不是结论。\n\n---\n\n';
+  if(o.claim)   s += '## 第〇步 · 议题预设了哪一条动力\n\n' + o.claim + '\n\n---\n\n';
+  if(o.lanes){
+    ['P1','P2','P3'].forEach(k=>{ if(o.lanes[k]) s += '## ' + DYN_CFG[k].name + '\n\n' + o.lanes[k] + '\n\n---\n\n'; });
+  }
+  if(o.premise) s += '## 第二步 · 共有前提与推翻它的材料\n\n' + o.premise + '\n\n---\n\n';
+  if(o.collide) s += '## 第三步 · 三对相撞与轮转\n\n' + o.collide + '\n\n---\n\n';
+  if(o.report)  s += '## 第四步 · 动力证伪报告\n\n' + o.report + '\n';
+  return s;
+}
+
+function saveMd(){
+  const blob = new Blob([reportMd()], {type:'text/markdown;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '动力证伪报告_' + (RUN&&RUN.q||'').slice(0,18).replace(/[\/\\:*?"<>|\s]/g,'_') + '.md';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function copyReport(){
+  const t = (RUN && RUN.out && RUN.out.report) || '';
+  if(!t){ return; }
+  navigator.clipboard.writeText(t).then(()=>{ const b=$('copyBtn'); const o=b.textContent; b.textContent='✓ 已复制'; setTimeout(()=>b.textContent=o,1600); }).catch(()=>{});
+}
+
+$('goBtn').addEventListener('click', ()=>{ run(); });
+$('stopBtn').addEventListener('click', ()=>{
+  STOPPED = true;
+  RUN_ABORTS.forEach(a=>{ try{ a.abort(); }catch(e){} });
+  RUN_ABORTS.clear();
+  $('hint').textContent='正在停止…（在飞的请求已中止，已完成的部分保留）';
+});
+$('dlBtn').addEventListener('click', saveMd);
+$('copyBtn').addEventListener('click', copyReport);
+$('modelSel').addEventListener('change', ()=>{ try{ const n=keyStoreName(); const v=localStorage.getItem(n); if(v) $('apiKey').value=v; }catch(e){} });
+$('apiKey').addEventListener('input', ()=>{ try{ localStorage.setItem(keyStoreName(), $('apiKey').value.trim()); }catch(e){} });
+try{ const v=localStorage.getItem(keyStoreName()); if(v) $('apiKey').value=v; }catch(e){}
+$('question').addEventListener('keydown', e=>{ if(e.key==='Enter' && (e.metaKey||e.ctrlKey)) run(); });
+document.querySelectorAll('.eg').forEach(b=>b.addEventListener('click', ()=>{ $('question').value = b.textContent.trim(); $('question').focus(); }));
+window.__dynRun = run; window.__dynState = ()=>RUN; window.__dynReportMd = reportMd;   // 供模拟验证
+
+</script>
+<script>
+/* Key 有效性检测：按钮由 SDEKeyProbe 注入。探测与真跑共用同一套 chatHeaders / apiUrl / buildPayload。 */
+(function(){
+  function go(){
+    if(!window.SDEKeyProbe) return;
+    try{
+      SDEKeyProbe.attach([{ key:'apiKey', sel:'modelSel' }], {
+        buildPayload: buildPayload, chatHeaders: chatHeaders, apiUrl: apiUrl,
+        isOverseas: (typeof isOverseas === 'function') ? isOverseas : function(){ return false; },
+        proxyUrl: (typeof PROXY_URL !== 'undefined') ? PROXY_URL : '/api/llm-proxy'
+      });
+    }catch(e){ /* 检测是附加件，装不上也绝不能影响正常跑 */ }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+</script>
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/taste/assets/sde-handoff.js?v=20260817c"></script>
+<script>
+/* 接住从 SDE 对话交过来的那一问：只填框、不开跑（纪律见 sde-handoff.js）。 */
+window.addEventListener("load", function () {
+  try { if (window.SDEHandoff) SDEHandoff.receive("dynamics"); } catch (e) {}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>论文讨论区 · 每篇论文的讨论与总广场 | SDE Universes</title>
+<meta name="description" content="SDE Universes 论文讨论区：每一篇长文、学术创造、学员论文的文末讨论在此汇聚，一处进入正在被讨论的论文；另设总讨论区，跨篇追问与对 SDE 的整体讨论都在这里。Google 账号登录即可发言。">
+<style>
+:root{
+  --bg:#F7F3E9;--surface:#F1EBDC;--card:#FBF8F0;--card2:#F4EEDF;
+  --border:#D8CBAA;--border2:#E4DAC2;
+  --text:#2A2318;--text2:#6B6050;--muted:#9A8F7A;
+  --gold:#8A6817;--gold2:#A8842B;
+  --disc:#3B4E9C;--disc2:#5162B4;--disc-soft:rgba(59,78,156,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Serif SC',Georgia,'Songti SC',serif;background:var(--bg);color:var(--text);line-height:1.9}
+a{color:var(--disc)}
+nav{position:sticky;top:0;z-index:50;background:rgba(247,243,233,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border2);padding:0.8rem 2rem;display:flex;justify-content:space-between;align-items:center}
+.nav-logo{font-weight:800;letter-spacing:0.05em;color:var(--gold);text-decoration:none;font-size:1.05rem}
+nav .back{font-size:0.85rem;color:var(--text2);text-decoration:none}
+nav .back:hover{color:var(--disc)}
+header{max-width:960px;margin:0 auto;padding:4.5rem 24px 2.2rem;text-align:center}
+.eyebrow{font-size:0.72rem;letter-spacing:0.32em;color:var(--disc);text-transform:uppercase;font-weight:700;margin-bottom:1.1rem}
+h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.2;margin-bottom:0.9rem}
+h1 span{color:var(--disc)}
+.sub{font-size:1.05rem;color:var(--text2);max-width:660px;margin:0 auto}
+.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:1.6rem}
+.chips span{font-size:12.5px;letter-spacing:0.12em;padding:5px 15px;border-radius:20px;border:1px solid var(--disc);color:var(--disc);background:var(--disc-soft)}
+main{max-width:960px;margin:0 auto;padding:0 24px 4rem}
+section.blk{margin:2.8rem 0}
+.blk-label{font-size:0.7rem;letter-spacing:0.28em;color:var(--disc);text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:1rem;margin-bottom:0.6rem}
+.blk-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.blk h2{font-size:1.55rem;font-weight:800;margin-bottom:0.5rem}
+.blk .lead{color:var(--text2);font-size:0.95rem;margin-bottom:1.4rem;max-width:720px}
+.agg-stat{font-size:0.85rem;color:var(--muted);margin-bottom:1.1rem}
+.agg-list{display:grid;gap:0.7rem}
+.agg-card{display:flex;justify-content:space-between;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--disc);border-radius:9px;padding:0.95rem 1.2rem;text-decoration:none;color:inherit;transition:background 0.15s,transform 0.15s}
+.agg-card:hover{background:var(--card2);transform:translateX(2px)}
+.agg-main{min-width:0}
+.agg-title{font-size:1.02rem;font-weight:700;color:var(--text);line-height:1.5;display:block;word-break:break-word}
+.agg-meta{font-size:0.76rem;color:var(--muted);margin-top:3px}
+.agg-sec{display:inline-block;font-size:0.7rem;color:var(--disc);background:var(--disc-soft);border:1px solid var(--disc);border-radius:20px;padding:1px 9px;margin-right:8px;letter-spacing:0.04em}
+.agg-count{flex:none;text-align:right;color:var(--disc);font-weight:800}
+.agg-count b{font-size:1.3rem}
+.agg-count span{display:block;font-size:0.68rem;color:var(--muted);font-weight:400;letter-spacing:0.08em}
+.agg-empty{background:var(--card2);border:1px dashed var(--border);border-radius:10px;padding:2rem 1.5rem;text-align:center;color:var(--text2);font-size:0.95rem}
+.agg-empty a{font-weight:700}
+.agg-loading{color:var(--muted);font-size:0.9rem;padding:1rem 0}
+.agg-more{text-align:center;margin-top:1rem}
+.agg-more button{font:inherit;font-size:0.85rem;letter-spacing:0.1em;color:var(--disc);background:transparent;border:1px solid var(--disc);border-radius:6px;padding:0.55rem 1.6rem;cursor:pointer}
+.agg-more button:hover{background:var(--disc-soft)}
+.notes{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:1.2rem 1.5rem;font-size:0.86rem;color:var(--text2)}
+.notes b{color:var(--text)}
+footer{border-top:1px solid var(--border2);padding:2rem 24px;text-align:center;font-size:0.75rem;color:var(--muted)}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.agg-card{padding:0.8rem 1rem}.agg-count b{font-size:1.1rem}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <a class="back" href="/browse/">← 返回首页</a>
+</nav>
+
+<header>
+  <div class="eyebrow">SDE Discussions</div>
+  <h1>论文<span>讨论区</span></h1>
+  <p class="sub">站内每一篇长文、学术创造与学员论文的文末讨论，在这里汇聚为一处。从这里进入正在被讨论的论文；跨篇的追问与对 SDE 的整体讨论，则发在下方总讨论区。</p>
+  <div class="chips">
+    <span>💬 每篇论文一个讨论区</span><span>🌐 总讨论区广场</span><span>Google 登录即可发言</span>
+  </div>
+  <div style="margin-top:1.6rem">
+    <a href="/sde-wechat/" style="display:inline-block;font-size:0.92rem;font-weight:700;text-decoration:none;color:#F5F2E8;background:var(--disc);border:1px solid var(--disc);border-radius:24px;padding:0.6rem 1.7rem">💬 SDE 社区 · 群聊与私聊</a>
+    <div style="font-size:0.78rem;color:var(--muted);margin-top:0.6rem">建群 · 通讯录 · @提及 · 引用回复 · 未读提醒 —— 纯文字，群与私聊只有成员看得见</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ① 正在被讨论的论文（聚合目录） -->
+<section class="blk" id="discussed">
+  <div class="blk-label">入口 · Papers Under Discussion</div>
+  <h2>正在被讨论的论文</h2>
+  <p class="lead">下面是站内已经有读者发言的论文，按讨论热度排序。点任意一篇，直接跳到那篇论文的文末讨论区。</p>
+  <div class="agg-stat" id="agg-stat"></div>
+  <div class="agg-list" id="agg-list"><div class="agg-loading">正在加载讨论…</div></div>
+  <div class="agg-more" id="agg-more" style="display:none"><button id="agg-more-btn">展开全部</button></div>
+</section>
+
+<!-- ② 总讨论区 · 实时群聊 -->
+<section class="blk" id="plaza-anchor">
+  <div class="blk-label">广场 · Live Group Chat</div>
+  <h2>总讨论区（实时群聊）</h2>
+  <p class="lead">像微信群一样即时——消息实时刷出，不用刷新。不针对某一篇的想法、跨篇的追问、对 SDE 的整体讨论，都在这里聊。围观无需登录；发言用 Google 账号登录即可，发言人就是你的账号名字。</p>
+</section>
+
+<section id="sde-chat">
+<style id="sde-chat-css">
+#sde-chat{max-width:760px;margin:0 auto 8px}
+#sde-chat .ch-box{border:1px solid var(--border2);border-radius:12px;background:var(--card);overflow:hidden;display:flex;flex-direction:column;height:min(64vh,560px)}
+#sde-chat .ch-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0.7rem 1rem;border-bottom:1px solid var(--border2);background:var(--card2);font-size:0.85rem;flex-wrap:wrap}
+#sde-chat .ch-bar .ttl{font-weight:800;color:var(--text)}
+#sde-chat .ch-status{display:flex;align-items:center;gap:6px;color:var(--text2);font-size:0.78rem}
+#sde-chat .dot{width:8px;height:8px;border-radius:50%;background:#B9AE93;flex:none}
+#sde-chat .dot.on{background:#2FA36B}
+#sde-chat .dot.off{background:#C0603F}
+#sde-chat .ch-mid{flex:1;position:relative;display:flex;min-height:0}
+#sde-chat .ch-scroll{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.6rem;background:var(--bg)}
+#sde-chat .ch-empty{margin:auto;color:var(--muted);font-size:0.9rem;text-align:center;padding:0 1rem}
+#sde-chat .msg{display:flex;flex-direction:column;max-width:80%;align-self:flex-start}
+#sde-chat .msg.mine{align-self:flex-end;align-items:flex-end}
+#sde-chat .msg .who{font-size:0.72rem;color:var(--muted);margin:0 5px 3px}
+#sde-chat .msg .bub{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:0.5rem 0.8rem;font-size:0.95rem;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:var(--text)}
+#sde-chat .msg.mine .bub{background:var(--disc);border-color:var(--disc);color:#F5F2E8}
+#sde-chat .msg .tm{font-size:0.66rem;color:var(--muted);margin:2px 6px 0}
+#sde-chat .ch-newpill{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;background:var(--disc);color:#F5F2E8;font-size:0.76rem;padding:5px 15px;border-radius:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:none;z-index:2}
+#sde-chat .ch-foot{border-top:1px solid var(--border2);padding:0.7rem 1rem;background:var(--card2)}
+#sde-chat .ch-login{font-size:0.85rem;color:var(--text2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#sde-chat .ch-input{display:none;gap:8px;align-items:flex-end}
+#sde-chat .ch-input textarea{flex:1;font:inherit;font-size:0.95rem;color:var(--text);background:#fff;border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.8rem;resize:none;height:42px;max-height:120px;line-height:1.5;outline:none}
+#sde-chat .ch-input textarea:focus{border-color:var(--disc)}
+#sde-chat .ch-input button{font:inherit;font-size:0.9rem;font-weight:700;letter-spacing:0.06em;padding:0 1.4rem;height:42px;border-radius:8px;border:1px solid var(--disc);background:var(--disc);color:#F5F2E8;cursor:pointer;white-space:nowrap}
+#sde-chat .ch-input button:disabled{opacity:0.5;cursor:default}
+#sde-chat .ch-emoji-btn{font-size:1.15rem;background:transparent;border:1px solid var(--border);border-radius:8px;height:42px;width:44px;cursor:pointer;flex:none;padding:0;line-height:1}
+#sde-chat .ch-emoji-btn:hover{background:var(--card2)}
+#sde-chat .ch-emoji-panel{display:none;flex-wrap:wrap;gap:2px;max-height:132px;overflow-y:auto;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:6px;margin-bottom:8px}
+#sde-chat .ch-emoji-panel.on{display:flex}
+#sde-chat .ch-emoji-panel span{font-size:1.25rem;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
+#sde-chat .ch-emoji-panel span:hover{background:var(--card2)}
+#sde-chat .ch-img-btn{font-size:1.05rem;background:transparent;border:1px solid var(--border);border-radius:8px;height:42px;width:44px;cursor:pointer;flex:none;padding:0;line-height:1}
+#sde-chat .ch-img-btn:hover{background:var(--card2)}
+#sde-chat .ch-img-btn:disabled{opacity:0.5;cursor:default}
+#sde-chat .bub.bub-img{padding:4px;max-width:100%;overflow:hidden}
+#sde-chat .ch-img{max-width:min(240px,60vw);max-height:280px;border-radius:8px;display:block;cursor:pointer;object-fit:cover}
+#sde-chat .ch-cap{font-size:0.9rem;line-height:1.5;padding:5px 6px 2px;color:var(--text);white-space:pre-wrap;word-break:break-word}
+#sde-chat .msg.mine .bub.bub-img{background:var(--disc)}
+#sde-chat .msg.mine .ch-cap{color:#F5F2E8}
+#sde-chat .ch-wds-btn{font-size:1.05rem;background:#FBF6E9;border:1px solid var(--gold);border-radius:8px;height:42px;width:44px;cursor:pointer;flex:none;padding:0;line-height:1}
+#sde-chat .ch-wds-btn:hover{background:#F5EDD8}
+#sde-chat .msg.bot{align-self:flex-start;align-items:flex-start;max-width:90%}
+#sde-chat .msg.bot .who{color:var(--gold2);font-weight:700}
+#sde-chat .msg.bot .bub{background:#FBF6E9;border-color:var(--gold);color:var(--text)}
+#sde-chat .ch-typing{align-self:flex-start;font-size:0.82rem;color:var(--muted);padding:3px 8px;font-style:italic}
+#sde-chat .ch-wds-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0.5rem 1rem;background:#FBF6E9;border-bottom:1px solid var(--gold);font-size:0.8rem;color:var(--text2);flex-wrap:wrap}
+#sde-chat .ch-wds-bar b{color:var(--gold2)}
+#sde-chat .ch-wds-ask{font:inherit;font-size:0.78rem;font-weight:700;color:#F5F2E8;background:var(--gold);border:1px solid var(--gold);border-radius:16px;padding:4px 15px;cursor:pointer;flex:none;white-space:nowrap}
+#sde-chat .ch-wds-ask:hover{background:var(--gold2)}
+#sde-chat .msg .tm .ch-recall{color:inherit;opacity:0.7;text-decoration:underline;cursor:pointer}
+#sde-chat .msg .tm .ch-recall:hover{opacity:1}
+#sde-chat .bub.recalled{background:transparent;border:1px dashed var(--border);color:var(--muted);font-style:italic}
+#sde-chat .msg.mine .bub.recalled{background:transparent;border:1px dashed var(--border);color:var(--muted)}
+#sde-chat .ch-signed{font-size:0.8rem;color:var(--text2);margin-bottom:7px}
+#sde-chat .ch-signed b{color:var(--text)}
+#sde-chat .ch-signed a{margin-left:8px;font-size:0.75rem;opacity:0.6;text-decoration:underline;cursor:pointer}
+#sde-chat .ch-msg{font-size:0.76rem;color:var(--muted);margin-top:6px;min-height:1em}
+</style>
+<div class="ch-box">
+  <div class="ch-bar">
+    <span class="ttl">SDE 广场 · 实时群聊</span>
+    <span class="ch-status"><span class="dot" id="ch-dot"></span><span id="ch-stat">连接中…</span><span id="ch-online"></span></span>
+  </div>
+  <div class="ch-wds-bar">
+    <span>🤖 <b>WDS智能体</b>（王德生 AI 分身）在群里——输入 <b>@WDS</b> 提问，或点右边</span>
+    <button class="ch-wds-ask" id="ch-wds-ask" type="button">问它</button>
+  </div>
+  <div class="ch-mid">
+    <div class="ch-scroll" id="ch-scroll"><div class="ch-empty" id="ch-empty">还没有人说话——登录后开口，或向 🤖 WDS智能体 提问。</div></div>
+    <div class="ch-newpill" id="ch-newpill" onclick="sdeChatToBottom()">有新消息 ↓</div>
+  </div>
+  <div class="ch-foot">
+    <div class="ch-signed" id="ch-signed" style="display:none">以 <b id="ch-name"></b> 的身份发言 <a id="ch-out">退出</a></div>
+    <div class="ch-login" id="ch-login"><span>登录后即可发言、向 🤖 WDS智能体 提问：</span><span id="ch-gsi"></span></div>
+    <div class="ch-emoji-panel" id="ch-emoji-panel"></div>
+    <div class="ch-input" id="ch-input">
+      <button class="ch-emoji-btn" id="ch-emoji-btn" type="button" title="表情">😊</button>
+      <button class="ch-img-btn" id="ch-img-btn" type="button" title="发图片">🖼️</button>
+      <input type="file" id="ch-file" accept="image/*" style="display:none">
+      <button class="ch-wds-btn" id="ch-wds-btn" type="button" title="问 WDS智能体">🤖</button>
+      <textarea id="ch-text" maxlength="500" placeholder="说点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
+      <button id="ch-send">发送</button>
+    </div>
+    <div class="ch-msg" id="ch-msg"></div>
+  </div>
+</div>
+</section>
+<script id="sde-chat-js">
+(function(){
+var ROOM="discussions/hall";
+var WSURL=(location.protocol==="https:"?"wss://":"ws://")+location.host+"/api/chat?room="+encodeURIComponent(ROOM);
+function el(id){return document.getElementById(id)}
+var gcred="",myName="",ws=null,lastId=0,seen={},connected=false,tries=0,usePoll=false,pollT=null,pendingNew=0,everMsg=false,nodes={};
+function note(s){el("ch-msg").textContent=s||"";}
+function fmtT(ts){var d=new Date(ts),p=function(x){return(x<10?"0":"")+x},now=new Date();
+  if(d.toDateString()===now.toDateString())return p(d.getHours())+":"+p(d.getMinutes());
+  return (d.getMonth()+1)+"/"+d.getDate()+" "+p(d.getHours())+":"+p(d.getMinutes());}
+function nearBottom(){var s=el("ch-scroll");return s.scrollHeight-s.scrollTop-s.clientHeight<60;}
+function toBottom(){var s=el("ch-scroll");s.scrollTop=s.scrollHeight;pendingNew=0;el("ch-newpill").style.display="none";}
+window.sdeChatToBottom=toBottom;
+function renderRecalled(bub){bub.textContent="[消息已撤回]";bub.className="bub recalled";}
+function addMsg(m){
+  if(m.id&&seen[m.id])return; if(m.id){seen[m.id]=1; if(m.id>lastId)lastId=m.id;}
+  if(!everMsg){everMsg=true;var e=el("ch-empty");if(e)e.parentNode.removeChild(e);}
+  var wasNear=nearBottom(),mine=(m.name===myName&&myName),bot=(m.bot||m.name==="WDS智能体");
+  if(bot)hideTyping();
+  var wrap=document.createElement("div");wrap.className="msg"+(bot?" bot":(mine?" mine":""));
+  var who=document.createElement("div");who.className="who";who.textContent=(bot?"🤖 ":"")+m.name;
+  var bub=document.createElement("div");bub.className="bub";
+  var tm=document.createElement("div");tm.className="tm";tm.textContent=fmtT(m.ts);
+  wrap.appendChild(who);wrap.appendChild(bub);wrap.appendChild(tm);
+  if(m.recalled){renderRecalled(bub);}
+  else{
+    if(m.img){
+      bub.className="bub bub-img";
+      var im=document.createElement("img");im.className="ch-img";im.loading="lazy";
+      im.src="/api/chat/img?room="+encodeURIComponent(ROOM)+"&id="+m.id;
+      im.onclick=function(){window.open(im.src,"_blank","noopener");};
+      im.onerror=function(){bub.className="bub";bub.textContent="[图片已过期]";};
+      bub.appendChild(im);
+      if(m.text){var cap=document.createElement("div");cap.className="ch-cap";cap.textContent=m.text;bub.appendChild(cap);}
+    }else{bub.textContent=m.text;}
+    if(mine&&!bot){var age=Date.now()-m.ts;
+      if(age<120000){var rc=document.createElement("a");rc.className="ch-recall";rc.textContent="撤回";
+        rc.onclick=function(){doRecall(m.id);};
+        tm.appendChild(document.createTextNode(" · "));tm.appendChild(rc);
+        setTimeout(function(){if(rc.parentNode)rc.parentNode.removeChild(rc);},120000-age);}
+    }
+  }
+  if(m.id)nodes[m.id]=bub;
+  el("ch-scroll").appendChild(wrap);
+  if(wasNear||mine){toBottom();}else{pendingNew++;var p=el("ch-newpill");p.textContent="有 "+pendingNew+" 条新消息 ↓";p.style.display="block";}
+}
+function onRecall(id){var bub=nodes[id];if(bub&&!/recalled/.test(bub.className))renderRecalled(bub);}
+function doRecall(id){
+  if(usePoll){fetch("/api/chat?room="+encodeURIComponent(ROOM),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,op:"recall",id:id})}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)note((d&&d.msg)||"撤回失败。");}).catch(function(){note("网络异常。");});}
+  else{if(!(ws&&connected)){note("正在重连，请稍候…");return;}wsSend({t:"recall",id:id});}
+}
+function insertEmoji(txt){var t=el("ch-text");var s=t.selectionStart||0,en=t.selectionEnd||0,v=t.value;t.value=v.slice(0,s)+txt+v.slice(en);t.selectionStart=t.selectionEnd=s+txt.length;t.focus();t.style.height="42px";t.style.height=Math.min(t.scrollHeight,120)+"px";}
+function setStatus(state){var dot=el("ch-dot"),st=el("ch-stat");
+  dot.className="dot"+(state==="online"?" on":state==="offline"?" off":"");
+  if(state==="online")st.textContent="实时在线";else if(state==="offline")st.textContent="连接断开，重连中…";else st.textContent="连接中…";}
+function setOnline(n){el("ch-online").textContent=(typeof n==="number"&&n>0)?("· "+n+" 人在线"):"";}
+var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com";
+try{var stg=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");if(stg&&stg.exp>Date.now()){gcred=stg.cred;myName=stg.name;showSigned();}}catch(e){}
+function showSigned(){el("ch-name").textContent=myName;el("ch-signed").style.display="block";el("ch-login").style.display="none";el("ch-input").style.display="flex";if(ws&&connected)wsSend({t:"auth",cred:gcred});}
+function showLogin(){gcred="";myName="";try{sessionStorage.removeItem("sde_gauth");}catch(e){}el("ch-signed").style.display="none";el("ch-login").style.display="flex";el("ch-input").style.display="none";}
+window.__sdeChatCb=function(resp){try{var p=JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));var nm=(p.name||(p.email||"").split("@")[0]||"").slice(0,20);gcred=resp.credential;myName=nm;try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:gcred,name:nm,exp:Date.now()+50*60*1000}));}catch(e){}showSigned();}catch(e){note("登录信息解析失败，请重试。");}};
+function bootGsi(){if(!(window.google&&google.accounts&&google.accounts.id)){el("ch-gsi").textContent="Google 登录组件加载失败，请检查网络后刷新。";return;}
+google.accounts.id.initialize({client_id:GCID,callback:window.__sdeChatCb,auto_select:true});
+google.accounts.id.renderButton(el("ch-gsi"),{theme:"outline",size:"medium",text:"signin_with",shape:"pill"});}
+(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;s.onload=bootGsi;s.onerror=function(){el("ch-gsi").textContent="无法连接 Google 登录服务。";};document.head.appendChild(s);})();
+el("ch-out").onclick=showLogin;
+function wsSend(o){try{ws.send(JSON.stringify(o));}catch(e){}}
+function connect(){
+  if(usePoll)return;setStatus("connecting");
+  try{ws=new WebSocket(WSURL);}catch(e){scheduleReconnect();return;}
+  ws.onopen=function(){connected=true;tries=0;setStatus("online");if(gcred)wsSend({t:"auth",cred:gcred});};
+  ws.onmessage=function(ev){var d;try{d=JSON.parse(ev.data);}catch(e){return;}
+    if(d.t==="history"){(d.items||[]).forEach(addMsg);setOnline(d.online);toBottom();}
+    else if(d.t==="msg"){addMsg(d);}
+    else if(d.t==="presence"){setOnline(d.online);}
+    else if(d.t==="authed"){myName=d.name;note("");}
+    else if(d.t==="recall"){onRecall(d.id);}
+    else if(d.t==="typing"){showTyping();}
+    else if(d.t==="err"){if(d.m==="login")note("请先用 Google 账号登录再发言。");else note(d.m||"发送失败。");}
+  };
+  ws.onclose=function(){connected=false;if(usePoll)return;setStatus("offline");scheduleReconnect();};
+  ws.onerror=function(){try{ws.close();}catch(e){}};
+}
+function scheduleReconnect(){tries++;if(tries>=5){startPoll();return;}setTimeout(connect,Math.min(1000*tries,5000));}
+function startPoll(){
+  if(usePoll)return;usePoll=true;setStatus("online");el("ch-stat").textContent="已连接（兼容模式）";
+  function tick(){fetch("/api/chat?room="+encodeURIComponent(ROOM)+"&since="+lastId).then(function(r){return r.json()}).then(function(d){if(d&&d.items)d.items.forEach(addMsg);if(d&&d.recalls)d.recalls.forEach(onRecall);if(d)setOnline(d.online);}).catch(function(){});}
+  tick();pollT=setInterval(tick,3000);
+}
+function doSend(){
+  var t=el("ch-text").value.trim();if(t.length<1)return;
+  if(!gcred){note("请先用 Google 账号登录再发言。");return;}
+  if(usePoll){
+    el("ch-send").disabled=true;
+    fetch("/api/chat?room="+encodeURIComponent(ROOM),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,text:t})})
+    .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})}).then(function(x){el("ch-send").disabled=false;
+      if(x.d&&x.d.ok){el("ch-text").value="";note("");el("ch-text").style.height="42px";}else if(x.s===401){note("登录已过期，请重新登录。");showLogin();}else{note((x.d&&x.d.msg)||"发送失败。");}}).catch(function(){el("ch-send").disabled=false;note("网络异常。");});
+  }else{
+    if(!(ws&&connected)){note("正在重连，请稍候…");return;}
+    wsSend({t:"msg",text:t});el("ch-text").value="";note("");el("ch-text").style.height="42px";
+  }
+}
+(function(){var EMOJI="😀 😃 😄 😁 😆 😊 🙂 😉 😍 🥰 😘 😜 🤪 🤔 🤨 😐 😴 😷 😎 🥳 🤗 🙄 😮 😲 😳 😭 😢 😱 😡 🥲 👍 👎 👏 🙏 💪 🤝 👌 ✌️ 🙌 🎉 🔥 💯 ❤️ 💔 ⭐ ✅ ❌ 🌹 ☕ 🍵 🎂 👀".split(" ");var panel=el("ch-emoji-panel"),ebtn=el("ch-emoji-btn");
+EMOJI.forEach(function(e){var s=document.createElement("span");s.textContent=e;s.onclick=function(){insertEmoji(e);};panel.appendChild(s);});
+ebtn.onclick=function(ev){ev.stopPropagation();panel.classList.toggle("on");};
+document.addEventListener("click",function(ev){if(panel.classList.contains("on")&&ev.target!==ebtn&&!panel.contains(ev.target))panel.classList.remove("on");});})();
+(function(){
+var fileInput=el("ch-file"),imgBtn=el("ch-img-btn");
+if(imgBtn&&fileInput){
+imgBtn.onclick=function(){if(!gcred){note("请先用 Google 账号登录再发图片。");return;}fileInput.click();};
+fileInput.onchange=function(){var f=fileInput.files&&fileInput.files[0];fileInput.value="";if(!f)return;if(!/^image\//.test(f.type)){note("请选择图片文件。");return;}compressAndSend(f);};
+}
+function compressAndSend(file){
+  note("图片处理中…");
+  var img=new Image(),url=URL.createObjectURL(file);
+  img.onload=function(){URL.revokeObjectURL(url);
+    var mx=1000,w=img.width,hh=img.height;
+    if(w>mx||hh>mx){if(w>=hh){hh=Math.round(hh*mx/w);w=mx;}else{w=Math.round(w*mx/hh);hh=mx;}}
+    function draw(sw,sh){var c=document.createElement("canvas");c.width=sw;c.height=sh;var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,sw,sh);x.drawImage(img,0,0,sw,sh);return c;}
+    var c=draw(w,hh),q=0.6,data=c.toDataURL("image/jpeg",q);
+    while(data.length>165000&&q>0.35){q-=0.1;data=c.toDataURL("image/jpeg",q);}
+    if(data.length>165000){var c2=draw(Math.round(w*0.7),Math.round(hh*0.7));data=c2.toDataURL("image/jpeg",0.5);}
+    if(data.length>172000){note("这张图压缩后还是太大，换一张小点的吧。");return;}
+    uploadImg(data);
+  };
+  img.onerror=function(){URL.revokeObjectURL(url);note("图片读取失败。");};
+  img.src=url;
+}
+function uploadImg(dataURL){
+  note("图片上传中…");if(imgBtn)imgBtn.disabled=true;
+  fetch("/api/chat/img?room="+encodeURIComponent(ROOM),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,data:dataURL,caption:el("ch-text").value.trim()})})
+  .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})}).then(function(x){if(imgBtn)imgBtn.disabled=false;
+    if(x.d&&x.d.ok){el("ch-text").value="";note("");el("ch-text").style.height="42px";}
+    else if(x.s===401){note("登录已过期，请重新登录。");showLogin();}
+    else note((x.d&&x.d.msg)||"图片发送失败。");
+  }).catch(function(){if(imgBtn)imgBtn.disabled=false;note("网络异常，图片没发出去。");});
+}
+})();
+var typingEl=null;
+function showTyping(){if(!typingEl){typingEl=document.createElement("div");typingEl.className="ch-typing";typingEl.textContent="🤖 WDS智能体 正在思考…";}var near=nearBottom();el("ch-scroll").appendChild(typingEl);if(near)toBottom();}
+function hideTyping(){if(typingEl&&typingEl.parentNode)typingEl.parentNode.removeChild(typingEl);}
+(function(){var wdsBtn=el("ch-wds-btn");if(!wdsBtn)return;
+wdsBtn.onclick=function(){
+  if(!gcred){note("请先用 Google 账号登录再向 WDS智能体提问。");return;}
+  var t=el("ch-text"),v=t.value.trim();
+  if(!v){if(!/^@\s*wds/i.test(t.value))t.value="@WDS "+t.value;t.focus();return;}
+  if(!/^@\s*wds/i.test(v))t.value="@WDS "+v;
+  doSend();
+};})();
+(function(){var a=el("ch-wds-ask");if(!a)return;a.onclick=function(){
+  if(!gcred){note("请先用 Google 账号登录（下方），登录后即可向 WDS智能体 提问。");return;}
+  var t=el("ch-text");if(!/^@\s*wds/i.test(t.value))t.value="@WDS "+t.value;t.focus();
+};})();
+el("ch-send").onclick=doSend;
+var ta=el("ch-text");
+ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();doSend();}});
+ta.addEventListener("input",function(){this.style.height="42px";this.style.height=Math.min(this.scrollHeight,120)+"px";});
+el("ch-scroll").addEventListener("scroll",function(){if(nearBottom()){pendingNew=0;el("ch-newpill").style.display="none";}});
+connect();
+})();
+</script>
+<section class="blk">
+  <div class="notes">
+    <b>关于讨论区</b>　每一篇论文的文末都有一个独立讨论区，你也可以直接在读完后就地发言；本页把这些讨论汇聚到一处，方便你看到大家正在谈什么、并一键跳入。发言需先用 Google 账号登录，发言人就是你的 Google 账号名字。请友善交流。
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>论文讨论区 · SDE Universes</p>
+  <p style="margin-top:6px">© 2026 Demai International Pte. Ltd. · <a href="/browse/">sdeuniverses.com</a></p>
+</footer>
+
+<script id="agg-js">
+(function(){
+function el(id){return document.getElementById(id)}
+function norm(p){return String(p||"").toLowerCase().replace(/^\/+|\/+$/g,"")}
+var SEC={column:"长文专栏",students:"学员专栏",creation:"学术创造",books:"专著导读",hotspot:"今日热点",plagiarism:"论文抄袭",_root:"站内"};
+var HIDE={"discussions/hall":1,"meeting/hall":1};
+var TESTPAT=/(^|\/)(zzz[-a-z0-9]*|livetest|test|demo|sandbox)$/i;
+var rows=[],expanded=false,titleMap={};
+function humanize(slug){var parts=slug.split("/");return parts[parts.length-1].replace(/-/g," ")}
+function cleanTitle(t){t=String(t||"");var i=t.indexOf(" | ");if(i>0)t=t.slice(0,i);return t.trim()}
+function card(r){
+  var meta=titleMap[norm(r.slug)];
+  var title=meta?cleanTitle(meta.t):humanize(r.slug);
+  var href="/browse/"+r.slug.replace(/^\/+|\/+$/g,"")+"/#sde-talk";
+  var seg=r.slug.split("/")[0];var secName=SEC[seg]||seg;
+  var a=document.createElement("a");a.className="agg-card";a.href=href;
+  var main=document.createElement("div");main.className="agg-main";
+  var tt=document.createElement("span");tt.className="agg-title";tt.textContent=title;
+  var mt=document.createElement("div");mt.className="agg-meta";
+  var sc=document.createElement("span");sc.className="agg-sec";sc.textContent=secName;
+  mt.appendChild(sc);mt.appendChild(document.createTextNode("点开参与讨论 →"));
+  main.appendChild(tt);main.appendChild(mt);
+  var cnt=document.createElement("div");cnt.className="agg-count";
+  var b=document.createElement("b");b.textContent=r.posts;var sp=document.createElement("span");sp.textContent="发言";
+  cnt.appendChild(b);cnt.appendChild(sp);
+  a.appendChild(main);a.appendChild(cnt);return a;
+}
+function render(){
+  var L=el("agg-list");L.textContent="";
+  if(!rows.length){
+    var e=document.createElement("div");e.className="agg-empty";
+    e.innerHTML='还没有论文被讨论——挑一篇读，在文末写下第一条。<br><a href="/today/">去首页看最新长文</a>';
+    L.appendChild(e);el("agg-stat").textContent="";return;
+  }
+  var total=rows.reduce(function(s,r){return s+r.posts},0);
+  el("agg-stat").textContent=rows.length+" 篇论文正在被讨论 · 共 "+total+" 条发言";
+  var show=expanded?rows:rows.slice(0,20);
+  show.forEach(function(r){L.appendChild(card(r))});
+  var more=el("agg-more");
+  if(rows.length>20&&!expanded){more.style.display="block";}else{more.style.display="none";}
+}
+el("agg-more-btn").onclick=function(){expanded=true;render()};
+function loadBoard(){
+  fetch("/api/board").then(function(r){return r.json()}).then(function(b){
+    var arr=(b&&b.slugs)||[];
+    rows=arr.filter(function(x){return x.slug&&!HIDE[x.slug]&&!TESTPAT.test(x.slug)&&x.posts>0});
+    rows.sort(function(a,b){return b.posts-a.posts});
+    render();
+  }).catch(function(){el("agg-list").innerHTML='<div class="agg-empty">讨论列表暂时加载不出来，请稍后刷新。</div>';el("agg-stat").textContent="";});
+}
+fetch("/search/manifest.json").then(function(r){return r.json()}).then(function(m){
+  (m.docs||[]).forEach(function(d){titleMap[norm(d.u)]={t:d.t,s:d.s}});
+}).catch(function(){}).then(loadBoard);
+})();
+</script>
+
+
+<script>window.WDS_READ={selector:"main"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

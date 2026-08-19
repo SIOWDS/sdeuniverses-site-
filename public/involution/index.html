@@ -1,0 +1,140 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>内卷与出路 · 专栏 | SDE Universes</title>
+<meta name="description" content="内卷与出路专栏：内卷不是竞争太狠，而是 0—1 发生窗口缺席之后，价值递减仍被滞留在原地。每篇先把一个具体场域的内卷写成可被推翻的机制，再给出那个场域里能落地的出路。">
+<link rel="canonical" href="https://sdeuniverses.com/involution/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="内卷与出路 · 专栏 | SDE Universes">
+<meta property="og:description" content="内卷不是竞争太狠，而是 0—1 发生窗口缺席之后，价值递减仍被滞留在原地。出路因此不在更努力，而在把发生窗口重新打开。">
+<meta property="og:url" content="https://sdeuniverses.com/involution/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+:root{--ink:#1B2422;--ink2:#55605D;--paper:#F3F6F4;--card:#FFFEFA;--deep:#0E3A3C;--teal:#1F7A72;--teal2:#2F8C86;--amber:#D8973C;--line:rgba(14,58,60,.16)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Serif SC","Songti SC",serif;line-height:1.9}a{color:inherit}
+nav{position:sticky;top:0;z-index:10;background:rgba(243,246,244,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.navin{max-width:1120px;margin:auto;padding:13px 24px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}.navin a{text-decoration:none;color:var(--teal)}
+.hero{min-height:600px;display:grid;place-items:center;text-align:center;padding:70px 22px;color:#EFF3F1;position:relative;overflow:hidden;
+background:radial-gradient(circle at 50% 30%,rgba(216,151,60,.20),transparent 38%),radial-gradient(ellipse at 50% 100%,rgba(47,140,134,.22),transparent 48%),linear-gradient(150deg,#08282A,#0E3A3C 56%,#123033)}
+.hero:before{content:"";position:absolute;inset:9% 9%;border:1px solid rgba(216,151,60,.22);transform:rotate(-1deg)}
+.heroin{position:relative;z-index:1;max-width:880px}
+.eyebrow{font-size:12px;letter-spacing:.5em;color:var(--amber)}
+.hero h1{font-size:clamp(46px,8vw,86px);margin:22px 0 16px;line-height:1.1;text-shadow:0 7px 34px #061B1C}
+.hero p{font-size:clamp(17px,2.1vw,23px);color:#D8E2DE;line-height:2}
+.hero p b{color:#7FD3C9}
+.stats{display:flex;justify-content:center;gap:45px;margin-top:34px;flex-wrap:wrap}.stat b{display:block;color:var(--amber);font-size:30px}.stat span{font-size:12px;letter-spacing:.16em;color:#B6C4C0}
+.wrap{max-width:1120px;margin:auto;padding:70px 24px}
+.lead{max-width:850px;margin:0 auto 22px;font-size:18px;line-height:2.1;text-align:justify}
+.lead:first-letter{float:left;font-size:54px;line-height:.85;color:var(--teal);padding:10px 10px 0 0}
+.axiom{max-width:850px;margin:0 auto 56px;border-left:3px solid var(--amber);background:rgba(47,140,134,.07);padding:18px 24px;font-size:16.5px;line-height:2}
+.section-title{text-align:center;margin:0 0 34px}.section-title small{color:var(--teal2);letter-spacing:.34em;font-size:12px}.section-title h2{font-size:34px;margin:8px}
+.section-title p{color:var(--ink2);font-size:15px;max-width:720px;margin:6px auto 0}
+.part{margin-bottom:40px}
+.part-h{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:20px}
+.part-h b{font-size:21px;color:var(--deep)}.part-h span{font-size:12.5px;letter-spacing:.2em;color:var(--teal2)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.paper{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--teal);border-radius:8px;padding:24px 26px;transition:.2s}
+.paper:hover{transform:translateY(-4px);box-shadow:0 16px 38px rgba(14,58,60,.14)}
+.paper .num{color:var(--amber);font-size:12px;letter-spacing:.16em}
+.paper h3{font-size:21px;line-height:1.55;color:var(--deep);margin:9px 0}
+.paper p{color:var(--ink2);font-size:14px;margin:0;line-height:1.9}
+.paper .go{display:inline-block;margin-top:14px;color:var(--teal);font-weight:700;font-size:13px}
+.cta{text-align:center;margin:34px 0 0}
+.cta a{display:inline-block;padding:12px 28px;border:1px solid var(--teal);border-radius:28px;color:var(--teal);text-decoration:none;font-weight:700;font-size:14.5px}
+.cta a:hover{background:var(--teal);color:#FFF}
+.near{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.near a{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:6px;padding:20px 22px}
+.near a:hover{box-shadow:0 10px 26px rgba(14,58,60,.12)}
+.near .k{font-size:11.5px;letter-spacing:.2em;color:var(--teal2)}
+.near h4{font-size:17px;margin:8px 0 7px;color:var(--deep);line-height:1.5}
+.near p{font-size:13.5px;color:var(--ink2);margin:0;line-height:1.85}
+.open{max-width:850px;margin:56px auto 0;border:1px solid var(--line);border-radius:10px;background:rgba(47,140,134,.06);padding:26px 28px}
+.open b{color:var(--deep)}
+.open ul{margin:12px 0 0;padding-left:20px;color:var(--ink2);font-size:15px;line-height:2}
+footer{text-align:center;border-top:1px solid var(--line);padding:32px;color:var(--ink2);font-size:12px}
+@media(max-width:720px){.hero{min-height:520px}.grid,.near{grid-template-columns:1fr}.wrap{padding:50px 18px}.lead{font-size:16px}.hero h1{font-size:42px}.stats{gap:22px}}
+</style></head><body>
+<nav><div class="navin"><a href="/browse/">SDE Universes</a><a href="/books/involution/">《内卷与突围》全书 →</a></div></nav>
+<header class="hero"><div class="heroin">
+<div class="eyebrow">INVOLUTION · GENESIS WINDOW · THE WAY OUT</div>
+<h1>内卷与出路</h1>
+<p>内卷不是竞争太狠，<br>而是 <b>0—1 发生窗口</b>缺席之后，价值递减仍被滞留在原地。<br>出路因此不在更努力，而在把发生窗口重新打开。</p>
+<div class="stats"><div class="stat"><b>10</b><span>开栏基座章节</span></div><div class="stat"><b>27万+</b><span>文字</span></div><div class="stat"><b>8</b><span>同题长文</span></div></div>
+</div></header>
+<main class="wrap">
+<p class="lead">加班更久、流程更细、指标更多、竞争更狠——这三十年里几乎所有被称作「解法」的东西，都属于同一个动作：在已经存在的那条曲线上再往前推一格。推得动的时候叫努力，推不动的时候叫内卷。本栏目认为，把内卷写成「人太多、位置太少」是把结果当成了原因：真正决定一件事会不会卷起来的，是那个能生出新东西的 0—1 窗口还开不开着。窗口关上，剩下的全部力气就只能花在 1—N 的分配上，于是每多一分投入，换回的意义就少一分——递减不是欲望疲劳，是意义输入的条件被持续削掉。</p>
+<div class="axiom">本栏每篇只做两件事：<b>其一</b>，把某个具体场域里的内卷写成一条可以被推翻的机制——它靠什么自我繁殖、在哪一步价值开始递减、这段递减最后由谁买单；<b>其二</b>，给出那个场域里真正能落地的出路——不是更快更狠更长，而是把 0—1 的发生窗口重新装回制度、课程与日程里。不收抱怨，也不收口号：每篇都要写清楚，自己在什么条件下算错。</div>
+
+<section>
+<div class="section-title"><small>FOUNDATION · 开栏基座</small><h2>《内卷与突围》十章</h2>
+<p>栏目的地基是这部十章专著：先证原理，再定定义，然后进三个场域，最后处理 AI 这一层。全书网页版可逐章阅读，每章配编者按、摘要、目次与延伸参考文献。</p></div>
+
+<div class="part"><div class="part-h"><b>第一编 · 原理</b><span>WHY IT DECAYS</span></div>
+<div class="grid">
+<a class="paper" href="/books/involution/marginal-utility/"><span class="num">第 1 章</span><h3>边际效用递减原理：SIO 发生学证明</h3><p>效用不是满足度，而是意义体验；递减不是欲望疲劳，而是意义输入的条件被价值持续削减。</p><span class="go">阅读本章 →</span></a>
+<a class="paper" href="/books/involution/expansion-law/"><span class="num">第 2 章</span><h3>SIO 膨胀律与 AI 典范转移：从 AGI 到 AEI</h3><p>系统越强，越造新问题；封闭完备之梦因此永远后撤。出路不是更大的通用智能，而是分布式的「我智能」。</p><span class="go">阅读本章 →</span></a>
+<a class="paper" href="/books/involution/babel-theorem/"><span class="num">第 3 章</span><h3>巴别塔倒塌定理：膨胀律 × 递减原理</h3><p>从哥德尔到 AGI——任何以封闭完备为终点、以发展加码为道路的工程，都会在两条曲线的交叉点上坍塌。</p><span class="go">阅读本章 →</span></a>
+</div></div>
+
+<div class="part"><div class="part-h"><b>第二编 · 定义</b><span>WHAT IT IS</span></div>
+<div class="grid">
+<a class="paper" href="/books/involution/involution-defined/"><span class="num">第 4 章</span><h3>与主流内卷学术谱系的对话：最严密的定义与解释边界</h3><p>把「抱怨词」锻成「结构态」，再与经济学、社会学、组织学、心理学与平台研究逐派对话，并划出自己的解释边界。</p><span class="go">阅读本章 →</span></a>
+</div></div>
+
+<div class="part"><div class="part-h"><b>第三编 · 场景</b><span>WHERE IT BITES</span></div>
+<div class="grid">
+<a class="paper" href="/books/involution/education/"><span class="num">第 5 章</span><h3>教育内卷与出路：递减滞留、发生窗口与再生教育学</h3><p>教育不是内卷最严重的行业，而是内卷的总病灶——因为它决定一个社会如何理解成长、如何分配未来。</p><span class="go">阅读本章 →</span></a>
+<a class="paper" href="/books/involution/workplace/"><span class="num">第 6 章</span><h3>基于 AEI 的职场内卷与出路</h3><p>加班更久、流程更优、竞争更狠——为什么这三种「解法」恰恰是内卷的自我繁殖方式。</p><span class="go">阅读本章 →</span></a>
+<a class="paper" href="/books/involution/research/"><span class="num">第 7 章</span><h3>基于 AEI 的科研内卷与出路</h3><p>论文仍在增长，原创却在稀薄——高产而无生，是科研内卷的准确画像。</p><span class="go">阅读本章 →</span></a>
+</div></div>
+
+<div class="part"><div class="part-h"><b>第四编 · AI</b><span>THE NEW MULTIPLIER</span></div>
+<div class="grid">
+<a class="paper" href="/books/involution/agi-not-concrete/"><span class="num">第 8 章</span><h3>为何 AGI 无法解决具体问题</h3><p>越通用越平均，越平均越模糊——具体不是算出来的，具体是活出来的。</p><span class="go">阅读本章 →</span></a>
+<a class="paper" href="/books/involution/agi-bubble/"><span class="num">第 9 章</span><h3>AGI：从一个巨型教育泡沫到全球性经济泡沫的发生学</h3><p>当无力知识的生产被工业化并集中化，教育泡沫就获得了外溢为经济泡沫的条件。</p><span class="go">阅读本章 →</span></a>
+<a class="paper" href="/books/involution/ai-tools/"><span class="num">第 10 章</span><h3>对抗内卷的 AI 工具：AEI 的生成机制与实践指南</h3><p>真正的问题不是「有没有 AI」，而是「AI 被放进了哪一种结构里」。</p><span class="go">阅读本章 →</span></a>
+</div></div>
+
+<div class="cta"><a href="/books/involution/">从第一章开始通读全书 →</a></div>
+</section>
+
+<section style="margin-top:66px">
+<div class="section-title"><small>SAME QUESTION · 学科通融</small><h2>同题八篇</h2>
+<p>同一道题——AI 时代的内卷困境与出路——被反复撞了八次，撞出八条不同的判断。前七篇同取经济学 × 艺术学 × 工程学，第八篇换成教育学 × 哲学 × 经济学。八篇互相指名划界，可以并排读：它们不是八种说法，是八个不同位置上的病灶——前七处都在评价一侧，第八处在上游，问的是做判定的那群人从哪里来。</p></div>
+<div class="grid">
+<a class="paper" href="/confluence/claim-artifact/"><span class="num">之四十四 · 约 2.5 万字</span><h3>认领物</h3><p>病灶在<b>归属的成本</b>：为使一件产出可被归到某人名下，必须与它一并被生产的那一层东西——三家的账本都只给它成本位、不给产出位。内卷因此不是投入增加而产出不增加，是产出的构成变了而账本没变。</p><span class="go">阅读全文 →</span></a>
+<a class="paper" href="/confluence/stopped-no-one/"><span class="num">之四十五 · 约 2.0 万字</span><h3>这道关拦下过谁</h3><p>病灶在<b>判定的权属</b>：生成合格证据的成本对所有人同时塌陷，可读门槛整体失去分辨力；而由于没有位置有权宣布一道关作废，饱和的关不会被撤下，只会被继续满足。</p><span class="go">阅读全文 →</span></a>
+<a class="paper" href="/confluence/unread-refusal/"><span class="num">之四十六 · 约 2.8 万字</span><h3>两种「不」</h3><p>病灶在<b>否决的记录</b>：没有人看过就作出的否决，与看过之后作出的否决，在所有记录上同码。努力的回报不是被竞争压低的，是被「没有人看」截断的。</p><span class="go">阅读全文 →</span></a>
+<a class="paper" href="/confluence/discarded-glance/"><span class="num">之四十七 · 学科通融</span><h3>被丢掉的那一眼</h3><p>病灶在<b>未被接受的产出</b>：它们在无人记账处合成一条判定基线，而生成成本趋零之后，这条基线的移动方式变了。</p><span class="go">阅读全文 →</span></a>
+<a class="paper" href="/confluence/isomorphic-labour/"><span class="num">之四十八 · 约 2.0 万字</span><h3>认不出来，就得自己交代</h3><p>病灶在<b>承担者</b>：核实一份产出这件工作，从评价一方整体移到了被评价一方。什么都没有多出来——是同一份工作换了人做，而换过去的那一份不入任何账。</p><span class="go">阅读全文 →</span></a>
+<a class="paper" href="/confluence/how-many-is-one/"><span class="num">之四十九 · 学科通融</span><h3>一件是几件</h3><p>病灶在<b>计数的单位</b>：件数暴涨而通过的人没有变多，被普遍读作投入增加而产出不增；本文指出这个读法预设了「一件」的下界是固定的，而生成成本塌陷之后这个下界没有了。</p><span class="go">阅读全文 →</span></a>
+<a class="paper" href="/confluence/before-first-reading/"><span class="num">之五十 · 学科通融</span><h3>第一个读数之前</h3><p>病灶在<b>判进步还是判衰退</b>：同一个用人工智能大幅提高了产出的团队，工程学看标准评测判进步，经济学看投入产出比判衰退，艺术学判两边都在测一个已经不在那里的东西。</p><span class="go">阅读全文 →</span></a>
+<a class="paper" href="/confluence/who-walked-it/"><span class="num">之五十一 · 教育学 × 哲学 × 经济学</span><h3>那一段谁走的</h3><p>病灶在<b>验收者的生产</b>：前五篇都预设有一群人在做判定，这一篇问这群人从哪里来。当期不产出任何东西、却生成日后全部判断力的那段时间被协助提前兑现，于是在账上记为已完成、实际没有被走过。</p><span class="go">阅读全文 →</span></a>
+<a class="paper" href="/confluence/undivided-difference/"><span class="num">之五十二 · 经济学 × 艺术学 × 工程学</span><h3>未分之别</h3><p>病灶在<b>分辨的种类数</b>：前几篇追问的是账上少了什么、谁在承担、由谁判定，这一篇问那把尺子本身——当能分辨的种类不再增加，投进去的一切努力就只能落在已有的种类之内，而这件事在原理上不可能被任何现有指标发现。</p><span class="go">阅读全文 →</span></a>
+</div>
+</section>
+
+<section style="margin-top:66px">
+<div class="section-title"><small>NEIGHBOURS · 站内近邻</small><h2>三篇最贴身的旁证</h2>
+<p>不属于本栏，但从另外三个角度打在同一处：提效为何反而内耗、能被指认的优势为何已经干涸、原创如何被抵押成产权标记。</p></div>
+<div class="near">
+<a href="/column/efficiency-breeds-burnout/"><div class="k">今日长文 · 机制诊断</div><h4>越提效，越内耗</h4><p>流程更细、指标更多、节奏更快，短期有产出，长期却是疲惫、烂尾与暴雷。内耗不是人不行，是层级错配。</p></a>
+<a href="/column/moat-illusion/"><div class="k">今日长文 · 商业</div><h4>护城河的错觉</h4><p>一条你能指着、能命名、能量出宽度的护城河，恰恰已经不再保护你了。优势是动词，不是位置。</p></a>
+<a href="/column/originality-mortgage/"><div class="k">论文抄袭专栏 · 科研</div><h4>原创抵押权</h4><p>制度把它管不了的认知发生，抵押给它管得了的产权标记——查重率、创新点声明、期刊级别。</p></a>
+</div>
+</section>
+
+<div class="open">
+<b>开栏说明</b>：本栏目自今日起收文。地基是《内卷与突围》十章，第一批进来的是上面那组同题八篇。此后按场域陆续补入，计划中的方向：
+<ul>
+<li>医疗与照护里的递减滞留：更多检查、更多指南、更少判断</li>
+<li>平台与算法：把竞争做成实时可比之后发生了什么</li>
+<li>婚恋与育儿：把人生装进可排序的赛道</li>
+<li>组织与考核：指标如何吃掉它本来要衡量的那件事</li>
+<li>每篇附一份可操作的出路清单，以及这条判断的证伪条件</li>
+</ul>
+</div>
+</main>
+<footer>内卷与出路 · SDE Universes · © 德麦国际 Demai International</footer>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body></html>

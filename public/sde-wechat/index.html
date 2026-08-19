@@ -1,0 +1,2997 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SDE 社区 · 群聊与私聊 | SDE Universes</title>
+<meta name="description" content="SDE 社区：站内聊天系统——群聊、一对一私聊、社区动态（发文字与图片、点赞、评论）、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和密码即用，无需安装。">
+<meta name="robots" content="noindex">
+<style>
+:root{
+  --bg:#F7F3E9;--surface:#F1EBDC;--card:#FBF8F0;--card2:#F4EEDF;
+  --border:#D8CBAA;--border2:#E4DAC2;
+  --text:#2A2318;--text2:#6B6050;--muted:#9A8F7A;
+  --gold:#8A6817;--gold2:#A8842B;
+  --disc:#3B4E9C;--disc2:#5162B4;--disc-soft:rgba(59,78,156,0.08);
+  --grp:#2E7D64;--red:#C0603F;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Noto Serif SC',Georgia,'Songti SC',serif;background:var(--surface);color:var(--text);line-height:1.75;-webkit-tap-highlight-color:transparent}
+a{color:var(--disc)}
+#app{max-width:520px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--bg);box-shadow:0 0 24px rgba(0,0,0,0.07)}
+.top{flex:none;display:flex;align-items:center;gap:8px;padding:0.7rem 0.9rem;background:var(--card2);border-bottom:1px solid var(--border2);min-height:52px}
+.top .back{font-size:1.3rem;color:var(--disc);cursor:pointer;line-height:1;padding:0 4px;user-select:none;flex:none}
+.top .ttlwrap{flex:1;min-width:0;cursor:default}
+.top .ttl{font-weight:800;font-size:1.02rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top .sub{font-size:0.7rem;color:var(--text2);display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;background:#B9AE93;flex:none}
+.dot.on{background:#2FA36B}.dot.off{background:var(--red)}
+.top .act{font-size:0.74rem;color:var(--text2);text-decoration:none;flex:none;border:1px solid var(--border);border-radius:14px;padding:2px 10px;cursor:pointer;background:transparent;font-family:inherit}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.view{display:none;flex:1;min-height:0;flex-direction:column}
+.view.on{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.row{display:flex;align-items:center;gap:12px;padding:0.8rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);cursor:pointer}
+.row:active{background:var(--card2)}
+.av{flex:none;width:42px;height:42px;border-radius:8px;background:var(--disc);color:#F5F2E8;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.02rem;position:relative}
+.av.g{background:var(--grp);border-radius:11px}
+.av.me{background:var(--gold)}
+.badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:var(--red);color:#fff;font-size:0.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;font-family:system-ui,sans-serif}
+.rmain{flex:1;min-width:0}
+.rname{font-weight:700;font-size:0.97rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rlast{font-size:0.79rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.rlast .at{color:var(--red);font-weight:700}
+.rtime{flex:none;font-size:0.7rem;color:var(--muted);align-self:flex-start;padding-top:3px}
+.chip{display:inline-block;font-size:0.65rem;color:var(--disc);background:var(--disc-soft);border:1px solid var(--disc);border-radius:20px;padding:0 7px;margin-left:6px;vertical-align:1px;font-family:system-ui,sans-serif;font-weight:400}
+.chip.g{color:var(--grp);border-color:var(--grp);background:rgba(46,125,100,0.08)}
+.hint{padding:1.6rem 1.4rem;color:var(--text2);font-size:0.89rem;text-align:center;line-height:1.9}
+.hint b{color:var(--text)}
+.sec{padding:0.5rem 1rem;font-size:0.7rem;letter-spacing:0.18em;color:var(--muted);background:var(--surface);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.sec button{font:inherit;font-size:0.72rem;letter-spacing:0.04em;color:var(--grp);background:transparent;border:1px solid var(--grp);border-radius:14px;padding:1px 11px;cursor:pointer}
+.search{padding:0.55rem 1rem;background:var(--card2);border-bottom:1px solid var(--border2)}
+.search input{width:100%;font:inherit;font-size:0.9rem;padding:0.42rem 0.7rem;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);outline:none}
+.search input:focus{border-color:var(--disc)}
+.msgs{flex:1;overflow-y:auto;padding:0.9rem;display:flex;flex-direction:column;gap:0.55rem;background:var(--bg)}
+.notice{flex:none;background:#FBF6E9;border-bottom:1px solid var(--gold);padding:0.5rem 1rem;font-size:0.8rem;color:var(--text2);display:none;line-height:1.65}
+.notice.on{display:block}
+.notice b{color:var(--gold2)}
+.msg{display:flex;flex-direction:column;max-width:82%;align-self:flex-start}
+.msg.mine{align-self:flex-end;align-items:flex-end}
+.msg .who{font-size:0.7rem;color:var(--muted);margin:0 5px 3px}
+.msg .bub{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:0.48rem 0.75rem;font-size:0.95rem;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:var(--text)}
+.msg.mine .bub{background:var(--disc);border-color:var(--disc);color:#F5F2E8}
+.msg .bub .q{display:block;font-size:0.78rem;line-height:1.5;color:var(--text2);border-left:3px solid var(--border);padding:2px 0 2px 7px;margin-bottom:5px;white-space:pre-wrap;word-break:break-word}
+.msg.mine .bub .q{color:#E6E1D2;border-left-color:rgba(255,255,255,0.55)}
+.msg .tm{font-size:0.66rem;color:var(--muted);margin:2px 6px 0}
+.msg .tm a{color:inherit;opacity:0.75;text-decoration:underline;cursor:pointer;margin-left:6px}
+.msg.bot .bub{background:#FBF6E9;border-color:var(--gold);color:var(--text)}
+.msg.bot .who{color:var(--gold2);font-weight:700}
+.bub.recalled{background:transparent;border:1px dashed var(--border);color:var(--muted);font-style:italic}
+.msg.mine .bub.recalled{background:transparent;color:var(--muted)}
+.typing{align-self:flex-start;font-size:0.8rem;color:var(--muted);font-style:italic;padding:2px 8px}
+.newpill{position:absolute;left:50%;transform:translateX(-50%);bottom:78px;background:var(--disc);color:#F5F2E8;font-size:0.76rem;padding:5px 15px;border-radius:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:none;z-index:3}
+.foot{flex:none;border-top:1px solid var(--border2);padding:0.55rem 0.7rem;background:var(--card2)}
+.replybar{display:none;align-items:flex-start;gap:8px;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--disc);border-radius:7px;padding:5px 8px;margin-bottom:7px;font-size:0.78rem;color:var(--text2);line-height:1.5}
+.replybar.on{display:flex}
+.replybar .rtxt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.replybar .x{cursor:pointer;font-size:0.95rem;color:var(--muted);flex:none}
+.panel{display:none;flex-wrap:wrap;gap:2px;max-height:126px;overflow-y:auto;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:6px;margin-bottom:7px}
+.panel.on{display:flex}
+.panel span{font-size:1.25rem;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
+.panel.at{flex-direction:column;flex-wrap:nowrap;gap:0}
+.panel.at span{font-size:0.9rem;padding:6px 8px;border-radius:6px;font-family:inherit}
+.panel.at span:hover{background:var(--card2)}
+.inbar{display:flex;gap:6px;align-items:flex-end}
+.inbar textarea{flex:1;font:inherit;font-size:0.95rem;color:var(--text);background:#fff;border:1px solid var(--border);border-radius:8px;padding:0.48rem 0.7rem;resize:none;height:40px;max-height:110px;line-height:1.5;outline:none}
+.inbar textarea:focus{border-color:var(--disc)}
+.ib{font-size:1rem;background:transparent;border:1px solid var(--border);border-radius:8px;height:40px;width:38px;flex:none;cursor:pointer;padding:0;line-height:1;font-family:inherit}
+.ib.w{background:#FBF6E9;border-color:var(--gold)}
+.ib.at{color:var(--grp);border-color:var(--grp);font-weight:700}
+.send{font:inherit;font-size:0.88rem;font-weight:700;padding:0 1rem;height:40px;border-radius:8px;border:1px solid var(--disc);background:var(--disc);color:#F5F2E8;cursor:pointer;flex:none}
+.send:disabled{opacity:0.5}
+.note{font-size:0.73rem;color:var(--muted);min-height:1em;margin-top:4px}
+.tabs{flex:none;display:flex;border-top:1px solid var(--border2);background:var(--card2);padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;text-align:center;padding:0.45rem 0 0.5rem;font-size:0.68rem;color:var(--text2);cursor:pointer;position:relative;letter-spacing:0.05em}
+.tab i{display:block;font-size:1.2rem;font-style:normal;line-height:1.3}
+.tab.on{color:var(--disc);font-weight:700}
+.tab .tb{position:absolute;top:2px;left:50%;margin-left:4px;min-width:17px;height:17px;border-radius:9px;background:var(--red);color:#fff;font-size:0.66rem;display:none;align-items:center;justify-content:center;padding:0 4px;font-family:system-ui,sans-serif;font-weight:700}
+.tab .tb.on{display:flex}
+#gate{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:2rem 1.5rem;text-align:center}
+#gate h2{font-size:1.35rem;font-weight:800}
+#gate p{font-size:0.9rem;color:var(--text2);max-width:340px}
+.form{padding:1.1rem 1rem}
+.form label{display:block;font-size:0.78rem;color:var(--text2);margin:0 0 5px 2px;letter-spacing:0.06em}
+.form input[type=text],.form textarea{width:100%;font:inherit;font-size:0.95rem;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);outline:none;margin-bottom:0.9rem}
+.form textarea{resize:vertical;min-height:74px;line-height:1.7}
+.form input:focus,.form textarea:focus{border-color:var(--disc)}
+.pick{max-height:38vh;overflow-y:auto;border:1px solid var(--border2);border-radius:8px;background:var(--card);margin-bottom:0.9rem}
+.pick .p{display:flex;align-items:center;gap:10px;padding:0.5rem 0.7rem;border-bottom:1px solid var(--border2);cursor:pointer;font-size:0.92rem}
+.pick .p:last-child{border-bottom:none}
+.pick .p .bx{width:18px;height:18px;border:1px solid var(--border);border-radius:4px;flex:none;display:flex;align-items:center;justify-content:center;font-size:0.8rem;color:#fff;background:#fff}
+.pick .p.on .bx{background:var(--grp);border-color:var(--grp)}
+.btn{font:inherit;font-size:0.92rem;font-weight:700;padding:0.55rem 1.4rem;border-radius:8px;border:1px solid var(--disc);background:var(--disc);color:#F5F2E8;cursor:pointer}
+.btn.gh{background:transparent;color:var(--disc)}
+.btn.dg{border-color:var(--red);color:var(--red);background:transparent}
+.btn:disabled{opacity:0.5}
+.formmsg{font-size:0.8rem;color:var(--red);min-height:1em;margin-top:8px}
+.me-card{padding:1.3rem 1.1rem}
+.me-card .nm{font-size:1.15rem;font-weight:800}
+.me-card .uid{font-size:0.72rem;color:var(--muted);font-family:ui-monospace,monospace;margin-top:2px}
+.me-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0.75rem 0.9rem;background:var(--card);border:1px solid var(--border2);border-radius:9px;margin-bottom:0.55rem;font-size:0.87rem}
+.me-item button{font:inherit;font-size:0.77rem;padding:0.28rem 0.85rem;border-radius:15px;border:1px solid var(--disc);background:transparent;color:var(--disc);cursor:pointer}
+.me-item a{text-decoration:none}
+.gmeta{padding:1rem;background:var(--card2);border-bottom:1px solid var(--border2)}
+.gmeta .gn{font-size:1.1rem;font-weight:800}
+.gmeta .gc{font-size:0.78rem;color:var(--muted);margin-top:2px}
+/* ── 文章讨论 ── */
+.dt-row .av{background:var(--gold);color:#fff}
+.dt{padding:0.85rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);cursor:pointer}
+.dt:hover{background:var(--card2)}
+.dt .h{font-size:0.88rem;line-height:1.6}
+.dt .h b{color:var(--disc);font-weight:700}
+.dt .t{font-size:0.9rem;line-height:1.7;margin-top:3px;word-break:break-word}
+.dt .w{font-size:0.75rem;color:var(--muted);margin-top:4px}
+.dt .w em{font-style:normal;color:var(--gold2)}
+.dt.new{background:#FBF6E9}
+/* ── 社区动态 ── */
+.mo{display:flex;gap:11px;padding:0.95rem 1rem;background:var(--card);border-bottom:1px solid var(--border2)}
+.mo .av{cursor:pointer}
+.mo .mm{flex:1;min-width:0}
+.mo .mn{font-weight:700;font-size:0.94rem;color:var(--disc);cursor:pointer}
+.mo .mt{font-size:0.95rem;line-height:1.8;white-space:pre-wrap;word-break:break-word;margin-top:2px}
+.mo .imgs{display:grid;gap:4px;margin-top:8px;grid-template-columns:repeat(3,1fr)}
+.mo .imgs.n1{grid-template-columns:minmax(0,72%)}
+.mo .imgs.n2,.mo .imgs.n4{grid-template-columns:repeat(2,1fr)}
+.mo .imgs img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:7px;background:var(--card2);cursor:zoom-in;display:block;border:1px solid var(--border2)}
+.mo .imgs.n1 img{aspect-ratio:4/3;object-fit:cover}
+.mo .bar{display:flex;align-items:center;gap:15px;margin-top:8px;font-size:0.76rem;color:var(--muted)}
+.mo .bar a{color:var(--disc);text-decoration:none;cursor:pointer}
+.mo .bar a.dg{color:var(--red)}
+.mo .bar .sp{flex:1}
+.mo .likes{margin-top:8px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;font-size:0.81rem;line-height:1.75;color:var(--text2)}
+.mo .likes b{color:var(--disc);font-weight:700}
+.mo .cs{margin-top:6px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:2px 10px}
+.mo .likes+.cs{margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0}
+.mo .c{font-size:0.84rem;line-height:1.8;padding:4px 0;border-bottom:1px solid var(--border2);word-break:break-word}
+.mo .c:last-child{border-bottom:none}
+.mo .c b{color:var(--disc);font-weight:700;cursor:pointer}
+.mo .c i{font-style:normal;color:var(--muted)}
+.mo .c .x{float:right;color:var(--muted);cursor:pointer;font-size:0.76rem;margin-left:8px}
+.mo .cin{display:none;gap:6px;margin-top:7px}
+.mo .cin.on{display:flex}
+.mo .cin input{flex:1;min-width:0;font:inherit;font-size:0.88rem;padding:0.36rem 0.6rem;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--text);outline:none}
+.mo .cin input:focus{border-color:var(--disc)}
+.mo .cin button{font:inherit;font-size:0.8rem;padding:0 0.85rem;border-radius:7px;border:1px solid var(--disc);background:var(--disc);color:#F5F2E8;cursor:pointer;flex:none}
+.mo-news{padding:0.6rem 1rem;background:#FBF6E9;border-bottom:1px solid var(--gold);font-size:0.83rem;color:var(--gold2);cursor:pointer;display:none;font-weight:700}
+.mo-news.on{display:block}
+.mo-more{padding:0.9rem;text-align:center;font-size:0.83rem;color:var(--disc);cursor:pointer}
+.mo-box{position:fixed;inset:0;background:rgba(20,17,10,0.93);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out;padding:14px}
+.mo-box.on{display:flex}
+.mo-box img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px}
+.mo-box .cnt{position:absolute;top:14px;left:0;right:0;text-align:center;color:#EDE6D4;font-size:0.8rem}
+.mp-thumbs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:0.9rem}
+.mp-thumbs .t{position:relative;width:74px;height:74px;border-radius:7px;overflow:hidden;border:1px solid var(--border)}
+.mp-thumbs .t img{width:100%;height:100%;object-fit:cover;display:block}
+.mp-thumbs .t .x{position:absolute;top:1px;right:1px;background:rgba(0,0,0,0.6);color:#fff;width:19px;height:19px;border-radius:50%;font-size:0.75rem;line-height:19px;text-align:center;cursor:pointer}
+.mp-add{width:74px;height:74px;border:1px dashed var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.5rem;cursor:pointer;background:var(--card)}
+.mu-bar{display:flex;gap:8px;align-items:center;margin:0 0 0.8rem}
+.mu-bar .btn.mu{flex:none;border-color:var(--gold);background:var(--gold);padding:0.5rem 0.9rem;font-size:0.86rem}
+.mu-bar select{flex:1;min-width:0;font:inherit;font-size:0.82rem;color:var(--text2);padding:0.45rem 0.4rem;border:1px solid var(--border);border-radius:8px;background:var(--card)}
+.mu-out{margin:0 0 0.9rem}
+.mu-out .mu-note{font-size:0.76rem;color:var(--muted);line-height:1.6;margin-bottom:7px}
+.mu-out .mu-item{border:1px solid var(--border);background:var(--card);border-radius:9px;padding:0.5rem 0.7rem;margin-bottom:7px;font-size:0.95rem;line-height:1.65;cursor:pointer}
+.mu-out .mu-txt{font-size:0.95rem;line-height:1.65}
+.mu-out .mu-src{font-size:0.72rem;color:var(--muted);margin-top:3px}
+.mu-out .mu-src a{color:var(--disc);text-decoration:none}
+.mu-out .mu-item:active{background:var(--card2)}
+.mu-out .mu-again{display:inline-block;font-size:0.82rem;color:var(--disc);cursor:pointer;padding:2px 0}
+.ag-hd{font-size:0.74rem;color:var(--text2);letter-spacing:0.04em;margin:0 0 6px 2px}
+.ag-hd b{color:var(--gold);font-weight:700}
+.ag-sub{font-size:0.72rem;color:var(--muted);margin:0 0 8px 2px;line-height:1.55}
+.ag-sep{height:1px;background:var(--border2);margin:0.2rem 0 0.9rem}
+.mu-bar .btn.ic{border-color:var(--grp);background:var(--grp)}
+.ic-key{width:100%;font:inherit;font-size:0.84rem;padding:0.45rem 0.6rem;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);outline:none;margin-bottom:7px}
+.ic-key:focus{border-color:var(--grp)}
+.ic-see{border:1px dashed var(--border);border-radius:9px;padding:0.5rem 0.7rem;margin-bottom:8px;font-size:0.8rem;color:var(--text2);line-height:1.7}
+.ic-see .k{color:var(--muted);margin-right:4px}
+.mu-out .mu-tag{display:inline-block;font-size:0.68rem;color:#F5F2E8;background:var(--grp);border-radius:4px;padding:0 5px;margin-right:6px;vertical-align:0.08em}
+.nw{padding:0.75rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);font-size:0.87rem;line-height:1.75;cursor:pointer}
+.nw b{color:var(--disc)}
+.nw .t{font-size:0.72rem;color:var(--muted)}
+
+/* 社区动态里的文章条 */
+.mo-doc{display:flex;align-items:center;gap:10px;margin:8px 0 2px;padding:10px 12px;border:1px solid rgba(201,168,76,.34);
+  border-radius:8px;background:rgba(201,168,76,.06);cursor:pointer}
+.mo-doc:hover{background:rgba(201,168,76,.12)}
+.mo-doc-ic{flex:0 0 40px;height:46px;border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;letter-spacing:.06em;color:#1a1410}
+.mo-doc-ic.pdf{background:#C9584C}.mo-doc-ic.doc{background:#4C7EC9}
+.mo-doc-tx{flex:1 1 auto;min-width:0}
+.mo-doc-n{font-size:14px;line-height:1.45;color:#E7DFC8;word-break:break-all}
+.mo-doc-s{font-size:12px;color:#9A906F;margin-top:3px}
+.mo-doc .dg{flex:0 0 auto;font-size:12px}
+.mo-doc-s.dead{color:#C9584C}
+
+/* 社区首页：公共物的门面。刻意没有任何「热度/排名」样式——见 patch_community_home.py 的纪律① */
+.hm-wrap{padding:14px 16px 26px}
+.hm-lead{font-size:0.8rem;color:var(--muted);line-height:1.85;margin:0 0 14px}
+.hm-stat{display:flex;gap:8px;margin:0 0 6px}
+.hm-s{flex:1;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:9px 2px}
+.hm-s b{display:block;font-size:1.15rem;line-height:1.4}
+.hm-s span{font-size:0.66rem;color:var(--muted)}
+.hm-note{font-size:0.7rem;color:var(--muted);line-height:1.7;margin:0 0 18px}
+.hm-h{font-size:0.82rem;font-weight:700;margin:18px 0 8px;display:flex;align-items:baseline;gap:8px}
+.hm-h em{font-style:normal;font-weight:400;font-size:0.7rem;color:var(--muted)}
+.hm-card{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;margin-bottom:8px;cursor:pointer}
+.hm-prop{font-size:0.86rem;line-height:1.65}
+.hm-meta{font-size:0.68rem;color:var(--muted);margin-top:6px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.hm-pid{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:0.64rem;color:var(--muted);background:rgba(127,127,127,0.12);border-radius:4px;padding:1px 5px;cursor:pointer}
+.hm-sep{font-size:0.75rem;color:var(--muted);line-height:1.7;margin-top:6px;padding-left:9px;border-left:2px solid #1a7f5a}
+.hm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.hm-g{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:11px 12px;cursor:pointer}
+.hm-g b{font-size:0.8rem}
+.hm-g span{display:block;font-size:0.68rem;color:var(--muted);line-height:1.6;margin-top:4px}
+.hm-empty{font-size:0.76rem;color:var(--muted);line-height:1.85;background:var(--card2);border:1px dashed var(--border2);border-radius:10px;padding:12px 13px}
+
+/* 成员面：显示痕迹与距离，不显示任何可排序成等级的数字 */
+.wh-wrap{padding:14px 16px 26px}
+.wh-nm{font-size:1.12rem;font-weight:700}
+.wh-fd{font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.7}
+.wh-dist{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px 13px;margin:14px 0 4px}
+.wh-j{font-size:1.3rem;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace}
+.wh-bar{height:6px;border-radius:3px;background:rgba(127,127,127,0.18);margin:8px 0 7px;position:relative;overflow:hidden}
+.wh-bar i{position:absolute;top:0;bottom:0;left:0;background:#1a7f5a;border-radius:3px}
+.wh-bar u{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--muted);text-decoration:none}
+.wh-say{font-size:0.72rem;color:var(--muted);line-height:1.75}
+.wh-h{font-size:0.82rem;font-weight:700;margin:20px 0 8px}
+.wh-it{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin-bottom:7px;cursor:pointer}
+.wh-t{font-size:0.84rem;line-height:1.6}
+.wh-m{font-size:0.67rem;color:var(--muted);margin-top:5px;display:flex;gap:9px;flex-wrap:wrap}
+.wh-act{display:flex;gap:8px;margin-top:18px}
+.wh-act button{flex:1;padding:9px 0;border-radius:9px}
+</style>
+<!-- 全站三态：浏览 / SDE 社区 / SDE 对话。模块自己会挂到 .top 顶栏上 -->
+<script src="/assets/sde-modes.js?v=20260818b" defer></script>
+  <script src="/assets/sde-nbr.js"></script>
+  <script src="/assets/sde-dist.js?v=20260817c"></script>
+</head>
+<body>
+<div id="app">
+
+  <div class="mo-box" id="mo-box"><div class="cnt" id="mo-cnt"></div><img id="mo-big" alt=""></div>
+
+  <div class="top">
+    <span class="back" id="t-back" style="display:none">‹</span>
+    <div class="ttlwrap" id="t-ttlwrap">
+      <div class="ttl" id="t-ttl">SDE 社区</div>
+      <div class="sub" id="t-sub"><span class="dot" id="t-dot"></span><span id="t-stat"></span></div>
+    </div>
+    <button class="act" id="t-act" type="button" style="display:none">群资料</button>
+    <button class="act" id="t-mopen" type="button" style="display:none">发表</button><div id="t-cdnew" class="tbtn" style="display:none">＋立卡</div>
+    <a class="act" id="t-mtg" href="/meeting/">会议</a>
+    <a class="act" id="t-plaza" href="/sde-talk/">广场</a>
+  </div>
+
+  <div class="body">
+
+    <div class="view on" id="v-gate">
+      <div id="gate">
+        <h2>SDE 社区</h2>
+        <p>站内的聊天系统：群聊、一对一私聊、<b>社区动态</b>、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和进入密码即可，无需安装、无需翻墙。密码向学员发放；名字须与学员名录一致。</p>
+        <div id="gsi" style="display:none"></div>
+        <div id="pwbox" style="margin-top:14px">
+          <p style="font-size:0.8rem;color:var(--muted);margin:0 0 8px">输入名字和进入密码：</p>
+          <input id="pw-name" maxlength="20" list="pw-roster" placeholder="输入名字" autocomplete="off"
+                 style="width:100%;box-sizing:border-box;padding:9px 11px;margin-bottom:7px;border:1px solid var(--line,#ddd);border-radius:8px;font-size:0.95rem">
+          <input id="pw-code" type="password" maxlength="60" placeholder="进入密码" autocomplete="off"
+                 style="width:100%;box-sizing:border-box;padding:9px 11px;margin-bottom:7px;border:1px solid var(--line,#ddd);border-radius:8px;font-size:0.95rem">
+          <button id="pw-go" class="btn" style="width:100%">进入</button>
+          <datalist id="pw-roster"></datalist>
+          <div id="pw-msg" style="font-size:0.8rem;color:#b3261e;margin-top:7px;min-height:1em"></div>
+          <p style="font-size:0.76rem;color:var(--muted);margin:8px 0 0">名字要和你在站上发表用的名字一致（点一下输入框可以从名录里选）；进入密码向学员发放。</p>
+        </div>
+        <p style="font-size:0.78rem;color:var(--muted)">群与私聊都只有成员看得见——外人打不开。</p>
+      </div>
+    </div>
+
+    <div class="view" id="v-chats">
+      <div class="scroll" id="chat-list"><div class="hint">正在加载…</div></div>
+    </div>
+
+    <div class="view" id="v-book">
+      <div class="search"><input id="q" placeholder="搜群名或人名…" autocomplete="off"></div>
+      <div class="scroll" id="book-list"><div class="hint">正在加载…</div></div>
+    </div>
+
+    <div class="view" id="v-talk" style="position:relative">
+      <div class="notice" id="g-notice"></div>
+      <div id="msgsearch" style="display:none;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid var(--line,#e5e5e5);background:var(--card,#fff)">
+        <input id="ms-q" placeholder="在这个会话里搜…" autocomplete="off"
+               style="flex:1;min-width:0;padding:6px 9px;border:1px solid var(--line,#ddd);border-radius:7px;font-size:0.9rem">
+        <span id="ms-n" style="font-size:0.78rem;color:var(--muted);white-space:nowrap"></span>
+        <button id="ms-prev" class="ib" type="button" title="上一条">↑</button>
+        <button id="ms-next" class="ib" type="button" title="下一条">↓</button>
+        <button id="ms-x" class="ib" type="button" title="关闭">✕</button>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="newpill" id="newpill">有新消息 ↓</div>
+      <div class="foot">
+        <div class="replybar" id="replybar"><span class="rtxt" id="reply-txt"></span><span class="x" id="reply-x">✕</span></div>
+        <div class="panel" id="epanel"></div>
+        <div class="panel at" id="atpanel"></div>
+        <div class="panel" id="inspanel"></div>
+        <div class="inbar">
+          <button class="ib" id="b-emoji" type="button" title="表情">😊</button>
+          <button class="ib at" id="b-at" type="button" title="@ 群成员" style="display:none">@</button>
+          <button class="ib w" id="b-wds" type="button" title="问 WDS 智能体">🤖</button>
+        <button class="ib" id="b-ins" type="button" title="插一篇文章 / 插一句库存">📎</button>
+          <button class="ib" id="b-find" type="button" title="搜本会话">🔍</button>
+          <textarea id="text" maxlength="500" placeholder="说点什么…（Enter 发送）"></textarea>
+          <button class="send" id="b-send">发送</button>
+        </div>
+        <div class="note" id="note"></div>
+      </div>
+    </div>
+
+    <div class="view" id="v-fwd">
+      <div class="search"><input id="fw-q" placeholder="搜会话、群或人…" autocomplete="off"></div>
+      <div class="scroll" id="fw-list"><div class="hint">正在加载…</div></div>
+    </div>
+
+    <div class="view" id="v-admin">
+      <div class="scroll" id="ad-body">
+        <div id="ad-gate" style="padding:18px">
+          <p style="font-size:0.86rem;color:var(--muted);margin:0 0 10px">全权管理需要<b>管理密码</b>（与站点管理口令相同）。</p>
+          <input id="ad-pw" type="password" maxlength="80" placeholder="管理密码" autocomplete="off"
+                 style="width:100%;box-sizing:border-box;padding:9px 11px;margin-bottom:8px;border:1px solid var(--line,#ddd);border-radius:8px">
+          <button id="ad-go" class="btn" style="width:100%">解锁</button>
+          <div id="ad-msg" style="font-size:0.8rem;color:#b3261e;margin-top:8px;min-height:1em"></div>
+        </div>
+        <div id="ad-panel" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="view" id="v-lib">
+      <div class="scroll" id="lb-body"></div>
+    </div>
+
+    <div class="view" id="v-kb">
+      <div class="scroll" id="kb-body"></div>
+    </div>
+    <div class="view" id="v-vault">
+      <div class="scroll" id="vt-body"></div>
+    </div>
+    <div class="view" id="v-who">
+      <div class="scroll" id="wh-body"></div>
+    </div>
+    <div class="view" id="v-home">
+      <div class="scroll" id="hm-body"></div>
+    </div>
+    <div class="view" id="v-cand">
+      <div class="scroll" id="cd-list"></div>
+    </div>
+    <div class="view" id="v-cdnew">
+      <div class="scroll"><div class="form">
+        <p style="font-size:0.82rem;color:var(--muted);line-height:1.75;margin:0 0 12px">
+          候选卡不是发帖。它是一句<b>能被反对的判断</b>，交给和你不共享语汇的人来顶。<br>
+          三段都要填满——<b>说不出切了哪一刀、给不出可裁决的判据，别人只能表态，不能顶回。</b><br>
+          落卡后有 <b>72 小时</b>顶回期，到点自动结算：没人顶＝未交手；被占位者击中而你说不出分离线＝死格；
+          带着分离线活下来＝已交手。
+        </p>
+        <label>承重命题（压成 50 字上下的一句话）</label>
+        <textarea id="cd-prop" maxlength="120" rows="2" placeholder="例：任何划界者都无法在自己划出的界内安置自己的划界动作"></textarea>
+        <div id="cd-nbr" style="font-size:0.8rem;color:var(--muted);margin:-4px 0 10px;line-height:1.7"></div>
+        <label>它切开的辨别面（把什么和什么分开）</label>
+        <textarea id="cd-face" maxlength="200" rows="2" placeholder="例：把「规则适用于对象」与「规则适用于自身」分开"></textarea>
+        <label>一条可裁决判据（怎样才算它错了）</label>
+        <textarea id="cd-crit" maxlength="300" rows="2" placeholder="例：找到一条能规定自身适用条件的规则，本判断即失效"></textarea>
+        <div id="cd-picks" style="font-size:0.8rem;color:var(--muted);margin:0 0 10px;line-height:1.8"></div>
+        <button class="btn" id="cd-ok">落卡（开始 72 小时顶回期）</button>
+        <button class="btn gh" id="cd-cancel">取消</button>
+        <div class="formmsg" id="cd-msg"></div>
+      </div></div>
+    </div>
+    <div class="view" id="v-cdone">
+      <div class="scroll" id="cd-one"></div>
+    </div>
+    <div class="view" id="v-cdnews">
+      <div class="scroll" id="cd-newsbox"></div>
+    </div>
+
+    <div class="view" id="v-gnew">
+      <div class="scroll">
+        <div class="form">
+          <label>群名称</label>
+          <input type="text" id="gn-name" maxlength="30" placeholder="例如：SDE 学员 · 改姓训练">
+          <label>拉谁进群（可多选，之后还能加）</label>
+          <div class="pick" id="gn-pick"></div>
+          <button class="btn" id="gn-ok">建群</button>
+          <button class="btn gh" id="gn-cancel">取消</button>
+          <div class="formmsg" id="gn-msg"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="v-ginfo">
+      <div class="scroll">
+        <div class="gmeta">
+          <div class="gn" id="gi-name">—</div>
+          <div class="gc" id="gi-count"></div>
+        </div>
+        <div class="form">
+          <label>群公告<span id="gi-owner-hint" style="color:var(--muted)"></span></label>
+          <textarea id="gi-notice" maxlength="300" placeholder="（还没有群公告）"></textarea>
+          <button class="btn" id="gi-save" style="display:none">保存公告</button>
+          <div class="formmsg" id="gi-msg"></div>
+        </div>
+        <div class="sec">群成员<button id="gi-add">＋ 拉人</button></div>
+        <div id="gi-members"></div>
+        <div class="pick" id="gi-pick" style="display:none;margin:0.9rem 1rem"></div>
+        <div style="padding:0 1rem 1rem;display:none" id="gi-addwrap">
+          <button class="btn" id="gi-addok">确认拉入</button>
+          <button class="btn gh" id="gi-addcancel">取消</button>
+        </div>
+        <div class="form"><button class="btn dg" id="gi-leave">退出这个群</button></div>
+      </div>
+    </div>
+
+    <div class="view" id="v-dtalk">
+      <div class="scroll" id="dt-list"><div class="hint">正在加载…</div></div>
+    </div>
+
+    <div class="view" id="v-moments">
+      <div class="mo-news" id="mo-newsbar"></div>
+      <div class="scroll" id="mo-list"><div class="hint">正在加载…</div></div>
+    </div>
+
+    <div class="view" id="v-mopost">
+      <div class="scroll">
+        <div class="form">
+          <label>说点什么</label>
+          <textarea id="mp-text" maxlength="1000" placeholder="这一刻的想法…（最多 1000 字）"></textarea>
+          <div class="ag-hd">① <b>SDE金句生产机</b> · 随机翻五篇站内文章，一篇长一句</div>
+          <div class="mu-bar">
+            <button class="btn mu" id="mu-go" type="button">✨ SDE金句生产机</button>
+            <button class="btn mu" id="mu-vault" type="button">💡 从库存里挑</button>
+            <button class="btn mu" id="mu-article" type="button">📎 插一篇文章</button>
+            <select id="mu-kind">
+              <option value="auto">自动（看图·接你写的）</option>
+              <option value="maxim">格言体</option>
+              <option value="flip">反着说</option>
+              <option value="ask">问一句</option>
+              <option value="fun">幽默一点</option>
+              <option value="now">就写这一刻</option>
+            </select>
+          </div>
+          <div class="mu-out" id="mu-out"></div>
+          <div class="ag-sep"></div>
+          <div class="ag-hd">② <b>吃图出金句</b> · 用 SDE 解构你这张图，再出五句</div>
+          <div class="ag-sub">先在下面放图，再点它。用的是<b>你自己的看图基底</b>：Key 只存在你本机、直连厂商，本站服务器不经手。</div>
+          <div class="mu-bar">
+            <select id="ic-vd">
+              <option value="glm">智谱 GLM（大陆直连）</option>
+              <option value="qwen">千问 Qwen（大陆直连）</option>
+              <option value="kimi">Kimi（大陆直连）</option>
+              <option value="gpt">GPT（经本站中转）</option>
+            </select>
+            <select id="ic-kind">
+              <option value="asis">就图说图</option>
+              <option value="borrow">借图说事</option>
+              <option value="maxim">格言体</option>
+              <option value="flip">反着说</option>
+              <option value="fun">幽默一点</option>
+            </select>
+          </div>
+          <input type="text" id="ic-key" class="ic-key" placeholder="填你自己的 API Key（只存本机，填一次就行）">
+          <input type="text" id="ic-model" class="ic-key" placeholder="型号（可留空，默认 glm-5v）">
+          <div class="mu-bar"><button class="btn ic" id="ic-go" type="button">🖼 吃图出金句</button></div>
+          <div class="mu-out" id="ic-out"></div>
+          <label>图片（最多 9 张，自动压缩）</label>
+          <div class="mp-thumbs" id="mp-thumbs"></div>
+          <input type="file" id="mp-file" accept="image/*" multiple style="display:none">
+          <label>文章（PDF 或 Word，可选，单篇不超过 20MB）</label>
+          <div class="hint" style="margin:-4px 0 6px">文章存在「SDE 社区库」里，<b>保留 7 天后自动清除</b>——是给朋友读一读的，不是站内存档。<br><b>站上已经有的篇目不必上传</b>：用下面的「📎 插一篇文章」贴链接就行——链接不会过期，别人点进去读的还是最新那一版。</div>
+          <div id="mp-docbox"></div>
+          <button class="btn gh" id="mp-docpick" type="button">＋ 附一篇文章</button>
+          <input type="file" id="mp-doc" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none">
+          <button class="btn" id="mp-ok">发表</button>
+          <button class="btn gh" id="mp-cancel">取消</button>
+          <div class="formmsg" id="mp-msg"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="v-monews">
+      <div class="scroll" id="nw-list"><div class="hint">正在加载…</div></div>
+    </div>
+
+    <div class="view" id="v-key">
+      <div style="padding:14px 16px;max-width:560px;margin:0 auto">
+        <h2 id="key-ttl" style="font-size:1.05rem;margin:6px 0 4px">🔑 配置你的基底 Key</h2>
+        <p id="key-why" style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin:0 0 14px">
+          SDE 社区里的 <b>@WDS 智能体</b>用的是<b>你自己的</b> API Key——谁 @ 它，就记在谁账上。
+          你的 Key 只存在这台机器的浏览器里，发问时随那一次请求转给厂商，<b>本站不保存、不记录</b>。
+          在 ChatSDE 或站上任何一篇文章的陪读里填过 Key 的话，下面会自动带出来。
+        </p>
+        <label style="display:block;font-size:0.8rem;color:var(--muted);margin-bottom:4px">选一家基底</label>
+        <select id="key-vd" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--line);margin-bottom:12px">
+          <option value="ds">DeepSeek（platform.deepseek.com）</option>
+          <option value="glm">智谱 GLM（open.bigmodel.cn）</option>
+          <option value="kimi">Kimi（platform.moonshot.cn）</option>
+          <option value="qwen">千问 Qwen（bailian.console.aliyun.com）</option>
+        </select>
+        <label style="display:block;font-size:0.8rem;color:var(--muted);margin-bottom:4px">粘贴 API Key</label>
+        <input id="key-in" type="password" autocomplete="off" placeholder="sk-…" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--line)">
+        <div id="key-probe-slot" style="margin-top:10px"></div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button id="key-save" style="flex:1">保存并进入</button>
+          <button id="key-skip" style="display:none">稍后再说</button>
+        </div>
+        <div id="key-msg" style="font-size:0.8rem;margin-top:10px;min-height:1.2em"></div>
+      </div>
+    </div>
+    <div class="view" id="v-me">
+      <div class="scroll">
+        <div class="me-card">
+          <div class="nm" id="me-nm">—</div>
+          <div class="uid" id="me-uid"></div>
+          <div style="margin-top:1.1rem">
+            <div class="me-item"><span>新消息桌面提醒</span><button id="b-notify">开启</button></div>
+            <div class="me-item"><span>🧭 我的主页（痕迹与距离）</span><button id="b-who">打开</button></div>
+            <div class="me-item"><span>SDE 讨论（公开广场）</span><a href="/sde-talk/"><button>进入</button></a></div>
+            <div class="me-item"><span>SDE 会议室</span><a href="/meeting/"><button>进入</button></a></div>
+            <div class="me-item"><span>💡 思想库存<br><span style="font-size:0.74rem;color:var(--muted)">对话里撞出来的东西存在这儿，发社区动态、立候选卡都从这儿取</span></span><button id="b-vault">进入</button></div>
+            <div class="me-item"><span>📦 我的知识库<br><span style="font-size:0.74rem;color:var(--muted)">画布上锻出来的稿子存在这儿——只有你看得见，换台机器也还在</span></span><button id="b-kb">进入</button></div>
+            <div class="me-item"><span>🔑 基底 Key<br><span style="font-size:0.74rem;color:var(--muted)">@WDS 用的是你自己的 Key；随时可换、可检测</span></span><button id="b-key">设置</button></div>
+            <div class="me-item"><span>📚 文章库<br><span style="font-size:0.74rem;color:var(--muted)">站上的文章收在这儿；发帖发社区动态时可以随时插一篇进去</span></span><button id="b-lib">进入</button></div>
+            <div class="me-item"><span>全权管理</span><button id="b-admin">进入</button></div>
+            <div class="me-item"><span>退出登录</span><button id="b-out">退出</button></div>
+          </div>
+          <p style="font-size:0.79rem;color:var(--muted);margin-top:1rem;line-height:1.95">
+            聊天是<b>纯文字</b>的：只发文字与表情，不发语音、文件；<b>图片请发在社区动态</b>。<br>
+            <b>文章讨论</b>＝全站 1400 多篇文章底下的讨论都汇到消息列表最上面那条，谁回了你会有提醒。<br>
+            <b>社区动态</b>＝站内所有登录过的人共见的一条时间线：发文字与图片、点赞、评论、回复；点名字看某人的全部。<br>
+            通讯录里是所有在本站登录过的人——学员一登录就出现，可直接私聊或拉进群。<br>
+            群里 <b>@某人</b> 会给他一个红标；<b>@所有人</b> 全员提醒。<br>
+            任何会话里都能 <b>@WDS</b> 提问，答案只落在这个会话里。<br>
+            消息 2 分钟内可撤回；长按不用，点消息下方的「回复」即可引用。
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="tabs" id="tabs" style="display:none">
+    <div class="tab on" data-go="home"><i>🏛</i>社区</div>
+    <div class="tab" data-go="chats"><i>💬</i>聊天<span class="tb" id="tb-unread"></span></div>
+    <div class="tab" data-go="book"><i>👥</i>通讯录</div>
+    <div class="tab" data-go="cand"><i>🎯</i>候选<span class="tb" id="tb-cd"></span></div>
+    <div class="tab" data-go="moments"><i>🌿</i>动态<span class="tb" id="tb-mo"></span></div>
+    <div class="tab" data-go="me"><i>👤</i>我</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+function el(id){return document.getElementById(id)}
+var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com";
+var TITLE="SDE 社区 · 群聊与私聊 | SDE Universes";
+var CRED="",ME=null,contacts=[],groups=[],chats=[],roster={},unread=0;
+var cur=null,ws=null,connected=false,tries=0,usePoll=false,pollT=null,lastId=0,seen={},nodes={},pendingNew=0,inboxT=null,notifyOn=false;
+var replyTo=null,gMembers=[],gOwner=false,pickSel={};
+
+/* ── 小工具 ── */
+function note(s){el("note").textContent=s||""}
+function pad(x){return(x<10?"0":"")+x}
+function fmtT(ts){var d=new Date(ts),n=new Date();
+  if(d.toDateString()===n.toDateString())return pad(d.getHours())+":"+pad(d.getMinutes());
+  var y=new Date(n.getTime()-86400000);
+  if(d.toDateString()===y.toDateString())return "昨天 "+pad(d.getHours())+":"+pad(d.getMinutes());
+  return (d.getMonth()+1)+"/"+d.getDate();}
+function initial(nm){nm=String(nm||"?").trim();return nm?nm.slice(0,1):"?"}
+function api(op,extra){
+  var body={credential:CRED,op:op};
+  if(extra)for(var k in extra)body[k]=extra[k];
+  return fetch("/api/im",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)})
+    .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})});
+}
+/* api() 回的是 {s:HTTP状态, d:载荷}——老调用点按 x.d.ok 读，不能改它的形状。
+   候选/库存/文章库三家的调用点都按「载荷」在读，所以在各自的 wrapper 里拆一次包。
+   ⚠️ 这条曾让三个 tab 全部常亮「加载失败，请重试。」，而后端一直是 200 ok。 */
+function unwrap(x){return (x&&x.d)?x.d:{ok:false};}
+function setStat(state){var d=el("t-dot"),s=el("t-stat");
+  if(!cur){d.className="dot";s.textContent="";return;}
+  d.className="dot"+(state==="online"?" on":state==="offline"?" off":"");
+  s.textContent=state==="online"?(cur.kind==="g"?(cur.count?cur.count+" 人":"群聊"):"在线"):state==="offline"?"重连中…":"连接中…";}
+
+/* ── 视图 ── */
+function show(v){
+  ["gate","who","home","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews","vault","lib","kb","key"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  el("tabs").style.display=(v==="gate")?"none":"flex";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||v==="vault"||v==="lib"||v==="kb"||(v==="key"&&!keyGate)||v==="who"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
+  el("t-sub").style.display=(v==="talk")?"flex":"none";
+  el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
+  el("t-plaza").style.display=(v==="home"||v==="chats"||v==="book"||v==="me")?"block":"none";
+  el("t-mopen").style.display=(v==="moments")?"block":"none";
+  el("t-cdnew").style.display=(v==="cand")?"block":"none";
+  if(v==="gnew")el("t-ttl").textContent="建群";
+  else if(v==="ginfo")el("t-ttl").textContent="群资料";
+  else if(v==="fwd")el("t-ttl").textContent="转发给…";
+  else if(v==="admin")el("t-ttl").textContent="全权管理";
+  else if(v==="dtalk")el("t-ttl").textContent="文章讨论";
+  else if(v==="mopost")el("t-ttl").textContent="发表";
+  else if(v==="monews")el("t-ttl").textContent="新消息";
+  else if(v==="cdnew")el("t-ttl").textContent="立一张候选卡";
+  else if(v==="cdone")el("t-ttl").textContent="候选卡";
+  else if(v==="cdnews")el("t-ttl").textContent="顶回提醒";
+  else if(v==="who")el("t-ttl").textContent=whoName||"成员";
+  else if(v==="vault")el("t-ttl").textContent="💡 思想库存";   else if(v==="lib")el("t-ttl").textContent="📚 文章库";   else if(v==="kb")el("t-ttl").textContent="📦 我的知识库";   else if(v==="key")el("t-ttl").textContent="🔑 基底 Key";
+  else if(v==="cand")el("t-ttl").textContent=cdWho?(cdWhoName+"的候选"):"候选";
+  else if(v==="moments")el("t-ttl").textContent=moWho?(moWhoName+"的社区动态"):"社区动态";
+  else if(v!=="talk")el("t-ttl").textContent="SDE 社区";
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){t.classList.toggle("on",v===t.getAttribute("data-go"))});
+}
+Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){
+  t.onclick=function(){var g=t.getAttribute("data-go");closeTalk();
+    if(g==="home"){homeGo();return;}
+    if(g==="moments"){moGo("","");return;}
+    if(g==="cand"){cdGo("","");return;}
+    show(g);if(g==="chats")loadInbox();if(g==="book")loadBook();};
+});
+
+/* ── 社区首页：公共物摆到门口 ─────────────────────────────────
+   判据见 tools/patch_community_home.py 的文件头。两条不许破的纪律：
+     ① 这一面上不出现任何可排序成等级的数字（赞/分/热度/排名/粉丝一个都没有）。
+        四个计数是**账本状态**，不是名次。
+     ② 空态写明出路，不是「暂无内容」。
+   后端一行没动：三次已有的 feed 调用在前端汇总即可。 */
+var hmBusy = false;
+function homeGo(){ show("home"); homeLoad(); }
+function homeLoad(){
+  if (hmBusy) return;
+  hmBusy = true;
+  var box = el("hm-body");
+  if (!box.getAttribute("data-once")) box.innerHTML = '<div class="hint">正在取共同体此刻的状态…</div>';
+  Promise.all([
+    cdApi("feed", { limit: 30 }).catch(function(){ return null; }),
+    vtApi("feed", { pick: 1, limit: 6 }).catch(function(){ return null; }),
+    lbApi("pub",  { limit: 6 }).catch(function(){ return null; })
+  ]).then(function(r){
+    hmBusy = false;
+    box.setAttribute("data-once", "1");
+    homeRender(
+      (r[0] && r[0].ok && r[0].cards) || [],
+      (r[1] && r[1].ok && r[1].items) || [],
+      (r[2] && r[2].ok && r[2].items) || []
+    );
+  }).catch(function(){
+    hmBusy = false;
+    box.innerHTML = '<div class="hint">加载失败，请重试。</div>';
+  });
+}
+/* 命题编号：点一下复制。它是三个维度指着同一条命题说话的唯一凭据，
+   老卡（账本上线之前立的）还没有号——如实说「还没编号」，不假装有。 */
+function hmPid(c){
+  if (!c.pid) return '<span class="hm-pid" title="账本上线前立的卡，读到时才补号">未编号</span>';
+  return '<span class="hm-pid hm-copy" data-p="' + esc(c.pid) + '" title="点一下复制；浏览、对话、社区三处指的是同一条命题">' + esc(c.pid) + '</span>';
+}
+function homeRender(cards, vault, pubs){
+  var n = { open: 0, alive: 0, dead: 0, untouched: 0 };
+  cards.forEach(function(c){ if (n[c.state] !== undefined) n[c.state]++; });
+  var opens = cards.filter(function(c){ return c.state === "open"; })
+                   .sort(function(a, b){ return (a.due || 0) - (b.due || 0); }).slice(0, 5);
+  var alives = cards.filter(function(c){ return c.state === "alive"; })
+                    .sort(function(a, b){ return (b.settled || 0) - (a.settled || 0); }).slice(0, 3);
+
+  var h = '<div class="hm-wrap">';
+  h += '<p class="hm-lead">这里不是聊天的门口，是<b>共同体的门口</b>。'
+     + '一条命题在这套系统里有四个年龄段：被立出来、被顶回、活下来或者死掉——下面这四个数说的就是它们此刻各有几条。</p>';
+
+  h += '<div class="hm-stat">'
+     + '<div class="hm-s"><b>' + n.open + '</b><span>顶回期</span></div>'
+     + '<div class="hm-s"><b style="color:#1a7f5a">' + n.alive + '</b><span>已交手</span></div>'
+     + '<div class="hm-s"><b style="color:#b3261e">' + n.dead + '</b><span>死格</span></div>'
+     + '<div class="hm-s"><b style="color:#8a8a8a">' + n.untouched + '</b><span>未交手</span></div>'
+     + '</div>';
+  h += '<p class="hm-note">这四个不是分数，是<b>账本状态</b>。这套系统里没有赞、没有热度、没有排行——'
+     + '可排序的数字会让所有人朝分高的那套说法靠拢，而这里唯一稀缺的东西正是<b>说法之间的距离</b>。</p>';
+
+  h += '<div class="hm-h">⏳ 正在交手 <em>72 小时内可顶回</em></div>';
+  if (opens.length) {
+    opens.forEach(function(c){
+      h += '<div class="hm-card cd-open" data-id="' + esc(c.id) + '">'
+         + '<div class="hm-prop">' + esc(c.prop || "（无承重命题）") + '</div>'
+         + '<div class="hm-meta">' + hmPid(c)
+         + '<span class="hm-who" data-u="' + esc(c.uid) + '" data-n="' + esc(c.name || "") + '" style="cursor:pointer;text-decoration:underline">' + esc(c.name || "（未署名）") + '</span>'
+         + '<span>' + (((c.backs || []).length) ? ("已被顶回 " + c.backs.length + " 次") : "还没有人顶回") + '</span>'
+         + '<span>' + esc(cdLeft(c)) + '</span></div></div>';
+    });
+  } else {
+    h += '<div class="hm-empty">此刻没有一条命题在交手期。<br>'
+       + '去「🎯 候选」立一张——或者在文章页、ChatSDE 里撞出一条，那两处都有「立成候选卡」的出口。</div>';
+  }
+
+  h += '<div class="hm-h">✅ 带着分离线活下来的 <em>这是共同体真正的产出</em></div>';
+  if (alives.length) {
+    alives.forEach(function(c){
+      var sp = (c.seps || [])[0];
+      h += '<div class="hm-card cd-open" data-id="' + esc(c.id) + '">'
+         + '<div class="hm-prop">' + esc(c.prop || "") + '</div>'
+         + (sp ? '<div class="hm-sep">分离线：' + esc(sp.text || sp.sep || "") + '</div>' : "")
+         + '<div class="hm-meta">' + hmPid(c) + '<span>' + esc(c.name || "") + '</span></div></div>';
+    });
+  } else {
+    h += '<div class="hm-empty">还没有命题走完整条链。<br>'
+       + '一条命题要活下来，得<b>被人顶回、而作者说得出一条分离线</b>——没人顶回只算「未交手」，被占位者击中又说不出分离线就是「死格」。</div>';
+  }
+
+  h += '<div class="hm-h">📦 共同体攒下的</div><div class="hm-grid">'
+     + '<div class="hm-g" data-go2="vault"><b>💡 思想库存 · ' + vault.length + '＋</b><span>还没成型的命题、命名与观察。够硬的可以一键升格成候选卡。</span></div>'
+     + '<div class="hm-g" data-go2="kb"><b>📦 我的知识库</b><span>画布上锻出来的稿子存在这儿——只有你看得见，换台机器也还在。</span></div>'
+     + '<div class="hm-g" data-go2="lib"><b>📚 文章库 · ' + pubs.length + '＋</b><span>推给大家的篇目，每一条都附着推荐人写的那句「它切开了什么」。</span></div>'
+     + '<div class="hm-g" data-go2="cand"><b>🎯 候选卡</b><span>三段硬门：承重命题、它切开的辨别面、可裁决的判据。</span></div>'
+     + '<div class="hm-g" data-go2="nbr"><b>🔗 近邻库</b><span>先查这块地被谁占过。库未命中≠没被占，不得据以放行。</span></div>'
+     + '</div>';
+  h += '</div>';
+  el("hm-body").innerHTML = h;
+
+  Array.prototype.forEach.call(document.querySelectorAll("#hm-body .cd-open"), function(a){
+    a.onclick = function(){ cdOne(a.getAttribute("data-id")); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("#hm-body .hm-who"), function(a){
+    a.onclick = function(e){ e.stopPropagation(); whoGo(a.getAttribute("data-u"), a.getAttribute("data-n")); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("#hm-body .hm-copy"), function(a){
+    a.onclick = function(e){
+      e.stopPropagation();
+      var p = a.getAttribute("data-p");
+      try { navigator.clipboard.writeText(p); a.textContent = "已复制"; setTimeout(function(){ a.textContent = p; }, 1200); } catch (err) {}
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("#hm-body .hm-g"), function(a){
+    a.onclick = function(){
+      var g = a.getAttribute("data-go2");
+      if (g === "vault") { vtGo("me", null); return; }
+      if (g === "kb")    { kbOpen = null; show("kb"); kbLoad(); return; }
+      if (g === "lib")   { lbGo("me", null); return; }
+      if (g === "cand")  { cdGo("", ""); return; }
+      if (g === "nbr")   { window.open("/nbr/", "_blank"); return; }
+    };
+  });
+}
+
+
+/* ── 成员面（个人 SDE 主页）─────────────────────────────────
+   判据见 tools/patch_member_page.py 的文件头。一条不许破的纪律：
+   **这一面上不出现任何可排序成等级的数字**——没有粉丝、没有阅读量、没有点赞、没有分。
+   显示的是痕迹（他立过哪些命题、哪些活下来了、他在站上留下了什么）
+   与距离（他和你的语汇族重叠率，当场按指纹算，与全站中位数对照）。 */
+var whoUid = "", whoName = "", whoIdx = null, whoPubs = null;
+function whoGo(uid, name){ whoUid = uid || ""; whoName = name || ""; show("who"); whoLoad(); }
+function whoMe(){ if (ME) whoGo(ME.uid, ME.name); }
+/* 两份静态索引：各取一次、缓存住、失败不拦路（少一块就少显示一块） */
+function whoJ(url, cache, set){
+  if (cache) return Promise.resolve(cache);
+  return fetch(url, { cache: "force-cache" }).then(function(r){ return r.json(); })
+    .then(function(d){ set(d); return d; }).catch(function(){ return null; });
+}
+/* 语汇族重叠率：两个人的指纹取 Jaccard。这就是全站「离你最远」用的同一把尺子。 */
+function whoJac(a, b){
+  if (!a || !b || !a.length || !b.length) return -1;
+  var s = {}, i, hit = 0;
+  for (i = 0; i < a.length; i++) s[a[i]] = 1;
+  for (i = 0; i < b.length; i++) if (s[b[i]]) hit++;
+  var uni = a.length + b.length - hit;
+  return uni > 0 ? (hit / uni) : -1;
+}
+function whoFind(idx, name){
+  if (!idx || !idx.people) return null;
+  for (var i = 0; i < idx.people.length; i++) if (idx.people[i].name === name) return idx.people[i];
+  return null;
+}
+function whoLoad(){
+  var box = el("wh-body");
+  box.innerHTML = '<div class="hint">正在取他的痕迹…</div>';
+  Promise.all([
+    whoJ("/props/index.json", whoIdx, function(d){ whoIdx = d; }),
+    whoJ("/students/publications.json", whoPubs, function(d){ whoPubs = d; }),
+    cdApi("feed", { who: whoUid, limit: 30 }).catch(function(){ return null; })
+  ]).then(function(r){
+    whoRender(r[0], r[1], (r[2] && r[2].ok && r[2].cards) || []);
+  }).catch(function(){ box.innerHTML = '<div class="hint">加载失败，请重试。</div>'; });
+}
+function whoRender(idx, pubs, cards){
+  var him = whoFind(idx, whoName);
+  var me  = (ME && ME.name) ? whoFind(idx, ME.name) : null;
+  var mine = (ME && whoUid === ME.uid);
+  var h = '<div class="wh-wrap">';
+  h += '<div class="wh-nm">' + esc(whoName || "（未署名）") + (mine ? '　<span class="wh-say">（这是你自己）</span>' : "") + '</div>';
+  h += '<div class="wh-fd">'
+     + (him ? (esc((him.fields || []).join(" · ") || "—") + '　站上 ' + esc(String(him.n || 0)) + ' 篇') : '站上还没有作品索引')
+     + '</div>';
+
+  /* ── 距离：不是评分，是这套系统唯一的稀缺品 ── */
+  h += '<div class="wh-dist">';
+  if (mine) {
+    h += '<div class="wh-say">自己跟自己没有距离。<b>去看别人</b>——离你越远的人，越可能拿得出你语汇里没有的占位者。</div>';
+  } else if (him && me && him.fp && me.fp) {
+    var j = whoJac(me.fp, him.fp);
+    var med = (idx.calib && idx.calib.j_median) || 0.034;
+    var mx  = (idx.calib && idx.calib.j_max) || 0.1;
+    var pct = Math.max(2, Math.min(100, Math.round(j / mx * 100)));
+    var medp = Math.max(0, Math.min(100, Math.round(med / mx * 100)));
+    h += '<div class="wh-j">' + j.toFixed(4) + '</div>';
+    h += '<div class="wh-bar"><i style="width:' + pct + '%"></i><u style="left:' + medp + '%"></u></div>';
+    h += '<div class="wh-say">你和他的<b>语汇族重叠率</b>（灰线是全站中位 ' + med.toFixed(3) + '）。'
+       + (j < med ? '他<b>比一半人离你更远</b>——这正是该找他顶回的理由。'
+                  : '你们说话用的是相近的一套词，互相顶回时更容易只是彼此附和。')
+       + '<br>这不是评分，也不排名：<b>重叠率低不等于他更好，只等于他更可能看见你看不见的那一格。</b></div>';
+  } else {
+    h += '<div class="wh-say">还算不出你们之间的距离——'
+       + (him ? '你' : '他') + '在站上的作品还不够烘出一份语汇指纹。<br>指纹要 800 个语汇二元组，作品太少时宁可不给数，也不编一个出来。</div>';
+  }
+  h += '</div>';
+
+  /* ── 他的命题（账本）── */
+  var alive = cards.filter(function(c){ return c.state === "alive"; });
+  h += '<div class="wh-h">🧭 他立过的命题 · ' + cards.length + ' 条'
+     + (alive.length ? '（' + alive.length + ' 条带着分离线活下来）' : "") + '</div>';
+  if (cards.length) {
+    cards.slice(0, 6).forEach(function(c){
+      var lab = (typeof CD_STATE !== "undefined" && CD_STATE[c.state]) ? CD_STATE[c.state][0] : c.state;
+      h += '<div class="wh-it cd-open" data-id="' + esc(c.id) + '">'
+         + '<div class="wh-t">' + esc(c.prop || "") + '</div>'
+         + '<div class="wh-m"><span>' + esc(lab) + '</span>'
+         + (c.pid ? '<span class="hm-pid">' + esc(c.pid) + '</span>' : '<span class="hm-pid">未编号</span>')
+         + '</div></div>';
+    });
+  } else {
+    h += '<div class="hm-empty">' + (mine ? '你' : '他') + '还没有立过候选卡。<br>'
+       + '一条命题只有被立成卡、被人顶回、再被一条分离线救回来，才会留在账本上。</div>';
+  }
+
+  /* ── 他在站上留下的（S 维度：只存指针，不搬副本）── */
+  var items = [];
+  if (pubs && pubs.students) {
+    for (var i = 0; i < pubs.students.length; i++) {
+      if (pubs.students[i].name === whoName) { items = pubs.students[i].items || []; break; }
+    }
+  }
+  h += '<div class="wh-h">📄 他在站上留下的 · ' + items.length + ' 篇</div>';
+  if (items.length) {
+    items.slice(0, 6).forEach(function(it){
+      h += '<div class="wh-it" onclick="window.open(\'' + esc(it.url) + '\',\'_blank\')">'
+         + '<div class="wh-t">' + esc(it.title || "") + '</div>'
+         + '<div class="wh-m"><span>' + esc(it.kind || "") + '</span><span>去读 →</span></div></div>';
+    });
+  } else {
+    h += '<div class="hm-empty">站上还没有署他名字的篇目。</div>';
+  }
+
+  if (!mine) {
+    h += '<div class="wh-act"><button id="wh-dm">私聊他</button><button id="wh-cd">看他的候选</button></div>';
+  }
+  h += '</div>';
+  el("wh-body").innerHTML = h;
+
+  Array.prototype.forEach.call(document.querySelectorAll("#wh-body .cd-open"), function(a){
+    a.onclick = function(){ cdOne(a.getAttribute("data-id")); };
+  });
+  if (el("wh-dm")) el("wh-dm").onclick = function(){ openDm(whoUid, whoName); };
+  if (el("wh-cd")) el("wh-cd").onclick = function(){ cdGo(whoUid, whoName); };
+}
+
+/* ── 全权管理 ── */
+var ADPW="";
+try{ADPW=sessionStorage.getItem("sde_wx_adpw")||"";}catch(e){}
+function adCall(act,extra){
+  var body={credential:CRED,op:"admin",a:act,pass:ADPW};
+  if(extra)for(var k in extra)body[k]=extra[k];
+  return fetch("/api/im",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)})
+    .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})});
+}
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function adUnlock(){
+  var pw=el("ad-pw").value||"",m=el("ad-msg");
+  if(!pw){m.textContent="请输入管理密码。";return;}
+  ADPW=pw;m.style.color="var(--muted)";m.textContent="正在核对…";
+  adCall("auth").then(function(x){
+    if(!x.d||!x.d.ok){ADPW="";m.style.color="#b3261e";m.textContent=(x.d&&x.d.msg)||"解锁失败。";return;}
+    try{sessionStorage.setItem("sde_wx_adpw",ADPW);}catch(e){}
+    el("ad-pw").value="";m.textContent="";el("ad-gate").style.display="none";
+    el("ad-panel").style.display="";adLoad();
+  }).catch(function(){m.style.color="#b3261e";m.textContent="网络异常。"});
+}
+function adLoad(){
+  var box=el("ad-panel");box.innerHTML='<div class="hint">正在加载…</div>';
+  Promise.all([adCall("users"),adCall("groups"),adCall("bans"),adCall("aliases")]).then(function(r){
+    var us=(r[0].d&&r[0].d.users)||[],gs=(r[1].d&&r[1].d.groups)||[],bs=(r[2].d&&r[2].d.bans)||[];
+    var h='<div style="padding:14px 16px">';
+    // 合并身份排在最前——国内走口令、海外走 Google，两个入口该留，但一个人只该有一个身份。
+    h+='<h3 style="margin:0 0 6px;font-size:0.95rem">合并身份（国内／海外同一个人）</h3>';
+    h+='<p style="font-size:0.76rem;color:var(--muted);margin:0 0 8px;line-height:1.7">'
+      +'大陆用名字＋密码进，海外用 Google 进——<b>是两拨真实的人，两个入口都保留</b>；'
+      +'但同一个人换通道进来会变成通讯录里的另一个人，群、社区动态都跟着旧身份走。'
+      +'在下面选中那个旧身份，填他在<b>学员名录里的名字</b>，就把一切改挂过去。<br>'
+      +'⚠️ <b>群聊与社区动态都能完整搬走；私聊的历史消息搬不走</b>'
+      +'（私聊房号由两个 uid 算出来，换了 uid 就是另一个房间）——会话还在，里面会写明。</p>';
+    h+='<div class="me-item" style="display:block;padding:10px 0">'
+      +'<select id="ad-mg-from" style="width:100%;box-sizing:border-box;padding:8px;margin-bottom:6px;border:1px solid var(--line,#ddd);border-radius:8px">'
+      +'<option value="">选一个要并掉的旧身份…</option>';
+    us.forEach(function(u){ h+='<option value="'+esc(u.uid)+'">'+esc(u.name||"（未署名）")+'　'+esc(u.uid)+'</option>'; });
+    h+='</select>'
+      +'<input id="ad-mg-to" list="ad-roster" maxlength="40" placeholder="合并到名录里的哪个名字（可填本名或 slug）" '
+      +'style="width:100%;box-sizing:border-box;padding:8px;margin-bottom:6px;border:1px solid var(--line,#ddd);border-radius:8px">'
+      +'<datalist id="ad-roster"></datalist>'
+      +'<button id="ad-mg-go" class="btn" style="width:100%">合并</button></div>';
+    h+='<h3 style="margin:20px 0 6px;font-size:0.95rem">全部用户（'+us.length+'）</h3>';
+    h+='<p style="font-size:0.76rem;color:var(--muted);margin:0 0 10px">移除＝从通讯录、所有群、所有会话里彻底清掉。勾上「同时停用」他就再也登不进来。</p>';
+    us.forEach(function(u){
+      h+='<div class="me-item"><span>'+esc(u.name||"（未署名）")+' <span style="color:var(--muted);font-size:0.74rem">'+esc(u.uid)+'</span></span>'+
+         '<span><label style="font-size:0.74rem;color:var(--muted);margin-right:8px"><input type="checkbox" class="ad-ban" data-u="'+esc(u.uid)+'"> 同时停用</label>'+
+         '<button class="ad-rm" data-u="'+esc(u.uid)+'" data-n="'+esc(u.name||"")+'">移除</button></span></div>';
+    });
+    h+='<h3 style="margin:20px 0 6px;font-size:0.95rem">全部群（'+gs.length+'）</h3>';
+    if(!gs.length)h+='<p style="font-size:0.8rem;color:var(--muted)">还没有群。</p>';
+    gs.forEach(function(g){
+      h+='<div class="me-item"><span>'+esc(g.name||"（无名群）")+' <span style="color:var(--muted);font-size:0.74rem">'+g.count+' 人</span></span>'+
+         '<button class="ad-gdel" data-g="'+esc(g.gid)+'" data-n="'+esc(g.name||"")+'">解散</button></div>';
+    });
+    h+='<h3 style="margin:20px 0 6px;font-size:0.95rem">已停用的名字（'+bs.length+'）</h3>';
+    if(!bs.length)h+='<p style="font-size:0.8rem;color:var(--muted)">没有被停用的名字。</p>';
+    bs.forEach(function(x){
+      h+='<div class="me-item"><span>'+esc(x.name)+'</span><button class="ad-unban" data-n="'+esc(x.name)+'">恢复</button></div>';
+    });
+    var als=(r[3]&&r[3].d&&r[3].d.aliases)||[];
+    if(als.length){
+      h+='<h3 style="margin:20px 0 6px;font-size:0.95rem">已合并过的身份（'+als.length+'）</h3>';
+      h+='<p style="font-size:0.76rem;color:var(--muted);margin:0 0 8px">留痕只为日后追查，不影响使用。</p>';
+      als.forEach(function(a){
+        h+='<div class="me-item"><span>'+esc(a.fromName||"（未署名）")+' <span style="color:var(--muted);font-size:0.74rem">'+esc(a.from)+'</span>'
+          +' → '+esc(a.toName||"")+' <span style="color:var(--muted);font-size:0.74rem">'+esc(a.to)+'</span></span></div>';
+      });
+    }
+    h+='<div id="ad-note" style="font-size:0.8rem;color:var(--muted);margin-top:14px;min-height:1em"></div></div>';
+    box.innerHTML=h;adBind();
+  }).catch(function(){box.innerHTML='<div class="hint">加载失败，请重试。</div>'});
+}
+function adNote(t,bad){var n=el("ad-note");if(n){n.style.color=bad?"#b3261e":"var(--muted)";n.textContent=t;}}
+function adBind(){
+  // 名录联想：第一次点输入框才拉 roster.json（140KB，不进首屏）——与门禁那处同一惯例
+  var mgTo=el("ad-mg-to");
+  if(mgTo){
+    mgTo.addEventListener("focus",function once(){
+      mgTo.removeEventListener("focus",once);
+      fetch("/students/roster.json").then(function(r){return r.json()}).then(function(j){
+        var dl=el("ad-roster");if(!dl)return;
+        ((j&&j.students)||[]).forEach(function(s){
+          if(!s||!s.name)return;
+          var o=document.createElement("option");o.value=s.name;dl.appendChild(o);
+        });
+      }).catch(function(){});
+    });
+  }
+  var mgGo=el("ad-mg-go");
+  if(mgGo)mgGo.onclick=function(){
+    var from=(el("ad-mg-from")||{}).value||"",to=((el("ad-mg-to")||{}).value||"").trim();
+    if(!from){adNote("先选一个要并掉的旧身份。",1);return;}
+    if(!to){adNote("填上要合并到的名录名字。",1);return;}
+    if(!confirm("把 "+from+" 名下的群籍、会话、社区动态全部改挂到「"+to+"」？\n私聊的历史消息搬不走（会话仍在）。此操作不可撤销。"))return;
+    adNote("正在合并…");
+    adCall("merge",{from:from,toName:to}).then(function(x){
+      var d=x.d||{};
+      if(!d.ok){adNote(d.msg||"合并失败。",1);return;}
+      adNote("已把「"+(d.fromName||from)+"」并进「"+(d.toName||to)+"」："
+        +"群 "+(d.groups||0)+"，会话 "+(d.convs||0)+"（其中 "+(d.dmLost||0)+" 个私聊的历史留在原处），"
+        +"动态 "+(d.posts||0)+"，赞 "+(d.likes||0)+"，评论 "+(d.cmts||0)+"，提醒 "+(d.news||0)+"。");
+      setTimeout(adLoad,900);
+    }).catch(function(){adNote("合并失败，请重试。",1)});
+  };
+  Array.prototype.forEach.call(document.querySelectorAll(".ad-rm"),function(btn){
+    btn.onclick=function(){
+      var u=btn.getAttribute("data-u"),n=btn.getAttribute("data-n")||u;
+      var cb=document.querySelector('.ad-ban[data-u="'+u+'"]'),ban=cb&&cb.checked;
+      if(!confirm("确定移除「"+n+"」？"+(ban?"并停用这个名字（他将无法再登录）。":"")))return;
+      adNote("处理中…");adCall("rm",{target:u,ban:ban?1:0}).then(function(x){
+        if(!x.d||!x.d.ok){adNote((x.d&&x.d.msg)||"移除失败。",true);return;}
+        adNote("已移除「"+n+"」"+(x.d.groups?("，退出 "+x.d.groups+" 个群"):"")+(ban?"，并已停用":"")+"。");adLoad();
+      }).catch(function(){adNote("网络异常。",true)});
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".ad-gdel"),function(btn){
+    btn.onclick=function(){
+      var g=btn.getAttribute("data-g"),n=btn.getAttribute("data-n")||g;
+      if(!confirm("确定解散群「"+n+"」？群里所有人都会失去这个会话。"))return;
+      adNote("处理中…");adCall("gdel",{gid:g}).then(function(x){
+        if(!x.d||!x.d.ok){adNote((x.d&&x.d.msg)||"解散失败。",true);return;}
+        adNote("已解散「"+n+"」。");adLoad();
+      }).catch(function(){adNote("网络异常。",true)});
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".ad-unban"),function(btn){
+    btn.onclick=function(){
+      var n=btn.getAttribute("data-n");
+      adNote("处理中…");adCall("unban",{name:n}).then(function(x){
+        if(!x.d||!x.d.ok){adNote((x.d&&x.d.msg)||"恢复失败。",true);return;}
+        adNote("已恢复「"+n+"」，他可以再登录了。");adLoad();
+      }).catch(function(){adNote("网络异常。",true)});
+    };
+  });
+}
+el("b-admin").onclick=function(){
+  show("admin");
+  if(ADPW){el("ad-gate").style.display="none";el("ad-panel").style.display="";adLoad();}
+  else{el("ad-gate").style.display="";el("ad-panel").style.display="none";}
+};
+el("ad-go").onclick=adUnlock;
+el("ad-pw").addEventListener("keydown",function(e){if(e.key==="Enter")adUnlock();});
+
+/* ── 基底 Key（BYOK）──────────────────────────────────────────────
+   与全站陪读 wds-read.js 用**同一套键名与借位顺序**：sde_wds_key / sde_wds_vendor，
+   本入口没存过就借品尝系列/ChatSDE 已存的规范键。反过来，这里保存也回写规范键，
+   于是「在哪儿填过一次，处处都有」。**Key 只在本机 localStorage，发问时随那一次请求走。** */
+var keyGate=false;
+var KEY_VDS=["ds","glm","kimi","qwen"];
+function wdsKeyGet(){try{
+  var k=(localStorage.getItem("sde_wds_key")||"").trim(),v=localStorage.getItem("sde_wds_vendor")||"ds";
+  if(k.length>=8&&KEY_VDS.indexOf(v)>=0)return{key:k,vendor:v};
+  for(var i=0;i<KEY_VDS.length;i++){var d=(localStorage.getItem("sde_"+KEY_VDS[i]+"_key")||"").trim();if(d.length>=8)return{key:d,vendor:KEY_VDS[i]};}
+  return null;}catch(e){return null;}}
+function wdsKeySave(k,v){try{
+  localStorage.setItem("sde_wds_key",k);localStorage.setItem("sde_wds_vendor",v);
+  localStorage.setItem("sde_"+v+"_key",k);return true;}catch(e){return false;}}
+/* 只有真的 @了它才把 Key 递上去——普通聊天一个字节都不多传。 */
+function byokFor(t){if(!/@\s*(sde|wds|王德生)/i.test(String(t||"")))return undefined;var kv=wdsKeyGet();return kv?{key:kv.key,vendor:kv.vendor}:undefined;}
+function keyOpen(){
+  var kv=wdsKeyGet()||{key:"",vendor:"ds"};
+  el("key-vd").value=kv.vendor;el("key-in").value=kv.key;
+  el("key-msg").textContent="";
+  el("key-ttl").textContent=keyGate?"🔑 先配一个基底 Key":"🔑 基底 Key";
+  el("key-save").textContent=keyGate?"保存并进入":"保存";
+  show("key");
+}
+var keyWired=false;
+function keyWire(){
+  if(keyWired)return;keyWired=true;
+  var b=el("b-key");if(b)b.onclick=function(){keyGate=false;keyOpen();};
+  el("key-save").onclick=function(){
+    var k=el("key-in").value.trim(),v=el("key-vd").value;
+    if(k.length<8){el("key-msg").style.color="#c33";el("key-msg").textContent="这个 Key 看起来太短了，请检查。";return;}
+    if(!wdsKeySave(k,v)){el("key-msg").style.color="#c33";el("key-msg").textContent="这台浏览器不让存本地数据（无痕模式？），换个窗口再试。";return;}
+    el("key-msg").style.color="var(--muted)";el("key-msg").textContent="已保存在这台机器上。";
+    if(keyGate){keyGate=false;show("home");homeLoad();}else{show("me");}
+  };
+  el("key-in").addEventListener("input",function(){el("key-msg").textContent="";});
+  el("key-vd").addEventListener("change",function(){el("key-msg").textContent="";});
+  keyProbeWire();
+}
+/* 检测：复用全站共享件 sde-keyprobe.js（判档口径全站一份，改一处四页都变）。
+   懒加载——大多数人不会点它，不该为它给每次进社区加一个请求。装不上不拦路。 */
+function keyProbeWire(){
+  var slot=el("key-probe-slot");if(!slot||slot.__on)return;slot.__on=1;
+  var s=document.createElement("script");s.src="/taste/assets/sde-keyprobe.js?v=20260817c";
+  s.onload=function(){try{
+    if(!window.SDEKeyProbe)return;
+    window.SDEKeyProbe.attach([{key:"key-in",sel:"key-vd"}],{
+      isOverseas:function(){return false;},
+      apiUrl:function(sel){return({ds:"https://api.deepseek.com/v1/chat/completions",
+        glm:"https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        kimi:"https://api.moonshot.cn/v1/chat/completions",
+        qwen:"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"})[sel];},
+      chatHeaders:function(sel,k){return{"content-type":"application/json","authorization":"Bearer "+k};},
+      buildPayload:function(sel,sys,usr,tok){return{model:({ds:"deepseek-v4-flash",glm:"glm-5-air",kimi:"kimi-k2.6",qwen:"qwen-plus"})[sel],
+        max_tokens:tok,stream:false,messages:[{role:"system",content:sys},{role:"user",content:usr}]};}
+    });
+  }catch(e){}};
+  s.onerror=function(){/* 检测装不上就没有那个钮，保存照常可用 */};
+  document.head.appendChild(s);
+}
+el("t-back").onclick=function(){
+  if(el("v-dtalk").classList.contains("on")){show("chats");loadInbox();return;}
+  if(el("v-mopost").classList.contains("on")||el("v-monews").classList.contains("on")){show("moments");return;}
+  if(el("v-moments").classList.contains("on")&&moWho){moGo("","");return;}
+  if(el("v-admin").classList.contains("on")){show("me");return;}
+  if(el("v-cdnew").classList.contains("on")||el("v-cdone").classList.contains("on")||el("v-cdnews").classList.contains("on")){show("cand");return;}
+  if(el("v-kb").classList.contains("on")){if(kbOpen){kbOpen=null;kbLoad();return;}show("me");return;}
+  if(el("v-key").classList.contains("on")){show("me");return;}
+  if(el("v-lib").classList.contains("on")){show(lbFrom||"me");return;}
+  if(el("v-vault").classList.contains("on")){show(vtFrom||"me");return;}
+  if(el("v-cand").classList.contains("on")&&cdWho){cdGo("","");return;}
+  if(el("v-fwd").classList.contains("on")){show(cur?"talk":"chats");return;}
+  if(el("v-ginfo").classList.contains("on")&&cur){show("talk");return;}
+  closeTalk();show("chats");loadInbox();
+};
+
+/* ── 登录 ── */
+try{var stg=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");if(stg&&stg.exp>Date.now())CRED=stg.cred;}catch(e){}
+window.__sdeWxCb=function(resp){
+  try{CRED=resp.credential;
+    var p=JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));
+    var nm=(p.name||(p.email||"").split("@")[0]||"").slice(0,20);
+    try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:CRED,name:nm,exp:Date.now()+50*60*1000}));}catch(e){}
+    afterLogin();
+  }catch(e){el("gsi").textContent="登录信息解析失败，请重试。";}
+};
+function bootGsi(){
+  if(!(window.google&&google.accounts&&google.accounts.id)){el("gsi").textContent="Google 登录组件加载失败，请检查网络后刷新。";return;}
+  google.accounts.id.initialize({client_id:GCID,callback:window.__sdeWxCb,auto_select:true});
+  google.accounts.id.renderButton(el("gsi"),{theme:"outline",size:"large",text:"signin_with",shape:"pill"});
+}
+function pwLogin(){
+  var nm=(el("pw-name").value||"").trim().slice(0,20), pw=(el("pw-code").value||"");
+  var m=el("pw-msg");
+  if(!nm){m.textContent="先起个名字。";return;}
+  if(!pw){m.textContent="请输入密码。";return;}
+  m.style.color="var(--muted)";m.textContent="正在进入…";
+  var c="sdepw1:"+pw+":"+nm;
+  var prev=CRED; CRED=c;
+  api("contacts").then(function(x){
+    if(x.s===401||!x.d||!x.d.ok){CRED=prev;m.style.color="#b3261e";m.textContent=(x.d&&x.d.msg)||"进不去，请检查名字和密码。";return;}
+    try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:c,name:nm,exp:Date.now()+12*60*60*1000}));}catch(e){}
+    el("pw-code").value="";m.textContent="";afterLogin();
+  }).catch(function(){CRED=prev;m.style.color="#b3261e";m.textContent="网络异常，请重试。";});
+}
+function logout(){CRED="";ME=null;ADPW="";try{sessionStorage.removeItem("sde_wx_adpw")}catch(e){}try{sessionStorage.removeItem("sde_gauth")}catch(e){}closeTalk();show("gate");}
+el("b-out").onclick=logout;
+el("pw-go").onclick=pwLogin;
+var rosterLoaded=false;
+function loadRoster(){
+  if(rosterLoaded)return; rosterLoaded=true;
+  fetch("/students/roster.json").then(function(r){return r.json()}).then(function(j){
+    var dl=el("pw-roster"),ns=(j&&j.students)||[];
+    dl.innerHTML=ns.map(function(x){return x&&x.name?'<option value="'+String(x.name).replace(/"/g,"&quot;")+'">':""}).join("");
+  }).catch(function(){});
+}
+el("pw-name").addEventListener("focus",loadRoster);
+el("pw-code").addEventListener("keydown",function(e){if(e.key==="Enter")pwLogin();});
+el("pw-name").addEventListener("keydown",function(e){if(e.key==="Enter")el("pw-code").focus();});
+function afterLogin(){
+  api("contacts").then(function(x){
+    if(x.s===401||!x.d||!x.d.ok){logout();return;}
+    ME=x.d.me;contacts=x.d.contacts||[];
+    el("me-nm").textContent=ME.name;el("me-uid").textContent="ID "+ME.uid;
+    keyWire();
+    // 门卡：没配 Key 就停在配置页，不进社区。@WDS 是这里的公共设施，而它烧的是各人自己的 Key。
+    if(!wdsKeyGet()){keyGate=true;keyOpen();loadInbox();loadGroups();return;}
+    show("home");homeLoad();loadInbox();loadGroups();moBadge();cdWire();cdBadge();whoWire();vtWire();lbWire();insWire();dtBadge();
+    if(inboxT)clearInterval(inboxT);
+    inboxT=setInterval(function(){loadInbox(true);moBadge();dtBadge();},15000);
+  }).catch(function(){el("gsi").textContent="网络异常，请稍后重试。"});
+}
+
+/* ── 聊天列表 ── */
+function setUnread(n){
+  unread=n||0;var b=el("tb-unread");
+  b.textContent=unread>99?"99+":String(unread);
+  b.classList.toggle("on",unread>0);
+  document.title=(unread>0?"("+unread+") ":"")+TITLE;
+}
+function loadInbox(quiet){
+  if(!CRED)return Promise.resolve();
+  return api("inbox").then(function(x){
+    if(!x.d||!x.d.ok)return;
+    var before={};chats.forEach(function(c){before[c.key]=c.unread||0});
+    chats=x.d.chats||[];setUnread(x.d.unread||0);
+    if(!cur)renderChats();
+    if(quiet&&notifyOn)chats.forEach(function(c){
+      if((c.unread||0)>(before[c.key]||0)&&(!cur||cur.key!==c.key)&&!isMute(c.key)){
+        try{new Notification((c.kind==="g"?"群 ":"")+c.name,{body:c.last||"",tag:"sde-wx-"+c.key});}catch(e){}
+      }
+    });
+  }).catch(function(){});
+}
+function renderChats(){
+  var L=el("chat-list");L.textContent="";
+  L.appendChild(dtRow());          // 「文章讨论」永远排在最上面
+  if(!chats.length){
+    var h=document.createElement("div");h.className="hint";
+    h.innerHTML="还没有会话。<br>去 <b>通讯录</b> 找人私聊，或建一个群。";
+    h.style.paddingTop="1.2rem";L.appendChild(h);return;
+  }
+  chats.slice().sort(function(a,b){return (isPin(b.key)?1:0)-(isPin(a.key)?1:0)}).forEach(function(c){
+    var last=c.last||"";
+    var r=rowFor({name:c.name,kind:c.kind,last:last,at:c.at,ts:c.lastTs,unread:(isMute(c.key)?0:c.unread),count:c.count,
+      onclick:function(){c.kind==="g"?openGroup(c.gid,c.name):openDm(c.peer,c.name)}});
+    if(isPin(c.key))r.style.background="var(--pin,#f6f7f9)";
+    var tools=document.createElement("div");
+    tools.style.cssText="display:flex;flex-direction:column;gap:2px;margin-left:6px;font-size:0.82rem;line-height:1";
+    tools.appendChild(mkTool(isPin(c.key)?"📌":"📍", isPin(c.key)?"取消置顶":"置顶", function(){togglePin(c.key)}));
+    tools.appendChild(mkTool(isMute(c.key)?"🔕":"🔔", isMute(c.key)?"取消免打扰":"免打扰", function(){toggleMute(c.key)}));
+    r.appendChild(tools);
+    L.appendChild(r);
+  });
+}
+function rowFor(o){
+  var r=document.createElement("div");r.className="row";r.onclick=o.onclick;
+  var a=document.createElement("div");a.className="av"+(o.kind==="g"?" g":"");a.textContent=o.kind==="g"?"群":initial(o.name);
+  if(o.unread>0){var b=document.createElement("span");b.className="badge";b.textContent=o.unread>99?"99+":String(o.unread);a.appendChild(b);}
+  var m=document.createElement("div");m.className="rmain";
+  var n=document.createElement("div");n.className="rname";n.textContent=o.name;
+  if(o.kind==="g"&&o.count){var cg=document.createElement("span");cg.className="chip g";cg.textContent=o.count+" 人";n.appendChild(cg);}
+  if(o.kind!=="g"&&roster[o.name]){var cs=document.createElement("span");cs.className="chip";cs.textContent="学员";n.appendChild(cs);}
+  m.appendChild(n);
+  if(o.last||o.at){
+    var l=document.createElement("div");l.className="rlast";
+    if(o.at){var s=document.createElement("span");s.className="at";s.textContent="[有人@你] ";l.appendChild(s);}
+    l.appendChild(document.createTextNode(o.last||""));m.appendChild(l);
+  }
+  r.appendChild(a);r.appendChild(m);
+  if(o.ts){var t=document.createElement("div");t.className="rtime";t.textContent=fmtT(o.ts);r.appendChild(t);}
+  return r;
+}
+
+/* ── 通讯录（我的群 + 人） ── */
+function loadBook(){
+  if(!CRED)return;
+  api("contacts").then(function(x){if(x.d&&x.d.ok){contacts=x.d.contacts||[];renderBook();}}).catch(function(){});
+  loadGroups();
+}
+function loadGroups(){
+  if(!CRED)return Promise.resolve();
+  return api("groups").then(function(x){if(x.d&&x.d.ok){groups=x.d.groups||[];renderBook();}}).catch(function(){});
+}
+function renderBook(){
+  var L=el("book-list"),q=(el("q").value||"").trim().toLowerCase();
+  L.textContent="";
+  var gs=groups.filter(function(g){return !q||String(g.name||"").toLowerCase().indexOf(q)>=0});
+  var ps=contacts.filter(function(c){return !q||String(c.name||"").toLowerCase().indexOf(q)>=0});
+  var s1=document.createElement("div");s1.className="sec";
+  s1.appendChild(document.createTextNode("我的群 · "+gs.length));
+  var nb=document.createElement("button");nb.id="gn-open";nb.textContent="＋ 建群";nb.onclick=openGnew;s1.appendChild(nb);
+  L.appendChild(s1);
+  if(!gs.length){var h0=document.createElement("div");h0.className="hint";h0.style.padding="1rem";h0.textContent=q?"没有匹配的群。":"还没有群——点右上「＋ 建群」。";L.appendChild(h0);}
+  gs.forEach(function(g){L.appendChild(rowFor({name:g.name,kind:"g",count:g.count,onclick:function(){openGroup(g.gid,g.name)}}))});
+  var s2=document.createElement("div");s2.className="sec";s2.appendChild(document.createTextNode("登录过本站的人 · "+ps.length));L.appendChild(s2);
+  if(!ps.length){var h=document.createElement("div");h.className="hint";h.style.padding="1rem";h.innerHTML=q?"没有匹配的名字。":"学员在本站用 Google 登录一次，就会出现在这里。";L.appendChild(h);}
+  ps.forEach(function(c){L.appendChild(rowFor({name:c.name,last:"最近活跃 "+fmtT(c.ts),onclick:function(){openDm(c.uid,c.name)}}))});
+}
+el("q").addEventListener("input",renderBook);
+
+/* ── 建群 ── */
+function openGnew(){
+  pickSel={};el("gn-name").value="";el("gn-msg").textContent="";
+  var P=el("gn-pick");P.textContent="";
+  if(!contacts.length){var h=document.createElement("div");h.className="hint";h.style.padding="1rem";h.textContent="通讯录里还没有别人——可以先建群，之后再拉人。";P.appendChild(h);}
+  contacts.forEach(function(c){P.appendChild(pickRow(c.uid,c.name))});
+  show("gnew");
+}
+function pickRow(uid,name){
+  var d=document.createElement("div");d.className="p";
+  var b=document.createElement("span");b.className="bx";b.textContent="✓";
+  var s=document.createElement("span");s.textContent=name;
+  d.appendChild(b);d.appendChild(s);
+  d.onclick=function(){if(pickSel[uid]){delete pickSel[uid];d.classList.remove("on");}else{pickSel[uid]=1;d.classList.add("on");}};
+  return d;
+}
+el("gn-cancel").onclick=function(){show("book")};
+el("gn-ok").onclick=function(){
+  var nm=el("gn-name").value.trim();
+  if(!nm){el("gn-msg").textContent="先给群起个名字。";return;}
+  var mem=Object.keys(pickSel);
+  el("gn-ok").disabled=true;el("gn-msg").textContent="";
+  api("gcreate",{name:nm,members:mem}).then(function(x){
+    el("gn-ok").disabled=false;
+    if(!x.d||!x.d.ok){el("gn-msg").textContent=(x.d&&x.d.msg)||"建群失败。";return;}
+    loadGroups();loadInbox();openGroup(x.d.gid,nm);
+  }).catch(function(){el("gn-ok").disabled=false;el("gn-msg").textContent="网络异常。"});
+};
+
+/* ── 打开会话 ── */
+function closeTalk(){
+  if(cur&&cur.key)draftSet(cur.key,(el("text").value||"").trim());
+  if(ws){try{ws.onclose=null;ws.close()}catch(e){}ws=null}
+  if(pollT){clearInterval(pollT);pollT=null}
+  connected=false;usePoll=false;tries=0;cur=null;lastId=0;seen={};nodes={};pendingNew=0;
+  replyTo=null;gMembers=[];gOwner=false;
+  el("msgs").textContent="";el("newpill").style.display="none";note("");
+  el("replybar").classList.remove("on");el("g-notice").classList.remove("on");
+  el("atpanel").classList.remove("on");el("epanel").classList.remove("on");
+  el("b-at").style.display="none";setStat("");
+}
+function openDm(peer,name){open_({kind:"dm",key:peer,peer:peer,name:name},{peer:peer})}
+function openGroup(gid,name){open_({kind:"g",key:"g"+gid,gid:gid,name:name},{gid:gid})}
+function open_(c,arg){
+  closeTalk();cur=c;
+  el("t-ttl").textContent=c.name;
+  show("talk");setStat("connecting");
+  el("b-at").style.display=(c.kind==="g")?"block":"none";
+  api("open",arg).then(function(x){
+    if(!x.d||!x.d.ok||!x.d.room){note((x.d&&x.d.msg)||"打不开这个会话。");return;}
+    cur.room=x.d.room;
+    if(c.kind==="g"){cur.count=x.d.count||0;gOwner=!!x.d.owner;setNotice(x.d.notice);setStat("connecting");}
+    connect();
+    var dr=draftGet(c.key);
+    if(dr){var ta=el("text");ta.value=dr;ta.style.height="40px";ta.style.height=Math.min(ta.scrollHeight,110)+"px";}
+    api("read",{peer:c.key}).then(function(){loadInbox()});
+  }).catch(function(){note("网络异常。")});
+}
+function setNotice(s){
+  var n=el("g-notice");n.textContent="";
+  if(!s){n.classList.remove("on");return;}
+  var b=document.createElement("b");b.textContent="群公告　";
+  n.appendChild(b);n.appendChild(document.createTextNode(s));n.classList.add("on");
+}
+el("t-ttlwrap").onclick=function(){if(cur&&cur.kind==="g"&&el("v-talk").classList.contains("on"))openGinfo()};
+el("t-act").onclick=function(){if(cur&&cur.kind==="g")openGinfo()};
+
+/* ── 群资料 ── */
+function openGinfo(){
+  if(!cur||cur.kind!=="g")return;
+  el("gi-msg").textContent="";el("gi-pick").style.display="none";el("gi-addwrap").style.display="none";
+  api("ginfo",{gid:cur.gid}).then(function(x){
+    if(!x.d||!x.d.ok){el("gi-msg").textContent=(x.d&&x.d.msg)||"读不到群资料。";show("ginfo");return;}
+    var g=x.d.group;gMembers=x.d.members||[];gOwner=(g.owner===ME.uid);
+    cur.count=gMembers.length;
+    el("gi-name").textContent=g.name;
+    el("gi-count").textContent=gMembers.length+" 位成员"+(gOwner?"　·　你是群主":"");
+    el("gi-notice").value=g.notice||"";
+    el("gi-notice").readOnly=!gOwner;
+    el("gi-save").style.display=gOwner?"inline-block":"none";
+    el("gi-owner-hint").textContent=gOwner?"（你可以改）":"（只有群主能改）";
+    el("gi-add").style.display="inline-block";
+    var M=el("gi-members");M.textContent="";
+    gMembers.forEach(function(m){
+      var r=document.createElement("div");r.className="row";r.style.cursor="default";
+      var a=document.createElement("div");a.className="av"+(m.uid===ME.uid?" me":"");a.textContent=initial(m.name);
+      var mm=document.createElement("div");mm.className="rmain";
+      var n=document.createElement("div");n.className="rname";n.textContent=m.name;
+      if(m.owner){var c=document.createElement("span");c.className="chip g";c.textContent="群主";n.appendChild(c);}
+      if(m.uid===ME.uid){var c2=document.createElement("span");c2.className="chip";c2.textContent="我";n.appendChild(c2);}
+      mm.appendChild(n);r.appendChild(a);r.appendChild(mm);
+      if(gOwner&&m.uid!==ME.uid){
+        var kb=document.createElement("button");kb.className="act";kb.textContent="移出";
+        kb.onclick=function(ev){ev.stopPropagation();
+          if(!confirm("把「"+m.name+"」移出本群？"))return;
+          api("gkick",{gid:cur.gid,target:m.uid}).then(function(y){
+            if(y.d&&y.d.ok)openGinfo();else el("gi-msg").textContent=(y.d&&y.d.msg)||"移出失败。";
+          });};
+        r.appendChild(kb);
+      }else if(m.uid!==ME.uid){
+        var db=document.createElement("button");db.className="act";db.textContent="私聊";
+        db.onclick=function(ev){ev.stopPropagation();openDm(m.uid,m.name)};
+        r.appendChild(db);
+      }
+      M.appendChild(r);
+    });
+    show("ginfo");
+  }).catch(function(){el("gi-msg").textContent="网络异常。";show("ginfo")});
+}
+el("gi-save").onclick=function(){
+  el("gi-save").disabled=true;
+  api("gnotice",{gid:cur.gid,notice:el("gi-notice").value}).then(function(x){
+    el("gi-save").disabled=false;
+    if(x.d&&x.d.ok){el("gi-msg").style.color="var(--grp)";el("gi-msg").textContent="公告已更新。";setNotice(el("gi-notice").value.trim());}
+    else{el("gi-msg").style.color="var(--red)";el("gi-msg").textContent=(x.d&&x.d.msg)||"保存失败。";}
+  }).catch(function(){el("gi-save").disabled=false;el("gi-msg").textContent="网络异常。"});
+};
+el("gi-add").onclick=function(){
+  pickSel={};var P=el("gi-pick");P.textContent="";
+  var inG={};gMembers.forEach(function(m){inG[m.uid]=1});
+  var cand=contacts.filter(function(c){return !inG[c.uid]});
+  if(!cand.length){var h=document.createElement("div");h.className="hint";h.style.padding="0.9rem";h.textContent="通讯录里的人都已经在群里了。";P.appendChild(h);}
+  cand.forEach(function(c){P.appendChild(pickRow(c.uid,c.name))});
+  P.style.display="block";el("gi-addwrap").style.display="block";
+};
+el("gi-addcancel").onclick=function(){el("gi-pick").style.display="none";el("gi-addwrap").style.display="none"};
+el("gi-addok").onclick=function(){
+  var add=Object.keys(pickSel);
+  if(!add.length){el("gi-msg").textContent="先选人。";return;}
+  el("gi-addok").disabled=true;
+  api("gadd",{gid:cur.gid,add:add}).then(function(x){
+    el("gi-addok").disabled=false;
+    if(x.d&&x.d.ok){openGinfo();loadGroups();}else{el("gi-msg").style.color="var(--red)";el("gi-msg").textContent=(x.d&&x.d.msg)||"拉人失败。";}
+  }).catch(function(){el("gi-addok").disabled=false;el("gi-msg").textContent="网络异常。"});
+};
+el("gi-leave").onclick=function(){
+  if(!confirm("退出「"+cur.name+"」？退出后就看不到群里的消息了。"))return;
+  api("gleave",{gid:cur.gid}).then(function(){closeTalk();loadGroups();loadInbox();show("chats")});
+};
+
+/* ── 连接 ── */
+function wsSend(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+function connect(){
+  if(!cur||!cur.room||usePoll)return;
+  var url=(location.protocol==="https:"?"wss://":"ws://")+location.host+"/api/chat?room="+encodeURIComponent(cur.room);
+  try{ws=new WebSocket(url);}catch(e){reconnect();return;}
+  ws.onopen=function(){connected=true;tries=0;setStat("online");wsSend({t:"auth",cred:CRED});};
+  ws.onmessage=function(ev){
+    var d;try{d=JSON.parse(ev.data)}catch(e){return}
+    if(d.t==="needauth"){wsSend({t:"auth",cred:CRED});}
+    else if(d.t==="meta"){if(cur){cur.name=d.name||cur.name;cur.count=d.count||cur.count;gOwner=!!d.owner;el("t-ttl").textContent=cur.name;setNotice(d.notice);setStat("online");}}
+    else if(d.t==="history"){(d.items||[]).forEach(addMsg);toBottom();}
+    else if(d.t==="msg"){addMsg(d);if(cur)api("read",{peer:cur.key});}
+    else if(d.t==="authed"){note("");}
+    else if(d.t==="recall"){onRecall(d.id)}
+    else if(d.t==="typing"){showTyping()}
+    else if(d.t==="err"){
+      if(d.m==="no-access"){note("你不在这个会话里。");}
+      else if(d.m==="login"){note("登录已过期，请重新登录。");logout();}
+      else note(d.m||"发送失败。");
+    }
+  };
+  ws.onclose=function(){connected=false;if(usePoll||!cur)return;setStat("offline");reconnect();};
+  ws.onerror=function(){try{ws.close()}catch(e){}};
+}
+function reconnect(){tries++;if(tries>=5){startPoll();return;}setTimeout(function(){if(cur)connect()},Math.min(1000*tries,5000));}
+function startPoll(){
+  if(usePoll||!cur)return;usePoll=true;setStat("online");el("t-stat").textContent="已连接（兼容模式）";
+  function tick(){
+    if(!cur)return;
+    fetch("/api/chat?room="+encodeURIComponent(cur.room),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:CRED,op:"poll",since:lastId})})
+    .then(function(r){return r.json()}).then(function(d){
+      if(!d)return;
+      if(d.items)d.items.forEach(addMsg);
+      if(d.recalls)d.recalls.forEach(onRecall);
+    }).catch(function(){});
+  }
+  tick();pollT=setInterval(tick,3000);
+}
+
+/* ── 消息 ── */
+function nearBottom(){var s=el("msgs");return s.scrollHeight-s.scrollTop-s.clientHeight<60}
+function toBottom(){var s=el("msgs");s.scrollTop=s.scrollHeight;pendingNew=0;el("newpill").style.display="none";}
+el("newpill").onclick=toBottom;
+el("msgs").addEventListener("scroll",function(){if(nearBottom()){pendingNew=0;el("newpill").style.display="none";}});
+function renderRecalled(b){b.textContent="[消息已撤回]";b.className="bub recalled";}
+function addMsg(m){
+  if(m.id&&seen[m.id])return; if(m.id){seen[m.id]=1;if(m.id>lastId)lastId=m.id;}
+  var mine=!!(ME&&m.name===ME.name),bot=(m.bot||m.name==="WDS智能体");
+  if(bot)hideTyping();
+  var wasNear=nearBottom();
+  var w=document.createElement("div");w.className="msg"+(bot?" bot":(mine?" mine":""));
+  var who=document.createElement("div");who.className="who";who.textContent=(bot?"🤖 ":"")+m.name;
+  var b=document.createElement("div");b.className="bub";
+  var tm=document.createElement("div");tm.className="tm";tm.textContent=fmtT(m.ts);
+  w.appendChild(who);w.appendChild(b);w.appendChild(tm);
+  if(m.recalled){renderRecalled(b);}
+  else{
+    if(m.re){var q=document.createElement("span");q.className="q";q.textContent=m.re.name+"："+m.re.text;b.appendChild(q);}
+    var body=m.img?"[图片]":String(m.text||"");
+    b.appendChild(document.createTextNode(body));
+    var rp=document.createElement("a");rp.textContent="回复";
+    rp.onclick=function(){setReply(m.id,m.name,body)};
+    tm.appendChild(rp);
+    var fw=document.createElement("a");fw.textContent="转发";
+    fw.onclick=function(){openFwd(m.name+"："+body)};
+    tm.appendChild(fw);
+    if(mine&&!bot){
+      var age=Date.now()-m.ts;
+      if(age<120000){
+        var rc=document.createElement("a");rc.textContent="撤回";
+        rc.onclick=function(){doRecall(m.id)};
+        tm.appendChild(rc);
+        setTimeout(function(){if(rc.parentNode)rc.parentNode.removeChild(rc)},120000-age);
+      }
+    }
+  }
+  if(m.id)nodes[m.id]=b;
+  el("msgs").appendChild(w);
+  if(wasNear||mine)toBottom();
+  else{pendingNew++;var p=el("newpill");p.textContent="有 "+pendingNew+" 条新消息 ↓";p.style.display="block";}
+}
+function onRecall(id){var b=nodes[id];if(b&&!/recalled/.test(b.className))renderRecalled(b);}
+function doRecall(id){
+  if(usePoll){
+    fetch("/api/chat?room="+encodeURIComponent(cur.room),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:CRED,op:"recall",id:id})})
+    .then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)note((d&&d.msg)||"撤回失败。")}).catch(function(){note("网络异常。")});
+  }else{
+    if(!(ws&&connected)){note("正在重连，请稍候…");return;}
+    wsSend({t:"recall",id:id});
+  }
+}
+function setReply(id,name,text){
+  replyTo={id:id,name:name,text:String(text||"").slice(0,60)};
+  el("reply-txt").textContent="回复 "+name+"："+replyTo.text;
+  el("replybar").classList.add("on");el("text").focus();
+}
+el("reply-x").onclick=function(){replyTo=null;el("replybar").classList.remove("on")};
+function doSend(){
+  var t=el("text").value.trim();
+  if(t.length<1||!cur||!cur.room)return;
+  var re=replyTo?replyTo.id:undefined;
+  if(usePoll){
+    el("b-send").disabled=true;
+    fetch("/api/chat?room="+encodeURIComponent(cur.room),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:CRED,text:t,re:re,byok:byokFor(t)})})
+    .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})}).then(function(x){
+      el("b-send").disabled=false;
+      if(x.d&&x.d.ok){clearInput();}
+      else if(x.s===401){note("登录已过期，请重新登录。");logout();}
+      else note((x.d&&x.d.msg)||"发送失败。");
+    }).catch(function(){el("b-send").disabled=false;note("网络异常。")});
+  }else{
+    if(!(ws&&connected)){note("正在重连，请稍候…");return;}
+    wsSend({t:"msg",text:t,re:re,byok:byokFor(t)});clearInput();
+  }
+}
+function clearInput(){if(cur&&cur.key)draftSet(cur.key,"");el("text").value="";note("");el("text").style.height="40px";replyTo=null;el("replybar").classList.remove("on");}
+el("b-send").onclick=doSend;
+el("text").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();doSend();}});
+el("text").addEventListener("input",function(){this.style.height="40px";this.style.height=Math.min(this.scrollHeight,110)+"px";});
+el("b-wds").onclick=function(){var t=el("text");if(!/^@\s*wds/i.test(t.value))t.value="@WDS "+t.value;t.focus();};
+function insert(s){var t=el("text"),a=t.selectionStart||0,b=t.selectionEnd||0,v=t.value;
+  t.value=v.slice(0,a)+s+v.slice(b);t.selectionStart=t.selectionEnd=a+s.length;t.focus();}
+
+/* 表情（表情是文字，故保留） */
+(function(){
+  var EMOJI="😀 😃 😄 😁 😆 😊 🙂 😉 😍 🥰 😘 😜 🤪 🤔 🤨 😐 😴 😷 😎 🥳 🤗 🙄 😮 😲 😳 😭 😢 😱 😡 🥲 👍 👎 👏 🙏 💪 🤝 👌 ✌️ 🙌 🎉 🔥 💯 ❤️ 💔 ⭐ ✅ ❌ 🌹 ☕ 🍵 🎂 👀".split(" ");
+  var panel=el("epanel"),btn=el("b-emoji");
+  EMOJI.forEach(function(e){var s=document.createElement("span");s.textContent=e;s.onclick=function(){insert(e)};panel.appendChild(s)});
+  btn.onclick=function(ev){ev.stopPropagation();el("atpanel").classList.remove("on");panel.classList.toggle("on")};
+  document.addEventListener("click",function(ev){if(panel.classList.contains("on")&&ev.target!==btn&&!panel.contains(ev.target))panel.classList.remove("on")});
+})();
+
+/* @提及：列出群成员 */
+el("b-at").onclick=function(ev){
+  ev.stopPropagation();
+  var P=el("atpanel");el("epanel").classList.remove("on");
+  if(P.classList.contains("on")){P.classList.remove("on");return;}
+  P.textContent="";
+  var all=document.createElement("span");all.textContent="@所有人";all.onclick=function(){insert("@所有人 ");P.classList.remove("on")};
+  P.appendChild(all);
+  function add(list){list.forEach(function(m){
+    if(ME&&m.uid===ME.uid)return;
+    var s=document.createElement("span");s.textContent="@"+m.name;
+    s.onclick=function(){insert("@"+m.name+" ");P.classList.remove("on")};
+    P.appendChild(s);
+  })}
+  if(gMembers.length){add(gMembers);P.classList.add("on");}
+  else api("ginfo",{gid:cur.gid}).then(function(x){
+    if(x.d&&x.d.ok){gMembers=x.d.members||[];add(gMembers);}
+    P.classList.add("on");
+  }).catch(function(){P.classList.add("on")});
+};
+document.addEventListener("click",function(ev){var P=el("atpanel");if(P.classList.contains("on")&&ev.target!==el("b-at")&&!P.contains(ev.target))P.classList.remove("on")});
+
+/* WDS 思考中 */
+var typingEl=null;
+function showTyping(){if(!typingEl){typingEl=document.createElement("div");typingEl.className="typing";typingEl.textContent="🤖 WDS智能体 正在思考…";}var n=nearBottom();el("msgs").appendChild(typingEl);if(n)toBottom();}
+function hideTyping(){if(typingEl&&typingEl.parentNode)typingEl.parentNode.removeChild(typingEl);}
+
+/* 桌面提醒 */
+el("b-notify").onclick=function(){
+  var b=el("b-notify");
+  if(!("Notification" in window)){b.textContent="不支持";return;}
+  Notification.requestPermission().then(function(p){notifyOn=(p==="granted");b.textContent=notifyOn?"已开启":"被拒绝";});
+};
+if("Notification" in window&&Notification.permission==="granted"){notifyOn=true;el("b-notify").textContent="已开启";}
+
+/* 学员名录：给通讯录打「学员」标 */
+fetch("/students/roster.json").then(function(r){return r.json()}).then(function(d){
+  (d&&d.students||[]).forEach(function(s){if(s&&s.name)roster[s.name]=s.slug});
+  if(ME){renderBook();if(!cur)renderChats();}
+}).catch(function(){});
+
+/* ══════ 第一档：本地偏好（置顶/免打扰/草稿）· 会话内搜索 · 转发 ══════ */
+var PREF={};
+try{PREF=JSON.parse(localStorage.getItem("sde_wx_pref")||"{}")}catch(e){PREF={}}
+function prefSave(){try{localStorage.setItem("sde_wx_pref",JSON.stringify(PREF))}catch(e){}}
+function isPin(k){return !!(k&&PREF.pin&&PREF.pin[k])}
+function isMute(k){return !!(k&&PREF.mute&&PREF.mute[k])}
+function togglePin(k){PREF.pin=PREF.pin||{};if(PREF.pin[k])delete PREF.pin[k];else PREF.pin[k]=1;prefSave();renderChats();}
+function toggleMute(k){PREF.mute=PREF.mute||{};if(PREF.mute[k])delete PREF.mute[k];else PREF.mute[k]=1;prefSave();renderChats();}
+function draftGet(k){return (k&&PREF.draft&&PREF.draft[k])||""}
+function draftSet(k,v){if(!k)return;PREF.draft=PREF.draft||{};if(v)PREF.draft[k]=v;else delete PREF.draft[k];prefSave();}
+function mkTool(txt,title,fn){
+  var b=document.createElement("span");b.textContent=txt;b.title=title;
+  b.style.cssText="cursor:pointer;padding:1px 3px;opacity:.75";
+  b.onclick=function(ev){ev.stopPropagation();fn();};
+  return b;
+}
+
+/* ── 会话内搜索：不改气泡内容，只描边＋跳转（避免破坏引用块与链接） ── */
+var msHits=[],msAt=-1;
+function msClear(){msHits.forEach(function(b){b.style.boxShadow="";b.style.outline="";});msHits=[];msAt=-1;el("ms-n").textContent="";}
+function msRun(){
+  msClear();
+  var q=(el("ms-q").value||"").trim().toLowerCase();
+  if(!q){return;}
+  var bubs=el("msgs").querySelectorAll(".bub");
+  for(var i=0;i<bubs.length;i++){
+    if((bubs[i].textContent||"").toLowerCase().indexOf(q)>=0){
+      bubs[i].style.outline="2px solid #f0a020";msHits.push(bubs[i]);
+    }
+  }
+  el("ms-n").textContent=msHits.length?("1/"+msHits.length):"无结果";
+  if(msHits.length){msAt=0;msGo(0);}
+}
+function msGo(i){
+  if(!msHits.length)return;
+  msAt=(i+msHits.length)%msHits.length;
+  msHits.forEach(function(b){b.style.boxShadow=""});
+  var b=msHits[msAt];b.style.boxShadow="0 0 0 3px rgba(240,160,32,.35)";
+  try{b.scrollIntoView({block:"center",behavior:"smooth"})}catch(e){b.scrollIntoView()}
+  el("ms-n").textContent=(msAt+1)+"/"+msHits.length;
+}
+el("b-find").onclick=function(){
+  var box=el("msgsearch");
+  if(box.style.display==="flex"){box.style.display="none";msClear();}
+  else{box.style.display="flex";el("ms-q").focus();}
+};
+el("ms-x").onclick=function(){el("msgsearch").style.display="none";msClear();};
+el("ms-q").addEventListener("input",msRun);
+el("ms-q").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();msGo(msAt+(e.shiftKey?-1:1));}});
+el("ms-prev").onclick=function(){msGo(msAt-1)};
+el("ms-next").onclick=function(){msGo(msAt+1)};
+
+/* ── 转发：选一个会话/群/人，把这条消息原样发过去 ── */
+var fwdText="";
+function openFwd(t){
+  fwdText=String(t||"").slice(0,480);
+  el("fw-q").value="";renderFwd();show("fwd");
+}
+function fwdTargets(){
+  var out=[],seenK={};
+  chats.forEach(function(c){ if(!seenK[c.key]){seenK[c.key]=1;
+    out.push({name:c.name,kind:c.kind,arg:(c.kind==="g"?{gid:c.gid}:{peer:c.peer})}); } });
+  groups.forEach(function(g){ var k="g"+g.gid; if(!seenK[k]){seenK[k]=1;
+    out.push({name:g.name,kind:"g",arg:{gid:g.gid}}); } });
+  contacts.forEach(function(p){ if(p.uid!==(ME&&ME.uid)&&!seenK[p.uid]){seenK[p.uid]=1;
+    out.push({name:p.name,kind:"dm",arg:{peer:p.uid}}); } });
+  return out;
+}
+function renderFwd(){
+  var L=el("fw-list");L.textContent="";
+  var q=(el("fw-q").value||"").trim().toLowerCase();
+  var list=fwdTargets().filter(function(t){return !q||t.name.toLowerCase().indexOf(q)>=0});
+  if(!list.length){var h=document.createElement("div");h.className="hint";h.textContent="没有可转发的对象。";L.appendChild(h);return;}
+  list.forEach(function(t){
+    L.appendChild(rowFor({name:t.name,kind:t.kind,onclick:function(){doFwd(t)}}));
+  });
+}
+function doFwd(t){
+  var body=fwdText;if(!body)return;
+  el("fw-list").textContent="";
+  var h=document.createElement("div");h.className="hint";h.textContent="正在转发…";el("fw-list").appendChild(h);
+  api("open",t.arg).then(function(x){
+    if(!x.d||!x.d.ok||!x.d.room){h.textContent=(x.d&&x.d.msg)||"打不开这个会话。";return;}
+    return fetch("/api/chat?room="+encodeURIComponent(x.d.room),{method:"POST",headers:{"content-type":"application/json"},
+      body:JSON.stringify({credential:CRED,text:"【转发】"+body})})
+      .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+      .then(function(y){
+        if(y.d&&y.d.ok){show(cur?"talk":"chats");note("已转发给 "+t.name);loadInbox();}
+        else h.textContent=(y.d&&y.d.msg)||"转发失败。";
+      });
+  }).catch(function(){h.textContent="网络异常，请重试。"});
+}
+el("fw-q").addEventListener("input",renderFwd);
+
+/* ── 文章讨论：把 1407 个讨论区汇到一处 ── */
+var dtN=0,dtFresh=0,dtLast=null,dtPosts=[],dtNext="",dtMore=false,dtLoading=false;
+
+function dtRow(){
+  var r=document.createElement("div");r.className="row dt-row";
+  r.onclick=dtOpen;
+  var a=document.createElement("div");a.className="av";a.textContent="📄";
+  if(dtN>0){var b=document.createElement("span");b.className="badge";b.textContent=dtN>99?"99+":String(dtN);a.appendChild(b);}
+  var m=document.createElement("div");m.className="rmain";
+  var n=document.createElement("div");n.className="rname";n.textContent="文章讨论";
+  if(dtFresh&&!dtN){var c=document.createElement("span");c.className="chip";c.textContent="有新";n.appendChild(c);}
+  m.appendChild(n);
+  var l=document.createElement("div");l.className="rlast";
+  l.textContent=dtLast?((dtLast.name||"有人")+"：" + (dtLast.text||"")):"全站文章底下的讨论都汇到这里";
+  m.appendChild(l);
+  r.appendChild(a);r.appendChild(m);
+  if(dtLast&&dtLast.ts){var t=document.createElement("div");t.className="rtime";t.textContent=fmtT(dtLast.ts);r.appendChild(t);}
+  return r;
+}
+function dtOpen(){
+  dtPosts=[];dtNext="";dtMore=false;
+  show("dtalk");
+  el("dt-list").innerHTML='<div class="hint">正在加载…</div>';
+  // 先把「谁回了我」取走（取一次即清零），再拉全站最新讨论
+  api("dt",{a:"news"}).then(function(x){
+    var news=(x.d&&x.d.news)||[];
+    dtN=0;
+    return api("dt",{a:"feed",limit:25}).then(function(y){
+      if(y.d&&y.d.ok){dtPosts=y.d.posts||[];dtNext=y.d.next||"";dtMore=!!y.d.more;dtFresh=0;}
+      dtRender(news);
+      renderChats();
+    });
+  }).catch(function(){el("dt-list").innerHTML='<div class="hint">加载失败，稍后重试。</div>'});
+}
+function dtWhy(k){
+  if(k==="mine")return "在你的文章下";
+  if(k==="reply")return "回复了你";
+  return "也在这一帖里";
+}
+function dtCard(p,why){
+  var d=document.createElement("div");d.className="dt"+(why?" new":"");
+  var hh=document.createElement("div");hh.className="h";
+  var b=document.createElement("b");b.textContent=p.name||"有人";
+  hh.appendChild(b);
+  hh.appendChild(document.createTextNode(why?("　"+dtWhy(why)):(p.reply?"　回复了一条":"　发言")));
+  d.appendChild(hh);
+  var t=document.createElement("div");t.className="t";t.textContent=p.text||"";d.appendChild(t);
+  var w=document.createElement("div");w.className="w";
+  var em=document.createElement("em");em.textContent=p.title||p.slug;
+  w.appendChild(document.createTextNode("《"));w.appendChild(em);
+  w.appendChild(document.createTextNode("》 · "+fmtT(p.ts)+" · 点开去看 →"));
+  d.appendChild(w);
+  d.onclick=function(){window.open("/"+p.slug+"/#sde-talk","_blank","noopener")};
+  return d;
+}
+function dtRender(news){
+  var L=el("dt-list");L.textContent="";
+  if(news&&news.length){
+    var s=document.createElement("div");s.className="sec";
+    s.appendChild(document.createTextNode("与你有关 · "+news.length));
+    L.appendChild(s);
+    news.forEach(function(n){L.appendChild(dtCard(n,n.k||"join"))});
+  }
+  var s2=document.createElement("div");s2.className="sec";
+  s2.appendChild(document.createTextNode("全站最新讨论"));
+  L.appendChild(s2);
+  if(!dtPosts.length){
+    var e=document.createElement("div");e.className="hint";
+    e.innerHTML="还没有人在文章底下说话。<br>随便打开一篇文章，滚到底，就能发言。";
+    L.appendChild(e);return;
+  }
+  dtPosts.forEach(function(p){L.appendChild(dtCard(p,""))});
+  if(dtMore){
+    var m=document.createElement("div");m.className="mo-more";m.textContent="加载更多 ↓";
+    m.onclick=function(){
+      if(dtLoading)return;dtLoading=true;m.textContent="正在加载…";
+      api("dt",{a:"feed",after:dtNext,limit:25}).then(function(y){
+        dtLoading=false;
+        if(!y.d||!y.d.ok){m.textContent="加载失败";return;}
+        dtPosts=dtPosts.concat(y.d.posts||[]);dtNext=y.d.next||"";dtMore=!!y.d.more;
+        dtRender(null);
+      }).catch(function(){dtLoading=false;m.textContent="网络异常"});
+    };
+    L.appendChild(m);
+  }
+}
+function dtBadge(){
+  if(!CRED)return;
+  api("dt",{a:"badge"}).then(function(x){
+    if(!x.d||!x.d.ok)return;
+    var was=dtN+"|"+dtFresh+"|"+((dtLast&&dtLast.ts)||0);
+    dtN=x.d.n||0;dtFresh=x.d.fresh||0;dtLast=x.d.last||null;
+    if(was!==dtN+"|"+dtFresh+"|"+((dtLast&&dtLast.ts)||0)&&el("v-chats").classList.contains("on")&&!cur)renderChats();
+  }).catch(function(){});
+}
+
+/* ── 社区动态 ── */
+var moPosts=[],moNext="",moMore=false,moWho="",moWhoName="",moLoading=false,moPick=[],moBadgeN=0,moFresh=0;
+
+function mkEl(tag,cls,txt){var d=document.createElement(tag);if(cls)d.className=cls;if(txt!=null)d.textContent=txt;return d}
+function moFmt(ts){var d=new Date(ts),n=Date.now()-ts;
+  if(n<60000)return "刚刚";
+  if(n<3600000)return Math.floor(n/60000)+" 分钟前";
+  if(n<86400000)return Math.floor(n/3600000)+" 小时前";
+  if(n<2592000000)return Math.floor(n/86400000)+" 天前";
+  return (d.getMonth()+1)+"月"+d.getDate()+"日";}
+
+/* ═══ 候选卡与顶回 ═══
+   设计判据（改之前先读）：
+   ① Feed 没有终点，所以只能靠不断刺激维持；发生是有终点的——一张卡出生→被顶回→或死或活→结算。
+      所以这里是**一条有终点的链**，不是流。
+   ② **顶回不是点赞**，只有三种：占位者／反向预测／换承重层级。顶回记录就是分离线的原料。
+   ③ 落卡前先查近邻库（/assets/sde-nbr.js，零调用不烧 Key）。**库未命中 ≠ 未被占位**——
+      这句不是谨慎，是实测：评测集 35 条真候选里有 4 条与正主一个词都不共享。
+   ④ 共享密码 ⇒ 作者不可验证，所以这里**没有声望分、没有排行榜**；「活下来」只是一个状态。 */
+var cdWho="",cdWhoName="",cdCards=[],cdRoster=null,cdRosterRaw=null;
+var CD_STATE={open:["顶回期",""],untouched:["未交手","#8a8a8a"],dead:["死格","#b3261e"],alive:["已交手","#1a7f5a"]};
+var CD_KIND={occ:"占位者",rev:"反向预测",lvl:"换承重层级"};
+
+function whoWire(){ var b = el("b-who"); if (b) b.onclick = whoMe; }
+function cdWire(){
+  var b=el("t-cdnew");
+  if(b)b.onclick=function(){
+    el("cd-prop").value="";el("cd-face").value="";el("cd-crit").value="";
+    el("cd-nbr").textContent="";el("cd-nbr").removeAttribute("data-nbr");
+    el("cd-msg").textContent="";show("cdnew");cdPickWho();
+  };
+  var pr=el("cd-prop");
+  if(pr)pr.oninput=function(){clearTimeout(cdNbrTimer);cdNbrTimer=setTimeout(cdNbrCheck,700);};
+  var ca=el("cd-cancel");if(ca)ca.onclick=function(){show("cand");};
+  var okb=el("cd-ok");
+  if(okb)okb.onclick=function(){
+    var prop=(el("cd-prop").value||"").trim(),face=(el("cd-face").value||"").trim(),crit=(el("cd-crit").value||"").trim();
+    var msg=el("cd-msg");
+    if(prop.length<8){msg.textContent="承重命题太短——先把它压成一句能被反对的话。";return;}
+    if(!face){msg.textContent="「它切开的辨别面」不能空：说不出切了哪一刀，这张卡没法被顶回。";return;}
+    if(!crit){msg.textContent="「可裁决判据」不能空：没有判据，别人只能表态，不能顶回。";return;}
+    var nbrRaw=el("cd-nbr").getAttribute("data-nbr"),nbr=null;
+    try{nbr=nbrRaw?JSON.parse(nbrRaw):null;}catch(e){}
+    var pk=(el("cd-picks").getAttribute("data-picks")||"").split(",").filter(Boolean);
+    okb.disabled=true;msg.textContent="正在落卡…";
+    cdApi("post",{prop:prop,face:face,crit:crit,nbr:nbr,picks:pk}).then(function(d){
+      okb.disabled=false;
+      if(!d||!d.ok){msg.textContent=(d&&d.msg)||"落卡失败。";return;}
+      cdGo("","");
+    }).catch(function(){okb.disabled=false;msg.textContent="落卡失败，请重试。";});
+  };
+}
+function cdBadge(){
+  cdApi("badge",{}).then(function(d){
+    var t=el("tb-cd");if(!t)return;
+    var n=(d&&d.n)||0;t.textContent=n?String(n):"";t.style.display=n?"inline-block":"none";
+  }).catch(function(){});
+}
+/* ═══ 思想库存 ═══
+   用户定的：「对话产生的很多新思想，要能自动进入微信的某个库存……可以自动点击那个库存去发现。
+   这样对话产生的新思想和朋友圈可以共用，或者微信整个共用。」
+   **两个门槛，一条通路**：库存低门槛（一句话就存）先接住对话里冒出来的东西，
+   够硬的再一键升格成候选卡（三段硬门）。库存是全站共用的一池——
+   对话侧存进来、社区动态「说点什么」从里面取、候选卡从里面升格。 */
+var vtFrom="", vtMode="new", vtPick=null;
+var VT_KIND={line:"金句",name:"命名",claim:"命题",note:"观察"};
+function vtApi(a,extra){return api("vt",Object.assign({a:a},extra||{})).then(unwrap);}
+
+/* ===== 文章库 =====
+   存的是**指针不是副本**：站上 840 篇已有规范索引，这里只记 slug/title。
+   三路来源，奖励方向是分开的：
+     · 我收的  —— 私人书签，只按时间排，不计数、不公开、不做热度。
+                  热度榜是回声室，与「新思想发生」这条最高判据相反（同点赞被删掉的理由）。
+     · 推荐位  —— 要进公共库得另按一次「推给大家」，且必须附一句它切开了什么。
+                  同「转发必须附一条自己的分离线」：门槛高，但每一条都带信息。
+     · 发现    —— 不由人放，由前端从 publications.json 现算「离你最远」：
+                  优先给你**没收过的领域**。零后端零调用，永远有货且永远是陌生的。 */
+var lbFrom="me", lbMode="pub", lbPick=null, lbPubs=null, lbMineCache=[];
+/* ══ 个人知识库 ══════════════════════════════════════════
+   装的是**本人产出的成品文档**（画布上那些）。与另外两个库分工别混：
+     💡 思想库存＝一句话（200 字上限，全站共用一池）
+     📚 文章库＝站上已有篇目的指针（只存 slug＋题名）
+     📦 知识库＝文档本身，**私人**——键里带 uid，别人查不到也删不掉。
+   ⚠ 信封只拆一次：`.then(unwrap)` 之后各调用点直接读 `d.ok`。
+     （候选/库存/文章库三个 tab 全部"加载失败"那次，根因就是拆了两次。） */
+var kbOpen=null,kbCap=null;
+function kbApi(a,extra){return api("kb",Object.assign({a:a},extra||{})).then(unwrap);}
+function kbKindName(k){return ({md:"文稿",html:"网页",svg:"图",mermaid:"结构图",csv:"表",json:"数据",code:"代码",note:"笔记"})[k]||"笔记";}
+function kbLoad(){
+  var box=el("kb-body");box.innerHTML='<div class="hint">正在加载…</div>';
+  kbApi("mine",{}).then(function(d){
+    if(!d.ok){box.innerHTML='<div class="hint">加载失败，请重试。</div>';return;}
+    kbCap=d.cap||null;
+    var head='<div style="padding:12px 14px 0">'
+      +'<p style="font-size:0.8rem;color:var(--muted);line-height:1.8;margin:0 0 10px">'
+      +'这里存的是<b>你自己锻出来的稿子</b>——ChatSDE「画布与共创」上的报告、结构图、网页、长稿。'
+      +'<b>只有你看得见</b>，别人打不开也删不掉。<br>'
+      +'站上<b>已经有的篇目不必存进来</b>：那是「📚 文章库」的活，贴链接就行，链接不会过期。'
+      +'</p>'
+      +'<p style="font-size:0.76rem;color:var(--muted);margin:0 0 12px">'
+      +'已用 '+(d.n||0)+' / '+((d.cap&&d.cap.count)||0)+' 件　·　'+(d.chars||0)+' 字'
+      +'</p></div>';
+    if(!(d.items||[]).length){
+      box.innerHTML=head+'<div class="hint" style="line-height:1.9">还是空的。<br><br>'
+        +'去 <a href="/taste/chatsde/" target="_blank">ChatSDE</a> 问一句能出长文的，'
+        +'答完点「⧉ 落到画布」，再在画布工具条上点「⇧ 存进知识库」。</div>';
+      return;
+    }
+    var html=head;
+    (d.items||[]).forEach(function(it){
+      html+='<div class="me-item" style="align-items:flex-start">'
+        +'<span><b>'+esc(it.title||"未命名")+'</b>'
+        +'<br><span style="font-size:0.74rem;color:var(--muted)">'
+        +kbKindName(it.kind)+'　·　'+(it.chars||0)+' 字　·　'+fmtT(it.ts)
+        +(it.from?('　·　'+esc(it.from)):"")
+        +(it.ver?('　·　第 '+it.ver+' 版'):"")
+        +'</span></span>'
+        +'<button data-kbopen="'+esc(it.id)+'">打开</button></div>';
+    });
+    box.innerHTML=html;
+    Array.prototype.forEach.call(box.querySelectorAll("[data-kbopen]"),function(b){
+      b.onclick=function(){kbShow(b.getAttribute("data-kbopen"));};
+    });
+  },function(){box.innerHTML='<div class="hint">加载失败，请重试。</div>';});
+}
+function kbShow(id){
+  var box=el("kb-body");box.innerHTML='<div class="hint">正在打开…</div>';
+  kbApi("get",{id:id}).then(function(d){
+    if(!d.ok){box.innerHTML='<div class="hint">'+esc(d.msg||"打不开。")+'</div>';return;}
+    kbOpen=d.item;
+    var it=d.item,txt=d.text||"";
+    box.innerHTML='<div style="padding:12px 14px">'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">'
+      +'<b style="flex:1;min-width:0">'+esc(it.title||"未命名")+'</b>'
+      +'<button id="kb-ren">✎ 改名</button><button id="kb-dl">⤓ 下载</button><button id="kb-del">🗑 删除</button>'
+      +'</div>'
+      +'<p style="font-size:0.74rem;color:var(--muted);margin:0 0 10px">'
+      +kbKindName(it.kind)+'　·　'+(it.chars||0)+' 字　·　'+fmtT(it.ts)+'</p>'
+      +'<pre style="white-space:pre-wrap;word-break:break-word;font:0.78rem/1.75 ui-monospace,Menlo,Consolas,monospace;'
+      +'background:var(--card,#161310);padding:12px 14px;border-radius:8px;margin:0">'+esc(txt)+'</pre>'
+      +'</div>';
+    el("kb-ren").onclick=function(){
+      var n=prompt("这一件叫什么？",it.title||"");
+      if(!n||!n.trim())return;
+      kbApi("ren",{id:it.id,title:n.trim()}).then(function(r){if(r.ok)kbShow(it.id);else alert(r.msg||"改不了。");});
+    };
+    el("kb-dl").onclick=function(){
+      var ext=({md:".md",html:".html",svg:".svg",mermaid:".mmd",csv:".csv",json:".json",code:".txt"})[it.kind]||".txt";
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(new Blob([txt],{type:"text/plain;charset=utf-8"}));
+      a.download=String(it.title||"未命名").replace(/[^\w\u4e00-\u9fff-]/g,"_")+ext;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+    };
+    el("kb-del").onclick=function(){
+      if(!confirm("删掉《"+(it.title||"未命名")+"》？删了就没有了。"))return;
+      kbApi("del",{id:it.id}).then(function(r){if(r.ok){kbOpen=null;kbLoad();}else alert(r.msg||"删不了。");});
+    };
+  },function(){box.innerHTML='<div class="hint">打不开，请重试。</div>';});
+}
+function lbApi(a,extra){return api("lb",Object.assign({a:a},extra||{})).then(unwrap);}
+function lbGo(from,onPick){lbFrom=from||"me";lbPick=onPick||null;show("lib");lbLoad();}
+function lbUrl(slug){return "/students/"+String(slug||"").replace(/^\/+|\/+$/g,"")+"/";}
+/* 站上的规范索引，取一次缓存住；失败不拦路（发现这一路没了，另两路照用） */
+function lbLoadPubs(){
+  if(lbPubs)return Promise.resolve(lbPubs);
+  return fetch("/students/publications.json",{cache:"force-cache"}).then(function(r){return r.json();}).then(function(d){
+    var out=[];(d.students||[]).forEach(function(s){(s.items||[]).forEach(function(it){
+      out.push({slug:String(it.url||"").replace(/^\/students\/|\/$/g,""),title:it.title||"",sub:it.summary||"",field:it.kind||"",who:s.name||""});
+    });});
+    lbPubs=out;return out;
+  }).catch(function(){lbPubs=[];return [];});
+}
+/* 「离你最远」：把我收过的领域记下来，优先给没收过的那些领域的篇目 */
+function lbFar(all,mine,n){
+  var seen={};mine.forEach(function(x){if(x.field)seen[x.field]=1;});
+  var far=all.filter(function(x){return x.field&&!seen[x.field];});
+  var pool=far.length>=n?far:all.slice();
+  for(var i=pool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=pool[i];pool[i]=pool[j];pool[j]=t;}
+  return {items:pool.slice(0,n),far:far.length};
+}
+function lbCard(it,acts){
+  return '<div class="me-item" style="display:block;padding:12px 16px;border-bottom:1px solid var(--line,#eee)">'
+    +(it.name||it.who?('<div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px">'+esc(it.name||it.who)+(it.field?('　·　'+esc(it.field)):'')+'</div>'):'')
+    +'<div style="font-size:0.95rem;line-height:1.65;font-weight:600">'+esc(it.title)+'</div>'
+    +(it.sep?('<div style="margin-top:5px;font-size:0.84rem;line-height:1.7;color:var(--brand,#1a7f5a)">它切开的：'+esc(it.sep)+'</div>'):'')
+    +(it.sub?('<div style="margin-top:4px;font-size:0.8rem;line-height:1.7;color:var(--muted)">'+esc(it.sub).slice(0,120)+'</div>'):'')
+    +'<div style="margin-top:7px;font-size:0.78rem">'+acts+'</div></div>';
+}
+function lbLoad(){
+  var box=el("lb-body");box.innerHTML='<div class="hint">正在加载…</div>';
+  var head='<div style="padding:12px 14px 0">'
+    +'<p style="font-size:0.8rem;color:var(--muted);line-height:1.8;margin:0 0 10px">'
+    +'这里存的是<b>站上文章的链接</b>，不是副本。<b>「我收的」是私人书签</b>——只按时间排，'
+    +'不计数、不公开、不排热度；要让别人看见，得另按一次「推给大家」<b>并写一句它切开了什么</b>。<br>'
+    +'<b>「发现」不由人放</b>，是从全站现算的<b>离你最远</b>：优先给你还没收过的领域。</p>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'
+    +['pub:📌 推荐位','far:🧭 发现','mine:⭐ 我收的'].map(function(x){
+        var k=x.split(":")[0],t=x.split(":")[1];
+        return '<button class="lb-tab'+(lbMode===k?" on":"")+'" data-m="'+k+'" style="font-size:0.76rem;padding:4px 10px;border-radius:14px;border:1px solid '+(lbMode===k?"var(--brand,#1a7f5a)":"var(--line,#ddd)")+';background:'+(lbMode===k?"rgba(26,127,90,.08)":"transparent")+'">'+t+'</button>';
+      }).join("")
+    +'</div></div>';
+  function render(items,tip){
+    var s=head+(tip||"");
+    if(!items.length){
+      s+='<div style="padding:4px 16px 22px;font-size:0.86rem;color:var(--muted);line-height:1.9">'
+        +(lbMode==="mine"?'<b>你还没收过文章。</b><br><br>在站上读到值得记住的一篇，浮层底栏点「⭐ 收进文章库」就进来了。'
+         :lbMode==="pub"?'<b>推荐位还是空的。</b><br><br>去「⭐ 我收的」里挑一篇，写一句它切开了什么，推给大家。'
+         :'<b>暂时取不到全站目录。</b><br><br>另外两栏照常可用。')+'</div>';
+    }else{
+      items.forEach(function(it){
+        var acts="";
+        if(lbPick)acts+='<a href="#" class="lb-use" data-slug="'+esc(it.slug)+'" data-title="'+esc(it.title)+'">插入这一篇 →</a>　';
+        acts+='<a href="'+lbUrl(it.slug)+'" target="_blank" rel="noopener">去读 ↗</a>';
+        if(lbMode==="mine")acts+='　<a href="#" class="lb-push" data-id="'+esc(it.id)+'">推给大家</a>　<a href="#" class="lb-del" data-id="'+esc(it.id)+'" style="color:var(--muted)">删除</a>';
+        if(lbMode==="far")acts+='　<a href="#" class="lb-add" data-slug="'+esc(it.slug)+'" data-title="'+esc(it.title)+'" data-sub="'+esc(it.sub||"")+'" data-field="'+esc(it.field||"")+'">⭐ 收藏</a>';
+        if(lbMode==="pub"&&ME&&it.uid===ME.uid)acts+='　<a href="#" class="lb-unpush" data-id="'+esc(it.id)+'" style="color:var(--muted)">撤回</a>';
+        s+=lbCard(it,acts);
+      });
+    }
+    box.innerHTML=s;lbBind();
+  }
+  if(lbMode==="far"){
+    Promise.all([lbLoadPubs(),lbApi("mine",{limit:200})]).then(function(r){
+      var all=r[0]||[],mine=(r[1]&&r[1].items)||[];lbMineCache=mine;
+      var g=lbFar(all,mine,24);
+      render(g.items,'<div style="padding:0 16px 8px;font-size:0.76rem;color:var(--muted)">全站 '+all.length+' 篇，其中 '+g.far+' 篇落在你还没收过的领域。每次进来重洗一遍。</div>');
+    });
+    return;
+  }
+  lbApi(lbMode==="mine"?"mine":"pub",{limit:60}).then(function(d){
+    if(!d||!d.ok){box.innerHTML='<div class="hint">加载失败，请重试。</div>';return;}
+    if(lbMode==="mine")lbMineCache=d.items||[];
+    render(d.items||[]);
+  });
+}
+function lbBind(){
+  Array.prototype.forEach.call(el("lb-body").querySelectorAll(".lb-tab"),function(b){
+    b.onclick=function(){lbMode=b.getAttribute("data-m");lbLoad();};});
+  function on(cls,fn){Array.prototype.forEach.call(el("lb-body").querySelectorAll(cls),function(a){
+    a.onclick=function(e){e.preventDefault();fn(a);};});}
+  on(".lb-use",function(a){if(lbPick)lbPick({slug:a.getAttribute("data-slug"),title:a.getAttribute("data-title")});});
+  on(".lb-add",function(a){
+    lbApi("add",{slug:a.getAttribute("data-slug"),title:a.getAttribute("data-title"),sub:a.getAttribute("data-sub"),field:a.getAttribute("data-field")})
+      .then(function(d){a.textContent=(d&&d.ok)?(d.dup?"已在库里":"已收藏"):((d&&d.msg)||"没收成");a.style.color="var(--muted)";});});
+  on(".lb-del",function(a){
+    if(!confirm("从「我收的」里删掉这一篇？"))return;
+    lbApi("del",{id:a.getAttribute("data-id")}).then(function(){lbLoad();});});
+  on(".lb-unpush",function(a){
+    if(!confirm("从推荐位撤回？"))return;
+    lbApi("unpush",{id:a.getAttribute("data-id")}).then(function(){lbLoad();});});
+  on(".lb-push",function(a){
+    var it=null;lbMineCache.forEach(function(x){if(x.id===a.getAttribute("data-id"))it=x;});
+    if(!it)return;
+    var sep=prompt("推给大家之前，写一句它切开了什么——\n（只写「好文推荐」的话，别人无从判断要不要点开；至少 12 字）","");
+    if(sep===null)return;
+    lbApi("push",{slug:it.slug,title:it.title,sub:it.sub,field:it.field,sep:sep}).then(function(d){
+      if(d&&d.ok){lbMode="pub";lbLoad();}else alert((d&&d.msg)||"没推成。");});});
+}
+
+/* 📎 聊天现场插一篇／插一句 ——「S 维度」在群聊与私聊里的在场。
+   两个库此前只在「我」页与社区动态发表页够得着，聊天里完全够不着；
+   而聊天恰恰是纠缠真正发生的地方（E 的现场）。
+   插入一律**追加**、不覆盖已经写了的字；插完回到会话。 */
+function insWire(){
+  var b=el("b-ins");if(!b)return;
+  var p=el("inspanel");
+  p.innerHTML='<div style="padding:10px 12px;font-size:0.86rem;line-height:2">'
+    +'<div style="color:var(--muted);font-size:0.76rem;margin-bottom:6px">从「浏览」那一维带进来的两个库</div>'
+    +'<a href="#" id="ins-art" style="display:block">📚 插一篇文章（站内链接）</a>'
+    +'<a href="#" id="ins-vt" style="display:block">💡 插一句思想库存</a></div>';
+  b.onclick=function(ev){ev.stopPropagation();
+    el("epanel").classList.remove("on");el("atpanel").classList.remove("on");
+    p.classList.toggle("on");};
+  document.addEventListener("click",function(ev){
+    if(p.classList.contains("on")&&ev.target!==b&&!p.contains(ev.target))p.classList.remove("on");});
+  el("ins-art").onclick=function(e){e.preventDefault();p.classList.remove("on");
+    lbGo("talk",function(it){insAppend("《"+it.title+"》 "+location.origin+lbUrl(it.slug));});};
+  /* ⚠️ vtPick 收到的是**整条记录**不是字符串（vtBind 里 vtPick(it)），取 it.text */
+  el("ins-vt").onclick=function(e){e.preventDefault();p.classList.remove("on");
+    vtGo("talk",function(it){insAppend((it&&it.text)||"");});};
+}
+function insAppend(add){
+  var t=el("text");
+  if(t){t.value=(t.value?(t.value.replace(/\s+$/,"")+"\n"):"")+add;}
+  show("talk");
+  if(t)t.focus();
+}
+
+function lbWire(){
+  var bk=el("b-kb");if(bk)bk.onclick=function(){kbOpen=null;show("kb");kbLoad();};
+  var b=el("b-lib");if(b)b.onclick=function(){lbMode="pub";lbGo("me",null);};
+  var ma=el("mu-article");
+  if(ma)ma.onclick=function(){
+    lbGo("mopost",function(it){
+      var t=el("mp-text");
+      if(t){var add="《"+it.title+"》 "+location.origin+lbUrl(it.slug);
+        t.value=(t.value?(t.value.replace(/\s+$/,"")+"\n"):"")+add;}
+      show("mopost");
+    });
+  };
+}
+
+function vtWire(){
+  var b=el("b-vault");
+  if(b)b.onclick=function(){vtMode="new";vtGo("me",null);};
+  var mv=el("mu-vault");
+  // 社区动态这一条正是用户点名的场景：「有的时候，加入了图片，不知道今天想说什么」
+  // ——金句生产机是现造，库存是**已经攒下的**，两条路并排放。
+  if(mv)mv.onclick=function(){
+    vtMode="new";
+    vtGo("mopost",function(it){
+      show("mopost");
+      var ta=el("mp-text");
+      if(ta){ta.value=(ta.value?(ta.value+"\n"):"")+it.text;ta.focus();}
+    });
+  };
+}
+/* from＝从哪进来的（决定返回键回哪）；onPick＝点一条要干什么（社区动态是填进正文） */
+function vtGo(from,onPick){vtFrom=from||"me";vtPick=onPick||null;show("vault");vtLoad();}
+function vtLoad(){
+  var box=el("vt-body");box.innerHTML='<div class="hint">正在加载…</div>';
+  var q={limit:40};
+  if(vtMode==="pick")q.pick=1;
+  if(vtMode==="fresh")q.fresh=1;
+  if(vtMode==="mine")q.who=(ME&&ME.uid)||"";
+  vtApi("feed",q).then(function(d){
+    if(!d||!d.ok){box.innerHTML='<div class="hint">加载失败，请重试。</div>';return;}
+    var items=d.items||[];
+    var h='<div style="padding:12px 14px 0">'
+      +'<p style="font-size:0.8rem;color:var(--muted);line-height:1.8;margin:0 0 10px">'
+      +'库存是<b>全站共用的一池</b>：对话里撞出来的东西存进这里，'
+      +'发社区动态时可以从这里挑一句，够硬的还能一键升格成候选卡去被人顶回。<br>'
+      +'<b>门槛故意放低</b>——一句能站住的话就值得存下来，别让它刷新即失。</p>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'
+      +['new:最新','pick:🎲 随便翻翻','fresh:还没被用过','mine:我存的'].map(function(x){
+          var k=x.split(":")[0],t=x.split(":")[1];
+          return '<button class="vt-tab'+(vtMode===k?" on":"")+'" data-m="'+k+'" style="font-size:0.76rem;padding:4px 10px;border-radius:14px;border:1px solid '+(vtMode===k?"var(--brand,#1a7f5a)":"var(--line,#ddd)")+';background:'+(vtMode===k?"rgba(26,127,90,.08)":"transparent")+'">'+t+'</button>';
+        }).join("")
+      +'</div></div>';
+    if(!items.length){
+      h+='<div style="padding:4px 16px 22px;font-size:0.86rem;color:var(--muted);line-height:1.9">'
+        +(vtMode==="mine"?'<b>你还没往库存里存过东西。</b><br><br>':'<b>库存还是空的。</b><br><br>')
+        +'去<a href="/search/">搜索页的涌现档</a>撞一轮，三观点和典范上都有「💡 存进库存」；'
+        +'或者<a href="/taste/chatsde/">和 WDS 对话</a>问出一句好话，回来手动存。</div>';
+    }else{
+      items.forEach(function(it){
+        h+='<div class="me-item" style="display:block;padding:12px 16px;border-bottom:1px solid var(--line,#eee)">'
+          +'<div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px">'
+          +esc(VT_KIND[it.kind]||"观察")+'　·　'+esc(it.name||"")
+          +(it.src?('　·　'+esc(it.src)):'')
+          +(it.used?('　·　已被用过 '+it.used+' 次'):'')+'</div>'
+          +'<div style="font-size:0.95rem;line-height:1.7">'+esc(it.text)+'</div>'
+          +'<div style="margin-top:7px;font-size:0.78rem">'
+          +(vtPick?'<a href="#" class="vt-use" data-id="'+esc(it.id)+'">用这一句 →</a>　':'')
+          +'<a href="#" class="vt-up" data-id="'+esc(it.id)+'">升格成候选卡 →</a>'
+          +(it.uid===((ME&&ME.uid)||"")?'　<a href="#" class="vt-del" data-id="'+esc(it.id)+'" style="color:#b3261e">删</a>':'')
+          +'</div></div>';
+      });
+    }
+    box.innerHTML=h;vtBind();
+  }).catch(function(){box.innerHTML='<div class="hint">加载失败，请重试。</div>'});
+}
+function vtBind(){
+  Array.prototype.forEach.call(document.querySelectorAll(".vt-tab"),function(b){
+    b.onclick=function(){vtMode=b.getAttribute("data-m");vtLoad();};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".vt-use"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      var id=a.getAttribute("data-id");
+      var it=null;
+      Array.prototype.forEach.call(document.querySelectorAll(".vt-use"),function(){});
+      vtApi("feed",{limit:60}).then(function(d){
+        ((d&&d.items)||[]).forEach(function(x){if(x.id===id)it=x;});
+        if(!it)return;
+        vtApi("use",{id:id});                 // 记一次取用（不等它回，用户不该为统计等）
+        if(vtPick)vtPick(it);
+      });
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".vt-up"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      var id=a.getAttribute("data-id");
+      vtApi("feed",{limit:60}).then(function(d){
+        var it=null;((d&&d.items)||[]).forEach(function(x){if(x.id===id)it=x;});
+        if(!it)return;
+        // 升格＝把这句话填进候选卡的承重命题，另外两段仍要作者自己补——**不替他编**
+        show("cdnew");
+        el("cd-prop").value=it.text;el("cd-face").value="";el("cd-crit").value="";
+        el("cd-nbr").textContent="";el("cd-nbr").removeAttribute("data-nbr");
+        el("cd-msg").textContent="已从库存取来承重命题。另两段要你自己补——说不出切了哪一刀、给不出判据，它就还不是一张能被顶回的卡。";
+        try{cdNbrCheck();cdPickWho();}catch(e2){}
+      });
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".vt-del"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      if(!confirm("从库存里删掉这一条？"))return;
+      vtApi("del",{id:a.getAttribute("data-id")}).then(function(){vtLoad();});
+    };
+  });
+}
+function cdApi(a,extra){return api("cd",Object.assign({a:a},extra||{})).then(unwrap);}
+function cdGo(who,name){cdWho=who||"";cdWhoName=name||"";show("cand");cdLoad();}
+function cdLeft(c){
+  if(c.state!=="open")return "";
+  var ms=c.due-Date.now();if(ms<=0)return "正在结算…";
+  var hh=Math.floor(ms/3600000);
+  return hh>=1?("还剩 "+hh+" 小时"):("还剩 "+Math.max(1,Math.floor(ms/60000))+" 分钟");
+}
+function cdLoad(){
+  var box=el("cd-list");box.innerHTML='<div class="hint">正在加载…</div>';
+  cdApi("feed",{who:cdWho}).then(function(d){
+    if(!d||!d.ok){box.innerHTML='<div class="hint">加载失败，请重试。</div>';return;}
+    cdCards=d.cards||[];
+    if(!cdCards.length){
+      // 可见性铁律③：空态必须写明出路，不能只说"还没有"
+      box.innerHTML='<div style="padding:22px 18px;font-size:0.86rem;color:var(--muted);line-height:1.9">'
+        +'<b style="color:var(--fg,#222)">这里还没有候选。</b><br><br>'
+        +'候选卡是一句<b>能被反对的判断</b>——不是感想，不是提问。<br>'
+        +'你把它立在这里，系统会挑几位<b>和你不共享语汇的人</b>来顶它；'
+        +'72 小时后自动结算：没人顶＝未交手，被占位者击中而你说不出分离线＝死格，'
+        +'带着分离线活下来＝已交手。<br><br>'
+        +'点右上角<b>「＋立卡」</b>开始。想不出来的话，'
+        +'去<a href="/taste/chatsde/">和 WDS 对话</a>撞一个出来，再把它压成一句话搬过来。</div>';
+      return;
+    }
+    var h="";
+    cdCards.forEach(function(c){h+=cdCardHtml(c,0);});
+    box.innerHTML=h;cdBind();
+  }).catch(function(){box.innerHTML='<div class="hint">加载失败，请重试。</div>'});
+}
+function cdCardHtml(c,full){
+  var s=CD_STATE[c.state]||CD_STATE.open;
+  var h='<div class="mo-item" data-id="'+esc(c.id)+'" style="padding:14px 16px;border-bottom:1px solid var(--line,#eee)">';
+  h+='<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">'
+    +'<b class="cd-who" data-u="'+esc(c.uid)+'" data-n="'+esc(c.name)+'" style="cursor:pointer">'+esc(c.name||"（未署名）")+'</b>'
+    +'<span style="font-size:0.72rem;padding:1px 7px;border-radius:10px;border:1px solid '+(s[1]||"var(--line,#ddd)")+';color:'+(s[1]||"var(--muted)")+'">'+s[0]+'</span>'
+    +'<span style="font-size:0.72rem;color:var(--muted)">'+esc(cdLeft(c))+'</span></div>';
+  h+='<div style="font-size:0.98rem;font-weight:600;line-height:1.6;margin-bottom:6px">'+esc(c.prop)+'</div>';
+  h+='<div style="font-size:0.82rem;color:var(--muted);line-height:1.7">切开：'+esc(c.face)+'</div>';
+  h+='<div style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:6px">判据：'+esc(c.crit)+'</div>';
+  if(c.nbr&&c.nbr.verdict)h+='<div style="font-size:0.78rem;color:var(--muted);background:rgba(0,0,0,.04);border-radius:8px;padding:7px 9px;margin-bottom:6px">'+esc(c.nbr.verdict)+'</div>';
+  var nb=(c.backs||[]).length,ns=(c.seps||[]).length;
+  h+='<div style="font-size:0.78rem;color:var(--muted)">顶回 '+nb+' 条'+(ns?('　分离线 '+ns+' 条'):'')+'　<a href="#" class="cd-open" data-id="'+esc(c.id)+'">展开 →</a></div>';
+  if(full){
+    (c.backs||[]).forEach(function(b){
+      var mine=(c.seps||[]).filter(function(s2){return s2.to===b.bid;})[0];
+      h+='<div style="margin-top:10px;padding:9px 11px;background:rgba(0,0,0,.03);border-radius:9px">'
+        +'<div style="font-size:0.78rem;color:var(--muted);margin-bottom:3px">'+esc(b.name||"")+'　·　<b>'+esc(CD_KIND[b.kind]||b.kind)+'</b></div>'
+        +'<div style="font-size:0.86rem;line-height:1.7">'+esc(b.text)+'</div>';
+      if(mine)h+='<div style="margin-top:7px;padding-left:9px;border-left:2px solid var(--brand,#1a7f5a);font-size:0.84rem;line-height:1.7"><span style="color:var(--muted);font-size:0.76rem">分离线：</span>'+esc(mine.text)+'</div>';
+      else if(c.uid===ME.uid&&c.state==="open"&&b.kind==="occ")
+        h+='<div style="margin-top:7px"><a href="#" class="cd-sep" data-id="'+esc(c.id)+'" data-b="'+esc(b.bid)+'">给一条分离线 →</a>'
+          +'<span style="font-size:0.76rem;color:#b3261e;margin-left:8px">不给就会判死格</span></div>';
+      h+='</div>';
+    });
+    if(c.state==="open"&&c.uid!==ME.uid){
+      h+='<div style="margin-top:12px"><div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px">顶回它（只有这三种，没有点赞）：</div>'
+        +'<textarea class="cd-btext" data-id="'+esc(c.id)+'" rows="2" maxlength="600" placeholder="写清楚一点——顶回要能被作者回应" style="width:100%;box-sizing:border-box;padding:8px;border:1px solid var(--line,#ddd);border-radius:8px;margin-bottom:6px"></textarea>'
+        +'<button class="cd-back" data-id="'+esc(c.id)+'" data-k="occ">我这儿有一个占位者</button> '
+        +'<button class="cd-back" data-id="'+esc(c.id)+'" data-k="rev">我给一条方向相反的预测</button> '
+        +'<button class="cd-back" data-id="'+esc(c.id)+'" data-k="lvl">我换一个承重层级重述</button></div>';
+    }
+    if(c.uid===ME.uid)h+='<div style="margin-top:10px"><a href="#" class="cd-del" data-id="'+esc(c.id)+'" style="color:#b3261e">删掉这张卡</a></div>';
+  }
+  h+='</div>';return h;
+}
+function cdBind(){
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-open"),function(a){
+    a.onclick=function(e){e.preventDefault();cdOne(a.getAttribute("data-id"));};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-who"),function(a){
+    a.onclick=function(){cdGo(a.getAttribute("data-u"),a.getAttribute("data-n"));};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-back"),function(btn){
+    btn.onclick=function(){
+      var id=btn.getAttribute("data-id"),k=btn.getAttribute("data-k");
+      var ta=document.querySelector('.cd-btext[data-id="'+id+'"]');
+      var t=(ta&&ta.value||"").trim();
+      if(t.length<4){alert("写清楚一点——顶回要能被作者回应。");return;}
+      btn.disabled=true;
+      cdApi("back",{id:id,kind:k,text:t}).then(function(d){
+        btn.disabled=false;
+        if(!d||!d.ok){alert((d&&d.msg)||"顶回失败。");return;}
+        cdOne(id);
+      }).catch(function(){btn.disabled=false;alert("顶回失败。")});
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-sep"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      var t=prompt("分离线要写满：占位者在【某个可见特征】上是 A，本条是非 A，怎么读出来。");
+      if(!t||t.trim().length<4)return;
+      cdApi("sep",{id:a.getAttribute("data-id"),to:a.getAttribute("data-b"),text:t.trim()}).then(function(d){
+        if(!d||!d.ok){alert((d&&d.msg)||"没写成。");return;}
+        cdOne(a.getAttribute("data-id"));
+      });
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-del"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      if(!confirm("删掉这张卡？顶回记录会一起没了。"))return;
+      cdApi("del",{id:a.getAttribute("data-id")}).then(function(){cdGo(cdWho,cdWhoName);});
+    };
+  });
+}
+function cdOne(id){
+  show("cdone");
+  var box=el("cd-one");box.innerHTML='<div class="hint">正在加载…</div>';
+  cdApi("feed",{}).then(function(d){
+    var c=((d&&d.cards)||[]).filter(function(x){return x.id===id;})[0];
+    if(!c){box.innerHTML='<div class="hint">这张卡已经不在了。</div>';return;}
+    box.innerHTML=cdCardHtml(c,1);cdBind();
+  });
+}
+/* 立卡：一边写一边查近邻库；点将按「作品领域与你不重叠」挑 */
+function cdRosterLoad(){
+  if(cdRoster)return Promise.resolve(cdRoster);
+  return fetch("/students/roster.json").then(function(r){return r.json()}).then(function(j){
+    cdRosterRaw=((j&&j.students)||[]);      // v2 点将要 slug，下面那张表只留了 name
+    cdRoster=((j&&j.students)||[]).map(function(s){
+      var f={};((s.papers)||[]).forEach(function(p){if(p&&p.field)f[p.field]=1;});
+      return {name:s.name,n:((s.papers)||[]).length,fields:f};
+    }).filter(function(x){return x.n>0;});
+    return cdRoster;
+  }).catch(function(){cdRoster=[];return cdRoster;});
+}
+function cdPickWhoV1(){
+  // 回退档：按**作品领域完全不重叠**挑。留着是因为 v2 有三种取不到的情形
+  // （模块没加载／库里还没有我／命题还没写够字数），那时总得有人可点。
+  // 它的毛病是几乎挑不动：20 人 190 对里领域完全不重叠的只有 7 对。
+  var box=el("cd-picks");if(!box)return;
+  cdRosterLoad().then(function(rs){
+    var me=null;rs.forEach(function(x){if(x.name===ME.name)me=x;});
+    var mine=me?me.fields:{};
+    var far=rs.filter(function(x){
+      if(x.name===ME.name)return false;
+      var k;for(k in x.fields)if(mine[k])return false;   // 有一个领域重叠就不算"最远"
+      return true;
+    }).sort(function(a,b){return b.n-a.n;}).slice(0,5);
+    if(!far.length){box.textContent="";return;}
+    box.innerHTML='点将（按<b>作品领域与你不重叠</b>挑，落卡后他们会看到）：'
+      +far.map(function(x){return esc(x.name);}).join("、")
+      +'<br><span style="font-size:0.74rem">这是领域级的粗算——语汇族库这次没取到，先用它顶上。</span>';
+    box.setAttribute("data-picks",far.map(function(x){return x.name;}).join(","));
+  });
+}
+/* 点将 v2 · 语汇族级（/assets/sde-dist.js，零调用不烧 Key）
+   问的是「谁离**这条命题**最远」，不是「谁离**这个人**最远」——
+   一个人整体离你很远，却可能恰好在这条命题上跟你撞在一起，那就不该点他。
+   推的是池不是人：距离决定谁进池，轮转决定这次叫谁。直接取最远那一个，
+   实测会让同一个人被推给几乎所有人（最集中的一位吃到 16 次），
+   顶回请求全压给他，他第二天就不来了。 */
+function cdPickWho(){
+  var box=el("cd-picks");if(!box)return;
+  var prop=((el("cd-prop")&&el("cd-prop").value)||"").trim();
+  if(!window.SDEDist||prop.length<8){cdPickWhoV1();return;}
+  var mySlug="";
+  cdRosterLoad().then(function(){
+    try{
+      var rs=(cdRosterRaw||[]);
+      for(var i=0;i<rs.length;i++)if(rs[i].name===ME.name){mySlug=rs[i].slug||"";break;}
+    }catch(e){}
+    return window.SDEDist.forText(prop,3,mySlug);
+  }).then(function(far){
+    if(!far||!far.length){cdPickWhoV1();return;}
+    box.innerHTML='点将（按<b>语汇族距离</b>挑：谁离这条命题最远，落卡后他们会看到）：'
+      +far.map(function(x){return esc(x.name)+'<span style="opacity:.6">（'+(x.fields||[]).slice(0,1).join("")+'）</span>';}).join("、")
+      +'<br><span style="font-size:0.74rem">从最远的一批里轮着点，不是每次都叫同一个人。距离是词面粗算，不代表他一定看得懂这条——他看不懂也是一种读数。</span>';
+    box.setAttribute("data-picks",far.map(function(x){return x.name;}).join(","));
+  }).catch(function(){cdPickWhoV1();});
+}
+var cdNbrTimer=null;
+function cdNbrCheck(){
+  var q=(el("cd-prop").value||"").trim(),box=el("cd-nbr");
+  if(q.length<8){box.textContent="";box.removeAttribute("data-nbr");return;}
+  box.textContent="正在查占位库…";
+  if(!window.SDENbr){box.textContent="";return;}
+  window.SDENbr.ask(q,5).then(function(res){
+    box.textContent=window.SDENbr.verdictLine(res)
+      +(res.status==="miss"?"　（查不到不等于没被占，不得据以放行）":"");
+    box.setAttribute("data-nbr",JSON.stringify({status:res.status,verdict:res.verdict,
+      hits:(res.hits||[]).slice(0,5).map(function(x){return {prop:x.prop,who:(x.src&&x.src.author)||""};})}));
+  }).catch(function(){box.textContent="占位库没查成（不影响落卡）。";});
+  // 命题变了，该点的人也就变了——v2 问的是「谁离这条命题最远」，不重算就还是上一条的答案
+  try{cdPickWho();}catch(e){}
+}
+
+function moGo(who,name){
+  moWho=who||"";moWhoName=name||"";
+  moPosts=[];moNext="";moMore=false;
+  show("moments");moLoad(false);
+}
+function moLoad(more){
+  if(moLoading||!CRED)return;
+  moLoading=true;
+  var L=el("mo-list");
+  if(!more)L.innerHTML='<div class="hint">正在加载…</div>';
+  api("mo",{a:"feed",who:moWho,after:more?moNext:"",limit:20}).then(function(x){
+    moLoading=false;
+    if(!x.d||!x.d.ok){if(!more)L.innerHTML='<div class="hint">加载失败，稍后重试。</div>';return;}
+    moPosts=more?moPosts.concat(x.d.posts||[]):(x.d.posts||[]);
+    moNext=x.d.next||"";moMore=!!x.d.more;
+    if(!more){moFresh=0;moPaintBadge();}
+    moRender();
+  }).catch(function(){moLoading=false;if(!more)L.innerHTML='<div class="hint">网络异常，稍后重试。</div>'});
+}
+function moRender(){
+  var L=el("mo-list");L.textContent="";
+  if(!moPosts.length){
+    var h=mkEl("div","hint");
+    h.innerHTML=moWho?"他还没有发过社区动态。":"社区动态还空着。<br>点右上角 <b>发表</b>，说点什么。";
+    L.appendChild(h);return;
+  }
+  moPosts.forEach(function(p){L.appendChild(moCard(p))});
+  if(moMore){
+    var m=mkEl("div","mo-more","加载更多 ↓");
+    m.onclick=function(){m.textContent="正在加载…";moLoad(true)};
+    L.appendChild(m);
+  }else{
+    L.appendChild(mkEl("div","mo-more","—— 到底了 ——")).style.color="var(--muted)";
+  }
+}
+/* 社区动态里的一篇文章：PDF 点开就在浏览器里翻，Word 浏览器读不了、只能下载。
+   两者都走 /api/im/doc?k= —— 与图片同一道门（键不可枚举）。 */
+function moSize(n){n=Number(n)||0;return n<1024?n+" B":n<1048576?(n/1024).toFixed(0)+" KB":(n/1048576).toFixed(1)+" MB";}
+/* 附件只在 SDE 社区库里存 7 天（服务端每天定时清）。这里按发布时间算个剩余天数，
+   让读者知道"现在不看，过几天就没了"，而不是点开才发现 404。 */
+function moDocLife(ts){
+  var t=Number(ts)||0;
+  if(!t)return {dead:false,txt:"文章在 SDE 社区库保留 7 天"};
+  var left=t+7*24*3600*1000-Date.now();
+  if(left<=0)return {dead:true,txt:"已超过 7 天保留期，可能已被清除——可请作者重发"};
+  var d=Math.floor(left/86400000),hh=Math.floor(left%86400000/3600000);
+  return {dead:false,txt:"保留期还剩 "+(d>0?(d+" 天"):(hh+" 小时"))};
+}
+function moDocCard(d){
+  var isPdf=d.t==="pdf";
+  var box=mkEl("div","mo-doc");
+  var ic=mkEl("div","mo-doc-ic",isPdf?"PDF":"DOC");
+  ic.className="mo-doc-ic "+(isPdf?"pdf":"doc");
+  var tx=mkEl("div","mo-doc-tx");
+  tx.appendChild(mkEl("div","mo-doc-n",d.n||("文章."+d.t)));
+  var life=moDocLife(d.ts);
+  tx.appendChild(mkEl("div","mo-doc-s",(isPdf?"PDF 文章 · ":"Word 文章 · ")+moSize(d.s)+(isPdf?" · 点击阅读":" · 点击在线阅读")));
+  var lf=mkEl("div","mo-doc-s"+(life.dead?" dead":""),life.txt);
+  tx.appendChild(lf);
+  box.appendChild(ic);box.appendChild(tx);
+  box.onclick=function(ev){
+    ev.stopPropagation();
+    /* 进站内阅读器：PDF 翻页＋缩放、Word 用 mammoth 在线转成网页；
+       两个库都自托管在 /assets/lib/，不走 cdnjs 外链。 */
+    window.open("/sde-wechat/doc?k="+encodeURIComponent(d.k)+"&t="+encodeURIComponent(d.t)+"&n="+encodeURIComponent(d.n||""),"_blank","noopener");
+  };
+  return box;
+}
+function moCard(p){
+  var box=mkEl("div","mo");box.setAttribute("data-id",p.id);
+  var av=mkEl("div","av",initial(p.name));
+  if(ME&&p.uid===ME.uid)av.className="av me";
+  av.onclick=function(){moGo(p.uid,p.name)};
+  var mm=mkEl("div","mm");
+  var nm=mkEl("div","mn",p.name||"（未署名）");
+  nm.onclick=function(){moGo(p.uid,p.name)};
+  mm.appendChild(nm);
+  if(p.text)mm.appendChild(mkEl("div","mt",p.text));
+  var imgs=p.imgs||[];
+  if(imgs.length){
+    var g=mkEl("div","imgs n"+Math.min(imgs.length,9));
+    imgs.forEach(function(k,i){
+      var im=document.createElement("img");
+      im.loading="lazy";im.src="/api/im/img?k="+encodeURIComponent(k);im.alt="";
+      im.onclick=function(){moBig(imgs,i)};
+      g.appendChild(im);
+    });
+    mm.appendChild(g);
+  }
+  if(p.doc&&p.doc.k){var _d={};for(var _q in p.doc)_d[_q]=p.doc[_q];_d.ts=p.ts;mm.appendChild(moDocCard(_d));}
+  var bar=mkEl("div","bar");
+  bar.appendChild(mkEl("span",null,moFmt(p.ts)));
+  bar.appendChild(mkEl("span","sp"));
+  var lk=mkEl("a",null,p.liked?"取消赞":"赞");
+  lk.onclick=function(){moLike(p,lk)};
+  bar.appendChild(lk);
+  var cm=mkEl("a",null,"评论");
+  bar.appendChild(cm);
+  if(p.mine){
+    var dl=mkEl("a","dg","删除");
+    dl.onclick=function(){moDel(p)};
+    bar.appendChild(dl);
+  }
+  mm.appendChild(bar);
+  var lw=mkEl("div","likes");lw.style.display=(p.likes&&p.likes.length)?"":"none";
+  mm.appendChild(lw);
+  var cs=mkEl("div","cs");
+  mm.appendChild(cs);
+  var cin=mkEl("div","cin");
+  var inp=document.createElement("input");inp.maxLength=300;inp.placeholder="评论…";
+  var snd=mkEl("button",null,"发送");
+  var rid="",rname="";
+  cin.appendChild(inp);cin.appendChild(snd);
+  mm.appendChild(cin);
+  function doSend(){
+    var t=(inp.value||"").trim();
+    if(!t)return;
+    snd.disabled=true;
+    api("mo",{a:"cmt",id:p.id,text:t,rid:rid}).then(function(x){
+      snd.disabled=false;
+      if(!x.d||!x.d.ok){inp.placeholder=(x.d&&x.d.msg)||"发送失败";return;}
+      p.cmts=x.d.cmts||[];inp.value="";rid="";rname="";inp.placeholder="评论…";
+      paintC();
+    }).catch(function(){snd.disabled=false;inp.placeholder="网络异常"});
+  }
+  snd.onclick=doSend;
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")doSend()});
+  cm.onclick=function(){cin.classList.toggle("on");if(cin.classList.contains("on"))inp.focus()};
+  function paintL(){
+    var ls=p.likes||[];
+    lw.style.display=ls.length?"":"none";
+    lw.textContent="";
+    if(!ls.length)return;
+    lw.appendChild(document.createTextNode("♡ "));
+    ls.forEach(function(u,i){
+      if(i)lw.appendChild(document.createTextNode("，"));
+      lw.appendChild(mkEl("b",null,u.name||"（未署名）"));
+    });
+  }
+  function paintC(){
+    var cl=p.cmts||[];
+    cs.style.display=cl.length?"":"none";
+    cs.textContent="";
+    cl.forEach(function(c){
+      var d=mkEl("div","c");
+      var who=mkEl("b",null,c.name||"（未署名）");
+      who.onclick=function(){rid=c.cid;rname=c.name;inp.placeholder="回复 "+c.name+"…";cin.classList.add("on");inp.focus()};
+      d.appendChild(who);
+      if(c.rname){d.appendChild(mkEl("i",null," 回复 "));d.appendChild(mkEl("b",null,c.rname));}
+      d.appendChild(document.createTextNode("："+(c.text||"")));
+      if(ME&&(c.uid===ME.uid||p.uid===ME.uid)){
+        var x=mkEl("span","x","删");
+        x.onclick=function(){
+          if(!confirm("删掉这条评论？"))return;
+          api("mo",{a:"cdel",id:p.id,cid:c.cid}).then(function(y){
+            if(y.d&&y.d.ok){p.cmts=y.d.cmts||[];paintC();}
+          }).catch(function(){});
+        };
+        d.appendChild(x);
+      }
+      cs.appendChild(d);
+    });
+  }
+  paintL();paintC();
+  box._paintL=paintL;
+  box.appendChild(av);box.appendChild(mm);
+  return box;
+}
+function moLike(p,lk){
+  lk.style.opacity="0.5";
+  api("mo",{a:"like",id:p.id}).then(function(x){
+    lk.style.opacity="";
+    if(!x.d||!x.d.ok)return;
+    p.likes=x.d.likes||[];p.liked=x.d.on?1:0;
+    lk.textContent=p.liked?"取消赞":"赞";
+    var card=el("mo-list").querySelector('.mo[data-id="'+p.id+'"]');
+    if(card&&card._paintL)card._paintL();
+  }).catch(function(){lk.style.opacity=""});
+}
+function moDel(p){
+  if(!confirm("删掉这条动态？点赞和评论会一起消失。"))return;
+  api("mo",{a:"del",id:p.id}).then(function(x){
+    if(!x.d||!x.d.ok){alert((x.d&&x.d.msg)||"删除失败。");return;}
+    moPosts=moPosts.filter(function(q){return q.id!==p.id});
+    moRender();
+  }).catch(function(){alert("网络异常。")});
+}
+
+/* 大图 */
+var moBigList=[],moBigI=0;
+function moBig(list,i){
+  moBigList=list;moBigI=i;
+  el("mo-big").src="/api/im/img?k="+encodeURIComponent(list[i]);
+  el("mo-cnt").textContent=list.length>1?((i+1)+" / "+list.length):"";
+  el("mo-box").classList.add("on");
+}
+el("mo-box").onclick=function(e){
+  if(moBigList.length>1&&e.target&&e.target.id==="mo-big"){
+    moBigI=(moBigI+1)%moBigList.length;moBig(moBigList,moBigI);return;
+  }
+  el("mo-box").classList.remove("on");el("mo-big").src="";
+};
+
+/* 发表 */
+function moOpenPost(){
+  moPick=[];el("mp-text").value="";el("mp-msg").textContent="";el("mu-out").textContent="";el("ic-out").textContent="";
+  moPaintThumbs();show("mopost");
+}
+el("t-mopen").onclick=moOpenPost;
+el("mp-cancel").onclick=function(){show("moments")};
+function moPaintThumbs(){
+  var T=el("mp-thumbs");T.textContent="";
+  moPick.forEach(function(b64,i){
+    var t=mkEl("div","t");
+    var im=document.createElement("img");im.src="data:image/jpeg;base64,"+b64;
+    var x=mkEl("span","x","✕");
+    x.onclick=function(){moPick.splice(i,1);moPaintThumbs()};
+    t.appendChild(im);t.appendChild(x);T.appendChild(t);
+  });
+  if(moPick.length<9){
+    var a=mkEl("div","mp-add","＋");
+    a.onclick=function(){el("mp-file").click()};
+    T.appendChild(a);
+  }
+}
+function moShrink(file,cb){
+  var fr=new FileReader();
+  fr.onload=function(){
+    var im=new Image();
+    im.onload=function(){
+      var w=im.width,h2=im.height,M=1280;
+      if(w>M||h2>M){var s=M/Math.max(w,h2);w=Math.round(w*s);h2=Math.round(h2*s);}
+      var c=document.createElement("canvas");c.width=w;c.height=h2;
+      var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h2);g.drawImage(im,0,0,w,h2);
+      var q=0.78,out=c.toDataURL("image/jpeg",q);
+      while(out.length>520000&&q>0.35){q-=0.12;out=c.toDataURL("image/jpeg",q);}
+      cb(out.split(",")[1]||null);
+    };
+    im.onerror=function(){cb(null)};
+    im.src=fr.result;
+  };
+  fr.onerror=function(){cb(null)};
+  fr.readAsDataURL(file);
+}
+el("mp-file").addEventListener("change",function(){
+  var fs=Array.prototype.slice.call(this.files||[]),self=this;
+  if(!fs.length)return;
+  el("mp-msg").style.color="var(--muted)";el("mp-msg").textContent="正在压缩图片…";
+  var left=Math.min(fs.length,9-moPick.length);
+  if(left<=0){el("mp-msg").textContent="最多 9 张。";self.value="";return;}
+  var done=0;
+  fs.slice(0,left).forEach(function(f){
+    moShrink(f,function(b64){
+      if(b64&&moPick.length<9)moPick.push(b64);
+      if(++done===left){el("mp-msg").textContent="";moPaintThumbs();self.value="";}
+    });
+  });
+});
+/* 文章上传：走裸二进制 /api/im/up，不走 base64——一份 8MB 的 PDF 转 base64 要 10.7MB。
+   凭证不能放 body（body 就是文件），走 x-sde-cred 头。 */
+var moDoc=null;
+function moPaintDoc(){
+  var box=el("mp-docbox");box.innerHTML="";
+  if(!moDoc){return;}
+  var row=mkEl("div","mo-doc");
+  row.appendChild(mkEl("div","mo-doc-ic "+(moDoc.t==="pdf"?"pdf":"doc"),moDoc.t==="pdf"?"PDF":"DOC"));
+  var tx=mkEl("div","mo-doc-tx");
+  tx.appendChild(mkEl("div","mo-doc-n",moDoc.n));
+  tx.appendChild(mkEl("div","mo-doc-s",moSize(moDoc.s)+" · 已上传 · 保留 7 天"));
+  row.appendChild(tx);
+  var x=mkEl("a","dg","移除");
+  x.onclick=function(ev){ev.stopPropagation();moDoc=null;moPaintDoc();};
+  row.appendChild(x);
+  box.appendChild(row);
+}
+el("mp-docpick").onclick=function(){el("mp-doc").click()};
+el("mp-doc").addEventListener("change",function(){
+  var f=this.files&&this.files[0],m=el("mp-msg"),self=this;
+  if(!f)return;
+  var nm=f.name||"", low=nm.toLowerCase(), t="";
+  if(low.slice(-4)===".pdf")t="pdf"; else if(low.slice(-5)===".docx")t="docx";
+  if(!t){m.style.color="var(--red)";m.textContent=low.slice(-4)===".doc"?"旧的 .doc 请先在 Word 里另存为 .docx。":"只支持 PDF 和 Word（.docx）。";self.value="";return;}
+  if(f.size>20*1024*1024){m.style.color="var(--red)";m.textContent="文件太大了（上限 20MB）。";self.value="";return;}
+  m.style.color="var(--muted)";m.textContent="正在上传《"+nm+"》…";
+  el("mp-docpick").disabled=true;el("mp-ok").disabled=true;
+  fetch("/api/im/up?t="+t+"&n="+encodeURIComponent(nm),{method:"POST",headers:{"x-sde-cred":CRED},body:f})
+    .then(function(r){return r.json()})
+    .then(function(x){
+      el("mp-docpick").disabled=false;el("mp-ok").disabled=false;self.value="";
+      if(!x||!x.ok){m.style.color="var(--red)";m.textContent=(x&&x.msg)||"上传失败，请重试。";return;}
+      moDoc={k:x.k,n:x.n,t:x.t,s:x.s};m.textContent="";moPaintDoc();
+    })
+    .catch(function(){el("mp-docpick").disabled=false;el("mp-ok").disabled=false;self.value="";
+      m.style.color="var(--red)";m.textContent="上传时网络异常，请重试。";});
+});
+el("mp-ok").onclick=function(){
+  var t=(el("mp-text").value||"").trim(),m=el("mp-msg");
+  if(!t&&!moPick.length&&!moDoc){m.style.color="var(--red)";m.textContent="写点什么，或者放张图、附一篇文章。";return;}
+  el("mp-ok").disabled=true;m.style.color="var(--muted)";m.textContent="正在发表…";
+  api("mo",{a:"post",text:t,imgs:moPick,doc:moDoc}).then(function(x){
+    el("mp-ok").disabled=false;
+    if(!x.d||!x.d.ok){m.style.color="var(--red)";m.textContent=(x.d&&x.d.msg)||"发表失败。";return;}
+    moPick=[];moDoc=null;moPaintDoc();el("mp-text").value="";m.textContent="";
+    moGo("","");
+  }).catch(function(){el("mp-ok").disabled=false;m.style.color="var(--red)";m.textContent="网络异常，请重试。"});
+};
+
+/* SDE金句生产机：看图·接草稿·从站内篇目里长一句 */
+var muBusy=false;
+/* 这里的图另缩一道：发帖那份是 1280 长边·每张可到 520KB，
+   直接拿去让基底看图会把请求体撞爆。看图只需要“看清是什么”，640 就够。*/
+function muShrink(b64,cb){
+  try{
+    var im=new Image();
+    im.onload=function(){
+      var w=im.width,h2=im.height,M=640;
+      if(w>M||h2>M){var s=M/Math.max(w,h2);w=Math.round(w*s);h2=Math.round(h2*s);}
+      var c=document.createElement("canvas");c.width=w;c.height=h2;
+      var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h2);g.drawImage(im,0,0,w,h2);
+      cb(c.toDataURL("image/jpeg",0.6));
+    };
+    im.onerror=function(){cb(null)};
+    im.src="data:image/jpeg;base64,"+b64;
+  }catch(e){cb(null)}
+}
+function muPaint(d){
+  var O=el("mu-out");O.textContent="";
+  var tip="";
+  if(d.read)tip="\u4eca\u5929\u968f\u673a\u7ffb\u4e86\u7ad9\u5185 "+d.read+" \u7bc7\u6587\u7ae0\uff0c\u4e00\u7bc7\u957f\u4e00\u53e5\u3002";
+  if(d.saw)tip+=(tip?" ":"")+"\u4e5f\u770b\u4e86\u4f60\u7684 "+d.saw+" \u5f20\u56fe\u3002";
+  else if(d.blind)tip+=(tip?" ":"")+"\u5f53\u524d\u57fa\u5e95\u770b\u4e0d\u4e86\u56fe\uff0c\u4f60\u81ea\u5df1\u6311\u4e00\u6761\u914d\u5f97\u4e0a\u56fe\u7684\u3002";
+  tip+=(tip?" ":"")+"\u70b9\u4e00\u6761\u5c31\u586b\u8fdb\u4e0a\u9762\uff0c\u586b\u5b8c\u8fd8\u80fd\u6539\u3002";
+  O.appendChild(mkEl("div","mu-note",tip));
+  (d.lines||[]).forEach(function(x){
+    var s=(x&&typeof x==="object")?String(x.t||""):String(x||"");
+    if(!s)return;
+    var r=mkEl("div","mu-item");
+    r.appendChild(mkEl("div","mu-txt",s));
+    if(x&&x.s){
+      /* 出处两种：文章要书名号＋「去读」外链；库存条目没有篇也没有链接，直接写「长自 库存 · 谁存的」。
+         不加书名号是**判据不是审美**——库存里的句子不是一篇文章，套上书名号会让读者以为站上有这么一篇。 */
+      var f=mkEl("div","mu-src",x.v?("\u957f\u81ea "+x.s):("\u957f\u81ea\u300a"+x.s+"\u300b"));
+      if(x.u){
+        var link=document.createElement("a");
+        link.href=x.u;link.target="_blank";link.rel="noopener";link.textContent="\u53bb\u8bfb";
+        link.onclick=function(e){e.stopPropagation()};
+        f.appendChild(document.createTextNode(" "));f.appendChild(link);
+      }
+      r.appendChild(f);
+    }
+    r.onclick=function(){
+      el("mp-text").value=s;el("mp-text").focus();
+      el("mp-msg").style.color="var(--muted)";el("mp-msg").textContent="\u5df2\u586b\u5165\uff0c\u53ef\u4ee5\u76f4\u63a5\u6539\u3002";
+    };
+    O.appendChild(r);
+  });
+  var ag=mkEl("div","mu-again","\u21bb \u6362\u4e00\u6279\uff08\u518d\u7ffb\u4e94\u7bc7\uff09");
+  ag.onclick=function(){el("mu-go").click()};
+  O.appendChild(ag);
+}
+el("mu-go").onclick=function(){
+  if(muBusy)return;
+  muBusy=true;
+  var btn=el("mu-go"),old=btn.textContent;
+  btn.disabled=true;btn.textContent="正在想…";
+  el("mu-out").textContent="";
+  el("mu-out").appendChild(mkEl("div","mu-note","正在想（十几秒）…"));
+  var seed=(el("mp-text").value||"").trim(),kind=el("mu-kind").value;
+  var picks=moPick.slice(0,2),imgs=[],done=0;
+  function fire(){
+    api("mo",{a:"muse",seed:seed,kind:kind,imgs:imgs}).then(function(x){
+      muBusy=false;btn.disabled=false;btn.textContent=old;
+      if(!x.d||!x.d.ok){
+        el("mu-out").textContent="";
+        el("mu-out").appendChild(mkEl("div","mu-note",(x.d&&x.d.msg)||"没生出来，过会儿再试。"));
+        return;
+      }
+      muPaint(x.d);
+    }).catch(function(){
+      muBusy=false;btn.disabled=false;btn.textContent=old;
+      el("mu-out").textContent="";
+      el("mu-out").appendChild(mkEl("div","mu-note","网络异常，请重试。"));
+    });
+  }
+  if(!picks.length){fire();return;}
+  picks.forEach(function(b64){
+    muShrink(b64,function(d){
+      if(d)imgs.push(d);
+      if(++done===picks.length)fire();
+    });
+  });
+};
+
+/* 吃图出金句：用读者自己的看图基底，先用 SDE 解构这张图，再从解构里长五句。
+   两条纪律：① Key 只存本机、浏览器直连厂商，**本站服务器不经手**（国产三家）；
+   GPT 没有 CORS，只能走本站 /api/llm-proxy 纯转发（只转不存）。
+   ② 它看不清就该说看不清，不允许拿想象填图里没有的东西。*/
+var IC_VD={
+  glm:{n:"智谱 GLM",url:"https://open.bigmodel.cn/api/paas/v4/chat/completions",m:"glm-5v",k:"sde_glm_key",apply:"open.bigmodel.cn"},
+  qwen:{n:"千问 Qwen",url:"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",m:"qwen-vl-max",k:"sde_qwen_key",apply:"bailian.console.aliyun.com"},
+  kimi:{n:"Kimi",url:"https://api.moonshot.cn/v1/chat/completions",m:"kimi-k2.6",k:"sde_kimi_key",apply:"platform.moonshot.cn"},
+  gpt:{n:"GPT",url:"https://api.openai.com/v1/chat/completions",m:"gpt-5.5",k:"sde_gpt_key",apply:"platform.openai.com",proxy:1}
+};
+var IC_KIND={
+  asis:"就图说图：句句不离这张图里看得见的东西。",
+  borrow:"借图说事：从图里那件具体的东西起手，落到一件人人都碰到过的事上。",
+  maxim:"格言体：一句断言，主语明确，不留退路。",
+  flip:"反着说：把看图的人默认会说的那句话翻过来，但要翻得站得住。",
+  fun:"带点自嘲或幽默，可以轻，但不许油。"
+};
+var IC_SYS="你是「吃图出金句」：先用 SDE 解构一张图，再从解构里长出五句能发社区动态的话。\n"
++"\n【第一步·看见什么】先只列图里**真看得见**的东西：物件、动作、地方、光线、时间。"
++"看不清就写看不清。**不许写图里没有的东西**，不许猜人名地名品牌与心情。\n"
++"\n【第二步·三格解构】只靠上一步列出的东西做：\n"
++"· 显露（S）：这张图把什么**显了出来**？同时它又**遮住**了什么（画框之外、快门之前后）？\n"
++"· 差异（D）：图里那条分界线划在哪两样东西之间？（上下、内外、新旧、人与物、动与停…）\n"
++"· 纠缠（E）：图里谁和谁**互为条件**？拿掉其中一样，另一样就不成立的，是哪两样？\n"
++"这三格是**你自己看的工具**，不要在金句里讲这套词。\n"
++"\n【第三步·出五句】**五句各占一个机位，不许两句同位**：\n"
++"1（S显）这张图显出来的那件事；2（S遮）它同时遮住的那件事；"
++"3（D）那条分界线；4（D反）把默认读法翻过来；5（E）谁和谁互为条件。\n"
++"\n【硬规矩】\n"
++"1. 每句 12–34 字，一整句，能被人原样说出口。\n"
++"2. 句里必须有图里的**具体物**，不许整句都是抽象名词。\n"
++"3. 禁鸡汤（愿你…／生活总会…），禁空词（赋能、闭环、格局、认知升级），禁排比煊情，禁感叹号。\n"
++"4. 不许描述性地复述图（“一张安静的下午…”）；金句不是图说。\n"
++"5. 不许教育别人、不许居高临下；不许出现人名、品牌、地名，除非图里白纸黑字写着。\n"
++"6. 宁可句子短，不要凑字；实在看不清图，就在 see 里写明，lines 宁可少几句。\n"
++"\n【输出】只输出 JSON，不要任何别的字：\n"
++'{"see":["看得见的东西","…"],"s":"显露与遮蔽","d":"那条分界线","e":"谁与谁互为条件",'
++'"lines":[{"g":"S显","t":"…"},{"g":"S遮","t":"…"},{"g":"D","t":"…"},{"g":"D反","t":"…"},{"g":"E","t":"…"}]}';
+var icBusy=false;
+function icCfg(){return IC_VD[el("ic-vd").value]||IC_VD.glm}
+function icLoadKey(){
+  var c=icCfg(),k="";
+  try{k=localStorage.getItem(c.k)||""}catch(e){}
+  el("ic-key").value=k;
+  el("ic-key").placeholder="填你在 "+c.apply+" 申的 Key（只存本机）";
+  el("ic-model").placeholder="型号（可留空，默认 "+c.m+"）";
+}
+el("ic-vd").onchange=function(){
+  try{localStorage.setItem("sde_ic_vd",el("ic-vd").value)}catch(e){}
+  icLoadKey();
+};
+el("ic-key").addEventListener("input",function(){
+  var v=(this.value||"").trim();
+  if(!v)return;                                  /* 空值不写，避免清空误删存档 */
+  try{localStorage.setItem(icCfg().k,v)}catch(e){}
+});
+(function(){
+  try{
+    var v=localStorage.getItem("sde_ic_vd");
+    if(v&&IC_VD[v])el("ic-vd").value=v;
+  }catch(e){}
+  icLoadKey();
+})();
+function icShrink(b64,cb){
+  try{
+    var im=new Image();
+    im.onload=function(){
+      var w=im.width,h2=im.height,M=768;
+      if(w>M||h2>M){var s=M/Math.max(w,h2);w=Math.round(w*s);h2=Math.round(h2*s);}
+      var c=document.createElement("canvas");c.width=w;c.height=h2;
+      var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h2);g.drawImage(im,0,0,w,h2);
+      cb(c.toDataURL("image/jpeg",0.68));
+    };
+    im.onerror=function(){cb(null)};
+    im.src="data:image/jpeg;base64,"+b64;
+  }catch(e){cb(null)}
+}
+function icNote(s){var O=el("ic-out");O.textContent="";O.appendChild(mkEl("div","mu-note",s));}
+function icPaint(d){
+  var O=el("ic-out");O.textContent="";
+  var see=mkEl("div","ic-see");
+  var l1=mkEl("div");l1.appendChild(mkEl("span","k","看见："));
+  l1.appendChild(document.createTextNode((d.see||[]).join("、")||"（没列）"));
+  see.appendChild(l1);
+  [["显露：",d.s],["差异：",d.d],["纠缠：",d.e]].forEach(function(pr){
+    if(!pr[1])return;
+    var ln=mkEl("div");ln.appendChild(mkEl("span","k",pr[0]));
+    ln.appendChild(document.createTextNode(pr[1]));
+    see.appendChild(ln);
+  });
+  O.appendChild(see);
+  (d.lines||[]).forEach(function(x){
+    var s=(x&&typeof x==="object")?String(x.t||""):String(x||"");
+    if(!s)return;
+    var r=mkEl("div","mu-item"),t=mkEl("div","mu-txt");
+    if(x&&x.g)t.appendChild(mkEl("span","mu-tag",String(x.g).slice(0,3)));
+    t.appendChild(document.createTextNode(s));
+    r.appendChild(t);
+    r.onclick=function(){
+      el("mp-text").value=s;el("mp-text").focus();
+      el("mp-msg").style.color="var(--muted)";el("mp-msg").textContent="已填入，可以直接改。";
+    };
+    O.appendChild(r);
+  });
+  var ag=mkEl("div","mu-again","↻ 再吃一遍");
+  ag.onclick=function(){el("ic-go").click()};
+  O.appendChild(ag);
+}
+function icParse(txt){
+  var s=String(txt||"").replace(/```json|```/g,"").trim();
+  var j=null;
+  try{j=JSON.parse(s)}catch(e){}
+  if(!j){
+    var a=s.indexOf("{"),z=s.lastIndexOf("}");
+    if(a>=0&&z>a){try{j=JSON.parse(s.slice(a,z+1))}catch(e){}}
+  }
+  if(!j)return null;
+  var out={see:[],s:"",d:"",e:"",lines:[]},had={};
+  if(Array.isArray(j.see))out.see=j.see.map(function(v){return String(v||"").trim().slice(0,40)}).filter(Boolean).slice(0,8);
+  out.s=String(j.s||"").trim().slice(0,120);
+  out.d=String(j.d||"").trim().slice(0,120);
+  out.e=String(j.e||"").trim().slice(0,120);
+  (Array.isArray(j.lines)?j.lines:[]).forEach(function(one){
+    var isO=one&&typeof one==="object";
+    var t=String((isO?one.t:one)||"").replace(/\s+/g," ").trim()
+      .replace(/^[-\u2013\u2014*\u00b7\u2022\d]+[.\u3001)\uff09\s]*/,"")
+      .replace(/^["\u201c\u300c\u300e]/,"").replace(/["\u201d\u300d\u300f]$/,"");
+    if(t.length<4||t.length>60)return;
+    if(had[t])return;had[t]=1;
+    out.lines.push({t:t,g:isO?String(one.g||"").trim().slice(0,3):""});
+  });
+  out.lines=out.lines.slice(0,5);
+  return out;
+}
+el("ic-go").onclick=function(){
+  if(icBusy)return;
+  var btn=el("ic-go"),old=btn.textContent,c=icCfg();
+  var key=(el("ic-key").value||"").trim();
+  if(!moPick.length){icNote("先在下面放一张图，它才有得吃。");return;}
+  if(key.length<8){icNote("先填你自己的 "+c.n+" API Key（在 "+c.apply+" 申）。它只存在你本机。");return;}
+  icBusy=true;btn.disabled=true;btn.textContent="正在看图…";
+  icNote("正在看图、解构、出句（半分钟左右）…");
+  var picks=moPick.slice(0,2),imgs=[],done=0;
+  function fin(){icBusy=false;btn.disabled=false;btn.textContent=old;}
+  function fire(){
+    if(!imgs.length){fin();icNote("图没处理成功，换一张试试。");return;}
+    var model=(el("ic-model").value||"").trim()||c.m;
+    /* 与后端同一条纪律：**默认在思考的模型会把 max_tokens 全花在 reasoning 上**，
+       正文回来是空的。能关的家一律关掉，Kimi 关不掉就给足预算。 */
+    var body={model:model,max_tokens:3000,messages:[
+      {role:"system",content:IC_SYS},
+      {role:"user",content:[{type:"text",text:"【口味】"+(IC_KIND[el("ic-kind").value]||IC_KIND.asis)
+        +"\n\n这是读者要发社区动态的 "+imgs.length+" 张图。按三步来，只输出那段 JSON。"}]
+        .concat(imgs.map(function(d){return {type:"image_url",image_url:{url:d}}}))}
+    ]};
+    if(c.k==="sde_glm_key")body.thinking={type:"disabled"};
+    else if(c.k==="sde_qwen_key")body.enable_thinking=false;
+    var url=c.proxy?"/api/llm-proxy":c.url;
+    var hd={"content-type":"application/json",authorization:"Bearer "+key};
+    if(c.proxy)hd["x-target-url"]=c.url;
+    var ctl=new AbortController(),to=setTimeout(function(){try{ctl.abort()}catch(e){}},90000);
+    fetch(url,{method:"POST",headers:hd,body:JSON.stringify(body),signal:ctl.signal}).then(function(r){
+      return r.text().then(function(t){return{s:r.status,t:t}});
+    }).then(function(z){
+      clearTimeout(to);fin();
+      if(z.s===401||z.s===403){icNote("Key 用不了（"+z.s+"）：填错了或没开这个型号的权限。");return;}
+      if(z.s===402||z.s===429){icNote("这把 Key 此刻用不了（"+z.s+"）：余额不足或调得太快。");return;}
+      var j=null;try{j=JSON.parse(z.t)}catch(e){}
+      if(z.s!==200){
+        var m=(j&&j.error&&(j.error.message||j.error.type))||String(z.t||"").slice(0,140);
+        icNote(c.n+" 返回错误 "+z.s+"："+m);return;
+      }
+      var txt=(j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||"";
+      if(typeof txt!=="string"&&txt&&txt.length)txt=txt.map(function(p){return (p&&p.text)||""}).join("");
+      var d=icParse(txt);
+      if(!d||!d.lines.length){
+        var think=(j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.reasoning_content)||"";
+        icNote(think&&!txt
+          ?"它把额度全花在“想”上了，正文没写出来。换一个不默认思考的型号再试。"
+          :"它没按格式回。再点一次，或换个型号试试。");
+        return;
+      }
+      icPaint(d);
+    }).catch(function(e){
+      clearTimeout(to);fin();
+      var msg=(e&&e.name==="AbortError")
+        ?"超时了（超过 90 秒）。图小一点或换个型号再试。"
+        :"连不上 "+c.n+"："+((e&&e.message)||"网络异常")+"。如果是浏览器拦了跨域（CORS），换一家试试。";
+      icNote(msg);
+    });
+  }
+  picks.forEach(function(b64){
+    icShrink(b64,function(d){
+      if(d)imgs.push(d);
+      if(++done===picks.length)fire();
+    });
+  });
+};
+
+/* 新消息（谁赞了我、谁评了我） */
+function moPaintBadge(){
+  var b=el("tb-mo");
+  b.textContent=moBadgeN>99?"99+":String(moBadgeN||"");
+  b.classList.toggle("on",moBadgeN>0||!!moFresh);
+  if(moBadgeN<=0&&moFresh)b.textContent="";
+  var nb=el("mo-newsbar");
+  nb.classList.toggle("on",moBadgeN>0);
+  nb.textContent=moBadgeN>0?("有 "+moBadgeN+" 条新消息 ›"):"";
+}
+el("mo-newsbar").onclick=function(){
+  el("nw-list").innerHTML='<div class="hint">正在加载…</div>';
+  show("monews");
+  api("mo",{a:"news"}).then(function(x){
+    var L=el("nw-list");L.textContent="";
+    var ns=(x.d&&x.d.news)||[];
+    moBadgeN=0;moPaintBadge();
+    if(!ns.length){L.innerHTML='<div class="hint">没有新消息。</div>';return;}
+    ns.forEach(function(n){
+      var d=mkEl("div","nw");
+      d.appendChild(mkEl("b",null,n.name||"有人"));
+      d.appendChild(document.createTextNode(n.k==="like"?" 赞了你的动态":(n.k==="reply"?" 回复了你：":" 评论了你：")));
+      if(n.k!=="like")d.appendChild(document.createTextNode(n.text||""));
+      d.appendChild(mkEl("div","t",moFmt(n.ts)));
+      d.onclick=function(){moGo("","")};
+      L.appendChild(d);
+    });
+  }).catch(function(){el("nw-list").innerHTML='<div class="hint">加载失败。</div>'});
+};
+function moBadge(){
+  if(!CRED)return;
+  api("mo",{a:"badge"}).then(function(x){
+    if(!x.d||!x.d.ok)return;
+    moBadgeN=x.d.n||0;moFresh=x.d.fresh||0;
+    moPaintBadge();
+  }).catch(function(){});
+}
+
+/* 起 */
+/* Google 登录暂停使用（2026-07-30 用户裁定）：不再加载 accounts.google.com，
+   避免大陆访问卡在这条外链上。后端 verifyIdent 仍然接受 Google 凭证，
+   要恢复只需把下面这行的 0 改回 1。 */
+var USE_GOOGLE=0;
+if(USE_GOOGLE){(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;
+ s.onload=bootGsi;s.onerror=function(){el("gsi").textContent="无法连接 Google 登录服务。"};document.head.appendChild(s);})();
+ el("gsi").style.display="";}
+if(CRED)afterLogin();
+window.__sdeWx={api:api,openDm:openDm,openGroup:openGroup,openGnew:openGnew,openGinfo:openGinfo,addMsg:addMsg,
+  loadInbox:loadInbox,loadBook:loadBook,renderBook:renderBook,setReply:setReply,
+  state:function(){return{ME:ME,contacts:contacts,groups:groups,chats:chats,cur:cur,unread:unread,usePoll:usePoll,replyTo:replyTo,gMembers:gMembers,gOwner:gOwner}},
+  _afterLogin:afterLogin,_setCred:function(c){CRED=c},_show:show,
+  moGo:moGo,moLoad:moLoad,moRender:moRender,moBadge:moBadge,moOpenPost:moOpenPost,moShrink:moShrink,
+  dtOpen:dtOpen,dtBadge:dtBadge,dtRender:dtRender,dtRow:dtRow,
+  dtState:function(){return{dtN:dtN,dtFresh:dtFresh,dtLast:dtLast,dtPosts:dtPosts,dtMore:dtMore}},
+  _dtSet:function(o){if("n" in o)dtN=o.n;if("fresh" in o)dtFresh=o.fresh;if("last" in o)dtLast=o.last;if(o.posts)dtPosts=o.posts;},
+  moState:function(){return{moWho:moWho,moWhoName:moWhoName,moPosts:moPosts,moPick:moPick,moBadgeN:moBadgeN,moFresh:moFresh,moMore:moMore,moNext:moNext}},
+  _moSet:function(o){if(o.posts)moPosts=o.posts;if(o.pick)moPick=o.pick;if("badgeN" in o)moBadgeN=o.badgeN;if("fresh" in o)moFresh=o.fresh;if("who" in o){moWho=o.who;moWhoName=o.whoName||"";}}};
+})();
+</script>
+</body>
+</html>

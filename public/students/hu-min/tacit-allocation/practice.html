@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拿到一个「人均」，先问它是谁分出来的 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的判断是：很多被当成某个单位自身属性的数（人均、率、份额、分摊成本），其实是一次没有人作出、也没有人负责的分配的产物。这篇文章把它落成可上手的：怎么识别这类数、怎么用一句话验它、怎么把那次隐形的分配重新变成一个有人签字的决定。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="拿到一个「人均」，先问它是谁分出来的 · 方法实践文">
+<meta property="og:description" content="母文的判断是：很多被当成某个单位自身属性的数（人均、率、份额、分摊成本），其实是一次没有人作出、也没有人负责的分配的产物。这篇文章把它落成可上手的：怎么识别这类数、怎么用一句话验它、怎么把那次隐形的分配重新变成一个有人签字的决定。">
+<link rel="canonical" href="https://sdeuniverses.com/students/hu-min/tacit-allocation/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/hu-min/tacit-allocation/">← 回母文《默配》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《默配》</div>
+  <h1 class="art-title">拿到一个「人均」，先问它是谁分出来的</h1>
+  <div class="art-subtitle">——一套查「默配」的操作办法</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 3441 字</div>
+  <div class="swap">
+    <a href="/students/hu-min/tacit-allocation/"><b>← 母文 · 默配</b><span>完整论证在这里</span></a>
+    <a href="/students/hu-min/tacit-allocation/explain.html"><b>🌱 白话解释文 · 四个人合租，你那份房租是你自己的事吗</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的判断是：很多被当成某个单位自身属性的数（人均、率、份额、分摊成本），其实是一次没有人作出、也没有人负责的分配的产物。这篇文章把它落成可上手的：怎么识别这类数、怎么用一句话验它、怎么把那次隐形的分配重新变成一个有人签字的决定。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">什么时候该用这套检查</a></li><li><a href="#s2">第一步：把「测量」和「分配」分开</a></li><li><a href="#s3">第二步：用一句话验它</a></li><li><a href="#s4">第三步：三档读数怎么办</a></li><li><a href="#s5">第四步：把默配变成一次有人签字的分配</a></li><li><a href="#s6">第五步：盯住两端的失效信号</a></li><li><a href="#s7">三种做坏的方式</a></li><li><a href="#s8">五个实操疑问</a></li><li><a href="#s9">用在自己身上</a></li><li><a href="#s10">一页纸操作卡</a></li><li><a href="#s11">一个走完全套的例子</a></li><li><a href="#s12">与三种常见做法的分工</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>什么时候该用这套检查</h2>
+<p>只要满足两个条件，就该查：</p>
+<p><b>条件一，总量是固定的、必须被切开的。</b>预算、编制、席位、工时、床位、服务器成本、一段总时长、一个总人口。<b>条件二，切出来的那一份被当成了某个单位自己的数来用。</b>用来排名、用来考核、用来分配下一轮资源、用来对外说明。</p>
+<p>两条都占，那个数就一定是分出来的，不是测出来的。差别只在于这次分配有没有被当成一个决定来处理。</p>
+<p>有一个非常好用的触发信号：<b>一线的人反复说“这个数不对”，但说不出哪儿不对。</b>这几乎总是默配的现场——那个数在它自己的口径里完全正确，所以挑不出错，可它跟现场对不上，因为它测的根本不是现场。</p>
+<h2 id="s2"><span class="no">02</span>第一步：把「测量」和「分配」分开</h2>
+<p>拿到任何一个数，先做这个分类，一分钟就够。</p>
+<p>问：<b>要得到这个数，需不需要参照别的单位？</b></p>
+<p>不需要 → 测量。房间面积、机器功率、某个人的实际工时、某台设备的实际耗电。这些数不受别人影响，别人变了它不变。</p>
+<p>需要 → 分配。人均、占比、份额、分摊成本、标化率、排名、权重。这些数只要别的单位一变，它自己不动也会变。</p>
+<p>做完这个分类你通常会发现一件事：<b>你日常用来做决定的那些数，绝大多数在第二类里。</b>而它们在语言上全都被说成了第一类——「他们科室的人均」「这个年龄段的患病率」「这个部门的成本」。</p>
+<p>第一步的全部价值，就是把主语改回来：不是「他那份」，是「我们按某个算法分给他那份」。</p>
+<h2 id="s3"><span class="no">03</span>第二步：用一句话验它</h2>
+<p>母文给的判据只有一句，不含程度词，可以拿去问文件而不是问人：</p>
+<p><b>「这个数，换一种算法之后还成立吗？」</b></p>
+<p>操作起来是这样：</p>
+<p>1. 找出现在用的算法（往往写在某个附件里，或者根本没写下来，只在某个人的表格公式里）2. 找一种同样合理的替代算法（不是找一个更好的，是找一个同样说得通的）3. 两种都算一遍4. 比排名，不比数值</p>
+<p><b>比排名不比数值</b>这一条要记牢。数值差一点很正常，真正说明问题的是<b>顺序有没有翻</b>。如果换个算法排名就翻个儿，那么这个排名反映的主要是算法。</p>
+<h2 id="s4"><span class="no">04</span>第三步：三档读数怎么办</h2>
+<p>算完两遍，落在三档里的一档：</p>
+<p><b>第一档，排名基本不变。</b>这个数比较结实，可以放心用。同时把这次验算的结果写下来存档——下次有人质疑时，你有一份现成的证据。</p>
+<p><b>第二档，排名局部变动。</b>中间的几名换了位置，头尾没变。这时候要做的是<b>缩小它的用途</b>：可以用来看大格局，不能用来做临界判定（比如末位淘汰、达标线、评优）。因为临界判定恰好落在最不稳的那一段上。</p>
+<p><b>第三档，排名大幅翻转。</b>停止把它当成属性使用。它仍然可以作为一个内部参考量，但不能进考核、不能进对外文件、不能作为资源分配的依据。这一档要做第四步。</p>
+<h2 id="s5"><span class="no">05</span>第四步：把默配变成一次有人签字的分配</h2>
+<p>这是全部工作的落点。既然不存在正确算法，那么唯一诚实的做法不是找到正确算法，而是<b>让这次选择变成一个明面上的、有人负责的决定</b>。</p>
+<p>三个动作，从易到难：</p>
+<p><b>动作一：写下口径与理由。</b>在任何用到这个数的文件里，加一行：本表采用某某口径，理由是某某，另一种常见口径为某某。一行字，成本极低，作用极大——它把“这是客观数据”改成了“这是我们的选择”。</p>
+<p><b>动作二：指定一个人。</b>这个口径由谁定、谁有权改、什么时候复核。默配之所以没人负责，就是因为它从来没有被指派过。指派完，它就变成了一个普通的、可以被质疑和修订的决定。</p>
+<p><b>动作三：写下这次选择牺牲了什么。</b>每一种口径都在保护某一端、牺牲另一端。把牺牲的那一端明确写出来：「本口径便于横向比较，代价是小规模单位的实际情况被压平。」这一句话会让受损的那一方至少有据可依。</p>
+<h2 id="s6"><span class="no">06</span>第五步：盯住两端的失效信号</h2>
+<p>母文说，曲线两端的失效都不报警。所以要人工设两个哨兵。</p>
+<p><b>贴实际那一端的失效信号</b>：横向比较做不下去，会议上反复出现「这两个数没法比」，于是有人提议“统一口径”。听到这句提议时，要问一句：统一之后，谁的实际情况会被压平？</p>
+<p><b>统一口径那一端的失效信号</b>：数据很干净，结论很清楚，而一线持续反映对不上。听到「一线的感受不够客观」这句话时，要警觉——这句话本身就是这一端失效的典型症状。</p>
+<p>两个信号出现时，正确反应都不是往另一端推到底，而是<b>回到第二步，把两种算法都算一遍，看差在哪儿</b>。</p>
+<h2 id="s7"><span class="no">07</span>三种做坏的方式</h2>
+<p><b>做坏一：用它来否定所有数据。</b>「反正数都是分出来的，不用信」——这是最坏的用法，也是最常见的误读。本文要求的是同一件事算两遍，这比只算一遍更严格。凡是拿这套说法来支持“跟着感觉走”的，是把它用反了。</p>
+<p><b>做坏二：把它变成一场关于算法的无限争论。</b>因为不存在完美算法，所以争论可以永远进行下去。防止的办法是给争论定一个终点：<b>选定一个口径、写下理由和牺牲、定一个复核日期，然后照它执行。</b>执行期内不再争论口径，到期再议。</p>
+<p><b>做坏三：只在自己吃亏的时候查。</b>这是最常见的实际情况——某个部门排名靠后，就开始质疑分摊方式。这会让整套检查变成一个讨价还价的工具，几次之后就没人当真了。正确做法是<b>在拿到数据的时候一律查一遍，不管这次结果对自己有利还是不利</b>，并且把有利时的验算结果也一并公开。</p>
+<h2 id="s8"><span class="no">08</span>五个实操疑问</h2>
+<p><b>一、找不到第二种算法怎么办？</b>几乎总是能找到。最省事的三种替代口径：按人头、按时间、按产出。三选一，跟现行口径不同的那个就是你的第二种算法。</p>
+<p><b>二、只有我一个人在意这件事，做了有什么用？</b>有用，而且是最有杠杆的一件事。你会成为房间里唯一能在关键时刻说清“这个排名主要来自分摊方式”的人。这句话在临界判定的场合分量很重。</p>
+<p><b>三、领导说“别搞复杂，就用现在这个”怎么办？</b>接受，然后做动作一——把口径和另一种口径写在附注里。不改结论，只留记录。这个成本是零，而且几乎没有人会反对写一行说明。</p>
+<p><b>四、这套东西会不会让决策变慢？</b>验算一次通常是半小时的事。真正慢的是出事之后重新论证一整套考核体系是否合理。</p>
+<p><b>五、怎么判断我们这里的默配严重不严重？</b>一个粗略的读数：把最近一年里用来做重要决定的五个数拿出来，逐个做第一步分类。如果五个里有四个以上属于「分配」而不是「测量」，且没有一个写下过口径理由，那就是重的。</p>
+<h2 id="s9"><span class="no">09</span>用在自己身上</h2>
+<p>这套东西拿来查自己也很有用。</p>
+<p>一个人对自己的评价，几乎全部是分配出来的，不是测出来的。「我在同龄人里算中等」「我这个水平在这个行业里排不上号」——这些判断全都需要参照别人，别人一变它就变，而且用哪个参照系完全没有被审视过。</p>
+<p>用同样三步：这个判断需不需要参照别人（需要 → 是分配）；换一个参照系还成立吗（换个城市、换个行业、换个年龄段）；如果换了就翻个儿，那它说的是参照系，不是我。</p>
+<p>这不是自我安慰的技巧。它是同一条判据落在同一类问题上：<b>凡是需要参照别人才能得到的数，就不是你自己的属性。</b></p>
+<h2 id="s10"><span class="no">10</span>一页纸操作卡</h2>
+<p>1. 两个触发条件：总量固定必须切分 ＋ 切出的份额被当成谁自己的数2. 第一步分类：得到它需不需要参照别的单位？需要＝分配，不需要＝测量3. 第二步验算：找一种同样合理的替代算法，两种都算，<b>比排名不比数值</b>4. 三档处置：排名不变→照用并存档；局部变动→缩小用途，不做临界判定；大幅翻转→停止当属性用5. 第四步签字：写下口径与理由／指定负责人与复核日期／写明这次选择牺牲了什么6. 两个哨兵：听到「统一口径」问谁被压平；听到「一线不够客观」立刻回去算第二遍7. 三条不许：不用它否定所有数据、不让口径之争无限进行、不只在自己吃亏时查8. 同样三步拿来查一次自己对自己的评价</p>
+<h2 id="s11"><span class="no">11</span>一个走完全套的例子</h2>
+<p>一家有六个科室的医院，年终要评“人均效率”，排名后两位的科室次年编制不增。检验科连续两年垫底，主任每次都说这个数不对，但说不清哪儿不对。</p>
+<p><b>第一步分类。</b>人均效率＝科室总产出 ÷ 科室人数。产出里包含了门诊量、检查例数、收入。问一句：得到这个数需不需要参照别的科室？——单看是不需要，但它被用来排名，而排名需要。更关键的是“产出”的口径里有大量公摊：设备折旧怎么摊、共用的标本流转岗算谁的人头、夜班值守算不算工时。这些都需要参照别人。判定：<b>分配，不是测量。</b></p>
+<p><b>第二步验算。</b>现行口径是按在册人数算人均。他们找了一个同样合理的替代：按实际工时算（把夜班、值守、跨科支援折算进去）。两种都算了一遍。</p>
+<p><b>第三步读数。</b>排名大幅翻转：检验科从第六升到第三，另一个原本第二的科室掉到第五。原因很直白——检验科有大量夜班和随叫随到的值守工时，这些工时在“在册人数”口径里完全不出现，等于白干；而按在册人数算，人越多分母越大，一个必须配足夜班人力的科室天然吃亏。</p>
+<p>落在第三档，处置是：<b>停止把它当成科室属性使用</b>。</p>
+<p><b>第四步签字。</b>他们做了三件事。一是在评比文件里加了一行：本表采用在册人数口径，另一常见口径为实际工时口径，两者排名差异较大。二是指定了口径的责任人（医务科副科长），并写明每年十月复核一次。三是写下这次选择牺牲了什么：「本口径便于快速核算，代价是夜班与值守密集的科室被系统性低估。」</p>
+<p><b>结果。</b>当年的编制决定没有立刻改变，但“排名后两位次年编制不增”这条硬规则被改成了“排名后两位需提交口径说明”。这个改动看起来很小，实际上把一次没人作出的分配，变成了一件必须有人开口说话的事。</p>
+<p>注意整个过程里，没有一次是在论证“哪种算法才对”。他们只是把选择摆到了明面上。</p>
+<h2 id="s12"><span class="no">12</span>与三种常见做法的分工</h2>
+<p><b>和「提高数据质量」的分工。</b>数据质量处理的是采集准不准——有没有漏报、有没有录错、口径执行得一致不一致。本文处理的是口径本身的选择。两者容易混，混了会走弯路：一个默配问题被当成数据质量问题，结果是把采集越做越细，而那个决定排名的口径始终没被碰过。分辨的办法：如果把所有采集误差都修到零，这个排名会不会变？不会，那就是口径问题。</p>
+<p><b>和「多指标综合评价」的分工。</b>加更多指标是很自然的反应——既然一个数不可靠，那就多用几个。这有帮助，但要注意：多个指标最后还是要合成一个总分，而<b>合成的权重本身就是一次默配</b>。加指标不解决问题，只是把那次没人签字的分配挪到了权重表里。所以做多指标评价时，第二步的验算要做在权重上。</p>
+<p><b>和「申诉/复议机制」的分工。</b>申诉机制处理的是个案纠错，本文处理的是结构。差别在于：申诉要求受损方举证，而默配的受损方恰恰举不出证（他手里只有“实际情况不是这样”）。所以申诉机制在默配面前基本失效。要让它有效，必须先做第四步——把口径和它牺牲的那一端写下来。写下来之后，受损方才有了可以援引的东西。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/hu-min/tacit-allocation/">《默配》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/hu-min/tacit-allocation/explain.html">🌱 白话解释文《四个人合租，你那份房租是你自己的事吗》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/hu-min/tacit-allocation/">回母文</a> ·
+  <a href="/students/hu-min/works/">胡敏 · 慢性病 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

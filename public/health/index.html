@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健康专栏 · Health | SDE Universes</title>
+<meta name="description" content="疾病不是被发现的故障，而是身体在特征纠缠中「如何发生、如何自持、如何锁死」。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#2E8B57;--accent2:#40A06B}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:66vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#2E8B5714 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#2E8B570d 1px,transparent 1px),linear-gradient(90deg,#2E8B570d 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.4rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.6rem,7vw,5rem);font-weight:700;line-height:1.05;color:var(--text)}
+.title .en-only{color:var(--accent)}
+.sub{position:relative;font-size:clamp(1.05rem,2.3vw,1.35rem);color:var(--text2);max-width:640px;margin:1.6rem auto 2rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.5rem 0}
+.lead{font-size:1.12rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.pick{background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--accent);border-radius:6px;padding:1.6rem 1.4rem;transition:transform 0.2s,box-shadow 0.2s}
+.pick:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(138,104,23,0.1)}
+.pick h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.12rem;font-weight:600;color:var(--accent);margin-bottom:0.7rem;line-height:1.35}
+.pick p{font-size:0.94rem;color:var(--text2);line-height:1.75}
+.note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
+.note p{color:var(--text2);font-size:0.98rem}
+.note b{color:var(--accent)}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-bar-sub a{font-size:0.92rem}
+  .block{scroll-margin-top:5.5rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .picks{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
+}
+
+.block{margin:0 0 3.4rem;scroll-margin-top:6.5rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.32rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.98rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(138,104,23,.08)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
+.art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.55rem;font-size:0.82rem;color:var(--accent);letter-spacing:0.05em}
+.art.feature{grid-column:1 / -1;border-left-width:4px;background:linear-gradient(180deg,var(--card),var(--card2))}
+.art.feature h4{font-size:1.22rem}
+.tailnote{margin-top:1rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.5rem 1.4rem}
+.tailnote p{color:var(--text2);font-size:0.96rem}.tailnote b{color:var(--accent)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav-bar-sub{display:flex;align-items:center;justify-content:space-around;width:100%;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.05rem;font-weight:700;letter-spacing:0.13em;white-space:nowrap;transition:color .2s,opacity .2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
+@media(max-width:640px){.art-grid{grid-template-columns:1fr}}
+.nav-bar-sub a[href="#hea-body"]{color:#2E8B57}
+.nav-bar-sub a[href="#hea-mind"]{color:#7A4E9E}
+.nav-bar-sub a[href="#hea-quartet"]{color:#0A66C2}
+
+/* ── 论文抄袭专栏：燃烧警示 ───────────────────────────
+   字身掐在炭底→正红（最亮档 4.90:1，米底上仍可读）；
+   橙黄只走辉光，不进字色——真烧成橙黄，字就糊在米底上，警示反而失效。 */
+@keyframes plg-burn{
+  0%{background-position:50% 100%}
+  100%{background-position:50% 0%}
+}
+@keyframes plg-flicker{
+  0%,100%{filter:drop-shadow(0 0 1px rgba(198,40,40,.40)) drop-shadow(0 1px 5px rgba(217,58,30,.22))}
+  28%{filter:drop-shadow(0 0 2px rgba(226,59,59,.72)) drop-shadow(0 1px 9px rgba(232,80,30,.40))}
+  46%{filter:drop-shadow(0 0 1px rgba(163,46,78,.50)) drop-shadow(0 1px 4px rgba(217,58,30,.18))}
+  63%{filter:drop-shadow(0 0 3px rgba(226,59,59,.80)) drop-shadow(0 2px 12px rgba(245,124,31,.42))}
+  81%{filter:drop-shadow(0 0 1px rgba(198,40,40,.45)) drop-shadow(0 1px 6px rgba(232,80,30,.24))}
+}
+.burn{
+  background-image:linear-gradient(0deg,
+    #4A0810 0%, #5E0A16 14%, #8C1F33 30%, #A32E4E 46%,
+    #B92B36 62%, #C62828 76%, #A32E4E 90%, #5E0A16 100%);
+  background-size:100% 340%;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  animation:plg-burn 3.6s linear infinite, plg-flicker 1.7s ease-in-out infinite;
+  font-weight:800;
+}
+.burn sup{-webkit-text-fill-color:#A32E4E;color:#A32E4E}
+/* 光敏与前庭敏感：停火，退回静态酒红（对比度 5.99:1） */
+@media(prefers-reduced-motion:reduce){
+  .burn{animation:none;background-image:none;color:#A32E4E;-webkit-text-fill-color:#A32E4E}
+}
+/* 不支持 background-clip:text 的浏览器兜底 */
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .burn{color:#A32E4E;-webkit-text-fill-color:#A32E4E;background-image:none;animation:plg-flicker 1.7s ease-in-out infinite}
+}
+.nav-bar-sub a[href="/health/from-students/"]{color:#2E8B57}
+</style>
+<style>
+.hc-plan{margin:0 0 2.4rem;padding:1.6rem;border:1px solid rgba(46,139,87,.28);border-radius:18px;background:linear-gradient(145deg,#f0faf5,#fff);box-shadow:0 10px 35px rgba(26,95,70,.08)}
+.hc-plan-head{display:flex;justify-content:space-between;gap:1rem;align-items:end;margin-bottom:1.1rem}.hc-plan-head h2{margin:0;color:#185e49;font-size:clamp(1.3rem,3vw,1.85rem)}.hc-plan-head span{color:#397965;font-size:.82rem}
+.hc-plan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}.hc-set{padding:1rem;border:1px solid #d3e8df;border-radius:12px;background:#fff}.hc-set b{display:block;color:#183f34;margin-bottom:.55rem;line-height:1.5}.hc-links{display:flex;gap:.45rem;flex-wrap:wrap}.hc-links a{font-size:.76rem;padding:.34rem .58rem;border-radius:999px;border:1px solid #bddccd;color:#17654f}.hc-links a:first-child{background:#238468;color:#fff;border-color:#238468}
+@media(max-width:720px){.hc-plan-grid{grid-template-columns:1fr}.hc-plan-head{display:block}.hc-plan-head span{display:block;margin-top:.4rem}}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/" class="zh-only">首页</a><a href="/browse/" class="en-only">Home</a>
+    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
+    <a href="/health/" class="sib here zh-only">健康专栏</a><a href="/health/" class="sib here en-only">Health</a>
+    <a href="/business/" class="sib zh-only">商业与经济</a><a href="/business/" class="sib en-only">Business &amp; Economics</a>
+    <a href="/plagiarism/" class="sib zh-only burn">论文抄袭专栏</a><a href="/plagiarism/" class="sib en-only burn">Plagiarism</a>
+    <a href="/discovery-vs-genesis/" class="sib zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="sib en-only">Discovery vs Genesis</a>
+    <a href="/ai/" class="sib zh-only">AI专栏</a><a href="/ai/" class="sib en-only">AI</a>
+    <a href="/philosophy/" class="sib zh-only">思想宇宙</a><a href="/philosophy/" class="sib en-only">Philosophy</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+  <div class="nav-bar-sub">
+    <a href="#hea-body" class="zh-only">身体发生学</a><a href="#hea-body" class="en-only">The Body</a>
+    <a href="#hea-mind" class="zh-only">心身与健康观</a><a href="#hea-mind" class="en-only">Mind & Body</a><a href="#hea-quartet" class="zh-only">金点子四篇</a><a href="#hea-quartet" class="en-only">Gold-Point Quartet</a><a href="/health/medicine/" class="zh-only">医学与健康</a><a href="/health/medicine/" class="en-only">Medicine &amp; Health</a><a href="#hea-institution" class="zh-only">制度四篇</a><a href="#hea-institution" class="en-only">The Institution</a>
+    <a href="#hea-picks" class="zh-only">学员精选</a><a href="#hea-picks" class="en-only">Picks</a>
+        <a href="/health/from-students/" class="zh-only">学员专栏频道</a><a href="/health/from-students/" class="en-only">Student Channel</a>
+  
+    <a href="/sleep/" class="zh-only">睡眠专栏</a><a href="/sleep/" class="en-only">Sleep</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow zh-only">SDE 学科专栏</div><div class="eyebrow en-only">SDE SUBJECT COLUMN</div>
+  <h1 class="title"><span class="zh-only">健康发生学</span><span class="en-only">Genesis of Health</span></h1>
+  <p class="sub zh-only">疾病不是被发现的故障，而是身体在特征纠缠中「如何发生、如何自持、如何锁死」。</p><p class="sub en-only">Illness is not a defect to be discovered — it is how the body occurs, self-sustains, and locks in through entanglement.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">＋学员频道 50 篇 · 长文合辑 · 10 篇 / 3 板块 · 医学与健康增至 10 篇 · 持续增补</span><span class="en-only">Essay Collection · 10 pieces / 3 blocks · Medicine &amp; Health now 10</span></div>
+</header>
+
+<main class="wrap">
+  <section class="hc-plan" id="hea-companions">
+    <div class="hc-plan-head"><h2><span class="zh-only">健康理论并蒂文 · 10 组完成</span><span class="en-only">Health Theory Companion Series · 10 Sets</span></h2><span class="zh-only">每组：理论母文＋通俗诠释＋实践流程</span><span class="en-only">Original theory + plain-language interpretation + practice workflow</span></div>
+    <div class="hc-plan-grid">
+      <div class="hc-set"><b>01 · 重锚：溃散后重新组织可行秩序</b><div class="hc-links"><a href="/column/reanchoring/">母文</a><a href="/column/reanchoring/interpretation/">诠释文</a><a href="/column/reanchoring/practice/">实用文</a></div></div>
+      <div class="hc-set"><b>02 · 未济态：在拒绝完成中保持生成</b><div class="hc-links"><a href="/column/unfinished-state/">母文</a><a href="/column/unfinished-state/interpretation/">诠释文</a><a href="/column/unfinished-state/practice/">实用文</a></div></div>
+      <div class="hc-set"><b>03 · 沉默的配置：身体的元预算</b><div class="hc-links"><a href="/column/silent-allocation/">母文</a><a href="/column/silent-allocation/interpretation/">诠释文</a><a href="/column/silent-allocation/practice/">实用文</a></div></div>
+      <div class="hc-set"><b>04 · 形塑：治疗成功与未来重建能力</b><div class="hc-links"><a href="/column/therapeutic-deflection/">母文</a><a href="/column/therapeutic-deflection/interpretation/">诠释文</a><a href="/column/therapeutic-deflection/practice/">实用文</a></div></div>
+      <div class="hc-set"><b>05 · 健康：发现还是发生？</b><div class="hc-links"><a href="/column/discovery-vs-genesis-health/">母文</a><a href="/column/discovery-vs-genesis-health/interpretation/">诠释文</a><a href="/column/discovery-vs-genesis-health/practice/">实用文</a></div></div>
+      <div class="hc-set"><b>06 · 可续返域：把下一次恢复留给未来</b><div class="hc-links"><a href="/health/medicine/renewable-recovery-domain/">母文</a><a href="/health/medicine/renewable-recovery-domain/interpretation/">诠释文</a><a href="/health/medicine/renewable-recovery-domain/practice/">实用文</a></div></div>
+      <div class="hc-set"><b>07 · 身体余路域：功能之外还有没有路</b><div class="hc-links"><a href="/health/medicine/bodily-option-field/">母文</a><a href="/health/medicine/bodily-option-field/interpretation/">诠释文</a><a href="/health/medicine/bodily-option-field/practice/">实用文</a></div></div>
+      <div class="hc-set"><b>08 · 身体未来域：身体还能够成为什么</b><div class="hc-links"><a href="/health/medicine/bodily-future-field/">母文</a><a href="/health/medicine/bodily-future-field/interpretation/">诠释文</a><a href="/health/medicine/bodily-future-field/practice/">实用文</a></div></div>
+      <div class="hc-set"><b>09 · 终止失败：结束是一套独立程序</b><div class="hc-links"><a href="/health/medicine/termination-failure/">母文</a><a href="/health/medicine/termination-failure/interpretation/">诠释文</a><a href="/health/medicine/termination-failure/practice/">实用文</a></div></div>
+      <div class="hc-set"><b>10 · 癌症的组织场—演化重构</b><div class="hc-links"><a href="/health/medicine/cancer-field-and-evolution/">母文</a><a href="/health/medicine/cancer-field-and-evolution/interpretation/">诠释文</a><a href="/health/medicine/cancer-field-and-evolution/practice/">实用文</a></div></div>
+    </div>
+  </section>
+  <section>
+    <div class="block" id="hea-genesis-essay" style="margin-bottom:2.2rem">
+      <a class="art feature" href="/column/discovery-vs-genesis-health/" style="display:block">
+        <span class="k"><span class="zh-only">发现VS发生 · 三篇长论之二 · 约两万字</span><span class="en-only">DISCOVERY VS GENESIS · LONG ESSAY II · ~20k chars</span></span>
+        <h4><span class="zh-only">健康：发现还是发生？</span><span class="en-only">Health: Discovery or Genesis?</span></h4>
+        <p class="zh-only">按 SDE 本体论专著写就的长论：病不是身体上多出来的一样坏东西，而是身体这条发生链——供养、运行、显露——出了失调。连癌症都不是「局部坏了」，而是「局部太成功却拒绝归入整体」。含 AI 时代的健康困境与挑战。（本文是思维眼镜，不是诊疗方案。）</p><p class="en-only">A long essay in the SDE-ontology register: illness is a dysregulation of the body's genesis chain, not a bad thing added. Even cancer is "a part too successful yet refusing the whole." (A lens, not a prescription.)</p>
+        <span class="rd"><span class="zh-only">读长论 · 健康 →</span><span class="en-only">Read the essay →</span></span>
+      </a>
+    </div>
+
+    <div class="block" id="hea-body">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">壹</span><span class="en-only">I</span></span>
+        <span class="block-title"><span class="zh-only">身体的发生学 · 器官为何向自己开火</span><span class="en-only">The Genesis of the Body · When Organs Turn on Themselves</span></span>
+      </div>
+      <p class="block-desc zh-only">病，不是器官坏了，而是它所在的整个互动网络熄了火——从炎症到失眠，身体的失衡都有它的发生逻辑。</p><p class="block-desc en-only">Disease is not an organ breaking but its whole interaction network going dark — from inflammation to insomnia, every imbalance has its genesis.</p>
+      <div class="art-grid">
+        <a class="art" href="/column/no-iq-eq-wq/">
+          <span class="k"><span class="zh-only">★ 新 · 据《三律心理学》第四编</span><span class="en-only">NEW · From Three-Law Psychology, Part IV</span></span>
+          <h4><span class="zh-only">人没有智商、情商、意商</span><span class="en-only">No IQ, No EQ, No WQ</span></h4>
+          <p class="zh-only">三个商数把一段运行的状态,误当成一个人身上固有的存量。取而代之的是知格、意格、情格——三律的运行形态,各含四个条件依赖的参数;心理健康＝三律齐备＋通畅＋平衡。</p><p class="en-only">The three quotients mistake a mode of running for a stock a person owns. In their place: knowing-form, willing-form, feeling-form — and mental health as completeness, patency and balance.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/chronic-inflammation/">
+          <span class="k"><span class="zh-only">健康发生学 · 约万字</span><span class="en-only">Genesis of Health · ~10k words</span></span>
+          <h4><span class="zh-only">慢性炎症：身体为什么向自己开火？</span><span class="en-only">Chronic Inflammation: Why the Body Fires on Itself</span></h4>
+          <p class="zh-only">炎症本是身体最忠诚的卫兵，红肿热痛是它在灭火救灾。可当救火队从「来了就走」变成「常驻不撤」，它就从救你的力量，变成慢慢磨损你的力量——不是敌人入侵，是自家卫兵忘了收兵。</p><p class="en-only">Inflammation is the body's most loyal firefighter — but when the crew stops leaving, the force that saved you starts wearing you down. Not an invasion: sentries that forgot to stand down.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/gut-brain/">
+          <span class="k"><span class="zh-only">健康发生学 · 约万字</span><span class="en-only">Genesis of Health · ~10k words</span></span>
+          <h4><span class="zh-only">肠道与情绪：第二个大脑在替你做决定？</span><span class="en-only">Gut and Mood: Is a Second Brain Deciding for You?</span></h4>
+          <p class="zh-only">我们以为「我」住在大脑里，是纯粹的精神主体。可肚子里那片看不见的生态，却在持续影响你的情绪、食欲甚至选择。紧张会拉肚子，悲伤会没胃口——身份，或许也在那片被忽视的土壤里。</p><p class="en-only">We think the self lives in the brain. But the unseen ecology in the gut shapes mood, appetite, even choice — identity may also live in that neglected soil.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/insomnia/">
+          <span class="k"><span class="zh-only">健康专文 · 约万字</span><span class="en-only">Health Essay · ~10k words</span></span>
+          <h4><span class="zh-only">失眠：为什么越想睡越睡不着？</span><span class="en-only">Insomnia: Why Trying Harder Keeps You Awake</span></h4>
+          <p class="zh-only">失眠最折磨人的地方在于：你越努力，越失败。睡眠属于「越用力越远」的那类事——必须松手才能到达。为什么意志一介入，睡眠就锁死？怎样才能不靠努力重新入睡？</p><p class="en-only">Sleep belongs to the things you reach only by letting go — the moment will intervenes, it locks shut. How to fall asleep without trying.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/thyroid-spinning/">
+          <span class="k"><span class="zh-only">王博士与SDE · 约万字</span><span class="en-only">Dr. Wang &amp; SDE · ~10k words</span></span>
+          <h4><span class="zh-only">空转的甲状腺——一个器官如何「忘了自己是谁」</span><span class="en-only">The Idling Thyroid — When an Organ Forgets Who It Is</span></h4>
+          <p class="zh-only">甲状腺结节，西医要切、中医要调，可为什么切了会复发、调了会反复？因为病根不在甲状腺这个器官，而在它所处的整个互动网络熄了火。病，不是器官坏了，是互动熄火了。</p><p class="en-only">Cut it and it recurs; regulate it and it wavers — because the fault is not the organ but the interaction network around it going cold.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block" id="hea-mind">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">贰</span><span class="en-only">II</span></span>
+        <span class="block-title"><span class="zh-only">心身与健康观 · 情绪、自律与幻觉</span><span class="en-only">Mind, Body & the Idea of Health</span></span>
+      </div>
+      <p class="block-desc zh-only">人格不是标签，幸福不是舒适，自律不是意志的胜利——把健康从口号里赎回来，还给发生。</p><p class="block-desc en-only">Personality is not a label, happiness is not comfort, discipline is not willpower's win — redeeming health from slogans, back to occurrence.</p>
+      <div class="art-grid">
+        <a class="art" href="/column/no-iq-no-eq/">
+          <span class="k"><span class="zh-only">据《SIO心理学》</span><span class="en-only">From SIO Psychology</span></span>
+          <h4><span class="zh-only">人没有智商，也没有情商</span><span class="en-only">You Have No IQ, and No EQ</span></h4>
+          <p class="zh-only">IQ 把认知简化为静态能力，EQ 把情绪化为管理技巧，人格测试把人僵化为类型。可人格不是标签：它的真正内核是知格·意格·情格，是三律在生命历程中的长期沉淀。</p><p class="en-only">IQ freezes cognition into a static score, EQ into a technique, personality tests into types. But the self's core is a long sedimentation of three laws.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/fake-happiness-kills-creativity/">
+          <span class="k"><span class="zh-only">据《SIO心理学》</span><span class="en-only">From SIO Psychology</span></span>
+          <h4><span class="zh-only">假幸福，正在杀死创造力</span><span class="en-only">Fake Happiness Is Killing Creativity</span></h4>
+          <p class="zh-only">撤走张力、消灭混沌、切断纠缠，制造出幸福的幻觉，也批量制造了创造力的死亡。真幸福不是舒适，是顿悟；幸福律，才是创造力枯树回春的解码。</p><p class="en-only">Remove tension, kill chaos, sever entanglement — you manufacture an illusion of happiness and mass-produce the death of creativity. Real joy is insight, not comfort.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/self-discipline-genesis/">
+          <span class="k"><span class="zh-only">据《自律发生学》 · 两万字</span><span class="en-only">From The Genesis of Self-Discipline · ~20k words</span></span>
+          <h4><span class="zh-only">自律的发生学：你越自律，为什么越不像你自己</span><span class="en-only">The Genesis of Self-Discipline</span></h4>
+          <p class="zh-only">自律的失败不是意志的溃败，而是那个观看着的「我」的僭政：登记、征用、追认。网页 · PDF在线 · PDF下载三种模式。</p><p class="en-only">Discipline's failure is not a collapse of will but the tyranny of the watching 'I' — registering, requisitioning, ratifying. Web · PDF online · PDF download.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/health-is-not-slogans/">
+          <span class="k"><span class="zh-only">据《人生的真谛》</span><span class="en-only">From The Meaning of Life</span></span>
+          <h4><span class="zh-only">健康，不是那些口号</span><span class="en-only">Health Is Not Those Slogans</span></h4>
+          <p class="zh-only">西方说健康是良好习惯，中华说吃得健康就是健康，印度说心态好一切都好。三句貌似天经地义的话，其实是三大文明的三场幻觉。真正的健康，是差异在三种逻辑上的自由运行。</p><p class="en-only">The West says habits, China says diet, India says mindset — three self-evident sayings, three civilizational illusions. Real health is difference running free across all three.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block" id="hea-quartet">
+<div class="block-head">
+  <span class="block-num"><span class="zh-only">叁</span><span class="en-only">III</span></span>
+  <span class="block-title"><span class="zh-only">健康的四道切口 · 金点子四篇</span><span class="en-only">Four Incisions into Health · The Gold-Point Quartet</span></span>
+</div>
+<p class="block-desc zh-only">同一个问题——「身体健康的本质是什么？」——由 SDE 金点子发生器沿显露、差异、纠缠三维轮番追问，最后涌现出第四篇新典范。四篇各自独立成论，合起来是一次对现代健康观地基的完整开挖。</p>
+<p class="block-desc en-only">One question — what is health? — driven through Show, Difference and Entanglement by the SDE Gold Point Generator, with a fourth paper emerging as a new paradigm. Four standalone papers; together, one full excavation of the foundations of modern health.</p>
+<div class="art-grid">
+<a class="art" href="/column/reanchoring/">
+  <span class="k"><span class="zh-only">金点子① · 显露(S) · 约2.6万字</span><span class="en-only">Gold Point I · Show (S) · ~26k chars</span></span>
+  <h4><span class="zh-only">重锚：健康不是回到「正确剧本」</span><span class="en-only">Re-anchoring: Health Is Not a Return to the Right Script</span></h4>
+  <p class="zh-only">现代医学把健康等同于指标落回正常范围，背后是一个默认了千年的预设：身体内嵌着一套知道自己该恢复成什么样的自愈脚本。可临床上大量指标完美却整个人失锚的身体，正在推翻这个预设。健康或许不是回到旧秩序，而是在旧秩序被打碎后，还能重新锚定任何一种可行秩序的能力。</p><p class="en-only">Modern medicine equates health with indicators back in range — assuming the body carries an innate script it knows to restore. Patients with perfect numbers and no anchor overturn that. Health may be the power to re-anchor any workable order after the old one shatters.</p>
+  <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+</a>
+<a class="art" href="/column/unfinished-state/">
+  <span class="k"><span class="zh-only">金点子② · 差异(D) · 约2.3万字</span><span class="en-only">Gold Point II · Difference (D) · ~23k chars</span></span>
+  <h4><span class="zh-only">未济态：健康在拒绝完成中生成自身</span><span class="en-only">The Unfinished State: Health Generates Itself by Refusing Completion</span></h4>
+  <p class="zh-only">疼痛被彻底消除、指标被彻底达标、诊断被彻底给定——每一次「完成」都像是胜利。但从疼痛慢性化、免疫探索冗余到突触缩放，三个生理层面都指向同一件事：一旦完成，可塑性就关闭。《周易》以未济收卦，或许说的正是身体的事。</p><p class="en-only">Pain fully erased, targets fully met, diagnosis fully fixed — each completion looks like victory. Yet chronic pain, immune redundancy and synaptic scaling all point one way: once complete, plasticity closes. The I Ching ends on "not yet across."</p>
+  <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+</a>
+<a class="art" href="/column/silent-allocation/">
+  <span class="k"><span class="zh-only">金点子③ · 纠缠(E) · 约2.0万字</span><span class="en-only">Gold Point III · Entanglement (E) · ~20k chars</span></span>
+  <h4><span class="zh-only">沉默的配置：身体如何越过意识做出裁决</span><span class="en-only">Silent Allocation: How the Body Rules Over Consciousness</span></h4>
+  <p class="zh-only">当代健康话语默认意识是身体的最终责任人：你知道、你管理、你负责。可身体有一套不经协商的元预算——能源配给的选择性剥夺、感知阈值的底层着色、否决权的最终执行。它不是不听话，是它先算完了账。</p><p class="en-only">Health discourse assumes consciousness is the body's final manager. But the body runs a meta-budget without consultation: selective energy deprivation, threshold tinting, and a final veto. Not disobedience — it settled the account first.</p>
+  <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+</a>
+<a class="art" href="/column/therapeutic-deflection/">
+  <span class="k"><span class="zh-only">新典范 · 三金点子涌现 · 约2.3万字</span><span class="en-only">New Paradigm · Emergence · ~23k chars</span></span>
+  <h4><span class="zh-only">形塑：当成功的治疗窄化了身体的重建能力</span><span class="en-only">Deflection: When Successful Treatment Narrows the Body's Capacity to Rebuild</span></h4>
+  <p class="zh-only">最精准、最有效地清除了病灶与不适的治疗，有时也悄悄窄化了身体自己重建秩序的能力。这不是副作用，也不是医源病——信号被架空、中枢在缺信号中代偿重组、探索被悬置：治疗成功之下的沉默转向。</p><p class="en-only">The most precise, most effective removal of a lesion can quietly narrow the body's own capacity to rebuild order. Not a side effect, not iatrogenesis — signals hollowed out, centres re-compensating, exploration suspended.</p>
+  <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+</a>
+</div>
+</div>
+<div class="block" id="hea-medicine">
+<div class="block-head">
+  <span class="block-num"><span class="zh-only">肆</span><span class="en-only">IV</span></span>
+  <span class="block-title"><span class="zh-only">医学与健康 · 把一个具体的病放回它的组织场</span><span class="en-only">Medicine &amp; Health · A Disease Returned to Its Field, and What Health Itself Is</span></span>
+</div>
+<p class="block-desc zh-only">本栏此前谈的是健康的一般处境；医学与健康谈两件事：一是具体的病，二是那个更早的问题——<b>何谓身体健康</b>。写法是固定的三条：<b>每一条主张标注证据级别，每一篇写明本文不主张什么，每一篇给出可被推翻的判据</b>。凡是说得非常肯定、非常有颠覆感、且不需要试验就能理解的结论，本频道一律先怀疑——包括它自己发表的。</p>
+<p class="block-desc en-only">This column has so far discussed health in general; the Medicine channel takes specific diseases. Three fixed rules: every claim carries an evidence grade, every paper states what it does not claim, and every paper offers a criterion by which it could be overturned.</p>
+<div class="art-grid">
+<a class="art feature" href="/health/medicine/" style="display:block">
+  <span class="k"><span class="zh-only">医学与健康 · 入门 1 篇 + 长篇论文 1 篇 + 实践指导 3 篇 + 方法论 1 篇 + 同题三篇 · 持续增补</span><span class="en-only">MEDICINE &amp; HEALTH · 1 primer + 1 long paper + 3 guides + 1 methodology + a trilogy on health itself</span></span>
+  <h4><span class="zh-only">医学与健康</span><span class="en-only">Medicine &amp; Health</span></h4>
+  <p class="zh-only">入门篇：《癌症的 SDE 解构入门》，约 1.8 万字——三个字母、一句公式、三条方程，再到一句核心判断：癌是过程不断成功、整体完成失败的过程病，而失败之后不死亡、不退出、反复局部轮回才是核心。论文篇：《癌症的组织场—演化重构：匮缺、创造性同源与「容差在轨」治疗范式》，约 4.7 万字。把肿瘤从「局部长了一个坏东西」改写为「在一片恶化的组织场里被选择出来的一支高适应度细胞群」，并追问一个具体问题：什么时候应该追求彻底清零，什么时候不该——文中列出必须追求清零的八类禁忌情形，撤回三条流行却经不起检验的论断，给出六条可裁决预测。</p><p class="en-only">First paper: Cancer Reconstructed — Field, Creative Homology and the Tolerance-Orbit Paradigm (~47k chars). Eight absolute contraindications, three retracted claims, six adjudicable predictions.</p>
+  <p class="zh-only">新增：《<b>糖尿病的 SDE 医学治疗实践指导</b>》，约 1.78 万汉字。把「糖尿病不是血糖高、而是回位跑不完」这一判断落成可执行方案：三维自评与六种轮动模式、餐后走·间歇·抗阻三种回位训练、四个饮食杠杆，以及一条贯穿全文的规则——加码的许可来自恢复段，不来自计划表。文末给出完全不适用的人群清单与必须立即就医的红线清单；<b>本文不替代医疗，也不建议任何人减药停药</b>。</p><p class="en-only">New: an SDE practice guide for type 2 diabetes (~18k chars) — self-assessment, six rotation modes, three return-training protocols and four dietary levers, with exclusions and red lines stated. It does not replace medical care.</p>
+  <p class="zh-only">同系列第二篇：《<b>皮肤病的 SDE 医学治疗实践指导</b>》，约 1.78 万汉字。皮肤是最典型的场器官——屏障、分布、边界；本文把三律中段落成皮肤上的三种形态，把场—粒子—波三模态落成屏障底盘、痒阈修复与节律训练，并把父题的启动链条改为「场先托底、粒子解锁、波再点火」。含痒—抓循环的六个切口、七种常见皮肤病读法与就医红线。<b>全部内容以「已由医生诊断并正在规范治疗中」为前提，不构成减停任何药物的理由</b>。</p><p class="en-only">Second in the series: an SDE practice guide for chronic skin disease (~18k chars). It presupposes a diagnosis and ongoing medical care.</p>
+  <p class="zh-only">新增：《<b>关不掉的病——终止失败作为一个病族，与 E→S→D 的治疗次序</b>》，约 2.1 万汉字。瘢痕疙瘩、纤维化、银屑病、慢性炎症、慢性应激、慢性疼痛与肿瘤，分属六个科室，本文把它们并排放进同一根轴：共同缺的不是抑制，是<b>终止</b>——结束不是开始的耗尽，而是另一套独立的、可以单独坏掉的程序。名单按锁坏的深度排序，最后一列指出现行治疗几乎全部打在起动段与放大段。方法侧给出 E→S→D 的次序、三条通过判据、四类"测回落不测高度"的读数，以及一个能一次判死这套说法的次序对照设计。<b>本文不替代医疗。</b></p><p class="en-only">New: <i>What Will Not Switch Off</i> (~18k chars) — keloids, fibrosis, psoriasis, chronic inflammation, chronic stress, chronic pain and cancer read as one family ordered by depth of failure, with a soil-boundary-pathway order of repair and ten explicit prohibitions.</p>
+  <p class="zh-only">新增同题三篇：《<b>何谓身体健康</b>》——<b>可续返域</b>（成功恢复是否消耗下一次恢复）、<b>身体余路域</b>（正常输出可能只是要求被悄悄降低）、<b>身体未来域</b>（一个人的健康可能靠不可见地消耗另一个人的未来维持）。三篇各约两万汉字，各自独立成文，也各自写死了与另两篇的分界：它们记的是同一本健康账上的三个独立漏口——<b>向未来的自己借、把标准改掉、向别人转嫁</b>——三者互不可推，任何一篇单独使用都会把另外两个漏口记成零。<b>三篇均为理论构念稿，不替代医疗。</b></p><p class="en-only">New — a trilogy on one question, <i>What Is Bodily Health?</i>: the renewable recovery domain, the bodily option field, and the bodily future field. Three independent leaks in the same ledger: borrowing from one’s own future, quietly lowering the standard, and transferring the cost to someone else. None can absorb the others.</p>
+  <p class="zh-only">同系列第三篇：《<b>抑郁症的 SDE 医学治疗实践指导</b>》，约 1.81 万汉字。父题的三条硬证据在抑郁症上几乎一一对应——收尾失败＝反刍，恢复段缺失＝睡了也不解乏与晨重暮轻，沉积不能＝快感缺失与「做了也没用」。本文给出一个小到不会失败的最小闭环、反刍的六个切口、只记动作不记情绪的记录法，以及专门写给家人与陪伴者的一节。<b>本文不替代治疗，不构成减药停药的任何理由</b>；文首与文末均给出危机求助方式（全国心理援助热线 12356），并列出双相情感障碍等完全不适用的人群。</p><p class="en-only">Third in the series: an SDE practice guide for depression (~18k chars). It does not replace treatment and never advises reducing medication.</p>
+  <span class="rd"><span class="zh-only">进入医学与健康 →</span><span class="en-only">Enter the channel →</span></span>
+</a>
+</div>
+</div>
+<div class="tailnote">
+      <p class="zh-only">长文持续增补中——更多长文、专著导读与 SDE 智能体品尝将陆续汇入本栏。</p>
+      <p class="en-only">The collection keeps growing — more essays, monograph guides and SDE agent tastings will gather here.</p>
+      <div class="crosslinks">
+        <a href="/browse/" class="zh-only">← 返回首页</a><a href="/browse/" class="en-only">← Back home</a>
+        <a href="/today/#daily" class="zh-only">每日更新</a><a href="/today/#daily" class="en-only">Daily updates</a>
+        <a href="/taste/" class="zh-only">SDE 智能体免费品尝</a><a href="/taste/" class="en-only">Free SDE agent taste</a>
+          </div>
+    </div>
+  </section>
+
+    <div class="block" id="hea-institution">
+<div class="block-head">
+  <span class="block-num"><span class="zh-only">伍</span><span class="en-only">V</span></span>
+  <span class="block-title"><span class="zh-only">制度的四道切口 · 金点子四篇</span><span class="en-only">Four Incisions into the Institution · The Gold-Point Quartet</span></span>
+</div>
+<p class="block-desc zh-only">前面几栏谈的是身体、心身与具体的病。这一栏换一个层面：当一套医学传统遇上一个高度制度化的现代卫生体系，被吸收的是什么，被留在门外的又是什么。四篇以新加坡中医制度化为同一案例，沿显露、差异、纠缠三维轮番追问，最后涌现出第四篇新典范。四篇共用一份逐条可核实的制度事实表，各自设有可执行的证伪条件。</p>
+<p class="block-desc en-only">A different layer: when a medical tradition meets a highly institutionalised health system, what gets absorbed and what is left outside. Four papers on one case — the institutionalisation of TCM in Singapore — driven through Show, Difference and Entanglement, with a fourth emerging as a new paradigm. All four share one verifiable table of institutional facts, and each sets its own falsification conditions.</p>
+<div class="art-grid">
+<a class="art" href="/students/qin-li/institutional-funeral/">
+  <span class="k"><span class="zh-only">金点子① · 显露(S) · 约2.2万字</span><span class="en-only">Gold Point I · Show (S) · ~22k chars</span></span>
+  <h4><span class="zh-only">制度殡葬与暗门翻转：一场没人认为是殡葬的殡葬</span><span class="en-only">Institutional Funeral and the Hidden Door</span></h4>
+  <p class="zh-only">新加坡对中医的制度化，看起来是包容、务实、渐进的整合。但被请进门的是治疗，不是诊断——2025 年沙盒收到的 18 项提案全是治疗模态，没有一项是让中医师独立完成诊断。整合不是殡葬的反面，整合是殡葬的执行方式。而同一次整合所铺设的那条数据管道，也是唯一可能翻转结局的暗门。</p><p class="en-only">Singapore’s institutionalisation of TCM looks like inclusion. But what gets admitted is treatment, not diagnosis. Integration is not the opposite of a funeral — it is how the funeral is carried out. The same data pipeline it lays down is also the only hidden door out.</p>
+  <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+</a>
+<a class="art" href="/students/qin-li/self-locking-loop/">
+  <span class="k"><span class="zh-only">金点子② · 差异(D) · 约4.1万字</span><span class="en-only">Gold Point II · Difference (D) · ~41k chars</span></span>
+  <h4><span class="zh-only">自锁闭环：旧标准不必禁止你，只要垄断「什么算证据」</span><span class="en-only">The Self-Locking Loop and the Capability-Recovery Curve</span></h4>
+  <p class="zh-only">排斥的理由是一个经验命题——「缺乏群体规模的有效性证据」；而旧标准的证据定义，恰好使这个命题无法被验证为假。破解不在旧标准内更努力地自证，而在造一种它从未设计去拦截的新证据：被长期禁止运行的判断力，在受保护空间中还能不能被恢复。</p><p class="en-only">The reason for exclusion is an empirical claim — “no population-scale evidence” — that the old standard’s own definition of evidence renders unfalsifiable. The way out is not to prove yourself harder inside it, but to build an evidence type it was never designed to intercept.</p>
+  <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+</a>
+<a class="art" href="/students/qin-li/six-gates/">
+  <span class="k"><span class="zh-only">金点子③ · 纠缠(E) · 约2.8万字</span><span class="en-only">Gold Point III · Entanglement (E) · ~28k chars</span></span>
+  <h4><span class="zh-only">功能评估的阶梯：六道闸门，六套刹车，六把不正面冲撞的钥匙</span><span class="en-only">The Ladder of Functional Assessment: Six Institutional Gates</span></h4>
+  <p class="zh-only">不向白皮书索要证据，向临床操作流程的变化索要证据。基金指南条款、病历协同字段、住院轮转、法律试点条款、相变前导测试——六个可被外部核查的操作判据。本篇还用 2024–2025 年的新事实把自己先前的判断推翻了两处。</p><p class="en-only">Ask the clinical workflow for evidence, not the white paper. Six externally checkable behavioural criteria — and the paper uses 2024–2025 developments to overturn two of its own earlier verdicts.</p>
+  <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+</a>
+<a class="art" href="/students/qin-li/reverse-production/">
+  <span class="k"><span class="zh-only">金点子④ · 新典范 · 约3.2万字</span><span class="en-only">Gold Point IV · New Paradigm · ~32k chars</span></span>
+  <h4><span class="zh-only">边缘的逆生产：不被承认，反而是它长起来的条件</span><span class="en-only">Reverse Production at the Margin</span></h4>
+  <p class="zh-only">排斥体系为维护纯粹性而划出的那块「无害」区域，因为不值得投入昂贵的审查资源，反而成了它所排斥之物的孵化器。权力不必经由承认而生成——不问「我要多好你才肯承认我」，而问「我可以做哪件你做不到的事，让你没有我时感到痛」。</p><p class="en-only">The “harmless” zone an excluding system draws to protect its own purity is not worth expensive scrutiny — and so becomes the incubator of what it excludes. Power need not pass through recognition at all.</p>
+  <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+</a>
+</div>
+    </div>
+    <div class="block" id="health-from-students">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">陆</span><span class="en-only">VI</span></span>
+        <span class="block-title"><span class="zh-only">频道 · 来自学员专栏</span><span class="en-only">Channel · From the Student Column</span></span>
+      </div>
+      <p class="block-desc zh-only">五十篇全部来自<b>学员专栏</b>：写的人里有临床与照护一线的从业者、心理工作者、长期与慢性病共处的人、以及做卫生政策研究的人。本栏此前谈的是健康的一般处境与具体的病，这个频道谈的是——人在其中怎么活、感知怎么被拿走、又怎么拿回来。</p>
+      <p class="block-desc en-only">Fifty pieces from the Student Column: clinicians and carers, counsellors, people living with chronic illness, and health-policy researchers — on how perception is taken away, and how it is taken back.</p>
+      <div class="art-grid">
+        <a class="art feature" href="/health/from-students/" style="display:block">
+          <span class="k"><span class="zh-only">学员专栏频道 · 精选 50 篇 / 5 组 · 持续增补</span><span class="en-only">STUDENT CHANNEL · 50 SELECTED / 5 SETS</span></span>
+          <h4><span class="zh-only">来自学员专栏</span><span class="en-only">From the Student Column</span></h4>
+          <p class="zh-only">五组：<b>身体的主权</b>（指标正常，人却在坏）· <b>慢性病、照护与临床认知</b>（管理最成功的地方，往往正是最危险的地方）· <b>抑郁、心理与自我技术</b>（被善意绕过的生成权）· <b>中医、技艺与另一种医学知识</b>（一门靠在场判断活着的医学，如何在被标准化中冷却）· <b>身体、锻炼与可操作的健康手册</b>（含五份写给普通人的操作手册）。<b>本频道全部内容不替代医疗，也不构成减停任何药物的理由。</b></p>
+          <p class="en-only">Five sets: sovereignty over the body · chronic illness and care · depression and the technologies of the self · Chinese medicine as a craft that lives on situated judgement · exercise and five practical handbooks. Nothing here replaces medical care. The essays are in Chinese.</p>
+          <span class="rd"><span class="zh-only">进入频道 →</span><span class="en-only">Enter the channel →</span></span>
+        </a>
+      </div>
+    </div>
+    <div class="block" id="hea-picks">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">柒</span><span class="en-only">VII</span></span>
+        <span class="block-title"><span class="zh-only">学员精选 · 十篇必读</span><span class="en-only">Editor's Picks · Ten from the Student Column</span></span>
+      </div>
+      <p class="block-desc zh-only">从上一栏的五十篇里挑出<b>十篇</b>，覆盖十个互不重叠的切口：身体感受的解释权归谁、指标复常之后人为何仍不对劲、中医的「证」到底是什么、制度替人担责时信任发生在哪一步被取消、锻炼如何反过来剥夺感受、洞察为什么治不好、失智老人被拂去的是哪一层存在、一套评估标准如何自锁四十年、更懂身体为何更不会管理身体，以及一份可以照着做的操作手册。<b>以下全部内容不替代医疗，也不构成减停任何药物的理由。</b></p>
+      <p class="block-desc en-only">Ten of the fifty, each cutting a distinction the others cannot. Nothing here replaces medical care or justifies changing any medication.</p>
+      <div class="art-grid">
+        <a class="art" href="/students/hu-min/felt-sense-sovereignty/">
+          <span class="k"><span class="zh-only">胡敏 · 体认主权</span><span class="en-only">HU MIN · SOVEREIGNTY OF FELT SENSE</span></span>
+          <h4><span class="zh-only">断裂的门槛：照护中的体认主权与交换协议切换</span><span class="en-only">The Threshold of Rupture: Sovereignty of Felt Sense in Care</span></h4>
+          <p class="zh-only">为什么产后照护里的母亲会连「我到底累不累」都不确定？本文命名「体认主权」——一个人对自己身体感受的定义权、解释权与行动导向权——并论证它如何被照护中的交换协议制度性接管。与梅洛-庞蒂的身体图式、福柯的身体规训各划一道边界：管的不是身体如何知觉，而是谁有权解释这份知觉。</p>
+          <p class="en-only">Who holds the right to define what your body is feeling? A concept drawn out of postpartum care.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/students/hu-min/clinical-cognitive-substitution/">
+          <span class="k"><span class="zh-only">胡敏 · 慢性病管理</span><span class="en-only">HU MIN · CHRONIC ILLNESS</span></span>
+          <h4><span class="zh-only">指标体系下的身体：论慢性病管理中的一种认知替代机制</span><span class="en-only">The Body Under Indicators: A Mechanism of Cognitive Substitution in Chronic Care</span></h4>
+          <p class="zh-only">指标全部复常，人却仍然不对劲。本文提出「临床认知替代」：在精准管理里，第一人称的身体判断不是被否定，而是被长期闲置到萎缩——用进废退发生在判断力上。文末给出把判断权局部交还的制度路径，医患两端都用得上。</p>
+          <p class="en-only">Every marker normalises and the person still feels wrong: first-person bodily judgement idled into atrophy.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/students/hu-min/resonance-of-pattern-change/">
+          <span class="k"><span class="zh-only">胡敏 · 中医本体论</span><span class="en-only">HU MIN · THE ONTOLOGY OF CHINESE MEDICINE</span></span>
+          <h4><span class="zh-only">参变回响：中医辨证论治的本体论重述</span><span class="en-only">Resonance of Pattern Change: Restating the Ontology of Syndrome Differentiation</span></h4>
+          <p class="zh-only">中医科学化困局百年未解。本文说卡点不在方法不够精致，而在一个没被审查的预设：把诊疗当成医者头脑里「认知主体把握客观对象」的活动。从《黄帝内经》《伤寒论》与一个高度具体的临床现场出发，作者把「证」重述为实时交感中涌动流变的态势场——医者不在场外。</p>
+          <p class="en-only">The impasse is not method but a premise: that diagnosis happens inside the physician’s head, facing an object.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/students/kong-fanhe/institutional-compensation/">
+          <span class="k"><span class="zh-only">孔凡鹤 · 照护与信任</span><span class="en-only">KONG FANHE · CARE AND TRUST</span></span>
+          <h4><span class="zh-only">制度代偿的悖论：当制度替人承担了不可分责任</span><span class="en-only">The Paradox of Institutional Compensation</span></h4>
+          <p class="zh-only">认证、监控、标准化、评价能不能制造信任？本文说这是一个范畴错误：制度代偿掉的不只是一项判断任务，还有那个让信任作为「亲自冒险的托付」得以发生的实践机会。文中与卢曼的系统信任理论正面交手，指出其方法论在结构上就必然看不见这一层。</p>
+          <p class="en-only">Certification and monitoring do not manufacture trust; they remove the occasion on which trust could occur.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/students/kong-fanhe/dark-side-of-repair/">
+          <span class="k"><span class="zh-only">孔凡鹤 · 身体与锻炼</span><span class="en-only">KONG FANHE · THE BODY AND EXERCISE</span></span>
+          <h4><span class="zh-only">修复的暗面：锻炼如何蜕变为对感受的慢性剥夺</span><span class="en-only">The Dark Side of Repair: How Exercise Becomes a Chronic Deprivation of Feeling</span></h4>
+          <p class="zh-only">跑步、瑜伽、力量训练被广泛赋予「赎回身体主权」的解放叙事。本文给出更底层的诊断：任何针对亏空的修复，其释放感都会随重复衰减；修复感退去后剩下的那种弥漫的、说不清的「不够」，才是把锻炼推向自我剥夺的驱动力——不是叙事虚伪，也不是指标诱惑。</p>
+          <p class="en-only">The relief of repair decays with repetition; what remains is a diffuse “not enough” that turns the practice against the body.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/students/kong-fanhe/dual-axis-assembly/">
+          <span class="k"><span class="zh-only">孔凡鹤 · 心理治疗</span><span class="en-only">KONG FANHE · PSYCHOTHERAPY</span></span>
+          <h4><span class="zh-only">心理装置的双轴自组装：从「知晓」到「生成」的临床路径</span><span class="en-only">Dual-Axis Self-Assembly of the Psychic Apparatus</span></h4>
+          <p class="zh-only">来访者能准确说出自己的模式从何而来，下一次仍旧照旧反应——「洞察即治愈」在这里失效。本文论证旧反应不是被写坏的程序，而是由道德轴（把童年生存策略神圣化为道德义务）与身体轴（编译成自动程序并回供「真实感」）协同组装、持续互锁而成：洞察只碰到道德轴的语言表面，改变需要一次同时剪断两轴的解耦。</p>
+          <p class="en-only">Insight fails because it touches only the moral axis; the body axis keeps supplying the feeling of truth.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/students/chen-xiaoyan/positional-being/">
+          <span class="k"><span class="zh-only">陈晓艳 · 养老照护</span><span class="en-only">CHEN XIAOYAN · ELDER CARE</span></span>
+          <h4><span class="zh-only">被捧起的灰——论养老照护中「位置性存有」的优先性</span><span class="en-only">Ashes Held in the Hands: The Priority of Positional Being in Elder Care</span></h4>
+          <p class="zh-only">智慧养老在它最善意的运作里，正把一位失智老人从「人」的位子上轻轻拂去。本文命名「位置性存有」：不依赖任何能力、记忆或身份，仅仅作为「在世界中占着一个位子的人」而被无条件承认。一个把智能药盒收进柜子的动作，在这里得到了它应有的分量。</p>
+          <p class="en-only">Before any functional good: the unconditional standing of someone who simply occupies a place in the world.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/students/qin-li/self-locking-loop/">
+          <span class="k"><span class="zh-only">秦莉 · 卫生政策</span><span class="en-only">QIN LI · HEALTH POLICY</span></span>
+          <h4><span class="zh-only">自锁闭环与能力恢复轨迹：新加坡中医制度化的排斥机制</span><span class="en-only">The Self-Locking Loop: Exclusion in the Institutionalisation of Chinese Medicine in Singapore</span></h4>
+          <p class="zh-only">合法注册、纳入社区健康推广、嵌进慢性病管理——四十年制度化之后，中医的独立诊断能力反而系统性萎缩。本文把它诊断为「自锁闭环」：现行评估标准垄断了「什么算有效证据」的裁定权，于是所需证据无法在旧标准内部产生，排斥因此延续。出路不在更努力地自证，而在构造一种旧标准从未要求过的证据类型。</p>
+          <p class="en-only">A forty-year loop: the standard that decides what counts as evidence makes the missing evidence impossible to produce.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/students/zhang-qiong/somatic-trust/">
+          <span class="k"><span class="zh-only">张琼 · 体重与内感受</span><span class="en-only">ZHANG QIONG · WEIGHT AND INTEROCEPTION</span></span>
+          <h4><span class="zh-only">体信的拆卸：为什么「更知道」让我们「更不会」管理体重</span><span class="en-only">Dismantling Somatic Trust: Why Knowing More Makes Us Worse at It</span></h4>
+          <p class="zh-only">减肥知识空前普及、监控技术空前精密，肥胖率却持续攀升。既有解释要么怪个体执行失败，要么怪致胖环境，却共享一个未经检视的先验：人与身体之间本有一种「正常的」、可被恢复的信任，只是被破坏了。本文换一个诊断——不是信任的磨损，而是信任模式的历史性替换。</p>
+          <p class="en-only">Not eroded trust in the body but a historical substitution: interoceptive trust replaced by external readouts.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/students/zhang-qiong/suspension-is-receptivity/apply-health/">
+          <span class="k"><span class="zh-only">张琼 · 操作手册</span><span class="en-only">ZHANG QIONG · A PRACTICAL HANDBOOK</span></span>
+          <h4><span class="zh-only">腾出空间，让身体自己复苏：撤回「过度施为」的健康操作手册</span><span class="en-only">Make Room and Let the Body Recover: A Handbook for Withdrawing Over-Management</span></h4>
+          <p class="zh-only">一份操作手册，不是一篇养生道理。它假设你已接受这个判断：真正的复苏不是被生产或优化出来的，它恰恰发生在你撤回对身体每一刻的精细管理的那个点上。含分诊三问、一周最小动作，以及「何时该就医」的边界。十篇里最能直接照着做的一篇。</p>
+          <p class="en-only">A handbook, not advice: what to withdraw so that recovery has room to happen. Includes when to seek care.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+
+</main>
+
+<footer>
+  <div class="zh-only">SDE Universes · 显露 · 差异 · 纠缠 &nbsp;|&nbsp; 德麦国际 · 王德生 &nbsp;|&nbsp; <a href="/browse/">sdeuniverses.com</a></div>
+  <div class="en-only">SDE Universes · Show · Difference · Entanglement &nbsp;|&nbsp; Demai International · Desheng Wang &nbsp;|&nbsp; <a href="/browse/">sdeuniverses.com</a></div>
+</footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en')));
+  document.documentElement.lang=lang;
+}
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

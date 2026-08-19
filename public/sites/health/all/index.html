@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>全部篇目 · 健康发生学 · 胡敏</title>
+<meta name="description" content="胡敏健康写作的全部篇目，按栏分组，可即时筛选。">
+<link rel="canonical" href="https://health.sdeuniverses.com/all/">
+<meta property="og:title" content="全部篇目 · 健康发生学 · 胡敏">
+<meta property="og:description" content="胡敏健康写作的全部篇目，按栏分组，可即时筛选。">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --paper:#F1F3EF; --card:#FAFBF9; --ink:#14201B; --ink2:#5B6B62;
+  --line:#C7D0C9; --pine:#1E4D3E; --chop:#A63A2B;
+  --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.75;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px);
+  background-size:100% 34px;background-position:0 -1px;background-attachment:fixed;
+  background-blend-mode:multiply}
+body::before{content:"";position:fixed;inset:0;background:var(--paper);opacity:.86;z-index:-1}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:960px;margin:0 auto;padding:0 22px}
+
+/* 顶栏 */
+.top{border-bottom:1px solid var(--line);background:rgba(241,243,239,.92);
+  position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(6px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:56px}
+.brand{font-family:var(--serif);font-size:19px;letter-spacing:.14em;color:var(--pine)}
+.brand em{font-style:normal;color:var(--ink2);font-size:12px;letter-spacing:.24em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:20px;font-size:13.5px;color:var(--ink2)}
+.top nav a:hover{color:var(--pine)}
+.top nav a.out{font-family:var(--mono);font-size:12px}
+
+/* hero */
+.hero{padding:64px 0 34px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--pine);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.6vw,52px);line-height:1.28;
+  letter-spacing:.02em;margin:.5em 0 .38em;max-width:16em}
+.lede{max-width:38em;color:var(--ink2);font-size:16.5px}
+.lede b{color:var(--ink);font-weight:600}
+
+/* 签名件：体检报告单 */
+.report{margin:38px 0 0;background:var(--card);border:1px solid var(--line);
+  box-shadow:0 1px 0 rgba(20,32,27,.05);position:relative;overflow:hidden}
+.report .cap{display:flex;justify-content:space-between;align-items:baseline;
+  padding:14px 20px;border-bottom:2px solid var(--ink);font-family:var(--serif);letter-spacing:.1em}
+.report .cap span{font-family:var(--mono);font-size:11.5px;color:var(--ink2);letter-spacing:.08em}
+table.rep{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px}
+table.rep th{text-align:left;font-weight:400;color:var(--ink2);font-size:11px;letter-spacing:.14em;
+  padding:9px 20px;border-bottom:1px solid var(--line)}
+table.rep td{padding:9px 20px;border-bottom:1px dashed var(--line);white-space:nowrap}
+table.rep td:first-child{font-family:var(--sans);font-size:13.5px}
+table.rep td.v{font-variant-numeric:tabular-nums}
+table.rep td.j{color:var(--pine)}
+table.rep tr.miss td{border-bottom:none;color:var(--chop);padding-top:16px;padding-bottom:18px}
+table.rep tr.miss td:first-child{font-family:var(--serif);font-size:17px;letter-spacing:.14em}
+.stamp{display:inline-block;border:1.5px solid var(--chop);color:var(--chop);
+  padding:2px 9px;font-size:11.5px;letter-spacing:.2em;transform:rotate(-3deg)}
+.report tbody tr{opacity:0;animation:rise .5s ease forwards}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.rnote{margin:12px 2px 0;font-size:12.5px;color:var(--ink2);font-family:var(--mono)}
+@media (prefers-reduced-motion:reduce){.report tbody tr{opacity:1;animation:none}}
+
+/* 数据带 */
+.band{display:flex;flex-wrap:wrap;gap:34px;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);padding:16px 0;margin:44px 0 0}
+.band div{font-family:var(--mono);font-size:12px;color:var(--ink2);letter-spacing:.1em}
+.band b{display:block;font-size:24px;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+
+/* 栏 */
+section{padding:56px 0 8px}
+.col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
+.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--pine)}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
+
+.row{display:flex;gap:14px;align-items:baseline;padding:11px 4px;border-bottom:1px dashed var(--line)}
+.row:hover{background:var(--card)}
+.row:hover .r-t{color:var(--pine)}
+.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:2.4em;
+  font-variant-numeric:tabular-nums;flex:none}
+.r-t{font-size:15px;line-height:1.6}
+.r-h{font-family:var(--serif);font-weight:600;letter-spacing:.06em;margin-right:.55em}
+.r-h::after{content:"·";margin-left:.55em;color:var(--line);font-weight:400}
+.more{display:inline-block;margin:16px 0 0;font-family:var(--mono);font-size:12.5px;color:var(--pine);
+  border-bottom:1px solid var(--pine);padding-bottom:2px}
+
+/* 账册 */
+.books{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px;margin-top:26px}
+.bk{background:var(--card);border:1px solid var(--line);padding:0 0 18px;display:flex;flex-direction:column}
+.bk img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;border-bottom:1px solid var(--line);background:#E6EAE6}
+.bk .no{font-family:var(--mono);font-size:11px;color:var(--chop);letter-spacing:.16em;margin:14px 16px 0}
+.bk h3{font-family:var(--serif);font-size:19px;letter-spacing:.08em;margin:6px 16px 2px;font-weight:600}
+.bk .sub{font-size:12.5px;color:var(--ink2);margin:0 16px 10px}
+.bk p{font-size:13.5px;color:var(--ink2);margin:0 16px 12px;line-height:1.7}
+.bk .lk{margin:auto 16px 0;display:flex;gap:14px;font-family:var(--mono);font-size:12px}
+.bk .lk a{color:var(--pine);border-bottom:1px solid var(--line);padding-bottom:2px}
+.bk .lk a:hover{border-color:var(--pine)}
+
+/* 关于 */
+.about{background:var(--card);border:1px solid var(--line);padding:28px 26px;margin-top:20px}
+.about p{margin:0 0 14px;font-size:15px}
+.about p:last-child{margin-bottom:0}
+
+/* 筛选 */
+.filter{display:flex;gap:12px;align-items:center;margin:26px 0 0;
+  border:1px solid var(--line);background:var(--card);padding:10px 14px}
+.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
+.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2)}
+.filter .n{font-family:var(--mono);font-size:12px;color:var(--pine);font-variant-numeric:tabular-nums}
+.empty{padding:26px 4px;color:var(--ink2);font-size:14.5px}
+
+footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 60px;
+  font-size:13px;color:var(--ink2)}
+footer a{color:var(--pine);border-bottom:1px solid var(--line)}
+footer p{margin:0 0 8px}
+a:focus-visible,input:focus-visible{outline:2px solid var(--pine);outline-offset:2px}
+@media(max-width:640px){
+  .hero{padding:40px 0 24px}
+  table.rep td,table.rep th{padding-left:12px;padding-right:12px}
+  table.rep td.ref{display:none}table.rep th.ref{display:none}
+  .band{gap:22px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">健康发生学<em>HU MIN</em></a>
+  <nav>
+    <a href="/#books">账册</a>
+    <a href="/#cols">栏目</a>
+    <a href="/all/">全部篇目</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap"><div class="hero" style="padding-bottom:0"><div class="eyebrow">全部篇目 · INDEX</div><h1 style="font-size:clamp(26px,4.4vw,40px)">健康这一条线上的每一篇</h1><p class="lede">共 119 篇，按栏排列。输入任意词即时筛选；点标题读原文。</p><div class="filter"><label>筛选</label><input id="q" type="search" placeholder="输入名目、病名或任意词，例如：内感受" autocomplete="off" aria-label="筛选篇目"><span class="n" id="n"></span></div><p class="empty" id="empty" style="display:none">没有匹配的篇目。换一个词试试。</p></div><section id="chronic" data-col="chronic"><div class="col-h"><span class="no">栏 二</span><h2>慢性病</h2><span class="ct">9 篇</span></div><p class="col-d">指标一次次达标，而那口气一直没有接上来。</p><a class="row" href="/students/hu-min/lodging-in-class/"><span class="r-n">1</span><span class="r-t"><b class="r-h">寄类</b>关于一个人未来所说的话，其依据在哪一刻从他自己的序列换成了他所属类别的基数</span></a>
+<a class="row" href="/students/hu-min/unheld-seam/"><span class="r-n">2</span><span class="r-t"><b class="r-h">生缝</b>把一个人切成五个病，切口本身是一样实物</span></a>
+<a class="row" href="/students/hu-min/interruptibility-loss/"><span class="r-n">3</span><span class="r-t"><b class="r-h">失断</b>每一次调整都改善了读数，而计时一次也没有重新开始</span></a>
+<a class="row" href="/students/hu-min/re-scaffolding/"><span class="r-n">4</span><span class="r-t"><b class="r-h">返架</b>慢性病的逆转不是把加上去的减掉，而是新建了一套不入账的支撑</span></a>
+<a class="row" href="/students/hu-min/default-line/"><span class="r-n">5</span><span class="r-t"><b class="r-h">默标</b>慢性病逆转的那条达标线，是唯一一条没有问过「用来做什么」的线</span></a>
+<a class="row" href="/students/hu-min/mid-dwelling/"><span class="r-n">6</span><span class="r-t"><b class="r-h">中驻</b>慢性病的逆转有第三种结局，而账本上只有两格</span></a>
+<a class="row" href="/students/hu-min/tacit-allocation/"><span class="r-n">7</span><span class="r-t"><b class="r-h">默配</b>分年龄别患病率不是那个年龄组自己的数</span></a>
+<a class="row" href="/students/hu-min/revoked-endpoint/"><span class="r-n">8</span><span class="r-t"><b class="r-h">撤终</b>年龄标化扣得掉时间，扣不掉被撤销的终点</span></a>
+<a class="row" href="/students/hu-min/single-encounter/"><span class="r-n">9</span><span class="r-t"><b class="r-h">单遇</b>慢性病诊断里内建了一次「第二回」</span></a></section><section id="cancer" data-col="cancer"><div class="col-h"><span class="no">栏 三</span><h2>癌症</h2><span class="ct">9 篇</span></div><p class="col-d">一个癌与一处永远不会杀人的异常增生，分界并不在那块组织里。</p><a class="row" href="/students/hu-min/co-enclosure/"><span class="r-n">1</span><span class="r-t"><b class="r-h">同围</b>一个癌与永远不会杀人的异常增生，分界不在这块组织里</span></a>
+<a class="row" href="/students/hu-min/absorbing-column/"><span class="r-n">2</span><span class="r-t"><b class="r-h">落栏</b>一个癌与永远不会杀人的异常增生，分界落在那个专门用来收口的名目里</span></a>
+<a class="row" href="/students/hu-min/below-the-instrument/"><span class="r-n">3</span><span class="r-t"><b class="r-h">器下</b>一个癌与永远不会杀人的异常增生，分界是由一件器具做出的</span></a>
+<a class="row" href="/students/hu-min/delisted/"><span class="r-n">4</span><span class="r-t"><b class="r-h">脱籍</b>从肿瘤到全身消耗的那条路上，被划走的东西并没有离开身体</span></a>
+<a class="row" href="/students/hu-min/preempted-capacity/"><span class="r-n">5</span><span class="r-t"><b class="r-h">占虚</b>癌症把人杀死的那条路上，被吃掉的不是力量，是还能改变的那点地方</span></a>
+<a class="row" href="/students/hu-min/baseline-reset/"><span class="r-n">6</span><span class="r-t"><b class="r-h">移基</b>癌症把人杀死的那条路上，被移动的不是身体，是量身体的那把尺</span></a>
+<a class="row" href="/students/hu-min/off-peak/"><span class="r-n">7</span><span class="r-t"><b class="r-h">离峰</b>为什么五十年只有少数几个癌种被打下去——进展不取决于花了多少，取决于花在不可返工的那道关口的哪一侧</span></a>
+<a class="row" href="/students/hu-min/phantom-sum/"><span class="r-n">8</span><span class="r-t"><b class="r-h">合虚</b>为什么五十年只有少数几个癌种被打下去——被打下去的不是进展更大的那些，是进展加得起来的那些</span></a>
+<a class="row" href="/students/hu-min/frozen-base/"><span class="r-n">9</span><span class="r-t"><b class="r-h">凝底</b>为什么五十年只有少数几个癌种被打下去——被打下去的，是把底座整个换掉过的那些</span></a></section><section id="tcm" data-col="tcm"><div class="col-h"><span class="no">栏 四</span><h2>中医哲思</h2><span class="ct">17 篇</span></div><p class="col-d">把脉的手还在，认定这只手的那套制度不在了。</p><a class="row" href="/students/hu-min/state-and-path/"><span class="r-n">1</span><span class="r-t">气、血、经络、阴阳的本体论地位：发生同一性与运行语法的再奠基</span></a>
+<a class="row" href="/students/hu-min/reality-warrant/"><span class="r-n">2</span><span class="r-t">认知对象的静默退场：实在性担保体系的生成、维持与制度性猝死</span></a>
+<a class="row" href="/students/hu-min/certifying-perception/"><span class="r-n">3</span><span class="r-t"><b class="r-h">知觉的认证</b>一项关于中医脉诊能力制度性消解的认知-制度分析</span></a>
+<a class="row" href="/students/hu-min/longitudinal-link/"><span class="r-n">4</span><span class="r-t"><b class="r-h">评估即塑造</b>中医辨证纵向认知策略的制度性退行与隐性保存</span></a>
+<a class="row" href="/students/hu-min/deductive-visibility/"><span class="r-n">5</span><span class="r-t"><b class="r-h">从合规到活性</b>推演链制度性可见度对专业判断质量的控制效应</span></a>
+<a class="row" href="/students/hu-min/clinical-black-hole/"><span class="r-n">6</span><span class="r-t"><b class="r-h">临床黑洞</b>中医共同体中「认错」何以不发生</span></a>
+<a class="row" href="/students/hu-min/relation-discriminant/"><span class="r-n">7</span><span class="r-t"><b class="r-h">辨之辨</b>中医如何通过「关系辨」保持其临床锐度</span></a>
+<a class="row" href="/students/hu-min/knowing-being-rift/"><span class="r-n">8</span><span class="r-t"><b class="r-h">知与在的裂隙</b>为什么更精确的知识体系反而阻止了它声称要捕获的东西发生</span></a>
+<a class="row" href="/students/hu-min/unsettled-pathogen/"><span class="r-n">9</span><span class="r-t"><b class="r-h">客邪未定与化裁</b>证候退潮时刻的中医判断力</span></a>
+<a class="row" href="/students/hu-min/judging-for-another/"><span class="r-n">10</span><span class="r-t"><b class="r-h">为他判断</b>中医临床判断力的发生学考察</span></a>
+<a class="row" href="/students/hu-min/silent-on-track/"><span class="r-n">11</span><span class="r-t"><b class="r-h">沉默在轨</b>中医证据困境的另一种解法</span></a>
+<a class="row" href="/students/hu-min/adjudicative-revision/"><span class="r-n">12</span><span class="r-t"><b class="r-h">判决性修正</b>中医临床自我证伪能力的发生与制度性消弭</span></a>
+<a class="row" href="/students/hu-min/forced-otherness/"><span class="r-n">13</span><span class="r-t"><b class="r-h">他迫性缺失</b>认知系统创造力停滞的一个发生学约束</span></a>
+<a class="row" href="/students/hu-min/trust-deficit/"><span class="r-n">14</span><span class="r-t"><b class="r-h">信任赤字</b>中医临床判断「阐释闭环」的生存根基与拆解路径</span></a>
+<a class="row" href="/students/hu-min/causal-node/"><span class="r-n">15</span><span class="r-t"><b class="r-h">判断的因果节点性</b>当疗效始于医生的手落下之前</span></a>
+<a class="row" href="/students/hu-min/anticipatory-trust/"><span class="r-n">16</span><span class="r-t"><b class="r-h">预判性信托</b>从「不可拆卸」中逼出的一条制度路径</span></a>
+<a class="row" href="/students/hu-min/judgment-before-proof/"><span class="r-n">17</span><span class="r-t">举证之前，判断已在：举证制度对临床判断的前摄塑形</span></a></section><section id="medicine" data-col="medicine"><div class="col-h"><span class="no">栏 五</span><h2>医学与健康</h2><span class="ct">20 篇</span></div><p class="col-d">医学承诺修复，也在修复的动作里取走了一些东西。</p><a class="row" href="/students/hu-min/proxy-grammar/"><span class="r-n">1</span><span class="r-t"><b class="r-h">判决的尽头</b>当身体忘了自己还能造语法</span></a>
+<a class="row" href="/students/hu-min/agency-disuse/"><span class="r-n">2</span><span class="r-t"><b class="r-h">身体的短路</b>一项承诺了修复的医学，如何制造了无法再连接的身体</span></a>
+<a class="row" href="/students/hu-min/disuse-pathology/"><span class="r-n">3</span><span class="r-t"><b class="r-h">闲置的病理学</b>当身体失去生成自身秩序的时间</span></a>
+<a class="row" href="/students/hu-min/pseudo-closure/"><span class="r-n">4</span><span class="r-t"><b class="r-h">多器官假性闭合</b>慢性病时代单器官靶向成功背后的网络弹性耗竭</span></a>
+<a class="row" href="/students/hu-min/interoceptive-tax/"><span class="r-n">5</span><span class="r-t"><b class="r-h">内感能力税</b>当数字修好了报告卡，却修坏了一个人述说身体的能力</span></a>
+<a class="row" href="/students/hu-min/organ-as-convergence/"><span class="r-n">6</span><span class="r-t"><b class="r-h">器官即凝聚中心</b>论强心干预的过载—闭锁机制与一个可被经验裁决的假说</span></a>
+<a class="row" href="/students/hu-min/mutual-anchoring/"><span class="r-n">7</span><span class="r-t"><b class="r-h">互锚</b>健康作为在关系中重新组织可行秩序的能力</span></a>
+<a class="row" href="/students/hu-min/value-closure/"><span class="r-n">8</span><span class="r-t"><b class="r-h">价值闭合</b>现代医疗统计裁决系统的情感韧性</span></a>
+<a class="row" href="/students/hu-min/between-two-rights/"><span class="r-n">9</span><span class="r-t"><b class="r-h">在正确与正确之间</b>论临床操作语法如何不可逆地刻印身体的波动基底</span></a>
+<a class="row" href="/students/hu-min/antagonistic-load/"><span class="r-n">10</span><span class="r-t"><b class="r-h">拮抗负荷</b>保护性干预在生理指标正常时，如何取走了身体自我修复所需的时序信号</span></a>
+<a class="row" href="/students/hu-min/perceptual-stripping/"><span class="r-n">11</span><span class="r-t"><b class="r-h">感知剥脱</b>为什么重返赛场的运动员无法感觉到即将到来的崩溃</span></a>
+<a class="row" href="/students/hu-min/defending-the-no/"><span class="r-n">12</span><span class="r-t">在你与制度之间，谁为&quot;不&quot;辩护？</span></a>
+<a class="row" href="/students/hu-min/institutional-blind-spot/"><span class="r-n">13</span><span class="r-t"><b class="r-h">制度的双重盲区</b>为什么运动医学越是尽责，越可能稳定地生产它看不见的风险</span></a>
+<a class="row" href="/students/hu-min/accountability-grammar/"><span class="r-n">14</span><span class="r-t"><b class="r-h">责任语法的分裂</b>重返赛场决策中文件语法对肉身判断的制度性逐出</span></a>
+<a class="row" href="/students/hu-min/body-says-no/"><span class="r-n">15</span><span class="r-t"><b class="r-h">身体说&quot;不&quot;</b>训练中被拒绝的外部指令与运动科学的范式危机</span></a>
+<a class="row" href="/students/hu-min/load-accounting/"><span class="r-n">16</span><span class="r-t"><b class="r-h">谁在核算负荷</b>训练分化的内部记账冲突</span></a>
+<a class="row" href="/students/hu-min/hollow-history/"><span class="r-n">17</span><span class="r-t"><b class="r-h">空历的身体</b>一个判断与它的生成</span></a>
+<a class="row" href="/students/hu-min/bistable-lock/"><span class="r-n">18</span><span class="r-t">论运动代偿的双稳态锁定</span></a>
+<a class="row" href="/students/hu-min/re-anchoring/"><span class="r-n">19</span><span class="r-t"><b class="r-h">重锚</b>为什么健康不是对“正确剧本”的回归，而是在溃散后重新组织任何可行秩序的能力</span></a>
+<a class="row" href="/students/hu-min/adjudicative-interference/"><span class="r-n">20</span><span class="r-t"><b class="r-h">裁定性干扰</b>为什么修复的判决动作本身即构成修复的结构性减损</span></a></section><section id="agentive" data-col="agentive"><div class="col-h"><span class="no">栏 六</span><h2>代理接管与内源调节</h2><span class="ct">7 篇</span></div><p class="col-d">身体自己那条调节回路，是在哪一步被接管的。</p><a class="row" href="/students/hu-min/deafened-organ/"><span class="r-n">1</span><span class="r-t"><b class="r-h">失听的器官</b>慢性病精准管理如何制造出一种不可逆的对话性萎缩</span></a>
+<a class="row" href="/students/hu-min/truncative-genesis/"><span class="r-n">2</span><span class="r-t"><b class="r-h">截断性生成</b>创伤后身心调节的非后果动力学</span></a>
+<a class="row" href="/students/hu-min/temporal-genesis-right/"><span class="r-n">3</span><span class="r-t"><b class="r-h">时序发生权</b>身体调节回路在标准化管理中被系统性截断的发生与代价</span></a>
+<a class="row" href="/students/hu-min/sovereignty-drift/"><span class="r-n">4</span><span class="r-t"><b class="r-h">主权背离</b>慢性病临床中「正确决策」的系统性代价</span></a>
+<a class="row" href="/students/hu-min/somatic-knowing-deprivation/"><span class="r-n">5</span><span class="r-t"><b class="r-h">身知与身知剥夺</b>论现代医疗命名如何引发身体自我调节的回写中断</span></a>
+<a class="row" href="/students/hu-min/bootstrapping/"><span class="r-n">6</span><span class="r-t"><b class="r-h">被绕过的生成</b>慢性病达标管理如何静默注销了身体从零重建调节秩序的唯一现场</span></a>
+<a class="row" href="/students/hu-min/agentive-lock-in/"><span class="r-n">7</span><span class="r-t"><b class="r-h">代理性锁定</b>慢性病管理中被改写的交互规则</span></a></section><section id="care" data-col="care"><div class="col-h"><span class="no">栏 七</span><h2>照料者的生理学 · 风险医学</h2><span class="ct">6 篇</span></div><p class="col-d">照料者是生理学对象；预防医学在没有病的地方建了一座城。</p><a class="row" href="/students/hu-min/response-decoupling/"><span class="r-n">1</span><span class="r-t"><b class="r-h">应答–功能解耦</b>长期照护空转中一条被忽视的器官退化路径</span></a>
+<a class="row" href="/students/hu-min/settlement-hunger/"><span class="r-n">2</span><span class="r-t">结算饥饿与照料的隐性生理学</span></a>
+<a class="row" href="/students/hu-min/physiological-escrow/"><span class="r-n">3</span><span class="r-t"><b class="r-h">生理托管</b>照料何以成为一场必须被偿还的生理债务</span></a>
+<a class="row" href="/students/hu-min/supplicatory-core/"><span class="r-n">4</span><span class="r-t"><b class="r-h">在恳求中生成</b>照料行为的祈应核及其不可消解的生理后果</span></a>
+<a class="row" href="/students/hu-min/revoked-exemption/"><span class="r-n">5</span><span class="r-t"><b class="r-h">豁免权的注销</b>风险医学如何在不制造疾病的情况下制造病人</span></a>
+<a class="row" href="/students/hu-min/liminal-zone/"><span class="r-n">6</span><span class="r-t"><b class="r-h">临界间</b>当预防医学在没有病的地方建了一座城</span></a></section><section id="depression" data-col="depression"><div class="col-h"><span class="no">栏 八</span><h2>抑郁发生学</h2><span class="ct">4 篇</span></div><p class="col-d">抑郁不是心情的下限，是发生条件的塌陷。</p><a class="row" href="/students/hu-min/generative-void/"><span class="r-n">1</span><span class="r-t"><b class="r-h">发生性空洞</b>被善意系统绕过的生命生成权</span></a>
+<a class="row" href="/students/hu-min/hollowed-existence/"><span class="r-n">2</span><span class="r-t"><b class="r-h">空洞的回声</b>抑郁症与存在感的当代溃散</span></a>
+<a class="row" href="/students/hu-min/psychic-ledger/"><span class="r-n">3</span><span class="r-t">当日常赋值被颠倒——心理积分过程的扭曲与一种当代身心崩溃的发生</span></a>
+<a class="row" href="/students/hu-min/downside-deprivation/"><span class="r-n">4</span><span class="r-t"><b class="r-h">劣性潜能的剥夺</b>抑郁症时代流行的发生学机制</span></a></section><section id="other" data-col="other"><div class="col-h"><span class="no">栏 九</span><h2>其他 · 身体与临床</h2><span class="ct">15 篇</span></div><p class="col-d">早期篇目里同属这条线的那些。</p><a class="row" href="/students/hu-min/paper-p48-d01-a03/"><span class="r-n">1</span><span class="r-t">当“正确”耗尽裁决：慢性病照护中的低效冗余与能动性再生产</span></a>
+<a class="row" href="/students/hu-min/paper-p48-d01-a01/"><span class="r-n">2</span><span class="r-t"><b class="r-h">裂隙</b>指标复常之后的身体</span></a>
+<a class="row" href="/students/hu-min/paper-p47-d01-a03/"><span class="r-n">3</span><span class="r-t"><b class="r-h">复现土</b>判断离开现场之后，何以再发生</span></a>
+<a class="row" href="/students/hu-min/paper-p48-d01-a04/"><span class="r-n">4</span><span class="r-t"><b class="r-h">静默的回响面</b>当身体无人倾听</span></a>
+<a class="row" href="/students/hu-min/paper-p48-d01-a02/"><span class="r-n">5</span><span class="r-t"><b class="r-h">被悬置的感知</b>慢性病治理中“代偿性盲感”的发生与健康主体性的重组</span></a>
+<a class="row" href="/students/hu-min/paper-p41-d01-a04/"><span class="r-n">6</span><span class="r-t">未持之因——价值系统持久性的动力学研究</span></a>
+<a class="row" href="/students/hu-min/paper-p46-d01-a03/"><span class="r-n">7</span><span class="r-t"><b class="r-h">证身</b>为什么身体信号需要被翻译成对错才能被听到</span></a>
+<a class="row" href="/students/hu-min/paper-p46-d01-a02/"><span class="r-n">8</span><span class="r-t"><b class="r-h">饥饿性校准</b>当身体知识的生成条件被系统填平之后</span></a>
+<a class="row" href="/students/hu-min/paper-p39-d01-a01/"><span class="r-n">9</span><span class="r-t"><b class="r-h">背负的重量</b>论婚姻中“承重”的生成、磨损与不可还原性</span></a>
+<a class="row" href="/students/hu-min/paper-p47-d01-a04/"><span class="r-n">10</span><span class="r-t">技艺的活性如何被自身的守护冷却：一个“护盾热寂”假说</span></a>
+<a class="row" href="/students/hu-min/paper-p46-d01-a04/"><span class="r-n">11</span><span class="r-t"><b class="r-h">陪身体坐一会儿</b>当健康不再是一场需要被管理的事</span></a>
+<a class="row" href="/students/hu-min/paper-p47-d01-a02/"><span class="r-n">12</span><span class="r-t">对题发生——中医传承中被逼出的生成革命</span></a>
+<a class="row" href="/students/hu-min/bodily-self-disablement/"><span class="r-n">13</span><span class="r-t"><b class="r-h">身体自失能</b>感知判断的闲置性萎缩</span></a>
+<a class="row" href="/students/hu-min/dependency-vortex/"><span class="r-n">14</span><span class="r-t"><b class="r-h">漩涡之困</b>依赖行为的自我维持回路</span></a>
+<a class="row" href="/students/hu-min/clinical-cognitive-substitution/"><span class="r-n">15</span><span class="r-t"><b class="r-h">指标体系下的身体</b>论慢性病管理中的一种认知替代机制</span></a></section><section id="companion" data-col="companion"><div class="col-h"><span class="no">栏 十</span><h2>配套读物</h2><span class="ct">32 篇</span></div><p class="col-d">同一个判断的两篇写法：一篇讲清楚它是什么，一篇给出怎么做。</p><a class="row" href="/students/hu-min/single-encounter/practice/"><span class="r-n">1</span><span class="r-t"><b class="r-h">单遇清单</b>把「越过了线而没有第二次」的那些人列出来</span></a>
+<a class="row" href="/students/hu-min/single-encounter/interpretation/"><span class="r-n">2</span><span class="r-t">来过一次就没再来的那些人，在哪一栏里</span></a>
+<a class="row" href="/students/hu-min/revoked-endpoint/practice/"><span class="r-n">3</span><span class="r-t"><b class="r-h">首撤时刻清点</b>把「本来到此为止而被改判为继续」那一下数出来</span></a>
+<a class="row" href="/students/hu-min/revoked-endpoint/interpretation/"><span class="r-n">4</span><span class="r-t">那辆修了又修的车，从来没进过报废登记</span></a>
+<a class="row" href="/students/hu-min/off-peak/practice/"><span class="r-n">5</span><span class="r-t"><b class="r-h">兑位审计</b>查清楚你的力气落在关口的哪一侧</span></a>
+<a class="row" href="/students/hu-min/off-peak/interpretation/"><span class="r-n">6</span><span class="r-t">同样一笔钱，花在封墙之前和封墙之后，买到的不是同一样东西</span></a>
+<a class="row" href="/students/hu-min/lodging-in-class/practice/"><span class="r-n">7</span><span class="r-t"><b class="r-h">寄类度清点</b>逐条查一句关于未来的话，用的是谁的数据</span></a>
+<a class="row" href="/students/hu-min/lodging-in-class/interpretation/"><span class="r-n">8</span><span class="r-t">导航还是说「预计二十五分钟到」，只是它已经不看你这辆车了</span></a>
+<a class="row" href="/students/hu-min/frozen-base/practice/"><span class="r-n">9</span><span class="r-t"><b class="r-h">凝额审计</b>把「一直是这么定的那一层」找出来，算一次账</span></a>
+<a class="row" href="/students/hu-min/frozen-base/interpretation/"><span class="r-n">10</span><span class="r-t">那锅底汤三十年没换过，而每道新菜都在它上面</span></a>
+<a class="row" href="/students/hu-min/co-enclosure/practice/"><span class="r-n">11</span><span class="r-t"><b class="r-h">同围清点</b>查一次判定到底是在哪一圈东西里做出来的</span></a>
+<a class="row" href="/students/hu-min/co-enclosure/interpretation/"><span class="r-n">12</span><span class="r-t">同一颗果子，今天是精品，明天是散装</span></a>
+<a class="row" href="/students/hu-min/absorbing-column/practice/"><span class="r-n">13</span><span class="r-t"><b class="r-h">续料清点</b>查一查那个「待定」名目后面到底接着什么</span></a>
+<a class="row" href="/students/hu-min/absorbing-column/interpretation/"><span class="r-n">14</span><span class="r-t"><b class="r-h">疑难件库房</b>有编号、有台账、有人在动，就是不通向签收</span></a>
+<a class="row" href="/students/hu-min/clinical-cognitive-substitution/practice.html"><span class="r-n">15</span><span class="r-t"><b class="r-h">先说后看</b>把身体重新请回判断席</span></a>
+<a class="row" href="/students/hu-min/clinical-cognitive-substitution/explain.html"><span class="r-n">16</span><span class="r-t">仪表盘越来越聪明，司机为什么越来越不敢相信自己的手？</span></a>
+<a class="row" href="/students/hu-min/tacit-allocation/practice.html"><span class="r-n">17</span><span class="r-t">拿到一个「人均」，先问它是谁分出来的</span></a>
+<a class="row" href="/students/hu-min/tacit-allocation/explain.html"><span class="r-n">18</span><span class="r-t">四个人合租，你那份房租是你自己的事吗</span></a>
+<a class="row" href="/students/hu-min/re-anchoring/practice.html"><span class="r-n">19</span><span class="r-t">怎么判断一次恢复是真的恢复</span></a>
+<a class="row" href="/students/hu-min/re-anchoring/explain.html"><span class="r-n">20</span><span class="r-t">路断了，不是修回原来那条路</span></a>
+<a class="row" href="/students/hu-min/perceptual-stripping/practice.html"><span class="r-n">21</span><span class="r-t">当警报器本身可能已经坏了</span></a>
+<a class="row" href="/students/hu-min/perceptual-stripping/explain.html"><span class="r-n">22</span><span class="r-t">手冻僵了，你就摸不出杯子有多烫</span></a>
+<a class="row" href="/students/hu-min/institutional-blind-spot/practice.html"><span class="r-n">23</span><span class="r-t">给一个制度做一次格式体检</span></a>
+<a class="row" href="/students/hu-min/institutional-blind-spot/explain.html"><span class="r-n">24</span><span class="r-t">没有发票的那部分，公司不是不认，是看不见</span></a>
+<a class="row" href="/students/hu-min/adjudicative-interference/practice.html"><span class="r-n">25</span><span class="r-t">别在半夜验收</span></a>
+<a class="row" href="/students/hu-min/adjudicative-interference/explain.html"><span class="r-n">26</span><span class="r-t">越想知道自己睡着没有，就越睡不着</span></a>
+<a class="row" href="/students/hu-min/paper-p47-d01-a03/practice.html"><span class="r-n">27</span><span class="r-t">给一门靠判断吃饭的手艺建一块土</span></a>
+<a class="row" href="/students/hu-min/paper-p47-d01-a03/explain.html"><span class="r-n">28</span><span class="r-t">种子可以寄，土不能寄</span></a>
+<a class="row" href="/students/hu-min/bodily-self-disablement/practice.html"><span class="r-n">29</span><span class="r-t">先说后看</span></a>
+<a class="row" href="/students/hu-min/bodily-self-disablement/explain.html"><span class="r-n">30</span><span class="r-t">打了三个月石膏的那条腿</span></a>
+<a class="row" href="/students/hu-min/phantom-sum/practice/"><span class="r-n">31</span><span class="r-t"><b class="r-h">合虚审计</b>给一个多段治理的领域，算一次总账</span></a>
+<a class="row" href="/students/hu-min/phantom-sum/interpretation/"><span class="r-n">32</span><span class="r-t">每一段都说自己省了钱，为什么总账单没少</span></a></section><section><div class="col-h"><span class="no">附</span><h2>账册</h2></div><p class="col-d">四部专著另在首页陈列。</p><a class="row" href="/students/hu-min/weibing-ledger/"><span class="r-n">56</span><span class="r-t"><b class="r-h">治未病立账学</b>论未病作为一栏不存在的账</span></a><a class="row" href="/students/hu-min/bianzheng-settlement/"><span class="r-n">61</span><span class="r-t"><b class="r-h">辨证结算学</b>证的判定与复核中九类被吸收的量</span></a><a class="row" href="/students/hu-min/depression-inquiry/"><span class="r-n">63</span><span class="r-t"><b class="r-h">抑郁探究</b>判定、干预与记账</span></a><a class="row" href="/students/hu-min/ageing-primer/"><span class="r-n">69</span><span class="r-t"><b class="r-h">衰老初探</b>一份功能的账能记得平的九种来路</span></a></section></div><script>
+(function(){
+  var box=document.getElementById('q'), n=document.getElementById('n');
+  if(!box) return;
+  var rows=[].slice.call(document.querySelectorAll('.row'));
+  var secs=[].slice.call(document.querySelectorAll('section[data-col]'));
+  var total=rows.length;
+  function run(){
+    var v=box.value.trim().toLowerCase(), hit=0;
+    rows.forEach(function(r){
+      var ok=!v||r.textContent.toLowerCase().indexOf(v)>=0;
+      r.style.display=ok?'':'none'; if(ok) hit++;
+    });
+    secs.forEach(function(s){
+      var any=[].slice.call(s.querySelectorAll('.row')).some(function(r){return r.style.display!=='none';});
+      s.style.display=any?'':'none';
+    });
+    n.textContent=hit+' / '+total;
+    var e=document.getElementById('empty'); if(e) e.style.display=hit?'none':'';
+  }
+  box.addEventListener('input',run); run();
+})();
+</script>
+<footer><div class="wrap">
+  <p>健康发生学 · 胡敏 —— <a href="https://sdeuniverses.com/">SDE Universes</a> 的健康分站。全部篇目与主站同源，作者主页在 <a href="/students/hu-min/">学员专栏 · 胡敏</a>。</p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+<script>
+/* 分站页面的自家链接写的是分站根（/、/all/、/#栏）。在二级域名下这就是对的；
+   若从主站以 /sites/health/… 预览，则就地补上前缀，两处都能正常点。 */
+(function(){var b="/sites/health";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

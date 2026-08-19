@@ -1,0 +1,145 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>哪一份算数 · 翻页阅读 · 学科通融</title>
+<meta name="description" content="哪一份算数——同一样东西存了好几份，三个互不往来的行当给出三种互相取消的处方：必须消除、必须增加且刻意不设正本、不一致才是产出。本文论证三家漏掉了同一条分界——副本本身既不危险也不安全，危险只发生在一个地方：系统预期它们一致，却没有人负责让它们一致。。学科通融 · 翻页阅读。">
+<style>
+:root{--ink:#14161A;--ink2:#5A626C;--olive:#5B7247;--olive2:#7E9A55;
+--bg:#171A16;--bg2:#1F241D;--paper:#FFF;--line:rgba(126,154,85,.28)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;
+font-family:"Noto Sans CJK SC","PingFang SC","Hiragino Sans GB",sans-serif}
+#bar{position:fixed;top:0;left:0;right:0;height:54px;z-index:20;
+background:rgba(31,36,29,.94);backdrop-filter:blur(12px);
+border-bottom:1px solid var(--line);display:flex;align-items:center;
+justify-content:space-between;padding:0 14px;gap:10px;color:#E8E9E1;font-size:13.5px}
+#bar a{color:var(--olive2);text-decoration:none;white-space:nowrap}
+#bar a:hover{color:#A8C077}
+.grp{display:flex;align-items:center;gap:8px;min-width:0}
+.ttl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+color:#CFD3C4;font-size:13px;max-width:38vw}
+.btn{border:1px solid var(--line);background:transparent;color:#D8DCCB;
+border-radius:6px;padding:5px 11px;font-size:13px;cursor:pointer;line-height:1.4}
+.btn:hover{border-color:var(--olive2);color:#fff}
+.btn:disabled{opacity:.32;cursor:default}
+#pg{width:44px;text-align:center;background:transparent;border:1px solid var(--line);
+color:#E8E9E1;border-radius:6px;padding:5px 2px;font-size:13px}
+#prog{position:fixed;top:54px;left:0;height:2px;background:var(--olive2);z-index:21;
+width:0;transition:width .18s}
+#stage{position:absolute;top:54px;bottom:0;left:0;right:0;overflow:auto;
+display:flex;align-items:flex-start;justify-content:center;
+padding:26px 16px 40px;-webkit-overflow-scrolling:touch}
+#spread{display:flex;gap:18px;align-items:flex-start}
+canvas{background:var(--paper);border-radius:2px;
+box-shadow:0 2px 8px rgba(0,0,0,.34),0 18px 46px rgba(0,0,0,.44);
+max-width:100%;height:auto;display:block}
+#hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
+color:#8F978A;font-size:11.5px;letter-spacing:.06em;z-index:10;
+background:rgba(23,26,22,.7);padding:5px 13px;border-radius:14px;
+opacity:0;transition:opacity .5s}
+#hint.on{opacity:1}
+#fb{display:none;width:100%;height:calc(100% - 54px);border:0;position:absolute;top:54px}
+@media(max-width:640px){
+  .ttl{display:none} #bar{padding:0 10px;gap:6px}
+  #stage{padding:14px 8px 30px} .btn{padding:5px 9px}
+}
+</style></head>
+<body>
+<div id="bar">
+  <div class="grp"><a href="index.html">‹ 网页长文</a>
+  <span class="ttl">哪一份算数</span></div>
+  <div class="grp">
+    <button class="btn" id="prev">‹</button>
+    <input id="pg" value="1" inputmode="numeric"><span style="color:#8F978A">/ <b id="tot">–</b></span>
+    <button class="btn" id="next">›</button>
+    <button class="btn" id="two" title="单页／跨页">跨页</button>
+    <a class="btn" href="which-one-counts.pdf" download style="display:inline-block">⬇</a>
+  </div>
+</div>
+<div id="prog"></div>
+<div id="stage"><div id="spread"></div></div>
+<iframe id="fb" src="which-one-counts.pdf#view=FitH"></iframe>
+<div id="hint">← → 翻页　·　手机可左右滑动</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+(function(){
+  var URL_="which-one-counts.pdf", doc=null, cur=1, tot=0, two=false, busy=false;
+  var stage=document.getElementById('stage'), spread=document.getElementById('spread');
+  var elPg=document.getElementById('pg'), elTot=document.getElementById('tot');
+  var elPrev=document.getElementById('prev'), elNext=document.getElementById('next');
+  var elTwo=document.getElementById('two'), elProg=document.getElementById('prog');
+
+  function fallback(){
+    document.getElementById('stage').style.display='none';
+    document.getElementById('fb').style.display='block';
+  }
+  if(!window.pdfjsLib){ fallback(); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+  function fitScale(page){
+    var vp=page.getViewport({scale:1});
+    var gap=two?18:0, cols=two?2:1;
+    var availW=(stage.clientWidth-32-gap)/cols;
+    var availH=stage.clientHeight-56;
+    return Math.min(availW/vp.width, availH/vp.height);
+  }
+
+  function drawOne(n){
+    return doc.getPage(n).then(function(page){
+      var dpr=Math.min(window.devicePixelRatio||1, 2.5);
+      var s=fitScale(page), vp=page.getViewport({scale:s*dpr});
+      var c=document.createElement('canvas');
+      c.width=vp.width; c.height=vp.height;
+      c.style.width=(vp.width/dpr)+'px'; c.style.height=(vp.height/dpr)+'px';
+      return page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise
+        .then(function(){ return c; });
+    });
+  }
+
+  function render(){
+    if(busy||!doc) return; busy=true;
+    var ns=[cur]; if(two && cur+1<=tot) ns.push(cur+1);
+    Promise.all(ns.map(drawOne)).then(function(cs){
+      spread.innerHTML=''; cs.forEach(function(c){ spread.appendChild(c); });
+      elPg.value=cur; stage.scrollTop=0;
+      elProg.style.width=(cur/tot*100)+'%';
+      elPrev.disabled=(cur<=1); elNext.disabled=(cur>=tot);
+      busy=false;
+    }).catch(function(){ busy=false; fallback(); });
+  }
+
+  function go(n){ n=Math.max(1,Math.min(tot,n)); if(n!==cur){ cur=n; render(); } }
+  var step=function(){ return two?2:1; };
+
+  elPrev.onclick=function(){ go(cur-step()); };
+  elNext.onclick=function(){ go(cur+step()); };
+  elTwo.onclick=function(){
+    two=!two; elTwo.textContent=two?'单页':'跨页';
+    if(two && cur%2===0) cur=Math.max(1,cur-1);
+    render();
+  };
+  elPg.addEventListener('change',function(){ go(parseInt(elPg.value,10)||1); });
+  document.addEventListener('keydown',function(e){
+    if(e.target===elPg) return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); go(cur+step()); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(cur-step()); }
+    else if(e.key==='Home'){ go(1); } else if(e.key==='End'){ go(tot); }
+  });
+  var sx=0,sy=0;
+  stage.addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+  stage.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.6) go(cur+(dx<0?step():-step()));
+  },{passive:true});
+  var rt; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(render,180); });
+
+  pdfjsLib.getDocument(URL_).promise.then(function(d){
+    doc=d; tot=d.numPages; elTot.textContent=tot;
+    two=(window.innerWidth>=1080);
+    elTwo.textContent=two?'单页':'跨页';
+    render();
+    var h=document.getElementById('hint');
+    h.classList.add('on'); setTimeout(function(){ h.classList.remove('on'); },3600);
+  }).catch(fallback);
+})();
+</script>
+</body></html>

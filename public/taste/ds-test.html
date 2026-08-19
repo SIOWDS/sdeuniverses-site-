@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeepSeek 浏览器直连测试</title>
+<style>
+body{background:#0E1116;color:#E6EDF3;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;max-width:680px;margin:0 auto;padding:40px 20px}
+h1{font-size:24px;margin-bottom:8px}
+.sub{color:#8B98A5;font-size:14px;margin-bottom:28px}
+.box{background:#161B22;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:24px;margin-bottom:18px}
+label{display:block;font-size:13px;color:#8B98A5;margin-bottom:8px}
+input,select{width:100%;background:#1C232C;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#E6EDF3;padding:12px 14px;font-size:15px;font-family:inherit;margin-bottom:16px}
+input:focus,select:focus{outline:none;border-color:#D4B25E}
+button{width:100%;background:linear-gradient(120deg,#D4B25E,#E5C86E);color:#1a1205;font-weight:700;font-size:16px;border:none;border-radius:9px;padding:14px;cursor:pointer}
+button:disabled{opacity:0.5}
+.result{margin-top:20px;padding:18px;border-radius:9px;font-size:14px;line-height:1.8;white-space:pre-wrap;display:none}
+.result.ok{background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.4);color:#7ee787;display:block}
+.result.fail{background:rgba(248,81,73,0.12);border:1px solid rgba(248,81,73,0.4);color:#ff9b95;display:block}
+.result.info{background:rgba(46,80,144,0.15);border:1px solid rgba(110,159,212,0.4);color:#9cbde8;display:block}
+.hint{font-size:12px;color:#8B98A5;margin-top:8px}
+code{background:#0E1116;padding:2px 6px;border-radius:4px;font-size:13px}
+.step{color:#D4B25E;font-weight:700}
+</style>
+</head>
+<body>
+
+<h1>🔬 DeepSeek 浏览器直连测试</h1>
+<div class="sub">这个页面会用你的 Key 发一个最小的测试请求给 DeepSeek，判断"浏览器能否直接调用 DeepSeek API"。结果决定我们要不要加代理服务器。</div>
+
+<div class="box">
+  <label>你的 DeepSeek API Key（只在本机使用，不上传任何地方）</label>
+  <input type="password" id="key" placeholder="sk-..." autocomplete="off" spellcheck="false">
+
+  <label>测试哪个模型名</label>
+  <select id="model">
+    <option value="deepseek-v4-flash">deepseek-v4-flash（V4 新名 · 推荐先测这个）</option>
+    <option value="deepseek-v4-pro">deepseek-v4-pro（V4 顶配）</option>
+    <option value="deepseek-chat">deepseek-chat（旧名 · 7/24停用）</option>
+  </select>
+
+  <button id="btn">开始测试</button>
+  <div class="hint">点一下，等几秒。测试只花极少 token（约 1 个字），几乎不耗钱。</div>
+
+  <div class="result" id="result"></div>
+</div>
+
+<div class="box" style="font-size:13px;color:#8B98A5">
+  <b style="color:#E6EDF3">这个测试在看什么？</b><br><br>
+  <span class="step">情况①</span> 如果返回 <b style="color:#7ee787">✓ 成功</b> → DeepSeek 允许浏览器直连，金点子发生器可以零服务器运行。<br><br>
+  <span class="step">情况②</span> 如果报 <b style="color:#ff9b95">CORS / 跨域 / Failed to fetch</b> → 浏览器被拦截，需要加一个轻量代理服务器。<br><br>
+  <span class="step">情况③</span> 如果报 <b style="color:#ff9b95">401 / 402 / 模型不存在</b> → 能连通（CORS没问题！），只是 Key 或模型名的问题，换正确的再试。
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+$('key').value = localStorage.getItem('sde_ds_key') || '';
+
+$('btn').addEventListener('click', async ()=>{
+  const key = $('key').value.trim().replace(/^["']|["']$/g,'');
+  const model = $('model').value;
+  const r = $('result');
+  if(!key){ r.className='result fail'; r.textContent='请先填 Key'; return; }
+  localStorage.setItem('sde_ds_key', key);
+
+  $('btn').disabled=true; $('btn').textContent='测试中…';
+  r.className='result info'; r.textContent='正在发送测试请求到 api.deepseek.com …';
+
+  const t0=Date.now();
+  try{
+    const resp = await fetch("https://api.deepseek.com/v1/chat/completions",{
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+key },
+      body: JSON.stringify({
+        model,
+        messages:[{role:'user',content:'说一个字：好'}],
+        max_tokens: 5,
+        stream: false
+      })
+    });
+    const secs=((Date.now()-t0)/1000).toFixed(1);
+
+    if(resp.ok){
+      const j = await resp.json();
+      const reply = j.choices?.[0]?.message?.content || '(空)';
+      r.className='result ok';
+      r.textContent = '✓✓✓ 成功！DeepSeek 允许浏览器直连！\n\n'
+        + '模型「'+model+'」返回："'+reply+'"\n'
+        + '耗时 '+secs+'s\n\n'
+        + '→ 结论：金点子发生器可以【零服务器】直接运行，CORS 没有问题！\n'
+        + '→ 把这个好消息告诉 Claude，就可以继续了。';
+    } else {
+      let detail='';
+      try{ const j=await resp.json(); detail = j.error?.message || JSON.stringify(j); }catch(_){ detail=resp.statusText; }
+      r.className='result fail';
+      r.textContent = '⚠ 返回了错误码 '+resp.status+'（但注意：能收到这个错误码，说明请求已经到达 DeepSeek，CORS 其实是通的！）\n\n'
+        + '错误信息：'+detail+'\n\n'
+        + '→ 这多半是【模型名不对】或【Key无效/余额不足】，不是 CORS 问题。\n'
+        + '→ 换个模型名（先试 deepseek-v4-flash）或检查 Key，再测一次。';
+    }
+  }catch(e){
+    const secs=((Date.now()-t0)/1000).toFixed(1);
+    r.className='result fail';
+    r.textContent = '✗ 请求失败（'+secs+'s）：'+e.message+'\n\n'
+      + '→ 如果错误里有 "Failed to fetch" / "CORS" / "跨域" / "NetworkError"，\n'
+      + '   说明【浏览器被 CORS 拦截了】，DeepSeek 不允许网页直接调用。\n'
+      + '→ 这种情况就需要加一个轻量代理服务器。\n'
+      + '→ 把这个结果（尤其是错误信息原文）告诉 Claude。\n\n'
+      + '（也有可能是网络不通/断网，先确认你能正常上网）';
+  }
+  $('btn').disabled=false; $('btn').textContent='重新测试';
+});
+</script>
+</body>
+</html>

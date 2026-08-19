@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDE 语音解析 · 录下来，出文字，再把话拆开看 | SDE Universes</title>
+<meta name="description" content="录音或录像、也可以直接拖进已有的音视频文件，边录边出文字；转写稿再由 WDS 做观点解析与 SDE 语义解构——他到底主张了什么、哪些前提没说出口、这番话的 S/D/E 各是什么、缝隙与断链在哪、当场可以问他哪三个问题。三条转写通道任选：本机 Whisper（免费离线）、智谱 GLM-ASR、浏览器听写。音频与视频只在你这台机器上，用你自己的大模型 Key（只存本地）。">
+<style>
+:root{--bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:rgba(255,255,255,0.10);--text:#E6EDF3;--muted:#8B98A5;--vio:#9B7BD4;--vio2:#B79BE8;--ok:#3FB950;--err:#F85149;--gold:#D4B25E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;line-height:1.75;min-height:100vh}
+a{color:var(--vio2);text-decoration:none}a:hover{text-decoration:underline}
+nav{border-bottom:1px solid var(--border);background:rgba(14,17,22,0.9);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:13px 20px}
+.nav-logo{font-weight:700;letter-spacing:0.04em;color:var(--text);font-size:16px}
+.nav-back{font-size:14px;color:var(--muted)}
+.hero{position:relative;text-align:center;padding:52px 20px 6px}
+.hero-glow{position:absolute;left:50%;top:8%;transform:translateX(-50%);width:520px;height:260px;background:radial-gradient(ellipse,rgba(155,123,212,0.16),transparent 70%);pointer-events:none}
+.eyebrow{font-size:12px;letter-spacing:0.4em;color:var(--vio);margin-bottom:12px;position:relative}
+h1{font-size:clamp(26px,4.4vw,40px);font-weight:800;letter-spacing:0.02em;margin:0;position:relative}
+h1 .grad{background:linear-gradient(120deg,var(--vio),var(--vio2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--muted);font-size:clamp(14px,2vw,15.5px);margin-top:14px;max-width:730px;margin-left:auto;margin-right:auto;position:relative}
+.sub b{color:#C4B0E0;font-weight:600}
+.flow{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px;font-size:12px;color:var(--muted)}
+.flow span{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:5px 13px}
+.flow .arr{border:none;background:none;color:var(--vio);align-self:center}
+main{max-width:900px;margin:0 auto;padding:26px 18px 90px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px}
+.card h2{font-size:15px;margin:0 0 15px;color:var(--text);font-weight:700;letter-spacing:0.02em}
+.card h2 .n{color:var(--vio);margin-right:8px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.seg button{background:var(--panel2);color:var(--muted);border:none;padding:9px 15px;font-size:13.5px;font-family:inherit;cursor:pointer}
+.seg button.on{background:rgba(155,123,212,0.20);color:var(--vio2)}
+.seg button:disabled{opacity:.35;cursor:not-allowed}
+.lbl{font-size:13px;color:var(--muted);margin:0 0 7px;letter-spacing:0.02em}
+.kwrap{display:flex;gap:8px;margin-bottom:10px}
+input[type=password],input[type=text]{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:11px 13px;font-size:14px;font-family:inherit}
+input:focus{outline:none;border-color:var(--vio)}
+.ktog{flex-shrink:0;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--muted);padding:0 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+.ktog:hover{color:var(--text);border-color:var(--vio)}
+.khint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.65}
+.note{font-size:12.5px;color:var(--muted);line-height:1.7;margin-top:10px;background:var(--panel2);border:1px solid var(--border);border-left:2px solid var(--vio);border-radius:8px;padding:10px 13px}
+.note b{color:#C4B0E0}
+.warn{border-left-color:var(--gold)}.warn b{color:var(--gold)}
+.drop{border:1.5px dashed rgba(155,123,212,0.42);border-radius:12px;padding:30px 20px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(155,123,212,0.03)}
+.drop:hover,.drop.over{border-color:var(--vio);background:rgba(155,123,212,0.09)}
+.drop .di{font-size:30px;margin-bottom:8px}.drop .dt{font-size:14px}.drop .ds{font-size:12px;color:var(--muted);margin-top:6px}
+textarea{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:12px 14px;font-size:14px;font-family:inherit;line-height:1.85;resize:vertical;min-height:150px}
+textarea:focus{outline:none;border-color:var(--vio)}
+.btn{background:linear-gradient(120deg,var(--vio),var(--vio2));color:#140d24;border:none;border-radius:10px;padding:13px 26px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:0.03em}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn.rec{background:linear-gradient(120deg,#E5484D,#F2777A);color:#1a0708}
+.btn.ghost{background:none;border:1px solid var(--border);color:var(--muted);font-weight:600;padding:10px 18px;font-size:13.5px}
+.btn.ghost:hover:not(:disabled){color:var(--text);border-color:var(--vio)}
+.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.status{font-size:13px;color:var(--muted)}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(155,123,212,0.3);border-top-color:var(--vio);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.meter{height:8px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 8px}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--vio),var(--vio2));transition:width .09s linear}
+.recbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#E5484D;margin-right:6px;animation:blink 1.1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+video{width:100%;max-height:340px;background:#000;border-radius:10px;border:1px solid var(--border);display:block;margin-bottom:12px}
+#segList{margin-top:14px;max-height:260px;overflow:auto}
+.srow{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:8px 12px;margin-bottom:6px;font-size:13px}
+.srow.err{border-color:rgba(248,81,73,0.42)}
+.srow.run{border-color:rgba(155,123,212,0.45)}
+.stime{color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0;font-size:12.5px}
+.stext{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#CBD5E0}
+.sbtn{background:none;border:1px solid var(--border);border-radius:7px;color:var(--muted);padding:3px 10px;font-size:12px;cursor:pointer;flex-shrink:0}
+.sbtn:hover{color:var(--text);border-color:var(--vio)}
+.meta{font-size:12.5px;color:var(--muted);margin-top:8px}
+#results{display:none}
+.rcard{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:20px 22px;margin-bottom:16px}
+.rcard.tidy{border-top:3px solid var(--gold)}
+.rcard.ana{border-color:rgba(155,123,212,0.45);border-top:3px solid var(--vio)}
+.rhead{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+.rhead b{font-size:15.5px;flex:1;color:var(--vio2)}
+.rcard.tidy .rhead b{color:var(--gold)}
+.rbody{font-size:14.8px;line-height:1.9;color:#DCE3EA;white-space:pre-wrap;word-break:break-word}
+.rbody .h{display:block;color:var(--vio2);font-weight:700;margin:18px 0 4px}
+.rcard.tidy .rbody .h{color:var(--gold)}
+footer{border-top:1px solid var(--border);padding:26px 20px;text-align:center;color:var(--muted);font-size:12.5px}
+@media(max-width:640px){main{padding:18px 12px 70px}.card{padding:17px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/browse/" class="nav-logo">SDE Universes</a>
+  <a href="/taste/" class="nav-back">← 回品尝系列</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="eyebrow">SDE 智能体 · 其十六</div>
+  <h1>SDE <span class="grad">语音解析</span></h1>
+  <p class="sub">录下来，出文字，再把这番话<b>拆开看</b>。<br>说出来的话和写出来的文章不是一回事——观点埋在重复与迂回里，大量前提根本不说出口，语气强度本身就是信息。这台机器按口语的读法来：先转成文字，再做<b>观点解析</b>与 <b>SDE 语义解构</b>。</p>
+  <div class="flow"><span>🎙 录音／录像</span><span class="arr">→</span><span>边录边出文字</span><span class="arr">→</span><span>整理成稿</span><span class="arr">→</span><span>观点解析</span><span class="arr">→</span><span>S / D / E 解构</span><span class="arr">→</span><span>三个可以当场问的问题</span></div>
+</div>
+
+<main>
+
+  <!-- ① 设置 -->
+  <div class="card">
+    <h2><span class="n">①</span>设置</h2>
+
+    <div class="lbl">转写通道（把声音变成字的那一步）</div>
+    <div class="seg" id="chanSeg">
+      <button data-c="local" class="on">本机 Whisper · 免费</button>
+      <button data-c="glm">智谱 GLM-ASR</button>
+      <button data-c="web">浏览器听写</button>
+    </div>
+    <div class="khint" id="chanHint"></div>
+
+    <div style="height:18px"></div>
+    <div class="lbl">解析基底（做观点解析与 SDE 解构的那一步）</div>
+    <div class="row">
+      <div class="seg" id="vendSeg">
+        <button data-v="ds" class="on">DeepSeek</button>
+        <button data-v="glm">智谱 GLM</button>
+      </div>
+      <div class="seg" id="tierSeg" style="margin-left:auto">
+        <button data-t="deep" class="on">深度思考档</button>
+        <button data-t="fast">快速档</button>
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
+    <div id="dsKeyBox">
+      <div class="lbl">DeepSeek API Key</div>
+      <div class="kwrap"><input type="password" id="dsKey" placeholder="sk-..." autocomplete="off"><button class="ktog" data-for="dsKey">显示</button></div>
+    </div>
+    <div id="glmKeyBox" style="display:none">
+      <div class="lbl">智谱 GLM API Key</div>
+      <div class="kwrap"><input type="password" id="glmKeyA" placeholder="智谱开放平台的 Key" autocomplete="off"><button class="ktog" data-for="glmKeyA">显示</button></div>
+    </div>
+    <div id="asrKeyBox" style="display:none">
+      <div class="lbl">智谱 Key（转写用，与上面同一把）</div>
+      <div class="kwrap"><input type="password" id="glmKeyB" placeholder="智谱开放平台的 Key" autocomplete="off"><button class="ktog" data-for="glmKeyB">显示</button></div>
+      <div class="khint">GLM-ASR 约 0.06 元/分钟，从你自己的账户扣。</div>
+    </div>
+    <div class="khint">Key 只存在你这台机器的浏览器里，不上传、不经过本站服务器保存。DeepSeek 在 platform.deepseek.com 申请，智谱在 open.bigmodel.cn。</div>
+  </div>
+
+  <!-- ② 录入 -->
+  <div class="card">
+    <h2><span class="n">②</span>录入</h2>
+    <div class="seg" id="srcSeg">
+      <button data-s="mic" class="on">🎙 麦克风</button>
+      <button data-s="cam">🎥 摄像头</button>
+      <button data-s="file">📁 上传音视频</button>
+    </div>
+
+    <div id="camWrap" style="display:none;margin-top:14px"><video id="preview" muted playsinline></video></div>
+
+    <div id="liveWrap" style="margin-top:16px">
+      <div class="actions">
+        <button class="btn rec" id="recBtn">● 开始</button>
+        <button class="btn ghost" id="pauseBtn" style="display:none">⏸ 暂停</button>
+        <button class="btn ghost" id="stopBtn" style="display:none">■ 停止</button>
+      </div>
+      <div class="meter"><i id="lvl"></i></div>
+      <div class="recbar" id="recBar">未开始。按下开始后就一直说，它会在你停顿的地方自己切段、切一段转一段。</div>
+    </div>
+
+    <div id="fileWrap" style="display:none;margin-top:16px">
+      <div class="drop" id="drop">
+        <div class="di">🎧</div>
+        <div class="dt">点这里选文件，或把音频／视频拖进来</div>
+        <div class="ds">mp3 · wav · m4a · aac · mp4 · webm · mov（浏览器能解的都行）· 单个 ≤300MB</div>
+      </div>
+      <input type="file" id="fileIn" accept="audio/*,video/*" style="display:none">
+      <div class="meta" id="fileMeta"></div>
+    </div>
+
+    <div class="note" id="privNote">音频与视频<b>只在你这台机器上</b>切段。选「本机 Whisper」时连字节都不出这台机器；选「智谱 GLM-ASR」时只有切好的音频段发去转写、转完即弃、不落盘。</div>
+    <div id="dlMedia" style="display:none;margin-top:12px"><button class="btn ghost" id="dlMediaBtn">⬇ 下载刚才录的文件</button></div>
+  </div>
+
+  <!-- ③ 转写稿 -->
+  <div class="card">
+    <h2><span class="n">③</span>转写稿</h2>
+    <div class="row" style="margin-bottom:10px">
+      <span class="status" id="tsStatus">还没有内容。</span>
+      <label style="margin-left:auto;font-size:13px;color:var(--muted);cursor:pointer"><input type="checkbox" id="tsClock" style="vertical-align:-1px;margin-right:5px">显示时间戳</label>
+    </div>
+    <textarea id="tsBox" placeholder="转写出来的文字会实时出现在这里。也可以直接把已有的文字稿粘进来——不录音，只做解析，一样能用。"></textarea>
+    <div class="meta" id="tsMeta"></div>
+    <div id="segList"></div>
+    <div class="actions" style="margin-top:14px">
+      <button class="btn ghost" id="copyTs">复制</button>
+      <button class="btn ghost" id="dlTs">下载 .txt</button>
+      <button class="btn ghost" id="clearTs">清空</button>
+    </div>
+  </div>
+
+  <!-- ④ 解析 -->
+  <div class="card">
+    <h2><span class="n">④</span>交给 WDS</h2>
+    <div class="lbl">场合与说话人（可不填，填了它才判得准「这番话与什么纠缠」）</div>
+    <input type="text" id="scene" placeholder="例：部门周会上我对着团队讲的／和客户的一对一／学生课堂发言" maxlength="120">
+    <div class="actions" style="margin-top:16px">
+      <button class="btn ghost" id="tidyBtn">整理成稿</button>
+      <button class="btn" id="anaBtn">SDE 解析 →</button>
+      <button class="btn ghost" id="stopAna" style="display:none">停下</button>
+      <span class="status" id="anaStatus"></span>
+    </div>
+    <div class="note">「整理成稿」只扶正断句与错字、去口水词，<b>一个观点都不删、语气强度不改</b>——前后矛盾正是要留给下一步看的。「SDE 解析」出五节：观点解析（含没说出口的前提）· S/D/E 语义解构 · 缝隙与断链 · 三个当场可以问的问题 · 一句判断。</div>
+  </div>
+
+  <div id="results"></div>
+  <div id="restore"></div>
+
+</main>
+
+<footer>SDE 语音解析 · 德麦国际 · 用你自己的大模型 Key，只存本地 · <a href="/taste/">回品尝系列</a></footer>
+
+<script src="/assets/wds-recorder.js" defer></script>
+<script>
+(function(){
+"use strict";
+function $(s){return document.querySelector(s);}
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+function mmss(x){x=Math.max(0,Math.round(x));var m=Math.floor(x/60),s=x%60;return (m<10?"0":"")+m+":"+(s<10?"0":"")+s;}
+function cn(s){return String(s).replace(/\s/g,"").length;}
+
+/* ═══ 状态 ═══ */
+var chan  = localStorage.getItem("sde_voice_chan") || "local";
+var vendor= localStorage.getItem("sde_wds_vendor") || "ds";
+var tier  = localStorage.getItem("sde_voice_tier") || "deep";
+var src   = "mic";
+var segs = [];              // {i, at, sec, text, status, b64, pcm}
+var queue = [], pumping = false;
+var handle = null, mediaBlob = null, mediaName = "";
+var manual = false;         // 读者动过转写框之后，就不再整篇重建，只往末尾追加
+var webSess = null;         // 浏览器听写会话
+var busy = false;
+var DRAFT = "sde_voice_draft";
+
+/* ═══ 设置 ═══ */
+var CHAN_HINT = {
+  local: "在你自己的机器上跑 Whisper：不要 Key、不花钱、音频一个字节都不出这台机器。代价是首次要下约 80MB 模型（之后浏览器缓存），没有 WebGPU 的机器靠 CPU 跑，一段五十秒的话可能要算十几秒到几十秒。长录音建议先按「开始」录完再慢慢转。",
+  glm:   "把切好的音频段发到智谱 GLM-ASR 转写（用你自己的智谱 Key，约 0.06 元/分钟）。国内网络下最稳，速度最快，长录音首选。音频转完即弃、不落盘。",
+  web:   "用浏览器自带的听写，边说边上屏、即时且免费。三个前提说在前面：只对麦克风／摄像头实时录音有效，<b>上传文件用不了它</b>；Chrome 的实现要把音频送到 Google 的服务器，<b>大陆网络下多半不通</b>；Firefox 没有这个能力。不通时请换另外两条。"
+};
+function paintChan(){
+  document.querySelectorAll("#chanSeg button").forEach(function(b){b.classList.toggle("on",b.dataset.c===chan);});
+  $("#chanHint").innerHTML = CHAN_HINT[chan];
+  $("#asrKeyBox").style.display = (chan==="glm" && vendor!=="glm") ? "block" : "none";
+  // 上传文件这一路走不了浏览器听写，如实禁掉而不是让它静默失败
+  var wb = document.querySelector('#chanSeg button[data-c="web"]');
+  wb.disabled = (src==="file");
+  wb.title = wb.disabled ? "上传的文件没法用浏览器听写，请选本机或智谱" : "";
+}
+document.querySelectorAll("#chanSeg button").forEach(function(b){b.onclick=function(){
+  if(b.disabled) return;
+  chan=b.dataset.c; localStorage.setItem("sde_voice_chan",chan); paintChan(); refresh();
+};});
+function paintVendor(){
+  document.querySelectorAll("#vendSeg button").forEach(function(b){b.classList.toggle("on",b.dataset.v===vendor);});
+  $("#dsKeyBox").style.display  = vendor==="ds"  ? "block" : "none";
+  $("#glmKeyBox").style.display = vendor==="glm" ? "block" : "none";
+  paintChan();
+}
+document.querySelectorAll("#vendSeg button").forEach(function(b){b.onclick=function(){
+  vendor=b.dataset.v; localStorage.setItem("sde_wds_vendor",vendor); paintVendor(); refresh();
+};});
+document.querySelectorAll("#tierSeg button").forEach(function(b){b.onclick=function(){
+  tier=b.dataset.t; localStorage.setItem("sde_voice_tier",tier);
+  document.querySelectorAll("#tierSeg button").forEach(function(x){x.classList.toggle("on",x.dataset.t===tier);});
+};});
+document.querySelectorAll(".ktog").forEach(function(b){b.onclick=function(){
+  var el=document.getElementById(b.dataset.for);
+  el.type = el.type==="password" ? "text" : "password";
+  b.textContent = el.type==="password" ? "显示" : "隐藏";
+};});
+// 智谱 Key 有两个输入框（解析用／转写用），是同一把——任一处改动同步另一处，
+// 否则读者在一处填了、另一处仍报「缺 Key」，而两个框长得一模一样，这种错最难自己看出来
+function bindKey(id, store, twin){
+  var el=document.getElementById(id);
+  el.value = localStorage.getItem(store) || "";
+  el.addEventListener("input",function(){
+    var v=el.value.trim();
+    localStorage.setItem(store,v);
+    if(twin){var t=document.getElementById(twin); if(t && t.value!==el.value) t.value=el.value;}
+    refresh();
+  });
+}
+bindKey("dsKey","sde_ds_key",null);
+bindKey("glmKeyA","sde_glm_key","glmKeyB");
+bindKey("glmKeyB","sde_glm_key","glmKeyA");
+function anaKey(){var k=(vendor==="ds"?$("#dsKey").value:$("#glmKeyA").value).trim();return k.length>=8?k:"";}
+function asrKey(){var k=($("#glmKeyA").value||$("#glmKeyB").value||"").trim();return k.length>=8?k:"";}
+paintVendor();
+
+/* ═══ 录入源切换 ═══ */
+document.querySelectorAll("#srcSeg button").forEach(function(b){b.onclick=function(){
+  if(handle){ say("先停止当前录制再切换。"); return; }
+  src=b.dataset.s;
+  document.querySelectorAll("#srcSeg button").forEach(function(x){x.classList.toggle("on",x.dataset.s===src);});
+  $("#camWrap").style.display  = src==="cam"  ? "block" : "none";
+  $("#liveWrap").style.display = src==="file" ? "none"  : "block";
+  $("#fileWrap").style.display = src==="file" ? "block" : "none";
+  if(src==="file" && chan==="web"){ chan="local"; localStorage.setItem("sde_voice_chan",chan); }
+  paintChan();
+};});
+
+/* ═══ 转写队列（严格串行）═══
+   并发发出去是拿自己的机器／自己的额度打自己：本机 Whisper 并发会把 CPU 顶死，
+   GLM-ASR 并发会撞限流。一次一段，慢一点，但每一段都到得了。 */
+function enqueue(seg){
+  seg.status="pending"; seg.text="";
+  segs.push(seg); queue.push(seg);
+  renderSegs(); pump();
+}
+function pump(){
+  if(pumping) return;
+  var s=null;
+  for(var i=0;i<queue.length;i++){ if(queue[i].status==="pending"){s=queue[i];break;} }
+  if(!s){ pumping=false; renderSegs(); saveDraft(); return; }
+  pumping=true; s.status="run"; renderSegs();
+  doSeg(s).then(function(txt){
+    s.text=String(txt||"").trim(); s.status = s.text ? "done" : "empty";
+    absorb(s);
+  }).catch(function(e){
+    s.status="err"; s.err=(e&&e.message)||String(e);
+  }).then(function(){
+    pumping=false; renderSegs(); saveDraft(); setTimeout(pump,0);
+  });
+}
+function doSeg(s){
+  if(chan==="glm"){
+    var k=asrKey();
+    if(!k) return Promise.reject(new Error("先填智谱 Key"));
+    var ctrl=new AbortController();
+    var to=setTimeout(function(){try{ctrl.abort();}catch(e){}},90000);   // 一段最多等 90 秒，不许无限期挂着
+    return fetch("/api/wds/asr",{method:"POST",headers:{"content-type":"application/json"},
+      signal:ctrl.signal, body:JSON.stringify({audio:s.b64,key:k,lang:"zh"})})
+      .then(function(r){return r.json();})
+      .then(function(j){
+        if(j&&j.ok) return j.text;
+        var m={need_key:"缺智谱 Key",bad_key:"Key 不对",no_credit:"智谱账户余额不足",rate:"转写太密集，稍后重试",empty:"这一段没听出内容",too_big:"这一段太长",net:"网络不通"}[j&&j.code];
+        throw new Error(m||("转写失败 "+((j&&j.code)||"")));
+      })
+      .then(function(t){clearTimeout(to);return t;},function(e){clearTimeout(to);throw (e.name==="AbortError"?new Error("这一段等超过 90 秒，已掐断"):e);});
+  }
+  if(chan==="local"){
+    return whisperReady().then(function(W){ return W.transcribe(s.pcm,"zh"); });
+  }
+  return Promise.reject(new Error("这条通道不走分段转写"));
+}
+
+/* ── 本机 Whisper：只准备一次，之后各段复用 ── */
+var wReady=null;
+function whisperLoad(cb){
+  if(window.WDSWhisper){window.WDSWhisper.load(cb);return;}
+  var sc=document.createElement("script"); sc.src="/assets/wds-whisper.js"; sc.async=true;
+  sc.onload=function(){ window.WDSWhisper ? window.WDSWhisper.load(cb) : cb(null); };
+  sc.onerror=function(){cb(null);};
+  document.head.appendChild(sc);
+}
+function whisperReady(){
+  if(wReady) return wReady;
+  wReady = new Promise(function(res,rej){
+    whisperLoad(function(W){
+      if(!W){ rej(new Error("这个浏览器起不了本机转写，请改用智谱通道")); return; }
+      say("正在准备本机模型 0%…");
+      W.prepare({lang:"zh",onProgress:function(p){ say(p>=100?"模型就绪，开始转写…":("下载本机模型 "+p+"%（约 80MB，只下这一次）")); }})
+       .then(function(){ res(W); })
+       .catch(function(e){ rej(new Error("本机模型没起来（"+((e&&e.message)||"").split(":")[0]+"），请改用智谱通道")); });
+    });
+  });
+  wReady.catch(function(){ wReady=null; });   // 失败了要能重来，不然换个网络也还是这个错
+  return wReady;
+}
+
+/* ═══ 转写稿组装 ═══ */
+function absorb(s){
+  if(!s.text) return;
+  if(manual){                                  // 读者已手改过：只追加，绝不覆盖他的修改
+    var box=$("#tsBox");
+    box.value = (box.value ? box.value.replace(/\s+$/,"")+"\n\n" : "") + stamp(s) + s.text;
+  } else rebuild();
+  meta();
+}
+function stamp(s){ return $("#tsClock").checked ? ("["+mmss(s.at)+"] ") : ""; }
+function rebuild(){
+  if(manual) return;
+  $("#tsBox").value = segs.filter(function(s){return s.text;})
+                          .map(function(s){return stamp(s)+s.text;}).join("\n\n");
+  meta();
+}
+function meta(){
+  var n=cn($("#tsBox").value);
+  var done=segs.filter(function(s){return s.status==="done";}).length;
+  var bad=segs.filter(function(s){return s.status==="err";}).length;
+  $("#tsMeta").textContent = n ? (n+" 字"+(segs.length?("　·　"+done+"/"+segs.length+" 段已转写"+(bad?("　·　"+bad+" 段失败，可单独重试"):"")):"")) : "";
+  $("#tsStatus").textContent = n ? "" : "还没有内容。";
+  refresh();
+}
+$("#tsBox").addEventListener("input",function(){
+  manual=true; meta(); saveDraft();
+});
+$("#tsClock").addEventListener("change",function(){ rebuild(); });
+function renderSegs(){
+  var box=$("#segList");
+  if(!segs.length){box.innerHTML="";return;}
+  box.innerHTML = segs.map(function(s){
+    var cls = s.status==="err"?"srow err":(s.status==="run"?"srow run":"srow");
+    var t = s.status==="run" ? '<span class="spinner"></span>转写中…'
+          : s.status==="pending" ? "排队中…"
+          : s.status==="err" ? ("失败："+esc(s.err||""))
+          : s.status==="empty" ? "（这一段没听出内容）"
+          : esc(s.text);
+    var btn = (s.status==="err"||s.status==="empty") ? '<button class="sbtn" data-retry="'+s.i+'">重试</button>' : "";
+    return '<div class="'+cls+'"><span class="stime">'+mmss(s.at)+"</span><span class=\"stext\">"+t+"</span>"+btn+"</div>";
+  }).join("");
+  box.querySelectorAll("[data-retry]").forEach(function(b){b.onclick=function(){
+    var s=segs.filter(function(x){return String(x.i)===b.dataset.retry;})[0];
+    if(!s||pumping) return;
+    if(!s.b64&&!s.pcm){ say("这一段的音频已经释放了，没法重转。"); return; }
+    s.status="pending"; s.err=""; if(queue.indexOf(s)<0) queue.push(s);
+    renderSegs(); pump();
+  };});
+}
+
+/* ═══ 录制 ═══ */
+function say(t){ $("#recBar").innerHTML=t; }
+function recUI(on,paused){
+  $("#recBtn").style.display   = on ? "none":"inline-block";
+  $("#pauseBtn").style.display = on ? "inline-block":"none";
+  $("#stopBtn").style.display  = on ? "inline-block":"none";
+  $("#pauseBtn").textContent   = paused ? "▶ 继续" : "⏸ 暂停";
+  document.querySelectorAll("#srcSeg button").forEach(function(b){b.disabled=on;});
+}
+var LS_OKDL="sde_wds_whisper_ok";
+function localOkAsked(){
+  try{ if(localStorage.getItem(LS_OKDL)==="1") return true; }catch(e){}
+  if(window.confirm("本机转写第一次要下载约 80MB 的模型（之后浏览器会缓存，不再重下）。现在下载吗？")){
+    try{localStorage.setItem(LS_OKDL,"1");}catch(e){}
+    return true;
+  }
+  return false;
+}
+$("#recBtn").onclick=function(){
+  if(handle) return;
+  if(chan==="glm" && !asrKey()){ say("走智谱通道要先在上面填智谱 Key。"); return; }
+  if(chan==="local" && !localOkAsked()){ say("没关系——也可以改用「智谱 GLM-ASR」通道，或先录完再转。"); return; }
+  if(!window.WDSRec){ say("录音模块没加载成功，刷新一下页面试试。"); return; }
+  window.WDSRec.load(function(R){
+    if(!R){ say("这个浏览器不支持录音。"); return; }
+    var useWeb = (chan==="web");
+    var opt = {
+      video: src==="cam",
+      want: chan==="local" ? "pcm" : "b64",
+      onSeg: useWeb ? null : enqueue,          // 浏览器听写自己出字，不需要切段
+      onLevel: function(peak,secs){
+        $("#lvl").style.width = Math.min(100,Math.round(peak*160))+"%";
+        var st = handle && handle.paused() ? "已暂停" : '<span class="dot"></span>录制中';
+        say(st+" · "+mmss(secs)+(useWeb?"　（浏览器听写，边说边上屏）":"　·　已切 "+segs.length+" 段"));
+      }
+    };
+    R.mic(opt).then(function(h){
+      handle=h; recUI(true,false);
+      if(src==="cam"){ var v=$("#preview"); v.srcObject=h.stream; v.play().catch(function(){}); }
+      if(useWeb) startWeb();
+      say('<span class="dot"></span>录制中 · 00:00');
+    }).catch(function(e){
+      var m=(e&&e.message)||"";
+      say(/denied|NotAllowed/i.test(m) ? "麦克风／摄像头权限被拒绝了，请在浏览器地址栏那里允许。"
+        : (/no_mic_api|no_audio_api/.test(m) ? "这个浏览器没有录音能力。" : "打不开设备："+m));
+    });
+  });
+};
+$("#pauseBtn").onclick=function(){
+  if(!handle) return;
+  if(handle.paused()){ handle.resume(); if(chan==="web") startWeb(); }
+  else { handle.pause(); stopWeb(); }
+  recUI(true,handle.paused());
+};
+$("#stopBtn").onclick=function(){
+  if(!handle) return;
+  var h=handle; handle=null; stopWeb(); recUI(false,false);
+  $("#lvl").style.width="0";
+  h.stop().then(function(r){
+    try{ var v=$("#preview"); v.srcObject=null; if(r.mediaBlob) { v.src=URL.createObjectURL(r.mediaBlob); v.muted=false; v.controls=true; } }catch(e){}
+    mediaBlob=r.mediaBlob;
+    mediaName=(r.video?"sde-录像-":"sde-录音-")+new Date().toISOString().slice(0,19).replace(/[:T]/g,"-")+(/mp4/.test(r.mime||"")?(r.video?".mp4":".m4a"):(r.video?".webm":".webm"));
+    $("#dlMedia").style.display = mediaBlob ? "block":"none";
+    say("录完了，共 "+mmss(r.sec)+(r.segs?("，切成 "+r.segs+" 段"):"")+"。"+(queue.filter(function(s){return s.status==="pending"||s.status==="run";}).length?"剩下的段还在转写。":""));
+    meta(); saveDraft();
+  }).catch(function(e){ say("收尾出错："+((e&&e.message)||e)); });
+};
+$("#dlMediaBtn").onclick=function(){ if(mediaBlob) dl(mediaBlob, mediaName); };
+
+/* ── 浏览器听写（通道 C）：与录制并行，自己往框里写 ── */
+function startWeb(){
+  stopWeb();
+  if(!window.WDSVoice){
+    var sc=document.createElement("script"); sc.src="/assets/wds-voice.js"; sc.async=true;
+    sc.onload=function(){ startWeb(); }; sc.onerror=function(){ say("听写模块没加载成功。"); };
+    document.head.appendChild(sc); return;
+  }
+  window.WDSVoice.load(function(V){
+    if(!V||!V.canWeb()){ say("这个浏览器没有听写能力，请改用本机或智谱通道。"); return; }
+    var mark=$("#tsBox").value.replace(/\s+$/,"");
+    webSess=V.startWeb({lang:"zh",
+      onText:function(fin,interim){
+        manual=true;                            // 听写直接写框，往后不再整篇重建
+        $("#tsBox").value=(mark?mark+"\n\n":"")+fin+interim; meta();
+      },
+      onEnd:function(){ saveDraft(); },
+      onError:function(code){
+        say(code==="network"||code==="service-not-allowed"
+          ? "浏览器听写在你这个网络下走不通（Chrome 要连 Google 的服务）。请改用「本机 Whisper」或「智谱 GLM-ASR」。"
+          : ("听写出错："+code));
+      }});
+  });
+}
+function stopWeb(){ if(webSess){ try{webSess.stop();}catch(e){} webSess=null; } }
+
+/* ═══ 上传文件 ═══ */
+$("#drop").onclick=function(){ $("#fileIn").click(); };
+["dragenter","dragover"].forEach(function(ev){ $("#drop").addEventListener(ev,function(e){e.preventDefault();$("#drop").classList.add("over");}); });
+["dragleave","drop"].forEach(function(ev){ $("#drop").addEventListener(ev,function(e){e.preventDefault();$("#drop").classList.remove("over");}); });
+$("#drop").addEventListener("drop",function(e){ if(e.dataTransfer.files&&e.dataTransfer.files[0]) takeFile(e.dataTransfer.files[0]); });
+$("#fileIn").addEventListener("change",function(){ if(this.files&&this.files[0]) takeFile(this.files[0]); this.value=""; });
+function takeFile(f){
+  if(chan==="web"){ say("上传的文件用不了浏览器听写。"); $("#fileMeta").textContent="请把转写通道换成「本机 Whisper」或「智谱 GLM-ASR」。"; return; }
+  if(chan==="glm" && !asrKey()){ $("#fileMeta").textContent="走智谱通道要先在上面填智谱 Key。"; return; }
+  if(chan==="local" && !localOkAsked()){ $("#fileMeta").textContent="也可以改用「智谱 GLM-ASR」通道。"; return; }
+  if(!window.WDSRec){ $("#fileMeta").textContent="录音模块没加载成功，刷新一下页面。"; return; }
+  $("#fileMeta").innerHTML='<span class="spinner"></span>正在本机解码 '+esc(f.name)+"…";
+  window.WDSRec.load(function(R){
+    if(!R){ $("#fileMeta").textContent="这个浏览器解不了音频。"; return; }
+    R.decodeFile(f,{
+      want: chan==="local" ? "pcm" : "b64",
+      onSeg: enqueue,
+      onProgress:function(p,total){ $("#fileMeta").innerHTML='<span class="spinner"></span>本机切段 '+Math.round(p*100)+"%（全长 "+mmss(total)+"）"; }
+    }).then(function(r){
+      $("#fileMeta").textContent="已切成 "+r.segs+" 段（全长 "+mmss(r.sec)+"），正在依次转写。";
+    }).catch(function(e){
+      var m=(e&&e.message)||"";
+      $("#fileMeta").textContent = m==="too_big" ? "这个文件超过 300MB，浏览器解不动；请先裁短或压一下。"
+        : (m==="decode" ? "这个格式浏览器解不开（多半是不常见的编码）。可以先转成 mp3 或 wav 再传。" : "读取失败："+m);
+    });
+  });
+}
+
+/* ═══ 交给 WDS ═══ */
+/* 状态条上有两类话，必须分开：
+   「指路话」（缺 Key／缺文字）是 refresh 写的，条件一变它自己该收回去；
+   「回执」（跑完多少字、报了什么错）是一次事件的结果，refresh 绝不许碰。
+   一开始没分，于是每次跑完/报错都被随后那次 refresh 当场抹掉——
+   读者看到的是结果出来了却没有任何说明，或者错误信息闪一下就没了。 */
+function hint(t){ var e=$("#anaStatus"); e.textContent=t; e.setAttribute("data-hint","1"); }
+function receipt(x,isHtml){ var e=$("#anaStatus"); if(isHtml) e.innerHTML=x; else e.textContent=x; e.removeAttribute("data-hint"); }
+function refresh(){
+  var has = cn($("#tsBox").value)>=20;
+  var k = !!anaKey();
+  $("#anaBtn").disabled  = busy || !has || !k;
+  $("#tidyBtn").disabled = busy || !has || !k;
+  $("#stopAna").style.display = busy ? "inline-block" : "none";
+  var e=$("#anaStatus"), mine = e.hasAttribute("data-hint") || !e.textContent;
+  if(!k){ if(mine) hint(has ? "先在上面填 "+(vendor==="ds"?"DeepSeek":"智谱")+" 的 Key。" : ""); }
+  else if(!has){ if(mine) hint("先录一段，或把文字稿粘进上面的框。"); }
+  else if(!busy && mine) hint("");
+}
+/* 走 SSE 边写边上屏。一次性 JSON 在这条路上是活不下来的：
+   深度档写八千 token 常要一两分钟，后端那道 55 秒护栏会先把它掐了，
+   而读者只看得到「生成失败」。流式还顺带解决了"干等一分钟不知道死没死"。 */
+var abortor=null;
+function run(mode,label){
+  if(busy) return;
+  busy=true; refresh();
+  var got="", think=0, t0=Date.now();
+  receipt('<span class="spinner"></span>'+label+"中…"+(tier==="deep"?"（深度思考档，会先想一会儿再动笔）":""),1);
+  abortor=new AbortController();
+  fetch("/api/wds/voice-sde",{
+    method:"POST",headers:{"content-type":"application/json"},signal:abortor.signal,
+    body:JSON.stringify({mode:mode,tier:tier,vendor:vendor,key:anaKey(),
+                         text:$("#tsBox").value,scene:$("#scene").value.trim()})
+  }).then(function(r){
+    var ct=r.headers.get("content-type")||"";
+    if(ct.indexOf("event-stream")<0){          // 校验没过时后端仍回 JSON，照旧读
+      return r.json().then(function(j){ throw new Error((j&&(j.msg||j.code))||("HTTP "+r.status)); });
+    }
+    var rd=r.body.getReader(), dec=new TextDecoder(), buf="";
+    function pump(){
+      return rd.read().then(function(x){
+        if(x.done) return;
+        buf+=dec.decode(x.value,{stream:true});
+        var i;
+        while((i=buf.indexOf("\n"))>=0){
+          var line=buf.slice(0,i).trim(); buf=buf.slice(i+1);
+          if(!line) continue;
+          if(line.charAt(0)===":") continue;            // 心跳行，跳过
+          if(line.indexOf("data:")!==0) continue;
+          var pl=line.slice(5).trim();
+          if(pl==="[DONE]") continue;
+          var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
+          if(j.t==="stage"){ receipt('<span class="spinner"></span>'+j.v,1); }
+          else if(j.t==="think"){ think=j.v; receipt('<span class="spinner"></span>'+label+"中…已思考 "+think+" 字，还没动笔",1); }
+          else if(j.t==="token"){ got+=j.v; live(mode,got); }
+          else if(j.t==="error"){ throw new Error(j.v); }
+          else if(j.t==="end"){ ST_end=j.v; }
+        }
+        return pump();
+      });
+    }
+    return pump();
+  }).then(function(){
+    busy=false; abortor=null;
+    if(!got){ receipt("没收到内容，重试一下。"); refresh(); return; }
+    var sec=Math.round((Date.now()-t0)/1000);
+    receipt((ST_end&&ST_end.truncated)
+      ? ("写到额度上限被截断了（"+got.length+" 字）。可以把转写稿分两段分别解析。")
+      : (label+"完成 · "+got.length+" 字 · "+sec+" 秒"));
+    show(mode,got); saveDraft(); refresh();
+  }).catch(function(e){
+    busy=false; abortor=null;
+    // 已经写出一半才断的，那一半要留下——不能因为收尾出错就把读者等来的东西丢掉
+    if(got){ show(mode,got); saveDraft(); receipt("中途断了（"+((e&&e.message)||e)+"），上面是已经写出来的部分。"); }
+    else receipt((e&&e.name==="AbortError") ? "已停下。" : ("出错了："+((e&&e.message)||e)));
+    refresh();
+  });
+}
+var ST_end=null;
+$("#tidyBtn").onclick=function(){ run("tidy","整理"); };
+$("#anaBtn").onclick =function(){ run("analyze","解析"); };
+$("#stopAna").onclick=function(){ if(abortor){ try{abortor.abort();}catch(e){} } };
+
+var out={};
+function live(mode,text){
+  out[mode]=text; render(); 
+}
+function show(mode,text){
+  out[mode]=text; render();
+  $("#results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+var painting=null;
+function render(){
+  // 流式一秒能来几十个 chunk，每个都重排整块会把手机端卡死；限到每 120ms 一次
+  if(painting) return;
+  painting=setTimeout(function(){
+    painting=null;
+    var R=$("#results"); R.style.display="block";
+    R.innerHTML =
+      (out.analyze ? card("ana","SDE 解析",out.analyze,"analyze") : "") +
+      (out.tidy    ? card("tidy","整理成稿",out.tidy,"tidy") : "");
+    R.querySelectorAll("[data-copy]").forEach(function(b){b.onclick=function(){ copy(out[b.dataset.copy]||"", b); };});
+    R.querySelectorAll("[data-dl]").forEach(function(b){b.onclick=function(){
+      var k=b.dataset.dl;
+      dl(new Blob([out[k]||""],{type:"text/plain;charset=utf-8"}), (k==="tidy"?"SDE整理稿-":"SDE语音解析-")+stampName()+".txt");
+    };});
+  },120);
+}
+function card(cls,title,text,key){
+  return '<div class="rcard '+cls+'"><div class="rhead"><b>'+title+"</b>"+
+    '<button class="sbtn" data-copy="'+key+'">复制</button>'+
+    '<button class="sbtn" data-dl="'+key+'">下载</button></div>'+
+    '<div class="rbody">'+fmt(text)+"</div></div>";
+}
+// 后端被要求不用 markdown 符号，但基底偶尔还是会漏出几个——顺手抹掉，别让读者看见 ** 和 ##
+function fmt(t){
+  return esc(String(t||"").replace(/^#{1,6}\s*/gm,"").replace(/\*\*/g,""))
+    .replace(/^([一二三四五六七八九十]+、.*)$/gm,'<span class="h">$1</span>')
+    .replace(/^((?:主张|他给的理由|没说出口的前提|强度|S 显露|D 差异序列|E 特征纠缠)：)/gm,'<b style="color:#C4B0E0">$1</b>');
+}
+function copy(t,b){
+  var old=b.textContent;
+  (navigator.clipboard&&navigator.clipboard.writeText(t)||Promise.reject())
+    .then(function(){b.textContent="已复制";},function(){
+      var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();
+      try{document.execCommand("copy");b.textContent="已复制";}catch(e){b.textContent="复制失败";}
+      document.body.removeChild(ta);
+    }).then(function(){setTimeout(function(){b.textContent=old;},1400);});
+}
+function dl(blob,name){
+  var u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(u);},800);
+}
+function stampName(){ return new Date().toISOString().slice(0,16).replace(/[:T]/g,"-"); }
+
+$("#copyTs").onclick=function(){ copy($("#tsBox").value,this); };
+$("#dlTs").onclick =function(){ dl(new Blob([$("#tsBox").value],{type:"text/plain;charset=utf-8"}),"转写稿-"+stampName()+".txt"); };
+$("#clearTs").onclick=function(){
+  if(handle){ say("先停止录制。"); return; }
+  if(!confirm("清空转写稿与解析结果？（刚才录的媒体文件还在，可以先下载）")) return;
+  segs=[];queue=[];manual=false;out={};
+  $("#tsBox").value="";$("#segList").innerHTML="";$("#results").style.display="none";$("#results").innerHTML="";
+  meta(); saveDraft();
+};
+
+/* ═══ 底稿：与成功与否无关，一律留底 ═══
+   转写是攒出来的，攒了半小时被一次误刷新清空是不可接受的。存在本机 localStorage，不上传。 */
+var saveT=null;
+function saveDraft(){
+  clearTimeout(saveT);
+  saveT=setTimeout(function(){
+    try{
+      var d={t:Date.now(),text:$("#tsBox").value,scene:$("#scene").value,tidy:out.tidy||"",analyze:out.analyze||""};
+      if(!cn(d.text)&&!d.tidy&&!d.analyze) { localStorage.removeItem(DRAFT); return; }
+      localStorage.setItem(DRAFT,JSON.stringify(d));
+    }catch(e){}
+  },500);
+}
+$("#scene").addEventListener("input",saveDraft);
+(function restore(){
+  var d; try{ d=JSON.parse(localStorage.getItem(DRAFT)||"null"); }catch(e){}
+  if(!d||(!cn(d.text||"")&&!d.tidy&&!d.analyze)) return;
+  var when=new Date(d.t||Date.now()).toLocaleString("zh-CN");
+  var box=$("#restore");
+  box.innerHTML='<div class="note warn">上一次留在这台机器上的底稿（<b>'+esc(when)+'</b>，转写稿 '+cn(d.text||"")+' 字'+
+    (d.analyze?"，含一份 SDE 解析":"")+'）。<div class="actions" style="margin-top:10px">'+
+    '<button class="btn ghost" id="rsYes">接着上次</button><button class="btn ghost" id="rsNo">丢掉</button></div></div>';
+  $("#rsYes").onclick=function(){
+    manual=true;
+    $("#tsBox").value=d.text||""; $("#scene").value=d.scene||"";
+    if(d.tidy) out.tidy=d.tidy;
+    if(d.analyze) out.analyze=d.analyze;
+    if(d.tidy||d.analyze) show(d.analyze?"analyze":"tidy", d.analyze||d.tidy);
+    box.innerHTML=""; meta();
+  };
+  $("#rsNo").onclick=function(){ try{localStorage.removeItem(DRAFT);}catch(e){} box.innerHTML=""; };
+})();
+
+window.addEventListener("beforeunload",function(e){
+  if(handle || queue.some(function(s){return s.status==="pending"||s.status==="run";})){
+    e.preventDefault(); e.returnValue="";
+  }
+});
+
+paintChan(); meta(); refresh();
+})();
+</script>
+</body>
+</html>

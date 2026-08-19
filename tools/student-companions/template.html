@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>$title$ · $page_type$ | 学员专栏 · SDE Universes</title>
+<meta name="description" content="$subtitle$">
+<link rel="stylesheet" href="/students/companion.css?v=20260817c">
+</head>
+<body>
+<nav class="c-nav"><div class="c-nav-in"><a class="c-logo" href="/browse/">SDE Universes</a><a class="c-back" href="$author_path$">← $if(student_name)$$student_name$$else$$theory_author$$endif$ · 全部作品</a></div></nav>
+<header class="c-hero">
+  <div class="c-eyebrow">学 员 专 栏 · 并 蒂 文 · $page_type$</div>
+  <h1 class="c-title">$title$</h1>
+  <div class="c-subtitle">$subtitle$</div>
+  <div class="c-meta">理论母文作者：$theory_author$ · 并蒂文：$if(companion_author)$$companion_author$$else$SDE 编辑部$endif$ · $date$ · $wordlabel$</div>
+</header>
+<div class="c-triad-wrap"><div class="c-triad">
+  <a href="$original_path$">① 理论母文<br>原作者的理论判断</a>
+  <a href="$interpretation_path$"$if(is_interpretation)$ class="active"$endif$>② 诠释文<br>日常类比与通俗解释</a>
+  <a href="$practice_path$"$if(is_practice)$ class="active"$endif$>③ 实用文<br>技术、流程与应用</a>
+</div></div>
+<main class="c-main">
+  <section class="c-source"><div class="label">THEORY SOURCE · 理论母文</div><div class="name">《$original_title$》</div><div class="note">本文只负责把母文的核心判断翻译或落地，不替代原文。建议读完本篇后回到母文，核对哪些来自原作者，哪些属于解释与应用层的展开。</div></section>
+  <article class="c-body">$body$</article>
+  <section class="c-end"><b>一篇理论，三种读法，放在一起</b><p>先看理论母文，再用诠释文听懂，最后用实用文做出第一步。</p><a href="$original_path$">读理论母文</a><a href="$sibling_path$" class="primary">读$sibling_label$</a></section>
+</main>
+<footer class="c-footer">© 德麦国际 Demai International · SDE Universes · 学员专栏并蒂文计划</footer>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

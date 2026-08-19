@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>非返母闭环——论一件事完整交出去之后有没有回头，是一栏此前没有人单独记过的账 | 学科通融 · SDE Universes</title>
+<meta name="description" content="一个家庭越依赖母亲不断提醒、解释、决定、纠错与救援，母亲反而越容易显得不可替代——所有日常经验都在生产证明她重要的证据。本文提出另一种辨别方式。返母事件的计数起点很窄：一件事必须已经完整交给母亲之外的责任者，包括识别需要、安排路径、做必要决定、处理普通异常与完成执行；如果在这件事关闭之前，母亲又因为">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+/* 学科通融 · 学术纸面版式 v2 —— 为长时间的思辨性阅读设计 */
+:root{
+  --paper:#F5F2E9; --paper2:#FBF9F3; --sheet:#FDFCF7;
+  --ink:#23201A; --ink2:#5C5647; --ink3:#8A8271;
+  --rule:#2A3B50; --rule2:#41586F;
+  --mark:#9E3D2C; --mark2:#B85A44;
+  --line:rgba(35,32,26,.13); --line2:rgba(35,32,26,.28);
+  --measure:700px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 8%, rgba(42,59,80,.035), transparent 46%),
+    radial-gradient(circle at 84% 72%, rgba(158,61,44,.030), transparent 44%);
+  background-attachment:fixed;
+  font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;
+  font-size:18.5px; line-height:2.06; letter-spacing:.012em;
+  font-feature-settings:"kern" 1;
+  text-rendering:optimizeLegibility;
+}
+a{color:inherit}
+::selection{background:rgba(158,61,44,.16)}
+
+/* 阅读进度：细，不抢注意力 */
+#pbar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--mark);z-index:99;opacity:.85}
+
+/* 顶栏 */
+.readbar{position:sticky;top:0;z-index:10;background:rgba(245,242,233,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 26px;font-size:13.5px;gap:12px;flex-wrap:wrap;letter-spacing:.02em}
+.nav-back{text-decoration:none;color:var(--mark)}
+.rb-modes{display:flex;gap:8px}
+.rb-btn{padding:5px 13px;border:1px solid var(--line2);border-radius:0;
+  text-decoration:none;font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
+.rb-btn:hover{border-color:var(--mark);color:var(--mark)}
+.rb-btn.cur{background:var(--rule);color:var(--sheet);border-color:var(--rule)}
+
+/* 题头：论文首页 */
+.art{max-width:800px;margin:auto;padding:78px 26px 8px;text-align:center}
+.art-series{color:var(--mark);letter-spacing:.42em;font-size:11.5px;text-transform:uppercase}
+.art-title{font-size:clamp(30px,4.4vw,45px);line-height:1.38;margin:26px 0 0;font-weight:700;letter-spacing:.01em}
+.art-title:after{content:"";display:block;width:56px;height:1px;background:var(--line2);margin:26px auto 0}
+.art-sub{color:var(--ink2);font-size:17px;line-height:1.94;max-width:620px;margin:22px auto 0;font-weight:400}
+.art-meta{color:var(--ink3);font-size:12.5px;margin-top:26px;letter-spacing:.09em}
+
+/* 正文栏宽：每行约三十四个汉字，是长文思辨阅读最省力的宽度 */
+.wrap{max-width:var(--measure);margin:auto;padding:8px 26px 46px}
+
+/* 摘要块 */
+.deck{position:relative;background:var(--paper2);border:0;border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--line);border-radius:0;
+  padding:30px 30px 26px;margin:44px 0 8px;font-size:16.2px;line-height:2.0;color:var(--ink2);text-align:justify}
+.deck:before{content:"题 解";position:absolute;top:-11px;left:26px;background:var(--paper);
+  padding:0 10px;font-size:11px;letter-spacing:.34em;color:var(--rule)}
+
+/* 目录：带引导点的学术目次 */
+.toc{background:transparent;border:0;border-top:1px solid var(--line2);
+  border-bottom:1px solid var(--line2);border-radius:0;padding:24px 4px 20px;margin:44px 0 56px}
+.toc .tl{font-size:11px;letter-spacing:.44em;color:var(--mark);margin-bottom:16px;text-align:center}
+.toc a{display:flex;align-items:baseline;gap:6px;padding:6px 2px;color:var(--ink2);
+  font-size:15px;text-decoration:none;border:0;line-height:1.7}
+.toc a:after{content:"";flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-4px)}
+.toc a:hover{color:var(--mark)}
+
+/* 章节层级 */
+h2{font-size:23px;margin:74px 0 22px;padding:26px 0 0;border:0;border-top:1px solid var(--line2);
+  line-height:1.55;scroll-margin-top:78px;letter-spacing:.02em;font-weight:700}
+h2:first-of-type{margin-top:48px}
+h2:target{background:linear-gradient(transparent 68%,rgba(158,61,44,.14) 68%)}
+h3{font-size:18.5px;margin:44px 0 14px;color:var(--rule);font-weight:700;
+  padding-left:12px;border-left:2px solid var(--mark);line-height:1.7}
+h4{font-size:17px;margin:30px 0 10px;color:var(--mark);font-weight:700}
+
+p{margin:0 0 17px;text-align:justify;hyphens:auto}
+strong,b{color:var(--rule);font-weight:700}
+i,cite{font-style:italic;color:var(--ink2)}
+
+/* 命题框：承重判断单独立出来，读者一眼可辨 */
+blockquote{position:relative;margin:38px 0;padding:26px 34px;background:var(--sheet);
+  border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);border-radius:0;
+  font-size:19px;line-height:1.95;font-weight:600;color:var(--ink);text-align:justify}
+blockquote:before,blockquote:after{position:absolute;color:var(--mark);font-size:26px;line-height:1;opacity:.55}
+blockquote:before{content:"⌜";top:9px;left:10px}
+blockquote:after{content:"⌟";bottom:9px;right:10px}
+blockquote p{margin:0}
+blockquote p+p{margin-top:12px}
+
+ul{margin:0 0 18px;padding-left:1.5em}
+ol{margin:0 0 18px;padding-left:1.7em}
+li{margin:0 0 10px;text-align:justify}
+li::marker{color:var(--mark)}
+
+hr{border:0;height:1px;background:var(--line);margin:52px auto;width:62%}
+
+em{font-style:normal;color:var(--ink3);font-size:15px}
+
+/* 三线表 */
+.tbl{width:100%;border-collapse:collapse;margin:32px 0;font-size:15.5px;line-height:1.8}
+.tbl th,.tbl td{padding:12px 14px;text-align:left;vertical-align:top;border:0}
+.tbl thead th{border-top:2px solid var(--ink);border-bottom:1px solid var(--line2);
+  font-weight:700;color:var(--rule);font-size:14.5px;letter-spacing:.04em}
+.tbl tbody tr:last-child td{border-bottom:2px solid var(--ink)}
+.tbl tbody td{border-bottom:1px solid var(--line)}
+.tbl caption{caption-side:bottom;font-size:13px;color:var(--ink3);padding-top:10px;text-align:left}
+
+/* 来源盒：参考文献式，悬挂缩进 */
+.src{margin:64px 0 8px;padding:30px 0 8px;border:0;border-top:2px solid var(--rule);
+  border-radius:0;background:transparent;counter-reset:srcn}
+.src .sl{font-size:11px;letter-spacing:.42em;color:var(--mark);margin-bottom:12px}
+.src .sd{font-size:14.8px;color:var(--ink2);line-height:1.95;margin:0 0 22px;text-align:justify}
+.src a.one{display:block;text-decoration:none;padding:16px 0 16px 34px;position:relative;
+  border-top:1px solid var(--line)}
+.src a.one:before{counter-increment:srcn;content:"[" counter(srcn) "]";position:absolute;left:0;top:16px;
+  color:var(--mark);font-size:13px;letter-spacing:.02em}
+.src a.one:hover .t{color:var(--mark)}
+.src a.one .k{font-size:12px;color:var(--mark);letter-spacing:.14em}
+.src a.one .t{font-size:16px;font-weight:700;color:var(--rule);margin:5px 0;line-height:1.72}
+.src a.one .g{font-size:14.5px;color:var(--ink2);line-height:1.9;text-align:justify}
+
+.endbox{text-align:center;border-top:1px solid var(--line2);margin-top:56px;padding:38px 20px;color:var(--ink2);font-size:15px}
+.endbox a{color:var(--mark);text-decoration:none}
+footer{text-align:center;border-top:1px solid var(--line);padding:32px;color:var(--ink3);font-size:12.5px;letter-spacing:.04em}
+
+#totop{position:fixed;right:22px;bottom:26px;width:40px;height:40px;border-radius:0;
+  background:var(--rule);color:var(--sheet);border:0;font-size:16px;cursor:pointer;display:none;z-index:98}
+
+@media(max-width:760px){
+  body{font-size:17px;line-height:2.0}
+  .art{padding:52px 18px 6px}
+  .wrap{padding:6px 18px 34px}
+  h2{font-size:20.5px;margin:56px 0 18px;padding-top:22px}
+  h3{font-size:17.5px}
+  blockquote{padding:22px 24px;font-size:17.5px}
+  blockquote:before{left:6px}blockquote:after{right:6px}
+  .tbl{font-size:14px}
+  .tbl th,.tbl td{padding:9px 8px}
+}
+
+@media print{
+  body{background:#fff;font-size:11.5pt;line-height:1.85}
+  .readbar,#pbar,#totop,.endbox,footer{display:none}
+  .wrap,.art{max-width:100%}
+  h2{page-break-after:avoid}
+  blockquote,.tbl,.src a.one{page-break-inside:avoid}
+  a{text-decoration:none}
+}
+
+.reflist{margin-top:6px}
+.reflist p{font-size:15px;line-height:1.95;color:var(--ink2);text-indent:-2em;padding-left:2em;margin:0 0 12px;text-align:justify}
+.reflist i{font-style:italic}
+h3{font-size:18.5px;margin:34px 0 14px;color:var(--rule)}
+.abs-en{margin-top:6px;padding:22px 24px;background:var(--sheet2,#faf8f3);border:1px solid var(--line2)}
+.abs-en p{font-size:14.5px;line-height:1.9;color:var(--ink2);margin:0 0 12px;text-align:justify}
+.kwline{font-size:14.5px;color:var(--ink2);margin:18px 0 0;letter-spacing:.02em}
+</style></head><body>
+
+<div id="pbar"></div>
+<div class="readbar">
+  <a class="nav-back" href="/confluence/">‹ 学科通融</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span>
+  <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+  <a class="rb-btn" href="non-returning-closure.pdf" download>⬇ 下载 PDF</a></div>
+</div>
+<header class="art">
+  <div class="art-series">学 科 通 融 · 之一百零二 · 家庭认知劳动研究 × 家庭责任所有权实务 × 管理学委派理论</div>
+  <h1 class="art-title">非返母闭环</h1>
+  <div class="art-sub">论一件事完整交出去之后有没有回头，是一栏此前没有人单独记过的账</div>
+  <div class="art-meta">王德生 ＋ Claude · 约 1.3 万字 · 21 页 · 三种阅读方式 · 发表于2026年8月18日</div>
+</header>
+<div class="wrap">
+<div class="deck">一个家庭越依赖母亲不断提醒、解释、决定、纠错与救援，母亲反而越容易显得不可替代——所有日常经验都在生产证明她重要的证据。本文提出另一种辨别方式。返母事件的计数起点很窄：一件事必须已经完整交给母亲之外的责任者，包括识别需要、安排路径、做必要决定、处理普通异常与完成执行；如果在这件事关闭之前，母亲又因为它被召回，才记一次返母。据此得到返母率，并以照护连续性构成二维辨别格；最危险的一格不是家里很乱，而是一切看起来都很好、每逢例外路线却都悄悄弯回同一个人。现有的家庭认知劳动数据能证明计划责任与身体执行可以显著分离，却算不出返母率——这个缺失本身就是本文的论点：账本记了谁想、谁做、谁管，没有记「交出去以后又回到谁」。发表前的跨领域敌意检索给出一个不利结果：本文以为自己新造的这件事，在管理学里有一个流传五十年的名字，判据比本文写得更早也更细；本文当面认下，并把剩下的主张收到三条上。</div>
+<p class="kwline"><b>关键词</b>：母亲的力量；非返母闭环；返母率；认知劳动；委派；地址簿</p>
+<div class="toc"><div class="tl">目 录</div><a href="#s1">一、最容易被误认成力量的东西，是“没有我就不行”</a><a href="#s2">二、关于母亲，我们并不缺少“力量”的理论</a><a href="#s3">三、完成一次工作，不等于它不会回来</a><a href="#s4">四、真正暴露问题的不是工作量，而是路线</a><a href="#s5">五、秩序本身不能证明力量，因为秩序有代价</a><a href="#s6">六、一件以前没有单独记账的事：返母</a><a href="#s7">七、于是，母亲的力量第一次可以与“不可替代”分开</a><a href="#s8">八、一个家庭可以非常稳定，却高度依赖母亲</a><a href="#s9">九、母亲的力量不是“少做”，而是“做过以后留下了什么”</a><a href="#s10">十、为什么这不是 mental load 的新名字</a><a href="#s11">十一、为什么这也不是 maternal gatekeeping</a><a href="#s12">十二、为什么 Fair Play 仍然没有把这个问题做完</a><a href="#s13">十三、第一次数据检查给出的不是胜利，而是一个缺失字段</a><a href="#s14">十四、返母率应该怎样计算</a><a href="#s15">十五、五个场景以后，这个判据必须给出五种不同答案</a><a href="#s16">十六、最高的母亲力量为什么反而不一定显得“最重要”</a><a href="#s17">十七、真正的力量不是把自己复制给别人</a><a href="#s18">十八、这也改变了“教会孩子独立”的含义</a><a href="#s19">十九、家庭制度也会制造返母，并不全是家庭成员的问题</a><a href="#s20">二十、它最可能怎样反噬母亲</a><a href="#s21">二十一、怎样真正推翻本文</a><a href="#s22">二十二、一个写死日期的赌注</a><a href="#s23">二十三、本文自己也可能是问题的标本</a><a href="#s24">二十四、重新回答：何谓母亲的力量？</a><a href="#s25">附节甲　一九七四年那篇管理学论文：猴子跳回谁的背上</a><a href="#s26">附节乙　落点重述：返母率读的是地址，不是能力，也不是意愿</a><a href="#s27">附节丙　与同栏其余四篇的分界</a><a href="#s28">版本与人机分工声明</a><a href="#s29">参考文献</a></div>
+<h2 id="s1">一、最容易被误认成力量的东西，是“没有我就不行”</h2>
+<p>设想两个家庭。</p>
+<p>第一个家庭里，母亲离开一天。学校的信息没人回，药不知道放在哪儿，孩子第二天要带什么没人确定，家里的缴费期限突然变得模糊。每个人都在做事，但一个接一个的问题通过电话和消息回到她那里：“这个怎么办？”“你放哪了？”“他明天几点？”“这个能不能吃？”“你以前都是怎么弄的？”</p>
+<p>第二个家庭里，母亲也离开一天。她仍然被想念，她的位置也没有被任何人取消。但是已经由别人接手的事情继续向前走：信息有人判断，遗漏有人发现，异常有人处理，决定有人承担后果。除非真的需要她本人，生活没有因为“母亲暂时不可调用”而失去方向。</p>
+<p>我们很容易赞美第一个母亲。她太重要了。她是这个家的主心骨。所有人都离不开她。</p>
+<p>但这里隐藏着一个令人不舒服的倒置：如果一个人的力量只能通过系统对她的持续依赖来证明，那么越是没有办法离开，她就越“有力量”；越是让别人真正长出能力，她反而越不显得重要。</p>
+<p>“不可替代”有时是爱给予一个人的位置；有时却只是一个系统没有长出第二条路的证据。</p>
+<p>母亲的力量究竟是哪一种？</p>
+<h2 id="s2">二、关于母亲，我们并不缺少“力量”的理论</h2>
+<p>母亲从来不是理论的空白。</p>
+<p>Adrienne Rich 在 1976 年的《Of Woman Born》中把作为亲身经验的 mothering 与塑造、约束女性的 motherhood institution 区分开来，这部作品后来成为母职研究的重要奠基文本之一（Rich, 1976）。Nancy Chodorow 1978 年的《The Reproduction of Mothering》则追问，为什么“女性承担母职”能够在心理和社会结构中不断再生产（Chodorow, 1978）。</p>
+<p>Sara Ruddick 后来把母职理解为一种实践，并把它面对的要求概括为保存、成长和社会接纳（Ruddick, 1989）。Sharon Hays 则揭示了“intensive mothering”的文化矛盾：现代母亲被要求向儿童投入大量时间、精力和资源，而这种要求本身可能强化女性的压力（Hays, 1996）。</p>
+<p>因此，如果今天重新定义母亲的力量，只说“母亲不是牺牲”“母亲需要主体性”“母亲承担了过多隐形劳动”“育儿应当共同承担”，几乎没有留下多少原创空间。</p>
+<p>更近的研究甚至已经进入了家庭生活中最难看见的一层。</p>
+<p>Daminger 把 cognitive labor 拆成预见需要、寻找方案、作出决定和监控结果。她发现女性总体承担更多这类劳动，尤其承担更多预见和监控（Daminger, 2019）。2024 年发表的一项研究同时测量同一批家务中的认知计划和身体执行，在 322 位有幼儿的母亲中，母亲平均承担约 72.57% 的认知劳动，而身体执行约为 63.64%（Aviv et al., 2024/2025）。</p>
+<p>所以，“爸爸把事做了，妈妈脑子还没下班”，今天也已经不是新判断。</p>
+<p>甚至在实务层，Fair Play 已经明确要求：一个人拿到一项家庭事务，就应当连同 conception、planning 和 execution 一起拥有，而不是只负责最后的执行动作（Rodsky, 2019）。</p>
+<p>问题于是必须再往后移动一步：如果一件事已经真的交出去了，会发生什么？</p>
+<h2 id="s3">三、完成一次工作，不等于它不会回来</h2>
+<p>工程中的“可靠”，首先关心系统是否能够在生命周期中继续完成规定任务。NASA 对 Reliability and Maintainability 的基本表述就是让系统在整个生命周期内按照要求工作，以满足任务目标。</p>
+<p>把这个视角暂时放到家庭里，一个非常自然的判断会出现：一个强大的家庭，是出了问题以后仍然能运转的家庭。</p>
+<p>于是一个总能把全家从故障中拉回来的母亲，看起来当然很强。</p>
+<p>可这只能回答一半问题。因为系统继续工作，不告诉我们：它是怎样继续工作的。</p>
+<p>如果每一个异常最终都由同一个人恢复，那么“高可靠”与“对一个恢复节点的高度依赖”完全可以同时存在。</p>
+<p>这在表面上甚至会制造一种错觉：这个节点越累，整个系统反而越稳定。母亲越善于救火，别人越少有机会看见系统原来会失火。</p>
+<h2 id="s4">四、真正暴露问题的不是工作量，而是路线</h2>
+<p>排队论提供了第二个视角。</p>
+<p>Little 在 1961 年证明的 L = λW，把系统中的平均数量、到达率和平均停留时间联系起来（Little, 1961）。如果需求到得比一个系统来得及处理的更快，积压、等待和拥堵就不会因为一个人“更努力”而神奇消失。</p>
+<p>家庭也是不断有东西到达的地方。冰箱里缺东西。学校发来通知。孩子出现情绪。老人要复诊。某件衣服突然不合身。账单快到期。一个生日快来了。一段关系出了问题。</p>
+<p>但真正关键的不是这些需求有多少，而是它们怎样经过家庭成员。</p>
+<p>早期排队模型很容易让人形成“到达—服务—离开”的直觉。可是排队理论自己很早就越过了这种单程想象。Jackson 1957 年已经研究等待网络；更一般的排队网络允许一次服务结束以后，项目退出系统，也允许它被重新路由到另一个队列（Jackson, 1957）。</p>
+<p>这提供了一个非常小、但后果极大的修正：做过一次，不等于结束。</p>
+<p>孩子的体检由父亲带去了。这是执行。但如果父亲到医院以后发消息问母亲：“保险卡在哪儿？”事情回来了。表格由父亲填写。但他碰到既往过敏史，打电话问母亲。事情又回来了。医生给出两个治疗方案，他说：“我还是问一下妈妈。”它又回来一次。</p>
+<p>最后，体检当然完成了。如果账本只记录“今天谁带孩子去医院”，这一天可以被记为父亲完成了一项育儿工作。如果账本记录计划与执行，它可能更精细：母亲预约，父亲执行。</p>
+<p>但还有第三种东西没有出现：事情被交出去以后，又回来过几次？</p>
+<h2 id="s5">五、秩序本身不能证明力量，因为秩序有代价</h2>
+<p>第三个视角来自非平衡热力学。</p>
+<p>这里必须先说明边界：家庭不是热力学装置，母亲也不是某种物理耗散器。把物理概念原样套在人身上只会制造漂亮而错误的比喻。</p>
+<p>真正有用的是一个更克制的提醒。</p>
+<p>Prigogine 对非平衡过程的研究说明，有序结构并不只存在于静止和平衡之中；远离平衡的开放系统能够在持续交换和不可逆过程中形成并维持有序状态（Prigogine, 1977）。</p>
+<p>因此，看到“有序”不能马上推出“没有代价”。把这个原则带回家庭，只得到一条方法上的警告：家里没有乱，并不自动告诉我们，谁正在为“不乱”持续付出注意、记忆、中断、情绪调节和恢复劳动。</p>
+<p>这使一个长期被歌颂的母亲形象突然变得可疑。“家里所有事她都知道。”“找不到东西问妈妈。”“孩子有事第一个找妈妈。”“爸爸也很参与，但大事还是要问她。”“只要她在，事情总能解决。”</p>
+<p>这些句子描述的究竟是母亲的力量，还是系统把她设置成了最后的异常处理器？两者不能再被当作同一件事。</p>
+<h2 id="s6">六、一件以前没有单独记账的事：返母</h2>
+<p>这里需要造一个非常小的新对象。</p>
+<p>我把它叫作返母事件。</p>
+<p>所谓返母事件，不是“妈妈参与了”。也不是“妈妈做了”。更不是“妈妈想了”。</p>
+<p>它必须满足一个更严格的前提：这件事情已经完整交给另一个人负责。</p>
+<p>这里的“完整”很重要。如果母亲从一开始负责预约，父亲只负责开车带孩子去医院，那么这并不是责任移交。父亲只是执行其中一个动作。如果母亲列好购物清单，父亲去超市购买，也不是完整移交。</p>
+<p>Fair Play 已经准确抓住了这一层：真正的 ownership 不能只有 execution，也要包含前面的 conception 和 planning（Rodsky, 2019）。</p>
+<p>本文从这里才开始计数。</p>
+<p>当另一个人已经拥有一件事的完整责任——包括识别需要、安排路径、做必要决定、处理普通异常和完成执行——如果在这件事关闭以前，母亲又因为它被召回，那么发生一次返母。</p>
+<p>召回可以有五种形式：提醒——“你提醒我明天别忘了。”解释——“老师这句话到底什么意思？”决定——“这两个方案你觉得选哪个？”纠错——“我好像弄错了，你来看一下。”救援——“我来不及了，你帮我收尾。”</p>
+<p>只有这种“已经离开，又重新回来”，才算。</p>
+<h2 id="s7">七、于是，母亲的力量第一次可以与“不可替代”分开</h2>
+<p>返母事件一旦被单独看见，两个过去常常被混在一起的母亲就分开了。</p>
+<p>第一位母亲承担很多事情，而且家人不断找她。第二位母亲也可能承担很多事情，但她真正交出去的那些事情不再返回。</p>
+<p>从工作量看，两个人可能差不多。从爱孩子的程度看，没有理由认为谁更高。从能力看，两个人都可能非常能干。但她们在家庭关系中留下的结构不同。</p>
+<p>第一种力量的证明方式是：事情最后还是要回到我。第二种力量的证明方式是：我曾经参与这个家庭能力的形成，但事情离开我以后也能继续。</p>
+<p>后者才值得被单独命名。</p>
+<p>我把这种完成称为：非返母闭环。</p>
+<p>非返母闭环：一件照护或家庭事务在被完整移交给母亲之外的责任者之后，在不降低事先约定的最低照护标准的前提下，不需要再次召回母亲进行提醒、解释、决定、纠错或救援，即达到关闭状态。</p>
+<h2 id="s8">八、一个家庭可以非常稳定，却高度依赖母亲</h2>
+<p>一根轴问：家庭事务的照护连续性高不高？另一根轴问：已经完整移交的事务返母率高不高？于是出现四种过去容易混在一起的状态。</p>
+<p>表1  母亲力量的二维辨别格</p>
+<table class="tbl"><thead><tr><th></th><th>返母率低</th><th>返母率高</th></tr></thead><tbody><tr><td>照护连续性高</td><td>生成稳态：别人真正拥有责任，事情不返母仍能完成</td><td>母源稳态：家里运行得很好，但大量异常最后仍回母亲</td></tr><tr><td>照护连续性低</td><td>断联失照：母亲不被召回，但事情也没有被照顾好</td><td>救火失稳：事情不断失败，又不断把母亲叫回来补洞</td></tr></tbody></table>
+<p>这里最值得研究的并不是右下角。右下角太明显了：家里本来就乱，母亲不断救火，谁都看得见问题。</p>
+<p>真正危险的是右上角：母源稳态。</p>
+<p>一切看起来都很好。孩子没有漏掉活动。药没有断。学校表格按时交。生日有人记得。冰箱里总有需要的东西。全家的运转甚至可以令人羡慕。</p>
+<p>唯一的问题是，每当一个任务出现模糊、例外、冲突或错误，路线都会悄悄弯回同一个人。系统的指标很好看。它的依赖结构却没有改变。</p>
+<p>这就是为什么“一个什么都能搞定的妈妈”并不自动等于“一个力量很大的妈妈”。她可能只是承担了别人看不见的恢复流量。</p>
+<h2 id="s9">九、母亲的力量不是“少做”，而是“做过以后留下了什么”</h2>
+<p>这一定义如果被误读，很容易滑到另一个错误：“所以最有力量的母亲就是越来越什么都不管。”不是。</p>
+<p>一个完全不照顾孩子的人，也可以拥有极低返母率。事情没人找她，是因为没人期待她。这当然不能叫母亲的力量。</p>
+<p>所以第二轴——照护连续性——不可取消。</p>
+<p>Ruddick 对 maternal practice 的分析在这里反过来约束了本文。她提醒我们，母职实践面对的是保存、成长与社会接纳等现实要求（Ruddick, 1989）。如果为了降低返母而让这些基本要求下降，那么得到的不是力量，而只是撤离。</p>
+<p>母亲的力量因此具有一个很特殊的方向：她曾经给过照料、判断、边界、语言和方法，而这些东西后来不必继续以“把她本人召回来”的形式才能存在。</p>
+<p>这与“牺牲越多越伟大”不同，也与“参与越少越先进”不同。它问的是：一个人的照料，有没有逐渐从她的身体和即时在场中长出去？</p>
+<h2 id="s10">十、为什么这不是 mental load 的新名字</h2>
+<p>这是本文最危险的质疑。</p>
+<p>Daminger 已经说明 cognitive labor 包含预见、寻找方案、决定和监控，而女性尤其承担更多预见与监控（Daminger, 2019）。最近的研究甚至直接指出，仅仅把执行工作委派出去，并不意味着母亲卸下认知责任。</p>
+<p>如果本文只是再说一遍这件事，“非返母闭环”应该被删除。</p>
+<p>二者的分界在计数起点。mental load 可以存在于移交之前。返母事件只能发生在完整移交之后。</p>
+<p>例如：母亲从一开始负责孩子的牙科预约，只让父亲负责送过去。这里母亲承担高认知劳动。但本文不把它计入返母率，因为责任从来没有真正离开母亲。</p>
+<p>另一个家庭中，父亲已经完整拥有牙科事务：预约、保险、交通、信息、后续安排全部由他负责。到诊所后，他却因为一个非标准问题打电话给母亲，让她判断是否接受治疗方案。这里才出现返母。</p>
+<p>mental load 问：谁在想？本文问：已经不归你想的事，为什么最后又回来找你？</p>
+<p>一个家庭甚至可能出现低 mental load、高返母率：母亲平时不负责多数事务，但只要出现异常，所有人都把她当最终仲裁者。也可以出现高 mental load、低返母率：母亲自己完整拥有很多领域，因此脑力负荷很高；但是交给别人的领域真正由别人关闭。</p>
+<p>如果未来数据证明这两个维度实际上高度重合到无法经验区分，本文就应该被 cognitive labor 吸收。</p>
+<h2 id="s11">十一、为什么这也不是 maternal gatekeeping</h2>
+<p>第二个危险近邻是 maternal gatekeeping。</p>
+<p>Allen 与 Hawkins 1999 年把它发展成研究母亲的信念与行为如何阻碍更协作的家庭劳动和父亲参与的概念（Allen &amp; Hawkins, 1999）。后来的研究也不断反思，把家庭参与不足都归于“母亲把着门”是否会过度简化问题。</p>
+<p>返母可以由 gatekeeping 造成。例如，母亲把一件事交出去，却对任何偏差都无法忍受，于是不断夺回决定权。</p>
+<p>但返母也可以在没有 gatekeeping 时出现。学校系统默认只联系母亲。孩子形成了“出问题先问妈妈”的习惯。另一位照护者在不确定时主动把风险上抛。家庭的信息只存在母亲记忆里。某项技能长期只有母亲掌握。紧急情况确实需要她的专业知识。</p>
+<p>这些情况下，母亲甚至可能非常愿意放权，任务仍然回来。</p>
+<p>因此 gatekeeping 问的是：母亲有没有把门关住？返母率问的是：不论是谁造成的，这条路线最后有没有又回到她？</p>
+<p>前者是行为与关系解释。后者首先是一张路由图。</p>
+<h2 id="s12">十二、为什么 Fair Play 仍然没有把这个问题做完</h2>
+<p>Fair Play 是本文遇到的最强实务占位者之一。</p>
+<p>它已经明确提出“完整拥有”一件家庭事务，而且 conception、planning、execution 应当放在同一个责任持有者那里（Rodsky, 2019）。这比传统家务分工表前进了一大步，因为它拒绝把“帮忙执行”误当成“拥有责任”。</p>
+<p>本文没有理由重复它。问题只剩一个：一个人拿到完整 ownership 以后，家庭怎样处理例外？</p>
+<p>真正困难的家庭事务从来不是百分之百标准化的。医生临时改变方案。学校发来一封模糊邮件。孩子突然拒绝原计划。预算超出。照护者迟到。重要物品找不到。原定方案失效。</p>
+<p>事情一旦偏离常规，谁获得解释权？谁有权决定“这样也算完成”？谁承担判断错的后果？</p>
+<p>如果完整任务卡看起来已经属于父亲，但每逢异常仍默认“问妈妈”，那么 ownership 在正常条件下已经转移，恢复权却没有转移。</p>
+<p>任务卡告诉我们谁拥有任务。返母事件告诉我们：发生意外时，这份 ownership 是否仍然成立。</p>
+<h2 id="s13">十三、第一次数据检查给出的不是胜利，而是一个缺失字段</h2>
+<p>一个新概念最危险的时刻，是作者刚喜欢上它的时候。所以问题不能停在语言上。现有数据能不能直接看见“返母”？</p>
+<p>Aviv 等人的研究很适合作第一次检查，因为它在相同的 30 类家庭事务中同时测量 cognitive planning 与 physical execution。在 322 位有幼儿的母亲中，母亲报告自己平均承担 72.57% 的认知劳动，而身体执行为 63.64%（Aviv et al., 2024/2025）。</p>
+<p>这个结果至少说明一件事：谁执行，与谁承担背后的认知责任，确实不能视为同一个变量。如果只看“谁把事情做了”，会漏掉重要结构。</p>
+<p>Petts 与 Carlson 的研究也发现母亲承担更多 cognitive labor，这种负担与母亲心理福祉存在负向关系；当父亲承担更多这类认知劳动时，母亲的心理福祉更好（Petts &amp; Carlson, 2023）。</p>
+<p>但这次检查同时给本文一个不利结果。这些研究仍然无法直接告诉我们返母率。</p>
+<p>它们记录的是：谁计划。谁执行。谁承担认知责任。却没有把每一件事务写成一条事件链：完整移交时间 → 是否再次召回母亲 → 召回原因 → 最终关闭时间。</p>
+<p>因此，本轮不能声称“数据已经证实非返母闭环”。恰恰相反。目前更严格的结论只有：已有数据足以证明计划和执行不是同一回事，却不足以判断“完整移交之后是否再次返母”。</p>
+<p>这是一个实实在在的空字段。如果未来研究补上这个字段以后发现它什么也解释不了，那么本文就应该失败。</p>
+<h2 id="s14">十四、返母率应该怎样计算</h2>
+<p>设一个家庭在观察期内发生 N_h 个符合条件的完整移交事件。其中有 N_r 个在关闭以前重新要求母亲介入。</p>
+<p>Rₘ = Nᵣ / Nₕ</p>
+<h3>1. 什么叫“一件事”</h3>
+<p>必须存在一个可以关闭的具体需要。“负责孩子教育”太大，不算；“完成本学期夏令营报名”可以。“照顾家庭健康”太大；“完成这次牙科复诊及后续安排”可以。</p>
+<h3>2. 什么叫“完整移交”</h3>
+<p>新的责任者不只是负责一个动作，还拥有普通情况下的判断与异常处理权。如果母亲仍然承担计划和监控，只让别人执行，不进入分母。</p>
+<h3>3. 什么叫“返母”</h3>
+<p>在关闭前，因为这件事需要母亲重新承担以下任一功能：提醒、解释、决定、纠错、救援。普通的情感分享不算。“跟妈妈说一下今天很顺利”不是返母；“我不知道该选哪个，你决定”才是。</p>
+<h3>4. 什么叫“关闭”</h3>
+<p>关闭标准必须在事件开始前约定。不是“做到母亲满意”。否则母亲又会被秘密设置成最终验收者。它可以是：已报名且收到确认；已完成复诊并记录下一步；已购得清单中约定物品；学校要求的文件已被系统接受。</p>
+<h3>5. 哪些情况不进入评价</h3>
+<p>母亲本来就是唯一责任人的事务，不进入分母。紧急医疗、安全事故、婴幼儿直接依赖，以及必须由特定照护者亲自处理的情形单独标注。一个没有足够其他责任者的单亲家庭，也不能用低返母率作为规范要求。因此，这个数不是“好妈妈指数”。它只描述一条家庭责任路线。</p>
+<h2 id="s15">十五、五个场景以后，这个判据必须给出五种不同答案</h2>
+<p>最简单的问题始终只有一句：</p>
+<p>这件已经由别人完整接手的事，在关闭以前，有没有再次要求母亲提醒、解释、决定、纠错或救援？</p>
+<h3>场景一：完整关闭。</h3>
+<p>父亲完整负责孩子本次露营活动，从读通知、报名、购买物品到接送。中间出现集合地点改变，他自己联系学校确认并调整。没有返母。</p>
+<h3>场景二：异常返母。</h3>
+<p>同一事务完整交给父亲，但学校临时改变付款方式，他立即让母亲处理。发生返母。</p>
+<h3>场景三：从未移交。</h3>
+<p>母亲从头负责牙科复诊，父亲只负责开车。即使父亲过程中问了母亲问题，也不计算返母——因为事情本来就在母亲这里。</p>
+<h3>场景四：安全豁免。</h3>
+<p>孩子出现严重过敏，原责任者召回掌握关键病史的母亲。事件被记录，但不拿来评价“能力是否转移”。安全优先于指标。</p>
+<h3>场景五：现有数据无法判断。</h3>
+<p>现有公开研究能够告诉我们某类任务由谁规划、谁执行，却没有事件级“移交—返母—关闭”字段。这一格的正确答案不是“返母”或“不返母”，而是：现有记录没有能力回答。</p>
+<h2 id="s16">十六、最高的母亲力量为什么反而不一定显得“最重要”</h2>
+<p>我们现在终于可以回答开头的悖论。</p>
+<p>一个高度依赖母亲的家庭，会制造大量证明她重要的证据。每个人都问她。很多决定等她。她一离开就出问题。她回来以后问题迅速解决。于是所有日常经验都在说：“看，她真的不可替代。”</p>
+<p>而一个产生大量非返母闭环的母亲，反而会失去这类证据。她不再每天被召回。别人做出的决定不会在最后时刻等她批准。有些知识已经从她的记忆进入公共记录。有些判断能力已经在别人身上形成。有些错误由出错者自己修复。有些关系不经过她也可以维持。</p>
+<p>从“被需要多少次”看，她的重要性似乎下降了。从“她参与过的生活长出了多少继续能力”看，恰恰相反。</p>
+<p>这意味着关于母亲力量的一个深层误判可能长期存在：我们把依赖产生的可见性，当成了力量产生的结果。</p>
+<h2 id="s17">十七、真正的力量不是把自己复制给别人</h2>
+<p>还有一种误读需要排除。</p>
+<p>如果母亲先把自己的所有方法变成一套标准，然后要求全家严格照做，事情确实可能不再回来。但这只是把母亲从“实时控制器”变成“预先写好的控制程序”。她仍然是唯一标准。别人只是复制她。</p>
+<p>这样的低返母率并不一定意味着真正的能力生成。</p>
+<p>所以一个完整移交必须允许新的责任者拥有在最低照护标准以内的差异权。父亲给孩子准备的午饭不必长得像母亲准备的。祖母安排生日不必沿用母亲原来的顺序。孩子长大以后可以选择不同的收纳方法。</p>
+<p>只要保存、健康、安全、承诺等底线没有被破坏，“不像妈妈”本身不能算错误。</p>
+<p>否则所谓“把事情交出去”只是：你可以做，但必须像我一样做；你可以决定，但必须决定成我的答案；你可以负责，但最后我保留判你对错的权力。</p>
+<p>这仍然会让所有道路回到母亲。</p>
+<h2 id="s18">十八、这也改变了“教会孩子独立”的含义</h2>
+<p>传统意义上的独立常常以孩子自己能不能做某个动作衡量。自己穿衣。自己收拾书包。自己去学校。自己做饭。这些当然重要。</p>
+<p>但返母结构揭示了另一层独立。一个孩子可能已经会做很多事，却仍然把所有例外发送给母亲。</p>
+<p>“我的作业交不上去怎么办？”“同学说这句话是什么意思？”“老师让我选两个，我选哪个？”“我和朋友吵架了，你告诉我该怎么说。”</p>
+<p>母亲如果每一次都能给出最佳答案，很容易被认为非常有力量。</p>
+<p>但存在另一种力量：她并不是停止回应。她开始把答案变成判断能力。</p>
+<p>“你现在有哪几个选择？”“哪一个后果你愿意承担？”“你需要什么信息才能决定？”“什么情况下必须找大人？”“这一次你先处理到哪一步？”</p>
+<p>这样做以后，某一天孩子仍然会来找她。但来的不再是每一件事情。更重要的是，他开始拥有一个不需要立即召回母亲也能向前走的内部空间。</p>
+<p>母亲留下的不再只是答案，而是继续判断的能力。</p>
+<h2 id="s19">十九、家庭制度也会制造返母，并不全是家庭成员的问题</h2>
+<p>如果把返母率全部解释成丈夫“不负责”、孩子“依赖”或母亲“控制”，同样过于简单。</p>
+<p>外部机构会主动把家庭责任重新路由给母亲。学校表格默认第一联系人是母亲。医疗沟通只向母亲确认。亲属认为节日安排应该问母亲。老师发现某项问题以后，习惯先联系妈妈。</p>
+<p>一个家庭内部即使完成了责任转移，外部制度也可能持续把任务重新发回旧节点。</p>
+<p>这时，返母不是家庭成员能力不足产生的，而是制度的地址簿制造的。</p>
+<p>因此一个很有判决力的未来研究，是把返母事件进一步分成：家庭内部返母与机构强制返母。</p>
+<p>如果大量返母来自外部机构，那么最有效的干预就不是让母亲“学会放手”，而是修改机构的联系人、授权和责任协议。</p>
+<p>这也是为什么本文不愿把问题写成“妈妈应该学会少管一点”。那样会把系统重新制造的负担，再一次交给母亲解决。</p>
+<h2 id="s20">二十、它最可能怎样反噬母亲</h2>
+<p>任何关于母亲的新指标都带着一个危险。</p>
+<p>只要“低返母率”听起来像一种优点，就可能迅速变成新的母职绩效：优秀妈妈不但要把家照顾好，还要把丈夫训练好，把孩子教得独立，把所有信息整理好，建立家庭系统，最后保证大家再也不来麻烦她。</p>
+<p>如果发生这种事，本文将制造它声称要识别的同一种结构：为了让事情不返母，所有“不返母能力”的建设工作又返给母亲。</p>
+<p>这不是一个边缘副作用。它是本文最严重的内部危险。</p>
+<p>因此有三条限制必须写死。第一，返母率描述的是责任结构的位置，不是母亲的品质。第二，任何家庭都不能为了降低这个数，而在健康、安全、特殊照护等高风险领域故意让关键照护者退出。第三，如果一个机构、研究或家庭真的根据这个数作出对某位母亲不利的判断，编码规则必须公开，并允许复核；更不能把它用于监护权、工作绩效或“好母亲”评价。</p>
+<p>一个用来解除单点依赖的指标，不能自己变成压在母亲身上的新任务。</p>
+<h2 id="s21">二十一、怎样真正推翻本文</h2>
+<p>如果“非返母闭环”只是一个漂亮名字，它不值得存在。</p>
+<p>最强的竞争解释就是：这不过是 cognitive labor / mental load 的另一种写法。</p>
+<p>因此未来研究不应该证明“母亲确实很累”。这没有判决力。真正的检验应该是事件级的。</p>
+<p>可以让至少数十个不同家庭在连续十四天里记录完整责任移交事件。每次记录：事件起点；初始责任者；是否完成完整 ownership；是否出现异常；是否重新召回母亲；召回功能；关闭时间；照护结果。</p>
+<p>同时测量总认知劳动、身体劳动份额、孩子年龄、就业时间、家庭人数、maternal gatekeeping 和共同养育质量。然后问：控制这些已有变量以后，返母率还剩下什么？</p>
+<p>如果返母率不再预测任何独特结果——例如母亲被中断次数、临时不可用时家庭连续性下降、异常处理重新集中的程度——那么它就是冗余概念。应该删除。</p>
+<p>第二个判决更加危险。如果研究发现：所谓返母并不特别回到母亲，而只是回到“家庭中知识最多的默认节点”；当父亲、祖父母或其他照护者成为这个节点时，完全出现相同结构，那么本文关于“母亲”的理论就必须收缩。</p>
+<p>到那时，更准确的对象可能不是“返母”，而是：返默认节点。</p>
+<p>这不会证明整个现象不存在。但会证明本文把一种一般协调机制过早地母职化了。这一结果同样算本文失败了一部分。</p>
+<h2 id="s22">二十二、一个写死日期的赌注</h2>
+<p>到 2030 年 8 月 18 日，如果出现至少两项具有事件级家庭责任记录的独立研究，能够同时观察“完整移交—重新介入—关闭”，并且得到下面的结果：</p>
+<p>在控制 cognitive labor、身体家务份额、maternal gatekeeping、孩子年龄和家庭结构以后，返母率既不能独立预测母亲被中断程度，也不能预测母亲临时不可用时家庭事务的连续性，而且其解释完全可被已有 cognitive labor 指标取代，那么本文关于“非返母闭环是一种独立辨别对象”的主张应当撤回。</p>
+<p>什么不算命中，也必须说清楚。只发现“妈妈比较累”不算。只发现“爸爸做得比较少”不算。调查人们是否喜欢这个概念不算。只有事件路线被真实记录，并且与最危险的既有解释进行同场比较，才算。</p>
+<h2 id="s23">二十三、本文自己也可能是问题的标本</h2>
+<p>本文要求人们注意一个过去没有被记录的字段。这本身就可能增加工作。谁来记？</p>
+<p>如果答案又是“让妈妈记一下每件事有没有回来”，那么本文立即落进自己批评的格子：为了研究返母，研究任务先返母了。</p>
+<p>因此任何真正的测量都不能依赖母亲成为家庭日志管理员。最低限度应该由所有责任者分别记录，或者使用共同任务系统、通讯日志和机构记录进行交叉核对；研究者还必须接受大量“无法判定”，而不是让母亲负责补齐所有缺失信息。</p>
+<p>这条限制会让数据变差，却会让理论更诚实。</p>
+<p>因为如果一种关于母亲隐形负担的理论，只有继续增加母亲的隐形负担才能被验证，那么它不值得被验证。</p>
+<h2 id="s24">二十四、重新回答：何谓母亲的力量？</h2>
+<p>现在可以回到最初的问题。</p>
+<p>母亲的力量当然可以表现为保护。可以表现为坚持。可以表现为在危险时承担。可以表现为无数次敏锐回应孩子。这些都没有因为本文而失效。</p>
+<p>但如果我们想把“力量”与“无限承受”“永久待命”“谁都离不开我”真正分开，就需要增加一个过去不常被看见的方向。</p>
+<p>母亲的力量，不是所有事情最后都能被她救回来。不是她能处理多大的需求流量。也不是家庭越有秩序，就证明她越强。</p>
+<p>一种更深的力量发生在：她给予过的照护没有消失；她建立过的关系没有断裂；她珍视的安全与责任标准仍然存在；但是一件事情真正离开她以后，生活不必一次又一次把她重新召回来，仍然能够抵达完成。</p>
+<p>这不是“不再需要妈妈”。一个孩子一生都可能需要母亲。一段关系也永远不应该以“可替换”为爱的目标。</p>
+<p>它改变的只是另一件事：需要她，不再等于所有生活都必须经过她。</p>
+<p>母亲的力量，是她参与过的生活，在不牺牲照护的前提下，逐渐获得一种不必反复返回她、仍能继续生成的能力。</p>
+<p>最强的母亲未必是家里那个“没有她什么都不行”的人。有时真正巨大的力量，恰恰已经藏在那些不再需要她亲自收尾、却仍然好好向前走的事情里。</p>
+<h2 id="s25">附节甲　一九七四年那篇管理学论文：猴子跳回谁的背上</h2>
+<p>本文正文与三位近邻做过划界：认知劳动、母亲守门、家庭任务卡。三位都在家庭研究内部。发表前的一次跨领域检索给出了一个不利的结果——<b>本文认为自己新造的那件事，在另一个领域里有一个流传五十年的名字，而且它的判据比本文写得更早、更细。</b></p>
+<p>那是 1974 年一篇管理学文章，讲的是管理者的时间。它的比喻是：每一项任务是一只猴子，它总要蹲在某个人的背上。管理者把一件事交给下属之后，下属带着问题回来问一句"这个您看怎么办"，猴子就在那一刻从下属背上跳回了管理者背上——<b>形式上这件事的责任已经移交，实质上下一步动作握在管理者手里，而下属在等</b>。文章给的判据是一句短句：<b>下一步动作在谁手里。</b>它据此给出五条规则，其中三条与本文的清点手册几乎逐条对应：离开之前必须先约定下一步动作由谁做；每只猴子只能有一个明确的负责人；每只猴子必须带一个约定的复查时间与结束标准。</p>
+<p>这一位比本文正文里那三位危险得多，原因很直接：<b>本文的返母事件，就是猴子跳回来那一下</b>。五种召回形式——提醒、解释、决定、纠错、救援——全部落在"下一步动作重新回到她手里"这一个判据之内。本文正文第六节的"完整移交"，与那篇文章的"这只猴子属于谁"是同一个概念；本文第十四节要求关闭标准事前约定、不许是"做到母亲满意"，与它的"约定结束标准、不许是含糊的'尽快'"是同一条纪律。</p>
+<p>本节不辩解，先把这一处认下来：<b>返母不是一个此前无人辨识的现象。它在组织中被辨识了五十年，只是从来没有人把它搬进家庭。</b></p>
+<p>搬进家庭之后剩下的是什么，本节给出三条，它们构成本文修订后的全部主张。</p>
+<p><b>其一，家庭里没有那个可以"拒收猴子"的位置。</b>那篇文章的整套解法建立在一个前提上：管理者有权把猴子推回去，而且推回去是他的职责——文章明说，管理者的目标是把下属强加的时间降到零。家庭没有这个前提。孩子生病、伴侣确实不知道保险条款、学校的表格确实只发给了她，这些猴子不能被推回去，推回去的后果落在被照护者身上。<b>因此那套解法在家庭里的可执行部分几乎为零，而本文关心的恰恰是它不可执行时的读数。</b>这一条差别使返母率不能被理解为"该拒没拒"的失败率：本文第十四节第五条把安全关键、婴幼儿直接依赖与法定责任事项一律排除出分母，正是这个理由。</p>
+<p><b>其二，路由的来源不同，因此干预的位置不同。</b>那篇文章把猴子回跳全部归因于二人之间的交接方式——管理者接得太快，下属推得太顺。本文第十九节给出了另一类来源：学校的表格默认第一联系人是母亲，医疗沟通只向母亲确认，亲属认为节日安排应该问她。这一类返母不由家庭成员的能力或意愿产生，由<b>外部机构的地址簿</b>产生。它在那篇文章的框架里没有位置，因为公司的地址簿就是组织结构图本身，不存在一个组织之外的第三方持续把任务寄回给某个人。这一条使返母率必须分层报告，本文据此在清点手册里增加一栏来源分类：家庭内部产生 / 外部机构路由产生 / 制度性不可移交。</p>
+<p><b>其三，那篇文章测的是时间，本文测的是次数与地址。</b>它的读数是管理者的可支配时间被下属占用了多少，落点在负荷；本文的读数是完整移交事件中有多少件在关闭前回头，落点在路由。二者可以背离：一位母亲每次被召回只花两分钟（负荷极低），而她的返母率是百分之九十——所有的路最后都经过她，只是每次经过得很快。<b>在负荷账本上这是一个健康的家庭，在路由账本上它是本文所说的母源稳态。</b>这一条是本文能够独立存在的唯一理由，也是它的证伪出口：若实测显示返母率在控制母亲的认知劳动时长之后没有任何增量解释力，本文应当撤回，改称"家庭版的猴子回跳率"，并作为那篇文章的一则应用注记发表。</p>
+<p>请这一位进来还改掉了本文的一处方法论毛病。本文原稿只在家庭社会学内部取材，因此它的三个近邻都在同一片文献里，划界做得再细也只是在一个房间里转。承认返母与猴子回跳同构之后，本文第一次有了一个真正跨领域的对照面：<b>同一个结构在两种组织里，一边有拒收权、有组织图、有可推回的默认，一边三样都没有。</b>这个对照面本身给出一条可检验的推论——在越接近科层制的家庭（分工明确、责任书面化、有可申诉的第三方，例如共同养育协议执行严格的离异家庭），返母率应当越接近那篇文章描述的模式；在越接近共同体的家庭里，返母率应当更多地由外部地址簿而非内部交接方式解释。</p>
+<h2 id="s26">附节乙　落点重述：返母率读的是地址，不是能力，也不是意愿</h2>
+<p>本文原稿的核心句是"母亲的力量……表现为一种此前很少被单独记录的事件——非返母闭环"。这句话把力量放在了事件上，比放在母亲身上前进了一步，但仍留了一个含混：一件事不回头，可能因为接手的人有能力，也可能因为他有意愿，还可能因为他根本不知道可以回来问。</p>
+<p>重述：</p>
+<blockquote><p><b>返母率不测能力，不测意愿，只读地址。</b>它回答的唯一一个问题是：这件已经完整交出去的事，在关闭之前，路线有没有再次经过母亲。至于路线为什么经过她——接手的人不会、不敢、不愿，还是外面的机构就是这么寄的——是返母率之外的另一层分析，本文要求分层报告，但不要求它进入读数本身。</p></blockquote>
+<p>这一重述让本文与"教会孩子独立""让丈夫多承担"这类主张彻底分开。那些主张的对象是人的能力与意愿；返母率的对象是一张表。一张表可以在所有人的能力与意愿都不变的情况下被改掉——把学校系统里的第一联系人换成两个、把家庭共同日历上的所有权字段写清楚、把"遇到例外先问妈妈"改成"遇到例外先看这张卡"。本文第十七节说的"真正的力量不是把自己复制给别人"，在这个重述下有了更准确的形式：<b>复制自己是在改人，改地址是在改表；前者会产生一个像她的新单点，后者才使路线真正分叉。</b></p>
+<h2 id="s27">附节丙　与同栏其余四篇的分界</h2>
+<p>本篇与同批发表的另外四篇处在五个不同的时间尺度上，这里逐一写死分界线，避免被读成同一句话的五次重复。</p>
+<p>与<b>《回撤给予》</b>（1–5 秒）：那一篇读的是一次给予动作之内的停顿，本篇读的是一件事从移交到关闭之间的回头。两者结构上有一处呼应值得指出——<b>一次返母是路由在关闭前回退到母亲，一次裂隙是路由在这一秒之内暂时不指向任何人</b>；前者是地址的回退，后者是地址的悬置。尺度相差四到五个数量级，不得放进同一个模型，也不得互相印证。</p>
+<p>与<b>《净差解码效率》</b>（单个事件）：那一篇问母亲的信号在孩子那一侧减少了多少不确定性，本篇问事情有没有回来。一次高效率的解释完全可以伴随一次返母——她把事情解释得极清楚，然后对方还是把决定权交回给她。<b>解释清楚与不再回来是两件事</b>，这正是本篇与"沟通质量"类研究的分界。</p>
+<p>与<b>《续域移交力》</b>（一次介入结束时）：最容易混淆的一处，必须写死。那一篇在母亲停手的那一刻清点孩子手里剩下几条可启动的路，是<b>能力的静态盘存</b>；本篇在一件事关闭之前记录路线有没有回头，是<b>路由的实际走向</b>。一个孩子手里可能有三条路（撤手子执份额高），而这件事仍在中途回到母亲（返母率高）——因为有路可走与实际走上去，中间隔着习惯、成本、风险预期和外面那张地址簿。两个读数的分母也不可互推：那一篇的分母是已显露的全部安全下一步类别，本篇的分母是合格的完整移交事件数。</p>
+<p>与<b>《未来可逆余量》</b>（一生）：那一篇问的是今天的处理给未来留下了多少可撤回的空间，本篇问的是这一件事有没有回头。方向恰好相反——<b>本篇的"回来"是负面读数，那一篇的"回得来"是正面读数</b>。这不是矛盾：本篇的回来是任务路线回到母亲，那一篇的回得来是主体退出错误路径的现实接口。两个"回"字指的不是同一件事，本节写下这一句正是为了防止它们被合读。</p>
+<h2 id="s28">版本与人机分工声明</h2>
+<p>本文为《母亲的力量》系列五篇之一，同批发表于学科通融专栏。三门来源学科的选取、共有前提的识别与推翻、新对象的命名、读数的定义与编码规则、可证伪条款与真跑设计，均由作者完成；本次发表前的打磨包括：跨领域敌意检索所抓到的占位者被逐位请进正文并配以可裁决的分界线，本文因此撤回或削弱的主张按原样写入，未作淡化；与同批另外四篇的分界另立一节。</p>
+<p>本页不印任何评分。本产线的纪律是：凡经改写的稿件，其质量判断须交由独立评审给出，作者与改写者的自评读数不得作为认证结论印在页面上。</p>
+<h2 id="s29">参考文献</h2>
+<div class="reflist"><p class="refitem">Allen, S. M., &amp; Hawkins, A. J. (1999). Maternal Gatekeeping: Mothers’ Beliefs and Behaviors That Inhibit Greater Father Involvement in Family Work. Journal of Marriage and the Family, 61, 199–212.</p><p class="refitem">Aviv, E., et al. (2024/2025). Cognitive Household Labor: Gender Disparities and Consequences for Maternal Mental Health and Wellbeing. Archives of Women’s Mental Health.</p><p class="refitem">Chodorow, N. J. (1978). The Reproduction of Mothering: Psychoanalysis and the Sociology of Gender. University of California Press.</p><p class="refitem">Daminger, A. (2019). The Cognitive Dimension of Household Labor. American Sociological Review, 84(4), 609–633.</p><p class="refitem">Hays, S. (1996). The Cultural Contradictions of Motherhood. Yale University Press.</p><p class="refitem">Jackson, J. R. (1957). Networks of Waiting Lines. Operations Research, 5(4), 518–521.</p><p class="refitem">Little, J. D. C. (1961). A Proof for the Queuing Formula: L = λW. Operations Research, 9(3), 383–387.</p><p class="refitem">Petts, R. J., &amp; Carlson, D. L. (2023). Managing a Household During a Pandemic: Cognitive Labor and Parents’ Psychological Well-Being. Society and Mental Health, 13, 187–207.</p><p class="refitem">Prigogine, I. (1977). Time, Structure and Fluctuations. Nobel Lecture.</p><p class="refitem">Rich, A. (1976). Of Woman Born: Motherhood as Experience and Institution. W. W. Norton.</p><p class="refitem">Rodsky, E. (2019). Fair Play. G. P. Putnam’s Sons.</p><p class="refitem">Ruddick, S. (1989). Maternal Thinking: Toward a Politics of Peace. Beacon Press.</p><p class="refitem">版本：v1.0 · 2026-08-18</p></div>
+<div class="src"><div class="sl">这一篇由哪三个领域的争论撞成</div><p class="sd">本文原稿的三个近邻全在家庭研究内部，划界做得再细也只是在一个房间里转。<b>发表前的跨领域检索给出一个不利结果：同一个结构在管理学里被辨识了五十年。</b>请它进来之后，本文第一次有了一个真正的对照面——同一件事在两种组织里，一边有拒收权、有组织图、有可推回的默认，一边三样都没有。</p><a class="one" href="https://hbr.org/1999/11/management-time-whos-got-the-monkey"><div class="k">管理学 · 猴子跳回谁的背上</div><div class="t">W. Oncken Jr. &amp; D. L. Wass, Management Time: Who’s Got the Monkey?（Harvard Business Review，1974 原刊／1999 经典重印）</div><div class="g">把每项任务比作一只必须蹲在某个人背上的猴子：下属带着「这个您看怎么办」回来问的那一刻，猴子就跳回了管理者背上——形式上责任已移交，实质上下一步动作握在管理者手里。判据是一句短句：下一步动作在谁手里。它的五条规则中有三条与本文的清点手册逐条对应。<b>本文的返母事件，就是猴子跳回来那一下</b>；本文剩下的主张只有三条，全部写在附节甲里。</div></a><a class="one" href="https://www.fairplaylife.com/"><div class="k">家庭责任所有权 · 拥有一件事不等于执行它</div><div class="t">Fair Play（家庭责任卡系统官方站点）</div><div class="g">明确提出「完整拥有」一件家庭事务，要求构思、计划与执行落在同一个责任持有者身上，拒绝把「帮忙执行」误当成「拥有责任」。本文从它停下的地方开始：一个人拿到完整所有权之后，家庭怎样处理例外？任务卡告诉我们谁拥有任务，返母事件告诉我们发生意外时这份所有权是否仍然成立。</div></a><a class="one" href="https://journals.sagepub.com/doi/10.1177/0003122419859007"><div class="k">认知劳动 · 谁在想，与谁在做，不是同一个变量</div><div class="t">A. Daminger, The Cognitive Dimension of Household Labor（American Sociological Review 84(4):609–633, 2019）</div><div class="g">把家务的认知维度拆成预见、识别方案、决定与监控四步，并显示女性尤其承担预见与监控。本文与它的分界在计数起点：认知劳动可以存在于移交之前，返母事件只能发生在完整移交之后。<b>体例说明：该出版社页面对自动抓取有拦截（返回验证页），人工点击可正常打开。</b></div></a></div>
+<div class="endbox"><p>三种阅读方式：网页长文 · <a href="read.html">在线 PDF 翻页</a> · <a href="non-returning-closure.pdf" download>下载 PDF</a></p>
+<p><a href="/confluence/">返回学科通融 →</a></p></div>
+</div>
+
+<button id="totop" aria-label="回到顶部">↑</button>
+<footer>学科通融 · 三学科交叉 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International · <a href="/browse/">sdeuniverses.com</a></footer>
+<script>
+(function(){var b=document.getElementById('pbar'),t=document.getElementById('totop');
+function u(){var d=document.documentElement,h=d.scrollHeight-d.clientHeight;
+b.style.width=(h>0?(d.scrollTop/h*100):0)+'%';t.style.display=d.scrollTop>700?'block':'none';}
+addEventListener('scroll',u,{passive:true});u();
+t.onclick=function(){scrollTo({top:0,behavior:'smooth'});};})();
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

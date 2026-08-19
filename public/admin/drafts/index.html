@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="sde-page-kind" content="admin">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>草稿箱 · 管理系统</title>
+<meta name="description" content="画布投进来的稿子，等着被改成站上的一页。不对外开放。">
+<style>
+:root{--bg:#0F0D0A;--pa:#EFE9DD;--dim:#B9AE99;--faint:#7C7466;--ac:#C9A227;--ok:#8FB3A0;--warn:#B4543C;--line:#2A2521;--card:#161310}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--pa);font-family:"Noto Serif CJK SC","Songti SC",Georgia,serif;line-height:1.8}
+a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
+.w{max-width:1000px;margin:0 auto;padding:0 22px}
+header{border-bottom:1px solid var(--line);padding:14px 0;font-size:13px;color:var(--dim)}
+header .w{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hero{padding:40px 0 20px;border-bottom:1px solid var(--line)}
+h1{font-size:29px;margin:8px 0 6px;letter-spacing:.04em}
+.sub{color:var(--dim);font-size:14.5px;max-width:56em}
+.warn{margin:16px 0 0;padding:12px 15px;background:var(--card);border-left:2px solid var(--warn);font-size:13.5px;color:var(--dim)}
+main{padding:26px 0 60px}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 18px}
+button{background:var(--ac);color:#17130A;border:0;border-radius:4px;padding:8px 16px;font:inherit;font-size:13.5px;cursor:pointer}
+button.g{background:transparent;color:var(--dim);border:1px solid var(--line)}
+button:hover{opacity:.88}
+.hint{font-size:12.5px;color:var(--faint)}
+.row{border-bottom:1px solid var(--line);padding:14px 0;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.row .t{font-size:16px;color:var(--pa);flex:1;min-width:200px}
+.row .m{font-size:12px;color:var(--faint);letter-spacing:.04em}
+.row .acts{display:flex;gap:6px;flex-wrap:wrap}
+.row .acts button{font-size:12px;padding:5px 10px;background:transparent;color:var(--dim);border:1px solid var(--line);border-radius:6px}
+.row .acts button:hover{color:var(--ac);border-color:var(--ac)}
+.st{font-size:11.5px;padding:2px 9px;border:1px solid var(--line);border-radius:2px;color:var(--dim)}
+.st.new{color:var(--ac);border-color:var(--ac)}
+.st.doing{color:#7FA8C9;border-color:#7FA8C9}
+.st.done{color:var(--ok);border-color:var(--ok)}
+pre{white-space:pre-wrap;word-break:break-word;font:12.5px/1.75 ui-monospace,Menlo,Consolas,monospace;background:var(--card);padding:14px 16px;border-radius:6px;max-height:60vh;overflow:auto}
+#msg{font-size:13.5px;color:var(--ac);min-height:1.4em;margin:0 0 14px}
+.stat{display:flex;gap:26px;flex-wrap:wrap;margin:18px 0 0}
+.stat b{display:block;font-size:22px;color:var(--ac)}
+.stat span{font-size:11.5px;color:var(--faint);letter-spacing:.1em}
+</style>
+</head>
+<body>
+
+<header><div class="w">
+  <span><a href="/browse/">← 爱思乐园</a> · <a href="/admin/">管理系统</a></span>
+  <span class="hint">不对外开放</span>
+</div></header>
+
+<div class="w hero">
+  <h1>草稿箱</h1>
+  <p class="sub">ChatSDE 画布上投进来的稿子，等着被改成站上的一页。<b style="color:var(--pa)">这里不对外开放</b>——只有管理员名单上的人进得来，别人拿到的是一句「草稿箱不对外开放」。</p>
+  <div class="warn">
+    进来要先在 <a href="/sde-wechat/" target="_blank">SDE 社区</a> 用名字和密码登录一次（全站唯一那一套）。<b style="color:var(--pa)">这个页面本身不设第二道口令</b>：再加一道只会让"投一稿"变麻烦，而门已经在服务端的管理员名单上了。
+  </div>
+  <div class="stat">
+    <div class="stat"><b id="s-n">—</b><span>件数</span></div>
+    <div class="stat"><b id="s-c">—</b><span>合计字数</span></div>
+  </div>
+</div>
+
+<main class="w">
+  <div class="bar">
+    <button id="load">刷新列表</button>
+    <button class="g" id="back">← 回列表</button>
+    <span class="hint" id="who"></span>
+  </div>
+  <div id="msg"></div>
+  <div id="list"></div>
+  <div id="one" style="display:none"></div>
+</main>
+
+<script src="/taste/assets/sde-vault.js?v=20260817c"></script>
+<script>
+(function () {
+  "use strict";
+  var el = function (id) { return document.getElementById(id); };
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+  function say(m) { el("msg").innerHTML = m || ""; }
+
+  function cred() {
+    try { return (window.SDEVault && SDEVault.cred && SDEVault.cred()) || ""; } catch (e) { return ""; }
+  }
+  function api(a, extra) {
+    var c = cred();
+    if (!c) return Promise.resolve({ ok: false, noAuth: 1 });
+    var body = { credential: c, op: "dr", a: a };
+    if (extra) for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) body[k] = extra[k];
+    return fetch("/api/im", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      return (d && d.d) ? d.d : d;          // 信封只拆一次
+    }, function () { return { ok: false }; });
+  }
+
+  function fmt(ts) {
+    try { var d = new Date(ts); return d.toLocaleString(); } catch (e) { return ""; }
+  }
+
+  function list() {
+    el("one").style.display = "none";
+    el("list").style.display = "";
+    say("正在取…");
+    api("list").then(function (d) {
+      if (d && d.noAuth) {
+        say('还没登录。先在 <a href="/sde-wechat/" target="_blank">SDE 社区</a> 用名字和密码登录一次，再回来刷新。');
+        return;
+      }
+      if (!d || !d.ok) { say(esc((d && d.msg) || "取不到。")); return; }
+      say("");
+      el("s-n").textContent = d.n || 0;
+      el("s-c").textContent = d.chars || 0;
+      if (d.me && d.me.name) el("who").textContent = "以 " + d.me.name + " 的身份";
+      var items = d.items || [];
+      if (!items.length) {
+        el("list").innerHTML = '<p style="color:var(--faint);font-size:14px">草稿箱是空的。在 ChatSDE 的画布上点「⋯ → 📥 投进草稿箱」就会落到这里。</p>';
+        return;
+      }
+      el("list").innerHTML = items.map(function (it) {
+        return '<div class="row" data-id="' + esc(it.id) + '">' +
+          '<span class="st ' + esc(it.state || "new") + '">' +
+            ({ "new": "新", doing: "在做", done: "已发" }[it.state] || "新") + '</span>' +
+          '<span class="t">' + esc(it.title) +
+            '<div class="m">' + fmt(it.ts) + ' · ' + (it.chars || 0) + ' 字 · ' +
+            esc(it.by || "—") + ' · ' + esc(it.from || "") +
+            (it.ver ? ' · 第 ' + it.ver + ' 版' : '') + '</div>' +
+            (it.note ? '<div class="m" style="color:var(--dim)">' + esc(it.note) + '</div>' : '') +
+          '</span>' +
+          '<span class="acts">' +
+            '<button data-a="open">打开</button>' +
+            '<button data-a="dl">下载</button>' +
+            '<button data-a="doing">标在做</button>' +
+            '<button data-a="done">标已发</button>' +
+            '<button data-a="del">删除</button>' +
+          '</span></div>';
+      }).join("");
+    });
+  }
+
+  el("list").addEventListener("click", function (ev) {
+    var b = ev.target;
+    var a = b.getAttribute && b.getAttribute("data-a");
+    if (!a) return;
+    var row = b.closest(".row");
+    var id = row && row.getAttribute("data-id");
+    if (!id) return;
+    if (a === "open" || a === "dl") {
+      say("正在取正文…");
+      api("get", { id: id }).then(function (d) {
+        if (!d || !d.ok) { say(esc((d && d.msg) || "取不到。")); return; }
+        say("");
+        if (a === "dl") {
+          var blob = new Blob([d.text], { type: "text/markdown" });
+          var link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = String(d.item.title || "draft").replace(/[^\w\u4e00-\u9fff-]/g, "_") + ".md";
+          document.body.appendChild(link); link.click(); document.body.removeChild(link);
+          return;
+        }
+        el("list").style.display = "none";
+        el("one").style.display = "";
+        el("one").innerHTML = '<h2 style="font-size:20px;margin:0 0 6px">' + esc(d.item.title) + '</h2>' +
+          '<div class="m" style="color:var(--faint);font-size:12px;margin-bottom:14px">' +
+          fmt(d.item.ts) + ' · ' + (d.item.chars || 0) + ' 字 · ' + esc(d.item.by || "") + '</div>' +
+          '<pre>' + esc(d.text) + '</pre>';
+      });
+      return;
+    }
+    if (a === "doing" || a === "done") {
+      api("mark", { id: id, state: a }).then(function (d) {
+        if (!d || !d.ok) { say(esc((d && d.msg) || "改不了。")); return; }
+        list();
+      });
+      return;
+    }
+    if (a === "del") {
+      if (!window.confirm("删掉这一件？删了就没有了。")) return;
+      api("del", { id: id }).then(function (d) {
+        if (!d || !d.ok) { say(esc((d && d.msg) || "删不掉。")); return; }
+        list();
+      });
+    }
+  });
+
+  el("load").onclick = list;
+  el("back").onclick = list;
+  list();
+})();
+</script>
+</body>
+</html>

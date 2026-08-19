@@ -1,0 +1,539 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SDE 共读一本书 · 翻页读一本专著，WDS 在旁边陪读 | SDE Universes</title>
+<meta name="description" content="打开手边任何一本出版专著的 PDF，选章翻页读，SDE 陪读在侧——六种读法各出一件不同的东西：说了什么、它把什么当给定、哪里是脆的、按三类拆、缝隙、顶回它。文件只在本机解析，一个字节都不上传。">
+<meta name="sde-page-kind" content="tool">
+<style>
+:root{--ink:#14161A;--olive:#5B7247;--olive2:#7E9A55;
+--bg:#171A16;--bg2:#1F241D;--paper:#FFF;--line:rgba(126,154,85,.28);--muted:#8F978A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;
+font-family:"Noto Sans CJK SC","PingFang SC","Hiragino Sans GB",sans-serif}
+#bar{position:fixed;top:0;left:0;right:0;height:54px;z-index:20;
+background:rgba(31,36,29,.94);backdrop-filter:blur(12px);
+border-bottom:1px solid var(--line);display:flex;align-items:center;
+justify-content:space-between;padding:0 14px;gap:10px;color:#E8E9E1;font-size:13.5px}
+#bar a{color:var(--olive2);text-decoration:none;white-space:nowrap}
+.grp{display:flex;align-items:center;gap:8px;min-width:0}
+.ttl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#CFD3C4;font-size:13px;max-width:26vw}
+.btn{border:1px solid var(--line);background:transparent;color:#D8DCCB;
+border-radius:6px;padding:5px 11px;font-size:13px;cursor:pointer;line-height:1.4}
+.btn:hover{border-color:var(--olive2);color:#fff}
+.btn:disabled{opacity:.32;cursor:default}
+#pg{width:44px;text-align:center;background:transparent;border:1px solid var(--line);
+color:#E8E9E1;border-radius:6px;padding:5px 2px;font-size:13px}
+#chap{max-width:210px;background:rgba(0,0,0,.25);border:1px solid var(--line);
+color:#E8E9E1;border-radius:6px;padding:5px 6px;font-size:12.5px}
+#prog{position:fixed;top:54px;left:0;height:2px;background:var(--olive2);z-index:21;width:0;transition:width .18s}
+#stage{position:absolute;top:54px;bottom:0;left:0;right:0;overflow:auto;
+display:flex;align-items:flex-start;justify-content:center;padding:26px 16px 64px}
+#spread{display:flex;gap:18px;align-items:flex-start}
+/* 连读：整本竖着排。占位先按页面比例撑出高度，滚到哪儿画哪儿——
+   一次画完等于一本书几百张 canvas，浏览器会被撑爆。 */
+#spread.flow{flex-direction:column;gap:14px;align-items:center}
+.pgw.ph{background:rgba(255,255,255,.035);border-radius:2px;
+box-shadow:0 2px 8px rgba(0,0,0,.28)}
+canvas{background:var(--paper);border-radius:2px;
+box-shadow:0 2px 8px rgba(0,0,0,.34),0 18px 46px rgba(0,0,0,.44);max-width:100%;height:auto;display:block}
+/* 每页＝画布 + 一层透明文字（自绘，见 drawTextLayer）——没有这层就选不中句子，陪读只能整章地读 */
+.pgw{position:relative;display:block;line-height:0}
+.tl{position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.tl span{position:absolute;color:transparent;white-space:pre;cursor:text;transform-origin:0 0}
+.tl ::selection{background:rgba(126,154,85,.45)}
+.tl ::-moz-selection{background:rgba(126,154,85,.45)}
+/* 陪读浮标默认 bottom:22px，正压在读法条上；抬到条子上面去 */
+.wdsr-fab{bottom:58px!important}
+/* 开场：选一本书 */
+#gate{position:absolute;top:54px;bottom:0;left:0;right:0;overflow:auto;
+display:flex;align-items:center;justify-content:center;padding:26px 18px}
+.card{max-width:620px;color:#D6DAC9;line-height:1.75;font-size:14.5px}
+.card h1{font-size:1.35rem;color:#EDEFE4;margin:0 0 6px;font-weight:600}
+.card .sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.drop{border:1.5px dashed var(--line);border-radius:12px;padding:30px 22px;text-align:center;
+background:rgba(126,154,85,.05);cursor:pointer;transition:.18s}
+.drop:hover,.drop.over{border-color:var(--olive2);background:rgba(126,154,85,.11)}
+.drop b{color:#E8E9E1;font-size:15px}
+.note{color:var(--muted);font-size:12.5px;margin-top:14px;line-height:1.7}
+.ways{margin-top:22px;border-top:1px solid var(--line);padding-top:16px}
+.ways b{color:#CFD3C4;font-size:13px;display:block;margin-bottom:8px}
+.ways ol{margin:0;padding-left:20px;color:var(--muted);font-size:12.8px;line-height:1.85}
+/* 读法条 */
+#ways{position:fixed;bottom:0;left:0;right:0;z-index:19;display:none;
+background:rgba(23,26,22,.93);border-top:1px solid var(--line);
+padding:8px 12px;gap:7px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+#ways.on{display:block}
+.way{border:1px solid var(--line);background:transparent;color:#C9CFBC;border-radius:15px;
+padding:5px 12px;font-size:12.5px;cursor:pointer;margin-right:7px;line-height:1.4}
+.way:hover{border-color:var(--olive2);color:#fff}
+.way-mine{border-color:rgba(126,154,85,.6);color:#DCE3CC}
+.way-mine:hover{background:rgba(126,154,85,.16)}
+#err{color:#E2A0A0;font-size:13px;margin-top:12px;min-height:1.2em}
+@media(max-width:640px){.ttl,#chap{display:none}#bar{padding:0 10px;gap:6px}#stage{padding:14px 8px 56px}}
+</style></head>
+<body>
+<div id="bar">
+  <div class="grp"><a href="/taste/">‹ 品尝系列</a><span class="ttl" id="bkname">共读一本书</span></div>
+  <div class="grp">
+    <select id="chap" title="选章"><option value="">整本</option></select>
+    <button class="btn" id="prev">‹</button>
+    <input id="pg" value="1" inputmode="numeric"><span style="color:#8F978A">/ <b id="tot">–</b></span>
+    <button class="btn" id="next">›</button>
+    <button class="btn" id="mode" title="翻页／连读（自由滚动）">连读</button>
+    <button class="btn" id="two" title="单页／跨页">跨页</button>
+    <button class="btn" id="other" title="换一本">换书</button>
+  </div>
+</div>
+<div id="prog"></div>
+<div id="gate">
+  <div class="card">
+    <h1>SDE 共读一本书</h1>
+    <div class="sub">读一本出版专著，WDS 在旁边陪读——这个陪读装了内功、三类判与整套方法论。<br>顶栏可切两种读法：<b style="color:#B9C2A8">翻页</b>一次一两页、铺满一屏；<b style="color:#B9C2A8">连读</b>整本竖着排，随手拖到哪儿看哪儿。</div>
+    <div class="drop" id="drop">
+      <b>选一本书的 PDF</b>
+      <div style="color:#8F978A;font-size:12.5px;margin-top:7px">点这里选文件，或把 PDF 拖进来</div>
+      <input type="file" id="file" accept="application/pdf,.pdf" style="display:none">
+    </div>
+    <div class="note">
+      <b style="color:#B9C2A8">文件只在你这台机器上解析，一个字节都不会上传。</b>
+      站上不保存你的书，也不需要——共读要共享的从来不是书，是各人读出来的东西。<br>
+      有书签目录的 PDF 会自动切好章；没有的可以按页读。<br>
+      <b style="color:#B9C2A8">读到哪一句想问，就在页面上把它选中</b>——陪读会扣着那一句聊，而不是泛泛地聊这一章。
+    </div>
+    <div class="ways">
+      <b>六种读法，各出一件不同的东西</b>
+      <ol>
+        <li><b style="color:#C9CFBC">说了什么</b>——承重的那一句在哪，逐字引出</li>
+        <li><b style="color:#C9CFBC">它把什么当给定</b>——「把 __ 当作给定，因此看不见 __」</li>
+        <li><b style="color:#C9CFBC">哪里是脆的</b>——至少三处，每处指得出是哪一句</li>
+        <li><b style="color:#C9CFBC">按三类拆</b>——它在答 What／How／Why 的哪一类</li>
+        <li><b style="color:#C9CFBC">缝隙</b>——它和上下章之间空着什么</li>
+        <li><b style="color:#C9CFBC">顶回它</b>——站内哪篇跟它撞了，分离线在哪</li>
+        <li><b style="color:#C9CFBC">我把它组织成了什么</b>——<span style="color:#A8B396">这一条的产出属于你，不属于这本书；两个人在这里必然分岔，而分岔正是共读要的</span></li>
+      </ol>
+    </div>
+    <div id="err"></div>
+  </div>
+</div>
+<div id="stage" style="display:none"><div id="spread"></div></div>
+<div id="ways">
+  <button class="way" data-w="1">① 说了什么</button>
+  <button class="way" data-w="2">② 它把什么当给定</button>
+  <button class="way" data-w="3">③ 哪里是脆的</button>
+  <button class="way" data-w="4">④ 按三类拆</button>
+  <button class="way" data-w="5">⑤ 缝隙</button>
+  <button class="way" data-w="6">⑥ 顶回它</button>
+  <button class="way way-mine" data-w="7">⑦ 我把它组织成了什么</button>
+</div>
+
+<script src="/assets/lib/pdf.min.js"></script>
+<script>
+/* ═══ SDE 共读一本书 ═══════════════════════════════════════════
+   形态＝站内已有的「PDF 翻页读」，差别全在陪读的底盘上（后端 b.book 档）。
+   三条纪律：
+   ① **书不上传**——`getDocument({data})` 走本地 ArrayBuffer，版权与仓库铁律各占一半理由。
+   ② **doc 暴露成 window.pdfDoc**——wds-pdf.js 那个取文垫片会先找它再考虑自己下载；
+      本地文件根本没有可下载的 URL，不暴露的话陪读就一个字都读不到。
+   ③ **切章失败不硬切**——没有书签就如实说「这本没有书签目录，按页读」，
+      绝不拿标题正则猜一个目录出来：切错了后面全错，而读者不会知道。 */
+(function () {
+  var doc = null, cur = 1, tot = 0, two = false, busy = false, chapters = [];
+  /* 两种读法：flow=false 翻页（一次一两页，铺满视口）；flow=true 连读（整本竖排，自由滚动）。
+     连读靠占位＋按需渲染撑住长书，见 buildFlow / syncFlow。 */
+  var flow = false, slots = [], pageDim = {}, baseDim = null, flowLock = 0, rafId = 0;
+  var $ = function (i) { return document.getElementById(i); };
+  var stage = $("stage"), spread = $("spread"), gate = $("gate"), ways = $("ways");
+  var elPg = $("pg"), elTot = $("tot"), elPrev = $("prev"), elNext = $("next"),
+      elTwo = $("two"), elMode = $("mode"), elProg = $("prog"), elChap = $("chap"), elErr = $("err");
+
+  if (!window.pdfjsLib) { elErr.textContent = "这台浏览器加载不了 PDF 组件，换一个浏览器试试。"; return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/lib/pdf.worker.min.js";
+
+  /* ── 取文：陪读要的是**当前这一章**的文字，不是整本。
+       一本专著几十万字，整本喂进去既撞窗口又贵；而"这一章说了什么"本来就只该看这一章。 ── */
+  var pageText = {};                    // 页码 → 文本（取过就缓存）
+  function textOfRange(a, b) {
+    var out = [], i;
+    for (i = a; i <= b; i++) if (pageText[i]) out.push(pageText[i]);
+    return out.join("\n");
+  }
+  function pullRange(a, b) {            // 后台把这一段的页逐页取出来
+    var i = a;
+    (function step() {
+      if (i > b || i > tot) return;
+      if (pageText[i]) { i++; return step(); }
+      var n = i;
+      doc.getPage(n).then(function (p) { return p.getTextContent(); })
+        .then(function (tc) {
+          pageText[n] = (tc.items || []).map(function (t) { return t.str; }).join(" ");
+          i++; setTimeout(step, 0);
+        }).catch(function () { i++; setTimeout(step, 0); });
+    })();
+  }
+  function curChap() {
+    var v = elChap.value;
+    if (!v) return null;
+    var k = parseInt(v, 10);
+    return chapters[k] || null;
+  }
+  window.__bookText = function () {
+    var c = curChap();
+    if (c) return textOfRange(c.from, c.to).slice(0, 100000);
+    // 没选章：给当前这一页前后各一点，够陪读扣住"你此刻读到的位置"
+    return textOfRange(Math.max(1, cur - 1), Math.min(tot, cur + (two ? 2 : 1))).slice(0, 100000);
+  };
+  window.__bookTitle = function () {
+    var c = curChap();
+    return (window.__bookName || "这本书") + (c ? (" · " + c.title) : (" · 第 " + cur + " 页"));
+  };
+
+  /* ── 切章：只认 PDF 自带的书签（outline）。见文件头纪律③。 ── */
+  function buildChapters(d) {
+    return d.getOutline().then(function (ol) {
+      if (!ol || !ol.length) return null;
+      var jobs = ol.slice(0, 200).map(function (it) {
+        return d.getPageIndex(Array.isArray(it.dest) ? it.dest[0] : null)
+          .then(function (idx) { return { title: String(it.title || "").trim().slice(0, 60), page: idx + 1 }; })
+          .catch(function () { return null; });
+      });
+      return Promise.all(jobs).then(function (rs) {
+        var list = rs.filter(function (r) { return r && r.page >= 1; })
+          .sort(function (a, b) { return a.page - b.page; });
+        if (list.length < 2) return null;      // 只有一条＝切不出章，当没有
+        list.forEach(function (r, i) { r.from = r.page; r.to = (i + 1 < list.length) ? (list[i + 1].page - 1) : tot; });
+        return list;
+      });
+    }).catch(function () { return null; });
+  }
+  function fillChapters(list) {
+    chapters = list || [];
+    elChap.innerHTML = "";
+    var o0 = document.createElement("option");
+    o0.value = ""; o0.textContent = chapters.length ? "整本（不选章）" : "这本没有书签目录 · 按页读";
+    elChap.appendChild(o0);
+    chapters.forEach(function (c, i) {
+      var o = document.createElement("option");
+      o.value = String(i);
+      o.textContent = c.title + "（p." + c.from + "–" + c.to + "）";
+      elChap.appendChild(o);
+    });
+    elChap.disabled = !chapters.length;
+  }
+  elChap.addEventListener("change", function () {
+    var c = curChap();
+    if (c) { go(c.from); pullRange(c.from, Math.min(c.to, c.from + 40)); }
+  });
+
+  /* ── 翻页（沿用站内 read.html 那套，只把来源换成本地文件）── */
+  function fitScale(page) {
+    var vp = page.getViewport({ scale: 1 });
+    // 连读只按宽度铺满，高度放开——受高度约束的话每页都被压进一屏，就又变成翻页了
+    if (flow) return Math.min((stage.clientWidth - 32), 1100) / vp.width;
+    var gap = two ? 18 : 0, cols = two ? 2 : 1;
+    return Math.min((stage.clientWidth - 32 - gap) / cols / vp.width, (stage.clientHeight - 70) / vp.height);
+  }
+  /* 自绘文字层：getTextContent + Util.transform 定位透明 span（全 PDF.js 版本稳定）。
+     **返回一个校正函数而不是当场校正**——横向字宽要靠 getBoundingClientRect 量，
+     元素还没进文档时量到的是 0，当场跑等于白跑（中文尤其看得出错位）。 */
+  function drawTextLayer(tl, tc, vp) {
+    tl.innerHTML = "";
+    var frag = document.createDocumentFragment(), fix = [];
+    (tc.items || []).forEach(function (it) {
+      if (!it.str) return;
+      var m = pdfjsLib.Util.transform(vp.transform, it.transform);
+      var fs = Math.hypot(m[2], m[3]);
+      if (!fs) return;
+      var ang = Math.atan2(m[1], m[0]);
+      var sp = document.createElement("span");
+      sp.textContent = it.str;
+      var css = "left:" + m[4].toFixed(2) + "px;top:" + (m[5] - fs).toFixed(2) + "px;font-size:" + fs.toFixed(2) + "px;";
+      if (Math.abs(ang) > 0.01) css += "transform:rotate(" + ang.toFixed(4) + "rad);";
+      sp.style.cssText = css;
+      frag.appendChild(sp);
+      fix.push([sp, it.width * vp.scale, ang]);
+    });
+    tl.appendChild(frag);
+    return function () {
+      fix.forEach(function (w) {
+        var sp = w[0], target = w[1], ang = w[2];
+        if (!target) return;
+        var real = sp.getBoundingClientRect().width;
+        if (real > 1) {
+          var sx = target / real;
+          if (sx > 0.1 && sx < 10) sp.style.transform = (Math.abs(ang) > 0.01 ? ("rotate(" + ang.toFixed(4) + "rad) ") : "") + "scaleX(" + sx.toFixed(3) + ")";
+        }
+      });
+    };
+  }
+  function drawOne(n) {
+    return doc.getPage(n).then(function (page) {
+      var v1 = page.getViewport({ scale: 1 });
+      pageDim[n] = { w: v1.width, h: v1.height };          // 占位高度要靠它，见 slotHeight
+      if (!baseDim) baseDim = pageDim[n];
+      var dpr = Math.min(window.devicePixelRatio || 1, 2.5), s = fitScale(page);
+      var vp = page.getViewport({ scale: s * dpr }), c = document.createElement("canvas");
+      c.width = vp.width; c.height = vp.height;
+      c.style.width = (vp.width / dpr) + "px"; c.style.height = (vp.height / dpr) + "px";
+      var wrap = document.createElement("div"); wrap.className = "pgw";
+      wrap.style.width = (vp.width / dpr) + "px"; wrap.style.height = (vp.height / dpr) + "px";
+      var tl = document.createElement("div"); tl.className = "tl";
+      wrap.appendChild(c); wrap.appendChild(tl);
+      return page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise
+        .then(function () { return page.getTextContent(); })
+        .then(function (tc) {
+          pageText[n] = (tc.items || []).map(function (t) { return t.str; }).join(" ");   // 顺手落缓存，pullRange 不必再取一遍
+          wrap.__fix = drawTextLayer(tl, tc, page.getViewport({ scale: s }));             // 文字层按 CSS 尺寸定位，不乘 dpr
+          return wrap;
+        })
+        .catch(function () { return wrap; });   // 取不到文字层也要把画好的页给出去
+    });
+  }
+  function render() {
+    if (!doc) return;
+    if (flow) { buildFlow(); return; }
+    if (busy) return; busy = true;
+    var ns = [cur]; if (two && cur + 1 <= tot) ns.push(cur + 1);
+    Promise.all(ns.map(drawOne)).then(function (cs) {
+      spread.innerHTML = ""; cs.forEach(function (c) { spread.appendChild(c); });
+      cs.forEach(function (c) { if (c.__fix) c.__fix(); });   // 进了文档才量得到宽度，见 drawTextLayer
+      elPg.value = cur; stage.scrollTop = 0;
+      elProg.style.width = (cur / tot * 100) + "%";
+      elPrev.disabled = (cur <= 1); elNext.disabled = (cur >= tot);
+      busy = false;
+      pullRange(Math.max(1, cur - 1), Math.min(tot, cur + 3));   // 顺手把附近几页的文字取出来
+    }).catch(function () { busy = false; });
+  }
+
+  /* ── 连读：整本竖排、自由滚动 ────────────────────────────────
+     三件事必须一起做，少一件就崩：
+     ① **占位先撑高**——没有占位，滚动条长度是假的，拖到一半整册会往上塌；
+     ② **只画视口附近**——离开就把画布卸掉但把高度钉住，否则一本长书几百张 canvas 直接吃爆内存；
+     ③ **补偿滚动量**——占位是按首页比例估的，真页渲染出来高度对不上；
+        若这一页在视口上方，得把差值补进 scrollTop，不然读者眼下的字会自己跳走。 */
+  function slotWidth() { return Math.min(stage.clientWidth - 32, 1100); }
+  function slotHeight(n) {
+    var d = pageDim[n] || baseDim; if (!d) return 900;
+    return Math.round(slotWidth() * d.h / d.w);
+  }
+  function newSlot(n) {
+    var s = document.createElement("div");
+    s.className = "pgw ph"; s.setAttribute("data-p", String(n));
+    s.style.width = slotWidth() + "px"; s.style.height = slotHeight(n) + "px";
+    return s;
+  }
+  function mountSlot(s) {
+    if (s.__on || s.__loading) return;
+    var n = parseInt(s.getAttribute("data-p"), 10);
+    s.__loading = 1;
+    drawOne(n).then(function (w) {
+      s.__loading = 0;
+      if (!flow || !s.parentNode) return;
+      var oldH = parseFloat(s.style.height) || 0, newH = parseFloat(w.style.height) || oldH;
+      s.innerHTML = ""; s.classList.remove("ph");
+      while (w.firstChild) s.appendChild(w.firstChild);
+      s.style.width = w.style.width; s.style.height = w.style.height;
+      s.__on = 1; s.__fix = w.__fix;
+      var d = newH - oldH;
+      if (d && s.offsetTop + newH <= stage.scrollTop) stage.scrollTop += d;   // 见纪律③
+      if (s.__fix) s.__fix();                                                 // 进了文档才量得到宽度
+    }).catch(function () { s.__loading = 0; });
+  }
+  function unmountSlot(s) {
+    if (!s.__on) return;
+    s.style.height = (s.offsetHeight || parseFloat(s.style.height) || 0) + "px";  // 卸之前把高度钉住
+    s.innerHTML = ""; s.classList.add("ph"); s.__on = 0; s.__fix = null;
+  }
+  function ensureBase() {
+    if (baseDim) return Promise.resolve();
+    return doc.getPage(1).then(function (p) {
+      var v = p.getViewport({ scale: 1 }); baseDim = { w: v.width, h: v.height };
+    }).catch(function () { baseDim = { w: 595, h: 842 }; });
+  }
+  function buildFlow() {
+    if (busy) return; busy = true;
+    return ensureBase().then(function () {
+      spread.classList.add("flow"); spread.innerHTML = ""; slots = [];
+      var frag = document.createDocumentFragment(), n;
+      for (n = 1; n <= tot; n++) { var s = newSlot(n); slots.push(s); frag.appendChild(s); }
+      spread.appendChild(frag);
+      busy = false;
+      scrollToPage(cur);
+      syncFlow(); onFlowScroll();
+    }).catch(function () { busy = false; });
+  }
+  /* 不用 IntersectionObserver：滚动里自己算就够，且 jsdom 没有它——
+     测试跑不到的代码路径等于没测过。 */
+  function syncFlow() {
+    if (!flow || !slots.length) return;
+    var top = stage.scrollTop, bot = top + (stage.clientHeight || 800), PAD = 900, i, s, a, b;
+    for (i = 0; i < slots.length; i++) {
+      s = slots[i]; a = s.offsetTop; b = a + (s.offsetHeight || parseFloat(s.style.height) || 0);
+      if (b > top - PAD && a < bot + PAD) mountSlot(s); else unmountSlot(s);
+    }
+  }
+  function scrollToPage(n) {
+    var s = slots[n - 1]; if (!s) return;
+    flowLock = 1; stage.scrollTop = Math.max(0, s.offsetTop - 10);
+    setTimeout(function () { flowLock = 0; }, 80);
+  }
+  function onFlowScroll() {
+    if (!flow || !slots.length) return;
+    var y = stage.scrollTop + 60, n = 1, i;
+    for (i = 0; i < slots.length; i++) { if (slots[i].offsetTop <= y) n = i + 1; else break; }
+    if (!flowLock) cur = n;
+    elPg.value = cur;
+    elProg.style.width = (cur / tot * 100) + "%";
+    elPrev.disabled = (cur <= 1); elNext.disabled = (cur >= tot);
+    pullRange(Math.max(1, cur - 1), Math.min(tot, cur + 2));
+  }
+  function setMode(f) {
+    if (f === flow) return;
+    flow = f;
+    elMode.textContent = flow ? "翻页" : "连读";
+    elTwo.disabled = flow;                    // 跨页在连读里没有意义
+    if (flow) { render(); }
+    else {
+      spread.classList.remove("flow"); slots = [];
+      spread.innerHTML = ""; busy = false; render();
+    }
+  }
+
+  function go(n) {
+    n = Math.max(1, Math.min(tot, n));
+    if (flow) { cur = n; scrollToPage(n); onFlowScroll(); return; }
+    if (n !== cur) { cur = n; render(); }
+  }
+  function step() { return two ? 2 : 1; }
+  elPrev.onclick = function () { go(cur - step()); };
+  elNext.onclick = function () { go(cur + step()); };
+  elMode.onclick = function () { setMode(!flow); };
+  elTwo.onclick = function () {
+    if (flow) return;                       // 连读里跨页无意义，按钮已 disabled，这里再兜一层
+    two = !two; elTwo.textContent = two ? "单页" : "跨页";
+    if (two && cur % 2 === 0) cur = Math.max(1, cur - 1);
+    render();
+  };
+  elPg.addEventListener("change", function () { go(parseInt(elPg.value, 10) || 1); });
+  document.addEventListener("keydown", function (e) {
+    if (e.target === elPg || e.target === elChap) return;
+    if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;   // 别抢陪读输入框的方向键
+    if (flow) {
+      // 连读：上下键与空格是读者用来滚的，别抢；只留左右键跳页
+      if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1); }
+      return;
+    }
+    if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); go(cur + step()); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(cur - step()); }
+  });
+  var sx = 0, sy = 0;
+  stage.addEventListener("touchstart", function (e) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  stage.addEventListener("touchend", function (e) {
+    if (flow) return;                       // 连读里横扫不该翻页——竖着拖才是它的读法
+    var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 52 && Math.abs(dx) > Math.abs(dy) * 1.6) go(cur + (dx < 0 ? step() : -step()));
+  }, { passive: true });
+  var rt; window.addEventListener("resize", function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      if (!flow) return render();
+      slots.forEach(unmountSlot);                  // 宽度变了，占位高度整册要重算
+      slots.forEach(function (s) {
+        var n = parseInt(s.getAttribute("data-p"), 10);
+        s.style.width = slotWidth() + "px"; s.style.height = slotHeight(n) + "px";
+      });
+      syncFlow(); onFlowScroll();
+    }, 180);
+  });
+  stage.addEventListener("scroll", function () {
+    document.dispatchEvent(new Event("scroll"));   // 滚动不冒泡；不转发的话选中浮标会僵在原地
+    if (!flow) return;
+    if (rafId) return;                             // 每帧至多算一次，否则长书里滚动会卡
+    rafId = (window.requestAnimationFrame || setTimeout)(function () {
+      rafId = 0; syncFlow(); onFlowScroll();
+    }, 16);
+  }, { passive: true });
+
+  /* ── 打开一本书 ── */
+  function openBook(file) {
+    elErr.textContent = "";
+    if (!file) return;
+    if (!/\.pdf$/i.test(file.name) && file.type !== "application/pdf") {
+      elErr.textContent = "这个入口只读 PDF。Word 稿可以用「文章 SDE 解析器」。"; return;
+    }
+    window.__bookName = file.name.replace(/\.pdf$/i, "").slice(0, 80);
+    $("bkname").textContent = window.__bookName;
+    var fr = new FileReader();
+    fr.onload = function () {
+      pdfjsLib.getDocument({ data: new Uint8Array(fr.result) }).promise.then(function (d) {
+        doc = d; window.pdfDoc = d;          // 纪律②：取文垫片要靠它
+        tot = d.numPages; elTot.textContent = tot; cur = 1; pageText = {};
+        pageDim = {}; baseDim = null; slots = []; busy = false;
+        spread.classList.toggle("flow", flow); spread.innerHTML = "";
+        two = (window.innerWidth >= 1080); elTwo.textContent = two ? "单页" : "跨页";
+        gate.style.display = "none"; stage.style.display = "flex"; ways.classList.add("on");
+        buildChapters(d).then(fillChapters);
+        render();
+      }).catch(function () {
+        elErr.textContent = "这个 PDF 打不开——可能是加密的，或者文件损坏了。";
+      });
+    };
+    fr.onerror = function () { elErr.textContent = "读文件失败，再选一次试试。"; };
+    fr.readAsArrayBuffer(file);
+  }
+  $("drop").onclick = function () { $("file").click(); };
+  $("file").addEventListener("change", function (e) { openBook(e.target.files && e.target.files[0]); });
+  ["dragenter", "dragover"].forEach(function (t) {
+    $("drop").addEventListener(t, function (e) { e.preventDefault(); $("drop").classList.add("over"); });
+  });
+  ["dragleave", "drop"].forEach(function (t) {
+    $("drop").addEventListener(t, function (e) { e.preventDefault(); $("drop").classList.remove("over"); });
+  });
+  $("drop").addEventListener("drop", function (e) {
+    openBook(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]);
+  });
+  $("other").onclick = function () {
+    doc = null; chapters = []; pageText = {}; window.pdfDoc = null;
+    slots = []; pageDim = {}; baseDim = null; busy = false; spread.innerHTML = "";
+    stage.style.display = "none"; ways.classList.remove("on"); gate.style.display = "flex";
+    $("bkname").textContent = "共读一本书"; elProg.style.width = "0";
+  };
+
+  /* ── 六种读法：**只填不跑**（同 sde-handoff 的纪律，烧的是读者自己的 Key）── */
+  var WAY = {
+    "1": "按读法①：这一章说了什么——找出承重的那一句并逐字引出，再给我一段千字概写。",
+    "2": "按读法②：这一章把什么当作了给定？用「把 __ 当作给定，因此看不见 __」的句式，并说清一旦承认后半句它为什么就站不住。",
+    "3": "按读法③：这一章哪里是脆的？至少三处，每处要指得出是哪一句，别说「论证还可更充分」这类话。",
+    "4": "按读法④：这一章在答 What／How／Why 里的哪一类？照那一类的做法给我骨架。",
+    "5": "按读法⑤：这一章和上下章之间空着什么？能不能造一个概念把这条缝填上。",
+    "6": "按读法⑥：站内哪一篇跟这一章撞了？给我一条分离线——它们俩到底在什么地方分开。",
+    /* ⑦ 与前六条不是一类：前六条产出「关于这本书的判断」，两个人读得好会趋同；
+       这一条产出的是**读者自己的东西**，两个人必然分岔——而共读要的正是分岔。
+       所以填进去的不是一个问题，是一个**留着空等他自己填**的句子：
+       预填一个完整的问句等于替他起了头，他多半就顺着答了。 */
+    "7": "按读法⑦：这一章在我这儿组织成了——\n（我先写，写完你再帮我压成一句、指出它和原书在哪儿分开、以及它要什么才站得住。别先给我你的版本。）"
+  };
+  ways.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest(".way") : null;
+    if (!b) return;
+    var q = WAY[b.getAttribute("data-w")];
+    if (!q) return;
+    if (window.WDSRead && window.WDSRead.fill) window.WDSRead.fill(q);
+    else { try { navigator.clipboard.writeText(q); } catch (er) {} }   // 陪读没装上也别让按钮变哑巴
+  });
+
+  /* ── 陪读：走后端 b.book 高级档；正文取的是**当前这一章** ── */
+  window.WDS_READ = {
+    book: 1,
+    selector: "#stage",
+    title: "",
+    panelTitle: "SDE 共读 · 陪你读这一章",
+    fabLabel: "✦ 问 WDS",
+    subLabel: "内功 · 三类判 · 方法论 · 站内旁证都在",
+    docTextFn: function () { try { return window.__bookText(); } catch (e) { return ""; } }
+  };
+  var _t = window.__bookTitle;
+  Object.defineProperty(window.WDS_READ, "title", { get: function () { try { return _t(); } catch (e) { return ""; } } });
+})();
+</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+</body></html>

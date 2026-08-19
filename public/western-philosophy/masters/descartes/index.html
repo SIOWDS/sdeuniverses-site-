@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>笛卡尔频道 | Descartes Channel | SDE Universes</title>
+<meta name="description" content="笛卡尔频道——我思不是找到的地基，而是清场后的房东。那场怀疑的大火按剧本走位，恰好熄灭在「我」的门槛前。以 SDE 发生学收纳笛卡尔名下全部解构。王德生 · 德麦国际。">
+<meta property="og:title" content="笛卡尔频道 | SDE Universes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--col:#8C3B32}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#8C3B32;--accent2:#4A73B8}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav-bar-sub{display:flex;align-items:center;justify-content:space-around;width:100%;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.05rem;font-weight:700;letter-spacing:0.13em;white-space:nowrap;transition:color .2s,opacity .2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
+.nav-bar-sub a.sub-wpm{color:#8C3B32}
+.nav-bar-sub a.sub-wpc{color:#2E5090}
+.nav-bar-sub a.sub-wps{color:#1B6E7A}
+.nav-bar-sub a.sub-wpe{color:#7A4A8C}
+.nav-bar-sub a.sub-wpp{color:#A0651F}
+.nav-bar-sub a.sub-wpo{color:#4A73B8}
+.nav-num{font-size:0.62rem;color:var(--muted);margin-left:1px}
+header.hero{min-height:62vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#8C3B3214 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#8C3B320d 1px,transparent 1px),linear-gradient(90deg,#8C3B320d 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.4rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.8rem,8vw,5.4rem);font-weight:700;line-height:1.02;color:var(--text)}
+.title .en-only{color:var(--accent)}
+.dates{position:relative;font-size:0.9rem;letter-spacing:0.2em;color:var(--muted);margin-top:0.9rem}
+.thesis{position:relative;font-size:clamp(1.1rem,2.4vw,1.42rem);color:var(--text2);max-width:660px;margin:1.7rem auto 2rem;font-style:italic;font-weight:300;line-height:1.7}
+.thesis b{color:var(--accent);font-weight:600;font-style:normal}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.2rem 0}
+.lead{font-size:1.12rem;color:var(--text);line-height:1.98;border-left:3px solid var(--col);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.block{margin:0 0 3rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.6rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--col);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.3rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.98rem;color:var(--text2);font-style:italic;margin:0.8rem 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(140,59,50,.10)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
+.art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.55rem;font-size:0.82rem;color:var(--accent);letter-spacing:0.05em}
+.art.feature{grid-column:1 / -1;border-left-width:4px;background:linear-gradient(180deg,var(--card),var(--card2))}
+.art.feature h4{font-size:1.3rem}
+.art.feature p{font-size:0.98rem}
+.tailnote{margin-top:1rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.tailnote p{color:var(--text2);font-size:0.96rem;line-height:1.8}.tailnote b{color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-bar-sub a{font-size:0.92rem}
+  .nav-links a.sib{display:none}
+  .art-grid{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
+}
+</style>
+</head>
+<body class="zh">
+<nav>
+  <div class="nav-bar-main">
+    <a class="nav-logo" href="/browse/">SDE Universes</a>
+    <div class="nav-links">
+      <a href="/western-philosophy/masters/" class="zh-only">← 50 大师</a><a href="/western-philosophy/masters/" class="en-only">← 50 Masters</a>
+      <a href="/search/" class="zh-only sib">🔍 搜索</a><a href="/search/" class="en-only sib">🔍 Search</a>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('zh')">中</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+  <div class="nav-bar-sub">
+    <a href="/western-philosophy/masters/" class="sub-wpm zh-only">50大师</a><a href="/western-philosophy/masters/" class="sub-wpm en-only">50 Masters</a>
+    <a href="/western-philosophy/currents/" class="sub-wpc zh-only">洪流</a><a href="/western-philosophy/currents/" class="sub-wpc en-only">Currents</a>
+    <a href="/western-philosophy/science/" class="sub-wps zh-only">与科学</a><a href="/western-philosophy/science/" class="sub-wps en-only">&amp; Science</a>
+    <a href="/western-philosophy/east-west/" class="sub-wpe zh-only">东西对话</a><a href="/western-philosophy/east-west/" class="sub-wpe en-only">West–East</a>
+    <a href="/western-philosophy/predicament/" class="sub-wpp zh-only">今日困境</a><a href="/western-philosophy/predicament/" class="sub-wpp en-only">Predicament</a>
+    <a href="/western-philosophy/postmodern/" class="sub-wpo zh-only">后现代</a><a href="/western-philosophy/postmodern/" class="sub-wpo en-only">Postmodern</a>
+    <a href="/western-philosophy/epistemology/" class="sub-wpk zh-only">知识论</a><a href="/western-philosophy/epistemology/" class="sub-wpk en-only">Epistemology</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow">WESTERN PHILOSOPHY · 大师频道</div>
+  <h1 class="title"><span class="zh-only">笛卡尔</span><span class="en-only">Descartes</span></h1>
+  <div class="dates">1596 — 1650 · La Haye / Amsterdam</div>
+  <p class="thesis"><span class="zh-only">普遍怀疑烧掉一切，只剩「我思故我在」作不可动摇的地基。换一把刀看——<b>我思不是找到的地基，是清场后的房东。</b>那场大火按剧本走位，恰好熄灭在「我」的门槛前；房东，是住得最久的房客。</span><span class="en-only">The cogito is not found bedrock but <b>the landlord after the clearing</b> — a scripted fire that stopped just at the threshold of "I".</span></p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">本频道收录 3 篇 · 大师频道</span><span class="en-only">3 pieces · master channel</span></div>
+</header>
+
+<main class="wrap">
+<section>
+  <p class="lead"><span class="zh-only">「大师频道」新制：每位大师各得一个专属频道。这里把笛卡尔的「我思」重新认作一次发生——怀疑之火并非中立地烧到尽头，而是按一份剧本，恰好在「我」的门前收住。</span><span class="en-only">A dedicated channel gathering every deconstruction of Descartes — the cogito read as a scripted clearing, not a discovery.</span></p>
+
+  <div class="block">
+    <div class="block-head"><div class="block-num">收录</div><div class="block-title"><span class="zh-only">本频道 · 已收录</span><span class="en-only">In This Channel</span></div></div>
+    <p class="block-desc"><span class="zh-only">开篇长文领衔，另附否定序列深读与近邻对读。</span><span class="en-only">A headline essay, plus a deep read and a next-of-kin reading.</span></p>
+    <div class="art-grid">
+
+      <a class="art feature" href="/column/descartes-cogito-genesis/">
+        <span class="k"><span class="zh-only">开篇长文 · 已上线</span><span class="en-only">HEADLINE ESSAY · LIVE</span></span>
+        <h4><span class="zh-only">笛卡尔的我思，不是找到的地基，而是清场后的房东</span><span class="en-only">Descartes: The Landlord After the Clearing</span></h4>
+        <p><span class="zh-only">那场大火按剧本走位，恰好熄灭在「我」的门槛前；房东是住得最久的房客。</span><span class="en-only">A scripted fire that stopped just at the threshold of «I».</span></p>
+        <span class="rd"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></span>
+      </a>
+
+      <a class="art" href="/column/negation-sequence/#ring-7">
+        <span class="k"><span class="zh-only">深读 · 否定序列 环七</span><span class="en-only">DEEP READ · RING 7</span></span>
+        <h4><span class="zh-only">剧场里的大火与不烧的观众席</span><span class="en-only">The Fire in the Theatre, the Seats That Wouldn't Burn</span></h4>
+        <p><span class="zh-only">磐石·显形·偷运·猜想：普遍怀疑为何独独放过了那个正在怀疑的「我」。</span><span class="en-only">Why universal doubt spared the doubting «I».</span></p>
+        <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+      </a>
+
+      <a class="art" href="/western-philosophy/masters/schopenhauer/">
+        <span class="k"><span class="zh-only">近邻对读 · 那个接生者</span><span class="en-only">NEXT OF KIN · SCHOPENHAUER</span></span>
+        <h4><span class="zh-only">叔本华：从死雕像里接生出活着的「我」</span><span class="en-only">Schopenhauer: The Living «I» Born from the Dead Statue</span></h4>
+        <p><span class="zh-only">他留下的那尊只会思考的死雕像，两百年后被叔本华接生成了一团燃烧的渴。</span><span class="en-only">His thinking-statue was, two centuries on, delivered into a living burn.</span></p>
+        <span class="rd"><span class="zh-only">进入频道 →</span><span class="en-only">Enter channel →</span></span>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="tailnote"><span class="zh-only"><b>大师频道 · 建设中。</b>西方哲学每一位大师，各得一个专属频道，收纳其名下全部解构。现已开通九座：柏拉图 · 亚里士多德 · 笛卡尔 · 康德 · 叔本华 · 尼采 · 海德格尔 · 德勒兹 · 阿多诺（序列外增补）。名录五十，逐座扩建——下一座看每日头条预告。</span><span class="en-only"><b>Master channels — under construction.</b> Nine are open: Plato · Aristotle · Descartes · Kant · Schopenhauer · Nietzsche · Heidegger · Deleuze · Adorno (beyond the fifty). Fifty in the roster; the next is announced in Daily Headline.</span></div>
+</section>
+</main>
+
+<footer>
+  <div class="zh-only">SDE Universes · 西方哲学 · 笛卡尔频道 &nbsp;|&nbsp; 德麦国际 · 王德生 &nbsp;|&nbsp; <a href="/browse/">sdeuniverses.com</a></div>
+  <div class="en-only">SDE Universes · Western Philosophy · Descartes Channel &nbsp;|&nbsp; Demai International · Desheng Wang &nbsp;|&nbsp; <a href="/browse/">sdeuniverses.com</a></div>
+</footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en')));
+  document.documentElement.lang=lang;
+}
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

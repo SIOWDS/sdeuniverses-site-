@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>给一门靠判断吃饭的手艺建一块土 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的三个条件（操作空间、同行对照、预后反馈）可以反过来当作建设清单。这一篇给出：三条各自的可核对信号、造对照的三条规格、接通反馈时怎么处理长周期与自愈干扰、常见的伪三条件，以及什么时候标准化才是更好的选择。适用于医疗、工程、法律、教学、审计与任何带徒的场合。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="给一门靠判断吃饭的手艺建一块土 · 方法实践文">
+<meta property="og:description" content="母文的三个条件（操作空间、同行对照、预后反馈）可以反过来当作建设清单。这一篇给出：三条各自的可核对信号、造对照的三条规格、接通反馈时怎么处理长周期与自愈干扰、常见的伪三条件，以及什么时候标准化才是更好的选择。适用于医疗、工程、法律、教学、审计与任何带徒的场合。">
+<link rel="canonical" href="https://sdeuniverses.com/students/hu-min/paper-p47-d01-a03/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/hu-min/paper-p47-d01-a03/">← 回母文《复现土》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《复现土》</div>
+  <h1 class="art-title">给一门靠判断吃饭的手艺建一块土</h1>
+  <div class="art-subtitle">能写下来的只是种子——这一篇把三个条件做成体检表：查操作空间、造同行对照、接通真反馈，以及三条各自缺席时的不同症状。</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 4868 字</div>
+  <div class="swap">
+    <a href="/students/hu-min/paper-p47-d01-a03/"><b>← 母文 · 复现土</b><span>完整论证在这里</span></a>
+    <a href="/students/hu-min/paper-p47-d01-a03/explain.html"><b>🌱 白话解释文 · 种子可以寄，土不能寄</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的三个条件（操作空间、同行对照、预后反馈）可以反过来当作建设清单。这一篇给出：三条各自的可核对信号、造对照的三条规格、接通反馈时怎么处理长周期与自愈干扰、常见的伪三条件，以及什么时候标准化才是更好的选择。适用于医疗、工程、法律、教学、审计与任何带徒的场合。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">这套工序管什么、不管什么</a></li><li><a href="#s2">三条件当体检表</a></li><li><a href="#s3">工序一：查操作空间</a></li><li><a href="#s4">工序二：造同行对照</a></li><li><a href="#s5">工序三：接通预后反馈</a></li><li><a href="#s6">三条的顺序与权重</a></li><li><a href="#s7">常见的伪三条件</a></li><li><a href="#s8">六种典型失败</a></li><li><a href="#s9">一页纸操作卡</a></li><li><a href="#s10">三个场景变体</a></li><li><a href="#s11">走一遍：一个例子</a></li><li><a href="#s12">什么时候不该建土：标准化更合适的场合</a></li><li><a href="#s13">把这套工序放在可被推翻的位置</a></li><li><a href="#s14">五个实操疑问</a></li><li><a href="#s15">与三类常见做法的分工</a></li><li><a href="#s16">最容易被自己做坏的方式</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>这套工序管什么、不管什么</h2>
+<p><b>管</b>：一门靠判断吃饭、而判断无法被完全规则化的行当；具体表现是老手做得好、新人学不会，或者手册越写越厚而结果越来越不稳。</p>
+<p><b>不管</b>：<b>判断本来就该被规则化的场合。</b> 有大量工作的正确答案是确定的、可穷举的、且偏离的代价极高——用药剂量、安全操作、法定流程。<b>这些地方需要的是更严的规范，不是更多的判断空间</b>，把这套工序套上去是危险的。分辨办法见最后一节。</p>
+<p><b>这套工序不产出什么</b>：它不产出更好的手册、更细的规则、更全的知识库。<b>那些都是种子这一侧的工作</b>，做得再好也不替代土。</p>
+<p><b>一条总纪律</b>：<b>三条是一整套，不能只做一条。</b> 尤其是只做第一条（放手让新人自己判断）而不配后两条，是最坏的组合——它给了偏斜自由生长的空间，却没有任何东西能让偏斜显现。</p>
+<h2 id="s2"><span class="no">02</span>三条件当体检表</h2>
+<p>先做诊断。三条各自缺席的症状完全不同，可以反向定位。</p>
+<p><b>症状 A · 会背不会用</b>。规则掌握得好，流程一步不缺，遇到不典型的情况就退回“挑一个最像的”。<b>表现为流程完整而结果不稳。</b> → 缺第一条（操作空间）。</p>
+<p><b>症状 B · 越做越有一套，但只有自己人认</b>。判断自信、成体系，一旦拿到外面就对不上号，或者两个同样资深的人给出的判断系统性不同。<b>表现为局部有效、无法迁移。</b> → 缺第二条（同行对照）。</p>
+<p><b>症状 C · 看起来一直在进步</b>。成功率高、经验丰富、越来越笃定，而真正难的案子仍然做不下来。<b>这是三种里最危险的，因为它跟成熟长得一模一样。</b> → 缺第三条（预后反馈）。</p>
+<p><b>判读</b>：先定位最主要的那一条，一次只补一条。<b>顺序建议是三→一→二</b>：先把反馈接通（否则后面补的都没有校准依据），再开操作空间，最后建对照。</p>
+<h2 id="s3"><span class="no">03</span>工序一：查操作空间</h2>
+<p><b>要查的不是“有没有让新人做事”，而是“有没有让新人做判断”。</b> 这两件事常被混淆。</p>
+<p><b>四个可核对的信号</b>（中两条以上即为缺席）：</p>
+<ul class="pts"><li><b>不典型案例的去向</b>。遇到对不上任何标准情况的案子，实际做法是什么？如果标准做法是“往上报”或“挑一个最接近的”，那么判断从未发生。</li><li><b>可否给出非标准方案</b>。新人有没有权限提出一个不在现有清单里的处理方式，哪怕最后不被采纳？没有这个权限，操作空间为零。</li><li><b>允不允许说“我不确定”</b>。如果“不确定”必须立刻转化为一个确定的选项才能进入流程，那么所有的判断都会被压回匹配。</li><li><b>有没有一类事是必须自己拿主意的</b>。哪怕很小、哪怕后果可控。<b>一件都举不出来，就是缺席。</b></li></ul>
+<p><b>开空间的做法只有一条</b>：<b>划出一类后果可控的事，明确由本人判断，且不要求事先说明理由。</b> 范围必须小而确定——“某类患者的随访安排”“某类工单的处理顺序”“某一节课怎么讲”。</p>
+<p><b>关键在“后果可控”</b>：这不是妥协，是安全底线。见最后一节。</p>
+<h2 id="s4"><span class="no">04</span>工序二：造同行对照</h2>
+<p>第二条最难自己长出来，几乎必须专门造。</p>
+<p><b>三条规格</b>（三条全过才算）：</p>
+<ul class="pts"><li><b>独立</b>：对照方与你没有师承关系、不在同一个评价链条上、不需要顾及你的面子。<b>师父把关不算对照</b>——那只有一个来源。</li><li><b>水平相当</b>：不是找一个更高明的人来指点，而是找一个和你处在同一层的人。<b>指点解决的是“这次对不对”，对照解决的是“我是不是系统性地偏了”，两者不同。</b></li><li><b>看同一批东西</b>：必须处理同样的案子或同样的材料，否则无从比较。这一条最花力气，也最不能省。</li></ul>
+<p><b>最省事的做法</b>：两个人各自独立处理同一批（三到五个）案子，<b>先各自写下判断与理由，写完之后再交换</b>。顺序不能反——先交流再写，得到的是趋同，不是对照。</p>
+<p><b>看什么</b>：不看谁对谁错，看<b>分歧的形状</b>。如果分歧是随机的，那是水平问题；<b>如果分歧总是朝同一个方向（你总是比对方更保守、总是更重视某一类线索），那就是偏斜，而这正是这一条要找的东西。</b></p>
+<h2 id="s5"><span class="no">05</span>工序三：接通预后反馈</h2>
+<p>第三条听起来最简单，实际上最难接通，因为它有两个天然的干扰。</p>
+<p><b>干扰一 · 长周期</b>。判断的后果常常几个月甚至几年后才显现，而那时人已经记不清当初为什么那样判断了。<b>处理办法是留判断记录</b>：在做判断的当时写下三行——我判断是什么、依据是哪几点、我预期会出现什么。<b>第三行是关键</b>，它是后来唯一可核对的东西。</p>
+<p><b>干扰二 · 自愈与噪声</b>。母文那个例子指出，轻症相当一部分会自己好，于是判断对了病好、判断偏了病也好，反馈里几乎不含判断质量的信息。<b>处理办法是挑案子</b>：反馈训练必须用那些<b>结果确实取决于判断</b>的案子，而不是用最常见的那些。</p>
+<p><b>接通的具体做法</b>：</p>
+<ul class="pts"><li>建一个<b>只有自己看的</b>判断记录本，每条三行，含预期。</li><li>定期（按行业周期，一般三到十二个月）回看，<b>只核对第三行的预期与实际是否一致</b>，不评价自己。</li><li><b>专门标记那些“结果好但预期没中”的条目</b>——这类是最有信息量的，也是最容易被忽略的。</li></ul>
+<p><b>一条硬规则</b>：判断记录<b>不进任何考核</b>。一旦它可能被用于评价，人会开始写正确的判断而不是真实的判断，这一条随即失效。</p>
+<h2 id="s6"><span class="no">06</span>三条的顺序与权重</h2>
+<p>三条不是并列的，落地时有先后。</p>
+<p><b>先接反馈（第三条）</b>。理由是：在没有真反馈的情况下开放操作空间，等于让偏斜自由生长；而在没有真反馈的情况下建对照，两个人只能比较偏好，无法知道谁更接近事实。<b>反馈是另外两条的校准基准。</b></p>
+<p><b>再开空间（第一条）</b>。有了反馈之后，判断才有可能被校正。这一步的范围要从小开始，随着记录本上“预期中了”的比例上升再逐步扩大。</p>
+<p><b>最后建对照（第二条）</b>。它最花组织成本，也最需要信任，因此放在最后。<b>但它是唯一能发现“系统性偏斜”的机制</b>，长期看不可省——一个人可以在反馈良好的情况下，仍然在整个方向上偏着。</p>
+<p><b>权重上的经验</b>：如果只能做一条，做第三条；如果能做两条，做第三条加第一条；<b>三条都不做而只是加强培训，等于只在种子那一侧使劲。</b></p>
+<h2 id="s7"><span class="no">07</span>常见的伪三条件</h2>
+<p>四种常见的“看起来有、其实没有”，逐一记住能省很多力气：</p>
+<p><b>伪操作空间</b>：让新人自己做，但每一步都要事先报备并获得批准。<b>判断的权限如果在执行之前就被收走，那就不是空间。</b></p>
+<p><b>伪对照</b>：定期开病例讨论会/复盘会，大家一起看一个案子。<b>这通常不是对照而是趋同</b>——因为多数人会等资历最深的人先表态。要变成真对照，必须<b>先各自写、再交换</b>。</p>
+<p><b>伪反馈</b>：满意度调查、上级评价、结项验收。<b>这些反馈的对象是过程与关系，不是判断的准确性。</b> 判断的反馈必须来自事情本身后来怎么样了。</p>
+<p><b>伪案例</b>：用教学案例、经典案例、典型案例做训练。<b>这些案例的答案是已知的、干净的、可匹配的</b>——它们训练的正是母文说的那套匹配操作，而不是判断。</p>
+<h2 id="s8"><span class="no">08</span>六种典型失败</h2>
+<ul class="pts"><li><b>失败一 · 只放手不配套</b>。给了操作空间，没有对照也没有真反馈。<b>这是最坏的组合</b>，偏斜会被自由放大并固化，而且当事人会越来越自信。</li><li><b>失败二 · 用手册代替土</b>。把力气全部投在写规范、建知识库、训模型上。这些都有价值，但它们全在种子那一侧。</li><li><b>失败三 · 把判断记录纳入考核</b>。见工序三。一旦如此，记录本会变成一份精心写就的正确判断集。</li><li><b>失败四 · 拿容易的案子训练</b>。成功率好看，反馈里却几乎没有信息。<b>训练必须用那些结果确实取决于判断的案子。</b></li><li><b>失败五 · 找更高明的人当对照</b>。那是指点，不是对照。指点会带来趋同，而趋同恰好掩盖系统性偏斜。</li><li><b>失败六 · 把这套工序用在该标准化的地方</b>。见下一节。这一条的代价是安全，不是效率。</li></ul>
+<h2 id="s9"><span class="no">09</span>一页纸操作卡</h2>
+<ul class="pts"><li><b>诊断</b>：会背不会用＝缺空间／只有自己人认＝缺对照／看起来一直在进步＝缺反馈。</li><li><b>顺序</b>：先接反馈 → 再开空间 → 最后建对照。</li><li><b>反馈</b>：判断记录三行（判断／依据／<b>预期</b>）；挑结果取决于判断的案子；<b>不进考核</b>；重点看“结果好但预期没中”。</li><li><b>空间</b>：划一类后果可控的事，本人判断，不要求事先说明理由；四个信号自查。</li><li><b>对照</b>：独立／水平相当／看同一批；<b>先各自写再交换</b>；看分歧的形状不看谁对。</li><li><b>防伪</b>：报备制不是空间／集体讨论不是对照／满意度不是反馈／教学案例不是训练。</li><li><b>禁</b>：不只放手、不用手册代替、不把记录纳入考核、不在该标准化处使用。</li></ul>
+<h2 id="s10"><span class="no">10</span>三个场景变体</h2>
+<p><b>临床与技术诊断</b>：最难的是反馈的长周期与自愈干扰。可行的做法是<b>建立“随访子集”</b>——不追踪全部病例，只挑一小批结果确实取决于判断的，做长期跟踪。<b>小而真，胜过大而假。</b></p>
+<p><b>工程与运维</b>：这里第三条通常是天然具备的（系统会告诉你对不对），最缺的往往是第二条。<b>最省事的做法是“双盲初判”</b>：同一份故障资料，两个人各自独立给出判断与依据，然后比对分歧的方向。</p>
+<p><b>教学与带徒</b>：这里第一条最容易被挤掉，因为教学天然倾向于给标准答案。<b>可用的最小动作是：在给出正确做法之前，先让对方写下自己的判断与预期</b>，写完之后再讲。<b>顺序反过来，这一步就等于没有。</b></p>
+<h2 id="s11"><span class="no">11</span>走一遍：一个例子</h2>
+<p>以下为示意。某科室新人上手三年，处理常见问题很利落，遇到复杂病例仍然只能上报。</p>
+<p><b>诊断</b>：不典型案例一律上报（信号一）；没有提出非标准方案的权限（信号二）；“不确定”必须立刻转成一个选项（信号三）。判定缺第一条。同时发现：所有反馈来自上级评价与满意度，没有任何一条来自事情后来怎么样了。<b>判定第三条同样缺席，且更靠前。</b></p>
+<p><b>先接反馈</b>：给每人一个判断记录本，每条三行含预期，不进考核。挑了一类结果确实取决于判断的病例做半年随访。</p>
+<p><b>第一个半年</b>：记录本上“预期中了”的比例约四成。<b>最有价值的发现是七条“结果好但预期没中”</b>——它们指向同一个方向：这几个人系统性地高估了某一类因素的作用。<b>这个偏斜在此前的三年里从未被发现，因为结果一直是好的。</b></p>
+<p><b>再开空间</b>：划出一类后果可控的事项，明确由本人判断且不要求事先说明理由。范围从两类开始。</p>
+<p><b>第二年建对照</b>：两人一组，各自独立处理同一批案子，先写后换。<b>看的是分歧的方向而不是对错。</b></p>
+<p><b>读法</b>：不看“新人成长了多少”，只看两件事——记录本上预期命中率的趋势，以及“结果好但预期没中”这一类条目有没有被持续发现。<b>后者比前者更重要</b>：它一旦为零，多半不是没有偏斜，是记录不诚实了。</p>
+<h2 id="s12"><span class="no">12</span>什么时候不该建土：标准化更合适的场合</h2>
+<p>这一节是本工序的边界，也是安全底线。</p>
+<p><b>以下情形应当加强规范而不是扩大判断空间</b>：</p>
+<ul class="pts"><li><b>正确答案确定且可穷举</b>，偏离的代价高（用药剂量、安全联锁、法定程序）。</li><li><b>后果不可逆</b>：一次判断失误造成的损失无法补救。</li><li><b>执行者尚不具备最低限度的基础</b>：连规则都还没掌握时给操作空间，那不是培养判断，是放任。</li><li><b>时间压力极大、无法承受试错</b>：急救、事故处置的现场，不是练判断的地方。</li></ul>
+<p><b>分辨的一条实用问法</b>：<b>这件事如果做错了，能不能在几天内被发现并纠正？</b> 能，属于可以给空间的范围；不能，先标准化。</p>
+<p><b>必须说清楚的一点</b>：这套工序主张的从来不是“少一点规范”，而是“在规范之外，另外留一块能让判断重新发生的地”。<b>两者不是取舍，是并存</b>，而且规范那一侧永远优先。</p>
+<h2 id="s13"><span class="no">13</span>把这套工序放在可被推翻的位置</h2>
+<p>母文交代了自己的限度：三个场景是建构出来的理想型而非个案记录，整套框架是可检验的解释工具，不是被实证确认的结论。执行者照做，在开始前写下两句：</p>
+<ul class="pts"><li><b>如果……则不必</b>：如果在完全不建这三条、只是继续加强培训与规范的情况下，判断质量指标（预期命中率、复杂案例的独立处理比例）同样在一年内改善，那么这套工序在此处没有独立价值。</li><li><b>如果……则停止</b>：如果开放操作空间之后出现超出“后果可控”范围的失误，立即收回该范围并重新划定。<b>这一条优先于全部内容</b>——空间的边界是安全，不是效率。</li></ul>
+<p>最后一句：这套工序不承诺培养出名医，也不承诺缩短成长周期。<b>它只保证一件事——如果那块土在，判断至少有机会重新长出来一次；而如果只有手册，它一次也不会。</b></p>
+<h2 id="s14"><span class="no">14</span>五个实操疑问</h2>
+<p><b>问：判断记录写了半年，回看时发现自己根本记不清当时的情境，怎么办？</b>答：说明第三行（预期）写得不够具体。预期不能写“效果应该不错”，要写<b>可核对的事</b>——“两周内某个指标会往哪个方向动”“如果我判断对了，接下来最可能出现的是什么”。<b>写得越具体，越不依赖回忆。</b></p>
+<p><b>问：科室里找不到“水平相当且独立”的人做对照，怎么办？</b>答：可以跨机构找，也可以跨专业找<b>处理同类判断结构</b>的人。<b>实在找不到时的替代方案是“跟过去的自己对照”</b>：把同一批案子隔半年再判一次（不看原来的记录），比对分歧的方向。这不如真对照，但它至少能发现漂移。</p>
+<p><b>问：开放操作空间之后，新人第一次就判错了，要不要收回？</b>答：看是不是超出了“后果可控”的范围。<b>在范围内的失误恰恰是这套工序想要的东西</b>——它是反馈能提供信息的前提。超出范围，收回并重新划定，<b>但要说清楚收回的是范围不是信任</b>，否则下一次没有人敢做判断。</p>
+<p><b>问：能不能用模型或数据系统来充当“同行对照”？</b>答：部分可以，而且它天然满足“独立”这一条。<b>但要注意它可能不满足“水平相当”</b>——如果它在某类案子上明显更弱，你会系统性地忽略它的分歧；如果它明显更强，它就变成了指点而不是对照。<b>最好的用法是只看分歧的方向，不看谁对。</b></p>
+<p><b>问：这套工序要多久见效？</b>答：最小周期等于“判断的后果多久显现”。医疗按月按年，工程按天按周。<b>任何声称能大幅缩短这个周期的方法，多半是在种子那一侧使劲。</b> 可以人为加快的只有一件事：留判断记录，让周期不白过。</p>
+<h2 id="s15"><span class="no">15</span>与三类常见做法的分工</h2>
+<p><b>与规范化、SOP、知识库建设</b>：完全不冲突，而且优先级更高——<b>规范那一侧永远优先，尤其在后果不可逆的地方</b>。要注意的只有一点：规范做得越好，越容易让人以为土的问题已经解决了。<b>判断办法很简单——问问新人，遇到对不上任何标准情况的案子，实际会怎么做。</b></p>
+<p><b>与师带徒、导师制</b>：这类安排通常提供了第一条的一部分，但天然缺第二条（只有一个来源）。<b>可行的补法是给徒弟第二位不相干的对照者</b>，不必是更资深的人，同期的人反而更好。母文那个跟师五年的例子讲的正是这个缺口。</p>
+<p><b>与培训、案例教学</b>：这类活动的材料几乎全是“教学案例”——答案已知、材料干净、可匹配。<b>它们训练的正是匹配操作本身</b>。不必取消，但要清楚它属于种子那一侧，且<b>用得越多，越需要在别处补第一条</b>。</p>
+<h2 id="s16"><span class="no">16</span>最容易被自己做坏的方式</h2>
+<p>必须点名一个内建的风险：<b>这套工序很容易被做成一套新的规范。</b></p>
+<p>它有三个条件、有体检表、有顺序、有判据——这些东西天然适合被写进制度文件、变成检查项、纳入考核。而一旦如此，它会立刻反噬：</p>
+<ul class="pts"><li>判断记录进了考核 → 人开始写“正确的判断”而不是真实的判断 → 第三条失效。</li><li>同行对照变成定期例会 → 大家等资历深的人先表态 → 第二条变成趋同。</li><li>操作空间被写成制度 → 于是有了范围、有了报备、有了留痕要求 → 第一条被收回。</li></ul>
+<p><b>三条全部失效，而制度文件上写着“我们已经建立了判断力培养体系”。</b> 按母文的框架，这正是那种最难被察觉的失败——<b>表面完备，土是空的。</b></p>
+<p><b>防它的办法有三条</b>：判断记录只属于本人，任何情况下不上交；对照的形式保持非正式，不排进流程、不留会议纪要；操作空间以“取消一条审批”的形式给出，而不是以“新增一项制度”的形式给出。</p>
+<p><b>这三条的共同点是：它们都让这套工序看起来没有被落实。</b> 这是它必须付的代价——一个能被完整展示的判断力培养体系，多半已经不是了。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/hu-min/paper-p47-d01-a03/">《复现土：判断离开现场之后，何以再发生》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/hu-min/paper-p47-d01-a03/explain.html">🌱 白话解释文《种子可以寄，土不能寄》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/hu-min/paper-p47-d01-a03/">回母文</a> ·
+  <a href="/students/hu-min/works/">胡敏 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

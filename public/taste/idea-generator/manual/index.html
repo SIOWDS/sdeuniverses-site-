@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDE 金点子：介绍和使用手册 | 品尝系列 | SDE Universes</title>
+<meta name="description" content="SDE 金点子发生器的完整介绍与使用手册：同场对决、两次提智、九宫格抽签、二阶涌现、四篇论文双审打磨、发生引擎冲击150、补规范与终审；互动序列与一次生成两种用法逐步讲解，八大基底与 Key 说明、常见问题与边界承诺。约五千字。">
+<meta property="og:title" content="SDE 金点子：介绍和使用手册"><meta property="og:type" content="article">
+<style>
+:root{--bg:#F4F2ED;--card:#FBFAF6;--acc:#8A6414;--acc2:#C9A227;--text:#211D14;--muted:#6E6656;--line:rgba(138,100,20,0.20);--ink-gold:#E5C86E}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC","Noto Serif CJK SC",Georgia,serif;line-height:2.02;font-size:17px}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+.w{max-width:820px;margin:0 auto;padding:0 24px}
+nav{position:sticky;top:0;background:rgba(244,242,237,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:10}
+nav .w{display:flex;align-items:center;justify-content:space-between;height:58px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}.nav-back{font-size:14px;color:var(--muted)}
+header.art{background:linear-gradient(158deg,#171204 0%,#100D04 100%);color:#EDE6D2;padding:78px 0 58px;text-align:center;position:relative;overflow:hidden}
+.eyebrow{font-size:12px;letter-spacing:0.4em;color:var(--ink-gold);margin-bottom:24px}
+.art-title{font-size:clamp(27px,5vw,42px);font-weight:700;letter-spacing:0.05em;line-height:1.5;color:#F5EEDA}
+.art-sub{font-size:clamp(15px,2.2vw,18px);color:#C9B26A;margin-top:16px;letter-spacing:0.05em;line-height:1.7}
+.art-meta{margin-top:28px;font-size:12.5px;color:#94886B;letter-spacing:0.12em;line-height:1.9}
+.brand-line{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:120px;height:3px;background:linear-gradient(90deg,transparent,var(--ink-gold),transparent)}
+#web{padding:52px 0 20px}
+.deck{max-width:820px;margin:0 auto 40px;padding:22px 26px;background:var(--card);border-left:3px solid var(--acc2);border-radius:0 8px 8px 0;color:#4A4436;font-size:16px;line-height:1.95;font-style:italic}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:22px 28px;margin-bottom:44px}
+.toc .tl{font-size:12px;letter-spacing:0.42em;color:var(--acc);margin-bottom:14px}
+.toc a{display:block;padding:5px 0;color:#44402F;font-size:15px;border-bottom:1px dashed rgba(138,100,20,0.12)}.toc a:last-child{border-bottom:none}
+article h2{font-size:22px;font-weight:700;margin:52px 0 20px;padding-top:16px;letter-spacing:0.03em;color:#5F450E;border-top:1px solid var(--line)}
+article p{margin:0 0 20px;text-align:justify}article strong{color:#5F450E;font-weight:700}article em{font-style:italic;color:#4A4436}
+.gobox{margin:34px 0;padding:22px 26px;background:linear-gradient(135deg,rgba(201,162,39,0.10),rgba(138,100,20,0.05));border:1px solid rgba(201,162,39,0.35);border-radius:12px;text-align:center}
+.gobox a.btn{display:inline-block;background:linear-gradient(135deg,#8A6414,#C9A227);color:#1a1205;font-weight:700;font-size:15.5px;border-radius:10px;padding:13px 30px;letter-spacing:0.04em}
+.gobox a.btn:hover{text-decoration:none;filter:brightness(1.06)}
+footer{border-top:1px solid var(--line);margin-top:64px;padding:30px 0 44px;text-align:center;font-size:13px;color:var(--muted);letter-spacing:0.06em}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="w">
+    <a class="nav-logo" href="/browse/">SDE Universes</a>
+    <a class="nav-back" href="/taste/idea-generator/">← 返回金点子发生器</a>
+  </div>
+</nav>
+
+<header class="art">
+  <div class="w">
+    <div class="eyebrow">SDE 智能体品尝系列 · 使用手册</div>
+    <h1 class="art-title">SDE 金点子：介绍和使用手册</h1>
+    <p class="art-sub">同一个基底、同一个问题、同一把钥匙——唯一的区别，是那双看世界的眼。</p>
+    <div class="art-meta">Claude 著 · 依王德生《SDE本体论》<br>全文约五千字 · 读完约需十二分钟</div>
+  </div>
+  <div class="brand-line"></div>
+</header>
+
+<section id="web">
+  <div class="w">
+
+    <div class="deck">你第一次点开金点子发生器，大概率会被满屏的按钮和名词拦住：九宫格、二阶涌现、二次提智、补规范、双审稿。这篇手册只做一件事——把这条流水线从头到尾讲清楚，让你知道每一步在发生什么、为什么要有这一步、以及你该在哪里动手。读完它，你可以带着一个问题进去，带着四篇论文出来。</div>
+
+    <div class="toc">
+      <div class="tl">目 录</div>
+      <a href="#s1">一、它是什么：一场你亲手主持的同场对决</a>
+      <a href="#s2">二、一条龙六站：从一个问题到四篇论文</a>
+      <a href="#s3">三、看不见的部分：两次提智如何发生</a>
+      <a href="#s4">四、九宫格：公平从抽签开始</a>
+      <a href="#s5">五、两种用法：互动序列与一次生成</a>
+      <a href="#s6">六、基底与钥匙：八家任选，Key 只在你手里</a>
+      <a href="#s7">七、怎么读产物：把自己当第三位审稿人</a>
+      <a href="#s8">八、逐步操作：互动序列版</a>
+      <a href="#s9">九、逐步操作：一次生成版</a>
+      <a href="#s10">十、常见问题</a>
+      <a href="#s11">十一、边界与承诺</a>
+    </div>
+
+    <article>
+
+<h2 id="s1">一、它是什么：一场你亲手主持的同场对决</h2>
+<p>SDE 金点子发生器是 SDE 智能体品尝系列的第一件作品。它做的事情说穿了极简单：让<strong>同一个大模型基底</strong>，用<strong>同一个问题</strong>、<strong>同一把 API Key</strong>，各答一次。左边一次是它平时的样子——我们称之为普通 AI；右边一次，则是在动笔之前先被注入了一整套叫 <strong>SDE 发生学</strong>的"看世界的眼"。这套眼不问"这个东西是什么"，而问"这个东西在什么条件下、经过什么路径、成为了现在的样子"——在纠缠（E）之中，经由差异（D），显露为如今的形态（S）。</p>
+<p>于是同场对决的结果往往是：左边把百科词条换句话说了一遍，右边却穿透常识，交出一个反直觉但站得住的判断——我们把它叫作<strong>金点子</strong>。请注意这个设计的要害：两边没有换模型、没有换问题、没有偷偷加提示，唯一的变量就是那套发生学的眼。差距有多大，你自己一眼可见，也只能由你自己来见证——因为整条流水线都跑在你的浏览器里，用的是你自己的钥匙。它不给 AI 更多知识，它换掉 AI 看问题的方式；这句话是整个工具的纲领，也是你在使用中要反复回味的东西。</p>
+
+<h2 id="s2">二、一条龙六站：从一个问题到四篇论文</h2>
+<p>发生器不止于对决。它是一条完整的流水线，共六站。<strong>第一站，六篇小论文·三视角对决。</strong>你的问题被从 S 显露、D 差异、E 纠缠三个维度各追问一次，每个维度都让普通 AI 与 SDE 提智 AI 各写一篇约四千字的小论文并排对照，共六篇；每篇都必须给出可查证的证伪条件。<strong>第二站，二阶涌现。</strong>三个金点子各自是一个孤立的判断，而它们之间的空隙才是新东西的诞生地。一套"碰撞、暗流、新典范"的程序把三者相撞，逼出任何单个金点子都看不见的东西，最后过五重检验：点名至少三个最像它的现成概念逐个切割，写下至少两条可查证的证伪条款，并交代这面旗是从哪些矛盾里插下来的。</p>
+<p><strong>第三站，四篇论文。</strong>三个金点子加上新典范，各自扩写成一篇约一万字的正式学术论文，四篇并发；每篇内置一轮打磨——写初稿，交给两位不同基底的审稿人各审一次，主笔再据两份意见改稿。新典范还可以单独扩写成一篇两万字长文。<strong>第四站，二次提智。</strong>对四篇论文再执行一次更深的追问：逮住每篇自己都没质疑过的先验前提，撤销它，从矛盾更深处重新结算出新判断并精确命名，整篇据此重写，目标是把创新水平再推一档、冲击本体论级的一百五十分。<strong>第五站，补规范。</strong>二次提智把思想做深了，却会把学术装置剥掉；这一步只补规范、不动思想，给论文里已在对话的思想家补上真实经典原著的引注、脚注与参考文献表，绝不编造。<strong>第六站，二次审稿加打磨。</strong>两位审稿人复核全篇、重点核查引注，主笔终审打磨，只加固、不推倒。走完六站，你手里是四篇经过双审两轮、带真实文献装置的论文，每一步的产物都可以下载为 Word 或 PDF。需要强调的是：六站是递进而非并列的，前一站的产物是后一站的原料——金点子是涌现的原料，涌现是第四篇论文的核心论点，第一批论文是二次提智的靶子，二次提智稿是补规范的底本。你随时可以在任何一站停下带走成果，但每多走一站，稿子就多经受一层压力测试。</p>
+
+<h2 id="s3">三、看不见的部分：两次提智如何发生</h2>
+<p>右边那栏为什么强？答案不在某句咒语式的提示词里，而在<strong>两次提智</strong>的机制里。第一次提智发生在基底正式干活之前：它要先亲手写一篇约七千字的《从发现到发生》心得——不是背诵方法，而是用它自己的话，把"追问事物如何发生"的思维方式完整内化一遍，诚实检视自己平时答题的惯性，并把三大方程、六路径、一二三原理这三件方法论逐件写下学习心得。写完的心得存在你的浏览器本地，基底与心得一一对应：谁写的心得谁用，绝不互相借用；下次选同一基底会直接秒载复用，你也可以让它重写一份。第二次提智，则是它带着自己写的这份心得上阵，去生成正式的金点子、涌现与论文。先内化，再上阵——这就是右侧与左侧拉开差距的全部秘密，而且是你可以亲手验证的部分：心得就存在你机器上，你随时可以打开看它到底写了什么。</p>
+<p>到了第四站，提智还会换一副更重的装备。第一批四篇用的是静态坐标——二十七宫格意义上的角度库；第二批换用 <strong>SDE 发生引擎</strong>：三大方程、一二三原理、六路径、五连问逮先验。区别在于，第一批的判断是"从角度看出来的"，第二批要把它升级为"从矛盾里生成出来的、不可还原的新结构"。按站内评估口径，第一批四篇通常已达资深学者水平（约一百四十五分），第二批冲击的是一百五十分的本体论级——那意味着论文的核心判断无法被还原为任何一个既有概念的改写。冲击不保证命中，但每一次冲击都会在稿子上留下可检查的痕迹：那个被点名撤销的先验，就白纸黑字写在重写说明里。这也是整套工具最有野心、也最值得围观的一步。</p>
+
+<h2 id="s4">四、九宫格：公平从抽签开始</h2>
+<p>三个视角具体从哪里切入，不由你选，也不由工具偏心地指定，而是从一个九宫格里随机抽签。九宫格由三个维度各三格构成：S 显露维有 S1 规范（对比、变化、分布）、S2 模态（粒子、波、场）、S3 价值（真、善、美）；D 差异维有 D1 意义（特征律、自由律、幸福律）、D2 路径（从问题、猜想一路到聚合、升维）、D3 最优化（最小误差、冗余、亏损）；E 纠缠维有 E1 三界（理念、现实、自我）、E2 信息（符号、逻辑、数学）、E3 能量（内能、动能、势能）。每次生成时从九格中抽取三个互不重合的格子，共有八十四种组合——这意味着同一个问题多问几次，切口会不一样，值得对比着看。</p>
+<p>更要紧的是对决的公平性：左右两栏使用<strong>逐字相同的中性提问</strong>，提问里不带任何发生学术语。普通 AI 拿到的问题和提智 AI 拿到的问题一字不差，差别只在提问之前谁读过那篇心得。抽签保证广度，同题保证公平——这两条是对决可信的地基。</p>
+
+<h2 id="s5">五、两种用法：互动序列与一次生成</h2>
+<p>进入页面的第一件事，是回答"你想怎么用"。<strong>互动序列</strong>是经典模式：九宫格三视角对决、涌现新典范、四篇论文、二次提智、补规范、终审打磨，每一步都由你亲手点、亲眼看。你可以在每一站停下来读产物、下载文档、决定要不要继续，适合想理解机制、想在中途微调的人。<strong>一次生成</strong>则是全自动模式：把五样东西一次填齐——问题、主基底与它的 Key、两位不同基底的审稿人及各自的 Key、作者名、投稿密码——点一下按钮，后台自动依次跑完全程，最后把终审打磨版的四篇自动打包，以你的作者名投进学员投稿收件箱。全程约四十到九十分钟，取决于所选基底，期间请不要关闭页面。想看戏的选前者，只要结果的选后者；两条路的产物规格完全一致。给个建议：第一次来，先用互动序列完整走一遍，亲眼看清每一环在做什么、每一站的产物长什么样——这一遍是你对这套机制建立信任或提出怀疑的机会；之后再用一次生成批量干活，把它当成一台你已经检验过内部构造的机器。顺序反过来，你收到的就只是四篇来历不明的文稿。</p>
+<p>还有一条容易被忽略的规矩：无论哪种模式，两位审稿人都必须使用与彼此不同的基底。这不是形式要求——同一家基底审自己同门写的稿，盲区是重合的；换一家，等于多一双来路不同的眼睛，能照出主笔那一家习惯性放过的东西。</p>
+
+<h2 id="s6">六、基底与钥匙：八家任选，Key 只在你手里</h2>
+<p>发生器支持八家主流基底：DeepSeek V4 Pro、智谱 GLM-5、月之暗面 Kimi K2.6（二五六 K 上下文）、通义千问 Qwen3.7-Max、MiniMax M3（一百万上下文）、GPT-5.5、Claude Opus 4.8、Gemini 3.1 Pro，多数另配一档快速型号。每一家都能亲眼见证"灌了 SDE 内功之后的跃迁"，这本身就是一个可重复的实验：换一家基底，对决重来一次，看差距是否依然存在。</p>
+<p>连接方式分两种。国产四家（DeepSeek、智谱、Kimi、千问）是<strong>浏览器直连</strong>：请求直接从你的浏览器发往厂商，本站服务器全程不经手、不存储、不记录你的 Key 或问题。境外三家（GPT、Claude、Gemini）因大陆无法直连，加上 MiniMax 出于浏览器兼容的稳妥，走<strong>本站中转</strong>：请求经中转服务器转发给厂商，中转只转发、不存储、不记录，用完即走；介意的话，改用国产直连基底即可。无论哪种，你的 API Key 都只保存在本机浏览器的本地存储里，绝不上传。Key 需要自己到各厂商开放平台申请，都充值少量即可体验。一个实用提醒：千问单次输出上限较低，论文约一点二万字封顶，写长文时请留意；追求最高质量请选各家的"深度思考／最强"档，它们会先思考一两分钟再动笔。</p>
+
+<h2 id="s7">七、怎么读产物：把自己当第三位审稿人</h2>
+<p>发生器把稿子交到你手里的那一刻，你的角色就变了：从提问者，变成第三位审稿人。读六篇对决时，别急着被右栏的气势带走，先做一个朴素的对照——左栏的普通 AI 有没有把问题的常识答案说全？如果左栏本身就答得稀烂，那右栏的领先未必是提智之功；只有当左栏中规中矩、右栏仍然拉开身位时，那道差距才真正归功于发生学的眼。接着盯住每篇结尾的证伪条件：它写的是"若在某某处查到某某，则本判断作废"这样可操作的条款，还是一句谁也没法执行的空话？前者是诚实，后者是装饰。</p>
+<p>读新典范时，重点看五重检验里的最近邻切割。它点名的那几个现成概念，你可以真的去查——如果切割之后你发现新典范和其中某一个其实没有实质区别，那这次涌现就失败了，值得清空重来。读四篇论文时，勾选"显示两位审稿人的评审意见"是个好习惯：看审稿人有没有真的用发生学的眼把关，有没有指出主笔滑回了"这是什么"式的发现学答法，主笔改稿时又采纳了几条。二次提智之后，把第二批和第一批并排读：那个被逮住并撤销的先验前提，是不是你自己读第一批时也没有察觉的？如果是，这一刻你就切身体会到了"从矛盾里生成"和"从角度里看出"的差别。这套工具最好的用法，从来不是把产物当成品收下，而是把每一份产物都当靶子打——打不穿的，才配留下。</p>
+
+<h2 id="s8">八、逐步操作：互动序列版</h2>
+<p>第一步，在入口选择层点"互动序列"。第二步，选定主基底并填入它的 Key；页面会提示该基底是否已有存好的心得——有则秒载复用，没有则第一次生成时它会先写心得，你能看着它写。第三步，在输入框里写下你的问题，任何领域都可以，一句话即可；然后点击生成六篇小论文。六路并行，深思档每篇先思考一两分钟，请耐心等几分钟；某一篇若因并发限流报错，刷新重试或换快速档。第四步，读完六篇对决后，点"二阶涌现"，把三个金点子撞成新典范，检查它的五重检验是否老实——最近邻切割了没有，证伪条款写了没有。第五步，设定审稿人 A 与 B：各选一个基底、各填 Key，两位必须用不同基底；然后开始四篇论文的并发生成，约十到三十分钟。第六步起是可选的进阶：依次执行二次提智（约十五到四十分钟）、补规范、二次审稿加打磨。每一站完成后都有对应的下载按钮，产物为 Word 或 PDF，全部内嵌思想拓展声明；最后还可以一键把终稿四篇存入收件箱。</p>
+
+<h2 id="s9">九、逐步操作：一次生成版</h2>
+<p>在入口选择层点"一次生成"，进入设置面板，从上到下五项：其一，问题，例如"如何理解拖延症"或"教育的本质是什么"；其二，主基底与它的 Key，主基底负责写心得、写初稿、据审稿意见改稿，是全程的主笔；其三，两位审稿人，必须选两个不同的基底并各填对应的 Key——若某位审稿人的基底与你之前填过的相同，Key 会自动带出，无需重复填；其四，作者名，这将署在最终投进收件箱的文稿上；其五，投稿密码。五项填齐，点最下方的金色按钮，后台自动跑完六篇对决、涌现、四篇论文、二次提智、补规范、终审打磨的全程并存入收件箱。这条路最重要的纪律只有一条：<strong>四十到九十分钟内不要关闭页面</strong>，整条流水线跑在你的浏览器里，页面一关，进程即断。</p>
+
+<h2 id="s10">十、常见问题</h2>
+<p><strong>某一路报错了怎么办？</strong>多半是厂商侧并发限流，刷新重试，或把该路换成快速档。<strong>为什么等这么久？</strong>深思档的基底在动笔前要真的思考一两分钟，六篇对决要几分钟，四篇论文十到三十分钟，二次提智与终审各十五到四十分钟——质量与耐心成正比。<strong>心得会过期吗？</strong>不会，它存在本地并与基底一一对应，下次秒载；若你怀疑心得写得敷衍，随时可点"重写心得"让它重新内化一遍。<strong>同一个问题可以问多次吗？</strong>可以，而且推荐：下载结果后点"清空结果"，同题再生成一次，九宫格会抽出不同组合，对比多次结果的差异本身就是一堂发生学的课。<strong>会很贵吗？</strong>各家充值少量即可体验；跑完全程消耗最大的是四篇一万字论文与两轮审稿，选国产基底通常更经济。<strong>我的问题和 Key 会被网站看到吗？</strong>直连基底完全不会；中转基底只经转发、不存储不记录。<strong>下载的文档里那段"思想拓展声明"是什么？</strong>它交代这些文本是人工智能在 SDE 方法论加持下的思想实验产物，是诚实装置的一部分，请保留。<strong>互动序列可以跳站吗？</strong>前三站是主干，顺序不可跳：没有六篇对决就没有金点子，没有金点子就无从涌现，没有涌现就凑不齐第四篇；从第四站起的二次提智、补规范、终审属于进阶，可以按需停在任何一站。<strong>手机上能用吗？</strong>可以打开，但一条流水线动辄几十分钟、页面不能关，用电脑浏览器体验稳妥得多。</p>
+
+<h2 id="s11">十一、边界与承诺</h2>
+<p>最后说清楚两件事。第一，<strong>这只是"尝一口"</strong>。金点子发生器展示的是 SDE 提智最轻量的一层；完整的 SDE 智能体集群还能锻造学术论文、解构经典、生成跨学科新范式，由王德生五十五部以上专著背书。第二，<strong>这套工具的诚实是设计出来的</strong>：每个金点子必须交出证伪条件，每个新典范必须点名最近邻并写下自己的死刑执行条款，补规范一步宁可少引、绝不错引，绝不编造页码、引文或假文献。它请你做的，不是崇拜产出，而是检验产出——拿着那些证伪条款，去现实里查。如果查下来它错了，那恰恰证明这套装置在正常工作；如果查下来它站住了，你就亲手见证了一次发生。现在，回到入口，带上你的问题。</p>
+
+    </article>
+
+    <div class="gobox">
+      <a class="btn" href="/taste/idea-generator/">🚀 前往 SDE 金点子发生器</a>
+      <div style="margin-top:12px;font-size:13px;color:var(--muted)">读完手册，带一个问题进去，带四篇论文出来。</div>
+    </div>
+
+  </div>
+</section>
+
+
+<footer>
+<div>SDE Universes &middot; 显露 &middot; 差异 &middot; 纠缠 &nbsp;|&nbsp; 德麦国际 &middot; 王德生 &nbsp;|&nbsp; <a href="/browse/">sdeuniverses.com</a></div>
+</footer>
+
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body></html>

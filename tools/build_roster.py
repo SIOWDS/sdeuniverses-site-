@@ -1,0 +1,442 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+从磁盘重建 public/students/roster.json。
+
+为什么存在这个脚本
+------------------
+roster.json 是**派生数据**：谁发了哪篇、哪天发的、多少字，这些事实已经全部写在
+已发布的页面里了。以前它靠手工维护，于是必然有两种死法：
+
+  1. 漏更 —— 发表提交忘了带上 roster（commit 823c99e / 7-16 那批 / 秦莉今天两条）；
+  2. 撞车 —— 两个 agent 同时改这一个文件，rebase 冲突；手工解冲突时一不小心
+     就把对方的数据整段抹掉（用错 --ours/--theirs 即可，方向极易搞反）。
+
+改成"从磁盘派生"之后，这两种死法一起消失：
+  · 漏更不可能 —— 页面在磁盘上，扫描就能看见，不依赖任何人记得更新；
+  · 撞车可自动化解 —— 论文页各在各的路径、天然不冲突，合并后磁盘已是双方成果的
+    并集；此时只要重跑本脚本，输出就是正确的并集。任选一边收下冲突再重跑即可，
+    绝不会丢数据。
+
+哪些字段仍是手工的
+------------------
+slug / name / small / enrolled_order 是学员身份信息，磁盘上推不出来，继续由
+roster.json 承载（新学员报名时才动）。本脚本只覆盖 papers[] 与 count。
+
+用法
+----
+    python3 tools/build_roster.py            # 重建并写回
+    python3 tools/build_roster.py --check    # 只比对不写（CI/提交前自检，有差异则退出码 1）
+"""
+import json, os, re, subprocess, sys, datetime
+from html.parser import HTMLParser
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STUDENTS = os.path.join(ROOT, 'public', 'students')
+ROSTER = os.path.join(STUDENTS, 'roster.json')
+
+# 索引页约定名：这些目录是"目录页"，不是作品本身
+INDEX_NAMES = {'works', 'submit', 'starter-template',
+               # 学员级频道的容器页（卡片目录，不是作品本身）
+               'tcm-philosophy', 'cinema-literature', 'precision-medicine',
+               'risk-and-care', 'conflict-peace', 'cancer', 'chronic-disease'}
+
+# 频道容器页的机器可读标记。新建学员级频道时在 hub 页 <head> 里放一行
+#     <meta name="sde-page-kind" content="channel">
+# 即可被本脚本自动排除，不必再往上面那张名单里手工加名字。
+CHANNEL_MARK = 'name="sde-page-kind" content="channel"'
+
+# 页面骨架：这些标签/类下的文字不算正文字数
+SKIP_TAGS = {'script', 'style', 'nav', 'footer', 'head'}
+SKIP_CLASSES = {
+    'readbar', 'topbar', 'endbox', 'foot-nav', 'navhint', 'side-tap',
+    'lang-toggle', 'rb-modes', 'controls', 'nav-right', 'back', 'modes',
+}
+
+
+class BodyText(HTMLParser):
+    """按标签与 class 跳过骨架，取正文。
+
+    不用正则剥离骨架：`<div class="topbar">.*?</div></div>` 这类写法靠猜嵌套，
+    `.*?` 会停在文档里第一个 `</div></div>`，把正文整段吞掉（黑咖啡那首诗就是
+    这么从 319 字缩成 31 字的）。改为跟踪真实标签深度。
+    """
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.buf = []
+        self.skip_depth = 0     # >0 表示正处在被跳过的子树里
+        self.stack = []         # (tag, 是否是本次跳过的起点)
+
+    def handle_starttag(self, tag, attrs):
+        starts_skip = False
+        if self.skip_depth == 0:
+            cls = dict(attrs).get('class', '') or ''
+            names = set(cls.split())
+            if tag in SKIP_TAGS or (names & SKIP_CLASSES):
+                starts_skip = True
+                self.skip_depth = 1
+        elif tag not in ('br', 'img', 'hr', 'meta', 'link', 'input'):
+            self.skip_depth += 1
+        if tag not in ('br', 'img', 'hr', 'meta', 'link', 'input'):
+            self.stack.append((tag, starts_skip))
+
+    def handle_endtag(self, tag):
+        while self.stack:
+            t, starts = self.stack.pop()
+            if t == tag:
+                if starts:
+                    self.skip_depth = 0
+                elif self.skip_depth > 0:
+                    self.skip_depth -= 1
+                break
+
+    def handle_data(self, data):
+        if self.skip_depth == 0:
+            self.buf.append(data)
+
+    def text(self):
+        return re.sub(r'\s+', '', ''.join(self.buf))
+
+
+
+def is_leaf_item(d):
+    """含 index.html 且其下再无 index.html 子目录 → 一件作品。"""
+    if not os.path.exists(os.path.join(d, 'index.html')):
+        return False
+    for sub in os.listdir(d):
+        p = os.path.join(d, sub)
+        if os.path.isdir(p) and os.path.exists(os.path.join(p, 'index.html')):
+            return False
+    return True
+
+
+def find_items(slug_dir):
+    """返回该学员的全部作品目录（递归，跳过索引页约定名）。"""
+    out = []
+
+    def walk(d):
+        idx = os.path.join(d, 'index.html')
+        children = [
+            os.path.join(d, name)
+            for name in sorted(os.listdir(d))
+            if name not in INDEX_NAMES and os.path.isdir(os.path.join(d, name))
+        ]
+        indexed_children = [
+            child for child in children
+            if os.path.exists(os.path.join(child, 'index.html'))
+        ]
+
+        if os.path.exists(idx):
+            if CHANNEL_MARK in open(idx, encoding='utf-8').read():
+                pass  # 频道容器页：是卡片目录，不是作品
+            elif not indexed_children:
+                out.append(d)
+            else:
+                # A published paper may also contain application sub-papers.
+                # Count the parent when it carries an article signature; plain
+                # collection pages (for example essays/ and poems/) stay excluded.
+                source = open(idx, encoding='utf-8').read()
+                # 2026-08-15：并蒂文批次给母文加了 interpretation/ 与 practice/ 两个子页，
+                # 于是母文自己被这一支静默排除——全站漏掉 9 篇（高鹏 8、孔凡鹤 1，
+                # 其中孔凡鹤那篇还是专著条目页，权重 10）。判据因此放宽到「页面自带
+                # 文章签名」：art-title 标题、并蒂三联块、或旧的 submission-id / readbar。
+                # 学员主页与频道容器页不会命中这三样（频道页另有 CHANNEL_MARK 先行拦下）。
+                if (
+                    'sde-submission-id' in source
+                    or re.search(r'class=["\'][^"\']*\breadbar\b', source)
+                    or re.search(r'class=["\'][^"\']*\bart-title\b', source)
+                    or 'bindi-triad' in source
+                ):
+                    out.append(d)
+
+        for child in children:
+            walk(child)
+
+    for name in sorted(os.listdir(slug_dir)):
+        d = os.path.join(slug_dir, name)
+        if os.path.isdir(d) and name not in INDEX_NAMES:
+            walk(d)
+    return out
+
+
+COMPANION_FILES = ('explain.html', 'practice.html')
+
+# 并蒂文（诠释文／实践文）的目录体例：<母文 slug>/interpretation/ 与 /practice/。
+COMPANION_DIRS = ('interpretation', 'practice')
+
+# 2026-08-16 王德生裁定：**并蒂文算 0.5 分，半个 paper**。
+# 件数（items）照记一件，计分篇数（count）与排名的 depth 都按半篇折算——
+# 并蒂文由 SDE 编辑部撰写、依附于母文，全额计入会让「谁配了并蒂文」
+# 比「谁写了什么」更能决定名次（占比曾从 0% 到 29% 不等）。
+COMPANION_WEIGHT = 0.5
+
+
+def is_companion_dir(d):
+    """目录体例的并蒂页：母文目录下的 interpretation/ 或 practice/。"""
+    return os.path.basename(d) in COMPANION_DIRS
+
+
+def is_redirect_shell(path):
+    """升级到子目录版之后留下的 307/refresh 壳，不是作品。"""
+    s = open(path, encoding='utf-8', errors='ignore').read()
+    if 'http-equiv="refresh"' in s.lower() or '已按新标准升级' in s:
+        return True
+    return body_chars(path) < 500
+
+
+def find_companion_files(slug_dir):
+    """同目录体例的并蒂文（<slug>/explain.html、<slug>/practice.html）。
+
+    2026-08-16 王德生令「并蒂文也要算分」。站上并蒂文有两种落法：
+      · 子目录版 <slug>/interpretation/ 与 <slug>/practice/ —— 本来就被 find_items 收；
+      · 同目录版 <slug>/explain.html 与 <slug>/practice.html —— 是文件不是目录，
+        find_items 只走目录，于是全站 164 页（胡敏 64、秦莉 28、陈晓艳 24、
+        高鹏 20、孔凡鹤 20、阳涌 6、黄倩盈 2）一直不计件、不进排名。
+    同一种内容因为落法不同而一收一漏，是口径不一致，不是设计。此处补齐。
+    """
+    out = []
+    for root, dirs, files in os.walk(slug_dir):
+        if os.path.basename(root) in INDEX_NAMES:
+            dirs[:] = []
+            continue
+        for name in files:
+            if name in COMPANION_FILES:
+                path = os.path.join(root, name)
+                if not is_redirect_shell(path):
+                    out.append(path)
+    return sorted(out)
+
+
+_git_cache = {}
+
+
+def git_added_date(path):
+    """该文件首次进入仓库的日期——发表日期的兜底来源。"""
+    if path in _git_cache:
+        return _git_cache[path]
+    try:
+        r = subprocess.run(
+            ['git', 'log', '--diff-filter=A', '--follow', '--format=%as', '--', path],
+            cwd=ROOT, capture_output=True, text=True, timeout=30)
+        lines = [l for l in r.stdout.strip().split('\n') if l]
+        d = lines[-1] if lines else None
+    except Exception:
+        d = None
+    _git_cache[path] = d
+    return d
+
+
+def published_date(idx):
+    """优先取页面自报的发表日期（发表规格的强制字段），缺则用 git 首次提交日兜底。"""
+    s = open(idx, encoding='utf-8').read()
+    m = re.search(r'发表于\s*(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日', s)
+    if m:
+        return f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}", 'page'
+    m = re.search(r'Published\s+([A-Z][a-z]{2})\w*\s+(\d{1,2}),\s*(\d{4})', s)
+    if m:
+        mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].index(m.group(1)) + 1
+        return f"{m.group(3)}-{mon:02d}-{int(m.group(2)):02d}", 'page'
+    d = git_added_date(os.path.relpath(idx, ROOT))
+    return d, 'git'
+
+
+def paper_weight(idx):
+    """页面自报的计分权重（相当于几篇标准论文）。
+
+    为什么放在页面里：roster.json 是派生数据，每次内容 push 都由本脚本从磁盘重建，
+    手写进 roster 的字段必被覆盖。长篇专著/小说这类"一件顶多篇"的作品，权重必须与
+    页面同在，才能在自动重建后存活。
+
+        <meta name="sde:paper-weight" content="20">
+    """
+    s = open(idx, encoding='utf-8').read()
+    m = re.search(r'<meta\s+name=["\']sde:paper-weight["\']\s+content=["\']([\d.]+)["\']', s)
+    if not m:
+        return None
+    try:
+        w = float(m.group(1))
+    except ValueError:
+        return None
+    if w <= 0 or w > 100:      # 明显写错的挡掉，不让它污染排名
+        return None
+    return int(w) if w == int(w) else w
+
+
+def work_meta(idx):
+    """页面自报的作品类型与书名（专著条目专用）。
+
+    与 sde:paper-weight 同理，写在页面里才能在 roster 自动重建后存活：
+
+        <meta name="sde:work-type"  content="book">
+        <meta name="sde:work-title" content="战争的资格">
+
+    书名要进 roster 是因为学员榜要把「发表的书名」直接列在名次旁边——
+    只报一个加权篇数，读者看不出那二十篇是哪一本书顶上来的。
+    """
+    s = open(idx, encoding='utf-8').read()
+    kind = re.search(r'<meta\s+name=["\']sde:work-type["\']\s+content=["\']([^"\']+)["\']', s)
+    title = re.search(r'<meta\s+name=["\']sde:work-title["\']\s+content=["\']([^"\']+)["\']', s)
+    return (kind.group(1) if kind else None), (title.group(1) if title else None)
+
+
+try:
+    from classify_fields import classify as _classify_field
+except ImportError:                                   # 与本文件同目录，CI 里以 tools/ 为 cwd 之外调用时兜底
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from classify_fields import classify as _classify_field
+
+
+def paper_field(idx):
+    """把这篇归入一张固定的一级领域表（见 tools/classify_fields.py）。
+
+    为什么不用页面眉题里的学科标签：那是每篇自造的长复合标签，不是分类——
+    高鹏 74 篇能产出 49 个「领域」，而黄倩盈、胡敏、张琼的眉题里根本没有学科字段。
+    按标签数算广度会得出与事实相反的结论，所以改由标题＋关键词＋摘要归类。
+    """
+    f, _n = _classify_field(idx)
+    return f
+
+
+def paper_iq(idx):
+    """页面自报的 SDE 创新智商分及其口径。
+
+    与 sde:paper-weight 同理：roster.json 是派生数据，手写字段必被本脚本覆盖，
+    所以分数只能从页面里抽。全站现有三种写法，口径不同，必须分开标：
+
+        「SDE 创新智商 136 → 打磨目标 146」  前者=原稿盲评，后者=打磨目标（不计分）
+        「本文的盲评分为 132」               盲评
+        「SDE 创新智商 138（原稿盲评…）」    盲评
+        「SDE 创新智商：149」               旧 Codex 单值，口径不明 → legacy，不进排名
+
+    返回 (分数, 口径) 或 (None, None)。排名公式只采用 kind == 'blind'。
+    """
+    s = open(idx, encoding='utf-8').read()
+    t = re.sub(r'<[^>]+>', '', s)
+    m = re.search(r'创新智商[：:\s]*(\d{3})\s*(?:→|-&gt;|->)', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    m = re.search(r'盲评分为\s*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    m = re.search(r'创新智商[：:\s]*(\d{3})\s*[（(]\s*原稿盲评', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    # 「SDE 创新智商　盲评 134 → 修改设计目标 136」/「盲评 137 → 加固后 138」
+    # 箭头左边是原稿盲评，右边是编辑增补后的修改设计目标（不计分）
+    m = re.search(r'创新智商[：:\s\u3000]*盲评\s*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    # 「关于本文的创新智商标注　本文在未经任何编辑改动的原稿状态下接受过一次盲评…按固定权重计算的综合分为 130」
+    m = re.search(r'创新智商标注[\s\S]{0,600}?综合分为\s*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    # 「SDE 创新智商 138　全文盲评 · 待独立复核」/「…结构化盲评…」
+    # 分数后面紧跟口径标签的写法：标了盲评就是盲评，不能落进 legacy 兜底。
+    m = re.search(r'创新智商[：:\s\u3000]*(\d{3})[\s\u3000]*(?:全文盲评|结构化盲评|盲评)', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    m = re.search(r'创新智商[：:\s]*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'legacy'
+    return None, None
+
+
+def body_chars(idx):
+    """正文字数：跳过骨架后数字符（CJK 一字算一字）。"""
+    p = BodyText()
+    p.feed(open(idx, encoding='utf-8').read())
+    return len(p.text())
+
+
+def build():
+    roster = json.load(open(ROSTER, encoding='utf-8'))
+    for stu in roster['students']:
+        d = os.path.join(STUDENTS, stu['slug'])
+        if not os.path.isdir(d):
+            stu['papers'], stu['count'] = [], 0
+            continue
+        papers = []
+        for item in find_items(d):
+            idx = os.path.join(item, 'index.html')
+            date, src = published_date(idx)
+            if not date:
+                print(f"  ⚠ 无法确定发表日期，跳过: {os.path.relpath(item, STUDENTS)}", file=sys.stderr)
+                continue
+            rec = {'slug': os.path.relpath(item, STUDENTS).replace(os.sep, '/'),
+                   'date': date, 'words': body_chars(idx)}
+            iq, kind = paper_iq(idx)
+            if iq is not None and 80 <= iq <= 175:
+                rec['iq'], rec['iq_kind'] = iq, kind
+            fld = paper_field(idx)
+            if fld:
+                rec['field'] = fld
+            # 诗歌与论文同权：排名公式给 type=poem 记 depth 1.0，不按篇幅折算。
+            # 站上的约定是诗歌收在该生的 poems/ 目录下。
+            if os.path.basename(os.path.dirname(item)) == 'poems':
+                rec['type'] = 'poem'
+            w = paper_weight(idx)
+            if w is not None:
+                rec['weight'] = w
+            if is_companion_dir(item):
+                # 并蒂文半篇计分（COMPANION_WEIGHT）。页面自报 weight 的优先，
+                # 但并蒂页从不自报，实际上这一支总是走 0.5。
+                rec['kind'] = 'companion'
+                rec.setdefault('weight', COMPANION_WEIGHT)
+            kind, title = work_meta(idx)
+            if kind:
+                rec['kind'] = kind
+            if title:
+                rec['title'] = title
+            papers.append(rec)
+        # 同目录体例的并蒂文（explain.html / practice.html）——见 find_companion_files。
+        # 与子目录版一样按「每篇一件」计；不取 iq：并蒂文由编辑部撰写，
+        # 创新维只采母文的原稿盲评，派生页不得重复喂分（实测全站并蒂页零处带分）。
+        for f in find_companion_files(d):
+            date, _src = published_date(f)
+            if not date:
+                print(f"  ⚠ 无法确定发表日期，跳过: {os.path.relpath(f, STUDENTS)}", file=sys.stderr)
+                continue
+            rec = {'slug': os.path.relpath(f, STUDENTS).replace(os.sep, '/'),
+                   'date': date, 'words': body_chars(f), 'kind': 'companion',
+                   'weight': COMPANION_WEIGHT}
+            fld = paper_field(f)
+            if fld:
+                rec['field'] = fld
+            papers.append(rec)
+        papers.sort(key=lambda p: (p['date'], p['words']), reverse=True)
+        stu['papers'] = papers
+        # count 是**加权篇数**，不是页面数（王德生 2026-08-07 裁定：专著按十篇论文计算）。
+        # 权重来自页面自报的 <meta name="sde:paper-weight">，缺省为 1。
+        # 一部专著抵十篇写在专著条目页里，因此本脚本从磁盘重建后权重仍然存活；
+        # 想知道有多少个页面，用 len(papers)，别用 count。
+        total = sum(p.get('weight', 1) for p in papers)
+        stu['count'] = int(total) if float(total).is_integer() else round(total, 1)
+        stu['items'] = len(papers)
+    roster['students'].sort(key=lambda s: s['enrolled_order'])
+    roster['updated'] = datetime.date.today().isoformat()
+    return roster
+
+
+def dump(r):
+    return json.dumps(r, ensure_ascii=False, indent=2) + '\n'
+
+
+if __name__ == '__main__':
+    new = build()
+    text = dump(new)
+    if '--check' in sys.argv:
+        cur = open(ROSTER, encoding='utf-8').read()
+        if cur == text:
+            print('[OK] roster.json 与磁盘一致')
+            sys.exit(0)
+        print('roster.json 与磁盘不一致 ❌ —— 请运行 python3 tools/build_roster.py', file=sys.stderr)
+        old = json.load(open(ROSTER, encoding='utf-8'))
+        om = {s['slug']: s['count'] for s in old['students']}
+        for s in new['students']:
+            if om.get(s['slug']) != s['count']:
+                print(f"  {s['name']}({s['slug']}): roster {om.get(s['slug'])} → 磁盘 {s['count']}", file=sys.stderr)
+        sys.exit(1)
+    open(ROSTER, 'w', encoding='utf-8').write(text)
+    total = sum(s['count'] for s in new['students'])
+    print(f"roster.json 已重建：{len(new['students'])} 名学员 · 作品合计 {total} 件")

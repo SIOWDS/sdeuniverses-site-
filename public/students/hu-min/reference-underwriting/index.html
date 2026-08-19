@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>垫指：应试教育杀掉的是那一类「删掉它读数不变」的动作 · 胡敏 · SDE 学员专栏</title>
+<meta name="description" content="从同义突变、未成交的估值与音位合并看一条五步停产次序，以及为什么最后的拦截点在批改端而不在学生端">
+<style>
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--paper:#1B3A26;--muted:#5E7263;--bg:#0E0B08;--panel:#171310}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.30)}
+body{background:var(--bg);color:#EAE2CE;font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+a{color:var(--gold);text-decoration:none}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,0.28);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#CBBE94;font-size:13px;letter-spacing:0.04em}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(201,168,76,0.5);color:#D9CDA0;letter-spacing:0.03em}
+.rb-btn.cur{background:var(--gold);color:#1A1410;font-weight:700;border-color:var(--gold)}
+.art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
+.art-series{font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:22px}
+.art-title{font-size:clamp(24px,4.2vw,36px);font-weight:800;line-height:1.55;color:#F5EFE0;letter-spacing:0.02em}
+.art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--gold2);margin-top:18px;line-height:1.85;letter-spacing:0.01em}
+.art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.12em}
+.wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
+.abstract{background:linear-gradient(160deg,#1C1712,#141009);border-left:3px solid var(--gold);padding:22px 26px;margin:20px 0 26px;font-size:15.5px;line-height:1.95}
+.abstract .ab-lbl{font-size:12px;letter-spacing:0.3em;color:var(--gold);margin-bottom:10px}
+.abstract p{color:#CFC6AE;text-align:justify}
+.keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 30px;padding-bottom:24px;border-bottom:1px solid rgba(201,168,76,0.2)}
+.keywords strong{color:var(--gold)}
+.wrap h2{font-size:22px;font-weight:800;color:#F2ECDC;margin:44px 0 18px;letter-spacing:0.02em;padding-top:8px;border-bottom:1px solid rgba(201,168,76,0.18);padding-bottom:8px}
+.wrap h2.notes-head{font-size:20px}
+.wrap h3{font-size:18px;font-weight:700;color:#E6DCC2;margin:30px 0 12px;letter-spacing:0.01em}
+.wrap p{margin-bottom:20px;text-align:justify;color:#DED6BF;text-indent:2em}
+.wrap p.ref{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:8px;text-indent:-2em;padding-left:2em;text-align:left}
+.wrap strong{color:var(--gold2);font-weight:700}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a3a 0%,#150f24 60%,#0c0818 100%);text-align:center;padding:60px 24px;margin-top:40px;border-radius:4px}
+.endbox .lbl{font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:16px}
+.endbox .big{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.06em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:1.95}
+.endbox a{display:inline-block;padding:12px 30px;font-size:14.5px;letter-spacing:0.08em;border-radius:2px;margin:5px;text-decoration:none}
+.endbox .solid{background:#D4B25E;color:#150F24;font-weight:700}
+.endbox .ghost{border:1px solid #D4B25E;color:#D4B25E}
+footer{background:#141009;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid rgba(201,168,76,0.15)}
+footer a{color:var(--gold)}
+@media(max-width:640px){body{font-size:16.5px}}
+
+/* ===== 统稿增补 ===== */
+.lead{max-width:760px;margin:0 auto;padding:30px 24px 0}
+.innov{background:linear-gradient(135deg,#3a2f18,#2a2212 60%,#1c1710);border:1px solid rgba(201,168,76,0.35);border-radius:12px;padding:24px 28px;margin:0 0 22px;box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.innov .lbl{font-size:12px;letter-spacing:0.28em;color:#D4B25E;margin-bottom:12px;font-weight:700}
+.innov .lbl::before{content:"✦ ";color:#F0C860}
+.innov .txt{font-size:16.5px;line-height:1.92;color:#EDE3CC}
+.innov .txt b{color:#F0C860;font-weight:700}
+.daodu{background:#181310;border:1px solid rgba(201,168,76,0.3);border-left:4px solid #C9A84C;border-radius:10px;padding:24px 28px;margin:0 0 6px}
+.daodu .lbl{display:inline-block;font-size:12px;letter-spacing:0.22em;color:#1a140c;background:#C9A84C;padding:5px 14px;border-radius:20px;margin-bottom:14px;font-weight:700}
+.daodu h4{font-size:17.5px;color:#EDE3CC;margin:0 0 16px;font-weight:800}
+.daodu .row{margin:12px 0;line-height:1.88;color:#CDC0A6;font-size:15.5px}
+.daodu .row .k{color:#D4B25E;font-weight:800}
+.hl2{background:rgba(201,168,76,0.16);border-bottom:2px solid #C9A84C;padding:1px 4px;font-weight:700;color:#F0E4C8;border-radius:2px}
+
+/* ===== 加固节与评分块 ===== */
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.scorebox p{margin:8px 0 0;font-size:14px;color:#BCB196;text-indent:0;line-height:1.85}
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h3{font-size:17px;color:#E6DCC2}
+.supptip{font-size:14.5px;opacity:.82;text-indent:0!important}
+.supp .pull{border-left:3px solid #C9A84C;background:rgba(201,168,76,0.10);padding:14px 18px;margin:14px 0;text-indent:0!important;font-size:16.5px;color:#F0E4C8}
+
+.tw{overflow-x:auto;margin:22px 0 26px}
+.tw table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.7}
+.tw th,.tw td{border:1px solid rgba(201,168,76,.28);padding:8px 11px;text-align:left;vertical-align:top;color:#D8D0B8}
+.tw th{background:rgba(201,168,76,.10);color:var(--gold2);font-weight:700}
+.wrap h2.notes-head{margin-top:48px}
+.lead{max-width:760px;margin:0 auto;padding:0 24px}
+.lead .innov{background:linear-gradient(145deg,#20180f,#161009);border:1px solid rgba(201,168,76,.34);border-radius:5px;padding:18px 22px;margin:6px 0 14px}
+.lead .innov .lbl{font-size:11.5px;letter-spacing:.28em;color:var(--gold);margin-bottom:8px}
+.lead .innov .txt{font-size:15px;line-height:1.9;color:#DED6BF}
+.lead .daodu{background:#131009;border-left:3px solid var(--gold2);padding:16px 20px;margin-bottom:16px}
+.lead .daodu .lbl{font-size:11.5px;letter-spacing:.28em;color:var(--gold)}
+.lead .daodu h4{font-size:15px;color:#EDE5D0;margin:8px 0 10px;font-weight:700}
+.lead .daodu .row{font-size:14px;line-height:1.85;color:#CFC6AE;margin-bottom:7px}
+.lead .daodu .row .k{color:var(--gold2);font-weight:700}
+.scorebox{max-width:760px;margin:0 auto 6px;padding:0 24px}
+.scorebox b{color:var(--gold2)}
+.scorebox p{font-size:13px;line-height:1.85;color:#B5AC92;margin-top:6px}
+.enbox{border:1px solid rgba(201,168,76,.2);border-radius:5px;padding:16px 20px;margin:0 0 28px;font-size:13.5px;line-height:1.8;color:#B9B097}
+.supp{border:1px solid rgba(201,168,76,.34);background:linear-gradient(165deg,#1D1811,#141009);border-radius:6px;padding:6px 26px 22px;margin:26px 0 10px}
+.supp h3{font-size:17px;color:var(--gold2);margin:26px 0 10px;border-left:3px solid var(--gold);padding-left:11px}
+.supp p.pull{font-size:16.5px;line-height:2.0;color:#F0E7CF;background:rgba(201,168,76,.10);border-left:3px solid var(--gold2);padding:16px 20px;text-indent:0;margin:16px 0 20px}
+.supp ol{margin:0 0 20px 1.6em;color:#DED6BF}
+.supp ol li{margin-bottom:10px;line-height:1.9;text-align:justify}
+.supp p.ref{margin-top:18px}
+.suphd{font-size:22px!important}
+.enbox .lbl{font-size:11px;letter-spacing:.3em;color:var(--gold);margin-bottom:8px}
+
+.tblwrap{overflow-x:auto;margin:22px 0}
+.tbl{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.75}
+.tbl th,.tbl td{border:1px solid rgba(201,168,76,.30);padding:8px 11px;text-align:left;vertical-align:top}
+.tbl th{background:rgba(201,168,76,.12);color:#E7D9A6;font-weight:700}
+blockquote{border-left:2px solid rgba(201,168,76,.42);margin:16px 0;padding:2px 0 2px 16px;color:#C6BC9C}
+.wrap .xp-app{list-style:none;margin:14px 0;padding:0}
+.wrap .xp-app li{position:relative;padding:9px 0 9px 16px;border-top:1px dashed rgba(201,168,76,.22);line-height:1.9}
+.wrap .xp-app li:first-child{border-top:none}
+.wrap .xp-app li:before{content:"";position:absolute;left:0;top:20px;width:5px;height:5px;background:#C9A84C;transform:rotate(45deg)}
+</style>
+<link rel="stylesheet" href="/sde-read.css">
+</head>
+<body class="sde-read">
+<div class="readbar">
+  <a class="nav-back" href="/students/hu-min/hu-min-talks/">‹ 胡敏谈</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="/exam-education/">📚 应试教育专栏</a></div>
+</div>
+<header class="art">
+  <div class="art-series">胡敏谈 · 应试教育 · 贰 · 杀掉了什么</div>
+  <h1 class="art-title">垫指：应试教育杀掉的是那一类「删掉它读数不变」的动作</h1>
+  <div class="art-subtitle">从同义突变、未成交的估值与音位合并看一条五步停产次序，以及为什么最后的拦截点在批改端而不在学生端</div>
+  <div class="art-meta">作者 胡敏 · SDE 学员 · 约 2.1 万字 · 分子遗传学 · 金融学 · 语言学 · 发表于2026年8月8日</div>
+</header>
+<div class="lead">
+  <div class="innov"><div class="lbl">本文的那一刀</div><div class="txt">关于应试教育「扼杀了什么」，三种流行答案分别把损失定位在能力、动机、分数的准确性，而三者共享一个未被说出的假定：<b>被杀掉的东西独立于测量而存在，因而可以另找一把尺子去量</b>。本文界定一类此前没有本体地位的动作——垫指：它与另一条来路在本次读数上产出<b>完全相同</b>的结果，删掉它读数不变，因而任何账本都不为它设字段；而只有它在维持「这个读数还指着它所声称的那样东西」这条链。</div></div>
+  <div class="daodu"><span class="lbl">导读</span><h4>读这篇，你会看见三件事</h4><div class="row"><span class="k">三门学问逼出同一格　</span>分子遗传学的同义替换（碱基变了、氨基酸没变）、金融学里「做完独立估值后决定不交易」的那一类工作、语言演变中防止音位合并的冗余区别——三个量纲完全不同的领域里的同一种东西：读数为零，而链靠它维持。</div><div class="row"><span class="k">真跑没跑成，作者照实写了　</span>预注册八个公开代码仓、两千四百条记录，实际因接口配额被反复挡回，<b>只拿到五仓两百九十二条</b>。三个不利结果照登，并据此把读数限死为同一体系内的纵向比较，不得跨组织横比。</div><div class="row"><span class="k">一句可以拿去问文件的话　</span>这套记录体系里，有没有一个字段用来记「这一次投入产生了什么」？没有字段，就没有账；没有账，停产不留痕。</div></div>
+</div>
+<div class="scorebox"><b>SDE 创新智商 135 → 打磨目标 141 · 待独立复核</b><p><b>135</b>（精确读数 135.40）是投稿原稿的全文盲评（五维 S 140　D 137　E 136　I 121　F 145，加权 S×.20+D×.25+E×.20+I×.20+F×.15，参照语料＝教育测量与效度理论、课程研究、组织社会学与制度理论、控制论与激励理论、实施科学，中英文公开文献，并计入站内自撞；评分截至 2026 年 8 月）。<b>141</b> 是文末「最美文定稿」一节（编辑增补的最近邻切割、相反预测与裁决设计）之后的<b>编辑自评</b>。按本站铁律，改稿者不得为自己改过的文本盖认证分，故后一数只作修改设计目标，须由另一位独立评分者复评后方能作数。<span style="opacity:.8">（评分：Claude · 2026年8月8日）</span></p></div>
+<div class="wrap">
+<div class="abstract"><div class="ab-lbl">摘　要</div><p>关于应试教育”扼杀了什么”，流行的三种回答分别把损失定位在能力、在动机、在分数的准确性。本文认为三者都没有说中，因为它们共享一个未被说出的假定：那样被杀掉的东西，是一个独立于测量而存在、因而可以另找一把尺子去量的东西。本文提出并界定一类此前没有本体地位的动作——<b>垫指</b>：它与另一条来路在本次读数上产出完全相同的结果，删掉它读数不变，因而任何账本都不为它设字段；而只有它在持续维持”这个读数还指着它所声称的那样东西”这条链。分子遗传学中的同义替换、证券市场中”做完独立估值后决定不交易”的那一类工作、语言演变中防止音位合并的那些冗余区别，是它在三个量纲完全不同的领域里的同一比率。垫指的消失遵循一条五步次序：等值化、择廉、失信号、合并、停产；其中第四步”合并”是不可返工关口，它发生在批改端而不是学生端——先是判卷者不再能分辨两条来路，然后学生才不再走贵的那条。据此，全文的判据是一句不含程度词的问话：<b>在这次得到这个读数的过程里，删掉哪一个动作读数不会变？那个动作有没有被任何记录保存下来？</b> 本文给出一份”不留痕动作清单”及其派生的覆盖率读数，附清点手册，并报告一次基于 292 条公开记录的预注册检验及其三个不利结果。结论是：应试教育不是把某种能力损坏了，而是让一类动作停产；停产不产生任何信号，因为这类动作的定义就是”它不产生信号”。</p></div>
+<p class="keywords"><b>关键词</b>　垫指；不留痕动作清单；读数与所指；合并不可逆；批改端分辨力；应试教育</p>
+<div class="enbox"><div class="lbl">ENGLISH TITLE &amp; ABSTRACT</div><p style="margin-bottom:8px"><b>Title</b>　Reference-Underwriting: What High-Stakes Examination Actually Eliminates Is the Class of Acts Whose Deletion Leaves the Reading Unchanged</p><p style="margin-bottom:8px"><b>Abstract</b>　Three standard accounts locate the damage of examination-driven schooling in ability, in motivation, or in the fidelity of the score. This paper argues that all three share an unstated premise: that whatever is lost exists independently of measurement and can therefore be recovered by a better instrument. It introduces <i>reference-underwriting</i>: a class of acts that produce exactly the same reading as a cheaper alternative — deleting them leaves the reading unchanged, so no ledger assigns them a field — yet only they sustain the link between the reading and what it purports to designate. Synonymous substitutions in molecular genetics, valuation work that terminates in no trade, and the redundant distinctions that forestall phonemic merger are the same ratio across three incommensurable dimensions. Its disappearance follows five steps: equivalencing, cheapening, signal loss, merger, and cessation of production. Step four is irreversible and occurs at the marking end rather than the learning end. A pre-registered test on 292 public records is reported, together with three unfavourable results.</p><p style="margin-bottom:8px"><b>Keywords</b>　reference-underwriting; ledger without a field; reading and referent; irreversibility of merger; discriminative capacity at the marking end</p></div>
+<h2>一 · 问题：三个被问烂了的答案，和它们共同漏掉的那一格</h2>
+<p>问”应试教育扼杀了什么”，几乎所有人都能立刻给出答案，而且答案高度集中。</p>
+<p>第一种答案说，被扼杀的是<b>能力</b>：创造力、想象力、独立思考。这种说法把损失设想成一次损坏——某样官能本来长在那里，被高强度、单一形态的训练磨坏了。它的证据形态是”高分低能”，它的处方是减负、增加非标准化的活动、把评价方式多元化。</p>
+<p>第二种答案说，被扼杀的是<b>动机</b>：好奇心、内在兴趣、对一件事本身的喜欢。这种说法把损失设想成一次挤出——外部奖惩太强，把原本自发的驱力压到了看不见的地方。它的证据形态是”孩子上学以前什么都问，上学以后什么都不问了”，它的处方是降低外部压力、恢复自主选择。</p>
+<p>第三种答案说，被扼杀的其实不是学生身上的什么东西，而是<b>分数的准确性</b>：考试本来是一把尺子，一旦这把尺子被用来分配前途，它就会被针对，于是它量出来的数越来越漂亮而越来越不真。它的证据形态是”分数年年涨，能力没涨”，它的处方是换一把不被针对的尺子——审计式抽测、随机命题、能力本位评价。</p>
+<p>这三种答案都不是胡说。它们各自有几十年的文献支撑，各自对应着一个真实的现象。本文要说的不是它们错了，而是它们<b>在同一个地方停住了</b>，而且是因为同一个原因停住的。</p>
+<p>三者共同的那个假定是：<b>那样被杀掉的东西，是一个独立于测量而存在的东西。</b> 能力说假定能力独立于考试而存在，所以能被磨坏；动机说假定兴趣独立于奖惩而存在，所以能被压住；准确性说假定”真实学力”独立于分数而存在，所以能被另一把尺子量到。三者争的是该用什么方式去够到它——磨坏的东西要修，压住的东西要放，量不准的东西要换尺子。</p>
+<p>一旦接受这个假定，有一格就永远不会被看到：<b>那一类其存在方式就是”维持读数与所指之间的链”的动作</b>。这类动作不独立于测量而存在——它不是被测量的对象，它是使测量还有对象的那件事。它在任何账本上都记为零，不是因为记录得少，是因为它的定义决定了它不产生任何可记的差别：<b>删掉它，这次的读数一模一样。</b></p>
+<p>本文把这一类动作命名为<b>垫指</b>。命名取”垫”字的三重意思：垫付（先出，不记名）、垫资（成果由别人兑现）、垫底（不在台面上）。它垫的是”指”——是”这个符号还指着那样东西”这件事本身。</p>
+<p>于是本文的承重命题写成：</p>
+<blockquote>应试教育扼杀的<b>不是</b>能力，<b>也不是</b>动机，<b>也不是</b>分数的准确性，<b>而是</b>垫指——那一类删掉它读数不变、因而在所有账本上记为零、却单独维持着读数与所指之间那条链的动作。它的消失不产生任何信号，因为不产生信号正是它的定义。</blockquote>
+<p>这个命题若成立，会带来两个不太舒服的推论。其一，减负、恢复兴趣、换一把更好的尺子，这三条处方都动不了它——前两条处理的是被测量的对象，第三条处理的是测量工具，而垫指两者都不是。其二，这件事有一个不可返工的关口，过了那个关口，即使把考试整个取消也回不去，因为回去所需要的那样东西已经没有活的携带者了。</p>
+<p>本文的路线是：先让三门在这道题上说法互不相容的学问各自把话说完（第二节），找出它们共同站着的那块地并用其中一门自己的材料把它掀开（第三、四节），据此给出垫指的定义与三个领域里的原型（第五至八节），再给出辨别表与靶格（第九节）、五步次序与它的不可返工关口（第十、十一节）、一句不带程度词的判据与它在五个场景里的五个不同答案（第十二节）、可清点的读数与清点手册（第十三节）、一次预注册检验及其不利结果（第十四节），最后是与既有说法的分界、反向约束、不适用边界、证伪条件、以及本文自己是不是它所描述的那样东西的标本（第十五至二十节）。</p>
+<h2>二 · 三家怎么说：一个单位、一条路径、一张网</h2>
+<p>要让三种说法真正顶起来，得先让它们各自把”什么算被杀掉了”讲成自己那门学问里的硬话。本文取的三门是分子遗传学、金融学、语言学——它们在这道题上不会互相点头，因为它们各自把一样东西当成了单独够用的那一样。</p>
+<p><b>分子遗传学：看那个单位本身。</b> 这门学问的账本计量序列与功能的对应，失败是”表达不出、脱靶”。它的整个传统建立在一个极强的假定上：遗传的单位是离散的、稳定的、可独立传递的。孟德尔之所以战胜融合遗传，靠的正是”颗粒性”——性状不会像颜料一样混匀，它以整颗的方式传下去。此后中心法则把这套颗粒性推到极致：序列决定产物，产物决定功能。据此，问”什么被杀掉了”，这门学问的回答是清楚的：<b>看那个单位本身有没有被改坏</b>。基因被敲除、蛋白折不出来、通路断掉——这才叫杀掉。没有实体上的改变，就没有死亡；表型看着变了而序列没动，那多半是环境，是可逆的。</p>
+<p>翻译到教育这道题上，这一路的回答就是能力说的严格版本：要说应试教育杀掉了什么，你得指出那个被改坏的东西，指得出来才算数；指不出来，你说的只是不喜欢。</p>
+<p><b>金融学：看它的轨迹、速度和黏度。</b> 这门学问的账本计量定价与风险，失败是”错定价、爆仓”。它的强立场是：你不需要知道一样东西”是什么”，你只需要看它的价格路径、成交速度和流动性——这三样已经把所有公开信息压进去了。据此，问”什么被杀掉了”，这门学问的回答会让教育界的人不舒服：<b>什么也没被杀掉，只是重新定价了</b>。学生把时间从”弄懂”转到”刷题”，不是能力受损，是理性地把资源配到回报率更高的用途上；老师少讲拓展多讲考点，同理。整个现象不是一场死亡，是一次再配置。若真有损失，那也是配置扭曲导致的效率损失，而不是有什么东西不见了。</p>
+<p>这一路的锋利之处在于，它拒绝承认有”死亡”这回事。一切都是路径、速度和黏度：这条路更快、那条路更黏（沉没成本高、转换难），于是流量改道。改道不是消失。</p>
+<p><b>语言学：看它在结构中的位置。</b> 这门学问的账本计量的是母语者的合法性判断，失败是”说不通”。它的强立场是结构主义那条：一个项的价值不由它自身决定，而由它与系统中其他项的差异关系决定；换句话说，<b>一样东西是什么，取决于它在整张网里与什么连着、排在什么次序上</b>。据此，问”什么被杀掉了”，这门学问的回答与前两家都不同：死掉的既不是实体也不是路径，而是<b>区别</b>。当两个原本被区分的项不再被区分，它们就在这个系统里合并成一项——不是其中一项死了，是”它们是两项”这件事没了。</p>
+<p>三家的立场无法靠判谁对来化解，因为它们根本不在同一个语域里作答：一个说”指出被改坏的实体”，一个说”没有实体，只有流量”，一个说”死的不是项，是项与项之间的差别”。任何一家的胜利都不能取消另外两家。</p>
+<p><b>三对冲突</b>逐条摆开如下。遗传学与金融学：前者要求指出实体上的改变才承认死亡，后者认为一切都是可逆的再配置、根本没有死亡这一范畴，二者不能同真。遗传学与语言学：前者认定死亡是单位的损坏，后者认定死亡是区别的消失而单位可以毫发无损，二者不能同真。金融学与语言学：前者说改道不是消失、原路随时可回，后者说合并一旦发生就不可逆转、回不去，二者不能同真。</p>
+<h2>三 · 三家共同站着的那块地</h2>
+<p>三家吵得很凶，但吵架本身泄露了一件它们都没说出口的事。</p>
+<p>把争论压成一句话：<b>三家争的是”那样东西的身份，该由什么来裁定”</b>——由它当下的实体形态（遗传学）、由它在流通中的轨迹与价格（金融学）、还是由它在结构中的连接与次序（语言学）。</p>
+<p>争”该由什么来裁”，前提是这件事<b>可以被裁</b>。也就是说：</p>
+<blockquote><b>三家共同假定：身份是一个在任一时刻都有定义、都可以被读出的属性。</b> 一样东西在任何时刻要么是它、要么不是它；不存在”它正在被维持成它，而这个维持本身不产生任何读数”这种状态。</blockquote>
+<p>把这句话念给三家听，三家都会觉得这还用说吗。遗传学说，序列在那儿摆着，测就是了。金融学说，价格随时都在，报价就是读数。语言学说，问母语者一句话通不通，他当场就能判。三者都认为读数随时可取，分歧只在取哪一种读数。</p>
+<p>正因为都这么认为，三家都不会去问一个问题：<b>这个读数之所以还有所指，是不是靠着某一类不产生读数的动作在持续维持？</b> 这个问题在三家的问题结构里都不必问——不是它们疏忽，是它们各自的核心任务恰好使这一步成为不必要。遗传学的任务是把序列与功能对上，它默认对应关系一旦建立就是物理事实，不需要有人维持；金融学的任务是给风险定价，它默认价格是市场的输出而不是某些人无偿供养的东西；语言学的任务是描写系统的状态，它默认系统的区别要么在要么不在。</p>
+<p>于是这三门学问共同站着的这块地，谁也没法回头看它——因为看的人都站在它上面。</p>
+<p>这条前提直接支配了那三种流行答案。能力说、动机说、准确性说之所以三条并列而互不覆盖，正是因为它们都在这块地上：都假定”那样东西”在任一时刻要么在要么不在，问题只在于用什么方式去够到它。只要这条前提不动，第四种答案就没有位置可站。</p>
+<p>要动它，必须找到一件材料：它必须是三家之一自己已经掌握、已经反复引用、只是从来不往这个方向用的事实。从外面搬一个理由来反对，得到的只是第四家的立场，那样就只是加入了争论，而不是取消它。</p>
+<h2>四 · 推翻它的那件材料：来自金融学自己</h2>
+<p>这件材料是 Grossman 与 Stiglitz 一九八〇年那篇《论信息有效市场的不可能性》。它在金融学内部不是新闻，是被引用了几十年的常识，写在每一本市场微观结构教材里。</p>
+<p>它说的是：如果价格真的已经完整包含了所有信息，那么去收集信息就没有任何私人回报；没有回报，就没有人去收集；没有人收集，价格里就不再有信息。作者自己把这个结论概括为”存在一个均衡程度的非均衡”——价格只能部分地反映知情者的信息，否则那些花钱去获取信息的人就得不到补偿。</p>
+<p>请注意这句话的形状。它没有说价格被扭曲了，没有说尺子失真了，也没有说有谁被损坏了。它说的是一件更靠底下的事：</p>
+<blockquote><b>一个读数之所以有内容，是靠一群”不为读数而动作”的人持续供养的；当所有人都转去优化这个读数，读数本身完好无损，而它背后的东西被清空。</b></blockquote>
+<p>这件材料在金融学自己的领域里回答的是另一个问题——市场效率能否达到完全，这是一个关于均衡存在性的问题。从来没有人把它当作关于”身份是否随时可读”的证据。但它恰恰就是。它说明：<b>“</b><b>价格是对的</b><b>”</b><b>这件事，不是一个随时成立的属性，而是一个被持续生产出来的结果；而生产它的那一类动作，在价格这个读数上恰好是隐形的。</b></p>
+<p>一旦这一条被承认，三家的共有前提就塌了，而且三家都退不回自己的阵地，因为这是金融学自己的结论。</p>
+<p>对金融学自己：它必须承认，“没有死亡，只有再配置”这句话讲不通了。当所有资金都转去跟价格，被再配置掉的不是某一条路径，而是价格这个读数的内容本身。改道的确不是消失——但改道会把某样东西的<b>存在条件</b>取消掉，那就是消失。</p>
+<p>对遗传学：它必须承认，“指得出被改坏的实体才算数”这条要求太窄。有一类改变不改变任何实体，只改变实体与功能之间那条链的维持者是谁——而这一类改变在它自己的领域里同样存在（见第六节）。</p>
+<p>对语言学：它必须承认，区别的消失不是系统状态的自发漂移，而是有人停止做某件事的后果；而那件事在系统的任何一次读数里都是看不见的。</p>
+<p>这就是本文得以站住的那一步。</p>
+<h2>五 · 垫指：一个定义，四条判据</h2>
+<p><b>定义。</b> 在一个由某个读数结算的活动中，若两类动作满足下列全部条件，则称后者为<b>垫指</b>：</p>
+<p><b>同读数</b>：两类动作在本次结算上产出完全相同的读数，删掉后者、以前者替代，读数不变；</p>
+<p><b>不留痕</b>：结算体系中不存在任何字段记录二者之差，因而后者的发生与不发生在记录上不可分辨；</p>
+<p><b>维链</b>：只有后者的持续发生，使”该读数指向它所声称的那样东西”这件事继续成立；</p>
+<p><b>无对价</b>：后者的成果不落在它自己名下，它得到的补偿为零或不可归属。</p>
+<p>四条缺一不成立。第一条排除了”做得更好”的那类动作——做得更好会体现在读数上，那是常规的努力，不是垫指。第二条排除了”暂时没被记录”的那类动作——只要有字段，它就只是记录不全的问题，补上字段即可，而垫指的性质是<b>补字段本身会改变它</b>（见第十七节的第一处反向约束）。第三条排除了单纯的浪费——一个删掉读数不变、又不维持任何链的动作，那确实只是低效。第四条排除了”外部性”——外部性的受益方是可识别的主体，可以谈判、可以补偿；而垫指的受益方不是任何人，是<b>一条语义关系继续成立</b>这件事本身，没有人可以坐到谈判桌前来代表它。</p>
+<p><b>为什么它是一类原来不存在的东西，而不是旧东西的新算法。</b> 检验方法很简单：删掉本文提出的这个说法之后，它是不是就不存在了？答案是肯定的。删掉”垫指”这个说法，人们看到的只是两个学生都考了九十五分，一个是想通的，一个是认出题型的——而”想通”与”认出题型”是两种<b>学习方式</b>，它们已经有名字了（第十五节会逐一处理）。垫指不是这两种方式中的任何一种，它是<b>二者之差在系统维链上的那一份功能</b>。没有这个说法，这一份功能不出现在任何一本账上：不是记录得少，是压根不算一样东西。</p>
+<p><b>它与”深度学习”</b><b>“</b><b>内在动机</b><b>”</b><b>“</b><b>真实学力</b><b>”</b><b>的根本区别，在于它不是一个人的属性。</b> 它是一个<b>位置</b>上的量：在一批产出同一读数的动作里，有多少比例是那一类。同一个学生这次垫指、下次不垫指；同一个班级今年垫指份额高、明年低。把它读成”某某人有没有深度学习”，是把一个位置上的读数错记到人头上——本文在第十八节把这一条写成了不可违反的伦理条款。</p>
+<p><b>命名的辩护。</b> 描述性的名字（“不被记录的努力”“无形投入”）会立刻滑回旧概念，因为它们只说了”没被记录”，没说”它在维持什么”。“垫指”两个字把承重的那一半锁进名字里：<b>垫的是指</b>——垫的是”这个读数还指着那样东西”这件事。</p>
+<h2>六 · 同义突变：垫指在分子遗传学里的原型</h2>
+<p>遗传学自己账本上的垃圾栏里，摆着一样东西，叫<b>同义替换</b>：一个碱基变了，密码子变了，翻译出来的氨基酸没变。按中心法则那本账，蛋白序列是读数；同义替换在这个读数上恰好为零。</p>
+<p>因此它长期被当作噪声。分子演化的中性理论把它设为基准——正因为它”没有效果”，才被用作衡量其他替换有没有受选择的尺子。全基因组研究里，它是背景；临床变异解读里，它常被直接归入”可能良性”。这是一个完整的”删掉它读数不变”的定义。</p>
+<p>然后遗传学自己发现了不是这么回事。同义替换会改变密码子使用偏好，改变对应 tRNA 的丰度匹配，从而改变核糖体沿 mRNA 前进的<b>速度</b>；速度改变会改变新生肽链在离开核糖体通道时的<b>共翻译折叠</b>窗口；折叠窗口改变，最终蛋白的构象、稳定性、活性都可能改变。它还会改变 mRNA 二级结构、剪接增强子与沉默子的位点、mRNA 的稳定性。药物代谢相关基因上的同义变异被报告改变底物特异性——序列读数一字未改，功能改了。</p>
+<p>这就是垫指的四条判据在这门学问里的逐条兑现：同读数（氨基酸序列完全一致）、不留痕（以蛋白序列为字段的记录体系无法表示这个差别）、维链（它维持的正是”这段序列对应这个功能”这条链本身）、无对价（它不出现在任何以蛋白产物计功的评价里）。</p>
+<p>请注意这里发生的事情的形状：<b>不是有人发现同义替换”其实也有效果”，而是发现”效果”这个词原来一直被定义在一个特定读数上</b>。当读数是氨基酸序列时，它就是零；当所指是功能时，它不是零。二者之间的落差不是测量误差，是<b>读数与所指之间那条链需要有人维持</b>。</p>
+<p>对本文的用处有两层。第一层是兑现：教育里”想通”与”认出题型”之差，与同义替换之于蛋白序列，是同一个形状——分数这个读数上恰好为零，而功能上不为零。第二层更硬：遗传学的这段历史给出了一个可查的<b>发现次序</b>——先有几十年把它当作噪声的基准用法，然后才有对它非中性的系统研究。也就是说，<b>一类垫指被识别出来，通常晚于它被制度化地当作零</b>。这条次序在第十节还会用到。</p>
+<h2>七 · 未成交的估值：垫指在金融学里的原型</h2>
+<p>金融学账本上的垃圾栏更彻底：<b>它连字段都没有。</b></p>
+<p>设想一位分析师，花两周做完一家公司的独立估值，得出的结论与当前市价一致，于是他什么也不做——不买、不卖、不建仓、不发报告。这两周的工作在任何数据集里留下的痕迹是零：无成交记录、无仓位变化、无收益归属、无换手。业绩归因体系按定义读不到它，因为业绩归因读的是头寸的变化。</p>
+<p>而按 Grossman–Stiglitz 那条，正是这一类工作使”价格已经对了”这件事成立。如果所有人都不做这件事，价格照样每秒钟跳动，报价照样连续，成交照样活跃，流动性指标照样漂亮——只是价格不再包含关于这家公司的信息。<b>读数完好，所指清空。</b></p>
+<p>请把这个场景与常被混为一谈的两样东西分开。</p>
+<p>其一，它不是”知情交易”。知情交易者的成果<b>落在他自己的读数上</b>——他因信息优势而获利，这份获利被完整记账，学界甚至有专门的概率指标去估计知情交易的比例。知情交易不满足第四条判据。真正的垫指是那一部分<b>估值完成后决定不动手</b>的工作：它的结论恰是”市价是对的”，因而它对自己毫无回报，却是”市价是对的”这句话的全部依据。</p>
+<p>其二，它不是”沉默的多数持有者”。长期持有不交易的人未必做过估值；没做过估值的不持有，不构成任何维链。垫指的关键在于<b>动作发生过</b>，只是它的产出落在了链上而不是落在自己的读数上。</p>
+<p>于是金融学这一侧给出了本文最不留情面的一个推论：<b>一个市场可以在所有可见指标上达到历史最佳，同时它的价格已经不再指向任何东西。</b> 成交量、买卖价差、报价深度、成交速度——这四个是流动性最常用的读数，四个全好，与垫指份额为零完全相容。第十三节会把这一条写成本文可通约读数的第四条性质，即与既有主要指标正交。</p>
+<h2>八 · 语义漂白与音位合并：垫指在语言学里的原型</h2>
+<p>语言学提供的两样东西，一样解释”怎么被磨空”，一样解释”为什么回不去”。</p>
+<p><b>第一样是语义漂白。</b> 一个词被用得越频繁、越自动、越成功，它的实义被磨掉得越快，而它的形式完好无损。“很”字本义是凶狠，如今只是一个程度标记；“非常”本义是不寻常，如今只是”很”的同义词；英语的 <i>very</i> 来自”真实的”。这类演变的通例是：<b>磨损来自使用本身，而不是来自误用。</b> 没有人用错，没有人偷懒，每一次使用都是合法的、被听懂的；正是这些合法的使用把实义一点点磨平。</p>
+<p>这一条对本文极为要紧，因为它切断了一个最自然的误解：垫指的消失不需要有人作弊，不需要有人偷工减料，不需要任何一个环节出错。<b>所有人都规规矩矩，它照样会消失</b>——恰恰因为规矩本身是按读数写的。</p>
+<p><b>第二样是音位合并的不可逆性。</b> 历史语言学有一条被反复检验的原则：合并不可逆转。一旦两个音位在某个语言变体中合并成一个，后代说话人无法把它们重新分开，因为区分所需要的信息已经从系统里消失了；他们能做的至多是从另一个变体里借回一套区别，而那不是恢复，是引入。分裂可以逆转，合并不能。</p>
+<p>合并的判据也很值得抄过来：<b>合并的标志不是说话人不再发出区别，而是不再听出区别。</b> 产出端与感知端不同步时，系统还没有合并；一旦感知端也分不出，合并就完成了，此后产出端的差异变成自由变异，很快消失。</p>
+<p>把这一条搬到本文的题目上，得到的是全文最实用的一句：</p>
+<blockquote><b>判断那条不可返工的关口有没有过，不看学生做什么，看批改端还能不能分辨。</b></blockquote>
+<p>只要判卷者、评价体系、录取程序里还有人能在同一个分数下分辨出两条来路，系统就还没有合并，垫指还能被重新供养。一旦批改端也分不出——不是不愿分，是分不出——合并就完成了，此后学生端那条贵的路会迅速退化成自由变异，然后消失。</p>
+<p>三门学问在这里第一次合起来说了一句谁也单独说不出的话：垫指在读数上是零（遗传学的同义性），它的成果被一个不属于任何人的东西吸收（金融学的维链），而它的消失通过感知端的合并变成不可逆（语言学的合并）。这三段各自都在自己的领域里是常识，合起来是一条没有人说过的判断。</p>
+<h2>九 · 一张辨别表与它要打的那一格</h2>
+<p>把”读数是否达标”与”垫指是否发生”两根轴交叉，得到四格。</p>
+<div class="tblwrap"><table class="tbl"><tr><th></th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;垫指发生</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;垫指不发生</th></tr><tr><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;读数达标</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;甲格：读数与所指同在。 分数是九十五分，且这个九十五分背后有一批删掉它分数不变的动作在维持”九十五分意味着会了”。外部可见的一切与丙格完全一致。</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;丙格（靶格）：空指。 分数是九十五分，所有形式审查通过，评分记录完整，投诉为零，而已经没有任何动作在维持”九十五分意味着会了”。读数完好，所指清空。</td></tr><tr><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;读数不达标</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;乙格：在路上。 分数不到线，而垫指正在发生。这一格在现行体系里被判为失败，本文认为它是唯一可恢复的失败。</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;丁格：一眼可见的坏。 分数不到线且什么也没在维持。这一格不需要本文的框架，任何人都看得见，本文也不主张对它有新说法。</td></tr></table></div>
+<p><b>为什么靶格是丙而不是丁。</b> 丁格是一眼就能看出的坏——该做的没做、该有的没有。若一个框架的靶子落在丁格，说明第二根轴选错了：不需要任何新概念，现有的检查就能发现它。丙格的性质完全相反：它在所有现行读数上都是优等，因而不会触发任何一次检查。</p>
+<p><b>靶格的四条签名，逐条附误诊阻挡。</b> 骨架上通常只写三条，本文写四条，是因为第四条是本文与既有说法分开的地方。</p>
+<p><b>签名一：短期读数改善。</b> 丙格发生的时候，分数是<b>上升</b>的，因为便宜的那条路更快、方差更小。 　误诊阻挡：<b>不得以”分数下降”作为丙格的判据。</b> 用分数下降去找丙格，找到的全是丁格。任何以”成绩滑坡”为触发条件的预警机制，对丙格结构性失效。</p>
+<p><b>签名二：失效不产生信号。</b> 垫指份额从高走到零，现行指标体系里没有一个数会动：及格率不动、优秀率上升、投诉率下降、教学事故为零。 　误诊阻挡：<b>不得以”有人反映问题”作为判据。</b> 丙格里没有人有立场反映问题——学生分数好，家长满意，教师考核达标，学校排名上升。抱怨的缺席不是健康，是签名之一。</p>
+<p><b>签名三：自我加固，越规范化越严重。</b> 评分越客观、答案越标准、反馈越即时、命题越对齐课标，丙格越深。原因见第十节：规范化的每一步都在压缩两条来路在记录上的可分辨性。 　误诊阻挡：<b>不得以”管理混乱”作为判据。</b> 丙格是管理精良的产物，不是管理失败的产物。找一所秩序最好的学校，比找一所最乱的学校更容易找到它。</p>
+<p><b>签名四：分辨力先于产能消失。</b> 批改端分不出两条来路，发生在学生端不再走贵的那条<b>之前</b>，而不是之后。 　误诊阻挡：<b>不得以学生的能力测试成绩作为判据。</b> 学生端的读数在合并完成后还会继续漂亮很长一段时间——因为便宜那条路在标准化测试上表现更好。要看的是判卷者、命题者、录取者手里还有没有一个能分辨的字段与一次能分辨的动作。</p>
+<p>四条签名同时成立，才算丙格。缺第四条而具备前三条的，多半是普通的指标腐化，那已有名字（第十五节）。</p>
+<h2>十 · 五步次序：从等值化到停产</h2>
+<p>本文对”经由哪条次序把它杀掉”的回答，是一条五步序列。序列的每一步都有可查的触发条件，且每一步都不需要任何人怀有恶意。</p>
+<p><b>第一步 · 等值化。</b> 两条来路被压成同一个读数，且记录体系不保留二者之差。 　发生的形态：评分细则统一、答案标准化、机器阅卷比例上升、主观题给分点化。 　可查触发条件：在评分记录里，同一分值下不再存在任何字段区分”经哪条路得到”。 　注意这一步在动机上是完全正当的：它是为了公平。等值化的全部理由是消除判卷者的任意性，而这个理由无可辩驳。</p>
+<p><b>第二步 · 择廉。</b> 在两条产出同一读数的路里，成本低的一条被系统性地优选。 　发生的形态：题型识别、模板套用、限时训练、答题模式化。 　可查触发条件：<b>单位分数所需时间下降</b>，且下降幅度大于知识增量能解释的幅度。这一步同样不需要恶意——它是理性的，任何一个时间约束下的人都会这么选，而时间约束是真实的。</p>
+<p><b>第三步 · 失信号。</b> 垫指份额开始下降，而现行的所有指标同时改善或不变。 　发生的形态：分数上升、通过率上升、区分度下降、满分人数增加。 　可查触发条件：出现”读数改善而区分度下降”的组合。这是全程唯一一次系统自己发出的可读信号，而它会被读成好消息。<b>这一步是最后的拦截窗口</b>，理由见下一节。</p>
+<p><b>第四步 · 合并。</b> 批改端不再能分辨两条来路——不是不愿分，是分不出。评分标准、参考答案、命题模板、培训材料里都只剩结果的表述；能分辨的人退休、转岗，或因为分辨不产生任何考核收益而停止分辨。 　发生的形态：区分度下降被解释为”题目太简单”，于是提高难度、增加题量、加快节奏；这一举动只增加择廉的强度。 　可查触发条件：<b>在评分标准的修订记录里，</b><b>“</b><b>过程性描述</b><b>”</b><b>的比重连续下降，而”难度提升”的记录连续上升。</b> 这两条同时出现，即为合并完成的标志。</p>
+<p><b>第五步 · 停产。</b> 那条贵的路不再有活的携带者。教师不会讲（因为讲了在考核上是负收益，且他自己也不再有分辨的经验），学生不知道有（因为从来没见过），教材不写（因为它不对应任何题型）。此后取消考试也不能恢复——恢复所需要的不是政策，是携带者。</p>
+<p>这条次序里最要紧的一处，是<b>第三步与第四步之间的性质差别</b>。第一到第三步都是量的变化，每一步都可逆：恢复过程性字段、降低时间压力、重新引入区分度，垫指份额会回升。第四步不是量的变化，是<b>范畴的合并</b>——系统里”两条来路”这个区别本身没有了。此后所有证据都会被重新解释：区分度下降被解释成题不够难，学生不会灵活运用被解释成练得不够，教师讲不出第二种解法被解释成教研不足。<b>每一条证据都指向”加强”，而加强只会加深合并。</b></p>
+<p>这正是语言学那条原则搬过来的样子：分裂可逆，合并不可逆。第一到第三步是分裂在收窄，第四步是分裂消失。</p>
+<h2>十一 · 不可返工的那一步为什么在批改端</h2>
+<p>上一节把拦截点放在第三步末、第四步之前。这一节说明为什么判据必须在批改端取，而不在学生端取。</p>
+<p>三条理由，一条比一条硬。</p>
+<p><b>第一条：学生端的读数在合并之后仍会长期改善。</b> 因为便宜那条路在标准化测试上表现更好。用学生的成绩去判断系统有没有过关口，方向恰好是反的：过了关口，成绩更好看。</p>
+<p><b>第二条：产出端的差异会先于感知端消失而变成自由变异。</b> 音位合并的经验是：当说话人还能听出区别时，即使他自己不总是发出这个区别，系统里的区别仍然存在，因为纠正机制还在——他听到别人不区分会觉得别扭。一旦听不出，纠正机制消失，产出端的差异不再被维持，很快归零。搬到本题上：只要判卷者还能在两份同分的卷子上说出”这个是想通的、那个是套的”，即使当下的评分细则不允许他给不同的分，这个区别在系统里仍然活着——因为他会在别的地方使用它（课堂上、推荐信里、竞赛选拔里、自己教研时）。一旦他也说不出，这个区别在整个系统里就没有携带者了。</p>
+<p><b>第三条：批改端是这条链上唯一同时接触读数与所指的位置。</b> 学生只接触自己的过程，不接触读数的意义；管理者只接触读数，不接触过程；只有判卷者两样都碰得到。链的维持只能发生在两端都接触得到的位置上。这一条同时解释了为什么阅卷的规范化是最危险的一步——它恰恰是在唯一还能维链的位置上，把维链的动作定义成了不合规。</p>
+<p>由此得到本文对”在哪一步还拦得住”的完整回答：</p>
+<blockquote><b>拦截点在第三步末，判据在批改端：随机抽取一批同分的答卷，让评阅者在不看分数的情况下把它们按”经哪条路得到”分组，然后计算分组的一致性。这个一致性是全系统唯一一个在丙格里会先掉下来的读数。它一旦掉到随机水平，合并已经完成。</b></blockquote>
+<p>这个检验有三个好处：它不需要新的数据（答卷本来就在）、不需要额外的评价（不涉及给分）、不改变任何一个现行指标（因而不产生新的应试目标）。第十三节把它写成可清点的形式，第十九节把它写成一条可执行的证伪条款。</p>
+<h2>十二 · 一句不带程度词的问话，和它在五个场景里的五个不同答案</h2>
+<p>本文的判据不问任何人的判断，只问记录：</p>
+<blockquote><b>在这次得到这个读数的过程里，删掉哪一个动作读数不会变？那个动作有没有被任何记录保存下来？</b></blockquote>
+<p>这句话里没有”应当”“充分”“真正”“实质性”“恰当”“有意义”。它可以拿去问评分细则、日志、留痕系统、考核办法，得到的是一份可清点的清单，不是一个评价。</p>
+<p>需要立刻承认的一件事：<b>这个问法本身是一次消融。</b> 逐项移除、看输出变不变，是机器学习里成熟得不能再成熟的标准做法，也是实验科学的老手艺。本文不主张这个动作是新的。本文主张的是把消融的<b>判定方向倒过来用</b>：常规消融里，“移除后指标不变”的结论是”这个部件不重要，可以删”；本文的结论是”这个部件在这个读数上不可见，因而它可能正是维链的那一份”。同一个操作，相反的读法。这一条差别是可裁决的：若在某个系统里，所有”移除后读数不变”的部件被删掉之后，该读数与它所声称的所指之间的对应关系不下降，则本文错、常规消融对。</p>
+<p>把这句话拿到五个真实场景里跑，得到五个互不相同的答案，其中两个是查出来的，并且反过来改了本文原本要写的话。</p>
+<p><b>场景一 · 高考数学阅卷（查出来的，且削弱了本文）。</b> 本文原本打算写的一句更强的话是：“评分记录里根本没有路径字段。”这句话是错的。按步给分是一个货真价实的路径字段——它记录了解答经过了哪几个规定的步骤。但查下去会发现，这个字段记的是<b>规范解法的步骤</b>，不是”我当时为什么这样想”；而一旦步骤被公布，它立刻成为新的择廉目标：背步骤比想通更快，且能拿到同样的步骤分。<b>结论必须改写为：不是没有字段，而是任何被公布的字段都会被优化，因而字段的存在不构成保护。</b> 这一改动是实质性的，它把本文从”补上字段就能解决”的处方里踢了出去（详见第十七节第一处反向约束）。</p>
+<p><b>场景二 · 病历的鉴别诊断栏（查出来的，且削弱了本文）。</b> 本文原本打算写”成熟的记录体系一律不为这类动作设字段”。这也是错的。临床病历有”考虑过并排除了何种诊断”的栏目，它记录的正是一个删掉之后当前诊断不变的动作。进一步查会发现一个规律：<b>有这类字段的地方，几乎都是曾经因为漏掉它而付出过不可逆代价的专业</b>——误诊致死、事故调查、航空的检查单。结论改写为：垫指并非结构性不可记账，而是<b>只有在代价不可逆且已经兑现过的领域里才会被记账</b>；教育的代价可逆性看起来很高（可以复读、可以再学），这正是它长期不设字段的原因。这一条同时给出了本文的一个可查预测（第十九节第三条）。</p>
+<p><b>场景三 · 代码仓的贡献统计。</b> 提交数、增删行数、合入的请求数——这四个读数里，没有一个能表示”读了三天代码，得出结论是不必改”。这个动作在贡献统计里恰好为零。第十四节对这一场景做了一次真实数据的检验。</p>
+<p><b>场景四 · 证券公司的投研系统。</b> 系统记录持仓、调仓、研报、评级变更。“做完估值，结论与市价一致，因而不动”这一类工作没有落点；即使有观察池，进入观察池也不产生任何绩效归属。</p>
+<p><b>场景五 · 语音语料的流利度标注。</b> 自我修正、重启、加限定（“我是说字面意义上的”）在标注体系里被归为不流利现象，是要被清洗掉的噪声。而它们恰恰是说话人在维持”这个词还指着它本来指的东西”。</p>
+<p>五个答案互不相同：一个是”有字段但字段会被优化”，一个是”有字段，且字段的出现有条件”，一个是”四个读数全为零”，一个是”有池但无归属”，一个是”被明确标注为噪声”。前两个不是从命题推出来的，是查出来的，并且都反过来削弱了本文。</p>
+<h2>十三 · 读数：不留痕动作清单，与它的覆盖率</h2>
+<p>本文的主读数不是一个比率，是<b>一份清单</b>。比率是从清单派生的。这个次序不能颠倒——先有清单，才知道分母里装的是什么。</p>
+<h3>不留痕动作清单</h3>
+<p><b>做法。</b> 取一个结算单位（一次考试、一次诊断、一次交易日、一个版本周期），把导向该次读数的全部动作逐项列出，对每一项问那句判据：删掉它，这次读数变不变？变的划掉。剩下的，再问第二问：它有没有被任何记录保存下来？没有的，进清单。</p>
+<p>清单每一行写四件：动作的描述、由谁做的（<b>写位置，不写人名</b>）、它维持的是哪一条链、若它长期不发生，最早会在哪一个读数上露头（多数行这一栏应当填”无”——填不出”无”的，说明它不是垫指，划掉）。</p>
+<h3>派生读数：垫指份额</h3>
+<p><b>读数名</b>　垫指份额　<b>符号</b>　u</p>
+<p><b>定义</b>　在一批产出同一读数的结算单位中，清单非空的单位数占全部单位数的比例。N 的取法：同一结算体系内连续的 N 个单位，N ≥ 30；跨体系不合并计算。</p>
+<p><b>粒度</b>　什么算”一次动作”。边界例：一名学生在解题中途停下来验算了一遍，验算结果与原答案一致。算不算一次动作？<b>算</b>——它发生了，删掉它本次读数不变，且它维持着”答案对”与”我知道答案对”之间的链。反例：他停下来喝了口水。<b>不算</b>——它不维持任何链，第三条判据不成立。这条边界必须写死，否则清单会被生活琐事灌满。</p>
+<p><b>编码规则</b> 1. 只登记已发生的动作，不登记”本可以做而没做”的动作。 2. “被记录”的判定以<b>该体系自身的正式记录</b>为准（评分表、日志、报告、账本），不以私人记录（草稿纸、个人笔记）为准；私人记录另立一栏，不计入分母。 3. 一个动作若在任何一份正式记录里可被检索到，即视为留痕，不进清单——哪怕记录得很粗。 4. 同一结算单位内的多个动作，清单计”有/无”，不计条数；条数另设一栏供描述，不进 u。 5. 跨体系比较时，必须先核对两个体系的记录颗粒度；颗粒度不同的两个 u 不可直接相减。 6. 编码者一致性须实测：两名独立编码者对同一批单位的 u 之差超过 0.10 时，编码规则视为未写死，须重写。</p>
+<p><b>表头</b>（可直接拿去做一张空表）</p>
+<div class="tblwrap"><table class="tbl"><tr><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;结算单位</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;读数值</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;清单非空</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;清单条数</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;维持的链</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;最早露头的读数</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;编码者</th></tr></table></div>
+<p><b>不适用</b>　单位数不足 30 的批次；记录体系正在改版的时段；同一批次内读数定义发生过变更的情形。</p>
+<p><b>三处引用一致性自查</b>　正文第十三节 ＝ 证伪第十九节 ＝ 赌注第十九节末，均使用上述同一定义、同一粒度、同一 N ≥ 30 门槛。本文全篇不出现第二个 u 的定义。</p>
+<h3>为什么它是可通约的：三个量纲，同一个比率</h3>
+<p>在分子遗传学里，它是同义替换在全部替换里的占比与它们所落的位点分布；在证券市场里，它是”完成估值而未产生任何头寸变化”的工作在全部估值工作里的占比；在语言演变里，它是话语中那些不改变命题内容、只维持区别的成分（自我修正、加限定、冗余标记）在全部成分里的占比。三处的量纲分别是碱基替换、工时、语音成分，完全不可换算，而比率的定义是同一个。</p>
+<p><b>第四条性质，也是最容易漏的一条：它必须与既有主要指标正交。</b> 一个与既有指标高度相关的新数，会被立刻读成那个指标的一个代理，白造。本文的反例是现成的：<b>一个蛋白序列完全正确、密码子完全优化的构建体，可以有接近零的同义变异空间；一个成交量、买卖价差、报价深度、成交速度四项全优的市场，可以有零垫指份额；一个流利度评分最高的演讲，垫指份额最低。</b> 在教育里的反例最刺眼：<b>平均分最高、及格率最高、投诉率最低的那个班，可以是 u 最低的那个班。</b> 举得出这种”既有指标最好看而这个数最难看”的例子，正交才成立。</p>
+<h2>十四 · 真跑一条：预注册、数据、以及三个不利结果</h2>
+<p>证伪条款不能全是纸面的。本文在成文之前用公开数据跑通了最便宜的一条，并把不利结果写在这里。</p>
+<h3>预注册（跑数据之前写死，事后未改）</h3>
+<p>代理对象取公开代码仓的问题记录。<b>代理定义</b>：一次”投入了讨论而没有产生任何代码产物”的记录 ＝ 已关闭、关闭理由标记为”未计划”、且评论数不少于一条。u ＝ 该类记录数 ÷ 全部已关闭记录数；w ＝ 该类记录承载的评论数 ÷ 全部已关闭记录的评论数。</p>
+<p>预注册的三条假设与阈值：</p>
+<p><b>H1（存在与粒度）</b>：u 落在 0.05 与 0.40 之间。若 u &lt; 0.02，说明这类动作在真实记录里罕见，本文的粒度定义须修订；若 u &gt; 0.80，说明定义过宽。</p>
+<p><b>H2（正交性，本文最愿意押的一条）</b>：w 与仓库的标准产出读数（星标数）之间不存在正相关。若相关系数大于 0.5 且 p &lt; 0.05，本文”与既有主要指标正交”的主张受挫。</p>
+<p><b>H3（无记账字段）</b>：该类记录在这套记录体系里没有任何字段表示”这次讨论产生了什么”。判定为机械检查字段清单。</p>
+<p>样本设计为 8 个跨语言、跨领域的大型公开仓库，每仓最近 300 条已关闭记录，共约 2400 条。</p>
+<h3>实际拿到的数据</h3>
+<p>匿名接口的调用配额被反复挡回，最终只拿到 <b>5 个仓库、292 条已关闭记录</b>，远低于预注册的 8 仓 2400 条。逐仓读数如下（星标数为抓取当日值）：</p>
+<div class="tblwrap"><table class="tbl"><tr><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;仓库</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;星标</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;记录数</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;未计划且有讨论</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;u</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;评论总数</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;该类评论数</th><th>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;w</th></tr><tr><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;home-assistant/core</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;89,795</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;85</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;27</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.318</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;757</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;144</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.190</td></tr><tr><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;huggingface/transformers</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;163,455</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;61</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;23</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.377</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;236</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;74</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.314</td></tr><tr><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;vuejs/core</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;54,158</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;54</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;6</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.111</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;128</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;14</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.109</td></tr><tr><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;elastic/elasticsearch</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;77,807</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;36</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.000</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;152</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.000</td></tr><tr><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;matplotlib/matplotlib</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;23,067</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;56</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;10</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.179</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;330</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;61</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;0.185</td></tr><tr><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;合计／合并</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:t xml:space="preserve"&gt;—</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;292</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;66</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;0.226</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;1,603</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;293</td><td>&lt;w:tcPr /&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:pStyle w:val="Compact" /&gt;&lt;w:jc w:val="left" /&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:bCs /&gt;&lt;w:b /&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;0.183</td></tr></table></div>
+<p>关闭理由的分布：已完成 209 条、未计划 67 条、重复 16 条。</p>
+<h3>结果与三个不利结果</h3>
+<p><b>H1 通过</b>：合并 u ＝ 0.226，落在预注册区间内。这类动作在真实记录里既不罕见也不泛滥。</p>
+<p><b>不利结果之一：仓间方差极大，最低为零。</b> 逐仓 u 从 0.000 到 0.377。elasticsearch 在抽样窗口内一条都没有——<b>不是这个项目里没有这类讨论，而是它的维护者习惯用”已完成”关闭所有记录</b>。这直接暴露了代理的一个致命依赖：u 的高低有一大部分来自<b>关闭习惯</b>，而不是来自动作本身。写进本文的后果是：<b>跨组织比较 u 是不成立的，u 只能在同一记录体系内部做纵向比较。</b> 第十三节编码规则第五条正是据此加上的。</p>
+<p><b>不利结果之二：w 系统性低于 u。</b> 五个仓库里有四个的 w 小于 u（0.190&lt;0.318、0.314&lt;0.377、0.109&lt;0.111、0.000=0.000），只有 matplotlib 的 w 略高于 u。这意味着这类记录承载的讨论量<b>平均比其他记录更少</b>。本文原本会写下的一句更强的话是：“大量投入被记为零。”这句话被数据否掉了：<b>被记为零的不是大量投入，而是一类动作</b>；它的体量是中等偏小的。承重命题因此必须从”量”退到”类”——垫指的要害不在于它耗费多少，而在于它是链上唯一的维持者。这一处修订使命题变窄，也变得更难被”其实不就是隐性劳动吗”吸收。</p>
+<p><b>不利结果之三：H2 跑不动。</b> 相关系数为 0.60，p ＝ 0.28，样本量 5。按预注册的判定条件（大于 0.5 <b>且</b> p&lt;0.05），本条不成立，因而”受挫”没有触发；但样本量 5 低于任何跨案例比较的可用门槛，<b>这一条只能记为不可裁决，不能记为通过</b>。本文不据此声称正交性得到支持。正交性目前只有第十三节末尾那种”举得出反例”的定性支撑，定量支撑缺位。这是本文最薄的一处，明写在此。</p>
+<p><b>H3 通过（机械检查）</b>：该记录对象的字段清单里，有编号、状态、关闭理由、评论数、标签、关闭时间，<b>没有任何字段表示这次讨论产生了什么</b>。“关闭理由”能表示它没有产生代码，不能表示它维持了什么。</p>
+<h3>代理的边界，必须明写</h3>
+<p>第一，“未计划”这个关闭理由是较晚才加入这套记录体系的，早期记录不带这个标记，因而本次抽样天然偏向近期，不能据以做长时段比较。第二，关闭理由由维护者手动选择，是一个<b>主观字段</b>，第一个不利结果已经显示它的噪声有多大。第三，代码仓的讨论与考场答卷在结构上只是同形，不是同物；这次真跑证明的是”这类动作在真实记录里可被识别、且确实无字段”，<b>不证明教育系统里的 u 是多少</b>。把这次跑通读成对教育的经验支持，是本文明确拒绝的一种引用方式。</p>
+<h2>十五 · 与最近的几种说法的分界</h2>
+<p>这一节决定本文是不是换了个名字。逐条写，每条给一个可判定的对照。</p>
+<p><b>一 · 指标腐化（Campbell，一九七六）。</b> 这是最近的邻居之一。它说的是：一个量化的社会指标越是被用于决策，它就越会被腐化，也越会扭曲它本要监测的社会过程。分离线在”腐化”这个词的落点：Campbell 说的是<b>指标被扭曲</b>，其前提是被指标监测的那个社会过程独立存在，只是被扭曲了；本文说的是有一类动作<b>不是被监测的对象，而是使监测还有对象的那件事</b>。判定形式：<b>若在一个完全无利害关系、不用于任何决策的读数上（例如纯自用的练习正确率），垫指份额同样下降，则本文对而 Campbell 的机制不足以解释；若在零利害读数上垫指份额稳定，则 Campbell 对而本文错。</b> 这条对照可以在任何一个自适应练习系统的后台数据上直接跑。</p>
+<p><b>二 · 目标手段易位（Merton，一九四〇）。</b> 它说的是科层组织里，遵守规程本身取代了规程要服务的目的。分离线：目标手段易位的诊断依据是<b>行为改变</b>——人们开始做与目的无关的事。本文预测的却是<b>行为完全不变</b>的情形：学生照样做题，教师照样讲课，动作序列一模一样，只是其中不被读的那一段消失了。判定形式：<b>若在动作序列可核验地未发生任何变化的样本里，垫指份额显著下降，则本文对而目标手段易位不适用；若垫指份额的下降总是伴随可观察的行为替换，则本文被它吸收。</b></p>
+<p><b>三 · 分数通胀（Koretz，二〇〇八、二〇一七）。</b> 这是应用领域内部的正主，也是最危险的一位。他的核心判断是：高利害测试诱发应试教学，从而产生虚假的分数增长，这种增长远大于学习的真实增长，而且这种通胀高度可变、不可预测，因而无法辨别哪所学校的分数是虚的。他的处方是审计式抽测——用一把不被针对的尺子去量真实学力。分离线正落在他的处方上：<b>审计抽测能成立，前提是真实学力独立于测量而存在、可被另一把尺子量到。垫指按定义在任何尺子上都记零</b>——因为它是”删掉它读数不变”的那一类，换一把尺子，它照样为零。判定形式：<b>若审计抽测上的分数与高利害分数同步下降，则真实学力确实是一个可被另一把尺子量到的东西，Koretz 对而本文多余；若审计抽测分数稳定甚至上升，而批改端的分辨一致性、教师能否讲出第二种解法、学生能否说出自己为何这样想这三类不产生读数的动作同时枯竭，则本文对而他的框架不足。</b> 本文不主张 Koretz 错——本文主张他的框架里没有丙格的位置。</p>
+<p><b>四 · 过度理由效应与内在动机的挤出（Lepper、Greene、Nisbett，一九七三；Deci 与 Ryan，一九八五）。</b> 它说的是外部奖赏会侵蚀内在动机。分离线：动机是可压抑的，压力撤走后有恢复的可能。本文说的是<b>停产</b>，不是压抑。判定形式：<b>撤掉外部奖惩之后，若那条贵的路自动恢复，则动机说对；若不恢复——因为已经没有活的携带者知道那条路怎么走——则本文对。</b> 这条对照在一次真实的减负政策前后即可观测，且它区分的是两件常被混同的事：被压住的与被停产的。</p>
+<p><b>五 · 深层取向与表层取向（Marton 与 Säljö，一九七六）。</b> 它说的是学习者面对材料时采取的是理解意义的取向还是记诵符号的取向。分离线最要紧：<b>这是学习者的属性，本文的是位置的读数。</b> 深层／表层描述的是一个人怎么学；垫指描述的是一批同读数产出里有多少落在那一类上，它不归属任何人。判定形式：<b>若一个学习者取向量表得分很高的群体，其所在体系的垫指份额同样可以为零（因为体系不为二者之差设字段），则两者是不同的东西；若二者必然同升同降，则本文被它吸收。</b></p>
+<p><b>六 · 排名的反身性（Espeland 与 Sauder，二〇〇七）。</b> 它说的是排名会改变被排名者的行为与自我认识。分离线与第二条同源但更强：反身性研究的证据形态是<b>可观察的组织行为改变</b>（重组、公关、招生策略调整）；本文的丙格里组织行为可以毫无变化。判定形式同第二条。</p>
+<p><b>七 · 消融实验（机器学习与实验科学的标准做法）。</b> 这是方法学上最近的邻居，本文第十二节已正面承认自己的判据就是一次消融。分离线在判定方向：常规消融从”移除后指标不变”推出”该部件不重要”；本文从同一观察推出”该部件在这个读数上不可见，可能正是维链者”。判定形式：<b>把某系统中全部”移除后读数不变”的部件删去，若该读数与其所声称的所指之间的对应关系不下降，则常规读法对、本文错。</b></p>
+<p><b>八 · 语法化与语义漂白（Meillet 传统；见第八节）。</b> 这是本文取材的来源之一，也可能被误读为本文只是把它换了个说法。分离线：漂白描述的是<b>符号的含义被磨损</b>，是一个关于语言系统的描述；本文说的是<b>有一类动作在维持含义</b>，是一个关于维持者的主张。判定形式：<b>若在语言变化中，那些冗余区别成分的比例下降</b>并不<b>早于合并的完成，则本文的次序主张错。</b></p>
+<p><b>最近的邻居是哪一个。</b> 是 Koretz。因为他和本文谈的是同一个现象、同一个场域、同一批数据。本文之所以仍不能被他吸收，只有一条理由：他的全部处方都建立在”换一把尺子”上，而本文界定的那个东西的定义就是”任何尺子上都为零”。这不是侧重不同，这是他的方法在原理上够不到。</p>
+<h2>十六 · 与同栏几篇的分界</h2>
+<p>同一栏目下已有几篇在相邻位置上，读者最容易把它们与本文混起来，因此逐一指名。</p>
+<p><b>《阅痕》（同一轮的另一篇，处理”应试与教育在哪里分开”）。</b> 那一篇问的是分界，本文问的是次序与拦截点。更实质的差别在读数的方向：那一篇的读数问的是装置认不认自己的产物，本文的读数问的是一份清单里有没有条目。判决性对照：取同一批答卷，那一篇预测分界可在单份产物上判定，本文预测单份产物上判不出——本文的丙格与甲格在单份答卷上完全同形，只有在批改端的分组一致性上才分得开。</p>
+<p><b>《收源》（同一轮的另一篇，处理”为什么每次削弱应试的改革都在数年内被重新吸收”）。</b> 那一篇处理的是改革被回吸的曲线与半返期，本文处理的是一类动作的停产次序。两者是互补而不是竞争：那一篇解释了为什么第四步之后的每一次干预都会被吸收，本文解释了为什么第四步之后的干预<b>本来就够不到要救的那样东西</b>。若两条都成立，则一个可检验的联合预测是：<b>改革的半返期在合并完成之后显著缩短</b>——因为此时没有任何携带者会把改革的内容接过去。</p>
+<p><b>《回刻》（另一轮的一篇，同样取用了语言学）。</b> 同用一门学问必须指名。那一篇处理的是文本不变而归类变动，读数是换尺率；本文处理的是读数不变而链断裂，读数是清单的覆盖率。判决性对照：那一篇预测同一份材料在不同时期被归入不同类别，本文预测同一份材料在任何时期都被归入同一类别而它所指的东西已经不同。前者是分类边界的移动，后者是分类边界纹丝不动。</p>
+<p><b>《就常》（处理自我校验的参照随状态一起移动）。</b> 这是最容易与本文混淆的一篇，因为两者都涉及”分不出来了”。分离线：那一篇的分不出来发生在<b>自我校验</b>上——被评估者自己的参照跟着状态一起移动；本文的分不出来发生在<b>批改端</b>——评估者的分辨力消失。判决性对照：在那一篇的机制下，外部评估者仍能分辨而当事人不能；在本文的机制下，当事人可能仍能分辨（他知道自己是背的还是想通的）而外部评估者不能。<b>两者的分辨力缺口方向相反。</b> 这一条可以在同一批样本上同时检验，因而是本文最干净的一条分界。</p>
+<p><b>《同据》（处理判据与效据同源）。</b> 那一篇说的是判定的依据与效果的依据出自同一个回路，因而回路内自洽而回路外无效。本文说的是判据完好、回路完好，而回路所指的对象被清空。判决性对照：那一篇预测跨回路检验会失败，本文预测跨回路检验会通过——丙格的分数在任何一个回路里都是漂亮的。</p>
+<h2>十七 · 三处反向约束：三门学问反过来削掉了本文什么</h2>
+<p>一个跨领域的说法若只是从三门学问那里取材而不被它们反过来削，那多半只是借用。下面三处，每一处都削掉了本文原本打算主张的东西。</p>
+<p><b>第一处 · 由高考阅卷的按步给分削掉的：适用范围。</b> 本文原本会写下的一句更强的话是：“凡结算体系，必不为垫指设字段；因此处方是补上字段。”按步给分证伪了前半句，也毁掉了后半句这个最自然的处方。字段可以补，补了会被优化——公布的步骤立刻成为新的背诵对象。因此本文的适用范围必须缩窄为：<b>本文只适用于那些”两条来路在公开可得的评价规则下无法被非破坏性地区分”的体系</b>。凡是能设计出一个”公布之后仍不能被便宜地满足”的字段的场合，本文不适用，该场合应当直接去设那个字段。这一处削的是价值排序：本文不再主张”记录越细越好”，因为记录细化在这里是自我拆台的。</p>
+<p><b>第二处 · 由分子遗传学削掉的：命题的边界本身。</b> 同义替换的非中性研究里有一条本文不能绕过的发现：<b>并非所有同义替换都维链，绝大多数确实是中性的。</b> 维链的只是那些落在特定位点上的少数——密码子稀有度高、位于折叠关键窗口、影响剪接调控元件。搬回本文，这意味着：<b>并非所有”删掉它读数不变”的动作都是垫指。</b> 本文原本打算把第一条判据（同读数）与第三条判据（维链）当作可以互相推出的一对，这是错的：同读数是必要条件，远不是充分条件。这一处削掉的是本文的识别成本——垫指不能靠”读数不变”一条筛出来，必须逐条验第三条判据，而第三条判据的验证是昂贵的、往往需要事后才知道。承认这一点之后，本文的清单从”可自动生成”降级为”须人工判定，且判定有误差”。</p>
+<p><b>第三处 · 由金融学削掉的：一个本文很想给的处方。</b> 最自然的处方是”给垫指付费”——既然它无对价，那就补偿它。金融学自己的经验说这条路会翻车：一旦对”研究了但不交易”这件事给出可归属的报酬，最省事的达标方式是<b>生产研究的形式而不是研究</b>——报告、纪要、留痕材料。市场上”卖方研究报告的数量与它对定价的贡献长期背离”是一个熟知的现象。搬回本文：给垫指记账并支付，最省事的实现方式恰恰是生产垫指的<b>声称</b>，而声称是可以被便宜地大量生产的。这一处削掉的是本文最想给出的那条政策建议，并直接导出了第十九节的反噬预言。</p>
+<h2>十八 · 不适用的边界，与两条伦理条款</h2>
+<p><b>五条不适用。</b></p>
+<p>一、<b>读数与所指之间本来就不存在链的场合。</b> 例如纯粹的竞速类评价（百米跑的成绩就是所指本身）。这类场合没有维链问题，本文的全部概念空转。</p>
+<p>二、<b>单位数不足三十、或记录体系正在改版的批次。</b> 清单的覆盖率在小样本上不稳定，改版期的留痕规则不一致。</p>
+<p>三、<b>跨组织的横向比较。</b> 第十四节的第一个不利结果已经证明，u 的相当一部分来自记录习惯。本文的读数只能在同一体系内做纵向比较。</p>
+<p>四、<b>已经完成合并的体系。</b> 本文的拦截点在第四步之前；对已经过关口的体系，本文只提供解释，不提供干预。声称能靠本文的读数救回一个已完成合并的体系，是对本文的误用。</p>
+<p>五、<b>那些能够设计出”公布后仍不能被便宜满足”的字段的场合</b>（见第十七节第一处）。这类场合应当去设字段，而不是引入本文。</p>
+<p><b>两条伦理条款。</b> 本文的读数是一个比率，比率天然会被拿去考核人，因此下列三条写死，缺一条本文不得被用于任何评价用途：</p>
+<p>一、<b>这个读数指的是位置，不是人。</b> 清单的”由谁做的”一栏只填位置（阅卷组、命题组、任课岗位），不填人名。任何把 u 归到个人头上的用法，都是把一个位置上的量错记成个人属性。</p>
+<p>二、<b>不得为了把这个数做好看，而在任何安全攸关或权利攸关的环节上制造”不留痕动作”。</b> 医疗、司法、航空的留痕规则优先于本文的一切读数。若二者冲突，留痕规则胜出，本文在该环节不适用。</p>
+<p>三、<b>已经据此对任何人做出不利安排的，必须公开编码规则并提供复核通道。</b> 编码者一致性未达第十三节第六条门槛的，该批读数不得用于任何有后果的决定。</p>
+<p>顺带把反噬说清楚：<b>一旦这个读数进入考核，最省事的达标方式是在文书上做手脚——把本来会留痕的动作故意不留痕，以抬高清单的覆盖率。</b> 这个漏洞与第十七节第三处是同一件事的两面。本文找不到出口：任何对垫指的记账都会创造对”声称垫指”的激励，而声称比动作便宜得多。这不是待办事项，这是本文自己解不开的一处。</p>
+<h2>十九 · 证伪条件，与一条写死日期的赌注</h2>
+<p>先写出最强的竞争解释，再写排除它的条件。</p>
+<p><b>最强竞争解释</b>：其实不就是学生和老师太累、时间不够吗？在时间约束下，任何人都会先做性价比高的事；所谓垫指的消失，无非是总负荷太重导致的挤压，与”链”无关。这个解释朴素、难反驳，而且大概率解释了相当一部分方差。</p>
+<p>排除它的独有变量是<b>批改端的分辨一致性</b>——它与学生和教师的负荷无关，只与评价体系保留了多少可分辨的路径信息有关。</p>
+<h3>证伪条款（编号，其中第三条最便宜、且所需数据在多数机构的既有记录里已经存在）</h3>
+<p><b>F1</b>　控制师生总课时、班额与作业总量后，若”批改端分组一致性”与”若干年后同一批学生在非套路化任务上的表现”之间不存在剂量—反应关系，则本机制为伪，困境应归因于绝对负荷。样本纪律：须在同一省份、同一考试体系内取不少于六个可比单元（同一地市的多所同类学校），不得用两个国家或两个地区的对比充数。</p>
+<p><b>F2</b>　取一个零利害的读数（纯自用练习系统的正确率，不进入任何评价），若其垫指份额随使用时长同样下降，本文对；若稳定，则指标腐化的解释足够，本文多余。这一条同时是第十五节第一条的判决性对照。</p>
+<p><b>F3（最便宜、可当场执行）</b>　随机抽取同一场考试中同分的答卷各三十份，由两名不知分数的评阅者独立按”经哪条路得到”分组，计算一致性。若一致性显著高于随机水平，该体系尚未完成合并；若已达随机水平，则合并完成。<b>这条检验所需的数据（答卷）在任何一所学校的档案里都已经存在，不需要新增采集。</b> 本文最愿意押的一条正是它。</p>
+<p><b>F4</b>　撤除外部奖惩的自然实验（减负政策、录取方式变更）之后，若那条贵的路在两年内自动恢复，则动机挤出的解释成立而本文错。</p>
+<p><b>F5</b>　纵向：若在同一体系内，“评分标准中过程性描述的比重”与”批改端分组一致性”之间不存在同向变动，则本文关于第四步机制的说法为伪。</p>
+<p><b>F6</b>　顺序预测：若观察到”批改端分组一致性下降”<b>晚于</b>”学生端非套路任务表现下降”，则本文的次序主张（合并先于停产）被推翻。本文预测的是前者早于后者。</p>
+<p><b>F7</b>　负向：若在某个体系里把全部”删掉读数不变”的动作系统性移除之后，读数与其所声称的所指之间的对应关系不下降，则垫指这一范畴本身不成立。</p>
+<p><b>这条判断若被证伪，我们会学到什么。</b> 若 F3 显示分组一致性长期稳定在高位而学习质量仍在下降，那么问题就不在维链而在别处（多半在内容本身或在时间分配），干预方向应当整个改到负荷与课程上，而不是评价上。这是一个有价值的否定结果。</p>
+<h3>赌注（写死日期，并写死什么不算命中）</h3>
+<p>本文押的是：<b>到二〇三〇年十二月三十一日为止，在任何一个公开发布的国家级或省级教育质量监测报告中，都不会出现一个”同分答卷的路径分组一致性”或与之等价的读数。</b></p>
+<p>什么不算命中： 一、以”过程性评价”“综合素质评价”“表现性任务”等名义出现的指标不算——那些测的是学生的另一批产出，不是同分产出之间的可分辨性。 二、仅由学者在论文里提出而未进入任何官方监测报告的，不算。 三、以自评、问卷或教师主观报告形式收集的，不算；必须是对同分产出的独立分组一致性。 四、仅在单校或单次实验中出现的，不算；必须进入常规监测。</p>
+<h2>若这条被兑现（即真的出现了这样的读数），本文关于”这类动作在制度上不可见”的第三层主张即被削弱，本文应当据此让步。</h2>
+<h2>二十 · 本文自己：用这套判据检提出这道题的那条指令</h2>
+<p>这一节不写”本文也有局限”，那不算认账。这一节用本文自己的判据，去检<b>提出这道题的那条指令</b>——也就是”用一套跨领域的方法，把一个教育难题做成一篇两万字的学术论文”这件任务本身。</p>
+<p>对这条指令问那句判据：在这次得到”一篇两万字论文”这个读数的过程里，删掉哪一个动作读数不会变？</p>
+<p>答案不止一个，而且很难看。</p>
+<p><b>第一个：真跑那一条。</b> 第十四节的数据抓取、预注册、三个不利结果，删掉它，这篇文章照样是两万字，照样有辨别表、有五步次序、有可通约读数、有八条证伪条款，而且读起来更顺——因为不利结果是文章里唯一让论证变钝的部分。它在”两万字论文”这个读数上恰好为零。<b>它是本文自己的垫指。</b></p>
+<p><b>第二个：第十七节的三处反向约束。</b> 每一处都削掉了本文原本更有力的一句话。删掉它们，命题更强、更好卖、字数不变。同样为零。</p>
+<p><b>第三个：第十二节里那两个查出来的场景。</b> 按步给分与鉴别诊断栏这两条，一条推翻了本文”没有字段”的强主张，一条给本文的适用范围加了条件。删掉它们，文章的读数不变。</p>
+<p>于是本文落在自己表格的哪一格，取决于这三样在不在。它们在，本文在甲格；如果本文当初为了让论证更漂亮而把它们省掉——而这在文字上是完全不留痕的——本文就在丙格：一篇形式审查全过、结构完整、读起来更有力的两万字论文，而它与它所声称的那样东西之间的链已经断了。<b>读者无法从成品上分辨这两种情况。</b> 这正是本文关于丙格的全部主张：甲格与丙格在产物上同形。</p>
+<p>由此得出一个对本文自己不利的结论：<b>本文无法通过自我陈述来证明自己不在丙格。</b> 说”我做了真跑”本身就是一个声称，而第十七节第三处已经说明，声称比动作便宜。唯一能分辨的位置在批改端——在评阅这篇文章的人那里，而且只有在他还能分辨”这一段是查出来的还是想出来的”的时候。本文能做的只有一件：把数据、预注册文本、逐仓读数原样列出，让分辨这件事仍然可能。</p>
+<p>还有一处更深的自反。本文主张垫指的记账会诱发对声称的激励；而本文自己正是在<b>为垫指做一次记账</b>——把它命名、定义、给读数、写清点手册。按本文自己的机制，这次记账会诱发”生产垫指的声称”。<b>本文因此是它自己所描述的那个反噬的第一个实例。</b> 我看不到出口。能做的只是把这一段写在这里，而不是写在脚注里。</p>
+<p>最后一处：本文的第三层主张（“多数记录体系里没有这个字段”）是三层里最稳的一层，也是唯一一层不依赖前两层的。若”垫指”这个构念被推翻、若五步次序被推翻，“多数评价体系不为同读数产出之间的可分辨性设字段”这条经验主张仍然站得住，并且第十九节的 F3 仍然可以照跑。本文可以被分层引用，这既是诚实，也是保护。</p>
+<h2>二十一 · 结论</h2>
+<p>回到题面上的三问。</p>
+<p><b>扼杀的到底是什么。</b> 不是能力，不是动机，不是分数的准确性，而是垫指——那一类与另一条来路产出同一读数、删掉它读数不变、因而在所有账本上记为零、却单独维持着”这个读数还指着它所声称的那样东西”这条链的动作。它在分子遗传学里叫同义替换落在关键位点上的那一部分，在证券市场里叫做完估值而不产生任何头寸变化的那一部分工作，在语言演变里叫那些不改变命题内容、只维持区别的冗余成分。三处量纲完全不同，比率是同一个。</p>
+<p><b>经由哪条次序把它杀掉。</b> 等值化（两条来路被压成同一个读数）、择廉（便宜的一条被系统性优选）、失信号（份额下降而所有指标改善）、合并（批改端不再能分辨两条来路）、停产（那条路不再有活的携带者）。前三步是量变，逐步可逆；第四步是范畴的合并，不可返工；此后所有证据都会被重新解释成”标准还不够高”，而每一次加强都加深合并。</p>
+<p><b>在哪一步还拦得住。</b> 第三步末、第四步之前，判据取在批改端而不在学生端：随机抽取同分答卷，让不知分数的评阅者独立按”经哪条路得到”分组，看一致性。这是全系统唯一一个在丙格里会先掉下来的读数，而它所需的数据在任何一所学校的档案里已经存在。</p>
+<p>三条推论是不舒服的。第一，减负、恢复兴趣、换一把更好的尺子，这三条处方都够不到它——前两条处理被测量的对象，第三条处理测量工具，而它两者都不是。第二，最自然的两条补救——给它设字段、给它付费——都会自我拆台：字段公布后会被优化，付费会诱发对声称的生产。第三，它的消失不需要任何人作弊、偷懒或犯错；每一步都是正当的、理性的、合规的，而正是这些合规的步子把它磨掉。</p>
+<p>本文留下三个自己解不开的洞。其一，垫指的识别成本没有解决：同读数是必要条件而远非充分条件，第三条判据（维链）的验证往往只能事后进行。其二，正交性的定量支撑缺位，第十四节的样本量不足以裁决。其三，反噬无出口：任何对它的记账都在生产对声称的激励，本文自己就是第一个实例。</p>
+<h2 class="refs-h">注释</h2>
+<p class="ref">一、第四节所引结论的原文表述为”存在一个均衡程度的非均衡”（an equilibrium degree of disequilibrium），指价格只能部分地反映知情者的信息，否则获取信息者得不到补偿。</p>
+<p class="ref">二、第六节所述同义替换的非中性效应，涉及密码子使用偏好、tRNA 丰度匹配、翻译速率与共翻译折叠、mRNA 二级结构与剪接调控元件等多条机制，各机制的证据强度不一，本文只取其”读数为零而功能不为零”这一形状，不主张任何具体机制的普遍性。</p>
+<p class="ref">三、第八节所述合并不可逆性，在历史语言学中通常以 Garde 原则的名义讨论，并在方言接触与变体借入的情形下有已知的限定条件；本文取其判据（合并的标志是感知端不再分辨）而不主张它在所有语言变化中无例外。</p>
+<p class="ref">四、第十四节的原始数据、预注册文本与逐仓读数已在正文中完整给出，抓取日期为二〇二六年八月八日；关闭理由字段为记录体系较晚引入的字段，抽样因而偏向近期。</p>
+<p class="ref">五、本文全篇只使用一个 u 的定义（第十三节），第十九节的证伪条款与赌注均引用同一定义、同一粒度、同一 N ≥ 30 门槛。</p>
+<h2 class="refs-h">参考文献</h2>
+<p class="ref">Campbell, D. T. <i>Assessing the Impact of Planned Social Change.</i> Occasional Paper Series #8, The Public Affairs Center, Dartmouth College, December 1976. 重刊于 <i>Evaluation and Program Planning</i>, 1979, 2(1): 67–90.</p>
+<p class="ref">Deci, E. L., &amp; Ryan, R. M. <i>Intrinsic Motivation and Self-Determination in Human Behavior.</i> New York: Plenum, 1985.</p>
+<p class="ref">Espeland, W. N., &amp; Sauder, M. Rankings and Reactivity: How Public Measures Recreate Social Worlds. <i>American Journal of Sociology</i>, 2007, 113(1): 1–40.</p>
+<p class="ref">Garde, P. <i>Réflexions sur les différences phonétiques entre les langues slaves.</i> Word, 1961, 17(1): 34–62.</p>
+<p class="ref">Goodhart, C. A. E. Problems of Monetary Management: The U.K. Experience. 见 <i>Papers in Monetary Economics</i>, Vol. I. Sydney: Reserve Bank of Australia, 1975.</p>
+<p class="ref">Grossman, S. J., &amp; Stiglitz, J. E. On the Impossibility of Informationally Efficient Markets. <i>The American Economic Review</i>, 1980, 70(3): 393–408.</p>
+<p class="ref">Koretz, D. <i>Measuring Up: What Educational Testing Really Tells Us.</i> Cambridge, MA: Harvard University Press, 2008.</p>
+<p class="ref">Koretz, D. <i>The Testing Charade: Pretending to Make Schools Better.</i> Chicago: University of Chicago Press, 2017.</p>
+<p class="ref">Labov, W. <i>Principles of Linguistic Change, Volume 1: Internal Factors.</i> Oxford: Blackwell, 1994.</p>
+<p class="ref">Lepper, M. R., Greene, D., &amp; Nisbett, R. E. Undermining Children’s Intrinsic Interest with Extrinsic Reward: A Test of the “Overjustification” Hypothesis. <i>Journal of Personality and Social Psychology</i>, 1973, 28(1): 129–137.</p>
+<p class="ref">Marton, F., &amp; Säljö, R. On Qualitative Differences in Learning: I—Outcome and Process. <i>British Journal of Educational Psychology</i>, 1976, 46(1): 4–11.</p>
+<p class="ref">Meillet, A. L’évolution des formes grammaticales. <i>Scientia</i>, 1912, 12(26): 384–400.</p>
+<p class="ref">Merton, R. K. Bureaucratic Structure and Personality. <i>Social Forces</i>, 1940, 18(4): 560–568.</p>
+<p class="ref">Muller, J. Z. <i>The Tyranny of Metrics.</i> Princeton: Princeton University Press, 2018.</p>
+<p class="ref">Plotkin, J. B., &amp; Kudla, G. Synonymous but not the same: the causes and consequences of codon bias. <i>Nature Reviews Genetics</i>, 2011, 12(1): 32–42.</p>
+<p class="ref">Porter, T. M. <i>Trust in Numbers: The Pursuit of Objectivity in Science and Public Life.</i> Princeton: Princeton University Press, 1995.</p>
+<p class="ref">Sadler, D. R. Formative Assessment and the Design of Instructional Systems. <i>Instructional Science</i>, 1989, 18(2): 119–144.</p>
+<p class="ref">Kimura, M. <i>The Neutral Theory of Molecular Evolution.</i> Cambridge: Cambridge University Press, 1983.</p>
+<p class="ref">正文（不含参考文献与本节）约二万一千汉字。版本：第一稿，二〇二六年八月八日。第十四节的数据抓取与统计于同日完成，预注册文本先于统计写定。</p>
+<p class="ref">本文的选题、三门取材的指定、以及对成果形态的要求由作者提出；文献核对、数据抓取、统计与初稿撰写由人工智能辅助完成，全部判断与最终定稿由作者负责。第十四节所用数据来自公开接口，抓取脚本与预注册文本可应要求提供；受匿名接口配额限制，样本量低于预注册设计，该限制已在正文中明写，未做任何事后阈值调整。</p>
+<p class="ref">本文提出的读数可被用于对人的评价，因此第十八节的三条伦理条款为本文的构成部分而非附加说明：读数指位置不指人；不得为抬高该读数而在安全攸关或权利攸关的环节上制造不留痕动作；已据此做出不利安排的须公开编码规则并提供复核通道。编码者一致性未达门槛的批次，其读数不得用于任何有后果的决定。</p>
+
+<h2 class="suphd">最美文定稿：全球文库终审与核心命题的重写</h2>
+<p style="text-indent:0;font-size:14px;color:#B0A78D">以下一节由编辑增补，不属于投稿原稿。它按最美文频道的五道入选关执行：请出正文未曾请出的那位最危险的对手，与之划一条让两套理论对同一件事作出相反预测的线，写清怎么裁决，把核心命题改写为否定—重命名形式，并列出三条「被观察到即失效」。<b>正文的论证、数据与结论一字未改。</b></p>
+<section class="supp">
+<h3>一、本篇的对手全在自己家里</h3>
+<p>本文的三个原型——同义突变、未成交的估值、音位合并——分别取自它自己选的三门源头学问。这是好的取材，但它带来一个后果：<b>本文正面交手过的对象，几乎都在这三门之内</b>。一个新对象若只与自己的取材学科对质，它的不可还原性没有被真正检验过。下面补两位站在这三门之外、而且离本文很近的对手。</p><h3>二、第一位：测验效度里的「响应过程证据」</h3>
+<p>《教育与心理测验标准》把效度证据分为五类，其中一类专门处理<b>分数相同而作答过程不同</b>：两名学生得了同样的分，一个是推出来的，一个是背出来的，分数不区分他们，而效度论证要求你去证明「这个分数确实由所声称的那个过程产生」。做法是出声思维、眼动、答题日志、过程性数据——<b>把那个过程测出来，变成一个新的读数。</b></p><p>一个读者完全可以说：你说的「删掉它读数不变」的动作，测验效度早就知道，而且已经有一整套办法去测它。</p><p><b>分离线：一旦为它设了字段，它就不再是垫指。</b>这不是循环论证，而是一条可判决的预测。垫指的定义性质是「在本次读数上与另一条来路完全等价」；为它设字段等于把它从等价类里拽出来，使它成为可被单独计分的对象——而本文第十七节已经写死了随之而来的后果：<b>被设了字段的那部分会迅速被便宜地满足</b>（出声思维会被练成话术，过程日志会被填成模板），而未被设字段的部分继续消失。</p><p><b>裁决办法。</b>取一个新设立了过程性字段的评价体系，追踪该字段的作答形态在两个周期内是否出现模板化（编码离散度下降、高频句式占比上升）。响应过程证据预测：设了字段就测到了真东西，形态应保持多样。本文预测：<b>模板化在两个周期内出现，而总读数的分辨力不升反降。</b>若字段设立后形态保持多样、分辨力上升，本文关于「设字段即消灭该类动作」的主张失败。</p><h3>三、第二位：不可见劳动</h3>
+<p>斯塔尔与施特劳斯的<b>不可见劳动</b>处理的是另一件极像的事：做了而不被承认、不被计入、不被支付的那部分工作。本文说的「投入了而不留痕」，听上去就是它。</p><p><b>分离线：有没有主体，涉不涉及公平。</b>不可见劳动是一个<b>分配问题</b>——有人做了，有人受益，承认与报酬没有到位；它的处方是<b>让它被看见并被计入</b>。垫指是一个<b>记账算术问题</b>——它与另一条来路在读数上等价，因而账本没有为它设字段；没有任何人从中获益，也没有任何人有过失。</p><p><b>相反预测。</b>不可见劳动预测：一旦被看见并被计酬，该劳动会<b>增加</b>。本文预测：垫指一旦被计入读数，它会<b>变成另一类动作</b>（可被便宜满足的那一类），而原来那一类反而消失——因为它的定义就是「不被计入」。这两条预测在同一次制度改动上方向相反，可以直接裁决。</p><h3>四、核心命题的否定—重命名</h3>
+<p class="pull">应试教育杀掉的，不是某种被磨坏的官能，不是被外部奖惩挤走的动机，也不是「过程没有被测量」这一技术缺口——它是<b>那一类删掉它读数不变的动作</b>：与另一条来路在本次读数上完全等价，因而没有任何账本为它设字段；而恰恰是它在维持「这个读数还指着它所声称的那样东西」这条链。不可返工的那一步不在学生端，在批改端。</p><h3>五、本文禁止什么</h3>
+<ol><li>禁止为垫指设立字段之后，该字段的作答形态在两个周期内不出现模板化。若形态保持多样且分辨力上升，本文的核心机制失败。</li><li>禁止 u 在同一体系内的纵向变化与批改端分辨力无关。若两者无关，本文关于「拦截点在批改端」的定位失效。</li><li>禁止跨组织横向比较得出稳定结论。正文真跑的第一个不利结果已经证明 u 的相当一部分来自记录习惯；任何把本文读数用于跨体系排名的做法，都是对本文的误用。</li></ol><h3>六、独立成立性检验</h3>
+<p>把标准里的响应过程证据、斯塔尔与施特劳斯全部删去，本文还剩什么？剩下一个纯粹的机械检查：<b>把这套记录体系的字段清单调出来，看有没有一个字段用来记「这一次投入产生了什么」。</b>这个检查不需要访谈、不需要过程数据、不需要任何关于公平的立场——它查的是字段表。效度理论七十年从未把「有没有这个字段」当作一个需要逐体系清点的对象：它讨论的是分数能不能支持某个推论，本文清点的是账本上有没有那一栏。</p>
+<p class="ref">本轮定稿所核验的文献：American Educational Research Association, American Psychological Association, &amp; National Council on Measurement in Education. (2014). <i>Standards for Educational and Psychological Testing</i>. Washington, DC: AERA. · Star, S. L., &amp; Strauss, A. (1999). Layers of silence, arenas of voice: The ecology of visible and invisible work. <i>Computer Supported Cooperative Work</i>, 8(1–2), 9–30. · Ericsson, K. A., &amp; Simon, H. A. (1993). <i>Protocol Analysis: Verbal Reports as Data</i> (rev. ed.). Cambridge, MA: MIT Press.</p>
+</section>
+<p class="ref" style="margin-top:40px">本文正文为学员投稿原稿，作者胡敏。原稿自标的「学科通融专栏」栏目行已改为本站「胡敏谈 · 应试教育」（学科通融是本站二阶碰撞产线的栏目，学员论文收入学员专栏）。原稿每篇末尾均附有作者的人机分工声明：写作使用了大型语言模型作为检索、成文与自查的助手，材料的取舍、判断的落点以及不利结果的处置由作者决定——本站保留这一声明并在此重申。文中涉及教育评价与政策的讨论均为理论分析，不构成任何机构的评估依据。</p>
+</div>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

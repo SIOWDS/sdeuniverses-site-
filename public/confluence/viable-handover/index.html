@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>续域移交力——论母亲的力量不是一种移交的能力，而是可行下一步的执行地址 | 学科通融 · SDE Universes</title>
+<meta name="description" content="母职研究不缺「好的母亲」理论：依恋、足够好、教养类型、脚手架、自主支持、韧性、母亲守门，各自记录了非常多的信息。本文要找的是它们共同的缺项。断裂力学把「强」从无缺陷改写为有裂纹仍可承载，过渡态理论把「帮助」从给出终点改写为改变跨越门槛，可生存性理论把「自由」从选项数量改写为约束中的可继续轨迹——三家">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+/* 学科通融 · 学术纸面版式 v2 —— 为长时间的思辨性阅读设计 */
+:root{
+  --paper:#F5F2E9; --paper2:#FBF9F3; --sheet:#FDFCF7;
+  --ink:#23201A; --ink2:#5C5647; --ink3:#8A8271;
+  --rule:#2A3B50; --rule2:#41586F;
+  --mark:#9E3D2C; --mark2:#B85A44;
+  --line:rgba(35,32,26,.13); --line2:rgba(35,32,26,.28);
+  --measure:700px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 8%, rgba(42,59,80,.035), transparent 46%),
+    radial-gradient(circle at 84% 72%, rgba(158,61,44,.030), transparent 44%);
+  background-attachment:fixed;
+  font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;
+  font-size:18.5px; line-height:2.06; letter-spacing:.012em;
+  font-feature-settings:"kern" 1;
+  text-rendering:optimizeLegibility;
+}
+a{color:inherit}
+::selection{background:rgba(158,61,44,.16)}
+
+/* 阅读进度：细，不抢注意力 */
+#pbar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--mark);z-index:99;opacity:.85}
+
+/* 顶栏 */
+.readbar{position:sticky;top:0;z-index:10;background:rgba(245,242,233,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 26px;font-size:13.5px;gap:12px;flex-wrap:wrap;letter-spacing:.02em}
+.nav-back{text-decoration:none;color:var(--mark)}
+.rb-modes{display:flex;gap:8px}
+.rb-btn{padding:5px 13px;border:1px solid var(--line2);border-radius:0;
+  text-decoration:none;font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
+.rb-btn:hover{border-color:var(--mark);color:var(--mark)}
+.rb-btn.cur{background:var(--rule);color:var(--sheet);border-color:var(--rule)}
+
+/* 题头：论文首页 */
+.art{max-width:800px;margin:auto;padding:78px 26px 8px;text-align:center}
+.art-series{color:var(--mark);letter-spacing:.42em;font-size:11.5px;text-transform:uppercase}
+.art-title{font-size:clamp(30px,4.4vw,45px);line-height:1.38;margin:26px 0 0;font-weight:700;letter-spacing:.01em}
+.art-title:after{content:"";display:block;width:56px;height:1px;background:var(--line2);margin:26px auto 0}
+.art-sub{color:var(--ink2);font-size:17px;line-height:1.94;max-width:620px;margin:22px auto 0;font-weight:400}
+.art-meta{color:var(--ink3);font-size:12.5px;margin-top:26px;letter-spacing:.09em}
+
+/* 正文栏宽：每行约三十四个汉字，是长文思辨阅读最省力的宽度 */
+.wrap{max-width:var(--measure);margin:auto;padding:8px 26px 46px}
+
+/* 摘要块 */
+.deck{position:relative;background:var(--paper2);border:0;border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--line);border-radius:0;
+  padding:30px 30px 26px;margin:44px 0 8px;font-size:16.2px;line-height:2.0;color:var(--ink2);text-align:justify}
+.deck:before{content:"题 解";position:absolute;top:-11px;left:26px;background:var(--paper);
+  padding:0 10px;font-size:11px;letter-spacing:.34em;color:var(--rule)}
+
+/* 目录：带引导点的学术目次 */
+.toc{background:transparent;border:0;border-top:1px solid var(--line2);
+  border-bottom:1px solid var(--line2);border-radius:0;padding:24px 4px 20px;margin:44px 0 56px}
+.toc .tl{font-size:11px;letter-spacing:.44em;color:var(--mark);margin-bottom:16px;text-align:center}
+.toc a{display:flex;align-items:baseline;gap:6px;padding:6px 2px;color:var(--ink2);
+  font-size:15px;text-decoration:none;border:0;line-height:1.7}
+.toc a:after{content:"";flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-4px)}
+.toc a:hover{color:var(--mark)}
+
+/* 章节层级 */
+h2{font-size:23px;margin:74px 0 22px;padding:26px 0 0;border:0;border-top:1px solid var(--line2);
+  line-height:1.55;scroll-margin-top:78px;letter-spacing:.02em;font-weight:700}
+h2:first-of-type{margin-top:48px}
+h2:target{background:linear-gradient(transparent 68%,rgba(158,61,44,.14) 68%)}
+h3{font-size:18.5px;margin:44px 0 14px;color:var(--rule);font-weight:700;
+  padding-left:12px;border-left:2px solid var(--mark);line-height:1.7}
+h4{font-size:17px;margin:30px 0 10px;color:var(--mark);font-weight:700}
+
+p{margin:0 0 17px;text-align:justify;hyphens:auto}
+strong,b{color:var(--rule);font-weight:700}
+i,cite{font-style:italic;color:var(--ink2)}
+
+/* 命题框：承重判断单独立出来，读者一眼可辨 */
+blockquote{position:relative;margin:38px 0;padding:26px 34px;background:var(--sheet);
+  border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);border-radius:0;
+  font-size:19px;line-height:1.95;font-weight:600;color:var(--ink);text-align:justify}
+blockquote:before,blockquote:after{position:absolute;color:var(--mark);font-size:26px;line-height:1;opacity:.55}
+blockquote:before{content:"⌜";top:9px;left:10px}
+blockquote:after{content:"⌟";bottom:9px;right:10px}
+blockquote p{margin:0}
+blockquote p+p{margin-top:12px}
+
+ul{margin:0 0 18px;padding-left:1.5em}
+ol{margin:0 0 18px;padding-left:1.7em}
+li{margin:0 0 10px;text-align:justify}
+li::marker{color:var(--mark)}
+
+hr{border:0;height:1px;background:var(--line);margin:52px auto;width:62%}
+
+em{font-style:normal;color:var(--ink3);font-size:15px}
+
+/* 三线表 */
+.tbl{width:100%;border-collapse:collapse;margin:32px 0;font-size:15.5px;line-height:1.8}
+.tbl th,.tbl td{padding:12px 14px;text-align:left;vertical-align:top;border:0}
+.tbl thead th{border-top:2px solid var(--ink);border-bottom:1px solid var(--line2);
+  font-weight:700;color:var(--rule);font-size:14.5px;letter-spacing:.04em}
+.tbl tbody tr:last-child td{border-bottom:2px solid var(--ink)}
+.tbl tbody td{border-bottom:1px solid var(--line)}
+.tbl caption{caption-side:bottom;font-size:13px;color:var(--ink3);padding-top:10px;text-align:left}
+
+/* 来源盒：参考文献式，悬挂缩进 */
+.src{margin:64px 0 8px;padding:30px 0 8px;border:0;border-top:2px solid var(--rule);
+  border-radius:0;background:transparent;counter-reset:srcn}
+.src .sl{font-size:11px;letter-spacing:.42em;color:var(--mark);margin-bottom:12px}
+.src .sd{font-size:14.8px;color:var(--ink2);line-height:1.95;margin:0 0 22px;text-align:justify}
+.src a.one{display:block;text-decoration:none;padding:16px 0 16px 34px;position:relative;
+  border-top:1px solid var(--line)}
+.src a.one:before{counter-increment:srcn;content:"[" counter(srcn) "]";position:absolute;left:0;top:16px;
+  color:var(--mark);font-size:13px;letter-spacing:.02em}
+.src a.one:hover .t{color:var(--mark)}
+.src a.one .k{font-size:12px;color:var(--mark);letter-spacing:.14em}
+.src a.one .t{font-size:16px;font-weight:700;color:var(--rule);margin:5px 0;line-height:1.72}
+.src a.one .g{font-size:14.5px;color:var(--ink2);line-height:1.9;text-align:justify}
+
+.endbox{text-align:center;border-top:1px solid var(--line2);margin-top:56px;padding:38px 20px;color:var(--ink2);font-size:15px}
+.endbox a{color:var(--mark);text-decoration:none}
+footer{text-align:center;border-top:1px solid var(--line);padding:32px;color:var(--ink3);font-size:12.5px;letter-spacing:.04em}
+
+#totop{position:fixed;right:22px;bottom:26px;width:40px;height:40px;border-radius:0;
+  background:var(--rule);color:var(--sheet);border:0;font-size:16px;cursor:pointer;display:none;z-index:98}
+
+@media(max-width:760px){
+  body{font-size:17px;line-height:2.0}
+  .art{padding:52px 18px 6px}
+  .wrap{padding:6px 18px 34px}
+  h2{font-size:20.5px;margin:56px 0 18px;padding-top:22px}
+  h3{font-size:17.5px}
+  blockquote{padding:22px 24px;font-size:17.5px}
+  blockquote:before{left:6px}blockquote:after{right:6px}
+  .tbl{font-size:14px}
+  .tbl th,.tbl td{padding:9px 8px}
+}
+
+@media print{
+  body{background:#fff;font-size:11.5pt;line-height:1.85}
+  .readbar,#pbar,#totop,.endbox,footer{display:none}
+  .wrap,.art{max-width:100%}
+  h2{page-break-after:avoid}
+  blockquote,.tbl,.src a.one{page-break-inside:avoid}
+  a{text-decoration:none}
+}
+
+.reflist{margin-top:6px}
+.reflist p{font-size:15px;line-height:1.95;color:var(--ink2);text-indent:-2em;padding-left:2em;margin:0 0 12px;text-align:justify}
+.reflist i{font-style:italic}
+h3{font-size:18.5px;margin:34px 0 14px;color:var(--rule)}
+.abs-en{margin-top:6px;padding:22px 24px;background:var(--sheet2,#faf8f3);border:1px solid var(--line2)}
+.abs-en p{font-size:14.5px;line-height:1.9;color:var(--ink2);margin:0 0 12px;text-align:justify}
+.kwline{font-size:14.5px;color:var(--ink2);margin:18px 0 0;letter-spacing:.02em}
+</style></head><body>
+
+<div id="pbar"></div>
+<div class="readbar">
+  <a class="nav-back" href="/confluence/">‹ 学科通融</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span>
+  <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+  <a class="rb-btn" href="viable-handover.pdf" download>⬇ 下载 PDF</a></div>
+</div>
+<header class="art">
+  <div class="art-series">学 科 通 融 · 之一百零一 · 断裂力学 × 过渡态理论 × 数学可生存性理论</div>
+  <h1 class="art-title">续域移交力</h1>
+  <div class="art-sub">论母亲的力量不是一种移交的能力，而是可行下一步的执行地址</div>
+  <div class="art-meta">王德生 ＋ Claude · 约 1.6 万字 · 22 页 · 三种阅读方式 · 发表于2026年8月18日</div>
+</header>
+<div class="wrap">
+<div class="deck">母职研究不缺「好的母亲」理论：依恋、足够好、教养类型、脚手架、自主支持、韧性、母亲守门，各自记录了非常多的信息。本文要找的是它们共同的缺项。断裂力学把「强」从无缺陷改写为有裂纹仍可承载，过渡态理论把「帮助」从给出终点改写为改变跨越门槛，可生存性理论把「自由」从选项数量改写为约束中的可继续轨迹——三家共同默认了一件在材料世界里不必说、一进亲子关系就崩塌的事：只要知道结构、路径或可行域，就能把「能否继续」当作系统自身的属性，而无需另问下一步由谁执行。推翻材料来自可生存性理论自己：可行控制本来就受可容许控制集限定，把这个集合按执行主体拆分不是外加价值，是按现实主体细化约束。由此得到撤手子执份额：母亲核心动作停止后的观察窗内，孩子可自行启动的安全下一步类别数，占该窗内已显露全部安全下一步类别数的比例。一次真跑在公开自然情境资料上给出了不利结果，逼本文取消「越少介入越有力量」的强版本；发表前的跨领域敌意检索又补上一个本文原本漏掉的词——责任移交。</div>
+<p class="kwline"><b>关键词</b>：母亲的力量；续域移交力；撤手子执份额；可行控制；责任移交；执行地址</p>
+<div class="toc"><div class="tl">目 录</div><a href="#s1">一、问题不是“母亲能扛多少”，而是“她的力量究竟存在于哪里”</a><a href="#s2">二、现有讨论已经很丰富，真正的缺口反而更窄</a><a href="#s3">三、为什么是这三门学科：S、D、E 必须各自站在不同位置</a><a href="#s4">四、S 位：断裂力学把“强”从无缺陷改写为有裂纹仍可承载</a><a href="#s5">五、D 位：过渡态理论把“帮助”从给出终点改写为改变跨越门槛</a><a href="#s6">六、E 位：可生存性理论把“自由”从选项数量改写为约束中的可继续轨迹</a><a href="#s7">七、27 对交叉比对：真正有价值的不是相似，而是三家彼此否定后的余数</a><a href="#s8">八、五个候选为什么只留下一个</a><a href="#s9">九、二阶真正发生处：三家共同默认了“谁来执行并不重要”</a><a href="#s10">十、新典范：母亲的力量是一种“续域移交力”</a><a href="#s11">十一、一张真正的 2×2：问题解决与行动权移交必须分账</a><a href="#s12">十二、为什么“少帮一点”仍然不是答案</a><a href="#s13">十三、零情态词判据：不要问“她是不是好母亲”，直接问下一步归谁</a><a href="#s14">十四、可通约读数：撤手子执份额，而不是“母亲打分”</a><a href="#s15">十五、九个近邻：为什么“续域移交力”不是它们的改名</a><a href="#s16">十六、两处反向约束：三门学科必须有权把本文写弱</a><a href="#s17">十七、真跑：公开自然情境资料给出了一条不利结果</a><a href="#s18">十八、最强竞争解释：这不就是“自主支持做得好”吗？</a><a href="#s19">十九、六条明确会让理论失败的观测</a><a href="#s20">二十、边界：母亲的力量不是无限扩权，也不是把责任甩给孩子</a><a href="#s21">二十一、反噬预言：一旦“续域移交”成为 KPI，最容易毁掉的正是行动权</a><a href="#s22">二十二、自反：这篇论文自己有没有完成“续域移交”</a><a href="#s23">二十三、几个现实场景：同样是“爱”，为什么判决会相反</a><a href="#s24">二十四、结论：母亲最大的力量，是让自己的力量不再成为孩子下一步的必要条件</a><a href="#s25">附节甲　被漏掉的那个词：责任移交</a><a href="#s26">附节乙　落点重述：从能力到地址</a><a href="#s27">附节丙　与同栏其余四篇的分界</a><a href="#s28">版本与人机分工声明</a><a href="#s29">参考文献</a></div>
+<h2 id="s1">一、问题不是“母亲能扛多少”，而是“她的力量究竟存在于哪里”</h2>
+<p>“为母则强”是一个极容易得到共鸣、却极难获得精确定义的判断。它可以指一个女人成为母亲以后更能吃苦，可以指她对孩子的保护本能，可以指她在家庭危机中的韧性，也可以指一种爱、责任或道德担当。问题在于，这些说法把几种完全不同的东西装进了同一个“强”字：母亲自身的耐受性、母亲采取的行为、母子关系的质量、孩子最后的结果，常常被混为一谈。于是，只要母亲付出很多、解决很多、牺牲很多，或者孩子表现很好，我们就很容易反推“这位母亲有力量”。</p>
+<p>本文不否认这些经验，而是把问题向前推进一步：如果两个母亲都极其爱孩子，也都能把眼前的问题解决掉，但一个孩子越来越离不开她，另一个孩子在她退出以后仍能继续行动，我们是否有理由说两种“力量”不是一回事？如果有，那么“母亲的力量”就不能只从付出量、情感浓度或短期结果里读出。我们需要一个能把“帮助得很多”和“帮助之后生命仍能自己继续”分开的本体对象。</p>
+<p>这正是 What 型问题的难处。Why 会问“母亲为什么会变强”，How 会问“怎样培养母亲的力量”，而 What 必须提供一个能够重新划分现实的辨别物。本文因此把目标写得很窄：不是建构一套完整母职伦理，也不是给母亲打分，而是回答一个可裁决问题——在一次真实的母子互动中，什么东西出现了，我们才有资格把它叫作“母亲的力量”？</p>
+<h2 id="s2">二、现有讨论已经很丰富，真正的缺口反而更窄</h2>
+<p>母职和亲职研究并不缺“好的母亲”理论。依恋传统关注照料者的敏感回应与安全基地；Winnicott 的“足够好的母亲”把适应与逐渐失配放进儿童独立化过程；Baumrind 的教养类型讨论控制、回应与自主；Wood、Bruner 与 Ross 的脚手架理论研究成人如何临时承担学习者尚不能完成的部分；自我决定理论及其亲职研究区分自主支持、投入和结构；韧性研究则把儿童在逆境中的适应放回普通发展系统；母亲守门（maternal gatekeeping）又从家庭劳动与共同养育角度处理谁有机会进入照护现场。</p>
+<p>因此，如果本文最后只是说“母亲要给安全感”“要支持自主”“要在孩子需要时帮助、成熟后撤出”“要提高孩子韧性”，它无论写得多漂亮，都已经被占位。本文所用工作流程的要求不是找三个陌生术语来重新证明旧答案，而是找到既有理论难以单独记录的一项剩余。</p>
+<p>本轮敌意检索后，本文把缺口压缩为一个非常具体的剩余：既有理论大多可以记录母亲做了什么、孩子感觉如何、孩子是否安全、任务是否成功、独立性是否提高，却较少把“母亲停止核心动作以后，下一步可行行动的执行控制现在握在谁手里”设为独立对象。这个变量不是母亲的态度，也不是孩子的结果；它描述的是一次介入结束以后，关系中的可行行动权如何重新分布。</p>
+<h2 id="s3">三、为什么是这三门学科：S、D、E 必须各自站在不同位置</h2>
+<table class="tbl"><thead><tr><th>位置</th><th>来源学科</th><th>它真正关心的对象</th><th>移入本题后的约束</th></tr></thead><tbody><tr><td>S</td><td>断裂力学</td><td>存在裂纹时结构仍能承载到什么程度；裂纹何时扩展、何时止裂</td><td>不把“没有受伤”当力量，而看出现裂纹后是否避免灾难性贯穿</td></tr><tr><td>D</td><td>过渡态理论/反应动力学</td><td>状态转换需要跨越什么能垒，路径和速率如何被改变</td><td>不把“终点很好”当发生，而看从当前状态到下一状态的跨越条件</td></tr><tr><td>E</td><td>数学可生存性理论</td><td>在约束中是否仍存在至少一条可行轨迹以及相应控制</td><td>不把“选择很多”当自由，而看安全约束下是否仍有可执行路径</td></tr></tbody></table>
+<p>三家并不是三个比喻。断裂力学从结构的显露状态进入，过渡态理论从变化路径进入，可生存性理论从约束场进入。What 的最终产物不落在 S、D、E 中任何一个位置，而是由三维共同逼出：当“裂而未断”“难而能变”“困而有路”同时出现时，还缺什么才能称为母亲的力量？答案正是在三家账本都没有单独设栏的“执行控制移交”。</p>
+<h2 id="s4">四、S 位：断裂力学把“强”从无缺陷改写为有裂纹仍可承载</h2>
+<p>断裂力学的第一记打击，是把“强度高”与“有裂纹仍不发生灾难性断裂”分开。Griffith 在 1921 年从固体破裂与能量条件出发，把微小缺陷带入破坏分析；Irwin 随后发展裂尖应力强度的工程表达。现代 ASTM E399 仍把 K_IC 用于表征在尖锐裂纹存在时材料对断裂的抵抗。这一传统不把裂纹视为理论之外的意外，而把裂纹直接放进“强”的定义中。</p>
+<p>这对“母亲的力量”的第一个改写极其关键。孩子的发展不是无裂纹过程：考试失败、同伴关系破裂、第一次离家、与母亲激烈冲突、疾病、羞耻、被拒绝、计划落空都可能形成局部裂纹。若力量只能在“孩子一直稳定、家庭一直和谐”时被看见，它就几乎等于好运。断裂力学要求我们改问：裂纹已经存在以后，结构是否还保有继续承载的能力？</p>
+<p>但断裂力学也立即给本文加上一条反向约束：断裂韧性不是脱离几何、裂纹形态与约束条件的通用“好值”。不同试样、不同应力状态、不同裂纹条件会改变可比性。转入母职后，这意味着本文不能制造一个跨年龄、跨风险、跨情境的“母亲力量总分”。同样一次接管，在三岁儿童过马路时可能保护可生存域，在二十五岁子女择业时却可能压缩可行域。强弱必须和约束状态一起编码。</p>
+<p>可引原句闸（ASTM E399）：KIC “characterizes the resistance of a material to fracture … in the presence of a sharp crack.”</p>
+<h2 id="s5">五、D 位：过渡态理论把“帮助”从给出终点改写为改变跨越门槛</h2>
+<p>反应动力学关心的不是“产物好不好”，而是一个状态如何变成另一个状态。Eyring 的活化复合物理论与后来形成的过渡态理论，把反应速率与跨越势垒联系起来。IUPAC 对 transition state theory 的定义仍以速率和特殊平衡假设为核心。这个框架迫使我们区分两个常被亲职语言混在一起的动作：替孩子拿到终点，和改变孩子从当前状态走向下一状态所必须跨越的门槛。</p>
+<p>一个孩子不敢开口道歉，母亲替他去道歉，终点看起来抵达了，但孩子没有跨越“承认错误—承受羞耻—组织语言—面对回应”的过渡态。一个孩子不会解决作业，母亲把答案讲出来，任务关闭了，但原本需要形成的搜索路径可能没有出现。反过来，母亲也可能只改变一个关键条件：把任务拆小、把环境变安全、提供一次示范、陪孩子完成第一步，然后让核心动作重新由孩子执行。过渡态理论由此告诉我们：母亲的力量不能按终点完成量结算。</p>
+<p>第二条反向约束来自化学本身：降低能垒并不等于决定最终平衡，更不等于所有路径都越快越好。存在竞争路径与选择性。转入本题后，本文因此放弃一个最诱人的强说法——“有力量的母亲就是让孩子的成长更容易”。成长中有些门槛必须保留，因为绕过门槛会让关键能力根本不发生；真正需要改变的是使目标路径可进入的条件，而不是把一切困难消除。</p>
+<p>可引原句闸（IUPAC）：Transition state theory is “a theory of the rates of elementary reactions which assumes a special type of equilibrium”.</p>
+<h2 id="s6">六、E 位：可生存性理论把“自由”从选项数量改写为约束中的可继续轨迹</h2>
+<p>Jean-Pierre Aubin 发展的 viability theory 研究在状态约束与控制约束存在时，一个动态系统是否仍存在能够留在允许集合中的演化。其核心概念 viability kernel 不是“所有可能状态”，而是从哪些状态出发，至少存在一种允许控制，使系统继续满足约束。后来理论扩展到不确定性、反馈、捕获域、延迟与记忆等问题。</p>
+<p>这使母职讨论获得了一个比“给孩子更多选择”更严格的 E 维。真正的可行域不是菜单越长越好，而是安全底线、年龄能力、资源条件和现实约束内仍然存在下一步。母亲可能关闭十条危险路径，却因此保住一条长期可继续路径；也可能给孩子表面上很多选择，却用经济依赖、情绪惩罚或替代执行让这些选择都无法由孩子自己启动。</p>
+<p>可生存性理论还提供了本文最关键的内部推翻材料。断裂力学和过渡态理论都可以在不问“谁执行控制”的情况下描述系统：材料不会拥有行动权，分子也不会拥有行动权。一般的 viability 语言如果只问“存在控制使系统可行”，也可能把母亲执行的控制和孩子执行的控制混在一起。但控制约束本来就可以是主体特定的。只要把允许控制集合拆成 U_m（母亲可执行）与 U_c（孩子可执行），一个新的差异立刻出现：某条轨迹可以对母子二人共同系统可行，却对孩子单独不可行。这个差异就是三家共同漏记的对象。</p>
+<p>可引原句闸（Aubin 体系）：viability theory studies evolutions “governed by complex systems under uncertainty” and their adaptation to viability constraints.</p>
+<h2 id="s7">七、27 对交叉比对：真正有价值的不是相似，而是三家彼此否定后的余数</h2>
+<p>每家抽出三个支撑后，进行 S×D、S×E、D×E 三组各 9 对交叉比对，共 27 对。下面保留每一对的最短涌现物。不是每一项都进入最终理论，但至少八项必须产生不能由单家直接给出的新判断。</p>
+<table class="tbl"><thead><tr><th>#</th><th>支撑 A</th><th>支撑 B</th><th>二阶涌现物</th></tr></thead><tbody><tr><td>1</td><td>S1 裂纹存在≠结构立即失效</td><td>D1 跨越取决于能垒</td><td>裂纹后的第一任务不是回到原状，而是让下一次转换仍有入口</td></tr><tr><td>2</td><td>S1 裂纹存在≠结构立即失效</td><td>D2 改路径不等于替代产物</td><td>局部修补若没有生成可跨越路径，只是把裂纹藏起来</td></tr><tr><td>3</td><td>S1 裂纹存在≠结构立即失效</td><td>D3 竞争路径要求选择性</td><td>止裂也可能把系统困在原位置；不破并不等于能长</td></tr><tr><td>4</td><td>S2 裂尖/几何决定局部扩展</td><td>D1 跨越取决于能垒</td><td>同样的失败，真正危险的是把下一过渡门槛抬到不可进入</td></tr><tr><td>5</td><td>S2 裂尖/几何决定局部扩展</td><td>D2 改路径不等于替代产物</td><td>结构性帮助应改变门槛，不应由帮助者长期占据反应路径</td></tr><tr><td>6</td><td>S2 裂尖/几何决定局部扩展</td><td>D3 竞争路径要求选择性</td><td>修复一处可能制造另一条副路径；帮助需要选择性</td></tr><tr><td>7</td><td>S3 止裂≠恢复原状</td><td>D1 跨越取决于能垒</td><td>短期止裂与长期转化必须分账</td></tr><tr><td>8</td><td>S3 止裂≠恢复原状</td><td>D2 改路径不等于替代产物</td><td>最强支持不是持续承载，而是承载到控制能够移交</td></tr><tr><td>9</td><td>S3 止裂≠恢复原状</td><td>D3 竞争路径要求选择性</td><td>“避免失败”与“形成跨越能力”可能方向相反</td></tr><tr><td>10</td><td>S1 裂纹存在≠结构立即失效</td><td>E1 可行核=至少一条约束内轨迹</td><td>不发生灾难性断裂的最低条件，是裂纹后仍有一条可行轨迹</td></tr><tr><td>11</td><td>S1 裂纹存在≠结构立即失效</td><td>E2 可行取决于允许控制/反馈</td><td>同一裂纹在不同约束场中会导向不同可行域</td></tr><tr><td>12</td><td>S1 裂纹存在≠结构立即失效</td><td>E3 可行≠最优，选项多≠安全</td><td>保护不是让选择无限增多，而是阻止裂纹把可行域压成空集</td></tr><tr><td>13</td><td>S2 裂尖/几何决定局部扩展</td><td>E1 可行核=至少一条约束内轨迹</td><td>裂尖是局部的，可行域是全局的；局部修复必须接受全局检验</td></tr><tr><td>14</td><td>S2 裂尖/几何决定局部扩展</td><td>E2 可行取决于允许控制/反馈</td><td>结构能承载，不代表孩子拥有执行控制</td></tr><tr><td>15</td><td>S2 裂尖/几何决定局部扩展</td><td>E3 可行≠最优，选项多≠安全</td><td>高韧性结构也可能通过过度约束牺牲未来路径</td></tr><tr><td>16</td><td>S3 止裂≠恢复原状</td><td>E1 可行核=至少一条约束内轨迹</td><td>止裂动作只有在保留后续轨迹时才构成发展性力量</td></tr><tr><td>17</td><td>S3 止裂≠恢复原状</td><td>E2 可行取决于允许控制/反馈</td><td>母亲可执行的可行轨迹与孩子可执行的可行轨迹必须分开记</td></tr><tr><td>18</td><td>S3 止裂≠恢复原状</td><td>E3 可行≠最优，选项多≠安全</td><td>安全约束可能要求暂时关闭路径，因此“越开放越强”不成立</td></tr><tr><td>19</td><td>D1 跨越取决于能垒</td><td>E1 可行核=至少一条约束内轨迹</td><td>门槛低并不够，跨过去以后还必须留在可行域内</td></tr><tr><td>20</td><td>D1 跨越取决于能垒</td><td>E2 可行取决于允许控制/反馈</td><td>真正的催化应把可行控制转入孩子自己的控制集合</td></tr><tr><td>21</td><td>D1 跨越取决于能垒</td><td>E3 可行≠最优，选项多≠安全</td><td>降低所有门槛会打开危险路径，必须受约束集筛选</td></tr><tr><td>22</td><td>D2 改路径不等于替代产物</td><td>E1 可行核=至少一条约束内轨迹</td><td>母亲替孩子完成一次转换，与孩子获得可重复路径不是同一事件</td></tr><tr><td>23</td><td>D2 改路径不等于替代产物</td><td>E2 可行取决于允许控制/反馈</td><td>路径被打开以后，控制权是谁的决定了它能否在母亲撤手后继续</td></tr><tr><td>24</td><td>D2 改路径不等于替代产物</td><td>E3 可行≠最优，选项多≠安全</td><td>最优终点不是核心；可继续的次优路径可能更有发展价值</td></tr><tr><td>25</td><td>D3 竞争路径要求选择性</td><td>E1 可行核=至少一条约束内轨迹</td><td>竞争路径意味着母亲的帮助会重排孩子未来的选择地形</td></tr><tr><td>26</td><td>D3 竞争路径要求选择性</td><td>E2 可行取决于允许控制/反馈</td><td>移交不是退出，而是把可行反馈从 U_m 改写进 U_c</td></tr><tr><td>27</td><td>D3 竞争路径要求选择性</td><td>E3 可行≠最优，选项多≠安全</td><td>真正力量的最小单位不是“帮助一次”，而是“孩子多获得一个可自己启动的安全下一步”</td></tr></tbody></table>
+<h2 id="s8">八、五个候选为什么只留下一个</h2>
+<table class="tbl"><thead><tr><th>候选</th><th>50 字承重命题</th><th>最危险近邻</th><th>处理</th></tr></thead><tbody><tr><td>C1 断裂承载力</td><td>母亲的力量是让孩子在受挫、冲突和失败后仍不发生整体性崩解</td><td>韧性、依恋安全基地</td><td>淘汰：近邻可以 1:1 替换</td></tr><tr><td>C2 降障催化力</td><td>母亲的力量是降低孩子完成发展转换所需跨越的门槛</td><td>脚手架、自主支持</td><td>淘汰：方法与结局均已有成熟占位</td></tr><tr><td>C3 可行域守护力</td><td>母亲的力量是让孩子在现实约束中始终保有可走的路径</td><td>生态韧性、自主支持</td><td>降级：仍没有回答路径由谁执行</td></tr><tr><td>C4 退场延续力</td><td>母亲退出以后孩子仍能把事情继续做下去</td><td>脚手架 fading；自家“撤手”文章</td><td>淘汰：把“少介入”误当本体</td></tr><tr><td>C5 续域移交力</td><td>母亲改变结构/门槛/约束，使一条安全下一步从母亲可执行转为孩子可执行，并在母亲停止核心动作后仍存在</td><td>自主支持＋脚手架＋viability 的交叉区</td><td>保留：三者都能逼近，却不能单独替代“可行控制的主体移交”</td></tr></tbody></table>
+<p>“续域移交力”之所以活下来，不是因为它比“自主”或“韧性”更宏大，而是因为它更窄。它要求同时满足三个条件：有约束内的可行下一步；下一步的核心动作由孩子可执行；这一可执行性在母亲停止核心动作之后仍然存在。少一个条件，就退回既有概念。</p>
+<h2 id="s9">九、二阶真正发生处：三家共同默认了“谁来执行并不重要”</h2>
+<p>三家表面上争的是“力量应该从哪里读”：断裂力学说看裂纹与承载状态，过渡态理论说看跨越路径，可生存性理论说看约束中的可行轨迹。三维度型的结构性共有前提因此可以写实为：只要我们知道结构、路径或可行域中的一个，就能把“能否继续”当作系统自身的属性，而无需另问下一步由谁执行。</p>
+<p>这个前提在材料和分子世界里几乎不需要被说出来，因为不存在“材料自己做”与“母亲替材料做”的区分。但一进入亲子关系，主体差异使它崩塌：若所有可行路径都只能由母亲持续执行，母子共同系统可以维持“可行”，孩子的行动系统却可能已经是空集。反过来，眼前问题甚至可以没有完全解决，只要孩子已经获得一条自己能够启动的后续路径，他的个人可行域就并未关闭。</p>
+<p>推翻材料来自可生存性理论自己：viability 的控制本来就受 admissible controls 限定。把控制集进一步按执行主体拆分，并不是给理论硬加心理学价值，而是把控制约束按现实主体细化。于是，三门学科都没有单独设栏、但亲子关系必须设栏的新对象出现了——“可行控制的主体归属”。这不是旧概念的一项新指标，而是决定同一个“帮助成功”究竟属于代办还是移交的判决变量。</p>
+<h2 id="s10">十、新典范：母亲的力量是一种“续域移交力”</h2>
+<p>定义：续域移交力（Viable-Space Handover Power, VSHP）是指——当孩子处于裂纹、门槛或约束状态时，母亲通过结构修补、路径降障或条件重构，使至少一条符合安全约束的下一步可行行动，从“需要母亲执行核心动作”转化为“孩子能够自己启动核心动作”，并在母亲停止该核心动作后仍然存在的关系能力。</p>
+<p>这个定义故意使用“三重否定”保护边界。第一，它不等于母亲承受更多。一个母亲可以极其坚忍，却用自己的坚忍长期替孩子承担本该移交的行动。第二，它不等于母亲解决更多。问题可以被迅速关闭，但如果所有下一步仍要母亲继续做，系统只是高效代办。第三，它不等于母亲介入更少。危险、年龄、能力和不可逆后果都可能要求母亲直接介入；真正的分界是介入结束以后，可行行动权是否重新进入孩子的控制集合。</p>
+<p>因此，“有力量的母亲”不是永远后退一步，也不是永远站在孩子前面。她的典型动作更接近：在裂纹要贯穿时先承担结构，在门槛高到孩子进不去时改变路径，在环境把所有路都封死时重构条件；但是，一旦新的可行状态出现，她的核心动作不继续占据那条路，而让孩子成为下一步的执行者。</p>
+<p>这个理论把母爱中一个容易被忽略的悖论写出来：母亲最显眼的力量，常常是她能为孩子做多少；而最深的力量，可能恰恰在她做完关键的那一部分之后，孩子不需要她继续做。力量的完成标志不是“母亲还在用力”，而是“母亲的力量已经改写了条件，因此孩子的力量开始成为下一轮的起点”。</p>
+<h2 id="s11">十一、一张真正的 2×2：问题解决与行动权移交必须分账</h2>
+<table class="tbl"><thead><tr><th></th><th>撤手后孩子有 ≥1 条可独立启动的安全下一步</th><th>撤手后孩子没有可独立启动的安全下一步</th></tr></thead><tbody><tr><td>眼前问题已解决</td><td>续域移交：问题闭合，同时孩子接过下一步执行控制。</td><td>代办封闭：短期结果很好，但下一轮仍需母亲继续执行。</td></tr><tr><td>眼前问题未完全解决</td><td>留路未解：现在仍有困难，但孩子手里已经有一条能继续试的路。</td><td>双重封闭：问题未解，孩子也没有下一步可行行动。</td></tr></tbody></table>
+<p>这张表最重要的功能，是把通常被捆在一起的两个结果拆开。传统家庭评价非常容易只沿“问题是否解决”这一轴结算，于是右上角“代办封闭”反而常被看成强母亲：她效率高、办法多、总能兜底。但本理论指出，它恰恰是最容易制造长期误判的一格。</p>
+<p>“续域移交”有三个可观察签名：其一，母亲的核心动作可以停止，而活动不立即坍塌；其二，下一个关键动作由孩子启动，而不是母亲继续把任务往前推；其三，如果第一方案失败，安全约束内仍至少留有一条孩子可启动的替代路线。第三个签名很重要，因为只会重复一个被教会动作，仍可能不是可行域的真正扩展。</p>
+<p>“留路未解”则提醒我们不要把即时成功神圣化。一个母亲没有立刻替青春期孩子修复一段友情，但孩子已经能够自己决定是道歉、澄清、等待还是结束关系；眼前关系尚未恢复，续域却已经发生。反过来，母亲亲自打电话把冲突压平，眼前问题解决，却可能让孩子下一次仍没有任何自己可执行的路径。</p>
+<h2 id="s12">十二、为什么“少帮一点”仍然不是答案</h2>
+<p>若论文走到这里就得出“母亲越少帮越好”，它会立即落回脚手架 fading、自主支持甚至民间“放手教育”。公开自然情境材料提供了一个重要反例。Baker 等人（2022）对两段户外亲子活动进行微观互动分析。在 Rope 案例中，孩子 Rae 想够到绳子，母亲先尝试拉绳，随后移动桌子，希望调整物理基础设施，从而让孩子以后不需要她持续帮助。这个方案并没有完全成功：Rae 仍够不到，母亲最后直接把绳子送到孩子手里。之后 Rae 才获得两分多钟的自主探索。</p>
+<p>这条材料直接击穿“直接帮助=削弱力量”。有时孩子的身高、力量、危险程度或资源条件使核心路径暂时不可能由孩子完成。母亲若拒绝一切直接帮助，反而会把可行域缩成空集。真正重要的是直接帮助之后发生什么：Rae 拿住绳子后，母亲不必继续替她摆动、探索、决定玩法；核心活动重新进入孩子控制。</p>
+<p>同一研究的 Rocks 案例更清楚地展示了“控制移交”而不是“彻底退出”。母亲有时只提供一只被动的手，让孩子仍需主要依靠自身力量完成下坡；有时对立即求助稍作抵抗，研究者描述这一步重新打开了孩子的 decision space，孩子于是重新评估并继续形成自己的判断模式。这里的力量既不是完全接管，也不是冷眼旁观，而是动态调节帮助，使下一关键动作回到孩子手中。</p>
+<h2 id="s13">十三、零情态词判据：不要问“她是不是好母亲”，直接问下一步归谁</h2>
+<p>零情态词判据：母亲停止核心动作后，第一个关键动作由谁启动；此时孩子手里还有几条自己可以开始的安全路径？</p>
+<p>这个问句故意不使用“真正、恰当、有意义、充分、优秀”等评价词。它可以直接用于录像、逐字稿、家庭任务记录、学习过程日志，而不需要先问研究者“你觉得这个母亲支持得好吗”。为了检验它不是命题的复述，本文把它放进五个结构不同的场景：</p>
+<table class="tbl"><thead><tr><th>场景</th><th>母亲的动作</th><th>停止核心动作后的读数</th><th>理论判决</th></tr></thead><tbody><tr><td>幼儿户外攀爬</td><td>提供被动手、必要时短暂扶持</td><td>孩子继续评估并自己完成下一段动作</td><td>高移交；介入存在但执行权回到孩子</td></tr><tr><td>小学作业卡壳</td><td>母亲直接写出答案</td><td>下一个同型题仍由母亲起笔</td><td>问题解决但移交失败</td></tr><tr><td>青春期同伴冲突</td><td>母亲帮助梳理事实，不替孩子联系对方</td><td>孩子自己选择道歉/解释/等待中的一条并发出行动</td><td>留路或续域移交</td></tr><tr><td>突发交通危险</td><td>母亲立即把孩子拉离车道</td><td>当下没有孩子自主选择空间；危险解除后再恢复行动权</td><td>暂时关闭路径不判负；安全约束优先</td></tr><tr><td>成年子女择业</td><td>母亲给资源但把资助绑定于唯一职业选择</td><td>表面可选项增加，实际可执行路径受条件锁定</td><td>资源增加不等于续域增加</td></tr></tbody></table>
+<p>五个答案并不相同，尤其交通危险场景迫使理论承认：可行域不是越大越好，短时把行动权收回母亲手中可以是保护总体可生存域的必要动作。成年子女择业场景又表明：资源增加也可能缩小行动控制。由此，“介入量”“资源量”“即时解决率”都不能替代续域移交的独立读数。</p>
+<h2 id="s14">十四、可通约读数：撤手子执份额，而不是“母亲打分”</h2>
+<p>为了让理论可以被实证挑战，本文提出一个低配、可审计的过程读数：撤手子执份额（Post-Withdrawal Child-Executable Share, PWCES）。它不是人格分数，只用于一个预先界定的互动事件。</p>
+<p>PWCES = 在母亲核心动作停止后的观察窗内，孩子可自行启动的安全下一步类别数 ÷ 同一观察窗内已经显露的全部安全下一步类别数。</p>
+<p>“已经显露”是必要限制：只计录像、逐字稿、参与者明确提出或环境明显提供的路径，不猜测无限的潜在选项。“安全下一步”按研究前写死的不可接受风险标准过滤。“核心动作”指没有它任务无法继续的那一部分执行，而不是母亲所有说话、注视和在场。观察窗必须在研究前固定，例如接下来三个关键行动回合或 60 秒。</p>
+<p>这个读数有四项性质。第一，它是 0–1 的无量纲份额，可以把学习、户外活动、关系修复等不同情境并排，但不主张跨年龄无条件排名。第二，它可事后清点，每个分子分母都能回到具体动作。第三，它把“我感觉母亲很会放手”变成可复核事件。第四，它与常见指标正交：任务完成率可以是 100%，PWCES 仍可能为 0；母亲说话很少，PWCES 也可能为 0，因为孩子根本没有可行下一步。</p>
+<p>单一口径必须写死：本文所有地方的 PWCES 都只计算“母亲核心动作停止以后”的已显露安全路径，不计算母亲仍持续执行的路径，不把孩子仅能口头描述但当前不能启动的方案计入分子。若后续研究采用另一粒度，应另命名，不得沿用同一缩写。</p>
+<table class="tbl"><thead><tr><th>字段</th><th>编码规则</th></tr></thead><tbody><tr><td>事件起点</td><td>孩子出现可辨认的卡点/裂纹/约束，且母亲发生介入</td></tr><tr><td>母亲核心动作停止点</td><td>母亲不再执行决定该任务是否继续的关键动作</td></tr><tr><td>观察窗</td><td>预注册为后续 3 个关键行动回合；视频研究可追加 60 秒敏感性分析</td></tr><tr><td>已显露安全路径</td><td>被提出、尝试或由环境直接赋予，且不违反预注册安全约束的下一步类别</td></tr><tr><td>子执路径</td><td>孩子无需母亲再次执行核心动作即可启动该路径</td></tr><tr><td>PWCES</td><td>子执路径数 / 已显露安全路径数；分母为 0 时记 NA，不记 0</td></tr></tbody></table>
+<h2 id="s15">十五、九个近邻：为什么“续域移交力”不是它们的改名</h2>
+<table class="tbl"><thead><tr><th>近邻</th><th>它真正回答什么</th><th>1:1 替换为什么失败</th><th>判决性分离</th></tr></thead><tbody><tr><td>依恋/安全基地</td><td>照料关系是否提供安全与探索基础</td><td>安全依恋可以存在，但具体任务的下一步仍被母亲代办</td><td>安全感相同、PWCES 不同</td></tr><tr><td>母亲敏感性</td><td>母亲是否准确感知并回应儿童信号</td><td>高度敏感的回应也可能选择直接替代执行</td><td>敏感性评分相同、控制移交不同</td></tr><tr><td>足够好的母亲</td><td>适应—失配如何支持儿童独立化</td><td>强调适度失败，但未要求每次介入后可行控制落给孩子</td><td>容忍失败相同、子执路径不同</td></tr><tr><td>权威型教养</td><td>回应性与要求/控制的组合</td><td>是跨情境教养风格，不记录单次事件后的执行控制归属</td><td>教养风格相同、事件移交不同</td></tr><tr><td>脚手架</td><td>成人临时承担学习者尚不能完成的部分</td><td>fading 很近，但脚手架可只服务当前任务成功/能力形成，不要求约束内可行域的主体归属</td><td>帮助撤除程度相同、PWCES 可不同</td></tr><tr><td>自主支持</td><td>支持选择、自我发起与视角</td><td>可以主观自主高，但物理/制度可行路径仍很窄</td><td>自主支持评分相同、可执行路径数不同</td></tr><tr><td>韧性</td><td>动态系统在逆境中的适应能力</td><td>韧性是孩子/系统后果，不标记母亲介入后行动控制转给谁</td><td>适应结果相同、移交机制不同</td></tr><tr><td>母亲守门</td><td>母亲如何促进/限制另一照护者参与</td><td>研究共同养育入口，不是孩子下一步执行控制</td><td>父亲参与相同、孩子 PWCES 不同</td></tr><tr><td>自家“撤手”论</td><td>父母减少替代，把地盘还给孩子</td><td>撤手是母亲动作；孩子可能仍无任何可行路径</td><td>撤手程度相同、续域移交一高一低</td></tr></tbody></table>
+<p>最危险近邻不是依恋，而是“脚手架 + 自主支持”的交叉区，再加上本产线已有的“撤手”论。本文不靠“更深入”来躲它们，只靠一条可裁决分离线活下来：只要两个互动在脚手架撤除、自主支持和母亲退出程度上近似，但母亲核心动作停止以后孩子拥有的可执行安全路径不同，续域移交就给出不同判决；若这种差异长期无法获得独立解释力，本文应降级为脚手架/自主支持的过程指标。</p>
+<h2 id="s16">十六、两处反向约束：三门学科必须有权把本文写弱</h2>
+<p>第一处来自可生存性理论，它推翻了本文最初“孩子可选路径越多，母亲力量越大”的版本。viability 从来不是最大化选项数量，而是让轨迹留在约束集合内。于是，危险路径、超龄路径、不可逆高风险路径不能因为“孩子想选”就进入分子。这个约束改变了价值排序：安全的可继续性高于选项数量。没有这条约束，本文原本会写“强母亲不断扩张孩子的选择空间”；现在必须改成“强母亲在不可突破的约束内保存并移交可行控制”。</p>
+<p>第二处来自过渡态理论，它推翻了“母亲越能降低孩子门槛越有力量”。催化不等于替系统决定终态，竞争路径还要求选择性。于是，有些困难不能被母亲消除，因为跨越本身就是孩子形成能力的过程。没有这条约束，本文原本会写“母亲的力量是把困难变容易”；现在只能写“母亲改变阻断发生的条件，但不得把本应由孩子形成的核心转化直接替代掉”。</p>
+<p>第三处来自断裂力学，对指标适用范围再做削弱。断裂韧性有严格试样与约束条件，提醒我们 PWCES 不能变成跨家庭排行榜。它只能在同类事件、相近安全约束与相近发展能力下比较。一个母亲在急救场景中把 PWCES 暂时压到 0，不构成“力量低”；相反，那可能是在阻止不可逆断裂。</p>
+<h2 id="s17">十七、真跑：公开自然情境资料给出了一条不利结果</h2>
+<p>预注册最便宜的机制条款如下：若“续域移交”是独立于少介入的机制，那么公开亲子互动中应同时出现两类事件——（a）母亲发生直接或物理帮助，但核心动作停止后孩子仍接管下一关键行动；（b）母亲拒绝/减少帮助后，孩子的决策空间被重新打开。若两类事件都找不到，而所有高自主片段都只是“母亲不帮”，则本理论退回普通的 autonomy support/fading。</p>
+<table class="tbl"><thead><tr><th>公开材料</th><th>预注册观察</th><th>实际观察</th><th>对理论的影响</th></tr></thead><tbody><tr><td>Baker et al. 2022，Rope</td><td>寻找“直接帮助后仍发生孩子接管”</td><td>移动桌子意在让母亲退出，但单独失败；母亲仍需直接把绳子递下。孩子抓住后持续自主探索两分多钟。</td><td>有利于“移交≠少帮”；不利于“环境改造一次就足够”</td></tr><tr><td>同文，Rock #2</td><td>寻找“减少帮助后决策空间重开”</td><td>母亲没有立即答应求助，孩子重新评估；研究者明确描述为 re-opens the decision space。</td><td>支持“下一关键动作回到孩子”</td></tr><tr><td>同文，Rock #3</td><td>寻找“支持存在但核心动作仍由孩子完成”</td><td>母亲只提供被动手，孩子仍主要依靠自身力量下坡。</td><td>支持“介入量与移交可分离”</td></tr></tbody></table>
+<p>真跑的最重要结果恰恰是不利结果：Rope 中“移动桌子、让母亲退出”的方案失败了，母亲必须重新进入并直接把绳子交到孩子手里。如果本文坚持“母亲的力量就是撤手”，这一案例会把它直接判负。正因为把不利结果写进来，理论的粒度被迫修改：母亲可以在必要时执行孩子暂时无法执行的关键动作，只要这个动作不是把整个后续活动永久占据，而是把系统推到一个孩子可以接管的新状态。</p>
+<p>这次真跑还暴露出一个测量限制：公开论文提供的是两段经过精细分析的活动弧，而不是为 PWCES 设计的完整事件数据库，因此不能诚实地给出总体比率。本文只运行了机制条款，未伪装成大样本验证。下一步若要估计 PWCES，必须取得原始逐帧录像或完整逐字稿，并在编码前固定“显露路径类别”和观察窗。</p>
+<h2 id="s18">十八、最强竞争解释：这不就是“自主支持做得好”吗？</h2>
+<p>最朴素、也最危险的竞争解释是：所谓续域移交，只是 autonomy-supportive parenting 的一种表现。若控制了自主支持之后，PWCES 对儿童下一次无母亲提示的行动启动、策略迁移或遇阻后的再进入没有任何增量解释力，那么本文不应该保留为独立理论。</p>
+<p>真正的机制证伪不能只问“续域移交高的孩子是不是更独立”。一个自主支持高的母亲通常也会给孩子更多选择、少控制，当然可能产生独立性。本文必须预测一个自主支持量表不必然预测的变量：在一次母亲介入结束之后，孩子可执行安全路径的主体归属。如果两个家庭的自主支持、温暖、任务难度、孩子初始能力和母亲帮助时长近似，但 PWCES 不同，本文要求后续无提示同型任务中的“孩子先启动关键动作概率”也不同。</p>
+<p>反之，如果在控制这些变量后 PWCES 的增量效应稳定接近零，或者 PWCES 只能靠研究者事后主观扩展“可行路径”才能得到关系，那么“续域移交力”就应该降级成自主支持/脚手架的一种编码方式，而不能自称新存在物。</p>
+<h2 id="s19">十九、六条明确会让理论失败的观测</h2>
+<p>在相近任务难度、孩子能力、母亲自主支持、帮助时长和安全风险下，PWCES 与下一次无提示任务的孩子主动启动没有任何稳定关系。</p>
+<p>脚手架 fading 的成熟指标可以 1:1 替代 PWCES，且对后续迁移预测不弱于 PWCES。</p>
+<p>不同盲编码者对“核心动作停止点”和“子执路径”无法达到基本一致性，导致同一案例 PWCES 相差数倍。</p>
+<p>高 PWCES 系统性伴随更高不可逆风险，而加入安全约束后理论效应消失。</p>
+<p>直接帮助事件只要控制任务难度，其“之后移交”不再预测任何后续差异，说明所谓 handover 只是任务容易程度的影子。</p>
+<p>纵向资料显示母亲长期代办与孩子低主动性的关系完全由孩子先前困难度/气质选择效应解释，PWCES 无独立机制剩余。</p>
+<h2 id="s20">二十、边界：母亲的力量不是无限扩权，也不是把责任甩给孩子</h2>
+<p>续域移交力必须首先服从发展能力与不可逆风险。对于婴幼儿、急性疾病、交通危险、严重自伤/他伤风险、法律责任无法由儿童承担的情境，母亲或其他照护者直接控制可能是必要的。此时理论不要求“立即移交”，而要求在不可逆危险解除以后，重新寻找能够按发展水平移交的控制单位。</p>
+<p>第二，移交不是责任甩锅。若一个十岁的孩子承担本应由成人承担的经济、情绪或照护责任，这不是高 PWCES，而是约束集合被错误改写。所谓“安全路径”必须包含年龄适配和成人法定/伦理责任。否则“让孩子自己解决”会成为对 parentification 的美化。</p>
+<p>第三，母亲不是唯一可能拥有这种力量的人。本文回答的是“何谓母亲的力量”，所以以母亲为对象；但理论对象本身是关系能力，父亲、祖父母、教师、导师也可能表现同构机制。若未来研究表明它与“母亲”身份没有任何特殊关联，理论不因此失败，只意味着它应上提为“照护者续域移交力”，而“母亲的力量”是其中一个重要实例。</p>
+<h2 id="s21">二十一、反噬预言：一旦“续域移交”成为 KPI，最容易毁掉的正是行动权</h2>
+<p>任何可以量化的亲职概念都有一个危险：一旦变成考核，最省事的达标方式往往是制造读数。若学校、机构或家庭教育课程把 PWCES 变成“好妈妈分数”，母亲可能为了让数字好看，故意拒绝必要帮助、把孩子推向不安全的自主，或者在录像里表演“我不帮你，你自己来”。这会直接摧毁理论要保护的可行域。</p>
+<p>因此伦理规则写死三条。第一，PWCES 指一个事件位置，不指一个人的人格等级；不得用少量互动给母亲贴“强/弱”标签。第二，不得为了提高读数，在安全关键场景安排退出、延迟救助或制造不必要困难。第三，任何据此对母亲作出不利安排的研究或机构，必须公开编码规则、原始事件边界和复核通道。</p>
+<p>我看不到能够彻底消除这一反噬的出口。最合理的处理不是声称“只要正确使用就行”，而是把它保留为理论和研究工具，不把它包装成家庭排行榜。</p>
+<h2 id="s22">二十二、自反：这篇论文自己有没有完成“续域移交”</h2>
+<p>按照本文自己的判据，这篇文章目前不能把自己判成“高续域移交”。它给出了一个定义、一张 2×2、一个读数和一套边界，但这些关键动作仍主要由本文作者侧完成。读者是否真正获得了可自己执行的下一步，需要看本文停止解释之后，研究者能否拿一段新的亲子录像，独立标出卡点、核心动作停止点、显露路径、子执路径，并得到可复核的 PWCES。</p>
+<p>因此本文最具体的自反后果是：如果理论只能在这篇文章里成立、离开本文语言就无法编码，它就是“代办封闭”的标本——作者把问题说得很完整，却没有把研究控制移交给后来者。公开编码手册、失败条件和不利结果不是附加形式，而是本文试图把“下一步研究动作”交出去的最小条件。</p>
+<p>同样，本文所用的交叉比对方法也接受这个判据：若每次都必须由同一套方法替研究者选择三门学科、生成 27 对、决定什么算新概念，而使用者离开方法就没有任何可执行路径，那么方法本身也会制造依赖。它只有在使用者能把这些判据带到新的母题中独立裁决时，才完成自己的续域移交。</p>
+<h2 id="s23">二十三、几个现实场景：同样是“爱”，为什么判决会相反</h2>
+<table class="tbl"><thead><tr><th>场景</th><th>看起来很有力量的动作</th><th>续域移交判决</th></tr></thead><tbody><tr><td>孩子第一次做饭</td><td>母亲全程站在旁边，每一步都提前指出，最后菜很好吃。</td><td>即时结果高，但母亲一走孩子不会决定先做哪一步：代办封闭。</td></tr><tr><td>孩子考试失利</td><td>母亲没有只说“别难过”，也没有替他报班，而是一起找出卡点，让孩子自己选一个下周可试的改法。</td><td>裂纹被承载、门槛被重写，下一步由孩子发起：续域移交。</td></tr><tr><td>青春期要独自出行</td><td>母亲列出所有风险并直接禁止。</td><td>若风险确实超过安全阈值，关闭路径可能合理；若只是母亲焦虑，则可能把可行域误缩。</td></tr><tr><td>成年子女失业</td><td>母亲提供三个月生活费，同时要求每天由孩子自己完成岗位搜索和面试复盘。</td><td>资源承担不等于替代执行；可能扩大可行域并移交控制。</td></tr><tr><td>孩子被同学排斥</td><td>母亲立刻给班主任、对方家长连续打电话，所有沟通由她完成。</td><td>可能需要保护，但若长期没有逐步移交，孩子的关系修复路径仍为空。</td></tr></tbody></table>
+<p>这些例子显示，新理论不制造一套固定教养动作。相同的“帮”在不同约束下可以高，也可以低；相同的“不帮”也可以是移交，也可以是放弃。唯一稳定的观察对象是：在安全边界内，母亲的介入有没有改变下一轮“谁能够行动”的结构。</p>
+<h2 id="s24">二十四、结论：母亲最大的力量，是让自己的力量不再成为孩子下一步的必要条件</h2>
+<p>从断裂力学看，力量不以没有裂纹为前提；从过渡态理论看，发生不等于把终点直接交付；从可生存性理论看，自由不等于选项无限，而是在约束中仍有可行轨迹。三者交叉比对以后，“母亲的力量”出现了一个不同于牺牲、保护、敏感、控制、自主支持和韧性的落点：可行行动的执行控制能否在介入之后从母亲转入孩子，并在母亲停止核心动作以后继续存在。</p>
+<p>因此，何谓母亲的力量？本文的回答是：母亲的力量是一种续域移交力。她在孩子要断的时候先让结构不断，在孩子过不去的时候改变门槛，在现实把路封死的时候重构条件；但这些动作的完成，不以孩子永远需要她为证，而以孩子终于出现一个“不再需要她继续做”的下一步为证。</p>
+<p>这并不贬低母亲的付出，恰恰给付出增加了一个更严苛的完成条件：真正强的帮助，不只把今天的困难处理掉，还改变明天谁有能力处理。母亲的力量不是在孩子生命里留下一个越来越大的母亲，而是在关键时刻用自己的力量，发生出一个越来越能够继续发生的孩子。</p>
+<h2 id="s25">附节甲　被漏掉的那个词：责任移交</h2>
+<p>本文正文第十五节列出九个近邻，并把最危险的一位定为"脚手架撤除与自主支持的交叉区"。这个判断的方向是对的，但它漏掉了一件很难解释的事：<b>它交手的是 1976 年那篇导师作用的论文，而不是这个领域用来称呼本文落点的那个词。</b></p>
+<p>脚手架研究在四十年的积累之后，把这套过程的核心特征稳定地写成三项：随情境调整的支持强度、支持的逐步撤除，以及<b>责任移交</b>——任务的控制权在整个受支持互动的过程中从辅导者转到学习者手中，以学习者独立完成为终点。这三项是该领域综述里的标准清单。更麻烦的是，在母婴研究里它有一个字面上的用法：母亲把某项活动的责任移交给幼儿的时间点，本身就是一个被测量过的变量。教育学那边还有一个更操作化的模型，把这个过程写成"我做—我们一起做—你做"的三段结构，并给它起了名字。</p>
+<p>也就是说：本文自称的新落点，在参照语料里已经有名字，有测量，有教学模型。这是本文此前最严重的一处失分，而它之所以发生，是因为本文只去打这个领域的奠基文献，没有去看这个领域今天怎么说话。</p>
+<p>本节的处置不是辩解，是把分离线重新划在一个更窄、也更硬的地方。</p>
+<p><b>责任移交与撤手子执份额的三处不同：</b></p>
+<p><b>第一，移交的对象不同。</b>责任移交移的是"这项任务归谁负责"——它是一个归属判断，通常在一段辅导互动结束时由观察者整体判定。PWCES 移的是"母亲停止核心动作之后，孩子手里还剩下几条自己可以启动的安全路径"——它是一个可数的集合，分子分母都要回到具体动作。一个任务的责任可以被完整移交，而孩子手里的可启动路径只有一条：他会做这一道题的这一种解法，换一个条件就停住。责任移交对这种情况判"已移交"，PWCES 判"分子为一，分母为三"。</p>
+<p><b>第二，前提不同。</b>责任移交默认任务在原则上可由学习者独立完成，因此才有"移交完成"这个终点。本文处理的大量情境不满足这个前提：孩子的身高、力气、法定资格、不可逆风险，都可能使核心动作<b>永远</b>不能由他执行。本文正文第十七节的那条不利结果正落在这里——母亲最终必须亲手把绳子递到孩子手里，方案失败了。责任移交在这个案例上只能判"未移交"；PWCES 判的是母亲把绳子递过去之后，那两分多钟里孩子手里有几条自己能走的路。<b>本文测的不是任务的所有权，是母亲停手那一刻可行域的主体归属。</b></p>
+<p><b>第三，时间位置不同。</b>责任移交描述的是一段辅导过程之内的走向；PWCES 只在一个点上取样——母亲核心动作停止之后的那个观察窗。这个差别使 PWCES 可以用在完全没有教学结构的互动上：一次冲突调解、一次情绪安抚、一次成年子女的择业谈话，都没有"辅导者—学习者"的结构，因此没有责任可移交，却都可以问那一句：她不再往前推之后，他能自己开始的下一步有几条。</p>
+<p>判决性预测：在同一批录像上同时编码成熟的责任移交指标与 PWCES，若二者相关高到 PWCES 在控制责任移交之后对"下一次无提示同型任务中孩子先启动关键动作的概率"没有增量解释力，则本文应当降级为责任移交的一种秒级编码方式，不得自称新存在物。</p>
+<p>本文在第十五节写下的降级条款因此需要更新一处：原文说的降级对象是"脚手架/自主支持的过程指标"，现在应当明确写成"<b>责任移交的一种事件级操作化</b>"。这个更新让降级条款变得更容易被触发，也更诚实。</p>
+<h2 id="s26">附节乙　落点重述：从能力到地址</h2>
+<p>本文原稿的核心句是："母亲的力量是一种续域移交力。"这是一个肯定判断，主语是母亲，谓语是一种能力。按本书导论的立场，这句话仍然停在所属语法里——它只是把所属的对象从"牺牲"换成了"移交能力"。</p>
+<p>本文据此重述落点：</p>
+<blockquote><p><b>母亲的力量不是一种移交的能力，而是可行下一步的执行地址。</b>它不在母亲身上，也不在孩子身上；它在"这件事的核心动作停下来之后，谁能开始"这个位置上。PWCES 不测量母亲有多会放手，它读取的是一次介入结束时，可行域这张表上的地址栏。</p></blockquote>
+<p>这一重述有一个实质后果，不只是措辞。原来的写法把三重否定挂在母亲的行为上——不等于承受更多、不等于解决更多、不等于介入更少。重述之后，三重否定挂在读数的对象上：<b>PWCES 不是母亲的分数，不是孩子的分数，也不是这次互动的分数；它是一次介入结束时那张表的状态。</b>同一位母亲在同一天的两件事上可以给出 0 与 1，这不是她的人格在两小时内变了，而是两张表不同。</p>
+<p>这也让本文正文第二十一节的反噬预言有了更准确的形式。原来的担心是母亲为了让数字好看而表演放手；重述之后，更精确的担心是：<b>一旦地址被当成分数，改地址的最省事方式是把事情推给一个没有能力接手的地址</b>，而这在读数上与真正的移交完全同形。本文对此没有出口，只能把它写进伦理条款：任何 PWCES 的读取都必须同时报告"孩子可启动的路径是否在安全约束内"，缺这一栏的读数一律作废。</p>
+<h2 id="s27">附节丙　与同栏其余四篇的分界</h2>
+<p>与<b>《回撤给予》</b>：见那一篇的附节丙。要点重复一次：本篇在母亲核心动作停止<b>之后</b>取样，那一篇在给予开始<b>之前</b>取样；四种组合全部现实存在；这是同批五篇里最容易被合并的一对，分界靠一条可裁决线活着。</p>
+<p>与<b>《净差解码效率》</b>：见那一篇的附节丙。信息的到达与控制的转移不共用任何一个可编码的量。</p>
+<p>与<b>《非返母闭环》</b>：最容易混淆的一处，必须写死。本篇在母亲停手的那一刻清点孩子手里剩下几条可启动的路，是<b>能力的静态盘存</b>；那一篇在一件事关闭之前记录路线有没有回头，是<b>路由的实际走向</b>。一个孩子手里可能有三条路（本篇读数高），而这件事仍在中途回到母亲（那一篇读数也高）——因为有路可走与实际走上去，中间隔着习惯、成本、风险预期，以及外面那张把任务寄回给母亲的地址簿。两篇的分母也不可互推：本篇的分母是"已显露的全部安全下一步类别"，那一篇的分母是"合格的完整移交事件数"。</p>
+<p>这一对之间还有一处方向上的差别，值得单独指出：本篇的读数在<b>一次互动内</b>就能取到，因此它可以用在完全没有"移交"结构的场合——一次情绪安抚、一次成年子女的择业谈话，没有任何一件事被正式交出去，却仍然可以问"她不再往前推之后，他能自己开始的下一步有几条"。那一篇必须先有一次完整移交才能开始计数。<b>本篇的适用面更宽，那一篇的判据更硬。</b></p>
+<p>与<b>《未来可逆余量》</b>：看起来很近，实则分母完全不同。本篇的分母以一次互动为界；那一篇的分母是"这个人生阶段里现实存在的有价值生活路径"，跨越制度、经济与年龄。一个孩子可以在一次作业互动里有很高的撤手子执份额，同时因为学制不许转轨而有很低的路径可选择性。<b>一次互动里的可行域与一生的可达空间，不能互相代替，也不能互相印证。</b></p>
+<p><b>本篇在五篇中的位置</b>：它是"移交"这一族在同批里的唯一代表。这一族原本还有若干个并行的落点——下一轮谁先动、功能承继到哪个节点、跨回合的路径增益、中断之后能否续接——它们与本篇撞在同一个命题上，因此不与本篇同批发表。这件事本身应当写在读者面前：<b>同一个落点被不同的三学科组合反复长出来，这不是三次独立的证据，而是一次结果的三个版本。</b>本篇被选出来代表这一族，理由只有一条——它是其中唯一一篇在真跑处被自己的预注册材料判负、并据此修改了理论粒度的。</p>
+<h2 id="s28">版本与人机分工声明</h2>
+<p>版本：完整执行研究稿，2026-08-18。研究母问题、方法与一次性完成要求由用户设定；资料检索、跨域比较、候选构念生成、公开案例复核、论文初稿与文档排版由 AI 协助完成。本文属于理论研究与方法工件，不构成亲职临床诊断或个体母亲评价工具。正式投稿、出版或实证使用前，应由作者对所有引文、原始文献、编码规则与统计设计进行独立复核。</p>
+<h2 id="s29">参考文献</h2>
+<div class="reflist"><p class="refitem">1. Griffith, A. A. (1921). The phenomena of rupture and flow in solids. Philosophical Transactions of the Royal Society A, 221, 163–198.</p><p class="refitem">2. Irwin, G. R. (1957). Analysis of stresses and strains near the end of a crack traversing a plate. Journal of Applied Mechanics, 24, 361–364.</p><p class="refitem">3. ASTM International. ASTM E399, Standard Test Method for Linear-Elastic Plane-Strain Fracture Toughness of Metallic Materials. Current standard consulted 2026-08-18.</p><p class="refitem">4. ASTM International. ASTM E1820, Standard Test Method for Measurement of Fracture Toughness.</p><p class="refitem">5. Eyring, H. (1935). The Activated Complex in Chemical Reactions. Journal of Chemical Physics, 3(2), 107–115. https://doi.org/10.1063/1.1749604</p><p class="refitem">6. IUPAC. Compendium of Chemical Terminology (Gold Book): transition state theory; transition state; variational transition-state theory. Consulted 2026-08-18.</p><p class="refitem">7. Aubin, J.-P. (1991/2009). Viability Theory. Birkhäuser/Springer.</p><p class="refitem">8. Aubin, J.-P., Bayen, A. M., &amp; Saint-Pierre, P. (2011). Viability Theory: New Directions. Springer.</p><p class="refitem">9. Aubin, J.-P., &amp; Cellina, A. (1984). Differential Inclusions: Set-Valued Maps and Viability Theory. Springer.</p><p class="refitem">10. Bowlby, J. (1969). Attachment and Loss, Vol. 1: Attachment. Basic Books.</p><p class="refitem">11. Ainsworth, M. D. S., Blehar, M. C., Waters, E., &amp; Wall, S. (1978). Patterns of Attachment. Erlbaum.</p><p class="refitem">12. Winnicott, D. W. (1960). The theory of the parent-infant relationship. International Journal of Psycho-Analysis, 41, 585–595.</p><p class="refitem">13. Baumrind, D. (1966). Effects of authoritative parental control on child behavior. Child Development, 37(4), 887–907.</p><p class="refitem">14. Wood, D., Bruner, J. S., &amp; Ross, G. (1976). The role of tutoring in problem solving. Journal of Child Psychology and Psychiatry, 17(2), 89–100.</p><p class="refitem">15. Grolnick, W. S., &amp; Ryan, R. M. (1989). Parent styles associated with children’s self-regulation and competence in school. Journal of Educational Psychology, 81, 143–154.</p><p class="refitem">16. Deci, E. L., &amp; Ryan, R. M. (1985). Intrinsic Motivation and Self-Determination in Human Behavior. Plenum.</p><p class="refitem">17. Masten, A. S. (2001). Ordinary magic: Resilience processes in development. American Psychologist, 56(3), 227–238.</p><p class="refitem">18. Allen, S. M., &amp; Hawkins, A. J. (1999). Maternal gatekeeping: Mothers’ beliefs and behaviors that inhibit greater father involvement in family work. Journal of Marriage and the Family, 61, 199–212.</p><p class="refitem">19. Baker, J., DeLiema, D., Hufnagle, A. S., Carlson, S. M., Sharratt, A., &amp; Ridge, S. W. (2022). Impasses in the wild: Autonomy support in naturalistic, parent-child outdoor play. Frontiers in Education, 7, 885231. https://doi.org/10.3389/feduc.2022.885231</p><p class="refitem">20. Sameroff, A. J. (2000). Developmental systems and psychopathology. Development and Psychopathology, 12(3), 297–312.</p><p class="refitem">21. Whipple, N., Bernier, A., &amp; Mageau, G. A. (2011). Broadening the study of infant security of attachment: Maternal autonomy-support in the context of infant exploration. Social Development, 20, 17–32.</p><p class="refitem">22. 本产线既有文章：《父母越努力，孩子越没劲·蒙卦》（用户资料库版本，2026 年以前形成），用于同产线占位检验。</p></div>
+<div class="src"><div class="sl">这一篇由哪三个领域的争论撞成</div><p class="sd">三家争的是「能否继续」该从哪里读出来，却都默认它是系统自身的属性。<b>推翻这条共有前提的材料来自第三家自己的构造</b>——可容许控制集从来就可以按主体受限，于是「母子共同系统可行」与「孩子自己可行」在数学上本来就是两件事，而现有的母职账本没有为后者设过一栏。</p><a class="one" href="https://www.astm.org/e0399-23.html"><div class="k">断裂力学 · 强不等于无缺陷</div><div class="t">ASTM E399, Standard Test Method for Linear-Elastic Plane-Strain Fracture Toughness of Metallic Materials</div><div class="g">断裂韧性有严格的试样与约束条件，这不是技术细节而是这一家的判据形态：一个材料的「强」只在给定几何与约束下可比。本文在第十六节反向使用它来削弱自己——撤手子执份额不能变成跨家庭排行榜，只能在同类事件、相近安全约束与相近发展能力下比较。</div></a><a class="one" href="https://link.springer.com/book/10.1007/978-0-8176-4910-4"><div class="k">可生存性理论 · 自由不是选项数量</div><div class="t">J.-P. Aubin, Viability Theory（Birkhäuser／Springer 书页）</div><div class="g">研究在约束集合内是否仍存在可继续的轨迹，其控制受可容许控制集限定。本文用来推翻共有前提的那件材料就在这个构造里：把控制集按执行主体拆分，母子共同可行与孩子单独可行立刻分开。这一家同时反过来削弱了本文——可生存性从不最大化选项数量，因此「孩子可选路径越多母亲力量越大」这个原始版本被本文自己删掉。</div></a><a class="one" href="https://goldbook.iupac.org/terms/view/T06470"><div class="k">过渡态理论 · 帮助不是给出终点</div><div class="t">IUPAC Compendium of Chemical Terminology（金皮书）：transition state theory 词条</div><div class="g">催化改变的是跨越门槛的条件，而不是替系统决定终态；竞争路径还要求选择性。本文据此写下第二处反向约束：母亲改变阻断发生的条件，但不得把本应由孩子形成的核心转化直接替代掉。<b>体例说明：该出版社页面对自动抓取有拦截（返回验证页），人工点击可正常打开。</b></div></a></div>
+<div class="endbox"><p>三种阅读方式：网页长文 · <a href="read.html">在线 PDF 翻页</a> · <a href="viable-handover.pdf" download>下载 PDF</a></p>
+<p><a href="/confluence/">返回学科通融 →</a></p></div>
+</div>
+
+<button id="totop" aria-label="回到顶部">↑</button>
+<footer>学科通融 · 三学科交叉 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International · <a href="/browse/">sdeuniverses.com</a></footer>
+<script>
+(function(){var b=document.getElementById('pbar'),t=document.getElementById('totop');
+function u(){var d=document.documentElement,h=d.scrollHeight-d.clientHeight;
+b.style.width=(h>0?(d.scrollTop/h*100):0)+'%';t.style.display=d.scrollTop>700?'block':'none';}
+addEventListener('scroll',u,{passive:true});u();
+t.onclick=function(){scrollTo({top:0,behavior:'smooth'});};})();
+</script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDE教育学 | SDE Universes</title>
+<meta name="description" content="十二讲，把「教」这件事的底层假设拆开看一遍。从传道模式的八环链，到「在 E 中，经 D，成 S」，再到五个学科的具体做法与它明确不主张的边界。面向一线教师。">
+<link rel="canonical" href="https://sdeuniverses.com/sde-education/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SDE教育学 · 入门十二讲与研究论文">
+<meta property="og:description" content="教育：从发现到发生的革命。面向一线教师的入门系列。">
+<meta property="og:url" content="https://sdeuniverses.com/sde-education/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#8C5A2B;--accent2:#2E86AB}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#8C5A2B1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.6rem,3.7vw,2.3rem);font-weight:700;line-height:1.34;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.96rem,1.8vw,1.08rem);color:var(--text2);max-width:680px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.74}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.1em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.abs.en .l{letter-spacing:0.18em}
+.abs.en p{font-family:'EB Garamond',Georgia,serif;font-style:normal}
+.abs.en .et{font-weight:700;color:var(--text);margin-bottom:0.55rem;font-size:1rem;line-height:1.5}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.kw.en{margin-bottom:2.4rem}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+
+article h4{font-size:1.0rem;margin:1.6rem 0 0.55rem;color:var(--text);font-weight:700}
+.tbl{margin:1.6rem 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl table{border-collapse:collapse;width:100%;min-width:520px;font-size:0.9rem;line-height:1.62}
+.tbl th,.tbl td{border:1px solid var(--border2);padding:0.55rem 0.7rem;vertical-align:top;text-align:left}
+.tbl th{background:rgba(20,108,148,0.07);font-weight:700;color:var(--accent)}
+.tbl caption{caption-side:top;text-align:left;font-size:0.88rem;color:var(--text2);margin-bottom:0.5rem;font-weight:700}
+.formula{margin:1.2rem 0;padding:0.75rem 1rem;background:var(--bg2,rgba(0,0,0,0.03));border-left:3px solid var(--accent);font-family:'Courier New',monospace;font-size:0.95rem;overflow-x:auto}
+.revnote{margin:1.8rem 0 0;padding:1rem 1.15rem;border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:6px;font-size:0.9rem;color:var(--text2);line-height:1.75}
+.revnote b{color:var(--accent)}
+article h3{font-size:1.07rem;margin:2.1rem 0 0.7rem;color:var(--accent);letter-spacing:0.01em;font-weight:700}
+article h4{font-size:0.98rem;margin:1.6rem 0 0.5rem;color:var(--gold);letter-spacing:0.01em;font-weight:700}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#8C5A2B22 62%)}
+article i{font-style:italic}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.refs{margin:2rem 0 0}
+.refs h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem}
+.refs h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+.refs ol{padding-left:0;list-style:none;counter-reset:r}
+.refs li{position:relative;font-size:0.86rem;line-height:1.75;color:var(--text2);margin:0 0 0.7rem;padding-left:1.9rem;text-align:justify;word-break:break-word}
+.refs li::before{counter-increment:r;content:'['counter(r)']';position:absolute;left:0;color:var(--accent);font-weight:600;font-size:0.8rem}
+.refs li i{font-style:italic}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .fh{font-size:0.72rem;letter-spacing:0.2em;color:var(--accent);margin-bottom:1rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.foot-nav a.cur{opacity:.4;pointer-events:none}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+/* 三模式：网页 / 在线读PDF / 下载 —— 复用页面 --accent:#8C5A2B */
+.modes{border-bottom:1px solid rgba(20,108,148,.16);background:#FBF9F4}
+.modes .mw{max-width:820px;margin:0 auto;display:flex;gap:12px;justify-content:center;padding:16px 24px;flex-wrap:wrap}
+.modebtn{cursor:pointer;font-family:inherit;font-size:14px;color:#7A7059;background:#fff;border:1px solid rgba(20,108,148,.20);border-radius:6px;padding:9px 18px;transition:all .15s;letter-spacing:.03em}
+.modebtn:hover{color:#23201A}
+.modebtn.on{color:#fff;background:var(--accent);border-color:var(--accent);font-weight:700}
+.modebtn .ic{margin-right:6px}
+.panel{display:none}.panel.on{display:block}
+.rdr{max-width:920px;margin:0 auto}
+.rdr-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:center;padding:14px 12px;position:sticky;top:0;background:rgba(251,249,244,.97);z-index:6;border-bottom:1px solid rgba(20,108,148,.16)}
+.rbtn{background:#fff;border:1px solid rgba(20,108,148,.20);color:var(--accent);padding:7px 15px;border-radius:5px;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:.02em}
+.rbtn:hover:not(:disabled){background:#F4F7F9}.rbtn:disabled{opacity:.35;cursor:not-allowed}
+.rbtn.dl{background:var(--accent);color:#fff;border-color:var(--accent)}.rbtn.dl:hover{background:#0F5273;text-decoration:none}
+.pbox{font-size:14px;color:#23201A}.pbox input{width:52px;background:#fff;border:1px solid rgba(20,108,148,.20);color:var(--accent);padding:6px;border-radius:4px;text-align:center;font-family:inherit;font-size:14px}.pbox .ptot{color:#7A7059}
+.zm{display:flex;gap:4px}
+.rdr-stage{position:relative;display:flex;justify-content:center;padding:26px 8px 34px;min-height:62vh;background:#E4E9EC;border-radius:0 0 8px 8px}
+#cwrap{box-shadow:0 16px 46px rgba(0,0,0,.28);background:#fff;border-radius:2px;overflow:hidden;max-width:100%}
+#pcv{display:block;max-width:100%;height:auto}
+.rload{text-align:center;color:#7A7059;padding:72px 20px;font-size:15px}
+.spin{width:38px;height:38px;border:3px solid rgba(20,108,148,.2);border-top-color:var(--accent);border-radius:50%;margin:0 auto 18px;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rerr{text-align:center;color:#9A3B2B;padding:50px 20px;line-height:1.9}.rerr a{color:var(--accent);font-weight:700}
+.tapL,.tapR{position:absolute;top:0;bottom:0;width:14%;cursor:pointer;z-index:3}.tapL{left:0}.tapR{right:0}
+.rhint{text-align:center;font-size:12px;color:#7A7059;padding:12px 0 44px}
+#dl{padding:40px 0 70px}#dl .card{max-width:560px;margin:0 auto;text-align:center;background:#FBF9F4;border:1px solid rgba(20,108,148,.16);border-radius:12px;padding:48px 32px}
+#dl h2{font-size:22px;color:var(--accent);margin-bottom:10px}#dl .sz{color:#7A7059;font-size:13px;margin-top:16px;line-height:1.9}
+.dlbtn{display:inline-block;margin-top:22px;background:var(--accent);color:#fff;font-weight:700;padding:14px 32px;border-radius:8px;letter-spacing:.04em}.dlbtn:hover{background:#0F5273;text-decoration:none}
+
+.edition-link{display:inline-flex;align-items:center;gap:.45em;margin-top:18px;padding:10px 18px;border:1px solid rgba(20,108,148,.32);border-radius:999px;color:var(--accent);background:#fff;font-size:14px;font-weight:700;letter-spacing:.04em;text-decoration:none}.edition-link:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.fbox{margin:1.6rem 0;padding:1.15rem 1.4rem;background:#FBF3EA;border:1px solid #E4D3BF;border-radius:8px}
+.fbox p{margin:0;font-size:1.06rem;line-height:1.95;color:#3A2F22}
+.tag{margin:1.1rem 0;padding:.55rem .9rem;background:#F4F0E8;border-radius:6px;font-size:.93rem;color:#6B5D47}
+.cases p{margin:.85rem 0;padding:.75rem 1rem;background:#FAF6EC;border-radius:6px;line-height:1.9}
+sup.rf{color:#8C5A2B;font-size:.72em}
+ol.ref{padding-left:1.4rem}
+ol.ref li{margin:.55rem 0;line-height:1.8;font-size:.95rem;color:#4A4235}
+
+.chhero{padding:4.2rem 1.5rem 2.6rem;text-align:center;background:linear-gradient(180deg,#FBF5EC 0%,#F5EFE0 100%);border-bottom:1px solid #E4D3BF}
+.chhero .eb{font-size:.74rem;letter-spacing:.3em;color:#8C5A2B;text-transform:uppercase;margin-bottom:1rem}
+.chhero h1{font-family:'Playfair Display','Noto Serif SC',serif;font-size:2.5rem;font-weight:700;color:#2A2315;margin:0 0 .8rem;letter-spacing:.02em}
+.chhero .sub{font-size:1.06rem;color:#6B5D47;max-width:44rem;margin:0 auto;line-height:1.95}
+.chhero .meta{margin-top:1.4rem;font-size:.86rem;color:#98886C}
+.lead2{max-width:44rem;margin:2.6rem auto 0;padding:0 1.5rem;font-size:1.05rem;line-height:2.05;color:#3A3125}
+.lead2 p{margin:1.1rem 0}
+.lead2 b{color:#8C5A2B}
+.qbox{margin:1.8rem 0;padding:1.2rem 1.5rem;background:#FBF3EA;border:1px solid #E4D3BF;border-radius:8px;font-size:1.1rem;line-height:1.9;color:#3A2F22;text-align:center}
+.lecs{max-width:62rem;margin:3rem auto 4rem;padding:0 1.5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.1rem}
+.lec{display:block;text-decoration:none;background:#FAF6EC;border:1px solid #E4D3BF;border-top:3px solid #D8C6AE;border-radius:7px;padding:1.15rem 1.25rem}
+.lec.live{border-top-color:#8C5A2B;box-shadow:0 4px 16px rgba(140,90,43,.07)}
+.lec.live:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(140,90,43,.13);transition:.18s}
+.lec .no{display:block;font-size:.72rem;letter-spacing:.14em;color:#8C5A2B;font-weight:600;margin-bottom:.45rem}
+.lec h3{font-family:'Noto Serif SC',serif;font-size:1.08rem;font-weight:600;color:#2A2315;margin:0 0 .5rem;line-height:1.55}
+.lec p{font-size:.9rem;color:#6B5D47;line-height:1.8;margin:0}
+.lec .rd{display:inline-block;margin-top:.7rem;font-size:.8rem;color:#8C5A2B;font-weight:600}
+.lec .soon{display:inline-block;margin-top:.7rem;font-size:.76rem;color:#A89880;background:#F0E8D3;padding:.15rem .55rem;border-radius:3px}
+.secthead{max-width:62rem;margin:3.4rem auto 0;padding:0 1.5rem}
+.secthead .sl{font-size:.72rem;letter-spacing:.26em;color:#8C5A2B;font-weight:700;text-transform:uppercase}
+.secthead h2{font-family:'Noto Serif SC',serif;font-size:1.42rem;font-weight:700;color:#2A2315;margin:.5rem 0 .4rem}
+.secthead p{font-size:.96rem;color:#6B5D47;line-height:1.9;margin:0;max-width:46rem}
+.papers{max-width:62rem;margin:1.5rem auto 4rem;padding:0 1.5rem}
+.paper{display:block;text-decoration:none;background:#FAF6EC;border:1px solid #E4D3BF;border-left:4px solid #8C5A2B;border-radius:7px;padding:1.5rem 1.7rem;box-shadow:0 4px 16px rgba(140,90,43,.07)}
+.paper:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(140,90,43,.13);transition:.18s}
+.paper .no{display:block;font-size:.72rem;letter-spacing:.14em;color:#8C5A2B;font-weight:600;margin-bottom:.5rem}
+.paper h3{font-family:'Noto Serif SC',serif;font-size:1.24rem;font-weight:700;color:#2A2315;margin:0 0 .35rem;line-height:1.5}
+.paper .ps{font-size:.94rem;color:#6B5D47;font-style:italic;margin:0 0 .85rem;line-height:1.75}
+.paper .pd{font-size:.95rem;color:#4A4235;line-height:1.9;margin:0}
+.paper .pm{margin-top:.95rem;font-size:.8rem;color:#98886C;letter-spacing:.04em}
+.paper .rd{display:inline-block;margin-top:.8rem;font-size:.82rem;color:#8C5A2B;font-weight:600}
+.backbar{max-width:62rem;margin:0 auto 3rem;padding:0 1.5rem;text-align:center}
+.backbar a{display:inline-block;margin:0 .4rem;padding:.5rem 1.1rem;border:1px solid #E4D3BF;border-radius:5px;color:#6B5D47;text-decoration:none;font-size:.9rem}
+.backbar a:hover{border-color:#8C5A2B;color:#8C5A2B}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/browse/" class="here">教育专栏</a>
+    <a href="/education/ai-era/" class="sib">AI时代的教育</a>
+  </div>
+</nav>
+<header class="chhero">
+  <div class="eb">SDE Pedagogy</div>
+  <h1>SDE教育学</h1>
+  <p class="sub">把「教」这件事的底层假设拆开看一遍。入门十二讲面向一线教师，不需要任何预备知识；研究论文一栏放本栏目的长篇研究。</p>
+  <div class="meta">王德生 · 德麦国际 SDE 学派 · 栏目开设于 2026 年 8 月</div>
+</header>
+
+<div class="lead2">
+  <p>本栏目只处理一个问题：<b>我们说「教」的时候，究竟默认了什么。</b></p>
+
+  <div class="qbox">为什么「讲得最清楚」的那一节课，<br>学生未必学得最好？</div>
+
+  <p>这个现象每一位教师都遇到过。它之所以令人困惑，是因为它与我们对教学的默认理解相冲突——而那套默认理解，可以被完整地写出来：知识是客观世界的特征，被发现，被传播，被写进教材，被学生接受、消化、吸收，最后与旧知识重组。八个环节，一环扣一环。</p>
+
+  <p>这条链逻辑严整，<b>正因严整而极少被质疑</b>。入门十二讲的第一讲把它逐环写出来，标明每一环悄悄承诺了什么，再逐环去敲；此后各讲给出替代方案与它在课堂上的具体做法。</p>
+
+  <p>需要预先说明两件事。<b>其一，本系列不主张「不许讲授」</b>——讲授是极其高效的手段，且有大量研究支持；本系列处理的从来不是「要不要讲」，而是「什么时候讲」。<b>其二，本系列提供的是设计语汇与诊断，不是新的实证结果</b>；凡说「这样上课更好」，读者都应读作一个可检验的设计假设，其证据来自各讲所引的文献，而不是来自本系列。</p>
+
+  <p>这两条会在第一讲的第十六、十七、十八节被正面处理，也会在第十二讲被再讲一遍。它们不是免责声明，是本系列愿意被推翻的方式。</p>
+</div>
+
+<div class="secthead">
+  <div class="sl">第一系列</div>
+  <h2>入门十二讲</h2>
+  <p>面向一线教师，不需要任何预备知识。逐讲拆开「教」这件事的默认理解，并给出可在课堂上执行的替代做法。</p>
+</div>
+
+<div class="lecs">
+<a class="lec live" href="/sde-education/discovery-to-genesis/">
+  <span class="no">第一讲</span>
+  <h3>教育：从发现到发生的革命</h3>
+  <p>传道模式的八环链，与它的八处裂缝。逐环写出它悄悄承诺了什么，再逐环去敲；末章交代它与「最小指导教学」的分界。</p>
+  <span class="rd">网页长文 · 在线PDF · 下载PDF →</span>
+</a>
+<div class="lec">
+  <span class="no">第二讲</span>
+  <h3>一个概念是怎么发生的</h3>
+  <p>从数数到加法、到乘法、到幂与对数：七条概念发生链，两种完全不同的「不够用」。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第三讲</span>
+  <h3>容器：一个从未被写下来的假设</h3>
+  <p>接受能力、打开思路、巩固练习、知识体系——四个日常说法，同一个未经辩护的预设。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第四讲</span>
+  <h3>讲授的时机</h3>
+  <p>不是要不要讲，是什么时候讲。有效失败、为未来学习作准备，与它们各自的边界条件。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第五讲</span>
+  <h3>三种条件：E-条件 · D-条件 · S-条件</h3>
+  <p>一堂课的三种条件与它们不可颠倒的顺序，以及一份可以直接用的备课模板。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第六讲</span>
+  <h3>六种起手位</h3>
+  <p>同一个概念，六条进入路径；起手位选错，不只是慢，而会使一整类设计在原理上失效。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第七讲</span>
+  <h3>「学会了」到底是什么样子</h3>
+  <p>从「装在他身上」到「他的世界里多了一样能站住的东西」——检验方式随之全部改写。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第八讲</span>
+  <h3>五个学科的现场</h3>
+  <p>加法、乘法、分数、面积、方程：先不要做什么、先做什么、崩掉的那一刻。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第九讲</span>
+  <h3>不是所有失败都是有效的</h3>
+  <p>三个必要条件与三条禁忌。缺任何一条，撞墙就只是挫败。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第十讲</span>
+  <h3>哪些内容应当直接讲</h3>
+  <p>约定、安全、名字、脚手架——四类不必绕的内容，以及绕了为什么是浪费。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第十一讲</span>
+  <h3>评价：如果学习是发生的，考什么</h3>
+  <p>当「装了多少」不再是目标，评价的对象要换成什么，以及这一换会遇到的现实阻力。</p>
+  <span class="soon">即将上线</span>
+</div>
+<div class="lec">
+  <span class="no">第十二讲</span>
+  <h3>这套东西不做什么</h3>
+  <p>本系列的适用边界、可证伪条件，与三条它明确不主张的推论。</p>
+  <span class="soon">即将上线</span>
+</div>
+</div>
+
+<div class="secthead">
+  <div class="sl">研究论文</div>
+  <h2>长篇研究</h2>
+  <p>本栏目的研究性长文。与十二讲不同，这里的文章面向研究者，带完整的文献分界、预注册实算与证伪条款，并如实列出对自己不利的结果。</p><p><b>下面七篇是同一道题的七次作答。</b>同一个问题——「教育是什么」——用七组互不相同的三门学科各答一遍。七篇不是一个判断的七种说法：它们命名的对象类型分别是<b>方向、题、配对、遍、内容的一部分、位置、被比较的那一个</b>，并且对同一个动作（把一批本来不进入分配的记录接进判定）给出七种互相冲突的预测，任何一次真实的口径变更都会至少判掉其中两条。每篇各有一节把七篇摆在一张表上逐列分开，并写明最该被怀疑的那一对是哪两篇。</p>
+</div>
+
+<div class="papers">
+<a class="paper" href="/sde-education/unspanned-capability/">
+  <span class="no">论文 · 之一</span>
+  <h3>它读不出来的，它也造不出来</h3>
+  <p class="ps">论教育的产物不是能力而是不可分辨性，及一套判定装置的边界如何同时切出一类它在原则上长不出来的能力</p>
+  <p class="pd">工程学说输出相同即状态相同，生物学说决定它的是它长成的那条路径，艺术学说决定它的是它所站进去的那片条件——三条互不相容，而三家共同假定了「学到了什么」是这个人身上的属性。本文推翻这条共有前提，提出：一套判定口径装上的那一刻，同时切出一类它既读不出也造不出的能力；这一类在边界画出之前不构成一类，换一条边界就整批更换成员。全文含两次预注册真跑、十三条与最近说法的分界、八条证伪条款，以及五条对本文不利的结果与五个本文解释不了的洞。</p>
+  <div class="pm">王德生 · 2026年8月10日 · 约 2.7 万字 · 36 条参考文献 · 两次公开数据实算</div>
+  <span class="rd">网页长文 · 在线PDF · 下载PDF →</span>
+</a>
+<a class="paper" href="/sde-education/unasked-question/">
+  <span class="no">论文 · 之二</span>
+  <h3>那道题还没有被出出来</h3>
+  <p class="ps">论教育的产物是一批由做法之差定义、而尚未被任何人出出来的题目，及为什么一份全对的记录几乎排除不掉任何做法</p>
+  <p class="pd">符号学看它被读成什么，逻辑学看他能走哪些推论步，数学看条件配不配得上——三家共同假定「学会了」是学习者的一项属性。本文提出：教育是与已有表现相容的做法集合的收缩，而收缩到哪一支只在尚未被出出来的那批题上显形。全文含四条形式命题（其一：一道题的分辨力随它要求的技能数指数下降，难题不是更有信息量的题）、一份公开三十余年的分数减法数据上的完整实算，以及与混合策略模型、变异测试、版本空间等十二位先行者的逐条分界。</p>
+  <div class="pm">王德生 · 2026年8月10日 · 约 2.7 万字 · 27 条参考文献 · 公开 Q 矩阵实算</div>
+  <span class="rd">网页长文 · 在线PDF · 下载PDF →</span>
+</a>
+<a class="paper" href="/sde-education/tongxu-indiscernible-family/">
+  <span class="no">论文 · 之三</span>
+  <h3>同许</h3>
+  <p class="ps">论一族在既有尺子上分不开的进程，及其分离视界</p>
+  <p class="pd">舞蹈学从此刻被做出来的样子读它，混沌学从轨道对初始条件的敏感依赖读它，地理学从位置与可达性读它——三家共同假定教育的成果是一样有归属的东西。本文提出：教育是对同许族的一次改形；同许指在同一份可用观测下互不可分辨、且被同一套条件同等许可的那一族进程。两份公开成绩数据上预注册实算，三条假设两条被判伪；补跑另发现分离会回退，并推翻了本文原写的一句正交性论断。五处不利结果按原样写入正文。</p>
+  <div class="pm">王德生 · 2026年8月10日 · 约 2.3 万字 · 19 条参考文献 · 两次公开数据实算</div>
+  <span class="rd">网页长文 · 在线PDF · 下载PDF →</span>
+</a>
+<a class="paper" href="/sde-education/uncounted-run/">
+  <span class="no">论文 · 之四</span>
+  <h3>不计的那一遍</h3>
+  <p class="ps">论教育由一批必须不进任何账的重复构成，而三套计数装置各自都记得平</p>
+  <p class="pd">戏剧学说教育是那当场发生随即消失的一次，经济学说它是一条可结算的投资路径，法律学说它是一套可承认的资格关系——三家共同假定「一次教育发生了没有」在原则上可裁定。本文提出：教育是一批必须不进任何账才承担构成功能的重复，与三套计数装置之间的存量差。八千四百个公开拉取请求上的预注册实算，两条假设均未命中；最重的一处不利结果是入账者中九成的前拒次数为零，可见的不计遍只是一角。</p>
+  <div class="pm">王德生 · 2026年8月10日 · 约 2.2 万字 · 20 条参考文献 · 8,400 个拉取请求实算</div>
+  <span class="rd">网页长文 · 在线PDF · 下载PDF →</span>
+</a>
+<a class="paper" href="/sde-education/what-was-always-so/">
+  <span class="no">论文 · 之五</span>
+  <h3>本来就是这样</h3>
+  <p class="ps">论一个传承体系必须把所传之物分成「不许改的」与「必须自己重做的」两份，而这次分派在它自己的记载里一律被写成发现</p>
+  <p class="pd">圣经学要看它有没有被刻进心里，佛学要看他走到哪一位，道家说要紧的那样东西传不了——三家共同假定：所传之物里哪一部分是它本身、哪一部分只是外壳，由它自己决定。推翻它的材料在圣经学自己手里：死海古卷之后确立的文本多元期，同一卷书在公元前二世纪有多种结构并存并同时在用，没有一个先于使用的原本。本文提出：教育是传承体系每次交接时作出的一次分派，并把尚未被问过这个问题的那部分内容命名为未判之域。含两次回溯检验；第二次是为了补上第一次的一处构念裂缝而做的，那处裂缝按原样写进了正文。</p>
+  <div class="pm">王德生 · 2026年8月10日 · 约 2.6 万字 · 19 条参考文献 · 两次公开语料回溯检验</div>
+  <span class="rd">网页长文 · 在线PDF · 下载PDF →</span>
+</a>
+<a class="paper" href="/sde-education/place-left-empty/">
+  <span class="no">论文 · 之六</span>
+  <h3>先空着的那一处</h3>
+  <p class="ps">论教育由一批无人认领的空处构成，以及为什么把它标出来就等于开始填它</p>
+  <p class="pd">营养学看他同化了什么，水力学看他被什么样的渠道组织成什么样的流，园林学看他置身于哪一片条件——三家共同假定：能不能得到是供给端的事。推翻它的材料来自营养学自己：铁调素的负反馈使同一份含铁膳食在两个人身上的吸收率相差数倍，差别不在膳食，在接受者当前那个空。本文提出：教育是在接受端维持一批尚未被任何人认领的空处，而认领这个动作本身就是填充的第一步。一千二百余个公开事项的预注册回溯检验里，被标为「留给新手」的位置最终无一例外由核心维护者自己关闭——这个反向结果把靶段从人人看得见的那一段上移了一格。</p>
+  <div class="pm">王德生 · 2026年8月10日 · 约 2.2 万字 · 1,242 个公开事项回溯检验</div>
+  <span class="rd">网页长文 · 在线PDF · 下载PDF →</span>
+</a>
+<a class="paper" href="/sde-education/the-set-counterpart/">
+  <span class="no">论文 · 之七</span>
+  <h3>设对</h3>
+  <p class="ps">论教育是对设对的一次设置，及为什么有一类比较判断的另一侧根本不存在</p>
+  <p class="pd">体育学说成绩本身就是效标，历史学禁止时代错置，正义学说天赋分布在道德上任意——三家共同假定：一次教育的功过是一笔可以被分配完的量。推翻它的材料来自正义学自己：帕菲特的非同一性问题指出，一项足够深的介入会改变将来存在的是谁，因此「这样做让他更好了」在一部分场合没有比较对象——不是难比，是另一侧没有那个人。本文提出：教育是对设对的一次设置。九十五条现行游泳世界纪录的回溯检验里，三条不利结果有一条直接改掉了本文的措辞。</p>
+  <div class="pm">王德生 · 2026年8月10日 · 约 2.2 万字 · 21 条参考文献 · 95 条世界纪录回溯检验</div>
+  <span class="rd">网页长文 · 在线PDF · 下载PDF →</span>
+</a>
+</div>
+
+<div class="backbar">
+  <a href="/browse/">← 教育发生学 · 栏目首页</a>
+  <a href="/education/ai-era/">AI时代的教育</a>
+  <a href="/education/sio-classics/">SIO教育学修订文库</a>
+  <a href="/education/from-students/">频道 · 来自学员专栏</a>
+</div>
+
+<footer>
+  <div>© 德麦国际 Demai International · SDE教育学 · <a href="/browse/">sdeuniverses.com</a></div>
+</footer>
+<script src="/wds-mode.js?v=20260819a" defer></script>
+</body>
+</html>

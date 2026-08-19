@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>解构大师 · 往期全集 | Deconstruction Master · SDE Universes</title>
+<meta name="description" content="解构大师专栏往期全集 · The full archive of the Deconstruction Master column — deconstructing the giants of thought (Nietzsche, Foucault, Hegel, Plato, Kant, Derrida) through the eye of SDE generativics.">
+<style>
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.35)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
+body.zh .en-only{display:none!important}
+body.en .zh-only{display:none!important}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .w{max-width:1000px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center}
+nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
+.nav-right{display:flex;align-items:center;gap:16px}
+.lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.lang-btn{background:transparent;border:none;color:var(--ink2);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
+.lang-btn.active{background:var(--gold);color:#1A1410;font-weight:700}
+.hero{max-width:820px;margin:0 auto;padding:66px 24px 20px;text-align:center;position:relative}
+.hero .eyebrow{font-size:11px;letter-spacing:0.42em;color:var(--gold);margin-bottom:20px}
+.hero h1{font-size:clamp(34px,6vw,52px);font-weight:800;line-height:1.1;margin-bottom:20px;color:#F5EFE0;font-family:Georgia,"Noto Serif SC",serif;letter-spacing:0.04em}
+.hero .lead{font-size:16.5px;color:var(--ink2);line-height:1.95;max-width:660px;margin:0 auto}
+.hero .lead b{color:#F5E6BF}
+.hero .rule{width:60px;height:2px;background:var(--gold);margin:26px auto 0;opacity:0.6}
+.wrap{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+.count{font-size:12px;letter-spacing:0.3em;color:var(--accent);text-align:center;margin-bottom:34px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
+.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:26px 24px 22px;display:flex;flex-direction:column;transition:border-color .18s,transform .18s;position:relative;overflow:hidden}
+.card:hover{border-color:rgba(201,168,76,0.6);transform:translateY(-3px)}
+.card.feature{grid-column:1/-1;background:radial-gradient(ellipse 80% 120% at 12% 0%,rgba(212,178,94,0.12),transparent 60%),linear-gradient(160deg,var(--panel2),var(--panel))}
+.chip{display:inline-block;font-size:11px;letter-spacing:0.2em;color:#1A1410;background:var(--gold);border-radius:20px;padding:3px 12px;font-weight:700;margin-bottom:14px;align-self:flex-start}
+.chip.ser{color:var(--gold);background:transparent;border:1px solid rgba(201,168,76,0.5);font-weight:400}
+.badge-today{position:absolute;top:18px;right:18px;font-size:11px;letter-spacing:0.16em;color:#0E0B08;background:linear-gradient(90deg,#E8CE7E,#C9A84C);padding:4px 12px;border-radius:4px;font-weight:800}
+.card h2{font-size:20px;font-weight:800;color:#F5EFE0;line-height:1.42;margin-bottom:12px}
+.card.feature h2{font-size:26px}
+.card .hook{font-size:14.5px;color:var(--ink2);line-height:1.85;margin-bottom:18px;flex:1}
+.card.feature .hook{font-size:15.5px;max-width:720px}
+.card .meta{font-size:12px;color:#7C7159;letter-spacing:0.04em;margin-bottom:16px}
+.modes{display:flex;gap:9px;flex-wrap:wrap}
+.m{font-size:13px;letter-spacing:0.03em;text-decoration:none;border-radius:6px;padding:9px 15px;transition:all .15s}
+.m.primary{background:var(--gold);color:#1A1410;font-weight:700}
+.m.primary:hover{background:#E0C468}
+.m.ghost{background:rgba(201,168,76,0.08);color:var(--gold);border:1px solid rgba(201,168,76,0.4)}
+.m.ghost:hover{background:rgba(201,168,76,0.18)}
+.foretop{text-align:center;margin:70px auto 0;max-width:660px;padding:0 24px;color:#6B6250;font-size:13.5px;line-height:1.9}
+.foretop a{color:var(--gold);text-decoration:none}
+footer{border-top:1px solid var(--line);margin-top:56px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.card.feature h2{font-size:21px}.hero h1{font-size:34px}}
+</style></head>
+<body class="zh">
+<nav><div class="w">
+  <a href="/browse/">SDE Universes</a>
+  <div class="nav-right">
+    <a href="/western-philosophy/"><span class="zh-only">← 西方哲学专栏</span><span class="en-only">← Western Philosophy</span></a>
+    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+  </div>
+</div></nav>
+
+<div class="hero">
+  <div class="eyebrow zh-only">解 构 大 师 · DECONSTRUCTION MASTER</div>
+  <div class="eyebrow en-only">DECONSTRUCTION MASTER · DR. WANG × SDE</div>
+  <h1 class="zh-only">解构大师</h1>
+  <h1 class="en-only">Deconstruction Master</h1>
+  <p class="lead zh-only">用一双“事物如何发生”的眼，逐一解构思想史上的巨人。<br><b>带着敬意的精确</b>——先把对手扶到最强、最难反驳的状态，再指出他那记重拳，究竟偏了几度、偏在哪一个关节上。</p>
+  <p class="lead en-only">Deconstructing the giants of thought, one by one, through an eye trained on <b>how things come to be</b>. Precision with respect — first raise the opponent to his strongest, hardest-to-refute form, then show exactly by how many degrees, and at which joint, his mighty punch missed.</p>
+  <div class="rule"></div>
+</div>
+
+<div class="wrap">
+  <div class="count zh-only">解 构 巨 人 · 共 14 篇</div>
+  <div class="count en-only">THE GIANTS · 14 ESSAYS</div>
+  <div class="grid">
+
+    <a class="card feature" href="/column/nietzsche-perspectivism/" style="text-decoration:none">
+      <span class="badge-today zh-only">最新 · 今日</span><span class="badge-today en-only">Latest · Today</span>
+      <span class="chip">Nietzsche · 尼采</span>
+      <h2 class="zh-only">解构尼采：视角主义的错误</h2>
+      <h2 class="en-only">Deconstructing Nietzsche: The Error of Perspectivism</h2>
+      <p class="hook zh-only">你以为你在“选一个角度”看杯子——尼采把这一秒的错觉，盖成了一整座权力哲学。断口，在第二步：他把三界当场的联动，误记成了“主体的选择”；而剩下的那一界，就只能叫权力。约两万字，一只白瓷杯贯穿全篇。</p>
+      <p class="hook en-only">You think you are “choosing an angle” to view a cup — Nietzsche built an entire philosophy of power on that split-second illusion. The break is at the second step: he mistook the on-the-spot interplay of the three realms for “a choice by the subject,” and the one realm left over could only be called power. ~20,000 chars, one white porcelain cup running through it all.</p>
+      <div class="meta zh-only">约 2 万字 · 三种读法 · 二〇二六年七月十三日</div>
+      <div class="meta en-only">~20,000 chars · 3 reading modes · July 13, 2026</div>
+      <div class="modes">
+        <span class="m primary"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></span>
+        <span class="m ghost"><span class="zh-only">📄 在线 PDF</span><span class="en-only">📄 PDF online</span></span>
+        <span class="m ghost"><span class="zh-only">⬇ 下载</span><span class="en-only">⬇ Download</span></span>
+      </div>
+    </a>
+
+    <div class="card">
+      <span class="chip">Hegel · 黑格尔</span>
+      <h2 class="zh-only">黑格尔造出了那台引擎，却把它锁进了一个圆</h2>
+      <h2 class="en-only">Hegel Built the Engine, Then Locked It in a Circle</h2>
+      <p class="hook zh-only">他是最像「发生」的人——造出了矛盾驱动、自我推进的辩证法引擎，说对了「生成高于存在」。可他在最后一步，把这台开放的引擎，锁进了一个必然完满的圆：先在的绝对精神、注定的终点。SDE 在他的圆上凿开三个断口，把圆打开成永不收口的螺旋。他差的，只是一个字：开。</p>
+      <p class="hook en-only">The thinker who came closest to “genesis” — he built a self-driving, contradiction-powered dialectical engine and rightly held that becoming outranks being. But at the final step he locked this open engine inside a circle bound to complete itself: a pre-given Absolute Spirit, a destined end. SDE cuts three breaks in his circle and opens it into a spiral that never closes. He lacked just one thing: an opening.</p>
+      <div class="meta zh-only">约 3 万字 · 三种读法 · 2026年7月</div>
+      <div class="meta en-only">~30,000 chars · 3 reading modes · July 2026</div>
+      <div class="modes">
+        <a class="m primary" href="/column/deconstructing-hegel/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a>
+        <a class="m ghost" href="/column/deconstructing-hegel/read.html"><span class="zh-only">📄 在线 PDF</span><span class="en-only">📄 PDF online</span></a>
+        <a class="m ghost" href="/column/deconstructing-hegel/deconstructing-hegel.pdf" download><span class="zh-only">⬇ 下载</span><span class="en-only">⬇ Download</span></a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="chip">Foucault · 福柯</span>
+      <h2 class="zh-only">福柯站到了悬崖边，却没有桥</h2>
+      <h2 class="en-only">Foucault Reached the Cliff’s Edge, but Had No Bridge</h2>
+      <p class="hook zh-only">两千五百年的权力思想都在问“谁在统治”。福柯把问题翻转成“权力如何运作”，一举看穿了知识与权力的合谋——可他拆掉了旧主体之后，没能为“意义如何重新发生”架起一座桥，于是停在了悬崖边。</p>
+      <p class="hook en-only">For twenty-five centuries, thought about power asked “who rules.” Foucault flipped the question to “how does power operate,” seeing through the collusion of knowledge and power in a single stroke — but after dismantling the old subject, he built no bridge for “how meaning happens anew,” and so he stopped at the cliff’s edge.</p>
+      <div class="meta zh-only">约 3 万字 · 三种读法 · 2026年7月</div>
+      <div class="meta en-only">~30,000 chars · 3 reading modes · July 2026</div>
+      <div class="modes">
+        <a class="m primary" href="/column/deconstructing-foucault/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a>
+        <a class="m ghost" href="/column/deconstructing-foucault/read.html"><span class="zh-only">📄 在线 PDF</span><span class="en-only">📄 PDF online</span></a>
+        <a class="m ghost" href="/column/deconstructing-foucault/deconstructing-foucault.pdf" download><span class="zh-only">⬇ 下载</span><span class="en-only">⬇ Download</span></a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="chip ser zh-only">解构西方哲学家 · 之一</span><span class="chip ser en-only">Western Philosophers · I</span>
+      <h2 class="zh-only">柏拉图的理念，不是被回忆的，而是被发生的</h2>
+      <h2 class="en-only">Plato’s Ideas Are Not Recollected — They Are Brought About</h2>
+      <p class="hook zh-only">理念不是灵魂在出生前见过、此生只需回忆的现成模板。SDE 顺着柏拉图的“回忆说”往下追问：那被回忆的东西，最初又是怎么来的？答案是——它不是被回忆的，是在追问中当场被发生的。</p>
+      <p class="hook en-only">Ideas are not ready-made templates the soul glimpsed before birth and merely recollects. SDE follows Plato’s doctrine of recollection one step further: that thing being recollected — where did it first come from? The answer: it is not recollected; it is brought about, right there, in the act of questioning.</p>
+      <div class="meta zh-only">深度长文 · 长文阅读 · 2026年7月</div>
+      <div class="meta en-only">In-depth · Long-form · July 2026</div>
+      <div class="modes"><a class="m primary" href="/column/plato-idea-genesis/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+    <div class="card">
+      <span class="chip ser zh-only">解构西方哲学家 · 之二</span><span class="chip ser en-only">Western Philosophers · II</span>
+      <h2 class="zh-only">康德的范畴，不是先天的模具，而是沉淀的纠缠</h2>
+      <h2 class="en-only">Kant’s Categories Are Not A-Priori Moulds but Settled Entanglements</h2>
+      <p class="hook zh-only">康德说，十二范畴是先天装好、扣在一切经验之上的模具。SDE 反问：模具自己又是从哪儿来的？范畴不是天生现成的铁模，而是无数次纠缠沉淀下来的结晶——它会生长，也会变形。</p>
+      <p class="hook en-only">Kant said the twelve categories are moulds installed a priori, stamped onto all experience. SDE asks back: and where did the moulds themselves come from? Categories are not innate iron moulds but crystals settled out of countless entanglements — they grow, and they deform.</p>
+      <div class="meta zh-only">深度长文 · 长文阅读 · 2026年7月</div>
+      <div class="meta en-only">In-depth · Long-form · July 2026</div>
+      <div class="modes"><a class="m primary" href="/column/kant-categories-genesis/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+    <div class="card">
+      <span class="chip ser zh-only">解构西方哲学家 · 之三</span><span class="chip ser en-only">Western Philosophers · III</span>
+      <h2 class="zh-only">尼采的视角，不是主体选择的，而是发生出来的</h2>
+      <h2 class="en-only">Nietzsche’s Perspective Is Not Chosen by a Subject — It Happens</h2>
+      <p class="hook zh-only">与头条同一命门的另一角切入：视角从来不是一个主体站在高处、从一份菜单里挑出来的。它是在“看”的当场，被三界联动发生出来的一个侧面——主体，只是这场发生在下游落下的一个签名。</p>
+      <p class="hook en-only">The same fault line as the headline piece, entered from another angle: a perspective is never picked by a subject standing above, choosing from a menu. It is a facet brought about, right there in the seeing, by the interplay of the three realms — the subject is merely a signature left downstream by that very happening.</p>
+      <div class="meta zh-only">深度长文 · 长文阅读 · 2026年7月</div>
+      <div class="meta en-only">In-depth · Long-form · July 2026</div>
+      <div class="modes"><a class="m primary" href="/column/nietzsche-perspective-genesis/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+    <div class="card">
+      <span class="chip ser zh-only">解构西方哲学家 · 之四</span><span class="chip ser en-only">Western Philosophers · IV</span>
+      <h2 class="zh-only">亚里士多德的实体，不是万物的地基，而是被冻住的发生</h2>
+      <h2 class="en-only">Aristotle’s Substance Is Not Bedrock — It Is Frozen Genesis</h2>
+      <p class="hook zh-only">他把理念从天上搬进了物里，宣称找到了万物的地基。可「实体」这个概念，天生是一张快照——从持续的发生里截下的静止画面。一位御医之子把解剖台的语法投射成宇宙的宪法，一个终身无地的异邦人把分类当成自己的领土。Z卷两千年没打扫完，不是主人懒，是冻结术碰到流动，必然融化。</p>
+      <p class="hook en-only">He moved the Ideas from heaven into things and claimed to have found the bedrock of all beings. But “substance” is born a snapshot — a still frame cut from an ongoing genesis. A physician’s son projected the grammar of the dissection table onto the constitution of the cosmos; a lifelong stateless foreigner made classification his territory. Book Zeta stayed unfinished for two thousand years not from laziness, but because the freezing art must melt when it meets flow.</p>
+      <div class="meta zh-only">约 2 万字 · 四步结构 · 2026年7月</div>
+      <div class="meta en-only">~20,000 chars · four-stroke · July 2026</div>
+      <div class="modes"><a class="m primary" href="/column/aristotle-substance-genesis/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+    <div class="card">
+      <span class="chip ser zh-only">解构西方哲学家 · 之五</span><span class="chip ser en-only">Western Philosophers · V</span>
+      <h2 class="zh-only">笛卡尔的我思，不是找到的地基，而是清场后的房东</h2>
+      <h2 class="en-only">Descartes’ Cogito Is Not a Bedrock Found — It Is the Landlord After the Clearing</h2>
+      <p class="hook zh-only">那场著名的大火，不是一次真实的焚毁，而是一场按剧本进行的清场：火在哪点起、烧到哪、在哪道门槛前熄灭，都是事先写好的。无可怀疑的只是「思在发生」；而「我」，是语法配发、经院加冕的房东——一个住得最久、久到忘了签过租约的房客。</p>
+      <p class="hook en-only">The famous fire was not a real burning but a scripted clearing: where it was lit, how far it burned, at which threshold it went out — all written in advance. What is beyond doubt is only “thinking is happening”; the “I” is a landlord issued by grammar and crowned by the schools — the tenant who has lived there longest, so long he has forgotten he ever signed a lease.</p>
+      <div class="meta zh-only">约 2 万字 · 四步结构 · 2026年7月</div>
+      <div class="meta en-only">~20,000 chars · four-stroke · July 2026</div>
+      <div class="modes"><a class="m primary" href="/column/descartes-cogito-genesis/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+    <div class="card">
+      <span class="chip ser zh-only">解构西方哲学家 · 之六</span><span class="chip ser en-only">Western Philosophers · VI</span>
+      <h2 class="zh-only">海德格尔的存在，不是失而复得的，而是当场铸成的</h2>
+      <h2 class="en-only">Heidegger’s Being Is Not Regained — It Is Forged on the Spot</h2>
+      <p class="hook zh-only">他宣布整个西方遗忘了存在两千年。可"存在的遗忘"不是一桩历史事实，是他铸的一口钟——柏拉图的回忆说被放大到文明的尺度。脱了圣袍的词汇表、越挖越古的词根矿井、把工程搁浅改写成天命的"转向"，与那个名叫 es gibt 的匿名海关，逐一显形。而他晚年为终极之事找到的名字 Ereignis，在德语里本来就叫"发生"。</p>
+      <p class="hook en-only">He declared the West had forgotten Being for two thousand years. But the "forgetting of Being" is not a historical fact — it is a bell he cast: Plato’s recollection scaled up to a civilization. The unfrocked vocabulary, the ever-deeper etymological mine, the "turn" that rewrote a stalled project as destiny, and the anonymous customs house named es gibt — each is brought to light. And Ereignis, the name he found late in life for the ultimate matter, in German simply means "event, happening."</p>
+      <div class="meta zh-only">约 2 万字 · 四步结构 · 2026年7月</div>
+      <div class="meta en-only">~20,000 chars · four-stroke · July 2026</div>
+      <div class="modes"><a class="m primary" href="/column/heidegger-being-genesis/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+    <div class="card">
+      <span class="chip ser zh-only">解构西方哲学家 · 之七</span><span class="chip ser en-only">Western Philosophers · VII</span>
+      <h2 class="zh-only">德勒兹的潜在，不是发生的源头，而是发生的倒影</h2>
+      <h2 class="en-only">Deleuze’s Virtual Is Not Genesis’s Source — It Is Its Reflection</h2>
+      <p class="hook zh-only">他是第一个走到海关、主动打开箱子说"这是我造的"的人——公开承认概念是被创造的。序列还咬得动他吗？咬得动：他把现实化过程里那股真实的"势"，从进行时里取出来、冲洗定影，挂进一间名叫"潜在"的地下展厅；又用《什么是哲学？》一纸宪法宣布，创造出的概念永久豁免于经验的法庭。偷运的对象，退到了法庭本身。</p>
+      <p class="hook en-only">He was the first to walk up to customs and open the box himself: "these are things I made" — openly admitting concepts are created. Can the sequence still bite him? It can: he took the real "tendency" of actualization out of its present tense, developed and fixed it like a photograph, and hung it in an underground gallery called "the virtual"; then, in What Is Philosophy?, legislated that created concepts are permanently exempt from the court of experience. What is smuggled has retreated to the court itself.</p>
+      <div class="meta zh-only">约 2 万字 · 四步结构 · 2026年7月</div>
+      <div class="meta en-only">~20,000 chars · four-stroke · July 2026</div>
+      <div class="modes"><a class="m primary" href="/column/deleuze-virtual-genesis/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+    <div class="card">
+      <span class="chip">Derrida · 德里达</span>
+      <h2 class="zh-only">德里达那一拳，为何砸空？</h2>
+      <h2 class="en-only">Derrida’s Punch — Why Did It Hit Nothing?</h2>
+      <p class="hook zh-only">德里达一拳砸碎了结构主义的中心、在场与稳定所指，延异（différance）让意义永远被推迟。这一拳锐利无匹——可它最终砸在了哪里？为什么砸得结构粉碎，却砸不出一个新的立足之地？</p>
+      <p class="hook en-only">Derrida’s blow shattered structuralism’s center, presence, and stable signified; différance defers meaning forever. The blow was matchlessly sharp — but where did it finally land? Why did it smash structure to pieces yet fail to strike out any new ground to stand on?</p>
+      <div class="meta zh-only">王博士与 SDE · 长文阅读 · 据《SDE本体论入门》第二十七章</div>
+      <div class="meta en-only">Dr. Wang × SDE · Long-form · from Intro to SDE Ontology, ch. 27</div>
+      <div class="modes"><a class="m primary" href="/column/derrida-deconstruction/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+  </div>
+
+  <div class="count zh-only" style="margin-top:56px;border-top:1px solid var(--line);padding-top:44px">方 法 与 导 读 · 相 关 阅 读</div>
+  <div class="count en-only" style="margin-top:56px;border-top:1px solid var(--line);padding-top:44px">METHOD &amp; COMPANION READS</div>
+  <div class="grid">
+
+    <div class="card">
+      <span class="chip ser zh-only">导读 · 《权力为何物》</span><span class="chip ser en-only">Companion · What Is Power</span>
+      <h2 class="zh-only">视角不是主体选择的，而是发生的</h2>
+      <h2 class="en-only">Perspective Is Not Chosen by a Subject — It Happens</h2>
+      <p class="hook zh-only">尼采两句最爆炸的话——“没有事实，只有解释”“只有一种视角式的看”——把它们一路顺到底，会得到什么？这是《权力为何物》的导读长文，与“解构尼采”同一命门，却从“权力如何发生”这一侧切入：视角不是谁挑出来的，是当场发生出来的。</p>
+      <p class="hook en-only">Nietzsche’s two most explosive lines — “there are no facts, only interpretations” and “there is only a perspectival seeing” — followed all the way down, yield what? This companion essay to <em>What Is Power</em> shares the fault line of “Deconstructing Nietzsche” but enters from the side of “how power comes to be”: a perspective is not picked by anyone; it is brought about on the spot.</p>
+      <div class="meta zh-only">导读长文 · 长文阅读 · 2026年7月</div>
+      <div class="meta en-only">Companion essay · Long-form · July 2026</div>
+      <div class="modes"><a class="m primary" href="/column/nietzsche-perspectivism-power-genesis/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+    <div class="card">
+      <span class="chip ser zh-only">方法 · 批判性思维</span><span class="chip ser en-only">Method · Critical Thinking</span>
+      <h2 class="zh-only">真正的批判，首先是一种显影</h2>
+      <h2 class="en-only">Real Critique Is First an Unveiling</h2>
+      <p class="hook zh-only">GPT 时代，旧式批判性思维失灵了——“识别前提、检查逻辑、比较证据”那套动作，本是为单一、稳定、透明的对象设计的。而 GPT 吐出的，是多元交融、表面顺滑内里复合的显影体。真正的批判，得先学会把它显影出来。</p>
+      <p class="hook en-only">In the GPT era, the old critical thinking has failed — its drill of “identify premises, check logic, compare evidence” was built for a single, stable, transparent object. What GPT emits is a manifold-fused artifact, smooth on the surface and composite within. Real critique must first learn to develop it, like film.</p>
+      <div class="meta zh-only">深度长文 · 长文阅读 · 读《GPT时代的SDE批判性思维》</div>
+      <div class="meta en-only">In-depth · Long-form · on SDE Critical Thinking in the GPT Era</div>
+      <div class="modes"><a class="m primary" href="/column/critique-is-first-an-unveiling/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a></div>
+    </div>
+
+    <div class="card">
+      <span class="chip">Adorno · 阿多诺</span>
+      <h2 class="zh-only">阿多诺的非同一者，不是被保护的剩余，而是偷运进来的物自体</h2>
+      <h2 class="en-only">Adorno’s Non-Identical: Not a Protected Remainder but a Smuggled Thing-in-Itself</h2>
+      <p class="hook zh-only">他是这条序列上最勤快的拆迁队长——三十环里出现四次，四次都是拿刀的人。他看见了显露会僵化，看见了普遍者会吞没特殊者，看见了那个自称没有外部的整体在骗人。然后他做了那个反的动作：既然显露会僵化，那就不许显露。而为了给这条禁令找一个不动摇的根据，他造了一个永不显露的东西——物自体的三项职能，它一条不差地继承。</p>
+      <p class="hook en-only">The sequence’s busiest knife-holder — four appearances across thirty links, every one of them holding the blade. He saw that form ossifies, that the universal devours the particular, that any whole claiming no outside is lying. Then he made the reverse move: since form can ossify, form is forbidden. And to ground that ban he built something that can never appear — inheriting, item for item, the three offices of the thing-in-itself.</p>
+      <div class="meta zh-only">约 2 万字 · 四步结构 · 2026年8月</div>
+      <div class="meta en-only">~20,000 chars · four-stroke · August 2026</div>
+      <div class="modes"><a class="m primary" href="/column/adorno-nonidentical-genesis/"><span class="zh-only">📖 长文阅读</span><span class="en-only">📖 Long-form</span></a><a class="m" href="/western-philosophy/masters/adorno/"><span class="zh-only">🏛 阿多诺频道</span><span class="en-only">🏛 Channel</span></a></div>
+    </div>
+
+  </div>
+
+  <div class="foretop">
+    <span class="zh-only">每一篇解构，靠的都不是嗓门，是一双能看清“事情如何发生”的眼。<br>这双眼，你也可以借来一用 —— <a href="/taste/idea-generator/">免费品尝 SDE 金点子发生器 →</a></span>
+    <span class="en-only">Every deconstruction rests not on volume, but on an eye that can see how things happen.<br>That eye — you can borrow it too: <a href="/taste/idea-generator/">try the SDE Idea Generator, free →</a></span>
+  </div>
+</div>
+
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#17120C;border:1px solid #3A2E1A;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#E4C878;margin:0 0 10px">参考文献 · References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#8A7A55;margin:0 0 20px">本文为依 SDE 发生学（王德生《SDE本体论》）重读经典的原创论述。下列文献为文中所涉思想的原典与代表性研究，供读者对读与查证；本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#C9BFA8">
+    <li style="margin:0 0 9px;padding-left:6px">Jacques Derrida, De la grammatologie (1967)；中译《论文字学》，汪堂家译，上海译文出版社，1999。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Jacques Derrida, L'écriture et la différence (1967)；中译《书写与差异》，张宁译，三联书店，2001。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Jacques Derrida, Marges de la philosophie (1972)（含《延异》一文），Paris: Minuit。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Ferdinand de Saussure, Cours de linguistique générale (1916)；中译《普通语言学教程》，高名凯译，商务印书馆，1980。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Martin Heidegger, Sein und Zeit (1927)；中译《存在与时间》，陈嘉映、王庆节译，三联书店，2006。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Friedrich Nietzsche, Zur Genealogie der Moral (1887)；中译《论道德的谱系》，周红译，三联书店，1992。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Jonathan Culler, On Deconstruction: Theory and Criticism after Structuralism, Ithaca: Cornell University Press, 1982.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Paul de Man, Allegories of Reading, New Haven: Yale University Press, 1979.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Michel Foucault, "Qu'est-ce que la critique?" (1978)（《什么是批判？》）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Max Horkheimer, "Traditionelle und kritische Theorie" (1937)（《传统理论与批判理论》）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Theodor W. Adorno, Negative Dialektik (1966)；中译《否定的辩证法》，张峰译，重庆出版社，1993。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Bruno Latour, "Why Has Critique Run Out of Steam?", Critical Inquiry, Vol. 30, No. 2 (2004).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Walter Benjamin, "Über den Begriff der Geschichte" (1940)（《历史哲学论纲》）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Immanuel Kant, Kritik der Urteilskraft (1790)；中译《判断力批判》，邓晓芒译，人民出版社，2002。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Susan Sontag, Against Interpretation and Other Essays, New York: Farrar, Straus & Giroux, 1966.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Martin Heidegger, "Der Ursprung des Kunstwerkes" (1935/36)，收《林中路》，孙周兴译，上海译文出版社，2004（艺术作品的本源）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Maurice Merleau-Ponty, L'Œil et l'esprit (1964)；中译《眼与心》，杨大春译，商务印书馆，2007。</li>
+    <li style="margin:0 0 9px;padding-left:6px">John Dewey, Art as Experience, New York: Minton, Balch, 1934；中译《艺术即经验》，高建平译，商务印书馆，2005。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Viktor Shklovsky, "Art as Technique" (1917)（陌生化理论），in Russian Formalist Criticism, University of Nebraska Press, 1965。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Walter Benjamin, "Das Kunstwerk im Zeitalter seiner technischen Reproduzierbarkeit" (1936)；中译《机械复制时代的艺术作品》，王才勇译，中国城市出版社，2002。</li>
+    <li style="margin:0 0 9px;padding-left:6px">宗白华：《美学散步》，上海人民出版社，1981。</li>
+    <li style="margin:0 0 9px;padding-left:6px">李泽厚：《美的历程》，文物出版社，1981。</li>
+  </ol>
+</section>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  <span class="zh-only">© 德麦国际 Demai International · 解构大师专栏 · <a href="/browse/">sdeuniverses.com</a></span>
+  <span class="en-only">© Demai International · Deconstruction Master column · <a href="/browse/">sdeuniverses.com</a></span>
+</footer>
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

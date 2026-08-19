@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>讨论区管理 | SDE Universes</title>
+<style>
+:root{--ink:#2B2620;--muted:#8A8378;--line:#DDD5C6;--bg:#FAF7F0;--card:#FFFFFF;--gold:#8A6D2F;--red:#8B3A2E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.9 -apple-system,"Noto Sans SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:34px 20px 80px}
+h1{font-size:22px;letter-spacing:.06em;margin:0 0 4px}
+.sub{font-size:13px;color:var(--muted);margin:0 0 24px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:20px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input{font:inherit;color:inherit;border:1px solid var(--line);border-radius:6px;padding:8px 12px;background:#fff;outline:none;flex:1;min-width:160px}
+input:focus{border-color:var(--gold)}
+button{font:inherit;font-size:14px;letter-spacing:.12em;padding:8px 22px;border-radius:6px;border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer}
+button:hover{background:var(--gold);color:#fff}
+button:disabled{opacity:.4;cursor:default}
+button.danger{border-color:var(--red);color:var(--red)}
+button.danger:hover{background:var(--red);color:#fff}
+.msg{font-size:13px;color:var(--muted);margin-top:8px;min-height:1em}
+.stat{font-size:13px;color:var(--muted);margin:0 0 14px}
+.art{border:1px solid var(--line);border-radius:8px;background:var(--card);margin-bottom:14px;overflow:hidden}
+.art-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;background:rgba(138,109,47,.05)}
+.art-h .slug{font-weight:700;word-break:break-all}
+.art-h .slug a{color:var(--gold);text-decoration:none}
+.art-h .nums{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.art-b{display:none;padding:4px 16px 12px;border-top:1px solid var(--line)}
+.art.open .art-b{display:block}
+.cm{border-bottom:1px dashed var(--line);padding:10px 0}
+.cm:last-child{border-bottom:0}
+.cm.sub{margin-left:26px;padding-left:12px;border-left:2px solid var(--line)}
+.cm-h{font-size:12.5px;color:var(--muted)}
+.cm-h b{color:var(--ink);font-size:13.5px}
+.cm-t{white-space:pre-wrap;word-break:break-word;margin:3px 0 6px}
+.cm button{font-size:12px;letter-spacing:.06em;padding:3px 12px}
+h2{font-size:16px;margin:0 0 10px;letter-spacing:.04em}
+.note{font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>读者讨论区 · 管理</h1>
+  <p class="sub">SDE Universes 内部页面 · 管理口令与"智能问答"后台共用</p>
+
+  <div class="panel">
+    <div class="row">
+      <input id="pass" type="password" placeholder="管理口令" autocomplete="current-password">
+      <button id="load">载入全站留言</button>
+    </div>
+    <div class="msg" id="load-msg"></div>
+  </div>
+
+  <div class="panel">
+    <h2>按文章查询</h2>
+    <div class="row">
+      <input id="q-slug" placeholder="文章目录，如 column/gut-brain">
+      <button id="q-go">查询</button>
+    </div>
+    <p class="note">全站列表只包含"有过留言"的文章；这里可以查任何一篇（包括还没进列表的）。</p>
+    <div class="msg" id="q-msg"></div>
+  </div>
+
+  <div class="panel">
+    <h2>名字解绑</h2>
+    <div class="row">
+      <input id="ub-name" placeholder="要解绑的名字">
+      <button id="ub-go" class="danger">解 绑</button>
+    </div>
+    <p class="note">解除该名字与其网络的绑定：本人换名、或名字被误占时用。解绑不删留言。</p>
+    <div class="msg" id="ub-msg"></div>
+  </div>
+
+  <p class="stat" id="stat"></p>
+  <div id="arts"></div>
+</div>
+
+<script>
+(function(){
+function el(id){return document.getElementById(id)}
+function tme(ts){var d=new Date(ts),p=function(x){return (x<10?"0":"")+x};
+return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())}
+function pass(){return el("pass").value}
+function api(slug){return "/api/comments?slug="+slug}
+
+function post(slug,body){return fetch(api(slug),{method:"POST",
+headers:{"content-type":"application/json"},body:JSON.stringify(body)}).then(function(r){return r.json()})}
+
+function renderArt(slug,items,pv){
+var art=document.createElement("div");art.className="art";
+var h=document.createElement("div");h.className="art-h";
+var s=document.createElement("div");s.className="slug";
+var a=document.createElement("a");a.href="/browse/"+slug+"/";a.target="_blank";a.textContent="/"+slug+"/";
+s.appendChild(a);
+var n=document.createElement("div");n.className="nums";
+n.textContent=items.length+" 条留言"+(pv!=null?(" · 阅读 "+pv+" 次"):"");
+h.appendChild(s);h.appendChild(n);
+h.onclick=function(e){if(e.target.tagName!=="A")art.classList.toggle("open")};
+art.appendChild(h);
+var b=document.createElement("div");b.className="art-b";
+var tops=items.filter(function(c){return !c.parent}).sort(function(x,y){return y.ts-x.ts});
+var reps={};items.forEach(function(c){if(c.parent){(reps[c.parent]=reps[c.parent]||[]).push(c)}});
+function cmNode(c,sub){
+var d=document.createElement("div");d.className="cm"+(sub?" sub":"");
+var hd=document.createElement("div");hd.className="cm-h";
+var nb=document.createElement("b");nb.textContent=c.name;
+hd.appendChild(nb);hd.appendChild(document.createTextNode(" · "+tme(c.ts)+" · "+c.id));
+var t=document.createElement("div");t.className="cm-t";t.textContent=c.text;
+var del=document.createElement("button");del.className="danger";del.textContent="删除";
+del.onclick=function(){
+if(!confirm("确定删除这条留言"+(sub?"":"（连同它下面的回复）")+"？"))return;
+del.disabled=true;
+post(slug,{op:"del",id:c.id,pass:pass()}).then(function(r){
+if(r&&r.ok){d.style.opacity=".35";del.textContent="已删除"}
+else{del.disabled=false;alert((r&&r.msg)||"删除失败")}})
+.catch(function(){del.disabled=false;alert("网络异常")})};
+d.appendChild(hd);d.appendChild(t);d.appendChild(del);return d}
+if(!tops.length){var e=document.createElement("div");e.className="note";e.textContent="（空）";b.appendChild(e)}
+tops.forEach(function(c){
+b.appendChild(cmNode(c,false));
+(reps[c.id]||[]).sort(function(x,y){return x.ts-y.ts}).forEach(function(r){b.appendChild(cmNode(r,true))})});
+art.appendChild(b);
+return art}
+
+function loadOne(slug,into,withPv){
+return fetch(api(slug)).then(function(r){return r.json()}).then(function(d){
+var items=(d&&d.items)||[];
+if(withPv){return fetch("/api/pv?slug="+slug).then(function(r){return r.json()})
+.then(function(p){into.appendChild(renderArt(slug,items,p&&p.total));return items.length})
+.catch(function(){into.appendChild(renderArt(slug,items,null));return items.length})}
+into.appendChild(renderArt(slug,items,null));return items.length})}
+
+el("load").onclick=function(){
+if(!pass()){el("load-msg").textContent="请先输入管理口令。";return}
+var btn=el("load");btn.disabled=true;el("load-msg").textContent="载入中…";
+post("column/zzz-livetest",{op:"slugs",pass:pass()}).then(function(d){
+btn.disabled=false;
+if(!d||!d.ok){el("load-msg").textContent=(d&&d.msg)||"载入失败";return}
+var slugs=(d.slugs||[]).sort(function(a,b){return b.posts-a.posts});
+el("load-msg").textContent="";
+var arts=el("arts");arts.innerHTML="";
+el("stat").textContent="有过留言的文章："+slugs.length+" 篇（点击标题展开）";
+var total=0,done=0;
+if(!slugs.length){el("stat").textContent="还没有任何文章收到留言。";return}
+slugs.forEach(function(s){loadOne(s.slug,arts,true).then(function(n){
+total+=n;done+=1;
+if(done===slugs.length)el("stat").textContent="有过留言的文章："+slugs.length+" 篇 · 现存留言共 "+total+" 条（点击标题展开）"})})})
+.catch(function(){btn.disabled=false;el("load-msg").textContent="网络异常。"})};
+
+el("q-go").onclick=function(){
+var s=el("q-slug").value.trim().replace(/^\/+|\/+$/g,"");
+if(!s){el("q-msg").textContent="请输入文章目录。";return}
+el("q-msg").textContent="查询中…";
+var arts=el("arts");
+loadOne(s,arts,true).then(function(n){el("q-msg").textContent="已载入 /"+s+"/："+n+" 条留言（在下方列表底部）。"})
+.catch(function(){el("q-msg").textContent="查询失败：目录不对或网络异常。"})};
+
+el("ub-go").onclick=function(){
+if(!pass()){el("ub-msg").textContent="请先在上方输入管理口令。";return}
+var n=el("ub-name").value.trim();
+if(!n){el("ub-msg").textContent="请输入名字。";return}
+if(!confirm("确定解除「"+n+"」与其网络的绑定？"))return;
+post("column/zzz-livetest",{op:"unbind",name:n,pass:pass()}).then(function(d){
+el("ub-msg").textContent=(d&&d.ok)?("已解绑："+d.removed+" 处网络。"):((d&&d.msg)||"解绑失败")})
+.catch(function(){el("ub-msg").textContent="网络异常。"})};
+})();
+</script>
+</body></html>
