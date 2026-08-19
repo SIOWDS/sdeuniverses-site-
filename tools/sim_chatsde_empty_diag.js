@@ -158,5 +158,20 @@ ok((chatSeg.match(/clearTimeout\(_nof2\)/g) || []).length === 3,
   "两段看门狗一起撤（首帧两处＋收流后），实得 " + (chatSeg.match(/clearTimeout\(_nof2\)/g) || []).length);
 ok(/切到「标准」档重问/.test(chatSeg), "报信给出出路（切标准档），不是只报一个坏消息");
 
+console.log("⑨ 基底代号认不出时不许静默换一家（2026-08-19）");
+/* wdsVendorOf 认不出就退回 zhipu ⇒ DeepSeek 的 Key 被发去智谱、401，
+   而判词写的是「你的 Key 用不了」——把好 Key 判成坏 Key，读者会去换一把没问题的钥匙。 */
+{
+  const _v0 = W.indexOf("const WDS_VMAP = {");
+  const vm = W.slice(_v0, W.indexOf("};", _v0) + 2);   // ⚠ 只切这一条声明：切宽了会被紧邻的 WDS_VSHORT 喂饱
+  ["ds", "glm", "kimi", "qwen", "mm"].forEach((k) => ok(new RegExp("\\b" + k + ":").test(vm), "短名仍在：" + k));
+  ["deepseek", "zhipu", "minimax"].forEach((k) => ok(new RegExp("\\b" + k + ": \"").test(vm), "全名也认：" + k));
+  ok(/\|\| "zhipu";/.test(W), "退路本身保留（认不出总得有个去处），但常见全名不再落进来");
+  ok(/这一把是发给「" \+ VC\.name \+ "」的/.test(W),
+    "★ 401/402/429 的判词说清发给了哪一家——不说就等于把好 Key 判成坏 Key");
+  ok((W.match(/这一把是发给「" \+ VC\.name \+ "」的/g) || []).length >= 2,
+    "两条读者路径都改了（chat 与 read），实得 " + (W.match(/这一把是发给「" \+ VC\.name \+ "」的/g) || []).length);
+}
+
 console.log("\n" + (FAIL ? "✗ " : "✓ ") + PASS + " 项通过，" + FAIL + " 项失败");
 process.exit(FAIL ? 1 : 0);

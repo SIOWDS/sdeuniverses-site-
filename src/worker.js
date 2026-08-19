@@ -529,7 +529,12 @@ function wdsPickImgs(list) {
   return out;
 }
 // 前端短码 ↔ 基底键。未知一律落 zhipu（老前端只发 ds/其它两种值，这样不会断）。
-const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax" };
+/* 别名表。**全名也要认**：`wdsVendorOf` 认不出就静默退回 zhipu ——
+   于是一把好端端的 DeepSeek Key 被发去智谱、上游回 401，而我们告诉读者「你的 Key 用不了」。
+   2026-08-19 我自己写探针时就栽在这上面，查了二十分钟才发现是发错了家。
+   读者的前端只发短名，但任何别处调这个接口的人都会先想到全名。 */
+const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax",
+  deepseek: "deepseek", zhipu: "zhipu", glm5: "zhipu", moonshot: "kimi", minimax: "minimax", qwen3: "qwen" };
 const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm" };
 // LONG_ASK：读者这一问要的是"答一段话"还是"写一篇"？两者对预算与口径的要求完全不同。
 // 不识别它，就会出现最难看的那种失败：读者写"先写 8000 字"，而我们给的 max_tokens 是 8000（约等于 8000 汉字的极限），
@@ -7426,7 +7431,7 @@ export default {
               if (!upstream.ok) {
                 _clear();
                 const errtxt = (await upstream.text()).slice(0, 300);
-                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { hard: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" };
+                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { hard: "你的 Key 用不了（" + upstream.status + "，这一把是发给「" + VC.name + "」的）：额度不足、填错了，或者这把 Key 不是这一家的。去设置里检查或换一个。", code: "bad_key" };
                 // CONTEXT_OVERFLOW：深聊时历史+资料超过基底输入窗口，基底回 400 且报的是上下文/长度过长。
                 // 不直接报错——返回 overflow 让上层把历史预算砍半、重建 messages 重跑。max_tokens 类 400 已由 wdsFetchMax 处理，走不到这里。
                 if (upstream.status === 400 && /context|too long|too large|maximum context|length limit|exceed|输入.*过长|上下文|token/i.test(errtxt) && b.guide && histBudget > 24000) {
@@ -7862,7 +7867,7 @@ export default {
             }
             if (!upstream.ok) {
               const errtxt = (await upstream.text()).slice(0, 300);
-              if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" })); return fin(); }
+              if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "，这一把是发给「" + VC.name + "」的）：额度不足、填错了，或者这把 Key 不是这一家的。去设置里检查或换一个。", code: "bad_key" })); return fin(); }
               controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
             }
             const reader = upstream.body.getReader();
