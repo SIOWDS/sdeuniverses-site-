@@ -153,7 +153,12 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   const WR = fs.readFileSync(path.join(__dirname, "../wrangler.jsonc"), "utf8");
   ok("wrangler 绑定了 IDXMEM", /"name": "IDXMEM", "class_name": "IndexMemory"/.test(WR));
   ok("migration 里 IndexMemory 是 sqlite 类", /"new_sqlite_classes": \["IndexMemory"\]/.test(WR));
-  ok("重建口要管理员口令（守的是这件事，不是路径叫什么）", /idx\/(status|rebuild)[\s\S]{0,900}adminPassOk/.test(SRC));
+  ok("重建口有管理口令这道锁（守的是这件事，不是路径叫什么）", /idx\/(status|rebuild)[\s\S]{0,1200}adminPassOk/.test(SRC));
+  /* 锁的位置：force（无条件全量重跑）才要口令；不带 force 的指纹复验式重建不要——
+     它 etag 没变就是空转，而 _query 本来就每次都在 fire-and-forget 触发它，
+     给它上锁拦不住什么，只会让我们自己在接线前刷不了索引。 */
+  ok("★ 锁上在 force 那一格", /force && !\(await adminPassOk/.test(SRC));
+  ok("不带 force 的重建不要口令（否则等于锁错格）", /if \(url\.searchParams\.get\("build"\) === "1"\) op = "ensure";/.test(SRC));
 
   console.log("\n──────── " + pass + " passed, " + fail + " failed ────────");
   process.exit(fail ? 1 : 0);

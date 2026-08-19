@@ -6919,18 +6919,21 @@ export default {
     if (url.pathname === "/api/idx/status") {
       try {
         const st = _do(env, "IDXMEM").get(_do(env, "IDXMEM").idFromName("global"));
-        /* 🔴 重建是一次全量的 R2 读取＋建表：**必须要管理员口令**，否则谁都能拿它当压力测试。
-           （这一条是把 2026-08-18 那份护栏取回来跑时当场抓到的——我第一版忘了加。） */
-        let op = "status";
-        if (url.searchParams.get("build") === "1") {
-          if (!(await adminPassOk(url.searchParams.get("pass") || ""))) {
-            return Response.json({ bound: !!env.IDXMEM, error: "重建索引要管理口令（?pass=…）。" }, { status: 403, headers: _cors() });
-          }
-          op = "ensure";
+        /* 锁要上在对的那一格（2026-08-19 二改）：
+           `ensure(false)` 是**指纹复验式**的——manifest 的 etag 没变它什么都不做，
+           而且 `_query` 本来就每次 fire-and-forget 触发它。给它上锁既拦不住什么，
+           又让我们自己没法在接线前手工刷一次。真正贵的是 `force:true`：不看指纹、
+           无条件重跑一次全量 R2 读取与建表 —— **那一格才要管理口令。**
+           ⚠ 第一版我把锁上在了 build 上，是取回旧护栏跑出来的提醒让我发现这里该有锁；
+             锁该有，只是位置错了一格。 */
+        let op = "status", force = url.searchParams.get("force") === "1";
+        if (force && !(await adminPassOk(url.searchParams.get("pass") || ""))) {
+          return Response.json({ bound: !!env.IDXMEM, error: "无条件全量重建要管理口令（?pass=…）；不带 force 的指纹复验式重建不需要。" }, { status: 403, headers: _cors() });
         }
+        if (url.searchParams.get("build") === "1") op = "ensure";
         const r = await st.fetch(new Request("https://idx.internal/", {
           method: "POST", headers: { "content-type": "application/json" },
-          body: JSON.stringify({ op: op, force: url.searchParams.get("force") === "1" }),
+          body: JSON.stringify({ op: op, force: force }),
         }));
         const j = await r.json();
         return Response.json({ bound: !!env.IDXMEM, op: op, r: j }, { headers: _cors() });
