@@ -556,6 +556,15 @@ const WDS_CHAT_HIST_BUDGET = 120000;   // 整场历史预算（字符），实�
 const WDS_CHAT_HIST_MIN = 20000;       // 收缩下限：system 再大也要留出这么多历史
 const WDS_CHAT_PERMSG = 12000;         // 单条上限（原 1500：长答一律只剩开头）
 const CHAT_FIRST_MS = 90000;           // 首帧护栏，收到第一帧即撤（正常长思考不误杀）
+/* ⭐ 首帧护栏必须**按档给**。90 秒是标准档的账，而深度档在顶栏写的就是「满血基底＋满功率思考
+   ＋SDE 全内功与方法论工序，慢但深」——拿标准档的秒数去掐一个自称慢的档，就是自己掐自己：
+   2026-08-19 用户报的「45 秒零字」正是这条路上的前半段，再等 45 秒它就被我们自己判死了。
+   ⚠ 掐断不是可选项（心跳撑着连接，客户端的无字节看门狗永远喂饱，只能由我方掐），
+   所以不是取消它，是把它放宽到「这个档真的可能要用这么久」的量级。 */
+const CHAT_FIRST_DEEP_MS = 240000, CHAT_TOTAL_DEEP_MS = 420000;
+// 深度档等到这个点还是零帧，就发一条 note 说明「还在等、最长等到几分几秒」——
+// 只报信不掐流。读者据此自己决定是继续等还是切标准档。
+const CHAT_WAIT_NOTE_MS = 90000;
 const CHAT_TOTAL_MS = 240000;
 const CHAT_TOTAL_LONG_MS = 420000;     // 读者点名要长篇时给更长的总时长
 // 关思考重答那一遍的时钟。它不烧思考，所以不能沿用满功率档的 90/240 秒——沿用就等于
@@ -7805,13 +7814,24 @@ export default {
             const tokWant = askLen
               ? Math.min(32000, Math.max(6000, Math.round(askLen * 1.8)))   // 中文近似 1 字 1 token，留一点余量
               : (rs ? (deep ? 6000 : 4000) : (deep ? 6000 : (tool ? 4000 : 2600)));
-            const clk = wdsClock(CHAT_FIRST_MS, askLen ? CHAT_TOTAL_LONG_MS : CHAT_TOTAL_MS);
+            /* 按档给：深度档 240s 首帧 / 420s 总时长；标准档仍是 90s / 240s。长篇请求的总时长照旧最长。 */
+            const clk = wdsClock(deep ? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,
+              askLen ? CHAT_TOTAL_LONG_MS : (deep ? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS));
             _st.pre = Math.round((Date.now() - _st.t0) / 1000);
             _stg("基底作答");
             /* 零帧要说出来。读者盯着「正在想 45s · 基底作答」，分不出「它在想」和「它卡死了」——
                而这两种的下一步完全不同（前者等，后者切标准档）。上游 25 秒还没回第一个字就把
                阶段改成实话，心跳自会把它带出去。首帧一到立刻撤，正常长思考不误报。 */
             let _nof = setTimeout(() => { if (!_st.think && !_st.out) _stg("基底作答·上游还没回第一个字"); }, ANS_NOFRAME_MS);
+            /* 第二段：护栏放宽到 4 分钟之后，光改阶段名不够——读者得知道还要等多久、以及有没有别的出路。
+               只发 note，不掐流。掐流是时钟的活。 */
+            let _nof2 = setTimeout(() => {
+              if (_st.think || _st.out) return;
+              const _lim = Math.round((deep ? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS) / 1000);
+              controller.enqueue(_sseBytes({ t: "note", v: "上游到现在一个字都没回（已等 " + Math.round(CHAT_WAIT_NOTE_MS / 1000) + " 秒）。"
+                + (deep ? ("深度档是满功率思考，开口慢是常事——最长等到 " + _lim + " 秒，再没有就自动关掉思考重答一次。等不及可以按 Esc，切到「标准」档重问。")
+                        : ("最长等到 " + _lim + " 秒，再没有就自动关掉思考重答一次。")) }));
+            }, CHAT_WAIT_NOTE_MS);
             let upstream;
             try {
               // 视觉档型号会改名/下线：认不出就沿备用名退一格重发一次（只在看图这条路上，且只退到列表用完）。
@@ -7874,8 +7894,8 @@ export default {
                 if (j.usage) _cd.usage = j.usage;
                 if (j.choices && j.choices[0] && j.choices[0].finish_reason) _cd.finish = String(j.choices[0].finish_reason);
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; } if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-                if (d.content) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; } if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                if (d.reasoning_content) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; clearTimeout(_nof2); } if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                if (d.content) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; clearTimeout(_nof2); } if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
                 if (!outText && _st && _st.think > _thinkCap) { _cd.cutThink = _st.think; break; }
               }
               if (_cd.cutThink) { try { await reader.cancel(); } catch (e0) {} break; }
@@ -7893,7 +7913,7 @@ export default {
               else _cd.cut = why;
             }
             clk.stop();
-            if (_nof) { clearTimeout(_nof); _nof = null; }
+            if (_nof) { clearTimeout(_nof); _nof = null; clearTimeout(_nof2); }
             // ── 空产出兜底 ─────────────────────────────────────────────────
             // 满功率档（reasoning_effort=max）会把整份 max_tokens 烧在思考上，正文一个字不出；
             // 上游这时并不报错，流干干净净地结束 —— 于是 worker 直接 fin()，客户端收到一条空流，
@@ -8058,7 +8078,7 @@ export default {
               + "\n4. 全程说人话，不堆术语；1000 字上下；不要重复各步已经写过的细节。" + LANG;
             const usr = "研究题目：" + q + "\n\n【各分步的正文（节选）】\n"
               + secs.map((s, i) => "── 第 " + (i + 1) + " 步 · " + s.t + " ──\n" + s.body).join("\n\n");
-            const clk = wdsClock(CHAT_FIRST_MS, CHAT_TOTAL_MS);
+            const clk = wdsClock(deep ? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS, deep ? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS);
             let upstream;
             try {
               upstream = await wdsFetchMax(VC, KEY, [{ role: "system", content: sys }, { role: "user", content: usr }], true, deep ? 6000 : 4000, clk.signal);

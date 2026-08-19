@@ -87,11 +87,15 @@ console.log("── 三 · 长篇请求：按字数给预算 + 当轮覆盖简�
 
 console.log("── 四 · 答题戴时钟 + 断流保稿");
 {
-  ok(/const clk = wdsClock\(CHAT_FIRST_MS/.test(CHAT), "chat 也戴 wdsClock（此前只有 read/plan/part 戴）");
+  /* ⚠ CHAT 这一段一直切到 /api/wds/asr，把 research/readurl 也圈了进来 ——
+     只查 "wdsClock(" 会被邻居的那一处喂饱（2026-08-19 变异检验当场发现：把 chat 的时钟整个摘掉，
+     这一条照样绿）。所以这条单独用只到 research 为止的窄段。 */
+  const CHATONLY = CHAT.slice(0, CHAT.indexOf('/api/wds/research') > 0 ? CHAT.indexOf('/api/wds/research') : CHAT.length);
+  ok(/const clk = wdsClock\(/.test(CHATONLY), "chat 也戴 wdsClock（此前只有 read/plan/part 戴）");   // 钉「戴了钟」，不钉参数写法
   ok(/signal: clk\.signal/.test(CHAT), "signal 透传给上游 fetch");
   ok(/clk\.firstFrame\(\)/.test(CHAT), "收到第一帧即撤首帧护栏（长思考不误杀）");
   ok(/clk\.stop\(\)/.test(CHAT), "收尾撤钟");
-  ok(/CHAT_TOTAL_LONG_MS/.test(wk) && /askLen \? CHAT_TOTAL_LONG_MS : CHAT_TOTAL_MS/.test(CHAT), "长篇给更长的总时长");
+  ok(/CHAT_TOTAL_LONG_MS/.test(wk) && /askLen \? CHAT_TOTAL_LONG_MS/.test(CHAT), "长篇给更长的总时长");   // 同上：只守「长篇走 LONG」，冒号右边按档分叉与这条无关
   ok(/} catch \(e\) \{[\s\S]{0,400}上面已写出的部分保留着/.test(CHAT), "中途断线：已写出的正文一个字不丢");
   ok(/clk\.why\("作答"\)/.test(CHAT), "被自己掐断时说得出原因（不再只有『什么都没有』）");
   const clock = grab(wk, "wdsClock")();

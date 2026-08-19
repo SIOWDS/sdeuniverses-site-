@@ -116,12 +116,47 @@ ok(/const ANS_NOFRAME_MS = (\d+);/.test(W), "零帧看门狗常数存在");
 }
 ok(/^\s+let _nof = setTimeout\(\(\) => \{ if \(!_st\.think && !_st\.out\) _stg\("基底作答·上游还没回第一个字"\); \}, ANS_NOFRAME_MS\);$/m.test(chatSeg),
   "看门狗接在「基底作答」之后（注释掉当场红）");
-ok((chatSeg.match(/if \(_nof\) \{ clearTimeout\(_nof\); _nof = null; \}/g) || []).length === 3,
-  "首帧（think/content 两处）与收流后各撤一次，实得 " + (chatSeg.match(/if \(_nof\) \{ clearTimeout\(_nof\); _nof = null; \}/g) || []).length);
+ok((chatSeg.match(/clearTimeout\(_nof\)/g) || []).length === 3 && (chatSeg.match(/_nof = null/g) || []).length === 3,
+  "首帧（think/content 两处）与收流后各撤一次，实得 " + (chatSeg.match(/clearTimeout\(_nof\)/g) || []).length);
 ok(/d\.reasoning_content\) \{ clk\.firstFrame\(\); if \(_nof\)/.test(chatSeg) && /d\.content\) \{ clk\.firstFrame\(\); if \(_nof\)/.test(chatSeg),
   "撤看门狗与撤首帧护栏钉在同一处——正常长思考不会被误报成卡死");
 ok(!/_stg\("基底作答·上游还没回第一个字"\)[\s\S]{0,200}ac\.abort|_nof[\s\S]{0,60}abort/.test(chatSeg),
   "看门狗只改说法、不掐流（掐流是时钟的活）");
+
+console.log("⑦ 首帧护栏按档给（深度档不能用标准档的秒数掐死）");
+ok(/const CHAT_FIRST_DEEP_MS = (\d+), CHAT_TOTAL_DEEP_MS = (\d+);/.test(W), "深度档专用时钟常数存在");
+{
+  var d1 = W.match(/const CHAT_FIRST_DEEP_MS = (\d+), CHAT_TOTAL_DEEP_MS = (\d+);/);
+  var s1 = W.match(/const CHAT_FIRST_MS = (\d+);/), s2 = W.match(/const CHAT_TOTAL_MS = (\d+);/);
+  ok(d1 && s1 && +d1[1] > +s1[1], "深度档首帧护栏比标准档宽（顶栏写着「慢但深」，就不能按标准档的账掐）");
+  ok(d1 && +d1[2] > +d1[1], "深度档总时长大于它自己的首帧护栏（相等＝首帧一到就没时间写）");
+  ok(d1 && s2 && +d1[2] > +s2[1], "深度档总时长也比标准档宽");
+}
+ok(/const clk = wdsClock\(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,\s*\n\s*askLen \? CHAT_TOTAL_LONG_MS : \(deep \? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS\)\);/.test(chatSeg),
+  "chat 的主时钟真按 deep 分档，且长篇请求的总时长仍最长");
+ok(!/const clk = wdsClock\(CHAT_FIRST_MS, askLen/.test(chatSeg), "没退回不分档的老写法");
+{
+  var rs = W.slice(W.indexOf('url.pathname === "/api/wds/research"'));
+  ok(/wdsClock\(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS, deep \? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS\)/.test(rs),
+    "深度研究的总判断段也按档给（同一个坑，别只补一处）");
+}
+
+console.log("⑧ 放宽之后要报信：等多久、有没有别的出路");
+ok(/const CHAT_WAIT_NOTE_MS = (\d+);/.test(W), "报信时点常数存在");
+{
+  var w1 = W.match(/const CHAT_WAIT_NOTE_MS = (\d+);/), a1 = W.match(/const ANS_NOFRAME_MS = (\d+);/),
+      d2 = W.match(/const CHAT_FIRST_DEEP_MS = (\d+),/);
+  ok(w1 && a1 && +w1[1] > +a1[1], "报信晚于改阶段名（先改说法、再报详情）");
+  ok(w1 && d2 && +w1[1] < +d2[1], "报信早于深度档掐断（晚了就永远轮不到）");
+}
+ok(/^\s+let _nof2 = setTimeout\(\(\) => \{$/m.test(chatSeg), "第二段看门狗接在源码里（注释掉当场红）");
+ok(/if \(_st\.think \|\| _st\.out\) return;/.test(chatSeg), "已经开口就不报信（不对正常长思考喊话）");
+ok(/t: "note"/.test(chatSeg.slice(chatSeg.indexOf("let _nof2"), chatSeg.indexOf("let _nof2") + 900)),
+  "第二段只发 note —— 报信不掐流，掐流是时钟的活");
+ok(!/_nof2[\s\S]{0,400}ac\.abort|_nof2[\s\S]{0,400}clk\.signal/.test(chatSeg), "第二段没碰 abort");
+ok((chatSeg.match(/clearTimeout\(_nof2\)/g) || []).length === 3,
+  "两段看门狗一起撤（首帧两处＋收流后），实得 " + (chatSeg.match(/clearTimeout\(_nof2\)/g) || []).length);
+ok(/切到「标准」档重问/.test(chatSeg), "报信给出出路（切标准档），不是只报一个坏消息");
 
 console.log("\n" + (FAIL ? "✗ " : "✓ ") + PASS + " 项通过，" + FAIL + " 项失败");
 process.exit(FAIL ? 1 : 0);
