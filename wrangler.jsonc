@@ -31,7 +31,10 @@
       { "name": "ASK_LIMITER", "class_name": "AskLimiter" },
       { "name": "CONFIG_VAULT", "class_name": "ConfigVault" },
       { "name": "SUBMISSIONS", "class_name": "SubmissionBox" },
-      { "name": "COMMENTS", "class_name": "CommentBox" }
+      { "name": "COMMENTS", "class_name": "CommentBox" },
+      /* IDXMEM：全站索引的长期记忆（2026-08-19 重上）。migration v6 早已应用，
+         IndexMemory 是注册在案的 SQLite 类，故这里**只加绑定、不加 migration**。 */
+      { "name": "IDXMEM", "class_name": "IndexMemory" }
     ]
   },
   "migrations": [

@@ -2431,15 +2431,238 @@ export class AskLimiter {
   }
 }
 
-/* IndexMemory —— 长期记忆的 SQLite Durable Object（2026-08-18 **已停用**）。
-   为什么留着一个空壳：migrations 只增，v6 一旦上过线就删不得，而 migration 里点名的类
-   必须仍然导出，否则部署失败。实现本身已撤回——线上表现是所有 DO 绑定一起失灵
-   （CONFIG_VAULT 抛 1101、这一个取不到），整台智能问答对外不可用。
-   要再上，先在预览环境把「新增 SQLite DO 类」这件事单独验一遍，别和功能改动混在一笔里。 */
+/* ═══ IndexMemory —— 把全站索引搬出答题 isolate 的那台机器 ═══
+   为什么要有它：答题请求原来要在自己的堆上解析 4,488 篇 manifest（738KB）＋十一万个关键词
+   （kw/*.json 合计约 2MB）＋坐标表。峰值撞 isolate 的 128MB 上限时，**正在流的那一答一起陪葬**
+   —— 线上表现就是「第 2 秒 · 收到 37 帧 · 流被截断」外加检索 503（见 [[chatsde-empty-answer]]）。
+   DO 有自己的 isolate 与常驻存储：倒排表只建一份，答题侧只发一次查询、收几十条候选（几 KB）。
+
+   ⚠⚠ **这份实现 2026-08-18 上过一次线，被整笔回滚**（commit 5f193029 → c9a3f076），
+   当时的结论是「新增 DO 类导致所有绑定脱开」。2026-08-19 重读判定那个归因是错的：
+   这个类的调用点当时就写了 `if (!env.IDXMEM) return null` ＋ try/catch 退回旧路，
+   放倒站的是**别处 53 处把 env.X 当成一定存在来用**——那一层已由 `_do()` 垫住。
+   migration v6 早已在线上应用、IndexMemory 是注册在案的 SQLite 类，故这次**不需要新 migration**。
+
+   🔴 上线纪律（吃过一次亏）：**先只加绑定、不接任何调用点**，部署后逐个复验五个 DO，
+   健康了再单独一笔接线。绝不把「动 DO 配置」和「改检索逻辑」混进同一次部署。 */
 export class IndexMemory {
-  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
-  async fetch() { return new Response(JSON.stringify({ ok: false, why: "已停用" }), { headers: { "content-type": "application/json" } }); }
+  constructor(ctx, env) { this.ctx = ctx; this.env = env; this.sql = ctx.storage.sql; }
+
+  _init() {
+    if (this._ready) return;
+    const s = this.sql;
+    s.exec("CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT)");
+    s.exec("CREATE TABLE IF NOT EXISTS docs(i INTEGER PRIMARY KEY, u TEXT, t TEXT, tl TEXT, sec TEXT)");
+    /* src：'k'＝篇层关键词（每篇 64 个高频词），'c'＝SDE 坐标词。
+       两种来源的加分口径不同（坐标只在词义扩展命中时加分），所以必须分得开，不能合成一张。 */
+    s.exec("CREATE TABLE IF NOT EXISTS terms(term TEXT, i INTEGER, src TEXT)");
+    s.exec("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
+    s.exec("CREATE TABLE IF NOT EXISTS secs(sec TEXT PRIMARY KEY, label TEXT)");
+    this._ready = true;
+  }
+  _get(k) { const r = [...this.sql.exec("SELECT v FROM meta WHERE k=?", k)]; return r.length ? r[0].v : ""; }
+  _set(k, v) { this.sql.exec("INSERT INTO meta(k,v) VALUES(?,?) ON CONFLICT(k) DO UPDATE SET v=excluded.v", k, String(v)); }
+
+  async fetch(request) {
+    this._init();
+    let b = {}; try { b = await request.json(); } catch (e) {}
+    const op = String(b.op || "query");
+    if (op === "status") return this._json(this._status());
+    if (op === "ensure") return this._json(await this._ensure(b.force === true));
+    if (op === "query") {
+      // 查询绝不等重建：老表照常应答，重建在 alarm 里自己跑。
+      this._ensure(false).catch(() => {});
+      return this._json(this._query(b));
+    }
+    return this._json({ ok: false, why: "unknown op" });
+  }
+  _json(o) { return new Response(JSON.stringify(o), { headers: { "content-type": "application/json" } }); }
+
+  _status() {
+    const n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
+    const t = [...this.sql.exec("SELECT count(*) AS n FROM terms")][0].n;
+    return { ok: true, docs: n, terms: t, stamp: this._get("stamp"), built: this._get("built"),
+             pending: this._get("pending") ? JSON.parse(this._get("pending")).length : 0, err: this._get("err") };
+  }
+
+  /* ── 指纹复验：manifest 的 etag 没变就什么都不做 ── */
+  async _stamp() {
+    try {
+      const h = this.env.PDFS && this.env.PDFS.head ? await this.env.PDFS.head("search/manifest.json") : null;
+      if (h) return String(h.etag || (h.uploaded && h.uploaded.toISOString ? h.uploaded.toISOString() : h.uploaded) || "");
+    } catch (e) {}
+    return "";
+  }
+  async _ensure(force) {
+    if (!this.env.PDFS) return { ok: false, why: "no bucket" };
+    if (this._get("pending")) return { ok: true, why: "rebuilding" };
+    const st = await this._stamp();
+    if (!force && st && st === this._get("stamp")) return { ok: true, why: "fresh" };
+    // 任务清单：先 manifest（它给出版块名单），再逐个 kw 分片，最后坐标。分片跑，一次 alarm 一件。
+    this._set("newstamp", st);
+    this._set("pending", JSON.stringify(["man"]));
+    this._set("err", "");
+    await this.ctx.storage.setAlarm(Date.now() + 50);
+    return { ok: true, why: "queued" };
+  }
+
+  async alarm() {
+    this._init();
+    let q = [];
+    try { q = JSON.parse(this._get("pending") || "[]"); } catch (e) { q = []; }
+    if (!q.length) { this._set("pending", ""); return; }
+    const task = q.shift();
+    try {
+      await this._runTask(task, q);
+      this._set("pending", JSON.stringify(q));
+    } catch (e) {
+      // 一件失败不许把整次重建卡死在半路：记下来、跳过它、继续下一件。
+      this._set("err", String(task) + "：" + ((e && e.message) || e));
+      this._set("pending", JSON.stringify(q));
+    }
+    if (q.length) await this.ctx.storage.setAlarm(Date.now() + 50);
+    else {
+      /* 换手：影子表建好了才顶替老表。重建期间查询走的一直是老表——
+         宁可多用半分钟旧索引，也不要在重建那几秒里回一份空名单。 */
+      const s = this.sql;
+      s.exec("DROP TABLE IF EXISTS docs_old"); s.exec("DROP TABLE IF EXISTS terms_old"); s.exec("DROP TABLE IF EXISTS secs_old");
+      s.exec("ALTER TABLE docs RENAME TO docs_old"); s.exec("ALTER TABLE terms RENAME TO terms_old"); s.exec("ALTER TABLE secs RENAME TO secs_old");
+      s.exec("ALTER TABLE docs_new RENAME TO docs"); s.exec("ALTER TABLE terms_new RENAME TO terms"); s.exec("ALTER TABLE secs_new RENAME TO secs");
+      s.exec("DROP TABLE IF EXISTS docs_old"); s.exec("DROP TABLE IF EXISTS terms_old"); s.exec("DROP TABLE IF EXISTS secs_old");
+      s.exec("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
+      this._set("stamp", this._get("newstamp"));
+      this._set("built", new Date().toISOString());
+      this._set("pending", "");
+    }
+  }
+
+  async _text(key) {
+    const o = await this.env.PDFS.get(key);
+    if (!o) throw new Error("桶里没有 " + key);
+    return await o.text();
+  }
+  async _runTask(task, queue) {
+    const s = this.sql;
+    if (task === "man") {
+      s.exec("DROP TABLE IF EXISTS docs_new"); s.exec("DROP TABLE IF EXISTS terms_new"); s.exec("DROP TABLE IF EXISTS secs_new");
+      s.exec("CREATE TABLE docs_new(i INTEGER PRIMARY KEY, u TEXT, t TEXT, tl TEXT, sec TEXT)");
+      s.exec("CREATE TABLE terms_new(term TEXT, i INTEGER, src TEXT)");
+      s.exec("CREATE TABLE secs_new(sec TEXT PRIMARY KEY, label TEXT)");
+      const txt = await this._text("search/manifest.json");
+      let batch = [];
+      const flush = () => {
+        if (!batch.length) return;
+        const ph = batch.map(() => "(?,?,?,?,?)").join(",");
+        s.exec("INSERT OR REPLACE INTO docs_new(i,u,t,tl,sec) VALUES " + ph, ...batch.flat());
+        batch = [];
+      };
+      _scanTopLevel(txt, "docs", (dTxt) => {
+        let d; try { d = JSON.parse(dTxt); } catch (e) { return; }
+        batch.push([d.i, d.u, d.t, String(d.t || "").toLowerCase(), d.s]);
+        if (batch.length >= 120) flush();
+      });
+      flush();
+      const secs = [];
+      _scanTopLevel(txt, "sections", (sTxt) => { try { secs.push(JSON.parse(sTxt)); } catch (e) {} });
+      for (const se of secs) s.exec("INSERT OR REPLACE INTO secs_new(sec,label) VALUES(?,?)", se.key, se.label || se.key);
+      // 后面的活：每个版块一份 kw 分片，最后坐标
+      for (const se of secs) queue.push("kw:" + se.key);
+      queue.push("coords");
+      return;
+    }
+    if (task.indexOf("kw:") === 0) {
+      const sec = task.slice(3);
+      let txt = "";
+      try { txt = await this._text("search/kw/" + sec + ".json"); } catch (e) { return; }   // 没有这一份就跳过，不算失败
+      let batch = [];
+      const flush = () => {
+        if (!batch.length) return;
+        const ph = batch.map(() => "(?,?,'k')").join(",");
+        s.exec("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
+        batch = [];
+      };
+      _scanTopLevel(txt, "rows", (rowTxt) => {
+        let r0; try { r0 = JSON.parse(rowTxt); } catch (e) { return; }
+        for (const w of (r0.k || [])) { batch.push([String(w), r0.i]); if (batch.length >= 120) flush(); }
+      });
+      flush();
+      return;
+    }
+    if (task === "coords") {
+      let txt = "";
+      try { txt = await this._text("search/sde-coords.json"); } catch (e) { return; }
+      let batch = [];
+      const flush = () => {
+        if (!batch.length) return;
+        const ph = batch.map(() => "(?,?,'c')").join(",");
+        s.exec("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
+        batch = [];
+      };
+      _scanObjEntries(txt, (k, vTxt) => {
+        let arr; try { arr = JSON.parse(vTxt); } catch (e) { return; }
+        if (!Array.isArray(arr)) return;
+        const i = parseInt(k, 10);
+        for (const w of arr) { batch.push([String(w).toLowerCase(), i]); if (batch.length >= 120) flush(); }
+      });
+      flush();
+      return;
+    }
+  }
+
+  /* ── 查询：口径与旧的 L0/L1 打分逐条对齐，只是算在 SQLite 里而不是 JS 堆里 ──
+     旧口径：篇层关键词 base+1 / exp+1.2 / prev+0.4；标题子串 base+3 / exp+2；坐标只在 exp 命中时 +1.5。
+     旧路还有一层"先选版块、再读那几份篇层"——那是为了少读文件才有的绕行；
+     现在全站倒排就在手边，直接给全站打分，召回只会更全，不会更窄。 */
+  _query(b) {
+    const n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
+    if (!n) return { ok: false, why: "empty" };       // 还没建好：调用方退回旧路，绝不回空名单
+    const base = (b.baseKeys || []).slice(0, 80);
+    const exp = (b.exp || []).slice(0, 40);
+    const prev = (b.prev || []).slice(0, 40);
+    const only = String(b.only || "");
+    const pick = Math.max(6, Math.min(64, b.pick | 0 || 16));
+    const sc = new Map();
+    const add = (i, v) => { sc.set(i, (sc.get(i) || 0) + v); };
+    const byTerm = (list, wk, wc) => {
+      for (const key of list) {
+        if (!key) continue;
+        for (const r of this.sql.exec("SELECT i,src FROM terms WHERE term=?", key)) {
+          add(r.i, r.src === "c" ? wc : wk);
+        }
+      }
+    };
+    byTerm(base, 1, 0);        // 坐标不参与 base（与旧口径一致）
+    byTerm(exp, 1.2, 1.5);
+    byTerm(prev, 0.4, 0);
+    const byTitle = (list, w) => {
+      for (const key of list) {
+        if (!key) continue;
+        for (const r of this.sql.exec("SELECT i FROM docs WHERE tl LIKE ? ESCAPE '\\'", "%" + String(key).replace(/[\\%_]/g, "\\$&") + "%")) add(r.i, w);
+      }
+    };
+    byTitle(base, 3);
+    byTitle(exp, 2);
+    if (!sc.size) return { ok: true, cand: [], docs: [], secLabel: this._secLabel() };
+    let cand = Array.from(sc.entries()).map(([i, v]) => ({ i: i, sc: v })).sort((a, b2) => b2.sc - a.sc);
+    if (only) {
+      const keep = new Set();
+      for (const r of this.sql.exec("SELECT i FROM docs WHERE sec=?", only)) keep.add(r.i);
+      cand = cand.filter((c) => keep.has(c.i));
+    }
+    cand = cand.slice(0, pick);
+    // 只回候选那几篇的元数据——**不回全站 docs**。答题那一侧从此不再持有 4,488 篇的表。
+    const docs = [];
+    for (const c of cand) {
+      const r = [...this.sql.exec("SELECT i,u,t,sec FROM docs WHERE i=?", c.i)];
+      if (r.length) docs.push({ i: r[0].i, u: r[0].u, t: r[0].t, s: r[0].sec });
+    }
+    return { ok: true, cand: cand, docs: docs, secLabel: this._secLabel() };
+  }
+  _secLabel() { const m = {}; for (const r of this.sql.exec("SELECT sec,label FROM secs")) m[r.sec] = r.label; return m; }
 }
+
+// ===== 密钥保险箱·服务端存基底 Key（页面设置，免进 Cloudflare）=====
+// 纪律：key 只写入、只在 Worker 内部（op:get）读取用于调用基底；绝不经任何公开路由回传浏览器。
 
 // ===== 密钥保险箱·服务端存基底 Key（页面设置，免进 Cloudflare）=====
 // 纪律：key 只写入、只在 Worker 内部（op:get）读取用于调用基底；绝不经任何公开路由回传浏览器。
@@ -6691,6 +6914,30 @@ export default {
     // 冷启动时这一步要把全站索引（十几兆 JSON、上百个分片）装进内存，很吃 CPU；和答题挤在同一个
     // 请求里，会被平台按单请求 CPU 上限直接掐死——表现就是"流刚开就断、连来源都没发出来、只收到心跳"。
     // 拆开之后：它有自己的一份 CPU 预算；它失败也只是这一答没有站内资料，不连累答题本身。
+    /* 索引长期记忆的探口（第 1 步：只看状态、可手动触发重建，**不接任何检索调用点**）。
+       走 _do() ⇒ 绑定万一没跟上，这里回一个 503 JSON，不抛、不拖垮别的路由。 */
+    if (url.pathname === "/api/idx/status") {
+      try {
+        const st = _do(env, "IDXMEM").get(_do(env, "IDXMEM").idFromName("global"));
+        /* 🔴 重建是一次全量的 R2 读取＋建表：**必须要管理员口令**，否则谁都能拿它当压力测试。
+           （这一条是把 2026-08-18 那份护栏取回来跑时当场抓到的——我第一版忘了加。） */
+        let op = "status";
+        if (url.searchParams.get("build") === "1") {
+          if (!(await adminPassOk(url.searchParams.get("pass") || ""))) {
+            return Response.json({ bound: !!env.IDXMEM, error: "重建索引要管理口令（?pass=…）。" }, { status: 403, headers: _cors() });
+          }
+          op = "ensure";
+        }
+        const r = await st.fetch(new Request("https://idx.internal/", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ op: op, force: url.searchParams.get("force") === "1" }),
+        }));
+        const j = await r.json();
+        return Response.json({ bound: !!env.IDXMEM, op: op, r: j }, { headers: _cors() });
+      } catch (e) {
+        return Response.json({ bound: !!env.IDXMEM, error: String((e && e.message) || e) }, { status: 200, headers: _cors() });
+      }
+    }
     if (url.pathname === "/api/wds/rag") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
