@@ -160,6 +160,25 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   ok("★ 锁上在 force 那一格", /force && !\(await adminPassOk/.test(SRC));
   ok("不带 force 的重建不要口令（否则等于锁错格）", /if \(url\.searchParams\.get\("build"\) === "1"\) op = "ensure";/.test(SRC));
 
+  console.log("── 换手闸与批量上限（2026-08-19 线上真事故）──");
+  /* 事故经过：ensure 排的第一件 "man" 撞了 SQLite 绑定变量上限（120 行 × 5 列 = 600 个占位符，
+     报 too many SQL variables at offset 294）。catch 记下 err 就继续走，而 "man" 失败意味着
+     后面那些 kw:/coords 根本没被 push 进队列 ⇒ 队列空 ⇒ 直接进换手 ⇒
+     一张空的 docs_new 改名盖掉了线上那份好用的：docs 4488 → 0、terms 299803 → 0。 */
+  ok("★ 批量按占位符数算，不按行数算", /MAX_VARS = (\d+), DOC_BATCH = Math\.floor\(MAX_VARS \/ 5\), TERM_BATCH = Math\.floor\(MAX_VARS \/ 2\)/.test(SRC));
+  {
+    const mv = SRC.match(/MAX_VARS = (\d+)/); const v = mv ? +mv[1] : 999;
+    ok("占位符上限取在 100 以下（实测 Workers DO 上约 100）", v <= 100);
+    ok("★ docs 一批 " + Math.floor(v / 5) + " 行 × 5 = " + Math.floor(v / 5) * 5 + " 个占位符，不超上限", Math.floor(v / 5) * 5 <= v);
+    ok("★ terms 一批 " + Math.floor(v / 2) + " 行 × 2 = " + Math.floor(v / 2) * 2 + " 个占位符，不超上限", Math.floor(v / 2) * 2 <= v);
+  }
+  ok("没有残留写死 120 的批量", !/batch\.length >= 120/.test(SRC));
+  ok("★ 有 err 就不许换手（老表原样留着）", /const _err = this\._get\("err"\);[\s\S]{0,500}if \(_err\) \{[\s\S]{0,400}return;/.test(SRC));
+  ok("★ 空的新表不许顶替非空的旧表", /if \(!nNew \|\| \(nOld && nNew < nOld \* 0\.5\)\)/.test(SRC));
+  ok("被拦下时把原因写进 err，让 status 看得见", /换手被拦下：新表/.test(SRC));
+  ok("拦下之后清掉影子表", /换手被拦下[\s\S]{0,400}DROP TABLE IF EXISTS docs_new/.test(SRC));
+  ok("每次 ensure 开工先清上一轮 err（否则一次失败永久卡住换手）", /JSON\.stringify\(\["man"\]\)\);\s*\n\s*this\._set\("err", ""\);/.test(SRC));
+
   console.log("\n──────── " + pass + " passed, " + fail + " failed ────────");
   process.exit(fail ? 1 : 0);
 })();

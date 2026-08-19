@@ -2520,11 +2520,32 @@ export class IndexMemory {
       this._set("err", String(task) + "：" + ((e && e.message) || e));
       this._set("pending", JSON.stringify(q));
     }
-    if (q.length) await this.ctx.storage.setAlarm(Date.now() + 50);
-    else {
-      /* 换手：影子表建好了才顶替老表。重建期间查询走的一直是老表——
-         宁可多用半分钟旧索引，也不要在重建那几秒里回一份空名单。 */
+    if (q.length) { await this.ctx.storage.setAlarm(Date.now() + 50); return; }
+    /* 🔴🔴 换手前必须问一句「这一趟到底成没成」（2026-08-19 血案）。
+       原代码只在 catch 里记一条 err 就继续往下走，而 "man" 这一件失败时**后面那些
+       kw:/coords 根本还没被 push 进队列** ⇒ q 空 ⇒ 直接进换手 ⇒
+       把一张空的 docs_new 改名盖掉了线上那份好用的（docs 4488 → 0，terms 29 万 → 0）。
+       影子表这套设计本来就是为了防这件事，而错误路径从它旁边绕过去了。
+       💡 心法（站里第三次撞同一条）：**回滚重来不该是丢稿/丢数据的方式。**
+          凡「先建影子、再顶替」的地方，顶替之前都要有一道「新的这份确实比旧的好」的闸。 */
+    const _err = this._get("err");
+    if (_err) {
+      // 失败就地收工：老表原样留着，pending 清空，err 留给 status 看。下一次 ensure 再来一遍。
+      this._set("pending", "");
+      try { this.sql.exec("DROP TABLE IF EXISTS docs_new"); this.sql.exec("DROP TABLE IF EXISTS terms_new"); this.sql.exec("DROP TABLE IF EXISTS secs_new"); } catch (e) {}
+      return;
+    }
+    {
       const s = this.sql;
+      /* 第二道闸：新表得真有东西。空的新表顶替非空的旧表，永远是事故不是升级。 */
+      const nNew = [...s.exec("SELECT count(*) AS n FROM docs_new")][0].n;
+      const nOld = [...s.exec("SELECT count(*) AS n FROM docs")][0].n;
+      if (!nNew || (nOld && nNew < nOld * 0.5)) {
+        this._set("err", "换手被拦下：新表 " + nNew + " 篇、旧表 " + nOld + " 篇，不顶替（老表原样留着）");
+        this._set("pending", "");
+        s.exec("DROP TABLE IF EXISTS docs_new"); s.exec("DROP TABLE IF EXISTS terms_new"); s.exec("DROP TABLE IF EXISTS secs_new");
+        return;
+      }
       s.exec("DROP TABLE IF EXISTS docs_old"); s.exec("DROP TABLE IF EXISTS terms_old"); s.exec("DROP TABLE IF EXISTS secs_old");
       s.exec("ALTER TABLE docs RENAME TO docs_old"); s.exec("ALTER TABLE terms RENAME TO terms_old"); s.exec("ALTER TABLE secs RENAME TO secs_old");
       s.exec("ALTER TABLE docs_new RENAME TO docs"); s.exec("ALTER TABLE terms_new RENAME TO terms"); s.exec("ALTER TABLE secs_new RENAME TO secs");
@@ -2543,6 +2564,11 @@ export class IndexMemory {
   }
   async _runTask(task, queue) {
     const s = this.sql;
+    /* ⚠ SQLite 的绑定变量有条数上限（实测 Workers DO 上约 100）。
+       原来一批 120 行：docs 每行 5 个占位符 ⇒ 600 个 ⇒ 第一件事就 SQLITE_ERROR
+       （"too many SQL variables at offset 294"），而当时的换手闸没拦住，
+       一张空表直接顶掉了线上那份好用的。**按占位符数算批，不按行数算。** */
+    const MAX_VARS = 90, DOC_BATCH = Math.floor(MAX_VARS / 5), TERM_BATCH = Math.floor(MAX_VARS / 2);
     if (task === "man") {
       s.exec("DROP TABLE IF EXISTS docs_new"); s.exec("DROP TABLE IF EXISTS terms_new"); s.exec("DROP TABLE IF EXISTS secs_new");
       s.exec("CREATE TABLE docs_new(i INTEGER PRIMARY KEY, u TEXT, t TEXT, tl TEXT, sec TEXT)");
@@ -2559,7 +2585,7 @@ export class IndexMemory {
       _scanTopLevel(txt, "docs", (dTxt) => {
         let d; try { d = JSON.parse(dTxt); } catch (e) { return; }
         batch.push([d.i, d.u, d.t, String(d.t || "").toLowerCase(), d.s]);
-        if (batch.length >= 120) flush();
+        if (batch.length >= DOC_BATCH) flush();
       });
       flush();
       const secs = [];
@@ -2583,7 +2609,7 @@ export class IndexMemory {
       };
       _scanTopLevel(txt, "rows", (rowTxt) => {
         let r0; try { r0 = JSON.parse(rowTxt); } catch (e) { return; }
-        for (const w of (r0.k || [])) { batch.push([String(w), r0.i]); if (batch.length >= 120) flush(); }
+        for (const w of (r0.k || [])) { batch.push([String(w), r0.i]); if (batch.length >= TERM_BATCH) flush(); }
       });
       flush();
       return;
@@ -2602,7 +2628,7 @@ export class IndexMemory {
         let arr; try { arr = JSON.parse(vTxt); } catch (e) { return; }
         if (!Array.isArray(arr)) return;
         const i = parseInt(k, 10);
-        for (const w of arr) { batch.push([String(w).toLowerCase(), i]); if (batch.length >= 120) flush(); }
+        for (const w of arr) { batch.push([String(w).toLowerCase(), i]); if (batch.length >= TERM_BATCH) flush(); }
       });
       flush();
       return;
