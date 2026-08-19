@@ -8280,12 +8280,15 @@ export default {
         const inner = await env.SELF.fetch(new Request(new URL("/api/wds/hold?sec=" + sec, url).toString()));
         return new Response(inner.body, { headers: _h });
       }
+      /* quiet=1：全程一个字节都不往外发，到点才收尾。用来分开两个嫌疑——
+         是「跑得太久」被掐，还是「太久没有字节流出去」被掐。前者是墙钟，后者是静默。 */
+      const quiet = url.searchParams.get("quiet") === "1";
       const stream = new ReadableStream({
         async start(controller) {
           const t0 = Date.now();
           try {
             for (let i = 0; i < sec; i++) {
-              controller.enqueue(_sseBytes({ t: "beat", v: { sec: Math.round((Date.now() - t0) / 1000) } }));
+              if (!quiet) controller.enqueue(_sseBytes({ t: "beat", v: { sec: Math.round((Date.now() - t0) / 1000) } }));
               await new Promise((r) => setTimeout(r, 1000));
             }
             controller.enqueue(_sseBytes({ t: "end", v: { sec: Math.round((Date.now() - t0) / 1000) } }));
