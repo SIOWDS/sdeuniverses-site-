@@ -332,6 +332,27 @@ function wdsClock(firstMs, totalMs) {
 }
 // RAG_SUBREQUEST 的发车口：走 SELF 服务绑定（Worker 内部调用，不出边缘、自带一份 CPU 预算）。
 // 注意：**不能**用 fetch("https://本站/api/wds/rag") ——那是自请求回环，实测直接 522 超时。
+/* ═══ DO 绑定的安全垫（2026-08-19）═══
+   2026-08-18 那次事故的形状：新增一个 DO 类之后**所有 DO 绑定一起脱开**
+   （CONFIG_VAULT 抛 1101、IDXMEM undefined），而站内 53 处是把 `env.X` 当成
+   一定存在来用的 ⇒ 每一处都是 `undefined.get(...)` 当场 TypeError ⇒ 整台智能问答下线。
+   ⚠ 真正把站放倒的不是那个新功能（它的调用点当时就写了 `if (!env.IDXMEM) return null`），
+   是**别处对 DO 没有一句防守**。
+   这一垫子把「绑定不见了」从 TypeError 变成一个**普通的失败响应**：
+   调用方现有的 try/catch 与 `!r.ok` 判断照旧生效，功能降级而不是整页 500。
+   💡 心法：**一个可能不存在的东西，全站有几十处当它一定在，那它不见的那天就是全站事故。**
+   ⚠ 这是纯降级层，不改任何正常路径：绑定在就原样返回那个 namespace。 */
+const _DO_MISS = { ok: false, error: "binding_missing", why: "这个 Durable Object 绑定当前不可用（多半是一次部署里绑定没跟上），本次按降级处理。" };
+function _do(env, name) {
+  const ns = env && env[name];
+  if (ns && typeof ns.get === "function" && typeof ns.idFromName === "function") return ns;
+  return {
+    idFromName: (n) => ({ _miss: name, _n: String(n || "") }),
+    idFromString: (n) => ({ _miss: name, _n: String(n || "") }),
+    get: () => ({ fetch: async () => new Response(JSON.stringify(_DO_MISS), { status: 503, headers: { "content-type": "application/json" } }) }),
+  };
+}
+
 async function wdsRag(env, url, body) {
   const req = new Request(new URL("/api/wds/rag", url).toString(), {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
@@ -587,7 +608,7 @@ function wdsPickModel(vd, want, top) {
 }
 async function getActiveVendor(env) {
   try {
-    const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+    const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
     const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getVendor" }) }))).json();
     if (r && r.vendor && WDS_VENDORS[r.vendor] && r.key) return r;
   } catch (e) {}
@@ -595,7 +616,7 @@ async function getActiveVendor(env) {
 }
 async function readDiscussion(env, room) {
   try {
-    const r = await env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(new Request("https://do/api/chat?room=" + encodeURIComponent(room) + "&since=0"));
+    const r = await _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("chat:" + room)).fetch(new Request("https://do/api/chat?room=" + encodeURIComponent(room) + "&since=0"));
     const d = await r.json();
     const items = (d && d.items) || [];
     const lines = items.filter((m) => !m.recalled && m.text && m.name !== "WDS智能体").map((m) => m.name + "：" + (m.img ? "[图片]" : String(m.text))).filter((s) => s.length < 600);
@@ -608,7 +629,7 @@ async function wdsPaperVC(env) {
   const av = await getActiveVendor(env);
   if (av) return { VC: { url: WDS_VENDORS[av.vendor].url, model: av.model || WDS_VENDORS[av.vendor].model }, KEY: av.key, rvendor: ({ zhipu: "glm", deepseek: "ds" })[av.vendor] || av.vendor };
   try {
-    const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+    const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
     const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
     if (r && r.key) return { VC: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5" }, KEY: r.key, rvendor: "glm" };
   } catch (e) {}
@@ -2181,7 +2202,7 @@ async function drScan(ctx) {
     }
     // ② 平台兜底：默认关。开着等于门卡形同虚设（没配 Key 的人照样花平台的钱）。
     if (!key && WDS_PLATFORM_FALLBACK) try {
-      const cv = this.env.CONFIG_VAULT.get(this.env.CONFIG_VAULT.idFromName("global"));
+      const cv = this._do(env, "CONFIG_VAULT").get(this._do(env, "CONFIG_VAULT").idFromName("global"));
       const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getVendor" }) }))).json();
       if (r && r.vendor && WDS_VENDORS[r.vendor] && r.key) {
         VC = { url: WDS_VENDORS[r.vendor].url, model: r.model || WDS_VENDORS[r.vendor].model };
@@ -2191,7 +2212,7 @@ async function drScan(ctx) {
     } catch (e) {}
     if (!key && WDS_PLATFORM_FALLBACK) {
       try {
-        const cv = this.env.CONFIG_VAULT.get(this.env.CONFIG_VAULT.idFromName("global"));
+        const cv = this._do(env, "CONFIG_VAULT").get(this._do(env, "CONFIG_VAULT").idFromName("global"));
         const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
         if (r && r.key) { VC = { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5" }; key = r.key; rvendor = "glm"; }
       } catch (e) {}
@@ -2291,7 +2312,7 @@ async function drScan(ctx) {
     await this.chatAddBot(reply, tier);
   }
   // 把一条消息记进相关各方的会话列表（收信方未读 +1；群里被 @ 的另打标）——目录实例是 im-dir-global。
-  _dir() { return this.env.COMMENTS.get(this.env.COMMENTS.idFromName("im-dir-global")); }
+  _dir() { return this._do(env, "COMMENTS").get(this._do(env, "COMMENTS").idFromName("im-dir-global")); }
   async _dirCall(payload) {
     const r = await this._dir().fetch(new Request("https://do/_dir", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }));
     return await r.json().catch(() => ({ ok: false }));
@@ -2634,7 +2655,7 @@ async function handleRegister(request, env) {
   if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
   try { // 限流器住在 DO 里，取不到就放行——宁可少拦，不把门关死
-    const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("register:" + ip));
+    const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("register:" + ip));
     const lr = await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json();
     if (!lr.ok) return _subJson({ ok: false, msg: "提交太频繁，请过一会儿再试。" }, CORS);
   } catch (e) {}
@@ -2669,7 +2690,7 @@ async function handleSubmit(request, env) {
   if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
   try {
-    const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("submit:" + ip));
+    const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("submit:" + ip));
     const lr = await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json();
     if (!lr.ok) return _subJson({ ok: false, msg: "提交太频繁，请过一会儿再试。" }, CORS);
   } catch (e) {}
@@ -2715,7 +2736,7 @@ async function handleSubmitAdmin(request, env) {
   const b = await request.json().catch(() => ({}));
   const allow = ["list", "meta", "getchunk", "delete"];
   if (!allow.includes(b.op)) return _subJson({ ok: false, msg: "unknown op" }, { "access-control-allow-origin": "*" });
-  const box = env.SUBMISSIONS.get(env.SUBMISSIONS.idFromName("global"));
+  const box = _do(env, "SUBMISSIONS").get(_do(env, "SUBMISSIONS").idFromName("global"));
   const r = await box.fetch(new Request("https://sub.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) }));
   return _subJson(await r.json(), { "access-control-allow-origin": "*" });
 }
@@ -3603,7 +3624,7 @@ async function ensureReflect(env, url, vendor, VC, KEY, allowGen) {
   const mem = REFLECT_MEM[rkey];
   if (mem && now < mem.exp) return mem.text;
   try {
-    const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+    const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
     const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getReflect", vendor, rkey }) }))).json();
     if (r.reflect && r.reflect.length > 500) { REFLECT_MEM[rkey] = { text: r.reflect, exp: now + REFLECT_MEM_TTL }; return r.reflect; }
   } catch (e) {}
@@ -3629,7 +3650,7 @@ async function ensureReflect(env, url, vendor, VC, KEY, allowGen) {
   } catch (e) {}
   if (text && text.length > 500) {
     try {
-      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
       await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "setReflect", vendor, rkey, reflect: text }) }));
     } catch (e) {}
     REFLECT_MEM[rkey] = { text, exp: Date.now() + REFLECT_MEM_TTL };
@@ -4134,7 +4155,7 @@ async function followUps(VC, KEY, q, ans, lang) {
 const WEB_SEARCH_URL = "https://open.bigmodel.cn/api/paas/v4/web_search";
 async function _adminGlmKey(env) {
   try {
-    const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+    const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
     const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
     return String((r && r.key) || "");
   } catch (e) { return ""; }
@@ -5277,7 +5298,7 @@ async function askCore(request, env, url, body, SINK) {
       vendor = ({ zhipu: "glm", deepseek: "ds" })[av.vendor] || av.vendor;
     } else {
       try {
-        const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+        const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
         const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
         KEY = r.key || "";
       } catch (e) {}
@@ -5293,7 +5314,7 @@ async function askCore(request, env, url, body, SINK) {
   // 这个入口此前一个参数都没传，于是自带 Key 的人也被按 60/天掐——站上其余 BYOK 入口都传了，唯独漏了它。
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
   try {
-    const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(byok ? wdsBucket("ask", ip, userKey) : ("sys:" + ip)));
+    const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(byok ? wdsBucket("ask", ip, userKey) : ("sys:" + ip)));
     const _lq = byok ? ("?w=" + WDS_PER_MIN + BYOK_NO_DAY) : "";
     const lr = await (await lim.fetch(new Request("https://limiter.internal/" + _lq))).json();
     if (!lr.ok) {
@@ -6358,8 +6379,8 @@ export default {
       // 这里回一个 total:null + why，前端照样静默降级，运维一 curl 就看得见真正的错。
       try {
         if (!env.COUNTER) throw new Error("COUNTER binding is undefined");
-        const id = env.COUNTER.idFromName("site-total");
-        return await env.COUNTER.get(id).fetch(request);
+        const id = _do(env, "COUNTER").idFromName("site-total");
+        return await _do(env, "COUNTER").get(id).fetch(request);
       } catch (e) {
         return new Response(JSON.stringify({ total: null, ok: false, why: String((e && e.message) || e) }), {
           headers: { "content-type": "application/json", "cache-control": "no-store" },
@@ -6379,16 +6400,16 @@ export default {
       }
       try {
         if (!env.COUNTER) throw new Error("COUNTER binding is undefined");
-        const id = env.COUNTER.idFromName("pv:" + slug);
+        const id = _do(env, "COUNTER").idFromName("pv:" + slug);
         if (request.method === "POST") {
           const ip = request.headers.get("CF-Connecting-IP") || "0";
           const ua = request.headers.get("User-Agent") || "";
           const day = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
           const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-pv-v2:" + ip + "|" + ua + "|" + slug + "|" + day));
           const fp = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
-          return await env.COUNTER.get(id).fetch(new Request(request.url, { method: "POST", headers: { "x-pv-fp": fp, "x-pv-day": day } }));
+          return await _do(env, "COUNTER").get(id).fetch(new Request(request.url, { method: "POST", headers: { "x-pv-fp": fp, "x-pv-day": day } }));
         }
-        return await env.COUNTER.get(id).fetch(request);
+        return await _do(env, "COUNTER").get(id).fetch(request);
       } catch (e) {
         return new Response(JSON.stringify({ total: null, ok: false, why: String((e && e.message) || e) }), {
           headers: { "content-type": "application/json", "cache-control": "no-store" },
@@ -6414,7 +6435,7 @@ export default {
       const usr = "【文件名】" + filename + "\n【文章正文（从 PDF/Word 提取，格式可能略乱，请抓主干）】\n" + text + "\n\n请分两节作答：\n一、观点解读：准确复述这篇文章的核心主张、论证脉络，以及它没明说却依赖的隐含前提。\n二、SDE 解构：用发生学与显露S/差异D/纠缠E的视角重新审视——这篇文章把什么当成了『现成的结构/给定的对象』（而它其实是在差异序列与环境纠缠中被显影出来的）？它漏掉了哪个『如何发生』的层次？用三大方程或意义三律照见它的盲区，最后给出一个这篇文章自己看不到的、更深一层的判断。\n约 2000-2800 字，用『一、观点解读』『二、SDE 解构』分节，直接从正文写起，不要开场白。";
       const out = await llmText(vc.VC, vc.KEY, sys, usr, 4000);
       if (!out) return Response.json({ ok: false, msg: "解读生成失败，请重试。" }, { status: 502 });
-      try { await env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(new Request("https://do/_bot", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: "【《" + filename + "》· 观点解读与 SDE 解构】\n\n" + out }) })); } catch (e) {}
+      try { await _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("chat:" + room)).fetch(new Request("https://do/_bot", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: "【《" + filename + "》· 观点解读与 SDE 解构】\n\n" + out }) })); } catch (e) {}
       return Response.json({ ok: true });
     }
     if (url.pathname === "/api/wds/paper" && request.method === "POST") {
@@ -6513,7 +6534,7 @@ export default {
       const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };   // 降档：见纪律①
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("memo", ip, KEY)));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("memo", ip, KEY)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_MEMO_PER_MIN + BYOK_NO_DAY))).json();
         if (!lr.ok) return J({ ok: false, code: "rate", msg: lr.reason === "day" ? ("这把 Key 今天已更新 " + (lr.inDay || 0) + "/" + WDS_MEMO_PER_DAY + " 条记忆，明天再续（记忆额度与对话额度分开计）。") : "更新得太快了，过十几秒再继续——已经做好的不会丢。" }, 429);
       } catch (e) {}
@@ -6574,7 +6595,7 @@ export default {
       const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };   // 降档：纪律②
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("nbr", ip, KEY)));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("nbr", ip, KEY)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + NBR_PER_MIN + BYOK_NO_DAY))).json();
         if (!lr.ok) return J({ ok: false, code: "rate", msg: lr.reason === "day" ? ("这把 Key 今天已细判 " + (lr.inDay || 0) + "/" + NBR_PER_DAY + " 次，明天再续（闸门额度与对话额度分开计）。") : "判得太快了，过十几秒再来。" }, 429);
       } catch (e) {}
@@ -6734,7 +6755,7 @@ export default {
       const VC = wdsTopVC(vd);   // 开工学内功＝最费脑的一步，直接最强档
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("dlg", ip, userKey)));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("dlg", ip, userKey)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_DLG_PER_MIN + BYOK_NO_DAY))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("这把 Key 今天已用 " + (lr.inDay || 0) + "/" + WDS_DLG_PER_DAY + " 次，明天再来。") : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
@@ -6813,7 +6834,7 @@ export default {
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket(b.guide ? "dlg" : "read", ip, userKey)));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket(b.guide ? "dlg" : "read", ip, userKey)));
         const _pm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _pd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _pm + BYOK_NO_DAY))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("这把 Key 今天已用 " + (lr.inDay || 0) + "/" + _pd + " 次，明天再来。") : "太快啦，过十几秒再试。" }, 429);
@@ -7126,7 +7147,7 @@ export default {
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok-art:" + ip));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("byok-art:" + ip));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=20" + BYOK_NO_DAY))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? "今天这台机器的额度用完了，明天再来。" : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
@@ -7179,7 +7200,7 @@ export default {
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("voice", ip, userKey)));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("voice", ip, userKey)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=20" + BYOK_NO_DAY))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? "今天这台机器的额度用完了，明天再来。" : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
@@ -7322,7 +7343,7 @@ export default {
       // 限流（系统额度与自带 Key 各用独立配额桶，不互挤）
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket(b.guide ? "dlg" : "read", ip, userKey)));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket(b.guide ? "dlg" : "read", ip, userKey)));
         const _rm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _rd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _rm + BYOK_NO_DAY))).json();
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在" + (b.guide ? "「SDE 对谈」" : "「陪读」") + "入口已用 " + (lr.inDay || 0) + "/" + _rd + " 次，明天再来（额度按你的 Key 计，各入口独立）。") : "聊得太快啦，过十几秒再问。" }]);
@@ -7647,7 +7668,7 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       let dayLeft = null;
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("chat", ip, userKey)));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("chat", ip, userKey)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json();
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在「ChatSDE」入口已用 " + (lr.inDay || 0) + "/" + WDS_PER_DAY + " 次，明天再来（额度按你的 Key 计，陪读与「SDE 对谈」各有独立额度）。") : "聊得太快啦，过十几秒再问。" }]);
         // 自带 Key 已无日上限 ⇒ 不回传"今日剩余"那一帧（回传就是显示一个假数字）。
@@ -8070,7 +8091,7 @@ export default {
       const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, String(b.model || ""), 0), name: WDS_VENDORS[vd].name };
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("chat", ip, KEY)));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("chat", ip, KEY)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json();
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "这把 Key 今天的额度用完了，明天再来。" : "太快啦，过十几秒再来。" }]);
       } catch (e) {}
@@ -8167,7 +8188,7 @@ export default {
       if (blocked) return J({ ok: false, msg: "这个地址不给取（内网地址、本机地址）。" });
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("readurl", ip, "")));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("readurl", ip, "")));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=10&d=120"))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? "今天取链接的次数用完了，明天再来。" : "取得太快啦，过十几秒再来。" });
       } catch (e) {}
@@ -8240,7 +8261,7 @@ export default {
       const _aip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const _own = String(b.key || "").trim().length >= 8;
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("asr", _aip, String(b.key || ""))));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("asr", _aip, String(b.key || ""))));
         const _w = _own ? WDS_ASR_BYOK_PER_MIN : WDS_ASR_PER_MIN, _d = _own ? WDS_ASR_BYOK_PER_DAY : WDS_ASR_PER_DAY;
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _w + (_own ? BYOK_NO_DAY : ("&d=" + _d))))).json();
         if (!lr.ok) return Response.json({ ok: false, code: "rate", msg: lr.reason === "day" ? "今天的语音转写次数用完了。" : "说得太快啦，过十几秒再来。" }, { headers: _cors() });
@@ -8353,7 +8374,7 @@ export default {
       if (!titles.length) return Response.json({ ok: true, hits: [] }, { headers: _cors() });
       const _lip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("link", _lip, "")));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("link", _lip, "")));
         const lr0 = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_LINK_PER_MIN + "&d=" + WDS_LINK_PER_DAY))).json();
         if (!lr0.ok) return Response.json({ ok: false, reason: "rate", hits: [] }, { headers: _cors() });
       } catch (e) {}
@@ -8390,7 +8411,7 @@ export default {
       // （下面 /api/wds/link 见本文件另一处：它不烧任何 Key，只读索引）
       const _wip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("ws", _wip, String(b.skey || b.key || ""))));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("ws", _wip, String(b.skey || b.key || ""))));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_WS_PER_MIN + "&d=" + WDS_WS_PER_DAY))).json();
         if (!lr.ok) return Response.json({ ok: false, reason: "rate", items: [] }, { headers: _cors() });
       } catch (e) {}
@@ -8437,7 +8458,7 @@ export default {
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("chat", ip, userKey)));
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("chat", ip, userKey)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json();
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "这把 Key 今天的额度已用完，明天再来。" : "太快啦，过十几秒再来。" }]);
       } catch (e) {}
@@ -9396,10 +9417,10 @@ export default {
       const b = await request.json().catch(() => ({}));
       const room = (b.room || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room) || room.length > 120) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
-      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
       const chk = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "checkpass", pass: String(b.pass || "") }) }))).json();
       if (!chk || !chk.ok) return Response.json({ ok: false, msg: "管理口令不正确。" }, { status: 403 });
-      const r = await env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(new Request("https://do/_clear", { method: "POST" }));
+      const r = await _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("chat:" + room)).fetch(new Request("https://do/_clear", { method: "POST" }));
       return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
     }
     // 私聊页已升级为「SDE 社区」整套系统，换到 /sde-wechat/；老链接不作废，301 过去。
@@ -9492,7 +9513,7 @@ export default {
       if (probe && probe.bad === "name") return Response.json({ ok: false, msg: "这个名字不在学员名录里。请用你在站上发表用的名字。" }, { status: 401 });
       if (probe && probe.bad === "ban") return Response.json({ ok: false, msg: "这个名字已被管理员停用。" }, { status: 403 });
       if (!who || !who.uid) return Response.json({ ok: false, msg: "密码不对，请向管理员确认。" }, { status: 401 });
-      const dir = env.COMMENTS.get(env.COMMENTS.idFromName("im-dir-global"));
+      const dir = _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("im-dir-global"));
       const call = async (payload) => {
         const r = await dir.fetch(new Request("https://do/_dir", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }));
         return await r.json().catch(() => ({ ok: false }));
@@ -9686,7 +9707,7 @@ export default {
           const kindK = MUSE_KINDS[String(b.kind || "")] ? String(b.kind) : "auto";
           const imgs = wdsPickImgs((Array.isArray(b.imgs) ? b.imgs : []).slice(0, 2).map((d) => ({ n: "朋友圈配图", d: String(d || "") })));
           try {
-            const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("muse:" + who.uid));
+            const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("muse:" + who.uid));
             const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=6&d=60"))).json();
             if (!lr.ok) return Response.json({ ok: false, msg: lr.reason === "day" ? "今天的金句额度用完了（每天 60 次），明天再来。" : "生得太快了，过十几秒再点。" }, { status: 429 });
           } catch (e) {}
@@ -9855,12 +9876,12 @@ export default {
       if (url.pathname === "/api/chat" && request.method === "GET" && request.headers.get("Upgrade") !== "websocket" && (dmParties(room) || gRoomGid(room))) {
         return Response.json({ ok: false, msg: "这个会话需要登录后从聊天列表进入。" }, { status: 403 });
       }
-      return env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(request);
+      return _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("chat:" + room)).fetch(request);
     }
     // /api/board：公开只读——列出全站有过留言的文章及累计发言数（论文讨论区首页聚合用）。
     // 数据本身即公开（讨论全部公开可见），故不设口令；只读、无写入、无个人信息。
     if (url.pathname === "/api/board" && request.method === "GET") {
-      const names = env.COMMENTS.get(env.COMMENTS.idFromName("names-global"));
+      const names = _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("names-global"));
       const r = await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "slugs" }) }));
       const d = await r.json().catch(() => null);
       const slugs = (d && d.ok && Array.isArray(d.slugs)) ? d.slugs : [];
@@ -9874,17 +9895,17 @@ export default {
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(slug) || slug.length > 120) {
         return Response.json({ error: "bad slug" }, { status: 400 });
       }
-      const box = env.COMMENTS.get(env.COMMENTS.idFromName("cm:" + slug));
+      const box = _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("cm:" + slug));
       if (request.method === "GET") return box.fetch(request);
       if (request.method === "POST") {
         const body = await request.json().catch(() => null);
         if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
         if (body.op === "del" || body.op === "unbind" || body.op === "slugs") { // 管理操作：先过 ConfigVault 管理口令
-          const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+          const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
           const chk = await (await cv.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "checkpass", pass: String(body.pass || "") }) }))).json();
           if (!chk.ok) return Response.json({ ok: false, msg: "管理口令不正确。" }, { status: 403 });
           if (body.op === "unbind" || body.op === "slugs") { // 全局操作走 names-global 实例
-            const names = env.COMMENTS.get(env.COMMENTS.idFromName("names-global"));
+            const names = _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("names-global"));
             return names.fetch(new Request(request.url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: body.op, name: String(body.name || "") }) }));
           }
           return box.fetch(new Request(request.url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "del", id: String(body.id || "") }) }));
@@ -9920,7 +9941,7 @@ export default {
         // 名字·网络一一绑定：哈希只含 IP（跨天、跨浏览器持久），与限流指纹分开
         const nb = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-nm-v1:" + ip));
         const nh = [...new Uint8Array(nb)].map((b) => b.toString(16).padStart(2, "0")).join("");
-        const names = env.COMMENTS.get(env.COMMENTS.idFromName("names-global"));
+        const names = _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("names-global"));
         if (!googleOn && !whoIdent) { // 只有未验明身份的旧通道才做 IP-名字绑定
           const claim = await (await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "claim", h: nh, name }) }))).json();
           if (!claim.ok) return Response.json({ ok: false, msg: claim.msg || "名字与你的网络不匹配。" }, { status: 409 });
@@ -9958,7 +9979,7 @@ export default {
             }
             const others = [...new Set(list.map((x) => x && x.name).filter(Boolean))].slice(0, 30);
             for (const nm of others) push(await uidOf(nm), "join");
-            const dir2 = env.COMMENTS.get(env.COMMENTS.idFromName("im-dir-global"));
+            const dir2 = _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("im-dir-global"));
             await dir2.fetch(new Request("https://do/_dir", {
               method: "POST", headers: { "content-type": "application/json" },
               body: JSON.stringify({
@@ -10187,13 +10208,13 @@ export default {
     // /api/admin/*：页面设置基底密钥（op 由服务端固定，浏览器只能传 pass+key，无法注入 op:get 回读密钥）
     if (url.pathname === "/api/admin/setkey" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
-      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
       const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "set", pass: b.pass, key: b.key }) }));
       return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
     }
     if (url.pathname === "/api/admin/setvendor" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
-      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
       const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "setVendor", pass: b.pass, vendor: b.vendor, key: b.key, model: b.model }) }));
       const rj = await r.json();
       // 配好基底即后台预生成该基底心得（第一次配置就生成、存下、以后复用；已存在则秒返回、不重复生成），这样首个学员提问不用等
@@ -10206,19 +10227,19 @@ export default {
       return Response.json(rj, { headers: { "access-control-allow-origin": "*" } });
     }
     if (url.pathname === "/api/admin/vendorstatus") {
-      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
       const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "vendorStatus" }) }));
       return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
     }
     if (url.pathname === "/api/admin/status") {
-      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
       const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "status" }) }));
       return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
     }
     // /api/ask：站内智能问答（RAG）——浏览器只发问题，Key 锁在服务端
     if (url.pathname === "/api/admin/clearreflect" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
-      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
       const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "clearReflect", pass: b.pass, vendor: b.vendor }) }));
       return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
     }
@@ -10237,13 +10258,13 @@ export default {
       return handleSubmitAdmin(request, env);
     }
     if (url.pathname === "/api/submit/bootstrap" && request.method === "POST") { // 一次性设定口令（设定后自锁）
-      const box = env.SUBMISSIONS.get(env.SUBMISSIONS.idFromName("global"));
+      const box = _do(env, "SUBMISSIONS").get(_do(env, "SUBMISSIONS").idFromName("global"));
       const bb = await request.json().catch(() => ({}));
       const rr = await box.fetch(new Request("https://sub.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "bootstrap", studentPass: bb.studentPass, adminPass: bb.adminPass }) }));
       return _subJson(await rr.json(), { "access-control-allow-origin": "*" });
     }
     if (url.pathname === "/api/submit/status") {
-      const box = env.SUBMISSIONS.get(env.SUBMISSIONS.idFromName("global"));
+      const box = _do(env, "SUBMISSIONS").get(_do(env, "SUBMISSIONS").idFromName("global"));
       const rr = await box.fetch(new Request("https://sub.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "status" }) }));
       return _subJson(await rr.json(), { "access-control-allow-origin": "*" });
     }
@@ -10430,7 +10451,7 @@ export default {
       if (String(b.key || "") !== DRAFT_KEY) return J({ ok: false, msg: "钥匙不对。" }, 401);
       const a = String(b.a || "");
       if (["add", "list", "get", "del", "mark"].indexOf(a) < 0) return J({ ok: false, msg: "未知动作。" }, 400);
-      const dir2 = env.COMMENTS.get(env.COMMENTS.idFromName("im-dir-global"));
+      const dir2 = _do(env, "COMMENTS").get(_do(env, "COMMENTS").idFromName("im-dir-global"));
       const r = await dir2.fetch(new Request("https://do/_dir", {
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({
