@@ -14,8 +14,11 @@
  *
  * 换版本：改 V 即可（旧缓存在 activate 里清）。
  */
-var V = "sde-shell-v1";
-var SHELL = ["/offline.html", "/assets/app/icon-192.png"];
+// ⚠ 地址写 /offline 而不是 /offline.html：Cloudflare 的 html_handling=auto-trailing-slash
+// 会把 /offline.html 307 到 /offline，而带跳转的响应存不进 Cache（addAll 直接失败）——
+// 失败又被下面的 catch 咽掉，表现就是"断网白屏 + 安卓判定不可安装"。线上黑盒才看得出来。
+var V = "sde-shell-v2";
+var SHELL = ["/offline", "/assets/app/icon-192.png"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(
@@ -45,7 +48,7 @@ self.addEventListener("fetch", function (e) {
   if (req.mode === "navigate") {
     e.respondWith(
       fetch(req).catch(function () {
-        return caches.match("/offline.html").then(function (r) {
+        return caches.match("/offline").then(function (r) {
           return r || new Response("离线", { status: 503, headers: { "content-type": "text/plain; charset=utf-8" } });
         });
       })
