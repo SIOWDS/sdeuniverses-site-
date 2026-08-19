@@ -66,6 +66,11 @@ concurrency:
 jobs:
   reindex:
     runs-on: ubuntu-latest
+    # 【2026-08-19 加】整个 job 一道总闸。此前**一步都没有超时**，于是 2026-08-19 那趟
+    # 卡在 apt 上挂了二十分钟还在挂——而 concurrency 是 search-index 独一份，
+    # 它挂着就等于把这条产线整条占住，谁也看不出它在等什么。
+    # 实测一趟 4.5–6 分钟，25 分钟给足了余量：宁可红一趟去重跑，不要无声地挂着。
+    timeout-minutes: 25
     permissions:
       contents: read                 # 索引改上 R2，不再推回 main
 
@@ -79,7 +84,27 @@ jobs:
                                     # 它靠首次提交日兜底发表日期，那边必须留 fetch-depth: 0。
 
       - name: 装 pdftotext（专著正文靠它抽，缺了 PDF 就进不了索引）
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+        # 【2026-08-19 加固】这一步原来是光秃秃一行 apt，**没有超时也没有重试**。
+        # 当天两趟重建（run 1148／1149）都卡死在这里：1148 挂了 20 分钟，我只能靠再发一次
+        # repository_dispatch 用 cancel-in-progress 把它顶掉——PAT 没有 actions:write，掐不动。
+        # apt 镜像连不上是 runner 侧的常事，不该让整条索引产线陪着无限期挂着。
+        # 三条加固：① runner 自带就直接用（多数 ubuntu 镜像本来就有 poppler-utils，
+        # 跑得通就一次 apt 都不必打）；② 连不上就退避重试三次；③ 整步 6 分钟硬超时，
+        # 让它**快点红**——红了能重跑，挂着谁也不知道它在等什么。
+        timeout-minutes: 6
+        run: |
+          if command -v pdftotext >/dev/null 2>&1; then
+            echo "runner 自带 pdftotext：$(pdftotext -v 2>&1 | head -1)"
+            exit 0
+          fi
+          for i in 1 2 3; do
+            if sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils; then
+              echo "第 $i 次装上了"; exit 0
+            fi
+            echo "第 $i 次没装上（多半是 apt 镜像连不上），20 秒后再试"; sleep 20
+          done
+          echo "::error::装不上 poppler-utils —— 专著 PDF 的正文会进不了索引，本趟停在这里，别把半份索引传上去"
+          exit 1
 
       - name: 重建索引
         run: python3 tools/build_search_index.py
