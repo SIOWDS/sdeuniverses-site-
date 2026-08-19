@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第二十七章　稳定性：同一条序列自己稳不稳 · 分解之前 · 德麦国际专著</title>
+<meta name="description" content="第二十七章　稳定性：同一条序列自己稳不稳。《分解之前》康德二律背反的 SDE 解构 · 王德生 · Claude 著 · 九编六十章 · 约 16.5 万汉字 · 德麦国际专著第 98 号">
+<style>body{margin:0;background:#0B0D12;color:#E8E6E2;font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+.wrap{max-width:780px;margin:0 auto;padding:28px 18px 90px}
+a{color:#D69646;text-decoration:none}a:hover{text-decoration:underline}
+h1{font-size:26px;line-height:1.5;margin:.2em 0 .6em}h3{color:#7FA8E0;margin:2em 0 .6em;font-size:19px}
+h4{color:#9FBCE8;margin:1.6em 0 .5em;font-size:17px}h5{color:#8E99AC;margin:1.3em 0 .4em;font-size:16px}
+p{margin:.9em 0}blockquote{margin:1.1em 0;padding:.7em 1em;border-left:3px solid #D69646;background:#141822;color:#F0E4D0}
+table{width:100%;border-collapse:collapse;margin:1.2em 0;font-size:15px}
+th,td{border:1px solid #232733;padding:.5em .6em;text-align:left}th{background:#141822;color:#7FA8E0}
+li{margin:.4em 0}hr{border:0;border-top:1px solid #232733;margin:2em 0}
+.bar{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:#8E99AC;border-bottom:1px solid #232733;padding-bottom:12px;margin-bottom:22px}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:40px;border-top:1px solid #232733;padding-top:18px;font-size:15px}</style></head><body><div class="wrap">
+<div class="bar"><a href="../../">← 分解之前</a><span>德麦国际专著第 98 号</span><span>王德生 · Claude</span></div>
+<h1>第二十七章　稳定性：同一条序列自己稳不稳</h1>
+<h3>27.1 最基本的一项</h3>
+<p>稳定性是三项中最基本的一项，也是最容易被误解为&quot;不言而喻&quot;的一项。</p>
+<p>它的内容很简单：<strong>同一条序列在重复中给出同一读数。</strong>它的量是 σ_in，测量方式是现成的——同一位观察者、同一对象、不同时间，读数是否一致。</p>
+<p>但简单不等于自明。<strong>一个东西为什么会给出同一读数？</strong>这不是一个可以被跳过的问题，因为进入眼睛的光、落在手上的压力、到达舌头的分子，<strong>每一次都不同</strong>。</p>
+<h3>27.2 恒常性：稳定是被做出来的</h3>
+<p>答案是知觉恒常性，而恒常性正是本编的第一个证据。</p>
+<p><strong>大小恒常</strong>：同一个人走远，视网膜像缩小一半，你看到的仍是同样大的人。</p>
+<p><strong>形状恒常</strong>：一扇门转动时，视网膜上的形状从矩形变成各种平行四边形，你看到的仍是一扇矩形的门。</p>
+<p><strong>颜色恒常</strong>：从室内走到日光下，同一张纸的反射光谱变化巨大，你看到的仍是同一张白纸。</p>
+<p><strong>亮度恒常</strong>：阴影中的白纸反射的光可能少于日光下的黑纸，你仍然看得出哪张是白的。</p>
+<p>四种恒常有一个共同结构，而这个结构正是本书要指出的：</p>
+<blockquote><strong>恒常不是&quot;看见了不变的东西&quot;，而是&quot;回写把变动吸收掉了&quot;。</strong></blockquote>
+<p>变动确实发生了——视网膜像确实缩小了，光谱确实变了。恒常的意思是：<strong>这些变动被归给了别的因素</strong>（距离、角度、照明），因而不被归给对象本身。</p>
+<p>⇒ <strong>这是一次归因，不是一次读取。</strong>而归因需要另一条序列提供参照：大小恒常需要距离信息，颜色恒常需要照明估计。<strong>换句话说，稳定性从一开始就借用了整体性的资源。</strong>这正是 26.4 那条次序的机制性说明——稳定性是整体性的前提，但它自己也需要一点整体性才能实现。</p>
+<p>⚠ 这看起来像循环，实则不是：它是<strong>自举</strong>。少量的跨序列信息支撑起初步的稳定，初步的稳定使更多绑定成为可能，更多绑定又提高稳定。<strong>这正是&quot;慢慢地同时发生、互相影响&quot;的具体形态。</strong></p>
+<h3>27.3 恒常性是有代价的</h3>
+<p>第 5 章立过一条命题：<strong>格集的每一次细化都是双向的</strong>——新格带来新的可分辨，同时使被并入该格的差别不再可见。恒常性是这条命题的又一个实例，而且是最干净的一个。</p>
+<p><strong>颜色恒常把照明信息抹掉了。</strong>你看到的是&quot;这张纸是白的&quot;，而不是&quot;此刻到达我眼睛的是偏黄的光&quot;。要看出后者需要训练——画家要经过专门训练才能看见阴影里的蓝、白墙在夕阳下的橙。<strong>普通人不是看不见，是恒常性把那部分变动归给了照明因素，因而从读数里消失了。</strong></p>
+<p>⇒ <strong>稳定性的达成，同时是一部分信息的丢失。</strong>这是本书第三次遇到这个形式（第 5 章知觉窄化、第 5 章专业化、本节恒常性），可以立为一条通则：</p>
+<blockquote><strong>每一次把变动吸收进&quot;同一个东西&quot;，都同时使那部分变动不再可读。</strong></blockquote>
+<p>这条通则在第 30 章处理&quot;我&quot;的实体化时会变得沉重：<strong>一个人越是稳定地成为&quot;同一个我&quot;，他越读不出自己的变化。</strong></p>
+<h3>27.4 稳定不等于客观：σ_in 单独一项的危险</h3>
+<p>第 24 章 24.4b 已经指出：一个稳定的幻觉、一个反复出现的偏见、一个固执的观念，σ_in 都可以极高。</p>
+<p>本节把这一点在实体发生学内部再说一遍，因为它在这里有不同的后果：</p>
+<p><strong>σ_in 高而 σ_cross 低的东西，仍然会成为一个实体。</strong></p>
+<p>它满足第一项判据，若它还能被绑成一束（整体性）、并在不被感知时仍被记为存在（独立性），那么按 26.3 的三项，<strong>它就是一个实体</strong>——尽管它的客观度很低。</p>
+<p>⇒ 这正是 26.5 那个区分的用处：<strong>幻听是一个实体，但不客观。</strong>本书不因为它客观度低就否认它是一个实体——那样做等于用公共性去否定发生。<strong>对承受者而言，它确实完成了三项达成。</strong></p>
+<p>⚠ 这一段须极其小心，不可被读成对任何临床判断的意见。本书只做形式陈述：<strong>实体性判据与客观性判据是两套，各自独立成立。</strong>临床上如何处理，不在本书射程之内（第 6 章 6.6）。</p>
+<h3>27.5 婴儿：稳定性的爬升段</h3>
+<p>大小恒常在新生儿身上已有部分证据——即使在出生后不久，婴儿对同一物体在不同距离下的反应显示出某种恒常倾向。<strong>这一点对本书构成局部的不利</strong>：若稳定性完全是被做出来的，它不该在几乎没有经验的时候就部分在场。</p>
+<p>本书的处理与第 3 章 3.7 相同，并且要承认同一笔账：<strong>这类早期恒常属于跨代沉积</strong>（洛伦茨那条线，第 25 章 25.6），其爬升段跑在物种尺度上。而按 25.11，本书已经承认 n 轴必须允许跨代计数。<strong>所以这里不构成新的困难，但也不构成本书的胜利——它只是把问题推给了另一个尺度。</strong></p>
+<p>其后的爬升是清楚的：<strong>形状恒常、颜色恒常在婴儿期逐步稳定，而它们所依赖的参照信息（距离、照明估计）本身也在同期发育。</strong>⇒ 这与 27.2 的自举描述一致：两者互相支撑地上升，而不是一个先完成再支撑另一个。</p>
+<h3>27.6 稳定性的失败：可分离性的第一项证据</h3>
+<p>F10 要求三项可分别扰动。稳定性这一项的可分离性证据如下：</p>
+<p><strong>恒常性可以被单独破坏。</strong>在实验条件下剥夺距离信息（单眼、无纹理背景、无参照物），大小恒常显著下降，而绑定与持存不受同等影响——被试仍然把它当作一个东西，仍然认为它在遮挡后继续存在，只是判不准多大。</p>
+<p>⇒ <strong>稳定性下降而整体性与独立性保持</strong>，这是三项可分离的第一项证据。第 28、29 章将分别给出另外两项。</p>
+<p>⚠ 三项证据齐备之后（第 29 章 29.7），F10 才算被正面回应。<strong>在此之前，三项判据只是一个待检验的划分。</strong></p>
+<h3>27.7 一个跨领域的对照：制度里的稳定性</h3>
+<p>本编的三项判据不限于知觉。稳定性在制度层面有一个直接对应：<strong>科目的稳定。</strong></p>
+<p>一个会计科目、一个疾病分类码、一个考试评分标准，其存在的第一个条件就是&quot;同一情形每次落到同一格&quot;。评分者信度、编码一致性、跨年度可比性——这些都是 σ_in 的制度形态。</p>
+<p>而 27.3 的代价在这里同样成立：<strong>一个稳定的科目，把归入它的差别抹平了。</strong>两个被记入同一科目的事项，其差别在此后的所有报表中不再可见。⇒ 这与第 5 章 5.5 的诊断分类是同一件事，<strong>本书至此第四次遇到这个形式</strong>。</p>
+<p>⚠ 本书不由此推出任何制度批评。这里只是指出：<strong>三项判据在知觉与制度上是同一副骨架，因而本编的结论有跨领域的适用面</strong>——这一点在第七编会被用来说明本书的射程。</p>
+<h3>27.8 本章的证伪条件</h3>
+<p><strong>F30</strong> 若知觉恒常性可以被证明为纯粹的物理光学效应（即无需任何归因、无需任何参照序列即可产生），则 27.2 的&quot;恒常是归因&quot;失败，稳定性不再是被做出来的。</p>
+<p><strong>F31</strong> 若在稳定性被实验性破坏之后，整体性与独立性必然同等下降，则 27.6 的可分离性证据无效，F10 在第一项上失败。</p>
+<hr>
+<div class="nav"><a href="../c26/">← 上一章</a><a href="../../">目次</a><a href="../c28/">下一章 →</a></div>
+</div></body></html>
