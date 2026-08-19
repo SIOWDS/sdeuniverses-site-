@@ -558,6 +558,11 @@ const WDS_CHAT_PERMSG = 12000;         // 单条上限（原 1500：长答一律
 const CHAT_FIRST_MS = 90000;           // 首帧护栏，收到第一帧即撤（正常长思考不误杀）
 const CHAT_TOTAL_MS = 240000;
 const CHAT_TOTAL_LONG_MS = 420000;     // 读者点名要长篇时给更长的总时长
+// 关思考重答那一遍的时钟。它不烧思考，所以不能沿用满功率档的 90/240 秒——沿用就等于
+// 「第一遍等 240 秒、第二遍再等 240 秒」，读者面前是一个八分钟不动的转圈。
+const CHAT_RETRY_FIRST_MS = 45000, CHAT_RETRY_TOTAL_MS = 120000;
+// 零帧看门狗：上游多久没回第一个字就把这件事如实写进阶段名（只改说法，不掐流）。
+const ANS_NOFRAME_MS = 25000;
 function wdsVendorOf(v) { return WDS_VMAP[String(v || "").toLowerCase()] || "zhipu"; }
 function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
 // 读者自填的型号覆盖默认值。只放行像模型名的字符串，别让它变成往上游注入别的东西的口子。
@@ -7803,6 +7808,10 @@ export default {
             const clk = wdsClock(CHAT_FIRST_MS, askLen ? CHAT_TOTAL_LONG_MS : CHAT_TOTAL_MS);
             _st.pre = Math.round((Date.now() - _st.t0) / 1000);
             _stg("基底作答");
+            /* 零帧要说出来。读者盯着「正在想 45s · 基底作答」，分不出「它在想」和「它卡死了」——
+               而这两种的下一步完全不同（前者等，后者切标准档）。上游 25 秒还没回第一个字就把
+               阶段改成实话，心跳自会把它带出去。首帧一到立刻撤，正常长思考不误报。 */
+            let _nof = setTimeout(() => { if (!_st.think && !_st.out) _stg("基底作答·上游还没回第一个字"); }, ANS_NOFRAME_MS);
             let upstream;
             try {
               // 视觉档型号会改名/下线：认不出就沿备用名退一格重发一次（只在看图这条路上，且只退到列表用完）。
@@ -7830,7 +7839,7 @@ export default {
             let buf = "", outText = "";
             // ANSWER_DIAG：空答时唯一能查的东西。上游状态、收到几条流数据、上游给的收束理由、
             // 首帧长什么样、它自报烧了多少 token —— 没有这些，"只思考不写字"就永远只能靠猜。
-            const _cd = { lines: 0, finish: "", head: "", usage: null, err: false, status: upstream.status, cutThink: 0 };
+            const _cd = { lines: 0, finish: "", head: "", usage: null, err: false, cut: "", status: upstream.status, cutThink: 0 };
             /* 【思考额度看门狗】思考与正文吃同一份 max_tokens。等它把额度想光再兜底，
                要白等一两分钟——而那一两分钟正是流被平台无声掐死的窗口（isolate 的资源
                上限是共享的，掐断时连 error 都发不出，页面只看到「什么都没有」）。
@@ -7865,8 +7874,8 @@ export default {
                 if (j.usage) _cd.usage = j.usage;
                 if (j.choices && j.choices[0] && j.choices[0].finish_reason) _cd.finish = String(j.choices[0].finish_reason);
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) { clk.firstFrame(); if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-                if (d.content) { clk.firstFrame(); if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                if (d.reasoning_content) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; } if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                if (d.content) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; } if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
                 if (!outText && _st && _st.think > _thinkCap) { _cd.cutThink = _st.think; break; }
               }
               if (_cd.cutThink) { try { await reader.cancel(); } catch (e0) {} break; }
@@ -7875,9 +7884,16 @@ export default {
               // 中途断线（含被自己的时钟掐断）：已经写出来的一个字都不丢，只补一句说得出原因的说明。
               const why = clk.cut ? clk.why("作答") : ("流中断：" + (e && e.message));
               if (outText) controller.enqueue(_sseBytes({ t: "note", v: why + "——上面已写出的部分保留着，说一句「继续」就接着写。" }));
-              else { _cd.err = true; controller.enqueue(_sseBytes({ t: "error", v: why + "（可再问一次；深度档慢，可先用标准档）" })); }
+              /* ⚠⚠ 这里原来是 `_cd.err = true` ＋ 当场报错收工 —— 而下面「关思考重答」的闸写的是
+                 `!outText && !_cd.err`，于是**专为这种情形写的兜底，被触发它的那次错误自己关掉了**。
+                 上游一个字不回（满功率档最常见的死法）时，读者等满 90 秒只收到一句错误，
+                 那一遍不烧思考的重答根本没跑过 —— 这就是「45 秒零字、最后什么也没有」。
+                 /api/ask 那条路首帧掐断返回 soft、照样降档重来一遍，ChatSDE 是漏网的一条。
+                 现在改成：**无正文时只记下断因**（_cd.cut），err 留给上游真报错那一支，兜底照跑。 */
+              else _cd.cut = why;
             }
             clk.stop();
+            if (_nof) { clearTimeout(_nof); _nof = null; }
             // ── 空产出兜底 ─────────────────────────────────────────────────
             // 满功率档（reasoning_effort=max）会把整份 max_tokens 烧在思考上，正文一个字不出；
             // 上游这时并不报错，流干干净净地结束 —— 于是 worker 直接 fin()，客户端收到一条空流，
@@ -7893,12 +7909,16 @@ export default {
                 + (_cd.head ? (" · 首帧「" + _cd.head.replace(/\s+/g, " ").slice(0, 80) + "」") : "");
               controller.enqueue(_sseBytes({ t: "note", v: _cd.cutThink
                 ? ("这一答已经想了 " + _cd.cutThink + " 字、正文还是 0 字——不等它想完了，现在关掉思考重答一次…")
-                : "这一答只出了思考、正文 0 字，正在关掉思考重答一次…" }));
+                : (_cd.cut
+                  ? (_cd.cut + "——现在关掉思考重答一次（这一遍不烧思考，通常快得多）…")
+                  : "这一答只出了思考、正文 0 字，正在关掉思考重答一次…") }));
               _stg("关思考重答");
               // 重答不能原样再来一遍。常规问答：关思考＋压预算，逼它早点收住开始写；
               // 长篇请求（askLen）：只关思考，长度一个字不减 —— 降预算等于砍掉正文，那不是解药。
               const tok2 = askLen ? tokWant : Math.min(tokWant, 3000);
-              const clk2 = wdsClock(CHAT_FIRST_MS, CHAT_TOTAL_MS);
+              /* 这一遍思考是关掉的：90 秒首帧、240 秒总时长是按满功率给的账，搬到这里就成了
+                 「第一遍等 240 秒、第二遍再等 240 秒」。不烧思考还半分钟开不了口，就不会开口了。 */
+              const clk2 = wdsClock(CHAT_RETRY_FIRST_MS, CHAT_RETRY_TOTAL_MS);
               try {
                 const up2 = await fetch(VC.url, {
                   method: "POST",
@@ -7931,7 +7951,7 @@ export default {
               clk2.stop();
               if (!outText) {
                 controller.enqueue(_sseBytes({ t: "error", code: "empty",
-                  v: "两遍都没写出正文（第一遍只思考了 " + ((_st && _st.think) || 0) + " 字）。"
+                  v: "两遍都没写出正文（第一遍" + (_cd.cut ? ("：" + _cd.cut) : ("只思考了 " + ((_st && _st.think) || 0) + " 字")) + "）。"
                      + "这一场聊得越长、深度档越容易把额度耗在思考里：把顶部切到「标准」档再问一遍，或点「成文一篇」把这场凝出来后新开一场。\n" + dg }));
               }
             }

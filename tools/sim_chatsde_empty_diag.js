@@ -76,5 +76,52 @@ ok(/dgOk|dgCut/.test(M) && /流被截断（没收到收尾标记）/.test(M), "�
 // 一次失败只报一个死因（站内既有断言：不许两句死因同时出现）
 ok(!/t\("errCut"\)[\s\S]{0,120}t\("errEmptyNo"\)\s*\+/.test(M), "不许把两种死因拼在一句里");
 
+console.log("④ 首帧掐断之后，兜底那一遍必须还跑得到（2026-08-19 的病灶）");
+/* 病灶复述：上游一个字不回 ⇒ 90 秒时钟掐断 ⇒ 落进流内 catch ⇒ 原代码置 _cd.err=true 并当场报错收工。
+   而兜底的闸是 `!outText && !_cd.err` —— 专为这种情形写的那一遍重答，被触发它的那次错误自己关掉了。
+   这一节守的是：**掐断只记断因，不置 err；err 只留给上游流内真报错。** */
+ok(/^\s+else _cd\.cut = why;$/m.test(chatSeg),
+  "无正文的断线只记 _cd.cut（不再置 err、不再当场报错收工）");
+ok(!/else \{ _cd\.err = true; controller\.enqueue\(_sseBytes\(\{ t: "error", v: why/.test(chatSeg),
+  "旧写法（catch 里置 err 并报错）没有残留");
+ok((chatSeg.match(/_cd\.err = true;/g) || []).length === 1,
+  "chat 段里 _cd.err 只被置位一处（数带分号的真赋值，注释里提到不算），实得 " + (chatSeg.match(/_cd\.err = true;/g) || []).length);
+ok(/if \(j\.error\) \{ _cd\.err = true;/.test(chatSeg),
+  "唯一那一处置位是「上游流内真报错」——那才是不该自动重答的一支");
+ok(/if \(!outText && !_cd\.err\) \{/.test(chatSeg),
+  "兜底的闸仍在（_cd.cut 走得进去，_cd.err 仍被挡住）");
+ok(/cut: ""/.test(chatSeg), "_cd 带 cut 字段");
+ok(/_cd\.cut \+ "——现在关掉思考重答一次/.test(chatSeg),
+  "被掐断这一支有自己的开场白（与「只想不写」「撞线被掐」分开说）");
+ok(/两遍都没写出正文（第一遍" \+ \(_cd\.cut \?/.test(chatSeg),
+  "两遍都空时，第一遍的断因带进最终错误——不能丢掉诊断");
+
+console.log("⑤ 重答那一遍的时钟不许沿用满功率档的账");
+ok(/const CHAT_RETRY_FIRST_MS = (\d+), CHAT_RETRY_TOTAL_MS = (\d+);/.test(W), "重答专用时钟常数存在");
+{
+  var m1 = W.match(/const CHAT_RETRY_FIRST_MS = (\d+), CHAT_RETRY_TOTAL_MS = (\d+);/);
+  var m0f = W.match(/const CHAT_FIRST_MS = (\d+);/), m0t = W.match(/const CHAT_TOTAL_MS = (\d+);/);
+  ok(m1 && m0f && +m1[1] < +m0f[1], "重答首帧护栏比满功率档短（不烧思考还半分钟不开口就不会开口了）");
+  ok(m1 && m0t && +m1[2] < +m0t[1], "重答总时长比满功率档短（否则是 240＋240 的八分钟转圈）");
+}
+ok(/const clk2 = wdsClock\(CHAT_RETRY_FIRST_MS, CHAT_RETRY_TOTAL_MS\);/.test(chatSeg),
+  "clk2 真用的是重答那套常数");
+ok(!/const clk2 = wdsClock\(CHAT_FIRST_MS/.test(chatSeg), "没退回沿用 CHAT_FIRST_MS 的老写法");
+
+console.log("⑥ 零帧看门狗：45 秒零字要说出是「还没回第一个字」");
+ok(/const ANS_NOFRAME_MS = (\d+);/.test(W), "零帧看门狗常数存在");
+{
+  var m2 = W.match(/const ANS_NOFRAME_MS = (\d+);/), m3 = W.match(/const CHAT_FIRST_MS = (\d+);/);
+  ok(m2 && m3 && +m2[1] < +m3[1], "看门狗早于首帧护栏开口（晚于它就永远轮不到）");
+}
+ok(/^\s+let _nof = setTimeout\(\(\) => \{ if \(!_st\.think && !_st\.out\) _stg\("基底作答·上游还没回第一个字"\); \}, ANS_NOFRAME_MS\);$/m.test(chatSeg),
+  "看门狗接在「基底作答」之后（注释掉当场红）");
+ok((chatSeg.match(/if \(_nof\) \{ clearTimeout\(_nof\); _nof = null; \}/g) || []).length === 3,
+  "首帧（think/content 两处）与收流后各撤一次，实得 " + (chatSeg.match(/if \(_nof\) \{ clearTimeout\(_nof\); _nof = null; \}/g) || []).length);
+ok(/d\.reasoning_content\) \{ clk\.firstFrame\(\); if \(_nof\)/.test(chatSeg) && /d\.content\) \{ clk\.firstFrame\(\); if \(_nof\)/.test(chatSeg),
+  "撤看门狗与撤首帧护栏钉在同一处——正常长思考不会被误报成卡死");
+ok(!/_stg\("基底作答·上游还没回第一个字"\)[\s\S]{0,200}ac\.abort|_nof[\s\S]{0,60}abort/.test(chatSeg),
+  "看门狗只改说法、不掐流（掐流是时钟的活）");
+
 console.log("\n" + (FAIL ? "✗ " : "✓ ") + PASS + " 项通过，" + FAIL + " 项失败");
 process.exit(FAIL ? 1 : 0);
