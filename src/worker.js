@@ -10491,7 +10491,25 @@ export default {
       // 不带尾斜杠也认，取的是 /browse/ 那一页本身（不是根那份）
       assetReq = new Request(new URL("/browse/", url), request);
     }
-    const resp = await env.ASSETS.fetch(assetReq);
+    // ── 二级域名分站（2026-08-19 起）────────────────────────────────
+    // health.sdeuniverses.com → public/sites/health/。规矩只有一条：
+    // **先按 /sites/<名>/ 找一遍，没有再按原路径找主站那一份。**
+    // 于是分站有自己的首页与目录页，而 /students/… /books/… /assets/… /api/…
+    // 在分站域名下照旧可用，读者点开一篇论文不会被踢回裸域名。
+    // 加一个分站 = 在 SUBSITES 里加一行，别处不用动。
+    // 回落到主站内容时给一个 canonical 响应头，指回裸域名那一份，免得同一篇正文
+    // 在两个域名下各算一次（搜索引擎按重复内容处理）。
+    const SUBSITES = { health: "/sites/health" };
+    const subHost = url.hostname.toLowerCase();
+    const subPrefix = /\.sdeuniverses\.com$/.test(subHost) ? (SUBSITES[subHost.split(".")[0]] || null) : null;
+    let resp = null;
+    if (subPrefix && url.pathname.indexOf(subPrefix + "/") !== 0) {
+      const cand = await env.ASSETS.fetch(new Request(new URL(subPrefix + url.pathname, url), assetReq));
+      if (cand.status < 400) resp = cand;
+      else { try { if (cand.body) await cand.body.cancel(); } catch (e) {} }
+    }
+    const subFellBack = !!subPrefix && !resp;
+    if (!resp) resp = await env.ASSETS.fetch(assetReq);
     const ct = resp.headers.get("content-type") || "";
     if (ct.includes("text/html")) {
       const r = new Response(resp.body, resp);
@@ -10506,6 +10524,7 @@ export default {
       r.headers.delete("last-modified");
       // 版本可验证：每次响应盖实时时间戳，线上一眼看出服务的是不是最新版。
       r.headers.set("x-served-at", new Date().toISOString());
+      if (subFellBack) r.headers.set("link", "<https://sdeuniverses.com" + url.pathname + ">; rel=\"canonical\"");
       return r;
     }
     // 图片/字体/媒体：内容几乎不变，给 30 天缓存，省掉每次访问的 304 协商往返。
