@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>暂时没有网络 · 爱思乐园</title>
+<meta name="theme-color" content="#0C0906">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#0C0906;color:#E8E4DA;min-height:100%}
+body{font-family:'Noto Serif SC','Songti SC',Georgia,serif;line-height:1.9;
+     display:flex;align-items:center;justify-content:center;padding:10vh 6vw;text-align:center}
+.wrap{max-width:520px}
+img{width:76px;height:76px;opacity:.9;margin-bottom:1.6rem}
+h1{font-size:1.5rem;font-weight:600;letter-spacing:.04em}
+p{color:#9A9384;font-size:.95rem;margin-top:.9rem}
+button{margin-top:2rem;padding:.8rem 1.8rem;background:none;color:#E8E4DA;cursor:pointer;
+  border:1px solid rgba(232,228,218,.24);border-radius:999px;font:inherit;font-size:.9rem}
+button:hover{color:#F0DCA6;border-color:rgba(240,220,166,.5)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img src="/assets/app/icon-192.png" alt="爱思乐园">
+  <h1>暂时连不上网络</h1>
+  <p>爱思乐园的正文一律实时取自站上，不在本机留副本——<br>所以断网时读不到，这是刻意的：你看到的永远是最新那一版。</p>
+  <button onclick="location.reload()">重试</button>
+</div>
+<script>
+addEventListener("online", function () { location.reload(); });
+</script>
+</body>
+</html>

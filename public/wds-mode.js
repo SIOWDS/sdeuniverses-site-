@@ -7522,3 +7522,19 @@
   updTurns();
   if (PAGE) open();
 })();
+
+/* ── 装到手机桌面（PWA）────────────────────────────────────────────
+   全站 4000+ 页都引本脚本，所以由它把 /assets/pwa.js 带进来一次：
+   manifest、iOS 图标与 meta、Service Worker 注册全在那一支里。
+   放在最后、异步加载 —— 它与 ChatSDE 毫无关系，不能挡本脚本任何一步。
+   已经手写过 <link rel="manifest"> 的页面（如首页、/app/）会被那支脚本
+   自己的 __sdePWA 幂等锁挡掉，不会注两遍。 */
+(function () {
+  try {
+    if (window.__sdePWA) return;
+    if (document.querySelector('script[src="/assets/pwa.js"]')) return;
+    var s = document.createElement("script");
+    s.src = "/assets/pwa.js"; s.async = true;
+    (document.head || document.documentElement).appendChild(s);
+  } catch (e) {}
+})();

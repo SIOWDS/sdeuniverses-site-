@@ -14,7 +14,18 @@
      2026-08-18 起这一页是**独立的轻量入口页**（约 5KB）——旧口径里入口是盖在
      893KB 长卷上的一层，进站看一眼门就得先把整卷下下来。长卷已迁 /overview/，
      浏览页换成 /browse/ 的栏目总目录，这一页只剩门本身。 -->
+<!-- 装到手机桌面（PWA）：manifest + 图标 + 主题色。入口页静态写死，不靠脚本；
+     其余几千页由 wds-mode.js 引 /assets/pwa.js 动态注入同一份。 -->
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/assets/app/apple-touch-icon.png">
+<link rel="icon" href="/assets/app/favicon-32.png" sizes="32x32">
+<meta name="theme-color" content="#0C0906">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="爱思乐园">
 <script src="/assets/sde-portal.js"></script>
+<script src="/assets/pwa.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:#0C0906;color:#E8E4DA;min-height:100%}
@@ -50,7 +61,7 @@ body{font-family:'Noto Serif SC','Songti SC',Georgia,serif;line-height:1.8;
     <a class="c3" href="/sde-wechat/"><b>SDE 社区</b><span>群聊 · 私聊 · 会议 · 广场</span></a>
   </div>
   <p class="more">
-    <a href="/today/">今日文章</a>·<a href="/paradigm/">每日必读</a>·<a href="/confluence/">学科通融</a>·<a href="/frontier/">新思想前沿</a>·<a href="/students/">学员专栏</a>·<a href="/search/">全站检索</a>·<a href="/about/">平台介绍</a>
+    <a href="/today/">今日文章</a>·<a href="/paradigm/">每日必读</a>·<a href="/confluence/">学科通融</a>·<a href="/frontier/">新思想前沿</a>·<a href="/students/">学员专栏</a>·<a href="/search/">全站检索</a>·<a href="/about/">平台介绍</a>·<a href="/app/">装到手机桌面</a>
   </p>
 </main>
 </body>

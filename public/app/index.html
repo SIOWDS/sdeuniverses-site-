@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>装到手机桌面 · 爱思乐园 SDE Universes</title>
+<meta name="description" content="把爱思乐园（sdeuniverses.com）装到手机桌面：安卓一键安装，iPhone 用 Safari 分享菜单添加到主屏幕。装好后全屏打开，无地址栏，内容随站更新。">
+<link rel="canonical" href="https://sdeuniverses.com/app/">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/assets/app/apple-touch-icon.png">
+<meta name="theme-color" content="#0C0906">
+<script src="/assets/pwa.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#0C0906;color:#E8E4DA}
+body{font-family:'Noto Serif SC','Songti SC',Georgia,serif;line-height:1.9;padding:6vh 5vw 12vh}
+.wrap{max-width:720px;margin:0 auto}
+.top{display:flex;align-items:center;gap:16px;margin-bottom:2.4rem}
+.top img{width:64px;height:64px;border-radius:14px}
+.eyebrow{font-size:.7rem;letter-spacing:.34em;color:#A98A4B}
+h1{font-size:clamp(1.5rem,4.6vw,2.1rem);font-weight:600;letter-spacing:.03em;margin-top:.3rem}
+.lead{color:#9A9384;font-size:.95rem;margin-bottom:2.2rem}
+.tabs{display:flex;gap:.5rem;margin-bottom:1.6rem;flex-wrap:wrap}
+.tabs button{padding:.55rem 1.1rem;background:none;color:#9AA6B2;cursor:pointer;font:inherit;font-size:.85rem;
+  border:1px solid rgba(255,255,255,.14);border-radius:999px;transition:all .18s}
+.tabs button.on{color:#F0DCA6;border-color:rgba(240,220,166,.55);background:rgba(240,220,166,.06)}
+.panel{display:none;border:1px solid rgba(232,228,218,.13);border-radius:4px;padding:1.5rem 1.4rem;background:rgba(255,255,255,.02)}
+.panel.on{display:block}
+.panel h2{font-size:1.05rem;font-weight:600;margin-bottom:.9rem;color:#E8E4DA}
+ol{margin:0 0 0 1.2rem}
+ol li{margin-bottom:.7rem;font-size:.94rem}
+kbd{font-family:inherit;color:#F0DCA6;border-bottom:1px dotted rgba(240,220,166,.5);padding-bottom:1px}
+.note{font-size:.85rem;color:#7E7768;margin-top:1rem;border-left:2px solid rgba(169,138,75,.4);padding-left:.9rem}
+#go{display:none;margin:1.2rem 0 .4rem;padding:.85rem 1.9rem;border:1px solid rgba(240,220,166,.55);
+  border-radius:999px;background:rgba(240,220,166,.08);color:#F0DCA6;font:inherit;font-size:.95rem;cursor:pointer}
+#go:hover{background:rgba(240,220,166,.16)}
+#done{display:none;margin-bottom:2rem;padding:1rem 1.2rem;border:1px solid rgba(79,182,178,.4);
+  border-radius:4px;color:#8FD2CF;font-size:.9rem;background:rgba(79,182,178,.06)}
+.after{margin-top:2.6rem}
+.after h3{font-size:.95rem;color:#A98A4B;letter-spacing:.1em;margin-bottom:.8rem}
+.after ul{margin-left:1.1rem;color:#9A9384;font-size:.9rem}
+.after li{margin-bottom:.5rem}
+.back{display:inline-block;margin-top:2.8rem;color:#C9A227;text-decoration:none;font-size:.88rem}
+.back:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <img src="/assets/app/icon-192.png" alt="爱思乐园图标">
+    <div>
+      <div class="eyebrow">SDE UNIVERSES</div>
+      <h1>把爱思乐园装到手机桌面</h1>
+    </div>
+  </div>
+
+  <p class="lead">装好之后，桌面上会多一个图标；点开是全屏的，没有地址栏，和从应用商店下的 App 用起来一样。
+  它不占应用商店那份空间，正文也一律实时取自站上——站上改了什么，你下次打开就是新的。</p>
+
+  <div id="done">你现在就是从桌面图标打开的，已经装好了。</div>
+
+  <div class="tabs">
+    <button data-t="android">安卓手机</button>
+    <button data-t="ios">iPhone / iPad</button>
+    <button data-t="desktop">电脑</button>
+  </div>
+
+  <div class="panel" id="p-android">
+    <h2>安卓：Chrome / Edge / 三星浏览器</h2>
+    <button id="go">一键安装到桌面</button>
+    <ol>
+      <li>若上面没有出现安装按钮，点浏览器右上角的 <kbd>⋮</kbd> 菜单。</li>
+      <li>选 <kbd>安装应用</kbd> 或 <kbd>添加到主屏幕</kbd>。</li>
+      <li>确认名称「爱思乐园」，点<kbd>安装</kbd>——桌面上就有了。</li>
+    </ol>
+    <p class="note">从微信、QQ、微博里打开这一页是装不了的，那是它们自带的浏览器。
+    请点右上角菜单选「在浏览器打开」，再回到这一页。</p>
+  </div>
+
+  <div class="panel" id="p-ios">
+    <h2>iPhone / iPad：必须用 Safari</h2>
+    <ol>
+      <li>用 <kbd>Safari</kbd> 打开 <kbd>sdeuniverses.com/app/</kbd>（微信、Chrome 都不行，苹果只允许 Safari 添加）。</li>
+      <li>点屏幕下方正中的<kbd>分享</kbd>按钮（方框里一支向上的箭头）。</li>
+      <li>在菜单里往下翻，选 <kbd>添加到主屏幕</kbd>。</li>
+      <li>右上角点<kbd>添加</kbd>——桌面上就有了那个三角图标。</li>
+    </ol>
+    <p class="note">苹果不给网页「一键安装」的权限，这四步是它唯一的路子，别处也一样。</p>
+  </div>
+
+  <div class="panel" id="p-desktop">
+    <h2>电脑：Chrome / Edge</h2>
+    <button id="go2" style="display:none"></button>
+    <ol>
+      <li>看地址栏右侧，有一个<kbd>安装</kbd>图标（显示器带下箭头，或 <kbd>⊕</kbd>）。</li>
+      <li>点它，再点<kbd>安装</kbd>。</li>
+      <li>没有这个图标就走 <kbd>⋮</kbd> 菜单 → <kbd>投放、保存和共享</kbd> → <kbd>安装页面为应用</kbd>。</li>
+    </ol>
+    <p class="note">装好后它有自己的窗口和任务栏图标，和别的软件并排放。</p>
+  </div>
+
+  <div class="after">
+    <h3>装好之后</h3>
+    <ul>
+      <li><b>长按桌面图标</b>可以直接跳四个地方：SDE 浏览 · SDE 对话 · SDE 社区 · 全站检索。</li>
+      <li>不必再管「强刷」——App 里读到的永远是站上最新那一版。</li>
+      <li>断网时打开会看到一张离线提示页，联网后自动恢复。</li>
+      <li>要卸载：长按图标 → 卸载 / 移除，和普通 App 一样。</li>
+    </ul>
+  </div>
+
+  <a class="back" href="/home/">‹ 回入口</a>
+</div>
+
+<script>
+(function () {
+  var tabs = document.querySelectorAll(".tabs button");
+  function show(t) {
+    for (var i = 0; i < tabs.length; i++) tabs[i].className = (tabs[i].dataset.t === t) ? "on" : "";
+    var ps = document.querySelectorAll(".panel");
+    for (var j = 0; j < ps.length; j++) ps[j].className = (ps[j].id === "p-" + t) ? "panel on" : "panel";
+  }
+  for (var i = 0; i < tabs.length; i++)
+    tabs[i].addEventListener("click", function () { show(this.dataset.t); });
+
+  // 按当前设备默认选中哪一栏
+  var ua = navigator.userAgent || "";
+  var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/.test(ua);
+  show(isIOS ? "ios" : (isAndroid ? "android" : "desktop"));
+
+  // 已经装成 App 打开的，直接告诉他不用再装
+  try {
+    if ((window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+        navigator.standalone === true) document.getElementById("done").style.display = "block";
+  } catch (e) {}
+
+  // 一键安装：pwa.js 接住 beforeinstallprompt 后存在 window.__sdeInstall。
+  // 这一页可能在事件之前就画完了，所以两头都要接：现成的直接显示，晚到的听事件。
+  var go = document.getElementById("go");
+  function arm() {
+    if (!window.__sdeInstall) return;
+    go.style.display = "inline-block";
+    show(isIOS ? "ios" : "android");
+  }
+  go.addEventListener("click", function () {
+    var p = window.__sdeInstall;
+    if (!p) return;
+    go.disabled = true;
+    p.prompt();
+    (p.userChoice || Promise.resolve({})).then(function (r) {
+      go.disabled = false;
+      if (r && r.outcome === "accepted") {
+        go.style.display = "none";
+        document.getElementById("done").style.display = "block";
+      }
+    });
+    window.__sdeInstall = null;
+  });
+  window.addEventListener("sde:installable", arm);
+  window.addEventListener("sde:installed", function () {
+    go.style.display = "none";
+    document.getElementById("done").style.display = "block";
+  });
+  arm();
+})();
+</script>
+</body>
+</html>

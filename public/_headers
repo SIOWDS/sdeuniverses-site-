@@ -57,3 +57,14 @@
   Cache-Control: no-cache
 /js/home-5.js
   Cache-Control: no-cache
+
+# 装到手机桌面（PWA）三件套：改一次要立刻生效，不能被缓存住。
+# sw.js 尤其——浏览器缓存住旧 SW，等于装了 App 的人被钉在旧逻辑上，
+# 而他连"强刷"这个动作都没有（App 里没有地址栏）。
+/sw.js
+  Cache-Control: no-cache
+  Service-Worker-Allowed: /
+/manifest.json
+  Cache-Control: no-cache
+/assets/pwa.js
+  Cache-Control: no-cache

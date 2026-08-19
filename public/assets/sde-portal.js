@@ -712,6 +712,21 @@
     about.href = ABOUT;
     about.textContent = T("\u5e73\u53f0\u4ecb\u7ecd \u203a", "About the platform \u203a");
     foot.appendChild(about);
+    /* 第二颗：装到手机桌面。只在「还没装」时露面——已经从桌面图标打开的人
+       再看见"装到桌面"是荒唐的。同样是真链接（/app/ 是一整页图文说明），
+       不在门上弹窗：门的职责是分三路，不是拦住人推东西。 */
+    try {
+      var inApp = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+                  window.navigator.standalone === true;
+      if (!inApp) {
+        var inst = document.createElement("a");
+        inst.className = "sdep-skip";
+        inst.style.marginLeft = "8px";
+        inst.href = "/app/";
+        inst.textContent = T("\u88c5\u5230\u624b\u673a\u684c\u9762 \u203a", "Install as app \u203a");
+        foot.appendChild(inst);
+      }
+    } catch (e) {}
     box.appendChild(foot);
 
     document.body.appendChild(box);
