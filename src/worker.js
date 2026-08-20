@@ -2480,8 +2480,22 @@ export class IndexMemory {
     if (op === "status") return this._json(this._status());
     if (op === "ensure") return this._json(await this._ensure(b.force === true));
     if (op === "query") {
-      // 查询绝不等重建：老表照常应答，重建在 alarm 里自己跑。
-      this._ensure(false).catch(() => {});
+      /* 🔴🔴 【2026-08-21：查询不再触发重建 —— 这是把 Durable Object 额度写爆的那个口子】
+         [stated] 用户令：「每天 reindex 一次，自动的，每天固定时间。」
+         旧写法是每次查询都 fire-and-forget 触发一次指纹复验，而复验的判据只有一条：
+         R2 上 `search/manifest.json` 的 etag 变没变。**而每一次 push 之后 CI 都会重建搜索索引
+         并 sync 到 R2 —— 指纹必变。** 于是：推一次站 ⇒ 下一个检索的人替全站扛一次全量重建。
+         这张表的实测规模是 docs 4488 / **terms 29 万行**（见下面 alarm 里那段血案注释），
+         而免费档的额度是 **10 万行/天** —— **一次重建就是当天额度的 2.9 倍，一次就爆。**
+         2026-08-21 一天推了八次，站上计数、留言、系统密钥、心得存储全跟着躺下，
+         而症状是「智能问答很快就停止」，谁也想不到根子在这里。
+         💡 心法：**「源头变了就重建」这种判据，要先算一遍「源头一天变几次、一次重建多贵」。**
+            两个数一乘，才知道它是省事还是灾难。
+         ⇒ 现在只留一处冷启动兜底：**表是空的**才建（不然新部署后永远建不起来，
+           而定时那一趟要等到明天）。日常重建交给每日定时器（见 scheduled）。 */
+      let _n0 = 0;
+      try { _n0 = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n; } catch (e) {}
+      if (!_n0) this._ensure(false).catch(() => {});
       return this._json(this._query(b));
     }
     return this._json({ ok: false, why: "unknown op" });
@@ -2512,8 +2526,9 @@ export class IndexMemory {
        还自称 fresh，此后再也不肯重建 —— 只能靠 force 破，而 force 是要口令的。
        ⇒ fresh 的判据必须三条同时成立：指纹没变 **且** 表里真有东西 **且** 上一趟没留错。
        💡 心法：**判「新不新」不能只看源头的指纹，还要看自己手里那份成不成立。**
-       退避：留着错时不许每次查询都重试一遍（_query 每次都会 fire-and-forget 触发这里），
-       十分钟一次足够自愈，又不会把 R2 打成筛子。 */
+       退避：留着错时不许一遍遍重试，十分钟一次足够自愈，又不会把 R2 打成筛子。
+       ⚠ 2026-08-21 起 `_query` **不再**每次触发这里（那是写爆 DO 额度的口子，见 query 分支），
+         只剩三个入口：每日定时器、冷启动兜底（表空）、以及带口令的手动 force。 */
     const _n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
     const _err = this._get("err");
     if (_err) {
@@ -6885,6 +6900,15 @@ export default {
     if (env) { IM_ENV = env; if (env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
     const r = await wxSweep(env, Date.now());
     console.log("[wx-lib-sweep]", JSON.stringify(r));
+    /* 【每日一次的索引重建 —— 2026-08-21 用户令】
+       从前它挂在「每次检索」上，一天推八次站就重建八次，每次 29 万行，把 DO 额度写爆
+       （详见 IndexMemory 的 query 分支那段）。现在整条日常重建路只剩这一趟。
+       · 用 `op:"ensure"` 而**不是** force：它仍是指纹复验式的——源头没变就什么都不做，
+         所以这一趟本身是幂等的、廉价的，多跑一次也不会多写一行。
+       · 排队即返回（真正的活在 DO 自己的 alarm 里分片跑），不占这次定时任务的时间。
+       · 失败不抛：idxAsk 内部吞掉并回 null，定时任务不能因为它而整个红掉。 */
+    const ir = await idxAsk(env, { op: "ensure" });
+    console.log("[idx-daily]", JSON.stringify(ir));
   },
   async fetch(request, env, ctx) {
     if (env) { IM_ENV = env; if (env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
