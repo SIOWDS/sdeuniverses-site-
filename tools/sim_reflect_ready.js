@@ -81,8 +81,14 @@ ok(/if \(!reflect && KEY && !reflectStoreDown\(\)\) \{[\s\S]{0,600}ensureReflect
    "快路落空、手上有 Key、且存储写得进去 ⇒ **就地现写一份**（[stated] 用户令「必须有心得，不能打折」）");
 /* 报进度的话只在真要去做那件事时才说：存储躺着时先喊「正在现写一份」、
    紧接着又说「不再重复生成」，两句话打架，读者只会以为出了别的错。 */
-ok(DBLK.indexOf("!reflectStoreDown()") < DBLK.indexOf("正在现写一份"),
-   "判定排在那句进度话之前（不许先喊要写、再说不写）");
+/* ⚠ 判据不许用那句话的字面去比位置——**注释里就写着它**，indexOf 会先命中注释。
+   这个坑本文件家族已经踩过三次（sim_paper_half_guard／sim_paper_four_parts／这里）。
+   改用只在代码里出现的形状：那一行 if，与发进度帧的 `_stat("📝` 。 */
+{
+  const _iIf = DBLK.indexOf("if (!reflect && KEY && !reflectStoreDown()) {");
+  const _iSay = DBLK.indexOf('_stat("📝');
+  ok(_iIf > 0 && _iSay > _iIf, "判定排在那句进度话之前（不许先喊要写、再说不写）");
+}
 ok(/_reflectMs = Date\.now\(\) - _rt0;/.test(DBLK), "记下这次生成花了多久");
 /* 关键的一条：这次生成是**一次性投资**（写好即存 DO、全站复用），
    不该由这一刀的写作窗口买单。不扣，等于用「补心得」换来「稿子写一半被掐」。 */
