@@ -77,8 +77,12 @@ const DBLK = iD >= 0 ? W.slice(iD, iD + 2600) : "";
 ok(!!DBLK, "抠得出答题那一段的装载块");
 ok(/let reflect = await ensureReflect\(env, url, vendor, VC, KEY, false\);/.test(DBLK),
    "先走一遍不生成的快路（有现成的就秒返回，不必每次都走生成那条重路）");
-ok(/if \(!reflect && KEY\) \{[\s\S]{0,600}ensureReflect\(env, url, vendor, VC, KEY, true\)/.test(DBLK),
-   "快路落空且手上有 Key ⇒ **就地现写一份**（[stated] 用户令「必须有心得，不能打折」）");
+ok(/if \(!reflect && KEY && !reflectStoreDown\(\)\) \{[\s\S]{0,600}ensureReflect\(env, url, vendor, VC, KEY, true\)/.test(DBLK),
+   "快路落空、手上有 Key、且存储写得进去 ⇒ **就地现写一份**（[stated] 用户令「必须有心得，不能打折」）");
+/* 报进度的话只在真要去做那件事时才说：存储躺着时先喊「正在现写一份」、
+   紧接着又说「不再重复生成」，两句话打架，读者只会以为出了别的错。 */
+ok(DBLK.indexOf("!reflectStoreDown()") < DBLK.indexOf("正在现写一份"),
+   "判定排在那句进度话之前（不许先喊要写、再说不写）");
 ok(/_reflectMs = Date\.now\(\) - _rt0;/.test(DBLK), "记下这次生成花了多久");
 /* 关键的一条：这次生成是**一次性投资**（写好即存 DO、全站复用），
    不该由这一刀的写作窗口买单。不扣，等于用「补心得」换来「稿子写一半被掐」。 */

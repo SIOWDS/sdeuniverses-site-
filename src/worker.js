@@ -5976,7 +5976,10 @@ async function askCore(request, env, url, body, SINK) {
        降级仍然保留：真生成不出来（没 Key、基底报错），照常只装内功作答并把**真因**说出来，
        不再是一句没有信息的「提智会打折」。 */
     let reflect = await ensureReflect(env, url, vendor, VC, KEY, false);
-    if (!reflect && KEY) {
+    /* ⚠ 判定要排在那句话**之前**：存储躺着时它根本不会生成，而屏幕上却先说了一句
+       「正在现写一份」，紧接着又说「不再重复生成」——两句话打架，读者只会以为出了别的错。
+       报进度的话，只在真的要去做那件事时才说。 */
+    if (!reflect && KEY && !reflectStoreDown()) {
       const _rt0 = Date.now();
       _stat("📝 这个基底还没有心得——正在现写一份（约一分钟，只此一次；写好后存下来全站复用，不占本次写作时间）…");
       try { reflect = await ensureReflect(env, url, vendor, VC, KEY, true); } catch (e) {}
