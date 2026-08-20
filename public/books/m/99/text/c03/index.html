@@ -322,7 +322,7 @@ footer{border-top:1px solid var(--line);padding:30px 0 60px;color:var(--mute);fo
 <h3 style="font-size:19px;margin:1.9em 0 .5em">附录一 · 清点手册</h3>
 <p>读数名一：隐撤期符号：τ 定义：自一次表达进入某记录体系之时起，至该体系中“撤除此表达”这一动作必然在公开可查处留下至少一项可判读痕迹之时止，其间的时长。N 的取法：以该体系公开文档或接口行为为准，不以个案推断。</p>
 <p>粒度：什么算一次“表达”，随体系而定，须逐体系写死。软件包体系取一个版本号；议事记录取一次发言；通讯系统取一条消息。边界例子：一个软件包在同一天发布 1.0.0 与 1.0.1，其中 1.0.1 只改了一个字符——算两次表达。理由：该体系为它们各分配了一个不可重用的位。若某体系允许原地覆盖而不分配新位，则覆盖不计为新表达，而计为一次撤除加一次表达，且该体系的 τ 判为零以上。</p>
-<p>编码规则： 1. 只计公开接口可得的信息，不计需要授权才能取得的信息。 2. “可判读痕迹”须满足：不依赖对该体系的先验知识即可辨认。仅凭序列断口推断的，不计为痕迹。 3. 日期式版本号（形如 2022.5.18，主号大于等于一千）一律排除出序列断口的统计。 4. 同一表达在多个体系中出现时，逐体系分别计，不合并。 5. 撤除者的身份不计入，本读数不区分自撤与他撤。 6. 时限以体系公布的规则为上界，以实测到的最早留痕为下界，二者之间以区间报告，不取中点。</p>
+<p>编码规则：</p><p class="li" style="margin:0 0 .45em;padding-left:1.4em;text-indent:-1.4em">1.　只计公开接口可得的信息，不计需要授权才能取得的信息。</p><p class="li" style="margin:0 0 .45em;padding-left:1.4em;text-indent:-1.4em">2.　“可判读痕迹”须满足：不依赖对该体系的先验知识即可辨认。仅凭序列断口推断的，不计为痕迹。</p><p class="li" style="margin:0 0 .45em;padding-left:1.4em;text-indent:-1.4em">3.　日期式版本号（形如 2022.5.18，主号大于等于一千）一律排除出序列断口的统计。</p><p class="li" style="margin:0 0 .45em;padding-left:1.4em;text-indent:-1.4em">4.　同一表达在多个体系中出现时，逐体系分别计，不合并。</p><p class="li" style="margin:0 0 .45em;padding-left:1.4em;text-indent:-1.4em">5.　撤除者的身份不计入，本读数不区分自撤与他撤。</p><p class="li" style="margin:0 0 .45em;padding-left:1.4em;text-indent:-1.4em">6.　时限以体系公布的规则为上界，以实测到的最早留痕为下界，二者之间以区间报告，不取中点。</p>
 <p>表头（可直接拿去做一张空表）：体系名｜表达单位｜规则上界｜实测下界｜第二段痕迹类型｜第三段是否存在｜取数日期｜编码规则版本</p>
 <p>不适用：不产生可清点条目的表达；记录不公开的体系；痕迹持有者不可枚举的情形。</p>
 <p>读数名二：隐撤清单定义：在某记录体系中，落在第二段与第三段、可被逐条核对的已撤除表达的名录。本清单在原理上不包含第一段。</p>
@@ -361,7 +361,7 @@ footer{border-top:1px solid var(--line);padding:30px 0 60px;color:var(--mute);fo
 <p style="margin:.35em 0;padding-left:1.6em;text-indent:-1.6em">Congressional Research Service. A User’s Guide to the Congressional Record. Report 98-265 GOV. U.S. Government Publishing Office.</p>
 <p style="margin:.35em 0;padding-left:1.6em;text-indent:-1.6em">Congressional Record, Extensions of Remarks, 说明栏（关于插入而非说出内容的排印标记）。 U.S. House of Representatives. House Practice: A Guide to the Rules, Precedents and Procedures of the House, ch. on the Congressional Record.</p>
 </div>
-<p style="font-size:13.5px;color:var(--mute)">字数与版本 正文约一万九千汉字（不含附录与</p>
+<p style="font-size:13.5px;color:var(--mute)">字数与版本　正文约一万九千汉字（不含附录与本章参考文献）。本稿为第一版，取数日期二〇二六年八月十八日。若本章的任何读数被后续取数推翻，以后取者为准，本章不作辩护。</p>
 <h3 style="font-size:19px;margin:1.9em 0 .5em">补记 · 成书时回填</h3>
 <p>本章成文在先，本书第四编成于其后。以下两处按「以今日为准」补入：正文一字未删，凡与本补记冲突之处，以本补记为准。本章原有的伦理三条，以第十二章 12.4 的全书三条为准；本章读数的验收，依第十二章 12.5 的「栏的验收」——一栏是否真的开出来了，不看它在模板上有没有，看它的取值在同一体系内跨时间有没有变化。</p>
 <p>一 · 与其他各章的分界与第八章（退出栏）。</p>
@@ -374,10 +374,6 @@ footer{border-top:1px solid var(--line);padding:30px 0 60px;color:var(--mute);fo
 <p>隐撤期既可被技术副产品拉长（如依赖解析所需的只增时间表），也可被技术选择直接清零（如墓碑）；制度意图在两侧都不是决定项。</p>
 <p>这一改使本章的适用范围缩小，同时使预测变硬：凡宣称以保护表达为由延长或缩短撤回时限的体系，本章预测其实际隐撤期主要由其存储与解析结构决定，与该宣称无关。</p>
 <p>另须与引用腐烂分开：被引用的网络资源随时间失效，那里没有人做过撤除动作，是链路两端各自演化的结果，不属本章。</p>
-<h3 style="font-size:19px;margin:1.9em 0 .5em">本章参考文献</h3>
-<div style="font-size:13.5px;color:#C3CCDA;line-height:1.75">
-<p style="margin:.35em 0;padding-left:1.6em;text-indent:-1.6em">）。本稿为第一版，取数日期二〇二六年八月十八日。若本章的任何读数被后续取数推翻，以后取者为准，本章不作辩护。</p>
-</div>
 <p style="font-size:13.5px;color:var(--mute)">人机分工声明 选题、判断与全部主张由作者确定。文献检索、公开接口取数、统计脚本编写与两处方法学缺陷的排查由人工智能助手协助完成；预注册在取数之前由作者写定。全部数据可按附录二复算，复算不需要任何授权凭证。第十节所记的三处修订，均由取数结果推翻作者原有主张后写入，非事后追加。</p>
 </div>
 <div class="pn"><span><a href="../c02/">← 第一章　借同</a></span><span><a href="../c04/">第三章　叠归 →</a></span></div>
