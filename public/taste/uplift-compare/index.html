@@ -145,7 +145,7 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:40px;padding:22px 
         </div>
       </div>
       <div>
-        <button class="ghost" id="btnEval" type="button" title="用一把与门派无关的科学创新度量表，让基底盲评两栏对话各自产出了哪些创新并给出对照读数——工作台用，不上站">⚖ 科学创新度对照</button>
+        <button class="ghost" id="btnEval" type="button" title="用一把与门派无关的科学创新度尺子，让基底盲评两栏对话谁的创新智商更高">⚖ 科学创新智商评估</button>
         <button class="ghost" id="btnReset" type="button">清空两栏对话</button>
       </div>
     </div>
@@ -174,7 +174,7 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:40px;padding:22px 
     </div>
     <div class="barMeta">
       <div class="roundTag">大模型 <b id="roundNow">0</b> 轮 · WDS <b id="roundNowW">0</b> 轮 · 各栏独立提问、各自累加记忆 · 每栏上限 100 轮</div>
-      <div class="hint" style="margin:0">两栏各聊各的、各记各的轮次；想公平对比时用「同问两栏」把同一句发两边。　聊完点每栏标题栏的「成文」，可把该栏对话总结成 5 千 / 1 万字的正式论文。　两栏都聊过后，点顶部「⚖ 科学创新度对照」可让基底盲评两栏各自产出了哪些创新并给出对照读数（用一把与门派无关的科学量表，不用 SDE 自家的；读数只在这里看，不随文章上站）。</div>
+      <div class="hint" style="margin:0">两栏各聊各的、各记各的轮次；想公平对比时用「同问两栏」把同一句发两边。　聊完点每栏标题栏的「成文」，可把该栏对话总结成 5 千 / 1 万字的正式论文。　两栏都聊过后，点顶部「⚖ 科学创新智商评估」可让基底盲评谁的创新度更高（用一把与门派无关的科学尺子，不用 SDE 自家的）。</div>
     </div>
   </div>
 </div>
@@ -187,7 +187,7 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:40px;padding:22px 
 </div>
 <div class="modal" id="evalModal">
   <div class="modalBox">
-    <div class="modalHead"><div class="t" id="evalTitle">科学创新度对照</div><div class="modalActs"><button class="miniBtn" id="evalCopy" type="button">复制</button><button id="evalClose" type="button">×</button></div></div>
+    <div class="modalHead"><div class="t" id="evalTitle">科学创新智商评估</div><div class="modalActs"><button class="miniBtn" id="evalCopy" type="button">复制</button><button id="evalClose" type="button">×</button></div></div>
     <div class="modalBody" id="evalBody"></div>
   </div>
 </div>
@@ -744,9 +744,9 @@ function downloadPaper(){
   setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
 }
 
-// ===== 独立的科学创新度对照（盲评，不给分数）=====
+// ===== 独立的科学创新智商评估（盲评）=====
 // 用一把与任何门派无关的科学创新度量表（sci-innovation-iq.txt），让同一个基底当裁判，
-// 盲评两栏对话各自产出了哪些创新——两栏被随机标成「甲/乙」，裁判不知道哪个是裸基底、哪个是 WDS，
+// 盲评两栏对话谁的创新智商更高——两栏被随机标成「甲/乙」，裁判不知道哪个是裸基底、哪个是 WDS，
 // 以避免「自家用自家的尺子给自家打分」。这把尺子刻意不含任何 SDE 术语。
 let SCI_RUBRIC = '', SCI_OK = false;
 loadAsset('/taste/assets/sci-innovation-iq.txt?v=2', 1500)
@@ -768,7 +768,7 @@ async function evalIQ(){
   hideErr();
   evalBusy = true;
   $('btnEval').disabled = true;
-  $('evalTitle').textContent = '正在做科学创新度对照…';
+  $('evalTitle').textContent = '正在做科学创新智商评估…';
   $('evalBody').innerHTML = '<span class="spinner"></span>裁判正在盲评两栏对话，约一两分钟…';
   $('evalModal').classList.add('open');
   try{
@@ -778,8 +778,8 @@ async function evalIQ(){
     const B = baseFirst ? { name:'乙', src:'wds', hist:histWds } : { name:'乙', src:'base', hist:histBase };
     const sys = SCI_RUBRIC
       + '\n\n════════ 你现在的任务 ════════\n'
-      + '下面给你两场独立的问答对话，分别标为【甲】和【乙】。它们可能问的不是同一个问题——没关系，你看的是各自这一场里"产出了哪些真正的创新"，不是评谁答得更切题。'
-      + '\n请严格按上面这把《科学创新度量表》，对【甲】【乙】各走一遍量表里的"评审步骤"：先按【三新】定位——① 有没有新概念/新结构 ② 有没有新思维路径/逻辑模式 ③ 有没有新预设/新条件（每层都点明动没动、动得深不深）；再各自逐维（N/R/D/F/I）写明「有什么／没有什么／证据在哪一轮」，然后按量表给出五维分与综合分——**这份分数是工作台上的对照读数，不会随任何文章上站、也不进站内排名**。并各写出：一句核心主张复述、1–3个最近邻、比最近邻多出的剩余、是否可证伪。'
+      + '下面给你两场独立的问答对话，分别标为【甲】和【乙】。它们可能问的不是同一个问题——没关系，你评的是各自这一场里"产出的判断有多少真正的创新"，不是评谁答得更切题。'
+      + '\n请严格按上面这把《科学创新智商评估量表》，对【甲】【乙】各走一遍量表里的"评审步骤"：先按【三新】定位——① 有没有新概念/新结构 ② 有没有新思维路径/逻辑模式 ③ 有没有新预设/新条件（每层都点明动没动、动得深不深）；再各自给出五维分（N/R/D/F/I）与综合分，并各写出：一句核心主张复述、1–3个最近邻、比最近邻多出的剩余、是否可证伪。'
       + '\n然后给出对比结论：谁的综合分更高、高在哪一维、差距的实质是什么。'
       + '\n\n【铁律】① 你不知道、也不要猜测甲乙各自是"哪种系统"产出的——只依文本本身评分，只对文本负责。② 这把尺子测创新增量，不测文笔与信息量：写得顺、够详细、立场对，都不加分。③ 给分吝啬，每个分挂一句可核对的依据。④ 用 Markdown 输出，结构：## 甲 的评估 / ## 乙 的评估 / ## 对比结论。直接从"## 甲 的评估"开始，不要开场白。';
     const userMsg = '【甲】这一场对话（共 '+(A.hist.length/2)+' 轮）：\n\n' + transcriptOf(A.hist)
@@ -789,9 +789,9 @@ async function evalIQ(){
     // 评完再揭盲：把甲/乙映射回大模型/WDS，附在末尾
     const reveal = '\n\n──────────\n**揭盲**：【甲】＝' + (A.src==='base'?'左栏「大模型」（裸基底）':'右栏「WDS」（提智）')
                  + '　　【乙】＝' + (B.src==='base'?'左栏「大模型」（裸基底）':'右栏「WDS」（提智）')
-                 + '　\n（对照时裁判并不知道甲乙各是哪一栏——本次为盲评。这把量表是与门派无关的科学创新度量表，不是 SDE 自家的尺子。本站已取消**对外**展示分数：站上文章页、专著页与排名一律无分数，这里的读数只供你自己做提智前后的对照。）';
+                 + '　\n（评分时裁判并不知道甲乙各是哪一栏——本次为盲评。这把尺子是与门派无关的科学创新度量表，不是 SDE 自家的尺子。）';
     lastEval = out + reveal;
-    $('evalTitle').textContent = '科学创新度对照 · 盲评结果';
+    $('evalTitle').textContent = '科学创新智商评估 · 盲评结果';
     $('evalBody').textContent = lastEval;
   }catch(e){
     $('evalBody').innerHTML = '<span style="color:#E06C60">✗ 评估失败：'+esc(e.message)+'</span>';
@@ -850,7 +850,7 @@ function boot(){
   $('paperDl').addEventListener('click', downloadPaper);
   $('paperClose').addEventListener('click', ()=>$('paperModal').classList.remove('open'));
   $('paperModal').addEventListener('click', e=>{ if(e.target===$('paperModal')) $('paperModal').classList.remove('open'); });
-  // 科学创新度对照
+  // 科学创新智商评估
   $('btnEval').addEventListener('click', evalIQ);
   $('evalCopy').addEventListener('click', ()=>{ if(lastEval){ navigator.clipboard.writeText(lastEval).then(()=>{ $('evalCopy').textContent='已复制'; setTimeout(()=>$('evalCopy').textContent='复制',1500); }); } });
   $('evalClose').addEventListener('click', ()=>$('evalModal').classList.remove('open'));

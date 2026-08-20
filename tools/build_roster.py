@@ -298,10 +298,73 @@ def paper_field(idx):
     return f
 
 
-# 2026-08-20 起本站取消创新智商评分：页面不再标注分数，roster.json 不再存
-# papers[].iq / iq_kind，排名公式也不再有创新度维（活跃 0.53 · 篇数 0.27 · 广度 0.20）。
-# 原先从页面正则回抽分数的 paper_iq() 已删除——留着它，任何人在新页面里写一句
-# 「盲评 145」，分数就会自动回到数据层和排名里，等于源头没堵。
+SCORES_PATH = os.path.join(os.path.dirname(ROSTER), 'scores.json')
+try:
+    _SCORES = json.load(open(SCORES_PATH, encoding='utf-8')).get('scores', {})
+except Exception:
+    _SCORES = {}
+
+
+def paper_iq(idx, slug=None):
+    """篇目的内部自评分及口径——**只从 public/students/scores.json 查表，不再从页面正文抽**。
+
+    2026-08-20 起分数不再登在作品页上，页面里已没有分数可抽；分数改存在 scores.json 里，
+    它不被任何页面展示，只供本脚本算排名的创新度维、以及工作台判档用。
+    新篇要计入创新度维，就往 scores.json 里加一条 {slug: {"iq": N, "kind": "blind"}}。
+
+    返回 (分数, 口径) 或 (None, None)。排名公式只采用 kind == 'blind'。
+    """
+    if not slug:
+        return None, None
+    rec = _SCORES.get(slug)
+    if not rec:
+        return None, None
+    return rec.get('iq'), rec.get('kind')
+
+
+def _paper_iq_unused(idx):
+    """页面自报的 SDE 创新智商分及其口径。
+
+    与 sde:paper-weight 同理：roster.json 是派生数据，手写字段必被本脚本覆盖，
+    所以分数只能从页面里抽。全站现有三种写法，口径不同，必须分开标：
+
+        「SDE 创新智商 136 → 打磨目标 146」  前者=原稿盲评，后者=打磨目标（不计分）
+        「本文的盲评分为 132」               盲评
+        「SDE 创新智商 138（原稿盲评…）」    盲评
+        「SDE 创新智商：149」               旧 Codex 单值，口径不明 → legacy，不进排名
+
+    返回 (分数, 口径) 或 (None, None)。排名公式只采用 kind == 'blind'。
+    """
+    s = open(idx, encoding='utf-8').read()
+    t = re.sub(r'<[^>]+>', '', s)
+    m = re.search(r'创新智商[：:\s]*(\d{3})\s*(?:→|-&gt;|->)', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    m = re.search(r'盲评分为\s*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    m = re.search(r'创新智商[：:\s]*(\d{3})\s*[（(]\s*原稿盲评', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    # 「SDE 创新智商　盲评 134 → 修改设计目标 136」/「盲评 137 → 加固后 138」
+    # 箭头左边是原稿盲评，右边是编辑增补后的修改设计目标（不计分）
+    m = re.search(r'创新智商[：:\s\u3000]*盲评\s*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    # 「关于本文的创新智商标注　本文在未经任何编辑改动的原稿状态下接受过一次盲评…按固定权重计算的综合分为 130」
+    m = re.search(r'创新智商标注[\s\S]{0,600}?综合分为\s*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    # 「SDE 创新智商 138　全文盲评 · 待独立复核」/「…结构化盲评…」
+    # 分数后面紧跟口径标签的写法：标了盲评就是盲评，不能落进 legacy 兜底。
+    m = re.search(r'创新智商[：:\s\u3000]*(\d{3})[\s\u3000]*(?:全文盲评|结构化盲评|盲评)', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    m = re.search(r'创新智商[：:\s]*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'legacy'
+    return None, None
+
 
 def body_chars(idx):
     """正文字数：跳过骨架后数字符（CJK 一字算一字）。"""
@@ -326,6 +389,9 @@ def build():
                 continue
             rec = {'slug': os.path.relpath(item, STUDENTS).replace(os.sep, '/'),
                    'date': date, 'words': body_chars(idx)}
+            iq, kind = paper_iq(idx, rec['slug'])
+            if iq is not None and 80 <= iq <= 175:
+                rec['iq'], rec['iq_kind'] = iq, kind
             fld = paper_field(idx)
             if fld:
                 rec['field'] = fld
