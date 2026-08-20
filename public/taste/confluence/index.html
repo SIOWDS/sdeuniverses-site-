@@ -220,7 +220,7 @@ select.model-select{max-width:340px}
       <input type="checkbox" id="philChk" style="width:auto"> 这是哲学文章（放行本体论、涌现、发生学这类词——只保留学派专名与工序痕迹的封禁）
     </label>
     <label class="small" style="display:flex;gap:6px;align-items:center;margin:6px 0">
-      <input type="checkbox" id="autoRedoChk" style="width:auto" disabled> <s>不到线自动回炉</s>（<b>本机已关掉回炉</b>：评审只报分数，达不达标都照常交付，稿子归你判断）
+      <input type="checkbox" id="autoRedoChk" style="width:auto" disabled> <s>不到线自动回炉</s>（<b>本机已关掉回炉</b>：复核只列清单，缺不缺项都照常交付，稿子归你判断）
     </label>
     <div class="small" style="margin-top:10px;color:var(--muted)">⚠ 联网搜来的材料只有摘要级，<b>发表前务必自己点开每个链接核对</b>。取材那一步每一路都有 30–45 秒的闸，超时按空处理并如实标出，不会无限期转圈；站内那一路是<b>串行</b>跑的（每查一次都要把全站语料读一遍），三门大约 20–60 秒。本站检索通道要管理端配过智谱 Key 才通；不通时上面那一格会自动露出来。</div>
 
@@ -333,7 +333,7 @@ select.model-select{max-width:340px}
     </div>
     <div class="small" id="dlNote" style="margin-top:8px"></div>
     <label class="small" style="display:flex;gap:6px;align-items:center;margin-top:10px">
-      <input type="checkbox" id="autoSaveChk" style="width:auto" checked> 自动存盘到你选的文件夹（成文 · 打磨 · 评审 · 交付各存一次）—— <b>与分数无关，不到 140 也照存</b>；没选文件夹时改在浏览器本地留底，下次开页面可找回
+      <input type="checkbox" id="autoSaveChk" style="width:auto" checked> 自动存盘到你选的文件夹（成文 · 打磨 · 复核 · 交付各存一次）—— <b>与复核结果无关，有「缺」也照存</b>；没选文件夹时改在浏览器本地留底，下次开页面可找回
     </label>
   </div>
 
@@ -897,7 +897,7 @@ const ASSETS_READY = (async function loadAssets(){
   }
   NEIGONG = await grab('/taste/assets/sde-neigong.txt', 5000);   // 全文，不截断（约 10.6 万字符）
   HEART   = await grab('/taste/assets/sde-collide-heart.txt', 1000);
-  IQRUB   = await grab('/taste/assets/sde-innovation-iq.txt', 1000);
+  IQRUB   = await grab('/taste/assets/sde-review-checklist.txt', 1000);
 })();
 function sdeSystem(extra){
   return [
@@ -916,7 +916,7 @@ function reviewSystem(){
     '你是严格的评审，只评不写。不许恭维，不许给"很有启发"这类空话。',
     confTask(),
     '评的第一件事是**答没答到那道题**：文不对题、或答出来的形状与题型不对口（要一个驱动却交了一个漂亮概念），先扣 I 与 F，别被行文的通顺唬住。',
-    IQRUB ? ('【SDE 创新智商评分标尺（全文，按它打分）】\n' + IQRUB) : '',
+    IQRUB ? ('【五项可清点判据 · 复核检查表（全文，按它逐项核对；不得给任何分数）】\n' + IQRUB) : '',
     HEART ? ('【二阶碰撞心法（据此判它有没有真的走完工序）】\n' + HEART) : ''
   ].filter(Boolean).join('\n\n');
 }
@@ -994,7 +994,7 @@ const STAGES = [
   {id:'realrun', n:'真跑一条', hint:'挑最便宜的一条证伪条款，用真实可得的数据跑一遍，不利结果照写', tok:TOK_HARD},
   {id:'write',   n:'成文',     hint:'一趟写完整篇两万字（不分段）',          tok:4000},
   {id:'polish',  n:'打磨',     hint:'按封顶清单逐条自查，再照自查整篇重写一遍', tok:4000},
-  {id:'review',  n:'评审',     hint:'创新智商 · 只报分数，不回炉',        tok:4000}
+  {id:'review',  n:'复核',     hint:'五项可清点判据 · 只列清单，不回炉',   tok:4000}
 ];
 const ST = { mode:'X', forceAuto:false, reselect:0, badPick:[], sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
              qtype:'', discs:[], polished:false,
@@ -2108,19 +2108,18 @@ function promptFor(id){
   ].join('\n');
 
   if(id==='review') return [
-    '你是评审，不是作者。对下面这篇文章按 SDE 创新智商五维打分（每维 0–170，给总分）：',
-    'S 结构显露 ｜ D 路径组织 ｜ E 纠缠厚度 ｜ I 不可还原度 ｜ F 可证伪度。',
-    '反膨胀铁律（硬约束，必须执行）：',
-    '  · 没有与既有概念逐一划界的，I 封顶 130；下面附了站内近邻名单，名单里没被交代的篇目每一篇再减 2；',
-    '  · 没有可证伪条件的，F 封顶 130；',
-    '  · 跨学科兑现少于五个的，E 封顶 132；',
-    '  · 正文出现学派术语（如"显露""特征纠缠""发生学"等）的，总分直接减 8。',
+    '你是复核者，不是作者。本站已取消评分——**不许给任何分数、等级或档位**。',
+    '按下面五项可清点判据逐项核对这篇文章，每项只判「做到／部分做到／缺」，并指出证据在第几节。',
+    '判据一 真跑 ｜ 判据二 敌意拓宽 ｜ 判据三 划界 ｜ 判据四 让步 ｜ 判据五 改判。',
+    '硬约束（必须执行）：',
+    '  · 没有与既有概念逐一划界的，判据三判「缺」；下面附了站内近邻名单，名单里没被交代的篇目要逐篇点名；',
+    '  · 没有可证伪条件或没有真实数据跑过的，判据一判「缺」；',
+    '  · 跨学科兑现少于五个的，在判据二里写明查得不够远；',
+    '  · 正文出现学派术语（如"显露""特征纠缠""发生学"等）的，单列一条术语残留，写明出现在哪几处。',
     '输出格式（第一行必须是这个形状，供程序读取）：',
-    '总分：XXX',
-    '五维：S=… D=… E=… I=… F=…',
-    '判级：……',
-    '**不必点名回炉**——本机不回炉，分数只作读数用。',
-    '再给三条"最该补的一刀"（供作者自己判断要不要改，不构成退回）。',
+    '缺项：N　（N＝五项里判为「缺」的项数，0–5 的整数）',
+    '随后逐项写：【判据X · 名称】做到／部分做到／缺 ＋ 证据位置 ＋ 判读理由 ＋（非「做到」时）补齐的最小动作。',
+    '最后给【最高杠杆的一件】与【本文最强的一处】各一段。',
     '',
     (window.__NBR ? (window.__NBR + '\n') : ''),
     '【待评文章】',
@@ -2509,28 +2508,28 @@ async function runStage(i){
         await doSelectConf();
         return await runStage(i);
       }
-      showErr('闸一只给了 '+sc+'/10——三个源多半是互补不是打架。可以照旧往下跑，但成品分数不会高，建议换三门离得更远的。');
+      showErr('闸一只给了 '+sc+'/10——三个源多半是互补不是打架。可以照旧往下跑，但成品在五项判据上站不住，建议换三门离得更远的。');
     }
     else hideErr();
   }
   if(s.id==='review'){
-    const m = txt.match(/总分[：:]\s*(\d{2,3})/);
-    ST.score = m ? parseInt(m[1],10) : null;
+    const m = txt.match(/缺项[：:\s]*([0-5])/);
+    ST.gaps = m ? parseInt(m[1],10) : null;
     renderScore();
     // 无论多少分，先把这一稿存下来：回炉与否是后面的事，稿子不该押在这个决定上
-    await autosave('评审 ' + (ST.score==null ? '未读到分数' : ST.score + ' 分'));
-    if(false && ST.score !== null && ST.score < 140){
+    await autosave('复核 ' + (ST.gaps==null ? '未读到清单' : '缺 ' + ST.gaps + ' 项'));
+    if(false && ST.gaps !== null && ST.gaps > 0){
       const autoRedo = $('autoRedoChk') && $('autoRedoChk').checked;
       const back = backStageFrom(txt);
       if(autoRedo && ST.rounds < 2){
         ST.rounds++;
-        note('第 '+ST.rounds+' 轮回炉：'+ST.score+' 分，从「'+STAGES[back].n+'」重跑。');
-        showErr('创新智商 '+ST.score+'，不到 140——按你勾的「自动回炉」：从「'+STAGES[back].n+'」重跑（第 '+ST.rounds+'/2 轮）。这一稿已经存下来了。');
+        note('第 '+ST.rounds+' 轮回炉：五项里缺 '+ST.gaps+' 项，从「'+STAGES[back].n+'」重跑。');
+        showErr('五项里有 '+ST.gaps+' 项判为「缺」——按你勾的「自动回炉」：从「'+STAGES[back].n+'」重跑（第 '+ST.rounds+'/2 轮）。这一稿已经存下来了。');
         ST.redoFrom = back;
       } else {
         const many = ST.rounds >= 2;
         const pick = await askChoice('review',
-          '创新智商 <b>'+ST.score+'</b>，不到 140。评审建议从「<b>'+STAGES[back].n+'</b>」回炉'
+          '五项里有 <b>'+ST.gaps+'</b> 项判为「缺」。复核建议从「<b>'+STAGES[back].n+'</b>」回炉'
           + (many ? ('（已经回过 '+ST.rounds+' 轮了）') : '')
           + '。<b>这一稿已经自动存下来了</b>，回不回炉由你定：',
           [{label:'回炉重写（从「'+STAGES[back].n+'」）', value:'redo', primary:true},
@@ -2542,10 +2541,10 @@ async function runStage(i){
           ST.redoFrom = back;
         } else if(pick === 'stop'){
           ST.abort = true;
-          note('在评审那一格停下了；'+ST.score+' 分的这一稿已存。');
+          note('在复核那一格停下了；缺 '+ST.gaps+' 项的这一稿已存。');
         } else {
-          note('你选了就这样交付（'+ST.score+' 分，未回炉）。');
-          setStat('review', '✓ 创新智商 '+ST.score+' · 你选了就这样交付', 'done');
+          note('你选了就这样交付（缺 '+ST.gaps+' 项，未回炉）。');
+          setStat('review', '✓ 五项复核 · 缺 '+ST.gaps+' 项 · 你选了就这样交付', 'done');
         }
       }
     }
@@ -2808,7 +2807,7 @@ function packMd(){
     'qtype: ' + (ST.qtype || '未判'),
     'fields: ' + (ST.discs||[]).join(' × '),
     'model: ' + modelSel.value,
-    'iq_self: ' + (ST.score==null ? '未评' : ST.score),
+    'review_gaps: ' + (ST.gaps==null ? '未核' : ST.gaps) + '　# 五项可清点判据里判为「缺」的项数；本站已取消评分',
     'polished: ' + (ST.polished ? '是' : '否'),
     'sources:'].concat(ST.sources.map(s=>'  - ' + (s.url || '(无链接)') + '　' + s.title))
     .concat(['---','']).join('\n');
@@ -2822,7 +2821,7 @@ async function autosave(tag){
   let where = '浏览器本地';
   try{
     localStorage.setItem(DRAFT_KEY, JSON.stringify({
-      t: Date.now(), title: draftTitle(), tag: tag, score: ST.score, words: words, md: md }));
+      t: Date.now(), title: draftTitle(), tag: tag, score: ST.gaps, words: words, md: md }));
   }catch(e){ where = ''; }          // 存不进去（隐私模式／超额）就如实降级，别谎称存了
   const on = !$('autoSaveChk') || $('autoSaveChk').checked;
   const hasDir = window.WDSSaveDir && window.WDSSaveDir.supported() && window.WDSSaveDir.name();
@@ -2836,7 +2835,7 @@ async function autosave(tag){
   const el = $('draftNote');
   if(el) el.innerHTML = where
     ? ('✓ 已自动存稿（' + escTxt(tag) + ' · ' + words + ' 字 · 存到：' + escTxt(where) + '）。'
-       + '<b>存稿与评分无关</b>——不到 140 也照存，本机不回炉。')
+       + '<b>存稿与复核结果无关</b>——有「缺」也照存，本机不回炉。')
     : ('⚠ 这个浏览器不让本地留底（隐私模式或空间已满）。' + words + ' 字的稿子只在本页内存里——'
        + '选一个文件夹，或现在就点下面的按钮下载。');
   return where;
@@ -2853,7 +2852,7 @@ function draftRestore(){
   head.className = 'small';
   head.style.cssText = 'flex:1 1 260px';
   head.innerHTML = '上一次还留着一份稿：<b>' + escTxt(d.title||'') + '</b>（' + (d.words||0) + ' 字'
-    + (d.score != null ? ('　创新智商 ' + d.score) : '') + (d.tag ? ('　' + escTxt(d.tag)) : '')
+    + (d.score != null ? ('　五项复核 · 缺 ' + d.score + ' 项') : '') + (d.tag ? ('　' + escTxt(d.tag)) : '')
     + (when ? ('　' + escTxt(when)) : '') + '）';
   const a = document.createElement('button'); a.className = 'btn ghost'; a.id = 'draftGet'; a.textContent = '下载它';
   a.addEventListener('click', ()=> saveBlob('学科通融_找回_' + (d.title||'稿') + '.md',
@@ -3692,14 +3691,14 @@ async function nbrPostName(){
 
 function renderScore(){
   const p = panels.review;
-  if(ST.score==null) return;
-  const bad = ST.score < 140;
-  setStat('review', (bad?'· ':'✓ ')+'创新智商 '+ST.score, 'done');
+  if(ST.gaps==null) return;
+  const bad = ST.gaps > 0;
+  setStat('review', (bad?'· ':'✓ ')+'五项复核 · 缺 '+ST.gaps+' 项', 'done');
   const note = document.createElement('div');
   note.className = 'small'; note.style.marginTop='8px';
   note.innerHTML = bad
-    ? '低于 140。<b>本机不回炉</b>——这一稿照常交付，改不改由你定；评审给的三条「最该补的一刀」在上面。'
-    : '到 140 线。可以进交付了。';
+    ? '有判据判为「缺」。<b>本机不回炉</b>——这一稿照常交付，改不改由你定；复核给的「最高杠杆的一件」在上面。'
+    : '五项全部做到。可以进交付了。';
   p.out.parentNode.appendChild(note);
 }
 
@@ -3736,7 +3735,7 @@ async function deliver(){
   const hits = termHits(ST.article);
   const bits = [
     '成品 '+words+' 字',
-    ST.score==null ? '评审未读到分数' : ('创新智商 '+ST.score+(ST.score>=140?'（到 140 线）':'（未到 140 线，按口径照常交付）')),
+    ST.gaps==null ? '复核未读到清单' : ('五项复核 · 缺 '+ST.gaps+' 项'+(ST.gaps===0?'（五项全做到）':'（有缺项，按口径照常交付）')),
     hits.length ? ('⚠ 术语残留：'+hits.join('、')) : '术语零残留',
     isPaper() ? '体例：学科通融体（论文）' : '体例：每日必读体（散文）',
     ST.mode==='X'
@@ -3786,7 +3785,7 @@ $('stopBtn').addEventListener('click', ()=>{
 });
 $('resetBtn').addEventListener('click', ()=>{
   sideAbortAll();
-  ST.out = {}; ST.article=''; ST.outline=''; ST.score=null; ST.sources=[];
+  ST.out = {}; ST.article=''; ST.outline=''; ST.gaps=null; ST.sources=[];
   ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null; ST.pair=null; ST.bestPair=null; ST.usedA=[]; ST.badC=[]; ST.__swap=null; ST.forged=false;   // 心得不清：它按内功+基底缓存，重跑不必重内化
   ST.redoFrom=null; ST.rounds=0; ST.termRetry=0; ST.termFix=null; ST.notes=[];
   ST.spineRows=[]; ST.conflict=''; ST.truncated=false;
@@ -3978,7 +3977,7 @@ $('dlPack').addEventListener('click', ()=>{
     'author: 王德生 ＋ Claude',
     'mode: '+ST.mode,
     'model: '+modelSel.value,
-    'iq_self: '+(ST.score==null?'未评':ST.score),
+    'review_gaps: '+(ST.gaps==null?'未核':ST.gaps)+'　# 五项可清点判据里判为「缺」的项数；本站已取消评分',
     'sources:'].concat(ST.sources.map(s=>'  - '+(s.url||'(投喂)')+'　'+s.title)).concat(['---','']).join('\n');
   const body = [fm, ST.article, srcFooterMd(), '', '## 与既有说法的划界', '', ST.out.demarc||''].join('\n');
   saveBlob('发布包_'+title.slice(0,12)+'.md', new Blob([body], {type:'text/markdown'}));
