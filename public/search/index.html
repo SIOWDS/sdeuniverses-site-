@@ -877,6 +877,15 @@ function doAsk(){
   /* gotErr：服务端已经报过一句人话了，收尾不得再拿通用文案盖掉它（见 finishAsk）。
      lastStat：死在哪一步的唯一线索——检索、装内功，还是已经在等基底写。 */
   var gotErr=false, lastStat='';
+  /* 🔴 【2026-08-21：问答这条路一直没接住「收笔读数」帧 —— 用户截图报的「第五轮就停止了」】
+     08-18 加过一帧 `fin`（正文几字·思考几字·**停因**·上游有没有发过 [DONE]·第几秒），
+     它是分辨「基底自己停笔」与「整条流被掐断」的唯一依据。但那一刀只给 streamPaper
+     （提炼／成文）装了消费端，**doAsk 这条路把这一帧静默丢掉了**。
+     后果正是用户看到的那一幕：一轮答案断在「它」字上，屏幕上**没有任何报错**——
+     没有 error 帧、没有掉线提示，流干净结束、120 字入档、照常往下走。
+     服务端其实一直知道上游没发 [DONE]（`doneMark=false`），只是没人接。
+     ⇒ 这一刀先把证据接住并说出来，不是治那个断（断在谁那儿，要读到这句话才知道）。 */
+  var finRead={fin:'',done:false,sec:0,think:0,frames:0};
   function _bump(ms){ if(_wd) clearTimeout(_wd); _wd=setTimeout(function(){ _stalled=true; try{ _ac && _ac.abort(); }catch(e){} }, ms); }
   _bump(deepOn?150000:70000);
 
@@ -892,7 +901,7 @@ function doAsk(){
     var reader=resp.body.getReader(), dec=new TextDecoder(), buf='';
     function pump(){
       return reader.read().then(({done,value})=>{
-        if(done){ finishAsk(ansEl, gotErr, lastStat); return; }
+        if(done){ finishAsk(ansEl, gotErr, lastStat, finRead); return; }
         buf+=dec.decode(value,{stream:true});
         var lines=buf.split('\n'); buf=lines.pop();
         for(var i=0;i<lines.length;i++){
@@ -901,10 +910,20 @@ function doAsk(){
           var payload=s.slice(5).trim();
           if(payload==='[DONE]'){ continue; }
           var j; try{ j=JSON.parse(payload); }catch(e){ continue; }
-          _bump(75000);
+          _bump(75000); finRead.frames++;
           if(j.t==='token'){ acc+=j.v; lastAns=acc; ansEl.textContent=acc; }
           else if(j.t==='status'){ lastStat=j.v; thinkEl.textContent=j.v; }
           else if(j.t==='think'){ thinkChars+=(j.v||'').length; thinkEl.textContent='🧠 深度思考中（'+thinkChars+' 字）…'; }
+          /* 心跳（服务端每 5 秒一帧）：只在还没出正文时接管状态行——已经在写字了就别抢。 */
+          else if(j.t==='beat'){
+            var _bv=j.v||{}; if(_bv.sec) finRead.sec=_bv.sec; if(_bv.think) finRead.think=Math.max(finRead.think,_bv.think);
+            if(!acc.length) thinkEl.textContent='⏳ '+String(lastStat||'正在处理').replace(/（\+\d+s）\s*$/,'')
+              +' · 已 '+(finRead.sec||0)+' 秒'+(finRead.think?' · 已推演 '+finRead.think+' 字':'')+'…';
+          }
+          else if(j.t==='fin'){
+            var _fv=j.v||{}; finRead.fin=_fv.fin||''; finRead.done=!!_fv.done;
+            if(_fv.sec) finRead.sec=_fv.sec; if(_fv.think) finRead.think=Math.max(finRead.think,_fv.think);
+          }
           else if(j.t==='sources'){ _gotSrc=true; renderSources(j.v); }
           else if(j.t==='expand'){ document.getElementById('sdeExpand').textContent='🧭 SDE 词义检索：'+j.v; }
           else if(j.t==='error'){
@@ -936,7 +955,7 @@ function doAsk(){
         var _sb=document.createElement('div'); _sb.className='err';
         _sb.textContent='基底中途停住了（超过一分钟没有新内容），已主动掉线。以上是已经写出来的部分，本轮照常入档。';
         ansEl.appendChild(_sb);
-        finishAsk(ansEl, gotErr, lastStat);
+        finishAsk(ansEl, gotErr, lastStat, finRead);
       } else {
         ansEl.innerHTML='<div class="err">等了 '+(deepOn?'两半分钟':'一分多钟')+'，一帧都没收到，已主动掉线（再等下去也只是空白框）。本轮没有入档，直接再点一次「问」即可。</div>';
       }
@@ -950,8 +969,17 @@ function doAsk(){
     document.getElementById('thinkBar').textContent='';
   });
 }
-function finishAsk(ansEl, gotErr, lastStat){
+/* 一段答案收没收完：末尾是不是一个句子该有的收尾符号。
+   断在「它」「但他输光」这种半句上的稿，字数照样够长，光看长度分不出来。
+   做成顶层具名函数，好让 tools/sim_answer_cut.js 抠出来单测。 */
+function looksCut(txt){
+  var t=String(txt||'').replace(/[\s\u3000]+$/,'');
+  if(!t) return false;
+  return !/[。！？!?…」』”"）)】\]]$/.test(t);
+}
+function finishAsk(ansEl, gotErr, lastStat, finRead){
   ansEl.className='ans';
+  finRead=finRead||{fin:'',done:false,sec:0,think:0,frames:0};
   /* 【流完了却一个字都没有】旧版在这里完全沉默：空白框停在那儿，不报错也不提示，
      用户只看得到「不动了」。零产出一定是出事了——多半是 Worker 被平台无声杀掉，
      流突然断、没有 [DONE]、连 error 帧都没发出来。必须说一句。 */
@@ -964,6 +992,22 @@ function finishAsk(ansEl, gotErr, lastStat){
       +(lastStat?'停住时的最后一步是：'+esc(lastStat)+'　':'')
       +'本轮没有入档，直接再点一次「问」即可；若连着两次都空，把问题问短一点、或换一个基底。</div>';
     return;
+  }
+  /* 【写出了字，但这一段并没有写完 —— 2026-08-21】
+     判据两条，任一条成立就是没收完：① 上游没发过 [DONE]（服务端 fin 帧里的 done=false）——
+     这是被掐断的铁证；② 末尾不是一个句子该有的收尾符号。
+     这两条此前一条都没人看：流干净结束、字数够长 ⇒ 页面照常入档、照常往下走，
+     而读者看到的是一段断在半句上的答案和一片安静。 */
+  if(lastAns && lastAns.length>60 && !gotErr && (looksCut(lastAns) || (finRead.frames && !finRead.done))){
+    var _cut=document.createElement('div'); _cut.className='err';
+    _cut.textContent='⚠ 这一轮没有写完就断了（'+lastAns.length+' 字'
+      +(looksCut(lastAns)?'，停在半句上':'')+'）。读数：'
+      +(finRead.sec?'流停在第 '+finRead.sec+' 秒 · ':'')
+      +(finRead.think?'思考 '+finRead.think+' 字 · ':'')
+      +(finRead.fin?'停因 '+finRead.fin+' · ':'')
+      +(finRead.frames&&!finRead.done?'上游没发 [DONE]（是被掐断的，不是写完的）':'上游正常收笔')
+      +'。已写出的部分照常入档；想要完整的一轮，把这一问原样再问一次即可（上下文都还在）。';
+    ansEl.appendChild(_cut);
   }
   if(lastAns && lastAns.length>60){
     document.getElementById('askActs').classList.add('show');
@@ -1017,7 +1061,11 @@ function tailQuestion(txt){
   }
   q=q.replace(/^[\s\u3000]+/,'').replace(/^[「『“"']/,'').replace(/[」』”"']$/,'').trim();
   /* 前缀里可能还粘着「留一个可追问的问题：」这类引导语（走②那条路时尤其常见） */
-  q=q.replace(/^[^：:？?]{0,16}(?:追问|问题|想一想|再问)[^：:？?]{0,6}[：:]\s*/,'').trim();
+  /* ⚠ 名单是**实测长出来的**，不是拍脑袋列的：2026-08-21 用户截图里那一轮，
+     输入框拿到的是「那么下一轮值得追的一问是：如果返照速度…？」——引导语原样跟着进了下一轮。
+     旧名单只认「追问／问题／想一想／再问」，认不出「值得追的**一问**是」。
+     再遇到没被剥掉的形态，往这条名单里加，别去放宽字数窗口（那才会误伤正常问句）。 */
+  q=q.replace(/^[^：:？?]{0,22}(?:追问|问题|一问|可以问|值得追|该问的|想一想|再问)[^：:？?]{0,8}[：:]\s*/,'').trim();
   if(q.length<8 || q.length>160) return '';
   if(!/[？?]$/.test(q)) return '';
   return q;
@@ -1075,10 +1123,17 @@ function suggestNextQ(){
   }).catch(function(){
     /* 拟题失败不得中断问对：不报错、不动输入框。
        ⚠ 但结尾那句是本地解析出来的，与这次调用成败无关——它已经填好了，
-       此时把提示条整条收起来会让读者以为「什么都没填」。所以分开处置。 */
+       此时把提示条整条收起来会让读者以为「什么都没填」。所以分开处置。
+       🔴 第三种情况是 2026-08-21 用户报的那一幕：上一轮**断在半句上**（于是解析不出追问），
+          拟题这次又失败 ⇒ 输入框里还留着上一轮那句，而它已经问过了 ⇒ 点「问」会被
+          「这一句前面已经问过了」挡下 ⇒ **整场看起来就是「停止了」**。
+          出路必须写在屏幕上，不能让人对着一个死输入框。 */
     if(!tip) return;
-    if(tailQ) tip.innerHTML='↓ 已填入上一轮结尾留下的那句追问，可直接问、也可改。（阶梯问法这次没拟出来，不影响。）';
-    else tip.style.display='none';
+    if(tailQ){ tip.innerHTML='↓ 已填入上一轮结尾留下的那句追问，可直接问、也可改。（阶梯问法这次没拟出来，不影响。）'; return; }
+    tip.style.display='block';
+    tip.innerHTML='⚠ 这一轮没能替你拟出下一问'
+      +(looksCut(lastAns)?'（上一轮答案断在半句上，末尾那句追问没写出来）':'')
+      +'。三条出路：把上一问<b>原样再问一次</b>补一轮完整的、自己写一句、或点「🧪 提炼精华」收口。';
   });
 }
 

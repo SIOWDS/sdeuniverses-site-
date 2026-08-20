@@ -174,9 +174,15 @@ ok(/turns\.length>=MAXTURNS/.test(bFin), "满十轮不再拟题");
       与 nextq 这次调用成败无关，它已经填进输入框了；此时把提示条整条收起来，
       读者会以为什么都没填。所以分两支：有结尾追问就照说一句，没有才收起来。
    ② 「可替换」的口径多了一种：我们上次填进去的那句也算（否则第二轮起就再也填不进去了）。 */
-ok(/\.catch\(function\(\)\{[\s\S]{0,400}style\.display='none'/.test(bFin)
-   && /if\(tailQ\) tip\.innerHTML=/.test(bFin),
-  "拟题失败不报错、不动输入框；但结尾那句已填好时照说一句，不许把提示条整条收起来");
+/* 拟题失败的处置 2026-08-21 由「一律收起提示条」改成分两支（细节由 sim_next_question 单钉）：
+   结尾那句已填好 ⇒ 照说一句；两样都落空 ⇒ 给出路。要守住的仍是同一条：
+   **一次拟题失败不该有权力中断整场问对**——不抛错、不动输入框。 */
+const _sq = H.slice(H.indexOf("function suggestNextQ(){"), H.indexOf("/* ================= 🚀 自动二十轮"));
+const _cat = _sq.slice(_sq.indexOf("}).catch(function(){"));
+ok(_cat.length > 0 && !/throw /.test(_cat) && !/qa\.value=/.test(_cat),
+  "拟题失败不抛错、不动输入框——一次拟题失败不该有权力中断整场问对");
+ok(/if\(tailQ\)\{ tip\.innerHTML=/.test(_cat) && /三条出路/.test(_cat),
+  "失败时分两支：结尾那句已填好就照说一句；两样都落空就给出路（不许把提示条整条收起来了事）");
 ok(/qNorm\(v\)===qNorm\(lastQ\)/.test(bFin) && /qNorm\(v\)===qNorm\(nextQReady\)/.test(bFin),
   "只在输入框为空／仍是上一句／仍是我们上次填的那句时才替换：用户已在自己敲下一问时不许抢他的字");
 /* qNorm 抠出来真跑：去空白与句读后相等就算同一问 */
@@ -208,7 +214,7 @@ ok(/function _bump\(ms\)/.test(bAsk3) && (bAsk3.match(/_bump\(/g) || []).length 
   "看门狗每收一帧就续一次（只设一次等于把正常的长回答也掉了）");
 ok(/_bump\(deepOn\?150000:70000\)/.test(bAsk3),
   "首帧闸给得宽：深度档出流前要跑词表扩展＋全站检索＋装内功");
-ok(/if\(_stalled\)\{/.test(bAsk3) && /finishAsk\(ansEl, gotErr, lastStat\);/.test(bAsk3),
+ok(/if\(_stalled\)\{/.test(bAsk3) && /finishAsk\(ansEl, gotErr, lastStat[,)]/.test(bAsk3),
   "自己掉线时：已写出的字保住并入档，不当成「请求失败」一抄了事");
 ok(/if\(_wd\) clearTimeout\(_wd\);/.test(bAsk3), "收尾清掉看门狗（不清就会在下一轮里乱开枪）");
 
@@ -217,7 +223,9 @@ ok(/if\(_wd\) clearTimeout\(_wd\);/.test(bAsk3), "收尾清掉看门狗（不清
    上游 4xx、被闸掉线）一并盖成了「被平台无声掉线了」这句猜测——真因当场消失。 */
 console.log("— 八、零产出提示不得抹掉真因 —");
 const bFin3 = H.slice(H.indexOf("function finishAsk("), H.indexOf("function qNorm("));
-ok(/function finishAsk\(ansEl, gotErr, lastStat\)/.test(bFin3), "finishAsk 收得到 gotErr 与 lastStat");
+/* 2026-08-21 多了第四个参数 finRead（收笔读数：停因／上游有没有发过 DONE／第几秒）。
+   判据放宽到「至少收得到前三个」，读数那一层由 tools/sim_answer_cut.js 单钉。 */
+ok(/function finishAsk\(ansEl, gotErr, lastStat[,)]/.test(bFin3), "finishAsk 收得到 gotErr 与 lastStat");
 ok(/if\(gotErr\) return;/.test(bFin3), "服务端已报过真因时直接返回，不拿通用文案盖它");
 ok(bFin3.indexOf("if(gotErr) return;") < bFin3.indexOf("本轮一个字都没回来"), "返回排在写通用文案之前");
 ok(/lastStat\?'停住时的最后一步是：'/.test(bFin3), "真的没有真因时，至少把最后一条状态印出来（死在检索还是死在基底，是两回事）");
@@ -225,7 +233,7 @@ const bAsk4 = H.slice(H.indexOf("function doAsk("), H.indexOf("function finishAs
 ok(/var gotErr=false, lastStat='';/.test(bAsk4), "doAsk 里有这两个变量");
 ok(/gotErr=true;/.test(bAsk4), "收到 error 帧就立旗");
 ok(/lastStat=j\.v;/.test(bAsk4), "每条 status 都记下来");
-ok((bAsk4.match(/finishAsk\(ansEl, gotErr, lastStat\)/g) || []).length >= 2, "两个调用点都把旗传下去（漏一个就又盖一次）");
+ok((bAsk4.match(/finishAsk\(ansEl, gotErr, lastStat[,)]/g) || []).length >= 2, "两个调用点都把旗传下去（漏一个就又盖一次）");
 
 /* ===== 九、深度档连续问对：轮次越往后站内资料越少 =====
    检索时间与预填时间都算在平台那道 130 秒的墙里，而历轮上下文本身还在变长。 */
