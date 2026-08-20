@@ -811,7 +811,7 @@ function resetThread(quiet){
      所以确认语也要照实说，别让人以为点下去就永久没了。 */
   if(!quiet && turns.length && !confirm('清空屏幕上这场问对（共 '+turns.length+' 轮）与已提炼的精华报告？\n\n（本机存档不受影响，随时可以从下面的「📚 本机存档」恢复。）')) return;
   if(!quiet) newSession();
-  turns=[]; brief=''; lastAns=''; lastQ=''; nextQReady='';
+  turns=[]; brief=''; lastAns=''; lastQ=''; nextQReady=''; ladderQReady=''; ladderMove='';
   var _nt=document.getElementById('nextQTip'); if(_nt){ _nt.style.display='none'; _nt.textContent=''; }
   document.getElementById('threadBox').style.display='none';
   document.getElementById('briefWrap').classList.remove('show');
@@ -984,28 +984,101 @@ function qNorm(s){ return String(s||'').replace(/[\s\u3000]+/g,'').replace(/[?�
    以前却只有「自动十轮」用得上：手动连续问对全靠用户自己想下一句问什么，
    而输入框又留着上一句——结果就是十轮变成同一问重复十遍，「层层深入」根本没发生。
    这一步很便宜：400 tok、不跑检索、拟不出来服务端自带兵底问句，失败也不打扰人。 */
-var nextQReady='';
+var nextQReady='', ladderQReady='', ladderMove='';
+/* ═══ 从上一轮答案的**结尾**解析出那句追问 ═══
+   [stated] 用户 2026-08-21：「每次问对的最后一段的『追问的问题』的内容，要自动解析放到
+   第二次问对的『输入框』里面。现在的第二次问对的问题和这个『追问』不匹配。要修改。」
+   他说的是一处真打架：深度档的提示词明写着「最后留一个把前面前提再往深追一层的升维追问」
+   （worker.js 两处 ＋「结尾留一个可追问的问题」一处），于是**答案末尾自己就留了一句下一问**；
+   而输入框里填的却是 nextq 另拟的一句。屏幕上同时挂着两个不同的「下一问」，
+   读者读完最后那句「差异究竟发生在张力的形成，还是张力的释放？」，
+   低头一看输入框里是另一句——两句都对，但摆在一起就是错的。
+   ⇒ 结尾那句优先：它是模型带着整轮上下文、在答完之后自己长出来的下一步，与这一轮严丝合缝。
+   阶梯不丢：nextq 照旧调（它同时给出本轮的追问动作名），只是降为**备选**，一键可换。
+   ⚠ 做成顶层具名函数，好让 tools/sim_next_question.js 抠出来单测。 */
+function tailQuestion(txt){
+  var t=String(txt||'').replace(/[\s\u3000]+$/,'');
+  if(!t) return '';
+  var tail=t.slice(-800);
+  /* ① 先认标记词。模型通常写成「留一个可追问的问题：…？」「升维追问：…？」这类形态。
+     取冒号后到**第一个**问号为止（非贪婪），后面若还跟着别的句子一概不要。 */
+  var m=/(?:可追问的问题|可以追问的问题|升维追问|进一步追问|值得追问的是|留一个问题|追问)[^：:？?]{0,8}[：:]\s*([\s\S]{4,200}?[？?])/.exec(tail);
+  var q=m?m[1]:'';
+  if(!q){
+    /* ② 没有标记词就退回「结尾的最后一个问句」。两道闸防误认：
+       (a) 问号后面若还有大段正文，那就不是留在结尾的追问，而是行文中的一个反问；
+       (b) 往回只切到最近的句读或换行，不许把上一整段都吞进来。 */
+    var i=Math.max(tail.lastIndexOf('？'), tail.lastIndexOf('?'));
+    if(i<0) return '';
+    if(tail.slice(i+1).replace(/[\s\u3000）)」』”"']/g,'').length>40) return '';
+    var head=tail.slice(0,i+1);
+    var cut=Math.max(head.lastIndexOf('\n'), head.lastIndexOf('。'), head.lastIndexOf('！'), head.lastIndexOf('!'), head.lastIndexOf('？',i-1));
+    q=head.slice(cut+1);
+  }
+  q=q.replace(/^[\s\u3000]+/,'').replace(/^[「『“"']/,'').replace(/[」』”"']$/,'').trim();
+  /* 前缀里可能还粘着「留一个可追问的问题：」这类引导语（走②那条路时尤其常见） */
+  q=q.replace(/^[^：:？?]{0,16}(?:追问|问题|想一想|再问)[^：:？?]{0,6}[：:]\s*/,'').trim();
+  if(q.length<8 || q.length>160) return '';
+  if(!/[？?]$/.test(q)) return '';
+  return q;
+}
+/* 一键换成阶梯问法：两句都留着，把选择权交给读者，而不是替他决定。 */
+function useLadderQ(){
+  if(!ladderQReady) return;
+  var qa=document.getElementById('qa');
+  if(qa){ qa.value=ladderQReady; qa.focus(); }
+  nextQReady=ladderQReady;
+  var tip=document.getElementById('nextQTip');
+  if(tip) tip.innerHTML='↓ 已换成阶梯问法（本轮追问动作：<b>'+esc(ladderMove||'')+'</b>）。可直接问、也可改成你自己的问法。';
+}
 function suggestNextQ(){
   var tip=document.getElementById('nextQTip');
   if(turns.length>=MAXTURNS){ if(tip){ tip.style.display='none'; } return Promise.resolve(); }
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   var step=turns.length+1;
-  if(tip){ tip.style.display='block'; tip.textContent='… 正在拟第 '+step+' 轮该追的那一句…'; }
+  var qa=document.getElementById('qa');
+  /* 【结尾那句先落袋】不等 nextq 回来就填——它已经在屏幕上了，让输入框立刻与它一致，
+     读者不必先看见另一句、过几秒又被换掉。 */
+  var tailQ=tailQuestion(lastAns);
+  /* 只在输入框仍是上一句（或空、或仍是我们上次填进去的那句）时才替换：
+     用户已经在自己敲下一问时，一个字都不许抢。 */
+  var mayFill=function(){
+    if(!qa) return false;
+    var v=qa.value.trim();
+    return !v || qNorm(v)===qNorm(lastQ) || (nextQReady && qNorm(v)===qNorm(nextQReady));
+  };
+  if(tailQ && mayFill()){ qa.value=tailQ; nextQReady=tailQ; }
+  if(tip){ tip.style.display='block';
+    tip.textContent=tailQ ? '↓ 已填入上一轮结尾留下的那句追问。正在另拟一句阶梯问法备选…'
+                          : '… 正在拟第 '+step+' 轮该追的那一句…'; }
   return fetch('/api/ask',{
     method:'POST',headers:{'content-type':'application/json'},
     body:JSON.stringify(Object.assign({mode:'nextq',q:originQ(),step:step,hist:buildHist(true),vendor:vendor}, uk?{key:uk}:{}))
   }).then(function(r){ return r.json(); }).then(function(d){
     if(!d || !d.ok || !d.q) throw new Error('no q');
+    ladderQReady=d.q; ladderMove=d.move||'';
+    /* 结尾那句已经落袋 ⇒ 阶梯问法降为备选，只在提示条里给一个一键切换，不去动输入框。
+       两句都留着，选择权交给读者——替他决定哪一句更好，正是这次要修的那个毛病。 */
+    if(tailQ){
+      if(tip) tip.innerHTML='↓ 已填入<b>上一轮结尾留下的那句追问</b>。'
+        +'本轮阶梯的追问动作是 <b>'+esc(d.move||'')+'</b>'
+        +(d.fallback?'（基底没拟出来，用的是这一级的兜底问句）':'')
+        +' —— 想换成阶梯问法，点这里：<a href="javascript:void(0)" onclick="useLadderQ()" style="text-decoration:underline">换成阶梯问法</a>。';
+      return;
+    }
+    /* 结尾没留下追问（模型没照提示词写，或这一轮是别的档）⇒ 照旧用阶梯那一句。 */
     nextQReady=d.q;
-    var qa=document.getElementById('qa');
-    /* 只在输入框仍是上一句（或空）时才替换——用户已经在自己敲下一问时不许抢他的字 */
-    if(qa && (!qa.value.trim() || qNorm(qa.value)===qNorm(lastQ))) qa.value=d.q;
+    if(qa && mayFill()) qa.value=d.q;
     if(tip) tip.innerHTML='↓ 第 '+d.step+' 轮的追问动作：<b>'+esc(d.move||'')+'</b>。'
-      +(d.fallback?'（基底没拟出来，用的是这一级的兵底问句）':'')
+      +(d.fallback?'（基底没拟出来，用的是这一级的兜底问句）':'')
       +'已填进输入框，可直接问、也可改成你自己的问法。';
   }).catch(function(){
-    /* 拟题失败不得中断问对：只收起提示，不报错、不动输入框 */
-    if(tip) tip.style.display='none';
+    /* 拟题失败不得中断问对：不报错、不动输入框。
+       ⚠ 但结尾那句是本地解析出来的，与这次调用成败无关——它已经填好了，
+       此时把提示条整条收起来会让读者以为「什么都没填」。所以分开处置。 */
+    if(!tip) return;
+    if(tailQ) tip.innerHTML='↓ 已填入上一轮结尾留下的那句追问，可直接问、也可改。（阶梯问法这次没拟出来，不影响。）';
+    else tip.style.display='none';
   });
 }
 

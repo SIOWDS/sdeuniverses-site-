@@ -169,10 +169,16 @@ ok(/turns\.push\(\{q:lastQ, a:lastAns\}\);[\s\S]{0,120}suggestNextQ\(\);/.test(b
 ok(/mode:'nextq'/.test(bFin) && /step:step/.test(bFin) && /hist:buildHist\(true\)/.test(bFin),
   "拟题真走服务端那条阶梯：只送 step，不在前端再拄一份阶梯（拄两份迟早漂移，而漂移后页面一切正常）");
 ok(/turns\.length>=MAXTURNS/.test(bFin), "满十轮不再拟题");
-ok(/\.catch\(function\(\)\{[\s\S]{0,200}style\.display='none'/.test(bFin),
-  "拟题失败只收起提示，不报错也不动输入框——一次拟题失败不该有权力中断整场问对");
-ok(/qNorm\(qa\.value\)===qNorm\(lastQ\)/.test(bFin),
-  "只在输入框仍是上一句（或空）时才替换：用户已在自己敲下一问时不许抢他的字");
+/* ⚠ 2026-08-21 起这两条各自多了一层，判据跟着改（细节见 tools/sim_next_question.js）：
+   ① 失败路径不再无条件收起提示条——上一轮结尾那句追问是**本地解析**出来的，
+      与 nextq 这次调用成败无关，它已经填进输入框了；此时把提示条整条收起来，
+      读者会以为什么都没填。所以分两支：有结尾追问就照说一句，没有才收起来。
+   ② 「可替换」的口径多了一种：我们上次填进去的那句也算（否则第二轮起就再也填不进去了）。 */
+ok(/\.catch\(function\(\)\{[\s\S]{0,400}style\.display='none'/.test(bFin)
+   && /if\(tailQ\) tip\.innerHTML=/.test(bFin),
+  "拟题失败不报错、不动输入框；但结尾那句已填好时照说一句，不许把提示条整条收起来");
+ok(/qNorm\(v\)===qNorm\(lastQ\)/.test(bFin) && /qNorm\(v\)===qNorm\(nextQReady\)/.test(bFin),
+  "只在输入框为空／仍是上一句／仍是我们上次填的那句时才替换：用户已在自己敲下一问时不许抢他的字");
 /* qNorm 抠出来真跑：去空白与句读后相等就算同一问 */
 const qNorm = new Function("s", H.slice(H.indexOf("function qNorm("), H.indexOf("/* ===== 每答完一轮")) + "\nreturn qNorm(s);");
 ok(qNorm("语言是什么？") === qNorm("语言是什么"), "qNorm：带不带问号算同一句");
