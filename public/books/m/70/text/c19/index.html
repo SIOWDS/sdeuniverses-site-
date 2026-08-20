@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第十九章 通道三：扩张——某一族算子不封闭 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第十九章 通道三：扩张——某一族算子不封闭 · 王德生 著 · 约 1.5 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第十九章 通道三：扩张——某一族算子不封闭</h1><div class="meta">SDE数学解构导论 · 约 1,501 汉字</div>
+<h3>一、机制</h3>
+<p>某一族算子在当前允许类上不封闭，或某个序列在当前类中没有极限对象。</p>
+<p>为了让对象存在，环境必须扩张；而扩张的方向由造成不封闭的那一族算子</p>
+<p>唯一指定，不是任取。</p>
+<p>最后半句是这条通道全部的分量所在。“环境会变”是谁都同意的软话；“环境沿哪个方向变是被唯一决定的”才是一条可检验的规律。</p>
+<h3>二、一次归属纠正：分数与负数不走通道一</h3>
+<p>现有的概念发生学文献（包括本书早期稿）把分数、小数、负数一并归入“数系扩张的发生学”，但论证时使用的是通道一的语言：“整数 D 面对不可整除时出现表达亏损”。</p>
+<p>这里有一处必须切开的混淆：表达亏损与优化亏损不是一回事。</p>
+<p>• 优化亏损（通道一）：旧 D 做得出来，只是代价太高。把 7 加 40 遍，做得出</p>
+<p>来。• 表达亏损（通道三）：旧 D 根本给不出对象。在整数里表示 1/3，不是代价</p>
+<p>高，是不存在。</p>
+<p>用第十六章的签名判：分数的发生违反签名 A2（可恢复），因为新 S 让原本表示不了的对象变得可表示，表达域扩大了。A2 为假，故不是通道一。</p>
+<p>再用签名 B 判：B3 为假——除法在整数上不封闭，是一个结构事实。故不是通道二。</p>
+<p>所以分数走通道三。 负数、无理数、复数同理。这一纠正不是术语上的挑剔，它的后果在下一节。</p>
+<h3>三、扩张的统一表：从一年级到 K-理论</h3>
+<p>把上一节纠正后的归属与本学派此前在量化问题上得到的扩张选择律并排，得到本编最要紧的一张表。</p>
+<div class="tw"><pre class="rawtbl">新S           哪族算子不封闭         扩到什么       唯一性由什么保证
+负数 ℤ         减法在 ℕ 上不封闭      ℕ 的群化      泛性质
+                                        （Grothendieck
+                                        群）
+分数 ℚ         除法在 ℤ 上不封闭      ℤ 的分式域     泛性质（局部化）
+无理数 ℝ        Cauchy 列在 ℚ 中   ℚ 的完备化     泛性质（稠密等距
+             不收敛                        嵌入）
+复数 ℂ         多项式在 ℝ 上不分      ℝ 的代数闭包    同构意义下唯一
+             解
+分布 𝒟′        求导在 Cᵏ 上不封闭 试验函数空间的对       由求导的对偶唯一
+                         偶
+Young 测度     细化振荡在强拓扑        参数化测度 + 弱*拓 由振荡族唯一
+             无极限             扑
+概形           基变换在簇范畴不        局部环空间上的    由函子性唯一
+             封闭              Spec
+局部模式测度       大周期极限在周期        平移不变测度 + 弱* 由失紧算子唯一
+新S            哪族算子不封闭        扩到什么          唯一性由什么保证
+              类中不紧           拓扑</pre></div>
+<p>看第一行与最后几行。</p>
+<p>ℕ 到 ℤ 的构造是 Grothendieck 群构造。 把一个交换幺半群 (ℕ, +) 群化，标准做法是取 ℕ×ℕ 对关系 (a,b) ∼ (c,d) ⟺ a+d = b+c 的商——即“用差对表示差”。这与代数 K-理论中由向量丛的加法幺半群构造 K₀ 是同一个构造，服从同一条泛性质：任何从 ℕ 到群的幺半群同态唯一地经过 ℤ 分解。</p>
+<p>于是本编可以把话说到这个份上：</p>
+<p>一年级学的负数，与代数 K-理论的 K₀，走的是同一条通道，而且是字面上的</p>
+<p>同一条：都是把一个交换幺半群群化，都由同一条泛性质唯一确定。中间隔</p>
+<p>着的一百五十年，隔的是认出这件事，不是这件事本身。</p>
+<p>同样的话适用于分数与局部化、无理数与完备化、分布与对偶。扩张选择律不是一条关于数学史的观察，它是一批泛性质的共同形状。</p>
+<h3>四、判定签名 C</h3>
+<p>签名 C1（不封闭或不紧）. 存在一族算子 𝔉 与当前允许类 𝒜，使 𝔉(𝒜)</p>
+<p>⊄ 𝒜；或存在 𝒜 中的序列，其在所需拓扑下无极限对象。</p>
+<p>签名 C2（方向被指定）. 扩张后的类 𝒜′ 是 𝒜 在 𝔉 下的封闭化（或在所需拓</p>
+<p>扑下的完备化），且 𝒜′ 由一条泛性质在唯一同构下确定。</p>
+<p>签名 C3（表达域扩大）. 存在 𝒜′ 中的对象在 𝒜 中无对应物。即签名 A2 为</p>
+<p>假。</p>
+<p>环境扩张诊断（操作形式）. 若最小化序列或逼近序列在当前允许类中不预紧，识别使其失紧的那一族算子，把该类扩为该族的极限封闭；若扩张后目标泛函不再下半连续，说明扩张方向错误，应退回并寻找另一族失紧算子。</p>
+<p>这条诊断有正确答案也有错误答案，因而是本编三条通道中操作性最强的一条。</p>
+<h3>五、必须交代的一处让步</h3>
+<p>通道三的唯一性，全部由泛性质提供；而泛性质的唯一性论证，就是第二编第九章决定定理的那三行——两个满足同一泛性质的对象之间有唯一的互逆中介态射。</p>
+<p>这意味着两件事，两件都要说。</p>
+<p>第一件是好消息：S = F(D, E) 与 E = H(S, D) 由同一条引理支撑，两编在此合龙，全书结构上最紧的一处接缝在这里。第二件是让步：通道三本质上是范畴论的。 说“扩张方向被唯一指定”，等于说“该扩张有泛性质”，而这是范畴论一百年来的标准工作方式。本编在通道三上没有提供范畴论之外的东西，只提供了一件事——把小学算术与现代代数几何放进了同一张表，从而使这条形状可见。这是组织上的贡献，不是数学上的新定理。本编不打算把它说成后者。</p>
+<p>本学派真正的增量在通道一（压缩—局部性权衡，命题 17.1）与通道二（目标发生的年代可指认性）。这两条不是范畴论的，因为范畴论不处理代价，也不处理问题的来历。</p>
+<div class="nav"><a href="/books/m/70/text/c18/">← 第十八章 通道二：目标发生—</a><a href="/books/m/70/text/c20/">第二十章 三通道定理及其两条 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

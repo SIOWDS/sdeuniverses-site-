@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第十三章 四条硬边界 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第十三章 四条硬边界 · 王德生 著 · 约 1.4 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第十三章 四条硬边界</h1><div class="meta">SDE数学解构导论 · 约 1,394 汉字</div>
+<p>一条只会成立、从不失效的定理不是定理，是定义。本章交出定理 9.4 与推论 9.5 不说的四件事。四条都不是谦辞，每一条都划出一块可查的区域。</p>
+<h3>一、边界之一：只对同构不变量成立</h3>
+<p>定理 9.4 给的是"在唯一同构下唯一"。因此推论 9.5 中的 P 必须是同构不变的。</p>
+<p>不是同构不变的"特征"，其实不是 S 的特征，是某个表现的特征。sin 的幂级数系数表、它在 ℝ 上的图像、它作为 Im(e^(ix)) 的写法，是同一个 S 的三种表现；"第三项系数是 1/120"是表现的特征，不是 sin 的特征。</p>
+<p>这不是漏洞，是定理给出的划界：</p>
+<p>S 的特征集，恰是它的纠缠模式的不变量集。</p>
+<p>定理 9.7（米田）正是这句话的定理形式——对象被它与万物的关系穷尽，而"关系"只在同构意义下有意义。</p>
+<h3>二、边界之二：F 非单射，决定是单向的</h3>
+<p>推论 10.3 已经给出四个证人。给定 S 不能反推唯一的 (D, E)；能反推的只有 D 的极小零化算子（定理 12.1），而且不含种子。</p>
+<p>这条边界的后果在注 10.4 已经说过，此处只重申一次并把它写成正式条款：凡问"两组不同的 (D, E) 是否给出同一个 S"的问题，本编不提供工具。 那是纤维结构的问题，而定理 9.4 对纤维一无所知。</p>
+<h3>三、边界之三：E 必须给结构，不能只给理论</h3>
+<p>若 E 只以一阶理论呈现，Löwenheim–Skolem 定理与非范畴性立即使决定失效：同一套公理有互不同构的模型，S 的特征随模型而变。最著名的例子是：若 ZFC 一致，则连续统假设在其不同模型中真假不同。</p>
+<p>关键在于这不是定理 9.4 的反例。它正是条款 ⓑ 被违反时应当发生的事。于是本框架给独立性现象一个准确位置：</p>
+<p>独立性 = E 没给全。</p>
+<p>这是一句可查的判断，不是一句解释。它可以被推翻——只要找到一个 E 已经以完整结构形态给出、而某条同构不变特征仍不确定的例子。</p>
+<h3>四、边界之四：存在无 D 的对象</h3>
+<p>ℝ 上的 ℚ-Hamel 基、ℕ 上的非主超滤、ℝ 的良序——这些对象的存在由选择公理断言，而没有有穷生成律可写。它们不是"D 很复杂"，是没有 D：在 ZF + 依赖选择 + "所有实数集可测"的模型中，它们干脆不存在。</p>
+<p>故它们不在 F 的定义域内。严格命题因此应当这样表述：</p>
+<p>凡可生成的数学对象，S = F(D, E)；而纯存在性区——由选择公理断言、无构</p>
+<p>造——恰是无 D 区。</p>
+<p>这不是退让。它把命题变成一条可查的分界线：</p>
+<p>一个数学对象是否 SDE-可发生，等价于它是否在其所在结构上可由有穷生成</p>
+<p>律定义。</p>
+<p>这条分界线本身可以被检验，也可以被推翻：找出一个公认无构造的对象却写得出合格的 D，或找出一个有合格 D 的对象却不可生成，本条即倒。</p>
+<h3>五、可证伪条件与一条诊断规则</h3>
+<p>如何证伪本编：找出一个数学对象，其某条同构不变特征在 D 与 E 都被固定之后仍不确定。</p>
+<p>定理 9.4 表明这只在（余）极限不唯一时发生，而极限不唯一意味着两件事之一：D 有未定的分叉（条款 ⓐ 未满足，"有穷"不等于"够"——注 10.1 已给出一个具体的少给一位的例子），或 E 只给了理论没给结构（条款 ⓑ）。</p>
+<p>因此本编的最终形态不是一句宣告，而是一条诊断规则：</p>
+<p>"特征未定"永远等价于"D 或 E 没给全"。</p>
+<p>这条等价可以拿去查任何一个具体对象。它给出的是一个可执行的动作——特征查不出来时，不要去猜对象的"本性"，去数 D 的种子够不够、去看 E 是结构还是一组公理。</p>
+<h3>六、本编未做的一件事</h3>
+<p>归属表目前是逐条手工判定的。要把它从一批判例升级为一台机器，需要一条归属分解定理：</p>
+<p>对给定特征 P，定义其 D-份额与 E-份额为 P 在"固定 E 变 D"与"固定 D 变</p>
+<p>E"两族扰动下的敏感度，并证明二者构成一个分解。</p>
+<p>这一步做出来，本编就从"逐例兑现"升到"有一般机器"；做不出来，本编的归属部分永远是一批需要逐条验证的判例。它是本书第六编的第一个可检验问题。</p>
+<h3>七、本编所用的 S、D、E 与它们被略去的部分</h3>
+<p>按本书第一编的纪律，此处须交代本编的适用层级。</p>
+<p>本编所用的 D，全部落在 D2（路径组织） 这一层：递推、微分算子、极限规则。D1（意义目标） 完全未进入——本编从未问过"为什么要生成 sin"，而那正是第一编第三章第四节所说、定义里被略去的那一层。D3（优化约束） 亦未使用，因为本编的对象不由极小化产生。</p>
+<p>本编所用的 E，全部落在 E1 的理念界一格：域、环、拓扑、赋值、范畴。E2（信息三模态）与 E3（能量三态）未进入。</p>
+<p>这一交代不是免责声明，而是定位：本编证明的是理念界内、D2 层上的决定关系。把它外推到现实界或自我界的对象，需要另行论证，本编不为那种外推背书。</p>
+<div class="nav"><a href="/books/m/70/text/c12/">← 第十二章 两个变量都不可省</a><a href="/books/m/70/text/c14/">第十四章 这一编在范畴论之外 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第九章 决定定理 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第九章 决定定理 · 王德生 著 · 约 1.2 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第九章 决定定理</h1><div class="meta">SDE数学解构导论 · 约 1,206 汉字</div>
+<h3>一、三个对象的形式定义</h3>
+<p>定义 9.1（纠缠系统 E） 一个结构：载体集连同其上的运算、关系、拓扑或</p>
+<p>赋值；或范畴化地，一个范畴 𝓔 连同其全部态射。E 须满足条款 ⓑ。</p>
+<p>定义 9.2（差异路径 D） 一个生成律。形式上：一个小范畴 J 与一个图式</p>
+<p>D: J → 𝓔。解析形式上：一个差分算子或微分算子，配一个种子。D 须满足条</p>
+<p>款 ⓐ。</p>
+<p>定义 9.3（显露态 S） D 在 E 中的解：极限、余极限、初代数或表示对象，</p>
+<p>视 D 的形态而定。</p>
+<p>三条定义有一个共同特点：它们都不预设 S 已经存在。E 是先在的土壤，D 是可写下的推进律，S 是二者相遇后发生出来的那个东西。这正是"在 E 中，经 D，成 S"这一句在数学里的准确落法。</p>
+<h3>二、决定定理</h3>
+<p>定理 9.4（决定定理） 设 D: J → 𝓔 为图式。若 D 在 𝓔 中的极限存在，则它</p>
+<p>在唯一同构下唯一。因此</p>
+<p>F : (D, E) ⟼ [S]</p>
+<p>是一个单值偏函数。</p>
+<p>证明 设 L 与 L′ 皆为 D 的极限，分别配以锥 (λ_j)_(j∈J) 与 (λ′_j)_(j∈J)。</p>
+<p>由 L′ 的泛性质，存在唯一态射 u : L → L′ 使得对一切 j 有 λ′_j ∘ u = λ_j。 由 L 的泛性质，存在唯一态射 v : L′ → L 使得对一切 j 有 λ_j ∘ v = λ′_j。</p>
+<p>考察 v ∘ u : L → L。对一切 j， λ_j ∘ (v ∘ u) = (λ_j ∘ v) ∘ u = λ′_j ∘ u = λ_j。 而恒等态射 id_L 同样满足 λ_j ∘ id_L = λ_j。由 L 的泛性质中中介态射的唯一性，得 v ∘ u =id_L。</p>
+<p>对称地，u ∘ v = id_(L′)。故 L ≅ L′，且该同构由泛性质唯一确定。∎</p>
+<p>余极限的情形把全部箭头反向，证明逐字对偶。</p>
+<p>推论 9.5 对任何同构不变的性质 P，恒有</p>
+<p>P(S) = P ∘ F(D, E)。</p>
+<p>即：S 的每一条特征都是 (D, E) 的函数。</p>
+<p>证明 由定理 9.4，F 是单值的，即 (D, E) 唯一确定同构类 [S]。P 在同构类上良定，故P ∘ F 是 (D, E) 上的良定函数，且其值等于 P(S)。∎</p>
+<p>推论 9.5 是本编的主命题。它的证明只有一行，因为全部工作已经在定理 9.4 里做完了——单值性一旦成立，"每条特征都是二者的函数"就是它的直接读法。</p>
+<h3>三、解析版：Picard–Lindelöf</h3>
+<p>范畴论的写法覆盖面广，但离具体对象远。同一件事在分析里有一个人人熟悉的面孔。</p>
+<p>定理 9.6（解析版） 设 E = (X, ||·||) 为 Banach 空间，配以实区间 I 上的完</p>
+<p>备度量结构。设 D = (f, x₀)，其中 f : I·X → X 连续且关于第二变元一致</p>
+<p>Lipschitz，x₀ ∈ X 为种子。则初值问题</p>
+<p>x′(t) = f(t, x(t))，x(t₀) = x₀</p>
+<p>有唯一的极大解。</p>
+<p>这就是 Picard–Lindelöf 定理。它的标准证明是把初值问题转写为积分方程，再对压缩映射用 Banach 不动点定理。在本编的语言里：E 提供完备性（不动点定理的前提），D 提供压缩（Lipschitz 条件与推进律），S 是那个不动点。 三者的分工在证明中一目了然，缺任何一个,不动点都不存在或不唯一。</p>
+<p>值得注意的是失败的方式也各归其位：Lipschitz 条件坏掉（D 的问题）会导致解不唯一，例如 x′ = 2√|x|、x(0) = 0 有无穷多解；完备性坏掉（E 的问题）会导致解不存在。这一对失败例正是第十二章"两个变量都不可省"的分析版预演。</p>
+<h3>四、E 一侧的独立佐证：米田引理</h3>
+<p>第三个角度来自范畴论最基本的一条定理。</p>
+<p>定理 9.7（米田引理的推论） 米田嵌入 y : 𝓔 → [𝓔^op, Set]，X ↦ Hom(−,</p>
+<p>X)，是全忠实的。因此</p>
+<p>X ≅ Y 当且仅当 Hom(−, X) ≅ Hom(−, Y)（作为函子自然同构）。</p>
+<p>这句话的读法是：一个对象在同构意义下被它与全体对象的关系穷尽。 换言之，"S 由纠缠决定"在范畴论里不是隐喻，是一条一百年来天天在用的定理。</p>
+<p>而 D 在这里出现于另一个位置：关系模式不是凭空给出的，它由某个图式生成，而图式的形状——哪些箭头、按什么次序、如何复合——正是差异路径。定理 9.4 说的是"给定图式，极限唯一"；定理 9.7 说的是"给定关系全貌，对象唯一"。两条从不同侧面夹住同一件事。</p>
+<h3>五、一句要紧的话</h3>
+<p>必须把下面这句写在本章末尾，否则本编会被高估：</p>
+<p>形式化之后，定理 9.4 近乎自明。</p>
+<p>它是泛性质唯一性引理，任何一本范畴论教材的第一章都有。本编把它请到这里，不是因为它难，而是因为它把一句哲学宣告钉成了一条有前提、有证明、有边界的数学命题——而在此之前，那句宣告既不能被证明也不能被推翻。</p>
+<p>因此本编真正承重的部分不在第九章，在第十一章：归属。定理只说"S 的特征是 (D, E) 的函数"，它不说是哪一个函数，更不说某条具体特征的成因该记在 D 名下还是 E名下。后者才是可错的、可检验的、能预言换掉 E 之后哪条会翻面的部分。全编的力气从下一章起全部用在那里。</p>
+<div class="nav"><a href="/books/m/70/text/c08/">← 第八章 先设防：一个不设防的</a><a href="/books/m/70/text/c10/">第十章 sin(x)：四条路 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

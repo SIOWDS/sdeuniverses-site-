@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第十四章 这一编在范畴论之外做了什么 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第十四章 这一编在范畴论之外做了什么 · 王德生 著 · 约 1.9 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第十四章 这一编在范畴论之外做了什么</h1><div class="meta">SDE数学解构导论 · 约 1,871 汉字</div>
+<h3>一、一个必须正面回答的攻击</h3>
+<p>把本编用到的主要工具排开：</p>
+<div class="tw"><pre class="rawtbl"> •   定理 9.4 是泛性质唯一性引理，任何一本范畴论教材第一章都有；
+ •   定理 9.7 是米田引理，1954 年的东西；
+ •   定理 12.1 是 D-有限函数理论的标准结果。</pre></div>
+<p>三条都不新，都不是本编造的。于是攻击成立：</p>
+<p>你把三条现成定理翻译成三个字母，然后宣布这是一门本体论。</p>
+<p>这个攻击必须被正面回答，而不能靠加术语绕开——因为就那三条定理而言，它完全是对的。本编没有证明任何一条新的极限唯一性定理，将来也不会。</p>
+<h3>二、范畴论不问的那个问题</h3>
+<p>范畴论拥有定理 9.4，但它不问归属。</p>
+<p>给定图式 D 与范畴 𝓔，范畴论关心的是：极限是否存在，如何构造，有哪些泛性质，保极限的函子是哪些。它不问：这个极限的某一条具体特征，是图式给的还是范畴给的？</p>
+<p>这不是范畴论的疏忽，而是问题在它内部不良构。范畴论处理的是"给定 (J, 𝓔) 之后的结果"；归属问的却是"把 (J, 𝓔) 拆开，看哪一半在承重"。要问出这个问题，必须先允许 D 与 E 各自独立变动、并把变动后的结果拿来比较——那要求把 (D, E) 当作一对变量，而不是一组输入。</p>
+<p>第十一章那五个反例，形式上全部是"固定一个变量、扰动另一个、观察哪条特征翻面"。这是一个敏感度实验的形状，不是一个范畴论命题的形状。</p>
+<h3>三、这个立场产生的三样东西</h3>
+<p>其一，可以出错的判断。 反例四把加法定理的归属从 D 改判为 D ∧ E（交换性）。这是一个判断，它可以错，而且本编初稿确实错了。范畴论不产生这类判断，因为它不下这类判断——它既不说加法定理"属于"图式，也不说它"属于"范畴。</p>
+<p>其二，一条可执行的诊断规则。"特征未定 ⟺ D 或 E 没给全"告诉你回去查什么：数种子够不够（注 10.1 的 c′(0)），看 E 是结构还是一组公理（边界之三）。范畴论对同一现象的说法是"泛性质未被满足"，那是内部描述，不指向外部动作。</p>
+<p>其三，一条分界线。"SDE-可发生 ⟺ 可由有穷生成律定义"把选择公理断言区划到 F的定义域之外。在范畴论里这不是定理，是一个立场；本编把它写成了可证伪的命题（边界之四末段给了推翻它的两条具体路径）。</p>
+<h3>四、也必须说清它还不是什么</h3>
+<p>下面这句同样要说，否则本编就在做它自己批评过的事：</p>
+<p>决定定理不是本学派的贡献。归属问题才是——而归属问题目前只做完一半。</p>
+<p>第十三章第六节已经承认：归属表是十一条判例，不是一台机器。在归属分解定理被证明之前，本编能主张的东西是有限的，且必须这样列：</p>
+<p>已经做到的——把一句不可检验的宣告，改造成一条有三条前提、一个证明、四条边界的命题；提出了一个范畴论不问的问题；给出十一条判例，其中一条推翻了作者自己。</p>
+<p>尚未做到的——把归属从判例升为机器；把本编从 D2 与 E1 一格推广到 D 的三层与 E的三维（第十三章第七节）。</p>
+<p>这个自我限定不是谦辞，而是本编要求读者对它使用的同一把尺。第一编批评终态定义"把生成条件藏了起来"；本编若把自己的未完成部分藏起来，就是同一种病，只是换了个方向。</p>
+<h3>五、一句话</h3>
+<p>本编的位置可以这样定：</p>
+<p>它借范畴论的定理立住脚，然后问了一个范畴论不问的问题。</p>
+<p>立住脚的那一半不新；问出来的那个问题，才是本书的。本编术语术语 定义无循环条件（条款 ⓐ） D 须有穷可述，且描述中不得出现 S，不</p>
+<p>得含 S 的谕示结构而非理论（条款 ⓑ） E 须以载体、运算、关系、拓扑或赋值本</p>
+<p>身给出，不得只给公理F 为偏函数（条款 ⓒ） (D, E) 可以无解；F 的定义域本身是待查</p>
+<p>的事实决定定理 若 D 在 E 中的（余）极限存在，则在唯</p>
+<p>一同构下唯一，故 F 单值归属 判定某条特征的成因坐落在 D、E 还是二</p>
+<p>者的乘积上归属检验 判 D 的换 E 应不变，判 E 的固定 D 换 E</p>
+<p>应翻面半塌 归 D ∧ E 的特征在换 E 时只翻 E 那一</p>
+<p>半，D 那一半原样保留无D区 由选择公理断言存在而无有穷生成律的对</p>
+<p>象区；不在 F 的定义域内归属分解 把特征的 D-份额与 E-份额定义为两族扰</p>
+<p>动下的敏感度并证明其构成分解（未做）</p>
+<p>本编参考文献1. S. Mac Lane, Categories for the Working Mathematician, 2nd ed., Springer,</p>
+<p>1998.（定理 9.4、9.7）2. E. Coddington and N. Levinson, Theory of Ordinary Differential Equations,</p>
+<p>McGraw–Hill, 1955.（定理 9.6）3. J. Aczél, Lectures on Functional Equations and Their Applications,</p>
+<p>Academic Press, 1966.（第十章第三节）4. F. Q. Gouvêa, p-adic Numbers: An Introduction, 3rd ed., Springer, 2020.</p>
+<p>（反例二）5. N. J. Higham, Functions of Matrices: Theory and Computation, SIAM, 2008.</p>
+<p>（反例四）6. R. P. Stanley, Enumerative Combinatorics, Vol. 2, Cambridge University</p>
+<p>Press, 1999，第六章。（定理 12.1，D-有限函数）7. T. Jech, The Axiom of Choice, North-Holland, 1973.（边界之四）8. R. M. Solovay, "A model of set theory in which every set of reals is</p>
+<p>Lebesgue measurable," Annals of Mathematics 92 (1970), 1–56.（边界之</p>
+<p>四）</p>
+<h3>第三编       三通道：一个新的数学结构从哪里来</h3>
+<p>编首语</p>
+<p>第二编回答了一个静止的问题：给定差异路径 D 与纠缠系统 E，显露态 S 被决定到什么程度。答案是决定定理——若解存在则在唯一同构下唯一，因而 S 的每一条同构不变特征都是 (D, E) 的函数。</p>
+<p>但那条定理有一个它自己说不出口的前提：(D, E) 是给定的。</p>
+<p>数学史上真正重要的事件，恰恰是 (D, E) 被换掉的那一刻。没有人把加法当作“给定D 之后被决定的 S”——加法是新出现的。分数、负数、幂、对数、方程、函数、微积分、概率、分布、概形，全都是新出现的。第二编管的是“给定之后会怎样”，本编管的是“为什么会有新的给定”。</p>
+<p>这两问互补，且后者不能由前者推出。决定定理的四条硬边界之二写着“F 非单射”——同一个 S 可由多条 (D, E) 达到；但它对“新的 (D, E) 从哪里来”一个字都没说。本编填这一格。</p>
+<p>本编的回答不是给出一个来源，而是给出一张通道表与三条判定签名：新 S 的发生走压缩、目标发生、扩张三条通道的非空组合，每条通道各有一个可以当场判错的签名。给不出签名的分类是文学；能判错的分类才是命题。</p>
+<p>三条通道的证据群互不依赖：通道一的证据是小学算术，通道二的证据是数学史上可指认年代的四个事件，通道三的证据从小学的负数一路排到 Grothendieck 的概形。本编最要紧的一句话出现在第十九章——一年级学的负数与代数 K-理论的 K₀ 走的是同一条通道，而且是字面同一条：都是把一个交换幺半群群化，都由同一条泛性质唯一确定。</p>
+<p>本编也交出两处诚实：三条通道不互斥（微积分是三条复合的标本），穷尽性未证（范畴论的诞生可能是第四条）。这两处都配了证伪条件。</p>
+<div class="nav"><a href="/books/m/70/text/c13/">← 第十三章 四条硬边界</a><a href="/books/m/70/text/c15/">第十五章 问题：一个新的数学 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

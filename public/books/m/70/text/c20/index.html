@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第二十章 三通道定理及其两条边界 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第二十章 三通道定理及其两条边界 · 王德生 著 · 约 1.0 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第二十章 三通道定理及其两条边界</h1><div class="meta">SDE数学解构导论 · 约 1,032 汉字</div>
+<h3>一、定理</h3>
+<p>定理 20.1（三通道，分解形式）. 设 S 为一次新发生的数学结构。则 S 的发</p>
+<p>生可分解为通道一（压缩）、通道二（目标发生）、通道三（扩张）三者的</p>
+<p>非空组合；每条通道的参与与否，由签名 A、B、C 分别判定，且判定可以为</p>
+<p>假。</p>
+<p>注意陈述的形式是分解，不是归类。早期表述写作“走且仅走三条之一”，那是错的，下一节给出反例。</p>
+<h3>二、边界一：三条不互斥，微积分是标本</h3>
+<p>微积分的发生同时走三条通道，逐条拆开：</p>
+<p>通道一在场。 有限差分求变化率，要达到精度 ε 需要的步数随 ε 增长；一次求导则给出闭式。代价降阶，签名 A1 成立。</p>
+<p>通道二在场。 “瞬时速度”这个目标不是自明的。芝诺悖论表明，在被力学问出来之前，“某一刻的速度”甚至被认为是自相矛盾的。目标的出场年代可指认（十七世纪，与力学问题绑定），签名 B1 成立。</p>
+<p>通道三在场。 差商序列在有理数中不收敛；极限概念要求完备化，而 ε–δ 与实数构造的最终落定比牛顿莱布尼茨晚了两百年。签名 C1 成立。</p>
+<p>所以微积分是 (一, 二, 三) 全在场的一次发生。这解释了它为什么难教：三条通道的内容需要三种不同的教法，而教材通常只用压缩通道的教法（给公式，练计算）。</p>
+<p>第十六章表格最后一行留下的悬案至此了结：微分不是纯压缩，它是复合。</p>
+<h3>三、边界二：穷尽性未证，且已有一个候选反例</h3>
+<p>定理 20.1 断言三条通道足以分解每一次发生。这一断言目前没有证明，本编也不假装有。它的地位是一条经受了检验的经验命题，其证伪条件明确：</p>
+<p>证伪条件. 举出一次新数学结构的发生，签名 A、B、C 三者全部为假。</p>
+<p>本编自己提出第一个候选：范畴论的诞生。</p>
+<p>Eilenberg 与 Mac Lane 在 1945 年引入范畴，动机是为了精确定义“自然同构”。为了说清什么叫自然变换，需要函子；为了说清什么叫函子，需要范畴。逐条判：</p>
+<div class="tw"><pre class="rawtbl"> •   签名 A：没有把任何东西算得更短，A1 为假。
+ •   签名 B：目标（“自然”这个词是什么意思）确实是新的，B1 似乎成立；但 B2
+     存疑——当时的代数拓扑并非运行顺畅，“自然”一词被大量使用而无定义，这
+     本身像一种亏损。
+ •   签名 C：没有一族算子不封闭，也没有序列缺极限。C1 为假。</pre></div>
+<p>所以范畴论要么是纯通道二，要么是三条之外的第四条——一条可称为“语言层升维”的通道：不是对象不够、不是代价太高、不是问题新，而是现有的语言说不出一句已经在被使用的话。</p>
+<p>本编不下判断，把它作为穷尽性问题的第一个靶子留在这里。若第四条通道成立，定理 20.1 应改为四通道，而三条签名不受影响——这是分解形式相对于归类形式的好处：加一条通道不推翻已有的判定。</p>
+<h3>四、边界三：本编不解释“为什么是这一次”</h3>
+<p>三条通道说明新 S 在什么条件下会发生，不说明它何时发生。除法在整数上不封闭，这个事实从整数存在的那一刻起就成立；分数却在特定文明的特定时期才出现。通道三给出的是可能性条件，不是充分条件。</p>
+<p>补上这一格需要的是通道二的内容（是什么使它成为目标），而通道二的判定依赖史料。因此本编的解释力有一条明确上限：它能说清一次发生的机制，说不清它的时刻。 凡在本书中读到“因此 X 必然出现”的句子，都应读作“因此 X 的出现有一条可指认的通道”。</p>
+<div class="nav"><a href="/books/m/70/text/c19/">← 第十九章 通道三：扩张——某</a><a href="/books/m/70/text/c21/">第二十一章 这一编能被怎样推 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

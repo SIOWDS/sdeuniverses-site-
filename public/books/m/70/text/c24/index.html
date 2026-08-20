@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第二十四章 伞：定义与伞场 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第二十四章 伞：定义与伞场 · 王德生 著 · 约 0.7 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第二十四章 伞：定义与伞场</h1><div class="meta">SDE数学解构导论 · 约 660 汉字</div>
+<h3>一、定义</h3>
+<p>定义 24.1（伞）. 一把伞是一个三元组 (x, ω, r)：中心 x ∈ ℝᵈ，半径 r &gt; 0，</p>
+<p>权函数 ω: ℝᵈ → [0, ∞)，满足 ω(y) = 0 当 |y − x| &gt; r。</p>
+<p>定义 24.2（伞场）. 伞场是一族伞 {(x_i, ω_i, r)}，允许 ω_i 与 ω_j 的支撑重</p>
+<p>叠。若进一步要求</p>
+<p>Σ_i ω_i(y) = 1 对几乎所有 y ∈ Ω</p>
+<p>则称该伞场为单位分解型的。</p>
+<p>本书的伞是第 53 号那个伞的单参数截面。 第 53 号的伞带三个参数——半径 r、重叠度ω、传播速度 v——并由 N = r·ω/(v·T_c) 判相；在那里，传统数学是r→0、ω=1、v→∞ 的三重退化。本书只动其中一重（r→0），把 ω 与 v 固定，换来的是一条带显式常数与收敛率的定理（第二十六章）。这是一次收窄，不是一次推广，读者不应把本编当作伞模型的完整陈述。</p>
+<p>单位分解不是相容性的恢复，是相容性的连续松弛：剖分要求每个点属于且只属于一个块（权只能取 0 或 1），单位分解只要求权之和为一（权可以在多把伞之间分配）。剖分是单位分解的一个特例——把权限制在 {0,1} 上。</p>
+<p>这一句是整编的枢纽：</p>
+<p>伞不是对剖分的否定，是把剖分的取值域从 {0,1} 放宽到 [0,1]。</p>
+<p>所有基于剖分的经典结论都保留在伞的世界里，作为权取端点的那一层；新增的是权取内点的那一层。</p>
+<h3>二、为什么叫伞</h3>
+<p>雨伞的两个性质恰好对应所需的两条：它有一个中心（伞柄）与一片有限的覆盖（伞面），并且两把伞可以叠在一起而不必打架——重叠区被两把伞同时遮住，不需要划一条线把它分给谁。</p>
+<p>划一条线把重叠区分给谁，正是相容性公理要求做的事。伞的做法是不划。</p>
+<h3>三、伞与既有对象的关系</h3>
+<p>必须说清楚，伞不是一个新对象。它在既有文献中已有多个名字：</p>
+<div class="tw"><pre class="rawtbl">既有名字               出处             与伞的关系
+核函数 / 光滑核          核密度估计、SPH      单把伞的权函数
+单位分解               微分几何、有限元       单位分解型伞场
+有限覆盖               拓扑             去掉权的伞场
+ 既有名字                       出处                   与伞的关系
+ 影响域                        无网格法                 伞的支撑
+ 非局部相互作用核                   非局部向量微积              伞的权函数
+                            分、peridynamics</pre></div>
+<p>本编取"伞"这个名字，不是因为对象是新的，而是因为需要一个词把上面五行当成同一件事来谈，并且把它与它所替代的那条公理放在同一句话里。命名的功能是让对照可见，不是宣称发现。</p>
+<div class="nav"><a href="/books/m/70/text/c23/">← 第二十三章 相容性公理的陈述</a><a href="/books/m/70/text/c25/">第二十五章 共振算子 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

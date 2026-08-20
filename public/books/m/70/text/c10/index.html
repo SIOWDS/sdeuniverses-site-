@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第十章 sin(x)：四条路径，同一个显露态 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第十章 sin(x)：四条路径，同一个显露态 · 王德生 著 · 约 0.9 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第十章 sin(x)：四条路径，同一个显露态</h1><div class="meta">SDE数学解构导论 · 约 913 汉字</div>
+<p>本章把 sin 的四种生成方式写成四组 (D, E)，并证明它们给出同一个 S。四组之间没有任何一组能被另一组"看出来"——它们分别属于分析、代数、群论与几何。</p>
+<h3>一、微分型</h3>
+<p>E_A = (ℝ, C^∞(ℝ, ℝ), d/dx)：实数域、光滑函数空间、通常的求导算子。</p>
+<p>D_A：y″ = −y，种子 (y(0), y′(0)) = (0, 1)。</p>
+<p>唯一性来自线性常系数算子的标准事实：L = d²/dx² + 1 的核是二维实向量空间，而映射 y ↦ (y(0), y′(0)) 是该核到 ℝ² 的线性同构。种子选定核中唯一一个元素。</p>
+<h3>二、系数型：差异路径的字面形态</h3>
+<p>E_B = ℝ[[x]]，形式幂级数环，配形式求导；再加 ℝ 的完备性以谈收敛。</p>
+<p>D_B：a₀ = 0，a₁ = 1，a_(n+2) = −a_n / ((n+1)(n+2))。</p>
+<p>解这条递推。偶数下标链从 a₀ = 0 出发，故 a_(2k) = 0 对一切 k 成立。奇数下标链：设 a_(2k+1) = (−1)^k / (2k+1)!，则</p>
+<p>a_(2k+3) = −a_(2k+1) / ((2k+2)(2k+3)) = −(−1)^k / ((2k+1)! · (2k+2)(2k+3)) =(−1)^(k+1) / (2k+3)!，</p>
+<p>而 k = 0 时 a₁ = 1 = (−1)⁰/1! 成立，故归纳成立。于是S_B(x) = Σ_(k≥0) (−1)^k x^(2k+1) / (2k+1)!。</p>
+<p>这一条最见筋骨：它就是字面意义上的差异路径。每一项由上一项翻号，再被 (n+1) (n+2) 衰减；翻号制造振荡，衰减制造收敛。sin 的两条最基本性质——它会来回摆、它不会炸掉——在递推的两个因子上分别写着。第十一章的归属判断有一半可以直接从这一行读出来。</p>
+<h3>三、泛函方程型</h3>
+<p>E_C = (ℝ, +) 作为拓扑群。</p>
+<p>D_C：连续函数对 (s, c) : ℝ → ℝ² 满足</p>
+<p>s(x+y) = s(x)c(y) + c(x)s(y) c(x+y) = c(x)c(y) − s(x)s(y)</p>
+<p>并带种子 s(0) = 0、c(0) = 1、s′(0) = 1、c′(0) = 0。</p>
+<p>唯一性：由两条加法定理可验证矩阵 M(x) = [[c(x), −s(x)], [s(x), c(x)]] 满足 M(x+y) =M(x)M(y)，故 x ↦ c(x) + i·s(x) 是从 (ℝ, +) 到 (ℂ^×, ·) 的连续同态。这类同态恰为 x↦ e^(λx)，λ ∈ ℂ。写 λ = α + iβ，则 s(x) = e^(αx) sin(βx)、c(x) = e^(αx) cos(βx)。种子 s′(0) = 1 给出 β = 1，种子 c′(0) = 0 给出 α = 0。故 (s, c) = (sin, cos)。</p>
+<p>注 10.1 c′(0) = 0 这一条不能省。若只要求 s′(0) = 1，剩下的解族是 s(x) =</p>
+<p>e^(αx) sin x（α 任意实数），它们全部满足两条加法定理。这是本编第一次</p>
+<p>看到种子少给一位，S 就从一个点变成一条曲线——第八章条款 ⓐ 要求 D 有</p>
+<p>穷可述，但"有穷"不等于"够"。</p>
+<h3>四、群与几何型</h3>
+<p>E_D = (ℂ, |·|)、单位圆 S¹ = { z ∈ ℂ : |z| = 1 }、ℝ 作为一维李群。</p>
+<p>D_D：唯一的连续同态 φ : ℝ → S¹ 满足 φ′(0) = i；令 sin := Im φ。</p>
+<p>唯一性：连续同态 ℝ → S¹ 恰为 x ↦ e^(iβx)，β ∈ ℝ；φ′(0) = iβ = i 给出 β = 1。</p>
+<p>这一条把几乎全部信息压在 E 上：圆、模长、群结构都是环境，D 只剩下"在单位元处的切向是 i"这一个数据。与第二条恰成对照——第二条几乎全部信息在 D 上。同一个S，两种极端的分配方式。</p>
+<h3>五、四者等价，以及它的含义</h3>
+<p>定理 10.2 A、B、C、D 四组 (D, E) 给出同一个函数。</p>
+<p>证明梗概 B ⟹ A：由 |a_(n+2)/a_n| = 1/((n+1)(n+2)) → 0 知级数收敛半径为 ∞，故可逐项求导；代入即得 y″ = −y 与种子。A ⟹ C：固定 y，令 c := y′、u(x) := s(x+y) −s(x)c(y) − c(x)s(y)，则 u″ = −u 且 u(0) = u′(0) = 0，由 A 的唯一性 u ≡ 0；第二条加法定理同法可得。C ⟹ D：第三节已给出 x ↦ c(x) + i·s(x) 是到 S¹ 的连续同态，其在 0处的导数为 i。∎</p>
+<p>这条定理的价值不在于它成立——四种定义等价是微积分课上的常识——而在于它证伪了一个关于本编定理的自然误读：</p>
+<p>推论 10.3 F 不是单射。</p>
+<p>四组彼此不相干的 (D, E) 落在 F 的同一根纤维上。因此定理 9.4 提供的是单向的决定：给定 (D, E) 则 S 定，而给定 S 不能反推唯一的 (D, E)。</p>
+<p>注 10.4 这条单向性有具体后果，值得提前说明，以免本编被援引到它无能</p>
+<p>为力的地方。数学中有一整类深刻问题问的正是"两组毫不相干的 (D, E) 是否</p>
+<p>落在同一根纤维上"——傅里叶对偶、泊松求和、类域论及其非交换推广、镜</p>
+<p>像对称，都是这个形状。本编对这类问题不提供任何工具，因为纤维结构恰</p>
+<p>是定理 9.4 沉默的地方。第十三章会把这一点列为硬边界之二。一个框架的</p>
+<p>用处，一半在于它管得住的地方管得硬，另一半在于它管不住的地方肯说管</p>
+<p>不住。</p>
+<div class="nav"><a href="/books/m/70/text/c09/">← 第九章 决定定理</a><a href="/books/m/70/text/c11/">第十一章 特征归属表 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

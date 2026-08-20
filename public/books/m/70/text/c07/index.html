@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第七章 本编所用的 S、D、E 与它们被略去的部分 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第七章 本编所用的 S、D、E 与它们被略去的部分 · 王德生 著 · 约 2.3 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第七章 本编所用的 S、D、E 与它们被略去的部分</h1><div class="meta">SDE数学解构导论 · 约 2,275 汉字</div>
+<h3>一、为什么必须有这一章</h3>
+<p>一本导论最容易犯的错误，不是说错，是说得像是全部。</p>
+<p>前六章反复使用 S、D、E 三个字母，读者读到这里，很自然会以为已经掌握了这套框架的全貌。事实不是这样：本书用到的，是三个维度各自的一层或一格；被略去的那几层，恰好是本体论本身的主体。</p>
+<p>不交代这件事，会有两个后果。往轻里说，读者会拿一个入口去解释它解释不了的事；往重里说，本书会被误认为宣称“数学＝S＋D＋E”这样一句空话。划出边界，是使一个框架可用的前提。</p>
+<h3>二、本书用的 S 是哪一层</h3>
+<p>首先要正一个名。</p>
+<p>S 是显露（Show），不是结构（Structure）。</p>
+<p>这不是措辞讲究。显露是一条连续谱——从模糊、到轮廓浮现、到清晰可指认、到可计算；“结构”只是这条谱上最坚硬、最稳定的那一端。用“结构”命名整个 S 维度，会把一条谱窄化成它的一个端点。</p>
+<p>后果是具体的：如果 S 只指“已经稳定下来的结构”，那么“一个概念正在发生的那一段”就没有词可以说。而本书第三、四章讲的整整两条链，讲的全是那一段——加法在被发明出来之前的那个状态，既不是“没有加法”，也不是“已有加法”。它在谱的中段。</p>
+<p>本书主要使用的是谱的稳定端（圆、sin、共振算子都是可指认的对象），但必须保留整条谱的说法，否则第三、四章的叙述在自己的术语里说不通。</p>
+<h3>三、本书用的 D 是哪一层</h3>
+<p>差异序列有三层：</p>
+<p>D1 意义目标——方向：什么算“解决了”。 D2 路径组织——允许的路径族：</p>
+<p>怎么推进、怎么比较、怎么收敛。 D3 优化约束——推进中被最小化的东西：</p>
+<p>误差、冗余、损耗。</p>
+<p>第一编前六章讲的 D，几乎全是 D2：内接与外切、参数化、分割求和、极限。</p>
+<p>另外两层直到后面才补：D3 在第三编第十六、十七章（压缩通道讲的正是代价：误差、冗余、损耗），D1 在第三编第十八章（目标发生讲的正是“什么算解决了”这一层从哪里来）。</p>
+<p>这个次序是刻意的。若在第一编就把三层一起端出来，读者会把它当成一张分类表背下来；等到第三编需要用 D1 与 D3 去做判定时，它们已经变成了标签。先让读者在具体例子里撞上“代价”和“目标”，再给它们名字。</p>
+<h3>四、本书用的 E 是哪一维</h3>
+<p>纠缠系统也有三维：</p>
+<p>E1 三界——理念界（概念、规则、制度）、现实界（身体、器具、地理）、</p>
+<p>自我界（记忆、身份、意志）。 E2 信息的三种模态——符号态、逻辑态、数</p>
+<p>学态。 E3 能量的三种状态。</p>
+<p>本书用到的 E，绝大部分落在 E1 的理念界这一格：度量、拓扑、函数空间、公理系统、允许类，全在这一格里。</p>
+<p>有一处必须点明，因为它关系到本书的适用范围：数学不独属理念界。 三界各有其数学——物理定律是现实界本有的场模式，不是拿理念界的数学去套现实。这一条是化解“数学何以不合理地有效”那个疑问的方向，但它的完整展开属于本体论本身，不在本书范围内。</p>
+<p>本书只在一处用到它，而且只用到一句：两个问题若分属不同的界，同一副几何骨架可以被两套场模式分别显影，因而给出相反的秩序。 这句话在本书的姊妹卷里有一个具体的、可核对的实例（同一对候选结构在两个不同泛函下胜负相反）。本书不重复那个实例，只标明这条边界存在。</p>
+<h3>五、被略去的那几层，为什么可以略去</h3>
+<p>一个诚实的划界，必须说明“略去”是否损害了论证。逐条看：</p>
+<p>略去 D1 与 D3（在第一编内）——不损害，因为第一编只制造缺口，不做判定。判定需要三层齐备，而判定在第三编，那里三层都补上了。略去 E2 与 E3——对本书的四条主线（决定定理、三通道、退化定理、失明判据）不构成缺口，因为这四条全部在理念界内部就能陈述与检验。但要注意：这也意味着本书对“数学为什么对现实有效”这个问题没有给出回答，只指了一个方向。</p>
+<p>略去意义三律、存在三态、SIO 内部结构等——这些属于本体论主干，与本书主题的接触面很小。略去它们不影响本书任何一条命题。</p>
+<p>另注：本书不使用 varifold 的任何定理，第二章第十二节只是指出该对象存在并且早有名字；几何测度论本身不在本书范围内。</p>
+<p>一句话总结：本书是一个入口，不是一张地图。 用入口去走它通向的那几条路，是对的；用入口去代替地图，会走错。</p>
+<h3>六、一条防止过度使用的规则</h3>
+<p>框架最常见的死法不是被推翻，是被滥用——什么都能套，于是什么都不说。为防止这一点，本书给一条硬规则：</p>
+<p>不得把 S、D、E 用作分类标签。 每一次使用，必须能回答三问：变量是什</p>
+<p>么？定义域是什么？什么情况下它会失败？ 三问答不出来，就不要用这三个</p>
+<p>字母；改用该领域自己的话说。</p>
+<p>按这条规则回看本书：第二编给了 sin 的四条路径与十一行归属表（变量、定义域、失败情形俱全）；第三编给了三条通道各三条签名与四条失败标准；第四编给了共振算子的定义域、常数、收敛率与四条失败标准。凡不能这样落地的地方，本书用的是普通数学语言，没有贴标签。</p>
+<h3>七、通往第二编</h3>
+<p>本编到此结束。它交出的是：一个对象上的四格表（第二章），一整条链上的两种形状（第四章），两条边界（第五、六章），和一份适用范围声明（本章）。</p>
+<p>它没有交出任何一条命题。 这是刻意的：一本书若在第一编就给结论，读者不会知道那个结论是在补什么缺口。</p>
+<p>第二编第一页开始给命题。请带着第二章那张四格表去读它。</p>
+<h3>第二编   决定定理：数学对象的显露态由什么定</h3>
+<p>编首语</p>
+<p>第一编用圆与曲线制造了一个缺口：终态定义把生成条件和环境条件藏了起来，而藏起来的那两样并不是可以事后补上的注解——换一条逼近路径，有限阶段的周长就不同；换一个曲率环境，连 2πr 都不再成立。缺口已经打开，但第一编只到此为止：它给了例子，没有给命题。</p>
+<p>本编补这一步。它要把"数学对象的显露态 S 的特征，由差异路径 D 与纠缠系统 E 决定"这句话，从一条听上去正确的宣告，改造成一条可以为假、可以被检验、可以被推翻的定理。</p>
+<p>改造分四步。第八章设防——不设防，这句话自动为真且毫无内容，本编先说明为什么。第九章给出定理与证明。第十章至第十二章用一个对象把定理跑到底：函数sin(x)，四条互不相干的生成路径、一张逐条归属的特征表、五个可以一页纸算完的反例。第十三章交出四条硬边界，说明这条定理不说什么。第十四章回答一个必须正面回答的攻击：这一编在范畴论之外究竟做了什么。</p>
+<p>选 sin(x) 作标本有三个理由。它足够熟悉，读者不必先学一门新学科；它足够富裕，有微分、级数、群论、几何四套互不相同的生成方式；它足够坚硬，它的每一条性质都有精确的经典陈述，因此归属判断可以被当场证伪。第一编的圆做不到最后一条——圆的性质容易被说成"直观上如此"，而 sin 的性质全部有等式。</p>
+<p>一句话预告本编的结论：定理本身在形式化之后近乎自明；真正承重的是归属——每一条特征究竟是 D 给的还是 E 给的，以及这个判断能否预言"换掉 E 之后哪一条会翻面"。第十一章会给出一个例子，其中归属表推翻了本编作者自己的先验判断。那一处是全编最值得读的地方，因为它证明这张表不是给已知结论贴标签。</p>
+<div class="nav"><a href="/books/m/70/text/c06/">← 第六章 什么在发生，什么不在</a><a href="/books/m/70/text/c08/">第八章 先设防：一个不设防的 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

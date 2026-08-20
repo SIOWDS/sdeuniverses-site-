@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第二十三章 相容性公理的陈述，与它失效的三个现场 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第二十三章 相容性公理的陈述，与它失效的三个现场 · 王德生 著 · 约 1.1 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第二十三章 相容性公理的陈述，与它失效的三个现场</h1><div class="meta">SDE数学解构导论 · 约 1,061 汉字</div>
+<h3>一、陈述</h3>
+<p>相容性公理. 设 Ω 是被研究的区域。传统离散表述隐含假设：存在一族子集</p>
+<p>{c_i} 使得</p>
+<p>（不重叠） c_i ∩ c_j 至多是零测集，且 ∪ c_i = Ω； （局域） 定义在 Ω 上</p>
+<p>的量可以写成逐块的量之和，块与块之间的耦合只通过共享的界面发生，且</p>
+<p>界面上的耦合只依赖两侧有界多个块的信息。</p>
+<p>这两条覆盖了绝大部分离散几何与数值方法的默认设置：三角剖分、Voronoi 剖分、有限元、有限体积、图上的 Laplacian、逐胞求和、逐单元质量指标。</p>
+<h3>二、失效现场一：数据本身是重叠的</h3>
+<p>无网格方法（SPH、移动最小二乘）从一开始就不满足不重叠——它们用的是带重叠支撑的核，每个粒子的影响域覆盖多个邻居的影响域。这不是这些方法的缺陷，是它们的立身之本：正因为支撑重叠，函数才能在不铺网格的情况下保持光滑。</p>
+<p>这里的启发是反向的：已经有一整支数值分析放弃了相容性公理，并且工作得很好。那么问题不是"能不能放弃"，而是"放弃之后剩下什么"。本编第二十六章要回答的正是这一句。</p>
+<h3>三、失效现场二：承重的量长在界面上</h3>
+<p>第三编第十九章提到的量化问题是这一现场最干净的样本。那里的能量被写成逐胞求和，而逐胞求和正是相容性公理的直接后果。本书姊妹卷已经证明：在这一写法下存在一个天花板，它严格低于目标值，因而这一整类论证在原理上无法闭合，不论后续估计做得多精细。</p>
+<p>这个结论的形状可以脱离那个具体问题来讲：若一个问题的承重信息长在块与块的交接处，而表述规定了信息只能逐块登记，那么承重信息在登记之前就已经丢了。第二十七章会把这句话变成一条有条件的命题。</p>
+<h3>四、失效现场三：局域性本身是被假的</h3>
+<p>图上的 Laplacian 假设一个点只与它的邻居耦合。当被研究的对象本身有长程结构时——蛋白质的空间接触、地震波在非均匀介质中的传播、多尺度材料——"邻居"这个概念要么需要人为规定一个截断，要么根本不成立。截断半径是一个自由参数，而结论常常对它敏感。</p>
+<p>这三个现场的共同形状：不是方法算错了，是问题在被写下来的那一步就已经被改掉了。</p>
+<h3>五、SDE 数：离相容有多远</h3>
+<p>据此可以定义一个量，用来回答"某个问题离相容性公理有多远"。</p>
+<p>⚠ 与第 53 号的 SDE 数划界，先说在前面。 专著第 53 号已定义一个无量纲的 SDE 数N = r·ω/(v·T_c)（r 半径、ω 重叠度、v 传播速度、T_c 特征时间），用以判断系统处在秩序态、介生态还是混沌态。本节要定义的 δ 不是那个 N，两者不可混用：N 量的是伞场自身的相位，δ 量的是某个具体问题的承重泛函中有多少不能被逐块写出。二者可并用，但回答的是两个问题。为免歧义，本书此后一律称 δ 为盲缺口比，不称"SDE 数"。</p>
+<p>定义 23.1（盲缺口比 δ，工作定义）. 设问题的承重泛函为 E。令 E 在给定表</p>
+<p>示下的逐块可写部分为 E_vol，其余部分为 E_int = E − E_vol。称比值</p>
+<p>δ(E) := |E_int| / |E|</p>
+<p>为该问题在该表示下的盲缺口比。δ = 0 表示问题完全相容，逐块表述无损；</p>
+<p>δ 越大，相容性公理造成的信息损失越大。</p>
+<p>这只是一个工作定义——它依赖表示的选取，且 E_vol 与 E_int 的划分不唯一。把它做成一个良定的不变量是本编未完成的工作，第二十八章会把它列为公开问题。但即使是工作定义，它已经能提出一个可回答的问题：给定一个问题，先算它的 δ，再决定用不用逐块方法。</p>
+<div class="nav"><a href="/books/m/70/text/c22/">← 第二十二章 一条从未被写下来</a><a href="/books/m/70/text/c24/">第二十四章 伞：定义与伞场 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第八章 先设防：一个不设防的命题必然空转 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第八章 先设防：一个不设防的命题必然空转 · 王德生 著 · 约 1.0 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第八章 先设防：一个不设防的命题必然空转</h1><div class="meta">SDE数学解构导论 · 约 1,028 汉字</div>
+<h3>一、命题的原始形式</h3>
+<p>本编要证的命题，最朴素的写法是：</p>
+<p>每个数学对象的显露态 S，其全部特征由生成它的差异路径 D 与它所在的纠</p>
+<p>缠系统 E 共同决定。</p>
+<p>这句话有一个致命的方便之处：它太容易为真了。</p>
+<p>设想有人要"证明"sin(x) 的特征由 (D, E) 决定。他可以这样做：令 E = 实数域连同其通常结构，令 D = "取那个叫做 sin 的函数"。于是 S = sin，而 sin 的一切特征当然被 (D, E) 决定——因为 D 里已经装着 sin 本身。</p>
+<p>这不是抬杠。它是一切"某某由某某决定"型命题的标准塌陷方式：只要允许决定项包含被决定项，命题就退化为同语反复。一个永远为真的命题不提供任何信息，也不可能被检验；它看上去像一条定律，实际上是一句语法。</p>
+<p>因此本编的第一件事不是证明，是设防。</p>
+<h3>二、设防之一：D 不得提及 S</h3>
+<p>条款 ⓐ（无循环条件） D 必须有穷可述，且其描述中不得出现 S，也不得</p>
+<p>含 S 的谕示。D 只许说一件事：差异如何从上一步推进到下一步，加上一个</p>
+<p>种子。</p>
+<p>"有穷可述"排除了把无穷多条信息偷偷塞进 D。"不得出现 S"排除了上一节那种塌陷。"只许说差异如何推进"给出了 D 的正面形态：它是一条局域的推进律，不是对结果的描述。</p>
+<p>以 sin 为例，合格的 D 是这样的：</p>
+<p>a₀ = 0，a₁ = 1，a_(n+2) = −a_n / ((n+1)(n+2))</p>
+<p>它有穷（三行）、局域（只说下一项由上一项怎么来）、不提 sin（通篇只有整数与除法）。第十章会证明它确实生成 sin，但那是定理的内容，不是定义的内容——这正是设防要保证的次序。</p>
+<h3>三、设防之二：E 必须是结构，不是理论</h3>
+<p>条款 ⓑ E 必须以结构的形态给出：载体、运算、关系、拓扑或赋值本身。</p>
+<p>范畴化地说，给出范畴 𝓔 及其全部态射。不得只给出一组公理。</p>
+<p>这一条常被忽略，后果却很硬。若 E 只以一阶理论呈现，那么由 Löwenheim–Skolem 定理与非范畴性，同一套公理会有互不同构的模型，而 S 的特征在不同模型中取值不同。此时"决定"当场失效——但失效的原因不是命题错了，是 E 根本没给全。</p>
+<p>第十三章会把这一点做成硬边界之三，并说明数学中的独立性现象在本框架里的准确位置。</p>
+<h3>四、设防之三：F 是偏函数</h3>
+<p>条款 ⓒ 由 (D, E) 到 S 的映射 F 是偏函数：(D, E) 可以无解。F 的定义域本身</p>
+<p>是一条待查的事实，不是前提。</p>
+<p>这条看似技术，其实是本编最容易被跳过、也最容易在具体案例上出事的一条。第十一章的反例三会给出一个具体现场：同一条 D，把 E 从特征零的环换到特征 p 的环，递推在某一步除不下去，S 根本不发生。若事先假定 F 处处有定义，这个现象就会被误报为"计算失败"，而它其实是一条关于 E 的结论。</p>
+<h3>五、设防之后，命题才可能是假的</h3>
+<p>三条设防合起来，命题就有了三种为假的方式：</p>
+<p>其一，(D, E) 有解但解不唯一——决定失效。 其二，某条同构不变的特征不是 (D, E) 的函数——定理为假。 其三，(D, E) 无解——F 在该点无定义。这不是反例，但必须被老实标出来，因为它划定了定理的适用范围。第九章的定理会排除第二种，而排除的方式很有信息量：它证明第二种只在第一种发生时才可能发生。这一点在第十三章第五节会被写成一条可以拿去查任何具体对象的诊断规则。</p>
+<p>本章要点 命题的内容不来自它说了什么，而来自它排除了什么。三条设防</p>
+<p>排除的是：把结果塞进原因、用公理冒充结构、假定处处有解。</p>
+<div class="nav"><a href="/books/m/70/text/c07/">← 第七章 本编所用的 S、D、</a><a href="/books/m/70/text/c09/">第九章 决定定理 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

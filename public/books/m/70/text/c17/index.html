@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第十七章 压缩的代价：一条可检验命题 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第十七章 压缩的代价：一条可检验命题 · 王德生 著 · 约 1.2 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第十七章 压缩的代价：一条可检验命题</h1><div class="meta">SDE数学解构导论 · 约 1,165 汉字</div>
+<h3>一、压缩不是免费的</h3>
+<p>第十六章的表里藏着一个规律，值得单独提出来。</p>
+<p>位值制把计数从 Θ(N) 压到 Θ(log N)。代价是什么？在逐一记号里，“把两堆合起来”就是把两串记号并排——完全局部，没有任何位与位之间的相互作用。位值制之后，加法需要进位：某一位的结果可能影响更高位。局部性没有完全丧失，但已经打了折扣。</p>
+<p>再往上一层，情况更明显。位值制下的加法，结果的第 i 位只依赖两个加数第 i 位附近有界多位（含进位链）；而位值制下的乘法不局部——乘积的第 i 位依赖两个因数所有位的乘积之和。这就是为什么竖式加法是 Θ(n) 而竖式乘法是 Θ(n²)，也是为什么快速乘法必须借道傅里叶变换。</p>
+<p>再上一层。幂把重复乘法压成了 Θ(1) 的符号，代价是：加法在幂表示下完全不局部。aᵐ 与 aⁿ 相加没有任何化简规则；而在压缩之前，重复加法与重复乘法都在同一个加法制度里。于是有：</p>
+<h3>二、命题 17.1</h3>
+<p>先给一个工作定义。</p>
+<p>定义 17.1（局部）. 设某表示把对象写成符号串。称二元运算 ∘ 在该表示下</p>
+<p>局部，若结果的第 i 个符号只依赖两个操作数第 i 个符号附近有界多个符号</p>
+<p>（允许有界长度的进位传播）。</p>
+<p>命题 17.1（压缩—局部性权衡）. 一次压缩型发生若把旧 D 的代价降阶，则</p>
+<p>旧 D 中至少有一个运算在新表示下丧失局部性；恢复该局部性需要一次新的</p>
+<p>发生——或是又一次表示改造，或是一套新的近似制度。</p>
+<p>直观论证. 若旧 D 的全部运算在新表示下都保持局部，则新旧两个表示在局部意义下互相模拟，每一步的代价至多相差常数因子，总代价不可能降阶。降阶必须来自“用更少符号承载同样信息”，而更少的符号意味着单个符号承载了更多原信息，于是原本互不相干的位之间产生了依赖——这正是非局部。∎（直观）</p>
+<p>［证据分级：命题 17.1 属第二层。上面的论证给出了机制，但“局部”的定义依赖于表示的选取，一个完全严格的陈述需要把“表示”形式化为一类编码并给出信息论式的下界。本书不声称已完成这一步。］</p>
+<h3>三、三条验证</h3>
+<p>验证一（位值制 → 竖式乘法与九九表）. 位值制压缩计数，乘法随之非局部。修复方式是发明一套 D2 流程：竖式乘法把非局部的运算拆成 n² 个局部动作再求和，九九表把最小的那批局部动作制成查表。九九表不是记忆负担，它是位值制压缩的利息。</p>
+<p>验证二（幂 → 对数）. 幂压缩重复乘法，加法随之在幂表示下彻底非局部。修复方式是对数：把乘法搬进加法，从而在对数表示下乘法重新局部。代价立刻显现——对数值一般不是有理数，表示不再有限，必须引入对数表与近似制度。这一步同时逼出了第十九章要讲的扩张（有理数不够用）。</p>
+<p>验证三（小数 → 循环节与实数）. 小数把分数比较局部化，代价是许多分数的小数表示不再有限（1/3 = 0.333…）。修复方式是循环节记号；而当循环节也不够用时（无理数），逼出的是完备化。</p>
+<p>三条验证有同一个形状：压缩 → 局部性亏损 → D2 流程被发明 → 若 D2 修不好，则逼出下一次扩张。</p>
+<h3>四、这条命题解释了什么</h3>
+<p>它把第一编的一个观察升格为机制。第一编说“新 S 进入新 E 之后需要发明 D2 流程”，那是一句正确的描述，但它没有说明为什么必然需要。命题 17.1 给出了理由：D2 不是新 S 的附属品，它是为修复压缩造成的局部性亏损而被迫发明的。竖式、通分、约分、移项、配方、消元、求导法则——每一样都可以按这条线索去问：它在修复哪一次压缩造成的哪一处非局部？</p>
+<p>失败标准. 找到一次压缩型发生，其后旧 D 的全部运算仍然局部，且未引入任何新的近似制度或新的 D2 流程。举出这样一例，命题 17.1 即被推翻。</p>
+<div class="nav"><a href="/books/m/70/text/c16/">← 第十六章 通道一：压缩——旧</a><a href="/books/m/70/text/c18/">第十八章 通道二：目标发生— →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

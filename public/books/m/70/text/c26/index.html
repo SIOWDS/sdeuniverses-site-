@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第二十六章 退化定理 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第二十六章 退化定理 · 王德生 著 · 约 0.7 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第二十六章 退化定理</h1><div class="meta">SDE数学解构导论 · 约 677 汉字</div>
+<h3>一、陈述</h3>
+<p>定理 26.1（退化定理）. 设 J: [0,∞) → [0,∞) 有界、支撑在 [0,1] 内，记</p>
+<p>M₂ = ∫ J(|w|) |w|² dw, M₄ = ∫ J(|w|) |w|⁴ dw,</p>
+<p>二者均有限。令</p>
+<p>c = M₂ / (2d).</p>
+<p>则对任何 u ∈ C⁴(ℝᵈ) 且四阶导数有界，有</p>
+<p>‖ℒ_r u − c·Δu‖∞ ≤ (M₄ / 24) · ‖D⁴u‖∞ · r² 对一切 r &gt; 0.</p>
+<p>特别地，ℒ_r u → c·Δu 一致收敛，收敛率 O(r²)。</p>
+<h3>二、证明</h3>
+<p>在 x 处展开 u(y)，令 z = y − x：</p>
+<p>u(x+z) − u(x) = ∇u(x)·z + ½ zᵀD²u(x) z + (1/6) D³u(x)[z,z,z] + R₄(z),</p>
+<p>其中 |R₄(z)| ≤ (1/24)‖D⁴u‖∞ |z|⁴。</p>
+<p>代入定义并作变量替换 z = r w（dz = rᵈ dw）：</p>
+<p>ℒ_r u(x) = ∫ r^(−d−2) J(|z|/r) (u(x+z) − u(x)) dz = ∫ r^(−2) J(|w|) (u(x+rw) −u(x)) dw.</p>
+<p>一阶项. ∫ J(|w|) ∇u·(rw) dw · r^(−2) = r^(−1) ∇u · ∫ J(|w|) w dw = 0，因为 J径向对称故 w 的一次矩为零。</p>
+<p>二阶项. r^(−2) · ½ ∫ J(|w|) (rw)ᵀ D²u (rw) dw = ½ ∫ J(|w|) wᵀ D²u w dw。由径向对称，</p>
+<p>∫ J(|w|) w_i w_j dw = δ(ij) · (1/d) ∫ J(|w|)|w|² dw = δ(ij) M₂ / d，</p>
+<p>故二阶项 = ½ · (M₂/d) · tr(D²u) = (M₂ / 2d) · Δu = c · Δu。三阶项. 被积函数是 w 的奇次齐次式，径向对称下积分为零。</p>
+<p>余项. |r^(−2) ∫ J(|w|) R₄(rw) dw| ≤ r^(−2) · (1/24)‖D⁴u‖∞ · r⁴ ∫ J(|w|)|w|⁴ dw= (M₄/24)‖D⁴u‖∞ r²。∎</p>
+<h3>三、显式常数：以指示核为例</h3>
+<p>取 J = 𝟙[0,1]（即在半径 r 的球内均匀加权）。记 σ(d) = 2π^(d/2)/Γ(d/2) 为单位球面面积，则</p>
+<p>M₂ = σ(d) / (d+2), c = σ(d) / (2d(d+2)), M₄ = σ(d) / (d+4).</p>
+<div class="tw"><pre class="rawtbl"> 维数                         c 的封闭形式                      数值
+ d=1                        1/3                          0.333333333333
+ d=2                        π/8                          0.392699081699
+ d=3                        2π/15                        0.418879020479</pre></div>
+<h3>四、验算一：精确乘子（解析）</h3>
+<p>取 d = 3、J = 𝟙[0,1]、u(x) = e^(i k·x)。由球内指数积分的闭式 ∫(|w|≤1) e^(iξ·w) dw = 4π(sin|ξ| − |ξ|cos|ξ|)/|ξ|³，得共振算子的乘子</p>
+<p>m(r) = r^(−2) [ 4π(sin t − t cos t)/t³ − 4π/3 ], t = r|k|.</p>
+<p>把 sin t − t cos t = t³/3 − t⁵/30 + t⁷/840 − ⋯ 代入并整理：</p>
+<p>m(r) = −(2π/15)|k|² + (π/210) r²|k|⁴ − ⋯</p>
+<p>第一项恰为 c·Δ 的乘子 −c|k|²，验证 c = 2π/15；第二项给出误差的精确首项 (π/210) r²|k|⁴。取 |k| = 2 计算：</p>
+<div class="tw"><pre class="rawtbl"> r            m(r)          −c|k|²        误差             预测         比值
+ 0.400        −1.63766      −1.67551      3.785e−0       3.830e−0   0.988234
+              9             6             2              2
+ 0.200        −1.66597      −1.67551      9.546e−0       9.574e−0   0.997042
+              0             6             3              3
+ 0.100        −1.67312      −1.67551      2.392e−0       2.394e−0   0.999260
+              4             6             3              3
+ 0.050        −1.67491      −1.67551      5.983e−0       5.984e−0   0.999815
+              8             6             4              4
+ 0.025        −1.67536      −1.67551      1.496e−0       1.496e−0   0.999951
+              6             6             4              4
+比值单调趋于 1，确认误差的阶与常数都对。同时可核对定理给出的上界：M₄/24 ·
+‖D⁴u‖ 在此情形化为 (1/24)·(4π/35)|k|⁴ = (π/210)|k|⁴，与精确首项逐字相同——即
+定理 26.1 的常数在指示核与指数函数上是紧的。</pre></div>
+<h3>五、验算二：对偶蒙特卡罗（与验算一互不依赖）</h3>
+<p>取 d = 3、J = 𝟙[0,1]、u(x) = sin x₁ cos x₂ + x₃³、x = (0.3, 0.2, 0.1)，用对偶采样 (z, −z)消去奇次项后直接数值积分（4×10⁶ 样本）：</p>
+<div class="tw"><pre class="rawtbl">r             ℒ_r u         c·Δu          误差            收敛阶
+0.400         0.01142896    0.00868798    2.741e−03     —
+              8             9
+0.200         0.00936516    0.00868798    6.772e−04     2.017
+              9             9
+0.100         0.00884634    0.00868798    1.584e−04     2.096
+              6             9
+0.050         0.00871646    0.00868798    2.847e−05     （抽样噪声
+              1             9                           主导）</pre></div>
+<p>前两个收敛阶 2.017 与 2.096 独立确认 O(r²)。r 更小时误差已降到 10⁻⁵ 量级，蒙特卡罗噪声开始主导，此时的阶数不再可读——这一行保留在表中，是为了说明数值方法自身的有效范围，而不是为了充数。</p>
+<p>［证据分级：定理 26.1 属第一层，证明不依赖任何计算。第三节的常数属第一层（封闭形式）。第四节属第一层（解析展开）。第五节属第三层（数值），其作用是独立佐证，不承重。］</p>
+<h3>六、推论：经典微积分是伞模型的一个极限</h3>
+<p>推论 26.2. 在 J 与正则性条件下，经典二阶微分算子是共振算子族 {ℒ_r} 在</p>
+<p>r→0 时的极限，且差异为 O(r²)。</p>
+<p>把它放回第 53 号的框架：那里说传统数学是 r→0、ω=1、v→∞ 的三重退化，本推论给出的是其中 r→0 那一重的定量版本——带条件、带显式常数、带 O(r²) 收敛率。另外两重（ω 与 v）本书未处理。</p>
+<p>这句话的意义不在于"经典理论被包含了"——那只是一个包含关系，本身不产生任何新东西。意义在于它的逆用：</p>
+<p>既然经典理论是 r→0 的那一层，那么在 r→0 中被抹去的一切，经典理论结</p>
+<p>构性地看不见。</p>
+<p>下一章处理的就是"被抹去的是什么"。</p>
+<div class="nav"><a href="/books/m/70/text/c25/">← 第二十五章 共振算子</a><a href="/books/m/70/text/c27/">第二十七章 退化中丢失的：体 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

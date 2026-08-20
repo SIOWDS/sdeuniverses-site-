@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第二十二章 一条从未被写下来的公理 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第二十二章 一条从未被写下来的公理 · 王德生 著 · 约 0.9 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第二十二章 一条从未被写下来的公理</h1><div class="meta">SDE数学解构导论 · 约 853 汉字</div>
+<h3>一、从一个不被追问的动作说起</h3>
+<p>做数值计算的人每天都在做同一个动作：把区域切开。有限元把它切成单元，有限体积把它切成控制体，Voronoi 把它切成胞，网格把它切成格子。切开之后，每个块上算一次，最后加起来。</p>
+<p>这个动作从来没有人要求过论证。它看上去不是一个假设，而是"把问题写下来"这件事本身。</p>
+<p>但它是一个假设。</p>
+<p>这条假设不是本书发现的。 姊妹卷《SDE 数学导论（修订版）》（德麦国际专著第 53号）已经把它命名为相容性公理，并写成六重约束：conforming 网格、合法中间态、质量单调性、确定性、可审计性、固定点收敛；该书第一编证明这六条不是数学必然而是物理假设，并以 Santos 定理给出它的不完备性。</p>
+<p>本书沿用那个名字，并只取其中与本编主题直接相关的两条粗化形式：</p>
+<p>切开的块互不重叠。 每个块只跟它的直接邻居打交道。</p>
+<p>第一条是分割的定义，第二条是局域性。两条合起来，本书称为相容性公理。</p>
+<h3>二、为什么它从未被写下来</h3>
+<p>一条公理若长期无人写下，通常有两种原因：它太显然，或者它根本不是从假设那一侧进来的。相容性属于后者。</p>
+<p>回到第十七章的命题 17.1：一次压缩必然使某个运算丧失局部性，而修复局部性需要新的流程或新的表示。分割正是这种修复的一种。把连续区域压缩成有限个数（离散化），代价是原本处处成立的微分关系不再局部；修复方式是规定一套不重叠的块，让每个块内部自洽、块与块之间只在界面上交接。局部性由此被人工恢复。</p>
+<p>所以相容性不是有人主张的观点，是离散化这个动作自带的附赠品。它随表示进来，不随假设进来。这解释了它为什么从未被写下来——没有人主张过它，因此也没有人想到要为它辩护。［证据分级：本节属第三层。它是一条解释性判断，不是可验算的命题。可被推翻的方式是找出一支离散数学传统，其离散化不伴随不重叠假设，且不需要以其他方式恢复局部性。］</p>
+<h3>三、不写下来的代价</h3>
+<p>一条未被写下的假设有一个特别的危险：它不会出现在任何一份"本方法的适用条件"里。</p>
+<p>于是当一个方法失败时，人们会去检查它写下来的每一条假设，检查完了发现都满足，便得出结论"这是技术困难，估计还不够精细"。而真正的病灶在那条没有被写下来的假设上，它从不进入排查名单。</p>
+<p>本书第三编第十九章已经给过一次这种纠正的样本：分数被长期归入"整数不够用所以要扩张"的通道一叙述，直到用签名 A2 一判才发现表达域变了。相容性公理的情形更隐蔽，因为它连一句叙述都没有。</p>
+<div class="nav"><a href="/books/m/70/text/c21/">← 第二十一章 这一编能被怎样推</a><a href="/books/m/70/text/c23/">第二十三章 相容性公理的陈述 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第十六章 通道一：压缩——旧路径的代价超过阈值 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第十六章 通道一：压缩——旧路径的代价超过阈值 · 王德生 著 · 约 1.1 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第十六章 通道一：压缩——旧路径的代价超过阈值</h1><div class="meta">SDE数学解构导论 · 约 1,116 汉字</div>
+<h3>一、机制</h3>
+<p>通道一的机制可以一句话说完：</p>
+<p>旧 D 在旧 E 上仍然做得出来，但随着 E 的规模上升，代价增长到不可接受；</p>
+<p>新 S 是一次表示压缩，它把代价降阶，并保证旧 D 的输出可以从新表示中恢</p>
+<p>复。</p>
+<p>要点在“仍然做得出来”。这是通道一与通道三的分界：通道一里旧方法没有失败，只是变得昂贵；通道三里旧方法根本给不出对象。混淆这两者，是既有文献里最常见的一处错误，本编第十九章将纠正一次具体的误判。</p>
+<h3>二、七个例子与压缩比</h3>
+<p>把第一编的概念发生链按代价重排，通道一的签名立刻显形。设规模参数为 n。</p>
+<div class="tw"><pre class="rawtbl">旧D        任务         旧代价        新S   新代价          性质
+逐一记号      记录数量 N     Θ(N) 个符号 位值制    Θ(log N) 个   指数压缩
+                                     符号
+数数        求 k 组已知    Θ(N)，N 为   加法   Θ(k·log N) 指数压缩
+          数量之和       总数
+加法        a 重复 n 次   Θ(n) 次运算   乘法   Θ(1) 符号长     指数压缩
+                                     度
+乘法        a 自乘 n 次   Θ(n) 次乘法   幂    Θ(1) 符号长     指数压缩
+                                     度
+通分        两个分数比      求最小公倍      小数   逐位对齐         局部化
+          大小         数               Θ(位数)
+幂         由 aˣ=b 求 x 无直接算       对数   乘法群 →        局部化
+                     法，试探            加法群
+有限差分      求瞬时变化      不可达（只      微分   一次求导         见第二十章
+          率          能逼近）</pre></div>
+<p>前四行是同一件事的四次重演：把“重复”折叠成“参数”。逐一记号把 N 个记号折成 log N 位；加法把“重新数一遍”折成“取已有结果相加”；乘法把“重复加”折成“因子与次数”；幂把“重复乘”折成“底与指数”。每一次折叠都把线性代价降为对数代价或常数符号长度。</p>
+<p>第五、六行不同：小数与对数并没有把代价降阶，它们做的是另一件事——把一个不好算的运算搬到一个它好算的表示里。通分的困难不在于规模，在于最小公倍数依赖两个分母的算术关系；小数把这一依赖去掉，代价变成纯位数。对数把乘法搬进加法。这一类本章称为局部化型压缩，第十七章会说明它为什么必然出现。</p>
+<p>第七行是难判例，留到第二十章处理。</p>
+<h3>三、判定签名 A</h3>
+<p>据此可以写出通道一的判定签名，三条同时满足才算通道一：</p>
+<p>签名 A1（代价降阶）. 存在规模参数 n 与任务族，使旧 D 的代价 C(n) 与新 S</p>
+<p>的代价 c(n) 满足 c(n) = o(C(n))；或旧运算在新表示下由非局部变为局部。</p>
+<p>签名 A2（可恢复）. 旧 D 的全部输出可由新 S 在不高于 O(c(n)) 的代价内恢</p>
+<p>复。新 S 没有增加可表达的对象，只是把同一批对象表示得更短。</p>
+<p>签名 A3（旧 D 未失败）. 在新 S 出现之前，旧 D 对每个有限实例都给得出正</p>
+<p>确答案。</p>
+<p>A2 是这条签名的判错开关。 它要求“表达域不变”。若新 S 让原本表示不了的对象变得可表示，则 A2 为假，该次发生不是通道一——不论它看上去多么像“旧办法太麻烦了”。</p>
+<p>第十九章将用这一条推翻一处流行的归属。</p>
+<h3>四、通道一为什么是数学教育的主战场</h3>
+<p>小学到初中的绝大部分内容都落在通道一：位值制、四则、竖式、九九表、约分、小数、指数律、对数律。这解释了一个长期被误解的现象——这些内容之所以能被“训练”出来，正是因为它们是压缩。压缩有明确的效率指标，效率可以练。</p>
+<p>同时这也划出了训练的边界：通道二与通道三的内容练不出来。一个学生把分数运算练到极熟，不会因此更接近理解“为什么需要分数”，因为分数不走通道一（第十九章）。把三条通道的内容用同一套办法教，是当前数学教育里一处结构性的错配。这一判断可以被检验：若把分数按扩张通道教（从“除法在整数上不封闭”入手）而非按压缩通道教（从“分东西太麻烦”入手），理解指标应有可测的差异。这是本编留给教育研究的一个可证伪预言。</p>
+<div class="nav"><a href="/books/m/70/text/c15/">← 第十五章 问题：一个新的数学</a><a href="/books/m/70/text/c17/">第十七章 压缩的代价：一条可 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

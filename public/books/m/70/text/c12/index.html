@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第十二章 两个变量都不可省 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第十二章 两个变量都不可省 · 王德生 著 · 约 0.8 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第十二章 两个变量都不可省</h1><div class="meta">SDE数学解构导论 · 约 798 汉字</div>
+<p>第十一章证明了 E 不可省——固定 D 换 E，四次翻面。本章补上另一半，并处理一个真实的反驳。</p>
+<h3>一、固定 E 换 D</h3>
+<p>E = ℝ 与 ℝ[[x]] 一字不动。把递推中的一个符号翻过来：</p>
+<p>a₀ = 0，a₁ = 1，a_(n+2) = + a_n / ((n+1)(n+2))</p>
+<p>解得 S = Σ_(k≥0) x^(2k+1)/(2k+1)! = sinh x。</p>
+<p>对照：</p>
+<div class="tw"><pre class="rawtbl">                        sin                      sinh
+ℝ 上的零点                  πℤ，无穷多                   只有 x = 0
+有界性                     |sin| ≤ 1                无界
+周期                      2π                       无周期
+(0, ∞) 上                振荡                       严格凸、严格增</pre></div>
+<p>一个符号，对象整个换了。 D 不可省。</p>
+<h3>二、一个必须正面回答的反驳</h3>
+<p>有人可以这样反驳：第一编第二节里，内接多边形与外切多边形是两条不同的 D，却收敛到同一个 2πr；第一编第三节里，锯齿多边形是另一条 D，得到不同的周长，但那只说明 E（面积拓扑）给弱了。于是——</p>
+<p>你的 D 要么会自己消掉，要么只是 E 没写全。D 根本不是独立变量。</p>
+<p>这个反驳很强，必须正面回答，而不是绕开。回答是：上一节的 sinh 就是回答。E 完全相同（同一个 ℝ、同一个形式幂级数环、同一套收敛规则，无一处放宽或收紧），D 只改一个符号，得到的是一个在每一条可比特征上都不同的对象。这既不是"自己消掉"，也不是"E 没写全"。</p>
+<p>三种情形的分工可以并成一张表：</p>
+<div class="tw"><pre class="rawtbl">情形                   换 D 的后果           说明
+内接 / 外切              S 不变              F 非单射，同一纤维内
+                                       的两条路径（推论
+                                       10.3）
+锯齿多边形                极限不唯一             E 给弱了，(D, E) 不构
+                                       成解（条款 ⓑ）
+sin / sinh           S 真的不同            D 是独立变量</pre></div>
+<p>第一编只给了前两格。第三格是 D 之为独立变量的唯一证据，本编把它补上。缺这一格，前两格加起来恰好构成上述反驳。</p>
+<h3>三、单靠一个都不行</h3>
+<p>只给 D：递推 a_(n+2) = −a_n/((n+1)(n+2)) 里的除法在哪个环中进行没有说，"负号"是哪个环的加法逆元没有说。没有载体，S 无从谈起——反例三已经证明这不是形式上的挑剔：换个特征，同一条递推就不再有解。</p>
+<p>只给 E：ℝ[[x]] 里有不可数多个元素。没有 D，没有任何理由指向其中哪一个。</p>
+<h3>四、反向：D 能否由 S 与 E 回收</h3>
+<p>三方程的第二式 D = G(S, E) 在这里也有严格对应物，值得单列，因为它是本编唯一一处从 S 反推的地方。</p>
+<p>sin 是 D-有限（holonomic）函数：它满足一个系数为有理函数的线性常微分方程。</p>
+<p>定理 12.1（经典） 设 f 为 D-有限函数。在有理函数系数的 Weyl 代数 ℂ(x)</p>
+<p>⟨∂⟩ 中，零化 f 的算子全体 Ann(f) 构成一个左理想。由于 ℂ(x)⟨∂⟩ 具有带余</p>
+<p>除法，该理想是主左理想，由极小阶算子生成，且该生成元在 ℂ(x)^× 的左</p>
+<p>乘意义下唯一。</p>
+<p>对 sin：Ann(sin) = ℂ(x)⟨∂⟩ · (∂² + 1)。</p>
+<p>读法是：给定 E，S 唯一地决定了 D 的极小形式。 于是 S = F(D, E) 与 D = G(S, E) 在这一层同时为真，且都是定理，不是修辞。</p>
+<p>但要老实标出边界：这只回收 D 的"极小零化"那一面，不回收种子。cos 与 sin 有同一个极小零化算子，二者由种子区分。种子要从 S 在一点的 jet 读出，那是另一条信息。因此 D = G(S, E) 的准确形态是：算子部分可回收，种子部分需另给。</p>
+<div class="nav"><a href="/books/m/70/text/c11/">← 第十一章 特征归属表</a><a href="/books/m/70/text/c13/">第十三章 四条硬边界 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

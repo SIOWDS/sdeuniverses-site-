@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第二十七章 退化中丢失的：体积量与跳变量的分道 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第二十七章 退化中丢失的：体积量与跳变量的分道 · 王德生 著 · 约 0.9 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第二十七章 退化中丢失的：体积量与跳变量的分道</h1><div class="meta">SDE数学解构导论 · 约 892 汉字</div>
+<h3>一、两类量</h3>
+<p>在伞场上，一个泛函可以分成两部分：</p>
+<p>• 体积量 V_r：只用单把伞内部的信息，形如 Σ_i ∫ ω_i(y) f(u(y), ∇u(y)) dy。• 跳变量 I_r：只用伞与伞重叠区的信息，形如 Σ(i,j) ∫ ω_i ω_j · g(u|_i − u|</p>
+<p>_j)。</p>
+<p>剖分是伞的端点特例，在那里重叠区是零测的界面，跳变量退化为界面上的求和——这正是有限体积法里的通量项、逐胞结算里的接口项。</p>
+<h3>二、命题 27.1（分道）</h3>
+<p>命题 27.1. 设 u ∈ C¹ 且 ∇u 有界，g 为 p 次正齐次（g(λs) = λ^p g(s)），伞</p>
+<p>场半径 r、每单位体积伞数 ~ r^(−d)。则当 r → 0：</p>
+<p>(i) V_r → 经典体积积分，误差 O(r²)（定理 26.1）； (ii) I_r ~ C · r^(p−d)，</p>
+<p>因而 p &gt; d 时 I_r → 0：跳变信息在经典极限中被抹去； p = d 时 I_r</p>
+<p>→ 有限非零：跳变信息在极限中存活为一个新项； p &lt; d 时 I_r → ∞：</p>
+<p>经典极限不存在。</p>
+<p>论证. 单位体积内伞的数目为 Θ(r^(−d))，每把伞的重叠伙伴数为 O(1)。对 u ∈ C¹，相邻两伞中心相距 O(r)，故 u|_i − u|_j = O(r|∇u|)。g 的 p 次齐次性给出每对贡献O(r^p)。求和得 I_r = O(r^(−d)·r^p) = O(r^(p−d))。三分立即得出。∎</p>
+<p>［证据分级：属第二层。它是一条标度论证，量级正确、常数未给。临界情形 p = d 的极限值与其存在性条件，属于非局部泛函向局部泛函收敛的既有理论范围（Bourgain–Brezis–Mironescu 一系结果与其后续），本书不重复那里的分析。］</p>
+<h3>三、这条命题说了什么</h3>
+<p>它说的是一件很硬的事：</p>
+<p>在经典（r = 0）表述中，只有临界齐次度 p = d 的跳变信息能够存活。齐次度</p>
+<p>高于 d 的跳变信息在极限中恒为零——不是小，是零。</p>
+<p>于是有：</p>
+<p>推论 27.2（结构性失明）. 若一个问题的承重信息是齐次度 p &gt; d 的跳变量，</p>
+<p>则任何在 r = 0 上写出的表述都对它恒等失明，无论后续估计做得多精细。这一句给出了本书姊妹卷那条不可能性结论的一般形状。那里的具体情形是：能量被写成逐胞求和（r = 0，跳变项被丢弃），因而存在一个天花板严格低于目标值。天花板不是估计不够好造成的，是那一项在写下表述的那一刻就已经是零了。</p>
+<h3>四、诊断规则</h3>
+<p>据此，第二十三章的 SDE 数获得一个可操作的用法：</p>
+<p>失明判据. 面对一个问题，先做三件事： 一、把承重泛函按体积量与跳变量分</p>
+<p>开； 二、算跳变量的齐次度 p 与维数 d； 三、若 p &gt; d，则逐块（r=0）方法</p>
+<p>对该问题的承重部分恒等失明，应改用带重叠的表述，或把结算面迁到重叠</p>
+<p>区上。</p>
+<p>这条规则有正确答案与错误答案，因而是可用的。它同时也解释了为什么二维与三维会有截然不同的表现——d 变了，临界齐次度就变了，同一个 p 可能在二维处于临界之下、在三维处于临界之上。</p>
+<h3>五、与第三编的接口</h3>
+<p>第三编第十九章说过：扩张的方向由造成失紧的那一族算子唯一指定。本编给出了一个具体实例——共振算子的归一化指数 −(d+2) 就是这样被唯一指定的（第二十五章第三节）。而第二十七章的分道给出了扩张的代价表：扩张之后哪些信息被保住、哪些被丢掉，按齐次度分三档，一目了然。</p>
+<p>三编的关系至此完整： 第二编说给定 (D, E) 之后 S 被定到什么程度； 第三编说 (D, E)怎样被换成下一组； 第四编说换完之后，旧的那一组究竟丢了什么。</p>
+<div class="nav"><a href="/books/m/70/text/c26/">← 第二十六章 退化定理</a><a href="/books/m/70/text/c28/">第二十八章 这一编能被怎样推 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>

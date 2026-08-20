@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第二十五章 共振算子 · SDE数学解构导论 · 德麦国际专著第 70 号</title><meta name="description" content="《SDE数学解构导论》第二十五章 共振算子 · 王德生 著 · 约 0.5 千汉字"><style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#7FA8D8;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}
+pre.rawtbl{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);
+font:13px/1.75 "Noto Sans Mono CJK SC","SF Mono",Menlo,Consolas,monospace;white-space:pre;color:#DDD8D2}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.toc .sec{margin:1.6em 0 .4em;color:var(--dim);font-size:12.5px;letter-spacing:.22em}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}pre.rawtbl{font-size:11.5px}}
+</style></head><body><div class="bar"><a href="/books/m/70/">← 专著首页</a><a href="/books/m/70/text/">目录</a><span style="color:var(--dim)">德麦国际专著第 70 号</span></div><div class="wrap"><h1>第二十五章 共振算子</h1><div class="meta">SDE数学解构导论 · 约 455 汉字</div>
+<h3>一、从邻接差分到共振</h3>
+<p>在剖分的世界里，二阶算子写成邻接差分：</p>
+<p>ℒu(x_i) = Σ(j~i) w(ij) (u(x_j) − u(x_i))</p>
+<p>求和跑遍 i 的直接邻居。谁是邻居由剖分决定，因此这个算子的全部结构都建立在相容性公理上。</p>
+<p>伞的世界里没有"直接邻居"这个概念——两把伞要么重叠，要么不重叠，重叠有多少是连续的。相应的算子必须对全部重叠求和，而重叠的程度由权决定：</p>
+<p>定义 25.1（共振算子）. 设 J: [0, ∞) → [0, ∞) 有界、支撑在 [0,1] 内、不恒为</p>
+<p>零。定义</p>
+<p>(ℒ_r u)(x) = ∫ r^(−d−2) J(|x − y| / r) · (u(y) − u(x)) dy</p>
+<p>积分跑遍 ℝ ᵈ。称 ℒ_r 为半径 r、型 J 的共振算子。</p>
+<h3>二、为什么叫共振</h3>
+<p>在邻接差分里，x 与 y 之间只有"是不是邻居"这一个比特。在共振算子里，x 与 y 之间的耦合强度是 J(|x−y|/r)——一个连续的量，表示两把伞重叠得多深。重叠得深，两点的差异被强烈地共同响应；重叠得浅，响应弱；不重叠，不响应。</p>
+<p>这与本学派"纠缠"这个词的用法一致：不是先有两端再连线，而是两端被相互牵动的程度本身就是结构。共振算子把这一点写成了一个可计算的核。</p>
+<h3>三、归一化的选择</h3>
+<p>指数 −(d+2) 不是任意的，它是唯一使 r→0 极限非平凡的选择。</p>
+<p>• 若用 r^(−d)：积分的二阶项带因子 r²，极限为 0，算子退化为零。</p>
+<p>• 若用 r^(−d−4)：二阶项带因子 r^(−2)，极限发散。</p>
+<p>• 用 r^(−d−2)：二阶项不带 r，极限有限且非零。</p>
+<p>这一段初等观察就是下一章那条定理的全部动机：归一化指数是被"要一个非平凡极限"这个要求唯一逼出来的。 用第三编的语言说，这是一次通道三——指数不是选的，是被失紧唯一指定的。</p>
+<div class="nav"><a href="/books/m/70/text/c24/">← 第二十四章 伞：定义与伞场</a><a href="/books/m/70/text/c26/">第二十六章 退化定理 →</a></div><div class="foot">德麦国际专著第 70 号 · 王德生《SDE数学解构导论》</div></div></body></html>
