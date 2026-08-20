@@ -189,8 +189,10 @@ ok(clkFn("nextq", false, mkClk, 0, true) === null, "不进重档的模式不挂�
    词表扩展＋全站检索＋装内功先吃掉几十秒，再给上游满 115 秒，合计必超。
    线上真故障：手动问对第 4 轮空白框停了八十分钟。 */
 ok(/const _T0 = Date\.now\(\);/.test(W), "askCore 顶部埋下了请求起始时间");
-ok(/const _spent = Date\.now\(\) - _T0;/.test(W) && /_wall - _spent/.test(W),
-   "闸的预算把出流前已经花掉的时间扣掉了（检索与预填也算在这一刀的时间里）");
+/* ⚠ 2026-08-21 起 _spent 还要再减掉 _reflectMs：现写心得是一次性投资（写好即存 DO、全站复用），
+   不该由这一刀的写作窗口买单。不减的话，「补上心得」就换来了「稿子写一半被掐」。 */
+ok(/const _spent = Math\.max\(0, Date\.now\(\) - _T0 - _reflectMs\);/.test(W) && /_wall - _spent/.test(W),
+   "闸的预算把出流前花掉的时间扣掉了，但**不含**现写心得那一段（检索与预填算，一次性投资不算）");
 ok(/Math\.max\(25000, _wall - _spent\)/.test(W),
    "扣到最后也留 25 秒：前面再拖也要给基底一段能写出东西的窗口");
 ok(/wdsClock\(Math\.min\(_deepAns \? 45000 : \(_canPlain \? 60000 : 120000\), _budget\), _budget\)/.test(W),

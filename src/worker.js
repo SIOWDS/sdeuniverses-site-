@@ -2743,7 +2743,35 @@ export class ConfigVault {
        ⇒ 键改成 厂商 + 型号 + 提示版本。老键 `reflect:v3:*` 不删、不迁移——它自然失效，
        旧数据留着不碍事，删它反而多一条会出错的路。 */
     if (op === "getReflect") { // 深度档·按「基底＋型号＋提示版本」缓存的心得（内部调用）
-      return Response.json({ reflect: (await this.ctx.storage.get("reflect:" + (body.rkey || ("v3:" + (body.vendor || ""))))) || "" });
+      const _rk = body.rkey || ("v3:" + (body.vendor || ""));
+      const _hit = (await this.ctx.storage.get("reflect:" + _rk)) || "";
+      if (_hit) return Response.json({ reflect: _hit, rkey: _rk, exact: true });
+      /* 🔴 【按厂商回退 —— 2026-08-21】键里带着型号，本意是「不同型号别互相盖」，
+         但它同时制造了一种谁都看不见的缺失：`/api/ask` 的 BYOK 分支把型号写死成 deepseek-v4-pro，
+         而管理设置那条预生成走的是 `b.model || 表内默认`（多半是别的档）——**两个 rkey 天生对不上**，
+         于是心得明明存着，答题这条路却一份都认不到，只在状态行留一句「提智会打折」。
+         心得是「通读内功后写下的内化底盘」，与型号的关系只在文风；同厂商同版本的那一份拿来用，
+         远好过一份都没有。所以：精确键认不到 ⇒ 扫同版本同厂商，取最长的那一份（最长≈写得最透）。
+         ⚠ 只回退**读**，不回退**写**：setReflect 仍按精确键存，不同型号各自那一份照旧不互相盖。 */
+      const _pre = "reflect:v" + (String(_rk).split(":")[0] || "").slice(1) + ":" + (body.vendor || "") + ":";
+      let _best = "";
+      try {
+        const _all = await this.ctx.storage.list({ prefix: _pre });
+        for (const [, v] of _all) { const s = String(v || ""); if (s.length > _best.length) _best = s; }
+      } catch (e) {}
+      return Response.json({ reflect: _best, rkey: _rk, exact: false, from: _best ? "同厂商回退" : "" });
+    }
+    /* 盘点用：只报哪些键存着心得、各多少字，**绝不回正文**。
+       加它的理由很实在：2026-08-21 查「为什么一直没有心得」时，
+       手上没有任何办法看见 Durable Object 里到底存着什么，只能从答题状态行那一句话倒推。 */
+    if (op === "reflectStat") {
+      const out = [];
+      try {
+        const all = await this.ctx.storage.list({ prefix: "reflect:" });
+        for (const [k, v] of all) out.push({ key: String(k).slice(8), chars: String(v || "").length });
+      } catch (e) {}
+      out.sort((a, b) => (a.key < b.key ? -1 : 1));
+      return Response.json({ ok: true, items: out });
     }
     if (op === "setReflect") {
       await this.ctx.storage.put("reflect:" + (body.rkey || ("v3:" + (body.vendor || ""))), String(body.reflect || ""));
@@ -3926,6 +3954,13 @@ function reflectKey(vendor, VC) {
 }
 let REFLECT_MEM = {}; // rkey -> { text, exp }
 const REFLECT_MEM_TTL = 10 * 60 * 1000, REFLECT_FAIL_TTL = 60 * 1000;
+/* 这一份心得是**怎么来的**：缓存／同厂商回退／本场现生成。只为把状态行从
+   「有／没有」升级成「这一份出自哪里」——2026-08-21 之前，心得缺了只有一句
+   「提智会打折」，既说不出缺的是哪个键，也说不出为什么缺。 */
+const REFLECT_SRC = {};
+/* 生成心得失败时的最后一条错误。它跑在 waitUntil 或答题流里，没有人接得住 throw——
+   不留一笔，「为什么没有心得」就永远只能靠猜（这一次就猜了很久）。 */
+let REFLECT_ERR = "";
 /* 🔴 `allowGen` 的默认值从 true 翻成 **false**（2026-08-12）。
    原来九个调用点里只有一个显式传 false，其余全在**答题请求里现场生成**一篇五六千字的心得：
    第一位提问的人替全站付这笔钱和这段等待，而生成出来的那一份又**静默改变所有人的思考底盘**。
@@ -3941,34 +3976,68 @@ async function ensureReflect(env, url, vendor, VC, KEY, allowGen) {
   try {
     const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
     const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getReflect", vendor, rkey }) }))).json();
-    if (r.reflect && r.reflect.length > 500) { REFLECT_MEM[rkey] = { text: r.reflect, exp: now + REFLECT_MEM_TTL }; return r.reflect; }
+    if (r.reflect && r.reflect.length > 500) {
+      REFLECT_MEM[rkey] = { text: r.reflect, exp: now + REFLECT_MEM_TTL };
+      REFLECT_SRC[rkey] = r.exact ? "缓存" : "同厂商回退";
+      return r.reflect;
+    }
   } catch (e) {}
   // allowGen=false 的调用方（答题请求）宁可没有心得，也不肯在自己的时间里现生成一份。
   if (!allowGen) return "";
   const neigong = await loadNeigong(env, url);
   if (!neigong) return "";
   let text = "";
+  /* 🔴🔴🔴 【2026-08-21：全站那条纪律的**第四个漏网调用点**，也是「心得一直没有」的真病根】
+     纪律原文见 wdsPlainBody 头上：**默认在思考的基底（DeepSeek V4／GLM-5）会把 max_tokens 吃光，
+     content 回空字符串、HTTP 仍是 200**。此前点过名的三处是 llmText、/api/ask 流式主路、
+     /api/wds/chat —— 而这里，**生成心得的唯一一处**，从来就是自己 JSON.stringify 拼 body，
+     既不过 wdsPlainBody 也不过 wdsTopBody。
+     后果是一条完美的静默故障链：管理员在设置里配好基底 → ctx.waitUntil 后台跑这一段 →
+     6000 tok 全被 reasoning 吃掉 → content 空 → 下面 `text.length > 500` 不成立 → 不存 →
+     写进负缓存 → 永远没有心得。而这整条链跑在 waitUntil 里，**一个字的错误不会显示给任何人**，
+     屏幕上只剩答题时那一句「提智会打折」。
+     [stated] 用户 2026-08-21：「必须有心得，这个不能打折，现在改。」
+     三处一起改，缺一处都还是空：
+       ① 关思考（wdsPlainBody）——不关，给多少预算都只会想不会写；
+       ② 预算 6000 → 16000：心得要 5000–6500 汉字（≈4000 tok），6000 本来就顶在边界上；
+       ③ 超时 45 秒 → 150 秒：关思考后写六千汉字实测也要一分钟上下，45 秒是按「短答」标定的，
+          抬字数不抬闸＝当场把自己掐死（本文件记过同一个教训：抬字数必须同时抬闸）。 */
   try {
-    // 这一步会在答题流里被调用（本场没有开工心得时的兜底），卡住就又把答题那次的时钟烧掉——必须有超时。
     const _ac = new AbortController();
-    const _to = setTimeout(() => { try { _ac.abort(); } catch (e) {} }, 45000);
+    const _to = setTimeout(() => { try { _ac.abort(); } catch (e) {} }, 150000);
     let resp;
     try {
       resp = await fetch(VC.url, {
         method: "POST",
         headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-        body: JSON.stringify({ model: VC.model, stream: false, max_tokens: 6000, messages: [{ role: "system", content: neigong }, { role: "user", content: REFLECT_PROMPT }] }),
+        body: JSON.stringify(wdsPlainBody(VC, {
+          model: VC.model, stream: false, max_tokens: 16000,
+          messages: [{ role: "system", content: neigong }, { role: "user", content: REFLECT_PROMPT }],
+        })),
         signal: _ac.signal,
       });
     } finally { clearTimeout(_to); }
-    if (resp.ok) { const j = await resp.json(); text = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || ""; }
-  } catch (e) {}
+    if (resp.ok) {
+      const j = await resp.json();
+      const _m = (j.choices && j.choices[0] && j.choices[0].message) || {};
+      text = _m.content || "";
+      /* 诊断落进模块级变量而不是丢掉：这一段跑在 waitUntil 里，没有任何人接得住 throw。
+         「200 但正文是空的」与「连不上」是两种病，从前都长成同一个「没有心得」。 */
+      if (!text) REFLECT_ERR = "基底回了 200 但正文是空的"
+        + (_m.reasoning_content ? ("（思考 " + String(_m.reasoning_content).length + " 字、正文 0 字 —— 关思考没生效？）") : "")
+        + ((j.choices && j.choices[0] && j.choices[0].finish_reason) ? ("，停因 " + j.choices[0].finish_reason) : "");
+    } else {
+      REFLECT_ERR = "基底返回 " + resp.status + "：" + (await resp.text()).slice(0, 200);
+    }
+  } catch (e) { REFLECT_ERR = "生成心得时出错：" + ((e && e.message) || String(e)); }
   if (text && text.length > 500) {
     try {
       const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
       await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "setReflect", vendor, rkey, reflect: text }) }));
     } catch (e) {}
     REFLECT_MEM[rkey] = { text, exp: Date.now() + REFLECT_MEM_TTL };
+    REFLECT_SRC[rkey] = "本场现生成";
+    REFLECT_ERR = "";   // 成功了就把上一条错误清掉，否则旧错误会挂在新成功上误导排障
   } else {
     REFLECT_MEM[rkey] = { text: "", exp: Date.now() + REFLECT_FAIL_TTL }; // 负缓存：60 秒内不再重试生成
   }
@@ -5569,6 +5638,9 @@ async function askCore(request, env, url, body, SINK) {
      ⚠ 预算暂不动：数可能仍是对的，只是归属错了；要动得先拿真 Key 量一次上游。
      💡 心法：**一个没验过归属的经验值，会被后来的人当成物理定律用。** 这个数替八处定了预算。 */
   const _T0 = Date.now();
+  /* 现写心得那一次的耗时。它是一次性投资（写好即存 Durable Object、全站复用），
+     不该由这一刀的写作窗口买单，所以下面算 _spent 时把它扣掉。 */
+  let _reflectMs = 0;
   const _el = () => Math.round((Date.now() - _T0) / 1000);
   // 进度提示：出流之后这些重活要跑十几秒，读者总得看见页面还活着。
   // ⚠ 【每一条都带秒数】2026-08-10 连着八轮修这台机器，每一轮都是从一句没有时间的状态里**猜**
@@ -5848,18 +5920,33 @@ async function askCore(request, env, url, body, SINK) {
   // ===== 深度档 =====
   if (deep) {
     _stat("📚 正在装载内功与心得…");
-    // ⚠ allowGen=false：**答题请求里绝不现生成心得**。
-    //   ensureReflect 在缓存与 Durable Object 都落空时会现调一次基底写心得，那一次自带 45 秒超时——
-    //   而这一轮问答本来就要预填内功、还要写两千字，再塞一次 45 秒的生成，
-    //   合计必然越过平台那道 130 秒的墙，而且是在**调基底之前**就把预算用光。
-    //   心得该在「开工」那一步用 ctx.waitUntil 提前备好（见文件末尾那处调用）；
-    //   这里拿不到就只装内功照常作答，并在状态里说明——降级好过整轮没有答案。
-    const reflect = await ensureReflect(env, url, vendor, VC, KEY, false);
+    /* 🔴 【2026-08-21 改：心得不许缺 —— [stated] 用户令「必须有心得，这个不能打折，现在改」】
+       旧口径是 allowGen=false：答题请求里绝不现生成，理由是那一次自带超时会把预算吃光，
+       心得该由「管理设置里配基底」那一步提前备好。**这个理由现在站不住了，三条都变了**：
+         ① 唯一那条预生成路早就坏着（见 ensureReflect 里那段：自己拼 body、没关思考、
+            6000 tok 被推演吃光、content 空、静默不存）——**指望它备好，等于永远没有**；
+         ② 那道 120 秒的墙已改判并放宽到 300 秒（见下面 _wall 那段）；
+         ③ 更要紧的是：**生成心得是一次性投资，不该由这一刀的写作窗口买单**。
+            所以下面把这次生成的耗时从 `_spent` 里扣掉——写作窗口一秒不少，
+            只有本站第一个撞上的人多等一分钟，写好即存进 Durable Object，之后全站复用。
+       降级仍然保留：真生成不出来（没 Key、基底报错），照常只装内功作答并把**真因**说出来，
+       不再是一句没有信息的「提智会打折」。 */
+    let reflect = await ensureReflect(env, url, vendor, VC, KEY, false);
+    if (!reflect && KEY) {
+      const _rt0 = Date.now();
+      _stat("📝 这个基底还没有心得——正在现写一份（约一分钟，只此一次；写好后存下来全站复用，不占本次写作时间）…");
+      try { reflect = await ensureReflect(env, url, vendor, VC, KEY, true); } catch (e) {}
+      _reflectMs = Date.now() - _rt0;
+    }
     const neigong = await loadNeigong(env, url);
     // ⚠ 旧文案写「心得会在后台补上」——那是一句不会兑现的承诺：这条路上的 ensureReflect 传的是
     //   allowGen=false，本请求不生成，而**唯一会生成的地方是管理设置里配基底那一步**（ctx.waitUntil）。
     //   没人去配，它就永远补不上，而屏幕上一直说「会补上」。报错要报真的，包括这种善意的假话。
-    _stat(reflect ? "✅ 内功与心得就绪" : "⚠️ 只装到内功：这个基底还没有现成心得（心得只在「管理设置」里配置基底那一步预生成）。本轮照常作答，但提智会打折。");
+    _stat(reflect
+      ? ("✅ 内功与心得就绪 · 心得 " + reflect.length + " 字（" + (REFLECT_SRC[reflectKey(vendor, VC)] || "缓存")
+         + (_reflectMs ? "，用了 " + Math.round(_reflectMs / 1000) + "s，这段时间不计入写作预算" : "") + "）")
+      : ("⚠️ 只装到内功：心得没能备好——" + (REFLECT_ERR || (KEY ? "生成没返回正文" : "本次没有可用的 Key"))
+         + "。本轮照常作答，但提智会打折。"));
     // 四步法（S→D→E→整合，四次独立调用；贵 4 倍，仅在「四步法」开关打开时启用）
     if (reflect && neigong && body.four === true && mode !== "paper" && mode !== "polish") {
       const ctx4 = ctxText.slice(0, 15000); // 四步各调用共用《站内资料》，钳 15000 控 4× 成本
@@ -6550,7 +6637,8 @@ async function askCore(request, env, url, body, SINK) {
   const _canPlain = wdsCanPlain(VC);
   const _longWrite = (_topPower || mode === "rounds" || mode === "collide" || mode === "synth");
   const _wall = !_heavy ? 120000 : (_longWrite ? (_canPlain ? 300000 : 600000) : 150000);
-  const _spent = Date.now() - _T0;
+  //   ⚠ 扣掉现写心得那一段：它是一次性投资，不是这一刀的开销（见上面 _reflectMs 那段）。
+  const _spent = Math.max(0, Date.now() - _T0 - _reflectMs);
   const _budget = Math.max(25000, _wall - _spent);
   // 首帧闸不动那条老规矩：它防的是「上游一个字都不回」，与总时长是两件事。
   // 关不掉思考的那两家首帧本来就慢（先想几分钟才落字），给 120 秒，否则每一趟都被首帧闸冤杀。
@@ -10656,6 +10744,24 @@ export default {
         rj.msg = (rj.msg || "") + " 已在后台预生成心得（首次约需半分钟，之后复用）。";
       }
       return Response.json(rj, { headers: { "access-control-allow-origin": "*" } });
+    }
+    /* /api/admin/reflect-status：心得盘点（**只读、只报长度、不回正文**，所以不设口令）。
+       [stated] 用户 2026-08-21：「必须有心得，这个不能打折」。要守住这句话，就得先看得见——
+       此前「有没有心得」唯一的观测口是答题时那一句状态行，而生成心得跑在 waitUntil 里、
+       坏了一个字都不报。现在两秒钟能查清：哪些键存着、各多少字、最近一次生成失败的真因。 */
+    if (url.pathname === "/api/admin/reflect-status") {
+      const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
+      const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "reflectStat" }) }))).json();
+      const items = (r && r.items) || [];
+      return Response.json({
+        ok: true,
+        promptVer: REFLECT_PROMPT_VER,
+        note: "键的形态是 v<提示版本>:<厂商>:<型号>。答题时先认精确键，认不到就按同版本同厂商回退取最长的一份。",
+        count: items.length,
+        items: items,
+        lastError: REFLECT_ERR || "",
+        memCached: Object.keys(REFLECT_MEM).map((k) => ({ key: k, chars: (REFLECT_MEM[k] && REFLECT_MEM[k].text || "").length, src: REFLECT_SRC[k] || "" })),
+      }, { headers: { "access-control-allow-origin": "*" } });
     }
     if (url.pathname === "/api/admin/vendorstatus") {
       const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
