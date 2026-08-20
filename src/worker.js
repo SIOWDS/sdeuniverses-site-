@@ -2766,12 +2766,16 @@ export class ConfigVault {
        手上没有任何办法看见 Durable Object 里到底存着什么，只能从答题状态行那一句话倒推。 */
     if (op === "reflectStat") {
       const out = [];
+      /* ⚠ 这里原来是空 catch：存储抛错时回的是 `count: 0`，读起来像「一份都没有」，
+         而真相是「读不出来」。2026-08-21 排障时差点被它带偏——**盘点端点自己撒谎，
+         比没有盘点端点更糟**。所以 storage 出错要如实回，不许伪装成空。 */
+      let err = "";
       try {
         const all = await this.ctx.storage.list({ prefix: "reflect:" });
         for (const [k, v] of all) out.push({ key: String(k).slice(8), chars: String(v || "").length });
-      } catch (e) {}
+      } catch (e) { err = String((e && e.message) || e).slice(0, 300); }
       out.sort((a, b) => (a.key < b.key ? -1 : 1));
-      return Response.json({ ok: true, items: out });
+      return Response.json({ ok: !err, items: out, storageError: err });
     }
     if (op === "setReflect") {
       await this.ctx.storage.put("reflect:" + (body.rkey || ("v3:" + (body.vendor || ""))), String(body.reflect || ""));
@@ -3961,6 +3965,17 @@ const REFLECT_SRC = {};
 /* 生成心得失败时的最后一条错误。它跑在 waitUntil 或答题流里，没有人接得住 throw——
    不留一笔，「为什么没有心得」就永远只能靠猜（这一次就猜了很久）。 */
 let REFLECT_ERR = "";
+/* 🔴 【2026-08-21：存得下与写得出，是两回事】
+   Durable Object 免费档有「每日写入行数」上限（10 万行，00:00 UTC 重置）。写爆之后
+   **读得动、写不动**——CONFIG_VAULT 的 `setReflect` 会抛错，而它一直被 try/catch 吞着。
+   后果在 08-21 那一刀之后变成一场灾难：我把答题请求改成「心得缺了就地现写一份」，
+   于是每一次深度调用都白白多跑一次几千字的生成，**而且永远存不下来**——
+   下一次进来照样是空的，照样再烧一遍。用户的 token 就这么一次次白烧掉。
+   ⇒ 记下写失败的时刻：在这之后的一段时间里**不再重复生成**（内存里那份照用），
+   并把真因说出来，而不是让人对着一句「心得没能备好」猜。 */
+let REFLECT_STORE_DOWN = 0, REFLECT_STORE_WHY = "";
+const REFLECT_STORE_DOWN_TTL = 30 * 60 * 1000;
+function reflectStoreDown() { return REFLECT_STORE_DOWN && (Date.now() - REFLECT_STORE_DOWN) < REFLECT_STORE_DOWN_TTL; }
 /* 🔴 `allowGen` 的默认值从 true 翻成 **false**（2026-08-12）。
    原来九个调用点里只有一个显式传 false，其余全在**答题请求里现场生成**一篇五六千字的心得：
    第一位提问的人替全站付这笔钱和这段等待，而生成出来的那一份又**静默改变所有人的思考底盘**。
@@ -3984,6 +3999,16 @@ async function ensureReflect(env, url, vendor, VC, KEY, allowGen) {
   } catch (e) {}
   // allowGen=false 的调用方（答题请求）宁可没有心得，也不肯在自己的时间里现生成一份。
   if (!allowGen) return "";
+  /* 🔴 【存不下就别生成 —— 2026-08-21】刚刚才写失败过（30 分钟内），说明存储正躺着。
+     此时再生成一遍，结果是确定的：几千字、几十秒、用户的 token，然后照样存不下，
+     下一个请求进来还是空的。**这不是降级，这是空转**——所以直接不生成，把真因交出去。
+     内存里若还留着一份（同一个 isolate 内），上面那一支早就返回了，走不到这里。 */
+  if (reflectStoreDown()) {
+    REFLECT_ERR = "心得存储暂时写不进去（" + REFLECT_STORE_WHY + "）——"
+      + "本轮**不再重复生成**：生成得出来也存不下，只会白烧一次几千字的调用。"
+      + "Durable Object 免费档的每日写入额度 00:00 UTC 重置，或升 Workers Paid 解决。";
+    return "";
+  }
   const neigong = await loadNeigong(env, url);
   if (!neigong) return "";
   let text = "";
@@ -4031,10 +4056,20 @@ async function ensureReflect(env, url, vendor, VC, KEY, allowGen) {
     }
   } catch (e) { REFLECT_ERR = "生成心得时出错：" + ((e && e.message) || String(e)); }
   if (text && text.length > 500) {
+    /* 写失败必须记账。此前这里是空 catch：心得写出来了、存不进去，而**没有任何人知道**——
+       下一个请求进来又是一片空白，又生成一遍，又存不下，如此循环。 */
     try {
       const cv = _do(env, "CONFIG_VAULT").get(_do(env, "CONFIG_VAULT").idFromName("global"));
-      await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "setReflect", vendor, rkey, reflect: text }) }));
-    } catch (e) {}
+      const _sr = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "setReflect", vendor, rkey, reflect: text }) }));
+      if (!_sr.ok) throw new Error("CONFIG_VAULT 回 " + _sr.status);
+      REFLECT_STORE_DOWN = 0; REFLECT_STORE_WHY = "";
+    } catch (e) {
+      REFLECT_STORE_DOWN = Date.now();
+      REFLECT_STORE_WHY = String((e && e.message) || e).slice(0, 200);
+      REFLECT_ERR = "心得写出来了（" + text.length + " 字）但**存不下来**：" + REFLECT_STORE_WHY
+        + "（Durable Object 写入额度用尽时就是这个样子，00:00 UTC 重置）。本轮照常用它作答，"
+        + "但它进不了库——在存储恢复之前，本机内存里这一份用完即失。";
+    }
     REFLECT_MEM[rkey] = { text, exp: Date.now() + REFLECT_MEM_TTL };
     REFLECT_SRC[rkey] = "本场现生成";
     REFLECT_ERR = "";   // 成功了就把上一条错误清掉，否则旧错误会挂在新成功上误导排障
@@ -5947,6 +5982,9 @@ async function askCore(request, env, url, body, SINK) {
          + (_reflectMs ? "，用了 " + Math.round(_reflectMs / 1000) + "s，这段时间不计入写作预算" : "") + "）")
       : ("⚠️ 只装到内功：心得没能备好——" + (REFLECT_ERR || (KEY ? "生成没返回正文" : "本次没有可用的 Key"))
          + "。本轮照常作答，但提智会打折。"));
+    /* 存得下与写得出是两回事：写出来了却存不下，下一轮还得从头再来一遍。这句必须单独说。 */
+    if (reflect && reflectStoreDown()) _stat("⚠️ 但这份心得**存不进库**（" + REFLECT_STORE_WHY
+      + "）——本轮用得上，下一轮还得重来。Durable Object 免费档每日写入额度 00:00 UTC 重置。");
     // 四步法（S→D→E→整合，四次独立调用；贵 4 倍，仅在「四步法」开关打开时启用）
     if (reflect && neigong && body.four === true && mode !== "paper" && mode !== "polish") {
       const ctx4 = ctxText.slice(0, 15000); // 四步各调用共用《站内资料》，钳 15000 控 4× 成本
@@ -10754,7 +10792,10 @@ export default {
       const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "reflectStat" }) }))).json();
       const items = (r && r.items) || [];
       return Response.json({
-        ok: true,
+        ok: !(r && r.storageError),
+        storageError: (r && r.storageError) || "",
+        /* 写不进去与读不出来是两件事，分开报：08-18 那场事故的口径是「读得动、写不动」。 */
+        storeDown: reflectStoreDown() ? REFLECT_STORE_WHY : "",
         promptVer: REFLECT_PROMPT_VER,
         note: "键的形态是 v<提示版本>:<厂商>:<型号>。答题时先认精确键，认不到就按同版本同厂商回退取最长的一份。",
         count: items.length,

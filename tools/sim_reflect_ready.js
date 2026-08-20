@@ -92,12 +92,44 @@ ok(/心得没能备好——" \+ \(REFLECT_ERR/.test(W),
 ok(/内功与心得就绪 " \+ "?· 心得 " \+ reflect\.length/.test(W) || /✅ 内功与心得就绪 · 心得 " \+ reflect\.length/.test(W),
    "备好了要报字数与来源（有／没有 ⇒ 这一份出自哪里）");
 
+console.log("— 四之二、存不下就别再生成（2026-08-21 第二刀：治一条我自己引入的回归）—");
+/* 病史：上一刀把答题请求改成「心得缺了就地现写一份」。判断本身没错——那条唯一的预生成路
+   本身是坏的。但它有个前提我没验：**写得进去**。而当天 Durable Object 免费档的每日写入行数
+   正好被写爆（`Exceeded allowed rows written in Durable Objects free tier.`，00:00 UTC 重置），
+   于是每一次深度调用都白白多跑一次几千字的生成、存不下、下一次再烧一遍——
+   用户的 token 就这么一次次白烧。**空转不是降级，得当故障治。** */
+ok(/let REFLECT_STORE_DOWN = 0, REFLECT_STORE_WHY = "";/.test(W), "记得住「存储写不进去」这件事");
+ok(/function reflectStoreDown\(\)/.test(W) && /REFLECT_STORE_DOWN_TTL/.test(W),
+   "带时效（存储会恢复，不能一次失败就永久放弃）");
+ok(/if \(!_sr\.ok\) throw new Error\("CONFIG_VAULT 回 " \+ _sr\.status\);/.test(W),
+   "写心得的返回码真被检查了（非 2xx 也算失败，不只是抛异常那一种）");
+ok(/REFLECT_STORE_DOWN = Date\.now\(\);/.test(W) && /REFLECT_STORE_WHY = String/.test(W),
+   "写失败记账：时刻＋原话（此前是空 catch，写不进去而没有任何人知道）");
+ok(/REFLECT_STORE_DOWN = 0; REFLECT_STORE_WHY = "";/.test(W),
+   "写成功要把标记清掉（存储恢复后必须能自己走出来，不许一直记仇）");
+ok(/if \(reflectStoreDown\(\)\) \{[\s\S]{0,400}return "";/.test(W),
+   "存储正躺着时**不再生成**——生成得出来也存不下，只会白烧一次几千字的调用");
+ok(/本轮\*\*不再重复生成\*\*/.test(W), "并把真因交出去，不是一句没有信息的「心得没能备好」");
+/* 内存里那份仍要用：同一个 isolate 内，上面那一支早就返回了，走不到这里。 */
+const _iG = W.indexOf("if (mem && now < mem.exp) return mem.text;");
+ok(_iG > 0 && _iG < W.indexOf("if (reflectStoreDown())"),
+   "内存缓存那一支排在前面（存储躺着时，本机这一份照样用得上）");
+
 console.log("— 五、看得见：盘点端点 —");
 ok(/url\.pathname === "\/api\/admin\/reflect-status"/.test(W), "有一个只读的盘点端点");
 ok(/op: "reflectStat"/.test(W) && /if \(op === "reflectStat"\)/.test(W), "端点与 CONFIG_VAULT 的 op 对得上");
 const iRS = W.indexOf('if (op === "reflectStat")');
-ok(/chars: String\(v \|\| ""\)\.length/.test(W.slice(iRS, iRS + 700)) && !/reflect: v/.test(W.slice(iRS, iRS + 700)),
+ok(/chars: String\(v \|\| ""\)\.length/.test(W.slice(iRS, iRS + 900)) && !/reflect: v/.test(W.slice(iRS, iRS + 900)),
    "盘点只报长度、**绝不回正文**（所以它可以不设口令）");
+/* 🔴 这一条是 2026-08-21 排障时用一小时换来的：盘点端点原来把 storage 的错误吞成空数组，
+   回的是 `count: 0`，读起来像「一份都没有」，而真相是「读不出来」。
+   **盘点端点自己撒谎，比没有盘点端点更糟。** */
+ok(/catch \(e\) \{ err = String\(\(e && e\.message\) \|\| e\)/.test(W.slice(iRS, iRS + 900)),
+   "storage 出错如实回，不许伪装成「一份都没有」");
+ok(/storageError: err/.test(W) && /storageError: \(r && r\.storageError\) \|\| ""/.test(W),
+   "错误一路传到端点回参（吞在半路等于没记）");
+ok(/storeDown: reflectStoreDown\(\) \? REFLECT_STORE_WHY : ""/.test(W),
+   "读不出来与写不进去分开报（08-18 那场事故的口径就是「读得动、写不动」）");
 ok(/lastError: REFLECT_ERR/.test(W), "盘点里带上最近一次生成失败的真因");
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
