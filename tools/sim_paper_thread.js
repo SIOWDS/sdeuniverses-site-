@@ -47,7 +47,18 @@ turns = mk(1);
 ok(mkHist(turns)(false)[0].a.length === 1600, "只有一轮时也按最近轮给足");
 
 /* ===== 二、前端接线契约 ===== */
-ok(H.indexOf("var MAXTURNS=10;") > 0, "轮次上限写死为 10");
+/* ⚠ 2026-08-21 由 10 扩到 20（[stated] 用户令「增加问对次数到 20 次」）。
+   这里不再写死数字——写死一个数，下次扩容时红的是护栏而不是缺陷。要钉的是
+   「前端上限 ＝ 服务端阶梯最高级」：两处漂移了页面一切正常，只是后半场原地打转。 */
+const mMT = H.match(/var MAXTURNS=(\d+);/);
+const mLMAX = (function(){
+  const a = W.indexOf("const AUTO_LADDER = ["), b = W.indexOf("\n];", a);
+  if (a < 0 || b < 0) return -1;
+  const L = new Function(W.slice(a, b + 3) + "\nreturn AUTO_LADDER;")();
+  return L[L.length - 1].n;
+})();
+ok(!!mMT && Number(mMT[1]) === mLMAX,
+  "轮次上限是具名常量且与服务端阶梯最高级一致 · 前端 " + (mMT ? mMT[1] : "?") + " / 阶梯 " + mLMAX);
 ok(/turns\.length>=MAXTURNS/.test(H), "doAsk：满 10 轮拦住，不许无声继续");
 ok(H.indexOf("请先「提炼精华」成论文入口资料，或「清空重来」") > 0, "满轮提示给出下一步动作");
 ok(/turns\.length\?\{hist:buildHist\(false\)\}:\{\}/.test(H), "doAsk：有历史才带 hist（首轮仍走老路）");
@@ -94,16 +105,29 @@ ok(/_MODES = \{[^}]*distill: 1/.test(W), "worker：distill 进模式白名单");
    每轮都跑的（深度档问答、连写）预填时间算在平台 130 秒的墙里，放宽就是把撞墙提前。 */
 ok(/const _fullRead = \(mode === "distill"/.test(W), "worker：读全场的四档单独成一个集合");
 const mR = /\.slice\(_fullRead \? -(\d+) : -(\d+)\)/.exec(W);
-ok(!!mR && Number(mR[1]) > Number(mR[2]) && Number(mR[2]) === 10,
-  "worker：读全场取 " + (mR && mR[1]) + " 轮，其余仍钳到 10 轮");
+/* 非读全场那一档的窗口 2026-08-21 由 10 放宽到 20：前端 buildHist(false) 早就按新旧分层压过了
+   （最近两轮各 1600 字、其余各 500 字），二十轮合计约 1.2 万字。不放宽的话，后半场的连写
+   看不见前半场问过什么，于是重复提问——阶梯的「踩着上一级走」当场落空。
+   判据钉的是「窗口不小于轮次上限」，而不是某个具体数字。 */
+ok(!!mR && Number(mR[1]) > Number(mR[2]) && Number(mR[2]) >= mLMAX,
+  "worker：读全场取 " + (mR && mR[1]) + " 轮，其余窗口 " + (mR && mR[2]) + " 轮 ≥ 轮次上限 " + mLMAX);
 const mA = /a: String\(\(t && t\.a\) \|\| ""\)\.trim\(\)\.slice\(0, _fullRead \? (\d+) : (\d+)\)/.exec(W);
 ok(!!mA && Number(mA[1]) >= 30000 && Number(mA[2]) === 2600,
   "worker：单轮答案读全场时给 " + (mA && mA[1]) + " 字（实质不截断），其余仍是 2600");
 /* 前后端两个上限必须一致：前端先截一刀、服务端再截一刀，取的是两者的小值——
    任何一处忘了改，「不截断」就只是半句话。 */
 ok(LIM_FULL === Number(mA && mA[1]), "前端与服务端的上限是同一个数 · 前端 " + LIM_FULL + " / 服务端 " + (mA && mA[1]));
-ok(W.indexOf("const roundNo = hist.length + 1;") > 0, "worker：算得出这是第几轮");
-ok(W.indexOf("const originQ = hist.length ? hist[0].q : q;") > 0, "worker：缘起之问 = 第一轮的问题");
+/* 🔴 【2026-08-21 堵掉一个扩容才会露头的静默故障】
+   `hist` 是被窗口切过的，切完之后 hist[0] 就不再是第一轮。十轮时代窗口永远切不到，
+   这个洞一直没露头；扩到二十轮后，第 21 个元素一进来窗口就开始滑动，
+   《缘起之问》会**悄悄变成第 11 轮那一问**——检索定向、提炼的准星、成文的锚点全跟着偏，
+   而页面上一切正常。所以两个数都必须取自**未截断**的那一份。 */
+ok(/const _histRaw = \(Array\.isArray\(body\.hist\) \? body\.hist : \[\]\);/.test(W),
+  "worker：留了一份未截断的原始问对（轮号与缘起之问都从它取）");
+ok(W.indexOf("const roundNo = _histRaw.length + 1;") > 0,
+  "worker：轮号取自未截断的那一份（取自切过的 hist 会在第 21 轮起悄悄倒退）");
+ok(/const originQ = String\(\(_histRaw\[0\] && _histRaw\[0\]\.q\) \|\| ""\)/.test(W),
+  "worker：缘起之问 ＝ **第一轮**的问题，不是窗口里第一条的问题");
 ok(W.indexOf('const rq = _lightDeep') > 0, "worker：检索用问句按模式分流（distill 与碰撞/提炼同走 _lightDeep）");
 ok(W.indexOf('(hist.length ? (q + " " + originQ.slice(0, 40)) : q)') > 0, "worker：连续问对时把缘起之问并进召回（治指代式短问漂走）");
 ok(W.indexOf("lightRetrieve(env, url, rq, expTerms, K,") > 0, "worker：召回真的用了 rq，而不是裸 q");
@@ -231,8 +255,15 @@ ok(/宁可少展开一节，也必须把最后一句写完/.test(W),
 ok((W.match(/不写 #、不写 \*\*、不画表格、不写 --- 分隔线/g) || []).length >= 2,
   "深度档与普通档两处都禁了 Markdown（答案框是 textContent，## 会原样印出来）");
 ok(/ansEl\.textContent=acc;/.test(H), "答案框确实是纯文本渲染（所以上一条才是必须的）");
-ok(/Math\.max\(25000, 120000 - _spent\)/.test(W),
-  "总闸由 115 秒抬到 120 秒（平台墙 128–133，仍留 8–13 秒把掉线那句话发出去）");
+/* 🔴 【2026-08-21 改判】那道 120 秒当年被归给「平台墙」，08-19 已证伪归属
+   （Cloudflare 一条 SSE 流实测 290 秒、全程静默也收到 [DONE]；DeepSeek 直连跑到 449 秒
+   交出两万八千字）。而它正是「提炼精华」与「成文两万字」中途失败的原因：
+   一段四五千字加十万字入料，一百二十秒排不下，写到一半闸响 ⇒ 断在半句。
+   现按「这一刀该写多长」分档，闸值逐条断言在 sim_ask_maxconfig 里，这里只钉形状。 */
+ok(/const _wall = !_heavy \? \d+ : \(_longWrite \? \(_canPlain \? \d+ : \d+\) : \d+\);/.test(W),
+  "总闸按「这一刀该写多长」分档（长文／关不掉思考的家／深度档问答各一档），不再是全线一个数");
+ok(/Math\.max\(25000, _wall - _spent\)/.test(W),
+  "闸仍把出流前花掉的时间扣掉，且扣到最后留 25 秒底线");
 
 /* ===== 十一、检索段也要有闸（2026-08-10 第三起线上故障）=====
    第 5 轮零产出，提示里的「停住时的最后一步」是「正在检索站内语料」——

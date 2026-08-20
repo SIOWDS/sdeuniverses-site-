@@ -25,19 +25,36 @@ const lb = W.indexOf("\n];", la);
 if (la < 0 || lb < 0) { console.log("FAIL 抠不出 AUTO_LADDER（锚点变了，先改本脚本）"); process.exit(1); }
 const LADDER = new Function(W.slice(la, lb + 3) + "\nreturn AUTO_LADDER;")();
 
-ok(LADDER.length === 9, "九级（第 2–10 轮各一级；第 1 轮是读者自己那一问）· 实得 " + LADDER.length);
-ok(LADDER.map((x) => x.n).join(",") === "2,3,4,5,6,7,8,9,10", "轮号连续且从 2 起——没有哪一轮没人管");
-ok(new Set(LADDER.map((x) => x.k)).size === 9, "九个追问动作互不重名（重名＝那一轮在同义反复）");
+/* ⚠ 2026-08-21 由九级扩到十九级（第 2–20 轮），[stated] 用户令「增加问对次数到 20 次」。
+   断言从此**不写死级数**：写死一个数，下次扩阶梯时红的是护栏而不是缺陷。
+   要钉的是三件跟着源码走的事——级数与前端目标轮次对得上、轮号连续、动作互不重名。 */
+const LMAX = LADDER[LADDER.length - 1].n;
+ok(LADDER.length >= 9, "阶梯至少九级 · 实得 " + LADDER.length + " 级（第 2–" + LMAX + " 轮）");
+ok(LADDER.map((x) => x.n).join(",") === LADDER.map((x, i) => i + 2).join(","),
+   "轮号连续且从 2 起——没有哪一轮没人管");
+ok(new Set(LADDER.map((x) => x.k)).size === LADDER.length,
+   "每一级的追问动作互不重名（重名＝那一轮在同义反复，正是写死阶梯要避免的事）");
+ok(/const AUTO_LADDER_MAX = AUTO_LADDER\[AUTO_LADDER\.length - 1\]\.n;/.test(W),
+   "最高级号提成具名常量（钳位与分批都认它，不许在别处再写一个数字）");
 ok(LADDER.every((x) => x.task && x.task.length >= 20), "每一级都写清了本轮要做的动作，不是一个标签");
 ok(LADDER.every((x) => x.fb && x.fb.length >= 10 && /[？?]/.test(x.fb)), "每一级都带兜底问句且里面确有问号——拟题失败时这一轮照样问得出去");
-ok(new Set(LADDER.map((x) => x.fb)).size === 9, "九句兜底互不相同（同一句兜底九次＝十轮退化成一轮问九遍）");
+ok(new Set(LADDER.map((x) => x.fb)).size === LADDER.length,
+   "各级兜底问句互不相同（同一句兜底 N 次＝多轮退化成一轮问 N 遍）");
 /* 阶梯是一条下降线，不是九个平行标签：这五级的相对次序改了就不再是发生学次序 */
 const kOrder = LADDER.map((x) => x.k);
 ok(kOrder.indexOf("承重命题") === 0, "第一级＝承重命题（先把上一轮压成一句可追的话）");
 ok(kOrder.indexOf("共有前提") < kOrder.indexOf("反例与边界"), "共有前提排在反例之前（先挖前提，再打边界）");
 ok(kOrder.indexOf("可裁决读数") < kOrder.indexOf("证伪条件"), "先要读数再谈证伪（没有读数的证伪条件是空话）");
 ok(kOrder.indexOf("最近邻占位者") < kOrder.indexOf("落地与代价"), "先做敌意拓宽再谈落地（没交手就落地＝把别人说过的话当自己的结论）");
-ok(kOrder[8] === "落地与代价", "末级＝落地与代价");
+ok(kOrder[kOrder.length - 1] === "落地与代价", "末级仍＝落地与代价（收口动作，扩阶梯时整体后移而不是被顶掉）");
+/* 第 10–20 级是 2026-08-21 扩的那一段：一阶判断立住之后，把它推到可裁决、可证伪、可外推。
+   只钉相对次序，不钉具体名字之外的东西——次序错了就不再是发生学下降线。 */
+if (LADDER.length > 9) {
+  ok(kOrder.indexOf("第二轴") > kOrder.indexOf("机制拆解"), "先拆机制再上第二轴（机制没拆清就找第二轴＝拿成因当第二轴）");
+  ok(kOrder.indexOf("量纲与操作化") < kOrder.indexOf("当场检验"), "先把读数落成规程，才谈得上真跑一次（没有量纲的检验是空话）");
+  ok(kOrder.indexOf("当场检验") < kOrder.indexOf("反例搜寻"), "先跑自己的判据，再去找打脸的那一例");
+  ok(kOrder.indexOf("最强反驳") < kOrder.indexOf("最强竞争解释"), "先受一击，再请对手整套解释一遍");
+}
 
 /* ===== 二、nextq 的位置与形态（最贵的一条静默故障就在这儿）===== */
 console.log("— 二、nextq 模式 —");
@@ -98,6 +115,21 @@ ok(/一口气写完这 " \+ n \+ " 轮/.test(rBlk), "提示词明写「一口气
 ok(/只写了一轮就停下的回答，本次作废/.test(rBlk), "并写死了作废条件");
 ok(/〔第N轮·问〕/.test(rBlk) && /〔第N轮·答〕/.test(rBlk), "两个切分标记都在提示词里");
 ok(/AUTO_LADDER\.find/.test(rBlk), "每一轮的追问动作仍取自同一条阶梯（没有第二份）");
+/* 🔴 【这条是变异检验补出来的缺口 —— 2026-08-21】
+   rounds 分支里原本写死着两个 10（`Math.min(10, from)` 与 `if (no > 10) break;`）。
+   把阶梯扩到十九级、前端目标轮次改到 20 之后，这两处若忘了改，**全部护栏照样全绿**：
+   页面照常出字、批次照常推进，只是第 11 轮起反复重跑第 10 级的追问动作——
+   问对不再往前走，而屏幕上看不出任何异常。典型的静默故障，必须由判据钉死。
+   判据：这一段里的轮次上限一律认 AUTO_LADDER_MAX，不许出现任何写死的数字上限。 */
+ok(/Math\.min\(AUTO_LADDER_MAX, parseInt\(body\.from, 10\)/.test(rBlk),
+   "rounds：起始轮号的钳位认阶梯最高级，不是写死的数字");
+ok(/if \(no > AUTO_LADDER_MAX\) break;/.test(rBlk),
+   "rounds：连写到哪一轮为止也认阶梯最高级（写死 10 ⇒ 第 11 轮起原地重跑第 10 级）");
+ok(!/> 10\) break;/.test(rBlk) && !/Math\.min\(10,/.test(rBlk),
+   "rounds 分支里没有残留的写死轮次上限");
+/* nextq 同理：它是单轮追问那条路的钳位 */
+ok(/const stepNo = Math\.max\(2, Math\.min\(AUTO_LADDER_MAX, parseInt\(body\.step, 10\)/.test(W),
+   "nextq：轮号钳位同样认阶梯最高级");
 ok(/mode === "rounds"/.test(W.slice(W.indexOf("const _fullPower"), W.indexOf("const _msgs"))),
    "rounds 与长文同档：满预算 ＋ 关思考（三轮连写六千到七千五百字，再让它先推演就写不完）");
 ok(/const _fullPower = \([\s\S]{0,200}_deepAns/.test(W),
@@ -147,21 +179,48 @@ ok(/if\(acc\)\{[\s\S]{0,400}ansEl\.textContent=acc;/.test(bAskE),
 
 console.log("— 四、自动十轮的纪律 —");
 const bAuto = H.slice(H.indexOf("function doAutoRun(){"), H.indexOf("function autoRecordText(){"));
-ok(/var AUTO_TARGET=10, ROUND_BATCH=(\d+);/.test(H), "目标轮次写死 10，批量提成具名常量");
-ok(/if\(rem-n===1\) n=Math\.max\(2, ?n-1\);/.test(bAuto), "尾巴不留孤轮（worker 最小收 2 轮，10 轮拆成 3+3+2+2）");
+/* 【前端目标轮次必须与服务端阶梯对得上】这两个数分处两个文件，漂移了页面一切正常：
+   前端要 20 轮而阶梯只到 10，第 11 轮起就反复重跑第 10 级——静默故障。 */
+const mTgt = H.match(/var AUTO_TARGET=(\d+), ROUND_BATCH=(\d+);/);
+ok(!!mTgt, "目标轮次与批量都是具名常量");
+ok(mTgt && Number(mTgt[1]) === LMAX,
+   "前端目标轮次 " + (mTgt ? mTgt[1] : "?") + " ＝ 服务端阶梯最高级 " + LMAX + "（两处对不上＝后半场原地打转）");
+/* 分批规则必须只有一处定义：报账公式与主循环都调它。写两遍就是「说明条写 12、真跑 15」那种账实不符。 */
+ok(/function autoBatchSize\(done\)\{/.test(H) && /function autoBatchCount\(\)\{/.test(H),
+   "分批规则提成具名函数（唯一定义处）");
+ok(/if\(rem-n===1\) n=Math\.max\(2, ?n-1\);/.test(H), "尾巴不留孤轮（服务端 rounds 最小收 2 轮）");
+ok(/var from=okRounds\+1, n=autoBatchSize\(okRounds\);/.test(bAuto),
+   "主循环真的调了那个函数，没有自己再算一遍");
+{
+  /* 真跑分批：把两个常量与两个函数抠出来跑一遍，看它能不能正好铺满目标轮次 */
+  const _sz = H.slice(H.indexOf("function autoBatchSize(done){"), H.indexOf("var autoRunning=false"));
+  const plan = new Function("return (function(){var AUTO_TARGET=" + mTgt[1] + ",ROUND_BATCH=" + mTgt[2] + ";"
+    + _sz + "var p=[],d=0,n;while((n=autoBatchSize(d))){p.push(n);d+=n;}return {p:p,c:autoBatchCount(),s:d};})()")();
+  ok(plan.s === Number(mTgt[1]), "真跑：分批正好铺满 " + mTgt[1] + " 轮 · 实得 " + plan.p.join("+") + " ＝ " + plan.s);
+  ok(plan.p.every((n) => n >= 2), "真跑：没有哪一批只要一轮（服务端最小收 2 轮，要一轮会被钳成 2 而越界）");
+  ok(plan.c === plan.p.length, "真跑：报账用的批数与实际分批一致 · " + plan.c + " 批");
+}
 ok(/onclick="doAutoRun\(\)"/.test(H) && /id="autoStopBtn"/.test(H) && /id="autoWrap"/.test(H), "按钮与面板都挂上了（孤儿函数等于没做）");
 ok(/if\(!confirm\(/.test(bAuto) && /系统密钥/.test(bAuto), "开跑前必须确认，且如实说清系统密钥会被吃掉多少");
 /* ⚠ 2026-08-13 提炼由「规划＋两段」变「规划＋三段」（新增第十栏·论文观点与分章大纲）。
    次数从此**跟着 BRIEF_PARTS 的段数走**，不许写死——手抄一个 12 只会在下次改段数时安静失效。 */
-ok(/var calls=4\+\(triOn\?7:\(1\+BRIEF_PARTS\.length\)\)\+4\+1;/.test(bAuto),
-  "报给用户的调用次数按段数现算（四批问对 ＋ 提炼 1+段数 ＋ 成文四段 ＋ 盲评）");
+ok(/var calls=autoBatchCount\(\)\+\(triOn\?7:\(1\+BRIEF_PARTS\.length\)\)\+4\+1;/.test(bAuto),
+  "报给用户的调用次数**两头都现算**（批数按分批规则、提炼按段数）——手抄任何一个数都会在下次改动时安静失准");
 /* ⚠ 只在 BRIEF_PARTS 这一块里数，别全文宽搜——见 sim_brief_four_parts 里同一条注释。 */
 const _bpA = H.indexOf("var BRIEF_PARTS=[");
 const _bpB = H.indexOf("];", _bpA);
 const nParts = (_bpA > 0 && _bpB > _bpA) ? (H.slice(_bpA, _bpB).match(/\{min:\d+,name:/g) || []).length : -1;
 ok(nParts > 0, "数得出 BRIEF_PARTS 的段数 · 实得 " + nParts);
-const expect = 4 + (1 + nParts) + 4 + 1;
-ok(new RegExp("约 <b>" + expect + "<\\/b> 次基底调用（开涌现档 " + (4 + 7 + 4 + 1) + " 次）").test(H),
+/* ⚠ 批数也不许写死：2026-08-21 由四批（10 轮）变七批（20 轮），写死的 4 当场失准。 */
+const _nBatch = (function(){
+  const m = H.match(/var AUTO_TARGET=(\d+), ROUND_BATCH=(\d+);/);
+  if (!m) return -1;
+  const _sz = H.slice(H.indexOf("function autoBatchSize(done){"), H.indexOf("var autoRunning=false"));
+  return new Function("return (function(){var AUTO_TARGET=" + m[1] + ",ROUND_BATCH=" + m[2] + ";" + _sz + "return autoBatchCount();})()")();
+})();
+ok(_nBatch > 0, "算得出一场顺跑要几批 · 实得 " + _nBatch + " 批");
+const expect = _nBatch + (1 + nParts) + 4 + 1;
+ok(new RegExp("约 <b>" + expect + "<\\/b> 次基底调用（开涌现档 " + (_nBatch + 7 + 4 + 1) + " 次）").test(H),
   "说明条里的次数与公式对得上 · 提炼段数 " + nParts + " ⇒ 应为 " + expect);
 ok(/okRounds<2/.test(bAuto) && /不再往下烧调用/.test(bAuto), "一批两次都没跑成 ⇒ 停下收口，不把剩下的调用烧完");
 ok(/function nextBatch\(\)/.test(bAuto) && /okRounds\+=got;/.test(bAuto), "分批推进：写不满五轮也不算失败，下一批从断点接着要");

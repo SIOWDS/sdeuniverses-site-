@@ -116,7 +116,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
 .pp-fill.run{background:linear-gradient(90deg,#C9A227,#8A6817,#C9A227);background-size:200% 100%;animation:pp-slide 1.5s linear infinite}
 @keyframes pp-slide{0%{background-position:0 0}100%{background-position:-200% 0}}
 .pp-num{font-size:0.86rem;color:var(--gold,#8A6817);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:88px;text-align:right}
-/* 🚀 自动十轮：无人值守跑完整条产线时，屏幕上唯一能看的就是这块进度 */
+/* 🚀 自动二十轮：无人值守跑完整条产线时，屏幕上唯一能看的就是这块进度 */
 .auto-wrap{display:none;margin-top:16px;padding:14px 17px;border:1px solid var(--gold,#8A6817);border-radius:12px;background:var(--card2)}
 .auto-wrap.show{display:block}
 .auto-step{font-size:0.83rem;line-height:1.65;padding:3px 0;color:var(--text2);display:flex;gap:8px;align-items:flex-start}
@@ -195,7 +195,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
       </div>
       <div class="ctl-group">
         <span class="ctl-label"><span class="zh-only">全自动</span><span class="en-only">Auto</span></span>
-        <button class="seg" id="autoBtn" onclick="doAutoRun()"><span class="zh-only">🚀 自动十轮 → 论文 → 评分</span><span class="en-only">🚀 Auto 10 turns</span></button>
+        <button class="seg" id="autoBtn" onclick="doAutoRun()"><span class="zh-only">🚀 自动二十轮 → 论文 → 评分</span><span class="en-only">🚀 Auto 20 turns</span></button>
         <button class="seg" id="autoStopBtn" onclick="stopAutoRun()" style="display:none"><span class="zh-only">⏹ 中止</span><span class="en-only">⏹ Stop</span></button>
       </div>
       <div class="ctl-group">
@@ -206,8 +206,8 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
       </div>
     </div>
     <div id="deepHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:9px 2px 0;line-height:1.6">🔬 深度模式：基底先内化内功写心得，再用 <b>SDE 方法论</b>（六路径→S/D/E→三方程→误差互消→逮先验）做一次有指导性的深入研究，现实问题还会给可执行的「怎么办」。默认<b>单次调用</b>（较慢、较费 token，建议自带 Key）。<br>点「四步法」→ 升级为 <b>S/D/E 四次独立调用</b>的完整误差互消（最深，但慢 4 倍、贵 4 倍，只在要冲满时用）。</div>
-    <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–10 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
-    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 落地与代价）自己把问对逼深十轮（<b>分四批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（四段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>12</b> 次基底调用（开涌现档 16 次）、20–38 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
+    <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–20 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
+    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动二十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡 → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）自己把问对逼深二十轮（<b>分七批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（四段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>15</b> 次基底调用（开涌现档 19 次）、30–55 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
     <div id="ownKeyRow" style="display:none">
       <input id="userKey" type="password" autocomplete="off" placeholder="填入你的 DeepSeek / 智谱 API Key（仅存本机浏览器，不上传服务器保存）">
     </div>
@@ -216,7 +216,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
       <span class="en-only">Retrieves passages from the site's <b>articles and monographs</b>, then an SDE base model composes an answer with <b>sources</b> below. AI-generated — verify against sources.</span>
     </div>
     <div id="turnBar" style="display:none;font-size:0.78rem;color:var(--gold);margin:10px 2px 0;line-height:1.7">
-      <span class="zh-only">🧵 连续问对 · 第 <b id="turnNo">1</b> / 10 轮：每一轮都带着前面几轮的上下文；每答完一轮，系统会按九级追问阶梯替你拟好下一问并填进输入框（可改）。满 2 轮后可「提炼精华」，把整场问对收成一份约七千字的<b>精华报告</b>：九栏作业单 ＋ 第十栏「论文观点与分章大纲」，那一栏是交给「成文一篇」的施工图（先规划、再两段连写）。</span>
+      <span class="zh-only">🧵 连续问对 · 第 <b id="turnNo">1</b> / 20 轮：每一轮都带着前面几轮的上下文；每答完一轮，系统会按十九级追问阶梯替你拟好下一问并填进输入框（可改）。满 2 轮后可「提炼精华」，把整场问对收成一份约七千字的<b>精华报告</b>：九栏作业单 ＋ 第十栏「论文观点与分章大纲」，那一栏是交给「成文一篇」的施工图（先规划、再两段连写）。</span>
       <span class="en-only">🧵 Threaded Q&amp;A · turn <b id="turnNoE">1</b>/10 — each turn carries the earlier ones. After 2 turns you can distill the thread into a paper brief.</span>
       <b style="cursor:pointer;margin-left:6px;text-decoration:underline" onclick="resetThread()"><span class="zh-only">🧹 清空重来</span><span class="en-only">Reset</span></b>
       <div id="nextQTip" style="display:none;margin-top:6px;color:var(--muted);font-weight:600"></div>
@@ -225,7 +225,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
     <!-- 本机存档面板：一场问对＝一条记录，自动写、可恢复、可下载、可删。只写浏览器本地。 -->
     <div id="archWrap" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6"></div>
     <div class="auto-wrap" id="autoWrap">
-      <div class="ans-label"><span class="zh-only">🚀 自动十轮 · 一问到底</span><span class="en-only">Auto run</span></div>
+      <div class="ans-label"><span class="zh-only">🚀 自动二十轮 · 一问到底</span><span class="en-only">Auto run</span></div>
       <div class="think" id="autoStat"></div>
       <div id="autoSteps"></div>
       <div class="pdf-acts" id="autoActs">
@@ -246,7 +246,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
         <button class="actbtn" id="btnPaper" onclick="doPaper()">📝 <span class="zh-only">成文一篇 · 两万字论文 → PDF</span><span class="en-only">Write a paper → PDF</span></button>
         <button class="actbtn" id="btnIq" onclick="doIq()">🎯 <span class="zh-only">创新智商评估 · 五维盲评</span><span class="en-only">Innovation IQ</span></button>
         <button class="actbtn" id="btnPolish" onclick="doPolish()">🛠 <span class="zh-only">打磨修改 · 目标 135+</span><span class="en-only">Polish → 135+</span></button>
-        <span class="act-hint" style="width:100%"><span class="zh-only">🌀 涌现路线：开「涌现档」→ 连问 2–10 轮（每轮三观点）→「二阶碰撞」三典范择优 → 自动综合提炼 →「成文一篇」。🧵 常规路线：可连问 10 轮，每轮都带着前面的上下文；问够了先「提炼精华」，再「成文一篇」——论文水平主要由这份精华报告决定，所以它先做一次取舍规划，再分两段写约七千字：第一段是九栏作业单，第二段是「论文观点与分章大纲」，那一栏直接当成文的施工图。约 5–9 分钟。</span><span class="en-only">🧵 Up to 10 threaded turns → distill → write. The brief is what lifts the paper.</span></span>
+        <span class="act-hint" style="width:100%"><span class="zh-only">🌀 涌现路线：开「涌现档」→ 连问 2–20 轮（每轮三观点）→「二阶碰撞」三典范择优 → 自动综合提炼 →「成文一篇」。🧵 常规路线：可连问 20 轮，每轮都带着前面的上下文；问够了先「提炼精华」，再「成文一篇」——论文水平主要由这份精华报告决定，所以它先做一次取舍规划，再分两段写约七千字：第一段是九栏作业单，第二段是「论文观点与分章大纲」，那一栏直接当成文的施工图。约 5–9 分钟。</span><span class="en-only">🧵 Up to 20 threaded turns → distill → write. The brief is what lifts the paper.</span></span>
         <span class="act-hint"><span class="zh-only">「成文一篇」= 四段深度写作 · 两万字投稿体例 · 约 8–16 分钟 · 建议自带 Key　|　评估约 1 分钟 · 打磨（也是四段）约 10–18 分钟</span><span class="en-only">Paper = 4 deep calls · ~20k chars, submission-ready · 8–16 min　|　IQ ≈ 1 min · Polish ≈ 10–18 min</span></span>
         <span class="act-hint" style="width:100%;margin-top:2px"><span class="zh-only">🎯 与 🛠 默认作用于刚生成的论文；也可 <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">粘贴任意一篇文章</b> 来评、来改。</span><span class="en-only">Works on the generated paper, or <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">paste your own text</b>.</span></span>
       </div>
@@ -623,7 +623,7 @@ document.getElementById('userKey').addEventListener('input', function(){ try{ va
 })();
 
 var asking=false, papering=false, lastQ='', lastAns='';
-/* ===== 连续问对（最多十轮）→ 提炼 → 论文入口资料 =====
+/* ===== 连续问对（最多二十轮 · 2026-08-21 由十轮扩）→ 提炼 → 论文入口资料 =====
    服务端零状态：整场问对存在这个页面的内存里，每次提问原样带上去（body.hist）。
    ⚠ 这里原本写着「刷新即清空，这是刻意的」。2026-08-13 用户令：
    「要做一个 10 轮对话的保存，即所有对话要能保存起来。」——**改**。
@@ -631,7 +631,7 @@ var asking=false, papering=false, lastQ='', lastAns='';
    十几次基底调用全部白烧，而页面上那句「这场问对只活在这一页的内存里」只是提前认命。
    ⚠ 改的是「存不存」，**没有改「存在哪」**：仍然只写这台机器的浏览器本地存储，
    一个字节都不上传——与「用户 Key 只在本机」是同一条纪律，那一条一个字没动。 */
-var MAXTURNS=10;
+var MAXTURNS=20;
 var turns=[];      // [{q,a}] 已完成的轮次
 
 /* ═══════ 本机存档 ═══════
@@ -847,7 +847,7 @@ function doAsk(){
      线上真出过：第 1 轮与第 2 轮都是「语言是什么？」。十轮追问的价值全在「层层逐深」上，
      同一问重复问等于白烧一次百多秒的深度调用，还会把入口资料与论文一起带偏。 */
   if(turns.some(function(t){ return qNorm(t.q)===qNorm(q); })){
-    flashAsk('这一句前面已经问过了。十轮的价值在于一层层逐深，同一问再问一遍只会得到差不多的答案。'
+    flashAsk('这一句前面已经问过了。多轮问对的价值在于一层层逐深，同一问再问一遍只会得到差不多的答案。'
       +(nextQReady?'已把本轮该问的那一句填回输入框，可直接问、也可改。':'请换一句再问。'));
     if(nextQReady){ document.getElementById('qa').value=nextQReady; }
     document.getElementById('qa').focus();
@@ -977,8 +977,10 @@ function finishAsk(ansEl, gotErr, lastStat){
 /* 把问题归一化后比对（去空白与句读）：“语言是什么？”与“语言是什么”是同一句 */
 function qNorm(s){ return String(s||'').replace(/[\s\u3000]+/g,'').replace(/[?？。.!！,，、；;：:\-—～~]/g,''); }
 /* ===== 每答完一轮，替用户拟好下一问 =====
-   九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数
-   → 证伪条件 → 最近邻占位者 → 落地与代价）本来就写在服务端的 AUTO_LADDER 里，
+   十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数
+   → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡
+   → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）
+   本来就写在服务端的 AUTO_LADDER 里（2026-08-21 由九级扩到十九级），
    以前却只有「自动十轮」用得上：手动连续问对全靠用户自己想下一句问什么，
    而输入框又留着上一句——结果就是十轮变成同一问重复十遍，「层层深入」根本没发生。
    这一步很便宜：400 tok、不跑检索、拟不出来服务端自带兵底问句，失败也不打扰人。 */
@@ -1007,12 +1009,12 @@ function suggestNextQ(){
   });
 }
 
-/* ================= 🚀 自动十轮：一问到底 =================
-   十轮问对 → 提炼精华（先规划·两段·约七千字精华报告，含论文观点与分章大纲） → 两万字论文（四段·投稿体例·PDF） → 创新智商五维盲评 → 全程记录。
+/* ================= 🚀 自动二十轮：一问到底 =================
+   二十轮问对 → 提炼精华（先规划·两段·约七千字精华报告，含论文观点与分章大纲） → 两万字论文（四段·投稿体例·PDF） → 创新智商五维盲评 → 全程记录。
    人只交一个问题，中途不再点任何东西。
 
    为什么值得单独做一条：这条产线原本每一步都要人点一下，而十轮问对的价值恰恰在于「一层层逼深」，
-   逼深靠的是每一轮追问的**动作**，不是靠人守在旁边。所以追问动作被固化成服务端的九级阶梯
+   逼深靠的是每一轮追问的**动作**，不是靠人守在旁边。所以追问动作被固化成服务端的十九级阶梯
    （worker.js 的 AUTO_LADDER，那里是唯一定义处；这边只送 step，不复制一份阶梯——复制迟早漂移，
    而漂移之后页面一切正常，只是问对不再逼深，属于看不见的静默故障）。
 
@@ -1022,7 +1024,30 @@ function suggestNextQ(){
       余下几轮多半会以同一个理由失败（额度、Key、基底不可用），继续跑只是把钱烧完；
    ③ 提炼没出入口资料就不写论文：没有入口资料的论文会退回单轮底稿，白烧两次最贵的长调用；
    ④ 全程记录可下载——论文有 PDF，但十轮问答与评分卡此前只活在这一页的内存里，刷新即失。 */
-var AUTO_TARGET=10, ROUND_BATCH=3;   /* 一次调用装几轮——改每轮字数就必须回来改它 */
+/* [stated] 用户 2026-08-21：「首先要增加问对次数到 20 次」。
+   ⚠ 改这个数就必须同时改三处，缺一处就是静默故障：
+   ① 服务端 AUTO_LADDER 要有第 11–20 级（否则第 11 轮起反复重跑第 10 级的追问动作，
+      页面照常出字，只是问对不再往前走）；
+   ② 服务端 rounds 分支与 nextq 的钳位（原来写死 10）；
+   ③ 下面 calls 那条报账公式与说明条上的批数（20 轮 ÷ 每批 3 轮 = 7 批）。 */
+var AUTO_TARGET=20, ROUND_BATCH=3;   /* 一次调用装几轮——改每轮字数就必须回来改它 */
+/* ═══ 分批规则的**唯一定义处** ═══
+   下一批该要几轮：满批 ROUND_BATCH，但尾巴不许留孤轮（服务端 rounds 最小收 2 轮，
+   剩一轮的那一批会被钳成 2 而越界）。报账公式与主循环都调它，
+   不许任何一处自己再写一遍——写两遍就是「说明条写 12、真跑 15」那种账实不符。 */
+function autoBatchSize(done){
+  var rem=AUTO_TARGET-done; if(rem<=0) return 0;
+  var n=Math.min(ROUND_BATCH, rem);
+  if(rem-n===1) n=Math.max(2, n-1);
+  return n;
+}
+/* 一场顺跑要分几批（20 轮 ÷ 每批 3 轮，尾巴不留孤轮 ⇒ 3+3+3+3+3+3+2 ＝ 7 批）。
+   真跑时若某一批只写成两轮，实际批数会多——这里给的是报账用的下限。 */
+function autoBatchCount(){
+  var done=0, c=0;
+  while(done<AUTO_TARGET && c<99){ var n=autoBatchSize(done); if(!n) break; done+=n; c++; }
+  return c;
+}
 var autoRunning=false, autoStopped=false, autoT0=0, autoSteps=[];
 function autoElapsed(){
   var s=Math.max(0,Math.round((Date.now()-autoT0)/1000));
@@ -1139,29 +1164,31 @@ function stopAutoRun(){
 }
 function doAutoRun(){
   if(autoRunning) return Promise.resolve();
-  if(asking||papering||distilling||iqing||polishing||emerging){ flashAsk('有一步正在跑，等它跑完再开自动十轮。'); return Promise.resolve(); }
+  if(asking||papering||distilling||iqing||polishing||emerging){ flashAsk('有一步正在跑，等它跑完再开自动二十轮。'); return Promise.resolve(); }
   var q=document.getElementById('qa').value.trim();
   if(!q){ document.getElementById('qa').focus(); flashAsk('先写下你要一问到底的那一个问题。'); return Promise.resolve(); }
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
-  /* 四批问对（每批三轮装在一次调用里）＋ 提炼三次（规划＋两段）＋ 成文四段 ＋ 盲评 ＝ 12；
-     开涌现档时提炼那几次换成三路碰撞（3 撞 ＋ 3 盲评 ＋ 1 综合）＝ 16——
+  /* 七批问对（每批三轮装在一次调用里；20 = 3+3+3+3+3+3+2）＋ 提炼三次（规划＋两段）＋ 成文四段 ＋ 盲评 ＝ 15；
+     开涌现档时提炼那几次换成三路碰撞（3 撞 ＋ 3 盲评 ＋ 1 综合）＝ 19——
      ⚠ 涌现档走的是 collide/synth，**不经提炼**，所以加第十栏不影响这一档的次数。
      从前是 23／29——十轮各调一次、外加九次拟题。省下的不只是钱，更是十次独立的哑火机会。
      ⚠ 提炼 2026-08-10 由一次调用改成四段，这个公式跟着改过；再动段数记得回来改这里与说明条。 */
   /* ⚠ 提炼那一项是 BRIEF_PARTS 的段数 ＋1（规划段），别手写死数：
      2026-08-13 加第十栏时这里就差点漏改，说明条上写 13、真跑 13，而这一行还停在 12。 */
-  var calls=4+(triOn?7:(1+BRIEF_PARTS.length))+4+1;
-  if(!confirm('🚀 自动十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n十轮问对（分四批，每轮两千字以上）→ 约七千字精华报告（先规划再两段）→ 两万字论文（四段）与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
-    +'· 约 '+calls+' 次基底调用（'+(deepOn?'深度档':'普通档')+(triOn?' ＋ 涌现档':'')+'），预计 '+(deepOn?'25–45':'18–32')+' 分钟\n'
+  /* ⚠ 批数不许手写：ROUND_BATCH 或 AUTO_TARGET 一改，写死的数当场失准（2026-08-13 已栽过一次）。
+     算法与下面 nextBatch 的分批规则逐字同源（尾巴不留孤轮）。 */
+  var calls=autoBatchCount()+(triOn?7:(1+BRIEF_PARTS.length))+4+1;
+  if(!confirm('🚀 自动二十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n'+AUTO_TARGET+' 轮问对（分 '+autoBatchCount()+' 批，每轮两千字以上）→ 约七千字精华报告（先规划再两段）→ 两万字论文（四段）与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
+    +'· 约 '+calls+' 次基底调用（'+(deepOn?'深度档':'普通档')+(triOn?' ＋ 涌现档':'')+'），预计 '+(deepOn?'40–70':'30–55')+' 分钟\n'
     +'· 期间请勿关闭或刷新页面——这场问对只活在这一页的内存里\n'
     +'· 随时可「⏹ 中止」，已跑出来的部分全部保留\n\n'
     +(keyMode==='own'
       ? '你用的是自带 Key，token 由你自付。'
-      : '⚠ 你用的是系统密钥——那是站方付钱的公共额度（60 次/天），一次自动十轮就会吃掉其中约 '+calls+' 次。建议先切到「自带 Key」。')
+      : '⚠ 你用的是系统密钥——那是站方付钱的公共额度（60 次/天），一次自动二十轮就会吃掉其中约 '+calls+' 次。建议先切到「自带 Key」。')
     +'\n\n确定开始吗？')) return Promise.resolve();
   if(turns.length){
-    if(!confirm('当前已有 '+turns.length+' 轮问对，自动十轮会先把它清空，从这一问重新开始。继续？')) return Promise.resolve();
+    if(!confirm('当前已有 '+turns.length+' 轮问对，自动二十轮会先把它清空，从这一问重新开始。继续？')) return Promise.resolve();
     var keep=q; resetThread(true); document.getElementById('qa').value=keep;
   }
   autoRunning=true; autoStopped=false; autoT0=Date.now(); autoSteps=[];
@@ -1171,16 +1198,16 @@ function doAutoRun(){
   document.getElementById('goAsk').disabled=true;
   document.getElementById('autoStopBtn').style.display='inline-block';
   renderAutoSteps();
-  autoStat('🚀 自动十轮已启动 · 第 1 轮准备中…');
+  autoStat('🚀 自动二十轮已启动 · 第 1 轮准备中…');
 
-  /* 两批跑完十轮：写不满五轮也不算失败，下一批从断点接着要。 */
+  /* 分批跑完全程：写不满一批也不算失败，下一批从断点接着要。 */
   var okRounds=0;
   function nextBatch(){
     if(autoStopped || okRounds>=AUTO_TARGET) return Promise.resolve();
     /* 每轮字数抬到 2000–2600 后，一次调用只能装三轮：单次调用的安全区是六千到九千字。
-       尾巴不留孤轮（worker 最小收 2 轮），所以 10 轮拆成 3+3+2+2。 */
-    var from=okRounds+1, rem=AUTO_TARGET-okRounds, n=Math.min(ROUND_BATCH, rem);
-    if(rem-n===1) n=Math.max(2, n-1);
+       尾巴不留孤轮（worker 最小收 2 轮），所以 20 轮拆成 3+3+3+3+3+3+2。 */
+    var from=okRounds+1, n=autoBatchSize(okRounds);
+    if(!n) return Promise.resolve();
     var ix=autoPush('第 '+from+'–'+(from+n-1)+' 轮 · 一次调用连写');
     autoStat('🧵 第 '+from+'–'+(from+n-1)+' 轮 · 一次调用连写中 · 已用 '+autoElapsed()+'…');
     return autoBatch(from, n, ix, 1).then(function(got){
@@ -1195,7 +1222,7 @@ function doAutoRun(){
       throw new Error('这一批连续两次都没跑成（只完成 '+okRounds+' 轮），已停在这里，不再往下烧调用。'
         +'已完成的全部保留——可手动点「🧪 提炼精华」接着走，或换成自带 Key 后重跑。');
     }
-    if(okRounds<AUTO_TARGET) autoPush('第 '+(okRounds+1)+'–10 轮未跑成，用已完成的 '+okRounds+' 轮继续往下走');
+    if(okRounds<AUTO_TARGET) autoPush('第 '+(okRounds+1)+'–'+AUTO_TARGET+' 轮未跑成，用已完成的 '+okRounds+' 轮继续往下走');
     var ix=autoPush(triOn?'二阶碰撞 · 三典范择优 → 综合提炼':'提炼精华 · 整场问对 → 约七千字精华报告');
     autoStat('🧪 '+(triOn?'三路碰撞与综合提炼':'提炼入口资料（分四段，约 8–16 分钟）')+'中 · 已用 '+autoElapsed()+'…');
     return (triOn?doEmerge():doDistill()).then(function(){
@@ -1224,12 +1251,12 @@ function doAutoRun(){
       autoStat('⏹ 已中止 · 用时 '+autoElapsed()+' · 已完成 '+turns.length+' 轮问对'
         +(brief?'、入口资料':'')+(paperAll?'、论文':'')+(iqCard?'、评分卡':'')+'。下面可下载全程记录。');
     }else{
-      autoStat('✅ 自动十轮完成 · 用时 '+autoElapsed()+' · '+turns.length+' 轮问对 → 入口资料 '+brief.length+' 字 → 论文 '
+      autoStat('✅ 自动二十轮完成 · 用时 '+autoElapsed()+' · '+turns.length+' 轮问对 → 入口资料 '+brief.length+' 字 → 论文 '
         +paperAll.length+' 字'+(iqCard?(' → 创新智商 '+iqCard.total):'')+' · 论文 PDF 见下方，全程记录可下载。');
     }
     document.getElementById('autoActs').classList.add('show');
   }).catch(function(e){
-    autoStat('✗ 自动十轮中断：'+errText(e)+'（用时 '+autoElapsed()+'；已跑出来的都留在下面）');
+    autoStat('✗ 自动二十轮中断：'+errText(e)+'（用时 '+autoElapsed()+'；已跑出来的都留在下面）');
     document.getElementById('autoActs').classList.add('show');
   }).finally(function(){
     autoRunning=false;

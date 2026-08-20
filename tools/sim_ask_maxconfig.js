@@ -44,11 +44,15 @@ ok(/body\.reasoning_effort = \(VC && VC\.effort\) \? VC\.effort : "max";/.test(W
 const mTop0 = W.match(/const _topPower = \(([^)]*)\);/);
 const mFull = W.match(/const _fullPower = \(([^)]*)\);/);
 const mBP = W.match(/const _briefPlan = ([^;]*);/);
+const mLW = W.match(/const _longWrite = \(([^;]*)\);/);
+const mWall = W.match(/const _wall = ([^;]*);/);
 const PRE = 'const part = 1;\n'
   + 'const _briefPlan = (' + (mBP ? mBP[1] : 'false') + ');\n'
   + 'const _topPower = (' + (mTop0 ? mTop0[1] : 'false') + ');\n'
   + 'const _deepAns = (mode === "answer" && deep);\n'
-  + 'const _fullPower = (' + (mFull ? mFull[1] : 'false') + ');\n';
+  + 'const _fullPower = (' + (mFull ? mFull[1] : 'false') + ');\n'
+  /* _canPlain 由参数传进来：它是「这一家关不关得掉思考」，两条分支的时限差一倍 */
+  + 'const _longWrite = (' + (mLW ? mLW[1] : 'false') + ');\n';
 ok(!!mFull, "_fullPower 在位（满预算、关思考、上时钟、兜底 16000 四件事同用这一个集合）");
 const mH = W.match(/const _heavy = \(([^)]*)\);/);
 ok(!!mH, "_heavy 判据在位");
@@ -154,35 +158,52 @@ const mClk = W.match(/const _clk = ([^;]*);/);
 ok(!!mClk, "_clk 在位");
 /* _budget 也从源码里抽：它和 _clk 是一对，手抄任何一个都会把断言测到旧版本上去。 */
 const mBud = W.match(/const _budget = ([^;]*);/);
-const clkFn = new Function("mode", "deep", "wdsClock", "_spent",
+ok(!!mWall, "_wall 在位（这一刀该给多长，与「已经花掉多少」是两件事，分开写才看得懂）");
+const clkFn = new Function("mode", "deep", "wdsClock", "_spent", "_canPlain",
   PRE + 'const _heavy = (' + (mH ? mH[1] : "false") + ');\n'
+      + 'const _wall = ' + (mWall ? mWall[1] : "120000") + ';\n'
       + 'const _budget = ' + (mBud ? mBud[1] : "115000") + ';\n'
       + 'const _clk = ' + (mClk ? mClk[1] : "null") + ';\nreturn _clk;');
 const mkClk = (f, t) => ({ first: f, total: t });
-const cAns = clkFn("answer", true, mkClk, 0), cPaper = clkFn("paper", false, mkClk, 0);
+const cAns = clkFn("answer", true, mkClk, 0, true), cPaper = clkFn("paper", false, mkClk, 0, true);
+const cKimi = clkFn("paper", false, mkClk, 0, false);
 /* 闸值不写死：从源码里抽。写死一个数就是本文件反复被咬的那个病。 */
-const budgetAt = (spent) => clkFn("paper", false, mkClk, spent).total;
+const budgetAt = (spent) => clkFn("paper", false, mkClk, spent, true).total;
 const WALL = budgetAt(0);
-ok(cAns && cAns.total === WALL && WALL >= 90000 && WALL <= 125000, "深度档问答与长文同一个总闸，且早于平台那道 128–133 秒的墙 · 实得 " + WALL / 1000 + "s");
-ok(cPaper && cPaper.total === WALL, "全线同一个总闸（分开写两个数，改一个忘一个是迟早的事）");
+/* 🔴 【2026-08-21 改判】旧断言钉的是「总闸必须 ≤130 秒，早于平台那道 128–133 秒的墙」。
+   那道墙的**归属**已被证伪（worker.js _T0 处那段）：Cloudflare 一条 SSE 流实测开到 290 秒、
+   全程静默也照样收到 [DONE]；DeepSeek 直连一条流跑到 449 秒交出两万八千字。
+   而那条 120 秒恰恰是「提炼精华」与「成文两万字」中途失败的原因——一段四五千字加十万字入料，
+   一百二十秒本来就排不下，写到一半闸响，前端拿到的是「断在半句」。
+   所以判据从「必须早于 130 秒」改成「**按这一刀该写多长分档**」：
+   长文四五千字给 300 秒；关不掉思考的那两家先想几分钟才落笔，给 600 秒；
+   深度档问答一轮两千字，150 秒足够——闸响得早一点，真卡住时用户不必干等五分钟。 */
+ok(WALL >= 240000 && WALL <= 360000, "长文总闸 " + WALL / 1000 + "s（一段四五千字＋十万字入料，120 秒排不下——那正是中途失败的根）");
+ok(cKimi && cKimi.total > WALL, "思考关不掉的那几家给更长的闸 " + cKimi.total / 1000 + "s（它们先想几分钟才落第一个字）");
+ok(cAns && cAns.total < WALL && cAns.total >= 120000,
+   "深度档问答的闸短于长文 · 实得 " + cAns.total / 1000 + "s（一轮两千字，闸响得早一点才不用干等）");
 ok(cAns && cAns.first === 45000 && cPaper && cPaper.first === 60000, "首帧闸各自不同：问答 45 秒、长文 60 秒");
-ok(clkFn("nextq", false, mkClk, 0) === null, "不进重档的模式不挂时钟（行为不变）");
+ok(cKimi && cKimi.first === 120000, "关不掉思考的那几家首帧闸也放宽到 120 秒，否则每一趟都被首帧闸冤杀");
+ok(clkFn("nextq", false, mkClk, 0, true) === null, "不进重档的模式不挂时钟（行为不变）");
 /* 【闸必须从请求到达算起】平台那道约 130 秒的墙不管你前面干了什么：
    词表扩展＋全站检索＋装内功先吃掉几十秒，再给上游满 115 秒，合计必超。
    线上真故障：手动问对第 4 轮空白框停了八十分钟。 */
 ok(/const _T0 = Date\.now\(\);/.test(W), "askCore 顶部埋下了请求起始时间");
-ok(/const _spent = Date\.now\(\) - _T0;/.test(W) && /\d+ - _spent/.test(W),
-   "闸的预算把出流前已经花掉的时间扣掉了（否则总时长永远超平台那道墙）");
-ok(/Math\.max\(25000, \d+ - _spent\)/.test(W),
+ok(/const _spent = Date\.now\(\) - _T0;/.test(W) && /_wall - _spent/.test(W),
+   "闸的预算把出流前已经花掉的时间扣掉了（检索与预填也算在这一刀的时间里）");
+ok(/Math\.max\(25000, _wall - _spent\)/.test(W),
    "扣到最后也留 25 秒：前面再拖也要给基底一段能写出东西的窗口");
-ok(/wdsClock\(Math\.min\(_deepAns \? 45000 : 60000, _budget\), _budget\)/.test(W),
+ok(/wdsClock\(Math\.min\(_deepAns \? 45000 : \(_canPlain \? 60000 : 120000\), _budget\), _budget\)/.test(W),
    "首帧闸也不得超过剩余预算（否则首帧闸比总闸还晚，等于没闸）");
 /* 真跑：出流前已经花掉 60 秒时，上游只剩 55 秒，首帧闸也跟着缩 */
-const c60 = clkFn("answer", true, mkClk, 60000), c200 = clkFn("answer", true, mkClk, 200000);
-ok(c60.total === WALL - 60000 && c60.first === 45000, "出流前花掉 60s ⇒ 上游只剩 " + c60.total / 1000 + "s（总闸减 60）");
-ok(c200.total === 25000 && c200.first === 25000, "拖到 200s ⇒ 仍留 25s 底线，且首帧闸不得晚于总闸");
+const cA0 = clkFn("answer", true, mkClk, 0, true).total;
+const c60 = clkFn("answer", true, mkClk, 60000, true), c500 = clkFn("answer", true, mkClk, 500000, true);
+ok(c60.total === cA0 - 60000 && c60.first === 45000, "出流前花掉 60s ⇒ 上游只剩 " + c60.total / 1000 + "s（总闸减 60）");
+ok(c500.total === 25000 && c500.first === 25000, "拖到 500s ⇒ 仍留 25s 底线，且首帧闸不得晚于总闸");
 ok(/_clk \? _clk\.signal : undefined/.test(W), "时钟的 signal 真接到了主调用上（算对了没接上等于没改）");
-ok(cPaper.total <= 130000, "总闸早于平台那约 133 秒的无声一刀");
+/* 旧断言「总闸 ≤130 秒」已随归属改判撤销（见上）。换成一条仍然要守的：闸必须真的存在且有界，
+   不许写成 0 或无穷——没有闸的那一版，卡死时是一个永远转下去的圈。 */
+ok(cPaper.total > 0 && cPaper.total <= 900000, "闸仍然有界（无闸＝卡死时永远转下去，用户只看见一个空框）");
 const wantChars = W.match(/\*\*(\d+)–(\d+) 字\*\*，结尾留一个/);
 ok(!!wantChars && Number(wantChars[2]) <= 2200,
    "深度档问答的字数上限 ≤ 2200：线上实测 107 秒写不完 2800 字（窗口里还要先预填内功与站内资料）· 实得 " + (wantChars ? wantChars[2] : "?"));
