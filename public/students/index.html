@@ -119,7 +119,7 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="sub zh-only">接龙持续进行，人数不设上限——每一位学员的作品，通过合宪性审读后，都将署名在此陆续发表。</div>
     <div class="sub en-only">Sign-up is ongoing with no cap on numbers — every trainee’s work, once it passes a constitutionality review, will be published here under their name.</div>
   </div>
-  <div class="roster-note zh-only">编号按四维加权分自动排序：<b>活跃度 40%</b>（以三天为一个窗口计一次活跃，同一天连发多篇不按篇数叠加；近期权重更高、持续多月额外加分）· <b>发表篇数 20%</b>（<b>一部专著按十篇论文计</b>）· <b>创新度 25%</b>（只采用独立盲评分）· <b>领域广度 15%</b>（一级领域分布的有效领域数）。后两维样本少的向全站均值收缩，暂无数据的按均值计、不罚不奖。每次发表新文章即时更新 · 并列按报名顺序</div>
+  <div class="roster-note zh-only">编号按三维加权分自动排序：<b>活跃度 53%</b>（以三天为一个窗口计一次活跃，同一天连发多篇不按篇数叠加；近期权重更高、持续多月额外加分）· <b>发表篇数 27%</b>（<b>一部专著按十篇论文计</b>）· <b>领域广度 20%</b>（一级领域分布的有效领域数）。广度维样本少的向全站均值收缩，暂无数据的按均值计、不罚不奖。<b>本站已取消创新智商评分，排名不含任何评分维度。</b>每次发表新文章即时更新 · 并列按报名顺序</div>
   <div class="roster-note en-only">Ranked by four weighted parts: <b>activity 40%</b> (counted in three-day windows, so a single-day batch does not stack per piece) · <b>number of pieces 20%</b> (a monograph counts as ten papers) · <b>innovation 25%</b> (blind scores only) · <b>disciplinary breadth 15%</b> (effective number of primary fields). The last two are shrunk toward the site mean when the sample is small; students without data take the mean, neither penalised nor rewarded. Updates the instant a new piece is published · ties by sign-up order</div>
   <div class="roster" id="roster">
     <div class="stu-loading zh-only">名单加载中…</div>
@@ -194,9 +194,6 @@ fetch('/students/roster.json?v='+Date.now(),{cache:'no-store'}).then(function(r)
   }
   students.forEach(function(s){
     s.score_act = activityScore(s.papers);
-    var bl = (s.papers||[]).filter(function(p){ return p.iq_kind==='blind'; });
-    s.iqN = bl.length;
-    s.iqRaw = bl.length ? bl.reduce(function(a,p){ return a+p.iq; },0)/bl.length : null;
     // 领域广度＝一级领域分布的「有效领域数」exp(熵)。用熵不用标签数：
     // 五十篇均匀落在四个领域，比七十篇集中在一个领域却写了四十九个自造标签更广。
     var fc={}, fn=0;
@@ -206,15 +203,6 @@ fetch('/students/roster.json?v='+Date.now(),{cache:'no-store'}).then(function(r)
     s.fieldsN = fn;
     s.breadthRaw = fn ? Math.exp(H) : null;
   });
-  // ④ 创新度：只采用独立盲评（iq_kind==='blind'）；样本少的向全站均值收缩，
-  //    四篇代表七十三篇不该与三十六篇代表六十六篇等价；完全没有盲评分的取全站均值，不罚不奖。
-  var allIQ=[];
-  students.forEach(function(s){ (s.papers||[]).forEach(function(p){ if(p.iq_kind==='blind') allIQ.push(p.iq); }); });
-  var gmIQ = allIQ.length ? allIQ.reduce(function(a,b){ return a+b; },0)/allIQ.length : 138;
-  var K = 10;
-  students.forEach(function(s){
-    s.iqShrunk = (s.iqN*(s.iqRaw===null?gmIQ:s.iqRaw) + K*gmIQ)/(s.iqN+K);
-  });
   // 广度同样收缩：四篇文章落在四个领域不等于比五十篇跨四个领域更广
   var bAll=students.filter(function(s){ return s.breadthRaw!==null; }).map(function(s){ return s.breadthRaw; });
   var gmB = bAll.length ? bAll.reduce(function(a,b){ return a+b; },0)/bAll.length : 3;
@@ -222,7 +210,7 @@ fetch('/students/roster.json?v='+Date.now(),{cache:'no-store'}).then(function(r)
     var n=s.fieldsN||0;
     s.breadth = (n*(s.breadthRaw===null?gmB:s.breadthRaw) + K*gmB)/(n+K);
   });
-  // 四维归一后加权：活跃 0.40 · 篇数 0.20 · 字数 0.15 · 创新度 0.25
+  // 三维归一后加权：活跃 0.53 · 篇数 0.27 · 广度 0.20（创新智商评分已取消）
   function maxOf(f){ return Math.max.apply(null, students.map(f)) || 1; }
   var mA=maxOf(function(s){ return s.score_act; }),
       mC=maxOf(function(s){ return Math.sqrt(s.count); }),
@@ -230,11 +218,10 @@ fetch('/students/roster.json?v='+Date.now(),{cache:'no-store'}).then(function(r)
   students.forEach(function(s){
     var A=100*s.score_act/mA,
         C=100*Math.sqrt(s.count)/mC,
-        Q=100*Math.max(0, Math.min(1, (s.iqShrunk-125)/25)),
         B=100*s.breadth/mB;
     // 一篇未发的学员不参与计分：中性补均值只针对「已发表、缺某项元数据」的人，
     // 否则从未发表者会凭两维的均值补分白拿二十余分。
-    s.score = s.count ? (0.40*A + 0.20*C + 0.25*Q + 0.15*B) : 0;
+    s.score = s.count ? (0.53*A + 0.27*C + 0.20*B) : 0;
   });
   // 预备学员**不再被拿出榜单**：它是一个身份标记，不是排名开关。
   // （2026-08-01 用户令：蔡彦加入排名行列，同时三人都挂「预备学员」——
