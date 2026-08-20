@@ -3994,9 +3994,18 @@ async function ensureReflect(env, url, vendor, VC, KEY, allowGen) {
     if (r.reflect && r.reflect.length > 500) {
       REFLECT_MEM[rkey] = { text: r.reflect, exp: now + REFLECT_MEM_TTL };
       REFLECT_SRC[rkey] = r.exact ? "缓存" : "同厂商回退";
+      REFLECT_STORE_DOWN = 0; REFLECT_STORE_WHY = "";   // 读得出来 ⇒ 存储是活的
       return r.reflect;
     }
-  } catch (e) {}
+  } catch (e) {
+    /* 🔴 读也失败 ⇒ 存储整个躺了，写更不可能。此前这里是空 catch，于是「读不出来」
+       与「确实没有」长成同一个样子——照样往下走去生成一份，再存不下，白烧一次。
+       线上实测（2026-08-21）：写入额度爆掉后连 `storage.list` 都抛
+       `Exceeded allowed rows written in Durable Objects free tier.`，读写一起躺。
+       读失败就置位，等于把「每个 isolate 白烧一次」再压成「一次都不烧」。 */
+    REFLECT_STORE_DOWN = Date.now();
+    REFLECT_STORE_WHY = String((e && e.message) || e).slice(0, 200);
+  }
   // allowGen=false 的调用方（答题请求）宁可没有心得，也不肯在自己的时间里现生成一份。
   if (!allowGen) return "";
   /* 🔴 【存不下就别生成 —— 2026-08-21】刚刚才写失败过（30 分钟内），说明存储正躺着。

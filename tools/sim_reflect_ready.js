@@ -105,8 +105,13 @@ ok(/if \(!_sr\.ok\) throw new Error\("CONFIG_VAULT 回 " \+ _sr\.status\);/.test
    "写心得的返回码真被检查了（非 2xx 也算失败，不只是抛异常那一种）");
 ok(/REFLECT_STORE_DOWN = Date\.now\(\);/.test(W) && /REFLECT_STORE_WHY = String/.test(W),
    "写失败记账：时刻＋原话（此前是空 catch，写不进去而没有任何人知道）");
-ok(/REFLECT_STORE_DOWN = 0; REFLECT_STORE_WHY = "";/.test(W),
-   "写成功要把标记清掉（存储恢复后必须能自己走出来，不许一直记仇）");
+ok((W.match(/REFLECT_STORE_DOWN = 0; REFLECT_STORE_WHY = "";/g) || []).length >= 2,
+   "读到了或写成功了都要把标记清掉（存储恢复后必须能自己走出来，不许一直记仇）");
+/* 读失败＝存储整个躺了，写更不可能。线上实测：写入额度爆掉后连 storage.list 都抛同一句话。
+   读失败就置位，等于把「每个 isolate 白烧一次」再压成「一次都不烧」。 */
+const _iRd = W.indexOf('op: "getReflect", vendor, rkey');
+ok(_iRd > 0 && /REFLECT_STORE_DOWN = Date\.now\(\);/.test(W.slice(_iRd, _iRd + 1400)),
+   "**读**失败也算存储躺了（此前空 catch：读不出来与确实没有长成同一个样子）");
 ok(/if \(reflectStoreDown\(\)\) \{[\s\S]{0,400}return "";/.test(W),
    "存储正躺着时**不再生成**——生成得出来也存不下，只会白烧一次几千字的调用");
 ok(/本轮\*\*不再重复生成\*\*/.test(W), "并把真因交出去，不是一句没有信息的「心得没能备好」");
