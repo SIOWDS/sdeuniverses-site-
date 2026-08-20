@@ -1737,6 +1737,9 @@ function promptFor(id){
     '若 N > 0：必须点名回炉到哪一道工序（体检／抽脊／混沌碰撞／扩候选／候选互撞／自组织／涌现／近邻划界／成文），并给一句具体动作。',
     '最后给【最高杠杆的一件】与【本文最强的一处】各一段。',
     '',
+    '收尾再单列一行，供作者本人在工作台上判档用（不进任何对外文本）：',
+    '内部自评：XXX　（0–170 的整数，按 SDE 五维 S/D/E/I/F 加权；这一行只给作者看，不上站、不进发布包）',
+    '',
     (window.__NBR ? (window.__NBR + '\n') : ''),
     '【待评文章】',
     (ST.article || '').slice(0, 24000)
@@ -2053,6 +2056,8 @@ async function runStage(i){
   if(s.id==='review'){
     const m = txt.match(/缺项[：:\s]*([0-5])/);
     ST.gaps = m ? parseInt(m[1],10) : null;
+    const mi = txt.match(/内部自评[：:\s]*(\d{2,3})/);
+    ST.iq = mi ? parseInt(mi[1],10) : null;   // 工作台用，不上站、不进发布包
     renderScore();
     if(ST.gaps !== null && ST.gaps > 0){
       const autoRedo = $('autoRedoChk') && $('autoRedoChk').checked;
@@ -2663,7 +2668,8 @@ function renderScore(){
   const p = panels.review;
   if(ST.gaps==null) return;
   const bad = ST.gaps > 0;
-  setStat('review', (bad?'⚠ ':'✓ ')+'五项复核 · 缺 '+ST.gaps+' 项', bad? 'run':'done');
+  const iqTxt = (ST.iq==null ? '' : '　｜ 内部自评 '+ST.iq+'（不上站）');
+  setStat('review', (bad?'⚠ ':'✓ ')+'五项复核 · 缺 '+ST.gaps+' 项'+iqTxt, bad? 'run':'done');
   const note = document.createElement('div');
   note.className = 'small'; note.style.marginTop='8px';
   note.innerHTML = bad
@@ -2706,6 +2712,7 @@ async function deliver(){
   const bits = [
     '成品 '+words+' 字',
     ST.gaps==null ? '复核未读到清单' : ('五项复核 · 缺 '+ST.gaps+' 项'+(ST.gaps===0?'（五项全做到）':'（已回炉 '+ST.rounds+' 轮）')),
+    ST.iq==null ? null : ('内部自评 '+ST.iq+'　—— 工作台判档用，不随成品上站'),
     hits.length ? ('⚠ 术语残留：'+hits.join('、')) : '术语零残留',
     isPaper() ? '体例：学科通融体（论文）' : '体例：每日必读体（散文）',
     ST.mode==='D' ? '三家由基底联网找（站外，链接须自行核对）'
@@ -2745,7 +2752,7 @@ goBtn.addEventListener('click', async ()=>{
 });
 $('stopBtn').addEventListener('click', ()=>{ ST.abort = true; sideAbortAll(); });
 $('resetBtn').addEventListener('click', ()=>{
-  ST.out = {}; ST.article=''; ST.outline=''; ST.gaps=null; ST.sources=[];
+  ST.out = {}; ST.article=''; ST.outline=''; ST.gaps=null; ST.iq=null; ST.sources=[];
   ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null; ST.pair=null; ST.bestPair=null; ST.usedA=[]; ST.badC=[]; ST.__swap=null; ST.forged=false;   // 心得不清：它按内功+基底缓存，重跑不必重内化
   ST.redoFrom=null; ST.rounds=0; ST.termRetry=0; ST.termFix=null; ST.notes=[];
   ST.spineRows=[]; ST.conflict=''; ST.truncated=false;

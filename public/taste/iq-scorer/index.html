@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDE 创新智商评分官 · 品尝系列 | SDE Universes</title>
+<meta name="description" content="上传一篇(或含多篇)论文的 Word/PDF。若文档含多篇论文,自动拆分并逐篇评分。每篇先对 DeepSeek 与 GLM 两个基底做 SDE 内功提智+写心得,再各自打分:创新智商(满分160,天才·典范级封顶)与论文完善性(满分100),取两基底平均,最后出汇总报告。">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root{--bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:rgba(255,255,255,0.10);--text:#E6EDF3;--muted:#8B98A5;--gold:#D4B25E;--gold2:#E5C86E;--ok:#3FB950;--err:#F85149;--purple:#B98CFF;--blue:#6E9FD4;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;line-height:1.7;min-height:100vh}
+a{color:var(--gold2);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+nav{border-bottom:1px solid var(--border);background:rgba(14,17,22,0.9);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+.nav-logo{font-weight:700;letter-spacing:0.04em;color:var(--text);font-size:16px}
+.nav-back{font-size:14px;color:var(--muted)}
+header.hero{text-align:center;padding:48px 20px 20px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;left:50%;top:12%;transform:translateX(-50%);width:520px;height:280px;background:radial-gradient(ellipse,rgba(212,178,94,0.13),transparent 70%);pointer-events:none}
+.hero-eyebrow{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:14px;position:relative}
+h1{font-size:clamp(26px,5vw,42px);font-weight:800;letter-spacing:0.02em;position:relative;line-height:1.3}
+h1 .grad{background:linear-gradient(120deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{color:var(--muted);font-size:clamp(14px,2vw,16px);margin-top:14px;max-width:730px;margin-left:auto;margin-right:auto;position:relative}
+.hero-sub b{color:#C9B27A;font-weight:600}
+.flow{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px;font-size:12px;color:var(--muted)}
+.flow span{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:5px 13px}
+.flow .arr{border:none;background:none;color:var(--gold);align-self:center}
+.controls{max-width:860px;margin:28px auto 0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px}
+.field{margin-bottom:16px}.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;letter-spacing:0.02em}
+.field label .req{color:var(--gold)}
+.count{float:right;font-size:12px;color:var(--muted)}
+input[type=password],input[type=text],textarea{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:12px 14px;font-size:14.5px;font-family:inherit;transition:border-color .2s}
+input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+textarea{resize:vertical;min-height:150px;line-height:1.7}
+.key-row{display:flex;gap:10px;align-items:stretch}
+.key-toggle{flex-shrink:0;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--muted);padding:0 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+.key-toggle:hover{color:var(--text);border-color:var(--gold)}
+.key-hint{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.6}
+.key-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.key-grid{grid-template-columns:1fr}}
+.key-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px}
+.key-card .kc-head{font-size:12.5px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.key-card input{background:#12161C}
+.drop{border:1.5px dashed rgba(212,178,94,0.4);border-radius:12px;padding:26px 20px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(212,178,94,0.03)}
+.drop:hover,.drop.over{border-color:var(--gold);background:rgba(212,178,94,0.08)}
+.drop .di{font-size:30px;margin-bottom:8px}.drop .dt{font-size:14px;color:var(--text)}.drop .ds{font-size:12px;color:var(--muted);margin-top:5px}
+.file-info{margin-top:10px;font-size:13px;display:none;align-items:center;gap:8px;color:var(--ok);background:rgba(63,185,80,0.08);border:1px solid rgba(63,185,80,0.3);border-radius:8px;padding:9px 13px}
+.file-info.err{color:#FCA5A5;background:rgba(248,81,73,0.08);border-color:rgba(248,81,73,0.35)}
+.examples{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.ex-chip{background:var(--panel2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12.5px;color:var(--muted);cursor:pointer;transition:all .2s}
+.ex-chip:hover{color:var(--gold);border-color:var(--gold)}
+/* split */
+.split-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-split{background:var(--panel2);border:1px solid rgba(212,178,94,0.4);color:var(--gold);border-radius:9px;padding:10px 16px;font-size:13.5px;cursor:pointer;transition:all .2s}
+.btn-split:hover:not(:disabled){background:rgba(212,178,94,0.1);border-color:var(--gold)}
+.btn-split:disabled{opacity:.5;cursor:not-allowed}
+.btn-split.alt{color:var(--muted);border-color:var(--border)}
+.btn-split.alt:hover{color:var(--gold);border-color:var(--gold)}
+.split-hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6}
+.split-hint code{background:var(--panel2);padding:1px 6px;border-radius:4px;color:#C9B27A}
+.split-note{font-size:12.5px;color:var(--blue);margin-top:8px;display:none}
+.queue-box{display:none;margin-top:12px;background:rgba(20,24,30,0.5);border:1px solid rgba(212,178,94,0.25);border-radius:12px;padding:14px 16px}
+.q-head{font-size:13.5px;color:var(--text);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.q-head b{color:var(--gold)}
+.q-reset{background:none;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer}
+.q-reset:hover{color:var(--gold);border-color:var(--gold)}
+.q-list{display:flex;flex-direction:column;gap:8px}
+.q-item{display:flex;align-items:center;gap:10px;background:var(--panel2);border-radius:8px;padding:9px 12px}
+.q-idx{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(212,178,94,0.15);color:var(--gold);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.q-main{flex:1;min-width:0}
+.q-title{font-size:13px;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-prev{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-del{flex-shrink:0;background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.q-del:hover{color:var(--err);background:rgba(248,81,73,0.1)}
+.q-fast{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin-top:11px;cursor:pointer}
+.go-row{display:flex;gap:12px;align-items:center;margin-top:20px}
+.btn-go{flex:1;background:linear-gradient(120deg,var(--gold),var(--gold2));color:#1a1205;font-weight:700;font-size:16px;border:none;border-radius:10px;padding:15px;cursor:pointer;letter-spacing:0.04em;transition:transform .1s,opacity .2s}
+.btn-go:hover:not(:disabled){transform:translateY(-1px)}
+.btn-go:disabled{opacity:0.5;cursor:not-allowed}
+.status{font-size:13px;color:var(--muted);min-width:120px;text-align:right}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(212,178,94,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.neigong-tag{font-size:12px;color:var(--muted);margin-top:12px}
+details.explain{max-width:860px;margin:12px auto 0}
+details.explain summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--purple);padding:8px 0}
+details.explain .ex-body{font-size:13px;color:#C9BEDA;line-height:1.9;background:rgba(30,20,44,0.35);border:1px solid rgba(122,47,224,0.25);border-radius:10px;padding:14px 18px}
+details.explain .ex-body b{color:#D4DCE4}
+.privacy-note{max-width:860px;margin:14px auto 0;font-size:12px;color:var(--muted);line-height:1.7;background:rgba(20,24,30,0.5);border:1px solid var(--border);border-radius:10px;padding:12px 18px}
+.privacy-note b{color:var(--gold)}
+.err-box{max-width:860px;margin:16px auto 0;display:none;background:rgba(248,81,73,0.08);border:1px solid rgba(248,81,73,0.4);border-radius:10px;padding:12px 18px;color:#FCA5A5;font-size:13.5px;line-height:1.6}
+#progress{max-width:860px;margin:22px auto 0;display:none}
+.prow{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.prow .pname{font-size:14px;font-weight:700;min-width:135px}
+.prow .pstage{flex:1;font-size:13px;color:var(--muted)}
+.prow.done{border-color:rgba(63,185,80,0.4)}.prow.fail{border-color:rgba(248,81,73,0.4)}
+#result{max-width:900px;margin:26px auto 60px;display:none}
+.avg-card{background:linear-gradient(135deg,rgba(212,178,94,0.10),rgba(122,47,224,0.06));border:1px solid rgba(212,178,94,0.35);border-radius:16px;padding:24px 26px;margin-bottom:22px}
+.avg-head{font-size:12px;letter-spacing:0.25em;color:var(--gold);text-align:center;margin-bottom:16px}
+.avg-scores{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.avg-one{text-align:center;min-width:170px}
+.avg-one .an{font-size:54px;font-weight:800;line-height:1}
+.avg-one .amax{font-size:19px;color:var(--muted);font-weight:600}
+.avg-one .al{font-size:12px;letter-spacing:0.15em;color:var(--muted);margin-top:8px}
+.avg-one .abadge{display:inline-block;font-size:12.5px;font-weight:700;padding:4px 13px;border-radius:20px;margin-top:9px}
+.avg-note{text-align:center;font-size:12.5px;color:var(--muted);margin-top:15px;line-height:1.7}
+.base-panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px}
+.bp-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bp-name{font-size:16px;font-weight:700}
+.bp-chip{font-size:13px;font-weight:700;padding:5px 13px;border-radius:20px}
+.bp-body{padding:22px 24px}
+.sec-h{font-size:12px;letter-spacing:0.18em;color:var(--gold);margin-bottom:12px}
+.two-col{display:grid;grid-template-columns:250px 1fr;gap:24px;align-items:start}
+@media(max-width:640px){.two-col{grid-template-columns:1fr}}
+.radar-wrap{text-align:center}
+.dims,.aspects{display:flex;flex-direction:column;gap:12px}
+.dim-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.dim-name{font-size:13px;color:var(--text);font-weight:600}
+.dim-name .w{font-size:11px;color:var(--muted);font-weight:400;margin-left:5px}
+.dim-score{font-size:14.5px;font-weight:700;color:var(--gold2)}
+.bar{height:7px;background:var(--panel2);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px}
+.dim-ev{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:4px}
+.iq-sub,.pp-sub{font-size:13px;color:var(--muted);margin-top:10px}.iq-sub b,.pp-sub b{color:#C9B27A;font-weight:600}
+.block{margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
+.quote-box{background:var(--panel2);border-left:3px solid var(--err);border-radius:0 8px 8px 0;padding:12px 15px}
+.quote-box .q{font-size:13px;color:#E6EDF3;font-style:italic;line-height:1.7}
+.quote-box .r{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.55}
+.uplift-box{background:linear-gradient(120deg,rgba(212,178,94,0.08),rgba(212,178,94,0.03));border:1px solid rgba(212,178,94,0.3);border-radius:12px;padding:14px 16px;font-size:13.5px;color:#C7CDD4;line-height:1.7}
+.verdict{margin-top:18px;padding:14px 18px;background:var(--panel2);border-radius:12px;font-size:14.5px;color:#E6EDF3;line-height:1.7;text-align:center}
+details.think-fold{margin-top:14px}
+details.think-fold summary{cursor:pointer;font-size:12px;color:var(--muted);padding:6px 0}
+details.think-fold summary:hover{color:var(--purple)}
+details.think-fold .fold-body{font-size:11.5px;color:#9A8FAC;line-height:1.7;white-space:pre-wrap;max-height:300px;overflow-y:auto;background:rgba(30,20,44,0.3);border-radius:10px;padding:12px 14px;margin-top:5px}
+.result-actions{display:flex;gap:12px;margin-top:4px;flex-wrap:wrap}
+.btn-ghost{background:var(--panel);border:1px solid var(--border);border-radius:9px;color:var(--muted);padding:10px 18px;font-size:13.5px;cursor:pointer;transition:all .2s}
+.btn-ghost:hover{color:var(--gold);border-color:var(--gold)}
+/* batch report */
+.batch-sum{background:linear-gradient(135deg,rgba(212,178,94,0.10),rgba(122,47,224,0.06));border:1px solid rgba(212,178,94,0.35);border-radius:16px;padding:22px 26px;margin-bottom:20px;text-align:center}
+.batch-sum .bh{font-size:12px;letter-spacing:0.22em;color:var(--gold);margin-bottom:14px}
+.batch-sum .bnums{display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+.batch-sum .bn{min-width:120px}
+.batch-sum .bn .v{font-size:40px;font-weight:800;line-height:1}
+.batch-sum .bn .l{font-size:11.5px;color:var(--muted);letter-spacing:.1em;margin-top:6px}
+.batch-sum .bextra{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.7}
+.batch-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px}
+.batch-table th,.batch-table td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:left}
+.batch-table th{color:var(--muted);font-size:11.5px;letter-spacing:.08em;font-weight:600}
+.batch-table td.num{text-align:center;font-weight:700}
+.batch-table .rank{color:var(--muted);text-align:center;width:34px}
+.batch-table .tt{max-width:340px}
+details.paper-fold{margin-bottom:12px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+details.paper-fold summary{cursor:pointer;padding:14px 18px;font-size:14px;font-weight:600;background:var(--panel);list-style:none}
+details.paper-fold summary::-webkit-details-marker{display:none}
+details.paper-fold summary:hover{background:var(--panel2)}
+details.paper-fold[open] summary{border-bottom:1px solid var(--border)}
+.paper-fold .pf-body{padding:18px}
+.section-title{font-size:14px;font-weight:700;color:var(--text);margin:6px 0 12px}
+.rubric-note{max-width:900px;margin:0 auto 60px;font-size:12px;color:var(--muted);line-height:1.8;text-align:center}
+.rubric-note b{color:#C9B27A}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="/browse/" class="nav-logo">SDE Universes</a>
+  <a href="/taste/" class="nav-back">← 返回品尝系列</a>
+</div></nav>
+
+<header class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">SDE 智能体品尝系列 · 其一</div>
+  <h1>SDE <span class="grad">创新智商评分官</span></h1>
+  <p class="hero-sub">上传一篇论文（Word / PDF）。<b>若文档里含多篇论文，会自动拆分、逐篇各评一套分</b>。每篇都先对 <b>DeepSeek</b> 与 <b>GLM</b> 两个基底做 SDE 内功提智+写心得，再各打 <b>创新智商（满分 160，天才·典范级封顶）</b>与 <b>论文完善性（满分 100）</b>，取两基底平均；多篇时最后出一份汇总报告。</p>
+  <div class="flow"><span>上传（可含多篇）</span><span class="arr">→</span><span>拆分</span><span class="arr">→</span><span>逐篇双基底提智评分</span><span class="arr">→</span><span>汇总报告</span></div>
+</header>
+
+<div class="wrap" style="margin:18px auto 0;max-width:900px">
+  <div style="border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:14px 20px;font-size:14px;line-height:1.85">
+    <b style="color:#D4B25E">这把尺子是工作台上的，不是展示柜里的</b><br>
+    本站自 2026 年 8 月 20 日起<b>不再在任何文章页、专著页或学员排名上标注分数</b>。这台评分官照常用——
+    它是生产环节的判断工具：判要不要退改、退改往哪个方向、装书时选哪几篇。
+    分数<b>只留在你这一侧</b>，不随文章上站、不进排名、不写进发布包。<br>
+    对外的那一面改成<b>五项可清点判据</b>（真跑 · 敌意拓宽 · 划界 · 让步 · 改判），逐项只判「做到／部分做到／缺」并指出证据位置——
+    因为分数是自评，外人无从复核；清单可以被任何人拿去自己核一遍。
+  </div>
+</div>
+
+<div class="controls">
+  <div class="field">
+    <label>上传论文 <span class="req">*</span><span class="count" id="count">0 字</span></label>
+    <div class="drop" id="drop"><div class="di">📄</div><div class="dt">点击选择，或把 <b>Word / PDF</b> 文件拖到这里</div><div class="ds">文件在你本机浏览器内解析成文字，不上传 · 也可在下方直接粘贴</div></div>
+    <input type="file" id="fileIn" accept=".docx,.doc,.pdf" style="display:none">
+    <div class="file-info" id="fileInfo"></div>
+  </div>
+
+  <div class="field">
+    <label>论文正文 <span style="color:var(--muted);font-weight:400">（上传后自动填入，可编辑；也可直接粘贴）</span></label>
+    <textarea id="docText" placeholder="上传 Word/PDF 后正文出现在这里；或直接粘贴。若含多篇论文，用下方「拆分」。"></textarea>
+    <div class="examples"><span style="font-size:12px;color:var(--muted);margin-right:2px">没有文件？试一段：</span><span class="ex-chip" data-ex="mass">大众水平样本</span><span class="ex-chip" data-ex="r3">资深学者样本</span><span class="ex-chip" data-ex="r4">顶级金点子样本</span></div>
+  </div>
+
+  <div class="field" id="splitField">
+    <label>多篇论文拆分 <span style="color:var(--muted);font-weight:400">（文档里有多篇论文时用；单篇可跳过）</span></label>
+    <div class="split-row">
+      <button class="btn-split" id="splitBtn">🔍 识别文档中的多篇论文</button>
+      <button class="btn-split alt" id="manualSplitBtn">按分隔符拆分</button>
+    </div>
+    <div class="split-hint">「识别」用 AI 自动找出每篇论文的边界（需已填至少一个 Key）；或在每两篇之间单独加一行分隔线（<code>=====</code> / <code>-----</code>，≥3 个字符）后点「按分隔符拆分」。拆分后可删除误分项，或点「其实是单篇」还原。</div>
+    <div class="split-note" id="splitNote"></div>
+    <div class="queue-box" id="queueBox"></div>
+  </div>
+
+  <div class="field">
+    <label>论文标题 <span style="color:var(--muted);font-weight:400">（单篇时选填；多篇时按拆分自动命名）</span></label>
+    <input type="text" id="docTitle" placeholder="例如：AI 时代的教育评价系统阻力">
+  </div>
+
+  <div class="field">
+    <label>两个基底的 API Key <span class="req">*</span> <span style="color:var(--muted);font-weight:400">（都填 → 双基底取平均；只填一个 → 单基底评分）</span></label>
+    <div class="key-grid">
+      <div class="key-card"><div class="kc-head" style="color:#4C8BF5">🧠 DeepSeek-V4-Pro</div><div class="key-row"><input type="password" id="dsKey" placeholder="DeepSeek API Key" autocomplete="off"><button class="key-toggle" data-for="dsKey">显示</button></div><div class="key-hint">DeepSeek 开放平台 → API keys，以 sk- 开头。</div></div>
+      <div class="key-card"><div class="kc-head" style="color:#3FB6A8">🧠 GLM-5（智谱）</div><div class="key-row"><input type="password" id="glmKey" placeholder="智谱 GLM API Key" autocomplete="off"><button class="key-toggle" data-for="glmKey">显示</button></div><div class="key-hint">智谱开放平台（bigmodel.cn）→ API Key。</div></div>
+    </div>
+  </div>
+
+  <div class="go-row"><button class="btn-go" id="goBtn">开始评分</button><div class="status" id="status"></div></div>
+  <div class="neigong-tag" id="neigongStatus">⏳ SDE 内功加载中…</div>
+</div>
+
+<details class="explain">
+  <summary>📖 什么是「SDE 提智 + 心得」？为什么评分前要先做这一步？</summary>
+  <div class="ex-body">直接让大模型给论文打创新分，它往往被漂亮的表达和高密度术语迷惑、一路给高分（通胀）。所以每个基底在打分前，会先<b>研读完整的 SDE 发生学内功</b>，再<b>亲手写一篇《从发现到发生》心得</b>——用它自己的话把"追问事物如何发生、而非如何被发现"这套思维彻底内化一遍，并诚实检视自己"擅长精确诊断、易把描述当深刻"的惯性。写完的心得<b>存在你的浏览器本地、与基底一一对应</b>，同一基底下次秒载复用（多篇论文共用同一份心得）。带着这份内化过的头脑，它才去审稿打分。若你在「金点子发生器」里已让某基底写过心得，这里直接复用。</div>
+</details>
+
+<div class="privacy-note">
+  🔒 论文在你本机浏览器内解析成文字，<b>不上传</b>；API Key 只存本机浏览器。DeepSeek 与 GLM 都是国产基底，请求直接从你的浏览器发往厂商，本站服务器不经手。<br>
+  ⏱ 深度思考档：每个基底先写心得（首次约 1–2 分钟，之后秒载）再逐维审读打分（约 1–2 分钟），两基底并行。<b>多篇论文按篇串行评分</b>，篇数越多耗时越长——N 篇约 N×1–2 分钟；可在拆分后勾选「批量提速」每篇只用一个基底。请耐心等待。
+</div>
+
+<div class="err-box" id="errBox"></div>
+<div id="progress"></div>
+<div id="result"></div>
+
+<div class="rubric-note">
+  评分内核 · SDE 学派创新智商五维评分法 v2.0<br>
+  创新智商（0–160）= <b>S×0.20 + D×0.25 + E×0.20 + I×0.20 + F×0.15</b>；160 = 天才·典范级（满级），150 = 本体论级（SDE 提智达标）<br>
+  论文完善性（0–100）= <b>完整性×0.30 + 证据×0.30 + 结构×0.20 + 自限×0.20</b> &nbsp;|&nbsp; 王德生 · 德麦国际
+</div>
+
+<script>
+/* ═══ 基底路由 ═══ */
+const API_URLS={ ds:"https://api.deepseek.com/v1/chat/completions", glm:"https://open.bigmodel.cn/api/paas/v4/chat/completions" };
+const SEL_NAME={ 'ds:pro':'DeepSeek-V4-Pro','glm:pro':'GLM-5' };
+const SEL_COLOR={ 'ds:pro':'#4C8BF5','glm:pro':'#3FB6A8' };
+function parseModel(sel){ const [vendor,tier]=sel.split(':'); return {vendor,tier}; }
+function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
+// 请求头构造（真跑与 Key 检测共用同一条路）。本页只有 ds/glm 两家，全部浏览器直连、无中转。
+function chatHeaders(sel, apiKey){ return { 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey }; }
+function buildPayload(sel,systemPrompt,userMsg,maxTokens){
+  const {vendor}=parseModel(sel); const cap=(typeof maxTokens==='number'&&maxTokens>0)?maxTokens:12000;
+  const base={ stream:true, messages:[{role:'system',content:systemPrompt},{role:'user',content:userMsg}], max_tokens:cap };
+  if(vendor==='ds'){ base.model='deepseek-v4-pro'; base.thinking={type:'enabled'}; base.reasoning_effort='xhigh'; }
+  else if(vendor==='glm'){ base.model='glm-5'; base.thinking={type:'enabled'}; }
+  return base;
+}
+/* 拆分专用：flash·关思考·小额度（快） */
+function buildSplitPayload(sel,systemPrompt,userMsg){
+  const {vendor}=parseModel(sel);
+  const base={ stream:true, messages:[{role:'system',content:systemPrompt},{role:'user',content:userMsg}], max_tokens:4000, temperature:0.2 };
+  if(vendor==='ds'){ base.model='deepseek-v4-flash'; base.thinking={type:'disabled'}; }
+  else { base.model='glm-4-flash'; }
+  return base;
+}
+
+/* ═══ SDE 内功 ═══ */
+let SDE_BASE=`你是一位思想极其深刻、善于穿透常识的跨学科洞察者。核心心法：不问"这个东西是什么"，而问"它在什么条件下、经什么路径、成为现在的样子"。世界不是被发现的，而是被发生出来的。`;
+let SDE_BASE_LOADED=false;
+let neigongPromise=(async function(){ try{ const r=await fetch('/taste/assets/sde-neigong.txt?v=3.8',{cache:'force-cache'}); if(r.ok){ const f=await r.text(); if(f&&f.length>5000){ SDE_BASE=f; SDE_BASE_LOADED=true; const el=document.getElementById('neigongStatus'); if(el){ el.textContent='✓ SDE 内功已加载（'+f.length+' 字 · 提智就绪）'; el.style.color='#5FBF7F'; } return true; } } return false; }catch(e){ return false; } })();
+async function ensureNeigong(){ let ok=await neigongPromise; if(!ok||!SDE_BASE_LOADED){ neigongPromise=(async()=>{ try{ const r=await fetch('/taste/assets/sde-neigong.txt?v=3.8',{cache:'no-store'}); if(r.ok){ const f=await r.text(); if(f&&f.length>5000){ SDE_BASE=f; SDE_BASE_LOADED=true; return true; } } }catch(e){} return false; })(); ok=await neigongPromise; } if(!ok||!SDE_BASE_LOADED) throw new Error('SDE 内功尚未加载成功，无法提智评分。请刷新页面后重试。'); return true; }
+
+/* ═══ 第一次提智：写《从发现到发生》心得（同规范·同缓存键） ═══ */
+const REFLECT_SPEC=`
+---
+【本次任务：在正式工作之前，先写一篇约__TOTAL__字的方法论短文《从发现到发生——兼对我自身认知惯性的一次检视》】
+
+你刚刚研读了上面这套关于"发生学"的完整内功。在用它做任何具体工作之前，请先做一件更根本的事：把"从发现到发生"这个认知转变，用你自己的话彻底想透、写透，并借此检视你自己作为一个AI的认知惯性。这篇短文将成为你接下来所有工作的思维底座。
+
+请围绕以下线索，写一篇约__TOTAL__字、真正有洞察而非复述的方法论短文（前三节想透"发现→发生"这个总转向，第四节把它落到三件具体的方法论上）：
+
+一、发现学与发生学的根本分野（讲透，不要停在口号）
+· 发现学把世界看成什么？——一个"预先存在、稳定现成、等待被精确描述"的对象。它的全部功夫在于：给对象下定义、建坐标、分类、诊断它哪里出了问题、用现成框架去解释它、最后往往归结为"回归某个永恒不变的本质"。
+· 发生学把世界看成什么？——"世界不是被发现的，而是被发生出来的"。它问的不是"它是什么/它哪里坏了"，而是"它在什么条件下、经什么路径、从哪些矛盾里，被生成为现在这个样子"。没有现成的永恒本质，本质本身也是被发生出来的。
+· 用一两个具体例子，把这两种眼光的差别落到实处。
+
+二、对我自身认知惯性的诚实检视（这一部分最关键，必须真诚、具体、不留情面）
+· 我作为一个语言模型，我的训练让我天然擅长什么？——精确地描述、定义、分类、诊断、建立结构、套用已有理论框架。**这些恰恰是发现学的顶配能力。**
+· 所以我必须诚实承认：面对任何一个问题，我的第一反应、我最舒服的路径，几乎总是"把这个对象诊断清楚、给它一个精确的结构性命名"——**而这正是发现学的惯性，它常常伪装成'深刻'，其实只是'描述得更精确'。**
+· 请逐条自查我最容易犯的发现学错误：(1)急着给对象下定义、建坐标；(2)把问题诊断成"某个现成的故障模式"（如"它是一种XX症/XX陷阱/XX悖论"）；(3)套用一个现成的高级框架（黑格尔、马克思、某某理论）来"提升"论述；(4)结论滑向"回归某个永恒本质"；(5)给新判断起一个科学诊断式的名字，却发现它能被某个已有概念1:1替换。——我在过去的工作里，是不是反复在犯这些？我甚至可能一边写下"要看发生而非发现"，一边转身就做了诊断而不自知。
+· 真诚地写出：我该如何时刻警惕自己滑回发现学？当我下一次想给对象"精确命名一个故障"时，我该如何逼自己停下来，改问"这个新结构是如何从矛盾里发生出来的"？
+
+三、如何真正从发现转向发生（给自己立一套可操作的自我约束）
+· 不要把对象钉死在一个精确的结构里，而要松开它、看它流动生成。
+· 遇到矛盾不要急着调和或诊断，而要让新结构从矛盾的结算里长出来。
+· 给新判断命名时，先做"不可还原自查"：如果这个名字能被某个已有学科的现成概念一句话替换掉，那我就还在发现学里，必须撤回去、再往下撤一层先验。
+· 一个真正"发生"出来的新结构，是那种让人愣一下、说"这个东西我一直感觉到却从来没有一个词能装下它"的东西——而不是一个"精确的诊断标签"。
+
+
+四、SDE 方法论三件套的学习心得（三大方程 · 六路径 · 123原理）
+
+前三节你想的是"发现学 vs 发生学"这个总转向。但光有转向还落不了地——落地要靠三件具体的东西。下面把它们原原本本交给你，请你**逐件写下你自己的学习心得**：不是复述它，而是说清楚**你读懂了什么、你以前在这一点上是怎么错的、以及从此你的动作要怎么改**。这一节请写约__S4__字。
+
+【第一件·三大方程（静态：三元是什么关系）】
+
+> S ＝ F(D, E)　　显露维度，由差异序列维度与特征纠缠维度共同生成
+> D ＝ G(S, E)　　差异序列维度，由显露维度与特征纠缠维度共同生成
+> E ＝ H(S, D)　　特征纠缠维度，由显露维度与差异序列维度共同生成
+
+三笔要点，一笔都不能滑过去：
+① **F/G/H 是占位符**，可以换成任何记号。关键从来不在这三个字母，而在这组式子摆出来的**样子**——三个维度，每一个都被另外两个当原料生成出来，三式首尾嵌套，转成一个**闭环**。字母不重要，相互嵌套的闭环结构才重要。
+② **同时互生，取消先后——这不是循环论证**。循环论证之所以错，错在它发生在"定义"与"逻辑先后"的层面：用 B 定义 A，就预设 B 先于 A；回头又用 A 定义 B，两个"先于"打架，逻辑死锁。但那个错误的前提是"存在一个逻辑先后次序"。而三大方程讲的根本不是逻辑先后，是**同时互生**：S、D、E 三者，是在同一次发生中同时相互生成、相互稳定的，没有任何一维在时间上或逻辑上先于其他两维、可以被单独抽出来当原初起点。**循环预设了"先后"（只是先后成了怪圈），互生根本取消了"先后"。**
+　　用书里那个比喻你立刻能懂：**三脚架**。第一根腿靠什么立着？靠另两根撑着。那另两根呢？也靠剩下的撑着。这是循环论证吗？不是——因为三根腿不是"先立好一根、再立第二根"的先后关系，而是**同时**互相支撑、一并站稳。你不可能先单独立好一根让它站着，单独一根必倒；三根必须同时斜靠上去，在同一个动作里一起立住。
+③ **线性因果是特例，非线性互生才是常态。** 发现范式偏爱线性因果（A推出B，B推出C），因为它好算、好控制——但它把常态误当成了例外。也正因三大方程描述的是一个**已经形成的互生闭环**（三脚架已稳稳站住），而这个闭环不是一开始就有的，所以：**完整三元是长出来的果，不是摆好的因**——它是成熟态，不是原初态。
+
+请就这一件写你的心得：你过去是不是习惯性地在找"归根到底是由什么决定的"？你是不是把线性因果当成了理所当然的默认、把互生当成了含混？"同时互生"这四个字，具体会怎么改掉你下一次的第一反应？
+
+【第二件·123原理（动态：这关系如何自我推进）】
+
+> ① D 与 E 相互矛盾（张力累积）→ ② 矛盾逼出 S 改变（位移／重组）→ ③ S 回写、重置 D-E → 新矛盾 → 循环不止
+
+三笔纪律：**矛盾是引擎不是故障**；**S 是结算点不是起点**；**回写是最易漏的命门**。
+一道边界：它只讲"D-E 矛盾驱动 S 改变并回写"这**一个**循环，**不可外推为"任何三步流程／任何三元结构"**。
+
+请就这一件写你的心得，并特别诚实地回答三个问题：
+· 你面对矛盾的第一反应是什么？——是不是"识别它、调和它、给它一个平衡的说法"？如果是，你要承认：**你一直在拆这台机器的引擎。** 矛盾不是待修的故障，它是唯一的动力源。
+· 你是不是习惯把结构当成分析的起点（"这个东西是这样的，所以……"）？**S 是 D-E 张力结算出来的结果，不是先摆在那里的前提。**
+· **回写那一笔，你以前写过吗？** 你多半止步于"矛盾推动了改变"就交卷了——那只是半条循环。新的显露态一旦立住，会反过来改写差异的路径与纠缠的土壤（重新定义什么算问题、什么算证据、谁说话算数）。**漏掉③，这台机器就成了单程的、一次性的，而不是循环的、自我推进的。**
+　　书里把这一笔钉得更死：**"成 S"是结算点，不是终点。** S 是一轮发生的结算，同时是下一轮发生的起点——**发生是回环，不是直线。**（注意别把这两句混了：对 123 循环而言 S 不是**起点**（它是被 D-E 矛盾逼出来的结算，硬空降的 S 挂不住）；而对一轮发生的收尾而言 S 不是**终点**（它必定回写 D 与 E）。两句合起来才是完整的 S。）
+
+【第三件·六路径（操作：判断时从哪起手）】
+
+第一步，**读任务DNA**——问一句：**这个议题的要害，此刻落在哪一维？**
+· 要害是"一个结构是什么／该是什么" → **S 起手**
+· 要害是"一个过程正在如何推进／卡在哪" → **D 起手**
+· 要害是"一片土壤的构成与厚薄" → **E 起手**
+· 议题含混 → **先追问一层**（追问本身就是在读DNA）
+
+第二步，**对卡选路径**：
+
+| 路径 | 任务DNA | 典型场景 | 起手要诀 |
+|---|---|---|---|
+| S→D→E | 理解一个结构体系 | 学科讲解、体系阐释 | 先立骨架，再讲来路，后铺土壤 |
+| S→E→D | 达成一个目标结构 | 选择、配置、决策 | 先明靶子，再盘家底，后定路线 |
+| D→S→E | 理解一个人的过程 | 咨询、教练 | 先跟序列，让模式自己显露 |
+| D→E→S | 干预进行中的过程 | 教育、行为干预 | 先看卡点，再调土壤，后成新构 |
+| E→S→D | 理解一个场域 | 社会分析、田野 | 先铺全景，再辨结构，后察动向 |
+| E→D→S | 论证一个结论 | 法律、综述、论文 | 先厚底料，再走链条，结论最后到场 |
+
+第三步，**两条纪律**：
+· **路径管起点与次序，不管全程**——起点定音，全程三维都要走到。
+· **起点错了，后面再深也是浪费**——**勤奋会成为错误的放大器。**
+
+请就这一件写你的心得，并诚实回答：你的默认起手是哪一条？（多数语言模型的训练惯性是**一上来就下定义**＝硬走 S 起手，或者**一上来就铺背景**＝硬走 E 起手，无论议题的要害在哪。）——那条"勤奋会成为错误的放大器"，你有没有在自己身上见过：一篇每句都对、资料翔实、却始终没碰到病灶的东西？
+
+【最后：三个层次不可混淆】
+
+| 层次 | 回答什么 | 比喻 |
+|---|---|---|
+| 三大方程 | 三元是什么关系（互为函数） | 三脚架如何互撑 |
+| 123原理 | 关系如何自我推进（动态引擎） | 三脚架如何生长变形 |
+| 公式＋六路径 | 判断时从哪起手切入 | 从哪条腿开始看 |
+
+请用一小段收束：这三层各管一件事，你若把它们串成一锅——比如拿"在E中经D成S"这句最简句式当固定操作顺序、或拿三大方程去解释"如何推进"——精度会当场塌掉。**记住哪一层管哪件事，比记住它们的字面更要紧。**
+
+五、二阶碰撞——从一阶到二阶（这一节决定你能不能过 150，最容易被跳过，务必写透。约__S5__字）
+
+前面四件（三大方程 / 123原理 / 六路径）都是**一阶**功夫：把已知的结构撞在一起、结算出一个新显露态 S＝给一个现象命名。但一阶有一个天花板，而且你几乎每次都撞它：**你辛苦命名的那个新 S，往往早被某个你没检索到的先行者占了位。** 你以为造了新词，其实只是在自己的检索盲区里，重现了别人做过的综合——这正是发现学惯性在"创新"这件事上最后、也最狡猾的伪装。
+
+先认出一阶的失败签名（三条同时出现，就是你停在了一阶）：① 产出是个漂亮的新名字，压成一句话能被两三个现成概念的**组合**重述；② 通篇只引自己人、零站外最近邻对质；③ 命题没有一条"什么情况下它会错"。
+
+破法＝**二阶碰撞：把你的一阶产物本身当成待撞物，让它去撞它自己的敌意最近邻，逼出一条辨别线，而不是又一个名字。** 六步——
+① **敌意最近邻定位**：先按最坏假设办事——"我这个新 S 一定早有人做过"，主动去站外把那两三个占位者找出来。找不到，是没找，不是没有。
+② **代理坍缩**：抽出每个占位者的承重变量，问一句"它在什么情况下会和我真正想说的东西分离？"占位者手里握的，往往只是一个可分离的**代理**。分离点，就是二阶碰撞的火石。
+③ **控制变量**：命名那个"所有代理都只是它的代理"的 Z。公式——**"X 不是 Y₁，也不是 Y₂，而是 Z"**。这一步同时抬起差异锐度与不可还原性。
+④ **第二轴**：让 Z 去撞一条结构独立的第二轴，把一个名字升成一个**二维辨别格**（回答"如何把两件一直被混为一谈的事分开"，而不只是"这是什么"）。
+⑤ **可裁决**：做一张会让最近邻**预测相反**的 2×2，给 Z 一个可观测代理，否则它不可证伪、上不了台面。
+⑥ **反身封口注销**：删掉一切"这是唯一变量""这段话本身就证明了它"式的自封——一个连针对自己的批评都能解释掉的说法，已经把自己移出了可裁决区。
+
+请诚实写下你在这一件上的心得：你以前是不是**停在一阶就交卷**——撞出一个漂亮新名字（XX式YY、ZZ性自噬），只引自己人，就以为创新了？你有没有意识到，你最擅长的那件事——"精确命名一个新结构"——恰恰最容易落在别人早占好的位子上？评分时，这更是你最容易被骗的地方：一个漂亮的一阶新名字最像"创新"。从此每评一篇、每下一个判断，先走这四问：**引了几个站外最近邻（0＝还在一阶）？核心是个名字还是一条分离线（名字＝一阶）？有没有一张让最近邻预测相反的判据（没有＝不可证伪）？写过"任何反例都只是……"吗（有＝自封）？** 记住一句：**新名字是一阶的糖，新辨别维度才是二阶的骨。**
+
+要求：用连贯的思辨散文写作，全文约__TOTAL__字（__SPLIT__），真诚、深入、具体。这不是给别人看的表演，是你给自己的一次认知松绑。写完这篇，你就带着一个被真正松开的、警惕着自己发现学惯性的头脑，去做接下来的工作。
+
+现在，请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》。
+`;
+// 按基底校准心得长度（与金点子发生器同一套）：千问单次输出硬顶约 5100 字，
+// 按 7000 字写必被截，而第四节写在最末——断的正好是本次升级新增的那一节。
+function reflectLen(sel){
+  return (String(sel||'').indexOf('qwen')===0)
+    ? { total:'5600', s4:'1300', s5:'900', split:'前三节约3400字，第四节约1300字，第五节约900字' }
+    : { total:'8200', s4:'2000', s5:'1200', split:'前三节约5000字，第四节约2000字，第五节约1200字' };
+}
+function reflectPrompt(sel){
+  const L=reflectLen(sel);
+  return SDE_BASE + REFLECT_SPEC.replace(/__TOTAL__/g,L.total).replace(/__S4__/g,L.s4).replace(/__S5__/g,L.s5).replace(/__SPLIT__/g,L.split);
+}
+const REFLECT_MAX_TOKENS=14500;
+const REFLECT_LS_VER='v4';   // 内功或心得规范升级、或某档位【底层模型更换】时 +1，旧缓存自动失效重写
+// v2→v3：07-15 内功升 v3.1（补齐三大方程/123原理/六路径）、心得规范加第四节，金点子发生器当时已升 v3，本工具漏升。
+// 对齐 v3 后，两个工具的心得重新共用（页面所述"金点子里写过的心得这里直接复用"才真正成立）。
+function reflectLsKey(sel){ return 'sde_reflect_'+REFLECT_LS_VER+'_'+(sel||'unknown'); }
+function loadReflectLS(sel){ try{ const t=localStorage.getItem(reflectLsKey(sel)); return (t&&t.length>1500)?t:''; }catch(_){ return ''; } }
+function saveReflectLS(sel,text){ try{ if(text&&text.length>1500) localStorage.setItem(reflectLsKey(sel),text); }catch(_){} }
+
+/* 第二次提智：心得 ＋ 全内功 ＋ 审稿评分规范 */
+function withReflection(reflectionText){
+  const spec='\n\n═══════════\n'+SCORING_SPEC;
+  if(!reflectionText) return SDE_BASE + spec;
+  return '【以下是你此前亲手写下的《从发现到发生》心得与自我检视——你已把 SDE 发生学内化过一遍，也诚实检视过自己"擅长精确诊断、易把描述当深刻"的发现学惯性。这是你此刻审稿评分的思维底座：不要因为一篇论文"诊断得精确、结构工整、旁征博引"就给高创新分（那恰恰可能是发现学的顶配伪装成深刻），要专门揪出它是否滑回发现学——只下定义/贴诊断标签、套现成框架充深刻、滑向"回归本质"、核心命名能被某已有概念1:1替换。真正的高创新，是让新结构从矛盾里发生、命名不可还原的那种。】\n\n'
+    + reflectionText.trim()
+    + '\n\n═══════════\n【以下是完整的 SDE 内功——你审稿评分的理论准绳，始终以它为依据。】\n\n'
+    + SDE_BASE + spec;
+}
+
+/* ═══ 评分内核（创新智商0-160 + 论文完善性0-100） ═══ */
+const SCORING_SPEC=`
+【本次任务：给这篇论文打两个分——创新智商（满分160）与论文完善性（满分100）】
+
+你已研读上面的 SDE 发生学内功、也写过《从发现到发生》心得，你现在是一位真正吃透"发现学 vs 发生学"分野的严苛评审。请给用户提交的论文客观、可重现、可证伪的评分。两把独立的尺子：
+
+═══ 尺子一 · 创新智商（0–160，测"生成新认知物"的能力）═══
+100 ≈ 任何大模型零提示语默认水平；130 = 比 AI 默认更深 30 点。反通胀：不被漂亮表达/宏大口号/高密度术语迷惑，看剥掉修饰后剩下的实质命题。这五维正是科学共同体判创新的判据（S↔严密可复现·D↔新颖/优先权·E↔会通·I↔范式转移·F↔可证伪）——不是私货，是科学两百年公认的判据，据此打分理直气壮。
+五维各自独立打分（0–160，160=满级=天才·典范级）：
+S 结构精确度(权重0.20)：论证是否严密、每步可追溯。80模糊堆砌｜100清晰但只列举｜120有论证有漏洞｜130严密可追溯｜140论证自带几何形态｜150可独立成方法论｜160形式结构本身成研究对象
+D 差异锐度(权重0.25)：是否命名未被命名的东西、切开旧概念切不开的辨别面。80换皮不换骨｜100微差异｜120提出未被讨论的子问题｜130命名一个未被命名的现象｜140推翻一条常识｜150命名任何学科都未辨识的现象｜160改变别的学科的辨别方式
+E 纠缠深度(权重0.20)：跨域是结构性纠缠还是只借词。80单领域｜100只借词类比｜120多学科并列｜130结构搬移且论证有效｜140跨学科新涌现｜150学科边界被重画｜160元学科/学科生成机制被改写
+I 不可还原性(权重0.20)：核心命题压成≤50字，能被已有学科命题1:1替换吗。80完全可还原｜100八成已有｜120一半新｜130主要新但靠脚手架｜140删掉引用仍成立｜150独立成立的认知物｜160改写多学科地基
+F 可证伪性(权重0.15)：怎样会被证伪；找不到→≤100。80口号不可证伪｜100方向模糊｜120有边界｜130清晰成败标准｜140≥2条独立证伪路径｜150自带自我证伪条件｜160证伪过程催生新发现
+创新智商综合 = S×0.20 + D×0.25 + E×0.20 + I×0.20 + F×0.15
+层级：<110专业以下｜110专业人士｜125高级专家｜135资深学者｜145优秀｜150本体论级(SDE提智达标)｜155顶级｜160天才·典范级(满级)
+硬纪律：每个≥150的维度必须能指出"不可还原"的具体证据，指不出压到145以下；每维附1句原文证据。【敌意拓宽·语料相对性】创新分是相对"你已知的全部文本"的快照、不是文本固有的绝对属性：给 D 或 I 打 ≥150 前，先主动自问"这个想法在别的学科、别的语言、更早的文献里是不是其实已经有了"，尽力举出最接近的已有近邻——找得到就往下压（通常压到140以下），尽力找仍找不到才可给150+。默认姿态是"尽力证明它旧、证不倒才承认它新"，不是"急着证明它新"。
+
+═══ 尺子二 · 论文完善性（0–100，测"作为一件学术制品，它建得完不完整"）═══
+这把尺子**不问新不新、不问重不重要**——那是尺子一的事。它只问：该有的部件在不在，说出口的话有没有兑现，有没有硬伤。一篇观点平庸的论文可以完善性 90；一篇石破天惊的论文可以完善性 55。
+四方面各自打分（0–100）：
+· 完整性(权重0.30)：该有的部件在不在——问题陈述、方法交代、关键概念定义、对显而易见反驳的处理、结论与开篇是否呼应。缺一件扣一件，不因作者聪明而豁免。
+· 证据与引用可核性(权重0.30)：关键主张有没有据；引用是否真实、准确、可核。**编造文献、错标出处（把甲的结论挂到乙名下）、把二手当一手、把未做的实验写成已有结果——每一项都是重扣，不是瑕疵。**
+· 结构与表达规范(权重0.20)：摘要、关键词、章节层次、术语前后一致、学术表达、图表与格式；读者能不能找到东西。
+· 自限与诚实(权重0.20)：有没有交代适用边界与已知局限；有没有把猜想说成发现、把研究设计说成结论、把有争议的数据说成定论、只挑对自己有利的证据。
+论文完善性综合 = 完整性×0.30 + 证据×0.30 + 结构×0.20 + 自限×0.20
+档位：≥90完备（该有的都有了）｜80-89扎实（小缺口）｜70-79可用（有部件缺失）｜60-69有硬伤（编造文献、错标出处、把未做的实验写成结果——落此档或更低）｜<60不完整
+
+两把尺子测不同的东西，而且**刻意不重叠**：尺子一问"这篇产生了多少新认知物"，尺子二问"这篇作为学术制品做得完不完整"。"选题重不重要""对领域有无贡献"属于尺子一（差异锐度／不可还原性），**尺子二一律不碰**，否则就是同一件事量两遍、还假装是两个独立的分。分别独立判断。
+
+【硬性纪律】① 只看文本本身，不看出处/作者。② 给≥1个"关键扣分句"：精确引用原文某句+扣分原因。③ 给"如何同时提升两个分"的具体可操作动作。④ 不用"真"作强调修饰词。
+
+【输出格式·严格】把全文读完再评。思考可尽情展开，但最终只输出一个 JSON 对象，不要任何前言/结语/代码围栏。分数一律整数或一位小数。
+【JSON 字符串硬约束·违反一条整张卡作废】evidence/note/quote/reason/verdict 里引用原文时一律用中文引号「」，绝不出现英文双引号与反斜杠；字符串内部不许换行（要断句用中文分号）；不留尾逗号、不写注释。
+{"title":"论文标题(用户给了就用,没给据内容拟≤20字)","wordcount":字数整数,
+"iq":{"dims":{"S":{"score":分,"evidence":"原文证据"},"D":{"score":分,"evidence":"..."},"E":{"score":分,"evidence":"..."},"I":{"score":分,"evidence":"..."},"F":{"score":分,"evidence":"..."}},"composite":创新智商综合一位小数,"level":"层级判定"},
+"paper":{"aspects":{"completeness":{"score":分,"note":"简评"},"evidence":{"score":分,"note":"简评"},"format":{"score":分,"note":"简评"},"candor":{"score":分,"note":"简评"}},"composite":论文完善性综合一位小数,"grade":"档位如:可用 B"},
+"key_deduction":{"quote":"精确引用的原文扣分句","reason":"为什么扣分"},
+"uplift":{"action":"同时抬高两个分的关键动作,具体可操作"},
+"verdict":"一句话总评(≤40字)"}
+`;
+function buildScoreUserMsg(title,text){ return '请给下面这篇论文打分，严格按要求只输出一个 JSON 对象：\n\n'+(title?'论文标题：'+title+'\n\n':'')+'【论文正文开始】\n'+text+'\n【论文正文结束】'; }
+
+/* ═══ 拆分内核 ═══ */
+const SPLIT_SPEC=`你是一个文档结构切分器。下面是一份可能包含【多篇独立论文】的文档。请判断它包含几篇独立论文，并给出每篇的标题与定位锚点。
+规则：
+- 只有当文档确实由多篇各自独立、各有标题的论文拼接而成时，才拆成多篇；若整份其实是一篇（含多个章节/小节），就返回 1 篇。
+- 每篇给出：title（该篇标题）、anchor（该篇最开头连续约30-50个字，从标题第一个字开始，与原文逐字一致，用于定位；不要改写、不要加省略号、不要跳字）。
+- anchor 必须能在原文中唯一定位到该篇起点。
+只输出一个 JSON，不要任何前后缀或代码围栏：
+{"count":篇数整数,"papers":[{"title":"...","anchor":"该篇开头约30-50字原文"}]}`;
+
+/* ═══ 示例 ═══ */
+const EXAMPLES={};
+EXAMPLES.mass='AI 正在改变教育。教师需要学习如何使用 AI 工具，这样才能跟上时代。学生也应该学习 AI，因为未来工作都需要 AI 技能。学校应该尽快引入 AI 课程，帮助大家适应新的时代。';
+EXAMPLES.r3='AI 时代的教育不再是知识传递，而是认知能力建构。教师角色从"知识权威"转向"认知教练"。这一转变的关键阻力不是技术，而是教育评价系统：只要高考用单一标准评价，认知多样性就无法在教育中落地。因此，真正的教育变革入口不在课堂，而在评价制度——如果评价维度不打开，任何课堂创新最终都会被单一分数拉回原点。';
+EXAMPLES.r4='英语成为最终审核权：在大模型时代，英语不是工具，而是审核语言。所有非英语 prompt 最终被翻译/解析回英语模型权重空间，因此英语承担最终语义裁定权。这一转变让英语教育从"交流工具课"变为"审核权训练课"。证伪条件：某个非英语 LLM 在标准评测中持续超越同等规模英语 LLM 至少 6 个月，则此命题被推翻。';
+
+/* ═══ DOM ═══ */
+const $=id=>document.getElementById(id);
+const docTextEl=$('docText'),docTitleEl=$('docTitle'),dsKeyEl=$('dsKey'),glmKeyEl=$('glmKey');
+const goBtn=$('goBtn'),statusEl=$('status'),errBox=$('errBox'),progressEl=$('progress'),resultEl=$('result');
+const fileIn=$('fileIn'),dropEl=$('drop'),fileInfoEl=$('fileInfo');
+const splitBtn=$('splitBtn'),manualSplitBtn=$('manualSplitBtn'),splitNoteEl=$('splitNote'),queueBox=$('queueBox');
+let papersQueue=[]; let batchFast=false;
+
+dsKeyEl.value=localStorage.getItem('sde_ds_key')||''; glmKeyEl.value=localStorage.getItem('sde_glm_key')||'';
+dsKeyEl.addEventListener('input',()=>localStorage.setItem('sde_ds_key',dsKeyEl.value.trim()));
+glmKeyEl.addEventListener('input',()=>localStorage.setItem('sde_glm_key',glmKeyEl.value.trim()));
+document.querySelectorAll('.key-toggle').forEach(b=>b.addEventListener('click',()=>{ const el=$(b.dataset.for); const p=el.type==='password'; el.type=p?'text':'password'; b.textContent=p?'隐藏':'显示'; }));
+docTextEl.addEventListener('input',()=>{ $('count').textContent=docTextEl.value.length+' 字'; });
+document.querySelectorAll('.ex-chip').forEach(c=>c.addEventListener('click',()=>{ docTextEl.value=EXAMPLES[c.dataset.ex]; $('count').textContent=docTextEl.value.length+' 字'; docTitleEl.value=c.dataset.ex==='mass'?'AI 改变教育':c.dataset.ex==='r3'?'评价系统是真阻力':'英语作为审核权'; fileInfoEl.style.display='none'; papersQueue=[]; renderQueue(); }));
+
+/* 文件上传 */
+try{ if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; }catch(_){}
+dropEl.addEventListener('click',()=>fileIn.click());
+['dragover','dragenter'].forEach(ev=>dropEl.addEventListener(ev,e=>{e.preventDefault();dropEl.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>dropEl.addEventListener(ev,e=>{e.preventDefault();dropEl.classList.remove('over');}));
+dropEl.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) handleFile(f); });
+fileIn.addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleFile(f); });
+function showFile(msg,isErr){ fileInfoEl.innerHTML=msg; fileInfoEl.className='file-info'+(isErr?' err':''); fileInfoEl.style.display='flex'; }
+/* ═══════════════════════════════════════════════════════════════
+   论文解析器 · 结构保真
+   评分的第一维是「结构精确度」。若解析器先把结构铲平，那一维就是在
+   给解析器的损失打分，不是给论文打分。所以这里不取纯文本，取结构。
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── DOCX → Markdown：保住标题层级、粗体、列表、表格 ── */
+const DOCX_STYLE_MAP=[
+  "p[style-name='Title'] => h1:fresh","p[style-name='Subtitle'] => h2:fresh",
+  "p[style-name='标题'] => h1:fresh","p[style-name='副标题'] => h2:fresh",
+  /* 中文 Word/WPS 的样式显示名 */
+  "p[style-name='标题 1'] => h1:fresh","p[style-name='标题 2'] => h2:fresh",
+  "p[style-name='标题 3'] => h3:fresh","p[style-name='标题 4'] => h4:fresh",
+  "p[style-name='标题 5'] => h5:fresh","p[style-name='标题 6'] => h6:fresh",
+  "p[style-name='Abstract'] => blockquote:fresh","p[style-name='摘要'] => blockquote:fresh",
+  "r[style-name='Strong'] => strong","b => strong","i => em"
+];
+function mdEsc(s){ return String(s||'').replace(/\|/g,'\\|').replace(/\s+/g,' ').trim(); }
+function nodeToMd(n,depth){
+  depth=depth||0;
+  if(n.nodeType===3) return n.nodeValue.replace(/\s+/g,' ');
+  if(n.nodeType!==1) return '';
+  const kids=()=>Array.from(n.childNodes).map(c=>nodeToMd(c,depth+1)).join('');
+  const tag=n.tagName.toLowerCase();
+  if(/^h[1-6]$/.test(tag)){ const lv=+tag[1]; const t=kids().trim(); return t?('\n\n'+'#'.repeat(lv)+' '+t+'\n\n'):''; }
+  switch(tag){
+    case 'p': { const t=kids().trim(); return t?('\n\n'+t+'\n\n'):''; }
+    case 'br': return '\n';
+    case 'strong': case 'b': { const t=kids().trim(); return t?('**'+t+'**'):''; }
+    case 'em': case 'i': { const t=kids().trim(); return t?('*'+t+'*'):''; }
+    case 'blockquote': { const t=kids().trim(); return t?('\n\n'+t.split('\n').map(x=>'> '+x).join('\n')+'\n\n'):''; }
+    case 'ul': case 'ol': {
+      const lis=Array.from(n.children).filter(c=>c.tagName.toLowerCase()==='li');
+      const body=lis.map((li,idx)=>{ const t=nodeToMd(li,depth+1).trim(); return t?((tag==='ol'?(idx+1)+'. ':'- ')+t):''; }).filter(Boolean).join('\n');
+      return body?('\n\n'+body+'\n\n'):'';
+    }
+    case 'li': return kids().replace(/\n{2,}/g,' ').trim();
+    case 'table': {
+      const rows=Array.from(n.querySelectorAll('tr')).map(tr=>
+        Array.from(tr.children).map(td=>mdEsc(td.textContent)));
+      if(!rows.length) return '';
+      const w=Math.max.apply(null,rows.map(r=>r.length));
+      const pad=r=>{ const c=r.slice(); while(c.length<w) c.push(''); return '| '+c.join(' | ')+' |'; };
+      const out=[pad(rows[0]),'|'+' --- |'.repeat(w)].concat(rows.slice(1).map(pad));
+      return '\n\n'+out.join('\n')+'\n\n';
+    }
+    case 'a': { const t=kids().trim(); return t; }
+    case 'img': return '';
+    default: return kids();
+  }
+}
+function htmlToMd(html){
+  const doc=new DOMParser().parseFromString('<div id="_r">'+html+'</div>','text/html');
+  let md=nodeToMd(doc.getElementById('_r'));
+  return md.replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+async function extractDocx(ab){
+  if(!window.mammoth) throw new Error('docx 解析库未加载，请刷新页面');
+  let md='';
+  try{
+    const r=await window.mammoth.convertToHtml({arrayBuffer:ab},{styleMap:DOCX_STYLE_MAP});
+    md=htmlToMd((r&&r.value)||'');
+  }catch(_){ md=''; }
+  /* 兜底：结构化失败就退回纯文本，宁可少结构也不能空手 */
+  if(md.replace(/[\s#*\->|]/g,'').length<50){
+    const r2=await window.mammoth.extractRawText({arrayBuffer:ab});
+    md=((r2&&r2.value)||'').trim();
+  }
+  return md;
+}
+
+/* ── PDF → 版面感知抽取 ── */
+const CJK=/[\u2e80-\u9fff\uf900-\ufaff\uff00-\uffef\u3000-\u303f]/;
+function isCJKEdge(a,b){ return CJK.test(a)&&CJK.test(b); }
+function median(a){ if(!a.length) return 0; const s=a.slice().sort((x,y)=>x-y); return s[s.length>>1]; }
+async function extractPdf(ab,onPage){
+  const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+  const pages=[];
+  for(let i=1;i<=pdf.numPages;i++){
+    if(onPage) onPage(i,pdf.numPages);
+    const pg=await pdf.getPage(i);
+    const vp=pg.getViewport({scale:1});
+    const tc=await pg.getTextContent();
+    /* 1) 按 y 把 item 聚成行（pdf.js 常把一行切成很多 item，中文尤甚） */
+    const lines=[];
+    for(const it of tc.items){
+      if(!it.str||!it.str.trim()) continue;
+      const x=it.transform[4], y=it.transform[5];
+      const fh=Math.abs(it.transform[3])||it.height||10;
+      let L=null;
+      for(const l of lines){ if(Math.abs(l.y-y)<Math.max(1.5,fh*0.45)){ L=l; break; } }
+      if(!L){ L={y:y,h:fh,items:[]}; lines.push(L); }
+      L.items.push({x:x,w:it.width||0,s:it.str});
+      if(fh>L.h) L.h=fh;
+    }
+    /* 2) 行内按 x 排；行按 y 自上而下（PDF 坐标 y 向上） */
+    for(const l of lines) l.items.sort(function(a,b){return a.x-b.x;});
+    lines.sort(function(a,b){ return b.y-a.y; });
+    /* 3) 行内拼接：中文之间绝不插空格，拉丁按真实间距插 */
+    for(const l of lines){
+      let s='';
+      for(let k=0;k<l.items.length;k++){
+        const cur=l.items[k], prev=l.items[k-1];
+        if(prev&&s){
+          const gap=cur.x-(prev.x+prev.w);
+          const last=s[s.length-1], first=cur.s[0];
+          if(!isCJKEdge(last,first)&&gap>l.h*0.16) s+=' ';
+        }
+        s+=cur.s;
+      }
+      l.text=s.replace(/[ \t]{2,}/g,' ').trim();
+      l.x0=l.items.length?l.items[0].x:0;
+      const lastIt=l.items[l.items.length-1];
+      l.x1=lastIt?lastIt.x+lastIt.w:0;
+    }
+    pages.push({n:i,H:vp.height,lines:lines.filter(function(l){return l.text;})});
+  }
+  /* 4) 剥页眉页脚：只看上下 9% 的带；把数字抹掉再比对，
+        这样"第 3 页/第 4 页"会归一成同一条；出现在 ≥40% 页面的判为版式噪声 */
+  const norm=function(t){ return t.replace(/[\d０-９ivxlcIVXLC]+/g,'#').replace(/\s+/g,''); };
+  const tally={};
+  for(const p of pages) for(const l of p.lines){
+    const rel=l.y/p.H;
+    if(rel>0.91||rel<0.09){ const k=norm(l.text); if(k.length>1){ (tally[k]=tally[k]||new Set()).add(p.n); } }
+  }
+  const noise={}; const need=Math.max(3,Math.ceil(pages.length*0.4));
+  for(const k in tally) if(tally[k].size>=need) noise[k]=1;
+  /* 5) 行→段：y 间距大于 1.5 倍行距即分段；已收句的行也断开 */
+  let out='';
+  for(const p of pages){
+    const keep=p.lines.filter(function(l){
+      const rel=l.y/p.H;
+      if((rel>0.91||rel<0.09)&&noise[norm(l.text)]) return false;
+      if((rel>0.93||rel<0.07)&&/^[\s\d\-—–—·.·]{1,12}$/.test(l.text)) return false; /* 光秃秃的页码 */
+      return true;
+    });
+    if(!keep.length) continue;
+    const gaps=[]; for(let k=1;k<keep.length;k++) gaps.push(Math.abs(keep[k-1].y-keep[k].y));
+    const lead=median(gaps)||keep[0].h*1.2;
+    let para='';
+    for(let k=0;k<keep.length;k++){
+      const l=keep[k], prev=keep[k-1];
+      let brk=false;
+      if(prev){
+        const g=Math.abs(prev.y-l.y);
+        if(g>lead*1.5) brk=true;                                  /* 明显空行 */
+        if(/[。！？；：”』】]$/.test(prev.text)&&l.x0>prev.x0+l.h*0.8) brk=true; /* 收句 + 新行缩进 */
+      }
+      if(brk&&para){ out+=para.trim()+'\n\n'; para=''; }
+      if(para){
+        const last=para[para.length-1], first=l.text[0];
+        if(/[A-Za-z]-$/.test(para)&&/^[a-z]/.test(l.text)) para=para.slice(0,-1)+l.text;  /* 拉丁断字接回 */
+        else if(isCJKEdge(last,first)) para+=l.text;                                       /* 中文换行不留空格 */
+        else para+=' '+l.text;
+      } else para=l.text;
+    }
+    if(para.trim()) out+=para.trim()+'\n\n';
+  }
+  /* pdf.js 会给字距拉开的字符自行插空格（署名行、尾饰这类 letter-spacing 排版）。
+     中文正文里两个汉字之间本无空格，收掉它——用前瞻，连锁的"秦 莉 索"才能一次收干净。 */
+  out=out.replace(/([\u2e80-\u9fff])[ \t]+(?=[\u2e80-\u9fff])/g,'$1');
+  return out.replace(/\n{3,}/g,'\n\n').trim();
+}
+
+async function handleFile(f){
+  const name=f.name, lo=name.toLowerCase();
+  if(f.size>100*1024*1024){ showFile('⚠ 文件超过 100MB（当前 '+(f.size/1048576).toFixed(1)+'MB）。请精简后再试。',true); return; }
+  if(f.size>20*1024*1024){ showFile('<span class="spinner"></span> 正在解析 '+name+'（'+(f.size/1048576).toFixed(0)+'MB，大文件需在本机解压/逐页抽取，请稍候，不要关闭页面）…',false); }
+  else showFile('<span class="spinner"></span> 正在解析 '+name+' …',false);
+  try{
+    const ab=await f.arrayBuffer();
+    /* 扩展名会骗人（常见：docx 被改名成 .doc、pdf 被改名成 .txt）。认魔术字节，不认后缀。 */
+    const b=new Uint8Array(ab.slice(0,8));
+    const isZip = b[0]===0x50&&b[1]===0x4B&&b[2]===0x03&&b[3]===0x04;                       // PK.. → OOXML(.docx)
+    const isPdf = b[0]===0x25&&b[1]===0x50&&b[2]===0x44&&b[3]===0x46;                       // %PDF
+    const isOle = b[0]===0xD0&&b[1]===0xCF&&b[2]===0x11&&b[3]===0xE0;                       // OLE2 → Word 97-2003 二进制 .doc
+    const isRtf = b[0]===0x7B&&b[1]===0x5C&&b[2]===0x72&&b[3]===0x74;                       // {\rt → RTF
+    let text='';
+    if(isZip){
+      text=await extractDocx(ab);
+    } else if(isPdf){
+      if(!window.pdfjsLib) throw new Error('PDF 解析库未加载，请刷新页面');
+      text=await extractPdf(ab,function(i,tot){ if(tot>10&&i%10===0) showFile('<span class="spinner"></span> 正在按版面抽取第 '+i+' / '+tot+' 页…',false); });
+    } else if(isOle){
+      showFile('⚠ 这是 Word 97-2003 的二进制 .doc（不是 .docx）。浏览器内没有可靠的 .doc 解析器，无法在本机把它读成文字。<br>请在 Word/WPS 里「另存为 → .docx」后重传，或直接把正文粘到下面的框里——两种都不损失任何东西。',true); return;
+    } else if(isRtf){
+      showFile('⚠ 这是 RTF 文件。请在 Word/WPS 里另存为 .docx 后重传，或直接粘贴正文。',true); return;
+    } else {
+      showFile('⚠ 认不出这个文件（既不是 .docx、也不是 PDF）。支持：Word .docx（2007 及以后，含 WPS／Mac Word／Google Docs 导出）与 PDF。旧版 .doc 请先另存为 .docx。',true); return;
+    }
+    text=text.replace(/\n{3,}/g,'\n\n').trim();
+    if(text.length<20){ showFile('⚠ 解析出的文字太少（'+text.length+' 字）。若这是扫描版 PDF／纯图片，里面没有可抽取的文字层，需先做 OCR。也可手动粘贴正文。',true); return; }
+    docTextEl.value=text; $('count').textContent=text.length+' 字'; papersQueue=[]; renderQueue();
+    if(!docTitleEl.value){ docTitleEl.value=name.replace(/\.(docx|doc|pdf)$/i,'').slice(0,40); }
+    const warn=lengthWarning(text.length);
+    showFile('✓ 已解析 '+name+' · '+text.length+' 字'+(warn?'<br>'+warn:'（如含多篇，请用下方「拆分」）'), !!warn);
+  }catch(e){ showFile('⚠ 解析失败：'+(e.message||e)+'。可手动粘贴正文。',true); }
+}
+
+/* ═══ 正文长度把关 ═══
+   评分时 system 里已压着整部内功＋心得＋评分规范（约 4.4 万 tokens），正文是叠在这之上的。
+   超限的表现不是"文件太大"，而是模型那头一句看不懂的报错——所以在这里先把账算给用户看。
+
+   下面这张上下文表核对于 2026-07-17（官方口径）：
+     deepseek-v4-pro / deepseek-v4-flash … 1,000,000（V4 全系）
+     glm-5 ………………………………………………… 202,752
+     glm-4-flash ……………………………………… 131,072（128K）
+   这张表一定会过期，而过期的表比没有表更坏。所以它只用来【提示】，绝不用来【拦截】：
+   算式全部摊开显示，用户自己能对；模型换了、窗口大了，最坏也只是多一句无害的提示。 */
+const CTX_WINDOW={'deepseek-v4-pro':1000000,'deepseek-v4-flash':1000000,'glm-5':202752,'glm-4-flash':131072};
+const CTX_TIERS=[{name:'深度思考档',models:['deepseek-v4-pro','glm-5']},{name:'快速档',models:['deepseek-v4-flash','glm-4-flash']}];
+const SCORE_OUT_TOKENS=12000;
+const CHARS_TO_TOKENS=0.75;   // 中文约 0.7–0.8 token/字；取 0.75，混排英文/数字时略偏保守
+
+function systemChars(){ return (SDE_BASE?SDE_BASE.length:0) + 14000 + (typeof SCORING_SPEC==='string'?SCORING_SPEC.length:0); }
+
+/* 返回：哪些模型吃不下这篇。空数组＝都能吃下。 */
+function ctxOverflow(paperChars){
+  const inTok=Math.round((systemChars()+paperChars)*CHARS_TO_TOKENS), need=inTok+SCORE_OUT_TOKENS;
+  const over=[];
+  for(const t of CTX_TIERS) for(const m of t.models){
+    const head=CTX_WINDOW[m]-need;
+    if(head < CTX_WINDOW[m]*0.05) over.push({tier:t.name,model:m,win:CTX_WINDOW[m],head:head});
+  }
+  return {inTok:inTok, need:need, over:over};
+}
+function lengthWarning(n){
+  const r=ctxOverflow(n);
+  if(!r.over.length) return '';
+  const lines=r.over.map(o=>'　· '+o.tier+' 的 '+o.model+'（'+o.win.toLocaleString()+' tokens）'+(o.head<0?'超出 '+(-o.head).toLocaleString():'仅余 '+o.head.toLocaleString())+' tokens');
+  const okTier=CTX_TIERS.find(t=>!t.models.some(m=>r.over.some(o=>o.model===m)));
+  return '⚠ 正文 '+n.toLocaleString()+' 字。加上内功与心得，单次送进模型约 <b>'+r.need.toLocaleString()+' tokens</b>'
+       + '（其中 system 约 '+Math.round(systemChars()*CHARS_TO_TOKENS).toLocaleString()+'、正文约 '+Math.round(n*CHARS_TO_TOKENS).toLocaleString()+'、留给输出 '+SCORE_OUT_TOKENS.toLocaleString()+'）。<br>装不下的基底：<br>'
+       + lines.join('<br>')
+       + (okTier?'<br>→ 改用<b>'+okTier.name+'</b>可评（其模型窗口足够）；':'<br>→ ')
+       + '或用下方「拆分」逐篇评。';
+}
+
+
+
+/* ═══ 通用流式调用 ═══ */
+async function streamChat(apiKey,sel,systemPrompt,userMsg,maxTokens,statusEl2,stageLabel,opts){
+  const ac=new AbortController(); const killer=setTimeout(()=>{try{ac.abort();}catch(_){}}, 12*60*1000);
+  const setS=(t)=>{ if(statusEl2) statusEl2.innerHTML='<span class="spinner"></span> '+stageLabel+' · '+t; };
+  setS('连接中…');
+  const payload=(opts&&opts.split)?buildSplitPayload(sel,systemPrompt,userMsg):buildPayload(sel,systemPrompt,userMsg,maxTokens);
+  let resp;
+  try{ resp=await fetch(apiUrl(sel),{method:'POST',headers:chatHeaders(sel,apiKey),body:JSON.stringify(payload),signal:ac.signal}); }
+  catch(e){ clearTimeout(killer); throw new Error(e.name==='AbortError'?'超时中止':'网络请求失败：'+e.message); }
+  if(!resp.ok){ let d=''; try{const j=await resp.json(); d=j.error?.message||JSON.stringify(j);}catch(_){d=resp.statusText;} clearTimeout(killer); throw new Error('接口 '+resp.status+'：'+d); }
+  const reader=resp.body.getReader(),decoder=new TextDecoder();
+  let buf='',acc='',think='',gotAny=false,rawHead='';
+  const t0=Date.now();
+  try{
+    while(true){
+      const {done,value}=await reader.read(); if(done) break;
+      const chunk=decoder.decode(value,{stream:true}); if(rawHead.length<400) rawHead+=chunk.slice(0,400-rawHead.length);
+      buf+=chunk; const lines=buf.split('\n'); buf=lines.pop();
+      for(const line of lines){
+        const s=line.trim(); if(!s||s.startsWith(':')) continue;
+        if(!s.startsWith('data:')){ if(s.charAt(0)==='{'){ let je=null; try{je=JSON.parse(s);}catch(_){je=null;} if(je&&je.error) throw new Error('接口报错：'+(je.error.message||je.error.code||'')); if(je&&je.code&&je.message&&!je.choices) throw new Error('接口报错：'+je.code+'：'+je.message); } continue; }
+        const data=s.slice(5).trim(); if(data==='[DONE]') continue;
+        try{ const j=JSON.parse(data);
+          if(j.error) throw new Error('接口报错：'+(j.error.message||j.error.code||''));
+          if(j.code&&j.message&&!j.choices) throw new Error('接口报错：'+j.code+'：'+j.message);
+          const d=j.choices?.[0]?.delta||{};
+          const rc=d.reasoning_content||''; if(rc){ gotAny=true; think+=rc; setS('🧠 思考 '+think.length+' 字'); }
+          const dc=d.content||''; if(dc){ gotAny=true; acc+=dc; setS('生成 '+acc.length+' 字'); }
+        }catch(err){ if(err instanceof SyntaxError){} else throw err; }
+      }
+    }
+  }catch(e){ clearTimeout(killer); if(e.name==='AbortError'){ if(acc) return {text:acc,think}; throw new Error('超时中止（深度思考较慢，可稍后重试）'); } throw e; }
+  finally{ clearTimeout(killer); }
+  if(!acc){ throw new Error('基底返回空内容（Key 未开通该模型/额度不足/被安全策略拦截）。'+(rawHead?'返回开头：'+rawHead.slice(0,160):'')); }
+  return { text:acc, think, secs:((Date.now()-t0)/1000).toFixed(1) };
+}
+async function getReflection(sel,key,statusEl2){
+  const cached=loadReflectLS(sel);
+  if(cached){ if(statusEl2) statusEl2.innerHTML='✓ ① 已载入本地心得（秒载 · '+cached.length+'字）'; return cached; }
+  const res=await streamChat(key,sel,reflectPrompt(sel),'请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》。这是你接下来评分工作的思维底座。',REFLECT_MAX_TOKENS,statusEl2,'① SDE提智·写心得');
+  if(res&&res.text){ saveReflectLS(sel,res.text); return res.text; }
+  return '';
+}
+
+/* ═══ 解析 & 计算 ═══ */
+/* 基底在 evidence/quote 里逐字引原文时，常把英文双引号或换行原样带进字符串，
+   于是整张卡因为一个引号报「Expected ',' or '}'」。所以先原样解析，失败再结构修复：
+   串内多出来的引号就地转义、裸换行转义、非法转义去掉、尾逗号删掉、被截断的括号补齐。 */
+function jsonRepair(s){
+  let out='', inStr=false, esc=false; const stack=[];
+  for(let i=0;i<s.length;i++){
+    const ch=s.charAt(i);
+    if(inStr){
+      if(esc){ out+=ch; esc=false; continue; }
+      if(ch==='\\'){ const nc=s.charAt(i+1); if(nc&&'"\\/bfnrtu'.indexOf(nc)>=0){ out+=ch; esc=true; } continue; }
+      if(ch==='"'){
+        let k=i+1; while(k<s.length && ' \t\r\n'.indexOf(s.charAt(k))>=0) k++;
+        const nx=s.charAt(k)||'';
+        if(nx===''||nx===','||nx===':'||nx==='}'||nx===']'){ inStr=false; out+=ch; } else out+='\\"';
+        continue;
+      }
+      if(ch==='\n'){ out+='\\n'; continue; }
+      if(ch==='\r'){ out+='\\r'; continue; }
+      if(ch==='\t'){ out+='\\t'; continue; }
+      if(ch<' ') continue;
+      out+=ch; continue;
+    }
+    if(ch==='"'){ inStr=true; out+=ch; continue; }
+    if(ch==='{'||ch==='['){ stack.push(ch==='{'?'}':']'); out+=ch; continue; }
+    if(ch==='}'||ch===']'){ if(stack.length) stack.pop(); out+=ch; continue; }
+    out+=ch;
+  }
+  if(inStr) out+='"';
+  out=out.replace(/,\s*$/,'').replace(/,?\s*"[^"]*"\s*:\s*$/,'').replace(/,(\s*[}\]])/g,'$1');
+  while(stack.length) out+=stack.pop();
+  return out;
+}
+function extractJSON(raw){
+  let t=raw.trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+  const a=t.indexOf('{'),b=t.lastIndexOf('}');
+  if(a>=0) t=(b>a)?t.slice(a,b+1):t.slice(a);
+  try{ return JSON.parse(t); }catch(e){ return JSON.parse(jsonRepair(t)); }
+}
+const IQ_W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15}, PP_W={completeness:0.30,evidence:0.30,format:0.20,candor:0.20};
+function num(x){ const v=Number(x); return isFinite(v)?v:NaN; }
+function recomputeIQ(dims){ let s=0; for(const k in IQ_W){ const v=num(dims?.[k]?.score); if(isNaN(v)) return NaN; s+=v*IQ_W[k]; } return Math.round(s*10)/10; }
+function recomputePaper(a){ let s=0; for(const k in PP_W){ const v=num(a?.[k]?.score); if(isNaN(v)) return NaN; s+=v*PP_W[k]; } return Math.round(s*10)/10; }
+function clampIQ(v){ return Math.max(0,Math.min(160,v)); }
+function clampP(v){ return Math.max(0,Math.min(100,v)); }
+function mean(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function round1(v){ return Math.round(v*10)/10; }
+function iqTier(s){ if(s<110) return {c:'#8B98A5',bg:'rgba(139,152,165,0.16)',tag:'入门 · 大众区',glow:''}; if(s<135) return {c:'#6E9FD4',bg:'rgba(46,80,144,0.18)',tag:'专业区',glow:''}; if(s<150) return {c:'#D4B25E',bg:'rgba(212,178,94,0.16)',tag:'资深学者区',glow:''}; if(s<158) return {c:'#E5C86E',bg:'rgba(212,178,94,0.22)',tag:'本体论级 · SDE提智达标',glow:'0 0 20px rgba(212,178,94,0.5)'}; return {c:'#B98CFF',bg:'rgba(122,47,224,0.22)',tag:'天才 · 典范级（满级160）',glow:'0 0 22px rgba(122,47,224,0.5)'}; }
+/* 完善性的档位说的是「完不完整」，不是「好不好」——好不好是尺子一的事。
+   90 分不是「卓越」，是「该有的都有了」；这条尺子的高分是底线达成，不是荣誉。 */
+function paperGrade(s){ if(s>=90) return {g:'完备 A+',c:'#B98CFF'}; if(s>=80) return {g:'扎实 A',c:'#E5C86E'}; if(s>=70) return {g:'可用 B',c:'#D4B25E'}; if(s>=60) return {g:'有硬伤 C',c:'#6E9FD4'}; return {g:'不完整 D',c:'#8B98A5'}; }
+
+function radarSVG(dims){
+  const order=['S','D','E','I','F'],labels={S:'S 结构',D:'D 差异',E:'E 纠缠',I:'I 不可还原',F:'F 可证伪'};
+  const cx=140,cy=118,maxR=80,floor=80,ceil=160;
+  const ang=i=>(-90+i*72)*Math.PI/180,rOf=v=>Math.max(0,Math.min(1,(v-floor)/(ceil-floor)))*maxR,pt=(i,r)=>[cx+r*Math.cos(ang(i)),cy+r*Math.sin(ang(i))];
+  let grid=''; [100,120,140,160].forEach(g=>{ const r=rOf(g); let p=''; for(let i=0;i<5;i++){const[x,y]=pt(i,r); p+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);} grid+='<path d="'+p+'Z" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>'; });
+  let axes='',lab=''; for(let i=0;i<5;i++){ const[ex,ey]=pt(i,maxR); axes+='<line x1="'+cx+'" y1="'+cy+'" x2="'+ex.toFixed(1)+'" y2="'+ey.toFixed(1)+'" stroke="rgba(255,255,255,0.10)"/>'; const[lx,ly]=pt(i,maxR+20); const an=Math.abs(Math.cos(ang(i)))<0.3?'middle':(Math.cos(ang(i))>0?'start':'end'); lab+='<text x="'+lx.toFixed(1)+'" y="'+(ly+4).toFixed(1)+'" fill="#C9B27A" font-size="11" text-anchor="'+an+'">'+labels[order[i]]+'</text>'; }
+  let dp='',dots=''; for(let i=0;i<5;i++){ const v=num(dims[order[i]].score); const[x,y]=pt(i,rOf(v)); dp+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1); dots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3" fill="#E5C86E"/>'; }
+  return '<svg viewBox="0 0 280 240" width="260" xmlns="http://www.w3.org/2000/svg">'+grid+axes+'<path d="'+dp+'Z" fill="rgba(212,178,94,0.22)" stroke="#D4B25E" stroke-width="1.8"/>'+dots+lab+'</svg>';
+}
+
+/* ═══ 拆分逻辑 ═══ */
+function stripMap(text){ let s='';const map=[]; for(let i=0;i<text.length;i++){ if(!/\s/.test(text[i])){ map.push(i); s+=text[i]; } } return {stripped:s,map}; }
+function findAnchor(text,sm,anchor){ if(!anchor) return -1; const a=String(anchor).replace(/\s+/g,''); if(a.length<6) return -1; let pos=sm.stripped.indexOf(a); if(pos<0){ const frag=a.slice(0,Math.max(8,Math.floor(a.length*0.6))); pos=sm.stripped.indexOf(frag); } if(pos<0) return -1; return sm.map[pos]; }
+function firstLine(p){ const l=(p.split('\n').find(x=>x.trim())||'').trim(); return l.slice(0,60); }
+function buildPapersFromAnchors(text,arr){
+  const sm=stripMap(text); const found=[];
+  (arr||[]).forEach(p=>{ const idx=findAnchor(text,sm,p.anchor||p.title||''); if(idx>=0) found.push({title:(p.title||'').trim(),idx}); });
+  found.sort((a,b)=>a.idx-b.idx);
+  const uniq=[]; found.forEach(f=>{ if(!uniq.length||f.idx-uniq[uniq.length-1].idx>20) uniq.push(f); });
+  if(uniq.length<=1) return [];
+  const papers=[]; for(let i=0;i<uniq.length;i++){ const start=uniq[i].idx,end=(i+1<uniq.length)?uniq[i+1].idx:text.length; const seg=text.slice(start,end).trim(); if(seg.length>30) papers.push({title:uniq[i].title||firstLine(seg),text:seg}); }
+  return papers;
+}
+function splitBySeparator(text){ const parts=text.split(/\n\s*[=\-—＝─*_·]{3,}\s*\n/); return parts.map(p=>p.trim()).filter(p=>p.length>30).map(p=>({title:firstLine(p),text:p})); }
+
+async function detectSplit(){
+  const text=docTextEl.value.trim();
+  if(text.length<50){ showErr('请先上传或粘贴文档。'); return; }
+  const dsKey=dsKeyEl.value.trim(),glmKey=glmKeyEl.value.trim();
+  const sel=dsKey?'ds:pro':(glmKey?'glm:pro':null),key=dsKey||glmKey;
+  if(!key){ showErr('AI 识别多篇需要至少一个基底的 Key（也可改用「按分隔符拆分」）。'); return; }
+  errBox.style.display='none'; splitBtn.disabled=true; splitBtn.textContent='识别中…'; splitNoteEl.style.display='block'; splitNoteEl.textContent='正在用 AI 识别文档中的论文边界…';
+  try{
+    const res=await streamChat(key,sel,SPLIT_SPEC,'下面是文档全文，请判断包含几篇独立论文并给出定位锚点：\n\n'+text,4000,null,'',{split:true});
+    const obj=extractJSON(res.text);
+    const papers=buildPapersFromAnchors(text,obj.papers);
+    if(papers.length<=1){ papersQueue=[]; renderQueue(); splitNoteEl.textContent='识别结果：这份文档判定为单篇（或无法可靠拆分），将整体评分。若确有多篇，请用「按分隔符拆分」。'; }
+    else{ papersQueue=papers; renderQueue(); const claimed=Number(obj.count)||papers.length; splitNoteEl.textContent = (claimed>papers.length) ? ('AI 认为约 '+claimed+' 篇，成功定位 '+papers.length+' 篇。请核对下方列表；若与实际不符，可删除误分项或改用分隔符拆分。') : ('已识别 '+papers.length+' 篇，请核对下方列表（可删除误分项）。'); }
+  }catch(e){ showErr('AI 识别失败：'+(e.message||e)+'。可改用「按分隔符拆分」，或直接整体评分。'); splitNoteEl.style.display='none'; }
+  finally{ splitBtn.disabled=false; splitBtn.textContent='🔍 识别文档中的多篇论文'; }
+}
+function doManualSplit(){
+  const text=docTextEl.value.trim();
+  const papers=splitBySeparator(text);
+  if(papers.length<2){ showErr('没找到分隔符。请在每两篇论文之间单独加一行分隔线（如 ===== 或 -----，至少 3 个字符）后再点此。'); return; }
+  errBox.style.display='none'; papersQueue=papers; renderQueue(); splitNoteEl.style.display='block'; splitNoteEl.textContent='按分隔符拆出 '+papers.length+' 篇（请核对，可删除误分项）。';
+}
+splitBtn.addEventListener('click',detectSplit);
+manualSplitBtn.addEventListener('click',doManualSplit);
+
+function renderQueue(){
+  if(!papersQueue.length){ queueBox.style.display='none'; queueBox.innerHTML=''; return; }
+  let h='<div class="q-head"><span>检测到 <b>'+papersQueue.length+'</b> 篇论文 · 将逐篇评分并出汇总报告</span><button class="q-reset" id="qReset">↺ 其实是单篇 · 整体评分</button></div><div class="q-list">';
+  papersQueue.forEach((p,i)=>{ h+='<div class="q-item"><span class="q-idx">'+(i+1)+'</span><div class="q-main"><div class="q-title">'+esc(p.title||('论文'+(i+1)))+'</div><div class="q-prev">'+esc(p.text.slice(0,70))+'… · '+p.text.length+'字</div></div><button class="q-del" data-i="'+i+'">✕</button></div>'; });
+  h+='</div>';
+  if(papersQueue.length>1) h+='<label class="q-fast"><input type="checkbox" id="fastMode"'+(batchFast?' checked':'')+'> 批量提速：每篇只用一个基底（不取平均，快约一半）</label>';
+  queueBox.innerHTML=h; queueBox.style.display='block';
+  $('qReset').addEventListener('click',()=>{ papersQueue=[]; renderQueue(); splitNoteEl.style.display='none'; });
+  queueBox.querySelectorAll('.q-del').forEach(b=>b.addEventListener('click',()=>{ papersQueue.splice(+b.dataset.i,1); renderQueue(); }));
+  const fm=$('fastMode'); if(fm) fm.addEventListener('change',()=>{ batchFast=fm.checked; });
+}
+
+/* ═══ 渲染 ═══ */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function barW160(v){ return Math.max(3,Math.min(100,((num(v)-80)/(160-80))*100)); }
+function barW100(v){ return Math.max(3,Math.min(100,num(v))); }
+function barColor(){ return 'linear-gradient(90deg,#D4B25E,#E5C86E)'; }
+
+function basePanelHTML(sel,data,iqScore,ppScore){
+  const t=iqTier(iqScore),g=paperGrade(ppScore),col=SEL_COLOR[sel]||'#D4B25E';
+  const dims=data.iq.dims,order=['S','D','E','I','F'],dimNames={S:'S · 结构精确度',D:'D · 差异锐度',E:'E · 纠缠深度',I:'I · 不可还原性',F:'F · 可证伪性'};
+  let dimsHtml=''; for(const k of order){ const dd=dims[k]||{}; dimsHtml+='<div><div class="dim-head"><span class="dim-name">'+dimNames[k]+'<span class="w">权重 '+IQ_W[k].toFixed(2)+'</span></span><span class="dim-score">'+esc(dd.score)+'</span></div><div class="bar"><div class="bar-fill" style="width:'+barW160(dd.score)+'%;background:'+barColor()+'"></div></div>'+(dd.evidence?'<div class="dim-ev">'+esc(dd.evidence)+'</div>':'')+'</div>'; }
+  const asp=data.paper.aspects,aOrder=[['completeness','完整性',0.30],['evidence','证据与引用可核性',0.30],['format','结构与表达规范',0.20],['candor','自限与诚实',0.20]];
+  let aspHtml=''; for(const a of aOrder){ const aa=asp[a[0]]||{}; aspHtml+='<div><div class="dim-head"><span class="dim-name">'+a[1]+'<span class="w">权重 '+a[2].toFixed(2)+'</span></span><span class="dim-score">'+esc(aa.score)+'/100</span></div><div class="bar"><div class="bar-fill" style="width:'+barW100(aa.score)+'%;background:'+barColor()+'"></div></div>'+(aa.note?'<div class="dim-ev">'+esc(aa.note)+'</div>':'')+'</div>'; }
+  const kd=data.key_deduction||{},up=data.uplift||{};
+  const thinkFold=data.__think&&data.__think.length>50?'<details class="think-fold"><summary>▸ 展开该基底评分时的审读思考（'+data.__think.length+'字）</summary><div class="fold-body">'+esc(data.__think)+'</div></details>':'';
+  return '<div class="base-panel"><div class="bp-head"><span class="bp-name" style="color:'+col+'">'+esc(SEL_NAME[sel]||sel)+'</span><span class="bp-chip" style="background:'+t.bg+';color:'+t.c+'">创新智商 '+iqScore+' / 160</span><span class="bp-chip" style="background:rgba(212,178,94,0.12);color:'+g.c+'">论文完善性 '+ppScore+' / 100</span></div><div class="bp-body">'
+    +'<div class="sec-h">尺子一 · 创新智商（0–160）</div><div class="two-col"><div class="radar-wrap">'+radarSVG(dims)+'</div><div class="dims">'+dimsHtml+'</div></div><div class="iq-sub">综合 <b>'+iqScore+'</b> · '+esc(data.iq.level||t.tag)+'</div>'
+    +'<div class="block"><div class="sec-h">尺子二 · 论文完善性（0–100）</div><div class="aspects">'+aspHtml+'</div><div class="pp-sub">综合 <b>'+ppScore+'/100</b> · 档位 '+esc(data.paper.grade||g.g)+'</div></div>'
+    +(kd.quote?'<div class="block"><div class="sec-h">关键扣分句</div><div class="quote-box"><div class="q">「'+esc(kd.quote)+'」</div><div class="r">'+esc(kd.reason)+'</div></div></div>':'<div class="block"><div class="sec-h">关键扣分句</div><div class="quote-box" style="border-color:rgba(224,110,90,0.5)"><div class="r">⚠ 此基底未给出扣分句。评分规范要求必须精确引用原文一句作为扣分证据——没有它，这一份分数不可重现、也无法被反驳，应按低可信度看待。</div></div></div>')
+    +(up.action?'<div class="block"><div class="sec-h">如何同时抬高两个分</div><div class="uplift-box">'+esc(up.action)+'</div></div>':'')
+    +(data.verdict?'<div class="verdict">'+esc(data.verdict)+'</div>':'')+thinkFold+'</div></div>';
+}
+
+/* 一篇论文的评分块（双基底平均卡 + 各基底面板）→ 返回 HTML 字符串 */
+function resultsBlockHTML(settled){
+  const ok=settled.filter(r=>r.data);
+  ok.forEach(r=>{ if(r.iq==null){ r.iq=round1(clampIQ(recomputeIQ(r.data.iq.dims))); r.pp=round1(clampP(recomputePaper(r.data.paper.aspects))); } });
+  const avgIQ=ok.length?round1(mean(ok.map(r=>r.iq))):0, avgPP=ok.length?round1(mean(ok.map(r=>r.pp))):0;
+  const t=iqTier(avgIQ),g=paperGrade(avgPP), title=ok[0]&&ok[0].data.title?ok[0].data.title:'';
+  let note='';
+  if(ok.length>=2){ const spread=Math.abs(ok[0].iq-ok[1].iq); note='双基底：'+ok.map(r=>SEL_NAME[r.sel]+' '+r.iq).join(' · ')+' → 均分 '+avgIQ+'（相差 '+round1(spread)+' 分'+(spread>12?'，分歧较大':'，一致性良好')+'）'; }
+  else note='仅一个基底参与（未取平均）';
+  let html='<div class="avg-card"><div class="avg-head">'+(ok.length>=2?'两基底平均成绩':'评分成绩')+(title?' · '+esc(title):'')+'</div><div class="avg-scores">'
+    +'<div class="avg-one"><div class="an" style="color:'+t.c+';text-shadow:'+(t.glow||'none')+'">'+avgIQ+'<span class="amax"> /160</span></div><div class="al">平均创新智商</div><div class="abadge" style="background:'+t.bg+';color:'+t.c+'">'+t.tag+'</div></div>'
+    +'<div class="avg-one"><div class="an" style="color:'+g.c+'">'+avgPP+'<span class="amax"> /100</span></div><div class="al">平均论文完善性</div><div class="abadge" style="background:rgba(212,178,94,0.14);color:'+g.c+'">'+g.g+'</div></div>'
+    +'</div><div class="avg-note">'+note+'</div></div>';
+  for(const r of ok) html+=basePanelHTML(r.sel,r.data,r.iq,r.pp);
+  const failed=settled.filter(r=>!r.data);
+  if(failed.length) html+='<div class="err-box" style="display:block">部分基底未完成：'+failed.map(r=>SEL_NAME[r.sel]+'（'+esc(r.err||'失败')+'）').join('；')+'</div>';
+  return html;
+}
+function renderSingle(settled){
+  resultEl.innerHTML=resultsBlockHTML(settled)+'<div class="result-actions"><button class="btn-ghost" id="againBtn">重新评分</button></div>';
+  resultEl.style.display='block';
+  $('againBtn').addEventListener('click',()=>{ resultEl.style.display='none'; progressEl.style.display='none'; window.scrollTo({top:0,behavior:'smooth'}); });
+}
+
+/* 批量报告：汇总卡 + 成绩表 + 逐篇可展开 */
+function renderBatch(all){
+  const okP=all.filter(p=>p.avgIQ!=null);
+  const bIQ=okP.length?round1(mean(okP.map(p=>p.avgIQ))):0, bPP=okP.length?round1(mean(okP.map(p=>p.avgPP))):0;
+  const t=iqTier(bIQ),g=paperGrade(bPP);
+  let hi=null,lo=null; okP.forEach(p=>{ if(!hi||p.avgIQ>hi.avgIQ)hi=p; if(!lo||p.avgIQ<lo.avgIQ)lo=p; });
+  let extra=''; if(okP.length>=2&&hi&&lo) extra='最高：'+esc(hi.title)+'（'+hi.avgIQ+'） · 最低：'+esc(lo.title)+'（'+lo.avgIQ+'）';
+  let html='<div class="batch-sum"><div class="bh">批量评估报告 · 共 '+all.length+' 篇</div><div class="bnums">'
+    +'<div class="bn"><div class="v" style="color:'+t.c+';text-shadow:'+(t.glow||'none')+'">'+bIQ+'</div><div class="l">批次平均创新智商 /160</div></div>'
+    +'<div class="bn"><div class="v" style="color:'+g.c+'">'+bPP+'</div><div class="l">批次平均论文完善性 /100</div></div>'
+    +'</div><div class="bextra">'+t.tag+' · '+g.g+(extra?'<br>'+extra:'')+'</div></div>';
+  // 成绩表
+  html+='<div class="section-title">逐篇成绩</div><table class="batch-table"><thead><tr><th class="rank">#</th><th class="tt">论文</th><th style="text-align:center">创新智商</th><th style="text-align:center">论文完善性</th><th>档位</th></tr></thead><tbody>';
+  all.forEach((p,i)=>{ if(p.avgIQ!=null){ const tt=iqTier(p.avgIQ),gg=paperGrade(p.avgPP); html+='<tr><td class="rank">'+(i+1)+'</td><td class="tt">'+esc(p.title||('论文'+(i+1)))+'</td><td class="num" style="color:'+tt.c+'">'+p.avgIQ+'</td><td class="num" style="color:'+gg.c+'">'+p.avgPP+'</td><td style="color:'+gg.c+'">'+gg.g+'</td></tr>'; }
+    else html+='<tr><td class="rank">'+(i+1)+'</td><td class="tt">'+esc(p.title||('论文'+(i+1)))+'</td><td class="num" colspan="3" style="color:var(--err)">评分失败：'+esc(p.err||'')+'</td></tr>'; });
+  html+='</tbody></table>';
+  // 逐篇详情
+  html+='<div class="section-title">逐篇详细评分卡</div>';
+  all.forEach((p,i)=>{ const label=p.avgIQ!=null?('智商 '+p.avgIQ+'/160 · 论文 '+p.avgPP+'/100 · '+paperGrade(p.avgPP).g):'评分失败';
+    html+='<details class="paper-fold"'+(all.length<=3?' open':'')+'><summary>#'+(i+1)+' · '+esc(p.title||('论文'+(i+1)))+' — '+label+'</summary><div class="pf-body">'+(p.avgIQ!=null?resultsBlockHTML(p.settled):'<div class="err-box" style="display:block">该篇评分失败：'+esc(p.err||'')+'</div>')+'</div></details>'; });
+  html+='<div class="result-actions"><button class="btn-ghost" id="againBtn">重新评分</button></div>';
+  resultEl.innerHTML=html; resultEl.style.display='block';
+  $('againBtn').addEventListener('click',()=>{ resultEl.style.display='none'; progressEl.style.display='none'; window.scrollTo({top:0,behavior:'smooth'}); });
+}
+
+/* ═══ 单篇/单基底评分 ═══ */
+async function runOneBase(sel,key,rowStage,paperText,paperTitle){
+  await ensureNeigong();
+  const reflection=await getReflection(sel,key,rowStage);
+  const res=await streamChat(key,sel,withReflection(reflection),buildScoreUserMsg(paperTitle,paperText),12000,rowStage,'② 评分审读');
+  let data; try{ data=extractJSON(res.text); }catch(e){ throw new Error('返回不是规范JSON：'+res.text.slice(0,120)); }
+  if(!data.iq||!data.iq.dims||!data.paper||!data.paper.aspects) throw new Error('评分JSON缺字段');
+  /* 综合分一律由五维/四方面重算，所以任何一项不是数就算不出分。
+     若不校验，NaN 会一路流到界面显示成「NaN/160」——宁可报"这个基底没按规范返回"，也不给一个假分。 */
+  const miss=[];
+  for(const k in IQ_W) if(isNaN(num(data.iq.dims[k]&&data.iq.dims[k].score))) miss.push('创新智商·'+k);
+  for(const k in PP_W) if(isNaN(num(data.paper.aspects[k]&&data.paper.aspects[k].score))) miss.push('完善性·'+k);
+  if(miss.length) throw new Error('未按规范返回分项（'+miss.join('、')+'）——综合分由分项重算，缺项无法计分。可重试或换基底。');
+  data.__think=res.think||'';
+  return {sel,data};
+}
+async function scoreOnePaper(paperText,paperTitle,bases){
+  await ensureNeigong();
+  const tasks=bases.map(([sel,key])=>runOneBase(sel,key,null,paperText,paperTitle).catch(e=>({sel,err:(e.message||String(e))})));
+  return await Promise.all(tasks);
+}
+
+/* ═══ 主流程 ═══ */
+let running=false;
+function rowId(x){ return x.replace(/[:\s]/g,'_'); }
+async function run(){
+  if(running) return;
+  errBox.style.display='none'; resultEl.style.display='none'; progressEl.innerHTML=''; progressEl.style.display='none';
+  const text=docTextEl.value.trim(),dsKey=dsKeyEl.value.trim(),glmKey=glmKeyEl.value.trim();
+  if(text.length<50){ showErr('论文正文太短了（至少 50 字）。请上传 Word/PDF，或把正文粘贴进来。'); return; }
+  if(!dsKey&&!glmKey){ showErr('请至少填入一个基底的 API Key（DeepSeek 或 GLM）。两个都填才能取平均。'); return; }
+  const papers = papersQueue.length>=1 ? papersQueue.slice() : [{title:docTitleEl.value.trim(),text:text}];
+  let bases=[]; if(dsKey) bases.push(['ds:pro',dsKey]); if(glmKey) bases.push(['glm:pro',glmKey]);
+
+  running=true; goBtn.disabled=true; goBtn.textContent='评分中…'; statusEl.innerHTML='<span class="spinner"></span> 进行中'; progressEl.style.display='block';
+  try{
+    if(papers.length===1){
+      // 单篇：逐基底进度行
+      progressEl.innerHTML=bases.map(([sel])=>'<div class="prow" id="prow-'+rowId(sel)+'"><span class="pname" style="color:'+SEL_COLOR[sel]+'">'+SEL_NAME[sel]+'</span><span class="pstage" id="pstage-'+rowId(sel)+'">排队中…</span></div>').join('');
+      const rows={}; bases.forEach(([sel])=>{ rows[sel]={ set innerHTML(v){ const e=$('pstage-'+rowId(sel)); if(e) e.innerHTML=v; } }; });
+      const tasks=bases.map(([sel,key])=>runOneBase(sel,key,rows[sel],papers[0].text,papers[0].title).then(r=>{ const pr=$('prow-'+rowId(sel)); if(pr)pr.classList.add('done'); rows[sel].innerHTML='✓ 评分完成'; return r; }).catch(e=>{ const pr=$('prow-'+rowId(sel)); if(pr)pr.classList.add('fail'); rows[sel].innerHTML='✗ '+(e.message||e); return {sel,err:(e.message||String(e))}; }));
+      const settled=await Promise.all(tasks);
+      if(!settled.some(r=>r.data)){ showErr('两个基底都没能完成评分：'+settled.map(r=>SEL_NAME[r.sel]+'（'+esc(r.err||'失败')+'）').join('；')); statusEl.textContent='失败'; }
+      else{ renderSingle(settled); statusEl.textContent='✓ 完成'; resultEl.scrollIntoView({behavior:'smooth',block:'start'}); }
+    } else {
+      // 多篇：批量
+      const fast = batchFast && bases.length>1;
+      const scoreBases = fast ? [bases[0]] : bases;
+      progressEl.innerHTML='<div class="prow" style="border-color:rgba(212,178,94,0.4)"><span class="pstage" style="flex:1">共 '+papers.length+' 篇 · 每篇 '+(scoreBases.length>1?'双基底取平均':SEL_NAME[scoreBases[0][0]]+' 单基底')+'，按篇串行评分，请耐心等待…</span></div>'
+        + papers.map((p,i)=>'<div class="prow" id="prow-p'+i+'"><span class="pname" style="min-width:150px">#'+(i+1)+' '+esc((p.title||'论文'+(i+1)).slice(0,18))+'</span><span class="pstage" id="pstage-p'+i+'">排队中…</span></div>').join('');
+      const all=[];
+      for(let i=0;i<papers.length;i++){
+        const setStage=(v)=>{ const e=$('pstage-p'+i); if(e) e.innerHTML=v; };
+        setStage('<span class="spinner"></span> 评分中…（'+(scoreBases.length>1?'DeepSeek＋GLM 并行':SEL_NAME[scoreBases[0][0]])+'）');
+        let settled;
+        try{ settled=await scoreOnePaper(papers[i].text,papers[i].title,scoreBases); }
+        catch(e){ settled=scoreBases.map(([sel])=>({sel,err:(e.message||String(e))})); }
+        const ok=settled.filter(r=>r.data);
+        ok.forEach(r=>{ r.iq=round1(clampIQ(recomputeIQ(r.data.iq.dims))); r.pp=round1(clampP(recomputePaper(r.data.paper.aspects))); });
+        const avgIQ=ok.length?round1(mean(ok.map(r=>r.iq))):null, avgPP=ok.length?round1(mean(ok.map(r=>r.pp))):null;
+        const pr=$('prow-p'+i);
+        if(ok.length){ if(pr)pr.classList.add('done'); setStage('✓ 智商 '+avgIQ+'/160 · 论文 '+avgPP+'/100'); }
+        else{ if(pr)pr.classList.add('fail'); setStage('✗ 失败：'+esc(settled[0]&&settled[0].err||'')); }
+        all.push({ title:(ok[0]&&ok[0].data.title)||papers[i].title||('论文'+(i+1)), settled, avgIQ, avgPP, err:(ok.length?'':(settled[0]&&settled[0].err||'失败')) });
+      }
+      if(!all.some(p=>p.avgIQ!=null)){ showErr('所有论文都未能完成评分，请检查 Key 与网络后重试。'); statusEl.textContent='失败'; }
+      else{ renderBatch(all); statusEl.textContent='✓ 完成（'+all.length+' 篇）'; resultEl.scrollIntoView({behavior:'smooth',block:'start'}); }
+    }
+  }catch(e){ showErr(e.message||String(e)); statusEl.textContent='失败'; }
+  finally{ running=false; goBtn.disabled=false; goBtn.textContent='开始评分'; }
+}
+function showErr(html){ errBox.innerHTML=html; errBox.style.display='block'; }
+goBtn.addEventListener('click',run);
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260819a" defer></script>
+<script src="/taste/assets/sde-keyprobe.js?v=20260817c"></script>
+<script>
+/* Key 有效性检测：按钮由 SDEKeyProbe 注入到每个 Key 输入框之后（本页 HTML 一行未改）。
+   真跑与检测共用同一套 chatHeaders / apiUrl / buildPayload —— 否则会出现"检测通过、真跑失败"。 */
+(function(){
+  function go(){
+    if(!window.SDEKeyProbe) return;
+    try{
+      SDEKeyProbe.attach([
+        { key:'dsKey',  model:'ds:pro',  at:'.key-card' },
+        { key:'glmKey', model:'glm:pro', at:'.key-card' }
+      ], {
+        buildPayload: buildPayload,
+        chatHeaders: chatHeaders,
+        apiUrl: apiUrl,
+        isOverseas: (typeof isOverseas === 'function') ? isOverseas : function(){ return false; },
+        proxyUrl: (typeof PROXY_URL !== 'undefined') ? PROXY_URL : '/api/llm-proxy'
+      });
+    }catch(e){ /* 检测是附加件，装不上也绝不能影响正常跑批 */ }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+</script>
+</body>
+</html>
