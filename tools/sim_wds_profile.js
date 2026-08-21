@@ -264,6 +264,24 @@ console.log("\n── ⑥ 外观：品牌与工序子集 ───────�
   t("没给已筛掉的工序配别名（配了也点不着）",
     cmdKeys.every((k) => langKeys.indexOf(k) >= 0), cmdKeys.filter((k) => langKeys.indexOf(k) < 0).join(","));
 
+  /* 开屏的**结构**，不只是内容。第一版把标题/副题/脚注全塞进 .wdsm-egs，
+     而那是个 display:flex;flex-wrap:wrap 的芯片容器 ⇒ 标题变成一枚超大芯片参与折行、
+     四个种子排成锯齿。线上截图里"排版很不美"就是这么来的。 */
+  t("标题/副题是 hero 的直接子节点，不塞进芯片容器",
+    /heroEl\.insertBefore\(_h1, _sb\)/.test(MC) && /heroEl\.insertBefore\(_sb, egsEl\)/.test(MC));
+  t("脚注也挂在 hero 上，不进芯片容器", /heroEl\.appendChild\(el\("div", "wdsm-hero-after"/.test(MC));
+  t("只有种子进芯片容器", /egsEl\.appendChild\(b\);/.test(MC));
+  t("重绘不叠加（切语言时不会出现两个标题）",
+    /heroEl\.querySelectorAll\("\.wdsm-h1,\.wdsm-sub,\.wdsm-hero-after"\)/.test(MC));
+  t("档案开屏挂 .prof 标记（样式只作用在它身上）", /heroEl\.classList\.add\("prof"\)/.test(MC));
+  t("不挂档案时把标记摘掉（ChatSDE 那一屏一个像素不动）", /heroEl\.classList\.remove\("prof"\)/.test(MC));
+  t("种子改两列等宽栅格（flex-wrap 会排成锯齿）",
+    /\.wdsm-hero\.prof \.wdsm-egs\{display:grid;grid-template-columns:1fr 1fr/.test(M));
+  t("窄屏退成一列", /@media \(max-width:640px\)\{\.wdsm-hero\.prof \.wdsm-egs\{grid-template-columns:1fr\}\}/.test(M));
+  /* 可滚动容器里 justify-content:center，内容超高时上端会被切掉且滚不上去 */
+  t("开屏用 margin:auto 居中，不用 justify-content:center",
+    /\.wdsm-body\.empty>\.wdsm-hero\{margin:auto\}/.test(M) && /\.wdsm-body\.empty\{justify-content:flex-start\}/.test(M));
+
   t("种子问题点了就发（不是摆设）", /b\.onclick = function \(\) \{ inEl\.value = s;[\s\S]{0,80}send\(\); \}/.test(MC));
 }
 

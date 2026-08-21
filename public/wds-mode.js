@@ -1413,11 +1413,26 @@
     /* ── 对话区 ── */
     ".wdsm-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;position:relative}" +
     ".wdsm-body.empty{justify-content:center;align-items:center}" +
+    /* ⚠ flex 居中溢出的经典坑：可滚动容器里用 justify-content:center，内容一旦超过容器高度，
+       **上端会被切掉而且滚不上去**（滚动条只能往下走）。线上截图里 ChatJohn 的大标题被削掉半截
+       就是这个——ChatSDE 那一屏本来是空的，从没撞上过，我把开屏填满才撞出来。
+       正解是 margin:auto：内容装得下时照样居中，装不下时两端都留得住、滚得到。 */
+    ".wdsm-body.empty>.wdsm-hero{margin:auto}" +
+    ".wdsm-body.empty{justify-content:flex-start}" +
     ".wdsm-hero{max-width:680px;width:100%;margin:0 auto;padding:24px;text-align:center}" +
     ".wdsm-h1{font-family:'Songti SC','Noto Serif SC',serif;font-size:clamp(26px,5vw,40px);font-weight:600;color:var(--wtx2);margin:0 0 12px}" +
     ".wdsm-h1 .dot{color:var(--wteal)}" +
     ".wdsm-sub{color:var(--wdim);font-size:15px;line-height:1.7;margin:0 0 28px}" +
     ".wdsm-egs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}" +
+    /* 领域档案的开屏（.wdsm-hero.prof）：种子问题长短差很多，用 flex-wrap 会排成 1/2/1 的锯齿。
+       改成**两列等宽栅格**，一行两条、各占一半，长的自己换行；窄屏退成一列。
+       ⚠ 只作用在挂了档案的开屏上（.prof），ChatSDE 本体那一屏一个像素不动。 */
+    ".wdsm-hero.prof{padding:16px 24px 24px}" +
+    ".wdsm-hero.prof .wdsm-h1{margin:0 0 10px}" +
+    ".wdsm-hero.prof .wdsm-sub{max-width:560px;margin:0 auto;font-size:14.5px}" +
+    ".wdsm-hero.prof .wdsm-egs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px;align-items:stretch}" +
+    ".wdsm-hero.prof .wdsm-eg{height:100%;line-height:1.6;padding:12px 15px}" +
+    "@media (max-width:640px){.wdsm-hero.prof .wdsm-egs{grid-template-columns:1fr}}" +
     ".wdsm-eg{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);border-radius:12px;padding:10px 14px;font-size:13.5px;cursor:pointer;text-align:left;transition:border-color .15s}" +
     ".wdsm-eg:hover{border-color:var(--wline2)}" +
     ".wdsm-follow .pt{font-style:normal;font-size:10.5px;color:var(--wgold2);background:var(--wfill2);border:1px solid var(--wline);border-radius:5px;padding:2px 6px;margin-right:8px;white-space:nowrap;vertical-align:1px}" +
@@ -2042,13 +2057,22 @@
        所以档案带 hero 就铺一屏：一句招牌、一句它只做什么、几条点了就能开问的种子问题。
        ⚠ 种子问题必须是**点了就发**的真问题，不是标语——写成标语等于又铺了一屏空话。 */
     egsEl.innerHTML = "";
+    /* ⚠⚠ 结构要紧：标题／副题／脚注是 **.wdsm-hero 的直接子节点**，只有种子进 .wdsm-egs。
+       第一版把它们全塞进 egsEl，而 .wdsm-egs 是 `display:flex; flex-wrap:wrap` ——
+       标题当场变成一枚"超大芯片"参与折行，四个种子按各自宽度排成 1/2/1 的锯齿，
+       脚注也挤在同一条流里。线上截图里那个"排版很不美"就是这么来的。
+       💡 心法：**往一个现成容器里塞东西之前，先看它是什么布局**。
+          .wdsm-egs 是给一排小芯片用的，不是通用的插槽。 */
+    var heroEl = layer.querySelector(".wdsm-hero");
+    if (PROFILE && PROFILE.hero) heroEl.classList.add("prof"); else heroEl.classList.remove("prof");
+    var _old = heroEl.querySelectorAll(".wdsm-h1,.wdsm-sub,.wdsm-hero-after");
+    for (var _oi = 0; _oi < _old.length; _oi++) heroEl.removeChild(_old[_oi]);   // 重绘（切语言）不叠加
     if (PROFILE && PROFILE.hero) {
       var _hr = PROFILE.hero[LANG] || PROFILE.hero.zh || {};
-      var _box = el("div");
-      var _h1 = el("div", "wdsm-h1"); _h1.textContent = _hr.title || BRAND;
-      var _sb = el("div", "wdsm-sub"); _sb.textContent = _hr.sub || "";
-      _box.appendChild(_h1); _box.appendChild(_sb);
-      egsEl.appendChild(_box);
+      var _h1 = el("div", "wdsm-h1", _hr.title || BRAND);
+      var _sb = el("div", "wdsm-sub", _hr.sub || "");
+      heroEl.insertBefore(_sb, egsEl);
+      heroEl.insertBefore(_h1, _sb);
       var _seeds = PROFILE.seeds || [];
       for (var _si = 0; _si < _seeds.length; _si++) {
         (function (s) {
@@ -2058,7 +2082,7 @@
           egsEl.appendChild(b);
         })(_seeds[_si]);
       }
-      if (_hr.foot) { var _ft = el("div", "wdsm-hero-after", _hr.foot); egsEl.appendChild(_ft); }
+      if (_hr.foot) heroEl.appendChild(el("div", "wdsm-hero-after", _hr.foot));
     }
     paintModes(); updTurns();
     try { document.documentElement.lang = LANG; } catch (e) {}
