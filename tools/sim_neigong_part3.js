@@ -35,11 +35,21 @@ ok('长度过得了 loadNeigong 的 >3000 字节闸', Buffer.byteLength(p3) > 30
 ].forEach(function (x) { ok('含「' + x[0] + '」', p3.indexOf(x[1]) >= 0); });
 
 sec('二 · loadNeigong 真跑（抠出函数 + 打桩 ASSETS）');
-const m = src.match(/let NEIGONG = null;[\s\S]*?\nasync function loadNeigong\(env, url\) \{[\s\S]*?\n\}/);
+/* ⚠ 2026-08-21：原来的正则把**整串签名** `loadNeigong(env, url)` 与紧邻的 `let NEIGONG = null;`
+   一起钉死。领域档案给它加了第三个参数 path、又在中间插了 NEIGONG_BY_PATH 那个分档缓存，
+   正则当场配不上 ⇒ m 为 null ⇒ **整份 sim 崩掉**（不是红，是崩：看起来像环境问题）。
+   💡 本仓两条心法在这里同时应验：**钉字面的旧断言**（第六次）＋**会崩的护栏比会红的坏得多**。
+   ⇒ 改成按用意抠：从 `let NEIGONG = null;` 起，到 loadNeigong 函数体结束为止，
+     只认函数名，不认形参表；中间夹着什么声明都照收。 */
+const _a = src.indexOf('let NEIGONG = null;');
+const _f = src.indexOf('async function loadNeigong(', _a);
+const _e = src.indexOf('\n}', _f);
+const m = (_a >= 0 && _f > _a && _e > _f) ? [src.slice(_a, _e + 2)] : null;
 ok('抠得到 loadNeigong', !!m);
+ok('抠出来的括号是平的', !!m && m[0].split('{').length === m[0].split('}').length);
 function mkLoader() {
   // 每次重新 eval，拿到干净的模块级缓存
-  return eval('(function(){' + m[0].replace(/^let /, 'var ') + '\nreturn loadNeigong;})()');
+  return eval('(function(){' + m[0].replace(/^let /gm, 'var ').replace(/^const NEIGONG_BY_PATH/gm, 'var NEIGONG_BY_PATH') + '\nreturn loadNeigong;})()');
 }
 function mkEnv(map) {
   return { ASSETS: { fetch: function (req) {
@@ -58,6 +68,33 @@ const BASE = 'https://x/', A = 'A'.repeat(6000), C = 'C'.repeat(4000);
   f = mkLoader();
   r = await f(mkEnv({ '/taste/assets/sde-neigong.txt': A }), BASE);
   ok('第三部分读不到：退化为只有第一部分，不阻断开工', r === A);
+
+  /* ── 一档一份缓存（领域档案带自己的内功时）──
+     ⭐ 这是最容易静默串台的一处：NEIGONG 原来是**一个**模块级变量，
+        分档之后若还共用它，谁先冷启动谁那一份就被所有人复用，
+        表现是「ChatJohn 有时讲 SDE 黑话、有时不讲」——随冷启动飘，最难查。 */
+  const LITE = 'L'.repeat(7000);
+  f = mkLoader();
+  const envBoth = mkEnv({ '/taste/assets/sde-neigong.txt': A,
+                          '/taste/assets/sde-neigong-lite.txt': LITE,
+                          '/taste/assets/sde-collide-paradigm.txt': C });
+  const rFull = await f(envBoth, BASE);
+  const rLite = await f(envBoth, BASE, '/taste/assets/sde-neigong-lite.txt');
+  ok('同一个 isolate 里两档互不串台', rFull.indexOf(A) === 0 && rLite.indexOf(LITE) === 0);
+  ok('轻功档那一份不含满血那一份', rLite.indexOf(A) < 0);
+  ok('先取轻功档也不会污染满血那一档',
+    (await f(envBoth, BASE)).indexOf(A) === 0);
+  ok('两档都带上第三部分（碰撞法）', rFull.indexOf(C) > 0 && rLite.indexOf(C) > 0);
+  f = mkLoader();
+  const rBad = await f(envBoth, BASE, '/etc/passwd');
+  ok('路径不在白名单里就退回默认那一份（不许拿任意路径去取文件）', rBad.indexOf(A) === 0);
+  /* ⚠ 这条第一版用的是**全新 loader**：默认那一份根本没装过，返回空串是必然的，
+     于是「读不到就冒充默认那一份」这个变异照样绿。
+     💡 验「A 会不会被 B 冒充」，必须先让 B 真的在场——空着的缓存证明不了任何事。 */
+  f = mkLoader();
+  await f(mkEnv({ '/taste/assets/sde-neigong.txt': A }), BASE);          // 先把默认那一份装进缓存
+  const rMiss = await f(mkEnv({ '/taste/assets/sde-neigong.txt': A }), BASE, '/taste/assets/sde-neigong-lite.txt');
+  ok('这一档读不到就回空串，不拿默认那份冒充（由调用方出声）', rMiss === '', 'got ' + rMiss.slice(0, 12));
 
   f = mkLoader();
   r = await f(mkEnv({ '/taste/assets/sde-neigong.txt': 'x', '/taste/assets/sde-collide-paradigm.txt': C }), BASE);

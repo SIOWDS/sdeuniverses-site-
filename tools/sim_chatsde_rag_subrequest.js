@@ -23,7 +23,13 @@ const ok = (n, c, d) => { if (c) { pass++; console.log("  ✓ " + n); } else { f
 
 /* ═══ 一、/api/wds/rag 白名单与片段循环 ═══ */
 console.log("\n一、/api/wds/rag 白名单（加法式）");
-ok("pick 进了白名单并递给 ragScan", /pick \? \{ pick: pick \} : undefined/.test(SRC));
+/* ⚠ 原来钉的是 `pick ? { pick: pick } : undefined` 这一整串字面。2026-08-21 那行改成了
+   按需拼 opts（否则没传 pick 时会把领域档案的 keep 一起丢掉），字面没了、用意没变。
+   ⇒ 改成守用意：pick 进得了 opts，且 opts 不会在没传 pick 时退化成 undefined。 */
+ok("pick 进了 opts 并递给 ragScan", /if \(pick\) _o\.pick = pick;/.test(SRC)
+  && /ragScan\(env, url, q, expTerms, prevQ, K, chunkLimit \|\| 1600,/.test(SRC));
+ok("没传 pick 也不会把 opts 整个丢掉（keep 要活着）",
+  /Object\.keys\(_o\)\.length \? _o : undefined/.test(SRC));
 ok("abs / capkb / hits / hitskb 四个都在白名单里",
   /const abs = b\.abs === 1/.test(SRC) && /parseInt\(b\.capkb, 10\)/.test(SRC)
   && /parseInt\(b\.hits, 10\)/.test(SRC) && /parseInt\(b\.hitskb, 10\)/.test(SRC));
@@ -36,27 +42,57 @@ const LOOP = (a > 0 && b > a) ? SRC.slice(a, b) : "";
 ok("抠得到片段循环那一段", LOOP.length > 200);
 ok("抠出来的括号是平的", LOOP.split("{").length === LOOP.split("}").length);
 
+/* ⚠ 2026-08-21：这段循环新增了一个依赖 `wdsProfInScope`（领域档案的语料白名单）。
+   抠出来单跑时它不存在 ⇒ 整份 sim 当场 ReferenceError 崩掉、一条读数都没有。
+   💡 心法（本仓第二次）：**会崩的护栏比会红的护栏坏得多**——崩了看起来像环境问题，
+      没人会去想是产品代码变了。
+   喂的是**源码里那一份真实现**，不是在这里手写一个等价物：手写的那一份迟早与产品漂开，
+   而漂开之后这份 sim 会一直绿着。 */
+const SCOPE_FN = (() => {
+  const i = SRC.indexOf("function wdsProfInScope(");
+  const j = SRC.indexOf("\n}", i);
+  return i > 0 && j > i ? SRC.slice(i, j + 2) : "";
+})();
+ok("抠得到真的 wdsProfInScope", SCOPE_FN.length > 80);
+
 function runLoop(opt) {
   const picked = [];
   for (let i = 0; i < 30; i++) picked.push({ d: i, t: "段落" + i + "×".repeat(500) });
-  const docs = picked.map((x, i) => ({ u: "/a/" + i + "/", t: "篇" + i }));
+  // prof 传进来时，前 10 篇落在白名单内、其余在外——用来验"档案外的整块丢掉"
+  const docs = picked.map((x, i) => ({ u: (i < 10 ? "/keep/" : "/drop/") + i + "/", t: "篇" + i }));
   const box = { seen: {}, srcs: [], scan: { picked: picked, docs: docs }, url: "https://x.test/api/wds/rag" };
-  const fn = new Function("__b", "capKb", "cap", "kbBlock", "hitMax", "hitMaxKb", "abs",
-    "const seen=__b.seen, srcs=__b.srcs, scan=__b.scan, url=__b.url;\n" + LOOP +
-    "\nreturn { text: chunkText, n: nHit, srcs: srcs.length, cap: chunkCap };");
-  return fn(box, opt.capKb || 0, opt.cap, opt.kbBlock || "", opt.hitMax || 0, opt.hitMaxKb || 0, !!opt.abs);
+  const fn = new Function("__b", "capKb", "cap", "kbBlock", "hitMax", "hitMaxKb", "abs", "prof",
+    SCOPE_FN + "\nconst seen=__b.seen, srcs=__b.srcs, scan=__b.scan, url=__b.url;\n" + LOOP +
+    "\nreturn { text: chunkText, n: nHit, srcs: srcs.length, cap: chunkCap, srcU: srcs.map(function(s){return s.u;}) };");
+  return fn(box, opt.capKb || 0, opt.cap, opt.kbBlock || "", opt.hitMax || 0, opt.hitMaxKb || 0, !!opt.abs,
+            opt.prof || null);
 }
 const oldWay = runLoop({ cap: 30000, kbBlock: "K".repeat(5000) });
 ok("不传 capkb ⇒ 仍是旧算法 max(4000, cap-kb)（" + oldWay.cap + "）", oldWay.cap === 25000);
 ok("不传 hits ⇒ 条数不限（取到 " + oldWay.n + " 条）", oldWay.n > 20);
 ok("不传 abs ⇒ 源头行不带网址（旧行为）", oldWay.text.indexOf("http") < 0);
+
+/* —— 领域档案的语料白名单：真跑，不是查源码串 ——
+   💡「有没有做某件事」查源码串查得出，「做对没做对」只有真跑查得出（本仓已写过一次）。 */
+const noProf = runLoop({ cap: 30000, prof: null });
+ok("不带档案 ⇒ 一篇不滤（ChatSDE 本身照旧全站）", noProf.srcs === 30, "srcs=" + noProf.srcs);
+const withProf = runLoop({ cap: 30000, prof: { pre: ["/keep/"] } });
+ok("带档案 ⇒ 只剩白名单内那几篇（" + withProf.srcs + "）", withProf.srcs === 10);
+ok("正文里没有档案外的段落", withProf.text.indexOf("/drop/") < 0 && !/篇1[0-9]/.test(withProf.text));
+ok("出处与正文用同一份判据（出处里也没有档案外的）",
+  withProf.srcU.every((u) => u.indexOf("/keep/") >= 0), withProf.srcU.filter((u) => u.indexOf("/keep/") < 0).join(","));
+const emptyPre = runLoop({ cap: 30000, prof: { pre: [] } });
+ok("空白名单不过滤（宁可不滤，也不要静默滤成零）", emptyPre.srcs === 30, "srcs=" + emptyPre.srcs);
 const newKb = runLoop({ cap: 18000, capKb: 12000, kbBlock: "K".repeat(5000), hitMax: 28, hitMaxKb: 20, abs: 1 });
 ok("传 capkb 且有 KB 块 ⇒ 走 capkb 那一档（" + newKb.cap + "）", newKb.cap === 12000);
 ok("有 KB 块时条数上限走 hitskb（" + newKb.n + " ≤ 20）", newKb.n <= 20 && newKb.n > 0);
 const newNoKb = runLoop({ cap: 18000, capKb: 12000, kbBlock: "", hitMax: 28, hitMaxKb: 20, abs: 1 });
 ok("无 KB 块时预算走 cap（" + newNoKb.cap + "）", newNoKb.cap === 18000);
 ok("无 KB 块时条数上限走 hits（" + newNoKb.n + " ≤ 28）", newNoKb.n <= 28 && newNoKb.n > newKb.n);
-ok("传 abs ⇒ 源头行带绝对网址", /【来源：篇0｜https:\/\/x\.test\/a\/0\//.test(newNoKb.text));
+/* ⚠ 原来钉死了 fixture 的路径（/a/0/）。fixture 一改这条就红，而要守的事
+   （abs=1 时源头行带的是**绝对**网址）没变。改成只认「篇名后面跟着 http(s) 绝对网址」。 */
+ok("传 abs ⇒ 源头行带绝对网址", /【来源：篇0｜https?:\/\/[^】]+】/.test(newNoKb.text),
+   newNoKb.text.slice(0, 60));
 
 /* ═══ 二、ChatSDE 的站内检索走子请求 ═══ */
 console.log("\n二、/api/wds/chat 的站内检索");
