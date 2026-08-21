@@ -534,7 +534,36 @@ const WDS_PROFILES = {
     home: "https://lang.sdeuniverses.com/",
     all: "https://lang.sdeuniverses.com/all/",
     sys: JOHN_SYS,
-    scope: JOHN_SCOPE,
+    /* 【这一档自己的内功 —— 2026-08-21，用户交来轻功档 5,479 汉字】
+       ⭐ 先查清的一件事：**ChatSDE 答题这条路从来没装过完整内功**，它只挂一行 SDEM 骨架
+          （见 chat 端点里那个 SDEM）＋ reflect 心得。满血那份 14 万字只在 /api/ask 深度档、
+          写心得、陪读那几条路上装。
+       ⇒ 所以「给 lang 换内功」＝把那一行骨架换成这份 5 千字的轻功档。
+       为什么它对 ChatJohn 特别合适：轻功档第零条是**改姓爪硬纪律**（产出里 SDE 术语零容忍），
+       而 John 面对的是语言老师——他本来就不该讲 S/D/E 那套黑话。
+       ⚠ 不覆盖 /taste/assets/sde-neigong.txt：那一份被站上十几个智能体页面直接 fetch，
+         worker 里另有六处调用，覆盖它等于改动全站每一台机器。 */
+    neigong: "/taste/assets/sde-neigong-lite.txt",
+    /* 【白名单只有一种写法：网址前缀】
+       它要同时被两个地方用——SQLite 里的 `u LIKE ?`（候选阶段，DO 那条路）
+       与 JS 里的 substring（后置过滤，出处与正文共用）。
+       ⚠ 若这里放正则、那里放前缀，两份判据迟早对不上，而对不上的表现是
+       「正文引了一篇、出处里没有它」这种没人会当场发现的错。所以只留一种。
+       ⚠ 每条都带结尾斜杠：没有它，/books/m/62/ 会连 /books/m/620/ 一起收进来。
+       （旧 JOHN_SCOPE 那份正则仍归 /api/john/* 三个老端点用，两边互不影响。） */
+    pre: [
+      "/students/hu-zhiying/",
+      "/books/m/60/", "/books/m/62/", "/books/m/71/", "/books/m/77/",
+      "/column/pike-linguistics/",
+      "/confluence/evidence-responsibility-alignment/",
+      "/students/bao-jinchao/preemptive-compensation/",
+      "/students/huang-qianying/regenerative-boundary/",
+      "/students/jin-hua/grammar-shame/",
+      "/students/jin-hua/cognitive-recession/",
+      "/students/jin-hua/load-bearing-body/",
+      "/paradigm/civil-war-scar/",
+      "/paradigm/who-gets-to-settle/"
+    ],
     // 【怎么答】里那两条与人格绑死的，按档案换掉；链接规矩、数学写法、术语规矩等机制条款照旧共用。
     how1: "\n1. 像 John 本人：从一句具体的话入手，先诊断再建议，一句顶十句；给判断，不做资料复述员。",
     how3: "\n3. 站内资料不足、或读者只是想聊语言，就凭你的底本直接展开——Form-D-Meaning 与三条件能剖开任何一个语言现象，别拘泥站里有没有现成文章。",
@@ -556,9 +585,9 @@ function wdsProfileOf(x) {
 // 白名单判定单独抽一个函数：检索那一路与出处那一路必须用同一份判据，
 // 抄成两份就会有一天出处里出现一篇正文里根本没引到的文章。
 function wdsProfInScope(prof, u) {
-  if (!prof || !prof.scope || !prof.scope.length) return true;
+  if (!prof || !prof.pre || !prof.pre.length) return true;
   const s = String(u || "");
-  return prof.scope.some((re) => re.test(s));
+  return prof.pre.some((p) => s.indexOf(p) >= 0);
 }
 const WDS_VISION = {
   zhipu: ["glm-5v", "glm-4.6v"],
@@ -2833,6 +2862,16 @@ export class IndexMemory {
     const exp = (b.exp || []).slice(0, 40);
     const prev = (b.prev || []).slice(0, 40);
     const only = String(b.only || "");
+    /* 【领域档案的白名单下推到候选阶段 —— 2026-08-21】
+       ⭐ 病灶：白名单原来只在**取完 top-20 之后**滤。而 ChatJohn 的白名单约占全站 1%，
+          于是普通问法的前 20 名里一篇都轮不到，滤完就是零——线上实测
+          「后手生位」3 条、「语感 语法 胡志英」10 条，而「语感能不能教」**0 条**：
+          带专名的问法碰巧撞上，读者最常用的那种问法反而什么都查不到。
+       💡 心法：**后置过滤的命中率约等于白名单占总体的比例。** 白名单越窄，越必须
+          把它推到候选阶段去，而不是指望在全站前 N 名里碰运气。
+       这里推的是 `u LIKE ?`：先按白名单收窄，再在窄集合里排名次，pick 才拿得满。 */
+    const keep = (Array.isArray(b.keep) ? b.keep : []).slice(0, 40)
+      .map((x) => String(x || "").slice(0, 200)).filter(Boolean);
     const pick = Math.max(6, Math.min(64, b.pick | 0 || 16));
     const sc = new Map();
     const add = (i, v) => { sc.set(i, (sc.get(i) || 0) + v); };
@@ -2858,9 +2897,21 @@ export class IndexMemory {
     if (!sc.size) return { ok: true, cand: [], docs: [], secLabel: this._secLabel() };
     let cand = Array.from(sc.entries()).map(([i, v]) => ({ i: i, sc: v })).sort((a, b2) => b2.sc - a.sc);
     if (only) {
-      const keep = new Set();
-      for (const r of this.sql.exec("SELECT i FROM docs WHERE sec=?", only)) keep.add(r.i);
-      cand = cand.filter((c) => keep.has(c.i));
+      const keepSec = new Set();
+      for (const r of this.sql.exec("SELECT i FROM docs WHERE sec=?", only)) keepSec.add(r.i);
+      cand = cand.filter((c) => keepSec.has(c.i));
+    }
+    if (keep.length) {
+      /* 一次查出白名单覆盖的全部篇号，再拿它筛候选。
+         ⚠ 用 LIKE 而不是把网址取回来在 JS 里比：篇号集合通常只有一两百，
+           而候选列表可能上千——让 SQLite 做它擅长的那件事。
+         ⚠ 转义 % 与 _：网址里出现它们不算通配（现在没有，但这种事一旦发生是静默扩大白名单）。 */
+      const esc = (s) => String(s).replace(/[\\%_]/g, "\\$&");
+      const where = keep.map(() => "u LIKE ? ESCAPE '\\'").join(" OR ");
+      const args = keep.map((p) => "%" + esc(p) + "%");
+      const keepDoc = new Set();
+      try { for (const r of this.sql.exec("SELECT i FROM docs WHERE " + where, ...args)) keepDoc.add(r.i); } catch (e) {}
+      cand = cand.filter((c) => keepDoc.has(c.i));
     }
     cand = cand.slice(0, pick);
     // 只回候选那几篇的元数据——**不回全站 docs**。答题那一侧从此不再持有 4,488 篇的表。
@@ -3778,7 +3829,8 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
        （ok:false 的两种由来：桶没配、表还没建好。）*/
   let cand = null, docsArr = null, coords = null, secLabel = null, viaIdx = false;
   {
-    const lt = await idxAsk(env, { op: "query", baseKeys: baseKeys, exp: exp, prev: prev, only: o.only || "", pick: PICK_DOCS });
+    const lt = await idxAsk(env, { op: "query", baseKeys: baseKeys, exp: exp, prev: prev, only: o.only || "",
+                                   keep: o.keep || [], pick: PICK_DOCS });
     if (lt && lt.ok && (lt.cand || []).length) {
       docsArr = [];                             // 稀疏数组：调用方一直按 docs[编号] 取，形态不变
       for (const d of (lt.docs || [])) docsArr[d.i] = d;
@@ -3803,6 +3855,10 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   const man = await idxManifest(env, url);
   coords = await loadCoords(env, url);
   const SEC_FIRST = Math.max(1, Math.min(9, o.sections || 3));
+  /* 白名单模式下的动态放宽要**走全所有版块**：语言这条线横跨五个版块，
+     而 L0 按相关度只先挑三个——挑中的三个里可能一篇白名单文章都没有。
+     代价是多读几份篇层索引（kw/<sec>.json）；不这么做的代价是查不出东西。 */
+  const KEEP = (Array.isArray(o.keep) ? o.keep : []).filter(Boolean);
   // 限定版块（栏目内检索）：o.only = 版块 key（如 "frontier"）。
   // 只在 L0 选版块与 L1 候选篇这两处收窄；打分、下钻、选段一律照旧，
   // 这样栏目内问答与全站问答走的是同一条链，出问题只有一处要查。
@@ -3838,8 +3894,12 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
     const l1 = await tierGet(env, url, "/search/kw/" + se + ".json", se);
     if (!l1 || !l1.rows) return;
     for (const r of l1.rows) {
-      let sc = _scoreKeys(r.k, baseKeys, exp, prev);
       const d = man.docs[r.i];
+      /* 白名单在**打分之前**就把篇目挡掉（与 DO 那条路同一个位置：候选阶段）。
+         两条路必须在同一个阶段收窄，否则索引热不热会让读者看到两种表现，
+         而切换是自动发生的——那种飘忽最难查。 */
+      if (KEEP.length && !(d && KEEP.some((p) => String(d.u || "").indexOf(p) >= 0))) continue;
+      let sc = _scoreKeys(r.k, baseKeys, exp, prev);
       if (d) {
         const tl = d.tl || String(d.t || "").toLowerCase();   // tl 在 idxManifest 装载时就备好了：别每答一次就把全站标题重新小写一遍
         for (const key of baseKeys) if (tl.indexOf(key) >= 0) sc += 3;
@@ -3851,7 +3911,8 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   };
   for (let i = 0; i < SEC_FIRST && i < secRank.length; i++) await takeSection(secRank[i].s);
   // 动态放宽：候选篇不足就再拉两个版块，最多把全站版块走一遍
-  for (let i = SEC_FIRST; docScore.size < Math.max(6, PICK_DOCS / 2) && i < secRank.length; i += 2) {
+  const _needDocs = KEEP.length ? Math.max(PICK_DOCS, 24) : Math.max(6, PICK_DOCS / 2);
+  for (let i = SEC_FIRST; docScore.size < _needDocs && i < secRank.length; i += 2) {
     await takeSection(secRank[i].s);
     if (secRank[i + 1]) await takeSection(secRank[i + 1].s);
   }
@@ -4056,20 +4117,29 @@ let NEIGONG = null; // 完整 SDE 内功先验（模块级缓存，isolate 内�
 // 这一部分管"怎么造"，凡装内功的调用都该带着它——包括答题、成文、打磨、碰撞、综合提炼与写心得。
 // 唯一不带它的仍是 mode=iq（盲评者刻意裸机）——这恰好也是本部分自己要求的「评审不装心法」。
 // 独立文件、独立读取：改碰撞口径不必动全站共用的内功正文；读不到就退化为只有前面的部分，不阻断开工。
-async function loadNeigong(env, url) {
-  if (NEIGONG) return NEIGONG;
+/* 【一档一份缓存 —— 2026-08-21】领域档案可以带自己的内功（见 WDS_PROFILES 的 neigong）。
+   ⚠ 原来 NEIGONG 是**一个**模块级变量：一旦分档，谁先跑谁的那一份就会被所有人复用，
+     而表现是「ChatJohn 有时说 SDE 黑话、有时不说」——随冷启动飘，最难查的那一类。
+     ⇒ 按文件路径各存各的。 */
+const NEIGONG_BY_PATH = new Map();
+async function loadNeigong(env, url, path) {
+  const P = (typeof path === "string" && /^\/taste\/assets\/[a-z0-9.-]+\.txt$/.test(path))
+    ? path : "/taste/assets/sde-neigong.txt";
+  if (P === "/taste/assets/sde-neigong.txt" && NEIGONG) return NEIGONG;   // 老路径沿用老缓存，行为一字不变
+  if (NEIGONG_BY_PATH.has(P)) return NEIGONG_BY_PATH.get(P);
   try {
-    const t = await (await env.ASSETS.fetch(new Request(new URL("/taste/assets/sde-neigong.txt", url)))).text();
+    const t = await (await env.ASSETS.fetch(new Request(new URL(P, url)))).text();
     if (t && t.length > 5000) {
       let full = t;
       try {
         const c = await (await env.ASSETS.fetch(new Request(new URL("/taste/assets/sde-collide-paradigm.txt", url)))).text();
         if (c && c.length > 3000) full = t + "\n\n" + c;
       } catch (e2) {}
-      NEIGONG = full;
+      if (P === "/taste/assets/sde-neigong.txt") NEIGONG = full; else NEIGONG_BY_PATH.set(P, full);
+      return full;
     }
   } catch (e) {}
-  return NEIGONG || "";
+  return (P === "/taste/assets/sde-neigong.txt" ? NEIGONG : NEIGONG_BY_PATH.get(P)) || "";
 }
 // 内功第二部分：SDE 创新智商评估 Skill（SDE 对谈专用；第一部分＝上面的 SDE-FT-Skill 本体论先验）。
 // 独立成文件、独立缓存：改评分口径不必动全站共用的内功正文。读不到就退化为只有第一部分，不阻断开工。
@@ -7516,7 +7586,13 @@ export default {
          而这里 d.u 还在手上，判据只有一处。 */
       const prof = wdsProfileOf(b.prof);
       try {
-        const scan = await ragScan(env, url, q, expTerms, prevQ, K, chunkLimit || 1600, pick ? { pick: pick } : undefined);
+        /* opts 原来只在传了 pick 时才建。现在白名单也要走 opts，
+           所以按需拼一个——**别退回 undefined**，那会把 keep 一起丢掉（静默，且只在档案模式下发作）。 */
+        const _o = {};
+        if (pick) _o.pick = pick;
+        if (prof && prof.pre && prof.pre.length) _o.keep = prof.pre;
+        const scan = await ragScan(env, url, q, expTerms, prevQ, K, chunkLimit || 1600,
+                                   Object.keys(_o).length ? _o : undefined);
         const seen = {}, srcs = [];
         let kbBlock = "";
         /* 九库（结构化知识）在档案模式下**整块跳过**，并如实回报 kb:false。
@@ -8623,7 +8699,16 @@ export default {
               } catch (e) { controller.enqueue(_sseBytes({ t: "nbrfail", v: "error" })); }
             }
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
-            const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+            let SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+            /* 领域档案可以带自己那一份内功，装上就顶掉上面这一行骨架。
+               ⚠ 读不到**不许静默退回**——退回去以后它照样答得像模像样，只是底盘换了，
+                 而没有任何人会发现。本文件反复写的那条：静默降级＝把没做的事记成做过了。 */
+            if (prof && prof.neigong) {
+              let _pn = "";
+              try { _pn = await loadNeigong(env, url, prof.neigong); } catch (e) {}
+              if (_pn) SDEM = "\n\n" + _pn;
+              else controller.enqueue(_sseBytes({ t: "note", v: "这一档自己的内功文件这次没读到，本轮退回通用骨架作答（答案仍可用，但底盘不是 " + prof.name + " 那一份）。" }));
+            }
             const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof);
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，

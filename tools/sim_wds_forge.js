@@ -65,8 +65,25 @@ ok(!/FORGE_STAGES|FORGE_HEART/.test(F), "十八道工序表/心法漏进了前�
   ok(ps.length >= 18, "CO_OPS 条数对不上：" + ps.length);
   ok(ps.every(x => x.length < 400), "有共创动作的指令超过 400 字 —— 那是把产线伪装成一个动作，豁免不适用");
 }
+/* ⚠ 原来数的是「全文出现两次」。领域档案（WDSM_PROFILE）给分身加了第三张文案表，
+   这个数就变了——而要守的事（**每一张表里 zh/en 都得有**）没变，反而更该守：
+   profCopy 缺哪条就落回中文，英文界面上冒出一句中文，不报错也没人反馈。
+   ⇒ 改成逐表数：按 `zh: {` / `en: {` 把源码切段，每一段里有没有这个 key，zh 与 en 的份数要相等。 */
+function _pairs(src, k) {
+  const re = /\b(zh|en): \{/g;
+  const marks = []; let m;
+  while ((m = re.exec(src))) marks.push({ lang: m[1], at: m.index });
+  const has = { zh: 0, en: 0 };
+  const kre = new RegExp("\\b" + k + ":");
+  for (let i = 0; i < marks.length; i++) {
+    const seg = src.slice(marks[i].at, i + 1 < marks.length ? marks[i + 1].at : src.length);
+    if (kre.test(seg)) has[marks[i].lang]++;
+  }
+  return has;
+}
 ["tlForge", "tlForgeS", "fgTitle", "fgPlan", "fgSteps", "fgJudge"].forEach((k) => {
-  ok((F.match(new RegExp("\\b" + k + ":", "g")) || []).length === 2, k + " 中英两套文案都齐");
+  const _p = _pairs(F, k);
+  ok(_p.zh > 0 && _p.zh === _p.en, k + " 中英两套文案都齐（zh " + _p.zh + " / en " + _p.en + "）");
 });
 
 console.log("\n===== " + P + " PASS / " + X + " FAIL =====");

@@ -32,7 +32,14 @@ console.log("── ① 档案表与解析器 ───────────�
 
   t("认得 lang", !!lang && lang.id === "lang");
   t("lang 的人格就是 JOHN_SYS", !!lang && lang.sys === johnSys);
-  t("lang 的白名单就是 JOHN_SCOPE", !!lang && lang.scope === johnScope);
+  t("lang 的白名单是一串网址前缀", !!lang && Array.isArray(lang.pre) && lang.pre.length >= 8);
+  /* 白名单只准有**一种**写法：SQL 的 LIKE 与 JS 的 substring 共用同一份前缀表。
+     两种写法（比如这里放正则、DO 那边放前缀）迟早对不上，而对不上的表现是
+     「正文引了一篇、出处里没有它」——没人会当场发现。 */
+  t("档案里不再另存一份正则白名单", !!lang && lang.scope === undefined);
+  t("每条前缀都带结尾斜杠（否则 /books/m/62/ 会连 620 一起收）",
+    !!lang && lang.pre.every((x) => /\/$/.test(x)), (lang.pre || []).filter((x) => !/\/$/.test(x)).join(","));
+  t("前缀都是站内绝对路径", !!lang && lang.pre.every((x) => x.charAt(0) === "/"));
   t("lang 带题域闸", !!lang && /题域闸/.test(lang.guard || ""));
 
   // 认不出的 key 一律 null＝退回 ChatSDE。含原型链上的名字——不 hasOwnProperty 就会被它们喂出对象。
@@ -59,7 +66,64 @@ console.log("── ① 档案表与解析器 ───────────�
   t("不收别的专著", !inS("/books/m/83/"));
   t("绝对网址同样判得出", inS("https://lang.sdeuniverses.com/students/hu-zhiying/a/"));
   t("没档案时不过滤（ChatSDE 本身照旧全站）", S.wdsProfInScope(null, "/anything/") === true);
-  t("空白名单也不过滤", S.wdsProfInScope({ scope: [] }, "/anything/") === true);
+  t("空白名单也不过滤", S.wdsProfInScope({ pre: [] }, "/anything/") === true);
+  t("前缀不带斜杠的邻居不会被误收", !inS("/books/m/620/") && !inS("/books/m/771/"));
+
+  console.log("\n── ②b 白名单下推到候选阶段（治 K 饥饿）─────────");
+  /* ⭐ 线上实测过的病：白名单只在取完 top-20 之后滤，而它约占全站 1%，
+     于是「语感能不能教」返回 0 条，「后手生位」（带专名）却有 3 条。
+     后置过滤的命中率≈白名单占总体的比例 —— 必须推到候选阶段。 */
+  t("rag 端点把前缀递进 ragScan", /_o\.keep = prof\.pre;/.test(WC));
+  t("opts 不会因为没传 pick 就把 keep 一起丢掉", /Object\.keys\(_o\)\.length \? _o : undefined/.test(WC));
+  t("ragScan 把 keep 递给 DO", /keep: o\.keep \|\| \[\]/.test(WC));
+  t("DO 侧按 u LIKE 收窄候选", /u LIKE \? ESCAPE/.test(WC) && /keepDoc\.has\(c\.i\)/.test(WC));
+  t("DO 侧收窄排在 slice(0, pick) 之前", WC.indexOf("keepDoc.has(c.i)") < WC.indexOf("cand = cand.slice(0, pick);"));
+  /* ⚠ 这条第一版写成正则字面量去匹配一段**本身满是反斜杠**的源码，反斜杠层数当场数错、假红。
+     💡 判一段含转义的代码，用 indexOf 比字符串，别再套一层正则去数反斜杠。 */
+  t("DO 侧转义 % 与 _（网址里出现它们不算通配）",
+    WC.indexOf('const esc = (s) => String(s).replace(/[\\\\%_]/g, "\\\\$&");') > 0);
+  // 旧路（索引没热时）必须在**同一个阶段**收窄，否则索引热不热会让读者看到两种表现
+  const scanSeg = WC.slice(WC.indexOf("async function ragScan("), WC.indexOf("async function ragScanShards("));
+  t("旧路也在打分之前挡掉档案外的篇目", /if \(KEEP\.length && !\(d && KEEP\.some\(/.test(scanSeg));
+  const posKeep = scanSeg.indexOf("if (KEEP.length && !(d &&");
+  const posScore = scanSeg.indexOf("let sc = _scoreKeys(r.k, baseKeys, exp, prev);");
+  t("旧路的收窄真的排在打分之前", posKeep > 0 && posScore > 0 && posKeep < posScore);
+  t("白名单模式下动态放宽会走更多版块", /KEEP\.length \? Math\.max\(PICK_DOCS, 24\)/.test(scanSeg));
+  t("后置过滤仍在（候选收窄不取代它，两道都要）", /if \(!wdsProfInScope\(prof, d\.u\)\) continue;/.test(WC));
+}
+
+console.log("\n── ②c 这一档自己的内功 ─────────────────────────");
+{
+  const seg = W.slice(W.indexOf("const WDS_PROFILES = {"), W.indexOf("function wdsProfileOf"));
+  const m = /neigong: "([^"]+)"/.exec(seg);
+  t("lang 带自己的内功", !!m, "(没有)");
+  t("内功指向轻功档，不是站上那份满血的", !!m && m[1] === "/taste/assets/sde-neigong-lite.txt", m && m[1]);
+  t("轻功档文件真的在", fs.existsSync("public" + (m ? m[1] : "")));
+  const lite = m && fs.existsSync("public" + m[1]) ? fs.readFileSync("public" + m[1], "utf8") : "";
+  t("轻功档过得了 loadNeigong 的 5000 字节闸", lite.length > 5000, "bytes=" + lite.length);
+  t("轻功档确实是轻的（不到满血那份的四分之一）",
+    lite.length > 0 && lite.length < fs.readFileSync("public/taste/assets/sde-neigong.txt", "utf8").length / 4);
+  t("轻功档自带改姓纪律（John 不该对语言老师讲 S/D/E）", /改姓/.test(lite) && /术语/.test(lite));
+  // ⚠ 没覆盖站上那份满血的：它被十几个页面直接 fetch，覆盖＝改动全站每一台机器
+  /* ⚠ 第一版拿字符数 >100000 当判据，假红：文件 141,758 **字节**，而中文一个字三字节，
+     读成 utf8 字符串只有约 5 万字符。💡 判「文件有没有被动过」不要用长度猜——**问 git**。 */
+  const gitDirty = require("child_process")
+    .execSync("git status --porcelain public/taste/assets/sde-neigong.txt", { encoding: "utf8" }).trim();
+  t("没有动站上那份满血内功（它被十几个页面直接 fetch）", gitDirty === "", gitDirty);
+
+  /* ⭐ 最容易静默串台的一处：NEIGONG 原来是**一个**模块级变量。
+     分档之后若仍共用它，谁先冷启动谁那一份就被所有人复用，
+     表现是「ChatJohn 有时讲 SDE 黑话、有时不讲」——随冷启动飘。 */
+  t("内功按路径分档缓存", /const NEIGONG_BY_PATH = new Map\(\)/.test(WC));
+  t("loadNeigong 收得下路径参数", /async function loadNeigong\(env, url, path\)/.test(WC));
+  t("路径白名单（不许拿任意路径去取文件）", /\^\\\/taste\\\/assets\\\/\[a-z0-9\.-\]\+\\\.txt\$/.test(WC));
+  t("老路径仍走老缓存（本体行为一字不变）",
+    /if \(P === "\/taste\/assets\/sde-neigong\.txt" && NEIGONG\) return NEIGONG;/.test(WC));
+  // 答题处：装上就顶掉那一行骨架；读不到要出声
+  const sdemSeg = WC.slice(WC.indexOf("let SDEM ="), WC.indexOf("let SDEM =") + 1200);
+  t("答题处按档案换内功", /if \(prof && prof\.neigong\)/.test(sdemSeg));
+  t("装上就顶掉那一行骨架", /if \(_pn\) SDEM = /.test(sdemSeg));
+  t("读不到不静默退回，要出声", /else controller\.enqueue\(_sseBytes\(\{ t: "note"/.test(sdemSeg));
 }
 
 console.log("\n── ③ 隔离：客户端只能递一个 key ─────────────────");
@@ -165,6 +229,30 @@ console.log("\n── ⑥ 外观：品牌与工序子集 ───────�
     langKeys.filter((k) => allKeys.indexOf(k) < 0).join(","));
   t("语言版留下的工序不为空", langKeys.length >= 6, "n=" + langKeys.length);
   t("产线（forge）给了语言版", langKeys.indexOf("forge") >= 0);
+
+  /* 文案覆盖层：t() 前面那一道。守两件事——覆盖的是读者看得见的那几条，
+     且 zh/en 必须成对（profCopy 缺哪条就落回中文，英文界面上会冒出中文）。 */
+  t("t() 前面挂了档案覆盖", /function profCopy\(k\)/.test(MC) && /var pc = profCopy\(k\);/.test(MC));
+  t("缺条落回原表，不空白", /if \(pc !== undefined\) return pc;/.test(MC));
+  const copySeg = M.slice(M.indexOf("copy: {"), M.indexOf("var PROFILE = (function"));
+  /* ⚠ 切段起点要跳过 `zh: {` 那一行本身，否则 "zh" / "en" 自己会被当成一个文案 key
+     （第一版就这么报了一条 ← zh 的假红）。 */
+  const _zi = copySeg.indexOf("zh: {"), _ei = copySeg.indexOf("en: {");
+  const zhSeg = copySeg.slice(_zi + 5, _ei);
+  const enSeg = copySeg.slice(_ei + 5);
+  const keysOf = (s) => (s.match(/(^|[\s{,])([a-zA-Z][a-zA-Z0-9]*): /g) || []).map((x) => x.trim().replace(":", ""));
+  const zhK = keysOf(zhSeg), enK = keysOf(enSeg);
+  t("档案文案表两边都不空", zhK.length >= 8 && enK.length >= 8, "zh=" + zhK.length + " en=" + enK.length);
+  const missing = zhK.filter((k) => k !== "egs" && enK.indexOf(k) < 0);
+  t("每条中文覆盖都有对应英文", missing.length === 0, missing.join(","));
+  t("覆盖了读者一眼看到的那几条",
+    ["ph", "note", "setKeyP", "tlBtn"].every((k) => zhK.indexOf(k) >= 0));
+  t("没去动机制性文案（复制/停止/重答那些）",
+    ["aCopy", "aRegen", "aStop", "aEdit"].every((k) => zhK.indexOf(k) < 0));
+  // 开屏：分身必须自报家门，否则读者不知道它只谈什么、该怎么问
+  t("档案带开屏", /hero: \{/.test(copySeg) || /hero: \{/.test(M.slice(M.indexOf("seeds: ["), M.indexOf("copy: {"))));
+  t("开屏渲染接上了 seeds", /PROFILE\.seeds \|\| \[\]/.test(MC));
+  t("种子问题点了就发（不是摆设）", /b\.onclick = function \(\) \{ inEl\.value = s;[\s\S]{0,80}send\(\); \}/.test(MC));
 }
 
 console.log("\n── ⑦ 壳页接线 ─────────────────────────────────");

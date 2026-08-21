@@ -69,7 +69,75 @@
         "学生语法全会，一开口还是生硬，问题出在哪？",
         "语感到底能不能教？给我一个明天就能用的练习。",
         "《红楼梦》里那些对话为什么一读就知道是谁在说？"
-      ]
+      ],
+      /* 开屏。分身必须自报家门——读者不知道它只谈语言，也不知道该怎么问它。 */
+      hero: {
+        zh: {
+          title: "ChatJohn",
+          sub: "语言发生学 · John（胡志英）。只谈语言、语感、语法、语言教学与习得——从你手上那一句具体的话开始。",
+          foot: "答案会带语言分站的出处。用你自己的大模型 Key 运行，Key 只存在这台设备的浏览器里。"
+        },
+        en: {
+          title: "ChatJohn",
+          sub: "Language genesis, with John (Hu Zhiying). Grammar, feel for language, teaching and acquisition — starting from one real sentence you have in hand.",
+          foot: "Answers cite the language subsite. Runs on your own model key, kept only in this browser."
+        }
+      },
+      /* ⭐ 界面文案覆盖。**只改带产品口音的那几条**——招牌、输入框、工序、底注、设置面板、
+         档位提示。复制/停止/重答/字数/错误诊断那些机制性文案一个字不动：
+         它们与题域无关，改了只会让两边慢慢漂成两套说法，而没人说得清哪套算数。 */
+      copy: {
+        zh: {
+          ph: "说一句具体的话——一个病句、一堂课、一个学生的问题…",
+          note: "ChatJohn 只答语言、语感、语法、语言教学与习得，答案扣着语言分站的原文，可核验的篇名与引文请以原文为准。用你自己的大模型 Key 运行：Key 存在你这台机器上，调用时经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析。",
+          setKeyP: "ChatJohn 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 保存在你这台机器上；调用时会经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。",
+          tlBtn: "⊞ 语言工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
+          tipDeep: "满血基底＋满功率思考＋语言发生学全套工序，慢但深",
+          srcSite: "语言分站文献",
+          /* 工序的**名字与副题**换成语言老师听得懂的话；**动作一个字不改**——
+             后端那份工序提示语共用同一份，改了就成了两件不同的东西，
+             而没人说得清「ChatJohn 的母题」和「ChatSDE 的母题」哪一个才算数。
+             这里换的只是它在菜单里怎么自我介绍。 */
+          tlIq: "这一篇有多新", tlIqS: "五维打分＋它在已有说法里站在哪＋三条能提上去的路",
+          tlThree: "三个角度各看一遍", tlThreeS: "结构／过程／处境各答一遍，再互相纠错出一句",
+          tlMotif: "找出那条主绳", tlMotifS: "把这一场和你传的材料压成一句反直觉的判断",
+          tlNbr: "这话别人说过没有", tlNbrS: "找出最像的既有说法，逐条讲清你和他差在哪",
+          tlRename: "写成同行的话", tlRenameS: "改写成语言学／教学的母语，不留一个外来术语",
+          tlGap: "找那个还没有名字的东西", tlGapS: "读出现有说法漏掉的那一处，造一个词去填",
+          tlCollide: "三篇互相顶一顶", tlCollideS: "站内三篇彼此矛盾的文章，撞出一句新判断",
+          tlForge: "跨学科撞一条新判断", tlForgeS: "三家互撞的简版（整趟十八道用 /通融）",
+          tlWhat: "这到底是什么", tlWhatS: "三刀合看这个语言现象究竟是什么",
+          tlHow: "该怎么办", tlHowS: "三个落点合出一套明天就能用的做法",
+          tlWhy: "为什么会这样", tlWhyS: "推翻问题里那条没说出口的动力",
+          egs: [
+            "「他对这件事情进行了一个认真的思考。」——每条规则都对，为什么还是不对？",
+            "学生语法全会，一开口还是生硬，问题出在哪？",
+            "语感到底能不能教？给我一个明天就能用的练习。",
+            "《红楼梦》里那些对话为什么一读就知道是谁在说？"
+          ]
+        },
+        en: {
+          ph: "Give me one real sentence — a bad line, a lesson, a student's question…",
+          note: "ChatJohn answers only on language: grammar, feel for language, teaching and acquisition. It works from the language subsite; check titles and quotations against the originals. It runs on your own model key, kept only in this browser.",
+          setKeyP: "ChatJohn runs on your own model key. <b style=\"color:#C9A227\">The key is stored on your machine; each call relays it in memory through this site's edge service to the provider you chose. It is never written to a database, a log, or any analytics</b>; clear it whenever you like. Web search goes through Zhipu, so one Zhipu key covers both chat and search.",
+          tlBtn: "⊞ Language tools", tlTitle: "Which procedure this turn", tlNone: "No procedure (plain chat)",
+          /* ⚠ 中英必须成对。profCopy 缺哪条就落回中文——英文界面上冒出一句中文，
+             既不报错也没人反馈，正是那种能挂着半年的坏法。 */
+          tlIq: "How new is this?", tlIqS: "Five-dimension score, where it stands among existing claims, three ways up",
+          tlThree: "Three angles, one pass each", tlThreeS: "Structure / process / setting answer separately, then correct each other",
+          tlMotif: "Find the through-line", tlMotifS: "Compress this session and your files into one counter-intuitive claim",
+          tlNbr: "Has someone said this?", tlNbrS: "Find the nearest existing claims and say exactly where you differ",
+          tlRename: "Say it in the field's own words", tlRenameS: "Rewrite in the native language of linguistics or teaching, no imported jargon",
+          tlGap: "Find what has no name yet", tlGapS: "Locate what existing accounts miss, and coin a term for it",
+          tlCollide: "Let three pieces clash", tlCollideS: "Three contradictory pieces from this site, collided into one new claim",
+          tlForge: "Collide fields into a new claim", tlForgeS: "Short version of the three-way clash (full 18-stage run: /通融)",
+          tlWhat: "What is this, really?", tlWhatS: "Three cuts at what this language phenomenon actually is",
+          tlHow: "What do I do about it?", tlHowS: "Three angles combined into something usable tomorrow",
+          tlWhy: "Why does it happen?", tlWhyS: "Overturn the unspoken driver inside the question",
+          tipDeep: "Full model, full reasoning, the whole language-genesis toolchain — slow but deep",
+          srcSite: "From the language subsite"
+        }
+      }
     }
   };
   var PROFILE = (function () {
@@ -1122,7 +1190,24 @@
   }
   var LANG = langInit();
   // 先查主字典，再查 TX2（新功能的文案都写在 TX2 里，不去动那两坨大字典）
+  /* ⭐ 领域档案的文案覆盖挂在这里——t() 是全站唯一的取词口，改这一处，
+     整个界面就跟着换，不必去动那两坨字典，也不必复刻一份引擎。
+     纪律三条：
+     ① **只覆盖读者看得见、且带产品口音的那几条**（招牌、示例问题、输入框、
+        工序名、底注、设置面板）。机制性文案（复制/停止/重答/字数/错误诊断）
+        一个字不改——它们与题域无关，改了只会两边漂移。
+     ② 覆盖表按 zh/en 分开；**缺哪条就落回原表**，不许因为漏译整条空白。
+     ③ 覆盖表是**数据**，不是代码：加一个分身＝加一张表，不改这个函数。 */
+  function profCopy(k) {
+    if (!PROFILE || !PROFILE.copy) return undefined;
+    var c = PROFILE.copy[LANG] || PROFILE.copy.zh;
+    if (c && (k in c)) return c[k];
+    if (PROFILE.copy.zh && (k in PROFILE.copy.zh)) return PROFILE.copy.zh[k];
+    return undefined;
+  }
   function t(k) {
+    var pc = profCopy(k);
+    if (pc !== undefined) return pc;
     var d = TXT[LANG] || TXT.zh;
     if (k in d) return d[k];
     if (k in TXT.zh) return TXT.zh[k];
@@ -1944,9 +2029,30 @@
     q(".wdsm-note").textContent = t("note");
     q(".wdsm-mic").title = t("micIdle");
     if (!inEl.disabled) inEl.placeholder = t("ph");
-    // 首屏不再铺示例问题（2026-07-31 用户指定去掉）。词条 egs 与容器 .wdsm-egs 都留着，
-    // 将来想换个形式再用不必从头写；这里只是不再往里塞东西。
+    /* 首屏：ChatSDE 本体不铺示例问题（2026-07-31 用户指定去掉，它有全站导航兜底）。
+       **领域档案不一样**：一个限定题域的分身，读者打开时既不知道它只谈什么，
+       也不知道该怎么问它——空屏对分身是个真损失，对本体不是。
+       所以档案带 hero 就铺一屏：一句招牌、一句它只做什么、几条点了就能开问的种子问题。
+       ⚠ 种子问题必须是**点了就发**的真问题，不是标语——写成标语等于又铺了一屏空话。 */
     egsEl.innerHTML = "";
+    if (PROFILE && PROFILE.hero) {
+      var _hr = PROFILE.hero[LANG] || PROFILE.hero.zh || {};
+      var _box = el("div");
+      var _h1 = el("div", "wdsm-h1"); _h1.textContent = _hr.title || BRAND;
+      var _sb = el("div", "wdsm-sub"); _sb.textContent = _hr.sub || "";
+      _box.appendChild(_h1); _box.appendChild(_sb);
+      egsEl.appendChild(_box);
+      var _seeds = PROFILE.seeds || [];
+      for (var _si = 0; _si < _seeds.length; _si++) {
+        (function (s) {
+          var b = el("button", "wdsm-eg", s);
+          b.type = "button";
+          b.onclick = function () { inEl.value = s; try { inEl.focus(); } catch (e) {} send(); };
+          egsEl.appendChild(b);
+        })(_seeds[_si]);
+      }
+      if (_hr.foot) { var _ft = el("div", "wdsm-hero-after", _hr.foot); egsEl.appendChild(_ft); }
+    }
     paintModes(); updTurns();
     try { document.documentElement.lang = LANG; } catch (e) {}
   }
