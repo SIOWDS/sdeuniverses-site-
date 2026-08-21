@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>语言发生学 · 胡志英</title>
+<meta name="description" content="关于语言的新思想生产平台：语感、语法、语言教学与习得。胡志英主持，SDE Universes 子平台。一部专著与十二篇长论文，创新智商 135–143。">
+<link rel="canonical" href="https://lang.sdeuniverses.com/">
+<meta property="og:title" content="语言发生学 · 胡志英">
+<meta property="og:description" content="关于语言的新思想生产平台：语感、语法、语言教学与习得。胡志英主持，SDE Universes 子平台。">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272;
+  --line:#CBCCD4; --indigo:#1F3A5F; --vermilion:#A63A2B;
+  --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.75;
+  background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:34px 100%;background-position:-1px 0;background-attachment:fixed;
+  background-blend-mode:multiply}
+body::before{content:"";position:fixed;inset:0;background:var(--paper);opacity:.88;z-index:-1}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:960px;margin:0 auto;padding:0 22px}
+
+/* 顶栏 */
+.top{border-bottom:1px solid var(--line);background:rgba(242,241,237,.92);
+  position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(6px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:56px}
+.brand{font-family:var(--serif);font-size:19px;letter-spacing:.14em;color:var(--indigo)}
+.brand em{font-style:normal;color:var(--ink2);font-size:12px;letter-spacing:.24em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:20px;font-size:13.5px;color:var(--ink2)}
+.top nav a:hover{color:var(--indigo)}
+.top nav a.out{font-family:var(--mono);font-size:12px}
+
+/* hero */
+.hero{padding:64px 0 34px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--indigo);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(29px,5.4vw,50px);line-height:1.3;
+  letter-spacing:.02em;margin:.5em 0 .38em;max-width:15em}
+.lede{max-width:38em;color:var(--ink2);font-size:16.5px}
+.lede b{color:var(--ink);font-weight:600}
+
+/* 签名件：批改单 */
+.proof{margin:38px 0 0;background:var(--card);border:1px solid var(--line);
+  box-shadow:0 1px 0 rgba(23,26,34,.05);position:relative;overflow:hidden}
+.proof .cap{display:flex;justify-content:space-between;align-items:baseline;
+  padding:14px 20px;border-bottom:2px solid var(--ink);font-family:var(--serif);letter-spacing:.1em}
+.proof .cap span{font-family:var(--mono);font-size:11.5px;color:var(--ink2);letter-spacing:.08em}
+.sent{padding:22px 20px 20px;border-bottom:1px solid var(--line);background:#fff}
+.sent q{font-family:var(--serif);font-size:clamp(18px,3.4vw,25px);letter-spacing:.06em;quotes:"「" "」"}
+.sent .mk{display:block;margin-top:9px;font-family:var(--mono);font-size:11.5px;
+  letter-spacing:.14em;color:var(--ink2)}
+table.chk{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px}
+table.chk th{text-align:left;font-weight:400;color:var(--ink2);font-size:11px;letter-spacing:.14em;
+  padding:9px 20px;border-bottom:1px solid var(--line)}
+table.chk td{padding:9px 20px;border-bottom:1px dashed var(--line);white-space:nowrap}
+table.chk td:first-child{font-family:var(--sans);font-size:13.5px;white-space:normal}
+table.chk td.j{color:var(--indigo)}
+table.chk tr.miss td{border-bottom:none;color:var(--vermilion);padding-top:16px;padding-bottom:18px}
+table.chk tr.miss td:first-child{font-family:var(--serif);font-size:17px;letter-spacing:.14em}
+.stamp{display:inline-block;border:1.5px solid var(--vermilion);color:var(--vermilion);
+  padding:2px 9px;font-size:11.5px;letter-spacing:.2em;transform:rotate(-3deg)}
+.proof tbody tr{opacity:0;animation:rise .5s ease forwards}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pnote{margin:12px 2px 0;font-size:12.5px;color:var(--ink2);font-family:var(--mono);line-height:1.7}
+@media (prefers-reduced-motion:reduce){.proof tbody tr{opacity:1;animation:none}}
+
+/* 数据带 */
+.band{display:flex;flex-wrap:wrap;gap:34px;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);padding:16px 0;margin:44px 0 0}
+.band div{font-family:var(--mono);font-size:12px;color:var(--ink2);letter-spacing:.1em}
+.band b{display:block;font-size:24px;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+
+/* 栏 */
+section{padding:56px 0 8px}
+.col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
+.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--indigo)}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
+
+.row{display:flex;gap:14px;align-items:baseline;padding:11px 4px;border-bottom:1px dashed var(--line)}
+.row:hover{background:var(--card)}
+.row:hover .r-t{color:var(--indigo)}
+.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:2.4em;
+  font-variant-numeric:tabular-nums;flex:none}
+.r-t{font-size:15px;line-height:1.6}
+.r-h{font-family:var(--serif);font-weight:600;letter-spacing:.06em;margin-right:.55em}
+.r-h::after{content:"·";margin-left:.55em;color:var(--line);font-weight:400}
+.iq{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+  font-variant-numeric:tabular-nums;padding-left:12px}
+.more{display:inline-block;margin:16px 0 0;font-family:var(--mono);font-size:12.5px;color:var(--indigo);
+  border-bottom:1px solid var(--indigo);padding-bottom:2px}
+
+/* 账册 */
+.books{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px;margin-top:26px}
+.bk{background:var(--card);border:1px solid var(--line);padding:0 0 18px;display:flex;flex-direction:column}
+.bk.lead{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(31,58,95,.07)}
+.bk img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;border-bottom:1px solid var(--line);background:#E6E7EC}
+.bk .no{font-family:var(--mono);font-size:11px;color:var(--vermilion);letter-spacing:.16em;margin:14px 16px 0}
+.bk h3{font-family:var(--serif);font-size:19px;letter-spacing:.08em;margin:6px 16px 2px;font-weight:600}
+.bk .sub{font-size:12.5px;color:var(--ink2);margin:0 16px 10px}
+.bk p{font-size:13.5px;color:var(--ink2);margin:0 16px 12px;line-height:1.7}
+.bk .lk{margin:auto 16px 0;display:flex;gap:14px;font-family:var(--mono);font-size:12px;flex-wrap:wrap}
+.bk .lk a{color:var(--indigo);border-bottom:1px solid var(--line);padding-bottom:2px}
+.bk .lk a:hover{border-color:var(--indigo)}
+
+/* 平台说明 / 团队位 */
+.plat{background:var(--card);border:1px solid var(--line);padding:28px 26px;margin-top:24px}
+.plat p{margin:0 0 14px;font-size:15px}
+.plat p:last-child{margin-bottom:0}
+.tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin:26px 0 0}
+.tk{border:1px solid var(--line);background:var(--card);padding:18px 18px 16px}
+.tk .n{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--indigo)}
+.tk h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:7px 0 6px;font-weight:600}
+.tk p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.7}
+.soon{margin-top:24px;border:1px dashed var(--line);background:transparent;padding:22px 22px 20px}
+.soon .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+  color:var(--vermilion);border:1px solid var(--vermilion);padding:1px 8px}
+.soon h3{font-family:var(--serif);font-size:18px;letter-spacing:.08em;margin:12px 0 6px;font-weight:600}
+.soon p{margin:0;font-size:14px;color:var(--ink2)}
+
+/* 关于 */
+.about{background:var(--card);border:1px solid var(--line);padding:28px 26px;margin-top:20px}
+.about p{margin:0 0 14px;font-size:15px}
+.about p:last-child{margin-bottom:0}
+
+footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 60px;
+  font-size:13px;color:var(--ink2)}
+footer a{color:var(--indigo);border-bottom:1px solid var(--line)}
+footer p{margin:0 0 8px}
+a:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+@media(max-width:640px){
+  .hero{padding:40px 0 24px}
+  table.chk td,table.chk th{padding-left:12px;padding-right:12px}
+  table.chk td.ref,table.chk th.ref{display:none}
+  .band{gap:22px}
+  .iq{display:none}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
+  <nav>
+    <a href="/#books">账册</a>
+    <a href="/#cols">栏目</a>
+    <a href="/#platform">平台</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<div class="hero">
+<div class="eyebrow">语言 · 新思想生产平台 · Language Genesis</div>
+<h1>每一条规则都通过了，<br>为什么这句话还是不对？</h1>
+<p class="lede">这里生产关于语言的新思想。<b>语感</b>不是把规则背得更熟，<b>语法</b>不是把形式守得更死，<b>语言教学</b>也不是把正确答案递得更快——三者共同压着的那个问题是：判定一句话「顺不顺」的那个东西，从来不在任何一张检查表上。本站沿三条线追这一件事：语言理论、语言教学、语言学习。</p>
+
+<div class="proof">
+  <div class="cap">校　对　单<span>逐项检查 · 结果如下</span></div>
+  <div class="sent"><q>他对这件事情进行了一个认真的思考。</q>
+    <span class="mk">送检句 · 无错别字 · 无病句标记</span></div>
+  <table class="chk">
+    <thead><tr><th>检查项</th><th>结果</th><th class="ref">依据</th><th>判读</th></tr></thead>
+    <tbody>
+      <tr style="animation-delay:0ms"><td>主谓宾完整</td><td>齐全</td><td class="ref">句法成分</td><td class="j">通过</td></tr>
+      <tr style="animation-delay:90ms"><td>动宾搭配</td><td>进行 + 思考</td><td class="ref">搭配词典</td><td class="j">通过</td></tr>
+      <tr style="animation-delay:180ms"><td>量词与修饰</td><td>一个 + 认真的</td><td class="ref">规范用法</td><td class="j">通过</td></tr>
+      <tr style="animation-delay:270ms"><td>时体标记</td><td>了</td><td class="ref">完成体</td><td class="j">通过</td></tr>
+      <tr style="animation-delay:360ms"><td>标点与字形</td><td>无误</td><td class="ref">校对规则</td><td class="j">通过</td></tr>
+      <tr class="miss" style="animation-delay:710ms"><td>语　感</td><td>（无此项）</td><td class="ref">—</td><td><span class="stamp">本栏未开</span></td></tr>
+    </tbody>
+  </table>
+</div>
+<p class="pnote">每一项都通过了，而没有人会这样说话——判定它不对的那个东西，检查表上没有它的位置。<br>本站要做的，就是把这一栏开出来：给它名目，给它读数，给它可以被推翻的说法。</p>
+
+<div class="band">
+  <div><b>12</b>语言长论文</div>
+  <div><b>4</b>部专著</div>
+  <div><b>55</b>万字</div>
+  <div><b>135–143</b>创新智商区间</div>
+</div>
+</div>
+
+<section id="books">
+  <div class="col-h"><span class="no">栏 一</span><h2>账册</h2><span class="ct">4 部</span></div>
+  <p class="col-d">四部专著，一部在语言上，三部在与语言相邻的地方——知与行、注意与世界、习得与归属。</p>
+  <div class="books">
+    <article class="bk lead">
+      <img src="/books/m/62/cover.jpg" alt="语言的智慧 封面" loading="lazy">
+      <div class="no">专著第 62 号 · 本站主件</div>
+      <h3>语言的智慧</h3>
+      <div class="sub">语法不是规则的集合，是差异的接力</div>
+      <p>一条规则怎样立起来、怎样把差异交给下一个载体、又怎样好好地死去——语法的智慧不在守成，在交接。</p>
+      <div class="lk"><a href="/students/hu-zhiying/wisdom-of-language/">导读</a><a href="/books/m/62/">书页</a><a href="/books/m/62/text/">分章读</a><a href="/books/m/62/read">翻页读</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/60/cover.jpg" alt="一花一世界 封面" loading="lazy">
+      <div class="no">专著第 60 号</div>
+      <h3>一花一世界</h3>
+      <div class="sub">注意力如何构成一个世界</div>
+      <p>被看见的那一朵与没有被看见的那一片，差别不在花上，在看的那一次是怎么发生的。</p>
+      <div class="lk"><a href="/students/hu-zhiying/one-flower-one-world/">导读</a><a href="/books/m/60/">书页</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/71/cover.jpg" alt="知行合一 封面" loading="lazy">
+      <div class="no">专著第 71 号</div>
+      <h3>知行合一</h3>
+      <div class="sub">知道模式与知行断裂的发生学重判</div>
+      <p>知道了却做不到，不是意志薄弱——是「知道」这件事本身被做成了一种可以不通向行动的模式。</p>
+      <div class="lk"><a href="/students/hu-zhiying/unity-of-knowing-and-acting/">导读</a><a href="/books/m/71/">书页</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/77/cover.jpg" alt="记到谁的账上 封面" loading="lazy">
+      <div class="no">专著第 77 号</div>
+      <h3>记到谁的账上</h3>
+      <div class="sub">习得的归属与代价</div>
+      <p>一个人学会的东西最后记在谁的账上，决定了他还愿不愿意再学第二次。</p>
+      <div class="lk"><a href="/students/hu-zhiying/the-ledger-of-acquisition/">导读</a><a href="/books/m/77/">书页</a></div>
+    </article>
+  </div>
+</section>
+
+<div id="cols"></div>
+
+<section>
+  <div class="col-h"><span class="no">栏 二</span><h2>语　感</h2><span class="ct">5 篇</span></div>
+  <p class="col-d">「顺」不是一种感觉，是一批还没有被删掉的判断。同一个问题的五次独立作答，五个不同的读数。</p>
+  <a class="row" href="/students/hu-zhiying/post-hand-slot/"><span class="r-n">1</span><span class="r-t"><b class="r-h">后手生位</b>一句话说完之后，对方还剩几条路</span><span class="iq">137</span></a>
+  <a class="row" href="/students/hu-zhiying/deformation-reserve/"><span class="r-n">2</span><span class="r-t"><b class="r-h">承变余裕</b>还能变多少，才是能力</span><span class="iq">137</span></a>
+  <a class="row" href="/students/hu-zhiying/heterochronic-layering/"><span class="r-n">3</span><span class="r-t"><b class="r-h">异时共层</b>此刻说话的，是你哪一层的语言</span><span class="iq">137</span></a>
+  <a class="row" href="/students/hu-zhiying/relational-landing/"><span class="r-n">4</span><span class="r-t"><b class="r-h">关系落类</b>一句话为什么会在不同关系中落成不同的东西</span><span class="iq">136</span></a>
+  <a class="row" href="/students/hu-zhiying/coadaptive-homing/"><span class="r-n">5</span><span class="r-t"><b class="r-h">共适归航</b>语言不是不偏航，而是能够在变化中归航</span><span class="iq">135</span></a>
+  <a class="more" href="/students/hu-zhiying/language-sense/">进语感频道 →</a>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">栏 三</span><h2>语　法</h2><span class="ct">4 篇</span></div>
+  <p class="col-d">规则从哪里取得改判权，又在哪里失去它。四篇合起来是一条规则的一生。</p>
+  <a class="row" href="/students/hu-zhiying/context-threshold/"><span class="r-n">1</span><span class="r-t"><b class="r-h">语法境阈体</b>环境从哪里开始有改判权，又从哪里失去</span><span class="iq">141</span></a>
+  <a class="row" href="/students/hu-zhiying/evidence-before-rule/"><span class="r-n">2</span><span class="r-t"><b class="r-h">语法先证体</b>规则尚未成立时，证据已经先到了</span><span class="iq">139</span></a>
+  <a class="row" href="/students/hu-zhiying/carrier-handover/"><span class="r-n">3</span><span class="r-t"><b class="r-h">语法载差体</b>语法不是守住形式，而是让差异找到新的载体</span><span class="iq">138</span></a>
+  <a class="row" href="/students/hu-zhiying/grammar-retirement/"><span class="r-n">4</span><span class="r-t"><b class="r-h">语法退役体</b>一条规则怎样好好地死去</span><span class="iq">138</span></a>
+  <a class="more" href="/students/hu-zhiying/grammar-talk/">进语法杂谈频道 →</a>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">栏 四</span><h2>语言教学与习得</h2><span class="ct">3 篇</span></div>
+  <p class="col-d">教得越准、纠得越快，学的人反而越早停下——这一栏追的是教学动作本身的代价。</p>
+  <a class="row" href="/students/hu-zhiying/algorithmic-entrenchment/"><span class="r-n">1</span><span class="r-t"><b class="r-h">算法闭环与生物代价</b>AI 时代幼少儿英语学习的神经语言学诊断</span><span class="iq">141</span></a>
+  <a class="row" href="/students/hu-zhiying/operational-enclosure/"><span class="r-n">2</span><span class="r-t"><b class="r-h">操作性收编</b>继承不可继承者的智识代价——以皮尔斯遗产为例</span><span class="iq">143</span></a>
+  <a class="row" href="/students/hu-zhiying/shelter-as-cage/"><span class="r-n">3</span><span class="r-t"><b class="r-h">庇护所即牢笼</b>语言石化现象的制度性生产机制</span><span class="iq">136</span></a>
+</section>
+
+<section id="platform">
+  <div class="col-h"><span class="no">栏 五</span><h2>这是一个平台，不是一个文集</h2></div>
+  <div class="plat">
+    <p>语言发生学是 <a href="https://sdeuniverses.com/" style="color:var(--indigo);border-bottom:1px solid var(--line)">SDE Universes</a> 的<b>垂直思想创新子平台</b>。它与主站共用同一套生产方法与同一条评分通道：一个判断要在这里立住，得先经过敌意拓宽（谁已经站在这个位置上）、可裁决预测（哪一种结果会推翻它）、以及独立盲评。</p>
+    <p>它做的不是把语言学已有的结论讲得更好懂，而是<b>生产此前不存在的语言判断</b>——给一个还没有名目的东西起名，给它一个可以被算出来的读数，再把它交给能推翻它的证据。</p>
+  </div>
+  <div class="tracks">
+    <div class="tk"><div class="n">线 一</div><h3>语言理论</h3><p>语感、语法、意义与话轮：把「说不上来但就是不对」变成可陈述、可推翻的命题。</p></div>
+    <div class="tk"><div class="n">线 二</div><h3>语言教学</h3><p>纠错、反馈、教材与课堂节奏：每一个教学动作都在取走一点什么，先把它算清楚。</p></div>
+    <div class="tk"><div class="n">线 三</div><h3>语言学习</h3><p>习得、石化、母语与二语：学习者身上真正在变的是什么，而考试量的是哪一个。</p></div>
+  </div>
+  <div class="soon">
+    <span class="tag">筹备中</span>
+    <h3>作者与团队</h3>
+    <p>本站将开放给在语言方向持续写作的作者：投稿、评分、建页与计分与主站同轨，分数由主站独立盲评通道出具。团队栏目开设后在此列出。</p>
+  </div>
+</section>
+
+<section id="about">
+  <div class="col-h"><span class="no">附</span><h2>关于主持人</h2></div>
+  <div class="about">
+    <p>胡志英，别号约翰（John），SDE 学员，英语教学与语言学习的长期实践者。跟随王德生博士研究 SDE 发生学，把这套方法用在语言、教育与认知上。</p>
+    <p>他的语言写作从一个具体的困惑起步：一句话每条规则都对，母语者仍然会说「不是这么说的」——那么被违反的究竟是什么。由此长出两条线，一条追问「顺」的判定凭什么发生（语感），一条追问规则本身怎样立起又怎样退役（语法）；近年延伸到 AI 时代的语言教学，追问算法即时纠错在孩子身上换走了什么。</p>
+    <p><a href="/students/hu-zhiying/" style="color:var(--indigo);border-bottom:1px solid var(--line)">作者主页与全部作品 →</a></p>
+  </div>
+</section>
+</div>
+
+<footer><div class="wrap">
+  <p>语言发生学 · 胡志英 —— <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站。全部篇目与主站同源，作者主页在 <a href="/students/hu-zhiying/">学员专栏 · 胡志英</a>。</p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+<script>
+/* 分站页面的自家链接写的是分站根（/、/#栏）。在二级域名下这就是对的；
+   若从主站以 /sites/lang/… 预览，则就地补上前缀，两处都能正常点。 */
+(function(){var b="/sites/lang";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

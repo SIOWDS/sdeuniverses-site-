@@ -11302,7 +11302,7 @@ export default {
     // 加一个分站 = 在 SUBSITES 里加一行，别处不用动。
     // 回落到主站内容时给一个 canonical 响应头，指回裸域名那一份，免得同一篇正文
     // 在两个域名下各算一次（搜索引擎按重复内容处理）。
-    const SUBSITES = { health: "/sites/health" };
+    const SUBSITES = { health: "/sites/health", lang: "/sites/lang" };
     const subHost = url.hostname.toLowerCase();
     const subPrefix = /\.sdeuniverses\.com$/.test(subHost) ? (SUBSITES[subHost.split(".")[0]] || null) : null;
     let resp = null;
