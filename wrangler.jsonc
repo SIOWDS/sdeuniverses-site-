@@ -19,6 +19,15 @@
   // 定时清 SDE 微信库：朋友圈附件只留 7 天（见 worker.js 的 wxSweep）。
   // 每天 04:17 UTC 跑一次；错开整点，免得和别人的 cron 挤在同一分钟。
   "triggers": { "crons": ["17 4 * * *"] },
+  /* 【计划档位与 limits】2026-08-21 09:14（新加坡）本账号由 Workers Free 升到 Workers Paid $5/月。
+     · CPU 时间/次调用：免费档 10ms → 付费档默认 30s（可加 "limits":{"cpu_ms":…} 提到 300000＝5 分钟）。
+       **这里故意不写 limits**：默认 30s 已经远够用，写死一个数反而会在某次长活上错。
+     · isolate 内存 128MB：**两档完全一样，$5 不动它**。历史上那几场 error 1102 全是内存峰值，
+       别指望升级能治——治它的是「永不整份 parse」「SELF 把检索拆出去单跑」「TIER 只用 etag 复验」。
+     · ⚠ 升级当天必须重新部署一次：升级前部署的版本可能仍按旧档执行限额
+       （Cloudflare 文档原话是「若仍撞旧限额就 redeploy，让用量挂到新计划上」）。本笔即为那次重部署。
+     · 🔴 付费档没有「超限当场报错」这道保险丝了，只会继续计费：CPU 每月含 3000 万 ms，
+       超出 $0.02/百万 ms。要盯就去 Notifications 加 Usage Based Billing 告警，或看 Billable Usage。 */
   "r2_buckets": [
     { "binding": "PDFS", "bucket_name": "sdeuniverses-pdf" }
   ],
