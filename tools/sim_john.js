@@ -75,3 +75,42 @@ t2("最多六段", pick(Array.from({length:20},()=>({d:2,t:"s"})),docs).length<=
 t2("空命中返回空", pick([],docs).length===0);
 console.log("scope pass",p2,"fail",f2);
 if(f2) process.exit(1);
+
+/* ── 概括成文：段数表与前后端一致性、分段拼接、字数闸 ── */
+const JOHN_COMPOSE={paper:{parts:4,per:2500},essay:{parts:2,per:2000},wechat:{parts:1,per:2000}};
+const fs2=require("fs");
+let p3=0,f3=0; const t3=(n,c)=>{console.log((c?"PASS":"FAIL"),n); c?p3++:f3++;};
+
+// 前端 KINDS 必须与后端 JOHN_COMPOSE 段数一致（两处对不上＝缺段或空转）
+const page=fs2.readFileSync("public/sites/lang/john/index.html","utf8");
+const m=page.match(/var KINDS=\{([\s\S]*?)\};/);
+t3("页面里有 KINDS 表", !!m);
+if(m){
+  for(const k of Object.keys(JOHN_COMPOSE)){
+    const re=new RegExp(k+":\\{n:(\\d+)");
+    const hit=m[1].match(re);
+    t3("段数一致 "+k, !!hit && Number(hit[1])===JOHN_COMPOSE[k].parts);
+  }
+}
+// 服务端 part 钳位
+const clampPart=(kind,part)=>{const K=JOHN_COMPOSE[kind]||JOHN_COMPOSE.wechat;
+  return Math.max(1,Math.min(K.parts,parseInt(part,10)||1));};
+t3("part 下限钳到1", clampPart("paper",0)===1);
+t3("part 上限钳到4", clampPart("paper",99)===4);
+t3("wechat 只有1段", clampPart("wechat",3)===1);
+t3("未知文体退回 wechat", clampPart("zzz",2)===1);
+// 对话长度闸
+const tooShort=(s)=>s.length<200;
+t3("过短对话被挡", tooShort("读者：你好\n\nJohn：你好"));
+t3("够长的放行", !tooShort("字".repeat(250)));
+// 超长对话的头尾压缩：保头2万、留尾4万，且总长下降
+const squeeze=(c)=>c.length>60000 ? (c.slice(0,20000)+"\n\n……（中间略）……\n\n"+c.slice(-40000)) : c;
+const big="A".repeat(100000);
+t3("超长对话被压缩", squeeze(big).length<70000 && squeeze(big).startsWith("A") && squeeze(big).endsWith("A"));
+t3("正常长度不动", squeeze("B".repeat(1000)).length===1000);
+// 短段告警阈值＝目标四成
+const warn=(kind,wrote)=>wrote>0&&wrote<Math.round(JOHN_COMPOSE[kind].per*0.4);
+t3("论文段写 900 字要告警", warn("paper",900));
+t3("论文段写 2400 字不告警", !warn("paper",2400));
+console.log("compose pass",p3,"fail",f3);
+if(f3) process.exit(1);

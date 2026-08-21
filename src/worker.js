@@ -414,6 +414,64 @@ const WDS_VENDORS = {
 //    读者选了它们又传图，我们如实说一句「这家看不了图」，绝不拿 OCR 出来的字冒充"它看过了"。
 //    每家给一个备用名：型号改名/下线时沿着阶梯自动退一格，而不是整条看图功能一起哑掉。
 //    默认核对于 2026-07-31。读者仍可在设置里覆盖（payload.vmodel）。
+/* 「概括成文」——把一场与 John 的对话收成一篇成品。三种文体、三套规格。
+   为什么分部：站上实测过，满功率首发预算超过 8000 就会一路想到被平台掐死（流干净结束、正文 0 字）。
+   所以长文一律拆成几趟，每趟 2000–2600 字，由前端顺次请求、自己拼接；接缝靠上一趟的尾巴传回来对齐。
+   ⚠ 改 PART 数时前端 COMPOSE_KINDS 必须成对改——两处段数不一致就会缺段或空转。 */
+const JOHN_COMPOSE = {
+  paper:  { parts: 4, per: 2500, label: "论文", total: "约一万字" },
+  essay:  { parts: 2, per: 2000, label: "散文", total: "约四千字" },
+  wechat: { parts: 1, per: 2000, label: "公众号文章", total: "约两千字" },
+};
+const JOHN_COMPOSE_SPEC = {
+  paper:
+    "【文体：学术论文，SDE 语言发生学体例】" +
+    "承重命题写成一句可被推翻的断言，最好是「X 不是 Y，而是 Z」那种否定—重命名的形状。" +
+    "结构：引子（从对话里那个具体的语言现象起手，不要从定义起手）→ 现象的重述与它为什么难办 → " +
+    "承重命题 → 用 Form-D-Meaning 与三条件把机制拆开 → 与已有说法的划界（指名道姓，说清两者预测在哪里相反）→ " +
+    "可裁决的预测与证伪条件（写成「若观测到 X，则本文作废」）→ 反向约束（哪些条件下本文不成立，至少两条）→ 余下的问题。" +
+    "全篇用小标题分节，每节一个可独立引用的判断。",
+  essay:
+    "【文体：散文】" +
+    "不讲道理，讲经验。从一个具体的场景、一个人、一句话开始，让读者先看见，再明白。" +
+    "可以有教室、有学生的脸、有窗外的声音、有你当时的犹豫。" +
+    "**通篇不许出现 S／D／E、Form-D-Meaning、三条件这些术语**——道理要藏在事情里，" +
+    "读者读完自己想到，比你说出来强。句子要有长短，段落要有呼吸。不写结论段，" +
+    "在一个具体的画面上收住。",
+  wechat:
+    "【文体：公众号文章】" +
+    "写给手机上刷到它的人。开头三句话之内必须出现一个他见过的具体场面（一个病句、一堂课、一个学生），" +
+    "抓不住就没人往下读。用小标题分段，每段不超过五行。多用短句。" +
+    "术语最多出现两个，出现就当场用大白话解释一句。" +
+    "**结尾给一个明天就能做的动作**，具体到「拿一句话、让学生说三遍、每遍换一个对象」这种程度。" +
+    "不喊口号，不煽情，不写「你学会了吗」这类互动尾巴。",
+};
+function johnComposeSys(kind, part, N, per, prevTail, ctx) {
+  const K = JOHN_COMPOSE[kind];
+  let s = JOHN_SYS +
+    "\n\n════ 现在换一件事做：把刚才这场对话收成一篇成品 ════\n" +
+    "读者已经和你聊完了，现在要你把这场对话里长出来的东西写成一篇**独立成立的文章**——" +
+    "不是把问答复述一遍，也不是写会议纪要。读者没看过这场对话也要能读懂。" +
+    "对话里那个最要紧的判断是什么，就把它立成全文的骨干；" +
+    "对话里没谈透而你知道的，可以补；对话里岔开的枝节，删掉。\n\n" +
+    JOHN_COMPOSE_SPEC[kind] + "\n\n" +
+    "【硬规矩】① **不许编造文献、数据、人名与站内篇名**——要引就只引下面站内材料里真出现过的那几篇，" +
+    "宁可不引也不许造。② 不许写「本文将分为三部分」这类导览句，直接开始。" +
+    "③ 不许在文末写「总之」「综上所述」。④ 用中文全角标点。";
+  if (N > 1) {
+    s += "\n\n【分段写作】本篇共分 " + N + " 段连续写成，本次写**第 " + part + " 段**（全篇" + K.total + "）。" +
+      (part === 1
+        ? "这是开头：直接进入正文，写标题（单独一行，不加「标题：」二字），然后往下写。"
+        : "接着上一段往下写，**不要重复已经写过的内容，不要重新开题，不要再写一次标题**。") +
+      (part === N ? "这是最后一段，要把全文收住。" : "写到本段该停的地方停住，后面还有。") +
+      "本段写满约 " + per + " 字，**在一个完整句子的句号之后停笔**——不许停在半句话或逗号上。";
+    if (prevTail) s += "\n\n【上一段的结尾（接着它往下写，别重复）】\n……" + prevTail;
+  } else {
+    s += "\n\n【长度】全篇约 " + per + " 字，一次写完。开头单独一行写标题（不加「标题：」二字）。";
+  }
+  if (ctx) s += "\n\n════ 可引用的站内材料（只有这些是真的，其余一律不许当成站内篇目引用）════\n" + ctx;
+  return s;
+}
 /* 「与 John 对话」的站内取料。语言站的语料＝胡志英全部作品 ＋ 站上其余语言篇目 ＋ 他的四部专著。
    为什么用白名单而不用 scope：scope 只能限定 manifest 里的**版块**（如 frontier），
    而语言这条线横跨 students / confluence / column / paradigm / books 五个版块，没有自己的版块 key。
@@ -9024,6 +9082,89 @@ export default {
 
     // /api/wds/ping：只验一次「这把 Key + 这个型号 + 这家地址」通不通，不产内容、不进检索、不计对话额度。
     // 存在的理由很实在：各家型号改名下线的节奏比本站改代码快，读者得能自己当场验证，而不是对着一句"基底返回错误"猜。
+    // ── /api/john/compose ─────────────────────────────────────────
+    // 「概括成文」：把一场与 John 的对话收成论文（约一万字·4 段）／散文（约四千字·2 段）／
+    // 公众号文章（约两千字·1 段）。每次请求写一段，前端顺次调用并自己拼接。
+    if (url.pathname === "/api/john/compose") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let cb = {}; try { cb = await request.json(); } catch (e) {}
+      const ckind = JOHN_COMPOSE[String(cb.kind || "")] ? String(cb.kind) : "wechat";
+      const CK = JOHN_COMPOSE[ckind];
+      const cpart = Math.max(1, Math.min(CK.parts, parseInt(cb.part, 10) || 1));
+      let cmsgs = Array.isArray(cb.messages) ? cb.messages : [];
+      cmsgs = cmsgs.filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim())
+                   .map((m) => (m.role === "user" ? "读者：" : "John：") + String(m.content).slice(0, 6000));
+      let convo = cmsgs.join("\n\n");
+      if (convo.length < 200) return Response.json({ ok: false, code: "too_short", msg: "先多聊几轮，聊出东西来了再成文。" }, { headers: _cors() });
+      if (convo.length > 60000) convo = convo.slice(0, 20000) + "\n\n……（中间略）……\n\n" + convo.slice(-40000);
+      const cav = await getActiveVendor(env);
+      if (!cav) return Response.json({ ok: false, code: "no_key", msg: "系统基底暂时不可用，稍后再试。" }, { headers: _cors() });
+      const CVC = { url: WDS_VENDORS[cav.vendor].url, model: cav.model || WDS_VENDORS[cav.vendor].model };
+      const cstream = new ReadableStream({
+        async start(controller) {
+          const send = (o) => { try { controller.enqueue(_sseBytes(o)); } catch (e) {} };
+          const t0 = Date.now();
+          // 心跳：出流前的取料与思考可能几十秒不吐一个字，没有心跳连接会被判死。
+          const hb = setInterval(() => send({ t: "beat", v: Math.round((Date.now() - t0) / 1000) }), 5000);
+          const clk = wdsClock(150000, 420000);
+          let wrote = 0;
+          try {
+            const cctx = await johnRag(env, url, convo.slice(-3000));
+            const csys = johnComposeSys(ckind, cpart, CK.parts, CK.per,
+              String(cb.prev || "").slice(-800), cctx);
+            send({ t: "meta", v: { kind: ckind, part: cpart, parts: CK.parts, label: CK.label } });
+            const up = await fetch(CVC.url, {
+              method: "POST",
+              headers: { "content-type": "application/json", authorization: "Bearer " + cav.key },
+              body: JSON.stringify({
+                model: CVC.model, stream: true, max_tokens: 6000, temperature: 0.8,
+                messages: [
+                  { role: "system", content: csys },
+                  { role: "user", content: "【这一场对话的全程记录】\n" + convo + "\n\n请开始写。" },
+                ],
+              }),
+              signal: clk.signal,
+            });
+            if (!up.ok || !up.body) { send({ t: "error", v: "基底返回 " + up.status }); }
+            else {
+              const rd = up.body.getReader(); const dec = new TextDecoder(); let buf = "", fin = false;
+              for (;;) {
+                const { value, done } = await rd.read();
+                if (done) break;
+                clk.firstFrame();
+                buf += dec.decode(value, { stream: true });
+                let nl;
+                while ((nl = buf.indexOf("\n")) >= 0) {
+                  const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1);
+                  if (!line || line.indexOf("data:") !== 0) continue;
+                  const pay = line.slice(5).trim();
+                  if (pay === "[DONE]") { fin = true; buf = ""; break; }
+                  try {
+                    const j = JSON.parse(pay);
+                    const d = j && j.choices && j.choices[0] && j.choices[0].delta;
+                    if (d && d.content) { wrote += d.content.length; send({ t: "d", v: d.content }); }
+                  } catch (e) {}
+                }
+                if (fin) break;
+              }
+            }
+          } catch (e) {
+            send({ t: "error", v: clk.cut ? clk.why("这一段") : ("服务端异常：" + ((e && e.message) || String(e))) });
+          }
+          try { clk.stop(); } catch (e) {}
+          try { clearInterval(hb); } catch (e) {}
+          // 写得过短要说出来——短于目标四成多半是被掐断了，别让前端把半截当成品。
+          if (wrote && wrote < Math.round(CK.per * 0.4)) send({ t: "note", v: "这一段只写了约 " + wrote + " 字，短于预期，可能被掐断了，建议重写这一段。" });
+          if (!wrote) send({ t: "error", v: "这一段没有写出内容，请重试。" });
+          send({ t: "fin", v: { part: cpart, parts: CK.parts, wrote: wrote, sec: Math.round((Date.now() - t0) / 1000) } });
+          try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); } catch (e) {}
+          try { controller.close(); } catch (e) {}
+        },
+      });
+      return new Response(cstream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
+    }
+
     // ── /api/john ─────────────────────────────────────────────────
     // 「与 John 对话」——语言发生学分站（lang.sdeuniverses.com/john/）的对话智能体。
     // 简单版：不做 RAG、不做记忆、不落库；一次请求 = 系统提示 + 前几轮 + 这一问，流式回。

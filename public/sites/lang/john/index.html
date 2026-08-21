@@ -58,6 +58,23 @@ a{color:inherit;text-decoration:none}
 @keyframes bl{50%{opacity:0}}
 .err{color:var(--vermilion);font-size:14px;font-family:var(--mono)}
 
+.compose{margin:0 0 22px;border:1px solid var(--edge);background:var(--night2)}
+.compose .hd{display:flex;align-items:baseline;gap:12px;padding:12px 16px;border-bottom:1px solid var(--edge)}
+.compose .hd b{font-family:var(--serif);font-size:15px;letter-spacing:.12em;color:#F4F2EC;font-weight:600}
+.compose .hd span{font-family:var(--mono);font-size:11px;color:var(--bone2);margin-left:auto}
+.compose .bd2{padding:18px 18px 20px;white-space:pre-wrap;word-break:break-word;font-size:15.5px;
+  color:#EDEBE4;font-family:var(--serif);line-height:1.95}
+.compose .act{display:flex;gap:10px;padding:0 16px 16px;flex-wrap:wrap}
+.compose .act button{border:1px solid var(--edge);background:rgba(255,255,255,.04);color:#C3C9D6;
+  font:inherit;font-size:12.5px;padding:6px 13px;cursor:pointer;font-family:var(--mono)}
+.compose .act button:hover{border-color:var(--indigo);color:#F4F2EC}
+.bar{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 18px;align-items:center}
+.bar .lb{font-family:var(--mono);font-size:11.5px;color:var(--bone2);letter-spacing:.14em}
+.bar button{border:1px solid var(--edge);background:rgba(255,255,255,.03);color:#C3C9D6;
+  font:inherit;font-size:13px;padding:7px 14px;cursor:pointer}
+.bar button:hover:not(:disabled){border-color:var(--jade);color:#F4F2EC}
+.bar button:disabled{opacity:.4;cursor:default}
+.bar button em{font-style:normal;color:var(--bone2);font-size:11.5px;margin-left:6px;font-family:var(--mono)}
 .dock{flex:none;border-top:1px solid var(--edge);background:rgba(11,14,20,.96);padding:14px 0 18px}
 .box{display:flex;gap:10px;align-items:flex-end;border:1px solid var(--edge);
   background:var(--night2);padding:10px 12px}
@@ -105,6 +122,12 @@ button:focus-visible,#q:focus-visible,a:focus-visible{outline:2px solid var(--in
 </div></div>
 
 <div class="dock"><div class="wrap">
+  <div class="bar" id="bar" hidden>
+    <span class="lb">概括成文</span>
+    <button type="button" data-kind="paper">论文<em>约 1 万字</em></button>
+    <button type="button" data-kind="essay">散文<em>约 4000 字</em></button>
+    <button type="button" data-kind="wechat">公众号文章<em>约 2000 字</em></button>
+  </div>
   <div class="box">
     <textarea id="q" rows="1" placeholder="说一句具体的话……（Enter 发送，Shift+Enter 换行）" aria-label="输入你的问题"></textarea>
     <button id="go" type="button">发送</button>
@@ -180,7 +203,7 @@ button:focus-visible,#q:focus-visible,a:focus-visible{outline:2px solid var(--in
       }
       return pump();
     }).then(function(){
-      if(acc) HIST.push({role:"assistant",content:acc});
+      if(acc){ HIST.push({role:"assistant",content:acc}); showBar(); }
       else { var e=document.createElement("div"); e.className="err"; e.textContent="⚠ 这一轮没有收到回答，请再问一次。"; out.parentNode.appendChild(e); }
       stop();
     }).catch(function(err){
@@ -188,6 +211,106 @@ button:focus-visible,#q:focus-visible,a:focus-visible{outline:2px solid var(--in
       e.textContent="⚠ "+((err&&err.message)||"网络中断了，请再试一次。");
       out.parentNode.appendChild(e); stop(); bottom();
     });
+  }
+
+  // ── 概括成文 ───────────────────────────────────────────────
+  // 段数必须与后端 JOHN_COMPOSE 一致；两处对不上就会缺段或空转。
+  var KINDS={paper:{n:4,label:"论文",total:"约一万字"},
+             essay:{n:2,label:"散文",total:"约四千字"},
+             wechat:{n:1,label:"公众号文章",total:"约两千字"}};
+  var bar=document.getElementById("bar");
+  function showBar(){ if(HIST.length>=4) bar.hidden=false; }
+
+  function compose(kind){
+    if(busy) return;
+    var K=KINDS[kind]; if(!K) return;
+    busy=true; go.disabled=true;
+    var bs=bar.querySelectorAll("button");
+    for(var i=0;i<bs.length;i++) bs[i].disabled=true;
+
+    var box=document.createElement("div"); box.className="compose";
+    var hd=document.createElement("div"); hd.className="hd";
+    var t=document.createElement("b"); t.textContent=K.label;
+    var st=document.createElement("span"); st.textContent="正在写…";
+    hd.appendChild(t); hd.appendChild(st);
+    var bd=document.createElement("div"); bd.className="bd2";
+    box.appendChild(hd); box.appendChild(bd); wrap.appendChild(box); bottom();
+
+    var full="", part=1;
+
+    function done(){
+      st.textContent=full.replace(/\s/g,"").length+" 字";
+      var act=document.createElement("div"); act.className="act";
+      var b1=document.createElement("button"); b1.type="button"; b1.textContent="复制全文";
+      b1.onclick=function(){
+        function ok(){ b1.textContent="已复制"; setTimeout(function(){b1.textContent="复制全文";},1600); }
+        if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(full).then(ok,fallback); }
+        else fallback();
+        function fallback(){ var ta=document.createElement("textarea"); ta.value=full;
+          ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
+          try{ document.execCommand("copy"); ok(); }catch(e){}
+          document.body.removeChild(ta); }
+      };
+      var b2=document.createElement("button"); b2.type="button"; b2.textContent="下载 .md";
+      b2.onclick=function(){
+        var blob=new Blob([full],{type:"text/markdown;charset=utf-8"});
+        var a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+        a.download=(K.label+"-"+new Date().toISOString().slice(0,10)+".md");
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(a.href); },4000);
+      };
+      act.appendChild(b1); act.appendChild(b2); box.appendChild(act);
+      busy=false; go.disabled=false;
+      for(var i=0;i<bs.length;i++) bs[i].disabled=false;
+      bottom();
+    }
+
+    function run(){
+      if(K.n>1) st.textContent="第 "+part+" / "+K.n+" 段 · 正在写…";
+      var got="";
+      fetch("/api/john/compose",{method:"POST",headers:{"content-type":"application/json"},
+        body:JSON.stringify({messages:HIST,kind:kind,part:part,prev:full.slice(-800)})
+      }).then(function(r){
+        if(!r.ok||!r.body){ return r.json().then(function(j){ throw new Error((j&&j.msg)||("HTTP "+r.status)); },
+                                                function(){ throw new Error("HTTP "+r.status); }); }
+        var rd=r.body.getReader(), dec=new TextDecoder(), buf="", fin=false;
+        function pump(){
+          return rd.read().then(function(s){
+            if(s.done||fin) return;
+            buf+=dec.decode(s.value,{stream:true});
+            var nl;
+            while((nl=buf.indexOf("\n"))>=0){
+              var line=buf.slice(0,nl).trim(); buf=buf.slice(nl+1);
+              if(!line||line.indexOf("data:")!==0) continue;
+              var pay=line.slice(5).trim();
+              if(pay==="[DONE]"){ fin=true; buf=""; break; }
+              try{ var j=JSON.parse(pay);
+                if(j.t==="d"&&j.v){ got+=j.v; full+=j.v; bd.textContent=full; bottom(); }
+                else if(j.t==="beat"&&!got){ st.textContent=(K.n>1?("第 "+part+" / "+K.n+" 段 · "):"")+"思考中 "+j.v+"s"; }
+                else if(j.t==="note"||j.t==="error"){
+                  var e=document.createElement("div"); e.className="err"; e.style.padding="0 18px 12px";
+                  e.textContent="⚠ "+j.v; box.appendChild(e); }
+              }catch(e){}
+            }
+            if(fin) return;
+            return pump();
+          });
+        }
+        return pump();
+      }).then(function(){
+        if(part<K.n&&got){ part++; full+="\n\n"; run(); }
+        else done();
+      }).catch(function(err){
+        var e=document.createElement("div"); e.className="err"; e.style.padding="0 18px 12px";
+        e.textContent="⚠ "+((err&&err.message)||"网络中断，请重试。"); box.appendChild(e);
+        done();
+      });
+    }
+    run();
+  }
+  var kb=bar.querySelectorAll("button");
+  for(var bi=0;bi<kb.length;bi++){
+    kb[bi].addEventListener("click",function(){ compose(this.getAttribute("data-kind")); });
   }
 
   go.addEventListener("click",function(){ ask(q.value); });
