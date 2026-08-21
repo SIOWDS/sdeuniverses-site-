@@ -9117,13 +9117,15 @@ export default {
             const up = await fetch(CVC.url, {
               method: "POST",
               headers: { "content-type": "application/json", authorization: "Bearer " + cav.key },
-              body: JSON.stringify({
+              // ⚠ 必须显式关思考。第一版没关，实测 56 秒后 reasoning_content 吃光 max_tokens、
+              //    正文回来 0 字、流还"干净地"结束——正是文件上方那条老教训的形状。
+              body: JSON.stringify(wdsPlainBody(CVC, {
                 model: CVC.model, stream: true, max_tokens: 6000, temperature: 0.8,
                 messages: [
                   { role: "system", content: csys },
                   { role: "user", content: "【这一场对话的全程记录】\n" + convo + "\n\n请开始写。" },
                 ],
-              }),
+              })),
               signal: clk.signal,
             });
             if (!up.ok || !up.body) { send({ t: "error", v: "基底返回 " + up.status }); }
