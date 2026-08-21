@@ -423,7 +423,12 @@ console.log("⑧ 成文（distill）");
   // 2026-08-01 再加第六档「总结载入的文章」（对标 SDE 对谈那台读一篇文章的能力）→ 九项。
   // 2026-08-12 再加第七档「两万字论文 · 一趟写完」（paper1，默认该选的那一个，
   //   分十六趟那一档留着做对照）→ 十项；同时「一万字」全线改名「两万字」。
-  ok(menu.children.length === 10, "菜单十项（报告/成文/两万字一趟/两万字十六趟/提纲/总结文章/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
+  // 2026-08-22 再加四档创作体（公众号3000/散文5000/短篇小说2000/诗歌500）→ 十四项。
+  //   ⚠ 这四档点下去**先开作家笔法面板**，不直接开写（见下面那一节）。
+  ok(menu.children.length === 14, "菜单十四项（七档 ＋ 四档创作体 ＋ 导出/选目录/成文记录），实得 " + menu.children.length);
+  ok(/公众号文章（3000字）/.test(menu.textContent) && /散文（5000字）/.test(menu.textContent)
+     && /短篇小说（2000字）/.test(menu.textContent) && /诗歌（500字）/.test(menu.textContent),
+    "四档创作体都在菜单里，且档名自带字数");
   ok(menu.textContent.indexOf("两万字") >= 0, "两万字论文那一档在菜单里");
   ok(/一趟写完|single pass/.test(menu.textContent) && /十六趟|sixteen passes/.test(menu.textContent),
     "一趟与十六趟两档并列（单趟是默认，十六趟作对照）");
@@ -441,6 +446,44 @@ console.log("⑧ 成文（distill）");
   ok(/<h[1-6]>/.test(htmlOf(dist.querySelector(".wdsm-a"))), "成文内容按 Markdown 渲染");
   dist.querySelector(".dx").click();
   ok(!document.body.querySelector(".wdsm-dist"), "成文面板可关闭");
+
+  /* ⑧之二 作家笔法（2026-08-22）：四档创作体点下去**先问用谁的笔法**，不直接开写。
+     ⚠ 这一节守的是那条最容易静默失效的链：选了作家 → id 进请求体 → 服务端才认得出。
+       中间任何一环断了都不报错，只是稿子不对味。 */
+  {
+    layer.querySelector(".wdsm-distbtn").click();
+    const m2 = document.body.querySelector(".wdsm-menu");
+    const story = [].slice.call(m2.children).find((b) => /短篇小说/.test(b.textContent));
+    ok(!!story, "菜单里点得到短篇小说");
+    story.click();
+    await new Promise((r) => setTimeout(r, 120));
+    const panel = document.body.querySelector(".wdsm-tplb");
+    ok(!!panel, "⭐ 点创作体先弹作家笔法面板，不是直接开写");
+    const names = [].slice.call(panel.querySelectorAll(".wdsm-tplitem"));
+    ok(names.length > 100, "面板里列出一百位以上（含「本色写」那一条），实得 " + names.length);
+    ok(/本色写|Plain/.test(panel.textContent), "第一条是「本色写（不模仿）」——不模仿是默认可走的路");
+    ok(/不搬原句/.test(htmlOf(panel)) || /No borrowed lines/.test(htmlOf(panel)),
+      "面板上明写「不搬原句、不借人物与情节」——读者要知道这是学手法不是抄");
+    const inp2 = panel.querySelector("input");
+    ok(!!inp2, "有筛选框（一百位平铺是一堵墙）");
+    const fire = () => (inp2._listeners.input || []).forEach((f) => f());
+    inp2.value = "契诃夫"; fire();
+    /* ⚠ 桩 DOM 的 htmlOf 只看 innerHTML，而这些条目的字是用 textContent 挂的（el(t,c,x)），
+       所以这里必须取 textContent——第一版取错了，红的是断言不是筛选。 */
+    const after = [].slice.call(panel.querySelectorAll(".wdsm-tplitem")).map((x) => x.textContent);
+    ok(after.length <= 3 && after.join("").indexOf("契诃夫") >= 0, "按中文名筛得出来，实得 " + after.join("、"));
+    inp2.value = "chekhov"; fire();
+    ok([].slice.call(panel.querySelectorAll(".wdsm-tplitem")).map((x) => x.textContent).join("").indexOf("契诃夫") >= 0,
+      "⭐ 按原名也筛得出来（想找 Chekhov 的人不该被中文名挡住）");
+    const pick = [].slice.call(panel.querySelectorAll(".wdsm-tplitem")).find((b) => /契诃夫/.test(b.textContent));
+    pick.click();
+    await new Promise((r) => setTimeout(r, 220));
+    ok(LAST_PAYLOAD.kind === "story" && LAST_PAYLOAD.style === "chekhov",
+      "⭐ 档位与笔法都进了请求体，实得 kind=" + LAST_PAYLOAD.kind + " style=" + LAST_PAYLOAD.style);
+    const d2 = document.body.querySelector(".wdsm-dist");
+    ok(!!d2 && /笔法：契诃夫|Hand: /.test(htmlOf(d2)), "面板抬头标出这一篇是用谁的笔写的");
+    if (d2) d2.querySelector(".dx").click();
+  }
 
   console.log("⑨ 导出本场");
   DOWNLOADS = [];

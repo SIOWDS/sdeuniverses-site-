@@ -657,6 +657,17 @@
       kPaper1: "凝成两万字论文 · 一趟写完", kPaper1S: "照金点子发生器那台已经跑熟的口径：**一次调用出全篇**，十六节体例写进提示语、字数服从内容（18000–22000 字），出 Word 与 PDF。写得快，中途不会停在某一节。",
       kPaper: "凝成两万字论文 · 分十六趟", kPaperS: "按《正规学术论文写作规范》十六节投稿体例：结构化中英摘要 · 研究问题 · 文献述评 · 概念界定 · 研究设计与方法 · 分析三节 · 可裁决判据 · 稳健性与证伪 · 效度威胁 · 声明组 · 参考文献与附录，约两万字（出 Word 与 PDF）",
       kSumdoc: "总结载入的文章", kSumdocS: "读完那篇：它在说什么 · 承重句 · 哪里脆 · 没看见什么 · 千字概写（需先载入文章）",
+      // 四档创作体（2026-08-22）。与上面几档的分别：那几档要判断立得住，这四档要读得下去。
+      kWechat: "公众号文章（3000字）", kWechatS: "开头三句必须有一个具体场面；小标题分段、短句、结尾给一个明天就能做的动作",
+      kProse: "散文（5000字）", kProseS: "不讲道理讲经验：从一个场面进去，道理藏在事里，收在一个具体画面上",
+      kStory: "短篇小说（2000字）", kStoryS: "一个场景、一到三个人；判断由情节自己撞出来，结尾不解决不点题",
+      kPoem: "诗歌（500字）", kPoemS: "一首长诗或三到五首短章；具体胜过抽象，不解释自己",
+      // 作家风格选择面板
+      wsPick: "要不要模仿一位作家的笔法？", wsNone: "本色写（不模仿）", wsNoneS: "按这台机器自己的口吻写",
+      wsNote: "学的是手法——句子的长短、意象的取法、视角与语气、留白的位置。**不搬原句、不借人物与情节**：题材仍全部来自这场对话。写出来要像他来写这件事，不是像他写过的那件事。",
+      wsSearch: "输入名字筛选…", wsNoHit: "没有这一位。可以换个写法找找，或选「本色写」。",
+      wsOn: "笔法：", wsCount: "共 100 位",
+      gZhmod: "中国现当代", gZhcls: "中国古典", gZhtw: "港台华语", gWest: "西方小说", gEast: "日本与东亚", gPoet: "诗歌", gEssay: "随笔与思想",
       mDocx: "\u2913 Word (.docx)", mDocxS: "把这一篇存成 Word 文档",
       mPdfx: "\u2913 PDF", mPdfxS: "把这一篇排成印刷稿并存成 PDF（打印框里把「目标」选成「另存为 PDF」）",
       mGoOn: "\u21bb 继续写缺的几节", mGoOnS: "扫描这一稿，只重跑没写够的那几节，写完插回原位（不动已经写好的）",
@@ -872,6 +883,15 @@
       kPaper1: "Forge a 20,000-word paper (single pass)", kPaper1S: "One call writes the whole thing, the way the idea generator already does it: all sixteen sections specified in the prompt, length serving content (18,000-22,000 characters). Exports to Word and PDF.",
       kPaper: "Forge a 20,000-word paper (sixteen passes)", kPaperS: "Sixteen sections in full submission format: structured bilingual abstract, research questions, literature review, conceptual definitions, design and methods, three analysis sections, a modal-free test, robustness and falsifiers, validity threats, declarations, references (exports to Word and PDF)",
       kSumdoc: "Read the loaded article", kSumdocS: "What it claims \u00b7 its load-bearing line \u00b7 where it is brittle \u00b7 a 1,000-word condensation",
+      kWechat: "Column piece (3,000 characters)", kWechatS: "A concrete scene in the first three lines; short sections, short sentences, one thing to do tomorrow",
+      kProse: "Personal essay (5,000 characters)", kProseS: "Experience, not argument: enter through a scene, keep the point inside the events, end on an image",
+      kStory: "Short story (2,000 characters)", kStoryS: "One scene, one to three people; the claim has to surface through what happens — no moral at the end",
+      kPoem: "Poem (500 characters)", kPoemS: "One long poem or a set of three to five; concrete over abstract, and no explaining itself",
+      wsPick: "Write it in a particular writer's hand?", wsNone: "Plain (no imitation)", wsNoneS: "In this agent's own voice",
+      wsNote: "What is borrowed is craft — sentence length and rhythm, how images are chosen, point of view and tone, where to leave things unsaid. **No borrowed lines, characters or plots**: the material still comes entirely from this conversation. It should read as if he were writing *this*, not as one of the things he wrote.",
+      wsSearch: "Type a name to filter…", wsNoHit: "No match. Try another spelling, or pick Plain.",
+      wsOn: "Hand: ", wsCount: "100 writers",
+      gZhmod: "Modern Chinese", gZhcls: "Classical Chinese", gZhtw: "Chinese diaspora", gWest: "Western fiction", gEast: "Japan & East Asia", gPoet: "Poetry", gEssay: "Essay & ideas",
       mDocx: "\u2913 Word (.docx)", mDocxS: "Save this piece as a Word document",
       dCloseBusy: "Still writing \u2014 clicking the backdrop will not close it, so a stray click cannot cost you the draft. Press Esc or the \u2715 at the top right; both save what has been written to your saved write-ups first.",
       mPdfx: "\u2913 PDF", mPdfxS: "Typeset this piece and save it as a PDF (choose \u201cSave as PDF\u201d in the print dialog)",
@@ -1936,6 +1956,168 @@
     m.appendChild(box);
     m.onclick = function (ev) { if (!ev || ev.target === m) { if (m.parentNode) m.parentNode.removeChild(m); } };
     document.body.appendChild(m);
+    return m;
+  }
+  /* ═══════════ 作家笔法（2026-08-22）═══════════
+     这张表**只有 id 与名字**——风格提示语在服务端 src/worker.js 的 WRITER_STYLES 里。
+     为什么不把提示语也放这儿：客户端能递的东西，任何人都能改；而"用谁的笔法写"
+     一旦可以由请求体自由填写，这台机器就成了写任何东西的机器（与领域档案同一条纪律）。
+     ⚠ 两份表的 id 集合必须逐条相等，tools/sim_wds_writers.js 会比对，对不上即红。 */
+  var WRITERS = [
+    { k: "luxun", n: "鲁迅", g: "zhmod" },
+    { k: "shencongwen", n: "沈从文", g: "zhmod" },
+    { k: "laoshe", n: "老舍", g: "zhmod" },
+    { k: "zhangailing", n: "张爱玲", g: "zhmod" },
+    { k: "wangzengqi", n: "汪曾祺", g: "zhmod" },
+    { k: "xiaohong", n: "萧红", g: "zhmod" },
+    { k: "qianzhongshu", n: "钱钟书", g: "zhmod" },
+    { k: "bajin", n: "巴金", g: "zhmod" },
+    { k: "maodun", n: "茅盾", g: "zhmod" },
+    { k: "linyutang", n: "林语堂", g: "zhmod" },
+    { k: "zhouzuoren", n: "周作人", g: "zhmod" },
+    { k: "zhuziqing", n: "朱自清", g: "zhmod" },
+    { k: "yuhua", n: "余华", g: "zhmod" },
+    { k: "moyan", n: "莫言", g: "zhmod" },
+    { k: "wanganyi", n: "王安忆", g: "zhmod" },
+    { k: "acheng", n: "阿城", g: "zhmod" },
+    { k: "jiapingwa", n: "贾平凹", g: "zhmod" },
+    { k: "chizijian", n: "迟子建", g: "zhmod" },
+    { k: "sutong", n: "苏童", g: "zhmod" },
+    { k: "gefei", n: "格非", g: "zhmod" },
+    { k: "wangxiaobo", n: "王小波", g: "zhmod" },
+    { k: "shitiesheng", n: "史铁生", g: "zhmod" },
+    { k: "muxin", n: "木心", g: "zhmod" },
+    { k: "zhangchengzhi", n: "张承志", g: "zhmod" },
+    { k: "lijuan", n: "李娟", g: "zhmod" },
+    { k: "simaqian", n: "司马迁", g: "zhcls" },
+    { k: "taoyuanming", n: "陶渊明", g: "zhcls" },
+    { k: "libai", n: "李白", g: "zhcls" },
+    { k: "dufu", n: "杜甫", g: "zhcls" },
+    { k: "baijuyi", n: "白居易", g: "zhcls" },
+    { k: "sushi", n: "苏轼", g: "zhcls" },
+    { k: "xinqiji", n: "辛弃疾", g: "zhcls" },
+    { k: "liqingzhao", n: "李清照", g: "zhcls" },
+    { k: "wangwei", n: "王维", g: "zhcls" },
+    { k: "hanyu", n: "韩愈", g: "zhcls" },
+    { k: "liuzongyuan", n: "柳宗元", g: "zhcls" },
+    { k: "caoxueqin", n: "曹雪芹", g: "zhcls" },
+    { k: "pusongling", n: "蒲松龄", g: "zhcls" },
+    { k: "guiyouguang", n: "归有光", g: "zhcls" },
+    { k: "zhangdai", n: "张岱", g: "zhcls" },
+    { k: "baixianyong", n: "白先勇", g: "zhtw" },
+    { k: "dongqiao", n: "董桥", g: "zhtw" },
+    { k: "longyingtai", n: "龙应台", g: "zhtw" },
+    { k: "yuguangzhong", n: "余光中", g: "zhtw" },
+    { k: "yaxian", n: "痖弦", g: "zhtw" },
+    { k: "tolstoy", n: "托尔斯泰（Tolstoy）", g: "west" },
+    { k: "dostoevsky", n: "陀思妥耶夫斯基（Dostoevsky）", g: "west" },
+    { k: "chekhov", n: "契诃夫（Chekhov）", g: "west" },
+    { k: "kafka", n: "卡夫卡（Kafka）", g: "west" },
+    { k: "proust", n: "普鲁斯特（Proust）", g: "west" },
+    { k: "hemingway", n: "海明威（Hemingway）", g: "west" },
+    { k: "faulkner", n: "福克纳（Faulkner）", g: "west" },
+    { k: "woolf", n: "伍尔夫（Woolf）", g: "west" },
+    { k: "joyce", n: "乔伊斯（Joyce）", g: "west" },
+    { k: "camus", n: "加缪（Camus）", g: "west" },
+    { k: "borges", n: "博尔赫斯（Borges）", g: "west" },
+    { k: "marquez", n: "马尔克斯（García Márquez）", g: "west" },
+    { k: "calvino", n: "卡尔维诺（Calvino）", g: "west" },
+    { k: "nabokov", n: "纳博科夫（Nabokov）", g: "west" },
+    { k: "munro", n: "门罗（Munro）", g: "west" },
+    { k: "mccarthy", n: "麦卡锡（McCarthy）", g: "west" },
+    { k: "ishiguro", n: "石黑一雄（Ishiguro）", g: "west" },
+    { k: "coetzee", n: "库切（Coetzee）", g: "west" },
+    { k: "oconnor", n: "奥康纳（O'Connor）", g: "west" },
+    { k: "carver", n: "卡佛（Carver）", g: "west" },
+    { k: "cheever", n: "契弗（Cheever）", g: "west" },
+    { k: "dickens", n: "狄更斯（Dickens）", g: "west" },
+    { k: "austen", n: "简·奥斯汀（Austen）", g: "west" },
+    { k: "gogol", n: "果戈里（Gogol）", g: "west" },
+    { k: "kawabata", n: "川端康成（Kawabata）", g: "west" },
+    { k: "soseki", n: "夏目漱石（Sōseki）", g: "east" },
+    { k: "tanizaki", n: "谷崎润一郎（Tanizaki）", g: "east" },
+    { k: "murakami", n: "村上春树（Murakami）", g: "east" },
+    { k: "dazai", n: "太宰治（Dazai）", g: "east" },
+    { k: "mishima", n: "三岛由纪夫（Mishima）", g: "east" },
+    { k: "homer", n: "荷马（Homer）", g: "poet" },
+    { k: "dante", n: "但丁（Dante）", g: "poet" },
+    { k: "shakespeare", n: "莎士比亚（Shakespeare）", g: "poet" },
+    { k: "keats", n: "济慈（Keats）", g: "poet" },
+    { k: "dickinson", n: "狄金森（Dickinson）", g: "poet" },
+    { k: "whitman", n: "惠特曼（Whitman）", g: "poet" },
+    { k: "rilke", n: "里尔克（Rilke）", g: "poet" },
+    { k: "eliot", n: "艾略特（Eliot）", g: "poet" },
+    { k: "yeats", n: "叶芝（Yeats）", g: "poet" },
+    { k: "neruda", n: "聂鲁达（Neruda）", g: "poet" },
+    { k: "szymborska", n: "辛波斯卡（Szymborska）", g: "poet" },
+    { k: "milosz", n: "米沃什（Miłosz）", g: "poet" },
+    { k: "frost", n: "弗罗斯特（Frost）", g: "poet" },
+    { k: "lorca", n: "洛尔迦（Lorca）", g: "poet" },
+    { k: "akhmatova", n: "阿赫玛托娃（Akhmatova）", g: "poet" },
+    { k: "celan", n: "策兰（Celan）", g: "poet" },
+    { k: "montaigne", n: "蒙田（Montaigne）", g: "essay" },
+    { k: "bacon", n: "培根（Bacon）", g: "essay" },
+    { k: "emerson", n: "爱默生（Emerson）", g: "essay" },
+    { k: "thoreau", n: "梭罗（Thoreau）", g: "essay" },
+    { k: "benjamin", n: "本雅明（Benjamin）", g: "essay" },
+    { k: "sontag", n: "桑塔格（Sontag）", g: "essay" },
+    { k: "orwell", n: "奥威尔（Orwell）", g: "essay" },
+    { k: "berlin", n: "伯林（Berlin）", g: "essay" },
+    { k: "barthes", n: "罗兰·巴特（Barthes）", g: "essay" },
+    { k: "ebwhite", n: "E.B.怀特（E. B. White）", g: "essay" },
+    { k: "didion", n: "琼·迪迪恩（Didion）", g: "essay" },
+  ];
+  var WGROUPS = [["zhmod", "gZhmod"], ["zhcls", "gZhcls"], ["zhtw", "gZhtw"], ["west", "gWest"], ["east", "gEast"], ["poet", "gPoet"], ["essay", "gEssay"]];
+  function writerName(id) { for (var i = 0; i < WRITERS.length; i++) if (WRITERS[i].k === id) return WRITERS[i].n; return ""; }
+  /* 一百位平铺是一堵墙：按七组分节，并给一个当场筛选的输入框。
+     ⚠ 筛选**同时匹配中文名与括号里的原名**——读者想找 Chekhov 时不该被中文名挡住。 */
+  function writerMenu(kind) {
+    var m = el("div", "wdsm-help");
+    var box = el("div", "wdsm-tplb");
+    box.appendChild(el("h4", null, t("wsPick") + "　" + t("wsCount")));
+    /* ⚠ 这一段用 innerHTML 是因为文案里有 **加粗**；先 esc 再只放行加粗，
+       别把整段原样塞进去——文案将来可能被改成带尖括号的东西。 */
+    var note = el("div", "wdsm-tplnote");
+    note.innerHTML = esc(t("wsNote")).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+    box.appendChild(note);
+    var inp = el("input", "wdsm-sch");
+    inp.type = "text"; inp.placeholder = t("wsSearch");
+    inp.style.cssText = "width:100%;margin:0 0 12px;box-sizing:border-box";
+    box.appendChild(inp);
+    var go = function (id) { if (m.parentNode) m.parentNode.removeChild(m); distill(kind, null, null, "", null, id); };
+    var none = el("button", "wdsm-tplitem");
+    none.appendChild(el("b", null, t("wsNone")));
+    none.appendChild(el("span", null, t("wsNoneS")));
+    none.onclick = function () { go(""); };
+    box.appendChild(none);
+    var list = el("div"); box.appendChild(list);
+    var empty = el("div", "wdsm-tplnote", t("wsNoHit"));
+    empty.style.display = "none"; box.appendChild(empty);
+    function paint(q) {
+      list.innerHTML = "";
+      var qq = String(q || "").trim().toLowerCase(), n = 0;
+      WGROUPS.forEach(function (g) {
+        var hit = WRITERS.filter(function (w) {
+          return w.g === g[0] && (!qq || w.n.toLowerCase().indexOf(qq) >= 0 || w.k.indexOf(qq) >= 0);
+        });
+        if (!hit.length) return;
+        list.appendChild(el("div", "wdsm-tplgrp", t(g[1])));
+        hit.forEach(function (w) {
+          n++;
+          var b = el("button", "wdsm-tplitem");
+          b.appendChild(el("b", null, w.n));
+          b.onclick = function () { go(w.k); };
+          list.appendChild(b);
+        });
+      });
+      empty.style.display = n ? "none" : "";
+    }
+    paint("");
+    inp.addEventListener("input", function () { paint(inp.value); });
+    m.appendChild(box);
+    m.onclick = function (ev) { if (!ev || ev.target === m) { if (m.parentNode) m.parentNode.removeChild(m); } };
+    document.body.appendChild(m);
+    setTimeout(function () { try { inp.focus(); } catch (e) {} }, 60);
     return m;
   }
   function memBadge() {
@@ -6033,6 +6215,11 @@
     { k: "report", t: "kReport" }, { k: "essay", t: "kEssay" },
     { k: "paper1", t: "kPaper1" }, { k: "paper", t: "kPaper" },
     { k: "outline", t: "kOutline" }, { k: "sumdoc", t: "kSumdoc" }, { k: "deck", t: "kDeck" },
+    /* 四档创作体（2026-08-22）。都带 w:1 ＝ 点它先问一句「要不要模仿谁的笔法」。
+       ⚠ 加一档要同时改**服务端那张白名单与 SPEC 表**——只改这里的话，
+       菜单点得到、后端认不出，表现是默默按「对话报告」写了一篇。 */
+    { k: "wechat", t: "kWechat", w: 1 }, { k: "prose", t: "kProse", w: 1 },
+    { k: "story", t: "kStory", w: 1 }, { k: "poem", t: "kPoem", w: 1 },
   ];
   function kindDef(k) { for (var i = 0; i < KIND_DEF.length; i++) if (KIND_DEF[i].k === k) return KIND_DEF[i]; return null; }
   function kindT(k) { var d = kindDef(k); return d ? t(d.t) : String(k || ""); }
@@ -6056,6 +6243,8 @@
       b.onclick = function () {
         if (menu.parentNode) menu.parentNode.removeChild(menu);
         if (k === "deck") { tplMenu(); return; }        // PPT 先问做成哪一种
+        var d0 = kindDef(k);
+        if (d0 && d0.w) { writerMenu(k); return; }      // 四档创作体先问用谁的笔法
         distill(k);
       };
       menu.appendChild(b);
@@ -6241,12 +6430,17 @@
   }
 
   // 成文面板。第三个参数给「成文记录」复用：直接把存下的正文摊开，不再调基底。
-  function distill(kind, existing, title, tpl, again) {
+  /* style ＝ 作家笔法的 id（见 WRITERS）。递上去的只是这个 id，
+     提示语在服务端——见 WRITERS 上方那段注释。空串＝本色写。 */
+  function distill(kind, existing, title, tpl, again, style) {
     var kv = existing ? {} : wdsKeyGet();
-    if (!existing && !kv) { wdsKeyPanel(function () { distill(kind); }); return; }
+    /* ⚠ 填 Key 那一跳必须把 tpl 与 style 一并带回来——第一版只递了 kind，
+       表现是「点了作家 → 弹出填 Key → 填完写出来却是本色」，而且没有任何报错。 */
+    if (!existing && !kv) { wdsKeyPanel(function () { distill(kind, null, title, tpl, again, style); }); return; }
     var wrap = el("div", "wdsm-dist");
     wrap.innerHTML = "<div class='wdsm-dist-box'>"
-      + "<div class='wdsm-dist-top'><span class='wdsm-dist-t'>" + esc(title || kindT(kind)) + "</span>"
+      + "<div class='wdsm-dist-top'><span class='wdsm-dist-t'>" + esc(title || kindT(kind))
+      + (style ? esc("　" + t("wsOn") + writerName(style)) : "") + "</span>"
       + "<span class='dst' style='color:#8B98A5;font-size:12px;flex:1 1 140px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>" + esc(t("dWorking")) + "</span>"
       + "<button class='wdsm-tbtn dsv'></button><button class='wdsm-tbtn dcp'></button><button class='wdsm-tbtn ddir'></button><button class='wdsm-tbtn ddl'></button><button class='wdsm-tbtn dx' style='margin-right:0'>✕</button></div>"
       + "<div class='wdsm-dist-c'><div class='wdsm-a'></div></div></div>"
@@ -6907,6 +7101,7 @@
     dBump();
 
     var BASEP = { kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "",
+        style: style || "",
         // 载入的文章一并送过去：sumdoc 那一档拿它当正主，其余几档只作背景。
         // 这里送**全文**而不是按问题取段——成文是一次性的活，取段会让它读到半篇就下判断。
         docs: (typeof atts !== "undefined" ? atts : []).filter(function (d) { return d && d.text && !d.img; })
