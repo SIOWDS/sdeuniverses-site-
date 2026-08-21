@@ -82,7 +82,7 @@ const fs2=require("fs");
 let p3=0,f3=0; const t3=(n,c)=>{console.log((c?"PASS":"FAIL"),n); c?p3++:f3++;};
 
 // 前端 KINDS 必须与后端 JOHN_COMPOSE 段数一致（两处对不上＝缺段或空转）
-const page=fs2.readFileSync("public/sites/lang/john/index.html","utf8");
+const page=fs2.readFileSync("public/sites/lang/chatjohn/index.html","utf8");
 const m=page.match(/var KINDS=\{([\s\S]*?)\};/);
 t3("页面里有 KINDS 表", !!m);
 if(m){
@@ -114,3 +114,41 @@ t3("论文段写 900 字要告警", warn("paper",900));
 t3("论文段写 2400 字不告警", !warn("paper",2400));
 console.log("compose pass",p3,"fail",f3);
 if(f3) process.exit(1);
+
+
+/* ── ChatJohn：BYOK 校验 · markdown 渲染 · 前后端一致 ── */
+let p4=0,f4=0; const t4=(n,c)=>{console.log((c?"PASS":"FAIL"),n); c?p4++:f4++;};
+const needKey=(k)=>String(k||"").trim().length<8;
+t4("空 Key 被挡", needKey(""));
+t4("短 Key 被挡", needKey("sk-123"));
+t4("正常 Key 放行", !needKey("sk-abcdefghijklmn"));
+
+// 与页面同一份 md()：从页面里抠出来跑，防止两边漂移
+const page2=fs2.readFileSync("public/sites/lang/chatjohn/index.html","utf8");
+const mdSrc=[null, (page2.match(/function inline\(s\)\{[\s\S]*?\n\}/)||[])[0], (page2.match(/function md\(src\)\{[\s\S]*?\n\}\n/)||[])[0]];
+t4("页面里能抠出 md 渲染器", !!(mdSrc[1]&&mdSrc[2]));
+if(mdSrc[1]&&mdSrc[2]){
+  const F=new Function("var esc=function(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};"
+    + mdSrc[1] + "\n" + mdSrc[2] + "\nreturn md;");
+  const md=F();
+  t4("段落", md("你好").indexOf("<p>")===0);
+  t4("二级标题", md("## 标题").indexOf("<h2>")>=0);
+  t4("粗体", md("**重**").indexOf("<strong>")>=0);
+  t4("无序列表", (md("- a\n- b").match(/<li>/g)||[]).length===2);
+  t4("有序列表", md("1. a").indexOf("<ol>")>=0);
+  t4("引用", md("> q").indexOf("<blockquote>")>=0);
+  t4("行内代码", md("`x`").indexOf("<code>")>=0);
+  t4("代码块", md("```\nx\n```").indexOf("<pre>")>=0);
+  t4("裸链接自动成锚", md("见 https://a.com/b").indexOf('<a href="https://a.com/b"')>=0);
+  t4("HTML 被转义（防注入）", md("<img src=x onerror=alert(1)>").indexOf("<img")<0);
+  t4("脚本标签被转义", md("<script>alert(1)</"+"script>").indexOf("<script")<0);
+  t4("列表后接段落不粘连", md("- a\n\n正文").indexOf("</ul>")>=0);
+}
+// 入口一致性：首页/nav 指向 /chatjohn/，老 /john/ 是跳转页
+const home=fs2.readFileSync("public/sites/lang/index.html","utf8");
+t4("首页第二张卡指向 chatjohn", home.indexOf('href="/chatjohn/"')>=0);
+t4("首页不再指向旧 /john/", home.indexOf('href="/john/"')<0);
+const old=fs2.readFileSync("public/sites/lang/john/index.html","utf8");
+t4("旧页是跳转页", old.indexOf('/chatjohn/')>=0 && old.indexOf('noindex')>=0);
+console.log("chatjohn pass",p4,"fail",f4);
+if(f4) process.exit(1);

@@ -500,9 +500,15 @@ async function johnRag(env, url, q) {
       out.push({ t: String(d.t || "").slice(0, 90), u: new URL(u, url).toString(), s: String(ck.t || "").slice(0, 700) });
       if (out.length >= 6) break;
     }
-    if (!out.length) return "";
-    return out.map((o, i) => "〔" + (i + 1) + "〕《" + o.t + "》 " + o.u + "\n" + o.s).join("\n\n");
-  } catch (e) { return ""; }
+    if (!out.length) return { text: "", srcs: [] };
+    // srcs 去重后回给前端做「出处」条；text 进上下文。
+    const seen = new Set(); const srcs = [];
+    for (const o of out) { if (seen.has(o.u)) continue; seen.add(o.u); srcs.push({ t: o.t, u: o.u }); }
+    return {
+      text: out.map((o, i) => "〔" + (i + 1) + "〕《" + o.t + "》 " + o.u + "\n" + o.s).join("\n\n"),
+      srcs: srcs,
+    };
+  } catch (e) { return { text: "", srcs: [] }; }
 }
 // 「与 John 对话」的人格与底本。据王德生《SDE 语言发生学》专著（Form-D-Meaning、三方程、
 // 教学发生学）与《SIO 语言发生学导论》（三性三律、语感定义）凝出；改这段等于改 John 是谁。
@@ -9098,9 +9104,11 @@ export default {
       let convo = cmsgs.join("\n\n");
       if (convo.length < 200) return Response.json({ ok: false, code: "too_short", msg: "先多聊几轮，聊出东西来了再成文。" }, { headers: _cors() });
       if (convo.length > 60000) convo = convo.slice(0, 20000) + "\n\n……（中间略）……\n\n" + convo.slice(-40000);
-      const cav = await getActiveVendor(env);
-      if (!cav) return Response.json({ ok: false, code: "no_key", msg: "系统基底暂时不可用，稍后再试。" }, { headers: _cors() });
-      const CVC = { url: WDS_VENDORS[cav.vendor].url, model: cav.model || WDS_VENDORS[cav.vendor].model };
+      // BYOK：用读者自己的 Key，站上不出这笔钱，也不替读者保管密钥。
+      const ckey = String(cb.key || "").trim();
+      if (ckey.length < 8) return Response.json({ ok: false, code: "need_key", msg: "这一步也用你自己的 API Key 运行——在 ⚙ 里填，只存在你的浏览器里。" }, { headers: _cors() });
+      const cvd = wdsVendorOf(cb.vendor);
+      const CVC = { url: WDS_VENDORS[cvd].url, model: wdsPickModel(cvd, String(cb.model || ""), false) };
       const cstream = new ReadableStream({
         async start(controller) {
           const send = (o) => { try { controller.enqueue(_sseBytes(o)); } catch (e) {} };
@@ -9110,13 +9118,13 @@ export default {
           const clk = wdsClock(150000, 420000);
           let wrote = 0;
           try {
-            const cctx = await johnRag(env, url, convo.slice(-3000));
+            const cctx = (await johnRag(env, url, convo.slice(-3000))).text;
             const csys = johnComposeSys(ckind, cpart, CK.parts, CK.per,
               String(cb.prev || "").slice(-800), cctx);
             send({ t: "meta", v: { kind: ckind, part: cpart, parts: CK.parts, label: CK.label } });
             const up = await fetch(CVC.url, {
               method: "POST",
-              headers: { "content-type": "application/json", authorization: "Bearer " + cav.key },
+              headers: { "content-type": "application/json", authorization: "Bearer " + ckey },
               // ⚠ 必须显式关思考。第一版没关，实测 56 秒后 reasoning_content 吃光 max_tokens、
               //    正文回来 0 字、流还"干净地"结束——正是文件上方那条老教训的形状。
               body: JSON.stringify(wdsPlainBody(CVC, {
@@ -9167,50 +9175,62 @@ export default {
       return new Response(cstream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
 
-    // ── /api/john ─────────────────────────────────────────────────
-    // 「与 John 对话」——语言发生学分站（lang.sdeuniverses.com/john/）的对话智能体。
-    // 简单版：不做 RAG、不做记忆、不落库；一次请求 = 系统提示 + 前几轮 + 这一问，流式回。
-    // 人格与底本见 JOHN_SYS（据王德生《SDE 语言发生学》专著与《SIO 语言发生学导论》凝出）。
-    // 用站上的系统基底（getActiveVendor），与 ChatSDE 同一把 Key，不另开通道。
-    if (url.pathname === "/api/john") {
+    // ── /api/john/chat ────────────────────────────────────────────
+    // ChatJohn 的问答端点：语言发生学分站（lang.sdeuniverses.com/chatjohn/）。
+    // **纯 BYOK**——读者自带 API Key，站上不出这笔钱、也不替谁保管密钥（Key 只在这一次请求里过一遍）。
+    // 人格与底本见 JOHN_SYS；站内取料见 johnRag，命中篇目会以 src 帧回给前端做「出处」条。
+    if (url.pathname === "/api/john/chat" || url.pathname === "/api/john") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let jb = {}; try { jb = await request.json(); } catch (e) {}
-      // 钳位：最多留最近 16 轮，每条 4000 字；越界直接截，不报错。
+      const jkey = String(jb.key || "").trim();
+      if (jkey.length < 8) return Response.json({ ok: false, code: "need_key", msg: "先在 ⚙ 里填一把你自己的 API Key——只存在你的浏览器里，本站看不到也不保存。" }, { headers: _cors() });
+      // 钳位：最多留最近 24 轮，每条 8000 字；越界直接截，不报错。
       let msgs = Array.isArray(jb.messages) ? jb.messages : [];
       msgs = msgs.filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim())
-                 .slice(-16)
-                 .map((m) => ({ role: m.role, content: String(m.content).slice(0, 4000) }));
+                 .slice(-24)
+                 .map((m) => ({ role: m.role, content: String(m.content).slice(0, 8000) }));
       if (!msgs.length) return Response.json({ ok: false, code: "empty", msg: "说点什么吧。" }, { headers: _cors() });
-      const jav = await getActiveVendor(env);
-      if (!jav) return Response.json({ ok: false, code: "no_key", msg: "系统基底暂时不可用，稍后再试。" }, { headers: _cors() });
-      const JVC = { url: WDS_VENDORS[jav.vendor].url, model: jav.model || WDS_VENDORS[jav.vendor].model };
-      // 站内取料：只拿最后一问去找；找不到就空着，退化成只凭底本作答。
-      const jctx = await johnRag(env, url, msgs[msgs.length - 1].content);
-      const jsys = JOHN_SYS + (jctx ? ("\n\n════ 这一轮的站内材料（原文摘录，可直接引用并给链接）════\n" + jctx) : "");
+      const jvd = wdsVendorOf(jb.vendor);
+      const jdeep = !!jb.deep;
+      const JVC = { url: WDS_VENDORS[jvd].url, model: wdsPickModel(jvd, String(jb.model || ""), jdeep), top: jdeep };
+      // 限流按「这把 Key」算，与站上其余 BYOK 入口同一口径。
+      try {
+        const ip = request.headers.get("cf-connecting-ip") || "unknown";
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("john", ip, jkey)));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json();
+        if (!lr.ok) return Response.json({ ok: false, code: "rate", msg: "太快啦，过十几秒再试。" }, { headers: _cors() });
+      } catch (e) {}
       const jstream = new ReadableStream({
         async start(controller) {
           const send = (o) => { try { controller.enqueue(_sseBytes(o)); } catch (e) {} };
-          const ctrl = new AbortController();
-          const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 120000);
+          const t0 = Date.now();
+          // 心跳：取料与思考可能几十秒不吐字，没有心跳连接会被判死。
+          const hb = setInterval(() => send({ t: "beat", v: Math.round((Date.now() - t0) / 1000) }), 4000);
+          const clk = wdsClock(jdeep ? 150000 : 90000, jdeep ? 420000 : 240000);
+          let got = 0;
           try {
+            const rag = await johnRag(env, url, msgs[msgs.length - 1].content);
+            if (rag.srcs && rag.srcs.length) send({ t: "src", v: rag.srcs });
+            const jsys = JOHN_SYS + (rag.text ? ("\n\n════ 这一轮的站内材料（原文摘录，可直接引用并给链接）════\n" + rag.text) : "");
+            const body = { model: JVC.model, stream: true, max_tokens: jdeep ? WDS_TOK_SAFE : 2600, temperature: 0.7,
+                           messages: [{ role: "system", content: jsys }].concat(msgs) };
             const up = await fetch(JVC.url, {
               method: "POST",
-              headers: { "content-type": "application/json", authorization: "Bearer " + jav.key },
-              body: JSON.stringify(wdsPlainBody(JVC, {
-                model: JVC.model, stream: true, max_tokens: 2600, temperature: 0.7,
-                messages: [{ role: "system", content: jsys }].concat(msgs),
-              })),
-              signal: ctrl.signal,
+              headers: { "content-type": "application/json", authorization: "Bearer " + jkey },
+              body: JSON.stringify(jdeep ? wdsTopBody(JVC, body) : wdsPlainBody(JVC, body)),
+              signal: clk.signal,
             });
             if (!up.ok || !up.body) {
-              send({ t: "error", v: "基底返回 " + up.status });
+              const tx = up.body ? (await up.text()).slice(0, 200) : "";
+              send({ t: "error", v: (up.status === 401 || up.status === 403) ? "这把 Key 没通过校验，检查一下厂商选对了没、Key 有没有复制全。"
+                     : (up.status === 402 ? "这把 Key 余额不足了。" : ("基底返回 " + up.status + (tx ? ("：" + tx) : ""))) });
             } else {
-              // 流式逐行解析：**永不整份 parse**（整份 parse 是站上 1102 内存峰值的老病根）。
-              const rd = up.body.getReader(); const dec = new TextDecoder(); let buf = "", got = 0, fin = false;
+              const rd = up.body.getReader(); const dec = new TextDecoder(); let buf = "", fin = false;
               for (;;) {
                 const { value, done } = await rd.read();
                 if (done) break;
+                clk.firstFrame();
                 buf += dec.decode(value, { stream: true });
                 let nl;
                 while ((nl = buf.indexOf("\n")) >= 0) {
@@ -9222,19 +9242,22 @@ export default {
                   if (pay === "[DONE]") { fin = true; buf = ""; break; }
                   try {
                     const j = JSON.parse(pay);
+                    if (j.error) { send({ t: "error", v: (j.error.message || "基底流内错误") }); fin = true; break; }
                     const d = j && j.choices && j.choices[0] && j.choices[0].delta;
-                    const tx = d && d.content;
-                    if (tx) { got += tx.length; send({ t: "d", v: tx }); }
+                    if (d && d.reasoning_content) send({ t: "think", v: d.reasoning_content });
+                    if (d && d.content) { got += d.content.length; send({ t: "d", v: d.content }); }
                   } catch (e) {}
                 }
                 if (fin) break;
               }
-              if (!got) send({ t: "error", v: "这一轮没有生成内容，请再问一次。" });
+              if (!got) send({ t: "error", v: "这一轮没有生成内容——多半是思考吃光了预算，再问一次，或在 ⚙ 里关掉深想档。" });
             }
           } catch (e) {
-            send({ t: "error", v: "服务端异常：" + ((e && e.message) || String(e)) });
+            send({ t: "error", v: clk.cut ? clk.why("这一答") : ("服务端异常：" + ((e && e.message) || String(e))) });
           }
-          try { clearTimeout(timer); } catch (e) {}
+          try { clk.stop(); } catch (e) {}
+          try { clearInterval(hb); } catch (e) {}
+          send({ t: "fin", v: { wrote: got, sec: Math.round((Date.now() - t0) / 1000) } });
           try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); } catch (e) {}
           try { controller.close(); } catch (e) {}
         },
