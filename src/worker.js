@@ -9098,17 +9098,17 @@ export default {
       const ckind = JOHN_COMPOSE[String(cb.kind || "")] ? String(cb.kind) : "wechat";
       const CK = JOHN_COMPOSE[ckind];
       const cpart = Math.max(1, Math.min(CK.parts, parseInt(cb.part, 10) || 1));
+      // BYOK：用读者自己的 Key，站上不出这笔钱，也不替读者保管密钥。
+      const ckey = String(cb.key || "").trim();
+      if (ckey.length < 8) return Response.json({ ok: false, code: "need_key", msg: "这一步也用你自己的 API Key 运行——在 ⚙ 里填，只存在你的浏览器里。" }, { headers: _cors() });
+      const cvd = wdsVendorOf(cb.vendor);
+      const CVC = { url: WDS_VENDORS[cvd].url, model: wdsPickModel(cvd, String(cb.model || ""), false) };
       let cmsgs = Array.isArray(cb.messages) ? cb.messages : [];
       cmsgs = cmsgs.filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim())
                    .map((m) => (m.role === "user" ? "读者：" : "John：") + String(m.content).slice(0, 6000));
       let convo = cmsgs.join("\n\n");
       if (convo.length < 200) return Response.json({ ok: false, code: "too_short", msg: "先多聊几轮，聊出东西来了再成文。" }, { headers: _cors() });
       if (convo.length > 60000) convo = convo.slice(0, 20000) + "\n\n……（中间略）……\n\n" + convo.slice(-40000);
-      // BYOK：用读者自己的 Key，站上不出这笔钱，也不替读者保管密钥。
-      const ckey = String(cb.key || "").trim();
-      if (ckey.length < 8) return Response.json({ ok: false, code: "need_key", msg: "这一步也用你自己的 API Key 运行——在 ⚙ 里填，只存在你的浏览器里。" }, { headers: _cors() });
-      const cvd = wdsVendorOf(cb.vendor);
-      const CVC = { url: WDS_VENDORS[cvd].url, model: wdsPickModel(cvd, String(cb.model || ""), false) };
       const cstream = new ReadableStream({
         async start(controller) {
           const send = (o) => { try { controller.enqueue(_sseBytes(o)); } catch (e) {} };
