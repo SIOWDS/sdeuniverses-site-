@@ -71,6 +71,13 @@
         "《红楼梦》里那些对话为什么一读就知道是谁在说？"
       ],
       /* 开屏。分身必须自报家门——读者不知道它只谈语言，也不知道该怎么问它。 */
+      /* 斜杠命令的**追加**别名（老的一个不删，见下面 TOOLS 那段）。
+         每条都贴着改过的菜单名，让「看到什么就敲什么」成立。 */
+      cmd: {
+        iq: ["有多新"], three: ["三个角度"], motif: ["主绳"], nbr: ["说过没有", "查一查"],
+        rename: ["同行的话", "本地话"], gap: ["没名字", "空位"], collide: ["顶一顶"],
+        forge: ["撞一条"], what: ["到底是什么"], how: ["怎么教"], why: ["为什么会这样"]
+      },
       hero: {
         zh: {
           title: "ChatJohn",
@@ -7127,6 +7134,17 @@
      会慢慢变成两件事，而没人说得清哪一件才算数。 */
   if (PROFILE && PROFILE.tools && PROFILE.tools.length) {
     TOOLS = TOOLS.filter(function (it) { return PROFILE.tools.indexOf(it.k) >= 0; });
+  }
+  /* 斜杠命令跟着改过的名字走。**是加别名，不是换**：
+     菜单里写着「写成同行的话」，敲的却得是 /改姓 —— 名字改了命令没跟上，
+     读者照着菜单敲什么都不会发生，而且不报错（认不出的 /xxx 原样当正文发出去）。
+     老命令一个不删：已经habituated 的人不该因为改了个招牌就失手。 */
+  if (PROFILE && PROFILE.cmd) {
+    for (var _ci = 0; _ci < TOOLS.length; _ci++) {
+      var _ex = PROFILE.cmd[TOOLS[_ci].k];
+      if (!_ex || !_ex.length) continue;
+      TOOLS[_ci] = { k: TOOLS[_ci].k, n: TOOLS[_ci].n, s: TOOLS[_ci].s, cmd: TOOLS[_ci].cmd.concat(_ex) };
+    }
   }
   var DEEP_OF = { what: "idea", how: "zhiwen", why: "dynamics" };
   var curTool = "";

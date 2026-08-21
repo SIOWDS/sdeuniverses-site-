@@ -252,6 +252,18 @@ console.log("\n── ⑥ 外观：品牌与工序子集 ───────�
   // 开屏：分身必须自报家门，否则读者不知道它只谈什么、该怎么问
   t("档案带开屏", /hero: \{/.test(copySeg) || /hero: \{/.test(M.slice(M.indexOf("seeds: ["), M.indexOf("copy: {"))));
   t("开屏渲染接上了 seeds", /PROFILE\.seeds \|\| \[\]/.test(MC));
+  /* 斜杠命令要跟着改过的名字走，否则读者照着菜单敲什么都不会发生——**而且不报错**
+     （认不出的 /xxx 会被原样当正文发出去，最坏的一种：像是它没听懂你的问题）。
+     ⚠ 是**追加**别名不是替换：已经习惯 /改姓 /母题 的人不该因为换了招牌就失手。 */
+  const cmdSeg = M.slice(M.indexOf("cmd: {", M.indexOf("var PROFILES = {")), M.indexOf("hero: {"));
+  t("档案给工序追加了斜杠别名", /cmd: \{/.test(cmdSeg) && cmdSeg.split(":").length > 8);
+  t("追加而非替换（老命令一个不删）", /TOOLS\[_ci\]\.cmd\.concat\(_ex\)/.test(MC));
+  const cmdKeys = (cmdSeg.match(/(^|[\s{,])([a-z]+): \[/g) || []).map((x) => x.trim().replace(/[:[]/g, "").trim());
+  t("每一件留下的工序都配了新别名",
+    langKeys.every((k) => cmdKeys.indexOf(k) >= 0), langKeys.filter((k) => cmdKeys.indexOf(k) < 0).join(","));
+  t("没给已筛掉的工序配别名（配了也点不着）",
+    cmdKeys.every((k) => langKeys.indexOf(k) >= 0), cmdKeys.filter((k) => langKeys.indexOf(k) < 0).join(","));
+
   t("种子问题点了就发（不是摆设）", /b\.onclick = function \(\) \{ inEl\.value = s;[\s\S]{0,80}send\(\); \}/.test(MC));
 }
 
