@@ -152,3 +152,44 @@ const old=fs2.readFileSync("public/sites/lang/john/index.html","utf8");
 t4("旧页是跳转页", old.indexOf('/chatjohn/')>=0 && old.indexOf('noindex')>=0);
 console.log("chatjohn pass",p4,"fail",f4);
 if(f4) process.exit(1);
+
+/* ── 三件工具追问：解析与钳位 ── */
+let p5=0,f5=0; const t5=(n,c)=>{console.log((c?"PASS":"FAIL"),n); c?p5++:f5++;};
+const TOOLS=["三方程","六路径","123原理"];
+function parseQs(tx){
+  tx=String(tx).replace(/```(?:json)?/g,"").trim();
+  const a=tx.indexOf("["), b=tx.lastIndexOf("]");
+  if(a<0||b<=a) return {err:"parse"};
+  let arr; try{ arr=JSON.parse(tx.slice(a,b+1)); }catch(e){ return {err:"parse"}; }
+  const qs=[];
+  for(const it of (Array.isArray(arr)?arr:[])){
+    const qq=String((it&&it.q)||"").trim().replace(/\s+/g,"").slice(0,60);
+    if(qq.length<6) continue;
+    const tl=TOOLS.indexOf(String((it&&it.tool)||"").trim())>=0?String(it.tool).trim():(TOOLS[qs.length]||"三方程");
+    if(qs.some(x=>x.q===qq)) continue;
+    qs.push({tool:tl,q:qq});
+    if(qs.length>=3) break;
+  }
+  return {qs};
+}
+const good='[{"tool":"三方程","q":"那这句话立住之后，反过来改变了他后面怎么说吗？"},'
+          +'{"tool":"六路径","q":"这件事真正卡住的，是他不会写还是没人读？"},'
+          +'{"tool":"123原理","q":"他改完这一句之后，班上其他人的写法有变化吗？"}]';
+t5("正常三问", parseQs(good).qs.length===3);
+t5("工具名保留", parseQs(good).qs[1].tool==="六路径");
+t5("带代码围栏也能解析", parseQs("```json\n"+good+"\n```").qs.length===3);
+t5("前后有废话也能解析", parseQs("好的：\n"+good+"\n以上。").qs.length===3);
+t5("非法工具名回退", parseQs('[{"tool":"胡说","q":"这个说法在别的场合也成立吗？"}]').qs[0].tool==="三方程");
+t5("太短的问被丢掉", parseQs('[{"tool":"三方程","q":"为什么"}]').qs.length===0);
+t5("重复问去重", parseQs('[{"tool":"三方程","q":"这句话是对谁说的呢？"},{"tool":"六路径","q":"这句话是对谁说的呢？"}]').qs.length===1);
+t5("最多三条", parseQs('['+Array.from({length:6},(_,i)=>'{"tool":"三方程","q":"这是第'+i+'个足够长的追问吗？"}').join(",")+']').qs.length===3);
+t5("坏 JSON 报 parse", parseQs("{乱码").err==="parse");
+t5("空数组不给问", parseQs("[]").qs.length===0);
+t5("超长问被截到60", parseQs('[{"tool":"三方程","q":"'+"追".repeat(200)+'"}]').qs[0].q.length===60);
+// 页面侧：三问区必须存在且失败时静默移除
+const page3=fs2.readFileSync("public/sites/lang/chatjohn/index.html","utf8");
+t5("页面有 nextQ", page3.indexOf("function nextQ(")>=0);
+t5("失败时移除追问区", /catch\(function\(\)\{ try\{ box\.removeChild\(wrapd\)/.test(page3));
+t5("答完才拉追问", page3.indexOf("nextQ(m.box)")>=0);
+console.log("nextq pass",p5,"fail",f5);
+if(f5) process.exit(1);

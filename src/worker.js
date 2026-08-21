@@ -9175,6 +9175,84 @@ export default {
       return new Response(cstream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
 
+    // ── /api/john/next ────────────────────────────────────────────
+    // 每答完一轮，用 SDE 的三件工具各出一问，做成可点的追问按钮：
+    //   三方程（三维互问：拿到一维，追另外两维）／六路径（起手次序：这题卡在哪一维）／
+    //   123原理（动态引擎：矛盾在哪→S 结算在哪→回写了什么）。
+    // 轻量、关思考、小预算；**失败一律静默**——追问出不来不能影响主对话。同样 BYOK。
+    if (url.pathname === "/api/john/next") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let nb = {}; try { nb = await request.json(); } catch (e) {}
+      const nkey = String(nb.key || "").trim();
+      if (nkey.length < 8) return Response.json({ ok: false, code: "need_key" }, { headers: _cors() });
+      let nmsgs = Array.isArray(nb.messages) ? nb.messages : [];
+      nmsgs = nmsgs.filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim()).slice(-4);
+      if (nmsgs.length < 2) return Response.json({ ok: false, code: "empty" }, { headers: _cors() });
+      const lastQ = String((nmsgs.filter((m) => m.role === "user").pop() || {}).content || "").slice(0, 1200);
+      const lastA = String((nmsgs.filter((m) => m.role === "assistant").pop() || {}).content || "").slice(0, 4000);
+      const nvd = wdsVendorOf(nb.vendor);
+      const NVC = { url: WDS_VENDORS[nvd].url, model: wdsPickModel(nvd, String(nb.model || ""), false) };
+      const NSYS =
+        "你是 John（胡志英），SDE 语言发生学。刚才你回答了读者一个关于语言的问题。" +
+        "现在用 SDE 的三件工具各出**一个**追问，让这场对话往深处走一步。\n\n" +
+        "【三件工具，一件出一问，不许混】\n" +
+        "① **三方程**（S=F(D,E)、D=G(S,E)、E=H(S,D)）——三维互问：刚才那一答里已经露出了哪一维（一个结构 S、" +
+        "一条差异路径 D、还是一片纠缠土壤 E），就追问另外两维；也可以反过来问「它立住之后回头改写了什么」。\n" +
+        "② **六路径**（S→D→E 学科本体论｜S→E→D 配置与决策｜D→S→E 咨询与干预｜D→E→S 求助与困境｜" +
+        "E→S→D 社会分析｜E→D→S 综述与建制）——问「这件事真正卡住的是哪一维」，也就是该从哪一维重新起手。\n" +
+        "③ **123原理**（D 与 E 矛盾 → 矛盾逼出 S 改变 → S 回写 D 与 E）——问动态：" +
+        "矛盾在哪、S 在哪一处结算、结算之后回写了什么。**最容易漏的是第三步回写，优先问它。**\n\n" +
+        "【怎么问才算数】\n" +
+        "· 每一问都必须**咬住刚才那一答里的具体东西**——某个具体句子、某个具体场景、某个刚被命名的东西；" +
+        "凡是换个话题也能问的（「能举个例子吗」「还有别的角度吗」）一律作废。\n" +
+        "· 用读者会脱口而出的口气写，**第一人称「我」**，像他自己想到要追问的那一句。\n" +
+        "· 每问 **12–30 字**，一句话，问号结尾。不许出现 S／D／E、方程、路径、123 这些字眼——" +
+        "工具是你用的，读者看到的应该是一句人话。\n" +
+        "· 三问必须问三件不同的事，不许是同一问的三种说法。\n\n" +
+        "【输出】只输出一个 JSON 数组，三个对象，每个是 {\"tool\":\"三方程|六路径|123原理\",\"q\":\"追问\"}。" +
+        "不要写任何解释、不要用代码围栏。";
+      try {
+        const ctrl2 = new AbortController();
+        const tm = setTimeout(() => { try { ctrl2.abort(); } catch (e) {} }, 45000);
+        const up = await fetch(NVC.url, {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: "Bearer " + nkey },
+          body: JSON.stringify(wdsPlainBody(NVC, {
+            model: NVC.model, stream: false, max_tokens: 700, temperature: 0.9,
+            messages: [
+              { role: "system", content: NSYS },
+              { role: "user", content: "【读者刚问的】\n" + lastQ + "\n\n【你刚答的】\n" + lastA + "\n\n出三问。" },
+            ],
+          })),
+          signal: ctrl2.signal,
+        });
+        clearTimeout(tm);
+        if (!up.ok) return Response.json({ ok: false, code: "up", status: up.status }, { headers: _cors() });
+        const j = await up.json();
+        let tx = (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
+        tx = String(tx).replace(/```(?:json)?/g, "").trim();
+        const a = tx.indexOf("["), b = tx.lastIndexOf("]");
+        if (a < 0 || b <= a) return Response.json({ ok: false, code: "parse" }, { headers: _cors() });
+        let arr = [];
+        try { arr = JSON.parse(tx.slice(a, b + 1)); } catch (e) { return Response.json({ ok: false, code: "parse" }, { headers: _cors() }); }
+        const TOOLS = ["三方程", "六路径", "123原理"];
+        const qs = [];
+        for (const it of (Array.isArray(arr) ? arr : [])) {
+          const qq = String((it && it.q) || "").trim().replace(/\s+/g, "").slice(0, 60);
+          if (qq.length < 6) continue;
+          const tl = TOOLS.indexOf(String((it && it.tool) || "").trim()) >= 0 ? String(it.tool).trim() : TOOLS[qs.length] || "三方程";
+          if (qs.some((x) => x.q === qq)) continue;      // 去重：三问说同一件事等于只有一问
+          qs.push({ tool: tl, q: qq });
+          if (qs.length >= 3) break;
+        }
+        if (!qs.length) return Response.json({ ok: false, code: "empty_out" }, { headers: _cors() });
+        return Response.json({ ok: true, qs: qs }, { headers: _cors() });
+      } catch (e) {
+        return Response.json({ ok: false, code: "net" }, { headers: _cors() });
+      }
+    }
+
     // ── /api/john/chat ────────────────────────────────────────────
     // ChatJohn 的问答端点：语言发生学分站（lang.sdeuniverses.com/chatjohn/）。
     // **纯 BYOK**——读者自带 API Key，站上不出这笔钱、也不替谁保管密钥（Key 只在这一次请求里过一遍）。

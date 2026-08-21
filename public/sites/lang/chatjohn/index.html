@@ -91,6 +91,17 @@ button{font:inherit}
 .srcs a{display:block;font-size:12.5px;color:#9FB2CC;margin:3px 0;line-height:1.55}
 .srcs a::before{content:"— ";color:#5C6377}
 
+.nextq{margin:14px 0 0;border-top:1px solid var(--edge2);padding-top:11px}
+.nextq .lb{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:#5C6377;margin-bottom:7px}
+.nextq .qs{display:grid;gap:7px}
+.nextq button{display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;
+  border:1px solid var(--edge2);background:rgba(255,255,255,.025);color:#C3C9D6;
+  font-size:13.5px;padding:9px 12px;cursor:pointer;line-height:1.6}
+.nextq button:hover{border-color:var(--jade);color:#F4F2EC;background:rgba(111,169,140,.07)}
+.nextq button:disabled{opacity:.4;cursor:default}
+.nextq .tg{flex:none;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  color:var(--jade);border:1px solid rgba(111,169,140,.35);padding:1px 6px}
+.nextq.load{font-family:var(--mono);font-size:11.5px;color:#5C6377;padding-top:11px}
 .tools{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
 .tools button{border:1px solid transparent;background:transparent;color:#5C6377;
   font-family:var(--mono);font-size:11.5px;padding:3px 8px;cursor:pointer}
@@ -397,7 +408,7 @@ function ask(text,redo){
     }
     m.box.appendChild(tools);
     stopBtn(false); ctrl=null; q.focus();
-    if(ok&&acc){ HIST.push({role:"assistant",content:acc}); if(HIST.length>=4) bar.hidden=false; }
+    if(ok&&acc){ HIST.push({role:"assistant",content:acc}); if(HIST.length>=4) bar.hidden=false; nextQ(m.box); }
     bottom();
   }
   function fail(msg){
@@ -442,6 +453,37 @@ function ask(text,redo){
       return; }
     fail((err&&err.message)||"网络中断了，请再试一次。");
   });
+}
+/* 三件工具各出一问，做成可点的追问。出不来就静默——追问是锦上添花，不能拖累主对话。 */
+function nextQ(box){
+  var wrapd=document.createElement("div"); wrapd.className="nextq load";
+  wrapd.textContent="正在想三个可以往下追的问题…";
+  box.appendChild(wrapd); bottom();
+  fetch("/api/john/next",{method:"POST",headers:{"content-type":"application/json"},
+    body:JSON.stringify({messages:HIST,key:KEY(),vendor:VND(),model:MDL()})
+  }).then(function(r){ return r.json(); }).then(function(j){
+    if(!j||!j.ok||!j.qs||!j.qs.length){ try{ box.removeChild(wrapd); }catch(e){} return; }
+    wrapd.className="nextq";
+    var html='<div class="lb">往下追一步</div><div class="qs"></div>';
+    wrapd.innerHTML=html;
+    var qs=wrapd.querySelector(".qs");
+    for(var i=0;i<j.qs.length;i++){
+      (function(it){
+        var b=document.createElement("button"); b.type="button";
+        var tg=document.createElement("span"); tg.className="tg"; tg.textContent=it.tool;
+        var tx=document.createElement("span"); tx.textContent=it.q;
+        b.appendChild(tg); b.appendChild(tx);
+        b.onclick=function(){
+          if(busy) return;
+          var all=wrapd.querySelectorAll("button");
+          for(var k=0;k<all.length;k++) all[k].disabled=true;
+          ask(it.q);
+        };
+        qs.appendChild(b);
+      })(j.qs[i]);
+    }
+    bottom();
+  }).catch(function(){ try{ box.removeChild(wrapd); }catch(e){} });
 }
 function copy(txt,btn){
   function ok(){ var o=btn.textContent; btn.textContent="已复制"; setTimeout(function(){btn.textContent=o;},1500); }
