@@ -5,7 +5,11 @@
 const fs = require("fs");
 const { JSDOM } = require("jsdom");
 
-const HTML = fs.readFileSync("public/sites/lang/chatjohn/index.html", "utf8");
+/* ⚠ 路径改了：ChatJohn 的完整版自 2026-08-21 起是 ChatSDE 引擎的一张壳页
+   （/chatjohn/index.html 只有两行接线），这两份 sim 验的是**旧那份自制页**，
+   它已整份移到 /chatjohn/lite/ 当退路。守的东西没变，只是它搬了家。
+   新那层（领域档案）的护栏另有一份：tools/sim_wds_profile.js。 */
+const HTML = fs.readFileSync("public/sites/lang/chatjohn/lite/index.html", "utf8");
 let pass = 0, fail = 0;
 const t = (n, c, extra) => { console.log((c ? "PASS" : "FAIL") + "  " + n + (c || !extra ? "" : "   ← " + extra)); c ? pass++ : fail++; };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

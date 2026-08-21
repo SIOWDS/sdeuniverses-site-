@@ -50,7 +50,39 @@
   var LS_WEB = "sde_wds_web";             // "1" | "0"
   var LS_LANG = "sde_wds_lang";           // "zh" | "en"
   var PAGE = !!window.WDSM_PAGE;
-  var PAGE_URL = "/taste/chatsde/";
+  /* ════════ 领域档案（profile）════════════════════════════════════
+     同一台引擎借给一个限定题域的分身：壳页里写 window.WDSM_PROFILE = "lang" 即可，
+     其余一个字不改。**人格提示语、语料白名单、题域闸全在服务端**（worker.js 的 WDS_PROFILES）——
+     这里只有品牌、入口地址、种子问题、工序子集这些纯外观的东西。
+     🔒 认不出的 key 一律退回 ChatSDE 本身，不猜。 */
+  var PROFILES = {
+    lang: {
+      id: "lang",
+      brand: "ChatJohn",
+      url: "/chatjohn/",
+      home: "/",
+      // 语言版留下的工序：与语言域真用得上的那几件。产线（forge）照给——
+      // 「撞出语言领域的新判断」正是它的活。去掉的是 grid/nine/map 那三件全站坐标类的。
+      tools: ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"],
+      seeds: [
+        "「他对这件事情进行了一个认真的思考。」——每条规则都对，为什么还是不对？",
+        "学生语法全会，一开口还是生硬，问题出在哪？",
+        "语感到底能不能教？给我一个明天就能用的练习。",
+        "《红楼梦》里那些对话为什么一读就知道是谁在说？"
+      ]
+    }
+  };
+  var PROFILE = (function () {
+    var k = String(window.WDSM_PROFILE || "").trim();
+    return Object.prototype.hasOwnProperty.call(PROFILES, k) ? PROFILES[k] : null;
+  })();
+  var PROF_ID = PROFILE ? PROFILE.id : "";
+  var BRAND = PROFILE ? PROFILE.brand : "ChatSDE";
+  var PAGE_URL = PROFILE ? PROFILE.url : "/taste/chatsde/";
+  /* 每一个打到 /api/wds/* 的请求都要盖上这个戳。
+     ⚠ 漏一处的后果不是报错，是**静默串台**：那一路会拿 WDS 的人格、全站的语料来答，
+     而页面上仍写着 ChatJohn。所以盖戳集中在这一个函数里，调用点只管调它。 */
+  function P(o) { if (PROF_ID) o.profile = PROF_ID; return o; }
   function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function esc(s) { return String(s).replace(/[&<>]/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m]; }); }
 
@@ -1530,7 +1562,7 @@
   var layer = el("div", "wdsm-layer");
   layer.innerHTML =
     "<div class='wdsm-side'>" +
-      "<div class='wdsm-sbrand'><a href='/taste/chatsde/'>ChatSDE</a><button class='wdsm-fold'>\u00ab</button></div>" +
+      "<div class='wdsm-sbrand'><a href='" + PAGE_URL + "'>" + esc(BRAND) + "</a><button class='wdsm-fold'>\u00ab</button></div>" +
       "<button class='wdsm-nc'></button>" +
       "<div class='wdsm-pjwrap'><button class='wdsm-pj'></button></div>" +
       "<div class='wdsm-schwrap'><input class='wdsm-sch' type='text'></div>" +
@@ -3261,7 +3293,7 @@
       if (stick) scrollBottom();
     }
 
-    fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
+    fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(payload)) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(); curReader = reader;
@@ -4785,14 +4817,14 @@
     fetch(API, {
       method: "POST", headers: { "content-type": "application/json" },
       signal: ctrl ? ctrl.signal : undefined,
-      body: JSON.stringify({
+      body: JSON.stringify(P({
         /* 请求体逐字对齐主对话那一份：少带一个字段就可能走到别的分支上去，
            而这种错在前端看不出来（表现是基底那边一句莫名其妙的报错）。 */
         q: tx("cvLabSys") + "\n\n" + cvLabCtx(it) + "\n【他的问题】\n" + q,
         history: hist, umem: "", key: kv.key, vendor: kv.vendor, model: kv.model || "",
         mode: thinkMode, web: 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: "",
         nosite: 1     // 共创台就着画布这一件干活，不需要全站检索（那一段最重，也正是线上掐断的地方）
-      })
+      }))
     }).then(function (resp) {
       diag.http = resp.status;
       if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
@@ -5283,7 +5315,7 @@
       text: (COMP.text ? "【上一版账本】\n" + COMP.text + "\n\n【接下来这段原文】\n" : "") + seg,
     };
     COMP.busy = true; compPaint();
-    fetch("/api/wds/summarize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
+    fetch("/api/wds/summarize", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(payload)) })
       .then(function (r) { return r.json(); })
       .then(function (j) {
         COMP.busy = false;
@@ -5308,11 +5340,11 @@
   }
   if (rsBtn) rsBtn.onclick = function () { if (RS.running) return; RS.on = !RS.on; rsPaint(); };
   function rsPost(body) {
-    return fetch("/api/wds/research", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    return fetch("/api/wds/research", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(body)) });
   }
   // 一趟流式请求 → 把 token 交给 onTok，结束时 resolve 全文。研究的每一步都用它。
   function rsStream(url, payload, onTok, onNote) {
-    return fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
+    return fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(payload)) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(); curReader = reader;
@@ -6658,7 +6690,7 @@
         dAC = ac;
         dBump();
         fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" },
-                             body: JSON.stringify(body), signal: ac ? ac.signal : undefined })
+                             body: JSON.stringify(P(body)), signal: ac ? ac.signal : undefined })
           .then(function (resp) {
             if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
             var reader = resp.body.getReader(); dr = reader;
@@ -6984,6 +7016,12 @@
   /* 题型三分 → 对口的那一台完整机器。
      轻松版只回答一个当场能拿走的判断；要进细节，就交给那一台跑完整一趟。
      这张表是唯一来源——别处要用就读它，不许再抄一份（抄一份就会有一天两份不一样）。 */
+  /* 领域档案可以只留一部分工序。**只筛不改**：留下来的那几件，提示语与后端一个字不动——
+     分身与本体在同一件工序上必须是同一个东西，否则「ChatJohn 的母题」和「ChatSDE 的母题」
+     会慢慢变成两件事，而没人说得清哪一件才算数。 */
+  if (PROFILE && PROFILE.tools && PROFILE.tools.length) {
+    TOOLS = TOOLS.filter(function (it) { return PROFILE.tools.indexOf(it.k) >= 0; });
+  }
   var DEEP_OF = { what: "idea", how: "zhiwen", why: "dynamics" };
   var curTool = "";
   function toolInfo(k) { for (var i = 0; i < TOOLS.length; i++) if (TOOLS[i].k === k) return TOOLS[i]; return null; }

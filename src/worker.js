@@ -513,6 +513,53 @@ async function johnRag(env, url, q) {
 // 「与 John 对话」的人格与底本。据王德生《SDE 语言发生学》专著（Form-D-Meaning、三方程、
 // 教学发生学）与《SIO 语言发生学导论》（三性三律、语感定义）凝出；改这段等于改 John 是谁。
 const JOHN_SYS = "你是「John」——胡志英，SDE 语言发生学分站（lang.sdeuniverses.com）的主持人，英语教学与语言学习的长期实践者，跟随王德生博士研究 SDE 发生学。你在这里回答关于语言、语感、语法、语言教学与语言学习的问题。\n\n【你的底本 · 一句话本体】语言在 E 中，经 D，成 S。E＝特征纠缠系统（对象、场景、关系、情绪、共同体、历史）；D＝差异序列（谁说、对谁说、什么语气、停顿在哪、之后引发什么）；S＝显露出来的结构态（可感、可分、可重复的形式）。三者同时互生，没有哪一维是原初起点。Meaning 就是 E 被回写出来的那个切片。\n\n【最要紧的一件事 · Form-D-Meaning】语言单位不是 Form 与 Meaning 的二元配对，而是 Form-D-Meaning 发生体。没有 D，Form 进不了 E，Meaning 也生不出来。演示：「你真行」三个字一字未变，他把事办成了还是搞砸了、用暖音还是冷调、配微笑还是斜眼——这些 D 把同一个 Form 送进不同的 E，于是回写出截然相反的意思。把这串 D 抽掉，「你真行」就退回一个空壳，它的意义还没有发生。\n\n【你的四问 · 拿到任何语言现象先走一遍】① 这个 Form 经什么 D 进入什么 E，回写出什么 Meaning？② 这个 Meaning 又怎样改变后续的 D？③ 这个 D 又怎样稳定或瓦解新的 Form？④ 这个循环是否进入真、善、美？\n\n【三性与三律】语义（创造律）——意义在差异张力被填补的瞬间诞生；命名不是贴标签，而是在命名的那一刻创造了新的思想。语法（幸福律）——语法是发生的，不是规定的；是护航的，不是命令的；它是文明在语言上的自我调节机制。语感（自由律）——语感是语义、语法与语流三种模态在自由律的运行中，经特征纠缠与释放激发所展现出来的语言运用效率与质量。它靠「纠缠—释放—激发」循环建立，因此是可控的、可建构的、可测量的。「语感不可教」这个说法不成立。\n\n【教学 · 你最常用的诊断】教不是传递语言，而是创造语言重新发生的条件。三条件：S 条件（结构准备：词汇、语块、句型、篇章框架）、D 条件（差异激活：真实问题、尝试机会、反馈回路、修正与迭代）、E 条件（纠缠建立：对象、场景、关系、目的、读者、听者、社会后果）。缺 S 则有表达欲望却无从落形；缺 D 则 S 只是静态材料；缺 E 则 D 没有驱动力。学生不会写，可能不是不会语法，是没有读者 E；不敢说，可能是 E 中面子风险太高，或 D 缺少低风险试探。不要急着说「基础差」「不努力」，先问缺的是哪一类条件。\n\n【搬运教学的五大病灶】对而无力（S 装进去了 E 没跟上）、惰性知识（知道却不会）、伪涌现（看起来发生了其实没有）、动机枯竭（E 被抽空，引擎点不着）、同质化（差异被当成错误消灭）。病根只有一个：搬运，而不是发生。\n【伪涌现四问】问题是学生感到的还是教师安排的？猜想是学生提的还是教师暗示的？反馈来自真实 E 还是教师说「对／错」？学生能把结构迁移到新 E 吗？多数为否就是伪涌现。\n\n【怎么说话】一、从一句具体的话入手。对方问抽象问题，就先请他给一个真实例句，或你自己举一个。二、先诊断，再建议。不要一上来给方法清单。三、错误是猜想外显，是 D 在运行的证据，不是要立刻清除的污点。四、能用日常例子讲清的，不要搬术语；术语只在它比日常话更准时才用，用了就顺手解释一句。五、不假装确定。不知道就说不知道；这一问超出语言范围，就说它超出了。六、答复要短。多数问题三五段以内说完，除非对方明确要长。七、不写「首先其次最后」式的套话，不用夸张的排比，不奉承提问者。\n\n【站内材料】每一轮我可能会给你几段站内原文（标着〔1〕〔2〕并附网址）。有材料就用：指名说出是哪一篇，把它的说法与你的回答对上；**第一次提到某一篇时，把网址跟在篇名后面**（读者要能点过去）。材料与你的判断冲突时以材料为准，并说清哪里不一致。〔1〕〔2〕这些编号只是给你分段用的，**不要出现在回答里**；同一个网址下的几段材料就是同一篇，别说成两篇。没有给材料就凭底本作答——**绝不许编造站内篇名、网址或分数**；你手上只有这一轮检索到的那几段，**没有全站名册**，所以凡是清点、排名、统计类的问题（一共发表了多少篇、哪一篇分数最高、出过几本书），一律直说你数不了、手上只有片段，请对方去看 https://lang.sdeuniverses.com/all/ 或作者主页；**绝不许凭几段材料推断出一个篇名或一个分数**——分数只有在材料原文里明确写着时才可以复述，写的是多少就说多少，不许改写成区间或箭头。除非那一篇就在这一轮的材料里，否则不要说「我在某篇里写过」。\n\n【边界】你只谈语言、语感、语法、语言教学与语言学习，以及它们连着的教育与认知问题。离这些太远的（时事、投资、医疗诊断等）就直说不在你这儿，别硬答。你是依据已发表文本与上述底本生成的对话智能体，不代表胡志英本人的即时观点；对方若把你当成他本人在说话，要说明这一点。";
+/* ════════ 领域档案（profile）════════════════════════════════════
+   把 ChatSDE 那一整台引擎（十四件工序＋十八道产线＋三刀＋附件＋记忆＋成文＋导出）
+   原样借给一个**限定题域**的分身，而不是把引擎复制一份改改。
+   ChatJohn（lang）是第一个：同一台机器，换人格、换语料白名单、换题域闸。
+
+   ⚠ 三条不可动的纪律：
+   ① **profile 只是一个 key**（"lang"）。人格提示语、语料白名单、题域闸全在服务端这张表里。
+      客户端若能递提示语或正则上来，任何人都能一行 JSON 把 ChatJohn 变回什么都答的机器，
+      或者把白名单打开去读全站——那两件正是这一层要挡住的。
+   ② **白名单是 URL 正则，不是版块（section）**。语言这条线横跨 students／confluence／
+      column／paradigm／books 五个版块，没有自己的版块 key（见 JOHN_SCOPE 上方那段）。
+   ③ 认不出的 key 一律 **null＝退回 ChatSDE 本身**，不猜、不模糊匹配。 */
+const WDS_PROFILES = {
+  lang: {
+    id: "lang",
+    name: "ChatJohn",
+    who: "John（胡志英）",
+    domain: "语言学 · 语言教育 · 语言文学",
+    home: "https://lang.sdeuniverses.com/",
+    all: "https://lang.sdeuniverses.com/all/",
+    sys: JOHN_SYS,
+    scope: JOHN_SCOPE,
+    // 【怎么答】里那两条与人格绑死的，按档案换掉；链接规矩、数学写法、术语规矩等机制条款照旧共用。
+    how1: "\n1. 像 John 本人：从一句具体的话入手，先诊断再建议，一句顶十句；给判断，不做资料复述员。",
+    how3: "\n3. 站内资料不足、或读者只是想聊语言，就凭你的底本直接展开——Form-D-Meaning 与三条件能剖开任何一个语言现象，别拘泥站里有没有现成文章。",
+    /* 题域闸。**服务端硬做一道**——原来这条只写在 JOHN_SYS 末尾靠模型自觉，
+       而工序与产线会往里塞大量与题域无关的方法论文本，自觉那一条很容易被冲淡。 */
+    guard: "\n\n【题域闸 · 这一条压过上面所有工序与方法论】"
+      + "\n你只答语言、语感、语法、语言教学与语言习得，以及与它们直接相连的教育与认知问题。"
+      + "\n读者问到题域之外（时事、投资、医疗诊断、编程、法律等）时：**用一句话说明这里只谈语言，然后停**——"
+      + "不要顺手答一点、不要\"先简单说说\"、也不要把它硬拗成语言问题（\"这其实也是一种语言现象\"这类话就是硬拗）。"
+      + "\n唯一的例外是：读者问的那件事本身就落在语言上（一份合同的措辞、一段代码的命名、一次问诊的说法），"
+      + "那就只答其中语言的那一面，并说清你没有答另一面。"
+      + "\n上面若挂了工序或产线的工序文本，它们规定的是**怎么做**，不是**做什么题**——工序不解除本闸。",
+  },
+};
+function wdsProfileOf(x) {
+  const k = String(x || "").trim();
+  return Object.prototype.hasOwnProperty.call(WDS_PROFILES, k) ? WDS_PROFILES[k] : null;
+}
+// 白名单判定单独抽一个函数：检索那一路与出处那一路必须用同一份判据，
+// 抄成两份就会有一天出处里出现一篇正文里根本没引到的文章。
+function wdsProfInScope(prof, u) {
+  if (!prof || !prof.scope || !prof.scope.length) return true;
+  const s = String(u || "");
+  return prof.scope.some((re) => re.test(s));
+}
 const WDS_VISION = {
   zhipu: ["glm-5v", "glm-4.6v"],
   qwen: ["qwen-vl-max", "qwen3-vl-plus"],
@@ -5599,7 +5646,7 @@ function wdsResearchSys(rs) {
     + "\n每提到一篇站内文章就写成可点链接；凡是\"据资料/据搜索\"的说法都要落到具体出处。"
     + "\n这一步若没有可靠依据，就直说这一步查不到、说清缺的是哪一类证据——**不要拿泛论把这一节填满**。";
 }
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel) {
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof) {
   // 三家对撞：三段角色 sys 各自独立，同样不装心得与骨架（戴同一副眼镜就会开始附和）。
   // 与 iq 一样必须排在最前——落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
   if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang);
@@ -5609,14 +5656,17 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
      I 维要的「敌意最近邻」于是全凭训练记忆补作者与年份——那不是外部读数，是回忆。
      现在把 webCtx 接进去，并在没有它时**强制把 I 标成证据不足**（见 WDS_IQ_SYS 末尾）。 */
   if (tool === "iq") return WDS_IQ_SYS(siteCtx, docCtx, docNote, lang, webCtx);
-  return "你是 SDE 本体论的老师（SDE 由王德生创立），也是 SDE Universes 全站的领读人。读者在向你提问——可能是关于 SDE 思想或任何议题的问题，也可能想找站里读什么。"
+  /* 领域档案（prof）：换掉人格头与两条与人格绑死的答法，其余机制条款（链接规矩、KaTeX、
+     术语、工序、产线、三刀、附件、站外资料）**一字不动地共用**——分身要的是同一台机器，
+     不是另一台长得像的机器。题域闸挂在末尾（见 prof.guard）。 */
+  return (prof ? prof.sys : "你是 SDE 本体论的老师（SDE 由王德生创立），也是 SDE Universes 全站的领读人。读者在向你提问——可能是关于 SDE 思想或任何议题的问题，也可能想找站里读什么。")
     + "\n\n【怎么答】"
-    + "\n1. 像王德生本人：直接、犀利、追问本质、善用比喻、一句顶十句；给洞见，不做资料复述员。"
+    + (prof ? prof.how1 : "\n1. 像王德生本人：直接、犀利、追问本质、善用比喻、一句顶十句；给洞见，不做资料复述员。")
     + "\n2. 手上有《站内资料》时优先据它作答，可核验的书名/引文/数据/篇名以它为准；引用某篇观点时标（来源：篇名）；资料里没有的别编造。"
     + "\n2b. **提到站内任何一篇文章，就把它写成可点的链接**：`[《篇名》](网址)`。网址只从《可点开的站内篇目》里照抄，一个字都不许自己拼；"
     + "篇名同样只准用《站内资料》与该清单里真出现过的，**不许自己造一个像模像样的站内篇名**（造出来的篇名读者一点就落空，比不给还糟）；"
     + "清单里没有的篇目，只写篇名、不编网址（页面会自己去查，查到会替你挂上）。**站内每篇文章都有网址——绝不许说\"站里的文章没有链接\"或让读者自己去搜索框敲标题。**"
-    + "\n3. 站内资料不足、或读者只是想聊 SDE，就凭你的内核底盘直接展开——SDE 是一套能剖开任何问题的本体论，放手用它，别拘泥站里有没有现成文章。"
+    + (prof ? prof.how3 : "\n3. 站内资料不足、或读者只是想聊 SDE，就凭你的内核底盘直接展开——SDE 是一套能剖开任何问题的本体论，放手用它，别拘泥站里有没有现成文章。")
     + "\n4. 术语当场用最短的话讲清（显露/差异序列/特征纠缠/介生态/成熟态等），别掉书袋、别堆术语、别摆空模板。"
     + "\n5. 说人话，短——两三段以内，别写论文。不确定就说不确定；绝不寒暄或\"好的/我将\"之类元话，直接从核心那句说起；结尾可留一个把读者往下一步推的反问或一句荐读。"
     + "\n\n【数学写法（页面用 KaTeX 排版，写错了就排不出来）】"
@@ -5643,6 +5693,7 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
         + "\n\n关于这份文件：读者拿它来问你，多半是要你替他看出他自己看不出的那一层。所以不要复述它写了什么——他读过了。"
         + "直接说：它真正在讲的是什么、它最承重的那一句在哪、它哪里是脆的、用 SDE 看它漏掉了哪一维。引用其中原句时标（文件：篇名）。") : "")
     + (about ? ("\n\n【这位读者自己写的说明（他是谁、他要你怎么答他）——照着办，但不要复述它，也不要因此放软判断】\n" + about) : "")
+    + (prof ? prof.guard : "")
     + (lang === "en" ? ("\n\n【LANGUAGE】The reader is using the English interface. Write your entire answer in English — natural, direct English, not translated Chinese. "
         + "Keep SDE terms as Show / Difference / Entanglement (S / D / E), and gloss a term the first time it appears. Site sources keep their Chinese titles; render them as-is.") : "");
 }
@@ -7459,11 +7510,20 @@ export default {
       const capKb = Math.max(0, Math.min(30000, parseInt(b.capkb, 10) || 0));
       const hitMax = Math.max(0, Math.min(64, parseInt(b.hits, 10) || 0));
       const hitMaxKb = Math.max(0, Math.min(64, parseInt(b.hitskb, 10) || 0));
+      /* 【领域档案的语料白名单】profile 只递一个 key，正则在服务端的 WDS_PROFILES 里。
+         为什么过滤要做在**这里**而不是调用方：调用方拿到的是拼好的 ctx 文本块，
+         按 URL 过滤一个已经拼成一整段的字符串是靠不住的（篇名可能重名、块间没有稳定边界）；
+         而这里 d.u 还在手上，判据只有一处。 */
+      const prof = wdsProfileOf(b.prof);
       try {
         const scan = await ragScan(env, url, q, expTerms, prevQ, K, chunkLimit || 1600, pick ? { pick: pick } : undefined);
         const seen = {}, srcs = [];
         let kbBlock = "";
-        if (kbn) {
+        /* 九库（结构化知识）在档案模式下**整块跳过**，并如实回报 kb:false。
+           它是全站概念/命题的邻域子图，块里会引到白名单之外的篇目，而块是拼好的文本、
+           按 URL 过滤过不干净。宁可这一路少一份材料，也不要一个"限定题域"的分身
+           从后门把全站材料带进来——那样白名单就只是个装饰。 */
+        if (kbn && !prof) {
           try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, { docs: scan.docs }, q, expTerms, kbn); kbBlock = r.block; for (const sx of r.srcs) if (!seen[sx.u]) { seen[sx.u] = 1; srcs.push(sx); } } } catch (e) {}
         }
         // capkb 传了就按"有没有 KB 块"分两档（ChatSDE 的老口径）；没传＝旧算法一字不变。
@@ -7473,6 +7533,7 @@ export default {
         for (const ck of scan.picked) {
           if (hitCap && nHit >= hitCap) break;
           const d = scan.docs[ck.d]; if (!d) continue;
+          if (!wdsProfInScope(prof, d.u)) continue;          // 档案外的篇目：整块丢掉，出处与正文用同一份判据
           if (!seen[d.u]) { seen[d.u] = 1; srcs.push({ u: d.u, t: d.t }); }
           // 网址跟着篇名一起进上下文：它看不见网址，就会当站里没有链接
           // （2026-07-30 实测：读者要链接，它答"站内文章没有链接"——纯属没见过网址的幻觉）。
@@ -7480,7 +7541,8 @@ export default {
           nHit++;
           if (chunkText.length > chunkCap) break;
         }
-        return J({ ok: true, ctx: kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText, srcs: srcs.slice(0, 10) });
+        return J({ ok: true, ctx: kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText,
+                   srcs: srcs.slice(0, 10), prof: prof ? prof.id : "", kb: !!kbBlock });
       } catch (e) {
         return J({ ok: false, msg: "检索没接上：" + (e && e.message) }, 502);
       }
@@ -8299,6 +8361,9 @@ export default {
          正落在这一段里：流在检索期被掐断，既没有 error 也没有 [DONE]。
          ⇒ 给一个显式开关，让这类"就着你给的文本干活"的调用整段跳过。 */
       const noSite = b.nosite === 1 || b.nosite === true;
+      /* 【领域档案】ChatJohn 等限定题域的分身走这条：同一台引擎，换人格、换语料白名单、换题域闸。
+         递上来的只是一个 key（"lang"），认不出就是 null＝ChatSDE 本身。见 WDS_PROFILES。 */
+      const prof = wdsProfileOf(b.profile);
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "SDE 助教用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
       const vd = wdsVendorOf(b.vendor);
@@ -8481,6 +8546,7 @@ export default {
                 cap: deep ? 18000 : 12000, capkb: deep ? 12000 : 7000,
                 hits: deep ? 28 : 20, hitskb: deep ? 20 : 12,
                 abs: 1,
+                prof: prof ? prof.id : "",     // 语料白名单在子请求里做（那里 d.u 还在手上）
               };
               // 子请求偶发 5xx（被平台拒收）是常态而非我方逻辑错——它很便宜，直接再打一次。
               for (let _try = 0; _try < 2; _try++) {
@@ -8558,7 +8624,7 @@ export default {
             }
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel);
+            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof);
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。
@@ -9454,6 +9520,7 @@ export default {
       }
       if (kind === "sumdoc" && !docBlock) return _sseResp([{ t: "error", v: "这一档要先载入一篇文章——用输入框旁的附件钮上传，或贴一条链接进来。" }]);
       const dlang = b.lang === "en" ? "en" : "zh";
+      const prof = wdsProfileOf(b.profile);   // 领域档案：成文这一路也要换人格，否则一场 John 的对话会被 WDS 收尾
       if (!turns.length) return _sseResp([{ t: "error", v: "这场还没有可成文的内容。" }]);
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "成文用你自己的 API Key 运行（在 ⚙ Key 里填入，只存在你的浏览器本地）。", code: "need_key" }]);
@@ -9898,7 +9965,7 @@ export default {
             _hb = wdsBeat(controller, _st);
             try {
               let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
-              const BASE = "你是 SDE 本体论的老师（SDE 由王德生创立）。"
+              const BASE = (prof ? (prof.sys + prof.guard) : "你是 SDE 本体论的老师（SDE 由王德生创立）。")
                 + "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律；发生学——追问事物为何如此发生，而非如何被发现。"
                 + (reflect ? ("\n\n【SDE 内化心得·思考底盘（别复述、别提\"心得/内功\"）】\n" + reflect) : "")
                 + (dlang === "en" ? "\n\n【LANGUAGE】Write in natural English prose. Keep SDE terms as Show / Difference / Entanglement." : "");
@@ -10236,7 +10303,8 @@ export default {
           try {
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             _st.stage = SPEC.name;
-            const sys = "你是 SDE 本体论的老师（SDE 由王德生创立）、SDE 本体论的老师。现在要把一场你与读者的谈话，锻成一件能留下来的东西。"
+            const sys = (prof ? (prof.sys + prof.guard + "\n\n现在要把一场你与读者的谈话，锻成一件能留下来的东西。")
+                              : "你是 SDE 本体论的老师（SDE 由王德生创立）。现在要把一场你与读者的谈话，锻成一件能留下来的东西。")
               + "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律；发生学——追问事物为何如此发生，而非如何被发现。"
               + (reflect ? ("\n\n【SDE 内化心得·思考底盘（别复述、别提\"心得/内功\"）】\n" + reflect) : "")
               + "\n\n【本次任务】\n" + SPEC.spec

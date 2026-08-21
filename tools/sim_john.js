@@ -93,7 +93,11 @@ const fs2=require("fs");
 let p3=0,f3=0; const t3=(n,c)=>{console.log((c?"PASS":"FAIL"),n); c?p3++:f3++;};
 
 // 前端 KINDS 必须与后端 JOHN_COMPOSE 段数一致（两处对不上＝缺段或空转）
-const page=fs2.readFileSync("public/sites/lang/chatjohn/index.html","utf8");
+/* ⚠ 路径改了：ChatJohn 的完整版自 2026-08-21 起是 ChatSDE 引擎的一张壳页
+   （/chatjohn/index.html 只有两行接线），这两份 sim 验的是**旧那份自制页**，
+   它已整份移到 /chatjohn/lite/ 当退路。守的东西没变，只是它搬了家。
+   新那层（领域档案）的护栏另有一份：tools/sim_wds_profile.js。 */
+const page=fs2.readFileSync("public/sites/lang/chatjohn/lite/index.html","utf8");
 const m=page.match(/var KINDS=\{([\s\S]*?)\};/);
 t3("页面里有 KINDS 表", !!m);
 if(m){
@@ -135,7 +139,7 @@ t4("短 Key 被挡", needKey("sk-123"));
 t4("正常 Key 放行", !needKey("sk-abcdefghijklmn"));
 
 // 与页面同一份 md()：从页面里抠出来跑，防止两边漂移
-const page2=fs2.readFileSync("public/sites/lang/chatjohn/index.html","utf8");
+const page2=fs2.readFileSync("public/sites/lang/chatjohn/lite/index.html","utf8");
 const mdSrc=[null, (page2.match(/function inline\(s\)\{[\s\S]*?\n\}/)||[])[0], (page2.match(/function md\(src\)\{[\s\S]*?\n\}\n/)||[])[0]];
 t4("页面里能抠出 md 渲染器", !!(mdSrc[1]&&mdSrc[2]));
 if(mdSrc[1]&&mdSrc[2]){
@@ -198,7 +202,7 @@ t5("坏 JSON 报 parse", parseQs("{乱码").err==="parse");
 t5("空数组不给问", parseQs("[]").qs.length===0);
 t5("超长问被截到60", parseQs('[{"tool":"三方程","q":"'+"追".repeat(200)+'"}]').qs[0].q.length===60);
 // 页面侧：三问区必须存在且失败时静默移除
-const page3=fs2.readFileSync("public/sites/lang/chatjohn/index.html","utf8");
+const page3=fs2.readFileSync("public/sites/lang/chatjohn/lite/index.html","utf8");
 t5("页面有 nextQ", page3.indexOf("function nextQ(")>=0);
 t5("失败时移除追问区", /catch\(function\(\)\{ try\{ box\.removeChild\(wrapd\)/.test(page3));
 t5("答完才拉追问", page3.indexOf("nextQ(m.box)")>=0);

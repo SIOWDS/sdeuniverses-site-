@@ -17,7 +17,8 @@ ok(seg.length > 2000, "三段角色正文有实体（不是空壳），实得 " 
 console.log("② 改道排在最前，且不装心得与骨架");
 const cs = W.slice(W.indexOf("function WDS_CHAT_SYS("), W.indexOf("function WDS_CHAT_SYS(") + 1600);
 ok(/if \(duel && DUEL_ROLES\[duel\.role\]\) return WDS_DUEL_SYS\(/.test(cs), "WDS_CHAT_SYS 开头对 duel 整段改道");
-const pD = cs.indexOf("DUEL_ROLES[duel.role]"), pR = cs.indexOf('return "你是 SDE 本体论的老师');
+/* ⚠ 同上：人格头被领域档案包起来之后，旧的字面锚点失效，而要守的次序没变。 */
+const pD = cs.indexOf("DUEL_ROLES[duel.role]"), pR = cs.search(/return \(?\s*(prof \? prof\.sys : )?"你是 SDE 本体论的老师/);
 ok(pD >= 0 && pR >= 0 && pD < pR, "改道在老师人格那条 return 之前");
 ok(!/\breflect\b/.test(seg), "三段都不注入心得（戴同一副眼镜就会开始附和）");
 ok(!/\bSDEM\b/.test(seg) && !/SDE_METHOD_BLOCK/.test(seg), "三段都不注入 SDE 骨架与方法论块");
@@ -52,7 +53,10 @@ ok(/证伪条件/.test(C), "要一条证伪条件");
 console.log("⑥ 请求体解析：白名单 + 切长");
 ok(/DUEL_ROLES\[String\(duelRaw\.role \|\| ""\)\]/.test(W), "role 走白名单");
 ok(/\.slice\(0, 24000\)/.test(W), "prior 切长防撑爆输入窗");
-ok(/, tool, rs, duel\);/.test(W), "调用处补了 duel 参数");
+/* ⚠ 原来钉的是参数表**末尾**（`, tool, rs, duel);`）——于是后面每加一个参数都假红。
+   要守的是「调用处递了 duel」，与它是不是最后一个无关。 */
+const _csCall = /const sys = WDS_CHAT_SYS\(([^;]*)\);/.exec(W);
+ok(!!_csCall && /\bduel\b/.test(_csCall[1]), "调用处补了 duel 参数");
 
 console.log("⑦ 前端：串行、异质、互斥、降级");
 ok(/function sendTri\(/.test(F), "sendTri 存在");

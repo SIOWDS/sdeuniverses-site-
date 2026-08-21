@@ -648,7 +648,24 @@ console.log("⑧ 成文（distill）");
     "侧栏这颗 △ 刻意不烧——火只留浏览首页那一处");
 }
   // 抬头写"你在哪儿"，底下三颗写"能去哪儿"——所以底下不再有一颗写着 ChatSDE 的死按钮
-  ok(/<a href='\/taste\/chatsde\/'>ChatSDE<\/a>/.test(src), "侧栏抬头就是产品名 ChatSDE");
+  /* ⚠ 原来查的是源码字面 `<a href='/taste/chatsde/'>ChatSDE</a>`。领域档案（WDSM_PROFILE）
+     把它改成了变量拼接，字面没了——而要守的事（侧栏抬头就是产品名，且点得回本产品的首页）
+     一个字没变。**手上有 DOM 就验渲染结果**，比查源码字面守得更准：
+     这一份 sim 没挂档案，所以此处必须仍是 ChatSDE——顺带守住「不挂档案＝退回 ChatSDE」。 */
+  {
+    /* 本想直接验渲染结果，但这份 sim 的桩 DOM 是**扁平解析**（见文件开头那条注释）：
+       没有 class 的 <a> 挂不上节点，querySelector 取不到、htmlOf 也是空。
+       ⇒ 退一步守两件事，合起来等价于原来那条字面断言，且加一个档案不会再把它弄红：
+         ① 抬头用的是 PAGE_URL / BRAND 两个变量（不是写死的某个产品）；
+         ② **不挂 WDSM_PROFILE 时，这两个变量就是 ChatSDE 与 /taste/chatsde/**。
+       第②条同时守住了「认不出的档案一律退回 ChatSDE」这条纪律。 */
+    ok(/wdsm-sbrand'><a href='" \+ PAGE_URL \+ "'>" \+ esc\(BRAND\) \+ "<\/a>/.test(src),
+       "侧栏抬头由 PAGE_URL / BRAND 决定");
+    const _dfB = /var BRAND = PROFILE \? PROFILE\.brand : "([^"]+)"/.exec(src);
+    const _dfU = /var PAGE_URL = PROFILE \? PROFILE\.url : "([^"]+)"/.exec(src);
+    ok(!!_dfB && _dfB[1] === "ChatSDE", "没挂档案时品牌就是 ChatSDE，实得 " + (_dfB ? _dfB[1] : "(没有)"));
+    ok(!!_dfU && _dfU[1] === "/taste/chatsde/", "没挂档案时入口就是 /taste/chatsde/，实得 " + (_dfU ? _dfU[1] : "(没有)"));
+  }
   ok(!layer.querySelector(".wdsm-tab[data-m='wds']"), "底下那颗点了没反应的 ChatSDE 已经撤掉");
   const _pt = layer.querySelector(".wdsm-tab[data-m='portal']");
   ok(_pt && _pt.textContent.includes("系统入口"), "第三颗改成「系统入口」，实得 " + (_pt ? _pt.textContent : "(没有)"));

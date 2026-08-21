@@ -34,8 +34,12 @@ ok(/WDS_TOOL_KEYS\.indexOf\(String\(b\.tool \|\| ""\)\) >= 0 \? String\(b\.tool\
    "认不出的 tool 一律当没选（不把读者传来的字符串拼进 system）");
 
 console.log("③ 工序块拼进 system；近邻名单前置");
-ok(/function WDS_CHAT_SYS\(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool(?:, rs)?(?:, duel)?\)/.test(W),
-   "WDS_CHAT_SYS 收 tool");
+/* ⚠ 这条原来把**整串形参**抄进正则，加一个参数就假红（2026-08-21 加 prof 时又红了一次，
+   本仓同型坑第三次）。按用意重写：只认函数名，且形参表里有 tool。
+   再补一条「收了却不用」——签名有、正文一处没用，才是真正会静默失效的那种坏法。 */
+const _csSig = /function WDS_CHAT_SYS\(([^)]*)\)/.exec(W);
+ok(!!_csSig && /\btool\b/.test(_csSig[1]), "WDS_CHAT_SYS 收 tool");
+ok(/wdsToolSys\(tool\)/.test(W), "tool 在正文里真用上了（不是收了不用）");
 ok(/\+ wdsToolSys\(tool\)/.test(W), "system 里拼了 wdsToolSys(tool)");
 ok(/WDS_CHAT_SYS\(reflect, SDEM, \(nbrCtx \? nbrCtx \+ "\\n" : ""\) \+ ctxText/.test(W),
    "近邻名单前置在站内语料之前（放后面会被两万字语料埋掉）");

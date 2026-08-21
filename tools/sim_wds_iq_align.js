@@ -24,7 +24,10 @@ console.log("② 改道排在最前——落进那串 + 号就已经晚了");
 const chatSeg = W.slice(W.indexOf("function WDS_CHAT_SYS("), W.indexOf("function WDS_CHAT_SYS(") + 1200);
 ok(/if \(tool === "iq"\) return WDS_IQ_SYS\(/.test(chatSeg), "WDS_CHAT_SYS 开头对 iq 整段改道");
 const posGate = chatSeg.indexOf('if (tool === "iq")');
-const posRet = chatSeg.indexOf('return "你是 SDE 本体论的老师');
+/* ⚠ 锚点原来钉在 `return "你是 SDE 本体论的老师` 上。领域档案（prof）把人格头包成了
+   `return (prof ? prof.sys : "你是 SDE 本体论的老师…")`，字面就没了——而这条要守的事
+   （iq 改道必须排在通用人格那条 return 之前）一个字没变。锚改成「通用人格那条 return」本身。 */
+const posRet = chatSeg.search(/return \(?\s*(prof \? prof\.sys : )?"你是 SDE 本体论的老师/);
 ok(posGate >= 0 && posRet >= 0 && posGate < posRet, "改道语句在老师人格那条 return 之前");
 
 console.log("③ 评分 sys 里确实没有那四样");
