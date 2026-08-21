@@ -373,6 +373,23 @@ console.log("\n── ⑧ 分身页不画三态条（2026-08-22 摘除）──�
   t("样式留着（要恢复只需把判断改回常量串）", /\.wdsm-tabs\{display:flex/.test(js));
 }
 
+console.log("\n── ⑨ 分身页的历史记录另立一库（2026-08-22）──────");
+{
+  const js = fs.readFileSync("public/wds-mode.js", "utf8");
+  /* ⚠ 前提是查实过的：`lang.sdeuniverses.com/taste/chatsde/` 与 ChatJohn **同源**
+     （分站把主站那一页也照样供出来了），所以两台共用同一份 IndexedDB 与 localStorage。
+     不分库的后果不是报错，是**读者在语言分站里翻自己的记录，翻出一堆主站的对话与论文**。 */
+  t("挂了档案时对话库另起一个名", /AGENT_CHAT = PROF_ID \? \("wds-chat:" \+ PROF_ID\)/.test(js));
+  t("挂了档案时成文库另起一个名", /AGENT_DIST = PROF_ID \? \("wds-distill:" \+ PROF_ID\)/.test(js));
+  t("挂了档案时产线库另起一个名", /AGENT_FORGE = PROF_ID \? \("wds-forge:" \+ PROF_ID\)/.test(js));
+  t("画布留存的钥匙也分（同源共用 localStorage）", /CV_LS = PROF_ID \? \("sde_wds_cv:" \+ PROF_ID\)/.test(js));
+  t("不挂档案时三处仍是老名字（ChatSDE 的旧记录不失联）",
+    /: "wds-chat";/.test(js) && /: "wds-distill";/.test(js) && /: "wds-forge";/.test(js));
+  t("⭐ 全文没有一处还写死着库名", !/agent: "wds-(chat|distill|forge)"/.test(js));
+  t("记忆仍是跨台的（profileKey 照旧 global，别跟着分）", /profileKey: "profile:global"/.test(js));
+  t("画布落件与落新版本都会进历史", (js.match(/cvToHistory\(it\);/g) || []).length >= 2);
+}
+
 console.log("\n" + "═".repeat(48));
 console.log("总计  PASS " + pass + "   FAIL " + fail);
 if (fail) process.exit(1);

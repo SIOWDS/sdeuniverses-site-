@@ -241,6 +241,17 @@
   var WHO = PROFILE && PROFILE.who ? PROFILE.who : "WDS";                                // 答者的名字
   var KICKER = PROFILE && PROFILE.kicker ? PROFILE.kicker : "SDE UNIVERSES";             // PPT 每页角标
   function fileTag(dflt) { return PROF_ID ? BRAND : dflt; }                              // 下载文件名的前缀
+  /* ── 历史记录按档案分库（2026-08-22）──
+     本机的 IndexedDB 按 agent 分表。此前 ChatJohn 与 ChatSDE **共用同两张表**：
+     侧栏的会话列表、顶栏的历史面板、成文记录三处都会把对方的东西列出来——
+     读者在语言分站里翻自己的记录，翻出一堆主站的对话与论文。
+     ⚠ scope 这一格已经归**项目**用了（同一台机器里的分摊活），所以分库只能做在 agent 上。
+     ⚠ 换名之后，此前存在 `wds-chat` / `wds-distill` 里的 ChatJohn 旧记录不会再列出来
+       ——它们仍在库里、没有被删，从 ChatSDE 那一侧仍打得开。这是这一刀的已知代价。
+     💡 记忆（wds-memo）走的是 listAll，跨所有 agent 扫，不受这次改名影响。 */
+  var AGENT_CHAT = PROF_ID ? ("wds-chat:" + PROF_ID) : "wds-chat";
+  var AGENT_DIST = PROF_ID ? ("wds-distill:" + PROF_ID) : "wds-distill";
+  var AGENT_FORGE = PROF_ID ? ("wds-forge:" + PROF_ID) : "wds-forge";
   /* 每一个打到 /api/wds/* 的请求都要盖上这个戳。
      ⚠ 漏一处的后果不是报错，是**静默串台**：那一路会拿 WDS 的人格、全站的语料来答，
      而页面上仍写着 ChatJohn。所以盖戳集中在这一个函数里，调用点只管调它。 */
@@ -1919,7 +1930,10 @@
     function go() {
       if (!window.WDSMemo || !stApi) return;
       MEM = window.WDSMemo.create({
-        store: stApi, agent: "wds-chat", agents: "all", profileKey: "profile:global",
+        /* ⚠ 这里的 agent 只是**没传 agents:"all" 时的退路**——真正在用的是 listAll，
+           跨全部智能体取记忆。跟着 AGENT_CHAT 走只是为了不留写死的库名；
+           记忆本身**照旧是跨台的**（profileKey 仍是 global），这一条别改。 */
+        store: stApi, agent: AGENT_CHAT, agents: "all", profileKey: "profile:global",
         currentId: function () { return stSess ? stSess.id() : ""; },
       });
       MEM.refresh(function () { memBadge(); });
@@ -2578,7 +2592,7 @@
   function stMakeSession() {
     if (!stApi) return;
     var _p = pjInfo(pjCur());
-    stSess = stApi.session({ agent: "wds-chat", scope: _p ? _p.id : "", scopeLabel: _p ? _p.name : "" });
+    stSess = stApi.session({ agent: AGENT_CHAT, scope: _p ? _p.id : "", scopeLabel: _p ? _p.name : "" });
   }
   function stBoot() {
     if (stApi !== null || stBooting) return;
@@ -2699,7 +2713,7 @@
     b.style.display = "";
     b.onclick = function () {
       if (!stApi) return;
-      stApi.openPanel({ agent: "wds-chat", theme: "dark", onRestore: stRestore });
+      stApi.openPanel({ agent: AGENT_CHAT, theme: "dark", onRestore: stRestore });
     };
   }
   function stRestore(rec) {
@@ -4428,7 +4442,11 @@
   var cvBarEl = layer.querySelector(".wdsm-cvbar");
   var cvWrapEl = layer.querySelector(".wdsm-cvwrap");
   var CV = { items: [], cur: -1, src: false, sel: "", want: null, note: "", edit: false, diff: false, rich: true, talk: false, full: false, lab: false, labBusy: false };
-  var CV_LS = "sde_wds_cv";          // 画布随刷新留存（成品不该因为按了 F5 就消失）
+  /* ⚠ 这把钥匙必须按档案分（2026-08-22 查实）：`lang.sdeuniverses.com/taste/chatsde/`
+     与 ChatJohn **是同一个源**——分站把主站那一页也照样供出来了。同源就共用 localStorage，
+     于是两台的画布互相覆盖：在 ChatJohn 落一份研究报告，切到 ChatSDE 一看，它把人家的顶掉了。
+     IndexedDB 同理，那一层分在 AGENT_CHAT / AGENT_DIST 上（见上面那段）。 */
+  var CV_LS = PROF_ID ? ("sde_wds_cv:" + PROF_ID) : "sde_wds_cv";   // 画布随刷新留存（成品不该因为按了 F5 就消失）
   var CV_MAX = 20;
   var CV_KIND = { html: "html", svg: "svg", mermaid: "mermaid", md: "md", markdown: "md", csv: "csv", tsv: "csv", json: "json" };
   function cvKind(lang) {
@@ -4474,6 +4492,7 @@
     it.vers.push(text);
     cvMeta(it).push({ by: by || "?", op: op || "", at: stampTime() });
     it.vi = it.vers.length - 1;
+    try { cvToHistory(it); } catch (e) {}   // 改出新一版也进历史（同一条记录覆盖，不堆条）
   }
   function stampTime() {
     var d = new Date();
@@ -4503,6 +4522,7 @@
     CV.cur = CV.items.indexOf(it);
     if (!quiet) cvShow(true);
     cvPaint();
+    try { cvToHistory(it); } catch (e) {}   // 落一件就进历史，下一次还找得回来
     return it;
   }
   // 扫一条回答里的围栏块。不用 lookbehind（老 Safari 当场语法错、整脚本一起死，这是吃过的亏）。
@@ -5548,6 +5568,37 @@
 
   /* 留存：画布装的是**成品**，按一下 F5 就全没了是说不过去的。
      只存这一场（cvReset 会一并清掉），存的是源码不是渲染结果。 */
+  /* ── 画布也进历史（2026-08-22 · 用户令「所有行为形成的结果都要进历史记录」）──
+     此前画布只有 localStorage 那一份留存：换台机器没有、开新一场就被 cvReset 清掉，
+     而深度研究的报告、结构图、共创的成稿全都落在画布上。
+     ⇒ 落一件、或落一个新版本，就往「成文记录」里存一条（与成文同一个库，好在一处翻）。
+     三条纪律：① **一件一条**——按标题记住它的 session，改一版是覆盖，不是再堆一条；
+     ② 太短的不存（一句话的结构图不值得占一格）；③ 防抖，别在连改十次时写十次盘。 */
+  var cvHist = {}, cvHistT = null;
+  function cvToHistory(it) {
+    if (!it || !it.vers || !it.vers.length) return;
+    var body = String(it.vers[it.vers.length - 1] || "");
+    if (body.length < 200) return;
+    var key = String(it.kind || "md") + "|" + String(it.title || "");
+    clearTimeout(cvHistT);
+    cvHistT = setTimeout(function () {
+      function put(A) {
+        if (!A) return;
+        try {
+          if (!cvHist[key]) cvHist[key] = A.session({ agent: AGENT_DIST, scope: "",
+            scopeLabel: tx("cvTitle") + " \u00b7 " + (it.title || it.kind) });
+          cvHist[key].save([{ role: "reader", text: tx("cvTitle") + " \u00b7 " + (it.title || it.kind)
+                              + " \u00b7 " + new Date().toLocaleString() },
+                            { role: "wds", text: body }]);
+        } catch (e) {}
+      }
+      if (window.WDSStore) { window.WDSStore.load(put); return; }
+      var sc = document.createElement("script");
+      sc.src = "/assets/wds-store.js"; sc.async = true;
+      sc.onload = function () { if (window.WDSStore) window.WDSStore.load(put); };
+      document.head.appendChild(sc);
+    }, 1500);
+  }
   var cvSaveT = null;
   function cvSave() {
     clearTimeout(cvSaveT);
@@ -5700,6 +5751,9 @@
     CV.lab = false; CV.labBusy = false;
     if (cvEl) cvEl.classList.remove("labon");
     CV.full = false; layer.classList.remove("cvfull");
+    /* ⚠ 连 session 映射一起清：不清的话，新一场里一件同名的画布件会覆盖**上一场**
+       那条历史记录——上一场的成品就这么没了，而且没有任何提示。 */
+    cvHist = {}; clearTimeout(cvHistT);
     try { localStorage.removeItem(CV_LS); } catch (e) {}
     cvShow(false); cvPaint();
   }
@@ -5877,7 +5931,7 @@
   function forgeLastRun(cb) {
     function go(A) {
       if (!A) return cb(null);
-      A.list("wds-forge").then(function (ms) {
+      A.list(AGENT_FORGE).then(function (ms) {
         if (!ms || !ms.length) return cb(null);
         A.get(ms[0].id).then(function (rec) {
           var st = null;
@@ -5930,7 +5984,7 @@
       function put(A) {
         if (!A) return;
         try {
-          if (!runSess) runSess = A.session({ agent: "wds-forge", scope: "", scopeLabel: tx("fgTitle") });
+          if (!runSess) runSess = A.session({ agent: AGENT_FORGE, scope: "", scopeLabel: tx("fgTitle") });
           runSess.save([{ role: "reader", text: topic },
                         { role: "wds", text: JSON.stringify(runState()) }]);
         } catch (e) {}
@@ -6381,12 +6435,18 @@
     });
   }
 
+  /* 存进历史里的那一行名字。**档名在前、笔法在后，用 " · " 隔开**——
+     取回时按前半段反查是哪一档（见 openDistillHistory），后半段只给读者看。
+     ⚠ 别把顺序倒过来：反查认的是第一段。 */
+  function distLabel(kind, style) {
+    return kindT(kind) + (style ? (" · " + t("wsOn") + writerName(style)) : "");
+  }
   /* ── 成文落本机：和对话记录共用 IndexedDB，但另立一个 agent，两个历史面板互不混。 ── */
   function distSave(label, text, cb) {
     function go(A) {
       if (!A) { cb(false); return; }
       try {
-        var sess = A.session({ agent: "wds-distill", scope: "", scopeLabel: label });
+        var sess = A.session({ agent: AGENT_DIST, scope: "", scopeLabel: label });
         sess.save([{ role: "reader", text: label + " · " + new Date().toLocaleString() },
                    { role: "wds", text: text }]);
         sess.reset();
@@ -6404,7 +6464,7 @@
     function go(A) {
       if (!A) { alert(t("dNoStore")); return; }
       A.openPanel({
-        agent: "wds-distill", theme: "dark",
+        agent: AGENT_DIST, theme: "dark",
         onRestore: function (rec) {
           var body = "", head = rec.scopeLabel || rec.title || "";
           (rec.turns || []).forEach(function (x) { if (x && x.role === "wds") body = x.text; });
@@ -6414,10 +6474,18 @@
              稿子明明还在，却拿不出 Word 也拿不出 PDF。
              存进去的 scopeLabel 就是 kindT(kind)，照着反查即可；档名改过（一万字→两万字→
              学术论文…），老记录对不上，就按正文形状兜底认成论文。 */
+          /* ⚠ 存进去的名字现在可能带笔法（「短篇小说（2000字） · 笔法：契诃夫」），
+             所以反查只认 " · " 之前那一段——按整串比，带笔法的记录一条都认不出来，
+             表现是取回的稿子一颗导出按钮都没有。 */
+          var head0 = String(head).split(" \u00b7 ")[0];
           var k = "";
-          KIND_KEYS.forEach(function (x) { if (!k && kindT(x) === head) k = x; });
+          KIND_KEYS.forEach(function (x) { if (!k && kindT(x) === head0) k = x; });
+          /* 笔法也认回来：存的是名字（读者看得懂的那个），这里按名字倒查回 id，
+             取回的那一篇于是仍标着「笔法：某某」，接着重写也还用同一只手。 */
+          var st = "", mSt = /\u00b7\s*[^:：]*[:：]\s*(.+)$/.exec(String(head));
+          if (mSt) { var nm0 = mSt[1].trim(); for (var wi = 0; wi < WRITERS.length; wi++) if (WRITERS[wi].n === nm0) st = WRITERS[wi].k; }
           if (!k) k = /【摘要】|【关键词】|参考文献|Keywords/.test(body.slice(0, 4000)) ? "paper" : "report";
-          distill(k, body, head);
+          distill(k, body, head, "", null, st);
         },
       });
     }
@@ -6678,7 +6746,7 @@
       pTrace.leg = "收尾·存稿"; traceSave();
       if (text && text.length > 200 && !existing) {
         try {
-          distSave(kindT(kind), text, function (okv) {
+          distSave(distLabel(kind, style), text, function (okv) {
             if (okv) dNote(t("dAutoSaved"));
             else dNote(t("dAutoFail"), 1);
           });
@@ -6892,7 +6960,7 @@
     function distClose() {
       try { dStopped = true; } catch (e) {}
       try { if (dr) dr.cancel(); } catch (e) {}
-      try { if (text && text.length > 200 && !existing) distSave(kindT(kind), text, function () {}); } catch (e) {}
+      try { if (text && text.length > 200 && !existing) distSave(distLabel(kind, style), text, function () {}); } catch (e) {}
       try { if (beatT) { clearInterval(beatT); beatT = null; } } catch (e) {}
       try { document.removeEventListener("keydown", distEsc, true); } catch (e) {}
       if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
@@ -6919,7 +6987,7 @@
     dlBtn.onclick = function () { download(fileTag("WDS") + "-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
     svBtn.onclick = function () {
       if (!text) return;
-      distSave(kindT(kind), text, function (ok) { svBtn.textContent = ok ? t("dSaved") : t("dNoStore"); });
+      distSave(distLabel(kind, style), text, function (ok) { svBtn.textContent = ok ? t("dSaved") : t("dNoStore"); });
     };
     /* ── 增量渲染：写定的段落只排一次 ────────────────────────────────
        原来每 130ms 把**累计全文**重排一遍（O(N²)），一万字就开始卡、十万字必死。
@@ -7196,8 +7264,8 @@
       function put(A) {
         if (!A) return;
         try {
-          if (!dsess) dsess = A.session({ agent: "wds-distill", scope: "", scopeLabel: kindT(kind) });
-          dsess.save([{ role: "reader", text: kindT(kind) + " · " + new Date().toLocaleString() + (tag ? ("（" + tag + "）") : "") },
+          if (!dsess) dsess = A.session({ agent: AGENT_DIST, scope: "", scopeLabel: distLabel(kind, style) });
+          dsess.save([{ role: "reader", text: distLabel(kind, style) + " · " + new Date().toLocaleString() + (tag ? ("（" + tag + "）") : "") },
                       { role: "wds", text: text }]);
         } catch (e) {}
       }
@@ -7708,7 +7776,7 @@
     if (!sbListEl) return;
     if (!stApi) { sbListEl.innerHTML = ""; return; }
     // 选了项目就只列这个项目的（scope 传 undefined＝不限，列全部）
-    stApi.list("wds-chat", pjCur() || undefined).then(function (metas) {
+    stApi.list(AGENT_CHAT, pjCur() || undefined).then(function (metas) {
       sbListEl.innerHTML = "";
       var kw = sbKw.toLowerCase();
       var rows = (metas || []).filter(function (m) {

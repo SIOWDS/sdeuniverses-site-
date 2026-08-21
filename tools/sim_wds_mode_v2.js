@@ -169,13 +169,15 @@ global.alert = (m) => { console.log("  [alert] " + m); };
 window.document = document; window.localStorage = localStorage; window.fetch = fetchMock;
 window.speechSynthesis = speechMock;
 let STORE_SESSIONS_HOOK = null;
+// 每一次 session()／save() 都留底：验「哪些结果真的进了历史、进的是哪一个库」
+const SESSIONS = [], SAVES = [], LISTED = [], PANELS = [];
 // wds-store 的桩：只做到"够 wds-mode 跑起来"，重点是能验到成文写完自动存稿这一件事。
 // 凡返回 Promise 的照样返回 Promise——产品码到处 .then()，返回裸值会当场炸在加载阶段。
 window.WDSStore = {
   load(cb) {
     cb({
-      session(o) { return { save(turns) { if (STORE_SESSIONS_HOOK) STORE_SESSIONS_HOOK(turns, o); }, reset() {} }; },
-      list() { return Promise.resolve([]); },
+      session(o) { SESSIONS.push(o); return { save(turns) { SAVES.push({ cfg: o, turns: turns }); if (STORE_SESSIONS_HOOK) STORE_SESSIONS_HOOK(turns, o); }, reset() {} }; },
+      list(a, sc) { LISTED.push({ agent: a, scope: sc }); return Promise.resolve([]); },
       get() { return Promise.resolve(null); },
       remove() { return Promise.resolve(); },
       rename() { return Promise.resolve(); },
@@ -185,7 +187,7 @@ window.WDSStore = {
       kvGet() { return Promise.resolve(null); },
       kvSet() { return Promise.resolve(); },
       stamp(ts) { return new Date(ts).toISOString().slice(0, 10); },
-      openPanel() {},
+      openPanel(cfg) { PANELS.push(cfg); },
     });
   },
 };
@@ -1552,6 +1554,49 @@ console.log("⑧ 成文（distill）");
   const tr6 = JSON.parse(store["sde_wds_dist_trace"] || "null");
   ok(tr6 && tr6.leg === "已收尾" && tr6.ok === true, "正常跑完时痕迹停在「已收尾」，实得 " + (tr6 && tr6.leg));
   document.body.querySelector(".wdsm-dist").querySelector(".dx").click();
+
+  console.log("㉗ 所有结果都进历史记录（2026-08-22 用户令）");
+  {
+    /* 这一节守的是一件很容易看走眼的事：**东西存下了 ≠ 下次找得到**。
+       ⚠ 查实过的前提：`lang.sdeuniverses.com/taste/chatsde/` 与 ChatJohn **同源**，
+         所以两台共用同一份 IndexedDB 与 localStorage——分库不做，两边的记录会互相摆到对方面前。
+       这份 sim 跑的是**不挂档案**那一侧（ChatSDE 本身），所以名字应当是老名字；
+       分身页那一侧的名字由 tools/sim_wds_profile.js 从源码断言。 */
+    const chatSess = SESSIONS.filter((o) => String(o.agent || "").indexOf("wds-chat") === 0);
+    const distSess = SESSIONS.filter((o) => String(o.agent || "").indexOf("wds-distill") === 0);
+    ok(chatSess.length > 0, "对话开了会话（每一轮都往里存）");
+    ok(distSess.length > 0, "成文开了会话（写完自动存）");
+    ok(chatSess.every((o) => o.agent === "wds-chat"), "不挂档案时对话库仍叫 wds-chat（老记录不失联）");
+    ok(distSess.every((o) => o.agent === "wds-distill"), "不挂档案时成文库仍叫 wds-distill");
+    ok(LISTED.some((x) => x.agent === "wds-chat"), "侧栏列的是对话库");
+    /* 顶栏那颗历史键是**点了才开面板**，前面几节没点过它——这里补点一下再看。 */
+    try { layer.querySelector(".wdsm-histbtn").click(); } catch (e) {}
+    ok(PANELS.some((x) => x.agent === "wds-chat"), "顶栏历史面板开的是对话库",
+      JSON.stringify(PANELS.map((x) => x.agent)));
+    /* ⭐ 分库的两条：谁都不许把对方的库列出来。判据落在**常量**上而不是字面量上——
+       字面量改一处漏一处，正是这类 bug 的长相。 */
+    const src = require("fs").readFileSync(SITE + "/public/wds-mode.js", "utf8");
+    ok(/var AGENT_CHAT = PROF_ID \? \("wds-chat:" \+ PROF_ID\) : "wds-chat";/.test(src),
+      "⭐ 对话库名按档案派生（分身页另立一张表）");
+    ok(/var AGENT_DIST = PROF_ID \? \("wds-distill:" \+ PROF_ID\) : "wds-distill";/.test(src),
+      "⭐ 成文库名按档案派生");
+    ok(/var AGENT_FORGE = PROF_ID \? \("wds-forge:" \+ PROF_ID\) : "wds-forge";/.test(src), "产线库名按档案派生");
+    ok(!/agent: "wds-chat"/.test(src) && !/agent: "wds-distill"/.test(src) && !/agent: "wds-forge"/.test(src),
+      "没有一处还写死着库名（写死一处，那一处就串台）");
+    ok(/var CV_LS = PROF_ID \? \("sde_wds_cv:" \+ PROF_ID\) : "sde_wds_cv";/.test(src),
+      "⭐ 画布留存的钥匙也按档案分（同源共用 localStorage，不分就互相覆盖）");
+    // 画布进历史：研究报告、结构图、共创稿都从画布走，此前只有 localStorage 那一份
+    ok(/function cvToHistory\(it\)/.test(src), "画布有一条进历史的路");
+    ok(/try \{ cvToHistory\(it\); \} catch \(e\) \{\}/.test(src), "落一件、改一版都会调它");
+    ok(/if \(body\.length < 200\) return;/.test(src), "太短的画布件不占历史的格子");
+    ok(/cvHist = \{\}; clearTimeout\(cvHistT\);/.test(src),
+      "⭐ 新开一场时清掉映射（不清的话，新一场的同名件会覆盖上一场那条记录）");
+    // 成文记录里认得回档位与笔法
+    ok(/function distLabel\(kind, style\)/.test(src), "成文记录的名字带上了笔法");
+    ok(/String\(head\)\.split\(" \\u00b7 "\)\[0\]/.test(src),
+      "⭐ 反查只认 「 · 」之前那一段（否则带笔法的记录一条都认不出，取回来连导出按钮都没有）");
+    ok(/distill\(k, body, head, "", null, st\)/.test(src), "取回时把笔法一并带回去");
+  }
 
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
