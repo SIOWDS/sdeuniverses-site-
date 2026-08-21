@@ -239,7 +239,11 @@ const bRound = H.slice(H.indexOf("function autoBatch("), H.indexOf("function sto
 ok(/attempt>=2/.test(bRound), "每批失败自动重试一次，只重试一次");
 ok(/parseRounds\(acc\)/.test(bRound), "按标记切分，切不出来就当这一批没跑成");
 ok(/turns\.length<MAXTURNS/.test(bRound), "入档时仍守十轮上限");
-ok(/if\(turns\.length>before\)/.test(bRound), "以 turns 真的长了几轮为准判成败（报错也会走完 finally，光看 resolve 判不出来）");
+/* ⚠ 这一条钉的是**判据**（以 turns 真的长了几轮为准），不是某一种写法。
+   2026-08-21 那一刀把它改成先算出增量再判，判据没变、字面变了——
+   断言若写死旧字面，红的就是护栏而不是缺陷（本条线记过同一教训）。 */
+ok(/turns\.length-before/.test(bRound) && /if\(landed>0\)/.test(bRound),
+  "以 turns 真的长了几轮为准判成败（报错也会走完 finally，光看 resolve 判不出来）");
 
 /* ===== 五、阶梯只有一处定义：前端不许复制 ===== */
 console.log("— 五、单一定义处 —");

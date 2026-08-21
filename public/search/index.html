@@ -1222,8 +1222,21 @@ function autoBatch(from, n, ix, attempt){
   var wrap=document.getElementById('ansWrap'); wrap.classList.add('show');
   var ansEl=document.getElementById('ans'); ansEl.className='ans blink'; ansEl.textContent='';
   var thinkEl=document.getElementById('thinkBar');
+  /* 【看门狗 —— 2026-08-21】这条路是自动二十轮的主力（七批全走它），却是四条流式通道里
+     唯一没有闸的一条：`doAsk`／`streamPaper`／`sseCollect` 都带 AbortController＋停滞闸，
+     只有它裸奔。上游若半开连接（不发帧、也不关流），下面那个 pump 既不 resolve 也不 reject，
+     **整场自动跑就永久挂在这里**，屏幕上只剩一句「一次调用连写中」——没有报错、没有超时、
+     没有下一批。首帧给宽（出流前要跑词表扩展＋满档检索＋装内功心得）；出流后服务端每 5 秒
+     一帧 beat，帧间静默超过 90 秒就是真停住了。口径与 streamPaper 同族，只是首帧更宽：
+     一批要连写三轮六千到九千字。 */
+  var _ac=(typeof AbortController!=='undefined')?new AbortController():null, _wd=null, _stalled=false;
+  function _bump(ms){ if(_wd) clearTimeout(_wd); _wd=setTimeout(function(){ _stalled=true; try{ _ac && _ac.abort(); }catch(e){} }, ms); }
+  _bump(180000);
+  /* 这一批的收笔读数：服务端每一帧都在说话，从前这条路一帧都没接。 */
+  var _rd={sec:0, think:0, fin:'', done:false, sseEnd:false, beats:0};
   return fetch('/api/ask',{
     method:'POST',headers:{'content-type':'application/json'},
+    signal:_ac?_ac.signal:undefined,
     body:JSON.stringify(Object.assign({mode:'rounds',q:q,from:from,n:n,vendor:vendor},
       turns.length?{hist:buildHist(false)}:{}, uk?{key:uk}:{}))
   }).then(function(resp){
@@ -1238,8 +1251,12 @@ function autoBatch(from, n, ix, attempt){
           for(var i=0;i<lines.length;i++){
             var ln=lines[i].trim();
             if(!ln||!ln.startsWith('data:')) continue;
-            var pl=ln.slice(5).trim(); if(pl==='[DONE]') continue;
+            /* ⚠ 这个 [DONE] 是**我们自己的 handleAsk** 收尾时发的，它永远都会发；
+               `fin.done` 说的是**上游基底**发没发过 [DONE]。两者同名不同事，绝不能写进同一个字段
+               ——混用等于把「被掐断」永远读成「正常收笔」。 */
+            var pl=ln.slice(5).trim(); if(pl==='[DONE]'){ _rd.sseEnd=true; continue; }
             var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
+            _bump(90000);
             if(j.t==='token'){
               acc+=j.v; ansEl.textContent=acc.slice(-2600);
               /* 写到第几轮是从标记数出来的，不是估的 */
@@ -1248,6 +1265,23 @@ function autoBatch(from, n, ix, attempt){
             }
             else if(j.t==='status'){ thinkEl.textContent=j.v; }
             else if(j.t==='sources'){ renderSources(j.v); }
+            /* 【收笔读数与心跳 —— 2026-08-21】服务端 08-18 就开始发 `fin`（正文几字·推演几字·
+               停因·上游有没有发过 [DONE]·第几秒）与每 5 秒一帧的 `beat`，08-21 又给 doAsk 补了
+               消费端——**唯独这条路两帧都整帧丢掉**。于是一批被静默掐断时，它走 r.done 当正常收口，
+               parseRounds 少切一轮，面板照打「ok · 2 轮」往下走，**没有任何证据说明那一轮为什么没了**。
+               通则（这条线第二次记）：加一帧诊断，就得在**每一条**消费路径上都装消费端。 */
+            else if(j.t==='beat'){
+              var _v=j.v||{}; _rd.beats++;
+              if(_v.sec) _rd.sec=_v.sec; if(_v.think) _rd.think=Math.max(_rd.think,_v.think);
+              if(!acc.length){
+                autoStat('⏳ 第 '+from+'–'+(from+n-1)+' 轮 · 出流前（检索·装内功心得·预填）· 已 '+_rd.sec+' 秒'
+                  +(_rd.think?' · 已推演 '+_rd.think+' 字':'')+'…');
+              }
+            }
+            else if(j.t==='fin'){
+              var _f=j.v||{}; _rd.fin=_f.fin||''; _rd.done=!!_f.done;
+              if(_f.sec) _rd.sec=_f.sec; if(_f.think) _rd.think=Math.max(_rd.think,_f.think);
+            }
             else if(j.t==='error'){
               /* 一批三轮，写到第三轮被掉线时，前两轮是写完了的。
                  旧版一律 rej，整批作废——parseRounds 本来就只收带〔第N轮·答〕且够长的完整轮，
@@ -1261,6 +1295,7 @@ function autoBatch(from, n, ix, attempt){
       })();
     });
   }).then(function(){
+    if(_wd) clearTimeout(_wd);
     ansEl.className='ans';
     if(batchErr){ var _be=document.createElement('div'); _be.className='err';
       _be.textContent=batchErr+'　—— 本批写完的轮次照常入档，没写完的那一轮下一批会接着要。';
@@ -1268,22 +1303,43 @@ function autoBatch(from, n, ix, attempt){
     var got=parseRounds(acc);
     got.forEach(function(t){ if(turns.length<MAXTURNS) turns.push(t); });
     archSave();          /* 成批问对：一批三轮，落一批存一次 */
-    if(turns.length>before){
+    var landed=turns.length-before;
+    /* 【少写了几轮，要说出为什么 —— 2026-08-21】旧版只报「N 轮 / M 字」，一批要三轮却只落两轮时
+       面板照样打勾。缺的那一轮到底是被掐断、是基底自己收笔、还是压根没按标记交卷，从前一个字都不说。
+       判据表与提炼那条线同一套：无 done ＝ 上游或链路掐的；fin=length ＝ 预算不够；
+       fin=stop ＝ 提示词收不住笔（它自己停的）。 */
+    if(landed>0){
       lastQ=turns[turns.length-1].q; lastAns=turns[turns.length-1].a;
       renderThread(); updateTurnBar();
       document.getElementById('askActs').classList.add('show');
-      autoDone(ix,'ok',(turns.length-before)+' 轮 / '+acc.length+' 字');
-      return turns.length-before;
+      autoDone(ix,'ok', landed<n
+        ? (landed+'/'+n+' 轮 · '+acc.length+' 字 —— '+batchWhy(_rd)+'（缺的下一批接着要）')
+        : (landed+' 轮 / '+acc.length+' 字'));
+      return landed;
     }
-    if(attempt>=2 || autoStopped){ autoDone(ix,'fail','两次都没切出完整轮次（基底没按标记交卷）'); return 0; }
-    autoStat('… 这一批没切出完整轮次，3 秒后重试一次…');
+    if(attempt>=2 || autoStopped){ autoDone(ix,'fail','两次都没切出完整轮次 —— '+batchWhy(_rd)); return 0; }
+    autoStat('… 这一批没切出完整轮次（'+batchWhy(_rd)+'），3 秒后重试一次…');
     return new Promise(function(r){ setTimeout(r,3000); }).then(function(){ return autoBatch(from,n,ix,attempt+1); });
   }).catch(function(e){
+    if(_wd) clearTimeout(_wd);
     ansEl.className='ans';
-    if(attempt>=2 || autoStopped){ autoDone(ix,'fail',errText(e)); return 0; }
-    autoStat('… 这一批出错（'+errText(e)+'），3 秒后重试一次…');
+    /* 我们自己掐的线与请求真失败是两回事，报错必须分开说，否则又回到「猜」。 */
+    var _msg=_stalled ? ('久等无新内容，已主动掉线 —— '+batchWhy(_rd)) : errText(e);
+    if(attempt>=2 || autoStopped){ autoDone(ix,'fail',_msg); return 0; }
+    autoStat('… 这一批出错（'+_msg+'），3 秒后重试一次…');
     return new Promise(function(r){ setTimeout(r,3000); }).then(function(){ return autoBatch(from,n,ix,attempt+1); });
   });
+}
+/* 一批为什么没写满，用服务端自己发的读数说话，不猜。 */
+function batchWhy(rd){
+  rd=rd||{};
+  var p=[];
+  p.push('流停在第 '+(rd.sec||0)+' 秒');
+  if(rd.think) p.push('推演 '+rd.think+' 字');
+  if(rd.fin) p.push('停因 '+rd.fin);
+  if(!rd.done) p.push('上游没发 [DONE]（多半是被掐断）');
+  if(!rd.beats) p.push('一个心跳都没收到（这一趟活了不到 5 秒）');
+  return '读数：'+p.join(' · ');
 }
 function stopAutoRun(){
   if(!autoRunning) return;
@@ -2136,7 +2192,11 @@ function doIq(onPolished){
   var acc='';
   return fetch('/api/ask',{
     method:'POST',headers:{'content-type':'application/json'},
-    body:JSON.stringify(Object.assign({mode:'iq',q:lastQ||'创新智商评估',text:text.slice(0,26000),vendor:vendor}, uk?{key:uk}:{}))
+    /* 【26000 → 120000，2026-08-21】成文目标已是两万汉字＝含标点 2.1–2.8 万字符，
+       26000 正好卡在边界上：**评分卡看不到结尾**，而「收尾立不立得住／证伪条款有没有兑现」
+       恰恰是 F 维要看的东西，砍掉的正是最该评的那一段，且页面零提示。
+       服务端那一处同步放开，两处成对。 */
+    body:JSON.stringify(Object.assign({mode:'iq',q:lastQ||'创新智商评估',text:text.slice(0,120000),vendor:vendor}, uk?{key:uk}:{}))
   }).then(function(resp){
     var reader=resp.body.getReader(), dec=new TextDecoder(), buf='', tk=0;
     return new Promise(function(res,rej){
@@ -2235,8 +2295,14 @@ function pickWays(n){
   emergeUsed=emergeUsed.concat(out);
   return out;
 }
+/* 【入料上限 —— 2026-08-21 由 20000 放开到 120000】二阶碰撞吃的是「整场问对」。
+   20000 是十轮时代的数：一轮两千字、十轮两万字，正好贴着。扩到二十轮之后同一行
+   **把后十轮整段切掉**，而页面一个字都不提示——与当年 `brief.slice(0,5000)` 是同一物种。
+   12 万字符对齐站内既有的「单篇正文上限」口径（deepseek-v4-pro 1M／glm-5 20 万窗口足够），
+   它不是预算而是防呆：二十轮撑死四五万字符，谁也摸不到。服务端那一处同步放开，
+   **两处必须一起改**——前端放开而服务端不放，等于换个地方静默砍。 */
 function viewsText(){
-  return turns.map(function(t,i){ return '〔第'+(i+1)+'轮〕问：'+t.q+'\n'+t.a; }).join('\n\n').slice(0,20000);
+  return turns.map(function(t,i){ return '〔第'+(i+1)+'轮〕问：'+t.q+'\n'+t.a; }).join('\n\n').slice(0,120000);
 }
 /* 出错原因要能读，才谈得上让人决定重试。平台把调用按资源上限掐掉时返回的是 Cloudflare
    自己的 HTML 错误页，整页塞进 message 里，读者只看见一串标签——那不叫报错，那叫失踪。 */
