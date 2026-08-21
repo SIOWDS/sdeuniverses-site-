@@ -99,7 +99,7 @@
           note: "ChatJohn 只答语言、语感、语法、语言教学与习得，答案扣着语言分站的原文，可核验的篇名与引文请以原文为准。用你自己的大模型 Key 运行：Key 存在你这台机器上，调用时经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析。",
           setKeyP: "ChatJohn 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 保存在你这台机器上；调用时会经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。",
           tlBtn: "⊞ 语言工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
-          tipDeep: "满血基底＋满功率思考＋语言发生学全套工序，慢但深",
+          tipDeep: "满血基底＋满功率思考＋整套语言工序，慢但深",
           srcSite: "语言分站文献",
           /* 工序的**名字与副题**换成语言老师听得懂的话；**动作一个字不改**——
              后端那份工序提示语共用同一份，改了就成了两件不同的东西，
@@ -133,6 +133,8 @@
           setAboutPh: "例：我教初中英语，班上四十人，最头疼的是学生会做题不会开口。答我时多举课堂能直接用的例子，术语讲一遍就够。",
           kOutlineS: "一条主绳 + 章节骨架，照着就能写",
           kPaper1S: "**一次调用出全篇**：十六节体例写进提示语、字数服从内容（18000–22000 字），出 Word 与 PDF。写得快，中途不会停在某一节。",
+          /* 追问按钮上那行小字。共用那条写的是「SDE 六路径」——这台机器面对语言老师，
+             招牌之外一律不出黑话（后端还有一道术语闸，见 worker.js 的 prof.term）。 */
           pathTip: "三条延伸各从一个不同的维度起手：它是什么／它怎么运行／它站在什么上面",
           memHd: "本机共 <b>{n}</b> 场对话（含本站其它智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场",
           turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在 ChatJohn 的额度，站上其它入口各有独立额度。",
@@ -207,7 +209,7 @@
           cdSrcAns: "ChatJohn · this answer", cdSrcDist: "ChatJohn · ",
           cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any block of image, web page, table or long draft inside an answer.\n\nTo put something here by hand: click ⧉ To canvas under any answer.\n\nOnce it is here: use ✎ Edit to format and rewrite it like a Word document (headings, bold, lists, tables), or ⚡ Co-write to have John rewrite, condense, compress it into one load-bearing claim, or draw a dividing line — with a selection, only that passage changes. Every change lands a new version; the version bar records who made it, and ⇄ What changed shows the difference between any two.",
           cvLabNone: "This is where you **co-write with John** — not to have it write for you, but so there is someone to ask when you are stuck.\n\nEach turn it carries the piece you are working on: its title, the current version, and whatever passage you have selected.\n\nReplies do not go into the text on their own. If it reads right, press ⤵ Insert into text.",
-          tipDeep: "Full model, full reasoning, the whole language-genesis toolchain — slow but deep",
+          tipDeep: "Full model, full reasoning, the whole language toolchain — slow but deep",
           srcSite: "From the language subsite"
         }
       }
