@@ -114,9 +114,28 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
   }
 
   console.log("— 七、后端：part 钳位（旧版把第三、四段当成第一段重写）—");
-  ok(/const part = \(body\.part >= 0 && body\.part <= 4\)/.test(w),
-    "worker 收 part=0..4（0 是提炼的规划段），不再写死 `body.part === 2 ? 2 : 1`");
+  /* ⚠⚠ 2026-08-21 契约翻面，而且这条判据**此前正在守着那个 bug**：
+     它断言解析层写着 `body.part <= 4` —— 那正是把成文第五段打回第一段、
+     给一份稿子安上第二个开头的那一行。判据钉住了一个具体的数，于是段数一改，
+     它不但不报红，反而拦着人去改。
+     新口径：解析层只做卫生（取整、非负、防呆），**段数的上限只许由各分支的段名表决定**。
+     这里从源码把解析那一段抠出来真跑，不再比对形状。 */
+  /* ⚠ 抠取要能抠到**旧形状**，否则改坏了只会崩在抠取上、行为断言一条都跑不到
+     ——「护栏红」看起来就像「护栏坏了」，而不是「产品坏了」。 */
+  const _plB = w.indexOf("// ===== 连续问对的上下文");
+  let _plA = w.lastIndexOf("const _rawPart = parseInt(body.part", _plB);
+  if (_plA < 0) _plA = w.lastIndexOf("\n  const part =", _plB);
+  ok(_plA > 0 && _plB > _plA, "抠得到 part 的请求解析");
+  const parsePart = new Function("body", w.slice(_plA, _plB) + "\nreturn part;");
+  ok(parsePart({ part: 0 }) === 0, "part=0 保住（提炼的规划段，不许被当成第一段）");
+  ok(parsePart({ part: 2 }) === 2 && parsePart({ part: 5 }) === 5, "1 以上原样穿过，解析层不做语义钳位");
+  ok(parsePart({}) === 1, "没传 part ⇒ 缺省第一段");
   ok(!/const part = body\.part === 2 \? 2 : 1;/.test(w), "旧的 1|2 钳位已经删掉");
+  /* 提炼这一侧的钳位也必须跟着自己的段名表走（BRIEF_NAME 有 0/1/2 三档）。 */
+  ok(/const BRIEF_MAX = Object\.keys\(BRIEF_NAME\)\.length - 1;/.test(w),
+    "提炼段数只有一处定义（BRIEF_NAME），钳位跟着它走");
+  ok(/const P = Math\.min\(Math\.max\(part \| 0, 0\), BRIEF_MAX\);/.test(w),
+    "提炼的钳位不含写死的上限（写死过 <=2，加第三段那次就是这么丢掉第十栏的）");
 
   console.log("— 八、后端：distill 的四段提示语 —");
   const d0 = w.indexOf('else if (mode === "distill") {');

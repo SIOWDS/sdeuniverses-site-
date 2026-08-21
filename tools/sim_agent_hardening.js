@@ -127,7 +127,21 @@ const names = (PP.match(/name:'第[一二三四五]段'/g) || []);
 ok(names.length === 5, "前端成文是五段");
 ok(/第四段',desc:'证伪条件与当场检验·讨论·研究局限'/.test(PP), "第四段只收论证三章");
 ok(/第五段',desc:'结论·注释·参考文献·附录 A·投稿声明'/.test(PP), "第五段收交付件");
-ok(/part >= 1 && part <= 5/.test(W), "服务端钳位跟着改到 5（不改就永远写不到第五段）");
+/* ⚠⚠ 这条判据曾经是**绿着骗人**的典型：它只看分支里那一行 `part >= 1 && part <= 5`，
+   而请求解析那一行还写着 `body.part <= 4` —— 第五段在进分支之前就已经被改成 1 了。
+   分支怎么写都对，因为它收到的 part 永远 ≤4。真正要守的是**从请求那一行到分支的整条路**。 */
+{
+  const _b = W.indexOf("// ===== 连续问对的上下文");
+  let _a = W.lastIndexOf("const _rawPart = parseInt(body.part", _b);
+  if (_a < 0) _a = W.lastIndexOf("\n  const part =", _b);
+  ok(_a > 0, "抠得到 part 的请求解析");
+  const parsePart = new Function("body", W.slice(_a, _b) + "\nreturn part;");
+  ok(parsePart({ part: 5 }) === 5, "请求解析放第五段过去（写死 <=4 的那一版在这里报红）");
+  const _t = W.indexOf("const SEG_NAME = {");
+  const nSeg = _t < 0 ? -1 : (W.slice(_t, W.indexOf("};", _t)).match(/\b\d+:\s*"第[一二三四五六七八九十]段"/g) || []).length;
+  ok(nSeg === names.length, "服务端段名表与前端 PAPER_PARTS 同长 · " + nSeg + " vs " + names.length);
+  ok(!/part\s*[<>]=?\s*[0-9]\b/.test(W.slice(_a, _b)), "解析那一行不含任何跟段数有关的数字");
+}
 ok(/4: "〔第四段完·待续〕", 5: "〔全文完〕"/.test(W), "收尾标记：第四段改成待续，全文完移到第五段");
 ok(/第[一二三四五]段完·待续/.test(H) && /第\[一二三四五\]段完/.test(H.replace(/\\/g, "")) === false || /一二三四五/.test(H),
   "前端段末标记正则认得第五段");
@@ -157,6 +171,18 @@ if (typeof auditOutput === "function") {
   ok(/拼接残留/.test(r.join("")), "抓段间拼接残留");
   ok(/章节号重复/.test(r.join("")), "抓章节号重复");
   ok(/格式占位/.test(r.join("")), "抓参考文献里的格式占位");
+  /* ⑤⑥ 交付层最后一道闸：一份稿子两个开头 ／ 末段交付件整段没交（2026-08-21） */
+  const twoHeads = "【摘要】甲\n【一、引言】乙\n" + "正".repeat(20) + "\n【摘要】丙\n【一、引言】丁";
+  const rr = auditOutput(twoHeads);
+  ok(rr.some((x) => /两个开头/.test(x)), "第二个开头被当场点名 · 实得 " + JSON.stringify(rr));
+  ok(/【摘要】/.test(rr.join("")) && /【一、引言】/.test(rr.join("")), "点名到具体是哪几件重复了");
+  ok(auditOutput("【摘要】只有一次\n【一、引言】也只有一次").every((x) => !/两个开头/.test(x)),
+    "只出现一次不误报（章标题在正文里被提及一次是常事）");
+  const tailMiss = auditOutput("【摘要】甲\n【一、引言】乙\n" + "正".repeat(9000));
+  ok(tailMiss.some((x) => /末段交付件缺/.test(x)), "长稿缺结论/参考文献/投稿声明 ⇒ 点名（第五段没写成）");
+  ok(auditOutput("【摘要】甲\n" + "正".repeat(9000) + "【十、结论】\n【参考文献】\n【投稿声明】")
+    .every((x) => !/末段交付件缺/.test(x)), "交付件齐全就不报");
+  ok(auditOutput("【摘要】短稿").every((x) => !/末段交付件缺/.test(x)), "短稿不按完稿要求（八千字以下不报缺件）");
   ok(auditOutput("一、引言\n本文讨论知识分发。\n2.1 缺口\n拉图尔 Latour, B. (1987). Science in Action. Harvard University Press.").length === 0,
     "干净稿零误报（误报会让人学会无视机检）");
 }

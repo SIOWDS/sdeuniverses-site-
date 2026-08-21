@@ -58,11 +58,19 @@ for (const [name, re] of [
 sec("③之二 全站 BYOK 入口一并放开（2026-08-08 用户裁定）");
 ok("有共用常量 BYOK_NO_DAY，各处不再各写各的数字", /const BYOK_NO_DAY = "&d=0";/.test(W));
 const CALLS = W.match(/limiter\.internal\/\?w=[^)]*/g) || [];
-ok("限流调用点数目未变（15 处）", CALLS.length === 15, "实得 " + CALLS.length);
+/* ⚠ 2026-08-21 重新对基线：15→16、11→12（金句机之后又新增一个入口，属别条线的改动）。
+   数目本身只是绊线——**它绊住的时候要做的事是逐点看一遍，不是把数字改大**。
+   这一次十六处逐条查过：要么带 BYOK_NO_DAY（读者自付，不设日上限），要么写着显式的 &d= 日上限，
+   没有一处是「站方付钱又没有日上限」。所以下面除了数目，再加一条**不变量**：
+   凡不带 BYOK_NO_DAY 的调用点，必须带 &d= —— 数目会随业务长，这条不会。 */
+ok("限流调用点数目未变（16 处）", CALLS.length === 16, "实得 " + CALLS.length);
 // 读者自付的入口：一律不设日上限
 const OPENED = CALLS.filter((c) => /BYOK_NO_DAY/.test(c));
-ok("已放开的入口有 11 处（memo/nbr/dlg/read×2/byok-art/voice/chat×3/asr-BYOK）",
-  OPENED.length === 11, "实得 " + OPENED.length);
+ok("已放开的入口有 12 处（memo/nbr/dlg/read×2/byok-art/voice/chat×3/asr-BYOK …）",
+  OPENED.length === 12, "实得 " + OPENED.length);
+const NAKED = CALLS.filter((c) => !/BYOK_NO_DAY/.test(c) && !/&d=/.test(c));
+ok("站方付钱的入口没有一处漏掉日上限（数目会长，这条不会）",
+  NAKED.length === 0, "漏掉的：" + JSON.stringify(NAKED));
 ok("搜索页问答也用同一个常量（它是这条口径的起点，别落在体例外）",
   /const _lq = byok \? \("\?w=" \+ WDS_PER_MIN \+ BYOK_NO_DAY\) : "";/.test(W));
 // 站方付钱或站方 CPU 的入口：日上限必须还在

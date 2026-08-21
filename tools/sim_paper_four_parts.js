@@ -144,6 +144,30 @@ const reset = (p) => { plan = p; calls = []; };
        ① 前端段数 ＝ 服务端 paper 段数 ＝ 服务端 polish 段数；
        ② 两处钳位都从段数表现算，源码里不许再出现 `part <= <数字>` 这种上限；
        ③ 体例块里那句「全文由 N 段连续写成」的 N 跟着段数走（成文与打磨共用它）。 */
+  /* ⚠⚠ 先测**请求进入 worker 的那一行**，再测提示语构造函数。
+     本站早写过这条纪律，而 2026-08-21 的血案正是漏在这一行：`body.part <= 4` 把第五段
+     打回第一段，提示语构造函数那一侧怎么测都是对的（它收到的 part 已经被改成 1 了）。 */
+  console.log("— 九之零、请求解析：part 不许在这一行被语义钳位 —");
+  /* ⚠ 抠取要能抠到**旧形状**，否则改坏了只会崩在抠取上、行为断言一条都跑不到
+     ——「护栏红」看起来就像「护栏坏了」，而不是「产品坏了」。 */
+  const _plB = w.indexOf("// ===== 连续问对的上下文");
+  let _plA = w.lastIndexOf("const _rawPart = parseInt(body.part", _plB);
+  if (_plA < 0) _plA = w.lastIndexOf("\n  const part =", _plB);
+  ok(_plA > 0 && _plB > _plA, "抠得到 part 的请求解析");
+  const parseSeg = w.slice(_plA, _plB);
+  ok(!/\bpart\b[^\n]*[<>]=?\s*[0-9]\b/.test(parseSeg.replace(/99/g, "CAP")),
+    "解析这一行不含个位数上限（段数只许由各分支的段名表决定）");
+  const parsePart = new Function("body", parseSeg + "\nreturn part;");
+  const nEnd = R.PAPER_PARTS.length;
+  ok(parsePart({ part: nEnd }) === nEnd,
+    "末段的 part 原样穿过解析层 · part=" + nEnd + " ⇒ " + parsePart({ part: nEnd }));
+  ok(parsePart({ part: 5 }) === 5, "part=5 不再被打回 1（2026-08-21 一份稿子两个开头的真因）");
+  ok(parsePart({ part: 0 }) === 0, "显式 0 保住（提炼的规划段）");
+  ok(parsePart({}) === 1, "没传 part ⇒ 缺省第一段");
+  ok(parsePart({ part: "3" }) === 3, "字符串 part 也取得到整数");
+  ok(parsePart({ part: -2 }) === 0 && parsePart({ part: 1e9 }) <= 99, "负数与超大数被拦在防呆范围内");
+  ok(parsePart({ part: "abc" }) === 1, "读不出数 ⇒ 缺省第一段，不是 0");
+
   console.log("— 九、前后端段数成对（重复两篇的真因）—");
   const _pa = w.indexOf('else if (mode === "paper" || mode === "polish") {');
   ok(_pa > 0, "抠得到 paper/polish 分支");
@@ -151,26 +175,29 @@ const reset = (p) => { plan = p; calls = []; };
   const _elseP = w.indexOf("      else {", _po);          /* polish 之后就是成文那一支 */
   const segPolish = w.slice(_po, _elseP);
   const segPaper = w.slice(_elseP, w.indexOf('else if (reflect && neigong) {', _elseP));
-  const countTbl = (seg, name) => {
-    const a = seg.indexOf("const " + name + " = {");
-    const b = seg.indexOf("};", a);
-    return (a < 0 || b < 0) ? -1 : (seg.slice(a, b).match(/\b\d+:\s*"第[一二三四五六七八九十]段"/g) || []).length;
+  /* 2026-08-21 第二刀：段名表由「成文一张、打磨一张」并成**整条分支只有一张** SEG_NAME，
+     体例块与身份句里的段数也从它派生 —— 所以这里数的是那一张表。 */
+  const countTbl = (src, name) => {
+    const a = src.indexOf("const " + name + " = {");
+    const b = src.indexOf("};", a);
+    return (a < 0 || b < 0) ? -1 : (src.slice(a, b).match(/\b\d+:\s*"第[一二三四五六七八九十]段"/g) || []).length;
   };
   /* ⚠ 扫「有没有写死的上限」之前必须先剥注释：说明这个洞的那段注释里就写着它的形状，
      不剥就会被自己的说明喂饱（本站两个方向都栽过：锚点被注释抢先命中／注释被断言数进去）。 */
   const bare = (x) => x.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
   const nFront = R.PAPER_PARTS.length;
-  const nPaper = countTbl(segPaper, "PART_NAME");
-  const nPolish = countTbl(segPolish, "PN");
-  ok(nPaper === nFront, "服务端 paper 段数 = 前端 PAPER_PARTS · " + nPaper + " vs " + nFront);
-  ok(nPolish === nFront, "服务端 polish 段数 = 前端 PAPER_PARTS（漏改这一处＝一份稿子两个开头）· " + nPolish + " vs " + nFront);
+  const nSrv = countTbl(w, "SEG_NAME");
+  ok(nSrv === nFront, "服务端段名表 SEG_NAME = 前端 PAPER_PARTS · " + nSrv + " vs " + nFront);
+  ok(/const PART_NAME = SEG_NAME;/.test(segPaper), "成文分支引用那唯一一张段名表");
+  ok(/const PN = SEG_NAME;/.test(segPolish), "打磨分支引用同一张段名表（漏改这一处＝一份稿子两个开头）");
+  ok(/分" \+ SEG_CN \+ "段连续写成/.test(w), "身份句里的段数也从段名表派生，不写死");
+  ok(!/分四段各约五千字/.test(w), "身份句里那句写死的「分四段」已经不在了");
   ok(!/part\s*[<>]=?\s*\d/.test(bare(segPaper)), "成文那一侧的钳位不含写死的上限");
   ok(!/part\s*[<>]=?\s*\d/.test(bare(segPolish)), "打磨那一侧的钳位不含写死的上限");
-  ok(/Object\.keys\(PART_NAME\)\.length/.test(segPaper), "成文段数只有一处定义（PART_NAME），钳位跟着它走");
-  ok(/Object\.keys\(PN\)\.length/.test(segPolish), "打磨段数只有一处定义（PN），钳位跟着它走");
-  const CN = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
-  ok(w.indexOf("全文由" + CN[nFront - 1] + "段连续写成") > 0,
-    "体例块那句「全文由 N 段连续写成」跟着段数走 · 应为「" + CN[nFront - 1] + "」");
+  ok(/const PART_MAX = SEG_MAX;/.test(segPaper), "成文钳位取自那唯一一张表的长度");
+  ok(/const PMAX = SEG_MAX;/.test(segPolish), "打磨钳位取自那唯一一张表的长度");
+  ok(/const SEG_MAX = Object\.keys\(SEG_NAME\)\.length;/.test(w), "段数只有一处定义（SEG_NAME）");
+  ok(/全文由" \+ SEG_CN \+ "段连续写成/.test(w), "体例块那句「全文由 N 段连续写成」也从段名表派生，不写死");
   ok(/绝不许重写题名/.test(segPolish),
     "打磨的续写指令明令后段不许重写题名与摘要（钳位之外的第二道锁）");
   /* 段名与收尾标记必须两两不同：同名两段＝同一份指令发两遍，症状与钳位失手一模一样。 */

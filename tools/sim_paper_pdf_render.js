@@ -116,6 +116,29 @@ ok(/ink>=0 && ink<INK_MIN/.test(bp), "只在「量得到且低于下限」时拦
 ok(/throw new Error\('PDF 渲染出来是白纸/.test(bp), "拦下时抛错并报读数，不静默交白稿");
 ok(/画布 '\+cv\.width\+'×'\+cv\.height/.test(bp), "读数里带画布尺寸（判「是没画还是画歪了」全靠它）");
 
+/* ⚠⚠ 上面全是形状判据 —— 第一版就是这么全绿着上线的，而闸**根本没接上**：
+   html2pdf 的 then 用 onFulfilled.bind(this) 把 this 绑到 worker，
+   画布挂在 **this.prop.canvas**（0.10.1 源码 `this.prop.canvas=e`），不是 this.canvas。
+   写成 this.canvas 不报错，只是永远 undefined，`cv?…:-1` 那一支于是一路放行。
+   所以这里把闸的回调**原样抠出来真跑**，`this` 换成一个仿真 worker —— 形状对不对不算数，
+   拿不拿得到画布才算数。 */
+console.log("— 闸真的接在 worker 上（不是只有形状对）—");
+const _gA = bp.indexOf(".toCanvas().then(function(){");
+const _gB = bp.indexOf("}).outputPdf('blob')", _gA);
+ok(_gA > 0 && _gB > _gA, "抠得到墨量闸的回调");
+const guardBody = bp.slice(_gA + ".toCanvas().then(function(){".length, _gB);
+ok(guardBody.trim().length > 0, "抠出来的回调非空（空串对 !/…/.test 全是 PASS，会安静失效）");
+const guard = new Function("INK_MIN", "canvasInk", "text",
+  "return function(){" + guardBody + "};")(INK_MIN, (cv) => F.canvasInk(cv, mkFake()), "正文两万字");
+const fire = (self) => { try { guard.call(self); return null; } catch (e) { return e.message; } };
+const msg = fire({ prop: { canvas: fakeSrc(1588, 67000, 0) } });
+ok(msg && /白纸/.test(msg), "worker.prop.canvas 上的全白画布 ⇒ 真的抛错（写成 this.canvas 这条会红）");
+ok(msg && /1588×67000/.test(msg), "错误里报出真实画布尺寸 · 实得：" + String(msg).slice(0, 60));
+ok(fire({ prop: { canvas: fakeSrc(1588, 67000, 0.05) } }) === null, "正常画布 ⇒ 放行");
+ok(fire({ canvas: fakeSrc(1588, 67000, 0) }) !== null, "兜底：画布挂在 this.canvas 上也量得到（上游改字段时还活着）");
+ok(fire({}) === null, "拿不到画布 ⇒ 放行，绝不因为量不到就拦真稿");
+ok(fire(undefined) === null, "this 丢了也不炸（不许把出稿链搞成一个新的静默死法）");
+
 
 console.log("\n===== " + P + " PASS / " + FA + " FAIL =====");
 process.exit(FA ? 1 : 0);

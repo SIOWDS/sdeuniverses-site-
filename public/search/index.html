@@ -247,7 +247,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
         <button class="actbtn" id="btnIq" onclick="doIq()">🎯 <span class="zh-only">创新智商评估 · 五维盲评</span><span class="en-only">Innovation IQ</span></button>
         <button class="actbtn" id="btnPolish" onclick="doPolish()">🛠 <span class="zh-only">打磨修改 · 目标 135+</span><span class="en-only">Polish → 135+</span></button>
         <span class="act-hint" style="width:100%"><span class="zh-only">🌀 涌现路线：开「涌现档」→ 连问 2–20 轮（每轮三观点）→「二阶碰撞」三典范择优 → 自动综合提炼 →「成文一篇」。🧵 常规路线：可连问 20 轮，每轮都带着前面的上下文；问够了先「提炼精华」，再「成文一篇」——论文水平主要由这份精华报告决定，所以它先做一次取舍规划，再分两段写约七千字：第一段是九栏作业单，第二段是「论文观点与分章大纲」，那一栏直接当成文的施工图。约 5–9 分钟。</span><span class="en-only">🧵 Up to 20 threaded turns → distill → write. The brief is what lifts the paper.</span></span>
-        <span class="act-hint"><span class="zh-only">「成文一篇」= 五段深度写作 · 两万字投稿体例 · 约 10–18 分钟 · 建议自带 Key　|　评估约 1 分钟 · 打磨（四段）约 10–18 分钟</span><span class="en-only">Paper = 5 deep calls · ~20k chars, submission-ready · 8–16 min　|　IQ ≈ 1 min · Polish ≈ 10–18 min</span></span>
+        <span class="act-hint"><span class="zh-only">「成文一篇」= 五段深度写作 · 两万字投稿体例 · 约 10–18 分钟 · 建议自带 Key　|　评估约 1 分钟 · 打磨（五段）约 10–18 分钟</span><span class="en-only">Paper = 5 deep calls · ~20k chars, submission-ready · 8–16 min　|　IQ ≈ 1 min · Polish ≈ 10–18 min</span></span>
         <span class="act-hint" style="width:100%;margin-top:2px"><span class="zh-only">🎯 与 🛠 默认作用于刚生成的论文；也可 <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">粘贴任意一篇文章</b> 来评、来改。</span><span class="en-only">Works on the generated paper, or <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">paste your own text</b>.</span></span>
       </div>
       <div id="iqSrcRow" style="display:none;margin-top:10px">
@@ -1613,7 +1613,7 @@ function doDistill(){
   var stat=document.getElementById('briefStat');
   var box=document.getElementById('briefBox'); box.textContent=''; box.className='ans blink';
   setProg(0, true);
-  /* 四段共用同一份问对上下文；后三段另外拿到已写部分的开头与结尾，接着往下写。 */
+  /* 各段共用同一份问对上下文；首段之后的每一段另外拿到已写部分的开头与结尾，接着往下写。 */
   var hist=buildHist(true);
   /* 【先思考】part=0 是一次**不进正文**的规划调用：把字数先分配到十栏、先定好取舍。
      它失败不阻断——拿不到清单就照旧直接写，一次规划失败不该有权力废掉整份资料。 */
@@ -1842,6 +1842,18 @@ function auditOutput(text){
   if(dup.length) hits.push('章节号重复：'+dup.slice(0,4).join('、'));
   /* ④ 参考文献里的格式说明被当成条目 */
   if(/—\s*URL[。.\s）)]/.test(t) || /「篇名\s*—\s*URL」格式列出/.test(t)) hits.push('参考文献里留着格式占位（「篇名 — URL」没换成真网址）');
+  /* ⑤ 一份稿子两个开头 —— 2026-08-21 线上真交出过：第九章之后又冒出整套
+     题名、【摘要】、【Abstract】、【一、引言】、【二、文献述评】。成因是某一段的段号被打回 1，
+     基底照着「第一段」的分工把开头又写了一遍；不报错、不短，进度条照样走完。
+     段号那两道闸已经修好，这一条是**交付层的最后一道**：不管上游怎么坏，
+     稿子里出现第二个开头就当场说出来。 */
+  var dupHead=['【摘要】','【Abstract】','【关键词】','【一、引言】','【二、文献述评'].filter(function(k){
+    return t.split(k).length-1 >= 2;
+  });
+  if(dupHead.length) hits.push('一份稿子两个开头：'+dupHead.join('、')+' 各出现两次以上（多半是某一段的段号被打回第一段）');
+  /* ⑥ 末段（交付件）整段没交：这几项任缺其一都不能拿去投稿 */
+  var needTail=['【十、结论】','【参考文献】','【投稿声明】'].filter(function(k){ return t.indexOf(k)<0; });
+  if(needTail.length && t.length>8000) hits.push('末段交付件缺 '+needTail.join('、')+'（第五段没写成）');
   return hits;
 }
 /* 进度条：万字论文的总长事先并不知道，所以生成中走不确定态（跑马条 + 真实字数），
@@ -1912,8 +1924,8 @@ function paperHalf(part, extra, minLen, label, attempt){
     return paperHalf(part, extra, minLen, label, attempt+1);
   });
 }
-/* ===== 四段流水（成文与打磨共用）=====
-   为什么是四段不是两段：单次调用有 ~120 秒的平台时钟上限，5000 字/段是线上真跑量出来的安全区；
+/* ===== 分段流水（成文与打磨共用，段数见 PAPER_PARTS）=====
+   为什么要分段不是两段：单次调用有 ~120 秒的平台时钟上限，5000 字/段是线上真跑量出来的安全区；
    两万字只能靠加段数，加长单段必被杀在思考阶段（正文 0 字、流干净结束、不报错）。
    任一段写不出来就地停住、不再往后跑——后面的段要靠前一段的结尾接续，硬跑只会接到空气上。 */
 /* 【四段 → 五段 —— 2026-08-21】原第四段要在五千字里装完证伪、讨论、局限、结论、注释、
@@ -2157,8 +2169,12 @@ function buildPdf(text, incomplete, opt){
       var c=cs[cs.length-1];
       if(c){ c.style.left='0'; c.style.right='auto'; c.style.margin='0'; }
     }).toCanvas().then(function(){
-      /* html2pdf 的 then 把 this 绑到 worker，画布挂在 this.canvas 上。 */
-      var cv=this && this.canvas;
+      /* ⚠ html2pdf 的 then 用 onFulfilled.bind(this) 把 this 绑到 worker，
+         而画布挂在 **this.prop.canvas** 上（0.10.1 源码：`this.prop.canvas=e`），不是 this.canvas。
+         写成 this.canvas 不会报错，只会永远拿到 undefined —— 这道闸于是安静地不存在。
+         第一版就是这么写的，五条护栏全绿。留一条兜底，哪天上游改了字段也还量得到。 */
+      var _wk=this||{};
+      var cv=(_wk.prop && _wk.prop.canvas) || _wk.canvas;
       var ink=cv?canvasInk(cv):-1;
       if(cv && ink>=0 && ink<INK_MIN){
         throw new Error('PDF 渲染出来是白纸，已拦下不交（画布 '+cv.width+'×'+cv.height+' 像素，墨量 '
