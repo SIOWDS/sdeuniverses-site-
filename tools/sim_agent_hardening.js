@@ -52,6 +52,11 @@ ok(/它才是本轮的最后一行/.test(W) && /那\*\*不是\*\*最后一步/.t
   "结账块显式改写旧的收尾要求（新加的收尾不明说破，就会被先出现的那条盖掉）");
 ok(/不受上面那句「不要另起新标题」的约束/.test(W),
   "并明说它不受「不要另起新标题」那条约束（否则基底会拿那句话当不写的理由）");
+/* 🔴🔴 第三次真跑仍不交 ⇒ 位置问题：拼在四万字 system 的末尾等于没写。
+   对照组是同文件里的 rounds——它每次都听话，因为交付形态在 user 里又下了一次口令。 */
+ok(/usr \+= "\\n\\n———\\n【最后一步·不许省】/.test(W),
+  "结账块在 **user 消息**末尾再下一次口令（system 讲规矩、user 下口令）");
+ok(/let usr = usrOverride/.test(W), "usr 改成可追加（原来是 const，加不上去）");
 
 const TL = H.slice(H.indexOf("function takeLedger(txt){"), H.indexOf("function parseRounds(txt){"));
 ok(TL.length > 100, "抠得出摘账本的函数");
