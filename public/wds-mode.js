@@ -116,6 +116,41 @@
           tlWhat: "这到底是什么", tlWhatS: "三刀合看这个语言现象究竟是什么",
           tlHow: "该怎么办", tlHowS: "三个落点合出一套明天就能用的做法",
           tlWhy: "为什么会这样", tlWhyS: "推翻问题里那条没说出口的动力",
+          /* ── 扫除 SDE 遗留 · 第二批（2026-08-21）──
+             读者在 ChatJohn 里不该撞见 WDS、ChatSDE、SDE 六路径、金点子发生器这些名字。
+             ⚠ 三类**不改**，改了是错：
+               ① 「SDE 社区」「SDE 个人知识库」——那是全站真实存在的那个东西的名字，
+                  改了读者按图索骥会找不到（tabIm / cvToBoxNo / cvKbBackNo / cvKbT）；
+               ② 「语言发生学」里的「发生学」——那是胡志英这门学问的正名，不是黑话；
+               ③ 额度提示里「陪读与『SDE 对谈』各有独立额度」——那是在讲**别的入口**的额度，
+                  说成别的名字就成了假话。这两条只把主语从"全站问答"换成本档。 */
+          errNet: "接不上 ChatJohn 了（",
+          convoTitle: "与 John 的对话",
+          stDefault: "John 本色",
+          pdfFoot: "导出自 ChatJohn · 语言发生学 · lang.sdeuniverses.com　|　回答由大模型生成，引用前请自行核实。",
+          deckFoot: "ChatJohn · 语言发生学 · lang.sdeuniverses.com",
+          setAboutP: "写一句你是谁、在做什么、想让 John 怎么答你。以后每次提问都会带上，不必再重复交代。也只存在你本机。",
+          setAboutPh: "例：我教初中英语，班上四十人，最头疼的是学生会做题不会开口。答我时多举课堂能直接用的例子，术语讲一遍就够。",
+          kOutlineS: "一条主绳 + 章节骨架，照着就能写",
+          kPaper1S: "**一次调用出全篇**：十六节体例写进提示语、字数服从内容（18000–22000 字），出 Word 与 PDF。写得快，中途不会停在某一节。",
+          pathTip: "三条延伸各从一个不同的维度起手：它是什么／它怎么运行／它站在什么上面",
+          memHd: "本机共 <b>{n}</b> 场对话（含本站其它智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场",
+          turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在 ChatJohn 的额度，站上其它入口各有独立额度。",
+          dayOut: "今日本机额度已用完，明天再来（站上其它入口不受影响）。",
+          // —— TX2 那张表（画布与共创、并排、项目、候选卡）——
+          cvAsk: "让 John 改这一段", cvAskAll: "让 John 改这一版",
+          cvTalkT: "对选中的一段加一条批注；每条都能就地问 John",
+          cvTalkAsk: "⚡ 就这条问 John",
+          cvTalkSent: "已把这一条递给 John —— 讨论出来的话留在对话里；要落成新版本，用「⚡ 共创」。",
+          cvLabT: "随时问 John 两句：这句接下去怎么写、这条站不站得住、还缺什么",
+          cvCoT: "让 John 就着这一件动手：选中一段就只改那一段，没选中就改整版",
+          cvCoSde: "John 的动作", cvCoOn: "正在让 John {op}…", cvByWds: "John",
+          duTip: "同一问同时问两家，左右并排；答完可再让 John 做一次对照",
+          duCmp: "⇄ 让 John 对照这两份",
+          pjAboutAsk: "这个项目里，每一问都要 John 知道的背景与要求（会随每问带上）",
+          cdSrcAns: "ChatJohn · 这一答", cdSrcDist: "ChatJohn · ",
+          cvEmpty: "画布与共创还是空的。会自动落到这儿的是：结构图（/结构图）、深度研究的报告、以及回答里成块的图/网页/表格/长文稿。\n\n想手动放一件进来：在任意一条回答下面点「⧉ 落到画布」。\n\n落进来之后：可以用「✎ 编辑」像 Word 那样直接排版改字（标题、加粗、列表、表格都有），也可以点「⚡ 共创」让 John 重写／概括／压成一句承重的判断／划一条分界线——选中一段就只改那一段。每改一次落一个新版本，版本条上写着这一版是谁改的，「⇄ 改了什么」能看到两版之间动了哪几处。",
+          cvLabNone: "这是**与 John 共创**的地方——不是让它替你写，是卡住的时候有个人可以问。\n\n它每一轮都带着你正在写的这一件去问：件名、当前这一版的正文、以及你选中的那一段。\n\n回话不会自动写进正文。看着行，再按「⤵ 插入正文」。",
           egs: [
             "「他对这件事情进行了一个认真的思考。」——每条规则都对，为什么还是不对？",
             "学生语法全会，一开口还是生硬，问题出在哪？",
@@ -141,6 +176,37 @@
           tlWhat: "What is this, really?", tlWhatS: "Three cuts at what this language phenomenon actually is",
           tlHow: "What do I do about it?", tlHowS: "Three angles combined into something usable tomorrow",
           tlWhy: "Why does it happen?", tlWhyS: "Overturn the unspoken driver inside the question",
+          // —— 与中文侧逐条成对（缺一条，英文界面上就冒出一句中文）——
+          egs: ["Every rule checks out, so why is the sentence still wrong?",
+                "My students know the grammar cold and still sound stiff. Where does that come from?",
+                "Can a feel for language be taught? Give me one exercise I can use tomorrow.",
+                "Why can you tell who is speaking from a line of dialogue alone?"],
+          errNet: "Couldn't reach ChatJohn (",
+          convoTitle: "A conversation with John",
+          stDefault: "John, unstyled",
+          pdfFoot: "Exported from ChatJohn · language genesis · lang.sdeuniverses.com  |  Answers are model-generated — verify before citing.",
+          deckFoot: "ChatJohn · language genesis · lang.sdeuniverses.com",
+          setAboutP: "A line about who you are, what you teach, and how you want John to answer. It rides along with every question, so you needn't repeat yourself. Stored only on this machine.",
+          setAboutPh: "e.g. I teach lower-secondary English to classes of forty. My problem is students who ace the paper and freeze when they speak. Give me examples I can use in class; one pass over the terminology is enough.",
+          kOutlineS: "One through-line plus a chapter skeleton — enough to write from",
+          kPaper1S: "**Whole piece in one call**: the sixteen-section format goes into the prompt, length follows content (18,000–22,000 characters), Word and PDF out. Fast, and it won't stall mid-section.",
+          pathTip: "Three follow-ups, each starting from a different dimension: what it is / how it runs / what it rests on",
+          memHd: "<b>{n}</b> chats on this device (including other agents on this site), <b>{m}</b> distilled, <b>{p}</b> pending",
+          turnsTitle: "This session = up to 100 turns (＋ New chat to start over); Today = this device's daily quota on ChatJohn. Other entry points on the site have their own.",
+          dayOut: "This device is out of quota for today; try again tomorrow (other entry points are unaffected).",
+          cvAsk: "Ask John to revise this", cvAskAll: "Ask John to revise this version",
+          cvTalkT: "Annotate a selected passage; each note can be taken straight to John",
+          cvTalkAsk: "⚡ Ask John about this note",
+          cvTalkSent: "Sent to John — the discussion stays in the chat; to land a new version, use ⚡ Co-write.",
+          cvLabT: "Ask John as you go: where this sentence goes next, whether this claim holds, what is missing",
+          cvCoT: "Put John to work on this piece: with a selection, only that passage changes; without one, the whole version",
+          cvCoSde: "John's moves", cvCoOn: "John is {op}…", cvByWds: "John",
+          duTip: "Ask two models the same question side by side; afterwards John can compare them",
+          duCmp: "⇄ Have John compare the two",
+          pjAboutAsk: "Background and requirements John should carry into every question in this project",
+          cdSrcAns: "ChatJohn · this answer", cdSrcDist: "ChatJohn · ",
+          cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any block of image, web page, table or long draft inside an answer.\n\nTo put something here by hand: click ⧉ To canvas under any answer.\n\nOnce it is here: use ✎ Edit to format and rewrite it like a Word document (headings, bold, lists, tables), or ⚡ Co-write to have John rewrite, condense, compress it into one load-bearing claim, or draw a dividing line — with a selection, only that passage changes. Every change lands a new version; the version bar records who made it, and ⇄ What changed shows the difference between any two.",
+          cvLabNone: "This is where you **co-write with John** — not to have it write for you, but so there is someone to ask when you are stuck.\n\nEach turn it carries the piece you are working on: its title, the current version, and whatever passage you have selected.\n\nReplies do not go into the text on their own. If it reads right, press ⤵ Insert into text.",
           tipDeep: "Full model, full reasoning, the whole language-genesis toolchain — slow but deep",
           srcSite: "From the language subsite"
         }
@@ -1185,7 +1251,13 @@
     },
   };
   function tx(k, map) {
-    var d = TX2[LANG] || TX2.zh, s = (k in d) ? d[k] : (TX2.zh[k] || k);
+    /* ⚠ 覆盖也要走这一条。第一版只给 t() 挂了档案覆盖，忘了 tx()——
+       而 TX2 这张表里带产品口音的词条比 TXT 还多（画布与共创那一整套都在这儿），
+       于是 ChatJohn 里一路都是「让 WDS 改这一段」「SDE 的动作」。
+       💡 一个产品有两个取词口时，改了一个就必须去看另一个。 */
+    var pc = profCopy(k);
+    var d = TX2[LANG] || TX2.zh;
+    var s = (pc !== undefined) ? pc : ((k in d) ? d[k] : (TX2.zh[k] || k));
     if (map) for (var m in map) s = s.split("{" + m + "}").join(map[m]);
     return s;
   }

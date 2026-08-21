@@ -285,6 +285,50 @@ console.log("\n── ⑥ 外观：品牌与工序子集 ───────�
   t("种子问题点了就发（不是摆设）", /b\.onclick = function \(\) \{ inEl\.value = s;[\s\S]{0,80}send\(\); \}/.test(MC));
 }
 
+console.log("\n── ⑥b 扫除 SDE 遗留（读者看得见的每一条词条）──────");
+{
+  /* 把三张表按 profCopy 的口径合并，逐条查产品口音。
+     ⚠ 白名单里那几条是**站上真实存在的地方的名字**——「SDE 社区」是那个社区的名字，
+       改成别的，读者按图索骥就找不到了。所以它们不是遗留，是专名。 */
+  function objAt(marker) {
+    const i = M.indexOf(marker); if (i < 0) return null;
+    const a2 = M.indexOf("{", i);
+    let dep = 0, j = a2;
+    for (; j < M.length; j++) { const c = M[j]; if (c === "{") dep++; else if (c === "}") { dep--; if (!dep) { j++; break; } } }
+    try { return new Function("return (" + M.slice(a2, j) + ")")(); } catch (e) { return null; }
+  }
+  const TXTo = objAt("var TXT = {"), TX2o = objAt("var TX2 = {"), PROFo = objAt("var PROFILES = {");
+  t("抠得出三张文案表", !!TXTo && !!TX2o && !!PROFo);
+  const cp = (PROFo && PROFo.lang && PROFo.lang.copy) || {};
+  const ACCENT = /ChatSDE|\bWDS\b|\bSDE(?! 社区| Community| Universes)|显露|差异序列|特征纠缠|本体论|王德生|金点子|中华智问/;
+  const KEEP = ["tabIm", "cvToBoxNo", "cvKbBackT", "cvKbBackNo", "cvKbT"];   // 专名，不是遗留
+  function leftovers(base, over) {
+    const out = [];
+    for (const k of Object.keys(base || {})) {
+      if (KEEP.indexOf(k) >= 0) continue;
+      const v = (over && (k in over)) ? over[k] : base[k];
+      const s = Array.isArray(v) ? v.join(" ") : v;
+      if (typeof s === "string" && s && ACCENT.test(s)) out.push(k);
+    }
+    return out;
+  }
+  const l1 = leftovers(TXTo && TXTo.zh, cp.zh), l2 = leftovers(TXTo && TXTo.en, cp.en);
+  const l3 = leftovers(TX2o && TX2o.zh, cp.zh), l4 = leftovers(TX2o && TX2o.en, cp.en);
+  t("TXT 中文没有产品口音残留", l1.length === 0, l1.join(","));
+  t("TXT 英文没有产品口音残留", l2.length === 0, l2.join(","));
+  t("TX2 中文没有产品口音残留", l3.length === 0, l3.join(","));
+  t("TX2 英文没有产品口音残留", l4.length === 0, l4.join(","));
+  /* ⭐ tx() 也必须挂覆盖。第一版只给 t() 挂了，而 TX2 里带口音的词条比 TXT 还多
+     （画布与共创那一整套），于是 ChatJohn 里一路是「让 WDS 改这一段」。
+     💡 一个产品有两个取词口时，改了一个就必须去看另一个。 */
+  t("tx() 也走档案覆盖（不只是 t()）",
+    /function tx\(k, map\) \{[\s\S]{0,400}?var pc = profCopy\(k\);/.test(MC));
+  t("两个取词口用的是同一个覆盖函数", (MC.match(/profCopy\(k\)/g) || []).length >= 2);
+  // 专名要留住：改掉了读者就找不到那个地方
+  t("站上真实存在的地名没有被改掉",
+    KEEP.every((k) => !(cp.zh && k in cp.zh)), KEEP.filter((k) => cp.zh && k in cp.zh).join(","));
+}
+
 console.log("\n── ⑦ 壳页接线 ─────────────────────────────────");
 {
   const shell = fs.readFileSync("public/sites/lang/chatjohn/index.html", "utf8");
