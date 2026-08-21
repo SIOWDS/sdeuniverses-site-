@@ -78,5 +78,47 @@ console.log("— 四、上游确实发得出这一帧（消费端的前提）—
 ok(/controller\.enqueue\(_sseBytes\(\{ t: "fin", v: \{/.test(W), "服务端仍在发收笔读数帧");
 ok(/done: !!_fin\.doneMark/.test(W), "帧里带着 doneMark（前端那条铁证判据靠它）");
 
+
+/* ═══ 追加（2026-08-21 第八刀）：太短＝没写成 ⇒ 不入档 ＋ 自动重问一次 ═══
+   现场：正文 67 字 · fin=stop · 上游正常收笔 · 流停在第 3 秒。
+   对照真跑（同路同档）2,535 字 / 47 秒 ⇒ 非结构性，属上游瞬时早停 ⇒ 正解是重试。 */
+(function(){
+  const H2 = H;
+  const sec = (t) => console.log("— " + t + " —");
+  const s2 = H2.indexOf("var ASK_MIN_OUT");
+  const e2 = H2.indexOf("function finishAsk(");
+  const BLK = (s2 >= 0 && e2 > s2) ? H2.slice(s2, e2) : "";
+  sec("⑧ 太短＝没写成：判据、不入档、自动重试一次");
+  ok(BLK.length > 200, "抠得出判据块");
+  ok(/var ASK_MIN_OUT = (\d+);/.test(BLK), "门槛是具名常量，不是散在代码里的裸数字");
+  const th = (BLK.match(/var ASK_MIN_OUT = (\d+);/) || [])[1];
+  ok(th && +th >= 200 && +th <= 400, "门槛落在 200–400 之间（一轮口径 400–700 字）");
+  ok(/function tooShort\(txt\)\{/.test(BLK), "tooShort 是顶层具名函数（好抠出来单测）");
+  ok(/n > 0 && n < ASK_MIN_OUT/.test(BLK), "零产出不走这条路（那边另有话说）");
+  /* 真跑判据本身 */
+  let tooShort = null;
+  try { tooShort = new Function(BLK + "\nreturn tooShort;")(); } catch (e) {}
+  ok(typeof tooShort === "function", "判据抠得出并能构造");
+  if (typeof tooShort === "function") {
+    ok(tooShort("短".repeat(67)) === true, "67 字判为没写成（用户截图那一份）");
+    ok(tooShort("短".repeat(299)) === true, "299 字仍判没写成");
+    ok(tooShort("短".repeat(300)) === false, "300 字起不再判没写成");
+    ok(tooShort("长".repeat(2535)) === false, "2535 字（对照真跑那一份）判为正常");
+    ok(tooShort("") === false, "零字不归它管");
+  }
+  const FA = H2.slice(H2.indexOf("function finishAsk("), H2.indexOf("function qNorm("));
+  ok(FA.indexOf("tooShort(lastAns)") > 0 && FA.indexOf("tooShort(lastAns)") < FA.indexOf("turns.push("), "太短那一支排在断稿提示与入档之前（不然它先被入档了）");
+  ok(/tooShort\(lastAns\) && _askTry < 1\)\{[\s\S]{0,600}_askRetry = true;[\s\S]{0,900}return;/.test(FA), "第一次太短：置重试旗标并 return（不入档）");
+  ok(/不入档/.test(FA) && /重问一次/.test(FA), "这一支明说「不入档」与「正在重问」，不静默");
+  ok(/finRead\.sec/.test(FA) && /finRead\.fin/.test(FA) && /finRead\.done/.test(FA), "提示里带读数（第几秒、停因、上游有没有收尾）");
+  ok(/!gotErr && tooShort/.test(FA), "报错那一支不走重试（真错误该报，不该闷头重打）");
+  ok(/_askTry < 1/.test(FA), "第二次仍太短则照收入档（否则这一轮彻底没有）");
+  const DA = H2.slice(H2.indexOf("function doAsk(){"), H2.indexOf("var ASK_MIN_OUT"));
+  ok(DA.indexOf("asking=false") > 0 && DA.indexOf("if(_askRetry)") > DA.indexOf("asking=false"), "重试排在 asking=false 之后（早一步会被 doAsk 自己的闸挡掉）");
+  ok(/_askTry\+\+; _askIsRetry=true;/.test(DA), "重试时计数加一并置「这是重试」旗标");
+  ok(/if\(_askIsRetry\) _askIsRetry=false; else _askTry=0;/.test(DA), "新的一问才清零计数（否则永远重试不完）");
+  ok(/setTimeout\(function\(\)\{ doAsk\(\); \}/.test(DA), "重试是延时调度，不是同步递归");
+})();
+
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);

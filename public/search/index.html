@@ -854,6 +854,8 @@ function doAsk(){
     return Promise.resolve();
   }
   asking=true;
+  /* 计数只在**新的一问**清零；重试那一次进来时保留，否则永远重试不完。 */
+  if(_askIsRetry) _askIsRetry=false; else _askTry=0;
   lastQ=q; lastAns='';
   document.getElementById('askActs').classList.remove('show');
   document.getElementById('recoBox').innerHTML='';
@@ -967,7 +969,26 @@ function doAsk(){
     if(!_gotSrc && _prevSrc) srcEl.innerHTML=_prevSrc;   /* 本轮没检索 ⇒ 留住上一轮的出处 */
     asking=false; goBtn.disabled=false;
     document.getElementById('thinkBar').textContent='';
+    /* 重试排在 asking=false 之后：doAsk 开头有 `if(asking) return`，早一步调它会被自己挡掉。
+       输入框此刻仍是原问（只有入档成功才会被 suggestNextQ 换掉），所以原样重问即可；
+       那一份也没进 turns，「同一问不得问两遍」那道闸同样拦不住它。 */
+    if(_askRetry){ _askRetry=false; _askTry++; _askIsRetry=true; setTimeout(function(){ doAsk(); }, 1200); }
   });
+}
+/* 【太短就是没写成，不是写短了 —— 2026-08-21】
+   现场（用户截图）：一轮深度问答**正文 67 字**、`fin=stop`、上游正常收笔、**流停在第 3 秒**。
+   三条同时成立就把所有的墙都排除了：不是预算（stop 不是 length）、不是被掐（发了 [DONE]）、
+   不是我们那张表（第 3 秒）。是上游那一次自己在三秒钟里"写完了"。
+   拿同一份问对的前两轮做对照真跑（同一条路、同一档、跳检索）：正文 2,535 字 / 47 秒 / fin=stop —
+   **复现不出来** ⇒ 这不是结构性的病，是上游的瞬时早停。瞬时故障的正解是重试，不是让人手动重问。
+   而提炼／成文那条路（paperHalf）**早就自带重试一次**，问答这条路一直漏着——
+   这是同一个漏法的第三次：一样东西只装了一条路。
+   口径：一轮 400–700 字，低于 300 字就是没写成。零产出走另一条路（那边已经有话说）。 */
+var ASK_MIN_OUT = 300;
+var _askTry = 0, _askIsRetry = false, _askRetry = false;
+function tooShort(txt){
+  var n = String(txt||'').length;
+  return n > 0 && n < ASK_MIN_OUT;
 }
 /* 一段答案收没收完：末尾是不是一个句子该有的收尾符号。
    断在「它」「但他输光」这种半句上的稿，字数照样够长，光看长度分不出来。
@@ -991,6 +1012,21 @@ function finishAsk(ansEl, gotErr, lastStat, finRead){
     ansEl.innerHTML='<div class="err">本轮一个字都没回来，连错误也没报——这通常是整个请求被平台无声掉线了（轮次越往后、上下文越长，越容易碰到）。'
       +(lastStat?'停住时的最后一步是：'+esc(lastStat)+'　':'')
       +'本轮没有入档，直接再点一次「问」即可；若连着两次都空，把问题问短一点、或换一个基底。</div>';
+    return;
+  }
+  /* 【太短 ⇒ 不入档，自动重问一次 —— 2026-08-21】
+     67 字的残句入档比丢掉它更糟：下一轮会踩着「需要一」这样的半截句往下走，整场从这里开始歪；
+     提炼时它还会作为一轮正式材料被读进去。所以第一次太短：**不入 turns**，原样重问一次。
+     第二次仍太短就照收入档（否则这一轮彻底没有），并保留下面那句读数提示。 */
+  if(!gotErr && tooShort(lastAns) && _askTry < 1){
+    _askRetry = true;
+    var _rt=document.createElement('div'); _rt.className='err';
+    _rt.textContent='⚠ 上游'+(finRead.sec?'第 '+finRead.sec+' 秒':'很快')+'就收笔了，这一轮只写了 '
+      +lastAns.length+' 字（一轮的口径是 400–700 字）'
+      +(finRead.fin?'，停因 '+finRead.fin:'')
+      +(finRead.frames&&!finRead.done?'，而且上游没发 [DONE]':'')
+      +'。这一份**不入档**（残句会把后面几轮带偏），正在把这一问原样重问一次…';
+    ansEl.appendChild(_rt);
     return;
   }
   /* 【写出了字，但这一段并没有写完 —— 2026-08-21】
