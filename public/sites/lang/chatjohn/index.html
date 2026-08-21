@@ -492,6 +492,101 @@ function copy(txt,btn){
     document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); ok(); }catch(e){} document.body.removeChild(ta); }
 }
 
+/* ── 导出 Word ────────────────────────────────────────────────
+   docx UMD **按需加载**：不用成文功能的读者不该白背一个 CDN 依赖。
+   加载失败要如实说，并给一条 .md 的退路——不许把失败咽掉、也不许拿 .md 冒充 Word。 */
+var DOCX_CDN="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js";
+var docxP=null;
+function loadDocx(){
+  if(window.docx) return Promise.resolve(window.docx);
+  if(docxP) return docxP;
+  docxP=new Promise(function(res,rej){
+    var s=document.createElement("script"); s.src=DOCX_CDN; s.async=true;
+    var tm=setTimeout(function(){ rej(new Error("timeout")); },20000);
+    s.onload=function(){ clearTimeout(tm); window.docx?res(window.docx):rej(new Error("loaded but empty")); };
+    s.onerror=function(){ clearTimeout(tm); rej(new Error("network")); };
+    document.head.appendChild(s);
+  });
+  docxP["catch"](function(){ docxP=null; });   // 失败可重试，别把失败缓存成永久状态
+  return docxP;
+}
+function mdTokens(str){
+  var out=[]; if(str==null) str="";
+  var re=/(\*\*([^*]+)\*\*|__([^_]+)__|`([^`]+)`|\*([^\s*][^*]*?[^\s*]|[^\s*])\*)/g, last=0, m;
+  while((m=re.exec(str))){
+    if(m.index>last) out.push({text:str.slice(last,m.index)});
+    if(m[2]!=null) out.push({text:m[2],bold:true});
+    else if(m[3]!=null) out.push({text:m[3],bold:true});
+    else if(m[4]!=null) out.push({text:m[4],code:true});
+    else if(m[5]!=null) out.push({text:m[5],italics:true});
+    last=re.lastIndex;
+  }
+  if(last<str.length) out.push({text:str.slice(last)});
+  return out.length?out:[{text:str}];
+}
+/* markdown 文本 → Paragraph[]。与 /taste/confluence/ 同一套口径。
+   第一行当主标题（成文的提示语要求「开头单独一行写标题」），其余按 md 结构走。 */
+function mdParas(text,opts){
+  opts=opts||{};
+  var P=window.docx.Paragraph, T=window.docx.TextRun;
+  var base=opts.size||24, color=opts.color||"222222";
+  function runs(s,over){
+    over=over||{};
+    return mdTokens(s).map(function(tk){
+      var o={text:tk.text,size:over.size||base,color:over.color||color,
+             bold:!!(tk.bold||over.bold),italics:!!(tk.italics||over.italics)};
+      if(tk.code) o.font="Consolas";
+      return new T(o);
+    });
+  }
+  var raw=String(text||"").split("\n"), out=[], firstDone=false;
+  for(var i=0;i<raw.length;i++){
+    var t=raw[i].replace(/\s+$/,"").trim();
+    if(!t) continue;
+    if(/^\|.*\|$/.test(t)){                                  // 表格行：分隔行丢掉，单元格用空格拼
+      if(/^\|[\s:|-]+\|$/.test(t)) continue;
+      var cells=t.replace(/^\||\|$/g,"").split("|").map(function(c){ return mdTokens(c.trim()).map(function(x){return x.text;}).join(""); });
+      out.push(new P({children:[new T({text:cells.join("    "),size:base,color:color})],spacing:{after:80}})); continue;
+    }
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(t)){
+      out.push(new P({children:[new T({text:"———",color:"BBBBBB",size:base})],alignment:"center",spacing:{before:80,after:80}})); continue;
+    }
+    var h=t.match(/^(#{1,6})\s+(.*)$/);
+    if(h){ var lv=h[1].length, sz=lv<=1?32:(lv===2?28:(lv===3?26:base+2));
+      out.push(new P({children:runs(h[2],{bold:true,size:sz}),spacing:{before:220,after:120}})); firstDone=true; continue; }
+    var q=t.match(/^>\s?(.*)$/);
+    if(q){ out.push(new P({children:runs(q[1],{italics:true,color:"666666"}),indent:{left:480},spacing:{after:120}})); firstDone=true; continue; }
+    var b=t.match(/^([-*+]|•)\s+(.*)$/);
+    if(b){ out.push(new P({children:[new T({text:"• ",size:base,color:color})].concat(runs(b[2])),indent:{left:360},spacing:{after:80}})); firstDone=true; continue; }
+    var n=t.match(/^(\d+)[.)]\s+(.*)$/);
+    if(n){ out.push(new P({children:[new T({text:n[1]+". ",bold:true,size:base,color:color})].concat(runs(n[2])),indent:{left:360},spacing:{after:80}})); firstDone=true; continue; }
+    if(!firstDone){                                          // 首行＝主标题，居中大粗
+      firstDone=true;
+      out.push(new P({children:runs(t,{bold:true,size:32}),alignment:"center",spacing:{before:80,after:220}})); continue;
+    }
+    out.push(new P({children:runs(t),spacing:{after:160,line:360}}));
+  }
+  return out;
+}
+function saveDocx(text,label,btn){
+  var o=btn.textContent; btn.disabled=true; btn.textContent="正在生成…";
+  var back=function(msg){ btn.disabled=false; btn.textContent=o; if(msg) alert(msg); };
+  loadDocx().then(function(){
+    var D=window.docx, title=(String(text).split("\n")[0]||label).replace(/^#+\s*/,"").replace(/[\\\/:*?"<>|]/g,"").slice(0,40)||label;
+    var kids=mdParas(text,{size:24,color:"222222"});
+    kids.push(new D.Paragraph({children:[new D.TextRun({text:"由 ChatJohn（语言发生学 · 胡志英）与读者的一场对话概括成文　lang.sdeuniverses.com/chatjohn/",size:18,color:"999999"})],alignment:"center",spacing:{before:400}}));
+    return D.Packer.toBlob(new D.Document({sections:[{properties:{},children:kids}]})).then(function(blob){
+      var a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+      a.download=title+".docx";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(a.href); },4000);
+      btn.disabled=false; btn.textContent="已下载"; setTimeout(function(){ btn.textContent=o; },1800);
+    });
+  })["catch"](function(e){
+    back("生成 Word 没成功（"+((e&&e.message)||e)+"）。正文没丢——用旁边的「复制全文」，或点这个按钮再试一次。");
+  });
+}
+
 /* ── 概括成文（段数必须与后端 JOHN_COMPOSE 一致）── */
 var KINDS={paper:{n:4,label:"论文",total:"约一万字"},
            essay:{n:2,label:"散文",total:"约四千字"},
@@ -515,12 +610,8 @@ function compose(kind){
     var act=document.createElement("div"); act.className="act";
     var b1=document.createElement("button"); b1.type="button"; b1.textContent="复制全文";
     b1.onclick=function(){ copy(full,b1); };
-    var b2=document.createElement("button"); b2.type="button"; b2.textContent="下载 .md";
-    b2.onclick=function(){ var blob=new Blob([full],{type:"text/markdown;charset=utf-8"});
-      var a=document.createElement("a"); a.href=URL.createObjectURL(blob);
-      a.download=K.label+"-"+new Date().toISOString().slice(0,10)+".md";
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(function(){URL.revokeObjectURL(a.href);},4000); };
+    var b2=document.createElement("button"); b2.type="button"; b2.textContent="下载 Word";
+    b2.onclick=function(){ saveDocx(full,K.label,b2); };
     act.appendChild(b1); act.appendChild(b2); box.appendChild(act);
     stopBtn(false);
     for(var i=0;i<bs.length;i++) bs[i].disabled=false;

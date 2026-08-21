@@ -177,9 +177,15 @@ const $$ = (w, s) => Array.from(w.document.querySelectorAll(s));
     t("成文条三个文体", $$(w, "#bar button").length === 3);
     const labels = $$(w, "#bar button").map((b) => b.textContent);
     t("三个文体标了字数", /1 万字/.test(labels[0]) && /4000/.test(labels[1]) && /2000/.test(labels[2]), labels.join(" | "));
-    // 第二轮请求应带上完整历史
-    const last = w.__calls[w.__calls.length - 1];
-    t("第二轮带上整场历史", last.body.messages.length === 3);
+    // 第二轮的**主问答**请求应带上完整历史。
+    // ⚠ 不能取 __calls 的最后一条：答完一轮还会再打一次 /api/john/next 拉追问，
+    //    那一条才是最后的，带的是 4 条历史——按端点筛，否则验的是另一个请求。
+    const chats = w.__calls.filter((c) => /\/api\/john\/chat/.test(c.u));
+    t("第二轮走的是问答端点", chats.length === 2, "chat=" + chats.length + " 总=" + w.__calls.length);
+    t("第二轮带上整场历史", chats[chats.length - 1].body.messages.length === 3,
+      "messages=" + (chats[chats.length - 1] || {}).body.messages.length);
+    const nexts = w.__calls.filter((c) => /\/api\/john\/next/.test(c.u));
+    t("追问请求带的是答完之后的历史", nexts.length === 2 && nexts[1].body.messages.length === 4);
     $(w, "#btnNew").click(); await sleep(30);
     t("新对话清空消息", $$(w, ".msg").length === 0);
     t("新对话收起成文条", $(w, "#bar").hidden === true);
@@ -250,6 +256,74 @@ const $$ = (w, s) => Array.from(w.document.querySelectorAll(s));
     $(w, "#go").click(); await sleep(60);
     t("空白输入不发送", $$(w, ".msg").length === 2);
     t("种子问题按钮共四条", $$(w, ".seed").length === 4);
+  }
+
+  console.log("\n── I. 导出 Word ────────────────────────────────");
+  {
+    // 假的 docx 库：记下建了哪些 Paragraph/TextRun，验 mdParas 的渲染口径。
+    // 不联网——CDN 在测试里永远不该被真的拉一次。
+    function fakeDocx(rec) {
+      const D = {
+        Paragraph: function (o) { o = o || {}; this.children = o.children || []; this.alignment = o.alignment; rec.paras.push(this); },
+        TextRun: function (o) { Object.assign(this, o || {}); rec.runs.push(this); },
+        Document: function (o) { this.o = o; rec.doc = o; },
+        Packer: { toBlob: () => Promise.resolve({ size: 1234, type: "docx" }) },
+      };
+      return D;
+    }
+    async function composeThen(w, text) {
+      w.__handler = () => okStream([{ t: "d", v: "答" }, "[DONE]"]);
+      $(w, "#q").value = "问一"; $(w, "#go").click(); await sleep(150);
+      $(w, "#q").value = "问二"; $(w, "#go").click(); await sleep(150);
+      w.__handler = () => okStream([{ t: "meta", v: { part: 1, parts: 1 } }, { t: "d", v: text }, { t: "fin", v: {} }, "[DONE]"]);
+      $$(w, "#bar button")[2].click();          // 公众号＝1 段，最快
+      await sleep(350);
+      return $(w, ".compose");
+    }
+
+    const { w } = await boot(KEYED);
+    const rec = { paras: [], runs: [], doc: null };
+    w.docx = fakeDocx(rec);
+    let dl = null;
+    w.URL.createObjectURL = () => "blob:x"; w.URL.revokeObjectURL = () => {};
+    const realCreate = w.document.createElement.bind(w.document);
+    w.document.createElement = (tag) => { const el = realCreate(tag); if (tag === "a") { el.click = () => { dl = el.download; }; } return el; };
+
+    const box = await composeThen(w, "语感是什么\n\n## 一、从一句话起手\n\n**顺**不是一种感觉。\n\n- 第一条\n- 第二条\n\n1. 甲\n2. 乙\n\n> 引一句\n\n| 甲 | 乙 |\n| --- | --- |\n| 1 | 2 |\n");
+    const btns = Array.from(box.querySelectorAll(".act button")).map((b) => b.textContent);
+    t("下载按钮写的是 Word，不是 .md", btns.indexOf("下载 Word") >= 0 && !btns.some((x) => /\.md/.test(x)), btns.join(" | "));
+    t("页面里已无 .md 下载残留", !HTML.includes('.md"'), "");
+    box.querySelectorAll(".act button")[1].click();
+    await sleep(120);
+    t("下载的是 .docx", /\.docx$/.test(dl || ""), String(dl));
+    t("文件名取正文首行", /^语感是什么\./.test(dl || ""), String(dl));
+    t("建出了 Document", !!rec.doc && Array.isArray(rec.doc.sections[0].children));
+    const texts = rec.runs.map((r) => r.text);
+    t("标题居中大粗", rec.paras.some((p) => p.alignment === "center" && p.children.some((c) => c.text === "语感是什么" && c.bold && c.size === 32)));
+    t("## 小标题成粗体", rec.runs.some((r) => r.text === "一、从一句话起手" && r.bold && r.size === 28));
+    t("**粗体**被拆成粗 run", rec.runs.some((r) => r.text === "顺" && r.bold));
+    t("粗体标记不残留星号", !texts.some((x) => /\*\*/.test(String(x))));
+    t("无序列表加了圆点", texts.filter((x) => x === "• ").length === 2);
+    t("有序列表保留序号", texts.indexOf("1. ") >= 0 && texts.indexOf("2. ") >= 0);
+    t("引用被收进来", texts.indexOf("引一句") >= 0);
+    t("表格分隔行被丢掉", !texts.some((x) => /^\|?[\s:|-]+$/.test(String(x)) && /-/.test(String(x))));
+    t("表格单元格拼成一行", texts.some((x) => /甲\s+乙/.test(String(x))));
+    t("页脚标了出处", texts.some((x) => /lang\.sdeuniverses\.com\/chatjohn/.test(String(x))));
+    t("正文不进页脚以上的其它节", rec.doc.sections.length === 1);
+
+    // 失败分支：CDN 拉不到时必须如实说，且按钮要能复位重试——不许静默、不许拿 .md 冒充
+    const { w: w2 } = await boot(KEYED);
+    let alerted = "";
+    w2.alert = (m) => { alerted = String(m); };
+    const head = w2.document.head;
+    const realAppend = head.appendChild.bind(head);
+    head.appendChild = (el) => { if (el.tagName === "SCRIPT") { setTimeout(() => el.onerror && el.onerror(new w2.Event("error")), 5); return el; } return realAppend(el); };
+    const box2 = await composeThen(w2, "标题\n\n正文。");
+    const b2 = box2.querySelectorAll(".act button")[1];
+    b2.click(); await sleep(120);
+    t("CDN 失败时明确告知", /没成功/.test(alerted) && /复制全文/.test(alerted), alerted.slice(0, 60));
+    t("失败后按钮复位可重试", !b2.disabled && b2.textContent === "下载 Word", b2.textContent);
+    t("失败时不偷偷给 .md", !/\.md/.test(alerted));
   }
 
   console.log("\n" + "═".repeat(48));
