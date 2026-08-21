@@ -88,7 +88,10 @@ console.log("— 二、接线：结尾那句优先落袋，且不许抢用户正
 const iS = H.indexOf("function suggestNextQ(){");
 const BLK = iS >= 0 ? H.slice(iS, H.indexOf("/* ================= 🚀 自动二十轮", iS)) : "";
 ok(!!BLK, "抠得出 suggestNextQ");
-ok(/var tailQ=tailQuestion\(lastAns\);/.test(BLK), "每轮答完先解析上一轮结尾那句");
+/* ⚠ 2026-08-21：先认结账块里那一栏固定字段（写死的、不必猜），取不到才退回正则猜法。
+   断言跟着改成「两条路按这个次序接上」——只钉旧那一条，等于把新加的首选路径漏在护栏之外。 */
+ok(/tailQuestionFromLedger\([\s\S]{0,90}\) \|\| tailQuestion\(lastAns\)/.test(BLK),
+  "每轮答完先取结账块里的「下一问」，取不到才退回解析结尾那句");
 ok(BLK.indexOf("if(tailQ && mayFill()){ qa.value=tailQ; nextQReady=tailQ; }") > 0
    && BLK.indexOf("if(tailQ && mayFill())") < BLK.indexOf("return fetch("),
    "**不等 nextq 回来就填**——它已经在屏幕上了，输入框要立刻与它一致，不能先显示另一句再被换掉");

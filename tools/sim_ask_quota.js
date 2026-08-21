@@ -15,7 +15,13 @@ const W = fs.readFileSync(path.join(ROOT, "src/worker.js"), "utf8");
 
 sec("① 限流器：显式 0 ＝ 这一档不设上限");
 const LS = W.indexOf("export class AskLimiter");
-const LIM = W.slice(LS, W.indexOf("export class ConfigVault", LS));
+/* ⚠ 2026-08-19 有人把 IndexMemory 插在了 AskLimiter 与 ConfigVault 之间，
+   于是这段抠取带上了第二个 export，`new Function` 当场抛 Unexpected token 'export'——
+   限流器那 400 次连打真跑因此**两天没跑过**，而护栏只是红着，没人当回事。
+   改法：抠到**下一个 export class 为止**，不再指名某一个类当终点。
+   💡 通则：抠取式护栏的终点要选「同类里的下一个」，别选某个具体邻居——邻居是会被插队的。 */
+const LE = W.indexOf("export class", LS + 10);
+const LIM = W.slice(LS, LE > LS ? LE : W.indexOf("export class ConfigVault", LS));
 ok("抠得出 AskLimiter", LIM.length > 400);
 ok('传 "0" 时返回 Infinity', /if \(raw === "0"\) return Infinity;/.test(LIM));
 ok("只认字符串 0，不把 parseInt 的 0 也放行（省得别处传空串误开闸）",

@@ -207,7 +207,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
     </div>
     <div id="deepHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:9px 2px 0;line-height:1.6">🔬 深度模式：基底先内化内功写心得，再用 <b>SDE 方法论</b>（六路径→S/D/E→三方程→误差互消→逮先验）做一次有指导性的深入研究，现实问题还会给可执行的「怎么办」。默认<b>单次调用</b>（较慢、较费 token，建议自带 Key）。<br>点「四步法」→ 升级为 <b>S/D/E 四次独立调用</b>的完整误差互消（最深，但慢 4 倍、贵 4 倍，只在要冲满时用）。</div>
     <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–20 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
-    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动二十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡 → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）自己把问对逼深二十轮（<b>分七批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（四段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>15</b> 次基底调用（开涌现档 19 次）、30–55 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
+    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动二十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡 → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）自己把问对逼深二十轮（<b>分七批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（五段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>15</b> 次基底调用（开涌现档 19 次）、30–55 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
     <div id="ownKeyRow" style="display:none">
       <input id="userKey" type="password" autocomplete="off" placeholder="填入你的 DeepSeek / 智谱 API Key（仅存本机浏览器，不上传服务器保存）">
     </div>
@@ -247,7 +247,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
         <button class="actbtn" id="btnIq" onclick="doIq()">🎯 <span class="zh-only">创新智商评估 · 五维盲评</span><span class="en-only">Innovation IQ</span></button>
         <button class="actbtn" id="btnPolish" onclick="doPolish()">🛠 <span class="zh-only">打磨修改 · 目标 135+</span><span class="en-only">Polish → 135+</span></button>
         <span class="act-hint" style="width:100%"><span class="zh-only">🌀 涌现路线：开「涌现档」→ 连问 2–20 轮（每轮三观点）→「二阶碰撞」三典范择优 → 自动综合提炼 →「成文一篇」。🧵 常规路线：可连问 20 轮，每轮都带着前面的上下文；问够了先「提炼精华」，再「成文一篇」——论文水平主要由这份精华报告决定，所以它先做一次取舍规划，再分两段写约七千字：第一段是九栏作业单，第二段是「论文观点与分章大纲」，那一栏直接当成文的施工图。约 5–9 分钟。</span><span class="en-only">🧵 Up to 20 threaded turns → distill → write. The brief is what lifts the paper.</span></span>
-        <span class="act-hint"><span class="zh-only">「成文一篇」= 四段深度写作 · 两万字投稿体例 · 约 8–16 分钟 · 建议自带 Key　|　评估约 1 分钟 · 打磨（也是四段）约 10–18 分钟</span><span class="en-only">Paper = 4 deep calls · ~20k chars, submission-ready · 8–16 min　|　IQ ≈ 1 min · Polish ≈ 10–18 min</span></span>
+        <span class="act-hint"><span class="zh-only">「成文一篇」= 五段深度写作 · 两万字投稿体例 · 约 10–18 分钟 · 建议自带 Key　|　评估约 1 分钟 · 打磨（四段）约 10–18 分钟</span><span class="en-only">Paper = 5 deep calls · ~20k chars, submission-ready · 8–16 min　|　IQ ≈ 1 min · Polish ≈ 10–18 min</span></span>
         <span class="act-hint" style="width:100%;margin-top:2px"><span class="zh-only">🎯 与 🛠 默认作用于刚生成的论文；也可 <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">粘贴任意一篇文章</b> 来评、来改。</span><span class="en-only">Works on the generated paper, or <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">paste your own text</b>.</span></span>
       </div>
       <div id="iqSrcRow" style="display:none;margin-top:10px">
@@ -279,6 +279,8 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
           <div class="pp-bar"><div class="pp-fill" id="ppFill"></div></div>
           <div class="pp-num"><span id="ppChars">0</span> <span class="zh-only">字</span><span class="en-only">chars</span></div>
         </div>
+        <!-- 成文的实时正文：与提炼那个框同一套。没有它，读者只能盯着一个数字猜基底在做什么。 -->
+        <div class="ans" id="paperLive" style="max-height:22em;overflow:auto;white-space:pre-wrap"></div>
         <div class="pdf-acts" id="pdfActs">
           <a class="actbtn solidbtn" id="pdfRead" target="_blank" rel="noopener">📄 <span class="zh-only">PDF 在线阅读</span><span class="en-only">Read PDF online</span></a>
           <a class="actbtn" id="pdfDl">⬇ <span class="zh-only">下载 PDF</span><span class="en-only">Download PDF</span></a>
@@ -758,23 +760,21 @@ function originQ(){ return turns.length ? turns[0].q : lastQ; }
 /* 上下文预算：最近两轮给全文，更早的逐层压到 500 字。
    十轮全量塞进去会把单轮的 token 烧光，而真正要保真的永远是最近两轮——
    更早的轮次，留住它把问题推到哪儿就够了。 */
+/* 【携带策略 —— 2026-08-21 改】旧策略是一刀切：最近两轮留**前** 1600 字、更早的留**前** 500 字。
+   问题不在字数，在切的方向——一轮的落点与那句升维追问几乎总在**末尾**，那把刀砍掉的正是承前启后的铰链，
+   留下的是铺垫；早期轮次只剩开头 500 字，等于只知道它从哪儿起手、不知道它落到哪儿。
+   新策略：**全部轮次的结账块（一条不丢、一个字不切）＋ 最近两轮全文**。
+   十一轮的结账块合计约两千字，比旧窗口的一万二还小，而且没有一句是断的。
+   ⚠ 退路必须留着：老轮次（这一刀之前跑的）没有结账块，`led` 为空 ⇒ 那一轮自动退回旧切法，
+   不然正在跑的那些场次会当场丢掉上下文。 */
 function buildHist(full){
   var out=[];
   for(var i=0;i<turns.length;i++){
-    var back=turns.length-1-i;
-    /* 【入料上限 —— 2026-08-13】full=true 的那条路（提炼／成文／打磨／综合）是「读全场」的一刀：
-       它一次跑完就不再跑，而基底窗口有 1M，此前 2600 这个数把每一轮的答案都砍着尾巴送进去
-       ——深度档一轮就写 1700–2100 字、自动十轮每轮 2000–2600 字，正好卡在边界上。
-       金点子若恰在被砍掉的尾巴里，后面装多少内功都找不回来。
-       full=false 那条（每轮问对自己带的上下文）一个字不动：它每轮都要跑，
-       预填时间算在平台那道 130 秒的墙里，放宽就是把撞墙提前。 */
-    /* [stated] 用户 2026-08-13：「把 10 轮问对都保存起来，形成一个文档……基底可以处理很大的。」
-       full=true 这条路（提炼／成文／打磨／综合）从此**不截断**：40000 不是预算，是防呆——
-       深度档一轮写 1700–2100 字、涌现档约 3000 字，四万字是任何一轮都摸不到的天花板。
-       这份文档在 doDistill 里一次建好、三刀共用，逐字节相同 ⇒ 命中上游前缀缓存。
-       full=false 那两档一个字不动：它每轮都要跑，预填时间算在平台 130 秒的墙里。 */
-    var lim = full ? 40000 : (back<2 ? 1600 : 500);
-    out.push({q:turns[i].q, a:(turns[i].a||'').slice(0,lim)});
+    var back=turns.length-1-i, t=turns[i], led=t.led||'';
+    if(full){ out.push({q:t.q, a:(t.a||'').slice(0,40000)+(led?('\n\n'+led):'')}); continue; }
+    if(back<2){ out.push({q:t.q, a:(t.a||'').slice(0,1600)+(led?('\n\n'+led):'')}); continue; }
+    /* 更早的轮次：有账本就只带账本（完整），没有就退回旧的「前 500 字」 */
+    out.push({q:t.q, a: led || (t.a||'').slice(0,500)});
   }
   return out;
 }
@@ -1047,8 +1047,12 @@ function finishAsk(ansEl, gotErr, lastStat, finRead){
   }
   if(lastAns && lastAns.length>60){
     document.getElementById('askActs').classList.add('show');
-    /* 本轮入档：只有真答出来的才算一轮，报错/空答不占轮次 */
-    turns.push({q:lastQ, a:lastAns});
+    /* 本轮入档：只有真答出来的才算一轮，报错/空答不占轮次。
+       结账块从正文里摘出来单存（见 takeLedger 上方那段）：正文不再重复留一份，
+       携带上下文与拟下一问都改从 led 取。老轮次没有 led，一切照旧。 */
+    var _lg=takeLedger(lastAns);
+    if(_lg.led) lastAns=_lg.body;
+    turns.push({q:lastQ, a:lastAns, led:_lg.led});
     archSave();          /* 每轮存一次：跑到第九轮才断电，前八轮不该跟着一起没 */
     renderThread(); updateTurnBar();
     suggestNextQ();
@@ -1076,6 +1080,15 @@ var nextQReady='', ladderQReady='', ladderMove='';
    ⇒ 结尾那句优先：它是模型带着整轮上下文、在答完之后自己长出来的下一步，与这一轮严丝合缝。
    阶梯不丢：nextq 照旧调（它同时给出本轮的追问动作名），只是降为**备选**，一键可换。
    ⚠ 做成顶层具名函数，好让 tools/sim_next_question.js 抠出来单测。 */
+/* 【下一问 —— 2026-08-21 起先认结账块的固定字段】
+   本函数原来只能从正文末尾**猜**那句追问（认标记词、判问号、防误认，三道闸叠着走）。
+   现在每一轮自己交结账块，「下一问」是写死的一栏，直接取即可；取不到才退回下面那套猜法。
+   猜法一个字没删——老轮次与结账块写歪的那些，仍然靠它兜底。 */
+function tailQuestionFromLedger(led){
+  var q=ledField(led, '下一问');
+  if(!q || q.length<6 || q.length>120) return '';
+  return /[?？]$/.test(q) ? q : (q+'？');
+}
 function tailQuestion(txt){
   var t=String(txt||'').replace(/[\s\u3000]+$/,'');
   if(!t) return '';
@@ -1123,7 +1136,8 @@ function suggestNextQ(){
   var qa=document.getElementById('qa');
   /* 【结尾那句先落袋】不等 nextq 回来就填——它已经在屏幕上了，让输入框立刻与它一致，
      读者不必先看见另一句、过几秒又被换掉。 */
-  var tailQ=tailQuestion(lastAns);
+  /* 先认结账块里那一栏固定字段（写死的、不必猜）；没有账本才退回旧的正则猜法。 */
+  var tailQ=tailQuestionFromLedger(turns.length ? (turns[turns.length-1].led||'') : '') || tailQuestion(lastAns);
   /* 只在输入框仍是上一句（或空、或仍是我们上次填进去的那句）时才替换：
      用户已经在自己敲下一问时，一个字都不许抢。 */
   var mayFill=function(){
@@ -1174,7 +1188,7 @@ function suggestNextQ(){
 }
 
 /* ================= 🚀 自动二十轮：一问到底 =================
-   二十轮问对 → 提炼精华（先规划·两段·约七千字精华报告，含论文观点与分章大纲） → 两万字论文（四段·投稿体例·PDF） → 创新智商五维盲评 → 全程记录。
+   二十轮问对 → 提炼精华（先规划·两段·约七千字精华报告，含论文观点与分章大纲） → 两万字论文（五段·投稿体例·PDF） → 创新智商五维盲评 → 全程记录。
    人只交一个问题，中途不再点任何东西。
 
    为什么值得单独做一条：这条产线原本每一步都要人点一下，而十轮问对的价值恰恰在于「一层层逼深」，
@@ -1236,6 +1250,23 @@ function autoDone(ix,state,note){ if(autoSteps[ix]){ autoSteps[ix].state=state; 
    十轮＝十次独立的哑火机会；改成两批之后只剩两次。
    线上实测：五轮一次调用 53 秒 / 5,764 字 / 五轮问答俱全；逐轮那条路是每轮 50–100 秒、还会中途断。
    容错：一次没写满五轮不算失败——parseRounds 收下写成的那几轮，下一批从断点接着要。 */
+/* 【逐轮结账 —— 2026-08-21 用户裁定】「每次都进行一次总结和进一步提问，然后每次总结都带入」。
+   为什么让每一轮**自己**结账，而不是另开一次调用去总结：二十轮就是二十次额外调用，
+   而且事后总结的那一位不在现场。它刚写完，最清楚自己走到哪、欠了什么。
+   结账块四栏〔落点／走法／欠账／下一问〕由服务端提示词写死；这里只负责把它从正文里摘出来。
+   摘出来单存的用处有二：① buildHist 携带全部结账块（一条不丢、一个字不切），
+   取代旧那把「最近两轮留前 1600 字、更早留前 500 字」的一刀切——**旧刀砍掉的正是落点与下一问所在的尾巴**；
+   ② tailQuestion 直接吃「下一问」这个固定字段，不必再靠正则从正文末尾猜。 */
+function takeLedger(txt){
+  var t=String(txt||''), i=t.search(/〔第\s*\d+\s*轮·结〕/);
+  if(i<0) return {body:t, led:''};
+  return {body:t.slice(0,i).trim(), led:t.slice(i).trim()};
+}
+/* 从结账块里取某一栏；取不到回空串（老轮次没有结账块，一律走老路） */
+function ledField(led, name){
+  var m=String(led||'').match(new RegExp(name+'\\s*[:：]\\s*([^\n]+)'));
+  return m ? m[1].trim() : '';
+}
 function parseRounds(txt){
   var out=[], re=/〔第(\d+)轮·问〕/g, m, marks=[];
   while((m=re.exec(txt))!==null) marks.push({no:+m[1], at:m.index, end:re.lastIndex});
@@ -1245,7 +1276,9 @@ function parseRounds(txt){
     if(cut<0) continue;                                  /* 只有问没有答＝这一轮被截断，丢掉 */
     var q=seg.slice(0,cut).replace(/^[\s\n]+/,'').split('\n')[0].trim();
     var aTxt=seg.slice(cut).replace(/^〔第\d+轮·答〕\s*/,'').replace(/〔\d+轮完〕[\s\S]*$/,'').trim();
-    if(q.length>=4 && aTxt.length>=200) out.push({q:q, a:aTxt});
+    var led=takeLedger(aTxt);        /* 结账块从正文里摘出来单存，正文里不再重复留一份 */
+    if(led.led) aTxt=led.body;
+    if(q.length>=4 && aTxt.length>=200) out.push({q:q, a:aTxt, led:led.led});
   }
   return out;
 }
@@ -1389,7 +1422,7 @@ function doAutoRun(){
   if(!q){ document.getElementById('qa').focus(); flashAsk('先写下你要一问到底的那一个问题。'); return Promise.resolve(); }
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
-  /* 七批问对（每批三轮装在一次调用里；20 = 3+3+3+3+3+3+2）＋ 提炼三次（规划＋两段）＋ 成文四段 ＋ 盲评 ＝ 15；
+  /* 七批问对（每批三轮装在一次调用里；20 = 3+3+3+3+3+3+2）＋ 提炼三次（规划＋两段）＋ 成文五段 ＋ 盲评 ＝ 16；
      开涌现档时提炼那几次换成三路碰撞（3 撞 ＋ 3 盲评 ＋ 1 综合）＝ 19——
      ⚠ 涌现档走的是 collide/synth，**不经提炼**，所以加第十栏不影响这一档的次数。
      从前是 23／29——十轮各调一次、外加九次拟题。省下的不只是钱，更是十次独立的哑火机会。
@@ -1398,8 +1431,10 @@ function doAutoRun(){
      2026-08-13 加第十栏时这里就差点漏改，说明条上写 13、真跑 13，而这一行还停在 12。 */
   /* ⚠ 批数不许手写：ROUND_BATCH 或 AUTO_TARGET 一改，写死的数当场失准（2026-08-13 已栽过一次）。
      算法与下面 nextBatch 的分批规则逐字同源（尾巴不留孤轮）。 */
-  var calls=autoBatchCount()+(triOn?7:(1+BRIEF_PARTS.length))+4+1;
-  if(!confirm('🚀 自动二十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n'+AUTO_TARGET+' 轮问对（分 '+autoBatchCount()+' 批，每轮两千字以上）→ 约七千字精华报告（先规划再两段）→ 两万字论文（四段）与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
+  /* ⚠ 成文那一项写死过 4，成文改成五段时它就悄悄少报一次。改成认 PAPER_PARTS.length，
+     跟提炼那一项同一个做法：**段数一律从定义处抽，不许再出现写死的数**。 */
+  var calls=autoBatchCount()+(triOn?7:(1+BRIEF_PARTS.length))+PAPER_PARTS.length+1;
+  if(!confirm('🚀 自动二十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n'+AUTO_TARGET+' 轮问对（分 '+autoBatchCount()+' 批，每轮两千字以上）→ 约七千字精华报告（先规划再两段）→ 两万字论文（五段）与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
     +'· 约 '+calls+' 次基底调用（'+(deepOn?'深度档':'普通档')+(triOn?' ＋ 涌现档':'')+'），预计 '+(deepOn?'40–70':'30–55')+' 分钟\n'
     +'· 期间请勿关闭或刷新页面——这场问对只活在这一页的内存里\n'
     +'· 随时可「⏹ 中止」，已跑出来的部分全部保留\n\n'
@@ -1444,15 +1479,15 @@ function doAutoRun(){
     }
     if(okRounds<AUTO_TARGET) autoPush('第 '+(okRounds+1)+'–'+AUTO_TARGET+' 轮未跑成，用已完成的 '+okRounds+' 轮继续往下走');
     var ix=autoPush(triOn?'二阶碰撞 · 三典范择优 → 综合提炼':'提炼精华 · 整场问对 → 约七千字精华报告');
-    autoStat('🧪 '+(triOn?'三路碰撞与综合提炼':'提炼入口资料（分四段，约 8–16 分钟）')+'中 · 已用 '+autoElapsed()+'…');
+    autoStat('🧪 '+(triOn?'三路碰撞与综合提炼':'提炼入口资料（先规划再两段，约 5–9 分钟）')+'中 · 已用 '+autoElapsed()+'…');
     return (triOn?doEmerge():doDistill()).then(function(){
       if(!brief){ autoDone(ix,'fail','未产出入口资料'); throw new Error('提炼没交出入口资料——就此停手。没有入口资料的论文会退回单轮底稿，白烧两次最贵的长调用。十轮问对都还在上面，可手动重试提炼。'); }
       autoDone(ix,'ok',brief.length+' 字');
     });
   }).then(function(){
     if(autoStopped) return;
-    var ix=autoPush('成文一篇 · 两万字论文（四段续写·投稿体例）→ PDF');
-    autoStat('📝 论文写作中（分四段，约 8–16 分钟）· 已用 '+autoElapsed()+'…');
+    var ix=autoPush('成文一篇 · 两万字论文（五段续写·投稿体例）→ PDF');
+    autoStat('📝 论文写作中（分五段，约 10–18 分钟）· 已用 '+autoElapsed()+'…');
     return doPaper().then(function(){
       if(!paperAll || paperAll.length<600){ autoDone(ix,'fail','未成文'); throw new Error('论文没写成（详见上方成文状态行），止步于此。'); }
       autoDone(ix,'ok',paperAll.length+' 字');
@@ -1613,7 +1648,10 @@ function doDistill(){
       brief=''; return;
     }
     autoVault(brief, '提炼精华');
-    var cut=CUTLOG.length?('⚠ '+CUTLOG.join('、')+'——连跑两次都没写到收尾标记。读数：'+runWhy()+'　'):'';
+    var cut=CUTLOG.length?('⚠ '+CUTLOG.join('、')+'　'):'';
+    /* 编号机检：空号在这里说出来，比等成文把编号抄进论文再发现便宜得多。 */
+    var ab=auditBrief(brief);
+    if(ab.length) cut += '🔎 编号机检：'+ab.join('；')+'。　';
     stat.textContent = (miss || cut)
       ? cut+(miss||'')+' 已写的 '+brief.length+' 字仍可作论文入口，但断掉/缺掉的部分会原样变成论文里的缺口——建议再点一次「🧪 提炼精华」补齐。'
       : '✓ 论文入口资料已就绪（'+brief.length+' 字 · 九栏'+(plan?' · 已先做取舍规划':'')+' · 出自 '+turns.length+' 轮问对）· 现在点「成文一篇」，两万字论文将以它为起点逐条兑现。';
@@ -1635,7 +1673,7 @@ var GEN_STAT='paperStat', GEN_FILL='ppFill', GEN_CHARS='ppChars', GEN_BOX='', GE
 /* GEN_PREV = 本次任务里前面几段已写好的正文。两个用处：
    ① 字数计从它接着往上走——旧版写死 paperAll.length，打磨时会把已完成的论文长度算进打磨进度里；
    ② 有 GEN_BOX 的任务（提炼）靠它把「已完成段落＋本段实时流」拼起来显示，跑八分钟不至于对着空白框干等。 */
-function genTarget(stat, fill, chars, box){ GEN_STAT=stat; GEN_FILL=fill; GEN_CHARS=chars; GEN_BOX=box||''; GEN_PREV=''; CUTLOG=[]; }
+function genTarget(stat, fill, chars, box){ GEN_STAT=stat; GEN_FILL=fill; GEN_CHARS=chars; GEN_BOX=box||''; GEN_PREV=''; CUTLOG=[]; GEN_T0=Date.now(); }
 /* ═══ 一次调用的读数（诊断用 · 2026-08-13）═══
    线上真故障：提炼精华跑完只有 0 字，屏幕上留下的是一句**写死的猜测**
    （「多半是把额度全烧在思考上了」）。而服务端其实一路都在报读数——
@@ -1668,6 +1706,18 @@ function runWhy(){
   if(RUNLOG.err) a.push('服务端报的错：'+RUNLOG.err);
   if(RUNLOG.stat) a.push('最后一步：'+RUNLOG.stat);
   return a.join(' · ');
+}
+/* 段名：part=0 是**规划段**，不是第一段。`part||1` 那个写法把 0 变成 1，屏幕上从此没有规划段。 */
+function PART_LABEL(part){
+  if(part===0) return '规划段';
+  return '第'+('一二三四五'.charAt((part||1)-1)||'一')+'段';
+}
+/* 整刀总时长：由 genTarget 起表，跨段不重置——否则每段都停在「已 5 秒」，时间证据等于没有。 */
+var GEN_T0=0;
+function genElapsed(){
+  if(!GEN_T0) return '0 秒';
+  var s=Math.round((Date.now()-GEN_T0)/1000);
+  return s<60 ? (s+' 秒') : (Math.floor(s/60)+' 分 '+(s%60)+' 秒');
 }
 function streamPaper(part, extra){
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
@@ -1716,10 +1766,21 @@ function streamPaper(part, extra){
               var _v=j.v||{}; if(_v.sec) RUNLOG.sec=_v.sec; if(_v.think) RUNLOG.think=Math.max(RUNLOG.think,_v.think);
               if(!pacc.length){
                 var _base=(RUNLOG.stat||'正在处理').replace(/（\+\d+s）\s*$/,'');
-                stat.textContent='⏳ '+_base+' · 已 '+(RUNLOG.sec||0)+' 秒'+(RUNLOG.think?' · 已推演 '+RUNLOG.think+' 字':'')+'…';
+                stat.textContent='⏳ '+PART_LABEL(part)+' · '+_base+' · 本段 '+(RUNLOG.sec||0)+' 秒 · 整刀已 '+genElapsed()
+                  +(RUNLOG.think?' · 已推演 '+RUNLOG.think+' 字':'')+'…';
               }
             }
-            else if(j.t==='think'){ thinkChars+=(j.v||'').length; RUNLOG.think=Math.max(RUNLOG.think,thinkChars); stat.textContent='🧠 第'+('一二三四'.charAt((part||1)-1)||'一')+'段·深度思考中（'+thinkChars+' 字'+(RUNLOG.sec?'·第 '+RUNLOG.sec+' 秒':'')+'）…'; }
+            /* 【三处显示毛病，一起修 —— 2026-08-21】
+               ① `part||1` 把规划段的 0 变成 1 ⇒ 屏幕上「规划段」被印成「第一段」，
+                  而真正的第一段还没开始，看的人以为它在原地重写；
+               ② 思考帧此前无条件抢状态行：正文都流出三千字了，来一帧思考又翻回「深度思考中」，
+                  看上去像什么都没写。心跳帧早有「出了正文就别抢」这道保护，思考帧一直没有；
+               ③ 秒数每段重来一次，于是永远停在「已 5 秒」（第一颗心跳恰好落在第 5 秒、
+                  而第一个字通常 5–10 秒就到），等于没有时间证据。改成跟着整刀总时长走。 */
+            else if(j.t==='think'){
+              thinkChars+=(j.v||'').length; RUNLOG.think=Math.max(RUNLOG.think,thinkChars);
+              if(!pacc.length) stat.textContent='🧠 '+PART_LABEL(part)+'·深度思考中（'+thinkChars+' 字·整刀已 '+genElapsed()+'）…';
+            }
             else if(j.t==='fin'){ var _f=j.v||{}; RUNLOG.fin=_f.fin||''; RUNLOG.done=!!_f.done; if(_f.sec) RUNLOG.sec=_f.sec; if(_f.think) RUNLOG.think=Math.max(RUNLOG.think,_f.think); }
             /* 【写到一半的字不许丢 —— 2026-08-18】旧版收到 error 帧就 reject，pacc 里已经流下来的
                几千字当场作废。而服务端**恰恰只在「写到一半才断」时才发这一帧**（零正文那一支发的是
@@ -1737,6 +1798,51 @@ function streamPaper(part, extra){
     /* 我们自己掐的线与请求真失败是两回事，报错必须分开说，否则又回到「猜」。 */
     throw (_stalled ? new Error('久等无新内容，已主动掉线 —— '+runWhy()) : e);
   });
+}
+/* 【出稿机检 —— 2026-08-21】把「自检」从提示词里搬出来一半，改成成稿之后真扫一遍。
+   缘起：2026-08-21 那篇两万字论文，十五条自检规程写在提示词里，仍然漏出四类东西：
+     ① 内部编号泄漏——正文里写着「默顿这一支占了 M1.2 对面的那个功能位置」，
+        `M1.2` 是入口资料的节点编号；还写着「本节要做第十二节里最难的那一个动作」，
+        那是自检规程的第十二条，全文根本没有第十二节；
+     ② 拼接残留——「（这里按你的要求…继续写第四章。）」「注意：以下为第四段正文…」「续写正文如下：」
+        每一段开头它都在跟"你"说话，而没有任何一道工序把这些话剥掉；
+     ③ 章节号重复——`8.1 适用边界与反向约束` 出现两次，标题一字不差，一次还落在第七章里；
+     ④ 参考文献里的格式说明被当成条目写进成品，字面「URL」「篇名」留在纸上。
+   💡 通则：**提示词里写第十六条自检，不如成稿后扫一遍。** 前者靠模型自觉，后者是确定性的。
+   这道机检不改稿，只把问题说出来——判断权仍在人手上。 */
+/* 【入口资料的编号机检 —— 2026-08-21】提炼分两段写：第一段建九栏与树编号，第二段（第十栏）按编号取料。
+   真跑出过的病：第二栏根本没展开三级，第十栏却引用了 M1.1／M4.1.1 一堆没定义过的节点，
+   而下游成文正是按这些编号取料的——取到的是空，还把编号抄进了论文正文。
+   这道机检只做一件事：把第十栏引用过、而九栏里没定义过的编号列出来。**空号越早发现越便宜。** */
+function auditBrief(brief){
+  var t=String(brief||''), i=t.search(/(?:^|\n)\s*十、/);
+  if(i<0) return [];
+  var nine=t.slice(0,i), ten=t.slice(i), hits=[];
+  var defined={}; (nine.match(/M\d(?:\.\d)*/g)||[]).forEach(function(x){ defined[x]=1; });
+  var used=(ten.match(/M\d(?:\.\d)+/g)||[]);
+  var miss=used.filter(function(x,ix,arr){ return !defined[x] && arr.indexOf(x)===ix; });
+  if(miss.length) hits.push('第十栏引了 '+miss.length+' 个九栏里没定义过的节点（'+miss.slice(0,5).join('、')+(miss.length>5?'…':'')+'）——成文按它取料会取空');
+  if(!/M\d\.\d\.\d/.test(nine)) hits.push('九栏里一个三级节点都没有（第二栏没展开到 M1.1.1 那一层）');
+  return hits;
+}
+function auditOutput(text){
+  var t=String(text||''), hits=[];
+  /* ① 内部编号与内部条目号（正文体例明令不得出现） */
+  var nodes=t.match(/M\d(?:\.\d)+/g);
+  if(nodes && nodes.length) hits.push('内部节点编号 '+nodes.slice(0,4).join('、')+(nodes.length>4?' 等 '+nodes.length+' 处':'')+' 泄漏进正文');
+  var inner=t.match(/第[一二三四五六七八九十]{1,3}节里|自检规程（[一二三四五六七八九十]+）/g);
+  if(inner && inner.length) hits.push('内部条目号 '+inner[0]+' 泄漏进正文');
+  /* ② 拼接残留：每一段开头对"你"说的话 */
+  var glue=['按你的要求','以下为第','续写正文如下','本章节序号顺延','接着写第','全文不使用 Markdown'];
+  var g=glue.filter(function(w){ return t.indexOf(w)>=0; });
+  if(g.length) hits.push('段间拼接残留：'+g.map(function(w){return '「'+w+'…」';}).join('、'));
+  /* ③ 章节号重复（同一个 N.M 出现两次以上就是段间失忆） */
+  var secs=t.match(/(?:^|\n)\s*(\d{1,2}\.\d{1,2})\s/g)||[], seen={}, dup=[];
+  secs.forEach(function(x){ var k=x.trim(); if(seen[k]&&dup.indexOf(k)<0) dup.push(k); seen[k]=1; });
+  if(dup.length) hits.push('章节号重复：'+dup.slice(0,4).join('、'));
+  /* ④ 参考文献里的格式说明被当成条目 */
+  if(/—\s*URL[。.\s）)]/.test(t) || /「篇名\s*—\s*URL」格式列出/.test(t)) hits.push('参考文献里留着格式占位（「篇名 — URL」没换成真网址）');
+  return hits;
 }
 /* 进度条：万字论文的总长事先并不知道，所以生成中走不确定态（跑马条 + 真实字数），
    只在完成时才给确定的 100%。假装知道进度的进度条是骗人的。 */
@@ -1764,7 +1870,7 @@ function paperHalf(part, extra, minLen, label, attempt){
      整组真跑当场 ReferenceError；② 本文件的注释里**不许出现那两个抠取锚点的原文**
      （"函数 paperHalf 的定义行"与"doPaper 的定义行"那两串字），否则 indexOf 会先命中注释，
      抠出来的只是一截 139 字的残片——它不会红在断言上，而是整个脚本崩掉。这两条都是刚踩过的。 */
-  var END_RE=/〔(?:(?:上半篇完|第[一二三四]段完)·待续|规划完|全文完)〕\s*$/;
+  var END_RE=/〔(?:(?:上半篇完|第[一二三四五]段完)·待续|规划完|全文完)〕\s*$/;
   attempt = attempt || 1;
   var stat=document.getElementById(GEN_STAT);
   return streamPaper(part, extra).then(function(txt){
@@ -1779,6 +1885,17 @@ function paperHalf(part, extra, minLen, label, attempt){
     if(!c.length && attempt>=2) throw new Error(label+'连跑两次都没交出正文 —— '+runWhy());
     /* 断在半句上（没有收尾标记）与写得太短，是两种毛病、同一种处置：重试一次。
        第二次仍断的，照收——半段稿仍是稿，但必须记账，收尾那句话要如实说它断了。 */
+    /* 【别为一行标记重烧八千字 —— 2026-08-21】旧判据只看收尾标记：缺了就整段推倒重写。
+       线上真跑撞到的是这样一次：第四段写到 7,965 字、内容完整，只是最后那一行标记没写出来，
+       于是重烧一次八千字的调用（两三分钟＋一份 token）。而此刻手上**明明有更硬的证据没用**——
+       `RUNLOG.done`（上游有没有正常收笔）与末尾是不是完整句，都在 streamPaper 里记着。
+       新判据两条同时成立才重写：**缺标记 且（上游没正常收笔 或 末尾停在半句）**。
+       只缺标记、正文完整、字数达标的，记一笔账收下——缺标记 ≠ 断在半句，这两件事此前被说成了同一句。 */
+    var reallyCut = (RUNLOG.frames && !RUNLOG.done) || looksCut(c);
+    if(c.length && !ended && !reallyCut && c.length>=minLen){
+      CUTLOG.push(label+'（'+c.length+' 字·内容完整，只是没写收尾标记，已照收）');
+      return c;
+    }
     if(c.length && !ended){
       if(attempt<2){
         stat.textContent='… '+label+'断在半句上（'+c.length+' 字，缺收尾标记），正在重试一次…';
@@ -1799,11 +1916,17 @@ function paperHalf(part, extra, minLen, label, attempt){
    为什么是四段不是两段：单次调用有 ~120 秒的平台时钟上限，5000 字/段是线上真跑量出来的安全区；
    两万字只能靠加段数，加长单段必被杀在思考阶段（正文 0 字、流干净结束、不报错）。
    任一段写不出来就地停住、不再往后跑——后面的段要靠前一段的结尾接续，硬跑只会接到空气上。 */
+/* 【四段 → 五段 —— 2026-08-21】原第四段要在五千字里装完证伪、讨论、局限、结论、注释、
+   参考文献、附录 A、投稿声明**八项必交项**，而第十栏大纲又常超写四成。线上真跑连着两次写到
+   七八千字仍收不住笔，被段末标记闸判掉重写——不是它不听话，是这一段被设计成了收不了口的一段。
+   拆法按「论证」与「交付件」分界：第四段收论证（证伪·讨论·局限），第五段收交付件
+   （结论·注释·参考文献·附录·声明）。服务端 PART_SPEC 必须同步改成五段，两处成对。 */
 var PAPER_PARTS=[
   {min:600 ,name:'第一段',desc:'题名·中英摘要·引言·文献述评'},
   {min:900 ,name:'第二段',desc:'代理坍缩·控制变量 Z'},
   {min:900 ,name:'第三段',desc:'第二轴·二维辨别格·可裁决判据'},
-  {min:1000,name:'第四段',desc:'证伪条件·讨论·局限·结论·参考文献·附录·投稿声明'}
+  {min:900 ,name:'第四段',desc:'证伪条件与当场检验·讨论·研究局限'},
+  {min:700 ,name:'第五段',desc:'结论·注释·参考文献·附录 A·投稿声明'}
 ];
 function partHead(t){
   var cut=t.indexOf('【一、'); if(cut<0) cut=t.indexOf('一、');
@@ -1862,7 +1985,10 @@ function doPaper(){
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
   papering=true;
-  genTarget('paperStat','ppFill','ppChars');
+  /* 【成文也要有正文框 —— 2026-08-21】提炼一直有实时正文（读者看着那棵树一行行长出来），
+     成文却只给了一个进度条：八千字写下去，连它在写第几章都看不见，只能靠字数猜。
+     用户原话：「根本不知道基底在做什么」。根因不是基底沉默，是我们把它说的话丢了。 */
+  genTarget('paperStat','ppFill','ppChars','paperLive');
   var btn=document.getElementById('btnPaper'); btn.disabled=true;
   var wrap=document.getElementById('paperWrap'); wrap.classList.add('show');
   document.getElementById('pdfActs').classList.remove('show');
@@ -1888,14 +2014,17 @@ function doPaper(){
   return runFourParts(seedFor, stat, '📝 写作中').then(function(r){
     paperAll=r.text; miss=missText(r.done); archSave();   /* 两万字论文落稿即存 */
     setProg(paperAll.length, true);
-    stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版 PDF':'🖨 全文完成（'+paperAll.length+' 字·四段）· 正在排版 PDF')+'（约 20–50 秒）…';
+    stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版 PDF':'🖨 全文完成（'+paperAll.length+' 字·'+PAPER_PARTS.length+'段）· 正在排版 PDF')+'（约 20–50 秒）…';
     return buildPdf(paperAll, miss);
   }).then(function(){
     setProg(paperAll.length, false);
-    var cut=CUTLOG.length?('⚠ '+CUTLOG.join('、')+'——连跑两次都没写到收尾标记。读数：'+runWhy()+'　'):'';
-    stat.textContent = (miss || cut)
-      ? cut+(miss?miss+' PDF 首页已标注「未完成稿」。':'')+'请再点一次「成文一篇」补齐。已写的 '+paperAll.length+' 字都在。'
-      : '✓ 全文完成 · '+paperAll.length+' 字 · 四段齐全（含中英摘要、参考文献、附录与投稿声明）· PDF 已就绪，可在线阅读或下载。';
+    var cut=CUTLOG.length?('⚠ '+CUTLOG.join('、')+'　'):'';
+    /* 出稿机检：不改稿，只把提示词自检漏掉的那几类东西说出来（见 auditOutput 上方那段病史）。 */
+    var au=auditOutput(paperAll);
+    var auMsg=au.length?('🔎 出稿机检查出 '+au.length+' 处：'+au.join('；')+'。这些要人工改掉再投。　'):'';
+    stat.textContent = (miss || cut || auMsg)
+      ? cut+auMsg+(miss?miss+' PDF 首页已标注「未完成稿」。请再点一次「成文一篇」补齐。':'')+'已写的 '+paperAll.length+' 字都在。'
+      : '✓ 全文完成 · '+paperAll.length+' 字 · '+PAPER_PARTS.length+'段齐全（含中英摘要、参考文献、附录与投稿声明）· 出稿机检零缺陷 · PDF 已就绪，可在线阅读或下载。';
   }).catch(function(e){
     setProg(paperAll.length, false);
     stat.textContent='✗ '+(e.message||String(e));

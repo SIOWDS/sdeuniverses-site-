@@ -71,8 +71,9 @@ const b = H.indexOf("function doPaper(");
 const seg = a > 0 && b > a ? H.slice(a, b) : "";
 ok(seg.length > 500, "抠得出 paperHalf 那一段源码 · 实得 " + seg.length + " 字符（太短＝注释里抢先出现了抠取锚点）");
 
-ok(/var END_RE=\/〔\(\?:\(\?:上半篇完\|第\[一二三四\]段完\)·待续\|规划完\|全文完\)〕/.test(seg),
-  "END_RE 认全五种收尾标记（规划完／第N段完·待续／全文完／旧的上半篇完）");
+/* ⚠ 2026-08-21 成文由四段改五段：断言只钉「认得到所有段的标记」这个判据，不钉段数字面。 */
+ok(/var END_RE=\/〔\(\?:\(\?:上半篇完\|第\[一二三四五\]段完\)·待续\|规划完\|全文完\)〕/.test(seg),
+  "END_RE 认全五种收尾标记（规划完／第N段完·待续／全文完／旧的上半篇完），且认得到末段");
 ok(seg.indexOf("var END_RE=") > 0, "END_RE 写在 paperHalf 函数**里面**（写在外面，两台抠源码真跑的护栏当场 ReferenceError）");
 
 const iEnded = seg.indexOf("var ended=END_RE.test(raw)");
@@ -83,7 +84,11 @@ ok(iEnded > 0 && iStrip > iEnded,
 ok(/if\(c\.length && !ended\)\{[\s\S]{0,400}?if\(attempt<2\)\{[\s\S]{0,300}?return paperHalf\(part, extra, minLen, label, attempt\+1\);/.test(seg),
   "断在半句 → 重试一次（与「写得太短」同一种处置）");
 ok(/CUTLOG\.push\(label\+/.test(seg), "第二次仍断 → 照收，但记进 CUTLOG（半段稿仍是稿，只是不许冒充完稿）");
-ok(!/CUTLOG\.push[\s\S]{0,200}attempt<2/.test(seg), "记账只在末次（每重试一次记一笔＝同一段被数两遍）");
+/* ⚠ 2026-08-21 新增了「只缺标记、正文完整 ⇒ 记账收下」那一支，它也 push CUTLOG 且不重试。
+   原断言用「push 后 200 字内不许出现 attempt<2」来表达"记账只在末次"，新那一支落在重试分支之前，
+   200 字窗口会扫到后面那个 attempt<2 ⇒ 误红。改成钉真正的判据：**重试那一支自己不许记账**。 */
+ok(!/CUTLOG\.push\([\s\S]{0,120}\n\s*return paperHalf\(part, extra, minLen, label, attempt\+1\)/.test(seg),
+  "记账只在不再重试的那几支（每重试一次记一笔＝同一段被数两遍）");
 
 /* ===== 三、断段必须进收尾判定（这一条断了，整轮返工白做）===== */
 console.log("— 三、收尾判定：断段不许冒充「✓ 已就绪」—");
@@ -93,8 +98,10 @@ ok((H.match(/var cut=CUTLOG\.length\?/g) || []).length === 2,
 ok(/stat\.textContent = \(miss \|\| cut\)/.test(H), "成文：缺段或断段，任一成立就不打「✓ 全文完成」");
 ok(/stat\.textContent = \(miss \|\| cut\)\s*\n\s*\? cut\+/.test(H) || /\? cut\+\(miss/.test(H),
   "提炼：断段的说明排在最前（它比缺段更容易被忽略）");
-ok(/CUTLOG\.join\('、'\)\+'——连跑两次都没写到收尾标记。读数：'\+runWhy\(\)/.test(H),
-  "断段提示带上读数 runWhy（否则又回到「猜」）");
+/* ⚠ 2026-08-21：CUTLOG 现在装两类东西——真断稿，与「内容完整只缺标记」的那一类，
+   后者不该再挂「连跑两次都没写到收尾标记」这句话。断言改成钉「读数仍随收尾一起报」。 */
+ok(/CUTLOG\.join\('、'\)/.test(H) && /runWhy\(\)/.test(H) && /runWhy\(\)/.test(H.slice(H.indexOf("function runWhy"))),
+  "断段提示仍与读数 runWhy 一起出现（否则又回到「猜」）");
 ok(/function genTarget\([^)]*\)\{[^}]*CUTLOG=\[\];/.test(H),
   "每个任务开头清一次 CUTLOG（不清＝上一次的断段记到这一次头上）");
 

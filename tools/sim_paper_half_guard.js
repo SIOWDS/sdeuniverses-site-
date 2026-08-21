@@ -43,8 +43,15 @@ function makeHalf() {
   };
   /* 2026-07-29：状态行目标改成可切换的 GEN_STAT（成文一篇与打磨修改共用这台续写机），
      所以桩里要把它一并喂进去——真页面里它是顶层变量。 */
-  const fn = new Function("document", "streamPaper", "GEN_STAT", diag + "\n" + seg + "\nreturn paperHalf;");
-  return fn(stub, streamPaper, "paperStat");
+  /* ⚠ 2026-08-21：paperHalf 的重写判据新增了两个外部依赖——RUNLOG（上游有没有正常收笔）
+     与 looksCut（末尾是不是半句）。两者都定义在抠取范围之外，不喂进来就 ReferenceError。
+     **抠取式护栏的通病：被抠的函数长出新依赖时，护栏是「崩」不是「红」**，而崩比红更容易
+     被当成「环境坏了」放过去。所以桩要跟着契约一起长——looksCut 用页面里的真实现，不另写一份。 */
+  const looksCutSrc = h.slice(h.indexOf("function looksCut(txt){"), h.indexOf("function finishAsk("));
+  const runlog = { frames: 1, done: true, fin: "stop", sec: 0, think: 0 };
+  const fn = new Function("document", "streamPaper", "GEN_STAT", "RUNLOG",
+    looksCutSrc + "\n" + diag + "\n" + seg + "\nreturn paperHalf;");
+  return fn(stub, streamPaper, "paperStat", runlog);
 }
 
 const LONG = "字".repeat(2000);
@@ -126,7 +133,12 @@ t("下半篇收尾标记被剥掉", () => { plan = [{ text: LONG + "\n〔全文�
   const parts = /var PAPER_PARTS=\[([\s\S]*?)\];/.exec(h);
   ok(!!parts, "doPaper：四段规格表 PAPER_PARTS 在位");
   const mins = parts ? (parts[1].match(/min:\s*(\d+)/g) || []) : [];
-  ok(mins.length === 4, "四段整整四条规格（少一条＝有一段没有长度守卫）· 实得 " + mins.length);
+  /* ⚠ 2026-08-21 成文由四段改五段（第四段要装八项必交项，两次写到七八千字仍收不住笔）。
+     断言从此钉**判据**——每一段都得有长度守卫、段数与段名一一对应——不再钉「4」这个数字。
+     写死一个段数，下次改段数时红的是护栏而不是缺陷。 */
+  const pnames = parts ? (parts[1].match(/name:'第[一二三四五]段'/g) || []) : [];
+  ok(mins.length >= 4 && mins.length === pnames.length,
+    "每一段都有长度守卫，且守卫数与段名数一一对应 · 实得 " + mins.length + " 段");
   ok(/\{min:600\b/.test(h) && /\{min:1000\b/.test(h), "第一段 600 字守卫、末段 1000 字守卫都在");
   ok(/paperHalf\(i\s*\+\s*1,\s*seedFor\(i, head, acc\.slice\(-1000\)\), P\.min, P\.name\)/.test(h),
     "每一段都走 paperHalf 并带自己的最短长度（不是只守第一段）");
@@ -152,10 +164,10 @@ t("下半篇收尾标记被剥掉", () => { plan = [{ text: LONG + "\n〔全文�
   ok(h.indexOf("请再点一次「成文一篇」补齐") > 0, "状态栏：给出重来的动作");
 
   /* 投稿体例：四段合起来要凑齐的元素，前端文案与后端清单必须对得上 */
-  ok(/四段深度写作 · 两万字投稿体例/.test(h), "按钮下的说明条已改成四段·两万字·投稿体例");
+  ok(/[四五]段深度写作 · 两万字投稿体例/.test(h), "按钮下的说明条写明段数·两万字·投稿体例");
   ok(/成文一篇 · 两万字论文 → PDF/.test(h), "按钮文案已改成两万字");
 
-  ok(/第\[一二三四\]段完/.test(h), "回归：前端认四段收尾标记");
+  ok(/第\[一二三四五\]段完/.test(h), "回归：前端的段末标记正则认得到最后一段（漏一段＝末段永远被判「断在半句」）");
   ok(/function partHead\(t\)\{[\s\S]*?indexOf\('【一、'\)/.test(h), "回归：head 切分（题名+摘要）仍在");
   ok(h.indexOf("acc.slice(-1000)") > 0, "回归：tail 续写起点仍在");
   ok(/mdSkip|mdClean|isPaperHead/.test(h), "回归：排版 v3 的三个兜底函数仍在");

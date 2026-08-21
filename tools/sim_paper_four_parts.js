@@ -31,9 +31,13 @@ function makeRunner() {
   /* CUTLOG 是页面里的顶层变量（记「断在半句上的段」），定义在本脚本抠取范围之外，
      所以要像 document/streamPaper 一样喂进来——否则新契约那一支当场 ReferenceError。 */
   const cutlog = [];
-  const fn = new Function("document", "streamPaper", "GEN_STAT", "setProg", "CUTLOG",
-    seg + "\nreturn { runFourParts: runFourParts, missText: missText, paperHalf: paperHalf, PAPER_PARTS: PAPER_PARTS, partHead: partHead, CUTLOG: CUTLOG };");
-  return fn(stub, streamPaper, "paperStat", function () { }, cutlog);
+  /* ⚠ 2026-08-21：重写判据新增两个外部依赖（RUNLOG＝上游有没有正常收笔，looksCut＝末尾是不是半句），
+     两者都在抠取范围之外。桩必须跟着契约一起长；looksCut 用页面里的真实现，不另写一份。
+     默认桩置成「上游正常收笔」，这样「只缺收尾标记」的用例才走得到新那一支。 */
+  const looksCutSrc = h.slice(h.indexOf("function looksCut(txt){"), h.indexOf("function finishAsk("));
+  const fn = new Function("document", "streamPaper", "GEN_STAT", "setProg", "CUTLOG", "RUNLOG",
+    looksCutSrc + "\n" + seg + "\nreturn { runFourParts: runFourParts, missText: missText, paperHalf: paperHalf, PAPER_PARTS: PAPER_PARTS, partHead: partHead, CUTLOG: CUTLOG };");
+  return fn(stub, streamPaper, "paperStat", function () { }, cutlog, { frames: 1, done: true, fin: "stop", sec: 0, think: 0 });
 }
 const seedFor = (i, head, tail) => ({ i: i, head: head, tail: tail });
 const stat = { set textContent(v) { } };
@@ -41,7 +45,9 @@ const LONG = (n) => "字".repeat(n);
 /* 【2026-08-18】paperHalf 加了段末标记闸：先问收尾标记在不在，不在就当「断在半句」重试一次。
    所以凡是表达「这一段写成了」的桩，都必须带上它自己那一段的收尾标记；
    不带标记的桩从此表达的是「被掐断」，不再是「写完了」。 */
-const MK = ["〔第一段完·待续〕", "〔第二段完·待续〕", "〔第三段完·待续〕", "〔全文完〕"];
+/* ⚠ 2026-08-21 成文由四段改五段：末段标记从此在 MK 的最后一个位置，不再固定是第四个。
+   夹具跟着段数走，不写死——写死的夹具会在下次改段数时把「护栏红」伪装成「产品坏」。 */
+const MK = ["〔第一段完·待续〕", "〔第二段完·待续〕", "〔第三段完·待续〕", "〔第四段完·待续〕", "〔全文完〕"];
 const SEG = (i, n) => LONG(n) + "\n" + MK[i];
 /* 每个场景开跑前必须重置：plan 按 calls.length 取步，不清零会串场 */
 const reset = (p) => { plan = p; calls = []; };
@@ -50,19 +56,23 @@ const reset = (p) => { plan = p; calls = []; };
   const R = makeRunner();
 
   console.log("— 一、四段规格 —");
-  ok(R.PAPER_PARTS.length === 4, "整整四段 · 实得 " + R.PAPER_PARTS.length);
+  const N = R.PAPER_PARTS.length;
+  ok(N >= 4, "至少四段（段数由 PAPER_PARTS 定，本护栏不写死）· 实得 " + N);
   ok(R.PAPER_PARTS.every((p) => p.min > 0 && p.name && p.desc), "每段都有最短长度、段名与职能说明");
-  ok(new Set(R.PAPER_PARTS.map((p) => p.desc)).size === 4, "四段职能互不重复（重复＝会写出四段同样的东西）");
-  ok(/参考文献/.test(R.PAPER_PARTS[3].desc) && /投稿声明/.test(R.PAPER_PARTS[3].desc),
+  ok(new Set(R.PAPER_PARTS.map((p) => p.desc)).size === N, "各段职能互不重复（重复＝会写出几段同样的东西）");
+  ok(/参考文献/.test(R.PAPER_PARTS[N - 1].desc) && /投稿声明/.test(R.PAPER_PARTS[N - 1].desc),
     "末段职能里点名参考文献与投稿声明（投稿体例的收尾件）");
 
   console.log("— 二、顺利跑完四段 —");
-  reset([{ text: LONG(5000) + "\n【一、引言】起\n" + MK[0] }, { text: SEG(1, 5000) }, { text: SEG(2, 5000) }, { text: SEG(3, 5000) }]);
+  const okPlan = [{ text: LONG(5000) + "\n【一、引言】起\n" + MK[0] }];
+  for (let i = 1; i < N; i++) okPlan.push({ text: SEG(i === N - 1 ? MK.length - 1 : i, 4200) });
+  reset(okPlan);
   let r = await R.runFourParts(seedFor, stat, "写作中");
-  ok(calls.join(",") === "1,2,3,4", "四段依次发出 part=1,2,3,4 · 实得 " + calls.join(","));
-  ok(r.done === 4, "done=4");
+  const want = Array.from({ length: N }, (_, i) => i + 1).join(",");
+  ok(calls.join(",") === want, "各段依次发出 part=" + want + " · 实得 " + calls.join(","));
+  ok(r.done === N, "done=" + N);
   ok(r.text.length > 19000, "全文约两万字 · 实得 " + r.text.length);
-  ok(R.missText(r.done) === false, "四段齐全时不打未完成稿标记");
+  ok(R.missText(r.done) === false, "各段齐全时不打未完成稿标记");
 
   console.log("— 三、中途某段写不出来（最要命的一种）—");
   reset([{ text: SEG(0, 5000) }, { text: SEG(1, 5000) }, { text: "" }, { text: "" }, { text: SEG(2, 5000) }]);

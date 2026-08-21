@@ -138,7 +138,11 @@ ok(/const _fullPower = \([\s\S]{0,200}_deepAns/.test(W),
 /* parseRounds 抠出来真跑——切分错了会静默丢轮次 */
 const ps = H.indexOf("function parseRounds(");
 const pe = H.indexOf("function autoBatch(");
-const parseR = new Function("txt", H.slice(ps, pe) + "\nreturn parseRounds(txt);");
+/* ⚠ 2026-08-21：parseRounds 现在会调 takeLedger（把每一轮的结账块从正文里摘出来），
+   而 takeLedger 定义在它前面，不在这段抠取范围里 ⇒ 不带上就 ReferenceError。
+   抠取式护栏的通病：被抠的函数长出新依赖时，护栏是崩、不是红——崩得比红更容易被当成"环境坏了"。 */
+const TAKE = H.slice(H.indexOf("function takeLedger(txt){"), H.indexOf("function parseRounds("));
+const parseR = new Function("txt", TAKE + H.slice(ps, pe) + "\nreturn parseRounds(txt);");
 const mk = (no, q, len) => "〔第" + no + "轮·问〕\n" + q + "\n〔第" + no + "轮·答〕\n" + "答".repeat(len) + "\n";
 let R = parseR(mk(1, "何谓睡眠？", 900) + mk(2, "承重命题是哪一句？", 900) + "〔5轮完〕");
 ok(R.length === 2 && R[0].q === "何谓睡眠？" && R[1].q === "承重命题是哪一句？", "两轮全切出来，问句不带标记");
@@ -204,8 +208,11 @@ ok(/onclick="doAutoRun\(\)"/.test(H) && /id="autoStopBtn"/.test(H) && /id="autoW
 ok(/if\(!confirm\(/.test(bAuto) && /系统密钥/.test(bAuto), "开跑前必须确认，且如实说清系统密钥会被吃掉多少");
 /* ⚠ 2026-08-13 提炼由「规划＋两段」变「规划＋三段」（新增第十栏·论文观点与分章大纲）。
    次数从此**跟着 BRIEF_PARTS 的段数走**，不许写死——手抄一个 12 只会在下次改段数时安静失效。 */
-ok(/var calls=autoBatchCount\(\)\+\(triOn\?7:\(1\+BRIEF_PARTS\.length\)\)\+4\+1;/.test(bAuto),
-  "报给用户的调用次数**两头都现算**（批数按分批规则、提炼按段数）——手抄任何一个数都会在下次改动时安静失准");
+/* ⚠ 2026-08-21 成文由四段改五段，那个写死的 4 当场少报一次调用。
+   断言从此**只钉判据**（三头都从定义处抽），不再钉某一种字面。 */
+ok(/var calls=autoBatchCount\(\)\+\(triOn\?7:\(1\+BRIEF_PARTS\.length\)\)\+PAPER_PARTS\.length\+1;/.test(bAuto),
+  "报给用户的调用次数**三头都现算**（批数按分批规则、提炼按 BRIEF_PARTS、成文按 PAPER_PARTS）——手抄任何一个数都会在下次改动时安静失准");
+ok(!/\+\s*4\s*\+\s*1;/.test(bAuto), "公式里不许再留写死的段数");
 /* ⚠ 只在 BRIEF_PARTS 这一块里数，别全文宽搜——见 sim_brief_four_parts 里同一条注释。 */
 const _bpA = H.indexOf("var BRIEF_PARTS=[");
 const _bpB = H.indexOf("];", _bpA);

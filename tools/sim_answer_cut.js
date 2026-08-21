@@ -71,7 +71,9 @@ ok(/把这一问原样再问一次即可/.test(FBLK), "给出路：断了的那�
 const iCut = FBLK.indexOf("ansEl.appendChild(_cut);");
 ok(iCut > 0, "判出来的那句话真的贴进了答案框（只判不显示等于没做）");
 /* 断了照样入档：已经写出来的字是真交付物，不许因为断了就丢掉。 */
-ok(iCut > 0 && FBLK.indexOf("turns.push({q:lastQ, a:lastAns});") > iCut,
+/* ⚠ 2026-08-21 入档时多带一个 led 字段（这一轮自己交的结账块）。断言钉「贴完提示仍然入档」
+   这个判据，不钉 push 的字面形状——下次再加字段时，红的又会是护栏。 */
+ok(iCut > 0 && FBLK.indexOf("turns.push({q:lastQ, a:lastAns") > iCut,
    "断稿照常入档（已写出的字是真交付物），提示只是提示，不是把它作废");
 
 console.log("— 四、上游确实发得出这一帧（消费端的前提）—");

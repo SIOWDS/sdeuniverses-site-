@@ -34,8 +34,13 @@ const full = mkHist(turns)(true);
 /* 【2026-08-13 上限抬高】2600 这个数正好卡在每轮实际字数的边界上（深度档一轮 1700–2100、
    自动十轮每轮 2000–2600），长的那几轮是被砍着尾巴进提炼的。基底窗口有 1M，这刀砍得毫无必要。
    ⚠ 数值从源码抽出来比，不手抄——手抄只会在下次改上限时安静失效。 */
-const _limSrc = /var lim = full \? (\d+) : \(back<2 \? (\d+) : (\d+)\);/.exec(H);
+/* ⚠ 2026-08-21 携带策略改了：旧那把「一刀切且砍尾巴」换成「全部结账块＋最近两轮全文」。
+   三个上限仍在（40000／1600／500），只是散在三条 push 上，不再写成一行 lim。
+   断言跟着判据走：三个数抽得出、且更早那一档必须先认账本。 */
+const _limSrc = /slice\(0,(40000)\)[\s\S]{0,400}?slice\(0,(1600)\)[\s\S]{0,400}?slice\(0,(500)\)/.exec(H);
 ok(!!_limSrc, "buildHist 的三档上限抽得出来");
+ok(/led \|\| \(t\.a\|\|''\)\.slice\(0,500\)/.test(H),
+  "更早的轮次先带完整结账块，取不到才退回旧的前 500 字（老场次的退路必须留着）");
 const LIM_FULL = _limSrc ? Number(_limSrc[1]) : 0;
 ok(LIM_FULL >= 30000, "提炼档 full=true：每轮给到 " + LIM_FULL + " 字（高到任何一轮都摸不到＝实质不截断）");
 ok(full.every((t) => t.a.length === Math.min(LIM_FULL, t.a.length)), "full=true 时每轮按同一个上限给，不按新旧递减");
@@ -62,7 +67,10 @@ ok(!!mMT && Number(mMT[1]) === mLMAX,
 ok(/turns\.length>=MAXTURNS/.test(H), "doAsk：满 10 轮拦住，不许无声继续");
 ok(H.indexOf("请先「提炼精华」成论文入口资料，或「清空重来」") > 0, "满轮提示给出下一步动作");
 ok(/turns\.length\?\{hist:buildHist\(false\)\}:\{\}/.test(H), "doAsk：有历史才带 hist（首轮仍走老路）");
-ok(/turns\.push\(\{q:lastQ, a:lastAns\}\)/.test(H), "finishAsk：本轮入档");
+/* ⚠ 2026-08-21 入档时多带一个字段（led＝这一轮自己交的结账块）。断言钉「入的是本轮的问与答」，
+   不钉字段个数——下次再加字段时，红的又会是护栏。 */
+ok(/turns\.push\(\{q:lastQ, a:lastAns[,}]/.test(H), "finishAsk：本轮入档（问与答都进去）");
+ok(/turns\.push\(\{q:lastQ, a:lastAns, led:_lg\.led\}\)/.test(H), "结账块与这一轮一起入档（携带上下文与拟下一问都靠它）");
 ok(H.indexOf("if(lastAns && lastAns.length>60){") > 0, "只有真答出来的才算一轮（报错/空答不占轮次）");
 ok(/function originQ\(\)\{ return turns\.length \? turns\[0\]\.q : lastQ; \}/.test(H), "缘起之问 = 整场问对的第一问");
 ok(H.indexOf("q:originQ()") > 0, "成文用缘起之问定向，而不是最后一轮的追问");
@@ -164,7 +172,7 @@ ok(!!mCM && Number(mCM[1]) >= 40000, "distill/碰撞/提炼：《站内资料》
    点两下就把同一问问了两遍。登山靠的是阶梯，不是只告诉人「请往上走」。 */
 console.log("— 六、手动问对的追问阶梯 —");
 const bFin = H.slice(H.indexOf("function finishAsk("), H.indexOf("function doAutoRun("));
-ok(/turns\.push\(\{q:lastQ, a:lastAns\}\);[\s\S]{0,120}suggestNextQ\(\);/.test(bFin),
+ok(/turns\.push\(\{q:lastQ, a:lastAns[\s\S]{0,40}\);[\s\S]{0,160}suggestNextQ\(\);/.test(bFin),
   "每入档一轮就拟好下一问（不是等用户自己想）");
 ok(/mode:'nextq'/.test(bFin) && /step:step/.test(bFin) && /hist:buildHist\(true\)/.test(bFin),
   "拟题真走服务端那条阶梯：只送 step，不在前端再拄一份阶梯（拄两份迟早漂移，而漂移后页面一切正常）");
@@ -300,8 +308,10 @@ ok(/let expTerms = \[\], expStr = "", corpus = /.test(W),
   "检索产物改成 let 并给了空初值（跳过时下游照样能用）");
 ok(/_raceRag = \(p, fb\) =>/.test(W) && /Promise\.race\(\[_q,/.test(W) && /_ragCut = true; r\(fb\);/.test(W),
   "前两轮那条路仍然套着超时闸");
-ok(/const _ks = Object\.keys\(TIER\.l1\);[\s\S]{0,120}delete TIER\.l1\[_ks\[0\]\]/.test(W),
-  "篇层索引缓存封顶（全站三十多个版块全缓下来，峰值内存足以把 isolate 顶到平台上限）");
+/* ⚠ 这条红了很久，查下来**修的东西在、红的是断言**：封顶早改成按字节（TIER_L1_ALL）且
+   `const _ks` 改成了 `let _ks`。断言只钉判据：有字节上限、且先进先出地让位。 */
+ok(/TIER_L1_ALL/.test(W) && /Object\.keys\(TIER\.l1\)[\s\S]{0,200}delete TIER\.l1\[k0\]/.test(W),
+  "篇层索引缓存封顶（按字节，先进先出；全站三十多个版块全缓下来足以把 isolate 顶到平台上限）");
 ok(!/Promise\.resolve\(p\)\.catch\(\(\) => fb\)/.test(W) && /_q\.catch\(\(\) => \{\}\)/.test(W),
   "闸只赛超时、**不吞异常**：检索真报错还是要冒成一帧 error，否则又多一种静默");
 ok(/if \(_ragCut\) _stat\(/.test(W), "真的超时了要在状态里说一句，不得惄惄地交一份没出处的答案");
