@@ -44,20 +44,26 @@ on:
   #   成本不是问题：一趟约 2050 次 R2 写（2026-08-02 run #847 实测 2056 个对象），两趟 +
 #   每天一份快照 ≈ 6200 次/天 ≈ 19 万次/月，
   #   离 Class A 的 100 万免费额度仍差得远（存储也不变，快照仍是每天一份）。
+  #   ⚠【2026-08-21 更正】上面这笔账**已经作废**：那是 2026-08-02 的对象数（约 2,050）。
+  #     现在一趟约 5,070 个对象，且实际趟数是日均 15.8 而非 2 —— 免费额度已经越过，
+  #     Cloudflare 开始出账。凡引用本段数字前，先重新数一遍 manifest 里的 docs。
   schedule:
     - cron: '20 5 * * *'    # 13:20 新加坡时
     - cron: '20 15 * * *'   # 23:20 新加坡时
   workflow_dispatch:                 # 想立刻跑：Actions 页面 → search-index → Run workflow
-  # 【2026-08-02 加】第二条手动路子：站点 PAT 没有 actions:write，用它调
-  #   workflow_dispatch 一律 403（实测），于是"发了重要的一批不想等"每次都得人去点按钮。
-  #   repository_dispatch 只要 contents:write，PAT 有——所以助手也能拉这根绳：
-  #     curl -X POST -H "Authorization: Bearer <PAT>" \
-  #       https://api.github.com/repos/SIOWDS/sdeuniverses-site-/dispatches \
-  #       -d '{"event_type":"reindex"}'
-  #   **只是多一条手动入口，不改频率**：它不挂在 push 上，只在被显式调用时跑一次，
-  #   每日一次那条 cron 与 2026-07-29 的决定原样不动。
-  repository_dispatch:
-    types: [reindex]
+  # 【2026-08-21 删掉 repository_dispatch —— 王德生令："停掉，不需要每次都 reindex"】
+  #   它 2026-08-02 加进来时写的是"**只是多一条手动入口，不改频率**"。实际走向相反：
+  #   对每个新对话里的助手来说，它是一根摆在手边、拉一下就能让刚发的文章立刻进搜索的绳子，
+  #   于是发完文顺手就拉。**8 月实测 317 趟/20 天 ＝ 日均 15.8 趟**，来源分账
+  #   repository_dispatch 206 / workflow_dispatch 53 / schedule 38 / push 20。
+  #   代价：一趟全量重写现在是**约 5,070 个对象**（59 个分片＋每篇一个 doc/<i>.json，
+  #   而文档数已从 08-02 的约 2,000 涨到 4,994），不是本文件上面那段注释写的 2,050。
+  #   两个数一乘 ⇒ 月 Class A 越过 100 万免费额度，2026-08-21 收到 Cloudflare 第一批账单。
+  #   还有一层放大：检索侧 loadCorpus() 的新鲜判据是 manifest 的 built，索引一重建就变 ⇒
+  #   全网边缘 isolate 的语料缓存同时作废、各自重拉 59 个分片（310MB）。**推得越勤，读也越贵。**
+  #   ⇒ 门铃拆掉，只留每天两趟定时与人手那个按钮。想立刻进搜索：去 Actions 页面点
+  #   Run workflow（站点 PAT 现已有 actions:write，上面那句"403（实测）"是旧的、已不成立）。
+  #   ⚠ 恢复它之前先算一遍：一趟的对象数 × 一天的趟数，两个数都会自己长。
 
 concurrency:
   group: search-index
