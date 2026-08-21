@@ -2036,10 +2036,11 @@ function doPaper(){
     setProg(paperAll.length, false);
     var cut=CUTLOG.length?('⚠ '+CUTLOG.join('、')+'　'):'';
     /* 出稿机检：不改稿，只把提示词自检漏掉的那几类东西说出来（见 auditOutput 上方那段病史）。 */
+    var pdfNote=PDFLOG.length?('🖨 '+PDFLOG.join('；')+'。　'):'';
     var au=auditOutput(paperAll);
     var auMsg=au.length?('🔎 出稿机检查出 '+au.length+' 处：'+au.join('；')+'。这些要人工改掉再投。　'):'';
-    stat.textContent = (miss || cut || auMsg)
-      ? cut+auMsg+(miss?miss+' PDF 首页已标注「未完成稿」。⚠ 再点一次「成文一篇」是**从第一段整篇重写**，不是接着补——重写前请先把这 '+paperAll.length+' 字复制走。':'')+'已写的 '+paperAll.length+' 字都在。'
+    stat.textContent = (miss || cut || auMsg || pdfNote)
+      ? pdfNote+cut+auMsg+(miss?miss+' PDF 首页已标注「未完成稿」。⚠ 再点一次「成文一篇」是**从第一段整篇重写**，不是接着补——重写前请先把这 '+paperAll.length+' 字复制走。':'')+'已写的 '+paperAll.length+' 字都在。'
       : '✓ 全文完成 · '+paperAll.length+' 字 · '+PAPER_PARTS.length+'段齐全（含中英摘要、参考文献、附录与投稿声明）· 出稿机检零缺陷 · PDF 已就绪，可在线阅读或下载。';
   }).catch(function(e){
     setProg(paperAll.length, false);
@@ -2110,6 +2111,26 @@ function canvasInk(cv, mkCanvas){
 }
 var INK_MIN=0.002;   /* 缩略图上的墨量下限。一页正文缩到 160 宽仍有 2–8% 的非白像素；
                         只有整份全白才会掉到 0.2% 以下——阈值刻意留得很松，宁可放过不可错杀。 */
+/* 【为什么会画出白页 —— 2026-08-21 查实】那份 33 页全白的 PDF 自己带着证据：
+   每页图片 1588×2034 px（宽 1588/595.28pt ⇒ scale 2 无误），32 满页＋末页 1886，
+   **整份画布高 66,974 px，而 Chrome 单张 canvas 的高度硬上限是 65,535 px**。
+   超限时浏览器不抛错、不报警，只是静静返回一张空白画布 —— html2pdf 照样按它切页、
+   照样出 33 页 PDF，于是「页数对、内容没」。超出只有 1,439 px（2.2%），
+   临界点 65535/2034 ≈ **32.2 页**：成文四段改五段、稿子长了一截，正好把它推过线。
+   ⇒ 修法不是调版式，是**让 scale 跟着稿子长度走**：稿子越长，采样倍率越低，
+      保证 高×scale 落在上限之内。清晰度会降（2 → 1.6 约等于 154dpi），但那是可读的字，
+      不是一叠白纸。⚠ Safari 另有画布**面积**上限（约 1,678 万 px），比高度先撞上；
+      那一侧仍要靠墨量闸兜住——它现在会把读数说出来。 */
+var PDF_MAX_PX = 60000;   /* 留 8% 余量：上限是 65535，别贴着线走 */
+function pdfScaleFor(heightPx, maxPx){
+  var h = Number(heightPx) || 0, m = Number(maxPx) || PDF_MAX_PX;
+  if(h <= 0) return 2;
+  var s = m / h;
+  if(s >= 2) return 2;
+  s = Math.floor(s * 20) / 20;        /* 取到 0.05 的整数倍，读数好看也好对账 */
+  return Math.max(0.5, s);            /* 再长也不低于 0.5，低于这个字已经不可读，交给墨量闸去拦 */
+}
+var PDFLOG=[];   /* 出稿时的读数（降了几倍、画布多大），由调用方接到状态行上 */
 function buildPdf(text, incomplete, opt){
   opt = opt || {};
   var _eyebrow = opt.eyebrow || 'SDE UNIVERSES · 智 能 问 对 · 成 文 一 篇';
@@ -2151,12 +2172,17 @@ function buildPdf(text, incomplete, opt){
     el.innerHTML=inner;
     wrap.appendChild(el);
     document.body.appendChild(wrap);
+    /* 量的是真实排版高度（元素已经在文档里，scrollHeight 才有值）。 */
+    var _h=el.scrollHeight||el.offsetHeight||0;
+    var _scale=pdfScaleFor(_h);
+    PDFLOG=[];
+    if(_scale<2) PDFLOG.push('稿子长 '+_h+'px，采样倍率已由 2 降到 '+_scale+'（超过 '+PDF_MAX_PX+'px 的画布浏览器会直接给白纸），清晰度略降');
     var fn='SDE-'+_fnTag+'-'+new Date().toISOString().slice(0,10)+'.pdf';
     return html2pdf().set({
       margin:[13,0,15,0],
       filename:fn,
       image:{type:'jpeg',quality:0.92},
-      html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0},
+      html2canvas:{scale:_scale,useCORS:true,scrollX:0,scrollY:0},
       jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
       pagebreak:{mode:['css','legacy']}
     }).from(el).toContainer().then(function(){
@@ -2177,9 +2203,10 @@ function buildPdf(text, incomplete, opt){
       var cv=(_wk.prop && _wk.prop.canvas) || _wk.canvas;
       var ink=cv?canvasInk(cv):-1;
       if(cv && ink>=0 && ink<INK_MIN){
-        throw new Error('PDF 渲染出来是白纸，已拦下不交（画布 '+cv.width+'×'+cv.height+' 像素，墨量 '
-          +(ink*100).toFixed(3)+'%，下限 '+(INK_MIN*100).toFixed(1)+'%）。正文 '+String(text||'').length
-          +' 字仍在本页，可直接复制；请 Ctrl+F5 强刷一次再点一遍出稿。');
+        throw new Error('PDF 渲染出来是白纸，已拦下不交（画布 '+cv.width+'×'+cv.height+' 像素 · 采样倍率 '
+          +_scale+' · 排版高 '+_h+'px，墨量 '+(ink*100).toFixed(3)+'%，下限 '+(INK_MIN*100).toFixed(1)
+          +'%）。画布高度或面积多半超了浏览器的上限（Chrome 高度 65535px，Safari 面积约 1678 万 px）。正文 '
+          +String(text||'').length+' 字仍在本页，可直接复制。');
       }
     }).outputPdf('blob').then(function(blob){
       document.body.removeChild(wrap);

@@ -8,7 +8,8 @@ const fs = require("fs");
 const html = fs.readFileSync("/home/claude/site/public/search/index.html", "utf8");
 
 /* 把三个具名函数原样抠出来真跑（不复制一份实现——复制的那份永远不会跟着改） */
-const names = ["mdSkip", "mdClean", "isPaperHead", "canvasInk"];
+const names = ["mdSkip", "mdClean", "isPaperHead", "canvasInk", "pdfScaleFor"];
+const PDF_MAX_PX = parseInt((html.match(/var PDF_MAX_PX = (\d+);/) || [])[1], 10);
 let src = "";
 names.forEach(function (n) {
   const a = html.indexOf("function " + n + "(");
@@ -16,7 +17,7 @@ names.forEach(function (n) {
   const b = html.indexOf("\nfunction ", a + 1);
   src += html.slice(a, b < 0 ? a + 900 : b) + "\n";
 });
-const F = new Function(src + "return {mdSkip:mdSkip, mdClean:mdClean, isPaperHead:isPaperHead, canvasInk:canvasInk};")();
+const F = new Function("PDF_MAX_PX", src + "return {mdSkip:mdSkip, mdClean:mdClean, isPaperHead:isPaperHead, canvasInk:canvasInk, pdfScaleFor:pdfScaleFor};")(PDF_MAX_PX);
 
 let P = 0, FA = 0;
 const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (FA++, console.log("  FAIL " + m)); };
@@ -122,18 +123,61 @@ ok(/画布 '\+cv\.width\+'×'\+cv\.height/.test(bp), "读数里带画布尺寸�
    写成 this.canvas 不报错，只是永远 undefined，`cv?…:-1` 那一支于是一路放行。
    所以这里把闸的回调**原样抠出来真跑**，`this` 换成一个仿真 worker —— 形状对不对不算数，
    拿不拿得到画布才算数。 */
+/* ================= 画布高度上限（2026-08-21 查实的白页根因）=================
+   那份 33 页全白的 PDF 自己带着证据：每页 1588×2034 px，32 满页＋末页 1886
+   ⇒ 整份画布高 66,974 px，而 **Chrome 单张 canvas 的高度硬上限是 65,535 px**。
+   超限不抛错、不报警，只是静静给一张空白画布 —— 于是「页数对、内容没」。
+   超出仅 2.2%，临界点 65535/2034 ≈ 32.2 页：成文四段改五段把稿子推过了线。
+   ⇒ scale 必须跟着稿子长度走。下面用**那份真稿的高度**当夹具。 */
+console.log("— 画布高度上限：长稿必须自动降倍率 —");
+ok(PDF_MAX_PX > 0 && PDF_MAX_PX < 65535,
+  "上限常量取自源码，且留了余量（<65535）· 实得 " + PDF_MAX_PX);
+ok(F.pdfScaleFor(11230) === 2, "十页的稿子照旧 scale 2（不许为了防边界把所有稿子都弄糊）");
+const realH = Math.round(66974 / 2);                    /* 那份真稿的 CSS 排版高度 */
+const s33 = F.pdfScaleFor(realH);
+ok(s33 < 2, "33 页那份真稿必须降倍率 · 实得 " + s33);
+ok(realH * s33 <= 65535, "降完之后画布高度落在浏览器上限之内 · 实得 " + Math.round(realH * s33) + "px");
+ok(realH * 2 > 65535, "夹具本身是对的：不降倍率的那一版确实越线（" + realH * 2 + "px）");
+ok(F.pdfScaleFor(200000) >= 0.5, "再长也不低于 0.5（低于这个字不可读，交给墨量闸去拦）");
+ok(F.pdfScaleFor(0) === 2 && F.pdfScaleFor(undefined) === 2, "量不到高度 ⇒ 退回 2，不因为读数缺失就把稿子弄糊");
+let mono = true;
+for (let h = 20000; h <= 120000; h += 1000) if (F.pdfScaleFor(h) > F.pdfScaleFor(h - 1000)) mono = false;
+ok(mono, "倍率随稿子变长单调不升（不许中间反弹回去越线）");
+
+/* 闸装没装在出稿链上 */
+console.log("— 倍率真的传给了 html2canvas —");
+const bpScale = html.slice(html.indexOf("function buildPdf(text"), html.indexOf("var iqCard="));
+ok(/var _scale=pdfScaleFor\(_h\);/.test(bpScale), "出稿前按排版高度算一次倍率");
+ok(/scrollHeight/.test(bpScale), "高度取自真实排版（元素已进文档，scrollHeight 才有值）");
+ok(/html2canvas:\{scale:_scale,/.test(bpScale), "算出来的倍率真的传给了 html2canvas（不是算完丢掉）");
+ok(!/html2canvas:\{scale:2,/.test(bpScale), "写死的 scale:2 已经不在");
+ok(/PDFLOG\.push\(/.test(bpScale) && /采样倍率已由 2 降到/.test(bpScale),
+  "降了倍率要说出来（不许静默改画质）");
+/* ⚠ 只搜变量名是搜不出事的：`var pdfNote='';` 里照样有 pdfNote。要搜的是**它真的从
+   PDFLOG 取了值、又真的进了状态行**——这一条第一版就是这么绿着被变异测试打脸的。 */
+const dp = html.slice(html.indexOf("function doPaper(){"), html.indexOf("function loadHtml2pdf("));
+ok(/PDFLOG\.length\s*\?/.test(dp) && /PDFLOG\.join\(/.test(dp), "状态行真的从 PDFLOG 取读数，不是一个空串");
+ok(/stat\.textContent = \(miss \|\| cut \|\| auMsg \|\| pdfNote\)/.test(dp), "有读数时状态行会走「有话要说」那一支");
+ok(/\?\s*pdfNote\+cut\+auMsg/.test(dp), "读数排在最前面（读者一眼看到画质降了）");
+
 console.log("— 闸真的接在 worker 上（不是只有形状对）—");
 const _gA = bp.indexOf(".toCanvas().then(function(){");
 const _gB = bp.indexOf("}).outputPdf('blob')", _gA);
 ok(_gA > 0 && _gB > _gA, "抠得到墨量闸的回调");
 const guardBody = bp.slice(_gA + ".toCanvas().then(function(){".length, _gB);
 ok(guardBody.trim().length > 0, "抠出来的回调非空（空串对 !/…/.test 全是 PASS，会安静失效）");
-const guard = new Function("INK_MIN", "canvasInk", "text",
-  "return function(){" + guardBody + "};")(INK_MIN, (cv) => F.canvasInk(cv, mkFake()), "正文两万字");
+/* 闸的读数里要带采样倍率与排版高度（判「是没画还是超了上限」全靠这两个数），
+   它们是 buildPdf 的闭包变量 —— 桩必须跟着契约一起长，否则真跑会炸在 ReferenceError 上
+   而不是抛出那句该抛的话。 */
+const guard = new Function("INK_MIN", "canvasInk", "text", "_scale", "_h",
+  "return function(){" + guardBody + "};")(INK_MIN, (cv) => F.canvasInk(cv, mkFake()), "正文两万字", 1.75, 33487);
 const fire = (self) => { try { guard.call(self); return null; } catch (e) { return e.message; } };
 const msg = fire({ prop: { canvas: fakeSrc(1588, 67000, 0) } });
 ok(msg && /白纸/.test(msg), "worker.prop.canvas 上的全白画布 ⇒ 真的抛错（写成 this.canvas 这条会红）");
 ok(msg && /1588×67000/.test(msg), "错误里报出真实画布尺寸 · 实得：" + String(msg).slice(0, 60));
+ok(msg && /采样倍率 1\.75/.test(msg) && /排版高 33487px/.test(msg),
+  "读数里带采样倍率与排版高度（判「是没画还是超了浏览器上限」全靠这两个数）");
+ok(msg && /65535/.test(msg), "读数里点名浏览器的画布上限，看的人不用再去查");
 ok(fire({ prop: { canvas: fakeSrc(1588, 67000, 0.05) } }) === null, "正常画布 ⇒ 放行");
 ok(fire({ canvas: fakeSrc(1588, 67000, 0) }) !== null, "兜底：画布挂在 this.canvas 上也量得到（上游改字段时还活着）");
 ok(fire({}) === null, "拿不到画布 ⇒ 放行，绝不因为量不到就拦真稿");
