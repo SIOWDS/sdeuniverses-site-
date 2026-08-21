@@ -31,7 +31,19 @@ ok((W.match(/不许写「无」/g) || []).length >= 2,
 const ROUNDS = W.slice(W.indexOf('else if (mode === "rounds")'), W.indexOf('else if (mode === "synth")'));
 ok(/不许写「无」/.test(ROUNDS), "成批问对这一条路装了结账块");
 const ANSDEEP = W.slice(W.indexOf('if (histTxt && mode === "answer")'), W.indexOf('if (body.tri === true'));
-ok(/轮·结〕/.test(ANSDEEP) && /不许写「无」/.test(ANSDEEP), "深度档问答这一条路也装了（不能只装一条）");
+ok(/轮·结〕/.test(ANSDEEP) && /不许写「无」/.test(ANSDEEP), "问答这一条路也装了（不能只装一条）");
+/* 🔴 这一条是当天真跑抓出来的自造洞：结账块起初被写进「连续问对纪律」块里，
+   而那个块的条件是 histTxt——第 1 轮没有历史，于是第 1 轮不交结账，
+   而第 1 轮恰恰是缘起那一轮，它的账本一缺，后面每一轮的携带上下文都少最底下一笔。 */
+const LEDGER_BLK = W.slice(W.indexOf("【本轮收尾：交一个结账块】") - 400, W.indexOf("【本轮收尾：交一个结账块】") + 900);
+ok(/if \(mode === "answer"\) \{[\s\S]{0,600}【本轮收尾：交一个结账块】/.test(W),
+  "结账块只认 mode===answer 这一个条件——**每一轮都要结账，第一轮尤其要**");
+/* ⚠ 负向断言要贴身量，别用宽窗口：那个 histTxt 的 if 就在几百字之外，
+   宽窗口的「不许出现」永远为假。改成只看结账块**紧邻的那个 if**。 */
+const _li = W.indexOf("【本轮收尾：交一个结账块】");
+ok(!/histTxt/.test(W.slice(_li - 260, _li)),
+  "结账块紧邻的那个 if 里没有 histTxt（挂进去就继承了它的盲区）");
+ok(/roundNo <= 1 \?/.test(LEDGER_BLK), "第一轮的「走法」栏另给一句话（它没有上一轮可比）");
 
 const TL = H.slice(H.indexOf("function takeLedger(txt){"), H.indexOf("function parseRounds(txt){"));
 ok(TL.length > 100, "抠得出摘账本的函数");
