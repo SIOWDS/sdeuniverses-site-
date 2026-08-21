@@ -344,6 +344,21 @@ console.log("\n── ⑦ 壳页接线 ─────────────�
   t("分站首页仍指向 /chatjohn/", home.indexOf('href="/chatjohn/"') >= 0);
 }
 
+console.log("\n── ⑧ 分身页不画三态条（2026-08-22 摘除）──────────");
+{
+  const js = fs.readFileSync("public/wds-mode.js", "utf8");
+  /* 只守两件事，合起来就是那一刀：
+     ① 三态条的输出被 PROF_ID 判断包着（挂了档案就是空串）；
+     ② 语言文案那三行判过空——它开屏就跑，抛在那里等于白屏。 */
+  t("三态条由 PROF_ID 决定画不画", /\(PROF_ID \? ""\s*:\s*\n?\s*"<div class='wdsm-tabs'>/.test(js));
+  t("ChatSDE 本身仍留着这三颗（只摘分身页）", /data-m='normal'/.test(js) && /data-m='portal'/.test(js));
+  t("语言文案对这三颗判空，不会在分身页抛错",
+    /var _tb = q\(".wdsm-tab\[data-m='normal'\]"\); if \(_tb\)/.test(js)
+    && /var _ti = q\(".wdsm-tab\[data-m='im'\]"\); if \(_ti\)/.test(js)
+    && /var _tp = q\(".wdsm-tab\[data-m='portal'\]"\); if \(_tp\)/.test(js));
+  t("样式留着（要恢复只需把判断改回常量串）", /\.wdsm-tabs\{display:flex/.test(js));
+}
+
 console.log("\n" + "═".repeat(48));
 console.log("总计  PASS " + pass + "   FAIL " + fail);
 if (fail) process.exit(1);

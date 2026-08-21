@@ -1749,7 +1749,13 @@
       "<div class='wdsm-schwrap'><input class='wdsm-sch' type='text'></div>" +
       "<div class='wdsm-list'></div>" +
       "<div class='wdsm-sbot'>" +
-        "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab' data-m='im'></button><button class='wdsm-tab wdsm-portal' data-m='portal' title='\u56de\u5230\u5165\u53e3\u9875'></button></div>" +
+        /* 三态条（浏览 · SDE 社区 · 系统入口）只画给 ChatSDE 本身。
+           分身页（WDSM_PROFILE，如 ChatJohn）一律不画：那三颗全部通往主站，
+           读者在语言分站里点一下就被弹出这个站，而他要的只是接着聊语言。
+           2026-08-22 按王德生的令摘除。要恢复：把下面这个三元判断改回常量串即可，
+           .wdsm-tabs 一族的样式故意留着（与 sde-modes.js 里那颗 △ 同一处置）。 */
+        (PROF_ID ? "" :
+          "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab' data-m='im'></button><button class='wdsm-tab wdsm-portal' data-m='portal' title='\u56de\u5230\u5165\u53e3\u9875'></button></div>") +
         "<button class='wdsm-sb' data-a='theme'></button>" +
         "<button class='wdsm-sb' data-a='style'></button>" +
         "<button class='wdsm-sb' data-a='preset'></button>" +
@@ -2095,9 +2101,11 @@
   function applyLang() {
     ariaSet();                                  // 文案随语言走，切换后要重贴一遍
     var q = function (sel) { return layer.querySelector(sel); };
-    q(".wdsm-tab[data-m='normal']").textContent = t("tabBrowse");
-    q(".wdsm-tab[data-m='im']").textContent = t("tabIm");
-    q(".wdsm-tab[data-m='portal']").textContent = t("tabPortal");
+    /* ⚠ 分身页没有这三颗（见上面模板里那段）。直接 .textContent 会在 null 上抛，
+       而 applyLang 是开屏就跑的——抛在这里等于整个界面白屏。故逐颗判空。 */
+    var _tb = q(".wdsm-tab[data-m='normal']"); if (_tb) _tb.textContent = t("tabBrowse");
+    var _ti = q(".wdsm-tab[data-m='im']"); if (_ti) _ti.textContent = t("tabIm");
+    var _tp = q(".wdsm-tab[data-m='portal']"); if (_tp) _tp.textContent = t("tabPortal");
     q(".wdsm-distbtn").textContent = t("bDistill");
     try { var pb = q(".wdsm-pdfbtn"); pb.textContent = t("bPdf"); pb.title = t("bPdfT"); } catch (e) {}
     q(".wdsm-histbtn").textContent = t("bHist");
