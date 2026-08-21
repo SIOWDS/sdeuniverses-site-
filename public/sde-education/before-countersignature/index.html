@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>签收之前：数学教育中一段不可外包的持有 | SDE教育学 | SDE Universes</title>
+<meta name="description" content="大模型把数学教育里"给出可计算的结果"这一项拿走了。本文不问教师还能做什么，只问：推进权被短路之后，课堂里是否还有一种在结构上不可外包的持有。形式取自密码学的承诺方案、会计的确认条件与会话分析的沉默归属。预注册先封哈希后取数，在 2,262 段数学辅导对话上检验，结果对本文不利：话轮层给出的是 Rowe 的方向，切点检验被本文自己设置的三个安慰剂推翻，本文据此撤回序列侧主张。">
+<link rel="canonical" href="https://sdeuniverses.com/sde-education/before-countersignature/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="签收之前：数学教育中一段不可外包的持有">
+<meta property="og:description" content="大模型把数学教育里"给出可计算的结果"这一项拿走了。本文不问教师还能做什么，只问：推进权被短路之后，课堂里是否还有一种在结构上不可外包的持有。形式取自密码学的承诺方案、会计的确认条件与会话分析的沉默归属。预注册先封哈希后取数，在 2,262 段数学辅导对话上检验，结果对本文不利：话轮层给出的是 Ro">
+<meta property="og:url" content="https://sdeuniverses.com/sde-education/before-countersignature/">
+<meta name="sde:column" content="education/intro">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#8C5A2B;--accent2:#2E86AB}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#8C5A2B1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.6rem,3.7vw,2.3rem);font-weight:700;line-height:1.34;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.96rem,1.8vw,1.08rem);color:var(--text2);max-width:680px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.74}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.1em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.abs.en .l{letter-spacing:0.18em}
+.abs.en p{font-family:'EB Garamond',Georgia,serif;font-style:normal}
+.abs.en .et{font-weight:700;color:var(--text);margin-bottom:0.55rem;font-size:1rem;line-height:1.5}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.kw.en{margin-bottom:2.4rem}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+
+article h4{font-size:1.0rem;margin:1.6rem 0 0.55rem;color:var(--text);font-weight:700}
+.tbl{margin:1.6rem 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl table{border-collapse:collapse;width:100%;min-width:520px;font-size:0.9rem;line-height:1.62}
+.tbl th,.tbl td{border:1px solid var(--border2);padding:0.55rem 0.7rem;vertical-align:top;text-align:left}
+.tbl th{background:rgba(20,108,148,0.07);font-weight:700;color:var(--accent)}
+.tbl caption{caption-side:top;text-align:left;font-size:0.88rem;color:var(--text2);margin-bottom:0.5rem;font-weight:700}
+.formula{margin:1.2rem 0;padding:0.75rem 1rem;background:var(--bg2,rgba(0,0,0,0.03));border-left:3px solid var(--accent);font-family:'Courier New',monospace;font-size:0.95rem;overflow-x:auto}
+.revnote{margin:1.8rem 0 0;padding:1rem 1.15rem;border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:6px;font-size:0.9rem;color:var(--text2);line-height:1.75}
+.revnote b{color:var(--accent)}
+article h3{font-size:1.07rem;margin:2.1rem 0 0.7rem;color:var(--accent);letter-spacing:0.01em;font-weight:700}
+article h4{font-size:0.98rem;margin:1.6rem 0 0.5rem;color:var(--gold);letter-spacing:0.01em;font-weight:700}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#8C5A2B22 62%)}
+article i{font-style:italic}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.refs{margin:2rem 0 0}
+.refs h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem}
+.refs h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+.refs ol{padding-left:0;list-style:none;counter-reset:r}
+.refs li{position:relative;font-size:0.86rem;line-height:1.75;color:var(--text2);margin:0 0 0.7rem;padding-left:1.9rem;text-align:justify;word-break:break-word}
+.refs li::before{counter-increment:r;content:'['counter(r)']';position:absolute;left:0;color:var(--accent);font-weight:600;font-size:0.8rem}
+.refs li i{font-style:italic}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .fh{font-size:0.72rem;letter-spacing:0.2em;color:var(--accent);margin-bottom:1rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.foot-nav a.cur{opacity:.4;pointer-events:none}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+/* 三模式：网页 / 在线读PDF / 下载 —— 复用页面 --accent:#8C5A2B */
+.modes{border-bottom:1px solid rgba(20,108,148,.16);background:#FBF9F4}
+.modes .mw{max-width:820px;margin:0 auto;display:flex;gap:12px;justify-content:center;padding:16px 24px;flex-wrap:wrap}
+.modebtn{cursor:pointer;font-family:inherit;font-size:14px;color:#7A7059;background:#fff;border:1px solid rgba(20,108,148,.20);border-radius:6px;padding:9px 18px;transition:all .15s;letter-spacing:.03em}
+.modebtn:hover{color:#23201A}
+.modebtn.on{color:#fff;background:var(--accent);border-color:var(--accent);font-weight:700}
+.modebtn .ic{margin-right:6px}
+.panel{display:none}.panel.on{display:block}
+.rdr{max-width:920px;margin:0 auto}
+.rdr-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:center;padding:14px 12px;position:sticky;top:0;background:rgba(251,249,244,.97);z-index:6;border-bottom:1px solid rgba(20,108,148,.16)}
+.rbtn{background:#fff;border:1px solid rgba(20,108,148,.20);color:var(--accent);padding:7px 15px;border-radius:5px;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:.02em}
+.rbtn:hover:not(:disabled){background:#F4F7F9}.rbtn:disabled{opacity:.35;cursor:not-allowed}
+.rbtn.dl{background:var(--accent);color:#fff;border-color:var(--accent)}.rbtn.dl:hover{background:#0F5273;text-decoration:none}
+.pbox{font-size:14px;color:#23201A}.pbox input{width:52px;background:#fff;border:1px solid rgba(20,108,148,.20);color:var(--accent);padding:6px;border-radius:4px;text-align:center;font-family:inherit;font-size:14px}.pbox .ptot{color:#7A7059}
+.zm{display:flex;gap:4px}
+.rdr-stage{position:relative;display:flex;justify-content:center;padding:26px 8px 34px;min-height:62vh;background:#E4E9EC;border-radius:0 0 8px 8px}
+#cwrap{box-shadow:0 16px 46px rgba(0,0,0,.28);background:#fff;border-radius:2px;overflow:hidden;max-width:100%}
+#pcv{display:block;max-width:100%;height:auto}
+.rload{text-align:center;color:#7A7059;padding:72px 20px;font-size:15px}
+.spin{width:38px;height:38px;border:3px solid rgba(20,108,148,.2);border-top-color:var(--accent);border-radius:50%;margin:0 auto 18px;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rerr{text-align:center;color:#9A3B2B;padding:50px 20px;line-height:1.9}.rerr a{color:var(--accent);font-weight:700}
+.tapL,.tapR{position:absolute;top:0;bottom:0;width:14%;cursor:pointer;z-index:3}.tapL{left:0}.tapR{right:0}
+.rhint{text-align:center;font-size:12px;color:#7A7059;padding:12px 0 44px}
+#dl{padding:40px 0 70px}#dl .card{max-width:560px;margin:0 auto;text-align:center;background:#FBF9F4;border:1px solid rgba(20,108,148,.16);border-radius:12px;padding:48px 32px}
+#dl h2{font-size:22px;color:var(--accent);margin-bottom:10px}#dl .sz{color:#7A7059;font-size:13px;margin-top:16px;line-height:1.9}
+.dlbtn{display:inline-block;margin-top:22px;background:var(--accent);color:#fff;font-weight:700;padding:14px 32px;border-radius:8px;letter-spacing:.04em}.dlbtn:hover{background:#0F5273;text-decoration:none}
+
+.edition-link{display:inline-flex;align-items:center;gap:.45em;margin-top:18px;padding:10px 18px;border:1px solid rgba(20,108,148,.32);border-radius:999px;color:var(--accent);background:#fff;font-size:14px;font-weight:700;letter-spacing:.04em;text-decoration:none}.edition-link:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.fbox{margin:1.6rem 0;padding:1.15rem 1.4rem;background:#FBF3EA;border:1px solid #E4D3BF;border-radius:8px}
+.fbox p{margin:0;font-size:1.06rem;line-height:1.95;color:#3A2F22}
+.tag{margin:1.1rem 0;padding:.55rem .9rem;background:#F4F0E8;border-radius:6px;font-size:.93rem;color:#6B5D47}
+.cases p{margin:.85rem 0;padding:.75rem 1rem;background:#FAF6EC;border-radius:6px;line-height:1.9}
+sup.rf{color:#8C5A2B;font-size:.72em}
+ol.ref{padding-left:1.4rem}
+ol.ref li{margin:.55rem 0;line-height:1.8;font-size:.95rem;color:#4A4235}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/browse/" class="here">教育专栏</a>
+    <a href="/education/ai-era/" class="sib">AI时代的教育</a>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/sde-education/">SDE教育学</a> · 研究论文 · 头条</div>
+  <h1 class="art-title">签收之前</h1>
+  <p class="art-sub">数学教育中一段不可外包的持有，及其"打开即销毁"的结构——三家外部取源、二维辨别格与一次对本文不利的预注册检验</p>
+  <div class="art-meta">王德生 ＋ Claude · 德麦国际 SDE 学派 · SDE教育学 · 2026年8月21日 · 约 19,900 字 · 32 条参考文献 · 2,262 段对话预注册实算 · 结果对本文不利 · 三种阅读模式</div>
+<!-- CONFLUENCE-LINK -->
+  <div class="art-meta" style="margin-top:8px">本篇同时收入 <a href="/confluence/">学科通融</a> 专栏 · 之一百零五 ·「余地与承载」频道 · 三学科交叉：心脏电生理 × 燃烧动力学 × 微生物生长动力学</div>
+</header>
+
+<div class="modes"><div class="mw">
+  <button class="modebtn on" data-m="web"><span class="ic">📖</span>网页长文</button>
+  <button class="modebtn" data-m="pdf"><span class="ic">📄</span>在线读 PDF</button>
+  <button class="modebtn" data-m="dl"><span class="ic">⬇</span>下载 PDF</button>
+</div></div>
+
+<div id="web" class="panel on">
+<main class="wrap">
+<section class="body">
+  <div class="abs"><div class="l">摘 要</div><p>教育测量与教育技术一致地把学习者两个动作之间没有产出的时间当作待压缩的成本，其代价从未被系统检验。本文以心脏电生理的逸搏间期与超速抑制、燃烧动力学的点火延迟期与爆震、微生物学的迟滞期与传代失能为参照，析出三者共享而未被教育研究检验的形式结构，据此界定<b>无主时段</b>——上一程序已交出控制、下一程序尚未接手、任何一方均不持有启动权的一段时间，并提出抑制、非零下界、无主性守恒三条命题。预注册文本于任何结果被观察之前写定并计算哈希；数据取自 ASSISTments 两个学年，经预设标准后保留 575 万条作答记录、26,300 名学习者。结果：<b>抑制假设未获支持且方向相反</b>（β = −0.340，p = 8.1×10⁻¹⁰）；<b>非零下界假设在两个数据集上一致获得支持</b>——作答潜伏期与正确率呈倒 U 型，极值点位于学习者自身分布内部而非最快端；撤销规则未触发；第四条假设因本文自身的操作化失误而不可解释，如实作废。据此把抑制命题改判为：外部起搏并不延长撤除后的自启动潜伏期，而是<b>直接压缩无主时段本身</b>，使行为收敛为「立即作答」与「立即求助」的二值模式。探索性分组分析进一步给出一条两个数据集均复现的规律：<b>最优停顿随能力上升而缩短、随难度上升而延长</b>。</p></div>
+<div class="kw">关键词：无主时段；启动权；作答潜伏期；非单调关系；反馈时机；预注册研究；智能辅导系统</div>
+<div class="toc"><a href="#c1">摘　要</a><a href="#c2">Abstract</a><a href="#c3">一、问题的提出</a><a href="#c4">二、三家取源与共有前提</a><a href="#c5">三、教育文献里的五位近邻</a><a href="#c6">四、数学教育自己的账本：布鲁索的教学契约与 Topaze 效应</a><a href="#c7">五、Z 的定义：作保与不签收</a><a href="#c8">六、第二根轴与二维辨别格</a><a href="#c9">七、可观测代理、误诊阻挡与预注册</a><a href="#c10">八、检验：2,262 段数学辅导对话</a><a href="#c11">九、与等待时间研究的正面对照</a><a href="#c12">十、其余分界</a><a href="#c13">十一、局限与本文不做的事</a><a href="#c14">结论</a><a href="#c15">附录 A　计数手册（现场使用）</a><a href="#c16">附录 B　预注册文本（取数前封存，原样抄录）</a><a href="#c17">附录 C　复算路径</a><a href="#c18">附录 D　主要术语</a><a href="#c19">参考文献</a></div>
+  <article>
+<p><strong>王德生　Claude</strong></p>
+<p>（德麦国际出版社／SDE Universes 研究部，新加坡 048622）</p>
+<p><strong>中图分类号</strong>　G633.6　　<strong>文献标识码</strong>　A</p>
+<hr />
+<h2 id="c1">摘　要</h2>
+<p><strong>目的</strong>　大模型改写了数学教育可外包项的清单：凡属”给出可计算的结果”者，皆已不必经过教室。若数学教育的意义仍有剩余，这剩余就是机器不能代劳的那一部分。本文不问教师还能做什么，只问一件事：当解题推进权被短路之后，课堂里是否还有一种在结构上不可外包的持有。</p>
+<p><strong>方法</strong>　本文不从教育学内部取形式，理由是教育学的五位近邻——维果茨基的可提供的帮助、范梅南的时机、波兰尼的不可言传、布伯的在场、杜威的可接续的经验——各自握着一个在常态下与教师意义高度共现、却在同一处失效的代理变量。本文改从三门与教育无关的学科取形式：密码学的承诺方案（隐藏性与绑定性）、会计的确认条件与或有事项（不确认、仅披露）、会话分析的沉默归属与修复偏好（谁被选定为下一说话人）。三家共有一条从未被说破的前提——<strong>一个尚未确认的东西，其价值在于将来被确认</strong>——而推翻这条前提的材料在三家自己手里。</p>
+<p><strong>结果</strong>　由此得到一个控制变量：<strong>作保</strong>，即教师面对自己也未解的一处，不把它转成可交付的答案，而把一个缺口保持在正在卡住的学生面前。它的真值条件是<strong>不签收</strong>——只在未被学生指认、未被教师补叙、未被第三人转述的那一刻内成立。本文给出三条命题：不可自签（持有者不能自己宣布它成立）、打开即销毁（签收不是读出它，而是用另一个对象不可逆地替换它）、熟练反向（教师对”忍住不说”的熟练度上升时，它的真值率下降——这一条与维果茨基与范梅南的方向相反）。第二根轴取共场，与签收交叉成四格，最险的一格是”高共场且早签收”。可观测代理与计数手册全部写实，并先封预注册哈希再取数，在
+MathDial 语料的 2,262 段真人教师—模型学生数学辅导对话、28,320
+个话轮上执行。</p>
+<p><strong>结论</strong>　<strong>检验结果对本文不利，本文照原样交出。</strong>对话层的分化假设不可判（ρ＝−0.019，p＝0.386）；话轮层按预注册定义给出的是
+Rowe 的方向而不是本文的方向（教师不供给之后学生思辨性作答率
+0.47%，供给之后
+0.13%，OR＝3.58）；“签收即离场”的切点检验表面命中（p＝0.0013），但三个安慰剂切点给出的同向降幅<strong>全部更大</strong>，说明那一降不属于签收，属于对话内的自然收敛，本文据此判该条<strong>未成立</strong>并撤回序列侧的胜负主张。同一批数据给出三条本文事先没有预料的读数：学生一侧的态度型表达与缺口型表达之比为
+<strong>188∶1</strong>；教师公开说出”我还不知道”的话轮占
+<strong>0.060%</strong>；学生自发提问占
+<strong>0.664%</strong>。本文因此把主张收窄为一条事件级的结构定义与一条尚待人—人课堂检验的假设，并明写：在本次介质里，本文所指的那样东西的可观测一侧几乎不存在，而这既是本文诊断的一个极端例证，也是本文测量纲领的一处硬伤。</p>
+<p><strong>关键词</strong>　作保；不签收；承诺方案；教学契约；Topaze
+效应；等待时间；数学教育；意义结构</p>
+<hr />
+<h2 id="c2">Abstract</h2>
+<p><strong>Purpose.</strong> Large models have rewritten the list of
+what mathematics education can outsource: whatever consists in
+delivering a calculable result no longer requires a classroom. If any
+remainder is left, the remainder is what such models cannot do for a
+student. This paper does not ask what teachers can still do. It asks
+whether, once the advancement of problem-solving has been
+short-circuited, there remains in the classroom a holding that is
+structurally non-outsourceable.</p>
+<p><strong>Method.</strong> The paper deliberately does not take its
+form from education. Its five nearest educational neighbours —
+Vygotsky’s providable help, van Manen’s tact, Polanyi’s tacit knowing,
+Buber’s presence, Dewey’s continuity of experience — each hold a proxy
+variable that covaries with teacher meaning under normal conditions and
+fails at one identifiable point. Form is therefore taken from three
+fields unrelated to education: commitment schemes in cryptography
+(hiding and binding), recognition criteria and contingent liabilities in
+accounting (not recognised, only disclosed), and the attribution of
+silence and the preference for self-repair in conversation analysis. The
+three share one unstated premise — that a thing not yet confirmed
+derives its value from being confirmed later — and the material that
+overturns this premise lies within each field itself.</p>
+<p><strong>Results.</strong> The control variable is
+<em>warranting</em>: a teacher, facing something she has not resolved
+either, declines to convert it into a deliverable answer and instead
+holds a gap open in front of a student who is stuck. Its truth condition
+is <em>non-receipt</em>. Three propositions follow: no
+self-countersignature, open-to-destroy, and reverse-with-fluency — the
+last running against both Vygotsky and van Manen. A second axis,
+co-presence, crosses with receipt to form a four-cell grid whose most
+dangerous cell is “co-present and early-received.” A pre-registration
+was sealed by hash before data extraction and executed on MathDial:
+2,262 tutoring dialogues between human teachers and a model student,
+28,320 turns.</p>
+<p><strong>Conclusion.</strong> <strong>The result runs against this
+paper and is reported as it stands.</strong> The dialogue-level
+divergence hypothesis is undecidable. At turn level, the pre-registered
+comparison yields Rowe’s direction, not this paper’s. The cut-point test
+for “receipt-is-departure” is nominally significant but is defeated by
+all three placebo cut-points, and the claim is withdrawn. Three
+unanticipated descriptive readings emerge: attitude-type to gap-type
+student expressions stand at 188 to 1; teachers voice an unresolved
+judgment in 0.060% of turns; students ask unsolicited questions in
+0.664%. The paper narrows to one event-level structural definition and
+one hypothesis still awaiting a human-to-human classroom test, and
+states plainly that in this medium the observable side of its object has
+all but vanished — which is at once an extreme instance of what it
+diagnoses and a defect in its own measurement programme.</p>
+<p><strong>Keywords.</strong> warranting; non-receipt; commitment
+scheme; didactical contract; Topaze effect; wait time; mathematics
+education; structure of meaning</p>
+<hr />
+<h2 id="c3">一、问题的提出</h2>
+<h3>1.1 两个相邻的课堂</h3>
+<p>先放一个具体场景，不把问题悬在抽象处。</p>
+<p>一节初中数学课，学生甲在一道解析几何题的第三步卡住。依照今天课堂的现实，他的第一反应多半是把题拍给模型，拿到完整步骤，再回头把答案誊进练习册。教师走过来，看了一眼他手机上的步骤，说一句”对，你要理解这一步”。学生点头。课堂继续。</p>
+<p>隔壁班的学生乙也带着一道题来。他没有拍照，也没有要步骤。他把折过的卷子摊在桌角，说：“老师，这一步我试了三种写法，都不是很对，但我也说不出哪里不对。”这位教师三星期前遇过一道很像的题，当时也没拿准，还在班上公开说过一次”我也没过去”。这一刻他没有立刻去够教案，先让两句话之间多出了一段。那段多出来的东西持续了三秒，没有名字。</p>
+<p>甲那边发生的是”拆解”与”交付”。乙这边没有发生任何可以写进成果条的事。</p>
+<p>大模型之后再来看这两个场景，差别不在谁更慢，也不在谁更会关心人。模型可以把甲的批注生成得更贴，也可以模仿乙这位教师的”那三秒”并把它做成一个交互功能——提问后延迟三秒再给提示，这在任何一个辅导产品里都是一行配置。问题于是被逼到最窄处：在乙的场景里，有什么是模仿不动的。</p>
+<h3>1.2 被替代的不是讲解，是推进权</h3>
+<p>以往数学教育的意义，常说在解题能力的养成、思维品质的培养或数学兴趣的激发。大模型把前两条抽走了：它给出的步骤比多数教师的更清楚，且可以无限重复，不疲倦、不误判先验。余下的第三条也被动了地基，因为一只模型的”兴趣”是概率上的继续，不是一个人对另一个人产生的那种兴趣。</p>
+<p>但这样描述仍然不够准确。被替代的其实不是讲解这件事本身——那个半个世纪前的温情版本早已不构成评价制度的主流。被替代的是<strong>推进权</strong>：教师曾经拥有的那种由他决定何时给出下一步、给多大一步的能力。模型在手机上随时可以给出完整解答，学生拿到解答的速度快于教师的任何一次课堂介入。于是意义耗竭最先降临的，恰恰不是”教师讲得不够好”，而是推进权被短路：教师从推进者降为盖章者，他仍然可以签字”对，你要理解这一步”，但这个动作与学生的求解过程已经脱节。</p>
+<p>这个问题的尖锐之处在于：功能替代可以无限延后，而意义耗竭并不等功能的完全替代。意义的耗竭可以在推进权被短路的同时发生。</p>
+<h3>1.3 本文承重命题</h3>
+<p>本文要立的不是一句”教师仍有用”的话。承重命题较短：</p>
+<blockquote>
+<p>数学教育的意义，不在传递可计算的结果，不在提供能见效的帮助，也不在建立被记住的关系；唯一在结构上不可外包的那一项，是教师替学生的卡住作保——并且这种作保只在未被指认、未被复述、未被签收的那一刻之内为真。</p>
+</blockquote>
+<p>这里”不在”的第一个，是回应大模型的问题：“可计算的结果”这一项已经输给了机器。第二个”不在”，是回应帮助传统的同化：“能见效的帮助”是能力的最近代理，它会把作保吸收进去。第三个”不在”，是回应关系传统的同化：“被记住的关系”会取代作保，因为关系是经得起回忆的东西。三者都不是，作保才有一个独立的定义空间。</p>
+<p>也就是说，本文把一件被教育话语误当作技艺或关系的事实，从”教师这样做了”转到”作保这件事本身有自己的真值条件”上。</p>
+<h3>1.4 三条贡献</h3>
+<p>第一条，把<strong>关系确认型作保</strong>与<strong>未决判型作保</strong>分开。前者是教师接住等待之后，回应对象落在关系上——“我们之间有信任”——后者是教师自己的未决判断本身对他者在场。前者沦为仪式，后者才是本文所指。这个区分在第三章与教育文献并列，在第五章得到兑现。</p>
+<p>第二条，提出<strong>不签收是一个结构条件而不是态度要求</strong>。以往的接近说法多在”关系是否真诚”的层面打转，本文改为”它是否被签收”的层面，由此保住作保独立于人格的边界。这一条的形式不是从教育学里长出来的，是从密码学的承诺方案里搬来的：一个只有隐藏性、没有可打开性的持有，在那里不是残缺，是另一类对象。</p>
+<p>第三条，建立<strong>复述即离场</strong>作为可观察的败亡判据，并把它交付检验。第八章报告的结果对本文不利：判据的序列侧在本次介质中未能成立，而且是被本文自己设置的安慰剂切点推翻的。本文把这一节完整写出，包括它推翻了本文哪一句话。</p>
+<h3>1.5 全文结构</h3>
+<p>第二章从教育之外取三家形式，找出三家共有的前提并用三家自己的材料推翻它。第三章检查教育文献里五位最近的邻居，指出它们各自握着的代理变量与各自的分离点。第四章单独处理数学教育自己的账本——布鲁索的教学契约与
+Topaze
+效应——这是本文最贵的一位对手，本文欠它的账在这一章结清。第五章给出 Z
+的零情态定义、三个签收动作与三条命题，并与承诺方案逐项对照。第六章强制上第二根轴，建立二维辨别格，把最险一格写出来。第七章给可观测代理、误诊阻挡与预注册文本。第八章当场跑一次检验，并原样交出不利结果。第九章把本文与
+Rowe
+五十年的等待时间研究正面摆在一起。第十章清算其余分界。第十一章写局限与本文不做的事。</p>
+<hr />
+<h2 id="c4">二、三家取源与共有前提</h2>
+<h3>2.1 为什么不从教育学内部取形式</h3>
+<p>一个新对象若只由本领域的词做成，它几乎必然是本领域某个已有对象的更细一层。教育学里已经有帮助、有时机、有在场、有默会、有经验；把教师那一刻的不作为再描述一遍，得到的只会是这五样里的一样，换一个说法。第三章会逐一说明它们各自能走到哪一步。</p>
+<p>要得到一个不被它们吸收的对象，形式必须从别处来，而且必须是<strong>能在本领域产生它自己长不出的预测</strong>的形式。本章取三家：密码学的承诺方案、会计的确认条件与或有事项、会话分析的沉默归属与修复偏好。三家都处理同一件抽象的事——<strong>某样东西在被确认之前处于什么状态，以及确认这个动作本身做了什么</strong>——但三家的处理互不相容，这正是可用之处。</p>
+<h3>2.2
+第一家　密码学的承诺方案：隐藏性与绑定性</h3>
+<p>承诺方案（commitment scheme）是密码学的一个基础构件（Blum, 1981;
+Naor, 1991; Halevi &amp; Micali, 1996）。承诺者对一个值 m 计算
+c＝Commit(m, r) 并公开 c，此时验证者无法从 c 得知
+m，这叫<strong>隐藏性</strong>（hiding）；而承诺者事后也无法把 c
+打开成另一个
+m′，这叫<strong>绑定性</strong>（binding）。到了打开阶段，承诺者公布 (m,
+r)，验证者重算 Commit 并核对。</p>
+<p>对本文有用的不是这套协议本身，是它的一条结构事实：<strong>隐藏性是一次性的</strong>。打开之后
+c 仍然绑定
+m，但隐藏性永久失去，而且没有任何操作可以把它恢复。承诺方案的文献里还有一条常被忽略的判据：一个方案在信息论意义上的隐藏与绑定不能同时完美，二者之间存在硬性的取舍（Pedersen,
+1992）。</p>
+<p>搬进来的形式因此是这样一句：<strong>存在这样一类持有，它的性质只在未被打开的期间成立，且打开不是读出它，而是终止它。</strong>这句话在教育学里没有现成的对应物。帮助可以被读出，时机可以被复盘，在场可以被回忆，默会可以被示范——这四样都经得起打开。</p>
+<h3>2.3
+第二家　会计的确认条件与或有事项</h3>
+<p>会计准则对”什么时候把一件事记进表内”有明文规定。国际会计准则理事会的概念框架把确认（recognition）设为一个有条件的动作：只有当一个项目符合要素定义、且相关信息具有有用性时，才进入财务报表。与之配套的是《国际会计准则第
+37 号》（IAS
+37）对或有负债的处理：<strong>不予确认，只作披露</strong>——因为它的存在有待未来不确定事项的发生来证实，或因为流出金额不能可靠计量。</p>
+<p>这里有两件对本文有用的事。</p>
+<p>第一，会计承认存在一类项目，它是实在的，却在规范上被禁止进表。它不是”还没来得及记”，是”按规定不许记”。这给”负库存”一个硬判据：不是没有记录，是<strong>这类事项的记录条件本身不成立</strong>。</p>
+<p>第二，也是更要紧的一件：确认这个动作不是中性的。一旦一项或有负债转为确认并计提准备，主体的后续行为随之改变——这在准则的实施研究里有大量记录，也是准则要求披露而非确认的一部分理由。<strong>确认改变被确认者所处的行为环境。</strong></p>
+<h3>2.4
+第三家　会话分析的沉默归属与修复偏好</h3>
+<p>会话分析给沉默做过一件教育学从未做过的事：按归属切分。Sacks、Schegloff
+与 Jefferson（1974）的话轮转换系统区分 pause、gap 与
+lapse，判据不是长度，是<strong>下一说话人是否已被选定</strong>。Levinson（1983）由此提出可归属的沉默（attributable
+silence）：同样一秒钟的安静，在被选定者一侧记为他的沉默，在无人被选定时不记在任何人名下。</p>
+<p>第二件是修复偏好。Schegloff、Jefferson 与
+Sacks（1977）报告，会话中的修复存在系统性偏好：自我发起的自我修复优先于他人发起的他人修复；他人抢先修复是被回避的（dispreferred）。这条偏好的后果不是修得慢，而是<strong>修复的所有权归谁</strong>。</p>
+<p>搬进来的形式是：<strong>归属动作改变事件本身，而不只是改变对事件的记载。</strong></p>
+<h3>2.5 三家共有的前提</h3>
+<p>三家彼此不相干，却共有一条从未被说破的前提：</p>
+<blockquote>
+<p><strong>一个尚未确认的东西，其价值在于将来被确认。</strong></p>
+</blockquote>
+<p>承诺方案的整个协议是为打开阶段服务的——不打算打开的承诺在标准表述里没有位置。会计的确认条件是一条通往表内的路径，或有事项被披露是为了将来可能转入。会话分析里，沉默的分析价值在于它随后如何被处理、被谁接手。三家的默认落点一致：未确认状态是过渡态。</p>
+<h3>2.6
+三份推翻材料（各从该家自己取）</h3>
+<p><strong>其一，来自密码学自己。</strong>存在只有隐藏性、不设打开阶段的构件——一次性隐藏、不可打开承诺、以及以”永不揭示”为设计目标的场合。在那里，不打开不是协议未完成，是这一类对象的定义。故”未确认是过渡态”在这一家自己的谱系里就不成立。</p>
+<p><strong>其二，来自会计自己。</strong>IAS 37
+对或有负债的规定不是”暂缓确认”，是<strong>不得确认</strong>。准则的理由不是信息不足，是确认会给出一个它不该给出的断言。故”未确认是通往确认的路”在这一家自己的规范里被明文否定。</p>
+<p><strong>其三，来自会话分析自己。</strong>修复偏好规定他人抢先修复是被回避的。抢修不会让修复更完整，它把修复从当事人手里移走。故”归属越早越好”在这一家自己的经验材料里被否定。</p>
+<p>三份材料合起来，逼出一类此前无名的对象：<strong>一种其价值恰在于不被确认、且确认动作会终止它的持有。</strong>下面五章都在处理这一类对象在数学课堂里的样子。</p>
+<hr />
+<h2 id="c5">三、教育文献里的五位近邻</h2>
+<p>本章的任务不是给”数学教育危机”作评。本文只处理五个与所指对象最像的邻近概念。它们的相似不是巧合：这不是本文编造的新情感，而是一个教育现场早就反复擦碰、却从未被单独拿起来的东西。逐一摆出它们掌握到哪一步、握着什么代理变量、又在哪一点上不能同化，就给出了研究的缺口。</p>
+<h3>3.1 维果茨基：可提供的帮助</h3>
+<p>维果茨基（Vygotsky,
+1978）把发展表述为学生在成人或更有能力的同伴协助下能够达到的、高于其独立水平的区域，后经
+Wood、Bruner 与
+Ross（1976）沿化为支架。教师之所以有意义，是因为他握有学生尚未内化的认知程序。</p>
+<p>学生甲在本文场景里是经典的支架受益者。但学生乙的”卡住”并不是一个稍加协助就可以越过的问题点，而是”我试了三种写法，但说不出哪里不对”，是卡在问题本身的”在哪”上。这个位置不是支架可以垫进去的裂缝。支架能进入的地方，教师已经有一个比学生更好的解；本文所指的位置，教师自己也没有解。</p>
+<p>分离点写实：<strong>支架以”可提供的帮助”为承重变量。帮助可以被测量——教师撤走支架后独立解题的题目增多，支架就是有效的。</strong>若教师对学生乙随便给三行”方向”作为轻支架，那三行就是新型的帮助，而不是本文所称的东西。真正的位置是教师在学生身后停顿的那一下，教师身上并没有一个比学生更高的解正等着给出。最近发展区不会解释为什么在”教师自己也不会”的时刻，教育还能工作。</p>
+<p>大模型使这一处更尖锐：若支架可以是机器生成的下一步提示，维果茨基阵营会把它辩护为”支架的本质不是步骤供给，而是在最近发展区供给恰好的差异”。这个辩护仍然把一个变量放在中心：教师是那个给出恰好帮助的人。而当学生已经拿到模型的完整步骤、带着它回到教师面前时，教师的意义来源理应中断——可课堂里教师的失重并不总在这里消失，反而常常在这个点上升高。这意味着帮助变量的赋能力跑到了它的预测边界。</p>
+<h3>3.2 范梅南：时机</h3>
+<p>范梅南（van Manen,
+1991）把教学机智——瞬间知道什么是正确行动——的情境判断写成核心。他的时机概念与本文的那一刻在时间尺度上接近，所以他是最难推开的对手之一。范梅南把教师瞬间的不为，称为一种熟练的、可辨认的伦理敏感性。在他那里，教师的暂停是一种专业敏感，不是能力不足。</p>
+<p>这个框架的致命处是它给自己留了后门：停顿可以被培训和模仿。教学机智传统会说本文所指是一种成熟的敏感，并且敏感可以被反思发现地练出来。正因为这个传统非常像本文的未来，本文要在它最关键的代理变量上动刀：敏感。</p>
+<p>分离点写实：<strong>若本文所指等于教学机智，那么一位越熟练、越能在时机敏感上精进的教师，它的真值度应当越高。</strong>但课堂观察常出现相反的现象：教师越知道自己”在这类时刻要忍住不说”，那个停顿越容易变成一种可预演的手势；学生嗅得出那个手势是留给他们的教学行为，而不是教师自己还卡在某个地方没出来的在场。本文预测：它的真值度不随时机掌握的熟练度单调上升，而在教师能够标记自己”这是机智”的那一刻转折下行。这一条在第五章成为命题
+L3。</p>
+<h3>3.3 波兰尼：不可言传</h3>
+<p>波兰尼（Polanyi,
+1966）写下我们知道的多于我们能说出的。本文所指的不可转述性，很容易被归入默会知识：教师有一层亲临现场的判断，说不出来，只能在旁观中传给少数敏者。</p>
+<p>必须承认，若只停在”不可说”上，本文已经没有路。需要把缝划在”不可说”之后。默会知识有两条路可走：一条是留在个人那里，作为一种不能交出却可以持续存在的能力；另一条是被修为化。尽管默会不可直接说出，但一个传统完全可以围绕它发展出一整套可名的修为——师徒之间不说门道，却知道谁是高手；医术不写进教科书，却传得出师。也就是说，默会知识虽然不可转述为命题，却可以被做得更纯熟，越纯熟越是一个完整的能力。</p>
+<p>这里藏着它吸收本文的咽喉。默会知识与”熟练”相容：一个老练的骑手，比新手更处于默会的深处。本文所指与”熟练”不相容：一旦教师把那一下的停顿练得顺手，它就死。波兰尼可以解释”为何它说不出来”，却解释不了”为何它一熟练就变质”。</p>
+<p>分离点写实：<strong>若本文所指是默会知识，那么它在教学经验积累中应当像其他默会能力一样趋于纯熟与得心应手；本文预测它在重复中趋向的是姿态而非纯熟。</strong>这是三位代理变量中最窄的一道缝，正因窄，它把默会知识挡在了外面，而不是把本文装进默会知识的客房。</p>
+<h3>3.4 布伯：在场</h3>
+<p>布伯（Buber,
+1923/1970）把人与人之间不以对方为对象的相遇视为关系的本体形态。这个框架的诱惑在于，本文所指似乎正是我—你相遇在教育上的一个影子：教师不把学生当作一件要修好的东西，而是和另一个正在卡住的人同处。</p>
+<p>本文不这么看，但必须给布伯一个真实的位子：他是离本文命题最远的近邻，也是唯一一位可能把本文完好地放回在场的对手。布伯说，相遇不能由任何一方发动或描述，不能从”我”这边带出去。这是本文与他共有的：它无法被搬走。</p>
+<p>裂隙在”分享”上。我—你相遇对在场者是双面成立、没有第三人的活动；本文所指的现场却天然带有第三人。学生之外，可能还有邻座、助教、旁听者。本文要求这些旁观者也不动，不上前捡起那一刻。也就是说，本文比布伯的相遇多一层”不该被捡起来”的约束。布伯没有处理”不捡”的结构，他只处理了相遇本身。</p>
+<p>分离点写实：<strong>若本文所指就是在场，那么它只依赖教师与学生的关系成立，而与第三人的转述无关；本文预测，即便教师与学生同场为真，只要第三人签收发生，它即离场。</strong>布伯预测它随在场而保真，本文预测它随签收而失效。</p>
+<h3>3.5 杜威：可接续的经验</h3>
+<p>杜威（Dewey,
+1938）在《经验与教育》中写道，每项经验都是从先前的经验里借走什么，又以一种方式改变后来经验的性质，这就是连续性。它的强度很高：杜威不是把本文所指说成经验中的瞬间，而是指出经验的”质量”全由它向哪一种后来经验走去决定。</p>
+<p>这个邻接不是消解吗？杜威能吸收本文之处，正是它能把一种东西接到下一个东西上。可本文所指恰好不是一条将经验延续下去的链。它不给之后的经验提供材料，因为它里面没有可搬的”内容”。若学生乙日后更会做这类题，或更敢提问，那都不是它本身的继续，而是它的余波转化成了学习收益。</p>
+<p>分离点写实：<strong>若它是经验，那么它在学生后续经过中被调用的痕迹应当存在；但本文预测，学生后续面对同类卡住时不会出现”调用作保”的连续经过，只会出现另一个与上次无关的停顿。</strong>杜威预测有，本文预测没有。</p>
+<h3>3.6
+代理坍缩：五个分离点合起来看</h3>
+<p>五位彼此很不同，却都在同一扇门前转过一圈而没进去。它们手里的代理——经验、帮助、时机、默会、在场——全是”它被做了之后”留下的可识别物。经验是它残影被接住的部分，帮助是它被误当为可提供的部分，时机是它被误为可训练的部分，默会是它被误为可传的部分，在场是它被误为纯关系成分的部分。</p>
+<p>把这些代理串起来，缺的正是本文所找的那一块：一次未被签收的、不提供任何可识别好处的、不把自己转化为经验或技艺或关系的断开。</p>
+<p>这五个分离点还有一个共同形态，值得单独指出：<strong>代理变量都能在它被做了之后成为可识别之物，而它本身是从未转化为可识别之物的。</strong>它们的共同特征不是”错”，是”迟”。这正是第二章从密码学搬来的那句话在教育里的落点：打开之后仍然有东西在，只是那个还在的东西已经不是原来那一个。</p>
+<hr />
+<h2 id="c6">四、数学教育自己的账本：布鲁索的教学契约与
+Topaze 效应</h2>
+<h3>4.1 本章为什么单列</h3>
+<p>第三章的五位来自教育学与教育哲学的一般传统。但本文写的是数学教育，而数学教育有自己的一套理论装置，其中一位与本文的距离比那五位近得多，近到必须单列一章来结账。这一位是布鲁索（Guy
+Brousseau）的数学教学情境理论，尤其是其中的教学契约与 Topaze 效应。</p>
+<p>必须先说明一件事：上一稿没有这一章。一篇讨论数学教育意义的论文，引了杜威、维果茨基、波兰尼、布伯，却没有引任何一位数学教育学者——这是选题与文献的错配，本文在此更正。</p>
+<h3>4.2 教学契约、去责与三阶段</h3>
+<p>布鲁索（Brousseau, 1997,
+2002）把师生之间关于所教数学知识的相互义务与期待的那一套隐含规则称为教学契约。契约的条款大多不成文：教师会给出学生解得了的题；题里含有解题所需的全部数据；学生尽力去解；最后教师会给出正确答案。</p>
+<p>一个完整的教学过程被分为三类情境。第一类是<strong>去责</strong>（devolution）：教师把一个”非教学情境”交给学生，说明要解的问题、适用的条件与成功的判准。第二类是非教学情境本身，其中的环境（milieu）支持学生自主的数学活动，而<strong>教师克制自己，不作出任何会指示出她希望出现的那个知识的介入</strong>。第三类是制度化，教师把学生新获得的东西接回学科的知识建构。</p>
+<p>这里已经有了本文所指的形状的一大半：教师克制、不给指示、把责任让渡出去。任何声称”教师不给解是有结构意义的”的主张，都要先经过布鲁索这一关。</p>
+<h3>4.3 Topaze 效应</h3>
+<p>更近的是 Topaze 效应。名字取自帕尼奥尔（Pagnol,
+1928）的同名剧本：剧中教师在听写时几乎把学生反复拼错的那个词一个字母一个字母地念给他。布鲁索用它指称这样一种现象：<strong>学生遇到困难时，教师以某种方式替他把这个困难消掉；教师简化任务，使学生仅凭读出教师的问句与既有知识就能得到正确答案，于是教师承担了绝大部分工作，而目标知识完全消失。</strong></p>
+<p>请注意这句话的结构：不是”学生学得少了”，是”目标知识完全消失”。这与本文的命题
+L2（打开即销毁）几乎同形。</p>
+<p>更近的还有一层。已有工作把教学契约与 Topaze
+效应直接用在大模型时代的数学教学上，指出生成式模型满足了任务的可见条件——产出正确答案——却不满足其教育目的，这正是
+Topaze
+效应的系统化：学生给出正确输出，而数学知识完全留在人工制品那一侧。这一支与本文的缘起之问落在同一格。</p>
+<h3>4.4 本文欠布鲁索的账（明账）</h3>
+<p>先把账认清楚，再谈残量。</p>
+<p>第一，“教师替学生消掉困难，目标知识随之消失”这一判断，不是本文的发现。它在数学教育里有名字、有年份、有整套理论位置。本文第五章的
+L2 是它的一个特例。</p>
+<p>第二，“教师克制不给指示是一种有结构意义的教学动作”，也不是本文的发现。去责这个概念就是为它造的。</p>
+<p>第三，本文所用的”契约”式语汇——签收、认领、转述——在布鲁索的框架里有对应物：契约的破裂与重签。</p>
+<p>把这三条摆出来之后，本文的位置窄了很多。这是应该的。</p>
+<h3>4.5 三条本文能说而 Topaze
+说不了的推论</h3>
+<p>残量有三条，各自带一个可判决的对照预测。</p>
+<p><strong>残量一：第三人。</strong>Topaze
+效应是一个师生二元的现象——教师泄漏，学生接收，知识消失。布鲁索的框架里没有旁观者的位置。本文的命题要求：即使教师一个字也没有泄漏、学生一个字也没有接收，只要<strong>在场的第三人事后把那一刻转述出来</strong>（“刚才老师那儿其实是没过去”），该次持有同样离场。对照预测：在有旁观者的课堂与无旁观者的课堂里，同样的教师克制行为，其后果不同。Topaze
+效应对此没有预测。</p>
+<p><strong>残量二：教师自己也没有解。</strong>Topaze
+效应描述的是教师<strong>有解而泄漏</strong>。本文所指的是教师<strong>无解而持有</strong>。这两者在行为表面上可能一模一样（都是不给下一步），在结构上完全相反：前者是持有解的人把解漏出去，后者是不持有解的人把一个缺口维持住。对照预测：若把课堂里的教师克制按”教师是否已有解”分为两类，Topaze
+效应的机制只在第一类里起作用；本文的机制只在第二类里起作用。这是一个可以用课后教师访谈加课堂录音交叉编码的检验，本文未做，写入第十一章。</p>
+<p><strong>残量三：熟练方向。</strong>布鲁索的框架里，教师对去责的掌握越好，教学情境的质量越高。本文的
+L3
+预测相反：教师对”忍住不说”越熟练，本文所指的真值率越低。两者在同一个自变量上给出方向相反的预测，这是本文与布鲁索之间最硬的一条缝。</p>
+<p><strong>必须写明的一句：</strong>残量三与残量二互相支撑，也互相拖累。若教师的”无解”本身可以被练成一种姿态（教师熟练地表演自己没有解），那么残量二的分类就不可靠，残量三的方向也无从检验。本文没有解决这个问题，只把它标出来。</p>
+<h3>4.6 Chevallard 与本文的关系</h3>
+<p>顺带处理另一位数学教育学者。Chevallard（1985/1991）的教学转位描述了学术知识在进入课堂前被改造为可教知识的过程。本文与他没有正面冲突，但有一处可用的接口：教学转位处理的是<strong>知识如何被改造为可教的</strong>，本文处理的是<strong>一种在原则上不能被改造为可教的东西</strong>。若本文所指真的存在，它是转位链条上的一处结构性断点。本文不主张这个断点具有制度上的重要性，只主张它在概念上不能被转位吸收。</p>
+<hr />
+<h2 id="c7">五、Z 的定义：作保与不签收</h2>
+<p>本章给出定义。上一稿把这一章的位置留在结构预告里而正文缺失，这是一处结构性缺陷；本章补上。</p>
+<h3>5.1 名字</h3>
+<p>本文把所指的这一块材质叫作<strong>作保</strong>。这不是现成的教育学术语。它指这样一件事：</p>
+<blockquote>
+<p>一个面对自身未解之事的人，不把这件事转成一个可交付的答案，而把一个缺口保持在另一个正在卡住的人面前，并以这个保持本身作为对方继续卡住的理由。</p>
+</blockquote>
+<p>作保不是”帮他解决问题”，因为帮的那个”界”在作保里没有被跨过；作保也不是建立关系，因为被作保的那一位并不需要对作保者产生评价性的好感。作保是一个结构，不是一种态度。它要求作保者不完全站在学生的外部，也不能完全并进学生的卡住里。</p>
+<p>作保所以脆弱，是因为它没有外衣可分给任何第三人去记录。一个人若曾替另一个人作保，事后他不能把这件事写进工作量表里，听者也不能从第三人口中把它确认。</p>
+<h3>5.2 零情态定义</h3>
+<p>作保是一次持有，当且仅当以下三条同时成立：</p>
+<p><strong>（一）无解条件。</strong>在该时刻，作保者对该处不持有一个可交付的解。这里的”可交付”指：可以在当前课堂时间内以命题形式给出并被对方接收。</p>
+<p><strong>（二）不签收条件。</strong>在该时刻及其后，尚未发生任何一次签收动作（见
+5.3）。</p>
+<p><strong>（三）在位条件。</strong>作保者在场且未撤出，且未把该处转交给第三方装置（包括不把它转给模型）。</p>
+<p>三条中任何一条不成立，该次持有不成立或已终止。定义中不含任何程度词，不含”真诚”“用心”“敏感”一类不可外部判定的谓词——这是本文与教学机智传统在定义层面的第一道分界。</p>
+<h3>5.3 三个签收动作与排除标准</h3>
+<p><strong>签收动作一：学生指认。</strong>学生以言语把该处认领为一件已发生的、对他有好处的事。判据句型：主语落在教师身上且谓语为评价性动词。示例：老师刚才没说话／老师那样其实是让我自己想。
+排除：学生对题目本身的陈述（这一步我还是不确定）不算指认。</p>
+<p><strong>签收动作二：教师补叙。</strong>教师事后对该处作出说明，把自己的停顿归因于一个教学意图。判据句型：主语为教师且含目的状语。示例：我刚才是想让你们自己试试。
+排除：教师对题目本身的补充说明不算补叙。</p>
+<p><strong>签收动作三：第三人转述。</strong>在场的第三人（邻座、助教、旁听者、听课教师）事后向他人复述该刻，且复述的谓语落在教师身上。
+排除：第三人对题目内容的复述不算转述。</p>
+<p>三者任一发生，作保即迁移——它不是消失为无，它变成另一个对象：一件可库存的教学手艺，或一段可回忆的关系温度。这两个对象都是实在的，都有价值，但都不是作保。</p>
+<h3>5.4 三条命题</h3>
+<p><strong>L1　不可自签。</strong>作保不能由持有者自己宣布成立。形式表述：不存在任何由作保者单独执行的动作
+a，使得执行 a 之后作保的成立性得到确认。
+　依据从承诺方案取：承诺者不能自证隐藏性；隐藏性只能由验证者一侧的不可区分性定义。
+　可判错处：若能找到一种教师自我报告方式，其结果与不知情观察者的编码显著一致，则
+L1 为伪。</p>
+<p><strong>L2　打开即销毁。</strong>签收不是把作保读出来，而是把它映射成另一个对象，且该映射不可逆。形式表述：设签收动作为
+R，则 R(Z) ≠ Z 的一次读出，而是 Z → Z′ 的替换，且不存在 R⁻¹。
+　依据从承诺方案与会计取：打开之后隐藏性永久失去；确认之后事项性质随之改变。
+　可判错处：若存在一个课堂事件，它被学生当场认领为帮助、被复述、被教师事后补叙，而在第三人复述中仍保持作保的性质不衰，则
+L2 为伪。</p>
+<p><strong>L3　熟练反向。</strong>随着教师对”忍住不说”这一动作的熟练度上升，作保的真值率在某个临界点之后单调下降。
+　依据从会话分析取：修复偏好的后果是所有权，而熟练的抢修者恰恰更快地取走所有权。
+　可判错处：若在一段时间窗内，教师的克制熟练度上升而作保真值率的独立编码结果同步上升，则
+L3 为伪。
+　<strong>这一条是本文与维果茨基、范梅南、布鲁索三家同时相反的地方</strong>：三家都预测教师越熟练越好，本文预测越熟练越死。</p>
+<h3>5.5 与承诺方案的形式对照</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>承诺方案</th>
+<th>本文所指</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Commit(m, r) → c 公开，m 不可见</td>
+<td>教师在无解处停住，缺口在场而内容不可交付</td>
+</tr>
+<tr class="even">
+<td>隐藏性：验证者不能从 c 得知 m</td>
+<td>不签收：在场者不能把该处认领为任何已知类别</td>
+</tr>
+<tr class="odd">
+<td>绑定性：承诺者不能改口</td>
+<td>在位条件：作保者不能事后改述该处</td>
+</tr>
+<tr class="even">
+<td>打开：公布 (m, r)，隐藏性永久失去</td>
+<td>签收：该处被指认／补叙／转述，作保迁出</td>
+</tr>
+<tr class="odd">
+<td>完美隐藏与完美绑定不可兼得</td>
+<td>完全不可指认与完全可追责不可兼得（见 11.3）</td>
+</tr>
+<tr class="even">
+<td>不设打开阶段的一次性隐藏</td>
+<td>从未被任何人捡起的那一次</td>
+</tr>
+</tbody>
+</table>
+<p>对照表的用处不在修辞。它规定了本文可以说什么、不可以说什么。例如：承诺方案里没有”打开得越晚越好”这条，所以本文也不主张”停得越久越好”；承诺方案里
+c 是公开的，所以本文要求缺口必须在场可见，而不是教师心里的一个念头。</p>
+<h3>5.6 本文明确不主张的四件事</h3>
+<p>第一，本文不主张作保是一种可培训的教师技能。若它可培训，L3
+为伪，本文垮掉。
+第二，本文不主张作保比帮助更重要。帮助有它自己的完整闭环与充分证据，本文对它没有意见。
+第三，本文不主张学生在作保之后学得更好。本文对学习成效不作预测——这是本文与所有效果研究的分界线。
+第四，本文不主张这一结构可以被写进任何教师评价表。凡把它写进评价表的做法，按
+L1 与 L3 都会当场把它变成姿态；这是本文自带的反噬预言。</p>
+<hr />
+<h2 id="c8">六、第二根轴与二维辨别格</h2>
+<h3>6.1 单维不足以支撑一条判断</h3>
+<p>Z
+若只站成一条线，它就是又一个新名词。名词会旧，旧了就有人来认亲。只有在 Z
+上叠一条与之不重合的轴，它才从”命名一个现象”变成”划开一处此前混在一起的区别”。</p>
+<p>先排除两个看起来最顺手的候选。</p>
+<p><strong>候选一：教师经验多少。</strong>把横轴设为教师经验，纵轴设为签收快慢，四格也能画出来。这个候选很好排除：最险的一格会落在”无经验且早签收”，那就没有任何新意——没经验的教师被学生当场感谢，场面轻松，作保早就没了。本文要说的最险处，不是新手教师因不熟练而弄丢了那一刻，而是越熟练、越善意、越及时，才越早签收。若把危险写在新手身上，第三章那几位对手自动没事了。</p>
+<p><strong>候选二：学生是否求助。</strong>这根轴正是最近邻阵营里最宽的一条度量。把横轴设为学生事后是否主动求助，恰好落进支架逻辑：求助频率高，支架起了效；求助频率低，失败。无论布伯还是范梅南，都能在这根轴上顺利转弯。</p>
+<p><strong>候选三（必须排除且上一稿排得不干净）：是否被某个理论所承认。</strong>这根轴与
+Z
+有成因关系——作保者之所以会跨进签收那一半，部分正是因为存在一个被承认的场所。若把它做成轴，Z
+的一部分成因就跑进了第二轴，两轴互为因果，本文等于自证第二轴不独立。故从结构上拒掉。</p>
+<h3>6.2 第二根轴：共场</h3>
+<p>本文第二轴用<strong>共场</strong>：签收发生时，现场除了师生，还有没有第三人在同一事件中。</p>
+<p>它满足”结构独立”的要求，且与 Z
+只有场地关系、没有因果从属。它回答的不是”签收快还是慢”，而是”该处是否具备被转述出去的条件”。共场不产生签收，签收也不因为共场才发生；它们只在一个点上交会。</p>
+<p>过两条纪律。第一条：把这根轴删掉，本文的辨别格、裁决表与证伪条款会不会塌掉？答：会。如果没有共场这根轴，签收就只剩下快慢，而快慢无法托出最险一格。最险一格恰恰不在签收快慢上，而在”旁边有人却没有人拦”的处境里。</p>
+<p>第二条，正交声明：本文不主张共场与 Z
+正交。二者相关，但不重合。共场密集处，签收频次确实高；这是相关，不是因果。本文只说：共场与签收相关，而作保只在”共场中的不签收”这一个点上才成立。</p>
+<h3>6.3 四格与各家的相反预测</h3>
+<p>纵轴共场有无：低处是仅师生两人，高处是有第三人同在。横轴签收有无：低处是未签收，高处是被指认、被补叙、被转述。</p>
+<p><strong>第一象限（高共场 ×
+低签收）。</strong>现场有第三人，但没有任何人把那一刻捡起来。作保若在课堂里发生，只能在这格发生。维果茨基面对这一格的预测是：若没有学生把帮助认领出来，作保无法进入内化，所以它不能真正成立；布伯会承认这格里有真实相遇，但会说这就是相遇本身；范梅南会把它说成教师”让沉默自己起效”的机智；波兰尼会说这格是不可言传的一例，名目不点也能在。本文预测不同：作保在这一格里成立，不是因为它可以被说成某一种东西，而是因为四个人都没把它说成什么。</p>
+<p><strong>第二象限（低共场 ×
+低签收）。</strong>只有师生两人，也没有签收。这是作保最原初、最窄的发生面。本文预测：教育意义在这一格不进入任何可查记录，也无法形成任何库存。杜威会把这一格改写成经验连续性的时刻，并预测它能被下一次经验重组所继承；但这里没有可被重组的事件。</p>
+<p><strong>第三象限（低共场 ×
+高签收）。</strong>这一格在文献里最多见，它的名字叫”帮助”。学生说”我懂了”，教师说”我在这里”，两人把话接过去了。维果茨基认为这一格是教师介入后最成功的样子。本文预测，这一格若被当作作保来记，它就已经不是作保。它是帮助，是差异推进的完整闭环。意义当然有，但不是本文所指的意义。</p>
+<p><strong>第四象限（高共场 ×
+高签收）。</strong>这是本文的最险一格。因为这个场里签收不止发生了一次，而是先有在场的第三人把那一刻拾起来，后有或先或后的转述，前一次与后一次互相作证。课堂场面愉快，有人补录了方法，有人总结了意义。这里最险，不是因为它作保失败——最普通的课堂都是这一格——而是因为它看起来全然无害，甚至看起来比第三格更接近作保：在场的人看见了，看见的人没有打扰。可本文的预测在这一点上与任何”教学机智可被用来提升作保”的建议都相反：凡走进第四格的作保，无论签收者是谁，都将在若干次复述之后平滑转入”有分寸地不说话”这一姿态。此后教师越真诚，复述越感人，课堂越证明”这位老师懂得留白”，那一刻越是被清扫干净。</p>
+<h3>6.4 整张格的要害</h3>
+<p>作保不因为这些格里有否教育而消失，而因为”被打捞”而消失。最险的一格不在没有教师的失败处，而在人人以为作保已经发生的成功处。这正是本文为什么必须取共场这根第二轴：没有它，就没有第四格；没有第四格，就没有一处能让杜威、范梅南与维果茨基同时给出相反预测。</p>
+<hr />
+<h2 id="c9">七、可观测代理、误诊阻挡与预注册</h2>
+<h3>7.1 三个代理</h3>
+<p><strong>代理甲：公开未决判计数。</strong>教师口头发出一句”这里我尚未解决”“这点我没有把握”“这个问题我还在想”“目前我还不能确认”等陈述，句子的基本结构是”我”作为主语，表示一个尚未闭合的状态；并且该句不是教师为了考学生而预设的教学空白。排除标准：教师说”你们猜”“你们再说说看”这一类互动邀请，不算公开未决判。每个未决判必须被另一名不知研究目的的编码者二次判断，两个编码者一致才算一例。</p>
+<p><strong>代理乙：无邀请的自主追问计数。</strong>指学生主动提出一个本课尚未规定的、明确以”为什么”或”是否可以”引进新对象的问题，且提出之前课堂没有教师点名或教案预设。排除：若该问题属于教师刚布置的作业，必须排除。</p>
+<p><strong>代理丙：复述文本的谓语归属。</strong>课堂后三天内，由学生在自然场合复述”老师当时没有立刻说话”那一幕，或第三方在听课组中重述那一幕。把复述句按谓语落在”教师对我的态度”（他保护我、他很聪明、他很有分寸）或谓语落在”缺口本身”（那地方就是过不去、那个断口还在）分为两类。只有后者接近作保的仍在；前者无论语气多温柔，都是签收。</p>
+<h3>7.2 三条误诊阻挡</h3>
+<p><strong>其一：</strong>教师公开未决判的次数多，但学生自主追问没有下降，反而上升。这属于教师把未决判作为教学手段使用，不是作保的耗竭。此时不能判为作保死亡，只能判为”未决判被教学化”。</p>
+<p><strong>其二：</strong>教师未决判次数高、学生追问降，但追问降是因为整个班进入复习、备考，没有新对象进入讨论。这类下降不是作保死亡，是问题源头被暂时关掉了。因而必须在”无邀请的自主追问”之前加”无关闭”条件。</p>
+<p><strong>其三：</strong>学生复述教师态度多、缺口型复述少，但该学生在之后的隔夜卡住中坚持时间更长。本文不把”复述缺口感”与”卡住坚持时长”机械等价。被作保的经验若存在，它不让人更擅长求助，也不让人更持久地熬。它让人在缺口里不塌。这个”不塌”极难被一个姿势强度代表。</p>
+<h3>7.3 一处必须写清的方法论限制</h3>
+<p>上述三个代理测得出的，都是签收那一半。作保本身只能以这不签收的一半的不可证实来显示自己。它不站在可观测代理的任何一项里。这也正是本文与代理变量拉开距离的最后一处：代理量测得出，作保量不是测不出，而是一测就错。</p>
+<p>因此本文对检验结果的态度必须事先写死：<strong>只有当结果对本文不利时，这次检验才是有信息量的。</strong>若结果顺本文，本文必须先怀疑自己是不是在测另一样东西。第八章的结果正好落在前一种情形。</p>
+<h3>7.4 预注册</h3>
+<p>本文在取数之前封存了预注册文本（附录 B 全文，SHA-256 见附录
+C），三条假设与撤销规则如下：</p>
+<ul>
+<li><strong>H1（分化方向）</strong>：对话内不供给类教师动作密度与学生思辨性作答率的相关。本文预测
+ρ＜0；Rowe（1974, 1986）预测 ρ＞0。p＜.01
+时按符号定胜负，否则记为不可判。</li>
+<li><strong>H2（签收即离场）</strong>：以对话内首次供给类动作为切点，比较切点前后的学生思辨性作答率。本文预测后＜前。</li>
+<li><strong>H3（谓语归属）</strong>：学生出现态度型表达与出现缺口型表达之后，后续思辨性作答率的降幅比较。本文预测态度型降幅更大。</li>
+<li><strong>撤销规则</strong>：若 H1 的 ρ
+显著为正，则”反向分化”不得作为作保死亡的一般信号，正文必须写明反面结果，并把该判据降级为限定于人—人课堂的假设。H2
+若不成立，本文”签收即离场”的序列侧证据为零，只保留事件级的语义定义。</li>
+</ul>
+<hr />
+<h2 id="c10">八、检验：2,262 段数学辅导对话</h2>
+<h3>8.1 语料与选它的理由</h3>
+<p>语料取 MathDial（Macina et al., 2023）训练集：2,262
+段数学辅导对话，共 28,320 个话轮，其中教师话轮 14,910、学生话轮
+13,410。每段对话围绕一道学生已经给出错误解法的应用题展开，教师一侧是真人教师，学生一侧由语言模型扮演；教师的每个话轮自带动作标签：探询（probing，3,300）、聚焦（focus，5,549）、告知（telling，2,493）、一般（generic，3,566）。</p>
+<p>选它有两个理由，也各带一处代价。</p>
+<p>理由一：它是公开可得、可复算的数学辅导对话语料，教师动作已由数据构造者标注，不需本文自行编码，因而不受本文立场影响。代价：这套标注体系不是为本文设计的，“探询＋聚焦”只是”不供给”的近似，不等于本文定义中的无解条件。</p>
+<p>理由二：它的学生一侧由模型扮演，这在别的研究里是缺陷，在本文里恰是题中之义——本文问的正是大模型进入之后的数学教育。代价更重：模型学生的行为不是学生的行为，本节所有结论都限定在这一介质内，不得外推到人—人课堂。这一条写在结论里，不藏在局限里。</p>
+<p>按预注册定义：不供给类 U ＝ 探询 ∪ 聚焦；供给类 G ＝
+告知。学生思辨性作答按固定词表判定（I think／maybe／not sure／I
+guess／perhaps／probably／might be／could be／I wonder
+等），这一指标取自
+Rowe（1974）自己报告的六条结果之一——延长等待时间之后，学生的思辨性作答增加。选它是为了让本文与
+Rowe 在同一把尺子上比。</p>
+<h3>8.2 H1：不可判</h3>
+<p>对话层，不供给密度与学生思辨性作答率的 Spearman 相关：<strong>ρ ＝
+−0.019，p ＝ 0.386，n ＝ 2,018</strong>。</p>
+<p>方向与本文一致，但完全不显著。按预注册规则，<strong>H1
+记为不可判</strong>，不计入本文的胜负。</p>
+<h3>8.3 话轮层：Rowe
+的方向命中，本文在此败</h3>
+<p>把话轮层的条件概率按预注册定义算出来：</p>
+<table>
+<thead>
+<tr class="header">
+<th>前一个教师动作</th>
+<th>话轮数</th>
+<th>学生思辨性作答率</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>探询 probing</td>
+<td>3,233</td>
+<td>0.62%</td>
+</tr>
+<tr class="even">
+<td>聚焦 focus</td>
+<td>5,407</td>
+<td>0.39%</td>
+</tr>
+<tr class="odd">
+<td><strong>不供给类 U 合计</strong></td>
+<td><strong>8,640</strong></td>
+<td><strong>0.47%</strong></td>
+</tr>
+<tr class="even">
+<td>告知 telling</td>
+<td>2,253</td>
+<td>0.13%</td>
+</tr>
+<tr class="odd">
+<td>（一般 generic）</td>
+<td>2,515</td>
+<td>2.15%</td>
+</tr>
+</tbody>
+</table>
+<p>不供给之后 0.47%，供给之后 0.13%，<strong>OR ＝ 3.58，Fisher 精确检验
+p ＝ 0.023</strong>。</p>
+<p>方向是清楚的：<strong>教师不供给之后，学生更可能给出思辨性作答；教师一旦供给，思辨性作答几乎消失。</strong>这正是
+Rowe
+五十年前报告的方向，不是本文第六章所预测的”未决判上升而学生一侧下降”。</p>
+<p>本文在这一条上输了，而且输得干净。必须同时写清三件事，一件是本文的，两件是对本文有利也不能藏的：</p>
+<p>其一，事件数极少：不供给类里 41 例，供给类里 3
+例。这个效应脆弱，不宜承重。 其二，“一般”这一类的思辨性作答率
+2.15%，比任何一类都高，而它在本文的框架里没有位置。这说明这套动作标签与本文的分类之间有明显错配。
+其三，本文的预测本来就不是关于<strong>单次动作之后的下一轮</strong>，而是关于<strong>一段时间窗内两个序列的分化</strong>。话轮层的这个结果并不直接证伪第六章的判据，但它足以说明：本文没有资格在缺乏人—人课堂序列数据的情况下，把”未决判升而追问降”当成一个已知事实来用。</p>
+<h3>8.4
+H2：表面命中，被三个安慰剂切点推翻</h3>
+<p>以每段对话中<strong>首次告知</strong>为切点，比较切点前后的学生思辨性作答率：</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>切点</th>
+<th>n</th>
+<th>切点前</th>
+<th>切点后</th>
+<th>Δ</th>
+<th>Wilcoxon p</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>真切点：首次告知</strong></td>
+<td>722</td>
+<td>0.99%</td>
+<td>0.17%</td>
+<td>−0.81%</td>
+<td>0.0013</td>
+</tr>
+<tr class="even">
+<td>安慰剂①：首次聚焦</td>
+<td>616</td>
+<td>1.70%</td>
+<td>0.25%</td>
+<td>−1.46%</td>
+<td>6.2e−05</td>
+</tr>
+<tr class="odd">
+<td>安慰剂②：首次探询</td>
+<td>367</td>
+<td>2.47%</td>
+<td>0.34%</td>
+<td>−2.12%</td>
+<td>2.7e−04</td>
+</tr>
+<tr class="even">
+<td>安慰剂③：位置匹配的任意教师轮</td>
+<td>1,561</td>
+<td>1.03%</td>
+<td>0.25%</td>
+<td>−0.78%</td>
+<td>3.3e−05</td>
+</tr>
+</tbody>
+</table>
+<p>真切点显著，Δ ＝ −0.81%，p ＝ 0.0013。若只报这一行，H2
+命中，本文赢。</p>
+<p>但三个安慰剂切点全部给出<strong>同向且更大</strong>的降幅。安慰剂③是位置匹配的任意教师轮——它与真切点的相对位置中位数（0.571）对齐，除位置外不含任何”签收”含义——其降幅
+−0.78% 与真切点的 −0.81% 几乎相同。</p>
+<p>结论只能是一条：<strong>这一降不属于签收，属于对话内的自然收敛。</strong>随着对话推进，学生（此处是模型学生）的表述趋于确定，与教师此刻做了什么无关。</p>
+<p><strong>本文据此判 H2
+未成立，并撤回”签收即离场”在序列侧的胜负主张。</strong>第五章的 L2
+只保留为事件级的语义定义（即：被签收之后的那个对象与被签收之前的不是同一个），不再声称已有序列证据。</p>
+<p>这一处值得单独说一句。上一稿在类似的位置上写的是”本文无法把胜利和课程难度分开”——那是把混杂留在纸上。本节做的是另一件事：把混杂做成安慰剂，让它当场把本文推翻。两者的差别是可裁决与不可裁决的差别。本文宁愿要后者的结果，也不要前者的悬置。</p>
+<h3>8.5
+三条本文事先没有预料到的读数</h3>
+<p>同一批数据上，三条描述性读数比上面两条假设更值得记下来。</p>
+<p><strong>读数一：学生一侧的两类表达，比例 188∶1。</strong>13,410
+个学生话轮中，态度型表达（thanks／that helps／you’re right／got
+it／makes sense 等，谓语落在教师身上）<strong>564 条，占
+4.206%</strong>；缺口型表达（I don’t get／why is／where did／I’m
+confused／I’m stuck 等，谓语落在问题本身）<strong>3 条，占
+0.022%</strong>。比例 <strong>188∶1</strong>。</p>
+<p>这一条正是第七章代理丙所要区分的那两类，而在这一介质里，缺口那一侧几乎不存在。本文的负库存在这里没有分母。</p>
+<p><strong>读数二：学生自发提问占 0.664%。</strong>含问号的学生话轮 89
+条。本文第七章代理乙的整个计数纲领，在这一介质里落在一个几乎没有方差的量上。</p>
+<p><strong>读数三：教师公开说出”我还不知道”的话轮占
+0.060%。</strong>14,910 个教师话轮中，符合本文代理甲词表的仅 <strong>9
+条</strong>。也就是说，本文提出的第一个可观测代理，在大模型中介的数学辅导里，出现频率是万分之六。</p>
+<p>这三条读数的方向都对本文的诊断有利，对本文的测量纲领不利，本文两边都不藏：<strong>在这一介质里，本文所说的那样东西的可观测一侧几乎不存在</strong>——这既是”缺口被系统清除”这一诊断的一个极端例证，也说明本文提出的三个代理在这一介质里无法承担判决职能。</p>
+<h3>8.6 这次检验改判了什么</h3>
+<p>一、第六章的”反向分化”判据，从”作保死亡的一般信号”降为”限定于人—人课堂的待检假设”，且必须先在有教师无解标注的语料上重做（见
+4.5 残量二）。 二、L2 撤回序列侧主张，只保留事件级定义。 三、H3
+无法执行：缺口型表达在语料中仅 3 例，本文如实记为不可判，不作任何推断。
+四、本文新增一条此前没有的经验读数（态度型与缺口型
+188∶1），并把它写进结论——它不是本文预注册的假设，因此只作探索性证据，不进入胜负结算。</p>
+<hr />
+<h2 id="c11">九、与等待时间研究的正面对照</h2>
+<h3>9.1 Rowe 的六条结果</h3>
+<p>Rowe（1974,
+1986）在数百节小学科学课的分析之后报告：教师提问之后的停顿通常不足一秒；当停顿延长到三秒以上，学生一侧出现六项变化——作答变长；无作答的情况减少；思辨性作答增加；学生之间比对数据的次数增加；证据—推断类陈述增加；<strong>学生提问的次数增加</strong>。</p>
+<p>第六条与本文第六章的判据方向相反。本文预测教师公开未决判上升而学生自主追问下降；Rowe
+报告教师停顿延长而学生提问上升。这不是一个远处的对手，这是同一把尺子上的相反读数，而且对方有五十年的重复研究与训练方案。上一稿完全没有提到这一支，是一处必须更正的缺口。</p>
+<h3>9.2 两条预测在哪一点上分岔</h3>
+<p>本文并不打算否认 Rowe
+的结果，也没有资格否认。本文要做的是把分岔点找出来。</p>
+<p>分岔点在一个变量上：<strong>停顿时教师手上有没有解。</strong></p>
+<p>Rowe 研究的是 wait time 1 与 wait time
+2——教师提问之后的停顿、学生作答之后的停顿。在这两种情形里，教师手上都有一个可交付的解，他只是延后交付。用第四章的语言说，这是布鲁索意义上的去责：教师知道答案，并有意让出时间。</p>
+<p>本文所指的是另一种停顿：教师手上没有解。这一种在 Rowe
+的编码体系里不出现，因为它不是”提问后的等待”，它不是任何一次提问的第二拍。</p>
+<p>由此得到一条可判决的对照预测：</p>
+<blockquote>
+<p>把课堂里的教师停顿按”教师此刻是否已有可交付的解”分为两类。Rowe
+的六条结果应当在第一类里复现；本文的
+L3（熟练反向）只在第二类里成立。若把两类合并统计，两种效应互相抵消，得到的将是一个接近零且不稳定的相关——这恰好是第八章
+H1 得到的结果（ρ ＝ −0.019，p ＝ 0.386）。</p>
+</blockquote>
+<p>这条读法是事后的，本文不把它当作证据，只把它当作下一次预注册的假设写下来。检验方式：课堂录音加课后即时教师访谈（对每一次停顿，教师在当日回答”那一刻你手上有没有一个可以给出的下一步”），由不知情编码者交叉编码。这是本文能想到的最便宜的一次判决性检验，本文没有做。</p>
+<h3>9.3 本文现在只能说的话</h3>
+<p>把第八章与本节合起来，本文当前的经验地位是：</p>
+<p>一、事件级的结构定义（第五章
+5.2、5.3）未遇反例，但也未获正面证据；它目前是一个定义，不是一个发现。
+二、序列级的判据（第六章、第七章）在唯一跑过的介质里未成立，且被安慰剂推翻。
+三、与最近的实证对手（Rowe）之间，本文只有一条尚未执行的分离设计。
+四、与最近的理论对手（布鲁索）之间，本文有三条残量，其中两条互相拖累。</p>
+<p>这四条摆在一起，本文的位置是：一条尚可持有的假设，不是一条已被支持的结论。本文不因不利就换命题——换命题换的是胜负，不是事实。</p>
+<hr />
+<h2 id="c12">十、其余分界</h2>
+<h3>10.1
+埃尔斯特：本质上是副产品的状态</h3>
+<p>埃尔斯特（Elster,
+1983）在《酸葡萄》第二章处理”想要却不能想要的东西”：有些心理与社会状态只能作为为着别的目的而行动的副产品出现，永远不能被有意图地带出来，因为试图带出来这件事本身就排除了它。他把这类状态称为本质上是副产品的状态，把刻意追求它们称为副产品的道德谬误。自发性是他的标准例子。</p>
+<p>这是本文最贵的一处欠账，仅次于布鲁索。本文的 L1（不可自签）与
+L3（熟练反向）在形式上都是这一类的实例：一旦持有者刻意去做，它就不成立。本文不主张这是自己的发现。</p>
+<p>残量在一处：埃尔斯特处理的是<strong>行动者自己的意图</strong>——我不能有意图地使自己自发。本文的三个签收动作里，只有”教师补叙”落在这一处；“学生指认”与”第三人转述”是<strong>他人的动作</strong>，与持有者的意图无关。也就是说，本文主张的是一个更强的条件：不但持有者不能自签，任何在场者的认领也会终止它。埃尔斯特的框架不预测这一条，也不排除这一条。</p>
+<p>对照预测：若一次持有在持有者完全无意图的情况下发生，而由一位从头到尾未与持有者交流的第三人事后转述，埃尔斯特预测它不受影响（因为持有者的意图未被污染），本文预测它已经迁移。这一条可用课堂录音加旁听者访谈检验，本文未做。</p>
+<h3>10.2 朗西埃：无知的教师</h3>
+<p>朗西埃（Rancière,
+1987/1991）以雅科托的故事立论：一位不懂学生语言的教师，仍然教会了学生；由此他攻击”讲解”这一整套装置，主张讲解者制造的是无能，教学可以在教师不懂的情况下发生。</p>
+<p>“教师自己也没有解”这个位置，是朗西埃整本书的位置。本文第三章 3.1
+那句”支架要求进入的地方，教师自己也没有解”，若不点名朗西埃，就是未标注的重述。本文在此点名。</p>
+<p>分界在目标上。朗西埃要证明的是<strong>平等可以被预设</strong>，讲解的等级关系可以被取消；他的对象是教学的政治结构。本文要处理的是一次持有的真值条件，是一个时间尺度上以秒计的事件。两者可以同时为真而互不蕴含：朗西埃的无知教师完全可以在课后被学生感谢、被同事转述、被写进方法论——按朗西埃的框架这没有任何损失，按本文的
+L2
+那一次持有已经迁移。<strong>这是两条相反的预测，可以放在同一份材料上判。</strong></p>
+<h3>10.3 戈夫曼：参与框架</h3>
+<p>戈夫曼（Goffman,
+1981）的立足点（footing）与参与框架把”在场者”细分为被承认的参与者、旁听者、偷听者等一系列参与地位，并指出说话人对听者身份的判断会随时改变话语的组织方式。</p>
+<p>本文第六章的第二根轴——共场——在形式上就是参与框架的一个粗化版本：有没有第三人在同一事件中。本文不主张这根轴是自己造的；戈夫曼早已把在场者的分类做完，而且做得比本文细。</p>
+<p>残量：戈夫曼处理的是<strong>参与地位如何改变话语的组织</strong>，本文主张的是<strong>参与地位的一个后续动作（转述）如何改变一个已发生事件的性质</strong>。前者关于话语生产，后者关于事件的真值。本文因此可以从戈夫曼那里借来一个更好的操作化：把共场按参与地位分级（被承认的参与者／旁听者／偷听者），并预测转述的效力随参与地位递减——这是本文能给出而戈夫曼不给的一条预测，也是本文未做的一次检验。</p>
+<h3>10.4 布尔迪厄与阿吉里斯</h3>
+<p>布尔迪厄（Bourdieu,
+1977）的多沙（doxa）指一个世界内被当作自然而不被讨论、甚至在可争论性之前的那一层。本文的”不被认领”在某些地方会长得像多沙的一个特例。两者相反：多沙在被指认前是覆盖全场的背景，一旦有异见者出现，它转入正统教义被正面辩护；本文所指在被指认后则直接消失。</p>
+<p>阿吉里斯（Argyris,
+1990）的”不可讨论者”更近一步：组织里有若干议题连”不可讨论”这件事本身都不能讨论。若把课堂视为一个组织，本文所指或许就是课堂中不可讨论的一块。但阿吉里斯的对象是组织防御：不可讨论被维持，是为了保护一个被共同需要的结构不塌；本文所指的不被签收，不是为了维护什么东西，而是它只能在不被签收的那一刻存在。本文与这两位在形态上撞见，在机制上分道。</p>
+<h3>10.5 比斯塔</h3>
+<p>比斯塔（Biesta,
+2013）论”教育之美丽的风险”：教育不是一套可保证结果的生产程序，主体化这一维度在原则上不可被工艺化。本文的方向与他相合，但本文不满足于”不可保证”这一层——本文要给出一个具体的、事件级的、带三条签收动作与排除标准的定义，并把它交付检验。比斯塔提供的是本文的合法性背景，不是本文的对手。</p>
+<h3>10.6 与本站相邻研究的分界</h3>
+<p>本栏目已有一篇《无主时段》处理教育测量中”上一程序已交出控制、下一程序尚未接手”的那一段时间。两者形状相近，对象不同，必须写清：</p>
+<p>《无主时段》的对象是<strong>一段时间</strong>——它有两端，可计时，可在作答日志里取到分布，其命题是这段时间存在非零下界。本文的对象不是一段时间，是<strong>一次持有的真值条件</strong>——它的核心不是长度而是可打开性，其命题是打开即销毁。两者的可裁决量因此完全不同：前者测时长分布的极值点，后者测签收动作是否发生。</p>
+<p>一个机械的区分办法：把两者各拿去问”它该出现在哪一张表的哪一列”。《无主时段》答得出——时间戳之差那一列；本文答不出，而且本文主张它答不出正是它的定义的一部分。</p>
+<hr />
+<h2 id="c13">十一、局限与本文不做的事</h2>
+<p><strong>11.1
+唯一跑过的介质不是课堂。</strong>第八章的语料学生一侧由模型扮演。本文所有序列侧的读数都限定在这一介质内。本文没有在人—人课堂上跑过任何一条。</p>
+<p><strong>11.2 三个代理在这一介质里方差近零。</strong>教师公开未决判
+0.060%、学生自发提问 0.664%、缺口型表达
+0.022%。这不是样本量问题，是这三个量在该介质里近乎不存在。人—人课堂里的基线是多少，本文不知道。</p>
+<p><strong>11.3
+一个本文没有解决的取舍。</strong>若要求作保完全不可指认，它就无法被任何人负责；若要求它可追责，它就必须留下记录，而记录即签收。这与承诺方案里”完美隐藏与完美绑定不可兼得”同形。本文只指出这个取舍存在，没有给出取舍的判据。凡涉及学生的求助信号、安全风险与不可逆伤害，本文的全部克制主张一律让位。</p>
+<p><strong>11.4
+教师”无解”本身可能被表演。</strong>第四章残量二与残量三互相拖累，这一处本文没有解决办法，只能靠课后即时访谈的编码来降低，而访谈本身就是一次补叙，可能构成签收。这是一个本文没有出口的循环。</p>
+<p><strong>11.5 本文不给培训方案。</strong>按 L1 与
+L3，任何把这一结构写进培训或评价表的做法都会把它变成姿态。本文能指出的课堂里仅存的可做动作只有一条：维持在它旁边，不给它命名。这不是一条可以考核的动作，本文也不主张它应当被考核。</p>
+<hr />
+<h2 id="c14">结论</h2>
+<p>大模型改写了数学教育可外包项的清单。本文检查了五种为剩余辩护的既有解释——帮助、关系、时机、默会、经验——逐一指出它们各自握着同一个代理变量，并在同一处失效；又从数学教育自己的账本上把最近的一位（布鲁索的教学契约与
+Topaze 效应）请上桌，认清本文欠它的账，只留下三条残量。</p>
+<p>本文提出的对象是作保，其真值条件是不签收，其形式取自密码学的承诺方案、会计的确认条件与会话分析的沉默归属：<strong>一种其价值恰在于不被确认、且确认动作会终止它的持有。</strong>三条命题——不可自签、打开即销毁、熟练反向——其中第三条与维果茨基、范梅南、布鲁索三家方向相反，是本文最硬的一条缝。</p>
+<p>检验的结果对本文不利。对话层不可判；话轮层给出的是 Rowe
+的方向；切点检验被本文自己设置的三个安慰剂推翻。本文据此撤回序列侧的胜负主张，把判据降级为待检假设，并把第九章那条分离设计（按教师此刻是否已有可交付的解把停顿分为两类）写成下一次预注册的内容。</p>
+<p>同一批数据给出一条本文没有预料的读数：在大模型中介的数学辅导里，学生一侧的态度型表达与缺口型表达之比是
+<strong>188∶1</strong>，教师公开说出”我还不知道”的话轮占万分之六。本文不把这条读数当作自己的证据——它不在预注册里——但把它作为本文诊断的一个极端例证记下来：在那个介质里，缺口那一侧几乎已经不在了。</p>
+<p>本文最后不给培训方案，只指出课堂里仅存的可做动作是维持在它旁边。跑赢了它少一条，跑输了它还在。这一次没跑赢，它还在；却不是跑赢，而是它正在那一个还没有被分开的缝里，继续教人看别处。</p>
+<hr />
+<h2 id="c15">附录 A　计数手册（现场使用）</h2>
+<p><strong>A.1 公开未决判（代理甲）</strong>
+纳入：教师口头发出一句以”我”为主语、表示一个尚未闭合状态的陈述。示例句型：“这里我尚未解决”“这点我没有把握”“这个问题我还在想”“目前我还不能确认”“我也没过去”。
+排除：① 教师为考学生而预设的教学空白（“你们猜”“你们再说说看”）；②
+回顾式的已解陈述（“我以前也想不通，后来通了”）。
+编码：每一例须由另一名不知研究目的的编码者独立二次判断，两人一致才计一例；不一致条目由第三人裁定，裁定后不得回改。</p>
+<p><strong>A.2 无邀请的自主追问（代理乙）</strong>
+纳入：学生主动提出一个本课尚未规定、明确以”为什么”或”是否可以”引进新对象的问题，且提出之前课堂没有教师点名或教案预设。
+排除：① 属于教师刚布置作业的问题；② 程序性确认句（“这个明天要考吗”）；③
+教案中可检出的预设问题。
+附加条件（无关闭）：若该课时整体处于复习、备考或分段与数的阶段，无新对象进入讨论，则本代理作废。</p>
+<p><strong>A.3 复述文本的谓语归属（代理丙）</strong>
+取样：课堂后三天内，学生在自然场合的复述，或第三方在听课组中的重述。
+二元编码：谓语落在”教师对我的态度”为态度型；谓语落在”缺口本身”为缺口型。不设第三类，不得以”都差不多”取消区分。
+本代理为半程代理：数据需访谈或书面文本，若不查不对判据产生结构性影响；若查了，就须按此二元编码走。</p>
+<p><strong>A.4 判定门槛</strong>
+按三周为一段：若第三周的公开未决判计数相对第一周增长 30%
+以上，同时无邀请的自主追问下降 15%
+以上，该分化才算数。低于此门槛只记为趋势，不作判据兑现。 ⚠
+本门槛在第八章的介质里无法应用（三个量的方差近零），其在人—人课堂中的适用性未经检验。</p>
+<hr />
+<h2 id="c16">附录
+B　预注册文本（取数前封存，原样抄录）</h2>
+<pre><code>语料：MathDial (Macina et al. 2023) train.jsonl，2,262 段真人教师 × 模型学生的数学辅导对话；
+教师每轮自带动作标签 (probing) (telling) (focus) (generic)。学生轮无标签。
+定义：
+  不供给类教师动作 U = probing ∪ focus
+  供给类教师动作   G = telling
+  学生思辨性作答 = 学生轮文本命中固定词表（i think / maybe / not sure / i guess /
+  perhaps / i believe / probably / might be / could be / i wonder）
+假设：
+  H1 分化方向：对话内 U 密度 与 学生思辨性作答率 的 Spearman 相关。
+     本文预测 rho &lt; 0；Rowe(1974/1986) 预测 rho &gt; 0。
+     判定：p&lt;.01 时按符号定胜负；p&gt;=.01 记为不可判。
+  H2 签收即离场：以对话内首次 G(telling) 为切点，取切点前后各 &gt;=2 个学生轮的对话，
+     比较切点前后的思辨性作答率。本文预测 后 &lt; 前（配对 Wilcoxon，p&lt;.01）。
+  H3 谓语归属：学生轮出现态度型（thanks / you&#39;re right / that helps / got it /
+     makes sense）与缺口型（i don&#39;t get / why is / where did / how come /
+     i&#39;m confused / i&#39;m stuck）之后的后续思辨性作答率降幅比较。
+     本文预测 态度型降幅 &gt; 缺口型降幅（p&lt;.05）。
+撤销规则：
+  若 H1 的 rho 显著为正，则本文第六章&quot;反向分化&quot;不得作为作保死亡的一般信号，
+  正文必须写明本次介质给出反面结果，并把该判据降级为限定于人—人课堂的假设。
+  H2 若不成立，本文&quot;签收即离场&quot;的序列侧证据为零，只保留事件级语义定义。
+封存时间：2026-08-21</code></pre>
+<p><strong>追加声明（成文时补记）</strong>：安慰剂切点检验不在原预注册文本内，是取数后追加的稳健性检查。它的结果对本文不利（三个安慰剂全部给出更大的同向降幅），本文照原样采纳并据此判
+H2 未成立。若本文只报告预注册内的那一行，H2 命中且 p ＝
+0.0013。这一句写在此处，是为了让读者能自行判断本文是否在事后挑选了对自己不利的检验。</p>
+<hr />
+<h2 id="c17">附录 C　复算路径</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>项</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>数据</td>
+<td>MathDial train.jsonl，公开获取自
+<code>raw.githubusercontent.com/eth-nlped/mathdial/main/data/train.jsonl</code></td>
+</tr>
+<tr class="even">
+<td>数据文件 SHA-256</td>
+<td><code>d6135869c02dccf8d14756fa2f0367c5352922bb263ec22dc0eeace4da815d43</code></td>
+</tr>
+<tr class="odd">
+<td>数据文件大小</td>
+<td>7,181,555 字节</td>
+</tr>
+<tr class="even">
+<td>预注册文本 SHA-256</td>
+<td><code>1057f5d1c9bd5ca3e69f0dc5abdbe8ff96cab85e6ddcc8c26772712fa8e5d1c8</code></td>
+</tr>
+<tr class="odd">
+<td>规模</td>
+<td>2,262 段对话 · 28,320 话轮（教师 14,910 / 学生 13,410）</td>
+</tr>
+<tr class="even">
+<td>教师动作分布</td>
+<td>focus 5,549 · generic 3,566 · probing 3,300 · telling 2,493 · 未标注
+2</td>
+</tr>
+<tr class="odd">
+<td>统计</td>
+<td>Spearman 相关、Fisher 精确检验、配对 Wilcoxon（SciPy）</td>
+</tr>
+<tr class="even">
+<td>安慰剂③随机种子</td>
+<td>20260821</td>
+</tr>
+</tbody>
+</table>
+<p>复算脚本（<code>run.py</code> / <code>run2.py</code> /
+<code>run3.py</code>）与预注册文本随本文一并存档于本栏目
+<code>src/</code>
+目录。任何人重跑应得到与第八章逐位一致的读数；若不一致，以数据文件哈希为准先核对数据版本。</p>
+<hr />
+<h2 id="c18">附录 D　主要术语</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>术语</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>作保</td>
+<td>面对自身未解之事的人，不把它转成可交付的答案，而把一个缺口保持在正在卡住的人面前</td>
+</tr>
+<tr class="even">
+<td>不签收</td>
+<td>作保的真值条件：未被指认、未被补叙、未被转述</td>
+</tr>
+<tr class="odd">
+<td>签收动作</td>
+<td>学生指认／教师补叙／第三人转述，三者任一发生即终止</td>
+</tr>
+<tr class="even">
+<td>共场</td>
+<td>签收发生时，现场除师生外是否有第三人在同一事件中</td>
+</tr>
+<tr class="odd">
+<td>负库存</td>
+<td>学生一侧不可调用、不可复现的那一类留存，与可复述的正库存相对</td>
+</tr>
+<tr class="even">
+<td>隐藏性／绑定性</td>
+<td>承诺方案的两条性质，本文借其形式而非其协议</td>
+</tr>
+<tr class="odd">
+<td>去责</td>
+<td>布鲁索意义上教师把非教学情境交给学生的动作</td>
+</tr>
+<tr class="even">
+<td>Topaze 效应</td>
+<td>教师替学生消掉困难，目标知识随之消失</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="c19">参考文献</h2>
+<p>Argyris, C. (1990). <em>Overcoming Organizational Defenses:
+Facilitating Organizational Learning</em>. Boston: Allyn &amp;
+Bacon.</p>
+<p>Biesta, G. J. J. (2013). <em>The Beautiful Risk of Education</em>.
+Boulder: Paradigm Publishers.</p>
+<p>Blum, M. (1981). Coin flipping by telephone: A protocol for solving
+impossible problems. In <em>Advances in Cryptology: A Report on CRYPTO
+’81</em>.</p>
+<p>Bourdieu, P. (1977). <em>Outline of a Theory of Practice</em> (R.
+Nice, Trans.). Cambridge: Cambridge University Press.</p>
+<p>Brousseau, G. (1997). <em>Theory of Didactical Situations in
+Mathematics: Didactique des mathématiques, 1970–1990</em> (N. Balacheff
+et al., Eds. &amp; Trans.). Dordrecht: Kluwer.</p>
+<p>Brousseau, G. (2002). <em>Theory of Didactical Situations in
+Mathematics</em>. Dordrecht: Kluwer Academic Publishers.</p>
+<p>Brousseau, G., Sarrazy, B., &amp; Novotná, J. (2014). Didactic
+contract in mathematics education. In S. Lerman (Ed.), <em>Encyclopedia
+of Mathematics Education</em>. Dordrecht: Springer.</p>
+<p>Buber, M. (1970). <em>I and Thou</em> (W. Kaufmann, Trans.). New
+York: Scribner. (Original work published 1923)</p>
+<p>Chevallard, Y. (1991). <em>La transposition didactique: Du savoir
+savant au savoir enseigné</em> (2nd ed.). Grenoble: La Pensée Sauvage.
+(Original work published 1985)</p>
+<p>Demszky, D., &amp; Hill, H. (2023). The NCTE Transcripts: A dataset
+of elementary math classroom transcripts. In <em>Proceedings of the 18th
+Workshop on Innovative Use of NLP for Building Educational
+Applications</em> (pp. 528–538). Toronto: ACL.</p>
+<p>Dewey, J. (1938). <em>Experience and Education</em>. New York:
+Macmillan.</p>
+<p>Elster, J. (1983). <em>Sour Grapes: Studies in the Subversion of
+Rationality</em>. Cambridge: Cambridge University Press. (Ch. 2, “States
+that are essentially by-products”)</p>
+<p>Goffman, E. (1981). Footing. In <em>Forms of Talk</em> (pp. 124–159).
+Philadelphia: University of Pennsylvania Press.</p>
+<p>Halevi, S., &amp; Micali, S. (1996). Practical and provably-secure
+commitment schemes from collision-free hashing. In <em>Advances in
+Cryptology — CRYPTO ’96</em> (pp. 201–215). Berlin: Springer.</p>
+<p>International Accounting Standards Board. (2018). <em>Conceptual
+Framework for Financial Reporting</em>, Ch. 5: Recognition and
+derecognition. London: IFRS Foundation.</p>
+<p>International Accounting Standards Board. (1998, as amended). <em>IAS
+37: Provisions, Contingent Liabilities and Contingent Assets</em>.
+London: IFRS Foundation.</p>
+<p>Levinson, S. C. (1983). <em>Pragmatics</em>. Cambridge: Cambridge
+University Press.</p>
+<p>Macina, J., Daheim, N., Chowdhury, S. P., Sinha, T., Kapur, M.,
+Gurevych, I., &amp; Sachan, M. (2023). MathDial: A dialogue tutoring
+dataset with rich pedagogical properties grounded in math reasoning
+problems. In <em>Findings of EMNLP 2023</em>.</p>
+<p>Naor, M. (1991). Bit commitment using pseudorandomness. <em>Journal
+of Cryptology</em>, 4(2), 151–158.</p>
+<p>Pagnol, M. (1958). <em>Topaze</em>. Paris: Fasquelle. (Original work
+published 1928)</p>
+<p>Pedersen, T. P. (1992). Non-interactive and information-theoretic
+secure verifiable secret sharing. In <em>Advances in Cryptology — CRYPTO
+’91</em> (pp. 129–140). Berlin: Springer.</p>
+<p>Polanyi, M. (1966). <em>The Tacit Dimension</em>. New York:
+Doubleday.</p>
+<p>Rancière, J. (1991). <em>The Ignorant Schoolmaster: Five Lessons in
+Intellectual Emancipation</em> (K. Ross, Trans.). Stanford: Stanford
+University Press. (Original work published 1987)</p>
+<p>Rowe, M. B. (1974). Wait-time and rewards as instructional variables,
+their influence on language, logic, and fate control: Part one —
+wait-time. <em>Journal of Research in Science Teaching</em>, 11(2),
+81–94.</p>
+<p>Rowe, M. B. (1986). Wait time: Slowing down may be a way of speeding
+up! <em>Journal of Teacher Education</em>, 37(1), 43–50.</p>
+<p>Sacks, H., Schegloff, E. A., &amp; Jefferson, G. (1974). A simplest
+systematics for the organization of turn-taking for conversation.
+<em>Language</em>, 50(4), 696–735.</p>
+<p>Schegloff, E. A., Jefferson, G., &amp; Sacks, H. (1977). The
+preference for self-correction in the organization of repair in
+conversation. <em>Language</em>, 53(2), 361–382.</p>
+<p>Stahl, R. J. (1994). <em>Using “Think-Time” and “Wait-Time”
+Skillfully in the Classroom</em>. ERIC Digest, ED370885.</p>
+<p>Tobin, K. (1987). The role of wait time in higher cognitive level
+learning. <em>Review of Educational Research</em>, 57(1), 69–95.</p>
+<p>van Manen, M. (1991). <em>The Tact of Teaching: The Meaning of
+Pedagogical Thoughtfulness</em>. Albany: SUNY Press.</p>
+<p>Vygotsky, L. S. (1978). <em>Mind in Society: The Development of
+Higher Psychological Processes</em>. Cambridge, MA: Harvard University
+Press.</p>
+<p>Wood, D., Bruner, J. S., &amp; Ross, G. (1976). The role of tutoring
+in problem solving. <em>Journal of Child Psychology and Psychiatry</em>,
+17(2), 89–100.</p>
+<hr />
+<p><em>本文数据、预注册文本与复算脚本公开。作者声明：第八章的检验结果对本文的核心序列判据不利，已按原样报告，未作任何事后修改。</em></p>
+
+</article>
+</section>
+</main>
+</div><!--/#web-->
+
+<div id="pdf" class="panel"><div class="rdr">
+  <div class="rdr-bar">
+    <button class="rbtn" id="pv" disabled>‹ 上一页</button>
+    <span class="pbox"><input id="pin" type="number" min="1" value="1"> / <span class="ptot" id="ptot">…</span></span>
+    <button class="rbtn" id="nx" disabled>下一页 ›</button>
+    <span class="zm"><button class="rbtn" id="zo" title="缩小">−</button><button class="rbtn" id="zi" title="放大">＋</button></span>
+    <a class="rbtn dl" href="/sde-education/pdf/before-countersignature.pdf" download>⬇ 下载</a>
+  </div>
+  <div class="rdr-stage">
+    <div id="rload" class="rload"><div class="spin"></div>正在载入精排 PDF…</div>
+    <div id="cwrap" style="display:none"><canvas id="pcv"></canvas></div>
+    <div class="tapL" id="tL"></div><div class="tapR" id="tR"></div>
+  </div>
+  <div class="rhint">← → 方向键翻页 · 点击画面两侧翻页 · 可输入页码跳转 · ＋ − 缩放</div>
+</div></div>
+
+<div id="dl" class="panel"><div class="card">
+  <h2>下载精排 PDF</h2>
+  <p style="color:#4A4235;line-height:1.85">《无主时段——一个被教育测量系统折为零的时间类别：概念界定、三条命题与基于 575 万条作答记录的预注册检验》<br>SDE教育学 · 研究论文 · 头条 · 王德生 ＋ Claude · 德麦国际 SDE 学派</p>
+  <a class="dlbtn" href="/sde-education/pdf/before-countersignature.pdf" download>⬇ 下载 PDF</a>
+  <div class="sz">含题头、摘要、正文与页码的印刷级精排版。如需翻页在线阅读，切换到「在线读 PDF」；如需网页版，切换到「网页长文」。</div>
+</div></div>
+
+<footer>
+  <div>© 德麦国际 Demai International · SDE教育学 · <a href="/sde-education/">返回栏目</a> · <a href="/browse/">sdeuniverses.com</a></div>
+</footer>
+
+<script>
+document.querySelectorAll('.modebtn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.modebtn').forEach(function(x){x.classList.remove('on')});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    var el=document.getElementById(b.dataset.m); if(el) el.classList.add('on');
+    window.scrollTo(0,0);
+  });
+});
+</script>
+<script>var PDF_URL="/sde-education/pdf/before-countersignature.pdf";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,scale=1.25,pdfInited=false;
+function $(id){return document.getElementById(id);}
+document.querySelectorAll('.modebtn').forEach(function(b){b.addEventListener('click',function(){var m=b.dataset.m;document.querySelectorAll('.modebtn').forEach(function(x){x.classList.toggle('on',x.dataset.m===m);});document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('on',p.id===m);});window.scrollTo(0,0);if(m==='pdf'){initPdf();}});});
+function initPdf(){if(pdfInited){return;}pdfInited=true;var s=document.createElement('script');s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";s.onload=startPdf;s.onerror=function(){showErr("阅读器脚本加载失败");};document.head.appendChild(s);}
+function showErr(msg){$('rload').style.display='none';var e=$('rerr');e.style.display='block';e.innerHTML='在线阅读暂时无法载入。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开 / 下载 PDF</a> 阅读。<br><span style="font-size:12px;color:#8A6F5E">（'+msg+'）</span>';}
+function startPdf(){try{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){pdfDoc=pdf;$('ptot').textContent=pdf.numPages;$('pin').max=pdf.numPages;$('rload').style.display='none';$('cwrap').style.display='block';render(1);}).catch(function(err){showErr(err.message);});}catch(e){showErr(e.message);}}
+function render(num){rendering=true;pdfDoc.getPage(num).then(function(page){var vp=page.getViewport({scale:scale});var ratio=window.devicePixelRatio||1;var cv=$('pcv'),cx=cv.getContext('2d');cv.width=vp.width*ratio;cv.height=vp.height*ratio;cv.style.width=vp.width+'px';cv.style.height=vp.height+'px';cx.setTransform(ratio,0,0,ratio,0,0);page.render({canvasContext:cx,viewport:vp}).promise.then(function(){rendering=false;if(pending!==null){var p=pending;pending=null;render(p);}});});$('pin').value=num;$('pv').disabled=(num<=1);$('nx').disabled=(num>=pdfDoc.numPages);}
+function queue(num){if(rendering){pending=num;}else{render(num);}}
+function go(n){if(!pdfDoc){return;}pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);var st=document.querySelector('.rdr-stage');if(st){st.scrollIntoView({block:'nearest'});}}
+$('pv').onclick=function(){go(pageNum-1);};$('nx').onclick=function(){go(pageNum+1);};$('tL').onclick=function(){go(pageNum-1);};$('tR').onclick=function(){go(pageNum+1);};
+$('pin').onchange=function(e){go(parseInt(e.target.value)||1);};$('zi').onclick=function(){scale=Math.min(scale+0.2,3);queue(pageNum);};$('zo').onclick=function(){scale=Math.max(scale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){if(!$('pdf').classList.contains('on')){return;}if(e.key==='ArrowLeft'){go(pageNum-1);}if(e.key==='ArrowRight'){go(pageNum+1);}});
+</script>
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260821c" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>
