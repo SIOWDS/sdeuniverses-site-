@@ -207,7 +207,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
     </div>
     <div id="deepHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:9px 2px 0;line-height:1.6">🔬 深度模式：基底先内化内功写心得，再用 <b>SDE 方法论</b>（六路径→S/D/E→三方程→误差互消→逮先验）做一次有指导性的深入研究，现实问题还会给可执行的「怎么办」。默认<b>单次调用</b>（较慢、较费 token，建议自带 Key）。<br>点「四步法」→ 升级为 <b>S/D/E 四次独立调用</b>的完整误差互消（最深，但慢 4 倍、贵 4 倍，只在要冲满时用）。</div>
     <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–20 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
-    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动二十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡 → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）自己把问对逼深二十轮（<b>分七批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（五段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>15</b> 次基底调用（开涌现档 19 次）、30–55 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
+    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动二十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡 → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）自己把问对逼深二十轮（<b>分七批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（五段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>16</b> 次基底调用（开涌现档 20 次）、30–55 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
     <div id="ownKeyRow" style="display:none">
       <input id="userKey" type="password" autocomplete="off" placeholder="填入你的 DeepSeek / 智谱 API Key（仅存本机浏览器，不上传服务器保存）">
     </div>
@@ -1957,14 +1957,18 @@ function missText(done, SPEC){
   var m=[]; for(var i=done;i<SPEC.length;i++) m.push(SPEC[i].name+'（'+SPEC[i].desc+'）');
   return '本稿只写完 '+SPEC.length+' 段中的前 '+done+' 段，缺：'+m.join('、')+'。';
 }
-/* 成文、打磨、提炼共用这一台四段流水；差别只在 SPEC 与 seedFor。 */
+/* 成文、打磨、提炼共用这一台分段流水；差别只在 SPEC 与 seedFor。
+   ⚠ 段数以传进来的 SPEC 为准（成文/打磨＝PAPER_PARTS 五段，提炼＝BRIEF_PARTS 两段）。
+      **服务端那一侧的段数表必须与本表同长**：前端多要一段而服务端上限写小了，
+      多出来的那一段会被服务端钳成第一段，于是题名与摘要被再写一遍——一份稿子两个开头，
+      不报错、不短（2026-08-21 打磨那一侧就是这么出的「重复写了两篇」）。 */
 function runParts(SPEC, seedFor, stat, prefix, headFn){
   var acc='', head='', done=0;
   function step(i){
     if(i>=SPEC.length) return Promise.resolve();
     var P=SPEC[i];
     GEN_PREV=acc;                              /* 字数计与实时正文都从已写部分接着走 */
-    stat.textContent=prefix+' '+P.name+'／共四段（'+P.desc+'）· 已写 '+acc.length+' 字 · 请勿关闭页面…';
+    stat.textContent=prefix+' '+P.name+'／共'+SPEC.length+'段（'+P.desc+'）· 已写 '+acc.length+' 字 · 请勿关闭页面…';
     return paperHalf(i+1, seedFor(i, head, acc.slice(-1000)), P.min, P.name).catch(function(e){
       if(i===0) throw e;                       /* 第一段拿不到就没有稿子，直接报错 */
       return '';                               /* 后面某段失败不丢已写的部分 */
@@ -2023,7 +2027,7 @@ function doPaper(){
     var au=auditOutput(paperAll);
     var auMsg=au.length?('🔎 出稿机检查出 '+au.length+' 处：'+au.join('；')+'。这些要人工改掉再投。　'):'';
     stat.textContent = (miss || cut || auMsg)
-      ? cut+auMsg+(miss?miss+' PDF 首页已标注「未完成稿」。请再点一次「成文一篇」补齐。':'')+'已写的 '+paperAll.length+' 字都在。'
+      ? cut+auMsg+(miss?miss+' PDF 首页已标注「未完成稿」。⚠ 再点一次「成文一篇」是**从第一段整篇重写**，不是接着补——重写前请先把这 '+paperAll.length+' 字复制走。':'')+'已写的 '+paperAll.length+' 字都在。'
       : '✓ 全文完成 · '+paperAll.length+' 字 · '+PAPER_PARTS.length+'段齐全（含中英摘要、参考文献、附录与投稿声明）· 出稿机检零缺陷 · PDF 已就绪，可在线阅读或下载。';
   }).catch(function(e){
     setProg(paperAll.length, false);
@@ -2068,6 +2072,32 @@ function isPaperHead(raw,L){
   if(L.length<=40 && /^\d{1,2}(\.\d{1,2}){1,2}[\s　]*\S/.test(L)) return true;
   return false;
 }
+/* 【PDF 空白自检 —— 2026-08-21】线上真交出过一份 **33 页全白**的 PDF：
+   jsPDF 2.3.1，每页 content stream 只有一句 `q … cm /I0 Do Q`（只画一张图、零文字对象），
+   而那张图是 1588×2034 的纯白 JPEG（灰度 min=max=255）。**分页是对的、页数也对**——
+   说明 DOM 里有内容、高度算得出来，白掉的是 html2canvas 那一步（克隆体没画出东西）。
+   这一类失败最坏的地方不是白，是**它静默地成功了**：进度条走完、状态行报「PDF 已就绪」、
+   文件也能下载，读者拿去当交付物才发现是白纸。与本站「断稿不许写成完成」是同一条规矩。
+   所以出稿前先量一次画布墨量：缩到小图再数非白像素，白到不像话就当场拦下并报读数。
+   ⚠ 读不到画布（跨域污染、getImageData 抛错）一律返回 -1 ＝ **不判**——
+      看不见不等于是白的，绝不许因为量不到就把真稿拦掉。 */
+function canvasInk(cv, mkCanvas){
+  try{
+    var W=cv.width|0, H=cv.height|0;
+    if(!W || !H) return 0;                       /* 零尺寸画布：确定是白的 */
+    var tw=160, th=Math.max(1, Math.min(2000, Math.round(H*tw/W)));
+    var t=(mkCanvas||function(){ return document.createElement('canvas'); })();
+    t.width=tw; t.height=th;
+    var g=t.getContext('2d');
+    g.fillStyle='#ffffff'; g.fillRect(0,0,tw,th);
+    g.drawImage(cv,0,0,tw,th);
+    var d=g.getImageData(0,0,tw,th).data, ink=0;
+    for(var i=0;i<d.length;i+=4){ if((d[i]+d[i+1]+d[i+2])/3 < 250) ink++; }
+    return ink/(tw*th);
+  }catch(e){ return -1; }
+}
+var INK_MIN=0.002;   /* 缩略图上的墨量下限。一页正文缩到 160 宽仍有 2–8% 的非白像素；
+                        只有整份全白才会掉到 0.2% 以下——阈值刻意留得很松，宁可放过不可错杀。 */
 function buildPdf(text, incomplete, opt){
   opt = opt || {};
   var _eyebrow = opt.eyebrow || 'SDE UNIVERSES · 智 能 问 对 · 成 文 一 篇';
@@ -2126,6 +2156,15 @@ function buildPdf(text, incomplete, opt){
       var cs=document.querySelectorAll('.html2pdf__container');
       var c=cs[cs.length-1];
       if(c){ c.style.left='0'; c.style.right='auto'; c.style.margin='0'; }
+    }).toCanvas().then(function(){
+      /* html2pdf 的 then 把 this 绑到 worker，画布挂在 this.canvas 上。 */
+      var cv=this && this.canvas;
+      var ink=cv?canvasInk(cv):-1;
+      if(cv && ink>=0 && ink<INK_MIN){
+        throw new Error('PDF 渲染出来是白纸，已拦下不交（画布 '+cv.width+'×'+cv.height+' 像素，墨量 '
+          +(ink*100).toFixed(3)+'%，下限 '+(INK_MIN*100).toFixed(1)+'%）。正文 '+String(text||'').length
+          +' 字仍在本页，可直接复制；请 Ctrl+F5 强刷一次再点一遍出稿。');
+      }
     }).outputPdf('blob').then(function(blob){
       document.body.removeChild(wrap);
       var u=URL.createObjectURL(blob);
@@ -2420,7 +2459,7 @@ function doPolish(){
   runFourParts(seedFor, stat, (card?'🛠 按评分卡打磨':'🛠 打磨（未评分，按目标五维自查）')).then(function(r){
     polishAll=r.text; miss=missText(r.done);
     setProg(polishAll.length,true);
-    stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版':'🖨 打磨完成（'+polishAll.length+' 字·四段）· 正在排版 PDF')+'（约 20–50 秒）…';
+    stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版':'🖨 打磨完成（'+polishAll.length+' 字·'+PAPER_PARTS.length+'段）· 正在排版 PDF')+'（约 20–50 秒）…';
     return buildPdf(polishAll, miss, {eyebrow:'SDE UNIVERSES · 智 能 问 对 · 打 磨 修 改 稿', fnTag:'polished', readId:'polishRead', dlId:'polishDl', actsId:'polishActs'});
   }).then(function(){
     setProg(polishAll.length,false);

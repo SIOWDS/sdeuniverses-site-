@@ -226,9 +226,15 @@ const _nBatch = (function(){
   return new Function("return (function(){var AUTO_TARGET=" + m[1] + ",ROUND_BATCH=" + m[2] + ";" + _sz + "return autoBatchCount();})()")();
 })();
 ok(_nBatch > 0, "算得出一场顺跑要几批 · 实得 " + _nBatch + " 批");
-const expect = _nBatch + (1 + nParts) + 4 + 1;
-ok(new RegExp("约 <b>" + expect + "<\\/b> 次基底调用（开涌现档 " + (_nBatch + 7 + 4 + 1) + " 次）").test(H),
-  "说明条里的次数与公式对得上 · 提炼段数 " + nParts + " ⇒ 应为 " + expect);
+/* ⚠ 成文那一项也不许写死：2026-08-21 由四段变五段，写死的 4 当场失准
+   （那一次说明条上的 15 就是这么留下来的——公式已经现算，说明条与本判据还停在四段）。 */
+const _ppA = H.indexOf("var PAPER_PARTS=[");
+const _ppB = H.indexOf("];", _ppA);
+const nPaper = (_ppA > 0 && _ppB > _ppA) ? (H.slice(_ppA, _ppB).match(/\{min:\d+\s*,name:/g) || []).length : -1;
+ok(nPaper > 0, "数得出 PAPER_PARTS 的段数 · 实得 " + nPaper);
+const expect = _nBatch + (1 + nParts) + nPaper + 1;
+ok(new RegExp("约 <b>" + expect + "<\\/b> 次基底调用（开涌现档 " + (_nBatch + 7 + nPaper + 1) + " 次）").test(H),
+  "说明条里的次数与公式对得上 · 提炼 " + nParts + " 段＋成文 " + nPaper + " 段 ⇒ 应为 " + expect);
 ok(/okRounds<2/.test(bAuto) && /不再往下烧调用/.test(bAuto), "一批两次都没跑成 ⇒ 停下收口，不把剩下的调用烧完");
 ok(/function nextBatch\(\)/.test(bAuto) && /okRounds\+=got;/.test(bAuto), "分批推进：写不满五轮也不算失败，下一批从断点接着要");
 ok(/if\(!brief\)\{[^}]*throw/.test(bAuto), "提炼没出入口资料 ⇒ 不写论文（没有入口资料的论文会退回单轮底稿）");

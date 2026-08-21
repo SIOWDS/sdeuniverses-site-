@@ -10,6 +10,8 @@ const fs = require("fs");
 const SRC = "/home/claude/site/public/search/index.html";
 const h = fs.readFileSync(SRC, "utf8");
 
+const w = fs.readFileSync("/home/claude/site/src/worker.js", "utf8");
+
 let P = 0, F = 0;
 const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (F++, console.log("  FAIL " + m)); };
 
@@ -130,6 +132,51 @@ const reset = (p) => { plan = p; calls = []; };
   ok(calls.length === 2 && two.length === 3000, "两次都缺标记 → 照收，不烧第三次 · 实得调用 " + calls.length);
   ok(R3.CUTLOG.length === 1 && /第一段/.test(R3.CUTLOG[0]) && /断在半句/.test(R3.CUTLOG[0]),
     "两次都缺标记 → 记进 CUTLOG（收尾那句话据此不打「✓」）· 实得 " + JSON.stringify(R3.CUTLOG));
+
+  /* ================= 九、前后端段数必须成对（2026-08-21 「重复写了两篇」的真因）=================
+     现场：读者拿到的稿子在第九章之后**又出现一整套**题名、【摘要】、【Abstract】、
+     【一、引言】、【二、文献述评】——一份稿子两个开头。
+     根因：同一天把成文由四段改成五段，前端 PAPER_PARTS 改了、**服务端 polish 那一侧漏改**，
+     那里还写着 `part >= 1 && part <= 4`。前端第五段带着 part=5 打进来，被**钳成 1**，
+     基底于是拿着「第一段」的指令把开头又写了一遍。它不报错、不短、进度条走完、状态行打✓——
+     这一族病本文件记过三回，每一回都是「段数写成了字面量」。
+     所以这一组守的不是某个具体数字，而是三条不变量：
+       ① 前端段数 ＝ 服务端 paper 段数 ＝ 服务端 polish 段数；
+       ② 两处钳位都从段数表现算，源码里不许再出现 `part <= <数字>` 这种上限；
+       ③ 体例块里那句「全文由 N 段连续写成」的 N 跟着段数走（成文与打磨共用它）。 */
+  console.log("— 九、前后端段数成对（重复两篇的真因）—");
+  const _pa = w.indexOf('else if (mode === "paper" || mode === "polish") {');
+  ok(_pa > 0, "抠得到 paper/polish 分支");
+  const _po = w.indexOf('if (mode === "polish") {', _pa);
+  const _elseP = w.indexOf("      else {", _po);          /* polish 之后就是成文那一支 */
+  const segPolish = w.slice(_po, _elseP);
+  const segPaper = w.slice(_elseP, w.indexOf('else if (reflect && neigong) {', _elseP));
+  const countTbl = (seg, name) => {
+    const a = seg.indexOf("const " + name + " = {");
+    const b = seg.indexOf("};", a);
+    return (a < 0 || b < 0) ? -1 : (seg.slice(a, b).match(/\b\d+:\s*"第[一二三四五六七八九十]段"/g) || []).length;
+  };
+  /* ⚠ 扫「有没有写死的上限」之前必须先剥注释：说明这个洞的那段注释里就写着它的形状，
+     不剥就会被自己的说明喂饱（本站两个方向都栽过：锚点被注释抢先命中／注释被断言数进去）。 */
+  const bare = (x) => x.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+  const nFront = R.PAPER_PARTS.length;
+  const nPaper = countTbl(segPaper, "PART_NAME");
+  const nPolish = countTbl(segPolish, "PN");
+  ok(nPaper === nFront, "服务端 paper 段数 = 前端 PAPER_PARTS · " + nPaper + " vs " + nFront);
+  ok(nPolish === nFront, "服务端 polish 段数 = 前端 PAPER_PARTS（漏改这一处＝一份稿子两个开头）· " + nPolish + " vs " + nFront);
+  ok(!/part\s*[<>]=?\s*\d/.test(bare(segPaper)), "成文那一侧的钳位不含写死的上限");
+  ok(!/part\s*[<>]=?\s*\d/.test(bare(segPolish)), "打磨那一侧的钳位不含写死的上限");
+  ok(/Object\.keys\(PART_NAME\)\.length/.test(segPaper), "成文段数只有一处定义（PART_NAME），钳位跟着它走");
+  ok(/Object\.keys\(PN\)\.length/.test(segPolish), "打磨段数只有一处定义（PN），钳位跟着它走");
+  const CN = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+  ok(w.indexOf("全文由" + CN[nFront - 1] + "段连续写成") > 0,
+    "体例块那句「全文由 N 段连续写成」跟着段数走 · 应为「" + CN[nFront - 1] + "」");
+  ok(/绝不许重写题名/.test(segPolish),
+    "打磨的续写指令明令后段不许重写题名与摘要（钳位之外的第二道锁）");
+  /* 段名与收尾标记必须两两不同：同名两段＝同一份指令发两遍，症状与钳位失手一模一样。 */
+  const ends = (segPaper.match(/〔第[一二三四五六七八九十]段完·待续〕/g) || []).concat(
+    (segPaper.match(/〔全文完〕/g) || []));
+  ok(new Set(ends).size === nFront, "成文 " + nFront + " 段的收尾标记两两不同 · 实得 " + new Set(ends).size);
 
   console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
   process.exit(F ? 1 : 0);

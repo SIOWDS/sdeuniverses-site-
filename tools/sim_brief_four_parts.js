@@ -34,14 +34,26 @@ function makeRunner() {
     calls.push(part); seeds.push(extra);
     return step.err ? Promise.reject(new Error(step.err)) : Promise.resolve(step.text);
   };
-  const fn = new Function("document", "streamPaper", "GEN_STAT", "setProg",
-    "var GEN_PREV='', GEN_BOX='';\n" + seg +
+  /* ⚠ 2026-08-21 修：paperHalf 的重写判据早已依赖 CUTLOG／RUNLOG／looksCut 三个外部依赖，
+     而它们都声明在抠取范围（function paperHalf ↑）之外 —— 本脚本一直没跟着长桩，
+     于是整份护栏在 `ReferenceError: RUNLOG is not defined` 上崩掉、**一条都没在测**。
+     桩必须跟着契约一起长；looksCut 用页面里的真实现，不另写一份。 */
+  const cutlog = [];
+  const looksCutSrc = h.slice(h.indexOf("function looksCut(txt){"), h.indexOf("function finishAsk("));
+  const fn = new Function("document", "streamPaper", "GEN_STAT", "setProg", "CUTLOG", "RUNLOG", "runWhy",
+    "var GEN_PREV='', GEN_BOX='';\n" + looksCutSrc + "\n" + seg +
     "\nreturn { runParts: runParts, runFourParts: runFourParts, missText: missText, paperHalf: paperHalf, BRIEF_PARTS: BRIEF_PARTS, PAPER_PARTS: PAPER_PARTS, getPrev: function(){ return GEN_PREV; } };");
-  return fn(stub, streamPaper, "briefStat", function () { });
+  return fn(stub, streamPaper, "briefStat", function () { }, cutlog,
+    { frames: 1, done: true, fin: "stop", sec: 0, think: 0 }, function () { return "（读数桩）"; });
 }
 const seedFor = (i, head, tail) => ({ gmode: "distill", head: i > 0 ? head : undefined, tail: i > 0 ? tail : undefined });
 const stat = { set textContent(v) { } };
 const LONG = (n) => "字".repeat(n);
+/* ⚠ 2026-08-18 paperHalf 加了段末标记闸：先问收尾标记在不在，不在就当「断在半句」重试一次。
+   本脚本的夹具一直停在加闸之前 —— 从此凡表达「这一段写成了」的桩都要带自己那一段的标记，
+   不带标记的桩表达的是「被掐断」。（改判据必须回头改夹具，否则测的是一个不存在的版本。） */
+const BMK = ["〔第一段完·待续〕", "〔全文完〕"];
+const BSEG = (i, n) => LONG(n) + "。\n" + BMK[i];
 const reset = (p) => { plan = p; calls = []; seeds = []; };
 
 (async () => {
@@ -56,10 +68,14 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
   /* 2026-08-13 收短后：九栏并进第一段，第二段专写〔十〕论文观点与分章大纲。 */
   ok(/最近邻/.test(R.BRIEF_PARTS[0].desc), "第一段职能点名敌意最近邻（九栏已并进它）");
   ok(/分章大纲/.test(R.BRIEF_PARTS[1].desc), "第二段职能点名分章大纲（交给成文的施工图）");
-  ok(R.BRIEF_PARTS !== R.PAPER_PARTS && R.PAPER_PARTS.length === 4, "入口资料两段、论文四段，各有各的表");
+  /* ⚠ 2026-08-21：论文由四段改五段，这条判据写死了 4 —— 它本该在那一刻报红，
+     可惜整份脚本当时正崩在 RUNLOG 上，红也没人看见。段数从此不写死：
+     只守「两张表不是同一张、论文段数不等于入口资料段数」这个真正的不变量。 */
+  ok(R.BRIEF_PARTS !== R.PAPER_PARTS && R.PAPER_PARTS.length !== R.BRIEF_PARTS.length,
+    "入口资料与论文各有各的表、段数不同 · 实得 " + R.BRIEF_PARTS.length + " vs " + R.PAPER_PARTS.length);
 
   console.log("— 二、顺利跑完四段 —");
-  reset([{ text: LONG(5000) }, { text: LONG(5000) }]);
+  reset([{ text: BSEG(0, 5000) }, { text: BSEG(1, 5000) }]);
   let r = await R.runParts(R.BRIEF_PARTS, seedFor, stat, "提炼中");
   ok(calls.join(",") === "1,2", "两段依次发出 part=1,2 · 实得 " + calls.join(","));
   ok(r.done === 2, "done=2");
@@ -75,7 +91,7 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
     "入口资料自带取头函数（partHead 是按论文的题名＋摘要写的，对只有栏目的资料会切错）");
 
   console.log("— 四、中途某段写不出来：就地停住、不丢已写的 —");
-  reset([{ text: LONG(5000) }, { text: "" }, { text: "" }, { text: LONG(5000) }]);
+  reset([{ text: BSEG(0, 5000) }, { text: "" }, { text: "" }, { text: BSEG(1, 5000) }]);
   r = await R.runParts(R.BRIEF_PARTS, seedFor, stat, "提炼中");
   ok(r.done === 1, "第二段没成 ⇒ done 停在 1 · 实得 " + r.done);
   ok(r.text.length > 4000, "第一段一个字没丢 · 实得 " + r.text.length);
@@ -83,7 +99,7 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
   ok(typeof miss === "string" && /第二段/.test(miss), "缺段说明点名缺了第二段 · 实得：" + miss);
 
   console.log("— 五、第一段拿不到就没有资料，必须抛错 —");
-  reset([{ err: "boom" }, { err: "boom" }, { text: LONG(5000) }]);
+  reset([{ err: "boom" }, { err: "boom" }, { text: BSEG(0, 5000) }]);
   let threw = false;
   try { await R.runParts(R.BRIEF_PARTS, seedFor, stat, "提炼中"); } catch (e) { threw = true; }
   ok(threw, "第一段两次都失败 ⇒ 抛错（不许静默交白卷）");
@@ -190,8 +206,11 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
   ok(/GEN_PREV\.length\+pacc\.length/.test(h), "字数计从已写部分接着走（旧版写死 paperAll.length，打磨时把论文长度算了进去）");
   /* ⚠ 别手抄次数：2026-08-13 加第十栏时提炼由 3 次变 4 次，说明条、确认框、公式三处要一起动。
      从源码把公式与说明条的数各取出来，逼它们对上——手抄一个 12 只会在下次改段数时安静失效。 */
-  const mCalls = /var calls=4\+\(triOn\?7:\(1\+BRIEF_PARTS\.length\)\)\+4\+1;/.test(h);
-  ok(mCalls, "调用次数按 BRIEF_PARTS 的段数现算，不写死（改段数时最容易漏的就是这一行）");
+  /* ⚠ 2026-08-21：这条判据手抄了公式的形状（`4+…+4+1`），而源码早已把两头都改成现算
+     （问对批数 autoBatchCount()、成文段数 PAPER_PARTS.length）—— 手抄的判据于是在测一个
+     不存在的版本。改成只守「两处段数都不是写死的数」这个真正的不变量。 */
+  const mCalls = /var calls=autoBatchCount\(\)\+\(triOn\?7:\(1\+BRIEF_PARTS\.length\)\)\+PAPER_PARTS\.length\+1;/.test(h);
+  ok(mCalls, "调用次数按 BRIEF_PARTS／PAPER_PARTS 的段数现算，不写死（改段数时最容易漏的就是这一行）");
   /* ⚠ 只在 BRIEF_PARTS 这一块里数：全文宽搜会把 PAPER_PARTS 的段也数进来。
    2026-08-13 就是这么假过的一次——BRIEF_PARTS 只有 2 段（第十栏那笔改动在 git 重放时丢了），
    宽正则却数出 3（多算了 PAPER_PARTS 的第四段），恰好凑出当时期望的 13，判据全绿而病已上线。 */
@@ -199,9 +218,21 @@ const _bpA = h.indexOf("var BRIEF_PARTS=[");
 const _bpB = h.indexOf("];", _bpA);
 const nParts = (_bpA > 0 && _bpB > _bpA) ? (h.slice(_bpA, _bpB).match(/\{min:\d+,name:/g) || []).length : -1;
 ok(nParts > 0, "数得出 BRIEF_PARTS 的段数 · 实得 " + nParts);
-  const expect = 4 + (1 + nParts) + 4 + 1;
-  ok(new RegExp("约 <b>" + expect + "<\\/b> 次基底调用（开涌现档 " + (4 + 7 + 4 + 1) + " 次）").test(h),
-    "说明条里的次数与公式对得上 · 段数 " + nParts + " ⇒ 应为 " + expect);
+  /* 论文段数与问对批数也一律从源码取，跟提炼那一项同一个做法。
+     2026-08-21 成文四段改五段时，页面说明条正是漏在这里（写着 15，公式算出来是 16）。 */
+  const _ppA = h.indexOf("var PAPER_PARTS=[");
+  const _ppB = h.indexOf("];", _ppA);
+  const nPaper = (_ppA > 0 && _ppB > _ppA) ? (h.slice(_ppA, _ppB).match(/\{min:\d+\s*,name:/g) || []).length : -1;
+  ok(nPaper > 0, "数得出 PAPER_PARTS 的段数 · 实得 " + nPaper);
+  const _abA = h.indexOf("function autoBatchSize(");
+  const _abB = h.indexOf("var autoRunning=", _abA);
+  const nBatch = new Function(
+    h.slice(h.indexOf("var AUTO_TARGET="), h.indexOf(";", h.indexOf("var AUTO_TARGET=")) + 1) +
+    h.slice(_abA, _abB) + "return autoBatchCount();")();
+  ok(nBatch > 0, "算得出问对批数 · 实得 " + nBatch);
+  const expect = nBatch + (1 + nParts) + nPaper + 1;
+  ok(new RegExp("约 <b>" + expect + "<\\/b> 次基底调用（开涌现档 " + (nBatch + 7 + nPaper + 1) + " 次）").test(h),
+    "说明条里的次数与公式对得上 · " + nBatch + "批＋(1+" + nParts + ")＋" + nPaper + "段＋1 ⇒ 应为 " + expect);
 
   console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
   process.exit(F ? 1 : 0);
