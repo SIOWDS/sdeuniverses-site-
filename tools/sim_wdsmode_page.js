@@ -150,7 +150,8 @@ T('返回浏览=history.back', e3.navigated==='BACK');
   T("脚本一开始就把它拉进来（点击那一刻句柄要已在内存里）", dec.includes("SAVEDIR_SRC") && dec.includes("sc.src = SAVEDIR_SRC"));
   T("启用撞名顺延，反复成文不覆盖上一稿", dec.includes("noOverwrite: true"));
   T("拿不到模块时退回普通下载，读者不空手", dec.includes('if (!A || !A.supported()) { say(t("dDirNoApi")); download(name, text); return; }'));
-  T("导出本场对话也走同一个目录", dec.includes("function exportSession") && dec.includes('saveToDir("WDS-" + safeName(t("convoTitle"))'));
+  // ⚠ 2026-08-22：文件名前缀改走 fileTag()——分身页导出的文件不该叫 WDS-（见 wds-mode.js 那三个署名常量）
+  T("导出本场对话也走同一个目录", dec.includes("function exportSession") && dec.includes('saveToDir(fileTag("WDS") + "-" + safeName(t("convoTitle"))'));
   T("菜单动作有浮动提示条（菜单里没有状态栏可写）", dec.includes("wdsm-toast") && dec.includes("function toast(msg)"));
   // ── 侧栏「收回」必须有回程票（2026-07-30 线上读者反馈：点了 « 就再也回不来）──
   // « 长在 .wdsm-side 内部，而 .fold 把侧栏压成 width:0;overflow:hidden，按钮跟着一起消失；

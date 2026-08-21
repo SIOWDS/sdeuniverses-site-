@@ -60,6 +60,11 @@
       id: "lang",
       brand: "ChatJohn",
       url: "/chatjohn/",
+      /* 导出物上的署名（PDF 页脚、每一答抬头、PPT 角标）。少写一条就落回 ChatSDE 那一套，
+         而那正是「界面全对、导出来的文件不对」那种最难被发现的错。 */
+      sig: "ChatJohn \u00b7 lang.sdeuniverses.com",
+      who: "John",
+      kicker: "LANG.SDEUNIVERSES.COM",
       home: "/",
       // 语言版留下的工序：与语言域真用得上的那几件。产线（forge）照给——
       // 「撞出语言领域的新判断」正是它的活。去掉的是 grid/nine/map 那三件全站坐标类的。
@@ -113,6 +118,9 @@
           tlGap: "找那个还没有名字的东西", tlGapS: "读出现有说法漏掉的那一处，造一个词去填",
           tlCollide: "三篇互相顶一顶", tlCollideS: "站内三篇彼此矛盾的文章，撞出一句新判断",
           tlForge: "跨学科撞一条新判断", tlForgeS: "三家互撞的简版（整趟十八道用 /通融）",
+          /* 产线面板的抬头。共用那条写的是「学科通融 · 二阶碰撞」——读者在这台机器上
+             看到的应该是他要的东西（撞出一条语言上的新判断），不是这套工具的内部叫法。 */
+          fgTitle: "跨学科撞一条新判断",
           tlWhat: "这到底是什么", tlWhatS: "三刀合看这个语言现象究竟是什么",
           tlHow: "该怎么办", tlHowS: "三个落点合出一套明天就能用的做法",
           tlWhy: "为什么会这样", tlWhyS: "推翻问题里那条没说出口的动力",
@@ -175,6 +183,7 @@
           tlGap: "Find what has no name yet", tlGapS: "Locate what existing accounts miss, and coin a term for it",
           tlCollide: "Let three pieces clash", tlCollideS: "Three contradictory pieces from this site, collided into one new claim",
           tlForge: "Collide fields into a new claim", tlForgeS: "Short version of the three-way clash (full 18-stage run: /通融)",
+          fgTitle: "Collide fields into a new claim",
           tlWhat: "What is this, really?", tlWhatS: "Three cuts at what this language phenomenon actually is",
           tlHow: "What do I do about it?", tlHowS: "Three angles combined into something usable tomorrow",
           tlWhy: "Why does it happen?", tlWhyS: "Overturn the unspoken driver inside the question",
@@ -222,6 +231,16 @@
   var PROF_ID = PROFILE ? PROFILE.id : "";
   var BRAND = PROFILE ? PROFILE.brand : "ChatSDE";
   var PAGE_URL = PROFILE ? PROFILE.url : "/taste/chatsde/";
+  /* ── 产出物上的署名（2026-08-22 清结）──
+     PDF 的页脚与每一答的抬头、Word 的作者、PPT 每页的角标、导出文件名、会话 Markdown 里
+     答者那三个字——这些都是**读者会拿出去给别人看的东西**。它们此前一律写死 ChatSDE / WDS /
+     SDE UNIVERSES：ChatJohn 里聊了一整场语言，导出来的 PDF 每一答上方印着「WDS」、页脚是
+     另一个站的名字。⚠ 这一层最容易漏，因为界面上全对，只有导出的那份文件不对。
+     三个常量都**只在挂了档案时才换**，ChatSDE 那一侧一字不变。 */
+  var SIG = PROFILE && PROFILE.sig ? PROFILE.sig : "ChatSDE \u00b7 sdeuniverses.com";   // 页脚／页眉那一行
+  var WHO = PROFILE && PROFILE.who ? PROFILE.who : "WDS";                                // 答者的名字
+  var KICKER = PROFILE && PROFILE.kicker ? PROFILE.kicker : "SDE UNIVERSES";             // PPT 每页角标
+  function fileTag(dflt) { return PROF_ID ? BRAND : dflt; }                              // 下载文件名的前缀
   /* 每一个打到 /api/wds/* 的请求都要盖上这个戳。
      ⚠ 漏一处的后果不是报错，是**静默串台**：那一路会拿 WDS 的人格、全站的语料来答，
      而页面上仍写着 ChatJohn。所以盖戳集中在这一个函数里，调用点只管调它。 */
@@ -1996,7 +2015,7 @@
       MEM.profileRefresh(kv, say).then(paint);
     };
     exB.onclick = function () {
-      download("WDS-memory-" + stampName() + ".json",
+      download(fileTag("WDS") + "-memory-" + stampName() + ".json",
         JSON.stringify({ site: "sdeuniverses.com", kind: "wds-global-memory", at: new Date().toISOString(), profile: MEM.state.profile, memos: MEM.state.memos }, null, 2));
     };
     clB.onclick = function () {
@@ -2722,7 +2741,7 @@
     var d = window.WDSPptx.parse(text);
     if (!d || !d.slides.length) return null;
     d.footer = t("deckFoot") + " · " + new Date().toISOString().slice(0, 10);
-    d.kicker = "SDE UNIVERSES";
+    d.kicker = KICKER;
     return d;
   }
   /* 配图要在**点击之前**取回来：build() 必须全同步（保住用户手势），
@@ -2856,7 +2875,7 @@
       b.onclick = function () {
         var q = String(ta.value || "").trim();
         if (!q) { ta.focus(); return; }
-        H.send(a.id, q, "SDE 对话");
+        H.send(a.id, q, PROF_ID ? BRAND : "SDE 对话");
         b.querySelector("u").textContent = "已在新标签打开，去那边按开始";
       };
       list.appendChild(b);
@@ -4487,7 +4506,7 @@
       cvGrab();
       SDEVault.kb({
         title: it.title, kind: it.kind, text: cvText(),
-        from: "ChatSDE · 画布与共创", ver: it.vi + 1
+        from: BRAND + " · " + tx("cvTitle"), ver: it.vi + 1
       }, cvNoteEl());        // ⚠ 必须传**真 DOM 元素**：模块的 note() 是 box.innerHTML=…，
                              //   传个带 _note 的假壳它会静默什么都不做（看着像存成功了）
     });
@@ -5311,7 +5330,7 @@
       body: JSON.stringify({
         credential: c, op: "dr", a: "add",
         title: it.title, kind: it.kind, text: cvText(),
-        from: "ChatSDE · 画布与共创", ver: it.vi + 1, note: String(note || "").slice(0, 400)
+        from: BRAND + " · " + tx("cvTitle"), ver: it.vi + 1, note: String(note || "").slice(0, 400)
       })
     }).then(function (r) { return r.json(); }).then(function (d) {
       var x = (d && d.d) ? d.d : d;            // 信封只拆一次
@@ -5335,11 +5354,11 @@
     else body = "<pre style='white-space:pre-wrap;word-break:break-word'>" + esc(cvText()) + "</pre>";
     window.WDSPdf.print({
       title: it.title,
-      file: "ChatSDE-" + safeName(it.title) + "-" + stampName(),
+      file: fileTag("ChatSDE") + "-" + safeName(it.title) + "-" + stampName(),
       lang: LANG === "en" ? "en" : "zh",
       katex: "/assets/katex/katex.min.css",
       base: cvOrigin() ? cvOrigin() + "/" : "",
-      meta: [new Date().toLocaleString(), tx("cvTitle") + " \u00b7 " + it.kind, "ChatSDE \u00b7 sdeuniverses.com"],
+      meta: [new Date().toLocaleString(), tx("cvTitle") + " \u00b7 " + it.kind, SIG],
       blocks: [{ q: "", html: body, aLabel: "" }],
       foot: t("pdfFoot")
     }, function (ok) { if (!ok) alert(t("pdfNo")); else toast(t("pdfTip")); });
@@ -5527,7 +5546,7 @@
     if (end - COMP.upto < 4) return;                          // 不值当为两三条跑一趟基底
     var kv = wdsKeyGet(); if (!kv) return;
     var seg = history.slice(COMP.upto, end).map(function (m) {
-      return (m.role === "reader" ? "读者：" : "WDS：") + String(m.text || "").slice(0, 4000);
+      return (m.role === "reader" ? "读者：" : (WHO + "：")) + String(m.text || "").slice(0, 4000);
     }).join("\n\n");
     var payload = {
       mode: "ledger", key: kv.key, vendor: kv.vendor, model: kv.model || "",
@@ -5985,13 +6004,13 @@
       try { if (who) localStorage.setItem("sde_sub_author", who); } catch (e) {}
       var title = firstTitleOf(text) || kindT(kind);
       msg.textContent = t("subWait");
-      var blob = window.SDEDocx.build({ title: title, author: who || "ChatSDE", md: text });
+      var blob = window.SDEDocx.build({ title: title, author: who || BRAND, md: text });
       // 命名成 .zip 以过服务端的 ZIP 校验（docx 首字节本就是 PK，改名不改内容）
-      var fname = safeName((who || "ChatSDE") + "_" + title).slice(0, 48) + "_" + stampName() + ".zip";
+      var fname = safeName((who || BRAND) + "_" + title).slice(0, 48) + "_" + stampName() + ".zip";
       var fd = new FormData();
       fd.append("pass", pass);
       fd.append("student", who);
-      fd.append("note", "【ChatSDE 成文·" + kindT(kind) + "】" + title);
+      fd.append("note", "【" + BRAND + " 成文·" + kindT(kind) + "】" + title);
       fd.append("file", blob, fname);
       fetch("/api/submit", { method: "POST", body: fd })
         .then(function (r) { return r.json().catch(function () { return {}; }); })
@@ -6072,12 +6091,12 @@
   };
   function sessionMd() {
     var out = "# " + t("convoTitle") + "\n\n> " + new Date().toLocaleString() + " · sdeuniverses.com\n\n";
-    history.forEach(function (m) { out += (m.role === "reader" ? "**我：**" : "**WDS：**") + "\n\n" + m.text + "\n\n---\n\n"; });
+    history.forEach(function (m) { out += (m.role === "reader" ? "**我：**" : ("**" + WHO + "：**")) + "\n\n" + m.text + "\n\n---\n\n"; });
     return out;
   }
   // 导出本场对话：和成文共用同一个目录——选过目录就写进去，没选过就当场问一次，都不行才普通下载。
   function exportSession() {
-    saveToDir("WDS-" + safeName(t("convoTitle")) + "-" + stampName() + ".md", sessionMd(), toast);
+    saveToDir(fileTag("WDS") + "-" + safeName(t("convoTitle")) + "-" + stampName() + ".md", sessionMd(), toast);
   }
 
   /* ════════ 导出为 PDF ════════
@@ -6161,12 +6180,12 @@
       window.WDSPdf.print({
         title: t("convoTitle"),
         // 建议文件名带时间戳：每场对话各存一份，不必再去跟"是否替换同名文件"较劲
-        file: "ChatSDE-" + safeName(t("convoTitle")) + "-" + stampName(),
+        file: fileTag("ChatSDE") + "-" + safeName(t("convoTitle")) + "-" + stampName(),
         lang: LANG === "en" ? "en" : "zh",
         katex: "/assets/katex/katex.min.css",
         base: (location && location.origin ? location.origin + "/" : ""),
-        meta: [new Date().toLocaleString(), blocks.length + t("sbTurnsN"), "ChatSDE · sdeuniverses.com"],
-        blocks: blocks.map(function (b) { return { q: b.q, html: b.html, qLabel: t("pdfMe"), aLabel: "WDS" }; }),
+        meta: [new Date().toLocaleString(), blocks.length + t("sbTurnsN"), SIG],
+        blocks: blocks.map(function (b) { return { q: b.q, html: b.html, qLabel: t("pdfMe"), aLabel: WHO }; }),
         foot: t("pdfFoot"),
       }, function (done) { if (!done) alert(t("pdfNo")); else toast(t("pdfTip")); });
       });
@@ -6306,7 +6325,7 @@
         if (!d) { stat.textContent = t("dPptxNo"); return; }
         if (tpl && !d.theme) d.theme = tplTheme(tpl);      // 模板定的主题（稿子里写了 theme: 则以稿子为准）
         var blob = window.WDSPptx.blob(d);            // 同步造好字节，再去要目录/下载（手势还新鲜）
-        var nm = "WDS-" + safeName(d.title || kindT(kind)) + "-" + stampName() + ".pptx";
+        var nm = fileTag("WDS") + "-" + safeName(d.title || kindT(kind)) + "-" + stampName() + ".pptx";
         stat.textContent = t("dPptxOk") + (d.slides.length + 1) + " · 渲染器 v" + (window.WDSPptx.VERSION || "?");
         saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = msg; });
       };
@@ -6321,8 +6340,8 @@
       dxBtn.onclick = function () {
         if (!text) return;
         if (!window.SDEDocx) { stat.textContent = t("dPptxWait"); return; }
-        var blob = window.SDEDocx.build({ title: firstTitleOf(text) || kindT(kind), author: "ChatSDE", md: text });
-        var nm = "WDS-" + safeName(firstTitleOf(text) || kind) + "-" + stampName() + ".docx";
+        var blob = window.SDEDocx.build({ title: firstTitleOf(text) || kindT(kind), author: BRAND, md: text });
+        var nm = fileTag("WDS") + "-" + safeName(firstTitleOf(text) || kind) + "-" + stampName() + ".docx";
         saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = msg; });
       };
       /* PDF：Word 早就有了，PDF 此前只有「导出整场对话」那一个口——
@@ -6424,11 +6443,11 @@
           try { body = mdRender(text); } catch (e) { body = "<pre>" + esc(text) + "</pre>"; }
           window.WDSPdf.print({
             title: ttl,
-            file: "WDS-" + safeName(ttl) + "-" + stampName(),
+            file: fileTag("WDS") + "-" + safeName(ttl) + "-" + stampName(),
             lang: LANG === "en" ? "en" : "zh",
             katex: "/assets/katex/katex.min.css",
             base: (location && location.origin ? location.origin + "/" : ""),
-            meta: [new Date().toLocaleString(), text.length + t("dChars"), "ChatSDE \u00b7 sdeuniverses.com"],
+            meta: [new Date().toLocaleString(), text.length + t("dChars"), SIG],
             blocks: [{ html: body, aLabel: "" }],     // aLabel 空串 ＝ 不印发言人抬头（论文不是对话）
             foot: t("pdfFoot"),
           }, function (okp) { stat.textContent = okp ? t("pdfTip") : t("pdfNo"); });
@@ -6444,7 +6463,7 @@
     dirBtn.title = dirName() ? (t("dDirSaved") + dirName()) : t("dDirNone");
     dirBtn.onclick = function () {
       if (!text) return;
-      saveToDir("WDS-" + safeName(title || kindT(kind)) + "-" + stampName() + ".md", text, function (msg) {
+      saveToDir(fileTag("WDS") + "-" + safeName(title || kindT(kind)) + "-" + stampName() + ".md", text, function (msg) {
         if (msg) stat.textContent = msg;
         dirBtn.title = dirName() ? (t("dDirSaved") + dirName()) : t("dDirNone");
       });
@@ -6703,7 +6722,7 @@
       distClose();
     });
     cpBtn.onclick = function () { copyText(text); cpBtn.textContent = t("aCopied"); setTimeout(function () { cpBtn.textContent = t("dCopy"); }, 1400); };
-    dlBtn.onclick = function () { download("WDS-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
+    dlBtn.onclick = function () { download(fileTag("WDS") + "-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
     svBtn.onclick = function () {
       if (!text) return;
       distSave(kindT(kind), text, function (ok) { svBtn.textContent = ok ? t("dSaved") : t("dNoStore"); });
@@ -6799,7 +6818,7 @@
           var cp2 = el("button", "wdsm-tbtn", t("dCopy"));
           cp2.onclick = function () { copyText(text); };
           var dl2 = el("button", "wdsm-tbtn", t("dDl"));
-          dl2.onclick = function () { download("WDS-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
+          dl2.onclick = function () { download(fileTag("WDS") + "-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
           /* 带上 dx：靠 wrap 上那个委托来关，和顶栏那颗、逃生钮那颗走同一条路（会先存稿）。 */
           var x2 = el("button", "wdsm-tbtn dx", "\u2715");
           bar.appendChild(tt); bar.appendChild(cp2); bar.appendChild(dl2); bar.appendChild(x2);

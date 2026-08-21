@@ -268,7 +268,12 @@ async function main() {
     const s = sysOf(lastUp());
     ok(/第 3 段/.test(s), "分段写作：告诉它现在写第几段");
     ok(/上一段的尾巴。/.test(s), "接缝：上一段的尾巴传回去对齐");
-    ok(/不许出现 S／D／E/.test(s), "论文体例里那条「不许出现 S／D／E」还在");
+    /* ⚠ 这一条 2026-08-22 改了：体例里原来那句自己就在点名 S／D／E 与 Form-D-Meaning——
+       **禁令自己把黑话又写了一遍**，而它就在递给基底的 system 里。现在改成指回上面的忌讳表。 */
+    ok(/别处搬来的框架词与字母缩写一律不出面/.test(s), "论文体例仍禁外来术语，但不再自己把那些词又列一遍");
+    /* 只看体例那一段（John 底本末尾的忌讳表**必须**列出这些词，那是闸不是泄漏）。 */
+    const _spec = s.slice(s.indexOf("【文体：学术论文】"));
+    ok(_spec.length > 100 && !/Form-D-Meaning|S／D／E/.test(_spec), "体例这一段里不再出现那些词");
     ok(/可引用的站内材料/.test(s), "站内材料进了成文的 system");
     ok(r.got("fin").length === 1 && r.got("fin")[0].v.wrote > 2000, "fin 帧报出这一段写了多少字");
 
@@ -381,6 +386,67 @@ async function main() {
     ok(fs.existsSync(neigong) && fs.statSync(neigong).size > 20000, "lang 档案指名的那份内功文件在仓库里");
   }
 
+  // ────────────────────────────────────────────────────────────
+  hd("【六】术语泄漏计数器 —— 每一条路真正递给基底的那份 system");
+  {
+    /* 这一节是 2026-08-22 那轮清结留下的**尺子**，不是一次性检查。
+       量法：把上游收到的 system 抓下来，先剪掉三处**必须**列出这些词的地方
+       （题域闸／术语闸／John 底本里的忌讳表——闸的活就是把它们列出来供比对），
+       剩下的每一次命中都是真泄漏：模型读了满屏黑话，就会顺手写给语言老师看。
+       ⚠ 这些不是「多几个词」的问题。清结前实测：问答 109 处、成文 10–12 处，
+       而成文那条路的骨架**排在术语闸之后**——闸的全部效力来自它在最末，
+       等于那一档的术语闸在成文时是废的。 */
+    const BAN = ["SDE", "显露", "差异序列", "特征纠缠", "纠缠", "介生态", "混沌态", "秩序态", "成熟态",
+      "发生学", "本体论", "Form-D-Meaning", "三界", "SIO", "六路径", "123 原理", "回写", "王德生",
+      "三大方程", "S=F(D,E)", "意义三律", "金点子", "龙爪手", "改姓", "创新智商"];
+    const leaks = (sys) => {
+      let s = String(sys);
+      for (const mark of ["【说话的忌讳", "【题域闸", "【术语闸"]) {
+        let i;
+        while ((i = s.indexOf(mark)) >= 0) { const j = s.indexOf("\n\n", i + 10); s = s.slice(0, i) + s.slice(j < 0 ? s.length : j); }
+      }
+      const out = [];
+      for (const b of BAN) { const n = s.split(b).length - 1; if (n) out.push(b + "×" + n); }
+      return out;
+    };
+    const convo = [{ role: "reader", text: "语感能不能教？我的学生语法都会，就是不敢开口。".repeat(6) },
+                   { role: "wds", text: "先给我一句真实的例句：他在办公室里想说什么。".repeat(6) }];
+    const check = async (label, path, body) => {
+      UP.mode = "ok"; UP.seen = []; UP.frames = [delta("好。"), "[DONE]"];
+      await hit(path, body);
+      if (!UP.seen.length) { ok(false, label + "：没打到上游（这一路没跑起来）"); return; }
+      const bad = leaks(sysOf(lastUp()));
+      ok(bad.length === 0, label + " 闸外零泄漏", bad.join(" "));
+    };
+    await check("完整版问答", "/api/wds/chat", { key: "sk-1234567890", profile: "lang", q: "语感是练出来的吗", history: [] });
+    await check("深想档", "/api/wds/chat", { key: "sk-1234567890", profile: "lang", q: "语感", history: [], mode: "deep" });
+    for (const tl of ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"]) {
+      await check("工序 /" + tl, "/api/wds/chat", { key: "sk-1234567890", profile: "lang", q: "语感", history: [], tool: tl });
+    }
+    for (const kd of ["essay", "report", "outline", "deck"]) {
+      await check("成文 · " + kd, "/api/wds/distill", { key: "sk-1234567890", profile: "lang", kind: kd, history: convo });
+    }
+    await check("成文 · 论文提纲", "/api/wds/distill", { key: "sk-1234567890", profile: "lang", kind: "paper", stage: "plan", history: convo });
+    await check("成文 · 论文写节", "/api/wds/distill", { key: "sk-1234567890", profile: "lang", kind: "paper", stage: "part", part: 1,
+      history: convo, plan: { title: "x", sections: [{ h: "摘要与关键词", ask: "写摘要", words: 1100 }] } });
+    await check("轻量版问答", "/api/john/chat", { key: "sk-1234567890", messages: [{ role: "user", content: "语感是练出来的吗" }] });
+    await check("轻量版成文", "/api/john/compose", { key: "sk-1234567890", kind: "paper", part: 1,
+      messages: [{ role: "user", content: "语感能不能教？".repeat(30) }, { role: "assistant", content: "先给例句。".repeat(30) }] });
+
+    // 这一档没开的工序，递上来也不该被挂上（否则读者拿到一台他这儿根本没有的机器）
+    UP.mode = "ok"; UP.seen = []; UP.frames = [delta("好。"), "[DONE]"];
+    await hit("/api/wds/chat", { key: "sk-1234567890", profile: "lang", q: "语感", history: [], tool: "grid" });
+    ok(!/27 宫格/.test(sysOf(lastUp())), "⭐ 这一档没开的工序（/坐标）递上来也不认");
+
+    // 这一档挂的是改姓版底盘，不是通用轻功档
+    UP.seen = []; await hit("/api/wds/chat", { key: "sk-1234567890", profile: "lang", q: "语感", history: [] });
+    const s6 = sysOf(lastUp());
+    ok(/在场合里，经用法，成形式/.test(s6), "挂的是改姓版底盘（lang-neigong.txt）");
+    ok(!/轻功档/.test(s6), "通用轻功档没有被一起挂上来");
+    const iTerm2 = s6.lastIndexOf("【术语闸");
+    ok(iTerm2 > 0 && s6.length - iTerm2 < 700, "术语闸仍在整份 system 的最末", "距末尾 " + (s6.length - iTerm2));
+  }
+
   // ── 真启动一次引擎：分身页不该再画三态条（2026-08-22 摘除） ──
   {
     const { JSDOM } = require("jsdom");
@@ -407,6 +473,19 @@ async function main() {
     ok(!!john.doc.querySelector(".wdsm-layer"), "界面其余部分照常长出来");
     const brand = (john.doc.querySelector(".wdsm-sbrand a") || {}).textContent;
     ok(brand === "ChatJohn", "抬头还是 ChatJohn", String(brand));
+
+    /* 导出物的署名（PDF 页脚与每一答抬头、Word 作者、PPT 角标、文件名）。
+       这一层最容易漏：界面上全对，只有读者导出去给别人看的那份文件不对。 */
+    const js2 = fs.readFileSync(ROOT + "/public/wds-mode.js", "utf8");
+    ok(/var SIG = PROFILE && PROFILE\.sig/.test(js2) && /var WHO = PROFILE && PROFILE\.who/.test(js2)
+       && /var KICKER = PROFILE && PROFILE\.kicker/.test(js2), "署名走档案常量（SIG／WHO／KICKER）");
+    ok(/sig: "ChatJohn/.test(js2) && /who: "John"/.test(js2) && /kicker: "LANG/.test(js2), "lang 档案把这三条都给全了");
+    ok(!/aLabel: "WDS"/.test(js2), "PDF 里每一答的抬头不再写死 WDS");
+    ok(!/"ChatSDE · sdeuniverses\.com"\]/.test(js2), "PDF 页脚不再写死另一个站的名字");
+    ok(!/d\.kicker = "SDE UNIVERSES"/.test(js2), "PPT 每页角标不再写死 SDE UNIVERSES");
+    ok((js2.match(/fileTag\(/g) || []).length >= 8, "下载文件名前缀统一走 fileTag()",
+      String((js2.match(/fileTag\(/g) || []).length));
+    ok(/author: who \|\| BRAND/.test(js2) && /author: BRAND/.test(js2), "Word 的作者栏跟着品牌走");
   }
 
   console.log("\n════════════════════════════════════════════════");

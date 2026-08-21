@@ -97,13 +97,27 @@ console.log("\n── ②c 这一档自己的内功 ─────────�
   const seg = W.slice(W.indexOf("const WDS_PROFILES = {"), W.indexOf("function wdsProfileOf"));
   const m = /neigong: "([^"]+)"/.exec(seg);
   t("lang 带自己的内功", !!m, "(没有)");
-  t("内功指向轻功档，不是站上那份满血的", !!m && m[1] === "/taste/assets/sde-neigong-lite.txt", m && m[1]);
+  /* ⚠ 2026-08-22 换档：原来挂的是通用轻功档 sde-neigong-lite.txt——它自己通篇是母体术语
+     （第零条那张严禁词表、三大方程、回写…），实测这一台的 system 闸外泄漏 109 处、其中 65 处
+     出自它。现在挂的是同一套工序、整份改用本地说法的 lang-neigong.txt。通用那份一字未动。 */
+  t("内功指向这一档自己那份改姓版，不是通用轻功档、更不是满血那份",
+    !!m && m[1] === "/taste/assets/lang-neigong.txt", m && m[1]);
   t("轻功档文件真的在", fs.existsSync("public" + (m ? m[1] : "")));
   const lite = m && fs.existsSync("public" + m[1]) ? fs.readFileSync("public" + m[1], "utf8") : "";
   t("轻功档过得了 loadNeigong 的 5000 字节闸", lite.length > 5000, "bytes=" + lite.length);
   t("轻功档确实是轻的（不到满血那份的四分之一）",
     lite.length > 0 && lite.length < fs.readFileSync("public/taste/assets/sde-neigong.txt", "utf8").length / 4);
-  t("轻功档自带改姓纪律（John 不该对语言老师讲 S/D/E）", /改姓/.test(lite) && /术语/.test(lite));
+  t("这份底盘自带说话的规矩（John 不该对语言老师讲那套黑话）",
+    /说话的规矩/.test(lite) && /本地/.test(lite));
+  /* ⭐ 最要紧的一条：这份底盘自己**必须**零母体术语——它是每一轮都注入的，
+     底盘里有什么词，答案里迟早出什么词。 */
+  {
+    const BAN = ["SDE", "显露", "差异序列", "特征纠缠", "纠缠", "介生态", "成熟态", "发生学",
+      "本体论", "三界", "SIO", "六路径", "回写", "三大方程", "改姓", "创新智商", "金点子"];
+    const hit = BAN.filter((b) => lite.indexOf(b) >= 0);
+    t("⭐ 这份底盘自己零母体术语", hit.length === 0, hit.join(" "));
+  }
+  t("通用轻功档仍在（站上另有几台在读它）", fs.existsSync("public/taste/assets/sde-neigong-lite.txt"));
   // ⚠ 没覆盖站上那份满血的：它被十几个页面直接 fetch，覆盖＝改动全站每一台机器
   /* ⚠ 第一版拿字符数 >100000 当判据，假红：文件 141,758 **字节**，而中文一个字三字节，
      读成 utf8 字符串只有约 5 万字符。💡 判「文件有没有被动过」不要用长度猜——**问 git**。 */
