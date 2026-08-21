@@ -21,13 +21,31 @@
   "triggers": { "crons": ["17 4 * * *"] },
   /* 【计划档位与 limits】2026-08-21 09:14（新加坡）本账号由 Workers Free 升到 Workers Paid $5/月。
      · CPU 时间/次调用：免费档 10ms → 付费档默认 30s（可加 "limits":{"cpu_ms":…} 提到 300000＝5 分钟）。
-       **这里故意不写 limits**：默认 30s 已经远够用，写死一个数反而会在某次长活上错。
+       **不提到 5 分钟**：提高上限一分钱不多花（按实际用掉的 CPU 计费），但它是保险丝不是油门——
+       调高＝跑飞时能烧更久才被拦下来，而免费档那道「超限当场报错」的保险丝已经随升级一起没了。
+       **也不当场夹到 10s**：站上有几条**纯 CPU** 的活（wds-pptx.js 在 Worker 里造 .pptx、
+       万字论文出 PDF、索引侧的文本切扫），它们本来就该吃秒级 CPU，没量过就夹紧＝拿智能体的稳定去赌。
+       ⇒ 分两步：**这一笔先把 cpu_ms 显式写成默认的 30000**（行为零变化，只是把口径落到纸面），
+       同时打开下面的 observability 收 cpuTime；等 Workers Logs 攒够一两天真数据，
+       看 p99 再夹到「p99 的三到五倍」那个数上（预计落在 5000–10000）。**先量后夹，不许拍脑袋。**
      · isolate 内存 128MB：**两档完全一样，$5 不动它**。历史上那几场 error 1102 全是内存峰值，
        别指望升级能治——治它的是「永不整份 parse」「SELF 把检索拆出去单跑」「TIER 只用 etag 复验」。
      · ⚠ 升级当天必须重新部署一次：升级前部署的版本可能仍按旧档执行限额
        （Cloudflare 文档原话是「若仍撞旧限额就 redeploy，让用量挂到新计划上」）。本笔即为那次重部署。
      · 🔴 付费档没有「超限当场报错」这道保险丝了，只会继续计费：CPU 每月含 3000 万 ms，
        超出 $0.02/百万 ms。要盯就去 Notifications 加 Usage Based Billing 告警，或看 Billable Usage。 */
+  "limits": { "cpu_ms": 30000 },
+  /* 【observability】把 Workers Logs 打开——每次调用都会记下 cpuTime / wallTime / outcome
+     （撞 CPU 上限时 outcome 是 exceededCpu，撞内存是 exceededResources），dashboard 的
+     Workers & Pages → 本 Worker → Logs / Observability 里可查、可按字段筛。
+     为什么现在才开：这站从 08-09 起八处按一个「约 128–133 秒的平台墙」定预算，那是**猜**出来的；
+     08-17／08-18 两次 1102 也是靠事后读码倒推病灶。**没有调用日志，故障只能靠猜。**
+     付费档每月含 2000 万条日志事件、留 7 天，本站流量连零头都用不掉；
+     真嫌多就把 head_sampling_rate 调小（1＝全记，0.1＝记一成）。 */
+  "observability": {
+    "enabled": true,
+    "logs": { "invocation_logs": true, "head_sampling_rate": 1 }
+  },
   "r2_buckets": [
     { "binding": "PDFS", "bucket_name": "sdeuniverses-pdf" }
   ],
