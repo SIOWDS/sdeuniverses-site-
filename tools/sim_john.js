@@ -1,9 +1,18 @@
 /* /api/john 的离线模拟：把端点里的消息钳位、SSE 逐行解析、错误分支拿出来单独跑。
    不联网、不碰 Key——只验"给什么输入 → 出什么帧"。改 /api/john 必跑这个。 */
+/* 钳位的两个数**从 src/worker.js 现读**，不在这里手抄。
+   血案：端点早已改成 24 轮 / 8000 字，本脚本里那份手抄的还停在 16 / 4000，
+   于是这个"改 /api/john 必跑"的安全网验的是一个不存在的口径，全绿也说明不了什么。 */
+const fs0=require("fs");
+const _wk=fs0.readFileSync("src/worker.js","utf8");
+const _cm=_wk.match(/jb\.messages[\s\S]{0,400}?\.slice\(-(\d+)\)[\s\S]{0,200}?content\)\.slice\(0,\s*(\d+)\)/);
+if(!_cm){ console.log("FAIL 抠不出 /api/john/chat 的钳位常量——端点结构变了，先改这条正则再跑"); process.exit(1); }
+const HIST_N=Number(_cm[1]), PER_MAX=Number(_cm[2]);
+console.log("（钳位口径读自 worker.js：最近 "+HIST_N+" 轮 / 每条 "+PER_MAX+" 字）");
 function clamp(messages){
   let msgs = Array.isArray(messages) ? messages : [];
   return msgs.filter((m)=>m&&(m.role==="user"||m.role==="assistant")&&typeof m.content==="string"&&m.content.trim())
-             .slice(-16).map((m)=>({role:m.role,content:String(m.content).slice(0,4000)}));
+             .slice(-HIST_N).map((m)=>({role:m.role,content:String(m.content).slice(0,PER_MAX)}));
 }
 function parseSSE(chunks){
   let buf="",got=0,out=[],fin=false;
@@ -24,8 +33,10 @@ const t=(name,cond)=>{ console.log((cond?"PASS":"FAIL"),name); cond?pass++:fail+
 t("空消息被挡", clamp([]).length===0);
 t("system 角色被过滤", clamp([{role:"system",content:"x"},{role:"user",content:"a"}]).length===1);
 t("空白内容被过滤", clamp([{role:"user",content:"   "}]).length===0);
-t("只留最近16轮", clamp(Array.from({length:30},(_,i)=>({role:"user",content:"q"+i}))).length===16);
-t("超长内容被截到4000", clamp([{role:"user",content:"字".repeat(9000)}])[0].content.length===4000);
+t("只留最近"+HIST_N+"轮", clamp(Array.from({length:HIST_N+14},(_,i)=>({role:"user",content:"q"+i}))).length===HIST_N);
+t("留的是最近的那几轮", clamp(Array.from({length:HIST_N+14},(_,i)=>({role:"user",content:"q"+i})))[0].content==="q14");
+t("超长内容被截到"+PER_MAX, clamp([{role:"user",content:"字".repeat(PER_MAX+2000)}])[0].content.length===PER_MAX);
+t("不足上限的不动", clamp([{role:"user",content:"字".repeat(10)}])[0].content.length===10);
 t("非字符串被过滤", clamp([{role:"user",content:{a:1}}]).length===0);
 
 const mk=(s)=>'data: '+JSON.stringify({choices:[{delta:{content:s}}]})+'\n\n';
