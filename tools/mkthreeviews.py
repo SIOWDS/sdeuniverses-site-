@@ -316,10 +316,13 @@ LINEAGE = """<div class="lineage">
 主体从不同的角度与客体互动、发生矛盾，于是得到不同的三视角——<b>特征、具相、关系</b>，
 也就是对比、变化、分布。那么请问：<b>这份知识是谁的？</b>
 是客体事物的？是主体的？还是那场互动的？——这道题在它自己的框架里没有一处能安放。</p>
-<p class="lg-warn">它留下的是一个<b>巨大的亏空</b>：</p>
-<p class="lg-fml">知识 ＝ F（主体的视角选择，互动矛盾种类，客体）</p>
+<p class="lg-warn">主体与客体互动，产生某种<b>现象的特征</b>，那就是知识。
+写成式子，它留下的是一个<b>巨大的亏空</b>：</p>
+<p class="lg-fml">现象的特征 ＝ 知识 ＝ F（主体，客体，互动）
+<span class="lg-fml-sub">展开就是 F（主体的视角选择，互动矛盾的种类，客体）</span></p>
 <p class="lg-warn">三个变量——<b>主体、客体、互动</b>——一个都少不了，
-却没有哪一个能认领这份知识。
+可知识是这个函数的<b>值</b>，而函数值不归任何一个自变量所有。
+所以那道归属题不是没想周全，是<b>构造上就没有落点</b>。
 这条路走了整整四年，最后被推翻；由什么取代，是后面两站的事。
 「继承 · 创新 · 颠覆」里的<b>颠覆</b>，第一刀就落在这里。
 本栏「<a href="/three-views/library/to-sde/">从三视角到 SDE</a>」那一格收的四篇写于 2025 年 7 月，
@@ -362,7 +365,10 @@ ol.lg li p.lg-warn + p.lg-warn,ol.lg li p.lg-fml + p.lg-warn{margin-top:0}
 ol.lg li p.lg-fml{margin:0;padding:.75rem .85rem;border-left:3px solid var(--ac);
  background:rgba(15,110,140,.06);text-align:center;font-size:1.02rem;letter-spacing:.02em;
  color:var(--text);font-weight:600}
-@media(max-width:640px){ol.lg li p.lg-fml{font-size:.9rem}}
+ol.lg li p.lg-fml .lg-fml-sub{display:block;margin-top:.4rem;font-size:.82rem;
+ font-weight:400;color:var(--muted);letter-spacing:0}
+@media(max-width:640px){ol.lg li p.lg-fml{font-size:.9rem}
+ ol.lg li p.lg-fml .lg-fml-sub{font-size:.76rem}}
 .lg-ft{margin:.4rem 0 0;padding-top:.9rem;border-top:1px solid var(--border2);
  font-size:.92rem;line-height:1.85;color:var(--text2)}
 @media(max-width:640px){ol.lg li .lg-t{display:block;margin:.15rem 0 0}}
