@@ -15,7 +15,8 @@
  * 所以这份护栏钉住四件事，一件都不许再退回去：
  *   ①【清点】ancPick / ancEras 能把「作者＋年份」数出来，且对那份真稿给出的正是当时的读数；
  *   ②【永远下发】ANCESTORS 块在清单为空时也必须下发（从前空清单＝整块不发，最该报警时最安静）；
- *   ③【取料】标了 rag 的四节在语言档下会调 johnRag，别的节与别的档不调；
+ *   ③【取料】标了 rag 的四节两条路都取料，**按档案分流取料源**（语言档 johnRag 白名单／其余档主站 wdsRag），
+ *       别的节不取，且白名单绝不许被别的档继承；
  *   ④【收稿闸】写完当场数，不足只发 note、绝不在服务端重写这一节。
  */
 const fs = require("fs");
@@ -107,12 +108,21 @@ eq("正好四节标了要取料", ragged, 4);
   const i = SKEL.indexOf(h);
   ok("「" + h + "」这一节标了 rag", i > 0 && SKEL.slice(i, i + 120).indexOf("rag: 1") > 0);
 });
-ok("取料只在语言档（别的 profile 不许继承语言白名单）", /_fixSec\.rag && prof && prof\.id === "lang"/.test(WSRC));
+/* 2026-08-22：这道闸原来只对语言档开，于是**主站 ChatSDE 的两万字论文一趟也没取过站内料**。
+   现在两条路都取，但取料源按档案分流——白名单被别的档继承＝检索范围张冠李戴。 */
+const RAGBLK = (() => { const a = WSRC.indexOf("if (_fixSec && _fixSec.rag)"); return a < 0 ? "" : WSRC.slice(a, a + 1400); })();
+ok("标了 rag 的节两条路都取料（不再只对语言档开）", /if \(_fixSec && _fixSec\.rag\) \{/.test(WSRC));
+ok("语言档走 johnRag（白名单）", /prof && prof\.id === "lang"[\s\S]{0,200}johnRag\(env, url, _rq\)/.test(RAGBLK));
+ok("其余档走主站 wdsRag（全站检索）", /\} else \{[\s\S]{0,300}wdsRag\(env, url, \{ q: _rq/.test(RAGBLK));
+ok("语言白名单没有被别的档继承", RAGBLK.indexOf("johnRag") < RAGBLK.indexOf("} else {"));
+ok("两条路的检索词是同一个（题名＋承重命题＋本节标题）", (RAGBLK.match(/_rq/g) || []).length >= 3);
+ok("主站那一路按 /api/wds/rag 的口径拿 ctx", /_jr && _jr\.ok\) siteCtx = _jr\.ctx/.test(RAGBLK));
+ok("两条路各自 try/catch，取料失败都退化成不取", (RAGBLK.match(/catch \(e\) \{ siteCtx = ""; \}/g) || []).length === 2);
 ok("取料读的是服务端的 SPEC.fixed，不是客户端递上来的 secs",
   /_fixSec = \(Array\.isArray\(SPEC\.fixed\) && SPEC\.fixed\[partIdx\]\)/.test(WSRC));
 ok("查询词是题名＋承重命题＋本节标题（不是对话尾巴）",
-  /planIn\.title[\s\S]{0,120}planIn\.thesis[\s\S]{0,60}sec\.h[\s\S]{0,40}johnRag|johnRag\(env, url,\s*\n\s*\[String\(planIn\.title/.test(WSRC));
-ok("取料失败退化成不取，不抛错", /\} catch \(e\) \{ siteCtx = ""; \}/.test(WSRC));
+  /planIn\.title[\s\S]{0,120}planIn\.thesis[\s\S]{0,60}sec\.h/.test(RAGBLK));
+ok("取料失败退化成不取，不抛错", /catch \(e\) \{ siteCtx = ""; \}/.test(WSRC));
 ok("取到料就要求指名划界", /\u5fc5\u987b\u6307\u540d\u5212\u754c/.test(WSRC));
 ok("站内自己人比外面的对手更该划界，这句在", /\u7ad9\u5185\u81ea\u5df1\u4eba\u6bd4\u5916\u9762\u7684\u5bf9\u624b\u66f4\u8be5\u5212\u754c/.test(WSRC));
 ok("材料块仍守着「只有这几篇是真的」那条反编造纪律", /\u53ea\u6709\u8fd9\u51e0\u7bc7\u662f\u771f\u7684/.test(WSRC));

@@ -11008,12 +11008,23 @@ export default {
                  取料失败不算错，退化成「只凭对话与底本写」——绝不能让检索把整节拖挂。 */
               const _fixSec = (Array.isArray(SPEC.fixed) && SPEC.fixed[partIdx]) || null;
               let siteCtx = "";
-              if (_fixSec && _fixSec.rag && prof && prof.id === "lang") {
-                try {
-                  siteCtx = (await johnRag(env, url,
-                    [String(planIn.title || ""), String(planIn.thesis || ""), String(sec.h || "")].join(" ")
-                  )).text || "";
-                } catch (e) { siteCtx = ""; }
+              /* 2026-08-22：这道闸原来只对语言档开（`prof.id === "lang"`），于是**主站 ChatSDE 的两万字论文
+                 一趟也没取过站内料**——而站内同题划界正是那两份真跑（121.8 / 132.7）失分最集中的地方之一。
+                 现在两条路都通，按档案分流取料源，不是把语言白名单让给别人：
+                   · 语言档 → johnRag（JOHN_SCOPE 白名单：胡志英全部作品＋站上语言篇目＋四部专著）
+                   · 其余档 → wdsRag（主站全站检索，与答题那一路同一个 /api/wds/rag 子请求）
+                 ⚠ 白名单绝不许被继承：别的档拿到语言白名单＝检索范围张冠李戴。
+                 取料失败一律退化成「只凭对话与底本写」，绝不能让检索把整节拖挂。 */
+              if (_fixSec && _fixSec.rag) {
+                const _rq = [String(planIn.title || ""), String(planIn.thesis || ""), String(sec.h || "")].join(" ");
+                if (prof && prof.id === "lang") {
+                  try { siteCtx = (await johnRag(env, url, _rq)).text || ""; } catch (e) { siteCtx = ""; }
+                } else {
+                  try {
+                    const _rr = await wdsRag(env, url, { q: _rq.slice(0, 300), k: 12, cap: 8000, kbn: 18, chunk: 900 });
+                    if (_rr.ok) { const _jr = await _rr.json(); if (_jr && _jr.ok) siteCtx = _jr.ctx || ""; }
+                  } catch (e) { siteCtx = ""; }
+                }
               }
               const want = Math.max(400, Math.min(4000, parseInt(sec.words, 10) || 1200));
               const others = secs.map((s, i) => (i + 1) + "、" + String((s && s.h) || "")).join("\n");
