@@ -1936,7 +1936,7 @@ function _dimLetterOf(r){
 }
 function buildEmergeInput(rows, question, ragCtx){
   let s = '用户最初的问题是：' + question + '\n\n下面是从三个不同角度追问出来的三个金点子（三篇小论文）。请对它们执行三阶涌现工程。\n';
-  // 【结构定位】三个金点子按设计分处 S/D/E 三维各一（见 pick3 的对角线约束）。
+  // 【结构定位】三个金点子按设计分处 S/D/E 三维各一（见 pick3 的合法组合表：同号位 ／ 123 轮换）。
   // 这一段必须显式喂进去：维度是本次碰撞的结构信息，不是装饰性标签。
   const _L = (rows||[]).map(_dimLetterOf);
   if(_L.filter(Boolean).length === 3 && new Set(_L).size === 3){
@@ -2116,15 +2116,23 @@ const rowEls=[1,2,3].map(n=>({
 }));
 
 // 九宫格池（S1-S3 / D1-D3 / E1-E3 共9格）
-// 从九格中无放回随机抽3个（三次不重合）
-// 三个金点子必须分别来自 S、D、E 三个维度各一个（不允许同一维度出现两个）：
-// 先从 S(show)的 S1/S2/S3 随机抽一个，再从 D(diff)的 D1/D2/D3 随机抽一个，再从 E(entangle)的 E1/E2/E3 随机抽一个。
+// 【取三格的合法组合表】九格取三格不是 C(9,3)=84 种随便取，只有两类合法、共 9 组：
+//   · 同号位（同一层号横穿三维）：S1·D1·E1 ／ S2·D2·E2 ／ S3·D3·E3
+//   · 123 轮换（S/D/E 各一格，层号恰好 1、2、3 各一次）：S1·D2·E3 ／ S1·D3·E2 ／ S2·D1·E3 ／ S2·D3·E1 ／ S3·D1·E2 ／ S3·D2·E1
+// 两类都保证"S、D、E 三维各一个"（涌现阶段的结构定位靠这一条），区别只在层号：
+// 同号位＝三格站在同一层高上；123 轮换＝跨维又跨层的那条对角线。
+// 非法的两种败相：同一维取两格（S1·S2·D3）／层号重复但又不是全同（S1·D1·E2）。
 function pick3(){
-  // 三个维度 S/D/E 各抽一个子层，且三个子层号(1/2/3)也各不相同——
-  // 即把 [0,1,2] 随机打乱后依次分给 show/diff/entangle，保证出现的是 1、2、3 各一次
-  // （形成一条"对角线"：既跨三维、又跨三层，例如 S1·D2·E3 或 S2·D3·E1，绝不会出现两个相同层号如 S3·D2·E3）
-  const nums = [0,1,2];
-  for(let i=nums.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [nums[i],nums[j]]=[nums[j],nums[i]]; }
+  // 先掷一次决定走哪一类，再在类内随机：
+  //   同号位——层号 n 三家共用（n 从 1/2/3 里抽）；
+  //   123 轮换——把 [0,1,2] 打乱后依次分给 show/diff/entangle。
+  const same = Math.random() < 1/3;              // 9 组里同号位占 3 组，故 1/3
+  let nums;
+  if(same){ const n = Math.floor(Math.random()*3); nums = [n,n,n]; }
+  else {
+    nums = [0,1,2];
+    for(let i=nums.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [nums[i],nums[j]]=[nums[j],nums[i]]; }
+  }
   const dims = ['show','diff','entangle'];
   // 抽中宫格后，再为每个宫格在它内部的三个要点里随机侧重——可以侧重"一个"，也可以侧重"两个的组合"。
   // 这样即使两次抽到同一个宫格（如都是S1），侧重点也不同（一次重点打"对比"、一次打"对比+分布"），金点子更聚焦、组合更多变。
@@ -2542,7 +2550,7 @@ async function run(){
   });
   // 从九宫格抽 3 个视角：S/D/E 三维各一，且层号 1/2/3 各一（对角线约束）。
   // 组合数 = 3!(维度指派) × 3!(层号排列) = 36，再乘每格内部 focus 的侧重变体。
-  // 【勘误】旧注释写的 C(9,3)=84 是早期无约束抽法的数，pick3() 早已改为对角线约束，此处一并更正。
+  // 【勘误】旧注释写的 C(9,3)=84 是早期无约束抽法的数；pick3() 现按合法组合表抽（同号位 3 组 ＋ 123 轮换 6 组＝9 组）。
   const cells = pick3();
   rowEls.forEach((row,i)=>{
     const c = cells[i];
@@ -4967,7 +4975,7 @@ questionEl.addEventListener('keydown', e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='
 <script>window.WDS_READ={selector:".wrap"};</script>
 <script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
 
-<script src="/wds-mode.js?v=20260822g" defer></script>
+<script src="/wds-mode.js?v=20260822h" defer></script>
 <script src="/taste/assets/sde-keyprobe.js?v=20260817c"></script>
 <script>
 /* Key 有效性检测：按钮由 SDEKeyProbe 注入到每个 Key 输入框之后（本页 HTML 一行未改）。

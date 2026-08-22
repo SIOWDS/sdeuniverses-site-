@@ -158,7 +158,7 @@ process.on("unhandledRejection", (e) => { PAGE_ERRS.push("unhandledRejection: " 
   if (typeof w.pick3 === "function") {
     let allDistinct = true;
     for (let i = 0; i < 40; i++) { const s = w.pick3(); if (new Set(s).size !== s.length) allDistinct = false; }
-    ok(allDistinct, "连抽 40 次，每次三格互不相同");
+    ok(allDistinct, "连抽 40 次，每次三格互不相同（合法性另见第 ⑨ 节）");
   } else { ok(true, "pick3 未暴露到 window，跳过（不算失败）"); }
 
   });
@@ -190,18 +190,26 @@ process.on("unhandledRejection", (e) => { PAGE_ERRS.push("unhandledRejection: " 
   });
 
   await step("⑨ 二阶碰撞的结构定位（第〇阶：三维度碰撞必须真的传进涌现）", async () => {
-    // 背景：pick3() 早已按对角线约束抽格（S/D/E 各一、层号各一），但涌现阶段长期只拿到一串中文
+    // 背景：pick3() 按合法组合表抽格（同号位 3 组 ＋ 123 轮换 6 组），但涌现阶段长期只拿到一串中文
     // 视角标签，EMERGE_SPEC 里没有任何一句要求它用维度——于是选源是三维度碰撞、涌现却退回成
     // 无维度的两两相撞。这一节守住修好之后的那条通路，别再被改回去。
     ok(typeof w.pick3 === "function", "pick3 可取");
     if (typeof w.pick3 === "function") {
-      let diagOK = true;
-      for (let i = 0; i < 60; i++) {
+      /* 合法只有两类：同号位（层号全同）与 123 轮换（层号 1/2/3 各一次）；两类都必须 S/D/E 各一格。
+         非法的两种败相：同一维取两格、层号重复但又不全同。 */
+      let legalOK = true, sameN = 0, rotN = 0;
+      const seen = new Set();
+      for (let i = 0; i < 900; i++) {
         const c = w.pick3();
-        const dims = c.map(x => x.dim), idxs = c.map(x => x.idx);
-        if (new Set(dims).size !== 3 || new Set(idxs).size !== 3) diagOK = false;
+        const dims = c.map(x => x.dim), u = new Set(c.map(x => x.idx)).size;
+        if (new Set(dims).size !== 3 || !(u === 1 || u === 3)) legalOK = false;
+        if (u === 1) sameN++; else rotN++;
+        seen.add(c.map(x => ({ show: "S", diff: "D", entangle: "E" }[x.dim]) + (x.idx + 1)).join("·"));
       }
-      ok(diagOK, "连抽 60 次，维度 S/D/E 各一且层号 1/2/3 各一（对角线约束仍在）");
+      ok(legalOK, "连抽 900 次，每次都落在合法组合上（S/D/E 各一 ＋ 层号全同 或 1/2/3 各一）");
+      ok(seen.size === 9, "九组合法组合都抽得到（少一组＝有格位永远轮不上），实得 " + seen.size);
+      ok(sameN > 0 && rotN > 0, "两类都真的会出现，实得 同号位 " + sameN + " ／ 轮换 " + rotN);
+      ok(sameN / 900 > 0.2 && sameN / 900 < 0.47, "同号位占比在 1/3 附近（九组等概率），实得 " + (sameN / 900).toFixed(3));
     }
 
     ok(typeof w.buildEmergeInput === "function", "buildEmergeInput 可取");
