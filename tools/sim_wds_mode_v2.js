@@ -890,6 +890,23 @@ console.log("⑧ 成文（distill）");
   sendEl.click();
   await new Promise((r) => setTimeout(r, 140));
   ok(LAST_PAYLOAD.q === "/zzz 一个带斜杠的问题", "认不出的斜杠原样送出（读者可能本来就要问带斜杠的东西），实得 " + LAST_PAYLOAD.q);
+  /* 九宫格这一道：前端只递 key，三格由服务端抽（抽签口径见 tools/sim_nine_grid.js）。
+     这里守的是"读者点得到、递得上去"，两条路各走一遍。 */
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "三格已抽好。" }];
+  inEl.value = "/九宫 拖延症是怎么回事";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 140));
+  ok(LAST_PAYLOAD.tool === "nine", "/九宫 挂上九宫格工序，实得 " + LAST_PAYLOAD.tool);
+  ok(LAST_PAYLOAD.q === "拖延症是怎么回事", "命令本身从提问里摘掉了，实得 " + LAST_PAYLOAD.q);
+  ok(!/S1|D2|E3|同号位|轮换/.test(JSON.stringify(LAST_PAYLOAD)), "前端不自己挑格、不自己拼组合（抽签在服务端）");
+  layer.querySelector(".wdsm-newbtn").click();
+  tlBtn.click();
+  document.body.querySelector(".wdsm-menu").querySelectorAll("button").find((b) => b.textContent.includes("九宫格取三格")).click();
+  inEl.value = "换个题：为什么越努力越焦虑";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 140));
+  ok(LAST_PAYLOAD.tool === "nine", "从菜单选「九宫格取三格」也递上 tool=nine，实得 " + LAST_PAYLOAD.tool);
   tlBtn.click();
   document.body.querySelector(".wdsm-menu").querySelectorAll("button").find((b) => b.textContent.includes("不用工序")).click();
   ok(!tlBtn.classList.contains("on") && LAST_PAYLOAD.tool !== undefined, "可以摘掉工序回到普通对话");
