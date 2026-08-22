@@ -13,6 +13,11 @@
  *
  * ⚠ 判据落在「递给基底的那份 system 里有没有这段字」，不是「源码里有没有这个函数」。
  *
+ * 【二】限流器降级（2026-08-22 补）：全站十九处限流调用点必须统一过 limitRead()。
+ *   病灶是站内挂了最久的一条硬伤——`_do()` 绑定缺失时回 {ok:false,error:"binding_missing"}
+ *   并自陈「按降级处理」，而调用点只看 !lr.ok 就拒 ⇒ 一次绑定没跟上的部署
+ *   ＝ **全站对话入口集体假报「太快啦」**。最坏的一种错：它长得像正常工作。
+ *
  *   node tools/sim_chatsde_parity.js
  */
 const fs=require("fs"), W=fs.readFileSync("src/worker.js","utf8");
@@ -34,4 +39,22 @@ ok("别名法补问里没有 lang 判断", !/"lang"/.test(asys));
 // 取料：唯一按档案分流的地方，且两条路都通
 ok("取料是唯一按档案分流处，且 else 支给主站", /\} else \{[\s\S]{0,300}wdsRag/.test(W.slice(W.indexOf("if (_fixSec && _fixSec.rag)"), W.indexOf("if (_fixSec && _fixSec.rag)")+1400)));
 ok("全仓只剩这一处 prof.id === \"lang\" 的产线分流", (W.match(/prof && prof\.id === "lang"/g)||[]).length===1);
+
+// ══ 二、限流器降级：绑定不见了要放行，不要假报「太快啦」 ══
+ok("装了 limitRead 这个解释器", W.indexOf("function limitRead(j)")>0);
+/* 要害是**一处不漏**：漏掉的那一处在绑定缺失的那天照样把人挡在门外，
+   而它挡的还偏偏是最常走的那条路——没人会想到去查限流器。 */
+const RAW=(W.match(/(?<!limitRead\()await \(await lim\.fetch\(/g)||[]).length;
+const WRAPPED=(W.match(/limitRead\(await \(await lim\.fetch\(/g)||[]).length;
+ok("十九处限流调用点全部过了解释器（未包装处 "+RAW+"）", RAW===0 && WRAPPED===19);
+const LR=(()=>{const a=W.indexOf("function limitRead(");return new Function(W.slice(a,W.indexOf("\n}",a)+2)+"; return limitRead;")();})();
+ok("绑定缺失→放行并标 degraded", (()=>{const r=LR({ok:false,error:"binding_missing"});return r.ok===true&&r.degraded===true;})());
+ok("真限流（按分钟）照旧拦", LR({ok:false,reason:"min"}).ok===false);
+ok("真限流（按天）照旧拦，且 inDay 不丢", (()=>{const r=LR({ok:false,reason:"day",inDay:7});return r.ok===false&&r.inDay===7;})());
+ok("正常放行原样透传", LR({ok:true,inDay:3}).inDay===3);
+ok("读不出 JSON 时也放行（限流是保护，不是正确性）", LR(null).ok===true);
+/* ⚠ 这个解释器只许给限流器用：别的 DO 上 fail open ＝ 把没存上的东西报成存上了。 */
+ok("limitRead 只出现在限流那一条路上", (W.match(/limitRead\(/g)||[]).length===WRAPPED+1);
+ok("注释里写明了别的 DO 不许套", /别的 DO（记忆、索引、配置）绝不许套这个/.test(W));
+
 console.log((f?"✗ ":"✓ ")+p+" passed, "+f+" failed"); process.exit(f?1:0);

@@ -353,6 +353,25 @@ function _do(env, name) {
   };
 }
 
+/* ═══ 限流器读数的解释器（2026-08-22）═══
+   病灶（三次真跑护栏里那条唯一未过的断言）：`_do()` 在绑定缺失时回
+   `{ok:false, error:"binding_missing"}` 并自陈「按降级处理」，而全站十九处调用点
+   只看 `!lr.ok` 就拒 ⇒ **一次绑定没跟上的部署，等于全站对话入口集体假报「太快啦」**。
+   读者看到的是限流，实际是这台机器根本没连上计数器——最坏的一种错：**它长得像正常工作**。
+
+   ⭐ 判断的分岔：限流是**保护**，不是正确性。计数器不见了的时候，
+   「谁也不许说话」比「这一阵不限流」坏得多——前者是全站下线，后者只是暂时少一道保护。
+   ⇒ 绑定缺失一律**放行**（fail open），并在日志里吼一声；真限流（reason=min/day）照旧拦。
+   ⚠ 只给限流器用。别的 DO（记忆、索引、配置）绝不许套这个：
+      那些地方 fail open 等于**把没存上的东西报成存上了**，是另一种更坏的骗。 */
+function limitRead(j) {
+  if (j && j.ok === false && j.error === "binding_missing") {
+    try { console.warn("[limiter] ASK_LIMITER 绑定缺失，本次放行（不限流）——这是部署问题，不是读者手快。"); } catch (e) {}
+    return { ok: true, degraded: true };
+  }
+  return j || { ok: true, degraded: true };
+}
+
 async function wdsRag(env, url, body) {
   const req = new Request(new URL("/api/wds/rag", url).toString(), {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
@@ -3346,7 +3365,7 @@ async function handleRegister(request, env) {
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
   try { // 限流器住在 DO 里，取不到就放行——宁可少拦，不把门关死
     const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("register:" + ip));
-    const lr = await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json();
+    const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json());
     if (!lr.ok) return _subJson({ ok: false, msg: "提交太频繁，请过一会儿再试。" }, CORS);
   } catch (e) {}
   const b = await request.json().catch(() => null);
@@ -3381,7 +3400,7 @@ async function handleSubmit(request, env) {
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
   try {
     const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("submit:" + ip));
-    const lr = await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json();
+    const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json());
     if (!lr.ok) return _subJson({ ok: false, msg: "提交太频繁，请过一会儿再试。" }, CORS);
   } catch (e) {}
   let form;
@@ -6582,7 +6601,7 @@ async function askCore(request, env, url, body, SINK) {
   try {
     const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(byok ? wdsBucket("ask", ip, userKey) : ("sys:" + ip)));
     const _lq = byok ? ("?w=" + WDS_PER_MIN + BYOK_NO_DAY) : "";
-    const lr = await (await lim.fetch(new Request("https://limiter.internal/" + _lq))).json();
+    const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/" + _lq))).json());
     if (!lr.ok) {
       const msg = lr.reason === "day"
         ? "今日提问次数已达上限——这是「系统密钥」的公共额度。在下方填入你自己的 API Key 即可继续：自带 Key 是你自付 token，不受每日次数限制。也可改用「🔍 关键词检索」。"
@@ -7950,7 +7969,7 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("memo", ip, KEY)));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_MEMO_PER_MIN + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_MEMO_PER_MIN + BYOK_NO_DAY))).json());
         if (!lr.ok) return J({ ok: false, code: "rate", msg: lr.reason === "day" ? ("这把 Key 今天已更新 " + (lr.inDay || 0) + "/" + WDS_MEMO_PER_DAY + " 条记忆，明天再续（记忆额度与对话额度分开计）。") : "更新得太快了，过十几秒再继续——已经做好的不会丢。" }, 429);
       } catch (e) {}
       const mode = b.mode === "profile" ? "profile" : "one";
@@ -8011,7 +8030,7 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("nbr", ip, KEY)));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + NBR_PER_MIN + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + NBR_PER_MIN + BYOK_NO_DAY))).json());
         if (!lr.ok) return J({ ok: false, code: "rate", msg: lr.reason === "day" ? ("这把 Key 今天已细判 " + (lr.inDay || 0) + "/" + NBR_PER_DAY + " 次，明天再续（闸门额度与对话额度分开计）。") : "判得太快了，过十几秒再来。" }, 429);
       } catch (e) {}
 
@@ -8215,7 +8234,7 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("dlg", ip, userKey)));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_DLG_PER_MIN + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_DLG_PER_MIN + BYOK_NO_DAY))).json());
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("这把 Key 今天已用 " + (lr.inDay || 0) + "/" + WDS_DLG_PER_DAY + " 次，明天再来。") : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
       let neigong = await loadNeigong(env, url.origin + "/");
@@ -8295,7 +8314,7 @@ export default {
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket(b.guide ? "dlg" : "read", ip, userKey)));
         const _pm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _pd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _pm + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + _pm + BYOK_NO_DAY))).json());
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("这把 Key 今天已用 " + (lr.inDay || 0) + "/" + _pd + " 次，明天再来。") : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
       // part 模式只用 b.convo（提纲阶段回传的约6000字摘要），无需把整场（可达30万字）重新拼一遍——省每节调用的内存/CPU，少触平台资源限
@@ -8607,7 +8626,7 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("byok-art:" + ip));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=20" + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=20" + BYOK_NO_DAY))).json());
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? "今天这台机器的额度用完了，明天再来。" : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
       const base = url.origin + "/";
@@ -8660,7 +8679,7 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("voice", ip, userKey)));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=20" + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=20" + BYOK_NO_DAY))).json());
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? "今天这台机器的额度用完了，明天再来。" : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
 
@@ -8804,7 +8823,7 @@ export default {
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket(b.guide ? "dlg" : "read", ip, userKey)));
         const _rm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _rd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _rm + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + _rm + BYOK_NO_DAY))).json());
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在" + (b.guide ? "「SDE 对谈」" : "「陪读」") + "入口已用 " + (lr.inDay || 0) + "/" + _rd + " 次，明天再来（额度按你的 Key 计，各入口独立）。") : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
       // ── 出流前只做“廉价且必须早退”的事:上面已完成 method/参数/Key/限流校验。──
@@ -9131,7 +9150,7 @@ export default {
       let dayLeft = null;
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("chat", ip, userKey)));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json());
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在「ChatSDE」入口已用 " + (lr.inDay || 0) + "/" + WDS_PER_DAY + " 次，明天再来（额度按你的 Key 计，陪读与「SDE 对谈」各有独立额度）。") : "聊得太快啦，过十几秒再问。" }]);
         // 自带 Key 已无日上限 ⇒ 不回传"今日剩余"那一帧（回传就是显示一个假数字）。
         // 前端 dayLeft 保持 null 时只显示本场轮次，正是想要的。
@@ -9564,7 +9583,7 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("chat", ip, KEY)));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json());
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "这把 Key 今天的额度用完了，明天再来。" : "太快啦，过十几秒再来。" }]);
       } catch (e) {}
       const stream = new ReadableStream({
@@ -9661,7 +9680,7 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("readurl", ip, "")));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=10&d=120"))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=10&d=120"))).json());
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? "今天取链接的次数用完了，明天再来。" : "取得太快啦，过十几秒再来。" });
       } catch (e) {}
       // ── 站内分支：本站自己的文章也要能整篇读进来 ─────────────────────────────
@@ -9735,7 +9754,7 @@ export default {
         const _own = String(b.key || "").trim().length >= 8;
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("asr", _aip, String(b.key || ""))));
         const _w = _own ? WDS_ASR_BYOK_PER_MIN : WDS_ASR_PER_MIN, _d = _own ? WDS_ASR_BYOK_PER_DAY : WDS_ASR_PER_DAY;
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _w + (_own ? BYOK_NO_DAY : ("&d=" + _d))))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + _w + (_own ? BYOK_NO_DAY : ("&d=" + _d))))).json());
         if (!lr.ok) return Response.json({ ok: false, code: "rate", msg: lr.reason === "day" ? "今天的语音转写次数用完了。" : "说得太快啦，过十几秒再来。" }, { headers: _cors() });
       } catch (e) {}
       const b64 = String(b.audio || "");
@@ -10005,7 +10024,7 @@ export default {
       try {
         const ip = request.headers.get("cf-connecting-ip") || "unknown";
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("john", ip, jkey)));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json());
         if (!lr.ok) return Response.json({ ok: false, code: "rate", msg: "太快啦，过十几秒再试。" }, { headers: _cors() });
       } catch (e) {}
       const jstream = new ReadableStream({
@@ -10108,7 +10127,7 @@ export default {
       const _lip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("link", _lip, "")));
-        const lr0 = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_LINK_PER_MIN + "&d=" + WDS_LINK_PER_DAY))).json();
+        const lr0 = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_LINK_PER_MIN + "&d=" + WDS_LINK_PER_DAY))).json());
         if (!lr0.ok) return Response.json({ ok: false, reason: "rate", hits: [] }, { headers: _cors() });
       } catch (e) {}
       // 归一化：去掉书名号/空格/标点与「 · SDE Universes」「 · 作者名」这类站点后缀，
@@ -10145,7 +10164,7 @@ export default {
       const _wip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("ws", _wip, String(b.skey || b.key || ""))));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_WS_PER_MIN + "&d=" + WDS_WS_PER_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_WS_PER_MIN + "&d=" + WDS_WS_PER_DAY))).json());
         if (!lr.ok) return Response.json({ ok: false, reason: "rate", items: [] }, { headers: _cors() });
       } catch (e) {}
       const r = await webSearch(env, String(b.q || ""), String(b.skey || b.key || ""), b.n);
@@ -10199,7 +10218,7 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("chat", ip, userKey)));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json();
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + BYOK_NO_DAY))).json());
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "这把 Key 今天的额度已用完，明天再来。" : "太快啦，过十几秒再来。" }]);
       } catch (e) {}
 
@@ -11752,7 +11771,7 @@ export default {
           const imgs = wdsPickImgs((Array.isArray(b.imgs) ? b.imgs : []).slice(0, 2).map((d) => ({ n: "朋友圈配图", d: String(d || "") })));
           try {
             const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("muse:" + who.uid));
-            const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=6&d=60"))).json();
+            const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=6&d=60"))).json());
             if (!lr.ok) return Response.json({ ok: false, msg: lr.reason === "day" ? "今天的金句额度用完了（每天 60 次），明天再来。" : "生得太快了，过十几秒再点。" }, { status: 429 });
           } catch (e) {}
           let vd = "", VC = null, KEY = "";
