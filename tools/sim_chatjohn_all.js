@@ -251,16 +251,23 @@ async function main() {
     r = await hit("/api/john/compose", { key: "sk-1234567890", messages: [{ role: "user", content: "太短" }] });
     ok(r.json && r.json.code === "too_short", "话没聊够 → 不给成文");
 
-    for (const [kind, parts, label] of [["paper", 4, "论文"], ["essay", 2, "散文"], ["wechat", 1, "公众号文章"]]) {
+    /* 2026-08-22：三体裁按 tools/skills/sde-creative-writing.md 附录 A 重配趟数
+       （实测欠字：公众号 1724/2000、散文 3606/5000——单趟越长越容易提前收尾）。
+       趟数的两处口径由 tools/sim_creative_writing.js 专门比对，这里只验真下发。 */
+    for (const [kind, parts, label] of [["paper", 4, "论文"], ["essay", 3, "散文"],
+                                        ["wechat", 2, "公众号文章"], ["story", 2, "短篇小说"]]) {
       UP.frames = [delta("正".repeat(1500)), "[DONE]"];
       r = await hit("/api/john/compose", { key: "sk-1234567890", kind: kind, part: 1, messages: convo });
       const meta = r.got("meta")[0];
       ok(!!meta && meta.v.parts === parts && meta.v.label === label, kind + " → " + parts + " 段 · " + label,
         JSON.stringify(meta && meta.v));
     }
+    /* 钳位的上界＝该档的 parts，别在这里再写死一个数字（写死＝第三份口径）。 */
+    const JOHN_PARTS_WECHAT = +(require("fs").readFileSync(__dirname + "/../src/worker.js", "utf8")
+      .match(/wechat:\s*\{ parts: (\d+),/) || [])[1];
     UP.frames = [delta("正".repeat(1500)), "[DONE]"];
     r = await hit("/api/john/compose", { key: "sk-1234567890", kind: "怪东西", part: 99, messages: convo });
-    ok(r.got("meta")[0].v.kind === "wechat" && r.got("meta")[0].v.part === 1, "认不出的文体退成公众号；段号越界钳到范围内");
+    ok(r.got("meta")[0].v.kind === "wechat" && r.got("meta")[0].v.part === JOHN_PARTS_WECHAT, "认不出的文体退成公众号；段号越界钳到范围内（钳到末段）");
 
     UP.seen = [];
     UP.frames = [delta("正".repeat(2400)), "[DONE]"];

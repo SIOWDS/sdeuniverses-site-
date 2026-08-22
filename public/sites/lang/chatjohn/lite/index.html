@@ -206,8 +206,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div class="bar" id="bar" hidden>
     <span class="lb">概括成文</span>
     <button type="button" data-kind="paper">论文<em>约 1 万字</em></button>
-    <button type="button" data-kind="essay">散文<em>约 4000 字</em></button>
-    <button type="button" data-kind="wechat">公众号文章<em>约 2000 字</em></button>
+    <button type="button" data-kind="essay">散文<em>约 5000 字</em></button>
+    <button type="button" data-kind="wechat">公众号文章<em>约 3000 字</em></button>
+    <button type="button" data-kind="story">短篇小说<em>约 2400 字</em></button>
   </div>
   <div class="box">
     <textarea id="q" rows="1" placeholder="说一句具体的话……（Enter 发送，Shift+Enter 换行）" aria-label="输入"></textarea>
@@ -590,8 +591,9 @@ function saveDocx(text,label,btn){
 
 /* ── 概括成文（段数必须与后端 JOHN_COMPOSE 一致）── */
 var KINDS={paper:{n:4,label:"论文",total:"约一万字"},
-           essay:{n:2,label:"散文",total:"约四千字"},
-           wechat:{n:1,label:"公众号文章",total:"约两千字"}};
+           essay:{n:3,label:"散文",total:"约五千字"},
+           wechat:{n:2,label:"公众号文章",total:"约三千字"},
+           story:{n:2,label:"短篇小说",total:"约两千四百字"}};
 function compose(kind){
   if(busy) return;
   if(KEY().length<8){ settings(); return; }

@@ -178,9 +178,9 @@ const $$ = (w, s) => Array.from(w.document.querySelectorAll(s));
     w.__handler = () => okStream([{ t: "d", v: "答二" }, "[DONE]"]);
     $(w, "#q").value = "问二"; $(w, "#go").click(); await sleep(200);
     t("两轮之后成文条出现", $(w, "#bar").hidden === false);
-    t("成文条三个文体", $$(w, "#bar button").length === 3);
+    t("成文条四个文体", $$(w, "#bar button").length === 4);   // 2026-08-22 加了短篇小说
     const labels = $$(w, "#bar button").map((b) => b.textContent);
-    t("三个文体标了字数", /1 万字/.test(labels[0]) && /4000/.test(labels[1]) && /2000/.test(labels[2]), labels.join(" | "));
+    t("四个文体标了字数", /1 万字/.test(labels[0]) && /5000/.test(labels[1]) && /3000/.test(labels[2]) && /2400/.test(labels[3]), labels.join(" | "));
     // 第二轮的**主问答**请求应带上完整历史。
     // ⚠ 不能取 __calls 的最后一条：答完一轮还会再打一次 /api/john/next 拉追问，
     //    那一条才是最后的，带的是 4 条历史——按端点筛，否则验的是另一个请求。
@@ -205,16 +205,16 @@ const $$ = (w, s) => Array.from(w.document.querySelectorAll(s));
     w.__handler = (u, o) => {
       const b = JSON.parse(o.body);
       seq++;
-      return okStream([{ t: "meta", v: { part: b.part, parts: 2 } }, { t: "d", v: "第" + b.part + "段正文。" }, { t: "fin", v: {} }, "[DONE]"]);
+      return okStream([{ t: "meta", v: { part: b.part, parts: 3 } }, { t: "d", v: "第" + b.part + "段正文。" }, { t: "fin", v: {} }, "[DONE]"]);
     };
-    $$(w, "#bar button")[1].click();   // 散文＝2 段
+    $$(w, "#bar button")[1].click();   // 散文＝3 段（2026-08-22 由 2×2000 改 3×1700，实测欠字 28%）
     await sleep(500);
     const box = $(w, ".compose");
     t("成文面板出现", !!box);
-    t("散文调了两趟", seq === 2, "seq=" + seq);
-    t("两段被拼在一起", /第1段正文。[\s\S]*第2段正文。/.test(box.querySelector(".bd2").textContent));
+    t("散文调了三趟", seq === 3, "seq=" + seq);
+    t("三段被拼在一起", /第1段正文。[\s\S]*第2段正文。[\s\S]*第3段正文。/.test(box.querySelector(".bd2").textContent));
     const parts = w.__calls.filter((c) => /compose/.test(c.u));
-    t("第二趟带上了上一段的尾巴", parts.length === 2 && /第1段正文/.test(parts[1].body.prev || ""));
+    t("第二趟带上了上一段的尾巴", parts.length === 3 && /第1段正文/.test(parts[1].body.prev || ""));
     t("成文请求也带 Key", parts[0].body.key === "sk-abcdefghijklmnop");
     t("成文请求带上整场对话", parts[0].body.messages.length === 4);
     t("完成后出现复制与下载", box.querySelectorAll(".act button").length === 2);
@@ -279,9 +279,12 @@ const $$ = (w, s) => Array.from(w.document.querySelectorAll(s));
       w.__handler = () => okStream([{ t: "d", v: "答" }, "[DONE]"]);
       $(w, "#q").value = "问一"; $(w, "#go").click(); await sleep(150);
       $(w, "#q").value = "问二"; $(w, "#go").click(); await sleep(150);
-      w.__handler = () => okStream([{ t: "meta", v: { part: 1, parts: 1 } }, { t: "d", v: text }, { t: "fin", v: {} }, "[DONE]"]);
-      $$(w, "#bar button")[2].click();          // 公众号＝1 段，最快
-      await sleep(350);
+      /* 公众号 2026-08-22 起是 2 段（原 1×2000 交 1724 字，欠 14%）。
+         正文只在第 1 段给，第 2 段空——否则同一份夹具会被拼两遍，下面数圆点、数序号全翻倍。 */
+      w.__handler = (u, o) => { const b = JSON.parse(o.body);
+        return okStream([{ t: "meta", v: { part: b.part, parts: 2 } }, { t: "d", v: b.part === 1 ? text : "" }, { t: "fin", v: {} }, "[DONE]"]); };
+      $$(w, "#bar button")[2].click();          // 公众号＝2 段
+      await sleep(600);
       return $(w, ".compose");
     }
 

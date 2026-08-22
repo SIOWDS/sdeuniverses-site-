@@ -197,8 +197,10 @@ hd("【五】端到端：四档各真跑一趟，看递给基底的到底是什�
   };
   const base = { key: "sk-1234567890", history: convo };
 
-  for (const [k, mark] of [["wechat", "开头三句之内"], ["prose", "不讲道理，讲经验"],
-                           ["story", "结尾不解决"], ["poem", "分行与断句"]]) {
+  /* 判据换成硬律编号：措辞会随规格改版而动，编号是规范层定的，不动。
+     唯一权威 tools/skills/sde-creative-writing.md，比对护栏 tools/sim_creative_writing.js。 */
+  for (const [k, mark] of [["wechat", "W-1"], ["prose", "P-1"],
+                           ["story", "S-2"], ["poem", "分行与断句"]]) {
     const sys = await run(Object.assign({}, base, { kind: k }));
     ok(sys.indexOf(mark) >= 0, "/" + k + " 的规格真的进了 system", sys ? "拿到 sys 但没这一句" : "根本没打到上游");
   }
