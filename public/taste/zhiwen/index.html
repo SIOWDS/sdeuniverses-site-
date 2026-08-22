@@ -2394,12 +2394,6 @@ function evalSystem(xinde){
   sys += '\n以上是你的内功底座与你自己的评审心得。学习它,内化它。\n然后,按下面的评估纪律执行你的评审任务:\n\n' + EVAL_PROMPT;
   return sys;
 }
-function evalUserMsg(question, parsed){
-  return '【被评的问题】\n' + question + '\n\n'
-    + '【被评的回答】\n' + (parsed.answer||'') + '\n\n'
-    + '【作者的自评】\n  自评分数:' + (parsed.score||'') + ' 分\n  自评分析:' + (parsed.analysis||'') + '\n\n'
-    + '现在,请按你内化的 SDE 评估纪律(六判准 + 智商水位标尺 + 失败模式识别),给出你的独立评分。';
-}
 const ORDINALS = ['第一次','第二次','第三次','第四次','第五次','第六次','第七次','第八次','第九次','第十次'];
 function buildRoundUserMsg(question, history, supplementary){
   supplementary = (supplementary || '').trim();
@@ -2928,6 +2922,16 @@ function waitManual(L, doneRound){
 }
 window.__zwManualAct = (type, fb)=>{ if(RUN && RUN.manualResolve) RUN.manualResolve.resolve({type: type, fb: fb||''}); };
 
+// 本台中途断了：已经跑完的那几轮是真产出，不许跟着一起丢。
+// 带着部分 history 正常返回(而不是 reject)，报告表、导出、手动补装配都还能用上它们。
+function laneBail(L, agent, history, rnd, err){
+  const n = history.length;
+  const why = RUN_STOPPED ? '已手动停止' : String(err && err.message || err).slice(0,70);
+  L.st.textContent = '⚠ 本台第'+rnd+'轮中断:'+why+' · 前 '+n+' 轮判断已保留';
+  const pb = RUN.papers[agent];
+  if(pb && !RUN.papersText[agent]) pb.st.textContent = '✗ 未产出(本台未跑到成文阶段) · 前 '+n+' 轮判断见全程报告';
+  return { history, paper:'', broke:true };
+}
 async function runLane(agent, manualMode){
   const L = RUN.lanes[agent];
   const maxR = L.nRounds || 6;
@@ -2954,9 +2958,9 @@ async function runLane(agent, manualMode){
     let res;
     try{
       res = await streamChat(RUN.key, RUN.sel, sys, usr, sub.body, sub.status, sub.meta, sub.col, ROUND_TOKENS);
-    }catch(e){ setChip(L, rnd, 'bad'); throw e; }
+    }catch(e){ setChip(L, rnd, 'bad'); return laneBail(L, agent, history, rnd, e); }
     const parsed = parseResponse(res.text||'');
-    if(!parsed.answer && !parsed.summary){ setChip(L, rnd, 'bad'); throw new Error('第'+rnd+'轮返回为空'); }
+    if(!parsed.answer && !parsed.summary){ setChip(L, rnd, 'bad'); return laneBail(L, agent, history, rnd, new Error('第'+rnd+'轮返回为空')); }
     let evs = [];
     if(RUN.evals.length){
       if(RUN_STOPPED) throw new Error('已手动停止');
@@ -2990,7 +2994,8 @@ async function runLane(agent, manualMode){
     rnd++;
   }
   // —— 本台论文 ——
-  if(RUN_STOPPED) throw new Error('已手动停止');
+  // 六轮到这里已经全部落袋。从这行往下,任何失败都只影响论文这一件,不许再把 history 一起带走。
+  if(RUN_STOPPED) return laneBail(L, agent, history, maxR, new Error('已手动停止'));
   setChip(L, maxR+1, 'on');
   L.st.innerHTML='<span class="spinner"></span> 写本台论文(约 2 万字,单步可能十几分钟)';
   const pb = RUN.papers[agent];
@@ -3013,11 +3018,21 @@ async function runLane(agent, manualMode){
     ptext = (finalRound.answer || finalRound.summary || '').trim();
     pb.st.textContent = (pb.st.textContent||'') + ' · 已用末轮收口全文兜底';
   }
-  ptext = await nbrGateFix(ptext, paperSystem(agent, RUN.xinde['DS-'+agent]||''), RUN.question, _nb, pb.st);
-  ptext = dejargonOutput(ptext);
-  finalizePaper(agent, ptext);
-  setChip(L, maxR+1, 'done');
-  L.st.textContent='✓ 本台完成('+history.length+' 轮 + 论文)';
+  try{
+    ptext = await nbrGateFix(ptext, paperSystem(agent, RUN.xinde['DS-'+agent]||''), RUN.question, _nb, pb.st);
+    ptext = dejargonOutput(ptext);
+  }catch(e){
+    pb.st.textContent = (pb.st.textContent||'') + ' · 近邻补写/清洗跳过(' + String(e&&e.message||e).slice(0,40) + ')';
+  }
+  if(ptext){
+    finalizePaper(agent, ptext);
+    setChip(L, maxR+1, 'done');
+    L.st.textContent='✓ 本台完成('+history.length+' 轮 + 论文)';
+  }else{
+    setChip(L, maxR+1, 'bad');
+    pb.st.textContent='✗ 未产出(成文与末轮兜底都为空)';
+    L.st.textContent='⚠ 本台 '+history.length+' 轮完成 · 论文未产出(轮次判断已保留,见全程报告)';
+  }
   return { history, paper: ptext };
 }
 
