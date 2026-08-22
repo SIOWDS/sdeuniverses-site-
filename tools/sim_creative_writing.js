@@ -50,8 +50,8 @@ rows.forEach((row) => {
 /* ══ ② 硬律编号：Skill 里定义了几条，SPEC 里就必须条条在 ══════════════ */
 sec("② 硬律编号逐条落地");
 const LAWS = {
-  wechat: ["W-1", "W-2", "W-3", "W-4", "W-5", "W-6"],
-  prose: ["P-1", "P-2", "P-3", "P-4", "P-5", "P-6"],
+  wechat: ["W-1", "W-2", "W-3", "W-4", "W-5", "W-6", "W-7"],
+  prose: ["P-1", "P-2", "P-3", "P-4", "P-5", "P-6", "P-7", "P-8"],
   story: ["S-1", "S-2", "S-3", "S-4", "S-5", "S-6"],
 };
 Object.keys(LAWS).forEach((k) => {
@@ -68,7 +68,7 @@ sec("③ 共用硬律 CW_X");
 const cwIdx = W.indexOf("const CW_X =");
 ok(cwIdx > 0, "worker.js 里没有 CW_X");
 const cwBody = cwIdx > 0 ? W.slice(cwIdx, cwIdx + 2600) : "";
-["X1", "X2", "X3", "X4", "X5", "X6", "X7"].forEach((x) => {
+["X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10"].forEach((x) => {
   ok(SKILL.indexOf("### " + x + " ·") >= 0, "Skill 第六节缺 " + x);
   ok(cwBody.indexOf("· " + x + " ") >= 0, "CW_X 里缺 " + x);
 });
@@ -116,12 +116,12 @@ const kindsBlk = LITE.slice(LITE.indexOf("var KINDS={"), LITE.indexOf("function 
 /* ══ ⑥ 字数下限闸（X2）真的下发了 ══════════════════════════════════ */
 sec("⑥ X2 字数闸");
 const jcsFn = W.slice(W.indexOf("function johnComposeSys"), W.indexOf("const JOHN_SCOPE"));
-ok(/per \* 0\.8/.test(jcsFn), "johnComposeSys 里没有按 80% 算下限");
+ok(/per \* 0\.9/.test(jcsFn), "johnComposeSys 里没有按 90% 算下限（目标 90 分之后由八成提到九成）");
 ok(jcsFn.indexOf("不许收尾") >= 0, "非末趟没有写「不许收尾」（实测欠字就出在提前收尾）");
 ok(jcsFn.indexOf('kind !== "paper"') >= 0, "共用硬律应只挂三体裁，论文档有自己的体例");
 ["wechat", "prose", "story"].forEach((k) => {
   const b = specBlock(k);
-  ok(b && /八成|八成以上|字数到/.test(b.body), k + " SPEC 里没有字数闸的说法");
+  ok(b && /九成|字数到/.test(b.body), k + " SPEC 里没有字数闸的说法");
 });
 
 /* ══ ⑦ 三条实测病灶必须写进规格（不是写进注释）══════════════════════ */
@@ -139,10 +139,40 @@ ok(sb && sb.body.indexOf("寓言") >= 0, "小说档没写不许写成寓言");
   ok(b && /明写|隐写|演出/.test(b.body), k + " SPEC 没说承重物在这一档是什么形态（X7 无从自检）");
 });
 
+/* ══ ⑨ 90 分线与评分卡：Skill §9.1 的六项 ⇄ 代码 CW_GRADE ══════════ */
+sec("⑨ 评分卡与 90 分线");
+const gIdx = W.indexOf("const CW_GRADE");
+ok(gIdx > 0, "worker.js 里没有 CW_GRADE");
+const gBody = gIdx > 0 ? W.slice(gIdx, W.indexOf("}", W.indexOf("story:", gIdx))) : "";
+/* 从 Skill 的评分卡表里取三列各自的六个项名，逐个在 CW_GRADE 里找。
+   两处不一致的表现不是报错，是**写的人按一套自评、评的人按另一套判分**。 */
+const DIMS = {
+  wechat: ["开场与结构", "承重判断", "例证（数量·次序·远近）", "语言手艺", "结尾动作与边界", "硬律合规"],
+  prose: ["场景与细节", "三段呼吸", "视点守恒", "藏理", "闲笔还账与收尾", "硬律合规"],
+  story: ["进入与冲突", "判断的演出", "口吻分离", "细节出处", "结尾", "硬律合规"],
+};
+Object.keys(DIMS).forEach((k) => {
+  DIMS[k].forEach((d) => {
+    ok(SKILL.indexOf(d) >= 0, "Skill §9.1 评分卡里缺维度「" + d + "」");
+    const line = (gBody.match(new RegExp(k + ': "([^"]+)"')) || [])[1] || "";
+    ok(line.indexOf(d) >= 0, "CW_GRADE." + k + " 里缺维度「" + d + "」");
+  });
+  const b = specBlock(k);
+  ok(b && b.body.indexOf('cwGrade("' + k + '")') >= 0, k + " 的 SPEC 没有下发评分卡");
+});
+ok(/目标 90/.test(W.slice(W.indexOf("function cwGrade"), W.indexOf("function cwGrade") + 1500)),
+  "cwGrade 里没写目标 90");
+ok(/85%/.test(W.slice(W.indexOf("function cwGrade"), W.indexOf("function cwGrade") + 1500)),
+  "cwGrade 里没写每项不低于 85% 这条判据");
+ok(/封顶 85/.test(W.slice(W.indexOf("function cwGrade"), W.indexOf("function cwGrade") + 1500)),
+  "cwGrade 里没写硬律违反封顶 85");
+ok(SKILL.indexOf("目标线：90") >= 0 || SKILL.indexOf("**目标线：90**") >= 0, "Skill §9.1 没写目标线 90");
+ok(SKILL.indexOf("### 9.2 从 87 到 90") >= 0, "Skill 缺 §9.2「从 87 到 90 差的三件」");
+
 /* ══ ⑧ 规范层自身的完整性 ═══════════════════════════════════════ */
 sec("⑧ 规范层自检");
 const han = (SKILL.match(/[\u4e00-\u9fff]/g) || []).length;
-ok(han >= 10000, "Skill 汉字数 " + han + "，低于一万字的规格要求");
+ok(han >= 12000, "Skill 汉字数 " + han + "，低于一万字的规格要求");
 ["## 一 ·", "## 二 ·", "## 三 ·", "## 四 ·", "## 五 ·", "## 六 ·", "## 七 ·", "## 八 ·", "## 九 ·", "## 十 ·", "## 附录 A"]
   .forEach((h) => ok(SKILL.indexOf(h) >= 0, "Skill 缺章节 " + h));
 ok(SKILL.indexOf("tools/sim_creative_writing.js") >= 0, "Skill 第一节没有指向本护栏");
