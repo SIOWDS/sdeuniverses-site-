@@ -303,19 +303,17 @@ LINEAGE = """<div class="lineage">
 问的是知识怎么组织，不是存在怎么发生。<b>本栏记的就是这一站。</b></p></li>
 <li class="gap"><span class="gap-t">2021 初 &ndash; 2021.07　酝酿期</span></li>
 <li><b>321 智慧系统</b><span class="lg-t">2021.07 &ndash; 2025.07　过渡期</span>
-<p>它要解决的是第一站留下的那道难题：<b>给定同一个存在</b>——人、事、物，
-也就是旧本体论里的主体·客体·互动——<b>为什么不同的人会得出不同的对比、变化、分布？</b></p>
-<p>答案取自尼采的视角论：<b>321 智慧 ＝（存在，矛盾，视角）</b>。
-一个存在的三视角，不是从存在身上读出来的，是<b>主体带着各自的视角与客体（存在）相撞、发生矛盾之后形成的</b>。</p>
-<p>所以 321 本身还不是一门干净的本体论，它是<b>本体论与知识论混合着的一种「智慧」</b>，
-拿这种混合去解释<b>旧知识论的那团混乱</b>——也就是尼采的知识论所摆出的局面：
-视角一多，同一个存在上的知识就不再有一个统一的落点。尼采在这里是两重身份，
-既是那团混乱的名字，也是拆解它的工具。</p>
-<p>它因此只能是<b>过渡</b>：混合能解释混乱，却还安置不了本体。三视角不再属于对象了，
-可矛盾的两端——主体与存在——仍是两个现成的东西。本体松动了，还没有被换掉。
-研究的对象从<b>知识论</b>挪向<b>本体论</b>，整整四年。
-本栏「<a href="/three-views/library/to-sde/">从三视角到 SDE</a>」那一格收的四篇写于 2025 年 7 月，
-正落在交棒给 SIO 的那个月。</p></li>
+<p>它要解决的是<b>三视角的不唯一性</b>：给定同一个存在——人、事、物，也就是旧本体论里的
+主体·客体·互动——为什么不同的人会得出不同的对比、变化、分布？这正是尼采说的
+<b>真理的不唯一性</b>。</p>
+<p>用的办法也是尼采的：<b>视角主义</b>。<b>321 智慧 ＝（存在，矛盾，视角）</b>——
+主体从各自不同的视角与客体（存在）互动、发生矛盾，三视角就在这场矛盾里产生。</p>
+<p>所以它还不是一门干净的本体论，而是<b>本体论与知识论混合着的一种「智慧」</b>，
+拿这种混合去解释<b>旧知识论的那团混乱</b>：视角一多，同一个存在上的知识就不再有一个统一的落点。</p>
+<p class="lg-warn"><b>听起来很对，其实是错的。</b>这条路走了整整四年，最后被推翻——
+错在哪一处、由什么取代，是后面两站的事。「继承 · 创新 · 颠覆」里的<b>颠覆</b>，
+第一刀就落在这里。本栏「<a href="/three-views/library/to-sde/">从三视角到 SDE</a>」那一格
+收的四篇写于 2025 年 7 月，正落在交棒给 SIO 的那个月。</p></li>
 <li><b>SIO 本体论</b><span class="lg-t">2025.07 &ndash; 2026.01　本体论</span>
 <p>过渡走完，落到本体论上：分的不再是看法，是存在本身，27 宫格在这里成了本体论的坐标。
 站内另有 <a href="/education/sio-classics/">SIO 教育经典</a> 一辑。</p></li>
@@ -348,6 +346,8 @@ ol.lg li.gap .gap-t{font-size:.86rem;color:var(--muted);letter-spacing:.02em}
 ol.lg li b{font-size:1.06rem;letter-spacing:.03em}
 ol.lg li .lg-t{margin-left:.6rem;font-size:.8rem;color:var(--muted);white-space:nowrap}
 ol.lg li p{margin:.35rem 0 0;font-size:.93rem;line-height:1.82;color:var(--text2)}
+ol.lg li p.lg-warn{margin-top:.7rem;padding:.6rem .85rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.06);border-radius:0 5px 5px 0}
 .lg-ft{margin:.4rem 0 0;padding-top:.9rem;border-top:1px solid var(--border2);
  font-size:.92rem;line-height:1.85;color:var(--text2)}
 @media(max-width:640px){ol.lg li .lg-t{display:block;margin:.15rem 0 0}}
