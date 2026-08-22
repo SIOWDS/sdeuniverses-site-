@@ -29,7 +29,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(PUB, 'banyu')
 
 sys.path.insert(0, HERE)
-from banyu_plan import SESSIONS, BRING, RULES, LINKS  # noqa: E402
+from banyu_plan import SESSIONS, BRING, RULES, LINKS, READING  # noqa: E402
 
 STAMP = re.search(r'^stamp=(\S+)',
                   open(os.path.join(HERE, 'wds-mode.stamp'), encoding='utf-8').read(),
@@ -152,6 +152,8 @@ def topbar(cur):
     for slug, dn, date, name in DAYS:
         links.append('<a href="/banyu/%s/"%s>%s · %s</a>'
                      % (slug, ' class="cur"' if cur == slug else '', dn, esc(name)))
+    links.append('<a href="/banyu/reading/"%s>阅读材料</a>'
+                 % (' class="cur"' if cur == 'reading' else ''))
     return ('<header class="top"><div class="w">'
             '<span style="color:var(--ac);letter-spacing:.12em">巴渝培训</span>'
             '<nav>%s</nav></div></header>' % ''.join(links))
@@ -640,10 +642,55 @@ def build_index():
         #   本栏现在不提任何第三方、不做任何对外承诺。要恢复请先问过他。
         '<h2>先看点什么</h2>',
         '<p>三天里会反复用到站内两处现成的东西：'
-        '<a href="/taste/">ChatSDE 与其他智能体</a>（第一天上机用），'
-        '<a href="/education/">教育专栏</a>（第一天下午与第二天用）。'
+        '<a href="/taste/">ChatSDE 与其他智能体</a>（第一、二天上机用），'
+        '<a href="/education/">教育专栏</a>。'
         '两处都不需要提前准备，带着自己最难教的那一个概念来就行。</p>',
+        '<p>另外挑了一份 <a href="/banyu/reading/"><b>阅读材料 · %d 篇</b></a>——'
+        '站上写过的文章与专著，按天与按学科分好组，'
+        '每一条都写明谁读、读了能拿走什么。'
+        '<b>开课前只读第一组那四篇就够了。</b></p>'
+        % sum(len(g[2]) for g in READING),
         '</div></main>', FOOT, TAIL])
+
+
+def build_reading():
+    n = sum(len(g[2]) for g in READING)
+    title = '阅读材料 · %d 篇｜巴渝培训' % n
+    desc = ('巴渝培训三天的阅读材料：站内 SDE 教育发生学的文章与专著共 %d 篇，'
+            '分七组——三天的底稿、第一天为什么非改不可、第二天分科的、'
+            '第三天一节课里发生了什么、要成体系读的专著、可以转给家长的。'
+            '每一条都写明谁读、读了能拿走什么。' % n)
+    body = [head(title, desc, 'https://sdeuniverses.com/banyu/reading/'),
+            topbar('reading'),
+            '<div class="hero"><div class="w">',
+            '<div class="kicker">巴渝培训 · 站内现成的东西</div>',
+            '<h1>阅读材料</h1>',
+            '<p class="tag">%d 篇 · 分七组</p>' % n,
+            '<div class="keys"><span>课前可读</span><span>课后再读</span>'
+            '<span>按学科挑</span><span>可转家长</span></div>',
+            '</div></div>',
+            '<main><div class="w">',
+            '<p class="lead">三天讲的东西，站上大多已经写过一遍。'
+            '这里挑出来的，都是<b>老师读得进去、读完能带走一件事</b>的。</p>',
+            '<div class="note">怎么用这张单子：'
+            '<b>开课前只读第一组四篇</b>就够了，读了三天会轻松很多；'
+            '第二、三、四组配着当天读；专著留到散会以后。'
+            '每一条后面写的是<b>谁读、拿走什么</b>，不是内容简介——'
+            '对不上你的，直接跳过。</div>']
+    for gi, (gname, gnote, rows) in enumerate(READING, 1):
+        body.append('<h2>%s</h2>' % esc(gname))
+        body.append('<p>%s</p>' % esc(gnote))
+        body.append('<ul class="links">'
+                    + ''.join('<li><a href="%s">%s</a><em>%s</em></li>'
+                              % (u, esc(t), d) for u, t, d in rows)
+                    + '</ul>')
+    body.append('<div class="note" style="margin-top:2rem">'
+                '⚠ <b>作文这一格眼下是空的。</b>站上写作文那一路的东西不在本栏收录范围内，'
+                '语文组暂时先用上面「语言不是学来的」那一篇顶着。</div>')
+    body += ['<div class="pager"><a href="/banyu/">← 本栏总目</a>'
+             '<a href="/banyu/day1/">第一天 →</a></div>',
+             '</div></main>', FOOT, TAIL]
+    return '\n'.join(body)
 
 
 def main():
@@ -656,7 +703,11 @@ def main():
         d = os.path.join(OUT, slug)
         os.makedirs(d, exist_ok=True)
         open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(build_day(i))
-    print('已写 %d 页 →' % (len(DAYS) + 1), OUT)
+    d = os.path.join(OUT, 'reading')
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(build_reading())
+    print('已写 %d 页（总目 ＋ %d 天 ＋ 阅读材料 %d 篇）→'
+          % (len(DAYS) + 2, len(DAYS), sum(len(g[2]) for g in READING)), OUT)
 
 
 if __name__ == '__main__':
