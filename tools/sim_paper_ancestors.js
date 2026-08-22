@@ -85,7 +85,7 @@ ok("无论够不够，参考文献一位不漏那一条都在", /\u4e00\u4f4d\u4
 
 /* ═══ 三、下发点：判据必须落在常量上，不许是字面量 ═══ */
 console.log("\u2500\u2500 part 那一趟怎么挂 \u2500\u2500");
-ok("part 的 sys 用的是 ancBlock（不是原来那个三元条件）", /\+ ancBlock\(planIn\.ancestors\)/.test(WSRC));
+ok("part 的 sys 用的是 ancBlock（不是原来那个三元条件）", /\+ ancBlock\(planIn\.ancestors/.test(WSRC));
 ok("原来那句「清单为空就整块不发」已经不在了",
   WSRC.indexOf('(Array.isArray(planIn.ancestors) && planIn.ancestors.length') < 0);
 ok("plan 那一趟会把实到位数记进 plan（ancN）", /plan\.ancN = _ancF\.n/.test(WSRC));
@@ -138,6 +138,63 @@ console.log("\u2500\u2500 收稿闸真跑 \u2500\u2500");
   const fired = M.ancPick(txt).n < need;
   ok(name + "：闸" + (shouldFire ? "该响" : "该不响"), fired === shouldFire);
 });
+
+/* ═══ 七、v3.0 祖宗闸的第二道：从「数得出来」到「数对了人」 ═══
+   缘起第二份真稿：《论语言之美的发生》26,425 字，盲评 132.7（前一版同题 130.9，只涨 1.8）。
+   v2.3 那四道闸结构上全部生效——文献从零到十二条、六条脉络各有判决性反例、三条自我否决条款——
+   可补进来的十二位全是这个题目下**最容易想到的名字**，真正占着承重命题的四位一个没有：
+   雅各布森的诗性功能、鲍曼的表演、鲍曼与布里格斯的再语境化、戈夫曼的参与框架。
+   四位都不在「语言之美」这个词底下——**它们在别的行里，用别的名字，说的是同一件事**。
+   ⇒ 本节钉住 A1 别名法与随之而来的六条纪律，规范层在 tools/skills/sde-academic-paper.md §3.8。 */
+console.log("\u2500\u2500 v3.0 别名法与四条纪律 \u2500\u2500");
+const SKILL = fs.readFileSync(path.join(__dirname, "skills", "sde-academic-paper.md"), "utf8");
+const ANCB = (() => { const a = WSRC.indexOf("function ancBlock("); return a < 0 ? "" : WSRC.slice(a, WSRC.indexOf("\n}", a)); })();
+const ASYS = (() => { const a = WSRC.indexOf("【只做一件事"); return a < 0 ? "" : WSRC.slice(a, a + 3000); })();
+
+ok("ancBlock 收 aliases 这个入参", /function ancBlock\(list, aliases\)/.test(WSRC));
+ok("调用点把 planIn.aliases 传进去了", WSRC.indexOf("ancBlock(planIn.ancestors, planIn.aliases)") > 0);
+/* ⚠ 与「永远下发」同理：**没盘出叫法**才是最该报警的情况，那一支绝不许静默。 */
+ok("有叫法时下发 ALIASES 块", ANCB.indexOf("ALIASES（这个现象在别的行里还叫这些名字") > 0);
+ok("没盘出叫法时也下发（且改成让本节自己先补一步）", ANCB.indexOf("这一趟没盘出别的叫法") > 0);
+ok("ALIASES 要求每个叫法底下都有人被点到名", /每一个叫法底下都得有人被点到名/.test(ANCB));
+[["A2 承重命题逐条配祖宗", "每条至少两位"], ["A3 年代验实交", "近十年至少两条"],
+ ["Q1 伪引文禁令", "加引号的伪引文比不引更伤"], ["Q2 列而不引禁令", "要么从表里删掉"]].forEach(([n, mark]) => {
+  ok(n + " 随每一节下发", ANCB.indexOf(mark) > 0);
+});
+/* A1 的要害是**顺序**：叫法必须是补问那一趟的第一个必填字段，
+   不是提示语末尾一句叮嘱（v2.3 那句「先想三个不同叫法」就是被当成叮嘱忽略掉的）。 */
+ok("补问改成两步、只输出一个 JSON 对象", /只做一件事，分两步/.test(ASYS) && /aliases/.test(ASYS));
+ok("aliases 排在 list 之前（先列名再列人）", ASYS.indexOf("第一步 aliases") > 0
+  && ASYS.indexOf("第一步 aliases") < ASYS.indexOf("第二步 list"));
+ok("每个叫法要对得上一个学科", /对得上一个具体的学科或传统/.test(ASYS));
+ok("第二步要求按每个叫法各找一位", /按每一个叫法各去找至少一位/.test(ASYS));
+ok("补问里加了「每条承重命题各要有人」", ASYS.indexOf("每一条承重命题上至少两位") > 0);
+ok("旧那句「三个不同叫法」的叮嘱已被顶掉", WSRC.indexOf("三个不同叫法**各想一遍") < 0);
+/* 形状兼容：模型偷懒直接给裸数组时不许整趟白跑。 */
+ok("两种形状都收（对象与裸数组）", /Array\.isArray\(_aj0\) \? _aj0 :/.test(WSRC));
+ok("盘出来的叫法也报一条 note", WSRC.indexOf("这个现象在别的行里还叫：") > 0);
+
+/* Q1 的可数版真跑一遍 */
+console.log("\u2500\u2500 Q1 引文闸真跑 \u2500\u2500");
+const QA = (() => {
+  const a = WSRC.indexOf("function quoteAudit(");
+  return new Function(WSRC.slice(a, WSRC.indexOf("\n}", a) + 2) + "; return quoteAudit;")();
+})();
+eq("那句伪引文数得出来", QA("亚里士多德提出隐喻是「对偏离日常语言的一种令人愉快的手段」的早期表述").n, 1);
+eq("两处引文数两处", QA("他说「甲乙丙丁戊己」，又说「庚辛壬癸子丑」").n, 2);
+eq("短引号不算（术语标记不是引文）", QA("所谓「场合」不是「环境」的同义语").n, 0);
+eq("没有引文时不响", QA("语域三变项共同选择语义结构。").n, 0);
+
+/* 规范层自身 */
+console.log("\u2500\u2500 规范层 v3.0 \u2500\u2500");
+ok("Skill 有 §3.8 v3.0 那一章", SKILL.indexOf("### 3.8　v3.0") > 0);
+["A1", "A2", "A3", "A4", "Q1", "Q2", "C1"].forEach((c) => {
+  ok("Skill 里有 " + c + " 这一条", SKILL.indexOf("#### " + c + " ·") > 0);
+  ok("出稿自检清单里有 " + c, new RegExp("\\*\\*" + c + "[ab]?\\*\\*").test(SKILL));
+});
+ok("Skill 记下了漏掉的那四位", ["雅各布森", "鲍曼", "布里格斯", "戈夫曼"].every((n) => SKILL.indexOf(n) > 0));
+ok("Skill 头部写明 v3.0 管的是「找的是不是对的人」", SKILL.indexOf("找的是不是对的人") > 0);
+ok("A4 把自我否决条款接到盘点表上", SKILL.indexOf("接到 I 维的盘点表上") > 0);
 
 console.log("\n" + (fail ? "\u2717 " : "\u2713 ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);
