@@ -35,18 +35,28 @@ const _q1 = F.indexOf("(t(\"dDone\") + text.length));", _q0);
 const done = (_q0 > 0 && _q1 > _q0) ? F.slice(_q0, _q1 + '(t("dDone") + text.length));'.length) : "";
 ok("抠得到那段判定", done.indexOf("dPartial") > 0);
 /* 真跑：把那几行拿出来跑一遍，别只查字符串 */
-function label(len, secs) {
+function label(len, secs, kw) {
+  /* 2026-08-23：产品那段多了一路——dSecs 取不到时退回档位表的目标字数（kindDef(kind).w）。
+     桩要跟着长出这两样，否则报的是 ReferenceError 而不是真读数。
+     第三个参数 ＝ 这一档的目标字数，不传就当这一档没有目标（旧行为）。 */
   const src = "var text='x'.repeat(" + len + "), dSecs=" + JSON.stringify(secs)
-    + ", stat={}; function t(k){return k+':';}\n" + done + "\nreturn stat.textContent;";
+    + ", kind='x', stat={}; function t(k){return k+':';}"
+    + " function kindDef(){ return " + JSON.stringify(kw ? { w: kw } : {}) + "; }\n"
+    + done + "\nreturn stat.textContent;";
   return new Function(src)();
 }
 ok("54 字 · 目标一万 → 判未写完（这正是真跑那一份）", /dPartial/.test(label(54, [{ words: 10000 }])));
 ok("未写完时把分母也写出来（54/10000 一眼看得出差多少）", label(54, [{ words: 10000 }]).indexOf("/10000") > 0);
-ok("写够六成 → 才算完成", /dDone/.test(label(6500, [{ words: 10000 }])));
-ok("刚好卡在六成下方 → 仍算未写完", /dPartial/.test(label(5999, [{ words: 10000 }])));
+ok("写够九成 → 才算完成", /dDone/.test(label(9500, [{ words: 10000 }])));
+ok("刚好卡在九成下方 → 仍算未写完", /dPartial/.test(label(8999, [{ words: 10000 }])));
 ok("没有分节表时用下限兜底：54 字仍是未写完", /dPartial/.test(label(54, null)));
 ok("没有分节表时：写够下限就算完成", /dDone/.test(label(3000, null)));
 ok("一个字都没有 → 仍是失败，不是未写完", /dFail/.test(label(0, null)));
+/* ⭐ 2026-08-23 那次真事故：散文档没有分节表，目标 5000，交回 2858，
+   旧口径下限写死 400 ⇒ 判「完成 · 2858」。现在必须判未写完，并把分母写出来。 */
+ok("★ 无分节表但档位表有目标：2858/5000 判未写完", /dPartial/.test(label(2858, null, 5000)));
+ok("★ 并且把分母也写出来（一眼看得出差多少）", label(2858, null, 5000).indexOf("/5000") > 0);
+ok("★ 同一份稿子在旧口径（无目标）下会被判完成——这一刀确实改了结论", /dDone/.test(label(2858, null)));
 ok("dSecs 在提纲拿到分节时被赋上", /var secs = plan\.sections; dSecs = secs;/.test(F));
 ok("dSecs 有声明（否则收尾那一行会抛 ReferenceError）", /var dSecs = null;/.test(F));
 

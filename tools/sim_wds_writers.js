@@ -99,7 +99,13 @@ hd("【四】四档创作体：三处都加齐了没有");
     ok(new RegExp("\\n\\s{8}" + k + ": \\{ name:").test(W), k + "：服务端 SPEC 表里有");
     ok(W.indexOf(n) >= 0, k + "：字数写进了规格（" + n + "）");
   });
-  ok(/{ k: "wechat", t: "kWechat", w: 1, doc: 1 }/.test(F), "四档都标了 w:1（点它先问笔法）");
+  /* ⚠ 2026-08-23：这条原来钉着 `w: 1` 这个字面。而那个旗标已改名 sty——
+     改名不是洁癖：w 现在是**目标字数**，四档留着 w:1 就等于把散文的目标写成了 1 个字。
+     按用意重写：四档都要带笔法旗标；并多守一条——旗标绝不许再叫 w。 */
+  ["wechat", "prose", "story", "poem"].forEach((k) => {
+    ok(new RegExp('k: "' + k + '"[^}]*\\bsty: 1').test(F), k + "：标了笔法旗标（点它先问笔法）");
+    ok(!new RegExp('k: "' + k + '"[^}]*\\bw: 1\\b').test(F), k + "：旗标没有和目标字数撞名");
+  });
   /* 2026-08-22：四档也都标了 doc:1（出 Word 与 PDF），诗另加 verse:1（不走首行缩进）。
      ⚠ 漏标 doc 的表现是：写完了只拿得到 .md，读者要的那份 Word 一个也拿不到。 */
   ["wechat", "prose", "story", "poem"].forEach((k) => {
@@ -109,7 +115,9 @@ hd("【四】四档创作体：三处都加齐了没有");
   ok(/verse: !!\(_kd && _kd\.verse\)/.test(F), "Word 生成时把诗体开关递下去");
   ok(/VERSE = !!o\.verse;/.test(fs.readFileSync(ROOT + "/public/assets/sde-docx.js", "utf8")),
     "docx 模块认这个开关");
-  ok(/if \(d0 && d0\.w\) \{ writerMenu\(k\); return; \}/.test(F), "菜单点击真的会先开笔法面板");
+  /* 承重位是**调用点**：表里标了旗标而这里不看，四档就默默按本色写、零报错。
+     只认「读那个旗标 → 开笔法面板 → return」，不抄整行字面。 */
+  ok(/if \(d0 && d0\.sty\) \{ writerMenu\(k\); return; \}/.test(F), "菜单点击真的会先开笔法面板");
   ok(/function distill\(kind, existing, title, tpl, again, style\)/.test(F), "distill 收 style 这个参数");
   ok(/style: style \|\| "",/.test(F), "style 进了请求体");
   ok(/distill\(kind, null, title, tpl, again, style\)/.test(F),

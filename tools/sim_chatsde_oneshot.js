@@ -86,17 +86,22 @@ ok("注释引了金点子那句原话（下一个人不必再去翻）", /只让
 
 /* ═══ 三、两档并存，旧的那条一个字没动 ═══════════════════════ */
 console.log("── 两档并存 ──");
+/* ⚠ 2026-08-23：CHUNKED 从写死的 { paper: 1 } 改成由 KIND_DEF 的 c 字段派生
+   （三档创作体与三档应用文也要拆趟）。守的用意没变：**十六趟那一档还在，且它走的是拆趟那条路**。 */
 ok("★ 十六趟那一档还在（拿两条的读数对账，别拿信念对账）",
-  /paper: \{ name: "学术论文（两万字·投稿体例）"/.test(W) && /var CHUNKED = \{ paper: 1 \}/.test(bare(F)));
-ok("★★ paper1 不在 CHUNKED 表里（在表里就又被拆成十六趟了）",
-  !/CHUNKED = \{[^}]*paper1/.test(bare(F)));
+  /paper: \{ name: "学术论文（两万字·投稿体例）"/.test(W)
+  && /\{ k: "paper", t: "kPaper"[^}]*\bc: 1/.test(F)
+  && /KIND_DEF\[_ci2\]\.c\) CHUNKED\[KIND_DEF\[_ci2\]\.k\] = 1;/.test(bare(F)));
+ok("★★ paper1 不进 CHUNKED（进了就又被拆成十六趟了）",
+  !/\{ k: "paper1", t: "kPaper1"[^}]*\bc: 1/.test(F));
 ok("界面上两档分得清（一趟写完 / 分十六趟）",
   /kPaper1: "凝成两万字论文 · 一趟写完"/.test(F) && /kPaper: "凝成两万字论文 · 分十六趟"/.test(F));
 ok("英文同步（中英双份纪律）", /single pass/.test(F) && /sixteen passes/.test(F));
 ok("★ 出稿三口（Word／PDF／投稿）认得 paper1", /kind === "paper" \|\| kind === "paper1"/.test(F));
 /* ⚠ 落点搬家：那份手写清单已被 KIND_DEF 取代（正是为了不再有第二份）。 */
+/* 表项后来长出了 doc/w/c 几个字段，整串抄进正则就假红；它守的是「paper1 在档位表里」。 */
 ok("落进「成文记录」的档名也认得（paper1 在档位表里）",
-  /\{ k: "paper1", t: "kPaper1" \}/.test(F));
+  /\{ k: "paper1", t: "kPaper1"/.test(F));
 ok("注释记下了这是用户指出来的、我 memory 那条是错判", /是\*\*错判\*\*/.test(W) && /那道题是拆趟自己造出来的/.test(W));
 
 /* ═══ 四、⭐ 每一档都取得到文案（真跑）═══════════════════════

@@ -671,8 +671,14 @@
       // 四档创作体（2026-08-22）。与上面几档的分别：那几档要判断立得住，这四档要读得下去。
       kWechat: "公众号文章（3000字）", kWechatS: "开头三句必须有一个具体场面；小标题分段、短句、结尾给一个明天就能做的动作",
       kProse: "散文（5000字）", kProseS: "不讲道理讲经验：从一个场面进去，道理藏在事里，收在一个具体画面上",
-      kStory: "短篇小说（2000字）", kStoryS: "一个场景、一到三个人；判断由情节自己撞出来，结尾不解决不点题",
+      kStory: "短篇小说（2400字）", kStoryS: "一个场景、一到三个人；判断由情节自己撞出来，结尾不解决不点题",
       kPoem: "诗歌（500字）", kPoemS: "一首长诗或三到五首短章；具体胜过抽象，不解释自己",
+      /* 应用文五档：说明句一律写「责任落在谁身上」——这是选档时唯一要判断的事。 */
+      kNotice: "通知公告（1500字）", kNoticeS: "已经定了的事，送到该动的人手上；要求提在最前，做不到有出路",
+      kPlan: "方案策划（4000字）", kPlanS: "还没做的事写成可追责的承诺；最贵的是代价表与失败条款",
+      kSummary: "总结述职（3000字）", kSummaryS: "做完的事记成一笔可核的账；最贵的是没做成的那几件",
+      kSpeech: "讲话致辞（2500字）", kSpeechS: "只对这一屋人这一刻说；换个场合就不成立才算写对",
+      kLetter: "函件邮件（1200字）", kLetterS: "一屏成交：你是谁、要我做什么、几号之前",
       // 作家风格选择面板
       wsPick: "要不要模仿一位作家的笔法？", wsNone: "本色写（不模仿）", wsNoneS: "按这台机器自己的口吻写",
       wsNote: "学的是手法——句子的长短、意象的取法、视角与语气、留白的位置。**不搬原句、不借人物与情节**：题材仍全部来自这场对话。写出来要像他来写这件事，不是像他写过的那件事。",
@@ -828,6 +834,7 @@
     dPlanGot: "提纲已定：分 ", dPlanGot2: " 节写 —— ",
     dPart: "正在写第 ",
     dPartLost: "第 ", dPartLost2: " 节两次都没写出来，先跳过接着往下写（回头可以点「重答」重来）。",
+    dShortW1: "\u26a0 这一稿只写到 ", dShortW2: " 字，短于这一档的目标。点「\u21bb 重写」再来一趟，或在下面接着说一句「再展开一件事」让它补——⛔ 别让它把说过的话换个说法再说一遍来凑。",
     dShort1: "\u26a0 第 ", dShort2: " 节两遍都没写够字数，稿子在这几处是短的——点上面的「\u21bb 继续写缺的几节」就只补这几节，已经写好的不动。",
     dCut1: "\u26a0 第 ", dCut2: " 节字数是够的，但**断在半句上**（末尾没有句号）——多半是这一趟被顶穿了。这几节没有当场重写：额度先留给一个字都还没写的那些节。等全篇跑完，点「\u21bb 继续写缺的几节」把它们一起补上；重写不会比现在更差（比现在短就仍旧留着现在这一份）。",
     dTailRetry: "第 ", dTailRetry2: " 节字数够了却断在半句上（多半是这一趟被顶穿了），等 20 秒重写一遍；写出来的若不如现在这一份，就仍旧留着现在这一份。",
@@ -896,8 +903,13 @@
       kSumdoc: "Read the loaded article", kSumdocS: "What it claims \u00b7 its load-bearing line \u00b7 where it is brittle \u00b7 a 1,000-word condensation",
       kWechat: "Column piece (3,000 characters)", kWechatS: "A concrete scene in the first three lines; short sections, short sentences, one thing to do tomorrow",
       kProse: "Personal essay (5,000 characters)", kProseS: "Experience, not argument: enter through a scene, keep the point inside the events, end on an image",
-      kStory: "Short story (2,000 characters)", kStoryS: "One scene, one to three people; the claim has to surface through what happens — no moral at the end",
+      kStory: "Short story (2,400 characters)", kStoryS: "One scene, one to three people; the claim has to surface through what happens — no moral at the end",
       kPoem: "Poem (500 characters)", kPoemS: "One long poem or a set of three to five; concrete over abstract, and no explaining itself",
+      kNotice: "Notice (1,500 characters)", kNoticeS: "A settled decision, delivered to whoever must act; the ask comes first, with a route out",
+      kPlan: "Proposal (4,000 characters)", kPlanS: "An unmade thing written as a commitment you can be held to; cost table and failure clause carry it",
+      kSummary: "Report / review (3,000 characters)", kSummaryS: "A finished thing written as a checkable ledger; what didn't get done carries it",
+      kSpeech: "Speech (2,500 characters)", kSpeechS: "For this room, this hour only; if it survives a change of venue it isn't a speech",
+      kLetter: "Letter / email (1,200 characters)", kLetterS: "One screen: who you are, what you want done, by when",
       wsPick: "Write it in a particular writer's hand?", wsNone: "Plain (no imitation)", wsNoneS: "In this agent's own voice",
       wsNote: "What is borrowed is craft — sentence length and rhythm, how images are chosen, point of view and tone, where to leave things unsaid. **No borrowed lines, characters or plots**: the material still comes entirely from this conversation. It should read as if he were writing *this*, not as one of the things he wrote.",
       wsSearch: "Type a name to filter…", wsNoHit: "No match. Try another spelling, or pick Plain.",
@@ -953,6 +965,7 @@
       attFull: "kept in full for this chat", attIdx: "excerpted per question", attSegs: " segments", attStay: "Attachments stay with this conversation until you remove them or start a new one",
     attGone: "Attachments live on this page only — a refresh drops them (the transcript comes back)",
     sbCap: "Only the latest 60 chats are kept locally; older ones are dropped — export (⤓) to keep them",
+    dShortW1: "\u26a0 This draft came in at only ", dShortW2: " characters, short of this format's target. Hit \u21bb Rewrite for another pass, or ask below for one more concrete scene — don't let it pad by restating what it already said.",
     dCut: "This write-up was cut off (what's above can still be copied or exported)",
       micLocal: "On-device (free)", micDl: "Downloading the model ",
       micLocalAsk: "On-device transcription is free, needs no key, and the audio never leaves this machine. The cost is a one-time download of about 80 MB (the browser keeps it afterwards), and on a machine without a discrete GPU a sentence may take ten-odd seconds. Download it now?",
@@ -6270,14 +6283,27 @@
        2026-08-22 之前只有 essay/paper/paper1 三档有这两颗，于是散文、小说、诗、
        公众号文章、报告、提纲写完了只能拿到 .md，读者要的那份 Word 一个也拿不到。
        ⚠ deck 不给：它的成品是 .pptx，稿子本身是切页用的中间物。 */
-    { k: "report", t: "kReport", doc: 1 }, { k: "essay", t: "kEssay", doc: 1 },
-    { k: "paper1", t: "kPaper1", doc: 1 }, { k: "paper", t: "kPaper", doc: 1 },
+    /* w ＝ 目标汉字数，c ＝ 走拆趟那条路（服务端 SPEC 有 fixed／parts 的就是它）。
+       ⚠ 两个字段都必须与服务端 DIST_WORDS / SPEC 逐档对得上，菜单文案里的数字也算一处——
+       **三处对不上时不会报错，只会静静地按另一套跑**（护栏 sim_wds_dist_words 逐档对账）。
+       没有 w 的档（报告／提纲／总结／PPT）长度由内容定，不挂字数闸，逼字数只会注水。 */
+    { k: "report", t: "kReport", doc: 1 }, { k: "essay", t: "kEssay", doc: 1, w: 3000 },
+    { k: "paper1", t: "kPaper1", doc: 1, w: 20000 }, { k: "paper", t: "kPaper", doc: 1, w: 20000, c: 1 },
     { k: "outline", t: "kOutline", doc: 1 }, { k: "sumdoc", t: "kSumdoc", doc: 1 }, { k: "deck", t: "kDeck" },
     /* 四档创作体（2026-08-22）。都带 w:1 ＝ 点它先问一句「要不要模仿谁的笔法」。
        ⚠ 加一档要同时改**服务端那张白名单与 SPEC 表**——只改这里的话，
        菜单点得到、后端认不出，表现是默默按「对话报告」写了一篇。 */
-    { k: "wechat", t: "kWechat", w: 1, doc: 1 }, { k: "prose", t: "kProse", w: 1, doc: 1 },
-    { k: "story", t: "kStory", w: 1, doc: 1 }, { k: "poem", t: "kPoem", w: 1, doc: 1, verse: 1 },
+    /* ⚠ 这四档原来的 `w: 1` 是「点它先问笔法」的旗标，与目标字数撞名了 ⇒ 改叫 `sty`。
+       改名不是洁癖：w 现在是一个字数，留着 1 就等于把散文的目标写成了 1 个字。 */
+    { k: "wechat", t: "kWechat", sty: 1, doc: 1, w: 3000, c: 1 }, { k: "prose", t: "kProse", sty: 1, doc: 1, w: 5000, c: 1 },
+    { k: "story", t: "kStory", sty: 1, doc: 1, w: 2400, c: 1 }, { k: "poem", t: "kPoem", sty: 1, doc: 1, w: 500, verse: 1 },
+    /* 应用文五档（2026-08-23）。规范层在 tools/skills/sde-applied-*.md。
+       ⚠ **一律不给 sty**：应用文不挂笔法面板——学谁的腔调都不改责任落点，
+          而应用文的全部价值在落点上；给它一个「用某某笔法写通知」的入口只会诱人把力气花错地方。
+       ⚠ 五档全给 doc:1：应用文的成品是要发出去、要存档、要签字的，.md 一份都不够用。 */
+    { k: "notice", t: "kNotice", doc: 1, w: 1500 }, { k: "plan", t: "kPlan", doc: 1, w: 4000, c: 1 },
+    { k: "summary", t: "kSummary", doc: 1, w: 3000, c: 1 }, { k: "speech", t: "kSpeech", doc: 1, w: 2500, c: 1 },
+    { k: "letter", t: "kLetter", doc: 1, w: 1200 },
   ];
   function kindDef(k) { for (var i = 0; i < KIND_DEF.length; i++) if (KIND_DEF[i].k === k) return KIND_DEF[i]; return null; }
   function kindT(k) { var d = kindDef(k); return d ? t(d.t) : String(k || ""); }
@@ -6302,7 +6328,7 @@
         if (menu.parentNode) menu.parentNode.removeChild(menu);
         if (k === "deck") { tplMenu(); return; }        // PPT 先问做成哪一种
         var d0 = kindDef(k);
-        if (d0 && d0.w) { writerMenu(k); return; }      // 四档创作体先问用谁的笔法
+        if (d0 && d0.sty) { writerMenu(k); return; }    // 四档创作体先问用谁的笔法（旗标由 w 改名 sty，w 现在是目标字数）
         distill(k);
       };
       menu.appendChild(b);
@@ -6439,11 +6465,39 @@
     });
   }
 
-  /* 存进历史里的那一行名字。**档名在前、笔法在后，用 " · " 隔开**——
-     取回时按前半段反查是哪一档（见 openDistillHistory），后半段只给读者看。
-     ⚠ 别把顺序倒过来：反查认的是第一段。 */
-  function distLabel(kind, style) {
-    return kindT(kind) + (style ? (" · " + t("wsOn") + writerName(style)) : "");
+  /* 【文章自己的名字排在最前】(2026-08-23)
+     原来存进历史的那一行是「档名 · 笔法」——于是十篇散文在记录面板里长得一模一样，
+     读者要靠日期猜哪一篇是哪一篇。现在取**稿子标题的前面那几个词**放最前。
+     ⚠ 取的是「前面词语」而不是整条标题：应用文与论文的标题常带副题
+        （「关于…的通知」「退路即钩子——发生学学校不经营信任…」），整条塞进去反而看不清。
+        切在第一个强分隔上（破折号／冒号／竖线／间隔号），没有就截前 14 字。 */
+  function titleHead(md, max) {
+    var ttl = firstTitleOf(md);
+    if (!ttl) {                                  // 没有 # 标题的档（函件主题行、诗）退回第一行非空
+      var ls = String(md || "").split(/\n+/);
+      for (var i = 0; i < ls.length && !ttl; i++) {
+        var s = ls[i].replace(/^#+\s*/, "").replace(/^[>*\-\s]+/, "").trim();
+        if (s) ttl = s;
+      }
+    }
+    if (!ttl) return "";
+    /* 先剥掉「主题：」「标题：」这类标签，否则函件档会被切成一个「主题」，十封信长得一模一样。 */
+    ttl = String(ttl).replace(/^\s*(?:\u4e3b\u9898|\u6807\u9898|\u4e8b\u7531|Subject|Re)\s*[\uff1a:]\s*/i, "");
+    /* 强分隔（副题）优先切；没有强分隔再按句读切——「一句话落下，屋里的规矩就改了」取前半就够认。 */
+    var cut = ttl.split(/\s*(?:\u2014\u2014|\u2014|--|\uff1a|:|\uff5c|\||\u00b7)\s*/)[0] || ttl;
+    cut = cut.split(/[\uff0c,\u3001\uff1b;\u3002\uff01\uff1f!?]/)[0] || cut;
+    cut = cut.replace(/\s+/g, " ").trim();
+    var mx = max || 20;
+    if (cut.length > mx) cut = cut.slice(0, mx);
+    return cut;
+  }
+  /* 存进历史里的那一行名字：**「标题前段」· 档名 · 笔法**。
+     ⚠ 取回时反查档位**不许再认第一段**（第一段现在是标题）——
+        改成扫所有 " · " 分段去匹配档名，见 openDistillHistory。两处必须一起改。 */
+  function distLabel(kind, style, text) {
+    var h = text ? titleHead(text) : "";
+    return (h ? ("\u300c" + h + "\u300d \u00b7 ") : "") + kindT(kind)
+      + (style ? (" \u00b7 " + t("wsOn") + writerName(style)) : "");
   }
   /* ── 成文落本机：和对话记录共用 IndexedDB，但另立一个 agent，两个历史面板互不混。 ── */
   function distSave(label, text, cb) {
@@ -6481,9 +6535,16 @@
           /* ⚠ 存进去的名字现在可能带笔法（「短篇小说（2000字） · 笔法：契诃夫」），
              所以反查只认 " · " 之前那一段——按整串比，带笔法的记录一条都认不出来，
              表现是取回的稿子一颗导出按钮都没有。 */
-          var head0 = String(head).split(" \u00b7 ")[0];
+          /* ⚠ 2026-08-23：标题前段现在排在最前，档名在中间 ⇒ **不许再只认第一段**。
+             改成逐段扫，哪一段等于某个档名就是哪一档。
+             只认第一段的老写法在标题前置之后会一条都认不出来，
+             表现是取回的稿子一颗导出按钮都没有——稿子还在，却拿不出 Word 与 PDF。 */
+          var segs = String(head).split(" \u00b7 ");
           var k = "";
-          KIND_KEYS.forEach(function (x) { if (!k && kindT(x) === head0) k = x; });
+          for (var si = 0; si < segs.length && !k; si++) {
+            var s0 = segs[si].trim();
+            KIND_KEYS.forEach(function (x) { if (!k && kindT(x) === s0) k = x; });
+          }
           /* 笔法也认回来：存的是名字（读者看得懂的那个），这里按名字倒查回 id，
              取回的那一篇于是仍标着「笔法：某某」，接着重写也还用同一只手。 */
           var st = "", mSt = /\u00b7\s*[^:：]*[:：]\s*(.+)$/.exec(String(head));
@@ -6764,7 +6825,7 @@
       pTrace.leg = "收尾·存稿"; traceSave();
       if (text && text.length > 200 && !existing) {
         try {
-          distSave(distLabel(kind, style), text, function (okv) {
+          distSave(distLabel(kind, style, text), text, function (okv) {
             if (okv) dNote(t("dAutoSaved"));
             else dNote(t("dAutoFail"), 1);
           });
@@ -6806,11 +6867,18 @@
       /* 【断稿不许写成"完成"】原来只要 text 非空就是「完成 · N」——于是 54 个字断在半句上的稿子，
          状态栏一样写着"完成"。读者据此以为写完了，我方也据此以为这一趟没事。
          目标字数取得到就按目标的六成判，取不到就用一个下限。差得远就明写「未写完」。 */
+      /* 【目标字数必须取得到】原来只从 dSecs 求和，而 dSecs 只有拆趟档才有 ⇒
+         散文那种一趟档 _want=0 ⇒ 下限退成写死的 400 ⇒ **2858/5000 照样打「完成」**。
+         现在多一路：档位表里的目标字数（与服务端 DIST_WORDS 同源）。
+         判据放到九成——与服务端那道字数闸同一个数，两边说的是同一件事。 */
       var _want = 0;
       try { _want = (dSecs || []).reduce(function (a, s) { return a + (parseInt(s && s.words, 10) || 0); }, 0); } catch (e) {}
-      var _floor = _want ? Math.round(_want * 0.6) : 400;
+      if (!_want) { var _kdw = kindDef(kind); _want = (_kdw && _kdw.w) || 0; }
+      var _floor = _want ? Math.round(_want * 0.9) : 400;
       stat.textContent = !text ? t("dFail")
         : (text.length < _floor ? (t("dPartial") + text.length + (_want ? ("/" + _want) : "")) : (t("dDone") + text.length));
+      /* 状态栏那一行容易被略过（它就在角落里）。写短了另发一条 note，把差多少说清、把下一步给出来。 */
+      if (text && _want && text.length < _floor) dNote(t("dShortW1") + text.length + "/" + _want + t("dShortW2"), 1);
       if (dCutAny) dNote(t("dCut"), 1);
       /* 整趟的账：切走过几次、一共多久。**这一行是给下一次判读用的**——
          若失败集中在标签页藏起来的那几分钟，那就不是上游的事。 */
@@ -6978,7 +7046,7 @@
     function distClose() {
       try { dStopped = true; } catch (e) {}
       try { if (dr) dr.cancel(); } catch (e) {}
-      try { if (text && text.length > 200 && !existing) distSave(distLabel(kind, style), text, function () {}); } catch (e) {}
+      try { if (text && text.length > 200 && !existing) distSave(distLabel(kind, style, text), text, function () {}); } catch (e) {}
       try { if (beatT) { clearInterval(beatT); beatT = null; } } catch (e) {}
       try { document.removeEventListener("keydown", distEsc, true); } catch (e) {}
       if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
@@ -7005,7 +7073,7 @@
     dlBtn.onclick = function () { download(fileTag("WDS") + "-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
     svBtn.onclick = function () {
       if (!text) return;
-      distSave(distLabel(kind, style), text, function (ok) { svBtn.textContent = ok ? t("dSaved") : t("dNoStore"); });
+      distSave(distLabel(kind, style, text), text, function (ok) { svBtn.textContent = ok ? t("dSaved") : t("dNoStore"); });
     };
     /* ── 增量渲染：写定的段落只排一次 ────────────────────────────────
        原来每 130ms 把**累计全文**重排一遍（O(N²)），一万字就开始卡、十万字必死。
@@ -7260,7 +7328,11 @@
        而"想久一点"与"写长一点"吃的是同一份预算——单趟的结局要么被墙掐断、
        要么把预算耗在思考上交白卷。所以长档改成拟题一趟 ＋ 每节一趟。
        「再打磨一轮」不拆：它带着上一稿回来，重新拟题等于把上一稿扔了。 */
-    var CHUNKED = { paper: 1 };          // paper1 不在表里 ⇒ 走单趟那条路，一次出全篇
+    /* 【由 KIND_DEF 派生，不再手抄一张表】原来这里写死 `{ paper: 1 }`，
+       于是 2026-08-22 加的三档创作体在服务端拿到了拆趟表、前端却照旧一趟直出——
+       **散文交 2858/5000 的直接原因就在这一行**。paper1 仍不拆（用户明令一趟出全篇）。 */
+    var CHUNKED = {};
+    for (var _ci2 = 0; _ci2 < KIND_DEF.length; _ci2++) if (KIND_DEF[_ci2].c) CHUNKED[KIND_DEF[_ci2].k] = 1;
     if (!CHUNKED[kind] || again) {
       /* 一趟出全篇：正文区先摆一句"生成中"，全程只滚字数，收尾一次性排版。
          ⚠ ticker 必须在 done() 里停——它是 setInterval，不停就一直在跑。 */
@@ -7282,8 +7354,12 @@
       function put(A) {
         if (!A) return;
         try {
-          if (!dsess) dsess = A.session({ agent: AGENT_DIST, scope: "", scopeLabel: distLabel(kind, style) });
-          dsess.save([{ role: "reader", text: distLabel(kind, style) + " · " + new Date().toLocaleString() + (tag ? ("（" + tag + "）") : "") },
+          /* ⚠ 拆趟档逐节存稿：第一趟写完才有标题，所以每次都用**当前正文**重算一次名字；
+             session 的 scopeLabel 只在建会话时定得下来，因此这里另把名字写进那一行摘要里，
+             取回时两处都认得出（反查扫全段）。 */
+          var _dl = distLabel(kind, style, text);
+          if (!dsess) dsess = A.session({ agent: AGENT_DIST, scope: "", scopeLabel: _dl });
+          dsess.save([{ role: "reader", text: _dl + " · " + new Date().toLocaleString() + (tag ? ("（" + tag + "）") : "") },
                       { role: "wds", text: text }]);
         } catch (e) {}
       }

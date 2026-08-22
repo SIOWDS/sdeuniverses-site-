@@ -156,17 +156,32 @@ ok("两处白屏判据都改用 out.firstChild 这个此刻的结构量",
 
 /* ═══ 五、成文记录还原：kind 不能丢，否则 Word/PDF/投稿三颗按钮全没有 ═══ */
 console.log("── 成文记录还原 ──");
-const rst = FSRC.slice(FSRC.indexOf("onRestore: function (rec)"), FSRC.indexOf("onRestore: function (rec)") + 1200);
+/* ⚠ 窗口从 1200 提到 2600：2026-08-23 反查改成扫全段并加了注释，1200 字符切在半路上，
+   三条断言一起假红。💡 通则：按固定长度切的取样窗，会被后来的注释挤出去。 */
+const rst = FSRC.slice(FSRC.indexOf("onRestore: function (rec)"), FSRC.indexOf("onRestore: function (rec)") + 2600);
 ok("还原不再写死 report", !/distill\("report", body, head\)/.test(rst));
-ok("还原按 scopeLabel 反查 kind（用 KIND_KEYS 派生，不手抄档名）", /KIND_KEYS\.forEach/.test(rst) && /kindT\(x\) === head/.test(rst));
+/* 2026-08-23：记录名变成「标题前段 · 档名 · 笔法」，反查从「只认第一段」改成扫全段。
+   用意没变（用 KIND_KEYS 派生、不手抄档名），落点从 head0 搬到了逐段的 s0。 */
+ok("还原按 scopeLabel 反查 kind（用 KIND_KEYS 派生，不手抄档名）",
+  /KIND_KEYS\.forEach/.test(rst) && /kindT\(x\) === s0/.test(rst) && /split\(" \\u00b7 "\)/.test(rst));
 ok("老记录对不上时按正文形状兜底认成 paper", /\? "paper" : "report"/.test(rst));
 /* ⚠ 落点搬家：2026-08-12 加了「一趟写完」那一档（paper1），这条断言把整句抄进了正则、当场红。
    它守的用意没变，而且**正是我修过的那个病**——从成文记录取回来的论文拿不到 Word 与 PDF。
    所以不能删，要跟着扩：出稿三口必须认全部会写长文的档。 */
-ok("导出按钮挂在所有会写长文的档上（少认一档＝那一档取回来拿不到 Word/PDF）", (() => {
-  const m = FSRC.match(/if \(kind === "essay"([^)]*)\)/);
+/* ⚠ 这条钉的是一串手抄的档名，而产品早已改成**由档位表的 doc 字段驱动**（2026-08-22），
+   于是它在改动前就一直红着——守的事还在，红的只是写法。按用意重写：
+   ① 出稿三口由 KIND_DEF.doc 决定，不再手抄档名；② 所有会写长文的档都带着 doc:1。
+   💡 这正是它当初要守的病：少认一档＝那一档取回来拿不到 Word 与 PDF。 */
+ok("导出按钮由档位表的 doc 驱动（不手抄档名）",
+  /var _kd = kindDef\(kind\), _isDoc = !!\(_kd && _kd\.doc\)/.test(FSRC));
+ok("所有会写长文的档都标了 doc:1（少认一档＝那一档取回来拿不到 Word/PDF）", (() => {
+  const m = FSRC.match(/var KIND_DEF = \[([\s\S]*?)\n  \];/);
   if (!m) return false;
-  return ["paper", "paper1"].every((k) => m[1].indexOf('"' + k + '"') >= 0);
+  const need = ["essay", "paper", "paper1", "report", "outline", "sumdoc",
+                "wechat", "prose", "story", "poem",
+                "notice", "plan", "summary", "speech", "letter"];
+  return need.every((k) => new RegExp('k: "' + k + '"[^}]*doc: 1').test(m[1]))
+      && !/k: "deck"[^}]*doc: 1/.test(m[1]);   // deck 的成品是 .pptx，稿子只是切页用的中间物
 })());
 ok("痕迹逐步打标仍在（收尾·存稿／排版／挂链接／库存）",
   ["收尾·存稿", "收尾·排版", "收尾·挂链接", "收尾·库存", "已收尾"].every((k) => doneSrc.indexOf(k) > 0));

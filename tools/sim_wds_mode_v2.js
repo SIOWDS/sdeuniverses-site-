@@ -131,8 +131,22 @@ function sseBody(events, noDone) {
   return { getReader: () => ({ read: () => Promise.resolve(cancelled || i >= chunks.length ? { done: true } : { done: false, value: chunks[i++] }), cancel: () => { cancelled = true; } }) };
 }
 let LAST_PAYLOAD = null, ROUTE = {}, NO_DONE = {};
+/* 档位表条数由源码派生，别手抄——手抄的那个数每加一档就假红一次。 */
+const KIND_KEYS_N = ((require("fs").readFileSync(__dirname + "/../public/wds-mode.js", "utf8")
+  .match(/var KIND_DEF = \[([\s\S]*?)\n  \];/) || ["", ""])[1].match(/\{ k: "/g) || []).length;
 let JSON_ROUTE = {};
 let CALLS = [];   // 研究是多趟请求：只留最后一趟就看不出编排对不对
+/* ⚠ 2026-08-23：LAST_PAYLOAD 是**全站最后一次**请求体，谁最后打出去就是谁的。
+   三档创作体改成拆趟之后，前面那一节点过的 story 成文会在后面继续打 part 那几趟，
+   于是这里读到的 kind:"story"，而这一节要问的是刚发的那句对话——
+   表现是 `LAST_PAYLOAD.docs[0]` 抛 TypeError，看起来像环境炸了。
+   💡 心法：**一个"最后一次"的全局变量，在有后台任务的系统里就不再是"我这一次"。**
+   下面这个按 URL 取，谁问哪条路就取哪条路的最近一次。 */
+const lastOf = (u) => { for (let i = CALLS.length - 1; i >= 0; i--) if (CALLS[i].url === u) return CALLS[i].p; return null; };
+/* ⚠ 名字不能叫 lastChat：本文件后段（压缩那一节）在同一个函数作用域里另有一个 const lastChat，
+   同名会把整个作用域的这个名字 TDZ 掉——报的是「Cannot access before initialization」，
+   落点却在几百行之前，看起来像是这一行自己坏了。 */
+const chatPayload = () => lastOf("/api/wds/chat");
 const fetchMock = (url, opt) => {
   LAST_PAYLOAD = JSON.parse(opt.body);
   CALLS.push({ url, p: LAST_PAYLOAD });
@@ -427,9 +441,14 @@ console.log("⑧ 成文（distill）");
   //   分十六趟那一档留着做对照）→ 十项；同时「一万字」全线改名「两万字」。
   // 2026-08-22 再加四档创作体（公众号3000/散文5000/短篇小说2000/诗歌500）→ 十四项。
   //   ⚠ 这四档点下去**先开作家笔法面板**，不直接开写（见下面那一节）。
-  ok(menu.children.length === 14, "菜单十四项（七档 ＋ 四档创作体 ＋ 导出/选目录/成文记录），实得 " + menu.children.length);
-  ok(/公众号文章（3000字）/.test(menu.textContent) && /散文（5000字）/.test(menu.textContent)
-     && /短篇小说（2000字）/.test(menu.textContent) && /诗歌（500字）/.test(menu.textContent),
+  /* ⚠ 别在这里钉一个总数：加一档就要改这一行，而它守的用意不是「正好几项」，
+     是「档位表里每一档都真的出现在菜单里，且尾部三颗功能键都在」。
+     2026-08-23 加应用文五档（共 16 档 ＋ 3 颗 ＝ 19 项）时这条假红了一次。 */
+  ok(menu.children.length === KIND_KEYS_N + 3,
+     "菜单 = 档位表全部 " + KIND_KEYS_N + " 档 ＋ 导出/选目录/成文记录三颗，实得 " + menu.children.length);
+  /* ⚠ 别在这里手抄字数：三处（服务端 DIST_WORDS／前端 KIND_DEF.w／菜单文案）的对账
+     由 sim_wds_dist_words 专管。这里只守「四档都在菜单里，且档名自带一个字数」。 */
+  ok(["公众号文章", "散文", "短篇小说", "诗歌"].every((n) => new RegExp(n + "（[\\d,]+字）").test(menu.textContent)),
     "四档创作体都在菜单里，且档名自带字数");
   ok(menu.textContent.indexOf("两万字") >= 0, "两万字论文那一档在菜单里");
   ok(/一趟写完|single pass/.test(menu.textContent) && /十六趟|sixteen passes/.test(menu.textContent),
@@ -534,13 +553,13 @@ console.log("⑧ 成文（distill）");
   ROUTE["/api/wds/chat"] = [{ t: "token", v: "看完了。" }];
   inEl.value = "帮我看看这份稿子";
   await new Promise((res) => { sendEl.click(); setTimeout(res, 220); });
-  ok(LAST_PAYLOAD.docs && LAST_PAYLOAD.docs.length === 1 && LAST_PAYLOAD.docs[0].n === "讲稿.pdf", "payload 带上附件正文");
-  ok(LAST_PAYLOAD.about === "我是中学生物老师。", "payload 带上自定义指令");
+  ok(chatPayload().docs && chatPayload().docs.length === 1 && chatPayload().docs[0].n === "讲稿.pdf", "payload 带上附件正文");
+  ok(chatPayload().about === "我是中学生物老师。", "payload 带上自定义指令");
   ok(layer.querySelector(".wdsm-atts").children.length >= 1, "附件发出后仍常驻本场（第二句还问得下去）");
   ROUTE["/api/wds/chat"] = [{ t: "token", v: "第三段说的是…" }];
   inEl.value = "第三段什么意思";
   await new Promise((res) => { sendEl.click(); setTimeout(res, 200); });
-  ok(LAST_PAYLOAD.docs && LAST_PAYLOAD.docs.length === 1, "追问时文件仍在手上，不用重传");
+  ok(chatPayload().docs && chatPayload().docs.length === 1, "追问时文件仍在手上，不用重传");
 
   console.log("⑬b 长文自动转「按问题取段」");
   layer.querySelector(".wdsm-newbtn").click();
@@ -555,7 +574,7 @@ console.log("⑧ 成文（distill）");
   ROUTE["/api/wds/chat"] = [{ t: "token", v: "好。" }];
   inEl.value = "特征纠缠在慢性病里怎么定位";
   await new Promise((res) => { sendEl.click(); setTimeout(res, 220); });
-  const dd = LAST_PAYLOAD.docs[0];
+  const dd = chatPayload().docs[0];
   ok(dd.ex === 1 && dd.tot > 1, "长文标了节选与总段数（" + dd.take + "/" + dd.tot + "）");
   ok(dd.t.length <= 12000, "取段后没有超出标准档预算，实得 " + dd.t.length);
   ok(dd.t.indexOf("第 1 段") >= 0, "开头永远带上，让它知道这是篇什么");
@@ -1648,9 +1667,14 @@ console.log("⑧ 成文（distill）");
     ok(/cvHist = \{\}; clearTimeout\(cvHistT\);/.test(src),
       "⭐ 新开一场时清掉映射（不清的话，新一场的同名件会覆盖上一场那条记录）");
     // 成文记录里认得回档位与笔法
-    ok(/function distLabel\(kind, style\)/.test(src), "成文记录的名字带上了笔法");
-    ok(/String\(head\)\.split\(" \\u00b7 "\)\[0\]/.test(src),
-      "⭐ 反查只认 「 · 」之前那一段（否则带笔法的记录一条都认不出，取回来连导出按钮都没有）");
+    /* ⚠ 2026-08-23：记录名改成「标题前段 · 档名 · 笔法」，签名多收一个 text，
+       反查也从「只认第一段」改成扫全段——只认第一段在标题前置之后一条都认不出来。
+       两条断言按用意重写：名字里仍带得上笔法；反查仍认得回档位。 */
+    ok(/function distLabel\(kind, style, text\)/.test(src) && /writerName\(style\)/.test(src),
+      "成文记录的名字带上了笔法");
+    ok(/var segs = String\(head\)\.split\(/.test(src)
+       && /KIND_KEYS\.forEach\(function \(x\) \{ if \(!k && kindT\(x\) === s0\) k = x; \}\);/.test(src),
+      "⭐ 反查扫所有 「 · 」分段（只认第一段的话，带标题的记录一条都认不出，取回来连导出按钮都没有）");
     ok(/distill\(k, body, head, "", null, st\)/.test(src), "取回时把笔法一并带回去");
   }
 

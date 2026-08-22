@@ -22,7 +22,11 @@ const sec = (t) => console.log("\n【" + t + "】");
 
 /* ── 取 worker.js 里某一档 SPEC 的整块文本（从 `key: { name:` 到下一个 `key: { name:`）── */
 function specBlock(key) {
-  const re = new RegExp("\\n        " + key + ": \\{ name: \"([^\"]+)\", tok: (\\d+), spec:");
+  /* ⚠ 2026-08-23：这条原来把 `name: "…", tok: N, spec:` 整串抄进正则，
+     于是三档创作体一加 noHead/parts/fixed（拆趟表插在 tok 与 spec 之间）就全找不到 SPEC，
+     而它要守的用意（这一档的 SPEC 在不在、里面有没有那几条硬律）一点没变。
+     按用意重写：只认「档名 + name + tok」，spec 在后面哪一行由下面自己找。 */
+  const re = new RegExp("\\n        " + key + ": \\{ name: \"([^\"]+)\", tok: (\\d+)[,\\s]");
   const m = W.match(re);
   if (!m) return null;
   const start = m.index;
