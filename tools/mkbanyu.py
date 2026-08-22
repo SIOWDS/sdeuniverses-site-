@@ -27,6 +27,9 @@ PUB = os.path.join(ROOT, 'public')
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(PUB, 'banyu')
 
+sys.path.insert(0, HERE)
+from banyu_plan import SESSIONS, BRING, RULES, LINKS  # noqa: E402
+
 STAMP = re.search(r'^stamp=(\S+)',
                   open(os.path.join(HERE, 'wds-mode.stamp'), encoding='utf-8').read(),
                   re.M).group(1)
@@ -92,6 +95,18 @@ td b{color:var(--pa)}
 .say{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px}
 .say td:first-child{color:#C98F5E;width:48%}
 .say td:last-child{color:var(--e)}
+.run{width:100%;border-collapse:collapse;margin:14px 0 18px;font-size:14.6px}
+.run th{background:#14120E}
+.run td:first-child{white-space:nowrap;color:var(--ac);width:9.6em;font-variant-numeric:tabular-nums}
+.run td:nth-child(2){white-space:nowrap;color:var(--faint);width:4.2em}
+.run td b{display:block;color:var(--pa);margin-bottom:3px}
+.run td span{color:var(--dim)}
+.links{margin:14px 0 0;padding:0;list-style:none}
+.links li{margin:0 0 11px;padding-left:15px;border-left:2px solid var(--line);font-size:15px}
+.links li a{font-size:15.6px}
+.links li em{display:block;font-style:normal;color:var(--faint);font-size:13.8px;margin-top:2px}
+.bring{background:#12140F;border-left:3px solid var(--d);padding:15px 19px;margin:18px 0;font-size:15.2px;color:var(--dim)}
+.bring b{color:var(--pa)}
 .pager{display:flex;justify-content:space-between;gap:14px;margin:40px 0 0;
  padding-top:18px;border-top:1px solid var(--line);font-size:15px}
 .foot{border-top:1px solid var(--line);margin-top:44px;padding:26px 0 56px;
@@ -337,6 +352,28 @@ def render_blocks(blocks):
     return '\n'.join(out)
 
 
+def rundown(sess):
+    """一个半天的逐环节表。分钟数必须加得起来 —— 这里当场断言，别让它悄悄排错。"""
+    name, span, total, rows = sess
+    got = sum(r[1] for r in rows)
+    assert got == total, '%s 分钟对不上：逐段合计 %d，应为 %d' % (name, got, total)
+    out = ['<h2>%s</h2>' % esc(name),
+           '<p class="slot">%s　共 %d 分钟　·　逐环节安排</p>' % (esc(span), total),
+           '<table class="run"><tr><th>时间</th><th>分钟</th><th>环节与做法</th></tr>']
+    for t, m, what, how in rows:
+        out.append('<tr><td>%s</td><td>%d′</td><td><b>%s</b><span>%s</span></td></tr>'
+                   % (esc(t), m, esc(what), how))
+    out.append('</table>')
+    return '\n'.join(out)
+
+
+def linklist(rows):
+    return ('<ul class="links">'
+            + ''.join('<li><a href="%s">%s</a><em>%s</em></li>' % (u, esc(t), d)
+                      for u, t, d in rows)
+            + '</ul>')
+
+
 def build_day(i):
     slug, dn, date, name = DAYS[i]
     b = DAY_BODY[slug]
@@ -359,6 +396,14 @@ def build_day(i):
         '<main><div class="w">',
         '<p class="lead">%s</p>' % b['lead'],
         render_blocks(b['blocks']),
+        '<h2>这一天的现场安排</h2>',
+        '<div class="bring">%s</div>' % BRING[slug],
+        rundown(SESSIONS[slug][0]),
+        rundown(SESSIONS[slug][1]),
+        '<h3>主讲与巡场的三条纪律</h3>',
+        '<ul>%s</ul>' % ''.join('<li>%s</li>' % esc(x) for x in RULES[slug]),
+        '<h2>相关文章 · 站内可直接读</h2>',
+        linklist(LINKS[slug]),
         '<h2>散会时，你带走什么</h2>',
         '<ul>%s</ul>' % ''.join('<li>%s</li>' % x for x in b['take']),
         '<div class="pager">%s%s</div>' % (prev_l, next_l),
@@ -409,6 +454,8 @@ def build_index():
         '<td>四种「没发生」长什么样<br><span class="slot">先查哪一种</span></td>'
         '<td>当场备一节下周的真课<br><span class="slot">用语对照表 · 两个读数</span></td></tr>'
         '</table>',
+        '<p class="slot">每一天都有<b>逐环节的时间安排</b>（上午 5 段、下午 6 段，'
+        '分钟数已排到位）、现场要准备的东西，以及可以先读的站内文章——点开上面三张卡。</p>',
         '<h2>给谁</h2>',
         '<p>现场是重庆巴渝学校小学部<b>全体教师</b>，<b>不分学科</b>——'
         '语文、数学、英语、音乐、美术、体育、科学都在内。</p>',
