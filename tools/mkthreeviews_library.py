@@ -109,7 +109,7 @@ def build_reader(k, rows, ch):
               % (format(a['chars'], ','), esc(txt))) if a['chars'] >= 40 else
              '<div class="tv-note">本篇原件是整页图表（无文字层），只能看图或下载 PDF。</div>')
     body = [
-        page_head('%s · 三视角%s' % (a['title'], ch['zh']), desc,
+        page_head('%s · 三视角文库 · %s' % (a['title'], ch['zh']), desc,
                   'https://sdeuniverses.com/three-views/doc/%s/' % a['id']),
         '<body>',
         topbar([NAV_LIB,
@@ -154,7 +154,7 @@ def build_channel(ch):
     n_new = sum(1 for a in rows if 'id' in a)
     n_re = len(rows) - n_new
     chars = sum(a.get('chars', 0) for a in rows)
-    title = '三视角%s · %d 篇' % (ch['zh'], len(rows))
+    title = '三视角文库 · %s · %d 篇' % (ch['zh'], len(rows))
     desc = ('%s　%s' % (ch['blurb'], '共 %d 篇，可分页阅读与下载。' % len(rows)))[:190]
     body = [page_head(title, desc,
                       'https://sdeuniverses.com/three-views/library/%s/' % ch['slug']),
