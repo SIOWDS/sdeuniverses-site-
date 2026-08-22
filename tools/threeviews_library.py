@@ -32,7 +32,8 @@ CHANNELS = [
     dict(slug='training', zh='培训笔记', en='Training', n=13,
          blurb='2018 年线下培训与国庆高峰学习的逐日笔记，由赖奕洲等整理，口语实录。'),
     dict(slug='to-sde', zh='从三视角到SDE', en='Toward SDE', n=4,
-         blurb='2025 年的四篇：三视角如何长成 SDE——123 原理、321 智慧门，以及特征发生学的起点。'),
+         blurb='转折处的四篇：三视角如何交棒给 321 智慧系统，再经 SIO 走到今天的 SDE——'
+               '123 原理、321 智慧门，与特征发生学的起点。'),
 ]
 
 LIBRARY = [

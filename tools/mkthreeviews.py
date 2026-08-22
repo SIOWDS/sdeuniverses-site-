@@ -289,9 +289,44 @@ LEAD = """<div class="tv-lead">
 </div>
 <div class="tv-note">
 <b>两处分界，先说在前面。</b><br>
-<b>与 SDE 的分界：</b>三视角问的是「从哪几个角度看」，SDE（显露·差异·纠缠）问的是「它是怎么发生的」。前者是看法的分法，后者是发生的本体论。三视角是 SDE 的来路与母体，不是 SDE 的简化版；SDE 也不是三视角的续集。读这一栏，读的是那副架子本身。<br>
+<b>与 SDE 的分界：</b>三视角问的是「从哪几个角度看」，SDE（显露·差异·纠缠）问的是「它是怎么发生的」。前者是看法的分法，后者是发生的本体论。中间还隔着 321 智慧系统与 SIO 本体论两站，不是一步到位的改写。三视角是 SDE 的来路与母体，不是 SDE 的简化版；SDE 也不是三视角的续集。读这一栏，读的是那副架子本身。<br>
 <b>与「三维九宫」的分界：</b>三维九宫做的是 SDE 的九宫应用；这一栏放的是三视角九宫格的原件。同一个「九宫」两处出现，不是重复——一处是用它，一处是它本身。
 </div>"""
+
+
+LINEAGE = """<div class="lineage">
+<div class="lg-hd">思想体系的四站 · 继承 · 创新 · 颠覆</div>
+<ol class="lg">
+<li><b>三视角 · 知识的结构和体系</b><span class="lg-t">2015.07 &ndash; 2021 初</span>
+<p>对比·变化·分布，与由它生出的九宫格、27 宫格。<b>本栏记的就是这一站。</b></p></li>
+<li><b>321 智慧系统</b>
+<p>三视角不再只是「从哪几个角度看」，开始成体系地回答怎么用、怎么落地。本栏「<a href="/three-views/library/to-sde/">从三视角到 SDE</a>」那一格收的就是这个转折处的文章。</p></li>
+<li><b>SIO 本体论</b>
+<p>从看法的分法转向存在的分法，27 宫格在这里成了本体论的坐标。站内另有 <a href="/education/sio-classics/">SIO 教育经典</a> 一辑。</p></li>
+<li><b>SDE 本体论</b><span class="lg-t">今</span>
+<p>显露 · 差异 · 纠缠。问的已不是「从哪几个角度看」，而是「它是怎么发生的」。全站其余各栏走的都是这一站。</p></li>
+</ol>
+<p class="lg-ft">后一站不是前一站的升级版，前一站也不是后一站的简化版——每一站都推翻了上一站的一处根本设定，又接着用了它留下的东西。读这一栏，读的是<b>第一站本身</b>，不是读 SDE 的前传。</p>
+</div>"""
+
+LINEAGE_CSS = """<style>
+.lineage{margin:2.6rem 0 0;padding:1.5rem 1.6rem 1.2rem;border:1px solid var(--border2);
+ border-radius:12px;background:var(--card)}
+.lg-hd{font-size:.78rem;letter-spacing:.2em;color:var(--ac);font-weight:700}
+ol.lg{list-style:none;margin:1.1rem 0 0;padding:0;counter-reset:lg}
+ol.lg li{position:relative;padding:0 0 1.15rem 2.3rem;counter-increment:lg;
+ border-left:2px solid var(--border2);margin-left:.55rem}
+ol.lg li:last-child{border-left-color:transparent;padding-bottom:.3rem}
+ol.lg li::before{content:counter(lg);position:absolute;left:-.83rem;top:0;
+ width:1.6rem;height:1.6rem;border-radius:50%;background:var(--ac);color:#FAF6EC;
+ font-size:.82rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+ol.lg li b{font-size:1.06rem;letter-spacing:.03em}
+ol.lg li .lg-t{margin-left:.6rem;font-size:.8rem;color:var(--muted);white-space:nowrap}
+ol.lg li p{margin:.35rem 0 0;font-size:.93rem;line-height:1.82;color:var(--text2)}
+.lg-ft{margin:.4rem 0 0;padding-top:.9rem;border-top:1px solid var(--border2);
+ font-size:.92rem;line-height:1.85;color:var(--text2)}
+@media(max-width:640px){ol.lg li .lg-t{display:block;margin:.15rem 0 0}}
+</style>"""
 
 
 DOOR_CSS = """<style>
@@ -326,12 +361,13 @@ def build_door(secs):
     n_doc = len([a for a in LIBRARY if 'id' in a])
     n_art = n_doc + len(ARTICLES)
     title = '三视角专栏 · 图册与文章'
-    desc = ('三视角＝对比·变化·分布。本栏两道门：《三视角图册》%d 张图分二十一篇，'
-            '三视角文章 %d 篇分九个子频道与扫码原文，篇篇可分页阅读与下载。'
+    desc = ('三视角＝对比·变化·分布，王德生 2015 年 7 月至 2021 年初「知识的结构和体系」'
+            '一段的记载，其后经 321 智慧系统、SIO 本体论走到今天的 SDE 本体论。本栏两道门：'
+            '《三视角图册》%d 张图分二十一篇，三视角文章 %d 篇分九个子频道与扫码原文。'
             % (n_img, n_art))
     covers = [k for _, _, ks, _ in secs[:2] for k in ks[:2]][:4]
     body = [page_head(title, desc, 'https://sdeuniverses.com/three-views/').replace(
-                '</head>', DOOR_CSS + '\n</head>'),
+                '</head>', DOOR_CSS + '\n' + LINEAGE_CSS + '\n</head>'),
             '<body>',
             topbar(['<a class="cur">本栏首页</a>',
                     '<a href="/three-views/atlas/">三视角图册</a>',
@@ -344,8 +380,11 @@ def build_door(secs):
             '<div class="tv-lead"><p>任何一件事，都可以从<b>对比</b>、<b>变化</b>、<b>分布</b>'
             '三个视角去看。三个视角各自再分三层，就是九宫格；九宫格再分，就是 27 宫格、'
             '81 宫格，直到 19683。它不是一套结论，是一副把话说清楚之前先得摆好的架子。</p>'
-            '<p>这副架子留下两样东西：<b>画成图的</b>，和<b>写成文的</b>。从这里各走一道门。</p>'
+            '<p>本栏记的是<b>2015 年 7 月到 2021 年初</b>那一段：「知识的结构和体系」'
+            '这套理论怎么立起来、怎么一年年往前推。它不是旧版的 SDE，是 SDE 之前的那段路本身。</p>'
+            '<p>这段路留下两样东西：<b>画成图的</b>，和<b>写成文的</b>。从这里各走一道门。</p>'
             '</div>',
+            LINEAGE,
             '<div class="door">',
             '<a class="dcard" href="/three-views/atlas/"><div class="shot">%s</div>'
             '<div class="db"><b>三视角图册</b><span class="en">Atlas</span>'
@@ -367,7 +406,8 @@ def build_door(secs):
             '<div class="tv-note" style="margin-top:2.4rem">'
             '<b>两处分界，先说在前面。</b><br>'
             '<b>与 SDE 的分界：</b>三视角问的是「从哪几个角度看」，SDE（显露·差异·纠缠）'
-            '问的是「它是怎么发生的」。前者是看法的分法，后者是发生的本体论。三视角是 SDE 的'
+            '问的是「它是怎么发生的」。前者是看法的分法，后者是发生的本体论。中间还隔着'
+            '321 智慧系统与 SIO 本体论两站，不是一步到位的改写。三视角是 SDE 的'
             '来路与母体，不是 SDE 的简化版；SDE 也不是三视角的续集。<br>'
             '<b>与「三维九宫」的分界：</b>三维九宫做的是 SDE 的九宫应用；这一栏放的是'
             '三视角九宫格的原件。同一个「九宫」两处出现，不是重复——一处是用它，一处是它本身。'
