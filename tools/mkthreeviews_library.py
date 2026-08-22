@@ -31,6 +31,7 @@ PUB = os.path.join(ROOT, 'public')
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from threeviews_library import CHANNELS, LIBRARY, BY_CH        # noqa: E402
+from threeviews_articles import ARTICLES                       # noqa: E402
 from mkthreeviews_articles import CSS, FONTS, FIT, READER_JS   # noqa: E402
 
 OUT = os.path.join(PUB, 'three-views')
@@ -113,7 +114,7 @@ def build_reader(k, rows, ch):
                   'https://sdeuniverses.com/three-views/doc/%s/' % a['id']),
         '<body>',
         topbar([NAV_LIB,
-                '<a href="/three-views/library/">文库九频道</a>',
+                '<a href="/three-views/library/">三视角文章</a>',
                 '<a class="cur" href="/three-views/library/%s/">%s</a>'
                 % (ch['slug'], esc(ch['zh']))]),
         '<main class="tv-wrap">', '<header class="tv-hd">',
@@ -159,7 +160,7 @@ def build_channel(ch):
     body = [page_head(title, desc,
                       'https://sdeuniverses.com/three-views/library/%s/' % ch['slug']),
             '<body>',
-            topbar([NAV_LIB, '<a href="/three-views/library/">文库九频道</a>',
+            topbar([NAV_LIB, '<a href="/three-views/library/">三视角文章</a>',
                     '<a class="cur">%s</a>' % esc(ch['zh'])]),
             '<main class="tv-wrap">', '<header class="tv-hd">',
             '<div class="tv-eyebrow">%s</div>' % esc(ch['en']),
@@ -196,33 +197,43 @@ def build_channel(ch):
 
 
 def build_hub():
-    n = len(LIBRARY)
-    chars = sum(a.get('chars', 0) for a in LIBRARY)
-    title = '三视角文库 · %d 篇 · 九个子频道' % n
-    desc = ('王德生历年三视角文章 %d 篇，按基础理论、学科解构、教育、学习法、商业管理、'
-            '个人成长、学员实践、培训笔记、走向 SDE 九个子频道分列，篇篇可分页阅读与下载。' % n)
+    n_doc = len([a for a in LIBRARY if 'id' in a])
+    n = n_doc + len(ARTICLES)
+    chars = sum(a.get('chars', 0) for a in LIBRARY) + sum(a['chars'] for a in ARTICLES)
+    title = '三视角文章 · %d 篇' % n
+    desc = ('王德生历年三视角文章 %d 篇：九个子频道（基础理论、学科解构、教育、学习法、'
+            '商业管理、个人成长、学员实践、培训笔记、走向 SDE）加图册扫码原文 %d 篇，'
+            '篇篇可分页阅读与下载。' % (n, len(ARTICLES)))
     body = [page_head(title, desc, 'https://sdeuniverses.com/three-views/library/'),
             '<body>',
-            topbar([NAV_LIB, '<a class="cur">文库九频道</a>']),
+            topbar([NAV_LIB, '<a class="cur">三视角文章</a>']),
             '<main class="tv-wrap">', '<header class="tv-hd">',
-            '<div class="tv-eyebrow">Library</div>',
-            '<h1>三视角文库</h1>',
-            '<p class="tv-sub">%d 篇 · 九个子频道 · 约 %s 万字　|　王德生历年撰写</p>'
+            '<div class="tv-eyebrow">Articles</div>',
+            '<h1>三视角文章</h1>',
+            '<p class="tv-sub">%d 篇 · 九个子频道 ＋ 扫码原文 · 约 %s 万字　|　王德生历年撰写</p>'
             % (n, format(round(chars / 10000))),
             '</header>',
             '<div class="tv-note">这是《三视角图册》之外的另一半：图册给的是<b>一张张图</b>，'
-            '文库给的是<b>成篇的文章</b>。每一篇都能<b>在线分页翻阅</b>、<b>下载 PDF</b>，'
+            '这里给的是<b>成篇的文章</b>。每一篇都能<b>在线分页翻阅</b>、<b>下载 PDF</b>，'
             '也附<b>纯文字版</b>。同一篇在原始文件夹里往往出现三四次，已按正文比对并成一条；'
-            '成系列的（如「从圣经到三视角(1)(2)」）按篇号分开保留。</div>',
+            '成系列的（如「从圣经到三视角(1)(2)」）按篇号分开保留。'
+            '最后一格<b>扫码原文</b>是另一条来路——图册每张主图旁那枚二维码指向的文章，'
+            '按它对应的那张图归位；九个子频道里有 %d 篇与它是同一篇，点进去落在同一页。</div>'
+            % sum(1 for a in LIBRARY if 'reuse' in a),
             '<div class="chgrid">']
     for c in CHANNELS:
         body.append('<a class="chcard" href="/three-views/library/%s/">'
                     '<b>%s</b><span class="en">%s</span>'
                     '<span class="bl">%s</span><span class="ct">%d 篇 →</span></a>'
                     % (c['slug'], esc(c['zh']), esc(c['en']), esc(c['blurb']), c['n']))
+    body.append('<a class="chcard" href="/three-views/articles/">'
+                '<b>扫码原文</b><span class="en">Scan-code</span>'
+                '<span class="bl">图册每张主图旁那枚二维码指向的文章，'
+                '不再跳转公众号，按它对应的那张图归位。</span>'
+                '<span class="ct">%d 篇 →</span></a>' % len(ARTICLES))
     body += ['</div>',
-             '<div class="tv-pager"><a href="/three-views/">← 回三视角图册</a>'
-             '<a href="/three-views/articles/">扫码原文 166 篇 →</a></div>',
+             '<div class="tv-pager"><a href="/three-views/">← 回本栏首页</a>'
+             '<a href="/three-views/atlas/">三视角图册 →</a></div>',
              '</main>', FOOT, FIT, '</body>', '</html>']
     return '\n'.join(body)
 

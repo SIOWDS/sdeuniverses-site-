@@ -259,9 +259,9 @@ def build_reader(k, arts):
         page_head('%s · 三视角图册第 %03d 图' % (a['title'], a['img']), desc,
                   'https://sdeuniverses.com/three-views/read/%s/' % a['id']),
         '<body>',
-        topbar(['<a href="/three-views/">全部二十一篇</a>',
-                '<a href="/three-views/articles/">文章总目</a>',
-                '<a href="/three-views/library/">文库九频道</a>',
+        topbar(['<a href="/three-views/atlas/">三视角图册</a>',
+                '<a href="/three-views/library/">三视角文章</a>',
+                '<a href="/three-views/articles/">扫码原文</a>',
                 '<a href="/three-views/%s/#g%03d">%s · 第 %03d 图</a>'
                 % (slug, a['img'], esc(zh), a['img'])]
                + ['<a href="/three-views/%s/#g%03d">%s · 第 %03d 图</a>'
@@ -306,9 +306,9 @@ def build_index():
             '可分页阅读、可下载 PDF、附纯文字版，不再跳转公众号。' % n)
     body = [page_head(title, desc, 'https://sdeuniverses.com/three-views/articles/'),
             '<body>',
-            topbar(['<a href="/three-views/">全部二十一篇</a>',
-                    '<a class="cur">文章总目</a>',
-                    '<a href="/three-views/library/">文库九频道</a>']),
+            topbar(['<a href="/three-views/atlas/">三视角图册</a>',
+                    '<a href="/three-views/library/">三视角文章</a>',
+                    '<a class="cur">扫码原文</a>']),
             '<main class="tv-wrap">', '<header class="tv-hd">',
             '<div class="tv-eyebrow">Articles</div>',
             '<h1>扫码原文 · %d 篇</h1>' % n,
@@ -334,7 +334,7 @@ def build_index():
                         % (x['id'], esc(x['title']), n, esc(NAMES.get(n, '')),
                            x['pages'], '　·　' + esc(x['note']) if x['note'] else ''))
         body.append('</ul></div>')
-    body += ['<div class="tv-pager"><a href="/three-views/">← 回图册总目</a>'
+    body += ['<div class="tv-pager"><a href="/three-views/library/">← 回三视角文章</a>'
              '<a href="/browse/">爱思乐园首页 →</a></div>',
              '</main>', FOOT, FIT, '</body>', '</html>']
     return '\n'.join(body)

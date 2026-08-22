@@ -168,8 +168,8 @@ def page_head(title, desc, canon):
 
 def topbar(links):
     return ('<header class="tv-top">\n'
-            '<a class="tv-brand" href="/three-views/"><b>三视角图册</b>'
-            '<span>Three Views Atlas</span></a>\n<nav>%s</nav>\n</header>'
+            '<a class="tv-brand" href="/three-views/"><b>三视角专栏</b>'
+            '<span>Three Views</span></a>\n<nav>%s</nav>\n</header>'
             % ''.join(links))
 
 
@@ -243,14 +243,13 @@ def build_section_page(idx, secs):
                '、'.join(NAMES[start + k] for k in range(min(5, len(keys))))
                if not is_add else '不入目录的补充图'))
     prev_l = ('<a href="/three-views/%s/">← %s</a>' % (secs[idx - 1][1], secs[idx - 1][0])
-              if idx > 0 else '<a href="/three-views/">← 本栏总目</a>')
+              if idx > 0 else '<a href="/three-views/atlas/">← 图册总目</a>')
     next_l = ('<a href="/three-views/%s/">%s →</a>' % (secs[idx + 1][1], secs[idx + 1][0])
-              if idx + 1 < len(secs) else '<a href="/three-views/">回本栏总目 →</a>')
+              if idx + 1 < len(secs) else '<a href="/three-views/atlas/">回图册总目 →</a>')
     body = [page_head(title, desc, 'https://sdeuniverses.com/three-views/%s/' % slug),
             '<body>',
-            topbar(['<a href="/three-views/">全部二十一篇</a>',
-                    '<a href="/three-views/articles/">文章总目</a>',
-                    '<a href="/three-views/library/">文库九频道</a>',
+            topbar(['<a href="/three-views/atlas/">全部二十一篇</a>',
+                    '<a href="/three-views/library/">三视角文章</a>',
                     '<a class="cur">%s</a>' % esc(zh)]),
             '<main class="tv-wrap">', '<header class="tv-hd">',
             '<div class="tv-eyebrow">三视角图册</div>',
@@ -295,14 +294,95 @@ LEAD = """<div class="tv-lead">
 </div>"""
 
 
+DOOR_CSS = """<style>
+.door{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+ gap:1.6rem;margin:2.4rem 0 1rem}
+.dcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;
+ border:1px solid var(--border2);border-radius:12px;overflow:hidden;background:var(--card);
+ transition:transform .2s,box-shadow .2s,border-color .2s}
+.dcard:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(0,0,0,.11);
+ border-color:var(--ac)}
+.dcard .shot{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border2);
+ aspect-ratio:16/9}
+.dcard .shot img{width:100%;height:100%;object-fit:cover;object-position:top center;
+ display:block;background:#fff}
+.dcard .glyph{display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;
+ background:linear-gradient(150deg,rgba(44,127,168,.10),rgba(44,127,168,.02));
+ font-family:'Noto Serif SC',serif;font-size:2.5rem;letter-spacing:.5rem;color:var(--ac);
+ text-indent:.5rem}
+.dcard .db{padding:1.15rem 1.3rem 1.4rem}
+.dcard .db b{display:block;font-size:1.42rem;letter-spacing:.04em}
+.dcard .db .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.72rem;
+ letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:.25rem}
+.dcard .db p{margin:.75rem 0 0;font-size:.95rem;line-height:1.85;color:var(--text2)}
+.dcard .db .ct{display:block;margin-top:.9rem;font-size:.86rem;color:var(--ac);font-weight:600}
+@media(max-width:640px){.dcard .db b{font-size:1.2rem}}
+</style>"""
+
+
+def build_door(secs):
+    """/three-views/ —— 本栏门厅：图册与文章各一道门。"""
+    n_img = sum(len(k) for _, _, k, _ in secs)
+    n_doc = len([a for a in LIBRARY if 'id' in a])
+    n_art = n_doc + len(ARTICLES)
+    title = '三视角专栏 · 图册与文章'
+    desc = ('三视角＝对比·变化·分布。本栏两道门：《三视角图册》%d 张图分二十一篇，'
+            '三视角文章 %d 篇分九个子频道与扫码原文，篇篇可分页阅读与下载。'
+            % (n_img, n_art))
+    covers = [k for _, _, ks, _ in secs[:2] for k in ks[:2]][:4]
+    body = [page_head(title, desc, 'https://sdeuniverses.com/three-views/').replace(
+                '</head>', DOOR_CSS + '\n</head>'),
+            '<body>',
+            topbar(['<a class="cur">本栏首页</a>',
+                    '<a href="/three-views/atlas/">三视角图册</a>',
+                    '<a href="/three-views/library/">三视角文章</a>']),
+            '<main class="tv-wrap">', '<header class="tv-hd">',
+            '<div class="tv-eyebrow">Three Views</div>',
+            '<h1>三视角专栏</h1>',
+            '<p class="tv-sub">对比 · 变化 · 分布　|　发明 王德生</p>',
+            '</header>',
+            '<div class="tv-lead"><p>任何一件事，都可以从<b>对比</b>、<b>变化</b>、<b>分布</b>'
+            '三个视角去看。三个视角各自再分三层，就是九宫格；九宫格再分，就是 27 宫格、'
+            '81 宫格，直到 19683。它不是一套结论，是一副把话说清楚之前先得摆好的架子。</p>'
+            '<p>这副架子留下两样东西：<b>画成图的</b>，和<b>写成文的</b>。从这里各走一道门。</p>'
+            '</div>',
+            '<div class="door">',
+            '<a class="dcard" href="/three-views/atlas/"><div class="shot">%s</div>'
+            '<div class="db"><b>三视角图册</b><span class="en">Atlas</span>'
+            '<p>全册 %d 张图，正文 140 张分二十篇，从智慧论、本体论一路走到神学、科学、'
+            '国学、逻辑、教育、经济、生理健康与美学，另有补遗 47 张。一张图就是一个判断，'
+            '看得比读得快。</p><span class="ct">进入图册 · 二十一篇 →</span></div></a>'
+            % (''.join('<img src="/three-views/img/%s-t.webp" loading="lazy" '
+                       'decoding="async" alt="图册图例">' % k for k in covers), n_img),
+            '<a class="dcard" href="/three-views/library/">'
+            '<div class="glyph">对比·变化·分布</div>'
+            '<div class="db"><b>三视角文章</b><span class="en">Articles</span>'
+            '<p>王德生历年写下的三视角文章 %d 篇，分基础理论、学科解构、教育智慧、'
+            '学科学习法、商业与管理、个人成长智慧、学员实践与案例、培训笔记、'
+            '从三视角到 SDE 九个子频道，另有图册每张图旁那枚二维码指向的扫码原文 %d 篇。'
+            '篇篇可分页翻阅、下载 PDF，另附纯文字版。</p>'
+            '<span class="ct">进入文章 · 九个子频道 →</span></div></a>'
+            % (n_art, len(ARTICLES)),
+            '</div>',
+            '<div class="tv-note" style="margin-top:2.4rem">'
+            '<b>两处分界，先说在前面。</b><br>'
+            '<b>与 SDE 的分界：</b>三视角问的是「从哪几个角度看」，SDE（显露·差异·纠缠）'
+            '问的是「它是怎么发生的」。前者是看法的分法，后者是发生的本体论。三视角是 SDE 的'
+            '来路与母体，不是 SDE 的简化版；SDE 也不是三视角的续集。<br>'
+            '<b>与「三维九宫」的分界：</b>三维九宫做的是 SDE 的九宫应用；这一栏放的是'
+            '三视角九宫格的原件。同一个「九宫」两处出现，不是重复——一处是用它，一处是它本身。'
+            '</div>',
+            '</main>', FOOT, FIT, '</body>', '</html>']
+    return '\n'.join(body)
+
+
 def build_index(secs):
     title = '三视角图册 · 全册 187 图'
-    body = [page_head(title, DESC, 'https://sdeuniverses.com/three-views/'),
+    body = [page_head(title, DESC, 'https://sdeuniverses.com/three-views/atlas/'),
             '<body>', topbar(['<a class="cur">全部二十一篇</a>',
-                              '<a href="/three-views/articles/">文章总目 · %d 篇</a>'
-                              % len(ARTICLES),
-                              '<a href="/three-views/library/">文库 · %d 篇</a>'
-                              % len(LIBRARY)]),
+                              '<a href="/three-views/library/">三视角文章</a>',
+                              '<a href="/three-views/articles/">扫码原文 · %d 篇</a>'
+                              % len(ARTICLES)]),
             '<main class="tv-wrap">', '<header class="tv-hd">',
             '<div class="tv-eyebrow">Three Views Atlas</div>',
             '<h1>三视角图册</h1>',
@@ -360,8 +440,11 @@ def main():
         os.makedirs(d, exist_ok=True)
         open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(
             build_section_page(idx, secs))
-    open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(build_index(secs))
-    print('已写 %d 页 →' % (len(secs) + 1), OUT)
+    os.makedirs(os.path.join(OUT, 'atlas'), exist_ok=True)
+    open(os.path.join(OUT, 'atlas', 'index.html'), 'w', encoding='utf-8').write(
+        build_index(secs))
+    open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(build_door(secs))
+    print('已写 %d 页（%d 分篇 ＋ 图册总目 ＋ 本栏门厅）→' % (len(secs) + 2, len(secs)), OUT)
 
 
 if __name__ == '__main__':
