@@ -258,12 +258,15 @@ def build_reader(k, arts):
         topbar(['<a href="/three-views/">全部二十一篇</a>',
                 '<a href="/three-views/articles/">文章总目</a>',
                 '<a href="/three-views/%s/#g%03d">%s · 第 %03d 图</a>'
-                % (slug, a['img'], esc(zh), a['img'])]),
+                % (slug, a['img'], esc(zh), a['img'])]
+               + ['<a href="/three-views/%s/#g%03d">%s · 第 %03d 图</a>'
+                  % (sec_of(m)[1], m, esc(sec_of(m)[0]), m) for m in a['also']]),
         '<main class="tv-wrap">', '<header class="tv-hd">',
         '<div class="tv-eyebrow">三视角图册 · 扫码原文</div>',
         '<h1>%s</h1>' % esc(a['title']),
         '<p class="tv-sub">对应第 %03d 图「%s」·&nbsp;%s　|　共 %d 页 · 约 %s 字　|　王德生</p>'
         % (a['img'], esc(fig), esc(zh), a['pages'], format(a['chars'], ',')),
+        ('<div class="tv-note">%s。</div>' % esc(a['note'])) if a['note'] else '',
         '</header>',
         '<div class="bar">',
         '<button class="btn" id="prev" disabled>‹ 上一页</button>',
@@ -310,7 +313,8 @@ def build_index():
             '<div class="tv-note">每一篇都能<b>在线分页翻阅</b>、<b>下载 PDF</b>，也附<b>纯文字版</b>。'
             '文章按它在图册里对应的那张图归位——先是图，再是那张图底下的话。</div>']
     for zh, slug, a, b in SECTIONS:
-        rows = [x for x in ARTICLES if a <= x['img'] <= b]
+        rows = [x for x in ARTICLES
+                if any(a <= m <= b for m in [x['img']] + x['also'])]
         if not rows:
             continue
         body.append('<div class="grp"><h2><a href="/three-views/%s/" '
@@ -318,10 +322,11 @@ def build_index():
                     '<div class="gs">第 %d–%d 图 · %d 篇</div><ul class="alist">'
                     % (slug, esc(zh), a, b, len(rows)))
         for x in rows:
+            n = next(m for m in [x['img']] + x['also'] if a <= m <= b)
             body.append('<li><a href="/three-views/read/%s/">%s</a>'
-                        '<em>第 %03d 图 %s · %d 页</em></li>'
-                        % (x['id'], esc(x['title']), x['img'],
-                           esc(NAMES.get(x['img'], '')), x['pages']))
+                        '<em>第 %03d 图 %s · %d 页%s</em></li>'
+                        % (x['id'], esc(x['title']), n, esc(NAMES.get(n, '')),
+                           x['pages'], '　·　' + esc(x['note']) if x['note'] else ''))
         body.append('</ul></div>')
     body += ['<div class="tv-pager"><a href="/three-views/">← 回图册总目</a>'
              '<a href="/browse/">爱思乐园首页 →</a></div>',

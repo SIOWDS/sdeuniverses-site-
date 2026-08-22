@@ -194,29 +194,38 @@ def links_block(n):
     拿到原件补进 threeviews_articles.py 即可自动转为站内条目。
     """
     arts = BY_IMG.get(n, [])
+    # 剩多少条没搬回：先按链接精确扣掉，再为「站内有文章、但那份 PDF 页脚没带链接」的
+    # 篇目各扣一个名额——否则 46/50 这种图会把已经挂在下面的文章又数成"未搬回"。
+    # 这类图上余下的链接与余下的篇目对不上号（原册附录顺序与二维码顺序本就不一致），
+    # 所以下面只报数目、不声称某条链接对应某一篇。
     done_urls = {a['url'] for a in arts if a['url']}
-    left = [u for u in QR.get(n, []) if u not in done_urls]
+    rest = [u for u in QR.get(n, []) if u not in done_urls]
+    urlless = sum(1 for a in arts if not a['url'])
+    left_n = max(0, len(rest) - urlless)
     bits = []
     if arts:
         bits.append('<div class="tvl-h">本站原文 · 可分页阅读，可下载（%d 篇）</div><ol>' % len(arts)
                     + ''.join('<li><a href="/three-views/read/%s/">%s</a>'
                               '<span class="tvl-m"> · %d 页 · '
                               '<a href="/three-views/read/%s/%s.pdf" download="%s.pdf">下载 PDF</a>'
-                              '</span></li>'
+                              '%s</span></li>'
                               % (a['id'], esc(a['title']), a['pages'],
-                                 a['id'], a['id'], esc(a['title']))
+                                 a['id'], a['id'], esc(a['title']),
+                                 ('<br>（%s）' % esc(a['note'])) if a['note'] else '')
                               for a in arts) + '</ol>')
     else:
         titles = APPENDIX.get(n, [])
         if titles:
             bits.append('<div class="tvl-h">图册附录列出的原文（尚未搬回站内）</div><ol>'
                         + ''.join('<li>%s</li>' % esc(t) for t in titles) + '</ol>')
-    if left:
-        bits.append('<div class="tvl-h" style="margin-top:.55rem">'
-                    '另有 %d 篇（多为视频）尚未搬回，暂仍指向公众号原文</div><ol>' % len(left)
+    if left_n:
+        head = ('另有 %d 篇（多为视频）尚未搬回，暂仍指向公众号原文' % left_n if not urlless
+                else '另有 %d 篇尚未搬回；此图共 %d 条扫码链接，逐条对不上号，一并列出'
+                     % (left_n, len(rest)))
+        bits.append('<div class="tvl-h" style="margin-top:.55rem">%s</div><ol>' % head
                     + ''.join('<li><a href="%s" target="_blank" rel="noopener nofollow">'
                               '公众号原文 %d →</a></li>' % (esc(u), k + 1)
-                              for k, u in enumerate(left)) + '</ol>')
+                              for k, u in enumerate(rest)) + '</ol>')
     if not bits:
         return '<p class="tv-none">此图在原册中没有配二维码，也没有对应文章。</p>'
     return '<div class="tv-links">' + ''.join(bits) + '</div>'
@@ -305,8 +314,11 @@ def build_index(secs):
                     % (slug, keys[0], esc(zh + ' 代表图'), esc(zh), cap))
     body.append('</div>')
     n_art = len(ARTICLES)
-    n_left = sum(1 for n, us in QR.items() for u in us
-                 if u not in {a['url'] for a in BY_IMG.get(n, []) if a['url']})
+    n_left = 0
+    for n, us in QR.items():
+        arts = BY_IMG.get(n, [])
+        rest = [u for u in us if u not in {a['url'] for a in arts if a['url']}]
+        n_left += max(0, len(rest) - sum(1 for a in arts if not a['url']))
     body.append('<div class="tv-note" style="margin-top:2.4rem"><b>关于「扫码原文」。</b>'
                 '图册每张主图旁原印着二维码，指向王德生历年写下的文章与视频。'
                 '这些文章<b>已经搬回站内，不再跳转公众号</b>——'
