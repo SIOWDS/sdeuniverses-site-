@@ -29,7 +29,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(PUB, 'banyu')
 
 sys.path.insert(0, HERE)
-from banyu_plan import SESSIONS, BRING, RULES, LINKS, READING, PREP  # noqa: E402
+from banyu_plan import (SESSIONS, BRING, RULES, LINKS, READING, PREP,
+                        SLIDE_DECKS)  # noqa: E402
 
 STAMP = re.search(r'^stamp=(\S+)',
                   open(os.path.join(HERE, 'wds-mode.stamp'), encoding='utf-8').read(),
@@ -690,7 +691,7 @@ def build_index():
 
 SLIDES_JS = r"""<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-var PDF_URL="/banyu/prep/math-slides/sde-math-genesis-slides.pdf";
+var PDF_URL="%(pdf)s";
 pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 var pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.3,curText="";
 var canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
@@ -763,35 +764,30 @@ window.addEventListener('resize',function(){clearTimeout(window._rz);
 </script>"""
 
 
-def build_slides():
+def build_slides(D):
     """SDE 数学发生学教学法 · 61 页幻灯的在线翻页页。
 
     ⚠ 同目录既有 index.html 又有 PDF：站内检索把 PDF 收到这个 URL 名下，
       而 --reuse-pdf 增量重建会跳过它 —— 所以**必须内嵌纯文字版**，
       否则这一份会落在索引之外（与 /three-views/read/ 同一条道理）。
     """
-    base = '/banyu/prep/math-slides/sde-math-genesis-slides'
-    txt = open(os.path.join(HERE, 'banyu_text', 'math-slides.txt'), encoding='utf-8').read()
-    title = 'SDE 数学发生学教学法 · 幻灯 61 页｜巴渝培训'
-    desc = ('SDE 数学发生学教学法教师研修幻灯，61 页：从三年级那节分数课讲起，'
-            '数、加法、位值、乘法、分数、等号、三角形内角和七个概念各给两版对照教法，'
-            '末尾是备课四问、五步模板、三条纪律与四个常见的坑。可在线翻页、下载 PDF 或原始 PPT。')
+    base = '/banyu/prep/%s/%s' % (D['slug'], D['file'])
+    txt = open(os.path.join(HERE, 'banyu_text', D['slug'] + '.txt'), encoding='utf-8').read()
+    title = '%s · 幻灯 %d 页｜巴渝培训' % (D['title'], D['pages'])
     return '\n'.join([
-        head(title, desc, 'https://sdeuniverses.com/banyu/prep/math-slides/'),
+        head(title, D['desc'], 'https://sdeuniverses.com/banyu/prep/%s/' % D['slug']),
         topbar('prep'),
         '<div class="hero"><div class="w">',
         '<div class="kicker">巴渝培训 · 预习材料</div>',
-        '<h1>SDE 数学发生学教学法</h1>',
-        '<p class="tag">教师研修幻灯 · 61 页</p>',
-        '<div class="keys"><span class="hot">第二天上午讲的就是它</span>'
-        '<span>约一小时看完</span><span>可下载 PDF</span><span>可下载原始 PPT</span></div>',
+        '<h1>%s</h1>' % esc(D['title']),
+        '<p class="tag">%s · %d 页</p>' % (esc(D['kind']), D['pages']),
+        '<div class="keys">%s</div>'
+        % ''.join('<span%s>%s</span>' % (' class="hot"' if i == 0 else '', esc(k))
+                  for i, k in enumerate(D['keys'])),
         '</div></div>',
         '<main><div class="w">',
-        '<p class="lead">从三年级那节分数课讲起：当堂全对，一周后近一半孩子答「1/3 比 1/2 大」。'
-        '中间七个概念各给<b>「这样教／那样教」两版对照</b>，'
-        '末尾是备课四问、五步模板、三条纪律和四个最常见的坑。</p>',
-        '<div class="note">这是<b>教师研修用的原件</b>，里面带了几个名词（S／D／E、显露、回写）。'
-        '三天现场<b>不用这些词</b>——看不惯直接跳过，只看每一页右边那半栏的做法就行。</div>',
+        '<p class="lead">%s</p>' % D['lead'],
+        ('<div class="note">%s</div>' % D['note']) if D.get('note') else '',
         '<div class="bar">',
         '<button class="btn" id="prev" disabled>‹ 上一页</button>',
         '<div class="pgbox"><input id="pageInput" type="number" min="1" value="1">'
@@ -799,21 +795,24 @@ def build_slides():
         '<button class="btn" id="next" disabled>下一页 ›</button>',
         '<button class="btn" id="zoomOut">−</button>',
         '<button class="btn" id="zoomIn">＋</button>',
-        '<a class="btn dl" href="%s.pdf" download="SDE数学发生学教学法.pdf">⬇ 下载 PDF</a>' % base,
-        '<a class="btn dl" href="%s.pptx" download="SDE数学发生学教学法.pptx">⬇ 下载 PPT</a>' % base,
+        '<a class="btn dl" href="%s.pdf" download="%s.pdf">⬇ 下载 PDF</a>'
+        % (base, esc(D['title'])),
+        '<a class="btn dl" href="%s.pptx" download="%s.pptx">⬇ 下载 PPT</a>'
+        % (base, esc(D['title'])),
         '</div>',
         '<div class="stage" id="stage">',
-        '<div id="loading" class="loading"><div class="spinner"></div>正在载入 61 页…</div>',
+        '<div id="loading" class="loading"><div class="spinner"></div>正在载入 %d 页…</div>'
+        % D['pages'],
         '<div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas>'
         '<div class="textLayer" id="textLayer"></div></div>',
         '<div id="error" class="err" style="display:none"></div>',
         '</div>',
         '<p class="hint">← → 方向键翻页</p>',
-        '<details class="plain"><summary>纯文字版（全部 61 页的文字，便于手机上看与检索）</summary>'
-        '<div class="body">%s</div></details>' % esc(txt),
+        '<details class="plain"><summary>纯文字版（全部 %d 页的文字，便于手机上看与检索）</summary>'
+        '<div class="body">%s</div></details>' % (D['pages'], esc(txt)),
         '<div class="pager"><a href="/banyu/prep/">← 预习材料</a>'
-        '<a href="/banyu/day2/">第二天 · SDE教材发生学 →</a></div>',
-        '</div></main>', FOOT, SLIDES_JS, TAIL])
+        '<a href="%s">%s →</a></div>' % (D['next'][0], esc(D['next'][1])),
+        '</div></main>', FOOT, SLIDES_JS % {'pdf': base + '.pdf'}, TAIL])
 
 
 def build_prep():
@@ -909,11 +908,13 @@ def main():
     d = os.path.join(OUT, 'prep')
     os.makedirs(d, exist_ok=True)
     open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(build_prep())
-    d = os.path.join(OUT, 'prep', 'math-slides')
-    os.makedirs(d, exist_ok=True)
-    open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(build_slides())
-    print('已写 %d 页（总目 ＋ %d 天 ＋ 预习 %d 份 ＋ 幻灯 ＋ 阅读 %d 篇）→'
-          % (len(DAYS) + 4, len(DAYS), sum(len(g[2]) for g in PREP),
+    for D in SLIDE_DECKS:
+        d = os.path.join(OUT, 'prep', D['slug'])
+        os.makedirs(d, exist_ok=True)
+        open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(build_slides(D))
+    print('已写 %d 页（总目 ＋ %d 天 ＋ 预习 %d 份 ＋ 幻灯 %d 套 ＋ 阅读 %d 篇）→'
+          % (len(DAYS) + 3 + len(SLIDE_DECKS), len(DAYS),
+             sum(len(g[2]) for g in PREP), len(SLIDE_DECKS),
              sum(len(g[2]) for g in READING)), OUT)
 
 
