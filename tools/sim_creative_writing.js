@@ -52,7 +52,7 @@ sec("② 硬律编号逐条落地");
 const LAWS = {
   wechat: ["W-1", "W-2", "W-3", "W-4", "W-5", "W-6", "W-7"],
   prose: ["P-1", "P-2", "P-3", "P-4", "P-5", "P-6", "P-7", "P-8"],
-  story: ["S-1", "S-2", "S-3", "S-4", "S-5", "S-6"],
+  story: ["S-1", "S-2", "S-3", "S-4", "S-5", "S-6", "S-7", "S-8"],
 };
 Object.keys(LAWS).forEach((k) => {
   LAWS[k].forEach((code) => {
@@ -68,7 +68,7 @@ sec("③ 共用硬律 CW_X");
 const cwIdx = W.indexOf("const CW_X =");
 ok(cwIdx > 0, "worker.js 里没有 CW_X");
 const cwBody = cwIdx > 0 ? W.slice(cwIdx, cwIdx + 2600) : "";
-["X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10"].forEach((x) => {
+["X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11"].forEach((x) => {
   ok(SKILL.indexOf("### " + x + " ·") >= 0, "Skill 第六节缺 " + x);
   ok(cwBody.indexOf("· " + x + " ") >= 0, "CW_X 里缺 " + x);
 });
@@ -134,6 +134,16 @@ ok(pb && /视点|三问/.test(pb.body), "散文档没写视点守恒");
 ok(pb && pb.body.indexOf("取消提问资格") >= 0, "散文档没写 P-6");
 ok(sb && sb.body.indexOf("换嘴") >= 0, "小说档没写换嘴检验");
 ok(sb && sb.body.indexOf("寓言") >= 0, "小说档没写不许写成寓言");
+/* 2026-08-22 第三份真跑（79 分）的三处硬律失分，逐条要在规格里点名。 */
+ok(sb && /本篇之内有来历|第一次出现是在哪儿/.test(sb.body), "小说档没写 S-7 本篇自带出处（借来的那句话）");
+ok(sb && sb.body.indexOf("演过的") >= 0, "小说档没写 S-2 的演过就不许再说这条计数判据");
+ok(sb && sb.body.indexOf("记号") >= 0, "小说档没写 S-8 有意为之必须留记号");
+ok(cwBody.indexOf("开了的线") >= 0 || cwBody.indexOf("第二次交代") >= 0, "CW_X 里 X11 没写还账的判据");
+ok(cwBody.indexOf("小说档最容易犯") >= 0, "X1 没写「小说档最容易犯」这条警示");
+/* 小说档的评分卡要多带一段：手艺好不救硬律。 */
+const cgFn = W.slice(W.indexOf("function cwGrade"), W.indexOf("function cwGrade") + 2600);
+ok(/手艺好不救硬律/.test(cgFn), "cwGrade 里没写「手艺好不救硬律」这条读数");
+ok(/String\(kind\) === "story"/.test(cgFn), "小说档的评分卡没有它自己那三件");
 ["wechat", "prose", "story"].forEach((k) => {
   const b = specBlock(k);
   ok(b && /明写|隐写|演出/.test(b.body), k + " SPEC 没说承重物在这一档是什么形态（X7 无从自检）");
