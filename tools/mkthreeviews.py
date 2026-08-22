@@ -299,11 +299,11 @@ LINEAGE = """<div class="lineage">
 <ol class="lg">
 <li><b>三视角 · 知识的结构和体系</b><span class="lg-t">2015.07 &ndash; 2021 初</span>
 <p>对比·变化·分布，与由它生出的九宫格、27 宫格。<b>本栏记的就是这一站。</b></p></li>
-<li><b>321 智慧系统</b>
-<p>三视角不再只是「从哪几个角度看」，开始成体系地回答怎么用、怎么落地。本栏「<a href="/three-views/library/to-sde/">从三视角到 SDE</a>」那一格收的就是这个转折处的文章。</p></li>
-<li><b>SIO 本体论</b>
+<li><b>321 智慧系统</b><span class="lg-t">2021.07 &ndash; 2025.07</span>
+<p>三视角不再只是「从哪几个角度看」，开始成体系地回答怎么用、怎么落地。本栏「<a href="/three-views/library/to-sde/">从三视角到 SDE</a>」那一格收的四篇写于 2025 年 7 月，正落在交棒给 SIO 的那个月。</p></li>
+<li><b>SIO 本体论</b><span class="lg-t">2025.07 &ndash; 2026.01</span>
 <p>从看法的分法转向存在的分法，27 宫格在这里成了本体论的坐标。站内另有 <a href="/education/sio-classics/">SIO 教育经典</a> 一辑。</p></li>
-<li><b>SDE 本体论</b><span class="lg-t">今</span>
+<li><b>SDE 本体论</b><span class="lg-t">2026.01 &ndash; 今</span>
 <p>显露 · 差异 · 纠缠。问的已不是「从哪几个角度看」，而是「它是怎么发生的」。全站其余各栏走的都是这一站。</p></li>
 </ol>
 <p class="lg-ft">后一站不是前一站的升级版，前一站也不是后一站的简化版——每一站都推翻了上一站的一处根本设定，又接着用了它留下的东西。读这一栏，读的是<b>第一站本身</b>，不是读 SDE 的前传。</p>
@@ -362,7 +362,8 @@ def build_door(secs):
     n_art = n_doc + len(ARTICLES)
     title = '三视角专栏 · 图册与文章'
     desc = ('三视角＝对比·变化·分布，王德生 2015 年 7 月至 2021 年初「知识的结构和体系」'
-            '一段的记载，其后经 321 智慧系统、SIO 本体论走到今天的 SDE 本体论。本栏两道门：'
+            '一段的记载，其后经 321 智慧系统（2021.07 起）、SIO 本体论（2025.07 起）'
+            '走到 2026 年元月以来的 SDE 本体论。本栏两道门：'
             '《三视角图册》%d 张图分二十一篇，三视角文章 %d 篇分九个子频道与扫码原文。'
             % (n_img, n_art))
     covers = [k for _, _, ks, _ in secs[:2] for k in ks[:2]][:4]
