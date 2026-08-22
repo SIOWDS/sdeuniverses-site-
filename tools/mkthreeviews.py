@@ -27,6 +27,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, 'public')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from threeviews_data import SECTIONS, NAMES, APPENDIX, QR, XQR_REMOVED  # noqa: E402
+from threeviews_articles import ARTICLES, BY_IMG  # noqa: E402
 
 OUT = os.path.join(PUB, 'three-views')
 AC = '#2C7FA8'                      # 本栏强调色（取自图册封面那枚三色环的蓝）
@@ -109,6 +110,8 @@ a{color:var(--ac)}
 .tv-links{margin:1rem 0 0;font-size:.93rem;line-height:1.88}
 .tv-links .tvl-h{color:var(--muted);font-size:.82rem;letter-spacing:.1em}
 .tv-links ol{margin:.3rem 0 0;padding-left:1.4rem}
+.tv-links li{margin:.12rem 0}
+.tv-links .tvl-m{color:var(--muted);font-size:.84rem}
 .tv-none{margin:.8rem 0 0;font-size:.87rem;color:var(--muted)}
 .tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.4rem 0 0;
  font-size:.94rem}
@@ -183,20 +186,39 @@ def sections_all():
 
 
 def links_block(n):
-    urls = QR.get(n, [])
-    titles = APPENDIX.get(n, [])
+    """这张图底下挂的文章。
+
+    2026-08-22 王德生定：**不再走公众号外链，文章直接挂在站内**——可分页阅读、可下载。
+    已搬回的 166 篇走 /three-views/read/<id>/；那一批还没拿到原件的（多为视频，
+    以及附录列了标题却没给到 PDF 的几十条），仍暂留公众号地址并明确标注「未搬回」，
+    拿到原件补进 threeviews_articles.py 即可自动转为站内条目。
+    """
+    arts = BY_IMG.get(n, [])
+    done_urls = {a['url'] for a in arts if a['url']}
+    left = [u for u in QR.get(n, []) if u not in done_urls]
     bits = []
-    if titles:
-        bits.append('<div class="tvl-h">图册附录列出的原文</div><ol>'
-                    + ''.join('<li>%s</li>' % esc(t) for t in titles) + '</ol>')
-    if urls:
+    if arts:
+        bits.append('<div class="tvl-h">本站原文 · 可分页阅读，可下载（%d 篇）</div><ol>' % len(arts)
+                    + ''.join('<li><a href="/three-views/read/%s/">%s</a>'
+                              '<span class="tvl-m"> · %d 页 · '
+                              '<a href="/three-views/read/%s/%s.pdf" download="%s.pdf">下载 PDF</a>'
+                              '</span></li>'
+                              % (a['id'], esc(a['title']), a['pages'],
+                                 a['id'], a['id'], esc(a['title']))
+                              for a in arts) + '</ol>')
+    else:
+        titles = APPENDIX.get(n, [])
+        if titles:
+            bits.append('<div class="tvl-h">图册附录列出的原文（尚未搬回站内）</div><ol>'
+                        + ''.join('<li>%s</li>' % esc(t) for t in titles) + '</ol>')
+    if left:
         bits.append('<div class="tvl-h" style="margin-top:.55rem">'
-                    '扫码原文 · 微信公众号（%d）</div><ol>' % len(urls)
+                    '另有 %d 篇（多为视频）尚未搬回，暂仍指向公众号原文</div><ol>' % len(left)
                     + ''.join('<li><a href="%s" target="_blank" rel="noopener nofollow">'
-                              '打开第 %d 篇 →</a></li>' % (esc(u), k + 1)
-                              for k, u in enumerate(urls)) + '</ol>')
+                              '公众号原文 %d →</a></li>' % (esc(u), k + 1)
+                              for k, u in enumerate(left)) + '</ol>')
     if not bits:
-        return '<p class="tv-none">此图在原册中没有配二维码。</p>'
+        return '<p class="tv-none">此图在原册中没有配二维码，也没有对应文章。</p>'
     return '<div class="tv-links">' + ''.join(bits) + '</div>'
 
 
@@ -217,6 +239,7 @@ def build_section_page(idx, secs):
     body = [page_head(title, desc, 'https://sdeuniverses.com/three-views/%s/' % slug),
             '<body>',
             topbar(['<a href="/three-views/">全部二十一篇</a>',
+                    '<a href="/three-views/articles/">文章总目</a>',
                     '<a class="cur">%s</a>' % esc(zh)]),
             '<main class="tv-wrap">', '<header class="tv-hd">',
             '<div class="tv-eyebrow">三视角图册</div>',
@@ -264,7 +287,9 @@ LEAD = """<div class="tv-lead">
 def build_index(secs):
     title = '三视角图册 · 全册 187 图'
     body = [page_head(title, DESC, 'https://sdeuniverses.com/three-views/'),
-            '<body>', topbar(['<a class="cur">全部二十一篇</a>']),
+            '<body>', topbar(['<a class="cur">全部二十一篇</a>',
+                              '<a href="/three-views/articles/">文章总目 · %d 篇</a>'
+                              % len(ARTICLES)]),
             '<main class="tv-wrap">', '<header class="tv-hd">',
             '<div class="tv-eyebrow">Three Views Atlas</div>',
             '<h1>三视角图册</h1>',
@@ -279,12 +304,18 @@ def build_index(secs):
                     'alt="%s"><div class="tv-cb"><b>%s</b><span>%s</span></div></a>'
                     % (slug, keys[0], esc(zh + ' 代表图'), esc(zh), cap))
     body.append('</div>')
+    n_art = len(ARTICLES)
+    n_left = sum(1 for n, us in QR.items() for u in us
+                 if u not in {a['url'] for a in BY_IMG.get(n, []) if a['url']})
     body.append('<div class="tv-note" style="margin-top:2.4rem"><b>关于「扫码原文」。</b>'
-                '图册每张主图旁原印着二维码，指向王德生历年写在微信公众号上的文章与视频。'
-                '这些链接已全部解出，逐图列在各分篇页上，眼下直接外链公众号原文；'
-                '它们会分批搬回本站首发，搬一篇、这里就换一篇为站内地址。'
-                '140 张主图中 130 张有码，共 %d 条外链；另 10 张原册即无码。</div>'
-                % sum(len(v) for v in QR.values()))
+                '图册每张主图旁原印着二维码，指向王德生历年写下的文章与视频。'
+                '这些文章<b>已经搬回站内，不再跳转公众号</b>——'
+                '<a href="/three-views/articles/">%d 篇全在这里</a>，'
+                '逐图挂在各分篇页上：点开就能<b>分页翻阅</b>，也能<b>下载 PDF</b>，'
+                '每篇另附纯文字版。落在 %d 张主图之下。'
+                '尚有 %d 条（多为视频，原件未到）暂留公众号地址，'
+                '拿到就补进来。140 张主图中 130 张有码，另 10 张原册即无码。</div>'
+                % (n_art, len(BY_IMG), n_left))
     body += ['</main>', FOOT, FIT, '</body>', '</html>']
     return '\n'.join(body)
 
