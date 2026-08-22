@@ -2997,12 +2997,13 @@ async function runLane(agent, manualMode){
   pb.open(); pb.st.innerHTML='<span class="spinner"></span> 生成中';
   const finalRound = history[history.length-1];
   let ptext = '';
+  // 成文前取一次站内近邻：种子 = 原初问题 + 末轮判断（论文的核心命名就长在末轮里）
+  // ⚠ 这个声明必须留在 try 外：下面的近邻补写还要用它，写进 try 里它就出不了块（与碰撞段写法一致）
+  let _nb = '';
+  if(window.SDERag){
+    try{ _nb = await window.SDERag.neighbors((RUN.question + ' ' + String(finalRound.answer||finalRound.summary||'').slice(0,600)).trim(), { k:8 }); }catch(_){}
+  }
   try{
-    // 成文前取一次站内近邻：种子 = 原初问题 + 末轮判断（论文的核心命名就长在末轮里）
-    let _nb = '';
-    if(window.SDERag){
-      try{ _nb = await window.SDERag.neighbors((RUN.question + ' ' + String(finalRound.answer||finalRound.summary||'').slice(0,600)).trim(), { k:8 }); }catch(_){}
-    }
     const pr = await streamChat(RUN.key, RUN.sel, paperSystem(agent, RUN.xinde['DS-'+agent]||''),
       paperMaterials(RUN.question, history.map(h=>h.summary||''), finalRound.answer||finalRound.summary||'', _nb),
       pb.body, pb.st, pb.meta, pb.el, PAPER_TOKENS);
