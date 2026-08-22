@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三视角个人成长智慧 · 33 篇</title>
+<meta name="description" content="心态、情绪、情商、沟通、使命与幸福——写给一个人自己的那部分。　共 33 篇，可分页阅读与下载。">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/library/self/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三视角个人成长智慧 · 33 篇">
+<meta property="og:description" content="心态、情绪、情商、沟通、使命与幸福——写给一个人自己的那部分。　共 33 篇，可分页阅读与下载。">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/library/self/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur">个人成长智慧</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">Self</div>
+<h1>个人成长智慧</h1>
+<p class="tv-sub">33 篇　|　约 7.0 万字　|　王德生</p>
+</header>
+<div class="tv-note">心态、情绪、情商、沟通、使命与幸福——写给一个人自己的那部分。</div>
+<ul class="alist" style="margin-top:1.8rem">
+<li><a href="/three-views/doc/b196/">2018新年感想档</a><em>1 页 · 316 字</em></li>
+<li><a href="/three-views/doc/b197/">两种心态</a><em>6 页 · 7,354 字</em></li>
+<li><a href="/three-views/doc/b198/">两种心态两种人生</a><em>11 页 · 4,458 字</em></li>
+<li><a href="/three-views/doc/b199/">人为何喜欢给人贴标签</a><em>4 页 · 1,192 字</em></li>
+<li><a href="/three-views/doc/b200/">人生九宫格</a><em>1 页 · 146 字</em></li>
+<li><a href="/three-views/doc/b201/">人生智慧的有无</a><em>1 页 · 338 字</em></li>
+<li><a href="/three-views/doc/b202/">什么是幸福</a><em>7 页 · 2,535 字</em></li>
+<li><a href="/three-views/doc/b203/">何谓智慧人生</a><em>11 页 · 2,985 字</em></li>
+<li><a href="/three-views/doc/b204/">你以为终身学习仅仅就是活到老学到老</a><em>5 页 · 2,419 字</em></li>
+<li><a href="/three-views/doc/b205/">你愿意超越自我吗</a><em>3 页 · 781 字</em></li>
+<li><a href="/three-views/doc/b206/">你每天那么忙</a><em>7 页 · 3,240 字</em></li>
+<li><a href="/three-views/read/a035/">你每天那么忙，生活有改变吗？</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/read/a048/">你的心在哪儿呢？</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b207/">关于“做事先做人”的分析和讨论</a><em>9 页 · 4,772 字</em></li>
+<li><a href="/three-views/doc/b208/">关于道和逻辑</a><em>3 页 · 1,655 字</em></li>
+<li><a href="/three-views/doc/b209/">如何减少个人心理及组织的内耗</a><em>4 页 · 1,373 字</em></li>
+<li><a href="/three-views/doc/b210/">如何成为一个情商高的人</a><em>6 页 · 2,659 字</em></li>
+<li><a href="/three-views/doc/b211/">如何成为一个气场超强的人</a><em>5 页 · 1,986 字</em></li>
+<li><a href="/three-views/doc/b212/">如何找到自己的人生使命</a><em>6 页 · 1,477 字</em></li>
+<li><a href="/three-views/doc/b213/">如何调整不良情绪</a><em>5 页 · 2,109 字</em></li>
+<li><a href="/three-views/doc/b214/">如何面对坚硬如铁-成长心态</a><em>6 页 · 2,817 字</em></li>
+<li><a href="/three-views/doc/b215/">对事不对人</a><em>5 页 · 1,823 字</em></li>
+<li><a href="/three-views/doc/b216/">成功的沟通让工作事半功倍</a><em>5 页 · 2,478 字</em></li>
+<li><a href="/three-views/doc/b217/">成长心态继续聊</a><em>6 页 · 2,021 字</em></li>
+<li><a href="/three-views/doc/b218/">成长成长</a><em>10 页 · 2,944 字</em></li>
+<li><a href="/three-views/doc/b219/">摆脱信任危机</a><em>2 页 · 1,504 字</em></li>
+<li><a href="/three-views/doc/b220/">智慧之泉带来平安和幸福</a><em>8 页 · 5,245 字</em></li>
+<li><a href="/three-views/doc/b221/">沟通的三视角智慧</a><em>7 页 · 2,364 字</em></li>
+<li><a href="/three-views/read/a092/">现代人的三大顽疾：懒、怂、拖，怎么破？</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b222/">现在抑郁症是一种流行病</a><em>9 页 · 4,284 字</em></li>
+<li><a href="/three-views/read/a159/">自信的再剖析</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b223/">要有成长心态（二）</a><em>4 页 · 2,014 字</em></li>
+<li><a href="/three-views/doc/b224/">论千里马</a><em>2 页 · 339 字</em></li>
+</ul>
+<p class="hint" style="text-align:left;margin-top:1.2rem">其中 4 篇此前已作为图册扫码原文上站，点进去是同一篇，不另存一份。</p>
+<div class="tv-pager"><a href="/three-views/library/business/">← 商业与管理</a><a href="/three-views/library/practice/">学员实践与案例 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>

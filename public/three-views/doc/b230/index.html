@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三视角智慧在家里的运用 · 三视角学员实践与案例</title>
+<meta name="description" content="三视角智慧在家里的运用——王德生三视角文章，收在「学员实践与案例」子频道，共 17 页。三视角在家庭中的实践 行者小明 关注 2018-10-25 11:15 · 字数 9055 · 阅读 17 · 作者：周迎志 尊敬的王老师，各位热爱学习、努力成长的朋友们，大家晚上好！很高兴今晚能 够在">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/doc/b230/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三视角智慧在家里的运用 · 三视角学员实践与案例">
+<meta property="og:description" content="三视角智慧在家里的运用——王德生三视角文章，收在「学员实践与案例」子频道，共 17 页。三视角在家庭中的实践 行者小明 关注 2018-10-25 11:15 · 字数 9055 · 阅读 17 · 作者：周迎志 尊敬的王老师，各位热爱学习、努力成长的朋友们，大家晚上好！很高兴今晚能 够在">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/doc/b230/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur" href="/three-views/library/practice/">学员实践与案例</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">三视角文库 · 学员实践与案例</div>
+<h1>三视角智慧在家里的运用</h1>
+<p class="tv-sub">共 17 页 · 约 9,618 字　|　王德生　|　子频道：<a href="/three-views/library/practice/">学员实践与案例</a></p>
+</header>
+<div class="bar">
+<button class="btn" id="prev" disabled>‹ 上一页</button>
+<div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span>/ <span id="totalPages">…</span></span></div>
+<button class="btn" id="next" disabled>下一页 ›</button>
+<button class="btn" id="zoomOut">−</button>
+<button class="btn" id="zoomIn">＋</button>
+<a class="btn dl" href="/three-views/doc/b230/b230.pdf" download="三视角智慧在家里的运用.pdf">⬇ 下载 PDF</a>
+<a class="btn" href="/three-views/library/practice/">回「学员实践与案例」</a>
+</div>
+<div class="stage" id="stage">
+<div id="loading" class="loading"><div class="spinner"></div>正在载入本篇…</div>
+<div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
+<div id="error" class="err" style="display:none"></div>
+</div>
+<p class="hint">← → 方向键翻页 · 选中正文任意一句可问 WDS</p>
+<details class="plain"><summary>纯文字版（全文 9,618 字，便于手机阅读、复制与站内检索）</summary><div class="body">三视角在家庭中的实践
+行者小明
+ 关注
+2018-10-25 11:15 · 字数 9055 · 阅读 17 · 
+作者：周迎志
+       尊敬的王老师，各位热爱学习、努力成长的朋友们，大家晚上好！很高兴今晚能
+够在这里跟大家分享在三视角智慧学习道路上的心得体会。特别感恩老师和同学给我
+这个机会。
+        三视角智慧博大精深，学习一年多时间，我看到了智慧之门向我敞开。有人问你
+都学习那么久了，为什么还要学？我之所以坚持学习，每次基本参加老师线下的课程。
+因为我的问题特别多，而我又无法解决。每次线下活动解决一点点，螺旋式成长上升。
+      目前虽然三视角智慧没有给我带来很多的财富，可是我的伤痛在逐步修复，我的
+生命在重生，我的家庭已经重建，我的内心是自由的，充满了平安和喜乐！
+        我的分享即将开始，请大家提前预备好心情和时间喔！
+一、
+首先问问大家：到目前为止，最困扰你的问题是什么？
+（时间管理不合理）
+（最困扰我的问题：如何完全去相信他人？不那么自信。与人沟通如何去看到对方的
+思维地图？心智模式？）
+（时间不够用）
+我也说说我的问题：以前是彷徨，没有方向，只知道自己要帮助别人，但是不知道通
+过什么方式来帮助别人，所以频频改行跳槽。
+         后来，跟人合作办学校，又觉得自己核心竞争力不强，不能够办出特色。
+        昨晚在群里看到有朋友说自己人生彷徨，学到的东西又不是自己想要的东西。
+         也有人觉得自己有本事、有能力可是总被人束缚着手脚。
+         当然有很多人习惯把问题藏在心里，不愿意向别人袒露，我以前就是这样的人。
+        也许有人不知道怎样界定&quot;问题&quot;，希望以后有机会再讨论“问题”的话题。
+（跟周老师问题一样，最近几年频繁跳槽，不知如何定义使命，不知核心竞争力是什
+么。）
+人生的问题很多，或者说痛苦很多，痛苦大概可以分为哪三类呢？
+（身，心，灵三个方面）
+（人生三大痛苦：看不透，想不通，放不下）
+（自我的，他者的的，自我和他者的）
+心是身的方向，身是心的表现，灵是身的驱动力！
+从大家的回答中，归纳出三大类问题：
+是什么？目标和方向的问题，（即使命的问题）
+为什么？关系方面的问题，（生命场的问题）
+怎么办？具体解决问题的能力（核心竞争力的问题）
+二、
+大家思考一下人与人最大的区别是什么？
+（人的使命、生命场、核心竞争力都不同。）
+（使命是对比视角，因此作为区分标准）
+（人与人之间最大的区别是基因不同）
+（思维方式的不同）
+人与人最根本的区别在于使命不同。有的人的使命是服务家人，所以为了达成使命，
+他会努力提高自己的核心竞争力。比如做好饭菜，辅导好孩子，搞好卫生，营造良好
+的家庭氛围。
+人与人基因有很多相同的部分！
+人与人思维确实有不同的地方，但不是最根本的区别，只是知的不同。
+（在王老师的核心宫格图中，使命出现在 3 处，一处是教育27 宫格里教育的价值（分
+布视角）的对比特征（存在感）的对比特征-使命；一处是，创新27 宫格的精神（分
+布视角）的对比特征的对比特征-使命；一处是管理 27 宫格的对比特征（事业理论）
+的对比特征（使命/顾客）-使命。虽然各个场存在着交叉，但从人生教育创新管理角度
+来看，使命都占据对比特征位置。）
+很多人都不明白自己的使命是什么？很多人彷徨迷茫，终老一生。
+（很多人是没有使命感的，那怎么去区分呢？）
+      其实每个人都会有自己的使命，只是服务的对象的多少的问题，或者是自己不知
+道而已？使命，其实就是此人和彼人存在于世间的价值或意义的不同的地方！
+三、
+问题：人与动物和机器人的根本区别是什么？
+（人会追求真、善、美）
+这是人之所以不是非人的对比特征。
+我们一起来回顾前天老师的课程。关于人的话题，是我们恒久不衰的话题。
+人的对比特征的
+静态特征
+动态特征
+关系特征
+分别是什么呢？
+（静态是真，动态是善，关系是美）
+再问：
+人的变化视角
+静态变化
+动态变化
+关系变化
+分别是什么呢？
+（知，意，情）
+再问：人的分布视角视角
+静态分布
+动态分布
+关系分布
+分别是什么呢？
+（信，望，爱）
+这就是我们人的三视角再具体到九宫格。
+         三视角是人，事，物，理的本体结构，又是指导我们在各个领域创新和认识的
+方法论，能够给我们的各个领域带来巨大的影响的价值论，三视角智慧给我的生活带
+来了巨大的改变。
+四、
+        下面我分享三视角智慧给我的家庭带来怎样的改变和影响。
+        回想我跟先生结婚时也是两情相悦，可是婚后的日子里，没有耳鬓厮磨，没有唇
+枪舌战，少有正面的冲突的时刻，可是我感觉自己的生活却是十面埋伏，危机重重，
+以致我无法呼吸。我总以为他比我大，又经历过一次婚姻，应该知道我的想法，应该
+知道怎样处理家庭问题，应该……可是他并没有如我想象的那样，我特别痛苦，而且
+我还不说出来，直到第一次线下学习三视角智慧，我才明白：
+       凡事、物、理有三个视角，即对比、变化、和分布。因为人的认知有限，所以不
+可能完全透知事物理，而且由于每个人的生活环境，成长经历和信仰背景等不同，所
+关注的视角也就不同，而且每次每个人会有不同的视角假设：静态（粒子）、动态
+（波）、关系（场），因此对于同一个事、物、理就有九个视角的认识结果。
+       我假设我所知道的事、物、理就是事物理的本身，他应该跟我一样认为。现实却
+不是如此，骄傲无知的我还不跟他沟通，怎能不痛苦？第一次线下学习：啥专有名词
+也不懂，却仿佛看到九宫格给我开了一扇天窗，突然就明白：为什么“男大当婚女大
+当嫁”，为什么婚庆家庭的门楣上有“天作之合”“天造地设”。当时我泪流满面：
+因为人类的无知和有限，所以需要过团契生活，互相取长补短，团契生活的结晶就是
+孩子，把我们对同一个事物理的不同认识填在九个宫格甚至更多的格子里，就越发完
+善我们对事物的认识，并且一代代传下去，再补充再完善，直到那日来临。
+      我对先生的看法就完全翻转，我们之间的情开始升温，我就主动帮助他增强核心
+竞争力，达成他的使命。家开始有了家的味道了，先生逐步挪出时间来兼顾家庭了，
+现在每天会送孩子上学了。
+        婚姻生活中另一个痛苦就是跟公公婆婆的关系如鲠在喉，他们很爱他的孩子，也
+爱我们的孩子（爱孙子）。平时大家都好，一旦面临孩子生病哭闹时，冲突就来了，
+结果是我带孩子出去撞了鬼，赶紧占卜求仙，仙人十有八九回复是媳妇带去不该去的
+地方了。因为他们所奉为圣旨的观世音菩萨说：孩子不能晚上出门，不能被四眼妇人
+抱，不能去病痛人家，不能去医院，不能去丧葬场面。
+       那时我特别不理解：为什么我带两个孩子（建德和表妹）出去，别家的孩子就好
+好的呢，到底是我孩子有问题？还是孩子家有问题？还是仙人的话有问题？我知道他
+们是心疼孩子，所以当他们批评我时，我并不言语顶撞和反对，默默接受。可是一年
+又一年，重复到第三年，孩子依然半夜哭闹，常常生病。我就不苟同他们的做法了，
+不愿意去拜他们的“真善美”的模型。于是我成了公公婆婆小姑子的公敌，先生中立：
+尊重个人的选择。我心想：既然尊重个人选择，为什么非要我信你的“仙人”？可是
+我依然以为这些道理你们应该懂，不要我来说，免得伤和气。
+        在家里，我没有荣誉感，更没有成就感，逐渐地，我不愿意回家，我认为在这个
+家里没有身份地位，我存不存在不重要了。孩子三岁半的一个清晨，下着雨，我假装
+送孩子上幼儿园，然后带着孩子离开了。当我离开湖南省时，我大口呼吸着自由的空
+气，仿佛陶渊明的“久在樊笼里，复得返自然”的诗句是为我而写。
+        在外两年多时间，上帝拣选我，安慰我，医治我，翻转我，指引我回家的   路，
+把我带入了三视角智慧圈。
+        当我回到家中时，我的婆婆明显沧老了，糖尿病并发症，眼睛看不清，耳朵不灵
+光，腿脚不利索。两年前她做事麻利轻松，照顾月子里的我和孩子时，喜笑颜开。如
+今，时间改变了彼此，公公婆婆和姑子不再与我们同住一屋子，不再参与孩子的事。
+我在婆婆的皱纹里，在公公蹒跚的脚步里看到自己父母亲的影子。我体谅到婆婆几十
+年来就是服侍儿女和丈夫。如今儿女基本成家，她的服侍对象越来越少，越来越没有
+新的价值与成就，她的存在感就越来小。她快成了不被需要的老人了！她与我的亲娘
+又有什么不同？每当我想起我自己的母亲时，就赶紧借各种节日给婆婆买几套衣服和
+鞋子，因为她还能穿。
+今日，我把家丑都传开了，实在我看到很多人还在家庭的矛盾冲突中，纠结痛苦。不
+幸的家庭各有各的不幸，但如今用三视角智慧剖析：
+      夫妻家庭之间多是视角、层级不同而已，可能夫关注对比视角，而妻更关注变化
+或者分布视角。记得事物理的本体结构是三视角，各人只是看到了某一个或者有最多
+两个视角而已。每个人的真善美的标准不同，知情意表现就会不一样。标准是要求自
+己的，不能强求别人。对于别人的真善美的标准我们要理解包容，毕竟我们对家人的
+爱、对孩子的爱是真的，虽然有时我们不能完全接受。因为没有智慧，我们不知怎样
+去爱。
+        三视角智慧给我们满足人的基本需求：存在感（身份）、价值感（赞美肯定），
+成就感（做的好）。在这一原则下，解决问题果然容易。
+        前天公公摔倒了，送到了医院，幸好伤的不重。建德想去看爷爷，可是爷爷特别
+叮嘱：建德不要去医院看他，甚至他百年之后也不要去丧场。理由是：他的仙人早有
+指示，建德不能去医院，不能去丧场。如今理解他老人家都不计较唯一的孙子不去看
+他，而是避开一切对孩子的不利影响。这就是爱！爷爷对孙子的爱！我还有什么不理
+解的呢？
+      三视角九宫格里关于人的真善美的标准是抽象概念，由于不同的经历，不同的环
+境，不同的信仰我们的真善美的标准模型又有具体不同。真善美标准是要求自己，而
+且理解包容别人的真善美标准，家庭就和谐了。把王老师的话转送给大家，一起共勉。
+（王老师：三视角智慧似乎还没有给周老师带来直接的经济财富，但是其实是巨大的
+财富。生命的改变才能真正带来经济财富!）
+确实如此，以前我费尽心机出去赚钱，可是我的内心不自由，不喜乐不平安。
+可是如今我在家里带孩子，我的内心自由的，喜乐的，平安的。
+在最近这段日子，我有深切的体会，当我明白了人的九宫格以后，我慢慢的去运用在
+与人相处上。发现人与人之间的和谐相处有一些基本的原则：那就是要尊重人的存在
+感，成就感和价值感。
+  
+      孩子也需要存在感、成就感和荣誉感
+昨日是建德的生日，他邀请班上同学来家里玩。按计划我们到建德爷爷奶奶家吃
+中餐，然后在家里看电影。临到中餐时，孩子们不干，建德非要充当老师教其他同学
+做饭菜，孩子们也热烈响应，尊重孩子们的呼声吧！于是我们决定：建德爸爸去接爷
+爷奶奶和已经预备好的饭菜，我和孩子们去菜市场买菜。
+        一路上，我们先计划好买什么菜，并且安排两人一组，谁摘，谁洗，谁切，谁炒。
+孩子们一路的欢呼，一路的喜悦，甚至有一个孩子兴奋的给爸爸打电话说：爸爸，告
+诉你一个大好的消息――今天我要在成建德家学炒菜啦！（这年代，估计大部分家长
+都不会 7-8 岁的孩子下厨房的，所以孩子能有这个机会简直乐坏了！）
+采购回到家后，孩子们分批次进厨房按计划进行，到 12:30 左右有另一个小区的小朋
+友要建德去接预订好的比萨饼，一听说有好吃的，（生日吃蛋糕已经习以为常，生日
+吃披萨还是头一回。）孩子们基本上都去了，只剩下唯一一个跟我在厨房里学炒菜，
+菜炒完了，孩子们还没返回，我明显感觉到这个男孩的不安，再加上建德爸爸和爷爷
+奶奶来了之后，孩子开始手足无措。频频看手表，边问：他们还有几分钟回来？
+  
+  
+三视角智慧提醒我：孩子在这里找不到存在感。我立马给他事情做（给他在家里一样
+的身份），我假装数数不大清楚，请你帮我数数中餐有多少人吃饭？要准备多少碗筷？
+多少凳子？多少饮料杯子？把碗筷重新洗一次，一个个摆好。他做完一样就向我汇报
+一次，我就肯定他：做的真好，你真勤快！（给他成就感与荣誉感）当其他孩子抱着
+披萨回来时，这边餐桌全部准备就绪，只等开餐。
+  
+        孩子们在家里过电影节……《爱丽丝梦游仙境》，连看两次，直到晚餐时间。
+晚餐后我一声：谁能帮助我？（每个人心里有善的渴求，能帮助别人心里就特别
+美，）上午跟我在厨房里的孩子第一个就去把儿童房里的卫生做完，其他孩子就去阳
+台整理玩具，当然我忍不住赞美：勤快体贴的孩子们！孩子们又开始了游戏时间。晚
+上八点多了，还有四个孩子不肯离开，非要父母陪着再玩一会儿才走。
+      出门那一幕，令我很惊奇：那个上午跟我在厨房里的男孩子，走出门又折回来问
+我：那些垃圾怎么办？阿姨！一股暖流在心里涌动。他解释说想要帮我带下去，可是
+垃圾袋子太小，要我拿大袋子给他全装下提走。
+      几个孩子的父母特别惊奇，说他们在家从没有炒过菜，也没这么勤快。我反思自
+己做的好是因为三视角智慧：给我一条怎样去与人同在，共情的原则：尊重人的存在
+感，成就感和价值感。
+        孩子和成年人一样需要有存在感、成就感和荣誉感。教育中心的几个孩子的表现
+就明显的反映出他们的需求，这种需求一旦得到满足，就会推动知意情水平就如芝麻
+开花节节高。
+    九月新学期开始季，刚进湘潭德麦教育中心的有孩子们不会与人沟通，交往中摩擦
+不断，游戏中不守规矩，作业几个小时也完不成……每天跟这些孩子们相处就仿佛来
+到了战场，状况不断。明显的来到一个新地方开始新生活，孩子们心里充满恐惧、焦
+虑、不安。当我给孩子们每个人一个身份之后，情况就开始逆转：各类助教，值日生，
+小组长，图书管理员……一人身兼数职。其中一个二年级孩子兴奋的掰着三根指头告
+诉我：
+老师！我又是小助教，又是值日生，还是小组长，三！个！职位！
+我告诉他：因为你很优秀！而事实上这个孩子读二年级了，可是在知的学习上基本没
+入门，别的孩子在阅读、讨论或者作业时，他四处游荡。第一次当助教教了一年级小
+朋友的拼音后，他反馈：他还有好多不会。我回复他：因为他不会，才需要你去帮助
+他，你是助教要做好榜样啊！就这一次助教体验：这个孩子就有翻天覆地的改变：一
+回来就第一个开始做作业，书写写明显改变，做完作业就去教一年级的孩子。
+一个月过去后，孩子们因为有自己的特长而被冠以各种“职务”，而且被不断的肯定
+和鼓励后，他们都有明显的改变。孩子们彼此之间则越来越融洽和谐，并且开始有自
+己的使命和人生目标了！
+（王老师：德鲁克的员工管理一直强调核心就是存在感，成就感，价值感!）
+（一个生命破壳而出，祝福到周围的生命！）
+我是一个三视角智慧的学习者，实践者，感谢三视角智慧！
+接下来我将分享一个因为没有存在感，价值感，和成就感的生命是如何陨落。
+五，
+五、
+昨晚从医院回来，深夜又想起自己的母亲，14 年前离奇死亡的母亲。这一页我一直希
+望能轻松翻过去，却越发泪如泉涌。  关于母亲的死，我们家人一直藏在心里，而今晚
+的分享中,我要作为学习的案例公开，用三视角分析：
+      2004 年 7 月某日（暑假）上午，50 岁刚出头的母亲，自己洗澡，洗头发换上我
+给她买的新衣服，穿戴整齐，躺在客厅的长凉凳上。邻居家在忙着双抢，挑着谷子一
+趟一趟经过我家门口，还跟她打招呼，他们觉得她很正常。当另一个邻居来借工具时，
+从窗户里喊人，却没人答应。进入看人时，已经无法答应了，只看见她嘴里鼻
+沫，呼吸困难。当大姐赶到时，她流下眼泪，想说话已经不能了。当救护车过来时，
+已经停止了呼吸，心脏不再跳动了。
+      当时我正在市里一家学校试课，心神不定，烦躁不安。而我弟弟也在上班，爸爸
+也去市里有事，两个姐姐和妹妹已经出嫁。当母亲出殡时，阴雨绵绵，似乎也在为之
+哭泣……这个耗尽一生服侍公公、丈夫和五个儿女的女人却在有机会“享福”的时候
+离开了，而且是自己选择结束。
+      1999 年，我大学毕业到了山区教书，回家一趟不容易，可怜的工资给学生垫了学
+费，我成了吃里扒外的孩子，还从家里带米解决学校的一日三餐；弟弟也参加工作；
+这一年家里建楼房，来来往往的人特别多，别人家的孩子毕业了，往城里去工作很荣
+耀。而我还要去比我家更穷的山区工作，又到了适婚年龄，诸多因素，估计我的母亲
+很没面子。
+2000 年开始，母亲进入所谓的更年期，到 2002 年时，她做事虽很正常，依然烧饭炒
+菜，扫地洗衣，整理家务。可是我明显发现没有以前那么温暖了，会抱怨我爸爸布关
+心她，只顾看他得战争片。这样的抱怨在我母亲嘴里是很少有的，几乎都是任劳任怨。
+并且每次母亲即使有不舒服，很少说出来，躺一下咬咬牙就过去。倒是我的父亲稍有
+不适就会哼哼唧唧，大呼小叫，全家人都要关注他。有时我会以为我母亲比父亲更像
+一个军人。当母亲说父亲不关心她时我特别惊奇，我知道父亲确实不会关心人，几十
+年风里来雨里去走着或者踩着单车几十里去上班，大家都认为他很辛苦，所以大家都
+把目光转向他。他也习惯被人服侍的日子。特别是父亲退休后，更是热衷回忆他激情
+燃烧的军旅生活，有时间看电视，却很少顾及母亲的感受。明显的家里冷淡很多，来
+家里坐的邻居越来越少，冬天没有像以前那样有太阳晒过的被窝，母亲身上明显没有
+了温度，我们不再有边磕瓜子边说笑的场景。每次我买回她平常最爱吃的零食，她也
+没有惊喜，甚至爱吃不吃，越发沉默不语得坐着。那时只知道要多陪伴，却不知怎么
+陪。为了激起母亲跟我说话，我是过很多方法，甚至说过：你过去这么偏爱弟弟，娇
+惯他，宠着他，不让他做事，他现在大了都不知帮助您做事。母亲依然沉默不语，只
+是到了很困时，我我催母亲去睡觉，她告诉我：很害怕！年少不更事的我大大咧咧的
+回复她：有什么怕的？我带你去睡！
+到 2003 年春季，母亲的进入了严重的抑郁症，待外人非常的冷漠，只要看到儿女回
+来就说：有某人要来害你们了，快回去！我闻到药水的味道了！我们不得不把家里所
+有的农药，刀子全部都藏起来。到四月的时候，她说的越来越频繁。于是把母亲送到
+了精神病院，可是我不相信母亲是精神病人，我也不承认这个事实。我花了很多时间
+陪伴她，每周五晚上到周一早上我都跟她在一起。晚上睡一床，白天给她买好吃的东
+西，给她洗脚，剪指甲，唱歌，她很安静的听着，很快跟我有了回应。同一间病房里
+的人都羡慕她有个好女儿，说她有福，母亲脸色开始又了神采。一个多月后，母亲出
+院了。一年后，母亲再次发作，又被送去了精神病医院。这次我没有花那么多时间来
+照顾她。两个多月后出院了，回到家里不到两个月就走了。
+（王老师：如果没有三视角智慧，我们是无法去帮助这些苦难中的人!周老师一定会成
+为众人的祝福！目前她就在祝福很多孩子们!）
+每当想起我的母亲，一个严重的抑郁症患者，在她中年时，我们因为无知，以爱
+的名义让她不要再种地，少干活，剥夺她几十年的成就感；以让她享福的名义剥夺了
+她的存在感，价值感（她曾说过我在农村不种地我做什么？别人都会说我。），给家
+里添置彩电、冰箱、洗衣机等大件，而母亲感觉很陌生，没有沟通，儿女的相继
+“飞”走，让她内心倍感孤单。
+谨以今晚的分享献给各位还有父母的儿女们！
+父母还在的时候，一定让他们活着有存在的价值，让她做她喜欢的擅长的事（容易有
+成就感），赞美他们还很年轻，大有可为（有价值感或者荣誉感）！
+千万不要说你太大了，干不了活了！去休息吧！就等于直接说你已经没有价值了！
+（我家里外婆快80，也天天倒腾几块地，种菜，卖菜，去别人庄稼地剪麦穗，这也是
+她的价值感存在感吧！）
+对，人需要身心灵都健康。为什么人到了中年容易更年期综合症呢？抑郁症呢？
+人到中年，身体机能开始衰退，儿女的离开，心灵开始孤单，如果连身边的伴侣都对
+她不关心，人核心的需求：存在感、成就感和价值感得不到满足，就容易出现这样的
+问题。
+（王老师：这就是心，身，灵!这是大三视角！人的真善美可以离开知情意来表现吗？
+不能!而知情意可以没有九大生理系统吗？不能！信望爱必定不能离开身体九大系统!
+心，身，灵是三个视角！）
+  
+六、
+擦干眼泪，我们来聊一聊湘潭德麦教育中心的发展。
+在王老师的指导下，湘潭的七位黄埔学员们一起成立了湘潭德麦教育中心，九月招收
+了十五个孩子，到十月流动，还剩下十个孩子。我们的理想是把 21 世纪教育的系统理
+念在这些孩子当中进行具体的实施运用，通过影响这些孩子来带动孩子们的家长学习
+如何教育孩子。
+通过这一个半月的实践，我深切的体会到家长学习三视角智慧是何等的迫切和必须！
+      孩子的很多的行为习惯，思维方式，情绪管理都是直接复制家长，要想改变孩子，
+而家长不变，有如蚂蚁撼大山！
+这也更加坚定了我的目标和方向：带领更多的家长一起来学习和成长，给我们孩子的
+成长建立良好生命场，改变家庭，重生家庭。
+自从河源线下课程，老师讲到情绪管理，自己在情绪管理上有很大的进步，而我家的
+孩子也因此有很大的改变。
+情感三视角：情感认知，情绪管理和同理心。
+我会认知情感，也慢慢学会了情绪管理，可是我不知道如何跟有情绪的人同理心。
+因为中心有几个特殊的孩子，常常闹情绪，脾气发作时负面影响很大。
+我发现了一个与孩子迅速同频的好方法：迅速翻转他有负面情绪到正常甚至喜乐
+的有效方法之一，就是游戏！这是我最需要学习的功课，也是我们教育中心孩子们和
+谐相处的一大阻碍！现在也有解决的办法，真心的感谢三视角智慧！
+下一步我们将把 21 世纪的教育理念向更多的幼儿园，小学低年级进行辐射和影
+响，让更多的家长一起学习，改变家庭，让家庭成为全人教育、创新教育和终身教育
+的基地和摇篮。让学校、家庭和社会一起携手，改变我们的教育。
+七、
+（王老师：你是老学员，谈谈你的学习方法心得?帮助大家。）
+      学习三视角智慧，我花的时间是最长的，因为我问题多，花了很多钱和时间去寻
+找方法，仍然得不到解决。唯有三视角没有给我具体的方法，我的很多问题却得到了
+解决。
+远看三视角智慧高大上……很难懂！
+深入学习运用三视角智慧，切实可行又高效。
+（王老师：这就是智慧!没有具体模式!三视角不会给我们具体知识，具体方法，具体
+创新，但是却引导我们学习，解决问题，创造!）
+笨人的学习方法：
+      一遍不懂，放过不求甚解。先把它整理成文保存。
+      继续跟进学习，再懂一点点，立马实践运用一点点。
+      再跟进，又明白多一点，在线下课程中得到飞跃，螺旋上升。
+        继续学习，在学习中分享，在分享中成长。
+我是如此这般，在回首来时路，就如：晨起之苗，不见其增，日有所长。
+（王老师：给大家一些避免错误的方法和建议）
+错误的方法：
+只听课，只学习，不运用，不实践，等于没学。
+学习三视角不能急于求成，急于求成其实是不成。
+三视角智慧是一个生命体，只有真正的影响了自己的生命，改变自己的生命，才能真
+正影响新的生命。
+（王老师：给大家一些学习建议，比如三大课程的互相关系。你最有感触的:线上课程
+和线下课程的关系，微信课堂的参与。）
+      三视角智慧的学习也是三视角的。
+      今天在这里分享的是微课堂，属于大家参与的动态学习过程。
+      线上的视频课程，是大家参与学习的静态课堂。
+      线下课程，师生一起在同一个场里充满了爱，真诚，和谐的创新过程更是妙不可
+言。许多黄埔学员都是在每一次线下课程翻转生命。跟老师跟同学之间建立和谐美好
+的关系的感觉真是好的无比！这就是场的学习。
+这就是我为什么每次都想参加线下课程的原因。
+      我发现要迅速与有负面情绪的人同频，同理，做游戏是一个有效的方法。
+    可是实施中最大的障碍是骄傲，不能忍耐，不愿舍己。
+看到别人为一点小事就闹情绪，自己心里就很不爽，明明知道对方情绪来了，听不进
+道理（理智教育）了，偏偏还要逞强，讲一大堆的废话，让对方有如火上浇油。
+（骄傲固执，不善）
+      或者立马火冒三丈，自己的情绪也上来了，立马双方开炮。
+（忍耐不够。）
+      或者明明知道他是孩子，他没有学会控制情绪，可是自己就是不愿意给他树立一
+个情绪控制的好榜样。
+（不愿舍己）
+以前我觉得自己算有点爱心，现在看来，都是抽象的口号，我发现我最需要操练的功
+课是舍己！
+（王老师：同理心的主要特征就是舍己，就是要和他人同喜乐同哀哭！我们都是法力
+赛人，嘴里讲爱最多。一旦到了具体行动就原型毕露了。特别是很多喜爱坚持所谓&quot;自
+己的真理&quot;的属灵人!）
+最近有深切的体会，只有舍己才能与情绪中的人同理！要与人同理，就必须舍己。一
+旦舍己，爱的电流马上循环，照亮彼此的生命！
+（王老师：嘴里把信仰，爱，舍己，表现最多，实际上是一种律法主义，假冒伪善!回
+顾过去，我发现自己坚持的那些&quot;真理&quot;都是我自己的偏见！90%都是!所以人要谦卑地
+追求真理和完美，但是千万不要认为自己的理解就是真理本身!我们是不断地靠近真理
+而已!我们追求完美，但是完美永远不会来到!今天我们学习三视角智慧，但是无人能
+够说，他掌握了三视角智慧!永远不可能的!我们越是去研究三视角智慧，就越是发现
+它的奥秘无穷!）</div></details>
+<div class="tv-pager"><a href="/three-views/doc/b229/">← 上一篇</a><a href="/three-views/doc/b231/">下一篇 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+var PDF_URL="/three-views/doc/b230/b230.pdf", DOC_TITLE="三视角智慧在家里的运用";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.3,curText="";
+var canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'),textLayer=document.getElementById('textLayer');
+var $=function(i){return document.getElementById(i);};
+function drawTextLayer(tc,vp){
+  textLayer.innerHTML='';var frag=document.createDocumentFragment(),fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str)return;
+    var m=pdfjsLib.Util.transform(vp.transform,it.transform),fs=Math.hypot(m[2],m[3]);
+    if(!fs)return;
+    var ang=Math.atan2(m[1],m[0]),sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01)css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;frag.appendChild(sp);fix.push([sp,it.width*vp.scale,ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0],target=w[1],ang=w[2];if(!target)return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){var sx=target/real;if(sx>0.1&&sx<10){
+      sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')';}}
+  });
+}
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-24;
+    var vp1=page.getViewport({scale:1}),s=baseScale;
+    if(vp1.width*s>avail&&avail>120)s=avail/vp1.width;
+    var vp=page.getViewport({scale:s}),ratio=Math.min(window.devicePixelRatio||1,2.5);
+    canvas.width=Math.floor(vp.width*ratio);canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px';canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px';pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      curText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc,vp);rendering=false;
+      if(pending!==null){var p=pending;pending=null;render(p);}
+    });
+    $('pageInput').value=num;$('prev').disabled=(num<=1);$('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+// 载入失败后 pdfDoc 仍是 null：缩放键不走 go() 的守卫，这里必须自己挡住，
+// 否则一按 ＋/− 就抛 TypeError，把错误提示旁边的按钮全变成哑弹。
+function queue(n){if(!pdfDoc)return;if(rendering)pending=n;else render(n);}
+function go(n){if(!pdfDoc)return;pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);}
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;$('totalPages').textContent=pdf.numPages;$('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';$('page-wrap').style.display='inline-block';render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';$('error').style.display='block';
+  $('error').innerHTML='这一篇暂时无法在线分页显示。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开或下载 PDF</a>，'
+    +'或展开下方「纯文字版」阅读。<br><span style="font-size:12px">（'+err.message+'）</span>';
+});
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);
+  window._rz=setTimeout(function(){queue(pageNum);},220);});
+window.WDS_READ={title:DOC_TITLE,
+  bodyEl:function(){return document.getElementById('page-wrap');},
+  docTextFn:function(){return curText?('【'+DOC_TITLE+' · 第 '+pageNum+' 页 / 共 '
+    +(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+curText):'';}};
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三视角与九宫格速览 · 三视角三视角基础理论</title>
+<meta name="description" content="三视角与九宫格速览——王德生三视角文章，收在「三视角基础理论」子频道，共 6 页。三视角与九宫格速览 作者：王德生 马克思关于人的本质的思想主要有三个命题： 一是“劳动或实践是人的本质”； 二是“人的本质是一切社会关系的总和”； 三是“人的需要即人的本质”。 这三个本质和我们的九宫格有何关联呢？今晚揭">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/doc/b008/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三视角与九宫格速览 · 三视角三视角基础理论">
+<meta property="og:description" content="三视角与九宫格速览——王德生三视角文章，收在「三视角基础理论」子频道，共 6 页。三视角与九宫格速览 作者：王德生 马克思关于人的本质的思想主要有三个命题： 一是“劳动或实践是人的本质”； 二是“人的本质是一切社会关系的总和”； 三是“人的需要即人的本质”。 这三个本质和我们的九宫格有何关联呢？今晚揭">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/doc/b008/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur" href="/three-views/library/basics/">三视角基础理论</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">三视角文库 · 三视角基础理论</div>
+<h1>三视角与九宫格速览</h1>
+<p class="tv-sub">共 6 页 · 约 4,327 字　|　王德生　|　子频道：<a href="/three-views/library/basics/">三视角基础理论</a></p>
+</header>
+<div class="bar">
+<button class="btn" id="prev" disabled>‹ 上一页</button>
+<div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span>/ <span id="totalPages">…</span></span></div>
+<button class="btn" id="next" disabled>下一页 ›</button>
+<button class="btn" id="zoomOut">−</button>
+<button class="btn" id="zoomIn">＋</button>
+<a class="btn dl" href="/three-views/doc/b008/b008.pdf" download="三视角与九宫格速览.pdf">⬇ 下载 PDF</a>
+<a class="btn" href="/three-views/library/basics/">回「三视角基础理论」</a>
+</div>
+<div class="stage" id="stage">
+<div id="loading" class="loading"><div class="spinner"></div>正在载入本篇…</div>
+<div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
+<div id="error" class="err" style="display:none"></div>
+</div>
+<p class="hint">← → 方向键翻页 · 选中正文任意一句可问 WDS</p>
+<details class="plain"><summary>纯文字版（全文 4,327 字，便于手机阅读、复制与站内检索）</summary><div class="body">三视角与九宫格速览
+作者：王德生
+马克思关于人的本质的思想主要有三个命题：
+一是“劳动或实践是人的本质”；
+二是“人的本质是一切社会关系的总和”；
+三是“人的需要即人的本质”。
+这三个本质和我们的九宫格有何关联呢？今晚揭晓！
+我们会从
+1.三视角入门开始
+2.进入到九宫格
+3.最后应用到人的九宫格
+4.和生理九大系统:生理九宫格！
+一、
+“每个婴儿都非常可爱、柔软，他们所呈现的生命状态，中国传统文化称之为“赤
+子之心”：没有忧虑，没有忧愁，非常怡然自得。因为婴儿没有概念、分别，所
+以他很放松，天塌下来对他来说也没关系。”这个是一位法师说的话，大家看看
+有哪些问题?﻿
+今晚我们就从婴儿开始讲课。婴儿没有概念，没有分别吗？婴儿可以分别的事情
+很多的。一个人，如果真的没有任何概念，不会分别，那他就无法生存下去了。
+﻿
+问题 1
+婴儿生下来对什么最感兴趣?
+（气味、声音、触碰、吃的、妈妈的心跳……）
+吃的，吃啥呢？吃的奶，这是婴儿最感兴趣的。也是最为重要的，没有母乳就是
+其他的奶。那么婴儿如何区分奶和水呢？
+（味道。）
+还有呢？难道仅仅是气味吗？
+（母乳的香气水没有，温度……）
+颜色呢？如果气味，颜色都和母乳一样，可是孩子喝一口就不喝了，这是什么原
+因呢？﻿
+（太小的无法分辨颜色吧）（乳头和奶嘴不一样）
+你给牛奶弄成黑色看看！孩子也会用五感分辨事物，味道不好，孩子喝一次就不
+喝了。他怎么知道味道不好呢？是不是分辨啊？所以说婴儿不会分别，妈妈们会
+同意吗？﻿
+（不同意。宝宝会分辨，只是说不出来而已。﻿）
+那么婴儿分别奶会根据奶的哪些特征?
+（颜色、味道、气味、口感、有些母乳真的很香）
+还有奶是液体，流动的，是不是?﻿
+所以奶有几大特征：
+1.颜色
+2.流动性
+3.气味和味道﻿
+大家说说我为何把他们分为三类？静态、动态、关系，哪个是静态特征呢？
+(颜色)
+母乳的动态特征，即它的流动特征是什么？流动性。比如它和水的流动特征不一
+样的。做妈妈的难道不知道吗？
+(只要孩子一吃，就自动流出来，不用挤自己流出来。）
+我问的是流动特征？﻿
+(流动较慢)
+奶的味道属于它的什么特征呢？妈妈还需要关注奶吃完后，孩子的大便是不是
+啊？妈妈在关注奶的什么特征呢？
+(关系特征）
+所以婴儿也是根据三大特征来区分他最感兴趣的母乳或者其他奶。这就是静态特
+征，动态特征，关系特征。﻿
+二、
+问题 2
+大家说说，使用哪个特征最难区分双胞胎姐妹?
+(静态特征；静态特征最难区分，长得都差不多；动态特征）
+如果使用了哪个特征，仍然无法区分他们了，那就基本上无法区分了。请问这是
+什么特征?﻿
+（静态特征)
+使用静态特征最难区分双胞胎姐妹。﻿如果使用了哪个特征，仍然无法区分他
+们了，那就基本上无法区分了。请问这是什么特征?
+（关系特征）对!﻿
+三、
+问题 3
+孩子一路长大，首先主要是学习事物的什么特征，然后是什么特征，最后到了中
+学开始关注什么特征?
+(粒子特征，波特征，关系特征)
+对！﻿
+首先是静态特征学习很多，然后是动态特征，到了中学就是关系特征。﻿
+比如孩子小学的时候，自己觉得书包好看就行。到了中学就要考虑同学的意见了。
+这是考虑书包的什么特征?
+(其它同学是否喜欢。)
+这是考虑书包的什么特征?﻿
+(场（关系）特征)对!﻿
+现在测试一题目：把篮球抛向空中，呈抛物线落地，再弹起来。我想讨论这个过
+程中篮球的波特征，应该是什么内容呢？﻿这个是波特征吗？
+这是粒子的位置特征的变化、篮球的变形过程特征。
+四、
+下面我们应用一下，人类与动物植物是不同的，和机器人也是不同的。那么人类
+的动态特征叫做什么呢？关系特征叫做什么呢？静态特征叫做什么呢？
+(人类的动态特征叫做善，静态特征叫做真，关系特征叫做美。）
+对！﻿
+大家明白真善美了吗？﻿
+(这就扩展了真善美的概念了。）
+定义人类的真善美，必须有一个标准的人的模型。你是真善美的，就是你的静
+态、动态、关系特征和这个标准的模型的静态、动态、关系特征差不多。
+比如如果你的标准模型是希特勒。那么你要怎样才算有一颗美的心呢？
+（跟着希特勒去做杀害犹太民族才是美的。）
+对！这就是我们每个人心中的真善美定义。你的心中有一个标准模型。所以真善
+美是不是一些抽象的原则啊？真善美是生命的特征!就是生命，你心中那个标准
+的生命!所以人类的对比特征是不是真善美啊？有没有统一标准呢？﻿
+（没有统一的标准）（当然有啦。不然我们怎么知道什么是真善美）
+没有统一标准。那么我们怎么感觉到好像有呢？不同信仰下面的真善美标准不
+一样的。这个不一样会造成问题吗？何时会造成问题呢？何时不会有问题呢？
+（在不同场里不会造成问题）（大家都在同一个场里就没问题）
+没有统一，不等于没有共同点。﻿当大家需要一起交流的时候，就需要彼此之
+间的信望爱。而信望爱就是彼此的真善美的共同点。这样随着互相交流，真善美
+彼此互通，就有了越来越多的共同点。
+这样也带来了害处，就是真善美抽象化了!哲学化了。比如把各个信仰的真善美
+共性抽取出来，定义为抽象的真善美了。这就是今天大家的抽象的真善美概念！
+离开了生命的真善美定义!最后是法力赛人的真善美了!明白了吗？
+所以你的心中一定要有一个标准的生命模型。否则你的真善美认识就是问题多多
+的，比如如果你的心中有几个标准模型呢？可能这个告诉你真，那个是善，那个
+是美。最后你的真善美会分裂的。你的生命就会出分裂症的。
+最为可怕的是，以自己为标准模型。这是人的对比特征。﻿
+那么人的身体的对比特征通过哪三个系统来认识?那么人的生理系统的静态，动
+态，关系特征通过哪三个系统来认识?哪三大系统告诉我们人的身体和猴子的身
+体是不一样的？﻿
+（骨骼系统、免疫系统、生殖系统。）
+不是的。﻿
+（呼吸系统、消化系统、循环系统。）
+对！﻿
+骨骼，呼吸，循环三大系统告诉我们你是否还是人，即是否活着。是不是啊？
+(是的。）
+埋在土里，留下静态特征，是什么呢？﻿
+(骨骼。﻿）
+骨骼告诉我们静态特征；呼吸是动态特征；循环是场特征，即关系特征。去看病
+的时候，医生要你去检测各个指标，主要是这三大系统，是不是啊？﻿
+（是的。）
+以上对一个事物的三大特征叫做这个事物的什么视角?﻿
+（对比 粒子）
+对比视角。﻿
+三大特征的作用是指导我们对比区分事物。
+(从粒子波和场得到对比视角。）
+所以事物的对比特征包括静态、动态、关系特征。也就是我们是通过静态特征、
+动态特征、关系特征来对比区分事物。所以我们把这些对比特征叫做事物的对比
+视角。用物理学名词，又叫做粒子特征、波特征、场特征。﻿
+五、
+问题 4 仅仅通过特征，我们可以认识具体事物吗？
+（不能。）
+特征只能告诉我们关于这一类事物的共性。不能具体到事物的细节。比如葡萄是
+甜的，这个特征会不会告诉我具体一个葡萄的甜味吗？即它具体如何甜吗？﻿
+（尝过才知道）
+你必须进入第二个视角。即特征的具体表现。因为任何特征的具体表现都是有
+一个变化范围的，所以这些变化范围就叫做事物的变化视角。大家明白了变化视
+角吗？﻿
+这样的话，三大特征是不是对应了三大变化啊？﻿
+(是的。）
+所以有粒子的变化，波的变化，场的变化，就是静态特征的具体表现，都对应
+有具体的例显，动态特征的具体表现，场特征的具体表现。这个容易明白吗？
+应用题:人的三大特征是真善美，那么对应的静态变化，动态变化，场变化分
+布叫做什么呢？﻿
+这就是人的变化视角。即人的具体的生命表现。﻿
+（知，意，情）
+知，意，情!﻿
+大家说说，我们的定义是不是很广了啊？我们拓广了知意情。
+应用 2
+那么人的生理系统的三大变化由哪三个系统来体现出来?这个叫做人体的三大调
+节系统。﻿
+也就是你要查看身体健康的具体细节，你要去检测这三大系统，这是哪三个系
+统呢？
+(免疫、内分泌、神经)﻿
+对！这是今天医学验证了的。﻿
+最后我们来到事物的分布视角。任何一个事物总是位于某个场里面，和场里面的
+其他事物发生关系。互相影响，并且对场的和谐稳定做出贡献。这个关系，影响，
+价值贡献就是事物的分布视角。
+而关系就是和其他事物的对比特征有共性。所以分布视角也有粒子的分布，波的
+分布，场的分布。分布视角解释了为何事物具有变化视角。﻿
+所以对比视角回答 what，变化视角回答 how，分布视角回答 why。﻿
+这个明白了吗？这里是不是九个元素啊？叫做九宫格！﻿
+那么人的分布视角是什么呢？就是人类与外物或者自己的关系，分为粒子的关
+系，波的关系，场的关系。这个就是信，望，爱!﻿所以关于一个人的生命:
+真善美回答 what
+知情意回答 how
+信望爱回答 why
+那么最后一个人的身体与外界发生关系的三大系统是什么呢？﻿
+（生殖系统 消化系统 泌尿系统）
+静态关系就是生殖系统，动态关系就是消化系统，场关系就是泌尿系统。﻿
+大家明白了三个九宫格吗？﻿
+六、
+最后一个难题:为何泌尿系统是场关系?而消化是波的关系呢？﻿
+(就是想问这个问题，那么多 xx 系统，为何泌尿系统为场关系)
+想想大热天，走在武汉大街上，﻿﻿ 你就会明白了，你是不是全身都会泌尿啊？
+﻿﻿﻿ 
+(为何不是分泌系统)﻿﻿﻿ 
+(泌尿系统：排出机体新陈代谢中产生的废物和多余的液体，保持机体内环境的
+平衡和稳定)﻿﻿﻿ 
+泌尿系统起什么作用吗？你的温度场和周围环境的温度场是不是通过泌尿系统
+进行交流啊？发烧就知道了!﻿﻿﻿ 
+(明白了，泌尿系统不是单指尿液)﻿﻿﻿ 
+(很奇妙，9 大系统刚好对应 9 宫格)﻿﻿﻿ 
+奇妙吧？造物主的奇妙！﻿﻿﻿ 
+九宫格内部互相形成类比演绎归纳三大逻辑关系，所以人的九宫格也需要内部逻
+辑和谐. 出现了不和谐，人就是身心灵不健康了。生理九大系统出现了不和谐，
+就是身体生病了! 这个是不是非常有用啊？﻿﻿﻿ 
+(骨骼、呼吸、循环应该叫运动、呼吸，循环吧?)
+新的医学方法，不要拘泥于名词，要看名词的具体定义，看它包含哪些元素。
+(九大系统属于人的生理特征，九宫格属于心理特征，可以这样理解吗？)
+人体九大系统和人的知情意是有视角关系，九大系统是符号本身，这个符号指向
+人的知情意，这样身心灵大健康体系就有了!身心灵大健康是非常激动人心的巨
+大市场!﻿﻿﻿ 
+心就是真善美﻿﻿﻿ 
+身就是知情意﻿﻿﻿ 
+灵就是信望爱﻿﻿﻿ 
+﻿﻿ 这个九宫格必须逻辑和谐，叫做人的健康!那么如果不健康，就会引发身
+体的不健康，即知情意的不健康。而知情意的不健康表现在九大系统的不和谐。
+这样我们就有一个完整的健康体系!这是人类健康的整体医学!第一次发现!
+(所以说生病就是生命体在提醒我们，深层次的是关注九宫格的和谐。)
+对!不只是身体这些物质出问题。
+(躯体物质是表相)
+对。真正出问题的是知情意，你的身体不健康是指向你的知情意不健康。
+如果我们把九大系统再细化，就是生理 27 宫格，就会非常实用了。
+(起驱动作用的是信望爱吧)
+对。信望爱是动力场。
+大家思考一下， 为何同样的表达悲伤， 而不同的民族或者地方的人的身体
+的表现形式会不一样呢？
+即同样的知情意怎么会有不同的九大系统表现呢？这个由哪个因素控制呢？
+搞清楚这个﻿﻿﻿﻿ 心理学九宫格就完善了﻿﻿﻿ ！</div></details>
+<div class="tv-pager"><a href="/three-views/doc/b007/">← 上一篇</a><a href="/three-views/doc/b009/">下一篇 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+var PDF_URL="/three-views/doc/b008/b008.pdf", DOC_TITLE="三视角与九宫格速览";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.3,curText="";
+var canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'),textLayer=document.getElementById('textLayer');
+var $=function(i){return document.getElementById(i);};
+function drawTextLayer(tc,vp){
+  textLayer.innerHTML='';var frag=document.createDocumentFragment(),fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str)return;
+    var m=pdfjsLib.Util.transform(vp.transform,it.transform),fs=Math.hypot(m[2],m[3]);
+    if(!fs)return;
+    var ang=Math.atan2(m[1],m[0]),sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01)css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;frag.appendChild(sp);fix.push([sp,it.width*vp.scale,ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0],target=w[1],ang=w[2];if(!target)return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){var sx=target/real;if(sx>0.1&&sx<10){
+      sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')';}}
+  });
+}
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-24;
+    var vp1=page.getViewport({scale:1}),s=baseScale;
+    if(vp1.width*s>avail&&avail>120)s=avail/vp1.width;
+    var vp=page.getViewport({scale:s}),ratio=Math.min(window.devicePixelRatio||1,2.5);
+    canvas.width=Math.floor(vp.width*ratio);canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px';canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px';pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      curText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc,vp);rendering=false;
+      if(pending!==null){var p=pending;pending=null;render(p);}
+    });
+    $('pageInput').value=num;$('prev').disabled=(num<=1);$('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+// 载入失败后 pdfDoc 仍是 null：缩放键不走 go() 的守卫，这里必须自己挡住，
+// 否则一按 ＋/− 就抛 TypeError，把错误提示旁边的按钮全变成哑弹。
+function queue(n){if(!pdfDoc)return;if(rendering)pending=n;else render(n);}
+function go(n){if(!pdfDoc)return;pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);}
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;$('totalPages').textContent=pdf.numPages;$('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';$('page-wrap').style.display='inline-block';render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';$('error').style.display='block';
+  $('error').innerHTML='这一篇暂时无法在线分页显示。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开或下载 PDF</a>，'
+    +'或展开下方「纯文字版」阅读。<br><span style="font-size:12px">（'+err.message+'）</span>';
+});
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);
+  window._rz=setTimeout(function(){queue(pageNum);},220);});
+window.WDS_READ={title:DOC_TITLE,
+  bodyEl:function(){return document.getElementById('page-wrap');},
+  docTextFn:function(){return curText?('【'+DOC_TITLE+' · 第 '+pageNum+' 页 / 共 '
+    +(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+curText):'';}};
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>

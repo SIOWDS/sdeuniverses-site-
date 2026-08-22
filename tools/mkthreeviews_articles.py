@@ -257,6 +257,7 @@ def build_reader(k, arts):
         '<body>',
         topbar(['<a href="/three-views/">全部二十一篇</a>',
                 '<a href="/three-views/articles/">文章总目</a>',
+                '<a href="/three-views/library/">文库九频道</a>',
                 '<a href="/three-views/%s/#g%03d">%s · 第 %03d 图</a>'
                 % (slug, a['img'], esc(zh), a['img'])]
                + ['<a href="/three-views/%s/#g%03d">%s · 第 %03d 图</a>'
@@ -302,7 +303,8 @@ def build_index():
     body = [page_head(title, desc, 'https://sdeuniverses.com/three-views/articles/'),
             '<body>',
             topbar(['<a href="/three-views/">全部二十一篇</a>',
-                    '<a class="cur">文章总目</a>']),
+                    '<a class="cur">文章总目</a>',
+                    '<a href="/three-views/library/">文库九频道</a>']),
             '<main class="tv-wrap">', '<header class="tv-hd">',
             '<div class="tv-eyebrow">Articles</div>',
             '<h1>扫码原文 · %d 篇</h1>' % n,

@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三视角论如何学习数字（之一） · 三视角学科学习法</title>
+<meta name="description" content="三视角论如何学习数字（之一）——王德生三视角文章，收在「学科学习法」子频道，共 7 页。三视角论如何学习数字比如‘7’(1) =就是如何学会数数呢？ 作者：王德生 我们一直在用三视角方法来分析和认识事物。三视角方法是一个认识方法论或认识工具，它的内 涵是： 认识任何一个事情或物体，无论可见还是不可见，只要是">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/doc/b142/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三视角论如何学习数字（之一） · 三视角学科学习法">
+<meta property="og:description" content="三视角论如何学习数字（之一）——王德生三视角文章，收在「学科学习法」子频道，共 7 页。三视角论如何学习数字比如‘7’(1) =就是如何学会数数呢？ 作者：王德生 我们一直在用三视角方法来分析和认识事物。三视角方法是一个认识方法论或认识工具，它的内 涵是： 认识任何一个事情或物体，无论可见还是不可见，只要是">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/doc/b142/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur" href="/three-views/library/learning/">学科学习法</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">三视角文库 · 学科学习法</div>
+<h1>三视角论如何学习数字（之一）</h1>
+<p class="tv-sub">共 7 页 · 约 7,415 字　|　王德生　|　子频道：<a href="/three-views/library/learning/">学科学习法</a></p>
+</header>
+<div class="bar">
+<button class="btn" id="prev" disabled>‹ 上一页</button>
+<div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span>/ <span id="totalPages">…</span></span></div>
+<button class="btn" id="next" disabled>下一页 ›</button>
+<button class="btn" id="zoomOut">−</button>
+<button class="btn" id="zoomIn">＋</button>
+<a class="btn dl" href="/three-views/doc/b142/b142.pdf" download="三视角论如何学习数字（之一）.pdf">⬇ 下载 PDF</a>
+<a class="btn" href="/three-views/library/learning/">回「学科学习法」</a>
+</div>
+<div class="stage" id="stage">
+<div id="loading" class="loading"><div class="spinner"></div>正在载入本篇…</div>
+<div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
+<div id="error" class="err" style="display:none"></div>
+</div>
+<p class="hint">← → 方向键翻页 · 选中正文任意一句可问 WDS</p>
+<details class="plain"><summary>纯文字版（全文 7,415 字，便于手机阅读、复制与站内检索）</summary><div class="body">三视角论如何学习数字比如‘7’(1)
+=就是如何学会数数呢？
+作者：王德生
+我们一直在用三视角方法来分析和认识事物。三视角方法是一个认识方法论或认识工具，它的内
+涵是：
+认识任何一个事情或物体，无论可见还是不可见，只要是我们能叙说或定义的一个‘存在’
+体，不管是三维物体还是一个抽象数学理论或对象，数学过程和数学概念，我们都需要使用对比/
+本质视角，变化的视角，和分布/处境的视角来认识它。而且如果我们缺少任何一个视角的认识，
+我们的整个认识或理解就是空的；或者说，我们只是将一些符号记录在大脑储存区域内，并没有
+进入我们的知识结构体系里。任何信息必须经过学习者的解释才能成为知识, 而解释就是用已有的
+知识结构里的特定的图式来与新的信息建立结构关联.
+进一步解释是：当我们从对比/本质的视角研究和学习或认识一个事物时，我们必须以变化
+和分布的视角为条件；当我们使用变化视角时，我们必须使用本质和分布视角；照样，分布的视
+角的认识也必须以本质和变化的视角为预设。总而言之，认识任何事物，必须使用三个视角，三
+个视角彼此互相需要，没有重要和次要之分，地位平等，而且三个视角必须同时出现在任何一个
+认知活动里，但是有所侧重。
+那么，对一个事物的完整的认识和在它在人的知识结构体系里存在的知识图式就是一个三视
+角的知识结构体，这个结构体是整体协调，各个视角互不矛盾，互相依靠，互相补充。自然地，
+学习的本质就是如何形成这样的三视角知识结构体并不断地丰富这个结构体。
+前面我们细说了如何使用三视角来分析个位数的‘乘法’的教学和学习。今天我们来讨论如
+何学习数字比如‘7’。数字‘7’是一个符号，但是这个符号到底代表什么意思呢？这是我们今
+天要详细讨论的。学习一个数字，其实就是我们教育小孩‘数数’的过程。这么简单的事情，还
+值得讨论吗？其实，如果要真正地明白一个‘数字’所代表的含义，我们还必须走向信仰，要用
+三位一体的知识论才能明白，当然今天我们只是分析如何学习。
+毕达哥拿斯认为数字是很‘美’的，你能体验到‘7’的美吗？数学家Sfard 说一个数字既是一
+个过程也是一个独立的对象。到底如何认识‘7’呢？我们从对比/本质视角开始。
+1．对比本质视角告诉我们‘7’的本质是什么？就是‘7’成为他自身的‘身份证’。
+数学上说‘7’代表着一些‘相同’的存在体的集合，可以是看见的和看不见的；可以是
+物质的，也可以是观念性的。比如7 个西红柿，7 个中国人，7 个中文字，7 个圆的特性，
+7 个数学定义，等等。
+这里的相等是角度性的，或说从某个性质来看他们相同；不是说两个东西完全相等，因为
+任何两个事物都具有不同性的。即使是两个电子，或两个光子，事实上他们都不是完全相
+同的。所以当我们说7 个西红柿时，我们是从‘西红柿的固有属性，就是西红柿的本质视
+角’来说他们是相同的。
+人们研究这些包含有‘相同的事物‘的集合，比如集合A 里X 个苹果，B 里有X 个梨。人
+们发现这些集合有一个共性，就是这些集合之间可以建立‘彼此一一对应’的关系。
+然后我们把这种‘对应关系‘或‘共性’，定义为’同一个数目‘，比如这个数叫’7‘。
+或者说，在很多的‘这样的集合’里，有些‘集合’有共性，就是能‘一一对应’；而且
+每一个‘集合都可以找到和它’一一对应‘的其他的’集合‘。这样，这些‘彼此对应的
+集合’就有一个共性。把这个‘共性’定义为一个概念，就叫做一个数字，比如‘7’。
+这里我们使用十进制。它描述的就是集合的元素的多少。
+如果，我们使用二进制(0,1 两个符号)，那么这个‘共性’就是‘7’，就会被记写成
+‘111’；如果我们使用三进制（0，1，2 三个符号），它就是‘21’；如果我们使用
+‘A,B,C,D,E’ 来代表五进制，那么这个‘共性’就可以定义为‘BC’. 所以‘7’这个符号不
+是本质的，本质是这些‘集合’们，他们有一个共性，这个共性就是集合里的元素之间可
+以彼此一一对应。比如，袋子A 里有‘一些’苹果，袋子B 里有‘一些’书。如果我们能
+把书和苹果一一对应起来，那么我们说两个袋子里具有相同多的物体。这两个‘一些‘他
+们具有共性，就是’可以一一对应‘。这个就是我们衡量两个集合里的元素的个数是否相
+同的定义。对于无穷大，比如自然数的个数和有理数的个数是否一样多呢？我们也是用这
+个‘一一对应’来研究的。这就是’7‘的对比/本质视角。这个共性，就是‘集合’的元
+素的‘一一对应性’。我们应该引导孩子自己去探索发现这个‘一一对应性’。这个&#x27;一
+一对应’ 告诉孩子什么叫做’数目相等’ 和’不相等’.
+要认识本质视角，我们还要采用对比的方法。就是我们要比较‘7‘和’6‘，’7‘和’5
+‘，’7‘和’1‘等等。要让孩子去发现：我们不能把‘7’个苹果和‘5’个梨去‘一
+一对应’。只有在对比中，孩子才能真正明白‘7‘的内在含义和’7‘与其他数字的不同
+是什么意思。当然这个认识过程是漫长的，很多孩子要好几年的时间。很多人可能一生都
+不明白上面的意思。这个‘一一对应’过程也就是孩子数数的过程。但是大部分孩子学习
+数数的过程都是有问题的。
+2．变化的视角说的是，这样的‘7’个‘具有相同性质’的元素的集合体有很多，就是‘7’
+的本质的具体表现有很多，且有不同性。基本上，在大自然和历史中，我们能叙说和定义
+的任何事物都可以用‘7’来描述。但是，我们不能说‘7’个‘东西’，因为我们无法来
+定义‘东西’。同样，对于人本哲学上的‘存在’，我们也无法定义。我们不可能定义一
+个普遍概念，它能包括任何事物；我们也不能定义一个无所不包的范畴。
+变化的视角指‘7’的本质概念的具体应用。孩子们需要不断地去发现事物之间的共性，
+才能更好地明白数字的含义。发现共性和差异性几乎等同于认知世界的全部任务。所以中
+文的‘智力’是指知道和看见的能力，什么叫做‘看见’一个事物呢，就是将它从其他事
+物中分别出来，但是也要发现它和其他事物的共性。中文是从认知的结果视角来说的。那
+么英文呢？‘Intellect=choose between’，就是在两者中进行选择，就是区分，其中包括发
+现起共性和差异性。所有科学，包括人文和自然科学都是干一个‘区分‘的事情。
+显然，英文是从过程的角度来定义的。
+3． 分布和处境的视角言说‘7‘和其他数字和其他数学对象的关系，或者说‘7’代表的这些
+‘集合’，和不能与‘7‘的’集合‘进行’一一对应‘的’集合‘的关系。比如，’7
+‘比’6‘多一个，就是7=6+1；从’对应关系‘来说，就是一一对应之后，‘7’的‘集
+合’里面会比‘6’的集合多一个。分布的视角说的是‘7’和其他数字的普遍联系，或者
+说‘7‘的重要性的体现。’7‘本身是无价值的，如果他不和其他数字发生关系。所以，
+我们有7 和8 的关系：大小关系，加法关系，乘法关系，很多很多。
+分布的视角其实是把‘7‘已经看成一个独立的个体，把他的’过程性‘，就是‘一一对
+应性’封装起来了。然后，研究这个个体和其他个体的关系，就是普遍联系性。这个‘封
+装’的过程是需要很长时间的。比如很多孩子，你要他做7+3，他会这样在心里数：1，2，
+3，4，5，6，7，然后是8，9，10。结果是10。你会发现，他此时把‘7’还是理解成前
+面的对比本质视角里的‘一一对应’，就是‘从1 数到7’的过程。他还没有将这个‘过
+程’对象化。如何从‘过程’尽快过渡到‘对象‘阶段呢。这是一个很有意思的难题。从
+三视角理论来说，就是要在‘分布’的视角上进行多次训练和反思。
+完成了以上的三个视角的分析了，明天我们可以简单地介绍如何学习数字比如‘7’了。
+学习数字比如‘7’就是通常说的如何学习‘数数’。很多家长一定认为孩子只要会从0，
+1，。。。。一直数到10 就是会了10 以内的数数了。从我们以上的分析来看，这是一个
+错误的认识。因为很多孩子基本上不明白数字的意义，在他的大脑里，是一连串的符号，
+彼此相连，2 这个符号在3 之前，8 在7 之后。
+最基本的数数学习要求有下列几点认识：
+1．当你问到孩子7 是什么意思的时候，孩子要能告诉你，就是表示7 个苹果，7 本书，7
+天，等等。当他看到7 个相同的东西的时候，他要能告诉你，那儿有7 个什么。还有，
+他要明白当袋子里有3 个梨和4 个桃的时候，他应该知道那儿不是7 个梨也不是7 个
+桃。当然你不能要求他说7 个水果，因为他可能还不明白水果和梨的关系。
+还有要有应用能力：孩子要能使用数字，比如你要孩子拿7 个椅子过来。要他拿7 张
+纸和7 瓶水。
+2．孩子要能明白7 比6 多一个，就是数与数之间的关系要清楚。当然他们不必明白7 和
+4 的多少关系，但要知道7 比4 大。反过来也是，6 比7 少一个。孩子要明白，每一个
+数字的前面是谁，后面是谁。最好能明白前后的至少两个数是谁？
+其实上面的最基本的要求就是三视角的知识图式的应用的最基本部分。
+大家一定要切记：仅仅告诉孩子7 表示7 个苹果，或说7 个相同的东西，孩子是不能明白
+的。他只是记住你的话，应用的时候，就是重复你的话而已。
+下面我们具体讲解如何学习数数：
+1． 从变化视角到本质视角的数学活动设计
+这个过程是漫长的，往往要几年的时间，一般来说，我们可以在两岁半左右开始和孩子数
+数。学数字的知识预备是孩子会初步进行事物的分类，发现他们的相同和不同性。这个可
+以从一生下来就进行。活动可以变化多端。
+分类本身就是一个知识图式，这个知识图式的建造和完善是一生的。人的天性里有发现相
+同和不同的能力。我们要从小和孩子去进行事物的分辨和分类。当然是使用简单明了的教
+具。
+其次，孩子需要建立‘序列化’的知识图式，就是将相同的事物一个一个地按次序放在一
+个地方，就是整整齐齐排队。这个是每一个孩子都愿意做的。
+分类和排队是孩子从小就可以做的事情，也是很美的事情。分类和排队合起来就是一个三
+视角系统。排队是从普遍联系视角，就是分布的视角，分类就包含两个视角：本质和变化。
+第一步要设计‘一一对应的关系’的活动，反思和抽象总结。
+首先是设计对很多物体进行分类和排列。就是分类和排列的操作活动。我们以学习1，2，
+3 开始吧。因为研究表明，人类对1，2，3 是容易区分的，注意不是对1，2，3 这三个符
+号。而是下面我们要进行的数学游戏活动里的‘一些’的‘一一对应关系’的区分。
+a. 在分类和排列的活动中进行‘一一对应关系’的活动。
+老师可以根据孩子们的喜好，选好他们自己爱好的东西，进行个别独立或分组一起的
+分类和排列活动。比如：给孩子们1 个梨，2 个苹果，3 本书，2 个铅笔，3 个杯子，
+1 个桃子，混合在一起。然后要孩子将这些物体进行分类，就是相同的类型的排列在一
+起，每一组可以使用从左到右的排列方式。这样孩子就把相同的东西排列在一起，就
+有六组的东西。
+此时，老师可以和孩子做一个‘一一对应’的游戏。游戏老师和孩子随机各取一组，
+可以彼此蒙着眼睛选。比如孩子选了1 个桃子组，老师选了2 个苹果组，下面该玩一
+个什么样的游戏呢？ 注意一定要在孩子的已有的知识结构里进行，否则他不会明白的。
+明白外界事物，就是用自己的知识结构去解释外在的事物。孩子没有多少的概念，但
+是有‘有’和‘无’的概念，有‘序列’的概念。我们的目的是要建立一个‘一一对
+应’的概念。就是在具体的游戏中要让孩子体验出‘一一对应’的意思出来，从而明
+白桃子组和苹果组不能一一对应。很多家长一般会马上告诉孩子，苹果多些，桃子少
+些。你会发现孩子根本不懂你的‘多和少’。我们该设计什么样的游戏才能达到上面
+的目的呢？
+孩子虽然不是非常明白数字1 的概念，但是因为经常听我们说‘拿一个什么来吧，吃
+一个什么吧，等等‘，从一生下来就听到这样的’一‘很多。慢慢地，在他们的知识
+库里已经有一个模糊的’一‘的概念。 所以我们可以利用这个知识基础。记得我儿子
+小的时候，我就看到一个树，就和他说，一棵树，一片叶子，一个石头，等等。很多
+家长等不及，往往一起来，一棵树，两棵树，三棵树，。。。。。心太急了！
+游戏可以这样设计：孩子（Jimmy）选了桃子组，妈妈选了苹果组，爸爸没有。
+妈妈说：Jimmy, 你看爸爸没有水果，我们每人给爸爸一个好吗？
+孩子说：好啊！帮助爸爸。
+妈妈给爸爸一个苹果，孩子给爸爸一个桃子。
+妈妈说：Jimmy, 你还有吗？
+Jimmy: 妈妈我没有了。
+妈妈说： 我还有一个啊。你和我一样多吗？谁多些呢？
+这样的活动要进行很多次，第二次可能是孩子3 本书，妈妈2 个铅笔。这样，一个一
+个地给爸爸，玩后，孩子手里还有，妈妈手里没有了，妈妈要引导孩子思考，谁多些
+呢？这样，孩子通过‘一一对应’活动，开始发现，当玩书和杯子的一一对应的游戏
+时，两个人同时都没有了，慢慢地，他会发现有些组和有些组是可以一一对应的，就
+是游戏完后，自己和妈妈同时都没有了。此时，父母要引导孩子，告诉孩子，如果我
+们能建立‘一一对应‘， 那么就是一样的多。当然我们不能期望孩子很快就会明白的。
+第二个游戏就可以要孩子进行组于组之间的配对，比如告诉他，将一个苹果和一个本
+书放在一起，最后会发现书会多一本。慢慢地，孩子明白何谓‘一一对应‘。
+第三个游戏就是，将数量增加到10 以内。要孩子去体会‘一一对应‘。但是不要告诉
+孩子这是1，这是2，这是5。明白一一对应就是你一个，我一个，一个一个来，看看
+最后谁还有，谁没有呢？
+最后，可以将活动扩展到图形的配对。慢慢地孩子会明白，通过‘一一对应‘，可以
+判断谁比谁多些。因为’多少‘的本质意义就是’一一配对‘之后，谁还剩，就是谁
+多些；谁没有了，就是谁少些。同时没有了，就是一样的多。这样，孩子可以通过一
+一配对来分辨多，少，相同的关系了。
+下一步就是，给孩子一些各种物体的组合体，要孩子去分类和排列好，并且通过‘一
+一对应’去判断哪些多些，哪些少些，并且可以将少的放在前面，多的放在后面。相
+同的并列在一起。然后引导孩子去思考，就是如何将这个不同的‘一一对应‘，就是
+不同的’相等‘定义为一个数。此时，孩子已经知道了，如何判断那些多，那些少。
+但是，就是不知道如何描述这些不同的’相等关系‘。就是对每个’相同‘可以来一
+个标记，来区别不同的’相同‘，或区别不同的‘一一对应’关系。
+此时，妈妈可以要孩子做一件事，就是妈妈数好9 个苹果，然后要孩子去拿和苹果一
+样多的桃来。那么，孩子就会拿着苹果，用桃来一一对应完成任务。然后慢慢地，妈
+妈可一制作一些苹果的制片代表苹果，把不同数目的苹果纸片订在一起成为一个苹果
+书一样。先让孩子比较苹果书的页数的多少和相同，然后要孩子按苹果书的页数去那
+一样多的桃，用一一对应的方法。
+这样，我们已经从实物对应实物过渡到了实物和图片。接下来就是制作1，2，3，4，
+5 ，5 个不同的苹果书，就是每个苹果书有不同的页数。要孩子判断5 个不同的苹果书
+的页数的多少，就是从小到多排好，让孩子明白，一个比一个多，而且都是多一个。
+此时，妈妈可以问，如果最少的我们用一个符号，就是‘1’，来表示他的数目，那么
+你觉得比他多一个的应该用什么符号呢？这样可以叫孩子自己设计符号表示‘2’，
+‘3‘，’4‘，和’5‘。比如他的可能是一个图画都可以。你必须叫孩子给取个名字。
+比如如果孩子把有4 页的苹果书叫做‘狗狗’。 那么，你接下来，可以叫孩子，拿
+‘狗狗’个桃。就是和‘狗狗’那本书的页数一样多的苹果。那么孩子就会拿着这个
+‘狗狗‘书去’一一对应‘数出桃来。你可以进行更多的数桃的活动。
+此时，我们的‘狗狗‘已经靠近我们的’4‘了，但是还有一段距离。此时是因为，我
+们的’狗狗‘还是孤立的，没有和其他的苹果书建立关系。所以，下面的数学活动都
+要围绕’苹果书‘之间的关系。比如，孩子如果把1，2，3，4，5 页的苹果书，叫
+做，’哈哈‘，’依依‘，’亮亮‘，’狗狗‘，’娃娃‘。那么，妈妈要引导孩子
+问：
+1．如果，妈妈要‘哈哈‘个逃，怎么数？还要拿那本书吗？孩子说，就是一个吧。
+2．‘依依‘比’哈哈‘多吗？多一个吗？孩子说：是的。多一个。那么，
+如果妈妈要‘依依‘个桃，那么要用’依依‘这本书吗？可不可以，先数一个，
+就是‘哈哈‘个，那么’依依‘个呢，是不是就是再拿一个呢？
+3．这样，一直到‘亮亮‘，’狗狗‘，’娃娃’个桃都可以从‘哈哈’开始。
+4．慢慢地，妈妈可以把这五个名称改为‘1，2，3，4，5’，中文就是‘一，二，三，
+四，五’，英文就是‘one, two, three, four, five’.
+5．然后，妈妈必须和孩子一些慢慢地熟悉这些新的名称。并且要和孩子明白，2 本书，
+就是在1 本书上再加一本，3，就是2 多一本，一直到9。此时，孩子已经完成了
+整个9 个数字的自我概念建构。而且，也明白数字之间的关系。最后，妈妈可以
+告诉孩子，0 就是没有的意思，因为是空的。
+6．此时，孩子应该已经明白9 个数字都是表示不同的数目的相同性质的物体的集合，
+而且孩子也明白他们都是从1 开始，一个比一个多一个地递加上来的。这个其实
+就是孩子的排列活动的一个数学递加表叙。孩子已经明白数字之间的彼此关系。
+就是9 比8 多一个，8 比9 少一个，6 和7，3 和4 等等都是这样的关系。
+2．变化的视角就是运用这些数学符号去进行应用。
+比如：具体数数有多少个苹果，多少本书，就是通常的教科书上的一些题目。
+变化的视角就是训练孩子应用自己建立的数学概念，比如9，其实是一个一一对应关系。
+那么现在的应用就是一个与心里的一个递加的过程的对应，因为孩子要从1 开始数，一直
+到9。此时，孩子对9 的认识还是一个‘数算或对应‘的过程。我们需要第三个视角，就
+是要明白这九个数字之间的关系。
+3． 分布和处境的视角。
+在变化的视角里，孩子们自己建立了数的概念，其中也有数与数的一些简单关系。比如9
+比8 多1 个等等。此时我们要进行数与数之间的一些关系活动，使得孩子尽快将这个‘过
+程‘对象化，就是独立整体化。比如：如果现在我有8 个苹果，那么再加一个，就是9 个；
+2 比1 多一个，3 比2 多一个，那么3 比1 多几个？这样，将数字和数字之间的关系从相
+差一个扩充到相差两个，甚至三个，等等。就是孩子要明白往上面数一个，两个，三个。
+但不要更多。同时也要可以往下面数一个，两个，三个。不仅要能从1 数到9，也要能从
+9 数到1。
+完成了以上的三个视角的知识图式的建立后，孩子们可以开始学习加法和减法了。当然，
+我们建议和孩子将数字扩充到20 以内。因为，孩子可以自己思考如何，用数字表示‘比九多一个
+‘呢？ 就是使用1 和0 两个数，叫做’10‘来表示比’9‘多一个。然后就是11，12，
+13，。。。19，20，21，。。。。。100。很自然的一个过程。明天我们学习如何进行加法和减
+法的三视角分析和学习。</div></details>
+<div class="tv-pager"><a href="/three-views/doc/b141/">← 上一篇</a><a href="/three-views/doc/b143/">下一篇 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+var PDF_URL="/three-views/doc/b142/b142.pdf", DOC_TITLE="三视角论如何学习数字（之一）";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.3,curText="";
+var canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'),textLayer=document.getElementById('textLayer');
+var $=function(i){return document.getElementById(i);};
+function drawTextLayer(tc,vp){
+  textLayer.innerHTML='';var frag=document.createDocumentFragment(),fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str)return;
+    var m=pdfjsLib.Util.transform(vp.transform,it.transform),fs=Math.hypot(m[2],m[3]);
+    if(!fs)return;
+    var ang=Math.atan2(m[1],m[0]),sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01)css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;frag.appendChild(sp);fix.push([sp,it.width*vp.scale,ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0],target=w[1],ang=w[2];if(!target)return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){var sx=target/real;if(sx>0.1&&sx<10){
+      sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')';}}
+  });
+}
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-24;
+    var vp1=page.getViewport({scale:1}),s=baseScale;
+    if(vp1.width*s>avail&&avail>120)s=avail/vp1.width;
+    var vp=page.getViewport({scale:s}),ratio=Math.min(window.devicePixelRatio||1,2.5);
+    canvas.width=Math.floor(vp.width*ratio);canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px';canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px';pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      curText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc,vp);rendering=false;
+      if(pending!==null){var p=pending;pending=null;render(p);}
+    });
+    $('pageInput').value=num;$('prev').disabled=(num<=1);$('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+// 载入失败后 pdfDoc 仍是 null：缩放键不走 go() 的守卫，这里必须自己挡住，
+// 否则一按 ＋/− 就抛 TypeError，把错误提示旁边的按钮全变成哑弹。
+function queue(n){if(!pdfDoc)return;if(rendering)pending=n;else render(n);}
+function go(n){if(!pdfDoc)return;pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);}
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;$('totalPages').textContent=pdf.numPages;$('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';$('page-wrap').style.display='inline-block';render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';$('error').style.display='block';
+  $('error').innerHTML='这一篇暂时无法在线分页显示。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开或下载 PDF</a>，'
+    +'或展开下方「纯文字版」阅读。<br><span style="font-size:12px">（'+err.message+'）</span>';
+});
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);
+  window._rz=setTimeout(function(){queue(pageNum);},220);});
+window.WDS_READ={title:DOC_TITLE,
+  bodyEl:function(){return document.getElementById('page-wrap');},
+  docTextFn:function(){return curText?('【'+DOC_TITLE+' · 第 '+pageNum+' 页 / 共 '
+    +(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+curText):'';}};
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>

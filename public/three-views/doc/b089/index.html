@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三视角教育创新入门 · 三视角教育智慧</title>
+<meta name="description" content="三视角教育创新入门——王德生三视角文章，收在「教育智慧」子频道，共 6 页。三视角教育创新入门 作者：小波老师 （文中的图依次出现在文末） 一、 今晚我们的主题跟创新教育有关，我们要思考许多跟教育有关的题材。当前社会上对教育的 批评很多，指责很多，但正如王博士所言，要揭露总是简单，建设才是难！">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/doc/b089/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三视角教育创新入门 · 三视角教育智慧">
+<meta property="og:description" content="三视角教育创新入门——王德生三视角文章，收在「教育智慧」子频道，共 6 页。三视角教育创新入门 作者：小波老师 （文中的图依次出现在文末） 一、 今晚我们的主题跟创新教育有关，我们要思考许多跟教育有关的题材。当前社会上对教育的 批评很多，指责很多，但正如王博士所言，要揭露总是简单，建设才是难！">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/doc/b089/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur" href="/three-views/library/education/">教育智慧</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">三视角文库 · 教育智慧</div>
+<h1>三视角教育创新入门</h1>
+<p class="tv-sub">共 6 页 · 约 4,548 字　|　王德生　|　子频道：<a href="/three-views/library/education/">教育智慧</a></p>
+</header>
+<div class="bar">
+<button class="btn" id="prev" disabled>‹ 上一页</button>
+<div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span>/ <span id="totalPages">…</span></span></div>
+<button class="btn" id="next" disabled>下一页 ›</button>
+<button class="btn" id="zoomOut">−</button>
+<button class="btn" id="zoomIn">＋</button>
+<a class="btn dl" href="/three-views/doc/b089/b089.pdf" download="三视角教育创新入门.pdf">⬇ 下载 PDF</a>
+<a class="btn" href="/three-views/library/education/">回「教育智慧」</a>
+</div>
+<div class="stage" id="stage">
+<div id="loading" class="loading"><div class="spinner"></div>正在载入本篇…</div>
+<div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
+<div id="error" class="err" style="display:none"></div>
+</div>
+<p class="hint">← → 方向键翻页 · 选中正文任意一句可问 WDS</p>
+<details class="plain"><summary>纯文字版（全文 4,548 字，便于手机阅读、复制与站内检索）</summary><div class="body">三视角教育创新入门
+作者：小波老师
+（文中的图依次出现在文末）
+一、
+今晚我们的主题跟创新教育有关，我们要思考许多跟教育有关的题材。当前社会上对教育的
+批评很多，指责很多，但正如王博士所言，要揭露总是简单，建设才是难！
+什么是教育？对这个问题的回答多种多样，大家都有自己的见解。但无论是何种答案，教育
+都离不开“人”，因此研究教育，核心就是要研究“人”，而三视角智慧提供了对“人”的研究非
+常系统的方案！所以今晚我们就从研究人开始。
+（人是什么呢？似乎是千年难题！）
+王博士的大发明“21 世纪教育”图大家看了吗？21 世纪教育本质就是全人教育。
+因此，我们需要很深入地来研究“全人教育”所包含的内容，当我们明晰教育的本质，我们的
+教育创新才会有方向。绝不是提出一种新的做法就叫教育创新！这会闹出许多令人啼笑皆非
+的事情来。
+（从人的核心出发）
+人有真善美、有知情意、有信望爱，这九个元素相互影响、缠绕，形成了复杂的人。
+（清晰本质，才有方向）
+不管如何定义“教育”，教育就是一项培养人的社会活动。人有真善美，因此教育的目标就是
+培养“真善美”的人。
+（这应该是第一次完整地看人）
+从这个图，我们可以看到，真、善、美属于人的对比视角，或者说对比特征。人有许多特征，
+而唯有这三个特征将人与万物区分开来！
+（哲学说人是理性的动物，太窄了）
+中学上政治课，课本上介绍马克思学说，人是会制造和使用工具的动物，说这是人的本质特
+征。现在知道这个同样是太窄了！
+（还有一个定义:人是社会关系的总和，也是太窄了）
+是的。现在需要大家发言参与。大家说一些夸奖人的句子。
+（善良的人）
+（待人真诚）
+（今天您好帅呀！）
+（靠谱
+诚信）
+（聪明的人）
+（温柔友善的人）
+（有爱心的人）
+大家继续。可以是你在小说上读到过的，那些赞美的话。
+（沉鱼落雁，闭月羞花）
+（胆大心细 有智慧 ）
+（侠骨柔情）
+（精明能干）
+（风度翩翩，风流倜傥）
+（情感丰富的人）
+（有情怀）
+（玉树临风）
+（美丽善良）
+（聪明绝顶）
+（美若天仙）
+（英俊潇洒）
+（有格局）
+（有智慧的老师）
+沉鱼落雁、闭月羞花，风度翩翩，风流倜傥，玉树临风，美若天仙、英俊潇洒，这些是赞美
+一个人的什么特征？
+（美）
+（变化特征）
+是的，美的特征。
+（真善美是区分人与别的事物吗？比如宠物狗不真不善不美？）
+你需要再深入理解真善美的定义。
+聪明绝顶、有智慧，好厨艺等等，这些又是赞美人的什么特征呢？
+（内在的美）
+是善的特征。
+（如何看出善？）
+（这些词都是形容人的动态特征的，所以是善）
+（聪明绝顶、有智慧是善的特征，跟我们平时理解的善不一样？）
+大家可以课后继续思考。
+古往今来，那些美丽的辞藻，赞美人的话，通常都是在赞美一个人的真善美的特征，这其实
+也告诉我们真善美是人的本质特征。
+（我记得美学大师说，爱美之心人才有之！）
+（除了真善美就没有其他的本质的特征了吗？）
+（真就是静态特征，善就是动态特征，美就是关系特征）
+（应该是最概括和全面的）
+（应该没有缝隙）
+试想想，假如人的本质特征是“会制造和使用工具的动物”，那么他应该对这一类的赞美会感
+到满意：您的工具制造得真好呀！而假如有人对她说，您美若天仙，她应该会感到无动于衷
+才对！
+（这个例子很妙）
+同样的，一个人遭受攻击，通常也是他的真善美的特征受到攻击和非议，而当他要进行辩驳
+的时候，也是从真善美的角度来为自己辩护的。
+（假，丑，恶）
+真、善、美就是人的对比特征，是人的本质，因此教育的目标就是要培养、塑造真、善、美
+的人。
+二、
+人的变化视角同样分为静态、动态和关系三方面，具体的体现就是知。
+（这是一个真正的教育全人目标!）
+人的变化视角同样分为静态、动态和关系三方面，具体的体现就是知、意、情，知是知识、
+意是意志行动、情是情感。
+（明白了，所以人认识事物不只是依靠知，即理性思考!）
+是的。人认识事物需要全面的通过知、情、意。
+（平时在认识事物时忽视情感和意志，强调理智的重要性。）
+（难怪梁启超说有三大教育，知育，情育，意育。但是我发现梁没有说三大教育之间的关系。）
+知，有善的知、有非善的知。比如，一个人懂得如何设计算法，实现计算机脸部识别，那这
+是善的知；而另一个人懂得如何运用恶毒的词汇咒骂他人，这是非善的知。
+（对，要在恶知上做个愚蠢的人）
+人的真善美通过 知、情、意表现出来；人的假、丑、恶也通过他的知、情、意表现出来。
+当一个人的知、情、意反应出来人是假、丑、恶的时候，我们说人被扭曲了；当一个群体都
+是这样的时候，我们说社会有病了。
+因此，教育是培养真、善、美的人的社会活动，而我们通过具体的教学活动来达到这个目标。
+我们通常说的教育创新，就是在这个模块。
+（课堂教学创新太窄小，不能真正解决问题）
+而今天人们对教育的理解比较狭隘，基本上就是“知识教育”，或者说“知识传递”，而即便是
+在做“知识传递”，教师也常常是从知识到知识，而常常忽略了情感的因素。
+（上次我参加问对教育的 400 老师培训课程，论及教育创新，很少有人涉及人的定义）
+（所以不涉及人的教育是失败的）
+三、
+大家看这个图。
+学生没做作业，家长一起罚站。这是教育创新吗？
+（家长罚站，历史罕见！千古绝唱的教育创新。）
+（是对孩子和家长的羞辱）
+对，是羞辱。但这是情感因素，而这位教师认为情感在教学上是不起作用的，所以他这么做
+了。
+我们会说，这是一种不善的教育。而其背后就是教师对教育的狭隘理解：教育就是知识的传
+递，而完成作业是知识传递的重要环节！
+（这样的理念甚至连知识传递都算不上。）
+教育的第三个视角，就是教育产生的价值、意义、影响，就是人成为了具有健康的信、望、
+爱的人！
+这是三视角教育完整的架构。
+下面我带领大家一起品读一些教育家的教育名言。
+（教育不是注满一桶水，而是点燃一把火。——威廉·叶芝）
+这句话很有名，经常被人引用。大家知道他在说什么吗？他说的好在哪里？不足之处在哪
+里？要怎么解构？
+（不是灌输）
+（他的意思就是点火就行了）
+（火没有方向）
+（学生可以自由学习，可以自己控制自己。有点理想化。蒙特索利教育有点这个味道，即老
+师要尽量少干预。）
+（没有引导）
+（把孩子的学习热情激发出来）
+（自主学习）
+灌满一桶水，这是说的哪个视角？
+（知）
+教育的三个视角：教育的目标、教育的方式（手段、教学活动）、教育的影响。
+教育的目标：培养真善美的人；
+教学活动：通过知、情、意的活动全面培养学生；
+教育的价值：产生具有健康的信、望、爱的人
+（教育的方式）
+对！灌满一桶水，是指错误的教学方式。而点燃一把火，指的又是什么呢？
+（教育的价值）
+（哦，他把两个视角混为一谈了）
+点燃一把火，是指要培养学生强烈的信望爱！
+（这好像是大家经常犯的教育错误）
+是的，他把两个视角的内容混为一谈了。就算教育是如他所言，是点燃一把火，难道就不需
+要通过具体的教学活动来达到点火的目标吗？
+所以，他一方面在批判一种错误的教学方式，同时在倡导一种良好的教育影响。这个表达是
+不对等的。
+（可以理解，今天才有三视角智慧，以前都是二元思维。他觉得分布视角决定了变化视角。
+我们今天很多人都有这些错误的&quot;决定&quot;论调。）
+再来。
+（教师必须具有健康的体魄，农人的身手，科学的头脑，艺术的兴味，改革社会的精神。
+——陶行知）
+这是中国的教育大家陶行知的话，这里说的是什么呢？
+健康的体魄，农人的身手，是指教师需要行动敏捷，他的意志行动是好的，执行力是强的。
+科学的头脑，指教师要知识丰富。艺术的的兴味，就是教师的情感要丰富。
+（知，情，意）
+（还要创新精神!）
+（真正的教育是把人当人的教育，明白了你为何要从什么是人的本质切入了。）
+改革社会的精神，就是教师对社会要具有强烈的信望爱！这不只是一份职业，而是要改革社
+会！
+（陶行知真是至今少有的教育大师!）
+为什么教师需要这些品质呢？因为学生也是通过知、情、意来学习的，教师的农人的身手、
+科学家的头脑、艺术家的兴味，会影响学生的知情意，从而塑造学生的真善美、信望爱。
+（离开了&quot;人&quot;,不是教育!）
+做真人，就是道出了教育的目标，要培养”真“的人！陶行知是大师！
+（今天有很多陶行知教育研究院）
+（先生之最大的快乐，是创造出值得自己崇拜的学生。——陶行知）
+这是说到了教育的影响、价值和意义，当教师创造出值得自己崇拜的学生，那自然就是改造
+社会了！
+（教学的艺术不在于传授本领，而在于激励唤醒和鼓舞。——第斯多惠）
+（这句也有问题，都是二元思维模式的害处）
+这里道出了激励唤醒和鼓舞的重要性，这是今天被教育界忽略的。激励唤醒和鼓舞，就是说
+信望爱的重要性；但不应该把这个和传授本领对立起来，因为这是两个视角的内容。
+再来。
+（读书无疑者，须教有疑;有疑者，却要无疑，到这里方是长进。——朱熹）
+大家知道朱圣人在说什么吗？
+（批判和创新精神）
+对。读书无疑者，说的是如果教师遇到没有怀疑和批判精神的学生，要教会他具有批判精神。
+（后面一句是信）
+太对了！读书有疑者，指的这个学生信心不足，教师需要帮助学生建立信望爱。
+（朱熹牛!）
+这说的同样是两个视角的内容。
+（我发现大智慧的话语都是多个视角的!）
+今天也有许多人对三视角有疑，所以王博士经常解惑，建立信心。
+最后来一个。
+（吾爱吾师，吾更爱真理。——亚里士多德）
+（亚氏的话有点问题）
+亚里士多德的这句话非常丰富，可以从很多个角度来解读。
+（对!多个视角理解&quot;爱&quot;。不过亚里士多德就是二元论的完善者）
+（爱师和爱真理，应该没有可比性吧？）
+（爱真理和爱人是不同视角吧）
+首先，这句话道出了求知的动力：是出于对真理的爱而求知！这与我大中华的”书中自有黄
+金屋、书中自有颜如玉“真是对比强烈！！！
+（国人是此岸世界的追随者！）
+我国历来求知、读圣贤书，大都是为了做人上人。有情怀高尚的，是为了造福百姓（读书的
+社会影响），我们却从未有为了真理而求知，为了满足对未知的渴望而求知。
+（一般来说老师是真理的代言者，是变化视角；当老师与真理冲突时，他选择真理本身，对
+比视角。）
+到了今天，初等教育是为了考大学，而大学就成了职业培训所。
+（国人是把善作为真）
+（古今大家都是求道求真！）
+（所以，大师之后再无大师。）
+（对“真&quot;的认识错了，不会为道为真理而求知。）
+（也有情感动力，对真理的强烈追求超过对老师的爱，为真理不顾一切。）
+（而我们今天是跪拜古人圣贤，不敢批判他们!怎能超越呢？如果我是在中国工作，估计也
+不会创新出三视角智慧体系!）
+可是亚里士多德这句话也有问题，他的前设是：他能完全正确解读”吾师“，也能完全正确解
+读”真理“，并且他能把”吾师“和”真理“之间的冲突都厘清，然后他在”吾师“和”真理“之间选
+择了”真理“。他真的能做到吗？
+（对!亚的哲学就是预设可以找到这些完全的真理）
+四、
+举了这好些例子，为要使大家重视人的九宫格，这是我们理解教育的利器！也是我们做教育
+创新的基础。为我们教育创新指明方向的。
+最后跟大家分享两张图：
+（伏尔加河上的纤夫）
+第一张有如今日教育之现状，学生对待求学的精神状态：不得不为之！
+（这张图，大家都很痛苦）
+（体弱多病，今天的孩子学习没有信望爱）
+对！
+我们希望是这样：
+（法国大革命）
+学生有美好的信望爱，不畏艰难险阻，勇往直前，改造社会。
+（这是幼儿园，第一幅是大学毕业）
+（第一幅是高考之前）
+（教育现状和教育创新方向）
+（我建议大家应用教育 27 宫格来解读古今中外的教育名言，学习李昕老师!）
+三视角教育学员分享
+10.16 10:17 发表于三视角
+赞赏 1 元
+你可能错过的话题
+皮尔斯的三范畴和三视角符号学
+点击查看</div></details>
+<div class="tv-pager"><a href="/three-views/doc/b088/">← 上一篇</a><a href="/three-views/doc/b090/">下一篇 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+var PDF_URL="/three-views/doc/b089/b089.pdf", DOC_TITLE="三视角教育创新入门";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.3,curText="";
+var canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'),textLayer=document.getElementById('textLayer');
+var $=function(i){return document.getElementById(i);};
+function drawTextLayer(tc,vp){
+  textLayer.innerHTML='';var frag=document.createDocumentFragment(),fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str)return;
+    var m=pdfjsLib.Util.transform(vp.transform,it.transform),fs=Math.hypot(m[2],m[3]);
+    if(!fs)return;
+    var ang=Math.atan2(m[1],m[0]),sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01)css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;frag.appendChild(sp);fix.push([sp,it.width*vp.scale,ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0],target=w[1],ang=w[2];if(!target)return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){var sx=target/real;if(sx>0.1&&sx<10){
+      sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')';}}
+  });
+}
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-24;
+    var vp1=page.getViewport({scale:1}),s=baseScale;
+    if(vp1.width*s>avail&&avail>120)s=avail/vp1.width;
+    var vp=page.getViewport({scale:s}),ratio=Math.min(window.devicePixelRatio||1,2.5);
+    canvas.width=Math.floor(vp.width*ratio);canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px';canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px';pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      curText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc,vp);rendering=false;
+      if(pending!==null){var p=pending;pending=null;render(p);}
+    });
+    $('pageInput').value=num;$('prev').disabled=(num<=1);$('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+// 载入失败后 pdfDoc 仍是 null：缩放键不走 go() 的守卫，这里必须自己挡住，
+// 否则一按 ＋/− 就抛 TypeError，把错误提示旁边的按钮全变成哑弹。
+function queue(n){if(!pdfDoc)return;if(rendering)pending=n;else render(n);}
+function go(n){if(!pdfDoc)return;pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);}
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;$('totalPages').textContent=pdf.numPages;$('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';$('page-wrap').style.display='inline-block';render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';$('error').style.display='block';
+  $('error').innerHTML='这一篇暂时无法在线分页显示。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开或下载 PDF</a>，'
+    +'或展开下方「纯文字版」阅读。<br><span style="font-size:12px">（'+err.message+'）</span>';
+});
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);
+  window._rz=setTimeout(function(){queue(pageNum);},220);});
+window.WDS_READ={title:DOC_TITLE,
+  bodyEl:function(){return document.getElementById('page-wrap');},
+  docTextFn:function(){return curText?('【'+DOC_TITLE+' · 第 '+pageNum+' 页 / 共 '
+    +(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+curText):'';}};
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>

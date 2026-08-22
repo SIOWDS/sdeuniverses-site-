@@ -27,7 +27,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, 'public')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from threeviews_data import SECTIONS, NAMES, APPENDIX, QR, XQR_REMOVED  # noqa: E402
-from threeviews_articles import ARTICLES, BY_IMG  # noqa: E402
+from threeviews_articles import ARTICLES, BY_IMG            # noqa: E402
+from threeviews_library import LIBRARY  # noqa: E402
 
 OUT = os.path.join(PUB, 'three-views')
 AC = '#2C7FA8'                      # 本栏强调色（取自图册封面那枚三色环的蓝）
@@ -249,6 +250,7 @@ def build_section_page(idx, secs):
             '<body>',
             topbar(['<a href="/three-views/">全部二十一篇</a>',
                     '<a href="/three-views/articles/">文章总目</a>',
+                    '<a href="/three-views/library/">文库九频道</a>',
                     '<a class="cur">%s</a>' % esc(zh)]),
             '<main class="tv-wrap">', '<header class="tv-hd">',
             '<div class="tv-eyebrow">三视角图册</div>',
@@ -298,7 +300,9 @@ def build_index(secs):
     body = [page_head(title, DESC, 'https://sdeuniverses.com/three-views/'),
             '<body>', topbar(['<a class="cur">全部二十一篇</a>',
                               '<a href="/three-views/articles/">文章总目 · %d 篇</a>'
-                              % len(ARTICLES)]),
+                              % len(ARTICLES),
+                              '<a href="/three-views/library/">文库 · %d 篇</a>'
+                              % len(LIBRARY)]),
             '<main class="tv-wrap">', '<header class="tv-hd">',
             '<div class="tv-eyebrow">Three Views Atlas</div>',
             '<h1>三视角图册</h1>',
@@ -328,6 +332,16 @@ def build_index(secs):
                 '尚有 %d 条（多为视频，原件未到）暂留公众号地址，'
                 '拿到就补进来。140 张主图中 130 张有码，另 10 张原册即无码。</div>'
                 % (n_art, len(BY_IMG), n_left))
+    body.append('<div class="tv-note" style="margin-top:1.2rem"><b>关于「文库」。</b>'
+                '图册给的是一张张图，文库给的是成篇的文章——王德生历年写下的三视角文章'
+                '<a href="/three-views/library/">%d 篇，分 %d 个子频道</a>：'
+                '基础理论、学科解构、教育智慧、学科学习法、商业与管理、个人成长智慧、'
+                '学员实践与案例、培训笔记，以及最后一格「从三视角到 SDE」。'
+                '每篇同样可<b>分页翻阅</b>、<b>下载 PDF</b>、附纯文字版。'
+                '原件里同一篇常重复三四次，已按正文比对并成一条；'
+                '其中 %d 篇与上面的扫码原文是同一篇，只列条目，指回原页。</div>'
+                % (len(LIBRARY), len({a['slug'] for a in LIBRARY}),
+                   sum(1 for a in LIBRARY if 'reuse' in a)))
     body += ['</main>', FOOT, FIT, '</body>', '</html>']
     return '\n'.join(body)
 

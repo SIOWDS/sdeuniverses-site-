@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从哥德尔到三视角智慧 · 三视角三视角基础理论</title>
+<meta name="description" content="从哥德尔到三视角智慧——王德生三视角文章，收在「三视角基础理论」子频道，共 9 页。从哥德尔到三视角智慧 作者:王德生 我们一边阅读&quot;慧小田哲思学&quot;的哥特尔不完备性定理简介, 一边加上三视角解释以便大家更加明白。 ================================== 1978">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/doc/b029/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从哥德尔到三视角智慧 · 三视角三视角基础理论">
+<meta property="og:description" content="从哥德尔到三视角智慧——王德生三视角文章，收在「三视角基础理论」子频道，共 9 页。从哥德尔到三视角智慧 作者:王德生 我们一边阅读&quot;慧小田哲思学&quot;的哥特尔不完备性定理简介, 一边加上三视角解释以便大家更加明白。 ================================== 1978">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/doc/b029/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur" href="/three-views/library/basics/">三视角基础理论</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">三视角文库 · 三视角基础理论</div>
+<h1>从哥德尔到三视角智慧</h1>
+<p class="tv-sub">共 9 页 · 约 4,811 字　|　王德生　|　子频道：<a href="/three-views/library/basics/">三视角基础理论</a></p>
+</header>
+<div class="bar">
+<button class="btn" id="prev" disabled>‹ 上一页</button>
+<div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span>/ <span id="totalPages">…</span></span></div>
+<button class="btn" id="next" disabled>下一页 ›</button>
+<button class="btn" id="zoomOut">−</button>
+<button class="btn" id="zoomIn">＋</button>
+<a class="btn dl" href="/three-views/doc/b029/b029.pdf" download="从哥德尔到三视角智慧.pdf">⬇ 下载 PDF</a>
+<a class="btn" href="/three-views/library/basics/">回「三视角基础理论」</a>
+</div>
+<div class="stage" id="stage">
+<div id="loading" class="loading"><div class="spinner"></div>正在载入本篇…</div>
+<div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
+<div id="error" class="err" style="display:none"></div>
+</div>
+<p class="hint">← → 方向键翻页 · 选中正文任意一句可问 WDS</p>
+<details class="plain"><summary>纯文字版（全文 4,811 字，便于手机阅读、复制与站内检索）</summary><div class="body">从哥德尔到三视角智慧 
+作者:王德生 
+我们一边阅读&quot;慧小田哲思学&quot;的哥特尔不完备性定理简介, 
+一边加上三视角解释以便大家更加明白。 
+================================== 
+1978 年 1 月 14 日，一颗伟大的心脏停止了跳动， 
+世界著名的哲学家，逻辑学家和数学家哥德尔病逝。 
+他对逻辑学和数学基础等领域的研究做出了突出的贡献， 
+我们仅从爱因斯坦的一句话就可以大致判断出哥德尔是属于重量级的人物， 
+爱因斯坦说：&quot;他晚年之所以坚持每天都去办公室，是因为在路上可以和哥德尔
+聊天。&quot; 
+哥德尔一生最重要的工作是证明了哥德尔不完备性定理， 要想了解不完备性定理
+的大致含义， 
+我们先从希尔伯特雄心勃勃的计划说起。 德国著名数学家希尔伯特出生于东普鲁
+士的哥尼斯堡， 
+与伟大的哲学家康德是同乡。 希尔伯特是一位名副其实的数学大师， 有人将他称
+为“数学界最后的一位全才”。 
+希尔伯特希望为整个数学寻求一个坚实的基础， 他的目标是将整个数学体系严格
+公理化（就像欧几里得的平面几何学一样）， 
+然后运用元数学 （证明数学的数学） 来证明整个数学体系是建立在牢不可破的坚
+实的基础之上的。 
+首先，他计划要将所有数学形式化，让每一个数学陈述都能用符号表达出来， 
+让每一个数学家都能用定义好的规则来处理这些已经变成符号的陈述。 
+这样就可以使数学家们在思考任何数学问题的时候能够彻底摆脱自然语言的模
+糊性， 
+取而代之的是毫无含糊之处的符号语言。 
+============================================== 
+(三视角智慧解读:就是希望把波的视角去掉， 
+希望只用粒子和场的视角来绝对正确认识世界). 
+================================%%=%========= 
+然后， 证明数学是完整的， 也就是说所有为真的陈述都能够被证明， 这被称之为
+数学的完备性； 
+再来证明数学是一致的， 也就是说不会推出自相矛盾的陈述， 这被称为数学的一
+致性。 
+完备性保证了我们能够证明所有的真理，只要是真的命题就可以被证明； 
+一致性确保我们在不违背逻辑的前提下获得的结果是有意义的， 
+不会出现某一个陈述，它既是真的又是假的。 
+最后， 期望可以找到一个算法， 用此算法可以机械化地判定数学陈述的对错， 这
+被称为数学的可判定性。 
+一致性保证了自相矛盾的情况不会出现。 
+** 「在保证数学一致性这个前提之下，如果又有了数学的完备性，也就是说任
+何一个数学命题都可以被证明或者被证伪」 **。 
+这其实就是说，对于任意一个数学猜想，不管它有多难，只要假以时日，通过一
+代又一代人的努力， 总是可以知道这个猜想对不对， 并且证明或证伪它。 换句话
+说，在数学中，通过逻辑，我们必定能够知道我们想要知道的东西，这只不过是
+个时间问题。 
+希尔伯特提出， 先计划在基础的数学系统中进行这样的形式化， 然后再将其推广
+到更广阔的数学系统中，最后实现整个计划。 
+于是， 整个计划便归结为在算术系统中进行这样的形式化， 并且在算术系统的内
+部证明它的完备性、一致性和可判定性。 
+算术系统可以说是非常基础的系统， 我们做算术， 对自然数做加法、 乘法和数学
+归纳法，就都用到了这个系统。 
+但我们平时只是凭直觉来理解这个系统， 而数学家追求的是用逻辑的方法来定义
+它， 因为只有这样做才会使他们觉得安心。 这似乎不是一个十分困难的任务， 因
+为算术系统并不是一个很复杂的系统。 
+在希尔伯特提出这个雄心勃勃的计划以后， 许多数学家都投入了对于这个问题的
+研究，其中就包括哥德尔。 
+在完成自己的博士论文以后，哥德尔就着手研究更为一般的数学系统。 
+=================================== 
+1931 年，他对算术系统的探索宣告胜利， 
+然而他的这个胜利也就意味着希尔伯特计划的失败。 
+=================================== 
+哥德尔的结论后来被称为哥德尔不完备性定理。哥德尔不完备性定理包含两个： 
+第一，他证明了，对于任意的数学系统，如果其中包含了算术系统的话，那么这
+个系统不可能同时满足完备性和一致性。 
+也就是说， 要是我们能在一个数学系统中做算术的话， 那么要么这个系统是自相
+矛盾的， 
+要么有那么一些结论，它们是真的，但是我们却无法证明。 
+第二，他证明了，对于任意的数学系统，如果其中包含了算术系统的话， 
+那么我们不能在这个系统的内部来证明它的一致性。 
+====================================== 
+哥德尔不完备性定理的证明过程十分复杂， 但是其核心思想是运用了逻辑学里的
+“自指”的概念， 
+说的通俗一点就是：「这个陈述它陈述了它自己」。 
+自指是逻辑学里面很多悖论的根源，比如理发师悖论——在一个小镇内， 
+只有一名理发师， 他在理发店门外公布了这样一个原则： 「只为不给自己理发的
+人理发」。 
+那么，他自己的头发谁来理呢？ 
+要是他自己理的话， 他就会自己理发了， 那么根据他的原则， 他不应该为自己理
+发； 
+要是他不给自己理发的话，根据他的原则， 
+他倒是应该给他自己理发了，逻辑似乎在这里失效了。 
+这和中国的&quot;矛和盾&quot;的问题一样! 
+====================%====%=========%%%=%=====
+======%%%%%%%%%%%%%% 
+(三视角解读:人类无法进行普遍性地任何情况下都适用的判定 !即对比视角不能
+离开分布视角!) 
+也即是，离开分布视角，进行&quot;任何情形&quot;的假定，必定带来自相矛盾!) 
+=====================================%%=======
+=======%%%%%%%%%%%%%% 
+这种逻辑上的混乱局面，背后就是罗素悖论： 
+定义一个集合，它包含所有不包含自身的集合，那它是否包含自身？ 
+====================%============ 
+罗素悖论的产生就是因为他的问题本身就违背了三视角智慧理论! 
+他预设了一个普遍适用的概念的存在! 
+=========================%======== 
+从上面的分析我们可以看到，一切问题在于“包含自身”这种自指的描述。 
+然而这种“自指”的性质，在哥德尔的手中，却变成了完成证明的重要工具。 
+===========================%========%==%=%%% 
+哥德尔构造了一个命题，这个命题说的正是它自身的不可证明性。 
+================%==%%=%%%%==================% 
+如果用类似说谎者悖论的语言来描述的话，就可以表达为： ** “不存在对这个
+命题的形式证明。” ** 
+如果它是真的， 那么它是不可证明的， 说明系统是不完备的， 因为存在一个真的
+而又不可证明的命题； 
+如果它是假的， 那么就存在一个对它的证明， 这样它应该是真的， 这又说明了系
+统是自相矛盾的、不一致的。 
+==============================================
+====================== 
+(根据三视角智慧 ,人类无法通过理性得到一个普遍适用于任何情形的知识结论 !
+这是理性的局限!) 
+==== === == == ==== === == == ==== === == == =%== =%
+=%%%%%%%%%%==================%% 
+这就是哥德尔第一不完备性定理：如果系统包含有自然数的话， 
+「完备性和一致性不可得兼， 这个系统要么自相矛盾， 要么存在着既不能证明也
+不能证伪的命题」。 
+然后，我们再来仅考虑一致性的问题： 
+假定系统是一致的， 也就是说不会自相矛盾的， 那么我们刚才提到的命题就是不
+可证明的。 
+如果我们能在系统内部证明系统的一致性的话， 我们就相当于在系统内部证明了
+那个命题，这与不可证明性是矛盾的。 
+也就是说，我们做了错误的假设：能在系统内部证明系统本身的一致性。 
+由此， 哥德尔证明了他的第二不完备性定理。 如果我们假定数学是不会自相矛盾
+的话， 
+我们就必须承认数学是不完备的，也就是说有那么一些数学命题是不可判定的： 
+我们既不能证明它们为真，也不能证明它们为假。 
+自从哥德尔不完备性定理被证明以来， 越来越多的数学问题被证明是不可判定的， 
+这些不可判定的问题也越来越初等。 
+乍看起来并非不可捉摸，但到头来却是不可判定的。 
+========================================= 
+这就给数学家们的心头上压了重重的一块大石头， 谁也不能肯定自己辛辛苦苦做
+了十几年甚至几十年的题目， 
+会不会突然有一天被证明是在现有的数学系统中是不可判定的。 
+========================================== 
+尽管这样，哥德尔不完备性定理仍然带给我们很多收益， 
+** 至少我们知道了，有些东西我们是不可能知道的。 ** 
+============================================== 
+(三视角智慧:人类认识任何一个事物都是有限的，不可透知的， 
+所以事物总是具有变化视角!) 
+==============================================
+== 
+哥德尔的不完备性定理，首先是针对“形式系统”的。 
+只有在存在“形式系统”的条件下， 
+才会产生“形式与内容”之间的不相容性的问题。 
+============================================
+=%%%%%%%%%%% 
+(三视角解读:形式和意义不能分开，而意义和处境不能分开，所以数学形式不能
+离开 
+现实世界，希尔伯特的人类巴贝塔是无法建成的! 
+认识任何一个事物，我们不能离开它的分布视角，数学也一样!) 
+==============================================
+============%%= 
+理论物理系统作为一个标准的“形式系统”，其终极形式最终会导致“完备性”
+与“一致性”之间的不相容。 
+所以，理论物理的理论的发展只能是渐进的、分层次的， 
+这就是为什么爱因斯坦的相对论可以超越牛顿力学却无法取代牛顿力学的原因。 
+同样超越爱因斯坦的相对论也不意味着取代爱因斯坦相对论， 
+因为包含相对论理论的形式系统 （黎曼几何） 在相应的物理内容范围内是无矛盾
+的，相容的。 
+======================================== 
+三视角智慧告诉我们，对事物的对比视角，即对比特征的认识是永无止境的， 
+我们必须不断地扩充它的分布视角来丰富变化视角， 
+进而升华对事物的本质认识! 
+数学知识的分布视角就是它的公理假设系统， 
+物理学也是如此! 
+不断地扩大分布视角，就不断地推进物理学和数学的发展! 
+========================================== 
+真理与命题之间的矛盾，似乎是悖论的必然表现。 
+这个表现的本质在于，它证明了“真理”本身的相对性， 
+而 “绝对真理” 只能建立在体系完备的基础上， 哥德尔定理证明了这是不可能的。 
+因此，当人们追求“绝对真理”的时候，实际上就已经偏离了追求“真理”的正
+确道路， 
+其结果必然就是：发现“绝对真理”就是绝对的悖论。 
+=================%%%%%%=============== 
+(三视角智慧断然否定人类掌握这些&quot;绝对真理&quot;的可能性， 
+或者说，人类没有必要和能力掌握&quot;绝对真理&quot;). 
+适用于任何情形的形式机械模式不再存在! 
+====================================== 
+因此，20 世纪的哲学终于摆脱了 “绝对真理” 的庞杂体系， 开始了自身的变革。 
+虽然，哲学不再充当“科学的教父”， “意识形态的总司令”，但它自身却变的
+更加接近真理而远离了谬误。 
+这也许就是 20 世纪的数学，对于哲学的最大贡献，而且对于整个人类文明的影
+响也是非常深远的！ 
+这就是哲学自身追求成为&quot;理性上帝&quot;的失败! 
+哲学只是认识世界的一个视角而已! 
+科学，哲学，形而上(广义神学)成为人类知识体系的三视角! 
+彼此互相需要，彼此互相关联，互相解释! 
+三视角智慧</div></details>
+<div class="tv-pager"><a href="/three-views/read/a016/">← 上一篇</a><a href="/three-views/read/a057/">下一篇 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+var PDF_URL="/three-views/doc/b029/b029.pdf", DOC_TITLE="从哥德尔到三视角智慧";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.3,curText="";
+var canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'),textLayer=document.getElementById('textLayer');
+var $=function(i){return document.getElementById(i);};
+function drawTextLayer(tc,vp){
+  textLayer.innerHTML='';var frag=document.createDocumentFragment(),fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str)return;
+    var m=pdfjsLib.Util.transform(vp.transform,it.transform),fs=Math.hypot(m[2],m[3]);
+    if(!fs)return;
+    var ang=Math.atan2(m[1],m[0]),sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01)css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;frag.appendChild(sp);fix.push([sp,it.width*vp.scale,ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0],target=w[1],ang=w[2];if(!target)return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){var sx=target/real;if(sx>0.1&&sx<10){
+      sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')';}}
+  });
+}
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-24;
+    var vp1=page.getViewport({scale:1}),s=baseScale;
+    if(vp1.width*s>avail&&avail>120)s=avail/vp1.width;
+    var vp=page.getViewport({scale:s}),ratio=Math.min(window.devicePixelRatio||1,2.5);
+    canvas.width=Math.floor(vp.width*ratio);canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px';canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px';pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      curText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc,vp);rendering=false;
+      if(pending!==null){var p=pending;pending=null;render(p);}
+    });
+    $('pageInput').value=num;$('prev').disabled=(num<=1);$('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+// 载入失败后 pdfDoc 仍是 null：缩放键不走 go() 的守卫，这里必须自己挡住，
+// 否则一按 ＋/− 就抛 TypeError，把错误提示旁边的按钮全变成哑弹。
+function queue(n){if(!pdfDoc)return;if(rendering)pending=n;else render(n);}
+function go(n){if(!pdfDoc)return;pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);}
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;$('totalPages').textContent=pdf.numPages;$('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';$('page-wrap').style.display='inline-block';render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';$('error').style.display='block';
+  $('error').innerHTML='这一篇暂时无法在线分页显示。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开或下载 PDF</a>，'
+    +'或展开下方「纯文字版」阅读。<br><span style="font-size:12px">（'+err.message+'）</span>';
+});
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);
+  window._rz=setTimeout(function(){queue(pageNum);},220);});
+window.WDS_READ={title:DOC_TITLE,
+  bodyEl:function(){return document.getElementById('page-wrap');},
+  docTextFn:function(){return curText?('【'+DOC_TITLE+' · 第 '+pageNum+' 页 / 共 '
+    +(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+curText):'';}};
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>

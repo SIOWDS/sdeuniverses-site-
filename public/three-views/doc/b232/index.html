@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三视角解读导航仪和西游记 · 三视角学员实践与案例</title>
+<meta name="description" content="三视角解读导航仪和西游记——王德生三视角文章，收在「学员实践与案例」子频道，共 15 页。三视角解读导航仪和西游记 原创2017-09-16于维军，吕文杰三视角智慧 1.从“导航”到创造性“刷题” （于维军：湖南黄埔一期学员） “导航”“刷题”，相信这两个名词对于大多数人来说并不陌生。在我们 的日常生活中几乎">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/doc/b232/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三视角解读导航仪和西游记 · 三视角学员实践与案例">
+<meta property="og:description" content="三视角解读导航仪和西游记——王德生三视角文章，收在「学员实践与案例」子频道，共 15 页。三视角解读导航仪和西游记 原创2017-09-16于维军，吕文杰三视角智慧 1.从“导航”到创造性“刷题” （于维军：湖南黄埔一期学员） “导航”“刷题”，相信这两个名词对于大多数人来说并不陌生。在我们 的日常生活中几乎">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/doc/b232/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur" href="/three-views/library/practice/">学员实践与案例</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">三视角文库 · 学员实践与案例</div>
+<h1>三视角解读导航仪和西游记</h1>
+<p class="tv-sub">共 15 页 · 约 6,411 字　|　王德生　|　子频道：<a href="/three-views/library/practice/">学员实践与案例</a></p>
+</header>
+<div class="bar">
+<button class="btn" id="prev" disabled>‹ 上一页</button>
+<div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span>/ <span id="totalPages">…</span></span></div>
+<button class="btn" id="next" disabled>下一页 ›</button>
+<button class="btn" id="zoomOut">−</button>
+<button class="btn" id="zoomIn">＋</button>
+<a class="btn dl" href="/three-views/doc/b232/b232.pdf" download="三视角解读导航仪和西游记.pdf">⬇ 下载 PDF</a>
+<a class="btn" href="/three-views/library/practice/">回「学员实践与案例」</a>
+</div>
+<div class="stage" id="stage">
+<div id="loading" class="loading"><div class="spinner"></div>正在载入本篇…</div>
+<div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
+<div id="error" class="err" style="display:none"></div>
+</div>
+<p class="hint">← → 方向键翻页 · 选中正文任意一句可问 WDS</p>
+<details class="plain"><summary>纯文字版（全文 6,411 字，便于手机阅读、复制与站内检索）</summary><div class="body">三视角解读导航仪和西游记
+原创2017-09-16于维军，吕文杰三视角智慧
+1.从“导航”到创造性“刷题”
+（于维军：湖南黄埔一期学员）
+“导航”“刷题”，相信这两个名词对于大多数人来说并不陌生。在我们
+的日常生活中几乎天天都会碰到。出门不知道如何走，怎么办？导航！学
+习成绩上不去，怎么办？刷题！
+这似乎成了我们的灵丹妙药！“导航”引导我们顺利到达目的地，可“刷
+题”有时候就没那么灵了！这是为什么呢？两者之间会有什么关系呢？又
+如何把它们联系起来？
+我们常常会听到这样的谈话，“我就是一个路痴，这个地方我都来好多次
+了，就是搞方向不清，还是不知道如何走”。何为路痴？为什么会有路痴？
+是记忆力不好吗？
+当然不是，在她已经熟知的几个路段，根本就不用刻意记忆，哪儿拐弯，
+哪儿有个坑，一清二楚。那是因为这一片区域在她的脑海中有了完整的地
+图，已经建构了一幅清晰的位置网络图。
+
+那让我们看看具体是如何到达目的地的过程。
+如上图所示，从 A 点到达 B点，首先，我们要做的就是确定位置。一个是
+起点的位置，一个是要去目的地的位置。位置如何确定呢？通常就是说一
+个地方的东西南北方向，或者说经度和纬度。这就是三视角的对比视角。
+第二步就是以出发点为原点，思考从 A 点到达 B 点的具体线路。B 点在 A
+点的东偏北 40 度方向，距离 A 点5 千米，理论上我们按着连接线的方向，
+直行5 千米即可到达目的地。
+但实际的路线选择中，会有不同的偏好和路况选择，不一定刚好是沿着直
+线到达B 点（如下图所示有多条路线选择）。这就是三视角的变化视角。
+
+第三步，就是开始行动，根据事前选择的交通工具、路线，开始我们的行程。
+在出发之前我们会有一个预估的时间和过程，然而在实际行程中，常常会出现
+一些状况，修路、下雨、塞车等等因素，导致结果与我们预想的相差较远，有
+时候甚至被迫重新规划路线！这就是三视角的分布视角。
+以上的三步其实不是严格的线性的三步，它们是彼此互相需要的，实际上
+是计划路线的三个视角，表现为有不同的侧重点。
+“路痴”是怎样产生的呢？问题基本上就是出现在这三个环节当中，或者
+说是违反了三视角的某些视角。最严重的就是根本搞不清目的地的方位，
+也就是俗话说的，分不清东南西北。往哪个方向走都不知道，就更不用谈
+如何走了！这就是犯了自由主义的错误！
+有一点方向感的往往是只知道原来走过的路线，死记硬背一条路。一旦路
+况发生变化，就不知道如何调整应对。此等人经常犯机械主义的错误！
+当然，作为一名“老司机”，就可以做到择时、择人、随时灵活调整行驶
+路线，并以最经济有效的路线到达目的地！老司机就不会犯孤立主义的错
+误。
+究竟如何快速从一名“路痴”变为“老司机”呢？方法就是三视角地图建
+构！即用三视角方法来建构你心中的地图网络。
+三视角方法告诉我们，任何事、物、理都有其自身的三视角结构内容，即
+对比、变化、分布三个视角内容。
+对比就是一个事、物、理区分于其他事、物、理的特征、属性。变化就是
+这个事、物、理的特征、属性会通过一些具体的形式，在一定的范围内表
+现出来。而分布则是指这个事、物、理都是有着其特定的环境，处于一个
+网络之场中，与场里其他的事、物、理发生关系，彼此影响！
+
+三视角理论要求我们认识任何事物都必须从对比、变化和分布三视角出发，
+不能缺少任何一个视角。
+三个视角没有哪一个是绝对的，其他两个是次要的或相对的。三个视角具
+有相同的重要性和地位。比如，我们不能说事物的本质比事物的具体例子
+表现更重要，因为没有具体的变化视角内容，我们无法得到本质视角的内
+容。
+也没有哪个视角能独立存在，任何一个视角都必须以其他两个视角为预设
+条件。任何一个视角又都有别于其他视角，从任何一个视角出发都可以了
+解整个事物，但都不是完全的了解。
+我们不能单独认识事物的抽象的对比本质视角，也不能单独认识一个具体
+的事物。比如我们无法认识一个具体的苹果，但是没有苹果这个概念。
+违背三视角的对比视角，就会走上自由主义之路；违背变化视角，就
+会机械行事；违背分布视角，就会孤立自己。唯有遵行三视角，才能
+正确有效地工作，学习，管理等等。
+那么从A 点到 B 点这件事同其他事物也一样可以从三个视角来认识。
+
+如上图所示，要完成从“家润多A 座”到“师大附中”这个行程，就需要
+从三个方面来完成我们的认识。
+1.搞清楚株洲市区的特征，也就是我们所说的对比视角。一江两岸分东西
+（湘江、河东河西）；四区五桥绕江水（石峰区、天元区、荷塘区、芦淞
+区）；六大广场是中心（神农城、中心广场、红旗广场、向阳广场、响石
+广场、清石广场）；五横（新华路、泰山路、红港路、庐山路、芦淞路）
+七纵条干线（二环线、建设路、沿江路、滨江路、长江路、黄河路、珠江
+路）、十大工矿产业区。
+2.把以上这些主要的点、马路通过地图绘制形成一个初步的雏形。也就是
+变化视角内容，通过平面的地图将这些要素展现出来，体现其位置、区域。
+3.光有了上面的这个地图，你可以根据路线找到你所要去的目的地，但如
+何才能在有效的时间，选择合适的交通工具到达，还远远不够！
+比如，在上下班高峰区如何走？去芦淞服装市场开车去还是打车去？下雨
+天如何走？等等，这个时候就要求我们进一步丰富分布视角内容。也就是
+要熟悉这个城市的文化、习惯、交通状况、天气气候等。
+如此，一个城市的导航仪就成长在了你的脑海之中，进而成为一个株洲老
+司机，出门从此 so easy!
+那“刷题”如何看呢？其实同理，也要从三个视角去分析刷题。
+我们要搞清楚刷题的目的是什么？也就是我们说的本质是什么？重复做
+题？熟能生巧？这些都不是！这恰恰是我们目前大多数学校教育的法定！
+认为题目做多了，自然就会了。
+这就好比，一个小区有东南西北四个门，你从来就不知道其有四个门，每
+次都从同一条路、同一个门进去，也不知道小区有多大，还与哪些咱相连，
+你去了100 次，突然有一天，门口修路，这个门走不了，这时候你就懵了！
+学习同样如此，每一个知识点可以从若干个变化视角或分布视角内容进入
+考察学生，如果学生不能将知识点全然于心，始终管中窥豹，做再多的题
+也没办法灵活运用，得不了高分！
+同样我们也要明白刷题的变化视角内容。也就是说同样是刷题，方法有很
+多，不只是我们目前的机械套路，从第一张试卷到最后一张试卷，上半节
+课学生做，下半节课老师讲解答案！
+那么刷题的分布视角是什么呢？那就是打通题型之间的关系，把线性数学
+转化为网格数学！
+例如，和差问题、倍差问题、鸡免同笼问题等，这个题型之间有什么内在
+的关联呢？三者有何共性呢？
+总之，行程的导航与学生学习的融会贯通，道理都一样，就是要用三视角
+方法来建构属于自己的知识网格。把单个的、独立的知识点，运用三视角
+思维连起来，从线性到网格！从记忆到建构！
+2 三视角看黑人律师控诉现代教育制度
+（吕文杰 成都黄埔一期学员）
+“爱因斯坦曾说：‘每个人都是天才。但如果你以爬树能力来评断一只
+鱼，它将一辈子相信自己是个笨蛋。’
+“陪审团的各位先生女士们，今天我要控告‘现代教育制度’。他不仅让
+鱼爬树，他还让鱼爬下来，参加长跑比赛！学校将无数莘莘学子变成机器，
+使无数学生成了那条鱼，使他们在班级中力争上游，找不到自己的天赋所
+在，觉得自己很笨，认为自己是没用的失败者。”
+这是一段名为《对现代教育制度的控诉》视频中，一位年轻黑人律师在法
+庭上控诉现代教育制度时，开场时所陈述的一番话。
+透过三视角，我发现这位黑人律师对现代教育制度的控诉恰好从现代教育
+制度有什么罪（What）？它如何实施犯罪（How）？为什么会犯这些罪（Why）?
+——这三个视角全方位地对现代教育进行了控诉。
+首先，他控告学校扼杀创意、个体性，以及过分强调智商，滥用粗糙的标
+准化考试等，是一个早已腐朽的过时机构。这是从对比视角直接对现代教
+育制度进行控诉，即宣告现代教育制度有什么罪。
+为此，他通过一些事实来加以证明。这是通过变化视角来强化对比视角的
+一种论述方法。
+现代手机与 150年前的电话相比，有很大的不同。
+现代汽车相比 150年前的马车，也有很大的不同。
+现代学校中的教室与 150年前的教室，却没有多大变化！
+这种对于同类事物之间变化差异的对比，加强了不同类事物之间的对比效
+果，很值得我们留意和学习！
+一方面，他将现代手机、汽车和150 年前的电话、马车分别进行了对比，
+得出一个简单相似的结论——它们都发生了很大的变化。这是同类事物
+（如，通讯工具或交通工具）在150 年前后不同形态（变化视角）之间的
+对比。虽然是同类（如，现代手机和 150年前的电话同属于通讯工具，而
+现代汽车与 150 年前的马车同属于交通工具），但是它们各自在形态和功
+能上却有着很大的不同。
+另一方面，150 年前后，现代学校的教室却与过去没有多大变化。它们不
+只是同属一类事物，甚至连形态与功能也变化不大。
+这样一来，现代通讯与交通工具的日新月异，和现代教育制度的裹足不前
+之间的对比十分明显（因此强化了对比视角），那么律师对现代教育制度
+的控诉也就得到了巧妙而有力的证明。
+那位黑人律师甚至宣称他调查了现代教育制度产生的背景。这是从分布视
+角来揭示现代教育制度之所以会犯那些罪的历史原因。原来现代教育制度
+是为了训练人们进入工厂工作而创设的。
+这也就解释了为何学校会要求学生一排一排整整齐齐地就坐；叫他们安静
+坐好、要说话时须举手；给他们短暂的休息时间去吃饭；一天8 小时告诉
+他们只能思考什么；让他们为了得到A 而竞争——一个用来衡量商品好坏
+的字母，这被称为“A 级肉品”！
+这是在控诉现代教育制度的变化视角，也即现代教育制度是如何实施犯罪
+的。但“为了训练人们进入工厂工作而创设现代教育制度”，却是解释学
+校在扼杀学生创意和个体性、滥用标准化测验等具体行为表现的深层原因，
+也就是从分布视角来补充说明对比和变化视角。
+“社会在进步，需要有创新精神、有批判精神、有合作精神的人。每个
+人都是独一无二的，教育也应该因人而异。如果医生给所有病人开的药都
+是一模一样，后果将不堪想象。教育也一样。如果一位教师站在数十位学
+生面前，每位都拥有不同的优点，不同的需求，不同的天赋，不同的梦想，
+老师却用同样的方法教同样的东西。这是教育的误诊，也可能是人类史上
+犯下的最严重的罪行！”
+这位美国的黑人律师并未提及任何一个三视角“对比”“变化”“分布”
+的词汇，但是他对于如何运用这三个视角来陈述自己的观点，可以说运用
+的得心应手。
+这也是笔者为何写作本文的一个初衷，就是要透过三视角来学习其他人
+（哪怕是从未学习过三视角，却不自觉）成功地遵循和运用三视角原理。
+当然除此以外，完成王德生教授对黄埔一期学员的写作要求则是一个首要
+的写作原因。王教授说，如果连 3000 字文章这个起码的写作要求都不能
+完成，那么写书的事就只不过是空想罢了。
+愿笔者和读者都既不止于空想，更绝不陷于空谈。因为三视角原理一向注
+重学员结合自身处境、人生经历、知识结构来加以灵活地运用各种原理和
+更新自己的生命。否则只是一味地看书和听讲，是难以收到学习果效的。
+而三视角心得写作本身既是一种对三视角原理的应用，也是加速三视角学
+习进程的金钥匙、催化剂、高速路。
+我相信一些刚开始接触三视角的朋友，心中不免有些困惑。比如，什么是
+三视角？或者“对比视角”、“变化视角”、“分布视角”具体是指什么？
+等等。
+为了帮助这些朋友更多地了解三视角，也为了帮助大家对三视角能有新的
+发现和感悟，以下分享一点本人对三视角是什么，以及三个视角又分别是
+什么的浅见与学习心得：
+所谓三视角，狭义地理解是指透过对比、变化、分布这三个视角规范地、
+灵活地、联系地认识事物的一种方法或智慧。
+广义地理解是指万事万物都有对比（本质）、变化（例显）和分布（处境）
+这三个视角。所以认识万物就应当从对比、变化、分布这三个视角去进入。
+那么，什么是对比视角呢？对比视角，指某事物区别于其他事物时总会呈
+现出排他本质的视角。
+例如，现代手机和 150 年前的电话，虽然形态和功能差异很大，但是与现
+代汽车和 150 年前的马车相比，现代手机和 150 年前的电话总是会呈现出
+“通讯工具”这个排他本质，从而与现代汽车和150 年前的马车作的“交
+通工具”排他本质相区别。因此可以说对比视角是区别不同事物之间有何
+不同本质特征的视角，即异中求异，对比排他的视角。
+那么，什么是变化视角呢？变化视角，指某事物的本质特征具体有何表现
+或变化的视角。例如，“通讯工具”具体表现在现代手机和 150年前的电
+话身上，可以说不论是材质、形态、原理和功能都具有很大的差异。
+又如，“交通工具”在现代汽车和 150 年前的马车身上，同样呈现出许多
+不同的样式和功能。不过，有些对比视角相同的事物，其变化视角可能没
+有太大的差异。
+比如，现代学校的教室和150 年前学校的教室之间就差别不大。因此可以
+说变化视角是区别同类事物之间不同具体表现和变化的视角，即同中求异，
+变化多端的视角。
+至于分布视角，指事物整体（或部分）与其他事物整体（或部分）之间有
+何关系的视角。
+例如，现代手机与150 年前的电话之间，存有它们的历史演变关系这一分
+布视角。现代手机和现代汽车之间，存有它们在时间、场所、使用者、材
+料以及功能等多维分布视角。而学校教室内的桌椅、黑板、墙壁、窗户、
+空气、光线、教师、学生等各个要素之间构成了立体网状的分布视角。因
+此，可以说分布视角是异中求同，分布合一的视角。
+这三个视角相辅相成，缺一不可。它们既是事物自身的天然属性，也是我
+们认识它们时所应当遵循的。它遍存于万事万物之间，等待着我们继续不
+断地加以探索、发现和应用！
+3 三视角解析西游记
+（吕文杰 成都黄埔一期学员）
+在唐僧师徒中，孙悟空可谓本领最为高强，“火眼金睛”使得他具有凡人
+普遍缺乏的对于人、事、物本质的超强透视能力。所以说，孙悟空对于事
+物对比（本质）视角的辨识能力是最强的。
+唐僧可以说是最弱的。猪八戒和沙僧这方面的能力居中。不过猪八戒由于
+好色，屡屡被各路神仙或妖精所变的美女戏耍得昏头转向，所以沙僧在这
+些方面要比猪八戒略胜一筹。
+论到变得让别人晕头转向，孙悟空的七十二变毫无悬念，在师徒中间是绝
+对的No.1。唐僧则照样，还是最弱的一个。
+猪八戒和沙僧都会三十六变，这方面的能力依然居中，不过由于猪八戒有
+副猪样，在变化时就比沙僧稍微困难了点，常要孙悟空帮忙把他的猪鼻、
+猪耳、猪肚子给变没了。因此，猪八戒在这些方面还是要比沙僧稍逊一筹。
+按理说这几个徒弟，个个本领高强，远在唐僧之上，那么究竟是什么缘故
+唐僧竟然能作他们几个的师傅？
+用三视角就很容易理解了！原来唐僧的分布（关系）视角在师徒中是绝对
+一流的：天上的神仙都保他，连地上的女王和一些雌妖精都想嫁给他，可
+以说因为与世无争，所以“人际”关系处理得非常好！
+相反的，孙悟空可以说把所有人几乎都得罪了个遍！首先，他自封“齐天
+大圣”，根本不把玉帝放在眼里，又把天兵天将打得颜面扫地，后来大闹
+天宫，甚至敢跟如来斗法……所以如来、观音、玉帝、唐僧对他不满时，
+都称他为“泼猴”。
+其次，他屡因肉眼凡胎的唐僧认不得妖精，而被当作杀人的恶徒，念紧箍
+咒作为惩戒，甚至被除名。又因常骂猪八戒是“呆子”，喜拿他开涮，所
+以团队关系也处得很不和谐。
+最后，他一路降妖除魔，可以说妖魔鬼怪都对他恨之入骨；再加上他天生
+一副猢狲模样，也绝少有人会像喜欢慈悲的唐僧或菩萨那样喜欢这个动不
+动就吓唬人、暴脾气的猴子。
+相比而言，沙僧的人际关系也因他从不违逆师傅和师兄，因此很容易排在
+动不动就想回高老庄，或者爱跟师兄斗气的猪八戒前面了。
+如此，我们就可以列出一个唐僧师徒的能力/视角一览表了：
+能力/视角 第一名 第二名 第三名 第四名
+观察能力/对比视角 孙悟空 沙僧 猪八戒 唐僧
+应变能力/变化视角 孙悟空 沙僧 猪八戒 唐僧
+人际关系/分布视角 唐僧 沙僧 猪八戒 孙悟空
+以上，仅是用三视角对中国人耳熟能详的唐僧师徒做了一番简单的三视角
+分析。
+想想看，是不是也可以把它拿来用作企业人力资源与人事安排的一份参考
+资料呢？
+由此可见，三视角的应用范围十分广泛，而且可以做得简单明了、生动有
+趣！因此，具有非常广阔的应用前景！我邀请您一起加入三视角学习和应
+用！</div></details>
+<div class="tv-pager"><a href="/three-views/doc/b231/">← 上一篇</a><a href="/three-views/doc/b233/">下一篇 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+var PDF_URL="/three-views/doc/b232/b232.pdf", DOC_TITLE="三视角解读导航仪和西游记";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.3,curText="";
+var canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'),textLayer=document.getElementById('textLayer');
+var $=function(i){return document.getElementById(i);};
+function drawTextLayer(tc,vp){
+  textLayer.innerHTML='';var frag=document.createDocumentFragment(),fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str)return;
+    var m=pdfjsLib.Util.transform(vp.transform,it.transform),fs=Math.hypot(m[2],m[3]);
+    if(!fs)return;
+    var ang=Math.atan2(m[1],m[0]),sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01)css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;frag.appendChild(sp);fix.push([sp,it.width*vp.scale,ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0],target=w[1],ang=w[2];if(!target)return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){var sx=target/real;if(sx>0.1&&sx<10){
+      sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')';}}
+  });
+}
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-24;
+    var vp1=page.getViewport({scale:1}),s=baseScale;
+    if(vp1.width*s>avail&&avail>120)s=avail/vp1.width;
+    var vp=page.getViewport({scale:s}),ratio=Math.min(window.devicePixelRatio||1,2.5);
+    canvas.width=Math.floor(vp.width*ratio);canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px';canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px';pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      curText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc,vp);rendering=false;
+      if(pending!==null){var p=pending;pending=null;render(p);}
+    });
+    $('pageInput').value=num;$('prev').disabled=(num<=1);$('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+// 载入失败后 pdfDoc 仍是 null：缩放键不走 go() 的守卫，这里必须自己挡住，
+// 否则一按 ＋/− 就抛 TypeError，把错误提示旁边的按钮全变成哑弹。
+function queue(n){if(!pdfDoc)return;if(rendering)pending=n;else render(n);}
+function go(n){if(!pdfDoc)return;pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);}
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;$('totalPages').textContent=pdf.numPages;$('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';$('page-wrap').style.display='inline-block';render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';$('error').style.display='block';
+  $('error').innerHTML='这一篇暂时无法在线分页显示。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开或下载 PDF</a>，'
+    +'或展开下方「纯文字版」阅读。<br><span style="font-size:12px">（'+err.message+'）</span>';
+});
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);
+  window._rz=setTimeout(function(){queue(pageNum);},220);});
+window.WDS_READ={title:DOC_TITLE,
+  bodyEl:function(){return document.getElementById('page-wrap');},
+  docTextFn:function(){return curText?('【'+DOC_TITLE+' · 第 '+pageNum+' 页 / 共 '
+    +(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+curText):'';}};
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>

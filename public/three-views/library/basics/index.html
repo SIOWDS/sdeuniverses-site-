@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三视角三视角基础理论 · 57 篇</title>
+<meta name="description" content="三视角是什么、九宫格与二十七宫格怎么用、它与二元思维的分歧在哪里——先立地基的一组。　共 57 篇，可分页阅读与下载。">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/library/basics/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三视角三视角基础理论 · 57 篇">
+<meta property="og:description" content="三视角是什么、九宫格与二十七宫格怎么用、它与二元思维的分歧在哪里——先立地基的一组。　共 57 篇，可分页阅读与下载。">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/library/basics/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur">三视角基础理论</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">Foundations</div>
+<h1>三视角基础理论</h1>
+<p class="tv-sub">57 篇　|　约 20.1 万字　|　王德生</p>
+</header>
+<div class="tv-note">三视角是什么、九宫格与二十七宫格怎么用、它与二元思维的分歧在哪里——先立地基的一组。</div>
+<ul class="alist" style="margin-top:1.8rem">
+<li><a href="/three-views/doc/b001/">一定要学习三视角智慧吗</a><em>6 页 · 2,150 字</em></li>
+<li><a href="/three-views/doc/b002/">万剑穿心九宫格系统内在的逻辑关系和应用</a><em>17 页 · 4,422 字</em></li>
+<li><a href="/three-views/doc/b003/">三视角-不同学科</a><em>17 页 · 12,342 字</em></li>
+<li><a href="/three-views/doc/b004/">三视角27宫格</a><em>1 页 · 194 字</em></li>
+<li><a href="/three-views/doc/b005/">三视角27宫格</a><em>1 页 · 194 字</em></li>
+<li><a href="/three-views/doc/b006/">三视角VS二元思维</a><em>5 页 · 2,437 字</em></li>
+<li><a href="/three-views/doc/b007/">三视角不是什么</a><em>2 页 · 703 字</em></li>
+<li><a href="/three-views/doc/b008/">三视角与九宫格速览</a><em>6 页 · 4,327 字</em></li>
+<li><a href="/three-views/doc/b009/">三视角中阶课程</a><em>11 页 · 3,386 字</em></li>
+<li><a href="/three-views/read/a021/">三视角九宫格入门</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b010/">三视角入门（之一）</a><em>7 页 · 6,427 字</em></li>
+<li><a href="/three-views/doc/b011/">三视角入门（之二）</a><em>5 页 · 2,176 字</em></li>
+<li><a href="/three-views/doc/b012/">三视角入门,1</a><em>5 页 · 2,166 字</em></li>
+<li><a href="/three-views/doc/b013/">三视角入门2</a><em>5 页 · 2,176 字</em></li>
+<li><a href="/three-views/doc/b014/">三视角入门分布视角</a><em>5 页 · 2,106 字</em></li>
+<li><a href="/three-views/read/a129/">三视角发展简史</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b015/">三视角大集合</a><em>1 页 · 359 字</em></li>
+<li><a href="/three-views/doc/b016/">三视角应用智慧1</a><em>8 页 · 4,515 字</em></li>
+<li><a href="/three-views/doc/b017/">三视角方法-不同学科</a><em>5 页 · 4,008 字</em></li>
+<li><a href="/three-views/doc/b018/">三视角方法-不同学科</a><em>4 页 · 2,843 字</em></li>
+<li><a href="/three-views/doc/b019/">三视角方法论-学科3</a><em>3 页 · 1,803 字</em></li>
+<li><a href="/three-views/doc/b020/">三视角方法论（论文）</a><em>26 页 · 19,900 字</em></li>
+<li><a href="/three-views/read/a135/">三视角是时代的需要</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/read/a006/">三视角智慧应用模式2</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/read/a007/">三视角智慧应用模式3</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b021/">三视角智慧是万能的知识框架</a><em>3 页 · 947 字</em></li>
+<li><a href="/three-views/doc/b022/">三视角智慧科学研究</a><em>5 页 · 2,682 字</em></li>
+<li><a href="/three-views/doc/b023/">三视角符号学囧</a><em>16 页 · 293 字</em></li>
+<li><a href="/three-views/doc/b024/">三视角能解决实际问题吗</a><em>6 页 · 2,914 字</em></li>
+<li><a href="/three-views/doc/b025/">三视角解决问题的系统方案</a><em>2 页 · 533 字</em></li>
+<li><a href="/three-views/doc/b026/">三视角：生命的智慧指南针</a><em>13 页 · 9,133 字</em></li>
+<li><a href="/three-views/read/a022/">为什么没有所谓的事物固有属性？</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b027/">为何需要学习三视角智慧呢？--三视角智慧的分布视角剖析</a><em>17 页 · 4,380 字</em></li>
+<li><a href="/three-views/doc/b028/">九宫格入门和提升</a><em>8 页 · 3,955 字</em></li>
+<li><a href="/three-views/read/a016/">二元论给人类带来的危害</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b029/">从哥德尔到三视角智慧</a><em>9 页 · 4,811 字</em></li>
+<li><a href="/three-views/read/a057/">先有鸡还是先有蛋？</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/read/a024/">分布视角的预设和我们的忽视</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b030/">变化的时代，如何洞悉一切？</a><em>13 页 · 4,962 字</em></li>
+<li><a href="/three-views/doc/b031/">可以不学习三视角吗</a><em>7 页 · 5,356 字</em></li>
+<li><a href="/three-views/doc/b032/">复合三视角变化无穷</a><em>6 页 · 2,152 字</em></li>
+<li><a href="/three-views/doc/b033/">如何做出智慧的抉择</a><em>9 页 · 2,121 字</em></li>
+<li><a href="/three-views/doc/b034/">如何向人介绍三视角</a><em>4 页 · 1,823 字</em></li>
+<li><a href="/three-views/doc/b035/">学习三视角需要先整理出一套完美无瑕的理论体系再实践吗</a><em>4 页 · 1,585 字</em></li>
+<li><a href="/three-views/read/a018/">对比变化分布的彼此包含关系</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b036/">建构认知升级</a><em>16 页 · 2,664 字</em></li>
+<li><a href="/three-views/doc/b037/">斯腾伯格的成功三元智力介绍</a><em>9 页 · 4,602 字</em></li>
+<li><a href="/three-views/doc/b038/">皮尔士范畴理论探析</a><em>8 页 · 13,036 字</em></li>
+<li><a href="/three-views/read/a042/">皮尔斯的三范畴和三视角符号学</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b039/">粒子、波、场</a><em>62 页 · 27,662 字</em></li>
+<li><a href="/three-views/doc/b040/">粒子波场三视角认识事物</a><em>1 页 · 85 字</em></li>
+<li><a href="/three-views/doc/b041/">系统的万能创新框架</a><em>8 页 · 3,781 字</em></li>
+<li><a href="/three-views/doc/b042/">给你一双慧眼看天地</a><em>13 页 · 4,137 字</em></li>
+<li><a href="/three-views/doc/b043/">草是绿的</a><em>4 页 · 1,547 字</em></li>
+<li><a href="/three-views/doc/b044/">认识苹果和九宫格</a><em>1 页 · 617 字</em></li>
+<li><a href="/three-views/doc/b045/">论点论据论证又一件皇帝的新装</a><em>8 页 · 4,500 字</em></li>
+<li><a href="/three-views/doc/b046/">跳出变化，找到本质，联合分布，重生变化</a><em>13 页 · 12,053 字</em></li>
+</ul>
+<p class="hint" style="text-align:left;margin-top:1.2rem">其中 11 篇此前已作为图册扫码原文上站，点进去是同一篇，不另存一份。</p>
+<div class="tv-pager"><a href="/three-views/library/">← 文库总目</a><a href="/three-views/library/discipline/">学科解构 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>

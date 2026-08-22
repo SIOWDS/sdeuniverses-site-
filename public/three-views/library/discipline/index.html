@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三视角学科解构 · 41 篇</title>
+<meta name="description" content="把三视角当解剖刀，逐个学科切下去：物理、语言、法律、伦理、美学、医学、神学、易与道。　共 41 篇，可分页阅读与下载。">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/library/discipline/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三视角学科解构 · 41 篇">
+<meta property="og:description" content="把三视角当解剖刀，逐个学科切下去：物理、语言、法律、伦理、美学、医学、神学、易与道。　共 41 篇，可分页阅读与下载。">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/library/discipline/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur">学科解构</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">Disciplines</div>
+<h1>学科解构</h1>
+<p class="tv-sub">41 篇　|　约 9.8 万字　|　王德生</p>
+</header>
+<div class="tv-note">把三视角当解剖刀，逐个学科切下去：物理、语言、法律、伦理、美学、医学、神学、易与道。</div>
+<ul class="alist" style="margin-top:1.8rem">
+<li><a href="/three-views/doc/b047/">一定是至高喜乐</a><em>5 页 · 1,114 字</em></li>
+<li><a href="/three-views/doc/b048/">三视角在生物地理历史管理组织学的应用</a><em>6 页 · 3,836 字</em></li>
+<li><a href="/three-views/doc/b049/">三视角大健康（六）</a><em>10 页 · 3,974 字</em></li>
+<li><a href="/three-views/read/a152/">三视角大健康之四</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b050/">三视角心理健康入门</a><em>10 页 · 4,207 字</em></li>
+<li><a href="/three-views/doc/b051/">三视角方法论文学经济学神学医学</a><em>3 页 · 1,921 字</em></li>
+<li><a href="/three-views/doc/b052/">三视角物理学智慧入门及应用</a><em>12 页 · 2,858 字</em></li>
+<li><a href="/three-views/doc/b053/">三视角语言学入门</a><em>9 页 · 2,208 字</em></li>
+<li><a href="/three-views/doc/b054/">三视角谈艺术（入门）</a><em>1 页 · 305 字</em></li>
+<li><a href="/three-views/doc/b055/">东西方文字之美（之二）</a><em>2 页 · 981 字</em></li>
+<li><a href="/three-views/doc/b056/">为什么梵高的画那么值钱</a><em>4 页 · 1,881 字</em></li>
+<li><a href="/three-views/read/a165/">为何很多艺术家好像都有一些疯癫？</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/read/a153/">人体九大生理系统互相有何关系？</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b057/">人是由肉体加灵</a><em>9 页 · 3,906 字</em></li>
+<li><a href="/three-views/read/a164/">什么是美？</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b058/">从圣经到三视角（之一）</a><em>13 页 · 9,102 字</em></li>
+<li><a href="/three-views/read/a041/">从圣经到三视角</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b059/">从易经到三视角</a><em>10 页 · 4,215 字</em></li>
+<li><a href="/three-views/doc/b060/">从范冰冰被罚近9亿谈法律的三视角</a><em>6 页 · 2,337 字</em></li>
+<li><a href="/three-views/doc/b061/">从道家思想到三视角智慧</a><em>11 页 · 5,873 字</em></li>
+<li><a href="/three-views/doc/b062/">伦理学的三视角</a><em>2 页 · 1,200 字</em></li>
+<li><a href="/three-views/doc/b063/">伦理学知识论哲学和美学</a><em>6 页 · 4,110 字</em></li>
+<li><a href="/three-views/doc/b064/">你知道知情意三大健康的互相影响吗</a><em>4 页 · 2,142 字</em></li>
+<li><a href="/three-views/doc/b065/">信心希望爱心三视角解读</a><em>6 页 · 2,522 字</em></li>
+<li><a href="/three-views/doc/b066/">信望爱是什么呢</a><em>1 页 · 230 字</em></li>
+<li><a href="/three-views/doc/b067/">傅瑞姆三视角神学</a><em>20 页 · 17,505 字</em></li>
+<li><a href="/three-views/read/a138/">到底心身灵大健康是什么呢？</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/read/a043/">大爱带来至高喜乐</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b068/">天地之大美带来至高喜乐</a><em>8 页 · 1,810 字</em></li>
+<li><a href="/three-views/read/a151/">奇妙的人体三大调节系统</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b069/">当文艺遇见科技</a><em>12 页 · 4,088 字</em></li>
+<li><a href="/three-views/doc/b070/">情感的三视角</a><em>14 页 · 4,653 字</em></li>
+<li><a href="/three-views/doc/b071/">教育学股票和心理学</a><em>4 页 · 2,843 字</em></li>
+<li><a href="/three-views/doc/b072/">文化和政治学的三视角</a><em>2 页 · 1,265 字</em></li>
+<li><a href="/three-views/doc/b073/">漫谈美和艺术（一）</a><em>8 页 · 2,460 字</em></li>
+<li><a href="/three-views/read/a066/">略论中国古典美学</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/doc/b074/">纪念张首晟谈科学和信仰</a><em>7 页 · 3,813 字</em></li>
+<li><a href="/three-views/doc/b075/">美与艺术</a><em>1 页 · 280 字</em></li>
+<li><a href="/three-views/doc/b076/">美是什么呢</a><em>2 页 · 266 字</em></li>
+<li><a href="/three-views/read/a163/">美的形式三视角</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+<li><a href="/three-views/read/a069/">论语开篇三视角解读</a><span class="mark">已在扫码原文</span><em>图册扫码原文，点开即读</em></li>
+</ul>
+<p class="hint" style="text-align:left;margin-top:1.2rem">其中 11 篇此前已作为图册扫码原文上站，点进去是同一篇，不另存一份。</p>
+<div class="tv-pager"><a href="/three-views/library/basics/">← 三视角基础理论</a><a href="/three-views/library/education/">教育智慧 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三视角入门（之一） · 三视角三视角基础理论</title>
+<meta name="description" content="三视角入门（之一）——王德生三视角文章，收在「三视角基础理论」子频道，共 7 页。三视角入门(1):变化视角 这是一个变化的世界: 万物都在不停地变化。从变化的视角看万物:万物都在流变，都有一 个具体的发展过程，像物理的水波。中华民族总结得好：易经！然而易经的易却有三个角度：简、 变、常的意义。今天我">
+<link rel="canonical" href="https://sdeuniverses.com/three-views/doc/b010/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三视角入门（之一） · 三视角三视角基础理论">
+<meta property="og:description" content="三视角入门（之一）——王德生三视角文章，收在「三视角基础理论」子频道，共 7 页。三视角入门(1):变化视角 这是一个变化的世界: 万物都在不停地变化。从变化的视角看万物:万物都在流变，都有一 个具体的发展过程，像物理的水波。中华民族总结得好：易经！然而易经的易却有三个角度：简、 变、常的意义。今天我">
+<meta property="og:url" content="https://sdeuniverses.com/three-views/doc/b010/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+ --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+ font-family:'Noto Serif SC',Georgia,serif;-webkit-text-size-adjust:100%}
+a{color:var(--ac)}
+.tv-top{position:sticky;top:0;z-index:60;display:flex;align-items:center;
+ justify-content:space-between;gap:.8rem;padding:.55rem 1.2rem;flex-wrap:wrap;
+ background:rgba(245,239,224,.95);backdrop-filter:blur(10px);
+ border-bottom:1px solid var(--border2)}
+.tv-brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ac)}
+.tv-brand b{font-size:1rem;letter-spacing:.06em;font-weight:700}
+.tv-brand span{font-family:'Playfair Display',Georgia,serif;font-size:.68rem;
+ letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.tv-top nav{display:flex;align-items:center;gap:.3rem .9rem;flex-wrap:wrap;font-size:.88rem}
+.tv-top nav a{color:var(--text2);text-decoration:none;white-space:nowrap}
+.tv-top nav a:hover{color:var(--ac);text-decoration:underline;text-underline-offset:4px}
+.tv-top nav a.cur{color:var(--ac);font-weight:700}
+.tv-wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem}
+.tv-hd{padding:2.1rem 0 1.1rem;border-bottom:1px solid var(--border2)}
+.tv-eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--ac);font-weight:700;
+ text-transform:uppercase}
+.tv-hd h1{font-size:1.95rem;line-height:1.3;margin:.5rem 0 .2rem;letter-spacing:.02em}
+.tv-sub{color:var(--muted);font-size:.92rem;margin:0}
+.tv-note{margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--ac);
+ background:rgba(15,110,140,.05);font-size:.93rem;line-height:1.82}
+.tv-foot{margin-top:3rem;padding:2rem 1.6rem 2.6rem;border-top:1px solid var(--border2);
+ text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9}
+/* ── 阅读器 ── */
+.bar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.4rem 0 .2rem}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text2);
+ padding:.42rem .85rem;border-radius:4px;font-size:.9rem;cursor:pointer;
+ font-family:inherit;text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pagebox{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:var(--text2)}
+.pagebox input{width:3.6rem;background:#fff;border:1px solid var(--border);color:var(--text);
+ padding:.36rem .3rem;border-radius:4px;text-align:center;font-family:inherit;font-size:.9rem}
+.stage{display:flex;justify-content:center;padding:1rem 0 .5rem;min-height:50vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--border2);border-radius:4px;overflow:hidden;
+ box-shadow:0 12px 34px rgba(0,0,0,.10)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(44,127,168,.32)}
+.loading{text-align:center;color:var(--muted);padding:4rem 1rem;font-size:1rem}
+.spinner{width:34px;height:34px;border:3px solid rgba(44,127,168,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#9B4A3A;padding:3rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin:.2rem 0 0}
+details.plain{margin:2rem 0 0;border:1px solid var(--border2);border-radius:8px;
+ background:var(--card);padding:.85rem 1.1rem}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:.95rem;font-weight:600}
+details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-height:1.95;
+ border-top:1px solid var(--border2);padding-top:1rem}
+.tv-pager{display:flex;justify-content:space-between;gap:1rem;margin:2.2rem 0 0;font-size:.94rem}
+.tv-pager a{text-decoration:none}
+.tv-pager a:hover{text-decoration:underline;text-underline-offset:4px}
+/* ── 总目 ── */
+.grp{margin:2.4rem 0 0}
+.grp h2{font-size:1.18rem;margin:0 0 .1rem;letter-spacing:.03em}
+.grp .gs{color:var(--muted);font-size:.83rem}
+.alist{margin:.9rem 0 0;padding:0;list-style:none;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.5rem .9rem}
+.alist li{border:1px solid var(--border2);border-radius:7px;background:var(--card);
+ padding:.55rem .8rem;font-size:.96rem}
+.alist li a{text-decoration:none}
+.alist li a:hover{text-decoration:underline;text-underline-offset:3px}
+.alist li em{display:block;font-style:normal;color:var(--muted);font-size:.78rem;margin-top:.15rem}
+@media(max-width:640px){.tv-wrap{padding:0 1rem}.tv-hd h1{font-size:1.5rem}
+ .alist{grid-template-columns:1fr}}
+</style>
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+ gap:1.1rem;margin:2rem 0 1rem}
+.chcard{display:block;text-decoration:none;color:inherit;border:1px solid var(--border2);
+ border-radius:10px;background:var(--card);padding:1.05rem 1.15rem 1.15rem;
+ transition:transform .18s,box-shadow .18s,border-color .18s}
+.chcard:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.09);
+ border-color:var(--ac)}
+.chcard b{display:block;font-size:1.12rem;letter-spacing:.03em}
+.chcard .en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.7rem;
+ letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.chcard .bl{display:block;margin-top:.6rem;font-size:.88rem;line-height:1.75;color:var(--text2)}
+.chcard .ct{display:block;margin-top:.7rem;font-size:.8rem;color:var(--ac);font-weight:600}
+.mark{display:inline-block;margin-left:.4rem;padding:.05rem .38rem;border-radius:3px;
+ font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
+</style>
+</head>
+<body>
+<header class="tv-top">
+<a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
+<nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">文库九频道</a><a class="cur" href="/three-views/library/basics/">三视角基础理论</a></nav>
+</header>
+<main class="tv-wrap">
+<header class="tv-hd">
+<div class="tv-eyebrow">三视角文库 · 三视角基础理论</div>
+<h1>三视角入门（之一）</h1>
+<p class="tv-sub">共 7 页 · 约 6,427 字　|　王德生　|　子频道：<a href="/three-views/library/basics/">三视角基础理论</a></p>
+</header>
+<div class="bar">
+<button class="btn" id="prev" disabled>‹ 上一页</button>
+<div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span>/ <span id="totalPages">…</span></span></div>
+<button class="btn" id="next" disabled>下一页 ›</button>
+<button class="btn" id="zoomOut">−</button>
+<button class="btn" id="zoomIn">＋</button>
+<a class="btn dl" href="/three-views/doc/b010/b010.pdf" download="三视角入门（之一）.pdf">⬇ 下载 PDF</a>
+<a class="btn" href="/three-views/library/basics/">回「三视角基础理论」</a>
+</div>
+<div class="stage" id="stage">
+<div id="loading" class="loading"><div class="spinner"></div>正在载入本篇…</div>
+<div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
+<div id="error" class="err" style="display:none"></div>
+</div>
+<p class="hint">← → 方向键翻页 · 选中正文任意一句可问 WDS</p>
+<details class="plain"><summary>纯文字版（全文 6,427 字，便于手机阅读、复制与站内检索）</summary><div class="body">三视角入门(1):变化视角
+这是一个变化的世界: 万物都在不停地变化。从变化的视角看万物:万物都在流变，都有一
+个具体的发展过程，像物理的水波。中华民族总结得好：易经！然而易经的易却有三个角度：简、
+变、常的意义。今天我们聊聊大千世界、芸芸众生的变变变，即只是谈谈这个“变”！
+01 变，变，变
+佛教思想里最为重要的的智慧就是发现一切都在变化：万法无常。一切如泡影不停地变化：
+佛法的核心思想之一 !
+新婚之后，甜蜜的感觉在变化；赚了一百万时很高兴，但是没过几天后，幸福的感觉开始
+减少，在变化。每天的天气不论是湿度、温度、风向和强度都是在不停地变化。桌子上的苹果在
+不停地变化，它的甜味在变化，它的表面颜色在变化。它被切，被吃进肚子，不停地变化。我桌
+子上的一本书在不停地变化：我每天读 10 页，它和我的关系在变化，它的清洁程度因为我的手
+的缘故在不停地变化。
+02 不停地变
+我们每个人自己在不断地变化，我们一天比一天老，我们的思想在不停地变化，我们的知
+识的多少也在变化。我们的世界观、人生观、价值观都在不断地变化。从前我是科学唯物主义的
+坚持者，今天我坚持基督教的世界观、人生观、价值观，即使是对基督教的世界观，我的认识也
+是在不停地变化。
+以前我是以自己的理性为中心去理解圣经，现在变化为以神为中心去理解圣经。
+而且，在如何以神为中心的理解上又有变化，从前我是用亚里斯多德的二元逻辑，现在我采用三
+视角逻辑去思考。即使对三视角逻辑的认识和应用，我也是在经历不同的变化，以前只是在神学
+上应用它，现在我们应用三视角方法论到科学、艺术、语言、教育学、符号学等等。同时对三视
+角的理解，我们也在不停地变化，从前是粗略的三个视角，现在是进入双重的三视角理解事物，
+进入到一个更加精细的认识阶段。所以我们在认识事物上也是不停地变化。
+03 关系的变化
+我们和周边事物的关系也是在不停地变化。夫妻二人的关系、感情和相互了解的程度都是
+在不停地变化。一家公司的使命、组织结构、社会责任和影响都是在不停地变化。
+在教育学里，学生和老师的关系也是在不停地变化，老师的教学角色也是在不停地变化。
+从前是传道授业解惑者，现在看来要变化成为引导者、帮助者、鼓励者。学生学习的角色也在变
+化，从前是信息接受者，现在要变成知识创造者、知识的建构者。家庭、教会和政府之间的关系
+也是在不停地变化。
+儒家的人伦关系理论在历史上也是不停地变化，中国社会的人伦关系的具体历史也是在不
+停地变化。各种学科之间的关系，比如哲学和科学的关系，神学和科学的关系，物理学和化学的
+关系，数学和语言学的关系，等等都是在不停地变化。
+一切存在物之间的关系都在不停地变化。有的变化快，有的变化慢。
+04 静态的变化
+变化还体现在事物属性的自己变化范围。
+西瓜是甜的，但是有的很甜，有的一点点甜，有的好像冬瓜的味道。各种颜色都有自己的变化范
+围。有深红、浅红、土红、朱红各种变化的红色。
+幸福的感觉也是有范围的，幸福得要死了，非常幸福，温柔的幸福，安静的幸福感，像大
+海波涛一样的幸福感，各种各样的幸福感描述了幸福感觉的变化。
+痛苦的种类也是如此。有皮肉之痛和心灵之痛。皮肉之痛又有隐隐作痛，剧烈的疼痛，突
+然的一丝痛苦，长期的病痛。心灵的痛苦也是多种多样，失去孩子的痛苦不同于失去年老的父母
+的痛苦，人格尊严受到伤害的痛苦不同于股市失利带来的痛苦，觉得人生无意义带来的痛苦不同
+于失恋的痛苦。痛苦的种类也是变化多端的。
+人的长相、外表、文凭、地位、职位、薪水，成为一个人的一些独特属性，比如教授和一
+字不识的农民在文凭上形成对比的属性。但是这些属性也是有变化的，有多种多样的。一字不识
+的农民有的具有丰富的社会知识和经验，有的具有某一项很精深的工作技能，这样的一字不识的
+农民的各自的才能和智慧是有变化性的。
+05 总结
+所以佛教说，一切都在变化，没有不变的事物。所以变化才是事物的真相。这样，我们应
+该每时每刻以变化的视角去看万物，去认识万物。
+这就是佛教的:万法无常。这是对的，也是中华文化里最重要的的智慧。在中华文化里的易
+经早就告诉我们“变易”的智慧。就是我们上面讲的一切的变化。无论是事物的固有属性、事物
+的变化过程本身、事物和其他事物的关系都是在不停地变化，就是任何事物都在对比视角、变化
+视角、分布关系视角，这三个视角上不停地变化。
+这就是从粒子(静态)，波(动态)，场(关系)三个视角去发现事物的变化!那么有没有什么不变
+的东西，或说我们能否观察到一些稳定的东西呢?佛教说，没有永恒的，就是万法无常。那么这
+个“常”是什么意思呢?可是易经还告诉我们:“不易”，就是在不停的变化中，我们会发现一些
+不变的现象和规律。易经有简易、变易、不易三个视角来诠释万物的变化。简易就是大道至简，
+变易和不易合起来就是事物在有规律地变化。只可惜，我们对这个规律的认识堕落在阴阳二元论
+的“理想简化”里，没有注意到易经的“太和”视角，即万物的普遍和谐联系的视角的复杂性不
+是一个简单的“阴阳”可以概括。下次我们再仔细研究我们对世界的观察得到的“不变”的智慧
+理解。若没有不变，那么老子的道德经也就是废物了。
+请大家阅读饭团文章
+&quot;三视角入门:对比视角&quot;.
+事实上，若没有不变，我们就无法对比区分两个存在体，就无法论说一个事物，这样知识就没有
+可能性了，因为知识需要有知识的具体对象。所以如何理解变化和不变的关系，是很重要的。
+三视角入门(2):对比视角
+01 无我?
+佛教说万物万事都在变化之中，所以有“诸行无常”，然后就有推论“诸法无我”。即任何
+事物没有永远不变的本质，此即佛法理论的“空”的本质意义。所以任何对事物的定义和取名都
+是一个“方便之名”，不是真正的有其本质而来的名：万物万事如泡影!我们要仔细观察现实世界
+的事物和我们的社会实践。看看佛教的“无我”和道德经的“道”,易经的“不易”有何差别呢?
+我们先看看一些常识现象和我们的常识结论。
+当我说，高速公路的汽车在飞奔，儿子的学习成绩在增长，公司在壮大，国家在富强，苹
+果在变味，等等。这里我们是在叙述事物的变化，但是也隐含了一个“不变”的视角。
+我看见汽车飞奔，在飞奔的过程中，我是对同一个物体的运动在进行描述。运动是变化的
+视角，但在这个变化里，运动的主体保持不变:同一物体，就是汽车。这个是不变性！所以当我
+们说什么东西在变化的时候，就有一个不变性在里面:就是被描述的物体具有不变性，这个不变
+性使得我们能对一个物体进行描述。
+这个不变性就是物体的对比性，或叫物体的本质性。这个不变性的内容使得我们可以将该
+事物和其他事物进行区分，从而认识。这个叫做对事物的对比视角的认识。总结:当我们说某事
+物在不断地变化时，就隐藏了该事物的对比视角或本质视角。所以从语言逻辑来说，变化视角不
+能离开对比视角，对比也不能离开变化视角。知识一定是某个事物的知识，所以对比视角是必需
+的，这个对比视角是变化中的对比，所以变化不是唯一的视角。变化中有不变，就是对比的视角。
+02 粒子，波，场三视角认识对比特征
+科学研究的目的是在变化的杂多的现象里发现不变的规律性，比如物理规律、化学规律、
+数学规律、历史规律，等等。发现这些规律就是发现事物的不变的视角。就是从“多”中发现“一”。
+就是从变化的视角里发现共性，就是发现规律。事物的不变性也是常常体现在事物的分布视角里，
+就是在该事物和其他事物的关系里找不变性。
+比如，儿子和母亲的关系不断地变化，比如母亲照护儿子的时间从小孩到儿子成家是越来
+越少，两人谈话的时间也是越来越少。但是在这个不断地变化的关系里，有一个不变的:他们的
+关系永远是母子关系。这个是不变的。我们不能说，如果母亲不爱儿子了，他们就不是母子关系
+了。事物的不变性还可以到事物的变化视角里寻找。比如苹果的甜味随着时间会变化，但有的变
+化慢，有的变化快。就是甜味的变化过程和方式有不同，就是有变化的变化，但是我们能发现，
+这个变化的过程有不变性。比如一般都是从甜慢慢变为酸。这个是变化的规律性。比如水流动是
+水的变化视角，有的水是银河落九天，有的是缓缓地静静地流，有的是滔滔大河直奔东海。但是
+所有的这些不同的变化视角里有一个不变性:就是水的流动服从 NS 方程。事物的不变性还可以从
+事物的对比视角里发现。这是非常简单的也是我们通常说得最多的。比如米饭有各种各样的甜味，
+但是都是甜的。
+基督徒信耶稣，但是每个人的信心的程度不一样，行善爱人的表现也不一样，但是每一个
+基督徒都要是信耶稣，不是信佛陀，都要爱神爱人。这是从对比视角里发现的不变性。从以上三
+个视角发现的不变性形成该事物的对比属性内容。或者说我们可以在对比、变化和分布三视角去
+对比该事物和其他事物，进行区分。或许用物理学比较好理解。
+当你需要对比两个事物时，可以在粒子的视角上比较它们，就是把两个物体封装起来，进
+行比较。也可以在波或过程的视角对比，也可以在场或关系的视角对比总结:如何发现事物的不
+变性呢?
+我们可以从对比、变化和分布三个视角(或者说粒子，波，场)进行观察，发现不变性。这是
+三视角归纳法，就是从三个视角去进行从“多”到“一”的归纳。我们也可以从同样的三个视角
+去对比两个事物，发现他们各自的对比特性。两种方法得到相同的认识。
+从粒子，波，场三视角对比区分事物，将会对人工智能的机器识别的发展产生巨大推动作
+用!
+03 更多例子和总结
+要对比苹果和香蕉，我们只需要从粒子视角比较就可以了，就是比较颜色、形状，这两个
+稳定的对比特征就可以。
+我们不需要比较苹果和香蕉的变化或波的视角，也不需要比较他们的分布或关系视角。
+即只需要比较他们的静态特征，即粒子特征。
+但是如果我们对比两个形状和大小差不多的红色富士苹果，我们就需要进入变化视角进行
+对比。比如对比他们的红色的变化视角，即具体的红色的不同的变化情况。这就是考虑动态特征。
+如果我们对比区分一对双胞胎女孩，一般我们需要进入变化视角，困难情况下需要进入分
+布视角才能准确区分。所以外人很难区分双胞胎，而父母则容易多了，因为外人很难了解他们的
+变化和分布视角，而父母对这些就非常了解。
+比如父母熟悉他们对父母说话的不同方式。这个就是分布视角的对比。也就是考虑场的特
+征或者说关系的特征。
+所以认识事物的对比视角，也需要从三个视角进行:
+1.从对比的视角(粒子特征或是静态特征视角)进行对比;
+2.从变化的视角(波的特征或是动态特征视角)进行对比;
+3.从分布的视角(场的特征或是关系特征视角)进行对比。
+总结：我们可以认识这个世界，因为世界的万事万物在不停的变化中，却保持有一定的与其他事
+物形成对比区分的本质属性。这个就是事物的对比视角。
+现在我们又来了一个问题：这个本质属性是不是和具体事物和具体处境无关呢？即有没有
+一个固定的、永恒的对比本质内容，它能适用于任何情形呢？
+请大家阅读:&quot;三视角入门:分布视角&quot;。
+三视角入门(3):分布视角
+01
+我们对任何一个事物，需要从不变的视角，也需要从变化的视角去分析。佛教对世界的万
+物的生生灭灭的感悟很深，也是其最为智慧的部分，同时佛教还对事物之间的“因缘”，就是“关
+系”认识很深刻。佛教说，此有故彼有，此生故彼生，此无故彼无，此灭故彼灭。这四句话的解
+释就是:世界的一切事物，不论是物理的成住坏空，生理的生老病死，心理的生住异灭，不论是
+自然的，人为的，凡是能够成为一种现象的都是由于必然的因缘聚集而成的，就是因果关系。
+佛教告诉我们事物之间的普遍联系。而马克思主义哲学直接说万事万物是普遍联系的，没
+有一个事物是孤立存在的。任何一个事物都会和某些事物发生关联。但是为什么宇宙会普遍联系
+呢？基督教哲学思想是： 上帝预定安排一切，上帝亲自掌管和护理宇宙和历史的具体运行，按
+照他永恒的计划进行，万物万事互相联系于整个计划。
+02
+以上都属于形而上的哲学理论或神学信仰，下面我们从日常生活来进一步仔细思考事物的
+关系性。
+1.对任何事物和现象，当我们使用语言描述的时候，我们就是在使用一些概念组合，这样我
+们就是在述说一个种类，而这个种类就意味着很多杂多的个例集合，在这个集合里的元素就有相
+互关系，就是他们共享一个种类属性。这个叫做事物之间的属性关系。比如我手里的苹果和商店
+里的苹果虽然大小颜色不一样，但他们都是苹果，他们之间有关系。
+任何一个概念就意味着属于该概念的具体例子之间有相互关系。所有的人之间有关系，所
+有的狗之间有关系，所有的吃中饭行为现象之间有关系。
+2.家庭关系，夫妻关系，老师和学生关系，公司职员之间的关系，这是人与人之间的人伦关
+系。当我看到鲜花，心中喜悦，这是一种审美关系。汽车行在路上，汽车和路有位置的关系。一
+粒灰尘落在我的身上，它和我产生关系。当我思考路上的一滴水时，我和水产生关系。当我思想
+耶和华的话时，我和上帝产生关系。当我坐在椅子上时，我和椅子产生关系。关系是什么呢？两
+个事物之间发生关系，一定是他们之间共享某一些东西！员工关系由企业的共同使命、愿景、目
+标维系!
+3.关系无处不在。关系意味着该事物被分布在一个处境里，它对处境里其他事物产生的影响
+和发生的关系。所以我们把它叫做认识该事物的分布视角，或关系的视角。关系视角刻画的是该
+事物的重要性和影响价值。如果一个事物没有分布视角内容，就是它和其他事物不发生关系，那
+么它是不值得研究的。其实他也是不可述说的。所以分布视角是我们讨论任何事物的必须的视角。
+一个社会组织，比如医院、学校、教会或企业的分布视角包括组织或企业的社会责任和社会影响。
+管理企业的社会责任、贡献和影响是企业管理的三大任务之一（来自德鲁克的管理学）。
+管理三大任务：制定企业使命和目的，组织激励，管理社会影响和责任﻿! 
+4.观察事物的分布视角，就是发现该事物和其他事物的关系，我们可以从对比、变化和分布
+三视角来发现，或是从粒子、波和场来发现。比如研究我桌子上的水杯，我们发现水杯和桌子上
+的饭碗有关系，他们都是容器，有共性。这个是从粒子的视角说的。水杯和桌子发生位置的关系:
+水杯在桌子上面，桌子支撑着水杯。这个也是粒子与粒子的关系。再如研究桌上的苹果，苹果在
+变味，厨房的梨也在变味，这两个过程有关系，这是从波或变化的视角看苹果和梨。
+我们还可以研究苹果和我的关系和梨和我的关系的关系，这是从分布的视角或者场的视角发现关
+系。
+5.如果我们研究一家公司的分布视角，就必须研究:公司和同类公司的关系，公司和产业链
+里其他公司的关系，公司和周边社区的关系，公司对环境的影响关系，公司业务活动中对其他公
+司的影响关系，公司员工的形象对其他公司员工的影响，对社区群众的影响。公司和政府的关系
+和其他公司和政府的关系的比较等等。
+03
+总结：研究一个给定的事、物和理，我们必须从不变的视角（即对比本质视角）研究事物，
+也必须从变化的视角研究事物，还必须从关系或分布的视角研究事物。这是三位一体的关系。三
+个视角彼此互为预设，互为条件。我们不能脱离分布视角去讨论对比视角，去建立一个本质概念，
+所以我们不能发现一个普遍的概念适用于任何处境。这就是对一切的普遍的希望适用于任何处境
+的范畴的存在的否定。我们也不能离开处境来讨论事物的变化性。
+总结就是:我们必须在分布的视角里研究对比和变化视角。
+比如我们不能抽象地定义何为苹果的甜味，因为对苹果的甜味体验不能离开分布视角，就是不能
+离开苹果和吃苹果的人的关系。同样，研究关系视角，就必须以对比和变化视角为预设。单纯研
+究关系，这个关系是不确定的，也是空的。
+很多孩子学习数学知识，只是记住一些通用的公式和公式的应用，却不明白公式的由来，
+公式和其他公式的关系，公式的意义和价值。这是对分布视角的忽视，其后果是负面的：孩子的
+数学知识体系无法形成一个优美的整体，缺少分布视角，不明白知识的系统关系，最后的结果是：
+数学公式的机械背诵和记忆和机械应用。
+今天是知识经济时代，资源和产品的主流是新知识，然而知识自己不能自动产生新知识，
+所以创新能力是个人和企业或组织的最为重要的竞争力:立身之本!而只有三视角方法论才能真
+正给我们创新的发散思维和具体道路！</div></details>
+<div class="tv-pager"><a href="/three-views/read/a021/">← 上一篇</a><a href="/three-views/doc/b011/">下一篇 →</a></div>
+</main>
+<footer class="tv-foot">
+<p>三视角文章由王德生历年撰写　·　文库整理：德麦国际</p>
+<p>© 德麦国际　·　<a href="/three-views/">三视角专栏</a>　·　<a href="/browse/">爱思乐园 SDE Universes</a></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+var PDF_URL="/three-views/doc/b010/b010.pdf", DOC_TITLE="三视角入门（之一）";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.3,curText="";
+var canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'),textLayer=document.getElementById('textLayer');
+var $=function(i){return document.getElementById(i);};
+function drawTextLayer(tc,vp){
+  textLayer.innerHTML='';var frag=document.createDocumentFragment(),fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str)return;
+    var m=pdfjsLib.Util.transform(vp.transform,it.transform),fs=Math.hypot(m[2],m[3]);
+    if(!fs)return;
+    var ang=Math.atan2(m[1],m[0]),sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01)css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;frag.appendChild(sp);fix.push([sp,it.width*vp.scale,ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0],target=w[1],ang=w[2];if(!target)return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){var sx=target/real;if(sx>0.1&&sx<10){
+      sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')';}}
+  });
+}
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-24;
+    var vp1=page.getViewport({scale:1}),s=baseScale;
+    if(vp1.width*s>avail&&avail>120)s=avail/vp1.width;
+    var vp=page.getViewport({scale:s}),ratio=Math.min(window.devicePixelRatio||1,2.5);
+    canvas.width=Math.floor(vp.width*ratio);canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px';canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px';pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      curText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc,vp);rendering=false;
+      if(pending!==null){var p=pending;pending=null;render(p);}
+    });
+    $('pageInput').value=num;$('prev').disabled=(num<=1);$('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+// 载入失败后 pdfDoc 仍是 null：缩放键不走 go() 的守卫，这里必须自己挡住，
+// 否则一按 ＋/− 就抛 TypeError，把错误提示旁边的按钮全变成哑弹。
+function queue(n){if(!pdfDoc)return;if(rendering)pending=n;else render(n);}
+function go(n){if(!pdfDoc)return;pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);}
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;$('totalPages').textContent=pdf.numPages;$('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';$('page-wrap').style.display='inline-block';render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';$('error').style.display='block';
+  $('error').innerHTML='这一篇暂时无法在线分页显示。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开或下载 PDF</a>，'
+    +'或展开下方「纯文字版」阅读。<br><span style="font-size:12px">（'+err.message+'）</span>';
+});
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);
+  window._rz=setTimeout(function(){queue(pageNum);},220);});
+window.WDS_READ={title:DOC_TITLE,
+  bodyEl:function(){return document.getElementById('page-wrap');},
+  docTextFn:function(){return curText?('【'+DOC_TITLE+' · 第 '+pageNum+' 页 / 共 '
+    +(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+curText):'';}};
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260822g" defer></script>
+</body>
+</html>
