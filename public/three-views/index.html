@@ -115,6 +115,10 @@ ol.lg li:last-child{border-left-color:transparent;padding-bottom:.3rem}
 ol.lg li::before{content:counter(lg);position:absolute;left:-.83rem;top:0;
  width:1.6rem;height:1.6rem;border-radius:50%;background:var(--ac);color:#FAF6EC;
  font-size:.82rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+ol.lg li.gap{counter-increment:none;padding:0 0 1.15rem 2.3rem}
+ol.lg li.gap::before{content:'';width:.5rem;height:.5rem;left:-.28rem;top:.42rem;
+ background:transparent;border:2px dashed var(--ac);opacity:.55}
+ol.lg li.gap .gap-t{font-size:.86rem;color:var(--muted);letter-spacing:.02em}
 ol.lg li b{font-size:1.06rem;letter-spacing:.03em}
 ol.lg li .lg-t{margin-left:.6rem;font-size:.8rem;color:var(--muted);white-space:nowrap}
 ol.lg li p{margin:.35rem 0 0;font-size:.93rem;line-height:1.82;color:var(--text2)}
@@ -140,6 +144,7 @@ ol.lg li p{margin:.35rem 0 0;font-size:.93rem;line-height:1.82;color:var(--text2
 <ol class="lg">
 <li><b>三视角 · 知识的结构和体系</b><span class="lg-t">2015.07 &ndash; 2021 初</span>
 <p>对比·变化·分布，与由它生出的九宫格、27 宫格。<b>本栏记的就是这一站。</b></p></li>
+<li class="gap"><span class="gap-t">2021 初 &ndash; 2021.07　酝酿期</span></li>
 <li><b>321 智慧系统</b><span class="lg-t">2021.07 &ndash; 2025.07</span>
 <p>三视角不再只是「从哪几个角度看」，开始成体系地回答怎么用、怎么落地。本栏「<a href="/three-views/library/to-sde/">从三视角到 SDE</a>」那一格收的四篇写于 2025 年 7 月，正落在交棒给 SIO 的那个月。</p></li>
 <li><b>SIO 本体论</b><span class="lg-t">2025.07 &ndash; 2026.01</span>
