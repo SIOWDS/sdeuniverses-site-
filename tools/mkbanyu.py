@@ -29,7 +29,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(PUB, 'banyu')
 
 sys.path.insert(0, HERE)
-from banyu_plan import SESSIONS, BRING, RULES, LINKS, READING  # noqa: E402
+from banyu_plan import SESSIONS, BRING, RULES, LINKS, READING, PREP  # noqa: E402
 
 STAMP = re.search(r'^stamp=(\S+)',
                   open(os.path.join(HERE, 'wds-mode.stamp'), encoding='utf-8').read(),
@@ -108,6 +108,35 @@ td b{color:var(--pa)}
 .links li em{display:block;font-style:normal;color:var(--faint);font-size:13.8px;margin-top:2px}
 .bring{background:#12140F;border-left:3px solid var(--d);padding:15px 19px;margin:18px 0;font-size:15.2px;color:var(--dim)}
 .bring b{color:var(--pa)}
+.bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:20px 0 6px}
+.btn{background:var(--card);border:1px solid var(--line);color:var(--dim);
+ padding:7px 15px;border-radius:3px;font-size:14px;cursor:pointer;font-family:inherit;
+ text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac);text-decoration:none}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pgbox{display:flex;align-items:center;gap:5px;font-size:14px;color:var(--dim)}
+.pgbox input{width:3.4rem;background:#14120E;border:1px solid var(--line);color:var(--ac);
+ padding:6px 4px;border-radius:3px;text-align:center;font-family:inherit;font-size:14px}
+.stage{display:flex;justify-content:center;padding:10px 0 4px;min-height:40vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--line);border-radius:3px;overflow:hidden;
+ box-shadow:0 14px 40px rgba(0,0,0,.5)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(201,162,39,.35)}
+.loading{text-align:center;color:var(--faint);padding:3.5rem 1rem;font-size:15px}
+.spinner{width:32px;height:32px;border:3px solid rgba(201,162,39,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto .9rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#D08A7A;padding:2.5rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--faint);font-size:12.5px;margin:2px 0 0}
+details.plain{margin:1.8rem 0 0;border:1px solid var(--line);border-radius:5px;
+ background:var(--card);padding:14px 18px}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:14.5px;font-weight:600}
+details.plain .body{margin-top:14px;white-space:pre-wrap;font-size:14.6px;line-height:1.95;
+ color:var(--dim);border-top:1px solid var(--line);padding-top:14px}
 .pager{display:flex;justify-content:space-between;gap:14px;margin:40px 0 0;
  padding-top:18px;border-top:1px solid var(--line);font-size:15px}
 .foot{border-top:1px solid var(--line);margin-top:44px;padding:26px 0 56px;
@@ -152,6 +181,8 @@ def topbar(cur):
     for slug, dn, date, name in DAYS:
         links.append('<a href="/banyu/%s/"%s>%s · %s</a>'
                      % (slug, ' class="cur"' if cur == slug else '', dn, esc(name)))
+    links.append('<a href="/banyu/prep/"%s>预习材料</a>'
+                 % (' class="cur"' if cur == 'prep' else ''))
     links.append('<a href="/banyu/reading/"%s>阅读材料</a>'
                  % (' class="cur"' if cur == 'reading' else ''))
     return ('<header class="top"><div class="w">'
@@ -645,12 +676,181 @@ def build_index():
         '<a href="/taste/">ChatSDE 与其他智能体</a>（第一、二天上机用），'
         '<a href="/education/">教育专栏</a>。'
         '两处都不需要提前准备，带着自己最难教的那一个概念来就行。</p>',
+        '<p><a href="/banyu/prep/"><b>预习材料 · %d 份</b></a>是能整份带走的东西：'
+        '一份 <b>61 页的数学发生学教学法幻灯</b>（第二天上午讲的就是它，约一小时看完），'
+        '以及几本整本 PDF。<b>时间只够看一样，就看那份幻灯。</b></p>'
+        % sum(len(g[2]) for g in PREP),
         '<p>另外挑了一份 <a href="/banyu/reading/"><b>阅读材料 · %d 篇</b></a>——'
         '站上写过的文章与专著，按天与按学科分好组，'
         '每一条都写明谁读、读了能拿走什么。'
         '<b>开课前只读第一组那四篇就够了。</b></p>'
         % sum(len(g[2]) for g in READING),
         '</div></main>', FOOT, TAIL])
+
+
+SLIDES_JS = r"""<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+var PDF_URL="/banyu/prep/math-slides/sde-math-genesis-slides.pdf";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.3,curText="";
+var canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'),textLayer=document.getElementById('textLayer');
+var $=function(i){return document.getElementById(i);};
+function drawTextLayer(tc,vp){
+  textLayer.innerHTML='';var frag=document.createDocumentFragment(),fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str)return;
+    var m=pdfjsLib.Util.transform(vp.transform,it.transform),fs=Math.hypot(m[2],m[3]);
+    if(!fs)return;
+    var ang=Math.atan2(m[1],m[0]),sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01)css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;frag.appendChild(sp);fix.push([sp,it.width*vp.scale,ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0],target=w[1],ang=w[2];if(!target)return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){var sx=target/real;if(sx>0.1&&sx<10){
+      sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')';}}
+  });
+}
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-16;
+    var vp1=page.getViewport({scale:1}),sc=baseScale;
+    if(vp1.width*sc>avail&&avail>120)sc=avail/vp1.width;
+    var vp=page.getViewport({scale:sc}),ratio=Math.min(window.devicePixelRatio||1,2.5);
+    canvas.width=Math.floor(vp.width*ratio);canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px';canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px';pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx,viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      curText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc,vp);rendering=false;
+      if(pending!==null){var q=pending;pending=null;render(q);}
+    });
+    $('pageInput').value=num;$('prev').disabled=(num<=1);$('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+// 载入失败后 pdfDoc 仍是 null：缩放键不走 go() 的守卫，这里必须自己挡住。
+function queue(n){if(!pdfDoc)return;if(rendering)pending=n;else render(n);}
+function go(n){if(!pdfDoc)return;pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);}
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;$('totalPages').textContent=pdf.numPages;$('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';$('page-wrap').style.display='inline-block';render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';$('error').style.display='block';
+  $('error').innerHTML='这一份暂时无法在线翻页。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开或下载 PDF</a>，'
+    +'或展开下方「纯文字版」。<br><span style="font-size:12px">（'+err.message+'）</span>';
+});
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);
+  window._rz=setTimeout(function(){queue(pageNum);},220);});
+</script>"""
+
+
+def build_slides():
+    """SDE 数学发生学教学法 · 61 页幻灯的在线翻页页。
+
+    ⚠ 同目录既有 index.html 又有 PDF：站内检索把 PDF 收到这个 URL 名下，
+      而 --reuse-pdf 增量重建会跳过它 —— 所以**必须内嵌纯文字版**，
+      否则这一份会落在索引之外（与 /three-views/read/ 同一条道理）。
+    """
+    base = '/banyu/prep/math-slides/sde-math-genesis-slides'
+    txt = open(os.path.join(HERE, 'banyu_text', 'math-slides.txt'), encoding='utf-8').read()
+    title = 'SDE 数学发生学教学法 · 幻灯 61 页｜巴渝培训'
+    desc = ('SDE 数学发生学教学法教师研修幻灯，61 页：从三年级那节分数课讲起，'
+            '数、加法、位值、乘法、分数、等号、三角形内角和七个概念各给两版对照教法，'
+            '末尾是备课四问、五步模板、三条纪律与四个常见的坑。可在线翻页、下载 PDF 或原始 PPT。')
+    return '\n'.join([
+        head(title, desc, 'https://sdeuniverses.com/banyu/prep/math-slides/'),
+        topbar('prep'),
+        '<div class="hero"><div class="w">',
+        '<div class="kicker">巴渝培训 · 预习材料</div>',
+        '<h1>SDE 数学发生学教学法</h1>',
+        '<p class="tag">教师研修幻灯 · 61 页</p>',
+        '<div class="keys"><span class="hot">第二天上午讲的就是它</span>'
+        '<span>约一小时看完</span><span>可下载 PDF</span><span>可下载原始 PPT</span></div>',
+        '</div></div>',
+        '<main><div class="w">',
+        '<p class="lead">从三年级那节分数课讲起：当堂全对，一周后近一半孩子答「1/3 比 1/2 大」。'
+        '中间七个概念各给<b>「这样教／那样教」两版对照</b>，'
+        '末尾是备课四问、五步模板、三条纪律和四个最常见的坑。</p>',
+        '<div class="note">这是<b>教师研修用的原件</b>，里面带了几个名词（S／D／E、显露、回写）。'
+        '三天现场<b>不用这些词</b>——看不惯直接跳过，只看每一页右边那半栏的做法就行。</div>',
+        '<div class="bar">',
+        '<button class="btn" id="prev" disabled>‹ 上一页</button>',
+        '<div class="pgbox"><input id="pageInput" type="number" min="1" value="1">'
+        '<span>/ <span id="totalPages">…</span></span></div>',
+        '<button class="btn" id="next" disabled>下一页 ›</button>',
+        '<button class="btn" id="zoomOut">−</button>',
+        '<button class="btn" id="zoomIn">＋</button>',
+        '<a class="btn dl" href="%s.pdf" download="SDE数学发生学教学法.pdf">⬇ 下载 PDF</a>' % base,
+        '<a class="btn dl" href="%s.pptx" download="SDE数学发生学教学法.pptx">⬇ 下载 PPT</a>' % base,
+        '</div>',
+        '<div class="stage" id="stage">',
+        '<div id="loading" class="loading"><div class="spinner"></div>正在载入 61 页…</div>',
+        '<div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas>'
+        '<div class="textLayer" id="textLayer"></div></div>',
+        '<div id="error" class="err" style="display:none"></div>',
+        '</div>',
+        '<p class="hint">← → 方向键翻页</p>',
+        '<details class="plain"><summary>纯文字版（全部 61 页的文字，便于手机上看与检索）</summary>'
+        '<div class="body">%s</div></details>' % esc(txt),
+        '<div class="pager"><a href="/banyu/prep/">← 预习材料</a>'
+        '<a href="/banyu/day2/">第二天 · SDE教材发生学 →</a></div>',
+        '</div></main>', FOOT, SLIDES_JS, TAIL])
+
+
+def build_prep():
+    n = sum(len(g[2]) for g in PREP)
+    title = '预习材料 · %d 份｜巴渝培训' % n
+    desc = ('巴渝培训开课前的预习材料 %d 份：一份 61 页的 SDE 数学发生学教学法幻灯，'
+            '以及站上现成的入门与整本专著 PDF，都能在线翻页或下载。' % n)
+    body = [head(title, desc, 'https://sdeuniverses.com/banyu/prep/'),
+            topbar('prep'),
+            '<div class="hero"><div class="w">',
+            '<div class="kicker">巴渝培训 · 开课之前</div>',
+            '<h1>预习材料</h1>',
+            '<p class="tag">%d 份 · 都能整份带走</p>' % n,
+            '<div class="keys"><span class="hot">先看那份 PPT</span>'
+            '<span>其余按需</span><span>全部可下载</span></div>',
+            '</div></div>',
+            '<main><div class="w">',
+            '<p class="lead">这一页放的是<b>能整份带走的东西</b>——'
+            '幻灯、整本 PDF。想读单篇文章的，去'
+            '<a href="/banyu/reading/">阅读材料</a>那一页。</p>',
+            '<div class="note"><b>时间只够看一样，就看第一份。</b>'
+            '六十一页幻灯，一小时，三天里最要紧的东西它都讲了。'
+            '其余的按你教的那一科挑，或者留到散会以后。</div>']
+    for gname, gnote, rows in PREP:
+        body.append('<h2>%s</h2>' % esc(gname))
+        body.append('<p>%s</p>' % esc(gnote))
+        body.append('<ul class="links">'
+                    + ''.join('<li><a href="%s">%s</a><em>%s</em></li>' % (u, esc(t), d)
+                              for u, t, d, _k in rows)
+                    + '</ul>')
+    body.append('<div class="note" style="margin-top:2rem">'
+                '⚠ <b>还有别的 PPT 没收进来。</b>站上与手里应该还有几份做过的课件，'
+                '拿到就补进这一页——发给我就行，不用改页面。</div>')
+    body += ['<div class="pager"><a href="/banyu/">← 本栏总目</a>'
+             '<a href="/banyu/reading/">阅读材料 →</a></div>',
+             '</div></main>', FOOT, TAIL]
+    return '\n'.join(body)
 
 
 def build_reading():
@@ -706,8 +906,15 @@ def main():
     d = os.path.join(OUT, 'reading')
     os.makedirs(d, exist_ok=True)
     open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(build_reading())
-    print('已写 %d 页（总目 ＋ %d 天 ＋ 阅读材料 %d 篇）→'
-          % (len(DAYS) + 2, len(DAYS), sum(len(g[2]) for g in READING)), OUT)
+    d = os.path.join(OUT, 'prep')
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(build_prep())
+    d = os.path.join(OUT, 'prep', 'math-slides')
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(build_slides())
+    print('已写 %d 页（总目 ＋ %d 天 ＋ 预习 %d 份 ＋ 幻灯 ＋ 阅读 %d 篇）→'
+          % (len(DAYS) + 4, len(DAYS), sum(len(g[2]) for g in PREP),
+             sum(len(g[2]) for g in READING)), OUT)
 
 
 if __name__ == '__main__':

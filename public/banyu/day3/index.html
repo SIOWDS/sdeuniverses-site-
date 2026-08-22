@@ -84,6 +84,35 @@ td b{color:var(--pa)}
 .links li em{display:block;font-style:normal;color:var(--faint);font-size:13.8px;margin-top:2px}
 .bring{background:#12140F;border-left:3px solid var(--d);padding:15px 19px;margin:18px 0;font-size:15.2px;color:var(--dim)}
 .bring b{color:var(--pa)}
+.bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:20px 0 6px}
+.btn{background:var(--card);border:1px solid var(--line);color:var(--dim);
+ padding:7px 15px;border-radius:3px;font-size:14px;cursor:pointer;font-family:inherit;
+ text-decoration:none;line-height:1.5}
+.btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac);text-decoration:none}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.dl{border-color:var(--ac);color:var(--ac)}
+.pgbox{display:flex;align-items:center;gap:5px;font-size:14px;color:var(--dim)}
+.pgbox input{width:3.4rem;background:#14120E;border:1px solid var(--line);color:var(--ac);
+ padding:6px 4px;border-radius:3px;text-align:center;font-family:inherit;font-size:14px}
+.stage{display:flex;justify-content:center;padding:10px 0 4px;min-height:40vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;background:#fff;
+ border:1px solid var(--line);border-radius:3px;overflow:hidden;
+ box-shadow:0 14px 40px rgba(0,0,0,.5)}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(201,162,39,.35)}
+.loading{text-align:center;color:var(--faint);padding:3.5rem 1rem;font-size:15px}
+.spinner{width:32px;height:32px;border:3px solid rgba(201,162,39,.25);border-top-color:var(--ac);
+ border-radius:50%;margin:0 auto .9rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#D08A7A;padding:2.5rem 1rem;line-height:1.9}
+.hint{text-align:center;color:var(--faint);font-size:12.5px;margin:2px 0 0}
+details.plain{margin:1.8rem 0 0;border:1px solid var(--line);border-radius:5px;
+ background:var(--card);padding:14px 18px}
+details.plain summary{cursor:pointer;color:var(--ac);font-size:14.5px;font-weight:600}
+details.plain .body{margin-top:14px;white-space:pre-wrap;font-size:14.6px;line-height:1.95;
+ color:var(--dim);border-top:1px solid var(--line);padding-top:14px}
 .pager{display:flex;justify-content:space-between;gap:14px;margin:40px 0 0;
  padding-top:18px;border-top:1px solid var(--line);font-size:15px}
 .foot{border-top:1px solid var(--line);margin-top:44px;padding:26px 0 56px;
@@ -92,7 +121,7 @@ td b{color:var(--pa)}
 </style>
 </head>
 <body>
-<header class="top"><div class="w"><span style="color:var(--ac);letter-spacing:.12em">巴渝培训</span><nav><a href="/banyu/">总目</a><a href="/banyu/day1/">第一天 · SDE发生学教育入门</a><a href="/banyu/day2/">第二天 · SDE教材发生学</a><a href="/banyu/day3/" class="cur">第三天 · SDE课堂发生学</a><a href="/banyu/reading/">阅读材料</a></nav></div></header>
+<header class="top"><div class="w"><span style="color:var(--ac);letter-spacing:.12em">巴渝培训</span><nav><a href="/banyu/">总目</a><a href="/banyu/day1/">第一天 · SDE发生学教育入门</a><a href="/banyu/day2/">第二天 · SDE教材发生学</a><a href="/banyu/day3/" class="cur">第三天 · SDE课堂发生学</a><a href="/banyu/prep/">预习材料</a><a href="/banyu/reading/">阅读材料</a></nav></div></header>
 <div class="hero"><div class="w">
 <div class="kicker">巴渝培训 · 第三天 · 8 月 26 日</div>
 <h1>SDE课堂发生学</h1>
