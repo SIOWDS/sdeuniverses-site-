@@ -9,6 +9,11 @@
 做法：从 index.html 抽出 <head>（换标题/描述）、固定顶栏、页脚，把目标 <section>
 原样搬进 <main>，写到 public/<slug>/index.html。区块内的 #锚点链接一律改写为新页地址。
 """
+# ⚠⚠ 2026-08-22 起**不要直接跑这个工具**：
+#   ① 它从 public/index.html 取页壳，而站点首页早已搬到 public/browse/——取到的是空壳；
+#   ② 它会把 /taste/ 全表覆盖成首页那 5 张预览，并重建已删的 /agents/；
+#   ③ 它抄的是首页那一整套顶栏，而**专栏页不许带首页的内容和链接**（王德生定的基本原则，
+#      见 tools/decouple_column_nav.py）。真要重建栏目页，跑完必须再过一遍解耦。
 import re, os, sys, json
 
 ROOT = '/home/claude/site'

@@ -128,26 +128,26 @@ footer a{color:var(--gold);text-decoration:none}
 .hc-plan-head{display:flex;justify-content:space-between;gap:1rem;align-items:end;margin-bottom:1.1rem}.hc-plan-head h2{margin:0;color:#185e49;font-size:clamp(1.3rem,3vw,1.85rem)}.hc-plan-head span{color:#397965;font-size:.82rem}
 .hc-plan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}.hc-set{padding:1rem;border:1px solid #d3e8df;border-radius:12px;background:#fff}.hc-set b{display:block;color:#183f34;margin-bottom:.55rem;line-height:1.5}.hc-links{display:flex;gap:.45rem;flex-wrap:wrap}.hc-links a{font-size:.76rem;padding:.34rem .58rem;border-radius:999px;border:1px solid #bddccd;color:#17654f}.hc-links a:first-child{background:#238468;color:#fff;border-color:#238468}
 @media(max-width:720px){.hc-plan-grid{grid-template-columns:1fr}.hc-plan-head{display:block}.hc-plan-head span{display:block;margin-top:.4rem}}
+
+/* 2026-08-22 栏目页与首页解耦：本栏名做站标，回站那一条不抢戏 */
+.nav-logo .nlg-en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.66rem;letter-spacing:.18em;opacity:.72;text-transform:uppercase}
+.nav-links a.nav-back{margin-left:auto;opacity:.62;font-size:.9rem}
+.nav-links a.nav-back:hover{opacity:1}
 </style>
 </head>
 <body class="zh">
 
 <nav>
   <div class="nav-bar-main">
-  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <a class="nav-logo" href="/health/"><span class="zh-only">健康专栏</span><span class="en-only">Health</span><span class="nlg-en">Health</span></a>
   <div class="nav-links">
-    <a href="/browse/" class="zh-only">首页</a><a href="/browse/" class="en-only">Home</a>
-    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
-    <a href="/health/" class="sib here zh-only">健康专栏</a><a href="/health/" class="sib here en-only">Health</a>
-    <a href="/business/" class="sib zh-only">商业与经济</a><a href="/business/" class="sib en-only">Business &amp; Economics</a>
-    <a href="/plagiarism/" class="sib zh-only burn">论文抄袭专栏</a><a href="/plagiarism/" class="sib en-only burn">Plagiarism</a>
-    <a href="/discovery-vs-genesis/" class="sib zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="sib en-only">Discovery vs Genesis</a>
-    <a href="/ai/" class="sib zh-only">AI专栏</a><a href="/ai/" class="sib en-only">AI</a>
-    <a href="/philosophy/" class="sib zh-only">思想宇宙</a><a href="/philosophy/" class="sib en-only">Philosophy</a>
+    <a href="/health/" class="sib here zh-only">健康专栏</a>
+    <a href="/health/" class="sib here en-only">Health</a>
     <div class="lang-toggle">
       <button class="lang-btn active" onclick="setLang('zh')">中</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
+    <a class="nav-back" href="/browse/"><span class="zh-only">爱思乐园 ↗</span><span class="en-only">SDE Universes ↗</span></a>
   </div>
 </div>
   <div class="nav-bar-sub">

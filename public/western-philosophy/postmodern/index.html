@@ -111,20 +111,26 @@ section{padding:3.5rem 0}
 .sub-wpo.here,.sub-wpo:hover{color:#2F6272}
 .sub-wpk{color:#3C6E47}
 @media(max-width:640px){.sy-gap{padding:0 16px}.sy-a,.sy-b,.sy-k{padding-left:16px;padding-right:16px}}
+
+/* 2026-08-22 栏目页与首页解耦：本栏名做站标，回站那一条不抢戏 */
+.nav-logo .nlg-en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.66rem;letter-spacing:.18em;opacity:.72;text-transform:uppercase}
+.nav-links a.nav-back{margin-left:auto;opacity:.62;font-size:.9rem}
+.nav-links a.nav-back:hover{opacity:1}
 </style>
 </head>
 <body class="zh">
 <nav>
   <div class="nav-bar-main">
-    <a class="nav-logo" href="/browse/">SDE Universes</a>
+    <a class="nav-logo" href="/western-philosophy/"><span class="zh-only">西方哲学</span><span class="en-only">Western Philosophy</span><span class="nlg-en">Western Philosophy</span></a>
     <div class="nav-links">
-      <a href="/western-philosophy/" class="zh-only">← 西方哲学专栏</a><a href="/western-philosophy/" class="en-only">← Western Philosophy</a>
-      <a href="/search/" class="zh-only">🔍 搜索</a><a href="/search/" class="en-only">🔍 Search</a>
-      <div class="lang-toggle">
-        <button class="lang-btn active" onclick="setLang('zh')">中</button>
-        <button class="lang-btn" onclick="setLang('en')">EN</button>
-      </div>
+    <a href="/western-philosophy/" class="zh-only">← 西方哲学专栏</a>
+    <a href="/western-philosophy/" class="en-only">← Western Philosophy</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
+    <a class="nav-back" href="/browse/"><span class="zh-only">爱思乐园 ↗</span><span class="en-only">SDE Universes ↗</span></a>
+  </div>
   </div>
   <div class="nav-bar-sub">
     <a href="/western-philosophy/masters/" class="sub-wpm zh-only">50大师<sup class="nav-num">7</sup></a><a href="/western-philosophy/masters/" class="sub-wpm en-only">50 Masters<sup class="nav-num">7</sup></a>

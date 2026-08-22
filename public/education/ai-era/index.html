@@ -64,19 +64,26 @@ footer a{color:var(--gold);text-decoration:none}
   header.hero{padding:7rem 1.2rem 2.6rem;min-height:auto}
   .block{scroll-margin-top:5.5rem}
 }
+
+/* 2026-08-22 栏目页与首页解耦：本栏名做站标，回站那一条不抢戏 */
+.nav-logo .nlg-en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.66rem;letter-spacing:.18em;opacity:.72;text-transform:uppercase}
+.nav-links a.nav-back{margin-left:auto;opacity:.62;font-size:.9rem}
+.nav-links a.nav-back:hover{opacity:1}
 </style>
 </head>
 <body class="zh">
 
 <nav>
   <div class="nav-bar-main">
-  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <a class="nav-logo" href="/education/"><span class="zh-only">教育专栏</span><span class="en-only">Education</span><span class="nlg-en">Education</span></a>
   <div class="nav-links">
-    <a href="/browse/" class="zh-only">首页</a><a href="/browse/" class="en-only">Home</a>
-    <a href="/education/" class="sib here zh-only">教育专栏</a><a href="/education/" class="sib here en-only">Education</a>
-    <a href="/creation/" class="sib zh-only">学术创造专栏</a><a href="/creation/" class="sib en-only">Academic Creation</a>
-    <a href="/students/" class="sib zh-only">学员专栏</a><a href="/students/" class="sib en-only">Students</a>
-    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+    <a href="/education/" class="sib here zh-only">教育专栏</a>
+    <a href="/education/" class="sib here en-only">Education</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <a class="nav-back" href="/browse/"><span class="zh-only">爱思乐园 ↗</span><span class="en-only">SDE Universes ↗</span></a>
   </div>
   </div>
 </nav>

@@ -290,5 +290,16 @@ def main():
     print('写入 %s（%d 字节）' % (OUT, len(page)))
 
 
+
+# ⚠ 2026-08-22：本工具的页壳是从首页抄的，而**专栏页不许带首页的内容和链接**
+#    （王德生定的基本原则）。所以建完页立刻过一遍解耦，把顶栏收回本栏自己的。
+#    不加这一步，重跑一次 mkhowpage.py 就会把首页那一整套抄回 /how/。
+def _decouple():
+    import importlib
+    m = importlib.import_module('decouple_column_nav')
+    print('  解耦顶栏：', m.process('how/index.html', False)[0])
+
+
 if __name__ == '__main__':
     main()
+    _decouple()

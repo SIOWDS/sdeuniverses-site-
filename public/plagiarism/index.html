@@ -132,27 +132,26 @@ footer a{color:var(--gold);text-decoration:none}
 .art.soon{cursor:default;opacity:.92}
 .art.soon:hover{transform:none;box-shadow:none}
 .soon-rd{color:var(--muted)!important;font-style:italic}
+
+/* 2026-08-22 栏目页与首页解耦：本栏名做站标，回站那一条不抢戏 */
+.nav-logo .nlg-en{display:block;font-family:'Playfair Display',Georgia,serif;font-size:.66rem;letter-spacing:.18em;opacity:.72;text-transform:uppercase}
+.nav-links a.nav-back{margin-left:auto;opacity:.62;font-size:.9rem}
+.nav-links a.nav-back:hover{opacity:1}
 </style>
 </head>
 <body class="zh">
 
 <nav>
   <div class="nav-bar-main">
-  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <a class="nav-logo" href="/plagiarism/"><span class="zh-only">论文抄袭专栏</span><span class="en-only">Plagiarism</span><span class="nlg-en">Plagiarism</span></a>
   <div class="nav-links">
-    <a href="/browse/" class="zh-only">首页</a><a href="/browse/" class="en-only">Home</a>
-    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
-    <a href="/health/" class="sib zh-only">健康专栏</a><a href="/health/" class="sib en-only">Health</a>
-    <a href="/business/" class="sib zh-only">商业与经济</a><a href="/business/" class="sib en-only">Business &amp; Economics</a>
-    <a href="/creation/" class="sib zh-only">学术创造专栏</a><a href="/creation/" class="sib en-only">Academic Creation</a>
-    <a href="/plagiarism/" class="sib here zh-only burn">论文抄袭专栏</a><a href="/plagiarism/" class="sib here en-only burn">Plagiarism</a>
-    <a href="/discovery-vs-genesis/" class="sib zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="sib en-only">Discovery vs Genesis</a>
-    <a href="/ai/" class="sib zh-only">AI专栏</a><a href="/ai/" class="sib en-only">AI</a>
-    <a href="/philosophy/" class="sib zh-only">思想宇宙</a><a href="/philosophy/" class="sib en-only">Philosophy</a>
+    <a href="/plagiarism/" class="sib here zh-only burn">论文抄袭专栏</a>
+    <a href="/plagiarism/" class="sib here en-only burn">Plagiarism</a>
     <div class="lang-toggle">
       <button class="lang-btn active" onclick="setLang('zh')">中</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
+    <a class="nav-back" href="/browse/"><span class="zh-only">爱思乐园 ↗</span><span class="en-only">SDE Universes ↗</span></a>
   </div>
 </div>
   <div class="nav-bar-sub">
