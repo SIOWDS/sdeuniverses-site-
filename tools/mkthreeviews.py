@@ -355,6 +355,10 @@ LINEAGE = """<div class="lineage">
 <b>特征律</b>的发现：</p>
 <p class="lg-fml">现象的特征 ← 差异（δSIO）的稳定性
 <span class="lg-fml-sub">差异序列的稳定性，产生了感知现象的同一性，也就是「特征」</span></p>
+<p class="lg-eg"><b>举个例子。</b>眼前一台电风扇，它的<b>形状</b>——那份「就是这个形状」的
+<b>同一性</b>——是怎么发生的？不是因为有一台现成的扇子摆在那里被看见。
+是<b>视觉这一场 SDE 里的差异序列 D</b>（明暗、边界、远近、遮挡……一连串的差别）
+在<b>保持稳定</b>，于是有了一份稳定的 <b>S 显露</b>——形状的同一性，就在这里发生。</p>
 <p>康德那句没说完的话，到这里补上了：<b>现象的来源者不是客体，是差异序列的稳定性。</b>
 问的已不是「从哪几个角度看」，而是「它是怎么发生的」——本体不再是现成的人、事、物，
 而是它们各自被显露出来的那一次。从发现学到发生学，这一步走完了。</p>
@@ -392,6 +396,8 @@ ol.lg li p.lg-warn + p.lg-warn,ol.lg li p.lg-fml + p.lg-warn{margin-top:0}
 ol.lg li p.lg-fml{margin:0;padding:.75rem .85rem;border-left:3px solid var(--ac);
  background:rgba(15,110,140,.06);text-align:center;font-size:1.02rem;letter-spacing:.02em;
  color:var(--text);font-weight:600}
+ol.lg li p.lg-eg{margin-top:.7rem;padding:.7rem .95rem;border:1px dashed var(--border);
+ border-radius:7px;background:rgba(138,104,23,.045)}
 ol.lg li p.lg-fml .lg-fml-sub{display:block;margin-top:.4rem;font-size:.82rem;
  font-weight:400;color:var(--muted);letter-spacing:0}
 @media(max-width:640px){ol.lg li p.lg-fml{font-size:.9rem}
