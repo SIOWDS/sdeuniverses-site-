@@ -99,12 +99,51 @@ hd("【四】四档创作体：三处都加齐了没有");
     ok(new RegExp("\\n\\s{8}" + k + ": \\{ name:").test(W), k + "：服务端 SPEC 表里有");
     ok(W.indexOf(n) >= 0, k + "：字数写进了规格（" + n + "）");
   });
-  ok(/{ k: "wechat", t: "kWechat", w: 1 }/.test(F), "四档都标了 w:1（点它先问笔法）");
+  ok(/{ k: "wechat", t: "kWechat", w: 1, doc: 1 }/.test(F), "四档都标了 w:1（点它先问笔法）");
+  /* 2026-08-22：四档也都标了 doc:1（出 Word 与 PDF），诗另加 verse:1（不走首行缩进）。
+     ⚠ 漏标 doc 的表现是：写完了只拿得到 .md，读者要的那份 Word 一个也拿不到。 */
+  ["wechat", "prose", "story", "poem"].forEach((k) => {
+    ok(new RegExp('k: "' + k + '"[^}]*doc: 1').test(F), k + "：出得了 Word 与 PDF");
+  });
+  ok(/k: "poem"[^}]*verse: 1/.test(F), "⭐ 诗标了诗体（每行缩两格就不是诗了）");
+  ok(/verse: !!\(_kd && _kd\.verse\)/.test(F), "Word 生成时把诗体开关递下去");
+  ok(/VERSE = !!o\.verse;/.test(fs.readFileSync(ROOT + "/public/assets/sde-docx.js", "utf8")),
+    "docx 模块认这个开关");
   ok(/if \(d0 && d0\.w\) \{ writerMenu\(k\); return; \}/.test(F), "菜单点击真的会先开笔法面板");
   ok(/function distill\(kind, existing, title, tpl, again, style\)/.test(F), "distill 收 style 这个参数");
   ok(/style: style \|\| "",/.test(F), "style 进了请求体");
   ok(/distill\(kind, null, title, tpl, again, style\)/.test(F),
     "⭐ 填 Key 那一跳把 style 带了回来（第一版漏了它＝填完 Key 就变本色，且无任何报错）");
+}
+
+hd("【四之二】真造一份 Word 出来（不是看代码写着能造，是真造）");
+{
+  /* 这一节把 sde-docx 抠出来真跑一遍，造出字节再验：
+     ① 是不是真 .docx（PK 头，Word 与投稿口都逐字节查这个）；
+     ② 散文那一路仍是首行缩进两格（中文行文的规矩）；
+     ③ **诗那一路必须没有缩进**——每行缩两格，读起来就不是诗了。 */
+  const dsrc = fs.readFileSync(ROOT + "/public/assets/sde-docx.js", "utf8");
+  const win = {};
+  new Function("window", "Blob", "btoa", "TextEncoder", "Uint8Array", dsrc)(
+    win,
+    function (parts, opt) { this.parts = parts; this.type = opt && opt.type; },
+    (x) => Buffer.from(x, "binary").toString("base64"),
+    TextEncoder, Uint8Array);
+  const D = win.SDEDocx;
+  ok(!!D && typeof D.build === "function", "docx 模块跑得起来");
+  const bytes = (b) => Buffer.concat((b.parts || []).map((x) => Buffer.from(x.buffer ? x : new Uint8Array(x))));
+  const poem = bytes(D.build({ title: "一首诗", author: "John", verse: true, md: "# 一首诗\n\n第一行\n第二行" }));
+  const prose = bytes(D.build({ title: "一篇散文", author: "John", md: "# 一篇散文\n\n那天下午。" }));
+  ok(poem.slice(0, 2).toString() === "PK" && prose.slice(0, 2).toString() === "PK",
+    "造出来的是真 .docx（PK 头；投稿口逐字节查这个）");
+  ok(poem.length > 1000 && prose.length > 1000, "不是空壳，实得 " + poem.length + " / " + prose.length + " 字节");
+  const ind = (buf) => {
+    const x = buf.toString("latin1");
+    const m = x.match(/firstLine="(\d+)"/g) || [];
+    return m.length;
+  };
+  ok(ind(prose) > 0, "散文那一路仍是首行缩进两格");
+  ok(ind(poem) === 0, "⭐ 诗那一路一处缩进都没有");
 }
 
 hd("【五】端到端：四档各真跑一趟，看递给基底的到底是什么");

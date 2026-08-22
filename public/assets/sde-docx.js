@@ -7,7 +7,7 @@
  *   两件事需要的是同一样东西，所以只写这一份，两处共用。
  *
  * 用法：
- *     <script src="/assets/sde-docx.js?v=20260817c"></script>
+ *     <script src="/assets/sde-docx.js?v=20260822a"></script>
  *     var blob = SDEDocx.build({ title: "标题", author: "作者", md: "# 标题\n正文…" });
  *     // 下载：SDEDocx.save(blob, "文件名.docx")
  *     // 投稿：直接把 blob 当 file 塞进 FormData（命名成 .zip 也行，docx 首字节本来就是 PK）
@@ -122,11 +122,18 @@
     h4: { sz: 22, bold: true, before: 180, after: 80 },
     p:  { sz: 21, bold: false, before: 0, after: 120, indent: 420 },
     li: { sz: 21, bold: false, before: 0, after: 80, indent: 420, hanging: 0, left: 420 },
-    q:  { sz: 20, bold: false, before: 80, after: 120, left: 480, color: "555555" }
+    q:  { sz: 20, bold: false, before: 80, after: 120, left: 480, color: "555555" },
+    // 诗体正文：不缩进、行距紧一点（每一行是独立的一行，不是一段）
+    verse: { sz: 21, bold: false, before: 0, after: 60, indent: 0 }
   };
+  /* 诗体（2026-08-22）：诗、以及任何靠**分行**说话的稿子，不能走散文那套首行缩进——
+     每一行缩进两格，读起来就不是诗了；空行也不能被吞掉，它是节与节的界。
+     只多一个开关，散文/小说/论文那一路一字不变。 */
+  var VERSE = false;
   function paraXml(pp) {
     var st = STY[pp.k === "h1" ? "h1" : pp.k === "h2" ? "h2" : pp.k === "h3" ? "h3"
              : pp.k === "h4" ? "h4" : pp.k === "li" ? "li" : pp.k === "q" ? "q" : "p"];
+    if (VERSE && st === STY.p) st = STY.verse;
     var ind = "";
     if (st.left || st.indent) {
       ind = '<w:ind' + (st.left ? ' w:left="' + st.left + '"' : "")
@@ -140,6 +147,7 @@
 
   function build(o) {
     o = o || {};
+    VERSE = !!o.verse;          // 调用方一次性声明这一篇是不是靠分行说话的
     var paras = toParas(o.md || "");
     // 抬头：标题与署名。**署名必须排在标题之后**——正文若自带 `# 标题`，
     // 把署名一并塞到最前会让作者名跑到题目前面（实测栽过：python-docx 读出来第一段是署名）。

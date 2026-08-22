@@ -1555,6 +1555,45 @@ console.log("⑧ 成文（distill）");
   ok(tr6 && tr6.leg === "已收尾" && tr6.ok === true, "正常跑完时痕迹停在「已收尾」，实得 " + (tr6 && tr6.leg));
   document.body.querySelector(".wdsm-dist").querySelector(".dx").click();
 
+  console.log("㉗之一 每一档都出得了 Word（2026-08-22 用户令）");
+  {
+    /* ⚠ 此前 Word 与 PDF 那两颗只挂在 essay/paper/paper1 三档上——
+       散文、小说、诗、公众号文章、报告、提纲写完了只拿得到 .md。
+       这一节逐档点开面板，数那两颗在不在。 */
+    const want = ["report", "essay", "outline", "sumdoc", "wechat", "prose", "story", "poem"];
+    ROUTE["/api/wds/distill"] = [{ t: "token", v: "# 标题\n\n" + "正文一句。".repeat(60) }];
+    for (const k of want) {
+      layer.querySelector(".wdsm-distbtn").click();
+      const mm = document.body.querySelector(".wdsm-menu");
+      const label = (function () { const d = { report: "对话报告", essay: "提炼成文", outline: "写作提纲",
+        sumdoc: "总结载入的文章", wechat: "公众号文章", prose: "散文（", story: "短篇小说", poem: "诗歌（" }; return d[k]; })();
+      const b = [].slice.call(mm.children).find((x) => String(x.textContent || "").indexOf(label) >= 0);
+      if (!b) { ok(false, k + "：菜单里找得到"); continue; }
+      b.click();
+      await new Promise((r) => setTimeout(r, 60));
+      // 四档创作体会先弹笔法面板，选「本色写」进去
+      const wp = document.body.querySelector(".wdsm-tplb");
+      if (wp) { wp.querySelector(".wdsm-tplitem").click(); }
+      await new Promise((r) => setTimeout(r, 260));
+      const dp = document.body.querySelector(".wdsm-dist");
+      ok(!!dp && !!dp.querySelector(".ddocx"), k + "：面板上有 Word 那一颗");
+      ok(!!dp && !!dp.querySelector(".dpdfx"), k + "：面板上有 PDF 那一颗");
+      if (dp) dp.querySelector(".dx").click();
+    }
+    // 续写与投稿仍只归论文那几档（散文没有分节表，摆上去就是一颗按了报错的按钮）
+    layer.querySelector(".wdsm-distbtn").click();
+    const m9 = document.body.querySelector(".wdsm-menu");
+    [].slice.call(m9.children).find((x) => /散文（/.test(String(x.textContent || ""))).click();
+    await new Promise((r) => setTimeout(r, 60));
+    const wp9 = document.body.querySelector(".wdsm-tplb");
+    if (wp9) wp9.querySelector(".wdsm-tplitem").click();
+    await new Promise((r) => setTimeout(r, 260));
+    const d9 = document.body.querySelector(".wdsm-dist");
+    ok(d9 && !d9.querySelector(".dgoon"), "⭐ 散文上没有续写钮（它没有分节表）");
+    ok(d9 && !d9.querySelector(".dsub"), "散文上没有投稿钮（投稿口收的是文章）");
+    if (d9) d9.querySelector(".dx").click();
+  }
+
   console.log("㉗ 所有结果都进历史记录（2026-08-22 用户令）");
   {
     /* 这一节守的是一件很容易看走眼的事：**东西存下了 ≠ 下次找得到**。

@@ -38,7 +38,7 @@
   (function () {
     if (window.SDEDocx) return;
     var sc = document.createElement("script");
-    sc.src = "/assets/sde-docx.js?v=20260817c"; sc.defer = true;
+    sc.src = "/assets/sde-docx.js?v=20260822a"; sc.defer = true;
     document.head.appendChild(sc);
   })();
 
@@ -6266,14 +6266,18 @@
      💡 心法：**发现"两处要一起改"的那一刻，就是把它们并成一处的时刻**——
         靠人记得同步，早晚会漏，而漏了的样子就是界面上一个 undefined。 */
   var KIND_DEF = [
-    { k: "report", t: "kReport" }, { k: "essay", t: "kEssay" },
-    { k: "paper1", t: "kPaper1" }, { k: "paper", t: "kPaper" },
-    { k: "outline", t: "kOutline" }, { k: "sumdoc", t: "kSumdoc" }, { k: "deck", t: "kDeck" },
+    /* doc:1 ＝ 这一档出得了 Word 与 PDF。**除了 PPT 那一档，其余全都算**——
+       2026-08-22 之前只有 essay/paper/paper1 三档有这两颗，于是散文、小说、诗、
+       公众号文章、报告、提纲写完了只能拿到 .md，读者要的那份 Word 一个也拿不到。
+       ⚠ deck 不给：它的成品是 .pptx，稿子本身是切页用的中间物。 */
+    { k: "report", t: "kReport", doc: 1 }, { k: "essay", t: "kEssay", doc: 1 },
+    { k: "paper1", t: "kPaper1", doc: 1 }, { k: "paper", t: "kPaper", doc: 1 },
+    { k: "outline", t: "kOutline", doc: 1 }, { k: "sumdoc", t: "kSumdoc", doc: 1 }, { k: "deck", t: "kDeck" },
     /* 四档创作体（2026-08-22）。都带 w:1 ＝ 点它先问一句「要不要模仿谁的笔法」。
        ⚠ 加一档要同时改**服务端那张白名单与 SPEC 表**——只改这里的话，
        菜单点得到、后端认不出，表现是默默按「对话报告」写了一篇。 */
-    { k: "wechat", t: "kWechat", w: 1 }, { k: "prose", t: "kProse", w: 1 },
-    { k: "story", t: "kStory", w: 1 }, { k: "poem", t: "kPoem", w: 1 },
+    { k: "wechat", t: "kWechat", w: 1, doc: 1 }, { k: "prose", t: "kProse", w: 1, doc: 1 },
+    { k: "story", t: "kStory", w: 1, doc: 1 }, { k: "poem", t: "kPoem", w: 1, doc: 1, verse: 1 },
   ];
   function kindDef(k) { for (var i = 0; i < KIND_DEF.length; i++) if (KIND_DEF[i].k === k) return KIND_DEF[i]; return null; }
   function kindT(k) { var d = kindDef(k); return d ? t(d.t) : String(k || ""); }
@@ -6595,14 +6599,21 @@
     /* ── Word 与投稿：成文此前只能出 Markdown 与「打印成 PDF」，拿不出一份能直接投出去的稿子。
        两颗都只在**文章类**档位上摆（deck 是 PPT，报告/提纲不是投稿物）。 */
     var dxBtn = null, subBtn = null;
-    if (kind === "essay" || kind === "paper" || kind === "paper1") {
+    /* Word 与 PDF 归**所有文章类档位**（doc:1，见 KIND_DEF）；
+       续写与投稿仍只归 essay/paper/paper1：续写要有分节表才有意义，
+       投稿口收的是文章不是幻灯片稿。两组条件分开写，别再合成一个 if——
+       合着写正是「加了四档新体裁、Word 却没跟上」的来路。 */
+    var _kd = kindDef(kind), _isDoc = !!(_kd && _kd.doc), _isPaperish = (kind === "essay" || kind === "paper" || kind === "paper1");
+    if (_isDoc) {
       dxBtn = el("button", "wdsm-tbtn ddocx", t("mDocx"));
       dxBtn.title = t("mDocxS");
       dlBtn.parentNode.insertBefore(dxBtn, dlBtn);
       dxBtn.onclick = function () {
         if (!text) return;
         if (!window.SDEDocx) { stat.textContent = t("dPptxWait"); return; }
-        var blob = window.SDEDocx.build({ title: firstTitleOf(text) || kindT(kind), author: BRAND, md: text });
+        var blob = window.SDEDocx.build({ title: firstTitleOf(text) || kindT(kind), author: BRAND, md: text,
+          // 诗不能走散文那套首行缩进：每行缩两格就不是诗了
+          verse: !!(_kd && _kd.verse) });
         var nm = fileTag("WDS") + "-" + safeName(firstTitleOf(text) || kind) + "-" + stampName() + ".docx";
         saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = msg; });
       };
@@ -6612,8 +6623,11 @@
          走 /assets/wds-pdf.js（排版＋浏览器打印管线）：PDF 里的汉字要么落在内嵌字体里、
          要么是个空格，而仓库里没有也不该有中日韩字体——浏览器自己的打印管线带着系统中文字体，
          出来的是真矢量、可选可搜。代价只有一句话要讲清：目标选「另存为 PDF」。 */
-      /* 续写钮：只在「确实有缺节」时才亮，免得在一份完整稿上摆一颗没用的按钮。 */
-      var goOn = el("button", "wdsm-tbtn dgoon", t("mGoOn"));
+      /* 续写钮：只在「确实有缺节」时才亮，免得在一份完整稿上摆一颗没用的按钮。
+         ⚠ 而且只给 essay/paper/paper1——续写靠的是提纲那张分节表，
+         散文与诗根本没有分节，摆上去就是一颗按了会说「没有提纲」的按钮。 */
+      var goOn = _isPaperish ? el("button", "wdsm-tbtn dgoon", t("mGoOn")) : null;
+      if (goOn) {
       goOn.title = t("mGoOnS");
       goOn.style.display = "none";
       dlBtn.parentNode.insertBefore(goOn, dlBtn);
@@ -6692,6 +6706,7 @@
           });
         })();
       };
+      }   // ← 续写钮到此为止（只给 essay/paper/paper1）
       var pdfB = el("button", "wdsm-tbtn dpdfx", t("mPdfx"));
       pdfB.title = t("mPdfxS");
       dlBtn.parentNode.insertBefore(pdfB, dlBtn);
@@ -6715,10 +6730,13 @@
           }, function (okp) { stat.textContent = okp ? t("pdfTip") : t("pdfNo"); });
         });
       };
-      subBtn = el("button", "wdsm-tbtn dsub", t("mSub"));
-      subBtn.title = t("mSubS");
-      dlBtn.parentNode.insertBefore(subBtn, dlBtn);
-      subBtn.onclick = function () { submitPanel(cbox, text, kind, stat); };
+      // 投稿口收的是文章：散文/小说/诗/公众号那几档先不摆这颗（要放开另说，改这一行即可）
+      if (_isPaperish) {
+        subBtn = el("button", "wdsm-tbtn dsub", t("mSub"));
+        subBtn.title = t("mSubS");
+        dlBtn.parentNode.insertBefore(subBtn, dlBtn);
+        subBtn.onclick = function () { submitPanel(cbox, text, kind, stat); };
+      }
     }
     svBtn.textContent = t("dSave"); cpBtn.textContent = t("dCopy"); dlBtn.textContent = t("dDl");
     dirBtn.textContent = t("dDir");
