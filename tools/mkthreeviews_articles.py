@@ -27,7 +27,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, 'public')
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from threeviews_articles import ARTICLES, BY_IMG          # noqa: E402
+from threeviews_articles import ARTICLES as _RAW, BY_IMG  # noqa: E402
+
+# 文件里的顺序按编号（编号必须稳定，见 threeviews_articles.py 的说明），
+# 但读者看到的顺序按图号——否则后补的几篇会全堆在末尾。
+ARTICLES = sorted(_RAW, key=lambda a: (a['img'], a['title']))
 from threeviews_data import SECTIONS, NAMES              # noqa: E402
 
 OUT = os.path.join(PUB, 'three-views')
