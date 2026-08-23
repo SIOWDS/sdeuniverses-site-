@@ -137,7 +137,12 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms || 25));
     ok(/SAVEDIR_SRC = "\/assets\/wds-savedir\.js/.test(wm) && /sc\.src = SAVEDIR_SRC/.test(wm) && /sc\.src = "\/assets\/wds-savedir\.js/.test(dlg), "两处都在脚本一开始就把它拉进来（点击那一刻句柄要已在内存里）");
     ok(dlg.includes("noOverwrite: true") && wm.includes("noOverwrite: true"), "两处都启用了撞名顺延");
     ok(dlg.includes("tbtn savedir") && dlg.includes("\\u5b58\\u5230\\u76ee\\u5f55") && dlg.includes("saveDoc("), "对话页的成文弹窗有「存到目录」按钮并接上写入");
-    ok(wm.includes("function exportSession") && wm.includes("saveToDir(\"WDS-\" + safeName(t(\"convoTitle\"))"), "导出本场对话也走同一个目录");
+    /* ⚠ 文件名前缀后来抽成了 fileTag("WDS")（分身页要用自己的品牌名），
+       断言若钉死 "WDS-" 就会在开分身站那天长红。钉那件要守的事：
+       导出走的是同一个 saveToDir、名字里带本场对话标题。 */
+    ok(wm.includes("function exportSession")
+       && /saveToDir\(fileTag\("WDS"\) \+ "-" \+ safeName\(t\("convoTitle"\)\)/.test(wm),
+      "导出本场对话也走同一个目录");
   }
 
   console.log("\n===== " + P + " PASS / " + F + " FAIL =====");

@@ -86,14 +86,25 @@ step("⑤ 署名必须排在标题之后（实测栽过：作者名跑到题目�
 
 step("⑥ 一万字档：前后端都接上了", () => {
   ok(/paper: 1/.test(WORKER), "后端 kind 白名单里有 paper");
-  ok(/paper: \{ name: "一万字论文"/.test(WORKER), "后端有 paper 的规格");
+  /* 这一档 2026 年由「一万字论文」长成「学术论文（两万字·投稿体例）」、并改成十六趟分节写。
+     钉体裁与体量口径本身，别钉那个已经不存在的旧名字。 */
+  ok(/paper: \{ name: "学术论文（两万字·投稿体例）"/.test(WORKER) && /parts: PAPER_SKELETON\.length/.test(WORKER),
+    "后端有 paper 的规格（两万字投稿体例，按骨架分节写）");
   ok(WORKER.indexOf("不含情态词") > 0, "规格要求不含情态词的判据");
   ok(WORKER.indexOf("判决性对照预测") > 0, "规格要求逐条划界带判决性预测");
   ok(WORKER.indexOf("更强调／更深入／更系统／视角不同") > 0, "挡住不可判定的假划界");
-  ok(WORKER.indexOf("不要靠复述凑字数") > 0, "写不到一万字就如实说，不许凑");
-  ok(/KIND_KEYS = \["report", "essay", "paper", "outline", "sumdoc", "deck"\]/.test(M), "前端档位表含 paper 且排在 essay 之后");
+  /* 原句「不要靠复述凑字数」在改写十六趟体例时被换掉了，但**那条纪律还在**，
+     现在写成「绝不为了凑字数而注水、绝不用空段撑长度」。钉纪律，不钉那一句话。 */
+  ok(/绝不为了凑字数而注水/.test(WORKER) && /每一段都要真正推进论证/.test(WORKER),
+    "写不够就如实说，不许注水凑字数");
+  /* 档位表已从写死的六档数组长成 17 档的 KIND_DEF，KIND_KEYS 由它派生。
+     钉那两件要守的事：paper 这一档在表里、且排在 essay 之后（它是 essay 的重档）。 */
+  ok(/\{ k: "paper", t: "kPaper"/.test(M)
+     && M.indexOf('k: "essay"') < M.indexOf('k: "paper"')
+     && /var KIND_KEYS = KIND_DEF\.map/.test(M),
+    "前端档位表含 paper 且排在 essay 之后");
   ok(M.indexOf("kPaper:") > 0 && M.indexOf("kPaperS:") > 0, "中文文案在位");
-  ok(M.indexOf("Forge a 10,000-word paper") > 0, "英文文案在位");
+  ok(M.indexOf("Forge a 20,000-word paper") > 0, "英文文案在位（体量已随后端改成两万字）");
 });
 
 step("⑦ 投稿口的三条纪律", () => {
@@ -112,7 +123,12 @@ step("⑦ 投稿口的三条纪律", () => {
 });
 
 step("⑧ 两颗按钮只摆在文章类档位上", () => {
-  ok(/if \(kind === "essay" \|\| kind === "paper"\)/.test(M), "只有 essay/paper 摆 Word 与投稿（报告/提纲/PPT 不是投稿物）");
+  /* 两组条件 2026-08 起**故意分开**：Word/PDF 归所有文章类档位（doc:1，新加的九档也要出 Word），
+     投稿钮仍只归论文那几档（投稿口收的是论文，不是散文，更不是幻灯片稿）。
+     合成一个 if 正是「加了新体裁、Word 却没跟上」的来路，所以这里也分开钉。 */
+  ok(/_isPaperish = \(kind === "essay" \|\| kind === "paper" \|\| kind === "paper1"\)/.test(M)
+     && /if \(_isDoc\) \{/.test(M),
+    "投稿钮只归论文那几档；Word 归所有文章类档位（两组条件分开写）");
   ok(M.indexOf("mDocx") > 0 && M.indexOf("mSub") > 0, "两颗按钮的文案都在");
   ok(/sc\.src = "\/assets\/sde-docx\.js/.test(M), "docx 模块是懒加载进来的");
 });
@@ -128,7 +144,7 @@ step("⑨ 总结全文档：正主是文章，不是对话", () => {
   ok(/docBlock && kind === "sumdoc"/.test(WORKER), "sumdoc 时文章摆在最前当正主");
   ok(WORKER.indexOf("正主仍是上面这场对话") > 0, "其余档载了文章只作背景");
   ok(/if \(kind === "sumdoc" && !docBlock\)/.test(WORKER), "没载入文章时如实报错，不空跑");
-  ok(/KIND_KEYS = \["report", "essay", "paper", "outline", "sumdoc", "deck"\]/.test(M), "前端档位表含 sumdoc");
+  ok(/\{ k: "sumdoc", t: "kSumdoc"/.test(M), "前端档位表含 sumdoc");
   ok(M.indexOf("kSumdoc:") > 0 && M.indexOf("kSumdocS:") > 0, "中英文案在位");
   ok(/docs: \(typeof atts/.test(M), "请求体把附件正文送过去");
   ok(M.indexOf("取段会让它读到半篇就下判断") > 0, "送全文不送取段，且写明了理由");

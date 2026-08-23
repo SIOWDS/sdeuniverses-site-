@@ -41,6 +41,20 @@ const RE = SRC.indexOf("\n  }", RS) + 4;
 SEG += "\n" + SRC.slice(RS, RE) + "\n";
 ok(/function cvReset/.test(SEG), "cvReset 没被捞进来");
 
+/* ⚠ 画布段引用了段外的 PROF_ID（分身页身份，`var PROF_ID = PROFILE ? PROFILE.id : ""`）。
+   不补进来，vm 一执行就 ReferenceError —— 而这条护栏是顺序执行的，一抛就整个进程死在这里，
+   屏幕上只剩一段堆栈，看不出「这条护栏根本没跑过」。2026-08-23 体检才发现它已经崩了一阵。
+   💡 通则：抠一段源码出来真跑，就要把它的段外依赖一起补齐；缺一个就是静默腰斩。
+   本站没有分身时 PROF_ID 是空串，桩取空串即等价于主站那条路。 */
+/* 段外依赖清单（缺一个就 ReferenceError、护栏当场静默腰斩）：
+   · PROF_ID —— 分身页身份；本站无分身时是空串，取空串即等价于主站那条路。
+   · fileTag —— 下载文件名前缀，`PROF_ID ? BRAND : dflt`；PROF_ID 空 ⇒ 恒取默认值。
+   · SIG —— 页脚那一行署名，`PROFILE.sig || "ChatSDE · sdeuniverses.com"`；无分身即默认值。
+   · P(o) —— 出站请求体的分身标记器（有分身才往 body 上挂 profile）；无分身即原样返回。
+   ⚠ 谁再往画布段里引段外的东西，这里会当场红；照着往下加一行桩即可。 */
+SEG = 'var PROF_ID = "";\nfunction fileTag(dflt) { return dflt; }\n'
+  + 'var SIG = "ChatSDE \\u00b7 sdeuniverses.com";\nfunction P(o) { return o; }\n' + SEG;
+
 /* ── 假 DOM ───────────────────────────────────────── */
 function mkEl(tag, cls, txt) {
   const e = {
@@ -1043,8 +1057,12 @@ sec("⑰ 文案表：同名键会静默覆盖");
     "英文侧同步改成 Canvas & Co-create");
   ok(/cvTip: "画布与共创：[^"]*共创台/.test(SRC_FULL),
     "悬停说明里讲清了新名后半的「共创」指的就是共创台（改了名不说指什么等于没改）");
-  ok((SRC_FULL.match(/from: "ChatSDE · 画布与共创"/g) || []).length === 2,
-    "存进知识库的归属两处都改了（且中点已统一成原字，原来一处是转义写法）");
+  /* ⚠ 这条原来钉的是写死的 `from: "ChatSDE · 画布与共创"`。后来改成了
+     `BRAND + " · " + tx("cvTitle")` —— 分身页署自己的名、名字随语言走，**比写死的好**，
+     而断言从此长红。钉那件真要守的事：两处都在、都是拼出来的、都不再写死名字。 */
+  ok((SRC_FULL.match(/from: BRAND \+ " · " \+ tx\("cvTitle"\)/g) || []).length === 2
+     && !/from: "ChatSDE/.test(SRC_FULL),
+    "存进知识库的归属两处都由 BRAND ＋ 画布标题拼出（不写死，分身与语言都跟得上）");
   const zhBlock = SRC_FULL.slice(SRC_FULL.lastIndexOf("{", T0), T1);
   const enBlock = SRC_FULL.slice(T1, T1 + 20000);
   const dz = scan(zhBlock), de = scan(enBlock);

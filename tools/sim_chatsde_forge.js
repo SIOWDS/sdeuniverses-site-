@@ -186,9 +186,11 @@ ok("★ 预热那一处显式要生成（否则心得永远没人做）",
 ok("注释写明了为什么翻默认值", /静默改变所有人的思考底盘/.test(W));
 
 console.log("── 评分：站外敌意最近邻由程序保证 ──");
+/* ⚠ 签名后来又多了一个 prof（领域档案／分身）。钉整串形参就会在下一次加参数时长红，
+   而要守的事只有一件：**webCtx 真的传进了评分那一路**（缺了它，I 维就只能凭训练记忆补作者与年份）。 */
 ok("★ 评分这一路收得到站外资料了（原来签名里根本没有）",
-  /function WDS_IQ_SYS\(siteCtx, docCtx, docNote, lang, webCtx\)/.test(W)
-  && /WDS_IQ_SYS\(siteCtx, docCtx, docNote, lang, webCtx\);/.test(W));
+  /function WDS_IQ_SYS\(siteCtx, docCtx, docNote, lang, webCtx/.test(W)
+  && /WDS_IQ_SYS\(siteCtx, docCtx, docNote, lang, webCtx/.test(W.slice(W.indexOf('tool === "iq"'))));
 /* ⚠ 阶段D 把评分那一路从「宽泛搜索」改道到了**专用链**，这条断言的落点跟着搬家，
    而它要守的用意没变：**评分不等读者去点联网**。改成盯住新的那一条路。 */
 ok("★ 评分工序强制走检索，不等读者去点联网", /\|\| tool === "iq";/.test(W) && /const wantNbr =/.test(W));
@@ -276,7 +278,11 @@ console.log("── 幂等与断点恢复 ──");
 ok("★ 每一道带 attempt 与幂等键 run:stage:attempt",
   /idem: runid \+ ":" \+ \(i \+ 1\) \+ ":" \+ attempts\[i\]/.test(F) && /attempts\[i\] = \(attempts\[i\] \|\| 0\) \+ 1;/.test(F));
 ok("重跑同一道 attempt 会加一（服务端据此分得清是不是同一次）", /attempts = \{\}/.test(F));
-ok("★ 每写完一道就落一次 IndexedDB", /function saveRun\(\)/.test(F) && /agent: "wds-forge"/.test(F) && /saveRun\(\);/.test(F));
+/* ⚠ agent 名后来抽成了常量 AGENT_FORGE（分身页要挂自己的名字：`wds-forge:<分身>`）。
+   钉常量与它的取值口径，别钉那个已经不写在这里的字面量。 */
+ok("★ 每写完一道就落一次 IndexedDB", /function saveRun\(\)/.test(F)
+  && /agent: AGENT_FORGE/.test(F) && /AGENT_FORGE = PROF_ID \? \("wds-forge:"/.test(F)
+  && /saveRun\(\);/.test(F));
 ok("存的是规范状态不是画面", /存的是\*\*规范状态\*\*/.test(F) && /secs: secs\.map/.test(F) && !/innerHTML[^\n]*runState/.test(F));
 ok("状态里带着 gate 与 hash（恢复之后仍验得了）", /gate: x\.gate \|\| ""/.test(F) && /hash: x\.hash \|\| ""/.test(F));
 ok("★ 开跑前问一句要不要接着上一趟（不替读者选）",
