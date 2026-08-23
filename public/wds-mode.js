@@ -405,6 +405,45 @@
         en: { ph: "Paste a problem, a worked solution, or what happened in class…", srcSite: "From the maths subsite" }
       }
     },
+    /* ── 第六个分身：comp（ChatZiwen，2026-08-23）── */
+    comp: {
+      id: "comp",
+      brand: "ChatZiwen",
+      url: "/chatziwen/",
+      sig: "ChatZiwen \u00b7 comp.sdeuniverses.com",
+      who: "付自文",
+      kicker: "COMP.SDEUNIVERSES.COM",
+      home: "/",
+      tools: ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"],
+      seeds: [
+        "他经历过的事不少，可一写就没东西——问题出在哪？",
+        "这篇细节很多，为什么老师还是批「空洞」？",
+        "作文改到第五稿反而不如第二稿，我把什么改掉了？",
+        "评语该怎么写，才不是「语言优美，感情真挚」这种到处能贴的话？"
+      ],
+      hero: {
+        zh: {
+          title: "ChatZiwen",
+          sub: "作文 · 付自文。一篇作文、一个段落、一句评语——先找更早的那个岔口。",
+          foot: "它不替学生写：先问你想写哪件事、卡在哪一句。用你自己的大模型 Key 运行，Key 只存在这台设备的浏览器里。"
+        },
+        en: {
+          title: "ChatZiwen",
+          sub: "Composition, with Fu Ziwen. One essay, one paragraph, one comment — find the earlier fork first.",
+          foot: "It won't write it for you: it asks what you're trying to say and where you got stuck. Runs on your own model key."
+        }
+      },
+      copy: {
+        zh: {
+          ph: "贴一篇作文、一个段落，或说说卡在哪一句…",
+          note: "ChatZiwen 只答作文、写作教学、批改与评价，答案扣着作文分站的原文。**它不替学生写**：会先问你想写哪件事、卡在哪一句。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写入数据库、不写进日志。",
+          tlBtn: "⊞ 作文工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
+          tipDeep: "满血基底＋满功率思考＋整套工序，慢但深",
+          srcSite: "作文分站文献"
+        },
+        en: { ph: "Paste an essay, a paragraph, or tell me which sentence you're stuck on…", srcSite: "From the composition subsite" }
+      }
+    },
   };
   var PROFILE = (function () {
     var k = String(window.WDSM_PROFILE || "").trim();

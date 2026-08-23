@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>全部篇目 · 作文发生学</title>
+<meta name="description" content="《文心探幽》三卷二十七章的章题、章副题与实测字数，以及付自文的三篇长论文。作文发生学 · comp.sdeuniverses.com。">
+<link rel="canonical" href="https://comp.sdeuniverses.com/all/">
+<meta property="og:title" content="全部篇目 · 作文发生学">
+<meta property="og:description" content="《文心探幽》三卷二十七章的章题、章副题与实测字数，以及付自文的三篇长论文。作文发生学 · comp.sdeuniverses.com。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F6F4EC">
+<style>
+:root{
+  --paper:#F6F4EC; --card:#FCFBF6; --ink:#181A15; --ink2:#5D6155; --ink3:#8E9384;
+  --rule:#D5D2C4; --rule2:#E7E4D8;
+  --green:#2F5D50; --green-l:#4E8574;
+  --terra:#B4744A;                  /* 改稿的那支笔 */
+  --pencil:#9A9789;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi",var(--serif);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+/* 底色是一叠改过的稿子：横格线，没有竖格——与 math 那张方格纸分得开 */
+body{margin:0;color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.85;
+  background:var(--paper);
+  background-image:linear-gradient(var(--rule2) 1px,transparent 1px);
+  background-size:100% 30px}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:950px;margin:0 auto;padding:0 24px}
+.topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:30;
+  background:rgba(246,244,236,.95);backdrop-filter:saturate(140%) blur(6px)}
+.topbar .wrap{display:flex;align-items:baseline;gap:20px;height:54px}
+.brand{font-family:var(--serif);font-size:19px;letter-spacing:.2em;color:var(--green)}
+.brand em{font-style:normal;color:var(--ink3);font-size:11px;letter-spacing:.24em;margin-left:10px}
+.topbar nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--ink2)}
+.topbar nav a:hover{color:var(--terra)}
+.topbar nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:62px 0 0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--green-l);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.6vw,52px);line-height:1.28;
+  letter-spacing:.03em;margin:.42em 0 .34em;max-width:15em}
+h1 .hl{color:var(--terra)}
+.lede{max-width:39em;color:var(--ink2);font-size:16px}
+.lede b{color:var(--ink);font-weight:600}
+
+/* 签名件：同一句话的五稿 */
+.draft{margin:38px 0 0;max-width:700px;background:var(--card);border:1px solid var(--rule);
+  box-shadow:2px 3px 0 rgba(24,26,21,.05)}
+.draft .cap{display:flex;justify-content:space-between;align-items:baseline;padding:12px 20px;
+  border-bottom:1px solid var(--rule);font-family:var(--serif);letter-spacing:.24em;font-size:14.5px}
+.draft .cap span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink3)}
+.draft ol{list-style:none;margin:0;padding:8px 0 0}
+.draft li{display:flex;align-items:baseline;gap:14px;padding:10px 20px;
+  opacity:0;animation:fade .45s ease forwards}
+.draft li .v{font-family:var(--mono);font-size:10.5px;color:var(--ink3);flex:none;min-width:3.2em;letter-spacing:.1em}
+.draft li .s{font-family:var(--kai);font-size:16.5px;color:var(--pencil);flex:1;
+  text-decoration:line-through;text-decoration-color:var(--terra);text-decoration-thickness:1px}
+.draft li.keep .s{color:var(--ink);text-decoration:none}
+.draft li.ask{border-top:1px dashed var(--rule);margin-top:8px;padding-top:16px;padding-bottom:18px}
+.draft li.ask .s{font-family:var(--serif);color:var(--terra);text-decoration:none;letter-spacing:.04em}
+.draft li.ask .v{color:var(--terra)}
+.mark{display:inline-block;color:var(--terra);border:1.5px solid var(--terra);padding:2px 9px;
+  font-size:11px;letter-spacing:.16em;transform:rotate(-3deg);
+  animation:drop .45s cubic-bezier(.2,1.5,.4,1) 1.05s both;flex:none}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:rotate(-13deg) scale(1.55)}to{opacity:1;transform:rotate(-3deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.draft li{opacity:1;animation:none}.mark{animation:none}}
+.dnote{margin:14px 2px 0;max-width:44em;font-size:13.5px;color:var(--ink2);line-height:1.9}
+.dnote b{color:var(--ink)}
+
+section{padding:54px 0 6px}
+.hd{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:8px}
+.hd h2{font-family:var(--serif);font-weight:600;font-size:21px;letter-spacing:.2em;margin:0}
+.hd .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--terra)}
+.hd .ct{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+.lead{color:var(--ink2);font-size:15px;margin:14px 0 0;max-width:45em}
+
+.bots{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:0;margin-top:24px;
+  border:1px solid var(--rule);background:var(--card)}
+.bot{padding:22px 22px 20px;border-right:1px solid var(--rule);display:flex;flex-direction:column}
+.bot:last-child{border-right:none}
+a.bot:hover{background:#fff}
+.bot .n{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--terra)}
+.bot h3{font-family:var(--serif);font-size:20px;letter-spacing:.12em;margin:9px 0 4px;font-weight:600}
+.bot .en{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink3);margin-bottom:10px}
+.bot p{margin:0 0 13px;font-size:13.5px;color:var(--ink2);line-height:1.85}
+.bot .go{margin-top:auto;font-family:var(--mono);font-size:11.5px;color:var(--terra);
+  border-top:1px solid var(--rule2);padding-top:10px}
+.bot.wait{opacity:.72}
+.bot .soon{display:inline-block;margin-top:auto;font-family:var(--mono);font-size:10px;
+  letter-spacing:.18em;color:var(--ink3);border:1px solid var(--rule);padding:1px 7px}
+@media(max-width:720px){.bot{border-right:none;border-bottom:1px solid var(--rule)}
+  .bot:last-child{border-bottom:none}}
+
+/* 三卷 */
+.vols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:24px}
+.vol{border:1px solid var(--rule);background:var(--card);padding:20px 20px 18px;display:flex;flex-direction:column}
+.vol .n{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--terra)}
+.vol h3{font-family:var(--serif);font-size:20px;letter-spacing:.1em;margin:8px 0 3px;font-weight:600}
+.vol .q{font-family:var(--kai);font-size:15.5px;color:var(--green);margin:0 0 10px}
+.vol p{margin:0 0 12px;font-size:13.5px;color:var(--ink2);line-height:1.8}
+.vol .meta{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-bottom:10px}
+.vol .lk{margin-top:auto;display:flex;gap:13px;font-family:var(--mono);font-size:11px}
+.vol .lk a{color:var(--terra);border-bottom:1px solid var(--rule2)}
+
+.ln{display:flex;gap:11px;align-items:baseline;padding:9px 2px;border-bottom:1px dotted var(--rule2);font-size:15px}
+.ln:hover{background:var(--card)}
+.ln:hover .tt{color:var(--terra)}
+.ln .no{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:2.6em;flex:none}
+.ln .tt b{font-weight:600}
+.ln .tt em{font-style:normal;color:var(--ink2);font-size:13.5px;margin-left:.5em}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:0 36px}
+@media(max-width:720px){.cols2{grid-template-columns:1fr}}
+.mo{display:inline-block;margin:14px 0 0;font-family:var(--mono);font-size:11.5px;
+  color:var(--terra);border-bottom:1px solid var(--terra);padding-bottom:2px}
+
+.host{display:grid;grid-template-columns:140px 1fr;gap:26px;align-items:start;margin-top:24px}
+.host img{width:100%;border:1px solid var(--rule);display:block;filter:saturate(.92)}
+.host p{margin:0 0 12px;font-size:15px;color:var(--ink2)}
+.host .nm{font-family:var(--serif);font-size:21px;letter-spacing:.14em;color:var(--ink);margin-bottom:6px;font-weight:600}
+.host .nm em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink3);margin-left:10px}
+.host blockquote{margin:0 0 12px;font-family:var(--kai);font-size:16px;line-height:2;color:var(--ink);
+  border-left:2px solid var(--rule);padding-left:14px}
+.host a{color:var(--green);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.host{grid-template-columns:1fr}.host img{max-width:150px}}
+
+.plat{border:1px solid var(--rule);background:var(--card);padding:24px 26px;margin-top:22px}
+.plat p{margin:0 0 13px;font-size:15px;color:var(--ink2)}
+.plat p:last-child{margin-bottom:0}
+.plat b{color:var(--ink)}
+.plat a{color:var(--green);border-bottom:1px solid var(--rule)}
+
+footer{border-top:2px solid var(--ink);margin-top:58px;padding:24px 0 56px;font-size:13px;color:var(--ink2)}
+footer a{color:var(--green)}
+footer p{margin:0 0 7px}
+a:focus-visible{outline:2px solid var(--terra);outline-offset:3px}
+
+.item{border-bottom:1px dotted var(--rule2);padding:13px 2px 12px}
+.item:hover{background:var(--card)}
+.ihd{display:flex;gap:11px;align-items:baseline}
+.ihd .no{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:2.4em;flex:none}
+.ihd .it{font-size:16px;font-weight:600;letter-spacing:.03em}
+.item:hover .it{color:var(--terra)}
+.ihd .m{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);flex:none;padding-left:12px}
+.isub{margin:6px 0 0 3.4em;font-family:var(--kai);font-size:15px;color:var(--green)}
+.idesc{margin:6px 0 0 3.4em;font-size:13.5px;color:var(--ink2);line-height:1.8}
+.note{border:1px solid var(--rule);background:var(--card);padding:22px 24px;margin-top:28px}
+.note h3{font-family:var(--serif);font-size:17px;letter-spacing:.16em;margin:0 0 10px;font-weight:600}
+.note p{margin:0 0 12px;font-size:14.5px;color:var(--ink2);line-height:1.85}
+.note p:last-child{margin-bottom:0}
+.note b{color:var(--ink)}
+.note a{color:var(--green);border-bottom:1px solid var(--rule)}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap">
+  <a class="brand" href="/">作文发生学<em>FU ZIWEN</em></a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/chatziwen/">ChatZiwen</a>
+    <a href="/#books">三卷</a>
+    <a href="/#host">主持人</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap">
+
+
+<div class="hero" style="padding-top:46px">
+  <div class="eyebrow">全 部 篇 目 · CONTENTS</div>
+  <h1 style="font-size:clamp(26px,4.6vw,40px)">全部篇目</h1>
+  <p class="lede">《文心探幽》三卷二十七章，加三篇长论文。字数是<b>逐页实测的汉字数</b>（剥掉标签后数），不是估算。
+  <br><b>卷序与专著号是错开的</b>：按书号 90／91／93 拿到的，依次是卷三、卷一、卷二。</p>
+</div>
+
+
+<section id="v91">
+  <div class="hd"><span class="no">壹</span><h2>卷一　何谓作文</h2><span class="ct">专著第 91 号 · 9 章</span></div>
+  <p class="lead">凡直接读得出的，都不是它　·　<a href="/books/m/91/" style="color:var(--terra);border-bottom:1px solid var(--rule2)">书页</a>　<a href="/books/m/91/text/" style="color:var(--terra);border-bottom:1px solid var(--rule2)">分章读</a></p>
+  <div class="item">
+    <div class="ihd"><span class="no">1</span><a class="it" href="/books/m/91/text/c01/">第一章　撤掉成品之后，还剩什么</a><span class="m">2.2 万字</span></div>
+    <p class="isub">——生成见证与作文等价类</p>
+    <p class="idesc">把交上去的那一份拿开，问还剩什么算数——由此分出「哪些不同的写法其实是同一篇」。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">2</span><a class="it" href="/books/m/91/text/c02/">第二章　不动它，就不知道它是不是它</a><span class="m">2.0 万字</span></div>
+    <p class="isub">——篇章定相体与篇章定相率</p>
+    <p class="idesc">一篇的性质要靠动它一下才显出来：改一处、删一段，看它还是不是原来那篇。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">3</span><a class="it" href="/books/m/91/text/c03/">第三章　读得出的那一部分，恰恰不是整体性</a><span class="m">2.1 万字</span></div>
+    <p class="isub">——从内生判差到异源回判</p>
+    <p class="idesc">读得出的都是局部；整体性只能靠另一个来源回过头来判。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">4</span><a class="it" href="/books/m/91/text/c04/">第四章　文章还没出现，作文已经发生</a><span class="m">1.5 万字</span></div>
+    <p class="isub">——作定态与隐作</p>
+    <p class="idesc">动笔前那段什么都还没写的时间里，事情已经在发生了。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">5</span><a class="it" href="/books/m/91/text/c05/">第五章　高杠杆的那几处，是谁结的账</a><span class="m">1.8 万字</span></div>
+    <p class="isub">——写成事件与写成性</p>
+    <p class="idesc">一篇里真正结算的只有那么几处，其余都是被它们带出来的。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">6</span><a class="it" href="/books/m/91/text/c06/">第六章　在第一笔之前</a><span class="m">2.3 万字</span></div>
+    <p class="isub">——未生界与末次首现</p>
+    <p class="idesc">第一笔之前那片还没成形的区域，与它最后一次露头的时刻。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">7</span><a class="it" href="/books/m/91/text/c07/">第七章　路是谁关的</a><span class="m">1.5 万字</span></div>
+    <p class="isub">——预闭分叉与留叉率</p>
+    <p class="idesc">写下的每一句都在关掉后面的路；关得太早，后面就没得走了。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">8</span><a class="it" href="/books/m/91/text/c08/">第八章　两端都不记账的那一段</a><span class="m">2.1 万字</span></div>
+    <p class="isub">——悬跨段与悬跨长度 λ</p>
+    <p class="idesc">既不属于前面、也还没进入后面的那一段，谁都不认它——而它常常是唯一有希望的地方。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">9</span><a class="it" href="/books/m/91/text/c09/">第九章　灰为什么没有名分</a><span class="m">2.2 万字</span></div>
+    <p class="isub">——灰的名分与清偿率</p>
+    <p class="idesc">说不清算不算数的那部分，为什么在评价体系里永远没有位置。</p>
+  </div>
+</section>
+
+
+<section id="v93">
+  <div class="hd"><span class="no">贰</span><h2>卷二　作文如何发生</h2><span class="ct">专著第 93 号 · 9 章</span></div>
+  <p class="lead">看下一步由谁决定　·　<a href="/books/m/93/" style="color:var(--terra);border-bottom:1px solid var(--rule2)">书页</a>　<a href="/books/m/93/text/" style="color:var(--terra);border-bottom:1px solid var(--rule2)">分章读</a></p>
+  <div class="item">
+    <div class="ihd"><span class="no">1</span><a class="it" href="/books/m/93/text/c01/">第一章　作文怎样启动</a><span class="m">2.1 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">2</span><a class="it" href="/books/m/93/text/c02/">第二章　先析</a><span class="m">2.1 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">3</span><a class="it" href="/books/m/93/text/c03/">第三章　作文如何发生</a><span class="m">2.1 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">4</span><a class="it" href="/books/m/93/text/c04/">第四章　作文如何持续长下去</a><span class="m">2.1 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">5</span><a class="it" href="/books/m/93/text/c05/">第五章　未改之句如何被改写</a><span class="m">2.3 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">6</span><a class="it" href="/books/m/93/text/c06/">第六章　作文怎样完成</a><span class="m">2.1 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">7</span><a class="it" href="/books/m/93/text/c07/">第七章　如何写好作文</a><span class="m">1.6 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">8</span><a class="it" href="/books/m/93/text/c08/">第八章　何谓一篇作文的好</a><span class="m">2.2 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">9</span><a class="it" href="/books/m/93/text/c09/">第九章　通扣</a><span class="m">2.2 万字</span></div>
+  </div>
+</section>
+
+
+<section id="v90">
+  <div class="hd"><span class="no">叁</span><h2>卷三　作文的意义是什么</h2><span class="ct">专著第 90 号 · 9 章</span></div>
+  <p class="lead">作文不结算　·　<a href="/books/m/90/" style="color:var(--terra);border-bottom:1px solid var(--rule2)">书页</a>　<a href="/books/m/90/text/" style="color:var(--terra);border-bottom:1px solid var(--rule2)">分章读</a></p>
+  <div class="item">
+    <div class="ihd"><span class="no">1</span><a class="it" href="/books/m/90/text/c01/">第一章　错误还没有成为错误</a><span class="m">1.7 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">2</span><a class="it" href="/books/m/90/text/c02/">第二章　意义还没有定值</a><span class="m">2.0 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">3</span><a class="it" href="/books/m/90/text/c03/">第三章　意义没有被一次采完</a><span class="m">2.7 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">4</span><a class="it" href="/books/m/90/text/c04/">第四章　已写的部分开始收紧后面</a><span class="m">2.2 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">5</span><a class="it" href="/books/m/90/text/c05/">第五章　每一次新增都在开新的账</a><span class="m">2.2 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">6</span><a class="it" href="/books/m/90/text/c06/">第六章　规则的裁决权换了手</a><span class="m">2.4 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">7</span><a class="it" href="/books/m/90/text/c07/">第七章　不肯自动更新的过去</a><span class="m">2.7 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">8</span><a class="it" href="/books/m/90/text/c08/">第八章　在后果落地之前先付一次</a><span class="m">1.9 万字</span></div>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">9</span><a class="it" href="/books/m/90/text/c09/">第九章　让改判有地址</a><span class="m">1.1 万字</span></div>
+  </div>
+</section>
+
+
+<section id="papers">
+  <div class="hd"><span class="no">肆</span><h2>长　论　文</h2><span class="ct">3 篇</span></div>
+  <div class="item">
+    <div class="ihd"><span class="no">1</span><a class="it" href="/students/fu-ziwen/criterion-precipitate/">判据析出体</a><span class="m">1.5 万字</span></div>
+    <p class="idesc">作文不是既有思想的容器、不是写作流程的终点、也不是情境互动的记录。给出一条最低可检验标准——换题之后，那条区别还在不在。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">2</span><a class="it" href="/students/fu-ziwen/recoverable-distinction/">可复原差束</a><span class="m">2.2 万字</span></div>
+    <p class="idesc">经历很多却写不出来，文本细节很多却仍被判「空」——用锚点、复原、约束三闸，给「什么有资格算作已经进入这篇作文的内容」一个可复核的判据。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">3</span><a class="it" href="/students/fu-ziwen/criterion-feedback-residual/">判准回写余量</a><span class="m">2.0 万字</span></div>
+    <p class="idesc">判准一旦公开并进入教学与机器优化，就不再是外部的尺子，而成为作文生产的目标；把「好」从形容词改造成一个可清点的对象。</p>
+  </div>
+</section>
+
+<section>
+  <div class="note">
+    <h3>附　这些书是怎么写出来的</h3>
+    <p>不是先有观点再找例子。做法是<b>二阶碰撞</b>：先挑三门彼此无关、且与作文无关的学问，各自从自己的原理里推一遍这个问题；三条路撞出来的余数——三家都推不掉、又都解释不了的那一小块——才是要命名的东西。命名之后还要过两关：谁已经站在这个位置上（敌意拓宽），以及什么样的结果会推翻它（可裁决预测）。</p>
+    <p>所以二十七章的章题读起来都不像作文书：「两端都不记账的那一段」「灰为什么没有名分」「不肯自动更新的过去」——它们各自指着一件语文老师天天见到、却一直没有名目的事。做法的通俗讲解见 <a href="https://sdeuniverses.com/confluence/confluence-method/">《SDE 多学科通融创新法》</a>。</p>
+  </div>
+</section>
+
+
+</div>
+<footer><div class="wrap">
+  <p>作文发生学 · 付自文 —— <a href="https://sdeuniverses.com/">SDE Universes</a> 的作文分站。<a href="/">回首页</a></p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+<script>
+(function(){var b="/sites/comp";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatziwen/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

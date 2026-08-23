@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>作文发生学 · 付自文</title>
+<meta name="description" content="作文发生学：作文不是文本、过程或情境记录，而是一条区别被析出来的地方。付自文主持，《文心探幽》三卷二十七章、三篇长论文，约六十二万汉字；站上有对话智能体 ChatZiwen。SDE Universes 子平台。">
+<link rel="canonical" href="https://comp.sdeuniverses.com/">
+<meta property="og:title" content="作文发生学 · 付自文">
+<meta property="og:description" content="换一个题目，那条区别还在不在？关于作文怎样发生的新思想生产平台。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F6F4EC">
+<style>
+:root{
+  --paper:#F6F4EC; --card:#FCFBF6; --ink:#181A15; --ink2:#5D6155; --ink3:#8E9384;
+  --rule:#D5D2C4; --rule2:#E7E4D8;
+  --green:#2F5D50; --green-l:#4E8574;
+  --terra:#B4744A;                  /* 改稿的那支笔 */
+  --pencil:#9A9789;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi",var(--serif);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+/* 底色是一叠改过的稿子：横格线，没有竖格——与 math 那张方格纸分得开 */
+body{margin:0;color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.85;
+  background:var(--paper);
+  background-image:linear-gradient(var(--rule2) 1px,transparent 1px);
+  background-size:100% 30px}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:950px;margin:0 auto;padding:0 24px}
+.topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:30;
+  background:rgba(246,244,236,.95);backdrop-filter:saturate(140%) blur(6px)}
+.topbar .wrap{display:flex;align-items:baseline;gap:20px;height:54px}
+.brand{font-family:var(--serif);font-size:19px;letter-spacing:.2em;color:var(--green)}
+.brand em{font-style:normal;color:var(--ink3);font-size:11px;letter-spacing:.24em;margin-left:10px}
+.topbar nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--ink2)}
+.topbar nav a:hover{color:var(--terra)}
+.topbar nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:62px 0 0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--green-l);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.6vw,52px);line-height:1.28;
+  letter-spacing:.03em;margin:.42em 0 .34em;max-width:15em}
+h1 .hl{color:var(--terra)}
+.lede{max-width:39em;color:var(--ink2);font-size:16px}
+.lede b{color:var(--ink);font-weight:600}
+
+/* 签名件：同一句话的五稿 */
+.draft{margin:38px 0 0;max-width:700px;background:var(--card);border:1px solid var(--rule);
+  box-shadow:2px 3px 0 rgba(24,26,21,.05)}
+.draft .cap{display:flex;justify-content:space-between;align-items:baseline;padding:12px 20px;
+  border-bottom:1px solid var(--rule);font-family:var(--serif);letter-spacing:.24em;font-size:14.5px}
+.draft .cap span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink3)}
+.draft ol{list-style:none;margin:0;padding:8px 0 0}
+.draft li{display:flex;align-items:baseline;gap:14px;padding:10px 20px;
+  opacity:0;animation:fade .45s ease forwards}
+.draft li .v{font-family:var(--mono);font-size:10.5px;color:var(--ink3);flex:none;min-width:3.2em;letter-spacing:.1em}
+.draft li .s{font-family:var(--kai);font-size:16.5px;color:var(--pencil);flex:1;
+  text-decoration:line-through;text-decoration-color:var(--terra);text-decoration-thickness:1px}
+.draft li.keep .s{color:var(--ink);text-decoration:none}
+.draft li.ask{border-top:1px dashed var(--rule);margin-top:8px;padding-top:16px;padding-bottom:18px}
+.draft li.ask .s{font-family:var(--serif);color:var(--terra);text-decoration:none;letter-spacing:.04em}
+.draft li.ask .v{color:var(--terra)}
+.mark{display:inline-block;color:var(--terra);border:1.5px solid var(--terra);padding:2px 9px;
+  font-size:11px;letter-spacing:.16em;transform:rotate(-3deg);
+  animation:drop .45s cubic-bezier(.2,1.5,.4,1) 1.05s both;flex:none}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:rotate(-13deg) scale(1.55)}to{opacity:1;transform:rotate(-3deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.draft li{opacity:1;animation:none}.mark{animation:none}}
+.dnote{margin:14px 2px 0;max-width:44em;font-size:13.5px;color:var(--ink2);line-height:1.9}
+.dnote b{color:var(--ink)}
+
+section{padding:54px 0 6px}
+.hd{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:8px}
+.hd h2{font-family:var(--serif);font-weight:600;font-size:21px;letter-spacing:.2em;margin:0}
+.hd .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--terra)}
+.hd .ct{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+.lead{color:var(--ink2);font-size:15px;margin:14px 0 0;max-width:45em}
+
+.bots{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:0;margin-top:24px;
+  border:1px solid var(--rule);background:var(--card)}
+.bot{padding:22px 22px 20px;border-right:1px solid var(--rule);display:flex;flex-direction:column}
+.bot:last-child{border-right:none}
+a.bot:hover{background:#fff}
+.bot .n{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--terra)}
+.bot h3{font-family:var(--serif);font-size:20px;letter-spacing:.12em;margin:9px 0 4px;font-weight:600}
+.bot .en{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink3);margin-bottom:10px}
+.bot p{margin:0 0 13px;font-size:13.5px;color:var(--ink2);line-height:1.85}
+.bot .go{margin-top:auto;font-family:var(--mono);font-size:11.5px;color:var(--terra);
+  border-top:1px solid var(--rule2);padding-top:10px}
+.bot.wait{opacity:.72}
+.bot .soon{display:inline-block;margin-top:auto;font-family:var(--mono);font-size:10px;
+  letter-spacing:.18em;color:var(--ink3);border:1px solid var(--rule);padding:1px 7px}
+@media(max-width:720px){.bot{border-right:none;border-bottom:1px solid var(--rule)}
+  .bot:last-child{border-bottom:none}}
+
+/* 三卷 */
+.vols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:24px}
+.vol{border:1px solid var(--rule);background:var(--card);padding:20px 20px 18px;display:flex;flex-direction:column}
+.vol .n{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--terra)}
+.vol h3{font-family:var(--serif);font-size:20px;letter-spacing:.1em;margin:8px 0 3px;font-weight:600}
+.vol .q{font-family:var(--kai);font-size:15.5px;color:var(--green);margin:0 0 10px}
+.vol p{margin:0 0 12px;font-size:13.5px;color:var(--ink2);line-height:1.8}
+.vol .meta{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-bottom:10px}
+.vol .lk{margin-top:auto;display:flex;gap:13px;font-family:var(--mono);font-size:11px}
+.vol .lk a{color:var(--terra);border-bottom:1px solid var(--rule2)}
+
+.ln{display:flex;gap:11px;align-items:baseline;padding:9px 2px;border-bottom:1px dotted var(--rule2);font-size:15px}
+.ln:hover{background:var(--card)}
+.ln:hover .tt{color:var(--terra)}
+.ln .no{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:2.6em;flex:none}
+.ln .tt b{font-weight:600}
+.ln .tt em{font-style:normal;color:var(--ink2);font-size:13.5px;margin-left:.5em}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:0 36px}
+@media(max-width:720px){.cols2{grid-template-columns:1fr}}
+.mo{display:inline-block;margin:14px 0 0;font-family:var(--mono);font-size:11.5px;
+  color:var(--terra);border-bottom:1px solid var(--terra);padding-bottom:2px}
+
+.host{display:grid;grid-template-columns:140px 1fr;gap:26px;align-items:start;margin-top:24px}
+.host img{width:100%;border:1px solid var(--rule);display:block;filter:saturate(.92)}
+.host p{margin:0 0 12px;font-size:15px;color:var(--ink2)}
+.host .nm{font-family:var(--serif);font-size:21px;letter-spacing:.14em;color:var(--ink);margin-bottom:6px;font-weight:600}
+.host .nm em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink3);margin-left:10px}
+.host blockquote{margin:0 0 12px;font-family:var(--kai);font-size:16px;line-height:2;color:var(--ink);
+  border-left:2px solid var(--rule);padding-left:14px}
+.host a{color:var(--green);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.host{grid-template-columns:1fr}.host img{max-width:150px}}
+
+.plat{border:1px solid var(--rule);background:var(--card);padding:24px 26px;margin-top:22px}
+.plat p{margin:0 0 13px;font-size:15px;color:var(--ink2)}
+.plat p:last-child{margin-bottom:0}
+.plat b{color:var(--ink)}
+.plat a{color:var(--green);border-bottom:1px solid var(--rule)}
+
+footer{border-top:2px solid var(--ink);margin-top:58px;padding:24px 0 56px;font-size:13px;color:var(--ink2)}
+footer a{color:var(--green)}
+footer p{margin:0 0 7px}
+a:focus-visible{outline:2px solid var(--terra);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<header class="topbar"><div class="wrap">
+  <a class="brand" href="/">作文发生学<em>FU ZIWEN</em></a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/#books">三卷</a>
+    <a href="/#host">主持人</a>
+    <a href="/all/">全部篇目</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<div class="hero">
+<div class="eyebrow">作文 · 新思想生产平台 · Composition Genesis</div>
+<h1>他改了五遍，句子越来越顺，<br><span class="hl">可那件事一直没被写出来。</span></h1>
+<p class="lede">这里生产关于作文的新思想。追的是一个具体的问题：<b>一篇作文里真正算数的东西，是什么时候长出来的</b>。它不是把想好的东西写下来——动笔之前那样东西并不存在；它是在题目、读者、时限围出的处境里，被一连串取舍逼出来、并留在纸上的<b>那条区别</b>。</p>
+
+<div class="draft">
+  <div class="cap">同 一 句 话 的 五 稿<span>作文本 · 第 3 段第 1 句</span></div>
+  <ol>
+    <li style="animation-delay:0ms"><span class="v">初稿</span><span class="s">那天下午，奶奶在院子里洗衣服。</span></li>
+    <li style="animation-delay:110ms"><span class="v">二稿</span><span class="s">那个宁静的下午，奶奶在洒满阳光的院子里洗着衣服。</span></li>
+    <li style="animation-delay:220ms"><span class="v">三稿</span><span class="s">阳光温柔地洒在小院里，奶奶正弯着腰，一遍遍搓洗着那件旧衣裳。</span></li>
+    <li style="animation-delay:330ms"><span class="v">四稿</span><span class="s">时光仿佛在那一刻静止，奶奶佝偻的背影，成了我心中最温暖的风景。</span></li>
+    <li class="keep" style="animation-delay:440ms"><span class="v">五稿</span><span class="s">那天下午，奶奶在院子里洗衣服。她把我那件校服单独放在一边，没有洗。</span></li>
+    <li class="ask" style="animation-delay:860ms"><span class="v">批注</span><span class="s">前四稿越改越顺，第五稿才第一次说出了一件只有他知道的事。</span><span class="mark">改在哪一稿</span></li>
+  </ol>
+</div>
+<p class="dnote">二到四稿都在句子层面用功：换词、加形容、补比喻——每一稿单看都比上一稿"好"。<b>真正算数的那一次修改，是把那件只有他写得出的事放进来的那一次。</b><br>这个站要做的，就是把"哪一次修改真的改了这篇的走向"变成一个说得清、测得出、可以被推翻的东西。</p>
+</div>
+
+<section id="bots">
+  <div class="hd"><span class="no">栏 一</span><h2>智　能　体</h2><span class="ct">3 台 · 1 台已开</span></div>
+  <p class="lead">先开一台，另两台跟着栏目一起长。都用你自己的大模型 Key 运行，Key 只存在你这台设备的浏览器里。</p>
+  <div class="bots">
+    <a class="bot" href="/chatziwen/">
+      <div class="n">其 一 · 对话</div>
+      <h3>ChatZiwen</h3>
+      <div class="en">CHAT ZI WEN</div>
+      <p>贴一篇作文、一个段落，或者说说卡在哪一句。它先复原你实际走的那条路、找更早的那个岔口，再谈怎么改——<b>它不替学生写</b>，会先问你想写哪件事。答案带《文心探幽》三卷的出处。</p>
+      <span class="go">进入对话 →</span>
+    </a>
+    <div class="bot wait">
+      <div class="n">其 二 · 共改</div>
+      <h3>SDE 作文共改</h3>
+      <div class="en">CO-REVISING</div>
+      <p>把一篇稿子放进画布，一稿一稿地改，每一版都留着。要紧的不是改得顺，是每改一次都问一句：这一稿之后，后面能写的东西变了吗？</p>
+      <span class="soon">筹备中</span>
+    </div>
+    <div class="bot wait">
+      <div class="n">其 三 · 共批</div>
+      <h3>SDE 作文共批</h3>
+      <div class="en">CO-MARKING</div>
+      <p>一叠作文，一处一处地看：第一处走岔在哪、哪些是尺子要的、哪些是尺子没要而他还是写了的。目标不是打分，是把评语落到具体的一句一段上。</p>
+      <span class="soon">筹备中</span>
+    </div>
+  </div>
+</section>
+
+<section id="books">
+  <div class="hd"><span class="no">栏 二</span><h2>文　心　探　幽</h2><span class="ct">3 卷 · 27 章 · 55.5 万汉字</span></div>
+  <p class="lead">三卷分别问三个问题：作文是什么、作文如何发生、作文的意义是什么。二十七章各命名一件此前看得见、说不出的事。<b>注意卷序与专著号是错开的</b>——按书号 90／91／93 拿到的，依次是卷三、卷一、卷二。</p>
+  <div class="vols">
+    <article class="vol">
+      <div class="n">德麦国际 · 专著第 91 号</div>
+      <h3>卷一　何谓作文</h3>
+      <p class="q">凡直接读得出的，都不是它</p>
+      <div class="meta">298 页 · 九章 · 20.1 万汉字 · 文献 166 条</div>
+      <p>撤掉成品之后还剩什么、在第一笔之前、路是谁关的、两端都不记账的那一段、灰为什么没有名分。</p>
+      <div class="lk"><a href="/students/fu-ziwen/what-is-composition/">导读</a><a href="/books/m/91/">书页</a><a href="/books/m/91/text/">分章读</a></div>
+    </article>
+    <article class="vol">
+      <div class="n">德麦国际 · 专著第 93 号</div>
+      <h3>卷二　作文如何发生</h3>
+      <p class="q">看下一步由谁决定</p>
+      <div class="meta">306 页 · 九章 · 20.7 万汉字 · 文献 205 条</div>
+      <p>作文怎样启动、如何持续长下去、未改之句如何被改写、怎样完成、何谓一篇作文的好。</p>
+      <div class="lk"><a href="/students/fu-ziwen/how-composition-happens/">导读</a><a href="/books/m/93/">书页</a><a href="/books/m/93/text/">分章读</a></div>
+    </article>
+    <article class="vol">
+      <div class="n">德麦国际 · 专著第 90 号</div>
+      <h3>卷三　作文的意义是什么</h3>
+      <p class="q">作文不结算</p>
+      <div class="meta">316 页 · 九章 · 20.4 万汉字 · 文献 172 条</div>
+      <p>错误还没有成为错误、意义还没有定值、已写的部分开始收紧后面、规则的裁决权换了手、让改判有地址。</p>
+      <div class="lk"><a href="/students/fu-ziwen/composition-does-not-settle/">导读</a><a href="/books/m/90/">书页</a><a href="/books/m/90/text/">分章读</a></div>
+    </article>
+  </div>
+  <a class="mo" href="/all/">二十七章的章题与提要 →</a>
+</section>
+
+<section id="papers">
+  <div class="hd"><span class="no">栏 三</span><h2>长　论　文</h2><span class="ct">3 篇 · 5.7 万汉字</span></div>
+  <p class="lead">三篇各处理作文里最常被含混带过的一个词：内容、好、以及"作文"本身。</p>
+  <div class="cols2">
+    <div>
+      <a class="ln" href="/students/fu-ziwen/criterion-precipitate/"><span class="no">1</span><span class="tt"><b>判据析出体</b><em>作文不是文本、过程或情境</em></span></a>
+      <a class="ln" href="/students/fu-ziwen/recoverable-distinction/"><span class="no">2</span><span class="tt"><b>可复原差束</b><em>「内容」究竟是什么</em></span></a>
+    </div>
+    <div>
+      <a class="ln" href="/students/fu-ziwen/criterion-feedback-residual/"><span class="no">3</span><span class="tt"><b>判准回写余量</b><em>从评分达标到「好」的清点</em></span></a>
+      <div class="ln" style="border-bottom:none"><span class="no">—</span><span class="tt"><em style="margin-left:0">最低的一条检验：换题之后，那条区别还在不在。</em></span></div>
+    </div>
+  </div>
+</section>
+
+<section id="host">
+  <div class="hd"><span class="no">栏 四</span><h2>主　持　人</h2></div>
+  <div class="host">
+    <img src="/students/fu-ziwen/fu-ziwen.jpg" alt="付自文" loading="lazy">
+    <div>
+      <p class="nm">付自文<em>FU ZIWEN</em></p>
+      <blockquote>这并不是简单地学习一套已经完成的理论，而是亲历一种思想如何从问题中萌发，在不断追问中突破自身。</blockquote>
+      <p>2019 年起随王德生博士研习，研究方向为 SDE 本体论与多学科碰撞创新。著有《文心探幽》三卷，均由德麦国际出版社出版。</p>
+      <p>他这三卷做的不是"作文指导"——书里没有一条模板、一份素材库。它们追的是同一件事：<b>一篇作文里那条真正算数的区别，在什么条件下才会析出来</b>；以及一个更难的追问：当评分标准公开、并被教学与机器共同优化之后，"好作文"里还有多少是写作者自己的。<a href="/students/fu-ziwen/">作者主页与全部作品 →</a></p>
+    </div>
+  </div>
+</section>
+
+<section id="platform">
+  <div class="hd"><span class="no">栏 五</span><h2>这是一个平台，不是一本作文选</h2></div>
+  <div class="plat">
+    <p>作文发生学是 <a href="https://sdeuniverses.com/">SDE Universes</a> 的<b>垂直思想创新子平台</b>。它与主站共用同一套生产方法与同一条评分通道：一个判断要在这里立住，得先经过敌意拓宽（谁已经站在这个位置上——过程写作、体裁教学、读者意识、认知过程模型、写作评估这些都得先交过手）、可裁决预测（哪一种结果会推翻它），以及独立盲评。</p>
+    <p>它做的不是把写作教学已有的结论讲得更好懂，而是<b>生产此前不存在的判断</b>。这一行的代理其实很硬：换题之后那条区别还在不在、删段之后全篇塌不塌、同一篇多人评分的一致率、哪一稿真的改了走向、一篇作文里能被替换成套话而不损失什么的句子占多少——<b>说得出口的东西，多半测得出来。</b>做法的通俗讲解见 <a href="https://sdeuniverses.com/confluence/confluence-method/">《SDE 多学科通融创新法》</a>。</p>
+    <p><b>本站不提供范文，也不代写。</b>ChatZiwen 拿到一道作文题时，会先问你想写哪件事、卡在哪一句——直接交一篇成品，取消掉的正好是唯一有用的那个动作。</p>
+  </div>
+</section>
+
+</div>
+
+<footer><div class="wrap">
+  <p>作文发生学 · 付自文 —— <a href="https://sdeuniverses.com/">SDE Universes</a> 的作文分站。全部篇目与主站同源，作者主页在 <a href="/students/fu-ziwen/">学员专栏 · 付自文</a>。</p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+
+<script>
+/* 分站页面的自家链接写的是分站根（/、/all/、/#栏）。在二级域名下这就是对的；
+   若从主站以 /sites/comp/… 预览，则就地补上前缀，两处都能正常点。 */
+(function(){var b="/sites/comp";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatziwen/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

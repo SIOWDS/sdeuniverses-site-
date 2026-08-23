@@ -52,9 +52,14 @@ console.log("── ① 档案表与解析器 ───────────�
   t("抠得出 MATH_PRE 段", mathSeg.length > 40);
   const MATH_PRE = new Function(mathSeg + "\nreturn MATH_PRE;")();
   const xiaoboSys = "「小波老师」的人格底本占位（含：不替他做题／不把猜想说成定理）";
-  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE", "YANG_SYS", "EDU_PRE", "HUMIN_SYS", "HEALTH_PRE", "XIAOBO_SYS", "MATH_PRE",
+  /* 2026-08-23 第六个档案 comp（ChatZiwen）。 */
+  const compSeg = W.slice(W.indexOf("const COMP_PRE = ["), W.indexOf("];", W.indexOf("const COMP_PRE = [")) + 2);
+  t("抠得出 COMP_PRE 段", compSeg.length > 40);
+  const COMP_PRE = new Function(compSeg + "\nreturn COMP_PRE;")();
+  const fuSys = "「付自文」的人格底本占位（含：不替他写／先当人对待）";
+  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE", "YANG_SYS", "EDU_PRE", "HUMIN_SYS", "HEALTH_PRE", "XIAOBO_SYS", "MATH_PRE", "FUZIWEN_SYS", "COMP_PRE",
     seg + "\nreturn { WDS_PROFILES: WDS_PROFILES, wdsProfileOf: wdsProfileOf, wdsProfInScope: wdsProfInScope };");
-  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE, yangSys, EDU_PRE, huminSys, HEALTH_PRE, xiaoboSys, MATH_PRE);
+  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE, yangSys, EDU_PRE, huminSys, HEALTH_PRE, xiaoboSys, MATH_PRE, fuSys, COMP_PRE);
   const lang = S.wdsProfileOf("lang");
 
   t("认得 lang", !!lang && lang.id === "lang");
@@ -299,6 +304,39 @@ console.log("── ① 档案表与解析器 ───────────�
     t("math 分站首页有入口", /\/chatxiaobo\//.test(fs4.readFileSync("public/sites/math/index.html", "utf8")));
     t("小波老师作者页挂了分站入口", /math\.sdeuniverses\.com/.test(fs4.readFileSync("public/students/xiaobo/index.html", "utf8")));
     t("SUBSITES 里加了 math", /math: "\/sites\/math"/.test(WC));
+  }
+
+  console.log("\n── ②g 第六个档案：comp（ChatZiwen）─────────────");
+  const cmp = S.wdsProfileOf("comp");
+  t("认得 comp", !!cmp && cmp.id === "comp" && cmp.name === "ChatZiwen");
+  t("comp 挂了自己的内功档", !!cmp && cmp.neigong === "/taste/assets/comp-neigong.txt");
+  t("comp 收付自文的篇与三卷", !!cmp && S.wdsProfInScope(cmp, "/students/fu-ziwen/criterion-precipitate/")
+    && S.wdsProfInScope(cmp, "/books/m/91/text/c08/") && S.wdsProfInScope(cmp, "/books/m/90/text/c01/"));
+  t("comp 不收别人的篇", !!cmp && !S.wdsProfInScope(cmp, "/students/qin-li/line-of-separation/"));
+  /* ⭐ 作文这一档的两道额外闸：不替他写（交范文＝取消掉唯一有用的动作），
+     以及**先当人对待**——作文比数学更容易撞上学生写自己的创伤，这一条必须压过前一条。 */
+  t("带「不替他写」闸", !!cmp && /不替他写/.test(cmp.guard || ""));
+  t("带「先当人对待」闸", !!cmp && /先当人对待/.test(cmp.guard || ""));
+  t("危险信号的处置写在闸里", !!cmp && /自伤/.test(cmp.guard || "") && /不谈方法/.test(cmp.guard || ""));
+  t("工序不解除这几道闸", !!cmp && /工序不解除这几道闸/.test(cmp.guard || ""));
+  {
+    const fs5 = require("fs");
+    /* 断言的对象必须是源码里那份人格常量，不是 harness 注入的占位串（见 ②f 那一处的教训）。 */
+    const fzSeg = W.slice(W.indexOf("const FUZIWEN_SYS = "), W.indexOf("const WDS_PROFILES = {"));
+    t("人格底本里也各钉了一遍", /不替他写/.test(fzSeg) && /自伤/.test(fzSeg) && /先当人对待/.test(fzSeg));
+    const cn = fs5.readFileSync("public/taste/assets/comp-neigong.txt", "utf8");
+    t("作文内功用的是本行的词（成文／落笔／题境）", /在题境里，经落笔，成文章/.test(cn));
+    t("作文内功第五条也钉了同一条线", /你不替他写/.test(cn) && /先当人对待/.test(cn));
+    t("内功里有那把最狠的刀（换题还在不在）", /换一个题目，那条区别还在不在/.test(cn));
+    const cjk2 = (cn.match(/[\u4e00-\u9fff]/g) || []).length;
+    t("作文内功够厚（≥4000 汉字）", cjk2 >= 4000, String(cjk2));
+    t("ChatZiwen 壳页挂 comp 档", /WDSM_PROFILE = "comp"/.test(fs5.readFileSync("public/sites/comp/chatziwen/index.html", "utf8")));
+    t("comp 首页与全部篇目都在", fs5.existsSync("public/sites/comp/index.html") && fs5.existsSync("public/sites/comp/all/index.html"));
+    t("付自文作者页挂了分站入口", /comp\.sdeuniverses\.com/.test(fs5.readFileSync("public/students/fu-ziwen/index.html", "utf8")));
+    t("SUBSITES 里加了 comp", /comp: "\/sites\/comp"/.test(WC));
+    /* 卷序与书号错位是**事实**，页面必须写出来，不许在站上悄悄按 91/93/90 排成一二三卷。 */
+    t("⭐ 页面写明了卷序与书号错开",
+      /卷序与专著号是错开的/.test(fs5.readFileSync("public/sites/comp/index.html", "utf8")));
   }
 
   console.log("\n── ②b 白名单下推到候选阶段（治 K 饥饿）─────────");
