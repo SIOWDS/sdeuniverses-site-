@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>词汇之路 · 约翰专栏 · 语言发生学</title>
+<meta name="description" content="词汇之路共 23 篇。一个词怎样长出来，又怎样在需要的那一刻被取出来。词根词缀、形态、搭配、词卡、听力词汇转阅读词汇。">
+<link rel="canonical" href="https://lang.sdeuniverses.com/wechat/vocabulary/">
+<meta property="og:title" content="词汇之路 · 约翰专栏 · 语言发生学">
+<meta property="og:description" content="词汇之路共 23 篇。一个词怎样长出来，又怎样在需要的那一刻被取出来。词根词缀、形态、搭配、词卡、听力词汇转阅读词汇。">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272;
+  --line:#CBCCD4; --indigo:#1F3A5F; --vermilion:#A63A2B;
+  --night:#0B0E14; --night2:#121722; --bone:#E8E4DA; --bone2:#8E94A3;
+  --edge:rgba(232,228,218,.16); --indigo-l:#6E9BD8; --vermilion-l:#D2604A;
+  --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.75}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:960px;margin:0 auto;padding:0 22px}
+.top{border-bottom:1px solid var(--line);background:rgba(242,241,237,.92);
+  position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(6px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:56px}
+.brand{font-family:var(--serif);font-size:19px;letter-spacing:.14em;color:var(--indigo)}
+.brand em{font-style:normal;color:var(--ink2);font-size:12px;letter-spacing:.24em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:18px;font-size:13.5px;color:var(--ink2);
+  overflow-x:auto;white-space:nowrap}
+.top nav a:hover{color:var(--indigo)}
+.top nav a.out{font-family:var(--mono);font-size:12px}
+.hero{padding:56px 0 0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--indigo);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.3;
+  letter-spacing:.02em;margin:.5em 0 .38em}
+.lede{max-width:39em;color:var(--ink2);font-size:16.5px}
+.lede b{color:var(--ink);font-weight:600}
+.crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink2);margin-bottom:6px}
+.crumb a{color:var(--indigo)}
+.band{display:flex;flex-wrap:wrap;gap:0;margin:30px 0 0;border:1px solid var(--line);background:var(--card)}
+.band div{flex:1 1 130px;padding:14px 16px;border-right:1px solid var(--line)}
+.band div:last-child{border-right:0}
+.band b{display:block;font-family:var(--mono);font-size:21px;color:var(--indigo);
+  font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.band span{font-size:12.5px;color:var(--ink2)}
+.filter{display:flex;gap:12px;align-items:center;margin:26px 0 0;
+  border:1px solid var(--line);background:var(--card);padding:10px 14px}
+.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
+.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2)}
+.filter .n{font-family:var(--mono);font-size:12px;color:var(--indigo);font-variant-numeric:tabular-nums}
+.empty{padding:26px 4px;color:var(--ink2);font-size:14.5px}
+section{padding:48px 0 8px}
+.col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
+.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--indigo);flex:none}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);
+  font-variant-numeric:tabular-nums;flex:none;padding-left:10px}
+.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
+.item{border-bottom:1px dashed var(--line);padding:14px 4px 13px}
+.item:hover{background:var(--card)}
+.it-hd{display:flex;gap:12px;align-items:baseline}
+.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:3.1em;
+  font-variant-numeric:tabular-nums;flex:none}
+.it-t{font-size:15.5px;line-height:1.6}
+.item:hover .it-t{color:var(--indigo)}
+.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
+.it-d{margin:6px 0 0 4.1em;font-size:13.5px;color:var(--ink2);line-height:1.7}
+.it-l{margin:7px 0 0 4.1em;display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
+.it-l a{color:var(--indigo);border-bottom:1px solid var(--line);padding-bottom:1px}
+.it-l a:hover{border-color:var(--indigo)}
+.it-l span{color:var(--ink2)}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--vermilion);
+  border:1px solid var(--line);padding:1px 5px;margin-left:8px;vertical-align:2px}
+.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;
+  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:8px}
+.ch{display:block;padding:22px 22px 20px;border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);background:var(--card);transition:background .2s}
+.ch:hover{background:#fff}
+.ch .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--indigo)}
+.ch h3{font-family:var(--serif);font-weight:600;font-size:19.5px;letter-spacing:.09em;margin:9px 0 8px}
+.ch:hover h3{color:var(--indigo)}
+.ch p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.72}
+.ch .ct{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+  font-variant-numeric:tabular-nums}
+.ch .ct b{color:var(--vermilion);font-weight:500}
+.note{background:var(--card);border:1px solid var(--line);padding:22px 24px;margin-top:30px}
+.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:0 0 10px;font-weight:600}
+.note p{margin:0 0 11px;font-size:14.5px;color:var(--ink2)}
+.note p:last-child{margin-bottom:0}
+.note b{color:var(--ink)}
+.note a{color:var(--indigo);border-bottom:1px solid var(--line)}
+.years{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+.years a{font-family:var(--mono);font-size:12px;color:var(--indigo);
+  border:1px solid var(--line);padding:4px 10px;background:var(--card)}
+.years a:hover{border-color:var(--indigo)}
+footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 60px;
+  font-size:13px;color:var(--ink2)}
+footer a{color:var(--indigo);border-bottom:1px solid var(--line)}
+footer p{margin:0 0 8px}
+a:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+@media(max-width:640px){
+  .hero{padding:36px 0 0}
+  .it-m{display:none}
+  .it-d,.it-l{margin-left:0}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
+  <nav>
+    <a href="/#books">账册</a>
+    <a href="/#cols">栏目</a>
+    <a href="/all/">全部篇目</a>
+    <a href="/wechat/">约翰专栏</a>
+    <a href="/chatjohn/">ChatJohn</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap">
+<div class="hero">
+<div class="crumb"><a href="/wechat/">约翰专栏</a> / 词汇之路</div>
+<div class="eyebrow">栏三</div>
+<h1>词汇之路</h1>
+<p class="lede">一个词怎样长出来，又怎样在需要的那一刻被取出来。词根词缀、形态、搭配、词卡、听力词汇转阅读词汇。</p>
+<div class="filter"><label>筛选</label><input id="q" type="search" placeholder="输入任意词，例如：语感、复述、词根、RAZ" autocomplete="off" aria-label="筛选篇目"><span class="n" id="n"></span></div>
+<p class="empty" id="empty" style="display:none">没有匹配的篇目。换一个词试试。</p>
+</div>
+
+<section data-col="vocabulary">
+  <div class="col-h"><span class="no">栏&nbsp;三</span><h2>词汇之路</h2><span class="ct">23 篇 · 315 页</span></div>
+<div class="item" data-k="单词都会，为什么一组合就不像英语？孩子真正缺的可能是“搭配能力” 从“每个词都对”到“这些词本来就会这样一起出现”孩子会make，也会decision； 2026-08-21"><div class="it-hd"><span class="r-n">1</span><a class="it-t" href="/wechat/pdf/003.pdf">单词都会，为什么一组合就不像英语？孩子真正缺的可能是“搭配能力”</a><span class="it-m">2026-08-21 · 3 页</span></div><p class="it-d">从“每个词都对”到“这些词本来就会这样一起出现”孩子会make，也会decision；</p><div class="it-l"><a href="/wechat/pdf/003.pdf">读原文 PDF</a><span>存档号 003</span></div></div>
+<div class="item" data-k="背过的单词一听还是反应不过来：问题可能不在词汇量，而在“词义提取速度” 从“知道这个词”到“来得及用上这个词”家长语言学习科普系列听力不是一场没有时间限制的单词考试。 2026-08-18"><div class="it-hd"><span class="r-n">2</span><a class="it-t" href="/wechat/pdf/019.pdf">背过的单词一听还是反应不过来：问题可能不在词汇量，而在“词义提取速度”</a><span class="it-m">2026-08-18 · 2 页</span></div><p class="it-d">从“知道这个词”到“来得及用上这个词”家长语言学习科普系列听力不是一场没有时间限制的单词考试。</p><div class="it-l"><a href="/wechat/pdf/019.pdf">读原文 PDF</a><a href="/wechat/pdf/018.pdf">同题另稿 018</a><span>存档号 019</span></div></div>
+<div class="item" data-k="英语词形不是语法规则，而是意义在时间里的变化 孩子学英语，最容易被一个东西绊住。不是单词本身。而是单词一进入时间，就开始变样子。 2026-07-08"><div class="it-hd"><span class="r-n">3</span><a class="it-t" href="/wechat/pdf/069.pdf">英语词形不是语法规则，而是意义在时间里的变化</a><span class="it-m">2026-07-08 · 28 页</span></div><p class="it-d">孩子学英语，最容易被一个东西绊住。不是单词本身。而是单词一进入时间，就开始变样子。</p><div class="it-l"><a href="/wechat/pdf/069.pdf">读原文 PDF</a><span>存档号 069</span></div></div>
+<div class="item" data-k="为什么动词一进入真实生活，就不可能永远保持原形？ 孩子刚开始学英语动词时，最容易接受的是原形。play。go。eat。 2026-07-08"><div class="it-hd"><span class="r-n">4</span><a class="it-t" href="/wechat/pdf/070.pdf">为什么动词一进入真实生活，就不可能永远保持原形？</a><span class="it-m">2026-07-08 · 31 页</span></div><p class="it-d">孩子刚开始学英语动词时，最容易接受的是原形。play。go。eat。</p><div class="it-l"><a href="/wechat/pdf/070.pdf">读原文 PDF</a><span>存档号 070</span></div></div>
+<div class="item" data-k="一个词为什么会长出不同样子？词形变化背后的语言发生秘密 孩子学英语时，常常会遇到一个很奇怪的现象。明明已经背过一个词。可是这个词一换样子，他就不认识了。 2026-07-07"><div class="it-hd"><span class="r-n">5</span><a class="it-t" href="/wechat/pdf/072.pdf">一个词为什么会长出不同样子？词形变化背后的语言发生秘密</a><span class="it-m">2026-07-07 · 24 页</span></div><p class="it-d">孩子学英语时，常常会遇到一个很奇怪的现象。明明已经背过一个词。可是这个词一换样子，他就不认识了。</p><div class="it-l"><a href="/wechat/pdf/072.pdf">读原文 PDF</a><a href="/wechat/pdf/068.pdf">同题另稿 068</a><span>存档号 072</span></div></div>
+<div class="item" data-k="孩子背了一万个单词，为什么还是不会_说话_？ 有个爸爸跟我说，他儿子用APP打卡背单词，三年级词汇量已经过了四千，词汇测试正确率能到95%。 2026-07-03"><div class="it-hd"><span class="r-n">6</span><a class="it-t" href="/wechat/pdf/078.pdf">孩子背了一万个单词，为什么还是不会_说话_？</a><span class="it-m">2026-07-03 · 3 页</span></div><p class="it-d">有个爸爸跟我说，他儿子用APP打卡背单词，三年级词汇量已经过了四千，词汇测试正确率能到95%。</p><div class="it-l"><a href="/wechat/pdf/078.pdf">读原文 PDF</a><span>存档号 078</span></div></div>
+<div class="item" data-k="孩子学英语，最该培养的不是词汇量，而是“词汇生成力” 很多家长一谈到孩子英语学习，最关心的问题就是：孩子词汇量多少？小学阶段要多少词？ 2026-07-02"><div class="it-hd"><span class="r-n">7</span><a class="it-t" href="/wechat/pdf/079.pdf">孩子学英语，最该培养的不是词汇量，而是“词汇生成力”</a><span class="it-m">2026-07-02 · 22 页</span></div><p class="it-d">很多家长一谈到孩子英语学习，最关心的问题就是：孩子词汇量多少？小学阶段要多少词？</p><div class="it-l"><a href="/wechat/pdf/079.pdf">读原文 PDF</a><span>存档号 079</span></div></div>
+<div class="item" data-k="为什么你记不住 hand？因为你一直在背词义，而不是看它怎么“活过来的” 美国很多人学英语，会这样记：hand=手hand=帮助hand=人手hand=递交hand=控制hand=一手牌hand=方面hand=书写然后 2026-06-30"><div class="it-hd"><span class="r-n">8</span><a class="it-t" href="/wechat/pdf/084.pdf">为什么你记不住 hand？因为你一直在背词义，而不是看它怎么“活过来的”</a><span class="it-m">2026-06-30 · 6 页</span></div><p class="it-d">美国很多人学英语，会这样记：hand=手hand=帮助hand=人手hand=递交hand=控制hand=一手牌hand=方面hand=书写然后</p><div class="it-l"><a href="/wechat/pdf/084.pdf">读原文 PDF</a><span>存档号 084</span></div></div>
+<div class="item" data-k="孩子不是不会查词典，而是一直把词典当成“中文答案库” 很多孩子学英语，遇到生词时，第一反应很自然：查词典。这本来是一件好事。 2026-06-29"><div class="it-hd"><span class="r-n">9</span><a class="it-t" href="/wechat/pdf/085.pdf">孩子不是不会查词典，而是一直把词典当成“中文答案库”</a><span class="it-m">2026-06-29 · 22 页</span></div><p class="it-d">很多孩子学英语，遇到生词时，第一反应很自然：查词典。这本来是一件好事。</p><div class="it-l"><a href="/wechat/pdf/085.pdf">读原文 PDF</a><span>存档号 085</span></div></div>
+<div class="item" data-k="不懂形态学，孩子背一万个单词也可能只是散装记忆 美国很多孩子背英语单词，背得很辛苦。每天打卡。每天默写。每天听写。 2026-06-27"><div class="it-hd"><span class="r-n">10</span><a class="it-t" href="/wechat/pdf/091.pdf">不懂形态学，孩子背一万个单词也可能只是散装记忆</a><span class="it-m">2026-06-27 · 24 页</span></div><p class="it-d">美国很多孩子背英语单词，背得很辛苦。每天打卡。每天默写。每天听写。</p><div class="it-l"><a href="/wechat/pdf/091.pdf">读原文 PDF</a><span>存档号 091</span></div></div>
+<div class="item" data-k="英语词汇的真相：单词不是一个个背出来的，而是一族一族长出来的 美国每天背单词今天背20个。明天忘10个。后天重新背。一本单词书，从A背到Z。 2026-06-26"><div class="it-hd"><span class="r-n">11</span><a class="it-t" href="/wechat/pdf/092.pdf">英语词汇的真相：单词不是一个个背出来的，而是一族一族长出来的</a><span class="it-m">2026-06-26 · 23 页</span></div><p class="it-d">美国每天背单词今天背20个。明天忘10个。后天重新背。一本单词书，从A背到Z。</p><div class="it-l"><a href="/wechat/pdf/092.pdf">读原文 PDF</a><span>存档号 092</span></div></div>
+<div class="item" data-k="英语高级词汇的秘密：拉丁词根和希腊词根，撑起了半个学术英语世界 很多孩子不是从apple、banana、dog、cat开始害怕英语的。 2026-06-25"><div class="it-hd"><span class="r-n">12</span><a class="it-t" href="/wechat/pdf/093.pdf">英语高级词汇的秘密：拉丁词根和希腊词根，撑起了半个学术英语世界</a><span class="it-m">2026-06-25 · 28 页</span></div><p class="it-d">很多孩子不是从apple、banana、dog、cat开始害怕英语的。</p><div class="it-l"><a href="/wechat/pdf/093.pdf">读原文 PDF</a><span>存档号 093</span></div></div>
+<div class="item" data-k="词根词缀不是记忆技巧，而是英语词汇生长的底层路径 很多孩子学英语，一提到词根词缀，第一反应就是：这是背单词技巧。比如：un-表示“不”。 2026-06-25"><div class="it-hd"><span class="r-n">13</span><a class="it-t" href="/wechat/pdf/094.pdf">词根词缀不是记忆技巧，而是英语词汇生长的底层路径</a><span class="it-m">2026-06-25 · 31 页</span></div><p class="it-d">很多孩子学英语，一提到词根词缀，第一反应就是：这是背单词技巧。比如：un-表示“不”。</p><div class="it-l"><a href="/wechat/pdf/094.pdf">读原文 PDF</a><span>存档号 094</span></div></div>
+<div class="item" data-k="为什么你刷了一千天 Anki，却读不懂一本小说 你大概见过这种人——也可能，你自己就是。Anki连续打卡一千天，词库里躺着八千个单词，每天准时弹出复习卡片，正确率稳定在百分之九十以上。 2026-06-18"><div class="it-hd"><span class="r-n">14</span><a class="it-t" href="/wechat/pdf/110.pdf">为什么你刷了一千天 Anki，却读不懂一本小说</a><span class="it-m">2026-06-18 · 4 页</span></div><p class="it-d">你大概见过这种人——也可能，你自己就是。Anki连续打卡一千天，词库里躺着八千个单词，每天准时弹出复习卡片，正确率稳定在百分之九十以上。</p><div class="it-l"><a href="/wechat/pdf/110.pdf">读原文 PDF</a><span>存档号 110</span></div></div>
+<div class="item" data-k="孩子单词背了几百个，为什么还是听不懂英语动画？ 很多家长有过这样的经历。孩子学英语已经学了两三年，课本单词背得不错，听写很少出错，期末考试成绩也过得去。 2026-06-01"><div class="it-hd"><span class="r-n">15</span><a class="it-t" href="/wechat/pdf/144.pdf">孩子单词背了几百个，为什么还是听不懂英语动画？</a><span class="it-m">2026-06-01 · 6 页</span></div><p class="it-d">很多家长有过这样的经历。孩子学英语已经学了两三年，课本单词背得不错，听写很少出错，期末考试成绩也过得去。</p><div class="it-l"><a href="/wechat/pdf/144.pdf">读原文 PDF</a><span>存档号 144</span></div></div>
+<div class="item" data-k="为何我们的词汇学习如此低效？从Paul Bloom的著作谈起 词义，不只是声音和指——读PaulBloom《HowChildrenLearntheMeaningsofWords》有感作者：|教学研究者、五宝 2025-07-12"><div class="it-hd"><span class="r-n">16</span><a class="it-t" href="/wechat/pdf/220.pdf">为何我们的词汇学习如此低效？从Paul Bloom的著作谈起</a><span class="it-m">2025-07-12 · 7 页</span></div><p class="it-d">词义，不只是声音和指——读PaulBloom《HowChildrenLearntheMeaningsofWords》有感作者：|教学研究者、五宝</p><div class="it-l"><a href="/wechat/pdf/220.pdf">读原文 PDF</a><span>存档号 220</span></div></div>
+<div class="item" data-k="孩子英语单词学习的难题终于被解决了 单词学习，一直是幼少儿英语学习领域的难题。为了帮助孩子记忆单词，我所听过的方法包括但不限于以下几种：有的妈妈为了帮助自己孩子精准提升单词，首先会 2025-06-08"><div class="it-hd"><span class="r-n">17</span><a class="it-t" href="/wechat/pdf/222.pdf">孩子英语单词学习的难题终于被解决了</a><span class="it-m">2025-06-08 · 13 页</span></div><p class="it-d">单词学习，一直是幼少儿英语学习领域的难题。为了帮助孩子记忆单词，我所听过的方法包括但不限于以下几种：有的妈妈为了帮助自己孩子精准提升单词，首先会</p><div class="it-l"><a href="/wechat/pdf/222.pdf">读原文 PDF</a><span>存档号 222</span></div></div>
+<div class="item" data-k="别再自己做词卡了，你家孩子该拥有一套专业系统了 转载 单词学习，一直是幼少儿英语学习领域的老大难。不夸张地说，80%的家长英语焦虑，最后都卡在了“背单词”这一步。 2025-06-02"><div class="it-hd"><span class="r-n">18</span><a class="it-t" href="/wechat/pdf/225.pdf">别再自己做词卡了，你家孩子该拥有一套专业系统了 转载</a><span class="it-m">2025-06-02 · 15 页</span></div><p class="it-d">单词学习，一直是幼少儿英语学习领域的老大难。不夸张地说，80%的家长英语焦虑，最后都卡在了“背单词”这一步。</p><div class="it-l"><a href="/wechat/pdf/225.pdf">读原文 PDF</a><a href="/wechat/pdf/212.pdf">同题另稿 212</a><span>存档号 225</span></div></div>
+<div class="item" data-k="孩子英语启蒙的真相：为什么你熏了上千小时，词汇量还是不上去？ 该内容已被发布者删除微信公众平台运营中心 "><div class="it-hd"><span class="r-n">19</span><a class="it-t" href="/wechat/pdf/296.pdf">孩子英语启蒙的真相：为什么你熏了上千小时，词汇量还是不上去？</a><span class="it-m">1 页</span></div><p class="it-d">该内容已被发布者删除微信公众平台运营中心</p><div class="it-l"><a href="/wechat/pdf/296.pdf">读原文 PDF</a><span>存档号 296</span></div></div>
+<div class="item" data-k="英语单词学习的效率一直很低？核心原因终于被我找到了! !大家好！我是。今天我们聊聊英语学习中的一个老大难问题——单词记忆和使用。 2024-06-21"><div class="it-hd"><span class="r-n">20</span><a class="it-t" href="/wechat/pdf/306.pdf">英语单词学习的效率一直很低？核心原因终于被我找到了!</a><span class="it-m">2024-06-21 · 9 页</span></div><p class="it-d">!大家好！我是。今天我们聊聊英语学习中的一个老大难问题——单词记忆和使用。</p><div class="it-l"><a href="/wechat/pdf/306.pdf">读原文 PDF</a><span>存档号 306</span></div></div>
+<div class="item" data-k="如何高效提升英语词汇的创造性运用能力 语言学习效率的提升，其实是一个范式转移或者方向的改变。说到英语学习，无非就是听力、口语、词汇，还有阅读、写作、翻译，我们中国人的语言学习，我发现 2024-06-17"><div class="it-hd"><span class="r-n">21</span><a class="it-t" href="/wechat/pdf/309.pdf">如何高效提升英语词汇的创造性运用能力</a><span class="it-m">2024-06-17 · 9 页</span></div><p class="it-d">语言学习效率的提升，其实是一个范式转移或者方向的改变。说到英语学习，无非就是听力、口语、词汇，还有阅读、写作、翻译，我们中国人的语言学习，我发现</p><div class="it-l"><a href="/wechat/pdf/309.pdf">读原文 PDF</a><span>存档号 309</span></div></div>
+<div class="item" data-k="英语高效词汇学习的秘诀（公益直播课） 词汇，作为英语学习过程中，怎么都绕不过去的一道坎。多少英雄，在学习英语过程中，因为词汇量不够，被卡住，折戟。 2024-06-16"><div class="it-hd"><span class="r-n">22</span><a class="it-t" href="/wechat/pdf/310.pdf">英语高效词汇学习的秘诀（公益直播课）</a><span class="it-m">2024-06-16 · 3 页</span></div><p class="it-d">词汇，作为英语学习过程中，怎么都绕不过去的一道坎。多少英雄，在学习英语过程中，因为词汇量不够，被卡住，折戟。</p><div class="it-l"><a href="/wechat/pdf/310.pdf">读原文 PDF</a><a href="/wechat/pdf/312.pdf">同题另稿 312</a><span>存档号 310</span></div></div>
+<div class="item" data-k="将听力词汇量转化为阅读词汇量，这个方法最高效 经过一段时间的启蒙，孩子的听力词汇量已经有了一定的积累。很多家长都很困惑，如何将听力词汇量呢？ 2021-09-22"><div class="it-hd"><span class="r-n">23</span><a class="it-t" href="/wechat/pdf/407.pdf">将听力词汇量转化为阅读词汇量，这个方法最高效</a><span class="it-m">2021-09-22 · 1 页</span></div><p class="it-d">经过一段时间的启蒙，孩子的听力词汇量已经有了一定的积累。很多家长都很困惑，如何将听力词汇量呢？</p><div class="it-l"><a href="/wechat/pdf/407.pdf">读原文 PDF</a><span>存档号 407</span></div></div>
+</section>
+
+<div class="years"><a href="/wechat/enlighten/">← 英语启蒙</a><a href="/wechat/">全部频道</a><a href="/wechat/materials/">素材与分级 →</a></div>
+<script>
+(function(){
+  var q=document.getElementById("q"),n=document.getElementById("n"),
+      empty=document.getElementById("empty"),
+      items=[].slice.call(document.querySelectorAll(".item")),
+      secs=[].slice.call(document.querySelectorAll("section[data-col]"));
+  if(!q)return;
+  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();});
+  function run(){
+    var v=q.value.trim().toLowerCase(),c=0;
+    for(var i=0;i<items.length;i++){
+      var hit=!v||keys[i].indexOf(v)>=0;
+      items[i].style.display=hit?"":"none";
+      if(hit)c++;
+    }
+    for(var j=0;j<secs.length;j++){
+      var any=secs[j].querySelector('.item:not([style*="none"])');
+      secs[j].style.display=any?"":"none";
+    }
+    n.textContent=c+" / "+items.length;
+    empty.style.display=c?"none":"";
+  }
+  q.addEventListener("input",run); run();
+})();
+</script>
+</div>
+<footer><div class="wrap">
+  <p>约翰专栏 —— 胡志英（约翰老师）公众号「五宝爸约翰聊英语」原文存档，共 418 篇。原文一字未改，本站只做归类、排序与检索。</p>
+  <p>语言发生学 · <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站 —— 德麦国际 · Demai International Press</p>
+</div></footer>
+<script>
+/* 分站页面的自家链接写的是分站根。在二级域名下这就是对的；
+   若从主站以 /sites/lang/… 预览，则就地补上前缀，两处都能正常点。 */
+(function(){var b="/sites/lang";if(location.pathname.indexOf(b)!==0)return;
+var own=["/#","/all/","/wechat/","/chatjohn/"];
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");continue;}
+for(var k=0;k<own.length;k++){if(h.indexOf(own[k])===0){as[i].setAttribute("href",b+h);break;}}}})();
+</script>
+</body></html>
