@@ -16,7 +16,7 @@ let B = null;
 try {
   const a = S.indexOf('const SDE_METHOD_MISSION');
   const b = S.indexOf('\n\n\n/* ═══════════ 三类问题', a);
-  B = new Function(S.slice(a, b) + '\n; return { MISSION: SDE_METHOD_MISSION, SETTLE: SDE_METHOD_SETTLE, STOCK: SDE_METHOD_STOCK, DEEP: SDE_METHOD_BLOCK, LITE: SDE_METHOD_LITE };')();
+  B = new Function(S.slice(a, b) + '\n; return { MISSION: SDE_METHOD_MISSION, SETTLE: SDE_METHOD_SETTLE, STOCK: SDE_METHOD_STOCK, FIVE: SDE_METHOD_FIVE, DEEP: SDE_METHOD_BLOCK, LITE: SDE_METHOD_LITE };')();
 } catch (e) { ok(false, '这一族常量能独立跑起来', e.message); }
 
 if (B) {
@@ -54,7 +54,9 @@ if (B) {
   ok(B.LITE.length < B.DEEP.length, '精简版短于全量版', B.LITE.length + ' vs ' + B.DEEP.length);
   // 2026-08-23 抬到 1300：精简版又装进了「先清家底」那一步（+504 字）。
   // 抬这个数要有理由——它是每轮都付的固定成本，不是随手放宽的。
-  ok(B.LITE.length < 1300, '精简版控制在 1300 字以内', B.LITE.length + ' 字');
+  // 2026-08-23 再抬到 1800：又装进了「朝五维去写」（+509 字）。每抬一次都要写清抬的理由——
+  // 这是标准档每一轮都要付的固定成本，不是可以随手放宽的数。
+  ok(B.LITE.length < 1800, '精简版控制在 1800 字以内', B.LITE.length + ' 字');
   ok(B.DEEP.indexOf('意义三律') >= 0 && B.LITE.indexOf('意义三律') < 0, '意义三律等只留深度档');
 }
 
@@ -75,7 +77,26 @@ if (B) {
   ok(/相对家底里的哪几个说法而新/.test(B.SETTLE), '结算要说清相对谁而新');
 }
 
-console.log('【七】装配：非分身档每一轮都注入');
+console.log('【七】朝五维去写（不许自评分数）');
+if (B) {
+  ok(/不许你在答案里给自己打分/.test(B.FIVE), '明禁自评分数（评分铁律：不评自己写的文本）');
+  ['S 结构', 'D 差异', 'E 纠缠', 'I 不可还原', 'F 可证伪'].forEach(function (d) {
+    ok(B.FIVE.indexOf(d) >= 0, '五维齐：' + d);
+  });
+  ok(/权重最重/.test(B.FIVE), 'D 是权重最重的一维（心脏）');
+  ok(/闸门/.test(B.FIVE) && /两道闸没过/.test(B.FIVE), 'I/F 写成闸门，不是普通维度');
+  ok(/把那个领域整段删掉，论证还成立吗/.test(B.FIVE), 'E 有可执行判据（防借词类比）');
+  ok(/不必联网/.test(B.FIVE), 'E 的料只取站内语料与自身库存，不要求站外');
+  ok(/1:1 换掉/.test(B.FIVE), 'I 有可执行判据（能被现成说法替换即未创新）');
+  ok(/若观察到 X，本判断作废/.test(B.FIVE), 'F 给出成句的形状');
+  ok(/不许拿一句怎么都对的话冒充判据/.test(B.FIVE), 'F 禁止用永真句充数');
+  ok(/站内语料与你自己的库存要用干净/.test(B.FIVE), '写明两处料要用干净');
+  ok(B.DEEP.indexOf(B.FIVE) >= 0 && B.LITE.indexOf(B.FIVE) >= 0, '两档都装了五维（单一定义处）');
+  ok(B.LITE.indexOf(B.FIVE) < B.LITE.indexOf('必须结算'), '五维排在结算之前');
+  ok(B.LITE.indexOf(B.STOCK) < B.LITE.indexOf(B.FIVE), '清家底仍排在五维之前（先有料才谈怎么用）');
+}
+
+console.log('【八】装配：非分身档每一轮都注入');
 ok(/\(\(prof && prof\.term\) \? "" : \(deep \? SDE_METHOD_BLOCK : SDE_METHOD_LITE\)\)/.test(S),
   '深度走全量、标准走精简、分身不注入');
 ok(!/\(deep && !\(prof && prof\.term\)\) \? SDE_METHOD_BLOCK : ""/.test(S), '旧的「只有深度档才有」已清');
