@@ -34,7 +34,7 @@ if (mKD) for (const m of mKD[1].matchAll(/\{ k: "(\w+)"[^}]*\}/g)) {
 
 // ③ 菜单文案里印给读者看的那个数
 const LBL = {};
-for (const m of F.matchAll(/\bk(Report|Essay|Paper1|Paper|Outline|Sumdoc|Deck|Wechat|Prose|Story|Poem|Notice|Plan|Summary|Speech|Letter):\s*"([^"]*)"/g)) {
+for (const m of F.matchAll(/\bk(Report|Essay|Paper1|Paper|Outline|Sumdoc|Deck|Wechat|Prose|Story|Poem|Script|Notice|Plan|Summary|Speech|Letter):\s*"([^"]*)"/g)) {
   const k = m[1][0].toLowerCase() + m[1].slice(1);
   const n = m[2].match(/([\d,]{3,})\s*(字|characters)/);
   if (n && LBL[k] === undefined) LBL[k] = +n[1].replace(/,/g, "");
@@ -61,7 +61,11 @@ for (const k of ["notice", "plan", "summary", "speech", "letter"]) {
   ok("★【" + k + "】不挂笔法旗标（应用文的价值在责任落点，不在腔调）", !STY[k]);
   ok("【" + k + "】出得了 Word 与 PDF", new RegExp('k: "' + k + '"[^}]*doc: 1').test(F));
 }
-ok("笔法旗标的使用点也跟着改了（不是只改了表）", /d0 && d0\.sty/.test(F) && !/d0 && d0\.w\b/.test(F));
+/* 承重位是**调用点**：表里标了旗标而这里不看，四档就默默按本色写、零报错。
+   2026-08-23 菜单点击改成「先问体量再问笔法」，写法从 `d0 && d0.sty` 变成 `d0.sty`；
+   按用意重写，只认「读那个旗标 → 开笔法面板」。 */
+ok("笔法旗标的使用点也跟着改了（不是只改了表）",
+   /d0\.sty\) \{ writerMenu\(k, w\); return; \}/.test(F) && !/d0\.w\)/.test(F));
 
 // ── 字数闸 ───────────────────────────────────────────────────
 console.log("\n【二、字数闸】");
@@ -86,17 +90,20 @@ if (gate) {
 ok("★ 一趟出全篇那条路也挂了闸（原来只有提示语里一句自问）",
    /\+ distWordGate\(SPEC\.words, 1, 1\)/.test(W));
 ok("★ 拆趟那条路每趟都挂闸", /\+ distWordGate\(want, partIdx \+ 1, secs\.length\)/.test(W));
-ok("SPEC.words 从 DIST_WORDS 取，不从文案里抠", /SPEC\.words = DIST_WORDS\[kind\] \|\| 0/.test(W));
+/* 目标字数来自表（档次表命中就用读者选的那一档，否则退回 DIST_WORDS），**永远不从规格文案里正则抠**——
+   文案会被改写，数不会。2026-08-23 加档次后落点从常量搬到了 _wPick。 */
+ok("SPEC.words 从表里取，不从文案里抠",
+   /SPEC\.words = _wPick;/.test(W) && !/SPEC\.words = .*match\(/.test(W));
 
 // ── 拆趟 ─────────────────────────────────────────────────────
 console.log("\n【三、拆趟与 noHead】");
 ok("★ 前端 CHUNKED 由 KIND_DEF 派生，不再手抄一张表",
    /var CHUNKED = \{\};/.test(F) && /KIND_DEF\[_ci2\]\.c/.test(F) && !/var CHUNKED = \{ paper: 1 \}/.test(F));
-for (const k of ["prose", "story", "wechat", "plan", "summary", "speech"]) ok("【" + k + "】前端认它是拆趟档", !!CH[k]);
+for (const k of ["prose", "story", "wechat", "script", "plan", "summary", "speech"]) ok("【" + k + "】前端认它是拆趟档", !!CH[k]);
 ok("paper1 仍不拆（用户明令一趟出全篇）", !CH.paper1);
 
 const SPECseg = W.slice(W.indexOf("      const SPEC = {"), W.indexOf("      }[kind];"));
-for (const k of ["prose", "story", "wechat", "plan", "summary", "speech"]) {
+for (const k of ["prose", "story", "wechat", "script", "plan", "summary", "speech"]) {
   const m = SPECseg.match(new RegExp("\\n        " + k + ": \\{[\\s\\S]*?\\], spec:"));
   ok("【" + k + "】服务端给了 fixed 分趟表", !!m);
   if (!m) continue;
@@ -125,8 +132,10 @@ ok("noHead 档不发「结尾留一个开口」（散文/小说的收法各不�
 
 // ── 前端判「完成／未写完」 ──────────────────────────────────
 console.log("\n【四、前端验收】");
-ok("★ 目标字数取不到 dSecs 时退回档位表，而不是退回写死的 400",
-   /if \(!_want\) \{ var _kdw = kindDef\(kind\); _want = \(_kdw && _kdw\.w\) \|\| 0; \}/.test(F));
+/* 2026-08-23：退路从「档位表的默认体量」改成「读者这一趟选的体量」（wsel 自己已退回默认）。
+   用意没变：**不许退回那个写死的 400**——2858/5000 判「完成」就是那个 400 判出来的。 */
+ok("★ 目标字数取不到 dSecs 时退回选中的体量，而不是退回写死的 400",
+   /if \(!_want\) _want = wsel \|\| 0;/.test(F) && /var wsel = \(function \(\)/.test(F));
 ok("★ 判据是九成，与服务端那道闸同一个数",
    /var _floor = _want \? Math\.round\(_want \* 0\.9\) : 400;/.test(F));
 ok("写短了另发一条 note，不只是改状态栏两个字", /dShortW1/.test(F) && /text\.length < _floor\) dNote/.test(F));
@@ -178,6 +187,67 @@ console.log("\n【六、成文记录用文章自己的名字】");
      /var segs = String\(head\)\.split\(" \\u00b7 "\);/.test(F)
      && /for \(var si = 0; si < segs\.length && !k; si\+\+\)/.test(F)
      && !/var head0 = String\(head\)\.split/.test(F));
+}
+
+
+// ── 字数档次 ────────────────────────────────────────────────
+console.log("\n【七、字数档次】");
+const SRVO = {};
+{
+  const m = W.match(/const DIST_WORD_OPTS = \{([\s\S]*?)\n\};/);
+  ok("服务端有 DIST_WORD_OPTS 这张唯一来源表", !!m);
+  if (m) for (const x of m[1].matchAll(/(\w+):\s*\[([\d,\s]+)\]/g))
+    SRVO[x[1]] = x[2].split(",").map((s) => +s.trim()).filter((n) => n);
+}
+const FEO = {};
+if (mKD) for (const m of mKD[1].matchAll(/\{ k: "(\w+)"[\s\S]*?\}/g)) {
+  const w = m[0].match(/\bwo: \[([\d,\s]+)\]/);
+  if (w) FEO[m[1]] = w[1].split(",").map((s) => +s.trim()).filter((n) => n);
+}
+for (const k of Object.keys(SRVO)) {
+  ok("【" + k + "】前后端档次表一致", JSON.stringify(SRVO[k]) === JSON.stringify(FEO[k]),
+     "服务端 " + JSON.stringify(SRVO[k]) + " ／ 前端 " + JSON.stringify(FEO[k]));
+  ok("【" + k + "】三档递增且各不相同", SRVO[k].length === 3 && SRVO[k][0] < SRVO[k][1] && SRVO[k][1] < SRVO[k][2]);
+  // ⭐ 中间那一档必须等于默认体量——不等于就等于偷偷改了默认值，而菜单文案仍写着旧数
+  ok("★【" + k + "】中间那一档 = 默认体量（否则等于偷偷改了默认值）", SRVO[k][1] === SRV[k],
+     "中档 " + SRVO[k][1] + " ／ 默认 " + SRV[k]);
+}
+for (const k of Object.keys(FEO)) ok("【" + k + "】前端没多出服务端不认的档次", !!SRVO[k]);
+ok("★ 服务端只认自己表里的数（不许浏览器决定一趟写多少字）",
+   /_wOpts\.indexOf\(parseInt\(b\.words, 10\)\) >= 0 \? parseInt\(b\.words, 10\) : \(DIST_WORDS\[kind\] \|\| 0\)/.test(W));
+ok("★ 前端也自查一遍再递（递一个表外的数没意义）", /o\.indexOf\(parseInt\(words, 10\)\) >= 0/.test(F));
+ok("★ 选中的体量进了请求体", /words: wsel,/.test(F));
+ok("★ 收尾判据用的是选中的体量", /if \(!_want\) _want = wsel \|\| 0;/.test(F));
+ok("先问体量、再问笔法（腔调不改体量）",
+   /lenMenu\(k, function \(w\) \{[\s\S]{0,200}writerMenu\(k, w\)/.test(F));
+ok("笔法面板把体量原样带下去", /distill\(kind, null, null, "", null, id, words \|\| 0\)/.test(F));
+// ── 缩放真跑 ────────────────────────────────────────────────
+console.log("\n【八、分趟缩放真跑】");
+{
+  const s = /function distScaleFixed\(base, words\) \{[\s\S]*?\n\}/.exec(W);
+  ok("抠得到 distScaleFixed", !!s);
+  const fx = s ? new Function(s[0] + "; return distScaleFixed;")() : null;
+  const base = [{ h: "一", words: 2000, ask: "A" }, { h: "二", words: 1750, ask: "B" }, { h: "三", words: 1250, ask: "C" }];
+  if (fx) {
+    for (const w of [3000, 5000, 8000, 12000]) {
+      const r = fx(base, w);
+      const sum = r.reduce((a, x) => a + x.words, 0);
+      ok("【" + w + "】各趟之和 ≈ 目标（±3%）", Math.abs(sum - w) <= w * 0.03, "和 " + sum);
+      // ⭐ 单趟上限是硬约束：越长越容易提前收尾
+      ok("★【" + w + "】没有一趟超过 2200 字", Math.max(...r.map((x) => x.words)) <= 2200,
+         "最长 " + Math.max(...r.map((x) => x.words)));
+      // ⭐ 比例是体例的一部分：缩放不许把 40/35/25 压平
+      const g = ["一", "二", "三"].map((h) => r.filter((x) => x.h.indexOf(h) === 0).reduce((a, x) => a + x.words, 0));
+      ok("【" + w + "】三段比例保住了（40/35/25）",
+         Math.abs(g[0] / sum - 0.4) < 0.03 && Math.abs(g[1] / sum - 0.35) < 0.03 && Math.abs(g[2] / sum - 0.25) < 0.03,
+         g.map((x) => Math.round(x / sum * 100) + "%").join("/"));
+    }
+    // 拆出来的趟必须明说「这一段还没写完」，否则基底会在每一趟末尾各收一次尾
+    const r8 = fx(base, 8000).filter((x) => x.h.indexOf("\u00b7") > 0);
+    ok("★ 被拆开的段：非末趟明写「别收」", r8.length > 0 && r8.filter((x) => x.ask.indexOf("别收") > 0).length >= 1);
+    ok("★ 被拆开的段：末趟只收这一段，不越权收全篇", r8.some((x) => x.ask.indexOf("全篇是否收尾另看") > 0));
+    ok("短档不会把某一段压到 300 字以下", fx(base, 900).every((x) => x.words >= 300));
+  }
 }
 
 console.log("\n" + (FAIL ? "✗ " : "✓ ") + PASS + " 项通过，" + FAIL + " 项失败");

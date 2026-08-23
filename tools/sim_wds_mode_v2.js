@@ -131,6 +131,22 @@ function sseBody(events, noDone) {
   return { getReader: () => ({ read: () => Promise.resolve(cancelled || i >= chunks.length ? { done: true } : { done: false, value: chunks[i++] }), cancel: () => { cancelled = true; } }) };
 }
 let LAST_PAYLOAD = null, ROUTE = {}, NO_DONE = {};
+/* 点完档名之后，若弹出的是体量面板就选一档（默认那一档）。
+   ⚠ 2026-08-23 起每个有体量档次的档都多这一步；不选就一趟都不会跑，
+      表现是「实得 0 趟」，看起来像产线坏了。 */
+async function pickLen(match) {
+  await new Promise((r) => setTimeout(r, 120));
+  const lp = document.body.querySelector(".wdsm-tplb");
+  if (!lp) return false;
+  const items = [].slice.call(lp.querySelectorAll(".wdsm-tplitem"));
+  const hit = match ? items.filter((b) => match.test(b.textContent))[0]
+                    : items.filter((b) => /默认体量|default for this kind/.test(b.textContent))[0];
+  if (!hit) return false;
+  hit.click();
+  await new Promise((r) => setTimeout(r, 60));
+  return true;
+}
+
 /* 档位表条数由源码派生，别手抄——手抄的那个数每加一档就假红一次。 */
 const KIND_KEYS_N = ((require("fs").readFileSync(__dirname + "/../public/wds-mode.js", "utf8")
   .match(/var KIND_DEF = \[([\s\S]*?)\n  \];/) || ["", ""])[1].match(/\{ k: "/g) || []).length;
@@ -478,8 +494,22 @@ console.log("⑧ 成文（distill）");
     ok(!!story, "菜单里点得到短篇小说");
     story.click();
     await new Promise((r) => setTimeout(r, 120));
+    /* 2026-08-23：链路多了一步——**先问体量**（它决定拆几趟、每趟多少字），再问笔法。
+       次序不能反：腔调不改体量，而体量改的是有几条线、有几个人。 */
+    const lp = document.body.querySelector(".wdsm-tplb");
+    ok(!!lp, "⭐ 点创作体先弹体量面板");
+    const lens = [].slice.call(lp.querySelectorAll(".wdsm-tplitem"));
+    ok(lens.length === 4, "体量面板三档 ＋ 取消，实得 " + lens.length);
+    ok(/2400/.test(lp.textContent) && /1600/.test(lp.textContent) && /4000/.test(lp.textContent),
+      "★ 小说三档都摆出来了（1600/2400/4000）");
+    ok(/\u9ed8\u8ba4\u4f53\u91cf/.test(lp.textContent), "默认那一档标了出来");
+    // ⭐ 趟数是读者要付的钱（每趟一次上游调用，烧他自己的 Key），面板上先告诉他
+    ok(/\u8d9f\u5199/.test(lp.textContent), "★ 拆趟档在面板上先说清要跑几趟");
+    lens.find((b) => /2400/.test(b.textContent)).click();   // 选默认那一档
+    await new Promise((r) => setTimeout(r, 120));
     const panel = document.body.querySelector(".wdsm-tplb");
-    ok(!!panel, "⭐ 点创作体先弹作家笔法面板，不是直接开写");
+    ok(!!panel && /\u7b14\u6cd5|style|\u4e0d\u6a21\u4eff/.test(panel.textContent),
+      "⭐ 选完体量再弹作家笔法面板，不是直接开写");
     const names = [].slice.call(panel.querySelectorAll(".wdsm-tplitem"));
     ok(names.length > 100, "面板里列出一百位以上（含「本色写」那一条），实得 " + names.length);
     ok(/本色写|Plain/.test(panel.textContent), "第一条是「本色写（不模仿）」——不模仿是默认可走的路");
@@ -1438,6 +1468,14 @@ console.log("⑧ 成文（distill）");
      按档名点（这套护栏自己在⑨那里就写过这条规矩，这里当初没照做）。 */
   [].slice.call(document.body.querySelector(".wdsm-menu").children)
     .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  /* 2026-08-23：论文档也有体量三档了，点完档名先弹体量面板——不选一档就一趟都不会跑。 */
+  await new Promise((r) => setTimeout(r, 120));
+  {
+    const lp2 = document.body.querySelector(".wdsm-tplb");
+    ok(!!lp2, "★ 论文档也先问体量");
+    [].slice.call(lp2.querySelectorAll(".wdsm-tplitem"))
+      .filter((b) => /20000|20,000/.test(b.textContent))[0].click();   // 选默认那一档
+  }
   await new Promise((r) => setTimeout(r, 4000));
   let dpc = document.body.querySelector(".wdsm-dist");
   ok(LEGS.length === 4, "一共四趟：拟题 ＋ 三节，实得 " + LEGS.length + " 趟（" + LEGS.map((l) => l.stage || "单趟").join("/") + "）");
@@ -1466,6 +1504,7 @@ console.log("⑧ 成文（distill）");
   layer.querySelector(".wdsm-distbtn").click();
   [].slice.call(document.body.querySelector(".wdsm-menu").children)
     .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  await pickLen();   // 2026-08-23：先选体量，不选就一趟都不会跑
   /* ⚠ 重写不是立刻打的：产品**故意退避 RETRY_WAIT=20 秒**再来第二遍
      （"立刻重打等于把同一堵墙再撞一次"）。等 1.1 秒当然什么都读不到——
      这一条曾经是假红。要么等过那 20 秒，要么这条就废了；选等。 */
@@ -1488,6 +1527,7 @@ console.log("⑧ 成文（distill）");
   layer.querySelector(".wdsm-distbtn").click();
   [].slice.call(document.body.querySelector(".wdsm-menu").children)
     .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  await pickLen();   // 2026-08-23：先选体量，不选就一趟都不会跑
   await new Promise((r) => setTimeout(r, 3000));
   const dpf = document.body.querySelector(".wdsm-dist");
   /* 🔴 2026-08-12 反转：**骨架档不许退回"一趟写完"**——那是拿两万字去赌一次调用
@@ -1510,6 +1550,7 @@ console.log("⑧ 成文（distill）");
   layer.querySelector(".wdsm-distbtn").click();
   [].slice.call(document.body.querySelector(".wdsm-menu").children)
     .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  await pickLen();   // 2026-08-23：先选体量，不选就一趟都不会跑
   await new Promise((r) => setTimeout(r, 8000));
   ok(SAVES.length >= 3, "写作途中就在存（每写完一节存一次，不是等到最后才存），实得 " + SAVES.length + " 次");
   ok(SAVES[SAVES.length - 1] > SAVES[0], "存下来的稿子逐节变长（同一条记录反复覆盖）");
@@ -1556,6 +1597,7 @@ console.log("⑧ 成文（distill）");
   layer.querySelector(".wdsm-distbtn").click();
   [].slice.call(document.body.querySelector(".wdsm-menu").children)
     .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  await pickLen();   // 2026-08-23：先选体量，不选就一趟都不会跑
   await new Promise((r) => setTimeout(r, 900));
   const dph = document.body.querySelector(".wdsm-dist");
   ok(/<h[1-6]>/.test(htmlOf(dph.querySelector(".wdsm-a"))), "收尾之后整篇都是正式排版（纯文本只在写作途中用）");
@@ -1586,6 +1628,7 @@ console.log("⑧ 成文（distill）");
   layer.querySelector(".wdsm-distbtn").click();
   [].slice.call(document.body.querySelector(".wdsm-menu").children)
     .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  await pickLen();   // 2026-08-23：先选体量，不选就一趟都不会跑
   await new Promise((r) => setTimeout(r, 900));
   const tr6 = JSON.parse(store["sde_wds_dist_trace"] || "null");
   ok(tr6 && tr6.leg === "已收尾" && tr6.ok === true, "正常跑完时痕迹停在「已收尾」，实得 " + (tr6 && tr6.leg));
@@ -1606,8 +1649,11 @@ console.log("⑧ 成文（distill）");
       const b = [].slice.call(mm.children).find((x) => String(x.textContent || "").indexOf(label) >= 0);
       if (!b) { ok(false, k + "：菜单里找得到"); continue; }
       b.click();
+      /* 2026-08-23：链路是「档名 → 体量（有档次的档才有）→ 笔法（创作体才有）→ 开写」。
+         少走一步就一趟都不会跑，而表现是面板上一颗按钮都没有——看起来像导出按钮丢了。 */
+      await pickLen();
       await new Promise((r) => setTimeout(r, 60));
-      // 四档创作体会先弹笔法面板，选「本色写」进去
+      // 创作体接着弹笔法面板，选第一项「本色写」进去
       const wp = document.body.querySelector(".wdsm-tplb");
       if (wp) { wp.querySelector(".wdsm-tplitem").click(); }
       await new Promise((r) => setTimeout(r, 260));
@@ -1620,6 +1666,7 @@ console.log("⑧ 成文（distill）");
     layer.querySelector(".wdsm-distbtn").click();
     const m9 = document.body.querySelector(".wdsm-menu");
     [].slice.call(m9.children).find((x) => /散文（/.test(String(x.textContent || ""))).click();
+    await pickLen();                                   // 先选体量（2026-08-23）
     await new Promise((r) => setTimeout(r, 60));
     const wp9 = document.body.querySelector(".wdsm-tplb");
     if (wp9) wp9.querySelector(".wdsm-tplitem").click();

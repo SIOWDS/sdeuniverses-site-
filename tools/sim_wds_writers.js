@@ -117,8 +117,12 @@ hd("【四】四档创作体：三处都加齐了没有");
     "docx 模块认这个开关");
   /* 承重位是**调用点**：表里标了旗标而这里不看，四档就默默按本色写、零报错。
      只认「读那个旗标 → 开笔法面板 → return」，不抄整行字面。 */
-  ok(/if \(d0 && d0\.sty\) \{ writerMenu\(k\); return; \}/.test(F), "菜单点击真的会先开笔法面板");
-  ok(/function distill\(kind, existing, title, tpl, again, style\)/.test(F), "distill 收 style 这个参数");
+  /* 2026-08-23：点击链路变成「先问体量 → 再问笔法」（体量决定拆几趟、每趟多少字，腔调不改体量）。
+     用意没变：**标了旗标的档，动笔之前一定要经过笔法面板**。按用意重写，并多守一条次序。 */
+  ok(/d0\.sty\) \{ writerMenu\(k, w\); return; \}/.test(F), "菜单点击真的会先开笔法面板");
+  ok(/lenMenu\(k, function \(w\) \{/.test(F), "★ 先问体量再问笔法（腔调不改体量）");
+  /* 签名后来又多收一个 words（体量）。整串抄进正则就假红；只认它收得到 style。 */
+  ok(/function distill\(kind, existing, title, tpl, again, style(, words)?\)/.test(F), "distill 收 style 这个参数");
   ok(/style: style \|\| "",/.test(F), "style 进了请求体");
   ok(/distill\(kind, null, title, tpl, again, style\)/.test(F),
     "⭐ 填 Key 那一跳把 style 带了回来（第一版漏了它＝填完 Key 就变本色，且无任何报错）");

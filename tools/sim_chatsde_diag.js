@@ -40,7 +40,7 @@ function label(len, secs, kw) {
      桩要跟着长出这两样，否则报的是 ReferenceError 而不是真读数。
      第三个参数 ＝ 这一档的目标字数，不传就当这一档没有目标（旧行为）。 */
   const src = "var text='x'.repeat(" + len + "), dSecs=" + JSON.stringify(secs)
-    + ", kind='x', stat={}; function t(k){return k+':';}"
+    + ", kind='x', wsel=" + (kw || 0) + ", stat={}; function t(k){return k+':';}"
     + " function kindDef(){ return " + JSON.stringify(kw ? { w: kw } : {}) + "; }\n"
     + done + "\nreturn stat.textContent;";
   return new Function(src)();

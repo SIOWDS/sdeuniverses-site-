@@ -672,6 +672,11 @@
       kWechat: "公众号文章（3000字）", kWechatS: "开头三句必须有一个具体场面；小标题分段、短句、结尾给一个明天就能做的动作",
       kProse: "散文（5000字）", kProseS: "不讲道理讲经验：从一个场面进去，道理藏在事里，收在一个具体画面上",
       kStory: "短篇小说（2400字）", kStoryS: "一个场景、一到三个人；判断由情节自己撞出来，结尾不解决不点题",
+      kScript: "剧本（6000字）", kScriptS: "只写看得见与听得见的；写得出「他心里想」的那一句，一定是错的",
+      lnPick: "先定体量", lnUnit: " 字",
+      lnNote: "三千字与八千字不是同一篇的两种长度：**短的那一档要砍掉一条线，长的那一档要多一个人**。所以体量在动笔之前定，不是写完再删——删出来的稿子逻辑是断的。",
+      lnShort: "短", lnMid: "常用", lnLong: "长", lnDefault: "　这一档的默认体量",
+      lnLegs1: "　分 ", lnLegs2: " 趟写（每趟一次调用，烧你自己的 Key）",
       kPoem: "诗歌（500字）", kPoemS: "一首长诗或三到五首短章；具体胜过抽象，不解释自己",
       /* 应用文五档：说明句一律写「责任落在谁身上」——这是选档时唯一要判断的事。 */
       kNotice: "通知公告（1500字）", kNoticeS: "已经定了的事，送到该动的人手上；要求提在最前，做不到有出路",
@@ -904,6 +909,11 @@
       kWechat: "Column piece (3,000 characters)", kWechatS: "A concrete scene in the first three lines; short sections, short sentences, one thing to do tomorrow",
       kProse: "Personal essay (5,000 characters)", kProseS: "Experience, not argument: enter through a scene, keep the point inside the events, end on an image",
       kStory: "Short story (2,400 characters)", kStoryS: "One scene, one to three people; the claim has to surface through what happens — no moral at the end",
+      kScript: "Screenplay (6,000 characters)", kScriptS: "Only what can be seen and heard; any line saying what someone thinks is a wrong line",
+      lnPick: "Pick a length first", lnUnit: " chars",
+      lnNote: "Three thousand and eight thousand are not two lengths of one piece: **the short one has to lose a thread, the long one has to gain a person.** So length is settled before writing, not by cutting afterwards — a cut-down draft has a broken spine.",
+      lnShort: "Short", lnMid: "Usual", lnLong: "Long", lnDefault: "　default for this kind",
+      lnLegs1: "　", lnLegs2: " passes (one upstream call each, on your own key)",
       kPoem: "Poem (500 characters)", kPoemS: "One long poem or a set of three to five; concrete over abstract, and no explaining itself",
       kNotice: "Notice (1,500 characters)", kNoticeS: "A settled decision, delivered to whoever must act; the ask comes first, with a route out",
       kPlan: "Proposal (4,000 characters)", kPlanS: "An unmade thing written as a commitment you can be held to; cost table and failure clause carry it",
@@ -2098,7 +2108,39 @@
   function writerName(id) { for (var i = 0; i < WRITERS.length; i++) if (WRITERS[i].k === id) return WRITERS[i].n; return ""; }
   /* 一百位平铺是一堵墙：按七组分节，并给一个当场筛选的输入框。
      ⚠ 筛选**同时匹配中文名与括号里的原名**——读者想找 Chekhov 时不该被中文名挡住。 */
-  function writerMenu(kind) {
+  /* 【先问体量】(2026-08-23)
+     同一个体裁，三千字与八千字不是同一件东西：短的那一档要砍掉一条线，长的那一档要多一个人。
+     所以体量在**动笔之前**问，不是写完再删——删出来的稿子逻辑是断的（讲话档那条 J-9 说的就是这件事）。
+     ⚠ 选中的数只是一个提议，服务端只认它自己那张 DIST_WORD_OPTS 里的三个数；
+        不在表里一律退回默认体量，不报错——**别让浏览器决定一趟写多少字**。 */
+  function lenMenu(kind, next) {
+    var d = kindDef(kind), opts = (d && d.wo) || [];
+    if (!opts.length) { next(0); return; }
+    var m = el("div", "wdsm-help");
+    var box = el("div", "wdsm-tplb");
+    box.appendChild(el("h4", null, t("lnPick") + "　" + kindT(kind)));
+    var note = el("div", "wdsm-tplnote");
+    note.innerHTML = esc(t("lnNote")).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+    box.appendChild(note);
+    var LAB = [t("lnShort"), t("lnMid"), t("lnLong")];
+    opts.forEach(function (w, i) {
+      var b = el("button", "wdsm-tplitem");
+      b.appendChild(el("b", null, (LAB[i] || "") + "　" + w + t("lnUnit")));
+      /* 趟数是读者要付的钱（每一趟一次上游调用，烧的是他自己的 Key），所以先告诉他。 */
+      if (d.c) b.appendChild(el("span", null, t("lnLegs1") + Math.max(1, Math.ceil(w / 2200)) + t("lnLegs2")));
+      if (w === d.w) b.appendChild(el("span", null, t("lnDefault")));
+      b.onclick = function () { if (m.parentNode) m.parentNode.removeChild(m); next(w); };
+      box.appendChild(b);
+    });
+    var cx = el("button", "wdsm-tplitem");
+    cx.appendChild(el("b", null, t("cancel") || "\u53d6\u6d88"));
+    cx.onclick = function () { if (m.parentNode) m.parentNode.removeChild(m); };
+    box.appendChild(cx);
+    m.appendChild(box);
+    m.onclick = function (e) { if (e.target === m) m.parentNode.removeChild(m); };
+    layer.appendChild(m);
+  }
+  function writerMenu(kind, words) {
     var m = el("div", "wdsm-help");
     var box = el("div", "wdsm-tplb");
     box.appendChild(el("h4", null, t("wsPick") + "　" + t("wsCount")));
@@ -2111,7 +2153,7 @@
     inp.type = "text"; inp.placeholder = t("wsSearch");
     inp.style.cssText = "width:100%;margin:0 0 12px;box-sizing:border-box";
     box.appendChild(inp);
-    var go = function (id) { if (m.parentNode) m.parentNode.removeChild(m); distill(kind, null, null, "", null, id); };
+    var go = function (id) { if (m.parentNode) m.parentNode.removeChild(m); distill(kind, null, null, "", null, id, words || 0); };
     var none = el("button", "wdsm-tplitem");
     none.appendChild(el("b", null, t("wsNone")));
     none.appendChild(el("span", null, t("wsNoneS")));
@@ -6287,23 +6329,33 @@
        ⚠ 两个字段都必须与服务端 DIST_WORDS / SPEC 逐档对得上，菜单文案里的数字也算一处——
        **三处对不上时不会报错，只会静静地按另一套跑**（护栏 sim_wds_dist_words 逐档对账）。
        没有 w 的档（报告／提纲／总结／PPT）长度由内容定，不挂字数闸，逼字数只会注水。 */
-    { k: "report", t: "kReport", doc: 1 }, { k: "essay", t: "kEssay", doc: 1, w: 3000 },
-    { k: "paper1", t: "kPaper1", doc: 1, w: 20000 }, { k: "paper", t: "kPaper", doc: 1, w: 20000, c: 1 },
+    /* wo ＝ 字数档次（三档，中间那一档必须等于 w，否则等于偷偷改了默认体量）。
+       有 wo 的档，点下去先问体量；没有 wo 的（报告／提纲／总结全文／PPT）长度由内容定，不给选。 */
+    { k: "report", t: "kReport", doc: 1 }, { k: "essay", t: "kEssay", doc: 1, w: 3000, wo: [2000, 3000, 5000] },
+    { k: "paper1", t: "kPaper1", doc: 1, w: 20000, wo: [12000, 20000, 30000] },
+    { k: "paper", t: "kPaper", doc: 1, w: 20000, c: 1, wo: [12000, 20000, 30000] },
     { k: "outline", t: "kOutline", doc: 1 }, { k: "sumdoc", t: "kSumdoc", doc: 1 }, { k: "deck", t: "kDeck" },
     /* 四档创作体（2026-08-22）。都带 w:1 ＝ 点它先问一句「要不要模仿谁的笔法」。
        ⚠ 加一档要同时改**服务端那张白名单与 SPEC 表**——只改这里的话，
        菜单点得到、后端认不出，表现是默默按「对话报告」写了一篇。 */
     /* ⚠ 这四档原来的 `w: 1` 是「点它先问笔法」的旗标，与目标字数撞名了 ⇒ 改叫 `sty`。
        改名不是洁癖：w 现在是一个字数，留着 1 就等于把散文的目标写成了 1 个字。 */
-    { k: "wechat", t: "kWechat", sty: 1, doc: 1, w: 3000, c: 1 }, { k: "prose", t: "kProse", sty: 1, doc: 1, w: 5000, c: 1 },
-    { k: "story", t: "kStory", sty: 1, doc: 1, w: 2400, c: 1 }, { k: "poem", t: "kPoem", sty: 1, doc: 1, w: 500, verse: 1 },
+    { k: "wechat", t: "kWechat", sty: 1, doc: 1, w: 3000, c: 1, wo: [1500, 3000, 5000] },
+    { k: "prose", t: "kProse", sty: 1, doc: 1, w: 5000, c: 1, wo: [3000, 5000, 8000] },
+    { k: "story", t: "kStory", sty: 1, doc: 1, w: 2400, c: 1, wo: [1600, 2400, 4000] },
+    /* 剧本与小说最容易被当成一回事，而承重物不同：小说是演出（读者读叙述），剧本是可排演
+       （只写看得见与听得见的）。⚠ 它给 sty（腔调可学）但**不给 verse**（它不是诗体排版）。 */
+    { k: "script", t: "kScript", sty: 1, doc: 1, w: 6000, c: 1, wo: [3000, 6000, 12000] },
+    { k: "poem", t: "kPoem", sty: 1, doc: 1, w: 500, verse: 1, wo: [300, 500, 1000] },
     /* 应用文五档（2026-08-23）。规范层在 tools/skills/sde-applied-*.md。
        ⚠ **一律不给 sty**：应用文不挂笔法面板——学谁的腔调都不改责任落点，
           而应用文的全部价值在落点上；给它一个「用某某笔法写通知」的入口只会诱人把力气花错地方。
        ⚠ 五档全给 doc:1：应用文的成品是要发出去、要存档、要签字的，.md 一份都不够用。 */
-    { k: "notice", t: "kNotice", doc: 1, w: 1500 }, { k: "plan", t: "kPlan", doc: 1, w: 4000, c: 1 },
-    { k: "summary", t: "kSummary", doc: 1, w: 3000, c: 1 }, { k: "speech", t: "kSpeech", doc: 1, w: 2500, c: 1 },
-    { k: "letter", t: "kLetter", doc: 1, w: 1200 },
+    { k: "notice", t: "kNotice", doc: 1, w: 1500, wo: [800, 1500, 2500] },
+    { k: "plan", t: "kPlan", doc: 1, w: 4000, c: 1, wo: [2000, 4000, 7000] },
+    { k: "summary", t: "kSummary", doc: 1, w: 3000, c: 1, wo: [1500, 3000, 5000] },
+    { k: "speech", t: "kSpeech", doc: 1, w: 2500, c: 1, wo: [800, 2500, 5000] },
+    { k: "letter", t: "kLetter", doc: 1, w: 1200, wo: [600, 1200, 2000] },
   ];
   function kindDef(k) { for (var i = 0; i < KIND_DEF.length; i++) if (KIND_DEF[i].k === k) return KIND_DEF[i]; return null; }
   function kindT(k) { var d = kindDef(k); return d ? t(d.t) : String(k || ""); }
@@ -6327,9 +6379,13 @@
       b.onclick = function () {
         if (menu.parentNode) menu.parentNode.removeChild(menu);
         if (k === "deck") { tplMenu(); return; }        // PPT 先问做成哪一种
-        var d0 = kindDef(k);
-        if (d0 && d0.sty) { writerMenu(k); return; }    // 四档创作体先问用谁的笔法（旗标由 w 改名 sty，w 现在是目标字数）
-        distill(k);
+        var d0 = kindDef(k) || {};
+        /* 次序：先问体量（它决定拆几趟、每趟写多少），再问笔法（腔调不改体量）。
+           两个都没有的档直接开写。 */
+        lenMenu(k, function (w) {
+          if (d0.sty) { writerMenu(k, w); return; }
+          distill(k, null, null, "", null, "", w);
+        });
       };
       menu.appendChild(b);
     });
@@ -6565,7 +6621,7 @@
   // 成文面板。第三个参数给「成文记录」复用：直接把存下的正文摊开，不再调基底。
   /* style ＝ 作家笔法的 id（见 WRITERS）。递上去的只是这个 id，
      提示语在服务端——见 WRITERS 上方那段注释。空串＝本色写。 */
-  function distill(kind, existing, title, tpl, again, style) {
+  function distill(kind, existing, title, tpl, again, style, words) {
     var kv = existing ? {} : wdsKeyGet();
     /* ⚠ 填 Key 那一跳必须把 tpl 与 style 一并带回来——第一版只递了 kind，
        表现是「点了作家 → 弹出填 Key → 填完写出来却是本色」，而且没有任何报错。 */
@@ -6873,7 +6929,7 @@
          判据放到九成——与服务端那道字数闸同一个数，两边说的是同一件事。 */
       var _want = 0;
       try { _want = (dSecs || []).reduce(function (a, s) { return a + (parseInt(s && s.words, 10) || 0); }, 0); } catch (e) {}
-      if (!_want) { var _kdw = kindDef(kind); _want = (_kdw && _kdw.w) || 0; }
+      if (!_want) _want = wsel || 0;   // 读者选的那一档；没选过时 wsel 已退回档位表的默认体量
       var _floor = _want ? Math.round(_want * 0.9) : 400;
       stat.textContent = !text ? t("dFail")
         : (text.length < _floor ? (t("dPartial") + text.length + (_want ? ("/" + _want) : "")) : (t("dDone") + text.length));
@@ -7254,8 +7310,11 @@
     out.innerHTML = "<span class='cur'>▊</span>";
     dBump();
 
+    /* 体量：读者选的那一档。0／缺省 ＝ 用这一档的默认体量（服务端只认它自己那张表里的数）。 */
+    var wsel = (function () { var d = kindDef(kind) || {}; var o = d.wo || [];
+      return (o.indexOf(parseInt(words, 10)) >= 0) ? parseInt(words, 10) : (d.w || 0); })();
     var BASEP = { kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "",
-        style: style || "",
+        style: style || "", words: wsel,
         // 载入的文章一并送过去：sumdoc 那一档拿它当正主，其余几档只作背景。
         // 这里送**全文**而不是按问题取段——成文是一次性的活，取段会让它读到半篇就下判断。
         docs: (typeof atts !== "undefined" ? atts : []).filter(function (d) { return d && d.text && !d.img; })
