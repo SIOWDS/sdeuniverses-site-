@@ -9,200 +9,381 @@
 <meta property="og:title" content="思想谱系 · 约翰专栏 · 语言发生学">
 <meta property="og:description" content="思想谱系共 27 篇。克拉申、维果茨基、索绪尔、洪堡、皮尔斯、斯韦恩、杜威、陶行知、林语堂。不是介绍生平，是把一个人读成一道还没有答完的问题。">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0E14">
 <style>
 :root{
-  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272;
-  --line:#CBCCD4; --indigo:#1F3A5F; --vermilion:#A63A2B;
+  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272; --ink3:#868C9B;
+  --line:#CBCCD4; --line2:#E2E1DE;
+  --indigo:#1F3A5F; --vermilion:#A63A2B;
   --night:#0B0E14; --night2:#121722; --bone:#E8E4DA; --bone2:#8E94A3;
   --edge:rgba(232,228,218,.16); --indigo-l:#6E9BD8; --vermilion-l:#D2604A;
+  --accent:#1F3A5F;
   --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
   --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.75}
 a{color:inherit;text-decoration:none}
-.wrap{max-width:960px;margin:0 auto;padding:0 22px}
-.top{border-bottom:1px solid var(--line);background:rgba(242,241,237,.92);
-  position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(6px)}
-.top .wrap{display:flex;align-items:baseline;gap:18px;height:56px}
-.brand{font-family:var(--serif);font-size:19px;letter-spacing:.14em;color:var(--indigo)}
-.brand em{font-style:normal;color:var(--ink2);font-size:12px;letter-spacing:.24em;margin-left:10px}
-.top nav{margin-left:auto;display:flex;gap:18px;font-size:13.5px;color:var(--ink2);
-  overflow-x:auto;white-space:nowrap}
-.top nav a:hover{color:var(--indigo)}
-.top nav a.out{font-family:var(--mono);font-size:12px}
-.hero{padding:56px 0 0}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--indigo);text-transform:uppercase}
-h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.3;
-  letter-spacing:.02em;margin:.5em 0 .38em}
-.lede{max-width:39em;color:var(--ink2);font-size:16.5px}
-.lede b{color:var(--ink);font-weight:600}
-.crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink2);margin-bottom:6px}
-.crumb a{color:var(--indigo)}
-.band{display:flex;flex-wrap:wrap;gap:0;margin:30px 0 0;border:1px solid var(--line);background:var(--card)}
-.band div{flex:1 1 130px;padding:14px 16px;border-right:1px solid var(--line)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(56% 44% at 10% 0%,rgba(110,155,216,.13),transparent 70%),
+    radial-gradient(44% 40% at 94% 18%,rgba(210,96,74,.10),transparent 72%),
+    radial-gradient(72% 52% at 52% 104%,rgba(111,169,140,.07),transparent 70%)}
+.dark::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.45;
+  background-image:linear-gradient(90deg,rgba(232,228,218,.05) 1px,transparent 1px);
+  background-size:34px 100%}
+.dark .wrap{position:relative;z-index:1}
+
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:40;
+  background:rgba(11,14,20,.88);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone);flex:none}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--bone2);
+  overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a:hover{color:var(--indigo-l)}
+.top nav a[aria-current]{color:var(--bone);box-shadow:inset 0 -1px 0 var(--vermilion-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:70px 0 58px}
+.hero.tight{padding:44px 0 42px}
+.crumb{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--bone2);margin-bottom:16px}
+.crumb a{color:var(--indigo-l)}
+.crumb a:hover{color:var(--bone)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--indigo-l);text-transform:uppercase}
+.dark h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.4vw,52px);line-height:1.26;
+  letter-spacing:.03em;margin:.5em 0 .4em;max-width:15em;color:#F4F2EC}
+.dark h1 em{font-style:normal;color:var(--vermilion-l)}
+.lede{max-width:38em;color:#B9BECB;font-size:16.5px;margin:0}
+.lede b{color:var(--bone);font-weight:600}
+.lede + .lede{margin-top:.9em}
+
+.rhythm{margin:42px 0 0;border:1px solid var(--edge);background:var(--night2)}
+.rhythm .cap{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:nowrap;
+  padding:13px 20px;border-bottom:1px solid rgba(232,228,218,.28);
+  font-family:var(--serif);letter-spacing:.22em;font-size:14.5px;color:#F4F2EC}
+.rhythm .cap span{font-family:var(--mono);font-size:11px;color:var(--bone2);letter-spacing:.06em;
+  text-align:right;letter-spacing:.06em}
+.bars{display:flex;align-items:flex-end;gap:2px;height:116px;padding:20px 20px 0}
+.bars .b{flex:1 1 0;min-width:2px;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bars .b i,.bars .b u{display:block;width:100%;transform-origin:bottom;text-decoration:none;
+  animation:grow .55s cubic-bezier(.2,.7,.3,1) both}
+.bars .b i{background:rgba(232,228,218,.13)}
+.bars .b u{background:var(--indigo-l)}
+.bars .b.hot u{background:var(--vermilion-l)}
+.bars .b:hover i,.bars .b:hover u{filter:brightness(1.45)}
+@keyframes grow{from{transform:scaleY(.05);opacity:.15}to{transform:scaleY(1);opacity:1}}
+.axis{display:flex;padding:0 20px 14px;margin-top:9px;border-top:1px solid var(--edge)}
+.axis span{flex:1 1 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--bone2);
+  padding-top:8px;border-left:1px solid var(--edge);padding-left:7px;overflow:hidden}
+.axis span b,.axis span em{display:block;white-space:nowrap;font-style:normal}
+.axis span em{font-size:9.5px;opacity:.85;margin-top:1px}
+.axis span:first-child{border-left:0;padding-left:0}
+.axis span b{color:#C8CCD6;font-weight:400}
+.rnote{padding:0 20px 18px;margin:0;font-size:12.5px;color:var(--bone2);line-height:1.75;max-width:60em}
+.rnote b{color:#C8CCD6;font-weight:500}
+
+.band{display:flex;flex-wrap:wrap;gap:0;margin:26px 0 0;border:1px solid var(--edge)}
+.band div{flex:1 1 128px;padding:15px 18px;border-right:1px solid var(--edge)}
 .band div:last-child{border-right:0}
-.band b{display:block;font-family:var(--mono);font-size:21px;color:var(--indigo);
-  font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.band span{font-size:12.5px;color:var(--ink2)}
-.filter{display:flex;gap:12px;align-items:center;margin:26px 0 0;
-  border:1px solid var(--line);background:var(--card);padding:10px 14px}
-.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
-.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2)}
-.filter .n{font-family:var(--mono);font-size:12px;color:var(--indigo);font-variant-numeric:tabular-nums}
-.empty{padding:26px 4px;color:var(--ink2);font-size:14.5px}
-section{padding:48px 0 8px}
+.band b{display:block;font-family:var(--mono);font-size:22px;color:#F4F2EC;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.3}
+.band span{font-size:12.5px;color:var(--bone2)}
+.acts{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 0}
+.acts a,.acts button{font:inherit;font-size:14px;color:var(--bone);border:1px solid var(--edge);
+  background:transparent;padding:9px 18px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.acts a:hover,.acts button:hover{border-color:var(--indigo-l);color:#F4F2EC}
+.acts .primary{background:var(--vermilion);border-color:var(--vermilion);color:#FBF7F2}
+.acts .primary:hover{background:var(--vermilion-l);border-color:var(--vermilion-l);color:#fff}
+
+.light{background:var(--paper);
+  background-image:linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:34px 100%;background-position:-1px 0}
+section{padding:52px 0 6px}
 .col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
-.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--indigo);flex:none}
-.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .no{font-family:var(--serif);font-size:13px;letter-spacing:.24em;color:var(--vermilion);flex:none}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.1em;margin:0}
 .col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);
   font-variant-numeric:tabular-nums;flex:none;padding-left:10px}
-.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
-.item{border-bottom:1px dashed var(--line);padding:14px 4px 13px}
-.item:hover{background:var(--card)}
-.it-hd{display:flex;gap:12px;align-items:baseline}
-.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:3.1em;
-  font-variant-numeric:tabular-nums;flex:none}
-.it-t{font-size:15.5px;line-height:1.6}
-.item:hover .it-t{color:var(--indigo)}
-.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
-  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
-.it-d{margin:6px 0 0 4.1em;font-size:13.5px;color:var(--ink2);line-height:1.7}
-.it-l{margin:7px 0 0 4.1em;display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
-.it-l a{color:var(--indigo);border-bottom:1px solid var(--line);padding-bottom:1px}
-.it-l a:hover{border-color:var(--indigo)}
-.it-l span{color:var(--ink2)}
-.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--vermilion);
-  border:1px solid var(--line);padding:1px 5px;margin-left:8px;vertical-align:2px}
-.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;
-  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:8px}
-.ch{display:block;padding:22px 22px 20px;border-right:1px solid var(--line);
-  border-bottom:1px solid var(--line);background:var(--card);transition:background .2s}
+.col-d{color:var(--ink2);font-size:14.5px;margin:13px 0 4px;max-width:46em}
+
+.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0;
+  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:20px;background:var(--card)}
+.ch{display:flex;flex-direction:column;padding:0 0 20px;border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);transition:background .22s}
 .ch:hover{background:#fff}
-.ch .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--indigo)}
-.ch h3{font-family:var(--serif);font-weight:600;font-size:19.5px;letter-spacing:.09em;margin:9px 0 8px}
-.ch:hover h3{color:var(--indigo)}
+.ch .rule{height:3px;background:var(--cc)}
+.ch .in{padding:19px 22px 0;flex:1;display:flex;flex-direction:column}
+.ch .foot{margin-top:auto}
+.ch .n{font-family:var(--serif);font-size:12px;letter-spacing:.3em;color:var(--cc)}
+.ch h3{font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:.1em;margin:8px 0 9px}
+.ch:hover h3{color:var(--cc)}
 .ch p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.72}
-.ch .ct{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+.spark{display:flex;align-items:flex-end;gap:3px;height:26px;margin:16px 0 0}
+.spark i{flex:1 1 0;background:var(--cc);opacity:.26;min-height:1px}
+.spark i.pk{opacity:.85}
+.spark-x{display:flex;gap:3px;margin-top:5px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);
+  letter-spacing:.06em}
+.spark-x i{flex:1 1 0;font-style:normal;text-align:center}
+.ch .picks{margin:15px 0 0;padding-top:12px;border-top:1px dashed var(--line);
+  font-size:13px;color:var(--ink2);line-height:1.7}
+.ch .picks em{font-style:normal;color:var(--ink);display:block}
+.ch .picks em::before{content:"— ";color:var(--cc)}
+.ch .ct{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;display:flex;gap:14px}
+.ch .ct b{color:var(--cc);font-weight:600;font-size:13px}
+.ch .go{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--cc);opacity:0;
+  transform:translateX(-4px);transition:opacity .22s,transform .22s}
+.ch:hover .go,.ch:focus-visible .go{opacity:1;transform:none}
+
+.chips{position:sticky;top:0;z-index:30;background:rgba(242,241,237,.95);
+  backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--line)}
+.chips .wrap{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding:0 22px;
+  -webkit-mask-image:linear-gradient(to right,#000 92%,transparent);
+  mask-image:linear-gradient(to right,#000 92%,transparent)}
+.chips .wrap::-webkit-scrollbar{display:none}
+.chips a{flex:none;padding:12px 15px;font-size:13.5px;color:var(--ink2);white-space:nowrap;
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.chips a:hover{color:var(--ink)}
+.chips a[aria-current]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.chips a b{font-family:var(--mono);font-size:11px;color:var(--ink3);font-weight:400;margin-left:5px;
   font-variant-numeric:tabular-nums}
-.ch .ct b{color:var(--vermilion);font-weight:500}
-.note{background:var(--card);border:1px solid var(--line);padding:22px 24px;margin-top:30px}
-.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:0 0 10px;font-weight:600}
-.note p{margin:0 0 11px;font-size:14.5px;color:var(--ink2)}
+
+.tools{padding:30px 0 0}
+.list{padding-top:10px}
+.filter{display:flex;gap:12px;align-items:center;
+  border:1px solid var(--line);background:var(--card);padding:11px 15px}
+.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
+.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2);flex:none}
+.filter .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.chipy{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 0}
+.chipy button,.chipy a{font:inherit;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:4px 11px;cursor:pointer;
+  transition:border-color .18s,color .18s,background .18s}
+.chipy button:hover,.chipy a:hover{border-color:var(--cc,var(--accent));color:var(--cc,var(--accent))}
+.chipy button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FBF7F2}
+.empty{padding:24px 4px;color:var(--ink2);font-size:14.5px}
+.empty a{color:var(--accent);border-bottom:1px solid var(--line)}
+
+.yr{display:flex;align-items:baseline;gap:12px;margin:34px 0 2px;padding-bottom:6px}
+.yr b{font-family:var(--mono);font-size:19px;letter-spacing:.06em;color:var(--accent);
+  font-variant-numeric:tabular-nums;font-weight:500}
+.yr span{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.12em}
+.yr i{flex:1;height:1px;background:var(--line);font-style:normal}
+.item{border-bottom:1px dashed var(--line);padding:15px 4px 14px;position:relative;transition:background .18s}
+.item::before{content:"";position:absolute;left:-12px;top:15px;bottom:14px;width:2px;
+  background:var(--accent);opacity:0;transition:opacity .18s}
+.item:hover{background:var(--card)}
+.item:hover::before{opacity:.75}
+.it-hd{display:flex;gap:13px;align-items:baseline}
+.r-n{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:3.2em;
+  font-variant-numeric:tabular-nums;flex:none;letter-spacing:.06em}
+.it-t{font-size:15.5px;line-height:1.62;font-family:var(--serif);font-weight:600;letter-spacing:.02em}
+.item:hover .it-t{color:var(--accent)}
+.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
+.it-d{margin:7px 0 0 4.3em;font-size:13.5px;color:var(--ink2);line-height:1.72}
+.it-l{margin:8px 0 0 4.3em;display:flex;gap:15px;font-family:var(--mono);font-size:11px;flex-wrap:wrap;
+  letter-spacing:.06em}
+.it-l a{color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:1px}
+.it-l a:hover{border-color:var(--accent)}
+.it-l span{color:var(--ink3)}
+
+.note{background:var(--card);border:1px solid var(--line);padding:24px 26px;margin-top:36px}
+.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.1em;margin:0 0 12px;font-weight:600}
+.note p{margin:0 0 12px;font-size:14.5px;color:var(--ink2)}
 .note p:last-child{margin-bottom:0}
 .note b{color:var(--ink)}
 .note a{color:var(--indigo);border-bottom:1px solid var(--line)}
-.years{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
-.years a{font-family:var(--mono);font-size:12px;color:var(--indigo);
-  border:1px solid var(--line);padding:4px 10px;background:var(--card)}
-.years a:hover{border-color:var(--indigo)}
-footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 60px;
+.nearby{display:flex;flex-wrap:wrap;gap:0;margin:46px 0 0;border:1px solid var(--line);background:var(--card)}
+.nearby a{flex:1 1 210px;padding:17px 20px;border-right:1px solid var(--line);font-size:13.5px;
+  color:var(--ink2);transition:background .2s,color .2s}
+.nearby a:last-child{border-right:0}
+.nearby a:hover{background:#fff;color:var(--ink)}
+.nearby a small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  color:var(--ink3);margin-bottom:5px}
+.nearby a b{display:block;font-family:var(--serif);font-size:16.5px;letter-spacing:.08em;
+  font-weight:600;color:var(--ink);margin-bottom:3px}
+
+footer{margin-top:74px;border-top:1px solid var(--line);padding:28px 0 66px;
   font-size:13px;color:var(--ink2)}
 footer a{color:var(--indigo);border-bottom:1px solid var(--line)}
 footer p{margin:0 0 8px}
-a:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
-@media(max-width:640px){
-  .hero{padding:36px 0 0}
+a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--vermilion);outline-offset:2px}
+@media(max-width:700px){
+  .hero{padding:40px 0 34px}
+  .hero.tight{padding:32px 0 30px}
+  .top nav{-webkit-mask-image:linear-gradient(to right,#000 86%,transparent);
+    mask-image:linear-gradient(to right,#000 86%,transparent)}
+  .rhythm .cap{flex-wrap:wrap;letter-spacing:.14em;font-size:13.5px}
+  .rhythm .cap span{text-align:left;flex:1 1 100%}
+  .bars{height:82px;padding:16px 14px 0}
+  .axis{padding:0 14px 12px}
+  .axis span{font-size:9px;padding-left:4px;min-width:32px;letter-spacing:0}
+  .axis span em{font-size:8.5px}
+  .rnote{padding:0 14px 15px}
+  .band div{flex:1 1 45%}
   .it-m{display:none}
   .it-d,.it-l{margin-left:0}
+  .item::before{left:-8px}
+  .chips a{padding:11px 12px;font-size:13px}
+  .nearby a{flex:1 1 100%;border-right:0;border-bottom:1px solid var(--line)}
+  .nearby a:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .bars .b i,.bars .b u{animation:none}
+  *{transition:none!important}
 }
 </style>
+<style>:root{--accent:#5B4B6B}</style>
 </head>
 <body>
+<div class="dark">
 <header class="top"><div class="wrap">
   <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
   <nav>
     <a href="/#books">账册</a>
     <a href="/#cols">栏目</a>
     <a href="/all/">全部篇目</a>
-    <a href="/wechat/">约翰专栏</a>
+    <a href="/wechat/" aria-current="page">约翰专栏</a>
     <a href="/chatjohn/">ChatJohn</a>
     <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
   </nav>
 </div></header>
-<div class="wrap">
-<div class="hero">
-<div class="crumb"><a href="/wechat/">约翰专栏</a> / 思想谱系</div>
-<div class="eyebrow">栏七</div>
-<h1>思想谱系</h1>
-<p class="lede">克拉申、维果茨基、索绪尔、洪堡、皮尔斯、斯韦恩、杜威、陶行知、林语堂。不是介绍生平，是把一个人读成一道还没有答完的问题。</p>
-<div class="filter"><label>筛选</label><input id="q" type="search" placeholder="输入任意词，例如：语感、复述、词根、RAZ" autocomplete="off" aria-label="筛选篇目"><span class="n" id="n"></span></div>
-<p class="empty" id="empty" style="display:none">没有匹配的篇目。换一个词试试。</p>
+<div class="wrap"><div class="hero tight">
+  <div class="crumb"><a href="/wechat/">约翰专栏</a> · 频道 柒</div>
+  <h1>思想谱系</h1>
+  <p class="lede">克拉申、维果茨基、索绪尔、洪堡、皮尔斯、斯韦恩、杜威、陶行知、林语堂。不是介绍生平，是把一个人读成一道还没有答完的问题。</p>
+
+  <div class="rhythm">
+    <div class="cap">本　栏　节　律<span>亮色＝本栏 · 暗色＝同月其他栏</span></div>
+    <div class="bars"><span class="b" title="2021-09 · 1 篇"><i style="height:32%;animation-delay:0ms"></i><u style="height:13%;animation-delay:0ms"></u></span><span class="b" title="2021-10 · 0 篇"><i style="height:25%;animation-delay:11ms"></i><u style="height:0%;animation-delay:11ms"></u></span><span class="b" title="2021-11 · 0 篇"><i style="height:25%;animation-delay:22ms"></i><u style="height:0%;animation-delay:22ms"></u></span><span class="b" title="2021-12 · 0 篇"><i style="height:22%;animation-delay:33ms"></i><u style="height:0%;animation-delay:33ms"></u></span><span class="b" title="2022-01 · 0 篇"><i style="height:13%;animation-delay:44ms"></i><u style="height:0%;animation-delay:44ms"></u></span><span class="b" title="2022-02 · 0 篇"><u style="height:0%;animation-delay:55ms"></u></span><span class="b" title="2022-03 · 0 篇"><i style="height:13%;animation-delay:66ms"></i><u style="height:0%;animation-delay:66ms"></u></span><span class="b" title="2022-04 · 0 篇"><u style="height:0%;animation-delay:77ms"></u></span><span class="b" title="2022-05 · 0 篇"><i style="height:13%;animation-delay:88ms"></i><u style="height:0%;animation-delay:88ms"></u></span><span class="b" title="2022-06 · 0 篇"><i style="height:13%;animation-delay:99ms"></i><u style="height:0%;animation-delay:99ms"></u></span><span class="b" title="2022-07 · 0 篇"><i style="height:13%;animation-delay:110ms"></i><u style="height:0%;animation-delay:110ms"></u></span><span class="b" title="2022-08 · 0 篇"><i style="height:22%;animation-delay:121ms"></i><u style="height:0%;animation-delay:121ms"></u></span><span class="b" title="2022-09 · 0 篇"><i style="height:18%;animation-delay:132ms"></i><u style="height:0%;animation-delay:132ms"></u></span><span class="b" title="2022-10 · 0 篇"><i style="height:18%;animation-delay:143ms"></i><u style="height:0%;animation-delay:143ms"></u></span><span class="b" title="2022-11 · 0 篇"><u style="height:0%;animation-delay:154ms"></u></span><span class="b" title="2022-12 · 0 篇"><i style="height:18%;animation-delay:165ms"></i><u style="height:0%;animation-delay:165ms"></u></span><span class="b" title="2023-01 · 0 篇"><u style="height:0%;animation-delay:176ms"></u></span><span class="b" title="2023-02 · 0 篇"><i style="height:25%;animation-delay:187ms"></i><u style="height:0%;animation-delay:187ms"></u></span><span class="b" title="2023-03 · 0 篇"><i style="height:18%;animation-delay:198ms"></i><u style="height:0%;animation-delay:198ms"></u></span><span class="b" title="2023-04 · 0 篇"><i style="height:22%;animation-delay:209ms"></i><u style="height:0%;animation-delay:209ms"></u></span><span class="b" title="2023-05 · 0 篇"><i style="height:13%;animation-delay:220ms"></i><u style="height:0%;animation-delay:220ms"></u></span><span class="b" title="2023-06 · 0 篇"><i style="height:22%;animation-delay:231ms"></i><u style="height:0%;animation-delay:231ms"></u></span><span class="b" title="2023-07 · 0 篇"><i style="height:31%;animation-delay:242ms"></i><u style="height:0%;animation-delay:242ms"></u></span><span class="b" title="2023-08 · 0 篇"><i style="height:31%;animation-delay:253ms"></i><u style="height:0%;animation-delay:253ms"></u></span><span class="b" title="2023-09 · 0 篇"><i style="height:18%;animation-delay:264ms"></i><u style="height:0%;animation-delay:264ms"></u></span><span class="b" title="2023-10 · 0 篇"><i style="height:22%;animation-delay:275ms"></i><u style="height:0%;animation-delay:275ms"></u></span><span class="b" title="2023-11 · 0 篇"><i style="height:18%;animation-delay:286ms"></i><u style="height:0%;animation-delay:286ms"></u></span><span class="b" title="2023-12 · 0 篇"><i style="height:25%;animation-delay:297ms"></i><u style="height:0%;animation-delay:297ms"></u></span><span class="b" title="2024-01 · 0 篇"><u style="height:0%;animation-delay:308ms"></u></span><span class="b" title="2024-02 · 0 篇"><i style="height:13%;animation-delay:319ms"></i><u style="height:0%;animation-delay:319ms"></u></span><span class="b" title="2024-03 · 0 篇"><i style="height:13%;animation-delay:330ms"></i><u style="height:0%;animation-delay:330ms"></u></span><span class="b" title="2024-04 · 0 篇"><i style="height:33%;animation-delay:341ms"></i><u style="height:0%;animation-delay:341ms"></u></span><span class="b" title="2024-05 · 1 篇"><i style="height:23%;animation-delay:352ms"></i><u style="height:13%;animation-delay:352ms"></u></span><span class="b" title="2024-06 · 0 篇"><i style="height:55%;animation-delay:363ms"></i><u style="height:0%;animation-delay:363ms"></u></span><span class="b" title="2024-07 · 0 篇"><i style="height:18%;animation-delay:374ms"></i><u style="height:0%;animation-delay:374ms"></u></span><span class="b" title="2024-08 · 0 篇"><i style="height:25%;animation-delay:385ms"></i><u style="height:0%;animation-delay:385ms"></u></span><span class="b" title="2024-09 · 1 篇"><i style="height:12%;animation-delay:396ms"></i><u style="height:13%;animation-delay:396ms"></u></span><span class="b" title="2024-10 · 0 篇"><i style="height:18%;animation-delay:407ms"></i><u style="height:0%;animation-delay:407ms"></u></span><span class="b" title="2024-11 · 0 篇"><i style="height:31%;animation-delay:418ms"></i><u style="height:0%;animation-delay:418ms"></u></span><span class="b" title="2024-12 · 0 篇"><i style="height:53%;animation-delay:429ms"></i><u style="height:0%;animation-delay:429ms"></u></span><span class="b" title="2025-01 · 0 篇"><i style="height:18%;animation-delay:440ms"></i><u style="height:0%;animation-delay:440ms"></u></span><span class="b" title="2025-02 · 0 篇"><i style="height:53%;animation-delay:451ms"></i><u style="height:0%;animation-delay:451ms"></u></span><span class="b" title="2025-03 · 0 篇"><i style="height:47%;animation-delay:462ms"></i><u style="height:0%;animation-delay:462ms"></u></span><span class="b" title="2025-04 · 0 篇"><u style="height:0%;animation-delay:473ms"></u></span><span class="b" title="2025-05 · 0 篇"><i style="height:22%;animation-delay:484ms"></i><u style="height:0%;animation-delay:484ms"></u></span><span class="b" title="2025-06 · 0 篇"><i style="height:28%;animation-delay:495ms"></i><u style="height:0%;animation-delay:495ms"></u></span><span class="b" title="2025-07 · 0 篇"><i style="height:18%;animation-delay:506ms"></i><u style="height:0%;animation-delay:506ms"></u></span><span class="b" title="2025-08 · 0 篇"><i style="height:13%;animation-delay:517ms"></i><u style="height:0%;animation-delay:517ms"></u></span><span class="b" title="2025-09 · 0 篇"><i style="height:18%;animation-delay:528ms"></i><u style="height:0%;animation-delay:528ms"></u></span><span class="b" title="2025-10 · 10 篇"><i style="height:2%;animation-delay:539ms"></i><u style="height:40%;animation-delay:539ms"></u></span><span class="b" title="2025-11 · 1 篇"><i style="height:5%;animation-delay:550ms"></i><u style="height:13%;animation-delay:550ms"></u></span><span class="b" title="2025-12 · 2 篇"><i style="height:7%;animation-delay:561ms"></i><u style="height:18%;animation-delay:561ms"></u></span><span class="b" title="2026-01 · 0 篇"><i style="height:18%;animation-delay:572ms"></i><u style="height:0%;animation-delay:572ms"></u></span><span class="b" title="2026-02 · 0 篇"><i style="height:28%;animation-delay:583ms"></i><u style="height:0%;animation-delay:583ms"></u></span><span class="b" title="2026-03 · 0 篇"><i style="height:18%;animation-delay:594ms"></i><u style="height:0%;animation-delay:594ms"></u></span><span class="b" title="2026-04 · 0 篇"><i style="height:36%;animation-delay:605ms"></i><u style="height:0%;animation-delay:605ms"></u></span><span class="b" title="2026-05 · 3 篇"><i style="height:36%;animation-delay:616ms"></i><u style="height:22%;animation-delay:616ms"></u></span><span class="b" title="2026-06 · 6 篇"><i style="height:69%;animation-delay:627ms"></i><u style="height:31%;animation-delay:627ms"></u></span><span class="b" title="2026-07 · 1 篇"><i style="height:54%;animation-delay:638ms"></i><u style="height:13%;animation-delay:638ms"></u></span><span class="b" title="2026-08 · 0 篇"><i style="height:65%;animation-delay:649ms"></i><u style="height:0%;animation-delay:649ms"></u></span></div>
+    <div class="axis"><span style="flex:4 1 0"><b>2021</b><em>1 篇</em></span><span style="flex:12 1 0"><b>2022</b><em>0 篇</em></span><span style="flex:12 1 0"><b>2023</b><em>0 篇</em></span><span style="flex:12 1 0"><b>2024</b><em>2 篇</em></span><span style="flex:12 1 0"><b>2025</b><em>13 篇</em></span><span style="flex:8 1 0"><b>2026</b><em>10 篇</em></span></div>
+    <p class="rnote">写得最多的一年是 <b>2025</b>（13 篇）。本栏最早一篇 2021-09-19，最新一篇 2026-07-24。</p>
+  </div>
+
+  <div class="band">
+    <div><b>27</b><span>篇</span></div>
+    <div><b>612</b><span>页</span></div>
+    <div><b>2025</b><span>写得最多的一年</span></div>
+    <div><b>7%</b><span>占全站篇数</span></div>
+  </div>
+</div></div>
 </div>
 
-<section data-col="lineage">
-  <div class="col-h"><span class="no">栏&nbsp;七</span><h2>思想谱系</h2><span class="ct">27 篇 · 612 页</span></div>
-<div class="item" data-k="死语言如何统治现代思想：学术拉丁的隐秘力量 整个现代学术大厦，是建立在一门早已死亡的方言之上。这句判断听起来像个悖论，但任何一个曾翻过《自然》或《柳叶刀》的人，都在身体里经验过它。 2026-07-24"><div class="it-hd"><span class="r-n">1</span><a class="it-t" href="/wechat/pdf/056.pdf">死语言如何统治现代思想：学术拉丁的隐秘力量</a><span class="it-m">2026-07-24 · 9 页</span></div><p class="it-d">整个现代学术大厦，是建立在一门早已死亡的方言之上。这句判断听起来像个悖论，但任何一个曾翻过《自然》或《柳叶刀》的人，都在身体里经验过它。</p><div class="it-l"><a href="/wechat/pdf/056.pdf">读原文 PDF</a><span>存档号 056</span></div></div>
-<div class="item" data-k="语言不是被解释明白的，而是在生活中发生出来的——用 SDE 解读维特根斯坦《哲学研究》第一章 很多孩子学英语，最早遭遇的不是难题，而是一幅错误的图画。老师拿起一张卡片，说：apple，苹果。 2026-06-22"><div class="it-hd"><span class="r-n">2</span><a class="it-t" href="/wechat/pdf/098.pdf">语言不是被解释明白的，而是在生活中发生出来的——用 SDE 解读维特根斯坦《哲学研究》第一章</a><span class="it-m">2026-06-22 · 20 页</span></div><p class="it-d">很多孩子学英语，最早遭遇的不是难题，而是一幅错误的图画。老师拿起一张卡片，说：apple，苹果。</p><div class="it-l"><a href="/wechat/pdf/098.pdf">读原文 PDF</a><span>存档号 098</span></div></div>
-<div class="item" data-k="当教师不再相信克拉申，却仍然必须引用他 很多教育理论的死亡，不是从被人反驳开始的，而是从被所有人熟练引用开始的。 2026-06-10"><div class="it-hd"><span class="r-n">3</span><a class="it-t" href="/wechat/pdf/127.pdf">当教师不再相信克拉申，却仍然必须引用他</a><span class="it-m">2026-06-10 · 12 页</span></div><p class="it-d">很多教育理论的死亡，不是从被人反驳开始的，而是从被所有人熟练引用开始的。</p><div class="it-l"><a href="/wechat/pdf/127.pdf">读原文 PDF</a><span>存档号 127</span></div></div>
-<div class="item" data-k="林语堂为什么被学校系统吃掉了？因为真正的语感，无法被考试清点 很多人谈林语堂英语学习法，最容易把它说成一种“老派方法”。比如多读、多背、多模仿、多写作； 2026-06-04"><div class="it-hd"><span class="r-n">4</span><a class="it-t" href="/wechat/pdf/139.pdf">林语堂为什么被学校系统吃掉了？因为真正的语感，无法被考试清点</a><span class="it-m">2026-06-04 · 15 页</span></div><p class="it-d">很多人谈林语堂英语学习法，最容易把它说成一种“老派方法”。比如多读、多背、多模仿、多写作；</p><div class="it-l"><a href="/wechat/pdf/139.pdf">读原文 PDF</a><span>存档号 139</span></div></div>
-<div class="item" data-k="林语堂早就说透了：真正毁掉英语学习的，不是低分，而是假成功 很多家长以为，孩子英语学习最可怕的结果是低分。其实不是。低分有时候反而是好事。 2026-06-03"><div class="it-hd"><span class="r-n">5</span><a class="it-t" href="/wechat/pdf/141.pdf">林语堂早就说透了：真正毁掉英语学习的，不是低分，而是假成功</a><span class="it-m">2026-06-03 · 15 页</span></div><p class="it-d">很多家长以为，孩子英语学习最可怕的结果是低分。其实不是。低分有时候反而是好事。</p><div class="it-l"><a href="/wechat/pdf/141.pdf">读原文 PDF</a><span>存档号 141</span></div></div>
-<div class="item" data-k="林语堂英语学习法为什么会被现代英语教育系统天然排斥？ 很多人以为，林语堂英语学习法之所以没有成为今天英语教育的主流，是因为它太旧了。 2026-06-02"><div class="it-hd"><span class="r-n">6</span><a class="it-t" href="/wechat/pdf/142.pdf">林语堂英语学习法为什么会被现代英语教育系统天然排斥？</a><span class="it-m">2026-06-02 · 18 页</span></div><p class="it-d">很多人以为，林语堂英语学习法之所以没有成为今天英语教育的主流，是因为它太旧了。</p><div class="it-l"><a href="/wechat/pdf/142.pdf">读原文 PDF</a><span>存档号 142</span></div></div>
-<div class="item" data-k="林语堂英语学习法：为什么一进制度，就…？ 很多英语学习法，本来是活的，一进入学校、课程、打卡和考试，就慢慢变成了任务。 "><div class="it-hd"><span class="r-n">7</span><a class="it-t" href="/wechat/pdf/143.pdf">林语堂英语学习法：为什么一进制度，就…？</a><span class="it-m">2 页</span></div><p class="it-d">很多英语学习法，本来是活的，一进入学校、课程、打卡和考试，就慢慢变成了任务。</p><div class="it-l"><a href="/wechat/pdf/143.pdf">读原文 PDF</a><span>存档号 143</span></div></div>
-<div class="item" data-k="林语堂英语学习法为什么一进入制度传播，就会被杀伤、退化、掏空？ 很多人谈林语堂英语学习法，第一反应是：多读经典，多背名篇，多模仿好英文，多培养语感。 2026-06-01"><div class="it-hd"><span class="r-n">8</span><a class="it-t" href="/wechat/pdf/145.pdf">林语堂英语学习法为什么一进入制度传播，就会被杀伤、退化、掏空？</a><span class="it-m">2026-06-01 · 17 页</span></div><p class="it-d">很多人谈林语堂英语学习法，第一反应是：多读经典，多背名篇，多模仿好英文，多培养语感。</p><div class="it-l"><a href="/wechat/pdf/145.pdf">读原文 PDF</a><span>存档号 145</span></div></div>
-<div class="item" data-k="学校不理解的英语学习法，反而成就了林语堂 很多⼈谈林语堂的英语，第⼀反应是羡慕。⼀个中国⼈，为什么能⽤英语写出那么⾃然、幽默、有⽓质的⽂章？ 2026-05-31"><div class="it-hd"><span class="r-n">9</span><a class="it-t" href="/wechat/pdf/147.pdf">学校不理解的英语学习法，反而成就了林语堂</a><span class="it-m">2026-05-31 · 6 页</span></div><p class="it-d">很多⼈谈林语堂的英语，第⼀反应是羡慕。⼀个中国⼈，为什么能⽤英语写出那么⾃然、幽默、有⽓质的⽂章？</p><div class="it-l"><a href="/wechat/pdf/147.pdf">读原文 PDF</a><span>存档号 147</span></div></div>
-<div class="item" data-k="从学英语到用英语活：林语堂的英语学习法带给中国孩子英语教育的深层启示 很多中国孩子学英语，学得很早，也学得很久。从幼儿园认字母，到小学背单词，再到初中刷语法、高中做阅读理解，十年下来，书读了不少，课上了不少，单词背 2026-05-29"><div class="it-hd"><span class="r-n">10</span><a class="it-t" href="/wechat/pdf/151.pdf">从学英语到用英语活：林语堂的英语学习法带给中国孩子英语教育的深层启示</a><span class="it-m">2026-05-29 · 6 页</span></div><p class="it-d">很多中国孩子学英语，学得很早，也学得很久。从幼儿园认字母，到小学背单词，再到初中刷语法、高中做阅读理解，十年下来，书读了不少，课上了不少，单词背</p><div class="it-l"><a href="/wechat/pdf/151.pdf">读原文 PDF</a><span>存档号 151</span></div></div>
-<div class="item" data-k="从可理解输入到语言栖居：克拉申理论退化之后，儿童英语学习如何重建输入、表达与成长的发生系统 原创 已修改 第1次修改 2026年05月28日 16时12分 胡志英-约翰 在过去几十年的儿童英语学习领域，“可理解输入”几乎已经成为一个无法绕开的关键词。 2026-05-28"><div class="it-hd"><span class="r-n">11</span><a class="it-t" href="/wechat/pdf/156.pdf">从可理解输入到语言栖居：克拉申理论退化之后，儿童英语学习如何重建输入、表达与成长的发生系统 原创 已修改 第1次修改 2026年05月28日 16时12分 胡志英-约翰</a><span class="it-m">2026-05-28 · 6 页</span></div><p class="it-d">在过去几十年的儿童英语学习领域，“可理解输入”几乎已经成为一个无法绕开的关键词。</p><div class="it-l"><a href="/wechat/pdf/156.pdf">读原文 PDF</a><span>存档号 156</span></div></div>
-<div class="item" data-k="林语堂传：自由之魂的文明桥桥接者 福音书与山海经之间——林语堂的童年发生林语堂的一生，如果要寻找一个真正决定性的起点，并不在清华的课堂，也不在哈佛或莱比锡的讲堂，而是在福建山海之 2025-12-25"><div class="it-hd"><span class="r-n">12</span><a class="it-t" href="/wechat/pdf/191.pdf">林语堂传：自由之魂的文明桥桥接者</a><span class="it-m">2025-12-25 · 23 页</span></div><p class="it-d">福音书与山海经之间——林语堂的童年发生林语堂的一生，如果要寻找一个真正决定性的起点，并不在清华的课堂，也不在哈佛或莱比锡的讲堂，而是在福建山海之</p><div class="it-l"><a href="/wechat/pdf/191.pdf">读原文 PDF</a><span>存档号 191</span></div></div>
-<div class="item" data-k="中国英语教学发展史 ｜英语从何而来——一种外来语言如何进入中国文明的深层结构英语并不是作为一门“课程”进入中国的，它最初也并不以“知识”的形态出现，更不携带任何关于 2025-12-20"><div class="it-hd"><span class="r-n">13</span><a class="it-t" href="/wechat/pdf/194.pdf">中国英语教学发展史</a><span class="it-m">2025-12-20 · 27 页</span></div><p class="it-d">｜英语从何而来——一种外来语言如何进入中国文明的深层结构英语并不是作为一门“课程”进入中国的，它最初也并不以“知识”的形态出现，更不携带任何关于</p><div class="it-l"><a href="/wechat/pdf/194.pdf">读原文 PDF</a><span>存档号 194</span></div></div>
-<div class="item" data-k="陶行知传：生活即教育的觉醒 在二十世纪的中国，教育从未只是学校里的事。它是民族的呼吸，是社会的血脉，是人类灵魂在时代巨变中的一次次自我更新。 2025-11-03"><div class="it-hd"><span class="r-n">14</span><a class="it-t" href="/wechat/pdf/198.pdf">陶行知传：生活即教育的觉醒</a><span class="it-m">2025-11-03 · 23 页</span></div><p class="it-d">在二十世纪的中国，教育从未只是学校里的事。它是民族的呼吸，是社会的血脉，是人类灵魂在时代巨变中的一次次自我更新。</p><div class="it-l"><a href="/wechat/pdf/198.pdf">读原文 PDF</a><span>存档号 198</span></div></div>
-<div class="item" data-k="约翰·杜威传：经验的社会化与教育的发生 从边陲到思想：一位普通人的哲学开端在十九世纪中叶的美国佛蒙特州，一个名叫约翰·杜威的孩子在小镇伯灵顿诞生了。 2025-10-31"><div class="it-hd"><span class="r-n">15</span><a class="it-t" href="/wechat/pdf/199.pdf">约翰·杜威传：经验的社会化与教育的发生</a><span class="it-m">2025-10-31 · 30 页</span></div><p class="it-d">从边陲到思想：一位普通人的哲学开端在十九世纪中叶的美国佛蒙特州，一个名叫约翰·杜威的孩子在小镇伯灵顿诞生了。</p><div class="it-l"><a href="/wechat/pdf/199.pdf">读原文 PDF</a><span>存档号 199</span></div></div>
-<div class="item" data-k="从发现到发生：王德生博士的学术贡献与著作序列 原创 已修改 第1次修改 2025年10月27日 21时18分 胡志英-约翰 王德生王德生博士是一位以数学理性为根、以哲学生成为魂的思想家、科学家与教育改革者。 2025-10-27"><div class="it-hd"><span class="r-n">16</span><a class="it-t" href="/wechat/pdf/200.pdf">从发现到发生：王德生博士的学术贡献与著作序列 原创 已修改 第1次修改 2025年10月27日 21时18分 胡志英-约翰</a><span class="it-m">2025-10-27 · 25 页</span></div><p class="it-d">王德生王德生博士是一位以数学理性为根、以哲学生成为魂的思想家、科学家与教育改革者。</p><div class="it-l"><a href="/wechat/pdf/200.pdf">读原文 PDF</a><span>存档号 200</span></div></div>
-<div class="item" data-k="梅里尔·斯韦恩：从输入到输出——语言生成的觉醒之路 当语言开口之时在二十世纪的语言学殿堂里，梅里尔·斯韦恩是一个温柔而锋利的名字。 2025-10-18"><div class="it-hd"><span class="r-n">17</span><a class="it-t" href="/wechat/pdf/202.pdf">梅里尔·斯韦恩：从输入到输出——语言生成的觉醒之路</a><span class="it-m">2025-10-18 · 42 页</span></div><p class="it-d">当语言开口之时在二十世纪的语言学殿堂里，梅里尔·斯韦恩是一个温柔而锋利的名字。</p><div class="it-l"><a href="/wechat/pdf/202.pdf">读原文 PDF</a><span>存档号 202</span></div></div>
-<div class="item" data-k="Avraham Kadar：从医学到教育的跨界之光 在人类教育史的漫长河流中，少有一位思想者像AvrahamKadar医生那样，以一生的跨界旅程重新定义了“理解”的意义。 2025-10-13"><div class="it-hd"><span class="r-n">18</span><a class="it-t" href="/wechat/pdf/203.pdf">Avraham Kadar：从医学到教育的跨界之光</a><span class="it-m">2025-10-13 · 40 页</span></div><p class="it-d">在人类教育史的漫长河流中，少有一位思想者像AvrahamKadar医生那样，以一生的跨界旅程重新定义了“理解”的意义。</p><div class="it-l"><a href="/wechat/pdf/203.pdf">读原文 PDF</a><span>存档号 203</span></div></div>
-<div class="item" data-k="斯蒂芬·克拉申传：输入、理解与语言自由的革命 童年与教育：美国语言环境中的自由精神一、战后美国的语言氛围斯蒂芬·克拉申（StephenD.Krashen）于1941年出生在美国芝加哥，这是一 2025-10-12"><div class="it-hd"><span class="r-n">19</span><a class="it-t" href="/wechat/pdf/204.pdf">斯蒂芬·克拉申传：输入、理解与语言自由的革命</a><span class="it-m">2025-10-12 · 69 页</span></div><p class="it-d">童年与教育：美国语言环境中的自由精神一、战后美国的语言氛围斯蒂芬·克拉申（StephenD.Krashen）于1941年出生在美国芝加哥，这是一</p><div class="it-l"><a href="/wechat/pdf/204.pdf">读原文 PDF</a><span>存档号 204</span></div></div>
-<div class="item" data-k="呼吸的物质：诺贝尔奖得主北川进与金属有机框架的奇迹 早年：从京都的静谧出发在日本的科学版图中，京都一直是一种独特的存在。 2025-10-10"><div class="it-hd"><span class="r-n">20</span><a class="it-t" href="/wechat/pdf/205.pdf">呼吸的物质：诺贝尔奖得主北川进与金属有机框架的奇迹</a><span class="it-m">2025-10-10 · 50 页</span></div><p class="it-d">早年：从京都的静谧出发在日本的科学版图中，京都一直是一种独特的存在。</p><div class="it-l"><a href="/wechat/pdf/205.pdf">读原文 PDF</a><span>存档号 205</span></div></div>
-<div class="item" data-k="维果茨基传：语言、思维与社会的生成之路 语言的诞生与精神的生成在思想的历史上，有些名字被时代的喧嚣所遗忘，却在沉默中成为思想的源泉。 2025-10-08"><div class="it-hd"><span class="r-n">21</span><a class="it-t" href="/wechat/pdf/206.pdf">维果茨基传：语言、思维与社会的生成之路</a><span class="it-m">2025-10-08 · 38 页</span></div><p class="it-d">语言的诞生与精神的生成在思想的历史上，有些名字被时代的喧嚣所遗忘，却在沉默中成为思想的源泉。</p><div class="it-l"><a href="/wechat/pdf/206.pdf">读原文 PDF</a><span>存档号 206</span></div></div>
-<div class="item" data-k="费尔迪南·德·索绪尔：语言的隐秘结构与思想的静默革命 静默的革命者在二十世纪思想史的星空中，有些名字并非闪耀于喧嚣的演讲或宏大的宣言之中，而是在安静的讲台与笔记的字里行间，悄然改变了人类理解世界的方 2025-10-07"><div class="it-hd"><span class="r-n">22</span><a class="it-t" href="/wechat/pdf/207.pdf">费尔迪南·德·索绪尔：语言的隐秘结构与思想的静默革命</a><span class="it-m">2025-10-07 · 35 页</span></div><p class="it-d">静默的革命者在二十世纪思想史的星空中，有些名字并非闪耀于喧嚣的演讲或宏大的宣言之中，而是在安静的讲台与笔记的字里行间，悄然改变了人类理解世界的方</p><div class="it-l"><a href="/wechat/pdf/207.pdf">读原文 PDF</a><span>存档号 207</span></div></div>
-<div class="item" data-k="洪堡：语言与自由的建筑师 语言的火种与自由的黎明十八世纪末的欧洲，理性与浪漫正发生着深刻的分裂。 2025-10-06"><div class="it-hd"><span class="r-n">23</span><a class="it-t" href="/wechat/pdf/208.pdf">洪堡：语言与自由的建筑师</a><span class="it-m">2025-10-06 · 32 页</span></div><p class="it-d">语言的火种与自由的黎明十八世纪末的欧洲，理性与浪漫正发生着深刻的分裂。</p><div class="it-l"><a href="/wechat/pdf/208.pdf">读原文 PDF</a><span>存档号 208</span></div></div>
-<div class="item" data-k="孤独的真理之路：皮尔斯与思想的永恒火焰 孤独的逻辑学家与被误解的思想黎明在十九世纪的美国学术史上，查尔斯·桑德斯·皮尔斯（CharlesSandersPeirce,1839–1914） 2025-10-05"><div class="it-hd"><span class="r-n">24</span><a class="it-t" href="/wechat/pdf/209.pdf">孤独的真理之路：皮尔斯与思想的永恒火焰</a><span class="it-m">2025-10-05 · 16 页</span></div><p class="it-d">孤独的逻辑学家与被误解的思想黎明在十九世纪的美国学术史上，查尔斯·桑德斯·皮尔斯（CharlesSandersPeirce,1839–1914）</p><div class="it-l"><a href="/wechat/pdf/209.pdf">读原文 PDF</a><span>存档号 209</span></div></div>
-<div class="item" data-k="郑重介绍我的导师王德生博士 原创 已修改 第1次修改 2025年02月27日 17时11分 胡志英-约翰 王德生博士是我的智慧导师，从2018年起，我就有幸师从王德生博士学习英语教学，三视角智慧体系，之后在老 2024-09-04"><div class="it-hd"><span class="r-n">25</span><a class="it-t" href="/wechat/pdf/297.pdf">郑重介绍我的导师王德生博士 原创 已修改 第1次修改 2025年02月27日 17时11分 胡志英-约翰</a><span class="it-m">2024-09-04 · 21 页</span></div><p class="it-d">王德生博士是我的智慧导师，从2018年起，我就有幸师从王德生博士学习英语教学，三视角智慧体系，之后在老</p><div class="it-l"><a href="/wechat/pdf/297.pdf">读原文 PDF</a><span>存档号 297</span></div></div>
-<div class="item" data-k="为何克拉申在启蒙一开始就会让你踩坑？ 昨天的文章，我相信看懂的人并不多，因为里面涉及了很多的专有名词。 2024-05-29"><div class="it-hd"><span class="r-n">26</span><a class="it-t" href="/wechat/pdf/328.pdf">为何克拉申在启蒙一开始就会让你踩坑？</a><span class="it-m">2024-05-29 · 4 页</span></div><p class="it-d">昨天的文章，我相信看懂的人并不多，因为里面涉及了很多的专有名词。</p><div class="it-l"><a href="/wechat/pdf/328.pdf">读原文 PDF</a><span>存档号 328</span></div></div>
-<div class="item" data-k="对克拉申可理解性输入假说的辨析（文末有彩蛋） 原创 已修改 第1次修改 2022年06月06日 16时19分 在写这篇文章之前，先说几句题外话，开这个号的初衷是基于以下几点考虑，在近十年的英语教学与研究的生涯中有很多实战性的宝贵的经验和思考，但很多的经验 2021-09-19"><div class="it-hd"><span class="r-n">27</span><a class="it-t" href="/wechat/pdf/409.pdf">对克拉申可理解性输入假说的辨析（文末有彩蛋） 原创 已修改 第1次修改 2022年06月06日 16时19分</a><span class="it-m">2021-09-19 · 11 页</span></div><p class="it-d">在写这篇文章之前，先说几句题外话，开这个号的初衷是基于以下几点考虑，在近十年的英语教学与研究的生涯中有很多实战性的宝贵的经验和思考，但很多的经验</p><div class="it-l"><a href="/wechat/pdf/409.pdf">读原文 PDF</a><span>存档号 409</span></div></div>
+<div class="chips"><div class="wrap"><a href="/wechat/">全部频道</a><a href="/wechat/genesis/">语言发生学<b>49</b></a><a href="/wechat/enlighten/">英语启蒙<b>78</b></a><a href="/wechat/vocabulary/">词汇之路<b>23</b></a><a href="/wechat/materials/">素材与分级<b>57</b></a><a href="/wechat/ai/">AI 与语言教育<b>42</b></a><a href="/wechat/school/">课堂与制度<b>41</b></a><a href="/wechat/lineage/" aria-current="page">思想谱系<b>27</b></a><a href="/wechat/notes/">奶爸手记<b>45</b></a><a href="/wechat/camp/">营地与公告<b>25</b></a><a href="/wechat/all/">全部篇目<b>387</b></a></div></div>
+<div class="light"><div class="wrap">
+<div class="tools">
+  <div class="filter"><label>本栏筛选</label><input id="q" type="search" placeholder="输入任意词，例如：克拉申、林语堂、洪堡" autocomplete="off" aria-label="在本栏内筛选"><span class="n" id="n"></span></div>
+  <p class="empty" id="empty" style="display:none">本栏没有匹配的篇目。换一个词，或去<a href="/wechat/all/">全部篇目</a>里找。</p>
+</div>
+<section class="list">
+<div data-group="2026"><div class="yr"><b>2026</b><i></i><span>10 篇</span></div>
+<div class="item" data-k="死语言如何统治现代思想：学术拉丁的隐秘力量 整个现代学术大厦，是建立在一门早已死亡的方言之上。这句判断听起来像个悖论，但任何一个曾翻过《自然》或《柳叶刀》的人，都在身体里经验过它。 2026-07-24" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">056</span><a class="it-t" href="/wechat/pdf/056.pdf">死语言如何统治现代思想：学术拉丁的隐秘力量</a><span class="it-m">2026-07-24 · 9 页</span></div><p class="it-d">整个现代学术大厦，是建立在一门早已死亡的方言之上。这句判断听起来像个悖论，但任何一个曾翻过《自然》或《柳叶刀》的人，都在身体里经验过它。</p><div class="it-l"><a href="/wechat/pdf/056.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="语言不是被解释明白的，而是在生活中发生出来的——用 SDE 解读维特根斯坦《哲学研究》第一章 很多孩子学英语，最早遭遇的不是难题，而是一幅错误的图画。老师拿起一张卡片，说：apple，苹果。 2026-06-22" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">098</span><a class="it-t" href="/wechat/pdf/098.pdf">语言不是被解释明白的，而是在生活中发生出来的——用 SDE 解读维特根斯坦《哲学研究》第一章</a><span class="it-m">2026-06-22 · 20 页</span></div><p class="it-d">很多孩子学英语，最早遭遇的不是难题，而是一幅错误的图画。老师拿起一张卡片，说：apple，苹果。</p><div class="it-l"><a href="/wechat/pdf/098.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="当教师不再相信克拉申，却仍然必须引用他 很多教育理论的死亡，不是从被人反驳开始的，而是从被所有人熟练引用开始的。 2026-06-10" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">127</span><a class="it-t" href="/wechat/pdf/127.pdf">当教师不再相信克拉申，却仍然必须引用他</a><span class="it-m">2026-06-10 · 12 页</span></div><p class="it-d">很多教育理论的死亡，不是从被人反驳开始的，而是从被所有人熟练引用开始的。</p><div class="it-l"><a href="/wechat/pdf/127.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="林语堂为什么被学校系统吃掉了？因为真正的语感，无法被考试清点 很多人谈林语堂英语学习法，最容易把它说成一种“老派方法”。比如多读、多背、多模仿、多写作； 2026-06-04" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">139</span><a class="it-t" href="/wechat/pdf/139.pdf">林语堂为什么被学校系统吃掉了？因为真正的语感，无法被考试清点</a><span class="it-m">2026-06-04 · 15 页</span></div><p class="it-d">很多人谈林语堂英语学习法，最容易把它说成一种“老派方法”。比如多读、多背、多模仿、多写作；</p><div class="it-l"><a href="/wechat/pdf/139.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="林语堂早就说透了：真正毁掉英语学习的，不是低分，而是假成功 很多家长以为，孩子英语学习最可怕的结果是低分。其实不是。低分有时候反而是好事。 2026-06-03" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">141</span><a class="it-t" href="/wechat/pdf/141.pdf">林语堂早就说透了：真正毁掉英语学习的，不是低分，而是假成功</a><span class="it-m">2026-06-03 · 15 页</span></div><p class="it-d">很多家长以为，孩子英语学习最可怕的结果是低分。其实不是。低分有时候反而是好事。</p><div class="it-l"><a href="/wechat/pdf/141.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="林语堂英语学习法为什么会被现代英语教育系统天然排斥？ 很多人以为，林语堂英语学习法之所以没有成为今天英语教育的主流，是因为它太旧了。 2026-06-02" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">142</span><a class="it-t" href="/wechat/pdf/142.pdf">林语堂英语学习法为什么会被现代英语教育系统天然排斥？</a><span class="it-m">2026-06-02 · 18 页</span></div><p class="it-d">很多人以为，林语堂英语学习法之所以没有成为今天英语教育的主流，是因为它太旧了。</p><div class="it-l"><a href="/wechat/pdf/142.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="林语堂英语学习法为什么一进入制度传播，就会被杀伤、退化、掏空？ 很多人谈林语堂英语学习法，第一反应是：多读经典，多背名篇，多模仿好英文，多培养语感。 2026-06-01" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">145</span><a class="it-t" href="/wechat/pdf/145.pdf">林语堂英语学习法为什么一进入制度传播，就会被杀伤、退化、掏空？</a><span class="it-m">2026-06-01 · 17 页</span></div><p class="it-d">很多人谈林语堂英语学习法，第一反应是：多读经典，多背名篇，多模仿好英文，多培养语感。</p><div class="it-l"><a href="/wechat/pdf/145.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="学校不理解的英语学习法，反而成就了林语堂 很多人谈林语堂的英语，第一反应是羡慕。一个中国人，为什么能用英语写出那么自然、幽默、有气质的文章？ 2026-05-31" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">147</span><a class="it-t" href="/wechat/pdf/147.pdf">学校不理解的英语学习法，反而成就了林语堂</a><span class="it-m">2026-05-31 · 6 页</span></div><p class="it-d">很多人谈林语堂的英语，第一反应是羡慕。一个中国人，为什么能用英语写出那么自然、幽默、有气质的文章？</p><div class="it-l"><a href="/wechat/pdf/147.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="从学英语到用英语活：林语堂的英语学习法带给中国孩子英语教育的深层启示 很多中国孩子学英语，学得很早，也学得很久。从幼儿园认字母，到小学背单词，再到初中刷语法、高中做阅读理解，十年下来，书读了不少，课上了不少，单词背…… 2026-05-29" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">151</span><a class="it-t" href="/wechat/pdf/151.pdf">从学英语到用英语活：林语堂的英语学习法带给中国孩子英语教育的深层启示</a><span class="it-m">2026-05-29 · 6 页</span></div><p class="it-d">很多中国孩子学英语，学得很早，也学得很久。从幼儿园认字母，到小学背单词，再到初中刷语法、高中做阅读理解，十年下来，书读了不少，课上了不少，单词背……</p><div class="it-l"><a href="/wechat/pdf/151.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="从可理解输入到语言栖居：克拉申理论退化之后，儿童英语学习如何重建输入、表达与成长的发生系统 在过去几十年的儿童英语学习领域，“可理解输入”几乎已经成为一个无法绕开的关键词。 2026-05-28" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">156</span><a class="it-t" href="/wechat/pdf/156.pdf">从可理解输入到语言栖居：克拉申理论退化之后，儿童英语学习如何重建输入、表达与成长的发生系统</a><span class="it-m">2026-05-28 · 6 页</span></div><p class="it-d">在过去几十年的儿童英语学习领域，“可理解输入”几乎已经成为一个无法绕开的关键词。</p><div class="it-l"><a href="/wechat/pdf/156.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2025"><div class="yr"><b>2025</b><i></i><span>13 篇</span></div>
+<div class="item" data-k="林语堂传：自由之魂的文明桥桥接者 福音书与山海经之间——林语堂的童年发生林语堂的一生，如果要寻找一个真正决定性的起点，并不在清华的课堂，也不在哈佛或莱比锡的讲堂，而是在福建山海之…… 2025-12-25" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">191</span><a class="it-t" href="/wechat/pdf/191.pdf">林语堂传：自由之魂的文明桥桥接者</a><span class="it-m">2025-12-25 · 23 页</span></div><p class="it-d">福音书与山海经之间——林语堂的童年发生林语堂的一生，如果要寻找一个真正决定性的起点，并不在清华的课堂，也不在哈佛或莱比锡的讲堂，而是在福建山海之……</p><div class="it-l"><a href="/wechat/pdf/191.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="中国英语教学发展史 ｜英语从何而来——一种外来语言如何进入中国文明的深层结构英语并不是作为一门“课程”进入中国的，它最初也并不以“知识”的形态出现，更不携带任何关于…… 2025-12-20" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">194</span><a class="it-t" href="/wechat/pdf/194.pdf">中国英语教学发展史</a><span class="it-m">2025-12-20 · 27 页</span></div><p class="it-d">｜英语从何而来——一种外来语言如何进入中国文明的深层结构英语并不是作为一门“课程”进入中国的，它最初也并不以“知识”的形态出现，更不携带任何关于……</p><div class="it-l"><a href="/wechat/pdf/194.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="陶行知传：生活即教育的觉醒 在二十世纪的中国，教育从未只是学校里的事。它是民族的呼吸，是社会的血脉，是人类灵魂在时代巨变中的一次次自我更新。 2025-11-03" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">198</span><a class="it-t" href="/wechat/pdf/198.pdf">陶行知传：生活即教育的觉醒</a><span class="it-m">2025-11-03 · 23 页</span></div><p class="it-d">在二十世纪的中国，教育从未只是学校里的事。它是民族的呼吸，是社会的血脉，是人类灵魂在时代巨变中的一次次自我更新。</p><div class="it-l"><a href="/wechat/pdf/198.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="约翰·杜威传：经验的社会化与教育的发生 从边陲到思想：一位普通人的哲学开端在十九世纪中叶的美国佛蒙特州，一个名叫约翰·杜威的孩子在小镇伯灵顿诞生了。 2025-10-31" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">199</span><a class="it-t" href="/wechat/pdf/199.pdf">约翰·杜威传：经验的社会化与教育的发生</a><span class="it-m">2025-10-31 · 30 页</span></div><p class="it-d">从边陲到思想：一位普通人的哲学开端在十九世纪中叶的美国佛蒙特州，一个名叫约翰·杜威的孩子在小镇伯灵顿诞生了。</p><div class="it-l"><a href="/wechat/pdf/199.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="从发现到发生：王德生博士的学术贡献与著作序列 王德生王德生博士是一位以数学理性为根、以哲学生成为魂的思想家、科学家与教育改革者。 2025-10-27" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">200</span><a class="it-t" href="/wechat/pdf/200.pdf">从发现到发生：王德生博士的学术贡献与著作序列</a><span class="it-m">2025-10-27 · 25 页</span></div><p class="it-d">王德生王德生博士是一位以数学理性为根、以哲学生成为魂的思想家、科学家与教育改革者。</p><div class="it-l"><a href="/wechat/pdf/200.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="梅里尔·斯韦恩：从输入到输出——语言生成的觉醒之路 当语言开口之时在二十世纪的语言学殿堂里，梅里尔·斯韦恩是一个温柔而锋利的名字。 2025-10-18" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">202</span><a class="it-t" href="/wechat/pdf/202.pdf">梅里尔·斯韦恩：从输入到输出——语言生成的觉醒之路</a><span class="it-m">2025-10-18 · 42 页</span></div><p class="it-d">当语言开口之时在二十世纪的语言学殿堂里，梅里尔·斯韦恩是一个温柔而锋利的名字。</p><div class="it-l"><a href="/wechat/pdf/202.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="Avraham Kadar：从医学到教育的跨界之光 在人类教育史的漫长河流中，少有一位思想者像AvrahamKadar医生那样，以一生的跨界旅程重新定义了“理解”的意义。 2025-10-13" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">203</span><a class="it-t" href="/wechat/pdf/203.pdf">Avraham Kadar：从医学到教育的跨界之光</a><span class="it-m">2025-10-13 · 40 页</span></div><p class="it-d">在人类教育史的漫长河流中，少有一位思想者像AvrahamKadar医生那样，以一生的跨界旅程重新定义了“理解”的意义。</p><div class="it-l"><a href="/wechat/pdf/203.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="斯蒂芬·克拉申传：输入、理解与语言自由的革命 童年与教育：美国语言环境中的自由精神一、战后美国的语言氛围斯蒂芬·克拉申（StephenD.Krashen）于1941年出生在美国芝加哥，这是一…… 2025-10-12" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">204</span><a class="it-t" href="/wechat/pdf/204.pdf">斯蒂芬·克拉申传：输入、理解与语言自由的革命</a><span class="it-m">2025-10-12 · 69 页</span></div><p class="it-d">童年与教育：美国语言环境中的自由精神一、战后美国的语言氛围斯蒂芬·克拉申（StephenD.Krashen）于1941年出生在美国芝加哥，这是一……</p><div class="it-l"><a href="/wechat/pdf/204.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="呼吸的物质：诺贝尔奖得主北川进与金属有机框架的奇迹 早年：从京都的静谧出发在日本的科学版图中，京都一直是一种独特的存在。 2025-10-10" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">205</span><a class="it-t" href="/wechat/pdf/205.pdf">呼吸的物质：诺贝尔奖得主北川进与金属有机框架的奇迹</a><span class="it-m">2025-10-10 · 50 页</span></div><p class="it-d">早年：从京都的静谧出发在日本的科学版图中，京都一直是一种独特的存在。</p><div class="it-l"><a href="/wechat/pdf/205.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="维果茨基传：语言、思维与社会的生成之路 语言的诞生与精神的生成在思想的历史上，有些名字被时代的喧嚣所遗忘，却在沉默中成为思想的源泉。 2025-10-08" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">206</span><a class="it-t" href="/wechat/pdf/206.pdf">维果茨基传：语言、思维与社会的生成之路</a><span class="it-m">2025-10-08 · 38 页</span></div><p class="it-d">语言的诞生与精神的生成在思想的历史上，有些名字被时代的喧嚣所遗忘，却在沉默中成为思想的源泉。</p><div class="it-l"><a href="/wechat/pdf/206.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="费尔迪南·德·索绪尔：语言的隐秘结构与思想的静默革命 静默的革命者在二十世纪思想史的星空中，有些名字并非闪耀于喧嚣的演讲或宏大的宣言之中，而是在安静的讲台与笔记的字里行间，悄然改变了人类理解世界的方…… 2025-10-07" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">207</span><a class="it-t" href="/wechat/pdf/207.pdf">费尔迪南·德·索绪尔：语言的隐秘结构与思想的静默革命</a><span class="it-m">2025-10-07 · 35 页</span></div><p class="it-d">静默的革命者在二十世纪思想史的星空中，有些名字并非闪耀于喧嚣的演讲或宏大的宣言之中，而是在安静的讲台与笔记的字里行间，悄然改变了人类理解世界的方……</p><div class="it-l"><a href="/wechat/pdf/207.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="洪堡：语言与自由的建筑师 语言的火种与自由的黎明十八世纪末的欧洲，理性与浪漫正发生着深刻的分裂。 2025-10-06" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">208</span><a class="it-t" href="/wechat/pdf/208.pdf">洪堡：语言与自由的建筑师</a><span class="it-m">2025-10-06 · 32 页</span></div><p class="it-d">语言的火种与自由的黎明十八世纪末的欧洲，理性与浪漫正发生着深刻的分裂。</p><div class="it-l"><a href="/wechat/pdf/208.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="孤独的真理之路：皮尔斯与思想的永恒火焰 孤独的逻辑学家与被误解的思想黎明在十九世纪的美国学术史上，查尔斯·桑德斯·皮尔斯（CharlesSandersPeirce,1839–1914）…… 2025-10-05" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">209</span><a class="it-t" href="/wechat/pdf/209.pdf">孤独的真理之路：皮尔斯与思想的永恒火焰</a><span class="it-m">2025-10-05 · 16 页</span></div><p class="it-d">孤独的逻辑学家与被误解的思想黎明在十九世纪的美国学术史上，查尔斯·桑德斯·皮尔斯（CharlesSandersPeirce,1839–1914）……</p><div class="it-l"><a href="/wechat/pdf/209.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2024"><div class="yr"><b>2024</b><i></i><span>2 篇</span></div>
+<div class="item" data-k="郑重介绍我的导师王德生博士 王德生博士是我的智慧导师，从2018年起，我就有幸师从王德生博士学习英语教学，三视角智慧体系，之后在老师创新精神的激励下辞职出来独立创业，创立家…… 2024-09-04" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">297</span><a class="it-t" href="/wechat/pdf/297.pdf">郑重介绍我的导师王德生博士</a><span class="it-m">2024-09-04 · 21 页</span></div><p class="it-d">王德生博士是我的智慧导师，从2018年起，我就有幸师从王德生博士学习英语教学，三视角智慧体系，之后在老师创新精神的激励下辞职出来独立创业，创立家……</p><div class="it-l"><a href="/wechat/pdf/297.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="为何克拉申在启蒙一开始就会让你踩坑？ 昨天的文章，我相信看懂的人并不多，因为里面涉及了很多的专有名词。 2024-05-29" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">328</span><a class="it-t" href="/wechat/pdf/328.pdf">为何克拉申在启蒙一开始就会让你踩坑？</a><span class="it-m">2024-05-29 · 4 页</span></div><p class="it-d">昨天的文章，我相信看懂的人并不多，因为里面涉及了很多的专有名词。</p><div class="it-l"><a href="/wechat/pdf/328.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2021"><div class="yr"><b>2021</b><i></i><span>1 篇</span></div>
+<div class="item" data-k="对克拉申可理解性输入假说的辨析（文末有彩蛋） 在写这篇文章之前，先说几句题外话，开这个号的初衷是基于以下几点考虑，在近十年的英语教学与研究的生涯中有很多实战性的宝贵的经验和思考，但很多的经验…… 2021-09-19" data-y="2021"><div class="it-hd"><span class="r-n" title="存档号">409</span><a class="it-t" href="/wechat/pdf/409.pdf">对克拉申可理解性输入假说的辨析（文末有彩蛋）</a><span class="it-m">2021-09-19 · 11 页</span></div><p class="it-d">在写这篇文章之前，先说几句题外话，开这个号的初衷是基于以下几点考虑，在近十年的英语教学与研究的生涯中有很多实战性的宝贵的经验和思考，但很多的经验……</p><div class="it-l"><a href="/wechat/pdf/409.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="未标日期"><div class="yr"><b>未标日期</b><i></i><span>1 篇</span></div>
+<div class="item" data-k="林语堂英语学习法：为什么一进制度，就…？ 很多英语学习法，本来是活的，一进入学校、课程、打卡和考试，就慢慢变成了任务。 " data-y=""><div class="it-hd"><span class="r-n" title="存档号">143</span><a class="it-t" href="/wechat/pdf/143.pdf">林语堂英语学习法：为什么一进制度，就…？</a><span class="it-m">2 页</span></div><p class="it-d">很多英语学习法，本来是活的，一进入学校、课程、打卡和考试，就慢慢变成了任务。</p><div class="it-l"><a href="/wechat/pdf/143.pdf">读原文 PDF</a></div></div>
+</div>
 </section>
 
-<div class="years"><a href="/wechat/school/">← 课堂与制度</a><a href="/wechat/">全部频道</a><a href="/wechat/notes/">奶爸手记 →</a></div>
-<script>
-(function(){
-  var q=document.getElementById("q"),n=document.getElementById("n"),
-      empty=document.getElementById("empty"),
-      items=[].slice.call(document.querySelectorAll(".item")),
-      secs=[].slice.call(document.querySelectorAll("section[data-col]"));
-  if(!q)return;
-  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();});
-  function run(){
-    var v=q.value.trim().toLowerCase(),c=0;
-    for(var i=0;i<items.length;i++){
-      var hit=!v||keys[i].indexOf(v)>=0;
-      items[i].style.display=hit?"":"none";
-      if(hit)c++;
-    }
-    for(var j=0;j<secs.length;j++){
-      var any=secs[j].querySelector('.item:not([style*="none"])');
-      secs[j].style.display=any?"":"none";
-    }
-    n.textContent=c+" / "+items.length;
-    empty.style.display=c?"none":"";
-  }
-  q.addEventListener("input",run); run();
-})();
-</script>
+<div class="nearby">
+  <a href="/wechat/school/"><small>上一栏</small><b>课堂与制度</b>41 篇</a>
+  <a href="/wechat/"><small>门厅</small><b>九个频道</b>回到总目，看写作节律</a>
+  <a href="/wechat/notes/"><small>下一栏</small><b>奶爸手记</b>45 篇</a>
 </div>
+</div></div>
 <footer><div class="wrap">
   <p>约翰专栏 —— 胡志英（约翰老师）公众号「五宝爸约翰聊英语」原文存档，共 418 篇。原文一字未改，本站只做归类、排序与检索。</p>
   <p>语言发生学 · <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站 —— 德麦国际 · Demai International Press</p>
 </div></footer>
 <script>
 /* 分站页面的自家链接写的是分站根。在二级域名下这就是对的；
-   若从主站以 /sites/lang/… 预览，则就地补上前缀，两处都能正常点。 */
-(function(){var b="/sites/lang";if(location.pathname.indexOf(b)!==0)return;
-var own=["/#","/all/","/wechat/","/chatjohn/"];
+   若从主站以 /sites/lang/… 预览，就地补前缀，两处都能点。 */
+(function(){window.__wechatBase="";var b="/sites/lang";
+if(location.pathname.indexOf(b)!==0)return;
+window.__wechatBase=b;
+var own=["/#","/all/","/wechat","/chatjohn/"];
 var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
 if(h==="/"){as[i].setAttribute("href",b+"/");continue;}
 for(var k=0;k<own.length;k++){if(h.indexOf(own[k])===0){as[i].setAttribute("href",b+h);break;}}}})();
+</script>
+<script>
+(function(){
+  var q=document.getElementById("q"),n=document.getElementById("n"),
+      empty=document.getElementById("empty"),
+      items=[].slice.call(document.querySelectorAll(".item")),
+      groups=[].slice.call(document.querySelectorAll("[data-group]")),
+      ybtns=[].slice.call(document.querySelectorAll(".chipy button[data-year]")),
+      year=null;
+  if(!q&&!ybtns.length)return;
+  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();}),
+      years=items.map(function(el){return el.getAttribute("data-y")||"";});
+  function run(){
+    var v=q?q.value.trim().toLowerCase():"",c=0;
+    for(var i=0;i<items.length;i++){
+      var hit=(!v||keys[i].indexOf(v)>=0)&&(year===null||years[i]===year);
+      items[i].style.display=hit?"":"none";
+      if(hit)c++;
+    }
+    for(var j=0;j<groups.length;j++){
+      var any=groups[j].querySelector('.item:not([style*="none"])');
+      groups[j].style.display=any?"":"none";
+    }
+    if(n)n.textContent=c+" / "+items.length;
+    if(empty)empty.style.display=c?"none":"";
+  }
+  if(q)q.addEventListener("input",run);
+  ybtns.forEach(function(b){
+    b.addEventListener("click",function(){
+      var y=b.getAttribute("data-year");
+      year=(year===y)?null:y;
+      ybtns.forEach(function(o){
+        o.setAttribute("aria-pressed",String(year!==null&&o.getAttribute("data-year")===year));
+      });
+      run();
+    });
+  });
+  run();
+})();
 </script>
 </body></html>

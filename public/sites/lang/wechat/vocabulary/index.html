@@ -9,196 +9,377 @@
 <meta property="og:title" content="词汇之路 · 约翰专栏 · 语言发生学">
 <meta property="og:description" content="词汇之路共 23 篇。一个词怎样长出来，又怎样在需要的那一刻被取出来。词根词缀、形态、搭配、词卡、听力词汇转阅读词汇。">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0E14">
 <style>
 :root{
-  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272;
-  --line:#CBCCD4; --indigo:#1F3A5F; --vermilion:#A63A2B;
+  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272; --ink3:#868C9B;
+  --line:#CBCCD4; --line2:#E2E1DE;
+  --indigo:#1F3A5F; --vermilion:#A63A2B;
   --night:#0B0E14; --night2:#121722; --bone:#E8E4DA; --bone2:#8E94A3;
   --edge:rgba(232,228,218,.16); --indigo-l:#6E9BD8; --vermilion-l:#D2604A;
+  --accent:#1F3A5F;
   --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
   --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.75}
 a{color:inherit;text-decoration:none}
-.wrap{max-width:960px;margin:0 auto;padding:0 22px}
-.top{border-bottom:1px solid var(--line);background:rgba(242,241,237,.92);
-  position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(6px)}
-.top .wrap{display:flex;align-items:baseline;gap:18px;height:56px}
-.brand{font-family:var(--serif);font-size:19px;letter-spacing:.14em;color:var(--indigo)}
-.brand em{font-style:normal;color:var(--ink2);font-size:12px;letter-spacing:.24em;margin-left:10px}
-.top nav{margin-left:auto;display:flex;gap:18px;font-size:13.5px;color:var(--ink2);
-  overflow-x:auto;white-space:nowrap}
-.top nav a:hover{color:var(--indigo)}
-.top nav a.out{font-family:var(--mono);font-size:12px}
-.hero{padding:56px 0 0}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--indigo);text-transform:uppercase}
-h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.3;
-  letter-spacing:.02em;margin:.5em 0 .38em}
-.lede{max-width:39em;color:var(--ink2);font-size:16.5px}
-.lede b{color:var(--ink);font-weight:600}
-.crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink2);margin-bottom:6px}
-.crumb a{color:var(--indigo)}
-.band{display:flex;flex-wrap:wrap;gap:0;margin:30px 0 0;border:1px solid var(--line);background:var(--card)}
-.band div{flex:1 1 130px;padding:14px 16px;border-right:1px solid var(--line)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(56% 44% at 10% 0%,rgba(110,155,216,.13),transparent 70%),
+    radial-gradient(44% 40% at 94% 18%,rgba(210,96,74,.10),transparent 72%),
+    radial-gradient(72% 52% at 52% 104%,rgba(111,169,140,.07),transparent 70%)}
+.dark::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.45;
+  background-image:linear-gradient(90deg,rgba(232,228,218,.05) 1px,transparent 1px);
+  background-size:34px 100%}
+.dark .wrap{position:relative;z-index:1}
+
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:40;
+  background:rgba(11,14,20,.88);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone);flex:none}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--bone2);
+  overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a:hover{color:var(--indigo-l)}
+.top nav a[aria-current]{color:var(--bone);box-shadow:inset 0 -1px 0 var(--vermilion-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:70px 0 58px}
+.hero.tight{padding:44px 0 42px}
+.crumb{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--bone2);margin-bottom:16px}
+.crumb a{color:var(--indigo-l)}
+.crumb a:hover{color:var(--bone)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--indigo-l);text-transform:uppercase}
+.dark h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.4vw,52px);line-height:1.26;
+  letter-spacing:.03em;margin:.5em 0 .4em;max-width:15em;color:#F4F2EC}
+.dark h1 em{font-style:normal;color:var(--vermilion-l)}
+.lede{max-width:38em;color:#B9BECB;font-size:16.5px;margin:0}
+.lede b{color:var(--bone);font-weight:600}
+.lede + .lede{margin-top:.9em}
+
+.rhythm{margin:42px 0 0;border:1px solid var(--edge);background:var(--night2)}
+.rhythm .cap{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:nowrap;
+  padding:13px 20px;border-bottom:1px solid rgba(232,228,218,.28);
+  font-family:var(--serif);letter-spacing:.22em;font-size:14.5px;color:#F4F2EC}
+.rhythm .cap span{font-family:var(--mono);font-size:11px;color:var(--bone2);letter-spacing:.06em;
+  text-align:right;letter-spacing:.06em}
+.bars{display:flex;align-items:flex-end;gap:2px;height:116px;padding:20px 20px 0}
+.bars .b{flex:1 1 0;min-width:2px;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bars .b i,.bars .b u{display:block;width:100%;transform-origin:bottom;text-decoration:none;
+  animation:grow .55s cubic-bezier(.2,.7,.3,1) both}
+.bars .b i{background:rgba(232,228,218,.13)}
+.bars .b u{background:var(--indigo-l)}
+.bars .b.hot u{background:var(--vermilion-l)}
+.bars .b:hover i,.bars .b:hover u{filter:brightness(1.45)}
+@keyframes grow{from{transform:scaleY(.05);opacity:.15}to{transform:scaleY(1);opacity:1}}
+.axis{display:flex;padding:0 20px 14px;margin-top:9px;border-top:1px solid var(--edge)}
+.axis span{flex:1 1 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--bone2);
+  padding-top:8px;border-left:1px solid var(--edge);padding-left:7px;overflow:hidden}
+.axis span b,.axis span em{display:block;white-space:nowrap;font-style:normal}
+.axis span em{font-size:9.5px;opacity:.85;margin-top:1px}
+.axis span:first-child{border-left:0;padding-left:0}
+.axis span b{color:#C8CCD6;font-weight:400}
+.rnote{padding:0 20px 18px;margin:0;font-size:12.5px;color:var(--bone2);line-height:1.75;max-width:60em}
+.rnote b{color:#C8CCD6;font-weight:500}
+
+.band{display:flex;flex-wrap:wrap;gap:0;margin:26px 0 0;border:1px solid var(--edge)}
+.band div{flex:1 1 128px;padding:15px 18px;border-right:1px solid var(--edge)}
 .band div:last-child{border-right:0}
-.band b{display:block;font-family:var(--mono);font-size:21px;color:var(--indigo);
-  font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.band span{font-size:12.5px;color:var(--ink2)}
-.filter{display:flex;gap:12px;align-items:center;margin:26px 0 0;
-  border:1px solid var(--line);background:var(--card);padding:10px 14px}
-.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
-.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2)}
-.filter .n{font-family:var(--mono);font-size:12px;color:var(--indigo);font-variant-numeric:tabular-nums}
-.empty{padding:26px 4px;color:var(--ink2);font-size:14.5px}
-section{padding:48px 0 8px}
+.band b{display:block;font-family:var(--mono);font-size:22px;color:#F4F2EC;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.3}
+.band span{font-size:12.5px;color:var(--bone2)}
+.acts{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 0}
+.acts a,.acts button{font:inherit;font-size:14px;color:var(--bone);border:1px solid var(--edge);
+  background:transparent;padding:9px 18px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.acts a:hover,.acts button:hover{border-color:var(--indigo-l);color:#F4F2EC}
+.acts .primary{background:var(--vermilion);border-color:var(--vermilion);color:#FBF7F2}
+.acts .primary:hover{background:var(--vermilion-l);border-color:var(--vermilion-l);color:#fff}
+
+.light{background:var(--paper);
+  background-image:linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:34px 100%;background-position:-1px 0}
+section{padding:52px 0 6px}
 .col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
-.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--indigo);flex:none}
-.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .no{font-family:var(--serif);font-size:13px;letter-spacing:.24em;color:var(--vermilion);flex:none}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.1em;margin:0}
 .col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);
   font-variant-numeric:tabular-nums;flex:none;padding-left:10px}
-.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
-.item{border-bottom:1px dashed var(--line);padding:14px 4px 13px}
-.item:hover{background:var(--card)}
-.it-hd{display:flex;gap:12px;align-items:baseline}
-.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:3.1em;
-  font-variant-numeric:tabular-nums;flex:none}
-.it-t{font-size:15.5px;line-height:1.6}
-.item:hover .it-t{color:var(--indigo)}
-.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
-  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
-.it-d{margin:6px 0 0 4.1em;font-size:13.5px;color:var(--ink2);line-height:1.7}
-.it-l{margin:7px 0 0 4.1em;display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
-.it-l a{color:var(--indigo);border-bottom:1px solid var(--line);padding-bottom:1px}
-.it-l a:hover{border-color:var(--indigo)}
-.it-l span{color:var(--ink2)}
-.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--vermilion);
-  border:1px solid var(--line);padding:1px 5px;margin-left:8px;vertical-align:2px}
-.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;
-  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:8px}
-.ch{display:block;padding:22px 22px 20px;border-right:1px solid var(--line);
-  border-bottom:1px solid var(--line);background:var(--card);transition:background .2s}
+.col-d{color:var(--ink2);font-size:14.5px;margin:13px 0 4px;max-width:46em}
+
+.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0;
+  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:20px;background:var(--card)}
+.ch{display:flex;flex-direction:column;padding:0 0 20px;border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);transition:background .22s}
 .ch:hover{background:#fff}
-.ch .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--indigo)}
-.ch h3{font-family:var(--serif);font-weight:600;font-size:19.5px;letter-spacing:.09em;margin:9px 0 8px}
-.ch:hover h3{color:var(--indigo)}
+.ch .rule{height:3px;background:var(--cc)}
+.ch .in{padding:19px 22px 0;flex:1;display:flex;flex-direction:column}
+.ch .foot{margin-top:auto}
+.ch .n{font-family:var(--serif);font-size:12px;letter-spacing:.3em;color:var(--cc)}
+.ch h3{font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:.1em;margin:8px 0 9px}
+.ch:hover h3{color:var(--cc)}
 .ch p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.72}
-.ch .ct{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+.spark{display:flex;align-items:flex-end;gap:3px;height:26px;margin:16px 0 0}
+.spark i{flex:1 1 0;background:var(--cc);opacity:.26;min-height:1px}
+.spark i.pk{opacity:.85}
+.spark-x{display:flex;gap:3px;margin-top:5px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);
+  letter-spacing:.06em}
+.spark-x i{flex:1 1 0;font-style:normal;text-align:center}
+.ch .picks{margin:15px 0 0;padding-top:12px;border-top:1px dashed var(--line);
+  font-size:13px;color:var(--ink2);line-height:1.7}
+.ch .picks em{font-style:normal;color:var(--ink);display:block}
+.ch .picks em::before{content:"— ";color:var(--cc)}
+.ch .ct{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;display:flex;gap:14px}
+.ch .ct b{color:var(--cc);font-weight:600;font-size:13px}
+.ch .go{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--cc);opacity:0;
+  transform:translateX(-4px);transition:opacity .22s,transform .22s}
+.ch:hover .go,.ch:focus-visible .go{opacity:1;transform:none}
+
+.chips{position:sticky;top:0;z-index:30;background:rgba(242,241,237,.95);
+  backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--line)}
+.chips .wrap{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding:0 22px;
+  -webkit-mask-image:linear-gradient(to right,#000 92%,transparent);
+  mask-image:linear-gradient(to right,#000 92%,transparent)}
+.chips .wrap::-webkit-scrollbar{display:none}
+.chips a{flex:none;padding:12px 15px;font-size:13.5px;color:var(--ink2);white-space:nowrap;
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.chips a:hover{color:var(--ink)}
+.chips a[aria-current]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.chips a b{font-family:var(--mono);font-size:11px;color:var(--ink3);font-weight:400;margin-left:5px;
   font-variant-numeric:tabular-nums}
-.ch .ct b{color:var(--vermilion);font-weight:500}
-.note{background:var(--card);border:1px solid var(--line);padding:22px 24px;margin-top:30px}
-.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:0 0 10px;font-weight:600}
-.note p{margin:0 0 11px;font-size:14.5px;color:var(--ink2)}
+
+.tools{padding:30px 0 0}
+.list{padding-top:10px}
+.filter{display:flex;gap:12px;align-items:center;
+  border:1px solid var(--line);background:var(--card);padding:11px 15px}
+.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
+.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2);flex:none}
+.filter .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.chipy{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 0}
+.chipy button,.chipy a{font:inherit;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:4px 11px;cursor:pointer;
+  transition:border-color .18s,color .18s,background .18s}
+.chipy button:hover,.chipy a:hover{border-color:var(--cc,var(--accent));color:var(--cc,var(--accent))}
+.chipy button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FBF7F2}
+.empty{padding:24px 4px;color:var(--ink2);font-size:14.5px}
+.empty a{color:var(--accent);border-bottom:1px solid var(--line)}
+
+.yr{display:flex;align-items:baseline;gap:12px;margin:34px 0 2px;padding-bottom:6px}
+.yr b{font-family:var(--mono);font-size:19px;letter-spacing:.06em;color:var(--accent);
+  font-variant-numeric:tabular-nums;font-weight:500}
+.yr span{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.12em}
+.yr i{flex:1;height:1px;background:var(--line);font-style:normal}
+.item{border-bottom:1px dashed var(--line);padding:15px 4px 14px;position:relative;transition:background .18s}
+.item::before{content:"";position:absolute;left:-12px;top:15px;bottom:14px;width:2px;
+  background:var(--accent);opacity:0;transition:opacity .18s}
+.item:hover{background:var(--card)}
+.item:hover::before{opacity:.75}
+.it-hd{display:flex;gap:13px;align-items:baseline}
+.r-n{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:3.2em;
+  font-variant-numeric:tabular-nums;flex:none;letter-spacing:.06em}
+.it-t{font-size:15.5px;line-height:1.62;font-family:var(--serif);font-weight:600;letter-spacing:.02em}
+.item:hover .it-t{color:var(--accent)}
+.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
+.it-d{margin:7px 0 0 4.3em;font-size:13.5px;color:var(--ink2);line-height:1.72}
+.it-l{margin:8px 0 0 4.3em;display:flex;gap:15px;font-family:var(--mono);font-size:11px;flex-wrap:wrap;
+  letter-spacing:.06em}
+.it-l a{color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:1px}
+.it-l a:hover{border-color:var(--accent)}
+.it-l span{color:var(--ink3)}
+
+.note{background:var(--card);border:1px solid var(--line);padding:24px 26px;margin-top:36px}
+.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.1em;margin:0 0 12px;font-weight:600}
+.note p{margin:0 0 12px;font-size:14.5px;color:var(--ink2)}
 .note p:last-child{margin-bottom:0}
 .note b{color:var(--ink)}
 .note a{color:var(--indigo);border-bottom:1px solid var(--line)}
-.years{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
-.years a{font-family:var(--mono);font-size:12px;color:var(--indigo);
-  border:1px solid var(--line);padding:4px 10px;background:var(--card)}
-.years a:hover{border-color:var(--indigo)}
-footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 60px;
+.nearby{display:flex;flex-wrap:wrap;gap:0;margin:46px 0 0;border:1px solid var(--line);background:var(--card)}
+.nearby a{flex:1 1 210px;padding:17px 20px;border-right:1px solid var(--line);font-size:13.5px;
+  color:var(--ink2);transition:background .2s,color .2s}
+.nearby a:last-child{border-right:0}
+.nearby a:hover{background:#fff;color:var(--ink)}
+.nearby a small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  color:var(--ink3);margin-bottom:5px}
+.nearby a b{display:block;font-family:var(--serif);font-size:16.5px;letter-spacing:.08em;
+  font-weight:600;color:var(--ink);margin-bottom:3px}
+
+footer{margin-top:74px;border-top:1px solid var(--line);padding:28px 0 66px;
   font-size:13px;color:var(--ink2)}
 footer a{color:var(--indigo);border-bottom:1px solid var(--line)}
 footer p{margin:0 0 8px}
-a:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
-@media(max-width:640px){
-  .hero{padding:36px 0 0}
+a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--vermilion);outline-offset:2px}
+@media(max-width:700px){
+  .hero{padding:40px 0 34px}
+  .hero.tight{padding:32px 0 30px}
+  .top nav{-webkit-mask-image:linear-gradient(to right,#000 86%,transparent);
+    mask-image:linear-gradient(to right,#000 86%,transparent)}
+  .rhythm .cap{flex-wrap:wrap;letter-spacing:.14em;font-size:13.5px}
+  .rhythm .cap span{text-align:left;flex:1 1 100%}
+  .bars{height:82px;padding:16px 14px 0}
+  .axis{padding:0 14px 12px}
+  .axis span{font-size:9px;padding-left:4px;min-width:32px;letter-spacing:0}
+  .axis span em{font-size:8.5px}
+  .rnote{padding:0 14px 15px}
+  .band div{flex:1 1 45%}
   .it-m{display:none}
   .it-d,.it-l{margin-left:0}
+  .item::before{left:-8px}
+  .chips a{padding:11px 12px;font-size:13px}
+  .nearby a{flex:1 1 100%;border-right:0;border-bottom:1px solid var(--line)}
+  .nearby a:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .bars .b i,.bars .b u{animation:none}
+  *{transition:none!important}
 }
 </style>
+<style>:root{--accent:#7A6A2E}</style>
 </head>
 <body>
+<div class="dark">
 <header class="top"><div class="wrap">
   <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
   <nav>
     <a href="/#books">账册</a>
     <a href="/#cols">栏目</a>
     <a href="/all/">全部篇目</a>
-    <a href="/wechat/">约翰专栏</a>
+    <a href="/wechat/" aria-current="page">约翰专栏</a>
     <a href="/chatjohn/">ChatJohn</a>
     <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
   </nav>
 </div></header>
-<div class="wrap">
-<div class="hero">
-<div class="crumb"><a href="/wechat/">约翰专栏</a> / 词汇之路</div>
-<div class="eyebrow">栏三</div>
-<h1>词汇之路</h1>
-<p class="lede">一个词怎样长出来，又怎样在需要的那一刻被取出来。词根词缀、形态、搭配、词卡、听力词汇转阅读词汇。</p>
-<div class="filter"><label>筛选</label><input id="q" type="search" placeholder="输入任意词，例如：语感、复述、词根、RAZ" autocomplete="off" aria-label="筛选篇目"><span class="n" id="n"></span></div>
-<p class="empty" id="empty" style="display:none">没有匹配的篇目。换一个词试试。</p>
+<div class="wrap"><div class="hero tight">
+  <div class="crumb"><a href="/wechat/">约翰专栏</a> · 频道 叁</div>
+  <h1>词汇之路</h1>
+  <p class="lede">一个词怎样长出来，又怎样在需要的那一刻被取出来。词根词缀、形态、搭配、词卡、听力词汇转阅读词汇。</p>
+
+  <div class="rhythm">
+    <div class="cap">本　栏　节　律<span>亮色＝本栏 · 暗色＝同月其他栏</span></div>
+    <div class="bars"><span class="b" title="2021-09 · 1 篇"><i style="height:32%;animation-delay:0ms"></i><u style="height:13%;animation-delay:0ms"></u></span><span class="b" title="2021-10 · 0 篇"><i style="height:25%;animation-delay:11ms"></i><u style="height:0%;animation-delay:11ms"></u></span><span class="b" title="2021-11 · 0 篇"><i style="height:25%;animation-delay:22ms"></i><u style="height:0%;animation-delay:22ms"></u></span><span class="b" title="2021-12 · 0 篇"><i style="height:22%;animation-delay:33ms"></i><u style="height:0%;animation-delay:33ms"></u></span><span class="b" title="2022-01 · 0 篇"><i style="height:13%;animation-delay:44ms"></i><u style="height:0%;animation-delay:44ms"></u></span><span class="b" title="2022-02 · 0 篇"><u style="height:0%;animation-delay:55ms"></u></span><span class="b" title="2022-03 · 0 篇"><i style="height:13%;animation-delay:66ms"></i><u style="height:0%;animation-delay:66ms"></u></span><span class="b" title="2022-04 · 0 篇"><u style="height:0%;animation-delay:77ms"></u></span><span class="b" title="2022-05 · 0 篇"><i style="height:13%;animation-delay:88ms"></i><u style="height:0%;animation-delay:88ms"></u></span><span class="b" title="2022-06 · 0 篇"><i style="height:13%;animation-delay:99ms"></i><u style="height:0%;animation-delay:99ms"></u></span><span class="b" title="2022-07 · 0 篇"><i style="height:13%;animation-delay:110ms"></i><u style="height:0%;animation-delay:110ms"></u></span><span class="b" title="2022-08 · 0 篇"><i style="height:22%;animation-delay:121ms"></i><u style="height:0%;animation-delay:121ms"></u></span><span class="b" title="2022-09 · 0 篇"><i style="height:18%;animation-delay:132ms"></i><u style="height:0%;animation-delay:132ms"></u></span><span class="b" title="2022-10 · 0 篇"><i style="height:18%;animation-delay:143ms"></i><u style="height:0%;animation-delay:143ms"></u></span><span class="b" title="2022-11 · 0 篇"><u style="height:0%;animation-delay:154ms"></u></span><span class="b" title="2022-12 · 0 篇"><i style="height:18%;animation-delay:165ms"></i><u style="height:0%;animation-delay:165ms"></u></span><span class="b" title="2023-01 · 0 篇"><u style="height:0%;animation-delay:176ms"></u></span><span class="b" title="2023-02 · 0 篇"><i style="height:25%;animation-delay:187ms"></i><u style="height:0%;animation-delay:187ms"></u></span><span class="b" title="2023-03 · 0 篇"><i style="height:18%;animation-delay:198ms"></i><u style="height:0%;animation-delay:198ms"></u></span><span class="b" title="2023-04 · 0 篇"><i style="height:22%;animation-delay:209ms"></i><u style="height:0%;animation-delay:209ms"></u></span><span class="b" title="2023-05 · 0 篇"><i style="height:13%;animation-delay:220ms"></i><u style="height:0%;animation-delay:220ms"></u></span><span class="b" title="2023-06 · 0 篇"><i style="height:22%;animation-delay:231ms"></i><u style="height:0%;animation-delay:231ms"></u></span><span class="b" title="2023-07 · 0 篇"><i style="height:31%;animation-delay:242ms"></i><u style="height:0%;animation-delay:242ms"></u></span><span class="b" title="2023-08 · 0 篇"><i style="height:31%;animation-delay:253ms"></i><u style="height:0%;animation-delay:253ms"></u></span><span class="b" title="2023-09 · 0 篇"><i style="height:18%;animation-delay:264ms"></i><u style="height:0%;animation-delay:264ms"></u></span><span class="b" title="2023-10 · 0 篇"><i style="height:22%;animation-delay:275ms"></i><u style="height:0%;animation-delay:275ms"></u></span><span class="b" title="2023-11 · 0 篇"><i style="height:18%;animation-delay:286ms"></i><u style="height:0%;animation-delay:286ms"></u></span><span class="b" title="2023-12 · 0 篇"><i style="height:25%;animation-delay:297ms"></i><u style="height:0%;animation-delay:297ms"></u></span><span class="b" title="2024-01 · 0 篇"><u style="height:0%;animation-delay:308ms"></u></span><span class="b" title="2024-02 · 0 篇"><i style="height:13%;animation-delay:319ms"></i><u style="height:0%;animation-delay:319ms"></u></span><span class="b" title="2024-03 · 0 篇"><i style="height:13%;animation-delay:330ms"></i><u style="height:0%;animation-delay:330ms"></u></span><span class="b" title="2024-04 · 0 篇"><i style="height:33%;animation-delay:341ms"></i><u style="height:0%;animation-delay:341ms"></u></span><span class="b" title="2024-05 · 0 篇"><i style="height:36%;animation-delay:352ms"></i><u style="height:0%;animation-delay:352ms"></u></span><span class="b" title="2024-06 · 3 篇"><i style="height:33%;animation-delay:363ms"></i><u style="height:22%;animation-delay:363ms"></u></span><span class="b" title="2024-07 · 0 篇"><i style="height:18%;animation-delay:374ms"></i><u style="height:0%;animation-delay:374ms"></u></span><span class="b" title="2024-08 · 0 篇"><i style="height:25%;animation-delay:385ms"></i><u style="height:0%;animation-delay:385ms"></u></span><span class="b" title="2024-09 · 0 篇"><i style="height:25%;animation-delay:396ms"></i><u style="height:0%;animation-delay:396ms"></u></span><span class="b" title="2024-10 · 0 篇"><i style="height:18%;animation-delay:407ms"></i><u style="height:0%;animation-delay:407ms"></u></span><span class="b" title="2024-11 · 0 篇"><i style="height:31%;animation-delay:418ms"></i><u style="height:0%;animation-delay:418ms"></u></span><span class="b" title="2024-12 · 0 篇"><i style="height:53%;animation-delay:429ms"></i><u style="height:0%;animation-delay:429ms"></u></span><span class="b" title="2025-01 · 0 篇"><i style="height:18%;animation-delay:440ms"></i><u style="height:0%;animation-delay:440ms"></u></span><span class="b" title="2025-02 · 0 篇"><i style="height:53%;animation-delay:451ms"></i><u style="height:0%;animation-delay:451ms"></u></span><span class="b" title="2025-03 · 0 篇"><i style="height:47%;animation-delay:462ms"></i><u style="height:0%;animation-delay:462ms"></u></span><span class="b" title="2025-04 · 0 篇"><u style="height:0%;animation-delay:473ms"></u></span><span class="b" title="2025-05 · 0 篇"><i style="height:22%;animation-delay:484ms"></i><u style="height:0%;animation-delay:484ms"></u></span><span class="b" title="2025-06 · 2 篇"><i style="height:10%;animation-delay:495ms"></i><u style="height:18%;animation-delay:495ms"></u></span><span class="b" title="2025-07 · 1 篇"><i style="height:5%;animation-delay:506ms"></i><u style="height:13%;animation-delay:506ms"></u></span><span class="b" title="2025-08 · 0 篇"><i style="height:13%;animation-delay:517ms"></i><u style="height:0%;animation-delay:517ms"></u></span><span class="b" title="2025-09 · 0 篇"><i style="height:18%;animation-delay:528ms"></i><u style="height:0%;animation-delay:528ms"></u></span><span class="b" title="2025-10 · 0 篇"><i style="height:42%;animation-delay:539ms"></i><u style="height:0%;animation-delay:539ms"></u></span><span class="b" title="2025-11 · 0 篇"><i style="height:18%;animation-delay:550ms"></i><u style="height:0%;animation-delay:550ms"></u></span><span class="b" title="2025-12 · 0 篇"><i style="height:25%;animation-delay:561ms"></i><u style="height:0%;animation-delay:561ms"></u></span><span class="b" title="2026-01 · 0 篇"><i style="height:18%;animation-delay:572ms"></i><u style="height:0%;animation-delay:572ms"></u></span><span class="b" title="2026-02 · 0 篇"><i style="height:28%;animation-delay:583ms"></i><u style="height:0%;animation-delay:583ms"></u></span><span class="b" title="2026-03 · 0 篇"><i style="height:18%;animation-delay:594ms"></i><u style="height:0%;animation-delay:594ms"></u></span><span class="b" title="2026-04 · 0 篇"><i style="height:36%;animation-delay:605ms"></i><u style="height:0%;animation-delay:605ms"></u></span><span class="b" title="2026-05 · 0 篇"><i style="height:58%;animation-delay:616ms"></i><u style="height:0%;animation-delay:616ms"></u></span><span class="b" title="2026-06 · 8 篇"><i style="height:64%;animation-delay:627ms"></i><u style="height:36%;animation-delay:627ms"></u></span><span class="b" title="2026-07 · 5 篇"><i style="height:39%;animation-delay:638ms"></i><u style="height:28%;animation-delay:638ms"></u></span><span class="b" title="2026-08 · 2 篇"><i style="height:47%;animation-delay:649ms"></i><u style="height:18%;animation-delay:649ms"></u></span></div>
+    <div class="axis"><span style="flex:4 1 0"><b>2021</b><em>1 篇</em></span><span style="flex:12 1 0"><b>2022</b><em>0 篇</em></span><span style="flex:12 1 0"><b>2023</b><em>0 篇</em></span><span style="flex:12 1 0"><b>2024</b><em>3 篇</em></span><span style="flex:12 1 0"><b>2025</b><em>3 篇</em></span><span style="flex:8 1 0"><b>2026</b><em>15 篇</em></span></div>
+    <p class="rnote">写得最多的一年是 <b>2026</b>（15 篇）。本栏最早一篇 2021-09-22，最新一篇 2026-08-21。</p>
+  </div>
+
+  <div class="band">
+    <div><b>23</b><span>篇</span></div>
+    <div><b>315</b><span>页</span></div>
+    <div><b>2026</b><span>写得最多的一年</span></div>
+    <div><b>6%</b><span>占全站篇数</span></div>
+  </div>
+</div></div>
 </div>
 
-<section data-col="vocabulary">
-  <div class="col-h"><span class="no">栏&nbsp;三</span><h2>词汇之路</h2><span class="ct">23 篇 · 315 页</span></div>
-<div class="item" data-k="单词都会，为什么一组合就不像英语？孩子真正缺的可能是“搭配能力” 从“每个词都对”到“这些词本来就会这样一起出现”孩子会make，也会decision； 2026-08-21"><div class="it-hd"><span class="r-n">1</span><a class="it-t" href="/wechat/pdf/003.pdf">单词都会，为什么一组合就不像英语？孩子真正缺的可能是“搭配能力”</a><span class="it-m">2026-08-21 · 3 页</span></div><p class="it-d">从“每个词都对”到“这些词本来就会这样一起出现”孩子会make，也会decision；</p><div class="it-l"><a href="/wechat/pdf/003.pdf">读原文 PDF</a><span>存档号 003</span></div></div>
-<div class="item" data-k="背过的单词一听还是反应不过来：问题可能不在词汇量，而在“词义提取速度” 从“知道这个词”到“来得及用上这个词”家长语言学习科普系列听力不是一场没有时间限制的单词考试。 2026-08-18"><div class="it-hd"><span class="r-n">2</span><a class="it-t" href="/wechat/pdf/019.pdf">背过的单词一听还是反应不过来：问题可能不在词汇量，而在“词义提取速度”</a><span class="it-m">2026-08-18 · 2 页</span></div><p class="it-d">从“知道这个词”到“来得及用上这个词”家长语言学习科普系列听力不是一场没有时间限制的单词考试。</p><div class="it-l"><a href="/wechat/pdf/019.pdf">读原文 PDF</a><a href="/wechat/pdf/018.pdf">同题另稿 018</a><span>存档号 019</span></div></div>
-<div class="item" data-k="英语词形不是语法规则，而是意义在时间里的变化 孩子学英语，最容易被一个东西绊住。不是单词本身。而是单词一进入时间，就开始变样子。 2026-07-08"><div class="it-hd"><span class="r-n">3</span><a class="it-t" href="/wechat/pdf/069.pdf">英语词形不是语法规则，而是意义在时间里的变化</a><span class="it-m">2026-07-08 · 28 页</span></div><p class="it-d">孩子学英语，最容易被一个东西绊住。不是单词本身。而是单词一进入时间，就开始变样子。</p><div class="it-l"><a href="/wechat/pdf/069.pdf">读原文 PDF</a><span>存档号 069</span></div></div>
-<div class="item" data-k="为什么动词一进入真实生活，就不可能永远保持原形？ 孩子刚开始学英语动词时，最容易接受的是原形。play。go。eat。 2026-07-08"><div class="it-hd"><span class="r-n">4</span><a class="it-t" href="/wechat/pdf/070.pdf">为什么动词一进入真实生活，就不可能永远保持原形？</a><span class="it-m">2026-07-08 · 31 页</span></div><p class="it-d">孩子刚开始学英语动词时，最容易接受的是原形。play。go。eat。</p><div class="it-l"><a href="/wechat/pdf/070.pdf">读原文 PDF</a><span>存档号 070</span></div></div>
-<div class="item" data-k="一个词为什么会长出不同样子？词形变化背后的语言发生秘密 孩子学英语时，常常会遇到一个很奇怪的现象。明明已经背过一个词。可是这个词一换样子，他就不认识了。 2026-07-07"><div class="it-hd"><span class="r-n">5</span><a class="it-t" href="/wechat/pdf/072.pdf">一个词为什么会长出不同样子？词形变化背后的语言发生秘密</a><span class="it-m">2026-07-07 · 24 页</span></div><p class="it-d">孩子学英语时，常常会遇到一个很奇怪的现象。明明已经背过一个词。可是这个词一换样子，他就不认识了。</p><div class="it-l"><a href="/wechat/pdf/072.pdf">读原文 PDF</a><a href="/wechat/pdf/068.pdf">同题另稿 068</a><span>存档号 072</span></div></div>
-<div class="item" data-k="孩子背了一万个单词，为什么还是不会_说话_？ 有个爸爸跟我说，他儿子用APP打卡背单词，三年级词汇量已经过了四千，词汇测试正确率能到95%。 2026-07-03"><div class="it-hd"><span class="r-n">6</span><a class="it-t" href="/wechat/pdf/078.pdf">孩子背了一万个单词，为什么还是不会_说话_？</a><span class="it-m">2026-07-03 · 3 页</span></div><p class="it-d">有个爸爸跟我说，他儿子用APP打卡背单词，三年级词汇量已经过了四千，词汇测试正确率能到95%。</p><div class="it-l"><a href="/wechat/pdf/078.pdf">读原文 PDF</a><span>存档号 078</span></div></div>
-<div class="item" data-k="孩子学英语，最该培养的不是词汇量，而是“词汇生成力” 很多家长一谈到孩子英语学习，最关心的问题就是：孩子词汇量多少？小学阶段要多少词？ 2026-07-02"><div class="it-hd"><span class="r-n">7</span><a class="it-t" href="/wechat/pdf/079.pdf">孩子学英语，最该培养的不是词汇量，而是“词汇生成力”</a><span class="it-m">2026-07-02 · 22 页</span></div><p class="it-d">很多家长一谈到孩子英语学习，最关心的问题就是：孩子词汇量多少？小学阶段要多少词？</p><div class="it-l"><a href="/wechat/pdf/079.pdf">读原文 PDF</a><span>存档号 079</span></div></div>
-<div class="item" data-k="为什么你记不住 hand？因为你一直在背词义，而不是看它怎么“活过来的” 美国很多人学英语，会这样记：hand=手hand=帮助hand=人手hand=递交hand=控制hand=一手牌hand=方面hand=书写然后 2026-06-30"><div class="it-hd"><span class="r-n">8</span><a class="it-t" href="/wechat/pdf/084.pdf">为什么你记不住 hand？因为你一直在背词义，而不是看它怎么“活过来的”</a><span class="it-m">2026-06-30 · 6 页</span></div><p class="it-d">美国很多人学英语，会这样记：hand=手hand=帮助hand=人手hand=递交hand=控制hand=一手牌hand=方面hand=书写然后</p><div class="it-l"><a href="/wechat/pdf/084.pdf">读原文 PDF</a><span>存档号 084</span></div></div>
-<div class="item" data-k="孩子不是不会查词典，而是一直把词典当成“中文答案库” 很多孩子学英语，遇到生词时，第一反应很自然：查词典。这本来是一件好事。 2026-06-29"><div class="it-hd"><span class="r-n">9</span><a class="it-t" href="/wechat/pdf/085.pdf">孩子不是不会查词典，而是一直把词典当成“中文答案库”</a><span class="it-m">2026-06-29 · 22 页</span></div><p class="it-d">很多孩子学英语，遇到生词时，第一反应很自然：查词典。这本来是一件好事。</p><div class="it-l"><a href="/wechat/pdf/085.pdf">读原文 PDF</a><span>存档号 085</span></div></div>
-<div class="item" data-k="不懂形态学，孩子背一万个单词也可能只是散装记忆 美国很多孩子背英语单词，背得很辛苦。每天打卡。每天默写。每天听写。 2026-06-27"><div class="it-hd"><span class="r-n">10</span><a class="it-t" href="/wechat/pdf/091.pdf">不懂形态学，孩子背一万个单词也可能只是散装记忆</a><span class="it-m">2026-06-27 · 24 页</span></div><p class="it-d">美国很多孩子背英语单词，背得很辛苦。每天打卡。每天默写。每天听写。</p><div class="it-l"><a href="/wechat/pdf/091.pdf">读原文 PDF</a><span>存档号 091</span></div></div>
-<div class="item" data-k="英语词汇的真相：单词不是一个个背出来的，而是一族一族长出来的 美国每天背单词今天背20个。明天忘10个。后天重新背。一本单词书，从A背到Z。 2026-06-26"><div class="it-hd"><span class="r-n">11</span><a class="it-t" href="/wechat/pdf/092.pdf">英语词汇的真相：单词不是一个个背出来的，而是一族一族长出来的</a><span class="it-m">2026-06-26 · 23 页</span></div><p class="it-d">美国每天背单词今天背20个。明天忘10个。后天重新背。一本单词书，从A背到Z。</p><div class="it-l"><a href="/wechat/pdf/092.pdf">读原文 PDF</a><span>存档号 092</span></div></div>
-<div class="item" data-k="英语高级词汇的秘密：拉丁词根和希腊词根，撑起了半个学术英语世界 很多孩子不是从apple、banana、dog、cat开始害怕英语的。 2026-06-25"><div class="it-hd"><span class="r-n">12</span><a class="it-t" href="/wechat/pdf/093.pdf">英语高级词汇的秘密：拉丁词根和希腊词根，撑起了半个学术英语世界</a><span class="it-m">2026-06-25 · 28 页</span></div><p class="it-d">很多孩子不是从apple、banana、dog、cat开始害怕英语的。</p><div class="it-l"><a href="/wechat/pdf/093.pdf">读原文 PDF</a><span>存档号 093</span></div></div>
-<div class="item" data-k="词根词缀不是记忆技巧，而是英语词汇生长的底层路径 很多孩子学英语，一提到词根词缀，第一反应就是：这是背单词技巧。比如：un-表示“不”。 2026-06-25"><div class="it-hd"><span class="r-n">13</span><a class="it-t" href="/wechat/pdf/094.pdf">词根词缀不是记忆技巧，而是英语词汇生长的底层路径</a><span class="it-m">2026-06-25 · 31 页</span></div><p class="it-d">很多孩子学英语，一提到词根词缀，第一反应就是：这是背单词技巧。比如：un-表示“不”。</p><div class="it-l"><a href="/wechat/pdf/094.pdf">读原文 PDF</a><span>存档号 094</span></div></div>
-<div class="item" data-k="为什么你刷了一千天 Anki，却读不懂一本小说 你大概见过这种人——也可能，你自己就是。Anki连续打卡一千天，词库里躺着八千个单词，每天准时弹出复习卡片，正确率稳定在百分之九十以上。 2026-06-18"><div class="it-hd"><span class="r-n">14</span><a class="it-t" href="/wechat/pdf/110.pdf">为什么你刷了一千天 Anki，却读不懂一本小说</a><span class="it-m">2026-06-18 · 4 页</span></div><p class="it-d">你大概见过这种人——也可能，你自己就是。Anki连续打卡一千天，词库里躺着八千个单词，每天准时弹出复习卡片，正确率稳定在百分之九十以上。</p><div class="it-l"><a href="/wechat/pdf/110.pdf">读原文 PDF</a><span>存档号 110</span></div></div>
-<div class="item" data-k="孩子单词背了几百个，为什么还是听不懂英语动画？ 很多家长有过这样的经历。孩子学英语已经学了两三年，课本单词背得不错，听写很少出错，期末考试成绩也过得去。 2026-06-01"><div class="it-hd"><span class="r-n">15</span><a class="it-t" href="/wechat/pdf/144.pdf">孩子单词背了几百个，为什么还是听不懂英语动画？</a><span class="it-m">2026-06-01 · 6 页</span></div><p class="it-d">很多家长有过这样的经历。孩子学英语已经学了两三年，课本单词背得不错，听写很少出错，期末考试成绩也过得去。</p><div class="it-l"><a href="/wechat/pdf/144.pdf">读原文 PDF</a><span>存档号 144</span></div></div>
-<div class="item" data-k="为何我们的词汇学习如此低效？从Paul Bloom的著作谈起 词义，不只是声音和指——读PaulBloom《HowChildrenLearntheMeaningsofWords》有感作者：|教学研究者、五宝 2025-07-12"><div class="it-hd"><span class="r-n">16</span><a class="it-t" href="/wechat/pdf/220.pdf">为何我们的词汇学习如此低效？从Paul Bloom的著作谈起</a><span class="it-m">2025-07-12 · 7 页</span></div><p class="it-d">词义，不只是声音和指——读PaulBloom《HowChildrenLearntheMeaningsofWords》有感作者：|教学研究者、五宝</p><div class="it-l"><a href="/wechat/pdf/220.pdf">读原文 PDF</a><span>存档号 220</span></div></div>
-<div class="item" data-k="孩子英语单词学习的难题终于被解决了 单词学习，一直是幼少儿英语学习领域的难题。为了帮助孩子记忆单词，我所听过的方法包括但不限于以下几种：有的妈妈为了帮助自己孩子精准提升单词，首先会 2025-06-08"><div class="it-hd"><span class="r-n">17</span><a class="it-t" href="/wechat/pdf/222.pdf">孩子英语单词学习的难题终于被解决了</a><span class="it-m">2025-06-08 · 13 页</span></div><p class="it-d">单词学习，一直是幼少儿英语学习领域的难题。为了帮助孩子记忆单词，我所听过的方法包括但不限于以下几种：有的妈妈为了帮助自己孩子精准提升单词，首先会</p><div class="it-l"><a href="/wechat/pdf/222.pdf">读原文 PDF</a><span>存档号 222</span></div></div>
-<div class="item" data-k="别再自己做词卡了，你家孩子该拥有一套专业系统了 转载 单词学习，一直是幼少儿英语学习领域的老大难。不夸张地说，80%的家长英语焦虑，最后都卡在了“背单词”这一步。 2025-06-02"><div class="it-hd"><span class="r-n">18</span><a class="it-t" href="/wechat/pdf/225.pdf">别再自己做词卡了，你家孩子该拥有一套专业系统了 转载</a><span class="it-m">2025-06-02 · 15 页</span></div><p class="it-d">单词学习，一直是幼少儿英语学习领域的老大难。不夸张地说，80%的家长英语焦虑，最后都卡在了“背单词”这一步。</p><div class="it-l"><a href="/wechat/pdf/225.pdf">读原文 PDF</a><a href="/wechat/pdf/212.pdf">同题另稿 212</a><span>存档号 225</span></div></div>
-<div class="item" data-k="孩子英语启蒙的真相：为什么你熏了上千小时，词汇量还是不上去？ 该内容已被发布者删除微信公众平台运营中心 "><div class="it-hd"><span class="r-n">19</span><a class="it-t" href="/wechat/pdf/296.pdf">孩子英语启蒙的真相：为什么你熏了上千小时，词汇量还是不上去？</a><span class="it-m">1 页</span></div><p class="it-d">该内容已被发布者删除微信公众平台运营中心</p><div class="it-l"><a href="/wechat/pdf/296.pdf">读原文 PDF</a><span>存档号 296</span></div></div>
-<div class="item" data-k="英语单词学习的效率一直很低？核心原因终于被我找到了! !大家好！我是。今天我们聊聊英语学习中的一个老大难问题——单词记忆和使用。 2024-06-21"><div class="it-hd"><span class="r-n">20</span><a class="it-t" href="/wechat/pdf/306.pdf">英语单词学习的效率一直很低？核心原因终于被我找到了!</a><span class="it-m">2024-06-21 · 9 页</span></div><p class="it-d">!大家好！我是。今天我们聊聊英语学习中的一个老大难问题——单词记忆和使用。</p><div class="it-l"><a href="/wechat/pdf/306.pdf">读原文 PDF</a><span>存档号 306</span></div></div>
-<div class="item" data-k="如何高效提升英语词汇的创造性运用能力 语言学习效率的提升，其实是一个范式转移或者方向的改变。说到英语学习，无非就是听力、口语、词汇，还有阅读、写作、翻译，我们中国人的语言学习，我发现 2024-06-17"><div class="it-hd"><span class="r-n">21</span><a class="it-t" href="/wechat/pdf/309.pdf">如何高效提升英语词汇的创造性运用能力</a><span class="it-m">2024-06-17 · 9 页</span></div><p class="it-d">语言学习效率的提升，其实是一个范式转移或者方向的改变。说到英语学习，无非就是听力、口语、词汇，还有阅读、写作、翻译，我们中国人的语言学习，我发现</p><div class="it-l"><a href="/wechat/pdf/309.pdf">读原文 PDF</a><span>存档号 309</span></div></div>
-<div class="item" data-k="英语高效词汇学习的秘诀（公益直播课） 词汇，作为英语学习过程中，怎么都绕不过去的一道坎。多少英雄，在学习英语过程中，因为词汇量不够，被卡住，折戟。 2024-06-16"><div class="it-hd"><span class="r-n">22</span><a class="it-t" href="/wechat/pdf/310.pdf">英语高效词汇学习的秘诀（公益直播课）</a><span class="it-m">2024-06-16 · 3 页</span></div><p class="it-d">词汇，作为英语学习过程中，怎么都绕不过去的一道坎。多少英雄，在学习英语过程中，因为词汇量不够，被卡住，折戟。</p><div class="it-l"><a href="/wechat/pdf/310.pdf">读原文 PDF</a><a href="/wechat/pdf/312.pdf">同题另稿 312</a><span>存档号 310</span></div></div>
-<div class="item" data-k="将听力词汇量转化为阅读词汇量，这个方法最高效 经过一段时间的启蒙，孩子的听力词汇量已经有了一定的积累。很多家长都很困惑，如何将听力词汇量呢？ 2021-09-22"><div class="it-hd"><span class="r-n">23</span><a class="it-t" href="/wechat/pdf/407.pdf">将听力词汇量转化为阅读词汇量，这个方法最高效</a><span class="it-m">2021-09-22 · 1 页</span></div><p class="it-d">经过一段时间的启蒙，孩子的听力词汇量已经有了一定的积累。很多家长都很困惑，如何将听力词汇量呢？</p><div class="it-l"><a href="/wechat/pdf/407.pdf">读原文 PDF</a><span>存档号 407</span></div></div>
+<div class="chips"><div class="wrap"><a href="/wechat/">全部频道</a><a href="/wechat/genesis/">语言发生学<b>49</b></a><a href="/wechat/enlighten/">英语启蒙<b>78</b></a><a href="/wechat/vocabulary/" aria-current="page">词汇之路<b>23</b></a><a href="/wechat/materials/">素材与分级<b>57</b></a><a href="/wechat/ai/">AI 与语言教育<b>42</b></a><a href="/wechat/school/">课堂与制度<b>41</b></a><a href="/wechat/lineage/">思想谱系<b>27</b></a><a href="/wechat/notes/">奶爸手记<b>45</b></a><a href="/wechat/camp/">营地与公告<b>25</b></a><a href="/wechat/all/">全部篇目<b>387</b></a></div></div>
+<div class="light"><div class="wrap">
+<div class="tools">
+  <div class="filter"><label>本栏筛选</label><input id="q" type="search" placeholder="输入任意词，例如：词根、词卡、词汇量" autocomplete="off" aria-label="在本栏内筛选"><span class="n" id="n"></span></div>
+  <p class="empty" id="empty" style="display:none">本栏没有匹配的篇目。换一个词，或去<a href="/wechat/all/">全部篇目</a>里找。</p>
+</div>
+<section class="list">
+<div data-group="2026"><div class="yr"><b>2026</b><i></i><span>15 篇</span></div>
+<div class="item" data-k="单词都会，为什么一组合就不像英语？孩子真正缺的可能是“搭配能力” 从“每个词都对”到“这些词本来就会这样一起出现”：孩子会make，也会decision； 2026-08-21" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">003</span><a class="it-t" href="/wechat/pdf/003.pdf">单词都会，为什么一组合就不像英语？孩子真正缺的可能是“搭配能力”</a><span class="it-m">2026-08-21 · 3 页</span></div><p class="it-d">从“每个词都对”到“这些词本来就会这样一起出现”：孩子会make，也会decision；</p><div class="it-l"><a href="/wechat/pdf/003.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="背过的单词一听还是反应不过来：问题可能不在词汇量，而在“词义提取速度” 从“知道这个词”到“来得及用上这个词”：听力不是一场没有时间限制的单词考试。 2026-08-18" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">019</span><a class="it-t" href="/wechat/pdf/019.pdf">背过的单词一听还是反应不过来：问题可能不在词汇量，而在“词义提取速度”</a><span class="it-m">2026-08-18 · 2 页</span></div><p class="it-d">从“知道这个词”到“来得及用上这个词”：听力不是一场没有时间限制的单词考试。</p><div class="it-l"><a href="/wechat/pdf/019.pdf">读原文 PDF</a><a href="/wechat/pdf/018.pdf">同题另稿 018</a></div></div>
+<div class="item" data-k="英语词形不是语法规则，而是意义在时间里的变化 孩子学英语，最容易被一个东西绊住。不是单词本身。而是单词一进入时间，就开始变样子。 2026-07-08" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">069</span><a class="it-t" href="/wechat/pdf/069.pdf">英语词形不是语法规则，而是意义在时间里的变化</a><span class="it-m">2026-07-08 · 28 页</span></div><p class="it-d">孩子学英语，最容易被一个东西绊住。不是单词本身。而是单词一进入时间，就开始变样子。</p><div class="it-l"><a href="/wechat/pdf/069.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="为什么动词一进入真实生活，就不可能永远保持原形？ 孩子刚开始学英语动词时，最容易接受的是原形。play。go。eat。 2026-07-08" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">070</span><a class="it-t" href="/wechat/pdf/070.pdf">为什么动词一进入真实生活，就不可能永远保持原形？</a><span class="it-m">2026-07-08 · 31 页</span></div><p class="it-d">孩子刚开始学英语动词时，最容易接受的是原形。play。go。eat。</p><div class="it-l"><a href="/wechat/pdf/070.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="一个词为什么会长出不同样子？词形变化背后的语言发生秘密 孩子学英语时，常常会遇到一个很奇怪的现象。明明已经背过一个词。可是这个词一换样子，他就不认识了。 2026-07-07" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">072</span><a class="it-t" href="/wechat/pdf/072.pdf">一个词为什么会长出不同样子？词形变化背后的语言发生秘密</a><span class="it-m">2026-07-07 · 24 页</span></div><p class="it-d">孩子学英语时，常常会遇到一个很奇怪的现象。明明已经背过一个词。可是这个词一换样子，他就不认识了。</p><div class="it-l"><a href="/wechat/pdf/072.pdf">读原文 PDF</a><a href="/wechat/pdf/068.pdf">同题另稿 068</a></div></div>
+<div class="item" data-k="孩子背了一万个单词，为什么还是不会“说话”？ 有个爸爸跟我说，他儿子用APP打卡背单词，三年级词汇量已经过了四千，词汇测试正确率能到95%。 2026-07-03" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">078</span><a class="it-t" href="/wechat/pdf/078.pdf">孩子背了一万个单词，为什么还是不会“说话”？</a><span class="it-m">2026-07-03 · 3 页</span></div><p class="it-d">有个爸爸跟我说，他儿子用APP打卡背单词，三年级词汇量已经过了四千，词汇测试正确率能到95%。</p><div class="it-l"><a href="/wechat/pdf/078.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="孩子学英语，最该培养的不是词汇量，而是“词汇生成力” 很多家长一谈到孩子英语学习，最关心的问题就是：孩子词汇量多少？小学阶段要多少词？ 2026-07-02" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">079</span><a class="it-t" href="/wechat/pdf/079.pdf">孩子学英语，最该培养的不是词汇量，而是“词汇生成力”</a><span class="it-m">2026-07-02 · 22 页</span></div><p class="it-d">很多家长一谈到孩子英语学习，最关心的问题就是：孩子词汇量多少？小学阶段要多少词？</p><div class="it-l"><a href="/wechat/pdf/079.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="为什么你记不住 hand？因为你一直在背词义，而不是看它怎么“活过来的” 美国很多人学英语，会这样记：hand=手hand=帮助hand=人手hand=递交hand=控制hand=一手牌hand=方面hand=书写然后…… 2026-06-30" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">084</span><a class="it-t" href="/wechat/pdf/084.pdf">为什么你记不住 hand？因为你一直在背词义，而不是看它怎么“活过来的”</a><span class="it-m">2026-06-30 · 6 页</span></div><p class="it-d">美国很多人学英语，会这样记：hand=手hand=帮助hand=人手hand=递交hand=控制hand=一手牌hand=方面hand=书写然后……</p><div class="it-l"><a href="/wechat/pdf/084.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="孩子不是不会查词典，而是一直把词典当成“中文答案库” 很多孩子学英语，遇到生词时，第一反应很自然：查词典。这本来是一件好事。 2026-06-29" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">085</span><a class="it-t" href="/wechat/pdf/085.pdf">孩子不是不会查词典，而是一直把词典当成“中文答案库”</a><span class="it-m">2026-06-29 · 22 页</span></div><p class="it-d">很多孩子学英语，遇到生词时，第一反应很自然：查词典。这本来是一件好事。</p><div class="it-l"><a href="/wechat/pdf/085.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="不懂形态学，孩子背一万个单词也可能只是散装记忆 美国很多孩子背英语单词，背得很辛苦。每天打卡。每天默写。每天听写。 2026-06-27" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">091</span><a class="it-t" href="/wechat/pdf/091.pdf">不懂形态学，孩子背一万个单词也可能只是散装记忆</a><span class="it-m">2026-06-27 · 24 页</span></div><p class="it-d">美国很多孩子背英语单词，背得很辛苦。每天打卡。每天默写。每天听写。</p><div class="it-l"><a href="/wechat/pdf/091.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语词汇的真相：单词不是一个个背出来的，而是一族一族长出来的 美国每天背单词今天背20个。明天忘10个。后天重新背。一本单词书，从A背到Z。 2026-06-26" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">092</span><a class="it-t" href="/wechat/pdf/092.pdf">英语词汇的真相：单词不是一个个背出来的，而是一族一族长出来的</a><span class="it-m">2026-06-26 · 23 页</span></div><p class="it-d">美国每天背单词今天背20个。明天忘10个。后天重新背。一本单词书，从A背到Z。</p><div class="it-l"><a href="/wechat/pdf/092.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语高级词汇的秘密：拉丁词根和希腊词根，撑起了半个学术英语世界 很多孩子不是从apple、banana、dog、cat开始害怕英语的。 2026-06-25" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">093</span><a class="it-t" href="/wechat/pdf/093.pdf">英语高级词汇的秘密：拉丁词根和希腊词根，撑起了半个学术英语世界</a><span class="it-m">2026-06-25 · 28 页</span></div><p class="it-d">很多孩子不是从apple、banana、dog、cat开始害怕英语的。</p><div class="it-l"><a href="/wechat/pdf/093.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="词根词缀不是记忆技巧，而是英语词汇生长的底层路径 很多孩子学英语，一提到词根词缀，第一反应就是：这是背单词技巧。比如：un-表示“不”。 2026-06-25" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">094</span><a class="it-t" href="/wechat/pdf/094.pdf">词根词缀不是记忆技巧，而是英语词汇生长的底层路径</a><span class="it-m">2026-06-25 · 31 页</span></div><p class="it-d">很多孩子学英语，一提到词根词缀，第一反应就是：这是背单词技巧。比如：un-表示“不”。</p><div class="it-l"><a href="/wechat/pdf/094.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="为什么你刷了一千天 Anki，却读不懂一本小说 你大概见过这种人——也可能，你自己就是。Anki连续打卡一千天，词库里躺着八千个单词，每天准时弹出复习卡片，正确率稳定在百分之九十以上。 2026-06-18" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">110</span><a class="it-t" href="/wechat/pdf/110.pdf">为什么你刷了一千天 Anki，却读不懂一本小说</a><span class="it-m">2026-06-18 · 4 页</span></div><p class="it-d">你大概见过这种人——也可能，你自己就是。Anki连续打卡一千天，词库里躺着八千个单词，每天准时弹出复习卡片，正确率稳定在百分之九十以上。</p><div class="it-l"><a href="/wechat/pdf/110.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="孩子单词背了几百个，为什么还是听不懂英语动画？ 很多家长有过这样的经历。孩子学英语已经学了两三年，课本单词背得不错，听写很少出错，期末考试成绩也过得去。 2026-06-01" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">144</span><a class="it-t" href="/wechat/pdf/144.pdf">孩子单词背了几百个，为什么还是听不懂英语动画？</a><span class="it-m">2026-06-01 · 6 页</span></div><p class="it-d">很多家长有过这样的经历。孩子学英语已经学了两三年，课本单词背得不错，听写很少出错，期末考试成绩也过得去。</p><div class="it-l"><a href="/wechat/pdf/144.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2025"><div class="yr"><b>2025</b><i></i><span>3 篇</span></div>
+<div class="item" data-k="为何我们的词汇学习如此低效？从Paul Bloom的著作谈起 词义，不只是声音和指——读PaulBloom《HowChildrenLearntheMeaningsofWords》有感作者：|教学研究者、五宝…… 2025-07-12" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">220</span><a class="it-t" href="/wechat/pdf/220.pdf">为何我们的词汇学习如此低效？从Paul Bloom的著作谈起</a><span class="it-m">2025-07-12 · 7 页</span></div><p class="it-d">词义，不只是声音和指——读PaulBloom《HowChildrenLearntheMeaningsofWords》有感作者：|教学研究者、五宝……</p><div class="it-l"><a href="/wechat/pdf/220.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="孩子英语单词学习的难题终于被解决了 单词学习，一直是幼少儿英语学习领域的难题。为了帮助孩子记忆单词，我所听过的方法包括但不限于以下几种：有的妈妈为了帮助自己孩子精准提升单词，首先会…… 2025-06-08" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">222</span><a class="it-t" href="/wechat/pdf/222.pdf">孩子英语单词学习的难题终于被解决了</a><span class="it-m">2025-06-08 · 13 页</span></div><p class="it-d">单词学习，一直是幼少儿英语学习领域的难题。为了帮助孩子记忆单词，我所听过的方法包括但不限于以下几种：有的妈妈为了帮助自己孩子精准提升单词，首先会……</p><div class="it-l"><a href="/wechat/pdf/222.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="别再自己做词卡了，你家孩子该拥有一套专业系统了 单词学习，一直是幼少儿英语学习领域的老大难。不夸张地说，80%的家长英语焦虑，最后都卡在了“背单词”这一步。 2025-06-02" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">225</span><a class="it-t" href="/wechat/pdf/225.pdf">别再自己做词卡了，你家孩子该拥有一套专业系统了</a><span class="it-m">2025-06-02 · 15 页</span></div><p class="it-d">单词学习，一直是幼少儿英语学习领域的老大难。不夸张地说，80%的家长英语焦虑，最后都卡在了“背单词”这一步。</p><div class="it-l"><a href="/wechat/pdf/225.pdf">读原文 PDF</a><a href="/wechat/pdf/212.pdf">同题另稿 212</a></div></div>
+</div>
+<div data-group="2024"><div class="yr"><b>2024</b><i></i><span>3 篇</span></div>
+<div class="item" data-k="英语单词学习的效率一直很低？核心原因终于被我找到了! !大家好！我是。今天我们聊聊英语学习中的一个老大难问题——单词记忆和使用。 2024-06-21" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">306</span><a class="it-t" href="/wechat/pdf/306.pdf">英语单词学习的效率一直很低？核心原因终于被我找到了!</a><span class="it-m">2024-06-21 · 9 页</span></div><p class="it-d">!大家好！我是。今天我们聊聊英语学习中的一个老大难问题——单词记忆和使用。</p><div class="it-l"><a href="/wechat/pdf/306.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="如何高效提升英语词汇的创造性运用能力 语言学习效率的提升，其实是一个范式转移或者方向的改变。说到英语学习，无非就是听力、口语、词汇，还有阅读、写作、翻译，我们中国人的语言学习，我发现…… 2024-06-17" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">309</span><a class="it-t" href="/wechat/pdf/309.pdf">如何高效提升英语词汇的创造性运用能力</a><span class="it-m">2024-06-17 · 9 页</span></div><p class="it-d">语言学习效率的提升，其实是一个范式转移或者方向的改变。说到英语学习，无非就是听力、口语、词汇，还有阅读、写作、翻译，我们中国人的语言学习，我发现……</p><div class="it-l"><a href="/wechat/pdf/309.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语高效词汇学习的秘诀（公益直播课） 词汇，作为英语学习过程中，怎么都绕不过去的一道坎。多少英雄，在学习英语过程中，因为词汇量不够，被卡住，折戟。 2024-06-16" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">310</span><a class="it-t" href="/wechat/pdf/310.pdf">英语高效词汇学习的秘诀（公益直播课）</a><span class="it-m">2024-06-16 · 3 页</span></div><p class="it-d">词汇，作为英语学习过程中，怎么都绕不过去的一道坎。多少英雄，在学习英语过程中，因为词汇量不够，被卡住，折戟。</p><div class="it-l"><a href="/wechat/pdf/310.pdf">读原文 PDF</a><a href="/wechat/pdf/312.pdf">同题另稿 312</a></div></div>
+</div>
+<div data-group="2021"><div class="yr"><b>2021</b><i></i><span>1 篇</span></div>
+<div class="item" data-k="将听力词汇量转化为阅读词汇量，这个方法最高效 经过一段时间的启蒙，孩子的听力词汇量已经有了一定的积累。很多家长都很困惑，如何将听力词汇量呢？ 2021-09-22" data-y="2021"><div class="it-hd"><span class="r-n" title="存档号">407</span><a class="it-t" href="/wechat/pdf/407.pdf">将听力词汇量转化为阅读词汇量，这个方法最高效</a><span class="it-m">2021-09-22 · 1 页</span></div><p class="it-d">经过一段时间的启蒙，孩子的听力词汇量已经有了一定的积累。很多家长都很困惑，如何将听力词汇量呢？</p><div class="it-l"><a href="/wechat/pdf/407.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="未标日期"><div class="yr"><b>未标日期</b><i></i><span>1 篇</span></div>
+<div class="item" data-k="孩子英语启蒙的真相：为什么你熏了上千小时，词汇量还是不上去？ 该内容已被发布者删除微信公众平台运营中心…… " data-y=""><div class="it-hd"><span class="r-n" title="存档号">296</span><a class="it-t" href="/wechat/pdf/296.pdf">孩子英语启蒙的真相：为什么你熏了上千小时，词汇量还是不上去？</a><span class="it-m">1 页</span></div><p class="it-d">该内容已被发布者删除微信公众平台运营中心……</p><div class="it-l"><a href="/wechat/pdf/296.pdf">读原文 PDF</a></div></div>
+</div>
 </section>
 
-<div class="years"><a href="/wechat/enlighten/">← 英语启蒙</a><a href="/wechat/">全部频道</a><a href="/wechat/materials/">素材与分级 →</a></div>
-<script>
-(function(){
-  var q=document.getElementById("q"),n=document.getElementById("n"),
-      empty=document.getElementById("empty"),
-      items=[].slice.call(document.querySelectorAll(".item")),
-      secs=[].slice.call(document.querySelectorAll("section[data-col]"));
-  if(!q)return;
-  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();});
-  function run(){
-    var v=q.value.trim().toLowerCase(),c=0;
-    for(var i=0;i<items.length;i++){
-      var hit=!v||keys[i].indexOf(v)>=0;
-      items[i].style.display=hit?"":"none";
-      if(hit)c++;
-    }
-    for(var j=0;j<secs.length;j++){
-      var any=secs[j].querySelector('.item:not([style*="none"])');
-      secs[j].style.display=any?"":"none";
-    }
-    n.textContent=c+" / "+items.length;
-    empty.style.display=c?"none":"";
-  }
-  q.addEventListener("input",run); run();
-})();
-</script>
+<div class="nearby">
+  <a href="/wechat/enlighten/"><small>上一栏</small><b>英语启蒙</b>78 篇</a>
+  <a href="/wechat/"><small>门厅</small><b>九个频道</b>回到总目，看写作节律</a>
+  <a href="/wechat/materials/"><small>下一栏</small><b>素材与分级</b>57 篇</a>
 </div>
+</div></div>
 <footer><div class="wrap">
   <p>约翰专栏 —— 胡志英（约翰老师）公众号「五宝爸约翰聊英语」原文存档，共 418 篇。原文一字未改，本站只做归类、排序与检索。</p>
   <p>语言发生学 · <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站 —— 德麦国际 · Demai International Press</p>
 </div></footer>
 <script>
 /* 分站页面的自家链接写的是分站根。在二级域名下这就是对的；
-   若从主站以 /sites/lang/… 预览，则就地补上前缀，两处都能正常点。 */
-(function(){var b="/sites/lang";if(location.pathname.indexOf(b)!==0)return;
-var own=["/#","/all/","/wechat/","/chatjohn/"];
+   若从主站以 /sites/lang/… 预览，就地补前缀，两处都能点。 */
+(function(){window.__wechatBase="";var b="/sites/lang";
+if(location.pathname.indexOf(b)!==0)return;
+window.__wechatBase=b;
+var own=["/#","/all/","/wechat","/chatjohn/"];
 var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
 if(h==="/"){as[i].setAttribute("href",b+"/");continue;}
 for(var k=0;k<own.length;k++){if(h.indexOf(own[k])===0){as[i].setAttribute("href",b+h);break;}}}})();
+</script>
+<script>
+(function(){
+  var q=document.getElementById("q"),n=document.getElementById("n"),
+      empty=document.getElementById("empty"),
+      items=[].slice.call(document.querySelectorAll(".item")),
+      groups=[].slice.call(document.querySelectorAll("[data-group]")),
+      ybtns=[].slice.call(document.querySelectorAll(".chipy button[data-year]")),
+      year=null;
+  if(!q&&!ybtns.length)return;
+  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();}),
+      years=items.map(function(el){return el.getAttribute("data-y")||"";});
+  function run(){
+    var v=q?q.value.trim().toLowerCase():"",c=0;
+    for(var i=0;i<items.length;i++){
+      var hit=(!v||keys[i].indexOf(v)>=0)&&(year===null||years[i]===year);
+      items[i].style.display=hit?"":"none";
+      if(hit)c++;
+    }
+    for(var j=0;j<groups.length;j++){
+      var any=groups[j].querySelector('.item:not([style*="none"])');
+      groups[j].style.display=any?"":"none";
+    }
+    if(n)n.textContent=c+" / "+items.length;
+    if(empty)empty.style.display=c?"none":"";
+  }
+  if(q)q.addEventListener("input",run);
+  ybtns.forEach(function(b){
+    b.addEventListener("click",function(){
+      var y=b.getAttribute("data-year");
+      year=(year===y)?null:y;
+      ybtns.forEach(function(o){
+        o.setAttribute("aria-pressed",String(year!==null&&o.getAttribute("data-year")===year));
+      });
+      run();
+    });
+  });
+  run();
+})();
 </script>
 </body></html>

@@ -4,220 +4,405 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AI 与语言教育 · 约翰专栏 · 语言发生学</title>
-<meta name="description" content="AI 与语言教育共 42 篇。GPT、Claude 与各类工具进入学习现场之后：能力被放大了什么，又被换走了什么。这一栏从 2023 年一路记到现在。">
+<meta name="description" content="AI 与语言教育共 42 篇。GPT、Claude 与各类工具进入学习现场之后：能力被放大了什么，又被换走了什么。这一栏从 2023 年那一波起，一路记到现在。">
 <link rel="canonical" href="https://lang.sdeuniverses.com/wechat/ai/">
 <meta property="og:title" content="AI 与语言教育 · 约翰专栏 · 语言发生学">
-<meta property="og:description" content="AI 与语言教育共 42 篇。GPT、Claude 与各类工具进入学习现场之后：能力被放大了什么，又被换走了什么。这一栏从 2023 年一路记到现在。">
+<meta property="og:description" content="AI 与语言教育共 42 篇。GPT、Claude 与各类工具进入学习现场之后：能力被放大了什么，又被换走了什么。这一栏从 2023 年那一波起，一路记到现在。">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0E14">
 <style>
 :root{
-  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272;
-  --line:#CBCCD4; --indigo:#1F3A5F; --vermilion:#A63A2B;
+  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272; --ink3:#868C9B;
+  --line:#CBCCD4; --line2:#E2E1DE;
+  --indigo:#1F3A5F; --vermilion:#A63A2B;
   --night:#0B0E14; --night2:#121722; --bone:#E8E4DA; --bone2:#8E94A3;
   --edge:rgba(232,228,218,.16); --indigo-l:#6E9BD8; --vermilion-l:#D2604A;
+  --accent:#1F3A5F;
   --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
   --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.75}
 a{color:inherit;text-decoration:none}
-.wrap{max-width:960px;margin:0 auto;padding:0 22px}
-.top{border-bottom:1px solid var(--line);background:rgba(242,241,237,.92);
-  position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(6px)}
-.top .wrap{display:flex;align-items:baseline;gap:18px;height:56px}
-.brand{font-family:var(--serif);font-size:19px;letter-spacing:.14em;color:var(--indigo)}
-.brand em{font-style:normal;color:var(--ink2);font-size:12px;letter-spacing:.24em;margin-left:10px}
-.top nav{margin-left:auto;display:flex;gap:18px;font-size:13.5px;color:var(--ink2);
-  overflow-x:auto;white-space:nowrap}
-.top nav a:hover{color:var(--indigo)}
-.top nav a.out{font-family:var(--mono);font-size:12px}
-.hero{padding:56px 0 0}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--indigo);text-transform:uppercase}
-h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.3;
-  letter-spacing:.02em;margin:.5em 0 .38em}
-.lede{max-width:39em;color:var(--ink2);font-size:16.5px}
-.lede b{color:var(--ink);font-weight:600}
-.crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink2);margin-bottom:6px}
-.crumb a{color:var(--indigo)}
-.band{display:flex;flex-wrap:wrap;gap:0;margin:30px 0 0;border:1px solid var(--line);background:var(--card)}
-.band div{flex:1 1 130px;padding:14px 16px;border-right:1px solid var(--line)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(56% 44% at 10% 0%,rgba(110,155,216,.13),transparent 70%),
+    radial-gradient(44% 40% at 94% 18%,rgba(210,96,74,.10),transparent 72%),
+    radial-gradient(72% 52% at 52% 104%,rgba(111,169,140,.07),transparent 70%)}
+.dark::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.45;
+  background-image:linear-gradient(90deg,rgba(232,228,218,.05) 1px,transparent 1px);
+  background-size:34px 100%}
+.dark .wrap{position:relative;z-index:1}
+
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:40;
+  background:rgba(11,14,20,.88);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone);flex:none}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--bone2);
+  overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a:hover{color:var(--indigo-l)}
+.top nav a[aria-current]{color:var(--bone);box-shadow:inset 0 -1px 0 var(--vermilion-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:70px 0 58px}
+.hero.tight{padding:44px 0 42px}
+.crumb{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--bone2);margin-bottom:16px}
+.crumb a{color:var(--indigo-l)}
+.crumb a:hover{color:var(--bone)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--indigo-l);text-transform:uppercase}
+.dark h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.4vw,52px);line-height:1.26;
+  letter-spacing:.03em;margin:.5em 0 .4em;max-width:15em;color:#F4F2EC}
+.dark h1 em{font-style:normal;color:var(--vermilion-l)}
+.lede{max-width:38em;color:#B9BECB;font-size:16.5px;margin:0}
+.lede b{color:var(--bone);font-weight:600}
+.lede + .lede{margin-top:.9em}
+
+.rhythm{margin:42px 0 0;border:1px solid var(--edge);background:var(--night2)}
+.rhythm .cap{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:nowrap;
+  padding:13px 20px;border-bottom:1px solid rgba(232,228,218,.28);
+  font-family:var(--serif);letter-spacing:.22em;font-size:14.5px;color:#F4F2EC}
+.rhythm .cap span{font-family:var(--mono);font-size:11px;color:var(--bone2);letter-spacing:.06em;
+  text-align:right;letter-spacing:.06em}
+.bars{display:flex;align-items:flex-end;gap:2px;height:116px;padding:20px 20px 0}
+.bars .b{flex:1 1 0;min-width:2px;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bars .b i,.bars .b u{display:block;width:100%;transform-origin:bottom;text-decoration:none;
+  animation:grow .55s cubic-bezier(.2,.7,.3,1) both}
+.bars .b i{background:rgba(232,228,218,.13)}
+.bars .b u{background:var(--indigo-l)}
+.bars .b.hot u{background:var(--vermilion-l)}
+.bars .b:hover i,.bars .b:hover u{filter:brightness(1.45)}
+@keyframes grow{from{transform:scaleY(.05);opacity:.15}to{transform:scaleY(1);opacity:1}}
+.axis{display:flex;padding:0 20px 14px;margin-top:9px;border-top:1px solid var(--edge)}
+.axis span{flex:1 1 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--bone2);
+  padding-top:8px;border-left:1px solid var(--edge);padding-left:7px;overflow:hidden}
+.axis span b,.axis span em{display:block;white-space:nowrap;font-style:normal}
+.axis span em{font-size:9.5px;opacity:.85;margin-top:1px}
+.axis span:first-child{border-left:0;padding-left:0}
+.axis span b{color:#C8CCD6;font-weight:400}
+.rnote{padding:0 20px 18px;margin:0;font-size:12.5px;color:var(--bone2);line-height:1.75;max-width:60em}
+.rnote b{color:#C8CCD6;font-weight:500}
+
+.band{display:flex;flex-wrap:wrap;gap:0;margin:26px 0 0;border:1px solid var(--edge)}
+.band div{flex:1 1 128px;padding:15px 18px;border-right:1px solid var(--edge)}
 .band div:last-child{border-right:0}
-.band b{display:block;font-family:var(--mono);font-size:21px;color:var(--indigo);
-  font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.band span{font-size:12.5px;color:var(--ink2)}
-.filter{display:flex;gap:12px;align-items:center;margin:26px 0 0;
-  border:1px solid var(--line);background:var(--card);padding:10px 14px}
-.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
-.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2)}
-.filter .n{font-family:var(--mono);font-size:12px;color:var(--indigo);font-variant-numeric:tabular-nums}
-.empty{padding:26px 4px;color:var(--ink2);font-size:14.5px}
-section{padding:48px 0 8px}
+.band b{display:block;font-family:var(--mono);font-size:22px;color:#F4F2EC;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.3}
+.band span{font-size:12.5px;color:var(--bone2)}
+.acts{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 0}
+.acts a,.acts button{font:inherit;font-size:14px;color:var(--bone);border:1px solid var(--edge);
+  background:transparent;padding:9px 18px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.acts a:hover,.acts button:hover{border-color:var(--indigo-l);color:#F4F2EC}
+.acts .primary{background:var(--vermilion);border-color:var(--vermilion);color:#FBF7F2}
+.acts .primary:hover{background:var(--vermilion-l);border-color:var(--vermilion-l);color:#fff}
+
+.light{background:var(--paper);
+  background-image:linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:34px 100%;background-position:-1px 0}
+section{padding:52px 0 6px}
 .col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
-.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--indigo);flex:none}
-.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .no{font-family:var(--serif);font-size:13px;letter-spacing:.24em;color:var(--vermilion);flex:none}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.1em;margin:0}
 .col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);
   font-variant-numeric:tabular-nums;flex:none;padding-left:10px}
-.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
-.item{border-bottom:1px dashed var(--line);padding:14px 4px 13px}
-.item:hover{background:var(--card)}
-.it-hd{display:flex;gap:12px;align-items:baseline}
-.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:3.1em;
-  font-variant-numeric:tabular-nums;flex:none}
-.it-t{font-size:15.5px;line-height:1.6}
-.item:hover .it-t{color:var(--indigo)}
-.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
-  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
-.it-d{margin:6px 0 0 4.1em;font-size:13.5px;color:var(--ink2);line-height:1.7}
-.it-l{margin:7px 0 0 4.1em;display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
-.it-l a{color:var(--indigo);border-bottom:1px solid var(--line);padding-bottom:1px}
-.it-l a:hover{border-color:var(--indigo)}
-.it-l span{color:var(--ink2)}
-.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--vermilion);
-  border:1px solid var(--line);padding:1px 5px;margin-left:8px;vertical-align:2px}
-.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;
-  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:8px}
-.ch{display:block;padding:22px 22px 20px;border-right:1px solid var(--line);
-  border-bottom:1px solid var(--line);background:var(--card);transition:background .2s}
+.col-d{color:var(--ink2);font-size:14.5px;margin:13px 0 4px;max-width:46em}
+
+.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0;
+  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:20px;background:var(--card)}
+.ch{display:flex;flex-direction:column;padding:0 0 20px;border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);transition:background .22s}
 .ch:hover{background:#fff}
-.ch .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--indigo)}
-.ch h3{font-family:var(--serif);font-weight:600;font-size:19.5px;letter-spacing:.09em;margin:9px 0 8px}
-.ch:hover h3{color:var(--indigo)}
+.ch .rule{height:3px;background:var(--cc)}
+.ch .in{padding:19px 22px 0;flex:1;display:flex;flex-direction:column}
+.ch .foot{margin-top:auto}
+.ch .n{font-family:var(--serif);font-size:12px;letter-spacing:.3em;color:var(--cc)}
+.ch h3{font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:.1em;margin:8px 0 9px}
+.ch:hover h3{color:var(--cc)}
 .ch p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.72}
-.ch .ct{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+.spark{display:flex;align-items:flex-end;gap:3px;height:26px;margin:16px 0 0}
+.spark i{flex:1 1 0;background:var(--cc);opacity:.26;min-height:1px}
+.spark i.pk{opacity:.85}
+.spark-x{display:flex;gap:3px;margin-top:5px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);
+  letter-spacing:.06em}
+.spark-x i{flex:1 1 0;font-style:normal;text-align:center}
+.ch .picks{margin:15px 0 0;padding-top:12px;border-top:1px dashed var(--line);
+  font-size:13px;color:var(--ink2);line-height:1.7}
+.ch .picks em{font-style:normal;color:var(--ink);display:block}
+.ch .picks em::before{content:"— ";color:var(--cc)}
+.ch .ct{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;display:flex;gap:14px}
+.ch .ct b{color:var(--cc);font-weight:600;font-size:13px}
+.ch .go{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--cc);opacity:0;
+  transform:translateX(-4px);transition:opacity .22s,transform .22s}
+.ch:hover .go,.ch:focus-visible .go{opacity:1;transform:none}
+
+.chips{position:sticky;top:0;z-index:30;background:rgba(242,241,237,.95);
+  backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--line)}
+.chips .wrap{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding:0 22px;
+  -webkit-mask-image:linear-gradient(to right,#000 92%,transparent);
+  mask-image:linear-gradient(to right,#000 92%,transparent)}
+.chips .wrap::-webkit-scrollbar{display:none}
+.chips a{flex:none;padding:12px 15px;font-size:13.5px;color:var(--ink2);white-space:nowrap;
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.chips a:hover{color:var(--ink)}
+.chips a[aria-current]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.chips a b{font-family:var(--mono);font-size:11px;color:var(--ink3);font-weight:400;margin-left:5px;
   font-variant-numeric:tabular-nums}
-.ch .ct b{color:var(--vermilion);font-weight:500}
-.note{background:var(--card);border:1px solid var(--line);padding:22px 24px;margin-top:30px}
-.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:0 0 10px;font-weight:600}
-.note p{margin:0 0 11px;font-size:14.5px;color:var(--ink2)}
+
+.tools{padding:30px 0 0}
+.list{padding-top:10px}
+.filter{display:flex;gap:12px;align-items:center;
+  border:1px solid var(--line);background:var(--card);padding:11px 15px}
+.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
+.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2);flex:none}
+.filter .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.chipy{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 0}
+.chipy button,.chipy a{font:inherit;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:4px 11px;cursor:pointer;
+  transition:border-color .18s,color .18s,background .18s}
+.chipy button:hover,.chipy a:hover{border-color:var(--cc,var(--accent));color:var(--cc,var(--accent))}
+.chipy button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FBF7F2}
+.empty{padding:24px 4px;color:var(--ink2);font-size:14.5px}
+.empty a{color:var(--accent);border-bottom:1px solid var(--line)}
+
+.yr{display:flex;align-items:baseline;gap:12px;margin:34px 0 2px;padding-bottom:6px}
+.yr b{font-family:var(--mono);font-size:19px;letter-spacing:.06em;color:var(--accent);
+  font-variant-numeric:tabular-nums;font-weight:500}
+.yr span{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.12em}
+.yr i{flex:1;height:1px;background:var(--line);font-style:normal}
+.item{border-bottom:1px dashed var(--line);padding:15px 4px 14px;position:relative;transition:background .18s}
+.item::before{content:"";position:absolute;left:-12px;top:15px;bottom:14px;width:2px;
+  background:var(--accent);opacity:0;transition:opacity .18s}
+.item:hover{background:var(--card)}
+.item:hover::before{opacity:.75}
+.it-hd{display:flex;gap:13px;align-items:baseline}
+.r-n{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:3.2em;
+  font-variant-numeric:tabular-nums;flex:none;letter-spacing:.06em}
+.it-t{font-size:15.5px;line-height:1.62;font-family:var(--serif);font-weight:600;letter-spacing:.02em}
+.item:hover .it-t{color:var(--accent)}
+.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
+.it-d{margin:7px 0 0 4.3em;font-size:13.5px;color:var(--ink2);line-height:1.72}
+.it-l{margin:8px 0 0 4.3em;display:flex;gap:15px;font-family:var(--mono);font-size:11px;flex-wrap:wrap;
+  letter-spacing:.06em}
+.it-l a{color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:1px}
+.it-l a:hover{border-color:var(--accent)}
+.it-l span{color:var(--ink3)}
+
+.note{background:var(--card);border:1px solid var(--line);padding:24px 26px;margin-top:36px}
+.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.1em;margin:0 0 12px;font-weight:600}
+.note p{margin:0 0 12px;font-size:14.5px;color:var(--ink2)}
 .note p:last-child{margin-bottom:0}
 .note b{color:var(--ink)}
 .note a{color:var(--indigo);border-bottom:1px solid var(--line)}
-.years{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
-.years a{font-family:var(--mono);font-size:12px;color:var(--indigo);
-  border:1px solid var(--line);padding:4px 10px;background:var(--card)}
-.years a:hover{border-color:var(--indigo)}
-footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 60px;
+.nearby{display:flex;flex-wrap:wrap;gap:0;margin:46px 0 0;border:1px solid var(--line);background:var(--card)}
+.nearby a{flex:1 1 210px;padding:17px 20px;border-right:1px solid var(--line);font-size:13.5px;
+  color:var(--ink2);transition:background .2s,color .2s}
+.nearby a:last-child{border-right:0}
+.nearby a:hover{background:#fff;color:var(--ink)}
+.nearby a small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  color:var(--ink3);margin-bottom:5px}
+.nearby a b{display:block;font-family:var(--serif);font-size:16.5px;letter-spacing:.08em;
+  font-weight:600;color:var(--ink);margin-bottom:3px}
+
+footer{margin-top:74px;border-top:1px solid var(--line);padding:28px 0 66px;
   font-size:13px;color:var(--ink2)}
 footer a{color:var(--indigo);border-bottom:1px solid var(--line)}
 footer p{margin:0 0 8px}
-a:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
-@media(max-width:640px){
-  .hero{padding:36px 0 0}
+a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--vermilion);outline-offset:2px}
+@media(max-width:700px){
+  .hero{padding:40px 0 34px}
+  .hero.tight{padding:32px 0 30px}
+  .top nav{-webkit-mask-image:linear-gradient(to right,#000 86%,transparent);
+    mask-image:linear-gradient(to right,#000 86%,transparent)}
+  .rhythm .cap{flex-wrap:wrap;letter-spacing:.14em;font-size:13.5px}
+  .rhythm .cap span{text-align:left;flex:1 1 100%}
+  .bars{height:82px;padding:16px 14px 0}
+  .axis{padding:0 14px 12px}
+  .axis span{font-size:9px;padding-left:4px;min-width:32px;letter-spacing:0}
+  .axis span em{font-size:8.5px}
+  .rnote{padding:0 14px 15px}
+  .band div{flex:1 1 45%}
   .it-m{display:none}
   .it-d,.it-l{margin-left:0}
+  .item::before{left:-8px}
+  .chips a{padding:11px 12px;font-size:13px}
+  .nearby a{flex:1 1 100%;border-right:0;border-bottom:1px solid var(--line)}
+  .nearby a:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .bars .b i,.bars .b u{animation:none}
+  *{transition:none!important}
 }
 </style>
+<style>:root{--accent:#4A5B8C}</style>
 </head>
 <body>
+<div class="dark">
 <header class="top"><div class="wrap">
   <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
   <nav>
     <a href="/#books">账册</a>
     <a href="/#cols">栏目</a>
     <a href="/all/">全部篇目</a>
-    <a href="/wechat/">约翰专栏</a>
+    <a href="/wechat/" aria-current="page">约翰专栏</a>
     <a href="/chatjohn/">ChatJohn</a>
     <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
   </nav>
 </div></header>
-<div class="wrap">
-<div class="hero">
-<div class="crumb"><a href="/wechat/">约翰专栏</a> / AI 与语言教育</div>
-<div class="eyebrow">栏五</div>
-<h1>AI 与语言教育</h1>
-<p class="lede">GPT、Claude 与各类工具进入学习现场之后：能力被放大了什么，又被换走了什么。这一栏从 2023 年一路记到现在。</p>
-<div class="filter"><label>筛选</label><input id="q" type="search" placeholder="输入任意词，例如：语感、复述、词根、RAZ" autocomplete="off" aria-label="筛选篇目"><span class="n" id="n"></span></div>
-<p class="empty" id="empty" style="display:none">没有匹配的篇目。换一个词试试。</p>
+<div class="wrap"><div class="hero tight">
+  <div class="crumb"><a href="/wechat/">约翰专栏</a> · 频道 伍</div>
+  <h1>AI 与语言教育</h1>
+  <p class="lede">GPT、Claude 与各类工具进入学习现场之后：能力被放大了什么，又被换走了什么。这一栏从 2023 年那一波起，一路记到现在。</p>
+
+  <div class="rhythm">
+    <div class="cap">本　栏　节　律<span>亮色＝本栏 · 暗色＝同月其他栏</span></div>
+    <div class="bars"><span class="b" title="2021-09 · 1 篇"><i style="height:32%;animation-delay:0ms"></i><u style="height:13%;animation-delay:0ms"></u></span><span class="b" title="2021-10 · 0 篇"><i style="height:25%;animation-delay:11ms"></i><u style="height:0%;animation-delay:11ms"></u></span><span class="b" title="2021-11 · 0 篇"><i style="height:25%;animation-delay:22ms"></i><u style="height:0%;animation-delay:22ms"></u></span><span class="b" title="2021-12 · 0 篇"><i style="height:22%;animation-delay:33ms"></i><u style="height:0%;animation-delay:33ms"></u></span><span class="b" title="2022-01 · 0 篇"><i style="height:13%;animation-delay:44ms"></i><u style="height:0%;animation-delay:44ms"></u></span><span class="b" title="2022-02 · 0 篇"><u style="height:0%;animation-delay:55ms"></u></span><span class="b" title="2022-03 · 0 篇"><i style="height:13%;animation-delay:66ms"></i><u style="height:0%;animation-delay:66ms"></u></span><span class="b" title="2022-04 · 0 篇"><u style="height:0%;animation-delay:77ms"></u></span><span class="b" title="2022-05 · 0 篇"><i style="height:13%;animation-delay:88ms"></i><u style="height:0%;animation-delay:88ms"></u></span><span class="b" title="2022-06 · 0 篇"><i style="height:13%;animation-delay:99ms"></i><u style="height:0%;animation-delay:99ms"></u></span><span class="b" title="2022-07 · 0 篇"><i style="height:13%;animation-delay:110ms"></i><u style="height:0%;animation-delay:110ms"></u></span><span class="b" title="2022-08 · 0 篇"><i style="height:22%;animation-delay:121ms"></i><u style="height:0%;animation-delay:121ms"></u></span><span class="b" title="2022-09 · 0 篇"><i style="height:18%;animation-delay:132ms"></i><u style="height:0%;animation-delay:132ms"></u></span><span class="b" title="2022-10 · 0 篇"><i style="height:18%;animation-delay:143ms"></i><u style="height:0%;animation-delay:143ms"></u></span><span class="b" title="2022-11 · 0 篇"><u style="height:0%;animation-delay:154ms"></u></span><span class="b" title="2022-12 · 1 篇"><i style="height:5%;animation-delay:165ms"></i><u style="height:13%;animation-delay:165ms"></u></span><span class="b" title="2023-01 · 0 篇"><u style="height:0%;animation-delay:176ms"></u></span><span class="b" title="2023-02 · 0 篇"><i style="height:25%;animation-delay:187ms"></i><u style="height:0%;animation-delay:187ms"></u></span><span class="b" title="2023-03 · 1 篇"><i style="height:5%;animation-delay:198ms"></i><u style="height:13%;animation-delay:198ms"></u></span><span class="b" title="2023-04 · 1 篇"><i style="height:9%;animation-delay:209ms"></i><u style="height:13%;animation-delay:209ms"></u></span><span class="b" title="2023-05 · 1 篇"><u style="height:13%;animation-delay:220ms"></u></span><span class="b" title="2023-06 · 3 篇"><u style="height:22%;animation-delay:231ms"></u></span><span class="b" title="2023-07 · 2 篇"><i style="height:13%;animation-delay:242ms"></i><u style="height:18%;animation-delay:242ms"></u></span><span class="b" title="2023-08 · 2 篇"><i style="height:13%;animation-delay:253ms"></i><u style="height:18%;animation-delay:253ms"></u></span><span class="b" title="2023-09 · 1 篇"><i style="height:5%;animation-delay:264ms"></i><u style="height:13%;animation-delay:264ms"></u></span><span class="b" title="2023-10 · 1 篇"><i style="height:9%;animation-delay:275ms"></i><u style="height:13%;animation-delay:275ms"></u></span><span class="b" title="2023-11 · 2 篇"><u style="height:18%;animation-delay:286ms"></u></span><span class="b" title="2023-12 · 2 篇"><i style="height:7%;animation-delay:297ms"></i><u style="height:18%;animation-delay:297ms"></u></span><span class="b" title="2024-01 · 0 篇"><u style="height:0%;animation-delay:308ms"></u></span><span class="b" title="2024-02 · 0 篇"><i style="height:13%;animation-delay:319ms"></i><u style="height:0%;animation-delay:319ms"></u></span><span class="b" title="2024-03 · 1 篇"><u style="height:13%;animation-delay:330ms"></u></span><span class="b" title="2024-04 · 5 篇"><i style="height:5%;animation-delay:341ms"></i><u style="height:28%;animation-delay:341ms"></u></span><span class="b" title="2024-05 · 3 篇"><i style="height:14%;animation-delay:352ms"></i><u style="height:22%;animation-delay:352ms"></u></span><span class="b" title="2024-06 · 0 篇"><i style="height:55%;animation-delay:363ms"></i><u style="height:0%;animation-delay:363ms"></u></span><span class="b" title="2024-07 · 1 篇"><i style="height:5%;animation-delay:374ms"></i><u style="height:13%;animation-delay:374ms"></u></span><span class="b" title="2024-08 · 0 篇"><i style="height:25%;animation-delay:385ms"></i><u style="height:0%;animation-delay:385ms"></u></span><span class="b" title="2024-09 · 0 篇"><i style="height:25%;animation-delay:396ms"></i><u style="height:0%;animation-delay:396ms"></u></span><span class="b" title="2024-10 · 1 篇"><i style="height:5%;animation-delay:407ms"></i><u style="height:13%;animation-delay:407ms"></u></span><span class="b" title="2024-11 · 0 篇"><i style="height:31%;animation-delay:418ms"></i><u style="height:0%;animation-delay:418ms"></u></span><span class="b" title="2024-12 · 2 篇"><i style="height:35%;animation-delay:429ms"></i><u style="height:18%;animation-delay:429ms"></u></span><span class="b" title="2025-01 · 0 篇"><i style="height:18%;animation-delay:440ms"></i><u style="height:0%;animation-delay:440ms"></u></span><span class="b" title="2025-02 · 0 篇"><i style="height:53%;animation-delay:451ms"></i><u style="height:0%;animation-delay:451ms"></u></span><span class="b" title="2025-03 · 0 篇"><i style="height:47%;animation-delay:462ms"></i><u style="height:0%;animation-delay:462ms"></u></span><span class="b" title="2025-04 · 0 篇"><u style="height:0%;animation-delay:473ms"></u></span><span class="b" title="2025-05 · 1 篇"><i style="height:9%;animation-delay:484ms"></i><u style="height:13%;animation-delay:484ms"></u></span><span class="b" title="2025-06 · 0 篇"><i style="height:28%;animation-delay:495ms"></i><u style="height:0%;animation-delay:495ms"></u></span><span class="b" title="2025-07 · 0 篇"><i style="height:18%;animation-delay:506ms"></i><u style="height:0%;animation-delay:506ms"></u></span><span class="b" title="2025-08 · 0 篇"><i style="height:13%;animation-delay:517ms"></i><u style="height:0%;animation-delay:517ms"></u></span><span class="b" title="2025-09 · 1 篇"><i style="height:5%;animation-delay:528ms"></i><u style="height:13%;animation-delay:528ms"></u></span><span class="b" title="2025-10 · 0 篇"><i style="height:42%;animation-delay:539ms"></i><u style="height:0%;animation-delay:539ms"></u></span><span class="b" title="2025-11 · 0 篇"><i style="height:18%;animation-delay:550ms"></i><u style="height:0%;animation-delay:550ms"></u></span><span class="b" title="2025-12 · 0 篇"><i style="height:25%;animation-delay:561ms"></i><u style="height:0%;animation-delay:561ms"></u></span><span class="b" title="2026-01 · 0 篇"><i style="height:18%;animation-delay:572ms"></i><u style="height:0%;animation-delay:572ms"></u></span><span class="b" title="2026-02 · 0 篇"><i style="height:28%;animation-delay:583ms"></i><u style="height:0%;animation-delay:583ms"></u></span><span class="b" title="2026-03 · 0 篇"><i style="height:18%;animation-delay:594ms"></i><u style="height:0%;animation-delay:594ms"></u></span><span class="b" title="2026-04 · 0 篇"><i style="height:36%;animation-delay:605ms"></i><u style="height:0%;animation-delay:605ms"></u></span><span class="b" title="2026-05 · 1 篇"><i style="height:45%;animation-delay:616ms"></i><u style="height:13%;animation-delay:616ms"></u></span><span class="b" title="2026-06 · 2 篇"><i style="height:82%;animation-delay:627ms"></i><u style="height:18%;animation-delay:627ms"></u></span><span class="b" title="2026-07 · 1 篇"><i style="height:54%;animation-delay:638ms"></i><u style="height:13%;animation-delay:638ms"></u></span><span class="b" title="2026-08 · 2 篇"><i style="height:47%;animation-delay:649ms"></i><u style="height:18%;animation-delay:649ms"></u></span></div>
+    <div class="axis"><span style="flex:4 1 0"><b>2021</b><em>1 篇</em></span><span style="flex:12 1 0"><b>2022</b><em>1 篇</em></span><span style="flex:12 1 0"><b>2023</b><em>16 篇</em></span><span style="flex:12 1 0"><b>2024</b><em>13 篇</em></span><span style="flex:12 1 0"><b>2025</b><em>2 篇</em></span><span style="flex:8 1 0"><b>2026</b><em>6 篇</em></span></div>
+    <p class="rnote">写得最多的一年是 <b>2023</b>（16 篇）。本栏最早一篇 2021-09-18，最新一篇 2026-08-15。</p>
+  </div>
+
+  <div class="band">
+    <div><b>42</b><span>篇</span></div>
+    <div><b>350</b><span>页</span></div>
+    <div><b>2023</b><span>写得最多的一年</span></div>
+    <div><b>11%</b><span>占全站篇数</span></div>
+  </div>
+</div></div>
 </div>
 
-<section data-col="ai">
-  <div class="col-h"><span class="no">栏&nbsp;五</span><h2>AI 与语言教育</h2><span class="ct">42 篇 · 350 页</span></div>
-<div class="item" data-k="和GPT练口语，你真的练对了吗？ 成人英语·方法科普——AI可以陪你说一万句，但真正的口语能力，要在“失控”中长出来这两年，越来越多人开始用GPT练英语口语。 2026-08-15"><div class="it-hd"><span class="r-n">1</span><a class="it-t" href="/wechat/pdf/027.pdf">和GPT练口语，你真的练对了吗？</a><span class="it-m">2026-08-15 · 18 页</span></div><p class="it-d">成人英语·方法科普——AI可以陪你说一万句，但真正的口语能力，要在“失控”中长出来这两年，越来越多人开始用GPT练英语口语。</p><div class="it-l"><a href="/wechat/pdf/027.pdf">读原文 PDF</a><a href="/wechat/pdf/026.pdf">同题另稿 026</a><span>存档号 027</span></div></div>
-<div class="item" data-k="AI时代，我们为何要写作并出版顶级专著？ 知识生产·深度长文我们正在进入一个极其特殊的时代。过去，人类最稀缺的是知识。 2026-08-13"><div class="it-hd"><span class="r-n">2</span><a class="it-t" href="/wechat/pdf/032.pdf">AI时代，我们为何要写作并出版顶级专著？</a><span class="it-m">2026-08-13 · 16 页</span></div><p class="it-d">知识生产·深度长文我们正在进入一个极其特殊的时代。过去，人类最稀缺的是知识。</p><div class="it-l"><a href="/wechat/pdf/032.pdf">读原文 PDF</a><a href="/wechat/pdf/031.pdf">同题另稿 031</a><span>存档号 032</span></div></div>
-<div class="item" data-k="AI时代，用英语学全科，用中文学百科通识 一、一个被AI重新提出的问题：语言到底是什么？人类教育几千年来，一直有一个默认假设：语言，是知识的运输工具。 2026-07-31"><div class="it-hd"><span class="r-n">3</span><a class="it-t" href="/wechat/pdf/050.pdf">AI时代，用英语学全科，用中文学百科通识</a><span class="it-m">2026-07-31 · 17 页</span></div><p class="it-d">一、一个被AI重新提出的问题：语言到底是什么？人类教育几千年来，一直有一个默认假设：语言，是知识的运输工具。</p><div class="it-l"><a href="/wechat/pdf/050.pdf">读原文 PDF</a><span>存档号 050</span></div></div>
-<div class="item" data-k="如何和 Claude 合作，高效生产个性化课件 昨天文章发出去之后，很多人感兴趣。几天时间，600+课件重做，这放以前不敢想昨天很多人在问到底是怎么做到的，今天这堂课，我把方法一次讲透。 "><div class="it-hd"><span class="r-n">4</span><a class="it-t" href="/wechat/pdf/066.pdf">如何和 Claude 合作，高效生产个性化课件</a><span class="it-m">2 页</span></div><p class="it-d">昨天文章发出去之后，很多人感兴趣。几天时间，600+课件重做，这放以前不敢想昨天很多人在问&quot;到底是怎么做到的&quot;，今天这堂课，我把方法一次讲透。</p><div class="it-l"><a href="/wechat/pdf/066.pdf">读原文 PDF</a><span>存档号 066</span></div></div>
-<div class="item" data-k="几天时间，600+ 课件重做，这放以前不敢想 这几天，我干了一件说出来自己都有点不敢信的事：用Claude，把Jr和ELL的全部课件和课后练习，从头到尾升级重构了一遍——一共600多个。 "><div class="it-hd"><span class="r-n">5</span><a class="it-t" href="/wechat/pdf/067.pdf">几天时间，600+ 课件重做，这放以前不敢想</a><span class="it-m">2 页</span></div><p class="it-d">这几天，我干了一件说出来自己都有点不敢信的事：用Claude，把Jr和ELL的全部课件和课后练习，从头到尾升级重构了一遍——一共600多个。</p><div class="it-l"><a href="/wechat/pdf/067.pdf">读原文 PDF</a><span>存档号 067</span></div></div>
-<div class="item" data-k="为什么AI时代，英语老师更需要懂一点语言工程？ 湖南AI来了以后，很多英语老师心里其实有一种隐隐的不安。以前，老师讲单词，AI也能讲。 2026-06-28"><div class="it-hd"><span class="r-n">6</span><a class="it-t" href="/wechat/pdf/089.pdf">为什么AI时代，英语老师更需要懂一点语言工程？</a><span class="it-m">2026-06-28 · 25 页</span></div><p class="it-d">湖南AI来了以后，很多英语老师心里其实有一种隐隐的不安。以前，老师讲单词，AI也能讲。</p><div class="it-l"><a href="/wechat/pdf/089.pdf">读原文 PDF</a><span>存档号 089</span></div></div>
-<div class="item" data-k="你的孩子看了200集小猪佩奇，为什么还是不认识这些单词？——一个由AI驱动的词汇学习系统，正在重新定义“学英语”这件事。 一个让很多家长沉默的问题你家孩子看过小猪佩奇吗？当然看过。不只看过，是反复看。 2026-06-17"><div class="it-hd"><span class="r-n">7</span><a class="it-t" href="/wechat/pdf/113.pdf">你的孩子看了200集小猪佩奇，为什么还是不认识这些单词？——一个由AI驱动的词汇学习系统，正在重新定义“学英语”这件事。</a><span class="it-m">2026-06-17 · 9 页</span></div><p class="it-d">一个让很多家长沉默的问题你家孩子看过小猪佩奇吗？当然看过。不只看过，是反复看。</p><div class="it-l"><a href="/wechat/pdf/113.pdf">读原文 PDF</a><span>存档号 113</span></div></div>
-<div class="item" data-k="AI给孩子英语练习的频率，真人教师给孩子语言成长的灵魂 AI语音互动时代真正改变的，不只是英语学习的工具，而是中国孩子获得英语练习机会的基本结构。 2026-05-26"><div class="it-hd"><span class="r-n">8</span><a class="it-t" href="/wechat/pdf/157.pdf">AI给孩子英语练习的频率，真人教师给孩子语言成长的灵魂</a><span class="it-m">2026-05-26 · 3 页</span></div><p class="it-d">AI语音互动时代真正改变的，不只是英语学习的工具，而是中国孩子获得英语练习机会的基本结构。</p><div class="it-l"><a href="/wechat/pdf/157.pdf">读原文 PDF</a><span>存档号 157</span></div></div>
-<div class="item" data-k="攀阁林助手使用的保姆级教程 这篇文章主要讲解，攀阁林助手如何使用。首先，进入助手小程序，不知道怎么进入的扫描下方海报即可。 2025-09-16"><div class="it-hd"><span class="r-n">9</span><a class="it-t" href="/wechat/pdf/211.pdf">攀阁林助手使用的保姆级教程</a><span class="it-m">2025-09-16 · 25 页</span></div><p class="it-d">这篇文章主要讲解，攀阁林助手如何使用。首先，进入助手小程序，不知道怎么进入的扫描下方海报即可。</p><div class="it-l"><a href="/wechat/pdf/211.pdf">读原文 PDF</a><span>存档号 211</span></div></div>
-<div class="item" data-k="GPT5重磅来袭 时间8月8日凌晨1时，OpenAI举行长达一小时多的线上发布会，正式推出GPT-5。 "><div class="it-hd"><span class="r-n">10</span><a class="it-t" href="/wechat/pdf/216.pdf">GPT5重磅来袭</a><span class="it-m">2 页</span></div><p class="it-d">时间8月8日凌晨1时，OpenAI举行长达一小时多的线上发布会，正式推出GPT-5。</p><div class="it-l"><a href="/wechat/pdf/216.pdf">读原文 PDF</a><span>存档号 216</span></div></div>
-<div class="item" data-k="让我受益匪浅的几项技术 第一个当然是系统的英语发音技术，这个我在之前的文章里提到的，为何这个技术如此重要？ 2025-05-24"><div class="it-hd"><span class="r-n">11</span><a class="it-t" href="/wechat/pdf/226.pdf">让我受益匪浅的几项技术</a><span class="it-m">2025-05-24 · 2 页</span></div><p class="it-d">第一个当然是系统的英语发音技术，这个我在之前的文章里提到的，为何这个技术如此重要？</p><div class="it-l"><a href="/wechat/pdf/226.pdf">读原文 PDF</a><span>存档号 226</span></div></div>
-<div class="item" data-k="如何通过攀阁林助手高效习得英语单词？ 今天想跟大家聊聊如何用攀阁林助手来帮助孩子高效习得单词。 2024-12-16"><div class="it-hd"><span class="r-n">12</span><a class="it-t" href="/wechat/pdf/280.pdf">如何通过攀阁林助手高效习得英语单词？</a><span class="it-m">2024-12-16 · 12 页</span></div><p class="it-d">今天想跟大家聊聊如何用攀阁林助手来帮助孩子高效习得单词。</p><div class="it-l"><a href="/wechat/pdf/280.pdf">读原文 PDF</a><span>存档号 280</span></div></div>
-<div class="item" data-k="如何和GPT合作高效提升英语口语能力——约翰老师郑州线下分享预告 如何和GPT合作高效提升英语口语能力——线下分享预告▲点击上方卡片关注设为星标不错过每天的见面亲爱的家长朋友们，大家好！ 2024-12-13"><div class="it-hd"><span class="r-n">13</span><a class="it-t" href="/wechat/pdf/281.pdf">如何和GPT合作高效提升英语口语能力——约翰老师郑州线下分享预告</a><span class="it-m">2024-12-13 · 8 页</span></div><p class="it-d">如何和GPT合作高效提升英语口语能力——线下分享预告▲点击上方卡片关注设为星标不错过每天的见面亲爱的家长朋友们，大家好！</p><div class="it-l"><a href="/wechat/pdf/281.pdf">读原文 PDF</a><span>存档号 281</span></div></div>
-<div class="item" data-k="让AI为你打工是一种什么样的体验？ 昨天和一个朋友聊天，她说她的生活和工作，不需要AI。我听完，很震惊。 2024-10-07"><div class="it-hd"><span class="r-n">14</span><a class="it-t" href="/wechat/pdf/293.pdf">让AI为你打工是一种什么样的体验？</a><span class="it-m">2024-10-07 · 14 页</span></div><p class="it-d">昨天和一个朋友聊天，她说她的生活和工作，不需要AI。我听完，很震惊。</p><div class="it-l"><a href="/wechat/pdf/293.pdf">读原文 PDF</a><span>存档号 293</span></div></div>
-<div class="item" data-k="AI时代，家长如何一键帮孩子开启个性化之路？ AI时代来了，全民个性化学习的时代开启了，最近我带领团队和爱迪生老师一起组织的词汇训练营让近40位学员在暑期的时候体会了双个性化词汇学习的魅力。 2024-07-22"><div class="it-hd"><span class="r-n">15</span><a class="it-t" href="/wechat/pdf/303.pdf">AI时代，家长如何一键帮孩子开启个性化之路？</a><span class="it-m">2024-07-22 · 15 页</span></div><p class="it-d">AI时代来了，全民个性化学习的时代开启了，最近我带领团队和爱迪生老师一起组织的词汇训练营让近40位学员在暑期的时候体会了双个性化词汇学习的魅力。</p><div class="it-l"><a href="/wechat/pdf/303.pdf">读原文 PDF</a><span>存档号 303</span></div></div>
-<div class="item" data-k="攀阁林助手：听力词汇增长的神器 转载 因发表时内容与原创文章《一款神器改变听力学习，攀阁林助手让你轻松掌握海量词汇》过于相似，未通过原创逻辑校验，发表时原文已被替换为原创文章或使用 攀阁林助手：听力词汇增长的神器以下文章来源于爱迪生的理想世界，作者爱迪生1986爱迪生的理想世界20年英语学习发烧友，音乐和文学狂热爱好者。 2024-05-25"><div class="it-hd"><span class="r-n">16</span><a class="it-t" href="/wechat/pdf/331.pdf">攀阁林助手：听力词汇增长的神器 转载 因发表时内容与原创文章《一款神器改变听力学习，攀阁林助手让你轻松掌握海量词汇》过于相似，未通过原创逻辑校验，发表时原文已被替换为原创文章或使用</a><span class="it-m">2024-05-25 · 6 页</span></div><p class="it-d">攀阁林助手：听力词汇增长的神器以下文章来源于爱迪生的理想世界，作者爱迪生1986爱迪生的理想世界20年英语学习发烧友，音乐和文学狂热爱好者。</p><div class="it-l"><a href="/wechat/pdf/331.pdf">读原文 PDF</a><span>存档号 331</span></div></div>
-<div class="item" data-k="GPTo模型炸裂发布，大家还要教英语和学英语吗？ GPTo全能模型的发布，实在是太炸裂了。昨天我在ai素养课的课程里深入分享了这一次的更新，带给英语学习的启示和颠覆。 2024-05-20"><div class="it-hd"><span class="r-n">17</span><a class="it-t" href="/wechat/pdf/332.pdf">GPTo模型炸裂发布，大家还要教英语和学英语吗？</a><span class="it-m">2024-05-20 · 2 页</span></div><p class="it-d">GPTo全能模型的发布，实在是太炸裂了。昨天我在ai素养课的课程里深入分享了这一次的更新，带给英语学习的启示和颠覆。</p><div class="it-l"><a href="/wechat/pdf/332.pdf">读原文 PDF</a><span>存档号 332</span></div></div>
-<div class="item" data-k="如何培养孩子和AI合作的意识和本能 在上次的文章中，我们说到，人工智能能够加速我们科研创新，还可以加速人的思考，可以说，人工智能是一个思考的加速器。 2024-05-05"><div class="it-hd"><span class="r-n">18</span><a class="it-t" href="/wechat/pdf/333.pdf">如何培养孩子和AI合作的意识和本能</a><span class="it-m">2024-05-05 · 8 页</span></div><p class="it-d">在上次的文章中，我们说到，人工智能能够加速我们科研创新，还可以加速人的思考，可以说，人工智能是一个思考的加速器。</p><div class="it-l"><a href="/wechat/pdf/333.pdf">读原文 PDF</a><span>存档号 333</span></div></div>
-<div class="item" data-k="和GPT合作，学习托福词汇，效率提升100倍 和GPT合作，托福词汇效率提升100背？这是噱头吧，这又是割韭菜吧。 2024-04-26"><div class="it-hd"><span class="r-n">19</span><a class="it-t" href="/wechat/pdf/334.pdf">和GPT合作，学习托福词汇，效率提升100倍</a><span class="it-m">2024-04-26 · 9 页</span></div><p class="it-d">和GPT合作，托福词汇效率提升100背？这是噱头吧，这又是割韭菜吧。</p><div class="it-l"><a href="/wechat/pdf/334.pdf">读原文 PDF</a><span>存档号 334</span></div></div>
-<div class="item" data-k="浅谈ChatGPT和搜索引擎的区别是什么？ AI素养课：AI英语实战课模块，我和爱迪生要把我们过去一年在AI英语实战上的所有研究再次系统化，教给大家。 2024-04-24"><div class="it-hd"><span class="r-n">20</span><a class="it-t" href="/wechat/pdf/335.pdf">浅谈ChatGPT和搜索引擎的区别是什么？</a><span class="it-m">2024-04-24 · 7 页</span></div><p class="it-d">AI素养课：AI英语实战课模块，我和爱迪生要把我们过去一年在AI英语实战上的所有研究再次系统化，教给大家。</p><div class="it-l"><a href="/wechat/pdf/335.pdf">读原文 PDF</a><span>存档号 335</span></div></div>
-<div class="item" data-k="一篇文章说清楚关于GPT及其账号使用 重要的放在前头，和爱迪生老师的AI素养课，已经开班，正在优惠招生中，现在报课送2个月4.0账号使用，价值160元。 2024-04-19"><div class="it-hd"><span class="r-n">21</span><a class="it-t" href="/wechat/pdf/338.pdf">一篇文章说清楚关于GPT及其账号使用</a><span class="it-m">2024-04-19 · 8 页</span></div><p class="it-d">重要的放在前头，和爱迪生老师的AI素养课，已经开班，正在优惠招生中，现在报课送2个月4.0账号使用，价值160元。</p><div class="it-l"><a href="/wechat/pdf/338.pdf">读原文 PDF</a><span>存档号 338</span></div></div>
-<div class="item" data-k="这款高质量的文字转语音的个人GPT终于被我找到了 重要的放在前头，和爱迪生老师的AI素养课，已经开班，正在优惠招生中，现在报课送2个月4.0账号使用，价值160元。 2024-04-19"><div class="it-hd"><span class="r-n">22</span><a class="it-t" href="/wechat/pdf/339.pdf">这款高质量的文字转语音的个人GPT终于被我找到了</a><span class="it-m">2024-04-19 · 7 页</span></div><p class="it-d">重要的放在前头，和爱迪生老师的AI素养课，已经开班，正在优惠招生中，现在报课送2个月4.0账号使用，价值160元。</p><div class="it-l"><a href="/wechat/pdf/339.pdf">读原文 PDF</a><span>存档号 339</span></div></div>
-<div class="item" data-k="人工智能时代我们为何需要AI素养？ 转载 编者荐语：这是一篇深度好文，逻辑清晰的讲解了为何我们人工智能时代需要AI素养，就像汽车普及的时代，我们需要驾驶技术一样。 2024-04-15"><div class="it-hd"><span class="r-n">23</span><a class="it-t" href="/wechat/pdf/340.pdf">人工智能时代我们为何需要AI素养？ 转载</a><span class="it-m">2024-04-15 · 18 页</span></div><p class="it-d">编者荐语：这是一篇深度好文，逻辑清晰的讲解了为何我们人工智能时代需要AI素养，就像汽车普及的时代，我们需要驾驶技术一样。</p><div class="it-l"><a href="/wechat/pdf/340.pdf">读原文 PDF</a><span>存档号 340</span></div></div>
-<div class="item" data-k="以后电影，视频交给Sora，配音交给Elevenlabs 湖南最近Sora的出现火遍全网，这是继OpenAI发布ChatGPT和DellE之后的又一款颠覆性产品。 2024-03-01"><div class="it-hd"><span class="r-n">24</span><a class="it-t" href="/wechat/pdf/341.pdf">以后电影，视频交给Sora，配音交给Elevenlabs</a><span class="it-m">2024-03-01 · 5 页</span></div><p class="it-d">湖南最近Sora的出现火遍全网，这是继OpenAI发布ChatGPT和DellE之后的又一款颠覆性产品。</p><div class="it-l"><a href="/wechat/pdf/341.pdf">读原文 PDF</a><span>存档号 341</span></div></div>
-<div class="item" data-k="个人GPT为何是AI应用中的一场革命？ 今天，我想与大家分享一堂特别的课——个人GPT的搭建原理。 2023-12-23"><div class="it-hd"><span class="r-n">25</span><a class="it-t" href="/wechat/pdf/344.pdf">个人GPT为何是AI应用中的一场革命？</a><span class="it-m">2023-12-23 · 5 页</span></div><p class="it-d">今天，我想与大家分享一堂特别的课——个人GPT的搭建原理。</p><div class="it-l"><a href="/wechat/pdf/344.pdf">读原文 PDF</a><span>存档号 344</span></div></div>
-<div class="item" data-k="ChatGPT3.5和4.0模型的区别 最近有很多人问我，ChatGPT3.5和4.0模型有什么区别？简单来说就是，3.5的模型呢，它可以进行文字和语音的交互，不管是电脑端的网站，还是 2023-12-16"><div class="it-hd"><span class="r-n">26</span><a class="it-t" href="/wechat/pdf/346.pdf">ChatGPT3.5和4.0模型的区别</a><span class="it-m">2023-12-16 · 5 页</span></div><p class="it-d">最近有很多人问我，ChatGPT3.5和4.0模型有什么区别？简单来说就是，3.5的模型呢，它可以进行文字和语音的交互，不管是电脑端的网站，还是</p><div class="it-l"><a href="/wechat/pdf/346.pdf">读原文 PDF</a><span>存档号 346</span></div></div>
-<div class="item" data-k="如何和ChatGPT进行PDF内容的深度对话 ChatGPT被发布以来，已经有了ChatGPT3.5和ChatGPT4.0两个版本了。 2023-11-28"><div class="it-hd"><span class="r-n">27</span><a class="it-t" href="/wechat/pdf/347.pdf">如何和ChatGPT进行PDF内容的深度对话</a><span class="it-m">2023-11-28 · 4 页</span></div><p class="it-d">ChatGPT被发布以来，已经有了ChatGPT3.5和ChatGPT4.0两个版本了。</p><div class="it-l"><a href="/wechat/pdf/347.pdf">读原文 PDF</a><span>存档号 347</span></div></div>
-<div class="item" data-k="如何将与ChatGPT的对话内容高效转化成PPT文件 随着AI时代的到来，越来越多的行业将被颠覆，其中的一个重要的领域就是教育，以前，老师备课，需要画上大量的时间来准备内容和设计流程，而现在有了Ch 2023-11-23"><div class="it-hd"><span class="r-n">28</span><a class="it-t" href="/wechat/pdf/348.pdf">如何将与ChatGPT的对话内容高效转化成PPT文件</a><span class="it-m">2023-11-23 · 4 页</span></div><p class="it-d">随着AI时代的到来，越来越多的行业将被颠覆，其中的一个重要的领域就是教育，以前，老师备课，需要画上大量的时间来准备内容和设计流程，而现在有了Ch</p><div class="it-l"><a href="/wechat/pdf/348.pdf">读原文 PDF</a><span>存档号 348</span></div></div>
-<div class="item" data-k="和ChatGPT合作开启词根的发现之旅 贵州在上次的文章中我们说到，自然拼读是一个转换工具，需要孩子自己经历字母组合的拆分-组合-再拆分-再组合的过程，只有这样，才能真正达到“见词能读 2023-10-07"><div class="it-hd"><span class="r-n">29</span><a class="it-t" href="/wechat/pdf/349.pdf">和ChatGPT合作开启词根的发现之旅</a><span class="it-m">2023-10-07 · 7 页</span></div><p class="it-d">贵州在上次的文章中我们说到，自然拼读是一个转换工具，需要孩子自己经历字母组合的拆分-组合-再拆分-再组合的过程，只有这样，才能真正达到“见词能读</p><div class="it-l"><a href="/wechat/pdf/349.pdf">读原文 PDF</a><span>存档号 349</span></div></div>
-<div class="item" data-k="这款单词学习的神器，终于被开发出来了。 这是一款我带领团队原本为我们的翻转课堂和家庭营学员开发的单词学习神器，因为实在太好用，所以在一年多前开放给了市场。 2023-09-01"><div class="it-hd"><span class="r-n">30</span><a class="it-t" href="/wechat/pdf/353.pdf">这款单词学习的神器，终于被开发出来了。</a><span class="it-m">2023-09-01 · 8 页</span></div><p class="it-d">这是一款我带领团队原本为我们的翻转课堂和家庭营学员开发的单词学习神器，因为实在太好用，所以在一年多前开放给了市场。</p><div class="it-l"><a href="/wechat/pdf/353.pdf">读原文 PDF</a><span>存档号 353</span></div></div>
-<div class="item" data-k="ChatGPT口语训练的三大模式 四川从开始英语学习的那天起，我们就都很希望自己的口语不断提升，越来越接近nativespeaker，也就是母语状态。 2023-08-16"><div class="it-hd"><span class="r-n">31</span><a class="it-t" href="/wechat/pdf/357.pdf">ChatGPT口语训练的三大模式</a><span class="it-m">2023-08-16 · 6 页</span></div><p class="it-d">四川从开始英语学习的那天起，我们就都很希望自己的口语不断提升，越来越接近nativespeaker，也就是母语状态。</p><div class="it-l"><a href="/wechat/pdf/357.pdf">读原文 PDF</a><span>存档号 357</span></div></div>
-<div class="item" data-k="和ChatGPT合作高效备课以及321智慧学校的建立。 贵州想要实现和ChatGPT合作高效备课，需要我们从不同的角度理解备课备的是什么，还需要我们思考ChatGPT到底是个什么东西。 2023-08-09"><div class="it-hd"><span class="r-n">32</span><a class="it-t" href="/wechat/pdf/358.pdf">和ChatGPT合作高效备课以及321智慧学校的建立。</a><span class="it-m">2023-08-09 · 5 页</span></div><p class="it-d">贵州想要实现和ChatGPT合作高效备课，需要我们从不同的角度理解备课备的是什么，还需要我们思考ChatGPT到底是个什么东西。</p><div class="it-l"><a href="/wechat/pdf/358.pdf">读原文 PDF</a><span>存档号 358</span></div></div>
-<div class="item" data-k="如何和Chat GPT合作高效提高单词学习技术？ 贵州在英语单词的记忆过程中，有一个很重要的方式，就是利用ChatGPT帮助我们生成个性化的英语学习素材。 2023-07-27"><div class="it-hd"><span class="r-n">33</span><a class="it-t" href="/wechat/pdf/361.pdf">如何和Chat GPT合作高效提高单词学习技术？</a><span class="it-m">2023-07-27 · 8 页</span></div><p class="it-d">贵州在英语单词的记忆过程中，有一个很重要的方式，就是利用ChatGPT帮助我们生成个性化的英语学习素材。</p><div class="it-l"><a href="/wechat/pdf/361.pdf">读原文 PDF</a><span>存档号 361</span></div></div>
-<div class="item" data-k="英语学习即将迎来个性化学习的时代 贵州在不久前，我讲了一堂题为：“基于ChatGPT的个性化英语学习方案设计”的课程。 2023-07-16"><div class="it-hd"><span class="r-n">34</span><a class="it-t" href="/wechat/pdf/365.pdf">英语学习即将迎来个性化学习的时代</a><span class="it-m">2023-07-16 · 5 页</span></div><p class="it-d">贵州在不久前，我讲了一堂题为：“基于ChatGPT的个性化英语学习方案设计”的课程。</p><div class="it-l"><a href="/wechat/pdf/365.pdf">读原文 PDF</a><span>存档号 365</span></div></div>
-<div class="item" data-k="基于Chat GPT的托福词汇高效学习 打个很硬的广告。我决定开一个课程，基于ChatGPT一起学托福词汇，保底4000词汇增量。 2023-06-22"><div class="it-hd"><span class="r-n">35</span><a class="it-t" href="/wechat/pdf/366.pdf">基于Chat GPT的托福词汇高效学习</a><span class="it-m">2023-06-22 · 3 页</span></div><p class="it-d">打个很硬的广告。我决定开一个课程，基于ChatGPT一起学托福词汇，保底4000词汇增量。</p><div class="it-l"><a href="/wechat/pdf/366.pdf">读原文 PDF</a><span>存档号 366</span></div></div>
-<div class="item" data-k="太牛了，Chat GPT居然可以做个性化的英语学习方案设计 昨天写了一篇文章，基于ChatGPT的个性化英语学习设计，其实有点标题党的感觉，因为昨天的主要讨论内容是自然习得与刻意习得的深度关系，文章最后 2023-06-03"><div class="it-hd"><span class="r-n">36</span><a class="it-t" href="/wechat/pdf/367.pdf">太牛了，Chat GPT居然可以做个性化的英语学习方案设计</a><span class="it-m">2023-06-03 · 4 页</span></div><p class="it-d">昨天写了一篇文章，基于ChatGPT的个性化英语学习设计，其实有点标题党的感觉，因为昨天的主要讨论内容是自然习得与刻意习得的深度关系，文章最后</p><div class="it-l"><a href="/wechat/pdf/367.pdf">读原文 PDF</a><span>存档号 367</span></div></div>
-<div class="item" data-k="基于Chat GPT的个性化英语学习设计 湖南在约翰英语的学习体系中，很多学员常常面临着一个学习矛盾，就是在学习过程中学习兴趣和能力增长不能兼顾，很多情况下，孩子有兴趣，但能力增长缓慢 2023-06-01"><div class="it-hd"><span class="r-n">37</span><a class="it-t" href="/wechat/pdf/368.pdf">基于Chat GPT的个性化英语学习设计</a><span class="it-m">2023-06-01 · 4 页</span></div><p class="it-d">湖南在约翰英语的学习体系中，很多学员常常面临着一个学习矛盾，就是在学习过程中学习兴趣和能力增长不能兼顾，很多情况下，孩子有兴趣，但能力增长缓慢</p><div class="it-l"><a href="/wechat/pdf/368.pdf">读原文 PDF</a><span>存档号 368</span></div></div>
-<div class="item" data-k="Chat GPT的到来将如何引发教育范式的转移？ 最近ChatGPT实在是太火了，Chat的到来首先是要颠覆的是教育，作为十年英语教师的我的真实感受就是教育的天都要变了。 2023-05-26"><div class="it-hd"><span class="r-n">38</span><a class="it-t" href="/wechat/pdf/369.pdf">Chat GPT的到来将如何引发教育范式的转移？</a><span class="it-m">2023-05-26 · 3 页</span></div><p class="it-d">最近ChatGPT实在是太火了，Chat的到来首先是要颠覆的是教育，作为十年英语教师的我的真实感受就是教育的天都要变了。</p><div class="it-l"><a href="/wechat/pdf/369.pdf">读原文 PDF</a><span>存档号 369</span></div></div>
-<div class="item" data-k="用Chat GPT练习英语发音和口语，简直不要太爽。 有一段时间没有发文了，因为过年之后一直很忙，从去柬埔寨考察，到回国后，各样重磅的学习和调整一个接一个，直到最近才安顿了下来。 2023-04-28"><div class="it-hd"><span class="r-n">39</span><a class="it-t" href="/wechat/pdf/370.pdf">用Chat GPT练习英语发音和口语，简直不要太爽。</a><span class="it-m">2023-04-28 · 4 页</span></div><p class="it-d">有一段时间没有发文了，因为过年之后一直很忙，从去柬埔寨考察，到回国后，各样重磅的学习和调整一个接一个，直到最近才安顿了下来。</p><div class="it-l"><a href="/wechat/pdf/370.pdf">读原文 PDF</a><span>存档号 370</span></div></div>
-<div class="item" data-k="和Chat GPT 讨论语言学习中的音素解码！ &amp;ChatGPT孟加拉国今天在和ChatGPT问对之后就得到了这篇万字长文，这篇文章非常的有价值，是学术水平的。 2023-03-20"><div class="it-hd"><span class="r-n">40</span><a class="it-t" href="/wechat/pdf/374.pdf">和Chat GPT 讨论语言学习中的音素解码！</a><span class="it-m">2023-03-20 · 15 页</span></div><p class="it-d">&amp;ChatGPT孟加拉国今天在和ChatGPT问对之后就得到了这篇万字长文，这篇文章非常的有价值，是学术水平的。</p><div class="it-l"><a href="/wechat/pdf/374.pdf">读原文 PDF</a><span>存档号 374</span></div></div>
-<div class="item" data-k="攀阁林助手——刻意习得单词的神器 英语学习，单词的记忆和积累是非常重要的，如果您不这样认为，那您一定是不懂英语学习。 2022-12-29"><div class="it-hd"><span class="r-n">41</span><a class="it-t" href="/wechat/pdf/381.pdf">攀阁林助手——刻意习得单词的神器</a><span class="it-m">2022-12-29 · 11 页</span></div><p class="it-d">英语学习，单词的记忆和积累是非常重要的，如果您不这样认为，那您一定是不懂英语学习。</p><div class="it-l"><a href="/wechat/pdf/381.pdf">读原文 PDF</a><a href="/wechat/pdf/392.pdf">同题另稿 392</a><span>存档号 381</span></div></div>
-<div class="item" data-k="用这一招，将这款英语学习神器用出新高度 今天给大家推荐一款英语学习神器，叫每日英语听力，也许你之前已经知道这个学习软件。 2021-09-18"><div class="it-hd"><span class="r-n">42</span><a class="it-t" href="/wechat/pdf/410.pdf">用这一招，将这款英语学习神器用出新高度</a><span class="it-m">2021-09-18 · 9 页</span></div><p class="it-d">今天给大家推荐一款英语学习神器，叫每日英语听力，也许你之前已经知道这个学习软件。</p><div class="it-l"><a href="/wechat/pdf/410.pdf">读原文 PDF</a><span>存档号 410</span></div></div>
+<div class="chips"><div class="wrap"><a href="/wechat/">全部频道</a><a href="/wechat/genesis/">语言发生学<b>49</b></a><a href="/wechat/enlighten/">英语启蒙<b>78</b></a><a href="/wechat/vocabulary/">词汇之路<b>23</b></a><a href="/wechat/materials/">素材与分级<b>57</b></a><a href="/wechat/ai/" aria-current="page">AI 与语言教育<b>42</b></a><a href="/wechat/school/">课堂与制度<b>41</b></a><a href="/wechat/lineage/">思想谱系<b>27</b></a><a href="/wechat/notes/">奶爸手记<b>45</b></a><a href="/wechat/camp/">营地与公告<b>25</b></a><a href="/wechat/all/">全部篇目<b>387</b></a></div></div>
+<div class="light"><div class="wrap">
+<div class="tools">
+  <div class="filter"><label>本栏筛选</label><input id="q" type="search" placeholder="输入任意词，例如：GPT、Claude、词根" autocomplete="off" aria-label="在本栏内筛选"><span class="n" id="n"></span></div>
+  <p class="empty" id="empty" style="display:none">本栏没有匹配的篇目。换一个词，或去<a href="/wechat/all/">全部篇目</a>里找。</p>
+</div>
+<section class="list">
+<div data-group="2026"><div class="yr"><b>2026</b><i></i><span>6 篇</span></div>
+<div class="item" data-k="和GPT练口语，你真的练对了吗？ 成人英语·方法科普——AI可以陪你说一万句，但真正的口语能力，要在“失控”中长出来这两年，越来越多人开始用GPT练英语口语。 2026-08-15" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">027</span><a class="it-t" href="/wechat/pdf/027.pdf">和GPT练口语，你真的练对了吗？</a><span class="it-m">2026-08-15 · 18 页</span></div><p class="it-d">成人英语·方法科普——AI可以陪你说一万句，但真正的口语能力，要在“失控”中长出来这两年，越来越多人开始用GPT练英语口语。</p><div class="it-l"><a href="/wechat/pdf/027.pdf">读原文 PDF</a><a href="/wechat/pdf/026.pdf">同题另稿 026</a></div></div>
+<div class="item" data-k="AI时代，我们为何要写作并出版顶级专著？ 知识生产我们正在进入一个极其特殊的时代。过去，人类最稀缺的是知识。 2026-08-13" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">032</span><a class="it-t" href="/wechat/pdf/032.pdf">AI时代，我们为何要写作并出版顶级专著？</a><span class="it-m">2026-08-13 · 16 页</span></div><p class="it-d">知识生产我们正在进入一个极其特殊的时代。过去，人类最稀缺的是知识。</p><div class="it-l"><a href="/wechat/pdf/032.pdf">读原文 PDF</a><a href="/wechat/pdf/031.pdf">同题另稿 031</a></div></div>
+<div class="item" data-k="AI时代，用英语学全科，用中文学百科通识 一、一个被AI重新提出的问题：语言到底是什么？人类教育几千年来，一直有一个默认假设：语言，是知识的运输工具。 2026-07-31" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">050</span><a class="it-t" href="/wechat/pdf/050.pdf">AI时代，用英语学全科，用中文学百科通识</a><span class="it-m">2026-07-31 · 17 页</span></div><p class="it-d">一、一个被AI重新提出的问题：语言到底是什么？人类教育几千年来，一直有一个默认假设：语言，是知识的运输工具。</p><div class="it-l"><a href="/wechat/pdf/050.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="为什么AI时代，英语老师更需要懂一点语言工程？ 湖南AI来了以后，很多英语老师心里其实有一种隐隐的不安。以前，老师讲单词，AI也能讲。 2026-06-28" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">089</span><a class="it-t" href="/wechat/pdf/089.pdf">为什么AI时代，英语老师更需要懂一点语言工程？</a><span class="it-m">2026-06-28 · 25 页</span></div><p class="it-d">湖南AI来了以后，很多英语老师心里其实有一种隐隐的不安。以前，老师讲单词，AI也能讲。</p><div class="it-l"><a href="/wechat/pdf/089.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="你的孩子看了200集小猪佩奇，为什么还是不认识这些单词？——一个由AI驱动的词汇学习系统，正在重新定义“学英语”这件事。 一个让很多家长沉默的问题你家孩子看过小猪佩奇吗？当然看过。不只看过，是反复看。 2026-06-17" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">113</span><a class="it-t" href="/wechat/pdf/113.pdf">你的孩子看了200集小猪佩奇，为什么还是不认识这些单词？——一个由AI驱动的词汇学习系统，正在重新定义“学英语”这件事。</a><span class="it-m">2026-06-17 · 9 页</span></div><p class="it-d">一个让很多家长沉默的问题你家孩子看过小猪佩奇吗？当然看过。不只看过，是反复看。</p><div class="it-l"><a href="/wechat/pdf/113.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="AI给孩子英语练习的频率，真人教师给孩子语言成长的灵魂 AI语音互动时代真正改变的，不只是英语学习的工具，而是中国孩子获得英语练习机会的基本结构。 2026-05-26" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">157</span><a class="it-t" href="/wechat/pdf/157.pdf">AI给孩子英语练习的频率，真人教师给孩子语言成长的灵魂</a><span class="it-m">2026-05-26 · 3 页</span></div><p class="it-d">AI语音互动时代真正改变的，不只是英语学习的工具，而是中国孩子获得英语练习机会的基本结构。</p><div class="it-l"><a href="/wechat/pdf/157.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2025"><div class="yr"><b>2025</b><i></i><span>2 篇</span></div>
+<div class="item" data-k="攀阁林助手使用的保姆级教程 这篇文章主要讲解，攀阁林助手如何使用。首先，进入助手小程序，不知道怎么进入的扫描下方海报即可。 2025-09-16" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">211</span><a class="it-t" href="/wechat/pdf/211.pdf">攀阁林助手使用的保姆级教程</a><span class="it-m">2025-09-16 · 25 页</span></div><p class="it-d">这篇文章主要讲解，攀阁林助手如何使用。首先，进入助手小程序，不知道怎么进入的扫描下方海报即可。</p><div class="it-l"><a href="/wechat/pdf/211.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="让我受益匪浅的几项技术 第一个当然是系统的英语发音技术，这个我在之前的文章里提到的，为何这个技术如此重要？ 2025-05-24" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">226</span><a class="it-t" href="/wechat/pdf/226.pdf">让我受益匪浅的几项技术</a><span class="it-m">2025-05-24 · 2 页</span></div><p class="it-d">第一个当然是系统的英语发音技术，这个我在之前的文章里提到的，为何这个技术如此重要？</p><div class="it-l"><a href="/wechat/pdf/226.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2024"><div class="yr"><b>2024</b><i></i><span>13 篇</span></div>
+<div class="item" data-k="如何通过攀阁林助手高效习得英语单词？ 大家好，我是，今天想跟大家聊聊如何用攀阁林助手来帮助孩子高效习得单词。 2024-12-16" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">280</span><a class="it-t" href="/wechat/pdf/280.pdf">如何通过攀阁林助手高效习得英语单词？</a><span class="it-m">2024-12-16 · 12 页</span></div><p class="it-d">大家好，我是，今天想跟大家聊聊如何用攀阁林助手来帮助孩子高效习得单词。</p><div class="it-l"><a href="/wechat/pdf/280.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="如何和GPT合作高效提升英语口语能力——约翰老师郑州线下分享预告 如何和GPT合作高效提升英语口语能力——线下分享预告亲爱的家长朋友们，大家好！ 2024-12-13" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">281</span><a class="it-t" href="/wechat/pdf/281.pdf">如何和GPT合作高效提升英语口语能力——约翰老师郑州线下分享预告</a><span class="it-m">2024-12-13 · 8 页</span></div><p class="it-d">如何和GPT合作高效提升英语口语能力——线下分享预告亲爱的家长朋友们，大家好！</p><div class="it-l"><a href="/wechat/pdf/281.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="让AI为你打工是一种什么样的体验？ 昨天和一个朋友聊天，她说她的生活和工作，不需要AI。我听完，很震惊。 2024-10-07" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">293</span><a class="it-t" href="/wechat/pdf/293.pdf">让AI为你打工是一种什么样的体验？</a><span class="it-m">2024-10-07 · 14 页</span></div><p class="it-d">昨天和一个朋友聊天，她说她的生活和工作，不需要AI。我听完，很震惊。</p><div class="it-l"><a href="/wechat/pdf/293.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="AI时代，家长如何一键帮孩子开启个性化之路？ AI时代来了，全民个性化学习的时代开启了，最近我带领团队和爱迪生老师一起组织的词汇训练营让近40位学员在暑期的时候体会了双个性化词汇学习的魅力。 2024-07-22" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">303</span><a class="it-t" href="/wechat/pdf/303.pdf">AI时代，家长如何一键帮孩子开启个性化之路？</a><span class="it-m">2024-07-22 · 15 页</span></div><p class="it-d">AI时代来了，全民个性化学习的时代开启了，最近我带领团队和爱迪生老师一起组织的词汇训练营让近40位学员在暑期的时候体会了双个性化词汇学习的魅力。</p><div class="it-l"><a href="/wechat/pdf/303.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="攀阁林助手：听力词汇增长的神器 转载 因发表时内容与原创文章《一款神器改变听力学习，攀阁林助手让你轻松掌握海量词汇》过于相似，未通过原创逻辑校验，发表时原文已被替换为原创文章或使用 攀阁林助手：听力词汇增长的神器以下文章来源于爱迪生的理想世界，作者爱迪生1986爱迪生的理想世界20年英语学习发烧友，音乐和文学狂热爱好者。 2024-05-25" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">331</span><a class="it-t" href="/wechat/pdf/331.pdf">攀阁林助手：听力词汇增长的神器 转载 因发表时内容与原创文章《一款神器改变听力学习，攀阁林助手让你轻松掌握海量词汇》过于相似，未通过原创逻辑校验，发表时原文已被替换为原创文章或使用</a><span class="it-m">2024-05-25 · 6 页</span></div><p class="it-d">攀阁林助手：听力词汇增长的神器以下文章来源于爱迪生的理想世界，作者爱迪生1986爱迪生的理想世界20年英语学习发烧友，音乐和文学狂热爱好者。</p><div class="it-l"><a href="/wechat/pdf/331.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="GPTo模型炸裂发布，大家还要教英语和学英语吗？ GPTo全能模型的发布，实在是太炸裂了。昨天我在ai素养课的课程里深入分享了这一次的更新，带给英语学习的启示和颠覆。 2024-05-20" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">332</span><a class="it-t" href="/wechat/pdf/332.pdf">GPTo模型炸裂发布，大家还要教英语和学英语吗？</a><span class="it-m">2024-05-20 · 2 页</span></div><p class="it-d">GPTo全能模型的发布，实在是太炸裂了。昨天我在ai素养课的课程里深入分享了这一次的更新，带给英语学习的启示和颠覆。</p><div class="it-l"><a href="/wechat/pdf/332.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="如何培养孩子和AI合作的意识和本能 在上次的文章中，我们说到，人工智能能够加速我们科研创新，还可以加速人的思考，可以说，人工智能是一个思考的加速器。 2024-05-05" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">333</span><a class="it-t" href="/wechat/pdf/333.pdf">如何培养孩子和AI合作的意识和本能</a><span class="it-m">2024-05-05 · 8 页</span></div><p class="it-d">在上次的文章中，我们说到，人工智能能够加速我们科研创新，还可以加速人的思考，可以说，人工智能是一个思考的加速器。</p><div class="it-l"><a href="/wechat/pdf/333.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="和GPT合作，学习托福词汇，效率提升100倍 和GPT合作，托福词汇效率提升100背？这是噱头吧，这又是割韭菜吧。 2024-04-26" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">334</span><a class="it-t" href="/wechat/pdf/334.pdf">和GPT合作，学习托福词汇，效率提升100倍</a><span class="it-m">2024-04-26 · 9 页</span></div><p class="it-d">和GPT合作，托福词汇效率提升100背？这是噱头吧，这又是割韭菜吧。</p><div class="it-l"><a href="/wechat/pdf/334.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="浅谈ChatGPT和搜索引擎的区别是什么？ AI素养课：AI英语实战课模块，我和爱迪生要把我们过去一年在AI英语实战上的所有研究再次系统化，教给大家。 2024-04-24" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">335</span><a class="it-t" href="/wechat/pdf/335.pdf">浅谈ChatGPT和搜索引擎的区别是什么？</a><span class="it-m">2024-04-24 · 7 页</span></div><p class="it-d">AI素养课：AI英语实战课模块，我和爱迪生要把我们过去一年在AI英语实战上的所有研究再次系统化，教给大家。</p><div class="it-l"><a href="/wechat/pdf/335.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="一篇文章说清楚关于GPT及其账号使用 重要的放在前头，和爱迪生老师的AI素养课，已经开班，正在优惠招生中，现在报课送2个月4.0账号使用，价值160元。 2024-04-19" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">338</span><a class="it-t" href="/wechat/pdf/338.pdf">一篇文章说清楚关于GPT及其账号使用</a><span class="it-m">2024-04-19 · 8 页</span></div><p class="it-d">重要的放在前头，和爱迪生老师的AI素养课，已经开班，正在优惠招生中，现在报课送2个月4.0账号使用，价值160元。</p><div class="it-l"><a href="/wechat/pdf/338.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="这款高质量的文字转语音的个人GPT终于被我找到了 重要的放在前头，和爱迪生老师的AI素养课，已经开班，正在优惠招生中，现在报课送2个月4.0账号使用，价值160元。 2024-04-19" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">339</span><a class="it-t" href="/wechat/pdf/339.pdf">这款高质量的文字转语音的个人GPT终于被我找到了</a><span class="it-m">2024-04-19 · 7 页</span></div><p class="it-d">重要的放在前头，和爱迪生老师的AI素养课，已经开班，正在优惠招生中，现在报课送2个月4.0账号使用，价值160元。</p><div class="it-l"><a href="/wechat/pdf/339.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="人工智能时代我们为何需要AI素养？ 编者荐语：这是一篇深度好文，逻辑清晰的讲解了为何我们人工智能时代需要AI素养，就像汽车普及的时代，我们需要驾驶技术一样。 2024-04-15" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">340</span><a class="it-t" href="/wechat/pdf/340.pdf">人工智能时代我们为何需要AI素养？</a><span class="it-m">2024-04-15 · 18 页</span></div><p class="it-d">编者荐语：这是一篇深度好文，逻辑清晰的讲解了为何我们人工智能时代需要AI素养，就像汽车普及的时代，我们需要驾驶技术一样。</p><div class="it-l"><a href="/wechat/pdf/340.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="以后电影，视频交给Sora，配音交给Elevenlabs 湖南最近Sora的出现火遍全网，这是继OpenAI发布ChatGPT和DellE之后的又一款颠覆性产品。 2024-03-01" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">341</span><a class="it-t" href="/wechat/pdf/341.pdf">以后电影，视频交给Sora，配音交给Elevenlabs</a><span class="it-m">2024-03-01 · 5 页</span></div><p class="it-d">湖南最近Sora的出现火遍全网，这是继OpenAI发布ChatGPT和DellE之后的又一款颠覆性产品。</p><div class="it-l"><a href="/wechat/pdf/341.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2023"><div class="yr"><b>2023</b><i></i><span>16 篇</span></div>
+<div class="item" data-k="个人GPT为何是AI应用中的一场革命？ 大家好，我是。今天，我想与大家分享一堂特别的课——个人GPT的搭建原理。 2023-12-23" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">344</span><a class="it-t" href="/wechat/pdf/344.pdf">个人GPT为何是AI应用中的一场革命？</a><span class="it-m">2023-12-23 · 5 页</span></div><p class="it-d">大家好，我是。今天，我想与大家分享一堂特别的课——个人GPT的搭建原理。</p><div class="it-l"><a href="/wechat/pdf/344.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="ChatGPT3.5和4.0模型的区别 最近有很多人问我，ChatGPT3.5和4.0模型有什么区别？简单来说就是，3.5的模型呢，它可以进行文字和语音的交互，不管是电脑端的网站，还是…… 2023-12-16" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">346</span><a class="it-t" href="/wechat/pdf/346.pdf">ChatGPT3.5和4.0模型的区别</a><span class="it-m">2023-12-16 · 5 页</span></div><p class="it-d">最近有很多人问我，ChatGPT3.5和4.0模型有什么区别？简单来说就是，3.5的模型呢，它可以进行文字和语音的交互，不管是电脑端的网站，还是……</p><div class="it-l"><a href="/wechat/pdf/346.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="如何和ChatGPT进行PDF内容的深度对话 ChatGPT被发布以来，已经有了ChatGPT3.5和ChatGPT4.0两个版本了。 2023-11-28" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">347</span><a class="it-t" href="/wechat/pdf/347.pdf">如何和ChatGPT进行PDF内容的深度对话</a><span class="it-m">2023-11-28 · 4 页</span></div><p class="it-d">ChatGPT被发布以来，已经有了ChatGPT3.5和ChatGPT4.0两个版本了。</p><div class="it-l"><a href="/wechat/pdf/347.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="如何将与ChatGPT的对话内容高效转化成PPT文件 随着AI时代的到来，越来越多的行业将被颠覆，其中的一个重要的领域就是教育，以前，老师备课，需要画上大量的时间来准备内容和设计流程，而现在有了Ch…… 2023-11-23" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">348</span><a class="it-t" href="/wechat/pdf/348.pdf">如何将与ChatGPT的对话内容高效转化成PPT文件</a><span class="it-m">2023-11-23 · 4 页</span></div><p class="it-d">随着AI时代的到来，越来越多的行业将被颠覆，其中的一个重要的领域就是教育，以前，老师备课，需要画上大量的时间来准备内容和设计流程，而现在有了Ch……</p><div class="it-l"><a href="/wechat/pdf/348.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="和ChatGPT合作开启词根的发现之旅 贵州在上次的文章中我们说到，自然拼读是一个转换工具，需要孩子自己经历字母组合的拆分-组合-再拆分-再组合的过程，只有这样，才能真正达到“见词能读…… 2023-10-07" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">349</span><a class="it-t" href="/wechat/pdf/349.pdf">和ChatGPT合作开启词根的发现之旅</a><span class="it-m">2023-10-07 · 7 页</span></div><p class="it-d">贵州在上次的文章中我们说到，自然拼读是一个转换工具，需要孩子自己经历字母组合的拆分-组合-再拆分-再组合的过程，只有这样，才能真正达到“见词能读……</p><div class="it-l"><a href="/wechat/pdf/349.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="这款单词学习的神器，终于被开发出来了。 这是一款我带领团队原本为我们的翻转课堂和家庭营学员开发的单词学习神器，因为实在太好用，所以在一年多前开放给了市场。 2023-09-01" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">353</span><a class="it-t" href="/wechat/pdf/353.pdf">这款单词学习的神器，终于被开发出来了。</a><span class="it-m">2023-09-01 · 8 页</span></div><p class="it-d">这是一款我带领团队原本为我们的翻转课堂和家庭营学员开发的单词学习神器，因为实在太好用，所以在一年多前开放给了市场。</p><div class="it-l"><a href="/wechat/pdf/353.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="ChatGPT口语训练的三大模式 四川从开始英语学习的那天起，我们就都很希望自己的口语不断提升，越来越接近nativespeaker，也就是母语状态。 2023-08-16" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">357</span><a class="it-t" href="/wechat/pdf/357.pdf">ChatGPT口语训练的三大模式</a><span class="it-m">2023-08-16 · 6 页</span></div><p class="it-d">四川从开始英语学习的那天起，我们就都很希望自己的口语不断提升，越来越接近nativespeaker，也就是母语状态。</p><div class="it-l"><a href="/wechat/pdf/357.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="和ChatGPT合作高效备课以及321智慧学校的建立。 贵州想要实现和ChatGPT合作高效备课，需要我们从不同的角度理解备课备的是什么，还需要我们思考ChatGPT到底是个什么东西。 2023-08-09" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">358</span><a class="it-t" href="/wechat/pdf/358.pdf">和ChatGPT合作高效备课以及321智慧学校的建立。</a><span class="it-m">2023-08-09 · 5 页</span></div><p class="it-d">贵州想要实现和ChatGPT合作高效备课，需要我们从不同的角度理解备课备的是什么，还需要我们思考ChatGPT到底是个什么东西。</p><div class="it-l"><a href="/wechat/pdf/358.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="如何和Chat GPT合作高效提高单词学习技术？ 贵州在英语单词的记忆过程中，有一个很重要的方式，就是利用ChatGPT帮助我们生成个性化的英语学习素材。 2023-07-27" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">361</span><a class="it-t" href="/wechat/pdf/361.pdf">如何和Chat GPT合作高效提高单词学习技术？</a><span class="it-m">2023-07-27 · 8 页</span></div><p class="it-d">贵州在英语单词的记忆过程中，有一个很重要的方式，就是利用ChatGPT帮助我们生成个性化的英语学习素材。</p><div class="it-l"><a href="/wechat/pdf/361.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语学习即将迎来个性化学习的时代 贵州在不久前，我讲了一堂题为：“基于ChatGPT的个性化英语学习方案设计”的课程。 2023-07-16" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">365</span><a class="it-t" href="/wechat/pdf/365.pdf">英语学习即将迎来个性化学习的时代</a><span class="it-m">2023-07-16 · 5 页</span></div><p class="it-d">贵州在不久前，我讲了一堂题为：“基于ChatGPT的个性化英语学习方案设计”的课程。</p><div class="it-l"><a href="/wechat/pdf/365.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="基于Chat GPT的托福词汇高效学习 大家好，打个很硬的广告。我决定开一个课程，基于ChatGPT一起学托福词汇，保底4000词汇增量。 2023-06-22" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">366</span><a class="it-t" href="/wechat/pdf/366.pdf">基于Chat GPT的托福词汇高效学习</a><span class="it-m">2023-06-22 · 3 页</span></div><p class="it-d">大家好，打个很硬的广告。我决定开一个课程，基于ChatGPT一起学托福词汇，保底4000词汇增量。</p><div class="it-l"><a href="/wechat/pdf/366.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="太牛了，Chat GPT居然可以做个性化的英语学习方案设计 昨天写了一篇文章，基于ChatGPT的个性化英语学习设计，其实有点标题党的感觉，因为昨天的主要讨论内容是自然习得与刻意习得的深度关系，文章最后…… 2023-06-03" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">367</span><a class="it-t" href="/wechat/pdf/367.pdf">太牛了，Chat GPT居然可以做个性化的英语学习方案设计</a><span class="it-m">2023-06-03 · 4 页</span></div><p class="it-d">昨天写了一篇文章，基于ChatGPT的个性化英语学习设计，其实有点标题党的感觉，因为昨天的主要讨论内容是自然习得与刻意习得的深度关系，文章最后……</p><div class="it-l"><a href="/wechat/pdf/367.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="基于Chat GPT的个性化英语学习设计 湖南在约翰英语的学习体系中，很多学员常常面临着一个学习矛盾，就是在学习过程中学习兴趣和能力增长不能兼顾，很多情况下，孩子有兴趣，但能力增长缓慢…… 2023-06-01" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">368</span><a class="it-t" href="/wechat/pdf/368.pdf">基于Chat GPT的个性化英语学习设计</a><span class="it-m">2023-06-01 · 4 页</span></div><p class="it-d">湖南在约翰英语的学习体系中，很多学员常常面临着一个学习矛盾，就是在学习过程中学习兴趣和能力增长不能兼顾，很多情况下，孩子有兴趣，但能力增长缓慢……</p><div class="it-l"><a href="/wechat/pdf/368.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="Chat GPT的到来将如何引发教育范式的转移？ 最近ChatGPT实在是太火了，Chat的到来首先是要颠覆的是教育，作为十年英语教师的我的真实感受就是教育的天都要变了。 2023-05-26" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">369</span><a class="it-t" href="/wechat/pdf/369.pdf">Chat GPT的到来将如何引发教育范式的转移？</a><span class="it-m">2023-05-26 · 3 页</span></div><p class="it-d">最近ChatGPT实在是太火了，Chat的到来首先是要颠覆的是教育，作为十年英语教师的我的真实感受就是教育的天都要变了。</p><div class="it-l"><a href="/wechat/pdf/369.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="用Chat GPT练习英语发音和口语，简直不要太爽。 大家好，有一段时间没有发文了，因为过年之后一直很忙，从去柬埔寨考察，到回国后，各样重磅的学习和调整一个接一个，直到最近才安顿了下来。 2023-04-28" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">370</span><a class="it-t" href="/wechat/pdf/370.pdf">用Chat GPT练习英语发音和口语，简直不要太爽。</a><span class="it-m">2023-04-28 · 4 页</span></div><p class="it-d">大家好，有一段时间没有发文了，因为过年之后一直很忙，从去柬埔寨考察，到回国后，各样重磅的学习和调整一个接一个，直到最近才安顿了下来。</p><div class="it-l"><a href="/wechat/pdf/370.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="和Chat GPT 讨论语言学习中的音素解码！ &amp;ChatGPT孟加拉国今天在和ChatGPT问对之后就得到了这篇万字长文，这篇文章非常的有价值，是学术水平的。 2023-03-20" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">374</span><a class="it-t" href="/wechat/pdf/374.pdf">和Chat GPT 讨论语言学习中的音素解码！</a><span class="it-m">2023-03-20 · 15 页</span></div><p class="it-d">&amp;ChatGPT孟加拉国今天在和ChatGPT问对之后就得到了这篇万字长文，这篇文章非常的有价值，是学术水平的。</p><div class="it-l"><a href="/wechat/pdf/374.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2022"><div class="yr"><b>2022</b><i></i><span>1 篇</span></div>
+<div class="item" data-k="攀阁林助手——刻意习得单词的神器 英语学习，单词的记忆和积累是非常重要的，如果您不这样认为，那您一定是不懂英语学习。 2022-12-29" data-y="2022"><div class="it-hd"><span class="r-n" title="存档号">381</span><a class="it-t" href="/wechat/pdf/381.pdf">攀阁林助手——刻意习得单词的神器</a><span class="it-m">2022-12-29 · 11 页</span></div><p class="it-d">英语学习，单词的记忆和积累是非常重要的，如果您不这样认为，那您一定是不懂英语学习。</p><div class="it-l"><a href="/wechat/pdf/381.pdf">读原文 PDF</a><a href="/wechat/pdf/392.pdf">同题另稿 392</a></div></div>
+</div>
+<div data-group="2021"><div class="yr"><b>2021</b><i></i><span>1 篇</span></div>
+<div class="item" data-k="用这一招，将这款英语学习神器用出新高度 今天给大家推荐一款英语学习神器，叫每日英语听力，也许你之前已经知道这个学习软件。 2021-09-18" data-y="2021"><div class="it-hd"><span class="r-n" title="存档号">410</span><a class="it-t" href="/wechat/pdf/410.pdf">用这一招，将这款英语学习神器用出新高度</a><span class="it-m">2021-09-18 · 9 页</span></div><p class="it-d">今天给大家推荐一款英语学习神器，叫每日英语听力，也许你之前已经知道这个学习软件。</p><div class="it-l"><a href="/wechat/pdf/410.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="未标日期"><div class="yr"><b>未标日期</b><i></i><span>3 篇</span></div>
+<div class="item" data-k="如何和 Claude 合作，高效生产个性化课件 昨天文章发出去之后，很多人感兴趣。几天时间，600+课件重做，这放以前不敢想昨天很多人在问到底是怎么做到的，今天这堂课，我把方法一次讲透。 " data-y=""><div class="it-hd"><span class="r-n" title="存档号">066</span><a class="it-t" href="/wechat/pdf/066.pdf">如何和 Claude 合作，高效生产个性化课件</a><span class="it-m">2 页</span></div><p class="it-d">昨天文章发出去之后，很多人感兴趣。几天时间，600+课件重做，这放以前不敢想昨天很多人在问&quot;到底是怎么做到的&quot;，今天这堂课，我把方法一次讲透。</p><div class="it-l"><a href="/wechat/pdf/066.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="几天时间，600+ 课件重做，这放以前不敢想 这几天，我干了一件说出来自己都有点不敢信的事：用Claude，把Jr和ELL的全部课件和课后练习，从头到尾升级重构了一遍——一共600多个。 " data-y=""><div class="it-hd"><span class="r-n" title="存档号">067</span><a class="it-t" href="/wechat/pdf/067.pdf">几天时间，600+ 课件重做，这放以前不敢想</a><span class="it-m">2 页</span></div><p class="it-d">这几天，我干了一件说出来自己都有点不敢信的事：用Claude，把Jr和ELL的全部课件和课后练习，从头到尾升级重构了一遍——一共600多个。</p><div class="it-l"><a href="/wechat/pdf/067.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="GPT5重磅来袭 时间8月8日凌晨1时，OpenAI举行长达一小时多的线上发布会，正式推出GPT-5。 " data-y=""><div class="it-hd"><span class="r-n" title="存档号">216</span><a class="it-t" href="/wechat/pdf/216.pdf">GPT5重磅来袭</a><span class="it-m">2 页</span></div><p class="it-d">时间8月8日凌晨1时，OpenAI举行长达一小时多的线上发布会，正式推出GPT-5。</p><div class="it-l"><a href="/wechat/pdf/216.pdf">读原文 PDF</a></div></div>
+</div>
 </section>
 
-<div class="years"><a href="/wechat/materials/">← 素材与分级</a><a href="/wechat/">全部频道</a><a href="/wechat/school/">课堂与制度 →</a></div>
-<script>
-(function(){
-  var q=document.getElementById("q"),n=document.getElementById("n"),
-      empty=document.getElementById("empty"),
-      items=[].slice.call(document.querySelectorAll(".item")),
-      secs=[].slice.call(document.querySelectorAll("section[data-col]"));
-  if(!q)return;
-  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();});
-  function run(){
-    var v=q.value.trim().toLowerCase(),c=0;
-    for(var i=0;i<items.length;i++){
-      var hit=!v||keys[i].indexOf(v)>=0;
-      items[i].style.display=hit?"":"none";
-      if(hit)c++;
-    }
-    for(var j=0;j<secs.length;j++){
-      var any=secs[j].querySelector('.item:not([style*="none"])');
-      secs[j].style.display=any?"":"none";
-    }
-    n.textContent=c+" / "+items.length;
-    empty.style.display=c?"none":"";
-  }
-  q.addEventListener("input",run); run();
-})();
-</script>
+<div class="nearby">
+  <a href="/wechat/materials/"><small>上一栏</small><b>素材与分级</b>57 篇</a>
+  <a href="/wechat/"><small>门厅</small><b>九个频道</b>回到总目，看写作节律</a>
+  <a href="/wechat/school/"><small>下一栏</small><b>课堂与制度</b>41 篇</a>
 </div>
+</div></div>
 <footer><div class="wrap">
   <p>约翰专栏 —— 胡志英（约翰老师）公众号「五宝爸约翰聊英语」原文存档，共 418 篇。原文一字未改，本站只做归类、排序与检索。</p>
   <p>语言发生学 · <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站 —— 德麦国际 · Demai International Press</p>
 </div></footer>
 <script>
 /* 分站页面的自家链接写的是分站根。在二级域名下这就是对的；
-   若从主站以 /sites/lang/… 预览，则就地补上前缀，两处都能正常点。 */
-(function(){var b="/sites/lang";if(location.pathname.indexOf(b)!==0)return;
-var own=["/#","/all/","/wechat/","/chatjohn/"];
+   若从主站以 /sites/lang/… 预览，就地补前缀，两处都能点。 */
+(function(){window.__wechatBase="";var b="/sites/lang";
+if(location.pathname.indexOf(b)!==0)return;
+window.__wechatBase=b;
+var own=["/#","/all/","/wechat","/chatjohn/"];
 var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
 if(h==="/"){as[i].setAttribute("href",b+"/");continue;}
 for(var k=0;k<own.length;k++){if(h.indexOf(own[k])===0){as[i].setAttribute("href",b+h);break;}}}})();
+</script>
+<script>
+(function(){
+  var q=document.getElementById("q"),n=document.getElementById("n"),
+      empty=document.getElementById("empty"),
+      items=[].slice.call(document.querySelectorAll(".item")),
+      groups=[].slice.call(document.querySelectorAll("[data-group]")),
+      ybtns=[].slice.call(document.querySelectorAll(".chipy button[data-year]")),
+      year=null;
+  if(!q&&!ybtns.length)return;
+  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();}),
+      years=items.map(function(el){return el.getAttribute("data-y")||"";});
+  function run(){
+    var v=q?q.value.trim().toLowerCase():"",c=0;
+    for(var i=0;i<items.length;i++){
+      var hit=(!v||keys[i].indexOf(v)>=0)&&(year===null||years[i]===year);
+      items[i].style.display=hit?"":"none";
+      if(hit)c++;
+    }
+    for(var j=0;j<groups.length;j++){
+      var any=groups[j].querySelector('.item:not([style*="none"])');
+      groups[j].style.display=any?"":"none";
+    }
+    if(n)n.textContent=c+" / "+items.length;
+    if(empty)empty.style.display=c?"none":"";
+  }
+  if(q)q.addEventListener("input",run);
+  ybtns.forEach(function(b){
+    b.addEventListener("click",function(){
+      var y=b.getAttribute("data-year");
+      year=(year===y)?null:y;
+      ybtns.forEach(function(o){
+        o.setAttribute("aria-pressed",String(year!==null&&o.getAttribute("data-year")===year));
+      });
+      run();
+    });
+  });
+  run();
+})();
 </script>
 </body></html>

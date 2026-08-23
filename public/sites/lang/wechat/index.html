@@ -9,181 +9,341 @@
 <meta property="og:title" content="约翰专栏 · 语言发生学">
 <meta property="og:description" content="胡志英（约翰老师）公众号原文存档 418 篇，分九个频道：语言发生学、英语启蒙、词汇之路、素材与分级、AI 与语言教育、课堂与制度、思想谱系、奶爸手记、营地与公告。">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0E14">
 <style>
 :root{
-  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272;
-  --line:#CBCCD4; --indigo:#1F3A5F; --vermilion:#A63A2B;
+  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272; --ink3:#868C9B;
+  --line:#CBCCD4; --line2:#E2E1DE;
+  --indigo:#1F3A5F; --vermilion:#A63A2B;
   --night:#0B0E14; --night2:#121722; --bone:#E8E4DA; --bone2:#8E94A3;
   --edge:rgba(232,228,218,.16); --indigo-l:#6E9BD8; --vermilion-l:#D2604A;
+  --accent:#1F3A5F;
   --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
   --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.75}
 a{color:inherit;text-decoration:none}
-.wrap{max-width:960px;margin:0 auto;padding:0 22px}
-.top{border-bottom:1px solid var(--line);background:rgba(242,241,237,.92);
-  position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(6px)}
-.top .wrap{display:flex;align-items:baseline;gap:18px;height:56px}
-.brand{font-family:var(--serif);font-size:19px;letter-spacing:.14em;color:var(--indigo)}
-.brand em{font-style:normal;color:var(--ink2);font-size:12px;letter-spacing:.24em;margin-left:10px}
-.top nav{margin-left:auto;display:flex;gap:18px;font-size:13.5px;color:var(--ink2);
-  overflow-x:auto;white-space:nowrap}
-.top nav a:hover{color:var(--indigo)}
-.top nav a.out{font-family:var(--mono);font-size:12px}
-.hero{padding:56px 0 0}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--indigo);text-transform:uppercase}
-h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.3;
-  letter-spacing:.02em;margin:.5em 0 .38em}
-.lede{max-width:39em;color:var(--ink2);font-size:16.5px}
-.lede b{color:var(--ink);font-weight:600}
-.crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink2);margin-bottom:6px}
-.crumb a{color:var(--indigo)}
-.band{display:flex;flex-wrap:wrap;gap:0;margin:30px 0 0;border:1px solid var(--line);background:var(--card)}
-.band div{flex:1 1 130px;padding:14px 16px;border-right:1px solid var(--line)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(56% 44% at 10% 0%,rgba(110,155,216,.13),transparent 70%),
+    radial-gradient(44% 40% at 94% 18%,rgba(210,96,74,.10),transparent 72%),
+    radial-gradient(72% 52% at 52% 104%,rgba(111,169,140,.07),transparent 70%)}
+.dark::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.45;
+  background-image:linear-gradient(90deg,rgba(232,228,218,.05) 1px,transparent 1px);
+  background-size:34px 100%}
+.dark .wrap{position:relative;z-index:1}
+
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:40;
+  background:rgba(11,14,20,.88);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone);flex:none}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--bone2);
+  overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a:hover{color:var(--indigo-l)}
+.top nav a[aria-current]{color:var(--bone);box-shadow:inset 0 -1px 0 var(--vermilion-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:70px 0 58px}
+.hero.tight{padding:44px 0 42px}
+.crumb{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--bone2);margin-bottom:16px}
+.crumb a{color:var(--indigo-l)}
+.crumb a:hover{color:var(--bone)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--indigo-l);text-transform:uppercase}
+.dark h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.4vw,52px);line-height:1.26;
+  letter-spacing:.03em;margin:.5em 0 .4em;max-width:15em;color:#F4F2EC}
+.dark h1 em{font-style:normal;color:var(--vermilion-l)}
+.lede{max-width:38em;color:#B9BECB;font-size:16.5px;margin:0}
+.lede b{color:var(--bone);font-weight:600}
+.lede + .lede{margin-top:.9em}
+
+.rhythm{margin:42px 0 0;border:1px solid var(--edge);background:var(--night2)}
+.rhythm .cap{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:nowrap;
+  padding:13px 20px;border-bottom:1px solid rgba(232,228,218,.28);
+  font-family:var(--serif);letter-spacing:.22em;font-size:14.5px;color:#F4F2EC}
+.rhythm .cap span{font-family:var(--mono);font-size:11px;color:var(--bone2);letter-spacing:.06em;
+  text-align:right;letter-spacing:.06em}
+.bars{display:flex;align-items:flex-end;gap:2px;height:116px;padding:20px 20px 0}
+.bars .b{flex:1 1 0;min-width:2px;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bars .b i,.bars .b u{display:block;width:100%;transform-origin:bottom;text-decoration:none;
+  animation:grow .55s cubic-bezier(.2,.7,.3,1) both}
+.bars .b i{background:rgba(232,228,218,.13)}
+.bars .b u{background:var(--indigo-l)}
+.bars .b.hot u{background:var(--vermilion-l)}
+.bars .b:hover i,.bars .b:hover u{filter:brightness(1.45)}
+@keyframes grow{from{transform:scaleY(.05);opacity:.15}to{transform:scaleY(1);opacity:1}}
+.axis{display:flex;padding:0 20px 14px;margin-top:9px;border-top:1px solid var(--edge)}
+.axis span{flex:1 1 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--bone2);
+  padding-top:8px;border-left:1px solid var(--edge);padding-left:7px;overflow:hidden}
+.axis span b,.axis span em{display:block;white-space:nowrap;font-style:normal}
+.axis span em{font-size:9.5px;opacity:.85;margin-top:1px}
+.axis span:first-child{border-left:0;padding-left:0}
+.axis span b{color:#C8CCD6;font-weight:400}
+.rnote{padding:0 20px 18px;margin:0;font-size:12.5px;color:var(--bone2);line-height:1.75;max-width:60em}
+.rnote b{color:#C8CCD6;font-weight:500}
+
+.band{display:flex;flex-wrap:wrap;gap:0;margin:26px 0 0;border:1px solid var(--edge)}
+.band div{flex:1 1 128px;padding:15px 18px;border-right:1px solid var(--edge)}
 .band div:last-child{border-right:0}
-.band b{display:block;font-family:var(--mono);font-size:21px;color:var(--indigo);
-  font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.band span{font-size:12.5px;color:var(--ink2)}
-.filter{display:flex;gap:12px;align-items:center;margin:26px 0 0;
-  border:1px solid var(--line);background:var(--card);padding:10px 14px}
-.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
-.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2)}
-.filter .n{font-family:var(--mono);font-size:12px;color:var(--indigo);font-variant-numeric:tabular-nums}
-.empty{padding:26px 4px;color:var(--ink2);font-size:14.5px}
-section{padding:48px 0 8px}
+.band b{display:block;font-family:var(--mono);font-size:22px;color:#F4F2EC;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.3}
+.band span{font-size:12.5px;color:var(--bone2)}
+.acts{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 0}
+.acts a,.acts button{font:inherit;font-size:14px;color:var(--bone);border:1px solid var(--edge);
+  background:transparent;padding:9px 18px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.acts a:hover,.acts button:hover{border-color:var(--indigo-l);color:#F4F2EC}
+.acts .primary{background:var(--vermilion);border-color:var(--vermilion);color:#FBF7F2}
+.acts .primary:hover{background:var(--vermilion-l);border-color:var(--vermilion-l);color:#fff}
+
+.light{background:var(--paper);
+  background-image:linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:34px 100%;background-position:-1px 0}
+section{padding:52px 0 6px}
 .col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
-.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--indigo);flex:none}
-.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .no{font-family:var(--serif);font-size:13px;letter-spacing:.24em;color:var(--vermilion);flex:none}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.1em;margin:0}
 .col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);
   font-variant-numeric:tabular-nums;flex:none;padding-left:10px}
-.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
-.item{border-bottom:1px dashed var(--line);padding:14px 4px 13px}
-.item:hover{background:var(--card)}
-.it-hd{display:flex;gap:12px;align-items:baseline}
-.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:3.1em;
-  font-variant-numeric:tabular-nums;flex:none}
-.it-t{font-size:15.5px;line-height:1.6}
-.item:hover .it-t{color:var(--indigo)}
-.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
-  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
-.it-d{margin:6px 0 0 4.1em;font-size:13.5px;color:var(--ink2);line-height:1.7}
-.it-l{margin:7px 0 0 4.1em;display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
-.it-l a{color:var(--indigo);border-bottom:1px solid var(--line);padding-bottom:1px}
-.it-l a:hover{border-color:var(--indigo)}
-.it-l span{color:var(--ink2)}
-.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--vermilion);
-  border:1px solid var(--line);padding:1px 5px;margin-left:8px;vertical-align:2px}
-.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;
-  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:8px}
-.ch{display:block;padding:22px 22px 20px;border-right:1px solid var(--line);
-  border-bottom:1px solid var(--line);background:var(--card);transition:background .2s}
+.col-d{color:var(--ink2);font-size:14.5px;margin:13px 0 4px;max-width:46em}
+
+.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0;
+  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:20px;background:var(--card)}
+.ch{display:flex;flex-direction:column;padding:0 0 20px;border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);transition:background .22s}
 .ch:hover{background:#fff}
-.ch .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--indigo)}
-.ch h3{font-family:var(--serif);font-weight:600;font-size:19.5px;letter-spacing:.09em;margin:9px 0 8px}
-.ch:hover h3{color:var(--indigo)}
+.ch .rule{height:3px;background:var(--cc)}
+.ch .in{padding:19px 22px 0;flex:1;display:flex;flex-direction:column}
+.ch .foot{margin-top:auto}
+.ch .n{font-family:var(--serif);font-size:12px;letter-spacing:.3em;color:var(--cc)}
+.ch h3{font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:.1em;margin:8px 0 9px}
+.ch:hover h3{color:var(--cc)}
 .ch p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.72}
-.ch .ct{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+.spark{display:flex;align-items:flex-end;gap:3px;height:26px;margin:16px 0 0}
+.spark i{flex:1 1 0;background:var(--cc);opacity:.26;min-height:1px}
+.spark i.pk{opacity:.85}
+.spark-x{display:flex;gap:3px;margin-top:5px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);
+  letter-spacing:.06em}
+.spark-x i{flex:1 1 0;font-style:normal;text-align:center}
+.ch .picks{margin:15px 0 0;padding-top:12px;border-top:1px dashed var(--line);
+  font-size:13px;color:var(--ink2);line-height:1.7}
+.ch .picks em{font-style:normal;color:var(--ink);display:block}
+.ch .picks em::before{content:"— ";color:var(--cc)}
+.ch .ct{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;display:flex;gap:14px}
+.ch .ct b{color:var(--cc);font-weight:600;font-size:13px}
+.ch .go{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--cc);opacity:0;
+  transform:translateX(-4px);transition:opacity .22s,transform .22s}
+.ch:hover .go,.ch:focus-visible .go{opacity:1;transform:none}
+
+.chips{position:sticky;top:0;z-index:30;background:rgba(242,241,237,.95);
+  backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--line)}
+.chips .wrap{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding:0 22px;
+  -webkit-mask-image:linear-gradient(to right,#000 92%,transparent);
+  mask-image:linear-gradient(to right,#000 92%,transparent)}
+.chips .wrap::-webkit-scrollbar{display:none}
+.chips a{flex:none;padding:12px 15px;font-size:13.5px;color:var(--ink2);white-space:nowrap;
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.chips a:hover{color:var(--ink)}
+.chips a[aria-current]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.chips a b{font-family:var(--mono);font-size:11px;color:var(--ink3);font-weight:400;margin-left:5px;
   font-variant-numeric:tabular-nums}
-.ch .ct b{color:var(--vermilion);font-weight:500}
-.note{background:var(--card);border:1px solid var(--line);padding:22px 24px;margin-top:30px}
-.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:0 0 10px;font-weight:600}
-.note p{margin:0 0 11px;font-size:14.5px;color:var(--ink2)}
+
+.tools{padding:30px 0 0}
+.list{padding-top:10px}
+.filter{display:flex;gap:12px;align-items:center;
+  border:1px solid var(--line);background:var(--card);padding:11px 15px}
+.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
+.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2);flex:none}
+.filter .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.chipy{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 0}
+.chipy button,.chipy a{font:inherit;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:4px 11px;cursor:pointer;
+  transition:border-color .18s,color .18s,background .18s}
+.chipy button:hover,.chipy a:hover{border-color:var(--cc,var(--accent));color:var(--cc,var(--accent))}
+.chipy button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FBF7F2}
+.empty{padding:24px 4px;color:var(--ink2);font-size:14.5px}
+.empty a{color:var(--accent);border-bottom:1px solid var(--line)}
+
+.yr{display:flex;align-items:baseline;gap:12px;margin:34px 0 2px;padding-bottom:6px}
+.yr b{font-family:var(--mono);font-size:19px;letter-spacing:.06em;color:var(--accent);
+  font-variant-numeric:tabular-nums;font-weight:500}
+.yr span{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.12em}
+.yr i{flex:1;height:1px;background:var(--line);font-style:normal}
+.item{border-bottom:1px dashed var(--line);padding:15px 4px 14px;position:relative;transition:background .18s}
+.item::before{content:"";position:absolute;left:-12px;top:15px;bottom:14px;width:2px;
+  background:var(--accent);opacity:0;transition:opacity .18s}
+.item:hover{background:var(--card)}
+.item:hover::before{opacity:.75}
+.it-hd{display:flex;gap:13px;align-items:baseline}
+.r-n{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:3.2em;
+  font-variant-numeric:tabular-nums;flex:none;letter-spacing:.06em}
+.it-t{font-size:15.5px;line-height:1.62;font-family:var(--serif);font-weight:600;letter-spacing:.02em}
+.item:hover .it-t{color:var(--accent)}
+.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
+.it-d{margin:7px 0 0 4.3em;font-size:13.5px;color:var(--ink2);line-height:1.72}
+.it-l{margin:8px 0 0 4.3em;display:flex;gap:15px;font-family:var(--mono);font-size:11px;flex-wrap:wrap;
+  letter-spacing:.06em}
+.it-l a{color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:1px}
+.it-l a:hover{border-color:var(--accent)}
+.it-l span{color:var(--ink3)}
+
+.note{background:var(--card);border:1px solid var(--line);padding:24px 26px;margin-top:36px}
+.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.1em;margin:0 0 12px;font-weight:600}
+.note p{margin:0 0 12px;font-size:14.5px;color:var(--ink2)}
 .note p:last-child{margin-bottom:0}
 .note b{color:var(--ink)}
 .note a{color:var(--indigo);border-bottom:1px solid var(--line)}
-.years{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
-.years a{font-family:var(--mono);font-size:12px;color:var(--indigo);
-  border:1px solid var(--line);padding:4px 10px;background:var(--card)}
-.years a:hover{border-color:var(--indigo)}
-footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 60px;
+.nearby{display:flex;flex-wrap:wrap;gap:0;margin:46px 0 0;border:1px solid var(--line);background:var(--card)}
+.nearby a{flex:1 1 210px;padding:17px 20px;border-right:1px solid var(--line);font-size:13.5px;
+  color:var(--ink2);transition:background .2s,color .2s}
+.nearby a:last-child{border-right:0}
+.nearby a:hover{background:#fff;color:var(--ink)}
+.nearby a small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  color:var(--ink3);margin-bottom:5px}
+.nearby a b{display:block;font-family:var(--serif);font-size:16.5px;letter-spacing:.08em;
+  font-weight:600;color:var(--ink);margin-bottom:3px}
+
+footer{margin-top:74px;border-top:1px solid var(--line);padding:28px 0 66px;
   font-size:13px;color:var(--ink2)}
 footer a{color:var(--indigo);border-bottom:1px solid var(--line)}
 footer p{margin:0 0 8px}
-a:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
-@media(max-width:640px){
-  .hero{padding:36px 0 0}
+a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--vermilion);outline-offset:2px}
+@media(max-width:700px){
+  .hero{padding:40px 0 34px}
+  .hero.tight{padding:32px 0 30px}
+  .top nav{-webkit-mask-image:linear-gradient(to right,#000 86%,transparent);
+    mask-image:linear-gradient(to right,#000 86%,transparent)}
+  .rhythm .cap{flex-wrap:wrap;letter-spacing:.14em;font-size:13.5px}
+  .rhythm .cap span{text-align:left;flex:1 1 100%}
+  .bars{height:82px;padding:16px 14px 0}
+  .axis{padding:0 14px 12px}
+  .axis span{font-size:9px;padding-left:4px;min-width:32px;letter-spacing:0}
+  .axis span em{font-size:8.5px}
+  .rnote{padding:0 14px 15px}
+  .band div{flex:1 1 45%}
   .it-m{display:none}
   .it-d,.it-l{margin-left:0}
+  .item::before{left:-8px}
+  .chips a{padding:11px 12px;font-size:13px}
+  .nearby a{flex:1 1 100%;border-right:0;border-bottom:1px solid var(--line)}
+  .nearby a:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .bars .b i,.bars .b u{animation:none}
+  *{transition:none!important}
 }
 </style>
+<style>:root{--accent:#1F3A5F}</style>
 </head>
 <body>
+<div class="dark">
 <header class="top"><div class="wrap">
   <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
   <nav>
     <a href="/#books">账册</a>
     <a href="/#cols">栏目</a>
     <a href="/all/">全部篇目</a>
-    <a href="/wechat/">约翰专栏</a>
+    <a href="/wechat/" aria-current="page">约翰专栏</a>
     <a href="/chatjohn/">ChatJohn</a>
     <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
   </nav>
 </div></header>
-<div class="wrap">
-<div class="hero">
-<div class="eyebrow">约翰专栏 · WECHAT ARCHIVE</div>
-<h1>五年，四百一十八篇</h1>
-<p class="lede">胡志英（约翰老师）公众号「五宝爸约翰聊英语」的全部原文存档。从 2021 年秋天第一篇写起，到今天为止 <b>418 篇、3,979 页</b>。原文一字未改，本站做的只有三件事：<b>归类、按时间排序、可检索</b>。</p>
-<p class="lede">这些文章和本站那十二篇长论文是同一个人写的两种东西：长论文是把一个判断立到能被推翻的程度，这里则是他每天面对家长时，把同一批问题讲给用得上的人听。两边可以对着读。</p>
-<div class="band">
-  <div><b>418</b><span>篇 · 原文存档</span></div>
-  <div><b>9</b><span>个频道</span></div>
-  <div><b>3,979</b><span>页</span></div>
-  <div><b>2021.09 至 2026.08</b><span>写作跨度</span></div>
-</div>
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">约翰专栏 · WECHAT ARCHIVE</div>
+  <h1>五年，四百一十八篇，<em>一次搬完</em></h1>
+  <p class="lede">胡志英（约翰老师）公众号「五宝爸约翰聊英语」的全部原文存档。从 2021 年秋天那一篇写起，到今天为止 <b>418 篇、3,979 页</b>。原文一字未改，本站做的只有三件事：<b>归类、按时间排序、可检索</b>。</p>
+  <p class="lede">它和本站那十二篇长论文是同一个人写的两种东西。长论文要把一个判断立到能被推翻的程度；这里是他每天面对家长时，把同一批问题讲给用得上的人听。两边对着读，能看出一个判断是怎么从课堂里长出来的。</p>
+
+  <div class="rhythm">
+    <div class="cap">写　作　节　律<span>一列一个月 · 六十个月 · 高低即当月篇数</span></div>
+    <div class="bars"><span class="b" title="2021-09 · 13 篇"><u style="height:45%;animation-delay:0ms"></u></span><span class="b" title="2021-10 · 4 篇"><u style="height:25%;animation-delay:11ms"></u></span><span class="b" title="2021-11 · 4 篇"><u style="height:25%;animation-delay:22ms"></u></span><span class="b" title="2021-12 · 3 篇"><u style="height:22%;animation-delay:33ms"></u></span><span class="b" title="2022-01 · 1 篇"><u style="height:13%;animation-delay:44ms"></u></span><span class="b" title="2022-02 · 0 篇"><u style="height:0%;animation-delay:55ms"></u></span><span class="b" title="2022-03 · 1 篇"><u style="height:13%;animation-delay:66ms"></u></span><span class="b" title="2022-04 · 0 篇"><u style="height:0%;animation-delay:77ms"></u></span><span class="b" title="2022-05 · 1 篇"><u style="height:13%;animation-delay:88ms"></u></span><span class="b" title="2022-06 · 1 篇"><u style="height:13%;animation-delay:99ms"></u></span><span class="b" title="2022-07 · 1 篇"><u style="height:13%;animation-delay:110ms"></u></span><span class="b" title="2022-08 · 3 篇"><u style="height:22%;animation-delay:121ms"></u></span><span class="b" title="2022-09 · 2 篇"><u style="height:18%;animation-delay:132ms"></u></span><span class="b" title="2022-10 · 2 篇"><u style="height:18%;animation-delay:143ms"></u></span><span class="b" title="2022-11 · 0 篇"><u style="height:0%;animation-delay:154ms"></u></span><span class="b" title="2022-12 · 2 篇"><u style="height:18%;animation-delay:165ms"></u></span><span class="b" title="2023-01 · 0 篇"><u style="height:0%;animation-delay:176ms"></u></span><span class="b" title="2023-02 · 4 篇"><u style="height:25%;animation-delay:187ms"></u></span><span class="b" title="2023-03 · 2 篇"><u style="height:18%;animation-delay:198ms"></u></span><span class="b" title="2023-04 · 3 篇"><u style="height:22%;animation-delay:209ms"></u></span><span class="b" title="2023-05 · 1 篇"><u style="height:13%;animation-delay:220ms"></u></span><span class="b" title="2023-06 · 3 篇"><u style="height:22%;animation-delay:231ms"></u></span><span class="b" title="2023-07 · 6 篇"><u style="height:31%;animation-delay:242ms"></u></span><span class="b" title="2023-08 · 6 篇"><u style="height:31%;animation-delay:253ms"></u></span><span class="b" title="2023-09 · 2 篇"><u style="height:18%;animation-delay:264ms"></u></span><span class="b" title="2023-10 · 3 篇"><u style="height:22%;animation-delay:275ms"></u></span><span class="b" title="2023-11 · 2 篇"><u style="height:18%;animation-delay:286ms"></u></span><span class="b" title="2023-12 · 4 篇"><u style="height:25%;animation-delay:297ms"></u></span><span class="b" title="2024-01 · 0 篇"><u style="height:0%;animation-delay:308ms"></u></span><span class="b" title="2024-02 · 1 篇"><u style="height:13%;animation-delay:319ms"></u></span><span class="b" title="2024-03 · 1 篇"><u style="height:13%;animation-delay:330ms"></u></span><span class="b" title="2024-04 · 7 篇"><u style="height:33%;animation-delay:341ms"></u></span><span class="b" title="2024-05 · 8 篇"><u style="height:36%;animation-delay:352ms"></u></span><span class="b" title="2024-06 · 19 篇"><u style="height:55%;animation-delay:363ms"></u></span><span class="b" title="2024-07 · 2 篇"><u style="height:18%;animation-delay:374ms"></u></span><span class="b" title="2024-08 · 4 篇"><u style="height:25%;animation-delay:385ms"></u></span><span class="b" title="2024-09 · 4 篇"><u style="height:25%;animation-delay:396ms"></u></span><span class="b" title="2024-10 · 2 篇"><u style="height:18%;animation-delay:407ms"></u></span><span class="b" title="2024-11 · 6 篇"><u style="height:31%;animation-delay:418ms"></u></span><span class="b" title="2024-12 · 18 篇"><u style="height:53%;animation-delay:429ms"></u></span><span class="b" title="2025-01 · 2 篇"><u style="height:18%;animation-delay:440ms"></u></span><span class="b" title="2025-02 · 18 篇"><u style="height:53%;animation-delay:451ms"></u></span><span class="b" title="2025-03 · 14 篇"><u style="height:47%;animation-delay:462ms"></u></span><span class="b" title="2025-04 · 0 篇"><u style="height:0%;animation-delay:473ms"></u></span><span class="b" title="2025-05 · 3 篇"><u style="height:22%;animation-delay:484ms"></u></span><span class="b" title="2025-06 · 5 篇"><u style="height:28%;animation-delay:495ms"></u></span><span class="b" title="2025-07 · 2 篇"><u style="height:18%;animation-delay:506ms"></u></span><span class="b" title="2025-08 · 1 篇"><u style="height:13%;animation-delay:517ms"></u></span><span class="b" title="2025-09 · 2 篇"><u style="height:18%;animation-delay:528ms"></u></span><span class="b" title="2025-10 · 11 篇"><u style="height:42%;animation-delay:539ms"></u></span><span class="b" title="2025-11 · 2 篇"><u style="height:18%;animation-delay:550ms"></u></span><span class="b" title="2025-12 · 4 篇"><u style="height:25%;animation-delay:561ms"></u></span><span class="b" title="2026-01 · 2 篇"><u style="height:18%;animation-delay:572ms"></u></span><span class="b" title="2026-02 · 5 篇"><u style="height:28%;animation-delay:583ms"></u></span><span class="b" title="2026-03 · 2 篇"><u style="height:18%;animation-delay:594ms"></u></span><span class="b" title="2026-04 · 8 篇"><u style="height:36%;animation-delay:605ms"></u></span><span class="b" title="2026-05 · 21 篇"><u style="height:58%;animation-delay:616ms"></u></span><span class="b hot" title="2026-06 · 63 篇"><u style="height:100%;animation-delay:627ms"></u></span><span class="b" title="2026-07 · 28 篇"><u style="height:67%;animation-delay:638ms"></u></span><span class="b" title="2026-08 · 27 篇"><u style="height:65%;animation-delay:649ms"></u></span></div>
+    <div class="axis"><span style="flex:4 1 0"><b>2021</b><em>24 篇</em></span><span style="flex:12 1 0"><b>2022</b><em>14 篇</em></span><span style="flex:12 1 0"><b>2023</b><em>36 篇</em></span><span style="flex:12 1 0"><b>2024</b><em>72 篇</em></span><span style="flex:12 1 0"><b>2025</b><em>64 篇</em></span><span style="flex:8 1 0"><b>2026</b><em>156 篇</em></span></div>
+    <p class="rnote">写作不是均匀滴下来的。头两年是零星的现场记录；<b>2023 年那一波几乎全在 AI 上</b>，正是 GPT 进课堂的那半年；<b>2025 年转向人物与谱系</b>；<b>2026 年最密</b>，一个月最多写到 63 篇，理论文章几乎都长在这一段。另有 43 篇正文里读不出发表日期，未计入本图。</p>
+  </div>
+
+  <div class="band">
+    <div><b>418</b><span>篇 · 原文存档</span></div>
+    <div><b>9</b><span>个频道</span></div>
+    <div><b>3,979</b><span>页</span></div>
+    <div><b>2021–2026</b><span>写作跨度</span></div>
+  </div>
+
+  <div class="acts">
+    <a class="primary" href="/wechat/all/">一页翻完 387 篇</a>
+    <button id="lucky" type="button">随手抽一篇读</button>
+    <a href="/all/">看十二篇长论文</a>
+  </div>
+</div></div>
 </div>
 
+<div class="light"><div class="wrap">
 <section>
-  <div class="col-h"><span class="no">频　道</span><h2>九个入口</h2><span class="ct">按主题分栏</span></div>
-  <p class="col-d">同一篇只进一栏。栏与栏的分界不按体裁，按它要回答的问题：讲道理的进「语言发生学」，讲怎么做的进「英语启蒙」，讲用什么的进「素材与分级」。</p>
+  <div class="col-h"><span class="no">频　道</span><h2>九个入口</h2><span class="ct">同一篇只进一栏</span></div>
+  <p class="col-d">分栏不按体裁，按它要回答的问题：讲道理的进「语言发生学」，讲怎么做的进「英语启蒙」，讲用什么的进「素材与分级」。每一栏下面那排小柱是它自己的六年分布——有的栏一直在写，有的栏只属于某一年。</p>
   <div class="chs">
-<a class="ch" href="/wechat/genesis/"><div class="n">栏&nbsp;一</div><h3>语言发生学</h3><p>语感、语法、语用、意义与输出。这一栏追的是同一个问题：一句话每条规则都对，为什么还是「不是这么说的」——被违反的究竟是什么。</p><div class="ct"><b>49</b> 篇 · 580 页</div></a>
-<a class="ch" href="/wechat/enlighten/"><div class="n">栏&nbsp;二</div><h3>英语启蒙</h3><p>家庭启蒙的路线与工序：三条线、看听线与听读线、听指、跟读与复述、敏感期、自然拼读。这一栏最厚，因为家长每天要用的就是它。</p><div class="ct"><b>79</b> 篇 · 646 页</div></a>
-<a class="ch" href="/wechat/vocabulary/"><div class="n">栏&nbsp;三</div><h3>词汇之路</h3><p>一个词怎样长出来，又怎样在需要的那一刻被取出来。词根词缀、形态、搭配、词卡、听力词汇转阅读词汇。</p><div class="ct"><b>23</b> 篇 · 315 页</div></a>
-<a class="ch" href="/wechat/materials/"><div class="n">栏&nbsp;四</div><h3>素材与分级</h3><p>读什么、看什么、按什么次序排。RAZ、BrainPOP 与 ELL、原版动画、绘本、章节书与资源清单。</p><div class="ct"><b>57</b> 篇 · 420 页</div></a>
-<a class="ch" href="/wechat/ai/"><div class="n">栏&nbsp;五</div><h3>AI 与语言教育</h3><p>GPT、Claude 与各类工具进入学习现场之后：能力被放大了什么，又被换走了什么。这一栏从 2023 年一路记到现在。</p><div class="ct"><b>42</b> 篇 · 350 页</div></a>
-<a class="ch" href="/wechat/school/"><div class="n">栏&nbsp;六</div><h3>课堂与制度</h3><p>翻转课堂、家校共学、考试与评价、高考与双减。每一个教学动作与制度安排都在取走一点什么，先把它算清楚。</p><div class="ct"><b>41</b> 篇 · 424 页</div></a>
-<a class="ch" href="/wechat/lineage/"><div class="n">栏&nbsp;七</div><h3>思想谱系</h3><p>克拉申、维果茨基、索绪尔、洪堡、皮尔斯、斯韦恩、杜威、陶行知、林语堂。不是介绍生平，是把一个人读成一道还没有答完的问题。</p><div class="ct"><b>27</b> 篇 · 612 页</div></a>
-<a class="ch" href="/wechat/notes/"><div class="n">栏&nbsp;八</div><h3>奶爸手记</h3><p>五个孩子、郊区的院子、种瓜与卖瓜、父亲与儿子。不谈方法的时候，他写这些。</p><div class="ct"><b>45</b> 篇 · 347 页</div></a>
-<a class="ch" href="/wechat/camp/"><div class="n">栏&nbsp;九</div><h3>营地与公告</h3><p>训练营、开班、说明会、公开课与学员见证。现场记录，按时间存档。</p><div class="ct"><b>25</b> 篇 · 153 页</div></a>
+<a class="ch" href="/wechat/genesis/" style="--cc:#2B4C7E"><div class="rule"></div><div class="in"><div class="n">壹</div><h3>语言发生学</h3><p>语感、语法、语用、意义与输出。这一栏追的是同一个问题：一句话每条规则都对，母语者仍然会说「不是这么说的」——被违反的究竟是什么。</p><div class="foot"><div class="spark"><i class="" style="height:3%" title="2021 年 0 篇"></i><i class="" style="height:3%" title="2022 年 0 篇"></i><i class="" style="height:16%" title="2023 年 1 篇"></i><i class="" style="height:39%" title="2024 年 6 篇"></i><i class="" style="height:28%" title="2025 年 3 篇"></i><i class="pk" style="height:100%" title="2026 年 38 篇"></i></div><div class="spark-x"><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i></div><div class="picks"><em>语言学错过了语言出生</em><em>语感的真相：它不是一种神秘天赋，而是声音、身体与意义长期纠缠的结果</em></div><div class="ct"><span><b>49</b> 篇</span><span>587 页</span></div><div class="go">进入这一栏 →</div></div></div></a>
+<a class="ch" href="/wechat/enlighten/" style="--cc:#B0603A"><div class="rule"></div><div class="in"><div class="n">贰</div><h3>英语启蒙</h3><p>家庭启蒙的路线与工序：三条线、看听线与听读线、听指、跟读与复述、敏感期、自然拼读。这一栏最厚，因为家长每天要用的就是它。</p><div class="foot"><div class="spark"><i class="" style="height:46%" title="2021 年 6 篇"></i><i class="" style="height:46%" title="2022 年 6 篇"></i><i class="" style="height:32%" title="2023 年 3 篇"></i><i class="" style="height:59%" title="2024 年 10 篇"></i><i class="pk" style="height:100%" title="2025 年 28 篇"></i><i class="" style="height:90%" title="2026 年 23 篇"></i></div><div class="spark-x"><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i></div><div class="picks"><em>不要让“磨耳朵”，只是磨了个耳朵。</em><em>看听线中的“语音冲浪技术”（Phonetic Surfing） 如何操作？</em></div><div class="ct"><span><b>78</b> 篇</span><span>659 页</span></div><div class="go">进入这一栏 →</div></div></div></a>
+<a class="ch" href="/wechat/vocabulary/" style="--cc:#7A6A2E"><div class="rule"></div><div class="in"><div class="n">叁</div><h3>词汇之路</h3><p>一个词怎样长出来，又怎样在需要的那一刻被取出来。词根词缀、形态、搭配、词卡、听力词汇转阅读词汇。</p><div class="foot"><div class="spark"><i class="" style="height:25%" title="2021 年 1 篇"></i><i class="" style="height:3%" title="2022 年 0 篇"></i><i class="" style="height:3%" title="2023 年 0 篇"></i><i class="" style="height:44%" title="2024 年 3 篇"></i><i class="" style="height:44%" title="2025 年 3 篇"></i><i class="pk" style="height:100%" title="2026 年 15 篇"></i></div><div class="spark-x"><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i></div><div class="picks"><em>为什么你记不住 hand？因为你一直在背词义，而不是看它怎么“活过来的”</em><em>英语词汇的真相：单词不是一个个背出来的，而是一族一族长出来的</em></div><div class="ct"><span><b>23</b> 篇</span><span>315 页</span></div><div class="go">进入这一栏 →</div></div></div></a>
+<a class="ch" href="/wechat/materials/" style="--cc:#3F7A63"><div class="rule"></div><div class="in"><div class="n">肆</div><h3>素材与分级</h3><p>读什么、看什么、按什么次序排。RAZ、BrainPOP 与 ELL、原版动画、绘本、章节书与资源清单。</p><div class="foot"><div class="spark"><i class="" style="height:53%" title="2021 年 8 篇"></i><i class="" style="height:18%" title="2022 年 1 篇"></i><i class="" style="height:32%" title="2023 年 3 篇"></i><i class="" style="height:53%" title="2024 年 8 篇"></i><i class="" style="height:42%" title="2025 年 5 篇"></i><i class="pk" style="height:100%" title="2026 年 28 篇"></i></div><div class="spark-x"><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i></div><div class="picks"><em>读 RAZ，为什么不能只看 AR 或 Lexile？</em><em>孩子不是学不会，而是我们低估了他：从《Ocean Habitats》看学科英语的真正路径</em></div><div class="ct"><span><b>57</b> 篇</span><span>420 页</span></div><div class="go">进入这一栏 →</div></div></div></a>
+<a class="ch" href="/wechat/ai/" style="--cc:#4A5B8C"><div class="rule"></div><div class="in"><div class="n">伍</div><h3>AI 与语言教育</h3><p>GPT、Claude 与各类工具进入学习现场之后：能力被放大了什么，又被换走了什么。这一栏从 2023 年那一波起，一路记到现在。</p><div class="foot"><div class="spark"><i class="" style="height:25%" title="2021 年 1 篇"></i><i class="" style="height:25%" title="2022 年 1 篇"></i><i class="pk" style="height:100%" title="2023 年 16 篇"></i><i class="" style="height:90%" title="2024 年 13 篇"></i><i class="" style="height:35%" title="2025 年 2 篇"></i><i class="" style="height:61%" title="2026 年 6 篇"></i></div><div class="spark-x"><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i></div><div class="picks"><em>GPTo模型炸裂发布，大家还要教英语和学英语吗？</em><em>让AI为你打工是一种什么样的体验？</em></div><div class="ct"><span><b>42</b> 篇</span><span>350 页</span></div><div class="go">进入这一栏 →</div></div></div></a>
+<a class="ch" href="/wechat/school/" style="--cc:#8C3F52"><div class="rule"></div><div class="in"><div class="n">陆</div><h3>课堂与制度</h3><p>翻转课堂、家校共学、考试与评价、高考与双减。每一个教学动作与制度安排都在取走一点什么，先把它算清楚。</p><div class="foot"><div class="spark"><i class="" style="height:20%" title="2021 年 1 篇"></i><i class="" style="height:20%" title="2022 年 1 篇"></i><i class="" style="height:29%" title="2023 年 2 篇"></i><i class="" style="height:62%" title="2024 年 9 篇"></i><i class="" style="height:36%" title="2025 年 3 篇"></i><i class="pk" style="height:100%" title="2026 年 23 篇"></i></div><div class="spark-x"><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i></div><div class="picks"><em>为什么高考英语越改革，家长反而越不信它了？</em><em>纯教学累死老师，纯自学累死妈！</em></div><div class="ct"><span><b>41</b> 篇</span><span>424 页</span></div><div class="go">进入这一栏 →</div></div></div></a>
+<a class="ch" href="/wechat/lineage/" style="--cc:#5B4B6B"><div class="rule"></div><div class="in"><div class="n">柒</div><h3>思想谱系</h3><p>克拉申、维果茨基、索绪尔、洪堡、皮尔斯、斯韦恩、杜威、陶行知、林语堂。不是介绍生平，是把一个人读成一道还没有答完的问题。</p><div class="foot"><div class="spark"><i class="" style="height:27%" title="2021 年 1 篇"></i><i class="" style="height:3%" title="2022 年 0 篇"></i><i class="" style="height:3%" title="2023 年 0 篇"></i><i class="" style="height:39%" title="2024 年 2 篇"></i><i class="pk" style="height:100%" title="2025 年 13 篇"></i><i class="" style="height:87%" title="2026 年 10 篇"></i></div><div class="spark-x"><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i></div><div class="picks"><em>洪堡：语言与自由的建筑师</em><em>当教师不再相信克拉申，却仍然必须引用他</em></div><div class="ct"><span><b>27</b> 篇</span><span>612 页</span></div><div class="go">进入这一栏 →</div></div></div></a>
+<a class="ch" href="/wechat/notes/" style="--cc:#6E7A4B"><div class="rule"></div><div class="in"><div class="n">捌</div><h3>奶爸手记</h3><p>五个孩子、郊区的院子、种瓜与卖瓜、父亲与儿子。不谈方法的时候，他写这些。</p><div class="foot"><div class="spark"><i class="" style="height:55%" title="2021 年 5 篇"></i><i class="" style="height:25%" title="2022 年 1 篇"></i><i class="" style="height:55%" title="2023 年 5 篇"></i><i class="pk" style="height:100%" title="2024 年 16 篇"></i><i class="" style="height:43%" title="2025 年 3 篇"></i><i class="" style="height:82%" title="2026 年 11 篇"></i></div><div class="spark-x"><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i></div><div class="picks"><em>父亲的缺席，不一定是离开家，而是人在旁边，心不在场</em><em>《村院暮归》</em></div><div class="ct"><span><b>45</b> 篇</span><span>347 页</span></div><div class="go">进入这一栏 →</div></div></div></a>
+<a class="ch" href="/wechat/camp/" style="--cc:#A6772B"><div class="rule"></div><div class="in"><div class="n">玖</div><h3>营地与公告</h3><p>训练营、开班、说明会、公开课与学员见证。现场记录，按时间存档。</p><div class="foot"><div class="spark"><i class="" style="height:40%" title="2021 年 1 篇"></i><i class="" style="height:81%" title="2022 年 4 篇"></i><i class="pk" style="height:100%" title="2023 年 6 篇"></i><i class="" style="height:91%" title="2024 年 5 篇"></i><i class="" style="height:81%" title="2025 年 4 篇"></i><i class="" style="height:57%" title="2026 年 2 篇"></i></div><div class="spark-x"><i>21</i><i>22</i><i>23</i><i>24</i><i>25</i><i>26</i></div><div class="picks"><em>约翰英语21天训练营开始了，一起来挑战，突破孩子英语学习瓶颈的同时还能挣奖学金。</em><em>约翰21天训练营之见证系列——Phil</em></div><div class="ct"><span><b>25</b> 篇</span><span>153 页</span></div><div class="go">进入这一栏 →</div></div></div></a>
   </div>
 </section>
 
 <div class="note">
   <h3>关于这批存档</h3>
   <p><b>同题另稿。</b>公众号常有「原创版」与「非原创版」两稿，或同一篇改标题重发。这类共 <b>30</b> 篇，已配对认出：列表里只出现正稿一条，另一稿挂在它下面的「同题另稿」链接上，一篇不删。</p>
-  <p><b>日期。</b>376 篇能从正文里读出确切发表日期，直接显示；其余按存档号排在应有的位置，不显示日期。存档号越小越新——001 是最近的一篇。</p>
-  <p><b>怎么读。</b>点标题直接打开 PDF。想找某一篇，去 <a href="/wechat/all/">全部 418 篇</a> 那一页，输入任意词即时筛选。</p>
+  <p><b>日期。</b>375 篇能从正文里读出确切发表日期，直接显示；其余按存档号排在应有的位置，归入「未标日期」。<b>存档号越小越新</b>——001 是最近的一篇，418 是最早的一篇。</p>
+  <p><b>怎么读。</b>点标题直接打开 PDF。想找某一篇，去 <a href="/wechat/all/">全部篇目</a>，输入任意词即时筛选，也可以只看某一年。</p>
 </div>
 
 <section>
   <div class="col-h"><span class="no">另　见</span><h2>同一个人的另一面</h2></div>
   <p class="col-d">公众号写给家长，长论文写给同行。后者要过敌意拓宽、可裁决预测与独立盲评三道关。</p>
-  <div class="years">
-    <a href="/all/">十二篇长论文 →</a>
-    <a href="/#books">四部专著 →</a>
-    <a href="/chatjohn/">和 ChatJohn 谈一句 →</a>
-    <a href="/students/hu-zhiying/">作者主页 →</a>
+  <div class="nearby">
+    <a href="/all/"><small>长论文</small><b>十二篇新判断</b>语感、语法、语言教学与习得，创新智商 135–143</a>
+    <a href="/#books"><small>账册</small><b>四部专著</b>语言的智慧 · 一花一世界 · 知行合一 · 记到谁的账上</a>
+    <a href="/chatjohn/"><small>对话</small><b>ChatJohn</b>把一句「说不上来就是不对」交给它往下追</a>
   </div>
 </section>
-
-</div>
+</div></div>
 <footer><div class="wrap">
   <p>约翰专栏 —— 胡志英（约翰老师）公众号「五宝爸约翰聊英语」原文存档，共 418 篇。原文一字未改，本站只做归类、排序与检索。</p>
   <p>语言发生学 · <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站 —— 德麦国际 · Demai International Press</p>
 </div></footer>
 <script>
 /* 分站页面的自家链接写的是分站根。在二级域名下这就是对的；
-   若从主站以 /sites/lang/… 预览，则就地补上前缀，两处都能正常点。 */
-(function(){var b="/sites/lang";if(location.pathname.indexOf(b)!==0)return;
-var own=["/#","/all/","/wechat/","/chatjohn/"];
+   若从主站以 /sites/lang/… 预览，就地补前缀，两处都能点。 */
+(function(){window.__wechatBase="";var b="/sites/lang";
+if(location.pathname.indexOf(b)!==0)return;
+window.__wechatBase=b;
+var own=["/#","/all/","/wechat","/chatjohn/"];
 var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
 if(h==="/"){as[i].setAttribute("href",b+"/");continue;}
 for(var k=0;k<own.length;k++){if(h.indexOf(own[k])===0){as[i].setAttribute("href",b+h);break;}}}})();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById("lucky");if(!btn)return;
+  var pool=["002", "003", "005", "007", "010", "011", "013", "016", "017", "019", "021", "023", "025", "027", "030", "032", "034", "036", "038", "040", "041", "043", "044", "045", "046", "047", "048", "049", "050", "051", "052", "053", "054", "055", "056", "057", "058", "059", "060", "061", "062", "063", "064", "069", "070", "071", "072", "073", "074", "075", "076", "078", "079", "080", "081", "082", "083", "084", "085", "086", "087", "088", "089", "090", "091", "092", "093", "094", "095", "096", "097", "098", "099", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "120", "121", "122", "123", "124", "125", "126", "127", "128", "129", "130", "131", "132", "133", "134", "135", "136", "137", "138", "139", "140", "141", "142", "144", "145", "146", "147", "149", "150", "151", "153", "154", "155", "156", "157", "158", "159", "160", "162", "163", "164", "165", "166", "167", "168", "169", "170", "171", "172", "173", "174", "175", "177", "178", "181", "183", "184", "185", "186", "187", "188", "189", "190", "191", "194", "195", "196", "197", "198", "199", "200", "201", "202", "203", "204", "205", "206", "207", "208", "209", "210", "211", "214", "219", "220", "221", "222", "223", "224", "225", "226", "227", "228", "229", "230", "231", "232", "233", "234", "235", "236", "237", "238", "239", "240", "241", "242", "243", "244", "245", "246", "247", "248", "249", "250", "252", "253", "254", "255", "256", "257", "258", "259", "260", "261", "262", "264", "265", "267", "268", "269", "270", "271", "272", "273", "275", "276", "278", "279", "280", "281", "282", "283", "284", "285", "286", "287", "288", "289", "290", "291", "292", "293", "294", "295", "297", "298", "299", "300", "301", "302", "303", "304", "305", "306", "307", "308", "309", "310", "311", "313", "314", "315", "316", "317", "318", "319", "320", "322", "323", "324", "325", "326", "327", "328", "329", "330", "331", "332", "333", "334", "335", "336", "337", "338", "339", "340", "341", "342", "343", "344", "345", "346", "347", "348", "349", "350", "351", "352", "353", "354", "355", "356", "357", "358", "359", "360", "361", "362", "363", "364", "365", "366", "367", "368", "369", "370", "371", "372", "373", "374", "376", "377", "378", "379", "380", "381", "382", "383", "384", "385", "386", "387", "388", "389", "390", "391", "393", "394", "395", "396", "397", "398", "399", "400", "401", "402", "403", "404", "405", "406", "407", "408", "409", "410", "411", "412", "413", "414", "415", "416", "417", "418", "028", "066", "067", "077", "143", "148", "152", "161", "176", "179", "180", "182", "192", "193", "213", "215", "216", "217", "218", "296", "375"];
+  btn.addEventListener("click",function(){
+    var n=pool[Math.floor(Math.random()*pool.length)];
+    location.href=(window.__wechatBase||"")+"/wechat/pdf/"+n+".pdf";
+  });
+})();
 </script>
 </body></html>

@@ -4,257 +4,441 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>英语启蒙 · 约翰专栏 · 语言发生学</title>
-<meta name="description" content="英语启蒙共 79 篇。家庭启蒙的路线与工序：三条线、看听线与听读线、听指、跟读与复述、敏感期、自然拼读。这一栏最厚，因为家长每天要用的就是它。">
+<meta name="description" content="英语启蒙共 78 篇。家庭启蒙的路线与工序：三条线、看听线与听读线、听指、跟读与复述、敏感期、自然拼读。这一栏最厚，因为家长每天要用的就是它。">
 <link rel="canonical" href="https://lang.sdeuniverses.com/wechat/enlighten/">
 <meta property="og:title" content="英语启蒙 · 约翰专栏 · 语言发生学">
-<meta property="og:description" content="英语启蒙共 79 篇。家庭启蒙的路线与工序：三条线、看听线与听读线、听指、跟读与复述、敏感期、自然拼读。这一栏最厚，因为家长每天要用的就是它。">
+<meta property="og:description" content="英语启蒙共 78 篇。家庭启蒙的路线与工序：三条线、看听线与听读线、听指、跟读与复述、敏感期、自然拼读。这一栏最厚，因为家长每天要用的就是它。">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0E14">
 <style>
 :root{
-  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272;
-  --line:#CBCCD4; --indigo:#1F3A5F; --vermilion:#A63A2B;
+  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272; --ink3:#868C9B;
+  --line:#CBCCD4; --line2:#E2E1DE;
+  --indigo:#1F3A5F; --vermilion:#A63A2B;
   --night:#0B0E14; --night2:#121722; --bone:#E8E4DA; --bone2:#8E94A3;
   --edge:rgba(232,228,218,.16); --indigo-l:#6E9BD8; --vermilion-l:#D2604A;
+  --accent:#1F3A5F;
   --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
   --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.75}
 a{color:inherit;text-decoration:none}
-.wrap{max-width:960px;margin:0 auto;padding:0 22px}
-.top{border-bottom:1px solid var(--line);background:rgba(242,241,237,.92);
-  position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(6px)}
-.top .wrap{display:flex;align-items:baseline;gap:18px;height:56px}
-.brand{font-family:var(--serif);font-size:19px;letter-spacing:.14em;color:var(--indigo)}
-.brand em{font-style:normal;color:var(--ink2);font-size:12px;letter-spacing:.24em;margin-left:10px}
-.top nav{margin-left:auto;display:flex;gap:18px;font-size:13.5px;color:var(--ink2);
-  overflow-x:auto;white-space:nowrap}
-.top nav a:hover{color:var(--indigo)}
-.top nav a.out{font-family:var(--mono);font-size:12px}
-.hero{padding:56px 0 0}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--indigo);text-transform:uppercase}
-h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.4vw,40px);line-height:1.3;
-  letter-spacing:.02em;margin:.5em 0 .38em}
-.lede{max-width:39em;color:var(--ink2);font-size:16.5px}
-.lede b{color:var(--ink);font-weight:600}
-.crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink2);margin-bottom:6px}
-.crumb a{color:var(--indigo)}
-.band{display:flex;flex-wrap:wrap;gap:0;margin:30px 0 0;border:1px solid var(--line);background:var(--card)}
-.band div{flex:1 1 130px;padding:14px 16px;border-right:1px solid var(--line)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(56% 44% at 10% 0%,rgba(110,155,216,.13),transparent 70%),
+    radial-gradient(44% 40% at 94% 18%,rgba(210,96,74,.10),transparent 72%),
+    radial-gradient(72% 52% at 52% 104%,rgba(111,169,140,.07),transparent 70%)}
+.dark::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.45;
+  background-image:linear-gradient(90deg,rgba(232,228,218,.05) 1px,transparent 1px);
+  background-size:34px 100%}
+.dark .wrap{position:relative;z-index:1}
+
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:40;
+  background:rgba(11,14,20,.88);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone);flex:none}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--bone2);
+  overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a:hover{color:var(--indigo-l)}
+.top nav a[aria-current]{color:var(--bone);box-shadow:inset 0 -1px 0 var(--vermilion-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:70px 0 58px}
+.hero.tight{padding:44px 0 42px}
+.crumb{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--bone2);margin-bottom:16px}
+.crumb a{color:var(--indigo-l)}
+.crumb a:hover{color:var(--bone)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--indigo-l);text-transform:uppercase}
+.dark h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.4vw,52px);line-height:1.26;
+  letter-spacing:.03em;margin:.5em 0 .4em;max-width:15em;color:#F4F2EC}
+.dark h1 em{font-style:normal;color:var(--vermilion-l)}
+.lede{max-width:38em;color:#B9BECB;font-size:16.5px;margin:0}
+.lede b{color:var(--bone);font-weight:600}
+.lede + .lede{margin-top:.9em}
+
+.rhythm{margin:42px 0 0;border:1px solid var(--edge);background:var(--night2)}
+.rhythm .cap{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:nowrap;
+  padding:13px 20px;border-bottom:1px solid rgba(232,228,218,.28);
+  font-family:var(--serif);letter-spacing:.22em;font-size:14.5px;color:#F4F2EC}
+.rhythm .cap span{font-family:var(--mono);font-size:11px;color:var(--bone2);letter-spacing:.06em;
+  text-align:right;letter-spacing:.06em}
+.bars{display:flex;align-items:flex-end;gap:2px;height:116px;padding:20px 20px 0}
+.bars .b{flex:1 1 0;min-width:2px;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bars .b i,.bars .b u{display:block;width:100%;transform-origin:bottom;text-decoration:none;
+  animation:grow .55s cubic-bezier(.2,.7,.3,1) both}
+.bars .b i{background:rgba(232,228,218,.13)}
+.bars .b u{background:var(--indigo-l)}
+.bars .b.hot u{background:var(--vermilion-l)}
+.bars .b:hover i,.bars .b:hover u{filter:brightness(1.45)}
+@keyframes grow{from{transform:scaleY(.05);opacity:.15}to{transform:scaleY(1);opacity:1}}
+.axis{display:flex;padding:0 20px 14px;margin-top:9px;border-top:1px solid var(--edge)}
+.axis span{flex:1 1 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--bone2);
+  padding-top:8px;border-left:1px solid var(--edge);padding-left:7px;overflow:hidden}
+.axis span b,.axis span em{display:block;white-space:nowrap;font-style:normal}
+.axis span em{font-size:9.5px;opacity:.85;margin-top:1px}
+.axis span:first-child{border-left:0;padding-left:0}
+.axis span b{color:#C8CCD6;font-weight:400}
+.rnote{padding:0 20px 18px;margin:0;font-size:12.5px;color:var(--bone2);line-height:1.75;max-width:60em}
+.rnote b{color:#C8CCD6;font-weight:500}
+
+.band{display:flex;flex-wrap:wrap;gap:0;margin:26px 0 0;border:1px solid var(--edge)}
+.band div{flex:1 1 128px;padding:15px 18px;border-right:1px solid var(--edge)}
 .band div:last-child{border-right:0}
-.band b{display:block;font-family:var(--mono);font-size:21px;color:var(--indigo);
-  font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.band span{font-size:12.5px;color:var(--ink2)}
-.filter{display:flex;gap:12px;align-items:center;margin:26px 0 0;
-  border:1px solid var(--line);background:var(--card);padding:10px 14px}
-.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
-.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2)}
-.filter .n{font-family:var(--mono);font-size:12px;color:var(--indigo);font-variant-numeric:tabular-nums}
-.empty{padding:26px 4px;color:var(--ink2);font-size:14.5px}
-section{padding:48px 0 8px}
+.band b{display:block;font-family:var(--mono);font-size:22px;color:#F4F2EC;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.3}
+.band span{font-size:12.5px;color:var(--bone2)}
+.acts{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 0}
+.acts a,.acts button{font:inherit;font-size:14px;color:var(--bone);border:1px solid var(--edge);
+  background:transparent;padding:9px 18px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.acts a:hover,.acts button:hover{border-color:var(--indigo-l);color:#F4F2EC}
+.acts .primary{background:var(--vermilion);border-color:var(--vermilion);color:#FBF7F2}
+.acts .primary:hover{background:var(--vermilion-l);border-color:var(--vermilion-l);color:#fff}
+
+.light{background:var(--paper);
+  background-image:linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:34px 100%;background-position:-1px 0}
+section{padding:52px 0 6px}
 .col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
-.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--indigo);flex:none}
-.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .no{font-family:var(--serif);font-size:13px;letter-spacing:.24em;color:var(--vermilion);flex:none}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.1em;margin:0}
 .col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);
   font-variant-numeric:tabular-nums;flex:none;padding-left:10px}
-.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
-.item{border-bottom:1px dashed var(--line);padding:14px 4px 13px}
-.item:hover{background:var(--card)}
-.it-hd{display:flex;gap:12px;align-items:baseline}
-.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:3.1em;
-  font-variant-numeric:tabular-nums;flex:none}
-.it-t{font-size:15.5px;line-height:1.6}
-.item:hover .it-t{color:var(--indigo)}
-.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
-  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
-.it-d{margin:6px 0 0 4.1em;font-size:13.5px;color:var(--ink2);line-height:1.7}
-.it-l{margin:7px 0 0 4.1em;display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
-.it-l a{color:var(--indigo);border-bottom:1px solid var(--line);padding-bottom:1px}
-.it-l a:hover{border-color:var(--indigo)}
-.it-l span{color:var(--ink2)}
-.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--vermilion);
-  border:1px solid var(--line);padding:1px 5px;margin-left:8px;vertical-align:2px}
-.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;
-  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:8px}
-.ch{display:block;padding:22px 22px 20px;border-right:1px solid var(--line);
-  border-bottom:1px solid var(--line);background:var(--card);transition:background .2s}
+.col-d{color:var(--ink2);font-size:14.5px;margin:13px 0 4px;max-width:46em}
+
+.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0;
+  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:20px;background:var(--card)}
+.ch{display:flex;flex-direction:column;padding:0 0 20px;border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);transition:background .22s}
 .ch:hover{background:#fff}
-.ch .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--indigo)}
-.ch h3{font-family:var(--serif);font-weight:600;font-size:19.5px;letter-spacing:.09em;margin:9px 0 8px}
-.ch:hover h3{color:var(--indigo)}
+.ch .rule{height:3px;background:var(--cc)}
+.ch .in{padding:19px 22px 0;flex:1;display:flex;flex-direction:column}
+.ch .foot{margin-top:auto}
+.ch .n{font-family:var(--serif);font-size:12px;letter-spacing:.3em;color:var(--cc)}
+.ch h3{font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:.1em;margin:8px 0 9px}
+.ch:hover h3{color:var(--cc)}
 .ch p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.72}
-.ch .ct{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+.spark{display:flex;align-items:flex-end;gap:3px;height:26px;margin:16px 0 0}
+.spark i{flex:1 1 0;background:var(--cc);opacity:.26;min-height:1px}
+.spark i.pk{opacity:.85}
+.spark-x{display:flex;gap:3px;margin-top:5px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);
+  letter-spacing:.06em}
+.spark-x i{flex:1 1 0;font-style:normal;text-align:center}
+.ch .picks{margin:15px 0 0;padding-top:12px;border-top:1px dashed var(--line);
+  font-size:13px;color:var(--ink2);line-height:1.7}
+.ch .picks em{font-style:normal;color:var(--ink);display:block}
+.ch .picks em::before{content:"— ";color:var(--cc)}
+.ch .ct{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;display:flex;gap:14px}
+.ch .ct b{color:var(--cc);font-weight:600;font-size:13px}
+.ch .go{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--cc);opacity:0;
+  transform:translateX(-4px);transition:opacity .22s,transform .22s}
+.ch:hover .go,.ch:focus-visible .go{opacity:1;transform:none}
+
+.chips{position:sticky;top:0;z-index:30;background:rgba(242,241,237,.95);
+  backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--line)}
+.chips .wrap{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding:0 22px;
+  -webkit-mask-image:linear-gradient(to right,#000 92%,transparent);
+  mask-image:linear-gradient(to right,#000 92%,transparent)}
+.chips .wrap::-webkit-scrollbar{display:none}
+.chips a{flex:none;padding:12px 15px;font-size:13.5px;color:var(--ink2);white-space:nowrap;
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.chips a:hover{color:var(--ink)}
+.chips a[aria-current]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.chips a b{font-family:var(--mono);font-size:11px;color:var(--ink3);font-weight:400;margin-left:5px;
   font-variant-numeric:tabular-nums}
-.ch .ct b{color:var(--vermilion);font-weight:500}
-.note{background:var(--card);border:1px solid var(--line);padding:22px 24px;margin-top:30px}
-.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:0 0 10px;font-weight:600}
-.note p{margin:0 0 11px;font-size:14.5px;color:var(--ink2)}
+
+.tools{padding:30px 0 0}
+.list{padding-top:10px}
+.filter{display:flex;gap:12px;align-items:center;
+  border:1px solid var(--line);background:var(--card);padding:11px 15px}
+.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
+.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2);flex:none}
+.filter .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.chipy{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 0}
+.chipy button,.chipy a{font:inherit;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:4px 11px;cursor:pointer;
+  transition:border-color .18s,color .18s,background .18s}
+.chipy button:hover,.chipy a:hover{border-color:var(--cc,var(--accent));color:var(--cc,var(--accent))}
+.chipy button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FBF7F2}
+.empty{padding:24px 4px;color:var(--ink2);font-size:14.5px}
+.empty a{color:var(--accent);border-bottom:1px solid var(--line)}
+
+.yr{display:flex;align-items:baseline;gap:12px;margin:34px 0 2px;padding-bottom:6px}
+.yr b{font-family:var(--mono);font-size:19px;letter-spacing:.06em;color:var(--accent);
+  font-variant-numeric:tabular-nums;font-weight:500}
+.yr span{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.12em}
+.yr i{flex:1;height:1px;background:var(--line);font-style:normal}
+.item{border-bottom:1px dashed var(--line);padding:15px 4px 14px;position:relative;transition:background .18s}
+.item::before{content:"";position:absolute;left:-12px;top:15px;bottom:14px;width:2px;
+  background:var(--accent);opacity:0;transition:opacity .18s}
+.item:hover{background:var(--card)}
+.item:hover::before{opacity:.75}
+.it-hd{display:flex;gap:13px;align-items:baseline}
+.r-n{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:3.2em;
+  font-variant-numeric:tabular-nums;flex:none;letter-spacing:.06em}
+.it-t{font-size:15.5px;line-height:1.62;font-family:var(--serif);font-weight:600;letter-spacing:.02em}
+.item:hover .it-t{color:var(--accent)}
+.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
+.it-d{margin:7px 0 0 4.3em;font-size:13.5px;color:var(--ink2);line-height:1.72}
+.it-l{margin:8px 0 0 4.3em;display:flex;gap:15px;font-family:var(--mono);font-size:11px;flex-wrap:wrap;
+  letter-spacing:.06em}
+.it-l a{color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:1px}
+.it-l a:hover{border-color:var(--accent)}
+.it-l span{color:var(--ink3)}
+
+.note{background:var(--card);border:1px solid var(--line);padding:24px 26px;margin-top:36px}
+.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.1em;margin:0 0 12px;font-weight:600}
+.note p{margin:0 0 12px;font-size:14.5px;color:var(--ink2)}
 .note p:last-child{margin-bottom:0}
 .note b{color:var(--ink)}
 .note a{color:var(--indigo);border-bottom:1px solid var(--line)}
-.years{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
-.years a{font-family:var(--mono);font-size:12px;color:var(--indigo);
-  border:1px solid var(--line);padding:4px 10px;background:var(--card)}
-.years a:hover{border-color:var(--indigo)}
-footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 60px;
+.nearby{display:flex;flex-wrap:wrap;gap:0;margin:46px 0 0;border:1px solid var(--line);background:var(--card)}
+.nearby a{flex:1 1 210px;padding:17px 20px;border-right:1px solid var(--line);font-size:13.5px;
+  color:var(--ink2);transition:background .2s,color .2s}
+.nearby a:last-child{border-right:0}
+.nearby a:hover{background:#fff;color:var(--ink)}
+.nearby a small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  color:var(--ink3);margin-bottom:5px}
+.nearby a b{display:block;font-family:var(--serif);font-size:16.5px;letter-spacing:.08em;
+  font-weight:600;color:var(--ink);margin-bottom:3px}
+
+footer{margin-top:74px;border-top:1px solid var(--line);padding:28px 0 66px;
   font-size:13px;color:var(--ink2)}
 footer a{color:var(--indigo);border-bottom:1px solid var(--line)}
 footer p{margin:0 0 8px}
-a:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
-@media(max-width:640px){
-  .hero{padding:36px 0 0}
+a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--vermilion);outline-offset:2px}
+@media(max-width:700px){
+  .hero{padding:40px 0 34px}
+  .hero.tight{padding:32px 0 30px}
+  .top nav{-webkit-mask-image:linear-gradient(to right,#000 86%,transparent);
+    mask-image:linear-gradient(to right,#000 86%,transparent)}
+  .rhythm .cap{flex-wrap:wrap;letter-spacing:.14em;font-size:13.5px}
+  .rhythm .cap span{text-align:left;flex:1 1 100%}
+  .bars{height:82px;padding:16px 14px 0}
+  .axis{padding:0 14px 12px}
+  .axis span{font-size:9px;padding-left:4px;min-width:32px;letter-spacing:0}
+  .axis span em{font-size:8.5px}
+  .rnote{padding:0 14px 15px}
+  .band div{flex:1 1 45%}
   .it-m{display:none}
   .it-d,.it-l{margin-left:0}
+  .item::before{left:-8px}
+  .chips a{padding:11px 12px;font-size:13px}
+  .nearby a{flex:1 1 100%;border-right:0;border-bottom:1px solid var(--line)}
+  .nearby a:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .bars .b i,.bars .b u{animation:none}
+  *{transition:none!important}
 }
 </style>
+<style>:root{--accent:#B0603A}</style>
 </head>
 <body>
+<div class="dark">
 <header class="top"><div class="wrap">
   <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
   <nav>
     <a href="/#books">账册</a>
     <a href="/#cols">栏目</a>
     <a href="/all/">全部篇目</a>
-    <a href="/wechat/">约翰专栏</a>
+    <a href="/wechat/" aria-current="page">约翰专栏</a>
     <a href="/chatjohn/">ChatJohn</a>
     <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
   </nav>
 </div></header>
-<div class="wrap">
-<div class="hero">
-<div class="crumb"><a href="/wechat/">约翰专栏</a> / 英语启蒙</div>
-<div class="eyebrow">栏二</div>
-<h1>英语启蒙</h1>
-<p class="lede">家庭启蒙的路线与工序：三条线、看听线与听读线、听指、跟读与复述、敏感期、自然拼读。这一栏最厚，因为家长每天要用的就是它。</p>
-<div class="filter"><label>筛选</label><input id="q" type="search" placeholder="输入任意词，例如：语感、复述、词根、RAZ" autocomplete="off" aria-label="筛选篇目"><span class="n" id="n"></span></div>
-<p class="empty" id="empty" style="display:none">没有匹配的篇目。换一个词试试。</p>
+<div class="wrap"><div class="hero tight">
+  <div class="crumb"><a href="/wechat/">约翰专栏</a> · 频道 贰</div>
+  <h1>英语启蒙</h1>
+  <p class="lede">家庭启蒙的路线与工序：三条线、看听线与听读线、听指、跟读与复述、敏感期、自然拼读。这一栏最厚，因为家长每天要用的就是它。</p>
+
+  <div class="rhythm">
+    <div class="cap">本　栏　节　律<span>亮色＝本栏 · 暗色＝同月其他栏</span></div>
+    <div class="bars"><span class="b" title="2021-09 · 2 篇"><i style="height:27%;animation-delay:0ms"></i><u style="height:18%;animation-delay:0ms"></u></span><span class="b" title="2021-10 · 1 篇"><i style="height:12%;animation-delay:11ms"></i><u style="height:13%;animation-delay:11ms"></u></span><span class="b" title="2021-11 · 2 篇"><i style="height:7%;animation-delay:22ms"></i><u style="height:18%;animation-delay:22ms"></u></span><span class="b" title="2021-12 · 1 篇"><i style="height:9%;animation-delay:33ms"></i><u style="height:13%;animation-delay:33ms"></u></span><span class="b" title="2022-01 · 1 篇"><u style="height:13%;animation-delay:44ms"></u></span><span class="b" title="2022-02 · 0 篇"><u style="height:0%;animation-delay:55ms"></u></span><span class="b" title="2022-03 · 0 篇"><i style="height:13%;animation-delay:66ms"></i><u style="height:0%;animation-delay:66ms"></u></span><span class="b" title="2022-04 · 0 篇"><u style="height:0%;animation-delay:77ms"></u></span><span class="b" title="2022-05 · 1 篇"><u style="height:13%;animation-delay:88ms"></u></span><span class="b" title="2022-06 · 0 篇"><i style="height:13%;animation-delay:99ms"></i><u style="height:0%;animation-delay:99ms"></u></span><span class="b" title="2022-07 · 0 篇"><i style="height:13%;animation-delay:110ms"></i><u style="height:0%;animation-delay:110ms"></u></span><span class="b" title="2022-08 · 2 篇"><i style="height:4%;animation-delay:121ms"></i><u style="height:18%;animation-delay:121ms"></u></span><span class="b" title="2022-09 · 1 篇"><i style="height:5%;animation-delay:132ms"></i><u style="height:13%;animation-delay:132ms"></u></span><span class="b" title="2022-10 · 0 篇"><i style="height:18%;animation-delay:143ms"></i><u style="height:0%;animation-delay:143ms"></u></span><span class="b" title="2022-11 · 0 篇"><u style="height:0%;animation-delay:154ms"></u></span><span class="b" title="2022-12 · 1 篇"><i style="height:5%;animation-delay:165ms"></i><u style="height:13%;animation-delay:165ms"></u></span><span class="b" title="2023-01 · 0 篇"><u style="height:0%;animation-delay:176ms"></u></span><span class="b" title="2023-02 · 0 篇"><i style="height:25%;animation-delay:187ms"></i><u style="height:0%;animation-delay:187ms"></u></span><span class="b" title="2023-03 · 0 篇"><i style="height:18%;animation-delay:198ms"></i><u style="height:0%;animation-delay:198ms"></u></span><span class="b" title="2023-04 · 0 篇"><i style="height:22%;animation-delay:209ms"></i><u style="height:0%;animation-delay:209ms"></u></span><span class="b" title="2023-05 · 0 篇"><i style="height:13%;animation-delay:220ms"></i><u style="height:0%;animation-delay:220ms"></u></span><span class="b" title="2023-06 · 0 篇"><i style="height:22%;animation-delay:231ms"></i><u style="height:0%;animation-delay:231ms"></u></span><span class="b" title="2023-07 · 0 篇"><i style="height:31%;animation-delay:242ms"></i><u style="height:0%;animation-delay:242ms"></u></span><span class="b" title="2023-08 · 1 篇"><i style="height:18%;animation-delay:253ms"></i><u style="height:13%;animation-delay:253ms"></u></span><span class="b" title="2023-09 · 1 篇"><i style="height:5%;animation-delay:264ms"></i><u style="height:13%;animation-delay:264ms"></u></span><span class="b" title="2023-10 · 1 篇"><i style="height:9%;animation-delay:275ms"></i><u style="height:13%;animation-delay:275ms"></u></span><span class="b" title="2023-11 · 0 篇"><i style="height:18%;animation-delay:286ms"></i><u style="height:0%;animation-delay:286ms"></u></span><span class="b" title="2023-12 · 0 篇"><i style="height:25%;animation-delay:297ms"></i><u style="height:0%;animation-delay:297ms"></u></span><span class="b" title="2024-01 · 0 篇"><u style="height:0%;animation-delay:308ms"></u></span><span class="b" title="2024-02 · 0 篇"><i style="height:13%;animation-delay:319ms"></i><u style="height:0%;animation-delay:319ms"></u></span><span class="b" title="2024-03 · 0 篇"><i style="height:13%;animation-delay:330ms"></i><u style="height:0%;animation-delay:330ms"></u></span><span class="b" title="2024-04 · 0 篇"><i style="height:33%;animation-delay:341ms"></i><u style="height:0%;animation-delay:341ms"></u></span><span class="b" title="2024-05 · 2 篇"><i style="height:18%;animation-delay:352ms"></i><u style="height:18%;animation-delay:352ms"></u></span><span class="b" title="2024-06 · 3 篇"><i style="height:33%;animation-delay:363ms"></i><u style="height:22%;animation-delay:363ms"></u></span><span class="b" title="2024-07 · 0 篇"><i style="height:18%;animation-delay:374ms"></i><u style="height:0%;animation-delay:374ms"></u></span><span class="b" title="2024-08 · 1 篇"><i style="height:12%;animation-delay:385ms"></i><u style="height:13%;animation-delay:385ms"></u></span><span class="b" title="2024-09 · 0 篇"><i style="height:25%;animation-delay:396ms"></i><u style="height:0%;animation-delay:396ms"></u></span><span class="b" title="2024-10 · 0 篇"><i style="height:18%;animation-delay:407ms"></i><u style="height:0%;animation-delay:407ms"></u></span><span class="b" title="2024-11 · 2 篇"><i style="height:13%;animation-delay:418ms"></i><u style="height:18%;animation-delay:418ms"></u></span><span class="b" title="2024-12 · 2 篇"><i style="height:35%;animation-delay:429ms"></i><u style="height:18%;animation-delay:429ms"></u></span><span class="b" title="2025-01 · 2 篇"><u style="height:18%;animation-delay:440ms"></u></span><span class="b" title="2025-02 · 12 篇"><i style="height:9%;animation-delay:451ms"></i><u style="height:44%;animation-delay:451ms"></u></span><span class="b" title="2025-03 · 11 篇"><i style="height:5%;animation-delay:462ms"></i><u style="height:42%;animation-delay:462ms"></u></span><span class="b" title="2025-04 · 0 篇"><u style="height:0%;animation-delay:473ms"></u></span><span class="b" title="2025-05 · 0 篇"><i style="height:22%;animation-delay:484ms"></i><u style="height:0%;animation-delay:484ms"></u></span><span class="b" title="2025-06 · 1 篇"><i style="height:15%;animation-delay:495ms"></i><u style="height:13%;animation-delay:495ms"></u></span><span class="b" title="2025-07 · 0 篇"><i style="height:18%;animation-delay:506ms"></i><u style="height:0%;animation-delay:506ms"></u></span><span class="b" title="2025-08 · 0 篇"><i style="height:13%;animation-delay:517ms"></i><u style="height:0%;animation-delay:517ms"></u></span><span class="b" title="2025-09 · 0 篇"><i style="height:18%;animation-delay:528ms"></i><u style="height:0%;animation-delay:528ms"></u></span><span class="b" title="2025-10 · 0 篇"><i style="height:42%;animation-delay:539ms"></i><u style="height:0%;animation-delay:539ms"></u></span><span class="b" title="2025-11 · 1 篇"><i style="height:5%;animation-delay:550ms"></i><u style="height:13%;animation-delay:550ms"></u></span><span class="b" title="2025-12 · 1 篇"><i style="height:12%;animation-delay:561ms"></i><u style="height:13%;animation-delay:561ms"></u></span><span class="b" title="2026-01 · 0 篇"><i style="height:18%;animation-delay:572ms"></i><u style="height:0%;animation-delay:572ms"></u></span><span class="b" title="2026-02 · 1 篇"><i style="height:15%;animation-delay:583ms"></i><u style="height:13%;animation-delay:583ms"></u></span><span class="b" title="2026-03 · 0 篇"><i style="height:18%;animation-delay:594ms"></i><u style="height:0%;animation-delay:594ms"></u></span><span class="b" title="2026-04 · 0 篇"><i style="height:36%;animation-delay:605ms"></i><u style="height:0%;animation-delay:605ms"></u></span><span class="b" title="2026-05 · 5 篇"><i style="height:30%;animation-delay:616ms"></i><u style="height:28%;animation-delay:616ms"></u></span><span class="b" title="2026-06 · 3 篇"><i style="height:78%;animation-delay:627ms"></i><u style="height:22%;animation-delay:627ms"></u></span><span class="b" title="2026-07 · 2 篇"><i style="height:49%;animation-delay:638ms"></i><u style="height:18%;animation-delay:638ms"></u></span><span class="b" title="2026-08 · 12 篇"><i style="height:21%;animation-delay:649ms"></i><u style="height:44%;animation-delay:649ms"></u></span></div>
+    <div class="axis"><span style="flex:4 1 0"><b>2021</b><em>6 篇</em></span><span style="flex:12 1 0"><b>2022</b><em>6 篇</em></span><span style="flex:12 1 0"><b>2023</b><em>3 篇</em></span><span style="flex:12 1 0"><b>2024</b><em>10 篇</em></span><span style="flex:12 1 0"><b>2025</b><em>28 篇</em></span><span style="flex:8 1 0"><b>2026</b><em>23 篇</em></span></div>
+    <p class="rnote">写得最多的一年是 <b>2025</b>（28 篇）。本栏最早一篇 2021-09-06，最新一篇 2026-08-20。</p>
+  </div>
+
+  <div class="band">
+    <div><b>78</b><span>篇</span></div>
+    <div><b>659</b><span>页</span></div>
+    <div><b>2025</b><span>写得最多的一年</span></div>
+    <div><b>20%</b><span>占全站篇数</span></div>
+  </div>
+</div></div>
 </div>
 
-<section data-col="enlighten">
-  <div class="col-h"><span class="no">栏&nbsp;二</span><h2>英语启蒙</h2><span class="ct">79 篇 · 646 页</span></div>
-<div class="item" data-k="能跟读得一模一样，为什么还是不会自己说？（非原创版本） 孩子英语跟读得一模一样，不等于会自己开口。跟读时，原声已经把词和语序都铺好了。 "><div class="it-hd"><span class="r-n">1</span><a class="it-t" href="/wechat/pdf/008.pdf">能跟读得一模一样，为什么还是不会自己说？（非原创版本）</a><span class="it-m">2 页</span></div><p class="it-d">孩子英语跟读得一模一样，不等于会自己开口。跟读时，原声已经把词和语序都铺好了。</p><div class="it-l"><a href="/wechat/pdf/008.pdf">读原文 PDF</a><a href="/wechat/pdf/010.pdf">同题另稿 010</a><span>存档号 008</span></div></div>
-<div class="item" data-k="每天放英文当背景音有用吗？“耳朵泡着英语”（标题以页面为准） 每天把英语当背景音，不等于给孩子做了英语启蒙。很多家庭从早到晚放着英文儿歌和动画。 "><div class="it-hd"><span class="r-n">2</span><a class="it-t" href="/wechat/pdf/009.pdf">每天放英文当背景音有用吗？“耳朵泡着英语”（标题以页面为准）</a><span class="it-m">2 页</span></div><p class="it-d">每天把英语当背景音，不等于给孩子做了英语启蒙。很多家庭从早到晚放着英文儿歌和动画。</p><div class="it-l"><a href="/wechat/pdf/009.pdf">读原文 PDF</a><span>存档号 009</span></div></div>
-<div class="item" data-k="每天放英文当背景音有用吗？“耳朵泡着英语”为什么可能什么也没发生 从“声音存在”到“语言真正进入”背景音并非完全没有价值，它可能增加声音熟悉度，也可能让孩子偶然捕捉到已经认识的表达。 2026-08-20"><div class="it-hd"><span class="r-n">3</span><a class="it-t" href="/wechat/pdf/011.pdf">每天放英文当背景音有用吗？“耳朵泡着英语”为什么可能什么也没发生</a><span class="it-m">2026-08-20 · 2 页</span></div><p class="it-d">从“声音存在”到“语言真正进入”背景音并非完全没有价值，它可能增加声音熟悉度，也可能让孩子偶然捕捉到已经认识的表达。</p><div class="it-l"><a href="/wechat/pdf/011.pdf">读原文 PDF</a><span>存档号 011</span></div></div>
-<div class="item" data-k="孩子听英语只看情节、不管语言，要不要停掉动画重新来？ 从“追剧情”到“让英语承担意义”孩子盯着画面笑、追着剧情跑，却似乎根本不在意英语，这并不意味着动画输入失败。 2026-08-19"><div class="it-hd"><span class="r-n">4</span><a class="it-t" href="/wechat/pdf/016.pdf">孩子听英语只看情节、不管语言，要不要停掉动画重新来？</a><span class="it-m">2026-08-19 · 8 页</span></div><p class="it-d">从“追剧情”到“让英语承担意义”孩子盯着画面笑、追着剧情跑，却似乎根本不在意英语，这并不意味着动画输入失败。</p><div class="it-l"><a href="/wechat/pdf/016.pdf">读原文 PDF</a><a href="/wechat/pdf/014.pdf">同题另稿 014</a><span>存档号 016</span></div></div>
-<div class="item" data-k="同一集动画到底该听20遍，还是不断换新的？很多家庭一开始就选错了 从“重复熟悉”到“变化中重建”家长语言学习科普系列：重复和换新不是两套互相排斥的方法。 2026-08-18"><div class="it-hd"><span class="r-n">5</span><a class="it-t" href="/wechat/pdf/021.pdf">同一集动画到底该听20遍，还是不断换新的？很多家庭一开始就选错了</a><span class="it-m">2026-08-18 · 14 页</span></div><p class="it-d">从“重复熟悉”到“变化中重建”家长语言学习科普系列：重复和换新不是两套互相排斥的方法。</p><div class="it-l"><a href="/wechat/pdf/021.pdf">读原文 PDF</a><a href="/wechat/pdf/020.pdf">同题另稿 020</a><span>存档号 021</span></div></div>
-<div class="item" data-k="自然拼读学得很好，为什么真实英语还是听不懂？ 家⻓语⾔学习科普⾃然拼读帮助孩⼦把印刷词转换成声⾳；真实听⼒却要求他从没有空格、不断变化的语流中找出词，并在声⾳消失之前接上意思。 2026-08-13"><div class="it-hd"><span class="r-n">6</span><a class="it-t" href="/wechat/pdf/034.pdf">自然拼读学得很好，为什么真实英语还是听不懂？</a><span class="it-m">2026-08-13 · 17 页</span></div><p class="it-d">家⻓语⾔学习科普⾃然拼读帮助孩⼦把印刷词转换成声⾳；真实听⼒却要求他从没有空格、不断变化的语流中找出词，并在声⾳消失之前接上意思。</p><div class="it-l"><a href="/wechat/pdf/034.pdf">读原文 PDF</a><a href="/wechat/pdf/033.pdf">同题另稿 033</a><span>存档号 034</span></div></div>
-<div class="item" data-k="跟读、复述、自由表达，孩子应该按什么顺序练？ 家长语言学习科普·深度长文,欢迎点赞转发。真正有效的顺序，不是学完跟读再“升级”，而是让成人提供的声音、内容和答案逐步撤出，让孩子越来越多地承担 2026-08-11"><div class="it-hd"><span class="r-n">7</span><a class="it-t" href="/wechat/pdf/038.pdf">跟读、复述、自由表达，孩子应该按什么顺序练？</a><span class="it-m">2026-08-11 · 13 页</span></div><p class="it-d">家长语言学习科普·深度长文,欢迎点赞转发。真正有效的顺序，不是学完跟读再“升级”，而是让成人提供的声音、内容和答案逐步撤出，让孩子越来越多地承担</p><div class="it-l"><a href="/wechat/pdf/038.pdf">读原文 PDF</a><a href="/wechat/pdf/037.pdf">同题另稿 037</a><span>存档号 038</span></div></div>
-<div class="item" data-k="孩子总混淆字母、跳行、记不住词，是练得少还是可能存在阅读困难？ 家长语言学习科普·深度长文:欢迎点赞转发。单个错误不能诊断阅读障碍； 2026-08-10"><div class="it-hd"><span class="r-n">8</span><a class="it-t" href="/wechat/pdf/040.pdf">孩子总混淆字母、跳行、记不住词，是练得少还是可能存在阅读困难？</a><span class="it-m">2026-08-10 · 15 页</span></div><p class="it-d">家长语言学习科普·深度长文:欢迎点赞转发。单个错误不能诊断阅读障碍；</p><div class="it-l"><a href="/wechat/pdf/040.pdf">读原文 PDF</a><a href="/wechat/pdf/039.pdf">同题另稿 039</a><span>存档号 040</span></div></div>
-<div class="item" data-k="孩子只看画面不听英语，家长怎样把注意力拉回声音？ 孩子忽略英语，往往不是不专注，而是画面已经足够完成理解；把注意力拉回声音的关键，是让一句英语真正决定预测、选择、行动和结果。 2026-08-09"><div class="it-hd"><span class="r-n">9</span><a class="it-t" href="/wechat/pdf/041.pdf">孩子只看画面不听英语，家长怎样把注意力拉回声音？</a><span class="it-m">2026-08-09 · 15 页</span></div><p class="it-d">孩子忽略英语，往往不是不专注，而是画面已经足够完成理解；把注意力拉回声音的关键，是让一句英语真正决定预测、选择、行动和结果。</p><div class="it-l"><a href="/wechat/pdf/041.pdf">读原文 PDF</a><span>存档号 041</span></div></div>
-<div class="item" data-k="大孩子学外语一定不如幼儿吗？他们其实拥有另一套优势 幼儿擅长在生活中吸收声音，大孩子则能借助母语、文字、规则与世界知识加速前进； 2026-08-08"><div class="it-hd"><span class="r-n">10</span><a class="it-t" href="/wechat/pdf/043.pdf">大孩子学外语一定不如幼儿吗？他们其实拥有另一套优势</a><span class="it-m">2026-08-08 · 14 页</span></div><p class="it-d">幼儿擅长在生活中吸收声音，大孩子则能借助母语、文字、规则与世界知识加速前进；</p><div class="it-l"><a href="/wechat/pdf/043.pdf">读原文 PDF</a><a href="/wechat/pdf/042.pdf">同题另稿 042</a><span>存档号 043</span></div></div>
-<div class="item" data-k="语言启蒙中真正的“敏感期”，不是一个错过就永远关门的日期 敏感期改变的是不同能力的学习难度与所需条件，不是给整个语言系统设置统一截止日； 2026-08-08"><div class="it-hd"><span class="r-n">11</span><a class="it-t" href="/wechat/pdf/044.pdf">语言启蒙中真正的“敏感期”，不是一个错过就永远关门的日期</a><span class="it-m">2026-08-08 · 12 页</span></div><p class="it-d">敏感期改变的是不同能力的学习难度与所需条件，不是给整个语言系统设置统一截止日；</p><div class="it-l"><a href="/wechat/pdf/044.pdf">读原文 PDF</a><span>存档号 044</span></div></div>
-<div class="item" data-k="两岁开始和八岁开始，家庭语言启蒙究竟应该有什么不同？ 两岁从共同⽣活进⼊语⾔，⼋岁带着已有概念与经验进⼊语⾔；相同的听、说、读与纠错，必须使⽤不同⽅法。 2026-08-07"><div class="it-hd"><span class="r-n">12</span><a class="it-t" href="/wechat/pdf/045.pdf">两岁开始和八岁开始，家庭语言启蒙究竟应该有什么不同？</a><span class="it-m">2026-08-07 · 11 页</span></div><p class="it-d">两岁从共同⽣活进⼊语⾔，⼋岁带着已有概念与经验进⼊语⾔；相同的听、说、读与纠错，必须使⽤不同⽅法。</p><div class="it-l"><a href="/wechat/pdf/045.pdf">读原文 PDF</a><span>存档号 045</span></div></div>
-<div class="item" data-k="孩子学英语，真的是越早越好吗？年龄背后还有三个更重要的条件 年龄决定孩⼦更容易⽤什么⽅式学习；真正决定早期优势能否⻓成能⼒的，是有效接触、真实互动与⻓期连续性。 2026-08-07"><div class="it-hd"><span class="r-n">13</span><a class="it-t" href="/wechat/pdf/046.pdf">孩子学英语，真的是越早越好吗？年龄背后还有三个更重要的条件</a><span class="it-m">2026-08-07 · 12 页</span></div><p class="it-d">年龄决定孩⼦更容易⽤什么⽅式学习；真正决定早期优势能否⻓成能⼒的，是有效接触、真实互动与⻓期连续性。</p><div class="it-l"><a href="/wechat/pdf/046.pdf">读原文 PDF</a><span>存档号 046</span></div></div>
-<div class="item" data-k="为什么孩子阅读分数高，复述却说不出来？ 很多家长看到孩子阅读理解分数不错，会自然觉得：阅读没问题。一篇短文后面五道题，孩子错一两道，甚至全对。 2026-07-27"><div class="it-hd"><span class="r-n">14</span><a class="it-t" href="/wechat/pdf/054.pdf">为什么孩子阅读分数高，复述却说不出来？</a><span class="it-m">2026-07-27 · 19 页</span></div><p class="it-d">很多家长看到孩子阅读理解分数不错，会自然觉得：阅读没问题。一篇短文后面五道题，孩子错一两道，甚至全对。</p><div class="it-l"><a href="/wechat/pdf/054.pdf">读原文 PDF</a><span>存档号 054</span></div></div>
-<div class="item" data-k="成年人学英语，重要的是要让英语在声音里活过来 成年人学英语，有一个令人泄气的普遍循环：背了七八千个单词，语法书刷了三四本，一到开口时，好不容易凑出来的句子却像一具拼错的骨架，僵硬、别扭、毫无 2026-07-23"><div class="it-hd"><span class="r-n">15</span><a class="it-t" href="/wechat/pdf/057.pdf">成年人学英语，重要的是要让英语在声音里活过来</a><span class="it-m">2026-07-23 · 10 页</span></div><p class="it-d">成年人学英语，有一个令人泄气的普遍循环：背了七八千个单词，语法书刷了三四本，一到开口时，好不容易凑出来的句子却像一具拼错的骨架，僵硬、别扭、毫无</p><div class="it-l"><a href="/wechat/pdf/057.pdf">读原文 PDF</a><span>存档号 057</span></div></div>
-<div class="item" data-k="真正重要的不是读得流利，而是让孩子把理解读进声音里 一个孩子坐在桌前，打开英语课本。音频播放一句，他跟一句。第一遍还有些停顿。 2026-06-15"><div class="it-hd"><span class="r-n">16</span><a class="it-t" href="/wechat/pdf/118.pdf">真正重要的不是读得流利，而是让孩子把理解读进声音里</a><span class="it-m">2026-06-15 · 14 页</span></div><p class="it-d">一个孩子坐在桌前，打开英语课本。音频播放一句，他跟一句。第一遍还有些停顿。</p><div class="it-l"><a href="/wechat/pdf/118.pdf">读原文 PDF</a><span>存档号 118</span></div></div>
-<div class="item" data-k="跟读越熟练，孩子越不会自己说？很多家长正在练错方向 很多家长都有过这样一个瞬间。孩子坐在书桌前，音频里读一句，他跟一句。 2026-06-14"><div class="it-hd"><span class="r-n">17</span><a class="it-t" href="/wechat/pdf/119.pdf">跟读越熟练，孩子越不会自己说？很多家长正在练错方向</a><span class="it-m">2026-06-14 · 14 页</span></div><p class="it-d">很多家长都有过这样一个瞬间。孩子坐在书桌前，音频里读一句，他跟一句。</p><div class="it-l"><a href="/wechat/pdf/119.pdf">读原文 PDF</a><span>存档号 119</span></div></div>
-<div class="item" data-k="从跟读到复述，中间只差这一个步骤 很多家长有过这样的困惑。孩子跟读，读得挺好的。音频放着，孩子跟着念，节奏对，发音像，一句接一句，听起来流畅。 2026-06-14"><div class="it-hd"><span class="r-n">18</span><a class="it-t" href="/wechat/pdf/120.pdf">从跟读到复述，中间只差这一个步骤</a><span class="it-m">2026-06-14 · 6 页</span></div><p class="it-d">很多家长有过这样的困惑。孩子跟读，读得挺好的。音频放着，孩子跟着念，节奏对，发音像，一句接一句，听起来流畅。</p><div class="it-l"><a href="/wechat/pdf/120.pdf">读原文 PDF</a><span>存档号 120</span></div></div>
-<div class="item" data-k="成人学英语，真正的突破不是更努力，而是让英语重新进入生活 湖南很多中国成人学英语，都会陷入一种很熟悉的状态：每天都在寻找方法，每天都在怀疑方法。 2026-05-29"><div class="it-hd"><span class="r-n">19</span><a class="it-t" href="/wechat/pdf/153.pdf">成人学英语，真正的突破不是更努力，而是让英语重新进入生活</a><span class="it-m">2026-05-29 · 8 页</span></div><p class="it-d">湖南很多中国成人学英语，都会陷入一种很熟悉的状态：每天都在寻找方法，每天都在怀疑方法。</p><div class="it-l"><a href="/wechat/pdf/153.pdf">读原文 PDF</a><span>存档号 153</span></div></div>
-<div class="item" data-k="约翰英语七步法学习流程说明（老版） 在英语学习中，我的学习流程的核⼼是要简单⾼效，所谓简单是指操作流程要极其简化，不要繁琐，所⽤到的设备要简单。 2026-05-09"><div class="it-hd"><span class="r-n">20</span><a class="it-t" href="/wechat/pdf/162.pdf">约翰英语七步法学习流程说明（老版）</a><span class="it-m">2026-05-09 · 3 页</span></div><p class="it-d">在英语学习中，我的学习流程的核⼼是要简单⾼效，所谓简单是指操作流程要极其简化，不要繁琐，所⽤到的设备要简单。</p><div class="it-l"><a href="/wechat/pdf/162.pdf">读原文 PDF</a><span>存档号 162</span></div></div>
-<div class="item" data-k="英语启蒙的第一步，不是背单词，而是听见声音的秩序 很多中国孩子的英语启蒙，常常是从单词开始的。家长会问：“这个单词是什么意思？ 2026-05-06"><div class="it-hd"><span class="r-n">21</span><a class="it-t" href="/wechat/pdf/165.pdf">英语启蒙的第一步，不是背单词，而是听见声音的秩序</a><span class="it-m">2026-05-06 · 3 页</span></div><p class="it-d">很多中国孩子的英语启蒙，常常是从单词开始的。家长会问：“这个单词是什么意思？</p><div class="it-l"><a href="/wechat/pdf/165.pdf">读原文 PDF</a><span>存档号 165</span></div></div>
-<div class="item" data-k="真正的英语启蒙，要让孩子看到生命之间的关系 重庆很多时候，我们一谈到英语启蒙，想到的往往是单词、儿歌、绘本、动画、自然拼读和分级阅读。 2026-05-03"><div class="it-hd"><span class="r-n">22</span><a class="it-t" href="/wechat/pdf/167.pdf">真正的英语启蒙，要让孩子看到生命之间的关系</a><span class="it-m">2026-05-03 · 4 页</span></div><p class="it-d">重庆很多时候，我们一谈到英语启蒙，想到的往往是单词、儿歌、绘本、动画、自然拼读和分级阅读。</p><div class="it-l"><a href="/wechat/pdf/167.pdf">读原文 PDF</a><span>存档号 167</span></div></div>
-<div class="item" data-k="儿童英语学习必须重视情绪与关系 重庆儿童英语学习，从来不是一个单纯的知识输入过程，而是一个孩子在情绪安全中慢慢打开自己、在关系回应中慢慢生成语言的过程。 2026-05-02"><div class="it-hd"><span class="r-n">23</span><a class="it-t" href="/wechat/pdf/168.pdf">儿童英语学习必须重视情绪与关系</a><span class="it-m">2026-05-02 · 3 页</span></div><p class="it-d">重庆儿童英语学习，从来不是一个单纯的知识输入过程，而是一个孩子在情绪安全中慢慢打开自己、在关系回应中慢慢生成语言的过程。</p><div class="it-l"><a href="/wechat/pdf/168.pdf">读原文 PDF</a><span>存档号 168</span></div></div>
-<div class="item" data-k="英语启蒙，拼的不是资源 昨天的文章发出去之后，春节刚过，拉了一个小营训练群，在攀阁林助手年卡分销商的群里，大家对约翰英语小营都非常的好奇，纷纷问起了小营还能不能进，以及 2026-02-25"><div class="it-hd"><span class="r-n">24</span><a class="it-t" href="/wechat/pdf/186.pdf">英语启蒙，拼的不是资源</a><span class="it-m">2026-02-25 · 8 页</span></div><p class="it-d">昨天的文章发出去之后，春节刚过，拉了一个小营训练群，在攀阁林助手年卡分销商的群里，大家对约翰英语小营都非常的好奇，纷纷问起了小营还能不能进，以及</p><div class="it-l"><a href="/wechat/pdf/186.pdf">读原文 PDF</a><span>存档号 186</span></div></div>
-<div class="item" data-k="从嗜看到嗜听：儿童英语自然习得的发生机制 这堂课的核心，不是简单讨论动画片、电影该不该看，而是在为家长建立一个完整的儿童语言习得发生机制框架。 2025-12-02"><div class="it-hd"><span class="r-n">25</span><a class="it-t" href="/wechat/pdf/196.pdf">从嗜看到嗜听：儿童英语自然习得的发生机制</a><span class="it-m">2025-12-02 · 10 页</span></div><p class="it-d">这堂课的核心，不是简单讨论动画片、电影该不该看，而是在为家长建立一个完整的儿童语言习得发生机制框架。</p><div class="it-l"><a href="/wechat/pdf/196.pdf">读原文 PDF</a><span>存档号 196</span></div></div>
-<div class="item" data-k="3S：让孩子在歌声里自然开口的英语启蒙密码 原创 已修改 第1次修改 2025年11月22日 11时20分 胡志英-约翰 一直以来，3S（SuperSimpleSongs）都是约翰英语翻转课堂的入门课程，而把这套体系作为入门课程的原因，是因为其有趣，简单，帮助孩子很 2025-11-22"><div class="it-hd"><span class="r-n">26</span><a class="it-t" href="/wechat/pdf/197.pdf">3S：让孩子在歌声里自然开口的英语启蒙密码 原创 已修改 第1次修改 2025年11月22日 11时20分 胡志英-约翰</a><span class="it-m">2025-11-22 · 7 页</span></div><p class="it-d">一直以来，3S（SuperSimpleSongs）都是约翰英语翻转课堂的入门课程，而把这套体系作为入门课程的原因，是因为其有趣，简单，帮助孩子很</p><div class="it-l"><a href="/wechat/pdf/197.pdf">读原文 PDF</a><span>存档号 197</span></div></div>
-<div class="item" data-k="锻炼孩子“强悍口语输出力”的秘密 很多家长都困惑：孩子听得懂，却总是“说不出来”。其实，这不是孩子词汇量不够，而是缺乏“低抽象度+高频场景”的输出训练。 "><div class="it-hd"><span class="r-n">27</span><a class="it-t" href="/wechat/pdf/213.pdf">锻炼孩子“强悍口语输出力”的秘密</a><span class="it-m">2 页</span></div><p class="it-d">很多家长都困惑：孩子听得懂，却总是“说不出来”。其实，这不是孩子词汇量不够，而是缺乏“低抽象度+高频场景”的输出训练。</p><div class="it-l"><a href="/wechat/pdf/213.pdf">读原文 PDF</a><span>存档号 213</span></div></div>
-<div class="item" data-k="英语学习中背诵真的落伍了吗？ 许多语言高手之所以能精通多种语言，靠的并非天赋，而是系统性的“背诵训练”。 "><div class="it-hd"><span class="r-n">28</span><a class="it-t" href="/wechat/pdf/217.pdf">英语学习中背诵真的落伍了吗？</a><span class="it-m">2 页</span></div><p class="it-d">许多语言高手之所以能精通多种语言，靠的并非天赋，而是系统性的“背诵训练”。</p><div class="it-l"><a href="/wechat/pdf/217.pdf">读原文 PDF</a><span>存档号 217</span></div></div>
-<div class="item" data-k="启蒙阶段走好这四步，轻松积累2000听力词汇 在英语启蒙阶段，最容易让家长焦虑的一个问题就是：“我到底该让孩子先学什么？ 2025-06-05"><div class="it-hd"><span class="r-n">29</span><a class="it-t" href="/wechat/pdf/223.pdf">启蒙阶段走好这四步，轻松积累2000听力词汇</a><span class="it-m">2025-06-05 · 17 页</span></div><p class="it-d">在英语启蒙阶段，最容易让家长焦虑的一个问题就是：“我到底该让孩子先学什么？</p><div class="it-l"><a href="/wechat/pdf/223.pdf">读原文 PDF</a><span>存档号 223</span></div></div>
-<div class="item" data-k="母语习得的关键：海量输入、多角度高频互动与极致场景化 语言习得并非“自然”，而是精心设计的结果很多家长认为，孩子学母语是“自然而然”的过程，但事实是，母语习得的每一步都是环境精心设计的结果。 2025-03-16"><div class="it-hd"><span class="r-n">30</span><a class="it-t" href="/wechat/pdf/231.pdf">母语习得的关键：海量输入、多角度高频互动与极致场景化</a><span class="it-m">2025-03-16 · 9 页</span></div><p class="it-d">语言习得并非“自然”，而是精心设计的结果很多家长认为，孩子学母语是“自然而然”的过程，但事实是，母语习得的每一步都是环境精心设计的结果。</p><div class="it-l"><a href="/wechat/pdf/231.pdf">读原文 PDF</a><span>存档号 231</span></div></div>
-<div class="item" data-k="如何在复述训练中培养孩子的语言创造力？ 引言：为什么要培养孩子的语言创造力？在儿童语言学习的过程中，复述（retelling）是一种非常有效的方法，它不仅可以帮助孩子加深对文本内容的理 2025-03-15"><div class="it-hd"><span class="r-n">31</span><a class="it-t" href="/wechat/pdf/232.pdf">如何在复述训练中培养孩子的语言创造力？</a><span class="it-m">2025-03-15 · 8 页</span></div><p class="it-d">引言：为什么要培养孩子的语言创造力？在儿童语言学习的过程中，复述（retelling）是一种非常有效的方法，它不仅可以帮助孩子加深对文本内容的理</p><div class="it-l"><a href="/wechat/pdf/232.pdf">读原文 PDF</a><span>存档号 232</span></div></div>
-<div class="item" data-k="听线和听读线为何要严格区分？ 将看听线（i+5沉浸式输入）和听读线（i+3结构化输入）严格区分开来的核心意义在于最大化利用不同学习路径的优势，使其互补，从而提高英语学习的效率 2025-03-12"><div class="it-hd"><span class="r-n">32</span><a class="it-t" href="/wechat/pdf/233.pdf">听线和听读线为何要严格区分？</a><span class="it-m">2025-03-12 · 4 页</span></div><p class="it-d">将看听线（i+5沉浸式输入）和听读线（i+3结构化输入）严格区分开来的核心意义在于最大化利用不同学习路径的优势，使其互补，从而提高英语学习的效率</p><div class="it-l"><a href="/wechat/pdf/233.pdf">读原文 PDF</a><span>存档号 233</span></div></div>
-<div class="item" data-k="不结合看听线与听读线，英语学习迟早歇菜！ 过去十年里，我见过太多孩子的英语学习卡在某个阶段。 2025-03-10"><div class="it-hd"><span class="r-n">33</span><a class="it-t" href="/wechat/pdf/234.pdf">不结合看听线与听读线，英语学习迟早歇菜！</a><span class="it-m">2025-03-10 · 6 页</span></div><p class="it-d">过去十年里，我见过太多孩子的英语学习卡在某个阶段。</p><div class="it-l"><a href="/wechat/pdf/234.pdf">读原文 PDF</a><span>存档号 234</span></div></div>
-<div class="item" data-k="家庭英语启蒙，为什么总感觉执行起来这么难？ 过去十多年里，我几乎每天都在和家长们聊英语学习的那些事儿。 2025-03-09"><div class="it-hd"><span class="r-n">34</span><a class="it-t" href="/wechat/pdf/235.pdf">家庭英语启蒙，为什么总感觉执行起来这么难？</a><span class="it-m">2025-03-09 · 12 页</span></div><p class="it-d">过去十多年里，我几乎每天都在和家长们聊英语学习的那些事儿。</p><div class="it-l"><a href="/wechat/pdf/235.pdf">读原文 PDF</a><span>存档号 235</span></div></div>
-<div class="item" data-k="英语启蒙一开始，如何拉看听线？ 原创 已修改 第1次修改 2025年03月07日 12时48分 胡志英-约翰 很多家长不知道一开始给孩子英语启蒙拉看听线的重要性。直接上手就是刷分级。 2025-03-07"><div class="it-hd"><span class="r-n">35</span><a class="it-t" href="/wechat/pdf/236.pdf">英语启蒙一开始，如何拉看听线？ 原创 已修改 第1次修改 2025年03月07日 12时48分 胡志英-约翰</a><span class="it-m">2025-03-07 · 12 页</span></div><p class="it-d">很多家长不知道一开始给孩子英语启蒙拉看听线的重要性。直接上手就是刷分级。</p><div class="it-l"><a href="/wechat/pdf/236.pdf">读原文 PDF</a><span>存档号 236</span></div></div>
-<div class="item" data-k="英语启蒙过程为何一定要关心背后的理论支持？ 在英语启蒙的过程中，许多家长和教育者更关注具体的操作方法，如使用哪套分级读物、看哪些动画、练习哪些口语句型等。 2025-03-05"><div class="it-hd"><span class="r-n">36</span><a class="it-t" href="/wechat/pdf/238.pdf">英语启蒙过程为何一定要关心背后的理论支持？</a><span class="it-m">2025-03-05 · 14 页</span></div><p class="it-d">在英语启蒙的过程中，许多家长和教育者更关注具体的操作方法，如使用哪套分级读物、看哪些动画、练习哪些口语句型等。</p><div class="it-l"><a href="/wechat/pdf/238.pdf">读原文 PDF</a><span>存档号 238</span></div></div>
-<div class="item" data-k="看听线中的“语音冲浪技术”（Phonetic Surfing） 如何操作？ 在i+8高强度输入的看听线训练中，（详细参考：三大英语操作路线的底层逻辑），孩子的听觉系统需要适应不同的语音模式，尤其是在英语语音的流畅性、连读 2025-03-04"><div class="it-hd"><span class="r-n">37</span><a class="it-t" href="/wechat/pdf/239.pdf">看听线中的“语音冲浪技术”（Phonetic Surfing） 如何操作？</a><span class="it-m">2025-03-04 · 13 页</span></div><p class="it-d">在i+8高强度输入的看听线训练中，（详细参考：三大英语操作路线的底层逻辑），孩子的听觉系统需要适应不同的语音模式，尤其是在英语语音的流畅性、连读</p><div class="it-l"><a href="/wechat/pdf/239.pdf">读原文 PDF</a><span>存档号 239</span></div></div>
-<div class="item" data-k="三大英语操作路线的底层逻辑 第一部分：语言习得理论解构1.1语言习得的三大核心理论儿童如何习得语言？ 2025-03-03"><div class="it-hd"><span class="r-n">38</span><a class="it-t" href="/wechat/pdf/240.pdf">三大英语操作路线的底层逻辑</a><span class="it-m">2025-03-03 · 14 页</span></div><p class="it-d">第一部分：语言习得理论解构1.1语言习得的三大核心理论儿童如何习得语言？</p><div class="it-l"><a href="/wechat/pdf/240.pdf">读原文 PDF</a><span>存档号 240</span></div></div>
-<div class="item" data-k="英语启蒙中不得不说的语感。 语感在语法层级是学习者对语言的连接，次序和结构的感知能力，在语音层级，是对语音的轨迹，速度和粘度的感知能力。 2025-03-02"><div class="it-hd"><span class="r-n">39</span><a class="it-t" href="/wechat/pdf/241.pdf">英语启蒙中不得不说的语感。</a><span class="it-m">2025-03-02 · 10 页</span></div><p class="it-d">语感在语法层级是学习者对语言的连接，次序和结构的感知能力，在语音层级，是对语音的轨迹，速度和粘度的感知能力。</p><div class="it-l"><a href="/wechat/pdf/241.pdf">读原文 PDF</a><span>存档号 241</span></div></div>
-<div class="item" data-k="英语启蒙如何提升投入产出比？ 英语启蒙，当然需要堆量，这个毋容置疑。当基本的学习时间难以保证时，学习效果很难理想。 2025-03-01"><div class="it-hd"><span class="r-n">40</span><a class="it-t" href="/wechat/pdf/242.pdf">英语启蒙如何提升投入产出比？</a><span class="it-m">2025-03-01 · 10 页</span></div><p class="it-d">英语启蒙，当然需要堆量，这个毋容置疑。当基本的学习时间难以保证时，学习效果很难理想。</p><div class="it-l"><a href="/wechat/pdf/242.pdf">读原文 PDF</a><span>存档号 242</span></div></div>
-<div class="item" data-k="英语学习与食材烹饪 自从三条线的架构出来之后，我每天都在给家长普及三条线的科学操作架构。 2025-02-24"><div class="it-hd"><span class="r-n">41</span><a class="it-t" href="/wechat/pdf/243.pdf">英语学习与食材烹饪</a><span class="it-m">2025-02-24 · 10 页</span></div><p class="it-d">自从三条线的架构出来之后，我每天都在给家长普及三条线的科学操作架构。</p><div class="it-l"><a href="/wechat/pdf/243.pdf">读原文 PDF</a><span>存档号 243</span></div></div>
-<div class="item" data-k="英语学习三条线，按线操作不会乱 英语启蒙分为看听线，听读线，自主阅读线三条线。三条线对应着不同的操作逻辑。 2025-02-22"><div class="it-hd"><span class="r-n">42</span><a class="it-t" href="/wechat/pdf/244.pdf">英语学习三条线，按线操作不会乱</a><span class="it-m">2025-02-22 · 10 页</span></div><p class="it-d">英语启蒙分为看听线，听读线，自主阅读线三条线。三条线对应着不同的操作逻辑。</p><div class="it-l"><a href="/wechat/pdf/244.pdf">读原文 PDF</a><span>存档号 244</span></div></div>
-<div class="item" data-k="英语学习可以只要兴趣，不要结果吗？ 这是一个巨大的误区，很多家长认为英语学习，只需要兴趣就够了，不需要能力，也就是拿结果，尤其是英语启蒙初期的家长。 2025-02-21"><div class="it-hd"><span class="r-n">43</span><a class="it-t" href="/wechat/pdf/245.pdf">英语学习可以只要兴趣，不要结果吗？</a><span class="it-m">2025-02-21 · 10 页</span></div><p class="it-d">这是一个巨大的误区，很多家长认为英语学习，只需要兴趣就够了，不需要能力，也就是拿结果，尤其是英语启蒙初期的家长。</p><div class="it-l"><a href="/wechat/pdf/245.pdf">读原文 PDF</a><span>存档号 245</span></div></div>
-<div class="item" data-k="英语启蒙正式跨入科学高效时代 作为一名从业十二年的资深英语老师。超级奶爸约翰小传（下）我每天思考的就是如何让广大的孩子英语启蒙简单高效。 2025-02-18"><div class="it-hd"><span class="r-n">44</span><a class="it-t" href="/wechat/pdf/246.pdf">英语启蒙正式跨入科学高效时代</a><span class="it-m">2025-02-18 · 7 页</span></div><p class="it-d">作为一名从业十二年的资深英语老师。超级奶爸约翰小传（下）我每天思考的就是如何让广大的孩子英语启蒙简单高效。</p><div class="it-l"><a href="/wechat/pdf/246.pdf">读原文 PDF</a><span>存档号 246</span></div></div>
-<div class="item" data-k="家庭英语启蒙中最怕的是什么？ 不是没有开始，而是开始了，投入时间了，投入精力了，但收效甚微。效率呀在今天这个知识爆炸的时代。 2025-02-17"><div class="it-hd"><span class="r-n">45</span><a class="it-t" href="/wechat/pdf/247.pdf">家庭英语启蒙中最怕的是什么？</a><span class="it-m">2025-02-17 · 1 页</span></div><p class="it-d">不是没有开始，而是开始了，投入时间了，投入精力了，但收效甚微。效率呀在今天这个知识爆炸的时代。</p><div class="it-l"><a href="/wechat/pdf/247.pdf">读原文 PDF</a><span>存档号 247</span></div></div>
-<div class="item" data-k="英语启蒙如何降本增效？ 昨天做完21天训练营说明会，（后台回复：说明会直接领取说明会回放。 2025-02-15"><div class="it-hd"><span class="r-n">46</span><a class="it-t" href="/wechat/pdf/248.pdf">英语启蒙如何降本增效？</a><span class="it-m">2025-02-15 · 7 页</span></div><p class="it-d">昨天做完21天训练营说明会，（后台回复：说明会直接领取说明会回放。</p><div class="it-l"><a href="/wechat/pdf/248.pdf">读原文 PDF</a><span>存档号 248</span></div></div>
-<div class="item" data-k="看英语启蒙经验帖要适可而止 是的，在你没有办法拆解别人的经验之前，要适可而止。就是我在上一篇文章里说的，每一个家长给自己孩子做启蒙的过程都极具个性化。 2025-02-12"><div class="it-hd"><span class="r-n">47</span><a class="it-t" href="/wechat/pdf/252.pdf">看英语启蒙经验帖要适可而止</a><span class="it-m">2025-02-12 · 3 页</span></div><p class="it-d">是的，在你没有办法拆解别人的经验之前，要适可而止。就是我在上一篇文章里说的，每一个家长给自己孩子做启蒙的过程都极具个性化。</p><div class="it-l"><a href="/wechat/pdf/252.pdf">读原文 PDF</a><span>存档号 252</span></div></div>
-<div class="item" data-k="催眠九宫格的全面解释与应用在婴幼儿语言学习 这篇文章是基于王德生博士的创造力奥秘大揭开：催眠九宫格的解释与应用。 2025-02-11"><div class="it-hd"><span class="r-n">48</span><a class="it-t" href="/wechat/pdf/253.pdf">催眠九宫格的全面解释与应用在婴幼儿语言学习</a><span class="it-m">2025-02-11 · 7 页</span></div><p class="it-d">这篇文章是基于王德生博士的创造力奥秘大揭开：催眠九宫格的解释与应用。</p><div class="it-l"><a href="/wechat/pdf/253.pdf">读原文 PDF</a><span>存档号 253</span></div></div>
-<div class="item" data-k="让英语学习简单高效是怎么实现的？ 昨天文章，讲了英语启蒙的两条线有的家长可能觉得复杂，但语言学习本来就不是简单的事情。 2025-02-11"><div class="it-hd"><span class="r-n">49</span><a class="it-t" href="/wechat/pdf/254.pdf">让英语学习简单高效是怎么实现的？</a><span class="it-m">2025-02-11 · 3 页</span></div><p class="it-d">昨天文章，讲了英语启蒙的两条线有的家长可能觉得复杂，但语言学习本来就不是简单的事情。</p><div class="it-l"><a href="/wechat/pdf/254.pdf">读原文 PDF</a><span>存档号 254</span></div></div>
-<div class="item" data-k="为何英语启蒙阶段听指操作十分重要？ 无论是听指，还是自然拼读，都是建立音形匹配的工具。听指操作属于整体认读法。 2025-02-08"><div class="it-hd"><span class="r-n">50</span><a class="it-t" href="/wechat/pdf/258.pdf">为何英语启蒙阶段听指操作十分重要？</a><span class="it-m">2025-02-08 · 2 页</span></div><p class="it-d">无论是听指，还是自然拼读，都是建立音形匹配的工具。听指操作属于整体认读法。</p><div class="it-l"><a href="/wechat/pdf/258.pdf">读原文 PDF</a><a href="/wechat/pdf/263.pdf">同题另稿 263</a><span>存档号 258</span></div></div>
-<div class="item" data-k="我们的英语启蒙技术还很落后 诚然，经过一代又一代的英语启蒙前辈的努力。英语启蒙的理念被逐渐广泛传播。 2025-02-07"><div class="it-hd"><span class="r-n">51</span><a class="it-t" href="/wechat/pdf/259.pdf">我们的英语启蒙技术还很落后</a><span class="it-m">2025-02-07 · 7 页</span></div><p class="it-d">诚然，经过一代又一代的英语启蒙前辈的努力。英语启蒙的理念被逐渐广泛传播。</p><div class="it-l"><a href="/wechat/pdf/259.pdf">读原文 PDF</a><span>存档号 259</span></div></div>
-<div class="item" data-k="幼少儿英语启蒙要抓住常识 经常给家长们说，有少儿英语启蒙，要抓住常识，就不会跑偏太远，那什么是常识？ 2025-02-05"><div class="it-hd"><span class="r-n">52</span><a class="it-t" href="/wechat/pdf/261.pdf">幼少儿英语启蒙要抓住常识</a><span class="it-m">2025-02-05 · 4 页</span></div><p class="it-d">经常给家长们说，有少儿英语启蒙，要抓住常识，就不会跑偏太远，那什么是常识？</p><div class="it-l"><a href="/wechat/pdf/261.pdf">读原文 PDF</a><span>存档号 261</span></div></div>
-<div class="item" data-k="用听指学习是不是很Low？ 很多家长一听听指，整体认读法，就觉得很Low，是一种被淘汰的方法。 2025-01-12"><div class="it-hd"><span class="r-n">53</span><a class="it-t" href="/wechat/pdf/262.pdf">用听指学习是不是很Low？</a><span class="it-m">2025-01-12 · 4 页</span></div><p class="it-d">很多家长一听听指，整体认读法，就觉得很Low，是一种被淘汰的方法。</p><div class="it-l"><a href="/wechat/pdf/262.pdf">读原文 PDF</a><span>存档号 262</span></div></div>
-<div class="item" data-k="英语启蒙规划路线图重要吗？ 上午我们大群里讲的是什么？首先大家一定要有一张英语启蒙规划路线图，这个非常重要。 2025-01-10"><div class="it-hd"><span class="r-n">54</span><a class="it-t" href="/wechat/pdf/264.pdf">英语启蒙规划路线图重要吗？</a><span class="it-m">2025-01-10 · 4 页</span></div><p class="it-d">上午我们大群里讲的是什么？首先大家一定要有一张英语启蒙规划路线图，这个非常重要。</p><div class="it-l"><a href="/wechat/pdf/264.pdf">读原文 PDF</a><span>存档号 264</span></div></div>
-<div class="item" data-k="从活动看语言习得，这样做，孩子的英语能力蹭蹭涨！ 今天，我想和大家聊聊孩子的语言习得。 2024-12-23"><div class="it-hd"><span class="r-n">55</span><a class="it-t" href="/wechat/pdf/271.pdf">从活动看语言习得，这样做，孩子的英语能力蹭蹭涨！</a><span class="it-m">2024-12-23 · 9 页</span></div><p class="it-d">今天，我想和大家聊聊孩子的语言习得。</p><div class="it-l"><a href="/wechat/pdf/271.pdf">读原文 PDF</a><span>存档号 271</span></div></div>
-<div class="item" data-k="影响浸入式英语学习的因素是什么？ 浸入式英语学习法的初步体验与思考大家好，我是。 2024-12-11"><div class="it-hd"><span class="r-n">56</span><a class="it-t" href="/wechat/pdf/284.pdf">影响浸入式英语学习的因素是什么？</a><span class="it-m">2024-12-11 · 9 页</span></div><p class="it-d">浸入式英语学习法的初步体验与思考大家好，我是。</p><div class="it-l"><a href="/wechat/pdf/284.pdf">读原文 PDF</a><span>存档号 284</span></div></div>
-<div class="item" data-k="3S动作儿歌——高阶智慧与英语启蒙的完美结合 小莉老师！ 2024-11-08"><div class="it-hd"><span class="r-n">57</span><a class="it-t" href="/wechat/pdf/290.pdf">3S动作儿歌——高阶智慧与英语启蒙的完美结合</a><span class="it-m">2024-11-08 · 9 页</span></div><p class="it-d">小莉老师！</p><div class="it-l"><a href="/wechat/pdf/290.pdf">读原文 PDF</a><span>存档号 290</span></div></div>
-<div class="item" data-k="3S动画儿歌如何高效系统学习？ 又是好多天没有发文了，最近我开了一个公益项目，帮助大家系统启蒙3S动画儿歌。 2024-11-07"><div class="it-hd"><span class="r-n">58</span><a class="it-t" href="/wechat/pdf/291.pdf">3S动画儿歌如何高效系统学习？</a><span class="it-m">2024-11-07 · 13 页</span></div><p class="it-d">又是好多天没有发文了，最近我开了一个公益项目，帮助大家系统启蒙3S动画儿歌。</p><div class="it-l"><a href="/wechat/pdf/291.pdf">读原文 PDF</a><span>存档号 291</span></div></div>
-<div class="item" data-k="不要让“磨耳朵”，只是磨了个耳朵。 在接触的众多英语学习的案例中，有一个案例十分典型，属于典型的起了个大早，赶了个晚集。 2024-08-25"><div class="it-hd"><span class="r-n">59</span><a class="it-t" href="/wechat/pdf/300.pdf">不要让“磨耳朵”，只是磨了个耳朵。</a><span class="it-m">2024-08-25 · 14 页</span></div><p class="it-d">在接触的众多英语学习的案例中，有一个案例十分典型，属于典型的起了个大早，赶了个晚集。</p><div class="it-l"><a href="/wechat/pdf/300.pdf">读原文 PDF</a><span>存档号 300</span></div></div>
-<div class="item" data-k="英语学习，越放松，越持久 说一个颠覆性的观点，英语学习，越放松，越持久。 2024-06-18"><div class="it-hd"><span class="r-n">60</span><a class="it-t" href="/wechat/pdf/308.pdf">英语学习，越放松，越持久</a><span class="it-m">2024-06-18 · 1 页</span></div><p class="it-d">说一个颠覆性的观点，英语学习，越放松，越持久。</p><div class="it-l"><a href="/wechat/pdf/308.pdf">读原文 PDF</a><span>存档号 308</span></div></div>
-<div class="item" data-k="语感与音素库的建立是英语启蒙的双引擎 前几天的6岁以前的孩子如何实现高效的英语启蒙？ 2024-06-06"><div class="it-hd"><span class="r-n">61</span><a class="it-t" href="/wechat/pdf/320.pdf">语感与音素库的建立是英语启蒙的双引擎</a><span class="it-m">2024-06-06 · 9 页</span></div><p class="it-d">前几天的6岁以前的孩子如何实现高效的英语启蒙？</p><div class="it-l"><a href="/wechat/pdf/320.pdf">读原文 PDF</a><span>存档号 320</span></div></div>
-<div class="item" data-k="英语启蒙是一门技术 现在不是一个资源匮乏的时代，而是一个资源泛滥的时代。随着互联网的发展，各种优质英语学习资源如潮水般涌入国内。 2024-06-03"><div class="it-hd"><span class="r-n">62</span><a class="it-t" href="/wechat/pdf/323.pdf">英语启蒙是一门技术</a><span class="it-m">2024-06-03 · 6 页</span></div><p class="it-d">现在不是一个资源匮乏的时代，而是一个资源泛滥的时代。随着互联网的发展，各种优质英语学习资源如潮水般涌入国内。</p><div class="it-l"><a href="/wechat/pdf/323.pdf">读原文 PDF</a><span>存档号 323</span></div></div>
-<div class="item" data-k="英语习得分两种，你的是哪一种？ 日本这篇文章只是作为我个人对于克拉申的习得理论的学术探讨。因为随着我的导师王德生博士的主客互动本体论的提出。 2024-05-31"><div class="it-hd"><span class="r-n">63</span><a class="it-t" href="/wechat/pdf/326.pdf">英语习得分两种，你的是哪一种？</a><span class="it-m">2024-05-31 · 8 页</span></div><p class="it-d">日本这篇文章只是作为我个人对于克拉申的习得理论的学术探讨。因为随着我的导师王德生博士的主客互动本体论的提出。</p><div class="it-l"><a href="/wechat/pdf/326.pdf">读原文 PDF</a><span>存档号 326</span></div></div>
-<div class="item" data-k="6岁以前的孩子如何实现高效的英语启蒙？ 日本当我给出这个问题的时候，6岁以前要不要做英语启蒙这个问题已经不在讨论范围之内了，因为我已经默认为要做的。 2024-05-28"><div class="it-hd"><span class="r-n">64</span><a class="it-t" href="/wechat/pdf/329.pdf">6岁以前的孩子如何实现高效的英语启蒙？</a><span class="it-m">2024-05-28 · 7 页</span></div><p class="it-d">日本当我给出这个问题的时候，6岁以前要不要做英语启蒙这个问题已经不在讨论范围之内了，因为我已经默认为要做的。</p><div class="it-l"><a href="/wechat/pdf/329.pdf">读原文 PDF</a><span>存档号 329</span></div></div>
-<div class="item" data-k="零基础成年人如何高效突破英语？ 零基础成年人英语学习如何快速入门一个成年人的英语词汇量在1500左右，都可以称作零基础，因为词汇量对英语学习来说是非常非常重要的。 2023-10-06"><div class="it-hd"><span class="r-n">65</span><a class="it-t" href="/wechat/pdf/350.pdf">零基础成年人如何高效突破英语？</a><span class="it-m">2023-10-06 · 4 页</span></div><p class="it-d">零基础成年人英语学习如何快速入门一个成年人的英语词汇量在1500左右，都可以称作零基础，因为词汇量对英语学习来说是非常非常重要的。</p><div class="it-l"><a href="/wechat/pdf/350.pdf">读原文 PDF</a><span>存档号 350</span></div></div>
-<div class="item" data-k="当孩子的英语学习兴趣枯竭的时候 贵州目前我们孩子的英语学习都是正统的英语学习，也就是公立学校里面提倡的那种主流的英语学习模式。 2023-09-23"><div class="it-hd"><span class="r-n">66</span><a class="it-t" href="/wechat/pdf/352.pdf">当孩子的英语学习兴趣枯竭的时候</a><span class="it-m">2023-09-23 · 4 页</span></div><p class="it-d">贵州目前我们孩子的英语学习都是正统的英语学习，也就是公立学校里面提倡的那种主流的英语学习模式。</p><div class="it-l"><a href="/wechat/pdf/352.pdf">读原文 PDF</a><span>存档号 352</span></div></div>
-<div class="item" data-k="自然拼读究竟应该怎么学？ 贵州我每天基本上都会花一定时间和我的学员做沟通。在沟通的过程中我发现，不论孩子的年龄大小，他们的英语学习都会遇到一个问题——自然拼读究竟应该怎么 2023-08-21"><div class="it-hd"><span class="r-n">67</span><a class="it-t" href="/wechat/pdf/355.pdf">自然拼读究竟应该怎么学？</a><span class="it-m">2023-08-21 · 7 页</span></div><p class="it-d">贵州我每天基本上都会花一定时间和我的学员做沟通。在沟通的过程中我发现，不论孩子的年龄大小，他们的英语学习都会遇到一个问题——自然拼读究竟应该怎么</p><div class="it-l"><a href="/wechat/pdf/355.pdf">读原文 PDF</a><span>存档号 355</span></div></div>
-<div class="item" data-k="自然拼读应该这样学（含资源包） 提起自然拼读在中国的普及以及火热，有一个人和一本书是不能绕开的，那就是安妮鲜花和她的《不可错过的英语启蒙》。 2022-12-29"><div class="it-hd"><span class="r-n">68</span><a class="it-t" href="/wechat/pdf/380.pdf">自然拼读应该这样学（含资源包）</a><span class="it-m">2022-12-29 · 8 页</span></div><p class="it-d">提起自然拼读在中国的普及以及火热，有一个人和一本书是不能绕开的，那就是安妮鲜花和她的《不可错过的英语启蒙》。</p><div class="it-l"><a href="/wechat/pdf/380.pdf">读原文 PDF</a><span>存档号 380</span></div></div>
-<div class="item" data-k="关于听指，跟读，复述和语法学习的解答。 今天在21天亲子精学训练营，我们谈到几个非常具有代表性的问题，这些问题的价值极大，因为很多家长也有同样的困惑，现在分享给大家。 2022-09-20"><div class="it-hd"><span class="r-n">69</span><a class="it-t" href="/wechat/pdf/384.pdf">关于听指，跟读，复述和语法学习的解答。</a><span class="it-m">2022-09-20 · 4 页</span></div><p class="it-d">今天在21天亲子精学训练营，我们谈到几个非常具有代表性的问题，这些问题的价值极大，因为很多家长也有同样的困惑，现在分享给大家。</p><div class="it-l"><a href="/wechat/pdf/384.pdf">读原文 PDF</a><span>存档号 384</span></div></div>
-<div class="item" data-k="英语学习中，选择性听力能力为何如此重要 ？ 上次我们分享了三大英语学习模式，统合并科学指导英语学习，其中提到自然习得，刻意习得和学得习得。 2022-08-11"><div class="it-hd"><span class="r-n">70</span><a class="it-t" href="/wechat/pdf/387.pdf">英语学习中，选择性听力能力为何如此重要 ？</a><span class="it-m">2022-08-11 · 6 页</span></div><p class="it-d">上次我们分享了三大英语学习模式，统合并科学指导英语学习，其中提到自然习得，刻意习得和学得习得。</p><div class="it-l"><a href="/wechat/pdf/387.pdf">读原文 PDF</a><span>存档号 387</span></div></div>
-<div class="item" data-k="三大英语学习模式，统合并科学指导英语学习 我们今天分享一个非常重要的主题。今天的主题是：三大英语学习模式，统合并科学指导英语学习。 2022-08-09"><div class="it-hd"><span class="r-n">71</span><a class="it-t" href="/wechat/pdf/388.pdf">三大英语学习模式，统合并科学指导英语学习</a><span class="it-m">2022-08-09 · 6 页</span></div><p class="it-d">我们今天分享一个非常重要的主题。今天的主题是：三大英语学习模式，统合并科学指导英语学习。</p><div class="it-l"><a href="/wechat/pdf/388.pdf">读原文 PDF</a><span>存档号 388</span></div></div>
-<div class="item" data-k="英语学习中，复述该如何推动呢？ 在英语学习中，复述是一步非常关键的操作。在刻意习得的各个环节里。 2022-05-31"><div class="it-hd"><span class="r-n">72</span><a class="it-t" href="/wechat/pdf/391.pdf">英语学习中，复述该如何推动呢？</a><span class="it-m">2022-05-31 · 7 页</span></div><p class="it-d">在英语学习中，复述是一步非常关键的操作。在刻意习得的各个环节里。</p><div class="it-l"><a href="/wechat/pdf/391.pdf">读原文 PDF</a><span>存档号 391</span></div></div>
-<div class="item" data-k="如何帮助孩子在英语学习中达到嗜看和嗜听的状态？ 今天的直播非常重要，全程575人观看，喝彩次数多多达1.3万次，足以说明直播的内容之优质，直播之后，很多家长都问有没有回放，视频号直播确实没有回 2022-01-28"><div class="it-hd"><span class="r-n">73</span><a class="it-t" href="/wechat/pdf/394.pdf">如何帮助孩子在英语学习中达到嗜看和嗜听的状态？</a><span class="it-m">2022-01-28 · 12 页</span></div><p class="it-d">今天的直播非常重要，全程575人观看，喝彩次数多多达1.3万次，足以说明直播的内容之优质，直播之后，很多家长都问有没有回放，视频号直播确实没有回</p><div class="it-l"><a href="/wechat/pdf/394.pdf">读原文 PDF</a><span>存档号 394</span></div></div>
-<div class="item" data-k="英语学习有三种模式，EFL,ESL和EML，您的孩子用的是哪一种？ 是否要学英语对大多数人来说，在不同的时代有不同的答案。在50多年前，毋容置疑，英语是不用学的。 2021-12-23"><div class="it-hd"><span class="r-n">74</span><a class="it-t" href="/wechat/pdf/395.pdf">英语学习有三种模式，EFL,ESL和EML，您的孩子用的是哪一种？</a><span class="it-m">2021-12-23 · 8 页</span></div><p class="it-d">是否要学英语对大多数人来说，在不同的时代有不同的答案。在50多年前，毋容置疑，英语是不用学的。</p><div class="it-l"><a href="/wechat/pdf/395.pdf">读原文 PDF</a><span>存档号 395</span></div></div>
-<div class="item" data-k="如何在泛学时避免精学陷阱？ 上一次分享了英语学习的“情绪电池”原理。有些家长在操作过程中间还是有一些疑问。 2021-11-25"><div class="it-hd"><span class="r-n">75</span><a class="it-t" href="/wechat/pdf/398.pdf">如何在泛学时避免精学陷阱？</a><span class="it-m">2021-11-25 · 5 页</span></div><p class="it-d">上一次分享了英语学习的“情绪电池”原理。有些家长在操作过程中间还是有一些疑问。</p><div class="it-l"><a href="/wechat/pdf/398.pdf">读原文 PDF</a><span>存档号 398</span></div></div>
-<div class="item" data-k="英语学习中的“情绪电池”原理 有一段时间没有更新了，因为最近事情有点多。一方面老四出生了，同时伴随着“21天训练营”开营了。 2021-11-22"><div class="it-hd"><span class="r-n">76</span><a class="it-t" href="/wechat/pdf/399.pdf">英语学习中的“情绪电池”原理</a><span class="it-m">2021-11-22 · 6 页</span></div><p class="it-d">有一段时间没有更新了，因为最近事情有点多。一方面老四出生了，同时伴随着“21天训练营”开营了。</p><div class="it-l"><a href="/wechat/pdf/399.pdf">读原文 PDF</a><span>存档号 399</span></div></div>
-<div class="item" data-k="风靡全世界的3S动画儿歌究竟该怎么学？ 关于3S（SuperSimpleSong）动画儿歌，很多人都已经很熟悉了，3S动画儿歌在英语启蒙界的地位是无人可以撼动的。 2021-10-29"><div class="it-hd"><span class="r-n">77</span><a class="it-t" href="/wechat/pdf/402.pdf">风靡全世界的3S动画儿歌究竟该怎么学？</a><span class="it-m">2021-10-29 · 9 页</span></div><p class="it-d">关于3S（SuperSimpleSong）动画儿歌，很多人都已经很熟悉了，3S动画儿歌在英语启蒙界的地位是无人可以撼动的。</p><div class="it-l"><a href="/wechat/pdf/402.pdf">读原文 PDF</a><span>存档号 402</span></div></div>
-<div class="item" data-k="3岁前就开始做英语启蒙真的有必要吗？（含资源和书单） 上一篇文章写到一篇文章说清楚0-3岁孩子英语启蒙那些事（含资源）有的家长说，，你是不是制造焦虑？ 2021-09-07"><div class="it-hd"><span class="r-n">78</span><a class="it-t" href="/wechat/pdf/416.pdf">3岁前就开始做英语启蒙真的有必要吗？（含资源和书单）</a><span class="it-m">2021-09-07 · 8 页</span></div><p class="it-d">上一篇文章写到一篇文章说清楚0-3岁孩子英语启蒙那些事（含资源）有的家长说，，你是不是制造焦虑？</p><div class="it-l"><a href="/wechat/pdf/416.pdf">读原文 PDF</a><span>存档号 416</span></div></div>
-<div class="item" data-k="一篇文章说清楚0-3岁孩子英语启蒙那些事（含资源） 经常被妈妈们问到这个问题：“我的孩子一岁多，怎么给她做英语启蒙？ 2021-09-06"><div class="it-hd"><span class="r-n">79</span><a class="it-t" href="/wechat/pdf/417.pdf">一篇文章说清楚0-3岁孩子英语启蒙那些事（含资源）</a><span class="it-m">2021-09-06 · 9 页</span></div><p class="it-d">经常被妈妈们问到这个问题：“我的孩子一岁多，怎么给她做英语启蒙？</p><div class="it-l"><a href="/wechat/pdf/417.pdf">读原文 PDF</a><span>存档号 417</span></div></div>
+<div class="chips"><div class="wrap"><a href="/wechat/">全部频道</a><a href="/wechat/genesis/">语言发生学<b>49</b></a><a href="/wechat/enlighten/" aria-current="page">英语启蒙<b>78</b></a><a href="/wechat/vocabulary/">词汇之路<b>23</b></a><a href="/wechat/materials/">素材与分级<b>57</b></a><a href="/wechat/ai/">AI 与语言教育<b>42</b></a><a href="/wechat/school/">课堂与制度<b>41</b></a><a href="/wechat/lineage/">思想谱系<b>27</b></a><a href="/wechat/notes/">奶爸手记<b>45</b></a><a href="/wechat/camp/">营地与公告<b>25</b></a><a href="/wechat/all/">全部篇目<b>387</b></a></div></div>
+<div class="light"><div class="wrap">
+<div class="tools">
+  <div class="filter"><label>本栏筛选</label><input id="q" type="search" placeholder="输入任意词，例如：看听线、复述、听指" autocomplete="off" aria-label="在本栏内筛选"><span class="n" id="n"></span></div>
+  <p class="empty" id="empty" style="display:none">本栏没有匹配的篇目。换一个词，或去<a href="/wechat/all/">全部篇目</a>里找。</p>
+</div>
+<section class="list">
+<div data-group="2026"><div class="yr"><b>2026</b><i></i><span>23 篇</span></div>
+<div class="item" data-k="能跟读得一模一样，为什么还是不会自己说？ 从“复制别人的句子”到“生成自己的语言”：跟读时，孩子面对的是一条已经铺好的语言轨道：说什么、用什么词、怎样组织、在哪里重读，几乎都由原声提前给…… 2026-08-20" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">010</span><a class="it-t" href="/wechat/pdf/010.pdf">能跟读得一模一样，为什么还是不会自己说？</a><span class="it-m">2026-08-20 · 17 页</span></div><p class="it-d">从“复制别人的句子”到“生成自己的语言”：跟读时，孩子面对的是一条已经铺好的语言轨道：说什么、用什么词、怎样组织、在哪里重读，几乎都由原声提前给……</p><div class="it-l"><a href="/wechat/pdf/010.pdf">读原文 PDF</a><a href="/wechat/pdf/008.pdf">同题另稿 008</a></div></div>
+<div class="item" data-k="每天放英文当背景音有用吗？“耳朵泡着英语”为什么可能什么也没发生 从“声音存在”到“语言真正进入”：背景音并非完全没有价值，它可能增加声音熟悉度，也可能让孩子偶然捕捉到已经认识的表达。 2026-08-20" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">011</span><a class="it-t" href="/wechat/pdf/011.pdf">每天放英文当背景音有用吗？“耳朵泡着英语”为什么可能什么也没发生</a><span class="it-m">2026-08-20 · 2 页</span></div><p class="it-d">从“声音存在”到“语言真正进入”：背景音并非完全没有价值，它可能增加声音熟悉度，也可能让孩子偶然捕捉到已经认识的表达。</p><div class="it-l"><a href="/wechat/pdf/011.pdf">读原文 PDF</a><a href="/wechat/pdf/009.pdf">同题另稿 009</a></div></div>
+<div class="item" data-k="孩子听英语只看情节、不管语言，要不要停掉动画重新来？ 从“追剧情”到“让英语承担意义”：孩子盯着画面笑、追着剧情跑，却似乎根本不在意英语，这并不意味着动画输入失败。 2026-08-19" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">016</span><a class="it-t" href="/wechat/pdf/016.pdf">孩子听英语只看情节、不管语言，要不要停掉动画重新来？</a><span class="it-m">2026-08-19 · 8 页</span></div><p class="it-d">从“追剧情”到“让英语承担意义”：孩子盯着画面笑、追着剧情跑，却似乎根本不在意英语，这并不意味着动画输入失败。</p><div class="it-l"><a href="/wechat/pdf/016.pdf">读原文 PDF</a><a href="/wechat/pdf/014.pdf">同题另稿 014</a></div></div>
+<div class="item" data-k="同一集动画到底该听20遍，还是不断换新的？很多家庭一开始就选错了 从“重复熟悉”到“变化中重建”：重复和换新不是两套互相排斥的方法。 2026-08-18" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">021</span><a class="it-t" href="/wechat/pdf/021.pdf">同一集动画到底该听20遍，还是不断换新的？很多家庭一开始就选错了</a><span class="it-m">2026-08-18 · 14 页</span></div><p class="it-d">从“重复熟悉”到“变化中重建”：重复和换新不是两套互相排斥的方法。</p><div class="it-l"><a href="/wechat/pdf/021.pdf">读原文 PDF</a><a href="/wechat/pdf/020.pdf">同题另稿 020</a></div></div>
+<div class="item" data-k="自然拼读学得很好，为什么真实英语还是听不懂？ 自然拼读帮助孩子把印刷词转换成声音；真实听力却要求他从没有空格、不断变化的语流中找出词，并在声音消失之前接上意思。 2026-08-13" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">034</span><a class="it-t" href="/wechat/pdf/034.pdf">自然拼读学得很好，为什么真实英语还是听不懂？</a><span class="it-m">2026-08-13 · 17 页</span></div><p class="it-d">自然拼读帮助孩子把印刷词转换成声音；真实听力却要求他从没有空格、不断变化的语流中找出词，并在声音消失之前接上意思。</p><div class="it-l"><a href="/wechat/pdf/034.pdf">读原文 PDF</a><a href="/wechat/pdf/033.pdf">同题另稿 033</a></div></div>
+<div class="item" data-k="跟读、复述、自由表达，孩子应该按什么顺序练？ 真正有效的顺序，不是学完跟读再“升级”，而是让成人提供的声音、内容和答案逐步撤出，让孩子越来越多地承担意义、选择与交流后果。 2026-08-11" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">038</span><a class="it-t" href="/wechat/pdf/038.pdf">跟读、复述、自由表达，孩子应该按什么顺序练？</a><span class="it-m">2026-08-11 · 13 页</span></div><p class="it-d">真正有效的顺序，不是学完跟读再“升级”，而是让成人提供的声音、内容和答案逐步撤出，让孩子越来越多地承担意义、选择与交流后果。</p><div class="it-l"><a href="/wechat/pdf/038.pdf">读原文 PDF</a><a href="/wechat/pdf/037.pdf">同题另稿 037</a></div></div>
+<div class="item" data-k="孩子总混淆字母、跳行、记不住词，是练得少还是可能存在阅读困难？ 单个错误不能诊断阅读障碍；真正需要观察的是，孩子在获得适龄、明确、系统的教学后，字音对应、解码、拼写和流利度是否仍持续困难，以及他怎样回应有针对…… 2026-08-10" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">040</span><a class="it-t" href="/wechat/pdf/040.pdf">孩子总混淆字母、跳行、记不住词，是练得少还是可能存在阅读困难？</a><span class="it-m">2026-08-10 · 15 页</span></div><p class="it-d">单个错误不能诊断阅读障碍；真正需要观察的是，孩子在获得适龄、明确、系统的教学后，字音对应、解码、拼写和流利度是否仍持续困难，以及他怎样回应有针对……</p><div class="it-l"><a href="/wechat/pdf/040.pdf">读原文 PDF</a><a href="/wechat/pdf/039.pdf">同题另稿 039</a></div></div>
+<div class="item" data-k="孩子只看画面不听英语，家长怎样把注意力拉回声音？ 孩子忽略英语，往往不是不专注，而是画面已经足够完成理解；把注意力拉回声音的关键，是让一句英语真正决定预测、选择、行动和结果。 2026-08-09" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">041</span><a class="it-t" href="/wechat/pdf/041.pdf">孩子只看画面不听英语，家长怎样把注意力拉回声音？</a><span class="it-m">2026-08-09 · 15 页</span></div><p class="it-d">孩子忽略英语，往往不是不专注，而是画面已经足够完成理解；把注意力拉回声音的关键，是让一句英语真正决定预测、选择、行动和结果。</p><div class="it-l"><a href="/wechat/pdf/041.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="大孩子学外语一定不如幼儿吗？他们其实拥有另一套优势 幼儿擅长在生活中吸收声音，大孩子则能借助母语、文字、规则与世界知识加速前进； 2026-08-08" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">043</span><a class="it-t" href="/wechat/pdf/043.pdf">大孩子学外语一定不如幼儿吗？他们其实拥有另一套优势</a><span class="it-m">2026-08-08 · 14 页</span></div><p class="it-d">幼儿擅长在生活中吸收声音，大孩子则能借助母语、文字、规则与世界知识加速前进；</p><div class="it-l"><a href="/wechat/pdf/043.pdf">读原文 PDF</a><a href="/wechat/pdf/042.pdf">同题另稿 042</a></div></div>
+<div class="item" data-k="语言启蒙中真正的“敏感期”，不是一个错过就永远关门的日期 敏感期改变的是不同能力的学习难度与所需条件，不是给整个语言系统设置统一截止日； 2026-08-08" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">044</span><a class="it-t" href="/wechat/pdf/044.pdf">语言启蒙中真正的“敏感期”，不是一个错过就永远关门的日期</a><span class="it-m">2026-08-08 · 12 页</span></div><p class="it-d">敏感期改变的是不同能力的学习难度与所需条件，不是给整个语言系统设置统一截止日；</p><div class="it-l"><a href="/wechat/pdf/044.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="两岁开始和八岁开始，家庭语言启蒙究竟应该有什么不同？ 两岁从共同生活进入语言，八岁带着已有概念与经验进入语言；相同的听、说、读与纠错，必须使用不同方法。 2026-08-07" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">045</span><a class="it-t" href="/wechat/pdf/045.pdf">两岁开始和八岁开始，家庭语言启蒙究竟应该有什么不同？</a><span class="it-m">2026-08-07 · 11 页</span></div><p class="it-d">两岁从共同生活进入语言，八岁带着已有概念与经验进入语言；相同的听、说、读与纠错，必须使用不同方法。</p><div class="it-l"><a href="/wechat/pdf/045.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="孩子学英语，真的是越早越好吗？年龄背后还有三个更重要的条件 年龄决定孩子更容易用什么方式学习；真正决定早期优势能否长成能力的，是有效接触、真实互动与长期连续性。 2026-08-07" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">046</span><a class="it-t" href="/wechat/pdf/046.pdf">孩子学英语，真的是越早越好吗？年龄背后还有三个更重要的条件</a><span class="it-m">2026-08-07 · 12 页</span></div><p class="it-d">年龄决定孩子更容易用什么方式学习；真正决定早期优势能否长成能力的，是有效接触、真实互动与长期连续性。</p><div class="it-l"><a href="/wechat/pdf/046.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="为什么孩子阅读分数高，复述却说不出来？ 很多家长看到孩子阅读理解分数不错，会自然觉得：阅读没问题。一篇短文后面五道题，孩子错一两道，甚至全对。 2026-07-27" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">054</span><a class="it-t" href="/wechat/pdf/054.pdf">为什么孩子阅读分数高，复述却说不出来？</a><span class="it-m">2026-07-27 · 19 页</span></div><p class="it-d">很多家长看到孩子阅读理解分数不错，会自然觉得：阅读没问题。一篇短文后面五道题，孩子错一两道，甚至全对。</p><div class="it-l"><a href="/wechat/pdf/054.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="成年人学英语，重要的是要让英语在声音里活过来 成年人学英语，有一个令人泄气的普遍循环：背了七八千个单词，语法书刷了三四本，一到开口时，好不容易凑出来的句子却像一具拼错的骨架，僵硬、别扭、毫无…… 2026-07-23" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">057</span><a class="it-t" href="/wechat/pdf/057.pdf">成年人学英语，重要的是要让英语在声音里活过来</a><span class="it-m">2026-07-23 · 10 页</span></div><p class="it-d">成年人学英语，有一个令人泄气的普遍循环：背了七八千个单词，语法书刷了三四本，一到开口时，好不容易凑出来的句子却像一具拼错的骨架，僵硬、别扭、毫无……</p><div class="it-l"><a href="/wechat/pdf/057.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="真正重要的不是读得流利，而是让孩子把理解读进声音里 一个孩子坐在桌前，打开英语课本。音频播放一句，他跟一句。第一遍还有些停顿。 2026-06-15" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">118</span><a class="it-t" href="/wechat/pdf/118.pdf">真正重要的不是读得流利，而是让孩子把理解读进声音里</a><span class="it-m">2026-06-15 · 14 页</span></div><p class="it-d">一个孩子坐在桌前，打开英语课本。音频播放一句，他跟一句。第一遍还有些停顿。</p><div class="it-l"><a href="/wechat/pdf/118.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="跟读越熟练，孩子越不会自己说？很多家长正在练错方向 很多家长都有过这样一个瞬间。孩子坐在书桌前，音频里读一句，他跟一句。 2026-06-14" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">119</span><a class="it-t" href="/wechat/pdf/119.pdf">跟读越熟练，孩子越不会自己说？很多家长正在练错方向</a><span class="it-m">2026-06-14 · 14 页</span></div><p class="it-d">很多家长都有过这样一个瞬间。孩子坐在书桌前，音频里读一句，他跟一句。</p><div class="it-l"><a href="/wechat/pdf/119.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="从跟读到复述，中间只差这一个步骤 很多家长有过这样的困惑。孩子跟读，读得挺好的。音频放着，孩子跟着念，节奏对，发音像，一句接一句，听起来流畅。 2026-06-14" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">120</span><a class="it-t" href="/wechat/pdf/120.pdf">从跟读到复述，中间只差这一个步骤</a><span class="it-m">2026-06-14 · 6 页</span></div><p class="it-d">很多家长有过这样的困惑。孩子跟读，读得挺好的。音频放着，孩子跟着念，节奏对，发音像，一句接一句，听起来流畅。</p><div class="it-l"><a href="/wechat/pdf/120.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="成人学英语，真正的突破不是更努力，而是让英语重新进入生活 湖南很多中国成人学英语，都会陷入一种很熟悉的状态：每天都在寻找方法，每天都在怀疑方法。 2026-05-29" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">153</span><a class="it-t" href="/wechat/pdf/153.pdf">成人学英语，真正的突破不是更努力，而是让英语重新进入生活</a><span class="it-m">2026-05-29 · 8 页</span></div><p class="it-d">湖南很多中国成人学英语，都会陷入一种很熟悉的状态：每天都在寻找方法，每天都在怀疑方法。</p><div class="it-l"><a href="/wechat/pdf/153.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="约翰英语七步法学习流程说明（老版） 在英语学习中，我的学习流程的核心是要简单高效，所谓简单是指操作流程要极其简化，不要繁琐，所用到的设备要简单。 2026-05-09" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">162</span><a class="it-t" href="/wechat/pdf/162.pdf">约翰英语七步法学习流程说明（老版）</a><span class="it-m">2026-05-09 · 3 页</span></div><p class="it-d">在英语学习中，我的学习流程的核心是要简单高效，所谓简单是指操作流程要极其简化，不要繁琐，所用到的设备要简单。</p><div class="it-l"><a href="/wechat/pdf/162.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙的第一步，不是背单词，而是听见声音的秩序 很多中国孩子的英语启蒙，常常是从单词开始的。家长会问：“这个单词是什么意思？ 2026-05-06" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">165</span><a class="it-t" href="/wechat/pdf/165.pdf">英语启蒙的第一步，不是背单词，而是听见声音的秩序</a><span class="it-m">2026-05-06 · 3 页</span></div><p class="it-d">很多中国孩子的英语启蒙，常常是从单词开始的。家长会问：“这个单词是什么意思？</p><div class="it-l"><a href="/wechat/pdf/165.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="真正的英语启蒙，要让孩子看到生命之间的关系 重庆很多时候，我们一谈到英语启蒙，想到的往往是单词、儿歌、绘本、动画、自然拼读和分级阅读。 2026-05-03" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">167</span><a class="it-t" href="/wechat/pdf/167.pdf">真正的英语启蒙，要让孩子看到生命之间的关系</a><span class="it-m">2026-05-03 · 4 页</span></div><p class="it-d">重庆很多时候，我们一谈到英语启蒙，想到的往往是单词、儿歌、绘本、动画、自然拼读和分级阅读。</p><div class="it-l"><a href="/wechat/pdf/167.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="儿童英语学习必须重视情绪与关系 重庆儿童英语学习，从来不是一个单纯的知识输入过程，而是一个孩子在情绪安全中慢慢打开自己、在关系回应中慢慢生成语言的过程。 2026-05-02" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">168</span><a class="it-t" href="/wechat/pdf/168.pdf">儿童英语学习必须重视情绪与关系</a><span class="it-m">2026-05-02 · 3 页</span></div><p class="it-d">重庆儿童英语学习，从来不是一个单纯的知识输入过程，而是一个孩子在情绪安全中慢慢打开自己、在关系回应中慢慢生成语言的过程。</p><div class="it-l"><a href="/wechat/pdf/168.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙，拼的不是资源 昨天的文章发出去之后，春节刚过，拉了一个小营训练群，在攀阁林助手年卡分销商的群里，大家对约翰英语小营都非常的好奇，纷纷问起了小营还能不能进，以及…… 2026-02-25" data-y="2026"><div class="it-hd"><span class="r-n" title="存档号">186</span><a class="it-t" href="/wechat/pdf/186.pdf">英语启蒙，拼的不是资源</a><span class="it-m">2026-02-25 · 8 页</span></div><p class="it-d">昨天的文章发出去之后，春节刚过，拉了一个小营训练群，在攀阁林助手年卡分销商的群里，大家对约翰英语小营都非常的好奇，纷纷问起了小营还能不能进，以及……</p><div class="it-l"><a href="/wechat/pdf/186.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2025"><div class="yr"><b>2025</b><i></i><span>28 篇</span></div>
+<div class="item" data-k="从嗜看到嗜听：儿童英语自然习得的发生机制 这堂课的核心，不是简单讨论动画片、电影该不该看，而是在为家长建立一个完整的儿童语言习得发生机制框架。 2025-12-02" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">196</span><a class="it-t" href="/wechat/pdf/196.pdf">从嗜看到嗜听：儿童英语自然习得的发生机制</a><span class="it-m">2025-12-02 · 10 页</span></div><p class="it-d">这堂课的核心，不是简单讨论动画片、电影该不该看，而是在为家长建立一个完整的儿童语言习得发生机制框架。</p><div class="it-l"><a href="/wechat/pdf/196.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="3S：让孩子在歌声里自然开口的英语启蒙密码 一直以来，3S（SuperSimpleSongs）都是约翰英语翻转课堂的入门课程，而把这套体系作为入门课程的原因，是因为其有趣，简单，帮助孩子很…… 2025-11-22" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">197</span><a class="it-t" href="/wechat/pdf/197.pdf">3S：让孩子在歌声里自然开口的英语启蒙密码</a><span class="it-m">2025-11-22 · 7 页</span></div><p class="it-d">一直以来，3S（SuperSimpleSongs）都是约翰英语翻转课堂的入门课程，而把这套体系作为入门课程的原因，是因为其有趣，简单，帮助孩子很……</p><div class="it-l"><a href="/wechat/pdf/197.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="启蒙阶段走好这四步，轻松积累2000听力词汇 在英语启蒙阶段，最容易让家长焦虑的一个问题就是：“我到底该让孩子先学什么？ 2025-06-05" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">223</span><a class="it-t" href="/wechat/pdf/223.pdf">启蒙阶段走好这四步，轻松积累2000听力词汇</a><span class="it-m">2025-06-05 · 17 页</span></div><p class="it-d">在英语启蒙阶段，最容易让家长焦虑的一个问题就是：“我到底该让孩子先学什么？</p><div class="it-l"><a href="/wechat/pdf/223.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="母语习得的关键：海量输入、多角度高频互动与极致场景化 语言习得并非“自然”，而是精心设计的结果很多家长认为，孩子学母语是“自然而然”的过程，但事实是，母语习得的每一步都是环境精心设计的结果。 2025-03-16" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">231</span><a class="it-t" href="/wechat/pdf/231.pdf">母语习得的关键：海量输入、多角度高频互动与极致场景化</a><span class="it-m">2025-03-16 · 9 页</span></div><p class="it-d">语言习得并非“自然”，而是精心设计的结果很多家长认为，孩子学母语是“自然而然”的过程，但事实是，母语习得的每一步都是环境精心设计的结果。</p><div class="it-l"><a href="/wechat/pdf/231.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="如何在复述训练中培养孩子的语言创造力？ 引言：为什么要培养孩子的语言创造力？在儿童语言学习的过程中，复述（retelling）是一种非常有效的方法，它不仅可以帮助孩子加深对文本内容的理…… 2025-03-15" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">232</span><a class="it-t" href="/wechat/pdf/232.pdf">如何在复述训练中培养孩子的语言创造力？</a><span class="it-m">2025-03-15 · 8 页</span></div><p class="it-d">引言：为什么要培养孩子的语言创造力？在儿童语言学习的过程中，复述（retelling）是一种非常有效的方法，它不仅可以帮助孩子加深对文本内容的理……</p><div class="it-l"><a href="/wechat/pdf/232.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="听线和听读线为何要严格区分？ 将看听线（i+5沉浸式输入）和听读线（i+3结构化输入）严格区分开来的核心意义在于最大化利用不同学习路径的优势，使其互补，从而提高英语学习的效率…… 2025-03-12" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">233</span><a class="it-t" href="/wechat/pdf/233.pdf">听线和听读线为何要严格区分？</a><span class="it-m">2025-03-12 · 4 页</span></div><p class="it-d">将看听线（i+5沉浸式输入）和听读线（i+3结构化输入）严格区分开来的核心意义在于最大化利用不同学习路径的优势，使其互补，从而提高英语学习的效率……</p><div class="it-l"><a href="/wechat/pdf/233.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="不结合看听线与听读线，英语学习迟早歇菜！ 大家好，我是。过去十年里，我见过太多孩子的英语学习卡在某个阶段。 2025-03-10" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">234</span><a class="it-t" href="/wechat/pdf/234.pdf">不结合看听线与听读线，英语学习迟早歇菜！</a><span class="it-m">2025-03-10 · 6 页</span></div><p class="it-d">大家好，我是。过去十年里，我见过太多孩子的英语学习卡在某个阶段。</p><div class="it-l"><a href="/wechat/pdf/234.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="家庭英语启蒙，为什么总感觉执行起来这么难？ 大家好，我是。过去十多年里，我几乎每天都在和家长们聊英语学习的那些事儿。 2025-03-09" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">235</span><a class="it-t" href="/wechat/pdf/235.pdf">家庭英语启蒙，为什么总感觉执行起来这么难？</a><span class="it-m">2025-03-09 · 12 页</span></div><p class="it-d">大家好，我是。过去十多年里，我几乎每天都在和家长们聊英语学习的那些事儿。</p><div class="it-l"><a href="/wechat/pdf/235.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙一开始，如何拉看听线？ 很多家长不知道一开始给孩子英语启蒙拉看听线的重要性。直接上手就是刷分级。 2025-03-07" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">236</span><a class="it-t" href="/wechat/pdf/236.pdf">英语启蒙一开始，如何拉看听线？</a><span class="it-m">2025-03-07 · 12 页</span></div><p class="it-d">很多家长不知道一开始给孩子英语启蒙拉看听线的重要性。直接上手就是刷分级。</p><div class="it-l"><a href="/wechat/pdf/236.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙过程为何一定要关心背后的理论支持？ 在英语启蒙的过程中，许多家长和教育者更关注具体的操作方法，如使用哪套分级读物、看哪些动画、练习哪些口语句型等。 2025-03-05" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">238</span><a class="it-t" href="/wechat/pdf/238.pdf">英语启蒙过程为何一定要关心背后的理论支持？</a><span class="it-m">2025-03-05 · 14 页</span></div><p class="it-d">在英语启蒙的过程中，许多家长和教育者更关注具体的操作方法，如使用哪套分级读物、看哪些动画、练习哪些口语句型等。</p><div class="it-l"><a href="/wechat/pdf/238.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="看听线中的“语音冲浪技术”（Phonetic Surfing） 如何操作？ 在i+8高强度输入的看听线训练中，（详细参考：三大英语操作路线的底层逻辑），孩子的听觉系统需要适应不同的语音模式，尤其是在英语语音的流畅性、连读…… 2025-03-04" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">239</span><a class="it-t" href="/wechat/pdf/239.pdf">看听线中的“语音冲浪技术”（Phonetic Surfing） 如何操作？</a><span class="it-m">2025-03-04 · 13 页</span></div><p class="it-d">在i+8高强度输入的看听线训练中，（详细参考：三大英语操作路线的底层逻辑），孩子的听觉系统需要适应不同的语音模式，尤其是在英语语音的流畅性、连读……</p><div class="it-l"><a href="/wechat/pdf/239.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="三大英语操作路线的底层逻辑 第一部分：语言习得理论解构1.1语言习得的三大核心理论儿童如何习得语言？ 2025-03-03" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">240</span><a class="it-t" href="/wechat/pdf/240.pdf">三大英语操作路线的底层逻辑</a><span class="it-m">2025-03-03 · 14 页</span></div><p class="it-d">第一部分：语言习得理论解构1.1语言习得的三大核心理论儿童如何习得语言？</p><div class="it-l"><a href="/wechat/pdf/240.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙中不得不说的语感。 语感在语法层级是学习者对语言的连接，次序和结构的感知能力，在语音层级，是对语音的轨迹，速度和粘度的感知能力。 2025-03-02" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">241</span><a class="it-t" href="/wechat/pdf/241.pdf">英语启蒙中不得不说的语感。</a><span class="it-m">2025-03-02 · 10 页</span></div><p class="it-d">语感在语法层级是学习者对语言的连接，次序和结构的感知能力，在语音层级，是对语音的轨迹，速度和粘度的感知能力。</p><div class="it-l"><a href="/wechat/pdf/241.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙如何提升投入产出比？ 英语启蒙，当然需要堆量，这个毋容置疑。当基本的学习时间难以保证时，学习效果很难理想。 2025-03-01" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">242</span><a class="it-t" href="/wechat/pdf/242.pdf">英语启蒙如何提升投入产出比？</a><span class="it-m">2025-03-01 · 10 页</span></div><p class="it-d">英语启蒙，当然需要堆量，这个毋容置疑。当基本的学习时间难以保证时，学习效果很难理想。</p><div class="it-l"><a href="/wechat/pdf/242.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语学习与食材烹饪 自从三条线的架构出来之后，我每天都在给家长普及三条线的科学操作架构。 2025-02-24" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">243</span><a class="it-t" href="/wechat/pdf/243.pdf">英语学习与食材烹饪</a><span class="it-m">2025-02-24 · 10 页</span></div><p class="it-d">自从三条线的架构出来之后，我每天都在给家长普及三条线的科学操作架构。</p><div class="it-l"><a href="/wechat/pdf/243.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语学习三条线，按线操作不会乱 英语启蒙分为看听线，听读线，自主阅读线三条线。三条线对应着不同的操作逻辑。 2025-02-22" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">244</span><a class="it-t" href="/wechat/pdf/244.pdf">英语学习三条线，按线操作不会乱</a><span class="it-m">2025-02-22 · 10 页</span></div><p class="it-d">英语启蒙分为看听线，听读线，自主阅读线三条线。三条线对应着不同的操作逻辑。</p><div class="it-l"><a href="/wechat/pdf/244.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语学习可以只要兴趣，不要结果吗？ 这是一个巨大的误区，很多家长认为英语学习，只需要兴趣就够了，不需要能力，也就是拿结果，尤其是英语启蒙初期的家长。 2025-02-21" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">245</span><a class="it-t" href="/wechat/pdf/245.pdf">英语学习可以只要兴趣，不要结果吗？</a><span class="it-m">2025-02-21 · 10 页</span></div><p class="it-d">这是一个巨大的误区，很多家长认为英语学习，只需要兴趣就够了，不需要能力，也就是拿结果，尤其是英语启蒙初期的家长。</p><div class="it-l"><a href="/wechat/pdf/245.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙正式跨入科学高效时代 作为一名从业十二年的资深英语老师。超级奶爸约翰小传（下）我每天思考的就是如何让广大的孩子英语启蒙简单高效。 2025-02-18" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">246</span><a class="it-t" href="/wechat/pdf/246.pdf">英语启蒙正式跨入科学高效时代</a><span class="it-m">2025-02-18 · 7 页</span></div><p class="it-d">作为一名从业十二年的资深英语老师。超级奶爸约翰小传（下）我每天思考的就是如何让广大的孩子英语启蒙简单高效。</p><div class="it-l"><a href="/wechat/pdf/246.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="家庭英语启蒙中最怕的是什么？ 不是没有开始，而是开始了，投入时间了，投入精力了，但收效甚微。效率呀在今天这个知识爆炸的时代。 2025-02-17" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">247</span><a class="it-t" href="/wechat/pdf/247.pdf">家庭英语启蒙中最怕的是什么？</a><span class="it-m">2025-02-17 · 1 页</span></div><p class="it-d">不是没有开始，而是开始了，投入时间了，投入精力了，但收效甚微。效率呀在今天这个知识爆炸的时代。</p><div class="it-l"><a href="/wechat/pdf/247.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙如何降本增效？ 昨天做完21天训练营说明会，（后台回复：说明会直接领取说明会回放。 2025-02-15" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">248</span><a class="it-t" href="/wechat/pdf/248.pdf">英语启蒙如何降本增效？</a><span class="it-m">2025-02-15 · 7 页</span></div><p class="it-d">昨天做完21天训练营说明会，（后台回复：说明会直接领取说明会回放。</p><div class="it-l"><a href="/wechat/pdf/248.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="看英语启蒙经验帖要适可而止 是的，在你没有办法拆解别人的经验之前，要适可而止。就是我在上一篇文章里说的，每一个家长给自己孩子做启蒙的过程都极具个性化。 2025-02-12" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">252</span><a class="it-t" href="/wechat/pdf/252.pdf">看英语启蒙经验帖要适可而止</a><span class="it-m">2025-02-12 · 3 页</span></div><p class="it-d">是的，在你没有办法拆解别人的经验之前，要适可而止。就是我在上一篇文章里说的，每一个家长给自己孩子做启蒙的过程都极具个性化。</p><div class="it-l"><a href="/wechat/pdf/252.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="催眠九宫格的全面解释与应用在婴幼儿语言学习 这篇文章是基于王德生博士的创造力奥秘大揭开：催眠九宫格的解释与应用。 2025-02-11" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">253</span><a class="it-t" href="/wechat/pdf/253.pdf">催眠九宫格的全面解释与应用在婴幼儿语言学习</a><span class="it-m">2025-02-11 · 7 页</span></div><p class="it-d">这篇文章是基于王德生博士的创造力奥秘大揭开：催眠九宫格的解释与应用。</p><div class="it-l"><a href="/wechat/pdf/253.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="让英语学习简单高效是怎么实现的？ 昨天文章，讲了英语启蒙的两条线有的家长可能觉得复杂，但语言学习本来就不是简单的事情。 2025-02-11" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">254</span><a class="it-t" href="/wechat/pdf/254.pdf">让英语学习简单高效是怎么实现的？</a><span class="it-m">2025-02-11 · 3 页</span></div><p class="it-d">昨天文章，讲了英语启蒙的两条线有的家长可能觉得复杂，但语言学习本来就不是简单的事情。</p><div class="it-l"><a href="/wechat/pdf/254.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="为何英语启蒙阶段听指操作十分重要？ 无论是听指，还是自然拼读，都是建立音形匹配的工具。听指操作属于整体认读法。 2025-02-08" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">258</span><a class="it-t" href="/wechat/pdf/258.pdf">为何英语启蒙阶段听指操作十分重要？</a><span class="it-m">2025-02-08 · 2 页</span></div><p class="it-d">无论是听指，还是自然拼读，都是建立音形匹配的工具。听指操作属于整体认读法。</p><div class="it-l"><a href="/wechat/pdf/258.pdf">读原文 PDF</a><a href="/wechat/pdf/263.pdf">同题另稿 263</a></div></div>
+<div class="item" data-k="我们的英语启蒙技术还很落后 诚然，经过一代又一代的英语启蒙前辈的努力。英语启蒙的理念被逐渐广泛传播。 2025-02-07" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">259</span><a class="it-t" href="/wechat/pdf/259.pdf">我们的英语启蒙技术还很落后</a><span class="it-m">2025-02-07 · 7 页</span></div><p class="it-d">诚然，经过一代又一代的英语启蒙前辈的努力。英语启蒙的理念被逐渐广泛传播。</p><div class="it-l"><a href="/wechat/pdf/259.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="幼少儿英语启蒙要抓住常识 经常给家长们说，有少儿英语启蒙，要抓住常识，就不会跑偏太远，那什么是常识？ 2025-02-05" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">261</span><a class="it-t" href="/wechat/pdf/261.pdf">幼少儿英语启蒙要抓住常识</a><span class="it-m">2025-02-05 · 4 页</span></div><p class="it-d">经常给家长们说，有少儿英语启蒙，要抓住常识，就不会跑偏太远，那什么是常识？</p><div class="it-l"><a href="/wechat/pdf/261.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="用听指学习是不是很Low？ 很多家长一听听指，整体认读法，就觉得很Low，是一种被淘汰的方法。 2025-01-12" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">262</span><a class="it-t" href="/wechat/pdf/262.pdf">用听指学习是不是很Low？</a><span class="it-m">2025-01-12 · 4 页</span></div><p class="it-d">很多家长一听听指，整体认读法，就觉得很Low，是一种被淘汰的方法。</p><div class="it-l"><a href="/wechat/pdf/262.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙规划路线图重要吗？ 上午我们大群里讲的是什么？首先大家一定要有一张英语启蒙规划路线图，这个非常重要。 2025-01-10" data-y="2025"><div class="it-hd"><span class="r-n" title="存档号">264</span><a class="it-t" href="/wechat/pdf/264.pdf">英语启蒙规划路线图重要吗？</a><span class="it-m">2025-01-10 · 4 页</span></div><p class="it-d">上午我们大群里讲的是什么？首先大家一定要有一张英语启蒙规划路线图，这个非常重要。</p><div class="it-l"><a href="/wechat/pdf/264.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2024"><div class="yr"><b>2024</b><i></i><span>10 篇</span></div>
+<div class="item" data-k="从活动看语言习得，这样做，孩子的英语能力蹭蹭涨！ 大家好，我是。今天，我想和大家聊聊孩子的语言习得。先别急着皱眉，其实，语言学习并不复杂。 2024-12-23" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">271</span><a class="it-t" href="/wechat/pdf/271.pdf">从活动看语言习得，这样做，孩子的英语能力蹭蹭涨！</a><span class="it-m">2024-12-23 · 9 页</span></div><p class="it-d">大家好，我是。今天，我想和大家聊聊孩子的语言习得。先别急着皱眉，其实，语言学习并不复杂。</p><div class="it-l"><a href="/wechat/pdf/271.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="影响浸入式英语学习的因素是什么？ 浸入式英语学习法的初步体验与思考大家好，我是。今天，我想和大家分享一下我对浸入式英语学习法的初步体验与思考。 2024-12-11" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">284</span><a class="it-t" href="/wechat/pdf/284.pdf">影响浸入式英语学习的因素是什么？</a><span class="it-m">2024-12-11 · 9 页</span></div><p class="it-d">浸入式英语学习法的初步体验与思考大家好，我是。今天，我想和大家分享一下我对浸入式英语学习法的初步体验与思考。</p><div class="it-l"><a href="/wechat/pdf/284.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="3S动作儿歌——高阶智慧与英语启蒙的完美结合 3S 系列由三位草根英语教师在东京发起，把语言、节奏与动作绑在一起：孩子边唱边跳，记得住，也把社交与自信一起练了。 2024-11-08" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">290</span><a class="it-t" href="/wechat/pdf/290.pdf">3S动作儿歌——高阶智慧与英语启蒙的完美结合</a><span class="it-m">2024-11-08 · 9 页</span></div><p class="it-d">3S 系列由三位草根英语教师在东京发起，把语言、节奏与动作绑在一起：孩子边唱边跳，记得住，也把社交与自信一起练了。</p><div class="it-l"><a href="/wechat/pdf/290.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="3S动画儿歌如何高效系统学习？ 大家好，我是，又是好多天没有发文了，最近我开了一个公益项目，帮助大家系统启蒙3S动画儿歌。 2024-11-07" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">291</span><a class="it-t" href="/wechat/pdf/291.pdf">3S动画儿歌如何高效系统学习？</a><span class="it-m">2024-11-07 · 13 页</span></div><p class="it-d">大家好，我是，又是好多天没有发文了，最近我开了一个公益项目，帮助大家系统启蒙3S动画儿歌。</p><div class="it-l"><a href="/wechat/pdf/291.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="不要让“磨耳朵”，只是磨了个耳朵。 在接触的众多英语学习的案例中，有一个案例十分典型，属于典型的起了个大早，赶了个晚集。 2024-08-25" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">300</span><a class="it-t" href="/wechat/pdf/300.pdf">不要让“磨耳朵”，只是磨了个耳朵。</a><span class="it-m">2024-08-25 · 14 页</span></div><p class="it-d">在接触的众多英语学习的案例中，有一个案例十分典型，属于典型的起了个大早，赶了个晚集。</p><div class="it-l"><a href="/wechat/pdf/300.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语学习，越放松，越持久 说一个颠覆性的观点，英语学习，越放松，越持久。 2024-06-18" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">308</span><a class="it-t" href="/wechat/pdf/308.pdf">英语学习，越放松，越持久</a><span class="it-m">2024-06-18 · 1 页</span></div><p class="it-d">说一个颠覆性的观点，英语学习，越放松，越持久。</p><div class="it-l"><a href="/wechat/pdf/308.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="语感与音素库的建立是英语启蒙的双引擎 前几天的6岁以前的孩子如何实现高效的英语启蒙？这篇文章的信息量有点大，今天继续聊，语感与音素库的建立在英语启蒙期的重要性！ 2024-06-06" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">320</span><a class="it-t" href="/wechat/pdf/320.pdf">语感与音素库的建立是英语启蒙的双引擎</a><span class="it-m">2024-06-06 · 9 页</span></div><p class="it-d">前几天的6岁以前的孩子如何实现高效的英语启蒙？这篇文章的信息量有点大，今天继续聊，语感与音素库的建立在英语启蒙期的重要性！</p><div class="it-l"><a href="/wechat/pdf/320.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语启蒙是一门技术 现在不是一个资源匮乏的时代，而是一个资源泛滥的时代。随着互联网的发展，各种优质英语学习资源如潮水般涌入国内。 2024-06-03" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">323</span><a class="it-t" href="/wechat/pdf/323.pdf">英语启蒙是一门技术</a><span class="it-m">2024-06-03 · 6 页</span></div><p class="it-d">现在不是一个资源匮乏的时代，而是一个资源泛滥的时代。随着互联网的发展，各种优质英语学习资源如潮水般涌入国内。</p><div class="it-l"><a href="/wechat/pdf/323.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语习得分两种，你的是哪一种？ 日本这篇文章只是作为我个人对于克拉申的习得理论的学术探讨。因为随着我的导师王德生博士的主客互动本体论的提出。 2024-05-31" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">326</span><a class="it-t" href="/wechat/pdf/326.pdf">英语习得分两种，你的是哪一种？</a><span class="it-m">2024-05-31 · 8 页</span></div><p class="it-d">日本这篇文章只是作为我个人对于克拉申的习得理论的学术探讨。因为随着我的导师王德生博士的主客互动本体论的提出。</p><div class="it-l"><a href="/wechat/pdf/326.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="6岁以前的孩子如何实现高效的英语启蒙？ 日本当我给出这个问题的时候，6岁以前要不要做英语启蒙这个问题已经不在讨论范围之内了，因为我已经默认为要做的。 2024-05-28" data-y="2024"><div class="it-hd"><span class="r-n" title="存档号">329</span><a class="it-t" href="/wechat/pdf/329.pdf">6岁以前的孩子如何实现高效的英语启蒙？</a><span class="it-m">2024-05-28 · 7 页</span></div><p class="it-d">日本当我给出这个问题的时候，6岁以前要不要做英语启蒙这个问题已经不在讨论范围之内了，因为我已经默认为要做的。</p><div class="it-l"><a href="/wechat/pdf/329.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2023"><div class="yr"><b>2023</b><i></i><span>3 篇</span></div>
+<div class="item" data-k="零基础成年人如何高效突破英语？ 零基础成年人英语学习如何快速入门一个成年人的英语词汇量在1500左右，都可以称作零基础，因为词汇量对英语学习来说是非常非常重要的。 2023-10-06" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">350</span><a class="it-t" href="/wechat/pdf/350.pdf">零基础成年人如何高效突破英语？</a><span class="it-m">2023-10-06 · 4 页</span></div><p class="it-d">零基础成年人英语学习如何快速入门一个成年人的英语词汇量在1500左右，都可以称作零基础，因为词汇量对英语学习来说是非常非常重要的。</p><div class="it-l"><a href="/wechat/pdf/350.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="当孩子的英语学习兴趣枯竭的时候 贵州目前我们孩子的英语学习都是正统的英语学习，也就是公立学校里面提倡的那种主流的英语学习模式。 2023-09-23" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">352</span><a class="it-t" href="/wechat/pdf/352.pdf">当孩子的英语学习兴趣枯竭的时候</a><span class="it-m">2023-09-23 · 4 页</span></div><p class="it-d">贵州目前我们孩子的英语学习都是正统的英语学习，也就是公立学校里面提倡的那种主流的英语学习模式。</p><div class="it-l"><a href="/wechat/pdf/352.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="自然拼读究竟应该怎么学？ 呢？自然拼读这个词大家好像都已经很熟悉了。但是呢，我觉得很多家长并没有理解自然拼读这个工具究竟是干什么的，或者说，很多孩子学习自然拼读的方式，是…… 2023-08-21" data-y="2023"><div class="it-hd"><span class="r-n" title="存档号">355</span><a class="it-t" href="/wechat/pdf/355.pdf">自然拼读究竟应该怎么学？</a><span class="it-m">2023-08-21 · 7 页</span></div><p class="it-d">呢？自然拼读这个词大家好像都已经很熟悉了。但是呢，我觉得很多家长并没有理解自然拼读这个工具究竟是干什么的，或者说，很多孩子学习自然拼读的方式，是……</p><div class="it-l"><a href="/wechat/pdf/355.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2022"><div class="yr"><b>2022</b><i></i><span>6 篇</span></div>
+<div class="item" data-k="自然拼读应该这样学（含资源包） 提起自然拼读在中国的普及以及火热，有一个人和一本书是不能绕开的，那就是安妮鲜花和她的《不可错过的英语启蒙》。 2022-12-29" data-y="2022"><div class="it-hd"><span class="r-n" title="存档号">380</span><a class="it-t" href="/wechat/pdf/380.pdf">自然拼读应该这样学（含资源包）</a><span class="it-m">2022-12-29 · 8 页</span></div><p class="it-d">提起自然拼读在中国的普及以及火热，有一个人和一本书是不能绕开的，那就是安妮鲜花和她的《不可错过的英语启蒙》。</p><div class="it-l"><a href="/wechat/pdf/380.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="关于听指，跟读，复述和语法学习的解答。 今天在21天亲子精学训练营，我们谈到几个非常具有代表性的问题，这些问题的价值极大，因为很多家长也有同样的困惑，现在分享给大家。 2022-09-20" data-y="2022"><div class="it-hd"><span class="r-n" title="存档号">384</span><a class="it-t" href="/wechat/pdf/384.pdf">关于听指，跟读，复述和语法学习的解答。</a><span class="it-m">2022-09-20 · 4 页</span></div><p class="it-d">今天在21天亲子精学训练营，我们谈到几个非常具有代表性的问题，这些问题的价值极大，因为很多家长也有同样的困惑，现在分享给大家。</p><div class="it-l"><a href="/wechat/pdf/384.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语学习中，选择性听力能力为何如此重要 ？ 上次我们分享了三大英语学习模式，统合并科学指导英语学习，其中提到自然习得，刻意习得和学得习得。 2022-08-11" data-y="2022"><div class="it-hd"><span class="r-n" title="存档号">387</span><a class="it-t" href="/wechat/pdf/387.pdf">英语学习中，选择性听力能力为何如此重要 ？</a><span class="it-m">2022-08-11 · 6 页</span></div><p class="it-d">上次我们分享了三大英语学习模式，统合并科学指导英语学习，其中提到自然习得，刻意习得和学得习得。</p><div class="it-l"><a href="/wechat/pdf/387.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="三大英语学习模式，统合并科学指导英语学习 相信我的粉丝中都或多或少关注了英语学习，也有不少英语专家。我就抛砖引玉，给大家分享我最近在家庭营中指导孩子和自己实践英语学习的一些思考。 2022-08-09" data-y="2022"><div class="it-hd"><span class="r-n" title="存档号">388</span><a class="it-t" href="/wechat/pdf/388.pdf">三大英语学习模式，统合并科学指导英语学习</a><span class="it-m">2022-08-09 · 6 页</span></div><p class="it-d">相信我的粉丝中都或多或少关注了英语学习，也有不少英语专家。我就抛砖引玉，给大家分享我最近在家庭营中指导孩子和自己实践英语学习的一些思考。</p><div class="it-l"><a href="/wechat/pdf/388.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语学习中，复述该如何推动呢？ 在英语学习中，复述是一步非常关键的操作。在刻意习得的各个环节里。 2022-05-31" data-y="2022"><div class="it-hd"><span class="r-n" title="存档号">391</span><a class="it-t" href="/wechat/pdf/391.pdf">英语学习中，复述该如何推动呢？</a><span class="it-m">2022-05-31 · 7 页</span></div><p class="it-d">在英语学习中，复述是一步非常关键的操作。在刻意习得的各个环节里。</p><div class="it-l"><a href="/wechat/pdf/391.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="如何帮助孩子在英语学习中达到嗜看和嗜听的状态？ 今天的直播非常重要，全程575人观看，喝彩次数多多达1.3万次，足以说明直播的内容之优质，直播之后，很多家长都问有没有回放，视频号直播确实没有回…… 2022-01-28" data-y="2022"><div class="it-hd"><span class="r-n" title="存档号">394</span><a class="it-t" href="/wechat/pdf/394.pdf">如何帮助孩子在英语学习中达到嗜看和嗜听的状态？</a><span class="it-m">2022-01-28 · 12 页</span></div><p class="it-d">今天的直播非常重要，全程575人观看，喝彩次数多多达1.3万次，足以说明直播的内容之优质，直播之后，很多家长都问有没有回放，视频号直播确实没有回……</p><div class="it-l"><a href="/wechat/pdf/394.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="2021"><div class="yr"><b>2021</b><i></i><span>6 篇</span></div>
+<div class="item" data-k="英语学习有三种模式，EFL,ESL和EML，您的孩子用的是哪一种？ 是否要学英语对大多数人来说，在不同的时代有不同的答案。在50多年前，毋容置疑，英语是不用学的。 2021-12-23" data-y="2021"><div class="it-hd"><span class="r-n" title="存档号">395</span><a class="it-t" href="/wechat/pdf/395.pdf">英语学习有三种模式，EFL,ESL和EML，您的孩子用的是哪一种？</a><span class="it-m">2021-12-23 · 8 页</span></div><p class="it-d">是否要学英语对大多数人来说，在不同的时代有不同的答案。在50多年前，毋容置疑，英语是不用学的。</p><div class="it-l"><a href="/wechat/pdf/395.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="如何在泛学时避免精学陷阱？ 上一次分享了英语学习的“情绪电池”原理。有些家长在操作过程中间还是有一些疑问。 2021-11-25" data-y="2021"><div class="it-hd"><span class="r-n" title="存档号">398</span><a class="it-t" href="/wechat/pdf/398.pdf">如何在泛学时避免精学陷阱？</a><span class="it-m">2021-11-25 · 5 页</span></div><p class="it-d">上一次分享了英语学习的“情绪电池”原理。有些家长在操作过程中间还是有一些疑问。</p><div class="it-l"><a href="/wechat/pdf/398.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语学习中的“情绪电池”原理 大家好，有一段时间没有更新了，因为最近事情有点多。一方面老四出生了，同时伴随着“21天训练营”开营了。 2021-11-22" data-y="2021"><div class="it-hd"><span class="r-n" title="存档号">399</span><a class="it-t" href="/wechat/pdf/399.pdf">英语学习中的“情绪电池”原理</a><span class="it-m">2021-11-22 · 6 页</span></div><p class="it-d">大家好，有一段时间没有更新了，因为最近事情有点多。一方面老四出生了，同时伴随着“21天训练营”开营了。</p><div class="it-l"><a href="/wechat/pdf/399.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="风靡全世界的3S动画儿歌究竟该怎么学？ 关于3S（SuperSimpleSong）动画儿歌，很多人都已经很熟悉了，3S动画儿歌在英语启蒙界的地位是无人可以撼动的。 2021-10-29" data-y="2021"><div class="it-hd"><span class="r-n" title="存档号">402</span><a class="it-t" href="/wechat/pdf/402.pdf">风靡全世界的3S动画儿歌究竟该怎么学？</a><span class="it-m">2021-10-29 · 9 页</span></div><p class="it-d">关于3S（SuperSimpleSong）动画儿歌，很多人都已经很熟悉了，3S动画儿歌在英语启蒙界的地位是无人可以撼动的。</p><div class="it-l"><a href="/wechat/pdf/402.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="3岁前就开始做英语启蒙真的有必要吗？（含资源和书单） 上一篇文章写到一篇文章说清楚0-3岁孩子英语启蒙那些事（含资源）有的家长说，，你是不是制造焦虑？ 2021-09-07" data-y="2021"><div class="it-hd"><span class="r-n" title="存档号">416</span><a class="it-t" href="/wechat/pdf/416.pdf">3岁前就开始做英语启蒙真的有必要吗？（含资源和书单）</a><span class="it-m">2021-09-07 · 8 页</span></div><p class="it-d">上一篇文章写到一篇文章说清楚0-3岁孩子英语启蒙那些事（含资源）有的家长说，，你是不是制造焦虑？</p><div class="it-l"><a href="/wechat/pdf/416.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="一篇文章说清楚0-3岁孩子英语启蒙那些事（含资源） 经常被妈妈们问到这个问题：“我的孩子一岁多，怎么给她做英语启蒙？ 2021-09-06" data-y="2021"><div class="it-hd"><span class="r-n" title="存档号">417</span><a class="it-t" href="/wechat/pdf/417.pdf">一篇文章说清楚0-3岁孩子英语启蒙那些事（含资源）</a><span class="it-m">2021-09-06 · 9 页</span></div><p class="it-d">经常被妈妈们问到这个问题：“我的孩子一岁多，怎么给她做英语启蒙？</p><div class="it-l"><a href="/wechat/pdf/417.pdf">读原文 PDF</a></div></div>
+</div>
+<div data-group="未标日期"><div class="yr"><b>未标日期</b><i></i><span>2 篇</span></div>
+<div class="item" data-k="锻炼孩子“强悍口语输出力”的秘密 很多家长都困惑：孩子听得懂，却总是“说不出来”。其实，这不是孩子词汇量不够，而是缺乏“低抽象度+高频场景”的输出训练。 " data-y=""><div class="it-hd"><span class="r-n" title="存档号">213</span><a class="it-t" href="/wechat/pdf/213.pdf">锻炼孩子“强悍口语输出力”的秘密</a><span class="it-m">2 页</span></div><p class="it-d">很多家长都困惑：孩子听得懂，却总是“说不出来”。其实，这不是孩子词汇量不够，而是缺乏“低抽象度+高频场景”的输出训练。</p><div class="it-l"><a href="/wechat/pdf/213.pdf">读原文 PDF</a></div></div>
+<div class="item" data-k="英语学习中背诵真的落伍了吗？ 许多语言高手之所以能精通多种语言，靠的并非天赋，而是系统性的“背诵训练”。 " data-y=""><div class="it-hd"><span class="r-n" title="存档号">217</span><a class="it-t" href="/wechat/pdf/217.pdf">英语学习中背诵真的落伍了吗？</a><span class="it-m">2 页</span></div><p class="it-d">许多语言高手之所以能精通多种语言，靠的并非天赋，而是系统性的“背诵训练”。</p><div class="it-l"><a href="/wechat/pdf/217.pdf">读原文 PDF</a></div></div>
+</div>
 </section>
 
-<div class="years"><a href="/wechat/genesis/">← 语言发生学</a><a href="/wechat/">全部频道</a><a href="/wechat/vocabulary/">词汇之路 →</a></div>
-<script>
-(function(){
-  var q=document.getElementById("q"),n=document.getElementById("n"),
-      empty=document.getElementById("empty"),
-      items=[].slice.call(document.querySelectorAll(".item")),
-      secs=[].slice.call(document.querySelectorAll("section[data-col]"));
-  if(!q)return;
-  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();});
-  function run(){
-    var v=q.value.trim().toLowerCase(),c=0;
-    for(var i=0;i<items.length;i++){
-      var hit=!v||keys[i].indexOf(v)>=0;
-      items[i].style.display=hit?"":"none";
-      if(hit)c++;
-    }
-    for(var j=0;j<secs.length;j++){
-      var any=secs[j].querySelector('.item:not([style*="none"])');
-      secs[j].style.display=any?"":"none";
-    }
-    n.textContent=c+" / "+items.length;
-    empty.style.display=c?"none":"";
-  }
-  q.addEventListener("input",run); run();
-})();
-</script>
+<div class="nearby">
+  <a href="/wechat/genesis/"><small>上一栏</small><b>语言发生学</b>49 篇</a>
+  <a href="/wechat/"><small>门厅</small><b>九个频道</b>回到总目，看写作节律</a>
+  <a href="/wechat/vocabulary/"><small>下一栏</small><b>词汇之路</b>23 篇</a>
 </div>
+</div></div>
 <footer><div class="wrap">
   <p>约翰专栏 —— 胡志英（约翰老师）公众号「五宝爸约翰聊英语」原文存档，共 418 篇。原文一字未改，本站只做归类、排序与检索。</p>
   <p>语言发生学 · <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站 —— 德麦国际 · Demai International Press</p>
 </div></footer>
 <script>
 /* 分站页面的自家链接写的是分站根。在二级域名下这就是对的；
-   若从主站以 /sites/lang/… 预览，则就地补上前缀，两处都能正常点。 */
-(function(){var b="/sites/lang";if(location.pathname.indexOf(b)!==0)return;
-var own=["/#","/all/","/wechat/","/chatjohn/"];
+   若从主站以 /sites/lang/… 预览，就地补前缀，两处都能点。 */
+(function(){window.__wechatBase="";var b="/sites/lang";
+if(location.pathname.indexOf(b)!==0)return;
+window.__wechatBase=b;
+var own=["/#","/all/","/wechat","/chatjohn/"];
 var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
 if(h==="/"){as[i].setAttribute("href",b+"/");continue;}
 for(var k=0;k<own.length;k++){if(h.indexOf(own[k])===0){as[i].setAttribute("href",b+h);break;}}}})();
+</script>
+<script>
+(function(){
+  var q=document.getElementById("q"),n=document.getElementById("n"),
+      empty=document.getElementById("empty"),
+      items=[].slice.call(document.querySelectorAll(".item")),
+      groups=[].slice.call(document.querySelectorAll("[data-group]")),
+      ybtns=[].slice.call(document.querySelectorAll(".chipy button[data-year]")),
+      year=null;
+  if(!q&&!ybtns.length)return;
+  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();}),
+      years=items.map(function(el){return el.getAttribute("data-y")||"";});
+  function run(){
+    var v=q?q.value.trim().toLowerCase():"",c=0;
+    for(var i=0;i<items.length;i++){
+      var hit=(!v||keys[i].indexOf(v)>=0)&&(year===null||years[i]===year);
+      items[i].style.display=hit?"":"none";
+      if(hit)c++;
+    }
+    for(var j=0;j<groups.length;j++){
+      var any=groups[j].querySelector('.item:not([style*="none"])');
+      groups[j].style.display=any?"":"none";
+    }
+    if(n)n.textContent=c+" / "+items.length;
+    if(empty)empty.style.display=c?"none":"";
+  }
+  if(q)q.addEventListener("input",run);
+  ybtns.forEach(function(b){
+    b.addEventListener("click",function(){
+      var y=b.getAttribute("data-year");
+      year=(year===y)?null:y;
+      ybtns.forEach(function(o){
+        o.setAttribute("aria-pressed",String(year!==null&&o.getAttribute("data-year")===year));
+      });
+      run();
+    });
+  });
+  run();
+})();
 </script>
 </body></html>
