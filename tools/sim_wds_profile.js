@@ -174,7 +174,7 @@ console.log("── ① 档案表与解析器 ───────────�
     t("她的文章页把陪读挂成 liter 档", /window\.WDS_READ=\{[^}]*profile:"liter"/.test(one));
   }
 
-  console.log("\n── ②d 第三个档案：edu（ChatYang）───────────────");
+  console.log("\n── ②f 第三个档案：edu（ChatYang）───────────────");
   const edu = S.wdsProfileOf("edu");
   t("认得 edu", !!edu && edu.id === "edu" && edu.name === "ChatYang");
   t("edu 的人格是自己那一份", !!edu && edu.sys === yangSys && edu.sys !== johnSys && edu.sys !== feisuoSys);
@@ -189,9 +189,29 @@ console.log("── ① 档案表与解析器 ───────────�
     && !S.wdsProfInScope(lit, "/students/yang-yong/negative-transcoding/"));
   t("edu 带题域闸与术语闸", !!edu && /题域闸/.test(edu.guard || "") && /术语闸/.test(edu.term || ""));
   t("edu 每条前缀都带结尾斜杠", !!edu && edu.pre.every((x) => /\/$/.test(x)));
-  /* ⚠ 同 liter：教育版内功档没写之前，这里必须是空的。 */
-  t("edu 宁可不挂内功，也不挂通用那份母体术语底盘",
-    !!edu && (!edu.neigong || edu.neigong.indexOf("lite") < 0), edu && edu.neigong);
+  /* 2026-08-23 起 edu 也挂上了自己那份 edu-neigong.txt。逐条钉：换错档不会报错，
+     它照样答得像模像样，只是又变回了 ChatSDE——而这一台面对的是老师，术语会被照着学走。
+     ⚠ 判据不能写成 indexOf("lite")：派生档文件名里可能正好含这四个字母。 */
+  {
+    const fsE = require("fs");
+    t("edu 挂了自己的内功档", !!edu && edu.neigong === "/taste/assets/edu-neigong.txt", edu && edu.neigong);
+    t("edu 挂的不是通用那份母体术语底盘",
+      !!edu && !/neigong-lite\.txt$/.test(edu.neigong), edu && edu.neigong);
+    t("内功档真在仓库里", fsE.existsSync("public/taste/assets/edu-neigong.txt"));
+    const en = fsE.readFileSync("public/taste/assets/edu-neigong.txt", "utf8");
+    const cjkE = (en.match(/[\u4e00-\u9fff]/g) || []).length;
+    t("内功档够厚（教育的家底最多，≥6000 汉字）", cjkE >= 6000, String(cjkE));
+    t("第零条是说话的规矩（术语纪律在最前）", /第零条[^\n]*说话的规矩/.test(en));
+    t("三样用的是课堂自家的词（表现／过程／条件）", /在条件里，经过程，成表现/.test(en));
+    t("带方法论：二阶碰撞六步", /六步/.test(en) && /最不客气的近邻/.test(en));
+    t("带方法论：问题裁定三档", /承接/.test(en) && /改切/.test(en) && /驳回/.test(en));
+    t("带教育这一行的看家判断（第五条）",
+      /失败常常长得像成功/.test(en) && /代偿/.test(en) && /负值转译/.test(en) && /守护过剩/.test(en));
+    t("⭐ 尺子里钉死「明天早上能做的一个动作」", /明天早上/.test(en));
+    t("⭐ 提醒了不要增加老师的羞愧（这套眼法极易被误用成审判的尺子）", /羞愧/.test(en));
+    t("⭐ 内功档里没有母体术语裸露（它自己就是泄漏源的话，术语闸等于白设）",
+      !/(差异序列|特征纠缠|结构显露态|S=F\(D,E\))/.test(en.replace(/^#.*$/gm, "")));
+  }
   /* 术语闸放行「教育发生学」这个正名（同 lang 放行「语言发生学」），但不许把「发生学」当形容词乱用。 */
   t("edu 的术语闸给本站正名开了口子", !!edu && /教育发生学/.test(edu.term || ""));
 
