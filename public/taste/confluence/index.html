@@ -345,7 +345,9 @@ select.model-select{max-width:340px}
   <span id="buildTag" class="small"></span>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="/taste/assets/docx-8.5.0.umd.js"></script>
+<script>/* 本地优先：jsdelivr 在国内时通时断，断了就三个下载钮全哑。本地没拿到再回落 CDN。 */
+if(typeof docx==="undefined"){document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"><\/scr'+'ipt>');}</script>
 <script src="/assets/wds-savedir.js?v=20260817c"></script>
 <!-- 站内近邻：端点客户端 + 三关判据。判据只有一份来源，复制两份必漂，而那种漂是静默的 -->
 <script src="/taste/assets/sde-rag.js?v=20260817c"></script>

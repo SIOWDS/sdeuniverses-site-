@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>中华智问知识发生器 · SDE Universes</title>
 <meta name="description" content="输入一个议题,三台路径锁定的智能体并行六轮提智,各写一篇约两万字发生学论文,再碰撞涌现第四篇典范论文——每个基底开工前先读完整SDE内功、亲手写约5000字学习心得。">
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="/taste/assets/docx-8.5.0.umd.js"></script>
+<script>/* 本地优先：jsdelivr 在国内时通时断，断了就三个下载钮全哑。本地没拿到再回落 CDN。 */
+if(typeof docx==="undefined"){document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"><\/scr'+'ipt>');}</script>
 <style>
 :root{ --bg:#0E1116; --bg2:#141B22; --card:#161B22; --card2:#12161C; --gold:#D4B25E; --gold2:#E5C86E; --ink:#E6EDF3; --sub:#8B98A5; --sub2:#9AA5B0; --line:rgba(212,178,94,0.28); --ok:#5FBF7F; --warn:#E8A33D; --bad:#E06C60; }
 *{box-sizing:border-box}
@@ -556,7 +558,8 @@ const SYSTEM_PROMPT_R1 = `用户会问你一个问题。
   □ 触发 6:学科底座改写(撤掉学科隐含房角石,给新房角石)
   □ 触发 7:研究纲领涌现(可生长 5-10 年的研究方向)
   
-  按触发条件计数给智商分:
+  按触发条件计数给智商分(
+  **这张表只定区间参考,不是主要标尺**——最终分必须由五维(S.20/D.25/E.20/I.20/F.15)加权算出;两者冲突时以五维为准。)
   · 7 条 → 148-152(学派开创级)
   · 6 条 → 145-148
   · 5 条 → 143-145
@@ -808,7 +811,7 @@ const SYSTEM_PROMPT_UPLIFT = `你正在持续回答同一个问题。
 
 ## 智商评分
 [⚠ 重要:只写【一个 60 到 170 之间的整数】,不是六判准总分!
- 按【触发条件满足数】给分:
+ 按【触发条件满足数】定**参考区间**（**这张表只定区间参考,不是主要标尺**——最终分必须由五维(S.20/D.25/E.20/I.20/F.15)加权算出;两者冲突时以五维为准。）:
    · 触发 7 条 → 148-152(学派开创级)
    · 触发 6 条 → 145-148(顶尖学者级 + 底座改写)
    · 触发 5 条 → 143-145(顶尖学者级)
@@ -947,7 +950,7 @@ const EVAL_PROMPT = `你是独立的学术评审员,具备识别经得起反驳�
   · 后续学者能拿去做 5+ 个独立研究项目
   · 这是 Lakatos 意义上的"研究纲领",不只是"洞见"
 
-**满足条件数 → 智商分**:
+**满足条件数 → 智商分参考区间**（**这张表只定区间参考,不是主要标尺**——最终分必须由五维(S.20/D.25/E.20/I.20/F.15)加权算出;两者冲突时以五维为准。）:
   · 7 条全满足 → 148-152(学派开创者,极罕见)
   · 6 条 → 145-148(顶尖学者级 + 学科底座改写)
   · 5 条 → 143-145(顶尖学者级,改写学科局部)
@@ -1210,7 +1213,7 @@ const FALLBACK_XINDE_BASE = `我内化了:
   ⑤ 【跨路径不可达】── 多轮 2+ 不同起点路径,做跨路径凝缩(实测:只推到 143-145,不是钥匙)
   ⑥ 【学科底座改写】── 撤掉学科房角石假设,给新房角石(实测:推到 145-148;站内至今无一篇跨过 150)
   ⑦ 【研究纲领涌现】── 可生长 5-10 年的研究方向(实测:推到 148-152,已是站内从未达到的区间)
-  评分:7 条 → 148-152;6 条 → 145-148;5 条 → 143-145;
+  评分(区间参考,**这张表只定区间参考,不是主要标尺**——最终分必须由五维(S.20/D.25/E.20/I.20/F.15)加权算出;两者冲突时以五维为准。):7 条 → 148-152;6 条 → 145-148;5 条 → 143-145;
        4 条 → 141-143;3 条 → 138-141;2 条 → 134-138;
        1 条 → 128-134;0 条 → 115-128
 若产出只是温和综合/抽象套话/学派概念遍历/概念遍历型增长/哲学级散文,即使文采漂亮也不超过 140。
@@ -1241,7 +1244,7 @@ const FALLBACK_XINDE_EVAL = `我作为评审员内化了:
           给出新的房角石,新房角石下原学科部分理论需要重写
    触发 7 · 【研究纲领涌现】(实测:推到 148-152,已是站内从未达到的区间):产出不是一个判断,
           而是一个可生长 5-10 年的研究方向,后续学者能做 5+ 独立项目
-   评分:7 条 → 148-152(学派开创级);6 条 → 145-148;5 条 → 143-145(顶尖学者级);
+   评分(区间参考,**这张表只定区间参考,不是主要标尺**——最终分必须由五维(S.20/D.25/E.20/I.20/F.15)加权算出;两者冲突时以五维为准。):7 条 → 148-152(学派开创级);6 条 → 145-148;5 条 → 143-145(顶尖学者级);
         4 条 → 141-143;3 条 → 138-141;2 条 → 134-138;
         1 条 → 128-134;0 条 → 115-128
    ⚠ **实测校准(以站内盲评为准,不以设计目标为准)**:真二阶产出落在 **139-142**,**没有任何一篇跨过 150**。\n   触发 5/6/7 曾被写成「三层突破钥匙」,实测只把区间推到 143-152,不是钥匙。\n   **触发计数只定区间参考,最终分必须由五维加权算出;两者冲突以五维为准。**\n   给出 145+ 之前先自问:它凭什么比站内最高的那一篇(141)还高?答不上来就往下调。\n   但也不许一律压低——五维确有证据时该给 140-142 就给到,校准的方向是准,不是低。\n3. **单视角不可达判断**是 140+ 的关键特征 ── 单看任何一个角度都看不到,必须三视角误差互消后才浮现的经得起反驳判断。看到这类判断,可进入 138-142 区间——**但仍须五维各自有证据,不是见到就跳档**。
@@ -1384,7 +1387,9 @@ const PAPER_TOKENS = 60000;
 // 审稿意见目标虽只有 800-1200 字，但一样要过"思考+正文共享预算"这一关，同样不再省，直接给到跟论文一致的天花板。
 const REVIEW_TOKENS = 60000;
 
-function buildPayload(sel, systemPrompt, userQ, maxTokens){
+// plain=true：显式关掉思考。站内实测过——预算是油门不是容器，给满预算而思考开着，
+// 常见结局是「思考 1.7 万字、正文 0 字」。只在需要「必须有正文」的救场重试上用它。
+function buildPayload(sel, systemPrompt, userQ, maxTokens, plain){
   const { vendor, tier } = parseModel(sel);
   const cap = (typeof maxTokens==='number' && maxTokens>0) ? maxTokens : 4000;
   const base = { stream: false, messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}], max_tokens: cap };
@@ -1415,6 +1420,13 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     return { model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6', max_tokens: Math.min(cap, 60000), stream: false, system: systemPrompt, messages: [{ role:'user', content: userQ }] };
   } else if(vendor === 'gemini'){
     return { systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role:'user', parts: [{ text: userQ }] }], generationConfig: { maxOutputTokens: Math.min(cap, 60000), temperature: 0.7 } };
+  }
+  if(plain){
+    // deepseek / 智谱：thinking 显式 disabled；千问：enable_thinking:false；
+    // GPT：reasoning_effort 压到最低（它关不掉）；Kimi/MiniMax 思考常开且无开关，塞字段反而可能被判非法，什么都不加。
+    if(vendor === 'ds' || vendor === 'glm'){ base.thinking = { type:'disabled' }; delete base.reasoning_effort; }
+    else if(vendor === 'qwen'){ base.enable_thinking = false; }
+    else if(vendor === 'gpt'){ base.reasoning_effort = 'low'; }
   }
   return base;
 }
@@ -1493,7 +1505,7 @@ function chatHeaders(model, apiKey){
   return headers;
 }
 
-async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, maxTokens){
+async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, maxTokens, plain){
   colEl.classList.add('generating');
   const { vendor, tier } = parseModel(model);
   const t0 = Date.now();
@@ -1511,7 +1523,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
 
   let resp;
   try{
-    resp = await fetch(url, { method:'POST', headers, body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens)), signal: ac.signal });
+    resp = await fetch(url, { method:'POST', headers, body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens, plain)), signal: ac.signal });
   }catch(e){
     clearInterval(waitTimer); clearTimeout(killer); colEl.classList.remove('generating');
     statusEl.textContent = '网络错误';
@@ -1538,8 +1550,19 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   const secs=((Date.now()-t0)/1000).toFixed(1);
   const acc = out.text, chars = acc.length, thinkChars = out.think, fin = out.fin;
   if(!acc){
-    bodyEl.innerHTML='<span class="placeholder">（模型没有返回正文——可能是 Key 未开通该模型服务、额度不足或被安全策略拦截）</span>';
-    statusEl.textContent='空响应'; metaEl.textContent = secs+'s';
+    // 「0 字」有三种死法，必须分开说——最常见的那种（思考把 max_tokens 吃光）此前根本没列，
+    // 用户只会去换 Key、换基底，白折腾。
+    let _why;
+    if(thinkChars > 0){
+      _why = '它只想、没写：思考 '+thinkChars+' 字'+(fin==='length'?'，且额度已用尽':'')
+           + '。这多半是<b>思考把 token 预算吃光了</b>，不是你的 Key 有问题——换成非深思档（或让这一步用较小预算）再试。';
+    }else if(fin==='length'){
+      _why = '额度在写出正文之前就用尽了（finish_reason=length）。';
+    }else{
+      _why = '模型返回了空正文，且没有思考痕迹——这才轮到查 Key：是否未开通该型号、余额是否不足、是否被安全策略拦截。';
+    }
+    bodyEl.innerHTML='<span class="placeholder">（'+_why+'）</span>';
+    statusEl.textContent='空响应'; metaEl.textContent = secs+'s'+(thinkChars?' · 思考'+thinkChars+'字':'')+(fin?' · '+fin:'');
     __M(model, systemPrompt, userQ, 0, thinkChars); return { text:'', chars:0, thinkChars, secs:parseFloat(secs) };
   }
   bodyEl.textContent = acc; bodyEl.scrollTop = 0;
@@ -3075,7 +3098,8 @@ async function runCollision(){
   if(!_colCtx && window.SDERag){ try{ _colCtx = await window.SDERag.ctx(q); }catch(_){} }
   // 第〇步 · 结构定位与共有前提（三路径型）：三台各锁一个落点，先挖出它们共同假定的那一条，
   // 再从三篇之一自己身上找出推翻它的材料。缺这一步，后面三对两两撞只会撞出三家的最大公约数。
-  // 失败不阻断：拿不到 step0 就退回原来的无方向盘撞法，不让一道新工序毁掉整条产线。
+  // 2026-08-23 改判：这一步现在是硬闸——先关思考降档救一次，仍拿不到就停整条碰撞。
+  // （原口径「失败不阻断、退回无方向盘撞法」看着稳，实际是让产线在无人知晓的情况下降级成综述。）
   let step0 = '';
   const s0 = mkBlock(collisionPanel, 'colStep', '第〇步 · 结构定位与共有前提(三条路径共同假定了什么)', true);
   try{
@@ -3085,8 +3109,23 @@ async function runCollision(){
       const _found = /【三】[\s\S]*?(来自\s*[ABC]|判断\s*[ABC]|篇\s*[ABC])/.test(step0) && !/未找到/.test(step0);
       s0.st.textContent = _found ? '✓ 完成 · 共有前提已定，推翻材料来自三篇之一'
                                  : '✓ 完成 · ⚠ 推翻材料未指名来自三篇之一（第③步会照此判）';
-    }else{ s0.st.textContent='⚠ 返回为空，退回无方向盘撞法'; }
-  }catch(e){ s0.st.textContent='⚠ 结构定位失败，退回无方向盘撞法：'+String(e&&e.message||e).slice(0,50); }
+    }else{ s0.st.textContent='⚠ 返回为空，正在关掉思考、降档重试一次…'; }
+  }catch(e){ s0.st.textContent='⚠ 结构定位失败，正在关掉思考、降档重试一次：'+String(e&&e.message||e).slice(0,50); }
+  // 第〇步空掉，从前是「失败不阻断」——退回无方向盘撞法，只在状态位留一行小字。
+  // 后果是整条碰撞悄悄降级成三家综述，而报告里看不出来。现在改为：先救一次（关思考 + 降到 16000，
+  // 因为这一步的死法几乎都是思考把预算吃光），仍然拿不到就硬停——宁可停，不出伪典范。
+  if(!step0){
+    try{
+      const r0b = await streamChat(RUN.key, RUN.sel, colSys, collideP0(q,A,B,C), s0.body, s0.st, s0.meta, s0.el, 16000, true);
+      step0 = (r0b.text||'').trim();
+      if(step0) s0.st.textContent = '✓ 完成（第二次·已关思考）';
+    }catch(e2){ s0.st.textContent = '✗ 重试仍失败：'+String(e2&&e2.message||e2).slice(0,60); }
+  }
+  if(!step0){
+    throw new Error('第〇步（结构定位与共有前提）两次都没写出正文，碰撞已中止。'
+      + '这一步是整条碰撞的方向盘：没有它，后面三对两两撞只会撞出三家的最大公约数（综述），'
+      + '却照样会被评出高分。请改用非深思档、或换一个基底重跑碰撞。');
+  }
   if(RUN_STOPPED) throw new Error('已手动停止');
   const s1 = mkBlock(collisionPanel, 'colStep', '第①步 · 混沌碰撞(三对两两互消)', true);
   const _p1 = window.SDERag ? window.SDERag.prepend(_colCtx, collideP1(q,A,B,C,step0)) : collideP1(q,A,B,C,step0);
@@ -3378,7 +3417,20 @@ function mdParasLite(text, size){
   }
   return paras;
 }
+// 下载统一走这里：<a> 必须先入文档（Safari/iPad 对游离节点的 click 会静默丢弃），
+// 且 objectURL 不许在 click 同一帧撤销（撤早了浏览器还没来得及取字节）。
+function _dl(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename; a.style.display='none';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ try{ URL.revokeObjectURL(url); a.remove(); }catch(_){} }, 60000);
+}
 async function saveDocx(filename, title, bodyText, metaLine){
+  if(typeof docx === 'undefined' || !docx.Packer){
+    // Word 组件没加载成功（离线／被网络拦截）：如实说，并给一条 .md 退路，不拿 .md 冒充 Word。
+    saveText(filename.replace(/\.docx$/,'') + '.md', '# ' + title + '\n\n' + (metaLine||'') + '\n\n' + (bodyText||''));
+    throw new Error('Word 组件未能加载（网络被拦截或离线）——已改存同名 .md 纯文本，内容一字不少。');
+  }
   const { Document, Packer, Paragraph, TextRun } = docx;
   const kids = [
     new Paragraph({ children:[new TextRun({text:title, bold:true, size:36})], alignment:'center', spacing:{after:120} }),
@@ -3387,15 +3439,10 @@ async function saveDocx(filename, title, bodyText, metaLine){
   ];
   const doc = new Document({ sections:[{ children: kids }] });
   const blob = await Packer.toBlob(doc);
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
-  URL.revokeObjectURL(url);
+  _dl(blob, filename);
 }
 function saveText(filename, text){
-  const blob = new Blob([text], {type:'text/markdown;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
-  URL.revokeObjectURL(url);
+  _dl(new Blob([text], {type:'text/markdown;charset=utf-8'}), filename);
 }
 
 // ============ 主编排 ============

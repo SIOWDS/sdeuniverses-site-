@@ -128,7 +128,9 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 .privacy-note{max-width:820px;margin:14px auto 0;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
 .privacy-note b{color:var(--gold)}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="/taste/assets/docx-8.5.0.umd.js"></script>
+<script>/* 本地优先：jsdelivr 在国内时通时断，断了就三个下载钮全哑。本地没拿到再回落 CDN。 */
+if(typeof docx==="undefined"){document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"><\/scr'+'ipt>');}</script>
 <script src="/assets/wds-savedir.js?v=20260817c"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
