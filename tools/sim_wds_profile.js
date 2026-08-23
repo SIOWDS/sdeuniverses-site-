@@ -47,9 +47,14 @@ console.log("── ① 档案表与解析器 ───────────�
   t("抠得出 HEALTH_PRE 段", healthSeg.length > 40);
   const HEALTH_PRE = new Function(healthSeg + "\nreturn HEALTH_PRE;")();
   const huminSys = "「胡敏」的人格底本占位（含：不做诊断／自伤先请人求助）";
-  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE", "YANG_SYS", "EDU_PRE", "HUMIN_SYS", "HEALTH_PRE",
+  /* 2026-08-23 第五个档案 math（ChatXiaoBo）。 */
+  const mathSeg = W.slice(W.indexOf("const MATH_PRE = ["), W.indexOf("];", W.indexOf("const MATH_PRE = [")) + 2);
+  t("抠得出 MATH_PRE 段", mathSeg.length > 40);
+  const MATH_PRE = new Function(mathSeg + "\nreturn MATH_PRE;")();
+  const xiaoboSys = "「小波老师」的人格底本占位（含：不替他做题／不把猜想说成定理）";
+  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE", "YANG_SYS", "EDU_PRE", "HUMIN_SYS", "HEALTH_PRE", "XIAOBO_SYS", "MATH_PRE",
     seg + "\nreturn { WDS_PROFILES: WDS_PROFILES, wdsProfileOf: wdsProfileOf, wdsProfInScope: wdsProfInScope };");
-  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE, yangSys, EDU_PRE, huminSys, HEALTH_PRE);
+  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE, yangSys, EDU_PRE, huminSys, HEALTH_PRE, xiaoboSys, MATH_PRE);
   const lang = S.wdsProfileOf("lang");
 
   t("认得 lang", !!lang && lang.id === "lang");
@@ -258,6 +263,42 @@ console.log("── ① 档案表与解析器 ───────────�
       && !/chathumin/.test(fs3.readFileSync("public/students/hu-min/index.html", "utf8")));
     t("胡敏作者页挂了 health 分站入口", /health\.sdeuniverses\.com/.test(fs3.readFileSync("public/students/hu-min/index.html", "utf8")));
     t("liter 首页挂了对谈栏", /\/dialogue\//.test(fs3.readFileSync("public/sites/liter/index.html", "utf8")));
+  }
+
+  console.log("\n── ②f 第五个档案：math（ChatXiaoBo）─────────────");
+  const mth = S.wdsProfileOf("math");
+  t("认得 math", !!mth && mth.id === "math" && mth.name === "ChatXiaoBo");
+  t("math 挂了自己的内功档", !!mth && mth.neigong === "/taste/assets/math-neigong.txt");
+  /* ⭐ 这一档开站时**语料几乎是空的**（小波老师 0 篇）。白名单第一条必须是他的目录：
+     他一发文就自动进检索，不必再改代码；漏了这一条，将来他发了文而机器读不到，
+     症状是「站上读得到、ChatXiaoBo 引不到」，没有人会当场发现。 */
+  t("⭐ 白名单第一条是他自己的目录（将来发文自动进）", !!mth && mth.pre[0] === "/students/xiaobo/");
+  t("收了站上现有的数学存量", !!mth && S.wdsProfInScope(mth, "/column/black-box-and-taut-soil/")
+    && S.wdsProfInScope(mth, "/frontier/mathematics-education-cognition/"));
+  t("不收别人的非数学篇", !!mth && !S.wdsProfInScope(mth, "/students/qin-li/line-of-separation/"));
+  /* 数学这一档比别的多两道闸：不替学生做题（做了就取消掉唯一有用的动作）、
+     事实分寸（把猜想说成定理、编造定理名字，是这一行最贵的错）。 */
+  t("带「不替他做题」闸", !!mth && /不替他做题/.test(mth.guard || ""));
+  t("带「事实的分寸」闸", !!mth && /绝不把猜想说成定理/.test(mth.guard || ""));
+  /* ⚠ 这两条要验的是**源码里那份人格常量**，不是 harness 注入的占位串——
+     第一版写成 mth.sys 就是在验占位串自己，永远只反映我这里怎么写的占位文字。
+     判据只有一条：断言的对象必须是产品里真的那份文本。 */
+  const xbSeg = W.slice(W.indexOf("const XIAOBO_SYS = "), W.indexOf("const WDS_PROFILES = {"));
+  t("人格底本里也各钉了一遍", /不替他做题/.test(xbSeg) && /绝不把猜想说成定理/.test(xbSeg));
+  t("工序不解除这几道闸", !!mth && /工序不解除这几道闸/.test(mth.guard || ""));
+  /* 开站时检索多半落空——人格里必须明写「别说我在某篇里写过」，否则它会编一个篇名。 */
+  t("⭐ 明写了空检索时不许编篇名", /本站刚开栏/.test(xbSeg) && /我在某篇里写过/.test(xbSeg));
+  {
+    const fs4 = require("fs");
+    const mn = fs4.readFileSync("public/taste/assets/math-neigong.txt", "utf8");
+    t("数学内功用的是本行的词（写法／动作／条件）", /在条件里，经动作，成写法/.test(mn));
+    t("数学内功第五条也钉了同一条线", /你不替他做题/.test(mn) && /绝不把猜想说成定理/.test(mn));
+    const cjk = (mn.match(/[\u4e00-\u9fff]/g) || []).length;
+    t("数学内功够厚（≥4000 汉字）", cjk >= 4000, String(cjk));
+    t("ChatXiaoBo 壳页挂 math 档", /WDSM_PROFILE = "math"/.test(fs4.readFileSync("public/sites/math/chatxiaobo/index.html", "utf8")));
+    t("math 分站首页有入口", /\/chatxiaobo\//.test(fs4.readFileSync("public/sites/math/index.html", "utf8")));
+    t("小波老师作者页挂了分站入口", /math\.sdeuniverses\.com/.test(fs4.readFileSync("public/students/xiaobo/index.html", "utf8")));
+    t("SUBSITES 里加了 math", /math: "\/sites\/math"/.test(WC));
   }
 
   console.log("\n── ②b 白名单下推到候选阶段（治 K 饥饿）─────────");

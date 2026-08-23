@@ -366,6 +366,45 @@
         en: { ph: "Describe something concrete — a lab report, a follow-up visit…", srcSite: "From the health subsite" }
       }
     },
+    /* ── 第五个分身：math（ChatXiaoBo，2026-08-23）── */
+    math: {
+      id: "math",
+      brand: "ChatXiaoBo",
+      url: "/chatxiaobo/",
+      sig: "ChatXiaoBo \u00b7 math.sdeuniverses.com",
+      who: "小波老师",
+      kicker: "MATH.SDEUNIVERSES.COM",
+      home: "/",
+      tools: ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"],
+      seeds: [
+        "每一步都对，他也说听懂了，可换个数字就又不会了——问题出在哪？",
+        "学生把负号的规则用到了不该用的地方。这类错该怎么批？",
+        "这道题我讲得很顺，全班都点头，然后作业照错。我讲错了什么？",
+        "「函数」这一章，怎样才算他手上真有了这个东西？"
+      ],
+      hero: {
+        zh: {
+          title: "ChatXiaoBo",
+          sub: "数学 · 小波老师（李昕）。一道题、一份解答、一节课——先找第一处走岔，再谈怎么办。",
+          foot: "它不替学生做题：先问你到哪一步、卡在哪。用你自己的大模型 Key 运行，Key 只存在这台设备的浏览器里。"
+        },
+        en: {
+          title: "ChatXiaoBo",
+          sub: "Mathematics, with Teacher Xiaobo (Li Xin). One problem, one worked solution, one lesson — find the first wrong turn before anything else.",
+          foot: "It won't solve it for you: it asks where you got stuck first. Runs on your own model key."
+        }
+      },
+      copy: {
+        zh: {
+          ph: "贴一道题、一份解答，或一节课上出的事…",
+          note: "ChatXiaoBo 只答数学、数学学习与数学教学。**它不替学生做题**：会先问你到哪一步、卡在哪。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写入数据库、不写进日志。",
+          tlBtn: "⊞ 数学工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
+          tipDeep: "满血基底＋满功率思考＋整套工序，慢但深",
+          srcSite: "数学分站文献"
+        },
+        en: { ph: "Paste a problem, a worked solution, or what happened in class…", srcSite: "From the maths subsite" }
+      }
+    },
   };
   var PROFILE = (function () {
     var k = String(window.WDSM_PROFILE || "").trim();

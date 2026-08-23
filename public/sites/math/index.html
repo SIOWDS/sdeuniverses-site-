@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDE 数学 · 小波老师（李昕）</title>
+<meta name="description" content="SDE 数学：关于数学怎样在一个人身上真正发生的新思想生产平台。小波老师（李昕）主持，SDE Universes 子平台。站上有对话智能体 ChatXiaoBo——一道题、一份解答、一节课，先找第一处走岔。">
+<link rel="canonical" href="https://math.sdeuniverses.com/">
+<meta property="og:title" content="SDE 数学 · 小波老师（李昕）">
+<meta property="og:description" content="每一步都对，为什么他还是不会？关于数学怎样发生的新思想生产平台。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F4F6F3">
+<style>
+:root{
+  --paper:#F4F6F3; --card:#FBFCFA; --ink:#141A21; --ink2:#5A6470; --ink3:#8D97A3;
+  --grid:#D3DCD8; --grid2:#E6ECE8;
+  --blue:#1E4E6E; --blue-l:#3C7FA8;
+  --red:#C0453A;                     /* 老师的红笔 */
+  --pencil:#6E7A82;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+/* 方格纸：这一站的底色就是一张作业纸，与前四个分站一眼分得开 */
+body{margin:0;color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.8;
+  background:var(--paper);
+  background-image:linear-gradient(var(--grid2) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--grid2) 1px,transparent 1px);
+  background-size:26px 26px}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+.topbar{border-bottom:1px solid var(--grid);position:sticky;top:0;z-index:30;
+  background:rgba(244,246,243,.94);backdrop-filter:saturate(140%) blur(6px)}
+.topbar .wrap{display:flex;align-items:baseline;gap:20px;height:54px}
+.brand{font-family:var(--serif);font-size:19px;letter-spacing:.18em;color:var(--blue)}
+.brand em{font-style:normal;color:var(--ink3);font-size:11px;letter-spacing:.24em;margin-left:10px}
+.topbar nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--ink2)}
+.topbar nav a:hover{color:var(--red)}
+.topbar nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:64px 0 0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--blue-l);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.6vw,52px);line-height:1.28;
+  letter-spacing:.03em;margin:.45em 0 .35em;max-width:15em}
+h1 .hl{color:var(--red)}
+.lede{max-width:38em;color:var(--ink2);font-size:16px}
+.lede b{color:var(--ink);font-weight:600}
+
+/* 签名件：一份批改过的作业 */
+.hw{margin:40px 0 0;max-width:660px;background:var(--card);border:1px solid var(--grid);
+  box-shadow:2px 3px 0 rgba(20,26,33,.05)}
+.hw .cap{display:flex;justify-content:space-between;align-items:baseline;padding:12px 20px;
+  border-bottom:1px solid var(--grid);font-family:var(--serif);letter-spacing:.24em;font-size:14.5px}
+.hw .cap span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink3)}
+.hw .prob{padding:18px 20px 14px;border-bottom:1px dashed var(--grid);
+  font-family:var(--mono);font-size:15px;color:var(--ink)}
+.hw .prob i{display:block;font-style:normal;font-family:var(--sans);font-size:11.5px;
+  color:var(--ink3);letter-spacing:.14em;margin-top:8px}
+.hw ol{list-style:none;margin:0;padding:6px 0 0}
+.hw li{display:flex;align-items:baseline;gap:12px;padding:9px 20px;
+  opacity:0;animation:fade .45s ease forwards}
+.hw li .s{font-family:var(--mono);font-size:15px;color:var(--ink);flex:1}
+.hw li .m{font-family:var(--serif);font-size:19px;color:#3F8A5C;flex:none;line-height:1}
+.hw li.miss{border-top:1px dashed var(--grid);margin-top:8px;padding-top:16px;padding-bottom:18px}
+.hw li.miss .s{font-family:var(--serif);letter-spacing:.3em;color:var(--red);font-size:17px}
+.pen{display:inline-block;color:var(--red);border:1.5px solid var(--red);padding:2px 9px;
+  font-size:11.5px;letter-spacing:.18em;transform:rotate(-3.5deg);
+  animation:drop .45s cubic-bezier(.2,1.5,.4,1) 1s both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:rotate(-14deg) scale(1.6)}to{opacity:1;transform:rotate(-3.5deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.hw li{opacity:1;animation:none}.pen{animation:none}}
+.hwnote{margin:14px 2px 0;max-width:44em;font-size:13.5px;color:var(--ink2);line-height:1.9}
+.hwnote b{color:var(--ink)}
+
+section{padding:56px 0 6px}
+.hd{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:8px}
+.hd h2{font-family:var(--serif);font-weight:600;font-size:21px;letter-spacing:.2em;margin:0}
+.hd .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--red)}
+.hd .ct{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+.lead{color:var(--ink2);font-size:15px;margin:14px 0 0;max-width:44em}
+
+.bots{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:0;margin-top:24px;
+  border:1px solid var(--grid);background:var(--card)}
+.bot{padding:22px 22px 20px;border-right:1px solid var(--grid);display:flex;flex-direction:column}
+.bot:last-child{border-right:none}
+a.bot:hover{background:#fff}
+.bot .n{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--red)}
+.bot h3{font-family:var(--serif);font-size:20px;letter-spacing:.12em;margin:9px 0 4px;font-weight:600}
+.bot .en{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink3);margin-bottom:10px}
+.bot p{margin:0 0 13px;font-size:13.5px;color:var(--ink2);line-height:1.85}
+.bot .go{margin-top:auto;font-family:var(--mono);font-size:11.5px;color:var(--red);
+  border-top:1px solid var(--grid);padding-top:10px}
+.bot.wait{opacity:.72}
+.bot .soon{display:inline-block;margin-top:auto;font-family:var(--mono);font-size:10px;
+  letter-spacing:.18em;color:var(--ink3);border:1px solid var(--grid);padding:1px 7px}
+@media(max-width:720px){.bot{border-right:none;border-bottom:1px solid var(--grid)}
+  .bot:last-child{border-bottom:none}}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 34px;margin-top:10px}
+@media(max-width:720px){.cols{grid-template-columns:1fr}}
+.col{border-top:1px solid var(--grid);padding:18px 0 4px}
+.col b{display:block;font-family:var(--serif);font-size:17px;letter-spacing:.16em;font-weight:600}
+.col .t{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.14em;margin-top:4px}
+.col p{margin:9px 0 0;font-size:14px;color:var(--ink2);line-height:1.85}
+.col .q{margin:10px 0 0;padding-left:13px;border-left:2px solid var(--grid);
+  font-size:13.5px;color:var(--ink2);line-height:1.85}
+.col .q i{font-style:normal;color:var(--ink)}
+
+.host{display:grid;grid-template-columns:130px 1fr;gap:24px;align-items:start;margin-top:24px}
+.hostph{width:130px;height:130px;border:1px solid var(--grid);background:var(--card);
+  display:flex;align-items:center;justify-content:center;font-family:var(--serif);
+  font-size:34px;color:var(--grid);letter-spacing:.1em}
+.host p{margin:0 0 12px;font-size:15px;color:var(--ink2)}
+.host .nm{font-family:var(--serif);font-size:21px;letter-spacing:.14em;color:var(--ink);margin-bottom:6px;font-weight:600}
+.host .nm em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink3);margin-left:10px}
+.host a{color:var(--blue);border-bottom:1px solid var(--grid)}
+@media(max-width:720px){.host{grid-template-columns:1fr}}
+
+.plat{border:1px solid var(--grid);background:var(--card);padding:24px 26px;margin-top:22px}
+.plat p{margin:0 0 13px;font-size:15px;color:var(--ink2)}
+.plat p:last-child{margin-bottom:0}
+.plat b{color:var(--ink)}
+.plat a{color:var(--blue);border-bottom:1px solid var(--grid)}
+
+footer{border-top:2px solid var(--ink);margin-top:60px;padding:24px 0 56px;font-size:13px;color:var(--ink2)}
+footer a{color:var(--blue)}
+footer p{margin:0 0 7px}
+a:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<header class="topbar"><div class="wrap">
+  <a class="brand" href="/">SDE 数学<em>LI XIN</em></a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/#cols">栏目</a>
+    <a href="/#host">主持人</a>
+    <a href="/chatxiaobo/">ChatXiaoBo</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<div class="hero">
+<div class="eyebrow">数学 · 新思想生产平台 · Math Genesis</div>
+<h1>每一步都打了勾，<br><span class="hl">为什么换个数字他就不会了？</span></h1>
+<p class="lede">这里生产关于数学的新思想。追的是一个具体的问题：<b>「懂了」到底是什么时候发生的</b>。它不是知道了一个结论，是那一步在这个人自己手上重新走了一遍——而卷面上，走过的和模仿的长得一模一样。</p>
+
+<div class="hw">
+  <div class="cap">作　业　批　改<span>全对 · 得分 10/10</span></div>
+  <div class="prob">解方程：x² − 5x + 6 = 0
+    <i>学生解答 · 步骤完整 · 无计算错误</i></div>
+  <ol>
+    <li style="animation-delay:0ms"><span class="s">① 移项配平，判别式 Δ = 1 &gt; 0</span><span class="m">✓</span></li>
+    <li style="animation-delay:100ms"><span class="s">② 因式分解 (x−2)(x−3) = 0</span><span class="m">✓</span></li>
+    <li style="animation-delay:200ms"><span class="s">③ 由乘积为零，得 x−2=0 或 x−3=0</span><span class="m">✓</span></li>
+    <li style="animation-delay:300ms"><span class="s">④ 解得 x₁ = 2，x₂ = 3</span><span class="m">✓</span></li>
+    <li style="animation-delay:400ms"><span class="s">⑤ 代回检验，两根均满足</span><span class="m">✓</span></li>
+    <li class="miss" style="animation-delay:820ms"><span class="s">懂　了</span><span class="m"><span class="pen">此项无法批改</span></span></li>
+  </ol>
+</div>
+<p class="hwnote">五步全对，红笔无处可落。而把 6 换成 8、把「解方程」换成「为什么乘积为零就能拆开」——<b>同一个学生可能当场就停住了。</b><br>卷面量得到写对没写对，量不到那一步是他自己走的还是照着走的。本站要做的，就是把这一栏批出来：给它判据，给它能测的动作，给它可以被推翻的说法。</p>
+</div>
+
+<section id="bots">
+  <div class="hd"><span class="no">栏 一</span><h2>智　能　体</h2><span class="ct">3 台 · 1 台已开</span></div>
+  <p class="lead">先开一台，另两台跟着栏目一起长。都用你自己的大模型 Key 运行，Key 只存在你这台设备的浏览器里。</p>
+  <div class="bots">
+    <a class="bot" href="/chatxiaobo/">
+      <div class="n">其 一 · 对话</div>
+      <h3>ChatXiaoBo</h3>
+      <div class="en">CHAT XIAO BO</div>
+      <p>贴一道题、一份解答、或一节课上出的事。它先复原学生实际走的那条路、找第一处走岔，再谈怎么办——<b>它不替学生做题</b>，会先问你到哪一步、卡在哪。</p>
+      <span class="go">进入对话 →</span>
+    </a>
+    <div class="bot wait">
+      <div class="n">其 二 · 批改</div>
+      <h3>SDE 数学共批</h3>
+      <div class="en">CO-MARKING</div>
+      <p>把一份解答（或一叠）交给它，一处一处地看：第一处走岔在哪、他那个错法在什么条件下其实是对的、这一处该不该批。目标不是判分，是读懂那份解答背后的那套理论。</p>
+      <span class="soon">筹备中</span>
+    </div>
+    <div class="bot wait">
+      <div class="n">其 三 · 备课</div>
+      <h3>SDE 数学共备</h3>
+      <div class="en">CO-PLANNING</div>
+      <p>一节课要落地的不是讲得顺，是学生手上多出一个动作。共备台陪着把这一节的条件、动作与写法排出来，并预演三处最可能卡住的地方。</p>
+      <span class="soon">筹备中</span>
+    </div>
+  </div>
+</section>
+
+<section id="cols">
+  <div class="hd"><span class="no">栏 二</span><h2>栏　目</h2><span class="ct">开栏中</span></div>
+  <p class="lead">四条线已经排好，稿子在写。每一条都不是"数学知识讲解"——讲解站上到处都是；这里要的是<b>此前没有名目的那些判断</b>：一个老师天天见到、却说不清是什么的东西，被命名、被给出判据、被交给能推翻它的证据。</p>
+  <div class="cols">
+    <div class="col">
+      <b>线 一　懂了是什么</b>
+      <div class="t">WHAT · 概念在一个人手上落定的那一刻</div>
+      <p>「掌握了」这个词在课堂上其实指着好几件不同的事。把它们分开，才谈得上教哪一件。</p>
+      <div class="q">开栏三题：<i>模仿与理解在卷面上分不开，那用什么分？</i>／<i>「他手上有没有这个对象」这句话怎样才能测？</i>／<i>换个数字就不会，缺的到底是什么？</i></div>
+    </div>
+    <div class="col">
+      <b>线 二　错法里的理论</b>
+      <div class="t">HOW · 一个错是怎样长出来的</div>
+      <p>多数「低级错误」是把一条在旧范围里成立的规则用到了新范围。先把学生的错法当一套自洽的理论读，才批得对。</p>
+      <div class="q">开栏三题：<i>第一处走岔之后的错为什么不该单独批？</i>／<i>负号、约分、开方：三条最常越界的旧规则</i>／<i>一份看不懂的解答，怎样复原他走的那条路？</i></div>
+    </div>
+    <div class="col">
+      <b>线 三　讲题与解题</b>
+      <div class="t">HOW · 你会做，不等于你讲得出</div>
+      <p>把一条打磨过的、每步恰到好处的路径展示给学生，效果常常是反的——他看到的是天才表演，不是可复制的动作。</p>
+      <div class="q">开栏三题：<i>板书上该不该留下走过的回头路？</i>／<i>「讲得顺」为什么是一个危险信号？</i>／<i>一节课真正要交出去的是哪一个动作？</i></div>
+    </div>
+    <div class="col">
+      <b>线 四　分数这本账</b>
+      <div class="t">WHY · 考试是真实处境的一部分</div>
+      <p>不拿「应试」当挡箭牌不谈提分，也不拿提分当理由把理解那一栏取消掉。两本账各记各的，并说清哪一条建议为哪一本账服务。</p>
+      <div class="q">开栏三题：<i>提分与理解在什么条件下同向、什么条件下打架？</i>／<i>刷题真正练掉的是什么？</i>／<i>一张卷子量得到与量不到的，各是哪些？</i></div>
+    </div>
+  </div>
+</section>
+
+<section id="host">
+  <div class="hd"><span class="no">栏 三</span><h2>主　持　人</h2></div>
+  <div class="host">
+    <div class="hostph">李</div>
+    <div>
+      <p class="nm">李昕<em>小波老师　TEACHER XIAOBO</em></p>
+      <p>资深数学老师，SDE 学员，跟随王德生博士研究 SDE 发生学。他关心的不是"这个知识点怎么讲得更清楚"——那是每一本教参都在做的事——而是<b>那一步究竟在哪一刻、凭什么在一个学生身上发生</b>，以及一位老师如何在四十五分钟里为它准备条件。</p>
+      <p>他的作品正在陆续上线，本站与他的<a href="/students/xiaobo/">学员专栏</a>同源：每一篇通过审读后署名发表，同时进入本站的栏目与检索。</p>
+    </div>
+  </div>
+</section>
+
+<section id="platform">
+  <div class="hd"><span class="no">栏 四</span><h2>这是一个平台，不是一个题库</h2></div>
+  <div class="plat">
+    <p>SDE 数学是 <a href="https://sdeuniverses.com/">SDE Universes</a> 的<b>垂直思想创新子平台</b>。它与主站共用同一套生产方法与同一条评分通道：一个判断要在这里立住，得先经过敌意拓宽（谁已经站在这个位置上——概念意象、变异理论、认知负荷、APOS、错误分析这些都得先交过手）、可裁决预测（哪一种结果会推翻它），以及独立盲评。</p>
+    <p>它做的不是把数学教育已有的结论讲得更好懂，而是<b>生产此前不存在的判断</b>。数学这一行的好处是代理最硬：迁移题的正确率差、改数字之后还做不做得出、第一处走岔的位置分布、隔两周的保持率、能不能自己举一个反例——<b>说得出口的东西，多半测得出来。</b>做法的通俗讲解见 <a href="https://sdeuniverses.com/confluence/confluence-method/">《SDE 多学科通融创新法》</a>。</p>
+    <p>站上现有的数学存量（王德生《认知的黑箱与土壤的绷紧》，与「新思想前沿」里十五块数学面板）已接入 ChatXiaoBo 的检索。<b>本栏开栏中，检索不到小波老师本人的篇目是常态</b>——它会直说，不会编一个篇名出来。</p>
+  </div>
+</section>
+
+</div>
+
+<footer><div class="wrap">
+  <p>SDE 数学 · 小波老师（李昕）—— <a href="https://sdeuniverses.com/">SDE Universes</a> 的数学分站。作者主页在 <a href="/students/xiaobo/">学员专栏 · 小波老师</a>。</p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+
+<script>
+/* 分站页面的自家链接写的是分站根（/、/#栏）。在二级域名下这就是对的；
+   若从主站以 /sites/math/… 预览，则就地补上前缀，两处都能正常点。 */
+(function(){var b="/sites/math";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/chatxiaobo/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>
