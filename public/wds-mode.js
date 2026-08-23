@@ -831,6 +831,7 @@
       dayOut: "今日本机额度已用完，明天再来（陪读与「SDE 对谈」不受影响）。",
       sessFull: "这场已谈满 100 次，点＋新对话重开。",
       srcSite: "站内文献", srcWeb: "站外来源 · 联网搜索", followsH: "接着可以问",
+      ledH: "这一答走了几步", ledStock: "家底", ledField: "外领域", ledFal: "作废条件", ledNew: "新在",
       srcN: " 篇", toBot: "回到最新",
       aCopy: "\u29c9 复制", aCopied: "已复制", aRead: "\ud83d\udd0a 朗读", aStop: "\u23f9 停止", aRegen: "\u21bb 重答", aEdit: "\u270e 改问",
       thinking: "正在想…", thought: "已思考 ", chars: " 字（点开看）", expand: "展开", collapse: "收起",
@@ -1069,6 +1070,7 @@
       dayOut: "Today's allowance for this key is used up. Come back tomorrow.",
       sessFull: "This chat has hit 100 turns. Start a new one.",
       srcSite: "ON-SITE SOURCES", srcWeb: "WEB SOURCES", followsH: "ASK NEXT",
+    ledH: "STEPS TAKEN", ledStock: "prior views", ledField: "other field", ledFal: "falsifier", ledNew: "what's new",
       srcN: "", toBot: "Jump to latest",
       aCopy: "\u29c9 Copy", aCopied: "Copied", aRead: "\ud83d\udd0a Read", aStop: "\u23f9 Stop", aRegen: "\u21bb Retry", aEdit: "\u270e Edit",
       thinking: "Thinking…", thought: "Thought for ", chars: " chars (open)", expand: "open", collapse: "close",
@@ -1900,6 +1902,12 @@
     ".wdsm-agent b{display:block;font-size:13px;font-weight:600;margin-bottom:2px}" +
     ".wdsm-agent i{display:block;font-style:normal;font-size:11.5px;line-height:1.55;color:var(--wdim2)}" +
     ".wdsm-agent u{display:block;text-decoration:none;font-size:11px;color:var(--wgold2);margin-top:3px}" +
+    ".wdsm-led{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px}" +
+    ".wdsm-led .lh{font-style:normal;font-size:10.5px;letter-spacing:1px;color:var(--wdim2);margin-right:4px}" +
+    ".wdsm-led .lc{font-style:normal;font-size:11px;border-radius:999px;padding:3px 9px;border:1px solid var(--wline);color:var(--wdim);background:var(--wfill2);cursor:help}" +
+    ".wdsm-led .lc.ok{color:var(--wgold2);border-color:var(--wline2)}" +
+    ".wdsm-led .lc.no{color:#8B7A6A;border-style:dashed}" +
+    ".wdsm-led .lc.nu{color:var(--wdim2)}" +
     ".wdsm-follows{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}" +
     ".wdsm-follow{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer;text-align:left}" +
     ".wdsm-follow:hover{border-color:var(--wline2);color:var(--wgold)}" +
@@ -3228,6 +3236,76 @@
   // —— 追问建议：由后端在正文写完后补一次便宜档产出，点一下就直接问出去 ——
   /* 追问建议 = 六路径引导：三条各走一条不同的发生路径，读者每点一次就换一次起手维度。
      兼容两种形状：老的纯字符串、新的 {p:路径名, q:问句}——升级期两边都可能回。 */
+  /* ════════ 记分牌：把「这一答到底走没走那几步」变成可数的 ════════
+     服务端要求每一答末尾交一行 `〔交账〕已有说法：… ｜ 外领域：… ｜ 作废条件：… ｜ 新在：…`。
+     这里做三件事：把那一行从正文里**剥掉**（它不该进历史、成文稿与 PDF）、
+     回正文**核对**（只信它自报等于让它自己发证书）、**摆成四格**给读者看。 */
+  var LEDGER_RE = /\n*[〔【\[]\s*交账\s*[〕】\]][^\n]*/;
+  function ledgerStrip(text) { return String(text || "").replace(LEDGER_RE, "").replace(/\s+$/, ""); }
+  function ledgerField(line, name) {
+    // 字段之间用全角或半角竖线分隔；末字段吃到行尾。冒号全角半角都认。
+    var re = new RegExp(name + "\\s*[：:]\\s*([^｜|]*)");
+    var m = line.match(re);
+    return m ? String(m[1]).replace(/\s+$/, "").replace(/^\s+/, "") : "";
+  }
+  function ledgerEmpty(v) { return !v || /^(无|none|-|—|不适用)/i.test(v); }
+  /* take：从整段答案里取出账并剥净。回 null ＝ 这一答没交账（分身档不装这条规格，属正常）。 */
+  function ledgerTake(text) {
+    var s = String(text || "");
+    var m = s.match(LEDGER_RE);
+    if (!m) return null;
+    var line = m[0].replace(/^\s+/, "");
+    var body = ledgerStrip(s);
+    var stockRaw = ledgerField(line, "已有说法");
+    var stock = ledgerEmpty(stockRaw) ? [] : stockRaw.split(/[；;、]/).map(function (x) { return x.trim(); }).filter(Boolean);
+    return {
+      body: body, line: line,
+      stock: stock,
+      field: ledgerField(line, "外领域"),
+      falsify: ledgerField(line, "作废条件"),
+      newness: ledgerField(line, "新在"),
+    };
+  }
+  /* 核对：账上的东西回正文里找。找不到一律按**未做**算，不按它自报的算。 */
+  function ledgerAudit(led, body) {
+    var b = String(body || "");
+    var seen = (led.stock || []).filter(function (x) {
+      var k = x.replace(/[的了在是（）()《》"'「」]/g, "").slice(0, 6);
+      return k.length >= 2 && b.indexOf(k) >= 0;
+    });
+    var fieldOk = !ledgerEmpty(led.field) && b.indexOf(String(led.field).slice(0, 4)) >= 0;
+    // 作废条件必须真是个条件句：有条件词，且有「作废/推翻/不成立」这一类结果词。
+    var fal = String(led.falsify || "");
+    var falOk = !ledgerEmpty(fal) && /若|如果|一旦|当/.test(fal) && /作废|推翻|不成立|失效|就错/.test(fal);
+    var told = !ledgerEmpty(led.newness);          // 如实写「无」不算失败，算申报
+    return {
+      stockN: seen.length, stockClaim: (led.stock || []).length,
+      stockOk: seen.length >= 2,
+      fieldOk: fieldOk, falOk: falOk, newOk: told,
+      newTold: !told,                              // 明说「只到复述」——中性，不标红
+    };
+  }
+  function ledgerRender(cell, led, body) {
+    if (!led || cell.ledger) return;
+    var a = ledgerAudit(led, body);
+    var box = el("div", "wdsm-led");
+    box.appendChild(el("i", "lh", t("ledH")));
+    function chip(okv, label, tip, neutral) {
+      var c = el("i", "lc" + (neutral ? " nu" : (okv ? " ok" : " no")), label);
+      c.title = tip;
+      box.appendChild(c);
+    }
+    chip(a.stockOk, t("ledStock") + " " + a.stockN + (a.stockClaim > a.stockN ? ("/" + a.stockClaim) : ""),
+      (led.stock || []).join("；") + (a.stockClaim > a.stockN ? "\n（其中 " + (a.stockClaim - a.stockN) + " 个在正文里找不到，按未做算）" : ""));
+    chip(a.fieldOk, t("ledField") + (a.fieldOk ? " ✓" : " —"),
+      led.field || "（没有别的领域进来顶）");
+    chip(a.falOk, t("ledFal") + (a.falOk ? " ✓" : " —"),
+      led.falsify || "（没给出作废条件）");
+    chip(a.newOk, t("ledNew") + (a.newOk ? " ✓" : " —"),
+      led.newness || "（没写）", a.newTold);
+    cell.turn.appendChild(box); cell.ledger = box; cell.ledgerAudit = a;
+  }
+
   function renderFollows(cell, qs) {
     if (!qs || !qs.length || cell.follows) return;
     var box = el("div", "wdsm-follows");
@@ -3945,7 +4023,7 @@
       // 真正的增量渲染在成文面板那一侧（一万字起步的是它）。
       if (now - lastPaint < Math.min(700, 110 + answer.length / 30)) return;
       lastPaint = now;
-      cell.a.innerHTML = mdRender(answer) + "<span class='cur'>▊</span>";
+      cell.a.innerHTML = mdRender(ledgerStrip(answer)) + "<span class='cur'>▊</span>";
       typesetSync(cell.a);            // 与贴 innerHTML 同一个任务里排完，浏览器只画最终形态 ⇒ 不闪
       if (stick) scrollBottom();
     }
@@ -3985,10 +4063,14 @@
         function finish() {
           clearTimeout(wd);
           if (answer) {
+            /* 交账那一行必须在这里剥掉：再往下就进 history、进成文稿、进导出 PDF 了。 */
+            var _led = ledgerTake(answer);
+            if (_led) answer = _led.body;
             cell.a.innerHTML = mdRender(answer);
             if (stoppedByUser) { var n = el("div", null, t("stopped")); n.style.cssText = "color:#6b7684;font-size:12px;margin-top:8px"; cell.a.appendChild(n); }
             flushSrcs();                                  // 先正文，后文献
             history.push({ role: "wds", text: answer }); stSave(history); mountActs(cell, answer);
+            if (_led) ledgerRender(cell, _led, answer);      // 记分牌挂在正文之外，不进导出稿
             cvTake(answer);                                 // 先看是不是「就地改」的回稿（收成下一版），否则扫围栏块
             compTick();                                     // 够长了就把更早的压成账本
           } else if (timedOut) {
