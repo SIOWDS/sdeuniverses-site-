@@ -1929,7 +1929,15 @@
     ".wdsm-send:disabled{opacity:.4;cursor:default}" +
     ".wdsm-send.stop{background:#B4453E;color:#F5EFE0}" +
     ".wdsm-note{max-width:760px;margin:8px auto 0;text-align:center;color:var(--wdim2);font-size:11.5px}" +
-    ".wdsm-menu{position:fixed;z-index:100002;background:var(--wpanel);border:1px solid var(--wline2);border-radius:12px;padding:6px;min-width:210px;box-shadow:0 10px 34px var(--wsh)}" +
+    /* max-height/overflow 是 2026-08-23 补的：菜单从 4 档长到 20 条，整张约 1000px，
+       而它从顶栏往下开——末尾几条（应用文五档、成文历史）在任何屏幕上都点不到。
+       ⚠ 滚动条**故意做成看得见的**：能滚而看不出能滚，等于没修。
+       精确高度由 menuFit() 在落位后按实际可用空间再夹一次，这里只兜底。 */
+    ".wdsm-menu{position:fixed;z-index:100002;background:var(--wpanel);border:1px solid var(--wline2);border-radius:12px;padding:6px;min-width:210px;box-shadow:0 10px 34px var(--wsh);max-height:calc(100vh - 96px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--wline2) transparent}" +
+    ".wdsm-menu::-webkit-scrollbar{width:10px}" +
+    ".wdsm-menu::-webkit-scrollbar-track{background:transparent;margin:6px 0}" +
+    ".wdsm-menu::-webkit-scrollbar-thumb{background:var(--wline2);border-radius:6px;border:2px solid var(--wpanel)}" +
+    ".wdsm-menu::-webkit-scrollbar-thumb:hover{background:var(--wgold)}" +
     ".wdsm-menu button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--wtx);font:13.5px/1.5 inherit;padding:9px 12px;border-radius:8px;cursor:pointer}" +
     ".wdsm-menu button:hover{background:var(--wfill2);color:var(--wtx2)}" +
     ".wdsm-menu button.on{color:var(--wgold)}" +
@@ -6550,6 +6558,18 @@
   /* paper1 排在 paper 前面：一趟出全篇是**默认该选的那一个**（金点子那台已经跑熟了），
      十六趟那一档留着做对照。次序由 KIND_DEF 定，这里只派生。 */
   var KIND_KEYS = KIND_DEF.map(function (x) { return x.k; });
+  /* 菜单落位后按**实际可用空间**夹一次高度。CSS 那条 calc(100vh - 96px) 只是兜底：
+     真正能用的高度取决于按钮在哪、往下开还是往上开、这块屏有多高——只有开菜单那一刻知道。
+     down=true ⇒ 从按钮下沿往下开，可用＝窗口高 − 按钮下沿 − 留白；
+     down=false ⇒ 从按钮上沿往上开（menuAt 在按钮靠下时会这么做），可用＝按钮上沿 − 留白。
+     ⚠ 下限 200px：宁可让它盖住一点，也不能夹成一条缝——那等于菜单没开。 */
+  function menuFit(menu, rect, down) {
+    try {
+      var vh = window.innerHeight || 800;
+      var room = down ? (vh - rect.bottom - 16) : (rect.top - 16);
+      menu.style.maxHeight = Math.max(200, Math.round(room)) + "px";
+    } catch (e) {}
+  }
   try { layer.querySelector(".wdsm-pdfbtn").onclick = function () { exportPdf(); }; } catch (e) {}
   layer.querySelector(".wdsm-distbtn").onclick = function (ev) {
     var old = document.querySelector(".wdsm-menu");
@@ -6597,6 +6617,7 @@
     var r = ev.currentTarget.getBoundingClientRect();
     menu.style.top = (r.bottom + 8) + "px";
     menu.style.left = Math.max(10, Math.min(r.left, window.innerWidth - menu.offsetWidth - 10)) + "px";
+    menuFit(menu, r, true);          // 17 档 ＋ 三条，不夹高度就看不到最下面那几条
     setTimeout(function () {
       document.addEventListener("click", function h(e2) {
         if (!menu.contains(e2.target)) { if (menu.parentNode) menu.parentNode.removeChild(menu); document.removeEventListener("click", h); }
@@ -8041,8 +8062,10 @@
     try {
       var r = anchor.getBoundingClientRect();
       menu.style.left = Math.max(8, Math.min(r.left, (window.innerWidth || 1200) - 240)) + "px";
-      if (r.top > 320) { menu.style.bottom = ((window.innerHeight || 800) - r.top + 8) + "px"; }
+      var _down = !(r.top > 320);
+      if (!_down) { menu.style.bottom = ((window.innerHeight || 800) - r.top + 8) + "px"; }
       else { menu.style.top = (r.bottom + 8) + "px"; }
+      menuFit(menu, r, _down);       // 往上开时可用高度是按钮上沿，不是窗口高
     } catch (e) {}
     setTimeout(function () {
       try {
