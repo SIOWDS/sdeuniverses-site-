@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDE 文学共创 · 一边写，一边有人可以问</title>
+<meta name="description" content="SDE 文学共创：左边画布放你的稿子，右边共创台随时可问——这句接下去怎么写、这一段站不站得住、这里缺什么。稿子始终在你手上，回话不会自动写进正文。">
+<link rel="canonical" href="https://liter.sdeuniverses.com/cowrite/">
+<meta property="og:title" content="SDE 文学共创 · 一边写，一边有人可以问">
+<meta property="og:description" content="SDE 文学共创：左边画布放你的稿子，右边共创台随时可问——这句接下去怎么写、这一段站不站得住、这里缺什么。稿子始终在你手上，回话不会自动写进正文。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F7F3E9">
+<style>
+:root{
+  --paper:#F7F3E9; --paper2:#FDFBF5; --ink:#1A1714; --ink2:#6B6255; --ink3:#9A9182;
+  --rule:#CFC5B2; --rule2:#E4DCCB;
+  --cinnabar:#9E3D30; --cinnabar-l:#C25B45;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi",var(--serif);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:16.5px;line-height:1.95}
+a{color:inherit;text-decoration:none}
+
+/* 竖排刊名（书脊）——纸本刊物的立面，也是与 lang 最直接的分别 */
+.spine{position:fixed;left:0;top:0;bottom:0;width:62px;z-index:40;
+  background:var(--paper);border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;padding:20px 0 18px}
+.spine .nm{writing-mode:vertical-rl;font-family:var(--serif);font-size:20px;
+  letter-spacing:.36em;font-weight:600}
+.spine .sub{writing-mode:vertical-rl;font-family:var(--mono);font-size:10px;
+  letter-spacing:.3em;color:var(--ink3);margin-top:16px}
+.spine .seal{margin-top:auto;width:26px;height:26px;border:1.5px solid var(--cinnabar);
+  color:var(--cinnabar);font-size:13px;line-height:23px;text-align:center;
+  font-family:var(--serif);transform:rotate(-4deg)}
+.page{margin-left:62px}
+@media(max-width:720px){.spine{display:none}.page{margin-left:0}}
+
+.wrap{max-width:940px;margin:0 auto;padding:0 26px}
+.topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:30;
+  background:rgba(247,243,233,.94);backdrop-filter:saturate(140%) blur(6px)}
+.topbar .wrap{display:flex;align-items:baseline;gap:20px;height:52px;
+  font-family:var(--sans);font-size:13.5px;color:var(--ink2)}
+.topbar .m{display:none;font-family:var(--serif);font-size:17px;letter-spacing:.22em;color:var(--ink)}
+.topbar nav{margin-left:auto;display:flex;gap:19px}
+.topbar nav a:hover{color:var(--cinnabar)}
+.topbar nav a.out{font-family:var(--mono);font-size:11.5px}
+@media(max-width:720px){.topbar .m{display:block}}
+
+/* 刊头 */
+.masthead{padding:64px 0 0;text-align:center}
+.masthead .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--ink3)}
+.masthead h1{font-family:var(--serif);font-weight:600;margin:.42em 0 .3em;
+  font-size:clamp(34px,7.4vw,66px);letter-spacing:.22em;line-height:1.2}
+.masthead .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--ink3)}
+.dbl{border-top:3px double var(--rule);margin:34px 0 0}
+.motto{max-width:31em;margin:30px auto 0;font-family:var(--kai);font-size:18px;
+  line-height:2.1;text-align:center;color:var(--ink)}
+.motto b{font-weight:600;border-bottom:1px solid var(--cinnabar);padding-bottom:1px}
+
+/* 签名件：本期目录 */
+.toc{max-width:640px;margin:44px auto 0;border:1px solid var(--rule);background:var(--paper2);
+  padding:26px 30px 24px;position:relative}
+.toc .cap{text-align:center;font-family:var(--serif);letter-spacing:.5em;font-size:15px;
+  padding-bottom:12px;border-bottom:1px solid var(--rule2);margin-bottom:6px}
+.toc .cap i{display:block;font-style:normal;font-family:var(--mono);font-size:10px;
+  letter-spacing:.22em;color:var(--ink3);margin-top:7px}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc li{display:flex;align-items:baseline;gap:10px;padding:9px 0;font-size:15px;
+  border-bottom:1px dotted var(--rule2);opacity:0;animation:fade .5s ease forwards}
+.toc li .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink3);
+  min-width:4.6em;flex:none}
+.toc li .t{flex:1}
+.toc li .p{font-family:var(--mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.toc li.blank{border-bottom:none;padding-top:20px;color:var(--cinnabar)}
+.toc li.blank .t{font-family:var(--kai);font-size:17px;letter-spacing:.28em}
+.toc li.blank .k{color:var(--cinnabar-l)}
+.seal2{display:inline-block;border:1.5px solid var(--cinnabar);color:var(--cinnabar);
+  padding:2px 9px;font-size:11.5px;letter-spacing:.2em;transform:rotate(-4deg);
+  animation:drop .45s cubic-bezier(.2,1.5,.4,1) 1.05s both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:rotate(-15deg) scale(1.6)}to{opacity:1;transform:rotate(-4deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.toc li{opacity:1;animation:none}.seal2{animation:none}}
+.tocnote{max-width:640px;margin:14px auto 0;font-size:13.5px;color:var(--ink2);
+  font-family:var(--sans);line-height:1.9}
+.tocnote b{color:var(--ink)}
+
+/* 栏目通用 */
+section{padding:60px 0 6px}
+.hd{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--ink);padding-bottom:8px}
+.hd h2{font-family:var(--serif);font-weight:600;font-size:21px;letter-spacing:.24em;margin:0}
+.hd .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--cinnabar)}
+.hd .ct{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+.lead{color:var(--ink2);font-size:15px;margin:14px 0 0;max-width:44em;font-family:var(--sans)}
+
+/* 智能体板块 */
+.bots{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:0;margin-top:26px;
+  border:1px solid var(--rule)}
+.bot{padding:24px 22px 22px;border-right:1px solid var(--rule);display:flex;flex-direction:column;
+  background:var(--paper2)}
+.bot:last-child{border-right:none}
+a.bot:hover{background:#fff}
+.bot .n{font-family:var(--mono);font-size:10px;letter-spacing:.26em;color:var(--cinnabar)}
+.bot h3{font-family:var(--serif);font-size:21px;letter-spacing:.14em;margin:9px 0 4px;font-weight:600}
+.bot .en{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink3);margin-bottom:11px}
+.bot p{margin:0 0 14px;font-size:14px;color:var(--ink2);line-height:1.85;font-family:var(--sans)}
+.bot .go{margin-top:auto;font-family:var(--mono);font-size:11.5px;color:var(--cinnabar);
+  border-top:1px solid var(--rule2);padding-top:11px}
+@media(max-width:720px){.bot{border-right:none;border-bottom:1px solid var(--rule)}
+  .bot:last-child{border-bottom:none}}
+
+/* 文本板块 */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-top:8px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.sub-h{font-family:var(--serif);font-size:16px;letter-spacing:.2em;font-weight:600;
+  margin:30px 0 2px;padding-bottom:6px;border-bottom:1px solid var(--rule2);display:flex;align-items:baseline}
+.sub-h span{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.1em}
+.ln{display:flex;gap:11px;align-items:baseline;padding:8px 2px;border-bottom:1px dotted var(--rule2);
+  font-size:15px}
+.ln:hover{background:var(--paper2)}
+.ln:hover .tt{color:var(--cinnabar)}
+.ln .no{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:1.6em;flex:none}
+.ln .tt b{font-weight:600;letter-spacing:.04em}
+.ln .tt em{font-style:normal;color:var(--ink2);font-size:13.5px;font-family:var(--sans);margin-left:.5em}
+.ln .iq{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);flex:none;padding-left:10px}
+.mo{display:inline-block;margin:12px 0 0;font-family:var(--mono);font-size:11.5px;
+  color:var(--cinnabar);border-bottom:1px solid var(--cinnabar);padding-bottom:2px}
+
+/* 长篇 */
+.novel{display:grid;grid-template-columns:200px 1fr;gap:28px;margin-top:26px;align-items:start}
+.novel img{width:100%;display:block;border:1px solid var(--rule)}
+.novel .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink3)}
+.novel h3{font-family:var(--serif);font-size:27px;letter-spacing:.18em;margin:8px 0 4px;font-weight:600}
+.novel p{margin:0 0 13px;font-size:15px;color:var(--ink2);line-height:1.95;font-family:var(--sans)}
+.novel .q{font-family:var(--kai);font-size:17px;color:var(--ink);border-left:2px solid var(--cinnabar);
+  padding-left:15px;margin:0 0 14px;line-height:2}
+.novel .lk{display:flex;gap:15px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
+.novel .lk a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.novel{grid-template-columns:1fr}.novel img{max-width:180px}}
+
+/* 诗 */
+.poems{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.pm{border:1px solid var(--rule);padding:9px 15px;background:var(--paper2);font-size:15px;letter-spacing:.1em}
+.pm:hover{border-color:var(--cinnabar);color:var(--cinnabar)}
+.pm i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:9px}
+
+/* 主持人 */
+.host{display:grid;grid-template-columns:150px 1fr;gap:26px;align-items:start;margin-top:26px}
+.host img{width:100%;border:1px solid var(--rule);display:block;filter:saturate(.9)}
+.host p{margin:0 0 12px;font-size:15px;font-family:var(--sans);color:var(--ink2)}
+.host .nm{font-family:var(--serif);font-size:21px;letter-spacing:.16em;color:var(--ink);margin-bottom:6px;font-weight:600}
+.host .nm em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink3);margin-left:10px}
+.host blockquote{margin:0 0 12px;font-family:var(--kai);font-size:16.5px;line-height:2.05;color:var(--ink);
+  border-left:2px solid var(--rule);padding-left:15px}
+.host a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.host{grid-template-columns:1fr}.host img{max-width:160px}}
+
+.plat{border:1px solid var(--rule);background:var(--paper2);padding:26px 26px;margin-top:24px}
+.plat p{margin:0 0 13px;font-size:15px;font-family:var(--sans);color:var(--ink2)}
+.plat p:last-child{margin-bottom:0}
+.plat b{color:var(--ink)}
+.plat a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+
+footer{border-top:3px double var(--rule);margin-top:66px;padding:26px 0 60px;
+  font-size:13px;color:var(--ink2);font-family:var(--sans)}
+footer a{color:var(--cinnabar)}
+footer p{margin:0 0 7px}
+a:focus-visible{outline:2px solid var(--cinnabar);outline-offset:3px}
+
+.body p{font-family:var(--sans);font-size:15.5px;color:var(--ink2);line-height:1.95;margin:0 0 15px;max-width:44em}
+.body p b{color:var(--ink)}
+.steps{border:1px solid var(--rule);background:var(--paper2);padding:22px 24px;margin:24px 0 0;max-width:44em}
+.steps ol{margin:0;padding-left:1.3em}
+.steps li{font-family:var(--sans);font-size:14.5px;color:var(--ink2);margin:0 0 10px;line-height:1.9}
+.steps li:last-child{margin-bottom:0}
+.steps b{color:var(--ink)}
+.cta{display:inline-block;margin:24px 0 0;border:1px solid var(--cinnabar);color:var(--cinnabar);
+  padding:11px 26px;font-family:var(--serif);font-size:16px;letter-spacing:.2em}
+.cta:hover{background:var(--cinnabar);color:var(--paper)}
+</style>
+</head>
+<body>
+<div class="spine">
+  <div class="nm">SDE 文学</div>
+  <div class="sub">FEI SUO</div>
+  <div class="seal">斐</div>
+</div>
+<div class="page">
+<header class="topbar"><div class="wrap">
+  <a class="m" href="/">SDE 文学</a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/chatfeisuo/">ChatFeiSuo</a>
+    <a href="/cowrite/">共创</a>
+    <a href="/coread/">共读</a>
+    <a href="/all/">全部篇目</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap">
+
+<section style="padding-top:56px">
+  <div class="hd"><span class="no">其 二 · 共创</span><h2>SDE 文学共创</h2></div>
+  <div class="body" style="margin-top:26px">
+  <p>共创台不是替你写。它是<b>卡住的时候有个人可以问</b>——而且这个人手里一直拿着你正在写的这一件：件名、当前这一版的正文、以及你选中的那一段。</p>
+  <p>为什么不做成「你说要求、它交成品」：那样交回来的东西没有一处是你判断过的。<b>写作里唯一不能外包的动作是「够了」</b>——在没有人给你授权、也收不回来的条件下，自己说这一版到此为止。一旦这个动作被交出去，剩下的再顺也只是代偿。所以这里的规矩是：<b>回话不会自动写进正文，你看着行了，再按「⤵ 插入正文」。</b></p>
+  <div class="steps">
+    <ol>
+      <li>进入 <b>ChatFeiSuo</b>，先在 ⚙ 里填一把你自己的大模型 Key（只存在你这台设备上）。</li>
+      <li>点顶部的 <b>⊞ 画布</b>，把稿子贴进去，或者让它先落一版草稿到画布上。</li>
+      <li>点 <b>🤝 共创台</b>，右边就是可以随时问两句的地方。选中画布里的一段再问，它谈的就是那一段。</li>
+      <li>觉得哪一句可用，按 <b>⤵ 插入正文</b>；想留一版，按 <b>⟳ 落成新版本</b>——版本能来回切，改坏了不怕。</li>
+      <li>要就某一处争论，用 <b>💬 讨论</b> 给那一段加批注；批注跟着这一件走，切版本、刷新都还在。</li>
+    </ol>
+  </div>
+  <a class="cta" href="/chatfeisuo/">进入共创 →</a>
+  <p style="margin-top:26px;font-size:13.5px">共创台与 ChatFeiSuo 是同一台机器的两个面：一个用来想，一个用来写。人格、语料与题域都一样——它只谈文学、诗、小说、评论、写作与阅读。</p>
+  </div>
+</section>
+
+</div>
+</div>
+<script>
+(function(){var b="/sites/liter";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatfeisuo/")===0
+  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

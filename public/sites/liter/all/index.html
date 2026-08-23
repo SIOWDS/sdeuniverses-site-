@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>全部篇目 · SDE 文学</title>
+<meta name="description" content="SDE 文学全部篇目：长篇《狮城荣耀》、八首诗、十二篇批评与随笔，以及四十一篇文学发生学论文（美的发生、意识流与改编、创作·存在·爱）。每篇带实测字数、创新智商与一句话摘要。">
+<link rel="canonical" href="https://liter.sdeuniverses.com/all/">
+<meta property="og:title" content="全部篇目 · SDE 文学">
+<meta property="og:description" content="斐索（秦莉）文学一线的每一篇：诗、长篇、批评，与四十一篇理论长论文。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F7F3E9">
+<style>
+:root{
+  --paper:#F7F3E9; --paper2:#FDFBF5; --ink:#1A1714; --ink2:#6B6255; --ink3:#9A9182;
+  --rule:#CFC5B2; --rule2:#E4DCCB;
+  --cinnabar:#9E3D30; --cinnabar-l:#C25B45;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi",var(--serif);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:16.5px;line-height:1.95}
+a{color:inherit;text-decoration:none}
+
+/* 竖排刊名（书脊）——纸本刊物的立面，也是与 lang 最直接的分别 */
+.spine{position:fixed;left:0;top:0;bottom:0;width:62px;z-index:40;
+  background:var(--paper);border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;padding:20px 0 18px}
+.spine .nm{writing-mode:vertical-rl;font-family:var(--serif);font-size:20px;
+  letter-spacing:.36em;font-weight:600}
+.spine .sub{writing-mode:vertical-rl;font-family:var(--mono);font-size:10px;
+  letter-spacing:.3em;color:var(--ink3);margin-top:16px}
+.spine .seal{margin-top:auto;width:26px;height:26px;border:1.5px solid var(--cinnabar);
+  color:var(--cinnabar);font-size:13px;line-height:23px;text-align:center;
+  font-family:var(--serif);transform:rotate(-4deg)}
+.page{margin-left:62px}
+@media(max-width:720px){.spine{display:none}.page{margin-left:0}}
+
+.wrap{max-width:940px;margin:0 auto;padding:0 26px}
+.topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:30;
+  background:rgba(247,243,233,.94);backdrop-filter:saturate(140%) blur(6px)}
+.topbar .wrap{display:flex;align-items:baseline;gap:20px;height:52px;
+  font-family:var(--sans);font-size:13.5px;color:var(--ink2)}
+.topbar .m{display:none;font-family:var(--serif);font-size:17px;letter-spacing:.22em;color:var(--ink)}
+.topbar nav{margin-left:auto;display:flex;gap:19px}
+.topbar nav a:hover{color:var(--cinnabar)}
+.topbar nav a.out{font-family:var(--mono);font-size:11.5px}
+@media(max-width:720px){.topbar .m{display:block}}
+
+/* 刊头 */
+.masthead{padding:64px 0 0;text-align:center}
+.masthead .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--ink3)}
+.masthead h1{font-family:var(--serif);font-weight:600;margin:.42em 0 .3em;
+  font-size:clamp(34px,7.4vw,66px);letter-spacing:.22em;line-height:1.2}
+.masthead .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--ink3)}
+.dbl{border-top:3px double var(--rule);margin:34px 0 0}
+.motto{max-width:31em;margin:30px auto 0;font-family:var(--kai);font-size:18px;
+  line-height:2.1;text-align:center;color:var(--ink)}
+.motto b{font-weight:600;border-bottom:1px solid var(--cinnabar);padding-bottom:1px}
+
+/* 签名件：本期目录 */
+.toc{max-width:640px;margin:44px auto 0;border:1px solid var(--rule);background:var(--paper2);
+  padding:26px 30px 24px;position:relative}
+.toc .cap{text-align:center;font-family:var(--serif);letter-spacing:.5em;font-size:15px;
+  padding-bottom:12px;border-bottom:1px solid var(--rule2);margin-bottom:6px}
+.toc .cap i{display:block;font-style:normal;font-family:var(--mono);font-size:10px;
+  letter-spacing:.22em;color:var(--ink3);margin-top:7px}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc li{display:flex;align-items:baseline;gap:10px;padding:9px 0;font-size:15px;
+  border-bottom:1px dotted var(--rule2);opacity:0;animation:fade .5s ease forwards}
+.toc li .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink3);
+  min-width:4.6em;flex:none}
+.toc li .t{flex:1}
+.toc li .p{font-family:var(--mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.toc li.blank{border-bottom:none;padding-top:20px;color:var(--cinnabar)}
+.toc li.blank .t{font-family:var(--kai);font-size:17px;letter-spacing:.28em}
+.toc li.blank .k{color:var(--cinnabar-l)}
+.seal2{display:inline-block;border:1.5px solid var(--cinnabar);color:var(--cinnabar);
+  padding:2px 9px;font-size:11.5px;letter-spacing:.2em;transform:rotate(-4deg);
+  animation:drop .45s cubic-bezier(.2,1.5,.4,1) 1.05s both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:rotate(-15deg) scale(1.6)}to{opacity:1;transform:rotate(-4deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.toc li{opacity:1;animation:none}.seal2{animation:none}}
+.tocnote{max-width:640px;margin:14px auto 0;font-size:13.5px;color:var(--ink2);
+  font-family:var(--sans);line-height:1.9}
+.tocnote b{color:var(--ink)}
+
+/* 栏目通用 */
+section{padding:60px 0 6px}
+.hd{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--ink);padding-bottom:8px}
+.hd h2{font-family:var(--serif);font-weight:600;font-size:21px;letter-spacing:.24em;margin:0}
+.hd .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--cinnabar)}
+.hd .ct{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+.lead{color:var(--ink2);font-size:15px;margin:14px 0 0;max-width:44em;font-family:var(--sans)}
+
+/* 智能体板块 */
+.bots{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:0;margin-top:26px;
+  border:1px solid var(--rule)}
+.bot{padding:24px 22px 22px;border-right:1px solid var(--rule);display:flex;flex-direction:column;
+  background:var(--paper2)}
+.bot:last-child{border-right:none}
+a.bot:hover{background:#fff}
+.bot .n{font-family:var(--mono);font-size:10px;letter-spacing:.26em;color:var(--cinnabar)}
+.bot h3{font-family:var(--serif);font-size:21px;letter-spacing:.14em;margin:9px 0 4px;font-weight:600}
+.bot .en{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink3);margin-bottom:11px}
+.bot p{margin:0 0 14px;font-size:14px;color:var(--ink2);line-height:1.85;font-family:var(--sans)}
+.bot .go{margin-top:auto;font-family:var(--mono);font-size:11.5px;color:var(--cinnabar);
+  border-top:1px solid var(--rule2);padding-top:11px}
+@media(max-width:720px){.bot{border-right:none;border-bottom:1px solid var(--rule)}
+  .bot:last-child{border-bottom:none}}
+
+/* 文本板块 */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-top:8px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.sub-h{font-family:var(--serif);font-size:16px;letter-spacing:.2em;font-weight:600;
+  margin:30px 0 2px;padding-bottom:6px;border-bottom:1px solid var(--rule2);display:flex;align-items:baseline}
+.sub-h span{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.1em}
+.ln{display:flex;gap:11px;align-items:baseline;padding:8px 2px;border-bottom:1px dotted var(--rule2);
+  font-size:15px}
+.ln:hover{background:var(--paper2)}
+.ln:hover .tt{color:var(--cinnabar)}
+.ln .no{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:1.6em;flex:none}
+.ln .tt b{font-weight:600;letter-spacing:.04em}
+.ln .tt em{font-style:normal;color:var(--ink2);font-size:13.5px;font-family:var(--sans);margin-left:.5em}
+.ln .iq{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);flex:none;padding-left:10px}
+.mo{display:inline-block;margin:12px 0 0;font-family:var(--mono);font-size:11.5px;
+  color:var(--cinnabar);border-bottom:1px solid var(--cinnabar);padding-bottom:2px}
+
+/* 长篇 */
+.novel{display:grid;grid-template-columns:200px 1fr;gap:28px;margin-top:26px;align-items:start}
+.novel img{width:100%;display:block;border:1px solid var(--rule)}
+.novel .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink3)}
+.novel h3{font-family:var(--serif);font-size:27px;letter-spacing:.18em;margin:8px 0 4px;font-weight:600}
+.novel p{margin:0 0 13px;font-size:15px;color:var(--ink2);line-height:1.95;font-family:var(--sans)}
+.novel .q{font-family:var(--kai);font-size:17px;color:var(--ink);border-left:2px solid var(--cinnabar);
+  padding-left:15px;margin:0 0 14px;line-height:2}
+.novel .lk{display:flex;gap:15px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
+.novel .lk a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.novel{grid-template-columns:1fr}.novel img{max-width:180px}}
+
+/* 诗 */
+.poems{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.pm{border:1px solid var(--rule);padding:9px 15px;background:var(--paper2);font-size:15px;letter-spacing:.1em}
+.pm:hover{border-color:var(--cinnabar);color:var(--cinnabar)}
+.pm i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:9px}
+
+/* 主持人 */
+.host{display:grid;grid-template-columns:150px 1fr;gap:26px;align-items:start;margin-top:26px}
+.host img{width:100%;border:1px solid var(--rule);display:block;filter:saturate(.9)}
+.host p{margin:0 0 12px;font-size:15px;font-family:var(--sans);color:var(--ink2)}
+.host .nm{font-family:var(--serif);font-size:21px;letter-spacing:.16em;color:var(--ink);margin-bottom:6px;font-weight:600}
+.host .nm em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink3);margin-left:10px}
+.host blockquote{margin:0 0 12px;font-family:var(--kai);font-size:16.5px;line-height:2.05;color:var(--ink);
+  border-left:2px solid var(--rule);padding-left:15px}
+.host a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.host{grid-template-columns:1fr}.host img{max-width:160px}}
+
+.plat{border:1px solid var(--rule);background:var(--paper2);padding:26px 26px;margin-top:24px}
+.plat p{margin:0 0 13px;font-size:15px;font-family:var(--sans);color:var(--ink2)}
+.plat p:last-child{margin-bottom:0}
+.plat b{color:var(--ink)}
+.plat a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+
+footer{border-top:3px double var(--rule);margin-top:66px;padding:26px 0 60px;
+  font-size:13px;color:var(--ink2);font-family:var(--sans)}
+footer a{color:var(--cinnabar)}
+footer p{margin:0 0 7px}
+a:focus-visible{outline:2px solid var(--cinnabar);outline-offset:3px}
+
+.item{border-bottom:1px dotted var(--rule2);padding:14px 2px 13px}
+.item:hover{background:var(--paper2)}
+.ihd{display:flex;gap:11px;align-items:baseline}
+.ihd .no{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:2em;flex:none}
+.ihd .it{font-size:16px;letter-spacing:.04em;font-weight:600}
+.item:hover .it{color:var(--cinnabar)}
+.ihd .m{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);flex:none;padding-left:12px}
+.ihd .m b{color:var(--ink2);font-weight:500}
+.idesc{margin:7px 0 0 3em;font-family:var(--sans);font-size:14px;color:var(--ink2);line-height:1.85}
+.ilk{margin:8px 0 0 3em;font-family:var(--mono);font-size:11px}
+.ilk a{color:var(--cinnabar);border-bottom:1px solid var(--rule2)}
+.note{border:1px solid var(--rule);background:var(--paper2);padding:24px 26px;margin-top:30px}
+.note h3{font-family:var(--serif);font-size:17px;letter-spacing:.16em;margin:0 0 11px;font-weight:600}
+.note p{margin:0 0 12px;font-size:14.5px;color:var(--ink2);font-family:var(--sans);line-height:1.9}
+.note p:last-child{margin-bottom:0}
+.note b{color:var(--ink)}
+.note a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+</style>
+</head>
+<body>
+<div class="spine">
+  <div class="nm">SDE 文学</div>
+  <div class="sub">FEI SUO</div>
+  <div class="seal">斐</div>
+</div>
+<div class="page">
+<header class="topbar"><div class="wrap">
+  <a class="m" href="/">SDE 文学</a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/chatfeisuo/">ChatFeiSuo</a>
+    <a href="/cowrite/">共创</a>
+    <a href="/coread/">共读</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap">
+
+<div class="masthead" style="padding-top:52px">
+  <div class="kicker">全 部 篇 目 · CONTENTS</div>
+  <h1 style="font-size:clamp(28px,5vw,44px)">全部篇目</h1>
+  <div class="en">斐索（秦莉）· 文学一线</div>
+  <div class="dbl"></div>
+</div>
+<p class="tocnote" style="max-width:44em;text-align:left">字数是**逐页实测的汉字数**（剥掉标签后数），不是估算；分数是站内独立盲评的创新智商，没有分数的是随笔、诗与短论。她另有一条制度与法哲学的线不在本站，见<a href="/students/qin-li/works/" style="color:var(--cinnabar)">作者全部作品页</a>。</p>
+
+
+<section id="fiction">
+  <div class="hd"><span class="no">壹</span><h2>小　说</h2><span class="ct">1 部</span></div>
+  <div class="item">
+    <div class="ihd"><span class="no">1</span><a class="it" href="/students/qin-li/lion-city-glory/">狮城荣耀</a><span class="m">21.6 万字 · <b>412 页</b></span></div>
+    <p class="idesc">长篇小说，三十章五卷。一个把帝国理工延后两年的少年、三个在海岛上被重新做过一遍的年轻人，和一次让系统失败两次的算法误判——第一次是它给出错误答案，第二次是使用者希望这个答案是对的。</p>
+    <div class="ilk"><a href="/students/qin-li/lion-city-glory/">全书简介</a>　<a href="/students/qin-li/lion-city-glory/read.html">在线翻页读</a>　<a href="/students/qin-li/lion-city-glory/preview.html">选读前三章</a></div>
+  </div>
+</section>
+
+<section id="poems">
+  <div class="hd"><span class="no">贰</span><h2>诗</h2><span class="ct">8 首</span></div>
+  <div class="poems">
+    <a class="pm" href="/students/qin-li/poems/me-and-my-shadow/">我和我的影子<i>2025.1.6</i></a>
+    <a class="pm" href="/students/qin-li/poems/untitled/">无题<i>2025.4.18</i></a>
+    <a class="pm" href="/students/qin-li/poems/divergence-point-to-yu-xiuhua/">岐点：致余秀华<i>2026.5.18</i></a>
+    <a class="pm" href="/students/qin-li/poems/black-coffee/">黑咖啡<i>2022.6.28</i></a>
+    <a class="pm" href="/students/qin-li/poems/rainy-night/">雨夜<i>2025.2.11</i></a>
+    <a class="pm" href="/students/qin-li/poems/summer-2023/">2023 年的夏天<i>2023.7.6</i></a>
+    <a class="pm" href="/students/qin-li/poems/the-other-side-of-the-mountain/">山那边<i>2023.3.1</i></a>
+    <a class="pm" href="/students/qin-li/poems/first-love/">起初之爱<i>2015.9.23</i></a>
+  </div>
+</section>
+
+
+<section id="essays">
+  <div class="hd"><span class="no">叁</span><h2>批评与随笔</h2><span class="ct">12 篇</span></div>
+  <p class="lead">读一本书读到身体不舒服的时候，不舒服的是哪一处——这一栏从这里开始，而不是从判定好坏开始。</p>
+  <div class="item">
+    <div class="ihd"><span class="no">1</span><a class="it" href="/students/qin-li/essays/boneless-book/">无骨之书</a><span class="m">1.6 万字</span></div>
+    <p class="idesc">无骨之书：论残雪小说如何拆掉我们读小说的那副骨头，兼谈一份被呕吐淹没的馈赠</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">2</span><a class="it" href="/students/qin-li/essays/perceptual-attunement/">调一种气味，四十年</a><span class="m">1.1 万字</span></div>
+    <p class="idesc">调一种气味，四十年：残雪的写作到底在追求什么——论一种以维持知觉状态为标的的写作驱动力</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">3</span><a class="it" href="/students/qin-li/essays/narrative-skin/">叙事的皮肤</a><span class="m">0.9 万字</span></div>
+    <p class="idesc">叙事的皮肤：卡夫卡、贝克特与残雪之间，身体读到了什么——论文本与身体之间那道被忽略的界面</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">4</span><a class="it" href="/students/qin-li/essays/mold-reverse-casting/">模具与逆铸</a><span class="m">1.2 万字</span></div>
+    <p class="idesc">模具与逆铸：先锋写作的一个隐秘陷阱——论一种看似激烈、实则从未与任何对象真正搏斗的写作</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">5</span><a class="it" href="/students/qin-li/essays/hualide-zangli/">华丽的葬礼</a><span class="m">0.5 万字</span></div>
+    <p class="idesc">华丽的葬礼：论《房思琪的初恋乐园》中的文学修辞与权力围猎</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">6</span><a class="it" href="/students/qin-li/offbeat-justice/">错拍的正义</a><span class="m">0.7 万字</span></div>
+    <p class="idesc">每个环节都走完了，正义仍未被生成——四口各自理性的时钟，与在相位差里结构性生成的不义。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">7</span><a class="it" href="/students/qin-li/scale-not-penetration/">越普世，越不能抵达</a><span class="m">0.7 万字</span></div>
+    <p class="idesc">一部影史第五的电影，97.1% 的票房来自一个市场——这不是文化壁垒被跨越的证据，而是它完好无损的证据</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">8</span><a class="it" href="/students/qin-li/essays/moved-in-order/">感动是有顺序的</a><span class="m">1.2 万字</span></div>
+    <p class="idesc">感动是有顺序的：艺术三情的层序发生论——感觉、情感、情境如何依次穿越我们</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">9</span><a class="it" href="/students/qin-li/essays/athill-roundtable/">暮色与晨曦之间</a><span class="m">0.9 万字</span></div>
+    <p class="idesc">暮色与晨曦之间：戴安娜·阿西尔与中国女性的圆桌对话</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">10</span><a class="it" href="/students/qin-li/essays/why-the-shore-remembers/">海岸为什么记得</a><span class="m">1.0 万字</span></div>
+    <p class="idesc">海岸为什么记得：意义三律的最终祭奠——从个人、民族到文明的交付结构</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">11</span><a class="it" href="/students/qin-li/essays/bypass-attainment/">指标正常，人却在坏</a><span class="m">0.9 万字</span></div>
+    <p class="idesc">指标正常，人却在坏：健康判准的旁路结构——为什么问题不是判准不准，而是判准可以被绕过</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">12</span><a class="it" href="/students/qin-li/generative-cosmos/">发生的宇宙</a><span class="m">1.0 万字</span></div>
+    <p class="idesc">发生的宇宙——王德生 SDE 本体论与两千年哲学、数学的一次交锋 · 作者 秦莉 · SDE 学员专栏</p>
+  </div>
+</section>
+
+
+<section id="aesthetics">
+  <div class="hd"><span class="no">肆</span><h2>美的发生</h2><span class="ct">5 篇</span></div>
+  <p class="lead">这一辑是地基：美不是被发现的属性，是在张力被释放的那一刻发生的；而每一道「不可」都圈出一片可以被写进去的空缺。</p>
+  <div class="item">
+    <div class="ihd"><span class="no">1</span><a class="it" href="/students/qin-li/aesthetic-genesis-equation/">审美发生方程</a><span class="m">1.6 万字</span></div>
+    <p class="idesc">美不是被发现的属性，而是特征获得自由重组、张力完成意义转换并得到释放时所发生的结构显露——意义三律、信息世界E2与美的动态生成机制</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">2</span><a class="it" href="/students/qin-li/unwritten-law/">古典汉语审美发生学</a><span class="m">1.6 万字</span></div>
+    <p class="idesc">古典诗歌之美不是储存在字里的成品，而是在诗人停止与读者开始之间重新发生的事件——“无法之法”、结构留白与诗性自由的生成机制</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">3</span><a class="it" href="/students/qin-li/release-morphology/">释放的形态学</a><span class="m">0.9 万字</span></div>
+    <p class="idesc">懂了，却没有发生；没懂，却泪流满面——从这对解离出发重写「被打动「的机制，给出爆破式与回旋式两种安顿的形态学。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">4</span><a class="it" href="/students/qin-li/law-as-negative-space/">禁令作为留白</a><span class="m">0.7 万字</span></div>
+    <p class="idesc">每一条“你不可”不是对行为的封堵，而是对一片可能性空间的圈定——创作，正是在这片被预留的空缺中发生</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">5</span><a class="it" href="/students/qin-li/negative-inheritance/">负继承</a><span class="m">0.7 万字</span></div>
+    <p class="idesc">他删去旋风却保留控诉、切除复活却续写救赎语法——加缪是圣经并置层的单独继承人。</p>
+  </div>
+</section>
+
+
+<section id="stream">
+  <div class="hd"><span class="no">伍</span><h2>意识流与改编</h2><span class="ct">20 篇</span></div>
+  <p class="lead">当文学与影像正面相撞，撞碎的是什么，又逼出了什么。二十篇各命名一件此前看得见、说不出的事。</p>
+  <div class="item">
+    <div class="ihd"><span class="no">1</span><a class="it" href="/students/qin-li/line-of-separation/">失败所逼出的，不是痕迹，而是一条分离线</a><span class="m">2.3 万字 · <b>152</b></span></div>
+    <p class="idesc">此前所有的改编理论都把失败当作同一个东西——一笔亏损、一道鸿沟、或是创造的前奏——从未追问失败内部的差异。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">2</span><a class="it" href="/students/qin-li/negative-print/">负片</a><span class="m">2.1 万字 · <b>147</b></span></div>
+    <p class="idesc">改编研究五十年来一直在逃离忠实性，办法是宣布改编作品自主、不必与原著相比。本文走第三条路：保留比较关系，但把原著从「标准」改成「试剂」——衡量鲁兹的不是他离普鲁斯特多近，而是普鲁斯特的抵抗把影像逼得暴露了什么。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">3</span><a class="it" href="/students/qin-li/overflow-genesis/">溢出性生成</a><span class="m">2.6 万字 · <b>145</b></span></div>
+    <p class="idesc">既有理论回应了改编的合法性问题，却未回答更根本的一问：改编中那种与原著同等强度的影像力量，究竟是如何从无到有地发生的？本文撤销“能力先于创作而存在”这一从未被质疑的先验，论证伟大改编所依赖的不是导演既有能力的运用，而是被小说逼入私密困境后、在既有表达习惯失效处逼出的一次不可逆事件。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">4</span><a class="it" href="/students/qin-li/pre-emption-and-withholding/">沉默的篡位</a><span class="m">2.6 万字 · <b>142</b></span></div>
+    <p class="idesc">从威廉·詹姆斯提炼意识流的两条本体条件——发生者亲自在场、连接不可预判——论证影像的剪辑流替观者走完了从意象到意象的全部路径，本文称之为「先占」。与异化、缝合、回收、预先消费四重辨析后确立其独立辨别面：先占关切的不是已有之物的归属，而是那件事在发生之前就已被替代。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">5</span><a class="it" href="/students/qin-li/forced-reclamation/">强制开荒</a><span class="m">2.2 万字 · <b>142</b></span></div>
+    <p class="idesc">某些作品在触达我们的瞬间，会制造出一种无法被“省力”消解的身体投入感。本文锁定一个瞬间：接受者惯常依赖的自动化感知被系统性悬置，反过来为一个全新的事件开辟了发生空间——接受者被迫以自身的身体记忆、注意力与判断力为原料，完成那份本该由媒介直接送达的意义生成。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">6</span><a class="it" href="/students/qin-li/image-proper-time/">影像原时</a><span class="m">2.6 万字 · <b>140</b></span></div>
+    <p class="idesc">意识流入影百年，最深刻的后果不是催生了一个流派，而是逼出了一种未被命名的影像时间形态。杜拉斯以摧毁性的方式暴露了代偿的边界——她不是用声音辅助影像，而是用声音把影像从叙事时间的统一性中剥离出去；伯格曼与塔可夫斯基的减法由此被重新识别为同一结构事件的另一面向。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">7</span><a class="it" href="/students/qin-li/reverse-darwinism/">逆向达尔文主义</a><span class="m">2.5 万字 · <b>138</b></span></div>
+    <p class="idesc">本文追踪一种在媒介文化演化中反复出现却未被独立命名的机制：一个领域为保护某种不可复制的生成性体验而建立的保护性语法，在其运行得最成功、最完善之际，会逆转为一套施加于其保护对象之上的筛选压力。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">8</span><a class="it" href="/students/qin-li/obligatory-perceptual-work/">工序的不可代偿性</a><span class="m">2.6 万字 · <b>137</b></span></div>
+    <p class="idesc">普鲁斯特文本的真正要旨不是「给予读者一种时间经验」，而是强迫读者执行一组感知操作、并在执行中亲自结算出一个意义。导演对镜头衔接的控制不是「损失了某种质感」，而是把一项必须由读者亲手完成的工序替换为一个已完工的视觉结论。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">9</span><a class="it" href="/students/qin-li/concurrence-membrane/">意识流的银幕显影</a><span class="m">2.5 万字 · <b>137</b></span></div>
+    <p class="idesc">声画分轨、多重独立信息同步抵达——这组物质属性在电影诞生之初就已存在。「并发膜」指的不是这一技术事实，而是它被问题化、被赋予独立表达使命、从物理基底转化为功能器官的整个过程。以《对话》（科波拉，1974）为判例追问它与时间-影像的分离点。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">10</span><a class="it" href="/students/qin-li/grammatical-fecundity/">语法生育力</a><span class="m">3.1 万字 · <b>135</b></span></div>
+    <p class="idesc">意识流语法从未缺乏扩散能力，它已碎屑化地渗入几乎所有影像种类的呼吸；但扩散与器官化是两件事。本文提出器官化的三个必要条件，解剖摄影机、剪辑台、放映厅三个器官的结构性自闭，并论证塔可夫斯基、雷乃、马利克的成功以个人觉察充当了缺失的器官替代物。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">11</span><a class="it" href="/students/qin-li/soliciting-text/">索解文本</a><span class="m">2.6 万字 · <b>134</b></span></div>
+    <p class="idesc">意识流文学在二十世纪文学史中占据了一个独特的位置：它被尊奉为小说艺术从外部描写走向内心真实的进化论终点，却同时是普通读者阅读挫败率最高的文学流派之一。既有研究大多将这一“崇高”与“挫败”的并存视为一个需要被解释的矛盾。本文提出一个根本不同的判断：这一并存本身，就是意识流文学的本体运作方式。意识流文学</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">12</span><a class="it" href="/students/qin-li/two-time-sovereignties/">时间的两种主权</a><span class="m">2.8 万字 · <b>133</b></span></div>
+    <p class="idesc">普鲁斯特的文字所生产的时间体验从来不是一个「内容」，而是读者在自己身体里、用自己的阅读动作执行的一次摸索的副产品。本文由此提出摸索时间与推送时间的区分，要害不在「接收者有没有控制权」这个量的维度——那仍是互动性的旧问题——而在控制权的行使方式是内在于体验流的肉身摸索，还是外在于体验流的界面操作。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">13</span><a class="it" href="/students/qin-li/unagentable-residue/">不可代理的残余</a><span class="m">2.4 万字 · <b>133</b></span></div>
+    <p class="idesc">意识流文学常被理解为心理写实主义的深化，是语言代理内心活动之能力的升级。本文提出一个相反的判断：意识流文学的实质，是语言首次将自身的代理本性逼至极限后，对“不可代理的残余”的发生学守护。在检讨了技术升级论、主体解体寓言以及以德曼与布朗肖为代表的语言自反理论这三条路径各自的洞见与共同的发现学盲区之后，</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">14</span><a class="it" href="/students/qin-li/tenanted-consciousness/">寓体意识</a><span class="m">3.0 万字 · <b>132</b></span></div>
+    <p class="idesc">意识流文学的本质，既不是“描写意识的文学”，也不是“把读者制造成意识发生者的文学”——二者都暗中预设了一个先在的、等待被表现或被激活的意识主体。本文撤销这个预设，提出一个反向判断：意识流文学不是让人“发现自己已有的意识”，而是让人“拥有一个本不属于自己的意识”。读者在阅读中让渡自身的认知与情感器官，</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">15</span><a class="it" href="/students/qin-li/suspended-vein/">悬停的流</a><span class="m">2.4 万字 · <b>132</b></span></div>
+    <p class="idesc">一个半世纪以来，围绕意识流文学本质的追问，始终在一个未经质疑的预设之上运行：意识之“流”，无论多么湍急、迂回、破碎，终将走向某种贯通——意义的贯通、情绪的贯通、抑或审美完形的贯通。本文的论证从撤销这一预设开始。在对威廉·詹姆斯“意识流”初始概念的哲学回勘、对伍尔夫《到灯塔去》一个关键段落的逐句发生学</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">16</span><a class="it" href="/students/qin-li/grammatical-act/">裂缝与在场</a><span class="m">2.0 万字 · <b>132</b></span></div>
+    <p class="idesc">本文经由对意识流发生史与继承史的重新追问，提出一个与既有文学史共识相悖的判断：意识流后继无人的根本困境，不在于它的底层操作语法与个体人格绑得太紧、无法拆卸——这一诊断将问题归于“技法遗传学”的失败，而错失了意识流在发生结构上更深层的特征。本文论证，意识流在伍尔夫、乔伊斯、杜亚丹手中，不是被制造出来的</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">17</span><a class="it" href="/students/qin-li/boundary-incursion/">在语言的尽头，造一场被允许的入侵</a><span class="m">1.4 万字 · <b>132</b></span></div>
+    <p class="idesc">意识流文学的独特艺术力量，既不在它写出了什么心理内容，也不在它运用了怎样的叙事技巧，而在于它完成了一件在其他艺术形式中几乎不可能的事：它用文字——人类最擅长切分、命名、归类的粒子媒介——构造出一种允许另一个人的意识过程暂时入侵读者自我世界的结构。这种入侵不是读者主动去“理解”或“共情”一个人物，而是</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">18</span><a class="it" href="/students/qin-li/dwelling-in-flux/">在碎镜中驻留</a><span class="m">2.4 万字 · <b>131</b></span></div>
+    <p class="idesc">本文对意识流文学的核心功能提出一个重判：它并非将碎片化的现代经验“缝合”为连续性意识的修复机制，而是一种更根本、也更悖论性的实践——它试图在语言内部，为那个正在被技术加速不断拆解的人，撑开一个临时性的、不需要缝合就可以暂时停留的意识区域。本文称这种实践为“驻流”。通过重新穿越十九世纪末时间标准化与心</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">19</span><a class="it" href="/students/qin-li/unpaid-labor/">无薪的劳作</a><span class="m">2.6 万字 · <b>130</b></span></div>
+    <p class="idesc">意识流文学长久以来被固化为一个技法标签——内心独白、自由联想、时空跳跃。本文翻转了这一凝视的方向：不再追问意识流“是什么”或“从哪来”，而是追问它在特定历史条件下被逼出来的那种结构，对读者做了什么。核心判断是：意识流文学之所以独特，不在于它把读者的参与推向了极致，而在于它造就了一种迄今为止没有被独立</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">20</span><a class="it" href="/students/qin-li/pre-attribution-field/">在“谁的”之前</a><span class="m">2.0 万字 · <b>130</b></span></div>
+    <p class="idesc">意识流电影的百年实践，一直被一个未经省察的隐喻所支配：内心世界必须被“拍出来”，如同将一个隐秘的客体从体内取出，放在摄影机前。这个隐喻迫使电影从文学那里借来一双眼睛——以单一人物为中心的内省模型——却导致了一项根本的媒介错配：摄影机天然地拍摄整个物理环境，而非某一个人的内心。本文指出，这一错配并非技</p>
+  </div>
+</section>
+
+
+<section id="existence">
+  <div class="hd"><span class="no">陆</span><h2>创作 · 存在 · 爱</h2><span class="ct">16 篇</span></div>
+  <p class="lead">一个人在没有任何外部授权的条件下做出一个收不回来的判断——这件事在创作里叫决断，在爱里叫决触，而两处都正在被「可撤销」悄悄取消。</p>
+  <div class="item">
+    <div class="ihd"><span class="no">1</span><a class="it" href="/students/qin-li/existential-stake/">存押</a><span class="m">2.6 万字 · <b>149</b></span></div>
+    <p class="idesc">让我们感到「重」的作品，其力量不能被形式精良、观念深刻、表达有力这些属性概念穷尽。本文提出存押：在无保底、不可逆、自己承担代价的条件下把一部分存在押进一个动作，该动作便成为存在历史中不可删除的节点。文章与阿伦特「行动」做了三重边界切割，并追问一个行动理论从未追问的维度——一个动作如何反过来折旧了做出</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">2</span><a class="it" href="/students/qin-li/completing-arc/">未完成的弧</a><span class="m">2.4 万字 · <b>149</b></span></div>
+    <p class="idesc">重力传递的主流叙述缺省了最关键的半个弧：接收者也必须在无外部返回码的条件下，亲自完成一次「我接住了」的判决，并承担它咬住自身、改写自身的全部后果。本文追问这条弧为何长期无名——不是理论家疏忽，是它在结构上抗拒被公共化，因而系统性地落出了理论的捕捉范围。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">3</span><a class="it" href="/students/qin-li/other-handedness/">爱的他手性</a><span class="m">2.7 万字 · <b>147</b></span></div>
+    <p class="idesc">让人在冲突顶点仍能选择不回击、不出走的那层无声厚度，其生成原料不掌握在生成者自己手里。每一次窄路摩擦之后，己方的忍耐能否从创伤转成骨骼的钙质，取决于对方是否交付了那个只有他能给出的承接动作。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">4</span><a class="it" href="/students/qin-li/twin-correctness/">孪生正确</a><span class="m">3.1 万字 · <b>147</b></span></div>
+    <p class="idesc">对技术代偿创造力的批判已成传统，却都锁定外部机制，不解释创作者在抉择当下为什么主动选了安全那条、还真诚地相信那是自己的直觉。本文撤销整个批判传统共享的隐蔽先验——创作者可凭内部感觉识别什么是正确——由此打开两种“正确感”在身体里真假莫辨的孪生现场。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">5</span><a class="it" href="/students/qin-li/bearing-the-enough/">不背</a><span class="m">2.7 万字 · <b>146</b></span></div>
+    <p class="idesc">在没有任何外部授权的情况下，独自做出「够了」这个不可撤回的判断，并把它永远承担在自己身上——本文称之为背负，并把它在作品物性层面沉淀出的痕迹称为承重。文章与克尔凯郭尔、海德格尔、阿多诺、福柯、本雅明、丹托六条脉络逐一碰撞，并诚实交代：背负不是艺术的永恒本质，而是现代艺术体制为自己设下的内在承诺。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">6</span><a class="it" href="/students/qin-li/residual-orientation/">剩余朝向</a><span class="m">1.8 万字 · <b>146</b></span></div>
+    <p class="idesc">一个人的存在地基被长期互动张力层层剥蚀，在不再持有任何「应当做」「值得做」的信念、甚至对这个动作感到憎恶的瞬间，身体仍然往对方那边斜了一点。本文命名这块残存为「剩余朝向」，引入「不可代偿的自我卷入判决」作为控制变量，把它从分裂样黏着、驱力与受虐性认同三个最强对手里辨析出来，并给出可经验检验的判别格。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">7</span><a class="it" href="/students/qin-li/yielded-void/">艺术作为被让予的裂隙</a><span class="m">2.6 万字 · <b>145</b></span></div>
+    <p class="idesc">既有美学——形式论、表现论、制度论——共享一个未经审查的预设：艺术是人类正面生产之物，因此全部努力都在增加承受者身上的某样东西。本文命名了一个被反复碰触却从未被单独命名的空项：缺余，承受者体内那片不被知识、语言、身份、体制所占满的原始空地。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">8</span><a class="it" href="/students/qin-li/guarding-drift/">守卫的漂移</a><span class="m">2.6 万字 · <b>144</b></span></div>
+    <p class="idesc">本文不问「艺术是什么」，只问那条让艺术显得重的边界靠什么维持、又在什么条件下被抹平。级差的一侧是不可代偿、不可撤回、亲自承担连锁后果的慢判决，另一侧是从既成选项中辨认最优解的快决策；技术平滑与即刻确认从判决的源头楔入，其控制变量被命名为「可代偿楔入度」并给出可计数的定义。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">9</span><a class="it" href="/students/qin-li/generative-silence/">肯定性拥抱</a><span class="m">1.8 万字 · <b>144</b></span></div>
+    <p class="idesc">艺术并未死于审查，也非死于排斥，而是承受着一种更隐蔽的力量：整个生态齐声说「是」。本文区分被剥夺的沉默与生成的沉默，论证承认的时间性才是关键——事后承认不侵入沉默，事前预判填满沉默。与丹托、布尔迪厄、朗西埃、阿多诺四重区隔之后，文章设下三组证伪条件，其中一组直指自己的历史锚点。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">10</span><a class="it" href="/students/qin-li/surplus-injection/">盈余</a><span class="m">2.2 万字 · <b>142</b></span></div>
+    <p class="idesc">「决断还是代偿」这个旧问题，在当代艺术体制的日常运转中已经失去辨别力。本文命名第三类动作：创作者在被规定要完成的任务之外或之内，于某个不可还原的微小节点上偷偷注入的超额存在重量。以莫兰迪边缘线的迟疑与色调的微偏为原型，以德塞托「战术」为主要竞争对手做二阶碰撞。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">11</span><a class="it" href="/students/qin-li/decisive-touch/">爱不是路径，是决触</a><span class="m">2.2 万字 · <b>141</b></span></div>
+    <p class="idesc">意志论、依附论、本真论、进化心理学与关系精神分析共享一个从未被追问的地基：在第一个爱的动作发生之前，双方已处于某种最低限度的连接之中。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">12</span><a class="it" href="/students/qin-li/beheld-flame/">被朝见的火，才能不灭</a><span class="m">2.1 万字 · <b>137</b></span></div>
+    <p class="idesc">既有理论把爱的原点安放在主体这一侧。本文从父母对前意识婴儿之爱这个极限案例切入，论证爱的第一推动力不供能、只定向：一个真实的他者以其全然赤裸且不可代偿的存在朝向你，这一「被朝见」本身就是擦燃爱之火的第一粒燧石。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">13</span><a class="it" href="/students/qin-li/natal-imprint/">叙事的胎印</a><span class="m">2.5 万字 · <b>136</b></span></div>
+    <p class="idesc">叙事医学把「讲故事」推举为修复疾病创伤的核心路径。本文的诊断是：叙事医学是一台精密的三层代偿机器——它在时间上把无意义的淤积修剪为有意义的弧线，在语言上把混沌的体验提纯为可命名的情感，在情感上把不可承受的痛苦转化为可分享的感动。</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">14</span><a class="it" href="/students/qin-li/decision-as-generation/">裁决即生成</a><span class="m">2.4 万字 · <b>133</b></span></div>
+    <p class="idesc">裁决即生成：艺术创造中「决-生成」结构的不可代偿性</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">15</span><a class="it" href="/students/qin-li/adjudication-loop/">裁决回路</a><span class="m">2.6 万字 · <b>132</b></span></div>
+    <p class="idesc">裁决回路：生成式人工智能如何拆解艺术发生的内在担保</p>
+  </div>
+  <div class="item">
+    <div class="ihd"><span class="no">16</span><a class="it" href="/students/qin-li/existential-verdict/">存在的决断</a><span class="m">4.0 万字 · <b>142</b></span></div>
+    <p class="idesc">杜威的「做与受」、海德格尔的「真理发生」、科林伍德的「表达即探索」分歧深重，却共享同一预设：意义需要发生在两个项的照面之间。</p>
+  </div>
+</section>
+
+
+<section>
+  <div class="note">
+    <h3>附一　那个数是什么</h3>
+    <p>篇名后面那个三位数是<b>创新智商</b>——不是文笔分，也不是影响力分，测的是「一个此前不存在的判断在发生意义上走得多深」。五个维度：这个东西被显露得清不清楚、它与既有说法的差异有多硬、它扎在什么条件上、它有没有交手过真正的对手（敌意拓宽）、以及它给不给得出可以推翻自己的预测。</p>
+    <p><b>120 是闸门</b>：低于它的，多半是把已有的说法换了个名字。本栏在 130–152 之间，最高的一篇是《分离线》152。分数由站内独立盲评给出，评的是稿子本身，不看作者是谁。</p>
+    <h3 style="margin-top:20px">附二　这些文章是怎么生产的</h3>
+    <p>不是先有观点再找例子。做法是<b>二阶碰撞</b>：先挑三门彼此无关、且与本题无关的学问，各自从自己的原理里推一遍这个问题；三条路撞出来的余数——三家都推不掉、又都解释不了的那一小块——才是要命名的东西。命名之后还要过两关：谁已经站在这个位置上（敌意拓宽），以及什么样的结果会推翻它（可裁决预测）。</p>
+    <p>通俗讲解见 <a href="https://sdeuniverses.com/confluence/confluence-method/">《SDE 多学科通融创新法》</a>。每篇理论长论文另配一组<b>并蒂文</b>：一篇解释文用一个日常类比讲清楚，一篇实践文把判据变成外人可核对的动作，入口在各篇母文页顶部。</p>
+  </div>
+</section>
+
+<footer><div class="wrap">
+  <p>SDE 文学 · 斐索（秦莉）—— <a href="https://sdeuniverses.com/">SDE Universes</a> 的文学分站。<a href="/">回首页</a></p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+
+</div>
+</div>
+<script>
+(function(){var b="/sites/liter";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatfeisuo/")===0
+  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

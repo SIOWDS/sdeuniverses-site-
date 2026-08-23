@@ -222,7 +222,59 @@
           srcSite: "From the language subsite"
         }
       }
-    }
+    },
+    /* ── 第二个分身：liter（ChatFeiSuo，2026-08-23）───────────────────
+       只覆盖带产品口音的那几条，其余一律落回 ChatSDE 的通用文案——
+       复制/停止/重答/错误诊断那些是机制性的，两边漂成两套说法只会没人说得清哪套算数。 */
+    liter: {
+      id: "liter",
+      brand: "ChatFeiSuo",
+      url: "/chatfeisuo/",
+      sig: "ChatFeiSuo \u00b7 liter.sdeuniverses.com",
+      who: "斐索",
+      kicker: "LITER.SDEUNIVERSES.COM",
+      home: "/",
+      tools: ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"],
+      seeds: [
+        "「月光落在寂静的湖面，像一层薄薄的银霜。」——每一项都合格，为什么它不动人？",
+        "我写的东西别人说「挺好的」，然后就没有然后了。问题出在哪？",
+        "读残雪读到想吐，这种不舒服是我的问题吗？",
+        "一首诗改到第七版反而不如第三版，我是不是把什么改掉了？"
+      ],
+      cmd: {
+        iq: ["有多新"], three: ["三个角度"], motif: ["主绳"], nbr: ["说过没有", "查一查"],
+        rename: ["同行的话", "本地话"], gap: ["没名字", "空位"], collide: ["顶一顶"],
+        forge: ["撞一条"], what: ["到底是什么"], how: ["怎么写"], why: ["为什么会这样"]
+      },
+      hero: {
+        zh: {
+          title: "ChatFeiSuo",
+          sub: "文学 · 斐索（秦莉）。诗、小说、评论、写作与阅读——从你手上那一段具体的文字开始。",
+          foot: "答案会带文学分站的出处。用你自己的大模型 Key 运行，Key 只存在这台设备的浏览器里。"
+        },
+        en: {
+          title: "ChatFeiSuo",
+          sub: "Literature, with Fei Suo (Qin Li). Poetry, fiction, criticism, writing and reading — starting from one real passage you have in hand.",
+          foot: "Answers cite the literature subsite. Runs on your own model key, kept only in this browser."
+        }
+      },
+      copy: {
+        zh: {
+          ph: "贴一段具体的文字——你自己的、或你读不下去的那一段…",
+          note: "ChatFeiSuo 只答文学、诗、小说、评论、写作与阅读，答案扣着文学分站的原文，可核验的篇名与引文请以原文为准。用你自己的大模型 Key 运行：Key 存在你这台机器上，调用时经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析。",
+          setKeyP: "ChatFeiSuo 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 保存在你这台机器上；调用时会经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。",
+          tlBtn: "⊞ 文学工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
+          tipDeep: "满血基底＋满功率思考＋整套文学工序，慢但深",
+          srcSite: "文学分站文献",
+          tlIq: "这一篇有多新", tlIqS: "五维打分＋它在已有说法里站在哪＋三条能提上去的路",
+          tlWhat: "它到底是什么", tlHow: "它是怎么写成的", tlWhy: "为什么会这样"
+        },
+        en: {
+          ph: "Paste a real passage — yours, or the one you can't get through…",
+          srcSite: "From the literature subsite"
+        }
+      }
+    },
   };
   var PROFILE = (function () {
     var k = String(window.WDSM_PROFILE || "").trim();

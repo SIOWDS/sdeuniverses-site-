@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDE 文学 · 斐索（秦莉）</title>
+<meta name="description" content="SDE 文学：三台智能体（ChatFeiSuo · SDE 文学共创 · SDE 文学共读）与一份经典文本板块——长篇《狮城荣耀》、诗、散文随笔、批评，与四十二篇文学发生学论文。斐索（秦莉）主持，SDE Universes 子平台。">
+<link rel="canonical" href="https://liter.sdeuniverses.com/">
+<meta property="og:title" content="SDE 文学 · 斐索（秦莉）">
+<meta property="og:description" content="每一项都合格了，为什么这一句还是不动人？三台智能体，一份文本。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F7F3E9">
+<style>
+:root{
+  --paper:#F7F3E9; --paper2:#FDFBF5; --ink:#1A1714; --ink2:#6B6255; --ink3:#9A9182;
+  --rule:#CFC5B2; --rule2:#E4DCCB;
+  --cinnabar:#9E3D30; --cinnabar-l:#C25B45;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi",var(--serif);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:16.5px;line-height:1.95}
+a{color:inherit;text-decoration:none}
+
+/* 竖排刊名（书脊）——纸本刊物的立面，也是与 lang 最直接的分别 */
+.spine{position:fixed;left:0;top:0;bottom:0;width:62px;z-index:40;
+  background:var(--paper);border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;padding:20px 0 18px}
+.spine .nm{writing-mode:vertical-rl;font-family:var(--serif);font-size:20px;
+  letter-spacing:.36em;font-weight:600}
+.spine .sub{writing-mode:vertical-rl;font-family:var(--mono);font-size:10px;
+  letter-spacing:.3em;color:var(--ink3);margin-top:16px}
+.spine .seal{margin-top:auto;width:26px;height:26px;border:1.5px solid var(--cinnabar);
+  color:var(--cinnabar);font-size:13px;line-height:23px;text-align:center;
+  font-family:var(--serif);transform:rotate(-4deg)}
+.page{margin-left:62px}
+@media(max-width:720px){.spine{display:none}.page{margin-left:0}}
+
+.wrap{max-width:940px;margin:0 auto;padding:0 26px}
+.topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:30;
+  background:rgba(247,243,233,.94);backdrop-filter:saturate(140%) blur(6px)}
+.topbar .wrap{display:flex;align-items:baseline;gap:20px;height:52px;
+  font-family:var(--sans);font-size:13.5px;color:var(--ink2)}
+.topbar .m{display:none;font-family:var(--serif);font-size:17px;letter-spacing:.22em;color:var(--ink)}
+.topbar nav{margin-left:auto;display:flex;gap:19px}
+.topbar nav a:hover{color:var(--cinnabar)}
+.topbar nav a.out{font-family:var(--mono);font-size:11.5px}
+@media(max-width:720px){.topbar .m{display:block}}
+
+/* 刊头 */
+.masthead{padding:64px 0 0;text-align:center}
+.masthead .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--ink3)}
+.masthead h1{font-family:var(--serif);font-weight:600;margin:.42em 0 .3em;
+  font-size:clamp(34px,7.4vw,66px);letter-spacing:.22em;line-height:1.2}
+.masthead .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--ink3)}
+.dbl{border-top:3px double var(--rule);margin:34px 0 0}
+.motto{max-width:31em;margin:30px auto 0;font-family:var(--kai);font-size:18px;
+  line-height:2.1;text-align:center;color:var(--ink)}
+.motto b{font-weight:600;border-bottom:1px solid var(--cinnabar);padding-bottom:1px}
+
+/* 签名件：本期目录 */
+.toc{max-width:640px;margin:44px auto 0;border:1px solid var(--rule);background:var(--paper2);
+  padding:26px 30px 24px;position:relative}
+.toc .cap{text-align:center;font-family:var(--serif);letter-spacing:.5em;font-size:15px;
+  padding-bottom:12px;border-bottom:1px solid var(--rule2);margin-bottom:6px}
+.toc .cap i{display:block;font-style:normal;font-family:var(--mono);font-size:10px;
+  letter-spacing:.22em;color:var(--ink3);margin-top:7px}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc li{display:flex;align-items:baseline;gap:10px;padding:9px 0;font-size:15px;
+  border-bottom:1px dotted var(--rule2);opacity:0;animation:fade .5s ease forwards}
+.toc li .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink3);
+  min-width:4.6em;flex:none}
+.toc li .t{flex:1}
+.toc li .p{font-family:var(--mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.toc li.blank{border-bottom:none;padding-top:20px;color:var(--cinnabar)}
+.toc li.blank .t{font-family:var(--kai);font-size:17px;letter-spacing:.28em}
+.toc li.blank .k{color:var(--cinnabar-l)}
+.seal2{display:inline-block;border:1.5px solid var(--cinnabar);color:var(--cinnabar);
+  padding:2px 9px;font-size:11.5px;letter-spacing:.2em;transform:rotate(-4deg);
+  animation:drop .45s cubic-bezier(.2,1.5,.4,1) 1.05s both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:rotate(-15deg) scale(1.6)}to{opacity:1;transform:rotate(-4deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.toc li{opacity:1;animation:none}.seal2{animation:none}}
+.tocnote{max-width:640px;margin:14px auto 0;font-size:13.5px;color:var(--ink2);
+  font-family:var(--sans);line-height:1.9}
+.tocnote b{color:var(--ink)}
+
+/* 栏目通用 */
+section{padding:60px 0 6px}
+.hd{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--ink);padding-bottom:8px}
+.hd h2{font-family:var(--serif);font-weight:600;font-size:21px;letter-spacing:.24em;margin:0}
+.hd .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--cinnabar)}
+.hd .ct{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+.lead{color:var(--ink2);font-size:15px;margin:14px 0 0;max-width:44em;font-family:var(--sans)}
+
+/* 智能体板块 */
+.bots{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:0;margin-top:26px;
+  border:1px solid var(--rule)}
+.bot{padding:24px 22px 22px;border-right:1px solid var(--rule);display:flex;flex-direction:column;
+  background:var(--paper2)}
+.bot:last-child{border-right:none}
+a.bot:hover{background:#fff}
+.bot .n{font-family:var(--mono);font-size:10px;letter-spacing:.26em;color:var(--cinnabar)}
+.bot h3{font-family:var(--serif);font-size:21px;letter-spacing:.14em;margin:9px 0 4px;font-weight:600}
+.bot .en{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink3);margin-bottom:11px}
+.bot p{margin:0 0 14px;font-size:14px;color:var(--ink2);line-height:1.85;font-family:var(--sans)}
+.bot .go{margin-top:auto;font-family:var(--mono);font-size:11.5px;color:var(--cinnabar);
+  border-top:1px solid var(--rule2);padding-top:11px}
+@media(max-width:720px){.bot{border-right:none;border-bottom:1px solid var(--rule)}
+  .bot:last-child{border-bottom:none}}
+
+/* 文本板块 */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-top:8px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.sub-h{font-family:var(--serif);font-size:16px;letter-spacing:.2em;font-weight:600;
+  margin:30px 0 2px;padding-bottom:6px;border-bottom:1px solid var(--rule2);display:flex;align-items:baseline}
+.sub-h span{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.1em}
+.ln{display:flex;gap:11px;align-items:baseline;padding:8px 2px;border-bottom:1px dotted var(--rule2);
+  font-size:15px}
+.ln:hover{background:var(--paper2)}
+.ln:hover .tt{color:var(--cinnabar)}
+.ln .no{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:1.6em;flex:none}
+.ln .tt b{font-weight:600;letter-spacing:.04em}
+.ln .tt em{font-style:normal;color:var(--ink2);font-size:13.5px;font-family:var(--sans);margin-left:.5em}
+.ln .iq{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);flex:none;padding-left:10px}
+.mo{display:inline-block;margin:12px 0 0;font-family:var(--mono);font-size:11.5px;
+  color:var(--cinnabar);border-bottom:1px solid var(--cinnabar);padding-bottom:2px}
+
+/* 长篇 */
+.novel{display:grid;grid-template-columns:200px 1fr;gap:28px;margin-top:26px;align-items:start}
+.novel img{width:100%;display:block;border:1px solid var(--rule)}
+.novel .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink3)}
+.novel h3{font-family:var(--serif);font-size:27px;letter-spacing:.18em;margin:8px 0 4px;font-weight:600}
+.novel p{margin:0 0 13px;font-size:15px;color:var(--ink2);line-height:1.95;font-family:var(--sans)}
+.novel .q{font-family:var(--kai);font-size:17px;color:var(--ink);border-left:2px solid var(--cinnabar);
+  padding-left:15px;margin:0 0 14px;line-height:2}
+.novel .lk{display:flex;gap:15px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
+.novel .lk a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.novel{grid-template-columns:1fr}.novel img{max-width:180px}}
+
+/* 诗 */
+.poems{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.pm{border:1px solid var(--rule);padding:9px 15px;background:var(--paper2);font-size:15px;letter-spacing:.1em}
+.pm:hover{border-color:var(--cinnabar);color:var(--cinnabar)}
+.pm i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:9px}
+
+/* 主持人 */
+.host{display:grid;grid-template-columns:150px 1fr;gap:26px;align-items:start;margin-top:26px}
+.host img{width:100%;border:1px solid var(--rule);display:block;filter:saturate(.9)}
+.host p{margin:0 0 12px;font-size:15px;font-family:var(--sans);color:var(--ink2)}
+.host .nm{font-family:var(--serif);font-size:21px;letter-spacing:.16em;color:var(--ink);margin-bottom:6px;font-weight:600}
+.host .nm em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink3);margin-left:10px}
+.host blockquote{margin:0 0 12px;font-family:var(--kai);font-size:16.5px;line-height:2.05;color:var(--ink);
+  border-left:2px solid var(--rule);padding-left:15px}
+.host a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.host{grid-template-columns:1fr}.host img{max-width:160px}}
+
+.plat{border:1px solid var(--rule);background:var(--paper2);padding:26px 26px;margin-top:24px}
+.plat p{margin:0 0 13px;font-size:15px;font-family:var(--sans);color:var(--ink2)}
+.plat p:last-child{margin-bottom:0}
+.plat b{color:var(--ink)}
+.plat a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+
+footer{border-top:3px double var(--rule);margin-top:66px;padding:26px 0 60px;
+  font-size:13px;color:var(--ink2);font-family:var(--sans)}
+footer a{color:var(--cinnabar)}
+footer p{margin:0 0 7px}
+a:focus-visible{outline:2px solid var(--cinnabar);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="spine">
+  <div class="nm">SDE 文学</div>
+  <div class="sub">FEI SUO</div>
+  <div class="seal">斐</div>
+</div>
+
+<div class="page">
+<header class="topbar"><div class="wrap">
+  <a class="m" href="/">SDE 文学</a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/#texts">文本</a>
+    <a href="/#host">主持人</a>
+    <a href="/all/">全部篇目</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+
+<div class="masthead">
+  <div class="kicker">文学 · 新思想生产平台</div>
+  <h1>SDE 文学</h1>
+  <div class="en">LITER.SDEUNIVERSES.COM　·　主持 斐索（秦莉）</div>
+  <div class="dbl"></div>
+  <p class="motto">美不是作品身上的一种属性，等着被有品味的人发现。<br>
+  它是一次<b>发生</b>——有条件、有顺序，可以被说清楚，也可以被推翻。<br>
+  而约束与留白不是诗性自由的对立面，<b>正是它赖以发生的条件</b>。</p>
+</div>
+
+<div class="toc">
+  <div class="cap">本　期　目　录<i>CONTENTS · 送审稿逐项已阅</i></div>
+  <ol>
+    <li style="animation-delay:0ms"><span class="k">意　象</span><span class="t">月光 · 湖面 · 银霜，三者俱备</span><span class="p">合格</span></li>
+    <li style="animation-delay:110ms"><span class="k">比　喻</span><span class="t">喻体同色同质，无一处失当</span><span class="p">合格</span></li>
+    <li style="animation-delay:220ms"><span class="k">音　步</span><span class="t">二二三，读来上口</span><span class="p">合格</span></li>
+    <li style="animation-delay:330ms"><span class="k">基　调</span><span class="t">清冷，前后统一</span><span class="p">合格</span></li>
+    <li style="animation-delay:440ms"><span class="k">主　题</span><span class="t">静夜独处，明确</span><span class="p">合格</span></li>
+    <li class="blank" style="animation-delay:860ms"><span class="k">—</span><span class="t">留　白</span><span class="p"><span class="seal2">无 页 码</span></span></li>
+  </ol>
+</div>
+<p class="tocnote">「月光落在寂静的湖面，像一层薄薄的银霜。」——每一项都合格了，而没有人会因为这一句停下来。<b>让人停下来的那一下，目录上没有它的位置。</b>本站做的就是把这一栏开出来：给它条件，给它顺序，给它可以被推翻的说法。</p>
+
+<section id="bots">
+  <div class="hd"><span class="no">栏 一</span><h2>智　能　体</h2><span class="ct">3 台</span></div>
+  <p class="lead">三台机器，各自站在写作的一个位置上：一台陪你想，一台陪你写，一台陪你读。都用你自己的大模型 Key 运行，Key 只存在你这台设备的浏览器里。</p>
+  <div class="bots">
+    <a class="bot" href="/chatfeisuo/">
+      <div class="n">其 一 · 对话</div>
+      <h3>ChatFeiSuo</h3>
+      <div class="en">CHAT FEI SUO</div>
+      <p>把手上那一段具体的文字交给它——你自己写的，或你读不下去的那一段。它顺着斐索的路子往下追：这里留出了什么位置？打动断在哪一层？这一处是决断，还是代偿？答案带文学分站的出处。</p>
+      <span class="go">进入对话 →</span>
+    </a>
+    <a class="bot" href="/cowrite/">
+      <div class="n">其 二 · 共创</div>
+      <h3>SDE 文学共创</h3>
+      <div class="en">CO-WRITING LAB</div>
+      <p>左边是你的画布，右边是共创台。稿子一直在你手上——它每一轮都带着你正在写的这一件去想：这句接下去怎么写、这一段站不站得住、这里缺什么、谁已经写过这件事。回话不会自动进正文，你看着行了再插入。</p>
+      <span class="go">进入共创 →</span>
+    </a>
+    <a class="bot" href="/coread/">
+      <div class="n">其 三 · 共读</div>
+      <h3>SDE 文学共读</h3>
+      <div class="en">CO-READING</div>
+      <p>挑一篇，边读边问。选中哪一段，它就跟你谈哪一段——为什么这里读不下去、这个说法站不站得住、它和上一节是什么关系。四十四篇长论文与长篇《狮城荣耀》都已开通。</p>
+      <span class="go">选一篇开读 →</span>
+    </a>
+  </div>
+</section>
+
+<section id="texts">
+  <div class="hd"><span class="no">栏 二</span><h2>经　典　板　块</h2><span class="ct">文本 · 63 篇</span></div>
+  <p class="lead">底下这一份是三台机器共同的底本：一部长篇、八首诗、十二篇随笔与批评，与四十二篇文学发生学论文。机器只是入口，读的是这些。</p>
+
+  <div class="sub-h">小　说<span>1 部 · 21.6 万字</span></div>
+  <div class="novel">
+    <img src="/students/qin-li/lion-city-glory/lcg-cover.jpg" alt="狮城荣耀 封面" loading="lazy">
+    <div>
+      <div class="meta">长篇小说 · 三十章五卷 · 412 页 · ISBN 978-1-970820-59-1 · 德麦国际 2026</div>
+      <h3>狮城荣耀</h3>
+      <p>秦语十八岁那年把帝国理工的录取通知延后两年，剃光头，登上开往海岛的渡轮。他以为自己带去的是优势：漂亮的成绩、流利的英文、一个国际学校少年的从容。海岛用两个星期告诉他，这里没人关心这些——口令是马来语的，玩笑是快得抓不住的 Singlish，而他的口音是一道所有人一听就听得出来的界线。</p>
+      <p class="q">一个系统会失败两次。第一次，是它给出错误答案；第二次，是使用者希望这个答案是对的。<br><span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">—— 拉詹少校 · 第十章</span></p>
+      <p>他和父亲写了两年的语言识别系统也跟着进了军营，越来越好用，越来越像「答案」。然后是那一场城市山脊救援演习：地形数据过期二十三天，屏幕上跳出一条置信度七十八的捷径，旁边一行灰字——需要现场确认。那天他按下了确认。</p>
+      <div class="lk"><a href="/students/qin-li/lion-city-glory/">全书简介</a><a href="/students/qin-li/lion-city-glory/read.html">在线翻页读</a><a href="/students/qin-li/lion-city-glory/preview.html">选读前三章</a></div>
+    </div>
+  </div>
+
+  <div class="sub-h">诗<span>8 首 · 2015–2026</span></div>
+  <div class="poems">
+    <a class="pm" href="/students/qin-li/poems/me-and-my-shadow/">我和我的影子<i>2025</i></a>
+    <a class="pm" href="/students/qin-li/poems/untitled/">无题<i>2025</i></a>
+    <a class="pm" href="/students/qin-li/poems/divergence-point-to-yu-xiuhua/">岐点：致余秀华<i>2026</i></a>
+    <a class="pm" href="/students/qin-li/poems/black-coffee/">黑咖啡<i>2022</i></a>
+    <a class="pm" href="/students/qin-li/poems/rainy-night/">雨夜<i>2025</i></a>
+    <a class="pm" href="/students/qin-li/poems/summer-2023/">2023 年的夏天<i>2023</i></a>
+    <a class="pm" href="/students/qin-li/poems/the-other-side-of-the-mountain/">山那边<i>2023</i></a>
+    <a class="pm" href="/students/qin-li/poems/first-love/">起初之爱<i>2015</i></a>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div class="sub-h">批　评<span>7 篇</span></div>
+      <a class="ln" href="/students/qin-li/essays/boneless-book/"><span class="no">1</span><span class="tt"><b>无骨之书</b><em>残雪拆掉了我们读小说的那副骨头</em></span></a>
+      <a class="ln" href="/students/qin-li/essays/perceptual-attunement/"><span class="no">2</span><span class="tt"><b>调一种气味，四十年</b><em>以维持知觉状态为标的的写作</em></span></a>
+      <a class="ln" href="/students/qin-li/essays/narrative-skin/"><span class="no">3</span><span class="tt"><b>叙事的皮肤</b><em>文本与身体之间那道界面</em></span></a>
+      <a class="ln" href="/students/qin-li/essays/mold-reverse-casting/"><span class="no">4</span><span class="tt"><b>模具与逆铸</b><em>先锋写作的一个隐秘陷阱</em></span></a>
+      <a class="ln" href="/students/qin-li/essays/hualide-zangli/"><span class="no">5</span><span class="tt"><b>华丽的葬礼</b><em>《房思琪》里修辞如何参与围猎</em></span></a>
+      <a class="ln" href="/students/qin-li/offbeat-justice/"><span class="no">6</span><span class="tt"><b>错拍的正义</b><em>四口时钟的相位差</em></span></a>
+      <a class="ln" href="/students/qin-li/scale-not-penetration/"><span class="no">7</span><span class="tt"><b>越普世，越不能抵达</b><em>《哪吒2》的 97.1%</em></span></a>
+    </div>
+    <div>
+      <div class="sub-h">散文随笔<span>5 篇</span></div>
+      <a class="ln" href="/students/qin-li/essays/moved-in-order/"><span class="no">1</span><span class="tt"><b>感动是有顺序的</b><em>感觉、情感、情境依次穿过我们</em></span></a>
+      <a class="ln" href="/students/qin-li/essays/athill-roundtable/"><span class="no">2</span><span class="tt"><b>暮色与晨曦之间</b><em>阿西尔与中国女性的四场对话</em></span></a>
+      <a class="ln" href="/students/qin-li/essays/why-the-shore-remembers/"><span class="no">3</span><span class="tt"><b>海岸为什么记得</b><em>从个人、民族到文明的交付</em></span></a>
+      <a class="ln" href="/students/qin-li/essays/bypass-attainment/"><span class="no">4</span><span class="tt"><b>指标正常，人却在坏</b><em>判准为什么可以被绕过</em></span></a>
+      <a class="ln" href="/students/qin-li/generative-cosmos/"><span class="no">5</span><span class="tt"><b>发生的宇宙</b><em>与两千年哲学、数学的一次交锋</em></span></a>
+    </div>
+  </div>
+
+  <div class="sub-h">文学发生学 · 一　美的发生<span>6 篇</span></div>
+  <div class="grid2">
+    <div>
+      <a class="ln" href="/students/qin-li/aesthetic-genesis-equation/"><span class="no">1</span><span class="tt"><b>审美发生方程</b><em>意义三律与美的动态生成</em></span></a>
+      <a class="ln" href="/students/qin-li/unwritten-law/"><span class="no">2</span><span class="tt"><b>古典汉语审美发生学</b><em>无法之法与结构留白</em></span></a>
+      <a class="ln" href="/students/qin-li/release-morphology/"><span class="no">3</span><span class="tt"><b>释放的形态学</b><em>懂了却没发生，没懂却泪流满面</em></span></a>
+    </div>
+    <div>
+      <a class="ln" href="/students/qin-li/law-as-negative-space/"><span class="no">4</span><span class="tt"><b>禁令作为留白</b><em>十诫的约束网格</em></span></a>
+      <a class="ln" href="/students/qin-li/negative-inheritance/"><span class="no">5</span><span class="tt"><b>负继承</b><em>加缪与圣经的张力</em></span></a>
+      <a class="ln" href="/students/qin-li/cinema-literature/"><span class="no">6</span><span class="tt"><b>影视艺术与文学频道</b><em>八篇一辑的总目</em></span></a>
+    </div>
+  </div>
+
+  <div class="sub-h">文学发生学 · 二　意识流与改编<span>20 篇</span></div>
+  <div class="grid2">
+    <div>
+      <a class="ln" href="/students/qin-li/line-of-separation/"><span class="no">1</span><span class="tt"><b>分离线</b><em>失败内部的差异，第一次成为变量</em></span><span class="iq">152</span></a>
+      <a class="ln" href="/students/qin-li/negative-print/"><span class="no">2</span><span class="tt"><b>负片</b><em>把原著从标准改成试剂</em></span><span class="iq">147</span></a>
+      <a class="ln" href="/students/qin-li/overflow-genesis/"><span class="no">3</span><span class="tt"><b>溢出性生成</b><em>能力不先于创作而存在</em></span><span class="iq">145</span></a>
+    </div>
+    <div>
+      <a class="ln" href="/students/qin-li/pre-emption-and-withholding/"><span class="no">4</span><span class="tt"><b>先占与留守</b><em>剪辑替观者走完了那段路</em></span><span class="iq">142</span></a>
+      <a class="ln" href="/students/qin-li/forced-reclamation/"><span class="no">5</span><span class="tt"><b>强制开荒</b><em>意义送不到终点的时候</em></span><span class="iq">142</span></a>
+      <a class="ln" href="/students/qin-li/image-proper-time/"><span class="no">6</span><span class="tt"><b>影像原时</b><em>摆脱叙事之后的那层时间质地</em></span><span class="iq">140</span></a>
+    </div>
+  </div>
+  <a class="mo" href="/all/#stream">二十篇详目与摘要 →</a>
+
+  <div class="sub-h">文学发生学 · 三　创作 · 存在 · 爱<span>16 篇</span></div>
+  <div class="grid2">
+    <div>
+      <a class="ln" href="/students/qin-li/existential-stake/"><span class="no">1</span><span class="tt"><b>存押</b><em>无保底、不可逆地押进一个动作</em></span><span class="iq">149</span></a>
+      <a class="ln" href="/students/qin-li/completing-arc/"><span class="no">2</span><span class="tt"><b>未完成的弧</b><em>被接住的判决才成为重力</em></span><span class="iq">149</span></a>
+      <a class="ln" href="/students/qin-li/other-handedness/"><span class="no">3</span><span class="tt"><b>爱的他手性</b><em>忍耐能否成骨，原料不在自己手里</em></span><span class="iq">147</span></a>
+    </div>
+    <div>
+      <a class="ln" href="/students/qin-li/twin-correctness/"><span class="no">4</span><span class="tt"><b>孪生正确</b><em>他真诚地相信那是自己的直觉</em></span><span class="iq">147</span></a>
+      <a class="ln" href="/students/qin-li/bearing-the-enough/"><span class="no">5</span><span class="tt"><b>不背</b><em>独自做出「够了」并永远承担它</em></span><span class="iq">146</span></a>
+      <a class="ln" href="/students/qin-li/residual-orientation/"><span class="no">6</span><span class="tt"><b>剩余朝向</b><em>信念坍缩之后，身体仍斜了一点</em></span><span class="iq">146</span></a>
+    </div>
+  </div>
+  <a class="mo" href="/all/#existence">十六篇详目与摘要 →</a>
+</section>
+
+<section id="host">
+  <div class="hd"><span class="no">栏 三</span><h2>主　持　人</h2></div>
+  <div class="host">
+    <img src="/students/qin-li/qin-li.jpg" alt="秦莉" loading="lazy">
+    <div>
+      <p class="nm">秦莉<em>笔名 · 斐索　FEI SUO</em></p>
+      <blockquote>无可救药的书虫，游弋的创作者。文字是我的锚，用来在这逝水的年华里，打捞纯粹与澄明。</blockquote>
+      <p>中文专业毕业，鲁迅文学院 99 级研修班结业。SDE 学员，跟随王德生博士研究 SDE 发生学。她的写作横跨两端：一端是诗、长篇与文学评论，另一端是以美学为核心的理论论文——这在同一个人身上并不常见。</p>
+      <p>诗与论在她这里不是两件事：她既亲手实践审美的发生，又为这一发生建立理论；把美还原为可被条件化描述的动态过程，却从不因此消解美的神秘。<a href="/students/qin-li/">作者主页与全部作品 →</a></p>
+    </div>
+  </div>
+</section>
+
+<section id="platform">
+  <div class="hd"><span class="no">栏 四</span><h2>这是一个平台，不是一个文集</h2></div>
+  <div class="plat">
+    <p>SDE 文学是 <a href="https://sdeuniverses.com/">SDE Universes</a> 的<b>垂直思想创新子平台</b>。它与主站共用同一套生产方法与同一条评分通道：一个判断要在这里立住，得先经过敌意拓宽（谁已经站在这个位置上）、可裁决预测（哪一种结果会推翻它），以及独立盲评。</p>
+    <p>它做的不是把文学理论已有的结论讲得更好懂，而是<b>生产此前不存在的文学判断</b>——给一个还没有名目的东西起名，给它可以被核对的条件，再把它交给能推翻它的证据。做法的通俗讲解见 <a href="https://sdeuniverses.com/confluence/confluence-method/">《SDE 多学科通融创新法》</a>。</p>
+    <p>本站收的是秦莉写作里的文学一线。她另有一条制度与法哲学的线（新加坡中医制度化三篇、功能权威的逆生产），不在本站，在<a href="/students/qin-li/works/">作者的全部作品页</a>。每篇理论长论文另配一组<b>并蒂文</b>（解释文＋实践文，共 36 组 72 篇），入口在各篇母文页顶部。</p>
+  </div>
+</section>
+
+<footer><div class="wrap">
+  <p>SDE 文学 · 斐索（秦莉）—— <a href="https://sdeuniverses.com/">SDE Universes</a> 的文学分站。全部篇目与主站同源，作者主页在 <a href="/students/qin-li/">学员专栏 · 秦莉</a>。</p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+
+</div>
+</div>
+
+<script>
+/* 分站页面的自家链接写的是分站根（/、/all/、/#栏）。在二级域名下这就是对的；
+   若从主站以 /sites/liter/… 预览，则就地补上前缀，两处都能正常点。 */
+(function(){var b="/sites/liter";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatfeisuo/")===0
+  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

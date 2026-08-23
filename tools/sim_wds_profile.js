@@ -29,9 +29,15 @@ console.log("── ① 档案表与解析器 ───────────�
   const preSeg = W.slice(W.indexOf("const LANG_PRE = ["), W.indexOf("];", W.indexOf("const LANG_PRE = [")) + 2);
   t("抠得出 LANG_PRE 段", preSeg.length > 200);
   const LANG_PRE = new Function(preSeg + "\nreturn LANG_PRE;")();
-  const F = new Function("JOHN_SYS", "LANG_PRE",
+  /* 2026-08-23 起表里有两个档案（lang / liter），第二个的白名单与人格同样从源码现读。
+     只注入 lang 那两个会当场 ReferenceError——而那正好证明这条注入是真在跑，不是摆设。 */
+  const literSeg = W.slice(W.indexOf("const LITER_PRE = ["), W.indexOf("];", W.indexOf("const LITER_PRE = [")) + 2);
+  t("抠得出 LITER_PRE 段", literSeg.length > 40);
+  const LITER_PRE = new Function(literSeg + "\nreturn LITER_PRE;")();
+  const feisuoSys = "「斐索」的人格底本占位";
+  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE",
     seg + "\nreturn { WDS_PROFILES: WDS_PROFILES, wdsProfileOf: wdsProfileOf, wdsProfInScope: wdsProfInScope };");
-  const S = F(johnSys, LANG_PRE);
+  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE);
   const lang = S.wdsProfileOf("lang");
 
   t("认得 lang", !!lang && lang.id === "lang");
@@ -98,6 +104,22 @@ console.log("── ① 档案表与解析器 ───────────�
     && !S.wdsProfInScope(lang, "/students/hu-zhiying/first-calibration/"));
   t("老三端点与档案共用同一份判据（JOHN_SCOPE ＝ LANG_PRE）", /const JOHN_SCOPE = LANG_PRE;/.test(WC));
   t("老三端点改用前缀判据、不再 re.test", /JOHN_SCOPE\.some\(\(pre\) => u\.indexOf\(pre\) >= 0\)/.test(WC));
+
+  console.log("\n── ②c 第二个档案：liter（ChatFeiSuo）──────────");
+  const lit = S.wdsProfileOf("liter");
+  t("认得 liter", !!lit && lit.id === "liter" && lit.name === "ChatFeiSuo");
+  t("liter 的人格是自己那一份，不是 John 的", !!lit && lit.sys === feisuoSys && lit.sys !== johnSys);
+  t("两档的白名单互不相同", !!lit && lit.pre !== lang.pre);
+  t("liter 收秦莉的作品", S.wdsProfInScope(lit, "/students/qin-li/line-of-separation/"));
+  t("liter 收长篇《狮城荣耀》", S.wdsProfInScope(lit, "/books/lion-city-glory/read.html"));
+  t("liter 不收胡志英的语言篇", !S.wdsProfInScope(lit, "/students/hu-zhiying/post-hand-slot/"));
+  t("lang 也不收秦莉的篇（两档不串台）", !S.wdsProfInScope(lang, "/students/qin-li/line-of-separation/"));
+  t("liter 带题域闸与术语闸", !!lit && /题域闸/.test(lit.guard || "") && /术语闸/.test(lit.term || ""));
+  t("liter 每条前缀都带结尾斜杠", !!lit && lit.pre.every((x) => /\/$/.test(x) || /\.html$/.test(x)));
+  /* ⚠ liter 暂时没有自己的内功档：通用那份满是母体术语，挂上去等于自拆术语闸
+     （lang 实测泄漏 109 处、其中 65 处出自那一个文件）。写好文学版之前，这里必须是空的。 */
+  t("liter 宁可不挂内功，也不挂通用那份母体术语底盘",
+    !!lit && (!lit.neigong || lit.neigong.indexOf("lite") < 0), lit && lit.neigong);
 
   console.log("\n── ②b 白名单下推到候选阶段（治 K 饥饿）─────────");
   /* ⭐ 线上实测过的病：白名单只在取完 top-20 之后滤，而它约占全站 1%，
