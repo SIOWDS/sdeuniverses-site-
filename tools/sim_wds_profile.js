@@ -35,9 +35,14 @@ console.log("── ① 档案表与解析器 ───────────�
   t("抠得出 LITER_PRE 段", literSeg.length > 40);
   const LITER_PRE = new Function(literSeg + "\nreturn LITER_PRE;")();
   const feisuoSys = "「斐索」的人格底本占位";
-  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE",
+  /* 2026-08-23 第三个档案 edu（ChatYang）。同样现读源码里那一份，不手抄。 */
+  const eduSeg = W.slice(W.indexOf("const EDU_PRE = ["), W.indexOf("];", W.indexOf("const EDU_PRE = [")) + 2);
+  t("抠得出 EDU_PRE 段", eduSeg.length > 40);
+  const EDU_PRE = new Function(eduSeg + "\nreturn EDU_PRE;")();
+  const yangSys = "「阳涌」的人格底本占位";
+  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE", "YANG_SYS", "EDU_PRE",
     seg + "\nreturn { WDS_PROFILES: WDS_PROFILES, wdsProfileOf: wdsProfileOf, wdsProfInScope: wdsProfInScope };");
-  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE);
+  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE, yangSys, EDU_PRE);
   const lang = S.wdsProfileOf("lang");
 
   t("认得 lang", !!lang && lang.id === "lang");
@@ -161,6 +166,27 @@ console.log("── ① 档案表与解析器 ───────────�
     const one = fs2.readFileSync("public/students/qin-li/line-of-separation/index.html", "utf8");
     t("她的文章页把陪读挂成 liter 档", /window\.WDS_READ=\{[^}]*profile:"liter"/.test(one));
   }
+
+  console.log("\n── ②d 第三个档案：edu（ChatYang）───────────────");
+  const edu = S.wdsProfileOf("edu");
+  t("认得 edu", !!edu && edu.id === "edu" && edu.name === "ChatYang");
+  t("edu 的人格是自己那一份", !!edu && edu.sys === yangSys && edu.sys !== johnSys && edu.sys !== feisuoSys);
+  t("三档白名单两两不同", !!edu && edu.pre !== lang.pre && edu.pre !== lit.pre);
+  t("edu 收阳涌的作品", S.wdsProfInScope(edu, "/students/yang-yong/negative-transcoding/"));
+  t("edu 收《课堂的智慧》与《答案之后》",
+    S.wdsProfInScope(edu, "/books/m/57/text/") && S.wdsProfInScope(edu, "/books/m/59/read"));
+  t("edu 不收胡志英的语言篇", !S.wdsProfInScope(edu, "/students/hu-zhiying/post-hand-slot/"));
+  t("edu 不收秦莉的文学篇", !S.wdsProfInScope(edu, "/students/qin-li/line-of-separation/"));
+  t("lang 与 liter 都不收阳涌的篇（三档不串台）",
+    !S.wdsProfInScope(lang, "/students/yang-yong/negative-transcoding/")
+    && !S.wdsProfInScope(lit, "/students/yang-yong/negative-transcoding/"));
+  t("edu 带题域闸与术语闸", !!edu && /题域闸/.test(edu.guard || "") && /术语闸/.test(edu.term || ""));
+  t("edu 每条前缀都带结尾斜杠", !!edu && edu.pre.every((x) => /\/$/.test(x)));
+  /* ⚠ 同 liter：教育版内功档没写之前，这里必须是空的。 */
+  t("edu 宁可不挂内功，也不挂通用那份母体术语底盘",
+    !!edu && (!edu.neigong || edu.neigong.indexOf("lite") < 0), edu && edu.neigong);
+  /* 术语闸放行「教育发生学」这个正名（同 lang 放行「语言发生学」），但不许把「发生学」当形容词乱用。 */
+  t("edu 的术语闸给本站正名开了口子", !!edu && /教育发生学/.test(edu.term || ""));
 
   console.log("\n── ②b 白名单下推到候选阶段（治 K 饥饿）─────────");
   /* ⭐ 线上实测过的病：白名单只在取完 top-20 之后滤，而它约占全站 1%，
