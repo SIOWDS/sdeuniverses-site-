@@ -188,6 +188,19 @@ a:focus-visible{outline:2px solid var(--cinnabar);outline-offset:3px}
 .note p:last-child{margin-bottom:0}
 .note b{color:var(--ink)}
 .note a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+.foundation-box{margin-top:26px;padding:27px;border:1px solid rgba(98,73,54,.13);border-radius:24px;
+  background:
+    radial-gradient(circle at 100% 0,rgba(169,140,203,.15),transparent 18rem),
+    radial-gradient(circle at 0 100%,rgba(111,198,165,.13),transparent 18rem),
+    linear-gradient(145deg,#FFFCF6,#F4ECDF)}
+.foundation-list{display:grid;grid-template-columns:1fr 1fr;gap:0 30px;margin-top:12px}
+.foundation-link{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:11px 4px;border-bottom:1px dotted var(--rule2)}
+.foundation-link:hover b{color:var(--cinnabar)}
+.foundation-link .n{font-family:var(--mono);font-size:10px;color:var(--ink3);padding-top:3px}
+.foundation-link b{font-size:14.5px;line-height:1.5;letter-spacing:.03em;transition:color .2s}
+.foundation-link small{display:block;font-family:var(--sans);font-size:11.5px;color:var(--ink2);margin-top:2px}
+.foundation-more{display:inline-block;margin-top:18px;padding:7px 13px;border:1px solid rgba(158,61,48,.22);border-radius:999px;color:var(--cinnabar);font-family:var(--mono);font-size:11px}
+@media(max-width:720px){.foundation-list{grid-template-columns:1fr}.foundation-box{padding:21px 17px}}
 </style>
 </head>
 <body>
@@ -202,6 +215,7 @@ a:focus-visible{outline:2px solid var(--cinnabar);outline-offset:3px}
   <nav>
     <a href="/#bots">智能体</a>
     <a href="/chatfeisuo/">ChatFeiSuo</a>
+    <a href="/foundation/">基础文库</a>
     <a href="/cowrite/">共创</a>
     <a href="/coread/">共读</a>
     <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
@@ -215,7 +229,29 @@ a:focus-visible{outline:2px solid var(--cinnabar);outline-offset:3px}
   <div class="en">斐索（秦莉）· 文学一线</div>
   <div class="dbl"></div>
 </div>
-<p class="tocnote" style="max-width:44em;text-align:left">字数是**逐页实测的汉字数**（剥掉标签后数），不是估算；分数是站内独立盲评的创新智商，没有分数的是随笔、诗与短论。她另有一条制度与法哲学的线不在本站，见<a href="/students/qin-li/works/" style="color:var(--cinnabar)">作者全部作品页</a>。</p>
+<p class="tocnote" style="max-width:44em;text-align:left">字数是<b>逐页实测的汉字数</b>（剥掉标签后数），不是估算；分数是站内独立盲评的创新智商，没有分数的是随笔、诗与短论。她另有一条制度与法哲学的线不在本站，见<a href="/students/qin-li/works/" style="color:var(--cinnabar)">作者全部作品页</a>。</p>
+
+<section id="foundation">
+  <div class="hd"><span class="no">基</span><h2>母站基础文库</h2><span class="ct">艺术 × 文学 · 12 篇</span></div>
+  <p class="lead">文学分站新增的公共地基：从母站精选十二篇艺术与文学文章，按四条阅读路径重新编排。以下为直达入口，完整策展说明见基础文库。</p>
+  <div class="foundation-box">
+    <div class="foundation-list">
+      <a class="foundation-link" href="/column/art-does-not-comfort/"><span class="n">01</span><span><b>艺术不负责让你舒服 · 它负责让你清醒</b><small>艺术为何必要</small></span></a>
+      <a class="foundation-link" href="/three-views/doc/b054/"><span class="n">02</span><span><b>三视角谈艺术（入门）</b><small>艺术家、作品与观看者</small></span></a>
+      <a class="foundation-link" href="/three-views/doc/b075/"><span class="n">03</span><span><b>美与艺术</b><small>美与艺术的边界</small></span></a>
+      <a class="foundation-link" href="/column/vangogh-sunflowers/"><span class="n">04</span><span><b>梵高的向日葵为什么让你心颤？</b><small>感动的作品个案</small></span></a>
+      <a class="foundation-link" href="/students/wang-desheng/art-practice/"><span class="n">05</span><span><b>让感动自己发生</b><small>可实践的审美教育</small></span></a>
+      <a class="foundation-link" href="/frontier/aesthetics/"><span class="n">06</span><span><b>美学：二十个当代思想入口</b><small>前沿研究地图</small></span></a>
+      <a class="foundation-link" href="/hotspot/two-channels-reading/"><span class="n">07</span><span><b>两条通道：审美式阅读为何不是一种姿态</b><small>阅读与身体</small></span></a>
+      <a class="foundation-link" href="/frontier/literary-theory/"><span class="n">08</span><span><b>文学理论：新思想与经典坐标</b><small>文学研究地图</small></span></a>
+      <a class="foundation-link" href="/art/pre-intentional/"><span class="n">09</span><span><b>守卫前意图物</b><small>艺术不可代偿的根基</small></span></a>
+      <a class="foundation-link" href="/art/verdict-thickness/"><span class="n">10</span><span><b>不在石头上：论裁决厚度及其当代贫化</b><small>制度与判断</small></span></a>
+      <a class="foundation-link" href="/art/verdict-metabolism/"><span class="n">11</span><span><b>慢判决何以被逐出日常</b><small>裁决生态的结构性萎缩</small></span></a>
+      <a class="foundation-link" href="/art/discernment-kill/"><span class="n">12</span><span><b>辨致死：为存在辩护如何杀了存在</b><small>守护、标准与自我监控</small></span></a>
+    </div>
+    <a class="foundation-more" href="/foundation/">按四条路径进入完整基础文库 →</a>
+  </div>
+</section>
 
 
 <section id="fiction">
@@ -502,6 +538,6 @@ var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
 if(h==="/"){as[i].setAttribute("href",b+"/");}
 else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatfeisuo/")===0
-  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0){as[i].setAttribute("href",b+h);}}})();
+  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0||h.indexOf("/foundation/")===0){as[i].setAttribute("href",b+h);}}})();
 </script>
 </body></html>

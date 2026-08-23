@@ -165,6 +165,32 @@ a.bot:hover{background:#fff}
 .plat b{color:var(--ink)}
 .plat a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
 
+/* 母站精选 · 艺术与文学基础文库 */
+.foundation-intro{display:grid;grid-template-columns:minmax(220px,.72fr) 1.28fr;gap:26px;margin-top:26px}
+.foundation-call{padding:28px;border-radius:24px;color:#FFF4DC;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 90% 10%,rgba(219,112,136,.22),transparent 15rem),
+    radial-gradient(circle at 5% 100%,rgba(111,198,165,.20),transparent 16rem),
+    linear-gradient(145deg,#07120F,#17251F);
+  box-shadow:0 18px 42px rgba(7,18,15,.18)}
+.foundation-call:before{content:"基";position:absolute;right:12px;top:-28px;font-family:var(--serif);
+  font-size:150px;line-height:1;color:rgba(255,244,220,.035)}
+.foundation-call .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--moon)}
+.foundation-call h3{font-size:25px;line-height:1.45;letter-spacing:.13em;margin:12px 0 10px;font-weight:500}
+.foundation-call p{font-family:var(--sans);font-size:13px;line-height:1.85;color:rgba(255,244,220,.65);margin:0 0 20px}
+.foundation-call a{display:inline-block;padding:9px 15px;border-radius:999px;color:#15231E;background:linear-gradient(135deg,#F6D995,#DDBD72);font-family:var(--sans);font-size:12px;letter-spacing:.06em}
+.foundation-paths{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.foundation-path{padding:20px 18px;border:1px solid rgba(96,71,53,.12);border-radius:20px;position:relative;overflow:hidden;background:rgba(255,255,255,.52);transition:.24s ease}
+.foundation-path:after{content:"";position:absolute;width:95px;height:95px;border-radius:50%;right:-44px;top:-48px;background:var(--glow);opacity:.15}
+.foundation-path:nth-child(1){--glow:var(--jade)}.foundation-path:nth-child(2){--glow:var(--rose)}
+.foundation-path:nth-child(3){--glow:var(--violet)}.foundation-path:nth-child(4){--glow:var(--moon)}
+.foundation-path:hover{transform:translateY(-4px);background:rgba(255,255,255,.82);box-shadow:0 12px 25px rgba(65,46,32,.08)}
+.foundation-path small{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:color-mix(in srgb,var(--glow) 70%,#52372D)}
+.foundation-path b{display:block;font-size:16px;letter-spacing:.07em;margin:7px 0 4px}
+.foundation-path span{font-family:var(--sans);font-size:11.8px;line-height:1.7;color:var(--ink2)}
+@media(max-width:820px){.foundation-intro{grid-template-columns:1fr}}
+@media(max-width:560px){.foundation-paths{grid-template-columns:1fr}.foundation-call{padding:24px 20px}}
+
 footer{border-top:3px double var(--rule);margin-top:66px;padding:26px 0 60px;
   font-size:13px;color:var(--ink2);font-family:var(--sans)}
 footer a{color:var(--cinnabar)}
@@ -331,6 +357,7 @@ section{
 section:before{content:"";position:absolute;inset:0 0 auto;height:5px;opacity:.72;
   background:linear-gradient(90deg,var(--jade),var(--moon),var(--rose),var(--violet))}
 #texts:before{background:linear-gradient(90deg,var(--rose),var(--moon),var(--jade))}
+#foundation:before{background:linear-gradient(90deg,var(--moon),var(--jade),var(--violet),var(--rose))}
 #host:before{background:linear-gradient(90deg,var(--violet),var(--rose),var(--moon))}
 #platform:before{background:linear-gradient(90deg,var(--moon),var(--jade),var(--sky))}
 .hd{position:relative;border-bottom:0;padding-bottom:13px}
@@ -435,6 +462,7 @@ footer a{color:var(--moon)}a:focus-visible{outline-color:var(--rose)}
   <a class="m" href="/">SDE 文学</a>
   <nav>
     <a href="/#bots">智能体</a>
+    <a href="/foundation/">基础文库</a>
     <a href="/#texts">文本</a>
     <a href="/dialogue/">对谈</a>
     <a href="/#host">主持人</a>
@@ -496,6 +524,25 @@ footer a{color:var(--moon)}a:focus-visible{outline-color:var(--rose)}
   </ol>
 </div>
 <p class="tocnote">「月光落在寂静的湖面，像一层薄薄的银霜。」——每一项都合格了，而没有人会因为这一句停下来。<b>让人停下来的那一下，目录上没有它的位置。</b>本站做的就是把这一栏开出来：给它条件，给它顺序，给它可以被推翻的说法。</p>
+
+<section id="foundation">
+  <div class="hd"><span class="no">新 馆</span><h2>艺术与文学基础文库</h2><span class="ct">母站精选 · 12 篇</span></div>
+  <p class="lead">从 SDE 母站三十三万余项思想记录中，先取十二篇奠基文章。不是按发布时间堆放，而是整理成四条可以真正读进去的路径。</p>
+  <div class="foundation-intro">
+    <div class="foundation-call">
+      <div class="eyebrow">FOUNDATION · CURATED FROM SDE</div>
+      <h3>先为文学<br>安放一块地基</h3>
+      <p>艺术为什么必要？感动怎样发生？阅读如何穿过身体？制度又怎样提前改变创作？</p>
+      <a href="/foundation/">进入基础文库 →</a>
+    </div>
+    <div class="foundation-paths">
+      <a class="foundation-path" href="/foundation/#paths"><small>PATH 01</small><b>艺术为何必要</b><span>从安慰与装饰之外，重新理解艺术的作用。</span></a>
+      <a class="foundation-path" href="/foundation/#paths"><small>PATH 02</small><b>感动怎样发生</b><span>从梵高到审美实践，追踪那一下真实触动。</span></a>
+      <a class="foundation-path" href="/foundation/#paths"><small>PATH 03</small><b>身体如何阅读</b><span>在理解之前，身体已经读到了什么。</span></a>
+      <a class="foundation-path" href="/foundation/#paths"><small>PATH 04</small><b>制度与创作</b><span>当标准提前抵达，判断与创作如何变薄。</span></a>
+    </div>
+  </div>
+</section>
 
 <section id="bots">
   <div class="hd"><span class="no">栏 一</span><h2>智　能　体</h2><span class="ct">3 台</span></div>
@@ -662,6 +709,7 @@ var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
 if(h==="/"){as[i].setAttribute("href",b+"/");}
 else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatfeisuo/")===0
-  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0||h.indexOf("/dialogue/")===0){as[i].setAttribute("href",b+h);}}})();
+  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0||h.indexOf("/dialogue/")===0
+  ||h.indexOf("/foundation/")===0){as[i].setAttribute("href",b+h);}}})();
 </script>
 </body></html>
