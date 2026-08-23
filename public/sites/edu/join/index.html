@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>加入队伍 · 教育发生学 · 阳涌</title>
+<meta name="description" content="教育发生学分站正在组建一支写教育的队伍。三级路径、第一件作业、评什么怎么评、怎么报名——先看清楚要求。">
+<link rel="canonical" href="https://edu.sdeuniverses.com/join/">
+<meta property="og:title" content="加入队伍 · 教育发生学">
+<meta property="og:description" content="不招听课的人，招写的人。三级路径与第一件作业。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0A0F0D">
+<style>
+:root{
+  --night:#0A0F0D; --night2:#121A17; --bone:#E9E6DC; --bone2:#8E9791;
+  --edge:rgba(233,230,220,.16);
+  --paper:#F3F1EA; --card:#FBFAF5; --ink:#1A1E1C; --ink2:#5C6560; --line:#CFCEC4;
+  --amber:#8A6220; --amber-l:#E0A458; --clay:#A8452F; --clay-l:#D2704F;
+  --teal:#4E8F86; --teal-l:#6FB3A8;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(58% 46% at 16% 0%,rgba(224,164,88,.14),transparent 70%),
+    radial-gradient(46% 42% at 92% 26%,rgba(210,112,79,.10),transparent 72%)}
+.dark .wrap{position:relative;z-index:1}
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:30;
+  background:rgba(10,15,13,.88);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px;max-width:980px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone)}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:18px;font-size:13.5px;color:var(--bone2)}
+.top nav a:hover{color:var(--amber-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+.hero{padding:66px 0 56px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--amber-l);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(29px,5.4vw,50px);line-height:1.26;
+  letter-spacing:.02em;margin:.5em 0 .4em;max-width:15em;color:#F5F2EA}
+h1 .hl{color:var(--clay-l)}
+.lede{max-width:38em;color:#B7BEB9;font-size:16.5px}
+.lede b{color:var(--bone);font-weight:600}
+.band{display:flex;flex-wrap:wrap;gap:34px;border-top:1px solid var(--edge);padding:20px 0 0;margin:40px 0 0}
+.band div{font-family:var(--mono);font-size:11.5px;color:var(--bone2);letter-spacing:.12em}
+.band b{display:block;font-size:22px;color:var(--bone);font-weight:500;margin-bottom:2px}
+.light{background:var(--paper)}
+section{padding:52px 0 8px}
+.col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
+.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--amber)}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
+p.body{font-size:15.5px;margin:14px 0}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:24px}
+.bx{border:1px solid var(--line);background:var(--card);padding:20px 20px 16px}
+.bx.yes{border-top:3px solid var(--teal)}
+.bx.no{border-top:3px solid var(--clay)}
+.bx h3{font-family:var(--serif);font-size:18px;letter-spacing:.08em;margin:0 0 12px;font-weight:600}
+.bx ul{margin:0;padding-left:1.1em}
+.bx li{font-size:14.5px;margin-bottom:9px;line-height:1.7;color:var(--ink2)}
+.bx li b{color:var(--ink);font-weight:600}
+.path{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;margin:26px 0 0;
+  border:1px solid var(--line);background:var(--card)}
+.st{padding:22px 20px 20px;border-right:1px solid var(--line)}
+.st:last-child{border-right:none}
+.st .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--clay)}
+.st h3{font-family:var(--serif);font-size:19px;letter-spacing:.08em;margin:7px 0 8px;font-weight:600}
+.st p{margin:0 0 10px;font-size:14px;color:var(--ink2);line-height:1.72}
+.st dl{margin:0;border-top:1px dashed var(--line);padding-top:10px;font-size:12.5px;font-family:var(--mono)}
+.st dt{color:var(--ink2);letter-spacing:.1em;margin-top:7px}
+.st dd{margin:2px 0 0;color:var(--ink)}
+@media(max-width:760px){.st{border-right:none;border-bottom:1px solid var(--line)}.st:last-child{border-bottom:none}}
+.task{background:var(--night);color:var(--bone);padding:28px 26px;margin-top:24px;border-left:3px solid var(--amber-l)}
+.task h3{font-family:var(--serif);font-size:19px;letter-spacing:.1em;margin:0 0 6px;font-weight:600;color:#F5F2EA}
+.task .sub{font-family:var(--mono);font-size:11.5px;color:var(--bone2);letter-spacing:.14em;margin-bottom:18px}
+.task ol{margin:0;padding-left:1.3em}
+.task li{margin-bottom:14px;font-size:15px;line-height:1.72;color:#CBD2CC}
+.task li b{color:#F5F2EA;font-weight:600;display:block;margin-bottom:2px}
+.task .foot{margin:18px 0 0;font-family:var(--mono);font-size:12px;color:var(--bone2);line-height:1.85;
+  border-top:1px solid var(--edge);padding-top:14px}
+table.g{width:100%;border-collapse:collapse;margin-top:24px;font-size:14.5px;background:var(--card)}
+table.g th,table.g td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+table.g th{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink2);font-weight:400;
+  border-bottom:1px solid var(--ink)}
+table.g td:first-child{font-family:var(--serif);font-weight:600;letter-spacing:.06em;white-space:nowrap}
+table.g td.n{font-family:var(--mono);color:var(--amber);white-space:nowrap}
+.plain{background:var(--card);border:1px solid var(--line);padding:24px 24px 20px;margin-top:24px}
+.plain p{margin:0 0 13px;font-size:14.5px;line-height:1.78}
+.plain p:last-child{margin-bottom:0}
+.plain b{color:var(--clay)}
+.cta{display:inline-block;margin:26px 0 0;background:var(--night);color:var(--bone);
+  font-family:var(--serif);font-size:16.5px;letter-spacing:.14em;padding:14px 28px;border-left:3px solid var(--amber-l)}
+.cta:hover{background:var(--night2)}
+.qa{margin-top:24px}
+.qa dt{font-family:var(--serif);font-size:16px;font-weight:600;letter-spacing:.05em;margin-top:20px}
+.qa dd{margin:6px 0 0;font-size:14.5px;color:var(--ink2);line-height:1.78}
+footer{background:var(--night);color:var(--bone2);margin-top:64px;border-top:1px solid var(--edge);
+  padding:30px 0 62px;font-size:13px}
+footer a{color:#B3BDB6;border-bottom:1px solid var(--edge)}
+footer p{margin:0 0 8px}
+a.ln{color:var(--amber);border-bottom:1px solid var(--line)}
+a:focus-visible{outline:2px solid var(--amber-l);outline-offset:3px}
+@media(max-width:640px){.hero{padding:44px 0 38px}.band{gap:22px}}
+</style>
+</head>
+<body>
+
+<div class="dark">
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">教育发生学<em>YANG YONG</em></a>
+  <nav>
+    <a href="/#host">主持人</a>
+    <a href="/#books">教材架</a>
+    <a href="/#tracks">研修</a>
+    <a href="/#kits">教研室</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<div class="hero">
+<div class="eyebrow">加入队伍 · Join the Team</div>
+<h1>我们不招来听课的人，<br><span class="hl">招来写的人。</span></h1>
+<p class="lede">这支队伍要做的事只有一件：<b>把课堂里那些说不出口的东西，做成可以被推翻的说法。</b>你不需要有博士学位，也不需要读过教育学史；你需要的是一间真的上过课的教室，和一个你至今没能说清楚的困惑。剩下的方法，我们一起补。</p>
+<div class="band">
+  <div><b>三级</b>成长路径</div>
+  <div><b>一页</b>第一件作业</div>
+  <div><b>五维</b>盲评口径</div>
+  <div><b>120</b>过闸分数线</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="light">
+<div class="wrap">
+
+<section>
+  <div class="col-h"><span class="no">壹</span><h2>这支队伍在找谁</h2></div>
+  <p class="col-d">下面两栏都请读完。第二栏比第一栏更重要——写清楚不适合谁，是对愿意来的人的尊重。</p>
+  <div class="two">
+    <div class="bx yes">
+      <h3>适　合</h3>
+      <ul>
+        <li><b>一线教师与教研员。</b>手上有课例、有作业本、有评课记录——这些是本站最缺的材料，不是最不值钱的材料。</li>
+        <li><b>被一个具体现象卡住的人。</b>比如：为什么这个孩子每次都做对，却越来越不敢猜。</li>
+        <li><b>愿意让自己的说法被推翻的人。</b>这里的稿子要自己写出「哪一种结果会证明我错了」。</li>
+        <li><b>能坐下来写长东西的人。</b>一篇成稿通常一万五到三万汉字，写完要改三遍。</li>
+      </ul>
+    </div>
+    <div class="bx no">
+      <h3>暂　不　适　合</h3>
+      <ul>
+        <li><b>想快速拿一个头衔的人。</b>这里发的是文章，不发证书。</li>
+        <li><b>想把已有的教育理论讲得更好懂的人。</b>那是好事，但不是本站在做的事——本站要生产此前不存在的判断。</li>
+        <li><b>不接受被打回的人。</b>过不了闸的稿子会拿到逐维分账，然后请你改；改不动就先不发。</li>
+        <li><b>把 AI 当代笔的人。</b>用 AI 做工具没问题，交上来的判断必须是你自己的，且经得起追问出处。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">贰</span><h2>三级路径</h2></div>
+  <p class="col-d">每一级只有一件交付物。做完这一件，才谈下一级——不设年限，做到为止。</p>
+  <div class="path">
+    <div class="st">
+      <div class="n">第 一 级</div>
+      <h3>旁听</h3>
+      <p>先读本站三篇（建议从《负值转译》《认知的禁食》《撤回的手》起），再挑一节自己上过的课，写下它在哪一项上「明明都合格」。</p>
+      <p>不要求术语，要求具体：哪一天、哪一道题、哪一个孩子、哪一句评语。</p>
+      <dl>
+        <dt>交 付</dt><dd>一页课例观察（600–1200 字）</dd>
+        <dt>看 什 么</dt><dd>观察是否具体、是否咬住一个反常</dd>
+      </dl>
+    </div>
+    <div class="st">
+      <div class="n">第 二 级</div>
+      <h3>写作</h3>
+      <p>把那个观察做成一个可以被推翻的说法：给它起个此前没有的名字，给它一个能算出来的读数，找出谁已经站在这个位置上（敌意拓宽），再写清哪种结果会推翻你。</p>
+      <p>写作过程中可以要材料、要对手名单、要方法上的陪跑。</p>
+      <dl>
+        <dt>交 付</dt><dd>一篇长论文，进独立盲评</dd>
+        <dt>看 什 么</dt><dd>五维读数与 120 闸门（见下一栏）</dd>
+      </dl>
+    </div>
+    <div class="st">
+      <div class="n">第 三 级</div>
+      <h3>主持</h3>
+      <p>过闸的作者在本站开自己的频道：认领一个题域，围绕它做出一批同题篇目——三篇何谓、三篇如何、三篇为何。</p>
+      <p>到这一级，你开始带下一批人走同一条路，你的名字挂在频道上。</p>
+      <dl>
+        <dt>交 付</dt><dd>一个频道 · 一批同题篇目</dd>
+        <dt>看 什 么</dt><dd>九篇之间是否真的互不重复</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">叁</span><h2>第一件作业</h2></div>
+  <p class="col-d">全站所有人都从这一页开始，包括主持人自己。四个问题，照着答就行。</p>
+  <div class="task">
+    <h3>一页课例观察</h3>
+    <div class="sub">600–1200 字 · 四问 · 不需要参考文献</div>
+    <ol>
+      <li><b>那节课发生了什么？</b>具体到时间、内容、人。不要写「学生反应热烈」，要写「第三排那个孩子举了两次手，第二次把手放下了」。</li>
+      <li><b>按现有的标准，它哪里都合格吗？</b>把你能想到的评价项一条条列出来，逐条给出结论。这一步越诚实，第三步越有力。</li>
+      <li><b>你凭什么仍然觉得不对？</b>那个让你不安的东西是什么。说不清也写下来——说不清正是它还没有名字的证据。</li>
+      <li><b>怎样才能证明你想多了？</b>如果出现什么情况，你就承认这节课其实很好。写不出这一条，说明第三步还没落地。</li>
+    </ol>
+    <p class="foot">写完不必润色。这一页不评文笔，只评你有没有真的看见一件别人没看见的事。</p>
+  </div>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">肆</span><h2>评什么，怎么评</h2></div>
+  <p class="col-d">本站与主站共用同一条评分通道：<b>SDE 创新智商</b>五维盲评。评的不是写得顺不顺、也不是结论对不对，而是一个此前不存在的认知物在发生意义上走得多深。</p>
+  <table class="g">
+    <thead><tr><th>维度</th><th>读的是</th><th>最常见的失分</th></tr></thead>
+    <tbody>
+      <tr><td>S 显露</td><td>这个新对象在什么条件下显出来，能不能被指认</td><td>只有名字，没有可观察的迹象</td></tr>
+      <tr><td>D 差异</td><td>它靠哪一条差异推进，换个场合还成不成立</td><td>换个说法其实是同一件事</td></tr>
+      <tr><td>E 纠缠</td><td>它和什么纠缠在一起，谁动它就跟着动</td><td>孤零零一个概念，接不上任何东西</td></tr>
+      <tr><td>I 独创</td><td>是不是真的没人站在这个位置上</td><td><b>全站最常塌的一维</b>——多数稿子输在这里：它其实早有正主</td></tr>
+      <tr><td>F 可证伪</td><td>哪一种结果会推翻它，作者自己写没写出来</td><td>只有支持它的例子，没有能杀死它的例子</td></tr>
+    </tbody>
+  </table>
+  <p class="body"><b>120 是闸门。</b>任何一维跌破它，整篇不发——不是分数低一点的问题，是这篇还不算立住。过闸的稿子按盲评分发表并署你的名；没过的会拿到一份逐维分账，写清是哪一维、被谁占了位、下一步该补什么。<a class="ln" href="https://sdeuniverses.com/column/innovation-iq-intro/">五维评估的完整解释 →</a></p>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">伍</span><h2>先把话说清楚</h2></div>
+  <div class="plain">
+    <p><b>一、不承诺发表。</b>交上来的稿子一律走同一条盲评通道，主持人也不例外。写得辛苦不构成发表理由，站内已有相近读数会直接判重复。</p>
+    <p><b>二、不承诺速度。</b>第一篇过闸通常要改三遍以上。有人两个月，有人半年，也有人始终卡在「名字起了但读数算不出来」这一步——那也是真实的结果。</p>
+    <p><b>三、署名与归属。</b>发表的文章署你自己的名字，进你自己的作品页与计分；方法、工装与评分通道属于平台。编者若在文末增补了内容，会明写它不属于原稿、不计入你的分数。</p>
+    <p>关于批次、时间安排与其他约定，由阳涌与你直接商定；本页只负责把标准写清楚。</p>
+  </div>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">陆</span><h2>怎么报名</h2></div>
+  <p class="col-d">走主站的注册入口。表格由王德生本人过目，通过后会把名字与口令发到你留的联系方式；进了名录才能交稿、留言、开专栏。</p>
+  <p class="body">填的时候有两栏最要紧：<b>「你想以什么身份加入」</b>选「学员：想投稿、想有自己的专栏」；<b>「你正在想的那个问题」</b>——把上面第一件作业的第三问写在这里，一两句就够，这一栏最管用。备注里写上「教育发生学 · 阳涌」，好让它落到这支队伍。</p>
+  <a class="cta" href="https://sdeuniverses.com/register/">去注册入口填表 →</a>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">柒</span><h2>常见问题</h2></div>
+  <dl class="qa">
+    <dt>我不是教师，能来吗？</dt>
+    <dd>能。教练、家长、教务、做教育产品的人都写得出好稿子——条件是你手上有真实的现场，而不是只有观点。</dd>
+    <dt>我没写过论文。</dt>
+    <dd>本站的文章不是学院论文的格式，也不要求综述。要求是：一个新名目、一个能算的读数、一份对手名单、一条会推翻自己的预测。第一件作业里一条都不需要。</dd>
+    <dt>可以用 AI 写吗？</dt>
+    <dd>可以用它查材料、找对手、做对照；但判断必须是你的。盲评会追问每一个关键论断的来处，编造的引文与数据一经发现，整篇退回。</dd>
+    <dt>和主站是什么关系？</dt>
+    <dd>本站是 <a class="ln" href="https://sdeuniverses.com/">SDE Universes</a> 的教育子平台，篇目与主站同源、共用同一条评分通道；你发表的文章同时出现在主站的学员专栏里。</dd>
+  </dl>
+  <p class="body"><a class="ln" href="/">← 回教育发生学首页</a></p>
+</section>
+
+</div>
+</div>
+
+<footer><div class="wrap">
+  <p>教育发生学 · 阳涌 —— <a href="https://sdeuniverses.com/">SDE Universes</a> 的教育分站。主持人作者页在 <a href="/students/yang-yong/">学员专栏 · 阳涌</a>。</p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+<script>
+(function(){var b="/sites/edu";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/join/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

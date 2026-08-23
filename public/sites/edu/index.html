@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>教育发生学 · 阳涌</title>
+<meta name="description" content="关于教育的新思想生产平台：课堂、数学与创造、评价与制度、AI 时代的学习者。阳涌主持，SDE Universes 子平台。三部专著与四十七篇长论文，创新智商 137–150。正在组建队伍。">
+<link rel="canonical" href="https://edu.sdeuniverses.com/">
+<meta property="og:title" content="教育发生学 · 阳涌">
+<meta property="og:description" content="每一项都优秀，为什么这堂课什么也没有长出来？关于教育的新思想生产平台，正在组建队伍。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0A0F0D">
+<style>
+:root{
+  --night:#0A0F0D; --night2:#121A17; --bone:#E9E6DC; --bone2:#8E9791;
+  --edge:rgba(233,230,220,.16);
+  --paper:#F3F1EA; --card:#FBFAF5; --ink:#1A1E1C; --ink2:#5C6560; --line:#CFCEC4;
+  --amber:#8A6220; --amber-l:#E0A458; --clay:#A8452F; --clay-l:#D2704F;
+  --teal:#4E8F86; --teal-l:#6FB3A8;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.75}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+
+/* ══ 深色门面 ══ */
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(56% 44% at 14% 0%,rgba(224,164,88,.14),transparent 70%),
+    radial-gradient(48% 40% at 90% 20%,rgba(210,112,79,.10),transparent 72%),
+    radial-gradient(72% 52% at 50% 100%,rgba(111,179,168,.08),transparent 70%)}
+.dark::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.42;
+  background-image:linear-gradient(rgba(233,230,220,.05) 1px,transparent 1px);
+  background-size:100% 30px}
+.dark .wrap{position:relative;z-index:1}
+
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:30;
+  background:rgba(10,15,13,.88);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone)}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:18px;font-size:13.5px;color:var(--bone2)}
+.top nav a:hover{color:var(--amber-l)}
+.top nav a.j{color:var(--amber-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:76px 0 64px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--amber-l);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(31px,6vw,58px);line-height:1.24;
+  letter-spacing:.02em;margin:.52em 0 .4em;max-width:15em;color:#F5F2EA}
+h1 .hl{color:var(--clay-l)}
+.lede{max-width:37em;color:#B7BEB9;font-size:16.5px}
+.lede b{color:var(--bone);font-weight:600}
+
+/* 签名件：听课评价表 */
+.proof{margin:42px 0 0;background:var(--night2);border:1px solid var(--edge);
+  max-width:760px;position:relative}
+.proof .cap{display:flex;justify-content:space-between;align-items:baseline;
+  padding:13px 20px;border-bottom:1px solid rgba(233,230,220,.3);
+  font-family:var(--serif);letter-spacing:.22em;font-size:14.5px}
+.proof .cap span{font-family:var(--mono);font-size:11px;color:var(--bone2);letter-spacing:.08em}
+.sent{padding:24px 20px 20px;border-bottom:1px solid var(--edge)}
+.sent q{font-family:var(--serif);font-size:clamp(18px,3.4vw,25px);letter-spacing:.05em;
+  quotes:"「" "」";color:#F5F2EA;line-height:1.6}
+.sent .mk{display:block;margin-top:10px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.16em;color:var(--bone2)}
+table.chk{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px}
+table.chk th{text-align:left;font-weight:400;color:var(--bone2);font-size:10.5px;letter-spacing:.16em;
+  padding:9px 20px;border-bottom:1px solid var(--edge)}
+table.chk td{padding:9px 20px;border-bottom:1px solid rgba(233,230,220,.07);white-space:nowrap;color:#C6CCC7}
+table.chk td:first-child{font-family:var(--sans);font-size:13.5px;white-space:normal;color:var(--bone)}
+table.chk td.j{color:var(--teal-l)}
+table.chk td.j::before{content:"✓ ";font-size:11px}
+table.chk tr.miss td{border-bottom:none;color:var(--clay-l);padding-top:18px;padding-bottom:20px}
+table.chk tr.miss td:first-child{font-family:var(--serif);font-size:17px;letter-spacing:.16em;color:var(--clay-l)}
+.stamp{display:inline-block;border:1.5px solid var(--clay-l);color:var(--clay-l);
+  padding:3px 10px;font-size:11.5px;letter-spacing:.2em;transform:rotate(-4deg);
+  animation:drop .45s cubic-bezier(.2,1.5,.4,1) .95s both}
+@keyframes drop{from{opacity:0;transform:rotate(-16deg) scale(1.7)}to{opacity:1;transform:rotate(-4deg) scale(1)}}
+.proof tbody tr{opacity:0;animation:rise .5s ease forwards}
+@keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.pnote{margin:16px 2px 0;max-width:45em;font-size:13px;color:var(--bone2);font-family:var(--mono);line-height:1.85}
+.pnote b{color:var(--bone)}
+@media (prefers-reduced-motion:reduce){.proof tbody tr{opacity:1;animation:none}.stamp{animation:none}}
+
+/* 三入口 */
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:16px;margin:52px 0 0}
+.gate{display:block;padding:20px 20px 18px;border:1px solid var(--edge);
+  background:rgba(255,255,255,.028);border-left-width:3px;border-left-style:solid}
+.gate.g1{border-left-color:var(--amber-l)}
+.gate.g2{border-left-color:var(--clay-l)}
+.gate.g3{border-left-color:var(--teal-l)}
+a.gate:hover{background:rgba(255,255,255,.06)}
+.gate b{display:block;font-family:var(--serif);font-size:17.5px;letter-spacing:.1em;font-weight:600;color:#F5F2EA}
+.gate span{display:block;font-size:12.5px;color:var(--bone2);margin-top:6px;line-height:1.65}
+.gate .soon{display:inline-block;margin-top:11px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.2em;color:var(--bone2);border:1px solid var(--edge);padding:1px 7px}
+.gate.wait{opacity:.72}
+
+.band{display:flex;flex-wrap:wrap;gap:36px;border-top:1px solid var(--edge);
+  padding:20px 0 0;margin:48px 0 0}
+.band div{font-family:var(--mono);font-size:11.5px;color:var(--bone2);letter-spacing:.12em}
+.band b{display:block;font-size:25px;color:var(--bone);font-weight:500;font-variant-numeric:tabular-nums;margin-bottom:2px}
+
+/* ══ 纸色阅读面 ══ */
+.light{background:var(--paper);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px);
+  background-size:100% 30px;background-position:0 -1px}
+.light>.wrap{background:linear-gradient(var(--paper),var(--paper));box-shadow:0 0 0 22px var(--paper)}
+section{padding:56px 0 8px}
+.col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
+.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--amber)}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
+
+/* 主持人 */
+.host{display:grid;grid-template-columns:184px 1fr;gap:28px;align-items:start;margin-top:26px}
+.host img{width:100%;border:1px solid var(--line);display:block;filter:saturate(.92)}
+.host .hb p{margin:0 0 13px;font-size:15px}
+.host .hb p:last-child{margin-bottom:0}
+.host .hb .nm{font-family:var(--serif);font-size:23px;letter-spacing:.1em;font-weight:600;margin:0 0 4px}
+.host .hb .nm em{font-style:normal;font-size:12.5px;color:var(--ink2);letter-spacing:.16em;margin-left:10px}
+.host a{color:var(--amber);border-bottom:1px solid var(--line)}
+@media(max-width:640px){.host{grid-template-columns:1fr}.host img{max-width:200px}}
+
+/* 篇目行 */
+.row{display:flex;gap:14px;align-items:baseline;padding:11px 4px;border-bottom:1px dashed var(--line)}
+.row:hover{background:var(--card)}
+.row:hover .r-t{color:var(--amber)}
+.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:2.4em;
+  font-variant-numeric:tabular-nums;flex:none}
+.r-t{font-size:15px;line-height:1.6}
+.r-h{font-family:var(--serif);font-weight:600;letter-spacing:.06em;margin-right:.55em}
+.r-h::after{content:"·";margin-left:.55em;color:var(--line);font-weight:400}
+.iq{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+  font-variant-numeric:tabular-nums}
+.more{display:inline-block;margin:16px 0 0;font-size:13.5px;color:var(--amber);
+  border-bottom:1px solid var(--line);padding-bottom:1px}
+
+/* 教材架 */
+.books{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px;margin-top:26px}
+.bk{border:1px solid var(--line);background:var(--card);padding:18px 18px 16px}
+.bk img{width:100%;max-width:150px;display:block;border:1px solid var(--line);margin-bottom:14px}
+.bk .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--amber)}
+.bk h3{font-family:var(--serif);font-size:21px;letter-spacing:.09em;margin:7px 0 4px;font-weight:600}
+.bk .sub{font-size:13.5px;color:var(--ink2);margin-bottom:9px}
+.bk p{margin:0 0 12px;font-size:14px;line-height:1.72}
+.bk .lk{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;font-family:var(--mono)}
+.bk .lk a{color:var(--amber);border-bottom:1px solid var(--line)}
+
+/* 教研卡 */
+.kits{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin:24px 0 0}
+.kit{border:1px solid var(--line);background:var(--card);padding:18px 18px 16px;border-top:3px solid var(--teal)}
+.kit .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--teal)}
+.kit h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:7px 0 6px;font-weight:600}
+.kit p{margin:0 0 11px;font-size:13.5px;color:var(--ink2);line-height:1.7}
+.kit a{font-size:12.5px;font-family:var(--mono);color:var(--amber);border-bottom:1px solid var(--line)}
+
+/* 队伍路径 */
+.path{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0;margin:26px 0 0;
+  border:1px solid var(--line);background:var(--card)}
+.st{padding:20px 20px 18px;border-right:1px solid var(--line)}
+.st:last-child{border-right:none}
+.st .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--clay)}
+.st h3{font-family:var(--serif);font-size:18px;letter-spacing:.08em;margin:7px 0 7px;font-weight:600}
+.st p{margin:0 0 9px;font-size:13.5px;color:var(--ink2);line-height:1.72}
+.st .req{font-family:var(--mono);font-size:11.5px;color:var(--ink);border-top:1px dashed var(--line);padding-top:9px;margin:0}
+@media(max-width:700px){.st{border-right:none;border-bottom:1px solid var(--line)}.st:last-child{border-bottom:none}}
+.cta{display:inline-block;margin:24px 0 0;background:var(--night);color:var(--bone);
+  font-family:var(--serif);font-size:16px;letter-spacing:.14em;padding:13px 26px;
+  border-left:3px solid var(--amber-l)}
+.cta:hover{background:var(--night2)}
+
+.plat{background:var(--card);border:1px solid var(--line);padding:28px 26px;margin-top:24px}
+.plat p{margin:0 0 14px;font-size:15px}
+.plat p:last-child{margin-bottom:0}
+.plat a{color:var(--amber);border-bottom:1px solid var(--line)}
+.tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin:24px 0 0}
+.tk{border:1px solid var(--line);background:var(--card);padding:18px 18px 16px}
+.tk .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--amber)}
+.tk h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:7px 0 6px;font-weight:600}
+.tk p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.7}
+
+footer{background:var(--night);color:var(--bone2);margin-top:64px;
+  border-top:1px solid var(--edge);padding:30px 0 62px;font-size:13px}
+footer a{color:#B3BDB6;border-bottom:1px solid var(--edge)}
+footer p{margin:0 0 8px}
+a:focus-visible{outline:2px solid var(--amber-l);outline-offset:3px}
+@media(max-width:640px){
+  .hero{padding:46px 0 40px}
+  table.chk td,table.chk th{padding-left:13px;padding-right:13px}
+  table.chk td.ref,table.chk th.ref{display:none}
+  .band{gap:24px}
+  .iq{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="dark">
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">教育发生学<em>YANG YONG</em></a>
+  <nav>
+    <a href="/#host">主持人</a>
+    <a href="/#books">教材架</a>
+    <a href="/#tracks">研修</a>
+    <a href="/#kits">教研室</a>
+    <a class="j" href="/join/">加入队伍</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<div class="hero">
+<div class="eyebrow">教育 · 新思想生产平台 · Education Genesis</div>
+<h1>每一项都优秀，<br><span class="hl">为什么这堂课什么也没有长出来？</span></h1>
+<p class="lede">这里生产关于教育的新思想。<b>课堂</b>的失败不长在差的那一节课上，<b>评价</b>不是把尺子做得更准，<b>教</b>也不是把正确答案递得更快——三者共同压着的那个问题是：判定一堂课有没有真的发生过什么的那个东西，从来不在任何一张评价表上。</p>
+
+<div class="proof">
+  <div class="cap">听　课　评　价　表<span>逐项评定 · 结果如下</span></div>
+  <div class="sent"><q>这节课上得真好——目标清楚，环节紧凑，孩子们都会做了。</q>
+    <span class="mk">送评课例 · 评委平均 96.5 分 · 无扣分项</span></div>
+  <table class="chk">
+    <thead><tr><th>评定项</th><th>结果</th><th class="ref">依据</th><th>判读</th></tr></thead>
+    <tbody>
+      <tr style="animation-delay:0ms"><td>教学目标达成</td><td>全部达成</td><td class="ref">课标对照</td><td class="j">优秀</td></tr>
+      <tr style="animation-delay:110ms"><td>当堂检测正确率</td><td>96%</td><td class="ref">抽样 25 人</td><td class="j">优秀</td></tr>
+      <tr style="animation-delay:220ms"><td>师生互动</td><td>41 次</td><td class="ref">课堂录像</td><td class="j">优秀</td></tr>
+      <tr style="animation-delay:330ms"><td>学生参与面</td><td>全员参与</td><td class="ref">观察量表</td><td class="j">优秀</td></tr>
+      <tr style="animation-delay:440ms"><td>板书与课件</td><td>规范清晰</td><td class="ref">评课细则</td><td class="j">优秀</td></tr>
+      <tr class="miss" style="animation-delay:820ms"><td>下课时还剩几条没走的路</td><td>（无此项）</td><td class="ref">—</td><td><span class="stamp">本栏未开</span></td></tr>
+    </tbody>
+  </table>
+</div>
+<p class="pnote">每一项都优秀，而铃响之后没有一个孩子带走一个还没有解决的问题——<b>判定这堂课白上了的那个东西，评价表上没有它的位置。</b><br>本站要做的，就是把这一栏开出来：给它名目，给它读数，给它可以被推翻的说法；再把这件事教会一支队伍。</p>
+
+<div class="three">
+  <a class="gate g1" href="/#tracks"><b>研修四线</b><span>课堂 · 数学与创造 · 评价与制度 · AI 时代的学习者，四十七篇长论文按线编排</span></a>
+  <a class="gate g2" href="/join/"><b>加入队伍</b><span>本站正在组建一支写教育的队伍。三级路径、第一件作业、评什么怎么评，全在这里说清楚</span></a>
+  <div class="gate g3 wait"><b>ChatYang</b><span>教育发生对话智能体。把一节课、一道题、一份评语交给它，顺着阳涌的路子往下追</span><span class="soon">筹备中</span></div>
+</div>
+
+<div class="band">
+  <div><b>47</b>教育长论文</div>
+  <div><b>3</b>部专著</div>
+  <div><b>95</b>万汉字</div>
+  <div><b>137–150</b>创新智商区间</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="light">
+<div class="wrap">
+
+<section id="host">
+  <div class="col-h"><span class="no">主 持 人</span><h2>阳涌与教育</h2></div>
+  <div class="host">
+    <img src="/students/yang-yong/yang-yong.jpg" alt="阳涌" loading="lazy">
+    <div class="hb">
+      <p class="nm">阳涌<em>YANG YONG</em></p>
+      <p>英语语言文学硕士，十六年一线教学与课程改革经验，长期做语言、数学、思维与 AI 教育的融合。自 2019 年起跟随王德生博士研修 SDE 发生学。已发表作品八十三件（按一部专著抵十篇计），其中教育方向四十七篇长论文、专著三部。</p>
+      <p>他的教育写作从一个很难说出口的观察起步：课堂真正的失败形态，恰好长得像成功——九种失败没有一种是明显的坏课堂，它们全都在被评价的维度上合格，多数还优于对照。由此长出四条线：课堂里那个被删掉的生成瞬间、数学创造为何在守护中枯竭、评价制度如何把「不对路」铸成「不够格」、以及 AI 时代学习者的能力在什么条件下被悄然废弛。</p>
+      <p><a href="/students/yang-yong/">作者主页与全部作品 →</a></p>
+    </div>
+  </div>
+</section>
+
+<section id="books">
+  <div class="col-h"><span class="no">栏 一</span><h2>教材架</h2><span class="ct">3 部</span></div>
+  <p class="col-d">三部专著，两部在课堂里，一部在课堂之外——但用的是同一把刀：先找到那种长得像成功的失败。</p>
+  <div class="books">
+    <article class="bk">
+      <img src="/books/m/57/cover.jpg" alt="课堂的智慧 封面" loading="lazy">
+      <div class="no">专著第 57 号 · 本站主件</div>
+      <h3>课堂的智慧</h3>
+      <div class="sub">课堂内生对象、运行条件与失效动力的可证伪理论纲领</div>
+      <p>九章各找到一种最难被识别的课堂失败形态。九格没有一个是明显的坏课堂——它们全都在被评价的维度上合格，多数还优于对照。</p>
+      <div class="lk"><a href="/students/yang-yong/classroom-wisdom/">导读</a><a href="/books/m/57/">书页</a><a href="/books/m/57/text/">分章读</a><a href="/books/m/57/read">翻页读</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/59/cover.jpg" alt="答案之后 封面" loading="lazy">
+      <div class="no">专著第 59 号</div>
+      <h3>答案之后</h3>
+      <div class="sub">数学学习的智慧</div>
+      <p>两个孩子都做对了：哪一份正确里面还留着能继续生长的东西，哪一份已经把所有没走的路封死？九章从二十七门学问进入数学课堂，每章到一张明天就能用的卡结束。</p>
+      <div class="lk"><a href="/students/yang-yong/answer-after/">导读</a><a href="/books/m/59/">书页</a><a href="/books/m/59/read">翻页读</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/67/cover.jpg" alt="战争的资格 封面" loading="lazy">
+      <div class="no">专著第 67 号</div>
+      <h3>战争的资格</h3>
+      <div class="sub">冲突何时成为战争：九种被换手的资格</div>
+      <p>伤亡在下降，协议在执行，纪念仪式比往年更隆重——这可能正是某项资格已经换了持有人的样子。同一套方法离开课堂之后的一次远征。</p>
+      <div class="lk"><a href="/students/yang-yong/standing-of-war/">导读</a><a href="/books/m/67/">书页</a><a href="/students/yang-yong/conflict-peace/">九章原发频道</a></div>
+    </article>
+  </div>
+</section>
+
+<div id="tracks"></div>
+
+<section>
+  <div class="col-h"><span class="no">研 修 · 线 一</span><h2>课　堂</h2><span class="ct">4 篇</span></div>
+  <p class="col-d">课不是上坏的，是上"好"的：越是把环节做满、把反馈给足，学生自己那一段就越没有地方发生。</p>
+  <a class="row" href="/students/yang-yong/negative-transcoding/"><span class="r-n">1</span><span class="r-t"><b class="r-h">负值转译</b>标准化评价如何把一个「好」结算成「错」</span><span class="iq">142</span></a>
+  <a class="row" href="/students/yang-yong/self-alarm-of-derailment/"><span class="r-n">2</span><span class="r-t"><b class="r-h">认知脱轨的自我预警</b>课程改革为何真诚地完成它的反向</span><span class="iq">141</span></a>
+  <a class="row" href="/students/yang-yong/cognitive-fasting/"><span class="r-n">3</span><span class="r-t"><b class="r-h">认知的禁食</b>AI 时代课程功能的重释——什么时候该不喂</span><span class="iq">140</span></a>
+  <a class="row" href="/students/yang-yong/cognitive-process-substitution/"><span class="r-n">4</span><span class="r-t"><b class="r-h">认知过程代偿</b>当评价替学生完成了学习，课堂意义的供血就断了</span><span class="iq">137</span></a>
+  <a class="more" href="/students/yang-yong/works/">全部作品总目 →</a>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">研 修 · 线 二</span><h2>数学与创造</h2><span class="ct">8 篇</span></div>
+  <p class="col-d">数学课上最先被牺牲的，正是创造之根基的那一点必要的不确定性。守护越周到，认领的那一刻越不发生。</p>
+  <a class="row" href="/students/yang-yong/paper-p40-d01-a01/"><span class="r-n">1</span><span class="r-t"><b class="r-h">被删掉的那个瞬间</b>数学学习中「不可教」的部分及其生态条件</span></a>
+  <a class="row" href="/students/yang-yong/paper-p40-d01-a02/"><span class="r-n">2</span><span class="r-t"><b class="r-h">认领困境</b>于认知荒原立法：数学创造的发生学奠基</span></a>
+  <a class="row" href="/students/yang-yong/paper-p40-d01-a03/"><span class="r-n">3</span><span class="r-t"><b class="r-h">撤回的手</b>教学中的「守护」如何悖论性地生产创造性匮乏</span></a>
+  <a class="row" href="/students/yang-yong/paper-p40-d01-a04/"><span class="r-n">4</span><span class="r-t"><b class="r-h">否定链</b>数学课堂中一种自我否定程序的发生与巩固</span></a>
+  <a class="row" href="/students/yang-yong/paper-p27-d01-a01/"><span class="r-n">5</span><span class="r-t"><b class="r-h">认知活体</b>跨域创造力的发生学重构</span></a>
+  <a class="row" href="/students/yang-yong/paper-p27-d01-a02/"><span class="r-n">6</span><span class="r-t"><b class="r-h">判断性撑开</b>被日程占满之后，那个赌一把的动作从何而来</span></a>
+  <a class="row" href="/students/yang-yong/paper-p27-d01-a04/"><span class="r-n">7</span><span class="r-t"><b class="r-h">童心的淤泥</b>创造力发生的一种根基性描述</span></a>
+  <a class="row" href="/students/yang-yong/uncomfortable-bone/"><span class="r-n">8</span><span class="r-t"><b class="r-h">不适的骨头</b>跨学科创造为何发生于旧结构的排异反应之中</span></a>
+  <a class="more" href="/books/m/59/">配套专著《答案之后》 →</a>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">研 修 · 线 三</span><h2>评价与制度</h2><span class="ct">5 篇</span></div>
+  <p class="col-d">一所学校可以什么都没做错，而把一个孩子判成不够格。这一栏追的是评价动作本身生产了什么。</p>
+  <a class="row" href="/students/yang-yong/paper-p38-d01-a04/"><span class="r-n">1</span><span class="r-t"><b class="r-h">监护的证明焦虑</b>现代教育何以被考试锁死</span></a>
+  <a class="row" href="/students/yang-yong/paper-p38-d01-a03/"><span class="r-n">2</span><span class="r-t"><b class="r-h">合法性的牢笼</b>学校认证如何将不可见的学习逐出课堂</span></a>
+  <a class="row" href="/students/yang-yong/paper-p38-d01-a02/"><span class="r-n">3</span><span class="r-t"><b class="r-h">认知偏馈</b>现代学校如何把「不对路」铸成「不够格」</span></a>
+  <a class="row" href="/students/yang-yong/paper-p38-d01-a01/"><span class="r-n">4</span><span class="r-t"><b class="r-h">策展评估</b>从「谁更合适」到「什么是这一个」的范式转换</span></a>
+  <a class="row" href="/students/yang-yong/paper-p45-d01-a02/"><span class="r-n">5</span><span class="r-t"><b class="r-h">被期望的内殖</b>教育中天资话语的机制与后果</span></a>
+  <a class="more" href="/books/m/57/text/">配套专著《课堂的智慧》分章读 →</a>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">研 修 · 线 四</span><h2>AI 时代的学习者</h2><span class="ct">6 篇</span></div>
+  <p class="col-d">当一个更完美的他者随时接管，学习者身上真正退掉的是哪一样能力——本站分数最高的两篇在这一线上。</p>
+  <a class="row" href="/students/yang-yong/coupling-reversibility/"><span class="r-n">1</span><span class="r-t"><b class="r-h">耦合可逆性极化</b>当产出趋同时，分化才刚刚开始</span><span class="iq">150</span></a>
+  <a class="row" href="/students/yang-yong/bearerless-success/"><span class="r-n">2</span><span class="r-t"><b class="r-h">一次成功由谁承载？</b>AI 时代两极分化的能力归宿结构</span><span class="iq">147</span></a>
+  <a class="row" href="/students/yang-yong/revoked-compulsion/"><span class="r-n">3</span><span class="r-t"><b class="r-h">强制的撤销</b>学术知识生产中的认知社会化危机</span></a>
+  <a class="row" href="/students/yang-yong/paper-p28-d01-a04/"><span class="r-n">4</span><span class="r-t"><b class="r-h">元气的泄尽</b>主体能力退化的发生学重写</span></a>
+  <a class="row" href="/students/yang-yong/value-closure/"><span class="r-n">5</span><span class="r-t"><b class="r-h">价值闭合</b>「无法启动的意义」的一个先验批判</span></a>
+  <a class="row" href="/students/yang-yong/argumentative-disenfranchisement/"><span class="r-n">6</span><span class="r-t"><b class="r-h">论证非平权</b>科学论证的三重契约如何被深度学习折叠</span></a>
+  <a class="more" href="/students/yang-yong/works/">全部作品总目 →</a>
+</section>
+
+<section id="kits">
+  <div class="col-h"><span class="no">栏 二</span><h2>教研室</h2></div>
+  <p class="col-d">明天就能用的那一层。理论要是不能变成周一早上的一个具体动作，它在这里不算完成。</p>
+  <div class="kits">
+    <div class="kit">
+      <div class="n">操 作 卡</div>
+      <h3>九张明天就能用的卡</h3>
+      <p>《答案之后》每一章结束于一张卡：一道题批完之后，怎么看出哪一份正确里还留着能生长的东西。</p>
+      <a href="/books/m/59/read">翻开看 →</a>
+    </div>
+    <div class="kit">
+      <div class="n">九 种 形 态</div>
+      <h3>课堂失败的九种长相</h3>
+      <p>九种最难被识别的课堂失败，每一种都配一组可观察的迹象与一条会推翻它的反例。备课与评课都能直接对表。</p>
+      <a href="/books/m/57/text/">分章读 →</a>
+    </div>
+    <div class="kit">
+      <div class="n">方 法</div>
+      <h3>一篇文章是怎么生产的</h3>
+      <p>二阶碰撞四步：找共有前提、找能推翻它的材料、跑一次真检验、再交给盲评。通俗版讲解在主站。</p>
+      <a href="https://sdeuniverses.com/confluence/confluence-method/">通融创新法 →</a>
+    </div>
+    <div class="kit">
+      <div class="n">评 分</div>
+      <h3>创新智商是什么</h3>
+      <p>五维盲评（S 显露 · D 差异 · E 纠缠 · I 独创 · F 可证伪），120 是闸门。本站在线篇目的区间是 137–150。</p>
+      <a href="https://sdeuniverses.com/about/">平台与评分说明 →</a>
+    </div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="col-h"><span class="no">栏 三</span><h2>加入队伍</h2></div>
+  <p class="col-d">本站正在组建一支写教育的队伍——不是招学生来听课，是招人来生产此前不存在的教育判断。三级路径，每一级都有一件明确的交付物。</p>
+  <div class="path">
+    <div class="st">
+      <div class="n">第 一 级</div>
+      <h3>旁听</h3>
+      <p>先读三篇，再挑一节自己上过的课，写下它在哪一项上「明明都合格」。不要求术语，要求具体。</p>
+      <p class="req">交付：一页课例观察</p>
+    </div>
+    <div class="st">
+      <div class="n">第 二 级</div>
+      <h3>写作</h3>
+      <p>把那个观察做成一个可以被推翻的说法：给它起名、给它一个能算出来的读数、找出谁已经站在这个位置上。</p>
+      <p class="req">交付：一篇长论文 · 进盲评</p>
+    </div>
+    <div class="st">
+      <div class="n">第 三 级</div>
+      <h3>主持</h3>
+      <p>过闸的作者进入自己的频道：一个题域、一批同题的篇目，并开始带下一批人走同一条路。</p>
+      <p class="req">交付：一个频道 · 一批人</p>
+    </div>
+  </div>
+  <a class="cta" href="/join/">看清楚要求，然后加入 →</a>
+</section>
+
+<section id="platform">
+  <div class="col-h"><span class="no">栏 四</span><h2>这是一个平台，不是一个培训班</h2></div>
+  <div class="plat">
+    <p>教育发生学是 <a href="https://sdeuniverses.com/">SDE Universes</a> 的<b>垂直思想创新子平台</b>。它与主站共用同一套生产方法与同一条评分通道：一个判断要在这里立住，得先经过敌意拓宽（谁已经站在这个位置上）、可裁决预测（哪一种结果会推翻它）、以及独立盲评。</p>
+    <p>它做的不是把教育学已有的结论讲得更好懂，而是<b>生产此前不存在的教育判断</b>——给一个还没有名目的东西起名，给它一个可以被算出来的读数，再把它交给能推翻它的证据。同一套方法离开课堂之后能走多远，见「冲突与和平」九篇：<a href="/students/yang-yong/conflict-peace/">同一把刀，另一个题域</a>。</p>
+  </div>
+  <div class="tracks">
+    <div class="tk"><div class="n">线 一</div><h3>课堂</h3><p>把「这节课其实什么也没长出来」变成可陈述、可观察、可推翻的命题。</p></div>
+    <div class="tk"><div class="n">线 二</div><h3>数学与创造</h3><p>创造不是天赋，是一次认领。追问它在哪一步被守护掉的。</p></div>
+    <div class="tk"><div class="n">线 三</div><h3>评价与制度</h3><p>每一次评定都在取走一点什么，先把它算清楚，再谈公平。</p></div>
+    <div class="tk"><div class="n">线 四</div><h3>AI 时代的学习者</h3><p>更完美的他者随时接管之后，学习者身上真正在退的是哪一样。</p></div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<footer><div class="wrap">
+  <p>教育发生学 · 阳涌 —— <a href="https://sdeuniverses.com/">SDE Universes</a> 的教育分站。全部篇目与主站同源，作者主页在 <a href="/students/yang-yong/">学员专栏 · 阳涌</a>；加入队伍见 <a href="/join/">招募页</a>。</p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+<script>
+/* 分站页面的自家链接写的是分站根（/、/join/、/#栏）。在二级域名下这就是对的；
+   若从主站以 /sites/edu/… 预览，则就地补上前缀，两处都能正常点。 */
+(function(){var b="/sites/edu";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/join/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>
