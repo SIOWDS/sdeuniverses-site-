@@ -40,7 +40,7 @@ console.log("── ① 档案表与解析器 ───────────�
   t("抠得出 EDU_PRE 段", eduSeg.length > 40);
   const EDU_PRE = new Function(eduSeg + "\nreturn EDU_PRE;")();
   const yangSys = "「阳涌」的人格底本占位";
-  /* 2026-08-23 第四个档案 health（ChatHuMin）。同样现读，不手抄。
+  /* 2026-08-23 第四个档案 health（ChatHM）。同样现读，不手抄。
      ⚠ 每多一个分身就多一对（人格常量＋白名单常量）要注入；漏注入不会静默，
        是当场 ReferenceError——这正是要的：宁可炸，不要验了个残缺的表。 */
   const healthSeg = W.slice(W.indexOf("const HEALTH_PRE = ["), W.indexOf("];", W.indexOf("const HEALTH_PRE = [")) + 2);
@@ -197,7 +197,7 @@ console.log("── ① 档案表与解析器 ───────────�
 
   console.log("\n── ②e 第三、四个档案与共创钩子（2026-08-23）─────");
   const hea = S.wdsProfileOf("health");
-  t("认得 health", !!hea && hea.id === "health" && hea.name === "ChatHuMin");
+  t("认得 health", !!hea && hea.id === "health" && hea.name === "ChatHM");
   t("health 挂了自己的内功档", !!hea && hea.neigong === "/taste/assets/health-neigong.txt");
   t("health 的白名单是胡敏那一线", !!hea && S.wdsProfInScope(hea, "/students/hu-min/lodging-in-class/")
     && S.wdsProfInScope(hea, "/books/m/61/") && !S.wdsProfInScope(hea, "/students/qin-li/line-of-separation/"));
@@ -223,9 +223,19 @@ console.log("── ① 档案表与解析器 ───────────�
     const cw = fs3.readFileSync("public/sites/liter/cowrite/index.html", "utf8");
     t("共创壳页递了三行接线", /WDSM_PAGE/.test(cw) && /WDSM_PROFILE = "liter"/.test(cw) && /WDSM_OPEN = "canvas"/.test(cw));
     t("共创壳页不自带第二套实现（还是那一台引擎）", cw.length < 4000 && /wds-mode\.js/.test(cw));
-    const hp = fs3.readFileSync("public/sites/health/chathumin/index.html", "utf8");
-    t("ChatHuMin 壳页挂 health 档", /WDSM_PROFILE = "health"/.test(hp));
-    t("health 分站首页有入口（不再是孤儿）", /\/chathumin\//.test(fs3.readFileSync("public/sites/health/index.html", "utf8")));
+    const hp = fs3.readFileSync("public/sites/health/chathm/index.html", "utf8");
+    t("ChatHM 壳页挂 health 档", /WDSM_PROFILE = "health"/.test(hp));
+    t("health 分站首页有入口（不再是孤儿）", /\/chathm\//.test(fs3.readFileSync("public/sites/health/index.html", "utf8")));
+    /* 改名（ChatHuMin → ChatHM，2026-08-23，用户令）之后，旧址必须留一张跳转页：
+       它只活了十几分钟，但入口卡、作者页、分站 nav 三处都指过它——
+       改名时漏掉任一处，症状是读者点进一个 404，而没有人会收到报错。 */
+    t("旧址 /chathumin/ 留了跳转页", fs3.existsSync("public/sites/health/chathumin/index.html"));
+    t("跳转页 noindex 且指向新址",
+      /noindex/.test(fs3.readFileSync("public/sites/health/chathumin/index.html", "utf8"))
+      && /\/chathm\//.test(fs3.readFileSync("public/sites/health/chathumin/index.html", "utf8")));
+    t("⭐ 全站不再有指向旧址的活链接",
+      !/href="[^"]*\/chathumin\//.test(fs3.readFileSync("public/sites/health/index.html", "utf8"))
+      && !/chathumin/.test(fs3.readFileSync("public/students/hu-min/index.html", "utf8")));
     t("胡敏作者页挂了 health 分站入口", /health\.sdeuniverses\.com/.test(fs3.readFileSync("public/students/hu-min/index.html", "utf8")));
     t("liter 首页挂了对谈栏", /\/dialogue\//.test(fs3.readFileSync("public/sites/liter/index.html", "utf8")));
   }

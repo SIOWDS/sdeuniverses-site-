@@ -327,12 +327,12 @@
         }
       }
     },
-    /* ── 第三个分身：health（ChatHuMin，2026-08-23）── */
+    /* ── 第三个分身：health（ChatHM，2026-08-23）── */
     health: {
       id: "health",
-      brand: "ChatHuMin",
-      url: "/chathumin/",
-      sig: "ChatHuMin \u00b7 health.sdeuniverses.com",
+      brand: "ChatHM",
+      url: "/chathm/",
+      sig: "ChatHM \u00b7 health.sdeuniverses.com",
       who: "胡敏",
       kicker: "HEALTH.SDEUNIVERSES.COM",
       home: "/",
@@ -345,12 +345,12 @@
       ],
       hero: {
         zh: {
-          title: "ChatHuMin",
+          title: "ChatHM",
           sub: "健康发生学 · 胡敏。指标、症状、照料与医疗制度——从你手上那一张单子、那一次复诊开始。",
           foot: "它不是医生，不做诊断、不改药。急症与危险征象请直接就医或打急救电话。用你自己的大模型 Key 运行。"
         },
         en: {
-          title: "ChatHuMin",
+          title: "ChatHM",
           sub: "Health genesis, with Hu Min. Numbers, symptoms, caregiving and the medical system — starting from one real report you have in hand.",
           foot: "Not a doctor: no diagnosis, no prescription changes. Seek care directly for emergencies. Runs on your own model key."
         }
@@ -358,7 +358,7 @@
       copy: {
         zh: {
           ph: "说一件具体的事——一张化验单、一次复诊、家里谁的情况…",
-          note: "ChatHuMin 只答健康、疾病、照料与医疗制度，答案扣着健康分站的原文。**它不是医生：不做诊断、不改药、不定剂量**；急症征象请直接就医或打急救电话。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写入数据库、不写进日志。",
+          note: "ChatHM 只答健康、疾病、照料与医疗制度，答案扣着健康分站的原文。**它不是医生：不做诊断、不改药、不定剂量**；急症征象请直接就医或打急救电话。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写入数据库、不写进日志。",
           tlBtn: "⊞ 健康工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
           tipDeep: "满血基底＋满功率思考＋整套工序，慢但深",
           srcSite: "健康分站文献"

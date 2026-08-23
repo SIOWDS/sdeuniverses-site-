@@ -915,7 +915,7 @@ const WDS_PROFILES = {
      人格提示语与内功里各钉了一遍「你不是医生」与急症/自伤的处置，两处都不许删。 */
   health: {
     id: "health",
-    name: "ChatHuMin",
+    name: "ChatHM",
     who: "胡敏",
     domain: "健康 · 疾病与照料 · 医疗制度",
     home: "https://health.sdeuniverses.com/",
