@@ -22,7 +22,9 @@ const STORY = fs.readFileSync(path.join(ROOT, "tools/skills/sde-story-writing.md
    所以它的每一条都必须配一个三十秒内做得完的机械判据——这也是本护栏能钉住它的前提。
    ⚠ 诗歌不在总纲的三体裁之内（总纲没有它的章节），所以它的硬律只在分册与机器层两处对账。 */
 const POEM = fs.readFileSync(path.join(ROOT, "tools/skills/sde-poem-writing.md"), "utf8");
-const SKILL_ALL = SKILL + "\n" + PROSE + "\n" + STORY + "\n" + POEM;
+/* 2026-08-23：公众号也移出分册。至此四档创作体各有分册，总纲只剩分工＋X 律＋四页指路。 */
+const WECHAT = fs.readFileSync(path.join(ROOT, "tools/skills/sde-wechat-writing.md"), "utf8");
+const SKILL_ALL = SKILL + "\n" + PROSE + "\n" + STORY + "\n" + POEM + "\n" + WECHAT;
 const W = fs.readFileSync(path.join(ROOT, "src/worker.js"), "utf8");
 const LITE = fs.readFileSync(path.join(ROOT, "public/sites/lang/chatjohn/lite/index.html"), "utf8");
 
@@ -64,7 +66,7 @@ rows.forEach((row) => {
 /* ══ ② 硬律编号：Skill 里定义了几条，SPEC 里就必须条条在 ══════════════ */
 sec("② 硬律编号逐条落地");
 const LAWS = {
-  wechat: ["W-1", "W-2", "W-3", "W-4", "W-5", "W-6", "W-7"],
+  wechat: ["W-1", "W-2", "W-3", "W-4", "W-5", "W-6", "W-7", "W-8", "W-9", "W-10", "W-11", "W-12"],
   prose: ["P-1", "P-2", "P-3", "P-4", "P-5", "P-6", "P-7", "P-8", "P-9", "P-10", "P-11", "P-12"],
   story: ["S-1", "S-2", "S-3", "S-4", "S-5", "S-6", "S-7", "S-8", "S-9", "S-10", "S-11", "S-12"],
 };
@@ -83,6 +85,11 @@ const jEssay = W.slice(W.indexOf("\n  essay:\n"), W.indexOf("\n  wechat:\n", W.i
 ok(jEssay.length > 200, "JOHN_COMPOSE_SPEC.essay 取不到");
 LAWS.prose.forEach((code) => {
   ok(jEssay.indexOf(code) >= 0, "ChatJohn essay SPEC 里没有 " + code);
+});
+const jWechat = W.slice(W.indexOf("\n  wechat:\n"), W.indexOf("\n  story:\n"));
+ok(jWechat.length > 200, "JOHN_COMPOSE_SPEC.wechat 取不到");
+LAWS.wechat.forEach((code) => {
+  ok(jWechat.indexOf(code) >= 0, "ChatJohn wechat SPEC 里没有 " + code);
 });
 const jStory = W.slice(W.indexOf("\n  story:\n"), W.indexOf("\n};", W.indexOf("\n  story:\n")));
 ok(jStory.length > 200, "JOHN_COMPOSE_SPEC.story 取不到");
@@ -156,6 +163,14 @@ sec("⑦ 实测病灶落进规格");
 const wb = specBlock("wechat"), pb = specBlock("prose"), sb = specBlock("story");
 ok(wb && wb.body.indexOf("同向") >= 0, "公众号档没写例证同向律（真跑第一号病）");
 ok(wb && /最多两位/.test(wb.body), "公众号档没写具名上限");
+/* 2026-08-23 新增五条：三条来自传播现实（首屏／标题／截图），一条来自伦理（W-10），一条是四档对齐的「推」（W-12）。 */
+ok(wb && /150 字/.test(wb.body), "公众号档没写 W-8 首屏 150 字那条判据");
+ok(wb && wb.body.indexOf("改标题，不是改正文") >= 0, "公众号档没写 W-9 遮标题自拟法的收口");
+ok(wb && wb.body.indexOf("封顶 70") >= 0, "公众号档没写 W-10 违反即封顶 70（全站唯一比 85 更狠的一条）");
+ok(wb && wb.body.indexOf("不存在的敌人") >= 0, "公众号档没写 W-10 的第一条判据（换成具体的人还站不站得住）");
+ok(wb && wb.body.indexOf("被截图转发") >= 0, "公众号档没写 W-11 可截图律");
+ok(wb && wb.body.indexOf("名字是工具，金句是结论") >= 0, "公众号档没写 W-12 与金句的分界");
+ok(wb && wb.body.indexOf("伦理层") >= 0, "公众号档的自检清单没有伦理层那四问（只有这一档有）");
 ok(pb && pb.body.indexOf("15%") >= 0, "散文档没写议论占比上限（真跑第二号病）");
 ok(pb && /视点|三问/.test(pb.body), "散文档没写视点守恒");
 ok(pb && pb.body.indexOf("取消提问资格") >= 0, "散文档没写 P-6");
@@ -226,8 +241,12 @@ const han = (SKILL.match(/[\u4e00-\u9fff]/g) || []).length;
 /* 2026-08-23：散文与小说两节已移出到分册，总纲从「三体裁全文」变成「分工总纲 ＋ 公众号一节 ＋ 两页指路」。
    一万字的规格从此**按文体分册计**（见 ⑩ ⑪），总纲自己只保底 8000。
    ⚠ 公众号那一节还留在总纲里；等它也拆出分册，这一条要连同 ⑫ 一起改。 */
+/* 2026-08-23 二次下调：公众号也移出分册后，总纲成为「分工总纲 ＋ X 律 ＋ 四页指路」。
+   一万字的规格按文体分册计（⑩ 散文 ⑪ 小说 ⑫ 诗歌 ⑬ 公众号），总纲自己保底 8000。
+   ⚠ 四份分册的入口都必须在总纲里挂着——漏一份的表现是「分册在仓库里、没人找得到」。 */
 ok(han >= 8000, "总纲汉字数 " + han + "，低于保底 8000");
-ok(SKILL.indexOf("## 三 · 公众号文章规范") >= 0, "公众号一节仍应留在总纲（尚未拆分册）");
+["sde-wechat-writing.md", "sde-prose-writing.md", "sde-story-writing.md", "sde-poem-writing.md"]
+  .forEach((f) => ok(SKILL.indexOf(f) >= 0, "总纲第一节的表里没挂分册 " + f));
 ["## 一 ·", "## 二 ·", "## 三 ·", "## 四 ·", "## 五 ·", "## 六 ·", "## 七 ·", "## 八 ·", "## 九 ·", "## 十 ·", "## 附录 A"]
   .forEach((h) => ok(SKILL.indexOf(h) >= 0, "Skill 缺章节 " + h));
 ok(SKILL.indexOf("tools/sim_creative_writing.js") >= 0, "Skill 第一节没有指向本护栏");
@@ -242,6 +261,24 @@ ok(PROSE.indexOf("tools/sim_creative_writing.js") >= 0, "分册第一节没有�
 ok(SKILL.indexOf("sde-prose-writing.md") >= 0, "总纲第四节没有指向散文分册（两份口径的入口断了）");
 /* 分册的附录 A 编译表要与机器层对上 */
 ok(/`prose`[^\n]*5000[^\n]*20000/.test(PROSE), "分册附录 A 的 prose 行与机器层字数/预算对不上");
+
+/* ══ ⑬ 公众号分册 sde-wechat-writing.md ════════════════════════════ */
+sec("⑬ 公众号分册 sde-wechat-writing.md");
+const whan = (WECHAT.match(/[\u4e00-\u9fff]/g) || []).length;
+ok(whan >= 10000, "公众号分册汉字 " + whan + "，低于一万字的规格要求");
+LAWS.wechat.forEach((code) =>
+  ok(WECHAT.indexOf("### " + code + " ·") >= 0, "公众号分册缺硬律条文 " + code + "（交叉引用不算，要有它自己那一节）"));
+["## 一 ·", "## 二 ·", "## 三 ·", "## 四 ·", "## 五 ·", "## 六 ·", "## 七 ·", "## 八 ·", "## 九 ·", "## 十 ·", "## 十一 ·", "## 十二 ·", "## 十三 ·", "## 附录 A", "## 附录 B", "## 附录 C"]
+  .forEach((h) => ok(WECHAT.indexOf(h) >= 0, "公众号分册缺章节 " + h));
+ok(WECHAT.indexOf("tools/sim_creative_writing.js") >= 0, "公众号分册第一节没有指向本护栏");
+ok(SKILL.indexOf("sde-wechat-writing.md") >= 0, "总纲第三节没有指向公众号分册");
+["观点文", "故事文", "方法文"].forEach((t) =>
+  ok(WECHAT.indexOf(t) >= 0, "公众号分册缺形态「" + t + "」"));
+/* 第七节那六个诱惑是这一册与任何通用写作规范的分别，缺一条 W-10 就只是一句口号 */
+["悬念钩子", "制造对立", "制造焦虑", "借权威", "金句化", "互动尾巴"].forEach((k) =>
+  ok(WECHAT.indexOf(k) >= 0, "公众号分册第七节缺诱惑「" + k + "」"));
+ok(WECHAT.indexOf("封顶 70") >= 0, "公众号分册没写 W-10 违反即封顶 70");
+ok(/`wechat`[^\n]*3000[^\n]*12000/.test(WECHAT), "公众号分册附录 A 与机器层的字数/预算对不上");
 
 /* ══ ⑫ 诗歌分册 sde-poem-writing.md ⇄ 成文机 poem 档 ════════════════ */
 sec("⑫ 诗歌分册与 poem 档");
