@@ -3190,7 +3190,10 @@
       var p = (item && typeof item === "object") ? String(item.p || "") : "";
       if (!q) return;
       var b = el("button", "wdsm-follow");
-      if (p) { var tag = el("i", "pt", p); tag.title = t("pathTip"); b.appendChild(tag); }
+      // w = 这一条用的是哪件工具（三方程/六路径/三原理里的哪一条）。没有 w 就退回通用说明，
+      // 老服务端只回 {p,q} 时行为一字不变。
+      var w = (item && typeof item === "object") ? String(item.w || "") : "";
+      if (p) { var tag = el("i", "pt", p); tag.title = w || t("pathTip"); b.appendChild(tag); }
       b.appendChild(document.createTextNode(q));
       b.onclick = function () { if (!streaming) send(q); };   // 只发问句，路径名是给人看的
       box.appendChild(b);
