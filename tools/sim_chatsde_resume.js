@@ -44,8 +44,16 @@ ok("门槛与正文那一处同源（本节目标 × 比例，比例从源码取
 
 /* ═══ 二、续写钮的源码级要求 ═══ */
 console.log("── 续写钮 ──");
-const btn = F.slice(F.indexOf('var goOn = el("button", "wdsm-tbtn dgoon"'), F.indexOf('var pdfB = el("button"'));
+/* ⚠ 锚点钉的是「这一行长什么样」，而这一行 2026-08-23 从 `el(...)` 改成了三元式
+   （资格由 _isPaperish 放宽成 _canGoOn）。旧锚点当场失配 → slice 回空串 → 底下十五条
+   **全部假红**，而产品一点没坏。教训：抠代码段要钉**认得出这一段的最短特征**，
+   别把整行连写法一起钉死。故改钉 `var goOn = `。 */
+const btn = F.slice(F.indexOf('var goOn = '), F.indexOf('var pdfB = el("button"'));
 ok("抠得到续写钮", btn.length > 600);
+/* ★ 资格按**能力**判、不按档名判：拆趟的档（SPEC.fixed 那几个）也该有续写钮。
+   钉死 essay|paper|paper1 正是「加了九档新体裁、续写却没跟上」的来路。 */
+ok("★ 续写钮的资格是「会不会分节写」，不是「是不是论文」",
+  /_canGoOn = _isPaperish \|\| !!\(_kd && _kd\.c\)/.test(F) && /var goOn = _canGoOn \?/.test(F));
 ok("默认不亮（没缺节时不摆没用的按钮）", /goOn\.style\.display = "none";/.test(btn));
 ok("★ 补出来的内容插回原位，不是追加在末尾", /blk\.from >= 0\) \{ head = text\.slice\(0, blk\.from\); tail = text\.slice\(blk\.to\); \}/.test(btn) && /text = head \+/.test(btn));
 ok("只跑缺的那几节，不重跑全篇", /missingSecs\(text, secs\)/.test(btn) && /miss\[k\]/.test(btn));

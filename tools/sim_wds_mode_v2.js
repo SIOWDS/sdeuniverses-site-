@@ -1662,7 +1662,14 @@ console.log("⑧ 成文（distill）");
       ok(!!dp && !!dp.querySelector(".dpdfx"), k + "：面板上有 PDF 那一颗");
       if (dp) dp.querySelector(".dx").click();
     }
-    // 续写与投稿仍只归论文那几档（散文没有分节表，摆上去就是一颗按了报错的按钮）
+    /* ⚠ 2026-08-23 更正：这条原来断言「散文上没有续写钮」，理由写的是「它没有分节表」。
+       **那个理由是错的**：散文属于 SPEC.fixed 骨架档，服务端在发提纲那一趟会回一份带
+       sections 的 plan（worker.js 那处还专门加了「骨架档发出去的必须正好是 FIXED.length 节」
+       的合同校验），客户端 dSecs 因此有值 —— 续写这条路对它一直是通的。
+       真正的旧限制是判据钉死了 essay|paper|paper1，于是 2026-08-22/23 新加的九档里
+       凡是拆趟的（公众号/散文/小说/剧本/方案/总结/讲话）缺一节只能整篇重来。
+       现在按**能力**判：`_canGoOn = _isPaperish || _kd.c`。
+       投稿钮不动（它收的是论文，不是散文）。 */
     layer.querySelector(".wdsm-distbtn").click();
     const m9 = document.body.querySelector(".wdsm-menu");
     [].slice.call(m9.children).find((x) => /散文（/.test(String(x.textContent || ""))).click();
@@ -1672,7 +1679,8 @@ console.log("⑧ 成文（distill）");
     if (wp9) wp9.querySelector(".wdsm-tplitem").click();
     await new Promise((r) => setTimeout(r, 260));
     const d9 = document.body.querySelector(".wdsm-dist");
-    ok(d9 && !d9.querySelector(".dgoon"), "⭐ 散文上没有续写钮（它没有分节表）");
+    ok(d9 && !!d9.querySelector(".dgoon"), "⭐ 散文上有续写钮（它是拆趟档，服务端会回分节表）");
+    ok(d9 && !d9.querySelector(".dsub"), "⭐ 散文上仍没有投稿钮（投稿口收的是论文）");
     ok(d9 && !d9.querySelector(".dsub"), "散文上没有投稿钮（投稿口收的是文章）");
     if (d9) d9.querySelector(".dx").click();
   }

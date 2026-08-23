@@ -10,6 +10,8 @@ const wm = fs.readFileSync(ROOT + "/public/wds-mode.js", "utf8");
 const wk = fs.readFileSync(ROOT + "/src/worker.js", "utf8");
 const MOD = fs.readFileSync(ROOT + "/public/assets/wds-pptx.js", "utf8");
 let P = 0, F = 0;
+/* SPEC 抠段的段外依赖前缀，两处 eval 共用（见下面第一处的说明）。 */
+let SPEC_PRELUDE = "";
 const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (F++, console.log("  FAIL " + m)); };
 
 // 在 node 里把模块跑起来（它只依赖 window / TextEncoder / Blob）
@@ -292,7 +294,11 @@ console.log("── 四 · 两端接线");
   ok(/每条不超过 24 字且必须是判断句/.test(wk), "要点是判断句、有字数上限（否则幻灯片必溢出）");
   ok(/8–14 页/.test(wk), "页数有上下限");
   ok(/不许只报喜/.test(wk), "要求写进不利证据");
-  ok(/KIND_KEYS = \["report", "essay", "outline", "deck"\]/.test(wm), "客户端菜单加了第四档");
+  /* 这条原来钉的是 `KIND_KEYS = ["report","essay","outline","deck"]` 这个写死的四档数组。
+     成文档位早已扩到 17 档、KIND_KEYS 改成由 KIND_DEF 派生 —— 断言从此长红，**红了就没人再看**。
+     钉那件真正要守的事：deck 这一档在菜单表里、并且点它先问做成哪一种。 */
+  ok(/\{ k: "deck", t: "kDeck" \}/.test(wm) && /if \(k === "deck"\) \{ tplMenu\(\); return; \}/.test(wm),
+    "客户端菜单有 deck 这一档，且点它先问模板");
   ok(/function pptxBoot\(/.test(wm) && /assets\/wds-pptx\.js\?v=/.test(wm), "客户端懒加载共享模块，且模块带版本号（改了能刷到）");
   ok(/pptxBoot\(function \(\) \{\}\);/.test(wm), "成文面板一开就先拉模块（点击那一刻必须已在内存）");
   ok(/window\.WDSPptx\.blob\(d\)/.test(wm) && /saveBlobToDir\(nm, blob/.test(wm), "同步造字节后再存盘（不让用户手势过期）");
@@ -407,7 +413,23 @@ console.log("── 三点九五 · PPT 文本打造 Skill：逐页产出 ＋ �
   const craft = wk.slice(wk.indexOf("const DECK_CRAFT"), wk.indexOf("// ── DECK_TPL"));
   const tplsrc = wk.slice(wk.indexOf("const DECK_TPL = {"), wk.indexOf("const DISTILL_FIRST_MS"));
   const s0 = wk.indexOf("const SPEC = {"), e0 = wk.indexOf("}[kind];", s0) + 8;
-  const mkSpec = new Function("kind", "tplId", "WDS_TOK_MAX", sizes + craft + tplsrc + wk.slice(s0, e0) + "\nreturn SPEC;");
+  /* ⚠ SPEC 里的 paper 那一档引用了段外的 PAPER_SKELETON。不把它一起抠进来，
+     `new Function` 一执行就 ReferenceError —— 而这条护栏是**顺序执行**的，
+     一抛就整个进程死在这里：全文 289 条断言只跑得到 183 条，后面 106 条
+     （几何越界／20 套配色对比度／diversify 多样闸／audit9 九宫格）**从此一条没跑过**，
+     而屏幕上只有一段堆栈，看不出「护栏被腰斩了」。2026-08-23 体检才发现。
+     💡 通则：**抠一段源码出来真跑，就要把它的段外依赖一起抠进来**；
+        并且护栏自己要能在抠不到时说人话，而不是抛一段堆栈就死。 */
+  const pskIdx = wk.indexOf("      const PAPER_SKELETON = [");
+  ok(pskIdx > 0, "抠得到 PAPER_SKELETON（SPEC 的段外依赖）");
+  const psk = pskIdx > 0 ? wk.slice(pskIdx, wk.indexOf("\n      ];", pskIdx) + 9) : "const PAPER_SKELETON = [];";
+  /* SPEC 段引用的其余段外常量：它们都是**纯文案**（各体裁的写作规格与自检清单），
+     对本护栏要验的事（deck 那一档拼没拼对、有没有污染别档）不承重，故给空串占位。
+     PAPER_SKELETON 例外——SPEC 用到它的 .length 与 .map，必须是真的。
+     ⚠ 谁再往 SPEC 里加段外常量，这一条会当场 ReferenceError；照着往下加一个空串即可。 */
+  SPEC_PRELUDE = "const APPLIED_CHECK='',APPLIED_X='',CW_X='',JOHN_COMPOSE={},PAPER_SPEC='',"
+    + "PAPER_MAX_TOKENS=64000,KIND_DEF=[];function cwGrade(){return '';}\n" + psk;
+  const mkSpec = new Function("kind", "tplId", "WDS_TOK_MAX", SPEC_PRELUDE + sizes + craft + tplsrc + wk.slice(s0, e0) + "\nreturn SPEC;");
   const deckSpec = mkSpec("deck", "teach", 64000).spec;
   ok(/想象力四条/.test(deckSpec) && /按骨架逐页写/.test(deckSpec), "文本打造真的拼进了 deck 规格");
   ok(!/想象力四条/.test(mkSpec("essay", "", 64000).spec), "没有污染「提炼成文」那一档");
@@ -442,7 +464,7 @@ console.log("── 三点九八 · 九宫格写进基底的写作 Skill（不�
   const nine = wk.slice(wk.indexOf("const DECK_BEAUTY9"), wk.indexOf("// ── DECK_TPL"));
   const tplsrc = wk.slice(wk.indexOf("const DECK_TPL = {"), wk.indexOf("const DISTILL_FIRST_MS"));
   const s0 = wk.indexOf("const SPEC = {"), e0 = wk.indexOf("}[kind];", s0) + 8;
-  const mk = new Function("kind", "tplId", "WDS_TOK_MAX", sizes + craft + nine + tplsrc + wk.slice(s0, e0) + "\nreturn SPEC;");
+  const mk = new Function("kind", "tplId", "WDS_TOK_MAX", SPEC_PRELUDE + sizes + craft + nine + tplsrc + wk.slice(s0, e0) + "\nreturn SPEC;");
   const spTalk = mk("deck", "talk", 64000).spec, spHealth = mk("deck", "health", 64000).spec;
   ok(/尤其看重九宫格里的两格：「活力」与「自由」/.test(spTalk), "观点演讲点名「活力＋自由」");
   ok(/尤其看重九宫格里的两格：「纯一」与「平安」/.test(spHealth), "健康科普点名「纯一＋平安」");
@@ -556,7 +578,10 @@ console.log("── 四点四八 · 第四次空产出：长输入不走满功�
   ok(/const VCuse = \(heavyIn && VC\.top\) \? \{ url: VC\.url, model: VC\.model, name: VC\.name \} : VC/.test(DIST),
      "重输入时摘掉 top（满功率）——思考与正文吃同一份预算，长输入下思考会把额度吃光");
   ok(/wdsFetchMax\(VCuse, /.test(DIST), "真的用摘过的那份档位去取流");
-  ok(/已自动关掉「满功率思考」/.test(DIST), "摘了要告诉读者，别让人以为偷偷降级");
+  /* 文案后来重写过（现在说的是「输出预算已按剩余上下文收窄…」）。钉的不该是那一句话，
+     而是**摘的同一个条件下必须发一条 note**——偷偷降级才是要防的事。 */
+  ok(/if \(heavyIn && VC\.top\) controller\.enqueue\(_sseBytes\(\{ t: "note"/.test(DIST),
+     "摘了要告诉读者，别让人以为偷偷降级");
   ok(/不是降级，是把预算让给正文/.test(DIST), "注释写清这不是降级");
   // 报错双通道：读者页面可能是旧版，note/error 会被覆盖，token 不会
   const both = (DIST.match(/t: "token", v: "（" \+ emsg/g) || []).length;
@@ -569,9 +594,14 @@ console.log("── 四点四五 · 第三次空产出：输出预算按入参�
 {
   const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
   ok(/const inChars = sys\.length \+ convo\.length/.test(DIST), "先量入参实际有多大");
-  ok(/const tokWant = Math\.max\(6000, Math\.min\(SPEC\.tok, Math\.round\(115000 - inChars \* 1\.05\)\)\)/.test(DIST),
+  /* 后来给「一趟出全篇」开了口子（那一档收窄会让两万字断头），于是这行成了三元式。
+     钉那两件要守的事：收窄公式还在、且它确实是拿 SPEC.tok 与剩余窗取小。 */
+  ok(/Math\.max\(6000, Math\.min\(SPEC\.tok, Math\.round\(115000 - inChars \* 1\.05\)\)\)/.test(DIST)
+     && /const tokWant = /.test(DIST),
      "输出预算＝本档上限与「窗里还剩多少」取小——写死 64000 而入参又有五六万，等于向上游要一个它给不出的数");
-  ok(/wdsFetchMax\(VCuse, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST), "用的是算出来的预算与摘过的档位，且要上游回报用量");
+  /* 尾参后来又加了两个（形参表在长）。别把整串实参钉死——钉前六个：
+     摘过的档位 VCuse、算出来的预算 tokWant、以及「要上游回报用量」那一位。 */
+  ok(/wdsFetchMax\(VCuse, KEY, messages, true, tokWant, clk\.signal, true/.test(DIST), "用的是算出来的预算与摘过的档位，且要上游回报用量");
   const f = (s, c, spec) => Math.max(6000, Math.min(spec, Math.round(115000 - (s + c) * 1.05)));
   ok(f(10000, 20000, 64000) === 64000, "入参小 → 顶配照给");
   ok(f(10000, 44000, 64000) < 64000 && f(10000, 44000, 64000) > 50000, "入参五万多 → 自动让出一部分（实得 " + f(10000, 44000, 64000) + "）");
@@ -593,16 +623,25 @@ console.log("── 四点五 · 空产出不许闷着（2026-07-30 实测撞上
   const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
   ok(/deck: \{ name: "对外 PPT", tok: WDS_TOK_MAX/.test(wk), "PPT 档直接给顶配 WDS_TOK_MAX（DeepSeek 吃得下，别因为别家吃不下就一起压低）");
   // 预算已改成按入参动态算（tokWant），仍是顶配起步＋撞 400 自动降档
-  ok(/upstream = await wdsFetchMax\(VCuse, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST),
+  ok(/upstream = await wdsFetchMax\(VCuse, KEY, messages, true, tokWant, clk\.signal, true/.test(DIST),
      "成文走 wdsFetchMax：按入参算出的预算起步，撞 400 自动降档");
   ok(/if \(a >= 16000\) return \[a, Math\.min\(32000, a\), Math\.min\(16000, a\)\]/.test(wk), "长文档档有自己的降档阶梯（不再退到 6000 那种答话口径）");
   ok(/report: \{ name: "对话报告", tok: 24000/.test(wk) && /essay: \{ name: "提炼成文", tok: 32000/.test(wk) && /outline: \{ name: "写作提纲", tok: 16000/.test(wk), "报告/成文/提纲三档也一并提到长文档区间");
   ok(/const messages = \[/.test(DIST), "messages 抽成变量——两遍必须喂同一件事");
   ok(/if \(!wrote\) \{[\s\S]{0,400}第一遍没写出正文/.test(DIST), "空产出时说清怎么空的（预算/思考/正文/入参五个数）");
-  ok(/关掉思考重来一次/.test(DIST) && /max_tokens: Math\.min\(32000, Math\.round\(SPEC\.tok \/ 2\)\)/.test(DIST), "自动降档重试一次：关思考、预算减半且钳在 32000");
-  ok(/刻意不走 wdsTopBody/.test(DIST), "重试那一遍不套满功率（否则又把预算烧在思考上）");
+  /* 重试预算 2026-08-12 由「减半钳 32000」改成钳 16000（实测 4000 交回的是断在半句上的稿，
+     32000 又太大）。钉那件要守的事：重试的预算是**钳过的一个定值**，不是原样再来一遍。 */
+  ok(/关掉思考重来一次/.test(DIST) && /const _retryTok = Math\.min\(\d+, SPEC\.tok\)/.test(DIST)
+     && /max_tokens: _retryTok/.test(DIST), "自动降档重试一次：关思考、预算钳在一个定值");
+  /* ⚠ 这一条原来钉的是注释「刻意不走 wdsTopBody」。而 2026-08-12 查出：不走 top 只等于没加
+     reasoning_effort，DeepSeek/GLM **默认就在思考** —— 那一遍其实还开着思考，同一个坑踩了两次。
+     修法是改走 wdsPlainBody 显式关掉。所以这里钉的必须是 wdsPlainBody 这个**动作**，不是那句注释。 */
+  ok(/wdsPlainBody\(VC, \{ model: VC\.model, stream: true, max_tokens: _retryTok/.test(DIST),
+     "重试那一遍显式关掉思考（不走 top 是不够的——那两家默认就在思考）");
   ok(/两遍都没写出正文/.test(DIST), "两遍都空也要给下一步，不许闷着");
-  ok(/dEmptyHint/.test(wm) && /if \(!text\) dNote\(t\("dEmptyHint"\), 1\)/.test(wm), "客户端空产出也挂一条说明");
+  /* 后来分了两种空：收到收尾信号＝基底真的一个字没写（dEmptyHint）；没收到＝流被平台掐断（dWall1）。
+     钉的是「空了必须挂一条说明」，两支都算。 */
+  ok(/dEmptyHint/.test(wm) && /if \(!text\) dNote\(/.test(wm), "客户端空产出也挂一条说明");
 }
 
 console.log("── 五 · 20 套模板：每套一份写作 Skill（骨架＋纪律＋视觉方案）");

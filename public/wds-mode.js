@@ -6773,6 +6773,16 @@
        投稿口收的是文章不是幻灯片稿。两组条件分开写，别再合成一个 if——
        合着写正是「加了四档新体裁、Word 却没跟上」的来路。 */
     var _kd = kindDef(kind), _isDoc = !!(_kd && _kd.doc), _isPaperish = (kind === "essay" || kind === "paper" || kind === "paper1");
+    /* 续写钮的资格 ＝ **这一档会不会分节写**，不是「它是不是论文」。
+       原来钉的是 _isPaperish，于是 2026-08-22/23 新加的九档里凡是拆趟的
+       （公众号/散文/小说/剧本/方案/总结/讲话）缺一节只能整篇重来 ——
+       而服务端对这些档（SPEC.fixed）**本来就回 plan 帧带 sections**，dSecs 有值，
+       续写这条路对它们一直是通的，只差这一个判据没放开。
+       ⚠ 放开是安全的：钮默认 display:none，只有在**真拿到分节表且真缺节**时才亮
+       （见收尾那一处 `goOnBtn && dSecs && missingSecs(...)`）；不拆趟的档拿不到分节表，钮永远不亮。
+       ⚠ 这正是上面那条注释警告过的坑（「合着写正是『加了四档新体裁、Word 却没跟上』的来路」）
+          换了个地方又踩了一次——所以这里按**能力**判，不按**档名**判。 */
+    var _canGoOn = _isPaperish || !!(_kd && _kd.c);
     if (_isDoc) {
       dxBtn = el("button", "wdsm-tbtn ddocx", t("mDocx"));
       dxBtn.title = t("mDocxS");
@@ -6795,7 +6805,7 @@
       /* 续写钮：只在「确实有缺节」时才亮，免得在一份完整稿上摆一颗没用的按钮。
          ⚠ 而且只给 essay/paper/paper1——续写靠的是提纲那张分节表，
          散文与诗根本没有分节，摆上去就是一颗按了会说「没有提纲」的按钮。 */
-      var goOn = _isPaperish ? el("button", "wdsm-tbtn dgoon", t("mGoOn")) : null;
+      var goOn = _canGoOn ? el("button", "wdsm-tbtn dgoon", t("mGoOn")) : null;
       if (goOn) {
       goOn.title = t("mGoOnS");
       goOn.style.display = "none";
