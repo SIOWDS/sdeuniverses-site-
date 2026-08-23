@@ -7,9 +7,9 @@
 <meta name="description" content="关于语言的新思想生产平台：语感、语法、语言教学与习得。胡志英主持，SDE Universes 子平台。一部专著与十二篇长论文，创新智商 135–143。">
 <link rel="canonical" href="https://lang.sdeuniverses.com/">
 <meta property="og:title" content="语言发生学 · 胡志英">
-<meta property="og:description" content="每一条规则都通过了，为什么这句话还是不对？关于语言的新思想生产平台。">
+<meta property="og:description" content="一句话，怎样在两个人之间活起来？从形式、用法与场合重新发现语言。">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#0B0E14">
+<meta name="theme-color" content="#050A12">
 <style>
 :root{
   --night:#0B0E14; --night2:#121722; --bone:#E8E4DA; --bone2:#8E94A3;
@@ -176,6 +176,268 @@ a:focus-visible{outline:2px solid var(--indigo-l);outline-offset:3px}
   .band{gap:24px}
   .iq{display:none}
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   2026-08-23 · 语言星河 / 话语发生场
+   系列语言继承主站“暗场＋发光节点”，以形式—用法—场合构成语言自己的发生图。
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --void:#050A12;--void2:#0A1422;--cyan:#58D5E8;--coral:#FF776B;
+  --lime:#AADB8D;--violet:#B49CFF;--gold:#FFD37A;--white:#F8F6EF;
+}
+body{overflow-x:hidden;background:#EAECEF}
+.wrap{max-width:1120px;padding-left:30px;padding-right:30px}
+.dark{
+  background:
+    radial-gradient(circle at 12% 18%,rgba(88,213,232,.11),transparent 30rem),
+    radial-gradient(circle at 88% 30%,rgba(255,119,107,.10),transparent 28rem),
+    radial-gradient(circle at 54% 83%,rgba(180,156,255,.09),transparent 30rem),
+    linear-gradient(145deg,#040913 0,#07131F 52%,#100B19 100%)
+}
+.dark::before{
+  background:
+    radial-gradient(circle at 7% 12%,rgba(88,213,232,.75) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 19% 34%,rgba(255,211,122,.65) 0 1px,transparent 2.5px),
+    radial-gradient(circle at 32% 9%,rgba(180,156,255,.75) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 48% 44%,rgba(170,219,141,.55) 0 1px,transparent 2.5px),
+    radial-gradient(circle at 67% 15%,rgba(88,213,232,.65) 0 1px,transparent 2.5px),
+    radial-gradient(circle at 82% 50%,rgba(255,119,107,.65) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 94% 24%,rgba(255,211,122,.55) 0 1px,transparent 2.5px)
+}
+.dark::after{
+  opacity:.28;
+  background-image:
+    linear-gradient(rgba(88,213,232,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(88,213,232,.07) 1px,transparent 1px);
+  background-size:54px 54px
+}
+.top{
+  border-bottom:1px solid rgba(88,213,232,.16);
+  background:rgba(4,9,19,.88);backdrop-filter:saturate(150%) blur(14px);
+  box-shadow:0 8px 28px rgba(0,0,0,.2)
+}
+.top .wrap{height:62px}.brand{color:#F7F5EE}.brand em{color:rgba(88,213,232,.62)}
+.top nav{gap:21px;white-space:nowrap}
+.top nav a{color:rgba(248,246,239,.62);position:relative;transition:color .25s ease}
+.top nav a:after{content:"";position:absolute;left:50%;right:50%;bottom:-9px;height:1px;
+  background:linear-gradient(90deg,var(--cyan),var(--coral));transition:left .25s ease,right .25s ease}
+.top nav a:hover{color:#fff}.top nav a:hover:after{left:0;right:0}
+.top nav a.out{color:var(--gold)}
+.hero{padding:20px 0 68px}
+.genesis-hero{
+  min-height:calc(100svh - 82px);display:grid;grid-template-columns:minmax(0,1.03fr) minmax(390px,.97fr);
+  gap:34px;align-items:center;padding:64px 0 52px;position:relative
+}
+.genesis-copy{position:relative;z-index:3}
+.genesis-copy .eyebrow{display:inline-flex;align-items:center;gap:12px;color:var(--cyan)}
+.genesis-copy .eyebrow:before{content:"";width:34px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+.genesis-copy h1{max-width:none;margin:20px 0 20px;letter-spacing:.02em;font-weight:500;
+  font-size:clamp(39px,5.6vw,67px);line-height:1.16;color:#F8F6EF}
+.genesis-copy h1 .name{display:block;font-family:var(--mono);font-size:13px;letter-spacing:.34em;
+  color:rgba(248,246,239,.45);margin-bottom:22px}
+.genesis-copy h1 em{font-style:normal;color:var(--coral);
+  text-shadow:0 0 35px rgba(255,119,107,.18)}
+.genesis-copy .lede{font-size:16px;line-height:1.95;color:rgba(248,246,239,.68);max-width:39em}
+.genesis-copy .lede b{color:#F8F6EF}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:27px}
+.hero-actions a{font-size:13px;letter-spacing:.05em;padding:11px 20px;border-radius:999px;
+  border:1px solid rgba(248,246,239,.18);color:#F8F6EF;background:rgba(255,255,255,.035);
+  backdrop-filter:blur(8px);transition:.25s ease}
+.hero-actions a.primary{color:#06131A;background:linear-gradient(135deg,#73E0EC,#56C4D8);
+  border-color:transparent;box-shadow:0 10px 32px rgba(88,213,232,.22)}
+.hero-actions a:hover{transform:translateY(-3px);border-color:rgba(88,213,232,.5);
+  box-shadow:0 12px 30px rgba(0,0,0,.24)}
+.genesis-map{aspect-ratio:1/1;position:relative;z-index:2;max-width:520px;width:100%;margin:auto}
+.genesis-map:before{content:"";position:absolute;inset:9%;border-radius:50%;
+  background:radial-gradient(circle,rgba(88,213,232,.11),rgba(180,156,255,.045) 44%,transparent 70%);
+  filter:blur(4px)}
+.map-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.map-lines .orbit{fill:none;stroke:rgba(88,213,232,.18);stroke-width:1}
+.map-lines .tri{fill:none;stroke:url(#langFlow);stroke-width:2;stroke-dasharray:8 12;
+  animation:flow 10s linear infinite}
+.map-lines .wave{fill:none;stroke:rgba(255,211,122,.42);stroke-width:1.5;stroke-dasharray:4 8;
+  animation:flow 7s linear reverse infinite}
+.map-lines text{fill:rgba(248,246,239,.40);font:14px var(--mono);letter-spacing:.08em}
+@keyframes flow{to{stroke-dashoffset:-120}}
+.lang-node{
+  position:absolute;width:118px;height:118px;border-radius:50%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:#F8F6EF;border:1px solid var(--node);
+  background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--node) 30%,transparent),rgba(5,10,18,.86) 68%);
+  box-shadow:0 0 42px color-mix(in srgb,var(--node) 20%,transparent),inset 0 0 24px rgba(255,255,255,.025);
+  backdrop-filter:blur(8px)
+}
+.lang-node b{font-family:var(--serif);font-size:22px;letter-spacing:.18em;font-weight:500}
+.lang-node small{font-family:var(--mono);font-size:9px;letter-spacing:.24em;color:rgba(248,246,239,.47);margin-top:5px}
+.lang-node.form{--node:var(--cyan);left:50%;top:2%;transform:translateX(-50%)}
+.lang-node.use{--node:var(--coral);left:4%;bottom:7%}
+.lang-node.scene{--node:var(--violet);right:4%;bottom:7%}
+.utterance{
+  position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);width:190px;min-height:108px;
+  border-radius:26px;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:17px;
+  color:#F8F6EF;border:1px solid rgba(255,211,122,.35);
+  background:rgba(8,16,26,.82);box-shadow:0 0 46px rgba(255,211,122,.12);
+  backdrop-filter:blur(14px)
+}
+.utterance:before,.utterance:after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 16px var(--gold);top:50%;transform:translateY(-50%)}
+.utterance:before{left:-5px}.utterance:after{right:-5px}
+.utterance b{font-family:var(--serif);font-size:25px;letter-spacing:.08em;font-weight:500}
+.utterance span{font-size:10.5px;color:rgba(248,246,239,.48);margin-top:7px;letter-spacing:.08em}
+.token{position:absolute;font-family:var(--mono);font-size:11px;color:rgba(248,246,239,.42);
+  animation:float-token 5s ease-in-out infinite}
+.token.t1{left:12%;top:25%;color:rgba(88,213,232,.7)}
+.token.t2{right:9%;top:29%;color:rgba(255,119,107,.7);animation-delay:-1.2s}
+.token.t3{left:40%;bottom:4%;color:rgba(170,219,141,.7);animation-delay:-2.5s}
+.token.t4{right:23%;bottom:36%;color:rgba(180,156,255,.7);animation-delay:-3.2s}
+@keyframes float-token{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-9px);opacity:.9}}
+.genesis-ribbon{
+  margin:-28px auto 0;max-width:830px;text-align:center;font-family:var(--serif);font-size:18px;
+  line-height:1.9;color:rgba(248,246,239,.70);position:relative;padding:17px 28px;
+  border-top:1px solid rgba(88,213,232,.18);border-bottom:1px solid rgba(180,156,255,.16)
+}
+.genesis-ribbon b{font-weight:500;color:var(--gold)}
+/* 校对单由首屏退至第二层，成为“规则不能解释一切”的证据 */
+.proof{
+  max-width:900px;margin:58px auto 0;border-radius:26px;overflow:hidden;
+  border:1px solid rgba(88,213,232,.18);
+  background:
+    radial-gradient(circle at 0 0,rgba(88,213,232,.08),transparent 18rem),
+    radial-gradient(circle at 100% 100%,rgba(255,119,107,.07),transparent 18rem),
+    rgba(10,20,34,.82);
+  box-shadow:0 24px 58px rgba(0,0,0,.2)
+}
+.proof .cap{border-bottom-color:rgba(88,213,232,.19);padding:16px 24px}
+.sent{padding:26px 24px 22px}.sent q{color:#F8F6EF}
+table.chk th,table.chk td{padding-left:24px;padding-right:24px}
+table.chk td.j{color:var(--lime)}
+.pnote{max-width:900px;margin:16px auto 0;text-align:center;color:rgba(248,246,239,.48)}
+.pnote b{color:rgba(248,246,239,.82)}
+.three{gap:16px;margin-top:44px}
+.gate{
+  min-height:152px;border:1px solid rgba(248,246,239,.11);border-left:1px solid rgba(248,246,239,.11);
+  border-radius:22px;padding:23px;position:relative;overflow:hidden;
+  background:rgba(255,255,255,.035);transition:.26s ease
+}
+.gate:before{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-75px;top:-75px;
+  background:var(--gate);opacity:.16;filter:blur(6px)}
+.gate.g1{--gate:var(--violet)}.gate.g2{--gate:var(--cyan)}.gate.g3{--gate:var(--lime)}
+.gate.g1,.gate.g2,.gate.g3{border-left-color:rgba(248,246,239,.11)}
+a.gate:hover{background:rgba(255,255,255,.065);transform:translateY(-5px);
+  border-color:color-mix(in srgb,var(--gate) 48%,transparent);box-shadow:0 16px 36px rgba(0,0,0,.17)}
+.gate b{font-size:19px}.gate span{margin-top:9px;color:rgba(248,246,239,.53)}
+.band{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;border-top:0;padding:0;margin-top:20px}
+.band div{padding:16px 18px;border-radius:18px;border:1px solid rgba(248,246,239,.09);
+  background:rgba(255,255,255,.025)}
+.band b{font-size:26px;color:var(--gold)}
+/* 阅读面：由表格纸升级成“语言图谱” */
+.light{
+  position:relative;background:
+    radial-gradient(circle at 8% 12%,rgba(88,213,232,.13),transparent 26rem),
+    radial-gradient(circle at 91% 32%,rgba(255,119,107,.11),transparent 28rem),
+    radial-gradient(circle at 40% 72%,rgba(180,156,255,.10),transparent 30rem),
+    linear-gradient(180deg,#EEF2F1,#F6F3ED 40%,#ECECF2)
+}
+.light:before{content:"“ ？ 语 / meaning / 声 / relation / ∅ / 话 / use / ”";
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;color:rgba(24,50,66,.035);
+  font-family:var(--mono);font-size:48px;line-height:3.3;word-spacing:1.5em;letter-spacing:.35em}
+.light>.wrap{position:relative;background:transparent;box-shadow:none;padding-top:38px;padding-bottom:12px}
+section{
+  position:relative;padding:66px 44px 42px;margin:30px 0 0;border-radius:30px;overflow:hidden;
+  border:1px solid rgba(30,52,64,.11);background:rgba(255,255,255,.78);
+  box-shadow:0 20px 55px rgba(30,44,54,.075)
+}
+section:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;
+  background:linear-gradient(90deg,var(--cyan),var(--gold),var(--coral))}
+.light section:nth-of-type(2):before{background:linear-gradient(90deg,var(--gold),var(--coral),var(--violet))}
+.light section:nth-of-type(3):before{background:linear-gradient(90deg,var(--cyan),var(--lime),var(--gold))}
+.light section:nth-of-type(4):before{background:linear-gradient(90deg,var(--coral),var(--violet),var(--cyan))}
+.light section:nth-of-type(5):before{background:linear-gradient(90deg,var(--lime),var(--cyan),var(--violet))}
+.light section:nth-of-type(6):before{background:linear-gradient(90deg,var(--violet),var(--gold),var(--cyan))}
+.col-h{position:relative;border-bottom:0;padding-bottom:14px}
+.col-h:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:linear-gradient(90deg,rgba(23,26,34,.72),rgba(23,26,34,.08),transparent)}
+.col-h h2{font-size:24px}.col-h .no{font-weight:700;color:#1C7081}
+.host{
+  margin-top:28px;padding:24px;border-radius:24px;border:1px solid rgba(88,213,232,.20);
+  background:linear-gradient(135deg,rgba(88,213,232,.08),rgba(180,156,255,.08),rgba(255,119,107,.07))
+}
+.host img{border:4px solid rgba(255,255,255,.8);border-radius:18px;box-shadow:0 16px 30px rgba(24,41,52,.15)}
+.books{gap:17px}
+.bk{
+  border:1px solid rgba(35,57,68,.12);border-radius:20px;overflow:hidden;padding-bottom:20px;
+  box-shadow:0 12px 28px rgba(30,44,54,.07);transition:.25s ease;background:#FBFBF9
+}
+.bk:nth-child(1){background:linear-gradient(180deg,#F3FBFC,#FBFBF9 52%)}
+.bk:nth-child(2){background:linear-gradient(180deg,#FAF8FF,#FBFBF9 52%)}
+.bk:nth-child(3){background:linear-gradient(180deg,#FFF7F4,#FBFBF9 52%)}
+.bk:nth-child(4){background:linear-gradient(180deg,#F6FBF2,#FBFBF9 52%)}
+.bk.lead{border-color:rgba(88,213,232,.55);box-shadow:0 0 0 3px rgba(88,213,232,.07),0 12px 28px rgba(30,44,54,.08)}
+.bk:hover{transform:translateY(-6px);box-shadow:0 20px 38px rgba(30,44,54,.13)}
+.bk img{border-bottom:0}.bk .no{color:#B54C43}.bk .lk a{color:#1C7081}
+.row{border-bottom-color:rgba(57,72,82,.14);border-radius:12px;padding-left:10px;padding-right:10px;transition:.22s ease}
+.row:hover{transform:translateX(5px);background:linear-gradient(90deg,rgba(88,213,232,.10),transparent)}
+.r-n{color:#1C7081}.iq{color:#7B609E}.more{color:#1C7081;border-color:#1C7081;
+  border:1px solid rgba(28,112,129,.25);border-radius:999px;padding:7px 13px;margin-top:18px}
+.plat{
+  border:1px solid rgba(88,213,232,.16);border-radius:24px;padding:30px;
+  color:rgba(248,246,239,.72);
+  background:
+    radial-gradient(circle at 90% 20%,rgba(255,119,107,.13),transparent 20rem),
+    radial-gradient(circle at 8% 85%,rgba(88,213,232,.12),transparent 20rem),
+    linear-gradient(145deg,#07131F,#110D19);
+  box-shadow:0 18px 42px rgba(5,10,18,.17)
+}
+.plat a{color:var(--gold);border-bottom-color:rgba(255,211,122,.30)}
+.tracks{gap:15px}
+.tk{border:1px solid rgba(35,57,68,.12);border-radius:18px;background:linear-gradient(145deg,#FFFFFF,#F2F5F4)}
+.tk:nth-child(2){background:linear-gradient(145deg,#FFFFFF,#F7F0F1)}
+.tk:nth-child(3){background:linear-gradient(145deg,#FFFFFF,#F2F0F9)}
+.tk .n{color:#1C7081}
+footer{
+  margin-top:40px;border-top-color:rgba(88,213,232,.16);padding:34px 0 58px;
+  background:
+    radial-gradient(circle at 10% 50%,rgba(88,213,232,.10),transparent 20rem),
+    linear-gradient(145deg,#040913,#0A1422);color:rgba(248,246,239,.48)
+}
+footer a{color:var(--gold)}
+@supports(animation-timeline:view()){
+  .light section{animation:lang-rise both linear;animation-timeline:view();animation-range:entry 3% cover 19%}
+  @keyframes lang-rise{from{opacity:.42;transform:translateY(26px)}to{opacity:1;transform:none}}
+}
+@media(max-width:900px){
+  .genesis-hero{grid-template-columns:1fr;gap:10px;padding-top:58px}
+  .genesis-copy{text-align:center}.genesis-copy .eyebrow{justify-content:center}
+  .genesis-copy .lede{margin-left:auto;margin-right:auto}.hero-actions{justify-content:center}
+  .genesis-map{max-width:490px}
+  .band{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .wrap{padding-left:16px;padding-right:16px}
+  .top .wrap{gap:10px}.brand{font-size:17px;white-space:nowrap}.brand em{display:none}
+  .top nav{overflow-x:auto;gap:16px;scrollbar-width:none}.top nav::-webkit-scrollbar{display:none}
+  .top nav a{font-size:12.5px}.top nav a.out{display:none}
+  .hero{padding-top:0}.genesis-hero{min-height:auto;padding:48px 0 34px}
+  .genesis-copy h1{font-size:39px}.genesis-copy h1 .name{font-size:11px}
+  .genesis-map{max-width:360px}.lang-node{width:90px;height:90px}
+  .lang-node b{font-size:18px}.utterance{width:154px;min-height:90px}.utterance b{font-size:21px}
+  .token{display:none}.genesis-ribbon{margin-top:2px;padding:15px 8px;font-size:16px}
+  .proof{margin-top:40px;border-radius:20px}.proof .cap{padding:14px 15px}
+  .sent{padding:22px 15px 18px}.sent q{font-size:19px}
+  table.chk td,table.chk th{padding-left:12px;padding-right:12px}
+  .pnote{text-align:left}.three{grid-template-columns:1fr}.gate{min-height:auto}
+  .band{gap:9px}.band div{padding:13px}.band b{font-size:22px}
+  .light>.wrap{padding-top:16px}section{padding:52px 20px 32px;border-radius:24px;margin-top:22px}
+  .col-h{gap:9px}.col-h h2{font-size:21px}.col-h .ct{font-size:10.5px}
+  .host{padding:16px}.books{grid-template-columns:1fr 1fr}.bk h3{font-size:17px}
+}
+@media(max-width:430px){
+  .books{grid-template-columns:1fr}.genesis-copy h1{font-size:35px}
+}
+@media(prefers-reduced-motion:reduce){
+  .map-lines .tri,.map-lines .wave,.token{animation:none}
+  .hero-actions a,.gate,.bk,.row{transition:none}
+}
+
 </style>
 </head>
 <body>
@@ -195,9 +457,43 @@ a:focus-visible{outline:2px solid var(--indigo-l);outline-offset:3px}
 
 <div class="wrap">
 <div class="hero">
-<div class="eyebrow">语言 · 新思想生产平台 · Language Genesis</div>
-<h1>每一条规则都通过了，<br><span class="hl">为什么这句话还是不对？</span></h1>
-<p class="lede">这里生产关于语言的新思想。<b>语感</b>不是把规则背得更熟，<b>语法</b>不是把形式守得更死，<b>语言教学</b>也不是把正确答案递得更快——三者共同压着的那个问题是：判定一句话「顺不顺」的那个东西，从来不在任何一张检查表上。</p>
+  <div class="genesis-hero">
+    <div class="genesis-copy">
+      <div class="eyebrow">SDE · LANGUAGE GENESIS · 新思想生产平台</div>
+      <h1><span class="name">语言发生学</span>一句话，怎样在两个人之间<br><em>活起来？</em></h1>
+      <p class="lede">同样一句“我懂了”，可以是理解、敷衍、安慰，也可以是结束对话。语言不只装在句子里；它在<b>形式、用法与场合</b>相遇时发生，在另一个人的回应中获得下一步。</p>
+      <div class="hero-actions">
+        <a class="primary" href="/chatjohn/">和 ChatJohn 谈一句</a>
+        <a href="/all/">浏览十二篇新判断</a>
+        <a href="/#books">进入语言书架</a>
+      </div>
+    </div>
+
+    <div class="genesis-map" role="img" aria-label="形式、用法、场合共同使一句话获得意义">
+      <svg class="map-lines" viewBox="0 0 520 520" aria-hidden="true">
+        <defs>
+          <linearGradient id="langFlow" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#58D5E8"/><stop offset=".5" stop-color="#FFD37A"/><stop offset="1" stop-color="#FF776B"/>
+          </linearGradient>
+        </defs>
+        <circle class="orbit" cx="260" cy="260" r="226"/>
+        <circle class="orbit" cx="260" cy="260" r="174"/>
+        <path class="tri" d="M260 78 L102 407 L418 407 Z"/>
+        <path class="wave" d="M102 407 C170 330 188 300 260 260 C331 220 350 167 418 407"/>
+        <text x="125" y="244">说者</text><text x="358" y="244">听者</text>
+        <text x="232" y="484">回应</text>
+      </svg>
+      <div class="lang-node form"><b>形 式</b><small>FORM</small></div>
+      <div class="lang-node use"><b>用 法</b><small>USE</small></div>
+      <div class="lang-node scene"><b>场 合</b><small>SITUATION</small></div>
+      <div class="utterance"><b>“我懂了”</b><span>理解 · 敷衍 · 安慰 · 结束</span></div>
+      <span class="token t1">你 / I / 他</span>
+      <span class="token t2">？ / 吗 / meaning</span>
+      <span class="token t3">关系 · relation</span>
+      <span class="token t4">未说 · ∅</span>
+    </div>
+  </div>
+  <div class="genesis-ribbon">语言的生命，不在词典给出的那一刻；它在<b>一个人说、另一个人接住或改写</b>的那一刻。</div>
 
 <div class="proof">
   <div class="cap">校　对　单<span>逐项检查 · 结果如下</span></div>
