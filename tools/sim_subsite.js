@@ -1,7 +1,7 @@
 // 复现 worker.js 11296 附近的分站分流逻辑（与源码逐字一致的那两行）
 const SUBSITES = { health: "/sites/health", lang: "/sites/lang", liter: "/sites/liter", edu: "/sites/edu" };
 const EXIST = new Set(["/sites/lang/index.html","/sites/health/index.html","/sites/health/all/index.html",
-  "/sites/liter/index.html","/sites/edu/index.html","/sites/edu/join/index.html",
+  "/sites/liter/index.html","/sites/edu/index.html","/sites/edu/join/index.html","/sites/edu/all/index.html","/sites/edu/chatyang/index.html",
   "/index.html","/students/hu-zhiying/index.html","/students/yang-yong/index.html",
   "/books/m/62/index.html","/books/m/57/index.html","/assets/sde-talk.js"]);
 function assetExists(p){ return EXIST.has(p) || EXIST.has(p.replace(/\/$/,"/index.html")); }
@@ -27,6 +27,8 @@ const cases=[
  ["www.sdeuniverses.com","/","/",true],   // www 不在表里 → subPrefix null → 主站, fellBack false 期望
  ["edu.sdeuniverses.com","/","/sites/edu/",false],
  ["edu.sdeuniverses.com","/join/","/sites/edu/join/",false],
+ ["edu.sdeuniverses.com","/all/","/sites/edu/all/",false],
+ ["edu.sdeuniverses.com","/chatyang/","/sites/edu/chatyang/",false],
  ["edu.sdeuniverses.com","/students/yang-yong/","/students/yang-yong/",true],
  ["edu.sdeuniverses.com","/books/m/57/","/books/m/57/",true],
  ["liter.sdeuniverses.com","/","/sites/liter/",false],
