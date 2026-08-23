@@ -165,8 +165,12 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
     SRC.indexOf("const PER_DOC") > 0 && SRC.indexOf("const PER_DOC") < SRC.indexOf("if (!viaIdx) {"));
   ok("★ 旧的 L0/L1 整段包在 if (!viaIdx) 里（退路仍在，不是被删了）",
     /if \(!viaIdx\) \{[\s\S]{0,200}const man = await idxManifest/.test(SRC));
+  /* 这个判断 2026-08-23 从 `if (...)` 改成了 `let idxOk = !!(...)`——后面还要再过一道
+     索引指纹闸门（两次构建不同源时篇号会错位）。钉的是**这个条件本身**，不是它写在 if 里还是变量里。 */
   ok("拿到长期记忆才算数：ok 且候选非空，否则照旧走旧路",
-    /if \(lt && lt\.ok && \(lt\.cand \|\| \[\]\)\.length\)/.test(SRC));
+    /lt && lt\.ok && \(lt\.cand \|\| \[\]\)\.length/.test(SRC));
+  ok("★ 还要过一道指纹闸门：两次构建不同源时不许混用篇号",
+    /if \(r2st && doSt && r2st !== doSt\)/.test(SRC) && /idxHeal\(env\)/.test(SRC));
   ok("走长期记忆时不再取 manifest/coords（这才是搬出 isolate 的落点）",
     !/^\s*const man = await idxManifest\(env, url\);\n\s*const coords = await loadCoords/m.test(SRC));
   const WR = fs.readFileSync(path.join(__dirname, "../wrangler.jsonc"), "utf8");

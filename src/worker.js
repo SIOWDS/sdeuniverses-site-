@@ -3163,7 +3163,7 @@ export class IndexMemory {
     };
     byTitle(base, 3);
     byTitle(exp, 2);
-    if (!sc.size) return { ok: true, cand: [], docs: [], secLabel: this._secLabel() };
+    if (!sc.size) return { ok: true, cand: [], docs: [], secLabel: this._secLabel(), stamp: this._get("stamp") };
     let cand = Array.from(sc.entries()).map(([i, v]) => ({ i: i, sc: v })).sort((a, b2) => b2.sc - a.sc);
     if (only) {
       const keepSec = new Set();
@@ -3189,7 +3189,11 @@ export class IndexMemory {
       const r = [...this.sql.exec("SELECT i,u,t,sec FROM docs WHERE i=?", c.i)];
       if (r.length) docs.push({ i: r[0].i, u: r[0].u, t: r[0].t, s: r[0].sec });
     }
-    return { ok: true, cand: cand, docs: docs, secLabel: this._secLabel() };
+    /* stamp 必须跟着候选一起回去：候选里的 i 是**本次构建的篇号**，而 L2 是拿这个号去 R2 取
+       `search/doc/<i>.json` 的。两边不是同一次构建时，号对不上 —— 取回的是另一篇文章的正文，
+       而标题又来自本表 ⇒ **标题对、摘录张冠李戴**（2026-08-23 线上实测：kb/find 六条全错）。
+       调用方据此判断能不能混用（见 ragScan 那处闸门）。 */
+    return { ok: true, cand: cand, docs: docs, secLabel: this._secLabel(), stamp: this._get("stamp") };
   }
   _secLabel() { const m = {}; for (const r of this.sql.exec("SELECT sec,label FROM secs")) m[r.sec] = r.label; return m; }
 }
@@ -4074,6 +4078,16 @@ function _scoreKeys(list, baseKeys, exp, prev) {
    IndexMemory 是**一个**全站单例（idFromName("global")）：倒排表只建一份，所有请求共用。
    失败一律吞掉并回 null —— 长期记忆不可用时必须能退回旧路，宁可慢一点、宁可多占一点堆，
    也不要整站问不出话。走 _do() ⇒ 连绑定脱开都只是回 null，不抛。 */
+/* 倒排表落后于 R2 索引时，催它重建一次。**节流 15 分钟**——_ensure 自己是分片跑的
+   （一次 alarm 一件），但重复叫它开工既费 DO 写入额度也没有意义。
+   不 await：这一趟问答该走的是退路，不该等重建。失败一概吞掉（检索不能因为它红）。 */
+let IDX_HEAL_AT = 0;
+function idxHeal(env) {
+  const now = Date.now();
+  if (now - IDX_HEAL_AT < 900000) return;
+  IDX_HEAL_AT = now;
+  try { const p = idxAsk(env, { op: "ensure" }); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+}
 async function idxAsk(env, body) {
   try {
     const ns = _do(env, "IDXMEM");
@@ -4100,7 +4114,27 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   {
     const lt = await idxAsk(env, { op: "query", baseKeys: baseKeys, exp: exp, prev: prev, only: o.only || "",
                                    keep: o.keep || [], pick: PICK_DOCS });
-    if (lt && lt.ok && (lt.cand || []).length) {
+    /* ⛔【同一次构建才通用】—— 2026-08-23 线上抓到的错配。
+       候选篇号 lt.cand[].i 是**倒排表那次构建**的篇号，而下面的 L2 拿它去 R2 取
+       `search/doc/<i>.json`；R2 那份索引每天由 CI 重建，倒排表落后一天是常态
+       （实测：倒排 4,996 篇 / 08-22 04:18，R2 manifest 5,475 篇 / 08-22 15:46）。
+       两边差 479 篇 ⇒ 篇号整体错位 ⇒ **标题取自倒排表（对的），正文取自 R2（另一篇）**。
+       症状极隐蔽：清单看着句句相关，摘录却驴唇不对马嘴；kb/find、kb/retrieve、
+       /api/ask 的站内资料全中招，而且不报任何错。
+       闸门：两个指纹都拿得到且不相等 ⇒ 这一趟不许走倒排路，退回 L0/L1
+       （那条路 man.docs 与 doc/<i>.json 同源，编号自洽）。
+       ⚠ 只在**两个都非空且不等**时拦：本地/预览取不到 etag，取不到就别拦，否则整条检索直接废掉。 */
+    let idxOk = !!(lt && lt.ok && (lt.cand || []).length);
+    if (idxOk) {
+      let r2st = "";
+      try { await tierFresh(env); r2st = TIER.stamp || ""; } catch (e) {}
+      const doSt = String((lt && lt.stamp) || "");
+      if (r2st && doSt && r2st !== doSt) {
+        idxOk = false;
+        idxHeal(env);        // 顺手催它追上去；节流在函数里，不会每问一次就重建一遍
+      }
+    }
+    if (idxOk) {
       docsArr = [];                             // 稀疏数组：调用方一直按 docs[编号] 取，形态不变
       for (const d of (lt.docs || [])) docsArr[d.i] = d;
       cand = lt.cand.map((c) => ({ i: c.i, sc: c.sc }));

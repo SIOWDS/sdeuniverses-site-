@@ -208,7 +208,14 @@ const FILES = Object.assign({
 
   /* ═══ 六、调用侧：三处 tierFresh 都改成了 await，且 rag 失败带回执 ═══ */
   console.log("\n六、调用侧");
-  ok("tierFresh 的三个调用点全部 await 并带 env", (SRC.match(/await tierFresh\(env\);/g) || []).length === 3);
+  /* 原来钉的是「正好三处」。2026-08-23 加索引指纹闸门时又多了一处合法调用，这条当场假红。
+     钉那件真要守的事：**一处都不许漏掉 await**（漏了就是拿旧索引答题），处数只给下限。 */
+  ok("tierFresh 每个调用点都 await 并带 env",
+    (SRC.match(/await tierFresh\(env\)/g) || []).length >= 3
+    /* 分母要减掉函数**自身的声明**那一行（`async function tierFresh(env) {`），
+       否则永远差一，判据变成永假。 */
+    && (SRC.match(/await tierFresh\(env\)/g) || []).length
+       === (SRC.match(/tierFresh\(env\)/g) || []).length - 1);
   ok("没有遗留的同步 tierFresh()", !/[^t]tierFresh\(\);/.test(SRC));
   ok("ChatSDE 那条 rag 失败把平台回执带回来", /_ragWhy = "HTTP " \+ rr\.status \+ \(_et \? \("：" \+ _et\) : ""\);/.test(SRC));
   ok("5xx 之后隔一拍再试", /await new Promise\(\(rs2\) => setTimeout\(rs2, 300\)\);/.test(SRC));
