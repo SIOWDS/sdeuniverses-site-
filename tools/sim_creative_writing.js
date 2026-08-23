@@ -33,6 +33,20 @@ const ok = (c, m) => { if (c) { pass++; } else { fail++; console.log("  ✗ " + 
 const sec = (t) => console.log("\n【" + t + "】");
 
 /* ── 取 worker.js 里某一档 SPEC 的整块文本（从 `key: { name:` 到下一个 `key: { name:`）── */
+/* 【共用常量要展开再查】2026-08-23：S-1…S-12 从 story 的 SPEC 里抽成模块级 STORY_CORE
+   （短篇与中篇共用一份，不许有两份口径）。于是「SPEC 里有没有 S-7」不能再按字面查——
+   查得到的只是 `+ STORY_CORE` 这四个字。⇒ 先把常量的**真值**取出来替换进去再查。
+   ⚠ 取真值而不是取源码：这一次重构里 `const STORY_CORE = ""` 后面少了那些 `+`，
+      **node --check 照样通过**（ASI 把它断成了一个空串加一串没人要的表达式语句），
+      常量真值是空的而语法零报错。按真值判，才判得出这一种。 */
+const STORY_CORE = (function () {
+  const i = W.indexOf('const STORY_CORE = ""');
+  if (i < 0) return "";
+  const j = W.indexOf(";\n\n", i);
+  if (j < 0) return "";
+  try { return eval("(" + W.slice(i + 'const STORY_CORE ='.length, j) + ")"); } catch (e) { return ""; }
+})();
+
 function specBlock(key) {
   /* ⚠ 2026-08-23：这条原来把 `name: "…", tok: N, spec:` 整串抄进正则，
      于是三档创作体一加 noHead/parts/fixed（拆趟表插在 tok 与 spec 之间）就全找不到 SPEC，
@@ -44,7 +58,8 @@ function specBlock(key) {
   const start = m.index;
   const rest = W.slice(start + 10);
   const nxt = rest.search(/\n        [a-z0-9]+: \{ name: "/);
-  return { name: m[1], tok: +m[2], body: rest.slice(0, nxt > 0 ? nxt : 6000) };
+  const raw = rest.slice(0, nxt > 0 ? nxt : 9000);
+  return { name: m[1], tok: +m[2], body: raw.split("STORY_CORE").join(STORY_CORE) };
 }
 
 /* ══ ① 规范层附录 A：三档编译表 ⇄ 成文机 SPEC ══════════════════════ */
@@ -121,17 +136,32 @@ ok(W.slice(W.indexOf("function johnComposeSys")).indexOf("CW_X") > 0,
 
 /* ══ ④ 附录 A 第二张表：JOHN_COMPOSE 趟数 × 每趟 ══════════════════ */
 sec("④ ChatJohn 概括成文的趟数与字数");
-const jcRe = /\|\s*`(wechat|essay|story)`\s*\|\s*([^|]+?)\s*\|\s*(\d+)\s*×\s*(\d+)\s*\|/g;
+const jcRe = /\|\s*`(wechat|essay|story)`\s*\|\s*([^|]+?)\s*\|\s*(\d+)\s*×\s*([\d/\s]+?)\s*\|/g;
 const jcRows = [];
-while ((r = jcRe.exec(SKILL))) jcRows.push({ key: r[1], label: r[2], parts: +r[3], per: +r[4] });
+while ((r = jcRe.exec(SKILL))) {
+  const cell = r[4].trim();
+  const multi = cell.indexOf("/") >= 0 ? cell.split("/").map((x) => +x.trim()) : null;
+  jcRows.push({ key: r[1], label: r[2], parts: +r[3], per: multi ? multi[0] : +cell, pers: multi });
+}
 ok(jcRows.length === 3, "附录 A 第二张表应解析出 3 行，实得 " + jcRows.length);
 jcRows.forEach((row) => {
-  const m = W.match(new RegExp(row.key + ":\\s*\\{ parts: (\\d+), per: (\\d+), label: \"([^\"]+)\""));
+  /* ⚠ 2026-08-23：essay 加了 pers（各趟不等长）插在 per 与 label 之间，
+     原来那条把 `per: N, label:` 抄死的正则当场找不到 essay。按用意重写：只认 parts 与 per，
+     label 另找。 */
+  const m = W.match(new RegExp(row.key + ":\\s*\\{ parts: (\\d+), per: (\\d+)[,\\s]"));
+  const lb = W.match(new RegExp(row.key + ":\\s*\\{ parts: \\d+,[^}]*label: \"([^\"]+)\""));
   ok(!!m, "JOHN_COMPOSE 里没有 " + row.key);
   if (!m) return;
   ok(+m[1] === row.parts, row.key + " 趟数不一致：Skill " + row.parts + " vs 代码 " + m[1]);
-  ok(+m[2] === row.per, row.key + " 每趟字数不一致：Skill " + row.per + " vs 代码 " + m[2]);
-  ok(m[3] === row.label, row.key + " 档名不一致：" + row.label + " vs " + m[3]);
+  if (row.pers) {
+    const pm = W.match(new RegExp(row.key + ":\\s*\\{ parts: \\d+, per: \\d+, pers: \\[([^\\]]+)\\]"));
+    ok(!!pm, row.key + " 的 pers（各趟不等长）在代码里找不到");
+    if (pm) ok(pm[1].replace(/\s/g, "") === row.pers.join(","),
+      row.key + " 各趟字数不一致：Skill " + row.pers.join("/") + " vs 代码 " + pm[1]);
+  } else {
+    ok(+m[2] === row.per, row.key + " 每趟字数不一致：Skill " + row.per + " vs 代码 " + m[2]);
+  }
+  ok(!!lb && lb[1] === row.label, row.key + " 档名不一致：" + row.label + " vs " + (lb ? lb[1] : "取不到"));
 });
 
 /* ══ ⑤ 两处趟数口径：JOHN_COMPOSE ⇄ lite 页 KINDS ═══════════════════
@@ -234,6 +264,68 @@ ok(/封顶 85/.test(W.slice(W.indexOf("function cwGrade"), W.indexOf("function c
   "cwGrade 里没写硬律违反封顶 85");
 ok(SKILL.indexOf("目标线：90") >= 0 || SKILL.indexOf("**目标线：90**") >= 0, "Skill §9.1 没写目标线 90");
 ok(SKILL.indexOf("### 9.2 从 87 到 90") >= 0, "Skill 缺 §9.2「从 87 到 90 差的三件」");
+
+/* ══ ⑭ 三件工程活（2026-08-23）══════════════════════════════════════
+   ① 世界快照 world：分趟叙事的承重件（P-9 / S-9 靠它才有机器保障）
+   ② 中篇档 novella：分册 §3.4 那条「中长篇故意没有机器层」的欠条
+   ③ 末句机检 tailCut：整篇收尾也要判一次（noHead 档此前完全漏判） */
+sec("⑭ 世界快照 / 中篇档 / 末句机检");
+{
+  /* ①-a 该开 world 的三档都开了；不该开的没被顺手打开 */
+  ["prose", "story", "novella"].forEach((k) => {
+    ok(new RegExp("\\n        " + k + ": \\{[^\\n]*world: 1").test(W), k + " 档没开 world（分趟时设定会各写一份）");
+  });
+  ["wechat", "poem"].forEach((k) => {
+    ok(!new RegExp("\\n        " + k + ": \\{[^\\n]*world: 1").test(W), k + " 档不该开 world（它没有跨趟的设定连续性问题）");
+  });
+  /* ①-b 提纲那一趟要得出来、正文各趟收得到，两头都要在 */
+  ok(/SPEC\.world \? \('"world":/.test(W), "plan 那一趟没有向基底要 world 字段");
+  ok(W.indexOf("【世界快照（全篇唯一，本趟必须逐条遵守") >= 0, "正文各趟没有回灌世界快照");
+  ok(W.indexOf("这一篇没有拟出设定表") >= 0,
+    "世界快照为空时没有明说——静默不下发等于把「没定」记成了「不需要」");
+  ok(/world: SPEC\.world \? "" : undefined/.test(W), "bare 兜底没有显式给出 world 键");
+  /* ①-c 线索表只给中篇（短篇散文用不上，给了是噪声） */
+  ok(/\n        novella: \{[^\n]*threads: 1/.test(W), "novella 没开 threads（线索表）");
+  ok(W.indexOf("另加⑦线索表") >= 0, "plan 提示语里没有线索表那一条");
+
+  /* ②-a 中篇八节表：M-1 那一对必须互相指认，否则中篇就不是中篇 */
+  const nb = specBlock("novella");
+  ok(!!nb, "worker.js 里找不到 novella 档");
+  if (nb) {
+    ok(nb.name === "中篇小说（24000字）", "novella 档名不对：" + nb.name);
+    ok(/parts: 8/.test(W.slice(W.indexOf("novella: { name:"), W.indexOf("novella: { name:") + 300)), "novella 不是八趟");
+    ok(nb.body.indexOf("将在第 7 节被原样重来一次") >= 0, "第 2 节没写明它会在第 7 节被重来（M-1 的一半）");
+    ok(nb.body.indexOf("与第 2 节同形的处境再来一次") >= 0, "第 7 节没指回第 2 节（M-1 的另一半）");
+    ["M-1", "M-2", "M-4", "M-5"].forEach((c) => ok(nb.body.indexOf(c) >= 0, "novella SPEC 里没有 " + c));
+    /* 十二条 S 律靠 STORY_CORE 拼进来——展开后必须条条都在 */
+    LAWS.story.forEach((c) => ok(nb.body.indexOf(c) >= 0, "novella 拼上 STORY_CORE 之后仍缺 " + c));
+    ok(nb.body.indexOf("压强") >= 0, "novella SPEC 没写「中篇与短篇是压强的两档」这条分界");
+  }
+  /* ②-b STORY_CORE 是共用的一份：真值非空，且短篇也吃这一份 */
+  ok(STORY_CORE.length > 1500, "STORY_CORE 真值只有 " + STORY_CORE.length
+    + " 字符——多半是 `const X = \"\"` 后面漏了 `+`，ASI 会把它断成空串而 node --check 照样通过");
+  ok(W.indexOf('          + STORY_CORE\n') >= 0, "story 档没有拼上 STORY_CORE（十二条 S 律落空）");
+  /* ②-c 一档三处：白名单、字数、档次表，缺一处就是「菜单点得到、后端认不出」 */
+  ok(/novella: 1/.test(W), "novella 不在服务端白名单里");
+  ok(/novella: 24000/.test(W), "DIST_WORDS 里没有 novella");
+  ok(/novella:\[16000,24000,40000\]/.test(W.replace(/\s/g, "")), "DIST_WORD_OPTS 里 novella 不是 16000/24000/40000");
+  const MODE = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");
+  ok(/k: "novella"[^}]*w: 24000/.test(MODE), "前端 KIND_DEF 里没有 novella，或目标字数对不上");
+  ok(/k: "novella"[^}]*[,{]\s*c: 1/.test(MODE), "novella 没标 c:1（不走拆趟那条路，八节会挤成一趟）");
+  ok(MODE.indexOf("kNovella:") >= 0, "前端没有 kNovella 的文案");
+  /* ⚠ 这一条是上面那次漏网留下的：`doc: 1` 里含着子串 `c: 1`，
+     所以凡是查这类短旗标，一律钉「逗号或左括号之后」，不许裸查。
+     同样的写法对四档创作体各查一次——它们全都必须走拆趟那条路。 */
+  ["wechat", "prose", "story", "novella"].forEach((k) => {
+    ok(new RegExp('k: "' + k + '"[^}]*[,{]\\s*c: 1').test(MODE), k + " 没标 c:1（不走拆趟，整篇会挤成一趟）");
+  });
+
+  /* ③ 末句机检：逐趟判之外，整篇收尾也要判一次 */
+  ok(MODE.indexOf("function tailCut") >= 0, "wds-mode.js 里没有 tailCut");
+  ok(MODE.indexOf("全文停在半句上") >= 0,
+    "收尾处没有全文末句闸——noHead 档没有 `## 小标题`，missingSecs 永远回空，断稿一路静默");
+  ok(/if \(tailCut\(text\)\)/.test(MODE), "全文末句闸判的不是整篇 text");
+}
 
 /* ══ ⑧ 规范层自身的完整性 ═══════════════════════════════════════ */
 sec("⑧ 规范层自检");
@@ -339,7 +431,11 @@ ok(SKILL.indexOf("sde-story-writing.md") >= 0, "总纲第五节没有指向小�
 LAWS.story.forEach((code) => ok(STORY.indexOf("### " + code + " ·") >= 0, "小说分册缺硬律条文 " + code));
 /* 附录 A 要与机器层对上，且必须写明中长篇没有机器层（否则下一个人会以为漏了） */
 ok(/`story`[^\n]*2400[^\n]*10000/.test(STORY), "小说分册附录 A 的 story 行与机器层字数/预算对不上");
-ok(/未实现|没有机器层/.test(STORY), "小说分册没写明中篇与长篇只有规范层——下一个改这里的人会以为机器层漏了");
+/* 2026-08-23：中篇已有机器层，欠条只剩长篇那一件（快照的增量更新）。
+   这条断言的用意没变——**分册必须写明哪一件还没做**，否则下一个人会以为机器层漏了。 */
+ok(/长篇仍然只有规范层|长篇还不能/.test(STORY), "小说分册没写明长篇仍无机器层");
+ok(STORY.indexOf("快照的增量更新") >= 0, "小说分册没写明长篇缺的到底是哪一件");
+ok(STORY.indexOf("`novella`") >= 0, "小说分册附录 A 没把中篇挪进已实现那一张表");
 ok(/2000\/1750\/1250/.test(PROSE), "分册附录 A 没写 ChatSDE 的三趟分法");
 LAWS.prose.forEach((code) => ok(PROSE.indexOf("### " + code + " ·") >= 0, "散文分册缺硬律条文 " + code));
 

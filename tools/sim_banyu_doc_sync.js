@@ -35,7 +35,7 @@ console.log('【二】说明页覆盖到 app 的每一档');
 const NAME = {
   report: '对话报告', essay: '提炼成文', paper1: '两万字论文', paper: '两万字论文',
   outline: '写作提纲', sumdoc: '总结你载入的那篇文章', deck: 'PPT',
-  wechat: '公众号文章', prose: '散文', story: '短篇小说', script: '剧本', poem: '诗歌',
+  wechat: '公众号文章', prose: '散文', story: '短篇小说', novella: '中篇小说', script: '剧本', poem: '诗歌',
   notice: '通知公告', plan: '方案策划', summary: '总结述职', speech: '讲话致辞', letter: '函件邮件',
 };
 kinds.forEach((k) => {

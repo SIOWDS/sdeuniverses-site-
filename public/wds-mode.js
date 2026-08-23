@@ -855,6 +855,7 @@
       kWechat: "公众号文章（3000字）", kWechatS: "开头三句必须有一个具体场面；小标题分段、短句、结尾给一个明天就能做的动作",
       kProse: "散文（5000字）", kProseS: "不讲道理讲经验：从一个场面进去，道理藏在事里，收在一个具体画面上",
       kStory: "短篇小说（2400字）", kStoryS: "一个场景、一到三个人；判断由情节自己撞出来，结尾不解决不点题",
+      kNovella: "中篇小说（24000字）", kNovellaS: "三幕八节、一主一反两条线；第二节那个选择会在第七节原样重来一次，只有动作不同",
       kScript: "剧本（6000字）", kScriptS: "只写看得见与听得见的；写得出「他心里想」的那一句，一定是错的",
       lnPick: "先定体量", lnUnit: " 字",
       lnNote: "三千字与八千字不是同一篇的两种长度：**短的那一档要砍掉一条线，长的那一档要多一个人**。所以体量在动笔之前定，不是写完再删——删出来的稿子逻辑是断的。",
@@ -1093,6 +1094,7 @@
       kWechat: "Column piece (3,000 characters)", kWechatS: "A concrete scene in the first three lines; short sections, short sentences, one thing to do tomorrow",
       kProse: "Personal essay (5,000 characters)", kProseS: "Experience, not argument: enter through a scene, keep the point inside the events, end on an image",
       kStory: "Short story (2,400 characters)", kStoryS: "One scene, one to three people; the claim has to surface through what happens — no moral at the end",
+      kNovella: "Novella (24,000 characters)", kNovellaS: "Eight sections in three acts, one main line and one rival; the choice in section 2 returns unchanged in section 7 — only the action differs",
       kScript: "Screenplay (6,000 characters)", kScriptS: "Only what can be seen and heard; any line saying what someone thinks is a wrong line",
       lnPick: "Pick a length first", lnUnit: " chars",
       lnNote: "Three thousand and eight thousand are not two lengths of one piece: **the short one has to lose a thread, the long one has to gain a person.** So length is settled before writing, not by cutting afterwards — a cut-down draft has a broken spine.",
@@ -6618,6 +6620,11 @@
     { k: "wechat", t: "kWechat", sty: 1, doc: 1, w: 3000, c: 1, wo: [1500, 3000, 5000] },
     { k: "prose", t: "kProse", sty: 1, doc: 1, w: 5000, c: 1, wo: [3000, 5000, 8000] },
     { k: "story", t: "kStory", sty: 1, doc: 1, w: 2400, c: 1, wo: [1600, 2400, 4000] },
+    /* 中篇（2026-08-23）。它与短篇不是同一件事的两种长度，是**压强的两档**——
+       短篇的力挤在一个转上，中篇的力在同一个人前后两次选择的差上。
+       ⚠ 它是全站第一个吃「世界快照」的档（服务端 SPEC.world + SPEC.threads）：
+          提纲那一趟产出设定表与线索表，八趟正文逐趟原样回灌。八趟＝八次调用，写一次要几分钟。 */
+    { k: "novella", t: "kNovella", sty: 1, doc: 1, w: 24000, c: 1, wo: [16000, 24000, 40000] },
     /* 剧本与小说最容易被当成一回事，而承重物不同：小说是演出（读者读叙述），剧本是可排演
        （只写看得见与听得见的）。⚠ 它给 sty（腔调可学）但**不给 verse**（它不是诗体排版）。 */
     { k: "script", t: "kScript", sty: 1, doc: 1, w: 6000, c: 1, wo: [3000, 6000, 12000] },
@@ -7846,6 +7853,18 @@
                   + (fm.cut ? ("；本地时钟：" + fm.cut + "闸已掐") : "") + "）")
                   : t("dWallNoMeta")), 1);
           }
+          /* 【全文末句闸】2026-08-23 补。tailCut 此前只逐节判（cutSecs），而 missingSecs 是靠
+             `## 小标题` 切块的——**noHead 那几档（散文／小说／中篇／公众号／剧本）根本没有小标题**，
+             于是它永远回空数组：断在半句上的稿子既不报、续写钮也不亮。
+             《滤网沉泥》那份 7172 字的散文最后五个字是「记得细得吓人，谁」，全程零提示，就是这么漏的。
+             ⇒ 全文收尾时再判一次整篇的末字；断了就明说，并把续写钮亮出来。 */
+          try {
+            if (tailCut(text)) {
+              dNote("⚠ 全文停在半句上（最后一句没有句号）——这不是写完了，是断在那儿了。"
+                + "用下面的「继续写」把最后一句补完，或把最后半句删掉自己收尾。", 1);
+              if (goOnBtn) goOnBtn.style.display = "";
+            }
+          } catch (e) {}
           /* 撞墙／写完都在这里亮续写钮——它是这台机器面对上游墙的唯一正解：
              不赌一口气十六节，而是分几趟把缺的补齐。 */
           try { if (goOnBtn && dSecs && missingSecs(text, dSecs).length) goOnBtn.style.display = ""; } catch (e) {}
