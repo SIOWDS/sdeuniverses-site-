@@ -116,10 +116,51 @@ console.log("── ① 档案表与解析器 ───────────�
   t("lang 也不收秦莉的篇（两档不串台）", !S.wdsProfInScope(lang, "/students/qin-li/line-of-separation/"));
   t("liter 带题域闸与术语闸", !!lit && /题域闸/.test(lit.guard || "") && /术语闸/.test(lit.term || ""));
   t("liter 每条前缀都带结尾斜杠", !!lit && lit.pre.every((x) => /\/$/.test(x) || /\.html$/.test(x)));
-  /* ⚠ liter 暂时没有自己的内功档：通用那份满是母体术语，挂上去等于自拆术语闸
-     （lang 实测泄漏 109 处、其中 65 处出自那一个文件）。写好文学版之前，这里必须是空的。 */
-  t("liter 宁可不挂内功，也不挂通用那份母体术语底盘",
-    !!lit && (!lit.neigong || lit.neigong.indexOf("lite") < 0), lit && lit.neigong);
+  /* ⚠ 两档都**不许挂通用那份** `sde-neigong-lite.txt`：它自己满是母体术语，
+     挂上去等于自拆术语闸（lang 实测泄漏 109 处、其中 65 处出自那一个文件）。
+     2026-08-23 liter 已挂上自己那份 liter-neigong.txt，见 ②d。 */
+  /* ⚠ 判据别写成 indexOf("lite")：`liter-neigong.txt` 里正好含 "lite" 四个字母，
+     第一版就是这么误伤的——安全网自己抓自己，比不设网更费时间。按文件名精确判。 */
+  t("两档都不挂通用那份母体术语底盘",
+    !!lit && !/neigong-lite\.txt$/.test(lit.neigong) && !/neigong-lite\.txt$/.test(lang.neigong),
+    (lit && lit.neigong) + " / " + (lang && lang.neigong));
+
+  console.log("\n── ②d 三台都装上这一档的底盘（2026-08-23）──────");
+  /* 王德生令「三个智能体都要加内功＋方法论」。三台走两条路：
+     ChatFeiSuo 与 共创 走 /api/wds/chat（问答与画布共用），共读走 /api/wds/read。
+     ⚠ 只给第一条路装上而漏了陪读，症状是**页面上写着共读、底盘却还是 ChatSDE**——
+       不报错、答得像模像样，没有人会发现。所以这一节逐条钉。 */
+  const fs2 = require("fs");
+  t("liter 挂了自己的内功档", !!lit && lit.neigong === "/taste/assets/liter-neigong.txt", lit && lit.neigong);
+  t("内功档真在仓库里", fs2.existsSync("public/taste/assets/liter-neigong.txt"));
+  {
+    const ng = fs2.readFileSync("public/taste/assets/liter-neigong.txt", "utf8");
+    const cjk = (ng.match(/[\u4e00-\u9fff]/g) || []).length;
+    t("内功档够厚（文学是大部头，≥6000 汉字）", cjk >= 6000, String(cjk));
+    t("第零条是说话的规矩（术语纪律在最前）", /第零条[^\n]*说话的规矩/.test(ng));
+    t("三样用的是文学自家的词（文本／抉择／处境）", /在处境里，经抉择，成文本/.test(ng));
+    t("带方法论：二阶碰撞六步", /六步/.test(ng) && /最不客气的近邻/.test(ng));
+    t("带方法论：问题裁定三档", /承接/.test(ng) && /改切/.test(ng) && /驳回/.test(ng));
+    t("带文学这一行的看家判断（第五条）", /决断/.test(ng) && /代偿/.test(ng) && /盈余/.test(ng) && /假留白/.test(ng));
+    t("⭐ 内功档里没有母体术语裸露（它自己就是泄漏源的话，术语闸等于白设）",
+      !/(差异序列|特征纠缠|结构显露态|S=F\(D,E\))/.test(ng.replace(/^#.*$/gm, "")));
+    t("涉及读者处于危险时的处置写在里面", /自伤|危险/.test(ng));
+  }
+  {
+    const rd = fs2.readFileSync("public/taste/wds-companion/wds-read.js", "utf8");
+    t("陪读组件把 profile 递上去", /payload\.profile = String\(CFG\.profile\)/.test(rd));
+    t("陪读端点认 profile 并换内功", /const rProf = wdsProfileOf\(b\.profile\)/.test(WC)
+      && /loadNeigong\(env, url, rProf\.neigong\)/.test(WC));
+    t("陪读也接上人格与两道闸", /rProf\.sys/.test(WC) && /rProf\.guard/.test(WC) && /rProf\.term/.test(WC));
+    /* 闸必须在最末：陪读那一大段通用提示语里全是母体术语，闸写在前面就被后面的字压掉。 */
+    const line = (WC.match(/if \(rProf\) sys = [^\n]*/) || [""])[0];
+    t("⭐ 人格在最前、两道闸在最末", /rProf\.sys[^\n]*\+ sys \+[^\n]*guard[^\n]*term/.test(line), line.slice(0, 90));
+    t("内功读不到会出 note，不静默降级", /没读到[^"]*退回通用骨架陪读/.test(W));
+  }
+  {
+    const one = fs2.readFileSync("public/students/qin-li/line-of-separation/index.html", "utf8");
+    t("她的文章页把陪读挂成 liter 档", /window\.WDS_READ=\{[^}]*profile:"liter"/.test(one));
+  }
 
   console.log("\n── ②b 白名单下推到候选阶段（治 K 饥饿）─────────");
   /* ⭐ 线上实测过的病：白名单只在取完 top-20 之后滤，而它约占全站 1%，
@@ -186,7 +227,11 @@ console.log("\n── ②c 这一档自己的内功 ─────────�
   t("老路径仍走老缓存（本体行为一字不变）",
     /if \(P === "\/taste\/assets\/sde-neigong\.txt" && NEIGONG\) return NEIGONG;/.test(WC));
   // 答题处：装上就顶掉那一行骨架；读不到要出声
-  const sdemSeg = WC.slice(WC.indexOf("let SDEM ="), WC.indexOf("let SDEM =") + 1200);
+  /* ⚠ 2026-08-23 起 `let SDEM =` 有两处（陪读一处、答题一处，陪读在前）。
+     原来这里取的是第一处，加了陪读之后它就悄悄改成在验陪读那一段——
+     而答题那一段有没有换内功，就没人验了。按 prof.neigong 定位答题那一处。 */
+  const _sdemIdx = WC.indexOf("let SDEM =", WC.indexOf("if (prof && prof.neigong)") - 900);
+  const sdemSeg = WC.slice(_sdemIdx, _sdemIdx + 1200);
   t("答题处按档案换内功", /if \(prof && prof\.neigong\)/.test(sdemSeg));
   t("装上就顶掉那一行骨架", /if \(_pn\) SDEM = /.test(sdemSeg));
   t("读不到不静默退回，要出声", /else controller\.enqueue\(_sseBytes\(\{ t: "note"/.test(sdemSeg));

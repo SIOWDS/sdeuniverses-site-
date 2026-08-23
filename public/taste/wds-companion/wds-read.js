@@ -466,6 +466,11 @@
     if (CFG.room) payload.room = CFG.room;
     if (CFG.guide) payload.guide = 1;
     if (CFG.book) payload.book = 1;   // 共读一本书：陪读的高级档（内功精简＋三类判＋方法论＋站内旁证）
+    /* 【领域档案 —— 2026-08-23】页面写 window.WDS_READ={profile:"liter"} 即可让陪读换成
+       那一档的人格与底盘（服务端 WDS_PROFILES 认这个 key；认不出就照旧是 WDS 本人）。
+       递上去的只是一个 key：人格、内功、题域闸都在服务端，客户端塞不进来。
+       ⚠ 不写这一行的后果不会报错——页面上写着「文学共读」，陪你读的仍是 ChatSDE。 */
+    if (CFG.profile) payload.profile = String(CFG.profile).slice(0, 24);
 
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
       .then(function (resp) {

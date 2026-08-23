@@ -822,10 +822,15 @@ const WDS_PROFILES = {
     home: "https://liter.sdeuniverses.com/",
     all: "https://liter.sdeuniverses.com/all/",
     sys: FEISUO_SYS,
-    /* ⚠ 这一档**暂不挂自己的内功**：lang 那份 lang-neigong.txt 是整份改用语言学说法重写的，
-       文学这一档需要同样规格的一份（改用文学与批评自家的话），还没写。
-       挂通用那份的后果是已知的：实测闸外泄漏 109 处，其中 65 处出自那一个文件。
-       ⇒ 宁可先只挂引擎默认的一行骨架，也不挂一份满是母体术语的底盘。写好再加这一行。 */
+    /* 【这一档自己的内功 —— 2026-08-23】`liter-neigong.txt`（7,370 汉字，比 lang 那份厚三成：
+       王德生令「文学是个大部头」）。同一套工序，整份改用文学与批评自家的说法：
+       文本／抉择／处境 三样，六条起手，二阶碰撞六步，问题裁定三档，
+       外加**第五条「文学这一行的看家判断」**——身体反应先解释、决断与代偿与盈余的分法、
+       三种假留白、感动的顺序、失败内部的差异、改编把原作当试剂、评论的规矩、并蒂文的写法。
+       ⚠ 绝不改挂通用的 `sde-neigong-lite.txt`：它自己通篇是母体术语，
+         lang 那边实测递给基底的 system 闸外泄漏 109 处、其中 65 处出自那一个文件。
+       ⚠ 也不覆盖 `/taste/assets/sde-neigong.txt`：那一份被站上十几台智能体直接 fetch。 */
+    neigong: "/taste/assets/liter-neigong.txt",
     tools: ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"],
     pre: LITER_PRE,
     how1: "\n1. 像斐索本人：从一段具体的文字入手，先诊断再建议；读者的身体反应（读不下去、忽然停住）是最先要解释的证据，不是修养问题。",
@@ -9116,7 +9121,21 @@ export default {
             // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
             let reflect = String(b.reflect || "").slice(0, 14000);   // SDE 对谈：本场开工亲写的心得（客户端随每条消息带上）
             if (!reflect) { try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {} }
-            const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+            let SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+            /* 【陪读也认领域档案 —— 2026-08-23】王德生令「三个智能体都要加内功＋方法论」。
+               陪读原来一律用上面那一行通用骨架：于是在文学分站里读秦莉的文章，
+               陪你读的仍是 ChatSDE 本人，满口 S/D/E——**页面上写着共读，底盘却不是那一台**。
+               装上档案＝换掉骨架（内功）＋接上人格、题域闸与术语闸。
+               ⚠ 与问答那条路同一条纪律：内功读不到**不许静默退回**，要出 note 帧说明。
+               ⚠ 档案只从 b.profile 这一个 key 认，认不出就是 null＝照旧通用——
+                 客户端递不进人格，也递不进白名单。 */
+            const rProf = wdsProfileOf(b.profile);
+            if (rProf && rProf.neigong) {
+              let _rn = "";
+              try { _rn = await loadNeigong(env, url, rProf.neigong); } catch (e) {}
+              if (_rn) SDEM = "\n\n" + _rn;
+              else controller.enqueue(_sseBytes({ t: "note", v: "这一档自己的内功文件这次没读到，本轮退回通用骨架陪读（答案仍可用，但底盘不是 " + rProf.name + " 那一份）。" }));
+            }
             // SDE 对谈（guide）：全站 RAG 加强档——K=36 广召回 + 上一轮接续检索，上下文上限 3 万字符，来源随流回传
             let siteCtx = "", siteSrcs = [];
             if (b.guide || b.book) {
@@ -9154,9 +9173,13 @@ export default {
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
             let _bookNg = "";
     if (b.book) { try { _bookNg = neigongLite(await loadNeigong(env, url.origin + "/")); } catch (e) {} }
-    const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)
+    let sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)
       : (b.book ? WDS_BOOK_SYS(reflect, SDEM, docTitle, docText, _bookNg, siteCtx)
                 : WDS_READ_SYS(reflect, SDEM, docTitle, docText));
+    /* 档案的人格放**最前**（读者第一眼就该是这一台），题域闸与术语闸放**最末**——
+       后面的字压前面的字，而上面那一大段通用陪读提示语里全是母体术语。
+       次序写反的后果不会报错：它照样陪你读，只是又变回了 ChatSDE。 */
+    if (rProf) sys = (rProf.sys ? rProf.sys + "\n\n" : "") + sys + (rProf.guard || "") + (rProf.term || "");
             // LONG_ASK 落地：读者要长篇时，①预算按要的字数给（8000 token 装不下 8000 汉字）；
             // ②当轮明确解除 system 里"一次两三段以内、别写论文"那一条，否则两条指令打架、它只会在思考里空转；
             // ③叮嘱它别在思考里打草稿、直接落笔——写出来的每一个字都留得住（中途断线也不丢），写不完读者说「继续」。
