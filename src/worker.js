@@ -5452,6 +5452,24 @@ function nbrChainBlock(res) {
     + (list || "（这一趟一条也没召回。）");
 }
 
+/* 成文那一路怎么用这份名单（2026-08-23）。nbrChainBlock 已经写了四条通用纪律，
+   这里只补成文特有的三条，每一条都是从一份真产出的实测缺陷里抠出来的：
+     · 只盘老经典＝没做敌意拓宽（那篇八位最近邻全在 1977–2014，正主在 2023–2026）；
+     · 编造网址（把两篇挂在一个不存在的站点上）；
+     · 声称一份没有写出来的材料清单（「共纳入 22 件…与正文逐件对应」，全文找不到那份清单）。 */
+function distNbrUsage(hasList) {
+  return "\n\n【成文时怎么用这份名单（三条硬的）】"
+    + (hasList
+        ? "\n① **最近邻盘点里至少三位要出自上面这份名单**。只盘二三十年前的经典而不碰近三年真正在做同一件事的人，"
+          + "等于没做敌意拓宽——**近三年正是你自己记忆最薄的那一段，名单是来补这一段的**。"
+        : "\n① 这一趟一条都没召回：最近邻盘点**按〔未核验〕写**，并在正文里如实说明这一节没有经过站外检索。"
+          + "**不许拿记忆里的老经典充数，更不许说「据我所知尚无人提出」。**")
+    + "\n② **参考文献与正文里的每一个网址，只准从上面这份名单或站内资料里照抄**，一个字符都不许自己拼。"
+      + "记得住篇名记不住网址，就只写篇名——**编一个能打开的样子出来，是这一篇里最严重的一种错**。"
+    + "\n③ 凡写「共纳入 N 件材料」「上述清单与正文逐件对应」这类**可被核对的话**，要么把那份清单真的写出来，"
+      + "要么这句话根本不要写。**一句可核验而为假的话，比论证薄弱伤得更重。**";
+}
+
 // 把搜索结果码成给基底看的块。编号 [W1..] 与前端"站外来源"卡一一对应，便于答里挂角标。
 // 从 HTML 里抽正文。刻意用最笨的办法：先剔掉整块非正文标签，再把标签抹掉。
 // 不追求完美——追求的是「抽出来的一定是这一页的字，而不是脚本和样式」。
@@ -11628,6 +11646,29 @@ export default {
       const convoFull = readConvoText(turns, 10000000);          // 先看看这一场到底多长
       const convo = convoFull.length > convoMax ? readConvoText(turns, convoMax) : convoFull;
       const convoCut = convoFull.length - convo.length;
+      /* 【成文前的占位者实搜】只加在真要盘最近邻的档上；报告/诗歌/应用文不加（那里盘最近邻是噪声）。
+         走的是评分那一路已有的专用链 nbrChain（四趟并发：同向占位／对立者／外圈学科／方法学），
+         不另造一套。惰性 + 只跑一次：提纲那一趟与正文各趟共用同一份结果。 */
+      const DIST_NBR_KINDS = { essay: 1, paper: 1, paper1: 1, outline: 1, wechat: 1 };
+      let _distNbrP = null;
+      const distNbrGet = () => {
+        if (_distNbrP) return _distNbrP;
+        if (!DIST_NBR_KINDS[kind]) { _distNbrP = Promise.resolve(null); return _distNbrP; }
+        /* 种子取**读者自己的第一问**（这一场的原初问题），不取工序标题也不取整篇——
+           把一整场塞进 34 字的查询里等于随机截一段（评分那一路踩过这个坑）。 */
+        const _t0 = (turns.find((t) => t && t.role !== "wds" && String(t.text || "").trim()) || {});
+        const _seed = String(_t0.text || b.title || "").trim();
+        if (!_seed) { _distNbrP = Promise.resolve(null); return _distNbrP; }
+        _distNbrP = nbrChain(env, _seed, (rvendor === "glm" ? KEY : ""), convo.slice(0, 20000))
+          .catch(() => null);
+        return _distNbrP;
+      };
+      /* 块 + 状态一起回：状态要发给读者看（失败必须可见——静默失败等于把没做的检测记成做过了）。 */
+      const distNbrBlock = (nc) => {
+        if (!nc) return "";
+        return "\n\n" + (nc.items.length ? nbrChainBlock(nc) : "【站外占位者检索 · 这一趟一条也没召回】")
+          + distNbrUsage(!!nc.items.length);
+      };
 
       /* ══ 拆趟成文（chunked）══════════════════════════════════════════
          为什么必须拆：一万字装不进一趟。平台有单请求时长墙、基底 max_tokens 有顶，
@@ -11683,6 +11724,17 @@ export default {
                     ? "\n\n【LANGUAGE】Write in natural English prose, in the plain vocabulary of linguistics and language teaching (form, use, situation, context, conditions for uptake) — never SDE labels or the letters S / D / E."
                     : "\n\n【LANGUAGE】Write in natural English prose. Keep SDE terms as Show / Difference / Entanglement.") : "")
                 + (prof && prof.term ? prof.term : "");   // 术语闸必须留在最末
+              /* 占位者名单**排在术语闸之后**是刻意的：它是材料不是人格，压不到闸上；
+                 而它必须进 BASE —— 提纲那一趟就要靠它决定「最近邻盘点」那一节写谁。 */
+              const _nbrDist = await distNbrGet();
+              const NBRB = distNbrBlock(_nbrDist);
+              if (_nbrDist) {
+                if (_nbrDist.items.length) controller.enqueue(_sseBytes({ t: "web", v: _nbrDist.items }));
+                controller.enqueue(_sseBytes({ t: "note", v: _nbrDist.items.length
+                  ? ("已先做一次站外占位者检索：召回 " + _nbrDist.items.length + " 条"
+                     + (_nbrDist.ok ? "（覆盖够）" : "（覆盖不足：" + _nbrDist.reason + "，最近邻那一节会按〔未核验〕写）"))
+                  : "站外占位者检索这一趟一条也没召回（多半是没有可用的搜索 Key）：最近邻那一节会按〔未核验〕写。" }));
+              }
               const convoPart = convo.length > convoMaxPart ? readConvoText(turns, convoMaxPart) : convo;
               const CONVO = "以下是这场对话的全文：\n\n" + convo + "\n———\n"
                 + (docBlock ? ("读者本场还载入了这些材料，可作背景（正主仍是上面这场对话）：\n\n" + docBlock + "\n———\n") : "");
@@ -11692,7 +11744,7 @@ export default {
                    （给了大头寸它反而写散、夹带解释，looseJSON 解不出来）。所以关思考＋有界预算。 */
                 /* 固定骨架档（论文）：提纲这一趟不许分节，只许拟题与配小标题。 */
                 const FIXED = Array.isArray(SPEC.fixed) ? SPEC.fixed : null;
-                const psys = BASE + "\n\n【本次任务】只出一份提纲，不写正文。\n" + SPEC.spec + writerBlock(styleId)
+                const psys = BASE + NBRB + "\n\n【本次任务】只出一份提纲，不写正文。\n" + SPEC.spec + writerBlock(styleId)
                   + "\n\n【怎么出】通读这场对话，先定下这篇的承重命题，再把它拆成若干节。"
                   + "每一节要有自己的活干——不是把每一轮问答各写一节，而是让这几节**合起来**把那条命题撑住。"
                   + "\n\n【只输出一个 JSON，前后不要任何说明、不要代码围栏】格式：\n"
@@ -11936,7 +11988,7 @@ export default {
               }
               const want = Math.max(400, Math.min(4000, parseInt(sec.words, 10) || 1200));
               const others = secs.map((s, i) => (i + 1) + "、" + String((s && s.h) || "")).join("\n");
-              const ssys = BASE + writerBlock(styleId)   // 分节各趟也要带风格，否则前后两节像两个人写的
+              const ssys = BASE + NBRB + writerBlock(styleId)   // 分节各趟也要带风格，否则前后两节像两个人写的
                 + "\n\n【全篇的骨架】标题：" + String(planIn.title || "") + "\n副题：" + String(planIn.sub || "")
                 + "\n承重命题：" + String(planIn.thesis || "") + "\n判据：" + String(planIn.criterion || "")
                 + "\n各节：\n" + others
@@ -12184,7 +12236,18 @@ export default {
               + (dlang === "en" ? (_langProf2
                   ? "\n\n【LANGUAGE】Write the whole piece in English — natural English prose, not translated Chinese. Use the plain vocabulary of linguistics and language teaching; never SDE labels or the letters S / D / E."
                   : "\n\n【LANGUAGE】Write the whole piece in English — natural English prose, not translated Chinese. Keep SDE terms as Show / Difference / Entanglement.") : "")
-              + (prof && prof.term ? prof.term : "");   // 术语闸必须留在最末
+              + (prof && prof.term ? prof.term : "")   // 术语闸必须留在最末
+              + await (async () => {
+                  const nc = await distNbrGet();
+                  if (nc) {
+                    if (nc.items.length) controller.enqueue(_sseBytes({ t: "web", v: nc.items }));
+                    controller.enqueue(_sseBytes({ t: "note", v: nc.items.length
+                      ? ("已先做一次站外占位者检索：召回 " + nc.items.length + " 条"
+                         + (nc.ok ? "（覆盖够）" : "（覆盖不足：" + nc.reason + "）"))
+                      : "站外占位者检索这一趟一条也没召回：最近邻那一节会按〔未核验〕写。" }));
+                  }
+                  return distNbrBlock(nc);
+                })();
             // 成文是全链路里最费脑的一步（满功率＋几千字输出），此前是唯一一条没戴时钟的 WDS 路由：
             // 平台掐断是静默的，不设时限就只能看到一个永远转着的光标。
             // 【输出预算按入参实际大小算】上下文窗是共用的：system＋对话已经吃掉多少，
