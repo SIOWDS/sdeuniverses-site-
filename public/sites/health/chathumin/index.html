@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ChatHuMin · 健康的对话智能体 | SDE Universes</title>
+<meta name="description" content="ChatHuMin：胡敏的健康对话智能体。只谈健康、疾病、照料与医疗制度。检索健康分站语料作答并给出处。它不是医生：不做诊断、不改药；急症请直接就医。用你自己的大模型 Key 运行，只存浏览器本地。">
+<link rel="canonical" href="https://health.sdeuniverses.com/chathumin/">
+<style>
+  html,body{margin:0;height:100%;background:#0B120F;color:#E7E9E2;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+  .fallback{max-width:560px;margin:18vh auto 0;padding:0 24px;text-align:center;font-size:14.5px;line-height:2;color:#8B9790}
+  .fallback a{color:#7FA98C}
+</style>
+</head>
+<body>
+<div class="fallback">正在进入 ChatHuMin……<br>若长时间停在本页，请刷新，或<a href="/">回健康发生学首页</a>。</div>
+<script>
+/* ChatHuMin ＝ ChatSDE 那一台引擎 ＋「健康」领域档案。
+   两行接线：WDSM_PAGE 开独立整页，WDSM_PROFILE 挂档案。
+   人格（胡敏）、语料白名单（胡敏全部作品＋专著 56／61／63／69）、题域闸、
+   **安全闸**（不是医生·不做诊断·急症与自伤先请人就医）与术语闸
+   都在服务端 src/worker.js 的 WDS_PROFILES.health 里——这里递上去的只是 "health" 六个字母。 */
+window.WDSM_PAGE = 1;
+window.WDSM_PROFILE = "health";
+</script>
+<script src="/taste/assets/sde-handoff.js?v=20260817c"></script>
+<script src="/wds-mode.js?v=20260823e" defer></script>
+</body>
+</html>

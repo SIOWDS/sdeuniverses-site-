@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>对　谈 · SDE 文学</title>
+<meta name="description" content="SDE 文学的对谈栏：开栏之作《暮色与晨曦之间》——阿西尔与中国女性的四场圆桌对话；以及对谈的另外两种：与斐索对话、就一段原文逐段共读。">
+<link rel="canonical" href="https://liter.sdeuniverses.com/dialogue/">
+<meta property="og:title" content="对　谈 · SDE 文学">
+<meta property="og:description" content="SDE 文学的对谈栏：开栏之作《暮色与晨曦之间》——阿西尔与中国女性的四场圆桌对话；以及对谈的另外两种：与斐索对话、就一段原文逐段共读。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F7F3E9">
+<style>
+:root{
+  --paper:#F7F3E9; --paper2:#FDFBF5; --ink:#1A1714; --ink2:#6B6255; --ink3:#9A9182;
+  --rule:#CFC5B2; --rule2:#E4DCCB;
+  --cinnabar:#9E3D30; --cinnabar-l:#C25B45;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi",var(--serif);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:16.5px;line-height:1.95}
+a{color:inherit;text-decoration:none}
+
+/* 竖排刊名（书脊）——纸本刊物的立面，也是与 lang 最直接的分别 */
+.spine{position:fixed;left:0;top:0;bottom:0;width:62px;z-index:40;
+  background:var(--paper);border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;padding:20px 0 18px}
+.spine .nm{writing-mode:vertical-rl;font-family:var(--serif);font-size:20px;
+  letter-spacing:.36em;font-weight:600}
+.spine .sub{writing-mode:vertical-rl;font-family:var(--mono);font-size:10px;
+  letter-spacing:.3em;color:var(--ink3);margin-top:16px}
+.spine .seal{margin-top:auto;width:26px;height:26px;border:1.5px solid var(--cinnabar);
+  color:var(--cinnabar);font-size:13px;line-height:23px;text-align:center;
+  font-family:var(--serif);transform:rotate(-4deg)}
+.page{margin-left:62px}
+@media(max-width:720px){.spine{display:none}.page{margin-left:0}}
+
+.wrap{max-width:940px;margin:0 auto;padding:0 26px}
+.topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:30;
+  background:rgba(247,243,233,.94);backdrop-filter:saturate(140%) blur(6px)}
+.topbar .wrap{display:flex;align-items:baseline;gap:20px;height:52px;
+  font-family:var(--sans);font-size:13.5px;color:var(--ink2)}
+.topbar .m{display:none;font-family:var(--serif);font-size:17px;letter-spacing:.22em;color:var(--ink)}
+.topbar nav{margin-left:auto;display:flex;gap:19px}
+.topbar nav a:hover{color:var(--cinnabar)}
+.topbar nav a.out{font-family:var(--mono);font-size:11.5px}
+@media(max-width:720px){.topbar .m{display:block}}
+
+/* 刊头 */
+.masthead{padding:64px 0 0;text-align:center}
+.masthead .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--ink3)}
+.masthead h1{font-family:var(--serif);font-weight:600;margin:.42em 0 .3em;
+  font-size:clamp(34px,7.4vw,66px);letter-spacing:.22em;line-height:1.2}
+.masthead .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--ink3)}
+.dbl{border-top:3px double var(--rule);margin:34px 0 0}
+.motto{max-width:31em;margin:30px auto 0;font-family:var(--kai);font-size:18px;
+  line-height:2.1;text-align:center;color:var(--ink)}
+.motto b{font-weight:600;border-bottom:1px solid var(--cinnabar);padding-bottom:1px}
+
+/* 签名件：本期目录 */
+.toc{max-width:640px;margin:44px auto 0;border:1px solid var(--rule);background:var(--paper2);
+  padding:26px 30px 24px;position:relative}
+.toc .cap{text-align:center;font-family:var(--serif);letter-spacing:.5em;font-size:15px;
+  padding-bottom:12px;border-bottom:1px solid var(--rule2);margin-bottom:6px}
+.toc .cap i{display:block;font-style:normal;font-family:var(--mono);font-size:10px;
+  letter-spacing:.22em;color:var(--ink3);margin-top:7px}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc li{display:flex;align-items:baseline;gap:10px;padding:9px 0;font-size:15px;
+  border-bottom:1px dotted var(--rule2);opacity:0;animation:fade .5s ease forwards}
+.toc li .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink3);
+  min-width:4.6em;flex:none}
+.toc li .t{flex:1}
+.toc li .p{font-family:var(--mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.toc li.blank{border-bottom:none;padding-top:20px;color:var(--cinnabar)}
+.toc li.blank .t{font-family:var(--kai);font-size:17px;letter-spacing:.28em}
+.toc li.blank .k{color:var(--cinnabar-l)}
+.seal2{display:inline-block;border:1.5px solid var(--cinnabar);color:var(--cinnabar);
+  padding:2px 9px;font-size:11.5px;letter-spacing:.2em;transform:rotate(-4deg);
+  animation:drop .45s cubic-bezier(.2,1.5,.4,1) 1.05s both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:rotate(-15deg) scale(1.6)}to{opacity:1;transform:rotate(-4deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.toc li{opacity:1;animation:none}.seal2{animation:none}}
+.tocnote{max-width:640px;margin:14px auto 0;font-size:13.5px;color:var(--ink2);
+  font-family:var(--sans);line-height:1.9}
+.tocnote b{color:var(--ink)}
+
+/* 栏目通用 */
+section{padding:60px 0 6px}
+.hd{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--ink);padding-bottom:8px}
+.hd h2{font-family:var(--serif);font-weight:600;font-size:21px;letter-spacing:.24em;margin:0}
+.hd .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--cinnabar)}
+.hd .ct{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+.lead{color:var(--ink2);font-size:15px;margin:14px 0 0;max-width:44em;font-family:var(--sans)}
+
+/* 智能体板块 */
+.bots{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:0;margin-top:26px;
+  border:1px solid var(--rule)}
+.bot{padding:24px 22px 22px;border-right:1px solid var(--rule);display:flex;flex-direction:column;
+  background:var(--paper2)}
+.bot:last-child{border-right:none}
+a.bot:hover{background:#fff}
+.bot .n{font-family:var(--mono);font-size:10px;letter-spacing:.26em;color:var(--cinnabar)}
+.bot h3{font-family:var(--serif);font-size:21px;letter-spacing:.14em;margin:9px 0 4px;font-weight:600}
+.bot .en{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink3);margin-bottom:11px}
+.bot p{margin:0 0 14px;font-size:14px;color:var(--ink2);line-height:1.85;font-family:var(--sans)}
+.bot .go{margin-top:auto;font-family:var(--mono);font-size:11.5px;color:var(--cinnabar);
+  border-top:1px solid var(--rule2);padding-top:11px}
+@media(max-width:720px){.bot{border-right:none;border-bottom:1px solid var(--rule)}
+  .bot:last-child{border-bottom:none}}
+
+/* 文本板块 */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-top:8px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.sub-h{font-family:var(--serif);font-size:16px;letter-spacing:.2em;font-weight:600;
+  margin:30px 0 2px;padding-bottom:6px;border-bottom:1px solid var(--rule2);display:flex;align-items:baseline}
+.sub-h span{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.1em}
+.ln{display:flex;gap:11px;align-items:baseline;padding:8px 2px;border-bottom:1px dotted var(--rule2);
+  font-size:15px}
+.ln:hover{background:var(--paper2)}
+.ln:hover .tt{color:var(--cinnabar)}
+.ln .no{font-family:var(--mono);font-size:10.5px;color:var(--ink3);min-width:1.6em;flex:none}
+.ln .tt b{font-weight:600;letter-spacing:.04em}
+.ln .tt em{font-style:normal;color:var(--ink2);font-size:13.5px;font-family:var(--sans);margin-left:.5em}
+.ln .iq{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink3);flex:none;padding-left:10px}
+.mo{display:inline-block;margin:12px 0 0;font-family:var(--mono);font-size:11.5px;
+  color:var(--cinnabar);border-bottom:1px solid var(--cinnabar);padding-bottom:2px}
+
+/* 长篇 */
+.novel{display:grid;grid-template-columns:200px 1fr;gap:28px;margin-top:26px;align-items:start}
+.novel img{width:100%;display:block;border:1px solid var(--rule)}
+.novel .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ink3)}
+.novel h3{font-family:var(--serif);font-size:27px;letter-spacing:.18em;margin:8px 0 4px;font-weight:600}
+.novel p{margin:0 0 13px;font-size:15px;color:var(--ink2);line-height:1.95;font-family:var(--sans)}
+.novel .q{font-family:var(--kai);font-size:17px;color:var(--ink);border-left:2px solid var(--cinnabar);
+  padding-left:15px;margin:0 0 14px;line-height:2}
+.novel .lk{display:flex;gap:15px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
+.novel .lk a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.novel{grid-template-columns:1fr}.novel img{max-width:180px}}
+
+/* 诗 */
+.poems{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.pm{border:1px solid var(--rule);padding:9px 15px;background:var(--paper2);font-size:15px;letter-spacing:.1em}
+.pm:hover{border-color:var(--cinnabar);color:var(--cinnabar)}
+.pm i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:9px}
+
+/* 主持人 */
+.host{display:grid;grid-template-columns:150px 1fr;gap:26px;align-items:start;margin-top:26px}
+.host img{width:100%;border:1px solid var(--rule);display:block;filter:saturate(.9)}
+.host p{margin:0 0 12px;font-size:15px;font-family:var(--sans);color:var(--ink2)}
+.host .nm{font-family:var(--serif);font-size:21px;letter-spacing:.16em;color:var(--ink);margin-bottom:6px;font-weight:600}
+.host .nm em{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink3);margin-left:10px}
+.host blockquote{margin:0 0 12px;font-family:var(--kai);font-size:16.5px;line-height:2.05;color:var(--ink);
+  border-left:2px solid var(--rule);padding-left:15px}
+.host a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+@media(max-width:720px){.host{grid-template-columns:1fr}.host img{max-width:160px}}
+
+.plat{border:1px solid var(--rule);background:var(--paper2);padding:26px 26px;margin-top:24px}
+.plat p{margin:0 0 13px;font-size:15px;font-family:var(--sans);color:var(--ink2)}
+.plat p:last-child{margin-bottom:0}
+.plat b{color:var(--ink)}
+.plat a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+
+footer{border-top:3px double var(--rule);margin-top:66px;padding:26px 0 60px;
+  font-size:13px;color:var(--ink2);font-family:var(--sans)}
+footer a{color:var(--cinnabar)}
+footer p{margin:0 0 7px}
+a:focus-visible{outline:2px solid var(--cinnabar);outline-offset:3px}
+
+.body p{font-family:var(--sans);font-size:15.5px;color:var(--ink2);line-height:1.95;margin:0 0 15px;max-width:44em}
+.body p b{color:var(--ink)}
+.feat{border:1px solid var(--rule);background:var(--paper2);padding:26px 28px;margin-top:26px}
+.feat .kk{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--cinnabar)}
+.feat h3{font-family:var(--serif);font-size:26px;letter-spacing:.16em;margin:8px 0 4px;font-weight:600}
+.feat .sub{font-family:var(--mono);font-size:11.5px;color:var(--ink3);margin-bottom:14px}
+.feat p{font-family:var(--sans);font-size:15px;color:var(--ink2);line-height:1.95;margin:0 0 13px}
+.feat .q{font-family:var(--kai);font-size:17px;color:var(--ink);border-left:2px solid var(--cinnabar);padding-left:15px;margin:0 0 14px;line-height:2}
+.feat .lk{display:flex;gap:15px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
+.feat .lk a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);margin-top:24px}
+@media(max-width:720px){.two{grid-template-columns:1fr}}
+.two>a{padding:22px 22px 20px;border-right:1px solid var(--rule);background:var(--paper2);display:block}
+.two>a:last-child{border-right:none}
+.two>a:hover{background:#fff}
+.two b{display:block;font-family:var(--serif);font-size:19px;letter-spacing:.12em;font-weight:600}
+.two span{display:block;font-size:13.5px;color:var(--ink2);margin-top:8px;line-height:1.85;font-family:var(--sans)}
+.two i{display:block;font-style:normal;font-family:var(--mono);font-size:11px;color:var(--cinnabar);margin-top:12px}
+</style>
+</head>
+<body>
+<div class="spine">
+  <div class="nm">SDE 文学</div>
+  <div class="sub">FEI SUO</div>
+  <div class="seal">斐</div>
+</div>
+<div class="page">
+<header class="topbar"><div class="wrap">
+  <a class="m" href="/">SDE 文学</a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/dialogue/">对谈</a>
+    <a href="/chatfeisuo/">ChatFeiSuo</a>
+    <a href="/coread/">共读</a>
+    <a href="/all/">全部篇目</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap">
+
+<section style="padding-top:56px">
+  <div class="hd"><span class="no">栏 目</span><h2>对　谈</h2><span class="ct">1 篇 · 在收</span></div>
+  <p class="lead">文学刊物里最耐读的那一栏，多半不是评论，是对谈——两个人当场把话顶出来，比一个人写完整篇更容易露出真东西。这一栏刚开，先立着一篇，和两条你自己就能开始的路。</p>
+
+  <div class="feat">
+    <div class="kk">开 栏 之 作 · 四场对话与结语 · 9,085 汉字</div>
+    <h3>暮色与晨曦之间</h3>
+    <div class="sub">戴安娜·阿西尔与中国女性的圆桌对话　·　斐索（秦莉）　·　2026.7.17</div>
+    <p>一生未婚未育、八十岁写出《暮色将尽》的英国编辑与作家，和几位来自不同年代的中国女性围桌坐下。四场：婚姻是合租还是合同、身体与欲望、退场与登场、孤独与自由；末了一篇结语。文中另有一重以「批」标出的声音，落在桌边评点。</p>
+    <p class="q">听起来是不是很惨？在你们眼里，我应该是一个缺席了「幸福」的老太太。<br><span style="font-family:var(--mono);font-size:11px;color:var(--ink3)">—— 第一场 · 婚姻是合租，还是合同？</span></p>
+    <p><b>它是一篇构造性的对话作品，这一点写在文章开头，不藏着</b>：归于阿西尔名下的话语系依其公开著作与访谈所作的文学性拟写，并非原话引录；与会的中国女性为复合形象，不指涉具体个人；文末所附材料一节可独立核查。<b>对谈这个体裁的诚实，全在这一句声明里</b>——有它，是作品；没有它，是伪造。</p>
+    <div class="lk"><a href="/students/qin-li/essays/athill-roundtable/">读全文</a><a href="/coread/">边读边问</a></div>
+  </div>
+
+  <div class="hd" style="margin-top:52px"><span class="no">另 两 种</span><h2>你自己开一场</h2></div>
+  <p class="lead">对谈不必等约到人。下面这两条现在就能走，用你自己的大模型 Key 运行。</p>
+  <div class="two">
+    <a href="/chatfeisuo/">
+      <b>与斐索对谈</b>
+      <span>把手上那一段文字、那个写不下去的地方交给它，一轮一轮顶下去。它答得短、会反问，也会说自己不确定；聊完可以一键收成一篇文稿。</span>
+      <i>进入 ChatFeiSuo →</i>
+    </a>
+    <a href="/coread/">
+      <b>就一篇原文逐段对谈</b>
+      <span>挑一篇长论文或长篇《狮城荣耀》，边读边问——选中哪一段，谈的就是哪一段。一场最多一百轮，全程留着，最后能收成一份小结。</span>
+      <i>选一篇开读 →</i>
+    </a>
+  </div>
+
+  <div class="body" style="margin-top:44px">
+    <p><b>这一栏在收稿。</b>要的是真顶起来的对谈：两个立场当场碰、谁也不让、最后各自留下一句收不回的话。构造性的拟写可以，<b>但那句声明必须在文章开头，不许放进脚注</b>；涉及在世的人，只写公开说过的话，或明写这是拟写。投稿走主站的<a href="https://sdeuniverses.com/" style="color:var(--cinnabar);border-bottom:1px solid var(--rule)">SDE Universes</a>。</p>
+  </div>
+</section>
+
+</div>
+</div>
+<script>
+(function(){var b="/sites/liter";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatfeisuo/")===0
+  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0||h.indexOf("/dialogue/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

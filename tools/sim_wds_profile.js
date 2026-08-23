@@ -40,9 +40,16 @@ console.log("── ① 档案表与解析器 ───────────�
   t("抠得出 EDU_PRE 段", eduSeg.length > 40);
   const EDU_PRE = new Function(eduSeg + "\nreturn EDU_PRE;")();
   const yangSys = "「阳涌」的人格底本占位";
-  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE", "YANG_SYS", "EDU_PRE",
+  /* 2026-08-23 第四个档案 health（ChatHuMin）。同样现读，不手抄。
+     ⚠ 每多一个分身就多一对（人格常量＋白名单常量）要注入；漏注入不会静默，
+       是当场 ReferenceError——这正是要的：宁可炸，不要验了个残缺的表。 */
+  const healthSeg = W.slice(W.indexOf("const HEALTH_PRE = ["), W.indexOf("];", W.indexOf("const HEALTH_PRE = [")) + 2);
+  t("抠得出 HEALTH_PRE 段", healthSeg.length > 40);
+  const HEALTH_PRE = new Function(healthSeg + "\nreturn HEALTH_PRE;")();
+  const huminSys = "「胡敏」的人格底本占位（含：不做诊断／自伤先请人求助）";
+  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE", "YANG_SYS", "EDU_PRE", "HUMIN_SYS", "HEALTH_PRE",
     seg + "\nreturn { WDS_PROFILES: WDS_PROFILES, wdsProfileOf: wdsProfileOf, wdsProfInScope: wdsProfInScope };");
-  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE, yangSys, EDU_PRE);
+  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE, yangSys, EDU_PRE, huminSys, HEALTH_PRE);
   const lang = S.wdsProfileOf("lang");
 
   t("认得 lang", !!lang && lang.id === "lang");
@@ -187,6 +194,41 @@ console.log("── ① 档案表与解析器 ───────────�
     !!edu && (!edu.neigong || edu.neigong.indexOf("lite") < 0), edu && edu.neigong);
   /* 术语闸放行「教育发生学」这个正名（同 lang 放行「语言发生学」），但不许把「发生学」当形容词乱用。 */
   t("edu 的术语闸给本站正名开了口子", !!edu && /教育发生学/.test(edu.term || ""));
+
+  console.log("\n── ②e 第三、四个档案与共创钩子（2026-08-23）─────");
+  const hea = S.wdsProfileOf("health");
+  t("认得 health", !!hea && hea.id === "health" && hea.name === "ChatHuMin");
+  t("health 挂了自己的内功档", !!hea && hea.neigong === "/taste/assets/health-neigong.txt");
+  t("health 的白名单是胡敏那一线", !!hea && S.wdsProfInScope(hea, "/students/hu-min/lodging-in-class/")
+    && S.wdsProfInScope(hea, "/books/m/61/") && !S.wdsProfInScope(hea, "/students/qin-li/line-of-separation/"));
+  /* ⭐ 健康这一档比别的多一道安全闸：答错的代价不是难看，是有人照做。
+     「不是医生」与「自伤先请人求助」必须在**人格与两道闸里各钉一遍**，少一处就可能被工序文本冲淡。 */
+  t("health 带安全闸（不是医生）", !!hea && /你不是医生/.test(hea.guard || ""));
+  t("安全闸里点了急症征象", !!hea && /急救电话/.test(hea.guard || ""));
+  t("安全闸里点了自伤的处置", !!hea && /自伤/.test(hea.guard || ""));
+  t("人格底本里也钉了一遍（不靠单点）", !!hea && /不做诊断/.test(hea.sys) && /自伤/.test(hea.sys));
+  t("工序不解除安全闸", !!hea && /工序不解除这两道闸/.test(hea.guard || ""));
+  {
+    const fs3 = require("fs");
+    const hn = fs3.readFileSync("public/taste/assets/health-neigong.txt", "utf8");
+    t("健康内功档里第五条也钉了同一条线", /你不是医生/.test(hn) && /自伤/.test(hn));
+    t("健康内功用的是本行的词（体征／处置／处境）", /在处境里，经处置，成体征/.test(hn));
+    const cjk = (hn.match(/[\u4e00-\u9fff]/g) || []).length;
+    t("健康内功够厚（≥4000 汉字）", cjk >= 4000, String(cjk));
+    /* 共创一键开画布：壳页递 WDSM_OPEN，引擎认得，且只认这一个值。 */
+    const M2 = fs3.readFileSync("public/wds-mode.js", "utf8");
+    t("引擎认 WDSM_OPEN=canvas", /String\(window\.WDSM_OPEN \|\| ""\) === "canvas"/.test(M2));
+    t("空画布时自动开一篇空白稿", /if \(!CV\.items\.length\) cvNewItem\(\)/.test(M2));
+    t("同时把共创台打开", /cvLabSet\(true\)/.test(M2.slice(M2.indexOf("WDSM_OPEN"))));
+    const cw = fs3.readFileSync("public/sites/liter/cowrite/index.html", "utf8");
+    t("共创壳页递了三行接线", /WDSM_PAGE/.test(cw) && /WDSM_PROFILE = "liter"/.test(cw) && /WDSM_OPEN = "canvas"/.test(cw));
+    t("共创壳页不自带第二套实现（还是那一台引擎）", cw.length < 4000 && /wds-mode\.js/.test(cw));
+    const hp = fs3.readFileSync("public/sites/health/chathumin/index.html", "utf8");
+    t("ChatHuMin 壳页挂 health 档", /WDSM_PROFILE = "health"/.test(hp));
+    t("health 分站首页有入口（不再是孤儿）", /\/chathumin\//.test(fs3.readFileSync("public/sites/health/index.html", "utf8")));
+    t("胡敏作者页挂了 health 分站入口", /health\.sdeuniverses\.com/.test(fs3.readFileSync("public/students/hu-min/index.html", "utf8")));
+    t("liter 首页挂了对谈栏", /\/dialogue\//.test(fs3.readFileSync("public/sites/liter/index.html", "utf8")));
+  }
 
   console.log("\n── ②b 白名单下推到候选阶段（治 K 饥饿）─────────");
   /* ⭐ 线上实测过的病：白名单只在取完 top-20 之后滤，而它约占全站 1%，

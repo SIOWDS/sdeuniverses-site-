@@ -327,6 +327,45 @@
         }
       }
     },
+    /* ── 第三个分身：health（ChatHuMin，2026-08-23）── */
+    health: {
+      id: "health",
+      brand: "ChatHuMin",
+      url: "/chathumin/",
+      sig: "ChatHuMin \u00b7 health.sdeuniverses.com",
+      who: "胡敏",
+      kicker: "HEALTH.SDEUNIVERSES.COM",
+      home: "/",
+      tools: ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"],
+      seeds: [
+        "体检每一项都在区间里，可我就是觉得不对劲——这算不算一回事？",
+        "指标好了，是身体自己调回来的，还是被药顶住的？怎么分？",
+        "照顾家里老人，我该替他做多少？做多了会不会反而害了他？",
+        "同一个病，指南和医生说的不一样，我该怎么问下一句？"
+      ],
+      hero: {
+        zh: {
+          title: "ChatHuMin",
+          sub: "健康发生学 · 胡敏。指标、症状、照料与医疗制度——从你手上那一张单子、那一次复诊开始。",
+          foot: "它不是医生，不做诊断、不改药。急症与危险征象请直接就医或打急救电话。用你自己的大模型 Key 运行。"
+        },
+        en: {
+          title: "ChatHuMin",
+          sub: "Health genesis, with Hu Min. Numbers, symptoms, caregiving and the medical system — starting from one real report you have in hand.",
+          foot: "Not a doctor: no diagnosis, no prescription changes. Seek care directly for emergencies. Runs on your own model key."
+        }
+      },
+      copy: {
+        zh: {
+          ph: "说一件具体的事——一张化验单、一次复诊、家里谁的情况…",
+          note: "ChatHuMin 只答健康、疾病、照料与医疗制度，答案扣着健康分站的原文。**它不是医生：不做诊断、不改药、不定剂量**；急症征象请直接就医或打急救电话。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写入数据库、不写进日志。",
+          tlBtn: "⊞ 健康工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
+          tipDeep: "满血基底＋满功率思考＋整套工序，慢但深",
+          srcSite: "健康分站文献"
+        },
+        en: { ph: "Describe something concrete — a lab report, a follow-up visit…", srcSite: "From the health subsite" }
+      }
+    },
   };
   var PROFILE = (function () {
     var k = String(window.WDSM_PROFILE || "").trim();
@@ -8343,6 +8382,19 @@
   applyLang();          // 顶栏/示例/提示/占位全部由这里上文案——上面的 HTML 骨架是空壳
   updTurns();
   if (PAGE) open();
+  /* 【开在哪一面 —— 2026-08-23】壳页写 window.WDSM_OPEN="canvas" 就直接开在画布＋共创台上。
+     缘由：文学分站的「共创」是一个独立入口，读者点进来是要写东西的，
+     再让他自己去顶栏找「⧉ 画布与共创」，等于把入口的意义抵消掉一半。
+     ⚠ 只认这一个值，认不出就当没写（照旧开在对话面）——别做成可以从 URL 塞进来的开关。
+     ⚠ 画布上一件都没有时开 cvNewItem()：它自带 cvShow(true) 与进编辑态，
+       读者一进来光标就在稿子里。已有件则只开画布，不平白多出一篇空稿。 */
+  if (String(window.WDSM_OPEN || "") === "canvas") {
+    try {
+      if (!CV.items.length) cvNewItem(); else { CV.cur = CV.items.length - 1; cvShow(true); }
+      cvLabSet(true);
+      cvPaint();
+    } catch (e) {}
+  }
 })();
 
 /* ── 装到手机桌面（PWA）────────────────────────────────────────────
