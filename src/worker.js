@@ -532,20 +532,65 @@ function johnComposeSys(kind, part, N, per, prevTail, ctx) {
   if (ctx) s += "\n\n════ 可引用的站内材料（只有这些是真的，其余一律不许当成站内篇目引用）════\n" + ctx;
   return s;
 }
+/* ══ 语言线的语料清单（**全站唯一一份**）══════════════════════════════
+   2026-08-23：原来这里第一条是 `/students/hu-zhiying/`——**他名下 90 余件作品整个进来**，
+   而其中属语言线的只有十二篇；其余是健康、制度、认知、经济那几条线。
+   后果不是报错，是**出处栏里混进一篇读者当场看得出不相干的文章**：
+   线上实测问「什么是语感」，回来的六段里有《蚀先于生：为什么形态的耗散比生成更原始》。
+   题域闸挡得住**答什么**，挡不住**取什么料**——闸在提示语层，取料在检索层，是两道。
+   ⇒ 白名单收到语言站自己那份选目上：十二篇 ＋ 两个频道页 ＋ 四部专著 ＋ 站上其余语言篇目。
+   ⚠ 他若发了新的语言篇，**两处一起加**：这里，与 public/sites/lang/all/index.html。
+     漏一处的表现是「站上读得到、John 引不到」，没人会当场发现——
+     所以 `node tools/sim_lang_scope.js` 把两处逐条对账，改这张表必跑它。
+   ⚠ 只有一种写法：**网址前缀，且每条带结尾斜杠**。它要同时喂 SQLite 的 `u LIKE %前缀%`
+     与 JS 的 substring；少了斜杠，/books/m/62/ 会把 /books/m/620/ 一起收进来。
+   为什么用前缀而不用版块（section）：语言这条线横跨 students／confluence／column／
+   paradigm／books 五个版块，没有自己的版块 key。 */
+const LANG_PRE = [
+  // 语感 五篇
+  "/students/hu-zhiying/post-hand-slot/",
+  "/students/hu-zhiying/deformation-reserve/",
+  "/students/hu-zhiying/heterochronic-layering/",
+  "/students/hu-zhiying/relational-landing/",
+  "/students/hu-zhiying/coadaptive-homing/",
+  // 语法 四篇
+  "/students/hu-zhiying/context-threshold/",
+  "/students/hu-zhiying/evidence-before-rule/",
+  "/students/hu-zhiying/carrier-handover/",
+  "/students/hu-zhiying/grammar-retirement/",
+  // 语言教学与习得 三篇
+  "/students/hu-zhiying/algorithmic-entrenchment/",
+  "/students/hu-zhiying/operational-enclosure/",
+  "/students/hu-zhiying/shelter-as-cage/",
+  // 两个频道页（含落选理由与分工地图，答「这一栏还有什么」时用得上）
+  "/students/hu-zhiying/language-sense/",
+  "/students/hu-zhiying/grammar-talk/",
+  // 四部专著：正文在 /books/m/，学员栏那四张是它们的落地页
+  "/books/m/60/", "/books/m/62/", "/books/m/71/", "/books/m/77/",
+  "/students/hu-zhiying/wisdom-of-language/",
+  "/students/hu-zhiying/one-flower-one-world/",
+  "/students/hu-zhiying/unity-of-knowing-and-acting/",
+  "/students/hu-zhiying/the-ledger-of-acquisition/",
+  // 站上其余语言篇目（别人写的，但在同一题域里，且是他必须划界的对手）
+  "/column/pike-linguistics/",
+  "/confluence/evidence-responsibility-alignment/",
+  "/students/bao-jinchao/preemptive-compensation/",
+  "/students/huang-qianying/regenerative-boundary/",
+  "/students/jin-hua/grammar-shame/",
+  "/students/jin-hua/cognitive-recession/",
+  "/students/jin-hua/load-bearing-body/",
+  "/paradigm/civil-war-scar/",
+  "/paradigm/who-gets-to-settle/",
+];
 /* 「与 John 对话」的站内取料。语言站的语料＝胡志英全部作品 ＋ 站上其余语言篇目 ＋ 他的四部专著。
    为什么用白名单而不用 scope：scope 只能限定 manifest 里的**版块**（如 frontier），
    而语言这条线横跨 students / confluence / column / paradigm / books 五个版块，没有自己的版块 key。
    取不到料不算错——退化成「只凭底本作答」；绝不能让检索失败把整场对话拖挂，故整体 try/catch 吞掉。 */
-const JOHN_SCOPE = [
-  /\/students\/hu-zhiying\//,
-  /\/books\/m\/(60|62|71|77)\b/,
-  /\/column\/pike-linguistics\//,
-  /\/confluence\/evidence-responsibility-alignment\//,
-  /\/students\/bao-jinchao\/preemptive-compensation/,
-  /\/students\/huang-qianying\/regenerative-boundary\//,
-  /\/students\/jin-hua\/(grammar-shame|cognitive-recession|load-bearing-body)\//,
-  /\/paradigm\/(civil-war-scar|who-gets-to-settle)\//,
-];
+/* 老三端点（/api/john、/api/john/chat、/api/john/compose，以及退路页 /chatjohn/lite/）
+   原来另有一份正则白名单，与 WDS_PROFILES.lang.pre 各写各的。**两份判据迟早对不上**，
+   而对不上的表现是「新页在 ChatJohn 里引得到、在 lite 里引不到」这种没人会报的错。
+   2026-08-23 合并成同一个 LANG_PRE，两条路逐字同一份判据。 */
+const JOHN_SCOPE = LANG_PRE;
 async function johnRag(env, url, q) {
   try {
     const lr = await lightRetrieve(env, url, q, [], 24, 900, { pick: 20, perDoc: 2 });
@@ -554,7 +599,7 @@ async function johnRag(env, url, q) {
     for (const ck of (lr.hits || [])) {
       const d = docs[ck.d]; if (!d || !d.u) continue;
       const u = String(d.u);
-      if (!JOHN_SCOPE.some((re) => re.test(u))) continue;
+      if (!JOHN_SCOPE.some((pre) => u.indexOf(pre) >= 0)) continue;   // 前缀判据，与 wdsProfInScope 同一套
       const c = cnt.get(u) || 0; if (c >= 2) continue;      // 同一篇最多两段，免得一篇占满
       cnt.set(u, c + 1);
       out.push({ t: String(d.t || "").slice(0, 90), u: new URL(u, url).toString(), s: String(ck.t || "").slice(0, 700) });
@@ -727,19 +772,7 @@ const WDS_PROFILES = {
        「正文引了一篇、出处里没有它」这种没人会当场发现的错。所以只留一种。
        ⚠ 每条都带结尾斜杠：没有它，/books/m/62/ 会连 /books/m/620/ 一起收进来。
        （旧 JOHN_SCOPE 那份正则仍归 /api/john/* 三个老端点用，两边互不影响。） */
-    pre: [
-      "/students/hu-zhiying/",
-      "/books/m/60/", "/books/m/62/", "/books/m/71/", "/books/m/77/",
-      "/column/pike-linguistics/",
-      "/confluence/evidence-responsibility-alignment/",
-      "/students/bao-jinchao/preemptive-compensation/",
-      "/students/huang-qianying/regenerative-boundary/",
-      "/students/jin-hua/grammar-shame/",
-      "/students/jin-hua/cognitive-recession/",
-      "/students/jin-hua/load-bearing-body/",
-      "/paradigm/civil-war-scar/",
-      "/paradigm/who-gets-to-settle/"
-    ],
+    pre: LANG_PRE,   // ⬅ 全站唯一一份，定义与维护规矩见文件上方 LANG_PRE
     /* 【怎么答】里与人格绑死的按档案换掉；链接规矩、数学写法等机制条款照旧共用。
        ⚠ 第 4 条（术语）也必须换：共用那一条原话是「术语当场用最短的话讲清（显露/差异序列/
        特征纠缠/介生态/成熟态等）」——它默认读者要学这套词，对 ChatSDE 成立，对 John 正好相反。 */

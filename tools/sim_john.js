@@ -52,17 +52,15 @@ console.log("pass",pass,"fail",fail);
 if(fail) process.exit(1);
 
 /* ── johnRag 的白名单过滤（离线复刻 JOHN_SCOPE）── */
-const JOHN_SCOPE = [
-  /\/students\/hu-zhiying\//,
-  /\/books\/m\/(60|62|71|77)\b/,
-  /\/column\/pike-linguistics\//,
-  /\/confluence\/evidence-responsibility-alignment\//,
-  /\/students\/bao-jinchao\/preemptive-compensation/,
-  /\/students\/huang-qianying\/regenerative-boundary\//,
-  /\/students\/jin-hua\/(grammar-shame|cognitive-recession|load-bearing-body)\//,
-  /\/paradigm\/(civil-war-scar|who-gets-to-settle)\//,
-];
-function inScope(u){ return JOHN_SCOPE.some((re)=>re.test(u)); }
+/* ⚠ 这份**从 src/worker.js 现读**，不手抄——同一文件开头那段血案说的就是手抄的下场。
+   2026-08-23 起白名单是一串网址前缀（不再是正则），且老三端点与 lang 档案共用同一份
+   LANG_PRE：手抄一份在这里，收窄了白名单而这张安全网还照着旧的全绿，等于没有网。 */
+const JOHN_SCOPE = (function(){
+  const i=_wk.indexOf("const LANG_PRE = [");
+  if(i<0){ console.log("FAIL 抠不出 LANG_PRE——白名单结构变了"); process.exit(1); }
+  return new Function(_wk.slice(i,_wk.indexOf("];",i)+2)+"\nreturn LANG_PRE;")();
+})();
+function inScope(u){ return JOHN_SCOPE.some((pre)=>String(u).indexOf(pre)>=0); }
 function pick(hits, docs){
   const out=[], cnt=new Map();
   for(const ck of hits){ const d=docs[ck.d]; if(!d||!d.u) continue;
@@ -73,13 +71,14 @@ function pick(hits, docs){
 }
 let p2=0,f2=0; const t2=(n,c)=>{console.log((c?"PASS":"FAIL"),n); c?p2++:f2++;};
 t2("收 John 自己的篇", inScope("/students/hu-zhiying/post-hand-slot/"));
+t2("不收他名下的非语言篇（2026-08-23 收窄）", !inScope("/students/hu-zhiying/erosion-precedes-genesis/"));
 t2("收专著62", inScope("/books/m/62/"));
 t2("收派克篇", inScope("/column/pike-linguistics/"));
 t2("收鲍锦朝语感篇", inScope("/students/bao-jinchao/preemptive-compensation/"));
 t2("不收别人的非语言篇", !inScope("/students/hu-min/lodging-in-class/"));
 t2("不收新思想前沿面板", !inScope("/frontier/linguistics/"));
 t2("不收别的专著", !inScope("/books/m/83/"));
-const docs=[{u:"/students/hu-zhiying/a/",t:"A"},{u:"/students/hu-min/x/",t:"X"},{u:"/books/m/62/",t:"B"}];
+const docs=[{u:"/students/hu-zhiying/post-hand-slot/",t:"A"},{u:"/students/hu-min/x/",t:"X"},{u:"/books/m/62/",t:"B"}];
 t2("站外篇被滤掉", pick([{d:1,t:"x"},{d:0,t:"a"}],docs).length===1);
 t2("同一篇最多两段", pick([{d:0,t:"1"},{d:0,t:"2"},{d:0,t:"3"}],docs).length===2);
 t2("最多六段", pick(Array.from({length:20},()=>({d:2,t:"s"})),docs).length<=6);
@@ -88,7 +87,17 @@ console.log("scope pass",p2,"fail",f2);
 if(f2) process.exit(1);
 
 /* ── 概括成文：段数表与前后端一致性、分段拼接、字数闸 ── */
-const JOHN_COMPOSE={paper:{parts:4,per:2500},essay:{parts:2,per:2000},wechat:{parts:1,per:2000}};
+/* ⚠ 同样从 worker.js 现读。手抄那份停在 essay 2×2000 / wechat 1×2000，
+   而服务端 2026-08-22 已改成 3×1700 / 2×1600（两份真跑欠字逼出来的）——
+   于是这张网连着两天报「段数一致 essay FAIL」，红的是网自己，不是页面。 */
+const JOHN_COMPOSE=(function(){
+  const i=_wk.indexOf("const JOHN_COMPOSE = {");
+  if(i<0){ console.log("FAIL 抠不出 JOHN_COMPOSE"); process.exit(1); }
+  const seg=_wk.slice(i,_wk.indexOf("\n};",i)+3);
+  const T=new Function(seg+"\nreturn JOHN_COMPOSE;")();
+  const o={}; for(const k of Object.keys(T)) o[k]={parts:T[k].parts,per:T[k].per};
+  return o;
+})();
 const fs2=require("fs");
 let p3=0,f3=0; const t3=(n,c)=>{console.log((c?"PASS":"FAIL"),n); c?p3++:f3++;};
 
@@ -112,8 +121,10 @@ const clampPart=(kind,part)=>{const K=JOHN_COMPOSE[kind]||JOHN_COMPOSE.wechat;
   return Math.max(1,Math.min(K.parts,parseInt(part,10)||1));};
 t3("part 下限钳到1", clampPart("paper",0)===1);
 t3("part 上限钳到4", clampPart("paper",99)===4);
-t3("wechat 只有1段", clampPart("wechat",3)===1);
-t3("未知文体退回 wechat", clampPart("zzz",2)===1);
+/* 断言跟着表走，别写死数字——段数按真跑欠字调过一次（2026-08-22），
+   写死的那两条当时就变成了假红。 */
+t3("wechat 钳到它自己的段数", clampPart("wechat",99)===JOHN_COMPOSE.wechat.parts);
+t3("未知文体退回 wechat 的段数", clampPart("zzz",99)===JOHN_COMPOSE.wechat.parts);
 // 对话长度闸
 const tooShort=(s)=>s.length<200;
 t3("过短对话被挡", tooShort("读者：你好\n\nJohn：你好"));

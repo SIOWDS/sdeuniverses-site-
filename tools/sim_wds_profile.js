@@ -24,10 +24,14 @@ console.log("── ① 档案表与解析器 ───────────�
   const seg = W.slice(W.indexOf("const WDS_PROFILES = {"), W.indexOf("const WDS_VISION = {"));
   t("抠得出 WDS_PROFILES 段", seg.length > 500);
   const johnSys = "「John」的人格底本占位";
-  const johnScope = [/\/students\/hu-zhiying\//, /\/books\/m\/(60|62|71|77)\b/];
-  const F = new Function("JOHN_SYS", "JOHN_SCOPE",
+  /* 白名单不再手抄：档案的 pre 自 2026-08-23 起指向文件上方那份 LANG_PRE，
+     所以这里也从 worker.js 现读同一份。手抄的下场见 sim_john.js 开头那段血案。 */
+  const preSeg = W.slice(W.indexOf("const LANG_PRE = ["), W.indexOf("];", W.indexOf("const LANG_PRE = [")) + 2);
+  t("抠得出 LANG_PRE 段", preSeg.length > 200);
+  const LANG_PRE = new Function(preSeg + "\nreturn LANG_PRE;")();
+  const F = new Function("JOHN_SYS", "LANG_PRE",
     seg + "\nreturn { WDS_PROFILES: WDS_PROFILES, wdsProfileOf: wdsProfileOf, wdsProfInScope: wdsProfInScope };");
-  const S = F(johnSys, johnScope);
+  const S = F(johnSys, LANG_PRE);
   const lang = S.wdsProfileOf("lang");
 
   t("认得 lang", !!lang && lang.id === "lang");
@@ -64,10 +68,36 @@ console.log("── ① 档案表与解析器 ───────────�
   t("收专著 62", inS("/books/m/62/"));
   t("不收别人的非语言篇", !inS("/students/hu-min/lodging-in-class/"));
   t("不收别的专著", !inS("/books/m/83/"));
-  t("绝对网址同样判得出", inS("https://lang.sdeuniverses.com/students/hu-zhiying/a/"));
+  t("绝对网址同样判得出", inS("https://lang.sdeuniverses.com/students/hu-zhiying/post-hand-slot/"));
   t("没档案时不过滤（ChatSDE 本身照旧全站）", S.wdsProfInScope(null, "/anything/") === true);
   t("空白名单也不过滤", S.wdsProfInScope({ pre: [] }, "/anything/") === true);
   t("前缀不带斜杠的邻居不会被误收", !inS("/books/m/620/") && !inS("/books/m/771/"));
+
+  console.log("\n── ②a 清单与站上选目对账 ─────────────────────");
+  /* ⭐ 2026-08-23 治的病：白名单第一条原是 `/students/hu-zhiying/`，
+     他名下九十余件作品整个进来，而属语言线的只有十二篇。线上实测问「什么是语感」，
+     六段材料里混进《蚀先于生：为什么形态的耗散比生成更原始》——
+     题域闸挡的是**答什么**，取料是另一道，闸管不着。
+     收窄之后新的风险变成**漏**：他发了新的语言篇，站上读得到、John 引不到，
+     而这种错没人会报。所以把「白名单」与「语言站自己那份选目」逐条对上账。 */
+  const allPage = fs.readFileSync("public/sites/lang/all/index.html", "utf8");
+  const siteSlugs = Array.from(new Set((allPage.match(/\/students\/hu-zhiying\/[a-z0-9-]+\//g) || [])));
+  const preHz = LANG_PRE.filter((x) => x.indexOf("/students/hu-zhiying/") === 0);
+  const bookLanding = ["wisdom-of-language", "one-flower-one-world", "unity-of-knowing-and-acting", "the-ledger-of-acquisition"]
+    .map((s) => "/students/hu-zhiying/" + s + "/");
+  const missing = siteSlugs.filter((u) => preHz.indexOf(u) < 0);
+  const extra = preHz.filter((u) => siteSlugs.indexOf(u) < 0 && bookLanding.indexOf(u) < 0);
+  t("站上选目每一篇都在白名单里（漏＝读得到引不到）", missing.length === 0, missing.join(","));
+  t("白名单里没有站上选目之外的篇（多＝出处栏混进不相干的文章）", extra.length === 0, extra.join(","));
+  t("不再整个收 hu-zhiying 名下所有作品", LANG_PRE.indexOf("/students/hu-zhiying/") < 0);
+  t("四部专著的正文路径都在", ["/books/m/60/", "/books/m/62/", "/books/m/71/", "/books/m/77/"].every((x) => LANG_PRE.indexOf(x) >= 0));
+  t("站上其余语言篇目还在（划界对手不能丢）",
+    ["/column/pike-linguistics/", "/students/bao-jinchao/preemptive-compensation/", "/paradigm/civil-war-scar/"]
+      .every((x) => LANG_PRE.indexOf(x) >= 0));
+  t("他的非语言篇确实被挡在外面", !S.wdsProfInScope(lang, "/students/hu-zhiying/erosion-precedes-genesis/")
+    && !S.wdsProfInScope(lang, "/students/hu-zhiying/first-calibration/"));
+  t("老三端点与档案共用同一份判据（JOHN_SCOPE ＝ LANG_PRE）", /const JOHN_SCOPE = LANG_PRE;/.test(WC));
+  t("老三端点改用前缀判据、不再 re.test", /JOHN_SCOPE\.some\(\(pre\) => u\.indexOf\(pre\) >= 0\)/.test(WC));
 
   console.log("\n── ②b 白名单下推到候选阶段（治 K 饥饿）─────────");
   /* ⭐ 线上实测过的病：白名单只在取完 top-20 之后滤，而它约占全站 1%，

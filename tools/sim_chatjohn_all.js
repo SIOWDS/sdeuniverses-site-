@@ -67,7 +67,10 @@ let SELF_ENV = null;
 // 二、桩：env（ASSETS 走真仓库文件；PDFS 是一份小小的假索引；DO 可切换）
 // ══════════════════════════════════════════════════════════════
 const DOCS = [
-  { i: 0, t: "语感是练出来的", u: "https://lang.sdeuniverses.com/students/hu-zhiying/yugan/", s: "students" },
+  /* ⚠ 网址必须是**白名单里真有的那一条**：2026-08-23 白名单由「他名下全部作品」
+     收窄成语言站那份选目，随手编的 slug（原来这里写的是 /hu-zhiying/yugan/）
+     从此挡在门外，四条断言当场变红——红的是桩，不是端点。 */
+  { i: 0, t: "后手生位", u: "https://lang.sdeuniverses.com/students/hu-zhiying/post-hand-slot/", s: "students" },
   { i: 1, t: "语法羞耻", u: "https://lang.sdeuniverses.com/students/jin-hua/grammar-shame/", s: "students" },
   { i: 2, t: "衰老九篇", u: "https://sdeuniverses.com/students/hu-min/shuailao-1/", s: "students" },   // ⚠ 白名单外，必须被挡
   { i: 3, t: "语言习得的本质", u: "https://sdeuniverses.com/books/m/62/", s: "books" },
@@ -172,7 +175,7 @@ async function main() {
     ok(r.frames[r.frames.length - 1].t === "[DONE]", "最后一帧是 [DONE]");
     const src = r.got("src")[0];
     ok(!!src && Array.isArray(src.v) && src.v.length > 0, "站内取料命中 → 有 src 出处帧");
-    ok(!!src && src.v.every((x) => /hu-zhiying|jin-hua|books\/m\/62/.test(x.u)), "出处全在白名单内",
+    ok(!!src && src.v.every((x) => /post-hand-slot|jin-hua\/grammar-shame|books\/m\/62/.test(x.u)), "出处全在白名单内",
       src ? JSON.stringify(src.v.map((x) => x.u)) : "无");
     ok(!!src && !src.v.some((x) => /shuailao/.test(x.u)), "⭐ 白名单外那篇（衰老）被挡住了");
     const u = lastUp();
