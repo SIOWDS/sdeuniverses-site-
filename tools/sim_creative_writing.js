@@ -13,6 +13,10 @@
 const fs = require("fs"), path = require("path");
 const ROOT = path.join(__dirname, "..");
 const SKILL = fs.readFileSync(path.join(ROOT, "tools/skills/sde-creative-writing.md"), "utf8");
+/* 2026-08-23：散文档规范全文移出到分册。总纲第四节只留指路，硬律正文在分册里，
+   所以 P-x 的存在性判定必须在 SKILL+PROSE 两份里找，只找 SKILL 会假红。 */
+const PROSE = fs.readFileSync(path.join(ROOT, "tools/skills/sde-prose-writing.md"), "utf8");
+const SKILL_ALL = SKILL + "\n" + PROSE;
 const W = fs.readFileSync(path.join(ROOT, "src/worker.js"), "utf8");
 const LITE = fs.readFileSync(path.join(ROOT, "public/sites/lang/chatjohn/lite/index.html"), "utf8");
 
@@ -55,16 +59,24 @@ rows.forEach((row) => {
 sec("② 硬律编号逐条落地");
 const LAWS = {
   wechat: ["W-1", "W-2", "W-3", "W-4", "W-5", "W-6", "W-7"],
-  prose: ["P-1", "P-2", "P-3", "P-4", "P-5", "P-6", "P-7", "P-8"],
+  prose: ["P-1", "P-2", "P-3", "P-4", "P-5", "P-6", "P-7", "P-8", "P-9", "P-10", "P-11", "P-12"],
   story: ["S-1", "S-2", "S-3", "S-4", "S-5", "S-6", "S-7", "S-8"],
 };
 Object.keys(LAWS).forEach((k) => {
   LAWS[k].forEach((code) => {
-    ok(SKILL.indexOf("硬律 " + code) >= 0 || SKILL.indexOf("（" + code + "）") >= 0,
+    ok(SKILL_ALL.indexOf("硬律 " + code) >= 0 || SKILL_ALL.indexOf("（" + code + "）") >= 0,
       "Skill 里找不到硬律 " + code);
     const b = specBlock(k);
     ok(b && b.body.indexOf(code) >= 0, k + " 的 SPEC 里没有 " + code);
   });
+});
+
+/* ══ ②b ChatJohn essay 档：散文硬律同样逐条落地（2026-08-23 前它只到 P-6）══ */
+sec("②b ChatJohn essay 的散文硬律");
+const jEssay = W.slice(W.indexOf("\n  essay:\n"), W.indexOf("\n  wechat:\n", W.indexOf("\n  essay:\n")));
+ok(jEssay.length > 200, "JOHN_COMPOSE_SPEC.essay 取不到");
+LAWS.prose.forEach((code) => {
+  ok(jEssay.indexOf(code) >= 0, "ChatJohn essay SPEC 里没有 " + code);
 });
 
 /* ══ ③ 共用硬律 X1–X7：只许有一份，三档都要挂 ══════════════════════ */
@@ -136,6 +148,13 @@ ok(wb && /最多两位/.test(wb.body), "公众号档没写具名上限");
 ok(pb && pb.body.indexOf("15%") >= 0, "散文档没写议论占比上限（真跑第二号病）");
 ok(pb && /视点|三问/.test(pb.body), "散文档没写视点守恒");
 ok(pb && pb.body.indexOf("取消提问资格") >= 0, "散文档没写 P-6");
+/* 2026-08-23 第三份真跑（《滤网沉泥》7172 字 · 盲评 110）的三处交付层失分，逐条点名。 */
+ok(pb && /六项|世界守恒/.test(pb.body), "散文档没写 P-9 世界守恒的六项核对表");
+ok(pb && pb.body.indexOf("那就是重开了") >= 0, "散文档的 P-10 条文里没写「就是重开了」这条判据收口");
+ok(pb && (pb.body.match(/拿去当全篇第一句/g) || []).length >= 2, "P-10 判据应在条文与自检清单各出现一次（少一处即有一边是空的）");
+ok(pb && /终止标点|收尾引号/.test(pb.body), "散文档没写 P-11 末句必须落在整句上");
+ok(pb && /起名|叫出一个名字/.test(pb.body), "散文档没写 P-12 起名律（这一档唯一能抬高位置的一条）");
+ok(pb && pb.body.indexOf("交付层") >= 0, "散文档的自检清单没把交付层五问排到最前");
 ok(sb && sb.body.indexOf("换嘴") >= 0, "小说档没写换嘴检验");
 ok(sb && sb.body.indexOf("寓言") >= 0, "小说档没写不许写成寓言");
 /* 2026-08-22 第三份真跑（79 分）的三处硬律失分，逐条要在规格里点名。 */
@@ -190,6 +209,19 @@ ok(han >= 12000, "Skill 汉字数 " + han + "，低于一万字的规格要求")
 ["## 一 ·", "## 二 ·", "## 三 ·", "## 四 ·", "## 五 ·", "## 六 ·", "## 七 ·", "## 八 ·", "## 九 ·", "## 十 ·", "## 附录 A"]
   .forEach((h) => ok(SKILL.indexOf(h) >= 0, "Skill 缺章节 " + h));
 ok(SKILL.indexOf("tools/sim_creative_writing.js") >= 0, "Skill 第一节没有指向本护栏");
+
+/* ══ ⑩ 散文分册自身（每一种文体的写作 Skill 都要到一万汉字）══════════ */
+sec("⑩ 散文分册 sde-prose-writing.md");
+const phan = (PROSE.match(/[\u4e00-\u9fff]/g) || []).length;
+ok(phan >= 10000, "散文分册汉字 " + phan + "，低于一万字的规格要求");
+["## 一 ·", "## 二 ·", "## 三 ·", "## 四 ·", "## 五 ·", "## 六 ·", "## 七 ·", "## 八 ·", "## 九 ·", "## 十 ·", "## 十一 ·", "## 十二 ·", "## 附录 A", "## 附录 B", "## 附录 C"]
+  .forEach((h) => ok(PROSE.indexOf(h) >= 0, "散文分册缺章节 " + h));
+ok(PROSE.indexOf("tools/sim_creative_writing.js") >= 0, "分册第一节没有指向本护栏");
+ok(SKILL.indexOf("sde-prose-writing.md") >= 0, "总纲第四节没有指向散文分册（两份口径的入口断了）");
+/* 分册的附录 A 编译表要与机器层对上 */
+ok(/`prose`[^\n]*5000[^\n]*20000/.test(PROSE), "分册附录 A 的 prose 行与机器层字数/预算对不上");
+ok(/2000\/1750\/1250/.test(PROSE), "分册附录 A 没写 ChatSDE 的三趟分法");
+LAWS.prose.forEach((code) => ok(PROSE.indexOf(code) >= 0, "分册附录 A 硬律清单缺 " + code));
 
 console.log("\n═══ sim_creative_writing: " + pass + " PASS / " + fail + " FAIL ═══");
 process.exit(fail ? 1 : 0);
