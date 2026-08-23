@@ -16,7 +16,9 @@ const SKILL = fs.readFileSync(path.join(ROOT, "tools/skills/sde-creative-writing
 /* 2026-08-23：散文档规范全文移出到分册。总纲第四节只留指路，硬律正文在分册里，
    所以 P-x 的存在性判定必须在 SKILL+PROSE 两份里找，只找 SKILL 会假红。 */
 const PROSE = fs.readFileSync(path.join(ROOT, "tools/skills/sde-prose-writing.md"), "utf8");
-const SKILL_ALL = SKILL + "\n" + PROSE;
+/* 2026-08-23：小说档同样移出到分册，并扩为短篇／中篇／长篇三类。 */
+const STORY = fs.readFileSync(path.join(ROOT, "tools/skills/sde-story-writing.md"), "utf8");
+const SKILL_ALL = SKILL + "\n" + PROSE + "\n" + STORY;
 const W = fs.readFileSync(path.join(ROOT, "src/worker.js"), "utf8");
 const LITE = fs.readFileSync(path.join(ROOT, "public/sites/lang/chatjohn/lite/index.html"), "utf8");
 
@@ -60,7 +62,7 @@ sec("② 硬律编号逐条落地");
 const LAWS = {
   wechat: ["W-1", "W-2", "W-3", "W-4", "W-5", "W-6", "W-7"],
   prose: ["P-1", "P-2", "P-3", "P-4", "P-5", "P-6", "P-7", "P-8", "P-9", "P-10", "P-11", "P-12"],
-  story: ["S-1", "S-2", "S-3", "S-4", "S-5", "S-6", "S-7", "S-8"],
+  story: ["S-1", "S-2", "S-3", "S-4", "S-5", "S-6", "S-7", "S-8", "S-9", "S-10", "S-11", "S-12"],
 };
 Object.keys(LAWS).forEach((k) => {
   LAWS[k].forEach((code) => {
@@ -77,6 +79,11 @@ const jEssay = W.slice(W.indexOf("\n  essay:\n"), W.indexOf("\n  wechat:\n", W.i
 ok(jEssay.length > 200, "JOHN_COMPOSE_SPEC.essay 取不到");
 LAWS.prose.forEach((code) => {
   ok(jEssay.indexOf(code) >= 0, "ChatJohn essay SPEC 里没有 " + code);
+});
+const jStory = W.slice(W.indexOf("\n  story:\n"), W.indexOf("\n};", W.indexOf("\n  story:\n")));
+ok(jStory.length > 200, "JOHN_COMPOSE_SPEC.story 取不到");
+LAWS.story.forEach((code) => {
+  ok(jStory.indexOf(code) >= 0, "ChatJohn story SPEC 里没有 " + code);
 });
 
 /* ══ ③ 共用硬律 X1–X7：只许有一份，三档都要挂 ══════════════════════ */
@@ -161,6 +168,13 @@ ok(sb && sb.body.indexOf("寓言") >= 0, "小说档没写不许写成寓言");
 ok(sb && /本篇之内有来历|第一次出现是在哪儿/.test(sb.body), "小说档没写 S-7 本篇自带出处（借来的那句话）");
 ok(sb && sb.body.indexOf("演过的") >= 0, "小说档没写 S-2 的演过就不许再说这条计数判据");
 ok(sb && sb.body.indexOf("记号") >= 0, "小说档没写 S-8 有意为之必须留记号");
+/* 2026-08-23《摔碎的杯子》那份（5193 字 · 盲评 110）的交付层失分，逐条点名。 */
+ok(sb && /六项|世界守恒/.test(sb.body), "小说档没写 S-9 世界守恒的六项核对表");
+ok(sb && sb.body.indexOf("那就是重开了") >= 0, "小说档的 S-10 条文里没写「就是重开了」这条判据收口");
+ok(sb && (sb.body.match(/拿去当全篇第一句/g) || []).length >= 2, "S-10 判据应在条文与自检清单各出现一次");
+ok(sb && /终止标点|收尾引号/.test(sb.body), "小说档没写 S-11 每趟必须落在整句上");
+ok(sb && /双次显影|两次而结果不同/.test(sb.body), "小说档没写 S-12 双次显影（这一档唯一能抬高位置的一条）");
+ok(sb && sb.body.indexOf("交付层") >= 0, "小说档的自检清单没把交付层五问排到最前");
 ok(cwBody.indexOf("开了的线") >= 0 || cwBody.indexOf("第二次交代") >= 0, "CW_X 里 X11 没写还账的判据");
 ok(cwBody.indexOf("小说档最容易犯") >= 0, "X1 没写「小说档最容易犯」这条警示");
 /* 小说档的评分卡要多带一段：手艺好不救硬律。 */
@@ -205,7 +219,11 @@ ok(SKILL.indexOf("### 9.2 从 87 到 90") >= 0, "Skill 缺 §9.2「从 87 到 90
 /* ══ ⑧ 规范层自身的完整性 ═══════════════════════════════════════ */
 sec("⑧ 规范层自检");
 const han = (SKILL.match(/[\u4e00-\u9fff]/g) || []).length;
-ok(han >= 12000, "Skill 汉字数 " + han + "，低于一万字的规格要求");
+/* 2026-08-23：散文与小说两节已移出到分册，总纲从「三体裁全文」变成「分工总纲 ＋ 公众号一节 ＋ 两页指路」。
+   一万字的规格从此**按文体分册计**（见 ⑩ ⑪），总纲自己只保底 8000。
+   ⚠ 公众号那一节还留在总纲里；等它也拆出分册，这一条要连同 ⑫ 一起改。 */
+ok(han >= 8000, "总纲汉字数 " + han + "，低于保底 8000");
+ok(SKILL.indexOf("## 三 · 公众号文章规范") >= 0, "公众号一节仍应留在总纲（尚未拆分册）");
 ["## 一 ·", "## 二 ·", "## 三 ·", "## 四 ·", "## 五 ·", "## 六 ·", "## 七 ·", "## 八 ·", "## 九 ·", "## 十 ·", "## 附录 A"]
   .forEach((h) => ok(SKILL.indexOf(h) >= 0, "Skill 缺章节 " + h));
 ok(SKILL.indexOf("tools/sim_creative_writing.js") >= 0, "Skill 第一节没有指向本护栏");
@@ -220,8 +238,27 @@ ok(PROSE.indexOf("tools/sim_creative_writing.js") >= 0, "分册第一节没有�
 ok(SKILL.indexOf("sde-prose-writing.md") >= 0, "总纲第四节没有指向散文分册（两份口径的入口断了）");
 /* 分册的附录 A 编译表要与机器层对上 */
 ok(/`prose`[^\n]*5000[^\n]*20000/.test(PROSE), "分册附录 A 的 prose 行与机器层字数/预算对不上");
+
+/* ══ ⑪ 小说分册（短篇／中篇／长篇）══════════════════════════════════ */
+sec("⑪ 小说分册 sde-story-writing.md");
+const shan = (STORY.match(/[\u4e00-\u9fff]/g) || []).length;
+ok(shan >= 10000, "小说分册汉字 " + shan + "，低于一万字的规格要求");
+["## 一 ·", "## 二 ·", "## 三 ·", "## 四 ·", "## 五 ·", "## 六 ·", "## 七 ·", "## 八 ·", "## 九 ·", "## 十 ·", "## 十一 ·", "## 十二 ·", "## 十三 ·", "## 十四 ·", "## 附录 A", "## 附录 B", "## 附录 C"]
+  .forEach((h) => ok(STORY.indexOf(h) >= 0, "小说分册缺章节 " + h));
+ok(STORY.indexOf("tools/sim_creative_writing.js") >= 0, "小说分册第一节没有指向本护栏");
+ok(SKILL.indexOf("sde-story-writing.md") >= 0, "总纲第五节没有指向小说分册");
+/* 三类必须都在，且中长篇的硬律编号齐全 */
+["短篇", "中篇", "长篇"].forEach((t) => ok(STORY.indexOf(t) >= 0, "小说分册缺「" + t + "」这一类"));
+["M-1", "M-2", "M-3", "M-4", "M-5"].forEach((c) =>
+  ok(STORY.indexOf("#### " + c + " ·") >= 0, "小说分册缺中篇硬律条文 " + c + "（交叉引用不算，要有它自己那一节）"));
+["L-1", "L-2", "L-3", "L-4", "L-5", "L-6"].forEach((c) =>
+  ok(STORY.indexOf("#### " + c + " ·") >= 0, "小说分册缺长篇硬律条文 " + c + "（交叉引用不算，要有它自己那一节）"));
+LAWS.story.forEach((code) => ok(STORY.indexOf("### " + code + " ·") >= 0, "小说分册缺硬律条文 " + code));
+/* 附录 A 要与机器层对上，且必须写明中长篇没有机器层（否则下一个人会以为漏了） */
+ok(/`story`[^\n]*2400[^\n]*10000/.test(STORY), "小说分册附录 A 的 story 行与机器层字数/预算对不上");
+ok(/未实现|没有机器层/.test(STORY), "小说分册没写明中篇与长篇只有规范层——下一个改这里的人会以为机器层漏了");
 ok(/2000\/1750\/1250/.test(PROSE), "分册附录 A 没写 ChatSDE 的三趟分法");
-LAWS.prose.forEach((code) => ok(PROSE.indexOf(code) >= 0, "分册附录 A 硬律清单缺 " + code));
+LAWS.prose.forEach((code) => ok(PROSE.indexOf("### " + code + " ·") >= 0, "散文分册缺硬律条文 " + code));
 
 console.log("\n═══ sim_creative_writing: " + pass + " PASS / " + fail + " FAIL ═══");
 process.exit(fail ? 1 : 0);
