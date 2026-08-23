@@ -18,7 +18,11 @@ const SKILL = fs.readFileSync(path.join(ROOT, "tools/skills/sde-creative-writing
 const PROSE = fs.readFileSync(path.join(ROOT, "tools/skills/sde-prose-writing.md"), "utf8");
 /* 2026-08-23：小说档同样移出到分册，并扩为短篇／中篇／长篇三类。 */
 const STORY = fs.readFileSync(path.join(ROOT, "tools/skills/sde-story-writing.md"), "utf8");
-const SKILL_ALL = SKILL + "\n" + PROSE + "\n" + STORY;
+/* 2026-08-23：诗歌此前只有成文机里六条规格、无规范层。**诗写坏了不表现为难读，表现为「读起来很像诗」**，
+   所以它的每一条都必须配一个三十秒内做得完的机械判据——这也是本护栏能钉住它的前提。
+   ⚠ 诗歌不在总纲的三体裁之内（总纲没有它的章节），所以它的硬律只在分册与机器层两处对账。 */
+const POEM = fs.readFileSync(path.join(ROOT, "tools/skills/sde-poem-writing.md"), "utf8");
+const SKILL_ALL = SKILL + "\n" + PROSE + "\n" + STORY + "\n" + POEM;
 const W = fs.readFileSync(path.join(ROOT, "src/worker.js"), "utf8");
 const LITE = fs.readFileSync(path.join(ROOT, "public/sites/lang/chatjohn/lite/index.html"), "utf8");
 
@@ -238,6 +242,48 @@ ok(PROSE.indexOf("tools/sim_creative_writing.js") >= 0, "分册第一节没有�
 ok(SKILL.indexOf("sde-prose-writing.md") >= 0, "总纲第四节没有指向散文分册（两份口径的入口断了）");
 /* 分册的附录 A 编译表要与机器层对上 */
 ok(/`prose`[^\n]*5000[^\n]*20000/.test(PROSE), "分册附录 A 的 prose 行与机器层字数/预算对不上");
+
+/* ══ ⑫ 诗歌分册 sde-poem-writing.md ⇄ 成文机 poem 档 ════════════════ */
+sec("⑫ 诗歌分册与 poem 档");
+const phan2 = (POEM.match(/[\u4e00-\u9fff]/g) || []).length;
+ok(phan2 >= 10000, "诗歌分册汉字 " + phan2 + "，低于一万字的规格要求");
+const pm = W.match(/\n        poem: \{ name: "([^"]+)", tok: (\d+),/);
+ok(!!pm, "worker.js 里找不到 poem 档 SPEC");
+const pBody = pm ? W.slice(pm.index, W.indexOf("\n        /* ══ 应用文五档", pm.index)) : "";
+ok(pm && /`poem`[^\n]*诗歌（500字）[^\n]*500[^\n]*6000/.test(POEM),
+  "诗歌分册附录 A 与机器层的档名/字数/预算对不上");
+const YLAWS = ["Y-1", "Y-2", "Y-3", "Y-4", "Y-5", "Y-6", "Y-7", "Y-8", "Y-9", "Y-10", "Y-11", "Y-12"];
+YLAWS.forEach((c) => {
+  ok(POEM.indexOf("### " + c + " ·") >= 0, "诗歌分册缺硬律条文 " + c + "（交叉引用不算，要有它自己那一节）");
+  ok(pBody.indexOf(c) >= 0, "poem 档 SPEC 里没有 " + c);
+});
+["## 一 ·", "## 二 ·", "## 三 ·", "## 四 ·", "## 五 ·", "## 六 ·", "## 七 ·", "## 八 ·", "## 九 ·", "## 十 ·", "## 十一 ·", "## 十二 ·", "## 十三 ·", "## 附录 A", "## 附录 B", "## 附录 C"]
+  .forEach((h) => ok(POEM.indexOf(h) >= 0, "诗歌分册缺章节 " + h));
+ok(POEM.indexOf("tools/sim_creative_writing.js") >= 0, "诗歌分册第一节没有指向本护栏");
+/* 五类必须都在 */
+["短章", "组诗", "长诗", "格律", "散文诗"].forEach((t) =>
+  ok(POEM.indexOf(t) >= 0, "诗歌分册缺「" + t + "」这一类"));
+/* 长度三档必须与 DIST_LENS.poem 对齐（两处不一致＝读者选了长度而规格不认） */
+ok(/poem:\s*\[300, 500, 1000\]/.test(W), "DIST_LENS.poem 不是 300/500/1000");
+/* 变异三实测漏网：分册里「300」在四处出现（短章上限、散文诗区间、两处长度三档），
+   宽松的「找得到就算」必然命中其中之一。⇒ 钉两个**唯一的结构位**：附录 A 那一行的常量写法，
+   与 §4.1 那句对齐声明。两处都要与 DIST_LENS.poem 逐字一致。 */
+ok(POEM.indexOf("`DIST_LENS.poem = [300, 500, 1000]`") >= 0,
+  "诗歌分册附录 A 没有逐字写出 DIST_LENS.poem = [300, 500, 1000]");
+ok(POEM.indexOf("长度选项正是 **300 / 500 / 1000**") >= 0,
+  "诗歌分册 §4.1 的长度三档与 DIST_LENS.poem 对不上");
+/* 三条底与三种伪诗：这一册的全部立论基础，缺一条则十二条硬律变成任意禁令 */
+["约束与留白", "身体", "决断", "代偿", "盈余", "安全的失败"].forEach((k) =>
+  ok(POEM.indexOf(k) >= 0, "诗歌分册第三节缺「" + k + "」"));
+["分行的散文", "意象的仓库", "格言的押韵版"].forEach((k) =>
+  ok(POEM.indexOf(k) >= 0, "诗歌分册缺伪诗类型「" + k + "」"));
+/* 机器层必须带上那几条只有诗才有的判据 */
+ok(pBody.indexOf("删掉重排成一段") >= 0 || pBody.indexOf("重排成一段") >= 0, "poem SPEC 没写「删换行重排成一段」这条判据");
+ok(pBody.indexOf("只有作者知道答案") >= 0, "poem SPEC 没写留白与含糊的分界");
+ok(pBody.indexOf("替我担保") >= 0, "poem SPEC 没写决断那一问（本档最值钱的自问）");
+ok(/感叹号\s*0\s*个/.test(pBody), "poem SPEC 没写感叹号 0 个（诗歌档比其余四档加严）");
+ok(POEM.indexOf("D／I 两维旁读") >= 0 || POEM.indexOf("D/I 两维旁读") >= 0,
+  "诗歌分册没写明这一档只做 D／I 两维旁读（五维里有三维对诗失效）");
 
 /* ══ ⑪ 小说分册（短篇／中篇／长篇）══════════════════════════════════ */
 sec("⑪ 小说分册 sde-story-writing.md");
