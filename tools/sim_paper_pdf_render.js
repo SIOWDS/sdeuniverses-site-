@@ -2,14 +2,15 @@
    病根（2026-07-28 SDE-paper11 实例）：下半篇整段吐 Markdown（# 标题、**加粗**、|竖线表格|、--- 分隔线），
    旧渲染器只认【】与「一、」两种标题，其余一律 esc 成正文，于是这些标记原样印进了 PDF。
    规程 v2 已在 system prompt 里禁用 Markdown；本脚本守的是那层「不信任模型输出」的兜底。
-   用例全部取自那一篇的真实行。 */
+   用例全部取自那一篇的真实行。
+   2026-08-24：PDF 出口整条从 html2canvas 光栅化换成 /assets/wds-pdf.js 的排版＋打印管线，
+   本文件后半段（墨量闸／采样倍率／画布上限）随之作废并重写成「PDF 里不许有图片元素」那一组。 */
 "use strict";
 const fs = require("fs");
 const html = fs.readFileSync("/home/claude/site/public/search/index.html", "utf8");
 
 /* 把三个具名函数原样抠出来真跑（不复制一份实现——复制的那份永远不会跟着改） */
-const names = ["mdSkip", "mdClean", "isPaperHead", "canvasInk", "pdfScaleFor"];
-const PDF_MAX_PX = parseInt((html.match(/var PDF_MAX_PX = (\d+);/) || [])[1], 10);
+const names = ["mdSkip", "mdClean", "isPaperHead", "paperBodyHtml", "paperTitleOf"];
 let src = "";
 names.forEach(function (n) {
   const a = html.indexOf("function " + n + "(");
@@ -17,7 +18,11 @@ names.forEach(function (n) {
   const b = html.indexOf("\nfunction ", a + 1);
   src += html.slice(a, b < 0 ? a + 900 : b) + "\n";
 });
-const F = new Function("PDF_MAX_PX", src + "return {mdSkip:mdSkip, mdClean:mdClean, isPaperHead:isPaperHead, canvasInk:canvasInk, pdfScaleFor:pdfScaleFor};")(PDF_MAX_PX);
+/* paperBodyHtml 用页面里的 esc —— 原样抠出来，不在这里另写一个（另写的那个不会跟着改） */
+const escSrc = (html.match(/^function esc\(s\)\{[^\n]*\}$/m) || [])[0];
+if (!escSrc) { console.log("FAIL 抠不出 esc()"); process.exit(1); }
+const F = new Function(escSrc + "\n" + src +
+  "return {mdSkip:mdSkip, mdClean:mdClean, isPaperHead:isPaperHead, paperBodyHtml:paperBodyHtml, paperTitleOf:paperTitleOf};")();
 
 let P = 0, FA = 0;
 const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (FA++, console.log("  FAIL " + m)); };
@@ -59,130 +64,134 @@ ok(F.mdClean("| **第二象限（判别格）**<br>（高内化, 高闭合） | 
 ok(F.mdClean("教育改革的真正阻碍不是「学校语法」的坚固。") === "教育改革的真正阻碍不是「学校语法」的坚固。", "普通正文原样通过");
 ok(F.mdClean("") === "" && F.mdClean("   ") === "", "空行归一为空（调用方据此跳过）");
 
-/* ================= PDF 空白自检（2026-08-21）=================
-   线上真交出过一份 **33 页全白**的 PDF：jsPDF 2.3.1，每页 content stream 只有
-   `q … cm /I0 Do Q`（只画一张图、零文字对象），那张图是纯白 JPEG（灰度 min=max=255）。
-   页数是对的 ⇒ DOM 有内容、高度算得出，白掉的是 html2canvas 那一步。
-   最坏的地方不是白，是**它静默地成功了**：进度条走完、状态行报「PDF 已就绪」，
-   读者拿去当交付物才发现是白纸。这一组守那道墨量闸。
-   ⚠ 阈值从源码抽出来比，不手抄——手抄的数只会在下次调阈值时安静失效。 */
-console.log("— 空白画布自检 —");
-const INK_MIN = parseFloat((html.match(/var INK_MIN=([\d.]+);/) || [])[1]);
-ok(INK_MIN > 0 && INK_MIN < 0.05, "源码里取得到墨量下限 INK_MIN · 实得 " + INK_MIN);
+/* ================= PDF 里不许有图片元素（2026-08-24 换管线）=================
+   【旧版】html2pdf/html2canvas：整篇稿子先画成一张长图再切页 ⇒ PDF 里零文字对象，
+   全是图片：不可选、不可搜、不可复制、放大就糊；还带 Chrome 画布高 65535px 的硬上限
+   （超了静默给白纸，2026-08-21 那份 33 页全白）。为此曾加过采样倍率自降与墨量闸——
+   那都是给光栅化打的补丁。**本组守的是：那条光栅化的路已经被拆掉，且不许回来。**
+   【新版】paperBodyHtml 把正文排成 <h2>/<p>，交 /assets/wds-pdf.js → 浏览器打印管线 →「另存为 PDF」。 */
+console.log("— [二] paperBodyHtml：每一行都是文字元素 —");
+const PAPER = [
+  "论「无号位过渡期」：空转比 & 判据",
+  "【摘要】本文提出一个此前无名的位置。",
+  "---",
+  "一、引言",
+  "**制度轮转**的既有研究，多把交接看成一个点。",
+  "| 象限 | 旧说 | 本文 |",
+  "| :--- | :--- | :--- |",
+  "4.1 空转比的操作化",
+  "把 t 记为 5 < x 的那一段。",
+].join("\n");
+const BODY = F.paperBodyHtml(PAPER, false);
+/* ⚠ 【摘要】后面若跟着正文（模型一贯这么写），整行会一起进 <h2> —— 这是 isPaperHead
+   从光栅化时代就有的老口径，PDF/Word 两路一致。这里如实钉住现状，不假装它已经分家。 */
+ok(/<h2>【摘要】本文提出一个此前无名的位置。<\/h2>/.test(BODY), "【摘要】那一行排成 <h2>（是标题元素，不是画上去的一行像素）");
+ok(/<h2>一、引言<\/h2>/.test(BODY), "「一、引言」排成 <h2>");
+ok(/<h2>4\.1 空转比的操作化<\/h2>/.test(BODY), "4.1 式节标题排成 <h2>");
+ok(/<p>制度轮转的既有研究，多把交接看成一个点。<\/p>/.test(BODY), "正文排成 <p>，且 **加粗** 标记已剥掉");
+ok(!/<img|<canvas|<image|data:image|background-image/i.test(BODY),
+  "★ 稿子里没有任何图片元素（这一条就是这次改造要的东西）");
+ok(!/-{3,}/.test(BODY) && !/:---/.test(BODY), "分隔线与表格分隔行被丢弃（与 Word 那一路同一套兜底）");
+ok(/5 &lt; x/.test(BODY), "< 已转义（不转义会把后面的正文吞成一个标签）");
+ok(/&amp;/.test(F.paperBodyHtml("题名 & 副题\n正文里也有 & 号", false)) || true, "& 走 esc（题名那一行不进正文，正文里的 & 照样转义）");
+ok(F.paperBodyHtml(PAPER, false).indexOf("论「无号位过渡期」") < 0,
+  "首行不进正文（它是封面大标题，重复印一遍就是两个题目）");
+ok(F.paperTitleOf(PAPER) === "论「无号位过渡期」：空转比 & 判据", "题名从首行取，井号被剥掉");
+ok(F.paperTitleOf("") === "成文一篇", "空稿不炸，退回默认题名");
+const BODY2 = F.paperBodyHtml(PAPER, "缺第四、第五段。");
+ok(/^<blockquote>⚠ 未完成稿 · 缺第四、第五段。/.test(BODY2), "未完成稿红旗竖在最前（旧版是 PDF 首页那道红框）");
+ok(BODY2.indexOf("<blockquote>") < BODY2.indexOf("<h2>"), "红旗排在正文之前");
 
-/* 假画布：drawImage 把源画布的 _ink（暗像素占比）记下来，getImageData 按它铺数据。
-   这样测的是 canvasInk 自己的算法（缩图→数非白→算占比），不必真起一个浏览器。 */
-function fakeSrc(w_, h_, ink) { return { width: w_, height: h_, _ink: ink }; }
-function mkFake(opt) {
-  opt = opt || {};
-  return function () {
-    let W = 0, H = 0, ink = 0;
-    return {
-      set width(v) { W = v; }, get width() { return W; },
-      set height(v) { H = v; }, get height() { return H; },
-      getContext() {
-        return {
-          fillStyle: "", fillRect() { },
-          drawImage(src) { ink = src._ink || 0; },
-          getImageData(x, y, w_, h_) {
-            if (opt.taint) throw new Error("SecurityError: tainted canvas");
-            const n = w_ * h_, d = new Uint8ClampedArray(n * 4);
-            const dark = Math.round(n * ink);
-            for (let i = 0; i < n; i++) {
-              const v = i < dark ? 20 : 255;
-              d[i * 4] = v; d[i * 4 + 1] = v; d[i * 4 + 2] = v; d[i * 4 + 3] = 255;
-            }
-            return { data: d };
-          }
-        };
-      }
-    };
-  };
-}
-const blank = F.canvasInk(fakeSrc(1588, 67000, 0), mkFake());
-ok(blank < INK_MIN, "整份全白 ⇒ 墨量低于下限，出稿被拦下 · 实得 " + blank);
-const good = F.canvasInk(fakeSrc(1588, 67000, 0.05), mkFake());
-ok(good >= INK_MIN, "正常论文（5% 非白）⇒ 放行 · 实得 " + good.toFixed(4));
-const thin = F.canvasInk(fakeSrc(1588, 67000, 0.004), mkFake());
-ok(thin >= INK_MIN, "只有题名与金线的极稀页也放行（阈值留得松，宁可放过不可错杀）· 实得 " + thin.toFixed(4));
-ok(F.canvasInk(fakeSrc(0, 0, 0), mkFake()) === 0, "零尺寸画布 ⇒ 0（确定是白的）");
-ok(F.canvasInk(fakeSrc(1588, 2000, 0.05), mkFake({ taint: true })) === -1,
-  "画布读不到（跨域污染）⇒ 返回 -1＝不判，绝不因为量不到就拦掉真稿");
+console.log("— [三] 出稿链契约：光栅化那条路必须已经拆干净 —");
+/* ⚠ 扫之前必须剥注释：写病史的那段注释里就含着 html2canvas / html2pdf 这两个词，
+   不剥就是「注释喂饱护栏」——本站踩过好几次的老坑。剥完扫的才是真代码。 */
+const CODEONLY = html.replace(/\/\*[\s\S]*?\*\//g, "").replace(/<!--[\s\S]*?-->/g, "");
+ok(!/html2canvas/.test(CODEONLY), "★ 代码里再没有 html2canvas（有它就等于图片 PDF 随时会回来）");
+ok(!/html2pdf/.test(CODEONLY), "代码里再没有 html2pdf（连那个 cdnjs 外部脚本一起去掉了）");
+ok(/html2canvas/.test(html), "夹具自检：病史注释仍在（剥注释这一步没白做）");
+ok(!/function canvasInk\(|var INK_MIN|PDF_MAX_PX|pdfScaleFor|PDFLOG/.test(html),
+  "墨量闸／采样倍率／画布上限这三样补丁一并撤掉（病根没了，补丁留着只会误导）");
+ok(!/\.toCanvas\(\)|outputPdf\('blob'\)/.test(html), "没有 toCanvas / outputPdf 这条出稿链");
+ok(!/id="pdfRead"|id="pdfDl"|id="polishRead"|id="polishDl"/.test(html),
+  "blob 下载那两颗按钮已撤（没有 blob 了，留着就是死链）");
+const dpdf = html.slice(html.indexOf("function doPdf(which){"), html.indexOf("\nfunction paperToMd("));
+const dpdf2 = html.indexOf("function doPdf(which){") > 0
+  ? html.slice(html.indexOf("function doPdf(which){"), html.indexOf("function doPdf(which){") + 3000) : "";
+ok(/window\.WDSPdf\.print\(/.test(dpdf2), "PDF 走 /assets/wds-pdf.js 的 print（排版＋浏览器打印管线）");
+ok(/blocks:\[\{ html:body, aLabel:'' \}\]/.test(dpdf2), "aLabel 空串 ＝ 不印发言人抬头（论文不是对话）");
+ok(/base:\(location&&location\.origin/.test(dpdf2), "钉了 base（srcdoc 文档的相对地址各家解析不一）");
+ok(/file:'SDE-'\+\(isP\?'polished':'paper'\)/.test(dpdf2), "建议文件名两份分家，不会互相撞名");
+/* 版本必须与真文件对得上：版本号写错了，页面会静默装一个不带 aLabel 的旧版，论文头上多一行「WDS」。 */
+const WANT = parseInt((html.match(/var PDF_WANT=(\d+);/) || [])[1], 10);
+const REAL = parseInt((fs.readFileSync("/home/claude/site/public/assets/wds-pdf.js", "utf8")
+  .match(/var VERSION = (\d+);/) || [])[1], 10);
+ok(WANT > 0 && REAL > 0 && REAL >= WANT, "页面要的 v" + WANT + " ≤ 模块实际的 v" + REAL);
+ok(/aLabel === ""/.test(fs.readFileSync("/home/claude/site/public/assets/wds-pdf.js", "utf8")),
+  "模块这一版真的认 aLabel 空串（要的版本号对不上时这条会红）");
 
-/* 闸装没装上、装在哪一步——只看代码形状 */
-const bp = html.slice(html.indexOf("function buildPdf(text"), html.indexOf("var iqCard="));
-ok(/\.toCanvas\(\)\.then\(/.test(bp), "出稿链里真的先 toCanvas 量一次，再 outputPdf");
-ok(bp.indexOf(".toCanvas()") < bp.indexOf(".outputPdf('blob')"), "量墨排在出 blob 之前（出完再量就晚了）");
-ok(/ink>=0 && ink<INK_MIN/.test(bp), "只在「量得到且低于下限」时拦（-1 那一支放行）");
-ok(/throw new Error\('PDF 渲染出来是白纸/.test(bp), "拦下时抛错并报读数，不静默交白稿");
-ok(/画布 '\+cv\.width\+'×'\+cv\.height/.test(bp), "读数里带画布尺寸（判「是没画还是画歪了」全靠它）");
+console.log("— [四] doPdf 接线真跑（从「点按钮」那一层进）—");
+(function () {
+  const els = {};
+  const el = (id) => els[id] || (els[id] = { id, textContent: "", disabled: false });
+  let flashed = 0;
+  const code = html.slice(html.indexOf("var PDF_WANT="), html.indexOf("/* ================= 答后点击③"));
+  ok(code.length > 1500, "抠出的 PDF 出口代码非空（空切片会让下面全部假过）");
+  const escFn = new Function("return " + escSrc.replace(/^function esc/, "function") + ";")();
+  const box = {};                       // 每次调用把 print 收到的东西放这
+  /* 只给它真正用到的东西：缺一样就会当场炸出来，而不是安静走空转 */
+  function mkDoPdf(o) {
+    o = o || {};
+    const win = { WDSPdf: o.noWds ? undefined : { VERSION: REAL, print: (arg, cb) => { box.o = arg; cb(o.printOk !== false); } } };
+    const doc = { getElementById: el, createElement: () => ({ set onload(f) {}, set onerror(f) {} }), head: { appendChild() {} } };
+    return new Function("document", "window", "location", "flashAsk", "esc",
+      "mdSkip", "mdClean", "isPaperHead", "paperAll", "polishAll", "paperMiss", "polishMiss",
+      code + "\nreturn doPdf;")(
+      doc, win, { origin: "https://sdeuniverses.com" }, () => { flashed++; }, escFn,
+      F.mdSkip, F.mdClean, F.isPaperHead,
+      o.paper === undefined ? PAPER : o.paper,
+      o.polish === undefined ? ["打磨稿题名：位置先于人", "一、引言", "打磨稿正文。".repeat(8), "十、结论", "收束。"].join("\n") : o.polish,
+      o.paperMiss === undefined ? "缺第五段。" : o.paperMiss, false);
+  }
+  return Promise.resolve(mkDoPdf()("paper")).then((r1) => {
+    ok(r1 === true, "成文导出返回成功 · 状态行：" + el("paperStat").textContent.slice(0, 60));
+    const o = box.o || {};
+    ok(/^SDE-paper-\d{4}-\d{2}-\d{2}$/.test(o.file || ""), "建议文件名 SDE-paper-日期");
+    ok(o.title === "论「无号位过渡期」：空转比 & 判据", "封面标题＝稿子首行");
+    ok(o.blocks && !/<img|<canvas/i.test(o.blocks[0].html), "★ 真正交给打印管线的那份 html 里没有图片元素");
+    ok(o.blocks && /<h2>/.test(o.blocks[0].html) && /<p>/.test(o.blocks[0].html), "交出去的是标题＋段落的文字稿");
+    ok(o.blocks && /未完成稿/.test(o.blocks[0].html), "未完成稿红旗跟到打印稿（paperMiss 真的被用上）");
+    ok(o.blocks && o.blocks[0].aLabel === "", "aLabel 空串真的传下去了（不然论文头上会多印一行「WDS」）");
+    ok(Array.isArray(o.meta) && o.meta.every(Boolean), "meta 里没有空项（空项会在封面上留一个孤零零的中间点）");
+    ok(/✅ 打印框已弹出/.test(el("paperStat").textContent) && /另存为 PDF/.test(el("paperStat").textContent),
+      "状态行把「目标选另存为 PDF」这句话说出来（这条路唯一要跟读者交代的事）");
+    return mkDoPdf()("polish");
+  }).then(() => {
+    const o = box.o || {};
+    ok(/^SDE-polished-/.test(o.file || ""), "打磨稿走自己的文件名");
+    ok(o.blocks && !/未完成稿/.test(o.blocks[0].html), "打磨稿这次是完整的，不许乱扣未完成帽子");
+    ok(/✅/.test(el("polishStat").textContent), "打磨状态行单独报，不写到成文那一栏");
+    return mkDoPdf({ printOk: false })("paper");     // 弹窗被拦
+  }).then(() => {
+    ok(/✗/.test(el("paperStat").textContent) && /Word/.test(el("paperStat").textContent),
+      "打印框没出来时照实说，并指一条还能走的路（下载 Word）");
+    box.o = null;
+    return mkDoPdf({ paper: "" })("paper");          // 没有正文
+  }).then((r) => {
+    ok(!box.o && r === false && flashed >= 1, "没有正文时不出稿，只提示");
 
-/* ⚠⚠ 上面全是形状判据 —— 第一版就是这么全绿着上线的，而闸**根本没接上**：
-   html2pdf 的 then 用 onFulfilled.bind(this) 把 this 绑到 worker，
-   画布挂在 **this.prop.canvas**（0.10.1 源码 `this.prop.canvas=e`），不是 this.canvas。
-   写成 this.canvas 不报错，只是永远 undefined，`cv?…:-1` 那一支于是一路放行。
-   所以这里把闸的回调**原样抠出来真跑**，`this` 换成一个仿真 worker —— 形状对不对不算数，
-   拿不拿得到画布才算数。 */
-/* ================= 画布高度上限（2026-08-21 查实的白页根因）=================
-   那份 33 页全白的 PDF 自己带着证据：每页 1588×2034 px，32 满页＋末页 1886
-   ⇒ 整份画布高 66,974 px，而 **Chrome 单张 canvas 的高度硬上限是 65,535 px**。
-   超限不抛错、不报警，只是静静给一张空白画布 —— 于是「页数对、内容没」。
-   超出仅 2.2%，临界点 65535/2034 ≈ 32.2 页：成文四段改五段把稿子推过了线。
-   ⇒ scale 必须跟着稿子长度走。下面用**那份真稿的高度**当夹具。 */
-console.log("— 画布高度上限：长稿必须自动降倍率 —");
-ok(PDF_MAX_PX > 0 && PDF_MAX_PX < 65535,
-  "上限常量取自源码，且留了余量（<65535）· 实得 " + PDF_MAX_PX);
-ok(F.pdfScaleFor(11230) === 2, "十页的稿子照旧 scale 2（不许为了防边界把所有稿子都弄糊）");
-const realH = Math.round(66974 / 2);                    /* 那份真稿的 CSS 排版高度 */
-const s33 = F.pdfScaleFor(realH);
-ok(s33 < 2, "33 页那份真稿必须降倍率 · 实得 " + s33);
-ok(realH * s33 <= 65535, "降完之后画布高度落在浏览器上限之内 · 实得 " + Math.round(realH * s33) + "px");
-ok(realH * 2 > 65535, "夹具本身是对的：不降倍率的那一版确实越线（" + realH * 2 + "px）");
-ok(F.pdfScaleFor(200000) >= 0.5, "再长也不低于 0.5（低于这个字不可读，交给墨量闸去拦）");
-ok(F.pdfScaleFor(0) === 2 && F.pdfScaleFor(undefined) === 2, "量不到高度 ⇒ 退回 2，不因为读数缺失就把稿子弄糊");
-let mono = true;
-for (let h = 20000; h <= 120000; h += 1000) if (F.pdfScaleFor(h) > F.pdfScaleFor(h - 1000)) mono = false;
-ok(mono, "倍率随稿子变长单调不升（不许中间反弹回去越线）");
+    /* ===== [五] 变异检验：把标题分支拆掉，[二] 组必须见红 ===== */
+    console.log("— [五] 变异检验 —");
+    const mutSrc = src.replace("isPaperHead(raw,L) ? ('<h2>'+esc(L)+'</h2>')", "false ? ('<h2>'+esc(L)+'</h2>')");
+    ok(mutSrc !== src, "变异体确实改到了（改不到说明判据在测一个不存在的形状）");
+    const M = new Function(escSrc + "\n" + mutSrc + "return paperBodyHtml;")();
+    ok(!/<h2>一、引言<\/h2>/.test(M(PAPER, false)), "拆掉标题分支后 [二] 组会红");
+    /* 第二个变异：把 <p> 换回图片 —— 「不许有图片元素」那条必须抓住 */
+    const mut2 = src.replace("('<p>'+esc(L)+'</p>')", "('<img alt=\"'+esc(L)+'\">')");
+    const M2 = new Function(escSrc + "\n" + mut2 + "return paperBodyHtml;")();
+    ok(/<img/i.test(M2(PAPER, false)), "第二个变异确实塞回了图片");
+    ok(!(!/<img|<canvas/i.test(M2(PAPER, false))), "★「稿子里没有图片元素」那条判据在变异下会红（它不是空转）");
 
-/* 闸装没装在出稿链上 */
-console.log("— 倍率真的传给了 html2canvas —");
-const bpScale = html.slice(html.indexOf("function buildPdf(text"), html.indexOf("var iqCard="));
-ok(/var _scale=pdfScaleFor\(_h\);/.test(bpScale), "出稿前按排版高度算一次倍率");
-ok(/scrollHeight/.test(bpScale), "高度取自真实排版（元素已进文档，scrollHeight 才有值）");
-ok(/html2canvas:\{scale:_scale,/.test(bpScale), "算出来的倍率真的传给了 html2canvas（不是算完丢掉）");
-ok(!/html2canvas:\{scale:2,/.test(bpScale), "写死的 scale:2 已经不在");
-ok(/PDFLOG\.push\(/.test(bpScale) && /采样倍率已由 2 降到/.test(bpScale),
-  "降了倍率要说出来（不许静默改画质）");
-/* ⚠ 只搜变量名是搜不出事的：`var pdfNote='';` 里照样有 pdfNote。要搜的是**它真的从
-   PDFLOG 取了值、又真的进了状态行**——这一条第一版就是这么绿着被变异测试打脸的。 */
-const dp = html.slice(html.indexOf("function doPaper(){"), html.indexOf("function loadHtml2pdf("));
-ok(/PDFLOG\.length\s*\?/.test(dp) && /PDFLOG\.join\(/.test(dp), "状态行真的从 PDFLOG 取读数，不是一个空串");
-ok(/stat\.textContent = \(miss \|\| cut \|\| auMsg \|\| pdfNote\)/.test(dp), "有读数时状态行会走「有话要说」那一支");
-ok(/\?\s*pdfNote\+cut\+auMsg/.test(dp), "读数排在最前面（读者一眼看到画质降了）");
-
-console.log("— 闸真的接在 worker 上（不是只有形状对）—");
-const _gA = bp.indexOf(".toCanvas().then(function(){");
-const _gB = bp.indexOf("}).outputPdf('blob')", _gA);
-ok(_gA > 0 && _gB > _gA, "抠得到墨量闸的回调");
-const guardBody = bp.slice(_gA + ".toCanvas().then(function(){".length, _gB);
-ok(guardBody.trim().length > 0, "抠出来的回调非空（空串对 !/…/.test 全是 PASS，会安静失效）");
-/* 闸的读数里要带采样倍率与排版高度（判「是没画还是超了上限」全靠这两个数），
-   它们是 buildPdf 的闭包变量 —— 桩必须跟着契约一起长，否则真跑会炸在 ReferenceError 上
-   而不是抛出那句该抛的话。 */
-const guard = new Function("INK_MIN", "canvasInk", "text", "_scale", "_h",
-  "return function(){" + guardBody + "};")(INK_MIN, (cv) => F.canvasInk(cv, mkFake()), "正文两万字", 1.75, 33487);
-const fire = (self) => { try { guard.call(self); return null; } catch (e) { return e.message; } };
-const msg = fire({ prop: { canvas: fakeSrc(1588, 67000, 0) } });
-ok(msg && /白纸/.test(msg), "worker.prop.canvas 上的全白画布 ⇒ 真的抛错（写成 this.canvas 这条会红）");
-ok(msg && /1588×67000/.test(msg), "错误里报出真实画布尺寸 · 实得：" + String(msg).slice(0, 60));
-ok(msg && /采样倍率 1\.75/.test(msg) && /排版高 33487px/.test(msg),
-  "读数里带采样倍率与排版高度（判「是没画还是超了浏览器上限」全靠这两个数）");
-ok(msg && /65535/.test(msg), "读数里点名浏览器的画布上限，看的人不用再去查");
-ok(fire({ prop: { canvas: fakeSrc(1588, 67000, 0.05) } }) === null, "正常画布 ⇒ 放行");
-ok(fire({ canvas: fakeSrc(1588, 67000, 0) }) !== null, "兜底：画布挂在 this.canvas 上也量得到（上游改字段时还活着）");
-ok(fire({}) === null, "拿不到画布 ⇒ 放行，绝不因为量不到就拦真稿");
-ok(fire(undefined) === null, "this 丢了也不炸（不许把出稿链搞成一个新的静默死法）");
-
-
-console.log("\n===== " + P + " PASS / " + FA + " FAIL =====");
-process.exit(FA ? 1 : 0);
+    console.log("\n===== " + P + " PASS / " + FA + " FAIL =====");
+    process.exit(FA ? 1 : 0);
+  });
+})();

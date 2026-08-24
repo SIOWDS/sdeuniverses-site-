@@ -148,9 +148,14 @@ t("下半篇收尾标记被剥掉", () => { plan = [{ text: LONG + "\n〔全文�
     "某段没写够就地停住，不再往后跑（后段要接前段结尾，硬跑会接到空气上）");
   ok(/function missText\(done, ?SPEC\)/.test(h) && /本稿只写完 '\+SPEC\.length\+' 段中的前 '\+done\+' 段，缺：/.test(h),
     "missText：按实际完成段数说清缺了哪几段");
-  ok(h.indexOf("return buildPdf(paperAll, miss);") > 0, "doPaper：缺段说明一路传进 PDF 排版");
-  ok(/function buildPdf\(text, incomplete, opt\)/.test(h), "buildPdf：接收缺段说明（并已参数化给打磨稿复用）");
-  ok(h.indexOf("⚠ 未完成稿 · '+esc(String(incomplete))+'") > 0, "buildPdf：未完成稿在 PDF 首页有红色警示带");
+  /* 2026-08-24 换管线：PDF 不再当场排版（旧版 doPaper 里那句 `return buildPdf(paperAll, miss)`
+     已经没有了），缺段说明改由 paperMiss/polishMiss 留住，导出 PDF 或 Word 时才用。
+     所以这里钉的是**缺段说明有没有被留住、有没有真的印进两种导出稿**，不是那一行调用长什么样。 */
+  ok(/paperMiss=miss;/.test(h) && /polishMiss=miss;/.test(h), "doPaper/doPolish：缺段说明被留住（导出是随后另一次点击）");
+  ok(/function paperBodyHtml\(text, incomplete\)/.test(h), "paperBodyHtml：PDF 那一路接收缺段说明");
+  ok(/function paperToMd\(text, incomplete, opt\)/.test(h), "paperToMd：Word 那一路也接收");
+  ok(h.indexOf("⚠ 未完成稿 · '+esc(String(incomplete))+'") > 0, "PDF 稿开头有未完成稿警示（<blockquote>）");
+  ok(/> ⚠ 未完成稿 · '\+String\(incomplete\)\+'/.test(h), "Word 稿开头同样有");
   ok(h.indexOf("请勿按完整论文评阅或引用") > 0, "警示带写明不得按完整论文评阅");
 
   /* 「✓ 全文完成」只许出现在 miss 判定之后 —— 静默半篇的病根就在这一句 */

@@ -207,7 +207,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
     </div>
     <div id="deepHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:9px 2px 0;line-height:1.6">🔬 深度模式：基底先内化内功写心得，再用 <b>SDE 方法论</b>（六路径→S/D/E→三方程→误差互消→逮先验）做一次有指导性的深入研究，现实问题还会给可执行的「怎么办」。默认<b>单次调用</b>（较慢、较费 token，建议自带 Key）。<br>点「四步法」→ 升级为 <b>S/D/E 四次独立调用</b>的完整误差互消（最深，但慢 4 倍、贵 4 倍，只在要冲满时用）。</div>
     <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–20 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
-    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动二十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡 → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）自己把问对逼深二十轮（<b>分七批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（五段连写，投稿体例）并出 PDF 与 Word、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>16</b> 次基底调用（开涌现档 20 次）、30–55 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
+    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动二十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡 → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）自己把问对逼深二十轮（<b>分七批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（五段连写，投稿体例）并给出 PDF（矢量文字）与 Word 两个导出口、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>16</b> 次基底调用（开涌现档 20 次）、30–55 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
     <div id="ownKeyRow" style="display:none">
       <input id="userKey" type="password" autocomplete="off" placeholder="填入你的 DeepSeek / 智谱 API Key（仅存本机浏览器，不上传服务器保存）">
     </div>
@@ -282,11 +282,11 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
         <!-- 成文的实时正文：与提炼那个框同一套。没有它，读者只能盯着一个数字猜基底在做什么。 -->
         <div class="ans" id="paperLive" style="max-height:22em;overflow:auto;white-space:pre-wrap"></div>
         <div class="pdf-acts" id="pdfActs">
-          <a class="actbtn solidbtn" id="pdfRead" target="_blank" rel="noopener">📄 <span class="zh-only">PDF 在线阅读</span><span class="en-only">Read PDF online</span></a>
-          <a class="actbtn" id="pdfDl">⬇ <span class="zh-only">下载 PDF</span><span class="en-only">Download PDF</span></a>
+          <button class="actbtn solidbtn" id="pdfBtn" onclick="doPdf('paper')">🖨 <span class="zh-only">导出 PDF · 矢量文字</span><span class="en-only">Export PDF (vector text)</span></button>
+          <span class="act-hint"><span class="zh-only">打印框弹出后，目标请选「另存为 PDF」。出来的是真文字（可选、可搜、可复制、放大不糊），不是把稿子画成图片。</span><span class="en-only">Choose “Save as PDF” in the print dialog — real selectable text, not images.</span></span>
         </div>
-        <!-- Word 出口：由正文直接造 docx，不经 html2canvas 那条渲染链，
-             所以 PDF 白页/超限/引擎加载失败时，这一份照样拿得到（这正是它单独一行的原因）。 -->
+        <!-- Word 出口：由正文直接造 docx，一次点击直接落盘，不经打印框。
+             与 PDF 那一路互不依赖（PDF 走排版＋浏览器打印管线），任一条出问题另一条照样拿得到。 -->
         <div class="pdf-acts" id="wordActs">
           <button class="actbtn" id="docxDl" onclick="dlDocx('paper')">📝 <span class="zh-only">下载 Word（.docx）</span><span class="en-only">Download Word</span></button>
           <span class="act-hint"><span class="zh-only">Word 由正文直接生成，不经排版渲染——PDF 万一出不来，这一份照样拿得到，且可直接在 Word 里改。</span><span class="en-only">Built straight from the text — independent of the PDF renderer.</span></span>
@@ -305,8 +305,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
           <div class="pp-num"><span id="ppChars2">0</span> <span class="zh-only">字</span><span class="en-only">chars</span></div>
         </div>
         <div class="pdf-acts" id="polishActs">
-          <a class="actbtn solidbtn" id="polishRead" target="_blank" rel="noopener">📄 <span class="zh-only">PDF 在线阅读</span><span class="en-only">Read PDF</span></a>
-          <a class="actbtn" id="polishDl">⬇ <span class="zh-only">下载 PDF</span><span class="en-only">Download</span></a>
+          <button class="actbtn solidbtn" id="pdfBtn2" onclick="doPdf('polish')">🖨 <span class="zh-only">导出 PDF · 矢量文字</span><span class="en-only">Export PDF (vector text)</span></button>
           <button class="actbtn" onclick="doIq(true)">🎯 <span class="zh-only">对打磨稿复评</span><span class="en-only">Re-score</span></button>
         </div>
         <div class="pdf-acts" id="wordActs2">
@@ -1210,7 +1209,7 @@ function suggestNextQ(){
    ② 每一轮失败自动重试一次；重试仍失败就**停下收口，不再往下烧**——
       余下几轮多半会以同一个理由失败（额度、Key、基底不可用），继续跑只是把钱烧完；
    ③ 提炼没出入口资料就不写论文：没有入口资料的论文会退回单轮底稿，白烧两次最贵的长调用；
-   ④ 全程记录可下载——论文有 PDF，但十轮问答与评分卡此前只活在这一页的内存里，刷新即失。 */
+   ④ 全程记录可下载——论文可导出 PDF/Word，但十轮问答与评分卡此前只活在这一页的内存里，刷新即失。 */
 /* [stated] 用户 2026-08-21：「首先要增加问对次数到 20 次」。
    ⚠ 改这个数就必须同时改三处，缺一处就是静默故障：
    ① 服务端 AUTO_LADDER 要有第 11–20 级（否则第 11 轮起反复重跑第 10 级的追问动作，
@@ -1443,7 +1442,7 @@ function doAutoRun(){
   /* ⚠ 成文那一项写死过 4，成文改成五段时它就悄悄少报一次。改成认 PAPER_PARTS.length，
      跟提炼那一项同一个做法：**段数一律从定义处抽，不许再出现写死的数**。 */
   var calls=autoBatchCount()+(triOn?7:(1+BRIEF_PARTS.length))+PAPER_PARTS.length+1;
-  if(!confirm('🚀 自动二十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n'+AUTO_TARGET+' 轮问对（分 '+autoBatchCount()+' 批，每轮两千字以上）→ 约七千字精华报告（先规划再两段）→ 两万字论文（五段）与 PDF、Word → 创新智商五维盲评 → 全程记录。\n\n'
+  if(!confirm('🚀 自动二十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n'+AUTO_TARGET+' 轮问对（分 '+autoBatchCount()+' 批，每轮两千字以上）→ 约七千字精华报告（先规划再两段）→ 两万字论文（五段，可导出 PDF/Word） → 创新智商五维盲评 → 全程记录。\n\n'
     +'· 约 '+calls+' 次基底调用（'+(deepOn?'深度档':'普通档')+(triOn?' ＋ 涌现档':'')+'），预计 '+(deepOn?'40–70':'30–55')+' 分钟\n'
     +'· 期间请勿关闭或刷新页面——这场问对只活在这一页的内存里\n'
     +'· 随时可「⏹ 中止」，已跑出来的部分全部保留\n\n'
@@ -1495,7 +1494,7 @@ function doAutoRun(){
     });
   }).then(function(){
     if(autoStopped) return;
-    var ix=autoPush('成文一篇 · 两万字论文（五段续写·投稿体例）→ PDF');
+    var ix=autoPush('成文一篇 · 两万字论文（五段续写·投稿体例）');
     autoStat('📝 论文写作中（分五段，约 10–18 分钟）· 已用 '+autoElapsed()+'…');
     return doPaper().then(function(){
       if(!paperAll || paperAll.length<600){ autoDone(ix,'fail','未成文'); throw new Error('论文没写成（详见上方成文状态行），止步于此。'); }
@@ -1516,7 +1515,7 @@ function doAutoRun(){
         +(brief?'、入口资料':'')+(paperAll?'、论文':'')+(iqCard?'、评分卡':'')+'。下面可下载全程记录。');
     }else{
       autoStat('✅ 自动二十轮完成 · 用时 '+autoElapsed()+' · '+turns.length+' 轮问对 → 入口资料 '+brief.length+' 字 → 论文 '
-        +paperAll.length+' 字'+(iqCard?(' → 创新智商 '+iqCard.total):'')+' · 论文 PDF 见下方，全程记录可下载。');
+        +paperAll.length+' 字'+(iqCard?(' → 创新智商 '+iqCard.total):'')+' · 论文可在下方导出 PDF 或 Word，全程记录可下载。');
     }
     document.getElementById('autoActs').classList.add('show');
   }).catch(function(e){
@@ -2044,19 +2043,20 @@ function doPaper(){
     /* Word 入口在排版之前就亮：它不靠 PDF 那条链，
        PDF 白页/超限/引擎加载失败都不应连坐它。 */
     document.getElementById('wordActs').classList.add('show');
+    /* 两个导出口一起亮，且都不再占时间：旧版那句「正在排版 PDF（约 20–50 秒）」
+       是光栅化时代的开销（把整篇画成长图），现在排版在点导出那一刻才做，几十毫秒。 */
+    document.getElementById('pdfActs').classList.add('show');
     setProg(paperAll.length, true);
-    stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版 PDF':'🖨 全文完成（'+paperAll.length+' 字·'+PAPER_PARTS.length+'段）· 正在排版 PDF')+'（约 20–50 秒）…';
-    return buildPdf(paperAll, miss);
+    return null;
   }).then(function(){
     setProg(paperAll.length, false);
     var cut=CUTLOG.length?('⚠ '+CUTLOG.join('、')+'　'):'';
     /* 出稿机检：不改稿，只把提示词自检漏掉的那几类东西说出来（见 auditOutput 上方那段病史）。 */
-    var pdfNote=PDFLOG.length?('🖨 '+PDFLOG.join('；')+'。　'):'';
     var au=auditOutput(paperAll);
     var auMsg=au.length?('🔎 出稿机检查出 '+au.length+' 处：'+au.join('；')+'。这些要人工改掉再投。　'):'';
-    stat.textContent = (miss || cut || auMsg || pdfNote)
-      ? pdfNote+cut+auMsg+(miss?miss+' PDF 首页已标注「未完成稿」。⚠ 再点一次「成文一篇」是**从第一段整篇重写**，不是接着补——重写前请先把这 '+paperAll.length+' 字复制走。':'')+'已写的 '+paperAll.length+' 字都在。'
-      : '✓ 全文完成 · '+paperAll.length+' 字 · '+PAPER_PARTS.length+'段齐全（含中英摘要、参考文献、附录与投稿声明）· 出稿机检零缺陷 · PDF 已就绪，可在线阅读或下载；需要接着改就下载 Word。';
+    stat.textContent = (miss || cut || auMsg)
+      ? cut+auMsg+(miss?miss+' 导出的 PDF 与 Word 都会在开头标注「未完成稿」。⚠ 再点一次「成文一篇」是**从第一段整篇重写**，不是接着补——重写前请先把这 '+paperAll.length+' 字复制走。':'')+'已写的 '+paperAll.length+' 字都在。'
+      : '✓ 全文完成 · '+paperAll.length+' 字 · '+PAPER_PARTS.length+'段齐全（含中英摘要、参考文献、附录与投稿声明）· 出稿机检零缺陷 · 下方可导出 PDF（矢量文字）或 Word。';
   }).catch(function(e){
     setProg(paperAll.length, false);
     stat.textContent='✗ '+(e.message||String(e));
@@ -2064,20 +2064,10 @@ function doPaper(){
     papering=false; btn.disabled=false;
   });
 }
-function loadHtml2pdf(){
-  return new Promise(function(res,rej){
-    if(window.html2pdf) return res();
-    var s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-    s.onload=function(){ res(); };
-    s.onerror=function(){ rej(new Error('PDF 引擎加载失败（网络原因），正文仍可直接阅读')); };
-    document.head.appendChild(s);
-  });
-}
 /* ===== Word 出口（2026-08-24）=====
-   为什么另起一条路而不是给 PDF 加个格式：PDF 那条链要走 html2canvas 光栅化，
-   长稿超画布上限就静默给白纸（见上方 canvasInk 那段病史），且出来的是图，拿不进 Word 改。
-   docx 是纯文本造 zip：不依赖网络引擎、不依赖画布、几十毫秒出稿，稿子还能直接接着改。
+   为什么另起一条路而不是只留 PDF：PDF 那一路最后要过浏览器的打印框（目标选「另存为 PDF」），
+   拿到的是一份印刷稿；而投稿、接着改、塞进投稿口要的是可编辑的 docx。
+   docx 是纯文本造 zip：不依赖网络引擎、不弹任何框、几十毫秒落盘。
    ⚠ 共用全站那一份 /assets/sde-docx.js（戳 20260822a 由 tools/asset-stamps.tsv 管，
      改戳要跑 tools/bump_asset.py，别在这里手写一个新的）。 */
 function loadDocx(){
@@ -2091,7 +2081,7 @@ function loadDocx(){
   });
 }
 /* 正文 → Markdown-lite（SDEDocx 只认这一小套）。
-   刻意与 buildPdf 共用同三个函数 mdSkip/mdClean/isPaperHead——
+   刻意与 paperBodyHtml（PDF 那一路）共用同三个函数 mdSkip/mdClean/isPaperHead——
    否则 PDF 与 Word 各认一套标题，同一份稿子会出两种目录。
    顶层具名函数，好让 tools/sim_paper_docx.js 抠出来单测。 */
 function paperToMd(text, incomplete, opt){
@@ -2169,140 +2159,87 @@ function isPaperHead(raw,L){
   if(L.length<=40 && /^\d{1,2}(\.\d{1,2}){1,2}[\s　]*\S/.test(L)) return true;
   return false;
 }
-/* 【PDF 空白自检 —— 2026-08-21】线上真交出过一份 **33 页全白**的 PDF：
-   jsPDF 2.3.1，每页 content stream 只有一句 `q … cm /I0 Do Q`（只画一张图、零文字对象），
-   而那张图是 1588×2034 的纯白 JPEG（灰度 min=max=255）。**分页是对的、页数也对**——
-   说明 DOM 里有内容、高度算得出来，白掉的是 html2canvas 那一步（克隆体没画出东西）。
-   这一类失败最坏的地方不是白，是**它静默地成功了**：进度条走完、状态行报「PDF 已就绪」、
-   文件也能下载，读者拿去当交付物才发现是白纸。与本站「断稿不许写成完成」是同一条规矩。
-   所以出稿前先量一次画布墨量：缩到小图再数非白像素，白到不像话就当场拦下并报读数。
-   ⚠ 读不到画布（跨域污染、getImageData 抛错）一律返回 -1 ＝ **不判**——
-      看不见不等于是白的，绝不许因为量不到就把真稿拦掉。 */
-function canvasInk(cv, mkCanvas){
-  try{
-    var W=cv.width|0, H=cv.height|0;
-    if(!W || !H) return 0;                       /* 零尺寸画布：确定是白的 */
-    var tw=160, th=Math.max(1, Math.min(2000, Math.round(H*tw/W)));
-    var t=(mkCanvas||function(){ return document.createElement('canvas'); })();
-    t.width=tw; t.height=th;
-    var g=t.getContext('2d');
-    g.fillStyle='#ffffff'; g.fillRect(0,0,tw,th);
-    g.drawImage(cv,0,0,tw,th);
-    var d=g.getImageData(0,0,tw,th).data, ink=0;
-    for(var i=0;i<d.length;i+=4){ if((d[i]+d[i+1]+d[i+2])/3 < 250) ink++; }
-    return ink/(tw*th);
-  }catch(e){ return -1; }
-}
-var INK_MIN=0.002;   /* 缩略图上的墨量下限。一页正文缩到 160 宽仍有 2–8% 的非白像素；
-                        只有整份全白才会掉到 0.2% 以下——阈值刻意留得很松，宁可放过不可错杀。 */
-/* 【为什么会画出白页 —— 2026-08-21 查实】那份 33 页全白的 PDF 自己带着证据：
-   每页图片 1588×2034 px（宽 1588/595.28pt ⇒ scale 2 无误），32 满页＋末页 1886，
-   **整份画布高 66,974 px，而 Chrome 单张 canvas 的高度硬上限是 65,535 px**。
-   超限时浏览器不抛错、不报警，只是静静返回一张空白画布 —— html2pdf 照样按它切页、
-   照样出 33 页 PDF，于是「页数对、内容没」。超出只有 1,439 px（2.2%），
-   临界点 65535/2034 ≈ **32.2 页**：成文四段改五段、稿子长了一截，正好把它推过线。
-   ⇒ 修法不是调版式，是**让 scale 跟着稿子长度走**：稿子越长，采样倍率越低，
-      保证 高×scale 落在上限之内。清晰度会降（2 → 1.6 约等于 154dpi），但那是可读的字，
-      不是一叠白纸。⚠ Safari 另有画布**面积**上限（约 1,678 万 px），比高度先撞上；
-      那一侧仍要靠墨量闸兜住——它现在会把读数说出来。 */
-var PDF_MAX_PX = 60000;   /* 留 8% 余量：上限是 65535，别贴着线走 */
-function pdfScaleFor(heightPx, maxPx){
-  var h = Number(heightPx) || 0, m = Number(maxPx) || PDF_MAX_PX;
-  if(h <= 0) return 2;
-  var s = m / h;
-  if(s >= 2) return 2;
-  s = Math.floor(s * 20) / 20;        /* 取到 0.05 的整数倍，读数好看也好对账 */
-  return Math.max(0.5, s);            /* 再长也不低于 0.5，低于这个字已经不可读，交给墨量闸去拦 */
-}
-var PDFLOG=[];   /* 出稿时的读数（降了几倍、画布多大），由调用方接到状态行上 */
-function buildPdf(text, incomplete, opt){
-  opt = opt || {};
-  var _eyebrow = opt.eyebrow || 'SDE UNIVERSES · 智 能 问 对 · 成 文 一 篇';
-  var _fnTag = opt.fnTag || 'paper';
-  var _readId = opt.readId || 'pdfRead', _dlId = opt.dlId || 'pdfDl', _actsId = opt.actsId || 'pdfActs';
-  return loadHtml2pdf().then(function(){
-    var lines=text.split('\n');
-    var title=(lines[0]||'成文一篇').trim().replace(/^[#＃\s]+/,'').slice(0,64)||'成文一篇';
-    /* 藏与渲染必须分两层：html2pdf 会把 from() 元素连内联样式一起克隆，
-       若把 left:-10000px 写在元素自身上，克隆体在渲染窗口里仍在屏外，
-       html2canvas 画出来就是整页空白（即「PDF 无内容」的病根）。
-       第二课（07-17）：html2canvas 的画布平移是 translate(-x+scrollX, -y+scrollY)，
-       x/y 取活文档里 html2pdf 容器的视口坐标（容器在全屏 overlay 里水平居中），
-       内容却按克隆 iframe 的布局来画。旧配置 windowWidth:794 让克隆视口≠真实视口，
-       居中偏移对不上 → 左边被切掉 (视口宽-794)/2 像素；scrollY 默认取页面滚动量，
-       而容器是 fixed 的根本没滚 → 内容整体下移一屏多 → 前几页空白、论文结尾掉出画布。
-       解法：scrollX/scrollY 归零 + 不设 windowWidth（克隆视口=真实视口，几何对称抵消）。 */
-    var wrap=document.createElement('div');
-    wrap.style.cssText='position:fixed;left:-10000px;top:0;width:794px;overflow:hidden;pointer-events:none';
-    var el=document.createElement('div');
-    el.style.cssText='width:794px;box-sizing:border-box;padding:52px 58px;background:#ffffff;color:#1a1a1a;font-family:"Noto Serif SC","Songti SC","SimSun",serif;line-height:1.92;font-size:14px';
-    var inner='<div style="font-size:10px;letter-spacing:0.32em;color:#8A6817;margin-bottom:14px">'+esc(_eyebrow)+'</div>'
-      +'<div style="font-size:22px;font-weight:800;line-height:1.5;margin-bottom:10px;color:#1E1A10">'+esc(title)+'</div>'
-      +'<div style="font-size:11px;color:#6b5e44;border-bottom:2px solid #B5860F;padding-bottom:12px;margin-bottom:18px">SDE 基底独立成文 · '+new Date().toLocaleDateString('zh-CN')+' · 缘起之问：'+esc(originQ().slice(0,64))+(turns.length>1?('（'+turns.length+' 轮问对提炼）'):'')+' · 排版v3</div>';
-    if(incomplete){
-      inner+='<div style="border:1.5px solid #B23B2E;background:#FDF3F1;color:#8E2C22;padding:10px 13px;margin-bottom:18px;font-size:12px;line-height:1.75">⚠ 未完成稿 · '+esc(String(incomplete))+'请勿按完整论文评阅或引用。</div>';
-    }
-    for(var i=1;i<lines.length;i++){
-      var raw=lines[i].trim();
-      if(!raw || mdSkip(raw)) continue;
-      var L=mdClean(raw);
-      if(!L) continue;
-      if(isPaperHead(raw,L)){
-        inner+='<div style="font-size:16px;font-weight:800;margin:18px 0 8px;padding-left:9px;border-left:3.5px solid #B5860F;color:#1E1A10;page-break-inside:avoid">'+esc(L)+'</div>';
-      } else {
-        inner+='<p style="text-indent:2em;text-align:justify;margin:0 0 9px;page-break-inside:avoid">'+esc(L)+'</p>';
-      }
-    }
-    el.innerHTML=inner;
-    wrap.appendChild(el);
-    document.body.appendChild(wrap);
-    /* 量的是真实排版高度（元素已经在文档里，scrollHeight 才有值）。 */
-    var _h=el.scrollHeight||el.offsetHeight||0;
-    var _scale=pdfScaleFor(_h);
-    PDFLOG=[];
-    if(_scale<2) PDFLOG.push('稿子长 '+_h+'px，采样倍率已由 2 降到 '+_scale+'（超过 '+PDF_MAX_PX+'px 的画布浏览器会直接给白纸），清晰度略降');
-    var fn='SDE-'+_fnTag+'-'+new Date().toISOString().slice(0,10)+'.pdf';
-    return html2pdf().set({
-      margin:[13,0,15,0],
-      filename:fn,
-      image:{type:'jpeg',quality:0.92},
-      html2canvas:{scale:_scale,useCORS:true,scrollX:0,scrollY:0},
-      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-      pagebreak:{mode:['css','legacy']}
-    }).from(el).toContainer().then(function(){
-      /* v2 保险杠：html2pdf 的渲染容器默认在全屏 overlay 里水平居中，
-         活文档与克隆文档各按各的视口宽算"居中"，视口一不同就左右错位。
-         把容器钉在 (0,0) 后，活/克隆两侧坐标恒为 0，裁剪原点与内容原点
-         无条件重合——与视口宽、滚动条、系统缩放全部无关。
-         内联样式会随克隆一起复制，故只需改这一处活容器。 */
-      var cs=document.querySelectorAll('.html2pdf__container');
-      var c=cs[cs.length-1];
-      if(c){ c.style.left='0'; c.style.right='auto'; c.style.margin='0'; }
-    }).toCanvas().then(function(){
-      /* ⚠ html2pdf 的 then 用 onFulfilled.bind(this) 把 this 绑到 worker，
-         而画布挂在 **this.prop.canvas** 上（0.10.1 源码：`this.prop.canvas=e`），不是 this.canvas。
-         写成 this.canvas 不会报错，只会永远拿到 undefined —— 这道闸于是安静地不存在。
-         第一版就是这么写的，五条护栏全绿。留一条兜底，哪天上游改了字段也还量得到。 */
-      var _wk=this||{};
-      var cv=(_wk.prop && _wk.prop.canvas) || _wk.canvas;
-      var ink=cv?canvasInk(cv):-1;
-      if(cv && ink>=0 && ink<INK_MIN){
-        throw new Error('PDF 渲染出来是白纸，已拦下不交（画布 '+cv.width+'×'+cv.height+' 像素 · 采样倍率 '
-          +_scale+' · 排版高 '+_h+'px，墨量 '+(ink*100).toFixed(3)+'%，下限 '+(INK_MIN*100).toFixed(1)
-          +'%）。画布高度或面积多半超了浏览器的上限（Chrome 高度 65535px，Safari 面积约 1678 万 px）。正文 '
-          +String(text||'').length+' 字仍在本页，可直接复制。');
-      }
-    }).outputPdf('blob').then(function(blob){
-      document.body.removeChild(wrap);
-      var u=URL.createObjectURL(blob);
-      var r=document.getElementById(_readId); r.href=u;
-      var d=document.getElementById(_dlId); d.href=u; d.download=fn;
-      document.getElementById(_actsId).classList.add('show');
-    }).catch(function(e){
-      if(wrap.parentNode) document.body.removeChild(wrap);
-      throw e;
-    });
+/* ===== PDF 出口：文字型（2026-08-24 整条换掉）=====
+   【旧版病根】走 html2pdf/html2canvas：先把整篇稿子**画成一张长图**，再切页塞进 PDF。
+   于是 PDF 里一个字也没有，全是图片：不可选、不可搜、不可复制、放大就糊、体积还大，
+   投稿方与检索引擎都只能把它当扫描件。附带两个病：Chrome 单张画布高 65535px 的硬上限
+   （超了**静默给白纸**——2026-08-21 那份 33 页全白就是它）、Safari 的面积上限。
+   为此曾加过采样倍率自降与墨量闸——那都是给光栅化打的补丁，而病根就是光栅化本身。
+   【现在】走全站共用的 /assets/wds-pdf.js：把正文排成印刷稿 → 浏览器自己的打印管线 →「另存为 PDF」。
+   出来的是真矢量文字（用系统中文字体，不必内嵌十几 MB 字体），可选可搜可复制；
+   画布上限与白页两条病根一并消失，也不再依赖 cdnjs 那个外部脚本。
+   代价只有一句要跟读者讲清楚：打印框弹出后，目标请选「另存为 PDF」。
+   ⚠ 不要因为「直接下载 blob 更顺手」而改回光栅化：那又会把文字变回图片。
+     真要一份不经打印框的文件，旁边就有：「下载 Word」。 */
+var PDF_WANT=5;                    /* 要的最低版本；/assets/wds-pdf.js 里的 VERSION 是它的账 */
+function loadWdsPdf(){
+  return new Promise(function(res,rej){
+    if(window.WDSPdf && window.WDSPdf.VERSION>=PDF_WANT) return res();
+    if(window.WDSPdf){ try{ delete window.WDSPdf; }catch(e){ window.WDSPdf=null; } }  /* 别处装了个旧版：换掉，不将就 */
+    var s=document.createElement('script');
+    s.src='/assets/wds-pdf.js?v='+PDF_WANT;
+    s.onload=function(){ (window.WDSPdf && window.WDSPdf.VERSION>=PDF_WANT)
+      ? res() : rej(new Error('排版模块版本不对（要 v'+PDF_WANT+'），请 Ctrl+F5 强刷一次页面')); };
+    s.onerror=function(){ rej(new Error('排版模块加载失败（网络原因）。正文仍在本页，可直接复制，或改用「下载 Word」')); };
+    document.head.appendChild(s);
   });
+}
+/* 正文 → 印刷稿的 HTML。**每一行都是 <h2>/<p> 这样的文字元素，没有一处是图片**——
+   这正是这次改造要的东西。标题识别与 Markdown 兜底与 Word 那一路共用同三个函数
+   （mdSkip/mdClean/isPaperHead），三种出口不会各认一套目录。顶层具名，供 sim 抠出来单测。 */
+function paperBodyHtml(text, incomplete){
+  var lines=String(text||'').split('\n'), out='';
+  /* 未完成稿那面旗照旧要竖在最前面（旧版是 PDF 首页的红框）。 */
+  if(incomplete) out+='<blockquote>⚠ 未完成稿 · '+esc(String(incomplete))+'请勿按完整论文评阅或引用。</blockquote>';
+  for(var i=1;i<lines.length;i++){
+    var raw=lines[i].trim();
+    if(!raw || mdSkip(raw)) continue;
+    var L=mdClean(raw);
+    if(!L) continue;
+    out += isPaperHead(raw,L) ? ('<h2>'+esc(L)+'</h2>') : ('<p>'+esc(L)+'</p>');
+  }
+  return out;
+}
+function paperTitleOf(text){
+  return (String(text||'').split('\n')[0]||'成文一篇').trim().replace(/^[#＃\s]+/,'').slice(0,64)||'成文一篇';
+}
+function doPdf(which){
+  var isP=(which==='polish');
+  var text=isP?polishAll:paperAll, miss=isP?polishMiss:paperMiss;
+  var stat=document.getElementById(isP?'polishStat':'paperStat');
+  var btn=document.getElementById(isP?'pdfBtn2':'pdfBtn');
+  if(!text || text.length<50){ flashAsk('还没有正文可出稿，先「成文一篇」。'); return Promise.resolve(false); }
+  if(btn) btn.disabled=true;
+  if(stat) stat.textContent='🖨 正在排版（矢量文字稿，不是图片）…';
+  return loadWdsPdf().then(function(){
+    var body=paperBodyHtml(text, miss);
+    /* 与 Word 那道闸同一条规矩：交付层不允许静默成功（旧版那一叠白纸就是这么交出去的）。 */
+    /* 量的是**剥掉标签之后真剩多少字**，不是 html 串有多长：
+       html 串里光标签就能凑出几百字节，按串长判等于给空稿开绿灯。 */
+    if(!body || body.replace(/<[^>]*>/g,'').trim().length<20) throw new Error('排版出来是空的，已拦下不交；正文 '+text.length+' 字仍在本页。');
+    var q=(typeof originQ==='function')?String(originQ()||'').slice(0,48):'';
+    window.WDSPdf.print({
+      title:paperTitleOf(text),
+      file:'SDE-'+(isP?'polished':'paper')+'-'+new Date().toISOString().slice(0,10),
+      lang:'zh',
+      base:(location&&location.origin?location.origin+'/':''),
+      /* filter(Boolean)：缘起之问可能是空的（粘贴来的稿子没有问对），
+         留一个空项会在封面上印出一个孤零零的中间点。 */
+      meta:[isP?'SDE UNIVERSES · 智能问对 · 打磨修改稿':'SDE UNIVERSES · 智能问对 · 成文一篇',
+            new Date().toLocaleDateString('zh-CN'), text.length+' 字',
+            q?('缘起之问：'+q):''].filter(Boolean),
+      blocks:[{ html:body, aLabel:'' }],      /* aLabel 空串 ＝ 不印发言人抬头（论文不是对话） */
+      foot:'SDE UNIVERSES · sdeuniverses.com'
+    }, function(okp){
+      if(stat) stat.textContent = okp
+        ? '✅ 打印框已弹出 —— 目标请选「另存为 PDF」。出来的是矢量文字稿，可选可搜可复制。'
+        : '✗ 这台浏览器没让打印框出来（多半是拦了弹窗）。可先允许弹窗再试，或改用「下载 Word」。';
+    });
+    return true;
+  }).catch(function(e){
+    if(stat) stat.textContent='✗ '+(e.message||String(e));
+    return false;
+  }).finally(function(){ if(btn) btn.disabled=false; });
 }
 /* ================= 答后点击③：SDE 创新智商 · 独立盲评 =================
    三条铁律照搬评分体系源本：
@@ -2587,13 +2524,13 @@ function doPolish(){
   runFourParts(seedFor, stat, (card?'🛠 按评分卡打磨':'🛠 打磨（未评分，按目标五维自查）')).then(function(r){
     polishAll=r.text; miss=missText(r.done); polishMiss=miss;
     document.getElementById('wordActs2').classList.add('show');
+    document.getElementById('polishActs').classList.add('show');
     setProg(polishAll.length,true);
-    stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版':'🖨 打磨完成（'+polishAll.length+' 字·'+PAPER_PARTS.length+'段）· 正在排版 PDF')+'（约 20–50 秒）…';
-    return buildPdf(polishAll, miss, {eyebrow:'SDE UNIVERSES · 智 能 问 对 · 打 磨 修 改 稿', fnTag:'polished', readId:'polishRead', dlId:'polishDl', actsId:'polishActs'});
+    return null;
   }).then(function(){
     setProg(polishAll.length,false);
     stat.textContent=miss
-      ? '⚠ '+miss+' PDF 首页已标注「未完成稿」，请再点一次「打磨修改」补齐。'
+      ? '⚠ '+miss+' 导出的 PDF 与 Word 都会在开头标注「未完成稿」，请再点一次「打磨修改」补齐。'
       : '✓ 打磨稿完成 · '+polishAll.length+' 字 · 建议接着点「🎯 对打磨稿复评」看这一轮抬了几分（同一把尺子前后对比才作数）。';
   }).catch(function(e){
     setProg(polishAll.length,false);

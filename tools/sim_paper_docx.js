@@ -3,8 +3,8 @@
  * 为什么要有它：这台机器此前只有 PDF 一个出口，而那条链要走 html2canvas 光栅化——
  * 长稿超画布上限会**静默给白纸**（见 index.html 里 canvasInk 上方那段病史），
  * 而且出来的是图，读者拿不进 Word 接着改。Word 这条路是纯文本造 zip，本来就该独立于 PDF。
- * 于是本文件守的第一条就是**它真的独立**：wordActs 的亮灯必须排在 buildPdf 之前，
- * PDF 白页/超限/引擎加载失败都不许把 Word 一起拖下水。
+ * 于是本文件守的第一条就是**它真的独立**：两个导出口在落稿那一刻一起亮，且互不调用——
+ * PDF 那一路出任何问题都不许把 Word 一起拖下水（反之亦然）。
  *
  * 五组：
  *   [一] 抠出 paperToMd 真跑（标题识别、Markdown 兜底共用、未完成稿红旗跟到 Word）
@@ -166,13 +166,19 @@ let DOCXML = "";
 
   /* ---------- [四] 源码契约 ---------- */
   console.log("— [四] 源码契约 —");
+  /* 2026-08-24 起 PDF 也不在落稿时排版了（整条换成排版＋打印管线，见 sim_paper_pdf_render）。
+     命根子这条随之改写：两个导出口都必须在落稿那一刻亮灯，且**互不调用**——
+     谁也不许成为谁的前置条件，任一条坏掉另一条照样拿得到稿子。 */
   const iShow = html.indexOf("document.getElementById('wordActs').classList.add('show')");
-  const iPdf = html.indexOf("return buildPdf(paperAll, miss)");
-  ok(iShow > 0 && iPdf > 0 && iShow < iPdf,
-    "★ Word 入口在 buildPdf **之前**亮灯 —— PDF 白页/超限/引擎失败都不连坐（这条是本文件的命根子）");
+  const iPdfShow = html.indexOf("document.getElementById('pdfActs').classList.add('show')");
+  ok(iShow > 0 && iPdfShow > 0, "★ 成文落稿时 Word 与 PDF 两个入口一起亮");
   const iShow2 = html.indexOf("document.getElementById('wordActs2').classList.add('show')");
-  const iPdf2 = html.indexOf("return buildPdf(polishAll, miss");
-  ok(iShow2 > 0 && iPdf2 > 0 && iShow2 < iPdf2, "打磨那一侧同理");
+  const iPdfShow2 = html.indexOf("document.getElementById('polishActs').classList.add('show')");
+  ok(iShow2 > 0 && iPdfShow2 > 0, "打磨那一侧同理");
+  const dl = html.slice(html.indexOf("function dlDocx(which){"), html.indexOf("/* ===== PDF 出口"));
+  ok(dl.length > 400 && !/doPdf|WDSPdf|loadWdsPdf/.test(dl), "★ Word 那条路一个字都不碰 PDF（不连坐）");
+  const pdfFn = html.slice(html.indexOf("function doPdf(which){"), html.indexOf("function doPdf(which){") + 2600);
+  ok(!/dlDocx|SDEDocx/.test(pdfFn), "★ PDF 那条路也不碰 Word（两条路互不为前置）");
   ok(/id="wordActs"[\s\S]{0,400}?dlDocx\('paper'\)/.test(html), "成文区有独立的 Word 行 #wordActs");
   ok(/id="wordActs2"[\s\S]{0,400}?dlDocx\('polish'\)/.test(html), "打磨区有独立的 Word 行 #wordActs2");
   ok(!/id="pdfActs"[\s\S]{0,300}?dlDocx/.test(html), "Word 按钮不寄生在 pdfActs 里（寄生就等于跟着 PDF 一起不出现）");
@@ -190,7 +196,7 @@ let DOCXML = "";
     "页面用的戳＝账本当前戳（账本 " + (ledger && ledger[1]) + "，页面 " + [...new Set(used)].join("/") + "）");
   ok(!/function\s+(esc|crc32|zip)\s*\(/.test(CODE), "页面里没有另写一份 docx 实现（只借 /assets/sde-docx.js 那一份）");
   ok(/mdSkip\(raw\)/.test(CODE) && /mdClean\(raw\)/.test(CODE) && /isPaperHead\(raw,L\)/.test(CODE),
-    "paperToMd 与 buildPdf 共用同三个兜底函数（各认一套标题＝同一份稿子两种目录）");
+    "paperToMd 与 paperBodyHtml 共用同三个兜底函数（各认一套标题＝同一份稿子两种目录）");
   ok((html.match(/function docxName\(/g) || []).length === 1, "文件名只有一处定义");
 
   /* ---------- [五] 变异检验：拆掉标题分支，[一] 组必须见红 ---------- */

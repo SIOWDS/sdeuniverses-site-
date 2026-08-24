@@ -74,7 +74,11 @@ ok(/turns\.push\(\{q:lastQ, a:lastAns, led:_lg\.led\}\)/.test(H), "结账块与�
 ok(H.indexOf("if(lastAns && lastAns.length>60){") > 0, "只有真答出来的才算一轮（报错/空答不占轮次）");
 ok(/function originQ\(\)\{ return turns\.length \? turns\[0\]\.q : lastQ; \}/.test(H), "缘起之问 = 整场问对的第一问");
 ok(H.indexOf("q:originQ()") > 0, "成文用缘起之问定向，而不是最后一轮的追问");
-ok(H.indexOf("esc(originQ().slice(0,64))") > 0, "PDF 页眉的缘起之问也走同一个口径");
+/* 2026-08-24 换 PDF 管线：页眉那一行改由 wds-pdf.js 的 meta 印（不再自己拼 html，
+   esc 交给模块做），Word 那一路也印同一条。判据从此钉「两个出口都用 originQ 定向」，
+   不再钉那一行 esc(...) 长什么样。 */
+ok(/originQ\(\)\|\|''\)\.slice\(0,48\)/.test(H), "PDF 稿的抬头用同一个缘起之问口径");
+ok(/originQ\(\)\|\|''\)\.slice\(0,64\)/.test(H), "Word 稿的抬头同样");
 
 /* 提炼 */
 ok(H.indexOf("function doDistill()") > 0, "提炼精华函数在位");
