@@ -31,25 +31,42 @@ function mkEnv(quotaBytes) {
     },
     removeItem: (k) => { delete store[k]; },
   };
-  const state = { turns: [], brief: "", briefKind: "distill", paperAll: "", vendor: "ds", deepOn: true, triOn: false, notes: [] };
-  const fn = new Function("localStorage", "state", "esc", "document", "confirm", "resetThread", "renderThread", "MAXTURNS", "URL", "Blob",
+  /* 【2026-08-24】一场问对的产出不止问对＋精华报告＋论文了：打磨稿、缺段说明、评分卡
+     都要能存下来、恢复回去（否则「点恢复接着做」只兑现一半）。桩必须跟着契约一起长。 */
+  const state = { turns: [], brief: "", briefKind: "distill", paperAll: "", paperMiss: false,
+    polishAll: "", polishMiss: false, iqCard: null, iqMeta: null,
+    vendor: "ds", deepOn: true, triOn: false };
+  /* 记录每个 id 被 add/remove 了什么 class —— 「恢复之后动作条到底亮没亮」只能这么测。
+     一律回 null 的 stub 测的是「元素不存在的页面」，不是这个页面。 */
+  const els = {};
+  const el = (id) => els[id] || (els[id] = { id, style: {}, textContent: "", innerHTML: "", value: "", className: "",
+    cls: [], classList: { add(c) { el(id).cls.push("+" + c); }, remove(c) { el(id).cls.push("-" + c); } } });
+  const shown = (id) => el(id).cls.lastIndexOf("+show") > el(id).cls.lastIndexOf("-show");
+  const rendered = { iq: 0, thread: 0, deep: 0, tri: 0 };
+  const fn = new Function("localStorage", "state", "esc", "document", "confirm", "resetThread", "renderThread",
+    "MAXTURNS", "URL", "Blob", "renderIqCard", "toggleDeep", "toggleTri", "rendered",
     "let turns=state.turns, brief=state.brief, briefKind=state.briefKind, paperAll=state.paperAll;\n"
-    + "const vendor=state.vendor, deepOn=state.deepOn, triOn=state.triOn;\n"
+    + "let paperMiss=state.paperMiss, polishAll=state.polishAll, polishMiss=state.polishMiss;\n"
+    + "let iqCard=state.iqCard, iqMeta=state.iqMeta;\n"
+    + "let deepOn=state.deepOn, triOn=state.triOn; const vendor=state.vendor;\n"
+    + "let lastQ='', lastAns='';\n"
     + "function originQ(){ return turns.length ? turns[0].q : ''; }\n"
     + "function newSession(){ sessionId='s'+Date.now()+Math.random().toString(36).slice(2,6); }\n"
     + seg.replace(/function newSession\(\)\{[^}]*\}\nnewSession\(\);/, "newSession();")
-    + "\nreturn { archSave, archLoad, archDrop, archRestore, archWrite,"
+    + "\nreturn { archSave, archLoad, archDrop, archRestore, archWrite, archSnapshot,"
     + " get sid(){return sessionId;}, set sid(v){sessionId=v;},"
-    + " push(q,a){ turns.push({q:q,a:a}); }, setBrief(t){ brief=t; }, setPaper(t){ paperAll=t; },"
-    + " get turns(){return turns;}, get brief(){return brief;} };");
-  const api = fn(localStorage, state,
-    /* 页面上这些元素是真实存在的（turnBar／briefWrap／ans…），所以 stub 要给一个假元素，
-       不能一律回 null——回 null 测的是「元素不存在」那种页面，不是这个页面。 */
-    (s) => String(s),
-    { getElementById: () => ({ style: {}, classList: { add() {}, remove() {} }, textContent: "", innerHTML: "", value: "", className: "" }) },
-    () => true, () => {}, () => {}, 10,
-    { createObjectURL: () => "blob:x", revokeObjectURL: () => {} }, function () {});
-  return { api, store, localStorage };
+    + " push(q,a){ turns.push({q:q,a:a}); lastQ=q; lastAns=a; },"
+    + " setBrief(t){ brief=t; }, setPaper(t,m){ paperAll=t; paperMiss=m||false; },"
+    + " setPolish(t,m){ polishAll=t; polishMiss=m||false; },"
+    + " setIq(raw,meta){ iqCard={raw:raw,dims:{},total:140,src:'x'}; iqMeta=meta; },"
+    + " get turns(){return turns;}, get brief(){return brief;}, get paper(){return paperAll;},"
+    + " get polish(){return polishAll;}, get iq(){return iqCard;}, get iqMeta(){return iqMeta;},"
+    + " get deep(){return deepOn;}, get tri(){return triOn;} };");
+  const api = fn(localStorage, state, (s) => String(s), { getElementById: el },
+    () => true, () => {}, () => { rendered.thread++; }, 10,
+    { createObjectURL: () => "blob:x", revokeObjectURL: () => {} }, function () {},
+    () => { rendered.iq++; }, () => { rendered.deep++; }, () => { rendered.tri++; }, rendered);
+  return { api, store, localStorage, shown, el, rendered };
 }
 
 console.log("— 一、每一轮都落一次盘 —");
@@ -113,6 +130,82 @@ console.log("— 四、恢复：沿用原 id，接着问是原地续写而不是
   const l = JSON.parse(store["sde_search_archive"]);
   ok(l.length === 1, "接着问仍是同一条记录，没裂成两条 · 实得 " + l.length + " 场");
   ok(l[0].turns.length === 3, "续写到三轮 · 实得 " + l[0].turns.length);
+}
+
+console.log("— 四之二、恢复要把整场搭回来（2026-08-24）—");
+{
+  /* 用户口径：「点击恢复，就能继续进行对话和其他后续操作」。
+     旧版只摆回问对与精华报告——动作条被 resetThread 藏起来后没人再亮回来，
+     论文只恢复了变量没恢复界面，打磨稿与评分卡压根没存。
+     这一组就守「后续操作真的还在」。 */
+  const { api, store, shown, el, rendered } = mkEnv();
+  api.sid = "s9"; api.push("问一", "答一".repeat(60)); api.push("问二", "答二".repeat(60));
+  api.setBrief("精华报告".repeat(50));
+  api.setPaper("论文正文".repeat(500), "本稿只写完 5 段中的前 3 段");
+  api.setPolish("打磨稿".repeat(400), false);
+  api.setIq({ S: { score: 30 }, verdict: "还行" }, { scorer: "DeepSeek", selfEval: true, src: "论文正文" });
+  api.archSave();
+  const rec = JSON.parse(store["sde_search_archive"])[0];
+  ok(rec.polishAll && rec.polishAll.length > 0, "快照带上打磨稿");
+  ok(rec.paperMiss === "本稿只写完 5 段中的前 3 段", "快照带上缺段说明（导出时要盖「未完成稿」的章）");
+  ok(rec.iqRaw && rec.iqRaw.verdict === "还行", "快照带上评分卡原始 JSON（存 raw 不存 HTML）");
+  ok(rec.iqMeta && rec.iqMeta.scorer === "DeepSeek", "快照带上评分卡的元信息（谁评的、是不是自评）");
+
+  api.sid = "other"; api.archRestore("s9");
+  ok(api.paper.length > 0 && api.polish.length > 0, "恢复：论文与打磨稿两个变量都回来了");
+  ok(api.iq && api.iq.raw, "恢复：评分卡回来了（打磨那一步要吃它）");
+  ok(rendered.iq === 1, "评分卡是用 raw **重新渲染**的一遍，不是塞回一段旧 HTML");
+  ok(shown("askActs"), "★ 动作条亮着 —— 提炼/成文/评分/打磨这一排按钮真的还能点");
+  ok(shown("paperWrap") && shown("pdfActs") && shown("wordActs"), "论文区与两个导出口都亮着（看得见、导得出）");
+  ok(shown("polishWrap") && shown("wordActs2") && shown("polishActs"), "打磨区与它的导出口也亮着");
+  ok(shown("iqWrap"), "评分卡区亮着");
+  ok(/从本机存档恢复/.test(el("paperStat").textContent), "论文状态行照实说这是从存档恢复的，不冒充刚写完");
+  ok(/未写完|只写完|⚠/.test(el("paperStat").textContent), "缺段说明跟着恢复出来，不把断稿说成完稿");
+}
+
+console.log("— 四之三、恢复另一场时，上一场的产出必须先清干净 —");
+{
+  /* 这是旧版真实存在的串场：resetThread 不清论文/打磨稿，恢复 B 场之后
+     屏幕上挂着 A 场的论文，而 polishAll 这个变量根本没被换过——
+     接着点「打磨」会拿 A 场的稿子去改 B 场。 */
+  /* ⚠ toggleTurn 排在 resetThread **前面**，indexOf 不带起点会切出空串——
+     空串对 /…/.test() 全是 false，四条断言会一起假红（也可能一起假绿，看写法）。 */
+  const _r0 = H.indexOf("function resetThread(quiet){");
+  const bReset2 = H.slice(_r0, H.indexOf("\nfunction ", _r0 + 1));
+  ok(bReset2.length > 400, "抠出的 resetThread 非空 · 实得 " + bReset2.length + " 字节");
+  ok(/paperAll='';\s*paperMiss=false;\s*polishAll='';\s*polishMiss=false;\s*iqCard=null;/.test(bReset2),
+    "★ resetThread 把论文/打磨稿/评分卡四个变量一起清（不清就会串场）");
+  ok(/'paperWrap','polishWrap','iqWrap','pdfActs','wordActs','polishActs','wordActs2'/.test(bReset2),
+    "对应的七块界面也一起收起来");
+  ok(/论文、打磨稿、评分卡/.test(bReset2), "确认语照实列出会被清掉的东西");
+  /* 上面三条钉的是 resetThread 的源码契约（清屏那一半）。下面这一条钉**恢复自己的那一半**：
+     不管进来之前屏幕上挂着谁的稿子，恢复之后手上必须只有被恢复那一场的东西。
+     （桩里的 resetThread 是空的，正好把「只靠恢复自己」这件事测干净。） */
+  const { api } = mkEnv();
+  api.sid = "A"; api.push("A问", "A答".repeat(60)); api.setPaper("A论文".repeat(100)); api.setPolish("A打磨".repeat(100)); api.archSave();
+  api.setPaper(""); api.setPolish("");                       // 换一场（真页面里这一步由 resetThread 做）
+  api.sid = "B"; api.push("B问", "B答".repeat(60)); api.archSave();
+  api.archRestore("A");
+  ok(api.paper.length > 0 && api.polish.length > 0, "恢复 A：它的论文与打磨稿回来了");
+  api.archRestore("B");
+  ok(api.paper === "" && api.polish === "",
+    "再恢复没有论文的 B ⇒ A 的论文与打磨稿当场清空，不会串场 · 实得 paper="
+    + api.paper.length + " polish=" + api.polish.length);
+}
+
+console.log("— 四之四、配额告急先扔长文，问对留到最后 —");
+{
+  const { api } = mkEnv();
+  const list = [{ id: "n", ts: 9, q: "新", turns: [{ q: "问", a: "答" }], brief: "", paperAll: "", polishAll: "" },
+                { id: "o", ts: 1, q: "旧", turns: [{ q: "问", a: "答" }], brief: "", paperAll: "论".repeat(3000), polishAll: "磨".repeat(3000) }];
+  const before = JSON.stringify(list).length;
+  api.archWrite(list);           // 配额无限：不该动它
+  ok(JSON.stringify(list).length === before, "配额够时一个字都不扔");
+  const { api: a2 } = mkEnv(2000);
+  const list2 = [{ id: "n", ts: 9, q: "新", turns: [{ q: "问", a: "答" }], brief: "", paperAll: "", polishAll: "" },
+                 { id: "o", ts: 1, q: "旧", turns: [{ q: "问", a: "答" }], brief: "", paperAll: "论".repeat(3000), polishAll: "磨".repeat(3000) }];
+  a2.archWrite(list2);
+  ok(list2[0].turns.length === 1, "本场的问对没被丢掉（问对是原始材料，丢了回不来）");
 }
 
 console.log("— 五、删除只删指定的那一场 —");

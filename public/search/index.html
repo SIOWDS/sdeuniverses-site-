@@ -664,16 +664,29 @@ function archWrite(list){
     try{ localStorage.setItem(ARCH_KEY, JSON.stringify(list)); return true; }catch(e){
       if(list.length>1){ list.pop(); continue; }
       var shed=false;
-      for(var i=list.length-1;i>0;i--){ if(list[i].paperAll){ list[i].paperAll=''; shed=true; } }
+      /* 先扔旧场的长文（论文＋打磨稿，各两万字，是这本账里最占地方的两块），
+         问对与评分卡留到最后——问对是原始材料，丢了就再也回不来。 */
+      for(var i=list.length-1;i>0;i--){
+        if(list[i].paperAll){ list[i].paperAll=''; shed=true; }
+        if(list[i].polishAll){ list[i].polishAll=''; shed=true; }
+      }
       if(!shed) return false;
     }
   }
   return false;
 }
+/* 【存什么 —— 2026-08-24 收全】旧快照只带问对＋精华报告＋论文正文，于是恢复出来的一场
+   拿不回打磨稿与评分卡，而「打磨修改」要吃评分卡（`iqCard.src` 对不上就退回无卡打磨）。
+   ⇒ 一场问对的**全部产出**都进快照：论文、缺段说明、打磨稿、评分卡原始 JSON 与它的元信息。
+   评分卡存 raw 而不是存渲染好的 HTML：卡片长什么样以后还会改，raw 是数据、HTML 是当时的样子。 */
 function archSnapshot(){
   return { id:sessionId, ts:Date.now(), q:originQ()||'', turns:turns.slice(),
            brief:brief||'', briefKind:(typeof briefKind==='string'?briefKind:'distill'),
            paperAll:(typeof paperAll==='string'?paperAll:''),
+           paperMiss:(typeof paperMiss==='string'?paperMiss:''),
+           polishAll:(typeof polishAll==='string'?polishAll:''),
+           polishMiss:(typeof polishMiss==='string'?polishMiss:''),
+           iqRaw:(iqCard&&iqCard.raw)||null, iqMeta:(typeof iqMeta==='object'&&iqMeta)||null,
            vendor:vendor, deepOn:!!deepOn, triOn:!!triOn };
 }
 /* 每一轮、每一步产出之后都调它。空场不存——否则一打开页面就多出一条空记录。 */
@@ -699,7 +712,9 @@ function archRestore(id){
   resetThread(true);
   sessionId=s.id;                              /* 沿用原 id：接着往下问就是原地续写，不会多出一条 */
   turns=(s.turns||[]).slice();
-  brief=s.brief||''; briefKind=s.briefKind||'distill'; paperAll=s.paperAll||'';
+  brief=s.brief||''; briefKind=s.briefKind||'distill';
+  paperAll=s.paperAll||''; paperMiss=s.paperMiss||false;
+  polishAll=s.polishAll||''; polishMiss=s.polishMiss||false;
   if(turns.length){
     lastQ=turns[turns.length-1].q; lastAns=turns[turns.length-1].a||'';
     /* ⚠ 用页面自己的 renderThread()，别在这里另画一套 DOM：
@@ -720,7 +735,47 @@ function archRestore(id){
     if(bb) bb.textContent=brief;
     var bs=document.getElementById('briefStat'); if(bs) bs.textContent='✓ 已从本机存档恢复（'+brief.length+' 字）';
   }
-  renderArch('✓ 已恢复这一场（'+turns.length+' 轮）。接着问下一轮即可。');
+  /* 【恢复不只是把字贴回屏幕 —— 2026-08-24】旧版只摆回了问对与精华报告：
+     动作条（提炼/成文/评分/打磨那一排按钮）刚被 resetThread 藏掉、没人再亮回来，
+     论文变量恢复了却没有界面（看不见、导不出），打磨稿与评分卡压根没存。
+     于是「点恢复就能接着往下做」只兼现了一半。下面把四块一并搭回来。 */
+  if(turns.length && lastAns && lastAns.length>60){
+    document.getElementById('askActs').classList.add('show');   /* ★ 没这一行，后续所有按钮都不存在 */
+  }
+  if(paperAll){
+    var pw=document.getElementById('paperWrap'); if(pw) pw.classList.add('show');
+    var pl=document.getElementById('paperLive'); if(pl) pl.textContent=paperAll;
+    var pc=document.getElementById('ppChars'); if(pc) pc.textContent=paperAll.length;
+    document.getElementById('pdfActs').classList.add('show');
+    document.getElementById('wordActs').classList.add('show');
+    var ps=document.getElementById('paperStat');
+    if(ps) ps.textContent='✓ 论文已从本机存档恢复（'+paperAll.length+' 字'+(paperMiss?' · ⚠ '+paperMiss:'')+'）· 可直接导出 PDF/Word，也可接着评分与打磨。';
+  }
+  if(polishAll){
+    var ow=document.getElementById('polishWrap'); if(ow) ow.classList.add('show');
+    var oc=document.getElementById('ppChars2'); if(oc) oc.textContent=polishAll.length;
+    document.getElementById('polishActs').classList.add('show');
+    document.getElementById('wordActs2').classList.add('show');
+    var os=document.getElementById('polishStat');
+    if(os) os.textContent='✓ 打磨稿已从本机存档恢复（'+polishAll.length+' 字'+(polishMiss?' · ⚠ '+polishMiss:'')+'）';
+  }
+  /* 评分卡用存下来的 raw 重新渲染一遍（而不是存 HTML）：
+     renderIqCard 会顺手把 iqCard 重建好，「打磨修改」那一步才吃得到这张卡。 */
+  if(s.iqRaw){
+    try{
+      iqMeta=s.iqMeta||{};
+      var wrp=document.getElementById('iqWrap'); if(wrp) wrp.classList.add('show');
+      renderIqCard(s.iqRaw, iqMeta);
+      var is=document.getElementById('iqStat');
+      if(is) is.textContent='✓ 评分卡已从本机存档恢复（日期为重渲染当日）';
+    }catch(e){}
+  }
+  /* 档位也要回来：接着问的那一轮得跟原来同一档，否则前后两半场不是一把尺子。 */
+  if(typeof s.deepOn==='boolean' && !!deepOn!==!!s.deepOn) toggleDeep();
+  if(typeof s.triOn==='boolean' && !!triOn!==!!s.triOn) toggleTri();
+  renderArch('✓ 已恢复这一场（'+turns.length+' 轮'
+    +(brief?' · 精华报告':'')+(paperAll?' · 论文':'')+(polishAll?' · 打磨稿':'')+(s.iqRaw?' · 评分卡':'')
+    +'）。可接着问下一轮，也可直接提炼/成文/评分/打磨。');
 }
 function archDownload(id){
   var list=archLoad(), s=null;
@@ -759,7 +814,8 @@ function renderArch(note){
   }).join('');
   el.innerHTML='<div style="font-weight:700">📚 本机存档 · '+list.length+' 场</div>'
     +'<div style="font-size:0.74rem;color:var(--muted);margin-top:2px">每问完一轮、每出一份产出就自动存一次，'
-    +'<b>只存在这台机器的浏览器里，不上传</b>；最多留 '+ARCH_MAX+' 场，超出自动挤掉最旧的。清空重来不会删存档。</div>'
+    +'<b>只存在这台机器的浏览器里，不上传</b>；最多留 '+ARCH_MAX+' 场，超出自动挤掉最旧的。清空重来不会删存档。'
+    +'点〔恢复〕会把那一场整个搭回来（问对、精华报告、论文、打磨稿、评分卡），可以接着问下一轮，也可以接着提炼、成文、评分、打磨。</div>'
     +(note?'<div style="margin-top:4px;font-weight:600">'+esc(note)+'</div>':'')+rows;
 }
 var brief='';      // 提炼出的《论文入口资料》
@@ -817,7 +873,7 @@ function renderThread(){
 function resetThread(quiet){
   /* ⚠ 只清屏幕上这一场，**不动本机存档**——存档正是「清空重来」之后的后悔药。
      所以确认语也要照实说，别让人以为点下去就永久没了。 */
-  if(!quiet && turns.length && !confirm('清空屏幕上这场问对（共 '+turns.length+' 轮）与已提炼的精华报告？\n\n（本机存档不受影响，随时可以从下面的「📚 本机存档」恢复。）')) return;
+  if(!quiet && turns.length && !confirm('清空屏幕上这场问对（共 '+turns.length+' 轮）与已提炼的精华报告、论文、打磨稿、评分卡？\n\n（本机存档不受影响，随时可以从下面的「📚 本机存档」恢复。）')) return;
   if(!quiet) newSession();
   turns=[]; brief=''; lastAns=''; lastQ=''; nextQReady=''; ladderQReady=''; ladderMove='';
   var _nt=document.getElementById('nextQTip'); if(_nt){ _nt.style.display='none'; _nt.textContent=''; }
@@ -833,6 +889,17 @@ function resetThread(quiet){
   document.getElementById('emergeStat').textContent='';
   document.getElementById('ansWrap').classList.remove('show');
   document.getElementById('askActs').classList.remove('show');
+  /* 【论文与评分也得一起清 —— 2026-08-24】旧版只清问对与精华报告，论文/打磨稿/评分卡
+     原样留在屏幕上。于是「从存档恢复另一场」之后，屏幕上是新一场的问对、下面挂着**上一场的论文**，
+     而 polishAll 这个变量根本没被换掉——接着点「打磨」会拿上一场的稿子去改。 */
+  paperAll=''; paperMiss=false; polishAll=''; polishMiss=false; iqCard=null; iqMeta=null;
+  ['paperWrap','polishWrap','iqWrap','pdfActs','wordActs','polishActs','wordActs2'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.classList.remove('show');
+  });
+  ['paperLive','paperStat','polishStat','iqStat'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.textContent='';
+  });
+  var _ic=document.getElementById('iqCard'); if(_ic) _ic.innerHTML='';
   /* 全程记录是从 turns/brief/paperAll/iqCard 现拼的，清空问对之后那份记录就不再成立——
      面板必须跟着清，否则「下载全程记录」会下到一份只剩标题的空壳。 */
   autoSteps=[]; renderAutoSteps();
@@ -2251,6 +2318,9 @@ function doPdf(which){
       同一组五维分，页面与脚本必须给出同一个数，差一分就是两把尺子。
    ③ 每维必附一句逐字引自原文的证据句 —— 拿不出证据句的维度分，在卡上标红。 */
 var iqCard=null, iqing=false, polishing=false, polishAll='', iqSrcOpen=false;
+/* iqMeta：这张卡是谁评的、是不是同基底自评、评的是哪一篇。存档要靠它把卡原样重渲一遍——
+   存 raw＋meta 而不是存渲染好的 HTML（卡片长什么样以后还会改，raw 才是数据）。 */
+var iqMeta=null;
 var IQ_W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15};
 var IQ_LEVELS=[[80,'大众水平（普通人随口可说）'],[100,'受过高校训练（知识总结型）≈ 基底零提示语默认水平'],[110,'专业人士（领域内熟练）'],[125,'高级专家（领域内有独立判断）'],[135,'资深学者'],[145,'优秀的资深学者产出'],[150,'★ 本体论级阈值（SDE 提智达标）'],[155,'混沌碰撞后的典型金点子'],[160,'★ 典范级阈值（双学科诞生）'],[165,'顶级金点子（命名了未被命名的现象）'],[170,'改写学科分界（极少数）'],[175,'文明级发生学']];
 function iqComposite(d){ return d.S*IQ_W.S+d.D*IQ_W.D+d.E*IQ_W.E+d.I*IQ_W.I+d.F*IQ_W.F; }
@@ -2425,6 +2495,7 @@ function renderIqCard(j, meta){
   o+='</div>';
   document.getElementById('iqCard').innerHTML=o;
   iqCard={raw:j,dims:d,total:total,src:String(meta.src||'').slice(0,120)};
+  iqMeta={scorer:meta.scorer||'', selfEval:!!meta.selfEval, src:String(meta.src||'').slice(0,120)};
   return total;
 }
 /* 打磨用的作业单：把评分卡压成一段纯文本喂给基底（卡片是给人看的，这段是给基底看的） */
@@ -2489,6 +2560,7 @@ function doIq(onPolished){
   }).then(function(raw){
     var j=parseIqJson(raw);
     var tot=renderIqCard(j,{scorer:(vendor==='ds'?'DeepSeek':'GLM-5'),selfEval:true,src:text});
+    archSave();                                  /* 评分卡落地即存（打磨要吃这张卡） */
     stat.textContent='✓ 盲评完成 · 综合分 '+tot+'（由页面按固定权重计算，非基底手算）。'
       +(tot<135?'　距 135 还差 '+(135-tot)+' 分 —— 可直接点「🛠 打磨修改」，评分卡会作为作业单交给基底。':'　已达 135 线。');
   }).catch(function(e){
@@ -2522,7 +2594,7 @@ function doPolish(){
   };
   var miss=false;
   runFourParts(seedFor, stat, (card?'🛠 按评分卡打磨':'🛠 打磨（未评分，按目标五维自查）')).then(function(r){
-    polishAll=r.text; miss=missText(r.done); polishMiss=miss;
+    polishAll=r.text; miss=missText(r.done); polishMiss=miss; archSave();   /* 打磨稿落稿即存 */
     document.getElementById('wordActs2').classList.add('show');
     document.getElementById('polishActs').classList.add('show');
     setProg(polishAll.length,true);
