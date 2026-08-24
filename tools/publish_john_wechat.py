@@ -21,6 +21,7 @@ from collections import Counter, defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "tools", "data", "john_wechat.json")
 OUT = os.path.join(ROOT, "public", "sites", "lang", "wechat")
+UPGRADE_SOURCE = os.path.join(ROOT, "tools", "data", "john_wechat_upgrades")
 
 # key, slug, 名, 序, 一句话, 强调色, 门厅代表作（两篇存档号）
 CHANNELS = [
@@ -125,6 +126,13 @@ def build():
         a["y"] = a["date"][:4] if a["date"] and a["date"][0] == "2" else ""
         a["mo"] = a["date"][:7] if a["y"] else ""
 
+    upgrade_nums = set()
+    if os.path.isdir(UPGRADE_SOURCE):
+        upgrade_nums = {os.path.splitext(n)[0] for n in os.listdir(UPGRADE_SOURCE)
+                        if re.fullmatch(r"\d{3}\.md", n)}
+    covered = sum(1 for a in arts
+                  if (a["alt_of"] if a["alt"] else a["num"]) in upgrade_nums)
+
     canon.sort(key=lambda a: (0 if a["y"] else 1, a["num"]))
     by_ch = {k: [a for a in canon if a["ch"] == k] for k in CH_ORDER}
     for key, slug, name, no, blurb, cc, picks in CHANNELS:
@@ -149,14 +157,16 @@ def build():
         key = (a["title"] + " " + a["sum"] + " " + (a["date"] or "")).replace('"', "")
         extra = "".join('<a href="/wechat/pdf/%s.pdf">同题另稿 %s</a>' % (b["num"], b["num"])
                         for b in altmap.get(a["num"], []))
+        lift = ('<a class="lift-link" href="/wechat/lift/%s/">读提升文 · 约5000字</a>' % a["num"]
+                if a["num"] in upgrade_nums else '<span>提升文 · 排期中</span>')
         return ('<div class="item" data-k="%s" data-y="%s"><div class="it-hd">'
                 '<span class="r-n" title="存档号">%s</span>'
                 '<a class="it-t" href="/wechat/pdf/%s.pdf">%s</a>'
                 '<span class="it-m">%s</span></div>'
                 '<p class="it-d">%s</p>'
-                '<div class="it-l"><a href="/wechat/pdf/%s.pdf">读原文 PDF</a>%s</div></div>\n'
+                '<div class="it-l"><a href="/wechat/pdf/%s.pdf">读原文 PDF</a>%s%s</div></div>\n'
                 % (esc(key), esc(a["y"]), a["num"], a["num"], esc(a["title"]),
-                   " · ".join(meta), esc(a["sum"]), a["num"], extra))
+                   " · ".join(meta), esc(a["sum"]), a["num"], lift, extra))
 
     def items_by_year(lst):
         out, cur = "", None
@@ -217,7 +227,7 @@ def build():
   </div>
 
   <div class="band">
-    <div><b>418</b><span>篇 · 原文存档</span></div>
+    <div><b>%d</b><span>篇 · 原文存档</span></div>
     <div><b>9</b><span>个频道</span></div>
     <div><b>%s</b><span>页</span></div>
     <div><b>%s</b><span>写作跨度</span></div>
@@ -225,6 +235,7 @@ def build():
 
   <div class="acts">
     <a class="primary" href="/wechat/all/">一页翻完 %d 篇</a>
+    <a href="/wechat/lift/">提升工程 %d / %d</a>
     <button id="lucky" type="button">随手抽一篇读</button>
     <a href="/all/">看十二篇长论文</a>
   </div>
@@ -241,7 +252,7 @@ def build():
 
 <div class="note">
   <h3>关于这批存档</h3>
-  <p><b>同题另稿。</b>公众号常有「原创版」与「非原创版」两稿，或同一篇改标题重发。这类共 <b>30</b> 篇，已配对认出：列表里只出现正稿一条，另一稿挂在它下面的「同题另稿」链接上，一篇不删。</p>
+  <p><b>同题另稿。</b>公众号常有「原创版」与「非原创版」两稿，或同一篇改标题重发。这类共 <b>%d</b> 篇，已配对认出：列表里只出现正稿一条，另一稿挂在它下面的「同题另稿」链接上，一篇不删。</p>
   <p><b>日期。</b>%d 篇能从正文里读出确切发表日期，直接显示；其余按存档号排在应有的位置，归入「未标日期」。<b>存档号越小越新</b>——001 是最近的一篇，418 是最早的一篇。</p>
   <p><b>怎么读。</b>点标题直接打开 PDF。想找某一篇，去 <a href="/wechat/all/">全部篇目</a>，输入任意词即时筛选，也可以只看某一年。</p>
 </div>
@@ -256,8 +267,8 @@ def build():
   </div>
 </section>
 </div></div>""" % (nav("wechat"), "{:,}".format(total_pages), bars, yrs, gmonth[hot],
-                   len(arts) - n_dated, "{:,}".format(total_pages), span,
-                   len(canon), cards, n_dated)
+                   len(arts) - n_dated, len(arts), "{:,}".format(total_pages), span,
+                   len(canon), covered, len(arts), cards, len(arts) - len(canon), n_dated)
 
     pool = json.dumps([a["num"] for a in canon])
     open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(
@@ -427,3 +438,5 @@ def build():
 
 if __name__ == "__main__":
     build()
+    from publish_john_wechat_upgrades import build as build_upgrades
+    build_upgrades()

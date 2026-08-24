@@ -1,15 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-lang.sdeuniverses.com 分站的共用外观：一套 CSS、一条导航、一个页壳、
-两段脚本（筛选、主站预览补前缀）。
-
-由 publish_john_wechat.py（约翰专栏）与 publish_hzy_works.py（作品全集）
-共读——样式一处维护，两栏不会走样。
-"""
-import html
-
-CSS = """
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>约翰专栏提升工程 · 语言发生学</title>
+<meta name="description" content="胡志英公众号 418 篇原文逐篇配写约 5000 字提升文，原文与提升文并列阅读。">
+<link rel="canonical" href="https://lang.sdeuniverses.com/wechat/lift/">
+<meta property="og:title" content="约翰专栏提升工程 · 语言发生学">
+<meta property="og:description" content="胡志英公众号 418 篇原文逐篇配写约 5000 字提升文，原文与提升文并列阅读。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0E14">
+<style>
 :root{
   --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272; --ink3:#868C9B;
   --line:#CBCCD4; --line2:#E2E1DE;
@@ -252,49 +253,41 @@ a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(-
   .bars .b i,.bars .b u{animation:none}
   *{transition:none!important}
 }
-"""
-
-FILTER_JS = """<script>
-(function(){
-  var q=document.getElementById("q"),n=document.getElementById("n"),
-      empty=document.getElementById("empty"),
-      items=[].slice.call(document.querySelectorAll(".item")),
-      groups=[].slice.call(document.querySelectorAll("[data-group]")),
-      ybtns=[].slice.call(document.querySelectorAll(".chipy button[data-year]")),
-      year=null;
-  if(!q&&!ybtns.length)return;
-  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();}),
-      years=items.map(function(el){return el.getAttribute("data-y")||"";});
-  function run(){
-    var v=q?q.value.trim().toLowerCase():"",c=0;
-    for(var i=0;i<items.length;i++){
-      var hit=(!v||keys[i].indexOf(v)>=0)&&(year===null||years[i]===year);
-      items[i].style.display=hit?"":"none";
-      if(hit)c++;
-    }
-    for(var j=0;j<groups.length;j++){
-      var any=groups[j].querySelector('.item:not([style*="none"])');
-      groups[j].style.display=any?"":"none";
-    }
-    if(n)n.textContent=c+" / "+items.length;
-    if(empty)empty.style.display=c?"none":"";
-  }
-  if(q)q.addEventListener("input",run);
-  ybtns.forEach(function(b){
-    b.addEventListener("click",function(){
-      var y=b.getAttribute("data-year");
-      year=(year===y)?null:y;
-      ybtns.forEach(function(o){
-        o.setAttribute("aria-pressed",String(year!==null&&o.getAttribute("data-year")===year));
-      });
-      run();
-    });
-  });
-  run();
-})();
-</script>"""
-
-PREFIX_FIX = """<script>
+</style>
+<style>:root{--accent:#A63A2B}</style>
+</head>
+<body>
+<div class="dark">
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
+  <nav>
+    <a href="/#books">账册</a>
+    <a href="/#cols">栏目</a>
+    <a href="/all/">全部篇目</a>
+    <a href="/works/">作品全集</a>
+    <a href="/wechat/" aria-current="page">约翰专栏</a>
+    <a href="/chatjohn/">ChatJohn</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">约翰专栏 · 提升工程</div>
+  <h1>原文不动，<em>思想继续向前</em></h1>
+  <p class="lede">胡志英公众号共 <b>418 篇原文</b>，其中 387 篇是正稿、31 篇是同题另稿。每个正稿配一篇约 5000 字提升文；同题另稿共享同一篇提升文，因此不制造重复文字，却让每一份原文都有可抵达的提升入口。</p>
+  <div class="lift-progress"><p>当前覆盖 2 / 418 篇原文 · 已完成 1 / 387 篇独立提升文</p><div class="bar"><i style="width:0.4785%"></i></div></div>
+</div></div></div>
+<div class="light"><div class="wrap"><section>
+  <div class="col-h"><span class="no">已　完　成</span><h2>逐篇并读</h2><span class="ct">每篇 4500–6500 汉字</span></div>
+  <p class="col-d">提升文必须补出四件原稿里尚未完成的工作：认识单位的改变、一个可复述的新读数、能推翻它的条件、读者明天可以执行的动作。</p>
+  <div class="lift-index"><a class="lift-card" href="/wechat/lift/002/">
+  <span class="num">002</span><span><h3>一句话之后，对方还剩几条路？——从“礼貌句型”到“关系续接力”</h3><p>原文：孩子英语说得很流利，为什么一开口却显得“不礼貌”？真正缺的可能是“语用能力”</p></span><span class="count">5,508 汉字</span>
+</a></div>
+</section></div></div>
+<footer><div class="wrap">
+  <p>约翰专栏提升工程 —— 原文一字未改；提升文从原文的问题继续向前，补出新判断、可操作读数、失效边界与家庭动作。</p>
+  <p>语言发生学 · <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站 —— 德麦国际 · Demai International Press</p>
+</div></footer>
+<script>
 /* 分站页面的自家链接写的是分站根。在二级域名下这就是对的；
    若从主站以 /sites/lang/… 预览，就地补前缀，两处都能点。 */
 (function(){window.__wechatBase="";var b="/sites/lang";
@@ -305,56 +298,50 @@ var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
 if(h==="/"){as[i].setAttribute("href",b+"/");continue;}
 for(var k=0;k<own.length;k++){if(h.indexOf(own[k])===0){as[i].setAttribute("href",b+h);break;}}}})();
-</script>"""
-
-
-def esc(s):
-    return html.escape(str(s), quote=True)
-
-
-NAV_ITEMS = [
-    ("/#books", "账册", ""),
-    ("/#cols", "栏目", ""),
-    ("/all/", "全部篇目", "all"),
-    ("/works/", "作品全集", "works"),
-    ("/wechat/", "约翰专栏", "wechat"),
-    ("/chatjohn/", "ChatJohn", "chatjohn"),
-]
-
-
-def nav(current=""):
-    out = ('<header class="top"><div class="wrap">\n'
-           '  <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>\n'
-           '  <nav>\n')
-    for href, label, key in NAV_ITEMS:
-        cur = ' aria-current="page"' if key and key == current else ""
-        out += '    <a href="%s"%s>%s</a>\n' % (href, cur, label)
-    out += ('    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>\n'
-            '  </nav>\n</div></header>')
-    return out
-
-
-def page(title, desc, canon, body, footer, accent="#1F3A5F", extra=""):
-    return """<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>%s</title>
-<meta name="description" content="%s">
-<link rel="canonical" href="%s">
-<meta property="og:title" content="%s">
-<meta property="og:description" content="%s">
-<meta property="og:type" content="website">
-<meta name="theme-color" content="#0B0E14">
-<style>%s</style>
-<style>:root{--accent:%s}</style>
-</head>
-<body>
-%s
-%s
-%s
-%s
+</script>
+<style>
+.lift-progress{margin-top:28px;border:1px solid var(--edge);padding:18px 20px;background:var(--night2)}
+.lift-progress .bar{height:5px;background:rgba(232,228,218,.13);margin-top:10px;overflow:hidden}
+.lift-progress .bar i{display:block;height:100%;background:var(--vermilion-l)}
+.lift-progress p{margin:0;color:var(--bone2);font:12px/1.7 var(--mono)}
+.compare-shell{max-width:1380px;margin:0 auto;padding:38px 24px 0;display:grid;
+  grid-template-columns:minmax(300px,38%) minmax(0,1fr);gap:38px;align-items:start}
+.source-rail{position:sticky;top:78px;border:1px solid var(--line);background:var(--card);padding:18px}
+.source-rail .tag,.lift-meta{font:11px/1.5 var(--mono);letter-spacing:.14em;color:var(--vermilion)}
+.source-rail h2{font:600 21px/1.5 var(--serif);letter-spacing:.03em;margin:9px 0 8px}
+.source-rail p{font-size:13.5px;line-height:1.75;color:var(--ink2);margin:0 0 14px}
+.source-rail iframe{width:100%;height:68vh;min-height:520px;border:1px solid var(--line);background:#fff}
+.source-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.source-actions a{font:12px/1.4 var(--mono);color:var(--indigo);border:1px solid var(--line);padding:7px 10px}
+.source-actions a:hover{border-color:var(--indigo);background:#fff}
+.lift-essay{min-width:0;padding:2px 0 20px}
+.lift-essay .lift-meta{margin-bottom:12px}
+.lift-essay .thesis{font:600 20px/1.75 var(--serif);color:var(--ink);padding:18px 20px;
+  border-left:3px solid var(--vermilion);background:var(--card);margin:0 0 34px}
+.lift-essay section{padding:0 0 20px}
+.lift-essay h2{font:600 23px/1.5 var(--serif);letter-spacing:.04em;margin:28px 0 12px;
+  padding-bottom:8px;border-bottom:1px solid var(--line)}
+.lift-essay p{font-size:17px;line-height:2;margin:15px 0;color:#23262F;max-width:44em}
+.lift-essay strong{font-weight:600;color:var(--ink);background:linear-gradient(transparent 62%,rgba(166,58,43,.15) 62%)}
+.lift-essay code{font:14px/1.6 var(--mono);background:#E7E6E1;padding:1px 5px;color:var(--indigo)}
+.lift-essay a{color:var(--indigo);border-bottom:1px solid var(--line)}
+.lift-index{padding-top:18px}
+.lift-card{display:grid;grid-template-columns:64px 1fr auto;gap:18px;align-items:baseline;
+  padding:18px 4px;border-bottom:1px dashed var(--line)}
+.lift-card .num{font:12px/1.5 var(--mono);color:var(--vermilion)}
+.lift-card h3{font:600 18px/1.55 var(--serif);margin:0 0 5px}
+.lift-card p{margin:0;color:var(--ink2);font-size:13.5px}
+.lift-card .count{font:11px/1.5 var(--mono);color:var(--ink3);white-space:nowrap}
+@media(max-width:900px){
+  .compare-shell{grid-template-columns:1fr;gap:26px;padding:28px 20px 0}
+  .source-rail{position:relative;top:auto}
+  .source-rail iframe{height:56vh;min-height:430px}
+}
+@media(max-width:600px){
+  .compare-shell{padding-left:16px;padding-right:16px}
+  .source-rail iframe{display:none}
+  .lift-essay p{font-size:16.5px;line-height:1.95}
+  .lift-card{grid-template-columns:46px 1fr}.lift-card .count{display:none}
+}
+</style>
 </body></html>
-""" % (esc(title), esc(desc), esc(canon), esc(title), esc(desc), CSS, accent,
-       body, footer, PREFIX_FIX, extra)
