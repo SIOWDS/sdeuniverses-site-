@@ -736,7 +736,7 @@ def build():
                 short = SHORT[slug]
                 rows += ('  <a class="row" href="/wechat/%s/"><span class="r-n">%d</span>'
                          '<span class="r-t"><b class="r-h">%s</b>%s</span>'
-                         '<span class="iq">%d</span></a>\n'
+                         '<span class="cnt"><b>%d</b> 篇</span></a>\n'
                          % (slug, k, esc(name), esc(short), len(by_ch[key])))
             head = h[:h.index(S) + len(S)]
             tail = h[h.index(E):]

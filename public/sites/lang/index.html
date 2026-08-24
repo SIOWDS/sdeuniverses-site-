@@ -139,6 +139,9 @@ section{padding:56px 0 8px}
 .r-h::after{content:"·";margin-left:.55em;color:var(--line);font-weight:400}
 .iq{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
   font-variant-numeric:tabular-nums;padding-left:12px}
+.cnt{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
+.cnt b{font-weight:500;color:var(--indigo)}
 .more{display:inline-block;margin:16px 0 0;font-family:var(--mono);font-size:12.5px;color:var(--indigo);
   border-bottom:1px solid var(--indigo);padding-bottom:2px}
 
@@ -174,7 +177,7 @@ a:focus-visible{outline:2px solid var(--indigo-l);outline-offset:3px}
   table.chk td,table.chk th{padding-left:13px;padding-right:13px}
   table.chk td.ref,table.chk th.ref{display:none}
   .band{gap:24px}
-  .iq{display:none}
+  .iq,.cnt{display:none}
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -376,7 +379,7 @@ section:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;
 .bk img{border-bottom:0}.bk .no{color:#B54C43}.bk .lk a{color:#1C7081}
 .row{border-bottom-color:rgba(57,72,82,.14);border-radius:12px;padding-left:10px;padding-right:10px;transition:.22s ease}
 .row:hover{transform:translateX(5px);background:linear-gradient(90deg,rgba(88,213,232,.10),transparent)}
-.r-n{color:#1C7081}.iq{color:#7B609E}.more{color:#1C7081;border-color:#1C7081;
+.r-n{color:#1C7081}.iq{color:#7B609E}.cnt{color:#7B609E}.cnt b{color:#58D5E8}.more{color:#1C7081;border-color:#1C7081;
   border:1px solid rgba(28,112,129,.25);border-radius:999px;padding:7px 13px;margin-top:18px}
 .plat{
   border:1px solid rgba(88,213,232,.16);border-radius:24px;padding:30px;
@@ -622,15 +625,15 @@ footer a{color:var(--gold)}
   <div class="col-h"><span class="no">栏 五</span><h2>约翰专栏</h2><span class="ct">418 篇</span></div>
   <p class="col-d">公众号「五宝爸约翰聊英语」五年原文存档。长论文是把一个判断立到能被推翻的程度，这一栏是他每天面对家长时，把同一批问题讲给用得上的人听。原文一字未改，只做归类、排序与检索。</p>
 <!-- wechat-rows:start -->
-  <a class="row" href="/wechat/genesis/"><span class="r-n">1</span><span class="r-t"><b class="r-h">语言发生学</b>语感、语法、语用、意义与输出</span><span class="iq">49</span></a>
-  <a class="row" href="/wechat/enlighten/"><span class="r-n">2</span><span class="r-t"><b class="r-h">英语启蒙</b>三条线、看听线、听指、跟读与复述、敏感期</span><span class="iq">78</span></a>
-  <a class="row" href="/wechat/vocabulary/"><span class="r-n">3</span><span class="r-t"><b class="r-h">词汇之路</b>一个词怎样长出来，又怎样被取出来</span><span class="iq">23</span></a>
-  <a class="row" href="/wechat/materials/"><span class="r-n">4</span><span class="r-t"><b class="r-h">素材与分级</b>RAZ、BrainPOP 与 ELL、原版动画与绘本</span><span class="iq">57</span></a>
-  <a class="row" href="/wechat/ai/"><span class="r-n">5</span><span class="r-t"><b class="r-h">AI 与语言教育</b>工具进课堂之后，能力被换走了什么</span><span class="iq">42</span></a>
-  <a class="row" href="/wechat/school/"><span class="r-n">6</span><span class="r-t"><b class="r-h">课堂与制度</b>翻转课堂、家校共学、考试与评价</span><span class="iq">41</span></a>
-  <a class="row" href="/wechat/lineage/"><span class="r-n">7</span><span class="r-t"><b class="r-h">思想谱系</b>克拉申、维果茨基、索绪尔、洪堡、林语堂</span><span class="iq">27</span></a>
-  <a class="row" href="/wechat/notes/"><span class="r-n">8</span><span class="r-t"><b class="r-h">奶爸手记</b>五个孩子、郊区的院子、父亲与儿子</span><span class="iq">45</span></a>
-  <a class="row" href="/wechat/camp/"><span class="r-n">9</span><span class="r-t"><b class="r-h">营地与公告</b>训练营、开班、公开课与学员见证</span><span class="iq">25</span></a>
+  <a class="row" href="/wechat/genesis/"><span class="r-n">1</span><span class="r-t"><b class="r-h">语言发生学</b>语感、语法、语用、意义与输出</span><span class="cnt"><b>49</b> 篇</span></a>
+  <a class="row" href="/wechat/enlighten/"><span class="r-n">2</span><span class="r-t"><b class="r-h">英语启蒙</b>三条线、看听线、听指、跟读与复述、敏感期</span><span class="cnt"><b>78</b> 篇</span></a>
+  <a class="row" href="/wechat/vocabulary/"><span class="r-n">3</span><span class="r-t"><b class="r-h">词汇之路</b>一个词怎样长出来，又怎样被取出来</span><span class="cnt"><b>23</b> 篇</span></a>
+  <a class="row" href="/wechat/materials/"><span class="r-n">4</span><span class="r-t"><b class="r-h">素材与分级</b>RAZ、BrainPOP 与 ELL、原版动画与绘本</span><span class="cnt"><b>57</b> 篇</span></a>
+  <a class="row" href="/wechat/ai/"><span class="r-n">5</span><span class="r-t"><b class="r-h">AI 与语言教育</b>工具进课堂之后，能力被换走了什么</span><span class="cnt"><b>42</b> 篇</span></a>
+  <a class="row" href="/wechat/school/"><span class="r-n">6</span><span class="r-t"><b class="r-h">课堂与制度</b>翻转课堂、家校共学、考试与评价</span><span class="cnt"><b>41</b> 篇</span></a>
+  <a class="row" href="/wechat/lineage/"><span class="r-n">7</span><span class="r-t"><b class="r-h">思想谱系</b>克拉申、维果茨基、索绪尔、洪堡、林语堂</span><span class="cnt"><b>27</b> 篇</span></a>
+  <a class="row" href="/wechat/notes/"><span class="r-n">8</span><span class="r-t"><b class="r-h">奶爸手记</b>五个孩子、郊区的院子、父亲与儿子</span><span class="cnt"><b>45</b> 篇</span></a>
+  <a class="row" href="/wechat/camp/"><span class="r-n">9</span><span class="r-t"><b class="r-h">营地与公告</b>训练营、开班、公开课与学员见证</span><span class="cnt"><b>25</b> 篇</span></a>
 <!-- wechat-rows:end -->
   <a class="more" href="/wechat/">九个频道门厅，或一页翻完全部 418 篇 →</a>
 </section>
