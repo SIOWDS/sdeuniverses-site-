@@ -207,7 +207,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
     </div>
     <div id="deepHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:9px 2px 0;line-height:1.6">🔬 深度模式：基底先内化内功写心得，再用 <b>SDE 方法论</b>（六路径→S/D/E→三方程→误差互消→逮先验）做一次有指导性的深入研究，现实问题还会给可执行的「怎么办」。默认<b>单次调用</b>（较慢、较费 token，建议自带 Key）。<br>点「四步法」→ 升级为 <b>S/D/E 四次独立调用</b>的完整误差互消（最深，但慢 4 倍、贵 4 倍，只在要冲满时用）。</div>
     <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–20 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
-    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动二十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡 → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）自己把问对逼深二十轮（<b>分七批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（五段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>16</b> 次基底调用（开涌现档 20 次）、30–55 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
+    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动二十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的十九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 最强反驳 → 反向约束 → 机制拆解 → 第二轴 → 误诊阻挡 → 量纲与操作化 → 当场检验 → 最强竞争解释 → 反例搜寻 → 外推边界 → 落地与代价）自己把问对逼深二十轮（<b>分七批连写，每轮两千字以上</b>），然后<b>提炼</b>成约七千字的精华报告（先规划，再两段：九栏作业单＋论文观点与分章大纲）、<b>写成两万字论文</b>（五段连写，投稿体例）并出 PDF 与 Word、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>16</b> 次基底调用（开涌现档 20 次）、30–55 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
     <div id="ownKeyRow" style="display:none">
       <input id="userKey" type="password" autocomplete="off" placeholder="填入你的 DeepSeek / 智谱 API Key（仅存本机浏览器，不上传服务器保存）">
     </div>
@@ -243,7 +243,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
         <button class="actbtn" id="btnReco" onclick="doRecommend()">📖 <span class="zh-only">推荐阅读 · 站内领读</span><span class="en-only">Reading picks</span></button>
         <button class="actbtn" id="btnEmerge" onclick="doEmerge()">🌀 <span class="zh-only">二阶碰撞 · 三典范择优 → 综合提炼</span><span class="en-only">Collide → 3 paradigms → synthesis</span></button>
         <button class="actbtn" id="btnDistill" onclick="doDistill()">🧪 <span class="zh-only">提炼精华 · 整场问对 → 论文入口资料</span><span class="en-only">Distill → paper brief</span></button>
-        <button class="actbtn" id="btnPaper" onclick="doPaper()">📝 <span class="zh-only">成文一篇 · 两万字论文 → PDF</span><span class="en-only">Write a paper → PDF</span></button>
+        <button class="actbtn" id="btnPaper" onclick="doPaper()">📝 <span class="zh-only">成文一篇 · 两万字论文 → PDF·Word</span><span class="en-only">Write a paper → PDF / Word</span></button>
         <button class="actbtn" id="btnIq" onclick="doIq()">🎯 <span class="zh-only">创新智商评估 · 五维盲评</span><span class="en-only">Innovation IQ</span></button>
         <button class="actbtn" id="btnPolish" onclick="doPolish()">🛠 <span class="zh-only">打磨修改 · 目标 135+</span><span class="en-only">Polish → 135+</span></button>
         <span class="act-hint" style="width:100%"><span class="zh-only">🌀 涌现路线：开「涌现档」→ 连问 2–20 轮（每轮三观点）→「二阶碰撞」三典范择优 → 自动综合提炼 →「成文一篇」。🧵 常规路线：可连问 20 轮，每轮都带着前面的上下文；问够了先「提炼精华」，再「成文一篇」——论文水平主要由这份精华报告决定，所以它先做一次取舍规划，再分两段写约七千字：第一段是九栏作业单，第二段是「论文观点与分章大纲」，那一栏直接当成文的施工图。约 5–9 分钟。</span><span class="en-only">🧵 Up to 20 threaded turns → distill → write. The brief is what lifts the paper.</span></span>
@@ -285,6 +285,12 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
           <a class="actbtn solidbtn" id="pdfRead" target="_blank" rel="noopener">📄 <span class="zh-only">PDF 在线阅读</span><span class="en-only">Read PDF online</span></a>
           <a class="actbtn" id="pdfDl">⬇ <span class="zh-only">下载 PDF</span><span class="en-only">Download PDF</span></a>
         </div>
+        <!-- Word 出口：由正文直接造 docx，不经 html2canvas 那条渲染链，
+             所以 PDF 白页/超限/引擎加载失败时，这一份照样拿得到（这正是它单独一行的原因）。 -->
+        <div class="pdf-acts" id="wordActs">
+          <button class="actbtn" id="docxDl" onclick="dlDocx('paper')">📝 <span class="zh-only">下载 Word（.docx）</span><span class="en-only">Download Word</span></button>
+          <span class="act-hint"><span class="zh-only">Word 由正文直接生成，不经排版渲染——PDF 万一出不来，这一份照样拿得到，且可直接在 Word 里改。</span><span class="en-only">Built straight from the text — independent of the PDF renderer.</span></span>
+        </div>
       </div>
       <div class="paper-wrap" id="iqWrap">
         <div class="ans-label"><span class="zh-only">SDE 创新智商 · 独立盲评</span><span class="en-only">Innovation IQ · blind review</span></div>
@@ -302,6 +308,9 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
           <a class="actbtn solidbtn" id="polishRead" target="_blank" rel="noopener">📄 <span class="zh-only">PDF 在线阅读</span><span class="en-only">Read PDF</span></a>
           <a class="actbtn" id="polishDl">⬇ <span class="zh-only">下载 PDF</span><span class="en-only">Download</span></a>
           <button class="actbtn" onclick="doIq(true)">🎯 <span class="zh-only">对打磨稿复评</span><span class="en-only">Re-score</span></button>
+        </div>
+        <div class="pdf-acts" id="wordActs2">
+          <button class="actbtn" id="docxDl2" onclick="dlDocx('polish')">📝 <span class="zh-only">下载 Word（.docx）</span><span class="en-only">Download Word</span></button>
         </div>
       </div>
       <div class="sources" id="sources"></div>
@@ -1434,7 +1443,7 @@ function doAutoRun(){
   /* ⚠ 成文那一项写死过 4，成文改成五段时它就悄悄少报一次。改成认 PAPER_PARTS.length，
      跟提炼那一项同一个做法：**段数一律从定义处抽，不许再出现写死的数**。 */
   var calls=autoBatchCount()+(triOn?7:(1+BRIEF_PARTS.length))+PAPER_PARTS.length+1;
-  if(!confirm('🚀 自动二十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n'+AUTO_TARGET+' 轮问对（分 '+autoBatchCount()+' 批，每轮两千字以上）→ 约七千字精华报告（先规划再两段）→ 两万字论文（五段）与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
+  if(!confirm('🚀 自动二十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n'+AUTO_TARGET+' 轮问对（分 '+autoBatchCount()+' 批，每轮两千字以上）→ 约七千字精华报告（先规划再两段）→ 两万字论文（五段）与 PDF、Word → 创新智商五维盲评 → 全程记录。\n\n'
     +'· 约 '+calls+' 次基底调用（'+(deepOn?'深度档':'普通档')+(triOn?' ＋ 涌现档':'')+'），预计 '+(deepOn?'40–70':'30–55')+' 分钟\n'
     +'· 期间请勿关闭或刷新页面——这场问对只活在这一页的内存里\n'
     +'· 随时可「⏹ 中止」，已跑出来的部分全部保留\n\n'
@@ -1666,7 +1675,9 @@ function doDistill(){
 }
 
 /* ===== 答后点击②：成文一篇（两段续写 · 最高提智）→ PDF 在线阅读 / 下载 ===== */
-var paperAll='';
+var paperAll='', paperMiss=false, polishMiss=false;
+/* paperMiss/polishMiss：留住「这稿子缺了哪几段」。PDF 首页那面红旗此前只在排版那一刻用一次，
+   而 Word 是随后另一次点击才造的 —— 不留住，导出的 docx 会把未完成稿印成完整稿。 */
 /* 成文一篇与打磨修改共用这台两段续写机：状态行、进度条、字数计都按 GEN_* 切换目标元素，
    不许再把 'paperStat' 写死——写死的那一版会让打磨稿的进度打在成文稿的状态行上。 */
 var GEN_STAT='paperStat', GEN_FILL='ppFill', GEN_CHARS='ppChars', GEN_BOX='', GEN_PREV='';
@@ -2008,8 +2019,9 @@ function doPaper(){
   var btn=document.getElementById('btnPaper'); btn.disabled=true;
   var wrap=document.getElementById('paperWrap'); wrap.classList.add('show');
   document.getElementById('pdfActs').classList.remove('show');
+  document.getElementById('wordActs').classList.remove('show');
   var stat=document.getElementById('paperStat');
-  paperAll=''; setProg(0, true);
+  paperAll=''; paperMiss=false; setProg(0, true);
   /* 有入口资料就以它为起点（清单式），没有就退回单轮底稿（老路径不变） */
   var qlist=turns.map(function(t,i){ return (i+1)+'. '+t.q; }).join('\n').slice(0,900);
   /* 【入口资料不再按段截断 —— 2026-08-18】旧版按段截断：首段吃九千字、续写三段各吃五千字。
@@ -2028,7 +2040,10 @@ function doPaper(){
   };
   var miss=false;
   return runFourParts(seedFor, stat, '📝 写作中').then(function(r){
-    paperAll=r.text; miss=missText(r.done); archSave();   /* 两万字论文落稿即存 */
+    paperAll=r.text; miss=missText(r.done); paperMiss=miss; archSave();   /* 两万字论文落稿即存 */
+    /* Word 入口在排版之前就亮：它不靠 PDF 那条链，
+       PDF 白页/超限/引擎加载失败都不应连坐它。 */
+    document.getElementById('wordActs').classList.add('show');
     setProg(paperAll.length, true);
     stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版 PDF':'🖨 全文完成（'+paperAll.length+' 字·'+PAPER_PARTS.length+'段）· 正在排版 PDF')+'（约 20–50 秒）…';
     return buildPdf(paperAll, miss);
@@ -2041,7 +2056,7 @@ function doPaper(){
     var auMsg=au.length?('🔎 出稿机检查出 '+au.length+' 处：'+au.join('；')+'。这些要人工改掉再投。　'):'';
     stat.textContent = (miss || cut || auMsg || pdfNote)
       ? pdfNote+cut+auMsg+(miss?miss+' PDF 首页已标注「未完成稿」。⚠ 再点一次「成文一篇」是**从第一段整篇重写**，不是接着补——重写前请先把这 '+paperAll.length+' 字复制走。':'')+'已写的 '+paperAll.length+' 字都在。'
-      : '✓ 全文完成 · '+paperAll.length+' 字 · '+PAPER_PARTS.length+'段齐全（含中英摘要、参考文献、附录与投稿声明）· 出稿机检零缺陷 · PDF 已就绪，可在线阅读或下载。';
+      : '✓ 全文完成 · '+paperAll.length+' 字 · '+PAPER_PARTS.length+'段齐全（含中英摘要、参考文献、附录与投稿声明）· 出稿机检零缺陷 · PDF 已就绪，可在线阅读或下载；需要接着改就下载 Word。';
   }).catch(function(e){
     setProg(paperAll.length, false);
     stat.textContent='✗ '+(e.message||String(e));
@@ -2058,6 +2073,75 @@ function loadHtml2pdf(){
     s.onerror=function(){ rej(new Error('PDF 引擎加载失败（网络原因），正文仍可直接阅读')); };
     document.head.appendChild(s);
   });
+}
+/* ===== Word 出口（2026-08-24）=====
+   为什么另起一条路而不是给 PDF 加个格式：PDF 那条链要走 html2canvas 光栅化，
+   长稿超画布上限就静默给白纸（见上方 canvasInk 那段病史），且出来的是图，拿不进 Word 改。
+   docx 是纯文本造 zip：不依赖网络引擎、不依赖画布、几十毫秒出稿，稿子还能直接接着改。
+   ⚠ 共用全站那一份 /assets/sde-docx.js（戳 20260822a 由 tools/asset-stamps.tsv 管，
+     改戳要跑 tools/bump_asset.py，别在这里手写一个新的）。 */
+function loadDocx(){
+  return new Promise(function(res,rej){
+    if(window.SDEDocx) return res();
+    var s=document.createElement('script');
+    s.src='/assets/sde-docx.js?v=20260822a';
+    s.onload=function(){ window.SDEDocx?res():rej(new Error('Word 引擎加载了却没挂上去')); };
+    s.onerror=function(){ rej(new Error('Word 引擎加载失败（网络原因），正文仍在本页，可直接复制')); };
+    document.head.appendChild(s);
+  });
+}
+/* 正文 → Markdown-lite（SDEDocx 只认这一小套）。
+   刻意与 buildPdf 共用同三个函数 mdSkip/mdClean/isPaperHead——
+   否则 PDF 与 Word 各认一套标题，同一份稿子会出两种目录。
+   顶层具名函数，好让 tools/sim_paper_docx.js 抠出来单测。 */
+function paperToMd(text, incomplete, opt){
+  opt=opt||{};
+  var lines=String(text||'').split('\n');
+  var title=(lines[0]||'成文一篇').trim().replace(/^[#＃\s]+/,'').slice(0,64)||'成文一篇';
+  var out=['# '+title];
+  var meta=(opt.eyebrow||'SDE UNIVERSES · 智能问对 · 成文一篇')
+    +' · '+new Date().toLocaleDateString('zh-CN');
+  if(typeof originQ==='function'){
+    meta+=' · 缘起之问：'+String(originQ()||'').slice(0,64)
+      +((typeof turns!=='undefined'&&turns.length>1)?('（'+turns.length+' 轮问对提炼）'):'');
+  }
+  out.push('> '+meta);
+  /* 未完成稿的红旗必须跟到 Word 里去：
+     PDF 首页有、Word 没有，就等于给断稿发了一张干净的封面。 */
+  if(incomplete) out.push('> ⚠ 未完成稿 · '+String(incomplete)+'请勿按完整论文评阅或引用。');
+  out.push('');
+  for(var i=1;i<lines.length;i++){
+    var raw=lines[i].trim();
+    if(!raw || mdSkip(raw)) continue;
+    var L=mdClean(raw);
+    if(!L) continue;
+    out.push(isPaperHead(raw,L) ? ('## '+L) : L);
+  }
+  return out.join('\n');
+}
+function docxName(tag){ return 'SDE-'+tag+'-'+new Date().toISOString().slice(0,10)+'.docx'; }
+function dlDocx(which){
+  var isP=(which==='polish');
+  var text=isP?polishAll:paperAll;
+  var stat=document.getElementById(isP?'polishStat':'paperStat');
+  var btn=document.getElementById(isP?'docxDl2':'docxDl');
+  if(!text || text.length<50){ flashAsk('还没有正文可导出，先「成文一篇」。'); return Promise.resolve(); }
+  if(btn){ btn.disabled=true; }
+  return loadDocx().then(function(){
+    var md=paperToMd(text, isP?polishMiss:paperMiss,
+      isP?{eyebrow:'SDE UNIVERSES · 智能问对 · 打磨修改稿'}:{});
+    var blob=window.SDEDocx.build({ md:md, author:'SDE UNIVERSES · sdeuniverses.com' });
+    /* 与 PDF 那道墨量闸同一条规矩：交付层不允许静默成功。
+       空 docx 也有一千多字节的骨架，所以下限按正文长度算。 */
+    var floor=1200+Math.min(text.length, 200);
+    if(!blob || blob.size<floor) throw new Error('Word 造出来是空的（'+((blob&&blob.size)||0)+' 字节），已拦下不交；正文 '+text.length+' 字仍在本页。');
+    window.SDEDocx.save(blob, docxName(isP?'polished':'paper'));
+    if(stat) stat.textContent='✅ Word 已导出 · '+text.length+' 字 · '+Math.round(blob.size/1024)+'KB · '+docxName(isP?'polished':'paper')+'（可直接在 Word 里接着改）';
+    return blob;
+  }).catch(function(e){
+    if(stat) stat.textContent='✗ '+(e.message||String(e));
+    throw e;
+  }).finally(function(){ if(btn){ btn.disabled=false; } });
 }
 /* ===== Markdown 兜底（排版v3）=====
    基底偶尔会吐 Markdown（下半篇尤其明显：# 标题、**加粗**、|竖线表格|、--- 分隔线）。
@@ -2489,6 +2573,7 @@ function doPolish(){
   var btn=document.getElementById('btnPolish'); btn.disabled=true;
   var wrap=document.getElementById('polishWrap'); wrap.classList.add('show');
   document.getElementById('polishActs').classList.remove('show');
+  document.getElementById('wordActs2').classList.remove('show');
   var stat=document.getElementById('polishStat');
   /* 只认「评的就是这一篇」的评分卡：拿 A 篇的作业单去改 B 篇，会把改稿引到别人的毛病上 */
   var card=(iqCard && iqCard.src===src.slice(0,120))?iqCardText():'';
@@ -2500,7 +2585,8 @@ function doPolish(){
   };
   var miss=false;
   runFourParts(seedFor, stat, (card?'🛠 按评分卡打磨':'🛠 打磨（未评分，按目标五维自查）')).then(function(r){
-    polishAll=r.text; miss=missText(r.done);
+    polishAll=r.text; miss=missText(r.done); polishMiss=miss;
+    document.getElementById('wordActs2').classList.add('show');
     setProg(polishAll.length,true);
     stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版':'🖨 打磨完成（'+polishAll.length+' 字·'+PAPER_PARTS.length+'段）· 正在排版 PDF')+'（约 20–50 秒）…';
     return buildPdf(polishAll, miss, {eyebrow:'SDE UNIVERSES · 智 能 问 对 · 打 磨 修 改 稿', fnTag:'polished', readId:'polishRead', dlId:'polishDl', actsId:'polishActs'});

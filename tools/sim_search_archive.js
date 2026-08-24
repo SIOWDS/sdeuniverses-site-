@@ -139,7 +139,10 @@ ok(/本机存档不受影响/.test(bReset), "确认语照实说清存档不受�
 ok(/archSave\(\);\s*\/\* 每轮存一次/.test(H), "每答完一轮存一次");
 ok(/archSave\(\);\s*\/\* 成批问对/.test(H), "成批问对每落一批存一次");
 ok(/brief=r\.text; briefKind='distill'; archSave\(\)/.test(H), "精华报告落稿即存");
-ok(/paperAll=r\.text; miss=missText\(r\.done\); archSave\(\)/.test(H), "论文落稿即存");
+/* ⚠ 这条原本钉的是三句的**逐字相邻**（paperAll=…; miss=…; archSave()）——
+   2026-08-24 那一行中间插进 paperMiss=miss 就当场假红。守的应是「落稿那一处存了档」
+   这个不变量，不是那一行长什么样。 */
+ok(/paperAll=r\.text;[^\n]*archSave\(\)/.test(H), "论文落稿即存");
 ok(/只存在这台机器的浏览器里，不上传/.test(H), "面板上明写「只存本机、不上传」（别让人误以为存到了云端）");
 ok(/id="archWrap"/.test(H), "存档面板真的挂在页面上（孤儿函数等于没做）");
 ok(/onclick="archDownload\(sessionId\)"/.test(H), "问对条上有「保存这一场为文档」");
