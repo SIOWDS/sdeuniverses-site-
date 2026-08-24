@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>作品全集 · 语言发生学</title>
+<meta name="description" content="胡志英在 SDE Universes 学员专栏已发表的全部 96 件作品，按八组重新编次：语言、专著、教育与评价、神经发展与身体、制度病理与知识生产、认知因果与存在、全球系统科学、并蒂文。">
+<link rel="canonical" href="https://lang.sdeuniverses.com/works/">
+<meta property="og:title" content="作品全集 · 语言发生学">
+<meta property="og:description" content="胡志英在 SDE Universes 学员专栏已发表的全部 96 件作品，按八组重新编次：语言、专著、教育与评价、神经发展与身体、制度病理与知识生产、认知因果与存在、全球系统科学、并蒂文。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0E14">
+<style>
+:root{
+  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272; --ink3:#868C9B;
+  --line:#CBCCD4; --line2:#E2E1DE;
+  --indigo:#1F3A5F; --vermilion:#A63A2B;
+  --night:#0B0E14; --night2:#121722; --bone:#E8E4DA; --bone2:#8E94A3;
+  --edge:rgba(232,228,218,.16); --indigo-l:#6E9BD8; --vermilion-l:#D2604A;
+  --accent:#1F3A5F;
+  --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.75}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(56% 44% at 10% 0%,rgba(110,155,216,.13),transparent 70%),
+    radial-gradient(44% 40% at 94% 18%,rgba(210,96,74,.10),transparent 72%),
+    radial-gradient(72% 52% at 52% 104%,rgba(111,169,140,.07),transparent 70%)}
+.dark::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.45;
+  background-image:linear-gradient(90deg,rgba(232,228,218,.05) 1px,transparent 1px);
+  background-size:34px 100%}
+.dark .wrap{position:relative;z-index:1}
+
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:40;
+  background:rgba(11,14,20,.88);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone);flex:none}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--bone2);
+  overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a:hover{color:var(--indigo-l)}
+.top nav a[aria-current]{color:var(--bone);box-shadow:inset 0 -1px 0 var(--vermilion-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:70px 0 58px}
+.hero.tight{padding:44px 0 42px}
+.crumb{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--bone2);margin-bottom:16px}
+.crumb a{color:var(--indigo-l)}
+.crumb a:hover{color:var(--bone)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--indigo-l);text-transform:uppercase}
+.dark h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5.4vw,52px);line-height:1.26;
+  letter-spacing:.03em;margin:.5em 0 .4em;max-width:15em;color:#F4F2EC}
+.dark h1 em{font-style:normal;color:var(--vermilion-l)}
+.lede{max-width:38em;color:#B9BECB;font-size:16.5px;margin:0}
+.lede b{color:var(--bone);font-weight:600}
+.lede + .lede{margin-top:.9em}
+
+.rhythm{margin:42px 0 0;border:1px solid var(--edge);background:var(--night2)}
+.rhythm .cap{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:nowrap;
+  padding:13px 20px;border-bottom:1px solid rgba(232,228,218,.28);
+  font-family:var(--serif);letter-spacing:.22em;font-size:14.5px;color:#F4F2EC}
+.rhythm .cap span{font-family:var(--mono);font-size:11px;color:var(--bone2);letter-spacing:.06em;
+  text-align:right;letter-spacing:.06em}
+.bars{display:flex;align-items:flex-end;gap:2px;height:116px;padding:20px 20px 0}
+.bars .b{flex:1 1 0;min-width:2px;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bars .b i,.bars .b u{display:block;width:100%;transform-origin:bottom;text-decoration:none;
+  animation:grow .55s cubic-bezier(.2,.7,.3,1) both}
+.bars .b i{background:rgba(232,228,218,.13)}
+.bars .b u{background:var(--indigo-l)}
+.bars .b.hot u{background:var(--vermilion-l)}
+.bars .b:hover i,.bars .b:hover u{filter:brightness(1.45)}
+@keyframes grow{from{transform:scaleY(.05);opacity:.15}to{transform:scaleY(1);opacity:1}}
+.axis{display:flex;padding:0 20px 14px;margin-top:9px;border-top:1px solid var(--edge)}
+.axis span{flex:1 1 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--bone2);
+  padding-top:8px;border-left:1px solid var(--edge);padding-left:7px;overflow:hidden}
+.axis span b,.axis span em{display:block;white-space:nowrap;font-style:normal}
+.axis span em{font-size:9.5px;opacity:.85;margin-top:1px}
+.axis span:first-child{border-left:0;padding-left:0}
+.axis span b{color:#C8CCD6;font-weight:400}
+.rnote{padding:0 20px 18px;margin:0;font-size:12.5px;color:var(--bone2);line-height:1.75;max-width:60em}
+.rnote b{color:#C8CCD6;font-weight:500}
+
+.band{display:flex;flex-wrap:wrap;gap:0;margin:26px 0 0;border:1px solid var(--edge)}
+.band div{flex:1 1 128px;padding:15px 18px;border-right:1px solid var(--edge)}
+.band div:last-child{border-right:0}
+.band b{display:block;font-family:var(--mono);font-size:22px;color:#F4F2EC;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.3}
+.band span{font-size:12.5px;color:var(--bone2)}
+.acts{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 0}
+.acts a,.acts button{font:inherit;font-size:14px;color:var(--bone);border:1px solid var(--edge);
+  background:transparent;padding:9px 18px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.acts a:hover,.acts button:hover{border-color:var(--indigo-l);color:#F4F2EC}
+.acts .primary{background:var(--vermilion);border-color:var(--vermilion);color:#FBF7F2}
+.acts .primary:hover{background:var(--vermilion-l);border-color:var(--vermilion-l);color:#fff}
+
+.light{background:var(--paper);
+  background-image:linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:34px 100%;background-position:-1px 0}
+section{padding:52px 0 6px}
+.col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
+.col-h .no{font-family:var(--serif);font-size:13px;letter-spacing:.24em;color:var(--vermilion);flex:none}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.1em;margin:0}
+.col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);
+  font-variant-numeric:tabular-nums;flex:none;padding-left:10px}
+.col-d{color:var(--ink2);font-size:14.5px;margin:13px 0 4px;max-width:46em}
+
+.chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0;
+  border:1px solid var(--line);border-right:0;border-bottom:0;margin-top:20px;background:var(--card)}
+.ch{display:flex;flex-direction:column;padding:0 0 20px;border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);transition:background .22s}
+.ch:hover{background:#fff}
+.ch .rule{height:3px;background:var(--cc)}
+.ch .in{padding:19px 22px 0;flex:1;display:flex;flex-direction:column}
+.ch .foot{margin-top:auto}
+.ch .n{font-family:var(--serif);font-size:12px;letter-spacing:.3em;color:var(--cc)}
+.ch h3{font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:.1em;margin:8px 0 9px}
+.ch:hover h3{color:var(--cc)}
+.ch p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.72}
+.spark{display:flex;align-items:flex-end;gap:3px;height:26px;margin:16px 0 0}
+.spark i{flex:1 1 0;background:var(--cc);opacity:.26;min-height:1px}
+.spark i.pk{opacity:.85}
+.spark-x{display:flex;gap:3px;margin-top:5px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);
+  letter-spacing:.06em}
+.spark-x i{flex:1 1 0;font-style:normal;text-align:center}
+.ch .picks{margin:15px 0 0;padding-top:12px;border-top:1px dashed var(--line);
+  font-size:13px;color:var(--ink2);line-height:1.7}
+.ch .picks em{font-style:normal;color:var(--ink);display:block}
+.ch .picks em::before{content:"— ";color:var(--cc)}
+.ch .ct{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;display:flex;gap:14px}
+.ch .ct b{color:var(--cc);font-weight:600;font-size:13px}
+.ch .go{margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--cc);opacity:0;
+  transform:translateX(-4px);transition:opacity .22s,transform .22s}
+.ch:hover .go,.ch:focus-visible .go{opacity:1;transform:none}
+
+.chips{position:sticky;top:0;z-index:30;background:rgba(242,241,237,.95);
+  backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--line)}
+.chips .wrap{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;padding:0 22px;
+  -webkit-mask-image:linear-gradient(to right,#000 92%,transparent);
+  mask-image:linear-gradient(to right,#000 92%,transparent)}
+.chips .wrap::-webkit-scrollbar{display:none}
+.chips a{flex:none;padding:12px 15px;font-size:13.5px;color:var(--ink2);white-space:nowrap;
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.chips a:hover{color:var(--ink)}
+.chips a[aria-current]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.chips a b{font-family:var(--mono);font-size:11px;color:var(--ink3);font-weight:400;margin-left:5px;
+  font-variant-numeric:tabular-nums}
+
+.tools{padding:30px 0 0}
+.list{padding-top:10px}
+.filter{display:flex;gap:12px;align-items:center;
+  border:1px solid var(--line);background:var(--card);padding:11px 15px}
+.filter input{flex:1;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
+.filter label{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--ink2);flex:none}
+.filter .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.chipy{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 0}
+.chipy button,.chipy a{font:inherit;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:4px 11px;cursor:pointer;
+  transition:border-color .18s,color .18s,background .18s}
+.chipy button:hover,.chipy a:hover{border-color:var(--cc,var(--accent));color:var(--cc,var(--accent))}
+.chipy button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FBF7F2}
+.empty{padding:24px 4px;color:var(--ink2);font-size:14.5px}
+.empty a{color:var(--accent);border-bottom:1px solid var(--line)}
+
+.yr{display:flex;align-items:baseline;gap:12px;margin:34px 0 2px;padding-bottom:6px}
+.yr b{font-family:var(--mono);font-size:19px;letter-spacing:.06em;color:var(--accent);
+  font-variant-numeric:tabular-nums;font-weight:500}
+.yr span{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.12em}
+.yr i{flex:1;height:1px;background:var(--line);font-style:normal}
+.item{border-bottom:1px dashed var(--line);padding:15px 4px 14px;position:relative;transition:background .18s}
+.item::before{content:"";position:absolute;left:-12px;top:15px;bottom:14px;width:2px;
+  background:var(--accent);opacity:0;transition:opacity .18s}
+.item:hover{background:var(--card)}
+.item:hover::before{opacity:.75}
+.it-hd{display:flex;gap:13px;align-items:baseline}
+.r-n{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:3.2em;
+  font-variant-numeric:tabular-nums;flex:none;letter-spacing:.06em}
+.it-t{font-size:15.5px;line-height:1.62;font-family:var(--serif);font-weight:600;letter-spacing:.02em}
+.item:hover .it-t{color:var(--accent)}
+.it-m{margin-left:auto;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
+.it-d{margin:7px 0 0 4.3em;font-size:13.5px;color:var(--ink2);line-height:1.72}
+.it-l{margin:8px 0 0 4.3em;display:flex;gap:15px;font-family:var(--mono);font-size:11px;flex-wrap:wrap;
+  letter-spacing:.06em}
+.it-l a{color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:1px}
+.it-l a:hover{border-color:var(--accent)}
+.it-l span{color:var(--ink3)}
+
+.essay{padding:8px 0 0}
+.essay section{padding:46px 0 4px}
+.essay p{font-size:16.5px;line-height:1.95;margin:18px 0 0;max-width:40em;color:#23262F}
+.essay p b{color:var(--ink);font-weight:600;
+  background:linear-gradient(transparent 62%,rgba(166,58,43,.16) 62%)}
+.essay p a{color:var(--indigo);border-bottom:1px solid var(--line)}
+.essay p a:hover{border-color:var(--indigo);background:rgba(31,58,95,.06)}
+.essay .col-h .no{font-size:15px;letter-spacing:.3em}
+.essay .nearby{margin-top:40px}
+.note{background:var(--card);border:1px solid var(--line);padding:24px 26px;margin-top:36px}
+.note h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.1em;margin:0 0 12px;font-weight:600}
+.note p{margin:0 0 12px;font-size:14.5px;color:var(--ink2)}
+.note p:last-child{margin-bottom:0}
+.note b{color:var(--ink)}
+.note a{color:var(--indigo);border-bottom:1px solid var(--line)}
+.nearby{display:flex;flex-wrap:wrap;gap:0;margin:46px 0 0;border:1px solid var(--line);background:var(--card)}
+.nearby a{flex:1 1 210px;padding:17px 20px;border-right:1px solid var(--line);font-size:13.5px;
+  color:var(--ink2);transition:background .2s,color .2s}
+.nearby a:last-child{border-right:0}
+.nearby a:hover{background:#fff;color:var(--ink)}
+.nearby a small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  color:var(--ink3);margin-bottom:5px}
+.nearby a b{display:block;font-family:var(--serif);font-size:16.5px;letter-spacing:.08em;
+  font-weight:600;color:var(--ink);margin-bottom:3px}
+
+footer{margin-top:74px;border-top:1px solid var(--line);padding:28px 0 66px;
+  font-size:13px;color:var(--ink2)}
+footer a{color:var(--indigo);border-bottom:1px solid var(--line)}
+footer p{margin:0 0 8px}
+a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--vermilion);outline-offset:2px}
+@media(max-width:700px){
+  .hero{padding:40px 0 34px}
+  .hero.tight{padding:32px 0 30px}
+  .top nav{-webkit-mask-image:linear-gradient(to right,#000 86%,transparent);
+    mask-image:linear-gradient(to right,#000 86%,transparent)}
+  .rhythm .cap{flex-wrap:wrap;letter-spacing:.14em;font-size:13.5px}
+  .rhythm .cap span{text-align:left;flex:1 1 100%}
+  .bars{height:82px;padding:16px 14px 0}
+  .axis{padding:0 14px 12px}
+  .axis span{font-size:9px;padding-left:4px;min-width:32px;letter-spacing:0}
+  .axis span em{font-size:8.5px}
+  .rnote{padding:0 14px 15px}
+  .band div{flex:1 1 45%}
+  .it-m{display:none}
+  .it-d,.it-l{margin-left:0}
+  .item::before{left:-8px}
+  .chips a{padding:11px 12px;font-size:13px}
+  .nearby a{flex:1 1 100%;border-right:0;border-bottom:1px solid var(--line)}
+  .nearby a:last-child{border-bottom:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .bars .b i,.bars .b u{animation:none}
+  *{transition:none!important}
+}
+</style>
+<style>:root{--accent:#1F3A5F}</style>
+</head>
+<body>
+<div class="dark">
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
+  <nav>
+    <a href="/#books">账册</a>
+    <a href="/#cols">栏目</a>
+    <a href="/all/">全部篇目</a>
+    <a href="/works/" aria-current="page">作品全集</a>
+    <a href="/wechat/">约翰专栏</a>
+    <a href="/chatjohn/">ChatJohn</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">作品全集 · COMPLETE WORKS</div>
+  <h1>九十六件作品，<em>都在这里</em></h1>
+  <p class="lede">胡志英（约翰）在 SDE Universes 学员专栏已发表的全部作品：<b>96 件</b>，含四部专著、十二篇语言长论文、十组并蒂文，以及七十件跨到教育、神经发展、制度病理、认知与存在的研究。</p>
+  <p class="lede">本站不复制正文。这一页做的是另一件事：<b>按主题重新编次、给每一组写一段导语、给每一件配一句可判断的摘要</b>，让人能先看清版图，再决定从哪一件进去。点标题即回主站读原文。</p>
+  <div class="acts">
+    <a class="primary" href="/survey/">先读总结文：这九十六件在问同一件事</a>
+    <a href="https://sdeuniverses.com/students/hu-zhiying/">主站作者主页 ↗</a>
+  </div>
+</div></div>
+</div><div class="light"><div class="wrap">
+<div class="tools">
+  <div class="filter"><label>全集筛选</label><input id="q" type="search" placeholder="输入任意词，例如：ADHD、评价、因果、语法" autocomplete="off" aria-label="筛选作品"><span class="n" id="n"></span></div>
+  <p class="empty" id="empty" style="display:none">没有匹配的作品。换一个词试试。</p>
+  <div class="chipy" style="margin-top:16px"><a href="#lang" style="--cc:#2B4C7E">语言这一条线 <b>12</b></a><a href="#books" style="--cc:#A63A2B">账册 · 四部专著 <b>4</b></a><a href="#edu" style="--cc:#B0603A">教育与评价 <b>9</b></a><a href="#neuro" style="--cc:#3F7A63">神经发展与身体 <b>10</b></a><a href="#institution" style="--cc:#8C3F52">制度病理与知识生产 <b>21</b></a><a href="#ontology" style="--cc:#5B4B6B">认知、因果与存在 <b>16</b></a><a href="#gss" style="--cc:#4A5B8C">全球系统科学 <b>4</b></a><a href="#twin" style="--cc:#6E7A4B">并蒂文 · 一题两写 <b>20</b></a></div>
+</div>
+<section id="lang" data-group="lang" style="--accent:#2B4C7E"><div class="col-h"><span class="no">壹</span><h2>语言这一条线</h2><span class="ct">12 篇</span></div><p class="col-d">十二篇，本站首页那一栏就是从这里来的。五篇追语感——「顺」不是一种感觉，是一批还没有被删掉的判断；四篇追语法的一生——证据先到、取得改判权、把差异交给新载体、最后退役；三篇追教学动作的代价。这一组的写法与别处不同：每篇都写死了一条可裁决预测，并用公开语料真跑过一遍，跑输了就当场改判。</p>
+<div class="item" data-k="后手生位：一句话说完之后，对方还剩几条路 一句话说完，对方还没开口，他能走的路已经被改了。三家把观察单位从说话人挪到尚未回应的那一侧，共同推翻「一句话的分量可以只从它自己读出」。判决性预测写死：控制礼貌评分之后，后手宽度仍应预测修复率与下一轮信息量，否则本文降格为礼貌理论的操作化。加固补切回应动员与偏好组织，并给出「压力 × 宽度正交四格」这条可判决点。本批盲评最高。 论文 · 语感频道"><div class="it-hd"><span class="r-n" title="学员专栏编号">74</span><a class="it-t" href="/students/hu-zhiying/post-hand-slot/">后手生位：一句话说完之后，对方还剩几条路</a><span class="it-m">论文 · 语感频道</span></div><p class="it-d">一句话说完，对方还没开口，他能走的路已经被改了。三家把观察单位从说话人挪到尚未回应的那一侧，共同推翻「一句话的分量可以只从它自己读出」。判决性预测写死：控制礼貌评分之后，后手宽度仍应预测修复率……</p><div class="it-l"><a href="/students/hu-zhiying/post-hand-slot/">读原文</a></div></div>
+<div class="item" data-k="异时共层：此刻说话的，是你哪一层的语言 一块化石组合可以由相隔很久的个体叠合而成；同样的外部驱动可以对应几种不同的稳定天气型；新制度常常不是把旧制度清零而是压在它上面。三家一起打掉一条几乎从不被说出口的前提：一个人的语言系统在此刻是一个同步的当前状态。真跑用 COHA 情态动词做预注册式回溯。加固补切Hopper 语法化五原则里的层叠——名字与机制双重撞车的那一位——与表观时间假说。 论文 · 语感频道"><div class="it-hd"><span class="r-n" title="学员专栏编号">73</span><a class="it-t" href="/students/hu-zhiying/heterochronic-layering/">异时共层：此刻说话的，是你哪一层的语言</a><span class="it-m">论文 · 语感频道</span></div><p class="it-d">一块化石组合可以由相隔很久的个体叠合而成；同样的外部驱动可以对应几种不同的稳定天气型；新制度常常不是把旧制度清零而是压在它上面。三家一起打掉一条几乎从不被说出口的前提：一个人的语言系统在此刻是……</p><div class="it-l"><a href="/students/hu-zhiying/heterochronic-layering/">读原文</a></div></div>
+<div class="item" data-k="承变余裕：还能变多少，才是能力 强度不等于韧性，很硬的可能恰好更脆；当前稳定不等于整个飞行包线内都有控制权威；零闲置看起来最高效，却最不耐冲击。三家共同撤掉的假定是「正常工况足以代表能力」。真跑用 CoLA 1.1 加载 2%–20% 的字符遮蔽，准确率并不单调，这处不利结果照实写进正文。加固补切简并性与认知储备，并给出「剖面各向异性」这条可判决点。 论文 · 语感频道"><div class="it-hd"><span class="r-n" title="学员专栏编号">72</span><a class="it-t" href="/students/hu-zhiying/deformation-reserve/">承变余裕：还能变多少，才是能力</a><span class="it-m">论文 · 语感频道</span></div><p class="it-d">强度不等于韧性，很硬的可能恰好更脆；当前稳定不等于整个飞行包线内都有控制权威；零闲置看起来最高效，却最不耐冲击。三家共同撤掉的假定是「正常工况足以代表能力」。</p><div class="it-l"><a href="/students/hu-zhiying/deformation-reserve/">读原文</a></div></div>
+<div class="item" data-k="关系落类：一句话为什么会在不同关系中落成不同的东西 同一句「你可真行」，在朋友之间是赞叹，换个人就是讽刺——词没换、语法没变，它被算成什么却变了。三家共同推翻「言语类别在说出口的一刻已经完成」。真跑用斯坦福礼貌语料：同一个 please 位于句首时平均礼貌分从 0.49 反转为 −0.30，跨域迁移后准确率由 83.79% 降至 67.53%；作者据此主动缩小理论范围。加固补切索引秩序与回应动员。 论文 · 语感频道"><div class="it-hd"><span class="r-n" title="学员专栏编号">71</span><a class="it-t" href="/students/hu-zhiying/relational-landing/">关系落类：一句话为什么会在不同关系中落成不同的东西</a><span class="it-m">论文 · 语感频道</span></div><p class="it-d">同一句「你可真行」，在朋友之间是赞叹，换个人就是讽刺——词没换、语法没变，它被算成什么却变了。三家共同推翻「言语类别在说出口的一刻已经完成」。真跑用斯坦福礼貌语料：同一个please位于句首时……</p><div class="it-l"><a href="/students/hu-zhiying/relational-landing/">读原文</a></div></div>
+<div class="item" data-k="共适归航：语言不是不偏航，而是能够在变化中归航 实际航行不可能压在一条数学细线上：航海者从已知点推算船位，再用新观测修正，横向偏差不是错误而是下一次操舵的输入。三家共同推翻的是「语言存在一个预先固定的正确目标」。真跑重新清点 JFLEG——747 句每句 4 个人工改写，92.37% 的句子有两个以上不同目标、50.07% 四个参考全不相同；作者同时承认无上下文的书面纠错测不到真正的共适。加固补切稳态应变与必要多样性定律。 论文 · 语感频道"><div class="it-hd"><span class="r-n" title="学员专栏编号">70</span><a class="it-t" href="/students/hu-zhiying/coadaptive-homing/">共适归航：语言不是不偏航，而是能够在变化中归航</a><span class="it-m">论文 · 语感频道</span></div><p class="it-d">实际航行不可能压在一条数学细线上：航海者从已知点推算船位，再用新观测修正，横向偏差不是错误而是下一次操舵的输入。三家共同推翻的是「语言存在一个预先固定的正确目标」。</p><div class="it-l"><a href="/students/hu-zhiying/coadaptive-homing/">读原文</a></div></div>
+<div class="item" data-k="语法境阈体：环境从哪里开始有改判权，又从哪里失去 同一个句子，远离判定边界时环境改不动它；只在一条有界的带里，环境才拿得到改判权，而这条带的宽度可以被测出来。真跑用 500 句公开评分数据：总体翻面率 28.0% 过了事前门槛，但未经往返翻译的原始英语句只有 7.0% 没过——作者据此撤回「语法普遍依赖环境」的强主张，把理论收紧到边界区域。 语法·境阈"><div class="it-hd"><span class="r-n" title="学员专栏编号">67</span><a class="it-t" href="/students/hu-zhiying/context-threshold/">语法境阈体：环境从哪里开始有改判权，又从哪里失去</a><span class="it-m">语法·境阈</span></div><p class="it-d">同一个句子，远离判定边界时环境改不动它；只在一条有界的带里，环境才拿得到改判权，而这条带的宽度可以被测出来。真跑用500句公开评分数据：总体翻面率28.0%过了事前门槛，但未经往返翻译的原始英……</p><div class="it-l"><a href="/students/hu-zhiying/context-threshold/">读原文</a></div></div>
+<div class="item" data-k="语法先证体：规则尚未成立时，证据已经先到了 一组仍被判错的语言事实，凭什么已经取得了要求修改规则的资格？不是因为它有系统——中介语可以极稳定却永不改变任何语法描述——而是因为它真的逼着规则改过一次，并在版本记录上留了痕。真跑过了复现门槛，但语料缺「是否触发复核」这个字段，只支持第一层。 语法·证据资格"><div class="it-hd"><span class="r-n" title="学员专栏编号">66</span><a class="it-t" href="/students/hu-zhiying/evidence-before-rule/">语法先证体：规则尚未成立时，证据已经先到了</a><span class="it-m">语法·证据资格</span></div><p class="it-d">一组仍被判错的语言事实，凭什么已经取得了要求修改规则的资格？不是因为它有系统——中介语可以极稳定却永不改变任何语法描述——而是因为它真的逼着规则改过一次，并在版本记录上留了痕。</p><div class="it-l"><a href="/students/hu-zhiying/evidence-before-rule/">读原文</a></div></div>
+<div class="item" data-k="语法退役体：一条规则怎样好好地死去 语法研究几乎只问规则怎样形成。一条规则退出时留下四本账，最难结的是遗债账：条文删了，它造出来的解释义务还在，无人认领。真跑查 GUM 里的 shall，结果与作者的先验假说方向相反，据此撤回「退役＝语域避难」，改写为多去向拆分结算。 语法·退役"><div class="it-hd"><span class="r-n" title="学员专栏编号">65</span><a class="it-t" href="/students/hu-zhiying/grammar-retirement/">语法退役体：一条规则怎样好好地死去</a><span class="it-m">语法·退役</span></div><p class="it-d">语法研究几乎只问规则怎样形成。一条规则退出时留下四本账，最难结的是遗债账：条文删了，它造出来的解释义务还在，无人认领。真跑查GUM里的shall，结果与作者的先验假说方向相反，据此撤回「退役＝……</p><div class="it-l"><a href="/students/hu-zhiying/grammar-retirement/">读原文</a></div></div>
+<div class="item" data-k="语法载差体：语法不是守住形式，而是让差异找到新的载体 同一条必须保持可辨的关系差异，原来由哪个形式承担，后来由哪个形式接手？核心读数是首换载点。真跑在七个日耳曼语树库上得到 Spearman ρ=0.000、p=1.000，简单静态补偿假设完全不被支持，作者据此把成立条件收窄为四项联合识别。 语法·承载权"><div class="it-hd"><span class="r-n" title="学员专栏编号">64</span><a class="it-t" href="/students/hu-zhiying/carrier-handover/">语法载差体：语法不是守住形式，而是让差异找到新的载体</a><span class="it-m">语法·承载权</span></div><p class="it-d">同一条必须保持可辨的关系差异，原来由哪个形式承担，后来由哪个形式接手？核心读数是首换载点。真跑在七个日耳曼语树库上得到Spearmanρ=0.000、p=1.000，简单静态补偿假设完全不被支……</p><div class="it-l"><a href="/students/hu-zhiying/carrier-handover/">读原文</a></div></div>
+<div class="item" data-k="算法闭环与生物代价：AI 时代幼少儿英语学习的神经语言学诊断 一批在 AI 评分里近乎满分的孩子，换一本新绘本就发音僵硬、怎么纠都改不过来。既有解释只会说“真人输入不够”或“算法茧房”，却都答不出最刺眼的一点：为什么损害在被制造的同时，恰好被同一个评分系统盖章为“健康”？ 神经语言学与早期教育"><div class="it-hd"><span class="r-n" title="学员专栏编号">03</span><a class="it-t" href="/students/hu-zhiying/algorithmic-entrenchment/">算法闭环与生物代价：AI 时代幼少儿英语学习的神经语言学诊断</a><span class="it-m">神经语言学与早期教育</span></div><p class="it-d">一批在AI评分里近乎满分的孩子，换一本新绘本就发音僵硬、怎么纠都改不过来。既有解释只会说“真人输入不够”或“算法茧房”，却都答不出最刺眼的一点：为什么损害在被制造的同时，恰好被同一个评分系统盖……</p><div class="it-l"><a href="/students/hu-zhiying/algorithmic-entrenchment/">读原文</a></div></div>
+<div class="item" data-k="操作性收编：继承不可继承者的智识代价——基于皮尔斯遗产的跨学科分析 为何每一次严肃地“完成皮尔斯”，都在使其遗产更清晰的同时使继承者自己提出新方向的能力更弱？本文以皮尔斯十万页手稿为极端案例命名“操作性收编”，配以晚清自强、罗马法继受、Google X、免疫耐受、二语石化五案例同构…… 思想史 · 概念接收"><div class="it-hd"><span class="r-n" title="学员专栏编号">15</span><a class="it-t" href="/students/hu-zhiying/operational-enclosure/">操作性收编：继承不可继承者的智识代价——基于皮尔斯遗产的跨学科分析</a><span class="it-m">思想史 · 概念接收</span></div><p class="it-d">为何每一次严肃地“完成皮尔斯”，都在使其遗产更清晰的同时使继承者自己提出新方向的能力更弱？本文以皮尔斯十万页手稿为极端案例命名“操作性收编”，配以晚清自强、罗马法继受、GoogleX、免疫耐受……</p><div class="it-l"><a href="/students/hu-zhiying/operational-enclosure/">读原文</a></div></div>
+<div class="item" data-k="庇护所即牢笼：语言石化现象的制度性生产机制研究 石化不是个体学习失败，而是刚性评价制度与理性学习者共谋生产的「认知内卷化」。与测试反拨效应、表层／深层学习取向正面分歧：三者预设策略随激励结构改变而改变，本文主张策略在长期重复后脱离激励结构独立存续——庇护所的墙在住…… 应用语言学 · 制度分析"><div class="it-hd"><span class="r-n" title="学员专栏编号">07</span><a class="it-t" href="/students/hu-zhiying/shelter-as-cage/">庇护所即牢笼：语言石化现象的制度性生产机制研究</a><span class="it-m">应用语言学 · 制度分析</span></div><p class="it-d">石化不是个体学习失败，而是刚性评价制度与理性学习者共谋生产的「认知内卷化」。与测试反拨效应、表层／深层学习取向正面分歧：三者预设策略随激励结构改变而改变，本文主张策略在长期重复后脱离激励结构独……</p><div class="it-l"><a href="/students/hu-zhiying/shelter-as-cage/">读原文</a></div></div>
+</section>
+<section id="books" data-group="books" style="--accent:#A63A2B"><div class="col-h"><span class="no">贰</span><h2>账册 · 四部专著</h2><span class="ct">4 篇</span></div><p class="col-d">四部，每部九章、二十万字上下。它们不是论文的加长版，是把一个判断放进九个互不重复的领域反复问，看它在哪一处开始承受不住。《语言的智慧》问的是一句话关上之后还剩什么；《一花一世界》问一个局部凭什么算一个世界；《知行合一》问交出去的东西还认不认得出；《记到谁的账上》问一次答对该记在谁名下。</p>
+<div class="item" data-k="记到谁的账上：语言习得的九本账（专著第 77 号） 一个学生答对了一道题，可是没有人问过：这一次答对该记在谁的账上？我们的测量把一次成功记为 1，而 1 的内部不再有结构。九章补上九个户头——承载、路径、配对、单位、同一性、空缺、时点、层级、范围，各配一个可判错的读数与一条会让自己被撤回的条件。并排后出现三件事：九种记错无一例外都会让传统指标上升；九个读数的分母没有一个是「人」；九章从九个不重叠的书架出发。八次真跑，八次产出对本书不利的结果并当场删条款。第十三章事先承认哪一个理论家族最可能整体吞掉本书。259 页，约 22.6 万汉字，文献 205 条，ISBN 979-8-90690-010-4。 专著 · 一部抵十篇"><div class="it-hd"><span class="r-n" title="学员专栏编号">76</span><a class="it-t" href="/students/hu-zhiying/the-ledger-of-acquisition/">记到谁的账上：语言习得的九本账（专著第 77 号）</a><span class="it-m">专著 · 一部抵十篇</span></div><p class="it-d">一个学生答对了一道题，可是没有人问过：这一次答对该记在谁的账上？我们的测量把一次成功记为1，而1的内部不再有结构。九章补上九个户头——承载、路径、配对、单位、同一性、空缺、时点、层级、范围，各……</p><div class="it-l"><a href="/students/hu-zhiying/the-ledger-of-acquisition/">读原文</a></div></div>
+<div class="item" data-k="知行合一：交出去之后，还认不认得出是同一个（专著第 71 号） 「他知道，但没有做到」——这句话把合一理解成一件关于距离的事，却没有办法评价一次没有出错的执行。本书换一个问法：这件事结束之后，有没有一样东西被交给了下一处，而在那里它还能被指认为同一个？九章给出九个答案，各配一个可编码的读数与一个能杀死自己的实验。第四编自拆台：九个读数里七个其实是同一种量，为此写死一条会让全书塌成三章的合并规则。第十四章与王阳明、朱熹、湛若水、颜元、王夫之、杜威、赖尔、马克思及一位中学教师对话，末节逐场结账。285 页，约 21.0 万汉字，文献 168 条。 专著 · 一部抵十篇"><div class="it-hd"><span class="r-n" title="学员专栏编号">75</span><a class="it-t" href="/students/hu-zhiying/unity-of-knowing-and-acting/">知行合一：交出去之后，还认不认得出是同一个（专著第 71 号）</a><span class="it-m">专著 · 一部抵十篇</span></div><p class="it-d">「他知道，但没有做到」——这句话把合一理解成一件关于距离的事，却没有办法评价一次没有出错的执行。本书换一个问法：这件事结束之后，有没有一样东西被交给了下一处，而在那里它还能被指认为同一个？</p><div class="it-l"><a href="/students/hu-zhiying/unity-of-knowing-and-acting/">读原文</a></div></div>
+<div class="item" data-k="语言的智慧：一句话关上之后（专著第 62 号） 语言最危险的形态不是错误，而是不可修订的成功——那种准确、统一、高效，当场人人听懂并照做，之后什么问题也没有出现的语言。中心判断：一句话的智慧，不在它说得多对，而在它关上之后还留不留得住回来的路。九章各锁定三门互不相容的学科。254 页，约 18.2 万汉字，文献 170 条。 专著 · 一部抵十篇"><div class="it-hd"><span class="r-n" title="学员专栏编号">69</span><a class="it-t" href="/students/hu-zhiying/wisdom-of-language/">语言的智慧：一句话关上之后（专著第 62 号）</a><span class="it-m">专著 · 一部抵十篇</span></div><p class="it-d">语言最危险的形态不是错误，而是不可修订的成功——那种准确、统一、高效，当场人人听懂并照做，之后什么问题也没有出现的语言。中心判断：一句话的智慧，不在它说得多对，而在它关上之后还留不留得住回来的……</p><div class="it-l"><a href="/students/hu-zhiying/wisdom-of-language/">读原文</a></div></div>
+<div class="item" data-k="一花一世界：一个局部凭什么成为一个世界（专著第 60 号） 把一句不可能失败的话改写成一个可以回答「没有」的问题：由这朵花引起的变化，有没有回到这朵花身上，改变它下一次被看见的方式？九章用二十七门互不重复的学问反复问同一句话，得到九个可结算的读数。293 页，约 21.9 万汉字，文献 145 条。 专著 · 一部抵十篇"><div class="it-hd"><span class="r-n" title="学员专栏编号">68</span><a class="it-t" href="/students/hu-zhiying/one-flower-one-world/">一花一世界：一个局部凭什么成为一个世界（专著第 60 号）</a><span class="it-m">专著 · 一部抵十篇</span></div><p class="it-d">把一句不可能失败的话改写成一个可以回答「没有」的问题：由这朵花引起的变化，有没有回到这朵花身上，改变它下一次被看见的方式？九章用二十七门互不重复的学问反复问同一句话，得到九个可结算的读数。</p><div class="it-l"><a href="/students/hu-zhiying/one-flower-one-world/">读原文</a></div></div>
+</section>
+<section id="edu" data-group="edu" style="--accent:#B0603A"><div class="col-h"><span class="no">叁</span><h2>教育与评价</h2><span class="ct">9 篇</span></div><p class="col-d">九篇。这一组最狠的一句写在《论教育的不可为》里：凡担保成功的，那件事就已经不再是教育。其余几篇从不同侧面逼同一件事——评价怎样把「我愿」磨平（《选择的热寂》），实时反馈怎样在提高成绩的同时拿走建造权（《核替》），以及守护论撤退到「我知道你有一个真实的自己」之后，为什么还得再撤一层（《悬而未决的守护》）。</p>
+<div class="item" data-k="论教育的不可为：教育行动为何在本体论上被禁止以其所意图的方式抵达 不是偶尔失效——凡担保成功的，那件事就已经不再是教育。正面迎击卢曼与舍尔斯基的「教育的技术缺陷」：他们把问题定位在手段（缺可靠因果技术，原则上可随技术改善而缩小），本文定位在教育行动的自我定义。判据＝技术提升后偏差的收窄幅度，应与该实践是否仍被从业者承认为教育呈负相关。 教育不可替代性"><div class="it-hd"><span class="r-n" title="学员专栏编号">58</span><a class="it-t" href="/students/hu-zhiying/pedagogical-unability/">论教育的不可为：教育行动为何在本体论上被禁止以其所意图的方式抵达</a><span class="it-m">教育不可替代性</span></div><p class="it-d">不是偶尔失效——凡担保成功的，那件事就已经不再是教育。正面迎击卢曼与舍尔斯基的「教育的技术缺陷」：他们把问题定位在手段（缺可靠因果技术，原则上可随技术改善而缩小），本文定位在教育行动的自我定义……</p><div class="it-l"><a href="/students/hu-zhiying/pedagogical-unability/">读原文</a></div></div>
+<div class="item" data-k="悬而未决的守护：教育不可替代性的发生学重释 守护论从塑造论那里撤退了，却只撤到我知道你有一个真实的自己，没撤到我不知道你会成为什么。本文撤销这最后一层知道。补上了本命题的正主——朗西埃的《无知的教师》，并给出方向相反的裁决点：持续追问本身是否即构成对悬空的填补。本文由同族两稿合并而成，另有一稿因撤销的先验逐字相同而归档。 教育不可替代性"><div class="it-hd"><span class="r-n" title="学员专栏编号">57</span><a class="it-t" href="/students/hu-zhiying/suspensive-indetermination/">悬而未决的守护：教育不可替代性的发生学重释</a><span class="it-m">教育不可替代性</span></div><p class="it-d">守护论从塑造论那里撤退了，却只撤到&quot;我知道你有一个真实的自己&quot;，没撤到&quot;我不知道你会成为什么&quot;。本文撤销这最后一层知道。补上了本命题的正主——朗西埃的《无知的教师》，并给出方向相反的裁决点：持……</p><div class="it-l"><a href="/students/hu-zhiying/suspensive-indetermination/">读原文</a></div></div>
+<div class="item" data-k="裂隙中的教育：一项关于认知发生条件的重构研究 无论是传统的知识传授模式，还是批判它的、强调守护与放手的教育理念，都共同预设了一个从未被撼动的承诺：好的教育者是一个有能力识别、守护并促发学习者认知机能的能动者。本文论证这一“能动者预设”恰恰是该领域最深的先验，它遮蔽了一个更悖谬的现场——在教育者不合时宜的介入所造成的微小缺口中，学习者的自主性被逼着以更尖锐、更不可逆的方式迸发出来。核心是“认知主权夺回”：一种在他者侵入后以关系性重演重新确立“我是认知行为的主人”的事件。 教育哲学与认知主权"><div class="it-hd"><span class="r-n" title="学员专栏编号">42</span><a class="it-t" href="/students/hu-zhiying/pedagogical-fissure/">裂隙中的教育：一项关于认知发生条件的重构研究</a><span class="it-m">教育哲学与认知主权</span></div><p class="it-d">无论是传统的知识传授模式，还是批判它的、强调守护与放手的教育理念，都共同预设了一个从未被撼动的承诺：好的教育者是一个有能力识别、守护并促发学习者认知机能的能动者。</p><div class="it-l"><a href="/students/hu-zhiying/pedagogical-fissure/">读原文</a></div></div>
+<div class="item" data-k="制度敏感区：被诊断的痛苦如何被制度浇筑成形 痛苦必须被塑造成某个形状才能领到资格。与哈金的循环效应分离。 评价与制度"><div class="it-hd"><span class="r-n" title="学员专栏编号">54</span><a class="it-t" href="/students/hu-zhiying/institutional-sensitive-zone/">制度敏感区：被诊断的痛苦如何被制度浇筑成形</a><span class="it-m">评价与制度</span></div><p class="it-d">痛苦必须被塑造成某个形状才能领到资格。与哈金的循环效应分离。</p><div class="it-l"><a href="/students/hu-zhiying/institutional-sensitive-zone/">读原文</a></div></div>
+<div class="item" data-k="核替：论实时反馈如何褫夺成就的建造权 损害的不是动机是建造权。与削弱效应分离，与心流理论的即时反馈条件正面冲突。 评价与制度"><div class="it-hd"><span class="r-n" title="学员专栏编号">51</span><a class="it-t" href="/students/hu-zhiying/core-substitution/">核替：论实时反馈如何褫夺成就的建造权</a><span class="it-m">评价与制度</span></div><p class="it-d">损害的不是动机是建造权。与削弱效应分离，与心流理论的即时反馈条件正面冲突。</p><div class="it-l"><a href="/students/hu-zhiying/core-substitution/">读原文</a></div></div>
+<div class="item" data-k="选择的热寂：优绩主义如何消解了“我愿”的发生结构 关于优绩主义与自主性危机，既有论述普遍采用“侵蚀—剩余”范式：个体先天拥有一个渴望自主、等待被释放的真我，外部制度层层渗入压缩其表达空间。本文对这一范式的先验前提做了回溯，指出它恰好遮蔽了危机最深的那层结构——问题不在于外部压力侵蚀了一个本已存在的意愿，而在于让意愿得以第一次发生的那种“选择的困境”，正被最优化的逻辑系统性地抹平。 自主性理论与教育社会学"><div class="it-hd"><span class="r-n" title="学员专栏编号">22</span><a class="it-t" href="/students/hu-zhiying/heat-death-of-choice/">选择的热寂：优绩主义如何消解了“我愿”的发生结构</a><span class="it-m">自主性理论与教育社会学</span></div><p class="it-d">关于优绩主义与自主性危机，既有论述普遍采用“侵蚀—剩余”范式：个体先天拥有一个渴望自主、等待被释放的真我，外部制度层层渗入压缩其表达空间。本文对这一范式的先验前提做了回溯，指出它恰好遮蔽了危机……</p><div class="it-l"><a href="/students/hu-zhiying/heat-death-of-choice/">读原文</a></div></div>
+<div class="item" data-k="评价依附性耗竭：AI 时代多子女家庭教育困境的系统性诊断 父母投入了前所未有的“陪伴”“共情”“鼓励”，孩子却在真实的道德困境前冷漠退缩。本文提出“评价依附性耗竭”：家庭的保护性情感劳动，其内容被评价逻辑系统性地“让渡”给认知竞争，从而抹平了手足之间那些本可训练伦理能力的摩…… 家庭教育与代际再生产"><div class="it-hd"><span class="r-n" title="学员专栏编号">02</span><a class="it-t" href="/students/hu-zhiying/evaluation-dependent-depletion/">评价依附性耗竭：AI 时代多子女家庭教育困境的系统性诊断</a><span class="it-m">家庭教育与代际再生产</span></div><p class="it-d">父母投入了前所未有的“陪伴”“共情”“鼓励”，孩子却在真实的道德困境前冷漠退缩。本文提出“评价依附性耗竭”：家庭的保护性情感劳动，其内容被评价逻辑系统性地“让渡”给认知竞争，从而抹平了手足之间……</p><div class="it-l"><a href="/students/hu-zhiying/evaluation-dependent-depletion/">读原文</a></div></div>
+<div class="item" data-k="活死态：一个技艺体系如何在成功中走向僵死 一个技艺体系在巅峰状态下，其内部的活性能量被自身成功所建构的评价结构悄悄驯化，直到丧失从内部敲碎自身边界的能力，进入一种以持续运动来维持的精致僵死。本文以日本汉方古方派三代人的师徒反馈记录为解剖案例，追踪“精熟骨架”如何从帮人不迷路的工具，升格为不再需要外部裁决的自我循环体系；并借围棋在AlphaGo之后的剧烈重组，反推出活死态的阻断条件。 技艺传承与评价结构"><div class="it-hd"><span class="r-n" title="学员专栏编号">21</span><a class="it-t" href="/students/hu-zhiying/living-death-state/">活死态：一个技艺体系如何在成功中走向僵死</a><span class="it-m">技艺传承与评价结构</span></div><p class="it-d">一个技艺体系在巅峰状态下，其内部的活性能量被自身成功所建构的评价结构悄悄驯化，直到丧失从内部敲碎自身边界的能力，进入一种以持续运动来维持的精致僵死。</p><div class="it-l"><a href="/students/hu-zhiying/living-death-state/">读原文</a></div></div>
+<div class="item" data-k="比较的假肢：当“我比”变成“比我” 比较被尊为理性的原型，却在当代越来越让人疲惫。学界通常归因于比较的过度或方式的偏差。本文提出一个更根本的判断：数字排名与标准化评价的要害不在于外部权力缴走了认知者的追问权——那个诊断仍预设了一个天然拥有追问能力、等待被解放的主体——而在于它用一套预制且自我闭环的假肢，从内部替代了比较动作的发动回路。形式还在，比较者却不在了。 比较认知与评价技术"><div class="it-hd"><span class="r-n" title="学员专栏编号">20</span><a class="it-t" href="/students/hu-zhiying/comparative-prosthesis/">比较的假肢：当“我比”变成“比我”</a><span class="it-m">比较认知与评价技术</span></div><p class="it-d">比较被尊为理性的原型，却在当代越来越让人疲惫。学界通常归因于比较的过度或方式的偏差。本文提出一个更根本的判断：数字排名与标准化评价的要害不在于外部权力缴走了认知者的追问权——那个诊断仍预设了一……</p><div class="it-l"><a href="/students/hu-zhiying/comparative-prosthesis/">读原文</a></div></div>
+</section>
+<section id="neuro" data-group="neuro" style="--accent:#3F7A63"><div class="col-h"><span class="no">肆</span><h2>神经发展与身体</h2><span class="ct">10 篇</span></div><p class="col-d">十篇。ADHD 与自闭症在这里不被当成两种故障，而被当成同一份地基缺失上长出来的两种住法（《异时性栖居》）；回避不是策略，是跨认知风格交流时必须实时支付的换算开销累积到阈值后的结算（《认知宪法与通算危机》）。另有三篇转向身体：量化健康怎样让身体感知不再被调用，以及撤掉外部代偿之后，生理时序不是显露出来的，是被重新结算出来的。</p>
+<div class="item" data-k="锻压型自我：ADHD 困境的一种发生学解释 不是硬件缺陷，也不是个体与标准化环境的失配：反复的路径挫败在被挡回的同一瞬间，于自我内部完成一次不可逆的折叠。与布迪厄的惯习分离在方向（适配 vs 折返），与复杂性创伤分离在事件（可指认 vs 无事件的日常反复），与习得性无助分离在层位（信念 vs 动作）。判据＝在近乎不可能失败的任务上，启动延迟是否仍在。 ADHD 与自闭症"><div class="it-hd"><span class="r-n" title="学员专栏编号">62</span><a class="it-t" href="/students/hu-zhiying/forged-self/">锻压型自我：ADHD 困境的一种发生学解释</a><span class="it-m">ADHD 与自闭症</span></div><p class="it-d">不是硬件缺陷，也不是个体与标准化环境的失配：反复的路径挫败在被挡回的同一瞬间，于自我内部完成一次不可逆的折叠。与布迪厄的惯习分离在方向（适配vs折返），与复杂性创伤分离在事件（可指认vs无事件……</p><div class="it-l"><a href="/students/hu-zhiying/forged-self/">读原文</a></div></div>
+<div class="item" data-k="制度的神经化：当大脑被要求成为它自己的环境 缺陷说、神经多样性叙事、代偿理论与差别易感性在批判之路上停在同一个地方——都把个体与环境当作两个可分离的实体，再在二者之间分配因果。本文撤销可分离性本身。与延展心智分离在「环境能不能被拆下来」，与哈金的生物回路分离在「回路要不要经过自我理解」；最硬的自我证伪口＝从未接触任何分类语言者身上是否照常出现同型痕迹。 ADHD 与自闭症"><div class="it-hd"><span class="r-n" title="学员专栏编号">60</span><a class="it-t" href="/students/hu-zhiying/neuralisation-of-institution/">制度的神经化：当大脑被要求成为它自己的环境</a><span class="it-m">ADHD 与自闭症</span></div><p class="it-d">缺陷说、神经多样性叙事、代偿理论与差别易感性在批判之路上停在同一个地方——都把个体与环境当作两个可分离的实体，再在二者之间分配因果。本文撤销可分离性本身。</p><div class="it-l"><a href="/students/hu-zhiying/neuralisation-of-institution/">读原文</a></div></div>
+<div class="item" data-k="从守护到制作：恐惧话语的底层先验及其撤销后结出的新辨别维度 一种不来源于任何真实威胁、而完全从精神医学命名、进化心理学叙事与自评量化三重话语的内部运行中被生产出来的恐惧。与《悲伤的丧失》分离在机制（误分类 vs 生产）：在从未接触命名与量表的人群中，误分类路径预测该类痛苦照常存在，本文预测发生率趋零。本文自带「本文禁止什么」一节。 精神医学"><div class="it-hd"><span class="r-n" title="学员专栏编号">59</span><a class="it-t" href="/students/hu-zhiying/discursive-fear/">从守护到制作：恐惧话语的底层先验及其撤销后结出的新辨别维度</a><span class="it-m">精神医学</span></div><p class="it-d">一种不来源于任何真实威胁、而完全从精神医学命名、进化心理学叙事与自评量化三重话语的内部运行中被生产出来的恐惧。与《悲伤的丧失》分离在机制（误分类vs生产）：在从未接触命名与量表的人群中，误分类……</p><div class="it-l"><a href="/students/hu-zhiying/discursive-fear/">读原文</a></div></div>
+<div class="item" data-k="搁浅：ADHD 的另一种发生学 意图完整、方案清楚、时间充裕，行动仍然不发生。卡点不在停不下来而在启动。 神经发展"><div class="it-hd"><span class="r-n" title="学员专栏编号">50</span><a class="it-t" href="/students/hu-zhiying/stranding/">搁浅：ADHD 的另一种发生学</a><span class="it-m">神经发展</span></div><p class="it-d">意图完整、方案清楚、时间充裕，行动仍然不发生。卡点不在停不下来而在启动。</p><div class="it-l"><a href="/students/hu-zhiying/stranding/">读原文</a></div></div>
+<div class="item" data-k="异时性栖居：ADHD与ASD作为同一份地基缺失的两种生存结算 不是两种病，是同一个缺口上长出来的两种住法。正面处理 Happé 与 Frith 的可分解三联征。 神经发展"><div class="it-hd"><span class="r-n" title="学员专栏编号">48</span><a class="it-t" href="/students/hu-zhiying/heterochronic-dwelling/">异时性栖居：ADHD与ASD作为同一份地基缺失的两种生存结算</a><span class="it-m">神经发展</span></div><p class="it-d">不是两种病，是同一个缺口上长出来的两种住法。正面处理Happé与Frith的可分解三联征。</p><div class="it-l"><a href="/students/hu-zhiying/heterochronic-dwelling/">读原文</a></div></div>
+<div class="item" data-k="认知宪法与通算危机：为什么自闭症的社交回避不是策略选择，而是发生学必然 回避不是选出来的，是跨认知风格交流时必须实时支付的换算开销累积到阈值后的结算。正面迎击 Milton 的双重共情问题。 神经发展"><div class="it-hd"><span class="r-n" title="学员专栏编号">46</span><a class="it-t" href="/students/hu-zhiying/cognitive-constitution/">认知宪法与通算危机：为什么自闭症的社交回避不是策略选择，而是发生学必然</a><span class="it-m">神经发展</span></div><p class="it-d">回避不是选出来的，是跨认知风格交流时必须实时支付的换算开销累积到阈值后的结算。正面迎击Milton的双重共情问题。</p><div class="it-l"><a href="/students/hu-zhiying/cognitive-constitution/">读原文</a></div></div>
+<div class="item" data-k="生存，而非故障：ADHD与自闭症作为内源唤起供给失败的表型连续体 被当作故障来治理的那些行为，可能正是一套供给失败之后仍在运转的生存方案。与 Zentall 的最优刺激理论、Sergeant 的状态调节说正面分离。 神经发展"><div class="it-hd"><span class="r-n" title="学员专栏编号">45</span><a class="it-t" href="/students/hu-zhiying/survival-not-malfunction/">生存，而非故障：ADHD与自闭症作为内源唤起供给失败的表型连续体</a><span class="it-m">神经发展</span></div><p class="it-d">被当作故障来治理的那些行为，可能正是一套供给失败之后仍在运转的生存方案。与Zentall的最优刺激理论、Sergeant的状态调节说正面分离。</p><div class="it-l"><a href="/students/hu-zhiying/survival-not-malfunction/">读原文</a></div></div>
+<div class="item" data-k="意会荒漠化：量化健康时代下身体感知生态的殖民 不是它说不出来，是它不再被调用。补上了意会一词的来处（波兰尼）。 身体与健康"><div class="it-hd"><span class="r-n" title="学员专栏编号">52</span><a class="it-t" href="/students/hu-zhiying/tacit-desertification/">意会荒漠化：量化健康时代下身体感知生态的殖民</a><span class="it-m">身体与健康</span></div><p class="it-d">不是它说不出来，是它不再被调用。补上了&quot;意会&quot;一词的来处（波兰尼）。</p><div class="it-l"><a href="/students/hu-zhiying/tacit-desertification/">读原文</a></div></div>
+<div class="item" data-k="初次对表：健康作为撤除外部代偿后在临界间歇中重新发生生理时序的能力 撤掉代偿之后，时序不是显露出来的，是被重新结算出来的。与时间生物学的自由运行范式分离。 身体与健康"><div class="it-hd"><span class="r-n" title="学员专栏编号">47</span><a class="it-t" href="/students/hu-zhiying/first-calibration/">初次对表：健康作为撤除外部代偿后在临界间歇中重新发生生理时序的能力</a><span class="it-m">身体与健康</span></div><p class="it-d">撤掉代偿之后，时序不是显露出来的，是被重新结算出来的。与时间生物学的自由运行范式分离。</p><div class="it-l"><a href="/students/hu-zhiying/first-calibration/">读原文</a></div></div>
+<div class="item" data-k="解绑的悖论：身体工作中操作者续期的自指结构 越精细地觉察身体的紧张，越感到有个“我”在觉察；越努力放下控制，那个“我”越把放下变成新的努力。本文命名“操作寄生”，正面越过 Wegner 的反讽过程，并设计一个与“注意力疲劳”方向相反的证伪（迁移层级越多→操作者…… 身体现象学 · 自指结构"><div class="it-hd"><span class="r-n" title="学员专栏编号">10</span><a class="it-t" href="/students/hu-zhiying/operational-parasitism/">解绑的悖论：身体工作中操作者续期的自指结构</a><span class="it-m">身体现象学 · 自指结构</span></div><p class="it-d">越精细地觉察身体的紧张，越感到有个“我”在觉察；越努力放下控制，那个“我”越把放下变成新的努力。本文命名“操作寄生”，正面越过Wegner的反讽过程，并设计一个与“注意力疲劳”方向相反的证伪（……</p><div class="it-l"><a href="/students/hu-zhiying/operational-parasitism/">读原文</a></div></div>
+</section>
+<section id="institution" data-group="institution" style="--accent:#8C3F52"><div class="col-h"><span class="no">伍</span><h2>制度病理与知识生产</h2><span class="ct">21 篇</span></div><p class="col-d">二十一篇，全集里最厚的一组，也是他被引用最多的那条线。它们讲的是同一件反直觉的事：一套制度往往不是在失效时崩塌，而是在最忠实地执行自身规则时走向内源性崩溃（《制度性自体免疫》）；一个范式靠主动放弃经验承诺换取内核的即时免疫，每退一次都在永久让出边疆（《边界收缩即边疆永失》）；而在资源最充裕、压力最小的顶级机构里，探究照样退化（《探究的会计化退化》）。</p>
+<div class="item" data-k="边界收缩即边疆永失：学术范式免疫性-脆弱性悖论的一个通用机制 一个理论范式如何能一边长期统治、一边悄悄走向崩塌？本文以乔姆斯基生成语言学为个案，命名“边界收缩即边疆永失”机制：主导范式靠主动放弃经验承诺来换取内核的即时免疫，而每一次退让都不可逆地把领地让给替代理论，并把再生产链…… 科学知识社会学"><div class="it-hd"><span class="r-n" title="学员专栏编号">01</span><a class="it-t" href="/students/hu-zhiying/boundary-contraction/">边界收缩即边疆永失：学术范式免疫性-脆弱性悖论的一个通用机制</a><span class="it-m">科学知识社会学</span></div><p class="it-d">一个理论范式如何能一边长期统治、一边悄悄走向崩塌？本文以乔姆斯基生成语言学为个案，命名“边界收缩即边疆永失”机制：主导范式靠主动放弃经验承诺来换取内核的即时免疫，而每一次退让都不可逆地把领地让……</p><div class="it-l"><a href="/students/hu-zhiying/boundary-contraction/">读原文</a></div></div>
+<div class="item" data-k="默认模式的能耗阈值：后工业社会中非意识性意义断裂的发生逻辑 当代技术与消费系统构成的「全覆盖」环境，并非通过压制有意义的追求，而是通过系统性地消耗个体维持非算法化生存所需的基础能量，导致意义感的非意识性断裂。这种断裂不依赖于意愿丧失，也不等同于耗竭。 社会理论"><div class="it-hd"><span class="r-n" title="学员专栏编号">04</span><a class="it-t" href="/students/hu-zhiying/default-mode-threshold/">默认模式的能耗阈值：后工业社会中非意识性意义断裂的发生逻辑</a><span class="it-m">社会理论</span></div><p class="it-d">当代技术与消费系统构成的「全覆盖」环境，并非通过压制有意义的追求，而是通过系统性地消耗个体维持非算法化生存所需的基础能量，导致意义感的非意识性断裂。这种断裂不依赖于意愿丧失，也不等同于耗竭。</p><div class="it-l"><a href="/students/hu-zhiying/default-mode-threshold/">读原文</a></div></div>
+<div class="item" data-k="自反性困境：制度变迁中「共识信托」的消耗与经济增长的停滞 一个致力于维持自身运转的社会系统，会通过制度化的成本外部化，消耗掉它赖以维系的集体行动基础。核心是一道残酷算术：系统为修复自身而提出的方案，其逻辑完备性与它被成功启动的概率，在信托耗尽的条件下呈负相关——方案越完美…… 政治经济学"><div class="it-hd"><span class="r-n" title="学员专栏编号">05</span><a class="it-t" href="/students/hu-zhiying/reflexive-impasse/">自反性困境：制度变迁中「共识信托」的消耗与经济增长的停滞</a><span class="it-m">政治经济学</span></div><p class="it-d">一个致力于维持自身运转的社会系统，会通过制度化的成本外部化，消耗掉它赖以维系的集体行动基础。核心是一道残酷算术：系统为修复自身而提出的方案，其逻辑完备性与它被成功启动的概率，在信托耗尽的条件下……</p><div class="it-l"><a href="/students/hu-zhiying/reflexive-impasse/">读原文</a></div></div>
+<div class="item" data-k="看不见的维持：论仪式体验的隐性基础设施 仪式的完整体验始终依赖一套未被明码标价的成本。与斯塔「基础设施只在故障时才可见」正面分歧：斯塔的显形由故障触发、各方同时看见，本文的显形由成本转移路线改变触发，而系统从未故障——改变的只是账单寄给了谁。 媒介与文化研究"><div class="it-hd"><span class="r-n" title="学员专栏编号">06</span><a class="it-t" href="/students/hu-zhiying/invisible-upkeep/">看不见的维持：论仪式体验的隐性基础设施</a><span class="it-m">媒介与文化研究</span></div><p class="it-d">仪式的完整体验始终依赖一套未被明码标价的成本。与斯塔「基础设施只在故障时才可见」正面分歧：斯塔的显形由故障触发、各方同时看见，本文的显形由成本转移路线改变触发，而系统从未故障——改变的只是账单……</p><div class="it-l"><a href="/students/hu-zhiying/invisible-upkeep/">读原文</a></div></div>
+<div class="item" data-k="合法性的自噬：当代文化精英评价体系崩溃的内在机制 为什么评价机构并非因能力丧失而停摆，反而在高度活跃的表象下系统性地消解了自身的裁决权威？本文提出「合法性代谢闭环」，并与阿杜特的丑闻社会学正面切割：阿杜特的公开者是外部行动者，本文的公开者就是机构自己； 文化社会学 · 制度病理"><div class="it-hd"><span class="r-n" title="学员专栏编号">08</span><a class="it-t" href="/students/hu-zhiying/legitimacy-autophagy/">合法性的自噬：当代文化精英评价体系崩溃的内在机制</a><span class="it-m">文化社会学 · 制度病理</span></div><p class="it-d">为什么评价机构并非因能力丧失而停摆，反而在高度活跃的表象下系统性地消解了自身的裁决权威？本文提出「合法性代谢闭环」，并与阿杜特的丑闻社会学正面切割：阿杜特的公开者是外部行动者，本文的公开者就是……</p><div class="it-l"><a href="/students/hu-zhiying/legitimacy-autophagy/">读原文</a></div></div>
+<div class="item" data-k="自我复制的悖论：精神实践效能衰减的内生机制 茶道在日本诸流派的制度化保存中极精确地延续，当代茶人达至的深度却普遍不及古典案例——为何培训体系更完整、效能反而退缩？本文命名“效能-磨损同源律”，配以声学、催化化学、生态学、群体遗传学、记忆神经科学五个真实同构机制…… 精神传统 · 效能衰减"><div class="it-hd"><span class="r-n" title="学员专栏编号">11</span><a class="it-t" href="/students/hu-zhiying/efficacy-attrition/">自我复制的悖论：精神实践效能衰减的内生机制</a><span class="it-m">精神传统 · 效能衰减</span></div><p class="it-d">茶道在日本诸流派的制度化保存中极精确地延续，当代茶人达至的深度却普遍不及古典案例——为何培训体系更完整、效能反而退缩？本文命名“效能-磨损同源律”，配以声学、催化化学、生态学、群体遗传学、记忆……</p><div class="it-l"><a href="/students/hu-zhiying/efficacy-attrition/">读原文</a></div></div>
+<div class="item" data-k="自我囚禁的传承：一项关于日本美学“制度化焦虑”的理论建构 覆满岁月痕迹的苔藓被换成无菌培植的新苔藓以“保护”寂，庭院却丧失了幽玄的力量。本文挑战“现代化碾压论”，命名“托管悖反”，用同现代化水平下（谷中/根津 vs 浅草）的差异证明是“制度性优化强度”而非现代化在窒息美学…… 文化遗产 · 美学存续"><div class="it-hd"><span class="r-n" title="学员专栏编号">12</span><a class="it-t" href="/students/hu-zhiying/custodial-backfire/">自我囚禁的传承：一项关于日本美学“制度化焦虑”的理论建构</a><span class="it-m">文化遗产 · 美学存续</span></div><p class="it-d">覆满岁月痕迹的苔藓被换成无菌培植的新苔藓以“保护”寂，庭院却丧失了幽玄的力量。本文挑战“现代化碾压论”，命名“托管悖反”，用同现代化水平下（谷中/根津vs浅草）的差异证明是“制度性优化强度”而……</p><div class="it-l"><a href="/students/hu-zhiying/custodial-backfire/">读原文</a></div></div>
+<div class="item" data-k="维持的悖论：一个关于文化观念操作性衰退的自噬机制模型 一个被阐释得最充分的命题，为何阐释越多其操作可及性反而越弱？本文以“知行合一”为例命名“封装性维持”，把语言遮蔽效应放大到文化传承，并设计排除“资源总量不足”的证伪方案。 文化理论 · 观念演化"><div class="it-hd"><span class="r-n" title="学员专栏编号">13</span><a class="it-t" href="/students/hu-zhiying/encapsulated-maintenance/">维持的悖论：一个关于文化观念操作性衰退的自噬机制模型</a><span class="it-m">文化理论 · 观念演化</span></div><p class="it-d">一个被阐释得最充分的命题，为何阐释越多其操作可及性反而越弱？本文以“知行合一”为例命名“封装性维持”，把语言遮蔽效应放大到文化传承，并设计排除“资源总量不足”的证伪方案。</p><div class="it-l"><a href="/students/hu-zhiying/encapsulated-maintenance/">读原文</a></div></div>
+<div class="item" data-k="稳定性借据：一项关于思想与制度何以骤然崩塌的借用性稳定理论研究 笛卡尔“我思”、雷曼兄弟、牛顿力学，为何都在功能尚存之时骤然失去“自明性”？本文命名“借用性稳定”，把稳定性拆解为向三类隐形资粮的借贷，用崩解曲线的二阶导数（S 型 vs 渐进）排除“功能过时论”。 科学哲学 · 范式崩解"><div class="it-hd"><span class="r-n" title="学员专栏编号">14</span><a class="it-t" href="/students/hu-zhiying/borrowed-stability/">稳定性借据：一项关于思想与制度何以骤然崩塌的借用性稳定理论研究</a><span class="it-m">科学哲学 · 范式崩解</span></div><p class="it-d">笛卡尔“我思”、雷曼兄弟、牛顿力学，为何都在功能尚存之时骤然失去“自明性”？本文命名“借用性稳定”，把稳定性拆解为向三类隐形资粮的借贷，用崩解曲线的二阶导数（S型vs渐进）排除“功能过时论”。</p><div class="it-l"><a href="/students/hu-zhiying/borrowed-stability/">读原文</a></div></div>
+<div class="item" data-k="探究的会计化退化：当代知识生产评价机制与认知主体性的腐蚀 在资源充裕、职位稳定、竞争压力缓和的顶级机构，为何探究退化同样显著？本文命名“探究的会计化退化”，与路径依赖、目标置换、职业倦怠、专业化系统切割，并设计排除“工作压力模型”的证伪方案与感知硬化的神经检验。 知识社会学 · 管理主义批判"><div class="it-hd"><span class="r-n" title="学员专栏编号">16</span><a class="it-t" href="/students/hu-zhiying/accountable-degeneration/">探究的会计化退化：当代知识生产评价机制与认知主体性的腐蚀</a><span class="it-m">知识社会学 · 管理主义批判</span></div><p class="it-d">在资源充裕、职位稳定、竞争压力缓和的顶级机构，为何探究退化同样显著？本文命名“探究的会计化退化”，与路径依赖、目标置换、职业倦怠、专业化系统切割，并设计排除“工作压力模型”的证伪方案与感知硬化……</p><div class="it-l"><a href="/students/hu-zhiying/accountable-degeneration/">读原文</a></div></div>
+<div class="item" data-k="制度性自体免疫：社会修复工程的结构性崩溃机制研究 为何某些旨在保护脆弱主体的修复制度，会在忠实执行自身规则的过程中走向内源性崩溃？本文把免疫学的“细胞因子风暴”结构性转译到社会系统，命名“制度性自体免疫”，并设计控制工作量的比较研究排除“资源损耗”假说。 组织社会学 · 制度崩溃"><div class="it-hd"><span class="r-n" title="学员专栏编号">17</span><a class="it-t" href="/students/hu-zhiying/institutional-autoimmunity/">制度性自体免疫：社会修复工程的结构性崩溃机制研究</a><span class="it-m">组织社会学 · 制度崩溃</span></div><p class="it-d">为何某些旨在保护脆弱主体的修复制度，会在忠实执行自身规则的过程中走向内源性崩溃？本文把免疫学的“细胞因子风暴”结构性转译到社会系统，命名“制度性自体免疫”，并设计控制工作量的比较研究排除“资源……</p><div class="it-l"><a href="/students/hu-zhiying/institutional-autoimmunity/">读原文</a></div></div>
+<div class="item" data-k="代谢基态的极性翻转：福利制度反向效果的内在机制 同一套设计精良、资源充足、形式中立的“好制度”，为何在相似的受助者身上稳定地制造“功能恢复”与“依赖增强”两种相反结果？本文命名“代谢基态的极性翻转”，把归因从制度或禀赋移到受体的转化界面，并设计准实验（控初始禀赋的…… 公共政策 · 福利悖论"><div class="it-hd"><span class="r-n" title="学员专栏编号">18</span><a class="it-t" href="/students/hu-zhiying/metabolic-polarity/">代谢基态的极性翻转：福利制度反向效果的内在机制</a><span class="it-m">公共政策 · 福利悖论</span></div><p class="it-d">同一套设计精良、资源充足、形式中立的“好制度”，为何在相似的受助者身上稳定地制造“功能恢复”与“依赖增强”两种相反结果？本文命名“代谢基态的极性翻转”，把归因从制度或禀赋移到受体的转化界面，并……</p><div class="it-l"><a href="/students/hu-zhiying/metabolic-polarity/">读原文</a></div></div>
+<div class="item" data-k="成功者的茧：论外闭型边界如何将成功转化为判断力的自我吞噬 一个在封闭边界内持续成功的人，其进行独立裁断的身体知觉，会在成功的反复强化下被不可逆地替换为一把内化了的尺子。这不是“被驯化”——他不是因为压力而服从，而是在“被量中成功、在成功中量”的循环里，身体分辨“到位”与“合格”的感觉被重新定向，以至于他不再能感受到自己失去了什么。本文以科举千年演变为脊椎，并给出一个带数值阈值的证伪设计。 制度史与判断力生成"><div class="it-hd"><span class="r-n" title="学员专栏编号">30</span><a class="it-t" href="/students/hu-zhiying/adjudicative-atrophy/">成功者的茧：论外闭型边界如何将成功转化为判断力的自我吞噬</a><span class="it-m">制度史与判断力生成</span></div><p class="it-d">一个在封闭边界内持续成功的人，其进行独立裁断的身体知觉，会在成功的反复强化下被不可逆地替换为一把内化了的尺子。这不是“被驯化”——他不是因为压力而服从，而是在“被量中成功、在成功中量”的循环里……</p><div class="it-l"><a href="/students/hu-zhiying/adjudicative-atrophy/">读原文</a></div></div>
+<div class="item" data-k="依赖清场：农耕文明“天地人合一”解体的考察 天地人合一长久以来被误解为一种可供追求的理想境界。本文的论断与此相反：合一在当代的消解不是文化价值的遗忘，而是文明在技术进步中逐层代理自身对天时、地力与血缘共同体的多重依赖，从而系统性地清空了它的发生土壤。本文命名这一过程为“依赖的反向工程”——对安全与富足的内在追求，通过技术代偿卸掉了那些此前充当合一器官的脆弱性依赖，并正面处理了新农人现象这一关键反例。 文明研究与技术代偿"><div class="it-hd"><span class="r-n" title="学员专栏编号">34</span><a class="it-t" href="/students/hu-zhiying/dependency-clearance/">依赖清场：农耕文明“天地人合一”解体的考察</a><span class="it-m">文明研究与技术代偿</span></div><p class="it-d">天地人合一长久以来被误解为一种可供追求的理想境界。本文的论断与此相反：合一在当代的消解不是文化价值的遗忘，而是文明在技术进步中逐层代理自身对天时、地力与血缘共同体的多重依赖，从而系统性地清空了……</p><div class="it-l"><a href="/students/hu-zhiying/dependency-clearance/">读原文</a></div></div>
+<div class="item" data-k="善的供养：传统饮食知识在现代厨房中的认知闭合 以阴阳五行为代表的传统饮食知识在现代厨房中的根本困境，既不是它在认识论上无效，也不是它在文化上虚构，而是一种结构性锁定：现代性为知识的“善”——赋予意义、秩序与身份认同的能力——提供了一条独立于其“真”的社会再生产链条。当一套话语的外壳之存续不再依赖其操作内核在实践中的有效性，善的供养便悄然取代了真的淬炼。这一闭合的隐蔽处恰在于：它由信仰者的真诚信奉所维系。 传统知识与现代性"><div class="it-hd"><span class="r-n" title="学员专栏编号">35</span><a class="it-t" href="/students/hu-zhiying/provisioning-of-the-good/">善的供养：传统饮食知识在现代厨房中的认知闭合</a><span class="it-m">传统知识与现代性</span></div><p class="it-d">以阴阳五行为代表的传统饮食知识在现代厨房中的根本困境，既不是它在认识论上无效，也不是它在文化上虚构，而是一种结构性锁定：现代性为知识的“善”——赋予意义、秩序与身份认同的能力——提供了一条独立……</p><div class="it-l"><a href="/students/hu-zhiying/provisioning-of-the-good/">读原文</a></div></div>
+<div class="item" data-k="濒危的感应器官：算法时代，法律比较何以保鲜？ 同样面对被告人反常的庭上表现，有的法官能把它转化为一个新的量刑争点，有的法官只用格式语言把它打发。既有辩护或求诸模式识别、或归因于道德直觉，都把比较的生命力预设在个体的卓越能力之上，无法解释在同一制度生态下精明的法官为何会系统性地停止感知。本文从两份真实判决的对照出发，逆向重建出“法感”的三个互持部件——搜索探头、建构器、悬置腔——并追踪它在考核与审级压力下被逐步耗竭的因果链条。 司法认知与制度生态"><div class="it-hd"><span class="r-n" title="学员专栏编号">36</span><a class="it-t" href="/students/hu-zhiying/juridical-sensorium/">濒危的感应器官：算法时代，法律比较何以保鲜？</a><span class="it-m">司法认知与制度生态</span></div><p class="it-d">同样面对被告人反常的庭上表现，有的法官能把它转化为一个新的量刑争点，有的法官只用格式语言把它打发。既有辩护或求诸模式识别、或归因于道德直觉，都把比较的生命力预设在个体的卓越能力之上，无法解释在……</p><div class="it-l"><a href="/students/hu-zhiying/juridical-sensorium/">读原文</a></div></div>
+<div class="item" data-k="代理僭政：比较何以戴上认知王冠 在认知负荷、制度压力与技术便利的催化下，认知的代理物——指标、名号、量化模型——从临时工具逐步篡夺认知对象自身的地位，使后续认识活动不再指向那个最初需要被认识的对象，而指向代理物本身。这不是任何单一行动者的阴谋，而是命名、道理、数字三重装置互相咬合的自我增强过程。本文以全球大学排名为贯穿案例，追踪它如何从新闻编辑室的临时创意沉降为全球高等教育治理的准宪法。 量化治理与认知体制"><div class="it-hd"><span class="r-n" title="学员专栏编号">37</span><a class="it-t" href="/students/hu-zhiying/proxy-usurpation/">代理僭政：比较何以戴上认知王冠</a><span class="it-m">量化治理与认知体制</span></div><p class="it-d">在认知负荷、制度压力与技术便利的催化下，认知的代理物——指标、名号、量化模型——从临时工具逐步篡夺认知对象自身的地位，使后续认识活动不再指向那个最初需要被认识的对象，而指向代理物本身。</p><div class="it-l"><a href="/students/hu-zhiying/proxy-usurpation/">读原文</a></div></div>
+<div class="item" data-k="熔蚀：一个关于组织可能性如何被管理绩效无声溶解的分析 医生依指南选最安全的方案，教师严格遵循统一进度，财务总监否决三年内无法证明回报的探索项目——每个决定在个体层面都无可指摘。可当日积月累的合规决策被放进同一框架，一个反直觉的问题浮现：为什么所有局部选择都正确时，组织在需要偏离既有轨道时却发现自己已无力可偏？本文命名这一过程为“熔蚀”：它不是针对坏做法的定向剔除，而是针对可能性本身的无差别溶解，由无数完全合规、尽职的管理动作所产生的制度性副反应。 组织理论与绩效制度"><div class="it-hd"><span class="r-n" title="学员专栏编号">38</span><a class="it-t" href="/students/hu-zhiying/possibility-dissolution/">熔蚀：一个关于组织可能性如何被管理绩效无声溶解的分析</a><span class="it-m">组织理论与绩效制度</span></div><p class="it-d">医生依指南选最安全的方案，教师严格遵循统一进度，财务总监否决三年内无法证明回报的探索项目——每个决定在个体层面都无可指摘。可当日积月累的合规决策被放进同一框架，一个反直觉的问题浮现：为什么所有……</p><div class="it-l"><a href="/students/hu-zhiying/possibility-dissolution/">读原文</a></div></div>
+<div class="item" data-k="审计性剥离：论创新识别如何从价值发生的完整体中切走骨 价值创造的过程是一个不可切割的连续体——试错的混乱、长期沉默的沉淀与最终的绽放共享同一根系；而对创新的识别、评估与审计必须把它切成离散的、可显现的片段。本文论证这种剥离不是识别失灵或偏差，而是识别动作本身内置的代价。更关键的是那道反身回路：组织为弥补代价而创设的守护性识别器，恰恰因自身合法性需求，把匿身于审计缝隙中的残余强行提升为必须产出成果的“被守护项目”——本文称之为“剥余锁”。 创新管理与组织理论"><div class="it-hd"><span class="r-n" title="学员专栏编号">41</span><a class="it-t" href="/students/hu-zhiying/audit-excision/">审计性剥离：论创新识别如何从价值发生的完整体中切走骨</a><span class="it-m">创新管理与组织理论</span></div><p class="it-d">价值创造的过程是一个不可切割的连续体——试错的混乱、长期沉默的沉淀与最终的绽放共享同一根系；而对创新的识别、评估与审计必须把它切成离散的、可显现的片段。</p><div class="it-l"><a href="/students/hu-zhiying/audit-excision/">读原文</a></div></div>
+<div class="item" data-k="因果的退场：宪法性权威的枯竭与寻求性认知的兴起 当代公共生活的幽暗变迁常被误诊为后真相或信任危机。本文给出一个更深的诊断：不是人们不再信任某个具体的因果叙事，而是“给出一个原因”作为一种合法解释形态，其宪法性地位正在静默失效。这套秩序依赖三重认知前置——身体化的追溯冲动、可亲自核验的兑现路径、签发者与接收者之间可问责的认知契约——而当代正在系统性抽空它们。文章以三代人的家庭知识传递为贯穿装置，追踪这套宪法如何被建立、维持、抽空。 公共认知与制度哲学"><div class="it-hd"><span class="r-n" title="学员专栏编号">43</span><a class="it-t" href="/students/hu-zhiying/causal-constitutionality/">因果的退场：宪法性权威的枯竭与寻求性认知的兴起</a><span class="it-m">公共认知与制度哲学</span></div><p class="it-d">当代公共生活的幽暗变迁常被误诊为后真相或信任危机。本文给出一个更深的诊断：不是人们不再信任某个具体的因果叙事，而是“给出一个原因”作为一种合法解释形态，其宪法性地位正在静默失效。</p><div class="it-l"><a href="/students/hu-zhiying/causal-constitutionality/">读原文</a></div></div>
+<div class="item" data-k="认知绝食悖论：特征如何以认知为食，使发生挨饿 特征不是事物的固有属性，而是认知压力下被逼出的代偿产物——它切断与完整叙事的联系、压缩发生史的时间厚度、依赖他者的差别回应来站稳自身。而特征一旦形成便内置一个不可拆除的悖论：它越精确、越共享、越制度化，就越能有效替代它所指向的那个活着的过程。本文以心理诊断与刑事司法两套制度为现场，并以自反检验收尾——本文自身也不豁免于它所描述的结构。 认知社会学与制度病理"><div class="it-hd"><span class="r-n" title="学员专栏编号">44</span><a class="it-t" href="/students/hu-zhiying/cognitive-starvation-paradox/">认知绝食悖论：特征如何以认知为食，使发生挨饿</a><span class="it-m">认知社会学与制度病理</span></div><p class="it-d">特征不是事物的固有属性，而是认知压力下被逼出的代偿产物——它切断与完整叙事的联系、压缩发生史的时间厚度、依赖他者的差别回应来站稳自身。而特征一旦形成便内置一个不可拆除的悖论：它越精确、越共享……</p><div class="it-l"><a href="/students/hu-zhiying/cognitive-starvation-paradox/">读原文</a></div></div>
+</section>
+<section id="ontology" data-group="ontology" style="--accent:#5B4B6B"><div class="col-h"><span class="no">陆</span><h2>认知、因果与存在</h2><span class="ct">16 篇</span></div><p class="col-d">十六篇，全集里最靠上游的一组。它们撤掉的都是些几乎从不被说出口的先验：「先有积木、后有搭法」（《碰撞逼出》）、「边界总是某个施压者对某个受迫者的作用」（《事物的压差地层》）、「耗散只是生成的倒放」（《蚀先于生》）、「客观性是一种静态状态」（《因果的维持》）。《刀与伤口同源》则把刀口转向自己：追问者手里那套靠边界与命名才能运作的工具，去追溯先于一切分化的源头时，悖论是他自己制造的。</p>
+<div class="item" data-k="知道模式：知行断裂的发生学重判 越是知道应该做什么，就越是无法迈出第一步。断裂发生之前，心灵已先被锁入一种接触形态——行动不是被阻碍，而是被推迟、被模拟、被代偿，每一次推迟都在加固这个模式本身。本次补切海德格尔的「好奇」、克尔凯郭尔的反思病与行动阶段模型；最干净的一格是：实施意图干预在知道模式中会被转化为「我把 if-then 的原理弄明白了」，解药被吞进病里。 知行断裂"><div class="it-hd"><span class="r-n" title="学员专栏编号">63</span><a class="it-t" href="/students/hu-zhiying/knowing-mode/">知道模式：知行断裂的发生学重判</a><span class="it-m">知行断裂</span></div><p class="it-d">越是知道应该做什么，就越是无法迈出第一步。断裂发生之前，心灵已先被锁入一种接触形态——行动不是被阻碍，而是被推迟、被模拟、被代偿，每一次推迟都在加固这个模式本身。</p><div class="it-l"><a href="/students/hu-zhiying/knowing-mode/">读原文</a></div></div>
+<div class="item" data-k="自囚结构：当自我修复成为冲突的永恒再生产 他不是在拆囚笼，而是在用囚笼的同一批砖瓦把它越修越坚固。修复动作以「下命令的我／被命令的我」这一分裂为前提，因此任何内容的自我命令都在再造那个分裂。与帕洛阿尔托学派的二阶变化正面分离：把「去连接」换成「允许自己不连接」，他们预测有效，本文预测同样引发稽查。 知行断裂"><div class="it-hd"><span class="r-n" title="学员专栏编号">61</span><a class="it-t" href="/students/hu-zhiying/self-immuring-structure/">自囚结构：当自我修复成为冲突的永恒再生产</a><span class="it-m">知行断裂</span></div><p class="it-d">他不是在拆囚笼，而是在用囚笼的同一批砖瓦把它越修越坚固。修复动作以「下命令的我／被命令的我」这一分裂为前提，因此任何内容的自我命令都在再造那个分裂。</p><div class="it-l"><a href="/students/hu-zhiying/self-immuring-structure/">读原文</a></div></div>
+<div class="item" data-k="算法时代的自由意志危机：一个「主体化代谢过程」的生成论诊断 自由的主体条件——把环境不确定性吸收并叙事化为「我的选择」这一过程本身——如何在算法环境下发生结构性癌变。与加扎尼加的左脑解释器传统正面分歧：解释器传统视事后归因为恒定运转、几乎不失效的装置，本文主张它需要真实的不确…… 认知科学 · 主体性"><div class="it-hd"><span class="r-n" title="学员专栏编号">09</span><a class="it-t" href="/students/hu-zhiying/subjectivation-metabolism/">算法时代的自由意志危机：一个「主体化代谢过程」的生成论诊断</a><span class="it-m">认知科学 · 主体性</span></div><p class="it-d">自由的主体条件——把环境不确定性吸收并叙事化为「我的选择」这一过程本身——如何在算法环境下发生结构性癌变。与加扎尼加的左脑解释器传统正面分歧：解释器传统视事后归因为恒定运转、几乎不失效的装置……</p><div class="it-l"><a href="/students/hu-zhiying/subjectivation-metabolism/">读原文</a></div></div>
+<div class="item" data-k="在最优化用尽之后：人何以重新凝出“我” 不出错、不浪费、不亏本——最优化原则在把效率推至极限的同时，正把人推入一场隐蔽的去我化。既有批判大多聚焦于它如何损害创造力、判断力与关系纽带，却共同预设了一个不言自明的前提：存在一个先于最优化、且能在挤压下保持完整的“我”。本文撤销这一先验，并把那个在虚空中从无中重新凝出“我”的雏形的原发动作命名为“凝我”：AI 可以模拟任何既成的“我”，却触及不到凝我——它没有一具被用尽之后仍残余着虚空的身体。 主体理论与人机之别"><div class="it-hd"><span class="r-n" title="学员专栏编号">39</span><a class="it-t" href="/students/hu-zhiying/self-recondensation/">在最优化用尽之后：人何以重新凝出“我”</a><span class="it-m">主体理论与人机之别</span></div><p class="it-d">不出错、不浪费、不亏本——最优化原则在把效率推至极限的同时，正把人推入一场隐蔽的去我化。既有批判大多聚焦于它如何损害创造力、判断力与关系纽带，却共同预设了一个不言自明的前提：存在一个先于最优化……</p><div class="it-l"><a href="/students/hu-zhiying/self-recondensation/">读原文</a></div></div>
+<div class="item" data-k="受迫生成：在被剥夺了等待权的世界里，因果何以被逼出 个体从混沌经验中自行生出因果框架的能力，其发生条件并不只在于拥有一段不被答案填满的时间。本文再推一层：当一个人连“等待”本身的资格都被剥夺——所有退路、救援与延期均被切断——认知系统会如何逼出一种此前并不存在的因果直觉？文章以亲密关系暴力后的自我命名与急诊医学中的无指南决策两个现场展开，并与自然决策理论正面交锋，厘定其不可被既有概念还原的边界。 认知科学与极限决策"><div class="it-hd"><span class="r-n" title="学员专栏编号">40</span><a class="it-t" href="/students/hu-zhiying/forced-causation/">受迫生成：在被剥夺了等待权的世界里，因果何以被逼出</a><span class="it-m">认知科学与极限决策</span></div><p class="it-d">个体从混沌经验中自行生出因果框架的能力，其发生条件并不只在于拥有一段不被答案填满的时间。本文再推一层：当一个人连“等待”本身的资格都被剥夺——所有退路、救援与延期均被切断——认知系统会如何逼出……</p><div class="it-l"><a href="/students/hu-zhiying/forced-causation/">读原文</a></div></div>
+<div class="item" data-k="创伤性凝结：不可逆性的生成根基——兼论AI时代人类不可替代性的存在论根据 关于人类不可替代性的讨论，从“还有什么能力尚未被替代”退到“守护理解发生的过程”，已是一次进步；但这条更前沿的进路仍悬在一个未经审查的先验上——它用“适当张力孵育了好的认知结晶”这一回溯性叙事，为过程的必要性作担保。撤销这个先验之后暴露出来的是：真正不可替代的不是张力的适当性，而是承受张力时那道不可逆的损伤。 认知生成与人机之别"><div class="it-hd"><span class="r-n" title="学员专栏编号">27</span><a class="it-t" href="/students/hu-zhiying/traumatic-crystallization/">创伤性凝结：不可逆性的生成根基——兼论AI时代人类不可替代性的存在论根据</a><span class="it-m">认知生成与人机之别</span></div><p class="it-d">关于人类不可替代性的讨论，从“还有什么能力尚未被替代”退到“守护理解发生的过程”，已是一次进步；但这条更前沿的进路仍悬在一个未经审查的先验上——它用“适当张力孵育了好的认知结晶”这一回溯性叙事……</p><div class="it-l"><a href="/students/hu-zhiying/traumatic-crystallization/">读原文</a></div></div>
+<div class="item" data-k="重识同一：从辨识的承重到辨识的倒逼 在生命史与认识史的大多数决定时刻，变化序列并未向辨识者交付一套完整的自组织法则——法则的闭合是在辨识行为之后才被反向确认的，而促使辨识发生的，恰恰是法则的缺位所引发的危机。本文把这个倒逼动作命名为“辨识闭合”，并以医学诊断的失败史与刑事司法的同一性裁决两大战场，论证它与科学假说检验的区别不是程度的，而是存在论的：假说被证伪只是解释错了，辨识闭合被拒付则意味着那个被命名的东西从未存在过。 同一性理论与诊断史"><div class="it-hd"><span class="r-n" title="学员专栏编号">28</span><a class="it-t" href="/students/hu-zhiying/identificatory-closure/">重识同一：从辨识的承重到辨识的倒逼</a><span class="it-m">同一性理论与诊断史</span></div><p class="it-d">在生命史与认识史的大多数决定时刻，变化序列并未向辨识者交付一套完整的自组织法则——法则的闭合是在辨识行为之后才被反向确认的，而促使辨识发生的，恰恰是法则的缺位所引发的危机。</p><div class="it-l"><a href="/students/hu-zhiying/identificatory-closure/">读原文</a></div></div>
+<div class="item" data-k="因果的维持：一项关于因果认知客观性的耗散结构分析 三百年的因果理论史持续松动着“客观性是一种静态状态”的预设，却每一次都停在最后一层窗户纸前。本文捅破它：因果陈述的客观地位，是制度重复、验证实践、推理依赖三种互相矛盾的认知能量在持续耦合中维持出来的耗散结构；一旦耦合减弱，它会经历一个可辨认的衰减谱系。放血疗法的十四个世纪与它的崩解，被完整地当作一次客观性的生命周期来解剖。 科学哲学与知识社会学"><div class="it-hd"><span class="r-n" title="学员专栏编号">29</span><a class="it-t" href="/students/hu-zhiying/causal-upkeep/">因果的维持：一项关于因果认知客观性的耗散结构分析</a><span class="it-m">科学哲学与知识社会学</span></div><p class="it-d">三百年的因果理论史持续松动着“客观性是一种静态状态”的预设，却每一次都停在最后一层窗户纸前。本文捅破它：因果陈述的客观地位，是制度重复、验证实践、推理依赖三种互相矛盾的认知能量在持续耦合中维持……</p><div class="it-l"><a href="/students/hu-zhiying/causal-upkeep/">读原文</a></div></div>
+<div class="item" data-k="临在：宇宙最深地基的一个自主生发论重构 物质在先还是关系在先，这道选择题卡了两千年，卡点不在两个答案，而在它们共享的那条“构成性语法”——认为存在总得由更基本的零件按先于存在的法则组装而成。量子场论与暗能量已经让这条语法在物理学前沿失效。本文论证接替它的必须是一个自主动作：存在给出自身、持存自身、并在自身给出的东西中认出自身。并据此把恶重新解剖为这一动作的三重阻断。 存在论与恶的生成机制"><div class="it-hd"><span class="r-n" title="学员专栏编号">31</span><a class="it-t" href="/students/hu-zhiying/presencing/">临在：宇宙最深地基的一个自主生发论重构</a><span class="it-m">存在论与恶的生成机制</span></div><p class="it-d">物质在先还是关系在先，这道选择题卡了两千年，卡点不在两个答案，而在它们共享的那条“构成性语法”——认为存在总得由更基本的零件按先于存在的法则组装而成。</p><div class="it-l"><a href="/students/hu-zhiying/presencing/">读原文</a></div></div>
+<div class="item" data-k="刀与伤口同源：对追问者概念处境的一项阐明 追问者所使用的概念工具是长过程的后期结晶，依赖边界、区分与命名才能运作。当他用这套工具去追溯那个先于一切分化的源头时，他不是遭遇了外部的悖论，而是亲手在源头上制造了它无法消化的切口——并对这个自毁动作浑然不觉，因为他已把正在执刀的那只手豁免于追问之外。全文以十九世纪末物理学对以太的集体扶稳与放弃为经验线索，并写下三条证伪条款，其中第三条对准本文自身。 认识论与追问者位置"><div class="it-hd"><span class="r-n" title="学员专栏编号">32</span><a class="it-t" href="/students/hu-zhiying/conceptual-autophagy/">刀与伤口同源：对追问者概念处境的一项阐明</a><span class="it-m">认识论与追问者位置</span></div><p class="it-d">追问者所使用的概念工具是长过程的后期结晶，依赖边界、区分与命名才能运作。当他用这套工具去追溯那个先于一切分化的源头时，他不是遭遇了外部的悖论，而是亲手在源头上制造了它无法消化的切口——并对这个……</p><div class="it-l"><a href="/students/hu-zhiying/conceptual-autophagy/">读原文</a></div></div>
+<div class="item" data-k="蚀先于生：为什么形态的耗散比生成更原始 当代过程存在论极擅长描述形态如何建立，却把形态的溃散悄悄解释为“维持条件被撤走”，仿佛耗散只是生成的倒放。本文从虚粒子涨落、信任的衰变、货币的空心化三个互不相干的领域提取出同一个形式结构：稳定形态的消散不是旧网络的松脱，而是异质网络的节点从内部逐点接替。命名为“互蚀”，并论证替代的顺序与临界阈值由旧网络自身的维持脆弱度分布决定，而非由新网络的效率优势决定。 过程存在论与跨域形态学"><div class="it-hd"><span class="r-n" title="学员专栏编号">33</span><a class="it-t" href="/students/hu-zhiying/erosion-precedes-genesis/">蚀先于生：为什么形态的耗散比生成更原始</a><span class="it-m">过程存在论与跨域形态学</span></div><p class="it-d">当代过程存在论极擅长描述形态如何建立，却把形态的溃散悄悄解释为“维持条件被撤走”，仿佛耗散只是生成的倒放。本文从虚粒子涨落、信任的衰变、货币的空心化三个互不相干的领域提取出同一个形式结构：稳定……</p><div class="it-l"><a href="/students/hu-zhiying/erosion-precedes-genesis/">读原文</a></div></div>
+<div class="item" data-k="碰撞逼出：宇宙与人心深处的发生机理 “先有积木、后有搭法”这个信念如此原始，以至于几乎从未被当成一个可质疑的先验来对待。本文把“碰撞逼出”做成一套有边界条件、不可逆性与能量标度的动力学：两股尚未结晶的差异倾向发生不可绕过的对抗，张力积累至临界点，旧的维持条件被迫失效，新结构在重组中被强行挤出存在并被锁定。粒子如此，自我如此，制度亦如此。 关系存在论与跨域动力学"><div class="it-hd"><span class="r-n" title="学员专栏编号">25</span><a class="it-t" href="/students/hu-zhiying/collisional-extrusion/">碰撞逼出：宇宙与人心深处的发生机理</a><span class="it-m">关系存在论与跨域动力学</span></div><p class="it-d">“先有积木、后有搭法”这个信念如此原始，以至于几乎从未被当成一个可质疑的先验来对待。本文把“碰撞逼出”做成一套有边界条件、不可逆性与能量标度的动力学：两股尚未结晶的差异倾向发生不可绕过的对抗……</p><div class="it-l"><a href="/students/hu-zhiying/collisional-extrusion/">读原文</a></div></div>
+<div class="item" data-k="受迫断裂：并置如何撕裂法则的信仰 比较的认知研究预设了一个在价值上无神的主体：它假定认知者面对的所有法则都只是等待被更精确掌握的中立知识，而不是他曾经全身心托付过的信靠。本文论证比较有一项比“制造认知缺口”更根本的功能——一次高强度的并置，能把那条曾经统摄万物的法则从公理打回“某些人在某个时刻做出的决断”，并把跪着聆听的信徒强行拽到一个他从未抵达过的裁决位置上。 比较认知与价值生成"><div class="it-hd"><span class="r-n" title="学员专栏编号">26</span><a class="it-t" href="/students/hu-zhiying/forced-rupture/">受迫断裂：并置如何撕裂法则的信仰</a><span class="it-m">比较认知与价值生成</span></div><p class="it-d">比较的认知研究预设了一个在价值上无神的主体：它假定认知者面对的所有法则都只是等待被更精确掌握的中立知识，而不是他曾经全身心托付过的信靠。本文论证比较有一项比“制造认知缺口”更根本的功能——一次……</p><div class="it-l"><a href="/students/hu-zhiying/forced-rupture/">读原文</a></div></div>
+<div class="item" data-k="事物的压差地层：边界如何作为内在差异的凝结而发生 从演化论的选择压力到福柯的规训权力再到布迪厄的场域，既有边界理论共享一个未经审视的先验：边界的发生总是某个施压者对某个受迫者的作用。可是追问一层——那个施压者自己的边界又是从哪来的？本文做了一次翻转，并把这道逼迫性的内在紧张命名为“压差”，据此重新解释知识的粒子化、学习的推挤与范式的弥漫三种边界形态。 边界理论与社会存在论"><div class="it-hd"><span class="r-n" title="学员专栏编号">23</span><a class="it-t" href="/students/hu-zhiying/pressure-differential-strata/">事物的压差地层：边界如何作为内在差异的凝结而发生</a><span class="it-m">边界理论与社会存在论</span></div><p class="it-d">从演化论的选择压力到福柯的规训权力再到布迪厄的场域，既有边界理论共享一个未经审视的先验：边界的发生总是某个施压者对某个受迫者的作用。可是追问一层——那个施压者自己的边界又是从哪来的？</p><div class="it-l"><a href="/students/hu-zhiying/pressure-differential-strata/">读原文</a></div></div>
+<div class="item" data-k="构成与可构成者：重勘创新的发生位 把创新的追问从产出端移到发生端，会露出一对不可还原的区分：一边是已被编码、构成一个时代公共库存的构成性知识；另一边不是任何可被命名为“创新方法”的成品，而是一个认识者在认知压力下把自己重新构成为能看见新问题的人的事件。本文以狭义相对论与洛伦兹电子论的对称解剖——一个发生了，一个没有发生——追踪这一事件的四个环节及其失败形态。 创新理论与科学史"><div class="it-hd"><span class="r-n" title="学员专栏编号">24</span><a class="it-t" href="/students/hu-zhiying/the-constitutable/">构成与可构成者：重勘创新的发生位</a><span class="it-m">创新理论与科学史</span></div><p class="it-d">把创新的追问从产出端移到发生端，会露出一对不可还原的区分：一边是已被编码、构成一个时代公共库存的构成性知识；另一边不是任何可被命名为“创新方法”的成品，而是一个认识者在认知压力下把自己重新构成……</p><div class="it-l"><a href="/students/hu-zhiying/the-constitutable/">读原文</a></div></div>
+<div class="item" data-k="缝点：事物在时间中如何缝合自己的存在 为什么一件事物常常在边界被砌得最厚、保护最严密的时候，恰恰失去那种活的内核？本文拆掉“内部动能对外部势能”这个空间隐喻，把事物存在的轴线移到时间上：一件事物之所以作为一个可辨认的“它”活着，是因为在每一个当下，行动者都还能把来自过去的规范沉淀与指向未来的试探冲动，缝合进同一个不可分割的动作。以苏州缂丝百年生命史追踪这个动作的生成、繁盛、硬化与停摆。 时间性与传统工艺"><div class="it-hd"><span class="r-n" title="学员专栏编号">19</span><a class="it-t" href="/students/hu-zhiying/suture-point/">缝点：事物在时间中如何缝合自己的存在</a><span class="it-m">时间性与传统工艺</span></div><p class="it-d">为什么一件事物常常在边界被砌得最厚、保护最严密的时候，恰恰失去那种活的内核？本文拆掉“内部动能对外部势能”这个空间隐喻，把事物存在的轴线移到时间上：一件事物之所以作为一个可辨认的“它”活着，是……</p><div class="it-l"><a href="/students/hu-zhiying/suture-point/">读原文</a></div></div>
+</section>
+<section id="gss" data-group="gss" style="--accent:#4A5B8C"><div class="col-h"><span class="no">柒</span><h2>全球系统科学</h2><span class="ct">4 篇</span></div><p class="col-d">四篇一组，独立成栏，因为它们咬的是同一台机器。一份携带结构性不确定性的认知，经由变量、模型与审稿三道技术上完全正当的工序，在制度层面丧失引发行动的能力——无主体、无阴谋、无恶意（《消毒》）。另外三篇分别处理命名怎样把行动驱力转成拖延的理由、「看见」怎样把现实重塑成能承接特定干预的形状、以及界面越复杂解释力越不长。</p>
+<div class="item" data-k="稀释性转译：命名如何把行动驱力转成拖延的理由 我们还没看全从催促行动的理由，被转译成继续研究、暂缓行动的依据——而这不需要任何人怀有拖延的意图。补上了转译一词的来处（卡隆与拉图尔），并与无知社会学划出分离线：他们需要恶意与资助链条，本文不需要。第七节的臭氧层反证是核心判据，不是案例点缀。 全球系统科学"><div class="it-hd"><span class="r-n" title="学员专栏编号">56</span><a class="it-t" href="/students/hu-zhiying/dilutive-translation/">稀释性转译：命名如何把行动驱力转成拖延的理由</a><span class="it-m">全球系统科学</span></div><p class="it-d">&quot;我们还没看全&quot;从催促行动的理由，被转译成继续研究、暂缓行动的依据——而这不需要任何人怀有拖延的意图。补上了&quot;转译&quot;一词的来处（卡隆与拉图尔），并与无知社会学划出分离线：他们需要恶意与资助链条……</p><div class="it-l"><a href="/students/hu-zhiying/dilutive-translation/">读原文</a></div></div>
+<div class="item" data-k="消毒：全球系统科学如何将不确定性加工为无害的残余物 携带结构性不确定性的认知，经由变量、模型与审稿三重技术上完全正当的工序，在制度层面丧失引发行动的能力——无主体、无阴谋、无恶意。补上了微观机制的正主（拉图尔与伍尔加的模态删除），分离线在限定词与行动力能否背离。 全球系统科学"><div class="it-hd"><span class="r-n" title="学员专栏编号">55</span><a class="it-t" href="/students/hu-zhiying/sterilisation/">消毒：全球系统科学如何将不确定性加工为无害的残余物</a><span class="it-m">全球系统科学</span></div><p class="it-d">携带结构性不确定性的认知，经由变量、模型与审稿三重技术上完全正当的工序，在制度层面丧失引发行动的能力——无主体、无阴谋、无恶意。补上了微观机制的正主（拉图尔与伍尔加的模态删除），分离线在&quot;限定……</p><div class="it-l"><a href="/students/hu-zhiying/sterilisation/">读原文</a></div></div>
+<div class="item" data-k="操作性看见：全球系统科学作为地缘认知基础设施的悖论性产出 它把现实重塑成能承接特定干预动作的形状。补上了看见一词的来处（斯科特的可读性）。 全球系统科学"><div class="it-hd"><span class="r-n" title="学员专栏编号">53</span><a class="it-t" href="/students/hu-zhiying/operational-seeing/">操作性看见：全球系统科学作为地缘认知基础设施的悖论性产出</a><span class="it-m">全球系统科学</span></div><p class="it-d">它把现实重塑成能承接特定干预动作的形状。补上了&quot;看见&quot;一词的来处（斯科特的可读性）。</p><div class="it-l"><a href="/students/hu-zhiying/operational-seeing/">读原文</a></div></div>
+<div class="item" data-k="界面的内卷：全球系统科学中一个自我指涉结构的浮现与自我加固 界面越复杂，维护它的投入越多，而解释力并没有跟着长。与卢曼的运作封闭、与反应性各划一条分离线。 全球系统科学"><div class="it-hd"><span class="r-n" title="学员专栏编号">49</span><a class="it-t" href="/students/hu-zhiying/interface-involution/">界面的内卷：全球系统科学中一个自我指涉结构的浮现与自我加固</a><span class="it-m">全球系统科学</span></div><p class="it-d">界面越复杂，维护它的投入越多，而解释力并没有跟着长。与卢曼的运作封闭、与反应性各划一条分离线。</p><div class="it-l"><a href="/students/hu-zhiying/interface-involution/">读原文</a></div></div>
+</section>
+<section id="twin" data-group="twin" style="--accent:#6E7A4B"><div class="col-h"><span class="no">捌</span><h2>并蒂文 · 一题两写</h2><span class="ct">10 组 · 20 篇</span></div><p class="col-d">十组二十篇，本站的一种特有体例：同一个判断写两遍。诠释文只讲事情本身，一个术语不用，读起来像散文；实用文给出可操作的步骤、判据与回滚方案。两篇同根同源，谁也不是谁的科普版——先读哪一篇都行，读完另一篇会发现它们在互相追问。</p>
+<div class="item" data-k="有些理解，不是学会的，而是再也回不去以后长出来的 让学习者经历真实摩擦，而不是承受人为伤害 有些理解不是学会的，是再也回不去以后长出来的——不可逆性从哪里来，以及它凭什么是人不可被替代的根据。"><div class="it-hd"><span class="r-n" title="学员专栏编号">95</span><a class="it-t" href="/students/hu-zhiying/traumatic-crystallization/interpretation/">有些理解，不是学会的，而是再也回不去以后长出来的</a><span class="it-m">一题两写</span></div><p class="it-d">有些理解不是学会的，是再也回不去以后长出来的——不可逆性从哪里来，以及它凭什么是人不可被替代的根据。</p><div class="it-l"><a href="/students/hu-zhiying/traumatic-crystallization/interpretation/">诠释文 · 有些理解，不是学会的，而是再也回不去……</a><a href="/students/hu-zhiying/traumatic-crystallization/practice/">实用文 · 让学习者经历真实摩擦，而不是承受人为……</a></div></div>
+<div class="item" data-k="创新不是多知道一点，而是提问的人换了一个位置 不考核谁最有创新潜能，只保护问题发生的条件 创新不是多知道一点，是提问的人换了一个位置；于是评审要保护的不是潜能，是问题发生的条件。"><div class="it-hd"><span class="r-n" title="学员专栏编号">93</span><a class="it-t" href="/students/hu-zhiying/the-constitutable/interpretation/">创新不是多知道一点，而是提问的人换了一个位置</a><span class="it-m">一题两写</span></div><p class="it-d">创新不是多知道一点，是提问的人换了一个位置；于是评审要保护的不是潜能，是问题发生的条件。</p><div class="it-l"><a href="/students/hu-zhiying/the-constitutable/interpretation/">诠释文 · 创新不是多知道一点，而是提问的人换了……</a><a href="/students/hu-zhiying/the-constitutable/practice/">实用文 · 不考核谁最有创新潜能，只保护问题发生……</a></div></div>
+<div class="item" data-k="积木之外，事物还会自己长出来 给出—持存—回嵌：一套让新结构真正长出来的设计法 积木之外，事物还会自己长出来——给出、持存、回嵌，一套让新结构真正落地的设计法。"><div class="it-hd"><span class="r-n" title="学员专栏编号">91</span><a class="it-t" href="/students/hu-zhiying/presencing/interpretation/">积木之外，事物还会自己长出来</a><span class="it-m">一题两写</span></div><p class="it-d">积木之外，事物还会自己长出来——给出、持存、回嵌，一套让新结构真正落地的设计法。</p><div class="it-l"><a href="/students/hu-zhiying/presencing/interpretation/">诠释文 · 积木之外，事物还会自己长出来</a><a href="/students/hu-zhiying/presencing/practice/">实用文 · 给出—持存—回嵌：一套让新结构真正长……</a></div></div>
+<div class="item" data-k="一个名字，为什么会逼着现实长成它的样子 把标签变成可撤销的工作假设 一个名字为什么会逼着现实长成它的样子；解法是把标签降格成可撤销的工作假设。"><div class="it-hd"><span class="r-n" title="学员专栏编号">89</span><a class="it-t" href="/students/hu-zhiying/identificatory-closure/interpretation/">一个名字，为什么会逼着现实长成它的样子</a><span class="it-m">一题两写</span></div><p class="it-d">一个名字为什么会逼着现实长成它的样子；解法是把标签降格成可撤销的工作假设。</p><div class="it-l"><a href="/students/hu-zhiying/identificatory-closure/interpretation/">诠释文 · 一个名字，为什么会逼着现实长成它的样……</a><a href="/students/hu-zhiying/identificatory-closure/practice/">实用文 · 把标签变成可撤销的工作假设</a></div></div>
+<div class="item" data-k="当两个都说得通的例子，把你信过的规则撕开 用成对案例审查规则，而不是操控信念 当两个都说得通的例子把你信过的规则撕开——用成对案例审查规则，而不是操控信念。"><div class="it-hd"><span class="r-n" title="学员专栏编号">87</span><a class="it-t" href="/students/hu-zhiying/forced-rupture/interpretation/">当两个都说得通的例子，把你信过的规则撕开</a><span class="it-m">一题两写</span></div><p class="it-d">当两个都说得通的例子把你信过的规则撕开——用成对案例审查规则，而不是操控信念。</p><div class="it-l"><a href="/students/hu-zhiying/forced-rupture/interpretation/">诠释文 · 当两个都说得通的例子，把你信过的规则……</a><a href="/students/hu-zhiying/forced-rupture/practice/">实用文 · 用成对案例审查规则，而不是操控信念</a></div></div>
+<div class="item" data-k="旧店没有突然消失，是另一套生活先搬了进来 互蚀地图：在旧系统倒下前找到第一处替换 旧店没有突然消失，是另一套生活先搬了进来；于是有了在旧系统倒下前找到第一处替换的互蚀地图。"><div class="it-hd"><span class="r-n" title="学员专栏编号">85</span><a class="it-t" href="/students/hu-zhiying/erosion-precedes-genesis/interpretation/">旧店没有突然消失，是另一套生活先搬了进来</a><span class="it-m">一题两写</span></div><p class="it-d">旧店没有突然消失，是另一套生活先搬了进来；于是有了在旧系统倒下前找到第一处替换的互蚀地图。</p><div class="it-l"><a href="/students/hu-zhiying/erosion-precedes-genesis/interpretation/">诠释文 · 旧店没有突然消失，是另一套生活先搬了……</a><a href="/students/hu-zhiying/erosion-precedes-genesis/practice/">实用文 · 互蚀地图：在旧系统倒下前找到第一处替……</a></div></div>
+<div class="item" data-k="拿尺子去量尺子的出生，会发生什么 握刀记录法：让理论审查先照见自己的手 拿尺子去量尺子的出生会发生什么——理论审查得先照见自己的手。"><div class="it-hd"><span class="r-n" title="学员专栏编号">83</span><a class="it-t" href="/students/hu-zhiying/conceptual-autophagy/interpretation/">拿尺子去量尺子的出生，会发生什么</a><span class="it-m">一题两写</span></div><p class="it-d">拿尺子去量尺子的出生会发生什么——理论审查得先照见自己的手。</p><div class="it-l"><a href="/students/hu-zhiying/conceptual-autophagy/interpretation/">诠释文 · 拿尺子去量尺子的出生，会发生什么</a><a href="/students/hu-zhiying/conceptual-autophagy/practice/">实用文 · 握刀记录法：让理论审查先照见自己的手</a></div></div>
+<div class="item" data-k="很多新东西，不是设计出来的，而是两股力量挤出来的 把冲突画成一张可试验、可回滚的碰撞地图 很多新东西不是设计出来的，是两股力量挤出来的；碰撞可以画成一张可试验、可回滚的地图。"><div class="it-hd"><span class="r-n" title="学员专栏编号">81</span><a class="it-t" href="/students/hu-zhiying/collisional-extrusion/interpretation/">很多新东西，不是设计出来的，而是两股力量挤出来的</a><span class="it-m">一题两写</span></div><p class="it-d">很多新东西不是设计出来的，是两股力量挤出来的；碰撞可以画成一张可试验、可回滚的地图。</p><div class="it-l"><a href="/students/hu-zhiying/collisional-extrusion/interpretation/">诠释文 · 很多新东西，不是设计出来的，而是两股……</a><a href="/students/hu-zhiying/collisional-extrusion/practice/">实用文 · 把冲突画成一张可试验、可回滚的碰撞地……</a></div></div>
+<div class="item" data-k="客观性更像一团火，不像一块石头 因果铁律维护审计：给知识系统做一次消防检查 客观性更像一团火，不像一块石头——因果铁律需要定期维护，像做一次消防检查。"><div class="it-hd"><span class="r-n" title="学员专栏编号">79</span><a class="it-t" href="/students/hu-zhiying/causal-upkeep/interpretation/">客观性更像一团火，不像一块石头</a><span class="it-m">一题两写</span></div><p class="it-d">客观性更像一团火，不像一块石头——因果铁律需要定期维护，像做一次消防检查。</p><div class="it-l"><a href="/students/hu-zhiying/causal-upkeep/interpretation/">诠释文 · 客观性更像一团火，不像一块石头</a><a href="/students/hu-zhiying/causal-upkeep/practice/">实用文 · 因果铁律维护审计：给知识系统做一次消……</a></div></div>
+<div class="item" data-k="考满分以后，为什么越来越看不见新答案 第二裁断共同体：防止成功把判断力变成量表 考满分以后为什么越来越看不见新答案；对策是设一个第二裁断共同体，别让成功把判断力变成量表。"><div class="it-hd"><span class="r-n" title="学员专栏编号">77</span><a class="it-t" href="/students/hu-zhiying/adjudicative-atrophy/interpretation/">考满分以后，为什么越来越看不见新答案</a><span class="it-m">一题两写</span></div><p class="it-d">考满分以后为什么越来越看不见新答案；对策是设一个第二裁断共同体，别让成功把判断力变成量表。</p><div class="it-l"><a href="/students/hu-zhiying/adjudicative-atrophy/interpretation/">诠释文 · 考满分以后，为什么越来越看不见新答案</a><a href="/students/hu-zhiying/adjudicative-atrophy/practice/">实用文 · 第二裁断共同体：防止成功把判断力变成……</a></div></div>
+</section>
+
+<div class="nearby">
+  <a href="/survey/"><small>总结文</small><b>问的是同一件事</b>把九十六件读成一条线</a>
+  <a href="/all/"><small>长论文</small><b>语言这一条线</b>十二篇的详目与摘要</a>
+  <a href="/wechat/"><small>存档</small><b>约翰专栏</b>公众号五年 418 篇原文</a>
+</div>
+</div></div>
+<footer><div class="wrap">
+  <p>作品全集 —— 胡志英在 <a href="https://sdeuniverses.com/students/hu-zhiying/">SDE Universes 学员专栏</a> 已发表的全部作品，本站按主题重新编次并写导语。每一件都链回主站原文，正文不在此处复制。</p>
+  <p>语言发生学 · <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站 —— 德麦国际 · Demai International Press</p>
+</div></footer>
+<script>
+/* 分站页面的自家链接写的是分站根。在二级域名下这就是对的；
+   若从主站以 /sites/lang/… 预览，就地补前缀，两处都能点。 */
+(function(){window.__wechatBase="";var b="/sites/lang";
+if(location.pathname.indexOf(b)!==0)return;
+window.__wechatBase=b;
+var own=["/#","/all/","/wechat","/chatjohn/"];
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");continue;}
+for(var k=0;k<own.length;k++){if(h.indexOf(own[k])===0){as[i].setAttribute("href",b+h);break;}}}})();
+</script>
+<script>
+(function(){
+  var q=document.getElementById("q"),n=document.getElementById("n"),
+      empty=document.getElementById("empty"),
+      items=[].slice.call(document.querySelectorAll(".item")),
+      groups=[].slice.call(document.querySelectorAll("[data-group]")),
+      ybtns=[].slice.call(document.querySelectorAll(".chipy button[data-year]")),
+      year=null;
+  if(!q&&!ybtns.length)return;
+  var keys=items.map(function(el){return (el.getAttribute("data-k")||"").toLowerCase();}),
+      years=items.map(function(el){return el.getAttribute("data-y")||"";});
+  function run(){
+    var v=q?q.value.trim().toLowerCase():"",c=0;
+    for(var i=0;i<items.length;i++){
+      var hit=(!v||keys[i].indexOf(v)>=0)&&(year===null||years[i]===year);
+      items[i].style.display=hit?"":"none";
+      if(hit)c++;
+    }
+    for(var j=0;j<groups.length;j++){
+      var any=groups[j].querySelector('.item:not([style*="none"])');
+      groups[j].style.display=any?"":"none";
+    }
+    if(n)n.textContent=c+" / "+items.length;
+    if(empty)empty.style.display=c?"none":"";
+  }
+  if(q)q.addEventListener("input",run);
+  ybtns.forEach(function(b){
+    b.addEventListener("click",function(){
+      var y=b.getAttribute("data-year");
+      year=(year===y)?null:y;
+      ybtns.forEach(function(o){
+        o.setAttribute("aria-pressed",String(year!==null&&o.getAttribute("data-year")===year));
+      });
+      run();
+    });
+  });
+  run();
+})();
+</script>
+</body></html>
