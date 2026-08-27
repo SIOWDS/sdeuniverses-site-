@@ -282,7 +282,7 @@ const layer = document.body.querySelector(".wdsm-layer");
 ok(!!layer, "对话层已挂载");
 const inEl = layer.querySelector(".wdsm-in"), sendEl = layer.querySelector(".wdsm-send");
 const modes = layer.querySelectorAll(".wdsm-mode").filter((b) => b.getAttribute("data-k"));
-ok(modes.length === 3, "模式条三个档位按钮（标准/深度/联网），实得 " + modes.length);
+ok(modes.length === 4, "模式条四个档位按钮（标准/深度/联网/无SDE），实得 " + modes.length);
 ok(!!layer.querySelector(".wdsm-attbtn"), "附件按钮存在（借 .wdsm-mode 样式但无 data-k，不参与档位互斥）");
 // 通用守门：模式条上**每一颗按钮都必须有字**。
 // 逐颗写断言是补不完的——链接键当初就是这么漏成一颗空框的（文案定义了，没人写进 DOM）。
@@ -321,6 +321,19 @@ webBtn.click(); ok(store["sde_wds_web"] === "1", "联网开关已存本地");
 const stdBtn = modes.find((b) => b.getAttribute("data-k") === "std");
 stdBtn.click(); ok(store["sde_wds_thinkmode"] === "std" && !deepBtn.classList.contains("on"), "切回标准档，深度取消高亮（互斥）");
 ok(webBtn.classList.contains("on"), "联网是独立开关，不被档位切换清掉");
+
+/* 「无 SDE」：跟 web 同款的独立开关，不参与 std/deep 那组互斥——
+   深度＋无 SDE 是合法组合（只是换一台更强的基底跑纯对话）。这里只验独立性；
+   与工序的互斥另有专门一节（工序按钮要先挂出来才测得了，见㉔.5）。 */
+const nosdeBtn = modes.find((b) => b.getAttribute("data-k") === "nosde");
+ok(!!nosdeBtn, "「无 SDE」按钮存在");
+nosdeBtn.click();
+ok(store["sde_wds_nosde"] === "1", "无 SDE 已存本地");
+ok(nosdeBtn.classList.contains("on"), "无 SDE 按钮高亮");
+ok(stdBtn.classList.contains("on") && webBtn.classList.contains("on"), "无 SDE 不清掉标准/联网——三者互不干扰（此刻是标准档，上一步刚切回去的）");
+nosdeBtn.click();
+ok(store["sde_wds_nosde"] === "0" && !nosdeBtn.classList.contains("on"), "再点一次关掉");
+
 deepBtn.click();
 
 console.log("③ 无 Key 时应弹 Key 面板而不是发请求");
@@ -352,11 +365,15 @@ ROUTE["/api/wds/chat"] = [
 (async () => {
   await new Promise((r) => setTimeout(r, 200));      // 等保存 Key 时自动触发的那次 send 跑完
   layer.querySelector(".wdsm-newbtn").click();        // 清场，只留下面这一轮
+  nosdeBtn.click();                                   // 顺带用这一轮验一下 nosde 进不进 payload，验完关掉
   inEl.value = "什么是特征纠缠？";
   await new Promise((res) => { sendEl.click(); setTimeout(res, 260); });
   ok(LAST_PAYLOAD && LAST_PAYLOAD.mode === "deep", "payload 带 mode=deep");
   ok(LAST_PAYLOAD && LAST_PAYLOAD.web === 1, "payload 带 web=1");
   ok(LAST_PAYLOAD && LAST_PAYLOAD.skey === "sk-test-1234567890", "payload 带 skey（联网搜索 Key）");
+  ok(LAST_PAYLOAD && LAST_PAYLOAD.nosde === 1, "payload 带 nosde=1");
+  nosdeBtn.click();
+  ok(!nosdeBtn.classList.contains("on"), "验完随手关掉，不留状态给后面章节");
 
   const msgs = layer.querySelector(".wdsm-msgs");
   ok(msgs.children.length === 1, "生成了一轮，实得 " + msgs.children.length);
@@ -888,8 +905,8 @@ console.log("⑧ 成文（distill）");
   console.log("㉓ SDE 工序：菜单 / 挂载 / 斜杠命令 / 近邻名单卡");
   const tlBtn = layer.querySelector(".wdsm-toolbtn");
   ok(!!tlBtn, "模式条上有「⊞ SDE 工序」按钮");
-  ok(layer.querySelectorAll(".wdsm-mode").filter((b) => b.getAttribute("data-k")).length === 3,
-     "工序按钮借 .wdsm-mode 样式但没有 data-k，不参与三档互斥（三档仍是 3 个）");
+  ok(layer.querySelectorAll(".wdsm-mode").filter((b) => b.getAttribute("data-k")).length === 4,
+     "工序按钮借 .wdsm-mode 样式但没有 data-k，不参与档位互斥（四档仍是 4 个）");
   tlBtn.click();
   const tlm = document.body.querySelector(".wdsm-menu");
   ok(!!tlm && tlm.querySelectorAll("button").length === 15, "工序菜单十四道＋「不用工序」共十五项，实得 " + (tlm ? tlm.querySelectorAll("button").length : 0));
@@ -959,6 +976,22 @@ console.log("⑧ 成文（distill）");
   tlBtn.click();
   document.body.querySelector(".wdsm-menu").querySelectorAll("button").find((b) => b.textContent.includes("不用工序")).click();
   ok(!tlBtn.classList.contains("on") && LAST_PAYLOAD.tool !== undefined, "可以摘掉工序回到普通对话");
+
+  console.log("㉔.5 「无 SDE」与工序互斥（同一件事的两种说法，不能同时亮）");
+  tlBtn.click();
+  document.body.querySelector(".wdsm-menu").querySelectorAll("button").find((b) => b.textContent.includes("近邻检测")).click();
+  ok(tlBtn.classList.contains("on"), "先选中一个工序（近邻检测）");
+  ok(!nosdeBtn.classList.contains("on"), "此刻无 SDE 应是关的（承接上一步的收尾状态）");
+  nosdeBtn.click();
+  ok(nosdeBtn.classList.contains("on"), "点开无 SDE");
+  ok(!tlBtn.classList.contains("on"), "工序被无 SDE 自动清掉——不能一边说无 SDE 一边还挂着一道 SDE 工序");
+  tlBtn.click();
+  document.body.querySelector(".wdsm-menu").querySelectorAll("button").find((b) => b.textContent.includes("近邻检测")).click();
+  ok(tlBtn.classList.contains("on"), "反过来：再选中一个工序");
+  ok(!nosdeBtn.classList.contains("on"), "无 SDE 被工序自动清掉——互斥是双向的");
+  tlBtn.click();
+  document.body.querySelector(".wdsm-menu").querySelectorAll("button").find((b) => b.textContent.includes("不用工序")).click();
+  ok(!tlBtn.classList.contains("on"), "收尾：工序清空，不留状态给后面章节");
 
 
   /* ═════════ ㉕ 画布（Artifacts）═════════ */

@@ -448,7 +448,11 @@ console.log("\n── ④ 接线：三个承重位 ─────────�
   const chatSeg = WC.slice(WC.indexOf('if (url.pathname === "/api/wds/chat")'),
                            WC.indexOf('if (url.pathname === "/api/wds/ping")'));
   t("抠得出 chat 端点段", chatSeg.length > 2000 && chatSeg.indexOf("WDS_CHAT_SYS(") > 0);
-  t("chat 端点读了档案", /const prof = wdsProfileOf\(b\.profile\);/.test(chatSeg));
+  /* ⚠ 2026-08-27：这三条的字面量因为「无 SDE 问对」新增的 noSde 参数改了形状——
+     prof 的赋值多了一层「noSde 时强制清空」的三元包装，调用点与函数签名都在
+     prof 后面添了 noSde。用意（chat 端点读档案／把档案递进 system／函数收得到 prof）
+     一个字没变，只把三条正则钉在新的准确形状上，不是放宽了事。 */
+  t("chat 端点读了档案", /const prof = (?:noSde \? null : )?wdsProfileOf\(b\.profile\);/.test(chatSeg));
   // _ragBody 那个对象字面量本身：递没递，只看这几行
   const ragBodySeg = chatSeg.slice(chatSeg.indexOf("const _ragBody = {"),
                                    chatSeg.indexOf("const _ragBody = {") + 500);
@@ -456,8 +460,8 @@ console.log("\n── ④ 接线：三个承重位 ─────────�
   // 调用点，不是声明：从 "const sys = WDS_CHAT_SYS(" 起算
   const callSeg = chatSeg.slice(chatSeg.indexOf("const sys = WDS_CHAT_SYS("),
                                 chatSeg.indexOf("const sys = WDS_CHAT_SYS(") + 220);
-  t("chat 把档案递进 system（调用点）", /duel, prof\);/.test(callSeg), callSeg.slice(0, 60));
-  t("WDS_CHAT_SYS 收得到 prof", /function WDS_CHAT_SYS\([^)]*\bprof\)/.test(WC));
+  t("chat 把档案递进 system（调用点）", /duel, prof, noSde\);/.test(callSeg), callSeg.slice(0, 60));
+  t("WDS_CHAT_SYS 收得到 prof", /function WDS_CHAT_SYS\([^)]*\bprof, noSde\)/.test(WC));
   // 「收了却不用」是本仓的老坑：签名加了参数、正文一处没用，断言照样绿
   const sysSeg = WC.slice(WC.indexOf("function WDS_CHAT_SYS("), WC.indexOf("const SDE_LEXICON"));
   t("prof 在 WDS_CHAT_SYS 正文里真用上了", (sysSeg.match(/\bprof\b/g) || []).length >= 4);
@@ -467,6 +471,13 @@ console.log("\n── ④ 接线：三个承重位 ─────────�
   t("rag 按白名单丢块", /if \(!wdsProfInScope\(prof, d\.u\)\) continue;/.test(WC));
   t("档案模式下九库整块跳过", /if \(kbn && !prof\)/.test(WC));
   t("成文那一路也换人格", (WC.match(/prof \? \(prof\.sys \+ prof\.guard/g) || []).length >= 2);
+  /* 反向：把「无 SDE」新加的 noSde 参数从调用点/签名里抹掉（模拟这条线被人删掉），
+     ②③两条必须当场红——证明它们钉的是 noSde 真的被传递、被接住，不是随便什么都能过。 */
+  const mutCall = callSeg.replace(", noSde);", ");");
+  const mutSig = WC.replace("function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde)",
+                             "function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof)");
+  t("反向：②的断言在删掉 noSde 后会红", !/duel, prof, noSde\);/.test(mutCall));
+  t("反向：③的断言在删掉 noSde 后会红", !/function WDS_CHAT_SYS\([^)]*\bprof, noSde\)/.test(mutSig));
 }
 
 console.log("\n── ⑤ 盖戳：一条都不许漏 ─────────────────────────");
@@ -589,7 +600,10 @@ console.log("\n── ⑥b 扫除 SDE 遗留（读者看得见的每一条词条
   t("抠得出三张文案表", !!TXTo && !!TX2o && !!PROFo);
   const cp = (PROFo && PROFo.lang && PROFo.lang.copy) || {};
   const ACCENT = /ChatSDE|\bWDS\b|\bSDE(?! 社区| Community| Universes)|显露|差异序列|特征纠缠|本体论|王德生|金点子|中华智问/;
-  const KEEP = ["tabIm", "cvToBoxNo", "cvKbBackT", "cvKbBackNo", "cvKbT"];   // 专名，不是遗留
+  const KEEP = ["tabIm", "cvToBoxNo", "cvKbBackT", "cvKbBackNo", "cvKbT",
+    // mNoSde/tipNoSde 不是"允许带口音的专名"，是**分身页上根本到不了读者眼前的词条**——
+    // 按钮 display:none、点击处又挡了一道 PROFILE 早退（见下面 ⑩ 的三条断言），双保险不是编个借口。
+    "mNoSde", "tipNoSde"];   // 专名，不是遗留
   function leftovers(base, over) {
     const out = [];
     for (const k of Object.keys(base || {})) {
@@ -662,6 +676,22 @@ console.log("\n── ⑨ 分身页的历史记录另立一库（2026-08-22）�
   t("⭐ 全文没有一处还写死着库名", !/agent: "wds-(chat|distill|forge)"/.test(js));
   t("记忆仍是跨台的（profileKey 照旧 global，别跟着分）", /profileKey: "profile:global"/.test(js));
   t("画布落件与落新版本都会进历史", (js.match(/cvToHistory\(it\);/g) || []).length >= 2);
+}
+
+console.log("\n── ⑩ 「无 SDE」按钮在分身页三重不生效（2026-08-27）──");
+{
+  /* 与前面 KEEP 白名单那两条呼应：mNoSde/tipNoSde 被放行是因为这里查实了
+     它们在分身页真的到不了读者眼前——不是嘴上说说。三处缺一不可：
+     缺①＝按钮露出来；缺②＝点了真会切换（哪怕看不见也能被点到）；
+     缺③＝就算前两处都失守，请求体也不该带 nosde:1。 */
+  t("① 分身页按钮强制隐藏", /_nsBtn\.style\.display = PROFILE \? "none" : ""/.test(MC));
+  t("② 点击处对 PROFILE 早退（就算被点到也不生效）",
+    /else if \(k === "nosde"\) \{[\s\S]{0,80}?if \(PROFILE\) return;/.test(MC));
+  t("③ payload 装配处也拦一道（双 !PROFILE 兜底）",
+    (MC.match(/!PROFILE && noSdeOn/g) || []).length >= 1);
+  /* 反向：把①的判断改成恒真（分身页也显示），断言必须当场红——防止这条测试自己也是摆设。 */
+  const mutA = MC.replace('_nsBtn.style.display = PROFILE ? "none" : ""', '_nsBtn.style.display = ""');
+  t("反向：①的断言真会因为改动而红", !/_nsBtn\.style\.display = PROFILE \? "none" : ""/.test(mutA));
 }
 
 console.log("\n" + "═".repeat(48));

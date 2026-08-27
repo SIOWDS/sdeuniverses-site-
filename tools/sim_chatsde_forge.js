@@ -208,17 +208,21 @@ ok("有站外资料时要求逐条落到出处", /逐条落到上面的出处/.t
    💡 心法一：改了传输契约，第一件事是去看接收端的白名单。
    💡 心法二：护栏必须走真正的那条路。绕过清洗去测处理函数，测的是一条读者永远走不到的路。 */
 console.log("── ⭐ 入参白名单：真的那条路 ──");
-const wa = W.indexOf("      const rs = rsRaw ? {");
+/* ⚠ 2026-08-27：「无 SDE 问对」给这一行前面加了一层「noSde 时整体清空」的三元包装——
+   const rs = (noSde ? null : rsRaw) ? {...} : null。字面量跟着变了形，锚点要跟上；
+   抠出来的这一段也因此多引用了一个自由变量 noSde，new Function 必须把它也当形参收下，
+   否则 "noSde is not defined" ——这跟当年 rs 本身漏收是同一类坑（改了契约，先看抠取点）。 */
+const wa = W.indexOf("      const rs = (noSde ? null : rsRaw) ? {");
 const wb = W.indexOf("      // VISION：读者带来的图", wa);
 const SAN = (wa > 0 && wb > wa) ? W.slice(wa, wb) : "";
 ok("抠得到 rs 的清洗那一段", SAN.indexOf("rsRaw.topic") > 0);
-const SANF = new Function("rsRaw", SAN.replace("      const rs = rsRaw ? {", "const rs = rsRaw ? {") + "\n return rs;");
+const SANF = new Function("rsRaw", "noSde", SAN.replace("      const rs = (noSde ? null : rsRaw) ? {", "const rs = (noSde ? null : rsRaw) ? {") + "\n return rs;");
 const sanIn = { i: 7, n: 18, forge: 1, t: "共有前提", topic: "题", done: "1. 选源",
   sv: 2, run: "r123abc", attempt: 2, idem: "r123abc:7:2",
   bodies: [{ i: 2, t: "抽脊", body: "甲家承重命题：" + MARK, hash: "deadbeefdeadbeef" },
            { i: 5, t: "近邻闸", body: "近邻正文" }, { i: 6, t: "候选互撞", body: "候选正文" }],
   gates: [{ i: 2, d: "passed" }, { i: 5, d: "needs_revision" }] };
-const sanOut = SANF(sanIn);
+const sanOut = SANF(sanIn, false);
 ok("★★ bodies 过得了白名单（上一版就死在这里，而护栏全绿）",
   Array.isArray(sanOut.bodies) && sanOut.bodies.length === 3);
 ok("★★ 正文一个字不少地过来了（不是只剩标题）", sanOut.bodies[0].body.indexOf(MARK) >= 0);

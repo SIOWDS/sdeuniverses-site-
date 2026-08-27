@@ -7044,7 +7044,33 @@ function wdsResearchSys(rs) {
     + "\n每提到一篇站内文章就写成可点链接；凡是\"据资料/据搜索\"的说法都要落到具体出处。"
     + "\n这一步若没有可靠依据，就直说这一步查不到、说清缺的是哪一类证据——**不要拿泛论把这一节填满**。";
 }
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof) {
+// ===== 无 SDE 问对：纯基底对话（不装人格/内功/内化心得/方法论块/站内 SDE 语料），2026-08-27 =====
+// 存在的理由：ChatSDE 现有唯一的问对通道，从人格头到检索语料全是 SDE 框架自己写的东西——
+// 提问经它、答案也经它，没有一步会威胁框架本身。这一档给读者一条真正绕开它的通道：
+// 可以拿来对照，也可以单纯把 ChatSDE 当一个称职的通用助手用。
+// 与 prof（ChatJohn 等改姓分身）不是一回事：分身换的是**说法**，内核仍是 SDE 方法论；
+// 这一档换的是**内核本身**——不装人格、不装骨架 SDEM、不装内化心得、不挂站内 SDE 语料、不挂任何 SDE 工序。
+// 调用方（/api/wds/chat）已把 tool/duel/rs/prof 在这一档下强制清空、siteCtx 强制不检索——
+// 这里只接 webCtx/docCtx/about/lang 四样与 SDE 无关的通用能力，一个字都不多接。
+function WDS_PLAIN_SYS(webCtx, docCtx, about, lang, docNote) {
+  return "你是一个称职、直接的通用助手，这一路是 SDE Universes 网站「ChatSDE」里的「无 SDE」问对入口。"
+    + "\n\n【怎么答】"
+    + "\n1. 就事论事，直接给判断，不绕弯子；不确定就说不确定。"
+    + "\n2. 不要主动把 SDE（显露·差异·纠缠）本体论的框架、术语或方法论套到读者的问题上——这个入口存在的意义就是绕开那一层，"
+    + "读者要的是一个不经过这层滤镜的回答。"
+    + "\n3. 如果读者主动问起 SDE、王德生本人或这个网站，你可以照实介绍，但不要反过来用 SDE 去分析他其余的问题。"
+    + "\n4. 说人话，别写论文腔、别堆免责声明；不寒暄，直接从核心那句说起。"
+    + "\n\n【数学写法（页面用 KaTeX 排版，写错了就排不出来）】"
+    + "\n· 凡是数学式子，一律用 LaTeX 写，不许用键盘代码写法：行内式包在 $…$ 里，独立成行包在 $$…$$ 里。"
+    + "\n· 指数写 $e^{i3\\theta}$，分式写 \\frac{a}{b}，根号写 \\sqrt{x}。"
+    + "\n· 绝不要把公式放进代码块（``` 或 `）里——那会被当代码原样显示，排不出公式。"
+    + (webCtx ? ("\n\n【站外资料 · 刚刚联网搜到的（时效性内容以它为准；引用时在句末标 [W序号]）】\n" + webCtx) : "")
+    + (docCtx ? ("\n\n【读者带来的文件（他上传的、在他自己浏览器里解析出来的正文；本站不留存）】\n" + docCtx + (docNote || "")) : "")
+    + (about ? ("\n\n【这位读者自己写的说明（他是谁、他要你怎么答他）——照着办】\n" + about) : "")
+    + (lang === "en" ? "\n\n【LANGUAGE】The reader is using the English interface. Write your entire answer in natural, direct English." : "");
+}
+
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde) {
   // 三家对撞：三段角色 sys 各自独立，同样不装心得与骨架（戴同一副眼镜就会开始附和）。
   // 与 iq 一样必须排在最前——落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
   if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang);
@@ -7054,6 +7080,9 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
      I 维要的「敌意最近邻」于是全凭训练记忆补作者与年份——那不是外部读数，是回忆。
      现在把 webCtx 接进去，并在没有它时**强制把 I 标成证据不足**（见 WDS_IQ_SYS 末尾）。 */
   if (tool === "iq") return WDS_IQ_SYS(siteCtx, docCtx, docNote, lang, webCtx, prof);
+  // 无 SDE 问对同样整段改道，同样必须排在这里——落进下面那串 + 号，
+  // 人格头、SDEM、内化心得、方法论块就都已经进 system 了。
+  if (noSde) return WDS_PLAIN_SYS(webCtx, docCtx, about, lang, docNote);
   /* 领域档案（prof）：换掉人格头与两条与人格绑死的答法，其余机制条款（链接规矩、KaTeX、
      术语、工序、产线、三刀、附件、站外资料）**一字不动地共用**——分身要的是同一台机器，
      不是另一台长得像的机器。题域闸挂在末尾（见 prof.guard）。 */
@@ -9826,9 +9855,15 @@ export default {
          正落在这一段里：流在检索期被掐断，既没有 error 也没有 [DONE]。
          ⇒ 给一个显式开关，让这类"就着你给的文本干活"的调用整段跳过。 */
       const noSite = b.nosite === 1 || b.nosite === true;
+      /* 【无 SDE 问对】读者选了「不套 SDE」这一档：人格／内功／内化心得／方法论块／站内 SDE 语料／
+         SDE 专属工序（工序菜单／学科通融／三家对撞／领域档案）整批清空，只留通用能力
+         （联网、附件、多轮记忆、模型选择）。下面四行是唯一的清空点——都在各自变量第一次算出来
+         的地方就地清空，不是算完正常值再回头覆盖：晚覆盖只要漏一处，就是「说是无 SDE、其实漏了一件」。 */
+      const noSde = b.nosde === 1 || b.nosde === true;
       /* 【领域档案】ChatJohn 等限定题域的分身走这条：同一台引擎，换人格、换语料白名单、换题域闸。
-         递上来的只是一个 key（"lang"），认不出就是 null＝ChatSDE 本身。见 WDS_PROFILES。 */
-      const prof = wdsProfileOf(b.profile);
+         递上来的只是一个 key（"lang"），认不出就是 null＝ChatSDE 本身。见 WDS_PROFILES。
+         无 SDE 档不认领域档案——分身仍是 SDE 方法论换了个名字在跑，与「真的不跑」矛盾。 */
+      const prof = noSde ? null : wdsProfileOf(b.profile);
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "SDE 助教用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
       const vd = wdsVendorOf(b.vendor);
@@ -9873,10 +9908,12 @@ export default {
       const about = String(b.about || "").trim().slice(0, 1200);   // 读者写的自定义指令
       const lang = b.lang === "en" ? "en" : "zh";                 // 界面语言：决定用哪种语言作答
       // SDE 工序：白名单校验，认不出的一律当没选（绝不把读者传来的字符串拼进 system）
-      const tool = WDS_TOOL_KEYS.indexOf(String(b.tool || "")) >= 0 ? String(b.tool) : "";
+      // 无 SDE 档不认工序——工序（评分/碰撞/近邻…）本身就是 SDE 方法论的具体动作。
+      const tool = noSde ? "" : (WDS_TOOL_KEYS.indexOf(String(b.tool || "")) >= 0 ? String(b.tool) : "");
       // 三家对撞的角色与上一家的原文。role 走白名单（认不出就当没开）；
       // prior 是别家模型的产出，只作材料读，切到 24000 字防撑爆输入窗。
-      const duelRaw = (b && typeof b.duel === "object" && b.duel) ? b.duel : null;
+      // 无 SDE 档不认对撞——它本来就是要用同一副 SDE 眼镜的三家去互相顶撞。
+      const duelRaw = noSde ? null : ((b && typeof b.duel === "object" && b.duel) ? b.duel : null);
       const duel = (duelRaw && DUEL_ROLES[String(duelRaw.role || "")])
         ? { role: String(duelRaw.role), prior: String(duelRaw.prior || "").slice(0, 24000) } : null;
       // COMPACTION：本场更早的对话已在读者本机压成一份「账本」（只留判断/否决/分离线/悬案）。
@@ -9892,7 +9929,8 @@ export default {
          护栏还全绿（它直接调 wdsForgeSys，绕过了这一步）。
          💡 心法：**改了传输契约，第一件事是去看接收端的白名单。**
          💡 心法：**护栏必须走真正的那条路。绕过清洗去测处理函数，测的是一条读者永远走不到的路。** */
-      const rs = rsRaw ? {
+      // 无 SDE 档不认学科通融/深度研究状态——rsRaw 在这里被清空，下面整段按「没有 rs」处理。
+      const rs = (noSde ? null : rsRaw) ? {
         i: Math.max(1, Math.min(20, parseInt(rsRaw.i, 10) || 1)),
         n: Math.max(1, Math.min(20, parseInt(rsRaw.n, 10) || 1)),
         forge: rsRaw.forge ? 1 : 0,
@@ -9989,7 +10027,9 @@ export default {
             if (qCut > 0) controller.enqueue(_sseBytes({ t: "note", v: "你这一问超过 " + WDS_CHAT_Q_MAX + " 字，只带上了前 " + WDS_CHAT_Q_MAX + " 字（后面 " + qCut + " 字没进去）。这么长的材料建议用「＋」当附件传，别塞进提问框。" }));
             /* nosite 时整段跳过。用条件闸而不是 throw —— throw 会被下面那个
                catch 吞掉，日后谁给 catch 加一行日志，"跳过"就会被报成"出错"。 */
-            if (!noSite) try {
+            /* 无 SDE 档强制跟 noSite 一起关：不然「无 SDE」答案里混进一段全是 SDE 语汇的
+               《站内资料》，那不是无 SDE，是嘴上无 SDE——语料关不掉，人格换了也没用。 */
+            if (!noSite && !noSde) try {
               _stg("扩展检索词");
               const expTerms = await sdeExpandQuery(VC, KEY, q);
               _stg("站内检索");
@@ -10087,18 +10127,20 @@ export default {
                 else controller.enqueue(_sseBytes({ t: "nbrfail", v: "empty" }));
               } catch (e) { controller.enqueue(_sseBytes({ t: "nbrfail", v: "error" })); }
             }
-            let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
+            // 无 SDE 档不装心得——省一次 ensureReflect（读 KV／可能现算），装了也用不上（WDS_PLAIN_SYS 不接 reflect 参数）。
+            let reflect = ""; if (!noSde) try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             let SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
             /* 领域档案可以带自己那一份内功，装上就顶掉上面这一行骨架。
                ⚠ 读不到**不许静默退回**——退回去以后它照样答得像模像样，只是底盘换了，
-                 而没有任何人会发现。本文件反复写的那条：静默降级＝把没做的事记成做过了。 */
+                 而没有任何人会发现。本文件反复写的那条：静默降级＝把没做的事记成做过了。
+               prof 在无 SDE 档下已被强制清空，这一段自然跳过。 */
             if (prof && prof.neigong) {
               let _pn = "";
               try { _pn = await loadNeigong(env, url, prof.neigong); } catch (e) {}
               if (_pn) SDEM = "\n\n" + _pn;
               else controller.enqueue(_sseBytes({ t: "note", v: "这一档自己的内功文件这次没读到，本轮退回通用骨架作答（答案仍可用，但底盘不是 " + prof.name + " 那一份）。" }));
             }
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof);
+            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde);
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。

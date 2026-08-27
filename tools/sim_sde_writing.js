@@ -137,7 +137,9 @@ sec("③ 页面接线");
   ok(/nosite: 1/.test(H), "请求没带 nosite —— 会白跑一遍全站检索");
   const W2 = fs.readFileSync(path.join(ROOT, "src/worker.js"), "utf8");
   ok(/const noSite = b\.nosite === 1/.test(W2), "服务端没有 nosite 开关（前端带了也没人认）");
-  ok(/if \(!noSite\) try \{/.test(W2), "检索块没有按 nosite 跳过");
+  // ⚠ 2026-08-27：「无 SDE 问对」在这个闸门上加了一层 && !noSde（同一个闸位，多一个跳过条件）——
+  // 字面量形状变了，用意（检索块按 nosite 跳过）没变，钉在新形状上。
+  ok(/if \(!noSite && !noSde\) try \{/.test(W2), "检索块没有按 nosite 跳过");
   ok(!/if \(noSite\) throw/.test(W2), "用 throw 跳过检索 —— 会被 catch 吞掉，日后加日志就成了假错误");
   ok(/watchdog/.test(H), "没有看门狗");
   ok(/toMd\(\$\("ed"\)\.innerHTML\)/.test(H), "富文本没有序列化回 markdown（版本链与导出全建在它上面）");

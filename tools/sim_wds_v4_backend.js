@@ -50,7 +50,9 @@ ok(/已经落下的判断[\s\S]{0,400}已经否决的路线[\s\S]{0,400}已经�
 ok(/不要凑/.test(SUM), "某一类没有就写「（无）」，不许凑——凑出来的账本比没有更坏");
 
 console.log("④ 深度研究");
-ok(/const rs = rsRaw \? \{/.test(CHAT), "chat 收 rs（研究步走同一条熟产线：检索/联网/心跳/时钟全现成）");
+// ⚠ 2026-08-27：「无 SDE 问对」在这一行前面加了「noSde 时整体清空」的三元包装，
+// 字面量形状变了，用意（chat 端点收得到 rs）没变——钉在新形状上。
+ok(/const rs = \(noSde \? null : rsRaw\) \? \{/.test(CHAT), "chat 收 rs（研究步走同一条熟产线：检索/联网/心跳/时钟全现成）");
 ok(/Math\.max\(1, Math\.min\(20, parseInt\(rsRaw\.i, 10\)/.test(CHAT), "rs 的步号有上下界钳位（读者传来的东西一律不信）；上限 20＝学科通融十八道工序放得下");
 ok(/forge: rsRaw\.forge \? 1 : 0/.test(CHAT), "rs 收 forge 位，且只当布尔用（不把读者传来的字符串拼进 system）");
 ok(/rs \? \(deep \? 6000 : 4000\)/.test(CHAT), "研究步预算 4000／满功率仍 6000");

@@ -48,6 +48,7 @@
   var LS = "sdeuniverses_wds_mode";
   var LS_MODE = "sde_wds_thinkmode";      // "std" | "deep"
   var LS_WEB = "sde_wds_web";             // "1" | "0"
+  var LS_NOSDE = "sde_wds_nosde";         // "1" | "0" —— 无 SDE 问对（只在 ChatSDE 本体页出现，分身页不读）
   var LS_LANG = "sde_wds_lang";           // "zh" | "en"
   var PAGE = !!window.WDSM_PAGE;
   /* ════════ 领域档案（profile）════════════════════════════════════
@@ -858,8 +859,9 @@
       tabNormal: "常规", tabBack: "\u2190 返回浏览", tabPortal: "\u2726 \u7cfb\u7edf\u5165\u53e3",
       bDistill: "\u270e 成文 · PPT", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
       egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
-      mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网",
+      mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网", mNoSde: "\u2298 无 SDE",
       tipStd: "快答档，够用且省", tipDeep: "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深", tipWeb: " · 已开联网（需智谱 Key）",
+      tipNoSde: " · 无 SDE：纯基底对话，不套 SDE 框架、不挂站内语料，可当一个称职的通用助手用",
       ph: "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…",
       /* 🔴 原文写的是「只存在浏览器本地」，而每一次提问的请求体里都带着 key 打到本站 Worker。
          Key 确实不写库、不写日志、不进任何分析——但「不上传本站」这句话与事实不符。
@@ -1100,10 +1102,11 @@
       tabNormal: "Browse", tabBack: "\u2190 Back to site", tabPortal: "\u2726 Entry",
       bDistill: "\u270e Write up · Deck", bHist: "\u21ba History", bSet: "\u2699 Settings", bNew: "\uff0b New chat",
       egs: ["What separates Show from structure in SDE?", "How would SDE read the onset of a chronic disease?", "What is entanglement of features? Give an example.", "Point me at a few pieces to start with"],
-      mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web",
+      mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web", mNoSde: "\u2298 No SDE",
       tipStd: "Fast tier — enough for most questions, and cheap",
       tipDeep: "Top model at full reasoning power, the whole SDE groundwork and its method stages. Slow, but it digs.",
       tipWeb: " · Web search on (needs a Zhipu key)",
+      tipNoSde: " · No SDE: plain conversation, no SDE framework, no site corpus — just a capable general assistant",
       ph: "ChatSDE anything about SDE, or ask it what to read here…",
       note: "WDS answers from what is actually on this site. Check titles and quotations against the originals. It runs on your own model key, kept only in this browser.",
       left: "", times: " left this session", today: " left this session · ", turnsTitle: "Session = up to 100 turns in this chat (start a new one to reset). Today = this key's daily allowance on the site-wide entrance; the reading companion has its own.",
@@ -2103,6 +2106,7 @@
           "<button class='wdsm-mode' data-k='std'></button>" +
           "<button class='wdsm-mode' data-k='deep'></button>" +
           "<button class='wdsm-mode' data-k='web'></button>" +
+          "<button class='wdsm-mode' data-k='nosde'></button>" +
           "<button class='wdsm-mode wdsm-rsbtn'></button>" +
           "<button class='wdsm-mode wdsm-lnkbtn'></button>" +
           "<button class='wdsm-mode wdsm-findbtn'></button>" +
@@ -2639,6 +2643,10 @@
     q(".wdsm-mode[data-k='std']").textContent = t("mStd");
     q(".wdsm-mode[data-k='deep']").textContent = t("mDeep");
     q(".wdsm-mode[data-k='web']").textContent = t("mWeb");
+    /* 无 SDE 只在 ChatSDE 本体出现——分身（ChatJohn 等）是一个策展过的品牌人格，
+       让它露出「不套 SDE」的开关，等于把分身自己的存在理由拆掉了一半。 */
+    var _nsBtn = q(".wdsm-mode[data-k='nosde']");
+    if (_nsBtn) { _nsBtn.textContent = t("mNoSde"); _nsBtn.style.display = PROFILE ? "none" : ""; }
     q(".wdsm-note").textContent = t("note");
     q(".wdsm-mic").title = t("micIdle");
     if (!inEl.disabled) inEl.placeholder = t("ph");
@@ -2685,18 +2693,26 @@
      那就把完整诊断行摆出来让人看见，别在那儿无限重问烧读者的 Key。 */
   var _cutRetryAt = 0;
 
-  // —— 模式（深度思考 / 联网），存本地，跨会话记住 ——
-  var thinkMode = "std", webOn = false;
-  try { thinkMode = localStorage.getItem(LS_MODE) === "deep" ? "deep" : "std"; webOn = localStorage.getItem(LS_WEB) === "1"; } catch (e) {}
+  // —— 模式（深度思考 / 联网 / 无 SDE），存本地，跨会话记住 ——
+  // 无 SDE 与 web 同款：独立开关，不参与 std/deep 那组互斥（深度＋无 SDE 是合法组合——
+  // 只是换一台更强的基底跑纯对话，深浅这条轴与套不套 SDE 是两件事）。
+  // PROFILE 页强制当关：分身共用同一个 localStorage，读者可能在本体页开过它、
+  // 再跳来分身页——分身没有这颗按钮，但状态不能跟着漏进来。
+  var thinkMode = "std", webOn = false, noSdeOn = false;
+  try {
+    thinkMode = localStorage.getItem(LS_MODE) === "deep" ? "deep" : "std";
+    webOn = localStorage.getItem(LS_WEB) === "1";
+    noSdeOn = !PROFILE && localStorage.getItem(LS_NOSDE) === "1";
+  } catch (e) {}
   function paintModes() {
     var bs = layer.querySelectorAll(".wdsm-mode");
     for (var i = 0; i < bs.length; i++) {
       var k = bs[i].getAttribute("data-k");
       if (!k) continue;                        // 附件按钮借了 .wdsm-mode 的样式，但不是档位，跳过
-      var on = (k === "web") ? webOn : (thinkMode === k);
+      var on = (k === "web") ? webOn : (k === "nosde") ? noSdeOn : (thinkMode === k);
       if (on) bs[i].classList.add("on"); else bs[i].classList.remove("on");
     }
-    tipEl.textContent = (thinkMode === "deep" ? t("tipDeep") : t("tipStd")) + (webOn ? t("tipWeb") : "");
+    tipEl.textContent = (thinkMode === "deep" ? t("tipDeep") : t("tipStd")) + (webOn ? t("tipWeb") : "") + (noSdeOn ? t("tipNoSde") : "");
   }
   (function () {
     var bs = layer.querySelectorAll(".wdsm-mode");
@@ -2706,6 +2722,17 @@
           var k = b.getAttribute("data-k");
           if (!k) return;                      // 同上：附件按钮另有自己的 onclick
           if (k === "web") { webOn = !webOn; try { localStorage.setItem(LS_WEB, webOn ? "1" : "0"); } catch (e) {} }
+          else if (k === "nosde") {
+            /* 双重保险：分身页这颗按钮本来就 display:none，这里再挡一次——
+               就算哪天样式没跟上（或读者用某种手段绕过隐藏点到了它），也不能真的生效。
+               分身是一份策展过的人格，「不套 SDE」这句话对它没有意义。 */
+            if (PROFILE) return;
+            noSdeOn = !noSdeOn;
+            try { localStorage.setItem(LS_NOSDE, noSdeOn ? "1" : "0"); } catch (e) {}
+            // 互斥：无 SDE 与工序都是「这一轮走不走 SDE 方法论」这同一件事的两种说法，
+            // 开一个就该把另一个关掉，否则界面上会显示两个互相矛盾的档位同时选中。
+            if (noSdeOn && curTool) toolSet("");
+          }
           else { thinkMode = k; try { localStorage.setItem(LS_MODE, k); } catch (e) {} }
           paintModes();
         };
@@ -4032,7 +4059,10 @@
     streaming = true; stoppedByUser = false;
     busyUI(true);
     stopBarShow(true); tipDeckHide(false);
-    var payload = { q: q, history: histPack(compFrom()), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
+    // nosde 单独用 !PROFILE 再兜一道：即便分身页因为共用 localStorage 而读到了 noSdeOn=true
+    // （按钮在分身页本就不出现，读者按不到它，但状态是跨页共享的同一把 key），也绝不把它发出去——
+    // 分身是一份策展过的人格，不该因为一个借来的开关状态就被静默拆穿。
+    var payload = { q: q, history: histPack(compFrom()), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
     var pics = imgsForSend();
     if (pics.length) { payload.imgs = pics; payload.vmodel = vmodelVis(kv.vendor); }
@@ -4721,7 +4751,7 @@
     return {
       n: String(name || "").slice(0, 40),
       v: kv ? kv.vendor : "", m: kv ? (kv.model || "") : "",
-      md: thinkMode, web: webOn ? 1 : 0, tool: curTool,
+      md: thinkMode, web: webOn ? 1 : 0, tool: curTool, nosde: (!PROFILE && noSdeOn) ? 1 : 0,
       st: styleGet(), stc: styleCustom(), ab: aboutGet(),
     };
   }
@@ -4731,6 +4761,8 @@
       if (p.m) localStorage.setItem("sde_wds_model_" + p.v, p.m);
       thinkMode = (p.md === "deep") ? "deep" : "std"; localStorage.setItem(LS_MODE, thinkMode);
       webOn = !!p.web; localStorage.setItem(LS_WEB, webOn ? "1" : "0");
+      // 分身页没有这颗按钮，也不该被一份预设文件（哪怕是读者自己导出的）悄悄打开——同一条纪律见按钮初始化处。
+      noSdeOn = !PROFILE && !!p.nosde; localStorage.setItem(LS_NOSDE, noSdeOn ? "1" : "0");
       localStorage.setItem(LS_STYLE, p.st || "default");
       if (p.stc) localStorage.setItem(LS_STYLE_C, p.stc);
       localStorage.setItem(LS_ABOUT, p.ab || "");
@@ -4753,6 +4785,7 @@
         b.appendChild(document.createTextNode(p.n));
         var sub = (p.v || "?") + " · " + (p.md === "deep" ? t("mDeep") : t("mStd"))
           + (p.web ? " · " + t("mWeb") : "")
+          + (p.nosde ? " · " + t("mNoSde") : "")
           + (p.tool && toolInfo(p.tool) ? " · " + t(toolInfo(p.tool).n) : "");
         b.appendChild(el("span", "sub", sub));
         b.onclick = function () { closeMenu(); psApply(p); };
@@ -4793,6 +4826,7 @@
           var clean = a.slice(0, 12).map(function (p) {
             return { n: String(p.n || "").slice(0, 40), v: String(p.v || ""), m: String(p.m || ""),
                      md: p.md === "deep" ? "deep" : "std", web: p.web ? 1 : 0, tool: String(p.tool || ""),
+                     nosde: p.nosde ? 1 : 0,
                      st: String(p.st || "default"), stc: String(p.stc || "").slice(0, 2000), ab: String(p.ab || "").slice(0, 1200) };
           });
           psPut(clean.concat(psAll()).slice(0, 12));
@@ -8054,7 +8088,13 @@
     if (it) toolBtn.classList.add("on"); else toolBtn.classList.remove("on");
     toolBtn.title = it ? t(it.s) : (t("tlTitle") + " \u00b7 " + t("tlSlash"));
   }
-  function toolSet(k) { curTool = toolInfo(k) ? k : ""; paintTool(); }
+  function toolSet(k) {
+    curTool = toolInfo(k) ? k : "";
+    // 互斥的另一半：选中一个真工序时把「无 SDE」关掉——工序本身就是 SDE 方法论的具体动作，
+    // 两者同时亮着会是一句自相矛盾的界面（另一半见按钮点击处：开无 SDE 就清工序）。
+    if (curTool && noSdeOn) { noSdeOn = false; try { localStorage.setItem(LS_NOSDE, "0"); } catch (e) {} paintModes(); }
+    paintTool();
+  }
   if (toolBtn) toolBtn.onclick = function () {
     menuAt(toolBtn, function (menu) {
       menu.appendChild(el("div", "mh", t("tlTitle")));
