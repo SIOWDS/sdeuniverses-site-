@@ -141,7 +141,7 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--pine);outline-offset
     <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
   </nav>
 </div></header>
-<div class="wrap"><div class="hero" style="padding-bottom:0"><div class="eyebrow">全部篇目 · INDEX</div><h1 style="font-size:clamp(26px,4.4vw,40px)">健康这一条线上的每一篇</h1><p class="lede">共 119 篇，按栏排列。输入任意词即时筛选；点标题读原文。</p><div class="filter"><label>筛选</label><input id="q" type="search" placeholder="输入名目、病名或任意词，例如：内感受" autocomplete="off" aria-label="筛选篇目"><span class="n" id="n"></span></div><p class="empty" id="empty" style="display:none">没有匹配的篇目。换一个词试试。</p></div><section id="chronic" data-col="chronic"><div class="col-h"><span class="no">栏 二</span><h2>慢性病</h2><span class="ct">9 篇</span></div><p class="col-d">指标一次次达标，而那口气一直没有接上来。</p><a class="row" href="/students/hu-min/lodging-in-class/"><span class="r-n">1</span><span class="r-t"><b class="r-h">寄类</b>关于一个人未来所说的话，其依据在哪一刻从他自己的序列换成了他所属类别的基数</span></a>
+<div class="wrap"><div class="hero" style="padding-bottom:0"><div class="eyebrow">全部篇目 · INDEX</div><h1 style="font-size:clamp(26px,4.4vw,40px)">健康这一条线上的每一篇</h1><p class="lede">共 <span data-sde-stat="health_papers">119</span> 篇，按栏排列。输入任意词即时筛选；点标题读原文。</p><div class="filter"><label>筛选</label><input id="q" type="search" placeholder="输入名目、病名或任意词，例如：内感受" autocomplete="off" aria-label="筛选篇目"><span class="n" id="n"></span></div><p class="empty" id="empty" style="display:none">没有匹配的篇目。换一个词试试。</p></div><section id="chronic" data-col="chronic"><div class="col-h"><span class="no">栏 二</span><h2>慢性病</h2><span class="ct">9 篇</span></div><p class="col-d">指标一次次达标，而那口气一直没有接上来。</p><a class="row" href="/students/hu-min/lodging-in-class/"><span class="r-n">1</span><span class="r-t"><b class="r-h">寄类</b>关于一个人未来所说的话，其依据在哪一刻从他自己的序列换成了他所属类别的基数</span></a>
 <a class="row" href="/students/hu-min/unheld-seam/"><span class="r-n">2</span><span class="r-t"><b class="r-h">生缝</b>把一个人切成五个病，切口本身是一样实物</span></a>
 <a class="row" href="/students/hu-min/interruptibility-loss/"><span class="r-n">3</span><span class="r-t"><b class="r-h">失断</b>每一次调整都改善了读数，而计时一次也没有重新开始</span></a>
 <a class="row" href="/students/hu-min/re-scaffolding/"><span class="r-n">4</span><span class="r-t"><b class="r-h">返架</b>慢性病的逆转不是把加上去的减掉，而是新建了一套不入账的支撑</span></a>
@@ -255,7 +255,7 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--pine);outline-offset
 (function(){
   var box=document.getElementById('q'), n=document.getElementById('n');
   if(!box) return;
-  var rows=[].slice.call(document.querySelectorAll('.row'));
+  var rows=[].slice.call(document.querySelectorAll('section[data-col] .row'));
   var secs=[].slice.call(document.querySelectorAll('section[data-col]'));
   var total=rows.length;
   function run(){

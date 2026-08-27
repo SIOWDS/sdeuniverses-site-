@@ -1,5 +1,112 @@
 // SDE Universes site worker: visit counter + static assets
 
+// ── 主站 / 四个正式子站：唯一归属、canonical 与统一统计 ────────────
+// 唯一数据源在 public/sites/site-data.json：Worker 用它判路由、改首页统计与
+// 元数据；tools/build_sitemap.py 用同一份文件分配 sitemap。任何篇目数或归属
+// 变化只改那一处，不能再在 HTML、路由和 sitemap 各维护一份。
+let SEO_SITE_CATALOG = null;
+let SEO_SITE_CATALOG_AT = 0;
+async function seoSiteCatalog(env) {
+  const now = Date.now();
+  if (SEO_SITE_CATALOG && now - SEO_SITE_CATALOG_AT < 300000) return SEO_SITE_CATALOG;
+  try {
+    const r = await env.ASSETS.fetch(new Request("https://sdeuniverses.com/sites/site-data.json"));
+    if (!r.ok) return SEO_SITE_CATALOG;
+    const data = await r.json();
+    if (!data || data.main_host !== "sdeuniverses.com" || !data.subsites) return SEO_SITE_CATALOG;
+    SEO_SITE_CATALOG = data;
+    SEO_SITE_CATALOG_AT = now;
+  } catch (e) {}
+  return SEO_SITE_CATALOG;
+}
+function seoSiteKeyForHost(host, catalog) {
+  if (!catalog || !catalog.subsites) return null;
+  const h = String(host || "").toLowerCase().replace(/^www\./, "");
+  for (const key of Object.keys(catalog.subsites)) {
+    if (catalog.subsites[key] && catalog.subsites[key].host === h) return key;
+  }
+  return null;
+}
+function seoOwnerForPath(pathname, catalog) {
+  if (!catalog || !catalog.subsites) return null;
+  const path = String(pathname || "/");
+  for (const key of Object.keys(catalog.subsites)) {
+    const own = (catalog.subsites[key] && catalog.subsites[key].ownership) || {};
+    if ((own.path_prefixes || []).some((prefix) => path.indexOf(String(prefix)) === 0)) return key;
+    for (const bookId of (own.book_ids || [])) {
+      if (new RegExp("^/books/m/" + String(bookId).replace(/[^0-9]/g, "") + "(?:/|$)").test(path)) return key;
+    }
+  }
+  return null;
+}
+function seoPermanentRedirect(host, url, pathname) {
+  const target = new URL(url.toString());
+  target.protocol = "https:";
+  target.hostname = host;
+  target.port = "";
+  if (pathname != null) target.pathname = pathname;
+  return Response.redirect(target.toString(), 301);
+}
+function seoHomeSchema(site, catalog) {
+  const publisher = (catalog && catalog.publisher) || { name: "SDE Universes", url: "https://sdeuniverses.com/" };
+  const owner = site.owner || {};
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        name: site.title,
+        url: "https://" + site.host + "/",
+        description: site.description,
+        inLanguage: "zh-CN",
+        publisher: { "@type": "Organization", name: publisher.name, url: publisher.url }
+      },
+      {
+        "@type": "Person",
+        name: owner.name || "",
+        alternateName: owner.alternate_name || "",
+        url: "https://" + site.host + "/"
+      }
+    ]
+  };
+}
+function seoDecorateHtml(response, canonical, site, catalog, pathname) {
+  const headers = new Headers(response.headers);
+  headers.set("link", "<" + canonical + ">; rel=\"canonical\"");
+  const base = new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  const isSubsiteHome = !!(site && pathname === "/");
+  const pageMeta = site && site.page_meta ? (site.page_meta[pathname] || null) : null;
+  let extra = '<link rel="canonical" href="' + canonical.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '">'
+    + '<meta property="og:url" content="' + canonical.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '">';
+  if (isSubsiteHome && site) {
+    extra += '<script type="application/ld+json">'
+      + JSON.stringify(seoHomeSchema(site, catalog)).replace(/</g, "\\u003c")
+      + "</script>";
+  }
+  let out = new HTMLRewriter()
+    .on('link[rel="canonical"]', { element(el) { el.remove(); } })
+    .on('meta[property="og:url"]', { element(el) { el.remove(); } })
+    .on("head", { element(el) { el.prepend(extra, { html: true }); } });
+  if (site) {
+    out = out.on("[data-sde-stat]", {
+      element(el) {
+        const key = el.getAttribute("data-sde-stat");
+        if (key && site.stats && Object.prototype.hasOwnProperty.call(site.stats, key)) {
+          el.setInnerContent(String(site.stats[key]));
+        }
+      }
+    });
+    if (pageMeta) {
+      out = out
+        .on("title", { element(el) { el.setInnerContent(pageMeta.title || site.title || ""); } })
+        .on('meta[name="description"]', { element(el) { el.setAttribute("content", pageMeta.description || site.description || ""); } })
+        .on('meta[property="og:title"]', { element(el) { el.setAttribute("content", pageMeta.title || site.title || ""); } })
+        .on('meta[property="og:description"]', { element(el) { el.setAttribute("content", pageMeta.og_description || pageMeta.description || site.og_description || site.description || ""); } });
+    }
+  }
+  return out.transform(base);
+}
+
 // ── 讨论区 Google 实名登录（方案B：只认 Google 登录）────────────────
 // 填入王德生在 console.cloud.google.com 创建的 OAuth Web 客户端 ID 即全站生效；
 // 留空 = 休眠，讨论区维持"起名+网络绑定"旧通道。
@@ -14059,32 +14166,67 @@ export default {
     //   /overview/ 旧的长滚动首页，原样留着
     // 旧口径里三个地址返回同一份 893KB 长卷——进站看一眼门就得先把整卷下下来，
     // 而用户裁定"长滚动那页意义不大了，都是点栏目进的"，于是拆开。
-    // **原地取内容，不发 30x 跳转**：跳转多一次往返，后退历史还多一格。
+    // 2026-08-27 起入口只保留一个正主：/。/home/ 永久归并，避免同一入口两条 URL。
+    const requestHost = url.hostname.toLowerCase().replace(/^www\./, "");
+    const isMainHost = requestHost === "sdeuniverses.com";
+    if (url.hostname.toLowerCase() === "www.sdeuniverses.com") {
+      return seoPermanentRedirect("sdeuniverses.com", url);
+    }
+    if (isMainHost && /^\/home\/?$/.test(url.pathname)) {
+      return seoPermanentRedirect("sdeuniverses.com", url, "/");
+    }
     let assetReq = request;
-    if (/^\/home\/?$/.test(url.pathname)) {
-      assetReq = new Request(new URL("/", url), request);
-    } else if (url.pathname === "/browse") {
+    if (url.pathname === "/browse") {
       // 不带尾斜杠也认，取的是 /browse/ 那一页本身（不是根那份）
       assetReq = new Request(new URL("/browse/", url), request);
     }
     // ── 二级域名分站（2026-08-19 起）────────────────────────────────
     // health.sdeuniverses.com → public/sites/health/。规矩只有一条：
-    // **先按 /sites/<名>/ 找一遍，没有再按原路径找主站那一份。**
-    // 于是分站有自己的首页与目录页，而 /students/… /books/… /assets/… /api/…
-    // 在分站域名下照旧可用，读者点开一篇论文不会被踢回裸域名。
-    // 加一个分站 = 在 SUBSITES 里加一行，别处不用动。
-    // 回落到主站内容时给一个 canonical 响应头，指回裸域名那一份，免得同一篇正文
-    // 在两个域名下各算一次（搜索引擎按重复内容处理）。
+    // **先按 /sites/<名>/ 找一遍；没有时再按中央归属表裁决。**
+    // 正确作者与专著留在本分站；落到错误分站的文章 301 到正确分站，普通母站
+    // 内容 301 回裸域名。母站访问一篇已划归正式分站的文章，也 301 到该分站。
     const SUBSITES = { health: "/sites/health", lang: "/sites/lang", liter: "/sites/liter", edu: "/sites/edu", math: "/sites/math", comp: "/sites/comp" };
     const subHost = url.hostname.toLowerCase();
     const subPrefix = /\.sdeuniverses\.com$/.test(subHost) ? (SUBSITES[subHost.split(".")[0]] || null) : null;
+    const seoCatalog = await seoSiteCatalog(env);
+    const formalSubKey = seoSiteKeyForHost(subHost, seoCatalog);
+    const ownerKey = seoOwnerForPath(url.pathname, seoCatalog);
+    const ownerSite = ownerKey && seoCatalog && seoCatalog.subsites ? seoCatalog.subsites[ownerKey] : null;
+    const previewMatch = url.pathname.match(/^\/sites\/(liter|lang|edu|health)(\/.*)?$/);
+    if (seoCatalog && previewMatch && seoCatalog.subsites[previewMatch[1]]) {
+      return seoPermanentRedirect(seoCatalog.subsites[previewMatch[1]].host, url, previewMatch[2] || "/");
+    }
     let resp = null;
+    let subLocal = false;
     if (subPrefix && url.pathname.indexOf(subPrefix + "/") !== 0) {
       const cand = await env.ASSETS.fetch(new Request(new URL(subPrefix + url.pathname, url), assetReq));
-      if (cand.status < 400) resp = cand;
+      if (cand.status < 400) { resp = cand; subLocal = true; }
       else { try { if (cand.body) await cand.body.cancel(); } catch (e) {} }
     }
-    const subFellBack = !!subPrefix && !resp;
+
+    // 这些是四站共用的运行资产，不是文章，维持同源读取；其余非本站 HTML/PDF
+    // 不再在错误子域复制一份。
+    const sharedFallback = /^\/(assets|js|api|search|kb)\//.test(url.pathname)
+      || /^\/taste\/assets\//.test(url.pathname)
+      || url.pathname === "/sites/site-data.json"
+      || /^\/(favicon\.ico|manifest\.webmanifest)$/.test(url.pathname);
+
+    if (seoCatalog && isMainHost && ownerSite) {
+      return seoPermanentRedirect(ownerSite.host, url);
+    }
+    if (formalSubKey && /^\/home\/?$/.test(url.pathname)) {
+      return seoPermanentRedirect(seoCatalog.main_host, url, "/");
+    }
+    if (formalSubKey && ownerSite && ownerKey !== formalSubKey) {
+      // 归属裁决高于本地副本：即使错误分站目录里残留了同路径文件，也不能再公开它。
+      return seoPermanentRedirect(ownerSite.host, url);
+    }
+    if (formalSubKey && !resp) {
+      if (!ownerSite && !sharedFallback) {
+        return seoPermanentRedirect(seoCatalog.main_host, url);
+      }
+      // ownerKey === formalSubKey：正文物理文件仍在 public/，但唯一公开域名是本分站。
+    }
     if (!resp) resp = await env.ASSETS.fetch(assetReq);
     const ct = resp.headers.get("content-type") || "";
     if (ct.includes("text/html")) {
@@ -14100,8 +14242,11 @@ export default {
       r.headers.delete("last-modified");
       // 版本可验证：每次响应盖实时时间戳，线上一眼看出服务的是不是最新版。
       r.headers.set("x-served-at", new Date().toISOString());
-      if (subFellBack) r.headers.set("link", "<https://sdeuniverses.com" + url.pathname + ">; rel=\"canonical\"");
-      return r;
+      let canonicalHost = "sdeuniverses.com";
+      if (formalSubKey && (subLocal || ownerKey === formalSubKey)) canonicalHost = subHost;
+      const canonical = "https://" + canonicalHost + url.pathname;
+      const site = formalSubKey && seoCatalog && seoCatalog.subsites ? seoCatalog.subsites[formalSubKey] : null;
+      return seoDecorateHtml(r, canonical, site, seoCatalog, url.pathname);
     }
     // 图片/字体/媒体：内容几乎不变，给 30 天缓存，省掉每次访问的 304 协商往返。
     // 故意不用 immutable、不用一年——同名替换（换封面、改配图）时最多 30 天见新版；
@@ -14112,6 +14257,16 @@ export default {
       const r2 = new Response(resp.body, resp);
       r2.headers.set("cache-control", "public, max-age=2592000");
       return r2;
+    }
+    if (url.pathname === "/robots.txt" && ct.includes("text/plain")) {
+      const rr = new Response(resp.body, resp);
+      rr.headers.set("content-type", "text/plain; charset=utf-8");
+      return rr;
+    }
+    if (ownerSite && (isMainHost || formalSubKey === ownerKey)) {
+      const rr = new Response(resp.body, resp);
+      rr.headers.set("link", "<https://" + ownerSite.host + url.pathname + ">; rel=\"canonical\"");
+      return rr;
     }
     return resp;
   },
