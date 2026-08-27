@@ -1,56 +1,150 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-生成 public/sitemap.xml（与 robots.txt 里的 Sitemap: 行配套）。
+"""Build the main sitemap plus one independent sitemap per formal subsite.
 
-口径（2026-08-18 定，王德生令）：
-  · 收录**有 index.html 的目录**，URL 一律带尾斜杠（站内链接就是这个形态）。
-  · **裸域名 "/" 不收**——它与 /home/ 是同一份轻量入口页，而 index.html 的
-    canonical 指向 /home/。给搜索引擎的正主：入口 /home/、首页 /browse/、
-    栏目目录 /directory/、总览长卷 /overview/，各是各的一条。
-  · 工具页与后台不收：/admin/**、/diag、/check、/*/test*。它们既无内容也不该被索引。
-  · **不写 lastmod**：仓库是浅克隆，逐文件问 git 拿不到可信日期；宁可不写，
-    也不要写一个假的（sitemap 的 lastmod 一旦不可信，爬虫会整份降权）。
-重跑：python3 tools/build_sitemap.py  → 覆盖 public/sitemap.xml，随内容改动一起提交。
-"""
-import os, re, sys
+The ownership map and public counters live in ``public/sites/site-data.json``.
+The same file is consumed by the Worker, so routing, canonical URLs, visible
+statistics and sitemap ownership cannot silently drift apart.
 
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-PUB = os.path.join(ROOT, "public")
-BASE = "https://sdeuniverses.com"
+This script reads tracked paths from Git rather than walking only the current
+checkout. That keeps it correct in the repository's sparse maintenance clones.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+from pathlib import Path
+from xml.sax.saxutils import escape
+
+
+ROOT = Path(__file__).resolve().parent.parent
+PUBLIC = ROOT / "public"
+CATALOG_PATH = PUBLIC / "sites" / "site-data.json"
 SKIP = re.compile(r"^/(admin|diag|check)(/|$)|/test(/|$)")
 
-# worker 改写出来的地址：磁盘上没有 public/home/，但它是入口页的正主
-# （public/index.html 的 canonical 就指这里），不补进来等于把入口页漏在 sitemap 外。
-EXTRA = ["/home/"]
 
-def collect():
-    out = list(EXTRA)
-    for dp, dn, fn in os.walk(PUB):
-        if "index.html" not in fn:
+def load_catalog() -> dict:
+    with CATALOG_PATH.open(encoding="utf-8") as handle:
+        data = json.load(handle)
+    assert data.get("main_host") == "sdeuniverses.com"
+    assert set(data.get("subsites", {})) >= {"liter", "lang", "edu", "health"}
+    return data
+
+
+def tracked_public_files() -> list[str]:
+    done = subprocess.run(
+        ["git", "ls-files", "public"],
+        cwd=ROOT,
+        check=True,
+        text=True,
+        stdout=subprocess.PIPE,
+    )
+    paths = set(filter(None, done.stdout.splitlines()))
+    for dirpath, _dirnames, filenames in os.walk(PUBLIC):
+        for filename in filenames:
+            paths.add((Path(dirpath) / filename).relative_to(ROOT).as_posix())
+    return sorted(paths)
+
+
+def index_url(path: str) -> str | None:
+    if not path.endswith("/index.html") and path != "public/index.html":
+        return None
+    rel = path[len("public/") :]
+    if rel == "index.html":
+        return "/"
+    return "/" + rel[: -len("index.html")]
+
+
+def owner_for(url: str, catalog: dict) -> str | None:
+    for key, site in catalog["subsites"].items():
+        ownership = site.get("ownership", {})
+        if any(url.startswith(prefix) for prefix in ownership.get("path_prefixes", [])):
+            return key
+        for book_id in ownership.get("book_ids", []):
+            if re.match(rf"^/books/m/{re.escape(str(book_id))}(/|$)", url):
+                return key
+    return None
+
+
+def collect(catalog: dict) -> tuple[set[str], dict[str, set[str]]]:
+    main_urls = {"/"}
+    subsite_urls = {key: {"/"} for key in catalog["subsites"]}
+
+    for path in tracked_public_files():
+        url = index_url(path)
+        if not url:
             continue
-        rel = dp[len(PUB):].replace(os.sep, "/")
-        url = (rel + "/") if rel else "/"
-        if url == "/":            # 裸域名让位给 /home/
+
+        local_match = re.match(r"^public/sites/([^/]+)/(.*)index\.html$", path)
+        if local_match:
+            key, rest = local_match.groups()
+            if key in subsite_urls:
+                local_url = "/" + rest
+                if not SKIP.search(local_url):
+                    subsite_urls[key].add(local_url)
             continue
+
         if SKIP.search(url):
             continue
-        out.append(url)
-    return sorted(set(out))
+        owner = owner_for(url, catalog)
+        if owner:
+            subsite_urls[owner].add(url)
+        else:
+            main_urls.add(url)
 
-def main():
-    urls = collect()
-    assert len(urls) > 2000, "只扫到 %d 条，八成是路径错了——空集会静默产出一份废 sitemap" % len(urls)
-    assert len(urls) < 50000, "超过 50000 条就必须拆分成 sitemap index"
-    lines = ['<?xml version="1.0" encoding="UTF-8"?>',
-             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    for u in urls:
-        lines.append("  <url><loc>%s%s</loc></url>" % (BASE, u))
+    return main_urls, subsite_urls
+
+
+def sitemap_xml(host: str, urls: set[str]) -> str:
+    assert len(urls) < 50000, f"{host} exceeds the 50,000 URL sitemap limit"
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    for url in sorted(urls):
+        lines.append(f"  <url><loc>{escape('https://' + host + url)}</loc></url>")
     lines.append("</urlset>")
-    xml = "\n".join(lines) + "\n"
-    with open(os.path.join(PUB, "sitemap.xml"), "w", encoding="utf-8") as f:
-        f.write(xml)
-    print("sitemap.xml: %d 条 / %d 字节" % (len(urls), len(xml.encode())))
+    return "\n".join(lines) + "\n"
+
+
+def robots_txt(host: str) -> str:
+    return (
+        f"# {host}\n"
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /admin/\n"
+        "Disallow: /diag\n"
+        "Disallow: /check\n\n"
+        f"Sitemap: https://{host}/sitemap.xml\n"
+    )
+
+
+def write_text(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def main() -> None:
+    catalog = load_catalog()
+    main_urls, subsite_urls = collect(catalog)
+    assert len(main_urls) > 2000, f"main sitemap unexpectedly small: {len(main_urls)}"
+
+    main_host = catalog["main_host"]
+    write_text(PUBLIC / "sitemap.xml", sitemap_xml(main_host, main_urls))
+    write_text(PUBLIC / "robots.txt", robots_txt(main_host))
+    print(f"{main_host}: {len(main_urls)} URLs")
+
+    for key, urls in subsite_urls.items():
+        host = catalog["subsites"][key]["host"]
+        assert len(urls) > 3, f"{host} sitemap unexpectedly small: {len(urls)}"
+        base = PUBLIC / "sites" / key
+        write_text(base / "sitemap.xml", sitemap_xml(host, urls))
+        write_text(base / "robots.txt", robots_txt(host))
+        print(f"{host}: {len(urls)} URLs")
+
 
 if __name__ == "__main__":
     main()
