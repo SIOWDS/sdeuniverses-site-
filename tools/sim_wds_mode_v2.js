@@ -1803,6 +1803,34 @@ console.log("⑧ 成文（distill）");
     ok(/\.wdsm-modes\.fold\{display:none\}/.test(src), "收起就是不占位（不是变透明）");
   }
 
+  /* ═══ 顶栏随读收起（2026-08-29）═══════════════════════════════
+     往下读就收、往上翻或到顶就现；收起时必须留得下出口。 */
+  {
+    console.log("㉑ 顶栏随读收起");
+    const topBar = layer.querySelector(".wdsm-top");
+    const showBtn = layer.querySelector(".wdsm-topshow");
+    const body = layer.querySelector(".wdsm-body");
+    ok(!!topBar && !!showBtn, "顶栏与唤回钮都在");
+    const fire = (y) => { body.scrollTop = y; (body._listeners.scroll || []).forEach((f) => f()); };
+    if (topBar && showBtn && body) {
+      fire(300);
+      ok(topBar.className.includes("hid"), "往下读 → 顶栏收起");
+      ok(showBtn.className.includes("on"), "⭐ 收起时右上角有唤回钮（顶栏里装着侧栏开关与新对话，没出口的隐藏是陷阱）");
+      fire(200);
+      ok(!topBar.className.includes("hid"), "往上翻 → 顶栏回来");
+      fire(600); ok(topBar.className.includes("hid"), "再往下读又收起");
+      fire(10);  ok(!topBar.className.includes("hid"), "滚到顶必现");
+      fire(900); ok(topBar.className.includes("hid"), "收起以便测唤回钮");
+      showBtn.onclick();
+      ok(!topBar.className.includes("hid") && !showBtn.className.includes("on"), "点唤回钮就回来");
+    }
+    ok(/\.wdsm-top\.hid\{max-height:0;padding-top:0;padding-bottom:0/.test(src),
+      "收起是真的不占位（max-height 与内边距一起归零，不是只调透明度）");
+    ok(/try \{ topSet\(false\); topLastY = 0; \} catch \(e\) \{\}/.test(src),
+      "新开一场把顶栏叫回来（清空后不会再有滚动事件）");
+    ok(/topShowT:/.test(src) && (src.match(/topShowT:/g) || []).length === 2, "唤回钮的说明中英两套都齐");
+  }
+
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
 })();

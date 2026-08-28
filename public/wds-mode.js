@@ -940,6 +940,7 @@
       egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
       mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网", mNoSde: "\u2298 无 SDE",
       mtHide: "收起工具", mtShow: "工具", mtHideT: "把档位条收起来，把屏幕让给答案",
+      topShowT: "把顶栏叫回来（往上翻一下也会回来）",
       mtShowT: "展开档位条（现在开着的）",
       tipStd: "快答档，够用且省", tipDeep: "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深", tipWeb: " · 已开联网（需智谱 Key）",
       tipNoSde: " · 无 SDE：纯基底对话，不套 SDE 框架、不挂站内语料，可当一个称职的通用助手用",
@@ -1187,6 +1188,7 @@
       egs: ["What separates Show from structure in SDE?", "How would SDE read the onset of a chronic disease?", "What is entanglement of features? Give an example.", "Point me at a few pieces to start with"],
       mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web", mNoSde: "\u2298 No SDE",
       mtHide: "Hide tools", mtShow: "Tools", mtHideT: "Collapse the mode bar and give the screen to the answer",
+      topShowT: "Bring the top bar back (scrolling up does it too)",
       mtShowT: "Show the mode bar (currently on)",
       tipStd: "Fast tier — enough for most questions, and cheap",
       tipDeep: "Top model at full reasoning power, the whole SDE groundwork and its method stages. Slow, but it digs.",
@@ -1821,7 +1823,7 @@
     ".wdsm-layer{position:fixed;inset:0;z-index:100000;background:var(--wbg);display:none;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--wtx)}" +
     ".wdsm-layer.on{display:flex}" +
     /* overflow:hidden 是兜底：无论顶栏/正文怎么算宽，都不许画到画布那一栏上去 */
-    ".wdsm-main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}" +
+    ".wdsm-main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;position:relative}" +
     /* ── 侧栏 ── */
     ".wdsm-side{flex:none;width:262px;background:var(--wside);border-right:1px solid var(--wline);display:flex;flex-direction:column;transition:width .18s ease}" +
     ".wdsm-layer.fold .wdsm-side{width:0;overflow:hidden;border-right:none}" +
@@ -1853,7 +1855,14 @@
        而且**只有带 position 的那一颗**（记忆，为了挂角标）会浮在画布上面——
        定位元素的绘制层级高于同层的非定位元素，其余按钮被画布背景盖住了。
        其余被画布背景盖住，于是看起来像"凭空多了一颗记忆按钮"。 */
-    ".wdsm-top{flex:none;display:flex;flex-wrap:wrap;row-gap:6px;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--wline2);min-width:0}" +
+    ".wdsm-top{flex:none;display:flex;flex-wrap:wrap;row-gap:6px;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--wline2);min-width:0;max-height:220px;overflow:hidden;transition:max-height .2s ease,padding .2s ease,opacity .16s ease}" +
+    /* ⭐ 顶栏随读收起（2026-08-29）。往下读＝正在读答案，屏幕归答案；往上翻或到顶＝在找东西，顶栏自己回来。
+       **收起是真的不占位**（max-height/padding 一起归零），不是变透明——变透明省不出一个像素。 */
+    ".wdsm-top.hid{max-height:0;padding-top:0;padding-bottom:0;opacity:0;border-bottom-color:transparent}" +
+    /* 收起时留一颗唤回钮：顶栏里装着侧栏开关与「新对话」，没有出口的隐藏是陷阱。 */
+    ".wdsm-topshow{position:absolute;top:6px;right:12px;z-index:8;display:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--wline2);background:var(--wbg2);color:var(--wgold);font-size:14px;line-height:1;cursor:pointer;box-shadow:0 3px 12px var(--wsh)}" +
+    ".wdsm-topshow:hover{border-color:var(--wgold)}" +
+    ".wdsm-topshow.on{display:block}" +
     /* 窄栏（画布打开）：次要按钮收进「⋯ 更多」，栏上只留画布与新对话 */
     ".wdsm-top.narrow .wdsm-turns,.wdsm-top.narrow .wdsm-langbtn,.wdsm-top.narrow .wdsm-distbtn," +
       ".wdsm-top.narrow .wdsm-pdfbtn,.wdsm-top.narrow .wdsm-membtn,.wdsm-top.narrow .wdsm-keybtn{display:none}" +
@@ -2176,6 +2185,7 @@
       "</div>" +
     "</div>" +
     "<div class='wdsm-main'>" +
+      "<button class='wdsm-topshow' title=''>\u2304</button>" +
       "<div class='wdsm-top'>" +
         "<button class='wdsm-burger'>\u2630</button>" +
         "<div class='wdsm-top-sp'></div><span class='wdsm-turns' id='wdsmTurns'>本场剩余 100 次</span>" +
@@ -2706,7 +2716,36 @@
     catch (e) { bodyEl.scrollTop = bodyEl.scrollHeight; }
   }
   function setStick(on) { stick = !!on; if (toBotEl) toBotEl.style.display = stick ? "none" : "block"; }
-  bodyEl.addEventListener("scroll", function () { setStick(atBottom()); }, { passive: true });
+  /* ════ 顶栏随读收起（2026-08-29）════════════════════════════════
+     诉求同档位条：把屏幕让给答案。判据用滚动方向，不用「是不是在流式」——
+     流式时读者若往上翻去查前一段，顶栏就该回来；而读完不动的静止页面上，
+     顶栏也没有理由自己弹出来。
+     三条纪律：
+     ① 收起是**真的不占位**（见 .wdsm-top.hid），不是变透明；
+     ② **一定要有出口**：顶栏里装着侧栏开关与「新对话」，所以收起时右上角留一颗唤回钮；
+     ③ 到顶必现——读者滚回最上面时，他找的多半正是顶栏那几颗。 */
+  var topEl = layer.querySelector(".wdsm-top");
+  var topShowBtn = layer.querySelector(".wdsm-topshow");
+  var topHid = false, topLastY = 0;
+  function topSet(hide) {
+    if (!topEl || topHid === !!hide) return;
+    topHid = !!hide;
+    if (topHid) topEl.classList.add("hid"); else topEl.classList.remove("hid");
+    if (topShowBtn) { if (topHid) topShowBtn.classList.add("on"); else topShowBtn.classList.remove("on"); }
+  }
+  if (topShowBtn) {
+    topShowBtn.onclick = function () { topSet(false); topLastY = bodyEl.scrollTop; };
+  }
+  function topOnScroll() {
+    var y = bodyEl.scrollTop || 0;
+    /* 到顶必现；往下读 8px 就收（流式贴底也会一直往下，于是读答案时它一直不在）；
+       往上翻 24px 才现——阈值不对称，是为了防手指微抖把它抖出来。 */
+    if (y < 40) topSet(false);
+    else if (y > topLastY + 8) topSet(true);
+    else if (y < topLastY - 24) topSet(false);
+    topLastY = y;
+  }
+  bodyEl.addEventListener("scroll", function () { setStick(atBottom()); topOnScroll(); }, { passive: true });
   if (toBotEl) { toBotEl.onclick = function () { setStick(true); scrollBottom(1); }; }
   var tipEl = layer.querySelector(".wdsm-mode-tip");
   // 语言只重刷"外壳"（按钮/提示/示例）；已经生成的回答保持它当时的语言——重译旧答既不诚实也没必要。
@@ -2724,6 +2763,7 @@
     q(".wdsm-keybtn").textContent = t("bSet");
     try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
     q(".wdsm-newbtn").textContent = t("bNew");
+    try { q(".wdsm-topshow").title = t("topShowT"); } catch (e) {}
     try { rsPaint(); lnkPaint(); fdPaint(); cvPaint(); compPaint(); duPaint(); pjPaint(); } catch (e) {}
     q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
     var g = function (sel) { return q(sel) || {}; };   // 防空取：桩环境里某些节点不存在，别为文案崩掉整页
@@ -3133,6 +3173,7 @@
     inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph"); updTurns();   // dayLeft 不复位：今日额度按本机计
     layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = ""; inEl.focus();
     VERS = []; sbRender();
+    try { topSet(false); topLastY = 0; } catch (e) {}   // 清空后不再有滚动事件，顶栏得自己回来
   };
 
   // —— 注入导航切换按钮 ——
