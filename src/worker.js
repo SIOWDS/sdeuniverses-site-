@@ -5639,7 +5639,10 @@ function parseFollows(out, prof) {
     let head = "", qq = s;
     if (bar.length >= 2) { head = bar[0].trim(); qq = bar.slice(1).join("|").trim(); }
     qq = qq.replace(/^[\s:：]+/, "").trim();
-    if (qq.length < 4 || qq.length > 40) continue;
+    /* 上限 40→60（2026-08-29）：「8–24 字」是写给基底的规矩，不是丢弃的判据。
+       话多的那一家（实测智谱）常写到三四十字往上，按 40 砍等于**三行全丢、一条追问都不出**，
+       而读者看到的只是「这一答没有追问」。宁可挂一颗长一点的按钮。 */
+    if (qq.length < 4 || qq.length > 60) continue;
     const i = rows.length;                       // 行序即 What/How/Why 的序，模型写错了也按序纠正
     if (i > 2) break;
     const kind = L ? FOLLOW_KINDS_CN[i] : FOLLOW_KINDS[i];
@@ -5657,16 +5660,34 @@ function parseFollows(out, prof) {
   return rows.slice(0, 3);
 }
 
-async function followUps(VC, KEY, q, ans, lang, prof) {
+/* 追问建议。**两条来路，不是一条**（2026-08-29 修）：
+   原来它只用 `WDS_VENDORS[vd].model` 那台便宜档，写死在表里、也不认读者在设置里覆盖的型号。
+   于是只要那一台改了名或对这把 Key 不可用（各家型号的更替比本站快得多），
+   这一次调用就 400 → llmText 返回空串 → 上层 `catch { return [] }` 吞掉 →
+   **读者只看到追问没有出现，看不到任何原因**。智谱那一路正是这么哑掉的。
+   ⇒ ① 便宜档也走 wdsPickModel（读者覆盖优先）；
+     ② 它没写出来时，用**刚刚写完正文的那一台**重试一次——那一台是当场验证过活着的；
+     ③ 两遍都没有就如实说一句（onFail），不再静默。 */
+async function followUps(VC, KEY, q, ans, lang, prof, alt, onFail) {
   try {
     const sys = followSys(prof) + (lang === "en" ? "\n⑥ Write the three questions in English (keep the What/How/Why labels)." : "");
     // 短截止（WDS_FOLLOW_MS）：这一步跑在正文写完之后、同一个请求里，客户端要等 [DONE] 才收尾并挂出操作行。
     // 吃缺省 55 秒＝正文早写完了，读者却按不到 复制/继续/重答。它是配菜：晚了就不上，不许拖住正菜。
     // 预算 260→460：三行现在各多带一个工具名，260 会把第三行截在半句上（第三行正是 Why，最不该丢的那条）。
-    const out = await llmText(VC, KEY, sys, "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：", 460, WDS_FOLLOW_MS);
-    if (!out) return [];
-    return parseFollows(out, prof);
-  } catch (e) { return []; }
+    const usr = "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：";
+    const st = {};
+    let out = await llmText(VC, KEY, sys, usr, 460, WDS_FOLLOW_MS, st);
+    let why = out ? "" : (st.status ? ("配菜那台 " + VC.model + " 返回 " + st.status + (st.err ? ("：" + String(st.err).slice(0, 120)) : "")) : ("配菜那台 " + VC.model + " 超时或没接上"));
+    if (!out && alt && alt.model && alt.model !== VC.model) {
+      const st2 = {};
+      out = await llmText(alt, KEY, sys, usr, 460, WDS_FOLLOW_MS, st2);
+      if (!out) why += "；换成 " + alt.model + " 再试也没写出来" + (st2.status ? ("（" + st2.status + "）") : "");
+    }
+    if (!out) { if (onFail) onFail(why); return []; }
+    const rows = parseFollows(out, prof);
+    if (!rows.length && onFail) onFail("基底写回来了，但三行的格式没解析出来");
+    return rows;
+  } catch (e) { if (onFail) onFail((e && e.message) || "未知原因"); return []; }
 }
 
 // ===== 联网搜索（站外资料）=====
@@ -10986,8 +11007,10 @@ export default {
             // 追问建议：正文已经吐完（读者已在读了），再花一次便宜档补三个「接着可以问什么」。
             // 走 WDS_VENDORS 的快档而非满血档——这一步要快，慢了读者早就自己打字了；失败一律吞掉。
             if (outText.length > 150 && !rs) {
-              const fVC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model };
-              const fs = await followUps(fVC, KEY, q, outText, lang, prof);
+              const fVC = { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, umodel, 0) };
+              const fs = await followUps(fVC, KEY, q, outText, lang, prof,
+                { url: VC.url, model: VC.model },                    // 备胎＝刚写完正文那台（当场验证过活着）
+                (why) => controller.enqueue(_sseBytes({ t: "note", v: "这一答没能配上追问建议（" + why + "）。" })));
               if (fs.length) controller.enqueue(_sseBytes({ t: "follow", v: fs }));
             }
           } catch (e) {
