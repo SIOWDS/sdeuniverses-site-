@@ -10453,7 +10453,11 @@ export default {
       const vd = wdsVendorOf(b.vendor);
       // 深度思考档：满血基底＋满功率思考＋方法论工序＋加大站内检索预算。教训：满功率必须配"有界预算＋小任务"，
       // 所以这里只把 max_tokens 提到 6000（不是几万），要更长让读者点「继续」。
-      const deep = b.mode === "deep";
+      /* ⭐ SDE 深度研究**一律满血**（2026-08-29）：这条产线一趟十道、每道都是要交付的活，
+         不该由「标准档／深度档」那个开关决定它拿到的是完整方法论还是精简版。
+         满血带来的是：最强基底（wdsTopVC）＋满功率思考＋SDE_METHOD_BLOCK 完整工序＋
+         站内检索与联网条数加倍＋每道 6000 max_tokens。 */
+      const deep = b.mode === "deep" || !!(b.rs && typeof b.rs === "object" && b.rs.sde && !noSde);
       /* 【评分这一路由程序保证检索，不等读者去点联网】
          I 维（不可还原性，权重 0.20，闸门维）要的是「已经有人占了这块地没有」——
          那是一个**外部事实**，凭训练记忆答不了。读者忘了开联网，模型就只能补作者与年份，
@@ -10741,6 +10745,35 @@ export default {
               try { _pn = await loadNeigong(env, url, prof.neigong); } catch (e) {}
               if (_pn) SDEM = "\n\n" + _pn;
               else controller.enqueue(_sseBytes({ t: "note", v: "这一档自己的内功文件这次没读到，本轮退回通用骨架作答（答案仍可用，但底盘不是 " + prof.name + " 那一份）。" }));
+            }
+            /* ⭐ SDE 深度研究：**装完整内功**，不是那一行骨架（2026-08-29）。
+               理由：这条产线每一道要真走三大方程／六路径／三原理，而那一行骨架只报得出名字——
+               名字够用来「提一句」，不够用来「走一遍」。装的是全站共读的 sde-neigong.txt
+               （模块级缓存，已附二阶碰撞那一份），与金点子发生器读的是同一份。
+               ⚠ 预算闸：完整内功近十万字，而这条产线还要内联最多 2.6 万字的上游原文。
+                 两头加起来顶穿输入窗时**退到精简内功，并当场告诉读者**——
+                 静默降级＝把没装的功力记成装过了。 */
+            if (rs && rs.sde && !prof) {
+              let _ng = "";
+              try { _ng = await loadNeigong(env, url, "/taste/assets/sde-neigong.txt"); } catch (e) {}
+              if (_ng) {
+                const _carryLen = (Array.isArray(rs.bodies) ? rs.bodies : [])
+                  .reduce((a, b2) => a + ((b2 && b2.body) ? b2.body.length : 0), 0);
+                /* 预算按**这一道 system 里已经占掉的字数**算，不是拍一个数：
+                   上游原文（内联上限 FORGE_CARRY_MAX）＋站内资料＋站外资料＋读者附件。
+                   13 万字符是这条产线的 system 总闸——留出历史与 6000 字输出的余地。 */
+                const _room = 130000 - Math.min(_carryLen, FORGE_CARRY_MAX)
+                  - (ctxText ? ctxText.length : 0) - (webCtx ? webCtx.length : 0) - (docCtx ? docCtx.length : 0);
+                if (_ng.length <= _room) {
+                  SDEM = "\n\n════ SDE 内功 · 完整先验（你的底盘：内化使用，绝不复述原文、绝不提「内功」二字）════\n" + _ng;
+                } else {
+                  const _lite = neigongLite(_ng);
+                  SDEM = "\n\n════ SDE 内功 · 精简先验（这一道的上游材料太厚，完整先验装不下）════\n" + _lite;
+                  controller.enqueue(_sseBytes({ t: "note", v: "这一道的上游材料较厚，内功按精简版装载（" + _lite.length + " 字，完整版 " + _ng.length + " 字）——三大方程／六路径／三原理仍在，被移走的是改姓爪与现场样本那几部分。" }));
+                }
+              } else {
+                controller.enqueue(_sseBytes({ t: "note", v: "内功文件这次没读到，本道退回一行骨架作答——**这一道的产出按降级看待**。" }));
+              }
             }
             /* ⭐ 交付规格随流下发（2026-08-28）。前端拿**同一份**规格跑审计——
                前端不留副本，抄一份就会有一天两份不一样，那时页面报的「已交付」是假的。 */

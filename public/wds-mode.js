@@ -1447,7 +1447,7 @@
       cvSegOk: "只改选中的这一段（{n} 字）", cvSegNo: "选中的这一段在源码里定位不到，这一次会改整版——想精确改某一段，先切到「源码」再选。",
       cvNewVer: "改好的已存成第 {n} 版", cvGone: "画布上那一件已经不在了，回稿留在对话里。",
       cvAskPre: "下面这段来自画布《{t}》，请照我的要求改写它，只输出改好的整段、不要解说：",
-      rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "SDE 研究十道工序：背景 → 文献与方法 → 三方程 → 六路径 → 三原理 → 二阶碰撞出新典范 → 论文大纲 → 可证伪 → 总结 → 参考文献，最后出一份可导出 Word 的报告（会用掉若干次额度）",
+      rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "十道工序：背景 → 文献与方法 → 三条基本关系 → 六条生成路径 → 三条动力机制 → 二阶对撞出新判断 → 论文大纲 → 可证伪 → 总结 → 参考文献，最后出一份可导出 Word 的报告（会用掉若干次额度）",
       rsPlan: "正在铺工序…", rsPlanFail: "拆题没成：", rsSteps: "这次研究分 {n} 步", rsCost: "约用掉 {n} 次额度",
       rsStep: "第 {i}/{n} 步", rsDoing: "正在查…", rsDone: "写完", rsFinal: "在下总判断…",
       rsStop: "已停下 —— 已经写完的几步都在。", rsReport: "研究报告", rsAsk: "要研究什么？把题目写清楚一点。",
@@ -1579,7 +1579,7 @@
       cvSegOk: "Revising only the selected passage ({n} chars)", cvSegNo: "The selection could not be located in the source, so the whole version will be revised. Switch to Source view to select precisely.",
       cvNewVer: "Saved as version {n}", cvGone: "That canvas item is gone; the reply stayed in the conversation.",
       cvAskPre: "The passage below comes from the canvas \u201c{t}\u201d. Rewrite it as I ask; output the revised passage only, no commentary:",
-      rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Ten SDE stages: background → literature & method → three equations → six paths → three principles → second-order collision → paper outline → falsifiability → summary → references. Ends in a report you can export to Word (uses several turns)",
+      rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Ten stages: background → literature & method → three basic relations → six generative paths → three drivers → second-order collision → paper outline → falsifiability → summary → references. Ends in a report you can export to Word (uses several turns)",
       rsPlan: "Laying out the stages\u2026", rsPlanFail: "Could not break it down: ", rsSteps: "{n} steps", rsCost: "about {n} turns",
       rsStep: "Step {i}/{n}", rsDoing: "Digging\u2026", rsDone: "done", rsFinal: "Writing the verdict\u2026",
       rsStop: "Stopped — the finished steps are kept.", rsReport: "Research report", rsAsk: "What should I research? Give me a sharper question.",
@@ -6505,6 +6505,9 @@
       updTurns();
     }
     var _planBody = { mode: "plan", q: topic, n: 4, key: base.key, vendor: base.vendor, model: base.model, lang: LANG };
+    /* ⚠ 分身页（改姓档）不跑这条工序产线：它的工序名与内功通篇是母体术语，
+       前脚改姓、后脚灌回。分身页仍走原来的自由拆题。 */
+    if (PROFILE) _planBody.plan = "free";
     if (fg) { _planBody.plan = "forge"; if (fg.judge) _planBody.judge = 1; }
     /* 接着跑：工序表是写死的，不必再打一次 plan（也不该——重新拟题等于把上一趟的题名换掉）。 */
     var _plan = resume

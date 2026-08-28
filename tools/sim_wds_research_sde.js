@@ -76,5 +76,30 @@ ok(/if \(sdePipe\) return done\(""\);/.test(fe), "跳过总判断（第九道就
 ok(/i \+ 1 === steps\.length\)\)\) \? 1 : 0/.test(fe), "背景/文献/参考文献三道强制联网");
 ok(/"\\u2913 \.docx"/.test(fe) && /SDEDocx\.build\(\{ title: title/.test(fe), "报告有 Word 导出");
 
-console.log(bad ? ("\n✗ " + bad + " 处不过") : "\n✓ 全过");
-process.exit(bad ? 1 : 0);
+
+/* ═══ 追加（2026-08-29）：满血 ＋ 完整内功 ═══════════════════════════ */
+console.log("⑥ 全血加功力");
+{
+  const S = fs.readFileSync("src/worker.js", "utf8");
+  const ok2 = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) process.exitCode = 1; };
+  ok2(/const deep = b\.mode === "deep" \|\| !!\(b\.rs && typeof b\.rs === "object" && b\.rs\.sde && !noSde\);/.test(S),
+    "深度研究一律满血档（最强基底＋完整方法论工序＋检索加倍＋6000 输出）");
+  ok2(/if \(rs && rs\.sde && !prof\) \{/.test(S), "研究这一路装完整内功（分身档不叠，它自带底盘）");
+  const FE2 = fs.readFileSync("public/wds-mode.js", "utf8");
+  ok2(/if \(PROFILE\) _planBody\.plan = "free";/.test(FE2), "分身页不跑这条产线（工序名是母体术语，会把改姓档灌回去）");
+  ok2(!/SDE/.test((FE2.match(/rsTip: "[^"]*"/g) || []).join(" ")), "按钮说明里没有学派术语（分身页读同一张表）");
+  ok2(/loadNeigong\(env, url, "\/taste\/assets\/sde-neigong\.txt"\)/.test(S), "装的是全站共读那一份（与金点子发生器同源）");
+  ok2(/const _room = 130000 - Math\.min\(_carryLen, FORGE_CARRY_MAX\)/.test(S), "预算按 system 实际占用算，不是拍脑袋");
+  ok2(/neigongLite\(_ng\)/.test(S) && /内功按精简版装载/.test(S), "装不下就退精简版并当场说明（不静默降级）");
+  ok2(/内功文件这次没读到/.test(S) && /按降级看待/.test(S), "读不到内功要如实报，不假装装过");
+  const neig = fs.readFileSync("public/taste/assets/sde-neigong.txt", "utf8");
+  const coll = fs.readFileSync("public/taste/assets/sde-collide-paradigm.txt", "utf8");
+  /* 常态（上游满载 2.6 万 ＋ 站内资料满载 1.8 万、无附件）必须装得下完整内功；
+     只有再叠上一份大附件才会退到精简版，而那时会当场说明。 */
+  const _full = neig.length + coll.length;
+  ok2(_full < 130000 - 26000 - 18000, "常态满载下完整内功装得进（内功 " + _full + " 字 vs 余量 " + (130000 - 26000 - 18000) + "）");
+  ok2(_full > 130000 - 26000 - 18000 - 12000, "再叠一份大附件就会退精简版——那一条路是有出口的，不是死码");
+}
+
+console.log(bad || process.exitCode ? ("\n✗ 有不过的项") : "\n✓ 全过");
+process.exit((bad || process.exitCode) ? 1 : 0);
