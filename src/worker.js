@@ -10590,8 +10590,18 @@ export default {
             }
             /* ⭐ 交付规格随流下发（2026-08-28）。前端拿**同一份**规格跑审计——
                前端不留副本，抄一份就会有一天两份不一样，那时页面报的「已交付」是假的。 */
-            if (tool && TOOL_SPEC[tool]) controller.enqueue(_sseBytes({ t: "toolspec",
-              v: { k: tool, min: TOOL_SPEC[tool].min, items: TOOL_SPEC[tool].items } }));
+            /* ⚠⚠ 规格里的正则**全是中文关键词**（显露／候选／承重／扣…），而英文界面下
+               system 明写「Write your entire answer in English」⇒ 一份完全合格的英文答
+               会被逐件判成「未交付」（真跑实测：three 0/5、what 0/8、genesis 0/7、nbr 0/6）。
+               冤枉读者的审计比没有审计更坏。所以英文界面这一轮**不判**——
+               但也不许静默跳过（静默＝把没查过记成查过了），如实说一句为止。
+               真正的修法是给每一件配英文判据，那是另一刀，未做。 */
+            if (tool && TOOL_SPEC[tool]) {
+              if (lang === "en") controller.enqueue(_sseBytes({ t: "note",
+                v: "Delivery audit is skipped this turn: its checks are written against Chinese wording, so it cannot judge an English answer. The procedure itself still applies." }));
+              else controller.enqueue(_sseBytes({ t: "toolspec",
+                v: { k: tool, min: TOOL_SPEC[tool].min, items: TOOL_SPEC[tool].items } }));
+            }
             const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde);
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，

@@ -265,5 +265,23 @@ KEYS.filter((k) => k !== "iq").forEach((k) => {
   ok(k + " 下发的必交件与规格逐件同名（" + items.length + " 件）", items.every((it) => out.indexOf(it.k) >= 0));
 });
 
+console.log("⑥ 英文界面：规格是中文判据，不许拿它去判英文答（2026-08-28 真跑抓到）");
+/* 一份照 three 工序做全的英文答。规格里每一件都是中文关键词 ⇒ 逐件判缺。
+   这不是样本写坏了：英文界面下 system 明写「Write your entire answer in English」，
+   读者做全了照样满屏「未交付」。所以端点在 lang==="en" 时不下发规格，改发一句实话。 */
+const EN3 = [
+  "Seen only as show: the silence appears as a stretch of time in which nobody speaks.",
+  "Seen only as difference: it grows out of a gap between a question asked and an answer withheld.",
+  "Seen only as entanglement: it is tangled with the seating chart and the grading scheme.",
+  "Cross-correction: the first view misses that two equally long silences are not the same thing.",
+  "The weakest link is that ownership cannot yet be counted.",
+].join("\n") + " filler.".repeat(200);
+const rEn = FE.toolAudit(EN3, S.TOOL_SPEC.three);
+ok("中文判据判英文答 ⇒ 逐件全判缺（" + rEn.done + "/" + rEn.total + "，正是不能拿它去判的理由）", rEn.done === 0);
+const dispatch = W.slice(W.indexOf('if (tool && TOOL_SPEC[tool])'), W.indexOf('if (tool && TOOL_SPEC[tool])') + 900);
+ok("英文界面不下发规格（不判）", /lang === "en"/.test(dispatch) && /t: "note"/.test(dispatch));
+ok("但不静默跳过：如实发一句说明", /Delivery audit is skipped/.test(dispatch));
+ok("中文界面照旧下发", /else controller\.enqueue\(_sseBytes\(\{ t: "toolspec"/.test(dispatch));
+
 console.log("\n" + (FAIL ? "✗ " : "✓ ") + PASS + " PASS / " + FAIL + " FAIL\n");
 process.exit(FAIL ? 1 : 0);
