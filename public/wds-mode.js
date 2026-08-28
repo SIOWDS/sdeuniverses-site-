@@ -1447,8 +1447,8 @@
       cvSegOk: "只改选中的这一段（{n} 字）", cvSegNo: "选中的这一段在源码里定位不到，这一次会改整版——想精确改某一段，先切到「源码」再选。",
       cvNewVer: "改好的已存成第 {n} 版", cvGone: "画布上那一件已经不在了，回稿留在对话里。",
       cvAskPre: "下面这段来自画布《{t}》，请照我的要求改写它，只输出改好的整段、不要解说：",
-      rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "拆题 → 逐步取证 → 总判断，最后出一份带出处的报告（会用掉若干次额度）",
-      rsPlan: "正在拆题…", rsPlanFail: "拆题没成：", rsSteps: "这次研究分 {n} 步", rsCost: "约用掉 {n} 次额度",
+      rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "SDE 研究十道工序：背景 → 文献与方法 → 三方程 → 六路径 → 三原理 → 二阶碰撞出新典范 → 论文大纲 → 可证伪 → 总结 → 参考文献，最后出一份可导出 Word 的报告（会用掉若干次额度）",
+      rsPlan: "正在铺工序…", rsPlanFail: "拆题没成：", rsSteps: "这次研究分 {n} 步", rsCost: "约用掉 {n} 次额度",
       rsStep: "第 {i}/{n} 步", rsDoing: "正在查…", rsDone: "写完", rsFinal: "在下总判断…",
       rsStop: "已停下 —— 已经写完的几步都在。", rsReport: "研究报告", rsAsk: "要研究什么？把题目写清楚一点。",
       rsFold: "展开这一步", rsAllDone: "研究完成 · 共 {n} 步 · {c} 字",
@@ -1579,8 +1579,8 @@
       cvSegOk: "Revising only the selected passage ({n} chars)", cvSegNo: "The selection could not be located in the source, so the whole version will be revised. Switch to Source view to select precisely.",
       cvNewVer: "Saved as version {n}", cvGone: "That canvas item is gone; the reply stayed in the conversation.",
       cvAskPre: "The passage below comes from the canvas \u201c{t}\u201d. Rewrite it as I ask; output the revised passage only, no commentary:",
-      rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Break it down → gather evidence step by step → one verdict, with sources (uses several turns)",
-      rsPlan: "Breaking the question down\u2026", rsPlanFail: "Could not break it down: ", rsSteps: "{n} steps", rsCost: "about {n} turns",
+      rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Ten SDE stages: background → literature & method → three equations → six paths → three principles → second-order collision → paper outline → falsifiability → summary → references. Ends in a report you can export to Word (uses several turns)",
+      rsPlan: "Laying out the stages\u2026", rsPlanFail: "Could not break it down: ", rsSteps: "{n} steps", rsCost: "about {n} turns",
       rsStep: "Step {i}/{n}", rsDoing: "Digging\u2026", rsDone: "done", rsFinal: "Writing the verdict\u2026",
       rsStop: "Stopped — the finished steps are kept.", rsReport: "Research report", rsAsk: "What should I research? Give me a sharper question.",
       rsFold: "Open this step", rsAllDone: "Done · {n} steps · {c} chars",
@@ -6458,6 +6458,7 @@
     cell.a.innerHTML = ""; cell.a.appendChild(card);
     var base = { key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG };
     var steps = [], secs = [], title = topic, degraded = [];
+    var sdePipe = false;                       // 这一趟是不是 SDE 研究产线（由 plan 的回执定）
     /* 一趟＝一个 run。attempt 按道次记，幂等键 run:stage:attempt——
        同一次重试不该在服务端算成两趟。 */
     var runid = (resume && resume.run) || runId(), attempts = {};
@@ -6517,8 +6518,12 @@
         }
         title = j.title || topic;
         steps = j.steps;
+        /* ⭐ SDE 研究产线（服务端持有的十道工序）。它与学科通融同轨：
+           工序不由基底拆，最后一道就是参考文献，**不再另跑一次「总判断」**
+           ——第九道就是研究总结，再来一段只会把结论摆到论证前面。 */
+        sdePipe = !!j.sde;
         note.textContent = (fg ? tx("fgSteps", { n: steps.length }) : tx("rsSteps", { n: steps.length }))
-          + " \u00b7 " + tx("rsCost", { n: steps.length + 1 })
+          + " \u00b7 " + tx("rsCost", { n: steps.length + ((fg || sdePipe) ? 0 : 1) })
           + (fg && fg.judge ? (" \u00b7 " + tx("fgJudge")) : "");
         var rows = steps.map(function (s, i) {
           var box = el("div", "wdsm-rstep");
@@ -6607,9 +6612,13 @@
           }
           var pl = {
             q: s.t, history: [], key: base.key, vendor: base.vendor, model: base.model,
-            mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG,
+            mode: thinkMode,
+            /* 背景（1）／文献综述（2）／参考文献（10）这三道**强制联网**：
+               不联网的「文献综述」只能靠训练记忆报作者与年份，那是回忆不是综述。 */
+            web: (webOn || (sdePipe && (i + 1 === 1 || i + 1 === 2 || i + 1 === steps.length))) ? 1 : 0,
+            skey: wdsSearchKey(), about: aboutPlus(), lang: LANG,
             rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, bodies: bodies, gates: gates,
-                  forge: fg ? 1 : 0, sv: FORGE_SV, run: runid, attempt: attempts[i],
+                  forge: fg ? 1 : 0, sde: sdePipe ? 1 : 0, sv: FORGE_SV, run: runid, attempt: attempts[i],
                   idem: runid + ":" + (i + 1) + ":" + attempts[i], audit: audit },
           };
           /* ⚠ 第四个参数（onNote）此前没传，于是服务端发的 note／nbrchain 全掉在地上——
@@ -6650,6 +6659,9 @@
           // 学科通融不跑「总判断」那一步：最后一道工序就是交付自查，再加一段总结
           // 只会把结论摆到论证前面（本产线明令禁止的写法），还白烧一次额度。
           if (fg) return done("");
+          /* SDE 研究同理：第九道就是「研究总结」、第十道是参考文献，
+             再跑一次总判断只会把结论摆到论证前面，还白烧一次额度。 */
+          if (sdePipe) return done("");
           note.textContent = tx("rsFinal");
           var vb = el("div", "wdsm-rstep open");
           var vh = el("div", "sh"); vh.appendChild(el("b", null, "\u25c6 " + tx("rsFinal")));
@@ -6685,7 +6697,17 @@
           c2.onclick = function () { cvAdd("md", title, md); };
           var c3 = el("button", "wdsm-act", "\u2913 .md");
           c3.onclick = function () { download(safeName(title) + ".md", md); };
-          row.appendChild(c1); row.appendChild(c2); row.appendChild(c3);
+          /* ⭐ 第十一件：报告出 Word（2026-08-29）。此前这份报告只能拿到 .md——
+             而它是要拿去发、拿去给人看的那一份，.md 不是「打开就是这个样子」的那一份。
+             走全站共用的 SDEDocx（成文与投稿用的是同一台）。 */
+          var c4 = el("button", "wdsm-act", "\u2913 .docx");
+          c4.onclick = function () {
+            if (!window.SDEDocx) { note.textContent = t("dPptxWait"); return; }   // 脚本还没到，不静默失败
+            var blob = window.SDEDocx.build({ title: title, author: BRAND, md: md });
+            saveBlobToDir(fileTag("WDS") + "-" + safeName(title) + "-" + stampName() + ".docx", blob,
+              function (m) { if (m) note.textContent = m; });
+          };
+          row.appendChild(c1); row.appendChild(c2); row.appendChild(c3); row.appendChild(c4);
           card.appendChild(row);
           endRs(md);
         }
