@@ -2833,11 +2833,8 @@
     if (toolsOpen) modesEl.classList.remove("fold"); else modesEl.classList.add("fold");
     var sum = toolsSum();
     togEl.innerHTML = "";
-    togEl.appendChild(document.createTextNode(toolsOpen ? ("\u2303 " + t("mtHide")) : ("\u2304 " + t("mtShow"))));
-    if (!toolsOpen && sum.length) {
-      var b = el("b", null, " \u00b7 " + sum.join(" \u00b7 "));
-      togEl.appendChild(b);
-    }
+    togEl.appendChild(el("span", null, toolsOpen ? ("\u2303 " + t("mtHide")) : ("\u2304 " + t("mtShow"))));
+    if (!toolsOpen && sum.length) togEl.appendChild(el("b", null, " \u00b7 " + sum.join(" \u00b7 ")));
     togEl.title = toolsOpen ? t("mtHideT") : (t("mtShowT") + (sum.length ? ("：" + sum.join("、")) : ""));
   }
   function toolsSet(on, byUser) {
