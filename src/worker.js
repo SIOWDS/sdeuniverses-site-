@@ -7286,127 +7286,129 @@ const WDS_TOOLS_LANG = {
      （例：改姓那道「成品里零 SDE 术语」——对照表那一栏必然要原样列出被换掉的术语，
       程序分不清「正文里的术语」与「表里被换掉的术语」，所以不做这条，改由自查那一件顶着）。 */
 const _LN = "(^|\n)[^\n]{0,14}";
+/* 英文行首比中文长（"Seen only as show:" 这一类），放宽到 28。 */
+const _LNE = "(^|\n)[^\n]{0,28}";
 const TOOL_SPEC = {
   three: { min: 900, items: [
-    { k: "只从显露看的那一段", re: _LN + "显露" },
-    { k: "只从差异看的那一段", re: _LN + "差异" },
-    { k: "只从纠缠看的那一段", re: _LN + "纠缠" },
-    { k: "三视角互相校正：真指出其中两个看错或看漏了什么", re: "(看错|看漏|校正|互消)", n: 2 },
-    { k: "这个判断最脆的一环", re: "(最脆|最薄弱|最经不起)" },
+    { k: "只从显露看的那一段", re: _LN + "显露" , ke: "The Show-only pass", en: _LNE + "[Ss]how" },
+    { k: "只从差异看的那一段", re: _LN + "差异" , ke: "The Difference-only pass", en: _LNE + "[Dd]ifference" },
+    { k: "只从纠缠看的那一段", re: _LN + "纠缠" , ke: "The Entanglement-only pass", en: _LNE + "[Ee]ntangle" },
+    { k: "三视角互相校正：真指出其中两个看错或看漏了什么", re: "(看错|看漏|校正|互消)", n: 2 , ke: "Cross-correction: name what two of the views got wrong or missed", en: "([Mm]isread|[Mm]issed|[Oo]verlook|got [^\n]{0,12}wrong|[Cc]ross-correct)" },
+    { k: "这个判断最脆的一环", re: "(最脆|最薄弱|最经不起)" , ke: "The weakest link in the judgement", en: "([Ww]eakest|most fragile|frailest|thinnest)" },
   ] },
   motif: { min: 800, items: [
-    { k: "动词族扫描（列的是动词不是名词）", re: "动词" },
-    { k: "2–3 条候选母题", re: "候选", n: 2 },
-    { k: "逐篇校验：每篇贴不贴、贴在哪一句", re: "(逐篇|贴不|贴在|不贴)" },
-    { k: "母题定稿（二十五字以内）", re: "(定稿|母题定|最终母题)" },
-    { k: "这条母题的可证伪条件", re: "(证伪|作废|则本)" },
+    { k: "动词族扫描（列的是动词不是名词）", re: "动词" , ke: "Verb-family scan (verbs, not nouns)", en: "[Vv]erb" },
+    { k: "2–3 条候选母题", re: "候选", n: 2 , ke: "2-3 candidate motifs", en: "[Cc]andidate" },
+    { k: "逐篇校验：每篇贴不贴、贴在哪一句", re: "(逐篇|贴不|贴在|不贴)" , ke: "Piece-by-piece check: does each one fit, and on which sentence", en: "([Ff]its|does not fit|fails to fit|[Ee]ach piece|[Pp]iece by piece)" },
+    { k: "母题定稿（二十五字以内）", re: "(定稿|母题定|最终母题)" , ke: "The settled motif (short)", en: "([Ff]inal motif|[Ss]ettled motif|[Mm]otif, final|[Ff]inal:|[Ss]ettles as)" },
+    { k: "这条母题的可证伪条件", re: "(证伪|作废|则本)" , ke: "Falsification condition for the motif", en: "([Ff]alsif|[Vv]oid|drops out)" },
   ] },
   nbr: { min: 900, items: [
-    { k: "单独一节「近邻检测」", re: _LN + "[^\n]{0,6}近邻检测" },
-    { k: "站内名单逐条交代", re: "(站内|本站)" },
-    { k: "库外至少三个，各带出处年份", re: "(18|19|20)\\d{2}", n: 3 },
-    { k: "每个近邻的分离线", re: "分离线", n: 3 },
-    { k: "判决性对照预测（若观测为 X 则它对而你错）", re: "(对照预测|判决性|它对而你错)" },
-    { k: "开头一行「本文所属学科」", re: "所属学科" },
+    { k: "单独一节「近邻检测」", re: _LN + "[^\n]{0,6}近邻检测" , ke: "A separate section headed Neighbour check", en: "(^|\n)[^\n]{0,28}([Nn]eighbou?r)" },
+    { k: "站内名单逐条交代", re: "(站内|本站)" , ke: "Every name on the site list answered one by one", en: "([Tt]his site|[Oo]n site|site list|[Ii]nternal)" },
+    { k: "库外至少三个，各带出处年份", re: "(18|19|20)\\d{2}", n: 3 , ke: "At least three outside the site, each with a source and year" },
+    { k: "每个近邻的分离线", re: "分离线", n: 3 , ke: "A separation line for each neighbour", en: "([Ss]eparat|sets it apart|apart from)" },
+    { k: "判决性对照预测（若观测为 X 则它对而你错）", re: "(对照预测|判决性|它对而你错)" , ke: "A decisive contrasting prediction", en: "([Dd]ecisive|contrasting prediction|then they are right)" },
+    { k: "开头一行「本文所属学科」", re: "所属学科" , ke: "An opening line naming this piece's discipline", en: "([Dd]iscipline|[Ff]ield of this|[Ff]ield:)" },
   ] },
   rename: { min: 800, items: [
-    { k: "改后的正文", re: "(改后|译文|正文)" },
+    { k: "改后的正文", re: "(改后|译文|正文)" , ke: "The rewritten text", en: "([Rr]ewritten|[Rr]ewrite|[Rr]evised text)" },
     /* ⚠ 原来只认 markdown 竖线表。而工序正文从没要求 markdown——照它写成
        「原说法：X → 换成：Y → 为什么：Z」三行的答，交付了却被判缺件（真跑抓到）。
        两条一起认：竖线表，或每行两个箭头的三列写法。工序正文也已写明数的是这两种形状。 */
-    { k: "对照表（原说法 → 换成什么 → 为什么这个学科的人认）", re: "(\\|[^\n]*\\|)|([^\n]*→[^\n]*→)", n: 3 },
-    { k: "自查：交给该学科同行看，哪一句露了口音", re: "(自查|口音|同行)" },
+    { k: "对照表（原说法 → 换成什么 → 为什么这个学科的人认）", re: "(\\|[^\n]*\\|)|([^\n]*→[^\n]*→)", n: 3 , ke: "A mapping table (old wording -> new wording -> why this field accepts it)", en: "(\\|[^\n]*\\|)|([^\n]*(→|->)[^\n]*(→|->))" },
+    { k: "自查：交给该学科同行看，哪一句露了口音", re: "(自查|口音|同行)" , ke: "Self-check: which sentence still sounds like an outsider", en: "([Ss]elf-check|[Aa]ccent|[Oo]utsider|colleague in)" },
   ] },
   gap: { min: 800, items: [
-    { k: "它已经说到哪一步", re: "(说到|到此为止|止步|已经)" },
-    { k: "缝隙指认（结构上缺了什么才接不上）", re: "缝隙" },
-    { k: "为缝隙发明的新概念（给名字）", re: "(新概念|命名|叫它|称之为)" },
-    { k: "一句定义", re: "定义" },
-    { k: "成立条件与可证伪条件", re: "(成立条件|证伪)", n: 2 },
-    { k: "与最近既有概念的分离线（指名到人或篇目）", re: "分离线" },
+    { k: "它已经说到哪一步", re: "(说到|到此为止|止步|已经)" , ke: "How far the material already gets", en: "(as far as|stops at|already says|gets to|[Aa]lready)" },
+    { k: "缝隙指认（结构上缺了什么才接不上）", re: "缝隙" , ke: "The gap named (what is structurally missing)", en: "([Gg]ap|[Cc]rack|missing)" },
+    { k: "为缝隙发明的新概念（给名字）", re: "(新概念|命名|叫它|称之为)" , ke: "A new concept coined for it (with a name)", en: "([Nn]ew concept|name it|call it|[Cc]oin)" },
+    { k: "一句定义", re: "定义" , ke: "A one-sentence definition", en: "([Dd]efinition|[Dd]efine|[Dd]efined as)" },
+    { k: "成立条件与可证伪条件", re: "(成立条件|证伪)", n: 2 , ke: "Conditions for it to hold, and a falsification condition", en: "([Cc]ondition|[Ff]alsif|[Vv]oid)" },
+    { k: "与最近既有概念的分离线（指名到人或篇目）", re: "分离线" , ke: "A separation line from the nearest existing concept", en: "([Ss]eparat|apart from)" },
   ] },
   collide: { min: 900, items: [
-    { k: "三对矛盾逐对写出（A 要什么 vs B 要什么）", re: "矛盾", n: 3 },
-    { k: "撞出的那个判断（单看任一篇都看不到）", re: "(判断|命题)" },
-    { k: "为什么非要三篇同时在场才出得来", re: "(同时在场|缺了任一|单独看|少了哪一篇)" },
-    { k: "三篇篇名与站内链接", re: "https?://", n: 3 },
+    { k: "三对矛盾逐对写出（A 要什么 vs B 要什么）", re: "矛盾", n: 3 , ke: "Three contradictions written out pair by pair", en: "([Cc]ontradict|[Cc]onflict|[Cc]lash|at odds)" },
+    { k: "撞出的那个判断（单看任一篇都看不到）", re: "(判断|命题)" , ke: "The judgement that came out of the collision", en: "([Jj]udgement|[Jj]udgment|[Cc]laim|[Pp]roposition)" },
+    { k: "为什么非要三篇同时在场才出得来", re: "(同时在场|缺了任一|单独看|少了哪一篇)" , ke: "Why all three had to be present at once", en: "([Aa]ll three|[Aa]ny one alone|only when the three)" },
+    { k: "三篇篇名与站内链接", re: "https?://", n: 3 , ke: "The three titles with their on-site links" },
   ] },
   forge: { min: 1000, items: [
-    { k: "三家各是哪门学科、各持哪条主张、各能指到谁", re: "(19|20)\\d{2}", n: 2 },
-    { k: "四道闸读数（矛盾烈度/同源度/门类三分/避重）", re: "(矛盾烈度|同源度|门类三分|避重)", n: 3 },
-    { k: "共有前提（念给三家听不会引起争论的那句）", re: "共有前提" },
-    { k: "推翻它的材料来自三家之一自己", re: "(推翻|反证)" },
-    { k: "承重命题写成三重否定「不是…也不是…而是」", re: "不是[^\n]{0,80}而是" },
-    { k: "一句不含情态词的判据", re: "判据" },
+    { k: "三家各是哪门学科、各持哪条主张、各能指到谁", re: "(19|20)\\d{2}", n: 2 , ke: "Which discipline each of the three is, what it holds, and who it can point to" },
+    { k: "四道闸读数（矛盾烈度/同源度/门类三分/避重）", re: "(矛盾烈度|同源度|门类三分|避重)", n: 3 , ke: "Readings on the four gates", en: "([Gg]ate|[Ii]ntensity|shared root|category split|[Oo]verlap)" },
+    { k: "共有前提（念给三家听不会引起争论的那句）", re: "共有前提" , ke: "The shared premise", en: "([Ss]hared premise|[Cc]ommon premise|[Aa]ll three assume)" },
+    { k: "推翻它的材料来自三家之一自己", re: "(推翻|反证)" , ke: "The material that overturns it comes from one of the three", en: "(overturn|refute|undercut)" },
+    { k: "承重命题写成三重否定「不是…也不是…而是」", re: "不是[^\n]{0,80}而是" , ke: "The load-bearing proposition as a triple negation (not X, not Y, but Z)", en: "[Nn]ot [^\n]{0,140}but" },
+    { k: "一句不含情态词的判据", re: "判据" , ke: "One criterion with no modal words", en: "([Cc]riterion|[Yy]ardstick|[Tt]est:)" },
   ] },
   what: { min: 1200, items: [
-    { k: "先定位到格并把那一格的内容答出来", re: "(S1|S2|S3|D1|D2|D3|E1|E2|E3)" },
-    { k: "显露这一刀：看见什么／看不见什么", re: "显露" },
-    { k: "路径这一刀：看见什么／看不见什么", re: "路径" },
-    { k: "土壤这一刀：看见什么／看不见什么", re: "土壤" },
-    { k: "三刀共同假定的那件没说出口的事", re: "(共同假定|没说出口|这还用说)" },
-    { k: "推翻它，且材料来自三刀之一自己（原样引出那一句）", re: "(推翻|原样引|正是这一刀)" },
-    { k: "落到一句「不是…也不是…而是 ____」", re: "不是[^\n]{0,80}而是" },
-    { k: "一句判别：怎么分辨「是它」与「像它但不是它」", re: "(判别|分辨)" },
+    { k: "先定位到格并把那一格的内容答出来", re: "(S1|S2|S3|D1|D2|D3|E1|E2|E3)" , ke: "Locate the cell first and answer that cell's own content" },
+    { k: "显露这一刀：看见什么／看不见什么", re: "显露" , ke: "The Show blade: what it sees and what it cannot see", en: "[Ss]how" },
+    { k: "路径这一刀：看见什么／看不见什么", re: "路径" , ke: "The Path blade: what it sees and what it cannot see", en: "[Pp]ath" },
+    { k: "土壤这一刀：看见什么／看不见什么", re: "土壤" , ke: "The Soil blade: what it sees and what it cannot see", en: "([Ss]oil|[Gg]round)" },
+    { k: "三刀共同假定的那件没说出口的事", re: "(共同假定|没说出口|这还用说)" , ke: "What all three blades assume without saying it", en: "([Ss]hared assumption|[Tt]akes for granted|goes without saying|[Aa]ll three assume|share the assumption)" },
+    { k: "推翻它，且材料来自三刀之一自己（原样引出那一句）", re: "(推翻|原样引|正是这一刀)" , ke: "Overturn it with material from one of the three blades", en: "([Oo]verturn|[Rr]efute|[Uu]ndercut)" },
+    { k: "落到一句「不是…也不是…而是 ____」", re: "不是[^\n]{0,80}而是" , ke: "One sentence: not X, not Y, but Z", en: "[Nn]ot [^\n]{0,140}but" },
+    { k: "一句判别：怎么分辨「是它」与「像它但不是它」", re: "(判别|分辨)" , ke: "A test telling it apart from what merely looks like it", en: "([Tt]ell .{0,12}apart|[Dd]istinguish|[Cc]riterion)" },
   ] },
   how: { min: 1300, items: [
-    { k: "这一次走的是哪一条路径，写成 X→Y→Z", re: "→", n: 2 },
-    { k: "三个落点各一条办法，各注明从哪个起点看过去", re: "(落在|起点)", n: 3 },
-    { k: "三条共同假定「可以由一个落点单独结算」", re: "(共同假定|单独结算|共有前提)" },
-    { k: "推翻它，材料来自三条之一自己", re: "推翻" },
-    { k: "步骤 · 失败模式 · 修复路径 · 三到五年后的形态（四件缺一不可）", re: "(步骤|失败模式|修复|三到五年)", n: 4 },
-    { k: "把序列写出来：先动什么→看到什么再动下一步→再回到哪里", re: "→", n: 3 },
-    { k: "三个月内看得出在不在起作用的读数", re: "(三个月|读数)" },
+    { k: "这一次走的是哪一条路径，写成 X→Y→Z", re: "→", n: 2 , ke: "Which route this turn takes, written X -> Y -> Z", en: "(→|->)" },
+    { k: "三个落点各一条办法，各注明从哪个起点看过去", re: "(落在|起点)", n: 3 , ke: "One move per landing point, each marked with the vantage it is seen from", en: "([Ll]anding|starting point|[Vv]antage|seen from)" },
+    { k: "三条共同假定「可以由一个落点单独结算」", re: "(共同假定|单独结算|共有前提)" , ke: "The shared assumption that one landing point could settle it alone", en: "([Ss]hared assumption|share the assumption|settle it alone|settled by one|[Cc]ommon premise)" },
+    { k: "推翻它，材料来自三条之一自己", re: "推翻" , ke: "Overturn it with material from one of the three", en: "([Oo]verturn|[Rr]efute|[Uu]ndercut)" },
+    { k: "步骤 · 失败模式 · 修复路径 · 三到五年后的形态（四件缺一不可）", re: "(步骤|失败模式|修复|三到五年)", n: 4 , ke: "Steps, failure modes, repair path, and the shape three to five years out", en: "([Ss]tep|[Ff]ailure mode|[Rr]epair|[Tt]hree to five years|five years out)" },
+    { k: "把序列写出来：先动什么→看到什么再动下一步→再回到哪里", re: "→", n: 3 , ke: "The sequence written out: move this, watch for that, then go back to", en: "(→|->)" },
+    { k: "三个月内看得出在不在起作用的读数", re: "(三个月|读数)" , ke: "A reading that shows within three months whether it is working", en: "([Tt]hree months|[Rr]eading|[Ii]ndicator)" },
   ] },
   why: { min: 1300, items: [
-    { k: "指认问题里那条没说出口的动力主张", re: "(预设|没说出口|假定)" },
-    { k: "三条动力各主张一次自己是决定性的", re: "(逼出|逼得|相争|驱动)", n: 3 },
-    { k: "反过来改：被逼动的那一样如何回改前两样、下一轮谁先动", re: "(反过来|下一轮)" },
-    { k: "每条自曝一句「在什么情形下它不是驱动而是被驱动」", re: "(撑不住|被驱动|不是驱动)", n: 2 },
-    { k: "翻转条件与触发点", re: "翻转" },
-    { k: "至少两条会让原主张翻车的观测", re: "(观测|翻车)", n: 2 },
+    { k: "指认问题里那条没说出口的动力主张", re: "(预设|没说出口|假定)" , ke: "The unspoken claim about what drives it", en: "([Pp]resuppose|[Aa]ssume|takes for granted)" },
+    { k: "三条动力各主张一次自己是决定性的", re: "(逼出|逼得|相争|驱动)", n: 3 , ke: "Each of the three drivers claims once to be the decisive one", en: "([Ff]orces|[Dd]rives|[Pp]ushes|[Cc]lash)" },
+    { k: "反过来改：被逼动的那一样如何回改前两样、下一轮谁先动", re: "(反过来|下一轮)" , ke: "The write-back: how the driven one changes the other two, and who moves first next round", en: "(in turn|back on|[Nn]ext round|write-back)" },
+    { k: "每条自曝一句「在什么情形下它不是驱动而是被驱动」", re: "(撑不住|被驱动|不是驱动)", n: 2 , ke: "Each driver admits where it is driven rather than driving", en: "(is driven|being driven|cannot hold|[Dd]riven rather)" },
+    { k: "翻转条件与触发点", re: "翻转" , ke: "The reversal condition and its trigger", en: "([Rr]eversal|[Rr]everses|[Ff]lips)" },
+    { k: "至少两条会让原主张翻车的观测", re: "(观测|翻车)", n: 2 , ke: "At least two observations that would derail the original claim", en: "([Oo]bservation|[Dd]erail|[Ff]alsif)" },
   ] },
   grid: { min: 800, items: [
-    { k: "C 内容 ⊗ M 方法 ⊗ V 价值 三轴各落哪一格", re: "(内容|方法|价值)", n: 3 },
-    { k: "O 一号位 / I 二号位 / S 三号位分别是谁", re: "(一号位|二号位|三号位)", n: 3 },
-    { k: "中心位现在轮转到哪一位，凭什么", re: "中心位" },
-    { k: "若中心位轮到另一位，这件事会变成什么样", re: "(若|如果|假如)" },
-    { k: "三号位显影了没有，没有的话卡在哪一步", re: "显影" },
+    { k: "C 内容 ⊗ M 方法 ⊗ V 价值 三轴各落哪一格", re: "(内容|方法|价值)", n: 3 , ke: "Which cell each of the three axes falls in (content, method, value)", en: "([Cc]ontent|[Mm]ethod|[Vv]alue)" },
+    { k: "O 一号位 / I 二号位 / S 三号位分别是谁", re: "(一号位|二号位|三号位)", n: 3 , ke: "Who occupies the first, second and third positions", en: "(first position|second position|third position)" },
+    { k: "中心位现在轮转到哪一位，凭什么", re: "中心位" , ke: "Which position the centre has rotated to, and on what evidence", en: "([Cc]entre|[Cc]enter)" },
+    { k: "若中心位轮到另一位，这件事会变成什么样", re: "(若|如果|假如)" , ke: "What it would become if the centre rotated elsewhere", en: "([Ii]f |were the centre)" },
+    { k: "三号位显影了没有，没有的话卡在哪一步", re: "显影" , ke: "Whether the third position has surfaced, and where it is stuck", en: "([Ss]urfac|[Aa]ppear|has not shown)" },
   ] },
   nine: { min: 900, items: [
-    { k: "三格各自先把这一格的三分原样写出来", re: "(S[123]|D[123]|E[123])", n: 3 },
-    { k: "每格用不带术语的话问一个问题", re: "[?？]", n: 3 },
-    { k: "把三格撞成一条判断（三格都在场才成立）", re: "(判断|合起来|三格)" },
-    { k: "句末写清本轮走的是哪一组（同号位／123 轮换）", re: "(同号位|轮换)" },
+    { k: "三格各自先把这一格的三分原样写出来", re: "(S[123]|D[123]|E[123])", n: 3 , ke: "Each cell's own triad written out first" },
+    { k: "每格用不带术语的话问一个问题", re: "[?？]", n: 3 , ke: "A jargon-free question for each cell" },
+    { k: "把三格撞成一条判断（三格都在场才成立）", re: "(判断|合起来|三格)" , ke: "One judgement the three cells together force", en: "([Jj]udgement|[Jj]udgment|together|[Aa]ll three)" },
+    { k: "句末写清本轮走的是哪一组（同号位／123 轮换）", re: "(同号位|轮换)" , ke: "Which of the two legal classes this draw is (same tier / 1-2-3 rotation)", en: "([Ss]ame tier|[Rr]otation|1-2-3)" },
   ] },
   /* ⚠ 地板 150 不是拍的：sim_tool_each 拿一份照工序正文写全的结构图真跑，实测 165 字
      （围栏里本来就没几个汉字，节点名上限 12 字，图下只要三到五句）。原来写 300，
      而判短线是 0.7×min=210 ⇒ **每一张合格的结构图都会被判「多半是被截短了」**——
      冤枉读者的审计比没有审计更坏（它把一次做对的活记成没做）。 */
   map: { min: 150, items: [
-    { k: "一个 mermaid 围栏代码块", re: "```mermaid" },
-    { k: "每条边写关系动词（A -->|关系| B），不要无名箭头", re: "-->\\|", n: 2 },
-    { k: "图下三到五句：最承重的边／不确定的边／抽掉哪个节点就散", re: "(承重|不确定|抽掉)", n: 2 },
+    { k: "一个 mermaid 围栏代码块", re: "```mermaid" , ke: "A fenced mermaid code block" },
+    { k: "每条边写关系动词（A -->|关系| B），不要无名箭头", re: "-->\\|", n: 2 , ke: "A relation verb on every edge, no unnamed arrows" },
+    { k: "图下三到五句：最承重的边／不确定的边／抽掉哪个节点就散", re: "(承重|不确定|抽掉)", n: 2 , ke: "Three to five lines under the diagram: the load-bearing edge, the uncertain one, the node that collapses it", en: "([Ll]oad-bearing|[Uu]ncertain|[Rr]emove)" },
   ] },
   genesis: { min: 1200, items: [
-    { k: "一 · 摆料：站内说法 ＋ 跨两个学科的已有说法 ＋ 站外占位者", re: "(摆料|家底|已有说法|占位)" },
-    { k: "二 · 上张力：真打架的两三对 ＋ 几家共同假定了什么", re: "(对阵|不能同时成立|共同假定)" },
-    { k: "候选：行（每条一行，行首照抄）", re: _LN + "候选[：:]", n: 3 },
-    { k: "分岔：行", re: _LN + "分岔[：:]", n: 3 },
-    { k: "作废：行", re: _LN + "作废[：:]", n: 3 },
-    { k: "张力源：行", re: _LN + "张力源[：:]", n: 3 },
-    { k: "〔交账〕行", re: "交账" },
+    { k: "一 · 摆料：站内说法 ＋ 跨两个学科的已有说法 ＋ 站外占位者", re: "(摆料|家底|已有说法|占位)" , ke: "Step one, lay out what is on the table", en: "(on the table|[Ee]xisting account|[Pp]laceholder|what is already said)" },
+    { k: "二 · 上张力：真打架的两三对 ＋ 几家共同假定了什么", re: "(对阵|不能同时成立|共同假定)" , ke: "Step two, set up the tension", en: "([Cc]annot both|[Tt]ension|[Ss]hared assumption)" },
+    { k: "候选：行（每条一行，行首照抄）", re: _LN + "候选[：:]", n: 3 , ke: "Candidate: lines", en: _LNE + "[Cc]andidate\\s*[::]" },
+    { k: "分岔：行", re: _LN + "分岔[：:]", n: 3 , ke: "Fork: lines", en: _LNE + "([Ff]ork|[Bb]ranch|[Dd]iverge)" },
+    { k: "作废：行", re: _LN + "作废[：:]", n: 3 , ke: "Void-if: lines", en: _LNE + "([Vv]oid|[Ii]nvalid|[Ff]alsif)" },
+    { k: "张力源：行", re: _LN + "张力源[：:]", n: 3 , ke: "Tension source: lines", en: _LNE + "[Tt]ension" },
+    { k: "〔交账〕行", re: "交账" , ke: "The reckoning line", en: "([Rr]eckoning|[Tt]ally|[Aa]ccount line)" },
   ] },
   /* iq 走的是 WDS_IQ_SYS 整段改道，拿不到下面那个「必交件」块（它本来就在自己的
      【输出】里把这五件写死了）。规格仍然摆在这里——**审计照跑**：
      评分是全站最常被引用的产出，少一件不该由读者自己去数。 */
   iq: { min: 800, items: [
-    { k: "五维各一行（S/D/E/I/F）", re: "(^|\n)[^\n]{0,8}[SDEIF][^A-Za-z]", n: 5 },
-    { k: "一行综合分与层级（算式写出来）", re: "综合分" },
-    { k: "敌意最近邻至少三位（谁·哪年·哪个概念）", re: "(18|19|20)\\d{2}", n: 3 },
-    { k: "至少两条扣分记录（原文引句·从几分扣到几分）", re: "扣", n: 2 },
-    { k: "三条最短提升路径", re: "(提升|路径)" },
-    { k: "每一维附一句「若 X 成立，本维应降到 Y」", re: "(本维应降|应降到)", n: 3 },
+    { k: "五维各一行（S/D/E/I/F）", re: "(^|\n)[^\n]{0,8}[SDEIF][^A-Za-z]", n: 5 , ke: "One line per dimension (S/D/E/I/F)" },
+    { k: "一行综合分与层级（算式写出来）", re: "综合分" , ke: "One line with the composite score and tier, arithmetic shown", en: "([Cc]omposite|[Oo]verall score|[Ww]eighted)" },
+    { k: "敌意最近邻至少三位（谁·哪年·哪个概念）", re: "(18|19|20)\\d{2}", n: 3 , ke: "At least three hostile nearest neighbours (who, what year, which concept)" },
+    { k: "至少两条扣分记录（原文引句·从几分扣到几分）", re: "扣", n: 2 , ke: "At least two deductions on the record", en: "([Dd]educt|[Dd]ocked|[Mm]inus)" },
+    { k: "三条最短提升路径", re: "(提升|路径)" , ke: "Three shortest routes to a higher score", en: "([Rr]oute|[Pp]ath|to raise|[Ii]mprove)" },
+    { k: "每一维附一句「若 X 成立，本维应降到 Y」", re: "(本维应降|应降到)", n: 3 , ke: "Each dimension carries a line: if X holds, this dimension should drop to Y", en: "(should drop to|would fall to|drops to)" },
   ] },
 };
 /* 「本轮必交件」块：把上表念给基底听。它是**告知**，不是审计——
@@ -7420,6 +7422,29 @@ function toolNeedBlock(tool) {
     + "\n· 实在交不出的那一件，就在它该在的位置写一行「（这一件交不出：因为……）」——**写出来才算交代**；"
     + "跳过不写，页面只会如实报「未交付」。"
     + "\n· 这几件是交付面，不是小标题模板：照常说人话，别把答案写成一张填空表。";
+}
+
+/* ═══ 按界面语言取一份规格（2026-08-28 第二刀）═══
+   病灶：TOOL_SPEC 的判据原来全是中文关键词，而英文界面下 system 明写「Write your entire
+   answer in English」⇒ 一份完全合格的英文答被逐件判成「未交付」（真跑实测 three 0/5、
+   what 0/8、genesis 0/7）。上一刀先把冤枉止住（英文界面不判），这一刀把它判得动：
+     · ke ＝英文件名（缺件那一行是给读者看的，不能给英文读者一串中文件名）；
+     · en ＝英文判据；**省略 en ＝这一件与语言无关**（年份、链接、```mermaid、箭头、
+       格位码、竖线表都是），不是漏写——sim_tool_each 会逐件核这一条：
+       没有 en 的，它的 re 里不许出现汉字。
+   EN_MIN_RATIO：同一份内容，英文的字符数约是中文的一倍半（判短线还要再乘 0.7）。
+   1.6 不是拍的——十五份英文样本真跑出来的最小富余量定的，见 sim_tool_each ②en。
+   下发时**逐字段重建**，不把 ke/en 一起发出去：前端只该拿到它这一轮要用的那一份。 */
+const EN_MIN_RATIO = 1.6;
+function toolSpecFor(tool, lang) {
+  const sp = TOOL_SPEC[tool];
+  if (!sp) return null;
+  const en = lang === "en";
+  return {
+    k: tool,
+    min: en ? Math.round(sp.min * EN_MIN_RATIO) : sp.min,
+    items: sp.items.map((it) => ({ k: (en && it.ke) ? it.ke : it.k, re: (en && it.en) ? it.en : it.re, n: it.n })),
+  };
 }
 
 function wdsToolSys(tool, prof) {
@@ -10596,12 +10621,7 @@ export default {
                冤枉读者的审计比没有审计更坏。所以英文界面这一轮**不判**——
                但也不许静默跳过（静默＝把没查过记成查过了），如实说一句为止。
                真正的修法是给每一件配英文判据，那是另一刀，未做。 */
-            if (tool && TOOL_SPEC[tool]) {
-              if (lang === "en") controller.enqueue(_sseBytes({ t: "note",
-                v: "Delivery audit is skipped this turn: its checks are written against Chinese wording, so it cannot judge an English answer. The procedure itself still applies." }));
-              else controller.enqueue(_sseBytes({ t: "toolspec",
-                v: { k: tool, min: TOOL_SPEC[tool].min, items: TOOL_SPEC[tool].items } }));
-            }
+            if (tool && TOOL_SPEC[tool]) controller.enqueue(_sseBytes({ t: "toolspec", v: toolSpecFor(tool, lang) }));
             const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde);
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
