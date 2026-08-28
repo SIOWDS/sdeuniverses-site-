@@ -939,6 +939,8 @@
       bDistill: "\u270e 成文 · PPT", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
       egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
       mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网", mNoSde: "\u2298 无 SDE",
+      mtHide: "收起工具", mtShow: "工具", mtHideT: "把档位条收起来，把屏幕让给答案",
+      mtShowT: "展开档位条（现在开着的）",
       tipStd: "快答档，够用且省", tipDeep: "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深", tipWeb: " · 已开联网（需智谱 Key）",
       tipNoSde: " · 无 SDE：纯基底对话，不套 SDE 框架、不挂站内语料，可当一个称职的通用助手用",
       ph: "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…",
@@ -1184,6 +1186,8 @@
       bDistill: "\u270e Write up · Deck", bHist: "\u21ba History", bSet: "\u2699 Settings", bNew: "\uff0b New chat",
       egs: ["What separates Show from structure in SDE?", "How would SDE read the onset of a chronic disease?", "What is entanglement of features? Give an example.", "Point me at a few pieces to start with"],
       mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web", mNoSde: "\u2298 No SDE",
+      mtHide: "Hide tools", mtShow: "Tools", mtHideT: "Collapse the mode bar and give the screen to the answer",
+      mtShowT: "Show the mode bar (currently on)",
       tipStd: "Fast tier — enough for most questions, and cheap",
       tipDeep: "Top model at full reasoning power, the whole SDE groundwork and its method stages. Slow, but it digs.",
       tipWeb: " · Web search on (needs a Zhipu key)",
@@ -2009,6 +2013,15 @@
     ".wdsm-mode{background:var(--wfill);border:1px solid var(--wline);color:var(--wdim);font:12.5px/1 inherit;padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}" +
     ".wdsm-mode.on{background:var(--wfill2);border-color:var(--wgold);color:var(--wgold)}" +
     ".wdsm-mode-tip{color:var(--wdim2);font-size:11.5px;margin-left:2px}" +
+    /* ⭐ 档位条可收起（2026-08-29）。两条按钮 ＋ 一行说明常年占着 90–110px，
+       而它们是「设一次就不再动」的东西，读答案才是这块屏幕的主业。
+       收起时**不是隐藏状态**：折叠钮上照旧写着现在开着哪几档（见 toolsPaint）。 */
+    ".wdsm-modes.fold{display:none}" +
+    ".wdsm-inbar:has(.wdsm-modes.fold){padding-top:9px}" +
+    ".wdsm-mtog{background:none;border:1px solid var(--wline);color:var(--wdim);font:12px/1 inherit;padding:7px 10px;border-radius:999px;cursor:pointer;white-space:nowrap;max-width:56%;overflow:hidden;text-overflow:ellipsis}" +
+    ".wdsm-mtog:hover{border-color:var(--wgold);color:var(--wgold)}" +
+    ".wdsm-mtog b{font-weight:400;color:var(--wgold)}" +
+    "@media(max-width:600px){.wdsm-mtog{max-width:44%;padding:6px 9px}}" +
     ".wdsm-atts{max-width:760px;margin:0 auto 8px;display:flex;gap:7px;flex-wrap:wrap}" +
     ".wdsm-att{display:flex;align-items:center;gap:7px;background:rgba(61,165,165,.12);border:1px solid rgba(61,165,165,.4);color:var(--wteal);border-radius:9px;padding:6px 9px;font-size:12.5px;max-width:100%}" +
     ".wdsm-att b{font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
@@ -2204,6 +2217,7 @@
           "<textarea class='wdsm-in' rows='1'></textarea>" +
           "<div class='wdsm-inrow'>" +
             "<button class='wdsm-mode wdsm-attbtn'></button>" +
+            "<button class='wdsm-mtog'></button>" +
             "<span class='wdsm-insp'></span>" +
             "<button class='wdsm-mp'></button>" +
             "<button class='wdsm-mic'>\ud83c\udf99</button>" +
@@ -2789,6 +2803,51 @@
     webOn = localStorage.getItem(LS_WEB) === "1";
     noSdeOn = !PROFILE && localStorage.getItem(LS_NOSDE) === "1";
   } catch (e) {}
+  /* ════ 档位条的收放（2026-08-29）════════════════════════════════
+     诉求：输出窗口要能随手变大。做法与 Claude／GPT 同路——把「设一次就不再动」的
+     档位条收进输入行的一颗小钮里，屏幕让给答案。
+     两条纪律：
+     ① **收起不等于藏起状态**：折叠钮上写着此刻开着哪几档（深度／联网／深度研究／工序…），
+        读者一眼看得见自己正拿什么在问。看不见的开关比没有开关更坏。
+     ② **读者点过就永远听他的**（存 LS）；没点过的才走默认：开屏展开，第一次发问后自动收起。 */
+  var LS_TOOLS = "sde_wds_tools";            // "1" 展开 / "0" 收起；没有这一项＝读者还没表过态
+  var togEl = layer.querySelector(".wdsm-mtog");
+  var modesEl = layer.querySelector(".wdsm-modes");
+  var toolsPinned = null, toolsOpen = true;
+  try { var _tv = localStorage.getItem(LS_TOOLS); if (_tv === "0" || _tv === "1") { toolsPinned = _tv === "1"; toolsOpen = toolsPinned; } } catch (e) {}
+  /* 摘要直接扫 DOM 里点亮的那几颗——不另记一份状态。
+     另记一份的下场是：哪天加了一颗档位而忘了同步，摘要就开始骗人。 */
+  function toolsSum() {
+    var out = [];
+    try {
+      var bs = layer.querySelectorAll(".wdsm-mode.on");   // 点亮态只出现在档位条上，不必再套一层后代选择器
+      for (var i = 0; i < bs.length && out.length < 4; i++) {
+        var s = String(bs[i].textContent || "").replace(/^[^\s]*\s/, "").trim();   // 去掉前面那个图标
+        if (s) out.push(s.length > 8 ? s.slice(0, 8) : s);
+      }
+    } catch (e) {}
+    return out;
+  }
+  function toolsPaint() {
+    if (!togEl || !modesEl) return;
+    if (toolsOpen) modesEl.classList.remove("fold"); else modesEl.classList.add("fold");
+    var sum = toolsSum();
+    togEl.innerHTML = "";
+    togEl.appendChild(document.createTextNode(toolsOpen ? ("\u2303 " + t("mtHide")) : ("\u2304 " + t("mtShow"))));
+    if (!toolsOpen && sum.length) {
+      var b = el("b", null, " \u00b7 " + sum.join(" \u00b7 "));
+      togEl.appendChild(b);
+    }
+    togEl.title = toolsOpen ? t("mtHideT") : (t("mtShowT") + (sum.length ? ("：" + sum.join("、")) : ""));
+  }
+  function toolsSet(on, byUser) {
+    toolsOpen = !!on;
+    if (byUser) { toolsPinned = !!on; try { localStorage.setItem(LS_TOOLS, on ? "1" : "0"); } catch (e) {} }
+    toolsPaint();
+  }
+  /* 第一次发问后自动收起——**只对没表过态的读者**。表过态的人按他自己的来。 */
+  function toolsAutoFold() { if (toolsPinned === null && toolsOpen) toolsSet(false, false); }
+  if (togEl) togEl.onclick = function () { toolsSet(!toolsOpen, true); };
   function paintModes() {
     var bs = layer.querySelectorAll(".wdsm-mode");
     for (var i = 0; i < bs.length; i++) {
@@ -2798,6 +2857,8 @@
       if (on) bs[i].classList.add("on"); else bs[i].classList.remove("on");
     }
     tipEl.textContent = (thinkMode === "deep" ? t("tipDeep") : t("tipStd")) + (webOn ? t("tipWeb") : "") + (noSdeOn ? t("tipNoSde") : "");
+ 
+    toolsPaint();                              // 档位一变，折叠钮上的摘要跟着变
   }
   (function () {
     var bs = layer.querySelectorAll(".wdsm-mode");
@@ -4077,6 +4138,9 @@
   function send(forceQ) {
     var q = String(forceQ != null ? forceQ : inEl.value).trim();
     if (!q) return;
+    /* 问出第一句之后，屏幕的主业就从「挑档位」变成「读答案」——档位条自动收起。
+       只对没表过态的读者生效；点过折叠钮的人按他自己的来（见 toolsSet 的 byUser）。 */
+    try { toolsAutoFold(); } catch (e) {}
     // 读者可能把改写那段整个删了改问别的——那这一稿就不该再被收进画布当新版本。
     // 判据是那句引子还在不在，不是"上次点过改写"。
     if (CV.want && q.indexOf(CV.want.pre) < 0) CV.want = null;
@@ -4394,6 +4458,8 @@
     duBtn.textContent = duV ? (t("duBtn") + "：" + vinfo(duV).name) : t("duBtn");
     duBtn.title = t("duTip");
     if (duV) duBtn.classList.add("on"); else duBtn.classList.remove("on");
+ 
+    try { toolsPaint(); } catch (e) {}
   }
   if (duBtn) duBtn.onclick = function () {
     if (streaming) return;
@@ -6307,6 +6373,8 @@
     rsBtn.textContent = tx("rsBtn");
     rsBtn.title = tx("rsTip");
     if (RS.on) rsBtn.classList.add("on"); else rsBtn.classList.remove("on");
+ 
+    try { toolsPaint(); } catch (e) {}
   }
   if (rsBtn) rsBtn.onclick = function () { if (RS.running) return; RS.on = !RS.on; rsPaint(); };
   function rsPost(body) {
@@ -8204,6 +8272,8 @@
     toolBtn.textContent = it ? (t("tlOn") + t(it.n)) : t("tlBtn");
     if (it) toolBtn.classList.add("on"); else toolBtn.classList.remove("on");
     toolBtn.title = it ? t(it.s) : (t("tlTitle") + " \u00b7 " + t("tlSlash"));
+ 
+    try { toolsPaint(); } catch (e) {}
   }
   function toolSet(k) {
     curTool = toolInfo(k) ? k : "";

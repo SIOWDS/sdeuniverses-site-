@@ -1770,6 +1770,39 @@ console.log("⑧ 成文（distill）");
     ok(/distill\(k, body, head, "", null, st\)/.test(src), "取回时把笔法一并带回去");
   }
 
+  /* ═══ 档位条收放（2026-08-29）═══════════════════════════════════
+     输出窗口要能变大：档位条收进输入行的一颗小钮。
+     这里验三件：收得起来、**收起时状态仍写在钮上**、读者点过就记住。 */
+  {
+    console.log("⑳ 档位条收放");
+    const tog = layer.querySelector(".wdsm-mtog");
+    const modesBar = layer.querySelector(".wdsm-modes");
+    ok(!!tog && !!modesBar, "折叠钮与档位条都在");
+    if (tog && modesBar) {
+      const wasFold = modesBar.className.includes("fold");
+      tog._listeners = tog._listeners || {};
+      const click = () => (tog.onclick ? tog.onclick() : null);
+      click();
+      ok(modesBar.className.includes("fold") !== wasFold, "点一下就收起／展开");
+      const foldedNow = modesBar.className.includes("fold");
+      if (!foldedNow) { click(); }
+      ok(modesBar.className.includes("fold"), "能收到收起态");
+      ok(String(tog.textContent || "").trim().length > 0, "收起时钮上仍有字（不是一颗空框）");
+      // 收起时必须写着开着哪几档：先把「联网」点亮，再看钮上有没有它
+      const webBtn = layer.querySelector(".wdsm-mode[data-k='web']");
+      const wasOn = webBtn.className.includes("on");
+      if (!wasOn) webBtn.onclick();
+      ok(String(tog.textContent || "").includes("联网") || String(tog.textContent || "").includes("Web"),
+        "⭐ 收起时钮上写着此刻开着哪几档（看不见的开关比没有开关更坏）：" + tog.textContent);
+      if (!wasOn) webBtn.onclick();
+      ok(localStorage.getItem("sde_wds_tools") === "0", "读者点过就记住（下次开屏照他的来）");
+    }
+    ok(/function toolsAutoFold\(\) \{ if \(toolsPinned === null && toolsOpen\)/.test(src),
+      "没表过态的读者：第一次发问后自动收起");
+    ok(/try \{ toolsAutoFold\(\); \} catch \(e\) \{\}/.test(src), "自动收起挂在 send 上");
+    ok(/\.wdsm-modes\.fold\{display:none\}/.test(src), "收起就是不占位（不是变透明）");
+  }
+
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
 })();
