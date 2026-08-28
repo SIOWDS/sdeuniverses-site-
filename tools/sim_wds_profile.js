@@ -57,9 +57,18 @@ console.log("── ① 档案表与解析器 ───────────�
   t("抠得出 COMP_PRE 段", compSeg.length > 40);
   const COMP_PRE = new Function(compSeg + "\nreturn COMP_PRE;")();
   const fuSys = "「付自文」的人格底本占位（含：不替他写／先当人对待）";
-  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE", "YANG_SYS", "EDU_PRE", "HUMIN_SYS", "HEALTH_PRE", "XIAOBO_SYS", "MATH_PRE", "FUZIWEN_SYS", "COMP_PRE",
+  /* 2026-08-28 第七、八个档案 physics / chemistry（站方主持，不挂个人名）。 */
+  const physSeg = W.slice(W.indexOf("const PHYSICS_PRE = ["), W.indexOf("];", W.indexOf("const PHYSICS_PRE = [")) + 2);
+  t("抠得出 PHYSICS_PRE 段", physSeg.length > 40);
+  const PHYSICS_PRE = new Function(physSeg + "\nreturn PHYSICS_PRE;")();
+  const physSys = "「SDE 物理」的人格底本占位（含：站方主持不挂人名／不替他做题／安全闸）";
+  const chemSeg = W.slice(W.indexOf("const CHEMISTRY_PRE = ["), W.indexOf("];", W.indexOf("const CHEMISTRY_PRE = [")) + 2);
+  t("抠得出 CHEMISTRY_PRE 段", chemSeg.length > 40);
+  const CHEMISTRY_PRE = new Function(chemSeg + "\nreturn CHEMISTRY_PRE;")();
+  const chemSys = "「SDE 化学」的人格底本占位（含：站方主持不挂人名／不替他做题／最硬的安全闸）";
+  const F = new Function("JOHN_SYS", "LANG_PRE", "FEISUO_SYS", "LITER_PRE", "YANG_SYS", "EDU_PRE", "HUMIN_SYS", "HEALTH_PRE", "XIAOBO_SYS", "MATH_PRE", "FUZIWEN_SYS", "COMP_PRE", "PHYSICS_SYS", "PHYSICS_PRE", "CHEMISTRY_SYS", "CHEMISTRY_PRE",
     seg + "\nreturn { WDS_PROFILES: WDS_PROFILES, wdsProfileOf: wdsProfileOf, wdsProfInScope: wdsProfInScope };");
-  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE, yangSys, EDU_PRE, huminSys, HEALTH_PRE, xiaoboSys, MATH_PRE, fuSys, COMP_PRE);
+  const S = F(johnSys, LANG_PRE, feisuoSys, LITER_PRE, yangSys, EDU_PRE, huminSys, HEALTH_PRE, xiaoboSys, MATH_PRE, fuSys, COMP_PRE, physSys, PHYSICS_PRE, chemSys, CHEMISTRY_PRE);
   const lang = S.wdsProfileOf("lang");
 
   t("认得 lang", !!lang && lang.id === "lang");
@@ -321,6 +330,92 @@ console.log("── ① 档案表与解析器 ───────────�
     t("math 旧首页已改成跳转页（域名已绑，不许 404）", /mpc\.sdeuniverses\.com/.test(MATHOLD) && /http-equiv="refresh"/.test(MATHOLD));
     t("math 旧首页 noindex（免得两个地址争同一份内容）", /noindex/.test(MATHOLD));
     t("小波老师作者页入口已改指 mpc", /mpc\.sdeuniverses\.com/.test(fs4.readFileSync("public/students/xiaobo/index.html", "utf8")));
+    /* ── ②h 物理台与化学台（2026-08-28）──
+       这两档由**站方主持、不挂个人名**，是站上头一次；人格里必须明写"不冒充任何一位老师"，
+       否则空检索加上"本栏主持人"这个提法，它会自己编出一个人来。
+       另外三道闸（不替他做题／事实的分寸／安全闸）逐档在人格、guard、内功第五条里各钉一遍，
+       **化学那道安全闸是全站最硬的一条**——化学是唯一一门答错了会有人照着做出事的课。 */
+    const MPC2 = fs4.readFileSync("public/sites/mpc/index.html", "utf8");
+    const phy = S.wdsProfileOf("physics"), chm = S.wdsProfileOf("chemistry");
+    t("认得 physics", !!phy && phy.id === "physics");
+    t("认得 chemistry", !!chm && chm.id === "chemistry");
+    t("两档都不与 math 串台", !!phy && !!chm && phy.sys !== chm.sys && phy.neigong !== chm.neigong);
+    t("两档的白名单够长（前沿栏物理约 25 块、化学约 20 块）",
+      (phy.pre || []).length >= 20 && (chm.pre || []).length >= 18,
+      "physics " + (phy.pre || []).length + " / chemistry " + (chm.pre || []).length);
+    t("两档的白名单前缀都带结尾斜杠且是站内绝对路径",
+      phy.pre.every((x) => /^\/.*\/$/.test(x)) && chm.pre.every((x) => /^\/.*\/$/.test(x)));
+    t("⭐ 物理档不收化学面板，化学档不收物理面板（不许串台）",
+      !phy.pre.some((x) => /synthetic-chemistry|catalysis|inorganic-chemistry/.test(x)) &&
+      !chm.pre.some((x) => /condensed-matter|particle-physics|fluid-mechanics/.test(x)));
+    t("两档都带题域闸", /题域闸/.test(phy.guard || "") && /题域闸/.test(chm.guard || ""));
+    t("两档都带「不替他做题」", /不替他做题/.test(phy.guard || "") && /不替他做题/.test(chm.guard || ""));
+    t("两档都带「事实的分寸」且禁编造", /事实的分寸/.test(phy.guard || "") && /事实的分寸/.test(chm.guard || "") &&
+      /绝不编造/.test(phy.guard || "") && /绝不编造/.test(chm.guard || ""));
+    t("⭐ 两档都带安全闸", /安全闸/.test(phy.guard || "") && /安全闸/.test(chm.guard || ""));
+    t("⭐ 物理安全闸点名了会伤人的那几样", /高压|激光|辐射|含能材料/.test(phy.guard || "") &&
+      /核材料|武器|爆炸物/.test(phy.guard || ""));
+    t("⭐⭐ 化学安全闸写死了「不给步骤、不给配比、不给条件参数」",
+      /不给步骤/.test(chm.guard || "") && /不给配比/.test(chm.guard || "") && /不给条件参数/.test(chm.guard || ""));
+    t("⭐⭐ 化学安全闸把边界钉成一句「到照着就能做出来那一步为止」",
+      /照着就能做出来/.test(chm.guard || ""));
+    t("⭐ 化学档遇自伤先当人对待、不追问细节", /自伤|伤人/.test(chm.guard || "") && /先当人对待/.test(chm.guard || ""));
+    t("⭐ 两档都写明「不冒充人」（站方主持，不许编一个主持人出来）",
+      /不冒充人/.test(phy.guard || "") && /不冒充人/.test(chm.guard || "") &&
+      /不要自称是某位老师/.test(phy.guard || "") && /不要自称是某位老师/.test(chm.guard || ""));
+    t("两档都写明「工序不解除这几道闸」",
+      /工序不解除/.test(phy.guard || "") && /工序不解除/.test(chm.guard || ""));
+    t("两档都带术语闸", /术语闸/.test(phy.term || "") && /术语闸/.test(chm.term || ""));
+    /* 招牌里就带那三个字母（「SDE 物理」「SDE 化学」），术语闸必须给它一个明写的口子，
+       否则闸与自己的名字打架——它要么报不出名字，要么把闸整条当成不作数的。 */
+    t("⭐ 术语闸给招牌开了明写的口子（名字不算概念）",
+      /你自己的名字「SDE 物理」不在此列/.test(phy.term || "") &&
+      /你自己的名字「SDE 化学」不在此列/.test(chm.term || ""));
+    t("两档的 who 是「站方主持」，不是某个人名",
+      /站方主持/.test(phy.who || "") && /站方主持/.test(chm.who || ""));
+
+    /* 断言的对象必须是源码里那份人格常量，不是 harness 注入的占位串（②f 那一处的教训）。 */
+    const PSYS = W.slice(W.indexOf("const PHYSICS_SYS ="), W.indexOf("const CHEMISTRY_SYS ="));
+    const CSYS = W.slice(W.indexOf("const CHEMISTRY_SYS ="), W.indexOf("const CHEMISTRY_SYS =") + 9000);
+    t("物理人格底本里也钉了不替他做题与安全", /你不替他做题/.test(PSYS) && /照着就能做出来/.test(PSYS));
+    t("化学人格底本里也钉了安全闸与不替他做题", /你不替他做题/.test(CSYS) && /照着就能做出来/.test(CSYS) && /不给配比/.test(CSYS));
+    t("两份人格底本都写明本栏由站方主持、不冒充老师",
+      /不挂个人名/.test(PSYS) && /不冒充任何一位老师/.test(PSYS) &&
+      /不挂个人名/.test(CSYS) && /不冒充任何一位老师/.test(CSYS));
+    t("两份人格底本都写明空检索时不许编篇名",
+      /绝不许编造站内篇名/.test(PSYS) && /绝不许编造站内篇名/.test(CSYS));
+    t("两份人格底本都说明前沿面板是知识面板、不是本栏观点",
+      /知识面板/.test(PSYS) && /知识面板/.test(CSYS));
+
+    /* 两份底盘：用本行的话，够厚，且自己不许裸露母体术语。 */
+    const PN = fs4.readFileSync("public/taste/assets/physics-neigong.txt", "utf8");
+    const CN = fs4.readFileSync("public/taste/assets/chemistry-neigong.txt", "utf8");
+    t("物理底盘用的是本行的词（图式／取舍／情境）", /在情境里，经取舍，成图式/.test(PN));
+    t("化学底盘用的是本行的词（表征／操作／体系）", /在体系里，经操作，成表征/.test(CN));
+    const pcjk = (PN.match(/[\u4e00-\u9fff]/g) || []).length;
+    const ccjk = (CN.match(/[\u4e00-\u9fff]/g) || []).length;
+    t("物理底盘够厚（≥4000 汉字）", pcjk >= 4000, String(pcjk));
+    t("化学底盘够厚（≥4000 汉字）", ccjk >= 4000, String(ccjk));
+    t("⭐ 两份底盘第五条也各钉了同一道安全闸",
+      /安全这一条压过教学效果/.test(PN) && /安全这一条压过一切教学效果/.test(CN));
+    t("⭐ 两份底盘都钉了「你不替他做题」", /你不替他做题/.test(PN) && /你不替他做题/.test(CN));
+    t("⭐⭐ 底盘自己不许裸露母体术语",
+      !/[^A-Za-z]SDE[^A-Za-z]|特征纠缠|差异序列|结构显露态|介生态|本体论级/.test(PN) &&
+      !/[^A-Za-z]SDE[^A-Za-z]|特征纠缠|差异序列|结构显露态|介生态|本体论级/.test(CN));
+
+    /* 引擎侧与壳页。 */
+    t("引擎侧有 physics / chemistry 两档", /brand: "SDE \u7269\u7406"|brand: "SDE 物理"/.test(MC) && /brand: "SDE \u5316\u5b66"|brand: "SDE 化学"/.test(MC));
+    t("引擎侧两档的 who 也是站方主持（页面上会露出来）",
+      (MC.match(/who: "站方主持"/g) || []).length >= 2);
+    const PSH = fs4.readFileSync("public/sites/mpc/physics/index.html", "utf8");
+    const CSH = fs4.readFileSync("public/sites/mpc/chemistry/index.html", "utf8");
+    t("物理壳页挂 physics 档", /WDSM_PROFILE = "physics"/.test(PSH));
+    t("化学壳页挂 chemistry 档", /WDSM_PROFILE = "chemistry"/.test(CSH));
+    t("两张壳页 canonical 指 mpc", /mpc\.sdeuniverses\.com\/physics\//.test(PSH) && /mpc\.sdeuniverses\.com\/chemistry\//.test(CSH));
+    t("首页两块已由「筹备中」换成真链接", /href="\/physics\/"/.test(MPC2) && /href="\/chemistry\/"/.test(MPC2) && !/class="soon"/.test(MPC2));
+    t("首页栏一计数已改成三台全开", /3 台 · 全部已开/.test(MPC2));
+    t("化学入口写明了危险合成不给步骤", /危险合成与制备一律不给步骤/.test(MPC2));
+
     /* 登记表：未登记的分站会被 Worker 把 canonical 改写掉（comp 至今就是这毛病，
        它自己的首页声明 canonical 指向主站门户页）。登记即修好。
        ⚠ ownership 必须留空——写进 path_prefixes 会让 /students/xiaobo/ 被 301 到本分站。 */

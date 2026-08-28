@@ -406,6 +406,85 @@
         en: { ph: "Paste a problem, a worked solution, or what happened in class…", srcSite: "From the maths subsite" }
       }
     },
+    /* ── 第七、八个分身：physics / chemistry（2026-08-28）──
+       数理化分站的物理栏与化学栏。**站方主持，不挂个人名**，所以 who 写的是「站方主持」
+       而不是某位老师——引擎侧的 who 会出现在页面上，写错了就等于站上多了一个不存在的人。 */
+    physics: {
+      id: "physics",
+      brand: "SDE 物理",
+      url: "/physics/",
+      sig: "SDE \u7269\u7406 \u00b7 mpc.sdeuniverses.com",
+      who: "站方主持",
+      kicker: "MPC.SDEUNIVERSES.COM",
+      home: "/",
+      tools: ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"],
+      seeds: [
+        "他公式全对、答案也对，可换一个参考系就画不出受力图了——问题出在哪？",
+        "学生认定「力是维持运动的原因」。演示实验做了，他还是这么想。怎么办？",
+        "「忽略空气阻力」这一步一直是题目替学生做的。这个动作该怎么练？",
+        "这次实验数据和预期不符，课堂上该发生什么？"
+      ],
+      hero: {
+        zh: {
+          title: "SDE 物理",
+          sub: "物理 · 站方主持。一道题、一张受力图、一次演示——先问系统划在哪、第一处走岔在哪。",
+          foot: "它不替学生做题：先问你系统划到哪、图画到哪一步。用你自己的大模型 Key 运行，Key 只存在这台设备的浏览器里。"
+        },
+        en: {
+          title: "SDE Physics",
+          sub: "Physics, hosted by the platform. One problem, one free-body diagram, one demonstration — where is the system boundary, and where is the first wrong turn?",
+          foot: "It won't solve it for you: it asks where you drew the boundary first. Runs on your own model key."
+        }
+      },
+      copy: {
+        zh: {
+          ph: "贴一道题、一张受力图，或一节课上出的事…",
+          note: "SDE 物理只答物理、物理学习与物理教学。**它不替学生做题**：会先问你系统划到哪、卡在哪。涉及高压、激光、辐射、含能材料等危险装置，只讲原理与防护，不给可操作的搭建细节。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写入数据库、不写进日志。",
+          tlBtn: "⊞ 物理工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
+          tipDeep: "满血基底＋满功率思考＋整套工序，慢但深",
+          srcSite: "物理面板文献"
+        },
+        en: { ph: "Paste a problem, a free-body diagram, or what happened in class…", srcSite: "From the physics panels" }
+      }
+    },
+    chemistry: {
+      id: "chemistry",
+      brand: "SDE 化学",
+      url: "/chemistry/",
+      sig: "SDE \u5316\u5b66 \u00b7 mpc.sdeuniverses.com",
+      who: "站方主持",
+      kicker: "MPC.SDEUNIVERSES.COM",
+      home: "/",
+      tools: ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"],
+      seeds: [
+        "他方程式配平全对，可我问溶液里有哪些微粒，他答不上来——这一步怎么补？",
+        "学生把强酸的规则用到了弱酸上。这类越界该怎么批？",
+        "「能发生」和「会发生」这两把尺子，学生总是混。有没有一道题能当场把它们分开？",
+        "化学要记的东西那么多，背和懂这两本账该怎么各记各的？"
+      ],
+      hero: {
+        zh: {
+          title: "SDE 化学",
+          sub: "化学 · 站方主持。一个方程式、一段现象、一次实验——先问默认的是哪个体系，那幅微粒图在不在。",
+          foot: "它不替学生做题。危险合成与制备一律不给步骤：只讲为什么危险、原理与防护。用你自己的大模型 Key 运行，Key 只存在这台设备的浏览器里。"
+        },
+        en: {
+          title: "SDE Chemistry",
+          sub: "Chemistry, hosted by the platform. One equation, one observation, one experiment — which system is assumed, and is the particle picture actually there?",
+          foot: "It won't solve it for you, and it gives no workable procedures for hazardous preparations. Runs on your own model key."
+        }
+      },
+      copy: {
+        zh: {
+          ph: "贴一个方程式、一段现象，或一节课上出的事…",
+          note: "SDE 化学只答化学、化学学习与化学教学。**它不替学生做题**：会先问你默认的是什么体系、卡在哪。**危险合成与制备一律不给可操作步骤、配比与条件**——只讲为什么危险、原理与防护。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写入数据库、不写进日志。",
+          tlBtn: "⊞ 化学工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
+          tipDeep: "满血基底＋满功率思考＋整套工序，慢但深",
+          srcSite: "化学面板文献"
+        },
+        en: { ph: "Paste an equation, an observation, or what happened in class…", srcSite: "From the chemistry panels" }
+      }
+    },
     /* ── 第六个分身：comp（ChatZiwen，2026-08-23）── */
     comp: {
       id: "comp",
