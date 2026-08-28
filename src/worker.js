@@ -7596,6 +7596,53 @@ const RES_NEEDS = {
 /* 必须走敌意最近邻专用链的那一道：典范出生时就查占位者（与学科通融第 5 道同理）。 */
 const RES_NBR_STAGES = { 6: 1 };
 
+/* ═══ 深度研究的底盘预算（2026-08-29 第二刀）═════════════════════════════
+   [stated] 作者：这条产线必须是**全套**——SDE 内功 Skill ＋ 心得 ＋ SDE 方法论，一道都不许少。
+   第一刀把完整内功装了进来，但预算写成「内功装不装得下取决于这一道还剩多少地方」——
+   于是上游原文最厚、最需要二阶碰撞那一部分的第六道，恰好是最先退成精简版的那一道
+   （精简版只留第一、二部分，三大方程／六路径／123 原理的完整节与整个第七部分都不在里面）。
+   ⇒ 掉个头：**内功是这条产线的固定成本，其余读物往它剩下的地方里塞。** 超预算时先裁站内资料、
+   再裁站外资料、再裁读者附件（各留一个地板），上游原文不裁（它是发生链）；裁了就当场说。
+   精简版只在地板都裁到了仍装不下时才出现——按现在的体量（内功 7.8 万 ＋ 上游 2.6 万 ＋ 三个地板 1.5 万）
+   走不到那一步；留着它是为了内功日后长大时不至于无声撞窗。
+   预算分两档：满血顶配型号（deepseek-v4-pro 1M／glm-5 20 万／kimi-k2.6 25 万 token）给 15 万字符；
+   读者自填的型号窗口未知，仍守 13 万。两档之外还有约 2.3 万字的固定块（人格头／三视角／平台名录／
+   心得／方法论）不在这个数里——第一刀的 13 万就是这么算的，线上跑通过，口径不变。 */
+const RES_SYS_CAP = 130000, RES_SYS_CAP_TOP = 150000;
+const RES_FLOOR = { ctx: 6000, web: 5000, doc: 4000 };
+function resPriorFit(ngLen, carryLen, ctxLen, webLen, docLen, cap) {
+  const need = ngLen + carryLen + ctxLen + webLen + docLen;
+  const out = { mode: "full", cap, need, ctxKeep: ctxLen, webKeep: webLen, docKeep: docLen };
+  let over = Math.max(0, need - cap);
+  const cut = (len, floor) => {
+    if (over <= 0 || len <= floor) return len;
+    const keep = Math.max(floor, len - over);
+    over -= (len - keep);
+    return keep;
+  };
+  out.ctxKeep = cut(ctxLen, RES_FLOOR.ctx);
+  out.webKeep = cut(webLen, RES_FLOOR.web);
+  out.docKeep = cut(docLen, RES_FLOOR.doc);
+  if (over > 0) out.mode = "lite";
+  return out;
+}
+/* 裁站内资料时**保住末尾那份可点清单**（网址只准从它照抄），只裁前面的片段，且截口要看得见。 */
+function resTrimCtx(ctx, keep) {
+  const s = String(ctx || "");
+  if (s.length <= keep) return s;
+  const mark = "\n\n【可点开的站内篇目";
+  const p = s.indexOf(mark);
+  const list = p >= 0 ? s.slice(p) : "";
+  const body = p >= 0 ? s.slice(0, p) : s;
+  const room = Math.max(0, keep - list.length);
+  return body.slice(0, room) + "\n〔⚠ 站内资料原有 " + body.length + " 字，为装下完整内功只带来前 " + room + " 字〕" + list;
+}
+function resTrimTail(txt, keep, what) {
+  const s = String(txt || "");
+  if (s.length <= keep) return s;
+  return s.slice(0, keep) + "\n〔⚠ " + what + "原有 " + s.length + " 字，为装下完整内功只带来前 " + keep + " 字〕";
+}
+
 function wdsSdeResearchSys(rs) {
   const i = Math.max(1, Math.min(RESEARCH_STAGES.length, rs.i | 0));
   const st = RESEARCH_STAGES[i - 1];
@@ -10756,6 +10803,17 @@ export default {
             }
             // 无 SDE 档不装心得——省一次 ensureReflect（读 KV／可能现算），装了也用不上（WDS_PLAIN_SYS 不接 reflect 参数）。
             let reflect = ""; if (!noSde) try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
+            /* ⭐ SDE 深度研究：**心得不许缺**（2026-08-29 第二刀）。
+               [stated] 作者：全套＝SDE 内功 Skill ＋ 心得 ＋ SDE 方法论。此前这条产线只在库里恰好有这家
+               基底的心得时才装，缺了既不生成也不作声——与 /api/ask 深度档那条「必须有心得，这个不能打折」
+               的纪律不同轨，于是同一份内功在两条路上装出两种功力，而屏幕上看不出区别。
+               现在同轨：缺就现写一份（只此一次，写好即存库，后面九道与全站复用），写不出来就把真因说出来。
+               生成的那一两分钟不进这一道的时钟（时钟在下面「基底作答」前才起）；心跳一直在拍，连接不会被判死。 */
+            if (rs && rs.sde && !prof && !reflect && KEY && !reflectStoreDown()) {
+              _stg("现写心得");
+              controller.enqueue(_sseBytes({ t: "note", v: "这个基底（" + VC.name + " · " + VC.model + "）还没有内化心得——正在带着完整内功现写一份（约一分钟，只此一次；写好即存库，后面各道与全站复用）…" }));
+              try { reflect = await ensureReflect(env, url, rvendor, VC, KEY, true); } catch (e) {}
+            }
             let SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
             /* 领域档案可以带自己那一份内功，装上就顶掉上面这一行骨架。
                ⚠ 读不到**不许静默退回**——退回去以后它照样答得像模像样，只是底盘换了，
@@ -10771,30 +10829,51 @@ export default {
                理由：这条产线每一道要真走三大方程／六路径／三原理，而那一行骨架只报得出名字——
                名字够用来「提一句」，不够用来「走一遍」。装的是全站共读的 sde-neigong.txt
                （模块级缓存，已附二阶碰撞那一份），与金点子发生器读的是同一份。
-               ⚠ 预算闸：完整内功近十万字，而这条产线还要内联最多 2.6 万字的上游原文。
-                 两头加起来顶穿输入窗时**退到精简内功，并当场告诉读者**——
+               ⚠ 预算闸（第二刀改法）：完整内功约 7.8 万字（含二阶碰撞那一份），是固定成本；
+                 上游原文（≤2.6 万）不裁；站内／站外／附件三样超出时按这个次序裁到地板并当场说明。
+                 只有地板都裁到了仍装不下才退精简版——那时也当场说明，且说清精简版少了哪几部分。
                  静默降级＝把没装的功力记成装过了。 */
             if (rs && rs.sde && !prof) {
               let _ng = "";
               try { _ng = await loadNeigong(env, url, "/taste/assets/sde-neigong.txt"); } catch (e) {}
+              /* 这一道实际会内联多少上游原文：forgeCarry 按 FORGE_CARRY_MAX 匀分，所以上限就是它。 */
+              const _carryLen = Math.min(FORGE_CARRY_MAX, (Array.isArray(rs.bodies) ? rs.bodies : [])
+                .reduce((a, b2) => a + ((b2 && b2.body) ? b2.body.length : 0), 0));
+              let _ngMode = "none";
               if (_ng) {
-                const _carryLen = (Array.isArray(rs.bodies) ? rs.bodies : [])
-                  .reduce((a, b2) => a + ((b2 && b2.body) ? b2.body.length : 0), 0);
-                /* 预算按**这一道 system 里已经占掉的字数**算，不是拍一个数：
-                   上游原文（内联上限 FORGE_CARRY_MAX）＋站内资料＋站外资料＋读者附件。
-                   13 万字符是这条产线的 system 总闸——留出历史与 6000 字输出的余地。 */
-                const _room = 130000 - Math.min(_carryLen, FORGE_CARRY_MAX)
-                  - (ctxText ? ctxText.length : 0) - (webCtx ? webCtx.length : 0) - (docCtx ? docCtx.length : 0);
-                if (_ng.length <= _room) {
+                /* ⭐ 第二刀（2026-08-29）：内功是固定成本，读物往它剩下的地方里塞——见 resPriorFit 头上那段。
+                   第一刀的算法是反过来的（先算读物占了多少，再看内功装不装得下），于是上游最厚的第六道
+                   最先退成精简版，而精简版恰恰不含二阶碰撞那一部分。 */
+                const _cap = (VC.top && !umodel) ? RES_SYS_CAP_TOP : RES_SYS_CAP;
+                const fit = resPriorFit(_ng.length, _carryLen, ctxText.length, webCtx.length, docCtx.length, _cap);
+                const _cuts = [];
+                if (fit.ctxKeep < ctxText.length) { _cuts.push("站内资料 " + ctxText.length + "→" + fit.ctxKeep); ctxText = resTrimCtx(ctxText, fit.ctxKeep); }
+                if (fit.webKeep < webCtx.length) { _cuts.push("站外资料 " + webCtx.length + "→" + fit.webKeep); webCtx = resTrimTail(webCtx, fit.webKeep, "站外资料"); }
+                if (fit.docKeep < docCtx.length) { _cuts.push("读者附件 " + docCtx.length + "→" + fit.docKeep); docCtx = resTrimTail(docCtx, fit.docKeep, "读者附件"); }
+                if (fit.mode === "full") {
+                  _ngMode = "full";
                   SDEM = "\n\n════ SDE 内功 · 完整先验（你的底盘：内化使用，绝不复述原文、绝不提「内功」二字）════\n" + _ng;
                 } else {
+                  _ngMode = "lite";
                   const _lite = neigongLite(_ng);
-                  SDEM = "\n\n════ SDE 内功 · 精简先验（这一道的上游材料太厚，完整先验装不下）════\n" + _lite;
-                  controller.enqueue(_sseBytes({ t: "note", v: "这一道的上游材料较厚，内功按精简版装载（" + _lite.length + " 字，完整版 " + _ng.length + " 字）——三大方程／六路径／三原理仍在，被移走的是改姓爪与现场样本那几部分。" }));
+                  SDEM = "\n\n════ SDE 内功 · 精简先验（读物裁到地板仍装不下完整先验）════\n" + _lite;
+                  /* 精简版少的是什么，要说真话：它只留第一、二部分，三大方程／123 原理／六路径的完整节
+                     与整个第七部分（二阶碰撞）都不在里面，方法论块里只有它们的凝版。 */
+                  controller.enqueue(_sseBytes({ t: "note", v: "⚠ 内功按精简版装载（" + _lite.length + " 字，完整版 " + _ng.length + " 字）：精简版**不含**三大方程／123 原理／六路径的完整节与二阶碰撞那一部分，只剩方法论块里的凝版——**这一道的产出按降级看待**。" }));
                 }
+                if (_cuts.length) controller.enqueue(_sseBytes({ t: "note", v: "为装下完整内功，这一道的读物做了裁减：" + _cuts.join("；") + "（上游原文不裁；预算 " + _cap + " 字，本道需 " + fit.need + " 字）。" }));
               } else {
                 controller.enqueue(_sseBytes({ t: "note", v: "内功文件这次没读到，本道退回一行骨架作答——**这一道的产出按降级看待**。" }));
               }
+              /* 装载清单：每一道一行，读者与我方都看得见这一道到底装了什么。
+                 三件里少一件就写「无」，不写「就绪」——静默降级＝把没装的记成装过了。 */
+              const _rk = reflectKey(rvendor, VC);
+              controller.enqueue(_sseBytes({ t: "note", v: "本道底盘 · 基底：" + VC.name + " · " + VC.model + (VC.top ? "（满功率）" : "（读者自选型号，非满功率）") + " · 内功："
+                + (_ngMode === "full" ? ("完整先验 " + _ng.length + " 字（含二阶碰撞与原初问题裁定）") : _ngMode === "lite" ? "精简先验" : "无（一行骨架）")
+                + " · 心得：" + (reflect ? (reflect.length + " 字，" + (REFLECT_SRC[_rk] || "缓存")) : ("**无**（" + (REFLECT_ERR || (KEY ? "这家基底暂时写不出来" : "没有可用的 Key")) + "）"))
+                + " · 方法论：" + (deep ? "完整工序（深度档）" : "精简工序")
+                + " · 上游原文 " + _carryLen + " 字 · 站内资料 " + ctxText.length + " 字"
+                + (webCtx ? (" · 站外 " + webCtx.length + " 字") : "") + (docCtx ? (" · 附件 " + docCtx.length + " 字") : "") }));
             }
             /* ⭐ 交付规格随流下发（2026-08-28）。前端拿**同一份**规格跑审计——
                前端不留副本，抄一份就会有一天两份不一样，那时页面报的「已交付」是假的。 */

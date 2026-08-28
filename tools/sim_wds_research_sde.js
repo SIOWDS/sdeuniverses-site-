@@ -89,16 +89,70 @@ console.log("⑥ 全血加功力");
   ok2(/if \(PROFILE\) _planBody\.plan = "free";/.test(FE2), "分身页不跑这条产线（工序名是母体术语，会把改姓档灌回去）");
   ok2(!/SDE/.test((FE2.match(/rsTip: "[^"]*"/g) || []).join(" ")), "按钮说明里没有学派术语（分身页读同一张表）");
   ok2(/loadNeigong\(env, url, "\/taste\/assets\/sde-neigong\.txt"\)/.test(S), "装的是全站共读那一份（与金点子发生器同源）");
-  ok2(/const _room = 130000 - Math\.min\(_carryLen, FORGE_CARRY_MAX\)/.test(S), "预算按 system 实际占用算，不是拍脑袋");
+  ok2(/const _carryLen = Math\.min\(FORGE_CARRY_MAX, /.test(S), "上游原文按 forgeCarry 的真实上限计（不是把二十万字原文全算进去）");
   ok2(/neigongLite\(_ng\)/.test(S) && /内功按精简版装载/.test(S), "装不下就退精简版并当场说明（不静默降级）");
   ok2(/内功文件这次没读到/.test(S) && /按降级看待/.test(S), "读不到内功要如实报，不假装装过");
   const neig = fs.readFileSync("public/taste/assets/sde-neigong.txt", "utf8");
   const coll = fs.readFileSync("public/taste/assets/sde-collide-paradigm.txt", "utf8");
-  /* 常态（上游满载 2.6 万 ＋ 站内资料满载 1.8 万、无附件）必须装得下完整内功；
-     只有再叠上一份大附件才会退到精简版，而那时会当场说明。 */
   const _full = neig.length + coll.length;
-  ok2(_full < 130000 - 26000 - 18000, "常态满载下完整内功装得进（内功 " + _full + " 字 vs 余量 " + (130000 - 26000 - 18000) + "）");
-  ok2(_full > 130000 - 26000 - 18000 - 12000, "再叠一份大附件就会退精简版——那一条路是有出口的，不是死码");
+  /* ⚠ 第一刀这里写的是「余量 = 130000 − 26000 − 18000」——漏算了九库块（capkb 12000）、可点清单与站外资料，
+     于是「常态装得进」是一条算错了的绿。第二刀不再手算，直接拿 resPriorFit 按每一道的真实负载跑。 */
+  const code2 = grab("const RES_SYS_CAP = 130000", "function wdsSdeResearchSys");
+  const m2 = new Function(code2 + "\nreturn { RES_SYS_CAP, RES_SYS_CAP_TOP, RES_FLOOR, resPriorFit, resTrimCtx, resTrimTail };")();
+  ok2(m2.RES_SYS_CAP_TOP === 150000 && m2.RES_SYS_CAP === 130000, "两档预算：满血顶配 15 万、读者自选型号 13 万");
+  /* 每一道的真实负载：站内资料＝九库块 12000 ＋ 片段 12000 ＋ 可点清单 1500；
+     上游原文按依赖表匀分到 FORGE_CARRY_MAX；站外资料 1/2/10 三道 8000、第 6 道近邻链 6000。 */
+  const CTX = 25500, WEB = { 1: 8000, 2: 8000, 6: 6000, 10: 8000 };
+  let allFull = true, cutStages = [];
+  for (let i = 1; i <= 10; i++) {
+    const need = mod.RES_NEEDS[i] || [];
+    const carry = need.length ? Math.min(26000, need.length * 9000) : 0;   // 每道正文按 9000 字算，多了会被匀分截到 26000
+    const f = m2.resPriorFit(_full, carry, CTX, WEB[i] || 0, 0, m2.RES_SYS_CAP_TOP);
+    if (f.mode !== "full") allFull = false;
+    if (f.ctxKeep < CTX || f.webKeep < (WEB[i] || 0)) cutStages.push(i);
+  }
+  ok2(allFull && !cutStages.length, "满血档：十道全部装完整内功且一样读物都不裁（内功 " + _full + " 字；第一刀在第 6/10 道会退精简版）");
+  const f6old = m2.resPriorFit(_full, 26000, CTX, 6000, 0, m2.RES_SYS_CAP);
+  ok2(f6old.mode === "full" && f6old.ctxKeep < CTX && f6old.ctxKeep >= m2.RES_FLOOR.ctx, "读者自选型号（13 万档）第 6 道也装完整内功，靠裁站内资料 " + CTX + "→" + f6old.ctxKeep);
+  const fbig = m2.resPriorFit(_full, 26000, CTX, 8000, 20000, m2.RES_SYS_CAP_TOP);
+  ok2(fbig.mode === "full" && fbig.docKeep === 20000 && fbig.ctxKeep < CTX, "再叠两万字附件：先裁自动检索的站内资料，读者自己带的附件不动（附件 " + fbig.docKeep + "，站内 " + CTX + "→" + fbig.ctxKeep + "）");
+  const ford = m2.resPriorFit(_full, 26000, CTX, 8000, 40000, m2.RES_SYS_CAP_TOP);
+  ok2(ford.ctxKeep === m2.RES_FLOOR.ctx && ford.webKeep === m2.RES_FLOOR.web && ford.docKeep < 40000 && ford.mode === "full", "裁减次序：站内到地板 → 站外到地板 → 才轮到附件（附件 40000→" + ford.docKeep + "）");
+  const fx = m2.resPriorFit(_full + 60000, 26000, CTX, 8000, 0, m2.RES_SYS_CAP_TOP);
+  ok2(fx.mode === "lite", "内功再长六万字、地板裁尽仍装不下时才退精简版——那条路有出口，不是死码");
+  /* 裁站内资料必须保住可点清单，且截口看得见 */
+  const ctx = "片".repeat(20000) + "\n\n【可点开的站内篇目 · 提到哪一篇就把它写成链接】\n- 《甲》 https://sdeuniverses.com/a/\n";
+  const tr = m2.resTrimCtx(ctx, 6000);
+  ok2(tr.indexOf("【可点开的站内篇目") >= 0 && tr.indexOf("https://sdeuniverses.com/a/") >= 0, "裁站内资料时可点清单原样保住");
+  ok2(/只带来前 \d+ 字/.test(tr) && tr.length <= 6000 + 80, "截口当场说明，且总长在预算内（" + tr.length + "）");
+  ok2(m2.resTrimCtx("短", 6000) === "短", "不超预算的不动");
+  /* 线上接线：读物裁减 → 精简版说真话 → 装载清单 */
+  ok2(/const fit = resPriorFit\(_ng\.length, _carryLen, ctxText\.length, webCtx\.length, docCtx\.length, _cap\);/.test(S), "接线：按真实负载算");
+  ok2(/ctxText = resTrimCtx\(ctxText, fit\.ctxKeep\)/.test(S) && /webCtx = resTrimTail\(webCtx, fit\.webKeep/.test(S) && /docCtx = resTrimTail\(docCtx, fit\.docKeep/.test(S), "接线：三样读物各自裁到 fit 给的长度");
+  ok2(/为装下完整内功，这一道的读物做了裁减/.test(S), "裁了就当场说（不静默）");
+  ok2(!/三大方程／六路径／三原理仍在/.test(S), "精简版那句假话已删（精简版恰恰不含三大方程／123原理／六路径的完整节）");
+  ok2(/精简版\*\*不含\*\*三大方程／123 原理／六路径的完整节与二阶碰撞那一部分/.test(S), "精简版的缺口如实写明");
+  ok2(/const _cap = \(VC\.top && !umodel\) \? RES_SYS_CAP_TOP : RES_SYS_CAP;/.test(S), "满血顶配走 15 万档，读者自选型号守 13 万");
+}
+
+console.log("⑦ 全套三件：内功 Skill ＋ 心得 ＋ 方法论");
+{
+  const S = fs.readFileSync("src/worker.js", "utf8");
+  const ok2 = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) process.exitCode = 1; };
+  /* 心得：缺就现写，而且只在研究这一路、且只在确实缺、有 Key、存储没躺的时候 */
+  ok2(/if \(rs && rs\.sde && !prof && !reflect && KEY && !reflectStoreDown\(\)\) \{[\s\S]{0,600}ensureReflect\(env, url, rvendor, VC, KEY, true\)/.test(S),
+    "心得缺了就现写一份（allowGen=true），条件：研究产线 · 非分身 · 缺 · 有 Key · 存储活着");
+  ok2(/_stg\("现写心得"\)/.test(S) && /正在带着完整内功现写一份/.test(S), "现写时阶段帧与提示都在（读者看得见它在干什么）");
+  /* 方法论：研究一路 deep 恒真 ⇒ WDS_CHAT_SYS 装 SDE_METHOD_BLOCK */
+  ok2(/\(deep \? SDE_METHOD_BLOCK : SDE_METHOD_LITE\)/.test(S), "方法论块随 deep 装完整工序");
+  /* 装载清单：三件各报一格，缺的写「无」不写「就绪」 */
+  const led = S.slice(S.indexOf("本道底盘 · 基底："), S.indexOf("本道底盘 · 基底：") + 1400);
+  ok2(/内功：/.test(led) && /心得：/.test(led) && /方法论：/.test(led), "每一道发一行装载清单：内功／心得／方法论三格都在");
+  ok2(/\*\*无\*\*/.test(led) && /REFLECT_ERR/.test(led), "心得缺席写「无」并带真因，不写「就绪」");
+  ok2(/无（一行骨架）/.test(led), "内功缺席写「无（一行骨架）」");
+  ok2(/（满功率）/.test(led) && /读者自选型号，非满功率/.test(led), "清单里报出实际基底与是否满功率");
+  /* 心得的键：与 ensureReflect 用的是同一把（vendor 短码＋型号），否则清单报的来源会对不上 */
+  ok2(/const _rk = reflectKey\(rvendor, VC\);/.test(S), "清单查来源用的键与 ensureReflect 同一把");
 }
 
 console.log(bad || process.exitCode ? ("\n✗ 有不过的项") : "\n✓ 全过");
