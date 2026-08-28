@@ -1093,6 +1093,8 @@
       tlGrid: "27 宫格定位", tlGridS: "C⊗M⊗V 与一二三号位，中心位轮到谁",
       tlNine: "九宫格取三格", tlNineS: "抽签取三格（同号位或 123 轮换），各问各答再撞成一条",
       nbrH: "站内近邻 · 待交代分离线", nbrFail: "这次没取到站内近邻名单——下面的近邻检测只凭它自己的记忆，请当心。",
+      taMiss: "⚠ 本轮工序未交付（页面逐件扫过，不是它自己说的）：", taShort: "篇幅只有 {n} 字，这道工序的下限是 {m} 字——多半是被截短了，说一句「继续」让它补。",
+      taOk: "✓ 本轮工序的 {n} 件交付件都在。", taPart: "（其余 {n} 件在）",
       nbrOwn: "本人已发",
       thDark: "深色", thLight: "浅色", thAuto: "跟随系统", thTitle: "外观",
       mpTitle: "选基底与档位", mpStd: "标准", mpDeep: "深度", mpModel: "型号 / Key 设置…", mpNoKey: "未填 Key",
@@ -1314,6 +1316,8 @@
       tlGrid: "27-cell placement", tlGridS: "C⊗M⊗V and positions one/two/three; whose turn at centre",
       tlNine: "Nine-cell, draw three", tlNineS: "Three cells drawn by rule (same tier, or a 1-2-3 rotation), each asked and answered, then struck together",
       nbrH: "Site neighbours · dividing lines owed", nbrFail: "No site neighbour list came back this time — the check below runs on memory alone, so treat it with care.",
+      taMiss: "⚠ Not delivered this turn (scanned item by item, not self-reported):", taShort: "Only {n} characters; this procedure's floor is {m} — it was probably cut short. Say \u300ccontinue\u300d to have it finish.",
+      taOk: "\u2713 All {n} required items of this procedure are present.", taPart: "(the other {n} are present)",
       nbrOwn: "by you",
       thDark: "Dark", thLight: "Light", thAuto: "System", thTitle: "Appearance",
       mpTitle: "Model & effort", mpStd: "Standard", mpDeep: "Deep", mpModel: "Model / key settings…", mpNoKey: "No key",
@@ -4158,6 +4162,7 @@
     }
     var answer = "", srcDone = false, thinkTxt = "", lastPaint = 0, errShown = false;
     var pendSite = null, pendWeb = null;                 // 来源先收着，等正文写完再渲染
+    var toolSpec = null;                                 // 这一轮的交付规格（服务端下发，前端不留副本）
     function flushSrcs() {
       if (pendSite) { renderSources(cell, pendSite, "site"); pendSite = null; }
       if (pendWeb) { renderSources(cell, pendWeb, "web"); pendWeb = null; }
@@ -4220,6 +4225,10 @@
             if (_led) answer = _led.body;
             cell.a.innerHTML = mdRender(answer);
             if (stoppedByUser) { var n = el("div", null, t("stopped")); n.style.cssText = "color:#6b7684;font-size:12px;margin-top:8px"; cell.a.appendChild(n); }
+            /* ⭐ 工序交付审计：缺件就在这里如实标出来。放在 flushSrcs 之前——
+               它属于正文的读数，不属于文献区；也必须在 mountActs 之前，
+               否则它会被挂到操作按钮下面，读者以为是页脚。 */
+            if (toolSpec && !stoppedByUser) toolAuditRender(cell, answer, toolSpec);
             flushSrcs();                                  // 先正文，后文献
             history.push({ role: "wds", text: answer }); stSave(history); mountActs(cell, answer);
             if (_led) ledgerRender(cell, _led, answer);      // 记分牌挂在正文之外，不进导出稿
@@ -4292,6 +4301,7 @@
               else if (j.t === "note") { noteLine(cell, j.v); }
               else if (j.t === "nbr") { renderNbr(cell, j.v || []); }
               else if (j.t === "nbrfail") { nbrFailNote(cell); }
+              else if (j.t === "toolspec") { toolSpec = j.v; }
               else if (j.t === "follow") { renderFollows(cell, j.v); }
               else if (j.t === "token") { answer += j.v; paint(); }
               else if (j.t === "error") { errShown = true; cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = j.v; if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
@@ -8243,6 +8253,54 @@
     cell.turn.insertBefore(box, cell.a);
     cell._nbr = box;
   }
+  /* ════════════ 工序交付审计 toolAudit（2026-08-28）════════════
+     一道工序＝这一轮必须交付哪几件。此前**没有任何一处验过**：少交三件的答案，
+     在页面上与做全了的长得一模一样。产线第 18 道早就把自查改成程序扫描（forgeAudit），
+     单轮这十五道一直是空的。💡 心法：**能数出来的东西不要问模型**——
+     问「你交全了吗」等于把裁判权交给被告。
+     规格不写在这里：它随 t:"toolspec" 从服务端下来（TOOL_SPEC 是唯一那一份）。
+     前端抄一份就会有一天两份不一样，那时页面报的「已交付」是假的。
+     诊断行**贴进 .wdsm-a**（不是 cell.turn）：只有写在正文里，导出 PDF 才带得走。 */
+  function toolAudit(text, spec) {
+    var body = String(text || ""), miss = [], done = 0;
+    if (!spec || !spec.items || !spec.items.length) return null;
+    for (var i = 0; i < spec.items.length; i++) {
+      var it = spec.items[i], hit = 0;
+      try {
+        var m = body.match(new RegExp(it.re, "g"));
+        hit = m ? m.length : 0;
+      } catch (e) { continue; }        // 正则在这台浏览器上跑不起来：跳过这一件，不冒充查过
+      if (hit >= (it.n || 1)) done++; else miss.push(it.k);
+    }
+    // 汉字数（不含空白与标点计不准，取全文长度即可——这里只用来判「是不是被截短了」）
+    return { miss: miss, done: done, total: spec.items.length, len: body.replace(/\s/g, "").length, min: spec.min || 0 };
+  }
+  function toolAuditRender(cell, text, spec) {
+    var a = toolAudit(text, spec);
+    if (!a) return;
+    /* ⚠ 取词口有两个：t() 认 TXT，tx() 认 TX2。这几条词条在 TXT 里，
+       所以占位替换只能自己做——直接写 tx("taOk") 会原样吐出键名（第一版就这么错过）。 */
+    function _s(k, map) { var v = t(k); for (var m in map) v = v.split("{" + m + "}").join(map[m]); return v; }
+    var short = a.min && a.len < a.min * 0.7;      // 七成以下才叫短：字数地板是下限不是靶心
+    if (!a.miss.length && !short) {
+      var okd = el("div", null, _s("taOk", { n: a.total }));
+      okd.style.cssText = "color:#6f8f6f;font-size:12px;line-height:1.6;margin:10px 0 0";
+      cell.a.appendChild(okd); return;
+    }
+    var d = el("div", null, "");
+    d.style.cssText = "color:#B07A4E;font-size:12.5px;line-height:1.7;margin:10px 0 0;border-top:1px dashed var(--wline);padding-top:8px";
+    if (a.miss.length) {
+      d.appendChild(el("div", null, t("taMiss")));
+      var ul = el("ul", null, "");
+      ul.style.cssText = "margin:4px 0 0;padding-left:18px";
+      a.miss.forEach(function (k) { ul.appendChild(el("li", null, k)); });
+      d.appendChild(ul);
+      if (a.done) { var p = el("div", null, _s("taPart", { n: a.done })); p.style.cssText = "margin-top:4px;opacity:.75"; d.appendChild(p); }
+    }
+    if (short) { var sd = el("div", null, _s("taShort", { n: a.len, m: a.min })); sd.style.cssText = "margin-top:4px"; d.appendChild(sd); }
+    cell.a.appendChild(d);
+  }
+
   function nbrFailNote(cell) {
     if (!cell || cell._nbr) return;
     var box = el("div", "wdsm-nbr");

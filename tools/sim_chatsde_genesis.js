@@ -90,8 +90,11 @@ if (WIRE) {
 console.log("【十】占位者链：旁挂接线，被钉的原行原样");
 ok(/const wantNbr = \(rs && rs\.forge && FORGE_NBR_STAGES\[rs\.i \| 0\]\) \|\| tool === "iq";/.test(W),
    "原行一字未动（sim_chatsde_forge:196 / sim_distill_nbr:72 钉着它）");
-ok(/const wantNbrG = wantNbr \|\| tool === "genesis";/.test(W), "旁挂 wantNbrG 在");
-const iA = W.indexOf('const wantNbrG = wantNbr || tool === "genesis";');
+/* ⚠ 这三条原来把**整行**抄进来，2026-08-28 近邻工序也接上这条链（+ tool === "nbr"）
+   就当场假红，而它们要守的用意一个字没变：**旁挂在自己一行、不并进 wantNbr 那一行；
+   先定义后使用**。按用意重写：只认「wantNbrG = wantNbr ||」这个形状 ＋ 里面有 genesis。 */
+ok(/const wantNbrG = wantNbr \|\|[^\n]*tool === "genesis"/.test(W), "旁挂 wantNbrG 在");
+const iA = W.search(/const wantNbrG = wantNbr \|\|/);
 const iB = W.indexOf("if (wantNbrG) {");
 ok(iA >= 0, "wantNbrG 定义找得到");           /* 次序断言先断「在」——indexOf 回 -1 比谁都小，
 ok(iB >= 0, "if (wantNbrG) 找得到");             2026-08-23 第四刀在这上面栽过一次 */
@@ -109,7 +112,7 @@ ok(toolsSeg.indexOf('k: "genesis"') >= 0, "genesis 落在 TOOLS 数组界内（�
 ok(/cmd: \["发生场", "genesis", "布场"\]/.test(F), "斜杠命令三别名（发生场/genesis/布场）");
 ok(/tlGenesis: "发生场", tlGenesisS: "[^"]{10,}"/.test(F), "中文文案齐且副题非空");
 ok(/tlGenesis: "Genesis field", tlGenesisS: "[^"]{10,}"/.test(F), "英文文案齐且副题非空");
-ok(!/本轮工序/.test(F), "前端仍不含任何工序正文（正文只在后端）");
+ok(!/【本轮工序/.test(F), "前端仍不含任何工序正文（正文只在后端）");   /* 认块头，不认四个字：前端有一条报缺件的 UI 文案带「本轮工序」 */
 
 console.log("【十二】护栏的护栏：sim_wds_sde_tools 的 KEYS 已带上第 15 道");
 try {
