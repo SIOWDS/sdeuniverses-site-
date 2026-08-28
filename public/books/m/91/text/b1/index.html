@@ -1,24 +1,97 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>编一 这一篇凭什么是这一篇 · 文心探幽·卷一 · 德麦国际专著第 91 号</title><style>
-:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#E27A4A;--line:#26242C;--card:#14131A}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
-font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
-a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
-.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
-padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
-.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
-h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
-h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
-p{margin:.85em 0;text-align:justify}
-.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.6em;letter-spacing:.04em}
-.tw{overflow-x:auto;margin:1.2em 0}
-table{border-collapse:collapse;width:100%;font-size:14px}
-td,th{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-tr.odd{background:var(--card)}
-.nav{display:flex;justify-content:space-between;gap:12px;margin-top:52px;
-border-top:1px solid var(--line);padding-top:18px;font-size:14px}
+:root{--bg:#0D0C10;--fg:#E9E7E3;--dim:#8C8894;--am:#E27A4A;--am2:#C9612F;
+--line:#26242C;--card:#15141B;--rule:#332F3A}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+font:17px/2.05 "Noto Serif CJK SC","Source Han Serif SC","Songti SC",Georgia,serif;
+font-feature-settings:"halt" 0}
+a{color:var(--am);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.965);backdrop-filter:blur(6px);
+border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;
+align-items:center;font-size:13px;letter-spacing:.03em;z-index:9}
+.wrap{max-width:720px;margin:0 auto;padding:44px 22px 96px}
+
+/* ── 标题层 ── */
+h1{font-size:29px;line-height:1.48;margin:.1em 0 .35em;letter-spacing:.01em;font-weight:700}
+h1::after{content:"";display:block;width:46px;height:2px;background:var(--am);
+margin:.55em 0 0;opacity:.85}
+h2{font-size:21px;line-height:1.6;margin:2.6em 0 .9em;padding-top:1.1em;
+border-top:1px solid var(--rule);font-weight:700;letter-spacing:.01em}
+h3{font-size:17.5px;line-height:1.72;margin:2.1em 0 .7em;color:var(--am);font-weight:600;
+letter-spacing:.01em}
+h4{font-size:16.5px;margin:1.6em 0 .5em;color:#CFC9C0;font-weight:600}
+
+/* ── 正文 ── */
+p{margin:.5em 0;text-align:justify;text-justify:inter-ideograph;text-indent:2em;
+overflow-wrap:break-word}
+p:lang(en){text-indent:0}
+strong{color:#F3EFE8;font-weight:700}
+em{font-style:normal;border-bottom:1px dotted var(--am2);padding-bottom:1px}
+hr{border:0;border-top:1px solid var(--rule);margin:2.4em 0}
+ul,ol{padding-left:1.6em;margin:.9em 0}
+li{margin:.35em 0;text-align:justify}
+blockquote{margin:1.5em 0;padding:.2em 0 .2em 16px;border-left:2px solid var(--am2);
+color:#D3CFC8}
+blockquote p{text-indent:0}
+
+/* ── 章首 ── */
+.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.5em;letter-spacing:.05em;text-indent:0}
+.csub{color:var(--am);font-size:17px;margin:-.6em 0 1.7em;letter-spacing:.02em;text-indent:0}
+.digest{background:var(--card);border-left:3px solid var(--am);border-radius:0 5px 5px 0;
+padding:17px 20px 18px;margin:0 0 2.8em}
+.digest .dl{display:block;color:var(--am);font-size:12.5px;letter-spacing:.24em;
+margin-bottom:.6em;text-indent:0}
+.digest p{margin:0;font-size:15.5px;line-height:1.96;color:#D6D3CE;text-align:justify;
+text-indent:2em}
+
+/* ── 表格 ── */
+.tw,div[style*="overflow-x"]{overflow-x:auto;margin:1.6em 0;
+border:1px solid var(--line);border-radius:5px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.75}
+td,th{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#191821;color:#EFEBE4;font-weight:600}
+tr:nth-child(even) td{background:#121118}
+tr.odd td{background:#121118}
+table p{text-indent:0;margin:.25em 0}
+.tcap{text-indent:0;text-align:center;color:var(--dim);font-size:13.5px;
+margin:-.9em 0 2em;letter-spacing:.03em}
+
+/* ── 文献与附注 ── */
+.ref{margin:.42em 0;padding-left:2em;text-indent:-2em;font-size:14.5px;line-height:1.78;
+text-align:left}
+.moved{color:var(--dim);font-size:14px;border-left:2px solid var(--line);padding-left:13px;
+margin:1.8em 0;text-indent:0}
+
+/* ── 页脚导航 ── */
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:60px;
+border-top:1px solid var(--rule);padding-top:20px;font-size:14px}
+.nav span{text-indent:0}
 .toc{list-style:none;padding:0}
-.toc li{border-bottom:1px solid var(--line);padding:13px 2px}
+.toc li{border-bottom:1px solid var(--line);padding:14px 2px}
 .toc .n{color:var(--dim);font-size:12.5px;letter-spacing:.14em}
 .toc .t{font-size:17px}
 .toc .d{color:var(--dim);font-size:14px}
-</style></head><body><div class="bar"><a href="/books/m/91/">← 专著页</a> · <a href="/books/m/91/text/">分章目录</a> · <a href="../dl/">上一节</a> · <a href="../c01/">下一节</a></div><div class="wrap"><h1>编一　这一篇凭什么是这一篇</h1><div class="meta">文心探幽·卷一 · 编前语 · 约 534 汉字</div><h3>编一　这一篇凭什么是这一篇</h3><p>三章共用一个动作：<strong>先破坏，再看什么还在。</strong></p><p>这个动作不是修辞。它是这一编从三门远学科借来的同一个方法论内核——判断一个对象的身份，不能只看它此刻的样子，要看它在受到规定好的扰动之后如何响应。晶体学判断多形，靠的是同样的组成在不同条件下是否落入不同的结构态；范畴论把对象的身份从“内部属性清单”推进到它与其他一切对象之间的完整关系剖面；理论密码学区分“能给出正确输出”与“拥有使输出成立的东西”，靠的是让对方在原答案不可调用时重新应答。</p><p>三章的差别在于<strong>扰动谁</strong>。第一章扰动人：封存原稿、禁用原会话，看写作者能否重新组织同一批意义关系。第二章扰动文本：在声明的判别分辨率下施加预注册的保相与破相变换，看宏观组织关系是否跃迁。第三章扰动局部：对同一篇文章施加六类最小改动，追问全文的判断能力究竟有多少是真的、有多少只是近邻可还原。</p><p>第三章的位置需要特别说明。它本来打算证明作文是一种“内部能判断偏差”的文本，结果被自己的数据淘汰——那个高达 0.9722 的覆盖率，绝大部分只需要改动句和一条邻句就能得到，而更糟的是，不读作文、只看施加了哪一类扰动，就能预测七成以上的判断结果。这篇文章因此把自己的肯定性定义收回，改提一个更窄、更难伪装的假说。它被放在这一编的末尾，不是因为它最弱，而是因为它给出了全卷方法论的边界：<strong>扰动法本身也会产生假象，而唯一的解药是事先写下淘汰线并照着执行。</strong></p><div class="nav"><span><a href='../dl/'>← 上一节</a></span><span><a href='../c01/'>下一节 →</a></span></div></div></body></html>
+
+@media (max-width:640px){
+ body{font-size:16px;line-height:2}
+ .wrap{padding:30px 16px 76px}
+ h1{font-size:24px}h2{font-size:19px}h3{font-size:16.5px}
+ table{font-size:13.5px}
+}
+@media print{
+ body{background:#fff;color:#111;font-size:11.5pt;line-height:1.75}
+ .bar,.nav{display:none}
+ .wrap{max-width:none;padding:0}
+ a{color:#111;text-decoration:none}
+ h1{font-size:20pt}h2{font-size:15pt;page-break-before:always}h3{font-size:12.5pt;color:#111}
+ .digest{background:#f4f2ee;border-left:2px solid #999;color:#222}
+ .digest p{color:#222}
+ th{background:#eee;color:#111}
+ tr:nth-child(even) td{background:#f7f7f7}
+ td,th{border:1px solid #999}
+ h2,h3{page-break-after:avoid}
+ table,blockquote{page-break-inside:avoid}
+}
+</style></head><body><div class="bar"><a href="/books/m/91/">← 专著页</a> · <a href="/books/m/91/text/">分章目录</a> · <a href="../dl/">上一节</a> · <a href="../c01/">下一节</a></div><div class="wrap"><h1>编一　这一篇凭什么是这一篇</h1><div class="meta">文心探幽·卷一 · 编前语 · 约 546 汉字</div><h3>编一　这一篇凭什么是这一篇</h3><p>三章共用一个动作：<strong>先破坏，再看什么还在。</strong></p><p>这个动作不是修辞。它是这一编从三门远学科借来的同一个方法论内核——判断一个对象的身份，不能只看它此刻的样子，要看它在受到规定好的扰动之后如何响应。晶体学判断多形，靠的是同样的组成在不同条件下是否落入不同的结构态；范畴论把对象的身份从“内部属性清单”推进到它与其他一切对象之间的完整关系剖面；理论密码学区分“能给出正确输出”与“拥有使输出成立的东西”，靠的是让对方在原答案不可调用时重新应答。</p><p>三章的差别在于<strong>扰动谁</strong>。第一章扰动人：封存原稿、禁用原会话，看写作者能否重新组织同一批意义关系。第二章扰动文本：在声明的判别分辨率下施加预注册的保相与破相变换，看宏观组织关系是否跃迁。第三章扰动局部：对同一篇文章施加六类最小改动，追问全文的判断能力究竟有多少是真的、有多少只是近邻可还原。</p><p>第三章的位置需要特别说明。它本来打算证明作文是一种“内部能判断偏差”的文本，结果被自己的数据淘汰——那个高达 0.9722 的覆盖率，绝大部分只需要改动句和一条邻句就能得到，而更糟的是，不读作文、只看施加了哪一类扰动，就能预测七成以上的判断结果。这篇文章因此把自己的肯定性定义收回，改提一个更窄、更难伪装的假说。它被放在这一编的末尾，不是因为它最弱，而是因为它给出了全卷方法论的边界：<strong>扰动法本身也会产生假象，而唯一的解药是事先写下淘汰线并照着执行。</strong></p><div class="nav"><span><a href='../dl/'>← 上一节</a></span><span><a href='../c01/'>下一节 →</a></span></div></div></body></html>

@@ -1,42 +1,100 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第七章　如何写好作文 · 文心探幽·卷二 · 德麦国际专著第 93 号</title><style>
-:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#E27A4A;--line:#26242C;--card:#14131A}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
-font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
-a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
-.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
-padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
-.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
-h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
-h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
-p{margin:.85em 0;text-align:justify}
-.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.6em;letter-spacing:.04em}
-.tw{overflow-x:auto;margin:1.2em 0}
-table{border-collapse:collapse;width:100%;font-size:14px}
-td,th{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-tr.odd{background:var(--card)}
-.nav{display:flex;justify-content:space-between;gap:12px;margin-top:52px;
-border-top:1px solid var(--line);padding-top:18px;font-size:14px}
+:root{--bg:#0D0C10;--fg:#E9E7E3;--dim:#8C8894;--am:#E27A4A;--am2:#C9612F;
+--line:#26242C;--card:#15141B;--rule:#332F3A}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+font:17px/2.05 "Noto Serif CJK SC","Source Han Serif SC","Songti SC",Georgia,serif;
+font-feature-settings:"halt" 0}
+a{color:var(--am);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.965);backdrop-filter:blur(6px);
+border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;
+align-items:center;font-size:13px;letter-spacing:.03em;z-index:9}
+.wrap{max-width:720px;margin:0 auto;padding:44px 22px 96px}
+
+/* ── 标题层 ── */
+h1{font-size:29px;line-height:1.48;margin:.1em 0 .35em;letter-spacing:.01em;font-weight:700}
+h1::after{content:"";display:block;width:46px;height:2px;background:var(--am);
+margin:.55em 0 0;opacity:.85}
+h2{font-size:21px;line-height:1.6;margin:2.6em 0 .9em;padding-top:1.1em;
+border-top:1px solid var(--rule);font-weight:700;letter-spacing:.01em}
+h3{font-size:17.5px;line-height:1.72;margin:2.1em 0 .7em;color:var(--am);font-weight:600;
+letter-spacing:.01em}
+h4{font-size:16.5px;margin:1.6em 0 .5em;color:#CFC9C0;font-weight:600}
+
+/* ── 正文 ── */
+p{margin:.5em 0;text-align:justify;text-justify:inter-ideograph;text-indent:2em;
+overflow-wrap:break-word}
+p:lang(en){text-indent:0}
+strong{color:#F3EFE8;font-weight:700}
+em{font-style:normal;border-bottom:1px dotted var(--am2);padding-bottom:1px}
+hr{border:0;border-top:1px solid var(--rule);margin:2.4em 0}
+ul,ol{padding-left:1.6em;margin:.9em 0}
+li{margin:.35em 0;text-align:justify}
+blockquote{margin:1.5em 0;padding:.2em 0 .2em 16px;border-left:2px solid var(--am2);
+color:#D3CFC8}
+blockquote p{text-indent:0}
+
+/* ── 章首 ── */
+.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.5em;letter-spacing:.05em;text-indent:0}
+.csub{color:var(--am);font-size:17px;margin:-.6em 0 1.7em;letter-spacing:.02em;text-indent:0}
+.digest{background:var(--card);border-left:3px solid var(--am);border-radius:0 5px 5px 0;
+padding:17px 20px 18px;margin:0 0 2.8em}
+.digest .dl{display:block;color:var(--am);font-size:12.5px;letter-spacing:.24em;
+margin-bottom:.6em;text-indent:0}
+.digest p{margin:0;font-size:15.5px;line-height:1.96;color:#D6D3CE;text-align:justify;
+text-indent:2em}
+
+/* ── 表格 ── */
+.tw,div[style*="overflow-x"]{overflow-x:auto;margin:1.6em 0;
+border:1px solid var(--line);border-radius:5px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.75}
+td,th{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#191821;color:#EFEBE4;font-weight:600}
+tr:nth-child(even) td{background:#121118}
+tr.odd td{background:#121118}
+table p{text-indent:0;margin:.25em 0}
+.tcap{text-indent:0;text-align:center;color:var(--dim);font-size:13.5px;
+margin:-.9em 0 2em;letter-spacing:.03em}
+
+/* ── 文献与附注 ── */
+.ref{margin:.42em 0;padding-left:2em;text-indent:-2em;font-size:14.5px;line-height:1.78;
+text-align:left}
+.moved{color:var(--dim);font-size:14px;border-left:2px solid var(--line);padding-left:13px;
+margin:1.8em 0;text-indent:0}
+
+/* ── 页脚导航 ── */
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:60px;
+border-top:1px solid var(--rule);padding-top:20px;font-size:14px}
+.nav span{text-indent:0}
 .toc{list-style:none;padding:0}
-.toc li{border-bottom:1px solid var(--line);padding:13px 2px}
+.toc li{border-bottom:1px solid var(--line);padding:14px 2px}
 .toc .n{color:var(--dim);font-size:12.5px;letter-spacing:.14em}
 .toc .t{font-size:17px}
 .toc .d{color:var(--dim);font-size:14px}
-</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c06/">上一节</a> · <a href="../c08/">下一节</a></div><div class="wrap"><h1>第七章　如何写好作文</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 16,081 汉字</div><p>如何写好作文</p>
-<p>—— 结算余损与追余写作</p>
-<p>如何写好作文？</p>
-<p>——从“纠错”到“追余”：论结算余损与三焦点轮转写作法</p>
-<p>How to Write a Good Essay?</p>
-<p>From Error Correction to Residual Pursuit: Settlement Residuals and Rotating-Focus Composition</p>
-<p>SDE 学科碰撞创新法 v3.9 · How 型三焦点路径实验稿</p>
-<p>形式化验证 × 化学反应工程 × 机制设计</p>
-<p>版本：2026-08-17</p>
-<h3>摘要</h3>
-<p>“如何写好作文”常被回答为一条固定流水线：审题、构思、起草、修改、润色；更精细的教学则把质量拆为内容、组织、语言、证据、受众等多项标准。本文指出，两种方案仍共享一个方法论前提：改进可以由某个稳定终点结算——只要成品更符合标准、生成路径更高效，或任务环境更合理，作文就沿同一方向趋近于“好”。本文以形式化验证、化学反应工程和机制设计为三条互相冲突的路径来源。形式化验证强调把性质写成可检验要求并证明实现满足要求；反应工程强调控制步骤、产品决定步骤、选择性与转化率之间可能并不重合；机制设计强调规则、私有信息、激励相容与多个均衡对结果的塑造。三者共同逼出一个被普通“纠错—再修改”模型遗漏的对象：某一轮已经按自身标准宣布成功，却在该标准没有记账的质量域中仍存在、或因这次成功而新产生的损失。本文将其称为“结算余损”。据此提出“追余写作法”：每轮只设一个可判定终点；一旦通过，立即检查未被本轮标准计入的另外两类记录；由最大且具有因果依据的结算余损夺取下一轮修改终点。写好作文因此不是把同一套标准反复拉高，而是让每一次局部成功暴露并转交它无法结算的质量损失，直到余损不再跨域迁移。本文以六套现行官方写作评价框架做公开字段审计，发现多维评分早已普遍存在，因此“评价太单一”的批判不成立；但这些框架仍主要以静态并列标准结算，未设置“成功触发换靶”的动态规则。本文进一步给出近邻划界、课堂操作、AI 场景、机制证伪、反噬预言及经验赌注。</p>
-<p>关键词：作文；结算余损；追余写作；形式化验证；反应工程；机制设计；生成式人工智能</p>
-<h3>Abstract</h3>
-<p>The question “How can one write a good essay?” is often answered by a fixed sequence—understand the task, plan, draft, revise, polish—or by a multidimensional rubric covering content, organization, language, evidence, and audience. Both approaches usually assume that improvement can be settled at a stable endpoint. This article collides three mature traditions with different terminal foci: formal verification, chemical reaction engineering, and mechanism design. Formal verification asks whether specified properties are objectively satisfied; reaction engineering shows that rate-controlling steps, product-determining steps, conversion, and selectivity need not coincide; mechanism design shows that rules and incentives may support multiple equilibria and place hard limits on attainable outcomes. Their conjunction reveals an object not adequately represented by ordinary error-correction models: a loss that remains outside the ledger of a round that has already been declared successful, or is newly displaced there by that very success. The article calls this a settlement residual. It proposes residual-pursuit composition: each round adopts one explicit terminal criterion; once it passes, the writer audits the other two domains, and the largest causally grounded residual determines the next terminal focus. Good writing is therefore treated not as repeated optimization against a fixed standard, but as a sequence in which each local success is forced to disclose what it failed to settle.</p>
-<p>Keywords: composition; settlement residual; revision; formal verification; reaction engineering; mechanism design; generative AI</p>
-<h3>一、为什么“多改几遍”仍然没有回答 How</h3>
+
+@media (max-width:640px){
+ body{font-size:16px;line-height:2}
+ .wrap{padding:30px 16px 76px}
+ h1{font-size:24px}h2{font-size:19px}h3{font-size:16.5px}
+ table{font-size:13.5px}
+}
+@media print{
+ body{background:#fff;color:#111;font-size:11.5pt;line-height:1.75}
+ .bar,.nav{display:none}
+ .wrap{max-width:none;padding:0}
+ a{color:#111;text-decoration:none}
+ h1{font-size:20pt}h2{font-size:15pt;page-break-before:always}h3{font-size:12.5pt;color:#111}
+ .digest{background:#f4f2ee;border-left:2px solid #999;color:#222}
+ .digest p{color:#222}
+ th{background:#eee;color:#111}
+ tr:nth-child(even) td{background:#f7f7f7}
+ td,th{border:1px solid #999}
+ h2,h3{page-break-after:avoid}
+ table,blockquote{page-break-inside:avoid}
+}
+</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c06/">上一节</a> · <a href="../c08/">下一节</a></div><div class="wrap"><h1>第七章　如何写好作文</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 15,938 汉字</div><p class="csub">——结算余损与追余写作</p><div class="digest"><span class="dl">本 章 提 要</span><p>“怎样写好作文”通常有两种答法：一条流水线（审题、构思、起草、修改、润色），或一张多维标准表（内容、组织、语言、证据、受众）。本章指出，两种答法共用同一个前提：只要成品更符合标准，作文就在同一个方向上越来越好。三门学科被请来拆掉这个前提：形式化验证要求把性质写成可检验的要求再证明它成立；化学反应工程告诉我们控制步骤、决定产品的步骤、选择性与转化率往往并不重合——某一处优化成功，恰恰会把损失赶到另一处；机制设计说明规则本身会改变参与者的行为，一个均衡被达成，另一些结果就不再可能。三者共同逼出一个被“纠错—再改”模型漏掉的东西：某一轮已经按自己的标准宣布成功，可是在这套标准没有记账的那些质量域里，损失依然存在，甚至正是因为这次成功才新产生。本章称之为“结算余损”，并据此提出“追余写作法”：每一轮只设一个可判定的终点；一旦通过，立刻去查这一轮标准没有计入的另外两类记录；由最大的那一处余损夺取下一轮的修改终点。写好作文因此不是把同一把尺子反复拉高，而是让每一次局部成功交出它结算不了的那笔损失，直到余损不再跨域搬家。对六套现行官方写作评价框架的公开字段审计显示：多维评分早就普遍存在，所以“评价太单一”这个批评并不成立；真正缺的是“成功之后换靶”的动态规则。</p></div><h3>一、为什么“多改几遍”仍然没有回答 How</h3>
 <p>“如何写好作文”看起来比“作文是什么”更容易回答。教师可以给出一条熟悉的流程：审题，构思，列提纲，起草，修改，润色；也可以给出一张更细的量规：立意、证据、结构、语言、受众、规范分别提高。问题在于，这些方案描述了很多动作，却没有回答一个更严格的 How 问题：下一步究竟为什么是这一步，而不是另一种修改？一个学生现在最该改语言，还是证据？最该重写段落，还是换掉任务结构？最该继续打磨成品，还是停止打磨，先改变自己写这篇文章的方式？</p>
 <p>现代写作研究当然早已超越“写完再改错”。1970 年代的过程写作、问题解决与 writing-to-learn 传统已经把构思、目标、计划、反馈和知识变化纳入写作本身；今天再说“作文要迭代”并不新。真正困难的是：当一次修改成功以后，凭什么继续沿着同一终点优化？</p>
 <p>本文的核心判断由此产生：写好作文最危险的时刻，不一定是失败的时候，而可能恰恰是某一项已经做得很好、系统因此允许我们宣布“这一轮完成”的时候。因为宣布完成的那把尺子，只看见它被设计去看见的东西。</p>
@@ -170,9 +228,9 @@ border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 <p>17. ETS. TOEFL iBT Writing Section：评分标准与说明. https://www.ets.org/toefl（检索日期：2026-08-17）</p>
 <p>18. Cambridge International. Cambridge IGCSE First Language English (0500)：教学大纲概览. https://www.cambridgeinternational.org/（检索日期：2026-08-17）</p>
 <p>19. 新西兰教育部. e-asTTle：写作如何评分. https://www.education.govt.nz/（检索日期：2026-08-17）</p>
-<h3>附录 A：v3.9 全工序制造审计（内部）</h3>
+<h3>附录 A：选源与工序审计（存档）</h3>
 <p>本附录保留制造过程，正式正文不依赖这些内部标签。它用于复核本篇是否真的按 How 型三焦点路径运行，而不是把三个学科拼成三种写作技巧。</p>
-<h4>A1. 题型、闸零与三焦点路径</h4>
+<h4>A1. 题型、前置检查与三条路径</h4>
 <table><thead><tr><th>来源</th><th>How 完整路径</th><th>未吸收度初判</th><th>理论厚度</th><th>厚度依据</th></tr></thead><tbody><tr><td>形式化验证</td><td>焦点 S：E→D→S</td><td>暂判干净</td><td>厚</td><td>NIST/ISO 长期 V&amp;V、requirements、formal methods 传统</td></tr><tr><td>化学反应工程</td><td>焦点 D：S→E→D</td><td>暂判干净</td><td>厚</td><td>IUPAC 术语体系＋反应器工程成熟教材与反例传统</td></tr><tr><td>机制设计</td><td>焦点 E：S→D→E</td><td>刚进入教育设计，作文理论暂判干净</td><td>厚</td><td>Hurwicz–Maskin–Myerson；激励相容、实施理论、不可能性结果</td></tr></tbody></table>
 <p>Gate Zero 检索的反向结果：writing studies 已大量吸收过程、问题解决、反馈、评价量规、游戏化与一般设计思想，因此这些不能承担本篇的新源；机制设计在教育领域已出现邻近应用，故不判“绝对干净”，而判“教育层刚进入、作文核心回答尚未形成固定传统”。</p>
 <h4>A2. 三家 1＋3＋1 抽脊</h4>
@@ -200,62 +258,62 @@ border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 <p>高风险评价：焦点迁移记录不直接用于给人打分；否则方法自身会触发局外余损。</p>
 <p>任务目标本身非法、不伦理或有害时：追余法不能替目标提供正当性。</p>
 <h4>A10. 人机分工与证据边界</h4>
-<p>本轮问题、方法框架和“从全球知识网络按 v3.9 选源”的任务由用户提出；资料检索、跨领域候选生成、敌意拓宽、公开字段审计、概念收敛与初稿由 AI 辅助完成。本文关于形式化验证、反应工程、机制设计和官方写作评价的事实性材料来自文末所列公开来源；“结算余损”“追余写作”及其用于作文教育的推论属于本文提出的理论假设，不是三家来源的原有主张。正式发表前仍需由作者人工核验所有原文、页码和完整书目，并用真实学生样本执行预注册实验。</p>
+<p>本轮问题、方法框架和“从全球知识网络跨领域选源”的任务由用户提出；资料检索、跨领域候选生成、敌意拓宽、公开字段审计、概念收敛与初稿由 AI 辅助完成。本文关于形式化验证、反应工程、机制设计和官方写作评价的事实性材料来自文末所列公开来源；“结算余损”“追余写作”及其用于作文教育的推论属于本文提出的理论假设，不是三家来源的原有主张。正式发表前仍需由作者人工核验所有原文、页码和完整书目，并用真实学生样本执行预注册实验。</p>
 <p>编者补节 · 第七章</p>
 <h3>一 · 取源的一处实情，先交代</h3>
 <p>本章的三家取源是形式化验证、化学反应工程、机制设计。其中形式化验证与第六章重复，机制设计与第三章重复——本章三家里有两家在本卷别处已经出现。</p>
 <p>编者核过取的线，确实不同：</p>
 <table><thead><tr><th>学科</th><th>本卷别处取的线</th><th>本章取的线</th></tr></thead><tbody><tr><td>形式化验证</td><td>第六章取验证义务与可判定结果态（走到能把与性质相关的义务判定掉才算走完）</td><td>本章取验证与确认之分（实现符合规格，不等于规格表达了真实用途）</td></tr><tr><td>机制设计</td><td>第三章取多重均衡（规则场也会被结果改写）</td><td>本章取激励相容与可测偏置（容易测的性质未必是最值得激励的性质）</td></tr></tbody></table>
-<p>两条线在各自学科内部确实是不同的问题。但编者不打算把这一点说成没有代价：在一本以「取三门远距离学科相撞」为体例的书里，一章的三家有两家已经被本卷别处用过，它在取源独立性上就是弱于其余各章。 本卷的处置是编排——把本章夹在第六章与第八章之间，让它在两侧的对照中被读；而不是单独被读。读者若要单独评估本章，应当把这一条计入。</p>
+<p>两条线在各自学科内部确实是不同的问题。但编者不打算把这一点说成没有代价：在一本以“取三门远距离学科相撞”为体例的书里，一章的三家有两家已经被本卷别处用过，它在取源独立性上就是弱于其余各章。 本卷的处置是编排——把本章夹在第六章与第八章之间，让它在两侧的对照中被读；而不是单独被读。读者若要单独评估本章，应当把这一条计入。</p>
 <h3>二 · 需要补的三位</h3>
 <p>本章的核心对象是结算余损：某一轮改进已按该轮明确的通过条件被判定成功，但在未被该条件计入的质量域中仍然存在、或因这次成功而新产生、转移、放大的损失。</p>
 <p>本章第十三节已经处理了六位近邻（过程写作、约束理论、指标腐化、双环学习、多目标优化、量规评价），处理得都相当利落。尤其与指标腐化那一条的分离线是决定性的：结算余损在完全没有策略性行为时也会出现——诚实地提高篇章清楚度仍可能压掉必要的限定；反应路径优化带来的选择性损失不需要一个会作弊的主体。这一刀切得干净。</p>
 <p>但有三位没有请进来，而且每一位都在本章的正下方。</p>
 <h4>（一）后果效度</h4>
 <p>Messick, S. (1989). Validity. In R. L. Linn (Ed.), *Educational Measurement* (3rd ed.). American Council on Education / Macmillan.</p>
-<p>这一支把效度从「测量是否测到了它声称要测的东西」扩展到测量被使用之后的社会后果是否可接受：一次测量即便在传统意义上完全有效，它进入使用之后所引发的教学窄化、内容偏移与价值后果，仍然属于效度论证必须承担的部分。</p>
-<p>这几乎就是本章那句「宣布完成的那把尺子只看见它被设计去看见的东西」的教育测量版本，而且早了三十多年。本章划了指标腐化却没有划它，编者认为这是本章最贵的一处缺席——因为本章的三类余损里，局外余损（规则成功地产生了可预测行为，但那不是规则制定者真正想要的）几乎就是后果效度所说的那一类后果。</p>
+<p>这一支把效度从“测量是否测到了它声称要测的东西”扩展到测量被使用之后的社会后果是否可接受：一次测量即便在传统意义上完全有效，它进入使用之后所引发的教学窄化、内容偏移与价值后果，仍然属于效度论证必须承担的部分。</p>
+<p>这几乎就是本章那句“宣布完成的那把尺子只看见它被设计去看见的东西”的教育测量版本，而且早了三十多年。本章划了指标腐化却没有划它，编者认为这是本章最贵的一处缺席——因为本章的三类余损里，局外余损（规则成功地产生了可预测行为，但那不是规则制定者真正想要的）几乎就是后果效度所说的那一类后果。</p>
 <p>分离线（本章可以站住）。</p>
-<p>对象层级不同。 那一支评的是一套测量工具的效度，它的论证单位是「这个测验／这套量规是否可以被这样使用」。本章处理的是一轮具体改进：这一次修改成功之后，损失去了哪里。前者是工具层的长期判断，后者是过程中的逐轮事件。</p>
+<p>对象层级不同。 那一支评的是一套测量工具的效度，它的论证单位是“这个测验／这套量规是否可以被这样使用”。本章处理的是一轮具体改进：这一次修改成功之后，损失去了哪里。前者是工具层的长期判断，后者是过程中的逐轮事件。</p>
 <p>本章允许没有工具。 后果效度的全部讨论都以存在一套被使用的测量为前提。本章的规外余损与路外余损在没有任何测量、没有任何评分者的情况下同样成立——一个人独自写作、无人评分，把段落压紧使读者理解更快，仍然可能把必要限定压没。</p>
-<p>本章要求因果或结构关系。 本章明写结算余损与「副作用」不同：它要求能够说明这笔损失为什么与本轮成功的优化方向存在因果或结构关系。后果效度不要求这一条，它容纳纯粹伴随的后果。</p>
+<p>本章要求因果或结构关系。 本章明写结算余损与“副作用”不同：它要求能够说明这笔损失为什么与本轮成功的优化方向存在因果或结构关系。后果效度不要求这一条，它容纳纯粹伴随的后果。</p>
 <p>判定形式。 在一个完全没有外部评价的写作场景（自己写日记，无人阅读，无人评分，也不使用任何量规）中，按本章的三域做余损审计。若仍能逐条指名余损且与本轮优化方向存在可说明的因果关系，本章成立且不可被后果效度覆盖；若在无测量条件下余损全部消失，本章应并回后果效度，成为它在写作教学中的一个应用。</p>
 <h4>（二）残余风险</h4>
-<p>本章在第八节用过「残余风险已经稳定」这个说法，正文一次也没有意识到，这是安全与风险管理标准里的一个正式术语：残余风险（residual risk）＝在风险处理措施实施之后仍然存留的风险（见 ISO/IEC Guide 51 与 ISO 31000 一系的定义）。</p>
+<p>本章在第八节用过“残余风险已经稳定”这个说法，正文一次也没有意识到，这是安全与风险管理标准里的一个正式术语：残余风险（residual risk）＝在风险处理措施实施之后仍然存留的风险（见 ISO/IEC Guide 51 与 ISO 31000 一系的定义）。</p>
 <p>一个与自己的核心概念几乎同名的现成术语，出现在自己的正文里而未被辨认，是本章体例上的一处失手。编者补上，并给出分离线。</p>
 <p>分离线。</p>
 <p>残余风险是处理之后剩下的——它的参照是一次已经施加的控制，被处理掉的部分与剩下的部分在同一本账上。本章的余损是被挤到另一本账上的——它的参照是本轮通过条件所没有登记的质量域。前者是同一维度上的剩余，后者是跨维度的转移。</p>
-<p>残余风险可以被接受。 那一支的整套实务就是「把风险降到可接受水平，然后正式接受残余部分」，接受本身是一个有记录的决定。本章的余损不进入任何记录——正因为本轮标准没有失败，它没有理由继续修改自己。</p>
+<p>残余风险可以被接受。 那一支的整套实务就是“把风险降到可接受水平，然后正式接受残余部分”，接受本身是一个有记录的决定。本章的余损不进入任何记录——正因为本轮标准没有失败，它没有理由继续修改自己。</p>
 <p>后果不同。 残余风险的存在不改变下一轮的目标；本章的余损夺取下一轮的终点。</p>
 <p>判定形式。 对同一次改进，先按残余风险的口径清点（本轮标准之下未被降到零的那部分），再按本章口径清点（本轮标准之外新出现或被放大的那部分）。若两份清单重合，本章应改用现成术语；若本章清单里存在一批项目，它们在本轮标准的维度上读数为零或更好，本章成立——而这恰恰是本章第六节反复举的那类例子（把段落压得更紧以后，清楚度这一维读数更好了，必要限定却被压没）。</p>
 <h4>（三）未预期后果与外部性</h4>
-<p>本章第十三节把「目标置换」处理为纯形式上游的一位（在第二章的对应节里也处理过）。编者补两位与它相邻、而本章未提的：</p>
+<p>本章第十三节把“目标置换”处理为纯形式上游的一位（在第二章的对应节里也处理过）。编者补两位与它相邻、而本章未提的：</p>
 <p>Merton, R. K. (1936). The unanticipated consequences of purposive social action. *American Sociological Review*, 1(6), 894–904. —— 有目的的行动会产生行动者未曾预期的后果，其来源包括知识不足、当下利益压过长期后果、以及基本价值本身的自我否定。</p>
 <p>外部性（经济学，Pigou 一系）：一项交易的成本或收益落到交易边界之外、不进入交易双方的核算。</p>
 <p>分离线。 编者认为这两位与本章的关系比本章已处理的那几位更紧，因为结算余损在形式上就是一次结算的外部性：损失落在结算边界之外，因此不进入这次结算的核算。本章要保住自己，靠的是三条：</p>
 <p>本章要求损失与本轮成功的优化方向有因果或结构关系，外部性不要求（外部性可以纯属伴随）。</p>
 <p>本章要求这笔损失夺取下一轮终点，即它必须进入下一轮的操作序列；外部性与未预期后果都不规定后续动作。</p>
 <p>本章处理的是同一个主体的连续轮次（写作者对自己的稿子），不是不同主体之间的成本转嫁。</p>
-<p>判定形式。 若在一批案例中，被指认的余损全部可以还原为「行动者当时不知道」（知识不足），而不能还原为「本轮通过条件的构造方式」，本章应并回未预期后果一支；若余损可以由通过条件的构造预先推出——即知道了本轮拿什么当终点，就能预言损失会落到哪一域——本章成立。这一条是本章可执行性最高的一次检验，编者建议优先跑它。</p>
+<p>判定形式。 若在一批案例中，被指认的余损全部可以还原为“行动者当时不知道”（知识不足），而不能还原为“本轮通过条件的构造方式”，本章应并回未预期后果一支；若余损可以由通过条件的构造预先推出——即知道了本轮拿什么当终点，就能预言损失会落到哪一域——本章成立。这一条是本章可执行性最高的一次检验，编者建议优先跑它。</p>
 <h3>三 · 编者提示：本章的枢纽没有刻度</h3>
-<p>本章的方法叫「追余写作」，五个动作里最关键的是第四个：由最大、最有因果依据、且不能被当前终点继续解释的余损，夺取下一轮的修改终点。</p>
+<p>本章的方法叫“追余写作”，五个动作里最关键的是第四个：由最大、最有因果依据、且不能被当前终点继续解释的余损，夺取下一轮的修改终点。</p>
 <p>这一句里有三个待判定的量，正文一个也没有给出清点规则：</p>
-<p>「最大」怎么比。 三类余损（规外、路外、局外）分属不同的质量域，本章没有给出跨域可比的尺度。一笔「必要限定被压没」与一笔「学生开始围绕可见条目做策略性优化」，谁更大？</p>
-<p>「有因果依据」怎么判。 本章明确把这一条作为余损与「副作用」的分界，却没有给出判定程序——是要求可说明的机制，还是要求可观察的共变？</p>
-<p>「连续两轮不迁移才允许停」怎么检测。 这条停止规则要求一个「没有新余损」的判定，而没有余损检测程序，这条规则无法执行；本章自己也承认「一次『没有新余损』可能只是检测盲区」。</p>
-<p>本章刻意不造一个「追余指数」，改用序列读数（本轮终点落在哪一域→下一轮落在哪一域），并给出了理由：先看焦点迁移序列，不要先造总分。编者认为这个选择是可辩护的——本卷第六章的天花板正是「先造一个能拿满分的读数」的后果。但可辩护不等于已完成：序列读数同样需要一条规则来决定序列的下一项是什么，而这条规则目前落在编码者的判断上。</p>
+<p>“最大”怎么比。 三类余损（规外、路外、局外）分属不同的质量域，本章没有给出跨域可比的尺度。一笔“必要限定被压没”与一笔“学生开始围绕可见条目做策略性优化”，谁更大？</p>
+<p>“有因果依据”怎么判。 本章明确把这一条作为余损与“副作用”的分界，却没有给出判定程序——是要求可说明的机制，还是要求可观察的共变？</p>
+<p>“连续两轮不迁移才允许停”怎么检测。 这条停止规则要求一个“没有新余损”的判定，而没有余损检测程序，这条规则无法执行；本章自己也承认“一次『没有新余损』可能只是检测盲区”。</p>
+<p>本章刻意不造一个“追余指数”，改用序列读数（本轮终点落在哪一域→下一轮落在哪一域），并给出了理由：先看焦点迁移序列，不要先造总分。编者认为这个选择是可辩护的——本卷第六章的天花板正是“先造一个能拿满分的读数”的后果。但可辩护不等于已完成：序列读数同样需要一条规则来决定序列的下一项是什么，而这条规则目前落在编码者的判断上。</p>
 <p>对读者的建议：本章可以按方法读，不宜按读数读。它在本卷九章中是唯一一章其读数尚不能被两名独立编码者一致产出的。</p>
 <h3>四 · 一处编者认可的做法</h3>
-<p>本章在成文前做了一次公开字段审计，对象是六套现行的官方写作评价框架。审计推翻了本章自己最初的批判——多维评分早已普遍存在，「主流作文评价只有一把尺」这句话不成立。作者因此把主张收窄为：缺的不是维度，是维度之间的时序夺靶规则。</p>
+<p>本章在成文前做了一次公开字段审计，对象是六套现行的官方写作评价框架。审计推翻了本章自己最初的批判——多维评分早已普遍存在，“主流作文评价只有一把尺”这句话不成立。作者因此把主张收窄为：缺的不是维度，是维度之间的时序夺靶规则。</p>
 <p>编者把这一处单列出来，是因为它示范了一件事：一次审计如果只能证实自己，它就没有被真正执行。 本章的审计改变了本章的主张，这是它值得被收进本卷的主要理由之一。</p>
 <h3>对切二 · 第六章 ↔ 第七章：对同一个动作的相反估价</h3>
 <p>为什么必须切。 两章以同一个动作为轴——结算——却给出方向相反的价值判断。第六章教人怎样合法地宣布完成，第七章说宣布完成正是损失逃逸的那道口子。放在同一本书里而不切，读者会认为编者没读懂其中一章。</p>
 <p>分离线。</p>
 <p>第六章问账内的余额。 它的对象是已经激活而尚未结清的义务。结清或合法限界之后，账平了，作者可以退场。</p>
-<p>第七章问账外的新增。 它的对象是本轮通过条件没有登记的那些质量域里，因为这次成功而仍然存在或新产生的损失。它明确区分自己与「还有错误」：普通错误意味着当前标准已经看得见问题，只是还没修；结算余损恰恰出现在标准宣布成功之后——当前标准没有失败，因此它没有理由继续修改自己。</p>
+<p>第七章问账外的新增。 它的对象是本轮通过条件没有登记的那些质量域里，因为这次成功而仍然存在或新产生的损失。它明确区分自己与“还有错误”：普通错误意味着当前标准已经看得见问题，只是还没修；结算余损恰恰出现在标准宣布成功之后——当前标准没有失败，因此它没有理由继续修改自己。</p>
 <p>一个测未结，一个测未记。</p>
 <p>判决性对照。 取一批退场闭合率达到 1.00、且经第六章的编码手册确认无未结核心义务的作文，交给三名不知道该批作文闭合状态的评阅者，按第七章的三域（成品、路径、环境）做余损审计。</p>
-<p>若查不出任何可指名的余损 ⇒ 第七章伪。「结算余损」只是「未结义务」的换名，第七章应并回第六章。</p>
+<p>若查不出任何可指名的余损 ⇒ 第七章伪。“结算余损”只是“未结义务”的换名，第七章应并回第六章。</p>
 <p>若查出的余损与第六章的未结义务清单完全重合 ⇒ 两章是同一个量的两种说法，本卷应把它们合并成一章，并承认多设了一个概念。</p>
 <p>若余损可以逐条指名、且与未结义务清单不重合 ⇒ 两章各自成立，且第七章证明了一件第六章没能证明的事：闭合不等于无损。</p>
-<p>这一处对切还有一个更麻烦的可能，编者一并写出。 第六章的探索性编码已经发现，退场闭合率在中高分段迅速达到天花板——一批人工评分只有中等的作文也可以闭合。若第七章的余损审计恰好在这一批「已闭合而质量中等」的作文上收获最大，那么两章合起来给出的不是矛盾，而是一条本卷未曾预料的联合命题：闭合是一个低门槛的状态，而质量的余下部分全部落在闭合之后。 若如此，本卷第六章的阈值 0.90 就不是「完成线」，而是「余损审计的起点线」。这条联合命题目前没有任何数据支持，编者只把它作为对照的第三种可能列出。</p><div class="bar" style="margin-top:2rem"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c06/">上一节</a> · <a href="../c08/">下一节</a></div></div></body></html>
+<p>这一处对切还有一个更麻烦的可能，编者一并写出。 第六章的探索性编码已经发现，退场闭合率在中高分段迅速达到天花板——一批人工评分只有中等的作文也可以闭合。若第七章的余损审计恰好在这一批“已闭合而质量中等”的作文上收获最大，那么两章合起来给出的不是矛盾，而是一条本卷未曾预料的联合命题：闭合是一个低门槛的状态，而质量的余下部分全部落在闭合之后。 若如此，本卷第六章的阈值 0.90 就不是“完成线”，而是“余损审计的起点线”。这条联合命题目前没有任何数据支持，编者只把它作为对照的第三种可能列出。</p><div class="bar" style="margin-top:2rem"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c06/">上一节</a> · <a href="../c08/">下一节</a></div></div></body></html>

@@ -1,45 +1,100 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第五章　未改之句如何被改写 · 文心探幽·卷二 · 德麦国际专著第 93 号</title><style>
-:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#E27A4A;--line:#26242C;--card:#14131A}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
-font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
-a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
-.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
-padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
-.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
-h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
-h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
-p{margin:.85em 0;text-align:justify}
-.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.6em;letter-spacing:.04em}
-.tw{overflow-x:auto;margin:1.2em 0}
-table{border-collapse:collapse;width:100%;font-size:14px}
-td,th{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-tr.odd{background:var(--card)}
-.nav{display:flex;justify-content:space-between;gap:12px;margin-top:52px;
-border-top:1px solid var(--line);padding-top:18px;font-size:14px}
+:root{--bg:#0D0C10;--fg:#E9E7E3;--dim:#8C8894;--am:#E27A4A;--am2:#C9612F;
+--line:#26242C;--card:#15141B;--rule:#332F3A}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+font:17px/2.05 "Noto Serif CJK SC","Source Han Serif SC","Songti SC",Georgia,serif;
+font-feature-settings:"halt" 0}
+a{color:var(--am);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.965);backdrop-filter:blur(6px);
+border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;
+align-items:center;font-size:13px;letter-spacing:.03em;z-index:9}
+.wrap{max-width:720px;margin:0 auto;padding:44px 22px 96px}
+
+/* ── 标题层 ── */
+h1{font-size:29px;line-height:1.48;margin:.1em 0 .35em;letter-spacing:.01em;font-weight:700}
+h1::after{content:"";display:block;width:46px;height:2px;background:var(--am);
+margin:.55em 0 0;opacity:.85}
+h2{font-size:21px;line-height:1.6;margin:2.6em 0 .9em;padding-top:1.1em;
+border-top:1px solid var(--rule);font-weight:700;letter-spacing:.01em}
+h3{font-size:17.5px;line-height:1.72;margin:2.1em 0 .7em;color:var(--am);font-weight:600;
+letter-spacing:.01em}
+h4{font-size:16.5px;margin:1.6em 0 .5em;color:#CFC9C0;font-weight:600}
+
+/* ── 正文 ── */
+p{margin:.5em 0;text-align:justify;text-justify:inter-ideograph;text-indent:2em;
+overflow-wrap:break-word}
+p:lang(en){text-indent:0}
+strong{color:#F3EFE8;font-weight:700}
+em{font-style:normal;border-bottom:1px dotted var(--am2);padding-bottom:1px}
+hr{border:0;border-top:1px solid var(--rule);margin:2.4em 0}
+ul,ol{padding-left:1.6em;margin:.9em 0}
+li{margin:.35em 0;text-align:justify}
+blockquote{margin:1.5em 0;padding:.2em 0 .2em 16px;border-left:2px solid var(--am2);
+color:#D3CFC8}
+blockquote p{text-indent:0}
+
+/* ── 章首 ── */
+.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.5em;letter-spacing:.05em;text-indent:0}
+.csub{color:var(--am);font-size:17px;margin:-.6em 0 1.7em;letter-spacing:.02em;text-indent:0}
+.digest{background:var(--card);border-left:3px solid var(--am);border-radius:0 5px 5px 0;
+padding:17px 20px 18px;margin:0 0 2.8em}
+.digest .dl{display:block;color:var(--am);font-size:12.5px;letter-spacing:.24em;
+margin-bottom:.6em;text-indent:0}
+.digest p{margin:0;font-size:15.5px;line-height:1.96;color:#D6D3CE;text-align:justify;
+text-indent:2em}
+
+/* ── 表格 ── */
+.tw,div[style*="overflow-x"]{overflow-x:auto;margin:1.6em 0;
+border:1px solid var(--line);border-radius:5px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.75}
+td,th{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#191821;color:#EFEBE4;font-weight:600}
+tr:nth-child(even) td{background:#121118}
+tr.odd td{background:#121118}
+table p{text-indent:0;margin:.25em 0}
+.tcap{text-indent:0;text-align:center;color:var(--dim);font-size:13.5px;
+margin:-.9em 0 2em;letter-spacing:.03em}
+
+/* ── 文献与附注 ── */
+.ref{margin:.42em 0;padding-left:2em;text-indent:-2em;font-size:14.5px;line-height:1.78;
+text-align:left}
+.moved{color:var(--dim);font-size:14px;border-left:2px solid var(--line);padding-left:13px;
+margin:1.8em 0;text-indent:0}
+
+/* ── 页脚导航 ── */
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:60px;
+border-top:1px solid var(--rule);padding-top:20px;font-size:14px}
+.nav span{text-indent:0}
 .toc{list-style:none;padding:0}
-.toc li{border-bottom:1px solid var(--line);padding:13px 2px}
+.toc li{border-bottom:1px solid var(--line);padding:14px 2px}
 .toc .n{color:var(--dim);font-size:12.5px;letter-spacing:.14em}
 .toc .t{font-size:17px}
 .toc .d{color:var(--dim);font-size:14px}
-</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c04/">上一节</a> · <a href="../b3/">下一节</a></div><div class="wrap"><h1>第五章　未改之句如何被改写</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 22,845 汉字</div><p>未改之句如何被改写</p>
-<p>—— 作文发生的稿际余载机制</p>
-<p>HOW型问题 · 理论研究</p>
-<p>未改之句如何被改写</p>
-<p>作文发生的稿际余载机制</p>
-<p>来自埋藏学、第三体摩擦学与位置信息理论的跨学科解释</p>
-<p>“作文不是文字不断增加的结果，
-而是篇章角色不断被重新分配的结果。”</p>
-<p>理论建构稿 · 含可证伪的实证研究方案</p>
-<p>2026年8月</p>
-<h3>摘要</h3>
-<p>“作文是如何发生的”通常被回答为计划、表达、回读与修订的递归过程，或被描述为若干草稿逐步接近成品的变化史。这些解释已经充分证明写作不是线性誊录，却仍留下一个不易被既有分析单位捕捉的问题：当某句话的字面形式完全未改时，它会不会因为别处的增删、移位与弃置而获得新的篇章角色？如果答案为是，那么作文的发生便不能只用新增了什么、删除了什么或改写了什么来说明，还必须解释未改文字为何也会被“结构性改写”。本文以结构映射而非表面比附为方法，将埋藏学关于记录由保存与破坏共同生成、死亡遗存反过来影响现存生态的认识，第三体摩擦学关于脱落物在接触界面承载、剪切、循环与排出的机制，以及形态发生素与位置信息理论关于位置依赖的命运分化和删减后的模式调节结合起来，提出“稿际余载”概念。稿际余载是文本成分退出当前可见稿后，其尚未解决的论证功能、语义承诺与位置约束在版本之间持续存在，并迫使其他文本成分重新分配篇章工作的效应。本文进一步提出“零字面角色迁移”：在相邻版本中保持字面不变的语句，由于关系场发生变化而从背景转为论点、从证据转为问题触发器、从解释转为反驳等。由此，作文被重新界定为：一次增删不再只改变被操作的文字，而开始释放稿际余载，使其他未被改动的语句发生位置重定和角色分化，并最终形成相互约束的篇章结构的过程。本文系统区分该命题与过程写作、修订研究、文本发生学、分布式认知、功能语言学修订研究及按键记录研究，给出稿际余载的来源、输运、吸收、再循环、排出与稳定化模型，提出零字面角色迁移率（ZRM）及“同一现稿、不同历史”的随机实验设计。本文的理论论证已经形成，但因尚未完成预注册实验，所有因果判断均保留为待检验命题。其意义在于把作文研究的最小解释单位从“被改动的字符串”推进到“跨版本迁移的篇章职责”，并为写作教学、过程评价和版本感知型人工智能写作工具提供新的观察框架。</p>
-<p>关键词： 作文发生；稿际余载；零字面角色迁移；修订；文本发生学；第三体；位置信息</p>
-<h3>How an Unchanged Sentence Is Rewritten</h3>
-<h4>Interdraft Residual Load as a Mechanism of Composition</h4>
-<h4>Abstract</h4>
-<p>Existing accounts of composing have convincingly rejected linear transcription and described writing as recursive planning, translating, reviewing, and revising. Yet they do not fully explain a peculiar event: a sentence may remain literally unchanged while its rhetorical role changes because material elsewhere has been added, deleted, moved, or abandoned. This article develops a theory of interdraft residual load through relational structure mapping across three distant fields: taphonomy, third-body tribology, and morphogen-based positional information. Interdraft residual load refers to the unresolved argumentative function, semantic commitment, and positional constraint that persist after a textual unit leaves the visible draft and that compel other units to take on redistributed discourse work. Its key observable consequence is zero-literal rhetorical-role migration: an aligned unit retains the same wording across versions but changes from, for example, background to claim, evidence to problem trigger, or explanation to rebuttal. Composition is therefore redefined as the process by which local textual operations release residual loads, relocate unchanged units, differentiate their roles, and stabilize a mutually constraining discourse pattern. The article distinguishes this proposal from process theory, revision studies, genetic criticism, distributed cognition, functional approaches to revision, and keystroke logging. It specifies a source-transport-absorption-recirculation-ejection model, proposes the Zero-Literal Role Migration rate (ZRM), and outlines a randomized “same current draft, different history” experiment. The paper is theoretical: it establishes a falsifiable research program but does not claim empirical confirmation. Its contribution is to shift the explanatory unit of writing research from modified strings to rhetorical obligations that migrate across versions.</p>
-<p>Keywords: composing process; interdraft residual load; rhetorical-role migration; revision; genetic criticism; positional information</p>
-<h3>一、问题的提出：作文何时不再只是“字数增加”</h3>
+
+@media (max-width:640px){
+ body{font-size:16px;line-height:2}
+ .wrap{padding:30px 16px 76px}
+ h1{font-size:24px}h2{font-size:19px}h3{font-size:16.5px}
+ table{font-size:13.5px}
+}
+@media print{
+ body{background:#fff;color:#111;font-size:11.5pt;line-height:1.75}
+ .bar,.nav{display:none}
+ .wrap{max-width:none;padding:0}
+ a{color:#111;text-decoration:none}
+ h1{font-size:20pt}h2{font-size:15pt;page-break-before:always}h3{font-size:12.5pt;color:#111}
+ .digest{background:#f4f2ee;border-left:2px solid #999;color:#222}
+ .digest p{color:#222}
+ th{background:#eee;color:#111}
+ tr:nth-child(even) td{background:#f7f7f7}
+ td,th{border:1px solid #999}
+ h2,h3{page-break-after:avoid}
+ table,blockquote{page-break-inside:avoid}
+}
+</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c04/">上一节</a> · <a href="../b3/">下一节</a></div><div class="wrap"><h1>第五章　未改之句如何被改写</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 22,446 汉字</div><p class="csub">——稿际余载与零字面角色迁移</p><div class="digest"><span class="dl">本 章 提 要</span><p>改稿时有一件事很少被说破：一句话一个字都没动，它在文章里的身份却已经变了——原来是背景，现在成了论点；原来是证据，现在成了要解释的麻烦。既有的过程研究和修订研究记录的是被改动的文字，而这句没被改动的话，落在所有记录之外。本章提出“稿际余载”：一段文字退出当前这一稿以后，它没有解决的论证任务、语义承诺和位置约束并不随之消失，而是留在版本之间，逼着别的句子重新分配工作；与之配套的是“零字面角色迁移”——字面完全不变，篇章角色却已经转移。三处材料来自很远的地方：埋藏学说记录是由保存与破坏共同生成的，脱落的东西反过来影响现存；第三体摩擦学说掉下来的碎屑会在接触面上承载、剪切、循环、排出；位置信息理论说同一个细胞的命运取决于它在场里的位置，删掉一部分之后其余部分会重新调整图案。由此，作文被重新界定为：一次增删不只改变被动的那几个字，而是释放出余载，使其他没被动过的句子重新定位、重新分工。本章的实验尚未预注册，因此所有因果判断都保留为待检验命题；它的价值在于把作文研究的最小单位，从“被改动的字符串”推进到“跨版本迁移的篇章职责”。</p></div><h3>一、问题的提出：作文何时不再只是“字数增加”</h3>
 <p>作文的成品容易制造一种视觉错觉。读者面对的是一页在空间上同时展开的文字，于是倾向于把它理解为作者先有一个完整意思，再把意思依次安放到句子中的结果。过程写作研究已经有力地拆解了这种错觉。Emig以个案和出声写作方法进入高中生的实际写作活动，Perl揭示基础写作者的回返与递归，Flower和Hayes则将写作描述为由计划、转译、回读等过程构成、受目标网络调节的复杂认知活动[1-4]。Sommers进一步指出，成熟写作者不会把修订仅仅理解为词语替换，而会反复改变作品的形状和意义[5]。自此，“作文不是直线生成的”已经不是有待争论的新命题，而是写作研究的共同起点。</p>
 <p>然而，非线性并不自动等于机制解释。若研究仍以新增、删除、替换、移位的文字为唯一观察对象，那么分析虽然能够细致记录操作，却可能忽略操作之外的结构后果。例如，某段作为主张的文字被删除后，原本只承担例证功能的一句话可能在新稿中成为全文最醒目的问题入口；某个未改动的结论句，可能因为前面增加反方观点而从总结变成反驳；某句保持原样，但它与段落中心、读者预期及相邻句的关系全部改变。在这些情形中，被编辑器标亮的“差异”发生在甲处，真正承担新篇章工作的却可能是未被标亮的乙处。</p>
 <p>这一现象带来三个层次的问题。第一个是描述问题：在版本对照中，如何命名“字面不变而功能改变”的单位？第二个是因果问题：为何别处的一次增删能够改变它的篇章命运？第三个是发生问题：一组句子究竟在什么时刻由并置材料转化为相互制约的作文结构？现有研究常把第三个问题回答为作者形成了目标、完成了计划、写出了初稿或进行了深层修订。这些答案各有根据，却大多把变化定位于作者内部的认知活动，或定位于可直接观察的修改事件。本文尝试把解释焦点移到二者之间：已经离开现稿的文本成分，其未完成的职责如何继续作用于当前稿，并通过其他文字重新落位。</p>
@@ -262,21 +317,21 @@ border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 <p>本章的观察对象是：语句在相邻版本中字面完全一致，而它的篇章角色改变了。这是本卷最反直觉的一个测量对象，编者认为它的窄口确实少有人正面占据。但有两位近邻必须请进来。</p>
 <h4>（一）修辞结构理论中的核—星之分</h4>
 <p>本章已经引了修辞结构理论（Mann, W. C., &amp; Thompson, S. A. 1988, *Rhetorical Structure Theory: Toward a functional theory of text organization*, Text, 8(3), 243–281），用它作为角色标注体系的参考之一。但本章没有用到这一支最贴近自己的那条：核与星的区分（nucleus / satellite）——一个跨度是核还是星，不由它自身的内容决定，而由它在关系中的位置决定；删掉星，整体大致仍成立，删掉核，上层关系随之改变。</p>
-<p>这几乎就是本章「关系中心性」与「中心暴露」的现成表述。</p>
+<p>这几乎就是本章“关系中心性”与“中心暴露”的现成表述。</p>
 <p>分离线。 那一支处理的是成品内部的关系层级：在一份已完成的文本里，哪些跨度承担核、哪些承担星。本章处理的是跨版本的角色再分配：某一跨度的核星身份，是否因为别处的删除而改变。前者是静态标注，后者要求至少两个版本与一次对齐。</p>
-<p>判定形式。 对同一份文本的相邻两版分别做核星标注。若所有角色迁移都能被表述为「核星身份的改变」，本章的八类角色体系没有额外分辨力，应改用那一支的记号；若存在核星身份不变而本章判为角色迁移的单元（例如证据→问题触发，两者可以同为星），本章的体系更细。</p>
+<p>判定形式。 对同一份文本的相邻两版分别做核星标注。若所有角色迁移都能被表述为“核星身份的改变”，本章的八类角色体系没有额外分辨力，应改用那一支的记号；若存在核星身份不变而本章判为角色迁移的单元（例如证据→问题触发，两者可以同为星），本章的体系更细。</p>
 <h4>（二）论证成分类别随上下文改变</h4>
-<p>在论证挖掘一支里，同一个句子被标为主张还是前提，本来就依赖于它在篇章中的位置与相邻成分（可参 Stab, C., &amp; Gurevych, I. 2017, *Parsing argumentation structures in persuasive essays*, Computational Linguistics, 43(3)）。这一支实际上早就承认「同一串文字的论证角色不是它自带的属性」。</p>
+<p>在论证挖掘一支里，同一个句子被标为主张还是前提，本来就依赖于它在篇章中的位置与相邻成分（可参 Stab, C., &amp; Gurevych, I. 2017, *Parsing argumentation structures in persuasive essays*, Computational Linguistics, 43(3)）。这一支实际上早就承认“同一串文字的论证角色不是它自带的属性”。</p>
 <p>分离线。 那一支承认角色依赖上下文，但它的任务是在一份给定文本上把角色标对；本章的任务是测量角色改变的发生率，并把它归因到一次特定的历史事件（某成分的退出）。前者视上下文依赖为标注难点，后者视之为研究对象。</p>
 <p>判定形式。 把同一份现稿交给标注者，一组知道版本历史，一组不知道。若两组标出的角色分布无差别、且都能重现本章的迁移，本章的历史归因成立；若只有知道历史的那一组标得出迁移，本章测到的是标注者的后见，不是文本的性质。（本章的标注设计已经要求盲于版本历史，此处只是把它挂到这位近邻名下。）</p>
 <h4>（三）上游那笔账</h4>
-<p>同前两章，本章亦须补已写出的文本进入任务环境这一构念（Hayes 1996）。本章的「载体」一节列举了工作记忆、撤销栈、版本面板、旁注、教师批注等，实际上已经在做这一支的工作，只是没有点名。</p>
+<p>同前两章，本章亦须补已写出的文本进入任务环境这一构念（Hayes 1996）。本章的“载体”一节列举了工作记忆、撤销栈、版本面板、旁注、教师批注等，实际上已经在做这一支的工作，只是没有点名。</p>
 <h3>二 · 编者提示：本章是本卷设计得最干净、也是最空的一章</h3>
 <p>最干净指的是第八节那个四臂随机设计：无接触、只阅读、写入—删除、写入—删除且历史可见。四组最终看到完全相同的当前稿，只有此前经历不同；平台在进入自由续写前自动规范化文档，使字符、格式、光标位置与可见提示一致，历史可见性是唯一允许保留的界面差异。六个替代解释（普通启动、版本检索、当前缺口、任务需求猜测、标注后见、投入差异）各自配了对照组或控制手段。这是全卷因果识别做得最彻底的一个方案。</p>
-<p>最空指的是：它一次也没有被执行。 本章通篇是理论建构与实验设计，作者在开篇即声明「本文属于理论建构论文，而不是已经完成验证的实证报告」，并把所有因果判断保留为待检验命题。这一声明是诚实的，编者原样保留。</p>
+<p>最空指的是：它一次也没有被执行。 本章通篇是理论建构与实验设计，作者在开篇即声明“本文属于理论建构论文，而不是已经完成验证的实证报告”，并把所有因果判断保留为待检验命题。这一声明是诚实的，编者原样保留。</p>
 <p>两件事放在一起，读者应当得到的印象是：本章提供的不是一个发现，是一件工具与一份可以让它失败的说明书。 本卷收它，是因为在九章之中，它是最容易被别人接手跑起来的一章——所需的仅是一个能记录版本与按键的写作平台，加两名盲于组别的标注者。</p>
 <h3>对切一 · 第三章 ↔ 第五章：文本不变，变的是哪一种角色</h3>
-<p>为什么必须切。 两章都主张「一字未改的文字可以已经变了」，而且都把这一点当作自己最重要的发现。若不切开，读者会认为其中一章是另一章的换名。</p>
+<p>为什么必须切。 两章都主张“一字未改的文字可以已经变了”，而且都把这一点当作自己最重要的发现。若不切开，读者会认为其中一章是另一章的换名。</p>
 <p>分离线。</p>
 <p>第五章读篇章角色。 自变量是别处的增删移位；因变量是盲法标注者读出的角色（背景→主张、证据→问题触发、解释→反驳、结论→让步）。它测的是这份文本对读者呈现的功能分工。</p>
 <p>第三章读工作角色。 自变量是这一段自己在工作区中的位置（可编辑的正文嵌入态 vs 逐字可见但不可编辑的侧栏态）；因变量是随后一段固定时间内的操作转移分布。它测的是这段文字对写作者当下可做之事的约束。</p>
@@ -285,9 +340,9 @@ border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 <p>其一。 把某一段已稳定的文字原样移到只读侧栏，别处一字不动。</p>
 <p>第三章预测：随后的操作转移分布与嵌入态条件系统不同。</p>
 <p>第五章预测：该段与其余各段的篇章角色不变——因为没有任何职责退出，关系场没有改变。</p>
-<p>若此时角色迁移率也随之上升，第五章的「退出」定义过宽，必须收窄：它把「不能再编辑」也算成了一种退出，而那不是它定义的退出。</p>
+<p>若此时角色迁移率也随之上升，第五章的“退出”定义过宽，必须收窄：它把“不能再编辑”也算成了一种退出，而那不是它定义的退出。</p>
 <p>其二。 删掉别处的中心主张，这一段的位置与可编辑性完全不动。</p>
-<p>第五章预测：该段发生角色迁移（很可能是「中心暴露」——原本的例证成为局部最强命题）。</p>
+<p>第五章预测：该段发生角色迁移（很可能是“中心暴露”——原本的例证成为局部最强命题）。</p>
 <p>第三章预测：端位效应不变——这一段的工作角色一点没动。</p>
-<p>若此时端位效应也变，第三章的「工作角色」混入了篇章角色，必须拆分：它测到的东西里有一部分其实来自内容关系的改变，而不是工作位置的改变。</p>
+<p>若此时端位效应也变，第三章的“工作角色”混入了篇章角色，必须拆分：它测到的东西里有一部分其实来自内容关系的改变，而不是工作位置的改变。</p>
 <p>编者按。 这一处对切的价值不在于判谁赢，而在于它把两个都很窄的读数放在同一个实验平台上——一台键击记录设备加一套角色标注，可以同时产出两个读数。两章各自的最小实验都不便宜，合起来跑反而更省。</p><div class="bar" style="margin-top:2rem"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c04/">上一节</a> · <a href="../b3/">下一节</a></div></div></body></html>

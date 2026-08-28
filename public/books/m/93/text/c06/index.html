@@ -1,43 +1,100 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第六章　作文怎样完成 · 文心探幽·卷二 · 德麦国际专著第 93 号</title><style>
-:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#E27A4A;--line:#26242C;--card:#14131A}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
-font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
-a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
-.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
-padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
-.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
-h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
-h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
-p{margin:.85em 0;text-align:justify}
-.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.6em;letter-spacing:.04em}
-.tw{overflow-x:auto;margin:1.2em 0}
-table{border-collapse:collapse;width:100%;font-size:14px}
-td,th{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-tr.odd{background:var(--card)}
-.nav{display:flex;justify-content:space-between;gap:12px;margin-top:52px;
-border-top:1px solid var(--line);padding-top:18px;font-size:14px}
+:root{--bg:#0D0C10;--fg:#E9E7E3;--dim:#8C8894;--am:#E27A4A;--am2:#C9612F;
+--line:#26242C;--card:#15141B;--rule:#332F3A}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+font:17px/2.05 "Noto Serif CJK SC","Source Han Serif SC","Songti SC",Georgia,serif;
+font-feature-settings:"halt" 0}
+a{color:var(--am);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.965);backdrop-filter:blur(6px);
+border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;
+align-items:center;font-size:13px;letter-spacing:.03em;z-index:9}
+.wrap{max-width:720px;margin:0 auto;padding:44px 22px 96px}
+
+/* ── 标题层 ── */
+h1{font-size:29px;line-height:1.48;margin:.1em 0 .35em;letter-spacing:.01em;font-weight:700}
+h1::after{content:"";display:block;width:46px;height:2px;background:var(--am);
+margin:.55em 0 0;opacity:.85}
+h2{font-size:21px;line-height:1.6;margin:2.6em 0 .9em;padding-top:1.1em;
+border-top:1px solid var(--rule);font-weight:700;letter-spacing:.01em}
+h3{font-size:17.5px;line-height:1.72;margin:2.1em 0 .7em;color:var(--am);font-weight:600;
+letter-spacing:.01em}
+h4{font-size:16.5px;margin:1.6em 0 .5em;color:#CFC9C0;font-weight:600}
+
+/* ── 正文 ── */
+p{margin:.5em 0;text-align:justify;text-justify:inter-ideograph;text-indent:2em;
+overflow-wrap:break-word}
+p:lang(en){text-indent:0}
+strong{color:#F3EFE8;font-weight:700}
+em{font-style:normal;border-bottom:1px dotted var(--am2);padding-bottom:1px}
+hr{border:0;border-top:1px solid var(--rule);margin:2.4em 0}
+ul,ol{padding-left:1.6em;margin:.9em 0}
+li{margin:.35em 0;text-align:justify}
+blockquote{margin:1.5em 0;padding:.2em 0 .2em 16px;border-left:2px solid var(--am2);
+color:#D3CFC8}
+blockquote p{text-indent:0}
+
+/* ── 章首 ── */
+.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.5em;letter-spacing:.05em;text-indent:0}
+.csub{color:var(--am);font-size:17px;margin:-.6em 0 1.7em;letter-spacing:.02em;text-indent:0}
+.digest{background:var(--card);border-left:3px solid var(--am);border-radius:0 5px 5px 0;
+padding:17px 20px 18px;margin:0 0 2.8em}
+.digest .dl{display:block;color:var(--am);font-size:12.5px;letter-spacing:.24em;
+margin-bottom:.6em;text-indent:0}
+.digest p{margin:0;font-size:15.5px;line-height:1.96;color:#D6D3CE;text-align:justify;
+text-indent:2em}
+
+/* ── 表格 ── */
+.tw,div[style*="overflow-x"]{overflow-x:auto;margin:1.6em 0;
+border:1px solid var(--line);border-radius:5px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.75}
+td,th{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#191821;color:#EFEBE4;font-weight:600}
+tr:nth-child(even) td{background:#121118}
+tr.odd td{background:#121118}
+table p{text-indent:0;margin:.25em 0}
+.tcap{text-indent:0;text-align:center;color:var(--dim);font-size:13.5px;
+margin:-.9em 0 2em;letter-spacing:.03em}
+
+/* ── 文献与附注 ── */
+.ref{margin:.42em 0;padding-left:2em;text-indent:-2em;font-size:14.5px;line-height:1.78;
+text-align:left}
+.moved{color:var(--dim);font-size:14px;border-left:2px solid var(--line);padding-left:13px;
+margin:1.8em 0;text-indent:0}
+
+/* ── 页脚导航 ── */
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:60px;
+border-top:1px solid var(--rule);padding-top:20px;font-size:14px}
+.nav span{text-indent:0}
 .toc{list-style:none;padding:0}
-.toc li{border-bottom:1px solid var(--line);padding:13px 2px}
+.toc li{border-bottom:1px solid var(--line);padding:14px 2px}
 .toc .n{color:var(--dim);font-size:12.5px;letter-spacing:.14em}
 .toc .t{font-size:17px}
 .toc .d{color:var(--dim);font-size:14px}
-</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../b3/">上一节</a> · <a href="../c07/">下一节</a></div><div class="wrap"><h1>第六章　作文怎样完成</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 20,889 汉字</div><p>作文怎样完成</p>
-<p>—— 退场闭合态</p>
-<p>作文不是“写尽”，而是获得退场许可：从继续可写到整体闭合的“退场闭合态”</p>
-<p>——形式化方法与程序验证 × 争议解决与仲裁 × 风险、安全与可靠性工程的二阶碰撞</p>
-<p>学科通融专栏 · 二阶碰撞典范文（How3）</p>
-<p>研究类型：How（三焦点路径）｜研究对象：作文从持续可写到整体闭合的完成机制</p>
-<p>版本：v1.0｜方法依据：SDE多学科通融创新法3.9版｜日期：2026年8月17日</p>
-<p>摘要</p>
-<p>“作文怎样完成”通常被降格为“结尾怎样写”：点题、照应、升华、总结、留白，仿佛只要最后一段处理得漂亮，一篇文章便自然获得完成性。然而真实写作持续暴露一个更基础的困难：一篇作文即使已经有开头、主体和结尾，作者仍可能感觉“哪里没有交代完”；另一篇文章明明还可以再加一个故事、一个例子、一个反方观点，却已经具有不可随意增删的整体感。这说明“还能继续写”与“尚未完成”不是同一件事。本文依照SDE多学科通融创新法3.9版的How型三焦点路径要求，从新思想前沿中选择形式化方法与程序验证、争议解决与仲裁、风险、安全与可靠性工程三门尚未被作文教学固定吸收且理论体系成熟的学科进行二阶碰撞。三家分别把“完成”压在三个互不相同的终点上：形式化验证要求待证性质对应的验证义务获得判定，而不要求穷举全部可能状态；仲裁把终局性建立在请求边界、程序结清与裁决效力上，而不要求现实世界再无争议；风险与安全工程则要求系统在操作者退出、环境变化和边界扰动下仍能保持可接受约束，而不是以“目前没有事故”冒充安全。三者互相冲突后共同推翻一个长期支配作文教学的隐含前提：完成必须等于内容耗尽，或者由某个局部终点——最后一句、中心点明、规定字数、写作时间结束——单独结算。本文据此提出新对象“退场闭合态”：在一个被冻结的篇章边界内，文本已经激活的必要续写义务均被结清或显式限界；作者退出后，独立读者无需作者补充即可维持核心关系；对结尾、例证与非承重文字做扰动时，不会重新暴露未结核心义务；此后若继续添加内容，新增文字主要是在创造新的义务，而非偿还旧义务。本文进一步提出单一读数“退场闭合率（Exit-Closure Ratio, ECR）”，给出义务识别、核心义务判定、结清链接与作者退出测试的清点手册，并在公开ASAP自动作文评分语料的12篇同题学生作文上进行探索性真跑。结果显示ECR与人工总分正相关，但在中高分段迅速饱和；一篇人工分数仅为6分的作文亦可达到0.92，而一篇没有传统总结段的作文可以达到1.00。这个不利结果反而划清了新概念的边界：退场闭合不是“好作文”评分器，而是独立回答“这篇文章是否已经完成”的过程判据。由此，作文教学可把“再写一点”改写为“还欠哪一笔”，把“写个结尾”改写为“作者能否退出”，把修改从无限润色改写为对未结义务的定向清算。</p>
-<p>关键词：作文完成；写作教学；二阶碰撞；退场闭合态；续写义务；退场闭合率；程序验证；仲裁；可靠性工程</p>
-<h3>二阶碰撞工序摘要</h3>
-<p>本表只呈现成文所需的学术化结果，不在正文中使用S/D/E母体术语。How型要求三家各锁一个不同焦点，最终产物不落在任何一家，而落在三条路径互相取消单独终点之后出现的新对象。</p>
-<table><thead><tr><th>焦点</th><th>取源</th><th>本家“走到哪里才算走完”</th><th>抽取的理论脊</th><th>对作文完成的压力</th></tr></thead><tbody><tr><td>结果焦点</td><td>形式化方法与程序验证（第352号）</td><td>“走到可判定结果态才算走完”</td><td>性质导向验证、验证义务、未证明部分</td><td>把“写尽”改成“结清与核心对象相关的必要义务”</td></tr><tr><td>程序焦点</td><td>争议解决与仲裁（第426号）</td><td>“走到请求边界内获得终局才算走完”</td><td>请求边界、程序节点、终局、执行</td><td>把“世界无争议”改成“本篇边界内有结算”</td></tr><tr><td>环境焦点</td><td>风险、安全与可靠性工程（第600号）</td><td>“走到操作者退出后仍守住约束才算走完”</td><td>韧性、边界场景、开放环境、近失误</td><td>把“作者自觉写完”改成“作者退出仍稳定”</td></tr></tbody></table>
-<h4>3.9版闸零记录：未吸收度与理论厚度</h4>
-<table><thead><tr><th>学科</th><th>未吸收度</th><th>厚度</th><th>厚度依据</th><th>作文领域检索判定</th></tr></thead><tbody><tr><td>形式化方法与程序验证</td><td>干净</td><td>厚</td><td>Hoare逻辑；模型检查/定理证明/分离逻辑等长期分歧</td><td>检索“作文教学+程序验证/形式化验证”；未见其完成判据成为作文理论固定术语</td></tr><tr><td>争议解决与仲裁</td><td>刚进入（名称/资源层），答案级干净</td><td>厚</td><td>终局性vs司法审查；效率vs正当程序；执行vs形式裁决</td><td>法律写作/作文评分中可见ADR或“仲裁”字样，但未见“请求边界+终局性”作为作文完成判据</td></tr><tr><td>风险、安全与可靠性工程</td><td>干净</td><td>厚</td><td>故障链vs系统安全；Safety-I vs Safety-II；FMEA/FTA vs STPA/FRAM</td><td>“可靠性”进入写作评价多指评分一致性，非复杂系统开放环境的安全闭合逻辑</td></tr></tbody></table>
-<p>闸零结论：放行。仲裁被判为“刚进入（名称/资源层）”而非“已吸收”，因为写作与ADR的既有交叉处理的是法律写作训练、社会冲突或评分程序，尚未把“请求边界—程序终局—执行”这一答案固定为作文完成理论；因此成文期必须以“终局性”而非“冲突管理”作为抽取对象。</p>
-<h3>一、问题的重新提出：为什么“还能写”不能推出“还没写完”</h3>
+
+@media (max-width:640px){
+ body{font-size:16px;line-height:2}
+ .wrap{padding:30px 16px 76px}
+ h1{font-size:24px}h2{font-size:19px}h3{font-size:16.5px}
+ table{font-size:13.5px}
+}
+@media print{
+ body{background:#fff;color:#111;font-size:11.5pt;line-height:1.75}
+ .bar,.nav{display:none}
+ .wrap{max-width:none;padding:0}
+ a{color:#111;text-decoration:none}
+ h1{font-size:20pt}h2{font-size:15pt;page-break-before:always}h3{font-size:12.5pt;color:#111}
+ .digest{background:#f4f2ee;border-left:2px solid #999;color:#222}
+ .digest p{color:#222}
+ th{background:#eee;color:#111}
+ tr:nth-child(even) td{background:#f7f7f7}
+ td,th{border:1px solid #999}
+ h2,h3{page-break-after:avoid}
+ table,blockquote{page-break-inside:avoid}
+}
+</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../b3/">上一节</a> · <a href="../c07/">下一节</a></div><div class="wrap"><h1>第六章　作文怎样完成</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 19,809 汉字</div><p class="csub">——退场闭合态与退场闭合率</p><div class="digest"><span class="dl">本 章 提 要</span><p>“作文怎样完成”常被降格成“结尾怎么写”：点题、照应、升华、留白。可真实写作里有两种相反的经验：一篇文章开头、主体、结尾都齐了，作者仍然觉得“有什么没交代完”；另一篇明明还能再加一个例子、一个反方，却已经动不得了。可见“还能继续写”和“还没写完”根本不是一回事。本章请来三门把“完”字定义得极硬的学科：程序验证要求待证的性质被判定，而不要求穷举全部状态；仲裁把终局性建立在请求边界、程序结清与裁决效力上，而不要求现实里再无争议；风险与安全工程要求人退出以后系统仍在可接受的约束内，而不是拿“目前没出事”冒充安全。三家一起推翻了作文教学里的一个隐含前提：完成等于把内容写尽，或者由最后一句、规定字数、下课铃单独结算。由此提出“退场闭合态”：在冻结的篇章边界内，文本已经激活的必要续写义务全部结清或明确限界；作者退出后，读者不必等作者补话也能维持核心关系；扰动结尾与非承重文字不会重新暴露未结的义务；此后再加内容，主要是在开新账而不是还旧账。配套读数叫“退场闭合率”。在十二篇公开同题学生作文上的探索性试算给出一个不利结果：它与人工总分正相关，却在中高分段迅速饱和——一篇只得六分的作文可以到 0.92，一篇没有传统总结段的作文可以到 1.00。这个结果反而划清了边界：退场闭合不是好作文评分器，它只回答一件事——这一篇写完了没有。</p></div><h3>一、问题的重新提出：为什么“还能写”不能推出“还没写完”</h3>
 <p>作文教学最常见的完成信号来自外部：铃声响了、格子写满了、字数够了、最后一段已经出现“总而言之”，或者教师提醒“赶快收尾”。这些信号当然具有课堂管理价值，却都没有回答文章内部的完成条件。学生最困惑的情形恰恰发生在外部信号失灵以后：时间还剩十分钟，他不知道该再加一个例子还是停笔；草稿已经一千字，他仍觉得某处“虚”；文章只有七百字，却再加任何材料都显得赘余。若没有内部判据，“完成”只能靠熟练者的感觉，而初学者只能模仿结尾样式。</p>
 <p>把“还能继续写”等同于“尚未完成”，会把作文推向一个逻辑上无法收束的状态。任何经验都可以继续细化，任何论点都可以再找一个例子，任何叙事都可以向前追溯或向后延展，任何描写都可以再增加一个感官维度。可写空间原则上没有自然终点。一个作者若以“还有东西可加”为停笔否决条件，就永远无法获得完成。由此可见，作文完成所要终止的不是可能内容，而是某种更小、更硬、可以清点的“必要继续”。</p>
 <p>反过来，“已经写了结尾”也不能推出“已经完成”。一篇议论文可以在最后重申中心论点，却仍有一个决定性的反例从未处理；一篇记叙文可以用景物描写首尾呼应，却让人物最关键的选择没有后果；一篇说明文可以用“综上所述”结束，却在正文里引入了一个术语而从未界定。结尾只是文本位置，完成则是整体状态。两者经常重合，但没有逻辑上的等价关系。</p>
@@ -234,25 +291,25 @@ border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 <p>https://github.com/Turanga1/Automated-Essay-Scoring</p>
 <p>编者补节 · 第六章</p>
 <h3>一 · 需要补的三位：本章语汇的正主</h3>
-<p>本章把「作文完成」重写为一张账本：文本自己激活了哪些前向义务，其中哪些已结清或已合法限界，哪些还欠着；作者退场之后，独立读者仍可仅凭文本维持核心关系。整套语汇——义务、激活、结清、未结、账本——在论辩逻辑与对话计算里是四十年的现成术语，而本章一位未提。</p>
+<p>本章把“作文完成”重写为一张账本：文本自己激活了哪些前向义务，其中哪些已结清或已合法限界，哪些还欠着；作者退场之后，独立读者仍可仅凭文本维持核心关系。整套语汇——义务、激活、结清、未结、账本——在论辩逻辑与对话计算里是四十年的现成术语，而本章一位未提。</p>
 <h4>（一）承诺存量</h4>
 <p>Hamblin, C. L. (1970). *Fallacies*. Methuen. 提出对话双方各有一个承诺存量（commitment store）：说出一个断言即把它计入自己的存量，此后要为它负责，除非依规则撤回。</p>
 <h4>（二）对话中的承诺</h4>
 <p>Walton, D., &amp; Krabbe, E. C. W. (1995). *Commitment in Dialogue*. SUNY Press. 把承诺存量发展成一整套对话类型的规范框架：不同的对话类型规定了承诺如何产生、如何转移、如何合法退出。</p>
 <h4>（三）话语义务</h4>
-<p>Traum, D. R., &amp; Allen, J. F. (1994). Discourse obligations in dialogue processing. In *Proceedings of the 32nd Annual Meeting of the ACL*, 1–8. 直接把「义务」作为一种独立于信念、目标与意图的态度引入，用以解释问与答之间的连接：一个问题使对方负有回答的义务。</p>
-<p>三位加起来，本章那句「作者写出一个中心判断，就欠下支持或限定」在上游是一句老话。</p>
-<p>为什么本章绕开了它们（编者的判断）。 本章的三家取源是形式化验证、争议解决与仲裁、风险安全与可靠性工程——它借的是法律的终局性与工程的边界稳定，而不是论辩的承诺。这不是疏忽，是取源路线决定的盲区：仲裁给了它「请求边界内获得终局」，却没有给它「承诺如何产生」。</p>
+<p>Traum, D. R., &amp; Allen, J. F. (1994). Discourse obligations in dialogue processing. In *Proceedings of the 32nd Annual Meeting of the ACL*, 1–8. 直接把“义务”作为一种独立于信念、目标与意图的态度引入，用以解释问与答之间的连接：一个问题使对方负有回答的义务。</p>
+<p>三位加起来，本章那句“作者写出一个中心判断，就欠下支持或限定”在上游是一句老话。</p>
+<p>为什么本章绕开了它们（编者的判断）。 本章的三家取源是形式化验证、争议解决与仲裁、风险安全与可靠性工程——它借的是法律的终局性与工程的边界稳定，而不是论辩的承诺。这不是疏忽，是取源路线决定的盲区：仲裁给了它“请求边界内获得终局”，却没有给它“承诺如何产生”。</p>
 <p>分离线（本章可以站住，但必须写出来）。</p>
-<p>承诺者不同。 那三位的承诺属于说话人——是某个主体欠下的，可以由主体撤回。本章的义务属于文本——由文本动作激活，作者不在场时仍然成立，且明令「作者说『我心里知道』不算结清」。</p>
-<p>结清的裁决者不同。 那三位由对话规则与对方裁决；本章由不知道写作计划的独立读者裁决，并把「作者退场」写成编码的必要条件而非第二个指标。</p>
+<p>承诺者不同。 那三位的承诺属于说话人——是某个主体欠下的，可以由主体撤回。本章的义务属于文本——由文本动作激活，作者不在场时仍然成立，且明令“作者说『我心里知道』不算结清”。</p>
+<p>结清的裁决者不同。 那三位由对话规则与对方裁决；本章由不知道写作计划的独立读者裁决，并把“作者退场”写成编码的必要条件而非第二个指标。</p>
 <p>合法退出的机制不同。 那三位的退出是撤回（retraction），要在对话中显式执行且可被对方追究；本章的退出是限界——作者在文本中明确把某问题排除在本篇边界之外，且排除不破坏核心对象。限界不是撤回：被限界的问题仍然被承认存在，只是不属于本篇。</p>
-<p>判定形式。 取一批作文，一路按承诺存量的规则编码（谁欠、欠什么、是否撤回），一路按本章的义务账本编码。若两套编码在「哪些篇目仍有未结核心项」上给出相同的名单，本章应并回承诺一支，退场闭合率只是承诺存量余额的换算；若两套名单系统不同——尤其若存在一批作文，其作者承诺已全部履行而文本仍有未结核心义务（或反之）——本章的「义务属于文本」这一条成立。</p>
+<p>判定形式。 取一批作文，一路按承诺存量的规则编码（谁欠、欠什么、是否撤回），一路按本章的义务账本编码。若两套编码在“哪些篇目仍有未结核心项”上给出相同的名单，本章应并回承诺一支，退场闭合率只是承诺存量余额的换算；若两套名单系统不同——尤其若存在一批作文，其作者承诺已全部履行而文本仍有未结核心义务（或反之）——本章的“义务属于文本”这一条成立。</p>
 <h3>二 · 与第四章的接口</h3>
-<p>见第四章补节第二节：本章的工作从第四章的持续生成窗口结束处开始，交接信号是结清义务数开始低于新激活义务数。两章在「合法闭合」这一格上共用，不是重复。</p>
+<p>见第四章补节第二节：本章的工作从第四章的持续生成窗口结束处开始，交接信号是结清义务数开始低于新激活义务数。两章在“合法闭合”这一格上共用，不是重复。</p>
 <h3>三 · 也需要补的一位：问题之下的问题</h3>
 <p>与第四章同（见第四章补节第一节）。对本章而言，分离线更短：那一支的问题入栈即构成回答的承诺，本章的义务激活即构成结清或限界的责任——两句几乎同形。本章多出来的那一条是作者退场：那一支不要求提问者离场后问题仍然成立，本章要求义务在作者不在场时由独立读者读得出来。</p>
 <h3>四 · 编者提示：本章最重要的一次自我收窄</h3>
 <p>本章的探索性编码在十二篇公开学生作文上跑出两个方向。第一个方向符合直觉：退场闭合率与人工总分总体同向。第二个方向不符合，也更重要：闭合率在中高分段迅速触顶——人工评分较高的六篇全部达到 1.00，同时一篇人工总分仅中等的作文也达到 0.92 且无未结核心义务。</p>
-<p>作者由此撤回了任何「闭合率越高作文越好」的解释，只保留「用于判断是否仍存在必要续写义务」这一较窄命题，并写了一句编者认为应当被反复引用的话：若这个读数能够精准预测总分，反而说明它可能只是在换名重做综合作文质量。</p>
+<p>作者由此撤回了任何“闭合率越高作文越好”的解释，只保留“用于判断是否仍存在必要续写义务”这一较窄命题，并写了一句编者认为应当被反复引用的话：若这个读数能够精准预测总分，反而说明它可能只是在换名重做综合作文质量。</p>
 <p>编者提醒读者注意这一撤回的连带后果：本章给出的阈值 0.90，不是一条质量线，是一条状态线。跨过它，只意味着这一轮的账已经结清，不意味着这一篇写得好。本卷第七章正是从这条线的另一侧接着往下问的（见对切二）。</p><div class="bar" style="margin-top:2rem"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../b3/">上一节</a> · <a href="../c07/">下一节</a></div></div></body></html>

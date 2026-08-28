@@ -1,38 +1,100 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第三章　作文如何发生 · 文心探幽·卷二 · 德麦国际专著第 93 号</title><style>
-:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#E27A4A;--line:#26242C;--card:#14131A}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
-font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
-a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
-.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
-padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
-.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
-h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
-h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
-p{margin:.85em 0;text-align:justify}
-.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.6em;letter-spacing:.04em}
-.tw{overflow-x:auto;margin:1.2em 0}
-table{border-collapse:collapse;width:100%;font-size:14px}
-td,th{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-tr.odd{background:var(--card)}
-.nav{display:flex;justify-content:space-between;gap:12px;margin-top:52px;
-border-top:1px solid var(--line);padding-top:18px;font-size:14px}
+:root{--bg:#0D0C10;--fg:#E9E7E3;--dim:#8C8894;--am:#E27A4A;--am2:#C9612F;
+--line:#26242C;--card:#15141B;--rule:#332F3A}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+font:17px/2.05 "Noto Serif CJK SC","Source Han Serif SC","Songti SC",Georgia,serif;
+font-feature-settings:"halt" 0}
+a{color:var(--am);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.965);backdrop-filter:blur(6px);
+border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;
+align-items:center;font-size:13px;letter-spacing:.03em;z-index:9}
+.wrap{max-width:720px;margin:0 auto;padding:44px 22px 96px}
+
+/* ── 标题层 ── */
+h1{font-size:29px;line-height:1.48;margin:.1em 0 .35em;letter-spacing:.01em;font-weight:700}
+h1::after{content:"";display:block;width:46px;height:2px;background:var(--am);
+margin:.55em 0 0;opacity:.85}
+h2{font-size:21px;line-height:1.6;margin:2.6em 0 .9em;padding-top:1.1em;
+border-top:1px solid var(--rule);font-weight:700;letter-spacing:.01em}
+h3{font-size:17.5px;line-height:1.72;margin:2.1em 0 .7em;color:var(--am);font-weight:600;
+letter-spacing:.01em}
+h4{font-size:16.5px;margin:1.6em 0 .5em;color:#CFC9C0;font-weight:600}
+
+/* ── 正文 ── */
+p{margin:.5em 0;text-align:justify;text-justify:inter-ideograph;text-indent:2em;
+overflow-wrap:break-word}
+p:lang(en){text-indent:0}
+strong{color:#F3EFE8;font-weight:700}
+em{font-style:normal;border-bottom:1px dotted var(--am2);padding-bottom:1px}
+hr{border:0;border-top:1px solid var(--rule);margin:2.4em 0}
+ul,ol{padding-left:1.6em;margin:.9em 0}
+li{margin:.35em 0;text-align:justify}
+blockquote{margin:1.5em 0;padding:.2em 0 .2em 16px;border-left:2px solid var(--am2);
+color:#D3CFC8}
+blockquote p{text-indent:0}
+
+/* ── 章首 ── */
+.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.5em;letter-spacing:.05em;text-indent:0}
+.csub{color:var(--am);font-size:17px;margin:-.6em 0 1.7em;letter-spacing:.02em;text-indent:0}
+.digest{background:var(--card);border-left:3px solid var(--am);border-radius:0 5px 5px 0;
+padding:17px 20px 18px;margin:0 0 2.8em}
+.digest .dl{display:block;color:var(--am);font-size:12.5px;letter-spacing:.24em;
+margin-bottom:.6em;text-indent:0}
+.digest p{margin:0;font-size:15.5px;line-height:1.96;color:#D6D3CE;text-align:justify;
+text-indent:2em}
+
+/* ── 表格 ── */
+.tw,div[style*="overflow-x"]{overflow-x:auto;margin:1.6em 0;
+border:1px solid var(--line);border-radius:5px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.75}
+td,th{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#191821;color:#EFEBE4;font-weight:600}
+tr:nth-child(even) td{background:#121118}
+tr.odd td{background:#121118}
+table p{text-indent:0;margin:.25em 0}
+.tcap{text-indent:0;text-align:center;color:var(--dim);font-size:13.5px;
+margin:-.9em 0 2em;letter-spacing:.03em}
+
+/* ── 文献与附注 ── */
+.ref{margin:.42em 0;padding-left:2em;text-indent:-2em;font-size:14.5px;line-height:1.78;
+text-align:left}
+.moved{color:var(--dim);font-size:14px;border-left:2px solid var(--line);padding-left:13px;
+margin:1.8em 0;text-indent:0}
+
+/* ── 页脚导航 ── */
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:60px;
+border-top:1px solid var(--rule);padding-top:20px;font-size:14px}
+.nav span{text-indent:0}
 .toc{list-style:none;padding:0}
-.toc li{border-bottom:1px solid var(--line);padding:13px 2px}
+.toc li{border-bottom:1px solid var(--line);padding:14px 2px}
 .toc .n{color:var(--dim);font-size:12.5px;letter-spacing:.14em}
 .toc .t{font-size:17px}
 .toc .d{color:var(--dim);font-size:14px}
-</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c02/">上一节</a> · <a href="../b2/">下一节</a></div><div class="wrap"><h1>第三章　作文如何发生</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 21,233 汉字</div><p>作文如何发生</p>
-<p>—— 局部终点转为下一轮条件的端位转换</p>
-<p>作文如何发生</p>
-<p>——局部终点转为下一轮条件的“端位转换”理论</p>
-<p>How Does Composition Occur? An Endpoint-Role Conversion Theory of Writing｜V1.0｜2026-08-17</p>
-<h3>摘  要</h3>
-<p>作文研究已经把规划、转译、修订、递归、问题解决、修辞情境和社会文化条件纳入“过程”，但“有过程”仍不等于解释了过程怎样不断产生下一步。本文把发育生物学的形态发生、交通流理论与机制设计放在同一问题上，提出“端位转换”假说：作文的发生不是预成结构的展开，不是思想流的连续通行，也不是规则场对行为的单向塑造，而是局部形态、生成路径与约束场在连续轮次中互换功能角色；一次的局部终点转成下一轮的条件、路径或规则。本文以“同一段已稳定文字保持可见，但从正文可编辑嵌入态移到不可编辑侧栏后，后续120秒操作序列分布是否改变”为零情态词判据，并给出稳定性×因果再入的二维辨别格。利用公开KUPA-KEYS 1,006篇作文元数据预注册真跑后，简单“活动强度存在中间最优”的代理假说未获支持，迫使理论放弃事件数量代理，转向状态与角色转换。文章进一步与递归写作、知识转换、反馈控制、行动中反思、认识性行动等逐一给出判决性分离，并提出随机干预实验与2028年底可裁决赌注。</p>
-<p>关键词：作文发生；端位转换；形态发生；交通流；机制设计；键盘日志</p>
-<h3>Abstract</h3>
-<p>Writing research has long treated composing as recursive, goal-directed, situated, and socially mediated, yet describing a process does not by itself explain how one local outcome becomes the cause of the next move. This article develops an endpoint-role conversion account by bringing morphogenesis, traffic-flow theory, and mechanism design into a single mechanistic problem. The central claim is triple-negative: composition does not occur merely by unfolding a preformed structure, by continuously transmitting ideas through a channel, or by letting a fixed rule environment shape behavior. It occurs when local forms, generation routes, and constraint fields repeatedly exchange functional roles across successive rounds, so that a temporary endpoint becomes a condition, route, or rule for what follows. The proposed zero-modal test keeps a stabilized text segment fully visible while moving it from an editable position in the main document to a non-editable side panel, and asks whether the distribution of operations over the next 120 seconds changes. A preregistered proxy test using metadata from 1,006 public KUPA-KEYS essays did not support a simple inverted-U relation between process activity and human scores; the adverse result rules out event counts as a proxy for the proposed mechanism and shifts measurement toward state and role transitions. The theory is separated from recursive process models, knowledge transforming, feedback control, reflection-in-action, epistemic action, and distributed cognition by discriminating predictions, and it ends with a preregistrable randomized intervention and a dated falsification bet.</p>
-<p>Keywords: composition process; endpoint-role conversion; morphogenesis; traffic flow; mechanism design; keystroke logging</p>
-<h3>一、问题的重启：我们已经知道“写作是过程”，却仍不知道过程怎样长出下一步</h3>
+
+@media (max-width:640px){
+ body{font-size:16px;line-height:2}
+ .wrap{padding:30px 16px 76px}
+ h1{font-size:24px}h2{font-size:19px}h3{font-size:16.5px}
+ table{font-size:13.5px}
+}
+@media print{
+ body{background:#fff;color:#111;font-size:11.5pt;line-height:1.75}
+ .bar,.nav{display:none}
+ .wrap{max-width:none;padding:0}
+ a{color:#111;text-decoration:none}
+ h1{font-size:20pt}h2{font-size:15pt;page-break-before:always}h3{font-size:12.5pt;color:#111}
+ .digest{background:#f4f2ee;border-left:2px solid #999;color:#222}
+ .digest p{color:#222}
+ th{background:#eee;color:#111}
+ tr:nth-child(even) td{background:#f7f7f7}
+ td,th{border:1px solid #999}
+ h2,h3{page-break-after:avoid}
+ table,blockquote{page-break-inside:avoid}
+}
+</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c02/">上一节</a> · <a href="../b2/">下一节</a></div><div class="wrap"><h1>第三章　作文如何发生</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 21,210 汉字</div><p class="csub">——端位转换</p><div class="digest"><span class="dl">本 章 提 要</span><p>写作研究早就说过写作是一个“过程”：会规划、会回读、会反复修改。可是“有过程”并不等于说清了过程怎样长出下一步——为什么刚写完的这一段，会改变下一段还能怎么写。本章把三样东西放到同一道题上：发育生物学讲局部先长出形状，交通流理论讲怎样让流不断通过，机制设计讲规则如何塑造行为。三家各自把“下一步从哪来”押在不同的地方，互相拆台之后逼出一个共同的盲点。由此提出“端位转换”：一次写作里，刚刚完成的局部结果不会停在原地当成果，它会转过身去当下一轮的条件、通道或规则——上一轮的终点变成了下一轮的起点。判据写成一句不含程度词的问话：把一段已经稳定的文字从正文挪到旁边（仍然看得见，但不能再编辑），此后两分钟里的操作分布会不会改变。用一千余篇公开作文的过程元数据做的预注册真跑没有支持简化版假设，本章据此放弃了“用动作多少来代理”的做法，把对象改回状态与角色的转换本身。文末与递归写作、知识转换、反馈控制、行动中反思逐一划清界线，并押下一个到 2028 年底可以裁决的赌注。</p></div><h3>一、问题的重启：我们已经知道“写作是过程”，却仍不知道过程怎样长出下一步</h3>
 <p>如果问一个学生“作文是怎么写出来的”，最常见的回答是一条步骤：审题、立意、列提纲、写开头、展开、修改。现代写作研究当然早已比这复杂得多。Flower 与 Hayes 把写作描述成目标导向而且递归的认知过程，规划、文本生成与检查可以嵌套和往返；后来的研究继续加入工作记忆、动机、修辞情境、社会文化环境、身份、反馈与工具。于是，“作文不是结果而是过程”已经不是一个新判断，而是研究常识。[10][24]</p>
 <p>但“过程”这个词有一个隐蔽的宽度。它可以告诉我们一连串事件发生过，却不自动告诉我们，为什么刚才这一步会改变下一步可做的事情。完整键盘日志能够记录某人在第几秒输入、删除、停顿、移动光标；过程挖掘能够从事件日志还原常见路径；写作者自己也能回忆“先想了这个，再删了那个”。这些材料都很重要，却仍可能停在事件序列。一个事件 B 出现在 A 之后，不等于 A 使 B 变得可能，更不等于 A 在 B 出现以前改变了自己的功能角色。</p>
 <p>因此，“作文如何发生”需要比“有哪些步骤”“哪些步骤会递归”更窄的一问：在一次真实写作中，某个已经出现的局部结果，什么时候不再只是结果，而开始成为下一轮生成的条件？如果这个转换不存在，写作也可以持续：一个人可以按预先写好的提纲连续誊写，段落越来越完整，字符越来越多，过程日志也非常丰富，却几乎没有任何局部产物反过来改写后面的行动。相反，一个并不成熟的句子有时会突然暴露问题，使作者改变证据、受众想象、论证路径乃至题目本身。两种写作都有“过程”，但它们的发生结构不同。</p>
@@ -232,16 +294,16 @@ border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 <h3>一 · 被移到侧栏的那一段，正是那个上游构念</h3>
 <p>本章的核心实验是：内容一字不改、逐字可见，只把一段已稳定的文字从可编辑的正文位置移到不可编辑的侧栏，比较随后一段固定时间内的操作转移分布。</p>
 <p>编者必须指出一件本章正文没有说的事：被移动的那个东西，在写作研究里已经有名字。 它就是已写出的文本（the text produced so far），四十年前就被放进了写作的任务环境（Hayes 1996），此后一直是键击记录研究的主要观察对象（Leijten &amp; Van Waes 2013）。本章引了这一支的方法学文献，却没有引它的构念本身，也没有把它列进第十二节那十一位占位者。</p>
-<p>这是本章最贵的一处缺席。因为那一支不只是说「已写文本会影响后续」——它把已写文本定名为任务环境的一个组成部分，而本章的整个实验，正是在改变这个组成部分的一项属性。</p>
+<p>这是本章最贵的一处缺席。因为那一支不只是说“已写文本会影响后续”——它把已写文本定名为任务环境的一个组成部分，而本章的整个实验，正是在改变这个组成部分的一项属性。</p>
 <p>分离线。 那一支把已写出的文本当作任务环境中一个可被读取的信息源，它的研究问题是写作者何时读它、读多久、读了之后做什么。本章把它当作工作区中一个可被操作的对象，研究问题是它的可操作性本身是否构成一个独立变量。</p>
 <p>判定形式（本章其实已经写好，只是没挂在这位祖宗名下）。 本章的第三臂设计——正文内冻结态（保留原位置、仍可见、暂时不可编辑）——恰好就是这条分离线的实验实现：</p>
-<p>若「完整嵌入」与「正文内冻结」无差别，则可编辑性不重要，本章测到的仍属于信息读取，应并回那一支。</p>
-<p>若「正文内冻结」与「侧栏」仍有差别，则文档嵌入关系另有作用，本章的变量比那一支多一项。</p>
+<p>若“完整嵌入”与“正文内冻结”无差别，则可编辑性不重要，本章测到的仍属于信息读取，应并回那一支。</p>
+<p>若“正文内冻结”与“侧栏”仍有差别，则文档嵌入关系另有作用，本章的变量比那一支多一项。</p>
 <p>编者建议本章在修订时把这三臂直接标注为对该构念的三种处理，本章的位置会因此立刻清楚。</p>
-<h3>二 · 定名：本章的「惰性成形」引第一章</h3>
-<p>「局部文本稳定而无因果再入」这一格，本卷以第一章的伪启动为正名（见第一章补节）。本章的「惰性成形」为同一格的另一种测法：本章看操作分布，第一章看下游依赖。读者遇到本章此词，应回到第一章的定义。</p>
-<p>两者不是同义反复，因为两种测法可能分离：一段文字可以对下游语义选择有依赖（第一章判为已启动）而其工作位置的改变不引起操作分布变化（本章判为无端位效应）。这种分离若真实存在，说明「取得续写权」与「取得工作角色」是两件事，本卷两章都需要收窄。编者把这一条列为两章共同的观察项。</p>
+<h3>二 · 定名：本章的“惰性成形”引第一章</h3>
+<p>“局部文本稳定而无因果再入”这一格，本卷以第一章的伪启动为正名（见第一章补节）。本章的“惰性成形”为同一格的另一种测法：本章看操作分布，第一章看下游依赖。读者遇到本章此词，应回到第一章的定义。</p>
+<p>两者不是同义反复，因为两种测法可能分离：一段文字可以对下游语义选择有依赖（第一章判为已启动）而其工作位置的改变不引起操作分布变化（本章判为无端位效应）。这种分离若真实存在，说明“取得续写权”与“取得工作角色”是两件事，本卷两章都需要收窄。编者把这一条列为两章共同的观察项。</p>
 <h3>三 · 编者提示：本章的诚实是它的天花板</h3>
-<p>本章第十二节把话说到了这个地步：「本文若把『写作会反过来改变思考』当贡献，几乎每一位都能取代它」，并逐条列出递归写作、知识转换、实践中的反思、认识性行动、反馈控制、修辞情境、分布式认知、稳定中间形态、键击记录、过程挖掘各自已经占了哪一块地，最后把自己的剩余命题压成一句：同一局部产物的内容保持可见，只有它在工作区中的功能位置被改变，后续操作序列仍出现差异。</p>
-<p>编者认为这是全卷最规矩的一次自我限定，也正因为如此，本章的不可还原性由作者自己封了顶。它明说自己「只能多拿一小块地」。读者应当按这个尺度读它：本章不是一套新的写作理论，是一个新增变量加一台可以判它死活的实验。</p>
+<p>本章第十二节把话说到了这个地步：“本文若把『写作会反过来改变思考』当贡献，几乎每一位都能取代它”，并逐条列出递归写作、知识转换、实践中的反思、认识性行动、反馈控制、修辞情境、分布式认知、稳定中间形态、键击记录、过程挖掘各自已经占了哪一块地，最后把自己的剩余命题压成一句：同一局部产物的内容保持可见，只有它在工作区中的功能位置被改变，后续操作序列仍出现差异。</p>
+<p>编者认为这是全卷最规矩的一次自我限定，也正因为如此，本章的不可还原性由作者自己封了顶。它明说自己“只能多拿一小块地”。读者应当按这个尺度读它：本章不是一套新的写作理论，是一个新增变量加一台可以判它死活的实验。</p>
 <p>本章的真跑同样应当按这个尺度读。那次预注册检验的对象不是本章的机制，而是一个较弱的代理猜想（过程活动强度与评分的倒 U 关系）。结果不支持，二次项方向与预期相反。作者据此删掉了整条第三层主张，并把核心读数从活动量改为工作角色干预——这是一次真正的自我删改，但它没有为本章的核心机制提供任何正面证据。本章至今没有一次针对自身机制的数据。</p><div class="bar" style="margin-top:2rem"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../c02/">上一节</a> · <a href="../b2/">下一节</a></div></div></body></html>

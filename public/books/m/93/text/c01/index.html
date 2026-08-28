@@ -1,42 +1,106 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第一章　作文怎样启动 · 文心探幽·卷二 · 德麦国际专著第 93 号</title><style>
-:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#E27A4A;--line:#26242C;--card:#14131A}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
-font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
-a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
-.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
-padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
-.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
-h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
-h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
-p{margin:.85em 0;text-align:justify}
-.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.6em;letter-spacing:.04em}
-.tw{overflow-x:auto;margin:1.2em 0}
-table{border-collapse:collapse;width:100%;font-size:14px}
-td,th{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-tr.odd{background:var(--card)}
-.nav{display:flex;justify-content:space-between;gap:12px;margin-top:52px;
-border-top:1px solid var(--line);padding-top:18px;font-size:14px}
+:root{--bg:#0D0C10;--fg:#E9E7E3;--dim:#8C8894;--am:#E27A4A;--am2:#C9612F;
+--line:#26242C;--card:#15141B;--rule:#332F3A}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+font:17px/2.05 "Noto Serif CJK SC","Source Han Serif SC","Songti SC",Georgia,serif;
+font-feature-settings:"halt" 0}
+a{color:var(--am);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.965);backdrop-filter:blur(6px);
+border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;
+align-items:center;font-size:13px;letter-spacing:.03em;z-index:9}
+.wrap{max-width:720px;margin:0 auto;padding:44px 22px 96px}
+
+/* ── 标题层 ── */
+h1{font-size:29px;line-height:1.48;margin:.1em 0 .35em;letter-spacing:.01em;font-weight:700}
+h1::after{content:"";display:block;width:46px;height:2px;background:var(--am);
+margin:.55em 0 0;opacity:.85}
+h2{font-size:21px;line-height:1.6;margin:2.6em 0 .9em;padding-top:1.1em;
+border-top:1px solid var(--rule);font-weight:700;letter-spacing:.01em}
+h3{font-size:17.5px;line-height:1.72;margin:2.1em 0 .7em;color:var(--am);font-weight:600;
+letter-spacing:.01em}
+h4{font-size:16.5px;margin:1.6em 0 .5em;color:#CFC9C0;font-weight:600}
+
+/* ── 正文 ── */
+p{margin:.5em 0;text-align:justify;text-justify:inter-ideograph;text-indent:2em;
+overflow-wrap:break-word}
+p:lang(en){text-indent:0}
+strong{color:#F3EFE8;font-weight:700}
+em{font-style:normal;border-bottom:1px dotted var(--am2);padding-bottom:1px}
+hr{border:0;border-top:1px solid var(--rule);margin:2.4em 0}
+ul,ol{padding-left:1.6em;margin:.9em 0}
+li{margin:.35em 0;text-align:justify}
+blockquote{margin:1.5em 0;padding:.2em 0 .2em 16px;border-left:2px solid var(--am2);
+color:#D3CFC8}
+blockquote p{text-indent:0}
+
+/* ── 章首 ── */
+.meta{color:var(--dim);font-size:13px;margin:.2em 0 1.5em;letter-spacing:.05em;text-indent:0}
+.csub{color:var(--am);font-size:17px;margin:-.6em 0 1.7em;letter-spacing:.02em;text-indent:0}
+.digest{background:var(--card);border-left:3px solid var(--am);border-radius:0 5px 5px 0;
+padding:17px 20px 18px;margin:0 0 2.8em}
+.digest .dl{display:block;color:var(--am);font-size:12.5px;letter-spacing:.24em;
+margin-bottom:.6em;text-indent:0}
+.digest p{margin:0;font-size:15.5px;line-height:1.96;color:#D6D3CE;text-align:justify;
+text-indent:2em}
+
+/* ── 表格 ── */
+.tw,div[style*="overflow-x"]{overflow-x:auto;margin:1.6em 0;
+border:1px solid var(--line);border-radius:5px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.75}
+td,th{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#191821;color:#EFEBE4;font-weight:600}
+tr:nth-child(even) td{background:#121118}
+tr.odd td{background:#121118}
+table p{text-indent:0;margin:.25em 0}
+.tcap{text-indent:0;text-align:center;color:var(--dim);font-size:13.5px;
+margin:-.9em 0 2em;letter-spacing:.03em}
+
+/* ── 文献与附注 ── */
+.ref{margin:.42em 0;padding-left:2em;text-indent:-2em;font-size:14.5px;line-height:1.78;
+text-align:left}
+.moved{color:var(--dim);font-size:14px;border-left:2px solid var(--line);padding-left:13px;
+margin:1.8em 0;text-indent:0}
+
+/* ── 页脚导航 ── */
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:60px;
+border-top:1px solid var(--rule);padding-top:20px;font-size:14px}
+.nav span{text-indent:0}
 .toc{list-style:none;padding:0}
-.toc li{border-bottom:1px solid var(--line);padding:13px 2px}
+.toc li{border-bottom:1px solid var(--line);padding:14px 2px}
 .toc .n{color:var(--dim);font-size:12.5px;letter-spacing:.14em}
 .toc .t{font-size:17px}
 .toc .d{color:var(--dim);font-size:14px}
-</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../b1/">上一节</a> · <a href="../c02/">下一节</a></div><div class="wrap"><h1>第一章　作文怎样启动</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 21,123 汉字</div><p>作文怎样启动</p>
-<p>—— 自持起写核与续写权移交</p>
-<p>第一字不是开始：作文从“没有”到“有”的自持起写核模型</p>
-<p>——物理化学成核 × 免疫动力学校对 × 分布式共识的二阶碰撞（3.9版）</p>
-<p>学科通融专栏 · 语文教育学专题 · 2026年8月</p>
-<table><thead><tr><th>摘　要
-一篇作文究竟在什么时候开始存在？传统作文教学常把“开始”放在审题、选材、构思、列提纲或落下第一字上；过程写作理论则早已证明，写作并非产品之前的一次性准备，而是规划、转写与修订不断递归的过程。然而，这些理论主要回答“写作者在做哪些活动”，并没有提供一个可以把“正在准备写”与“作文已经自己开始生长”分开的边界判据。本文依SDE多学科通融创新法3.9版，将问题判定为How题，并从新思想前沿中选取物理化学、免疫学、分布式系统三个远距成熟领域，分别抽取经典成核、动力学校对与共识提交三条彼此冲突的启动判据。三家分别把启动结算在局部稳定核、连续校验路径与共享承诺场上；碰撞后发现，它们共同把“启动”误作某个固定终点被达到，而其自身的失败材料又显示：任何单一终点都可能产生假启动。本文据此提出“续写权移交”与“自持起写核”两个相连的新概念：作文启动，不发生在第一想法或第一字出现之时，而发生在一个最小约束簇第一次取得续写权之时——此后，已经形成的作文能够自己产生、筛除并协调下一步选择，外部题目、教师、模板或AI不再承担逐步驱动。为把该判断变成可裁决命题，本文提出“续写依赖率CDR6”及反事实删核实验，建立表面痕迹稳定性×下游依赖性的二维判别格，并以KLiCKe、写作云数据和ScholaWrite三个公开过程数据资源进行字段审计。审计结果是不利的：现有公开数据均不能直接计算核心读数，因为缺少“早期选择—后续选择”的语义依赖边和受控删核分支。本文因此不声称模型已获经验确证，而将这一字段缺口转化为可执行的实验方案与课堂观察协议。该模型的教育含义是：帮助学生启动作文，不应等同于替学生提供更多开头、素材和步骤，而应帮助其形成一个能够逼出下一步、排除下一步并承受修改的内生约束核。
-关键词：作文启动；写作过程；自持起写核；续写权；成核；动力学校对；分布式共识；二阶碰撞</th></tr></thead><tbody></tbody></table>
-<p>核心命题：作文启动，不是第一想法出现，也不是第一字落下，而是“续写权”第一次从外部提示移交给正在形成的作文自身；取得这种续写权的最小约束闭环，本文称为“自持起写核”。</p>
-<h3>一、问题提出：我们知道怎样写，却不知道“什么时候算已经开始写”</h3>
+
+@media (max-width:640px){
+ body{font-size:16px;line-height:2}
+ .wrap{padding:30px 16px 76px}
+ h1{font-size:24px}h2{font-size:19px}h3{font-size:16.5px}
+ table{font-size:13.5px}
+}
+@media print{
+ body{background:#fff;color:#111;font-size:11.5pt;line-height:1.75}
+ .bar,.nav{display:none}
+ .wrap{max-width:none;padding:0}
+ a{color:#111;text-decoration:none}
+ h1{font-size:20pt}h2{font-size:15pt;page-break-before:always}h3{font-size:12.5pt;color:#111}
+ .digest{background:#f4f2ee;border-left:2px solid #999;color:#222}
+ .digest p{color:#222}
+ th{background:#eee;color:#111}
+ tr:nth-child(even) td{background:#f7f7f7}
+ td,th{border:1px solid #999}
+ h2,h3{page-break-after:avoid}
+ table,blockquote{page-break-inside:avoid}
+}
+</style></head><body><div class="bar"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../b1/">上一节</a> · <a href="../c02/">下一节</a></div><div class="wrap"><h1>第一章　作文怎样启动</h1><div class="meta">文心探幽·卷二 作文如何发生？ · 约 20,741 汉字</div><p class="csub">——自持起写核与续写权移交</p><div class="digest"><span class="dl">本 章 提 要</span><p>一个学生题目读完了、关键词圈了、开头也写出来了，还是抬头问“然后呢”；另一个半天不落笔，一动笔却连着写到底。可见“落下第一个字”并不等于作文已经开始。本章问的是：一篇作文从“没有”变成“有”，那一刻究竟发生了什么。三门学科被请来互相拆台——物理化学讲一小团晶核要长到多大才会自己继续长下去，免疫学讲一个信号要连续过完几道关才算被认下，分布式系统讲一件事要有多少方共同承诺才算真的提交。三家都把“开始”押在某个固定终点上，而它们各自的失败记录又都说明：只认一个终点，就会认下假的开始。本章据此提出“续写权移交”与“自持起写核”：作文真正启动的时刻，不是第一个念头，也不是第一个字，而是已经写出来的那一小团东西第一次能自己逼出下一步、自己排除下一步——从此题目、老师、模板和 AI 不再一步一步推着它走。对三份公开写作过程数据的字段核查结果是不利的：现有数据都算不出这个读数，因为没有一份记录“前一个选择是否管住了后一个选择”。这处缺口被写成了可执行的实验方案。教学上的推论很直接：帮学生启动作文，不是再多给几个开头和素材，而是帮他攒出一个能自己往下逼的小核。</p></div><h3>一、问题提出：我们知道怎样写，却不知道“什么时候算已经开始写”</h3>
 <p>语文课堂里有一种极常见却很少被理论单独命名的困境：学生已经读完题目，圈了关键词，老师也带着全班讨论了素材，甚至纸上已经出现了一个漂亮开头，但学生仍会抬头问：“然后呢？”另一名学生可能长时间没有落笔，只在草稿纸上改动几个词；一旦真正开始写，后面的段落却连续涌出。若把第一名学生判作“已经启动”，把第二名学生判作“尚未启动”，我们的判据其实只是把可见文字当成了作文存在的证明。教学经验不断提醒我们，这个证明并不可靠。第一字可以早于真正的生成，沉默也可以晚于真正的生成。</p>
 <p>写作研究对此并非一无所知。Rohman（1965）把pre-writing称为发现阶段；Emig（1971）通过有声构思研究真实写作者；Murray（1972）要求把写作从产品转为过程；Flower与Hayes（1981）进一步把规划、转写、复查写成递归的认知过程。Bereiter与Scardamalia（1987）区分知识陈述与知识转化，Galbraith（1999）强调文字生产本身能够生成新的认识。到键击记录、版本记录与写作云研究，研究者甚至可以逐秒看到停顿、插入、删除、回返和计划—转写之间的切换。问题因此不是“过程有没有被研究”，而是一个更窄、更基础的问题：这些过程中哪一个事件，使系统从“尚未有一篇作文”跨到“已经有一篇正在生长的作文”？</p>
 <p>这个边界不能由最终质量倒推。低质量作文也会真实启动，高质量成品也可能由模板、逐句提示或AI连续外包而来。它也不能由努力强度决定：学生可能想了二十分钟仍在漂浮，也可能被一个小细节突然牵住，三十秒后就进入稳定生成。更不能由“有没有计划”决定：计划可能只是老师给出的外部路线图，学生每走一步仍需再次询问。真正需要解释的是：某一刻之前，下一步主要由外部继续推动；某一刻之后，已经形成的东西开始反过来规定下一步。本文把这条边界称为“作文启动边界”。</p>
 <p>因此，本文的核心问题不是“为什么有人不愿写”，也不是“怎样提高写作动机”，更不是“怎样写一个好开头”。它问的是发生学意义上的How：一篇作文怎样从没有变成有？如果把作文看成一个能持续生成后续选择的过程，那么启动必须是一条可描述的发生路径，而不是一个心理标签。</p>
-<h3>二、方法：3.9版如何把“启动”从熟悉理论中重新挖出来</h3>
-<p>本研究采用SDE多学科通融创新法3.9版作为选源和碰撞程序。按照该版本的题型纪律，“怎样从没有变成有”属于How题，要求的不是一个静态定义，也不是一个单因解释，而是一条从当前状态走向新状态的路径。How型在3.9版中按三个不同焦点组织来源：有的路径把稳定对象作为结算点，有的把生成序列作为结算点，有的把关系场的共同状态作为结算点。三家必须各占一个焦点，否则只是同一轴上的学术辩论。</p>
+<h3>二、方法：怎样把“启动”从熟悉的理论里重新挖出来</h3>
+<p>本研究先判定题型。“怎样从没有变成有”问的是一条路径，要求的不是一个静态定义，也不是一个单因解释，而是一条从当前状态走向新状态的路。这类问题按三个不同焦点组织来源：有的路径把稳定对象作为结算点，有的把生成序列作为结算点，有的把关系场的共同状态作为结算点。三家必须各占一个焦点，否则只是同一轴上的学术辩论。</p>
 <p>在正式碰撞之前，本文先执行两项前置检查。第一项是“未吸收度”：不是问学科名字离作文远不远，而是问我们准备从它那里拿来的那条具体答案，是否已经进入写作理论的固定术语、教材章节或标准手册。检索以“写作/作文＋成核”“写作/作文＋kinetic proofreading”“写作/作文＋consensus/Raft”等学科词检索，同时把命题剥到形式层，改搜“一个局部候选何时算真正开始”“连续校验后才允许进入下一阶段”“局部完成何时变为系统承诺”等大白话结构。现有写作研究确有prewriting、planning、goal setting、knowledge transforming、writing as discovery、keystroke bursts等近邻，但未发现经典成核的临界核判据、免疫动力学校对的串行误识别抑制判据或分布式共识的提交判据成为作文教育的固定理论部件。故三源均判为“干净”，但这一判断只表示“未发现已被标准化吸收”，不等于证明历史上无人做过零散类比。</p>
 <p>第二项是“理论厚度”。成核理论有Gibbs热力学、Becker–Döring动力学、经典与非经典成核的长期争论及稳定的失效条件；动力学校对从Hopfield、Ninio到McKeithan及其后T细胞抗原辨识研究，已经形成关于等待时间、步骤数、能耗、反馈和灵敏度—特异性权衡的成熟传统；分布式共识从FLP不可能性、Paxos、PBFT到Raft，有完整故障模型、安全性、活性与成员变更理论。三家均能给出奠基层、内部争论、反例传统和权威教材，故均判“厚”。</p>
 <p>三门学科的焦点安排如下：物理化学的成核把“出现一个足以继续长大的局部核”作为终点，属于焦点S路径；免疫动力学校对把“候选信号连续走完一串时间与状态检验”作为终点，属于焦点D路径；分布式共识把“一个局部提议成为系统可承诺、不可由单节点任意撤回的共同状态”作为终点，属于焦点E路径。三者不是为了凑出三个比喻，而是对同一个“何时才允许宣布启动”给出三个互不相容的结算时点。</p>
@@ -212,22 +276,22 @@ border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 <p>33. 付自文、Claude. (2026). SDE多学科通融创新法：从0到1不是灵感，是一门可以重复的手艺. SDE Universes，学科通融方法论特稿.</p>
 <p>编者补节 · 第一章</p>
 <h3>一 · 本章是九章里唯一没有欠上游那笔账的</h3>
-<p>导论第三节已经说明，「已写出的文本会成为下一步的条件」是写作过程研究四十年的现成结论，本卷九章共同的上游是它。本章是唯一一章正面与它交手的：第十二节的十位占位者表里，把「写着写着产生思想」这一支单列一行，并写出了分离线——那一支占位的是写作产生新知识，本章只保留最早取得续写权的那一条边界。</p>
+<p>导论第三节已经说明，“已写出的文本会成为下一步的条件”是写作过程研究四十年的现成结论，本卷九章共同的上游是它。本章是唯一一章正面与它交手的：第十二节的十位占位者表里，把“写着写着产生思想”这一支单列一行，并写出了分离线——那一支占位的是写作产生新知识，本章只保留最早取得续写权的那一条边界。</p>
 <p>编者把这一处标出来，不是表扬，是为了给其余各章立一个格式：祖宗要请进正文的划界表，不能放在脚注里。 后面八节的补节全部按本章这一格式写。</p>
 <h3>二 · 需要补的两位</h3>
 <h4>（一）自催化闭合</h4>
-<p>本章的核心动作是「一个最小约束簇第一次取得续写权，此后系统能够自己产生、筛除并协调下一步」。这个形状在生物化学与复杂系统研究里有一位很近的上游：自催化集合（Kauffman, S. A. 1986, *Autocatalytic sets of proteins*, Journal of Theoretical Biology, 119(1), 1–24），即一组分子在集合内部互为催化剂，使整个集合的再生产不再依赖外部特定输入。</p>
-<p>本章正文里「自催化」一词出现过一次，无出处。这不合适——它恰好是本章最想说的那件事的现成名字。</p>
+<p>本章的核心动作是“一个最小约束簇第一次取得续写权，此后系统能够自己产生、筛除并协调下一步”。这个形状在生物化学与复杂系统研究里有一位很近的上游：自催化集合（Kauffman, S. A. 1986, *Autocatalytic sets of proteins*, Journal of Theoretical Biology, 119(1), 1–24），即一组分子在集合内部互为催化剂，使整个集合的再生产不再依赖外部特定输入。</p>
+<p>本章正文里“自催化”一词出现过一次，无出处。这不合适——它恰好是本章最想说的那件事的现成名字。</p>
 <p>分离线。 自催化集合讲的是闭合（closure）：集合内每一个成员的生成都被集合内某个成员催化。本章讲的是移交（handover）：外部驱动仍然可以存在，只是下一步的主要生成与排除作用已经落到内部约束核上。二者的差别有一处可判决的后果——自催化集合一旦闭合，撤走外部催化剂系统仍能维持；而本章的续写依赖率允许外部提示继续存在，只要求下游选择的依赖关系指向内部核。</p>
 <p>判定形式。 在候选核已形成之后，完全撤走一切外部提示（教师、范文、机器补全），观察写作是否继续推进。若继续推进，本章测到的是闭合，应改用自催化的语言，本章的读数是它的一个弱化版本；若外部提示撤走后推进停止、而删核实验仍显示高依赖，则本章测到的确实是移交而非闭合，二者不可互换。</p>
 <h4>（二）写作作为约束满足</h4>
-<p>Sharples, M. (1999). *How We Write: Writing as Creative Design*. Routledge. 把写作处理成一个在约束之间往返的设计活动：写作者不断在「构思空间」与「外化」之间切换，而约束既来自任务，也来自已经写下的东西。</p>
+<p>Sharples, M. (1999). *How We Write: Writing as Creative Design*. Routledge. 把写作处理成一个在约束之间往返的设计活动：写作者不断在“构思空间”与“外化”之间切换，而约束既来自任务，也来自已经写下的东西。</p>
 <p>分离线。 那一支讲约束从哪里来、如何被满足；本章讲约束什么时候开始自己生产新的约束。前者不要求区分外生约束与内生约束，本章的全部分量都在这一区分上。</p>
-<p>判定形式。 若把任务约束、教师约束与已写文本约束同等编码后，能够无剩余地预测删核实验的结果，则本章的「内生」一词没有额外解释力，应并回约束满足；若删核实验的结果只能由已写文本这一类约束解释，本章成立。</p>
-<h3>三 · 定名裁定：本章的「伪启动」为正名</h3>
-<p>「表面痕迹稳定而下游依赖为零」这一格，在本卷被两章各自命名过：本章称伪启动，第三章称惰性成形。</p>
-<p>编者裁定：以本章的「伪启动」为正名，理由是它的定义最严——不仅要求表面稳定，还要求没有任何一个后续独立语义选择依赖它，并配了删核反事实作为判据。第三章处改为引用本章并说明视角差：本章看下游依赖，第三章看操作分布；二者是同一格的两种测法，不是两个概念。</p>
-<p>读者若在第三章遇到「惰性成形」，应回到本节的定义。</p>
+<p>判定形式。 若把任务约束、教师约束与已写文本约束同等编码后，能够无剩余地预测删核实验的结果，则本章的“内生”一词没有额外解释力，应并回约束满足；若删核实验的结果只能由已写文本这一类约束解释，本章成立。</p>
+<h3>三 · 定名裁定：本章的“伪启动”为正名</h3>
+<p>“表面痕迹稳定而下游依赖为零”这一格，在本卷被两章各自命名过：本章称伪启动，第三章称惰性成形。</p>
+<p>编者裁定：以本章的“伪启动”为正名，理由是它的定义最严——不仅要求表面稳定，还要求没有任何一个后续独立语义选择依赖它，并配了删核反事实作为判据。第三章处改为引用本章并说明视角差：本章看下游依赖，第三章看操作分布；二者是同一格的两种测法，不是两个概念。</p>
+<p>读者若在第三章遇到“惰性成形”，应回到本节的定义。</p>
 <h3>四 · 编者提示：本章最强的一条与最弱的一条</h3>
-<p>最强的一条是那个反常预言：作文的启动可以晚于第一字，也可以早于第一字。 它同时对抗两种常识——「动笔了就是开始了」和「想清楚才算开始」。这一条也使本章可以处理一类现有研究几乎处理不了的人：文字表面反复改写而同一组织关系持续约束后文的写作者（本章的「隐性启动」格）。</p>
-<p>最弱的一条是三个公开过程数据集的字段审计全部得出「不能直接计算」。本章把这一失败原样保留并转成实验方案，做法是对的；但读者应当明白，本章的核心读数至今没有在任何真实数据上被算出过一次。本章的本钱在设计，不在读数。</p><div class="bar" style="margin-top:2rem"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../b1/">上一节</a> · <a href="../c02/">下一节</a></div></div></body></html>
+<p>最强的一条是那个反常预言：作文的启动可以晚于第一字，也可以早于第一字。 它同时对抗两种常识——“动笔了就是开始了”和“想清楚才算开始”。这一条也使本章可以处理一类现有研究几乎处理不了的人：文字表面反复改写而同一组织关系持续约束后文的写作者（本章的“隐性启动”格）。</p>
+<p>最弱的一条是三个公开过程数据集的字段审计全部得出“不能直接计算”。本章把这一失败原样保留并转成实验方案，做法是对的；但读者应当明白，本章的核心读数至今没有在任何真实数据上被算出过一次。本章的本钱在设计，不在读数。</p><div class="bar" style="margin-top:2rem"><a href="/books/m/93/">← 专著页</a> · <a href="/books/m/93/text/">分章目录</a> · <a href="../b1/">上一节</a> · <a href="../c02/">下一节</a></div></div></body></html>
