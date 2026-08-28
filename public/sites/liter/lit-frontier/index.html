@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文学新思想前沿 · SDE 文学</title>
+<meta name="description" content="百年文学新思想前沿：1930–2026 十个年代、一百个思想，每条两万字。为二阶碰撞备料——每条都交出承重命题、碰撞位置、预设、量纲与失效条件。">
+<link rel="canonical" href="https://liter.sdeuniverses.com/lit-frontier/">
+<meta property="og:title" content="文学新思想前沿 · SDE 文学">
+<meta property="og:description" content="百年文学新思想前沿：1930–2026 十个年代、一百个思想，每条两万字。为二阶碰撞备料——每条都交出承重命题、碰撞位置、预设、量纲与失效条件。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F7F3E9">
+<style>
+:root{
+  --paper:#F7F3E9; --paper2:#FDFBF5; --ink:#1A1714; --ink2:#6B6255; --ink3:#9A9182;
+  --rule:#CFC5B2; --rule2:#E4DCCB;
+  --cinnabar:#9E3D30; --cinnabar-l:#C25B45;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi",var(--serif);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:16.5px;line-height:1.95}
+a{color:inherit;text-decoration:none}
+.spine{position:fixed;left:0;top:0;bottom:0;width:62px;z-index:40;
+  background:var(--paper);border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;padding:20px 0 18px}
+.spine .nm{writing-mode:vertical-rl;font-family:var(--serif);font-size:20px;
+  letter-spacing:.36em;font-weight:600}
+.spine .sub{writing-mode:vertical-rl;font-family:var(--mono);font-size:10px;
+  letter-spacing:.3em;color:var(--ink3);margin-top:16px}
+.spine .seal{margin-top:auto;width:26px;height:26px;border:1.5px solid var(--cinnabar);
+  color:var(--cinnabar);font-size:13px;line-height:23px;text-align:center;
+  font-family:var(--serif);transform:rotate(-4deg)}
+.page{margin-left:62px}
+@media(max-width:720px){.spine{display:none}.page{margin-left:0}}
+.wrap{max-width:940px;margin:0 auto;padding:0 26px}
+.topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:30;
+  background:rgba(247,243,233,.94);backdrop-filter:saturate(140%) blur(6px)}
+.topbar .wrap{display:flex;align-items:baseline;gap:20px;height:52px;
+  font-family:var(--sans);font-size:13.5px;color:var(--ink2)}
+.topbar .m{display:none;font-family:var(--serif);font-size:17px;letter-spacing:.22em;color:var(--ink)}
+.topbar nav{margin-left:auto;display:flex;gap:19px;overflow-x:auto}
+.topbar nav a{white-space:nowrap}
+.topbar nav a:hover{color:var(--cinnabar)}
+.topbar nav a.out{font-family:var(--mono);font-size:11.5px}
+@media(max-width:720px){.topbar .m{display:block}}
+.masthead{padding:60px 0 0;text-align:center}
+.masthead .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--ink3)}
+.masthead h1{font-family:var(--serif);font-weight:600;margin:.42em 0 .3em;
+  font-size:clamp(30px,6.2vw,54px);letter-spacing:.2em;line-height:1.24}
+.masthead .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--ink3)}
+.dbl{border-top:3px double var(--rule);margin:32px 0 0}
+.motto{max-width:33em;margin:28px auto 0;font-family:var(--kai);font-size:17.5px;
+  line-height:2.1;text-align:center}
+.motto b{font-weight:600;border-bottom:1px solid var(--cinnabar);padding-bottom:1px}
+.hd{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--rule);
+  padding-bottom:9px;margin:52px 0 20px}
+.hd .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;color:var(--ink3);flex:none}
+.hd h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.14em;margin:0}
+.hd .ct{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink2);flex:none}
+.lead{color:var(--ink2);font-size:15.5px;line-height:2.05;margin:0 0 22px}
+.body p{margin:0 0 1.15em}
+.body b{font-weight:600}
+/* 年代格 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px}
+.dec{border:1px solid var(--rule);background:var(--paper2);padding:18px 20px 16px;display:block}
+.dec:hover{border-color:var(--cinnabar);box-shadow:0 2px 0 var(--rule2)}
+.dec .y{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--ink3)}
+.dec b{display:block;font-size:19px;letter-spacing:.16em;font-weight:600;margin:5px 0 8px}
+.dec span{display:block;font-size:13.5px;color:var(--ink2);line-height:1.85}
+.dec i{display:block;font-style:normal;font-family:var(--mono);font-size:10.5px;
+  color:var(--cinnabar);margin-top:11px;letter-spacing:.1em}
+/* 条目 */
+.item{border-top:1px solid var(--rule2);padding:22px 0 20px}
+.item:first-of-type{border-top:1px solid var(--rule)}
+.item .top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.item .n{font-family:var(--mono);font-size:11px;color:var(--cinnabar);letter-spacing:.1em;
+  border:1px solid var(--rule);padding:1px 7px;flex:none}
+.item h3{margin:0;font-size:19px;font-weight:600;letter-spacing:.06em}
+.item .yr{font-family:var(--mono);font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.item .who{font-family:var(--sans);font-size:13px;color:var(--ink2);margin:7px 0 10px}
+.item .th{font-family:var(--kai);font-size:17px;line-height:1.95;margin:0 0 12px}
+.rows{display:grid;grid-template-columns:5.6em 1fr;gap:5px 12px;font-size:13.5px;
+  color:var(--ink2);line-height:1.85}
+.rows .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--ink3);
+  padding-top:4px}
+.pos{display:inline-block;border:1px solid var(--cinnabar);color:var(--cinnabar);
+  font-family:var(--mono);font-size:10.5px;padding:1px 7px;letter-spacing:.1em}
+.wait{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;color:var(--ink3);border:1px dashed var(--rule);padding:3px 10px}
+/* 体例表 */
+.spec{border:1px solid var(--rule);background:var(--paper2);padding:22px 26px 18px}
+.spec ol{margin:0;padding-left:1.5em}
+.spec li{margin:0 0 .55em;font-size:14.5px;line-height:1.9;color:var(--ink2)}
+.spec li b{color:var(--ink);font-weight:600}
+.note{border-left:2px solid var(--cinnabar);padding:2px 0 2px 16px;margin:22px 0;
+  font-size:14.5px;color:var(--ink2);line-height:1.95}
+.pager{display:flex;gap:14px;margin:50px 0 0;border-top:1px solid var(--rule);padding-top:20px;
+  font-family:var(--sans);font-size:14px;flex-wrap:wrap}
+.pager a{border:1px solid var(--rule);padding:8px 15px;background:var(--paper2)}
+.pager a:hover{border-color:var(--cinnabar);color:var(--cinnabar)}
+.pager .sp{margin-left:auto}
+.end{margin:56px 0 70px;border-top:1px solid var(--rule);padding-top:18px;
+  font-family:var(--sans);font-size:12.5px;color:var(--ink3);line-height:1.95}
+</style>
+</head>
+<body>
+<div class="spine">
+  <div class="nm">SDE 文学</div>
+  <div class="sub">FEI SUO</div>
+  <div class="seal">斐</div>
+</div>
+<div class="page">
+<header class="topbar"><div class="wrap">
+  <a class="m" href="/">SDE 文学</a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/lit-frontier/">新思想前沿</a>
+    <a href="/foundation/">基础文库</a>
+    <a href="/dialogue/">对谈</a>
+    <a href="/coread/">共读</a>
+    <a href="/all/">全部篇目</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap">
+
+<div class="masthead">
+  <div class="kicker">A　H U N D R E D　Y E A R S　O F　L I T E R A R Y　I D E A S</div>
+  <h1>文学新思想前沿</h1>
+  <div class="en">1930 — 2026　·　十个年代　·　一百个思想　·　每条两万字</div>
+  <div class="dbl"></div>
+  <div class="motto">这一栏不是名人榜，也不是文学理论简史。<br>它是一座<b>备料场</b>——一百条思想被拆成可以互相碰撞的零件，摆在这里等着被撞。</div>
+</div>
+
+<div class="hd"><span class="no">这 一 栏</span><h2>为什么这么排</h2></div>
+<div class="body lead">
+<p>文学理论史通常按流派排：形式主义、结构主义、后结构主义、文化研究。按流派排的好处是好记，坏处是<b>同一个流派内部的思想彼此太像，撞不出东西</b>——它们共用前提，撞起来只是回声。</p>
+<p>这一栏按<b>年代</b>排。同一个十年里的十条，往往来自互不通气的地方：一条来自语言学，一条来自剧场，一条来自出版制度，一条来自一场诉讼。它们没打过照面，却在同一段时间里对同一批问题各自下了判断。<b>这种「同时代而不同源」的组合，正是二阶碰撞要的料。</b></p>
+<p>所以每一条都不是介绍某个人，而是抽出<b>一条可被反驳的承重命题</b>，再把它拆成碰撞时用得上的零件。写不出承重命题的思想，不进这一栏。</p>
+</div>
+
+<div class="hd"><span class="no">体 例</span><h2>一条两万字里写什么</h2></div>
+<p class="lead">两万字不是为了长。是因为一条思想要真能上碰撞台，下面这十节缺一节它就撞不动。</p>
+<div class="spec"><ol>
+<li><b>处境</b>——它是在什么条件下被提出的：谁在跟谁争，当时什么是不言自明的。</li>
+<li><b>承重命题</b>——一句话，且必须写成可以被反驳的形式。</li>
+<li><b>原文脉络</b>——关键处逐段辨读，标明出处；不长引，改述为主。</li>
+<li><b>它推翻的老前提</b>——那条老前提当年是谁、用什么材料立起来的。这一节最容易被跳过，也最值钱。</li>
+<li><b>量纲</b>——它给出的读数是什么，分母是什么。<b>没给读数的，明写「未给读数」，不许硬凑。</b></li>
+<li><b>失效条件</b>——在什么材料上它会判错。判不错的思想不是强，是空。</li>
+<li><b>异名</b>——它在别的学科、别的语汇族里叫什么，每个异名注明族名。</li>
+<li><b>流变与今用</b>——从提出到今天，哪一段还在服役，哪一段已经死了。</li>
+<li><b>碰撞接口</b>——它能供显露、差异序列、特征纠缠哪一格；与本栏哪几条正撞，与哪几条零划界。</li>
+<li><b>资料核验</b>——独立文献表，不并进正文。查不实的著录一律改写或换源。</li>
+</ol></div>
+
+<div class="note"><b>三条纪律。</b>一、年份标的是<b>首次公开提出</b>的年份，不是它出名的年份；实际作用延迟到后来的，在正文里单列一节记这段延迟，不许把年份挪到方便的位置。二、<b>已被后来修正甚至判错的思想照收</b>——它提供的是失效条件，那正是碰撞时最有用的一半。三、正文写成一条挂一条，<b>没写完的条目在这里只列接口、不放链接</b>；这一栏不做占位页。</div>
+
+<div class="hd"><span class="no">总 目</span><h2>十个年代</h2><span class="ct">100 条 · 显露 23 ／ 差异序列 33 ／ 特征纠缠 44</span></div>
+<div class="grid">
+  <a class="dec" href="/lit-frontier/1930s/">
+    <div class="y">1930–1939　·　NO.001–010</div>
+    <b>一九三〇年代</b>
+    <span>形式被当成可研究的对象，而不是内容的外衣。这十年里，文学第一次被要求交出它自己的构造图——层次、歧义、杂语、功能、距离。</span>
+    <i>看这十条 →</i>
+  </a>
+  <a class="dec" href="/lit-frontier/1940s/">
+    <div class="y">1940–1949　·　NO.011–020</div>
+    <b>一九四〇年代</b>
+    <span>批评开始为自己立法。内部与外部、意图与效果、行动与形式——这十年划下的那几条界线，此后八十年都在被反复搬动。</span>
+    <i>看这十条 →</i>
+  </a>
+  <a class="dec" href="/lit-frontier/1950s/">
+    <div class="y">1950–1959　·　NO.021–030</div>
+    <b>一九五〇年代</b>
+    <span>文学被放回更大的东西里去：世界、语言、媒介、整体生活方式。批评的对象第一次越出了作品的封面。</span>
+    <i>看这十条 →</i>
+  </a>
+  <a class="dec" href="/lit-frontier/1960s/">
+    <div class="y">1960–1969　·　NO.031–040</div>
+    <b>一九六〇年代</b>
+    <span>裁决权开始转手。从作者手里转到结构、转到读者、转到语言自身——这十年提出的问题，至今还是文学理论的主干道。</span>
+    <i>看这十条 →</i>
+  </a>
+  <a class="dec" href="/lit-frontier/1970s/">
+    <div class="y">1970–1979　·　NO.041–050</div>
+    <b>一九七〇年代</b>
+    <span>两条路同时铺开：一条把叙事拆成可数的零件，一条把文学放回权力与场域。前者给出了装置，后者给出了处境。</span>
+    <i>看这十条 →</i>
+  </a>
+  <a class="dec" href="/lit-frontier/1980s/">
+    <div class="y">1980–1989　·　NO.051–060</div>
+    <b>一九八〇年代</b>
+    <span>理论向外扩张到它的边界：历史、性别、民族、机器。文学不再只是被解释的对象，也成了别的领域借去用的工具。</span>
+    <i>看这十条 →</i>
+  </a>
+  <a class="dec" href="/lit-frontier/1990s/">
+    <div class="y">1990–1999　·　NO.061–070</div>
+    <b>一九九〇年代</b>
+    <span>身份、网络与后人类同时到场。文学开始要回答一个新问题：当载体、身体与边界都可换时，作品还剩下什么。</span>
+    <i>看这十条 →</i>
+  </a>
+  <a class="dec" href="/lit-frontier/2000s/">
+    <div class="y">2000–2009　·　NO.071–080</div>
+    <b>二〇〇〇年代</b>
+    <span>尺度换了。远读要处理没人读过的那百分之九十九，付费连载把节奏写进制度，怀疑本身第一次被放上审判席。</span>
+    <i>看这十条 →</i>
+  </a>
+  <a class="dec" href="/lit-frontier/2010s/">
+    <div class="y">2010–2019　·　NO.081–090</div>
+    <b>二〇一〇年代</b>
+    <span>计算方法成熟，怀疑的姿态退潮，产业把叙事拆成可交易的核。十年末尾，机器写出了第一批读得下去的句子。</span>
+    <i>看这十条 →</i>
+  </a>
+  <a class="dec" href="/lit-frontier/2020s/">
+    <div class="y">2020–2026　·　NO.091–100</div>
+    <b>二〇二〇年代</b>
+    <span>生成不再稀缺。这一段的十条都还在动，它们是本栏真正的前沿——也是最需要被撞、最经不起空话的十条。</span>
+    <i>看这十条 →</i>
+  </a>
+</div>
+
+<div class="hd"><span class="no">源 头</span><h2>不占格的那几条</h2></div>
+<div class="body lead">
+<p>本栏从一九三〇年代起算。再往前那十几年，是这一百年全部争论的起点，列在这里作接口，不占一百格：什克洛夫斯基的<b>手法与陌生化</b>（1917）、艾略特的<b>传统与个人才能</b>（1919）、瑞恰慈的<b>文学批评原理</b>（1924）、什克洛夫斯基的<b>散文理论</b>（1925）、巴赫金圈的<b>复调初论</b>（1929）、以及索绪尔身后出版的<b>语言学教程</b>（1916）所留下的那套符号观。</p>
+<p>后面一百条里，凡是从这六条里长出来的，正文第四节会指回来。</p>
+</div>
+
+<div class="hd"><span class="no">怎 么 用</span><h2>这一百条是拿来撞的</h2></div>
+<div class="body lead">
+<p>用法只有一条：<b>挑三条位置不同的——一条显露、一条差异序列、一条特征纠缠——把它们放在同一个问题上，看谁先失效。</b>先失效的那条不是输，是它把这个问题的边界露出来了。</p>
+<p>挑的时候避开同源：同一个年代内部的十条已经刻意选成互不通气，跨年代挑更好。挑完可以直接把三条的承重命题交给 <a href="/chatfeisuo/" style="color:var(--cinnabar);border-bottom:1px solid var(--rule)">ChatFeiSuo</a> 顶一轮，或在 <a href="/coread/" style="color:var(--cinnabar);border-bottom:1px solid var(--rule)">共读</a> 里就某一条的正文逐段追问。</p>
+</div>
+
+<div class="end">文学新思想前沿 · SDE 文学（liter.sdeuniverses.com）。选目定案版：一百条的承重命题、碰撞位置与失效条件已全部列出；正文按每条两万字的体例逐条写出，写成一条挂一条。凡年份、著录与数据，正文第十节独立列表可核；发现错处即改，并把修正过程写进正文，不悄悄改数。</div>
+</div>
+</div>
+<script>
+(function(){var b="/sites/liter";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatfeisuo/")===0
+  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0||h.indexOf("/dialogue/")===0
+  ||h.indexOf("/foundation/")===0||h.indexOf("/lit-frontier/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>

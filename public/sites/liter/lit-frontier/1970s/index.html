@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>一九七〇年代 · 文学新思想前沿 · SDE 文学</title>
+<meta name="description" content="文学新思想前沿 一九七〇年代（1970–1979）十条：符号方阵、叙事的五组参数、影响的焦虑、历史叙事的转义结构、互文性等。每条列出承重命题、碰撞位置与失效条件。">
+<link rel="canonical" href="https://liter.sdeuniverses.com/lit-frontier/1970s/">
+<meta property="og:title" content="一九七〇年代 · 文学新思想前沿 · SDE 文学">
+<meta property="og:description" content="文学新思想前沿 一九七〇年代（1970–1979）十条：符号方阵、叙事的五组参数、影响的焦虑、历史叙事的转义结构、互文性等。每条列出承重命题、碰撞位置与失效条件。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F7F3E9">
+<style>
+:root{
+  --paper:#F7F3E9; --paper2:#FDFBF5; --ink:#1A1714; --ink2:#6B6255; --ink3:#9A9182;
+  --rule:#CFC5B2; --rule2:#E4DCCB;
+  --cinnabar:#9E3D30; --cinnabar-l:#C25B45;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi",var(--serif);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:16.5px;line-height:1.95}
+a{color:inherit;text-decoration:none}
+.spine{position:fixed;left:0;top:0;bottom:0;width:62px;z-index:40;
+  background:var(--paper);border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;padding:20px 0 18px}
+.spine .nm{writing-mode:vertical-rl;font-family:var(--serif);font-size:20px;
+  letter-spacing:.36em;font-weight:600}
+.spine .sub{writing-mode:vertical-rl;font-family:var(--mono);font-size:10px;
+  letter-spacing:.3em;color:var(--ink3);margin-top:16px}
+.spine .seal{margin-top:auto;width:26px;height:26px;border:1.5px solid var(--cinnabar);
+  color:var(--cinnabar);font-size:13px;line-height:23px;text-align:center;
+  font-family:var(--serif);transform:rotate(-4deg)}
+.page{margin-left:62px}
+@media(max-width:720px){.spine{display:none}.page{margin-left:0}}
+.wrap{max-width:940px;margin:0 auto;padding:0 26px}
+.topbar{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:30;
+  background:rgba(247,243,233,.94);backdrop-filter:saturate(140%) blur(6px)}
+.topbar .wrap{display:flex;align-items:baseline;gap:20px;height:52px;
+  font-family:var(--sans);font-size:13.5px;color:var(--ink2)}
+.topbar .m{display:none;font-family:var(--serif);font-size:17px;letter-spacing:.22em;color:var(--ink)}
+.topbar nav{margin-left:auto;display:flex;gap:19px;overflow-x:auto}
+.topbar nav a{white-space:nowrap}
+.topbar nav a:hover{color:var(--cinnabar)}
+.topbar nav a.out{font-family:var(--mono);font-size:11.5px}
+@media(max-width:720px){.topbar .m{display:block}}
+.masthead{padding:60px 0 0;text-align:center}
+.masthead .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--ink3)}
+.masthead h1{font-family:var(--serif);font-weight:600;margin:.42em 0 .3em;
+  font-size:clamp(30px,6.2vw,54px);letter-spacing:.2em;line-height:1.24}
+.masthead .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--ink3)}
+.dbl{border-top:3px double var(--rule);margin:32px 0 0}
+.motto{max-width:33em;margin:28px auto 0;font-family:var(--kai);font-size:17.5px;
+  line-height:2.1;text-align:center}
+.motto b{font-weight:600;border-bottom:1px solid var(--cinnabar);padding-bottom:1px}
+.hd{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--rule);
+  padding-bottom:9px;margin:52px 0 20px}
+.hd .no{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;color:var(--ink3);flex:none}
+.hd h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.14em;margin:0}
+.hd .ct{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink2);flex:none}
+.lead{color:var(--ink2);font-size:15.5px;line-height:2.05;margin:0 0 22px}
+.body p{margin:0 0 1.15em}
+.body b{font-weight:600}
+/* 年代格 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px}
+.dec{border:1px solid var(--rule);background:var(--paper2);padding:18px 20px 16px;display:block}
+.dec:hover{border-color:var(--cinnabar);box-shadow:0 2px 0 var(--rule2)}
+.dec .y{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--ink3)}
+.dec b{display:block;font-size:19px;letter-spacing:.16em;font-weight:600;margin:5px 0 8px}
+.dec span{display:block;font-size:13.5px;color:var(--ink2);line-height:1.85}
+.dec i{display:block;font-style:normal;font-family:var(--mono);font-size:10.5px;
+  color:var(--cinnabar);margin-top:11px;letter-spacing:.1em}
+/* 条目 */
+.item{border-top:1px solid var(--rule2);padding:22px 0 20px}
+.item:first-of-type{border-top:1px solid var(--rule)}
+.item .top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.item .n{font-family:var(--mono);font-size:11px;color:var(--cinnabar);letter-spacing:.1em;
+  border:1px solid var(--rule);padding:1px 7px;flex:none}
+.item h3{margin:0;font-size:19px;font-weight:600;letter-spacing:.06em}
+.item .yr{font-family:var(--mono);font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.item .who{font-family:var(--sans);font-size:13px;color:var(--ink2);margin:7px 0 10px}
+.item .th{font-family:var(--kai);font-size:17px;line-height:1.95;margin:0 0 12px}
+.rows{display:grid;grid-template-columns:5.6em 1fr;gap:5px 12px;font-size:13.5px;
+  color:var(--ink2);line-height:1.85}
+.rows .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--ink3);
+  padding-top:4px}
+.pos{display:inline-block;border:1px solid var(--cinnabar);color:var(--cinnabar);
+  font-family:var(--mono);font-size:10.5px;padding:1px 7px;letter-spacing:.1em}
+.wait{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;color:var(--ink3);border:1px dashed var(--rule);padding:3px 10px}
+/* 体例表 */
+.spec{border:1px solid var(--rule);background:var(--paper2);padding:22px 26px 18px}
+.spec ol{margin:0;padding-left:1.5em}
+.spec li{margin:0 0 .55em;font-size:14.5px;line-height:1.9;color:var(--ink2)}
+.spec li b{color:var(--ink);font-weight:600}
+.note{border-left:2px solid var(--cinnabar);padding:2px 0 2px 16px;margin:22px 0;
+  font-size:14.5px;color:var(--ink2);line-height:1.95}
+.pager{display:flex;gap:14px;margin:50px 0 0;border-top:1px solid var(--rule);padding-top:20px;
+  font-family:var(--sans);font-size:14px;flex-wrap:wrap}
+.pager a{border:1px solid var(--rule);padding:8px 15px;background:var(--paper2)}
+.pager a:hover{border-color:var(--cinnabar);color:var(--cinnabar)}
+.pager .sp{margin-left:auto}
+.end{margin:56px 0 70px;border-top:1px solid var(--rule);padding-top:18px;
+  font-family:var(--sans);font-size:12.5px;color:var(--ink3);line-height:1.95}
+</style>
+</head>
+<body>
+<div class="spine">
+  <div class="nm">SDE 文学</div>
+  <div class="sub">FEI SUO</div>
+  <div class="seal">斐</div>
+</div>
+<div class="page">
+<header class="topbar"><div class="wrap">
+  <a class="m" href="/">SDE 文学</a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/lit-frontier/">新思想前沿</a>
+    <a href="/foundation/">基础文库</a>
+    <a href="/dialogue/">对谈</a>
+    <a href="/coread/">共读</a>
+    <a href="/all/">全部篇目</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+<div class="wrap">
+
+<div class="masthead">
+  <div class="kicker">文 学 新 思 想 前 沿 · 第 5 个 年 代</div>
+  <h1>一九七〇年代</h1>
+  <div class="en">1970–1979　·　NO.041–050</div>
+  <div class="dbl"></div>
+  <div class="motto">两条路同时铺开：一条把叙事拆成可数的零件，一条把文学放回权力与场域。前者给出了装置，后者给出了处境。</div>
+</div>
+
+<div class="hd"><span class="no">十 条</span><h2>本年代选目</h2><span class="ct">10 条 · 正文在写</span></div>
+<p class="lead">每条先给三样东西：<b>承重命题</b>（一句可被反驳的话）、<b>碰撞位置</b>（它主要在显露、差异序列、特征纠缠哪一格上使力）、<b>它会判错的地方</b>。三样齐了，这条思想才拿得上碰撞台；正文两万字要把它们逐一坐实。</p>
+  <article class="item">
+    <div class="top"><span class="n">041</span><h3>符号方阵</h3><span class="yr">1970</span></div>
+    <div class="who">格雷马斯《论意义》</div>
+    <p class="th">意义由四个位置的对立、矛盾与蕴含关系生成。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">D　差异序列</span></span>
+      <span class="k">它先假定</span><span>语义可被穷尽为二元对立的组合。</span>
+      <span class="k">它会判错</span><span>方阵可套在任何文本上，套上之后不产生新的读数。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+  <article class="item">
+    <div class="top"><span class="n">042</span><h3>叙事的五组参数</h3><span class="yr">1972</span></div>
+    <div class="who">热奈特《叙事话语》</div>
+    <p class="th">叙事可拆成时序、时长、频率、语式、语态五组可测参数。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">S　显露</span></span>
+      <span class="k">它先假定</span><span>故事与话语可分离并各自计量。</span>
+      <span class="k">它会判错</span><span>参数齐备之后，作品的高下仍不可由参数判定。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+  <article class="item">
+    <div class="top"><span class="n">043</span><h3>影响的焦虑</h3><span class="yr">1973</span></div>
+    <div class="who">布鲁姆《影响的焦虑》</div>
+    <p class="th">强诗人靠误读前人来给自己腾出位置，文学史是一场父子相争。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">D　差异序列</span></span>
+      <span class="k">它先假定</span><span>影响关系可由文本内的偏离读出。</span>
+      <span class="k">它会判错</span><span>误读与无关的差异不可区分，归因不可证。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+  <article class="item">
+    <div class="top"><span class="n">044</span><h3>历史叙事的转义结构</h3><span class="yr">1973</span></div>
+    <div class="who">海登·怀特《元史学》</div>
+    <p class="th">史书的深层结构是转义，历史叙事与文学叙事共用形式装置。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">S　显露</span></span>
+      <span class="k">它先假定</span><span>叙事形式可与史料真伪分开考察。</span>
+      <span class="k">它会判错</span><span>形式分析推到底之后，事实这一层无处安放。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+  <article class="item">
+    <div class="top"><span class="n">045</span><h3>互文性</h3><span class="yr">1974</span></div>
+    <div class="who">克里斯蒂娃《诗歌语言的革命》</div>
+    <p class="th">文本是别的文本的换位；符号态与象征态的张力驱动语言革命。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">E　特征纠缠</span></span>
+      <span class="k">它先假定</span><span>文本之间的取用可被追踪。</span>
+      <span class="k">它会判错</span><span>互文一旦被理解为一切文本与一切文本相关，就不再有信息量。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+  <article class="item">
+    <div class="top"><span class="n">046</span><h3>时空体</h3><span class="yr">1975</span></div>
+    <div class="who">巴赫金《文学与美学问题》（写于 1937–38）</div>
+    <p class="th">时间与空间在文本里结成不可分的整体，体裁由时空体决定。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">S　显露</span></span>
+      <span class="k">它先假定</span><span>时空体可从文本读出并归类。</span>
+      <span class="k">它会判错</span><span>新体裁出现时，类型表只能靠扩表吸收。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+  <article class="item">
+    <div class="top"><span class="n">047</span><h3>空白召唤补足</h3><span class="yr">1976</span></div>
+    <div class="who">伊瑟尔《阅读行为》</div>
+    <p class="th">文本的空白召唤读者补足，意义在阅读过程中构成。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">D　差异序列</span></span>
+      <span class="k">它先假定</span><span>空白由文本结构安排，不是任意的省略。</span>
+      <span class="k">它会判错</span><span>空白与写坏了之间，作者不在场时无从裁定。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+  <article class="item">
+    <div class="top"><span class="n">048</span><h3>文学生产方式</h3><span class="yr">1976</span></div>
+    <div class="who">伊格尔顿《批评与意识形态》</div>
+    <p class="th">意识形态经过形式加工才进入作品，中间有可追踪的生产环节。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">E　特征纠缠</span></span>
+      <span class="k">它先假定</span><span>意识形态与形式之间存在可追踪的中介。</span>
+      <span class="k">它会判错</span><span>中介环节太多，任何形式都能被回溯为某种意识形态。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+  <article class="item">
+    <div class="top"><span class="n">049</span><h3>表述即权力</h3><span class="yr">1978</span></div>
+    <div class="who">萨义德《东方学》</div>
+    <p class="th">东方是被表述出来的，知识与权力是同一个过程。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">E　特征纠缠</span></span>
+      <span class="k">它先假定</span><span>表述者与被表述者之间的不对称可被记录。</span>
+      <span class="k">它会判错</span><span>批判本身若沿用同一套表述装置，不对称不减反增。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+  <article class="item">
+    <div class="top"><span class="n">050</span><h3>趣味标记位置</h3><span class="yr">1979</span></div>
+    <div class="who">布尔迪厄《区分》</div>
+    <p class="th">趣味是阶级位置的标记，文学场有自己的位置斗争。</p>
+    <div class="rows">
+      <span class="k">碰撞位置</span><span><span class="pos">E　特征纠缠</span></span>
+      <span class="k">它先假定</span><span>趣味与社会位置之间的对应可统计。</span>
+      <span class="k">它会判错</span><span>对应关系随时代与地域漂移，跨社会移植即失效。</span>
+    </div>
+    <span class="wait">正文两万字 · 筹备中</span>
+  </article>
+
+<div class="pager"><a href="/lit-frontier/1960s/">← 一九六〇年代</a><a href="/lit-frontier/">回栏目总目</a><a class="sp" href="/lit-frontier/1980s/">一九八〇年代 →</a></div>
+<div class="end">文学新思想前沿 · SDE 文学（liter.sdeuniverses.com）。本页所列为选目定案与碰撞接口，正文按一条两万字的体例逐条写出，写成一条挂一条。年份标的是该思想首次公开提出的年份；若它的实际作用延迟到后来，正文里单列一节记这段延迟。</div>
+</div>
+</div>
+<script>
+(function(){var b="/sites/liter";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/chatfeisuo/")===0
+  ||h.indexOf("/cowrite/")===0||h.indexOf("/coread/")===0||h.indexOf("/dialogue/")===0
+  ||h.indexOf("/foundation/")===0||h.indexOf("/lit-frontier/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>
