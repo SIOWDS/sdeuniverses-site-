@@ -138,8 +138,13 @@ def main() -> None:
     print(f"{main_host}: {len(main_urls)} URLs")
 
     for key, urls in subsite_urls.items():
-        host = catalog["subsites"][key]["host"]
-        assert len(urls) > 3, f"{host} sitemap unexpectedly small: {len(urls)}"
+        entry = catalog["subsites"][key]
+        host = entry["host"]
+        # 这条闸是防「抓取悄悄断了」，不是防「站小」。刚开栏的分站页数天生就少，
+        # 让它在登记表里把预期页数写明（min_urls），写明了就按写明的数核；
+        # 没写明一律按 4 —— 免得哪天真断了，被一句"它本来就小"糊弄过去。
+        floor = int(entry.get("min_urls", 4))
+        assert len(urls) >= floor, f"{host} sitemap unexpectedly small: {len(urls)} < {floor}"
         base = PUBLIC / "sites" / key
         write_text(base / "sitemap.xml", sitemap_xml(host, urls))
         write_text(base / "robots.txt", robots_txt(host))

@@ -321,6 +321,21 @@ console.log("── ① 档案表与解析器 ───────────�
     t("math 旧首页已改成跳转页（域名已绑，不许 404）", /mpc\.sdeuniverses\.com/.test(MATHOLD) && /http-equiv="refresh"/.test(MATHOLD));
     t("math 旧首页 noindex（免得两个地址争同一份内容）", /noindex/.test(MATHOLD));
     t("小波老师作者页入口已改指 mpc", /mpc\.sdeuniverses\.com/.test(fs4.readFileSync("public/students/xiaobo/index.html", "utf8")));
+    /* 登记表：未登记的分站会被 Worker 把 canonical 改写掉（comp 至今就是这毛病，
+       它自己的首页声明 canonical 指向主站门户页）。登记即修好。
+       ⚠ ownership 必须留空——写进 path_prefixes 会让 /students/xiaobo/ 被 301 到本分站。 */
+    const SD = JSON.parse(fs4.readFileSync("public/sites/site-data.json", "utf8"));
+    t("mpc 已登记进 site-data.json", !!(SD.subsites && SD.subsites.mpc));
+    t("mpc 登记的 host 对得上", SD.subsites.mpc && SD.subsites.mpc.host === "mpc.sdeuniverses.com");
+    t("mpc 登记了首页的 title 与 description",
+      !!(SD.subsites.mpc.page_meta && SD.subsites.mpc.page_meta["/"] &&
+         SD.subsites.mpc.page_meta["/"].title && SD.subsites.mpc.page_meta["/"].description));
+    t("⭐ mpc 的 ownership 是空的（不许把学员页 301 走）",
+      SD.subsites.mpc.ownership &&
+      (SD.subsites.mpc.ownership.path_prefixes || []).length === 0 &&
+      (SD.subsites.mpc.ownership.book_ids || []).length === 0);
+    t("mpc 的篇数如实记 0（三栏都在开栏中）", SD.subsites.mpc.stats && SD.subsites.mpc.stats.papers === 0);
+    t("别的分站没被这次登记碰掉", ["liter", "lang", "edu", "health"].every((k) => !!SD.subsites[k]));
     t("browse 子网站菜单已改指 mpc", /mpc\.sdeuniverses\.com/.test(fs4.readFileSync("public/browse/index.html", "utf8")));
     t("引擎侧 math 档的落款与角标已换到 mpc", /ChatXiaoBo \\u00b7 mpc\.sdeuniverses\.com/.test(MC) && /MPC\.SDEUNIVERSES\.COM/.test(MC));
     t("服务端 math 档的 home/all 已换到 mpc", /home: "https:\/\/mpc\.sdeuniverses\.com\/"/.test(WC));
