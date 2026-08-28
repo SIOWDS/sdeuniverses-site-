@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDE 共批 · 一处一处地看那份解答 | SDE 数理化</title>
+<meta name="description" content="SDE 共批：把一份解答（或一叠）贴进画布，一处一处地看——第一处走岔在哪、他那个错法在什么条件下其实是对的。数学、物理、化学三科各一扇门。它不判分，也不替学生做题。">
+<link rel="canonical" href="https://mpc.sdeuniverses.com/comark/">
+<meta name="theme-color" content="#F4F6F3">
+<style>
+  :root{--paper:#F4F6F3;--card:#FBFCFA;--ink:#141A21;--ink2:#5A6470;--ink3:#8D97A3;
+    --grid:#D3DCD8;--grid2:#E6ECE8;--blue:#1E4E6E;--blue-l:#3C7FA8;--red:#C0453A;
+    --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+    --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace}
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.85;
+    background:var(--paper);
+    background-image:linear-gradient(var(--grid2) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--grid2) 1px,transparent 1px);
+    background-size:26px 26px}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:820px;margin:0 auto;padding:0 24px}
+  .topbar{border-bottom:1px solid var(--grid);background:rgba(244,246,243,.94)}
+  .topbar .wrap{display:flex;align-items:baseline;gap:20px;height:54px}
+  .brand{font-family:var(--serif);font-size:19px;letter-spacing:.18em;color:var(--blue)}
+  .topbar nav{margin-left:auto;display:flex;gap:18px;font-size:13.5px;color:var(--ink2)}
+  .topbar nav a:hover{color:var(--red)}
+  .hero{padding:56px 0 0}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--blue-l);text-transform:uppercase}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.6vw,40px);line-height:1.3;
+    letter-spacing:.03em;margin:.4em 0 .35em;max-width:16em}
+  .lede{max-width:38em;color:var(--ink2);font-size:15.5px}
+  .lede b{color:var(--ink);font-weight:600}
+  .doors{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:36px 0 0;
+    border:1px solid var(--grid);background:var(--card)}
+  @media(max-width:720px){.doors{grid-template-columns:1fr}
+    .door{border-right:none!important;border-bottom:1px solid var(--grid)}
+    .door:last-child{border-bottom:none}}
+  .door{display:flex;flex-direction:column;padding:22px 22px 20px;border-right:1px solid var(--grid)}
+  .door:last-child{border-right:none}
+  .door:hover{background:#fff}
+  .door .n{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--red)}
+  .door h2{font-family:var(--serif);font-size:20px;letter-spacing:.2em;margin:9px 0 4px;font-weight:600}
+  .door .en{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink3);margin-bottom:10px}
+  .door p{margin:0 0 13px;font-size:13.5px;color:var(--ink2);line-height:1.85}
+  .door .go{margin-top:auto;font-family:var(--mono);font-size:11.5px;color:var(--red);
+    border-top:1px solid var(--grid);padding-top:10px}
+  .note{margin:30px 0 0;border:1px solid var(--grid);background:var(--card);padding:20px 22px}
+  .note p{margin:0 0 12px;font-size:14.5px;color:var(--ink2)}
+  .note p:last-child{margin-bottom:0}
+  .note b{color:var(--ink)}
+  footer{border-top:2px solid var(--ink);margin-top:56px;padding:22px 0 48px;font-size:13px;color:var(--ink2)}
+  footer a{color:var(--blue)}
+  a:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+</style>
+<script>
+/* 【三科共用一台，学科由地址栏那一个参数决定 —— 2026-08-28】
+   共批与共备是跨三科的工具台，而档案是按学科分的，所以得有一处把两者接起来。
+   ⚠ 只认 s= 这一个参数，**并且只认下面白名单里的三个值**：
+     不加白名单，`?s=liter` 就能在数理化站里开出文学那一档，是一次静默的串台。
+   ⚠ 画布那个钩子（WDSM_OPEN）仍然写死在代码里、不从地址栏取——
+     引擎那边留了明话「别做成可以从 URL 塞进来的开关」，这里照办。
+   没带参数（或带了个认不出的）＝不加载引擎，就把下面这张选学科的门面留给读者。 */
+(function () {
+  var OK = { math: 1, physics: 1, chemistry: 1 };
+  var s = (location.search.match(/[?&]s=([a-z]+)/) || [])[1] || "";
+  if (!Object.prototype.hasOwnProperty.call(OK, s)) return;
+  window.WDSM_PAGE = 1;
+  window.WDSM_PROFILE = s;
+  window.WDSM_OPEN = "canvas";
+  var a = document.createElement("script"); a.src = "/taste/assets/sde-handoff.js?v=20260817c";
+  var b = document.createElement("script"); b.src = "/wds-mode.js?v=20260828f"; b.defer = true;
+  document.head.appendChild(a); document.head.appendChild(b);
+})();
+</script>
+</head>
+<body>
+
+<header class="topbar"><div class="wrap">
+  <a class="brand" href="/">SDE 数理化</a>
+  <nav>
+    <a href="/#bots">智能体</a>
+    <a href="/#cols">栏目</a>
+    <a href="/">首页</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<div class="hero">
+<div class="eyebrow">工具台 · 跨三科 · CO-MARKING</div>
+<h1>一份全对的解答，<br>红笔无处可落的时候看什么？</h1>
+<p class="lede">共批台不判分。它做的是把一份解答读回去：他实际走的是哪条路、第一处走岔在哪、那个错法<b>在什么条件下其实是对的</b>。三科各一扇门，进去之后左边画布、右边对话。</p>
+</div>
+
+<div class="doors">
+  <a class="door" href="?s=math">
+    <div class="n">其 一</div>
+    <h2>数　学</h2>
+    <div class="en">MATHEMATICS</div>
+    <p>一份解答、或一叠。先复原他实际走的那条路，找第一处走岔——后面的错都是被它逼出来的，不单独算。</p>
+    <span class="go">开始 →</span>
+  </a>
+  <a class="door" href="?s=physics">
+    <div class="n">其 二</div>
+    <h2>物　理</h2>
+    <div class="en">PHYSICS</div>
+    <p>先问他把哪些算进了系统、边界划在哪、画的是哪张图。一张画错了系统的受力图，后面的代数再漂亮也救不回来。</p>
+    <span class="go">开始 →</span>
+  </a>
+  <a class="door" href="?s=chemistry">
+    <div class="n">其 三</div>
+    <h2>化　学</h2>
+    <div class="en">CHEMISTRY</div>
+    <p>先问他默认的是哪个体系。多数「低级错误」是把一条在旧体系里成立的规则用到了新体系，不是遗忘。</p>
+    <span class="go">开始 →</span>
+  </a>
+</div>
+
+<div class="note">
+  <p><b>怎么用。</b>进去之后左边是画布、右边是对话：把那份解答（或那一叠里的一份）贴进画布，然后一处一处地问。稿子始终在你手上，它的回话不会自动写进正文。</p>
+  <p><b>它不判分。</b>目标不是给这份解答打一个数，是读懂它背后那套理论——他这么算，<b>在什么条件下是对的</b>。找到那个旧范围，才谈得上把边界讲出来。</p>
+  <p><b>它不替学生做题。</b>你把题目丢给它，它默认不会给你一份完整解答，而是先问你到哪一步、卡在哪。这是故意的：直接给答案取消掉的，正好是唯一有用的那个动作。</p>
+  <p>用你自己的大模型 Key 运行，Key 只存在你这台设备的浏览器里，本站不写入数据库、不写进日志。</p>
+</div>
+</div>
+
+<footer><div class="wrap">
+  <p>SDE 共批 —— <a href="https://sdeuniverses.com/">SDE Universes</a> 数理化分站的工具台。三科各一扇门，进去之后是同一台机器、各挂各自那一行的底盘。</p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+
+</body>
+</html>

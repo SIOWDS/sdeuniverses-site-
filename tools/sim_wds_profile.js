@@ -413,8 +413,42 @@ console.log("── ① 档案表与解析器 ───────────�
     t("化学壳页挂 chemistry 档", /WDSM_PROFILE = "chemistry"/.test(CSH));
     t("两张壳页 canonical 指 mpc", /mpc\.sdeuniverses\.com\/physics\//.test(PSH) && /mpc\.sdeuniverses\.com\/chemistry\//.test(CSH));
     t("首页两块已由「筹备中」换成真链接", /href="\/physics\/"/.test(MPC2) && /href="\/chemistry\/"/.test(MPC2) && !/class="soon"/.test(MPC2));
-    t("首页栏一计数已改成三台全开", /3 台 · 全部已开/.test(MPC2));
+    t("首页栏一计数已改成三台学科台全开", /3 台学科/.test(MPC2));
     t("化学入口写明了危险合成不给步骤", /危险合成与制备一律不给步骤/.test(MPC2));
+
+    /* ── ②i 共批与共备两台工具台（2026-08-28）──
+       跨三科，所以学科由地址栏 `?s=` 决定。**必须有白名单**：不加白名单，`?s=liter`
+       就能在数理化站里开出文学那一档，是一次静默的串台，且没有任何报错。
+       画布钩子 WDSM_OPEN 仍写死在代码里、不从地址栏取——引擎那边留了明话。 */
+    const CM = fs4.readFileSync("public/sites/mpc/comark/index.html", "utf8");
+    const CP = fs4.readFileSync("public/sites/mpc/coplan/index.html", "utf8");
+    for (const [nm, H] of [["共批", CM], ["共备", CP]]) {
+      const inline = (H.match(/<script>([\s\S]*?)<\/script>/) || [])[1] || "";
+      t(nm + "台有那段接线脚本", inline.length > 200);
+      const run = (search) => {
+        const w = {}; const doc = { head: { appendChild() {} }, createElement: () => ({}) };
+        try { new Function("location", "document", "window", inline)({ search: search }, doc, w); } catch (e) {}
+        return w;
+      };
+      t(nm + "台 ?s=physics 开物理档", run("?s=physics").WDSM_PROFILE === "physics");
+      t(nm + "台 ?s=chemistry 开化学档", run("?s=chemistry").WDSM_PROFILE === "chemistry");
+      t(nm + "台 ?s=math 开数学档", run("?s=math").WDSM_PROFILE === "math");
+      t("⭐ " + nm + "台挡住站外学科（?s=liter 不许开出文学档）", run("?s=liter").WDSM_PROFILE === undefined);
+      t("⭐ " + nm + "台挡住原型链上的名字（?s=constructor）", run("?s=constructor").WDSM_PROFILE === undefined);
+      t(nm + "台不带参数就不加载引擎（把选学科那张门面留给读者）", run("").WDSM_PROFILE === undefined);
+      t(nm + "台开的是画布那一面", run("?s=math").WDSM_OPEN === "canvas");
+      t("⭐ " + nm + "台的画布钩子写死在代码里，不从地址栏取",
+        /WDSM_OPEN = "canvas"/.test(inline) && !/WDSM_OPEN\s*=\s*[a-z]\b/.test(inline));
+      t(nm + "台三扇门都在且零死链", /\?s=math/.test(H) && /\?s=physics/.test(H) && /\?s=chemistry/.test(H) && !/href="#"/.test(H));
+      t(nm + "台 canonical 指 mpc", /canonical" href="https:\/\/mpc\.sdeuniverses\.com\//.test(H));
+    }
+    t("共批台写明它不判分、也不替学生做题", /目标不是判分|它不判分/.test(CM) && /不替学生做题/.test(CM));
+    t("共备台写明要落地的是学生手上多出一个动作", /多出一个动作/.test(CP));
+    t("首页两张工具台卡已挂上", /href="\/comark\/"/.test(MPC2) && /href="\/coplan\/"/.test(MPC2));
+    t("首页栏一计数已算上工具台", /3 台学科 ＋ 2 台工具/.test(MPC2));
+    const SD2 = JSON.parse(fs4.readFileSync("public/sites/site-data.json", "utf8"));
+    t("登记表收了六页（首页＋三台＋两工具台）",
+      Object.keys(SD2.subsites.mpc.page_meta).length === 6 && SD2.subsites.mpc.min_urls === 6);
 
     /* 登记表：未登记的分站会被 Worker 把 canonical 改写掉（comp 至今就是这毛病，
        它自己的首页声明 canonical 指向主站门户页）。登记即修好。
