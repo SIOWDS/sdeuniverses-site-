@@ -35,7 +35,10 @@ ok("规格表不多不少（与白名单同集）", Object.keys(S.TOOL_SPEC).len
   && Object.keys(S.TOOL_SPEC).every((k) => mKeys[1].includes('"' + k + '"')));
 KEYS.forEach((k) => {
   const sp = S.TOOL_SPEC[k];
-  ok(k + " 有字数地板", typeof sp.min === "number" && sp.min >= 200);
+  /* ⚠ 门槛原来写 200，那是个拍出来的数。sim_tool_each 拿一份照工序正文写全的结构图真跑，
+     实测只有 165 字（围栏里没几个汉字）⇒ map 的地板必须低于它，否则每张合格的图都被判「截短了」。
+     这条守的是「每道都有地板」，不是「地板得多高」；多高由那边的真跑样本管。 */
+  ok(k + " 有字数地板", typeof sp.min === "number" && sp.min >= 100);
   ok(k + " 有 ≥3 件交付件", sp.items && sp.items.length >= 3);
   let bad = "";
   (sp.items || []).forEach((it) => {
