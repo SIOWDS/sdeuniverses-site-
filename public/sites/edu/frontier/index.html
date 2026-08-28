@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>教育新思想前沿 · 教育发生学 · 阳涌</title>
+<meta name="description" content="最近一百年的一百个教育大思想，按十个年代各十个编排，每个思想写成两万字的独立面板：提出现场、原始读数、它推翻了谁、七十年的流变、今天活在哪张表格里、失效条件与碰撞接口。这是一座供二阶碰撞取源的料库，不是一份名人榜。">
+<link rel="canonical" href="https://edu.sdeuniverses.com/frontier/">
+<meta property="og:title" content="教育新思想前沿 · 一百年，一百个思想">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0A0F0D">
+<style>
+:root{
+  --night:#0A0F0D; --night2:#121A17; --bone:#E9E6DC; --bone2:#8E9791;
+  --edge:rgba(233,230,220,.16);
+  --paper:#F3F1EA; --card:#FBFAF5; --ink:#1A1E1C; --ink2:#5C6560; --line:#CFCEC4;
+  --amber:#8A6220; --amber-l:#E0A458; --clay:#A8452F; --clay-l:#D2704F;
+  --teal:#4E8F86; --teal-l:#6FB3A8;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(58% 46% at 16% 0%,rgba(224,164,88,.14),transparent 70%),
+    radial-gradient(46% 42% at 92% 26%,rgba(210,112,79,.10),transparent 72%)}
+.dark .wrap{position:relative;z-index:1}
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:30;
+  background:rgba(10,15,13,.88);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px;max-width:980px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone)}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:16px;font-size:13.5px;color:var(--bone2)}
+.top nav a:hover{color:var(--amber-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+.hero{padding:56px 0 46px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--amber-l);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,5vw,44px);line-height:1.28;
+  letter-spacing:.02em;margin:.5em 0 .4em;color:#F5F2EA}
+.lede{max-width:38em;color:#B7BEB9;font-size:16px}
+.stat{display:flex;flex-wrap:wrap;gap:26px;margin:28px 0 0;font-family:var(--mono);font-size:12px;color:var(--bone2)}
+.stat b{display:block;font-family:var(--serif);font-size:24px;color:var(--amber-l);font-weight:600;line-height:1.3}
+#q{margin:26px 0 0;width:100%;max-width:440px;background:rgba(255,255,255,.05);color:var(--bone);
+  border:1px solid var(--edge);padding:11px 14px;font-size:14.5px;font-family:var(--sans)}
+#q::placeholder{color:var(--bone2)}
+#qn{margin:10px 2px 0;font-family:var(--mono);font-size:11.5px;color:var(--bone2)}
+.jump{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0 0}
+.jump a{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--bone2);
+  border:1px solid var(--edge);padding:6px 11px}
+.jump a:hover{color:var(--amber-l);border-color:var(--amber-l)}
+.light{background:var(--paper)}
+section{padding:48px 0 6px}
+.col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
+.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--amber);white-space:nowrap}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.06em;margin:0}
+.col-h .yr{font-family:var(--mono);font-size:13px;color:var(--clay);letter-spacing:.06em}
+.col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2)}
+.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px;max-width:44em}
+.item{border-bottom:1px dashed var(--line);padding:15px 4px 13px}
+.item:hover{background:var(--card)}
+.it-h{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.it-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);flex:none;min-width:2.2em}
+.it-y{font-family:var(--mono);font-size:11.5px;color:var(--clay);flex:none}
+.it-t{font-family:var(--serif);font-size:17.5px;font-weight:600;letter-spacing:.04em;line-height:1.5}
+.item:hover .it-t{color:var(--amber)}
+.pos{margin-left:auto;flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  color:var(--teal);border:1px solid var(--line);padding:2px 7px}
+.it-b{margin:8px 0 8px 3.4em;font-size:14.5px;color:var(--ink2);line-height:1.8;max-width:44em}
+.it-f{margin-left:3.4em;font-family:var(--mono);font-size:11.5px;color:var(--bone2)}
+.pend{color:#96a09a;border:1px dashed var(--line);padding:2px 8px;display:inline-block}
+@media(max-width:640px){.it-b,.it-f{margin-left:0}.pos{display:none}}
+.app{background:var(--card);border:1px solid var(--line);padding:24px 24px 20px;margin-top:30px}
+.app h3{font-family:var(--serif);font-size:18px;letter-spacing:.06em;margin:0 0 12px;font-weight:600}
+.app p{margin:0 0 12px;font-size:14.5px;line-height:1.8;color:var(--ink2)}
+.app p:last-child{margin-bottom:0}
+.app b{color:var(--ink)}
+.app ol,.app ul{margin:0 0 12px;padding-left:1.5em;font-size:14.5px;color:var(--ink2);line-height:1.85}
+.app li{margin-bottom:5px}
+.app li b{color:var(--ink)}
+.app a{color:var(--amber);border-bottom:1px solid var(--line)}
+footer{background:var(--night);color:var(--bone2);margin-top:60px;border-top:1px solid var(--edge);
+  padding:30px 0 62px;font-size:13px}
+footer a{color:#B3BDB6;border-bottom:1px solid var(--edge)}
+footer p{margin:0 0 8px}
+a:focus-visible{outline:2px solid var(--amber-l);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="dark">
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">教育发生学<em>YANG YONG</em></a>
+  <nav>
+    <a href="/#host">主持人</a>
+    <a href="/#books">教材架</a>
+    <a href="/#kits">教研室</a>
+    <a href="/frontier/">前沿</a>
+    <a href="/all/">全部篇目</a>
+    <a href="/chatyang/">ChatYang</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<div class="hero">
+<div class="eyebrow">教育新思想前沿 · A Century of Educational Ideas</div>
+<h1>一百年，一百个思想，<br>每一个都留着可以被撞开的那道缝。</h1>
+<p class="lede">从一九二六到二〇二六，十个年代，每个年代十个真正改变过教育的思想。每一个写成两万字的独立面板——不是介绍它是谁提的，是把它当年拿出来的读数、它推翻的那条老前提、七十年里它被改写成了什么、今天它活在哪一张表格里，以及它在什么条件下不成立，全部摊开。</p>
+<div class="stat">
+  <div><b>100</b>个思想</div>
+  <div><b>10</b>个年代</div>
+  <div><b>2万字</b>每篇</div>
+  <div><b>0 / 100</b>已成篇</div>
+</div>
+<input id="q" type="search" placeholder="筛选：输入关键词，如 评价 · 动机 · 语言 · 高考 · AI" autocomplete="off">
+<div id="qn"></div>
+<div class="jump">
+  <a href="#d1">1926–1935</a>
+  <a href="#d2">1936–1945</a>
+  <a href="#d3">1946–1955</a>
+  <a href="#d4">1956–1965</a>
+  <a href="#d5">1966–1975</a>
+  <a href="#d6">1976–1985</a>
+  <a href="#d7">1986–1995</a>
+  <a href="#d8">1996–2005</a>
+  <a href="#d9">2006–2015</a>
+  <a href="#d10">2016–2026</a>
+  <a href="#why">为什么按年代排</a><a href="#form">一篇长什么样</a><a href="#use">怎么用来碰撞</a>
+</div>
+</div>
+</div>
+</div>
+
+<div class="light">
+<div class="wrap">
+
+<section id="d1">
+  <div class="col-h"><span class="no">年代 一</span><h2>立基</h2><span class="yr">1926–1935</span><span class="ct">10 个</span></div>
+  <p class="col-d">教育第一次被当作可实验、可测量、可组织的对象；同时，中国乡村与美国实验室各自给出了完全不同的答案。</p>
+  <div class="item" data-k="陶行知：生活即教育 · 教学做合一 教育不发生在课堂里，发生在做事的那一刻；把「做」从教与学之间抽掉，教育就停了。 1927">
+    <div class="it-h"><span class="it-n">001</span><span class="it-y">1927</span><span class="it-t">陶行知：生活即教育 · 教学做合一</span><span class="pos">差异 D</span></div>
+    <p class="it-b">教育不发生在课堂里，发生在做事的那一刻；把「做」从教与学之间抽掉，教育就停了。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="晏阳初：平民教育与定县实验 文盲不是个人缺陷，是愚穷弱私四病的一个断面；单治识字治不好。 1926">
+    <div class="it-h"><span class="it-n">002</span><span class="it-y">1926</span><span class="it-t">晏阳初：平民教育与定县实验</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">文盲不是个人缺陷，是愚穷弱私四病的一个断面；单治识字治不好。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="维果茨基：最近发展区 一个人独立能做的不是他的水平；他在别人扶着时能做的才是。 1933">
+    <div class="it-h"><span class="it-n">003</span><span class="it-y">1933</span><span class="it-t">维果茨基：最近发展区</span><span class="pos">差异 D</span></div>
+    <p class="it-b">一个人独立能做的不是他的水平；他在别人扶着时能做的才是。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="皮亚杰：从他律到自律的道德判断 规则的权威感不是被教会的，是同伴之间协商出来的。 1932">
+    <div class="it-h"><span class="it-n">004</span><span class="it-y">1932</span><span class="it-t">皮亚杰：从他律到自律的道德判断</span><span class="pos">差异 D</span></div>
+    <p class="it-b">规则的权威感不是被教会的，是同伴之间协商出来的。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="怀特海：惰性知识与教育的节奏 不被使用、不被检验、不被重组的知识是有害的，不是无用的。 1929">
+    <div class="it-h"><span class="it-n">005</span><span class="it-y">1929</span><span class="it-t">怀特海：惰性知识与教育的节奏</span><span class="pos">显露 S</span></div>
+    <p class="it-b">不被使用、不被检验、不被重组的知识是有害的，不是无用的。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="巴特莱特：记忆是重构不是复现 回忆不是取出，是按现有图式重造一遍；记错的方向暴露图式。 1932">
+    <div class="it-h"><span class="it-n">006</span><span class="it-y">1932</span><span class="it-t">巴特莱特：记忆是重构不是复现</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">回忆不是取出，是按现有图式重造一遍；记错的方向暴露图式。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="瑟斯顿：态度可以被测量 凡属心理的量，只要能排出等距的判断，就能被数字承载。 1928">
+    <div class="it-h"><span class="it-n">007</span><span class="it-y">1928</span><span class="it-t">瑟斯顿：态度可以被测量</span><span class="pos">显露 S</span></div>
+    <p class="it-b">凡属心理的量，只要能排出等距的判断，就能被数字承载。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="SAT 首考：把出身换成一场考试 统一考试可以把机会从家世手里夺回来重新分配。 1926">
+    <div class="it-h"><span class="it-n">008</span><span class="it-y">1926</span><span class="it-t">SAT 首考：把出身换成一场考试</span><span class="pos">显露 S</span></div>
+    <p class="it-b">统一考试可以把机会从家世手里夺回来重新分配。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="梁漱溟：乡村建设作为教育 中国的问题是文化失调；学校救不了，得从乡村组织重建。 1931">
+    <div class="it-h"><span class="it-n">009</span><span class="it-y">1931</span><span class="it-t">梁漱溟：乡村建设作为教育</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">中国的问题是文化失调；学校救不了，得从乡村组织重建。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="泰勒与八年研究的启动 不按大学入学要求办的中学，学生一样能上好大学——课程可以脱离考试而立。 1933">
+    <div class="it-h"><span class="it-n">010</span><span class="it-y">1933</span><span class="it-t">泰勒与八年研究的启动</span><span class="pos">显露 S</span></div>
+    <p class="it-b">不按大学入学要求办的中学，学生一样能上好大学——课程可以脱离考试而立。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+
+<section id="d2">
+  <div class="col-h"><span class="no">年代 二</span><h2>分岔</h2><span class="yr">1936–1945</span><span class="ct">10 个</span></div>
+  <p class="col-d">同一个十年里，行为主义、发生认识论、人本主义与战时的组织需求同时成熟，四条路从此再没合拢。</p>
+  <div class="item" data-k="蒙台梭利：有准备的环境与吸收性心智 教具与环境替教师承担了大部分教学；成人一插手，专注就断。 1936">
+    <div class="it-h"><span class="it-n">011</span><span class="it-y">1936</span><span class="it-t">蒙台梭利：有准备的环境与吸收性心智</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">教具与环境替教师承担了大部分教学；成人一插手，专注就断。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="杜威：经验的连续性与交互作用 不是所有经验都有教育性；一次经验的价值看它把下一次经验的门开大还是关小。 1938">
+    <div class="it-h"><span class="it-n">012</span><span class="it-y">1938</span><span class="it-t">杜威：经验的连续性与交互作用</span><span class="pos">差异 D</span></div>
+    <p class="it-b">不是所有经验都有教育性；一次经验的价值看它把下一次经验的门开大还是关小。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="皮亚杰：同化 · 顺应 · 平衡 认识不是接收，是已有结构被打破再重建；不平衡是发生的必要条件。 1936">
+    <div class="it-h"><span class="it-n">013</span><span class="it-y">1936</span><span class="it-t">皮亚杰：同化 · 顺应 · 平衡</span><span class="pos">差异 D</span></div>
+    <p class="it-b">认识不是接收，是已有结构被打破再重建；不平衡是发生的必要条件。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="斯金纳：操作条件作用 行为由其后果塑造；改变后果的时序与频率就能改变学习。 1938">
+    <div class="it-h"><span class="it-n">014</span><span class="it-y">1938</span><span class="it-t">斯金纳：操作条件作用</span><span class="pos">差异 D</span></div>
+    <p class="it-b">行为由其后果塑造；改变后果的时序与频率就能改变学习。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="勒温等：三种领导方式下的团体气氛 产出的差别不出自个人能力，出自被安排的关系结构。 1939">
+    <div class="it-h"><span class="it-n">015</span><span class="it-y">1939</span><span class="it-t">勒温等：三种领导方式下的团体气氛</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">产出的差别不出自个人能力，出自被安排的关系结构。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="陈鹤琴：活教育 做中教、做中学、做中求进步；书本中心是把儿童从生活里切出去。 1940">
+    <div class="it-h"><span class="it-n">016</span><span class="it-y">1940</span><span class="it-t">陈鹤琴：活教育</span><span class="pos">差异 D</span></div>
+    <p class="it-b">做中教、做中学、做中求进步；书本中心是把儿童从生活里切出去。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="泰勒：评价是证据不是名次 评价要回答的是「目标是否达成」，不是「谁比谁强」。 1942">
+    <div class="it-h"><span class="it-n">017</span><span class="it-y">1942</span><span class="it-t">泰勒：评价是证据不是名次</span><span class="pos">显露 S</span></div>
+    <p class="it-b">评价要回答的是「目标是否达成」，不是「谁比谁强」。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="罗杰斯：非指导性 改变的资源在当事人身上；指导越多，自我修复的通道越窄。 1942">
+    <div class="it-h"><span class="it-n">018</span><span class="it-y">1942</span><span class="it-t">罗杰斯：非指导性</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">改变的资源在当事人身上；指导越多，自我修复的通道越窄。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="韦特海默：创造性思维 会算面积而不懂它为什么成立的人，遇到变形题就废；理解是结构不是步骤。 1945">
+    <div class="it-h"><span class="it-n">019</span><span class="it-y">1945</span><span class="it-t">韦特海默：创造性思维</span><span class="pos">显露 S</span></div>
+    <p class="it-b">会算面积而不懂它为什么成立的人，遇到变形题就废；理解是结构不是步骤。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="边区教育：教育与生产劳动结合 把学校放进生产过程里，学习的动机与内容被同时解决。 1937–45">
+    <div class="it-h"><span class="it-n">020</span><span class="it-y">1937–45</span><span class="it-t">边区教育：教育与生产劳动结合</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">把学校放进生产过程里，学习的动机与内容被同时解决。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+
+<section id="d3">
+  <div class="col-h"><span class="no">年代 三</span><h2>立制</h2><span class="yr">1946–1955</span><span class="ct">10 个</span></div>
+  <p class="col-d">战后十年把教育变成了可编制、可复制、可判决的制度；四把尺子在这十年里被造出来，今天还在量人。</p>
+  <div class="item" data-k="泰勒原理：课程编制的四个问题 任何课程都可还原为目标、经验、组织、评价四问，而四问以目标为首。 1949">
+    <div class="it-h"><span class="it-n">021</span><span class="it-y">1949</span><span class="it-t">泰勒原理：课程编制的四个问题</span><span class="pos">显露 S</span></div>
+    <p class="it-b">任何课程都可还原为目标、经验、组织、评价四问，而四问以目标为首。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="斯金纳：程序教学与教学机器 把知识切成小步、每步立即反馈，个体化教学就能被机器规模化。 1954">
+    <div class="it-h"><span class="it-n">022</span><span class="it-y">1954</span><span class="it-t">斯金纳：程序教学与教学机器</span><span class="pos">显露 S</span></div>
+    <p class="it-b">把知识切成小步、每步立即反馈，个体化教学就能被机器规模化。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="克伦巴赫：α 系数 一份测验值不值得信，可以从题目之间的一致性算出来。 1951">
+    <div class="it-h"><span class="it-n">023</span><span class="it-y">1951</span><span class="it-t">克伦巴赫：α 系数</span><span class="pos">显露 S</span></div>
+    <p class="it-b">一份测验值不值得信，可以从题目之间的一致性算出来。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="韦克斯勒：离差智商 智力不是心理年龄的比值，是同龄人分布里的位置。 1949">
+    <div class="it-h"><span class="it-n">024</span><span class="it-y">1949</span><span class="it-t">韦克斯勒：离差智商</span><span class="pos">显露 S</span></div>
+    <p class="it-b">智力不是心理年龄的比值，是同龄人分布里的位置。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="布朗诉托皮卡教育局案 隔离的教育设施天然不平等——分开本身就是伤害，与设施是否等同无关。 1954">
+    <div class="it-h"><span class="it-n">025</span><span class="it-y">1954</span><span class="it-t">布朗诉托皮卡教育局案</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">隔离的教育设施天然不平等——分开本身就是伤害，与设施是否等同无关。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="皮亚杰：发生认识论 知识的性质要到它发生的过程里去找，不在逻辑的终点。 1950">
+    <div class="it-h"><span class="it-n">026</span><span class="it-y">1950</span><span class="it-t">皮亚杰：发生认识论</span><span class="pos">差异 D</span></div>
+    <p class="it-b">知识的性质要到它发生的过程里去找，不在逻辑的终点。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="凯洛夫《教育学》与「双基」 教学是有组织地传授系统知识；基础知识与基本技能是学校的主业。 1948">
+    <div class="it-h"><span class="it-n">027</span><span class="it-y">1948</span><span class="it-t">凯洛夫《教育学》与「双基」</span><span class="pos">显露 S</span></div>
+    <p class="it-b">教学是有组织地传授系统知识；基础知识与基本技能是学校的主业。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="马斯洛：需要层次 低阶需要未被满足时，高阶的学习动机根本不出现。 1954">
+    <div class="it-h"><span class="it-n">028</span><span class="it-y">1954</span><span class="it-t">马斯洛：需要层次</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">低阶需要未被满足时，高阶的学习动机根本不出现。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="苏霍姆林斯基：帕夫雷什的全面和谐 智育的成败取决于德育、劳动与情感是否同时在场。 1948">
+    <div class="it-h"><span class="it-n">029</span><span class="it-y">1948</span><span class="it-t">苏霍姆林斯基：帕夫雷什的全面和谐</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">智育的成败取决于德育、劳动与情感是否同时在场。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="听说法与语言实验室 语言是一套习惯，靠模仿、重复与强化形成，不靠讲解规则。 1950s">
+    <div class="it-h"><span class="it-n">030</span><span class="it-y">1950s</span><span class="it-t">听说法与语言实验室</span><span class="pos">差异 D</span></div>
+    <p class="it-b">语言是一套习惯，靠模仿、重复与强化形成，不靠讲解规则。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+
+<section id="d4">
+  <div class="col-h"><span class="no">年代 四</span><h2>认知革命</h2><span class="yr">1956–1965</span><span class="ct">10 个</span></div>
+  <p class="col-d">黑箱被撬开。学习第一次被当作内部结构的变化来谈，而不是行为的频率。</p>
+  <div class="item" data-k="布鲁姆：教育目标分类学 教育目标可以按认知复杂度排成累积的层级，且层级可被检验。 1956">
+    <div class="it-h"><span class="it-n">031</span><span class="it-y">1956</span><span class="it-t">布鲁姆：教育目标分类学</span><span class="pos">显露 S</span></div>
+    <p class="it-b">教育目标可以按认知复杂度排成累积的层级，且层级可被检验。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="米勒：神奇的数字七 即时加工的容量有限且可数；组块是绕过这个限制的唯一办法。 1956">
+    <div class="it-h"><span class="it-n">032</span><span class="it-y">1956</span><span class="it-t">米勒：神奇的数字七</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">即时加工的容量有限且可数；组块是绕过这个限制的唯一办法。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="斯普特尼克冲击与新数学运动 课程内容应由学科专家按学科结构定，而不是由教学便利定。 1957–">
+    <div class="it-h"><span class="it-n">033</span><span class="it-y">1957–</span><span class="it-t">斯普特尼克冲击与新数学运动</span><span class="pos">显露 S</span></div>
+    <p class="it-b">课程内容应由学科专家按学科结构定，而不是由教学便利定。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="乔姆斯基评斯金纳 儿童说出从未听过的句子，强化史解释不了；语言能力不是习惯。 1959">
+    <div class="it-h"><span class="it-n">034</span><span class="it-y">1959</span><span class="it-t">乔姆斯基评斯金纳</span><span class="pos">差异 D</span></div>
+    <p class="it-b">儿童说出从未听过的句子，强化史解释不了；语言能力不是习惯。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="布鲁纳：学科结构与螺旋课程 任何学科都能以某种诚实的形式教给任何发展阶段的儿童。 1960">
+    <div class="it-h"><span class="it-n">035</span><span class="it-y">1960</span><span class="it-t">布鲁纳：学科结构与螺旋课程</span><span class="pos">显露 S</span></div>
+    <p class="it-b">任何学科都能以某种诚实的形式教给任何发展阶段的儿童。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="舒尔茨：人力资本 教育支出是投资不是消费，其收益可以像资本一样被计算。 1961">
+    <div class="it-h"><span class="it-n">036</span><span class="it-y">1961</span><span class="it-t">舒尔茨：人力资本</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">教育支出是投资不是消费，其收益可以像资本一样被计算。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="班杜拉：观察学习与替代强化 不必亲自受强化也能学会；看见别人受什么后果就够了。 1961">
+    <div class="it-h"><span class="it-n">037</span><span class="it-y">1961</span><span class="it-t">班杜拉：观察学习与替代强化</span><span class="pos">差异 D</span></div>
+    <p class="it-b">不必亲自受强化也能学会；看见别人受什么后果就够了。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="奥苏贝尔：有意义学习与先行组织者 影响学习的最重要因素是学习者已经知道什么；接受学习不等于机械学习。 1963">
+    <div class="it-h"><span class="it-n">038</span><span class="it-y">1963</span><span class="it-t">奥苏贝尔：有意义学习与先行组织者</span><span class="pos">差异 D</span></div>
+    <p class="it-b">影响学习的最重要因素是学习者已经知道什么；接受学习不等于机械学习。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="加涅：学习的条件与教学事件 不同类型的学习结果需要不同的内外条件，教学要按类型分别设计。 1965">
+    <div class="it-h"><span class="it-n">039</span><span class="it-y">1965</span><span class="it-t">加涅：学习的条件与教学事件</span><span class="pos">显露 S</span></div>
+    <p class="it-b">不同类型的学习结果需要不同的内外条件，教学要按类型分别设计。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="皮亚杰与英海尔德：形式运算 青少年才获得对「可能性」而非「现实性」做运算的能力。 1958">
+    <div class="it-h"><span class="it-n">040</span><span class="it-y">1958</span><span class="it-t">皮亚杰与英海尔德：形式运算</span><span class="pos">差异 D</span></div>
+    <p class="it-b">青少年才获得对「可能性」而非「现实性」做运算的能力。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+
+<section id="d5">
+  <div class="col-h"><span class="no">年代 五</span><h2>批判</h2><span class="yr">1966–1975</span><span class="ct">10 个</span></div>
+  <p class="col-d">学校第一次被放到被告席上。这十年产出的不是更好的教法，是「学校到底在做什么」的重新定性。</p>
+  <div class="item" data-k="科尔曼报告 学校之间的资源差异对成绩的解释力，远小于家庭背景与同伴构成。 1966">
+    <div class="it-h"><span class="it-n">041</span><span class="it-y">1966</span><span class="it-t">科尔曼报告</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">学校之间的资源差异对成绩的解释力，远小于家庭背景与同伴构成。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="斯克里文：形成性与总结性 同一份材料，用来改进过程还是用来下判决，是两种不能混用的评价。 1967">
+    <div class="it-h"><span class="it-n">042</span><span class="it-y">1967</span><span class="it-t">斯克里文：形成性与总结性</span><span class="pos">显露 S</span></div>
+    <p class="it-b">同一份材料，用来改进过程还是用来下判决，是两种不能混用的评价。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="布鲁姆：掌握学习 若允许时间变化，绝大多数学生都能达到同一水平；能力差异大半是时间差异。 1968">
+    <div class="it-h"><span class="it-n">043</span><span class="it-y">1968</span><span class="it-t">布鲁姆：掌握学习</span><span class="pos">差异 D</span></div>
+    <p class="it-b">若允许时间变化，绝大多数学生都能达到同一水平；能力差异大半是时间差异。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="罗森塔尔与雅各布森：教师期望 教师对某个学生的预期，会经由日常互动改变该学生的实际表现。 1968">
+    <div class="it-h"><span class="it-n">044</span><span class="it-y">1968</span><span class="it-t">罗森塔尔与雅各布森：教师期望</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">教师对某个学生的预期，会经由日常互动改变该学生的实际表现。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="弗莱雷：被压迫者教育学 把学生当存钱罐来存放知识的教育，本身就是压迫的形式。 1970">
+    <div class="it-h"><span class="it-n">045</span><span class="it-y">1970</span><span class="it-t">弗莱雷：被压迫者教育学</span><span class="pos">差异 D</span></div>
+    <p class="it-b">把学生当存钱罐来存放知识的教育，本身就是压迫的形式。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="柯尔伯格：道德判断的阶段 道德成熟看的是给理由的结构，不是行为是否合规。 1969">
+    <div class="it-h"><span class="it-n">046</span><span class="it-y">1969</span><span class="it-t">柯尔伯格：道德判断的阶段</span><span class="pos">差异 D</span></div>
+    <p class="it-b">道德成熟看的是给理由的结构，不是行为是否合规。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="伊里奇：去学校化社会 学校教给人的第一课是「没有机构认证的学习不算数」。 1971">
+    <div class="it-h"><span class="it-n">047</span><span class="it-y">1971</span><span class="it-t">伊里奇：去学校化社会</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">学校教给人的第一课是「没有机构认证的学习不算数」。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="布迪厄与帕斯隆：文化资本与再生产 学校用一套家庭已先给了一部分人的语汇来评分，于是把出身译成了能力。 1970">
+    <div class="it-h"><span class="it-n">048</span><span class="it-y">1970</span><span class="it-t">布迪厄与帕斯隆：文化资本与再生产</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">学校用一套家庭已先给了一部分人的语汇来评分，于是把出身译成了能力。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="诺尔斯：成人教育学 成人的学习由自我概念、经验储备与即时应用需求驱动，不能照搬儿童教学法。 1970">
+    <div class="it-h"><span class="it-n">049</span><span class="it-y">1970</span><span class="it-t">诺尔斯：成人教育学</span><span class="pos">差异 D</span></div>
+    <p class="it-b">成人的学习由自我概念、经验储备与即时应用需求驱动，不能照搬儿童教学法。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="芝麻街 大众媒介可以在没有教师、没有教室的条件下产生可测的学前干预效果。 1969">
+    <div class="it-h"><span class="it-n">050</span><span class="it-y">1969</span><span class="it-t">芝麻街</span><span class="pos">显露 S</span></div>
+    <p class="it-b">大众媒介可以在没有教师、没有教室的条件下产生可测的学前干预效果。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+
+<section id="d6">
+  <div class="col-h"><span class="no">年代 六</span><h2>转向实践者</h2><span class="yr">1976–1985</span><span class="ct">10 个</span></div>
+  <p class="col-d">目光从课程与制度移到了「站在教室里的那个人」和「他脑子里正在发生什么」。</p>
+  <div class="item" data-k="鲍尔斯与金蒂斯：对应原理 学校的社会关系复制了工作场所的社会关系；隐性课程比显性课程更有效。 1976">
+    <div class="it-h"><span class="it-n">051</span><span class="it-y">1976</span><span class="it-t">鲍尔斯与金蒂斯：对应原理</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">学校的社会关系复制了工作场所的社会关系；隐性课程比显性课程更有效。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="恢复高考 一场统一考试可以在一夜之间重建整个社会的向上通道与学习动机。 1977">
+    <div class="it-h"><span class="it-n">052</span><span class="it-y">1977</span><span class="it-t">恢复高考</span><span class="pos">显露 S</span></div>
+    <p class="it-b">一场统一考试可以在一夜之间重建整个社会的向上通道与学习动机。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="《社会中的心智》英译：维果茨基的第二次出场 高级心理机能先在人与人之间发生，再转到人的内部。 1978">
+    <div class="it-h"><span class="it-n">053</span><span class="it-y">1978</span><span class="it-t">《社会中的心智》英译：维果茨基的第二次出场</span><span class="pos">差异 D</span></div>
+    <p class="it-b">高级心理机能先在人与人之间发生，再转到人的内部。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="弗拉维尔：元认知 对自己认知过程的监控本身是可教、可测的一层能力。 1979">
+    <div class="it-h"><span class="it-n">054</span><span class="it-y">1979</span><span class="it-t">弗拉维尔：元认知</span><span class="pos">差异 D</span></div>
+    <p class="it-b">对自己认知过程的监控本身是可教、可测的一层能力。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="帕佩特：Mindstorms 学习需要可被摆弄的思维对象；调试程序时孩子调试的是自己的想法。 1980">
+    <div class="it-h"><span class="it-n">055</span><span class="it-y">1980</span><span class="it-t">帕佩特：Mindstorms</span><span class="pos">差异 D</span></div>
+    <p class="it-b">学习需要可被摆弄的思维对象；调试程序时孩子调试的是自己的想法。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="克拉申：输入假说 语言习得靠可理解的输入，有意识的规则学习只能当监控器。 1982">
+    <div class="it-h"><span class="it-n">056</span><span class="it-y">1982</span><span class="it-t">克拉申：输入假说</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">语言习得靠可理解的输入，有意识的规则学习只能当监控器。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="加德纳：多元智能 智力不是一个量，是若干相对独立、各有神经基础的能力。 1983">
+    <div class="it-h"><span class="it-n">057</span><span class="it-y">1983</span><span class="it-t">加德纳：多元智能</span><span class="pos">显露 S</span></div>
+    <p class="it-b">智力不是一个量，是若干相对独立、各有神经基础的能力。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="舍恩：反思性实践者 专业的核心不是应用理论，是在行动中与不确定情境对话。 1983">
+    <div class="it-h"><span class="it-n">058</span><span class="it-y">1983</span><span class="it-t">舍恩：反思性实践者</span><span class="pos">差异 D</span></div>
+    <p class="it-b">专业的核心不是应用理论，是在行动中与不确定情境对话。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="《国家在危机中》 教育质量是国家安全问题，须以统一标准与测验来问责。 1983">
+    <div class="it-h"><span class="it-n">059</span><span class="it-y">1983</span><span class="it-t">《国家在危机中》</span><span class="pos">显露 S</span></div>
+    <p class="it-b">教育质量是国家安全问题，须以统一标准与测验来问责。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="布鲁姆：两个标准差问题 一对一辅导比常规班级教学高两个标准差；问题是如何在班级里逼近它。 1984">
+    <div class="it-h"><span class="it-n">060</span><span class="it-y">1984</span><span class="it-t">布鲁姆：两个标准差问题</span><span class="pos">显露 S</span></div>
+    <p class="it-b">一对一辅导比常规班级教学高两个标准差；问题是如何在班级里逼近它。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+
+<section id="d7">
+  <div class="col-h"><span class="no">年代 七</span><h2>情境与共同体</h2><span class="yr">1986–1995</span><span class="ct">10 个</span></div>
+  <p class="col-d">学习被从个体脑袋里搬出来，安放到活动、工具与共同体之间；同时，标准运动开始建它的全球基础设施。</p>
+  <div class="item" data-k="舒尔曼：学科教学知识 教师的专业知识既不是学科知识也不是教法知识，是把学科转化成可教形式的那一层。 1986">
+    <div class="it-h"><span class="it-n">061</span><span class="it-y">1986</span><span class="it-t">舒尔曼：学科教学知识</span><span class="pos">差异 D</span></div>
+    <p class="it-b">教师的专业知识既不是学科知识也不是教法知识，是把学科转化成可教形式的那一层。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="德韦克：能力的内隐理论 认为能力固定还是可变，会改变学生在失败面前的全部反应模式。 1988">
+    <div class="it-h"><span class="it-n">062</span><span class="it-y">1988</span><span class="it-t">德韦克：能力的内隐理论</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">认为能力固定还是可变，会改变学生在失败面前的全部反应模式。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="柯林斯等：认知学徒制 专家的思维过程是隐蔽的；教学要把它外显、示范，再逐步撤走支架。 1989">
+    <div class="it-h"><span class="it-n">063</span><span class="it-y">1989</span><span class="it-t">柯林斯等：认知学徒制</span><span class="pos">差异 D</span></div>
+    <p class="it-b">专家的思维过程是隐蔽的；教学要把它外显、示范，再逐步撤走支架。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="布朗等：情境认知 知识与它被使用的活动和文化不可分割；脱境的知识是另一种知识。 1989">
+    <div class="it-h"><span class="it-n">064</span><span class="it-y">1989</span><span class="it-t">布朗等：情境认知</span><span class="pos">差异 D</span></div>
+    <p class="it-b">知识与它被使用的活动和文化不可分割；脱境的知识是另一种知识。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="NCTM 标准：标准运动的诞生 先写出全国统一的内容与表现标准，教学与评价随后对齐。 1989">
+    <div class="it-h"><span class="it-n">065</span><span class="it-y">1989</span><span class="it-t">NCTM 标准：标准运动的诞生</span><span class="pos">显露 S</span></div>
+    <p class="it-b">先写出全国统一的内容与表现标准，教学与评价随后对齐。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="齐克森米哈伊：心流 挑战与技能匹配时出现的最优体验，本身就是持续投入的动力来源。 1990">
+    <div class="it-h"><span class="it-n">066</span><span class="it-y">1990</span><span class="it-t">齐克森米哈伊：心流</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">挑战与技能匹配时出现的最优体验，本身就是持续投入的动力来源。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="罗戈夫：引导性参与 认知发展的单位不是个体，是被文化安排好的共同活动。 1990">
+    <div class="it-h"><span class="it-n">067</span><span class="it-y">1990</span><span class="it-t">罗戈夫：引导性参与</span><span class="pos">差异 D</span></div>
+    <p class="it-b">认知发展的单位不是个体，是被文化安排好的共同活动。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="莱夫与温格：合法的边缘性参与 学习是身份的变化，是从共同体边缘走向核心，不是知识的转移。 1991">
+    <div class="it-h"><span class="it-n">068</span><span class="it-y">1991</span><span class="it-t">莱夫与温格：合法的边缘性参与</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">学习是身份的变化，是从共同体边缘走向核心，不是知识的转移。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="楚布与莫：政治、市场与美国学校 学校低效的根源是民主政治的直接控制；市场与自主可以替代问责。 1990">
+    <div class="it-h"><span class="it-n">069</span><span class="it-y">1990</span><span class="it-t">楚布与莫：政治、市场与美国学校</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">学校低效的根源是民主政治的直接控制；市场与自主可以替代问责。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="TIMSS 与国际大规模测评的常态化 跨国可比的成绩排名可以充当各国教育政策的外部裁判。 1995">
+    <div class="it-h"><span class="it-n">070</span><span class="it-y">1995</span><span class="it-t">TIMSS 与国际大规模测评的常态化</span><span class="pos">显露 S</span></div>
+    <p class="it-b">跨国可比的成绩排名可以充当各国教育政策的外部裁判。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+
+<section id="d8">
+  <div class="col-h"><span class="no">年代 八</span><h2>对齐与问责</h2><span class="yr">1996–2005</span><span class="ct">10 个</span></div>
+  <p class="col-d">这十年把前七十年的一切折算成了可对齐、可上报、可比较的表格；今天教师填的每一张表几乎都出自这里。</p>
+  <div class="item" data-k="比格斯：建构性对齐 只要目标、活动与评价三者对齐，学生的应试策略就等于我们想要的学习。 1996">
+    <div class="it-h"><span class="it-n">071</span><span class="it-y">1996</span><span class="it-t">比格斯：建构性对齐</span><span class="pos">显露 S</span></div>
+    <p class="it-b">只要目标、活动与评价三者对齐，学生的应试策略就等于我们想要的学习。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="布莱克与威廉：黑箱之内 加强课堂形成性评价所产生的成绩增益，可与任何其他干预相比。 1998">
+    <div class="it-h"><span class="it-n">072</span><span class="it-y">1998</span><span class="it-t">布莱克与威廉：黑箱之内</span><span class="pos">显露 S</span></div>
+    <p class="it-b">加强课堂形成性评价所产生的成绩增益，可与任何其他干预相比。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="温格：实践共同体 意义在实践中协商而成；共同体靠相互参与、共同事业与共享技艺库维持。 1998">
+    <div class="it-h"><span class="it-n">073</span><span class="it-y">1998</span><span class="it-t">温格：实践共同体</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">意义在实践中协商而成；共同体靠相互参与、共同事业与共享技艺库维持。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="维金斯与麦克泰：追求理解的教学设计 先定预期结果与验收证据，再设计活动——逆向设计。 1998">
+    <div class="it-h"><span class="it-n">074</span><span class="it-y">1998</span><span class="it-t">维金斯与麦克泰：追求理解的教学设计</span><span class="pos">显露 S</span></div>
+    <p class="it-b">先定预期结果与验收证据，再设计活动——逆向设计。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="斯威勒：认知负荷理论的教学化 教学效果由工作记忆负荷决定；无关负荷必须被设计掉。 1998">
+    <div class="it-h"><span class="it-n">075</span><span class="it-y">1998</span><span class="it-t">斯威勒：认知负荷理论的教学化</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">教学效果由工作记忆负荷决定；无关负荷必须被设计掉。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="PISA 可比的是运用知识解决真实问题的能力，不是课程内容的掌握。 2000">
+    <div class="it-h"><span class="it-n">076</span><span class="it-y">2000</span><span class="it-t">PISA</span><span class="pos">显露 S</span></div>
+    <p class="it-b">可比的是运用知识解决真实问题的能力，不是课程内容的掌握。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="安德森与克拉斯沃尔：分类学修订 目标是知识维度与认知过程维度的二维交叉，不是一维阶梯。 2001">
+    <div class="it-h"><span class="it-n">077</span><span class="it-y">2001</span><span class="it-t">安德森与克拉斯沃尔：分类学修订</span><span class="pos">显露 S</span></div>
+    <p class="it-b">目标是知识维度与认知过程维度的二维交叉，不是一维阶梯。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="中国新课程改革与三维目标 一节课要同时交出知识与技能、过程与方法、情感态度与价值观。 2001">
+    <div class="it-h"><span class="it-n">078</span><span class="it-y">2001</span><span class="it-t">中国新课程改革与三维目标</span><span class="pos">显露 S</span></div>
+    <p class="it-b">一节课要同时交出知识与技能、过程与方法、情感态度与价值观。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="德西与瑞安：自我决定论 自主、胜任、归属被满足时动机才内化；外部奖励会把它挤出去。 2000">
+    <div class="it-h"><span class="it-n">079</span><span class="it-y">2000</span><span class="it-t">德西与瑞安：自我决定论</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">自主、胜任、归属被满足时动机才内化；外部奖励会把它挤出去。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="NCLB：以测验为杠杆的问责 把测验结果与后果绑定，学校就会自己改进。 2002">
+    <div class="it-h"><span class="it-n">080</span><span class="it-y">2002</span><span class="it-t">NCLB：以测验为杠杆的问责</span><span class="pos">显露 S</span></div>
+    <p class="it-b">把测验结果与后果绑定，学校就会自己改进。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+
+<section id="d9">
+  <div class="col-h"><span class="no">年代 九</span><h2>证据为王</h2><span class="yr">2006–2015</span><span class="ct">10 个</span></div>
+  <p class="col-d">元分析、效应量与随机对照实验成了教育话语的通货；同一个十年，规模化在线学习第一次许诺要终结稀缺。</p>
+  <div class="item" data-k="柯什纳、斯威勒与克拉克：最少指导为何失败 新手在缺乏充分指导时无法有效发现；发现学习违反人类认知架构。 2006">
+    <div class="it-h"><span class="it-n">081</span><span class="it-y">2006</span><span class="it-t">柯什纳、斯威勒与克拉克：最少指导为何失败</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">新手在缺乏充分指导时无法有效发现；发现学习违反人类认知架构。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="罗迪格与卡皮克：检索练习 把知识取出来比再看一遍更能造成长期保持；主观感觉与实际效果相反。 2006">
+    <div class="it-h"><span class="it-n">082</span><span class="it-y">2006</span><span class="it-t">罗迪格与卡皮克：检索练习</span><span class="pos">差异 D</span></div>
+    <p class="it-b">把知识取出来比再看一遍更能造成长期保持；主观感觉与实际效果相反。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="德韦克：成长型思维 可以通过改变学生对能力的信念来改变其成就轨迹。 2006">
+    <div class="it-h"><span class="it-n">083</span><span class="it-y">2006</span><span class="it-t">德韦克：成长型思维</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">可以通过改变学生对能力的信念来改变其成就轨迹。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="达克沃斯：坚毅 长期成就的差异主要来自对长远目标的持久热情与毅力，而非天赋。 2007">
+    <div class="it-h"><span class="it-n">084</span><span class="it-y">2007</span><span class="it-t">达克沃斯：坚毅</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">长期成就的差异主要来自对长远目标的持久热情与毅力，而非天赋。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="学习进阶 课程标准应写成经验性的发展序列，而不是按年级切分的清单。 2007">
+    <div class="it-h"><span class="it-n">085</span><span class="it-y">2007</span><span class="it-t">学习进阶</span><span class="pos">差异 D</span></div>
+    <p class="it-b">课程标准应写成经验性的发展序列，而不是按年级切分的清单。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="哈蒂：可见的学习 把上千项元分析折成同一把效应量尺子，就能给教学干预排出高下。 2009">
+    <div class="it-h"><span class="it-n">086</span><span class="it-y">2009</span><span class="it-t">哈蒂：可见的学习</span><span class="pos">显露 S</span></div>
+    <p class="it-b">把上千项元分析折成同一把效应量尺子，就能给教学干预排出高下。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="Common Core 全国共享一套内容标准，可以同时提升质量与流动性。 2010">
+    <div class="it-h"><span class="it-n">087</span><span class="it-y">2010</span><span class="it-t">Common Core</span><span class="pos">显露 S</span></div>
+    <p class="it-b">全国共享一套内容标准，可以同时提升质量与流动性。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="比约克：合意困难 让学习当下变慢变难的安排，反而提高长期保持与迁移。 2011">
+    <div class="it-h"><span class="it-n">088</span><span class="it-y">2011</span><span class="it-t">比约克：合意困难</span><span class="pos">差异 D</span></div>
+    <p class="it-b">让学习当下变慢变难的安排，反而提高长期保持与迁移。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="MOOC 与规模化在线学习 把最好的课程边际成本降到近零，优质教育就能规模化。 2012">
+    <div class="it-h"><span class="it-n">089</span><span class="it-y">2012</span><span class="it-t">MOOC 与规模化在线学习</span><span class="pos">显露 S</span></div>
+    <p class="it-b">把最好的课程边际成本降到近零，优质教育就能规模化。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="弗里曼等：主动学习的元分析 讲授式课堂的挂科率显著高于主动学习课堂，证据强到不该再拿讲授当对照组。 2014">
+    <div class="it-h"><span class="it-n">090</span><span class="it-y">2014</span><span class="it-t">弗里曼等：主动学习的元分析</span><span class="pos">显露 S</span></div>
+    <p class="it-b">讲授式课堂的挂科率显著高于主动学习课堂，证据强到不该再拿讲授当对照组。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+
+<section id="d10">
+  <div class="col-h"><span class="no">年代 十</span><h2>承重转换</h2><span class="yr">2016–2026</span><span class="ct">10 个</span></div>
+  <p class="col-d">前九十年攒下的证据、标准与信念，在复制危机、停课与生成式 AI 的三次冲击里同时被要求重新过秤。</p>
+  <div class="item" data-k="中国学生发展核心素养 课程的目标单位应是跨学科的素养，而不是分科的知识点。 2016">
+    <div class="it-h"><span class="it-n">091</span><span class="it-y">2016</span><span class="it-t">中国学生发展核心素养</span><span class="pos">显露 S</span></div>
+    <p class="it-b">课程的目标单位应是跨学科的素养，而不是分科的知识点。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="复制危机进入教育心理学 成长型思维与坚毅在大样本元分析里的效应量，小到不足以支撑其政策地位。 2017–18">
+    <div class="it-h"><span class="it-n">092</span><span class="it-y">2017–18</span><span class="it-t">复制危机进入教育心理学</span><span class="pos">显露 S</span></div>
+    <p class="it-b">成长型思维与坚毅在大样本元分析里的效应量，小到不足以支撑其政策地位。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="OECD 学习指南针 2030 教育的目标是学生的能动性与共同能动性，而不是可预测的产出。 2018">
+    <div class="it-h"><span class="it-n">093</span><span class="it-y">2018</span><span class="it-t">OECD 学习指南针 2030</span><span class="pos">差异 D</span></div>
+    <p class="it-b">教育的目标是学生的能动性与共同能动性，而不是可预测的产出。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="阅读的科学之争 解码必须被系统直接地教；平衡阅读法把最需要教的那一步留给了猜。 2018–">
+    <div class="it-h"><span class="it-n">094</span><span class="it-y">2018–</span><span class="it-t">阅读的科学之争</span><span class="pos">差异 D</span></div>
+    <p class="it-b">解码必须被系统直接地教；平衡阅读法把最需要教的那一步留给了猜。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="全球停课与学习损失 学习进度可以被折算成「损失的月数」，并按此设计补救。 2020">
+    <div class="it-h"><span class="it-n">095</span><span class="it-y">2020</span><span class="it-t">全球停课与学习损失</span><span class="pos">显露 S</span></div>
+    <p class="it-b">学习进度可以被折算成「损失的月数」，并按此设计补救。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="建构思维的课堂 学生在课堂上不思考，是座位、板书与作业布置方式共同造成的可改变结果。 2020">
+    <div class="it-h"><span class="it-n">096</span><span class="it-y">2020</span><span class="it-t">建构思维的课堂</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">学生在课堂上不思考，是座位、板书与作业布置方式共同造成的可改变结果。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="双减 把校外时间收回来，学业竞争的军备赛就能被行政手段中止。 2021">
+    <div class="it-h"><span class="it-n">097</span><span class="it-y">2021</span><span class="it-t">双减</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">把校外时间收回来，学业竞争的军备赛就能被行政手段中止。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="生成式 AI 进入课堂 当答案的产出成本趋零，评价必须从产物移到过程，否则整套承重结构垮塌。 2022–">
+    <div class="it-h"><span class="it-n">098</span><span class="it-y">2022–</span><span class="it-t">生成式 AI 进入课堂</span><span class="pos">差异 D</span></div>
+    <p class="it-b">当答案的产出成本趋零，评价必须从产物移到过程，否则整套承重结构垮塌。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="认知卸载与认知债务 把认知步骤外包给工具会削弱本可形成的内部结构，且削弱在停用后仍持续。 2023–25">
+    <div class="it-h"><span class="it-n">099</span><span class="it-y">2023–25</span><span class="it-t">认知卸载与认知债务</span><span class="pos">纠缠 E</span></div>
+    <p class="it-b">把认知步骤外包给工具会削弱本可形成的内部结构，且削弱在停用后仍持续。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+  <div class="item" data-k="学习分析与预警 学生的未来表现可由行为数据预测，并据此提前干预。 2016–">
+    <div class="it-h"><span class="it-n">100</span><span class="it-y">2016–</span><span class="it-t">学习分析与预警</span><span class="pos">显露 S</span></div>
+    <p class="it-b">学生的未来表现可由行为数据预测，并据此提前干预。</p>
+    <div class="it-f"><span class="pend">两万字面板 · 筹备中</span></div>
+  </div>
+</section>
+<section id="why">
+<div class="col-h"><span class="no">说 明 一</span><h2>为什么按年代排，不按学科排</h2></div>
+<div class="app">
+<p>主站的「新思想前沿」有六百多块面板，按学科横切，其中教育相关的有二十四块——课程与教学论、教育心理学、学习科学、教育哲学、教育社会学、教育测量与评价、阅读与识字、早期儿童、高等教育、特殊教育……每块约两万六千汉字、二十条。</p>
+<p><b>但那二十四块几乎只覆盖最近二十年。</b>逐块数过：这十块教育面板全都没有「学科经典思想汇集部分」，也就是说，<b>一九二六到二〇〇五这八十年的教育思想，在整座碰撞料库里基本是空的</b>——它们只以「某某某某年提出」这样的一行出处存在，没有一条可以被取来当承载块用。</p>
+<p>这正是历次碰撞里 I 维（不可还原度）反复卡分的来源之一：撞出一个新读数，一做全球敌意拓宽，发现七十年前早有人用别的词说过同一件事，而料库里没有他，于是撞的时候看不见，评的时候才被抓住。</p>
+<p><b>所以这一栏走时间纵切，不走学科横切。</b>它与主站那二十四块是互补关系，不是重复：那边答「这个学科现在在争什么」，这边答「这件事一百年里被想过几遍、每一遍推翻了谁」。</p>
+</div>
+</section>
+
+<section id="form">
+<div class="col-h"><span class="no">说 明 二</span><h2>一篇两万字长什么样</h2></div>
+<div class="app">
+<p>两万字如果写成综述，对碰撞毫无用处——碰撞要的不是篇幅，是<b>可以被单独取走的结构位</b>。所以每一篇按固定十节写，前八节是料，后两节是接口：</p>
+<ol>
+<li><b>现场</b>——它在什么条件下被提出来，当时的对手是谁，原始文本是哪一篇。</li>
+<li><b>承重命题</b>——一句话，而且必须写成可以被推翻的形式。上面每条下面那行就是它的草稿。</li>
+<li><b>原始读数</b>——当年拿出来的是什么数据、多大样本、什么量纲（量纲必须带分母）。</li>
+<li><b>它推翻了谁</b>——被它取代的那条老前提，是谁在哪一年、用什么材料立起来的。</li>
+<li><b>流变</b>——之后几十年里，它被改写成了什么；哪一次改写是让步，哪一次是投降。</li>
+<li><b>今天活在哪</b>——点名到某一条现行制度、某一张教师要填的表、某一句办公室里的口头禅。<b>点不到就不收</b>。</li>
+<li><b>反证与失效条件</b>——什么情况下它不成立；以及本家自己承认过的局限（自曝，必须出自提出者自己的文献，不许从后世批评里搬）。</li>
+<li><b>异名</b>——别的学科把同一件事叫什么，登记到具体的块与条。</li>
+<li><b>碰撞行</b>——位置（S／D／E）｜预设〔属三十族之几〕｜量纲｜失效｜自曝｜空栏｜异名，七栏一行。</li>
+<li><b>十条可对撞命题 ＋ 资料核验</b>——文献表逐条实核，查不实就换，不许硬凑卷期页。</li>
+</ol>
+<p><b>硬标准两条。</b>其一，只收「至今仍被正面使用或被正面反对」的思想——已经被判定无效的要收（比如听说法的习惯形成论、成长型思维的原始效应量），因为它们提供的正是失效条件；只是好听而没人再用的不收。其二，<b>每一篇都必须点名它今天活在哪里</b>——这是这一栏不沦为名人榜的唯一保险。</p>
+</div>
+</section>
+
+<section id="use">
+<div class="col-h"><span class="no">说 明 三</span><h2>怎么用来碰撞</h2></div>
+<div class="app">
+<p>拿一个真实的例子。厨房里剩下半盘菜，你决定明天热一热再吃——这件事你从没想过要有个「理论」。但它其实做了一次判断：<b>这东西的价值还没结清，先记着，晚点再算</b>。冰箱是一个「暂缓结算」的装置。</p>
+<p>现在把它和第 43 号「掌握学习」放在一起。布鲁姆当年说的是：<b>如果允许时间变化，绝大多数学生都能达到同一水平</b>——也就是说，学得慢的人不是学不会，是被提前结算了。而学校的期中考试就是那个不肯留剩菜的人：铃一响，账当场结清，凡是还没成形的一律记零。</p>
+<p>两边一撞，撞出来的不是「要给学生更多时间」这种废话，而是一个此前不存在的问法：<b>一所学校每年一共「记零」了多少本来还有下文的东西？这个量有没有分母、能不能被数出来？</b>这就是一条新读数的胚胎——它不是从教育学里推出来的，是从冰箱那边借过来的。</p>
+<p>二阶碰撞要的就是这个：<b>两个互不相干的地方，各自都在处理同一件事，但只有一边把它写成了明文</b>。所以这一栏的每一篇都必须把「预设」「量纲」「失效条件」写死——因为撞的时候用得上的从来不是那个思想本身，而是它底下压着的那条没人说出口的假定。</p>
+<p>取源的规矩：一次碰撞取三家，三家之中<b>至多一家来自本栏</b>，另外两家必须去教育学之外找。三家全在教育学里，撞出来的必然还是教育学的老话。</p>
+</div>
+</section>
+
+<section id="prog">
+<div class="col-h"><span class="no">进 度</span><h2>现在做到哪一步</h2></div>
+<div class="app">
+<p><b>已完成：</b>选目定案（一百条，含逐条的承重命题草稿与位置预排）、体例定案、与主站二十四块教育面板的避撞扫描。</p>
+<p><b>位置预排：</b>显露 S 三十八条／差异 D 三十一条／纠缠 E 三十一条。S 偏多是真实的——过去一百年的教育大思想里，测量、标准与制度这一路确实压过了另外两路，这本身就是一条值得撞的读数。</p>
+<p><b>正在做：</b>逐篇成文。每一篇两万字、文献逐条实核，一次只做一篇。上面每一条下方的「筹备中」会随成篇逐条换成链接。</p>
+<p><b>顺序：</b>不按年代顺序写，按碰撞的边际价值写——先写那些主站料库完全空缺、而站内文章又反复撞到的（掌握学习、文化再生产、形成性评价、认知负荷、教师期望、去学校化）。</p>
+</div>
+</section>
+
+</div>
+</div>
+
+<footer><div class="wrap">
+<p><a href="/">教育发生学 · 阳涌</a> ｜ <a href="/all/">全部篇目</a> ｜ <a href="/chatyang/">ChatYang</a> ｜ <a href="/join/">加入队伍</a> ｜ <a href="https://sdeuniverses.com/frontier/">主站新思想前沿 ↗</a></p>
+<p>「教育新思想前沿」是一座为二阶碰撞取源而建的料库。选目与承重命题为编者所拟，逐篇成文时以原始文献为准；发现错处请从「加入队伍」页留言。</p>
+<p>Claude 编纂 · 依王德生《SDE 本体论》 ｜ 德麦国际</p>
+</div></footer>
+
+<script>
+(function(){
+  var q=document.getElementById('q'), qn=document.getElementById('qn');
+  if(!q) return;
+  var items=[].slice.call(document.querySelectorAll('.item'));
+  var secs=[].slice.call(document.querySelectorAll('section[id^="d"]'));
+  q.addEventListener('input',function(){
+    var v=q.value.trim().toLowerCase();
+    if(!v){ items.forEach(function(i){i.style.display='';});
+      secs.forEach(function(s){s.style.display='';}); qn.textContent=''; return; }
+    var n=0;
+    items.forEach(function(i){
+      var hit=(i.getAttribute('data-k')||'').toLowerCase().indexOf(v)>=0;
+      i.style.display=hit?'':'none'; if(hit)n++;
+    });
+    secs.forEach(function(s){
+      var any=[].slice.call(s.querySelectorAll('.item')).some(function(i){return i.style.display!=='none';});
+      s.style.display=any?'':'none';
+    });
+    qn.textContent='命中 '+n+' 个思想';
+  });
+})();
+</script>
+</body>
+</html>
