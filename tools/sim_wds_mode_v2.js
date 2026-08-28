@@ -909,7 +909,11 @@ console.log("⑧ 成文（distill）");
      "工序按钮借 .wdsm-mode 样式但没有 data-k，不参与档位互斥（四档仍是 4 个）");
   tlBtn.click();
   const tlm = document.body.querySelector(".wdsm-menu");
-  ok(!!tlm && tlm.querySelectorAll("button").length === 15, "工序菜单十四道＋「不用工序」共十五项，实得 " + (tlm ? tlm.querySelectorAll("button").length : 0));
+  /* 跟着 TOOLS 走，别写死数量——加一道工序就得回来改数字（sim_wds_sde_tools 同款纪律；
+     2026-08-28 加「发生场」时这里红过一次）。 */
+  const _tlN = (src.slice(src.indexOf("var TOOLS = ["), src.indexOf("\n  ];", src.indexOf("var TOOLS = ["))).match(/\{ k: "/g) || []).length;
+  ok(_tlN >= 14, "TOOLS 清单抠得到（>=14 道），实得 " + _tlN);
+  ok(!!tlm && tlm.querySelectorAll("button").length === _tlN + 1, "工序菜单 " + _tlN + " 道＋「不用工序」共 " + (_tlN + 1) + " 项，实得 " + (tlm ? tlm.querySelectorAll("button").length : 0));
   ["创新智商评分", "三视角误差互消", "母题打造", "近邻检测", "改姓", "缝隙扫描", "三篇碰撞", "是什么", "怎么办", "为什么", "27 宫格定位", "九宫格取三格"]
     .forEach((n) => ok(tlm.querySelectorAll("button").some((b) => b.textContent.includes(n)), "菜单里有「" + n + "」"));
   tlm.querySelectorAll("button").find((b) => b.textContent.includes("近邻检测")).click();

@@ -17,19 +17,31 @@ function ok(c, m) { if (c) { P++; console.log("  PASS " + m); } else { F++; cons
 
 const W = fs.readFileSync(process.env.WORKER_JS || path.join(ROOT, "src/worker.js"), "utf8");
 const i = W.indexOf("const SDE_PLATFORM_BLOCK");
-const seg = i < 0 ? "" : W.slice(i, W.indexOf("\n/* ═══════════ SDE 工序", i));
+/* 旧界标已在后续改版中消失，indexOf 回 -1 会让 seg 吞到文件尾（2026-08-28 抓出）。
+   改钉下一个常量 LANG_PLATFORM_BLOCK 的定义行——它就是本块的真实下边界；照 -1 纪律先断「在」。 */
+const _segEnd = W.indexOf("\nconst LANG_PLATFORM_BLOCK", i);
+const seg = (i < 0 || _segEnd < 0) ? "" : W.slice(i, _segEnd);
 
 console.log("① 常驻注入，且排在 iq 改道之后");
 ok(i > 0, "SDE_PLATFORM_BLOCK 存在");
-ok(/\+ SDE_TRIAD_BLOCK\s*\n\s*\+ SDE_PLATFORM_BLOCK/.test(W), "紧跟三类问题块无条件拼进去");
+ok(/\(\(prof && prof\.term\) \? LANG_TRIAD_BLOCK : SDE_TRIAD_BLOCK\)\s*\n\s*\+ \(\(prof && prof\.term\) \? LANG_PLATFORM_BLOCK : SDE_PLATFORM_BLOCK\)/.test(W),
+   "紧跟三类问题块拼进去（08-22 起走分身三元式：本体档拿原版、分身档拿改姓版，仍是无条件）");
 ok(!/deep \? SDE_PLATFORM_BLOCK/.test(W), "没有被写成只在深度档注入");
 const iq = W.indexOf("if (tool === \"iq\") return WDS_IQ_SYS");
 const cs = W.indexOf("function WDS_CHAT_SYS");
-const inj = W.indexOf("+ SDE_PLATFORM_BLOCK");
+const inj = W.indexOf(": SDE_PLATFORM_BLOCK)");
+ok(inj > 0, "注入表达式找得到（-1 防线：先断在，再比序）");
 ok(cs > 0 && cs < iq && iq < inj, "注入点在 WDS_CHAT_SYS 内且在 iq 改道之后（评分者不装名录）");
 
 console.log("② ⚠ 名录里的每一个站内路径都必须真的存在（编路径是这块唯一会伤到读者的地方）");
-const paths = Array.from(new Set((seg.match(/\/[a-z0-9][a-z0-9\-\/]*\//g) || [])));
+/* 只反查「送人去的页面路径」。目录后面紧跟文件名的（/taste/assets/lang-neigong.txt 这类
+   维护注释里的资产引用）不是页面，不在此列——2026-08-28 抓出：老写法把文件路径截成目录前缀来反查。 */
+const _rawPaths = [];
+const _re = /\/[a-z0-9][a-z0-9\-\/]*\//g; let _m;
+while ((_m = _re.exec(seg))) {
+  if (!/^[a-z0-9_\-]+\.[a-z0-9]{2,5}\b/.test(seg.slice(_m.index + _m[0].length))) _rawPaths.push(_m[0]);
+}
+const paths = Array.from(new Set(_rawPaths));
 ok(paths.length >= 20, "抠出 " + paths.length + " 个站内路径");
 // 一条路径出现在块里有两种正当理由：①它真的存在，可以送人去；
 // ②它**不存在，而块里正是在警告"别送到这个地址"**（/books/ 就是这种）。

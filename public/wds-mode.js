@@ -1453,6 +1453,7 @@
       imgSee: "直接看图", imgNo: "当前基底看不了图", imgOcr: "改用本机 OCR 转文字", imgOcrGo: "正在识别…",
       imgHint: "能看图的是 智谱 GLM / 千问 Qwen / Kimi；DeepSeek 与 MiniMax 在本站的接口下只能读文字。",
       tlMap: "结构图", tlMapS: "把这一问里的结构画成图（落在右侧画布里），并说清哪条边最承重",
+      tlGenesis: "发生场", tlGenesisS: "不答题，先布一场发生：摆料、上张力，交出五到八条自带分岔与作废条件的候选分辨",
       lnkBtn: "🔗 链接", lnkTip: "贴一个网址，把那一篇读进来当附件（本站只抓正文，不带你的任何凭证）",
       lnkAsk: "把哪个网址读进来？", lnkGo: "正在读这一页…", lnkBad: "读不了：",
       fdBtn: "🔎 找文章", fdTip: "在全站三千多篇里找出篇目清单，自己挑一篇读全文（不烧 Key）",
@@ -1584,6 +1585,7 @@
       imgSee: "seen directly", imgNo: "this model can't see images", imgOcr: "run local OCR instead", imgOcrGo: "reading\u2026",
       imgHint: "Vision works with Zhipu GLM / Qwen / Kimi; DeepSeek and MiniMax are text-only on this site.",
       tlMap: "Structure map", tlMapS: "Draw the structure behind this question (renders on the canvas) and say which edge carries the weight",
+      tlGenesis: "Genesis field", tlGenesisS: "Stage a genesis instead of answering: lay out the stock, set up the clash, deliver 5-8 candidate distinctions each with its fork and kill condition",
       lnkBtn: "🔗 Link", lnkTip: "Paste a URL and this page is pulled in as an attachment (text only, no credentials sent)",
       lnkAsk: "Which URL should I read?", lnkGo: "Reading that page\u2026", lnkBad: "Could not read it: ",
       fdBtn: "🔎 Find", fdTip: "Search 3,000+ pieces site-wide and pick one to read in full (no key used)",
@@ -8134,7 +8136,8 @@
     { k: "why", n: "tlWhy", s: "tlWhyS", cmd: ["为什么", "why", "动力"] },
     { k: "grid", n: "tlGrid", s: "tlGridS", cmd: ["坐标", "grid", "宫格"] },
     { k: "nine", n: "tlNine", s: "tlNineS", cmd: ["九宫", "nine"] },
-    { k: "map", n: "tlMap", s: "tlMapS", cmd: ["结构图", "map", "导图"] }
+    { k: "map", n: "tlMap", s: "tlMapS", cmd: ["结构图", "map", "导图"] },
+    { k: "genesis", n: "tlGenesis", s: "tlGenesisS", cmd: ["发生场", "genesis", "布场"] }
   ];
   /* 题型三分 → 对口的那一台完整机器。
      轻松版只回答一个当场能拿走的判断；要进细节，就交给那一台跑完整一趟。
