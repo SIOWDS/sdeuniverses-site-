@@ -372,9 +372,9 @@
       id: "math",
       brand: "ChatXiaoBo",
       url: "/chatxiaobo/",
-      sig: "ChatXiaoBo \u00b7 math.sdeuniverses.com",
+      sig: "ChatXiaoBo \u00b7 mpc.sdeuniverses.com",
       who: "小波老师",
-      kicker: "MATH.SDEUNIVERSES.COM",
+      kicker: "MPC.SDEUNIVERSES.COM",
       home: "/",
       tools: ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why"],
       seeds: [

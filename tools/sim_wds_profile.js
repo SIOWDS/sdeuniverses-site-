@@ -300,10 +300,33 @@ console.log("── ① 档案表与解析器 ───────────�
     t("数学内功第五条也钉了同一条线", /你不替他做题/.test(mn) && /绝不把猜想说成定理/.test(mn));
     const cjk = (mn.match(/[\u4e00-\u9fff]/g) || []).length;
     t("数学内功够厚（≥4000 汉字）", cjk >= 4000, String(cjk));
-    t("ChatXiaoBo 壳页挂 math 档", /WDSM_PROFILE = "math"/.test(fs4.readFileSync("public/sites/math/chatxiaobo/index.html", "utf8")));
-    t("math 分站首页有入口", /\/chatxiaobo\//.test(fs4.readFileSync("public/sites/math/index.html", "utf8")));
-    t("小波老师作者页挂了分站入口", /math\.sdeuniverses\.com/.test(fs4.readFileSync("public/students/xiaobo/index.html", "utf8")));
+    t("ChatXiaoBo 壳页挂 math 档（旧址仍在，math 域名不断）", /WDSM_PROFILE = "math"/.test(fs4.readFileSync("public/sites/math/chatxiaobo/index.html", "utf8")));
+    t("ChatXiaoBo 壳页挂 math 档（新址 mpc）", /WDSM_PROFILE = "math"/.test(fs4.readFileSync("public/sites/mpc/chatxiaobo/index.html", "utf8")));
     t("SUBSITES 里加了 math", /math: "\/sites\/math"/.test(WC));
+
+    /* ── ②g 扩成三领域：mpc（数学·物理·化学，2026-08-28）──
+       math 单科站扩为 mpc 三领域站。math 域名已绑，故 /sites/math/ 保留为跳转页，
+       不是删掉——删了老域名会 404。ChatXiaoBo 仍是 math 这一档，只是住址换了。 */
+    const MPC = fs4.readFileSync("public/sites/mpc/index.html", "utf8");
+    t("SUBSITES 里加了 mpc", /mpc: "\/sites\/mpc"/.test(WC));
+    t("mpc 首页有 ChatXiaoBo 入口", /\/chatxiaobo\//.test(MPC));
+    t("mpc 首页三科平级都在", /数　学/.test(MPC) && /物　理/.test(MPC) && /化　学/.test(MPC));
+    t("mpc 首页三科各有自己的线", (MPC.match(/开栏三题：/g) || []).length === 12,
+      String((MPC.match(/开栏三题：/g) || []).length) + " 条");
+    t("mpc 首页物化两栏写明站方主持、不挂个人名", /主持 · 站方/.test(MPC) && /栏目本身不挂个人名/.test(MPC));
+    t("mpc 首页没有死链", !/href="#"/.test(MPC));
+    t("mpc 首页 canonical 指自己", /canonical" href="https:\/\/mpc\.sdeuniverses\.com\//.test(MPC));
+    t("mpc 首页预览补前缀用的是自己的路径", /var b\s*=\s*"\/sites\/mpc"/.test(MPC));
+    const MATHOLD = fs4.readFileSync("public/sites/math/index.html", "utf8");
+    t("math 旧首页已改成跳转页（域名已绑，不许 404）", /mpc\.sdeuniverses\.com/.test(MATHOLD) && /http-equiv="refresh"/.test(MATHOLD));
+    t("math 旧首页 noindex（免得两个地址争同一份内容）", /noindex/.test(MATHOLD));
+    t("小波老师作者页入口已改指 mpc", /mpc\.sdeuniverses\.com/.test(fs4.readFileSync("public/students/xiaobo/index.html", "utf8")));
+    t("browse 子网站菜单已改指 mpc", /mpc\.sdeuniverses\.com/.test(fs4.readFileSync("public/browse/index.html", "utf8")));
+    t("引擎侧 math 档的落款与角标已换到 mpc", /ChatXiaoBo \\u00b7 mpc\.sdeuniverses\.com/.test(MC) && /MPC\.SDEUNIVERSES\.COM/.test(MC));
+    t("服务端 math 档的 home/all 已换到 mpc", /home: "https:\/\/mpc\.sdeuniverses\.com\/"/.test(WC));
+    t("⭐ 全站不再有指向 math 首页的旧外链（跳转页自身除外）",
+      !/https:\/\/math\.sdeuniverses\.com\//.test(fs4.readFileSync("public/browse/index.html", "utf8")) &&
+      !/https:\/\/math\.sdeuniverses\.com\//.test(fs4.readFileSync("public/students/xiaobo/index.html", "utf8")));
   }
 
   console.log("\n── ②g 第六个档案：comp（ChatZiwen）─────────────");
