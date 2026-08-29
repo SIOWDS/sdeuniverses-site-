@@ -637,7 +637,8 @@ console.log("⑧ 成文（distill）");
   langBtn.click();
   ok(store["sde_wds_lang"] === "en", "语言已存本地");
   ok(langBtn.textContent === "中", "切到英文后按钮显示 中");
-  ok(layer.querySelector(".wdsm-mode[data-k='deep']").textContent === "\u25c8 Deep", "档位按钮已英化");
+  /* 2026-08-30 难度条：深度档时钮上还挂着当前档（·Auto／·5／·pin3），钉整串就假红——守的事是「英化了」。 */
+  ok(String(layer.querySelector(".wdsm-mode[data-k='deep']").textContent).indexOf("\u25c8 Deep") === 0, "档位按钮已英化");
   ok(inEl.placeholder.indexOf("ChatSDE") === 0, "输入框占位已英化（ChatSDE）");
   ok(layer.querySelectorAll(".wdsm-eg").length === 0, "首屏不铺示例问题（切语言也不会把它们铺回来），实得 " + layer.querySelectorAll(".wdsm-eg").length);
   ROUTE["/api/wds/chat"] = [{ t: "token", v: "In English." }];
