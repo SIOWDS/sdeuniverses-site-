@@ -95,7 +95,8 @@ ok("总量卡在预算内（否则这一趟自己被顶穿）", c.text.length < 
 ok("★ 截断必须看得见（悄悄截一半 ⇒ 下游拿半截材料写得头头是道）", /此处只带来前/.test(c.text) && /退回第 2 道重跑/.test(c.text));
 ok("截断处说清原文有多长", /原文共 90000 字/.test(c.text));
 const c2 = M.carry(7, [{ i: 2, t: "抽脊", body: "短的" }]);
-ok("只递上来一部分时，got/miss 分得清", c2.got.length === 1 && c2.miss.length === 2);
+// v4.1：FORGE_NEEDS[7] 由 [2,6,5] 三项扩到 [1,2,6,5] 四项（新增第1道，供空位型/题型声明下传）——miss 相应从 2 变 3
+ok("只递上来一部分时，got/miss 分得清", c2.got.length === 1 && c2.miss.length === 3);
 ok("空 body 不算数（空字符串不是产出）", M.carry(2, [{ i: 1, t: "选源", body: "   " }]).got.length === 0);
 ok("第一道没有上游，carry 为空且不报缺", M.carry(1, bodies).text === "" && M.carry(1, bodies).miss.length === 0);
 
@@ -453,6 +454,21 @@ run(full, "沉默如何被生产", "Bourdieu 1977 说过").then((r) => {
   ok("第 5 道：上面没有的作者与年份一个都不许写", /上面没有的作者与年份一个都不许写/.test(M.STAGES[4].d));
   ok("第 13 道：〔尚未交手〕必须从真实召回里挑", /必须从真实召回里挑/.test(M.STAGES[12].d));
   ok("第 13 道：凭印象的只能写通行读法、不挂人名年份", /不挂人名年份/.test(M.STAGES[12].d));
+
+  console.log("── v4.1：三方程/六路径/三原理平衡（选源题闸三型化＋共有前提与靶格改按型分支）──");
+  const s1 = M.STAGES[0].d, s7d = M.STAGES[6].d, s9d = M.STAGES[8].d;
+  ok("第 1 道有题型判别（What/How/Why）", /题型判别/.test(s1) && /What/.test(s1) && /How/.test(s1) && /Why/.test(s1));
+  ok("第 1 道题闸三型化（S/D/E 空位型，不是只认 S 一种）", /S型·无字段者/.test(s1) && /D型·不可重走的那一段/.test(s1) && /E型·计入即毁者/.test(s1));
+  ok("第 1 道要求三家分处 S／D／E 三维（不是只分三个学科）", /三家须分处 S／D／E 三维/.test(s1));
+  ok("第 1 道加了方程轮换律（连续三趟不许取同一空位型）", /连续三趟不许取同一空位型/.test(s1));
+  ok("★★ 第 7 道不再把共有前提锁死成「归属」一种形状", !/该由谁来裁／该放在哪儿／该有多少/.test(s7d));
+  ok("第 7 道共有前提按 S/D/E 三型分支书写", /S 型.*账本/.test(s7d) && /D 型.*重走/.test(s7d) && /E 型.*计入而不改变/.test(s7d));
+  ok("★★ 第 9 道靶格判据不再只有 What 一种形状", /How 题（对应 D 型空位）/.test(s9d) && /Why 题（对应 E 型空位）/.test(s9d));
+  ok("第 9 道 How 分支要序列＋不可逆步骤＋可插手步骤，且不许用比率", /不可逆的那一步/.test(s9d) && /可插手的那一步/.test(s9d) && /不许用比率／指标/.test(s9d));
+  ok("第 9 道 Why 分支要三条动力式＋回写＋下一轮谁先动，且单因锁定", /回写.*下一轮谁先动|下一轮谁先动/.test(s9d) && /只是其中一个因素/.test(s9d));
+  ok("★★ 依赖表：第 7、9 道现在都读得到第 1 道（否则改了提示语也是空转）", M.NEEDS[7].indexOf(1) >= 0 && M.NEEDS[9].indexOf(1) >= 0);
+  const c3 = M.carry(7, [{ i: 1, t: "选源", body: "本趟声明：题型 Why，空位型 E" }]);
+  ok("★★ 真跑一遍：第 7 道真的能从上游材料里读到第 1 道声明的空位型", c3.text.indexOf("空位型 E") >= 0);
 
   console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
   process.exit(fail ? 1 : 0);
