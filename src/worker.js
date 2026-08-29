@@ -492,10 +492,30 @@ async function wdsRag(env, url, body) {
 // 上层看到的是"没生出来"，看不出是被思考吃掉了额度——朋友圈金句机就是这么哑了一整天。
 // 关不掉的家（Kimi/MiniMax 思考常开、无开关）由 llmText 的"空正文重试"兜底。
 function wdsPlainBody(VC, body) {
+  wdsMiniSplit(VC, body);   // MiniMax 的「回法」参数与开不开思考无关，两条路都要带（见函数头注释）
   const u = String((VC && VC.url) || "");
   if (u.indexOf("api.deepseek.com") >= 0) body.thinking = { type: "disabled" };
   else if (u.indexOf("open.bigmodel.cn") >= 0) body.thinking = { type: "disabled" };
   else if (u.indexOf("dashscope.aliyuncs.com") >= 0) body.enable_thinking = false;
+  return body;
+}
+/* 【MiniMax 的思考默认混在正文里回来 —— 2026-08-29 用户实测「回答有重复」的病灶】
+   官方 OpenAI 兼容口径：M 系（M2／M2.x／M3）不传 reasoning_split 时，思考不走
+   reasoning_content，而是包在 content 字段的 <think>…</think> 标签里一起流回来。
+   我们各处解析器都把 delta.content 原样当正文 ⇒ 整段思考（内含答案草稿）被当作
+   回答流给读者——思考里几乎必然先把答案打一遍草稿，于是读者看到同一段内容出现
+   两遍，报的就是「回答重复」。且 _st.think 恒为 0：思考看门狗、零正文兜底、诊断
+   遥测在 MiniMax 身上全部失明。
+   reasoning_split=true 只改「回法」不改思考开关（M 系思考关不掉，官方明说）：
+   思考走 reasoning_content，content 只剩正文——现有解析器不用改就能正确分流。
+   ⚠ 只对 M 系型号加：abab 老型号的文档没列这个参数，塞了怕被判非法字段
+   （与 wdsTopBody 里「Kimi/MiniMax 什么都不加」同一条教训）。
+   ⚠ 必须放在 wdsTopBody 第一行 `if (!VC.top) return` 那道闸**之前**调用——
+   标准档（无 top）也要带这个参数，否则只有深度档得救。 */
+function wdsMiniSplit(VC, body) {
+  const u = String((VC && VC.url) || "");
+  if ((u.indexOf("api.minimax.io") >= 0 || u.indexOf("api.minimaxi.com") >= 0)
+      && /^minimax-m/i.test(String((body && body.model) || ""))) body.reasoning_split = true;
   return body;
 }
 /* 【这一家能不能把思考关掉】——不是风格问题，是预算问题：思考与正文吃同一份 max_tokens
@@ -509,6 +529,7 @@ function wdsCanPlain(VC) {
       || u.indexOf("dashscope.aliyuncs.com") >= 0;
 }
 function wdsTopBody(VC, body) {
+  wdsMiniSplit(VC, body);   // 放在 top 闸之前：标准档也要带（见 wdsMiniSplit 头注释）
   if (!VC || !VC.top) return body;
   const u = String(VC.url);
   if (u.indexOf("api.deepseek.com") >= 0) {
@@ -525,6 +546,40 @@ function wdsTopBody(VC, body) {
   }
   // Kimi K3 与 MiniMax M2.x/M3：思考常开、无开关参数，塞了反而可能被判非法字段——什么都不加。
   return body;
+}
+/* 【<think> 流内剥离 —— wdsMiniSplit 的兜底那一半】reasoning_split 若被上游忽略
+   （读者覆盖成老型号、或参数支持度日后变卦），思考仍会包在 content 的 <think>…</think>
+   里进来。这个小状态机把 content 流切成「正文｜思考」两路，跨 chunk 切断的标签
+   （上一帧尾是 "<thi"、下一帧头是 "nk>"）也认得出：末尾疑似标签前缀的那几个字先扣着
+   （hold），下一帧来了再判。⚠ 只在 minimax 域名下启用——别家正文里出现 "<think>"
+   多半是在讨论这个标签本身，剥了就是删读者的字。
+   用法：st = { in:false, hold:"" }；每帧 wdsMMFeed(st, 片段) → { out, think }；
+   流一结束必须把 st.hold 冲掉（wdsMMFlush），否则正文恰好以 "<t" 收尾时会吞字。 */
+function wdsMMTail(s, tag) {
+  const m = Math.min(s.length, tag.length - 1);
+  for (let k = m; k > 0; k--) if (s.slice(-k) === tag.slice(0, k)) return s.slice(-k);
+  return "";
+}
+function wdsMMFeed(st, seg) {
+  let s = st.hold + String(seg || ""); st.hold = "";
+  let out = "", think = "";
+  while (s) {
+    if (st.in) {
+      const e = s.indexOf("</think>");
+      if (e >= 0) { think += s.slice(0, e); s = s.slice(e + 8); st.in = false; }
+      else { const h = wdsMMTail(s, "</think>"); think += s.slice(0, s.length - h.length); st.hold = h; s = ""; }
+    } else {
+      const b = s.indexOf("<think>");
+      if (b >= 0) { out += s.slice(0, b); s = s.slice(b + 7); st.in = true; }
+      else { const h = wdsMMTail(s, "<think>"); out += s.slice(0, s.length - h.length); st.hold = h; s = ""; }
+    }
+  }
+  return { out: out, think: think };
+}
+function wdsMMFlush(st) {
+  // 悬挂尾属于谁：思考没闭合就断流 ⇒ 归思考；否则它就是长得像标签前缀的正文。
+  const h = st.hold; st.hold = "";
+  return st.in ? { out: "", think: h } : { out: h, think: "" };
 }
 // 五家基底。全部走各自的 OpenAI 兼容 chat/completions，由 Worker 服务端转发（不是浏览器直连，所以无 CORS 问题）。
 // ⚠️ 型号会过时：各家改名/下线的节奏比本站快得多，所以读者可在设置里覆盖 model（见 wdsPickModel），
@@ -11190,6 +11245,8 @@ export default {
                在标准档就把一次本来写得出来的回答掐了（真跑：想了 1101 字＝约 640 tok、
                预算 2600 还剩三分之二，却已被判"想光了"）。 */
             const _thinkCap = Math.round(Math.max(1000, tokWant - 1200) * 1.7);
+            // <think> 剥离只在 minimax 域名下启用（api.minimax.io 与 api.minimaxi.com 都含 "minimax"）。
+            const _mm = { on: String(VC.url).indexOf("minimax") >= 0, in: false, hold: "" };
             try {
             while (true) {
               const { done: rdone, value } = await reader.read();
@@ -11211,10 +11268,26 @@ export default {
                 if (j.choices && j.choices[0] && j.choices[0].finish_reason) _cd.finish = String(j.choices[0].finish_reason);
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
                 if (d.reasoning_content) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; clearTimeout(_nof2); } if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-                if (d.content) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; clearTimeout(_nof2); } if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                if (d.content) {
+                  clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; clearTimeout(_nof2); }
+                  // MiniMax 兜底：reasoning_split 没生效时思考仍包在 content 的 <think> 里（见 wdsMMFeed 头注释）。
+                  // 剥出来的字走 think 帧、与 reasoning_content 同待遇；正文计数只认剥完剩下的——
+                  // 这样思考看门狗（下一行的 _thinkCap）在 MiniMax 身上也活了。
+                  let _tk = d.content, _th = "";
+                  if (_mm.on) { const r0 = wdsMMFeed(_mm, d.content); _tk = r0.out; _th = r0.think; }
+                  if (_th) { if (_st) _st.think += _th.length; controller.enqueue(_sseBytes({ t: "think", v: _th })); }
+                  if (_tk) { if (_st) _st.out += _tk.length; outText += _tk; controller.enqueue(_sseBytes({ t: "token", v: _tk })); }
+                }
                 if (!outText && _st && _st.think > _thinkCap) { _cd.cutThink = _st.think; break; }
               }
               if (_cd.cutThink) { try { await reader.cancel(); } catch (e0) {} break; }
+            }
+            // 流正常走完：剥离器里可能还扣着几个长得像标签前缀的字（正文恰好以 "<t" 收尾），
+            // 不冲掉就是无声吞字。思考没闭合就断流的那几个字归思考帧。
+            if (_mm.on && _mm.hold) {
+              const rf = wdsMMFlush(_mm);
+              if (rf.think) { if (_st) _st.think += rf.think.length; controller.enqueue(_sseBytes({ t: "think", v: rf.think })); }
+              if (rf.out) { if (_st) _st.out += rf.out.length; outText += rf.out; controller.enqueue(_sseBytes({ t: "token", v: rf.out })); }
             }
             } catch (e) {
               // 中途断线（含被自己的时钟掐断）：已经写出来的一个字都不丢，只补一句说得出原因的说明。
