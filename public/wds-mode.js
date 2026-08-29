@@ -1147,6 +1147,7 @@
     dWallLeft1: "还差第 ", dWallLeft2: " 节没写。稿子已存进「成文记录」；**隔十几二十分钟避开高峰再来一次**通常就能写下去。",
     dOneShort: "\u26a0 这一趟两遍都只写出很少的字（多半是上游把流掐断了）。稿子已存进「成文记录」；隔一两分钟按「重答」再来一次通常就好。",
     dPlanGot: "提纲已定：分 ", dPlanGot2: " 节写 —— ",
+    dNoteFold: "写作说明与提纲", dNoteBad: "有提醒",
     dPart: "正在写第 ",
     dPartLost: "第 ", dPartLost2: " 节两次都没写出来，先跳过接着往下写（回头可以点「重答」重来）。",
     dShortW1: "\u26a0 这一稿只写到 ", dShortW2: " 字，短于这一档的目标。点「\u21bb 重写」再来一趟，或在下面接着说一句「再展开一件事」让它补——⛔ 别让它把说过的话换个说法再说一遍来凑。",
@@ -7397,6 +7398,7 @@
     var out = wrap.querySelector(".wdsm-a"), stat = wrap.querySelector(".dst");
     var cbox = wrap.querySelector(".wdsm-dist-c");
     var text = "", dr = null, lastP = 0, dnote = null, dWd = null, dTimedOut = false;
+    var dnoteBtn = null, dnoteN = 0, dnoteBad = false;  // 说明/提纲这些"思考与设计"折叠着放，默认不占正文下面的地方（见 dNote）
     /* dAC：当前这一趟的 AbortController。看门狗原来只会 `dr.cancel()`，而 dr 要等
        **响应回来**才存在——响应回来之前卡住（连不上、握手不完、笔记本合盖醒来），
        看门狗一响，能掐的东西一个都没有：fetch 一直挂着，runLeg 的 Promise 永不 settle，
@@ -7432,11 +7434,37 @@
        （原来两者写在同一个容器里，谁后到谁赢，两样都可能丢）。 */
     // **追加**不是覆盖：一次成文可能有好几条说明（截断告知／空产出诊断／断流保稿），
     // 早先写成覆盖，结果服务端那条最要紧的诊断被客户端的兜底提示盖掉，读者只看到"两种可能…"。
+    /* 这些说明——提纲拿到了几节、哪节断句、撞墙没撞墙——是写给排查用的，不是写给读者读的。
+       原来直接摊在正文下面，稿子越长这一坨越长，读者读到的"空白"（可继续往下写的地方）
+       就越小。现在折成一条可展开的条：默认收着，读者要查才点开；出过错误（bad）时
+       条上仍会露一个提醒符号，不需要读者先展开才知道有没有事。 */
+    function dLabel() {
+      return (dnote && dnote.style.display !== "none" ? "\u25be " : "\u25b8 ") + t("dNoteFold")
+        + "\uff08" + dnoteN + (dnoteBad ? "\u3001" + t("dNoteBad") : "") + "\uff09";
+    }
     function dNote(msg, bad) {
-      if (!dnote) { dnote = el("div"); cbox.appendChild(dnote); }
+      if (!dnote) {
+        var dwrap = el("div");
+        dwrap.style.cssText = "margin-top:8px";
+        dnoteBtn = el("button", null, "");
+        dnoteBtn.type = "button";
+        dnoteBtn.style.cssText = "font:inherit;font-size:12px;color:#8B7B5E;background:none;border:none;" +
+          "padding:3px 0;cursor:pointer;opacity:.68";
+        dnote = el("div");
+        dnote.style.cssText = "display:none;margin-top:2px";
+        dnoteBtn.onclick = function () {
+          dnote.style.display = (dnote.style.display === "none") ? "block" : "none";
+          dnoteBtn.textContent = dLabel();
+        };
+        dwrap.appendChild(dnoteBtn); dwrap.appendChild(dnote);
+        cbox.appendChild(dwrap);
+      }
+      dnoteN++;
+      if (bad) dnoteBad = true;
       var line = el("div", null, String(msg || ""));
       line.style.cssText = "font-size:12.5px;line-height:1.6;margin:10px 0 0;color:" + (bad ? "#E8A8A0" : "#8B7B5E");
       dnote.appendChild(line);
+      dnoteBtn.textContent = dLabel();
     }
     // 看门狗：成文这条流原来客户端一个超时都没有，服务端也没戴时钟（今天补上了）——
     // 两头都不设时限时，流被无声掐断就只剩一个永远转着的光标。

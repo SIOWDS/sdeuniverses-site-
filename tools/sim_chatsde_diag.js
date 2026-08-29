@@ -173,5 +173,53 @@ ok("每趟的读数先接进 lastLegMeta（runLeg 原来把结果整个丢掉了
   /then\(function \(r2\) \{ if \(r2 && r2\.meta\) lastLegMeta = r2\.meta;/.test(F));
 ok("主循环那条老路仍只认 failMetas（没被顺手改坏）", /failMetas\.filter\(Boolean\)\.pop\(\)/.test(F));
 
+console.log("── dNote 折叠：正文下面不许再摊开这些说明与提纲（2026-08-29）──");
+{
+  const _n0 = F.indexOf("    function dLabel() {");
+  const _n1 = F.indexOf("\n    // 看门狗：成文这条流", _n0);
+  const src = F.slice(_n0, _n1);
+  ok("抠得到 dLabel + dNote 这一段", src.indexOf("function dNote") > 0 && _n1 > _n0);
+
+  function el(tag, cls, txt) {
+    return {
+      tagName: tag, className: cls || "", _text: txt || "", children: [],
+      style: { cssText: "", get display() { return (/display:\s*([a-z-]+)/.exec(this.cssText) || [0, ""])[1]; },
+        set display(v) { this.cssText = this.cssText.replace(/display:\s*[a-z-]+;?/, "") + "display:" + v + ";"; } },
+      appendChild(c) { this.children.push(c); },
+      get textContent() { return this._text; }, set textContent(v) { this._text = v; },
+    };
+  }
+  function run() {
+    const cbox = el("div");
+    let dnote = null, dnoteBtn = null, dnoteN = 0, dnoteBad = false;
+    const t = (k) => ({ dNoteFold: "写作说明与提纲", dNoteBad: "有提醒" }[k] || k);
+    const fn = new Function("el", "cbox", "t",
+      "var dnote=null, dnoteBtn=null, dnoteN=0, dnoteBad=false;\n" + src +
+      "\nreturn { dNote: dNote, get dnote(){return dnote;}, get dnoteBtn(){return dnoteBtn;} };");
+    return fn(el, cbox, t);
+  }
+  const r1 = run();
+  r1.dNote("占位盘点只盘到 8 位具名");
+  ok("★ 说明容器默认是收起来的（display:none）——正文下面不再摊开一大段", r1.dnote.style.display === "none");
+  ok("有一颗折叠按钮，标着「写作说明与提纲」与条数", r1.dnoteBtn.textContent.indexOf("写作说明与提纲") >= 0 && r1.dnoteBtn.textContent.indexOf("1") >= 0);
+  ok("说明文字本身一条没丢——只是先不显示，不是删掉", r1.dnote.children.length === 1);
+  r1.dNote("提纲已定：分 22 节写");
+  ok("第二条追加、计数跟着涨到 2", r1.dnoteBtn.textContent.indexOf("2") >= 0 && r1.dnote.children.length === 2);
+  ok("普通说明不带「有提醒」", r1.dnoteBtn.textContent.indexOf("有提醒") < 0);
+
+  const r2 = run();
+  r2.dNote("流被中途掐断", 1);
+  ok("★ 出过错误（bad=1）时，折叠着也看得出来（按钮上带「有提醒」）", r2.dnoteBtn.textContent.indexOf("有提醒") >= 0);
+  ok("即使出过错，默认也仍是收起的——不因为有提醒就强制摊开占地方", r2.dnote.style.display === "none");
+
+  const r3 = run();
+  r3.dNote("第一条");
+  r3.dnoteBtn.onclick();
+  ok("点一下折叠按钮 → 展开（block）", r3.dnote.style.display === "block");
+  ok("展开时按钮箭头换向", /\u25be/.test(r3.dnoteBtn.textContent));
+  r3.dnoteBtn.onclick();
+  ok("再点一下 → 收回去", r3.dnote.style.display === "none");
+}
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);
