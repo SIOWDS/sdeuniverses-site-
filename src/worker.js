@@ -7137,11 +7137,23 @@ const FORGE_NEEDS = {
   15: [1, 2, 3, 7, 14], 16: [8, 9, 10, 11, 14, 15], 17: [12, 13, 14, 15, 16],
   18: [1, 7, 9, 12, 13, 14, 15, 16, 17],         // 自查：判断 ＋ 全部成文 ＋ **第1道（声明型）与第7道（第二层地基）**——站级母题闸三张表要登它们
 };
-const FORGE_CARRY_MAX = 26000;   // 一趟最多内联多少字的上游原文（再多就把这一趟自己顶穿）
+/* 一趟最多内联多少字的上游原文。
+   ⚠ 2026-08-29 从 26000 抬到 48000，且改成**水位匀分**（短的先装满、省下的给长的）——见 forgeCarry。
+   原因：各道输出预算放开之后成文三段每段六七千字，而第 18 道要读九道上游：按 26000 匀分每道只剩 2,888 字，
+   等于交付自查只读到每一段成文的不到一半，「上游产物」又成了半截材料。
+   深度研究那条产线（RES_NEEDS）另有一份固定成本七万八千字的内功要装，它的份额不跟着抬，见 RES_CARRY_MAX。 */
+const FORGE_CARRY_MAX = 48000;
+const RES_CARRY_MAX = 26000;     // 深度研究产线的上游原文份额（与 resPriorFit 那套预算闸配套，未动）
 /* 哪几道**必须**走敌意最近邻专用链——由程序保证，不等读者去点联网。
    第 5 道：候选出生时就查占位者（这一道的全部意义就是查占位）。
    第 13 道：最终划界，三栏里每一位都要有出处与判决性对照预测。 */
 const FORGE_NBR_STAGES = { 5: 1, 13: 1 };
+/* 成文三段（第 15–17 道）**首发就关思考**（2026-08-29）：它们的活是把前十四道撞出来的东西写成两万字的三分之一，
+   材料全在上游产物里，没有要想的新东西；而思考与正文吃同一份 max_tokens、同一份时钟——开着思考首发，
+   就是本文件记了四次的那条老死法「预算越大想得越久」，最后靠关思考兜底重答才交稿，白付一趟十分钟。
+   与 distill／paper 成文同款：「满预算＋关思考」是长文实测唯一稳定的形态。判断各道（1–14、18）保留思考。
+   ⚠ 关不掉思考的家（Kimi／MiniMax，见 wdsCanPlain）这是空指令，那两家的成文段仍是思考＋正文共用预算。 */
+const FORGE_PLAIN_STAGES = { 15: 1, 16: 1, 17: 1 };
 
 /* ═══ 阶段B：状态契约 ═══════════════════════════════════════════
    建议书 §5.3：「不要完全相信前端传来的阶段编号和『已通过』标记。」
@@ -7194,8 +7206,9 @@ function forgeValidate(rs) {
 
 /* 把上游真产物编成可读的一段。**截断必须看得见**——悄悄截掉一半，
    下游会拿着半截材料写得头头是道，而这正是最难查的一类假产出。 */
-function forgeCarry(i, bodies, gates, needsTbl) {
+function forgeCarry(i, bodies, gates, needsTbl, capChars) {
   const need = (needsTbl || FORGE_NEEDS)[i] || [];
+  const cap = (capChars > 0) ? capChars : FORGE_CARRY_MAX;
   if (!need.length || !Array.isArray(bodies) || !bodies.length) return { text: "", got: [], miss: need.slice() };
   /* 闸门链：上游哪一道其实没过闸。建议书 §5.3——不完全相信前端的「已通过」标记；
      这里不硬拦（读者按了「仍要往下跑」是他的决定），但**必须让下游看见它接的是什么货**。 */
@@ -7209,11 +7222,23 @@ function forgeCarry(i, bodies, gates, needsTbl) {
   const have = need.filter((k) => by[k]);
   const miss = need.filter((k) => !by[k]);
   if (!have.length) return { text: "", got: [], miss };
-  // 匀分预算：谁都拿得到一份，长的那几道按比例截，不许有人一个字都读不到
-  const per = Math.max(1200, Math.floor(FORGE_CARRY_MAX / have.length));
+  /* 水位匀分（2026-08-29）：谁都拿得到一份（地板 1200 字），**短的先装满、省下的份额给长的**。
+     此前是死匀分 cap/n：第 18 道读九道时每道只有 2,888 字，而其中六道判断稿本来只有一两千字——
+     它们用不完的份额白白扔掉，三段成文却各被截到不足一半。长的那几道仍按剩余份额截，且截口看得见。 */
+  const alloc = {};
+  {
+    const order = have.slice().sort((x, y) => by[x].body.length - by[y].body.length);
+    let pool = cap, left = order.length;
+    for (const k of order) {
+      const share = Math.max(1200, Math.floor(pool / left));
+      alloc[k] = Math.min(by[k].body.length, share);
+      pool -= alloc[k]; left--;
+    }
+  }
   let out = "";
   for (const k of have) {
     const v = by[k];
+    const per = alloc[k];
     let bd = v.body;
     let cut = "";
     if (bd.length > per) { bd = bd.slice(0, per); cut = "\n〔⚠ 这一道原文共 " + v.body.length + " 字，此处只带来前 " + per + " 字；要用到后半段就退回第 " + k + " 道重跑〕"; }
@@ -8023,7 +8048,7 @@ function wdsSdeResearchSys(rs) {
   const i = Math.max(1, Math.min(RESEARCH_STAGES.length, rs.i | 0));
   const st = RESEARCH_STAGES[i - 1];
   if (!st) return "";
-  const carry = forgeCarry(i, rs.bodies, rs.gates, RES_NEEDS);
+  const carry = forgeCarry(i, rs.bodies, rs.gates, RES_NEEDS, RES_CARRY_MAX);
   return RESEARCH_HEART
     + "\n\n【第 " + rs.i + "/" + rs.n + " 道 · " + st.t + "】"
     + "\n研究题目：" + rs.topic
@@ -11232,8 +11257,8 @@ export default {
             if (rs && rs.sde && !prof) {
               let _ng = "";
               try { _ng = await loadNeigong(env, url, "/taste/assets/sde-neigong.txt"); } catch (e) {}
-              /* 这一道实际会内联多少上游原文：forgeCarry 按 FORGE_CARRY_MAX 匀分，所以上限就是它。 */
-              const _carryLen = Math.min(FORGE_CARRY_MAX, (Array.isArray(rs.bodies) ? rs.bodies : [])
+              /* 这一道实际会内联多少上游原文：forgeCarry 按 RES_CARRY_MAX 匀分（研究产线自己的份额），所以上限就是它。 */
+              const _carryLen = Math.min(RES_CARRY_MAX, (Array.isArray(rs.bodies) ? rs.bodies : [])
                 .reduce((a, b2) => a + ((b2 && b2.body) ? b2.body.length : 0), 0));
               let _ngMode = "none";
               if (_ng) {
@@ -11320,12 +11345,17 @@ export default {
                预算与总时长走 FORGE_STAGE_TOK／FORGE_TOTAL_MS（常数头上有账）。自由拆题的研究产线
                各步仍是 1200–2000 字，照旧。 */
             const rsLong = !!(rs && (rs.forge || rs.sde));
+            const rsPlain = !!(rs && rs.forge && FORGE_PLAIN_STAGES[rs.i | 0]);   // 成文三段首发关思考（见 FORGE_PLAIN_STAGES 头注释）
             const tokWant = askLen
               ? Math.min(32000, Math.max(6000, Math.round(askLen * 1.8)))   // 中文近似 1 字 1 token，留一点余量
               : (rsLong ? FORGE_STAGE_TOK : (rs ? (deep ? 6000 : 4000) : (deep ? 6000 : (tool ? 4000 : 2600))));
             /* 按档给：深度档 240s 首帧 / 420s 总时长；标准档仍是 90s / 240s。长篇请求的总时长照旧最长。 */
             const clk = wdsClock(deep ? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,
               rsLong ? FORGE_TOTAL_MS : (askLen ? CHAT_TOTAL_LONG_MS : (deep ? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS)));
+            /* 一句话说清这一道用的是什么配置——没有它，「是不是真放开了预算、思考开没开」永远只能靠读代码猜。 */
+            if (rsLong) controller.enqueue(_sseBytes({ t: "note", v: "⚙️ 本道预算 · 输出 " + tokWant + " tok（上游嫌大自动降档）· 思考"
+              + (rsPlain ? (wdsCanPlain(VC) ? "关（成文段：整份预算归正文）" : "关不掉（这家基底思考常开，正文与思考共用这份预算）") : (VC.top ? "开·满功率" : "随基底默认"))
+              + " · 总时长闸 " + Math.round(FORGE_TOTAL_MS / 1000) + " 秒" }));
             _st.pre = Math.round((Date.now() - _st.t0) / 1000);
             _stg("基底作答");
             /* 零帧要说出来。读者盯着「正在想 45s · 基底作答」，分不出「它在想」和「它卡死了」——
@@ -11349,7 +11379,7 @@ export default {
                    所以这一支走 wdsFetchMax——上游以「max_tokens 相关」的 400 拒收就自动降一档，
                    不会因为一个数字整道断掉。普通问答仍是原来那一发。 */
                 upstream = rsLong
-                  ? await wdsFetchMax(VC, KEY, messages, true, tokWant, clk.signal)
+                  ? await wdsFetchMax(VC, KEY, messages, true, tokWant, clk.signal, false, undefined, rsPlain)
                   : await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
                 if (upstream.ok || !canSee || vi + 1 >= visLadder.length) break;
                 if (upstream.status !== 400 && upstream.status !== 404) break;
@@ -11473,8 +11503,10 @@ export default {
               const tok2 = (askLen || rsLong) ? tokWant : Math.min(tokWant, 3000);
               /* 这一遍思考是关掉的：90 秒首帧、240 秒总时长是按满功率给的账，搬到这里就成了
                  「第一遍等 240 秒、第二遍再等 240 秒」。不烧思考还半分钟开不了口，就不会开口了。 */
-              /* 产线道次的重答是关着思考写整件产物，120 秒装不下六七千字——总时长同主道；首帧闸照旧。 */
-              const clk2 = wdsClock(CHAT_RETRY_FIRST_MS, rsLong ? FORGE_TOTAL_MS : CHAT_RETRY_TOTAL_MS);
+              /* 产线道次的重答是关着思考写整件产物，120 秒装不下六七千字——总时长同主道；首帧闸照旧。
+                 ⚠ 例外：关不掉思考的家（Kimi／MiniMax）重答仍要先想几分钟才落第一个字，而下面那个循环只把
+                 **正文**算作首帧——45 秒首帧闸会把它们的重答冤杀在思考期，读者看到的是「重答也没接上」。给 120 秒。 */
+              const clk2 = wdsClock((rsLong && !wdsCanPlain(VC)) ? 120000 : CHAT_RETRY_FIRST_MS, rsLong ? FORGE_TOTAL_MS : CHAT_RETRY_TOTAL_MS);
               try {
                 const up2 = rsLong
                   ? await wdsFetchMax(VC, KEY, messages, true, tok2, clk2.signal, false, undefined, true)
@@ -11498,15 +11530,24 @@ export default {
                     const pl = ln.slice(5).trim();
                     if (pl === "[DONE]") continue;
                     try {
-                      const d2 = (JSON.parse(pl).choices || [{}])[0].delta || {};
+                      const j2 = JSON.parse(pl);
+                      const c2 = (j2.choices || [{}])[0] || {};
+                      if (c2.finish_reason) _cd.finish2 = String(c2.finish_reason);   // 重答这一遍自己的收束理由
+                      const d2 = c2.delta || {};
                       if (d2.content) { clk2.firstFrame(); if (_st) _st.out += d2.content.length; outText += d2.content; controller.enqueue(_sseBytes({ t: "token", v: d2.content })); }
                     } catch (e2) {}
                   }
                 }
               } catch (e2) {
-                controller.enqueue(_sseBytes({ t: "note", v: "关掉思考重答这一遍也没接上：" + ((e2 && e2.message) || "未知原因") + "。" }));
+                _cd.cut2 = clk2.cut ? clk2.why("重答") : ("流中断：" + ((e2 && e2.message) || "未知原因"));
+                controller.enqueue(_sseBytes({ t: "note", v: "关掉思考重答这一遍也没接上：" + _cd.cut2 + "。" }));
               }
               clk2.stop();
+              /* ⭐ 重答写出来了，收束读数就要报**这一遍**的（2026-08-29）：此前 _cd.cut 里还留着第一遍的断因
+                 （「超过 N 秒还没写完」），fin 帧把它原样发出去，产线那一侧（rsJudge：cut 非空即断稿）
+                 就把一道**写完的**稿判成断稿停下——预算放开之后首发被时钟掐、重答补齐这条路更常走，这一处更要紧。
+                 第一遍的断因已在 note 里说过，帧里只报现在这份正文是怎么收的。 */
+              if (outText) { _cd.finish = _cd.finish2 || ""; _cd.cut = _cd.cut2 || ""; _cd.partCut = ""; }
               if (!outText) {
                 controller.enqueue(_sseBytes({ t: "error", code: "empty",
                   v: "两遍都没写出正文（第一遍" + (_cd.cut ? ("：" + _cd.cut) : ("只思考了 " + ((_st && _st.think) || 0) + " 字")) + "）。"

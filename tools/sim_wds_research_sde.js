@@ -15,7 +15,7 @@ function grab(startMark, endMark) {
 }
 const code = [
   grab("const FORGE_NEEDS = {", "const FORGE_NBR_STAGES"),
-  grab("function forgeCarry(i, bodies, gates, needsTbl)", "function wdsForgeSys"),
+  grab("function forgeCarry(i, bodies, gates, needsTbl, capChars)", "function wdsForgeSys"),   // 2026-08-29 加了第五参（各产线各自的上游份额），改落点不删
   grab("const RESEARCH_HEART =", "// RESEARCH_STEP"),
 ].join("\n");
 const mod = new Function(code + "\nreturn { RESEARCH_STAGES, RES_NEEDS, RES_NBR_STAGES, wdsSdeResearchSys, forgeCarry };")();
@@ -89,7 +89,8 @@ console.log("⑥ 全血加功力");
   ok2(/if \(PROFILE\) _planBody\.plan = "free";/.test(FE2), "分身页不跑这条产线（工序名是母体术语，会把改姓档灌回去）");
   ok2(!/SDE/.test((FE2.match(/rsTip: "[^"]*"/g) || []).join(" ")), "按钮说明里没有学派术语（分身页读同一张表）");
   ok2(/loadNeigong\(env, url, "\/taste\/assets\/sde-neigong\.txt"\)/.test(S), "装的是全站共读那一份（与金点子发生器同源）");
-  ok2(/const _carryLen = Math\.min\(FORGE_CARRY_MAX, /.test(S), "上游原文按 forgeCarry 的真实上限计（不是把二十万字原文全算进去）");
+  ok2(/const _carryLen = Math\.min\(RES_CARRY_MAX, /.test(S), "上游原文按 forgeCarry 的真实上限计（不是把二十万字原文全算进去）");   // 2026-08-29：研究产线自己的份额 RES_CARRY_MAX（数没变，仍 26000），改落点不删
+  ok2(/forgeCarry\(i, rs\.bodies, rs\.gates, RES_NEEDS, RES_CARRY_MAX\)/.test(S), "研究产线的 forgeCarry 真传了自己的份额（学科通融抬到 48000 不许连带把它抬上去——它另有七万八千字内功要装）");
   ok2(/neigongLite\(_ng\)/.test(S) && /内功按精简版装载/.test(S), "装不下就退精简版并当场说明（不静默降级）");
   ok2(/内功文件这次没读到/.test(S) && /按降级看待/.test(S), "读不到内功要如实报，不假装装过");
   const neig = fs.readFileSync("public/taste/assets/sde-neigong.txt", "utf8");
@@ -190,7 +191,8 @@ console.log("⑧ 研究产线的程序闸门：断稿即停");
     ok2(judge("正".repeat(900), { fin: "stop", cut: "", err: "" }).d === "passed", "写完的正常一道 → passed");
     ok2(judge("正".repeat(900), undefined).d === "passed", "没有读数（老服务端）时不误判");
   }
-  ok2(/var g = fg \? forgeGate\(txt\) : rsJudge\(txt, RS\.lastMeta\);/.test(FE), "step()：学科通融走基底的【闸门】，研究产线走程序判决");
+  /* 2026-08-29：学科通融先过一遍程序判（rsJudge）再读闸门，研究产线照旧程序判决——改落点不删 */
+  ok2(/var g = fg \? \(function \(\) \{ var j = rsJudge\(txt, RS\.lastMeta\); return j\.d === "passed" \? forgeGate\(txt\) : j; \}\)\(\) : rsJudge\(txt, RS\.lastMeta\);/.test(FE), "step()：学科通融先程序判再走基底的【闸门】，研究产线走程序判决");
   ok2(!/if \(!fg\) \{ i\+\+; return step\(\); \}/.test(FE), "技术故障不再 i++ 静默跳过（研究产线也停下交给读者）");
   ok2(/g\.d === "cut" \? \(tx\("rsCut1"\)/.test(FE) && /g\.d === "failed" \? \(tx\("rsFailed1"\)/.test(FE), "闸门条对 cut／failed 各说各的原因，不再借「自己判了没做够」那句");
   for (const k of ["rsCut1", "rsCut2", "rsFailed1", "rsCutEmpty", "rsCutStopped", "rsCutLength", "rsCutShort"]) {

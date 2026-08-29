@@ -31,7 +31,7 @@ const b = W.indexOf("// 工序是流程要求，不改人格", a);
 const SRC = (a > 0 && b > a) ? W.slice(a, b) : "";
 ok("抠得到那一整段", SRC.indexOf("function wdsForgeSys") > 0 && SRC.indexOf("FORGE_NEEDS") > 0);
 const M = new Function("const FORGE_HEART = '<HEART>';\n" + SRC
-  + "\n return { STAGES: FORGE_STAGES, NEEDS: FORGE_NEEDS, carry: forgeCarry, sys: wdsForgeSys, MAX: FORGE_CARRY_MAX, JUDGE: FORGE_JUDGE_N };")();
+  + "\n return { STAGES: FORGE_STAGES, NEEDS: FORGE_NEEDS, carry: forgeCarry, sys: wdsForgeSys, MAX: FORGE_CARRY_MAX, JUDGE: FORGE_JUDGE_N, PLAIN: FORGE_PLAIN_STAGES, RES_MAX: RES_CARRY_MAX };")();
 
 ok("十八道工序齐全", M.STAGES.length === 18);
 ok("只到判断跑前十三道", M.JUDGE === 13);
@@ -567,7 +567,7 @@ run(full, "沉默如何被生产", "Bourdieu 1977 说过").then((r) => {
       /:\s*\(rsLong \? FORGE_STAGE_TOK : \(rs \? \(deep \? 6000 : 4000\) : \(deep \? 6000 : \(tool \? 4000 : 2600\)\)\)\)/.test(chatSeg)
       && !/\n\s+: \(rs \? \(deep \? 6000 : 4000\)/.test(chatSeg));
     ok("★★ 产线道次的上游调用走 wdsFetchMax（上游以 max_tokens 相关 400 拒收就降一档，不会整道断掉）",
-      /upstream = rsLong\s*\n\s*\? await wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal\)/.test(chatSeg));
+      /upstream = rsLong\s*\n\s*\? await wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal, false, undefined, rsPlain\)/.test(chatSeg));   // 2026-08-29 末位加了 rsPlain（成文三段首发关思考），改落点不删
     ok("阶梯还在兜 400（只认 max_tokens 相关的 400 才降档）",
       /if \(resp\.ok \|\| resp\.status !== 400 \|\| i === ladder\.length - 1\) return resp;/.test(W)
       && /max\[_ \]\?tokens\|max\[_ \]\?completion/.test(W));
@@ -579,7 +579,7 @@ run(full, "沉默如何被生产", "Bourdieu 1977 说过").then((r) => {
     ok("★★ 关思考重答：产线道次不压预算（压到 3000 等于砍掉正文），普通问答照旧压",
       /const tok2 = \(askLen \|\| rsLong\) \? tokWant : Math\.min\(tokWant, 3000\);/.test(chatSeg));
     ok("★★ 关思考重答的总时长：产线道次同主道，普通问答仍是重答那套",
-      /const clk2 = wdsClock\(CHAT_RETRY_FIRST_MS, rsLong \? FORGE_TOTAL_MS : CHAT_RETRY_TOTAL_MS\);/.test(chatSeg));
+      /const clk2 = wdsClock\(\(rsLong && !wdsCanPlain\(VC\)\) \? 120000 : CHAT_RETRY_FIRST_MS, rsLong \? FORGE_TOTAL_MS : CHAT_RETRY_TOTAL_MS\);/.test(chatSeg));   // 2026-08-29 首帧档加了关不掉思考那两家的 120 秒，改落点不删
     ok("★ 重答那一发在产线道次上也走阶梯，且思考是关着的（plain=true）",
       /const up2 = rsLong\s*\n\s*\? await wdsFetchMax\(VC, KEY, messages, true, tok2, clk2\.signal, false, undefined, true\)/.test(chatSeg));
     ok("★ 「≤8000 是硬约束」那条老账在这一段里已标作废（别让下一个人照着改回去）",
@@ -616,6 +616,56 @@ run(full, "沉默如何被生产", "Bourdieu 1977 说过").then((r) => {
     }
   }
 
+
+  /* ═══ 十二、预算放开之后的三件配套（2026-08-29 同日第二刀）═══
+     ① 上游份额水位匀分（成文三段各六七千字之后，第 18 道读九道不能再每道 2,888 字）
+     ② 成文三段首发关思考（满预算＋关思考＝长文唯一稳定形态；判断各道保留思考）
+     ③ 重答写出来了，fin 帧报重答这一遍的收束（第一遍的断因不许把写完的稿判成断稿） */
+  console.log("── 十二、上游份额：水位匀分（短的先装满、省下的给长的）──");
+  ok("★ 学科通融上游份额抬到 48000（成文三段各六七千字，第 18 道读九道）", M.MAX >= 48000);
+  ok("★ 研究产线份额独立且未动（它另有七万八千字内功要装）", M.RES_MAX === 26000);
+  {
+    const mix = [1, 7, 9, 12, 13, 14].map((k) => ({ i: k, t: "判断稿" + k, body: "判".repeat(1500) }))
+      .concat([15, 16, 17].map((k) => ({ i: k, t: "成文" + k, body: "文".repeat(7000) })));
+    const c18 = M.carry(18, mix);
+    ok("★★ 第 18 道读九道：六道短稿一字不截，三段成文各 7000 字也一字不截（死匀分时每道只剩 2,888 字）",
+      c18.got.length === 9 && !/此处只带来前/.test(c18.text) && c18.text.split("文".repeat(7000)).length === 4);
+    ok("总量仍在份额内", c18.text.length < M.MAX * 1.3, "len=" + c18.text.length);
+    const c18b = M.carry(18, mix.map((x) => x.i >= 15 ? { i: x.i, t: x.t, body: "文".repeat(20000) } : x));
+    ok("★ 三段成文各 2 万字时：短稿仍一字不截，长的按剩余份额截且截口看得见",
+      c18b.text.split("判".repeat(1500)).length === 7 && (c18b.text.match(/此处只带来前 (\d+) 字/g) || []).length === 3
+      && /原文共 20000 字/.test(c18b.text));
+    ok("匀分的份额真是省下来的：三段各拿到 ≥ (48000−9000)/3", (c18b.text.match(/此处只带来前 (\d+) 字/g) || []).every((m) => parseInt(m.match(/\d+/)[0], 10) >= Math.floor((48000 - 9000) / 3)));
+    ok("研究产线传自己的份额时按 26000 分", M.carry(7, huge, undefined, undefined, 26000).text.length < 26000 * 1.3);
+  }
+  console.log("── 成文三段首发关思考 ──");
+  ok("★★ 只有第 15/16/17 道首发关思考，判断各道保留思考", JSON.stringify(Object.keys(M.PLAIN).sort()) === JSON.stringify(["15", "16", "17"]) && [15, 16, 17].every((k) => M.PLAIN[k]));
+  {
+    const CH = W_TXT(W.slice(W.indexOf('url.pathname === "/api/wds/chat"'), W.indexOf('url.pathname === "/api/wds/research"')));
+    ok("★★ rsPlain 只对学科通融的成文三段成立（深度研究与普通问答不沾）", /const rsPlain = !!\(rs && rs\.forge && FORGE_PLAIN_STAGES\[rs\.i \| 0\]\);/.test(CH));
+    ok("★★ 首发真的把 rsPlain 递给了 wdsFetchMax 的 plain 位（定义了 ≠ 用上了）", /wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal, false, undefined, rsPlain\)/.test(CH));
+    ok("★ 每一道开跑先报一句配置（输出多少 tok·思考开关·总时长闸）", /本道预算 · 输出 " \+ tokWant \+ " tok/.test(CH) && /总时长闸 " \+ Math\.round\(FORGE_TOTAL_MS \/ 1000\)/.test(CH));
+    ok("★ 配置那一句对关不掉思考的家说真话（不写「关」）", /关不掉（这家基底思考常开/.test(CH) && /wdsCanPlain\(VC\) \? "关（成文段/.test(CH));
+    ok("★ 关不掉思考的家重答首帧给 120 秒（它们的重答只把正文算首帧）", /wdsClock\(\(rsLong && !wdsCanPlain\(VC\)\) \? 120000 : CHAT_RETRY_FIRST_MS/.test(CH));
+    console.log("── 重答写出来了，fin 帧报的是这一遍 ──");
+    ok("★★ 重答循环记下自己的 finish_reason", /_cd\.finish2 = String\(c2\.finish_reason\)/.test(CH));
+    ok("★★ 重答被掐记 cut2，不覆盖第一遍的 note", /_cd\.cut2 = clk2\.cut \? clk2\.why\("重答"\)/.test(CH));
+    ok("★★ 重答有正文 ⇒ finish/cut/partCut 换成这一遍的（第一遍的断因不许把写完的稿判成断稿）",
+      /if \(outText\) \{ _cd\.finish = _cd\.finish2 \|\| ""; _cd\.cut = _cd\.cut2 \|\| ""; _cd\.partCut = ""; \}/.test(CH));
+    ok("★ 这一处落在 fin 帧之前（否则改了也发不出去）", CH.indexOf('if (outText) { _cd.finish = _cd.finish2') < CH.indexOf('t: "fin", v: { fin: _cd.finish') && CH.indexOf('if (outText) { _cd.finish = _cd.finish2') > 0);
+    /* 真跑一遍那句判决：第一遍被掐（cut 非空）、重答写满且 stop ⇒ 前端 rsJudge 必须判 passed */
+    const FE2 = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");
+    const mj = /function rsJudge\(txt, meta\) \{[\s\S]*?\n  \}/.exec(FE2);
+    const rsJ = mj ? new Function("tx", mj[0] + "; return rsJudge;")((k) => k) : null;
+    const cdSim = (first, retry) => {   // 照服务端那三行复现：有正文就换成重答那一遍的
+      const cd = { finish: first.finish, cut: first.cut, partCut: "" };
+      if (retry.out) { cd.finish = retry.finish2 || ""; cd.cut = retry.cut2 || ""; cd.partCut = ""; }
+      return { fin: cd.finish || "", cut: cd.cut || cd.partCut || "", err: "" };
+    };
+    ok("★★ 真跑：首发被时钟掐、重答写满 ⇒ 判 passed（改前判 cut）", !!rsJ && rsJ("字".repeat(3000), cdSim({ finish: "", cut: "作答超过 600 秒还没写完（已掐断）" }, { out: 3000, finish2: "stop" })).d === "passed");
+    ok("★★ 真跑：重答自己也被掐 ⇒ 仍判 cut，理由是重答那句", !!rsJ && /重答/.test(rsJ("字".repeat(3000), cdSim({ finish: "", cut: "首帧" }, { out: 3000, cut2: "重答超过 600 秒还没写完（已掐断）" })).why));
+    ok("★ 真跑：重答顶穿（length）⇒ 判 cut·预算顶穿", !!rsJ && rsJ("字".repeat(3000), cdSim({ finish: "", cut: "x" }, { out: 3000, finish2: "length" })).d === "cut");
+  }
   console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
   process.exit(fail ? 1 : 0);
 });

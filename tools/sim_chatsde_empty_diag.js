@@ -106,7 +106,8 @@ ok(/const CHAT_RETRY_FIRST_MS = (\d+), CHAT_RETRY_TOTAL_MS = (\d+);/.test(W), "�
 }
 /* 2026-08-29 改落点不删：产线道次（rsLong）的重答总时长跟主道走 FORGE_TOTAL_MS，首帧仍是重答那套；
    普通问答一个字没变。守的用意——重答不沿用满功率档的账——照旧。 */
-ok(/const clk2 = wdsClock\(CHAT_RETRY_FIRST_MS, (?:rsLong \? FORGE_TOTAL_MS : )?CHAT_RETRY_TOTAL_MS\);/.test(chatSeg),
+/* 2026-08-29：首帧那一档多了一个「关不掉思考的家给 120 秒」的分支（那两家的重答只把正文算首帧），常规问答那一支原样——改落点不删 */
+ok(/const clk2 = wdsClock\((?:\(rsLong && !wdsCanPlain\(VC\)\) \? 120000 : )?CHAT_RETRY_FIRST_MS, (?:rsLong \? FORGE_TOTAL_MS : )?CHAT_RETRY_TOTAL_MS\);/.test(chatSeg),
   "clk2 真用的是重答那套常数（产线道次只把总时长放宽到与主道同）");
 ok(!/const clk2 = wdsClock\(CHAT_FIRST_MS/.test(chatSeg), "没退回沿用 CHAT_FIRST_MS 的老写法");
 
