@@ -1379,6 +1379,22 @@
      t() 先查 TXT 再查这里。 */
   var TX2 = {
     zh: {
+      /* 学科通融/深度研究共用的「闸门暂停条」按钮与状态文案。tx() 只读 TX2，
+         这一组原来只写在 TXT.zh 里，查不到就照原样吐回键名——界面上直接露出
+         fgAgain / fgForce 这类裸标识符。这里镜像一份过来，字面与 TXT.zh 一致。 */
+      fgTitle: "学科通融 · 二阶碰撞", fgPlan: "十八道工序，顺序不可换", fgSteps: "这一趟 {n} 道工序",
+      fgGateNo: "这一道没过闸",
+      fgRedo: "这一道自己判了「没做够」，已经停在这里，没有往下跑。",
+      fgBack1: "这一道判定病根在第 ", fgBack2: " 道——往下做没有意义。",
+      fgBlocked: "这一道判了「缺材料」，停在这里等你补。",
+      fgNoGate: "这一道没有交出闸门判决（最后一行应当是【闸门】…）。按不通过处理，没有往下跑。",
+      fgAgain: "↻ 重跑这一道", fgGoBack: "↩ 退回第 ", fgGoBack2: " 道重跑",
+      fgForce: "仍要往下跑（记一笔降级）", fgForceTag: " 道未过闸仍继续",
+      fgDegraded: "这一趟有工序没过闸而被继续：第 ",
+      fgResumed1: "接着上一趟跑：前 ", fgResumed2: " 道已经在稿子里，从断点往下写。",
+      fgResumeAsk1: "上一趟《", fgResumeAsk2: "》跑到第 ", fgResumeAsk3: " 道停下了。接着跑，还是重开一趟？",
+      fgResumeGo: "↺ 接着跑", fgResumeNew: "重开一趟",
+      fgJudge: "只到判断，不成文",
       cvTitle: "画布与共创", cvOpen: "⧉ 画布与共创", cvClose: "收起画布与共创",       cvEmpty: "画布与共创还是空的。会自动落到这儿的是：结构图（/结构图）、深度研究的报告、以及回答里成块的图/网页/表格/长文稿。\n\n想手动放一件进来：在任意一条回答下面点「⧉ 落到画布」。\n\n落进来之后：可以用「✎ 编辑」像 Word 那样直接排版改字（标题、加粗、列表、表格都有），\
 也可以点「⚡ 共创」让 WDS 重写／概括／压成承重命题／划一条分离线——\
 选中一段就只改那一段。每改一次落一个新版本，版本条上写着这一版是谁改的，\
@@ -1519,6 +1535,12 @@
       cdSelTip: "选中回答里的一句再点这里，就用那一句当承重命题；没选中就先替你填了开头那一句——它多半还得再压一压。",
     },
     en: {
+      /* Mirrors the zh block above — only the four keys tx() is checked for bilingual
+         parity on. The rest of the fg* halt-bar strings have no English text anywhere
+         in this file (学科通融 was never localized past this panel chrome), so they
+         keep falling back to TX2.zh via tx()'s existing zh-fallback, same as before. */
+      fgTitle: "Cross-discipline forge", fgPlan: "Eighteen stages, order fixed", fgSteps: "{n} stages",
+      fgJudge: "stop at the claim, no full draft",
       cvTitle: "Canvas & Co-create", cvOpen: "⧉ Canvas & Co-create", cvClose: "Hide canvas",       cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any diagram, page, table or long draft that comes back as a block.\n\nTo put something here by hand: hit “⧉ To canvas” under any answer.\n\nOnce here you can switch versions, preview, download, save locally, or select a passage and have SDE revise it in place.",
       cvTip: "Canvas & Co-create: long outputs and diagrams on the left (versions, in-place edits); the 🤝 Co-create pane on the right lets you write and ask at once",
       cvPrev: "Preview", cvSrc: "Source", cvCopy: "Copy", cvDl: "Download", cvSave: "Save locally", cvSaved: "Saved",
