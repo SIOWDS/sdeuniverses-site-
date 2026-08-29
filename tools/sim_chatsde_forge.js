@@ -127,7 +127,8 @@ ok("★ 把每一道的正文一并递上去（不再只递标题）",
   /bodies = secs\.map\([\s\S]{0,120}body: x\.body/.test(STEP) && /bodies: bodies/.test(STEP));
 ok("★ 每件产物随身带 hash（服务端据此判是不是旧版本）", /hash: fnv1a64\(x\.body\)/.test(STEP));
 ok("目录那一份仍旧只给标题（它只是目录）", /done = steps\.map/.test(STEP));
-ok("★ 闸门解析出四态", /passed\|needs_revision\|return_to_stage/.test(STEP));
+/* 2026-08-29 第五态 run_pending（只第 12 道用）插在 needs_revision 与 return_to_stage 之间：改落点不删，用意不变。 */
+ok("★ 闸门解析出五态（含第 12 道专用的 run_pending）", /passed\|needs_revision\|run_pending\|return_to_stage/.test(STEP));
 ok("★ 只有 passed 才 i++ 往下跑", /if \(g\.d === "passed"\) \{ r\.box\.classList\.remove\("open"\); i\+\+; return step\(\); \}/.test(STEP));
 ok("★ 没交出闸门判决的按不通过处理（不许当合格收下）", /d: "unknown"/.test(STEP) && /fgNoGate/.test(STEP));
 ok("★ 技术故障也不再静默 i++ 跳过", /catch\(function \(e\) \{[\s\S]{0,400}forgeHalt/.test(STEP));

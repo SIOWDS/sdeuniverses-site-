@@ -1,4 +1,7 @@
 // SDE Universes site worker: visit counter + static assets
+/* 真跑执行器的出站网关是一个具名入口（WorkerEntrypoint），由 Dynamic Worker 的 globalOutbound 指向它。
+   这是全文件唯一一条 import；各护栏都是切片抠函数，不会把它一起 new Function。 */
+import { WorkerEntrypoint } from "cloudflare:workers";
 
 // ── 主站 / 四个正式子站：唯一归属、canonical 与统一统计 ────────────
 // 唯一数据源在 public/sites/site-data.json：Worker 用它判路由、改首页统计与
@@ -6883,6 +6886,187 @@ const FORGE_HEART =
   + "\n成品对读者一律不出现学派术语与工艺痕迹（碰撞／对撞／撞出／二阶／候选判断／五重检验／三视角／"
   + "近邻划界／本文的方法／创新智商／五维／综合分／SDE 及其术语），也不许印任何分数。";
 
+/* ═══ 真跑执行器（2026-08-29 · Dynamic Workers）═══════════════════════════════
+   为什么要有它：第 12 道「真跑一条」此前是把「用真实公开数据跑一遍」念给基底听——而基底没有执行器，
+   闸门要数字、它就编数字（6 月那批六篇全部编造了数值结果，实跑与它报的差一个数量级）。
+   现在分工是死的：**基底只写预注册三件＋judge＋取数代码，不碰执行；程序先锁定预注册、再执行、再判。**
+   锁定＝在读取任何结果之前把 prereg＋judge 压成 FNV-1a 哈希，写进记录；第二趟与第 18 道自查都拿这个哈希核对。
+   一条规矩如果让人有动机伪造它要保护的那个东西，它就是净负的——所以这里判的是过程（锁没锁、跑没跑、报没报），
+   不是结果的方向。 */
+const FORGE_RUN_COMPAT = "2026-04-15";                 // 与本 Worker 的 compatibility_date 同源
+const FORGE_RUN_LIMITS = { cpuMs: 15000, subRequests: 40, wallMs: 90000, bodyMax: 2000000, codeMax: 8000, judgeMax: 600, resultMax: 20000 };
+const FORGE_RUN_VERDICTS = ["favorable", "unfavorable", "mixed"];
+/* 只放公开、免密、可复核的数据接口；名单本身就是记录的一部分——被挡的请求会原样出现在取数记录里。 */
+const FORGE_RUN_HOSTS = [
+  "eutils.ncbi.nlm.nih.gov", "api.ncbi.nlm.nih.gov", "www.ebi.ac.uk", "rest.genenames.org", "clinicaltrials.gov",
+  "api.openalex.org", "export.arxiv.org", "api.crossref.org", "api.semanticscholar.org", "api.unpaywall.org",
+  "api.worldbank.org", "api.fda.gov", "api.gbif.org", "api.github.com", "raw.githubusercontent.com",
+  "zenodo.org", "data.europa.eu", "ourworldindata.org", "api.stackexchange.com",
+];
+const FORGE_RUN_HOST_SUFFIX = [".wikipedia.org", ".wikimedia.org", ".wiktionary.org"];
+function forgeRunAllow(urlStr, method) {
+  let u;
+  try { u = new URL(String(urlStr || "")); } catch (e) { return { ok: false, why: "不是合法 URL" }; }
+  if (u.protocol !== "https:") return { ok: false, why: "只许 https" };
+  const m = String(method || "GET").toUpperCase();
+  if (m !== "GET" && m !== "HEAD") return { ok: false, why: "只许 GET/HEAD（取数不许写入）" };
+  const h = u.hostname.toLowerCase();
+  const ok = FORGE_RUN_HOSTS.indexOf(h) >= 0 || FORGE_RUN_HOST_SUFFIX.some((sfx) => h.endsWith(sfx));
+  if (!ok) return { ok: false, why: "域名不在公开数据接口名单里：" + h };
+  u.username = ""; u.password = ""; u.hash = "";
+  return { ok: true, url: u.toString(), host: h };
+}
+/* 校验并规范化「真跑包」。只做形状与预算的钳位，不替基底改一个字——改了就不是它的预注册了。 */
+function forgeRunValidate(raw) {
+  const p = (raw && typeof raw === "object") ? raw : null;
+  if (!p) return { err: "真跑包不是对象" };
+  const S = (v, n) => String(v == null ? "" : v).replace(/\r/g, "").trim().slice(0, n);
+  const pre = (p.prereg && typeof p.prereg === "object") ? p.prereg : {};
+  const pack = {
+    claim: S(p.claim, 400), unit: S(p.unit, 200), source: S(p.source, 600),
+    prereg: { negative: S(pre.negative, 600), adverse: S(pre.adverse, 400), stop: S(pre.stop, 400) },
+    judge: S(p.judge, FORGE_RUN_LIMITS.judgeMax),
+    code: String(p.code == null ? "" : p.code).replace(/\r/g, ""),
+  };
+  if (!pack.prereg.negative || !pack.prereg.adverse || !pack.prereg.stop) return { err: "预注册三件缺项（negative / adverse / stop 都要有）" };
+  if (!pack.judge) return { err: "缺 judge（判负条款的机器形式）" };
+  if (!/^\s*(\(|async\b|function\b|[A-Za-z_$][\w$]*\s*=>)/.test(pack.judge)) return { err: "judge 必须是一个函数表达式，如 (r) => r.rate < 0.3 ? 'unfavorable' : 'favorable'" };
+  if (!pack.code.trim()) return { err: "缺 code" };
+  if (pack.code.length > FORGE_RUN_LIMITS.codeMax) return { err: "code 超过 " + FORGE_RUN_LIMITS.codeMax + " 字" };
+  if (/^\s*(import|export)\s/m.test(pack.code)) return { err: "code 里不许 import / export" };
+  if (!/async\s+function\s+run\s*\(/.test(pack.code)) return { err: "code 里必须定义 async function run()" };
+  return { pack };
+}
+/* 预注册锁：canon 是逐字规范串（键序固定），hash 在**任何执行之前**算出。记录里带 canon，谁都能重算核对。 */
+function forgeRunLock(pack) {
+  const canon = "negative=" + pack.prereg.negative + "\nadverse=" + pack.prereg.adverse + "\nstop=" + pack.prereg.stop + "\njudge=" + pack.judge;
+  return { canon, hash: fnv1a64(canon) };
+}
+/* 站方包一层：记每一次 fetch（URL／状态／耗时）与 console 输出，捕获异常，统一交 JSON。
+   这段包装在基底的代码之前跑，所以它的 run() 拿到的 fetch 已经是记账版。 */
+function forgeRunWrap(code) {
+  return "const __log = { calls: [], out: [] };\n"
+    + "const __fetch0 = globalThis.fetch;\n"
+    + "globalThis.fetch = async function (input, init) {\n"
+    + "  const u = (typeof input === 'string') ? input : ((input && input.url) || String(input));\n"
+    + "  const t0 = Date.now(); let r;\n"
+    + "  try { r = await __fetch0(input, init); }\n"
+    + "  catch (e) { if (__log.calls.length < 80) __log.calls.push({ url: String(u).slice(0, 300), err: String((e && e.message) || e).slice(0, 200), ms: Date.now() - t0 }); throw e; }\n"
+    + "  if (__log.calls.length < 80) __log.calls.push({ url: String(u).slice(0, 300), status: r.status, gate: r.headers.get('x-forge-run') || '', ms: Date.now() - t0 });\n"
+    + "  return r;\n"
+    + "};\n"
+    + "for (const k of ['log', 'info', 'warn', 'error']) { console[k] = function () { try { if (__log.out.length < 120) __log.out.push(Array.from(arguments).map((x) => typeof x === 'string' ? x : JSON.stringify(x)).join(' ').slice(0, 400)); } catch (e) {} }; }\n"
+    + "// ── 以下是基底写的取数代码（原样，未改一字） ──\n"
+    + code + "\n"
+    + "// ── 站方入口 ──\n"
+    + "export default {\n"
+    + "  async fetch() {\n"
+    + "    let out;\n"
+    + "    try {\n"
+    + "      if (typeof run !== 'function') throw new Error('代码里没有定义 async function run()');\n"
+    + "      const r = await run();\n"
+    + "      out = { ok: true, result: r === undefined ? null : r };\n"
+    + "    } catch (e) { out = { ok: false, error: String((e && e.stack) || e).slice(0, 2000) }; }\n"
+    + "    out.log = __log;\n"
+    + "    let txt; try { txt = JSON.stringify(out); } catch (e) { txt = JSON.stringify({ ok: false, error: 'run() 的返回值不能 JSON 化：' + String(e && e.message || e), log: __log }); }\n"
+    + "    return new Response(txt, { headers: { 'content-type': 'application/json' } });\n"
+    + "  },\n"
+    + "};\n";
+}
+/* judge 单独跑在一个**断网**的 isolate 里：它只能读 run() 的返回值，读不到别的、取不到数。 */
+function forgeRunJudgeWrap(judgeSrc) {
+  return "const judge = (" + judgeSrc + ");\n"
+    + "export default {\n"
+    + "  async fetch(req) {\n"
+    + "    let v;\n"
+    + "    try { const b = await req.json(); v = await judge(b.result); }\n"
+    + "    catch (e) { return new Response(JSON.stringify({ ok: false, error: String((e && e.message) || e).slice(0, 400) }), { headers: { 'content-type': 'application/json' } }); }\n"
+    + "    return new Response(JSON.stringify({ ok: true, verdict: String(v).slice(0, 40) }), { headers: { 'content-type': 'application/json' } });\n"
+    + "  },\n"
+    + "};\n";
+}
+function _forgeRunTimeout(ms) { return new Promise((_, rej) => setTimeout(() => rej(new Error("超过墙钟 " + ms + " ms")), ms)); }
+/* 执行一次真跑。返回的记录无论成败都是同一个形状——第二趟与第 18 道按同一份字段读。 */
+async function forgeRunExec(env, pack, meta) {
+  const lock = forgeRunLock(pack);                    // ⭐ 先锁，再跑：这一行在任何执行之前
+  const t0 = Date.now();
+  const rec = {
+    ok: false, code: "", hash: lock.hash, canon: lock.canon, code_hash: fnv1a64(pack.code),
+    claim: pack.claim, unit: pack.unit, source: pack.source, prereg: pack.prereg, judge: pack.judge,
+    verdict: "not_run", judge_error: "", result: "null", error: "", log: { calls: [], out: [] },
+    run: String((meta && meta.run) || ""), stage: (meta && meta.i) | 0, at: new Date().toISOString(), took: 0,
+    hosts: FORGE_RUN_HOSTS.length + FORGE_RUN_HOST_SUFFIX.length,
+  };
+  if (!env || !env.LOADER || typeof env.LOADER.load !== "function") {
+    rec.code = "no_loader";
+    rec.error = "本站这一版没有执行器绑定（LOADER）——真跑跑不了。这是部署问题，不是这份代码的问题；记录照发，第二趟按「未成」入账。";
+    rec.took = Date.now() - t0;
+    return rec;
+  }
+  let out = null;
+  try {
+    const w = env.LOADER.load({
+      compatibilityDate: FORGE_RUN_COMPAT,
+      mainModule: "run.js",
+      modules: { "run.js": forgeRunWrap(pack.code) },
+      /* 出站一律经 RunGateway（同一 Worker 的具名入口）：名单、方法、体积都在那里管。
+         没有这个绑定时宁可断网（null）也不放它直连公网。 */
+      globalOutbound: (env.RUN_GATE && typeof env.RUN_GATE.fetch === "function") ? env.RUN_GATE : null,
+      limits: { cpuMs: FORGE_RUN_LIMITS.cpuMs, subRequests: FORGE_RUN_LIMITS.subRequests },
+    });
+    const resp = await Promise.race([w.getEntrypoint().fetch(new Request("https://forge-run.internal/run")), _forgeRunTimeout(FORGE_RUN_LIMITS.wallMs)]);
+    const txt = await resp.text();
+    out = JSON.parse(txt);
+  } catch (e) {
+    rec.code = "exec_error";
+    rec.error = String((e && e.message) || e).slice(0, 800);
+  }
+  if (out) {
+    rec.log = { calls: Array.isArray(out.log && out.log.calls) ? out.log.calls.slice(0, 80) : [], out: Array.isArray(out.log && out.log.out) ? out.log.out.slice(0, 120) : [] };
+    if (out.ok) {
+      rec.ok = true; rec.code = "ran";
+      let rs = "null"; try { rs = JSON.stringify(out.result === undefined ? null : out.result); } catch (e) { rs = "null"; }
+      rec.result = String(rs).slice(0, FORGE_RUN_LIMITS.resultMax);
+      /* judge：断网 isolate，读返回值，只许交三个词之一。判不出来＝invalid，不替它圆。 */
+      try {
+        const jw = env.LOADER.load({
+          compatibilityDate: FORGE_RUN_COMPAT, mainModule: "judge.js",
+          modules: { "judge.js": forgeRunJudgeWrap(pack.judge) },
+          globalOutbound: null, limits: { cpuMs: 2000, subRequests: 0 },
+        });
+        const jr = await Promise.race([jw.getEntrypoint().fetch(new Request("https://forge-run.internal/judge", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ result: out.result }) })), _forgeRunTimeout(10000)]);
+        const jj = await jr.json();
+        if (jj && jj.ok && FORGE_RUN_VERDICTS.indexOf(jj.verdict) >= 0) rec.verdict = jj.verdict;
+        else { rec.verdict = "invalid"; rec.judge_error = (jj && jj.error) ? String(jj.error).slice(0, 400) : ("judge 交回的不是三个词之一：" + String(jj && jj.verdict).slice(0, 40)); }
+      } catch (e) { rec.verdict = "invalid"; rec.judge_error = String((e && e.message) || e).slice(0, 400); }
+    } else {
+      rec.code = "code_error";
+      rec.error = String(out.error || "run() 未交出结果").slice(0, 2000);
+    }
+  }
+  rec.took = Date.now() - t0;
+  return rec;
+}
+/* 记录摊成第二趟提示语里那一段。**只陈述，不下结论**——结论已经在 verdict 里，由 judge 算出。 */
+function forgeRunText(rec) {
+  if (!rec) return "";
+  const calls = (rec.log && rec.log.calls) || [];
+  const outs = (rec.log && rec.log.out) || [];
+  const st = rec.code === "ran" ? "已执行" : rec.code === "no_loader" ? "未执行（本站执行器缺席）" : rec.code === "exec_error" ? "执行失败（沙盒层）" : rec.code === "code_error" ? "代码报错" : String(rec.code || "未知");
+  return "锁定哈希＝" + rec.hash + "（预注册三件＋judge 在执行前锁定；代码哈希 " + (rec.code_hash || "") + "）"
+    + "\n判负条款＝" + rec.prereg.negative
+    + "\n不利结果处置＝" + rec.prereg.adverse
+    + "\n停止规则＝" + rec.prereg.stop
+    + "\njudge＝" + rec.judge
+    + "\n跑的是＝" + (rec.claim || "（未填）") + "｜单位＝" + (rec.unit || "（未填）") + "｜取数场＝" + (rec.source || "（未填）")
+    + "\n执行状态＝" + st + (rec.error ? ("｜错误：" + rec.error) : "") + "｜耗时 " + (rec.took | 0) + " ms"
+    + "\n取数记录＝" + calls.length + " 次调用" + (calls.length ? ("：" + calls.map((c) => (c.url || "") + " → " + (c.err ? ("失败 " + c.err) : ("HTTP " + c.status + (c.gate === "blocked" ? "（被名单挡下）" : c.gate === "truncated" ? "（超体积被截）" : "")))).join("；")) : "")
+    + (outs.length ? ("\n控制台输出＝" + outs.join(" ⏎ ").slice(0, 3000)) : "")
+    + "\n返回值（原样，截到 " + FORGE_RUN_LIMITS.resultMax + " 字）＝" + (rec.result || "null")
+    + "\n判决＝" + rec.verdict + (rec.judge_error ? ("（judge 报错：" + rec.judge_error + "）") : "") + "（由 judge 在断网 isolate 里算出，不是你写的，也不是我写的）";
+}
+
+
 const FORGE_STAGES = [
   { t: "选源与四道闸",
     d: "**先做三件事，做完才选源（v6.0）**：\n"
@@ -7049,7 +7233,25 @@ const FORGE_STAGES = [
       + "**不许用「可在未来研究中检验」这类话把它糊过去**——那句话读起来像做了，实际什么也没有。\n"
       + "　按这个格式收口：跑的是第 __ 条｜取数场＝__（复述第一步）｜样本与口径＝__｜"
       + "预注册三件：判负条款〔跑前已写死：是／否〕· 不利结果处置〔已约定：是／否〕· 停止规则〔已写死：是／否〕｜"
-      + "**结果＝__（有利／不利／混合，原样写）**｜据此改判了本文哪一处＝__（无则写「无」）。" },
+      + "**结果＝__（有利／不利／混合，原样写）**｜据此改判了本文哪一处＝__（无则写「无」）。\n"
+      + "\n"
+      + "· ⭐⭐ **真跑由程序执行，不由你执行（2026-08-29 起，这一道分两趟）**。此前这一条是念给你听的，而你没有执行器——闸门要数字、你就只能编。现在分工是死的：**你只写预注册三件、judge 与取数代码；程序先把预注册锁成哈希，再执行代码，再用 judge 判结果。**\n"
+      + "　**第一趟（现在这一趟）**：第一步闸零之三判「有／可造」且能指到一个**公开、免密的数据接口**时，在正文末尾、闸门之前交两块「真跑包」（两块都要，缺一不算）：\n"
+      + "　```json forge-run\n"
+      + "　{ \"claim\": \"跑的是上面第几条（原句）\", \"unit\": \"拟清点的单位\", \"source\": \"取数场（复述第一步）＋要访问的接口\",\n"
+      + "　  \"prereg\": { \"negative\": \"判负条款：观察到什么本文就错——写死数字\", \"adverse\": \"不利结果处置：含一句『无论结果如何都照原样发表』\", \"stop\": \"停止规则：样本量或时间窗写死，不许边看边加\" },\n"
+      + "　  \"judge\": \"(r) => r.rate < 0.30 ? 'unfavorable' : (r.rate > 0.60 ? 'favorable' : 'mixed')\" }\n"
+      + "　```\n"
+      + "　```js forge-run-code\n"
+      + "　async function run() { /* 用全局 fetch 取公开数据（只许 GET）；返回一个可 JSON 化的对象 */ return { n: 0, rate: 0 }; }\n"
+      + "　```\n"
+      + "　硬约束六条：① code 是 JavaScript，只许定义 `async function run()`（可带辅助函数），不许 import／export／eval，≤ 8000 字；② 只用全局 `fetch` 取**公开数据**，只许 GET；可访问的域名只有这些——"
+      + "PubMed E-utilities（eutils.ncbi.nlm.nih.gov）／Europe PMC（www.ebi.ac.uk）／HGNC（rest.genenames.org）／ClinicalTrials（clinicaltrials.gov）／OpenAlex（api.openalex.org）／arXiv（export.arxiv.org）／Crossref（api.crossref.org）／Semantic Scholar（api.semanticscholar.org）／World Bank（api.worldbank.org）／openFDA（api.fda.gov）／GBIF（api.gbif.org）／GitHub（api.github.com、raw.githubusercontent.com）／Zenodo／Wikipedia 各语种（*.wikipedia.org）——名单外的域名会被程序挡下并原样记入取数记录；"
+      + "③ **run() 只返回原始计数与比率，不许在代码里写结论**；结论由 judge 给——judge 是一个纯函数表达式，读 run() 的返回值，**只许返回 'favorable'／'unfavorable'／'mixed' 三个词之一**，且它必须与 prereg.negative 说的是同一句话（数字一致，否则第二趟会被程序判 invalid）；"
+      + "④ 样本量与时间窗写死在 code 里（这就是停止规则的机器形式）；⑤ 单次执行 CPU 15 秒、40 次请求、每个响应 2MB 以内——取不完就在 code 里分页取前 N 页并在 stop 里写明；"
+      + "⑥ 交了真跑包，这一道的最后一行写 `【闸门】run_pending`（第五态，只此一道用；程序会去执行，再把记录递回给你）。\n"
+      + "　第一步判「无」、或指不到公开接口，就**不交真跑包**，照旧写「本次未做真跑，原因：__」并正常交闸门——不许拿一个编出来的接口地址凑数。\n"
+      + "　**第二趟**：程序跑完会把【真跑记录】递回来，那一趟你的活只剩把它**原样入账**（见记录块下面的用法五条）。" },
   { t: "近邻划界（三栏）",
     d: "选 6–10 个最容易被读者混为一谈的既有概念，逐一写。其中**至少 3 个点到名**（作者 年份／《作品》），**至少一个来自本文学科之外**，**至少一个是方法学占位者**。每条必须写满四件，缺一件这条不算数：出处（概念名·作者年份·学科）／它说到哪一步（一句话，公允，不许写成稻草人）／分离线（差别落在哪，必须是一个可分辨的差别）／**判决性对照预测**（该邻居在具体案例预测 A，本判断预测非 A，A 怎么读数）。\n"
       + "三条硬规矩：「侧重不同」「更强调」不算划界，必须落到同一个案例按那个概念判是 A、按本判断判是 B；**每条的证伪句必须各不相同**（多位邻居共用同一句全称否定，等于一条都没划）；**最锋利的分离线常常是「两边对同一份材料给出相反的评价」**，而不是「我比它多说了一点」——只能写出「我更全面」的，多半没成立。\n"
@@ -7226,6 +7428,7 @@ function forgeCarry(i, bodies, gates, needsTbl) {
   return { text: out, got: have, miss };
 }
 
+
 function wdsForgeSys(rs) {
   const i = Math.max(1, Math.min(FORGE_STAGES.length, rs.i | 0));
   const st = FORGE_STAGES[i - 1];
@@ -7257,6 +7460,18 @@ function wdsForgeSys(rs) {
             + "③ 读数只覆盖数得出来的那几件；数不出来的（反向约束是否真的削弱了命题、洞是否真的留着、自反是否只是套话）"
             + "仍要你逐条看正文来判——那几件恰恰是最容易糊过去的。")
         : "")
+    /* ⭐ 真跑记录：第 12 道第二趟。程序已经执行完、判完，这一趟基底只入账。
+       记录块**只在第 12 道**注入——别的道次拿到它没有用处，只会诱它复述。 */
+    + ((rs.runrec && i === 12)
+        ? ("\n\n【真跑记录（程序跑出来的，一个字不许改）】\n" + forgeRunText(rs.runrec)
+            + "\n\n用法五条，一条都不许绕：\n"
+            + "① **原样入账**：预注册三件按记录里的字写，数字一个不许动；judge 原样抄。\n"
+            + "② 「结果＝」只许写记录里的判决（favorable＝有利／unfavorable＝不利／mixed＝混合）；判决是 invalid 或执行状态不是「已执行」，就写「本次真跑未成，原因：程序记录 ____」，**不许当作跑成**，也不许用「可在未来研究中检验」糊过去。\n"
+            + "③ 正文里必须有独占一行的 `〔真跑记录 " + rs.runrec.hash + "〕`——第 18 道的机器读数靠它核对；没有这一行视同没跑。\n"
+            + "④ 取数记录里被名单挡下或失败的调用要如实写进「样本与口径」，不许略去。\n"
+            + "⑤ 「据此改判了本文哪一处」如实写；结果全部有利时按上面那句写「预注册三件齐备，结果方向全部有利，读者可据此加倍怀疑」。\n"
+            + "这一趟照常交闸门（passed／needs_revision／return_to_stage／blocked），**不再写 run_pending**。")
+        : "")
     + (carry.miss.length
         ? ("\n\n⚠【材料不全】这一道本该读到第 " + carry.miss.join("、") + " 道的产出，但它们没有递上来。"
             + "**不许假装读过。**要么就本道能拿到的材料如实做、并在闸门里写明缺了哪几道；"
@@ -7275,6 +7490,7 @@ function wdsForgeSys(rs) {
     + "\n`【闸门】needs_revision · 理由`　　　本道自己没做够，应当重跑本道"
     + "\n`【闸门】return_to_stage:N · 理由`　病根在第 N 道，往下做没有意义"
     + "\n`【闸门】blocked · 缺什么`　　　　　缺材料或缺读者的决定，只能停在这里"
+    + (i === 12 && !rs.runrec ? "\n`【闸门】run_pending`　　　　　　　　只此一道：交了真跑包，等程序执行后再回来入账" : "")
     + "\n⚠ **不许为了让流程能往下走而写 passed。**这条产线的下游会全部空转，而读起来照样通顺——"
     + "一个诚实的 needs_revision 比一份好看的空转产出值钱得多。";
 }
@@ -9614,6 +9830,29 @@ async function wxSweep(env, now) {
   return { ok: true, scanned, removed, kept, ttlDays: 7, gone: gone.slice(0, 20) };
 }
 
+/* 出站网关：Dynamic Worker 里每一次 fetch/connect 都先到这里。名单、方法、体积三道。
+   它是本 Worker 的一个具名入口，由 wrangler 的 services 绑定 RUN_GATE 指回自己。 */
+export class RunGateway extends WorkerEntrypoint {
+  async fetch(request) {
+    const H = { "content-type": "application/json" };
+    const chk = forgeRunAllow(request.url, request.method);
+    if (!chk.ok) return new Response(JSON.stringify({ error: chk.why }), { status: 403, headers: { ...H, "x-forge-run": "blocked" } });
+    let r;
+    try {
+      r = await fetch(new Request(chk.url, { method: request.method === "HEAD" ? "HEAD" : "GET",
+        headers: { "accept": request.headers.get("accept") || "application/json, text/plain, */*", "user-agent": "sdeuniverses-forge-run/1 (+https://sdeuniverses.com; research data fetch)" } }));
+    } catch (e) {
+      return new Response(JSON.stringify({ error: "取数失败：" + String((e && e.message) || e).slice(0, 200) }), { status: 502, headers: { ...H, "x-forge-run": "fetch_failed" } });
+    }
+    const buf = await r.arrayBuffer();
+    const cut = buf.byteLength > FORGE_RUN_LIMITS.bodyMax;
+    return new Response(cut ? buf.slice(0, FORGE_RUN_LIMITS.bodyMax) : buf, {
+      status: r.status,
+      headers: { "content-type": r.headers.get("content-type") || "application/octet-stream", "x-forge-run": cut ? "truncated" : "ok" },
+    });
+  }
+}
+
 export default {
   // 定时清库：每天 04:17 UTC 跑一次（cron 写在 wrangler.jsonc 的 triggers.crons）
   async scheduled(event, env, ctx) {
@@ -10857,6 +11096,25 @@ export default {
       });
       return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
+    /* /api/wds/forge/run：第 12 道真跑的执行器。收真跑包 → 锁预注册 → Dynamic Worker 里跑取数代码 →
+       断网 isolate 里跑 judge → 交记录。记录无论成败都交（前端拿它去跑第二趟入账）；
+       只有请求本身不合法（不是对象／缺预注册）才 400。不烧读者的 Key，烧的是站方 CPU，所以按 IP 限流。 */
+    if (url.pathname === "/api/wds/forge/run") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("forge-run:" + ip));
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=6&d=80"))).json());
+        if (!lr.ok) return J({ ok: false, code: "rate", msg: lr.reason === "day" ? "今天的真跑次数用完了（每 IP 80 次），明天再来。" : "跑得太密了，过一分钟再来。" }, 429);
+      } catch (e) {}
+      const v = forgeRunValidate(b.pack);
+      if (v.err) return J({ ok: false, code: "pack", msg: v.err }, 400);
+      const rec = await forgeRunExec(env, v.pack, { run: String(b.run || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40), i: Math.max(0, Math.min(20, parseInt(b.i, 10) || 0)) });
+      return J(rec, 200);
+    }
     // /api/wds/chat：SDE 助教模式（首页 AI 对话入口）——全站检索 + 内核 + 王德生人格 + 多轮 + 出处（流式 SSE）
     if (url.pathname === "/api/wds/chat") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
@@ -10999,6 +11257,25 @@ export default {
               hash: String(b.hash || "").replace(/[^a-f0-9]/g, "").slice(0, 32) });
           }
           return out;
+        })(),
+        /* runrec：第 12 道第二趟带回来的真跑记录（程序产物）。逐字段钳位；hash 只认十六进制。
+           ⚠ 新字段不进这张单子就会被静默丢掉（2026-08-12 bodies 那次就是这么空转的）。 */
+        runrec: (function () {
+          const r = (rsRaw.runrec && typeof rsRaw.runrec === "object") ? rsRaw.runrec : null;
+          if (!r) return null;
+          const S = (v, n) => String(v == null ? "" : v).slice(0, n);
+          const pre = (r.prereg && typeof r.prereg === "object") ? r.prereg : {};
+          const lg = (r.log && typeof r.log === "object") ? r.log : {};
+          return {
+            ok: !!r.ok, code: S(r.code, 20).replace(/[^a-z_]/g, ""),
+            hash: S(r.hash, 32).replace(/[^a-f0-9]/g, ""), code_hash: S(r.code_hash, 32).replace(/[^a-f0-9]/g, ""),
+            claim: S(r.claim, 400), unit: S(r.unit, 200), source: S(r.source, 600),
+            prereg: { negative: S(pre.negative, 600), adverse: S(pre.adverse, 400), stop: S(pre.stop, 400) },
+            judge: S(r.judge, 600), verdict: S(r.verdict, 20).replace(/[^a-z_]/g, ""), judge_error: S(r.judge_error, 400),
+            result: S(r.result, 20000), error: S(r.error, 2000), took: Math.max(0, parseInt(r.took, 10) || 0),
+            log: { calls: (Array.isArray(lg.calls) ? lg.calls.slice(0, 80) : []).map((c) => ({ url: S(c && c.url, 300), status: parseInt(c && c.status, 10) || 0, err: S(c && c.err, 200), gate: S(c && c.gate, 20), ms: parseInt(c && c.ms, 10) || 0 })),
+                   out: (Array.isArray(lg.out) ? lg.out.slice(0, 120) : []).map((x) => S(x, 400)) },
+          };
         })(),
         /* gates：各道的闸门判决。服务端据此在材料里标出「这一道其实没过闸」。 */
         gates: (Array.isArray(rsRaw.gates) ? rsRaw.gates.slice(0, 20) : []).map((g) => ({

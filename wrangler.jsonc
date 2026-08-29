@@ -50,7 +50,17 @@
     { "binding": "PDFS", "bucket_name": "sdeuniverses-pdf" }
   ],
   "services": [
-    { "binding": "SELF", "service": "steep-band-faf5" }
+    { "binding": "SELF", "service": "steep-band-faf5" },
+    /* RUN_GATE：真跑执行器的出站网关＝本 Worker 自己的具名入口 RunGateway（src/worker.js）。
+       Dynamic Worker 的 globalOutbound 指向它，取数代码的每一次 fetch 都先过名单／方法／体积三道。 */
+    { "binding": "RUN_GATE", "service": "steep-band-faf5", "entrypoint": "RunGateway" }
+  ],
+  /* LOADER：Dynamic Workers（2026-03 开放测试，付费档可用）。第 12 道「真跑一条」的执行器：
+     基底写的取数代码在它自己的 isolate 里跑，CPU／子请求由 limits 钳住，出站走 RUN_GATE。
+     测试期每个动态 Worker $0.002/天的那笔免收；CPU 与调用照常计。缺了这个绑定，/api/wds/forge/run
+     会交回 code=no_loader 的记录（老实说跑不了），不会假装跑过。 */
+  "worker_loaders": [
+    { "binding": "LOADER" }
   ],
   "durable_objects": {
     "bindings": [
