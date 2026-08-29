@@ -2781,7 +2781,7 @@
     else if (y < topLastY - 24) topSet(false);
     topLastY = y;
   }
-  bodyEl.addEventListener("scroll", function () { setStick(atBottom()); topOnScroll(); }, { passive: true });
+  bodyEl.addEventListener("scroll", function () { setStick(atBottom()); topOnScroll(); toolsOnScroll(); }, { passive: true });
   if (toBotEl) { toBotEl.onclick = function () { setStick(true); scrollBottom(1); }; }
   var tipEl = layer.querySelector(".wdsm-mode-tip");
   // 语言只重刷"外壳"（按钮/提示/示例）；已经生成的回答保持它当时的语言——重译旧答既不诚实也没必要。
@@ -2921,6 +2921,24 @@
   /* 第一次发问后自动收起——**只对没表过态的读者**。表过态的人按他自己的来。 */
   function toolsAutoFold() { if (toolsPinned === null && toolsOpen) toolsSet(false, false); }
   if (togEl) togEl.onclick = function () { toolsSet(!toolsOpen, true); };
+  /* ════ 档位条随读收起、随写再现（2026-08-29）════════════════════
+     原来只有「问出第一句就收起、此后要手动点开」这一下，往后读者滚多久
+     它都不会自己回来。顶栏那一刀已经证明「随滚动收放」这条路走得通——
+     这里照同一套判据搬过来，让档位条也真正"动态"：往下读收、往上翻或
+     到顶回来；而**要打字了**（点进输入框）本身就是"我要挑档位"的信号，
+     不必等读者先滚回顶部再去点开那颗折叠钮。
+     只对没表过态的读者生效（toolsPinned===null）——手动点过开/关的人，
+     滚动与点输入框都不该再替他做主。 */
+  var toolsLastY = 0;
+  function toolsOnScroll() {
+    if (toolsPinned !== null) return;
+    var y = bodyEl.scrollTop || 0;
+    if (y < 40) toolsSet(true, false);
+    else if (y > toolsLastY + 8) toolsSet(false, false);
+    else if (y < toolsLastY - 24) toolsSet(true, false);
+    toolsLastY = y;
+  }
+  try { inEl.addEventListener("focus", function () { if (toolsPinned === null) toolsSet(true, false); }); } catch (e) {}
   function paintModes() {
     var bs = layer.querySelectorAll(".wdsm-mode");
     for (var i = 0; i < bs.length; i++) {

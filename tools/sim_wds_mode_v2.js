@@ -1813,11 +1813,42 @@ console.log("⑧ 成文（distill）");
     ok(/distill\(k, body, head, "", null, st\)/.test(src), "取回时把笔法一并带回去");
   }
 
+  /* ═══ 档位条随读收起、随写再现（2026-08-29）═══════════════════════
+     原来「问出第一句自动收起」只发生一次，此后读者滚多久它都不会自己
+     回来。这里验它跟顶栏一样真的动起来了：往下读收、往上翻或到顶现、
+     点进输入框也现——且这一段必须排在下面「档位条收放」那段手动点过
+     折叠钮之前：toolsPinned 一旦被点过（非 null），下面这几件事按设计
+     就不该再管，测不出默认行为了。 */
+  {
+    console.log("⑳ 档位条随读收起、随写再现");
+    const modesBar2 = layer.querySelector(".wdsm-modes");
+    const body2 = layer.querySelector(".wdsm-body");
+    const inBox = layer.querySelector(".wdsm-in");
+    const fire2 = (y) => { body2.scrollTop = y; (body2._listeners.scroll || []).forEach((f) => f()); };
+    ok(!!modesBar2 && !!body2 && !!inBox, "档位条、滚动容器、输入框都在");
+    if (modesBar2 && body2 && inBox) {
+      fire2(300);
+      ok(modesBar2.className.includes("fold"), "往下读 → 档位条也跟着收起");
+      fire2(200);
+      ok(!modesBar2.className.includes("fold"), "往上翻 → 档位条回来");
+      fire2(600); ok(modesBar2.className.includes("fold"), "再往下读又收起");
+      (inBox._listeners.focus || []).forEach((f) => f());
+      ok(!modesBar2.className.includes("fold"), "⭐ 点进输入框（要打字了）→ 档位条自己现出来，不必先滚回顶部找折叠钮");
+      fire2(10); ok(!modesBar2.className.includes("fold"), "滚到顶也必现");
+    }
+    ok(/function toolsOnScroll\(\) \{\s*if \(toolsPinned !== null\) return;/.test(src),
+      "滚动折叠只对没表过态的读者生效（源码级：表过态直接短路，不进后面的判断）");
+    ok(/toolsOnScroll\(\)/.test(src.slice(src.indexOf('bodyEl.addEventListener("scroll"'), src.indexOf('bodyEl.addEventListener("scroll"') + 200)),
+      "挂在与顶栏同一条滚动监听上（不是另起一条、容易漏挂）");
+    ok(/inEl\.addEventListener\("focus", function \(\) \{ if \(toolsPinned === null\) toolsSet\(true, false\); \}\)/.test(src),
+      "点进输入框会唤回档位条，同样只对没表过态的读者");
+  }
+
   /* ═══ 档位条收放（2026-08-29）═══════════════════════════════════
      输出窗口要能变大：档位条收进输入行的一颗小钮。
      这里验三件：收得起来、**收起时状态仍写在钮上**、读者点过就记住。 */
   {
-    console.log("⑳ 档位条收放");
+    console.log("㉑ 档位条收放");
     const tog = layer.querySelector(".wdsm-mtog");
     const modesBar = layer.querySelector(".wdsm-modes");
     ok(!!tog && !!modesBar, "折叠钮与档位条都在");
@@ -1839,6 +1870,14 @@ console.log("⑧ 成文（distill）");
         "⭐ 收起时钮上写着此刻开着哪几档（看不见的开关比没有开关更坏）：" + tog.textContent);
       if (!wasOn) webBtn.onclick();
       ok(localStorage.getItem("sde_wds_tools") === "0", "读者点过就记住（下次开屏照他的来）");
+      // 上面这一串点击已经把 toolsPinned 从 null 定成了 false（明确收起）——
+      // 借这个状态顺便验一条：表过态之后，滚动/聚焦不该再替读者做主。
+      const body3 = layer.querySelector(".wdsm-body");
+      const inBox3 = layer.querySelector(".wdsm-in");
+      body3.scrollTop = 10; (body3._listeners.scroll || []).forEach((f) => f());
+      (inBox3._listeners.focus || []).forEach((f) => f());
+      ok(modesBar.className.includes("fold"),
+        "★ 表过态（点过折叠钮）之后，滚到顶、点输入框都不会再把他手动收起的档位条弹开");
     }
     ok(/function toolsAutoFold\(\) \{ if \(toolsPinned === null && toolsOpen\)/.test(src),
       "没表过态的读者：第一次发问后自动收起");
@@ -1849,7 +1888,7 @@ console.log("⑧ 成文（distill）");
   /* ═══ 顶栏随读收起（2026-08-29）═══════════════════════════════
      往下读就收、往上翻或到顶就现；收起时必须留得下出口。 */
   {
-    console.log("㉑ 顶栏随读收起");
+    console.log("㉒ 顶栏随读收起");
     const topBar = layer.querySelector(".wdsm-top");
     const showBtn = layer.querySelector(".wdsm-topshow");
     const body = layer.querySelector(".wdsm-body");
