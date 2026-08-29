@@ -1085,6 +1085,11 @@
       fgBack1: "这一道判定病根在第 ", fgBack2: " 道——往下做没有意义。",
       fgBlocked: "这一道判了「缺材料」，停在这里等你补。",
       fgNoGate: "这一道没有交出闸门判决（最后一行应当是【闸门】…）。按不通过处理，没有往下跑。",
+      fgRunning: "程序真跑中：锁定预注册 → 沙盒执行取数代码 → 断网 judge 判决 …",
+      fgRunDone: "\u2713 真跑记录已回，判决＝", fgRunCalls: " 次取数",
+      fgRunFail: "真跑执行器没跑成：",
+      fgRunNoPack: "写了 run_pending 却没交出合格的真跑包（要两块：```json forge-run 与 ```js forge-run-code）",
+      fgRunTwice: "这一道已经拿到真跑记录，这一趟应当入账，不该再交 run_pending",
       fgAgain: "\u21bb 重跑这一道", fgGoBack: "\u21a9 退回第 ", fgGoBack2: " 道重跑",
       fgForce: "仍要往下跑（记一笔降级）", fgForceTag: " 道未过闸仍继续",
       fgDegraded: "这一趟有工序没过闸而被继续：第 ",
@@ -1389,6 +1394,11 @@
       fgBack1: "这一道判定病根在第 ", fgBack2: " 道——往下做没有意义。",
       fgBlocked: "这一道判了「缺材料」，停在这里等你补。",
       fgNoGate: "这一道没有交出闸门判决（最后一行应当是【闸门】…）。按不通过处理，没有往下跑。",
+      fgRunning: "程序真跑中：锁定预注册 → 沙盒执行取数代码 → 断网 judge 判决 …",
+      fgRunDone: "\u2713 真跑记录已回，判决＝", fgRunCalls: " 次取数",
+      fgRunFail: "真跑执行器没跑成：",
+      fgRunNoPack: "写了 run_pending 却没交出合格的真跑包（要两块：```json forge-run 与 ```js forge-run-code）",
+      fgRunTwice: "这一道已经拿到真跑记录，这一趟应当入账，不该再交 run_pending",
       fgAgain: "↻ 重跑这一道", fgGoBack: "↩ 退回第 ", fgGoBack2: " 道重跑",
       fgForce: "仍要往下跑（记一笔降级）", fgForceTag: " 道未过闸仍继续",
       fgDegraded: "这一趟有工序没过闸而被继续：第 ",
@@ -6570,8 +6580,11 @@
      💡 心法：能数出来的东西不要问模型，问了就等于把裁判权交给被告。 */
   var FORGE_MOTHER = ["碰撞", "对撞", "撞出", "二阶", "候选判断", "五重检验", "三视角",
     "近邻划界", "本文的方法", "创新智商", "综合分", "五维", "SDE", "显露态", "差异序列", "特征纠缠", "工序"];
-  function forgeAudit(md) {
+  function forgeAudit(md, md12) {
     var t0 = String(md || ""), out = { chars: t0.replace(/\s/g, "").length, hits: [], miss: [], notes: [] };
+    /* ⑦ 真跑记录标记：第 12 道带了哈希，成文必须原样带同一个（程序锁定的预注册就靠它对上号）。 */
+    out.runWant = forgeRunMark(md12);
+    out.runHas = out.runWant ? (t0.indexOf("\u3014真跑记录 " + out.runWant + "\u3015") >= 0 || new RegExp("\u3014真跑记录\\s*" + out.runWant + "\u3015").test(t0)) : false;
     /* ① 去母体化：报**次数与原句**，不报"有/无"——"有 3 处"改得动，"未通过"改不动。 */
     FORGE_MOTHER.forEach(function (w) {
       var n = 0, at = 0, first = "";
@@ -6615,7 +6628,41 @@
       + "｜赌注写死日期：" + (a.betDate ? "有" : "**没有**")
       + "｜写死「不算命中」：" + (a.betMiss ? "有" : "**没有**")
       + "｜成品上印了分数：" + (a.score.length ? ("**有**（" + a.score.join("、") + "）") : "无")
-      + "｜名单里点了名却没在正文交手的：" + (a.unmet.length ? a.unmet.join("、") : "无");
+      + "｜名单里点了名却没在正文交手的：" + (a.unmet.length ? a.unmet.join("、") : "无")
+      + "｜真跑记录标记：" + (a.runWant ? (a.runHas ? ("成文里有〔真跑记录 " + a.runWant + "〕") : ("**成文里没有**〔真跑记录 " + a.runWant + "〕——第 12 道有这一行，成文丢了它，视同没跑")) : "第 12 道无真跑记录（本趟未做真跑或未成）");
+  }
+  /* ═══ 真跑：第 12 道第五态 ═══════════════════════════════
+     基底交「真跑包」两块（```json forge-run ＋ ```js forge-run-code）；这里只解析、不改一字，
+     交给 /api/wds/forge/run：服务端先锁定预注册（哈希），再在 Dynamic Worker 里执行，再在断网 isolate 里跑 judge。
+     记录无论成败都回来，再以同一道第二趟递给基底入账。**闸门在模型外面。** */
+  function forgeRunPack(txt) {
+    var t = String(txt || "");
+    var m = t.match(/```json[ \t\u3000]+forge-run[ \t\u3000]*\n([\s\S]*?)```/);
+    var c = t.match(/```js[ \t\u3000]+forge-run-code[ \t\u3000]*\n([\s\S]*?)```/);
+    if (!m || !c) return null;
+    var raw = m[1].replace(/^\u3000+/gm, ""), meta = null;
+    try { meta = JSON.parse(raw); } catch (e) {
+      try { var a = raw.indexOf("{"), b = raw.lastIndexOf("}"); if (a >= 0 && b > a) meta = JSON.parse(raw.slice(a, b + 1)); } catch (e2) { meta = null; }
+    }
+    if (!meta || typeof meta !== "object") return null;
+    meta.code = c[1].replace(/^\u3000+/gm, "");
+    return meta;
+  }
+  function forgeRunCall(pack, run, stage) {
+    return fetch("/api/wds/forge/run", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ run: run, i: stage, pack: pack }) })
+      .then(function (r) {
+        return r.json().then(function (j) {
+          /* 记录（带 hash）无论 ok 与否都收下——跑不成也是一条要入账的记录；只有请求本身不合法才算失败。 */
+          if (j && j.hash) return j;
+          throw new Error((j && (j.msg || j.error)) || ("HTTP " + r.status));
+        });
+      });
+  }
+  /* 第 18 道自查的一条机器读数：第 12 道若带真跑记录标记〔真跑记录 hash〕，成文里必须原样出现同一个。 */
+  function forgeRunMark(md12) {
+    var m = String(md12 || "").match(/〔真跑记录\s*([0-9a-f]{8,32})〕/);
+    return m ? m[1] : "";
   }
   function runId() { return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
   /* 找出未跑完的那一趟（同一台机器、同一个浏览器）。只看最近一条：
@@ -6680,6 +6727,7 @@
        不再重试同一次注定失败的生成（典型是 kimi/minimax 关不掉思考）。跟着 run 走，不是全局的——
        换一趟新研究、或换回已经有缓存的基底，不该继承上一趟别的基底留下的退避状态。 */
     var reflectNoRegen = false;
+    RS.forgeRunRec = null;                     // 真跑记录跟着这一趟走，不从上一趟继承
     /* 【断点恢复】此前这一趟只活在闭包与 DOM 里：刷新一下、误关一个标签页，
        十几道工序几十分钟的产出一起没了。现在每写完一道就落一次 IndexedDB
        （复用 wds-store 的 session，agent 另立 `wds-forge`，不动它的表结构）。
@@ -6775,7 +6823,7 @@
            此前「做不出」只是一句写给人看的话，而这里无条件 `i++` 往下跑——
            于是不合格的产出被当成合格的传下去，下游全部空转、读起来却照样通顺。 */
         function forgeGate(txt) {
-          var m = String(txt || "").match(/【闸门】\s*(passed|needs_revision|return_to_stage\s*:\s*(\d+)|blocked)\s*(?:[·:：-]\s*([^\n]*))?/i);
+          var m = String(txt || "").match(/【闸门】\s*(passed|needs_revision|run_pending|return_to_stage\s*:\s*(\d+)|blocked)\s*(?:[·:：-]\s*([^\n]*))?/i);
           if (!m) return { d: "unknown", back: 0, why: "" };
           var raw = String(m[1] || "").toLowerCase();
           if (raw.indexOf("return_to_stage") === 0) return { d: "return_to_stage", back: parseInt(m[2], 10) || 0, why: (m[3] || "").trim() };
@@ -6815,6 +6863,8 @@
         function step() {
           if (RS.stop || i >= steps.length) return finalStep();
           var r = rows[i], s = steps[i];
+          /* 退回到第 12 道之前重做时，旧的真跑记录已经对不上新的候选，丢掉。 */
+          if (RS.forgeRunRec && RS.forgeRunRec.stage > i + 1) RS.forgeRunRec = null;
           r.stat.textContent = tx("rsDoing"); r.box.classList.add("open");
           var done = steps.map(function (x, k) { return (k + 1) + ". " + x.t; }).join("\n");
           /* ⭐⭐ 这一行是这条产线从「十八次各写各的」变成「发生链」的分界：
@@ -6831,7 +6881,7 @@
              前端不该假设它是几；「只到判断」跑十三道时最后一道没有成文，下面那道长度闸自己会拦。 */
           if (fg && i + 1 === steps.length) {
             var body18 = secs.slice(14, 17).map(function (x) { return x.body; }).join("\n\n");
-            if (body18.replace(/\s/g, "").length > 500) audit = forgeAuditText(forgeAudit(body18));
+            if (body18.replace(/\s/g, "").length > 500) audit = forgeAuditText(forgeAudit(body18, (secs[11] && secs[11].body) || ""));
           }
           var pl = {
             q: s.t, history: [], key: base.key, vendor: base.vendor, model: base.model,
@@ -6843,6 +6893,8 @@
             rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, bodies: bodies, gates: gates,
                   forge: fg ? 1 : 0, sde: sdePipe ? 1 : 0, sv: FORGE_SV, run: runid, attempt: attempts[i],
                   idem: runid + ":" + (i + 1) + ":" + attempts[i], audit: audit,
+                  /* 第二趟：把程序跑出来的真跑记录递回同一道；只在记录属于这一道时递。 */
+                  runrec: (RS.forgeRunRec && RS.forgeRunRec.stage === i + 1) ? RS.forgeRunRec : null,
                   noRegen: reflectNoRegen ? 1 : 0 },
           };
           /* ⚠ 第四个参数（onNote）此前没传，于是服务端发的 note／nbrchain 全掉在地上——
@@ -6865,6 +6917,31 @@
                  「仍要往下跑」——那趟十八道里七道就是这样带着半截稿子被强行带下去的。
                  程序判不出问题的，才轮到基底的【闸门】那一行。 */
               var g = fg ? (function () { var j = rsJudge(txt, RS.lastMeta); return j.d === "passed" ? forgeGate(txt) : j; })() : rsJudge(txt, RS.lastMeta);
+              /* ⭐ 第五态 run_pending（只第 12 道）：交了真跑包 ⇒ 程序执行 ⇒ 同一道再跑一趟入账。
+                 第一趟**不进 secs**——它不是产物，是给执行器的输入；进 secs 的是入账那一趟。 */
+              if (fg && g.d === "run_pending") {
+                if (RS.forgeRunRec && RS.forgeRunRec.stage === i + 1) g = { d: "needs_revision", back: 0, why: tx("fgRunTwice") };
+                else {
+                  var pack = forgeRunPack(txt);
+                  if (!pack) g = { d: "needs_revision", back: 0, why: tx("fgRunNoPack") };
+                  else {
+                    r.stat.textContent = tx("fgRunning"); r.box.classList.add("open");
+                    return forgeRunCall(pack, runid, i + 1).then(function (rec) {
+                      rec.stage = i + 1; RS.forgeRunRec = rec;
+                      var ln = el("div", null, tx("fgRunDone") + (rec.verdict || "?") + " \u00b7 " + (rec.code || "") + " \u00b7 " + (((rec.log || {}).calls || []).length) + tx("fgRunCalls") + (rec.error ? (" \u00b7 " + String(rec.error).slice(0, 160)) : ""));
+                      ln.style.cssText = "font-size:12.5px;line-height:1.7;margin:6px 0 0;color:#8B7B5E";
+                      r.sb.appendChild(ln);
+                      return step();
+                    }).catch(function (e) {
+                      return forgeHalt(r, { d: "needs_revision", back: 0, why: tx("fgRunFail") + ((e && e.message) || "") }, function (back) {
+                        secs = secs.slice(0, back); i = back;
+                        RS.running = true; streaming = true; busyUI(true); stopBarShow(true);
+                        step();
+                      });
+                    });
+                  }
+                }
+              }
               r.stat.textContent = (g.d === "passed" ? tx("rsDone") : ("\u26a0 " + tx("fgGateNo"))) + " \u00b7 " + txt.length;
               secs.push({ t: s.t, body: txt, gate: g.d, hash: fnv1a64(txt), at: Date.now() });
               saveRun();
