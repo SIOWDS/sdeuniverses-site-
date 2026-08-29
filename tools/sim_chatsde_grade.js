@@ -69,6 +69,11 @@ if (box) {
   ok("扩展词「显露」种到了却与题面无锚定 ⇒ 不算落点", c1.every((c) => c.n !== "显露"), JSON.stringify(c1));
   const c2 = box.gradeCoreLanding(kb, "什么是幸福律？", []);
   ok("题面直接含索引词 ⇒ 强锚定 w=10", c2.length > 0 && c2[0].n === "幸福律" && c2[0].via === "题面" && c2[0].w === 10, JSON.stringify(c2));
+  const c1b = box.gradeCoreLanding(kb, "身在福中不知福", []);
+  ok("扩展词一个都没有（假 Key／扩展超时）时，稀有字「福」也能直接种到「幸福律」", c1b.length > 0 && c1b[0].n === "幸福律" && c1b[0].by === "福", JSON.stringify(c1b));
+  const kbBig = { idx: { "数学场": ["c", "m1"], "数学三界化": ["c", "m2"], "科学": ["c", "m3"], "学者": ["c", "m4"], "幸福律": ["c", "c1"] },
+    byId: { m1: { id: "m1", type: "concept", name: "数学场" }, m2: { id: "m2", type: "concept", name: "数学三界化" }, m3: { id: "m3", type: "concept", name: "科学" }, m4: { id: "m4", type: "concept", name: "学者" }, c1: { id: "c1", type: "concept", name: "意义三律" } } };
+  ok("满词表都是的字（学×4）不直种：「量子力学」不种「数学场」", box.gradeCoreLanding(kbBig, "量子力学的测量问题", []).length === 0, JSON.stringify(box.gradeCoreLanding(kbBig, "量子力学的测量问题", [])));
   const c3 = box.gradeCoreLanding(kb, "下午好", ["显露", "幸福"]);
   ok("寒暄：扩展词种到的实体一个都不算落点", c3.length === 0, JSON.stringify(c3));
   ok("坏 kb 不炸", box.gradeCoreLanding(null, "x", []).length === 0 && box.gradeCoreLanding({}, "x", []).length === 0);

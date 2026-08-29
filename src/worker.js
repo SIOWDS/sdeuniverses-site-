@@ -5024,6 +5024,16 @@ function gradeCoreLanding(kb, q, expTerms) {
   for (const ch of qz.replace(/[^\u4e00-\u9fff]/g, "")) if (GRADE_STOP.indexOf(ch) < 0 && GRADE_STOP2.indexOf(ch) < 0) qChars[ch] = 1;
   const keysOf = {};
   for (const key in kb.idx) { const id = kb.idx[key] && kb.idx[key][1]; if (id) (keysOf[id] = keysOf[id] || []).push(key); }
+  /* 稀有字直种：「福」→「幸福律」这条链此前只靠基底扩出「幸福」才接得上（扩展那一步 6 秒截止、
+     关不掉思考的家常空手而归）。九库词表里只在 ≤3 个索引词里出现的字（福×2）视作稀有字，题面含它
+     就把那几个实体直接种进来——不必等扩展。「学」「大」这种满词表都是的字不种（种了全是巧合），
+     种进来的落点后面还要在召回段里验过一遍才算数（见 ragGrade）。 */
+  const charN = {};
+  for (const key in kb.idx) for (const ch of String(key).replace(/[^\u4e00-\u9fff]/g, "")) charN[ch] = (charN[ch] || 0) + 1;
+  for (const ch in qChars) {
+    if (!charN[ch] || charN[ch] > 3) continue;
+    for (const key in kb.idx) if (key.indexOf(ch) >= 0) { const id = kb.idx[key] && kb.idx[key][1]; if (id && kb.byId[id] && seeds.indexOf(id) < 0) seeds.push(id); }
+  }
   const out = [];
   for (const id of seeds) {
     const e = kb.byId[id]; if (!e || !e.name) continue;
