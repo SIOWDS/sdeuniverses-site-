@@ -155,5 +155,40 @@ console.log("⑦ 全套三件：内功 Skill ＋ 心得 ＋ 方法论");
   ok2(/const _rk = reflectKey\(rvendor, VC\);/.test(S), "清单查来源用的键与 ensureReflect 同一把");
 }
 
+console.log("⑧ 研究产线的程序闸门：断稿即停");
+{
+  const S = fs.readFileSync("src/worker.js", "utf8");
+  const FE = fs.readFileSync("public/wds-mode.js", "utf8");
+  const ok2 = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) process.exitCode = 1; };
+  ok2(/if \(rs\) controller\.enqueue\(_sseBytes\(\{ t: "fin", v: \{ fin: _cd\.finish \|\| "", cut: _cd\.cut \|\| _cd\.partCut \|\| "", err: !!_cd\.err, out: outText\.length \} \}\)\);/.test(S),
+    "服务端给带 rs 的调用发机器可读的收束帧（finish／cut／err／out）");
+  ok2(/_cd\.partCut = why;/.test(S), "写了一半被掐：partCut 记下来（note 是给人看的，判不了）");
+  const fi = S.indexOf('t: "fin", v: { fin: _cd.finish'), fu = S.indexOf("if (outText.length > 150 && !rs) {", fi);
+  ok2(fi > 0 && fu > fi && fu - fi < 800, "收束帧发在关思考重答之后、追问建议之前（重答补出来的正文也算进去）");
+  /* 客户端：rsStream 记读数，rsJudge 纯函数真跑 */
+  ok2(/else if \(j\.t === "fin" && j\.v\) \{ meta\.seen = true; meta\.fin = String\(j\.v\.fin \|\| ""\); meta\.cut = String\(j\.v\.cut \|\| ""\);/.test(FE), "rsStream 收 fin 帧");
+  ok2(/function settle\(\) \{\s*meta\.err = err; meta\.out = out\.length; RS\.lastMeta = meta;/.test(FE) && (FE.match(/return settle\(\);/g) || []).length === 2, "三条结束路（读完／[DONE]／按停）都把读数写进 RS.lastMeta");
+  ok2(/meta\.cut = meta\.cut \|\| "stopped"; RS\.lastMeta = meta; return out;/.test(FE), "读者按停也记成 cut");
+  const m = /function rsJudge\(txt, meta\) \{[\s\S]*?\n  \}/.exec(FE);
+  ok2(!!m, "抠得到 rsJudge");
+  const judge = m ? new Function("tx", m[0] + "; return rsJudge;")((k, v) => k + (v && v.n !== undefined ? ":" + v.n : "")) : null;
+  if (judge) {
+    ok2(judge("", {}).d === "failed", "空产出 → failed");
+    ok2(judge("正".repeat(900), { err: "上游流内报错" }).d === "cut", "有正文但流内报错 → cut");
+    ok2(judge("正".repeat(900), { cut: "作答超时" }).d === "cut", "有正文但被时钟掐 → cut");
+    ok2(judge("正".repeat(900), { fin: "length" }).d === "cut" && /rsCutLength/.test(judge("正".repeat(900), { fin: "length" }).why), "上游 finish=length（预算顶穿）→ cut，原因说是顶穿");
+    ok2(judge("正".repeat(200), { fin: "stop" }).d === "cut" && /rsCutShort:200/.test(judge("正".repeat(200), { fin: "stop" }).why), "不足 300 字 → cut，原因带字数");
+    ok2(judge("正".repeat(900), { cut: "stopped" }).d === "cut", "按停 → cut");
+    ok2(judge("正".repeat(900), { fin: "stop", cut: "", err: "" }).d === "passed", "写完的正常一道 → passed");
+    ok2(judge("正".repeat(900), undefined).d === "passed", "没有读数（老服务端）时不误判");
+  }
+  ok2(/var g = fg \? forgeGate\(txt\) : rsJudge\(txt, RS\.lastMeta\);/.test(FE), "step()：学科通融走基底的【闸门】，研究产线走程序判决");
+  ok2(!/if \(!fg\) \{ i\+\+; return step\(\); \}/.test(FE), "技术故障不再 i++ 静默跳过（研究产线也停下交给读者）");
+  ok2(/g\.d === "cut" \? \(tx\("rsCut1"\)/.test(FE) && /g\.d === "failed" \? \(tx\("rsFailed1"\)/.test(FE), "闸门条对 cut／failed 各说各的原因，不再借「自己判了没做够」那句");
+  for (const k of ["rsCut1", "rsCut2", "rsFailed1", "rsCutEmpty", "rsCutStopped", "rsCutLength", "rsCutShort"]) {
+    ok2((FE.match(new RegExp("\\b" + k + ":", "g")) || []).length === 2, "中英两套文案都有 " + k);
+  }
+}
+
 console.log(bad || process.exitCode ? ("\n✗ 有不过的项") : "\n✓ 全过");
 process.exit((bad || process.exitCode) ? 1 : 0);

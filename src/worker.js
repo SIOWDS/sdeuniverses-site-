@@ -11192,7 +11192,10 @@ export default {
             } catch (e) {
               // 中途断线（含被自己的时钟掐断）：已经写出来的一个字都不丢，只补一句说得出原因的说明。
               const why = clk.cut ? clk.why("作答") : ("流中断：" + (e && e.message));
-              if (outText) controller.enqueue(_sseBytes({ t: "note", v: why + "——上面已写出的部分保留着，说一句「继续」就接着写。" }));
+              if (outText) {
+                controller.enqueue(_sseBytes({ t: "note", v: why + "——上面已写出的部分保留着，说一句「继续」就接着写。" }));
+                _cd.partCut = why;   // 有正文但没写完：产线那一侧要拿它判「断稿」，note 是给人看的、判不了
+              }
               /* ⚠⚠ 这里原来是 `_cd.err = true` ＋ 当场报错收工 —— 而下面「关思考重答」的闸写的是
                  `!outText && !_cd.err`，于是**专为这种情形写的兜底，被触发它的那次错误自己关掉了**。
                  上游一个字不回（满功率档最常见的死法）时，读者等满 90 秒只收到一句错误，
@@ -11264,6 +11267,11 @@ export default {
                      + "这一场聊得越长、深度档越容易把额度耗在思考里：把顶部切到「标准」档再问一遍，或点「成文一篇」把这场凝出来后新开一场。\n" + dg }));
               }
             }
+            /* ⭐ 收束读数（2026-08-29）：产线（深度研究／学科通融）每一道要知道这一答是**写完了还是断了**。
+               此前只有「空产出」会报 error；写了一半被时钟掐、上游 finish_reason=length（预算顶穿）、流内报错，
+               客户端收到的都是一段正文加一条 note——于是断在半句的第六道被记成「写完」传给下游，报告里就留着
+               一句没说完的话。机器可读的判决只发给带 rs 的调用；普通问答的解析器对认不出的帧一律跳过。 */
+            if (rs) controller.enqueue(_sseBytes({ t: "fin", v: { fin: _cd.finish || "", cut: _cd.cut || _cd.partCut || "", err: !!_cd.err, out: outText.length } }));
             // 追问建议：正文已经吐完（读者已在读了），再花一次便宜档补三个「接着可以问什么」。
             // 走 WDS_VENDORS 的快档而非满血档——这一步要快，慢了读者早就自己打字了；失败一律吞掉。
             if (outText.length > 150 && !rs) {

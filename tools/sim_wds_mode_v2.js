@@ -1062,7 +1062,11 @@ console.log("⑧ 成文（distill）");
     ? { ok: true, title: "县中衰落的三重机制", steps: [{ t: "近十年县中生源流向如何变化？" }, { t: "教师流失与什么绑定？" }] }
     : null);   // final 那趟落到 SSE
   ROUTE["/api/wds/research"] = [{ t: "token", v: "总判断：三重机制共用同一个前提……" }];
-  ROUTE["/api/wds/chat"] = (p) => [{ t: "token", v: p.rs ? ("第 " + p.rs.i + " 步的正文。".repeat(30)) : "普通回答" }];
+  /* 2026-08-29：研究产线每一道由程序判决（rsJudge）——正文不足 300 字判「断稿」停下。
+     夹具改成像样的一节（约 720 字）并带服务端的 fin 帧，写完的那一道才能往下走。 */
+  ROUTE["/api/wds/chat"] = (p) => p.rs
+    ? [{ t: "token", v: ("第 " + p.rs.i + " 步的正文。").repeat(90) }, { t: "fin", v: { fin: "stop", cut: "", err: false, out: 720 } }]
+    : [{ t: "token", v: "普通回答" }];
   const rsBtn = layer.querySelector(".wdsm-rsbtn");
   ok(!!rsBtn, "模式条上有深度研究按钮");
   ok(!rsBtn.getAttribute("data-k"), "研究按钮不带 data-k，不参与标准/深度/联网三档互斥");
@@ -1088,6 +1092,42 @@ console.log("⑧ 成文（distill）");
     && layer.querySelectorAll(".wdsm-cvtab")[0].textContent === "县中衰落的三重机制",
     "研究报告自动落画布");
   ok(!rsBtn.classList.contains("on"), "跑完一趟研究后开关自动落下（不会下一问又莫名其妙研究一遍）");
+
+  /* ═════════ ㉖之二 研究产线的程序闸门（2026-08-29）═════════
+     第一道被上游预算顶穿（finish=length）：正文照样有字，但必须停下，不许传给第二道。 */
+  console.log("㉖之二 研究产线断稿即停");
+  {
+    const before = CALLS.length;
+    ROUTE["/api/wds/chat"] = (p) => p.rs
+      ? [{ t: "token", v: ("第 " + p.rs.i + " 步写到一半".repeat(80)) }, { t: "fin", v: { fin: "length", cut: "", err: false, out: 640 } }]
+      : [{ t: "token", v: "普通回答" }];
+    rsBtn.click();
+    inEl.value = "县中为什么衰落·断稿";
+    sendEl.click();
+    await new Promise((r) => setTimeout(r, 600));
+    const sc2 = CALLS.slice(before).filter((c) => c.url === "/api/wds/chat" && c.p.rs);
+    ok(sc2.length === 1, "第一道被预算顶穿：停在第一道，没有去打第二道（实得 " + sc2.length + " 趟）");
+    const bars = layer.querySelectorAll(".wdsm-rsgate");
+    const bar = bars[bars.length - 1];                       // 取这一趟的那条（前面学科通融那一节留下的旧条还在 DOM 里）
+    ok(!!bar, "屏幕上出现停下的闸门条（重跑／仍要往下跑）");
+    ok(!!bar && /没写完/.test(bar.textContent) && /顶穿/.test(bar.textContent), "闸门条说清了断稿的原因（预算顶穿），实得 " + JSON.stringify(bar ? bar.textContent.slice(0, 60) : ""));
+    ok(!layer.querySelector(".wdsm-rs .wdsm-acts"), "报告没有被拼出来（断稿不许当成品交付）");
+    /* 读者按「仍要往下跑」：第二道照打，且成品里必须留降级痕迹 */
+    ROUTE["/api/wds/chat"] = (p) => p.rs
+      ? [{ t: "token", v: ("第 " + p.rs.i + " 步的正文。").repeat(90) }, { t: "fin", v: { fin: "stop", cut: "", err: false, out: 720 } }]
+      : [{ t: "token", v: "普通回答" }];
+    /* 桩里的 tx() 对部分键回的是键名本身（fgForce），所以文案与键名都认 */
+    const force = bar && bar.querySelectorAll("button").find((b) => /仍要往下跑|fgForce/.test(b.textContent));
+    ok(!!force, "闸门条上有「仍要往下跑」");
+    if (force) { force.click(); await new Promise((r) => setTimeout(r, 600)); }
+    const sc3 = CALLS.slice(before).filter((c) => c.url === "/api/wds/chat" && c.p.rs);
+    ok(sc3.length === 2, "按了仍要往下跑之后第二道才打（实得 " + sc3.length + " 趟）");
+    ok(sc3.length === 2 && sc3[1].p.rs.gates && sc3[1].p.rs.gates[0] && sc3[1].p.rs.gates[0].d === "cut", "第二道收到的闸门链标着第一道是 cut（下游看得见它接的是半截货）");
+    const rep = layer.querySelectorAll(".wdsm-rs");
+    const last = rep[rep.length - 1];
+    ok(!!last && /没过闸|fgGateNo/.test(last.textContent) && !!last.querySelector(".wdsm-acts"),
+       "强行往下跑之后报告拼出来了，而第一道那一行仍标着「没过闸」（降级看得见）");
+  }
 
   /* ═════════ ㉗ 本场账本（上下文压缩）═════════ */
   console.log("㉗ 本场账本");

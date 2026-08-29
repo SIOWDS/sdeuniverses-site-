@@ -1457,6 +1457,8 @@
       cvAskPre: "下面这段来自画布《{t}》，请照我的要求改写它，只输出改好的整段、不要解说：",
       rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "十道工序：背景 → 文献与方法 → 三条基本关系 → 六条生成路径 → 三条动力机制 → 二阶对撞出新判断 → 论文大纲 → 可证伪 → 总结 → 参考文献，最后出一份可导出 Word 的报告（会用掉若干次额度）",
       rsPaperBtn: "📄 ＋一万字论文", rsPaperTip: "第 11 步（可选）：研究跑完后，按第七道「论文大纲」逐章展开成约一万字的学术论文（章目由大纲定，每章一趟，另出一份 Word）。不选就不做。",
+      rsCut1: "这一道没写完（", rsCut2: "）——已停在这里，没有往下跑：断稿传下去，下游会拿着半截材料写得头头是道。",
+      rsFailed1: "这一道没跑成（技术故障）：", rsCutEmpty: "一个字都没写出来", rsCutStopped: "你按了停止", rsCutLength: "上游预算顶穿，稿子断在半句", rsCutShort: "只写出 {n} 字",
       rsPaperStep: "第 11 步 · 学术论文（一万字）", rsPaperWait: "十道跑完，正在按第七道大纲逐章写作（每章一趟，几分钟到十几分钟）——成文窗口里可以看着它长出来；写完会回到这里，另出一份 Word。",
       rsPaperDone: "论文写完 · {n} 字（与研究报告分开，单独一份 Word）", rsPaperFail: "论文这一步没写成：", rsPaperRetry: "重写第 11 步", rsPaperDocx: "⤓ 论文 .docx",
       rsPlan: "正在铺工序…", rsPlanFail: "拆题没成：", rsSteps: "这次研究分 {n} 步", rsCost: "约用掉 {n} 次额度",
@@ -1592,6 +1594,8 @@
       cvAskPre: "The passage below comes from the canvas \u201c{t}\u201d. Rewrite it as I ask; output the revised passage only, no commentary:",
       rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Ten stages: background → literature & method → three basic relations → six generative paths → three drivers → second-order collision → paper outline → falsifiability → summary → references. Ends in a report you can export to Word (uses several turns)",
       rsPaperBtn: "📄 + 10k-word paper", rsPaperTip: "Optional step 11: once the ten stages finish, expand the stage-7 paper outline chapter by chapter into a ~10,000-character paper (chapters fixed by the outline, one pass each, exported as a separate Word file). Off by default.",
+      rsCut1: "This stage did not finish (", rsCut2: ") — stopped here, nothing passed downstream: a truncated stage would be written up fluently on half the material.",
+      rsFailed1: "This stage failed (technical): ", rsCutEmpty: "no text came back", rsCutStopped: "you pressed stop", rsCutLength: "the model hit its output budget mid-sentence", rsCutShort: "only {n} characters",
       rsPaperStep: "Step 11 · Academic paper (10k)", rsPaperWait: "Ten stages done; writing the paper chapter by chapter along the stage-7 outline (one pass per chapter, several minutes). Watch it grow in the writing window; it comes back here with its own Word export.",
       rsPaperDone: "Paper done · {n} characters (separate Word file from the report)", rsPaperFail: "Step 11 did not complete: ", rsPaperRetry: "Rewrite step 11", rsPaperDocx: "⤓ paper .docx",
       rsPlan: "Laying out the stages\u2026", rsPlanFail: "Could not break it down: ", rsSteps: "{n} steps", rsCost: "about {n} turns",
@@ -6443,24 +6447,31 @@
     return fetch("/api/wds/research", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(body)) });
   }
   // 一趟流式请求 → 把 token 交给 onTok，结束时 resolve 全文。研究的每一步都用它。
+  /* RS.lastMeta：上一趟流的收束读数（服务端 fin 帧＋流内 error），resolve 之前写好，
+     step() 紧接着读。每一趟串行跑，所以一格够用；不改 rsStream 的返回契约（三处调用方都只认字符串）。 */
   function rsStream(url, payload, onTok, onNote) {
     return fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(payload)) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(); curReader = reader;
-        var dec = new TextDecoder(), buf = "", out = "", err = "";
+        var dec = new TextDecoder(), buf = "", out = "", err = "", meta = { fin: "", cut: "", err: "", out: 0, seen: false };
+        function settle() {
+          meta.err = err; meta.out = out.length; RS.lastMeta = meta;
+          return out || (err ? Promise.reject(new Error(err)) : "");
+        }
         function pump() {
           return reader.read().then(function (r) {
-            if (r.done) return out || (err ? Promise.reject(new Error(err)) : "");
+            if (r.done) return settle();
             buf += dec.decode(r.value, { stream: true });
             var idx;
             while ((idx = buf.indexOf("\n")) >= 0) {
               var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
               if (line.slice(0, 5) !== "data:") continue;
               var p = line.slice(5).trim();
-              if (p === "[DONE]") return out || (err ? Promise.reject(new Error(err)) : "");
+              if (p === "[DONE]") return settle();
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
               if (j.t === "token") { out += j.v; if (onTok) onTok(out); }
+              else if (j.t === "fin" && j.v) { meta.seen = true; meta.fin = String(j.v.fin || ""); meta.cut = String(j.v.cut || ""); if (j.v.err) meta.err = meta.err || "上游流内报错"; }
               else if (j.t === "note" && onNote) onNote(j.v);
               /* 敌意最近邻专用链的覆盖读数。**覆盖不足要显著显示**（建议书 §13.3
                  「诚实显示能力降级」）——不说，读者会以为这一道真的查过占位者。 */
@@ -6473,7 +6484,7 @@
               else if (j.t === "error") err = j.v;
               else if (j.t === "quota" && j.v && typeof j.v.left === "number") { dayLeft = j.v.left; updTurns(); }
             }
-            if (RS.stop) { try { reader.cancel(); } catch (e) {} return out; }
+            if (RS.stop) { try { reader.cancel(); } catch (e) {} meta.cut = meta.cut || "stopped"; RS.lastMeta = meta; return out; }
             return pump();
           });
         }
@@ -6574,6 +6585,22 @@
     sc.onload = function () { window.WDSStore ? window.WDSStore.load(go) : cb(null); };
     sc.onerror = function () { cb(null); };
     document.head.appendChild(sc);
+  }
+  /* ⭐ 研究产线每一道的程序判决（2026-08-29）。学科通融那条线由基底自己交【闸门】判决；
+     深度研究这条线此前 `{ d: "passed" }` 无条件放行——断在半句的第六道就这样被记成「写完」传给了下游。
+     这里判的全是**能数出来的东西**（能数的不问模型）：
+       空产出 → failed；流内报错／被时钟掐／预算顶穿（finish=length）／读者按停 → cut；不足 300 字 → cut。
+     判不出问题的才 passed。judge 只出判决，停不停、怎么停由 forgeHalt 交给读者。 */
+  function rsJudge(txt, meta) {
+    var m = meta || {};
+    var n = String(txt || "").length;
+    if (!n) return { d: "failed", why: m.err || m.cut || tx("rsCutEmpty") };
+    if (m.err) return { d: "cut", why: m.err };
+    if (m.cut === "stopped") return { d: "cut", why: tx("rsCutStopped") };
+    if (m.cut) return { d: "cut", why: m.cut };
+    if (m.fin === "length") return { d: "cut", why: tx("rsCutLength") };
+    if (n < 300) return { d: "cut", why: tx("rsCutShort", { n: n }) };
+    return { d: "passed", why: "" };
   }
   function rsRun(topic, fg, resume) {
     var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { rsRun(topic, fg, resume); }); return; }
@@ -6705,6 +6732,8 @@
             g.d === "return_to_stage" ? (tx("fgBack1") + g.back + tx("fgBack2") + why)
               : g.d === "blocked" ? (tx("fgBlocked") + why)
               : g.d === "unknown" ? tx("fgNoGate")
+              : g.d === "cut" ? (tx("rsCut1") + (g.why || "") + tx("rsCut2"))
+              : g.d === "failed" ? (tx("rsFailed1") + (g.why || ""))
               : (tx("fgRedo") + why)));
           function mk(label, fn) {
             var b = el("button", "wdsm-tbtn", label);
@@ -6766,7 +6795,8 @@
               r.sb.appendChild(ln); r.box.classList.add("open");
             })
             .then(function (txt) {
-              var g = fg ? forgeGate(txt) : { d: "passed" };
+              /* 学科通融由基底交【闸门】；研究产线由程序判（断稿／报错／顶穿／过短），见 rsJudge。 */
+              var g = fg ? forgeGate(txt) : rsJudge(txt, RS.lastMeta);
               r.stat.textContent = (g.d === "passed" ? tx("rsDone") : ("\u26a0 " + tx("fgGateNo"))) + " \u00b7 " + txt.length;
               secs.push({ t: s.t, body: txt, gate: g.d, hash: fnv1a64(txt), at: Date.now() });
               saveRun();
@@ -6781,7 +6811,7 @@
             .catch(function (e) {
               /* 技术故障也不许静默跳过——那一节会带着空产物往下跑。 */
               r.stat.textContent = "\u2717 " + ((e && e.message) || "?");
-              if (!fg) { i++; return step(); }
+              /* 此前研究产线在这里 `i++` 静默跳过——一道没跑成，下游拿着「材料不全」照写。现在与学科通融同轨：停下交给读者。 */
               return forgeHalt(r, { d: "failed", why: (e && e.message) || "" }, function (back) {
                 secs = secs.slice(0, back); i = back;
                 RS.running = true; streaming = true; busyUI(true); stopBarShow(true);
