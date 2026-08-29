@@ -118,7 +118,7 @@
           tlRename: "写成同行的话", tlRenameS: "改写成语言学／教学的母语，不留一个外来术语",
           tlGap: "找那个还没有名字的东西", tlGapS: "读出现有说法漏掉的那一处，造一个词去填",
           tlCollide: "三篇互相顶一顶", tlCollideS: "站内三篇彼此矛盾的文章，撞出一句新判断",
-          tlForge: "跨学科撞一条新判断", tlForgeS: "三家互撞的简版（整趟十八道用 /通融）",
+          tlForge: "跨学科撞一条新判断", tlForgeS: "三家互撞，走完整十八道产线（等同 /通融）",
           /* 产线面板的抬头。共用那条写的是「学科通融 · 二阶碰撞」——读者在这台机器上
              看到的应该是他要的东西（撞出一条语言上的新判断），不是这套工具的内部叫法。 */
           fgTitle: "跨学科撞一条新判断",
@@ -183,7 +183,7 @@
           tlRename: "Say it in the field's own words", tlRenameS: "Rewrite in the native language of linguistics or teaching, no imported jargon",
           tlGap: "Find what has no name yet", tlGapS: "Locate what existing accounts miss, and coin a term for it",
           tlCollide: "Let three pieces clash", tlCollideS: "Three contradictory pieces from this site, collided into one new claim",
-          tlForge: "Collide fields into a new claim", tlForgeS: "Short version of the three-way clash (full 18-stage run: /通融)",
+          tlForge: "Collide fields into a new claim", tlForgeS: "Runs the full 18-stage pipeline (same as /forge)",
           fgTitle: "Collide fields into a new claim",
           tlWhat: "What is this, really?", tlWhatS: "Three cuts at what this language phenomenon actually is",
           tlHow: "What do I do about it?", tlHowS: "Three angles combined into something usable tomorrow",
@@ -1074,7 +1074,7 @@
       tlRename: "改姓", tlRenameS: "改写成目标学科母语，零 SDE 术语",
       tlGap: "缝隙扫描", tlGapS: "读出结构缝隙，发明一个新概念去填",
       tlCollide: "三篇碰撞", tlCollideS: "站内三篇互相矛盾的文章撞出一句新判断",
-      tlForge: "学科通融", tlForgeS: "三家撞出一条新判断的简版（整趟产线用 /通融）",
+      tlForge: "学科通融", tlForgeS: "三家撞出一条新判断，走完整十八道产线（等同 /通融）",
       tlWhat: "是什么", tlWhatS: "三刀合看它到底是什么（更狠的用金点子）",
       tlHow: "怎么办", tlHowS: "三个落点合出一套可操作的做法（更狠的用中华智问）",
       tlWhy: "为什么", tlWhyS: "推翻问题里那条没说出口的动力（更狠的用动力智能体）",
@@ -1314,7 +1314,7 @@
       tlRename: "Rename into a discipline", tlRenameS: "Rewrite in the target field's native voice, zero SDE terms",
       tlGap: "Gap scan", tlGapS: "Find the structural gap, coin a concept to fill it",
       tlCollide: "Collide three pieces", tlCollideS: "Three contradicting site pieces struck into one new claim",
-      tlForge: "Cross-discipline forge", tlForgeS: "Second-order collision, short form (full run: /forge)",
+      tlForge: "Cross-discipline forge", tlForgeS: "Collide three fields into a new claim — runs the full 18-stage pipeline (same as /forge)",
       tlWhat: "What is it", tlWhatS: "Three cuts, read together (full run: the Idea Generator)",
       tlHow: "What to do", tlHowS: "Three landing points into one workable method (full run: Zhiwen)",
       tlWhy: "Why", tlWhyS: "Overturn the drive claim hidden in the question (full run: SDE Dynamics)",
@@ -4249,6 +4249,13 @@
     }
     // 学科通融：这一问不是一次问答，是一整趟十八道工序的产线（只到判断则十三道）
     var fgq = forgePick(q);
+    // ⭐ 工具菜单里选了「学科通融」（curTool==="forge"）时，即使没打 /通融，也当真产线跑——
+    //   这个按钮此前只会触发单轮简版（服务端 WDS_TOOL_KEYS.forge），读者以为选中了完整
+    //   产线，实际点亮的是另一条路，产出的量级完全不对。现在选它＝就是十八道本身，不再是简版。
+    if (!fgq && curTool === "forge" && !streaming && !RS.running) {
+      var t0fg = String(q || "").trim();
+      if (t0fg) fgq = { topic: t0fg, judge: /只到判断|不成文|不写全文|不要全文/.test(t0fg) };
+    }
     if (fgq && !streaming && !RS.running) {
       if (turns() >= MAX) { updTurns(); return; }
       if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
