@@ -1598,6 +1598,19 @@ const CHAT_TOTAL_LONG_MS = 420000;     // 读者点名要长篇时给更长的�
 const CHAT_RETRY_FIRST_MS = 45000, CHAT_RETRY_TOTAL_MS = 120000;
 // 零帧看门狗：上游多久没回第一个字就把这件事如实写进阶段名（只改说法，不掐流）。
 const ANS_NOFRAME_MS = 25000;
+/* ⭐ 产线道次（学科通融十八道／SDE 深度研究）的预算与总时长（2026-08-29 放开）。
+   此前这两条产线每一道走的是「答一段话」的账：max_tokens 6000（标准档 4000）、总时长 420 秒。
+   而它们的一道不是一段话——第 3 道 27 对碰撞、第 11 道五重检验加十处兑现、成文三段各是
+   两万字的三分之一——六千 token 还要与满功率的思考同吃一份，于是成文断在半句、五重检验
+   的最后一行悬着「外领域：」、闸门那一行根本来不及写，读者只好一路「仍要往下跑」。
+   2026-08-29 一趟十八道里七道就是这样被强行带下去的。
+   ⚠ 依据是可对账的：08-19 直连 DeepSeek 实测 max_tokens 64000 一趟 449 秒、正文 27,947 字、
+   finish_reason=stop，且 Cloudflare 与上游都不存在 130 秒墙（见 /api/wds/hold 探针）——
+   「≤8000 是硬约束」那条老账的前提（会被平台在思考期杀掉）已经没了。
+   ⚠ 上限不是目标：预算是油门不是容器，给到顶配不会让它多写；真正的刹车仍是时钟＋阶梯
+   降档（wdsFetchMax 兜 400）＋关思考兜底。总时长按「一道写六七千字＋满功率思考」给十分钟。 */
+const FORGE_STAGE_TOK = WDS_TOK_MAX;      // 每一道的输出预算＝顶配；上游嫌大时由 wdsFetchMax 的阶梯自动降档
+const FORGE_TOTAL_MS = 600000;            // 每一道的总时长闸（首帧闸仍按档给）；关思考重答那一遍同此
 function wdsVendorOf(v) { return WDS_VMAP[String(v || "").toLowerCase()] || "zhipu"; }
 function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
 // 读者自填的型号覆盖默认值。只放行像模型名的字符串，别让它变成往上游注入别的东西的口子。
@@ -11301,13 +11314,18 @@ export default {
             // 时钟（十二～十五修的通则）：凡"出流之后 await 上游"的调用一律戴 wdsClock。
             // 不戴的代价已经付过四次：平台无声掐断时既无 error 也无正文，读者只看到"什么都没有"。
             // 这里心跳撑着连接，反而让客户端的无字节看门狗永远喂饱——所以时钟只能由我方来掐。
-            // 预算按"这一步该产出多长"给（老通则）：研究的一节 1200–2000 字 → 4000；满功率档仍死守 6000（≤8000 是硬约束）。
+            // 预算按"这一步该产出多长"给（老通则）：研究的一节 1200–2000 字 → 4000；普通问答满功率档仍是 6000。
+            // ⚠ 「≤8000 是硬约束」那条老账已作废（依据见 FORGE_STAGE_TOK 头上）：产线道次按整件产物给顶配。
+            /* 产线道次：学科通融十八道与 SDE 深度研究各道是要交付的整件产物，不是一段话——
+               预算与总时长走 FORGE_STAGE_TOK／FORGE_TOTAL_MS（常数头上有账）。自由拆题的研究产线
+               各步仍是 1200–2000 字，照旧。 */
+            const rsLong = !!(rs && (rs.forge || rs.sde));
             const tokWant = askLen
               ? Math.min(32000, Math.max(6000, Math.round(askLen * 1.8)))   // 中文近似 1 字 1 token，留一点余量
-              : (rs ? (deep ? 6000 : 4000) : (deep ? 6000 : (tool ? 4000 : 2600)));
+              : (rsLong ? FORGE_STAGE_TOK : (rs ? (deep ? 6000 : 4000) : (deep ? 6000 : (tool ? 4000 : 2600))));
             /* 按档给：深度档 240s 首帧 / 420s 总时长；标准档仍是 90s / 240s。长篇请求的总时长照旧最长。 */
             const clk = wdsClock(deep ? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,
-              askLen ? CHAT_TOTAL_LONG_MS : (deep ? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS));
+              rsLong ? FORGE_TOTAL_MS : (askLen ? CHAT_TOTAL_LONG_MS : (deep ? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS)));
             _st.pre = Math.round((Date.now() - _st.t0) / 1000);
             _stg("基底作答");
             /* 零帧要说出来。读者盯着「正在想 45s · 基底作答」，分不出「它在想」和「它卡死了」——
@@ -11327,7 +11345,12 @@ export default {
             try {
               // 视觉档型号会改名/下线：认不出就沿备用名退一格重发一次（只在看图这条路上，且只退到列表用完）。
               for (let vi = 0; ; vi++) {
-                upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
+                /* 产线道次要的是顶配预算，而只有 deepseek 一格的上限核实过：别家收不收 64000 没查。
+                   所以这一支走 wdsFetchMax——上游以「max_tokens 相关」的 400 拒收就自动降一档，
+                   不会因为一个数字整道断掉。普通问答仍是原来那一发。 */
+                upstream = rsLong
+                  ? await wdsFetchMax(VC, KEY, messages, true, tokWant, clk.signal)
+                  : await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
                 if (upstream.ok || !canSee || vi + 1 >= visLadder.length) break;
                 if (upstream.status !== 400 && upstream.status !== 404) break;
                 let et = ""; try { et = (await upstream.clone().text()).slice(0, 300); } catch (e2) {}
@@ -11447,12 +11470,15 @@ export default {
               _stg("关思考重答");
               // 重答不能原样再来一遍。常规问答：关思考＋压预算，逼它早点收住开始写；
               // 长篇请求（askLen）：只关思考，长度一个字不减 —— 降预算等于砍掉正文，那不是解药。
-              const tok2 = askLen ? tokWant : Math.min(tokWant, 3000);
+              const tok2 = (askLen || rsLong) ? tokWant : Math.min(tokWant, 3000);
               /* 这一遍思考是关掉的：90 秒首帧、240 秒总时长是按满功率给的账，搬到这里就成了
                  「第一遍等 240 秒、第二遍再等 240 秒」。不烧思考还半分钟开不了口，就不会开口了。 */
-              const clk2 = wdsClock(CHAT_RETRY_FIRST_MS, CHAT_RETRY_TOTAL_MS);
+              /* 产线道次的重答是关着思考写整件产物，120 秒装不下六七千字——总时长同主道；首帧闸照旧。 */
+              const clk2 = wdsClock(CHAT_RETRY_FIRST_MS, rsLong ? FORGE_TOTAL_MS : CHAT_RETRY_TOTAL_MS);
               try {
-                const up2 = await fetch(VC.url, {
+                const up2 = rsLong
+                  ? await wdsFetchMax(VC, KEY, messages, true, tok2, clk2.signal, false, undefined, true)
+                  : await fetch(VC.url, {
                   method: "POST",
                   headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
                   body: JSON.stringify(wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: tok2, messages })),

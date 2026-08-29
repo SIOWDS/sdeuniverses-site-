@@ -540,6 +540,82 @@ run(full, "沉默如何被生产", "Bourdieu 1977 说过").then((r) => {
   ok("★ 第 18 道加了真跑核对", /真跑核对/.test(s18));
   ok("★★ 真跑一遍：第 7 道真的能从上游材料里读到第 1 道声明的空位型", c3.text.indexOf("空位型 E") >= 0);
 
+  /* ═══ ⭐ 产线道次的预算与时钟（2026-08-29 放开）═══════════════════════
+     病：十八道每一道走的是「答一段话」的账（max_tokens 6000／总时长 420 秒），成文三段各是两万字的
+     三分之一、第 3 道 27 对、第 11 道十处兑现，六千 token 还要与满功率思考同吃——于是断在半句、
+     闸门那一行来不及写、读者一路「仍要往下跑」。这一段守：预算顶配、走阶梯兜 400、总时长十分钟、
+     关思考重答不压预算，以及前端先程序判断稿再看闸门。 */
+  console.log("── ⭐ 产线道次的预算与时钟（2026-08-29 放开）──");
+  const chatSeg = (function () {
+    const i0 = W.indexOf('url.pathname === "/api/wds/chat"');
+    const j0 = W.indexOf("/api/wds/research", i0);
+    return W.slice(i0, j0 > i0 ? j0 : i0 + 60000);
+  })();
+  {
+    const mTok = W.match(/^const FORGE_STAGE_TOK = (\w+);/m), mMax = W.match(/^const WDS_TOK_MAX = (\d+);/m);
+    const mTot = W.match(/^const FORGE_TOTAL_MS = (\d+);/m), mDeep = W.match(/const CHAT_FIRST_DEEP_MS = (\d+), CHAT_TOTAL_DEEP_MS = (\d+);/),
+      mLong = W.match(/const CHAT_TOTAL_LONG_MS = (\d+);/);
+    ok("★★ 产线道次的预算常数＝顶配（FORGE_STAGE_TOK = WDS_TOK_MAX，且 ≥ 32000）",
+      !!(mTok && mMax) && mTok[1] === "WDS_TOK_MAX" && +mMax[1] >= 32000);
+    ok("★★ 产线道次的总时长常数存在且不短于深度档与长篇档",
+      !!(mTot && mDeep && mLong) && +mTot[1] >= +mDeep[2] && +mTot[1] >= +mLong[1]);
+    ok("★ 放开的依据写在常数头上（08-19 直连实测 449 秒／27,947 字，130 秒墙两边都不存在）",
+      /449 秒/.test(W) && /130 秒墙/.test(W) && /FORGE_STAGE_TOK/.test(W));
+    ok("★★ rsLong＝学科通融或 SDE 深度研究（自由拆题的研究产线不在内）",
+      /^\s+const rsLong = !!\(rs && \(rs\.forge \|\| rs\.sde\)\);$/m.test(chatSeg));
+    ok("★★ 预算：产线道次取 FORGE_STAGE_TOK，普通问答与自由研究一个字没变",
+      /:\s*\(rsLong \? FORGE_STAGE_TOK : \(rs \? \(deep \? 6000 : 4000\) : \(deep \? 6000 : \(tool \? 4000 : 2600\)\)\)\)/.test(chatSeg)
+      && !/\n\s+: \(rs \? \(deep \? 6000 : 4000\)/.test(chatSeg));
+    ok("★★ 产线道次的上游调用走 wdsFetchMax（上游以 max_tokens 相关 400 拒收就降一档，不会整道断掉）",
+      /upstream = rsLong\s*\n\s*\? await wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal\)/.test(chatSeg));
+    ok("阶梯还在兜 400（只认 max_tokens 相关的 400 才降档）",
+      /if \(resp\.ok \|\| resp\.status !== 400 \|\| i === ladder\.length - 1\) return resp;/.test(W)
+      && /max\[_ \]\?tokens\|max\[_ \]\?completion/.test(W));
+    ok("普通问答那一发仍是原来的 fetch（max_tokens: tokWant）", /: await fetch\(VC\.url, \{ method: "POST"[^\n]*max_tokens: tokWant, messages \}\)\), signal: clk\.signal \}\);/.test(chatSeg));
+    ok("★★ 总时长：产线道次走 FORGE_TOTAL_MS，长篇与深度档的账照旧",
+      /rsLong \? FORGE_TOTAL_MS : \(askLen \? CHAT_TOTAL_LONG_MS : \(deep \? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS\)\)\);/.test(chatSeg));
+    ok("首帧闸没跟着放宽（仍按档给：首帧一到就撤，放宽它只会让卡死的更晚被发现）",
+      /const clk = wdsClock\(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,/.test(chatSeg));
+    ok("★★ 关思考重答：产线道次不压预算（压到 3000 等于砍掉正文），普通问答照旧压",
+      /const tok2 = \(askLen \|\| rsLong\) \? tokWant : Math\.min\(tokWant, 3000\);/.test(chatSeg));
+    ok("★★ 关思考重答的总时长：产线道次同主道，普通问答仍是重答那套",
+      /const clk2 = wdsClock\(CHAT_RETRY_FIRST_MS, rsLong \? FORGE_TOTAL_MS : CHAT_RETRY_TOTAL_MS\);/.test(chatSeg));
+    ok("★ 重答那一发在产线道次上也走阶梯，且思考是关着的（plain=true）",
+      /const up2 = rsLong\s*\n\s*\? await wdsFetchMax\(VC, KEY, messages, true, tok2, clk2\.signal, false, undefined, true\)/.test(chatSeg));
+    ok("★ 「≤8000 是硬约束」那条老账在这一段里已标作废（别让下一个人照着改回去）",
+      /「≤8000 是硬约束」那条老账已作废/.test(chatSeg) && !/满功率档仍死守 6000（≤8000 是硬约束）/.test(chatSeg));
+  }
+  /* 前端：学科通融先程序判断稿，再看闸门。拿源码里那一行的 IIFE 原样跑，不另抄一份。 */
+  {
+    const jl = STEP.match(/var g = fg \? (\(function \(\) \{[^\n]*\}\)\(\)) : rsJudge\(txt, RS\.lastMeta\);/);
+    ok("★★ 学科通融的判决行：先 rsJudge 再 forgeGate（程序判不出问题的才轮到闸门）",
+      !!jl && /rsJudge\(txt, RS\.lastMeta\)/.test(jl[1]) && /forgeGate\(txt\)/.test(jl[1]) && /j\.d === "passed" \? forgeGate/.test(jl[1]));
+    ok("★ 旧写法（只看闸门）已不在", !/var g = fg \? forgeGate\(txt\) : rsJudge/.test(STEP));
+    const rj = F.slice(F.indexOf("  function rsJudge(txt, meta) {"), F.indexOf("  function rsRun(topic, fg, resume) {"));
+    const fgs = F.slice(F.indexOf("        function forgeGate(txt) {"), F.indexOf("        function forgeHalt(r, g, retry) {"));
+    ok("抠得到 rsJudge 与 forgeGate", rj.length > 200 && fgs.length > 200 && !!jl);
+    if (jl && rj.length > 200 && fgs.length > 200) {
+      const J = new Function("function tx(k, o) { return k; }\n" + rj + "\n" + fgs
+        + "\n return function (txt, meta) { var RS = { lastMeta: meta }; var fg = true; return " + jl[1] + "; };")();
+      const body = "本道产出。".repeat(80);
+      const full = body + "\n【闸门】passed";
+      ok("真跑：写完＋闸门 passed ⇒ passed", J(full, { fin: "stop", cut: "", err: "" }).d === "passed");
+      const r1 = J(body + "……而这一处的", { fin: "length", cut: "", err: "" });
+      ok("真跑：预算顶穿、闸门那一行没来得及写 ⇒ 判 cut 且说的是「预算顶穿」（不再说「没交出判决」）",
+        r1.d === "cut" && r1.why === "rsCutLength");
+      const r2 = J(body + "\n【闸门】passed", { fin: "length", cut: "", err: "" });
+      ok("真跑：程序判决优先——就算末尾有 passed，finish=length 照样判 cut", r2.d === "cut");
+      const r3 = J(body, { fin: "stop", cut: "", err: "" });
+      ok("真跑：写完了却没交闸门 ⇒ 仍是 unknown（这是它不肯判，不是没写完）", r3.d === "unknown");
+      const r4 = J(body, { fin: "", cut: "作答超过 600 秒还没写完（已掐断）", err: "" });
+      ok("真跑：被时钟掐 ⇒ cut，理由是时钟那句话", r4.d === "cut" && /600 秒/.test(r4.why));
+      ok("真跑：只写一百字 ⇒ cut（过短）", J("短".repeat(100), { fin: "stop", cut: "", err: "" }).d === "cut");
+      ok("真跑：零字 ⇒ failed", J("", { fin: "", cut: "", err: "" }).d === "failed");
+      const r5 = J(body + "\n【闸门】return_to_stage:4 · 五候选共脊", { fin: "stop", cut: "", err: "" });
+      ok("真跑：程序判过了，闸门的退回判决原样交出（back=4）", r5.d === "return_to_stage" && r5.back === 4);
+    }
+  }
+
   console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
   process.exit(fail ? 1 : 0);
 });

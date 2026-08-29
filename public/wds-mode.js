@@ -6858,8 +6858,13 @@
             .then(function (txt) {
               /* 这一道若真的试过一次现写心得、且没写出来，后面各道都不用再撞一次同样的墙。 */
               if (RS.lastReflectGen && RS.lastReflectGen.ok === false) reflectNoRegen = true;
-              /* 学科通融由基底交【闸门】；研究产线由程序判（断稿／报错／顶穿／过短），见 rsJudge。 */
-              var g = fg ? forgeGate(txt) : rsJudge(txt, RS.lastMeta);
+              /* 学科通融由基底交【闸门】；研究产线由程序判（断稿／报错／顶穿／过短），见 rsJudge。
+                 ⭐ 2026-08-29：学科通融也**先过一遍程序判**——预算顶穿（finish=length）／被时钟掐／
+                 流内报错／过短，这些能数出来的不问模型。此前只看【闸门】：一道被预算顶穿时连那一行
+                 都来不及写，读者看到的是「没交出判决」，分不出它是不肯判还是没写完，于是一路
+                 「仍要往下跑」——那趟十八道里七道就是这样带着半截稿子被强行带下去的。
+                 程序判不出问题的，才轮到基底的【闸门】那一行。 */
+              var g = fg ? (function () { var j = rsJudge(txt, RS.lastMeta); return j.d === "passed" ? forgeGate(txt) : j; })() : rsJudge(txt, RS.lastMeta);
               r.stat.textContent = (g.d === "passed" ? tx("rsDone") : ("\u26a0 " + tx("fgGateNo"))) + " \u00b7 " + txt.length;
               secs.push({ t: s.t, body: txt, gate: g.d, hash: fnv1a64(txt), at: Date.now() });
               saveRun();

@@ -104,8 +104,10 @@ ok(/const CHAT_RETRY_FIRST_MS = (\d+), CHAT_RETRY_TOTAL_MS = (\d+);/.test(W), "�
   ok(m1 && m0f && +m1[1] < +m0f[1], "重答首帧护栏比满功率档短（不烧思考还半分钟不开口就不会开口了）");
   ok(m1 && m0t && +m1[2] < +m0t[1], "重答总时长比满功率档短（否则是 240＋240 的八分钟转圈）");
 }
-ok(/const clk2 = wdsClock\(CHAT_RETRY_FIRST_MS, CHAT_RETRY_TOTAL_MS\);/.test(chatSeg),
-  "clk2 真用的是重答那套常数");
+/* 2026-08-29 改落点不删：产线道次（rsLong）的重答总时长跟主道走 FORGE_TOTAL_MS，首帧仍是重答那套；
+   普通问答一个字没变。守的用意——重答不沿用满功率档的账——照旧。 */
+ok(/const clk2 = wdsClock\(CHAT_RETRY_FIRST_MS, (?:rsLong \? FORGE_TOTAL_MS : )?CHAT_RETRY_TOTAL_MS\);/.test(chatSeg),
+  "clk2 真用的是重答那套常数（产线道次只把总时长放宽到与主道同）");
 ok(!/const clk2 = wdsClock\(CHAT_FIRST_MS/.test(chatSeg), "没退回沿用 CHAT_FIRST_MS 的老写法");
 
 console.log("⑥ 零帧看门狗：45 秒零字要说出是「还没回第一个字」");
@@ -132,8 +134,9 @@ ok(/const CHAT_FIRST_DEEP_MS = (\d+), CHAT_TOTAL_DEEP_MS = (\d+);/.test(W), "深
   ok(d1 && +d1[2] > +d1[1], "深度档总时长大于它自己的首帧护栏（相等＝首帧一到就没时间写）");
   ok(d1 && s2 && +d1[2] > +s2[1], "深度档总时长也比标准档宽");
 }
-ok(/const clk = wdsClock\(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,\s*\n\s*askLen \? CHAT_TOTAL_LONG_MS : \(deep \? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS\)\);/.test(chatSeg),
-  "chat 的主时钟真按 deep 分档，且长篇请求的总时长仍最长");
+/* 2026-08-29 改落点不删：产线道次（rsLong）的总时长在外层再包一档 FORGE_TOTAL_MS；deep 分档与长篇最长照旧。 */
+ok(/const clk = wdsClock\(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,\s*\n\s*(?:rsLong \? FORGE_TOTAL_MS : \()?askLen \? CHAT_TOTAL_LONG_MS : \(deep \? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS\)\)?\);/.test(chatSeg),
+  "chat 的主时钟真按 deep 分档，且长篇请求的总时长仍最长（产线道次另有一档更长的）");
 ok(!/const clk = wdsClock\(CHAT_FIRST_MS, askLen/.test(chatSeg), "没退回不分档的老写法");
 {
   var rs = W.slice(W.indexOf('url.pathname === "/api/wds/research"'));
