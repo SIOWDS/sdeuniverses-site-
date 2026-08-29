@@ -5050,10 +5050,16 @@ function gradeCoreLanding(kb, q, expTerms) {
 }
 function ragGrade(q, picked, nHit, docsN, chars, core) {
   const anchors = gradeAnchors(q);
-  const names = [];
-  for (const c of (core || [])) { if (c.n && names.indexOf(c.n) < 0) names.push(c.n); if (c.e && names.indexOf(c.e) < 0) names.push(c.e); }
   const qq = String(q || "").trim();
   const P = Array.isArray(picked) ? picked : [];
+  /* 落点逐个验：弱锚定（共字）的落点必须在召回段里真出现过它的名字才算——「量子力学」共一个「学」字
+     种到「数学场」，段里一次都没出现，那就不是落点，是巧合。题面锚定（索引词整个在题面里）不必验。 */
+  const termsOf = (c) => [c.n, c.e].filter((x, i, a) => x && a.indexOf(x) === i);
+  const cnt = {};
+  for (const c of (core || [])) for (const n of termsOf(c)) if (!(n in cnt)) { let k = 0; for (const it of P) if (String((it && it.t) || "").indexOf(n) >= 0) k++; cnt[n] = k; }
+  const kept = (core || []).filter((c) => c.via === "题面" || termsOf(c).some((n) => cnt[n] > 0));
+  const names = [];
+  for (const c of kept) for (const n of termsOf(c)) if (names.indexOf(n) < 0) names.push(n);
   /* 量与准都只数**锚定**的段：段里得出现题面实词或落点名。没锚定的段是扩展词召回的，
      那是基底替我们造的术语，什么问题都召得到，计进去就是自己给自己打分。 */
   let aHits = 0, cHits = 0, exact = false, sum5 = 0, n5 = 0;
@@ -5073,15 +5079,18 @@ function ragGrade(q, picked, nHit, docsN, chars, core) {
   const aDocs = Object.keys(aDoc).length;
   const mean5 = n5 ? sum5 / n5 : 0;
   const cover = P.length ? aHits / P.length : 0;
-  const amount = 30 * Math.min(1, aHits / 10) + 10 * Math.min(1, aDocs / 6);
+  /* 分母按线上实况定（2026-08-30 十问实测）：L2 下钻「够用就停」，picked 通常只有 6–12 段、3–6 篇，
+     所以 8 段／5 篇就算「厚」。前五段均分一问就到 10 以上（幸福律 31、内卷 24），20 分那一项在
+     有材料的题上基本满，准这一项实际靠锚定覆盖率与题面原句在分。 */
+  const amount = 30 * Math.min(1, aHits / 8) + 10 * Math.min(1, aDocs / 5);
   const acc = 20 * Math.min(1, mean5 / 10) + 10 * cover + (exact ? 5 : 0);
-  const landing = (core && core.length) ? (core[0].w + 5 * Math.min(3, cHits)) : 0;
+  const landing = kept.length ? (kept[0].w + 5 * Math.min(3, cHits)) : 0;
   const score = Math.round(amount + acc + landing);
   let lv = 5;
   for (let i = 0; i < GRADE_LV.length; i++) if (score < GRADE_LV[i]) { lv = i + 1; break; }
   return { lv: lv, name: GRADE_NAME[lv], score: score, amount: Math.round(amount), acc: Math.round(acc), landing: Math.round(landing),
            hits: P.length, ahits: aHits, chits: cHits, docs: docsN || 0, adocs: aDocs, chars: chars || 0, mean5: Math.round(mean5 * 10) / 10,
-           exact: exact, core: (core || []).map((c) => ({ n: c.n, by: c.by, via: c.via })), anchors: anchors.slice(0, 8), nhit: nHit || 0 };
+           exact: exact, core: kept.map((c) => ({ n: c.n, by: c.by, via: c.via })), anchors: anchors.slice(0, 8), nhit: nHit || 0 };
 }
 /* 每一档改什么。第 4 档 ＝ 从前的深度档一字不差（顶配基底／满功率／6000／完整工序／240s·420s／10 篇）；
    第 5 档在它之上再装完整内功、预算 8000；第 1–2 档退到标准基底（1 档还关思考——寒暄与站外题的快车道）。 */

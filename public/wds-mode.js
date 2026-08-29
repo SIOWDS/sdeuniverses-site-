@@ -3024,8 +3024,11 @@
   /* 这一答的难度读数，摆在答案外面（不进正文）：档、自动/钉死、落点、命中量、这一档实际用的配方。 */
   function gradeLine(cell, v) {
     if (!cell || !v) return;
+    /* 标准档收到的读数是检索自己算的档（rlv）——没定档、只是让读者看见这一问的站内高级度；一档都算不出就不出这一行。 */
+    var lvShow = v.on ? (v.lv || 0) : (v.deep ? (v.lv || 0) : (v.rlv || 0));
+    if (!lvShow) return;
     var d = el("div", "wdsm-gline");
-    var lvb = el("b", null, gFmt("gLineLv", { n: v.lv || 0, name: gName(v.lv || 0) }));
+    var lvb = el("b", null, gFmt("gLineLv", { n: lvShow, name: gName(lvShow) }));
     d.appendChild(lvb);
     var how = v.on ? (v.auto ? (v.why === "norag" ? t("gLineNoRag") : t("gLineAuto")) : t("gLinePin")) : (v.deep ? "" : t("gLineStd"));
     if (how) d.appendChild(document.createTextNode("（" + how + "）"));

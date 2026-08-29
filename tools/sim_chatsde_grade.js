@@ -85,7 +85,13 @@ if (box) {
   const gNoise = box.ragGrade("下午好", mk(12, "显露 差异 纠缠 显露 差异 纠缠", 4), 12, 6, 6000, []);
   ok("寒暄召回一堆 SDE 术语段 ⇒ 仍是第 1 档、分 0（扩展词召回的段不计分）", gNoise.lv === 1 && gNoise.score === 0, JSON.stringify({ lv: gNoise.lv, s: gNoise.score, a: gNoise.amount, p: gNoise.acc }));
   const gMix = box.ragGrade("什么是内卷", mk(2, "内卷是……", 9).concat(mk(20, "显露 差异 纠缠", 9)), 22, 9, 9000, []);
-  ok("锚定段只有两段时，量按两段算、准按那两段算，不被二十段噪音抬高", gMix.ahits === 2 && gMix.amount <= 10 && gMix.lv <= 2, JSON.stringify({ lv: gMix.lv, s: gMix.score, a: gMix.amount, p: gMix.acc }));
+  ok("锚定段只有两段时，量按两段算、准按那两段算，不被二十段噪音抬高", gMix.ahits === 2 && gMix.amount <= 12 && gMix.lv <= 2, JSON.stringify({ lv: gMix.lv, s: gMix.score, a: gMix.amount, p: gMix.acc }));
+  const gGhost = box.ragGrade("量子力学的测量问题", mk(6, "量子 测量 力学 观测……", 9), 6, 4, 3500, [{ n: "数学场", e: "数学场", by: "学", via: "共字", w: 6 }]);
+  ok("共字种到的落点若在召回段里一次都没出现 ⇒ 不算落点（量子力学≠数学场）", gGhost.core.length === 0 && gGhost.landing === 0 && gGhost.chits === 0, JSON.stringify(gGhost.core));
+  const gKeep = box.ragGrade("量子力学的测量问题", mk(6, "量子 测量 数学场 观测……", 9), 6, 4, 3500, [{ n: "数学场", e: "数学场", by: "学", via: "共字", w: 6 }]);
+  ok("共字落点在段里真出现过 ⇒ 保留", gKeep.core.length === 1 && gKeep.landing > 0);
+  const gStrong = box.ragGrade("什么是幸福律", mk(6, "别的东西……", 9), 6, 4, 3500, [{ n: "幸福律", e: "意义三律", by: "幸福律", via: "题面", w: 10 }]);
+  ok("题面锚定不必验段：段里没出现也算落点（题目本身就点了名）", gStrong.core.length === 1 && gStrong.landing === 10);
   const gEx = box.ragGrade("三大方程是什么", mk(10, "三大方程是什么？S=F(D,E)……", 14), 10, 6, 9000, [{ n: "三大方程", e: "三大方程", by: "三大方程", via: "题面", w: 10 }]);
   ok("题面原句在站 ⇒ exact 为真且加分", gEx.exact === true && gEx.acc >= 25, JSON.stringify({ lv: gEx.lv, s: gEx.score, p: gEx.acc }));
   ok("档位切分是单调的（分越高档越高）", (function () {
@@ -247,7 +253,10 @@ console.log("\n五、前端真跑（小 DOM）");
     const cell2 = { turn: new N("div"), a: new N("div") }; cell2.turn.appendChild(cell2.a);
     fx.line(cell2, { lv: 0, name: "标准", on: false, auto: false, pin: 0, why: "std", deep: false, hits: 5, ahits: 1, docs: 3, core: [], anchors: [], rlv: 2, score: 20 });
     const txt2 = cell2.turn.children[0]._all([]).map((n) => n.textContent).join("");
-    ok("标准档的读数行只报高级度、注明未按此加深，不更新条", /标准档（未按此加深）/.test(txt2) && fx.last().lv === 4, txt2);
+    ok("标准档的读数行报的是检索自己算的档（rlv 2）、注明未按此加深，不更新条", /难度 2\/5·常/.test(txt2) && /标准档（未按此加深）/.test(txt2) && fx.last().lv === 4, txt2);
+    const cell3 = { turn: new N("div"), a: new N("div") }; cell3.turn.appendChild(cell3.a);
+    fx.line(cell3, { lv: 0, on: false, deep: false, rlv: 0, hits: 0 });
+    ok("一档都算不出（检索空）的标准档不出读数行", cell3.turn.children.length === 1);
     fx.mode("std"); fx.paint();
     ok("切回标准档：整条隐藏", grade.style.display === "none");
   }
