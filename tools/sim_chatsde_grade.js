@@ -185,7 +185,11 @@ ok("研究产线（rs.sde）自己的内功装载没被动", /if \(rs && rs\.sde
 console.log("\n四、前端：难度条");
 ok("难度条的存储键与状态", /var LS_GRADE = "sde_wds_grade";/.test(FE) && /var gradePin = 0, gradeLast = null;/.test(FE));
 ok("难度条挂在深度思考那颗钮旁边（自动＋1–5）", /data-k='deep'><\/button>" \+\s*"<span class='wdsm-grade' style='display:none'><i><\/i>" \+\s*"<button data-g='0'><\/button><button data-g='1'>1<\/button>/.test(FE) && /<button data-g='5'>5<\/button>/.test(FE));
-ok("标准档整条不显示", /function paintGrade\(\) \{\s*if \(!gradeEl\) return;\s*if \(thinkMode !== "deep"\) \{ gradeEl\.style\.display = "none"; return; \}/.test(FE));
+ok("标准档或没展开时整条不显示（动态隐藏）", /if \(thinkMode !== "deep" \|\| !gradeOpen\) \{ gradeEl\.style\.display = "none"; return; \}/.test(FE));
+ok("深度思考钮上露当前档（折叠摘要 toolsSum 读的就是它）", /deepBtn\.textContent = t\("mDeep"\) \+ \(thinkMode === "deep" \? gradeSuffix\(\) : ""\);/.test(FE));
+ok("已在深度档再点一次＝展开/收起；切进深度档时展开一次", /else if \(k === "deep" && thinkMode === "deep"\) \{ gradeOpen = !gradeOpen; \}/.test(FE) && /gradeOpen = \(k === "deep"\);/.test(FE));
+ok("选完即收、发问即收、点到别处也收", /gradeOpen = false;\s*\/\/ 选完就收/.test(FE) && /streaming = true; stoppedByUser = false;\s*gradeClose\(\);/.test(FE) && /document\.addEventListener\("click", function \(e\) \{\s*if \(!gradeOpen\) return;/.test(FE));
+ok("tipDeep 说明了「再点一次展开」", /再点一次「深度思考」展开 1–5/.test(FE) && /Click Deep again to unfold/.test(FE));
 ok("档位一变就重画难度条", /paintGrade\(\);\s*\/\/ 难度条只在深度档露面\s*toolsPaint\(\);/.test(FE));
 ok("点数字钉死、点自动回 0，都落 localStorage", /gradePin = \(g >= 1 && g <= 5\) \? g : 0;\s*try \{ localStorage\.setItem\(LS_GRADE, String\(gradePin\)\); \} catch \(e\) \{\}/.test(FE));
 ok("主对话请求只在深度档带 grade（auto 或钉死的档）", /if \(thinkMode === "deep"\) payload\.grade = gradePin \? gradePin : "auto";/.test(FE));
@@ -207,10 +211,18 @@ console.log("\n五、前端真跑（小 DOM）");
   N.prototype.setAttribute = function (k, v) { this.attrs[k] = String(v); };
   N.prototype.getAttribute = function (k) { return k in this.attrs ? this.attrs[k] : null; };
   N.prototype._all = function (o) { o.push(this); this.children.forEach((c) => c._all(o)); return o; };
-  N.prototype._m = function (sel) { if (sel[0] === ".") return this.className.split(/\s+/).indexOf(sel.slice(1)) >= 0; return this.tagName === sel; };
+  N.prototype._m = function (sel) {
+    const m = sel.match(/^([a-z]+)?(?:\.([\w-]+))?(?:\[([\w-]+)='([^']*)'\])?$/);
+    if (!m) return false;
+    if (m[1] && this.tagName !== m[1]) return false;
+    if (m[2] && this.className.split(/\s+/).indexOf(m[2]) < 0) return false;
+    if (m[3] && this.getAttribute(m[3]) !== m[4]) return false;
+    return true;
+  };
   N.prototype.querySelector = function (sel) { return this._all([]).slice(1).find((n) => n._m(sel)) || null; };
   N.prototype.querySelectorAll = function (sel) { return this._all([]).slice(1).filter((n) => n._m(sel)); };
   const layer = new N("div");
+  const deepBtn = new N("button"); deepBtn.className = "wdsm-mode"; deepBtn.setAttribute("data-k", "deep"); deepBtn.textContent = "\u25c8 深度思考"; layer.appendChild(deepBtn);
   const grade = new N("span"); grade.className = "wdsm-grade"; layer.appendChild(grade);
   grade.appendChild(new N("i"));
   for (let g = 0; g <= 5; g++) { const b = new N("button"); b.setAttribute("data-g", String(g)); grade.appendChild(b); }
@@ -223,21 +235,23 @@ console.log("\n五、前端真跑（小 DOM）");
   const i2 = FE.indexOf("\n  }\n", i1 > 0 ? i1 : i0) + 4;
   const seg = FE.slice(i0, i2);
   ok("抠得到难度条那一段前端代码", i0 > 0 && i1 > i0 && seg.indexOf("function gradeLine(") > 0 && seg.indexOf("function paintGrade(") > 0, "i0=" + i0 + " i1=" + i1 + " len=" + seg.length);
-  const zh = { gLab: "难度", gAuto: "自动", gNames: ["轻", "常", "深", "满", "极"], gAutoT: "A", gPinT: "钉死第 {n} 档（{name}）", gNow: "上一答 {n}·{name}", gPinNow: "钉 {n}·{name}",
+  const zh = { mDeep: "\u25c8 深度思考", gPinShort: "钉", gLab: "难度", gAuto: "自动", gNames: ["轻", "常", "深", "满", "极"], gAutoT: "A", gPinT: "钉死第 {n} 档（{name}）", gNow: "上一答 {n}·{name}", gPinNow: "钉 {n}·{name}",
     gLineLv: "难度 {n}/5·{name}", gLineAuto: "自动", gLineNoRag: "自动·检索没接上，按 4 档", gLinePin: "钉死", gLineStd: "标准档（未按此加深）",
     gLineLand: "落点：{list}", gLineBy: "由「{by}」", gLineHits: "站内 {docs} 篇·锚定 {a}/{h} 段", gLineCore: "核心 {c} 段", gLineExact: "题面原句在站", gLineNone: "站内无锚定命中", gLineThink: "思考{think}", gLineNg: "＋完整内功" };
   let fx = null;
   try {
     fx = new Function("layer", "localStorage", "document", "LS_GRADE", "t", "el",
-      "var thinkMode = 'deep', gradePin = 0, gradeLast = null;\n" + seg +
-      "\nreturn { paint: paintGrade, line: gradeLine, pin: function (v) { gradePin = v; }, mode: function (m) { thinkMode = m; }, last: function () { return gradeLast; } };")(
+      "var thinkMode = 'deep', gradePin = 0, gradeLast = null, gradeOpen = false;\n" + seg +
+      "\nreturn { paint: paintGrade, line: gradeLine, close: gradeClose, open: function (v) { gradeOpen = !!v; }, isOpen: function () { return gradeOpen; }, pin: function (v) { gradePin = v; }, mode: function (m) { thinkMode = m; }, last: function () { return gradeLast; } };")(
       layer, localStorage, document, "sde_wds_grade", (k) => zh[k], (t, c, x) => { const e = new N(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; });
     ok("难度条那一段装得起来", true);
   } catch (e) { ok("难度条那一段装得起来", false, String(e && e.message)); }
   if (fx) {
     fx.paint();
+    ok("深度档、没展开：条是藏着的，深度思考钮上露「·自动」（动态隐藏）", grade.style.display === "none" && deepBtn.textContent === "\u25c8 深度思考·自动", deepBtn.textContent);
+    fx.open(true); fx.paint();
     const bs = grade.querySelectorAll("button");
-    ok("深度档：条露面、「自动」钮点亮、还没读数时没有 lit", grade.style.display === "" && bs[0].className.indexOf("on") >= 0 && bs[0].textContent === "自动" && bs.every((b) => b.className.indexOf("lit") < 0));
+    ok("展开后：条露面、「自动」钮点亮、还没读数时没有 lit", grade.style.display === "" && bs[0].className.indexOf("on") >= 0 && bs[0].textContent === "自动" && bs.every((b) => b.className.indexOf("lit") < 0));
     const cell = { turn: new N("div"), a: new N("div") }; cell.turn.appendChild(cell.a);
     fx.line(cell, { lv: 4, name: "满", on: true, auto: true, pin: 0, why: "auto", deep: true, score: 66, amount: 30, acc: 15, landing: 21, hits: 18, ahits: 7, chits: 3, docs: 7, chars: 12000, exact: false,
       core: [{ n: "幸福律", by: "福", via: "共字" }], anchors: ["身在", "福中", "知福"], model: "deepseek-v4-pro", top: 1, think: "满功率", method: "完整工序", tok: 6000, ng: false });
@@ -246,14 +260,18 @@ console.log("\n五、前端真跑（小 DOM）");
     const txt = line._all([]).map((n) => n.textContent).join("");
     ok("读数行写着档／自动／落点（由「福」）／命中量／配方", /难度 4\/5·满/.test(txt) && /（自动）/.test(txt) && /落点：幸福律（由「福」）/.test(txt) && /站内 7 篇·锚定 7\/18 段·核心 3 段/.test(txt) && /deepseek-v4-pro · 思考满功率 · 完整工序/.test(txt), txt);
     ok("读数行的悬停提示带分项", /score 66 = 量 30 \+ 准 15 \+ 落点 21/.test(line.title) && /锚：身在\/福中\/知福/.test(line.title), line.title);
-    fx.paint();
+    fx.open(true); fx.paint();
     const bs2 = grade.querySelectorAll("button");
-    ok("自动定到 4 档后：4 号钮 lit、「自动」仍 on、右侧写「上一答 4·满」", bs2[4].className.indexOf("lit") >= 0 && bs2[0].className.indexOf("on") >= 0 && grade.querySelector("em").textContent === "上一答 4·满", bs2.map((b) => b.className).join(","));
+    ok("自动定到 4 档后：4 号钮 lit、「自动」仍 on、右侧写「上一答 4·满」、钮上露「·4」", bs2[4].className.indexOf("lit") >= 0 && bs2[0].className.indexOf("on") >= 0 && grade.querySelector("em").textContent === "上一答 4·满" && deepBtn.textContent === "\u25c8 深度思考·4", bs2.map((b) => b.className).join(",") + " " + deepBtn.textContent);
     // 钉死 2 档
     bs2[2].onclick();
-    ok("点 2 号钮 ⇒ 钉死 2 档、落 localStorage、2 号钮 on 且 lit", store.sde_wds_grade === "2" && bs2[2].className.indexOf("on") >= 0 && bs2[2].className.indexOf("lit") >= 0 && bs2[4].className.indexOf("lit") < 0 && grade.querySelector("em").textContent === "钉 2·常");
+    ok("点 2 号钮 ⇒ 钉死 2 档、落 localStorage、条自动收起、钮上露「·钉2」", store.sde_wds_grade === "2" && fx.isOpen() === false && grade.style.display === "none" && deepBtn.textContent === "\u25c8 深度思考·钉2");
+    fx.open(true); fx.paint();
+    ok("再展开：2 号钮 on 且 lit、4 号不 lit、右侧写「钉 2·常」", bs2[2].className.indexOf("on") >= 0 && bs2[2].className.indexOf("lit") >= 0 && bs2[4].className.indexOf("lit") < 0 && grade.querySelector("em").textContent === "钉 2·常");
     bs2[0].onclick();
-    ok("点「自动」⇒ 回 0、localStorage 记 0、lit 回到上一答的 4", store.sde_wds_grade === "0" && bs2[0].className.indexOf("on") >= 0 && bs2[4].className.indexOf("lit") >= 0);
+    ok("点「自动」⇒ 回 0、localStorage 记 0、收起、钮上回到「·4」（上一答的档）", store.sde_wds_grade === "0" && fx.isOpen() === false && deepBtn.textContent === "\u25c8 深度思考·4");
+    fx.open(true); fx.paint(); fx.close();
+    ok("gradeClose（发问时调用）能把展开的条收回", fx.isOpen() === false && grade.style.display === "none");
     // 标准档的读数：不更新条
     const cell2 = { turn: new N("div"), a: new N("div") }; cell2.turn.appendChild(cell2.a);
     fx.line(cell2, { lv: 0, name: "标准", on: false, auto: false, pin: 0, why: "std", deep: false, hits: 5, ahits: 1, docs: 3, core: [], anchors: [], rlv: 2, score: 20 });
@@ -262,8 +280,8 @@ console.log("\n五、前端真跑（小 DOM）");
     const cell3 = { turn: new N("div"), a: new N("div") }; cell3.turn.appendChild(cell3.a);
     fx.line(cell3, { lv: 0, on: false, deep: false, rlv: 0, hits: 0 });
     ok("一档都算不出（检索空）的标准档不出读数行", cell3.turn.children.length === 1);
-    fx.mode("std"); fx.paint();
-    ok("切回标准档：整条隐藏", grade.style.display === "none");
+    fx.mode("std"); fx.open(true); fx.paint();
+    ok("切回标准档：整条隐藏、钮上不带档", grade.style.display === "none" && deepBtn.textContent === "\u25c8 深度思考");
   }
 }
 

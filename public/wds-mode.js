@@ -943,8 +943,8 @@
       mtHide: "收起工具", mtShow: "工具", mtHideT: "把档位条收起来，把屏幕让给答案",
       topShowT: "把顶栏叫回来（往上翻一下也会回来）",
       mtShowT: "展开档位条（现在开着的）",
-      tipStd: "快答档，够用且省", tipDeep: "难度条：按这一问在站内检索到的核心词材料多少与准确度自动定档——1 轻 2 常 3 深 4 满 5 极；落到核心律（如幸福律）且材料厚才到 4–5：顶配基底＋满功率思考＋完整工序，5 档再装完整内功。点数字可钉死一档。", tipWeb: " · 已开联网（需智谱 Key）",
-      gLab: "难度", gAuto: "自动", gNames: ["轻", "常", "深", "满", "极"],
+      tipStd: "快答档，够用且省", tipDeep: "难度条：按这一问在站内检索到的核心词材料多少与准确度自动定档——1 轻 2 常 3 深 4 满 5 极；落到核心律（如幸福律）且材料厚才到 4–5：顶配基底＋满功率思考＋完整工序，5 档再装完整内功。再点一次「深度思考」展开 1–5，可钉死一档。", tipWeb: " · 已开联网（需智谱 Key）",
+      gLab: "难度", gAuto: "自动", gPinShort: "钉", gNames: ["轻", "常", "深", "满", "极"],
       gAutoT: "自动：按站内检索定档（这一问材料越厚、越准、越落在核心概念上，档越高）",
       gPinT: "钉死第 {n} 档（{name}）——不再按检索定档",
       gNow: "上一答 {n}·{name}", gPinNow: "钉 {n}·{name}",
@@ -1201,8 +1201,8 @@
       topShowT: "Bring the top bar back (scrolling up does it too)",
       mtShowT: "Show the mode bar (currently on)",
       tipStd: "Fast tier — enough for most questions, and cheap",
-      tipDeep: "Difficulty bar: the level is set automatically from how much accurate site material the retrieval finds on your question's core terms — 1 light … 5 max. Only a question that lands on a core law with thick material reaches 4–5: top model, full reasoning, full method stages; level 5 also loads the complete SDE groundwork. Click a digit to pin a level.",
-      gLab: "Level", gAuto: "Auto", gNames: ["light", "normal", "deep", "full", "max"],
+      tipDeep: "Difficulty bar: the level is set automatically from how much accurate site material the retrieval finds on your question's core terms — 1 light … 5 max. Only a question that lands on a core law with thick material reaches 4–5: top model, full reasoning, full method stages; level 5 also loads the complete SDE groundwork. Click Deep again to unfold 1–5 and pin a level.",
+      gLab: "Level", gAuto: "Auto", gPinShort: "pin", gNames: ["light", "normal", "deep", "full", "max"],
       gAutoT: "Auto: set from site retrieval (thicker, more accurate material on a core concept ⇒ higher level)",
       gPinT: "Pin level {n} ({name}) — retrieval no longer decides",
       gNow: "last {n}·{name}", gPinNow: "pin {n}·{name}",
@@ -2906,6 +2906,9 @@
   /* ⭐ 难度条（2026-08-30）：gradePin 0＝自动（按站内检索定档），1–5＝读者钉死；gradeLast＝上一答的读数。
      [stated] 作者：深度思考要做成难度条，档位按站内检索对核心词的材料多少与准确度定。 */
   var gradePin = 0, gradeLast = null;
+  /* 难度条是**动态隐藏**的（2026-08-30 用户令）：平时收在「深度思考」那颗钮里，钮上只露当前档
+     （◈ 深度思考·自动 / ·5 / ·钉3）；再点一次深度思考才把 1–5 展开，选完、发问、点到别处都自动收回。 */
+  var gradeOpen = false;
   try {
     thinkMode = localStorage.getItem(LS_MODE) === "deep" ? "deep" : "std";
     webOn = localStorage.getItem(LS_WEB) === "1";
@@ -2990,9 +2993,17 @@
   var gradeEl = layer.querySelector(".wdsm-grade");
   function gFmt(k, o) { var st = String(t(k) || ""); for (var kk in (o || {})) st = st.split("{" + kk + "}").join(String(o[kk])); return st; }
   function gName(n) { var a = t("gNames"); return (a && a[n - 1]) || String(n); }
+  var deepBtn = layer.querySelector(".wdsm-mode[data-k='deep']");
+  function gradeSuffix() {
+    if (gradePin) return "\u00b7" + t("gPinShort") + gradePin;
+    if (gradeLast && gradeLast.on && gradeLast.lv) return "\u00b7" + gradeLast.lv;
+    return "\u00b7" + t("gAuto");
+  }
   function paintGrade() {
     if (!gradeEl) return;
-    if (thinkMode !== "deep") { gradeEl.style.display = "none"; return; }
+    /* 钮上露当前档：折叠钮上的摘要（toolsSum）读的就是这段文字，所以收起档位条时也看得见「深度思考·5」。 */
+    if (deepBtn) deepBtn.textContent = t("mDeep") + (thinkMode === "deep" ? gradeSuffix() : "");
+    if (thinkMode !== "deep" || !gradeOpen) { gradeEl.style.display = "none"; return; }
     gradeEl.style.display = "";
     var lab = gradeEl.querySelector("i"); if (lab) lab.textContent = t("gLab");
     var bs = gradeEl.querySelectorAll("button");
@@ -3016,11 +3027,23 @@
           var g = parseInt(b.getAttribute("data-g") || "0", 10);
           gradePin = (g >= 1 && g <= 5) ? g : 0;
           try { localStorage.setItem(LS_GRADE, String(gradePin)); } catch (e) {}
+          gradeOpen = false;                     // 选完就收
           paintGrade();
         };
       })(bs[i]);
     }
+    /* 点到别处也收——档位条上其它钮、输入框、答案区都算「别处」；深度思考钮自己管开合。 */
+    try {
+      document.addEventListener("click", function (e) {
+        if (!gradeOpen) return;
+        var tg = e && e.target;
+        if (gradeEl.contains && gradeEl.contains(tg)) return;
+        if (deepBtn && deepBtn.contains && deepBtn.contains(tg)) return;
+        gradeOpen = false; paintGrade();
+      });
+    } catch (e) {}
   })();
+  function gradeClose() { if (gradeOpen) { gradeOpen = false; paintGrade(); } }
   /* 这一答的难度读数，摆在答案外面（不进正文）：档、自动/钉死、落点、命中量、这一档实际用的配方。 */
   function gradeLine(cell, v) {
     if (!cell || !v) return;
@@ -3061,7 +3084,8 @@
             // 开一个就该把另一个关掉，否则界面上会显示两个互相矛盾的档位同时选中。
             if (noSdeOn && curTool) toolSet("");
           }
-          else { thinkMode = k; try { localStorage.setItem(LS_MODE, k); } catch (e) {} }
+          else if (k === "deep" && thinkMode === "deep") { gradeOpen = !gradeOpen; }   // 已在深度档：再点＝展开/收起难度条
+          else { thinkMode = k; gradeOpen = (k === "deep"); try { localStorage.setItem(LS_MODE, k); } catch (e) {} }   // 切进深度档时展开一次让人看见它在
           paintModes();
         };
       })(bs[i]);
@@ -4400,6 +4424,7 @@
     cell.a.innerHTML = "<span class='cur'>▊</span>";
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; stoppedByUser = false;
+    gradeClose();                                   // 发问即收难度条
     busyUI(true);
     stopBarShow(true); tipDeckHide(false);
     // nosde 单独用 !PROFILE 再兜一道：即便分身页因为共用 localStorage 而读到了 noSdeOn=true
