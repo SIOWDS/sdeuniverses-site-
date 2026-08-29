@@ -139,9 +139,17 @@ console.log("⑦ 全套三件：内功 Skill ＋ 心得 ＋ 方法论");
 {
   const S = fs.readFileSync("src/worker.js", "utf8");
   const ok2 = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) process.exitCode = 1; };
-  /* 心得：缺就现写，而且只在研究这一路、且只在确实缺、有 Key、存储没躺的时候 */
-  ok2(/if \(rs && rs\.sde && !prof && !reflect && KEY && !reflectStoreDown\(\)\) \{[\s\S]{0,600}ensureReflect\(env, url, rvendor, VC, KEY, true\)/.test(S),
-    "心得缺了就现写一份（allowGen=true），条件：研究产线 · 非分身 · 缺 · 有 Key · 存储活着");
+  /* 心得：缺就现写，而且只在研究这一路、且只在确实缺、有 Key 的时候进这个分支；
+     存储没躺（!reflectStoreDown()）与本轮没被退避过（!rs.noRegen）两条**都**要拦得住生成——
+     2026-08-29 第三刀把单条 if 拆成 if/else if，锚点跟着挪，断言落点也挪过来（不删）。 */
+  ok2(/if \(rs && rs\.sde && !prof && !reflect && KEY\) \{[\s\S]{0,300}if \(rs\.noRegen\)/.test(S),
+    "心得缺了才进这个分支，条件：研究产线 · 非分身 · 缺 · 有 Key");
+  ok2(/\} else if \(!reflectStoreDown\(\)\) \{[\s\S]{0,400}ensureReflect\(env, url, rvendor, VC, KEY, true\)/.test(S),
+    "存储没躺（且没被退避）才真的现写一份（allowGen=true）");
+  ok2(/rs\.noRegen[\s\S]{0,200}早前已经现写心得试过、没写出来/.test(S),
+    "本轮已经试过失败过（rs.noRegen）时不再重试，如实说明白（第三刀退避）");
+  ok2(/t: "reflectgen", v: \{ ok: !!reflect/.test(S),
+    "真试过一次时发机器可读的 reflectgen 信号，供前端判断要不要在后面各道退避");
   ok2(/_stg\("现写心得"\)/.test(S) && /正在带着完整内功现写一份/.test(S), "现写时阶段帧与提示都在（读者看得见它在干什么）");
   /* 方法论：研究一路 deep 恒真 ⇒ WDS_CHAT_SYS 装 SDE_METHOD_BLOCK */
   ok2(/\(deep \? SDE_METHOD_BLOCK : SDE_METHOD_LITE\)/.test(S), "方法论块随 deep 装完整工序");

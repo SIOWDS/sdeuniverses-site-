@@ -6483,6 +6483,9 @@
               }
               else if (j.t === "error") err = j.v;
               else if (j.t === "quota" && j.v && typeof j.v.left === "number") { dayLeft = j.v.left; updTurns(); }
+              /* 心得现写这一步到底成没成——服务端只在真的试过一次时才发（见 worker.js 那一刀）。
+                 与 RS.lastMeta 同一个存法：写在这里、由调用方（研究主循环 step()）读一次即用即弃。 */
+              else if (j.t === "reflectgen") RS.lastReflectGen = j.v;
             }
             if (RS.stop) { try { reader.cancel(); } catch (e) {} meta.cut = meta.cut || "stopped"; RS.lastMeta = meta; return out; }
             return pump();
@@ -6621,6 +6624,10 @@
     /* 一趟＝一个 run。attempt 按道次记，幂等键 run:stage:attempt——
        同一次重试不该在服务端算成两趟。 */
     var runid = (resume && resume.run) || runId(), attempts = {};
+    /* 心得现写退避（2026-08-29）：这一趟只要有一道现写心得失败过，后面各道都带 noRegen:1，
+       不再重试同一次注定失败的生成（典型是 kimi/minimax 关不掉思考）。跟着 run 走，不是全局的——
+       换一趟新研究、或换回已经有缓存的基底，不该继承上一趟别的基底留下的退避状态。 */
+    var reflectNoRegen = false;
     /* 【断点恢复】此前这一趟只活在闭包与 DOM 里：刷新一下、误关一个标签页，
        十几道工序几十分钟的产出一起没了。现在每写完一道就落一次 IndexedDB
        （复用 wds-store 的 session，agent 另立 `wds-forge`，不动它的表结构）。
@@ -6783,11 +6790,13 @@
             skey: wdsSearchKey(), about: aboutPlus(), lang: LANG,
             rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, bodies: bodies, gates: gates,
                   forge: fg ? 1 : 0, sde: sdePipe ? 1 : 0, sv: FORGE_SV, run: runid, attempt: attempts[i],
-                  idem: runid + ":" + (i + 1) + ":" + attempts[i], audit: audit },
+                  idem: runid + ":" + (i + 1) + ":" + attempts[i], audit: audit,
+                  noRegen: reflectNoRegen ? 1 : 0 },
           };
           /* ⚠ 第四个参数（onNote）此前没传，于是服务端发的 note／nbrchain 全掉在地上——
              读者看不到「这一道的敌意近邻覆盖不足」，只会以为它真查过占位者。
              💡 心法：**新加一路事件，要顺着回调一直看到它有没有人接。** */
+          RS.lastReflectGen = null;   // 每一道各判各的：上一道留下的读数不该被这一道继承
           return rsStream(API, pl, function (txt) { r.sb.innerHTML = mdRender(txt); if (stick) scrollBottom(); },
             function (msg) {
               var ln = el("div", null, String(msg || ""));
@@ -6795,6 +6804,8 @@
               r.sb.appendChild(ln); r.box.classList.add("open");
             })
             .then(function (txt) {
+              /* 这一道若真的试过一次现写心得、且没写出来，后面各道都不用再撞一次同样的墙。 */
+              if (RS.lastReflectGen && RS.lastReflectGen.ok === false) reflectNoRegen = true;
               /* 学科通融由基底交【闸门】；研究产线由程序判（断稿／报错／顶穿／过短），见 rsJudge。 */
               var g = fg ? forgeGate(txt) : rsJudge(txt, RS.lastMeta);
               r.stat.textContent = (g.d === "passed" ? tx("rsDone") : ("\u26a0 " + tx("fgGateNo"))) + " \u00b7 " + txt.length;

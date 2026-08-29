@@ -10772,6 +10772,11 @@ export default {
         n: Math.max(1, Math.min(20, parseInt(rsRaw.n, 10) || 1)),
         forge: rsRaw.forge ? 1 : 0,
         sde: rsRaw.sde ? 1 : 0,                   // ⭐ SDE 深度研究产线（工序表持在服务端，见 RESEARCH_STAGES）
+        /* noRegen：本轮研究里前面某一道已经现写心得试过、失败了（见 reflectgen 事件与下面的退避）——
+           前端记住这件事，后面各道都带上它，这一道就不再重试同一次必然又要失败的生成。
+           2026-08-29：kimi/minimax 关不掉思考，生成这一步比 ds/glm/qwen 更容易撞上「预算全被
+           思考吃光、正文回空」，十一道各撞一次＝白烧十一次读者自己 Key 上的思考 token。 */
+        noRegen: rsRaw.noRegen ? 1 : 0,
         t: String(rsRaw.t || "").slice(0, 200),
         topic: String(rsRaw.topic || "").slice(0, 300),
         done: String(rsRaw.done || "").slice(0, 3000),
@@ -10990,11 +10995,26 @@ export default {
                的纪律不同轨，于是同一份内功在两条路上装出两种功力，而屏幕上看不出区别。
                现在同轨：缺就现写一份（只此一次，写好即存库，后面九道与全站复用），写不出来就把真因说出来。
                生成的那一两分钟不进这一道的时钟（时钟在下面「基底作答」前才起）；心跳一直在拍，连接不会被判死。 */
-            if (rs && rs.sde && !prof && !reflect && KEY && !reflectStoreDown()) {
-              _stg("现写心得");
-              controller.enqueue(_sseBytes({ t: "note", v: "这个基底（" + VC.name + " · " + VC.model + "）还没有内化心得——正在带着完整内功现写一份（约一分钟，只此一次；写好即存库，后面各道与全站复用）…" }));
-              try { reflect = await ensureReflect(env, url, rvendor, VC, KEY, true); } catch (e) {}
+            /* ⚠ 退避（2026-08-29 第三刀）：一趟研究十一道，若这一家现写心得会失败（典型是
+               kimi/minimax 关不掉思考、预算全被 reasoning 吃光），此前每一道都会重新试一次、
+               重新失败一次——十一次思考全部白烧在读者自己的 Key 上，且永远存不进库。
+               现在：负缓存（reflectStoreDown / 60 秒那道）之外，再加一道**跨道**的退避——
+               前端在收到下面那个 reflectgen 事件报 ok:false 后，会在本轮剩余各道的 rs 里
+               带上 noRegen:1，这里见到就直接跳过重试，只把真话说清楚。 */
+            let _reflectTried = false;
+            if (rs && rs.sde && !prof && !reflect && KEY) {
+              if (rs.noRegen) {
+                controller.enqueue(_sseBytes({ t: "note", v: "这个基底（" + VC.name + " · " + VC.model + "）本轮研究早前已经现写心得试过、没写出来——这一道不再重试（避免重复烧掉你 Key 上的思考额度），照常带着完整内功作答，只是少这一层。" }));
+              } else if (!reflectStoreDown()) {
+                _stg("现写心得");
+                controller.enqueue(_sseBytes({ t: "note", v: "这个基底（" + VC.name + " · " + VC.model + "）还没有内化心得——正在带着完整内功现写一份（约一分钟，只此一次；写好即存库，后面各道与全站复用）…" }));
+                _reflectTried = true;
+                try { reflect = await ensureReflect(env, url, rvendor, VC, KEY, true); } catch (e) {}
+              }
             }
+            /* 机器可读信号，专给前端判断「这一次生成到底成没成」——不靠它去正则解析上面那句人话。
+               只在真的试过一次时才发，避免跟「本来就有心得」「跳过重试」两种情况混在一起。 */
+            if (_reflectTried) controller.enqueue(_sseBytes({ t: "reflectgen", v: { ok: !!reflect, vendor: rvendor, model: VC.model } }));
             let SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
             /* 领域档案可以带自己那一份内功，装上就顶掉上面这一行骨架。
                ⚠ 读不到**不许静默退回**——退回去以后它照样答得像模像样，只是底盘换了，
