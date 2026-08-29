@@ -6345,7 +6345,8 @@ const APPLIED_CHECK = "\n\n【交稿前逐条答，答不上就回去改】这�
 
 const DIST_WORDS = { essay: 3000, paper1: 20000, paper: 20000, wechat: 3000, prose: 5000, story: 2400, novella: 24000, poem: 500,
   script: 6000,
-  notice: 1500, plan: 4000, summary: 3000, speech: 2500, letter: 1200 };
+  notice: 1500, plan: 4000, summary: 3000, speech: 2500, letter: 1200,
+  rpaper: 10800 };   // 深度研究第 11 步：一万字研究论文（骨架 RPAPER_SKELETON 十节之和，Skill §二之二）
 /* ══ 字数档次（2026-08-23）══
    同一个体裁，三千字与八千字不是同一件东西：短的那一档要砍掉一条线，长的那一档要多一个人。
    所以档次不是「同一份规格写长一点」，是**读者先挑一个体量，规格与拆趟跟着它走**。
@@ -6384,6 +6385,9 @@ function distScaleFixed(base, words) {
       out.push({
         h: f.h + (n > 1 ? ("\u00b7" + (i + 1) + "/" + n) : ""),
         words: per,
+        /* ⚠ 旗标要跟着走（2026-08-29 查出）：这里原来只抄 h/words/ask，rag／chk 一律掉在地上——
+           于是论文档述评／盘点／参考文献那几节的站内取料与祖宗收稿闸自 08-23 起就没再跑过，而护栏只查骨架源码里写没写 rag:1。 */
+        rag: f.rag, chk: f.chk, lock: f.lock, uses: f.uses,
         ask: f.ask + (n > 1
           ? (i === 0 ? "（这一段分 " + n + " 趟写完，本趟写它的开头部分，**这一段还没写完，别收**）"
             : i === n - 1 ? "（这一段的最后一趟，把这一段收住；全篇是否收尾另看你是不是最后一趟）"
@@ -7641,6 +7645,183 @@ function resTrimTail(txt, keep, what) {
   const s = String(txt || "");
   if (s.length <= keep) return s;
   return s.slice(0, keep) + "\n〔⚠ " + what + "原有 " + s.length + " 字，为装下完整内功只带来前 " + keep + " 字〕";
+}
+
+/* ═══ 深度研究第 11 步：把十道产出锻成一万字学术论文（2026-08-29）═════════════
+   [stated] 作者：深度研究增加一个功能选择——把产生的新典范展开写成一万字的正规学术论文，
+   按正规学术论文 Skill，单独出 Word，作为第 11 步；不选就不做。
+   走的是成文机那条拆趟产线（kind=rpaper，骨架 RPAPER_SKELETON 由 Skill §二之二 编译），
+   **材料不是这场对话，是研究的十道正文**——所以这里不用 readConvoText 那套「保头 35%＋保尾 65%」：
+   十道产出六七万字，头尾各留一段等于把三方程／六路径／三原理那几道全切掉，而它们正是论文的证据节。
+   改成按节取料：每一节各自消费哪几道，写死在下表里；预算匀分、截断可见（与 forgeCarry 同一条纪律）。 */
+const RPAPER_NEEDS = {
+  0: [6, 7, 8, 2, 9, 1, 3, 4, 5, 10],   // 提纲：先看典范、大纲、可证伪，再看文献与三份读数
+  1: [7, 6, 9, 1],                       // 摘要：第七道自带摘要草稿与关键词
+  2: [1, 2, 6, 9],                       // 引言：可清点对象、五家路数的缺陷账、承重判断
+  3: [2, 10, 6, 1],                      // 述评：五家路数、参考文献、占位者
+  4: [3, 1, 6],                          // 理论框架：三方程里 D 三层／E 三维的界定
+  5: [6, 3, 4, 5],                       // 核心命题：典范判断＋三份读数
+  6: [6, 2, 10, 8],                      // 盘点划界：判据三的占位者、五家、参考文献
+  7: [8, 6, 7, 2],                       // 判据与证伪：四条作废条件与赌注、判据二、方法节的推翻条件
+  8: [2, 3, 4, 5, 1],                    // 研究设计与分析：材料／算法／三份读数
+  9: [8, 9, 5, 6],                       // 讨论与局限：最脆的一步、没做到的、各道打架处
+  10: [9, 10, 7, 2, 1],                  // 结论、声明、参考文献
+};
+function rpaperSource(raw, kind) {
+  if (kind !== "rpaper" || !raw || typeof raw !== "object" || !Array.isArray(raw.stages)) return null;
+  const topic = String(raw.topic || "").slice(0, 300);
+  const stages = []; let tot = 0;
+  for (const s of raw.stages.slice(0, 12)) {
+    if (!s || typeof s !== "object") continue;
+    const i = Math.max(1, Math.min(20, parseInt(s.i, 10) || 0));
+    const body = String(s.body || "").slice(0, 40000);
+    if (!body.trim() || tot + body.length > 200000) continue;
+    tot += body.length;
+    stages.push({ i, t: String(s.t || "").slice(0, 200), body });
+  }
+  if (!stages.length) return null;
+  const turns = [{ role: "reader", text: "研究题目：" + topic }]
+    .concat(stages.map((s) => ({ role: "wds", text: "【第 " + s.i + " 道 · " + s.t + "】\n" + s.body })));
+  return { topic, stages, turns, total: tot };
+}
+function rpaperPack(src, sec, limit) {
+  if (!src) return "";
+  /* 大纲驱动的那一篇按各章「用到前面哪几道」取料（src.needs，由 rpaperOutline 算出）；
+     固定十节表按 RPAPER_NEEDS。两张表都没有的节号退到提纲那一号。 */
+  const order = (src.needs && src.needs[sec]) || RPAPER_NEEDS[sec] || RPAPER_NEEDS[0];
+  const by = {}; for (const s of src.stages) by[s.i] = s;
+  const have = order.filter((k) => by[k]);
+  let out = "研究题目：" + src.topic + "\n";
+  let left = Math.max(2000, (limit || 0) - out.length);
+  for (let n = 0; n < have.length; n++) {
+    const s = by[have[n]];
+    const per = Math.max(1200, Math.floor(left / (have.length - n)));   // 剩多少匀多少：前面的短了，后面的多拿
+    const head = "\n\n───── 第 " + s.i + " 道《" + s.t + "》的产出（研究工序，不是论文章节；原文，供逐字取用）─────\n";
+    let bd = s.body, cut = "";
+    if (bd.length > per) { bd = bd.slice(0, per); cut = "\n〔⚠ 这一道原文共 " + s.body.length + " 字，此处只带来前 " + per + " 字〕"; }
+    const blk = head + bd + cut;
+    if (blk.length > left + 200) break;
+    out += blk; left -= blk.length;
+  }
+  return out;
+}
+
+/* ═══ 论文照第七道大纲展开（2026-08-29）═══════════════════════════════════
+   [stated] 作者：**学术论文就是按照深度研究的第 7 步「论文大纲」来展开写作。**
+   所以论文的章目不由骨架定死，由第七道那张章节表定——每一章＝表里一行（标题／要承的那句话／
+   用到前面哪几道／预计字数），首节是第七道自带的摘要草稿与关键词改定，末节是声明组与第十道的
+   参考文献；字数按 DIST_WORDS.rpaper 等比缩放（每章 500–2200，单趟不拆）。
+   每一章的写作规程仍从十六节表里选配（按这一章承的是什么：引言／述评与方法／概念界定／
+   核心命题与划界（承重章）／证据分析／证伪与反思／结论），所以体例不减，只是章目听大纲的。
+   固定十节表只兜底：第七道解析不出章节表时用它，并当场说明。 */
+const RPAPER_ABS_WORDS = 600, RPAPER_REF_WORDS = 600, RPAPER_CH_MIN = 500, RPAPER_CH_MAX = 2200;
+const RPAPER_CN_NUM = { 一: 1, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10, 十一: 11, 十二: 12 };
+function rpaperCnNum(s) {
+  const t = String(s || "").replace(/[*★\s第章]/g, "");
+  if (/^\d+$/.test(t)) return parseInt(t, 10);
+  return RPAPER_CN_NUM[t] || 0;
+}
+function rpaperOutline(body7) {
+  const s = String(body7 || "");
+  if (!s.trim()) return null;
+  const chapters = [];
+  for (const raw of s.split("\n")) {
+    const ln = raw.trim();
+    if (!ln.startsWith("|")) continue;
+    const cells = ln.replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+    if (cells.length < 4) continue;
+    if (cells.every((c) => /^:?-{2,}:?$/.test(c))) continue;                       // 分隔行
+    if (/章|序/.test(cells[0]) && /标题|章目/.test(cells[1])) continue;             // 表头
+    const bold = /\*\*/.test(cells[0] + cells[1]), star = /★/.test(cells[1] + cells[0]);
+    const clean = (c) => c.replace(/\*\*/g, "").replace(/^★\s*/, "").replace(/\*\*\*\*/g, "").trim();
+    const n = rpaperCnNum(clean(cells[0])) || (chapters.length + 1);
+    const h = clean(cells[1]).slice(0, 80);
+    if (!h) continue;
+    const claim = clean(cells[2] || "").slice(0, 400);
+    const usesCell = cells[3] || "";
+    let uses = []; let m; const re = /第\s*(\d+)\s*道/g;
+    while ((m = re.exec(usesCell))) { const k = parseInt(m[1], 10); if (k >= 1 && k <= 10 && uses.indexOf(k) < 0) uses.push(k); }
+    if (!uses.length) uses = (usesCell.match(/\d+/g) || []).map((x) => parseInt(x, 10)).filter((k, i, a) => k >= 1 && k <= 10 && a.indexOf(k) === i);
+    if (!uses.length && /全部|全文|所有|各道|前面各道/.test(usesCell)) uses = [9, 6, 8, 7, 2];   // 「全部」＝收口章：先看总结与典范
+    const words = parseInt(String(cells[4] || "").replace(/[^\d]/g, ""), 10) || 0;
+    chapters.push({ n, h, claim, uses, words, star: star || bold });
+  }
+  if (chapters.length < 3 || chapters.length > 12) return null;
+  /* 承重章：行首带 ★／加粗，或正文里那句「承重章是第 X 章」；都没有就取消费第六道且最长的那一章。 */
+  let star = (chapters.find((c) => c.star) || {}).n || 0;
+  const sm = s.match(/承重章[是为]?\s*第\s*([一二三四五六七八九十\d]+)\s*章/);
+  if (!star && sm) star = rpaperCnNum(sm[1]);
+  if (!star) {
+    const six = chapters.filter((c) => c.uses.indexOf(6) >= 0);
+    star = ((six.length ? six : chapters).slice().sort((a, b) => b.words - a.words)[0] || {}).n || chapters[0].n;
+  }
+  /* 摘要草稿与关键词：第七道自带；捞不到就空着（首节自己从第九道与第六道写）。 */
+  let abstract = "";
+  const am = s.match(/摘要草稿[^\n]*\n+([\s\S]*?)(?=\n[^\n]*关键词|$)/);
+  if (am) abstract = am[1].replace(/\*\*/g, "").trim().slice(0, 1200);
+  let keywords = "";
+  const km = s.match(/关键词[*\s]*[:：]\s*\*{0,2}([^\n]+)/);
+  if (km) keywords = km[1].replace(/\*\*/g, "").trim().slice(0, 200);
+  /* 取料表：0 提纲、1 摘要、2…(N+1) 各章按它自己写的「用到前面哪几道」、末节参考文献。 */
+  const needs = { 0: [7, 6, 8, 2, 9, 1, 3, 4, 5, 10], 1: [7, 6, 9, 1] };
+  chapters.forEach((c, i) => { needs[i + 2] = (c.uses.length ? c.uses : [6, 3, 4, 5, 2]).slice(); });
+  needs[chapters.length + 2] = [10, 2, 6, 7];
+  return { chapters, star, abstract, keywords, needs };
+}
+/* 按这一章承的是什么，从十六节表里选配规程（pa(h) 返回十六节表里那一节的 ask）。 */
+function rpaperRole(c, isStar) {
+  const h = String(c.h || "");
+  if (isStar) return "core";
+  /* 只看章标题判角色——承重句里到处是「土壤／是什么」这类词，拿它判会把证据章判成概念章。 */
+  if (/证伪|反思|作废|赌注|最脆|局限|效度/.test(h)) return "falsify";
+  if (/结论|收口|总结|结语/.test(h)) return "conclude";
+  if (/文献|综述|述评|研究方法|方法论|既有|旧说|路数/.test(h)) return "review";
+  if (/概念|界定|框架|定义|何谓/.test(h)) return "frame";
+  if (c.n === 1 || /问题的发生|引言|缘起|为何.*问题/.test(h)) return "intro";
+  return "evidence";
+}
+function rpaperOutlineSkeleton(ol, head, pa, total) {
+  const T = Math.max(6000, parseInt(total, 10) || 10800);
+  const budget = T - RPAPER_ABS_WORDS - RPAPER_REF_WORDS;
+  const sum = ol.chapters.reduce((a, c) => a + (c.words || 0), 0);
+  const chN = ol.chapters.length;
+  const scaled = ol.chapters.map((c) => {
+    const w = sum ? Math.round(budget * (c.words || 0) / sum) : Math.round(budget / chN);
+    return Math.max(RPAPER_CH_MIN, Math.min(RPAPER_CH_MAX, w));
+  });
+  const ROLE_ASK = {
+    intro: [pa("一、引言：研究问题与研究意义")],
+    review: [pa("二、文献述评与研究缺口"), pa("八、研究设计与方法")],
+    frame: [pa("三、理论框架与概念界定")],
+    core: [pa("四、核心命题：承重判断的提出"), pa("五、最近邻盘点与占位划界")],
+    evidence: [pa("九、分析（一）：竞争解释的检验"), pa("十、分析（二）：类型学与辨别格")],
+    falsify: [pa("六、可裁决判据与可观测指标"), pa("七、稳健性检验与证伪条件"), pa("十二、效度威胁与研究局限")],
+    conclude: [pa("十三、结论与研究启示")],
+  };
+  const ROLE_FLAG = { review: { rag: 1, chk: 5 }, core: { rag: 1, chk: 8 } };
+  const out = [];
+  out.push({ h: "摘要与关键词", words: RPAPER_ABS_WORDS, lock: 1, ask: head + "\n" + pa("摘要与关键词")
+    + "\n（本档篇幅减半：中文摘要 220–300 字，Abstract 140–200 词。"
+    + (ol.abstract ? ("第七道自带的摘要草稿如下，**改定它、不照抄**——摘要里承诺的每一项正文都要兑现：\n" + ol.abstract) : "第七道没有交出可用的摘要草稿，据研究总结与承重判断自己写。")
+    + (ol.keywords ? ("\n关键词底料：" + ol.keywords) : "") + "）" });
+  ol.chapters.forEach((c, i) => {
+    const role = rpaperRole(c, c.n === ol.star);
+    const flag = ROLE_FLAG[role] || {};
+    const uses = c.uses.length ? c.uses : [6, 3, 4, 5, 2];
+    const card = "\n【本章（第七道大纲第 " + c.n + " 章，章目由大纲定，不改）】"
+      + "\n· 章标题：" + c.h
+      + "\n· 这一章要承的那句话（判断句，全章为它服务，写到能被反驳）：" + (c.claim || "（大纲没写，按章标题与材料自己立一句）")
+      + "\n· 材料：第 " + uses.join("、") + " 道的产出（正文另附），材料里没有的判断不许替研究补上"
+      + (c.n === ol.star ? "\n· ⭐ 本章是**承重章**：把第六道那条典范判断及其命名摆在这里，写成能被反驳的形状，并与既有说法逐条划界" : "")
+      + "\n· 目标 " + scaled[i] + " 字；章内分二到三小节 `### " + (i + 1) + ".1`…，每小节一个可独立引用的判断；不复述上游材料的行文，只取它的判断、读数与例子";
+    out.push({ h: c.h, words: scaled[i], lock: 1, rag: flag.rag, chk: flag.chk, uses,
+      ask: head + card + "\n【本章按其所承选配的写作规程（取自十六节体例表；小节编号按本章章号重编）】\n" + ROLE_ASK[role].filter(Boolean).join("\n") });
+  });
+  out.push({ h: "声明组与参考文献", words: RPAPER_REF_WORDS, lock: 1, rag: 1, chk: 8, ask: head
+    + "\n〔声明组〕" + pa("注释与声明组")
+    + "\n〔参考文献〕" + pa("参考文献与附录")
+    + "\n⚠ 本档不设附录；参考文献只列前文各章真引用过的，第十道那份清单里标〔未核验〕的另立一栏、原样标注未核验，一条都不许升级成已核验。" });
+  return out;
 }
 
 function wdsSdeResearchSys(rs) {
@@ -11777,9 +11958,10 @@ export default {
          ⚠ paper1 从前不在这张白名单里也能跑，是因为它落到 SPEC[kind] 才判空——
          白名单与 SPEC 两处必须同时有，缺一处就是「菜单点得到、后端认不出」。 */
       /* 2026-08-23 再增应用文五档：通知 1500／方案 4000／总结 3000／讲话 2500／函件 1200。 */
+      /* 2026-08-29 再增 rpaper：深度研究第 11 步——十道产出锻成一万字学术论文（材料由 b.rsrc 递上来，见 rpaperSource）。 */
       const kind = ({ report: 1, essay: 1, outline: 1, deck: 1, paper: 1, paper1: 1, sumdoc: 1,
                       wechat: 1, prose: 1, story: 1, novella: 1, poem: 1, script: 1,
-                      notice: 1, plan: 1, summary: 1, speech: 1, letter: 1 })[b.kind] ? b.kind : "report";
+                      notice: 1, plan: 1, summary: 1, speech: 1, letter: 1, rpaper: 1 })[b.kind] ? b.kind : "report";
       // 作家风格：只认 key，提示语在服务端 WRITER_STYLES 里（见那段注释里的三条纪律）。
       const styleId = WRITER_STYLES[String(b.style || "")] ? String(b.style) : "";
       // 模板：不只是配色，它决定「这一场该有哪几页、每页该写成什么形状」——
@@ -11789,7 +11971,9 @@ export default {
       // 内环（只调摆法）在浏览器里跑；外环（改内容）必须由基底来——摆法救不了"缺一页边界"。
       const fixNote = String(b.fix || "").slice(0, 3000);
       const prevDraft = String(b.prev || "").slice(0, 20000);
-      const turns = Array.isArray(b.history) ? b.history : [];   // 整场收下，长短由 readConvoText 处理
+      /* ⭐ 研究论文档的材料是十道产出，不是这场对话（rsrc 只在 kind=rpaper 下被认，别的档递上来也不认）。 */
+      const RSRC = rpaperSource(b.rsrc, kind);
+      const turns = RSRC ? RSRC.turns : (Array.isArray(b.history) ? b.history : []);   // 整场收下，长短由 readConvoText 处理
       // 载入的文章（读者上传/贴链接的那几篇，已在他自己浏览器里解析成文本）。
       // 只有 sumdoc 这一档以它为正主——其余几档正主仍是对话，带着它只会稀释。
       const docsIn = Array.isArray(b.docs) ? b.docs.slice(0, 6) : [];
@@ -12011,7 +12195,83 @@ export default {
           + "【附录 A　编码手册】与【附录 B　读数清点规程】：把可观测指标那一节写成别人能照着做的规程——"
           + "单位、粒度、编码规则、边界情形。" },
       ];
+      /* ═══ 一万字研究论文版骨架（10 节 · 合计 10,800 字 · 2026-08-29）══════════════
+         【唯一权威在 tools/skills/sde-academic-paper.md §二之二 那张表，这里是它的编译产物；
+          tools/sim_research_paper.js 解析那张表与本表逐条比对，对不上即红】
+         深度研究第 11 步专用（kind=rpaper）：材料是十道产出，承重命题是第六道那条典范判断。
+         十六节压成十节的原则：承重节（核心命题／盘点划界／判据与证伪）保住并前移，
+         轻节两两合并（判据＋证伪、设计＋分析、讨论＋局限、结论＋声明＋参考文献）；
+         每一节的规程**原样取自上面十六节那张表**——规程不减，只减篇幅。 */
+      const _pa = (h) => (PAPER_SKELETON.find((x) => x.h === h) || { ask: "" }).ask;
+      const RPAPER_HEAD_CORE = "【本篇的材料与承重】材料是一次 SDE 深度研究的十道产出（背景研究／文献综述与研究方法／三方程研究／六路径研究／三原理·动力机制／二阶碰撞：撞出新典范／论文大纲／自我反思与可证伪性／研究总结／参考文献）。"
+        + "**承重命题＝第六道那条「X 不是 Y₁、也不是 Y₂、也不是 Y₃，而是 Z」的判断及其命名**；";
+      /* 两种头：大纲驱动（常态）——章目听第七道；固定十节（兜底）——章目以骨架为准。其余一字相同。 */
+      const RPAPER_HEAD_TAIL = ""
+        + "第二道的五家路数与第六道判据三的占位者是最近邻的底料；第八道的可证伪条件与赌注是证伪节的底料；第三、四、五道是证据节的底料。"
+        + "⚠ 材料里的「第 N 道」「S／D／E」「三方程／六路径／三原理」是研究工序与学派术语，**一律不许原样写进论文**：写成本领域读者读得懂的话，术语首次出现当场用一句话讲清或换成本地说法。"
+        + "⚠ 下面规程里出现的小节编号（如 6.1、8.2、10.3）来自十六节版，本档一律按**本章的章号**重编，不要照抄。";
+      const RPAPER_HEAD = RPAPER_HEAD_CORE + "第七道的大纲只作参考，章目以本骨架为准；" + RPAPER_HEAD_TAIL;
+      const RPAPER_HEAD_OL = RPAPER_HEAD_CORE + "**章目取自第七道大纲**：每一章的标题、要承的那句话、消费哪几道都由大纲定，不改章目、不加章、不并章；" + RPAPER_HEAD_TAIL;
+      const RPAPER_FIXED = [
+        { h: "摘要与关键词", words: 600, ask: RPAPER_HEAD + "\n" + _pa("摘要与关键词")
+          + "（本档篇幅减半：中文摘要 220–300 字，Abstract 140–200 词；第七道自带的摘要草稿与关键词可作底料，但摘要里承诺的每一项正文都要兑现）" },
+        { h: "一、引言：研究问题、缺陷账与研究意义", words: 900, rag: 1, ask: RPAPER_HEAD + "\n" + _pa("一、引言：研究问题与研究意义") },
+        { h: "二、文献述评与研究缺口", words: 1200, rag: 1, chk: 5, ask: RPAPER_HEAD + "\n" + _pa("二、文献述评与研究缺口") },
+        { h: "三、理论框架与概念界定", words: 800, ask: RPAPER_HEAD + "\n" + _pa("三、理论框架与概念界定") },
+        { h: "四、核心命题：承重判断的提出", words: 1400, ask: RPAPER_HEAD + "\n" + _pa("四、核心命题：承重判断的提出") },
+        { h: "五、最近邻盘点与占位划界", words: 1500, rag: 1, chk: 8, ask: RPAPER_HEAD + "\n" + _pa("五、最近邻盘点与占位划界") },
+        { h: "六、可裁决判据、可观测指标与证伪条件", words: 1200, ask: RPAPER_HEAD
+          + "\n本节两件合写，两件都不许省：\n〔前半 · 判据与指标〕" + _pa("六、可裁决判据与可观测指标")
+          + "\n〔后半 · 证伪条件〕" + _pa("七、稳健性检验与证伪条件")
+          + "\n⚠ 第八道那四条作废条件与赌注是底料：已由研究执行过的标 [已执行] 并交结果，没执行的标 [未执行]。" },
+        { h: "七、研究设计、分析与检验结果", words: 1300, ask: RPAPER_HEAD
+          + "\n本节三件合写：\n〔7.1 研究设计与方法〕" + _pa("八、研究设计与方法")
+          + "\n〔7.2 分析（一）：竞争解释的检验〕" + _pa("九、分析（一）：竞争解释的检验")
+          + "\n〔7.3 分析（二）：类型学与辨别格〕" + _pa("十、分析（二）：类型学与辨别格")
+          + "\n⚠ 篇幅有限：竞争解释挑最强的两三家打；四格给不出独有预测就写两格；分析只出结果不出解读；研究里没跑过的检验不得用完成时态。" },
+        { h: "八、讨论、效度威胁与研究局限", words: 900, ask: RPAPER_HEAD
+          + "\n〔8.1 讨论〕" + _pa("十一、讨论")
+          + "\n〔8.2 效度威胁与研究局限〕" + _pa("十二、效度威胁与研究局限")
+          + "\n⚠ 第八道「最脆的一步」与「这次没做到的」、第九道「各道之间打架的地方」是本节的底料，不许和稀泥。" },
+        { h: "九、结论、声明组与参考文献", words: 1000, rag: 1, chk: 8, ask: RPAPER_HEAD
+          + "\n〔9.1 结论与研究启示〕" + _pa("十三、结论与研究启示")
+          + "\n〔9.2 声明组〕" + _pa("注释与声明组")
+          + "\n〔9.3 参考文献〕" + _pa("参考文献与附录")
+          + "\n⚠ 本档不设附录；参考文献只列前文真引用过的，第十道那份清单里标〔未核验〕的另立一栏、原样标注未核验，一条都不许升级成已核验。" },
+      ];
+      /* ⭐ [stated] 作者 2026-08-29：**学术论文就是按照深度研究第 7 步「论文大纲」来展开写作。**
+         章目由第七道那张章节表定（见 rpaperOutline / rpaperOutlineSkeleton 头上那段）；
+         固定十节表只在第七道解析不出章节表时兜底，并在提纲那一趟当场说明。
+         同一份 rsrc 每趟都递上来，所以提纲与各趟解出的是同一张表——不必把表传来传去。 */
+      const _ol7 = RSRC ? rpaperOutline((RSRC.stages.find((s) => s.i === 7) || {}).body || "") : null;
+      const RPAPER_SKELETON = _ol7 ? rpaperOutlineSkeleton(_ol7, RPAPER_HEAD_OL, _pa, DIST_WORDS.rpaper) : RPAPER_FIXED;
+      if (RSRC) RSRC.needs = _ol7 ? _ol7.needs : null;
       const SPEC = {
+        /* ⭐ 研究论文档（2026-08-29）：深度研究第 11 步。与 paper 档同一台机器（拆趟、PFIX 规程、祖宗闸、引文闸、
+           站内取料、字数闸），只换三样：骨架（十节一万字）、材料（十道产出而非对话）、承重（第六道的典范判断）。 */
+        rpaper: { name: "学术论文（一万字·深度研究第 11 步·投稿体例）", tok: WDS_TOK_MAX, parts: RPAPER_SKELETON.length,
+          fixed: RPAPER_SKELETON, spec:
+          "把这次 SDE 深度研究的十道产出【锻成一篇约一万汉字、可直接投稿的学术论文】。不是把研究报告换个排版，也不是写一篇长文章——"
+          + "是写成一篇**照学术体例排得下、能拿出去投、也能被人正面反驳**的东西。\n"
+          + "全篇按《正规学术论文写作规范》一万字研究论文版的十节体例写成（结构化摘要与关键词／引言与缺陷账／文献述评／理论框架与概念界定／核心命题／最近邻盘点与划界／判据与证伪／研究设计与分析／讨论与局限／结论、声明组与参考文献），"
+          + "体例是规范性的、不是可发挥的：缺任何一件，编辑部第一道形式审查就会退回来。每一节由一趟单独的调用写成，你这一趟只写属于你的那一节。\n"
+          + "读者没参与过这次研究，也没读过任何前情。全程不出现「第 N 道」「本次研究的工序」「S／D／E」之类痕迹——学派术语一律改成本领域读者读得懂的话。\n\n"
+          + "【必须有的七件，缺一件就说明这一万字是兑了水的】\n"
+          + "① **真标题**，并在副题里写出那条可裁决的主张（不要「关于XX的思考」这种）。\n"
+          + "② **承重命题**＝第六道撞出来的那条判断，写成能被反驳的形状「X 不是 Y₁、也不是 Y₂，而是 Z」；开篇第一段就给出，不铺垫。\n"
+          + "③ **一句判据**，不含情态词（禁用：应当／有意义／实质性／充分／真正／恰当／合理）——它要能拿去问流程、日志、记录，而不是拿去问人的判断。\n"
+          + "④ **正文按十节体例**，每节一个真标题，逐层把那条命题撑住；三份读数（三方程／六路径／三原理那三道）是证据不是章节名，要改写成本领域的分析。\n"
+          + "⑤ **与最近的几种既有说法逐条划界**（第二道的五家与第六道的占位者），每条写：那个说法说到哪一步／分离线在哪／一个判决性对照预测。\n"
+          + "   ⚠ 写「本文更强调／更深入／更系统／视角不同」一律不算划界。吃不准出处的只说通行看法，**绝不编造人名与年份**。\n"
+          + "⑥ **证伪条件**取自第八道，每条标 [已执行]／[未执行]，并写成「若⟨结果⟩，则本文第 X 节须删除」的撤稿级形状至少三条。\n"
+          + "⑦ **交出一到两个本文解释不了的洞**（第八道「这次没做到的」是底料），以及一条反噬。\n\n"
+          + "【纪律】\n"
+          + "· 忠于十道产出里真出现过的判断、读数与例子；**研究没做出的结论不要替它补上**，研究没跑过的检验不得用完成时态，宁可写短一点。\n"
+          + "· 不堆学派术语，普通人要能读懂；结尾留开口，不自我封顶。\n"
+          + "· 用 Markdown：章标题一行 `## 三、代理坍缩`，节标题一行 `### 3.1 标题`（节号必须与所属章号一致）。两级都必须是真标题行——出 Word 时靠它分层级。\n"
+          + "· 正文引证一律「作者 年份」制，外文首次出现给原名与原题；不得出现脚注编号、方括号编号或超链接。\n"
+          + "· 不画表格、不写 --- 分隔线：需要交付判据表时改写成逐格分条。\n"
+          + "· 约一万汉字，靠密度不靠注水——凡是把已说过的话换个说法再说一遍的段落，一律不许写。\n" },
         report: { name: "对话报告", tok: 24000, spec:
           "把这场对话整理成一份【对话报告】。结构：\n"
           + "① 一句话结论——这场谈话最承重的那个判断是什么（不是话题是什么，是判断是什么）。\n"
@@ -12781,13 +13041,14 @@ export default {
          ⇒ 拟题那一趟仍通读全场（它要定命题，非读全不可）；正文各趟只给一段够用的材料。
          承重的方向不靠它给——题名／承重命题／判据／占位清单都在 plan 里，接缝靠 prevTail。 */
       const convoMaxPart = Math.max(9000, Math.min(18000, Math.round(convoMax * 0.32)));
-      const convoFull = readConvoText(turns, 10000000);          // 先看看这一场到底多长
-      const convo = convoFull.length > convoMax ? readConvoText(turns, convoMax) : convoFull;
+      /* ⭐ 研究论文档（RSRC）：材料按节取，不走「保头保尾」——见 rpaperPack 头上那段。提纲那趟取第 0 号次序。 */
+      const convoFull = RSRC ? rpaperPack(RSRC, 0, 10000000) : readConvoText(turns, 10000000);          // 先看看这一场到底多长
+      const convo = RSRC ? rpaperPack(RSRC, 0, convoMax) : (convoFull.length > convoMax ? readConvoText(turns, convoMax) : convoFull);
       const convoCut = convoFull.length - convo.length;
       /* 【成文前的占位者实搜】只加在真要盘最近邻的档上；报告/诗歌/应用文不加（那里盘最近邻是噪声）。
          走的是评分那一路已有的专用链 nbrChain（四趟并发：同向占位／对立者／外圈学科／方法学），
          不另造一套。惰性 + 只跑一次：提纲那一趟与正文各趟共用同一份结果。 */
-      const DIST_NBR_KINDS = { essay: 1, paper: 1, paper1: 1, outline: 1, wechat: 1 };
+      const DIST_NBR_KINDS = { essay: 1, paper: 1, paper1: 1, outline: 1, wechat: 1, rpaper: 1 };
       let _distNbrP = null;
       const distNbrGet = () => {
         if (_distNbrP) return _distNbrP;
@@ -12851,6 +13112,10 @@ export default {
             const _st = { t0: Date.now(), think: 0, out: 0, stage: dStage === "plan" ? "拟题与提纲" : ("写第 " + (partIdx + 1) + " 节") };
             _hb = wdsBeat(controller, _st);
             try {
+              /* 研究论文档：提纲那一趟先说清这一篇的章目从哪来——大纲驱动是常态，兜底要当场说。 */
+              if (kind === "rpaper" && dStage === "plan") controller.enqueue(_sseBytes({ t: "note", v: _ol7
+                ? ("第 11 步按第七道大纲展开：" + _ol7.chapters.length + " 章 ＋ 摘要 ＋ 声明与参考文献，共 " + RPAPER_SKELETON.length + " 趟；承重章＝大纲第 " + _ol7.star + " 章；字数按 " + DIST_WORDS.rpaper + " 字等比缩放，章目不改。")
+                : "⚠ 第七道大纲解析不出章节表（要一张「章｜标题｜要承的那句话｜用到哪几道｜预计字数」的表，3–12 行），本篇按固定十节体例兜底——章目不是研究自己排的。" }));
               let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
               /* 【2026-08-22 清结】原来这三样是无条件拼上去的：SDE 骨架 ＋ 内化心得 ＋ 英文那句
                  「Keep SDE terms as…」。对 ChatJohn 是三重错：① 骨架与心得通篇母体术语，模型照着写；
@@ -12876,8 +13141,11 @@ export default {
                      + (_nbrDist.ok ? "（覆盖够）" : "（覆盖不足：" + _nbrDist.reason + "，最近邻那一节会按〔未核验〕写）"))
                   : "站外占位者检索这一趟一条也没召回（多半是没有可用的搜索 Key）：最近邻那一节会按〔未核验〕写。" }));
               }
-              const convoPart = convo.length > convoMaxPart ? readConvoText(turns, convoMaxPart) : convo;
-              const CONVO = "以下是这场对话的全文：\n\n" + convo + "\n———\n"
+              /* 研究论文档：正文各趟按本节的依赖表取料（RPAPER_NEEDS[partIdx+1]），不是全场再读一遍。 */
+              const convoPart = RSRC ? rpaperPack(RSRC, partIdx + 1, convoMaxPart)
+                : (convo.length > convoMaxPart ? readConvoText(turns, convoMaxPart) : convo);
+              const CONVO = (RSRC ? "以下是这次 SDE 深度研究十道工序的产出（这就是本篇论文的全部材料；标题里的「第 N 道」是研究工序，不是论文章节）：\n\n"
+                                  : "以下是这场对话的全文：\n\n") + convo + "\n———\n"
                 + (docBlock ? ("读者本场还载入了这些材料，可作背景（正主仍是上面这场对话）：\n\n" + docBlock + "\n———\n") : "");
 
               if (dStage === "plan") {
@@ -13074,7 +13342,8 @@ export default {
                     .map((x) => String(x || "").trim()).filter(Boolean).slice(0, 12);
                   const hs = Array.isArray(plan.sections) ? plan.sections : [];
                   plan.sections = FIXED.map((f, i) => ({
-                    h: (String((hs[i] && hs[i].h) || "").trim() || f.h).slice(0, 80),
+                    /* lock（大纲驱动的研究论文）：章目是第七道大纲定的，模型改的题名不收。 */
+                    h: (f.lock ? f.h : (String((hs[i] && hs[i].h) || "").trim() || f.h)).slice(0, 80),
                     ask: f.ask,
                     words: f.words,
                   }));
@@ -13263,7 +13532,8 @@ export default {
                   [{ role: "system", content: ssys },
                    /* ⚠ 这里用 convoPart 而不是 convo：正文各趟不需要把全场再读一遍（见上方 convoMaxPart 那段注释）。
                       省下来的入参额度直接让给正文——这是「额度放开」的实际落点。 */
-                   { role: "user", content: "以下是这场对话里够用的一段材料（正主是它，但方向以上面的提纲为准）：\n\n"
+                   { role: "user", content: (RSRC ? "以下是这次深度研究里与本节最相关的几道产出（正主是它，方向以上面的提纲为准；「第 N 道」是研究工序，不是论文章节）：\n\n"
+                                                    : "以下是这场对话里够用的一段材料（正主是它，但方向以上面的提纲为准）：\n\n")
                      + convoPart + "\n———\n现在只写第 " + (partIdx + 1) + " 节。" }],
                   true, stok, sclk.signal, true, _sl, true);
                 if (!up.ok) {

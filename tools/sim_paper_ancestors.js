@@ -100,7 +100,7 @@ ok("补问块留在合并块之外（合并块被别的护栏 new Function 求�
 
 /* ═══ 四、站内同题取料 ═══ */
 console.log("\u2500\u2500 站内同题取料 \u2500\u2500");
-const SKEL = grab("const PAPER_SKELETON = [", "\n      const SPEC = {");
+const SKEL = grab("const PAPER_SKELETON = [", "\n      /* ═══ 一万字研究论文版骨架");   // 只数十六节表：后面紧跟着研究论文档的兜底表，rag／chk 会被算进去
 ok("抠得到骨架表", SKEL.length > 2000);
 const ragged = (SKEL.match(/rag: 1/g) || []).length;
 eq("正好四节标了要取料", ragged, 4);

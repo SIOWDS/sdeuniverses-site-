@@ -193,7 +193,7 @@ ok("Skill 写明上限不是目标", SKILL.indexOf("上限不是目标") >= 0);
 ok("worker 里另立了 convoMaxPart", /convoMaxPart\s*=/.test(WSRC));
 ok("convoMaxPart 由 convoMax 折算而非照抄", /convoMaxPart[\s\S]{0,160}convoMax\s*\*/.test(WSRC));
 ok("convoMaxPart 有上下限（9000–18000）", /convoMaxPart[\s\S]{0,120}9000[\s\S]{0,60}18000/.test(WSRC));
-ok("生成了 convoPart 切片", /convoPart\s*=\s*convo\.length\s*>\s*convoMaxPart/.test(WSRC));
+ok("生成了 convoPart 切片", /convoPart\s*=\s*(RSRC \? rpaperPack\([^)]*\)\s*:\s*\()?convo\.length\s*>\s*convoMaxPart/.test(WSRC));   // 2026-08-29 研究论文档在同一行按节取料，普通论文那一支仍是这个切片
 ok("part 那一趟送的是 convoPart", /convoPart[\s\S]{0,200}现在只写第/.test(WSRC));
 ok("part 那一趟不再送整份 convo", !/content:\s*CONVO\s*\+\s*"现在只写第/.test(WSRC));
 ok("plan 那一趟仍通读全场", /content:\s*CONVO\s*\+\s*"现在只输出那个 JSON/.test(WSRC));
@@ -211,7 +211,7 @@ ok("「随着……的发展」这类开头被明令禁止", /随着……的发
 
 /* ═══ 二、paper 档挂上骨架 ═══ */
 console.log("── paper 档 ──");
-const mPaper = WSRC.match(/paper: \{ name: "([^"]+)", tok: WDS_TOK_MAX, parts: ([^,]+),\n\s*fixed: (\w+), spec:/);
+const mPaper = WSRC.match(/\n\s*paper: \{ name: "([^"]+)", tok: WDS_TOK_MAX, parts: ([^,]+),\n\s*fixed: (\w+), spec:/);   // 行首锚定：rpaper: 那一档同形，不能让它先命中
 ok("paper 表头形状对（name/parts/fixed 三样齐）", !!mPaper);
 ok("档名标明了投稿体例与字数口径", !!mPaper && /两万字/.test(mPaper[1]) && /体例/.test(mPaper[1]));
 ok("parts 由骨架推导，不是手写的数字", !!mPaper && mPaper[2].trim() === "PAPER_SKELETON.length");

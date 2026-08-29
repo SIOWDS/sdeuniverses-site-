@@ -122,9 +122,9 @@ hd("【四】四档创作体：三处都加齐了没有");
   ok(/d0\.sty\) \{ writerMenu\(k, w\); return; \}/.test(F), "菜单点击真的会先开笔法面板");
   ok(/lenMenu\(k, function \(w\) \{/.test(F), "★ 先问体量再问笔法（腔调不改体量）");
   /* 签名后来又多收一个 words（体量）。整串抄进正则就假红；只认它收得到 style。 */
-  ok(/function distill\(kind, existing, title, tpl, again, style(, words)?\)/.test(F), "distill 收 style 这个参数");
+  ok(/function distill\(kind, existing, title, tpl, again, style(, words(, ext)?)?\)/.test(F), "distill 收 style 这个参数");
   ok(/style: style \|\| "",/.test(F), "style 进了请求体");
-  ok(/distill\(kind, null, title, tpl, again, style\)/.test(F),
+  ok(/distill\(kind, null, title, tpl, again, style(, words, ext)?\)/.test(F),
     "⭐ 填 Key 那一跳把 style 带了回来（第一版漏了它＝填完 Key 就变本色，且无任何报错）");
 }
 

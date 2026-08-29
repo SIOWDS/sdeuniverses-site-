@@ -477,8 +477,11 @@ console.log("⑧ 成文（distill）");
   /* ⚠ 别在这里钉一个总数：加一档就要改这一行，而它守的用意不是「正好几项」，
      是「档位表里每一档都真的出现在菜单里，且尾部三颗功能键都在」。
      2026-08-23 加应用文五档（共 16 档 ＋ 3 颗 ＝ 19 项）时这条假红了一次。 */
-  ok(menu.children.length === KIND_KEYS_N + 3,
-     "菜单 = 档位表全部 " + KIND_KEYS_N + " 档 ＋ 导出/选目录/成文记录三颗，实得 " + menu.children.length);
+  /* 2026-08-29：研究论文档 hid:1 只从深度研究进、不摆菜单 ⇒ 菜单项 = 档位表减去隐藏档 ＋ 三颗。 */
+  const KIND_HID_N = (((require("fs").readFileSync(__dirname + "/../public/wds-mode.js", "utf8")
+    .match(/var KIND_DEF = \[([\s\S]*?)\n  \];/) || ["", ""])[1].match(/hid: 1 \}/g)) || []).length;
+  ok(menu.children.length === KIND_KEYS_N - KIND_HID_N + 3,
+     "菜单 = 档位表全部 " + KIND_KEYS_N + " 档（减 " + KIND_HID_N + " 个只从别处进的隐藏档）＋ 导出/选目录/成文记录三颗，实得 " + menu.children.length);
   /* ⚠ 别在这里手抄字数：三处（服务端 DIST_WORDS／前端 KIND_DEF.w／菜单文案）的对账
      由 sim_wds_dist_words 专管。这里只守「四档都在菜单里，且档名自带一个字数」。 */
   ok(["公众号文章", "散文", "短篇小说", "诗歌"].every((n) => new RegExp(n + "（[\\d,]+字）").test(menu.textContent)),

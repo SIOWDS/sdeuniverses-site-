@@ -972,6 +972,7 @@
       kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
       kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
       kPaper1: "凝成两万字论文 · 一趟写完", kPaper1S: "照金点子发生器那台已经跑熟的口径：**一次调用出全篇**，十六节体例写进提示语、字数服从内容（18000–22000 字），出 Word 与 PDF。写得快，中途不会停在某一节。",
+      kRpaper: "研究论文 · 一万字（深度研究第 11 步）", kRpaperS: "把深度研究的十道产出**按第七道论文大纲逐章展开**成约一万字的学术论文（章目由大纲定，每章一趟，规程按《正规学术论文写作规范》选配；出 Word 与 PDF）。只从深度研究里进，不在菜单上",
       kPaper: "凝成两万字论文 · 分十六趟", kPaperS: "按《正规学术论文写作规范》十六节投稿体例：结构化中英摘要 · 研究问题 · 文献述评 · 概念界定 · 研究设计与方法 · 分析三节 · 可裁决判据 · 稳健性与证伪 · 效度威胁 · 声明组 · 参考文献与附录，约两万字（出 Word 与 PDF）",
       kSumdoc: "总结载入的文章", kSumdocS: "读完那篇：它在说什么 · 承重句 · 哪里脆 · 没看见什么 · 千字概写（需先载入文章）",
       // 四档创作体（2026-08-22）。与上面几档的分别：那几档要判断立得住，这四档要读得下去。
@@ -1218,6 +1219,7 @@
       kEssay: "Forge into an essay", kEssayS: "A piece that stands on its own, about 3,000 words",
       kOutline: "Writing outline", kOutlineS: "A motif plus a chapter skeleton you can write from",
       kPaper1: "Forge a 20,000-word paper (single pass)", kPaper1S: "One call writes the whole thing, the way the idea generator already does it: all sixteen sections specified in the prompt, length serving content (18,000-22,000 characters). Exports to Word and PDF.",
+      kRpaper: "Research paper · 10,000 chars (deep research step 11)", kRpaperS: "Expands the stage-7 paper outline chapter by chapter into a ~10,000-character paper (chapters fixed by the outline, one pass each, rules from the academic-paper standard; Word and PDF). Reached only from deep research, not from this menu",
       kPaper: "Forge a 20,000-word paper (sixteen passes)", kPaperS: "Sixteen sections in full submission format: structured bilingual abstract, research questions, literature review, conceptual definitions, design and methods, three analysis sections, a modal-free test, robustness and falsifiers, validity threats, declarations, references (exports to Word and PDF)",
       kSumdoc: "Read the loaded article", kSumdocS: "What it claims \u00b7 its load-bearing line \u00b7 where it is brittle \u00b7 a 1,000-word condensation",
       kWechat: "Column piece (3,000 characters)", kWechatS: "A concrete scene in the first three lines; short sections, short sentences, one thing to do tomorrow",
@@ -1454,6 +1456,9 @@
       cvNewVer: "改好的已存成第 {n} 版", cvGone: "画布上那一件已经不在了，回稿留在对话里。",
       cvAskPre: "下面这段来自画布《{t}》，请照我的要求改写它，只输出改好的整段、不要解说：",
       rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "十道工序：背景 → 文献与方法 → 三条基本关系 → 六条生成路径 → 三条动力机制 → 二阶对撞出新判断 → 论文大纲 → 可证伪 → 总结 → 参考文献，最后出一份可导出 Word 的报告（会用掉若干次额度）",
+      rsPaperBtn: "📄 ＋一万字论文", rsPaperTip: "第 11 步（可选）：研究跑完后，按第七道「论文大纲」逐章展开成约一万字的学术论文（章目由大纲定，每章一趟，另出一份 Word）。不选就不做。",
+      rsPaperStep: "第 11 步 · 学术论文（一万字）", rsPaperWait: "十道跑完，正在按第七道大纲逐章写作（每章一趟，几分钟到十几分钟）——成文窗口里可以看着它长出来；写完会回到这里，另出一份 Word。",
+      rsPaperDone: "论文写完 · {n} 字（与研究报告分开，单独一份 Word）", rsPaperFail: "论文这一步没写成：", rsPaperRetry: "重写第 11 步", rsPaperDocx: "⤓ 论文 .docx",
       rsPlan: "正在铺工序…", rsPlanFail: "拆题没成：", rsSteps: "这次研究分 {n} 步", rsCost: "约用掉 {n} 次额度",
       rsStep: "第 {i}/{n} 步", rsDoing: "正在查…", rsDone: "写完", rsFinal: "在下总判断…",
       rsStop: "已停下 —— 已经写完的几步都在。", rsReport: "研究报告", rsAsk: "要研究什么？把题目写清楚一点。",
@@ -1586,6 +1591,9 @@
       cvNewVer: "Saved as version {n}", cvGone: "That canvas item is gone; the reply stayed in the conversation.",
       cvAskPre: "The passage below comes from the canvas \u201c{t}\u201d. Rewrite it as I ask; output the revised passage only, no commentary:",
       rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Ten stages: background → literature & method → three basic relations → six generative paths → three drivers → second-order collision → paper outline → falsifiability → summary → references. Ends in a report you can export to Word (uses several turns)",
+      rsPaperBtn: "📄 + 10k-word paper", rsPaperTip: "Optional step 11: once the ten stages finish, expand the stage-7 paper outline chapter by chapter into a ~10,000-character paper (chapters fixed by the outline, one pass each, exported as a separate Word file). Off by default.",
+      rsPaperStep: "Step 11 · Academic paper (10k)", rsPaperWait: "Ten stages done; writing the paper chapter by chapter along the stage-7 outline (one pass per chapter, several minutes). Watch it grow in the writing window; it comes back here with its own Word export.",
+      rsPaperDone: "Paper done · {n} characters (separate Word file from the report)", rsPaperFail: "Step 11 did not complete: ", rsPaperRetry: "Rewrite step 11", rsPaperDocx: "⤓ paper .docx",
       rsPlan: "Laying out the stages\u2026", rsPlanFail: "Could not break it down: ", rsSteps: "{n} steps", rsCost: "about {n} turns",
       rsStep: "Step {i}/{n}", rsDoing: "Digging\u2026", rsDone: "done", rsFinal: "Writing the verdict\u2026",
       rsStop: "Stopped — the finished steps are kept.", rsReport: "Research report", rsAsk: "What should I research? Give me a sharper question.",
@@ -2216,6 +2224,7 @@
           "<button class='wdsm-mode' data-k='web'></button>" +
           "<button class='wdsm-mode' data-k='nosde'></button>" +
           "<button class='wdsm-mode wdsm-rsbtn'></button>" +
+          "<button class='wdsm-mode wdsm-rspbtn' style='display:none'></button>" +
           "<button class='wdsm-mode wdsm-lnkbtn'></button>" +
           "<button class='wdsm-mode wdsm-findbtn'></button>" +
           "<button class='wdsm-mode wdsm-dubtn'></button>" +
@@ -6404,17 +6413,32 @@
      一趟满功率写整篇必吐 0 字（老教训），所以研究是**多趟小任务**：
      拆题（非满功率、有界 JSON）→ 每步一趟（走 /api/wds/chat 那条熟产线，带 rs 字段）→ 总判断一趟。
      每步都是独立请求：一步卡死只损失一步，且都能被停。 */
-  var RS = { on: false, running: false, stop: false };
+  /* paper：第 11 步开关（2026-08-29）。记在本机，跨场保留——它是读者的一个习惯，不是一次性的选择。
+     只在深度研究亮着时露出来：不跑研究时它没有意义。 */
+  var RS = { on: false, running: false, stop: false, paper: false };
+  try { RS.paper = localStorage.getItem("sde_wds_rs_paper") === "1"; } catch (e) {}
   var rsBtn = layer.querySelector(".wdsm-rsbtn");
+  var rspBtn = layer.querySelector(".wdsm-rspbtn");
   function rsPaint() {
     if (!rsBtn) return;
     rsBtn.textContent = tx("rsBtn");
     rsBtn.title = tx("rsTip");
     if (RS.on) rsBtn.classList.add("on"); else rsBtn.classList.remove("on");
- 
+    if (rspBtn) {
+      rspBtn.textContent = tx("rsPaperBtn");
+      rspBtn.title = tx("rsPaperTip");
+      rspBtn.style.display = RS.on ? "" : "none";
+      if (RS.paper) rspBtn.classList.add("on"); else rspBtn.classList.remove("on");
+    }
     try { toolsPaint(); } catch (e) {}
   }
   if (rsBtn) rsBtn.onclick = function () { if (RS.running) return; RS.on = !RS.on; rsPaint(); };
+  if (rspBtn) rspBtn.onclick = function () {
+    if (RS.running) return;
+    RS.paper = !RS.paper;
+    try { localStorage.setItem("sde_wds_rs_paper", RS.paper ? "1" : "0"); } catch (e) {}
+    rsPaint();
+  };
   function rsPost(body) {
     return fetch("/api/wds/research", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(body)) });
   }
@@ -6565,6 +6589,8 @@
     var base = { key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG };
     var steps = [], secs = [], title = topic, degraded = [];
     var sdePipe = false;                       // 这一趟是不是 SDE 研究产线（由 plan 的回执定）
+    /* 第 11 步开关在开跑那一刻定格：读者中途改开关不影响这一趟（学科通融不带这一步）。 */
+    var wantPaper = !fg && !!RS.paper;
     /* 一趟＝一个 run。attempt 按道次记，幂等键 run:stage:attempt——
        同一次重试不该在服务端算成两趟。 */
     var runid = (resume && resume.run) || runId(), attempts = {};
@@ -6819,10 +6845,72 @@
           row.appendChild(c1); row.appendChild(c2); row.appendChild(c3); row.appendChild(c4);
           card.appendChild(row);
           endRs(md);
+          /* ⭐ 第 11 步（可选，2026-08-29）：把撞出来的新判断展开成一万字学术论文，单独出 Word。
+             只在 SDE 产线 ＋ 读者选了这一步时跑；报告已经落地（endRs 之后），这一步坏了不伤报告。 */
+          if (sdePipe && wantPaper && secs.length >= 6) rsPaperStep(card, topic, title, secs);
         }
         return step();
       })
       .catch(function (e) { fail(tx("rsPlanFail") + ((e && e.message) || "?")); });
+  }
+
+  /* ── 深度研究第 11 步：一万字学术论文（2026-08-29）──
+     材料＝十道产出（rsrc），机器＝成文机的拆趟产线（kind=rpaper，骨架由 Skill §二之二 编译）。
+     写作在成文窗口里进行（那台机器的重试、断点、字数闸、祖宗闸、Word/PDF 出口全在那儿）；
+     写完回到研究卡片这一行，另出一份 Word——与研究报告那份分开。 */
+  function rsPaperStep(card, topic, title, secs) {
+    var row = el("div", "wdsm-rstep open");
+    var sh = el("div", "sh");
+    sh.appendChild(el("b", null, tx("rsPaperStep")));
+    var stat = el("i", null, "\u00b7\u00b7\u00b7"); sh.appendChild(stat);
+    var sb = el("div", "sb");
+    sh.onclick = function () { row.classList.toggle("open"); };
+    row.appendChild(sh); row.appendChild(sb); card.appendChild(row);
+    var ln = el("div", null, tx("rsPaperWait"));
+    ln.style.cssText = "font-size:12.5px;line-height:1.7;margin:6px 0 0;color:#8B7B5E";
+    sb.appendChild(ln);
+    var rsrc = { topic: topic, stages: secs.map(function (x, k) {
+      return { i: k + 1, t: x.t, body: String(x.body || "").replace(/\n*【闸门】[^\n]*\s*$/, "") }; }) };
+    function go() {
+      stat.textContent = tx("rsDoing");
+      distill("rpaper", null, tx("rsPaperStep") + "：" + (title || topic), "", null, "", 0, {
+        rsrc: rsrc,
+        onDone: function (text) {
+          if (!text || text.length < 800) return fail(tx("rsPaperFail") + (text ? (text.length + " 字") : "0 字"));
+          stat.textContent = tx("rsDone") + " \u00b7 " + text.length;
+          sb.innerHTML = "";
+          sb.appendChild(el("div", null, tx("rsPaperDone", { n: text.length }))).style.cssText = "font-size:12.5px;line-height:1.7;margin:6px 0;color:#8B7B5E";
+          var body = el("div"); body.innerHTML = mdRender(text); sb.appendChild(body);
+          var pt = firstTitleOf(text) || (title || topic);
+          var acts = el("div", "wdsm-acts");
+          var d1 = el("button", "wdsm-act", tx("rsPaperDocx"));
+          d1.onclick = function () {
+            if (!window.SDEDocx) { ln.textContent = t("dPptxWait"); return; }
+            var blob = window.SDEDocx.build({ title: pt, author: BRAND, md: text });
+            saveBlobToDir(fileTag("WDS") + "-\u8bba\u6587-" + safeName(pt) + "-" + stampName() + ".docx", blob,
+              function (m) { if (m) stat.textContent = m; });
+          };
+          var d2 = el("button", "wdsm-act", "\u2913 .md");
+          d2.onclick = function () { download(safeName(pt) + ".md", text); };
+          var d3 = el("button", "wdsm-act", tx("cvDrop"));
+          d3.onclick = function () { cvAdd("md", pt, text); };
+          acts.appendChild(d1); acts.appendChild(d2); acts.appendChild(d3);
+          sb.appendChild(acts);
+          cvAdd("md", pt, text);                                   // 论文也落画布：它是成品，不该只活在弹窗里
+          history.push({ role: "wds", text: text }); stSave(history); updTurns();
+        },
+        onFail: function (msg) { fail(tx("rsPaperFail") + (msg || "?")); },
+      });
+    }
+    function fail(msg) {
+      stat.textContent = "\u2717";
+      ln.textContent = msg;
+      var rb = el("button", "wdsm-act", tx("rsPaperRetry"));
+      rb.style.cssText = "margin-top:6px";
+      rb.onclick = function () { if (rb.parentNode) rb.parentNode.removeChild(rb); ln.textContent = tx("rsPaperWait"); go(); };
+      sb.appendChild(rb);
+    }
+    go();
   }
 
   /* ── 投稿到收件箱（ChatSDE → 学员投稿箱 → 评分 → 建页）──
@@ -6906,6 +6994,9 @@
     { k: "report", t: "kReport", doc: 1 }, { k: "essay", t: "kEssay", doc: 1, w: 3000, wo: [2000, 3000, 5000] },
     { k: "paper1", t: "kPaper1", doc: 1, w: 20000, wo: [12000, 20000, 30000] },
     { k: "paper", t: "kPaper", doc: 1, w: 20000, c: 1, wo: [12000, 20000, 30000] },
+    /* 研究论文（2026-08-29）：深度研究第 11 步专用。hid:1 ＝ 不进成文菜单——它的材料是十道产出，
+       从菜单点进去只会拿对话去写，写出来的东西对不上题。w 与服务端 DIST_WORDS.rpaper 同数（护栏对账）。 */
+    { k: "rpaper", t: "kRpaper", doc: 1, w: 10800, c: 1, hid: 1 },
     { k: "outline", t: "kOutline", doc: 1 }, { k: "sumdoc", t: "kSumdoc", doc: 1 }, { k: "deck", t: "kDeck" },
     /* 四档创作体（2026-08-22）。都带 w:1 ＝ 点它先问一句「要不要模仿谁的笔法」。
        ⚠ 加一档要同时改**服务端那张白名单与 SPEC 表**——只改这里的话，
@@ -6961,6 +7052,7 @@
     if (!history.length) { alert(t("needTalkDeck")); return; }
     var menu = el("div", "wdsm-menu");
     KIND_KEYS.forEach(function (k) {
+      var _hd = kindDef(k); if (_hd && _hd.hid) return;      // 只从别处进的档（研究论文）不摆在菜单上
       var b = el("button");
       b.appendChild(document.createTextNode(kindT(k)));
       if (k === "deck") { var nb = el("i", "wdsm-new", "NEW"); b.appendChild(nb); }
@@ -7211,11 +7303,14 @@
   // 成文面板。第三个参数给「成文记录」复用：直接把存下的正文摊开，不再调基底。
   /* style ＝ 作家笔法的 id（见 WRITERS）。递上去的只是这个 id，
      提示语在服务端——见 WRITERS 上方那段注释。空串＝本色写。 */
-  function distill(kind, existing, title, tpl, again, style, words) {
+  /* ext（2026-08-29）：由别的产线调用时的外挂——rsrc（研究论文的材料：十道产出）、onDone(text)、onFail(msg)。
+     成文菜单不传它，一切照旧。 */
+  function distill(kind, existing, title, tpl, again, style, words, ext) {
     var kv = existing ? {} : wdsKeyGet();
     /* ⚠ 填 Key 那一跳必须把 tpl 与 style 一并带回来——第一版只递了 kind，
        表现是「点了作家 → 弹出填 Key → 填完写出来却是本色」，而且没有任何报错。 */
-    if (!existing && !kv) { wdsKeyPanel(function () { distill(kind, null, title, tpl, again, style); }); return; }
+    if (!existing && !kv) { wdsKeyPanel(function () { distill(kind, null, title, tpl, again, style, words, ext); }); return; }
+    var extDone = false;                     // onDone/onFail 只回一次（收尾与关窗都可能到）
     var wrap = el("div", "wdsm-dist");
     wrap.innerHTML = "<div class='wdsm-dist-box'>"
       + "<div class='wdsm-dist-top'><span class='wdsm-dist-t'>" + esc(title || kindT(kind))
@@ -7487,6 +7582,8 @@
           });
         } catch (e) {}
       }
+      /* 外挂的调用方（深度研究第 11 步）在稿子落地之后、显示之前拿到正文——显示这一步崩了它也已经拿到。 */
+      if (ext && !extDone) { extDone = true; try { if (ext.onDone) ext.onDone(text); } catch (e) {} }
       /* ② 【渲染必须有兜底】渲染是可能失败的一步，而失败的样子是"白屏"——
          读者看不出是排版崩了还是稿子没了。纯文本一定画得出来，那就是我们的底线形态。 */
       pTrace.leg = "收尾·排版"; traceSave();
@@ -7568,7 +7665,7 @@
          它们对"读者能不能看见自己的稿子"零贡献，所以既排在最后、也不许因为长而拖住任何东西。 */
       try {
         if (window.SDEVault && text && text.length > 80) {
-          var _vt = (kind === "paper" || kind === "paper1" || kind === "essay")
+          var _vt = (kind === "paper" || kind === "paper1" || kind === "rpaper" || kind === "essay")
             ? window.SDEVault.lead(text, 200) : window.SDEVault.head(text, 200);
           if (_vt) {
             var _vb = wrap.querySelector(".wdsm-vaultnote");
@@ -7703,6 +7800,8 @@
       try { dStopped = true; } catch (e) {}
       try { if (dr) dr.cancel(); } catch (e) {}
       try { if (text && text.length > 200 && !existing) distSave(distLabel(kind, style, text), text, function () {}); } catch (e) {}
+      /* 写完之前关了窗：外挂的调用方要知道这一步没成，别让研究卡片上那一行永远「正在查」。 */
+      if (ext && !extDone) { extDone = true; try { if (ext.onFail) ext.onFail(t("stopped")); } catch (e) {} }
       try { if (beatT) { clearInterval(beatT); beatT = null; } } catch (e) {}
       try { document.removeEventListener("keydown", distEsc, true); } catch (e) {}
       if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
@@ -7913,13 +8012,16 @@
     /* 体量：读者选的那一档。0／缺省 ＝ 用这一档的默认体量（服务端只认它自己那张表里的数）。 */
     var wsel = (function () { var d = kindDef(kind) || {}; var o = d.wo || [];
       return (o.indexOf(parseInt(words, 10)) >= 0) ? parseInt(words, 10) : (d.w || 0); })();
-    var BASEP = { kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "",
+    /* 研究论文档：材料是十道产出（rsrc），对话与附件一概不送——送了只会稀释，且研究那十道早已消费过附件。 */
+    var _rsrc = (ext && ext.rsrc) ? ext.rsrc : null;
+    var BASEP = { kind: kind, history: _rsrc ? [] : history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "",
         style: style || "", words: wsel,
         // 载入的文章一并送过去：sumdoc 那一档拿它当正主，其余几档只作背景。
         // 这里送**全文**而不是按问题取段——成文是一次性的活，取段会让它读到半篇就下判断。
-        docs: (typeof atts !== "undefined" ? atts : []).filter(function (d) { return d && d.text && !d.img; })
+        docs: _rsrc ? [] : (typeof atts !== "undefined" ? atts : []).filter(function (d) { return d && d.text && !d.img; })
                 .slice(0, 6).map(function (d) { return { n: d.name, t: d.text }; }),
         fix: (again && again.fix) || "", prev: (again && again.prev) || "" };
+    if (_rsrc) BASEP.rsrc = _rsrc;
 
     /* 一趟请求。extra 里是这一趟与别趟的差异（stage / idx / plan / prevTail）。
        resolve 回来的对象带着这一趟的账：出了多少正文、拿没拿到提纲、报没报错。
