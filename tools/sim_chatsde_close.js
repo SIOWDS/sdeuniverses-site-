@@ -49,6 +49,12 @@ function harness(opts) {
     "var kind='paper';" +
     "var dStopped=" + (opts.stopped ? "true" : "false") + ", dr=__b.dr, text=__b.text, existing=" + (opts.existing ? "true" : "false") + ";" +
     "var beatT=1, pTrace={ ok:" + (opts.ok ? "true" : "false") + " }, wrap=__b.wrap;" +
+    /* 2026-08-29：distClose 多了一笔——写完前关窗要回外挂的 onFail（深度研究第 11 步靠它把卡片那一行从「正在查」改成可重写）。
+       mock 里给 ext 与 extDone，并把 onFail 的调用记下来；不给就是 ReferenceError，整份护栏在第一条出口上崩掉。 */
+    "var extDone=" + (opts.extDone ? "true" : "false") + ", ext=" + (opts.ext ? "{ onFail:function(m){ __b.failed=(__b.failed||0)+1; __b.failMsg=m; } }" : "null") + ";" +
+    /* distClose 存稿那一行自 08-22 起写的是 distSave(distLabel(kind, style, text), …)：mock 里少 distLabel／style，
+       那一行在 try 里静默抛掉，①③「关之前先存了稿」就一直假红——正是本文件头上警告过的那种假读数。 */
+    "var style='';function distLabel(k,s,t){ return kindT(k); }" +
     "function kindT(){return '论文';} function distSave(l,t,cb){ __b.saved++; cb&&cb(true); }" +
     "function clearInterval(){ __b.cleared++; }" +
     "function dNote(v){ __b.notes.push(String(v)); } function t(k){ return k; }" +
@@ -135,6 +141,21 @@ ok("关的是**最上面**那一个成文面板", /dps\[dps\.length - 1\]/.test(
 ok("优先走面板自己的 _close（会存稿），取不到才硬摘节点", /_close === "function"/.test(hk) && /removeChild\(topPanel\)/.test(hk));
 ok("旧的 `.wdsm-help || .wdsm-dist` 串联已拆掉（help 层会把成文面板挡住）",
   !/querySelector\("\.wdsm-help"\) \|\| document\.querySelector\("\.wdsm-dist"\)/.test(FSRC));
+/* ═══ 二之二、外挂调用方：写完前关窗要回 onFail，且只回一次；写完（extDone）之后关窗不再回 ═══ */
+console.log("── 外挂 onFail ──");
+{
+  const h1 = harness({ ext: true });
+  h1.box.esc({ key: "Escape", stopPropagation() {}, preventDefault() {} });
+  ok("写完前 Esc 关窗：外挂收到一次 onFail（研究卡片那一行不会永远「正在查」）", h1.box.failed === 1 && h1.box.failMsg === "stopped");
+  ok("回 onFail 之前照样先存稿（关窗不是丢稿的方式）", h1.box.saved === 1);
+  const h2 = harness({ ext: true, extDone: true });
+  h2.box.esc({ key: "Escape", stopPropagation() {}, preventDefault() {} });
+  ok("已经回过 onDone 的稿子，关窗不再回 onFail", !h2.box.failed);
+  const h3 = harness({ ext: false });
+  h3.box.esc({ key: "Escape", stopPropagation() {}, preventDefault() {} });
+  ok("没有外挂时关窗照旧，不抛", h3.wrap.parentNode === null && !h3.box.failed);
+}
+
 const beat = FSRC.slice(FSRC.indexOf("beatT = setInterval(function () {"), FSRC.indexOf("}, 2000);"));
 ok("心跳重建顶栏时那颗 ✕ 带了 dx（否则重建之后又关不掉）", /el\("button", "wdsm-tbtn dx", "\\u2715"\)/.test(beat));
 ok("重建的 ✕ 不再自己绑 onclick（统一走 wrap 上的委托，才会先存稿）",

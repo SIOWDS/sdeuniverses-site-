@@ -11,10 +11,13 @@ let PASS = 0, FAIL = 0;
 const ok = (c, m) => { if (c) { PASS++; console.log("  PASS " + m); } else { FAIL++; console.log("  FAIL " + m); } };
 
 // 只在成文那一段里找（从 SPEC 表到该路由结束），别让别的路由的同形代码蒙混过关
-const i0 = W.indexOf('const SPEC = {\n        report: { name: "对话报告"');
+/* 锚只认 SPEC 表的开头这一行，不认表里第一档叫什么——2026-08-29 研究论文档 rpaper 插在 report 前面，
+   写死「第一档是 report」的锚当场失联、24 条全红，而它要守的三道闸一条没变。 */
+const i0 = W.indexOf('      const SPEC = {\n');
 const i1 = W.indexOf('/api/chat/clear', i0);
 ok(i0 > 0 && i1 > i0, "定位到成文段（SPEC 表 → 路由结束）");
 const D = W.slice(i0, i1);
+ok(/report: \{ name: "对话报告"/.test(D.slice(0, 20000)), "锚住的确是成文那张 SPEC 表（report 档在表里）");
 
 console.log("① 预算：paper 档已是全站顶格，别再往上拧");
 /* 档名不写死：它随字数口径改（一万字 → 两万字），而这一条要守的是 tok 顶格，不是叫什么名字。 */
