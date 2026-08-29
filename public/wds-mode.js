@@ -47,6 +47,7 @@
   var API_LINK = "/api/wds/link";        // 篇名→站内网址（只读索引，不烧 Key）
   var LS = "sdeuniverses_wds_mode";
   var LS_MODE = "sde_wds_thinkmode";      // "std" | "deep"
+  var LS_GRADE = "sde_wds_grade";         // 难度条："0" 自动（按站内检索定档）| "1".."5" 读者钉死的档
   var LS_WEB = "sde_wds_web";             // "1" | "0"
   var LS_NOSDE = "sde_wds_nosde";         // "1" | "0" —— 无 SDE 问对（只在 ChatSDE 本体页出现，分身页不读）
   var LS_LANG = "sde_wds_lang";           // "zh" | "en"
@@ -942,7 +943,14 @@
       mtHide: "收起工具", mtShow: "工具", mtHideT: "把档位条收起来，把屏幕让给答案",
       topShowT: "把顶栏叫回来（往上翻一下也会回来）",
       mtShowT: "展开档位条（现在开着的）",
-      tipStd: "快答档，够用且省", tipDeep: "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深", tipWeb: " · 已开联网（需智谱 Key）",
+      tipStd: "快答档，够用且省", tipDeep: "难度条：按这一问在站内检索到的核心词材料多少与准确度自动定档——1 轻 2 常 3 深 4 满 5 极；落到核心律（如幸福律）且材料厚才到 4–5：顶配基底＋满功率思考＋完整工序，5 档再装完整内功。点数字可钉死一档。", tipWeb: " · 已开联网（需智谱 Key）",
+      gLab: "难度", gAuto: "自动", gNames: ["轻", "常", "深", "满", "极"],
+      gAutoT: "自动：按站内检索定档（这一问材料越厚、越准、越落在核心概念上，档越高）",
+      gPinT: "钉死第 {n} 档（{name}）——不再按检索定档",
+      gNow: "上一答 {n}·{name}", gPinNow: "钉 {n}·{name}",
+      gLineLv: "难度 {n}/5·{name}", gLineAuto: "自动", gLineNoRag: "自动·检索没接上，按 4 档", gLinePin: "钉死", gLineStd: "标准档（未按此加深）",
+      gLineLand: "落点：{list}", gLineBy: "由「{by}」", gLineHits: "站内 {docs} 篇·锚定 {a}/{h} 段", gLineCore: "核心 {c} 段", gLineExact: "题面原句在站", gLineNone: "站内无锚定命中",
+      gLineThink: "思考{think}", gLineNg: "＋完整内功",
       tipNoSde: " · 无 SDE：纯基底对话，不套 SDE 框架、不挂站内语料，可当一个称职的通用助手用",
       ph: "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…",
       /* 🔴 原文写的是「只存在浏览器本地」，而每一次提问的请求体里都带着 key 打到本站 Worker。
@@ -1193,7 +1201,14 @@
       topShowT: "Bring the top bar back (scrolling up does it too)",
       mtShowT: "Show the mode bar (currently on)",
       tipStd: "Fast tier — enough for most questions, and cheap",
-      tipDeep: "Top model at full reasoning power, the whole SDE groundwork and its method stages. Slow, but it digs.",
+      tipDeep: "Difficulty bar: the level is set automatically from how much accurate site material the retrieval finds on your question's core terms — 1 light … 5 max. Only a question that lands on a core law with thick material reaches 4–5: top model, full reasoning, full method stages; level 5 also loads the complete SDE groundwork. Click a digit to pin a level.",
+      gLab: "Level", gAuto: "Auto", gNames: ["light", "normal", "deep", "full", "max"],
+      gAutoT: "Auto: set from site retrieval (thicker, more accurate material on a core concept ⇒ higher level)",
+      gPinT: "Pin level {n} ({name}) — retrieval no longer decides",
+      gNow: "last {n}·{name}", gPinNow: "pin {n}·{name}",
+      gLineLv: "Level {n}/5·{name}", gLineAuto: "auto", gLineNoRag: "auto · retrieval failed, using 4", gLinePin: "pinned", gLineStd: "standard mode (not deepened)",
+      gLineLand: "landing: {list}", gLineBy: "via “{by}”", gLineHits: "{docs} site docs · {a}/{h} anchored chunks", gLineCore: "core {c}", gLineExact: "exact phrase found", gLineNone: "no anchored site hits",
+      gLineThink: "reasoning {think}", gLineNg: "+ full groundwork",
       tipWeb: " · Web search on (needs a Zhipu key)",
       tipNoSde: " · No SDE: plain conversation, no SDE framework, no site corpus — just a capable general assistant",
       ph: "ChatSDE anything about SDE, or ask it what to read here…",
@@ -2057,6 +2072,17 @@
     ".wdsm-mode{background:var(--wfill);border:1px solid var(--wline);color:var(--wdim);font:12.5px/1 inherit;padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}" +
     ".wdsm-mode.on{background:var(--wfill2);border-color:var(--wgold);color:var(--wgold)}" +
     ".wdsm-mode-tip{color:var(--wdim2);font-size:11.5px;margin-left:2px}" +
+    /* ⭐ 难度条（2026-08-30）：深度思考不再是一颗开关，是一条 1–5 档的条。「自动」按站内检索定档，
+       点数字钉死一档。lit＝这一答（或上一答）自动定到的档；on＝读者钉的档／自动。 */
+    ".wdsm-grade{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--wline);border-radius:999px;padding:2px 6px 2px 8px;background:var(--wfill)}" +
+    ".wdsm-grade i{font-style:normal;font-size:11px;color:var(--wdim2);margin-right:3px;white-space:nowrap}" +
+    ".wdsm-grade button{background:none;border:1px solid transparent;color:var(--wdim);font:11.5px/1 inherit;padding:5px 7px;border-radius:999px;cursor:pointer;white-space:nowrap}" +
+    ".wdsm-grade button.lit{background:var(--wfill2);color:var(--wgold2)}" +
+    ".wdsm-grade button.on{border-color:var(--wgold);color:var(--wgold)}" +
+    ".wdsm-grade em{font-style:normal;font-size:11px;color:var(--wgold);margin-left:4px;white-space:nowrap}" +
+    ".wdsm-gline{color:#8B7B5E;font-size:12px;line-height:1.6;margin:-6px 0 10px}" +
+    ".wdsm-gline b{font-weight:600;color:var(--wgold)}" +
+    ".wdsm-gline i{font-style:normal;color:var(--wteal)}" +
     /* ⭐ 档位条可收起（2026-08-29）。两条按钮 ＋ 一行说明常年占着 90–110px，
        而它们是「设一次就不再动」的东西，读答案才是这块屏幕的主业。
        收起时**不是隐藏状态**：折叠钮上照旧写着现在开着哪几档（见 toolsPaint）。 */
@@ -2248,6 +2274,9 @@
           "<button class='wdsm-mode wdsm-toolbtn'></button>" +
           "<button class='wdsm-mode' data-k='std'></button>" +
           "<button class='wdsm-mode' data-k='deep'></button>" +
+          "<span class='wdsm-grade' style='display:none'><i></i>" +
+            "<button data-g='0'></button><button data-g='1'>1</button><button data-g='2'>2</button><button data-g='3'>3</button><button data-g='4'>4</button><button data-g='5'>5</button>" +
+            "<em></em></span>" +
           "<button class='wdsm-mode' data-k='web'></button>" +
           "<button class='wdsm-mode' data-k='nosde'></button>" +
           "<button class='wdsm-mode wdsm-rsbtn'></button>" +
@@ -2874,10 +2903,14 @@
   // PROFILE 页强制当关：分身共用同一个 localStorage，读者可能在本体页开过它、
   // 再跳来分身页——分身没有这颗按钮，但状态不能跟着漏进来。
   var thinkMode = "std", webOn = false, noSdeOn = false;
+  /* ⭐ 难度条（2026-08-30）：gradePin 0＝自动（按站内检索定档），1–5＝读者钉死；gradeLast＝上一答的读数。
+     [stated] 作者：深度思考要做成难度条，档位按站内检索对核心词的材料多少与准确度定。 */
+  var gradePin = 0, gradeLast = null;
   try {
     thinkMode = localStorage.getItem(LS_MODE) === "deep" ? "deep" : "std";
     webOn = localStorage.getItem(LS_WEB) === "1";
     noSdeOn = !PROFILE && localStorage.getItem(LS_NOSDE) === "1";
+    var _gp = parseInt(localStorage.getItem(LS_GRADE) || "0", 10); gradePin = (_gp >= 1 && _gp <= 5) ? _gp : 0;
   } catch (e) {}
   /* ════ 档位条的收放（2026-08-29）════════════════════════════════
      诉求：输出窗口要能随手变大。做法与 Claude／GPT 同路——把「设一次就不再动」的
@@ -2948,8 +2981,63 @@
       if (on) bs[i].classList.add("on"); else bs[i].classList.remove("on");
     }
     tipEl.textContent = (thinkMode === "deep" ? t("tipDeep") : t("tipStd")) + (webOn ? t("tipWeb") : "") + (noSdeOn ? t("tipNoSde") : "");
- 
+    paintGrade();                              // 难度条只在深度档露面
     toolsPaint();                              // 档位一变，折叠钮上的摘要跟着变
+  }
+  /* ── 难度条的绘制与点选 ──
+     两种态：自动（gradePin=0，「自动」钮亮，lit 落在上一答自动定到的档）／钉死（数字钮亮）。
+     标准档整条不显示——它与难度条无关，别让读者以为标准档也在按条走。 */
+  var gradeEl = layer.querySelector(".wdsm-grade");
+  function gFmt(k, o) { var st = String(t(k) || ""); for (var kk in (o || {})) st = st.split("{" + kk + "}").join(String(o[kk])); return st; }
+  function gName(n) { var a = t("gNames"); return (a && a[n - 1]) || String(n); }
+  function paintGrade() {
+    if (!gradeEl) return;
+    if (thinkMode !== "deep") { gradeEl.style.display = "none"; return; }
+    gradeEl.style.display = "";
+    var lab = gradeEl.querySelector("i"); if (lab) lab.textContent = t("gLab");
+    var bs = gradeEl.querySelectorAll("button");
+    var lit = (gradePin || (gradeLast && gradeLast.on && gradeLast.lv) || 0);
+    for (var i = 0; i < bs.length; i++) {
+      var g = parseInt(bs[i].getAttribute("data-g") || "0", 10);
+      if (g === 0) { bs[i].textContent = t("gAuto"); bs[i].title = t("gAutoT"); }
+      else bs[i].title = gFmt("gPinT", { n: g, name: gName(g) });
+      bs[i].className = (g === gradePin ? "on" : "") + (g > 0 && g === lit ? " lit" : "");
+    }
+    var em = gradeEl.querySelector("em");
+    if (em) em.textContent = gradePin ? gFmt("gPinNow", { n: gradePin, name: gName(gradePin) })
+      : ((gradeLast && gradeLast.on && gradeLast.lv) ? gFmt("gNow", { n: gradeLast.lv, name: gName(gradeLast.lv) }) : "");
+  }
+  (function () {
+    if (!gradeEl) return;
+    var bs = gradeEl.querySelectorAll("button");
+    for (var i = 0; i < bs.length; i++) {
+      (function (b) {
+        b.onclick = function () {
+          var g = parseInt(b.getAttribute("data-g") || "0", 10);
+          gradePin = (g >= 1 && g <= 5) ? g : 0;
+          try { localStorage.setItem(LS_GRADE, String(gradePin)); } catch (e) {}
+          paintGrade();
+        };
+      })(bs[i]);
+    }
+  })();
+  /* 这一答的难度读数，摆在答案外面（不进正文）：档、自动/钉死、落点、命中量、这一档实际用的配方。 */
+  function gradeLine(cell, v) {
+    if (!cell || !v) return;
+    var d = el("div", "wdsm-gline");
+    var lvb = el("b", null, gFmt("gLineLv", { n: v.lv || 0, name: gName(v.lv || 0) }));
+    d.appendChild(lvb);
+    var how = v.on ? (v.auto ? (v.why === "norag" ? t("gLineNoRag") : t("gLineAuto")) : t("gLinePin")) : (v.deep ? "" : t("gLineStd"));
+    if (how) d.appendChild(document.createTextNode("（" + how + "）"));
+    var parts = [];
+    if (v.core && v.core.length) parts.push(gFmt("gLineLand", { list: v.core.map(function (c) { return c.n + (c.by && c.via !== "题面" ? "（" + gFmt("gLineBy", { by: c.by }) + "）" : ""); }).join("、") }));
+    if (v.hits) parts.push(gFmt("gLineHits", { docs: v.docs || 0, a: v.ahits || 0, h: v.hits || 0 }) + (v.chits ? ("·" + gFmt("gLineCore", { c: v.chits })) : "") + (v.exact ? ("·" + t("gLineExact")) : ""));
+    else if (v.deep) parts.push(t("gLineNone"));
+    if (v.on) parts.push((v.model || "") + (v.think ? (" · " + gFmt("gLineThink", { think: v.think })) : "") + (v.method ? (" · " + v.method) : "") + (v.ng ? (" " + t("gLineNg")) : ""));
+    if (parts.length) { d.appendChild(document.createTextNode(" ｜ ")); var ii = el("i", null, parts.join(" ｜ ")); d.appendChild(ii); }
+    if (typeof v.score === "number") d.title = "score " + v.score + " = 量 " + v.amount + " + 准 " + v.acc + " + 落点 " + v.landing + (v.anchors && v.anchors.length ? (" · 锚：" + v.anchors.join("/")) : "");
+    cell.turn.insertBefore(d, cell.a);
+    if (v.on) { gradeLast = v; paintGrade(); }
   }
   (function () {
     var bs = layer.querySelectorAll(".wdsm-mode");
@@ -4315,6 +4403,7 @@
     // （按钮在分身页本就不出现，读者按不到它，但状态是跨页共享的同一把 key），也绝不把它发出去——
     // 分身是一份策展过的人格，不该因为一个借来的开关状态就被静默拆穿。
     var payload = { q: q, history: histPack(compFrom()), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
+    if (thinkMode === "deep") payload.grade = gradePin ? gradePin : "auto";   // 难度条：自动按检索定档，或读者钉死的档
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
     var pics = imgsForSend();
     if (pics.length) { payload.imgs = pics; payload.vmodel = vmodelVis(kv.vendor); }
@@ -4466,6 +4555,7 @@
                 else if (!answer) waitLine(cell, t("thinking") + " " + (bv.sec || 0) + "s" + (bv.stage ? " · " + bv.stage : ""));
               }
               else if (j.t === "note") { noteLine(cell, j.v); }
+              else if (j.t === "grade") { gradeLine(cell, j.v); }
               else if (j.t === "nbr") { renderNbr(cell, j.v || []); }
               else if (j.t === "nbrfail") { nbrFailNote(cell); }
               else if (j.t === "toolspec") { toolSpec = j.v; }
@@ -4613,6 +4703,7 @@
         model: col.who.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(),
         about: aboutPlus(), lang: LANG, tool: curTool,
       };
+      if (thinkMode === "deep") pl.grade = gradePin ? gradePin : "auto";
       if (COMP.text) pl.comp = COMP.text;
       return rsStream(API, pl, function (txt) { col.text = txt; col.bd.innerHTML = mdRender(txt) + "<span class='cur'>\u258a</span>"; })
         .then(function (txt) { col.text = txt; col.bd.innerHTML = mdRender(txt); })

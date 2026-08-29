@@ -1591,6 +1591,9 @@ const CHAT_FIRST_DEEP_MS = 240000, CHAT_TOTAL_DEEP_MS = 420000;
 // 深度档等到这个点还是零帧，就发一条 note 说明「还在等、最长等到几分几秒」——
 // 只报信不掐流。读者据此自己决定是继续等还是切标准档。
 const CHAT_WAIT_NOTE_MS = 90000;
+/* 难度条第 3 档（深）的时钟：顶配基底、思考开在 high 而非 max——比标准档慢、比满功率快，
+   所以首帧／总时长也取两者之间（见 wdsGradeKnobs）。 */
+const CHAT_FIRST_MID_MS = 150000, CHAT_TOTAL_MID_MS = 300000;
 const CHAT_TOTAL_MS = 240000;
 const CHAT_TOTAL_LONG_MS = 420000;     // 读者点名要长篇时给更长的总时长
 // 关思考重答那一遍的时钟。它不烧思考，所以不能沿用满功率档的 90/240 秒——沿用就等于
@@ -4970,6 +4973,146 @@ function retrieveKB(kb, corpus, q, expTerms, budget) {
   const srcs = [];
   for (const d of srcDocs) { const dd = corpus.docs[d]; if (dd) srcs.push({ u: dd.u, t: dd.t }); }
   return { block, srcs: srcs.slice(0, 8), n: picked.size };
+}
+
+/* ═══════════ 难度条（2026-08-30）═══════════════════════════════════════════════
+   [stated] 作者：ChatSDE 的「深度思考」要做成一个**难度条选择**——档位按站内检索的
+   「高级度」定：与提问**核心词**相关的站内材料有多少、有多准。例：问「身在福中不知福」，
+   检索该一路走到「幸福律」；落到核心律且材料厚 ⇒ 高档；材料薄 ⇒ 低档。类似 GPT Pro
+   那条按题定推理强度的动态条。
+
+   为什么要有它（两条账都在本文件里写过）：
+   ① 满功率档给「下午好」也走满功率思考——那正是「想了 8174 字、正文 0 字」的死法之一；
+   ② 站内材料厚薄不一，按同一份功率去答，薄处白烧、厚处欠深。
+
+   读数怎么来（全部确定性、可复核，不再多打一次基底）：
+   · 锚：提问**自己的实词**二元组（去停用字）＋ 落到的核心概念名。**扩展检索词不算锚**——
+     扩展是基底替我们造的 SDE 术语，「显露」这类词任何问题都会被扩出来，拿它计分就是自己给自己打分。
+   · 落点：九库里被种到的实体，且必须与题面**有字面锚定**（索引词是题面子串＝强；实体名与题面
+     共有实词字＝弱，「福」→「幸福律」走的就是这条）。无锚定的种子不算落点。
+   · 量：锚定命中段数、篇数；准：前五段平均分、锚定覆盖率、题面原句出现。
+   分＝量(≤40)＋准(≤35)＋落点(≤25)，按 GRADE_LV 切成 1–5 档。
+   ⚠ 阈值是拍的，标明「来源＝设计值，待线上读数校准」；改阈值只改 GRADE_LV 一处。 */
+/* 停用字分两档：强停用字（的了么什吗…）出现在哪个二元组里，那个二元组就不当锚；
+   弱停用字（在不是有…）只在**打头**时才作废——「身在」「福中」「存在」「中心」留得住，
+   「在福」「不知」「什么」进不来。单字级停用表与实词撞车是常事（在／存在、中／中心位），
+   所以「中」不进弱表，带弱停用字收尾的二元组也放过，不整字杀掉。 */
+const GRADE_STOP = "的了么什吗呢吧啊哪";
+const GRADE_STOP2 = "在不是有和与之这那个我你他她它们也就都还很把被为对从到里上下能会要给让说而及或并以已所";
+const GRADE_LV = [18, 36, 54, 72];   // score <18 ⇒ 1 轻；<36 ⇒ 2 常；<54 ⇒ 3 深；<72 ⇒ 4 满；其余 5 极
+const GRADE_NAME = { 0: "标准", 1: "轻", 2: "常", 3: "深", 4: "满", 5: "极" };
+function gradeAnchors(q) {
+  const zh = String(q || "").replace(/[^\u4e00-\u9fff]/g, "");
+  const out = [];
+  for (let i = 0; i + 2 <= zh.length; i++) {
+    const g = zh.slice(i, i + 2);
+    if (GRADE_STOP.indexOf(g[0]) >= 0 || GRADE_STOP.indexOf(g[1]) >= 0) continue;
+    if (GRADE_STOP2.indexOf(g[0]) >= 0) continue;   // 弱停用字打头的二元组（在福／不知／是什）不当锚
+    if (out.indexOf(g) < 0) out.push(g);
+  }
+  const lat = String(q || "").toLowerCase().match(/[a-z0-9][a-z0-9._-]{2,}/g) || [];
+  for (const w of lat) if (out.indexOf(w) < 0) out.push(w);
+  return out;
+}
+/* 落点：九库种子里**与题面有字面锚定**的那几个。返回 [{ n, id, ty, by, via, w }]，按 w 降序、最多 3 个。 */
+function gradeCoreLanding(kb, q, expTerms) {
+  if (!kb || !kb.idx || !kb.byId) return [];
+  let seeds = [];
+  try { seeds = kbLink(kb, q, expTerms); } catch (e) { return []; }
+  const qz = String(q || "");
+  const qChars = {};
+  for (const ch of qz.replace(/[^\u4e00-\u9fff]/g, "")) if (GRADE_STOP.indexOf(ch) < 0 && GRADE_STOP2.indexOf(ch) < 0) qChars[ch] = 1;
+  const keysOf = {};
+  for (const key in kb.idx) { const id = kb.idx[key] && kb.idx[key][1]; if (id) (keysOf[id] = keysOf[id] || []).push(key); }
+  const out = [];
+  for (const id of seeds) {
+    const e = kb.byId[id]; if (!e || !e.name) continue;
+    const keys = (keysOf[id] || []).concat([String(e.name)]);
+    let by = "", via = "", w = 0, term = "";
+    /* 强锚定：某个索引词（或实体名）整个出现在题面里——「什么是幸福律」。落点名就写那个词。 */
+    for (const key of keys) if (key.length >= 2 && qz.indexOf(key) >= 0 && key.length > by.length) { by = key; term = key; via = "题面"; w = 10; }
+    /* 弱锚定：索引词／实体名与题面共有实词字——「身在福中不知福」的「福」→「幸福律」。
+       落点名取**含共字的最长索引词**（读者认得「幸福律」，认不得它在九库里的登记名「意义三律」）。 */
+    if (!by) {
+      const shared = [];
+      for (const key of keys) for (const ch of String(key).replace(/[^\u4e00-\u9fff]/g, "")) if (qChars[ch] && shared.indexOf(ch) < 0) shared.push(ch);
+      if (shared.length) {
+        let best = "";
+        for (const key of keys) { let hit = false; for (const ch of shared) if (key.indexOf(ch) >= 0) { hit = true; break; } if (hit && key.length > best.length) best = key; }
+        by = shared.join(""); term = best || String(e.name); via = "共字"; w = 6;
+      }
+    }
+    if (!w) continue;
+    out.push({ n: term, e: String(e.name), id: id, ty: String(e.type || ""), by: by, via: via, w: w });
+  }
+  out.sort((a, b) => b.w - a.w);
+  return out.slice(0, 3);
+}
+function ragGrade(q, picked, nHit, docsN, chars, core) {
+  const anchors = gradeAnchors(q);
+  const names = [];
+  for (const c of (core || [])) { if (c.n && names.indexOf(c.n) < 0) names.push(c.n); if (c.e && names.indexOf(c.e) < 0) names.push(c.e); }
+  const qq = String(q || "").trim();
+  const P = Array.isArray(picked) ? picked : [];
+  /* 量与准都只数**锚定**的段：段里得出现题面实词或落点名。没锚定的段是扩展词召回的，
+     那是基底替我们造的术语，什么问题都召得到，计进去就是自己给自己打分。 */
+  let aHits = 0, cHits = 0, exact = false, sum5 = 0, n5 = 0;
+  const aDoc = {};
+  for (let i = 0; i < P.length; i++) {
+    const t = String((P[i] && P[i].t) || ""), tl = t.toLowerCase();
+    let anch = false, cin = false;
+    for (const a of anchors) if (tl.indexOf(a) >= 0) { anch = true; break; }
+    for (const n of names) if (t.indexOf(n) >= 0) { cin = true; break; }
+    if (anch || cin) {
+      aHits++; aDoc[String(P[i].d)] = 1;
+      if (n5 < 5) { sum5 += (+(P[i] && P[i].sc) || 0); n5++; }   // picked 已按分降序：前五个锚定段＝最准的五段
+    }
+    if (cin) cHits++;
+    if (qq.length >= 4 && t.indexOf(qq) >= 0) exact = true;
+  }
+  const aDocs = Object.keys(aDoc).length;
+  const mean5 = n5 ? sum5 / n5 : 0;
+  const cover = P.length ? aHits / P.length : 0;
+  const amount = 30 * Math.min(1, aHits / 10) + 10 * Math.min(1, aDocs / 6);
+  const acc = 20 * Math.min(1, mean5 / 10) + 10 * cover + (exact ? 5 : 0);
+  const landing = (core && core.length) ? (core[0].w + 5 * Math.min(3, cHits)) : 0;
+  const score = Math.round(amount + acc + landing);
+  let lv = 5;
+  for (let i = 0; i < GRADE_LV.length; i++) if (score < GRADE_LV[i]) { lv = i + 1; break; }
+  return { lv: lv, name: GRADE_NAME[lv], score: score, amount: Math.round(amount), acc: Math.round(acc), landing: Math.round(landing),
+           hits: P.length, ahits: aHits, chits: cHits, docs: docsN || 0, adocs: aDocs, chars: chars || 0, mean5: Math.round(mean5 * 10) / 10,
+           exact: exact, core: (core || []).map((c) => ({ n: c.n, by: c.by, via: c.via })), anchors: anchors.slice(0, 8), nhit: nHit || 0 };
+}
+/* 每一档改什么。第 4 档 ＝ 从前的深度档一字不差（顶配基底／满功率／6000／完整工序／240s·420s／10 篇）；
+   第 5 档在它之上再装完整内功、预算 8000；第 1–2 档退到标准基底（1 档还关思考——寒暄与站外题的快车道）。 */
+function wdsGradeKnobs(lv) {
+  switch (lv | 0) {
+    case 1: return { lv: 1, name: "轻", top: 0, plain: 1, effort: "", tok: 2600, method: 0, first: CHAT_FIRST_MS, total: CHAT_TOTAL_MS, src: 4, ctx: 6000, ng: 0 };
+    case 2: return { lv: 2, name: "常", top: 0, plain: 0, effort: "", tok: 3200, method: 0, first: CHAT_FIRST_MS, total: CHAT_TOTAL_MS, src: 6, ctx: 10000, ng: 0 };
+    case 3: return { lv: 3, name: "深", top: 1, plain: 0, effort: "high", tok: 4500, method: 1, first: CHAT_FIRST_MID_MS, total: CHAT_TOTAL_MID_MS, src: 8, ctx: 16000, ng: 0 };
+    case 4: return { lv: 4, name: "满", top: 1, plain: 0, effort: "max", tok: 6000, method: 1, first: CHAT_FIRST_DEEP_MS, total: CHAT_TOTAL_DEEP_MS, src: 10, ctx: 30000, ng: 0 };
+    case 5: return { lv: 5, name: "极", top: 1, plain: 0, effort: "max", tok: 8000, method: 1, first: CHAT_FIRST_DEEP_MS, total: CHAT_TOTAL_DEEP_MS, src: 10, ctx: 30000, ng: 1 };
+    default: return { lv: 0, name: "标准", top: 0, plain: 0, effort: "", tok: 2600, method: 0, first: CHAT_FIRST_MS, total: CHAT_TOTAL_MS, src: 6, ctx: 30000, ng: 0 };
+  }
+}
+/* 客户端递来的 grade："auto" ＝ 按检索定档；1–5 ＝ 读者钉死；没递（老客户端）＝ 0，走老深度档。 */
+function wdsGradeReq(x) {
+  if (x === "auto" || x === "a") return "auto";
+  const n = parseInt(x, 10);
+  return (n >= 1 && n <= 5) ? n : 0;
+}
+/* 定档。不适用的路一律回老行为：非深度档、产线道次（rs）、三家对撞、看图——它们各有自己的预算账。
+   自动档而检索没接上 ⇒ 不知深浅，按第 4 档（老深度档）走，why 记 "norag" 让屏幕上说得出来。 */
+function wdsGradePick(deep, req, g, ctx) {
+  const c = ctx || {};
+  if (!deep || !req || c.rsLong || c.duel || c.canSee) {
+    const lv = deep ? 4 : 0;
+    return { on: false, lv: lv, auto: false, pin: 0, k: wdsGradeKnobs(lv),
+             why: !deep ? "std" : (!req ? "legacy" : (c.rsLong ? "rs" : (c.duel ? "duel" : "vision"))) };
+  }
+  if (req !== "auto") return { on: true, lv: req, auto: false, pin: req, k: wdsGradeKnobs(req), why: "pin" };
+  const lv = (g && g.lv >= 1 && g.lv <= 5) ? g.lv : 4;
+  return { on: true, lv: lv, auto: true, pin: 0, k: wdsGradeKnobs(lv), why: g ? "auto" : "norag" };
 }
 
 // ===== 深度档·两次内功提智 =====
@@ -10044,6 +10187,17 @@ export default {
         const _o = {};
         if (pick) _o.pick = pick;
         if (prof && prof.pre && prof.pre.length) _o.keep = prof.pre;
+        /* ⭐ 难度条的落点（2026-08-30）：九库在检索**之前**先种一次——种到的核心概念若与题面有字面
+           锚定（「福」→「幸福律」），把它的名字并进检索词，这一趟检索就真会走到那条律的材料上，
+           而不是停在含「福」字的散句上。九库只装一次，下面拼块时复用。档案模式仍整块跳过。 */
+        let kb = null, core = [];
+        if (kbn && !prof) {
+          try { kb = await loadKB(env, url); } catch (e) { kb = null; }
+          if (kb) {
+            core = gradeCoreLanding(kb, q, expTerms);
+            for (const c of core) if (expTerms.indexOf(c.n) < 0) expTerms.push(c.n);
+          }
+        }
         const scan = await ragScan(env, url, q, expTerms, prevQ, K, chunkLimit || 1600,
                                    Object.keys(_o).length ? _o : undefined);
         const seen = {}, srcs = [];
@@ -10052,8 +10206,8 @@ export default {
            它是全站概念/命题的邻域子图，块里会引到白名单之外的篇目，而块是拼好的文本、
            按 URL 过滤过不干净。宁可这一路少一份材料，也不要一个"限定题域"的分身
            从后门把全站材料带进来——那样白名单就只是个装饰。 */
-        if (kbn && !prof) {
-          try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, { docs: scan.docs }, q, expTerms, kbn); kbBlock = r.block; for (const sx of r.srcs) if (!seen[sx.u]) { seen[sx.u] = 1; srcs.push(sx); } } } catch (e) {}
+        if (kbn && !prof && kb) {
+          try { const r = retrieveKB(kb, { docs: scan.docs }, q, expTerms, kbn); kbBlock = r.block; for (const sx of r.srcs) if (!seen[sx.u]) { seen[sx.u] = 1; srcs.push(sx); } } catch (e) {}
         }
         // capkb 传了就按"有没有 KB 块"分两档（ChatSDE 的老口径）；没传＝旧算法一字不变。
         const chunkCap = capKb ? (kbBlock ? capKb : cap) : Math.max(4000, cap - kbBlock.length);
@@ -10071,7 +10225,9 @@ export default {
           if (chunkText.length > chunkCap) break;
         }
         return J({ ok: true, ctx: kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText,
-                   srcs: srcs.slice(0, 10), prof: prof ? prof.id : "", kb: !!kbBlock });
+                   srcs: srcs.slice(0, 10), prof: prof ? prof.id : "", kb: !!kbBlock,
+                   /* 难度条读数：量／准／落点三项与总分、档位（见 ragGrade 头注释）。调用方不认这个字段也无妨。 */
+                   grade: ragGrade(q, scan.picked, nHit, srcs.length, kbBlock.length + chunkText.length, core) });
       } catch (e) {
         return J({ ok: false, msg: "检索没接上：" + (e && e.message) }, 502);
       }
@@ -10927,6 +11083,10 @@ export default {
          满血带来的是：最强基底（wdsTopVC）＋满功率思考＋SDE_METHOD_BLOCK 完整工序＋
          站内检索与联网条数加倍＋每道 6000 max_tokens。 */
       const deep = b.mode === "deep" || !!(b.rs && typeof b.rs === "object" && b.rs.sde && !noSde);
+      /* ⭐ 难度条（2026-08-30，见 ragGrade 头注释）：深度档不再是一个固定配方，而是 1–5 档。
+         客户端递 grade："auto" 按站内检索定档、1–5 读者钉死；没递（老客户端）＝ 0，仍走从前的深度档（＝第 4 档）。
+         定档发生在站内检索**之后**（读数从检索里来），所以这里只收请求，配方到下面 wdsGradePick 处才定。 */
+      const gradeReq = wdsGradeReq(b.grade);
       /* 【评分这一路由程序保证检索，不等读者去点联网】
          I 维（不可还原性，权重 0.20，闸门维）要的是「已经有人占了这块地没有」——
          那是一个**外部事实**，凭训练记忆答不了。读者忘了开联网，模型就只能补作者与年份，
@@ -11085,6 +11245,7 @@ export default {
             }
             // 全站检索：先调用结构化知识(九库邻域子图,密/准/省token),再以相似句片段补充
             let ctxText = "", sources = [];   // 站内资料与出处：现在整段由 /api/wds/rag 子请求交回来
+            let ragG = null;                  // 难度条读数（子请求随 ctx/srcs 一起交回；老子请求没有它就是 null）
             if (imgs.length && !canSee) controller.enqueue(_sseBytes({ t: "note", v: "你传了 " + imgs.length + " 张图，但你现在选的这家基底在本站的接口下看不了图（能看图的是 智谱 GLM / 千问 Qwen / Kimi）。这一轮它**没有看到图**，只能就你的文字作答——要它真看图，去顶栏换一家。" }));
             else if (canSee) controller.enqueue(_sseBytes({ t: "note", v: "已把 " + imgs.length + " 张图直接交给 " + VC.name + " 的视觉档（" + VC.model + "）看——不是文字识别。" }));
             if (qCut > 0) controller.enqueue(_sseBytes({ t: "note", v: "你这一问超过 " + WDS_CHAT_Q_MAX + " 字，只带上了前 " + WDS_CHAT_Q_MAX + " 字（后面 " + qCut + " 字没进去）。这么长的材料建议用「＋」当附件传，别塞进提问框。" }));
@@ -11129,7 +11290,7 @@ export default {
                   const rr = await wdsRag(env, url, _ragBody);
                   if (rr.ok) {
                     const jr = await rr.json();
-                    if (jr && jr.ok) { ctxText = jr.ctx || ""; sources = jr.srcs || []; _ragWhy = ""; break; }
+                    if (jr && jr.ok) { ctxText = jr.ctx || ""; sources = jr.srcs || []; ragG = (jr.grade && typeof jr.grade === "object") ? jr.grade : null; _ragWhy = ""; break; }
                     _ragWhy = (jr && jr.msg) || "返回不可用";
                     break;
                   }
@@ -11144,8 +11305,37 @@ export default {
               // 失败必须可见：静默降级＝把"这一答其实没查过站内"记成查过了。
               if (!sources.length) controller.enqueue(_sseBytes({ t: "note", v: "站内检索这一问没接上（" + (_ragWhy || "无命中") + "），这一答只据内功与你给的材料——问的若是站内文章，重问一次多半就有了。" }));
             } catch (e) {}
-            sources = sources.slice(0, deep ? 10 : 6);
+            /* ⭐ 定档（难度条）。G.on 为真时这一答的基底／功率／预算／工序／时钟／带多少站内资料都按 G.k 给；
+               不适用的路（标准档、产线道次、三家对撞、看图、老客户端）G.on 为假、G.k 仍是老配方，下面各处读它就等于没改。
+               ⚠ VC 是 const 对象，这里改的是它的字段（看图那条路 VC.top 本就为 0，不碰）。 */
+            const G = wdsGradePick(deep, gradeReq, ragG, { rsLong: !!(rs && (rs.forge || rs.sde)), duel: !!duel, canSee: canSee });
+            const gK = G.k;
+            if (G.on && !canSee) {
+              VC.top = gK.top ? 1 : 0;
+              VC.model = wdsPickModel(vd, umodel, gK.top);
+              if (gK.top && gK.effort) VC.effort = gK.effort; else delete VC.effort;
+            }
+            const mFull = G.on ? !!gK.method : deep;                      // 方法论块：完整工序还是精简工序
+            const gPlain = !!(G.on && gK.plain && wdsCanPlain(VC));        // 第 1 档：关思考的快车道（关不掉的家照旧）
+            const tokGrade = G.on ? Math.max(gK.tok, tool ? 4000 : 0) : (deep ? 6000 : (tool ? 4000 : 2600));
+            sources = sources.slice(0, G.on ? gK.src : (deep ? 10 : 6));
+            if (G.on && ctxText.length > gK.ctx) {
+              const _cl = ctxText.length;
+              ctxText = ctxText.slice(0, gK.ctx) + "\n〔按难度第 " + G.lv + " 档，站内资料只带前 " + gK.ctx + " 字（检索到 " + _cl + " 字）〕";
+            }
             if (sources.length) controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 出处先发前端
+            /* 难度条读数随流下发：档位、是自动还是钉死、量／准／落点三项，以及这一档实际给的配方。
+               标准档也发（on:false）——读者看得见「这一问站内高级度几档」，才知道值不值得切深度。 */
+            if (ragG || G.on || deep) controller.enqueue(_sseBytes({ t: "grade", v: {
+              lv: G.lv, name: gK.name, on: G.on, auto: G.auto, pin: G.pin, why: G.why, deep: !!deep,
+              score: ragG ? ragG.score : null, amount: ragG ? ragG.amount : null, acc: ragG ? ragG.acc : null, landing: ragG ? ragG.landing : null,
+              hits: ragG ? ragG.hits : 0, ahits: ragG ? ragG.ahits : 0, chits: ragG ? ragG.chits : 0, docs: ragG ? ragG.docs : 0,
+              chars: ragG ? ragG.chars : 0, exact: !!(ragG && ragG.exact), core: ragG ? (ragG.core || []) : [], anchors: ragG ? (ragG.anchors || []) : [],
+              rlv: ragG ? ragG.lv : 0,                                     // 检索自己算出的档（钉死时与 lv 不同）
+              model: VC.model, top: VC.top ? 1 : 0,
+              think: canSee ? "看图档" : (gPlain ? "关" : ((G.on ? gK.plain : false) ? "关不掉（这家常开）" : (VC.top ? ((VC.effort || "max") === "max" ? "满功率" : "高") : "随基底默认"))),
+              method: mFull ? "完整工序" : "精简工序", tok: tokGrade, ng: !!(G.on && gK.ng && !prof),
+            } }));
             // 可点清单：把这一轮所有能引的篇目与真网址列成一份，附在站内资料末尾。
             // 只列这一份、且要求它只准照抄——凭印象拼站内网址必然拼错（篇名≠路径）。
             if (sources.length) {
@@ -11296,6 +11486,32 @@ export default {
                 + " · 上游原文 " + _carryLen + " 字 · 站内资料 " + ctxText.length + " 字"
                 + (webCtx ? (" · 站外 " + webCtx.length + " 字") : "") + (docCtx ? (" · 附件 " + docCtx.length + " 字") : "") }));
             }
+            /* ⭐ 难度条第 5 档：装完整内功（2026-08-30）。顶栏对深度档一直写着「SDE 全内功」，而普通问答
+               此前只装一行骨架＋心得——完整先验只有深度研究产线在装。第 5 档的判据是「题落在核心律上且站内
+               材料厚」，正是该拿完整先验去答的那一类题。预算闸与研究产线同一套（resPriorFit）：
+               内功是固定成本，站内／站外／附件超出时按次序裁到地板并当场说明；装不下完整版就退精简版并说明。
+               只在普通问答上做：研究产线自己装（上面那段）；领域档案有自己的底盘，不叠。 */
+            if (G.on && gK.ng && !prof && !(rs && rs.sde)) {
+              let _ng5 = "";
+              try { _ng5 = await loadNeigong(env, url, "/taste/assets/sde-neigong.txt"); } catch (e) {}
+              if (_ng5) {
+                const fit5 = resPriorFit(_ng5.length, 0, ctxText.length, webCtx.length, docCtx.length, (VC.top && !umodel) ? RES_SYS_CAP_TOP : RES_SYS_CAP);
+                const _cuts5 = [];
+                if (fit5.ctxKeep < ctxText.length) { _cuts5.push("站内资料 " + ctxText.length + "→" + fit5.ctxKeep); ctxText = resTrimCtx(ctxText, fit5.ctxKeep); }
+                if (fit5.webKeep < webCtx.length) { _cuts5.push("站外资料 " + webCtx.length + "→" + fit5.webKeep); webCtx = resTrimTail(webCtx, fit5.webKeep, "站外资料"); }
+                if (fit5.docKeep < docCtx.length) { _cuts5.push("读者附件 " + docCtx.length + "→" + fit5.docKeep); docCtx = resTrimTail(docCtx, fit5.docKeep, "读者附件"); }
+                if (fit5.mode === "full") {
+                  SDEM = "\n\n════ SDE 内功 · 完整先验（你的底盘：内化使用，绝不复述原文、绝不提「内功」二字）════\n" + _ng5;
+                  controller.enqueue(_sseBytes({ t: "note", v: "难度第 5 档：已装完整内功先验（" + _ng5.length + " 字，含二阶碰撞）" + (_cuts5.length ? ("；为装下它裁了：" + _cuts5.join("；")) : "") + "。" }));
+                } else {
+                  const _lite5 = neigongLite(_ng5);
+                  SDEM = "\n\n════ SDE 内功 · 精简先验（读物裁到地板仍装不下完整先验）════\n" + _lite5;
+                  controller.enqueue(_sseBytes({ t: "note", v: "难度第 5 档：内功按精简版装载（" + _lite5.length + " 字，完整版 " + _ng5.length + " 字）——精简版不含三大方程／123 原理／六路径的完整节与二阶碰撞。" }));
+                }
+              } else {
+                controller.enqueue(_sseBytes({ t: "note", v: "难度第 5 档本该装完整内功，这次内功文件没读到，退回一行骨架作答——这一答按第 4 档看待。" }));
+              }
+            }
             /* ⭐ 交付规格随流下发（2026-08-28）。前端拿**同一份**规格跑审计——
                前端不留副本，抄一份就会有一天两份不一样，那时页面报的「已交付」是假的。 */
             /* ⚠⚠ 规格里的正则**全是中文关键词**（显露／候选／承重／扣…），而英文界面下
@@ -11305,7 +11521,7 @@ export default {
                但也不许静默跳过（静默＝把没查过记成查过了），如实说一句为止。
                真正的修法是给每一件配英文判据，那是另一刀，未做。 */
             if (tool && TOOL_SPEC[tool]) controller.enqueue(_sseBytes({ t: "toolspec", v: toolSpecFor(tool, lang) }));
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde);
+            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde);
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。
@@ -11348,10 +11564,13 @@ export default {
             const rsPlain = !!(rs && rs.forge && FORGE_PLAIN_STAGES[rs.i | 0]);   // 成文三段首发关思考（见 FORGE_PLAIN_STAGES 头注释）
             const tokWant = askLen
               ? Math.min(32000, Math.max(6000, Math.round(askLen * 1.8)))   // 中文近似 1 字 1 token，留一点余量
-              : (rsLong ? FORGE_STAGE_TOK : (rs ? (deep ? 6000 : 4000) : (deep ? 6000 : (tool ? 4000 : 2600))));
-            /* 按档给：深度档 240s 首帧 / 420s 总时长；标准档仍是 90s / 240s。长篇请求的总时长照旧最长。 */
-            const clk = wdsClock(deep ? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,
-              rsLong ? FORGE_TOTAL_MS : (askLen ? CHAT_TOTAL_LONG_MS : (deep ? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS)));
+              : (rsLong ? FORGE_STAGE_TOK : (rs ? (deep ? 6000 : 4000) : tokGrade));
+            /* 按档给：深度档 240s 首帧 / 420s 总时长；标准档仍是 90s / 240s。长篇请求的总时长照旧最长。
+               难度条落定后首帧／总时长走 gK（第 4 档＝深度档那两个数；1–2 档＝标准档；3 档在中间）。 */
+            const gFirst = G.on ? gK.first : (deep ? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS);
+            const gTotal = G.on ? gK.total : (deep ? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS);
+            const clk = wdsClock(gFirst,
+              rsLong ? FORGE_TOTAL_MS : (askLen ? CHAT_TOTAL_LONG_MS : gTotal));
             /* 一句话说清这一道用的是什么配置——没有它，「是不是真放开了预算、思考开没开」永远只能靠读代码猜。 */
             if (rsLong) controller.enqueue(_sseBytes({ t: "note", v: "⚙️ 本道预算 · 输出 " + tokWant + " tok（上游嫌大自动降档）· 思考"
               + (rsPlain ? (wdsCanPlain(VC) ? "关（成文段：整份预算归正文）" : "关不掉（这家基底思考常开，正文与思考共用这份预算）") : (VC.top ? "开·满功率" : "随基底默认"))
@@ -11366,9 +11585,9 @@ export default {
                只发 note，不掐流。掐流是时钟的活。 */
             let _nof2 = setTimeout(() => {
               if (_st.think || _st.out) return;
-              const _lim = Math.round((deep ? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS) / 1000);
+              const _lim = Math.round(gFirst / 1000);
               controller.enqueue(_sseBytes({ t: "note", v: "上游到现在一个字都没回（已等 " + Math.round(CHAT_WAIT_NOTE_MS / 1000) + " 秒）。"
-                + (deep ? ("深度档是满功率思考，开口慢是常事——最长等到 " + _lim + " 秒，再没有就自动关掉思考重答一次。等不及可以按 Esc，切到「标准」档重问。")
+                + (VC.top ? ("这一档是" + ((VC.effort || "max") === "max" ? "满功率" : "高功率") + "思考，开口慢是常事——最长等到 " + _lim + " 秒，再没有就自动关掉思考重答一次。等不及可以按 Esc，切到「标准」档或把难度条钉到低档重问。")
                         : ("最长等到 " + _lim + " 秒，再没有就自动关掉思考重答一次。")) }));
             }, CHAT_WAIT_NOTE_MS);
             let upstream;
@@ -11380,7 +11599,7 @@ export default {
                    不会因为一个数字整道断掉。普通问答仍是原来那一发。 */
                 upstream = rsLong
                   ? await wdsFetchMax(VC, KEY, messages, true, tokWant, clk.signal, false, undefined, rsPlain)
-                  : await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
+                  : await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(gPlain ? wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages }) : wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
                 if (upstream.ok || !canSee || vi + 1 >= visLadder.length) break;
                 if (upstream.status !== 400 && upstream.status !== 404) break;
                 let et = ""; try { et = (await upstream.clone().text()).slice(0, 300); } catch (e2) {}

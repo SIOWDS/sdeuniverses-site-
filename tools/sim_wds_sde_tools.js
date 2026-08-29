@@ -57,11 +57,13 @@ console.log("④ 满功率预算没被工序顶破");
 // 就已经匹配不上、空转至今；改成先揪出 tokWant 那一整段表达式，再从里面挑数字。
 // 必须先切到 chat 段内：/api/wds/read 里也有一份同名的 tokWant，直接 indexOf 会跨过几千行检索代码
 const CHATSEG = W.slice(W.indexOf('url.pathname === "/api/wds/chat"'), W.indexOf('url.pathname === "/api/wds/research"'));
-const twSeg = CHATSEG.slice(CHATSEG.indexOf("const tokWant = askLen"), CHATSEG.indexOf("const clk = wdsClock"));
+/* 2026-08-30 难度条：三分支搬到了 tokGrade（定了档就按档给，没定档仍是这三分支），tokWant 从它取。要守的事不变。 */
+const twSeg = CHATSEG.slice(CHATSEG.indexOf("const tokGrade = "), CHATSEG.indexOf("const clk = wdsClock"));
 const mt = twSeg.match(/deep \? (\d+) : \(tool \? (\d+) : (\d+)\)/);
-ok(!!mt, "chat 的 max_tokens 三分支存在（深度/工序/闲聊）");
+ok(!!mt && /const tokWant = askLen[\s\S]{0,300}?tokGrade\)\)/.test(twSeg), "chat 的 max_tokens 三分支存在（深度/工序/闲聊）且 tokWant 从它取");
 ok(mt && +mt[1] <= 8000, "满功率档 ≤ 8000（这是硬约束不是可调参数），实得 " + (mt ? mt[1] : "?"));
 ok(mt && +mt[2] > +mt[3] && +mt[2] <= 12000, "工序档比闲聊宽但仍有界，实得 " + (mt ? mt[2] + " vs " + mt[3] : "?"));
+{ const kn = W.match(/tok: (\d+), method/g) || []; ok(kn.length === 6 && kn.every((x) => +x.match(/\d+/)[0] <= 8000), "难度条五档的预算也都 ≤ 8000（" + kn.map((x) => x.match(/\d+/)[0]).join("/") + "）"); }
 const bigs = (twSeg.match(/\b(\d{4,6})\b/g) || []).map(Number).filter((n) => n > 8000 && n !== 32000);
 ok(bigs.length === 0, "tokWant 段里没有 8000 以上的裸预算（32000 是长文档档的天花板，另有出处），实得 " + bigs.join("/"));
 

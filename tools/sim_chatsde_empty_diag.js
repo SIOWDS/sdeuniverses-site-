@@ -135,8 +135,11 @@ ok(/const CHAT_FIRST_DEEP_MS = (\d+), CHAT_TOTAL_DEEP_MS = (\d+);/.test(W), "深
   ok(d1 && +d1[2] > +d1[1], "深度档总时长大于它自己的首帧护栏（相等＝首帧一到就没时间写）");
   ok(d1 && s2 && +d1[2] > +s2[1], "深度档总时长也比标准档宽");
 }
-/* 2026-08-29 改落点不删：产线道次（rsLong）的总时长在外层再包一档 FORGE_TOTAL_MS；deep 分档与长篇最长照旧。 */
-ok(/const clk = wdsClock\(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,\s*\n\s*(?:rsLong \? FORGE_TOTAL_MS : \()?askLen \? CHAT_TOTAL_LONG_MS : \(deep \? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS\)\)?\);/.test(chatSeg),
+/* 2026-08-29 改落点不删：产线道次（rsLong）的总时长在外层再包一档 FORGE_TOTAL_MS；deep 分档与长篇最长照旧。
+   2026-08-30 难度条：首帧／总时长先经 gFirst/gTotal（定了档就按档、没定档仍是 deep 分档），要守的事不变。 */
+ok(/const gFirst = G\.on \? gK\.first : \(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS\);/.test(chatSeg)
+  && /const gTotal = G\.on \? gK\.total : \(deep \? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS\);/.test(chatSeg)
+  && /const clk = wdsClock\(gFirst,\s*\n\s*rsLong \? FORGE_TOTAL_MS : \(askLen \? CHAT_TOTAL_LONG_MS : gTotal\)\);/.test(chatSeg),
   "chat 的主时钟真按 deep 分档，且长篇请求的总时长仍最长（产线道次另有一档更长的）");
 ok(!/const clk = wdsClock\(CHAT_FIRST_MS, askLen/.test(chatSeg), "没退回不分档的老写法");
 {
@@ -160,7 +163,7 @@ ok(/t: "note"/.test(chatSeg.slice(chatSeg.indexOf("let _nof2"), chatSeg.indexOf(
 ok(!/_nof2[\s\S]{0,400}ac\.abort|_nof2[\s\S]{0,400}clk\.signal/.test(chatSeg), "第二段没碰 abort");
 ok((chatSeg.match(/clearTimeout\(_nof2\)/g) || []).length === 3,
   "两段看门狗一起撤（首帧两处＋收流后），实得 " + (chatSeg.match(/clearTimeout\(_nof2\)/g) || []).length);
-ok(/切到「标准」档重问/.test(chatSeg), "报信给出出路（切标准档），不是只报一个坏消息");
+ok(/切到「标准」档/.test(chatSeg) && /重问/.test(chatSeg), "报信给出出路（切标准档），不是只报一个坏消息");
 
 console.log("⑨ 基底代号认不出时不许静默换一家（2026-08-19）");
 /* wdsVendorOf 认不出就退回 zhipu ⇒ DeepSeek 的 Key 被发去智谱、401，

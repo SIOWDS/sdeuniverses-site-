@@ -563,8 +563,10 @@ run(full, "沉默如何被生产", "Bourdieu 1977 说过").then((r) => {
       /449 秒/.test(W) && /130 秒墙/.test(W) && /FORGE_STAGE_TOK/.test(W));
     ok("★★ rsLong＝学科通融或 SDE 深度研究（自由拆题的研究产线不在内）",
       /^\s+const rsLong = !!\(rs && \(rs\.forge \|\| rs\.sde\)\);$/m.test(chatSeg));
+    /* 2026-08-30 难度条：普通问答那一支改从 tokGrade 取（定了档按档、没定档仍是 deep?6000:(tool?4000:2600)），产线一字没动。 */
     ok("★★ 预算：产线道次取 FORGE_STAGE_TOK，普通问答与自由研究一个字没变",
-      /:\s*\(rsLong \? FORGE_STAGE_TOK : \(rs \? \(deep \? 6000 : 4000\) : \(deep \? 6000 : \(tool \? 4000 : 2600\)\)\)\)/.test(chatSeg)
+      /:\s*\(rsLong \? FORGE_STAGE_TOK : \(rs \? \(deep \? 6000 : 4000\) : tokGrade\)\)/.test(chatSeg)
+      && /const tokGrade = G\.on \? Math\.max\(gK\.tok, tool \? 4000 : 0\) : \(deep \? 6000 : \(tool \? 4000 : 2600\)\);/.test(chatSeg)
       && !/\n\s+: \(rs \? \(deep \? 6000 : 4000\)/.test(chatSeg));
     ok("★★ 产线道次的上游调用走 wdsFetchMax（上游以 max_tokens 相关 400 拒收就降一档，不会整道断掉）",
       /upstream = rsLong\s*\n\s*\? await wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal, false, undefined, rsPlain\)/.test(chatSeg));   // 2026-08-29 末位加了 rsPlain（成文三段首发关思考），改落点不删
@@ -573,9 +575,10 @@ run(full, "沉默如何被生产", "Bourdieu 1977 说过").then((r) => {
       && /max\[_ \]\?tokens\|max\[_ \]\?completion/.test(W));
     ok("普通问答那一发仍是原来的 fetch（max_tokens: tokWant）", /: await fetch\(VC\.url, \{ method: "POST"[^\n]*max_tokens: tokWant, messages \}\)\), signal: clk\.signal \}\);/.test(chatSeg));
     ok("★★ 总时长：产线道次走 FORGE_TOTAL_MS，长篇与深度档的账照旧",
-      /rsLong \? FORGE_TOTAL_MS : \(askLen \? CHAT_TOTAL_LONG_MS : \(deep \? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS\)\)\);/.test(chatSeg));
+      /rsLong \? FORGE_TOTAL_MS : \(askLen \? CHAT_TOTAL_LONG_MS : gTotal\)\);/.test(chatSeg)
+      && /const gTotal = G\.on \? gK\.total : \(deep \? CHAT_TOTAL_DEEP_MS : CHAT_TOTAL_MS\);/.test(chatSeg));
     ok("首帧闸没跟着放宽（仍按档给：首帧一到就撤，放宽它只会让卡死的更晚被发现）",
-      /const clk = wdsClock\(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS,/.test(chatSeg));
+      /const clk = wdsClock\(gFirst,/.test(chatSeg) && /const gFirst = G\.on \? gK\.first : \(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS\);/.test(chatSeg));
     ok("★★ 关思考重答：产线道次不压预算（压到 3000 等于砍掉正文），普通问答照旧压",
       /const tok2 = \(askLen \|\| rsLong\) \? tokWant : Math\.min\(tokWant, 3000\);/.test(chatSeg));
     ok("★★ 关思考重答的总时长：产线道次同主道，普通问答仍是重答那套",

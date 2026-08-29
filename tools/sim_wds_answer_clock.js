@@ -18,7 +18,9 @@ const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (F++, console.log
 /* ── ① 词表扩展：卸满功率 + 短截止（行为实测，不是 grep） ── */
 console.log("\n[一] 词表扩展是配菜，不许占答题的时钟");
 {
-  const seg = src.slice(src.indexOf("function wdsTopBody"), src.indexOf("// 五家基底"));
+  /* 2026-08-29 起 wdsTopBody 第一行调 wdsMiniSplit（MiniMax 的 reasoning_split），抠段起点若仍是
+     wdsTopBody，装起来当场 ReferenceError、整份 sim 崩掉（会崩的护栏比会红的坏得多）。起点前移到 wdsMiniSplit。 */
+  const seg = src.slice(src.indexOf("function wdsMiniSplit"), src.indexOf("// 五家基底"));
   const box = new Function(seg + "\nreturn { wdsTopBody };")();
   const top = { url: "https://api.deepseek.com/v1/chat/completions", model: "m", name: "n", top: 1 };
   const asTop = box.wdsTopBody(top, { model: "m" });
