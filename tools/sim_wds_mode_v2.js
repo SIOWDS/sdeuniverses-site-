@@ -341,7 +341,7 @@ inEl.value = "什么是特征纠缠？";
 sendEl.click();
 ok(!!document.body.querySelector(".kin"), "弹出 Key 面板");
 const kp = document.body.children[document.body.children.length - 1];
-ok(kp.querySelectorAll(".kv").length === 5, "设置面板列出五家基底，实得 " + kp.querySelectorAll(".kv").length);
+ok(kp.querySelectorAll(".kv").length === 6, "设置面板列出六条基底身份（含 MiniMax 国内/国际两条），实得 " + kp.querySelectorAll(".kv").length);
 ok(!!kp.querySelector(".kmod"), "有型号覆盖输入框");
 ok(!!kp.querySelector(".ktest"), "有连通测试按钮");
 kp.querySelectorAll(".kv").find((b) => b.getAttribute("data-v") === "glm").click();
@@ -668,7 +668,7 @@ console.log("⑧ 成文（distill）");
   layer.querySelector(".wdsm-keybtn").click();
   const kp2 = document.body.children[document.body.children.length - 1];
   const vBtns = kp2.querySelectorAll(".kv");
-  ok(vBtns.map((b) => b.getAttribute("data-v")).join(",") === "ds,glm,kimi,qwen,mm", "五家短码齐全且有序");
+  ok(vBtns.map((b) => b.getAttribute("data-v")).join(",") === "ds,glm,kimi,qwen,mm,mmcn", "六条短码齐全且有序（MiniMax 国内 mmcn 排在国际 mm 之后）");
   ok(vBtns.find((b) => b.getAttribute("data-v") === "glm").textContent.indexOf("✓") > 0, "已填 Key 的那家打了勾");
   vBtns.find((b) => b.getAttribute("data-v") === "kimi").click();
   const kp2b = document.body.children[document.body.children.length - 1];
@@ -811,8 +811,8 @@ console.log("⑧ 成文（distill）");
   mp.click();
   const vMm = document.body.querySelector(".wdsm-menu");
   ok(!!vMm, "模型菜单弹出");
-  ok(vMm.querySelectorAll("button").filter((b) => /DeepSeek|智谱|Kimi|千问|MiniMax/.test(b.textContent)).length === 5,
-     "菜单里五家基底俱在");
+  ok(vMm.querySelectorAll("button").filter((b) => /DeepSeek|智谱|Kimi|千问|MiniMax/.test(b.textContent)).length === 6,
+     "菜单里六条基底身份俱在（国际/国内 MiniMax 各一条，都命中 /MiniMax/）");
   vMm.querySelectorAll("button").find((b) => b.textContent.trim().endsWith("深度")).click();
   ok(store["sde_wds_thinkmode"] === "deep" && mp.textContent.includes("深度"), "在顶栏就地切到深度档并回显");
   mp.click();

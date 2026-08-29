@@ -335,7 +335,7 @@ export class VisitCounter {
 // ⚠️ kimi 深度档一度写成 kimi-k3 —— Kimi 平台的模型表里**没有**这个名字（2026-07-31 实查：
 //    现存 kimi-k2.7-code / kimi-k2.7-code-highspeed / kimi-k2.6 / kimi-k2.5；下线的是 kimi-k2-*-preview 那一批）。
 //    发一个不存在的型号＝这家深度档一直在 400。改回 k2.6（Kimi 自己标的"迄今最智能"）。
-const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3" };
+const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3" };
 function wdsTopVC(vd) {
   const base = WDS_VENDORS[vd];
   return { url: base.url, model: WDS_TOP_MODEL[vd] || base.model, name: base.name, top: 1 };
@@ -529,12 +529,19 @@ function wdsTopBody(VC, body) {
 // 五家基底。全部走各自的 OpenAI 兼容 chat/completions，由 Worker 服务端转发（不是浏览器直连，所以无 CORS 问题）。
 // ⚠️ 型号会过时：各家改名/下线的节奏比本站快得多，所以读者可在设置里覆盖 model（见 wdsPickModel），
 //    真过时了不必等改代码。默认值核对于 2026-07-28。
+/* MiniMax 国内／国际是两套完全独立的账号体系——域名不同（api.minimax.io ／ api.minimaxi.com，
+   多一个 i，不是同一个站点的子路径），Key 不互通（国内 Key 打国际域名、国际 Key 打国内域名都是
+   认证失败，不是限流也不是型号错）。2026-08-29 之前站上只接了国际这一条，国内用户的 Key 一把都用不了。
+   模型名两边一致（MiniMax-M3／M2.7 等，官方文档同名），只有 url／申请入口不同，所以按「另一个
+   基底身份」接（短码 mmcn），不是给 minimax 那一条加分支——两边独立缓存心得、独立存 Key，
+   互不覆盖，也互不依赖对方是否配置过。 */
 const WDS_VENDORS = {
   deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-flash", name: "DeepSeek", apply: "platform.deepseek.com" },
   zhipu: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5-air", name: "\u667a\u8c31 GLM", apply: "open.bigmodel.cn" },
   kimi: { url: "https://api.moonshot.cn/v1/chat/completions", model: "kimi-k2.6", name: "Kimi", apply: "platform.moonshot.cn" },
   qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen", apply: "bailian.console.aliyun.com" },
   minimax: { url: "https://api.minimax.io/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax", apply: "platform.minimax.io" },
+  minimax_cn: { url: "https://api.minimaxi.com/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax\uff08\u56fd\u5185\uff09", apply: "platform.minimaxi.com" },
 };
 // ── 看图（视觉档）。**只有这三家**在本站的转发口径下能直接吃图；DeepSeek / MiniMax 走不了，
 //    读者选了它们又传图，我们如实说一句「这家看不了图」，绝不拿 OCR 出来的字冒充"它看过了"。
@@ -1492,9 +1499,9 @@ function wdsPickImgs(list) {
    于是一把好端端的 DeepSeek Key 被发去智谱、上游回 401，而我们告诉读者「你的 Key 用不了」。
    2026-08-19 我自己写探针时就栽在这上面，查了二十分钟才发现是发错了家。
    读者的前端只发短名，但任何别处调这个接口的人都会先想到全名。 */
-const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax",
-  deepseek: "deepseek", zhipu: "zhipu", glm5: "zhipu", moonshot: "kimi", minimax: "minimax", qwen3: "qwen" };
-const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm" };
+const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax", mmcn: "minimax_cn",
+  deepseek: "deepseek", zhipu: "zhipu", glm5: "zhipu", moonshot: "kimi", minimax: "minimax", minimax_cn: "minimax_cn", qwen3: "qwen" };
+const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm", minimax_cn: "mmcn" };
 // LONG_ASK：读者这一问要的是"答一段话"还是"写一篇"？两者对预算与口径的要求完全不同。
 // 不识别它，就会出现最难看的那种失败：读者写"先写 8000 字"，而我们给的 max_tokens 是 8000（约等于 8000 汉字的极限），
 // 同时 system 里还写着"一次两三段以内、别写论文"——两条指令互相打架，基底就在思考里反复权衡、
@@ -14628,6 +14635,7 @@ export default {
         "https://api.anthropic.com/",
         "https://generativelanguage.googleapis.com/",
         "https://api.minimaxi.com/",
+        "https://api.minimax.io/",
       ];
       // Azure 语音合成端点：<region>.tts.speech.microsoft.com（TTS 音频，走同一转发通道，BYOK）
       const azureTts = /^https:\/\/[a-z0-9-]+\.tts\.speech\.microsoft\.com\//i.test(target);

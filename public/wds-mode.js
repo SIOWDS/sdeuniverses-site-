@@ -3895,13 +3895,17 @@
   }
 
   /* ── 五家基底。短码与后端 WDS_VMAP 对齐；Key 按家分存，互不覆盖。
-     ds/glm 沿用旧键名（金点子发生器等其它工具也读这两个），新三家另起键名。 ── */
+     ds/glm 沿用旧键名（金点子发生器等其它工具也读这两个），新三家另起键名。
+     mmcn（MiniMax 国内）2026-08-29 加：域名（api.minimaxi.com，比国际多一个 i）与账号
+     体系跟国际站完全独立，Key 不互通，所以按「另一条基底身份」接，不是给 mm 加个开关——
+     那样切换时要连 Key／型号覆盖／心得缓存一起清，比单独一条身份更容易出错。 ── */
   var VENDORS = [
     { v: "ds", name: "DeepSeek", ks: "sde_ds_key", apply: "https://platform.deepseek.com" },
     { v: "glm", name: "智谱 GLM", ks: "sde_glm_key", apply: "https://open.bigmodel.cn" },
     { v: "kimi", name: "Kimi", ks: "sde_kimi_key", apply: "https://platform.moonshot.cn" },
     { v: "qwen", name: "千问 Qwen", ks: "sde_qwen_key", apply: "https://bailian.console.aliyun.com" },
     { v: "mm", name: "MiniMax", ks: "sde_mm_key", apply: "https://platform.minimax.io" },
+    { v: "mmcn", name: "MiniMax（国内）", ks: "sde_mmcn_key", apply: "https://platform.minimaxi.com" },
   ];
   function vinfo(v) { for (var i = 0; i < VENDORS.length; i++) if (VENDORS[i].v === v) return VENDORS[i]; return VENDORS[0]; }
   function vkeyGet(v) { try { return (localStorage.getItem(vinfo(v).ks) || "").trim(); } catch (e) { return ""; } }
@@ -8674,7 +8678,7 @@
     return menu;
   }
 
-  /* ════════════════ 顶栏模型选择器：五家 × 标准/深度 就地可切 ════════════════ */
+  /* ════════════════ 顶栏模型选择器：VENDORS 全量 × 标准/深度 就地可切 ════════════════ */
   var mpEl = layer.querySelector(".wdsm-mp");
   // 标签用 JS 建子节点（不靠 innerHTML 里的嵌套）——顺手也让桩环境取得到，
   // 桩的 innerHTML 是扁平解析，嵌套 span 在那里读不出来。
