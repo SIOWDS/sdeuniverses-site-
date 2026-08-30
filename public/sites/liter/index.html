@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SDE 文学 · 斐索（秦莉）</title>
-<meta name="description" content="SDE 文学：三台智能体（ChatFeiSuo · SDE 文学共创 · SDE 文学共读）与一份经典文本板块——长篇《狮城荣耀》、诗、散文随笔、批评，与四十二篇文学发生学论文。斐索（秦莉）主持，SDE Universes 子平台。">
+<meta name="description" content="SDE 文学：三台智能体、小说、诗、批评与文学发生学论文。开放文学爱好者作者专栏，作品创新智商达到 120–135 即可投稿。斐索（秦莉）主持。">
 <link rel="canonical" href="https://liter.sdeuniverses.com/">
 <meta property="og:title" content="SDE 文学 · 斐索（秦莉）">
-<meta property="og:description" content="每一项都合格了，为什么这一句还是不动人？三台智能体，一份文本。">
+<meta property="og:description" content="每一项都合格了，为什么这一句还是不动人？开放作者专栏，文学爱好者创新智商达到 120–135 即可投稿。">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#07120F">
 <style>
@@ -164,6 +164,41 @@ a.bot:hover{background:#fff}
 .plat p:last-child{margin-bottom:0}
 .plat b{color:var(--ink)}
 .plat a{color:var(--cinnabar);border-bottom:1px solid var(--rule)}
+
+/* 作者专栏 · 面向文学爱好者的投稿入口 */
+.contributors{display:grid;grid-template-columns:minmax(240px,.78fr) 1.22fr;gap:24px;margin-top:28px}
+.contrib-call{position:relative;overflow:hidden;padding:30px;border-radius:24px;color:#FFF4DC;
+  background:
+    radial-gradient(circle at 92% 8%,rgba(219,112,136,.25),transparent 16rem),
+    radial-gradient(circle at 0 100%,rgba(111,198,165,.20),transparent 18rem),
+    linear-gradient(145deg,#081511,#18251F);box-shadow:0 18px 42px rgba(7,18,15,.18)}
+.contrib-call:before{content:"作";position:absolute;right:7px;top:-24px;font-size:145px;line-height:1;
+  color:rgba(255,244,220,.045)}
+.contrib-call .ey{font-family:var(--mono);font-size:10px;letter-spacing:.23em;color:var(--moon)}
+.contrib-call h3{position:relative;font-size:27px;line-height:1.5;letter-spacing:.11em;margin:14px 0 12px;font-weight:500}
+.contrib-call p{position:relative;margin:0;color:rgba(255,244,220,.68);font-family:var(--sans);font-size:13.5px;line-height:1.9}
+.iq-door{position:relative;display:flex;align-items:center;gap:16px;margin:26px 0 18px;padding:16px 0;
+  border-top:1px solid rgba(244,211,138,.22);border-bottom:1px solid rgba(244,211,138,.22)}
+.iq-door b{font-family:Georgia,"Times New Roman",serif;font-size:44px;line-height:1;color:var(--moon);font-weight:400}
+.iq-door span{font-family:var(--sans);font-size:12px;line-height:1.65;color:rgba(255,244,220,.72)}
+.contrib-body{padding:4px 2px}
+.contrib-body>p{margin:0 0 18px;font-family:var(--sans);font-size:14.5px;color:var(--ink2);line-height:1.95}
+.iq-bands{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.iq-band{padding:16px 14px;border-right:1px solid var(--rule2)}.iq-band:last-child{border-right:0}
+.iq-band b{display:block;font-family:var(--mono);font-size:16px;color:var(--cinnabar);letter-spacing:.08em}
+.iq-band span{display:block;margin-top:5px;font-family:var(--sans);font-size:12.5px;line-height:1.7;color:var(--ink2)}
+.submit-steps{counter-reset:submit;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px}
+.submit-step{position:relative;padding-left:34px;font-family:var(--sans);font-size:13px;line-height:1.75;color:var(--ink2)}
+.submit-step:before{counter-increment:submit;content:counter(submit);position:absolute;left:0;top:1px;width:23px;height:23px;
+  display:grid;place-items:center;border:1px solid rgba(158,61,48,.34);border-radius:50%;font-family:var(--mono);font-size:10px;color:var(--cinnabar)}
+.submit-step b{display:block;color:var(--ink);font-family:var(--serif);font-size:15px;letter-spacing:.08em}
+.submit-note{margin-top:22px;padding:14px 16px;border-left:2px solid var(--cinnabar);background:rgba(158,61,48,.045);
+  font-family:var(--sans);font-size:12.8px;line-height:1.8;color:var(--ink2)}
+.contrib-cta{display:inline-block;margin-top:18px;padding:10px 18px;border-radius:999px;color:#FFF8E7;
+  background:linear-gradient(135deg,var(--cinnabar),#7E3028);font-family:var(--sans);font-size:13px;letter-spacing:.06em;
+  box-shadow:0 8px 20px rgba(126,48,40,.18)}
+.contrib-cta:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(126,48,40,.24)}
+@media(max-width:820px){.contributors{grid-template-columns:1fr}.submit-steps{grid-template-columns:1fr}.iq-bands{grid-template-columns:1fr}.iq-band{border-right:0;border-bottom:1px solid var(--rule2)}.iq-band:last-child{border-bottom:0}}
 
 /* 母站精选 · 艺术与文学基础文库 */
 .foundation-intro{display:grid;grid-template-columns:minmax(220px,.72fr) 1.28fr;gap:26px;margin-top:26px}
@@ -358,6 +393,7 @@ section:before{content:"";position:absolute;inset:0 0 auto;height:5px;opacity:.7
   background:linear-gradient(90deg,var(--jade),var(--moon),var(--rose),var(--violet))}
 #texts:before{background:linear-gradient(90deg,var(--rose),var(--moon),var(--jade))}
 #foundation:before{background:linear-gradient(90deg,var(--moon),var(--jade),var(--violet),var(--rose))}
+#contributors:before{background:linear-gradient(90deg,var(--jade),var(--rose),var(--moon))}
 #host:before{background:linear-gradient(90deg,var(--violet),var(--rose),var(--moon))}
 #platform:before{background:linear-gradient(90deg,var(--moon),var(--jade),var(--sky))}
 .hd{position:relative;border-bottom:0;padding-bottom:13px}
@@ -466,6 +502,7 @@ footer a{color:var(--moon)}a:focus-visible{outline-color:var(--rose)}
     <a href="/foundation/">基础文库</a>
     <a href="/#texts">文本</a>
     <a href="/dialogue/">对谈</a>
+    <a href="/#contributors">作者投稿</a>
     <a href="/#host">主持人</a>
     <a href="/all/">全部篇目</a>
     <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
@@ -732,8 +769,36 @@ footer a{color:var(--moon)}a:focus-visible{outline-color:var(--rose)}
   <a class="mo" href="/all/#existence">十六篇详目与摘要 →</a>
 </section>
 
+<section id="contributors">
+  <div class="hd"><span class="no">栏 三</span><h2>作　者　专　栏</h2><span class="ct">文学爱好者投稿 · 创新智商 120–135</span></div>
+  <p class="lead">这里不以职业、学历、名气或发表经历为门槛。只要作品形成了可以辨认的新视角、新叙事或新审美经验，经评估达到 120–135 分，就可以进入作者专栏。</p>
+  <div class="contributors">
+    <div class="contrib-call">
+      <div class="ey">OPEN CALL · WRITERS' COLUMNS</div>
+      <h3>文学爱好者，<br>也可以拥有自己的专栏</h3>
+      <div class="iq-door"><b>120</b><span>基本入栏线<br>不要求达到 150 分以上的理论创新强度</span></div>
+      <p>小说、诗歌、散文、文学评论、戏剧文本与跨媒介写作均可。本站看的是作品有没有真正生成一点此前没有的东西，而不是作者已有多少头衔。</p>
+    </div>
+    <div class="contrib-body">
+      <p><b>创新智商不是文笔分，也不是影响力分。</b>它衡量的是作品是否显露了一个新的文学对象，是否与常见写法拉开真实差异，以及形式、经验与意义是否已经长成一个不可随意替换的整体。</p>
+      <div class="iq-bands" aria-label="作者专栏创新智商区间说明">
+        <div class="iq-band"><b>120–124</b><span>已有明确新意，能够从熟悉题材与惯常表达中拉开一条可辨认的差异。</span></div>
+        <div class="iq-band"><b>125–129</b><span>形成稳定的个人视角或叙事结构，作品离开解释后仍能独立成立。</span></div>
+        <div class="iq-band"><b>130–135</b><span>具有清晰原创判断与个人语言，并显出继续形成系列作品的潜力。</span></div>
+      </div>
+      <div class="submit-steps">
+        <div class="submit-step"><b>交完整稿</b>附作品题目、体裁、作者简介与联系方式；Word、PDF 均可。</div>
+        <div class="submit-step"><b>进入评估</b>按文学作品的发生性新意进行评估；达到 120–135 即可入栏。</div>
+        <div class="submit-step"><b>建立专栏</b>入选作品署作者本名或笔名，归入独立作者页并持续累积作品。</div>
+      </div>
+      <div class="submit-note">来稿须为原创或已获得转载授权；如使用 AI 协助，请简要说明使用环节，但 AI 使用本身不构成拒稿理由。申请表备注请写“文学子站 · 作者专栏投稿”。</div>
+      <a class="contrib-cta" href="https://sdeuniverses.com/register/">进入投稿申请入口 →</a>
+    </div>
+  </div>
+</section>
+
 <section id="host">
-  <div class="hd"><span class="no">栏 三</span><h2>主　持　人</h2></div>
+  <div class="hd"><span class="no">栏 四</span><h2>主　持　人</h2></div>
   <div class="host">
     <img src="/students/qin-li/qin-li.jpg" alt="秦莉" loading="lazy">
     <div>
@@ -746,7 +811,7 @@ footer a{color:var(--moon)}a:focus-visible{outline-color:var(--rose)}
 </section>
 
 <section id="platform">
-  <div class="hd"><span class="no">栏 四</span><h2>这是一个平台，不是一个文集</h2></div>
+  <div class="hd"><span class="no">栏 五</span><h2>这是一个平台，不是一个文集</h2></div>
   <div class="plat">
     <p>SDE 文学是 <a href="https://sdeuniverses.com/">SDE Universes</a> 的<b>垂直思想创新子平台</b>。它与主站共用同一套生产方法与同一条评分通道：一个判断要在这里立住，得先经过敌意拓宽（谁已经站在这个位置上）、可裁决预测（哪一种结果会推翻它），以及独立盲评。</p>
     <p>它做的不是把文学理论已有的结论讲得更好懂，而是<b>生产此前不存在的文学判断</b>——给一个还没有名目的东西起名，给它可以被核对的条件，再把它交给能推翻它的证据。做法的通俗讲解见 <a href="https://sdeuniverses.com/confluence/confluence-method/">《SDE 多学科通融创新法》</a>。</p>
