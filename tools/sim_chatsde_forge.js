@@ -591,7 +591,7 @@ run(full, "沉默如何被生产", "Bourdieu 1977 说过").then((r) => {
   /* 前端：学科通融先程序判断稿，再看闸门。拿源码里那一行的 IIFE 原样跑，不另抄一份。 */
   {
     /* 2026-08-30：研究产线那一支加了道次专判（sdePipe ? rsJudgeSde : rsJudge）并换了行，学科通融的 IIFE 一字未动——改落点不删 */
-    const jl = STEP.match(/var g = fg \? (\(function \(\) \{[^\n]*\}\)\(\))\s*\n\s*: \(sdePipe \? rsJudgeSde\(i \+ 1, txt, RS\.lastMeta\) : rsJudge\(txt, RS\.lastMeta\)\);/);
+    const jl = STEP.match(/var g = fg \? (\(function \(\) \{[^\n]*\}\)\(\))\s*\n\s*: \(sdePipe \? rsJudgeSde\(i \+ 1, txt, RS\.lastMeta, secs\) : rsJudge\(txt, RS\.lastMeta\)\);/);   // 2026-08-30 晚：研究那一支再递 secs（逐字核对推翻材料），学科通融 IIFE 仍一字未动
     ok("★★ 学科通融的判决行：先 rsJudge 再 forgeGate（程序判不出问题的才轮到闸门）",
       !!jl && /rsJudge\(txt, RS\.lastMeta\)/.test(jl[1]) && /forgeGate\(txt\)/.test(jl[1]) && /j\.d === "passed" \? forgeGate/.test(jl[1]));
     ok("★ 旧写法（只看闸门）已不在", !/var g = fg \? forgeGate\(txt\) : rsJudge/.test(STEP));

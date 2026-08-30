@@ -48,7 +48,7 @@ ok("抠得到常量与函数", parts.every((p) => p && p.length > 20), parts.map
     const rBad = await box2.resWebSearch({}, "题", 3, "");
     ok("全失败时 ok=false 且带原因（need_search_key）", rBad.ok === false && rBad.reason === "need_search_key" && rBad.items.length === 0);
     ok("空题目不查", (await box.resWebSearch({}, "", 1, "k")).ok === false);
-    ok("六道里除第 6 道外都配了后缀（第 6 道由敌意近邻链接管；7–10 道已并进出论文）", [1, 2, 3, 4, 5].every((i) => (box.RES_WEB_SUFFIX[i] || []).length >= 1) && !box.RES_WEB_SUFFIX[6] && !box.RES_WEB_SUFFIX[7] && !box.RES_WEB_SUFFIX[10]);
+    ok("前五道都配了后缀（第 6 道与第 7 道判官由敌意近邻链接管；原 7–10 道已并进出论文）", [1, 2, 3, 4, 5].every((i) => (box.RES_WEB_SUFFIX[i] || []).length >= 1) && !box.RES_WEB_SUFFIX[6] && !box.RES_WEB_SUFFIX[7] && !box.RES_WEB_SUFFIX[10]);
   }
 
   console.log("\n二、/api/wds/rag 白名单");
@@ -73,7 +73,7 @@ ok("抠得到常量与函数", parts.every((p) => p && p.length > 20), parts.map
   ok("webBlock 的封顶可传，不传仍是 9000", /function webBlock\(items, max\) \{[\s\S]{0,200}?const cap = max \|\| 9000;/.test(SRC));
   ok("出处条数：研究道次 16 篇，其余照难度条／老账", /sources = sources\.slice\(0, resFull \? RES_RAG\.srcn : \(G\.on \? gK\.src : \(deep \? 10 : 6\)\)\);/.test(CHAT));
   ok("站内与站外各发一条读数 note（查的是题目、查到多少）", /🔎 满血站内检索 · 题目「/.test(CHAT) && /🌐 站外寻找 · /.test(CHAT));
-  ok("第 6 道仍走敌意近邻链（wantNbr 在 wantWeb 之前）", CHAT.indexOf("if (wantNbrG) {") > 0 && CHAT.indexOf("if (wantNbrG) {") < CHAT.indexOf("} else if (wantWeb) {") && /const RES_NBR_STAGES = \{ 6: 1 \};/.test(SRC));   // 2026-08-30：Z 种子那一趟挪到出论文（第 8 道已并进去），研究里只剩第 6 道走链
+  ok("第 6、7 道走敌意近邻链（wantNbr 在 wantWeb 之前）", CHAT.indexOf("if (wantNbrG) {") > 0 && CHAT.indexOf("if (wantNbrG) {") < CHAT.indexOf("} else if (wantWeb) {") && /const RES_NBR_STAGES = \{ 6: 1, 7: 1 \};/.test(SRC));   // 2026-08-30：第 7 道判官也走链（种子＝Z）
   ok("用户消息仍是这一道的工序标题（q），只有检索换了题目", /const uText = q \+ UMEM/.test(CHAT));
 
   console.log("\n四、前端");

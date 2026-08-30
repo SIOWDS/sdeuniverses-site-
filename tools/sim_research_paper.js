@@ -74,7 +74,7 @@ console.log("①之二 出论文的近邻链种子＝第六道的 Z");
   ok(/const _seed = \(kind === "rpaper" && RSRC && _rpZ\) \? _rpZ : String\(_t0\.text \|\| b\.title \|\| ""\)\.trim\(\);/.test(W), "distNbrGet：研究论文档以 Z 为种子，抠不到才退回题目");
   ok(/出论文：按十节学术体例展开/.test(W) && /占位者检索以第六道命名的「" \+ _rpZ \+ "」为种子/.test(W) && /只能退回拿题目当种子——划界节按〔未核验〕写/.test(W), "提纲那趟当场说：十节体例、承重、种子是 Z 还是题目");
   ok(/以第六道命名的判断为种子查的/.test(m6.RPAPER_HEAD) && /研究里没有单独的大纲、可证伪、总结、参考文献道次——它们由本篇自己写/.test(m6.RPAPER_HEAD), "专属头写明：近邻块以 Z 为种子；大纲／证伪／总结／参考文献由论文自己写");
-  ok(!/第七道|第八道|第九道|第十道|十道产出/.test(m6.RPAPER_HEAD) && R.every((x) => !/第七道|第八道|第九道|第十道/.test(x.ask)), "专属头与各节规程里不再提第七～十道");
+  ok(!/第八道|第九道|第十道|十道产出/.test(m6.RPAPER_HEAD) && /第七道判官的复核/.test(m6.RPAPER_HEAD) && R.every((x) => !/第八道|第九道|第十道/.test(x.ask)), "专属头与各节规程里不再提第八～十道；第七道现在是判官");
   ok(/2×2/.test(R[6].ask) && /轮次时间轴/.test(R[6].ask) && /归属迁移矩阵/.test(R[6].ask) && /若……则本文主张不成立/.test(R[6].ask) && /什么不算命中/.test(R[6].ask), "证伪节自己立证伪条件与赌注，装置按题型三选");
 }
 
@@ -82,12 +82,12 @@ console.log("② 材料按节取（真跑）");
 const feed = grab(W, "const RPAPER_NEEDS = {", "function wdsSdeResearchSys");
 const fm = new Function(feed + "\nreturn { RPAPER_NEEDS, rpaperSource, rpaperPack };")();
 ok(Object.keys(fm.RPAPER_NEEDS).length === 11 && [0,1,2,3,4,5,6,7,8,9,10].every((k) => Array.isArray(fm.RPAPER_NEEDS[k]) && fm.RPAPER_NEEDS[k].length), "依赖表覆盖提纲＋十节");
-ok(Object.values(fm.RPAPER_NEEDS).every((a) => a.every((k) => k >= 1 && k <= 6)), "依赖表只指向 1–6 道（7–10 道已不存在，指了就是空取）");
+ok(Object.values(fm.RPAPER_NEEDS).every((a) => a.every((k) => k >= 1 && k <= 7)) && [0, 3, 6, 7, 9].every((k) => fm.RPAPER_NEEDS[k].indexOf(7) >= 0), "依赖表只指向 1–7 道（原 7–10 道已不存在）；提纲／述评／划界／判据／讨论都读第 7 道判官");
 ok(fm.RPAPER_NEEDS[0][0] === 6 && fm.RPAPER_NEEDS[5][0] === 6 && fm.RPAPER_NEEDS[7][0] === 6 && fm.RPAPER_NEEDS[7].indexOf(1) >= 0, "提纲、核心命题与证伪节都先看第六道（典范）；证伪节读第一道的题型定装置");
-const stages = []; for (let i = 1; i <= 6; i++) stages.push({ i, t: "第" + i + "道", body: ("第" + i + "道正文。").repeat(900) });
+const stages = []; for (let i = 1; i <= 7; i++) stages.push({ i, t: "第" + i + "道", body: ("第" + i + "道正文。").repeat(900) });
 ok(fm.rpaperSource({ topic: "T", stages }, "paper") === null, "rsrc 只在 kind=rpaper 下被认（别的档递上来不认）");
-const src = fm.rpaperSource({ topic: "T", stages: stages.concat([{ i: 7, t: "x", body: "   " }]) }, "rpaper");
-ok(!!src && src.stages.length === 6 && src.turns.length === 7 && src.turns[0].role === "reader", "六道全收、空正文丢掉、合成的 turns 以题目那一条开头");
+const src = fm.rpaperSource({ topic: "T", stages: stages.concat([{ i: 8, t: "x", body: "   " }]) }, "rpaper");
+ok(!!src && src.stages.length === 7 && src.turns.length === 8 && src.turns[0].role === "reader", "六道＋判官全收、空正文丢掉、合成的 turns 以题目那一条开头");
 const big = fm.rpaperSource({ topic: "T", stages: [{ i: 1, t: "a", body: "字".repeat(90000) }] }, "rpaper");
 ok(big.stages[0].body.length === 40000, "单道正文钳到 4 万字");
 const pk5 = fm.rpaperPack(src, 5, 14000);
@@ -95,7 +95,7 @@ ok(pk5.indexOf("第 6 道《") > 0 && pk5.indexOf("第 6 道《") < pk5.indexOf(
 ok(pk5.length <= 14000 + 400, "取料总量守预算（" + pk5.length + "）");
 ok(/此处只带来前 \d+ 字/.test(pk5), "截断当场说明");
 ok(fm.rpaperPack(src, 5, 10000000).indexOf("此处只带来前") < 0, "预算够时一字不截");
-ok(fm.rpaperPack(src, 8, 14000).indexOf("第 2 道《") > 0 && fm.rpaperPack(src, 10, 14000).indexOf("第 6 道《") > 0 && fm.rpaperPack(src, 10, 14000).indexOf("第 10 道《") < 0, "设计与分析取到第二道，结论取第六道（第十道已不存在）");
+ok(fm.rpaperPack(src, 8, 14000).indexOf("第 2 道《") > 0 && fm.rpaperPack(src, 10, 14000).indexOf("第 6 道《") > 0 && fm.rpaperPack(src, 10, 14000).indexOf("第 10 道《") < 0 && fm.rpaperPack(src, 6, 14000).indexOf("第 7 道《") > 0, "设计与分析取到第二道，结论取第六道（第十道已不存在），划界节取到判官");
 ok(/研究工序，不是论文章节/.test(pk5), "每块材料标明「研究工序，不是论文章节」");
 
 console.log("③ 成文机接线");
@@ -107,7 +107,7 @@ ok(/h: \(f\.lock \? f\.h : \(String\(\(hs\[i\] && hs\[i\]\.h\)/.test(W), "合并
 ok(/rag: f\.rag, chk: f\.chk, lock: f\.lock, uses: f\.uses,/.test(W), "distScaleFixed 缩放时旗标跟着走（rag／chk 此前掉在地上）");
 ok(/const convo = RSRC \? rpaperPack\(RSRC, 0, convoMax\)/.test(W), "提纲那趟按第 0 号次序取料");
 ok(/const convoPart = RSRC \? rpaperPack\(RSRC, partIdx \+ 1, convoMaxPart\)/.test(W), "正文各趟按本节依赖表取料");
-ok(/RSRC \? "以下是这次 SDE 深度研究六道工序的产出/.test(W) && /RSRC \? "以下是这次深度研究里与本节最相关的几道产出/.test(W), "两处「以下是这场对话」在研究档改了口");
+ok(/RSRC \? "以下是这次 SDE 深度研究六道工序的产出与第七道判官的复核/.test(W) && /RSRC \? "以下是这次深度研究里与本节最相关的几道产出/.test(W), "两处「以下是这场对话」在研究档改了口");
 const sp = grab(W, 'rpaper: { name: "学术论文（一万字', "\n        report: {");
 ok(/承重命题\*\*＝第六道撞出来的那条判断/.test(sp) && /研究没跑过的检验不得用完成时态/.test(sp) && /约一万汉字/.test(sp) && /研究不另出报告，这篇论文就是全部成品/.test(sp) && !/第八道/.test(sp), "规格写明承重＝第六道判断、完成时态禁令、一万字、论文即全部成品、不再提第八道");
 

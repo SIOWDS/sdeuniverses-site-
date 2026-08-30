@@ -983,7 +983,7 @@
       kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
       kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
       kPaper1: "凝成两万字论文 · 一趟写完", kPaper1S: "照金点子发生器那台已经跑熟的口径：**一次调用出全篇**，十六节体例写进提示语、字数服从内容（18000–22000 字），出 Word 与 PDF。写得快，中途不会停在某一节。",
-      kRpaper: "研究论文 · 一万字（深度研究·出论文）", kRpaperS: "把深度研究的六道产出**按十节学术体例逐节展开**成约一万字的学术论文（每节一趟，规程按《正规学术论文写作规范》；出 Word 与 PDF）。深度研究跑完直接进这一步，不在菜单上",
+      kRpaper: "研究论文 · 一万字（深度研究·出论文）", kRpaperS: "把深度研究的六道产出与判官复核**按十节学术体例逐节展开**成约一万字的学术论文（每节一趟，规程按《正规学术论文写作规范》；出 Word 与 PDF）。深度研究跑完直接进这一步，不在菜单上",
       kPaper: "凝成两万字论文 · 分十六趟", kPaperS: "按《正规学术论文写作规范》十六节投稿体例：结构化中英摘要 · 研究问题 · 文献述评 · 概念界定 · 研究设计与方法 · 分析三节 · 可裁决判据 · 稳健性与证伪 · 效度威胁 · 声明组 · 参考文献与附录，约两万字（出 Word 与 PDF）",
       kSumdoc: "总结载入的文章", kSumdocS: "读完那篇：它在说什么 · 承重句 · 哪里脆 · 没看见什么 · 千字概写（需先载入文章）",
       // 四档创作体（2026-08-22）。与上面几档的分别：那几档要判断立得住，这四档要读得下去。
@@ -1517,12 +1517,13 @@
       cvSegOk: "只改选中的这一段（{n} 字）", cvSegNo: "选中的这一段在源码里定位不到，这一次会改整版——想精确改某一段，先切到「源码」再选。",
       cvNewVer: "改好的已存成第 {n} 版", cvGone: "画布上那一件已经不在了，回稿留在对话里。",
       cvAskPre: "下面这段来自画布《{t}》，请照我的要求改写它，只输出改好的整段、不要解说：",
-      rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "六道工序：背景 → 文献与方法 → 三条基本关系 → 六条生成路径 → 三条动力机制 → 二阶对撞出新判断，然后直接写成一篇约一万字的学术论文（出 Word；不另出研究报告；会用掉十几次额度）",
+      rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "七道工序：背景 → 文献与方法 → 三条基本关系 → 六条生成路径 → 三条动力机制（三份独立读数各押一注）→ 二阶对撞出新判断 → 判官复核（另一趟，压回旧说法，压得回就退回），然后直接写成一篇约一万字的学术论文（出 Word；不另出研究报告；会用掉十几次额度）",
       rsCut1: "这一道没写完（", rsCut2: "）——已停在这里，没有往下跑：断稿传下去，下游会拿着半截材料写得头头是道。",
       rsFailed1: "这一道没跑成（技术故障）：", rsCutEmpty: "一个字都没写出来", rsCutStopped: "你按了停止", rsCutLength: "上游预算顶穿，稿子断在半句", rsCutShort: "只写出 {n} 字",
       rsJ6Dead: "第六道自报作废／停在一阶／只是操作化——没有撞出判断，不能当脊梁往下传", rsJ6NoZ: "第六道没写出「X 不是……而是 Z」那一句——没有判断就没有可撞、可排、可证伪的东西", rsJ6NoPair: "第六道三对只撞了 {n} 对（方程×路径／路径×动力／方程×动力）",
-      rsToPaper: "六道跑完 · 直接出论文（不另出研究报告）", rsPartial: "研究只跑了 {n}/{m} 道，没到二阶碰撞，不出论文——已写完的几道都在。",
-      rsPaperStep: "出论文 · 学术论文（一万字）", rsPaperWait: "六道跑完，正在按十节学术体例逐节写作（每节一趟，几分钟到十几分钟）——成文窗口里可以看着它长出来；写完会回到这里，出一份 Word。",
+      rsToPaper: "七道跑完 · 直接出论文（不另出研究报告）", rsPartial: "研究只跑了 {n}/{m} 道，没过判官，不出论文——已写完的几道都在。",
+      rsJ35NoBet: "这份读数没写「押注：」那一行——不押注的读数撞不出焦点", rsJ6NoPremise: "第六道没写出「结构层前提：」与「内容层前提：」——二阶发生在这一步，没有它撞的是名字", rsJ6QuoteMiss: "第六道「推翻材料：」引的那句在第二～五道原文里逐字找不到——推翻那条前提的材料必须来自上游自己，不能从外面搬", rsJ6NoThreeY: "第六道「判断：」没有写成「不是 Y₁，也不是 Y₂，也不是 Y₃，而是 Z」——少一个 Y 就有一家没被处理", rsJ6NoName: "第六道没有独占一行的「命名：」", rsJ6NoTable: "第六道没有一张真表（辨别装置）——只有一维还是个名字", rsJ6NoCriterion: "第六道没有「判据：」那一行", rsJ6Modal: "第六道「判据：」含情态词（应当／有意义／实质性／充分／真正／恰当／合理）——那是拿去问人的，不是拿去问记录的", rsJ6NoFalsify: "第六道没有「证伪：若…则本判断不成立」", rsJ7NoVerdict: "判官没交出判决行（【判官】passed／return_to_stage:6）", rsJ7Back: "判官判它压得回已有的东西里：",
+      rsPaperStep: "出论文 · 学术论文（一万字）", rsPaperWait: "七道跑完，正在按十节学术体例逐节写作（每节一趟，几分钟到十几分钟）——成文窗口里可以看着它长出来；写完会回到这里，出一份 Word。",
       rsPaperDone: "论文写完 · {n} 字（与研究报告分开，单独一份 Word）", rsPaperFail: "论文这一步没写成：", rsPaperRetry: "重写第 11 步", rsPaperDocx: "⤓ 论文 .docx",
       rsPlan: "正在铺工序…", rsPlanFail: "拆题没成：", rsSteps: "这次研究分 {n} 步", rsCost: "约用掉 {n} 次额度",
       rsStep: "第 {i}/{n} 步", rsDoing: "正在查…", rsDone: "写完", rsFinal: "在下总判断…",
@@ -1665,12 +1666,13 @@
       cvSegOk: "Revising only the selected passage ({n} chars)", cvSegNo: "The selection could not be located in the source, so the whole version will be revised. Switch to Source view to select precisely.",
       cvNewVer: "Saved as version {n}", cvGone: "That canvas item is gone; the reply stayed in the conversation.",
       cvAskPre: "The passage below comes from the canvas \u201c{t}\u201d. Rewrite it as I ask; output the revised passage only, no commentary:",
-      rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Six stages: background → literature & method → three basic relations → six generative paths → three drivers → second-order collision, then straight into a ~10,000-character academic paper (Word export; no separate report; uses a dozen or so turns)",
+      rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Seven stages: background → literature & method → three basic relations → six generative paths → three drivers (three independent readings, each placing a bet) → second-order collision → an independent judge (presses the claim back into existing work; if it fits, back to stage 6), then straight into a ~10,000-character academic paper (Word export; no separate report; uses a dozen or so turns)",
       rsCut1: "This stage did not finish (", rsCut2: ") — stopped here, nothing passed downstream: a truncated stage would be written up fluently on half the material.",
       rsFailed1: "This stage failed (technical): ", rsCutEmpty: "no text came back", rsCutStopped: "you pressed stop", rsCutLength: "the model hit its output budget mid-sentence", rsCutShort: "only {n} characters",
       rsJ6Dead: "Stage 6 declared itself void / first-order / mere operationalisation — no judgment came out, so it cannot be the spine", rsJ6NoZ: "Stage 6 never wrote the 'X is not … but Z' sentence — without a judgment there is nothing to outline or falsify", rsJ6NoPair: "Stage 6 collided only {n} of the three pairs (equations×paths / paths×dynamics / equations×dynamics)",
-      rsToPaper: "Six stages done · writing the paper directly (no separate research report)", rsPartial: "Only {n}/{m} stages ran — the collision stage was not reached, so no paper is written; the finished stages are kept.",
-      rsPaperStep: "Paper · Academic paper (10k)", rsPaperWait: "Six stages done; writing the paper section by section along the ten-section academic template (one pass per section, several minutes). Watch it grow in the writing window; it comes back here with a Word export.",
+      rsToPaper: "Seven stages done · writing the paper directly (no separate research report)", rsPartial: "Only {n}/{m} stages ran — the judge stage was not passed, so no paper is written; the finished stages are kept.",
+      rsJ35NoBet: "This reading has no 'bet:' line — a reading that won't bet cannot produce a point of collision", rsJ6NoPremise: "Stage 6 did not write the structural and content-level shared premise — that is where second order happens", rsJ6QuoteMiss: "The 'overturning material' quoted in stage 6 cannot be found verbatim in stages 2–5 — it must come from upstream itself, not from outside", rsJ6NoThreeY: "Stage 6 'judgment' is not shaped as 'not Y1, nor Y2, nor Y3, but Z' — a missing Y means a school was left unhandled", rsJ6NoName: "Stage 6 has no standalone 'name:' line", rsJ6NoTable: "Stage 6 has no real table (discriminating device) — one dimension is still just a name", rsJ6NoCriterion: "Stage 6 has no 'criterion:' line", rsJ6Modal: "Stage 6 'criterion' contains a modal word — that asks a person, not a record", rsJ6NoFalsify: "Stage 6 has no 'falsification: if … then the judgment fails'", rsJ7NoVerdict: "The judge returned no verdict line", rsJ7Back: "The judge could press it back into existing work: ",
+      rsPaperStep: "Paper · Academic paper (10k)", rsPaperWait: "Seven stages done; writing the paper section by section along the ten-section academic template (one pass per section, several minutes). Watch it grow in the writing window; it comes back here with a Word export.",
       rsPaperDone: "Paper done · {n} characters (separate Word file from the report)", rsPaperFail: "Step 11 did not complete: ", rsPaperRetry: "Rewrite step 11", rsPaperDocx: "⤓ paper .docx",
       rsPlan: "Laying out the stages\u2026", rsPlanFail: "Could not break it down: ", rsSteps: "{n} steps", rsCost: "about {n} turns",
       rsStep: "Step {i}/{n}", rsDoing: "Digging\u2026", rsDone: "done", rsFinal: "Writing the verdict\u2026",
@@ -6844,20 +6846,62 @@
     return { d: "passed", why: "" };
   }
   /* ⭐ SDE 研究产线的道次专判（2026-08-30）。长度闸判不出「有没有撞出来」——写「无焦点，本道作废」也能有一千字，
-     照样 passed，出论文那一步拿它当脊梁。能数的仍不问模型：
-       第六道：自报作废／停在一阶／只是操作化 ⇒ needs_revision；没有「不是……而是」那一句 ⇒ needs_revision；
-               三对（方程×路径／路径×动力／方程×动力）缺一 ⇒ needs_revision（重跑本道，或读者记降级往下）。
+     照样 passed，出论文那一步拿它当脊梁。能数的仍不问模型；数不出来的交给第 7 道判官（另一趟、外人的眼睛）。
+       第 3／4／5 道：没有「押注：」那一行 ⇒ needs_revision（不押注的读数撞不出焦点）；
+       第 6 道（十件按前缀查）：自报作废／停在一阶／只是操作化 ⇒ needs_revision；三对缺一 ⇒ needs_revision；
+               没有结构层＋内容层前提 ⇒ needs_revision；「推翻材料：」引的那句在第二～五道原文里**逐字找不到** ⇒ needs_revision；
+               「判断：」没有三个「不是」＋「而是」 ⇒ needs_revision；没有「命名：」行 ⇒ needs_revision；
+               没有一张真表（≥3 行、每行 ≥3 根竖线） ⇒ needs_revision；「判据：」含情态词 ⇒ needs_revision；没有「证伪：若…则…不成立」 ⇒ needs_revision；
+       第 7 道判官：末尾「【判官】passed」 ⇒ passed；「【判官】return_to_stage:6 · 理由」 ⇒ return_to_stage 6（退回钮当场可按）；没交出判决 ⇒ unknown（停下）。
      只在程序判 passed 之后才看这几条；判词的三句是第六道规格里写死给程序读的。 */
-  function rsJudgeSde(n1, txt, meta) {
+  var RS_MODAL = /应当|有意义|实质性|充分|真正|恰当|合理/;
+  function rsNorm(x) { return String(x || "").replace(/[\s，。、；：！？“”"'‘’（）()《》〈〉【】\[\]『』「」*＊_—\-]/g, ""); }
+  function rsLineOf(s, key) {
+    var m = new RegExp("(?:^|\\n)\\s*[*＊#>\\-\\d.、（）()\\s]*(?:[一二三四五六七八九十]+[、.．])?\\s*[*＊]*" + key + "[*＊]*\\s*[：:]\\s*([^\\n]*)").exec(String(s || ""));
+    return m ? m[1] : null;
+  }
+  function rsTableOk(s) {
+    var n = 0;
+    String(s || "").split("\n").forEach(function (ln) { var t = ln.trim(); if (t.charAt(0) === "|" && (t.match(/\|/g) || []).length >= 3 && !/^\|\s*:?-{2,}/.test(t)) n++; });
+    return n >= 3;
+  }
+  function rsJudgeSde(n1, txt, meta, secs) {
     var s = String(txt || "");
     var j = rsJudge(txt, meta);
+    if (n1 === 7) {
+      /* 判官的判决行先于长度闸认：一句「读不懂哪一句」加判决可能只有一两百字，那不是断稿。
+         流内报错／被掐／按停仍按程序判（j）走——半截判决不算判决。 */
+      var jm = /【判官】\s*(passed|return_to_stage\s*:\s*(\d+))\s*(?:[·:：-]\s*([^\n]*))?/i.exec(s);
+      var m7 = meta || {};
+      if (m7.err || m7.cut || m7.fin === "length" || !s.length) return j.d === "passed" ? { d: "cut", back: 0, why: tx("rsJ7NoVerdict") } : j;
+      if (!jm) return { d: "unknown", back: 0, why: tx("rsJ7NoVerdict") };
+      if (/return_to_stage/i.test(jm[1])) return { d: "return_to_stage", back: 6, why: tx("rsJ7Back") + (jm[3] || "").trim() };
+      return { d: "passed", back: 0, why: "" };
+    }
     if (j.d !== "passed") return j;
+    if (n1 >= 3 && n1 <= 5) {
+      if (rsLineOf(s, "押注") === null) return { d: "needs_revision", back: 0, why: tx("rsJ35NoBet") };
+    }
     if (n1 === 6) {
       if (/本道作废|整道作废|三对[^\n]{0,8}作废|判断停在一阶|本道停在一阶|仍停在一阶|停在了一阶|只是操作化|属于操作化|如实[^\n]{0,4}操作化|做的是操作化/.test(s)) return { d: "needs_revision", back: 0, why: tx("rsJ6Dead") };
-      if (!/不是[\s\S]{1,300}?而是/.test(s)) return { d: "needs_revision", back: 0, why: tx("rsJ6NoZ") };
       var pairs = [/方程[^\n]{0,24}路径|路径[^\n]{0,24}方程/, /路径[^\n]{0,24}动力|动力[^\n]{0,24}路径/, /方程[^\n]{0,24}动力|动力[^\n]{0,24}方程/]
         .filter(function (re) { return re.test(s); }).length;
       if (pairs < 3) return { d: "needs_revision", back: 0, why: tx("rsJ6NoPair", { n: pairs }) };
+      if (rsLineOf(s, "结构层前提") === null || rsLineOf(s, "内容层前提") === null) return { d: "needs_revision", back: 0, why: tx("rsJ6NoPremise") };
+      /* 推翻材料：程序到上游原文里逐字核对——这是二阶那一步唯一能由程序守住的纪律。 */
+      var fl = rsLineOf(s, "推翻材料");
+      var qm = fl === null ? null : /『([^』]{4,})』|「([^」]{4,})」|"([^"]{4,})"|“([^”]{4,})”/.exec(fl);
+      var qt = qm ? rsNorm(qm[1] || qm[2] || qm[3] || qm[4]) : "";
+      var up = rsNorm((secs || []).filter(function (x, k) { return k >= 1 && k <= 4; }).map(function (x) { return x.body; }).join("\n"));
+      if (!qt || qt.length < 6 || up.indexOf(qt) < 0) return { d: "needs_revision", back: 0, why: tx("rsJ6QuoteMiss") };
+      var jl = rsLineOf(s, "判断");
+      if (jl === null || !/不是[\s\S]{1,120}也不是[\s\S]{1,120}也不是[\s\S]{1,160}而是/.test(jl)) return { d: "needs_revision", back: 0, why: tx("rsJ6NoThreeY") };
+      if (rsLineOf(s, "命名") === null) return { d: "needs_revision", back: 0, why: tx("rsJ6NoName") };
+      if (!rsTableOk(s)) return { d: "needs_revision", back: 0, why: tx("rsJ6NoTable") };
+      var cr = rsLineOf(s, "判据");
+      if (cr === null || RS_MODAL.test(cr)) return { d: "needs_revision", back: 0, why: tx(cr === null ? "rsJ6NoCriterion" : "rsJ6Modal") };
+      var fz = rsLineOf(s, "证伪");
+      if (fz === null || !/若[\s\S]{2,200}则[\s\S]{0,60}(不成立|作废|须删除|错)/.test(fz)) return { d: "needs_revision", back: 0, why: tx("rsJ6NoFalsify") };
     }
     return j;
   }
@@ -7067,7 +7111,7 @@
                  「仍要往下跑」——那趟十八道里七道就是这样带着半截稿子被强行带下去的。
                  程序判不出问题的，才轮到基底的【闸门】那一行。 */
               var g = fg ? (function () { var j = rsJudge(txt, RS.lastMeta); return j.d === "passed" ? forgeGate(txt) : j; })()
-                : (sdePipe ? rsJudgeSde(i + 1, txt, RS.lastMeta) : rsJudge(txt, RS.lastMeta));   // 2026-08-30：SDE 产线加道次专判（第 6／7 道）
+                : (sdePipe ? rsJudgeSde(i + 1, txt, RS.lastMeta, secs) : rsJudge(txt, RS.lastMeta));   // 2026-08-30：SDE 产线加道次专判（3–5 押注／6 十件／7 判官）
               r.stat.textContent = (g.d === "passed" ? tx("rsDone") : ("\u26a0 " + tx("fgGateNo"))) + " \u00b7 " + txt.length;
               secs.push({ t: s.t, body: txt, gate: g.d, hash: fnv1a64(txt), at: Date.now() });
               saveRun();
