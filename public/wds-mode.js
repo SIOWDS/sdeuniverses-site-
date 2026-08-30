@@ -1538,6 +1538,10 @@
       psSave: "＋ 把现在这套存为预设", psAsk: "给这套预设起个名字", psDel: "删掉这个预设？",
       psExp: "⤓ 导出全部", psImp: "⤒ 导入", psImpAsk: "把导出的预设 JSON 贴在这里", psImpBad: "这段不是预设文件",
       psOn: "已切到预设：", psFull: "预设最多 12 套，先删一个再存。",
+      psMcr20: "📚 一日专著 · MCR-20", psMcr20S: "深度 · 学术 · 发生场；母题锁定 → 三轴碰撞 → 十八章装配 → 逆向回写",
+      psMcr20On: "已进入 MCR-20：题目已放进输入框，确认后发送第一轮。",
+      psMcr20Topic: "【请在这里填写专著研究问题】",
+      psMcr20Q: "【MCR-20 · 第 1/9 阶段：母题发生】\\n研究问题：{topic}\\n目标：今天完成一部约 20 万字、五部十八章的学术专著。现在只跑第一阶段，禁止拟目录、禁止写正文。\\n\\n请先做无 SDE 常识基线的内部对照，再布置发生场，交出 8 个候选母题。每个候选必须写明：①要推翻的旧答案；②旧答案没说出口的本体预设；③反直觉承重判断；④成立机制；⑤三个最近邻；⑥可裁决分离线；⑦两条证伪条件；⑧能否支撑五部十八章。\\n\\n最后只排序，不替我选择；另附一份《MCR-20 母题账本》，记录本轮材料、冲突、未决项与下一阶段应执行的三轴碰撞。",
       qTip: "它正在答——现在发出的会排队，答完自动接着问", qBar: "⏳ 已排队 {n} 条",
       qPausedT: "⏸ 已暂停 · {n} 条待发", qResume: "继续发", qClear: "清空队列",
       qFull: "队列最多 10 条", qNext: "下一句：",
@@ -1681,6 +1685,10 @@
       psSave: "＋ Save current setup", psAsk: "Name this preset", psDel: "Delete this preset?",
       psExp: "⤓ Export all", psImp: "⤒ Import", psImpAsk: "Paste the exported preset JSON here", psImpBad: "That is not a preset file",
       psOn: "Switched to preset: ", psFull: "12 presets max — delete one first.",
+      psMcr20: "📚 One-day monograph · MCR-20", psMcr20S: "Deep · academic · genesis field; lock the motif → three-axis clash → 18-chapter assembly → reverse write-back",
+      psMcr20On: "MCR-20 is ready: confirm the topic in the input box, then send round one.",
+      psMcr20Topic: "[Enter the monograph research question here]",
+      psMcr20Q: "[MCR-20 · Stage 1/9: Motif genesis]\\nResearch question: {topic}\\nGoal: complete an academic monograph of about 200,000 Chinese characters in five parts and eighteen chapters today. Run stage one only: do not draft a table of contents or prose chapters.\\n\\nInternally establish a no-SDE common-answer baseline, then stage a genesis field and produce eight candidate motifs. For each give: (1) the old answer it overturns; (2) the unspoken ontological premise; (3) the counter-intuitive load-bearing claim; (4) mechanism; (5) three nearest neighbours; (6) a decidable separation line; (7) two falsifiers; and (8) whether it can carry five parts and eighteen chapters.\\n\\nRank only; do not choose for me. End with an MCR-20 motif ledger recording materials, clashes, open questions, and the three-axis clash required next.",
       qTip: "It is still answering — what you send now is queued and asked next", qBar: "⏳ {n} queued",
       qPausedT: "⏸ Paused · {n} waiting", qResume: "Resume", qClear: "Clear queue",
       qFull: "10 queued messages max", qNext: "Next: ",
@@ -5175,10 +5183,34 @@
     paintModes(); paintMp();
     toast(t("psOn") + p.n);
   }
+  function psMcr20Apply() {
+    var topic = String((inEl && inEl.value) || "").trim();
+    if (!topic || topic.indexOf("【MCR-20") === 0 || topic.indexOf("[MCR-20") === 0) topic = t("psMcr20Topic");
+    // 第一阶段只做母题发生：深度＋学术＋发生场；联网留到近邻与材料碰撞阶段再由人打开。
+    // 不改基底、不碰 Key、不覆盖自定义指令。
+    psApply({ n: t("psMcr20"), v: "", m: "", md: "deep", web: 0, tool: "genesis",
+              nosde: 0, st: "acad", stc: "", ab: aboutGet() });
+    if (inEl) {
+      inEl.value = t("psMcr20Q").split("{topic}").join(topic.slice(0, 800));
+      try { inEl.dispatchEvent(new Event("input", { bubbles: true })); } catch (e) {}
+      inEl.style.height = "auto";
+      inEl.style.height = Math.min(inEl.scrollHeight || 160, 360) + "px";
+      inEl.focus();
+    }
+    toast(t("psMcr20On"));
+  }
+
   function psPanel(anchor) {
     menuAt(anchor, function (menu) {
       menu.appendChild(el("div", "mh", t("psTitle")));
       var list = psAll();
+      // 内置流程不占用户 12 个预设名额；它不是一组死设置，而是把第一阶段的真实施工单也放进输入框。
+      var mcr = el("button");
+      mcr.style.fontWeight = "700";
+      mcr.appendChild(document.createTextNode(t("psMcr20")));
+      mcr.appendChild(el("span", "sub", t("psMcr20S")));
+      mcr.onclick = function () { closeMenu(); psMcr20Apply(); };
+      menu.appendChild(mcr);
       if (!list.length) {
         var none = el("div", "mh", t("psNone"));
         none.style.cssText = "font-weight:400;line-height:1.6;white-space:normal;max-width:260px";
