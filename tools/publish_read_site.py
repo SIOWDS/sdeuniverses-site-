@@ -238,7 +238,7 @@ footer{margin-top:clamp(50px,8vw,90px);border-top:1px solid var(--border2);backg
 
 PREFIX_SCRIPT = """<script>
 (function(){var b="/sites/read";if(location.pathname.indexOf(b)!==0)return;
-var own={"/":1,"/#":1,"/library/":1,"/reviews/":1,"/club/":1,"/chatwyq/":1};
+var own={"/":1,"/#":1,"/library/":1,"/reviews/":1,"/club/":1,"/chatwyq/":1,"/sdejie/":1,"/sdegong/":1};
 var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");if(!h)continue;
  var hit=false;for(var k in own){if(h===k||h.indexOf(k)===0){hit=true;break;}}
@@ -256,7 +256,9 @@ def nav(active):
             f'<a href="/library/"{cls("library")}>专著库</a>'
             f'<a href="/reviews/"{cls("reviews")}>读名著·书评</a>'
             f'<a href="/club/"{cls("club")}>读书会·共读</a>'
-            f'<a href="/chatwyq/"{cls("chatwyq")}>领读人 WYQ</a>'
+            f'<a href="/chatwyq/"{cls("chatwyq")}>领读 WYQ</a>'
+            f'<a href="/sdejie/"{cls("sdejie")}>SDE解读</a>'
+            f'<a href="/sdegong/"{cls("sdegong")}>SDE共读</a>'
             f'</div></div></nav>')
 
 def footer():
@@ -265,7 +267,8 @@ def footer():
             '德麦国际读书馆 · read.sdeuniverses.com<br>'
             '<div style="margin-top:.7rem">'
             '<a href="/library/">专著库</a>·<a href="/reviews/">读名著·书评</a>·'
-            '<a href="/club/">读书会·共读</a>·<a href="/chatwyq/">领读人 WYQ</a>·'
+            '<a href="/club/">读书会·共读</a>·<a href="/chatwyq/">领读 WYQ</a>·'
+            '<a href="/sdejie/">SDE解读</a>·<a href="/sdegong/">SDE共读</a>·'
             '<a href="https://sdeuniverses.com/monographs/">专著栏</a>·'
             '<a href="https://sdeuniverses.com/">SDE Universes 主站</a>'
             '</div></div></div></footer>')
@@ -339,14 +342,27 @@ def build_home(numbered, topical):
         '<h3>读书会·共读</h3><p>挑一本书，打开翻书器，选中让你停下的那一句，'
         '和 WDS 一起把它读透。</p><div class="go">去共读 →</div></a>'
         '</div>')
-    # 领读人 WYQ 入口带
-    body.append('<a class="pill" href="/chatwyq/" style="display:block;margin:-.3rem 0 0;'
-        'background:linear-gradient(135deg,#17110B,#241A0F);border-color:var(--gold2)">'
-        '<div class="k" style="color:var(--dgold)">Ask · 领读人</div>'
+    # 三台智能体
+    body.append('<section class="sec" style="margin-top:clamp(30px,5vw,52px)">'
+        '<div class="sec-h"><span class="n">三台智能体 · 都用你自己的 Key</span>'
+        '<h2>让 AI 陪你读</h2></div>'
+        '<div class="pillars" style="background:linear-gradient(135deg,#17110B,#241A0F);border-radius:6px;padding:1.1rem;gap:.9rem">'
+        '<a class="pill" href="/chatwyq/" style="background:#1C150D;border-color:var(--gold2)">'
+        '<div class="k" style="color:var(--dgold)">领读 · WYQ</div>'
         '<h3 style="color:#F3E6BF">不知道读哪本？问 WYQ</h3>'
-        '<p style="color:#C9B47E">读书馆的领读人 WYQ 认得架上每一本书——说说你遇到的问题或想读什么，'
-        '它替你挑、帮你看清一本书讲什么、陪你把卡住的那一段读透。</p>'
-        '<div class="go" style="color:var(--dgold)">和 WYQ 说说 →</div></a>')
+        '<p style="color:#C9B47E">读书馆的领读人，认得架上每一本书——说说你的问题或想读什么，它替你挑、帮你看清、陪你读。</p>'
+        '<div class="go" style="color:var(--dgold)">和 WYQ 说说 →</div></a>'
+        '<a class="pill" href="/sdejie/" style="background:#1C150D;border-color:var(--gold2)">'
+        '<div class="k" style="color:var(--dgold)">解读 · SDE</div>'
+        '<h3 style="color:#F3E6BF">SDE解读</h3>'
+        '<p style="color:#C9B47E">贴一段经典或一本书里的话，它不复述给你听——它问：这套意思当初是怎么长出来的。</p>'
+        '<div class="go" style="color:var(--dgold)">解一段给我看 →</div></a>'
+        '<a class="pill" href="/sdegong/" style="background:#1C150D;border-color:var(--gold2)">'
+        '<div class="k" style="color:var(--dgold)">共读 · SDE</div>'
+        '<h3 style="color:#F3E6BF">SDE共读</h3>'
+        '<p style="color:#C9B47E">贴来一段或一章，它陪你逐段读，六种读法各出一件：说了什么、把什么当给定、哪里脆、缝隙、顶回它。</p>'
+        '<div class="go" style="color:var(--dgold)">陪我读一段 →</div></a>'
+        '</div></section>')
     # recent strip
     body.append('<section class="sec"><div class="sec-h"><h2>近期新书</h2>'
                 f'<span class="n">共 {total} 部 · {readable} 部可在线读</span>'
@@ -423,6 +439,9 @@ def build_reviews():
                     f'<div class="line">{esc(r["line"])}</div>'
                     f'<div class="via">经 SDE 重读为 <b>{esc(r["sde"])}</b></div></a>')
     body.append('</div></section>')
+    body.append('<div class="note"><b>想当场解读一段？</b>把一段经典或一本书里的话贴给 '
+                '<a href="/sdejie/" style="color:var(--gold)">SDE解读</a>，它顺着 SDE 追一遍这套意思的来路；'
+                '要完整四篇成稿版，去 <a href="https://sdeuniverses.com/taste/classics-deconstructor/" style="color:var(--gold)">经典解构器</a>。</div>')
     body.append('<div class="note"><b>这条线是开放的。</b>读者用 SDE 三视角认真读一部名著、写成一篇书评，'
                 '达到创新智商门槛即可收入本栏。投稿与共读入口见 '
                 '<a href="/club/" style="color:var(--gold)">读书会·共读</a>。</div>')
@@ -450,6 +469,9 @@ def build_club(numbered):
     for b in picks:
         body.append(book_card(b))
     body.append('</div></section>')
+    body.append('<div class="note"><b>想现在就开始共读？</b>把一段或一章贴给 '
+                '<a href="/sdegong/" style="color:var(--gold)">SDE共读</a>，它陪你逐段读、六种读法各出一件；'
+                '要翻着 PDF 一页页读下去，去 <a href="https://sdeuniverses.com/taste/book-club/" style="color:var(--gold)">共读一本书</a>。</div>')
     body.append('<div class="note"><b>还想和别人一起读？</b>文学一线已开出长文与长篇小说的共读，'
                 '选中哪一段就从哪一段谈起：<a href="https://liter.sdeuniverses.com/coread/" style="color:var(--gold)">文学共读 →</a>。'
                 '读书会的固定期次与公告，将陆续在本栏发布。</div>')
@@ -583,6 +605,36 @@ window.WDSM_PROFILE = "read";
 </html>
 """
 
+def _agent_stub(profile, name, title, desc):
+    return ('<!DOCTYPE html>\n<html lang="zh">\n<head>\n<meta charset="utf-8">\n'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">\n'
+        f'<title>{title}</title>\n<meta name="description" content="{desc}">\n'
+        f'<link rel="canonical" href="https://read.sdeuniverses.com/{profile}/">\n'
+        '<style>\n  html,body{margin:0;height:100%;background:#151210;color:#F0EADC;'
+        "font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}\n"
+        '  .fallback{max-width:560px;margin:18vh auto 0;padding:0 24px;text-align:center;'
+        'font-size:14.5px;line-height:2;color:#9A8F80}\n  .fallback a{color:#A88233}\n</style>\n'
+        f'</head>\n<body>\n<div class="fallback">正在进入 {name}……<br>'
+        '若长时间停在本页，请刷新，或<a href="/">回读书馆首页</a>。</div>\n<script>\n'
+        f'/* {name} ＝ ChatSDE 那一台引擎 ＋ 读书馆领域档案 WDS_PROFILES.{profile}（服务端 src/worker.js）。\n'
+        '   壳页只递一个 profile key；人格/语料白名单/题域闸都在服务端。绝不在这一页抄引擎。 */\n'
+        'window.WDSM_PAGE = 1;\n'
+        f'window.WDSM_PROFILE = "{profile}";\n</script>\n'
+        '<script src="/taste/assets/sde-handoff.js?v=20260817c"></script>\n'
+        '<script src="/wds-mode.js?v=20260830g" defer></script>\n</body>\n</html>\n')
+
+SDEJIE_STUB = _agent_stub("sdejie", "SDE解读",
+    "SDE解读 · 用 SDE 发生学解读经典 | 德麦国际读书馆",
+    "SDE解读：贴一段经典或一本书里的话，它不复述内容，而是用 SDE 发生学追这套意思的来路。想要四篇成稿版去经典解构器。用你自己的大模型 Key 运行，只存浏览器本地。")
+SDEGONG_STUB = _agent_stub("sdegong", "SDE共读",
+    "SDE共读 · 逐段陪读，六种读法 | 德麦国际读书馆",
+    "SDE共读：贴来一段或一章，它陪你逐段读——说了什么、把什么当给定、哪里是脆的、按三类拆、缝隙、顶回它。想翻着 PDF 逐页共读去共读一本书。用你自己的大模型 Key 运行，只存浏览器本地。")
+
+def build_stub(name, const):
+    path = os.path.join(OUT, name, "index.html")
+    open(path, "w", encoding="utf-8").write(const)
+    return path, len(const)
+
 def build_chatwyq_stub():
     path = os.path.join(OUT, "chatwyq", "index.html")
     open(path, "w", encoding="utf-8").write(CHATWYQ_STUB)
@@ -595,6 +647,8 @@ def main():
     os.makedirs(os.path.join(OUT, "reviews"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "club"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "chatwyq"), exist_ok=True)
+    os.makedirs(os.path.join(OUT, "sdejie"), exist_ok=True)
+    os.makedirs(os.path.join(OUT, "sdegong"), exist_ok=True)
     os.makedirs(os.path.join(PUB, "taste", "assets"), exist_ok=True)
     numbered = scan_numbered()
     topical  = scan_topical()
@@ -620,6 +674,9 @@ def main():
     print(f"wrote {os.path.relpath(np, PUB)}  ({nl:,} chars{'  ⚠ <5000 will be rejected' if nl <= 5000 else ''})")
     sp, sl = build_chatwyq_stub()
     print(f"wrote {os.path.relpath(sp, PUB)}  ({sl:,} bytes)")
+    for _nm, _c in [("sdejie", SDEJIE_STUB), ("sdegong", SDEGONG_STUB)]:
+        _p, _l = build_stub(_nm, _c)
+        print(f"wrote {os.path.relpath(_p, PUB)}  ({_l:,} bytes)")
     print(f"\nnumbered books: {len(numbered)} | topical: {len(topical)} | "
           f"readable: {sum(1 for b in numbered+topical if b['read'] or b['pdf'])}")
 
