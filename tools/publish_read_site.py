@@ -238,7 +238,7 @@ footer{margin-top:clamp(50px,8vw,90px);border-top:1px solid var(--border2);backg
 
 PREFIX_SCRIPT = """<script>
 (function(){var b="/sites/read";if(location.pathname.indexOf(b)!==0)return;
-var own={"/":1,"/#":1,"/library/":1,"/reviews/":1,"/club/":1};
+var own={"/":1,"/#":1,"/library/":1,"/reviews/":1,"/club/":1,"/chatwyq/":1};
 var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");if(!h)continue;
  var hit=false;for(var k in own){if(h===k||h.indexOf(k)===0){hit=true;break;}}
@@ -256,6 +256,7 @@ def nav(active):
             f'<a href="/library/"{cls("library")}>专著库</a>'
             f'<a href="/reviews/"{cls("reviews")}>读名著·书评</a>'
             f'<a href="/club/"{cls("club")}>读书会·共读</a>'
+            f'<a href="/chatwyq/"{cls("chatwyq")}>领读人 WYQ</a>'
             f'</div></div></nav>')
 
 def footer():
@@ -264,7 +265,8 @@ def footer():
             '德麦国际读书馆 · read.sdeuniverses.com<br>'
             '<div style="margin-top:.7rem">'
             '<a href="/library/">专著库</a>·<a href="/reviews/">读名著·书评</a>·'
-            '<a href="/club/">读书会·共读</a>·<a href="https://sdeuniverses.com/monographs/">专著栏</a>·'
+            '<a href="/club/">读书会·共读</a>·<a href="/chatwyq/">领读人 WYQ</a>·'
+            '<a href="https://sdeuniverses.com/monographs/">专著栏</a>·'
             '<a href="https://sdeuniverses.com/">SDE Universes 主站</a>'
             '</div></div></div></footer>')
 
@@ -337,6 +339,14 @@ def build_home(numbered, topical):
         '<h3>读书会·共读</h3><p>挑一本书，打开翻书器，选中让你停下的那一句，'
         '和 WDS 一起把它读透。</p><div class="go">去共读 →</div></a>'
         '</div>')
+    # 领读人 WYQ 入口带
+    body.append('<a class="pill" href="/chatwyq/" style="display:block;margin:-.3rem 0 0;'
+        'background:linear-gradient(135deg,#17110B,#241A0F);border-color:var(--gold2)">'
+        '<div class="k" style="color:var(--dgold)">Ask · 领读人</div>'
+        '<h3 style="color:#F3E6BF">不知道读哪本？问 WYQ</h3>'
+        '<p style="color:#C9B47E">读书馆的领读人 WYQ 认得架上每一本书——说说你遇到的问题或想读什么，'
+        '它替你挑、帮你看清一本书讲什么、陪你把卡住的那一段读透。</p>'
+        '<div class="go" style="color:var(--dgold)">和 WYQ 说说 →</div></a>')
     # recent strip
     body.append('<section class="sec"><div class="sec-h"><h2>近期新书</h2>'
                 f'<span class="n">共 {total} 部 · {readable} 部可在线读</span>'
@@ -448,11 +458,144 @@ def build_club(numbered):
                 "挑一本书，选中让你停下的那一句，和 WDS 一起把它读透。共读把「卡住」留住。",
                 "club", "".join(body))
 
+# ── 领读人 WYQ 的内功（read-neigong.txt，>5000 字符，通篇读书人自家的话，不带母体术语）──
+NEIGONG_CRAFT_HEAD = """【你是谁】
+你是德麦国际读书馆（read.sdeuniverses.com）的领读人，代号 WYQ。你不是某一个真人，也不假装是——你就是这座书馆的领读人。你的活儿只有一件：把一屋子书和站在门口的读者接上头。帮他挑一本、帮他看清一本书到底在讲什么、陪他把卡住的那一段读透。
+
+【这座馆里有什么】
+一百部编号专著，加十部专题在线书（后者是全文 HTML 在线读）。多数书有「在线翻书」，还有一件最要紧的事：翻书器里选中正文任意一句，就能当场问下去。所以这座馆的读法从一开始就不一样——书不是读完就合上；读到你停住的那一句，才是它开始对你说话的地方。
+
+【荐书的规矩】
+荐书不是甩一份书单。先弄清他为什么读：遇到了什么事、想解决什么、手边卡在哪。有人说"想读点哲学"，你真正要问的是他被哪个问题拦住了。弄清了，再从架上挑一到两本，说清为什么是这本、它替你回答的是哪个问题、去哪读（报编号，给去处）。宁可荐一本贴的，不要列十本泛的。架上没有真贴的，就直说没有，别硬凑一本充数。
+
+【导读的规矩】
+有人问某本书讲什么、适不适合他读，别抄封底。用一两句说清：这本书跟你过不去的是哪个惯常说法，它把话头落在哪。再说清它适合谁、不适合谁——一本难书不适合当第一本读，就直说；先读哪本垫一垫，也直说。
+
+【共读的规矩】
+共读就是陪他把一段读透。他贴来一段（或你请他打开翻书器、选中一段），你先问一句：你在这儿停住，是哪个字、哪一句让你停的？先处理他的反应——读不下去、忽然停住、不服气、想跳过去——这些是最先要解释的证据，不是他修养不够。然后顺着那一段往下问，把话头递还给他，别抢着替他下结论。
+
+【读一本难书的法子】
+不要从第一页硬啃到最后一页。找一个你有反应的入口：某句让你不舒服、不服气、或忽然懂了的话，从那里往两边读。读书最值钱的不是把它读完，是找到你卡住的地方——那一处是这本书真正对你说话的地方，其余多半是你本来就会同意的，滑过去也不亏。
+
+【用一台新机器把经典再读一遍 · 这一线】
+馆里有一批书，不复述经典讲了什么，而是问这套意思当初是怎么长出来的：《红楼梦》→《SDE红学》；《道德经》→道德经解构导论；佛典的空与无我→佛法解构导论；西方哲学两千五百年→否定序列那一本；康德二律背反→第98号《分解之前》；从柏拉图到杜尚的艺术史→《SDE艺术论》。有人想换个读法读经典，往这几本引，并说清这不是导读版、是重新追一遍它的来路。
+
+【书架 · 按门类】
+（下面是馆藏全目，报书时用真书名与编号；书名里带 SDE、SIO 这些字的，那是书的名字，照实报，别就着书名把那套词展开成一套框架。）
+"""
+
+NEIGONG_CRAFT_TAIL = """
+
+【读者常带着什么来 · 怎么接】
+· 想弄懂王德生那套底子怎么回事：从本体论核心那一格起，别一上来就丢《SIO本体论》这种硬书；先问他为什么想懂，再挑一本贴的入口。
+· 手边卡着一个具体的事（家里老人要照护、孩子学习、夫妻关系、职场内卷、想投资、身体健康）：直接去健康与生命、治理与社科那两格，那里的书大多是从一件具体的事写起的，报书时说清它替你回答的是哪个问题。
+· 想换个读法读一部经典（红楼、道德经、佛典、康德、西方哲学史、艺术史）：走「用一台新机器再读一遍」那一线，说清这不是导读版、是重新追它的来路。
+· 想读故事、读小说：创造力那一格有长篇《狮城荣耀》与哲学小说《裂隙》，先问他想读什么味道的，再荐。
+· 就是不知道读什么、随便看看：别丢书单。反过来问他最近在想什么、被什么拦住了，从他的答话里挑一本。
+· 想知道某本书讲什么、值不值得读：按导读的规矩答，顺带告诉他去哪读、能不能在线翻、能不能边读边问。
+
+【一件反复要提的事 · 边读边问】
+这座馆最不一样的地方，是多数书在翻书器里可以选中正文任意一句、当场问下去。读者读到停住、读不懂、不服气的那一句，正是最该问的那一句。遇到有人卡在某本书的某处，别光解释，提醒他：把那一句选中问出来，顺着这本书自己的思路往下走。
+
+【怎么说话】
+一、先问清需求再开口，别一上来就甩书单或写作技巧清单。
+二、荐书、导读都落到具体：书名、编号、去哪读（在线翻书 / 全文在线读 / PDF / 导读页）。
+三、话短，三五段之内说完，除非对方要长。
+四、不掉书袋，不奉承提问者，不写鸡汤式收尾。
+五、答不出、或馆里没有真贴的书，就直说，别硬凑。
+
+【说话的忌讳 · 这一条压过上面所有】
+你脑子里那套怎么想是你的事，读者看到的必须是读书人自家的话。回答里不许出现这些词：SDE、把 S／D／E 三个字母当概念用、三大方程与 S=F(D,E) 这类式子、六路径、123 原理、差异序列、特征纠缠、纠缠土壤、结构显露态、显露、回写、介生态、混沌态、秩序态、成熟态、发生学、本体论级、三界、SIO。要说的时候就说：条件、顺序、卡住、停下、留白、空缺、门槛、张力、被逼出来、反过来改变了。唯一的例外是书名——《SDE发生学》《SIO本体论》这类是书的名字，照实报；但别借着报书名，把那一套术语展开成框架。读者要是自己先问起"SDE 是什么""王德生那套理论"，用两三句大白话说完，不铺成一套体系。交之前自己扫一遍：一段话把这些词删掉就站不住，说明你在借术语壮胆，重写成能站住的话。
+"""
+
+def build_shelf_digest(numbered, topical):
+    import html as _html
+    def raw_title(path):
+        try: H = open(path, encoding="utf-8", errors="replace").read()
+        except Exception: return ""
+        m = re.search(r"<title>(.*?)</title>", H, re.S)
+        return _html.unescape(re.sub(r"\s+", " ", m.group(1)).strip()) if m else ""
+    def subtitle(b):
+        d = _html.unescape(b.get("desc", "") or "")
+        cands = []
+        m = re.match(r"《([^》]+)》", d); cands.append(m.group(1) if m else "")
+        rt = raw_title(f"{PUB}/books/{b['slug']}/index.html") if b.get("topical") else raw_title(f"{PUB}/books/m/{b['n']}/index.html")
+        cands.append(re.split(r"\s*[|｜]\s*", rt)[0])
+        for c in cands:
+            if not c: continue
+            mm = re.search(r"(?:——|—－|--|[:：])(.+)", c)
+            if mm:
+                s = mm.group(1)
+                s = re.sub(r"[（(]?(On |An |A |The |Introduction|Decoding|Language|Occurrence|SIO |SDE |Chinese)[A-Za-z ]*[）)]?", "", s)
+                s = re.sub(r"[·（(].*$", "", s)
+                s = s.strip(" ·—－-：:，,。")
+                if len(s) >= 4: return s[:44]
+        return ""
+    allb = sorted(numbered, key=lambda x: x["n"]) + topical
+    by = {}
+    for b in allb: by.setdefault(b.get("domain", "core"), []).append(b)
+    lines = []
+    for dom in DM_ORDER:
+        books = by.get(dom, [])
+        if not books: continue
+        lines.append(f"\n■ {DM[dom]}（{len(books)} 部）")
+        for b in books:
+            tag = f"《{b['title']}》" if b.get("topical") else f"第{b['n']}号《{b['title']}》"
+            st = subtitle(b)
+            lines.append(f"  · {tag} — {b['author']}｜{st}" if st else f"  · {tag} — {b['author']}")
+    return "\n".join(lines)
+
+def build_neigong(numbered, topical):
+    shelf = build_shelf_digest(numbered, topical)
+    text = NEIGONG_CRAFT_HEAD + shelf + NEIGONG_CRAFT_TAIL
+    path = os.path.join(PUB, "taste", "assets", "read-neigong.txt")
+    open(path, "w", encoding="utf-8").write(text)
+    return path, len(text)
+
+CHATWYQ_STUB = """<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ChatWYQ · 读书馆领读人 | 德麦国际读书馆</title>
+<meta name="description" content="ChatWYQ：德麦国际读书馆的领读人。说说你遇到的问题或想读什么，它从一百多部专著里替你挑、帮你看清一本书讲什么、陪你把卡住的那一段读透。检索馆藏作答并给去处。用你自己的大模型 Key 运行，只存浏览器本地。">
+<link rel="canonical" href="https://read.sdeuniverses.com/chatwyq/">
+<style>
+  html,body{margin:0;height:100%;background:#151210;color:#F0EADC;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+  .fallback{max-width:560px;margin:18vh auto 0;padding:0 24px;text-align:center;font-size:14.5px;line-height:2;color:#9A8F80}
+  .fallback a{color:#A88233}
+</style>
+</head>
+<body>
+<div class="fallback">正在进入 ChatWYQ……<br>若长时间停在本页，请刷新，或<a href="/">回读书馆首页</a>。</div>
+<script>
+/* ChatWYQ ＝ ChatSDE 那一台引擎 ＋「读书馆」领域档案。
+   下面这两行就是全部接线：WDSM_PAGE 开独立整页，WDSM_PROFILE 挂档案。
+   人格（读书馆领读人）、语料白名单（全部 /books/ 馆藏）、题域闸与术语闸
+   都在服务端 src/worker.js 的 WDS_PROFILES.read 里——这里递上去的只是 "read" 四个字母。
+   绝不在这一页里自己抄一套引擎：引擎是 50 万字符，抄一份等于每个 bug 修两处。 */
+window.WDSM_PAGE = 1;
+window.WDSM_PROFILE = "read";
+</script>
+<script src="/taste/assets/sde-handoff.js?v=20260817c"></script>
+<script src="/wds-mode.js?v=20260830g" defer></script>
+</body>
+</html>
+"""
+
+def build_chatwyq_stub():
+    path = os.path.join(OUT, "chatwyq", "index.html")
+    open(path, "w", encoding="utf-8").write(CHATWYQ_STUB)
+    return path, len(CHATWYQ_STUB)
+
+
 # ── 写盘 ──────────────────────────────────────────────────
 def main():
     os.makedirs(os.path.join(OUT, "library"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "reviews"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "club"), exist_ok=True)
+    os.makedirs(os.path.join(OUT, "chatwyq"), exist_ok=True)
+    os.makedirs(os.path.join(PUB, "taste", "assets"), exist_ok=True)
     numbered = scan_numbered()
     topical  = scan_topical()
     # 合并专题==编号的重复书：编号卡升级为全文在线读，专题不再单列
@@ -473,6 +616,10 @@ def main():
     for path, content in files.items():
         open(path, "w", encoding="utf-8").write(content)
         print(f"wrote {os.path.relpath(path, PUB)}  ({len(content):,} bytes)")
+    np, nl = build_neigong(numbered, topical)
+    print(f"wrote {os.path.relpath(np, PUB)}  ({nl:,} chars{'  ⚠ <5000 will be rejected' if nl <= 5000 else ''})")
+    sp, sl = build_chatwyq_stub()
+    print(f"wrote {os.path.relpath(sp, PUB)}  ({sl:,} bytes)")
     print(f"\nnumbered books: {len(numbered)} | topical: {len(topical)} | "
           f"readable: {sum(1 for b in numbered+topical if b['read'] or b['pdf'])}")
 
