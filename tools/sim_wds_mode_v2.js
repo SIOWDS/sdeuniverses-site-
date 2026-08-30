@@ -454,7 +454,9 @@ console.log("⑦.8 对外 PPT 的可见性（找不到＝没有）");
   T("点提示正文就直接开 PPT", /if \(!onX\) distill\("deck"\)/.test(wm));
   T("开始下一轮先把提示收起，不与停止条抢位置", /stopBarShow\(true\); tipDeckHide\(false\)/.test(wm));
   T("流式途中不冒提示（别打断阅读）", /if \(!b \|\| streaming\) return/.test(wm));
-  T("空对话点成文时说人话，不是通用提示", /needTalkDeck: "先聊两句/.test(wm) && /alert\(t\("needTalkDeck"\)\)/.test(wm));
+  /* 2026-08-30 落点搬家：空对话点成文原来是一句 alert 然后什么都不给；现在改成一个短菜单
+     （只摆「装成一本书」与成文记录——它们不看对话），那句人话仍在，成了菜单的头一行。用意没变：说人话。 */
+  T("空对话点成文时说人话，不是通用提示", /needTalkDeck: "先聊两句/.test(wm) && /el\("div", "mh", t\("needTalkDeck"\)\)/.test(wm));
 }
 
 // 顶栏那颗独立 PDF 按钮（2026-08-01 用户令：放在成文外面）

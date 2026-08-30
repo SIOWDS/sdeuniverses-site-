@@ -37,6 +37,7 @@ const NAME = {
   outline: '写作提纲', sumdoc: '总结你载入的那篇文章', deck: 'PPT',
   wechat: '公众号文章', prose: '散文', story: '短篇小说', novella: '中篇小说', script: '剧本', poem: '诗歌',
   notice: '通知公告', plan: '方案策划', summary: '总结述职', speech: '讲话致辞', letter: '函件邮件',
+  book: '装成一本书',
 };
 kinds.forEach((k) => {
   const n = NAME[k];
