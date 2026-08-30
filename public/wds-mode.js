@@ -6955,9 +6955,9 @@
           var pl = {
             q: s.t, history: [], key: base.key, vendor: base.vendor, model: base.model,
             mode: thinkMode,
-            /* 背景（1）／文献综述（2）／参考文献（10）这三道**强制联网**：
-               不联网的「文献综述」只能靠训练记忆报作者与年份，那是回忆不是综述。 */
-            web: (webOn || (sdePipe && (i + 1 === 1 || i + 1 === 2 || i + 1 === steps.length))) ? 1 : 0,
+            /* SDE 研究产线**每一道都联网**（2026-08-30 用户令：深度研究＝满血站内检索＋站外寻找）。
+               此前只有背景／文献综述／参考文献三道强制开；服务端同时按 rs.sde 兜底，这里写明是为了口径一致。 */
+            web: (webOn || sdePipe) ? 1 : 0,
             skey: wdsSearchKey(), about: aboutPlus(), lang: LANG,
             rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, bodies: bodies, gates: gates,
                   forge: fg ? 1 : 0, sde: sdePipe ? 1 : 0, sv: FORGE_SV, run: runid, attempt: attempts[i],

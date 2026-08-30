@@ -621,9 +621,11 @@ console.log("\n── ④ 接线：三个承重位 ─────────�
      一个字没变，只把三条正则钉在新的准确形状上，不是放宽了事。 */
   t("chat 端点读了档案", /const prof = (?:noSde \? null : )?wdsProfileOf\(b\.profile\);/.test(chatSeg));
   // _ragBody 那个对象字面量本身：递没递，只看这几行
-  const ragBodySeg = chatSeg.slice(chatSeg.indexOf("const _ragBody = {"),
-                                   chatSeg.indexOf("const _ragBody = {") + 500);
-  t("chat 把档案递进 RAG 子请求", /prof: prof \? prof\.id : ""/.test(ragBodySeg), ragBodySeg.slice(0, 40));
+  /* 2026-08-30：_ragBody 分成满血（研究道次）与普通两支（`const _ragBody = resFull ? {…} : {…}`），
+     两支都必须递档案——少一支就是研究道次从后门带进全站材料。 */
+  const ragBodySeg = chatSeg.slice(chatSeg.indexOf("const _ragBody = "),
+                                   chatSeg.indexOf("const _ragBody = ") + 1100);
+  t("chat 把档案递进 RAG 子请求（两支都递）", (ragBodySeg.match(/prof: prof \? prof\.id : ""/g) || []).length === 2, ragBodySeg.slice(0, 40));
   // 调用点，不是声明：从 "const sys = WDS_CHAT_SYS(" 起算
   const callSeg = chatSeg.slice(chatSeg.indexOf("const sys = WDS_CHAT_SYS("),
                                 chatSeg.indexOf("const sys = WDS_CHAT_SYS(") + 220);

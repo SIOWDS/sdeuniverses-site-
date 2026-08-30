@@ -101,7 +101,8 @@ const cj = SRC.indexOf('if (url.pathname === "/api/wds/research"', ci);
 const CHAT = SRC.slice(ci, cj > ci ? cj : ci + 120000);
 ok("找得到 /api/wds/chat 那一段", CHAT.length > 5000);
 ok("检索改走 wdsRag 子请求", CHAT.indexOf("const rr = await wdsRag(env, url, _ragBody);") > 0);
-ok("子请求的入参是就地拼的 _ragBody（不是别处漏过来的）", /const _ragBody = \{[\s\S]{0,400}?abs: 1,/.test(CHAT));
+/* 2026-08-30：_ragBody 分成满血／普通两支（`resFull ? {…} : {…}`），两支都就地拼、都带 abs:1。 */
+ok("子请求的入参是就地拼的 _ragBody（不是别处漏过来的）", /const _ragBody = (?:resFull \? )?\{[\s\S]{0,500}?abs: 1,[\s\S]{0,600}?abs: 1,/.test(CHAT));
 /* 只查真调用：正文注释里还写着病史（"原来是…lightRetrieve ＋ loadKB"），那是要留的。 */
 ok("本请求内不再自己装语料（无 await lightRetrieve）", CHAT.indexOf("await lightRetrieve(") < 0);
 ok("本请求内不再自己装知识库（无 await loadKB）", CHAT.indexOf("await loadKB(env, url)") < 0);

@@ -5114,6 +5114,8 @@ function wdsGradeKnobs(lv) {
     default: return { lv: 0, name: "标准", top: 0, plain: 0, effort: "", tok: 2600, method: 0, first: CHAT_FIRST_MS, total: CHAT_TOTAL_MS, src: 6, ctx: 30000, ng: 0 };
   }
 }
+/* 这一问是不是 SDE 深度研究的一道（rs.sde），在 rs 白名单重建之前就要知道（联网开关在那之前算）。 */
+function rs0Sde(b, noSde) { return !noSde && !!(b && b.rs && typeof b.rs === "object" && b.rs.sde); }
 /* 客户端递来的 grade："auto" ＝ 按检索定档；1–5 ＝ 读者钉死；没递（老客户端）＝ 0，走老深度档。 */
 function wdsGradeReq(x) {
   if (x === "auto" || x === "a") return "auto";
@@ -6077,16 +6079,64 @@ function wdsHtmlText(html) {
   s = s.replace(/[ \t\u00a0]+/g, " ").replace(/\n[ \t]+/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
   return { title, text: s.slice(0, 120000) };
 }
-function webBlock(items) {
+function webBlock(items, max) {
   if (!items || !items.length) return "";
+  const cap = max || 9000;
   let s = "";
   for (let i = 0; i < items.length; i++) {
     const it = items[i];
     s += "[W" + (i + 1) + "] " + it.t + (it.d ? "（" + it.d + "）" : "") + (it.m ? " · " + it.m : "") + "\n" + it.s + "\n" + it.u + "\n\n";
-    if (s.length > 9000) break;
+    if (s.length > cap) break;
   }
   return s;
 }
+/* ═══ 深度研究的「站外寻找」（2026-08-30）═════════════════════════════════
+   [stated] 作者：深度研究应该是「满血站内检索」＋「站外寻找」。
+   此前站外只在第 1／2／10 道开、每道一路查询、而且查的词是 **q＝工序标题**（「三方程研究」）——
+   等于没查。现在每一道都查、查的是题目、按这一道的活配二到三路查询词（同向／对立／方法），
+   并到一起去重，最多 30 条。 */
+const RES_WEB_SUFFIX = {
+  1: ["现状 数据 事件"],
+  2: ["研究 综述 理论 提出", "批评 反驳 局限"],
+  3: ["机制 原因 结构"],
+  4: ["过程 路径 演变"],
+  5: ["动力 矛盾 原因"],
+  7: ["研究 论文"],
+  8: ["反例 质疑 证伪"],
+  9: ["最新 进展"],
+  10: ["参考文献 来源 出处"],
+};
+const RES_WEB_N = 15, RES_WEB_MAX = 30, RES_WEB_BLOCK = 24000;
+async function resWebSearch(env, topic, stage, key) {
+  const t0 = String(topic || "").trim().slice(0, 70);   // 接口建议 ≤70 字，超了召回反而差
+  if (!t0) return { ok: false, reason: "empty", items: [], queries: [] };
+  const sfx = RES_WEB_SUFFIX[stage | 0] || [];
+  /* 带后缀的那几路：题目太长就先裁题目，后缀一定要留得住——后缀才是这一路与题目那一路的差别。 */
+  const queries = [t0].concat(sfx.map((x) => t0.slice(0, Math.max(8, 70 - x.length - 1)) + " " + x));
+  const rs = await Promise.all(queries.map((qx) => webSearch(env, qx, key, RES_WEB_N).catch(() => ({ ok: false, reason: "net", items: [] }))));
+  const seen = {}, items = [];
+  let ok = false, reason = "";
+  for (const r of rs) {
+    if (r && r.ok) ok = true; else if (r && r.reason && !reason) reason = r.reason;
+    for (const it of ((r && r.items) || [])) { if (!it || !it.u || seen[it.u]) continue; seen[it.u] = 1; items.push(it); if (items.length >= RES_WEB_MAX) break; }
+    if (items.length >= RES_WEB_MAX) break;
+  }
+  return { ok: ok, reason: ok ? "" : (reason || "none"), items: items, queries: queries };
+}
+/* 满血站内检索：每一道的检索词按这一道的活再加一组角度词（并进扩展词，权重与扩展词同）。 */
+const RES_ANGLE = {
+  1: ["背景", "现状", "指标", "事件"],
+  2: ["研究", "综述", "理论", "方法", "提出"],
+  3: ["三大方程", "显露", "差异序列", "特征纠缠"],
+  4: ["六路径", "路径", "在E中经D成S"],
+  5: ["三原理", "矛盾", "动力", "回写"],
+  6: ["争论", "反驳", "相反", "代价", "失败", "例外", "被推翻", "典范"],
+  7: ["论文", "大纲"],
+  8: ["证伪", "反例", "预注册", "赌注"],
+  9: ["结论", "总结"],
+  10: ["参考文献", "出处"],
+};
+const RES_RAG = { k: 48, pick: 48, kbn: 40, cap: 30000, capkb: 24000, hits: 48, hitskb: 36, want: 24000, srcn: 16 };
 // 深度思考档的方法论明示块：三大方程 · 六路径 · 123原理 · 意义三律。
 // 标准档不挂（省 token，也不必），深度档挂——要它真按工序走，而不是嘴上说 SDE。
 /* ═══ 每一答的使命（2026-08-23 王德生令）═══════════════════════════
@@ -10195,6 +10245,9 @@ export default {
       const capKb = Math.max(0, Math.min(30000, parseInt(b.capkb, 10) || 0));
       const hitMax = Math.max(0, Math.min(64, parseInt(b.hits, 10) || 0));
       const hitMaxKb = Math.max(0, Math.min(64, parseInt(b.hitskb, 10) || 0));
+      /* 满血档（深度研究）再加两个可选字段：want＝L2 下钻想凑够多少字（不传＝旧的 12000）、srcn＝出处条数（不传＝10）。 */
+      const want = Math.max(0, Math.min(30000, parseInt(b.want, 10) || 0));
+      const srcN = Math.max(1, Math.min(24, parseInt(b.srcn, 10) || 10));
       /* 【领域档案的语料白名单】profile 只递一个 key，正则在服务端的 WDS_PROFILES 里。
          为什么过滤要做在**这里**而不是调用方：调用方拿到的是拼好的 ctx 文本块，
          按 URL 过滤一个已经拼成一整段的字符串是靠不住的（篇名可能重名、块间没有稳定边界）；
@@ -10205,6 +10258,7 @@ export default {
            所以按需拼一个——**别退回 undefined**，那会把 keep 一起丢掉（静默，且只在档案模式下发作）。 */
         const _o = {};
         if (pick) _o.pick = pick;
+        if (want) _o.want = want;
         if (prof && prof.pre && prof.pre.length) _o.keep = prof.pre;
         /* ⭐ 难度条的落点（2026-08-30）：九库在检索**之前**先种一次——种到的核心概念若与题面有字面
            锚定（「福」→「幸福律」），把它的名字并进检索词，这一趟检索就真会走到那条律的材料上，
@@ -10244,7 +10298,7 @@ export default {
           if (chunkText.length > chunkCap) break;
         }
         return J({ ok: true, ctx: kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText,
-                   srcs: srcs.slice(0, 10), prof: prof ? prof.id : "", kb: !!kbBlock,
+                   srcs: srcs.slice(0, srcN), prof: prof ? prof.id : "", kb: !!kbBlock,
                    /* 难度条读数：量／准／落点三项与总分、档位（见 ragGrade 头注释）。调用方不认这个字段也无妨。 */
                    grade: ragGrade(q, scan.picked, nHit, srcs.length, kbBlock.length + chunkText.length, core) });
       } catch (e) {
@@ -11114,7 +11168,10 @@ export default {
       /* ⚠ 评分与近邻两道现在走**专用链**（见下面 wantNbr），不再走这条宽泛搜索。
          这里保留 `|| iq` 只是为了让 `webCtx` 那一支不至于在专用链失败时空手——
          实际取材见 nbrChain。普通问答仍按读者的开关走。 */
-      const wantWeb = !!b.web;                                  // 联网开关
+      /* ⭐ 深度研究每一道都联网（2026-08-30 用户令「深度研究应是满血站内检索＋站外寻找」）。
+         此前只有第 1／2／10 道由前端强制开，其余道只看读者的开关。 */
+      const resFull = !!(rs0Sde(b, noSde));
+      const wantWeb = !!b.web || resFull;                       // 联网开关（研究产线一律开）
       const skey = String(b.skey || "").trim();                 // 读者的智谱 Key（专供联网搜索；没有就退到管理员 Key）
       const umodel = String(b.model || "").trim();              // 读者自填的型号覆盖（各家型号会过时，留个自救口）
       // 附件：读者在自己浏览器里解析出的正文（文件本身从不上传到本站）。总量钳位，深度档给多一些。
@@ -11274,7 +11331,11 @@ export default {
                《站内资料》，那不是无 SDE，是嘴上无 SDE——语料关不掉，人格换了也没用。 */
             if (!noSite && !noSde) try {
               _stg("扩展检索词");
-              const expTerms = await sdeExpandQuery(VC, KEY, q);
+              /* ⭐ 产线道次的检索词是**题目**，不是工序标题（2026-08-30）。此前 q 就是「三方程研究」这类工序名，
+                 扩展词、站内检索、站外搜索三样全拿它去查——查了等于没查。题目在 rs.topic 里（白名单字段）。 */
+              const rq = (rs && rs.topic) ? rs.topic : q;
+              const expTerms = await sdeExpandQuery(VC, KEY, rq);
+              if (resFull) for (const w of (RES_ANGLE[rs.i | 0] || [])) if (expTerms.indexOf(w) < 0) expTerms.push(w);
               /* ⭐ 碰撞工序要的是**三篇互相矛盾**的站内文章，而检索只按相关度召回——
                  相关度最高的那几篇往往彼此支持，于是这道工序从料上就凑不出真矛盾，
                  只能硬造一个假的（这正是它自己写着「最难被事后发现的失手」）。
@@ -11295,8 +11356,15 @@ export default {
                  就是这个死法：一帧＝那一次心跳，零 sources ＝ 死在检索段里。
                  ⚠ 口径逐条搬过去了（k/pick/kbn/两档 chunkCap/两档条数/绝对网址），不是趁机改配方。 */
               let _ragWhy = "";
-              const _ragBody = {
-                q: q, exp: expTerms,
+              const _ragBody = resFull ? {
+                /* 满血站内检索：候选 48 篇、下钻凑够 24000 字、九库 40 个实体、片段 30000 字、出处 16 篇。 */
+                q: rq, exp: expTerms,
+                k: RES_RAG.k, pick: RES_RAG.pick, kbn: RES_RAG.kbn,
+                cap: RES_RAG.cap, capkb: RES_RAG.capkb,
+                hits: RES_RAG.hits, hitskb: RES_RAG.hitskb, want: RES_RAG.want, srcn: RES_RAG.srcn,
+                abs: 1, prof: prof ? prof.id : "",
+              } : {
+                q: rq, exp: expTerms,
                 k: wide ? 30 : 20, pick: wide ? 28 : 18, kbn: deep ? 36 : 24,
                 cap: deep ? 18000 : 12000, capkb: deep ? 12000 : 7000,
                 hits: deep ? 28 : 20, hitskb: deep ? 20 : 12,
@@ -11337,12 +11405,16 @@ export default {
             const mFull = G.on ? !!gK.method : deep;                      // 方法论块：完整工序还是精简工序
             const gPlain = !!(G.on && gK.plain && wdsCanPlain(VC));        // 第 1 档：关思考的快车道（关不掉的家照旧）
             const tokGrade = G.on ? Math.max(gK.tok, tool ? 4000 : 0) : (deep ? 6000 : (tool ? 4000 : 2600));
-            sources = sources.slice(0, G.on ? gK.src : (deep ? 10 : 6));
+            sources = sources.slice(0, resFull ? RES_RAG.srcn : (G.on ? gK.src : (deep ? 10 : 6)));
             if (G.on && ctxText.length > gK.ctx) {
               const _cl = ctxText.length;
               ctxText = ctxText.slice(0, gK.ctx) + "\n〔按难度第 " + G.lv + " 档，站内资料只带前 " + gK.ctx + " 字（检索到 " + _cl + " 字）〕";
             }
             if (sources.length) controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 出处先发前端
+            /* 满血站内检索的读数：查的是什么、查到多少。研究产线每一道一行，读者与我方都看得见这一道不是拿工序名在查。 */
+            if (resFull && !noSite) controller.enqueue(_sseBytes({ t: "note", v: "🔎 满血站内检索 · 题目「" + String((rs && rs.topic) || q).slice(0, 60) + "」→ 出处 " + sources.length + " 篇"
+              + (ragG ? (" · 片段 " + (ragG.nhit || 0) + " 段 · 资料 " + (ragG.chars || 0) + " 字" + (ragG.core && ragG.core.length ? (" · 落点 " + ragG.core.map((c) => c.n).join("、")) : "")) : "")
+              + (sources.length ? "" : "（这一道站内没查到，只据内功与上游原文）") }));
             /* 难度条读数随流下发：档位、是自动还是钉死、量／准／落点三项，以及这一档实际给的配方。
                标准档也发（on:false）——读者看得见「这一问站内高级度几档」，才知道值不值得切深度。 */
             if (ragG || G.on || deep) controller.enqueue(_sseBytes({ t: "grade", v: {
@@ -11402,9 +11474,13 @@ export default {
                 + nc.passes.map((x) => x.k + " " + x.n + (x.why ? ("·" + x.why) : "")).join("；")
                 + "）。这一道会按〔未核验〕处理，不据此放行。" }));
             } else if (wantWeb) {
-              const ws = await webSearch(env, q, (rvendor === "glm" ? KEY : skey), deep ? 12 : 8);
-              if (ws.ok && ws.items.length) { webCtx = webBlock(ws.items); controller.enqueue(_sseBytes({ t: "web", v: ws.items })); }
+              const rq2 = (rs && rs.topic) ? rs.topic : q;          // 站外也搜题目，不搜工序标题
+              const ws = resFull
+                ? await resWebSearch(env, rq2, rs.i | 0, (rvendor === "glm" ? KEY : skey))
+                : await webSearch(env, rq2, (rvendor === "glm" ? KEY : skey), deep ? 12 : 8);
+              if (ws.ok && ws.items.length) { webCtx = webBlock(ws.items, resFull ? RES_WEB_BLOCK : 0); controller.enqueue(_sseBytes({ t: "web", v: ws.items })); }
               else controller.enqueue(_sseBytes({ t: "webfail", v: ws.reason }));
+              if (resFull) controller.enqueue(_sseBytes({ t: "note", v: "🌐 站外寻找 · " + ((ws.queries || []).length || 1) + " 路查询「" + ((ws.queries || [rq2]).join("」「")).slice(0, 200) + "」→ " + (ws.items ? ws.items.length : 0) + " 条" + (ws.ok ? "" : ("（" + (ws.reason === "need_search_key" ? "没有可用的搜索 Key" : ws.reason) + "）")) }));
             }
             // 近邻工序：把真名单前置到 system（放在语料之前，否则会被两万字语料埋掉）。
             // 取不到就发 nbrfail 让前端如实说一句——静默失败等于把没做的检测记成做过了。

@@ -167,7 +167,7 @@ ok("方法论块按档给（mFull），不再直接看 deep", /WDS_CHAT_SYS\(ref
 ok("预算按档给，工序保底 4000；不适用时是老账（6000／4000／2600）", /const tokGrade = G\.on \? Math\.max\(gK\.tok, tool \? 4000 : 0\) : \(deep \? 6000 : \(tool \? 4000 : 2600\)\);/.test(CHAT) && /: \(rsLong \? FORGE_STAGE_TOK : \(rs \? \(deep \? 6000 : 4000\) : tokGrade\)\)/.test(CHAT));
 ok("时钟按档给，产线与长篇的总时长照旧最长", /const gFirst = G\.on \? gK\.first : \(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS\);/.test(CHAT) && /const clk = wdsClock\(gFirst,\s*rsLong \? FORGE_TOTAL_MS : \(askLen \? CHAT_TOTAL_LONG_MS : gTotal\)\);/.test(CHAT));
 ok("零帧提示报的是这一档真实的首帧闸", /const _lim = Math\.round\(gFirst \/ 1000\);/.test(CHAT));
-ok("出处条数与站内资料量按档裁，裁了要说", /sources = sources\.slice\(0, G\.on \? gK\.src : \(deep \? 10 : 6\)\);/.test(CHAT) && /if \(G\.on && ctxText\.length > gK\.ctx\)/.test(CHAT) && /站内资料只带前/.test(CHAT));
+ok("出处条数与站内资料量按档裁，裁了要说（研究道次另有满血条数）", /sources = sources\.slice\(0, resFull \? RES_RAG\.srcn : \(G\.on \? gK\.src : \(deep \? 10 : 6\)\)\);/.test(CHAT) && /if \(G\.on && ctxText\.length > gK\.ctx\)/.test(CHAT) && /站内资料只带前/.test(CHAT));
 ok("发 grade 帧，且标准档也发（读者看得见这一问的高级度）", /if \(ragG \|\| G\.on \|\| deep\) controller\.enqueue\(_sseBytes\(\{ t: "grade", v: \{/.test(CHAT));
 ok("grade 帧里带落点、量、准、配方", /core: ragG \? \(ragG\.core \|\| \[\]\) : \[\]/.test(CHAT) && /method: mFull \? "完整工序" : "精简工序", tok: tokGrade, ng: !!\(G\.on && gK\.ng && !prof\)/.test(CHAT));
 ok("第 1 档主答走关思考的请求体（普通问答那一发）", /body: JSON\.stringify\(gPlain \? wdsPlainBody\(VC, \{ model: VC\.model, stream: true, max_tokens: tokWant, messages \}\) : wdsTopBody\(VC, \{ model: VC\.model, stream: true, max_tokens: tokWant, messages \}\)\)/.test(CHAT));
