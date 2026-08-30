@@ -456,7 +456,7 @@ ok(STORY.indexOf("卷次时间线") >= 0, "小说分册没写明长篇跨部状�
   ok(/SPEC\.timeline \?/.test(W), "plan 那一趟没有按 SPEC.timeline 下发卷次时间线");
   ok(/novel: 1/.test(W), "novel 不在服务端白名单里");
   ok(/novel: 120000/.test(W), "DIST_WORDS 里没有 novel");
-  ok(/novel:\[100000,120000,160000\]/.test(W.replace(/\s/g, "")), "DIST_WORD_OPTS 里 novel 不是 100000/120000/160000");
+  ok(/novel:\[100000,120000,200000\]/.test(W.replace(/\s/g, "")), "DIST_WORD_OPTS 里 novel 不是 100000/120000/200000");
   ok(/k: "novel"[^}]*w: 120000/.test(MODE2), "前端 KIND_DEF 里没有 novel，或目标字数对不上");
   ok(/k: "novel"[^}]*[,{]\s*c: 1/.test(MODE2), "novel 没标 c:1（不走拆趟，四五十趟会挤成一趟）");
   ok(/k: "novel"[^}]*[,{]\s*seq: 1/.test(MODE2), "novel 没标 seq:1（断点续写靠它）");
