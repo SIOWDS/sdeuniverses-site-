@@ -1048,7 +1048,7 @@
       kProse: "散文（5000字）", kProseS: "不讲道理讲经验：从一个场面进去，道理藏在事里，收在一个具体画面上",
       kStory: "短篇小说（2400字）", kStoryS: "一个场景、一到三个人；判断由情节自己撞出来，结尾不解决不点题",
       kNovella: "中篇小说（24000字）", kNovellaS: "三幕八节、一主一反两条线；第二节那个选择会在第七节原样重来一次，只有动作不同",
-      kNovel: "长篇小说（10万字·四部）", kNovelS: "四部三到四条线、十万字。一次写不完：随时可停，回来点「接着往下写」从上次停的地方接着写。世界快照带卷次时间线，人物与设定全书守恒",
+      kNovel: "长篇小说（10万字以上·四部）", kNovelS: "四部三到四条线、十万字起。一次写不完：随时可停，回来点「接着往下写」从上次停的地方接着写。世界快照带卷次时间线，人物与设定全书守恒",
       kScript: "剧本（6000字）", kScriptS: "只写看得见与听得见的；写得出「他心里想」的那一句，一定是错的",
       lnPick: "先定体量", lnUnit: " 字",
       lnNote: "三千字与八千字不是同一篇的两种长度：**短的那一档要砍掉一条线，长的那一档要多一个人**。所以体量在动笔之前定，不是写完再删——删出来的稿子逻辑是断的。",
@@ -1325,7 +1325,7 @@
       kProse: "Personal essay (5,000 characters)", kProseS: "Experience, not argument: enter through a scene, keep the point inside the events, end on an image",
       kStory: "Short story (2,400 characters)", kStoryS: "One scene, one to three people; the claim has to surface through what happens — no moral at the end",
       kNovella: "Novella (24,000 characters)", kNovellaS: "Eight sections in three acts, one main line and one rival; the choice in section 2 returns unchanged in section 7 — only the action differs",
-      kNovel: "Novel (100,000 characters, four parts)", kNovelS: "Four parts, three to four lines, 100k characters. Too long for one sitting: stop anytime, come back and hit \u201ckeep writing\u201d to resume where you left off. A volume timeline in the world snapshot keeps people and setting consistent throughout",
+      kNovel: "Novel (100,000+ characters, four parts)", kNovelS: "Four parts, three to four lines, 100k characters and up. Too long for one sitting: stop anytime, come back and hit \u201ckeep writing\u201d to resume where you left off. A volume timeline in the world snapshot keeps people and setting consistent throughout",
       kScript: "Screenplay (6,000 characters)", kScriptS: "Only what can be seen and heard; any line saying what someone thinks is a wrong line",
       lnPick: "Pick a length first", lnUnit: " chars",
       lnNote: "Three thousand and eight thousand are not two lengths of one piece: **the short one has to lose a thread, the long one has to gain a person.** So length is settled before writing, not by cutting afterwards — a cut-down draft has a broken spine.",
@@ -7442,7 +7442,7 @@
        逐章存稿（saveProgress 连提纲一起存），中断后从已写章数接着往下跑，而不是靠中篇那条
        「按小标题定位缺节」的续写路——noHead 稿没有小标题可定位（那条路对 noHead 一律回全稿缺）。
        ⚠ 服务端白名单／SPEC／DIST_WORDS／DIST_WORD_OPTS 四处都已加 novel；只改这里会「菜单点得到、后端认不出」。 */
-    { k: "novel", t: "kNovel", sty: 1, doc: 1, w: 100000, c: 1, seq: 1, wo: [60000, 100000, 160000] },
+    { k: "novel", t: "kNovel", sty: 1, doc: 1, w: 120000, c: 1, seq: 1, wo: [100000, 120000, 160000] },
     /* 剧本与小说最容易被当成一回事，而承重物不同：小说是演出（读者读叙述），剧本是可排演
        （只写看得见与听得见的）。⚠ 它给 sty（腔调可学）但**不给 verse**（它不是诗体排版）。 */
     { k: "script", t: "kScript", sty: 1, doc: 1, w: 6000, c: 1, wo: [3000, 6000, 12000] },
