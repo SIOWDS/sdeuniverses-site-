@@ -224,7 +224,7 @@ ok("笔法面板把体量原样带下去", /distill\(kind, null, null, "", null,
 // ── 缩放真跑 ────────────────────────────────────────────────
 console.log("\n【八、分趟缩放真跑】");
 {
-  const s = /function distScaleFixed\(base, words\) \{[\s\S]*?\n\}/.exec(W);
+  const s = /function distScaleFixed\(base, words(?:, noHead)?\) \{[\s\S]*?\n\}/.exec(W);
   ok("抠得到 distScaleFixed", !!s);
   const fx = s ? new Function(s[0] + "; return distScaleFixed;")() : null;
   const base = [{ h: "一", words: 2000, ask: "A" }, { h: "二", words: 1750, ask: "B" }, { h: "三", words: 1250, ask: "C" }];
@@ -247,6 +247,30 @@ console.log("\n【八、分趟缩放真跑】");
     ok("★ 被拆开的段：非末趟明写「别收」", r8.length > 0 && r8.filter((x) => x.ask.indexOf("别收") > 0).length >= 1);
     ok("★ 被拆开的段：末趟只收这一段，不越权收全篇", r8.some((x) => x.ask.indexOf("全篇是否收尾另看") > 0));
     ok("短档不会把某一段压到 300 字以下", fx(base, 900).every((x) => x.words >= 300));
+    // ── noHead 续写段：一次性的开头/写标题/演转折只在开头段做，续写段只往下写 ──
+    //    （2026-08-30 修「长篇小说有文字的重复」：整拍的一次性指令原来被每个子趟各领一次）
+    {
+      const nb = [{ h: "一拍", words: 6000, ask: "先写一行 `# 书名`，再写一行 `## 第一部`，然后演出【那一次不可逆的大变化】。" }];
+      const rr = fx(nb, 6000, true);           // 6000/2200 ⇒ 3 趟
+      ok("★ noHead 拆趟：一拍被拆成多趟", rr.length >= 2, "趟数 " + rr.length);
+      const head = rr[0], conts = rr.slice(1);
+      ok("★ noHead 开头段仍领整拍 ask（负责开头/写标题/演转折）",
+         head.ask.indexOf("那一次不可逆的大变化") >= 0 && head.ask.indexOf("开头部分") >= 0);
+      ok("★ noHead 续写段标成「续写段·接着上一段往下写」",
+         conts.every((x) => x.ask.indexOf("续写段") >= 0 && x.ask.indexOf("接着上一段") >= 0));
+      ok("★ noHead 续写段明令不重印书名/部标题、不重演转折、不重复已写句子",
+         conts.every((x) => x.ask.indexOf("不再写、不再重演") >= 0 && x.ask.indexOf("再写一遍") >= 0));
+      ok("★ noHead 续写段把整拍 ask 降为「方向参考·总目标」，不当新命令重做",
+         conts.every((x) => x.ask.indexOf("总目标") >= 0));
+      ok("★ noHead 续写段仍允许开新章（不误伤 `## 章名`）",
+         conts.every((x) => x.ask.indexOf("开新章不算重复") >= 0));
+      ok("★ noHead 续写段：非末趟别收、末趟只收本段",
+         conts[conts.length - 1].ask.indexOf("全篇是否收尾另看") >= 0
+         && conts.slice(0, -1).every((x) => x.ask.indexOf("别收") >= 0));
+      // 反向：不传 noHead（学术骨架档）时，续写段保持原软提示、不被误加续写指令
+      ok("★ 非 noHead 续写段保持原软提示（不加 noHead 续写指令）",
+         fx(nb, 6000).slice(1).every((x) => x.ask.indexOf("续写段") < 0));
+    }
   }
 }
 
