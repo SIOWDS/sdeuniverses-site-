@@ -580,6 +580,18 @@ console.log("⑧ 成文（distill）");
   const fbox = t2.querySelector(".wdsm-follows");
   ok(!!fbox, "追问建议已渲染");
   ok(t2.querySelectorAll(".wdsm-follow").length === 3, "三个追问 chip");
+  /* 一起问（2026-08-30）：第四颗钮不是追问 chip（class 另起），点它把三条并成一问一次发出，①②③ 逐条标号。 */
+  {
+    const fa = t2.querySelector(".wdsm-follow-all");
+    ok(!!fa && /一起问/.test(fa.textContent), "有「一起问」钮，且不算进三个追问 chip 里");
+    ROUTE["/api/wds/chat"] = [{ t: "token", v: "三个一起答。" }];
+    if (fa) { fa.click(); await new Promise((r) => setTimeout(r, 260)); }
+    const q3 = String(LAST_PAYLOAD.q || "");
+    ok(["那退化谱系怎么算？", "这在教学里怎么落地？", "有没有反例？"].every((x) => q3.indexOf(x) >= 0),
+      "★ 一起问把三条问句都发出去了，实得 " + q3.replace(/\n/g, " / "));
+    ok(/①[\s\S]*②[\s\S]*③/.test(q3) && /逐条标号/.test(q3), "三条逐条标号，头一句要求逐条作答");
+    ok(q3.indexOf("wdsm") < 0 && q3.indexOf("|") < 0, "路径名与工艺痕迹不进问句");
+  }
   const spBtn = t2.querySelectorAll(".wdsm-act").find((b) => b.textContent.includes("朗读"));
   ok(!!spBtn, "朗读按钮存在");
   SPOKEN = []; spBtn.click();

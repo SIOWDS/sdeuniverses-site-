@@ -962,6 +962,9 @@
       dayOut: "今日本机额度已用完，明天再来（陪读与「SDE 对谈」不受影响）。",
       sessFull: "这场已谈满 100 次，点＋新对话重开。",
       srcSite: "站内文献", srcWeb: "站外来源 · 联网搜索", followsH: "接着可以问",
+      /* 一起问（2026-08-30）：三条追问并成一问一次发出。followAllQ 是并起来那条消息的头一句，读者看得见、可改。 */
+      followAll: "一起问", followAllT: "三个都问：并成一条消息一次发出，一趟答完、逐条标号",
+      followAllQ: "三个问题一起问，逐条标号作答：",
       ledH: "这一答走了几步", ledStock: "家底", ledField: "外领域", ledFal: "作废条件", ledNew: "新在",
       srcN: " 篇", toBot: "回到最新",
       aCopy: "\u29c9 复制", aCopied: "已复制", aRead: "\ud83d\udd0a 朗读", aStop: "\u23f9 停止", aRegen: "\u21bb 重答", aEdit: "\u270e 改问",
@@ -1230,6 +1233,8 @@
       dayOut: "Today's allowance for this key is used up. Come back tomorrow.",
       sessFull: "This chat has hit 100 turns. Start a new one.",
       srcSite: "ON-SITE SOURCES", srcWeb: "WEB SOURCES", followsH: "ASK NEXT",
+      followAll: "Ask all three", followAllT: "Send all three as one message; answered in one pass, numbered",
+      followAllQ: "All three at once \u2014 answer each in turn:",
     ledH: "STEPS TAKEN", ledStock: "prior views", ledField: "other field", ledFal: "falsifier", ledNew: "what's new",
       srcN: "", toBot: "Jump to latest",
       aCopy: "\u29c9 Copy", aCopied: "Copied", aRead: "\ud83d\udd0a Read", aStop: "\u23f9 Stop", aRegen: "\u21bb Retry", aEdit: "\u270e Edit",
@@ -2157,6 +2162,9 @@
     ".wdsm-follow{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer;text-align:left}" +
     ".wdsm-follow:hover{border-color:var(--wline2);color:var(--wgold)}" +
     ".wdsm-follows-h{width:100%;font-size:11px;letter-spacing:1px;color:var(--wdim2);margin-bottom:2px}" +
+    /* 一起问：与追问 chip 同形，金边区分——它不是第四条追问，是把上面三条一起发出去的那颗 */
+    ".wdsm-follow-all{background:none;border:1px solid var(--wgold2);color:var(--wgold);border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer}" +
+    ".wdsm-follow-all:hover{background:var(--wfill2);border-color:var(--wgold)}" +
     ".wdsm-inwrap{max-width:760px;margin:0 auto;background:var(--wfill);border:1px solid var(--wline2);border-radius:16px;padding:10px 10px 8px 14px}" +
     ".wdsm-inrow{display:flex;gap:8px;align-items:center;margin-top:4px}" +
     ".wdsm-insp{flex:1}" +
@@ -3764,6 +3772,7 @@
     if (!qs || !qs.length || cell.follows) return;
     var box = el("div", "wdsm-follows");
     box.appendChild(el("div", "wdsm-follows-h", t("followsH")));
+    var qList = [];                       // 三条问句本身（给「一起问」用；路径名不进去）
     qs.slice(0, 3).forEach(function (item) {
       var q = (item && typeof item === "object") ? String(item.q || "") : String(item || "");
       var p = (item && typeof item === "object") ? String(item.p || "") : "";
@@ -3776,7 +3785,21 @@
       b.appendChild(document.createTextNode(q));
       b.onclick = function () { if (!streaming) send(q); };   // 只发问句，路径名是给人看的
       box.appendChild(b);
+      qList.push(q);
     });
+    /* 一起问（2026-08-30 用户令）：三条并成一问一次发出。①②③ 逐条标号，头一句说明要逐条作答，
+       走同一个 send()——一次调用、一趟答完；不排队三趟（那要三倍额度与三倍时间）。
+       只在真有两条以上时才摆：一条追问没有「一起」可言。 */
+    if (qList.length >= 2) {
+      var all = el("button", "wdsm-follow-all", t("followAll"));
+      all.title = t("followAllT");
+      all.onclick = function () {
+        if (streaming) return;
+        var marks = ["\u2460", "\u2461", "\u2462"];
+        send(t("followAllQ") + "\n" + qList.map(function (x, i) { return marks[i] + " " + x; }).join("\n"));
+      };
+      box.appendChild(all);
+    }
     cell.turn.appendChild(box); cell.follows = box;
   }
 
