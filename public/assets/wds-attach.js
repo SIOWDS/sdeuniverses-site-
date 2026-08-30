@@ -20,7 +20,8 @@
     mammoth: "https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js",
     tesseract: "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js",
   };
-  var MAX_CHARS = 120000;     // 单篇上限（后端还会再钳一次，这里只是别把浏览器撑爆）
+  var MAX_CHARS = 200000;     // 单篇文字上限 20 万字（后端仍按每轮预算取段，这里只是别把浏览器撑爆）
+  var MAX_BYTES = 100 * 1024 * 1024;  // 单个文件上限 100 MB——再大浏览器读不动，早退比卡死好
   var OCR_MAX_PAGES = 20;     // 扫描件兜底只 OCR 前若干页——再多读者早不耐烦了
   var loaded = {};
 
@@ -149,6 +150,7 @@
 
   function parseFile(file, prog) {
     var name = file.name || "未命名";
+    if (file && file.size > MAX_BYTES) return Promise.reject(new Error("文件太大（超过 100 MB），换小一点的再传"));
     var low = name.toLowerCase();
     var P;
     if (/\.(txt|md|markdown|csv|json|log)$/.test(low)) P = readText(file).then(function (t) { return { text: t, note: "" }; });
