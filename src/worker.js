@@ -15679,7 +15679,7 @@ export default {
     // **先按 /sites/<名>/ 找一遍；没有时再按中央归属表裁决。**
     // 正确作者与专著留在本分站；落到错误分站的文章 301 到正确分站，普通母站
     // 内容 301 回裸域名。母站访问一篇已划归正式分站的文章，也 301 到该分站。
-    const SUBSITES = { health: "/sites/health", lang: "/sites/lang", liter: "/sites/liter", edu: "/sites/edu", math: "/sites/math", comp: "/sites/comp", mpc: "/sites/mpc" };
+    const SUBSITES = { read: "/sites/read", health: "/sites/health", lang: "/sites/lang", liter: "/sites/liter", edu: "/sites/edu", math: "/sites/math", comp: "/sites/comp", mpc: "/sites/mpc" };
     const subHost = url.hostname.toLowerCase();
     const subPrefix = /\.sdeuniverses\.com$/.test(subHost) ? (SUBSITES[subHost.split(".")[0]] || null) : null;
     const seoCatalog = await seoSiteCatalog(env);
