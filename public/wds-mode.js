@@ -525,6 +525,63 @@
         en: { ph: "Paste an essay, a paragraph, or tell me which sentence you're stuck on…", srcSite: "From the composition subsite" }
       }
     },
+    read: {
+      id: "read",
+      brand: "ChatWYQ",
+      url: "/chatwyq/",
+      sig: "ChatWYQ · read.sdeuniverses.com",
+      who: "WYQ",
+      kicker: "READ.SDEUNIVERSES.COM",
+      home: "/",
+      tools: [],
+      seeds: ["我想弄明白 AI 会把知识怎么样，读哪本？", "《道德经》想认真读一遍，从哪本入手？", "关心孩子教育，有没有一本能读的？", "这段话我读不懂，帮我看看它在说什么。"],
+      hero: {
+        zh: { title: "ChatWYQ", sub: "德麦国际读书馆 · 领读人。说说你遇到的问题或想读什么——从一百多部专著里替你挑、帮你看清一本书讲什么、陪你把卡住的那一段读透。", foot: "答案扣着馆藏的书。用你自己的大模型 Key 运行，Key 只存这台设备的浏览器里。" },
+        en: { title: "ChatWYQ", sub: "Demai International Reading House · your reading guide. Tell it what you're after or what you'd like to read — it picks from 100+ monographs, shows you what a book is really about, and reads the stuck passage with you.", foot: "Answers stay grounded in the shelf. Runs on your own model key, kept only in this browser." }
+      },
+      copy: {
+        zh: { ph: "说说你想读什么、或遇到的问题——也可以贴一段读不懂的话", note: "ChatWYQ 是读书馆的领读人，只帮你读书：挑书、看清一本书、陪你读卡住的地方，答案扣着馆藏。用你自己的大模型 Key 运行：Key 存在你这台机器上，调用时经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析。", setKeyP: "ChatWYQ 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 保存在你这台机器上；调用时会经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析</b>，随时可清除。", srcSite: "读书馆藏书", convoTitle: "与 WYQ 的对话", stDefault: "WYQ 本色", errNet: "接不上 ChatWYQ 了（", pdfFoot: "导出自 ChatWYQ · 德麦国际读书馆 · read.sdeuniverses.com　|　回答由大模型生成，引用前请自行核实。", deckFoot: "ChatWYQ · 德麦国际读书馆 · read.sdeuniverses.com", setAboutP: "写一句你是谁、平时读什么、想让 WYQ 怎么陪你读。以后每次都会带上，不必再重复。也只存你本机。", setAboutPh: "例：我不常读书，想从跟自己有关的问题入手，别一上来给我一长串书单。", memHd: "本机共 <b>{n}</b> 场对话（含本站其它智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场", turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在 ChatWYQ 的额度，站上其它入口各有独立额度。", dayOut: "今日本机额度已用完，明天再来（站上其它入口不受影响）。", tlBtn: "⊞ 读法", tlTitle: "挑一种读法", tlNone: "普通对话", srcSite2: "", egs: ["我想弄明白 AI 会把知识怎么样，读哪本？", "《道德经》想认真读一遍，从哪本入手？", "关心孩子教育，有没有一本能读的？", "这段话我读不懂，帮我看看它在说什么。"] },
+        en: { ph: "Tell me what you'd like to read, or the problem you're chewing on — or paste a passage you can't follow", note: "ChatWYQ is the reading house's guide. It only helps you read: picking a book, seeing what one is about, reading a stuck passage with you — grounded in the shelf. Runs on your own model key, kept only in this browser and never logged.", setKeyP: "ChatWYQ runs on your own model key. <b style=\"color:#C9A227\">It is kept on your machine and relayed in memory to your chosen provider — never written to a database, log, or analytics</b>; clear it anytime.", srcSite: "the reading-house shelf", convoTitle: "A conversation with WYQ", stDefault: "WYQ, unstyled", errNet: "Couldn't reach ChatWYQ (", pdfFoot: "Exported from ChatWYQ · Demai Reading House · read.sdeuniverses.com  |  Model-generated — verify before citing.", deckFoot: "ChatWYQ · Demai Reading House · read.sdeuniverses.com", setAboutP: "A line on who you are, what you usually read, and how you want WYQ to read with you. It rides along each time. Stored only on this machine.", setAboutPh: "e.g. I don't read much; start from something close to me, and don't hand me a long list up front.", memHd: "<b>{n}</b> chats on this device (including other agents here), <b>{m}</b> distilled, <b>{p}</b> pending", turnsTitle: "This session = up to 100 turns (＋ New chat to restart); Today = this device's daily quota on ChatWYQ. Other entry points have their own.", dayOut: "Out of quota on this device for today; try tomorrow (other entry points unaffected).", tlBtn: "⊞ Ways to read", tlTitle: "Pick a way to read", tlNone: "Plain chat", srcSite2: "", egs: ["I want to understand what AI does to knowledge — which book?", "I want to really read the Dao De Jing — where do I start?", "I care about my kid's education — is there a book for that?", "I can't follow this passage — help me see what it's saying."] }
+      }
+    },
+    sdejie: {
+      id: "sdejie",
+      brand: "SDE解读",
+      url: "/sdejie/",
+      sig: "SDE解读 · read.sdeuniverses.com",
+      who: "SDE解读",
+      kicker: "READ.SDEUNIVERSES.COM",
+      home: "/",
+      tools: [],
+      seeds: ["《道德经》第一章，帮我解读。", "论语『学而时习之』，SDE 怎么读？", "贴一段《红楼梦》，解一下。", "这段话，它把什么当成了不言自明的前提？"],
+      hero: {
+        zh: { title: "SDE解读", sub: "德麦国际读书馆 · 用 SDE 发生学解读文本。贴一段经典或一本书里的话，它不复述内容——追这套意思当初是怎么长出来的。", foot: "想要传统经学对照＋SDE 三条独立解读、四篇成稿，去经典解构器。用你自己的大模型 Key 运行。" },
+        en: { title: "SDE解读", sub: "Demai Reading House · reading texts through SDE genesis. Paste a line from a classic or a book — it won't summarize; it traces how that meaning came to be.", foot: "For the full four-paper version, use the Classics Deconstructor. Runs on your own model key." }
+      },
+      copy: {
+        zh: { ph: "贴一段经典、或一本书里的话——它追这套意思怎么发生的", note: "SDE解读 用 SDE 发生学解读你贴来的文本，不复述内容，追它当初怎么长出来的，答案扣着读书馆的书。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写库、不写日志、不做分析。", setKeyP: "SDE解读 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 保存在你这台机器上；调用时经本站边缘服务内存转发给你选的厂商，本站不写库、不写日志、不做分析</b>，随时可清除。", srcSite: "读书馆藏书", convoTitle: "与 SDE解读 的对话", stDefault: "SDE解读 本色", errNet: "接不上 SDE解读 了（", pdfFoot: "导出自 SDE解读 · 德麦国际读书馆 · read.sdeuniverses.com　|　回答由大模型生成，引用前请自行核实。", deckFoot: "SDE解读 · 德麦国际读书馆 · read.sdeuniverses.com", setAboutP: "写一句你想解读什么、想让它从哪个角度切。以后每次都会带上。只存你本机。", setAboutPh: "例：我在读《道德经》，想一章一章弄清它每句话当初针对的是什么。", memHd: "本机共 <b>{n}</b> 场对话（含本站其它智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场", turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在 SDE解读 的额度，站上其它入口各有独立额度。", dayOut: "今日本机额度已用完，明天再来（站上其它入口不受影响）。", tlBtn: "⊞ 工序", tlTitle: "这一轮走哪道", tlNone: "普通对话", srcSite2: "", egs: ["《道德经》第一章，帮我解读。", "论语『学而时习之』，SDE 怎么读？", "贴一段《红楼梦》，解一下。", "这段话，它把什么当成了不言自明的前提？"] },
+        en: { ph: "Paste a line from a classic or a book — it traces how that meaning arose", note: "SDE解读 reads your pasted text through SDE genesis — not summarizing, but tracing how it came to be. Grounded in the reading-house shelf. Runs on your own model key, never logged.", setKeyP: "SDE解读 runs on your own model key. <b style=\"color:#C9A227\">Kept on your machine, relayed in memory to your provider — never written to a database, log, or analytics</b>; clear it anytime.", srcSite: "the reading-house shelf", convoTitle: "A conversation with SDE解读", stDefault: "SDE解读, unstyled", errNet: "Couldn't reach SDE解读 (", pdfFoot: "Exported from SDE解读 · Demai Reading House · read.sdeuniverses.com  |  Model-generated — verify before citing.", deckFoot: "SDE解读 · Demai Reading House · read.sdeuniverses.com", setAboutP: "A line on what you want to read and from which angle. It rides along each time. Stored only on this machine.", setAboutPh: "e.g. I'm reading the Dao De Jing and want to work out, line by line, what each was answering.", memHd: "<b>{n}</b> chats on this device (including other agents here), <b>{m}</b> distilled, <b>{p}</b> pending", turnsTitle: "This session = up to 100 turns (＋ New chat to restart); Today = this device's daily quota on SDE解读.", dayOut: "Out of quota on this device for today; try tomorrow.", tlBtn: "⊞ Tools", tlTitle: "Which procedure this turn", tlNone: "Plain chat", srcSite2: "", egs: ["Dao De Jing, chapter 1 — read it for me.", "'Learn and practice' in the Analects — how does SDE read it?", "Here's a passage from a novel — deconstruct it.", "What does this passage take as an unspoken given?"] }
+      }
+    },
+    sdegong: {
+      id: "sdegong",
+      brand: "SDE共读",
+      url: "/sdegong/",
+      sig: "SDE共读 · read.sdeuniverses.com",
+      who: "SDE共读",
+      kicker: "READ.SDEUNIVERSES.COM",
+      home: "/",
+      tools: [],
+      seeds: ["贴一段专著，陪我读。", "这一章我读得慢，陪我逐段过。", "这段话哪里是脆的？", "它跳过了什么、绕开了什么？"],
+      hero: {
+        zh: { title: "SDE共读", sub: "德麦国际读书馆 · 陪你逐段读。贴来一段或一章，六种读法各出一件：说了什么、把什么当给定、哪里是脆的、按三类拆、缝隙、顶回它。", foot: "想翻着 PDF 一页页读、页页有陪读，去共读一本书。用你自己的大模型 Key 运行。" },
+        en: { title: "SDE共读", sub: "Demai Reading House · reading with you, passage by passage. Paste a section and it gives six different reads: what it says, what it takes as given, where it's brittle, the three-way cut, the gap, and pushing back.", foot: "To turn a book's PDF page by page with a companion, use Read-a-Book-Together. Runs on your own model key." }
+      },
+      copy: {
+        zh: { ph: "贴来一段或一章——它陪你逐段读，一段出几件不同的东西", note: "SDE共读 陪你逐段读你贴来的书，六种读法各出一件，答案扣着读书馆的书。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写库、不写日志、不做分析。", setKeyP: "SDE共读 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 保存在你这台机器上；调用时经本站边缘服务内存转发给你选的厂商，本站不写库、不写日志、不做分析</b>，随时可清除。", srcSite: "读书馆藏书", convoTitle: "与 SDE共读 的对话", stDefault: "SDE共读 本色", errNet: "接不上 SDE共读 了（", pdfFoot: "导出自 SDE共读 · 德麦国际读书馆 · read.sdeuniverses.com　|　回答由大模型生成，引用前请自行核实。", deckFoot: "SDE共读 · 德麦国际读书馆 · read.sdeuniverses.com", setAboutP: "写一句你在读哪本、想让它陪你怎么读。以后每次都会带上。只存你本机。", setAboutPh: "例：我在读一本讲发生学的专著，读得慢，帮我一段一段把它的主张和前提抠清楚。", memHd: "本机共 <b>{n}</b> 场对话（含本站其它智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场", turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在 SDE共读 的额度，站上其它入口各有独立额度。", dayOut: "今日本机额度已用完，明天再来（站上其它入口不受影响）。", tlBtn: "⊞ 读法", tlTitle: "这一段用哪几种读法", tlNone: "普通对话", srcSite2: "", egs: ["贴一段专著，陪我读。", "这一章我读得慢，陪我逐段过。", "这段话哪里是脆的？", "它跳过了什么、绕开了什么？"] },
+        en: { ph: "Paste a passage or a chapter — it reads it with you, several different ways", note: "SDE共读 reads your pasted book with you, passage by passage, six different reads each time. Grounded in the reading-house shelf. Runs on your own model key, never logged.", setKeyP: "SDE共读 runs on your own model key. <b style=\"color:#C9A227\">Kept on your machine, relayed in memory to your provider — never written to a database, log, or analytics</b>; clear it anytime.", srcSite: "the reading-house shelf", convoTitle: "A conversation with SDE共读", stDefault: "SDE共读, unstyled", errNet: "Couldn't reach SDE共读 (", pdfFoot: "Exported from SDE共读 · Demai Reading House · read.sdeuniverses.com  |  Model-generated — verify before citing.", deckFoot: "SDE共读 · Demai Reading House · read.sdeuniverses.com", setAboutP: "A line on which book you're reading and how you'd like company. It rides along each time. Stored only on this machine.", setAboutPh: "e.g. I'm reading a monograph on genesis, going slowly — help me pin down its claims and premises passage by passage.", memHd: "<b>{n}</b> chats on this device (including other agents here), <b>{m}</b> distilled, <b>{p}</b> pending", turnsTitle: "This session = up to 100 turns (＋ New chat to restart); Today = this device's daily quota on SDE共读.", dayOut: "Out of quota on this device for today; try tomorrow.", tlBtn: "⊞ Ways to read", tlTitle: "Which reads for this passage", tlNone: "Plain chat", srcSite2: "", egs: ["Here's a passage — read it with me.", "This chapter is slow going — walk me through it.", "Where is this passage brittle?", "What did it skip or step around?"] }
+      }
+    },
   };
   var PROFILE = (function () {
     var k = String(window.WDSM_PROFILE || "").trim();
