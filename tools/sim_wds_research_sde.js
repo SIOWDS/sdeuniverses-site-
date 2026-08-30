@@ -139,7 +139,11 @@ console.log("⑥ 全血加功力");
   ok2(/为装下完整内功，这一道的读物做了裁减/.test(S), "裁了就当场说（不静默）");
   ok2(!/三大方程／六路径／三原理仍在/.test(S), "精简版那句假话已删（精简版恰恰不含三大方程／123原理／六路径的完整节）");
   ok2(/精简版\*\*不含\*\*三大方程／123 原理／六路径的完整节与二阶碰撞那一部分/.test(S), "精简版的缺口如实写明");
-  ok2(/const _cap = \(VC\.top && !umodel\) \? RES_SYS_CAP_TOP : RES_SYS_CAP;/.test(S), "满血顶配走 15 万档，读者自选型号守 13 万");
+  ok2(/\(VC\.top && !umodel\) \? RES_SYS_CAP_TOP : RES_SYS_CAP/.test(S), "满血顶配走 15 万档，读者自选型号守 13 万");
+  /* 2026-08-30：读者点「整篇全带」（附件 full:1）时另走放开的窗口——顶配型号 1M 上下文放得下一整本专著。
+     top/umodel 那条分档仍在（上一条已验），这里只再钉住 full 那条支线确实存在、且用的是独立常量。 */
+  ok2(/const RES_SYS_CAP_FULL = \d{6}/.test(S), "缺 RES_SYS_CAP_FULL（整篇全带的放开窗口）");
+  ok2(/const _cap = fullDoc \? RES_SYS_CAP_FULL :/.test(S), "整篇全带（fullDoc）没有走 RES_SYS_CAP_FULL 那条支线");
 }
 
 console.log("⑦ 全套三件：内功 Skill ＋ 心得 ＋ 方法论");

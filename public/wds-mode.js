@@ -1134,6 +1134,7 @@
       micSwitch: "浏览器自带的听写在你这边连不上，已改用本机转写（免费、离线）。",
       micFail: "语音没成：",
       attFull: "全文常驻本场", attIdx: "按问题取段", attSegs: " 段", attStay: "附件会跟着这一场对话，直到你去掉它或开新对话",
+      attFullOn: "✓ 全篇全带", attToggleHint: "点这里切换：按问题取段（只挑相关的几段·省额度）⇄ 整篇全带（评全书、通读全文用；顶配型号（如 deepseek-v4-pro，1M 上下文）放得下整本，但每一轮都把全文发一遍、更费额度也更慢）",
     attGone: "附件只在本页有效，刷新会丢（对话文字会自动续上）",
     sbCap: "本机只保留最近 60 场，更旧的会自动淘汰——想长期留着就用 ⤓ 导出",
     dCut: "成文这一步断了（上面已写出的部分仍可复制/导出）",
@@ -1402,6 +1403,7 @@
       micSwitch: "The browser's own dictation can't reach its service from here, so on-device transcription is used instead (free, offline).",
       micFail: "Voice input failed: ",
       attFull: "kept in full for this chat", attIdx: "excerpted per question", attSegs: " segments", attStay: "Attachments stay with this conversation until you remove them or start a new one",
+      attFullOn: "✓ whole document", attToggleHint: "Click to switch: excerpt per question (only the relevant segments — cheaper) \u21c4 send the whole document (for reviewing or reading the full text; top models such as deepseek-v4-pro have a 1M context and hold a whole book, but it is re-sent every turn, so it costs more and is slower)",
     attGone: "Attachments live on this page only — a refresh drops them (the transcript comes back)",
     sbCap: "Only the latest 60 chats are kept locally; older ones are dropped — export (⤓) to keep them",
     dShortW1: "\u26a0 This draft came in at only ", dShortW2: " characters, short of this format's target. Hit \u21bb Rewrite for another pass, or ask below for one more concrete scene — don't let it pad by restating what it already said.",
@@ -3230,14 +3232,20 @@
   function docsForQuery0(q) {
     if (!atts.length) return null;
     var B = (thinkMode === "deep" ? 20000 : 12000);
+    var out = [];
+    /* 强制全文（d.full）：整篇照发，**不进这个预算**——读者主动要「读全书／评全书」，
+       而顶配型号（deepseek-v4-pro 1M 上下文等）放得下整本；后端见 full:1 也会把 DOC_CAP／整体窗口一起放开。
+       代价（每轮都发全文、更费额度）已在附件条的切换说明里讲清，风险由读者自担。 */
+    var forced = [], rest = [];
+    atts.forEach(function (d) { (d.full ? forced : rest).push(d); });
+    forced.forEach(function (d) { out.push({ n: d.name, t: d.text, full: 1 }); });
     var fulls = [], idxs = [];
-    atts.forEach(function (d) { (d.chunks ? idxs : fulls).push(d); });
+    rest.forEach(function (d) { (d.chunks ? idxs : fulls).push(d); });
     var sumFull = 0;
     fulls.forEach(function (d) { sumFull += d.text.length; });
-    if (sumFull > B) { idxs = atts.slice(); fulls = []; sumFull = 0; }   // 全带装不下 → 全部转取段
+    if (sumFull > B) { idxs = rest.slice(); fulls = []; sumFull = 0; }   // 非强制的全带装不下 → 全部转取段
     var left = Math.max(B - sumFull, 0);
     var per = idxs.length ? Math.floor(left / idxs.length) : 0;
-    var out = [];
     fulls.forEach(function (d) { out.push({ n: d.name, t: d.text }); });
     idxs.forEach(function (d) {
       var ch = d.chunks || (window.WDSAttach && window.WDSAttach.api.chunk(d.text));
@@ -3272,8 +3280,18 @@
         var x0 = el("button", null, "\u00d7"); x0.onclick = function () { atts.splice(i, 1); paintAtts(); };
         chip.appendChild(x0); attsEl.appendChild(chip); return;
       }
-      var how = d.chunks ? (t("attIdx") + "（" + d.chunks.length + t("attSegs") + "）") : t("attFull");
-      chip.appendChild(el("i", null, (d.note ? d.note + " \u00b7 " : "") + d.text.length + " 字 \u00b7 " + how));
+      chip.appendChild(el("i", null, (d.note ? d.note + " \u00b7 " : "") + d.text.length + " 字 \u00b7 "));
+      if (d.chunks) {
+        /* 大附件：默认按问题取段；点一下切成整篇全带（评全书/通读全文用）。
+           小附件（未切块）本就全带，不给切换。 */
+        var tog = el("i", "wdsm-att-tog", d.full ? t("attFullOn") : (t("attIdx") + "（" + d.chunks.length + t("attSegs") + "）"));
+        tog.style.cssText = "cursor:pointer;text-decoration:underline dotted;" + (d.full ? "color:#C9A227;font-weight:600;" : "");
+        tog.title = t("attToggleHint");
+        tog.onclick = function () { d.full = !d.full; paintAtts(); };
+        chip.appendChild(tog);
+      } else {
+        chip.appendChild(el("i", null, t("attFull")));
+      }
       var x = el("button", null, "\u00d7"); x.title = "去掉这个附件";
       x.onclick = function () { atts.splice(i, 1); paintAtts(); };
       chip.appendChild(x);

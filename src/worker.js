@@ -8180,6 +8180,11 @@ function resZOf(body6) {
    读者自填的型号窗口未知，仍守 13 万。两档之外还有约 2.3 万字的固定块（人格头／三视角／平台名录／
    心得／方法论）不在这个数里——第一刀的 13 万就是这么算的，线上跑通过，口径不变。 */
 const RES_SYS_CAP = 130000, RES_SYS_CAP_TOP = 150000;
+/* 读者点了「整篇全带」（附件 full:1）时用这个窗口：常规两档是控成本的保守预算，而顶配型号
+   （deepseek-v4-pro 1M／glm-5 20 万／kimi 25 万 token）放得下一整本 20 万字专著。这里放到 50 万字符——
+   足够整本不被裁，且总提示词（内功 ≈7.8 万 ＋ 读物 ≤50 万）仍远在 1M 上下文之内。实际提示词只有内容那么大，
+   不会被这个上限撑大；小窗口的自填型号若装不下，会由厂商侧报超长——那是读者主动要全文的自负风险。 */
+const RES_SYS_CAP_FULL = 500000;
 const RES_FLOOR = { ctx: 6000, web: 5000, doc: 4000 };
 function resPriorFit(ngLen, carryLen, ctxLen, webLen, docLen, cap) {
   const need = ngLen + carryLen + ctxLen + webLen + docLen;
@@ -11227,7 +11232,10 @@ export default {
       const skey = String(b.skey || "").trim();                 // 读者的智谱 Key（专供联网搜索；没有就退到管理员 Key）
       const umodel = String(b.model || "").trim();              // 读者自填的型号覆盖（各家型号会过时，留个自救口）
       // 附件：读者在自己浏览器里解析出的正文（文件本身从不上传到本站）。总量钳位，深度档给多一些。
-      const DOC_CAP = deep ? 20000 : 12000;
+      // 全文附件（前端标了 full:1，读者点了「整篇全带」）：钳位放到极宽——顶配型号 1M 上下文放得下一整本
+      //   （20 万字专著≈ 二三十万 token，远不到上限）。整体窗口也在下面 resPriorFit 处一并放开。
+      const fullDoc = Array.isArray(b.docs) && b.docs.some((d) => d && d.full);
+      const DOC_CAP = fullDoc ? 400000 : (deep ? 20000 : 12000);
       let docCtx = "", docEx = false;
       if (Array.isArray(b.docs)) {
         for (const d of b.docs.slice(0, 5)) {
@@ -11620,7 +11628,7 @@ export default {
                 /* ⭐ 第二刀（2026-08-29）：内功是固定成本，读物往它剩下的地方里塞——见 resPriorFit 头上那段。
                    第一刀的算法是反过来的（先算读物占了多少，再看内功装不装得下），于是上游最厚的第六道
                    最先退成精简版，而精简版恰恰不含二阶碰撞那一部分。 */
-                const _cap = (VC.top && !umodel) ? RES_SYS_CAP_TOP : RES_SYS_CAP;
+                const _cap = fullDoc ? RES_SYS_CAP_FULL : ((VC.top && !umodel) ? RES_SYS_CAP_TOP : RES_SYS_CAP);
                 const fit = resPriorFit(_ng.length, _carryLen, ctxText.length, webCtx.length, docCtx.length, _cap);
                 const _cuts = [];
                 if (fit.ctxKeep < ctxText.length) { _cuts.push("站内资料 " + ctxText.length + "→" + fit.ctxKeep); ctxText = resTrimCtx(ctxText, fit.ctxKeep); }
@@ -11660,7 +11668,7 @@ export default {
               let _ng5 = "";
               try { _ng5 = await loadNeigong(env, url, "/taste/assets/sde-neigong.txt"); } catch (e) {}
               if (_ng5) {
-                const fit5 = resPriorFit(_ng5.length, 0, ctxText.length, webCtx.length, docCtx.length, (VC.top && !umodel) ? RES_SYS_CAP_TOP : RES_SYS_CAP);
+                const fit5 = resPriorFit(_ng5.length, 0, ctxText.length, webCtx.length, docCtx.length, fullDoc ? RES_SYS_CAP_FULL : ((VC.top && !umodel) ? RES_SYS_CAP_TOP : RES_SYS_CAP));
                 const _cuts5 = [];
                 if (fit5.ctxKeep < ctxText.length) { _cuts5.push("站内资料 " + ctxText.length + "→" + fit5.ctxKeep); ctxText = resTrimCtx(ctxText, fit5.ctxKeep); }
                 if (fit5.webKeep < webCtx.length) { _cuts5.push("站外资料 " + webCtx.length + "→" + fit5.webKeep); webCtx = resTrimTail(webCtx, fit5.webKeep, "站外资料"); }
