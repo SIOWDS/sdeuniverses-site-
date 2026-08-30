@@ -76,7 +76,12 @@ jobs:
     # 卡在 apt 上挂了二十分钟还在挂——而 concurrency 是 search-index 独一份，
     # 它挂着就等于把这条产线整条占住，谁也看不出它在等什么。
     # 实测一趟 4.5–6 分钟，25 分钟给足了余量：宁可红一趟去重跑，不要无声地挂着。
-    timeout-minutes: 25
+    # 【2026-08-30 改 45】上面那笔账已经过期：文档涨到 5,563 篇之后，光 search/ 那一趟 sync 就要 12 分钟
+    #   （run 1178 实测），当天第一趟还要再传一份快照 ⇒ 6 分钟构建 ＋ 两趟各 12 分钟 ＞ 25 分钟。
+    #   08-29 三趟定时（1179/1180/1181）全部在「上传索引」那一步被这条总闸掐成 cancelled——
+    #   线上那份多半已同步完、只是快照传到一半，但三趟连红没人看得出是超时不是坏索引。
+    #   放到 45 分钟，并在上传那一步把 aws cli 并发从默认 10 提到 32（下面那一步的 aws configure）。
+    timeout-minutes: 45
     permissions:
       contents: read                 # 索引改上 R2，不再推回 main
 
@@ -170,6 +175,10 @@ jobs:
           EP=https://d3ea22f828ce19cf113a457ceba2c930.r2.cloudflarestorage.com
           B=s3://sdeuniverses-pdf
           SNAP=$(date -u +%F)
+          # 【2026-08-30】五千多个小对象逐个 HEAD＋PUT，默认并发 10 要 12 分钟一趟；提到 32 并发、队列放大，
+          #   一趟压到几分钟，当天第一趟（search/ ＋ 快照两趟）才装得进总闸。R2 吃得下这个并发。
+          aws configure set default.s3.max_concurrent_requests 32
+          aws configure set default.s3.max_queue_size 10000
 
           # index.html 是搜索页面本身，照旧走 ASSETS，绝不能进桶
           # （IDX_KEYS 也不认它，进了也读不到，只会白占空间）
