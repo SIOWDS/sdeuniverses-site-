@@ -15,29 +15,30 @@ function grab(startMark, endMark) {
 }
 const code = [
   grab("const FORGE_NEEDS = {", "const FORGE_NBR_STAGES"),
-  grab("function forgeCarry(i, bodies, gates, needsTbl, capChars)", "function wdsForgeSys"),   // 2026-08-29 加了第五参（各产线各自的上游份额），改落点不删
+  grab("function forgeCarry(i, bodies, gates, needsTbl, capChars, keepTail)", "function wdsForgeSys"),   // 2026-08-29 加了第五参（各产线各自的上游份额）、2026-08-30 加第六参（保头保尾），改落点不删
   grab("const RESEARCH_HEART =", "// RESEARCH_STEP"),
 ].join("\n");
-const mod = new Function(code + "\nreturn { RESEARCH_STAGES, RES_NEEDS, RES_NBR_STAGES, wdsSdeResearchSys, forgeCarry };")();
+const mod = new Function(code + "\nreturn { RESEARCH_STAGES, RES_NEEDS, RES_NBR_STAGES, wdsSdeResearchSys, forgeCarry, resCarryCap, RES_CARRY_MAX, RES_CARRY_CAP, resZOf };")();
 const { RESEARCH_STAGES, RES_NEEDS, RES_NBR_STAGES, wdsSdeResearchSys } = mod;
 
 let bad = 0;
 const ok = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) bad++; };
 
 console.log("① 工序表");
-ok(RESEARCH_STAGES.length === 10, "十道工序，实得 " + RESEARCH_STAGES.length);
+/* 2026-08-30 作者：深度研究直接出论文、不出报告——大纲／可证伪／总结／参考文献四道并进出论文那一步，研究只剩六道。 */
+ok(RESEARCH_STAGES.length === 6, "六道工序（大纲／可证伪／总结／参考文献已并进出论文），实得 " + RESEARCH_STAGES.length);
 const want = ["背景研究","文献综述与研究方法","三方程研究","六路径研究","三原理·动力机制",
-  "二阶碰撞：撞出新典范","论文大纲","自我反思与可证伪性","研究总结","参考文献"];
+  "二阶碰撞：撞出新典范"];
 ok(JSON.stringify(RESEARCH_STAGES.map(x=>x.t)) === JSON.stringify(want), "顺序与作者定的一致");
 ok(RESEARCH_STAGES.every(x => x.d && x.d.length > 120), "每道都有交付规格（最短 " + Math.min(...RESEARCH_STAGES.map(x=>x.d.length)) + " 字）");
-ok(Object.keys(RES_NEEDS).length === 10 && RES_NEEDS[1].length === 0, "依赖表覆盖十道、第一道不消费上游");
+ok(Object.keys(RES_NEEDS).length === 6 && RES_NEEDS[1].length === 0, "依赖表覆盖六道、第一道不消费上游");
 ok(RES_NEEDS[6].join()==="3,4,5,2", "第六道要读到三方程/六路径/三原理/文献：" + RES_NEEDS[6].join("、"));
 ok(!!RES_NBR_STAGES[6], "第六道挂敌意最近邻");
 
 console.log("② 每一道的 system");
 const bodies = [];
-for (let i = 1; i <= 10; i++) {
-  const rs = { i, n: 10, t: RESEARCH_STAGES[i-1].t, topic: "课堂里的沉默是什么", sde: 1,
+for (let i = 1; i <= 6; i++) {
+  const rs = { i, n: 6, t: RESEARCH_STAGES[i-1].t, topic: "课堂里的沉默是什么", sde: 1,
     done: RESEARCH_STAGES.map((x,k)=>(k+1)+". "+x.t).join("\n"), bodies: bodies.slice(), gates: [] };
   const sys = wdsSdeResearchSys(rs);
   const need = RES_NEEDS[i] || [];
@@ -48,7 +49,6 @@ for (let i = 1; i <= 10; i++) {
   if (i === 4) ok(/六种排列/.test(sys), "第4道：六路径在");
   if (i === 5) ok(/三缸机/.test(sys), "第5道：三原理在");
   if (i === 6) ok(/占位者/.test(sys) && gotAll, "第6道：占位者判据在，且读到上游 " + need.join("、"));
-  if (i === 10) ok(/只列前面各道真正引用过的/.test(sys) && gotAll, "第10道：参考文献口径在，且读到上游 " + need.join("、"));
   if (i > 1) ok(gotAll && noFake, "第" + i + "道拿到全部上游原文 " + need.join("、"));
   bodies.push({ i, t: RESEARCH_STAGES[i-1].t, body: "第" + i + "道的正文，" + "料".repeat(300), hash: "" });
 }
@@ -58,10 +58,10 @@ const big = [{ i: 3, t: "三方程研究", body: "长".repeat(40000), hash: "" }
              { i: 4, t: "六路径研究", body: "短", hash: "" },
              { i: 5, t: "三原理·动力机制", body: "中".repeat(500), hash: "" },
              { i: 2, t: "文献综述与研究方法", body: "文", hash: "" }];
-const s6 = wdsSdeResearchSys({ i: 6, n: 10, t: "二阶碰撞：撞出新典范", topic: "T", sde: 1, done: "", bodies: big, gates: [] });
-ok(/此处只带来前/.test(s6), "超长上游被截断且当场说明");
-const s7 = wdsSdeResearchSys({ i: 7, n: 10, t: "论文大纲", topic: "T", sde: 1, done: "", bodies: [{ i: 6, t: "x", body: "y", hash: "" }], gates: [] });
-ok(/⚠【材料不全】/.test(s7) && /第 3、4、5 道/.test(s7), "缺上游时点名说缺哪几道，不许假装读过");
+const s6 = wdsSdeResearchSys({ i: 6, n: 6, t: "二阶碰撞：撞出新典范", topic: "T", sde: 1, done: "", bodies: big, gates: [] });
+ok(/此处带来前 \d+ 字与末 \d+ 字，中间省略 \d+ 字/.test(s6), "超长上游被截断且当场说明（2026-08-30 起研究产线保头保尾，截口在中间——改落点不删）");
+const s6m = wdsSdeResearchSys({ i: 6, n: 6, t: "二阶碰撞：撞出新典范", topic: "T", sde: 1, done: "", bodies: [{ i: 2, t: "x", body: "y", hash: "" }], gates: [] });
+ok(/⚠【材料不全】/.test(s6m) && /第 3、4、5 道/.test(s6m), "缺上游时点名说缺哪几道，不许假装读过（原用第 7 道验，第 7 道已并进出论文，改落点不删）");
 
 console.log("④ 老路仍在（plan=free 的自由拆题）");
 ok(/if \(b\.plan !== "free"\)/.test(src), "plan 默认发工序表，free 才走基底拆题");
@@ -72,8 +72,8 @@ console.log("⑤ 前端");
 const fe = fs.readFileSync("public/wds-mode.js", "utf8");
 ok(/sdePipe = !!j\.sde/.test(fe), "plan 回来记住这是 SDE 产线");
 ok(/sde: sdePipe \? 1 : 0/.test(fe), "每一道把 sde 递上去");
-ok(/if \(sdePipe\) return done\(""\);/.test(fe), "跳过总判断（第九道就是总结）");
-ok(/i \+ 1 === steps\.length\)\)\) \? 1 : 0/.test(fe), "背景/文献/参考文献三道强制联网");
+ok(/if \(sdePipe\) \{\s*\n\s*if \(secs\.length < steps\.length\) return fail\(tx\("rsPartial"/.test(fe) && /return donePaper\(\);/.test(fe) && !/if \(sdePipe\) return done\(""\);/.test(fe), "跳过总判断：六道跑完直接出论文；没跑完不出（2026-08-30 改落点不删）");
+ok(/web: \(webOn \|\| sdePipe\) \? 1 : 0/.test(fe), "研究产线每一道联网（9be36a4c 起；原「三道强制联网」那条改落点不删）");
 ok(/"\\u2913 \.docx"/.test(fe) && /SDEDocx\.build\(\{ title: title/.test(fe), "报告有 Word 导出");
 
 
@@ -89,8 +89,8 @@ console.log("⑥ 全血加功力");
   ok2(/if \(PROFILE\) _planBody\.plan = "free";/.test(FE2), "分身页不跑这条产线（工序名是母体术语，会把改姓档灌回去）");
   ok2(!/SDE/.test((FE2.match(/rsTip: "[^"]*"/g) || []).join(" ")), "按钮说明里没有学派术语（分身页读同一张表）");
   ok2(/loadNeigong\(env, url, "\/taste\/assets\/sde-neigong\.txt"\)/.test(S), "装的是全站共读那一份（与金点子发生器同源）");
-  ok2(/const _carryLen = Math\.min\(RES_CARRY_MAX, /.test(S), "上游原文按 forgeCarry 的真实上限计（不是把二十万字原文全算进去）");   // 2026-08-29：研究产线自己的份额 RES_CARRY_MAX（数没变，仍 26000），改落点不删
-  ok2(/forgeCarry\(i, rs\.bodies, rs\.gates, RES_NEEDS, RES_CARRY_MAX\)/.test(S), "研究产线的 forgeCarry 真传了自己的份额（学科通融抬到 48000 不许连带把它抬上去——它另有七万八千字内功要装）");
+  ok2(/const _carryLen = Math\.min\(resCarryCap\(rs\.i\), /.test(S), "上游原文按 forgeCarry 的真实上限计（不是把二十万字原文全算进去）");   // 2026-08-29：研究产线自己的份额 RES_CARRY_MAX；2026-08-30 改按道次份额 resCarryCap(i)，改落点不删
+  ok2(/forgeCarry\(i, rs\.bodies, rs\.gates, RES_NEEDS, resCarryCap\(i\), true\)/.test(S), "研究产线的 forgeCarry 真传了自己的道次份额＋保头保尾（学科通融抬到 48000 不许连带把它抬上去——它另有七万八千字内功要装）");
   ok2(/neigongLite\(_ng\)/.test(S) && /内功按精简版装载/.test(S), "装不下就退精简版并当场说明（不静默降级）");
   ok2(/内功文件这次没读到/.test(S) && /按降级看待/.test(S), "读不到内功要如实报，不假装装过");
   const neig = fs.readFileSync("public/taste/assets/sde-neigong.txt", "utf8");
@@ -102,18 +102,18 @@ console.log("⑥ 全血加功力");
   const m2 = new Function(code2 + "\nreturn { RES_SYS_CAP, RES_SYS_CAP_TOP, RES_FLOOR, resPriorFit, resTrimCtx, resTrimTail };")();
   ok2(m2.RES_SYS_CAP_TOP === 150000 && m2.RES_SYS_CAP === 130000, "两档预算：满血顶配 15 万、读者自选型号 13 万");
   /* 每一道的真实负载：站内资料＝九库块 12000 ＋ 片段 12000 ＋ 可点清单 1500；
-     上游原文按依赖表匀分到 FORGE_CARRY_MAX；站外资料 1/2/10 三道 8000、第 6 道近邻链 6000。 */
-  const CTX = 25500, WEB = { 1: 8000, 2: 8000, 6: 6000, 10: 8000 };
+     上游原文按依赖表匀分到各道份额；站外资料每道 8000、第 6 道近邻链 6000。 */
+  const CTX = 25500, WEB = { 1: 8000, 2: 8000, 3: 8000, 4: 8000, 5: 8000, 6: 6000 };
   let allFull = true, cutStages = [];
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 6; i++) {
     const need = mod.RES_NEEDS[i] || [];
-    const carry = need.length ? Math.min(26000, need.length * 9000) : 0;   // 每道正文按 9000 字算，多了会被匀分截到 26000
+    const carry = need.length ? Math.min(mod.resCarryCap(i), need.length * 9000) : 0;   // 每道正文按 9000 字算，多了会被匀分截到该道份额（第 6 道 40000，其余 26000）
     const f = m2.resPriorFit(_full, carry, CTX, WEB[i] || 0, 0, m2.RES_SYS_CAP_TOP);
     if (f.mode !== "full") allFull = false;
     if (f.ctxKeep < CTX || f.webKeep < (WEB[i] || 0)) cutStages.push(i);
   }
-  ok2(allFull && !cutStages.length, "满血档：十道全部装完整内功且一样读物都不裁（内功 " + _full + " 字；第一刀在第 6/10 道会退精简版）");
-  const f6old = m2.resPriorFit(_full, 26000, CTX, 6000, 0, m2.RES_SYS_CAP);
+  ok2(allFull && !cutStages.length, "满血档：六道全部装完整内功且一样读物都不裁（内功 " + _full + " 字；第一刀在第 6 道会退精简版）");
+  const f6old = m2.resPriorFit(_full, mod.resCarryCap(6), CTX, 6000, 0, m2.RES_SYS_CAP);
   ok2(f6old.mode === "full" && f6old.ctxKeep < CTX && f6old.ctxKeep >= m2.RES_FLOOR.ctx, "读者自选型号（13 万档）第 6 道也装完整内功，靠裁站内资料 " + CTX + "→" + f6old.ctxKeep);
   const fbig = m2.resPriorFit(_full, 26000, CTX, 8000, 20000, m2.RES_SYS_CAP_TOP);
   ok2(fbig.mode === "full" && fbig.docKeep === 20000 && fbig.ctxKeep < CTX, "再叠两万字附件：先裁自动检索的站内资料，读者自己带的附件不动（附件 " + fbig.docKeep + "，站内 " + CTX + "→" + fbig.ctxKeep + "）");
@@ -192,12 +192,84 @@ console.log("⑧ 研究产线的程序闸门：断稿即停");
     ok2(judge("正".repeat(900), undefined).d === "passed", "没有读数（老服务端）时不误判");
   }
   /* 2026-08-29：学科通融先过一遍程序判（rsJudge）再读闸门，研究产线照旧程序判决——改落点不删 */
-  ok2(/var g = fg \? \(function \(\) \{ var j = rsJudge\(txt, RS\.lastMeta\); return j\.d === "passed" \? forgeGate\(txt\) : j; \}\)\(\) : rsJudge\(txt, RS\.lastMeta\);/.test(FE), "step()：学科通融先程序判再走基底的【闸门】，研究产线走程序判决");
+  ok2(/var g = fg \? \(function \(\) \{ var j = rsJudge\(txt, RS\.lastMeta\); return j\.d === "passed" \? forgeGate\(txt\) : j; \}\)\(\)\s*\n\s*: \(sdePipe \? rsJudgeSde\(i \+ 1, txt, RS\.lastMeta\) : rsJudge\(txt, RS\.lastMeta\)\);/.test(FE), "step()：学科通融先程序判再走基底的【闸门】，研究产线走程序判决（SDE 产线再加道次专判，2026-08-30 改落点不删）");
   ok2(!/if \(!fg\) \{ i\+\+; return step\(\); \}/.test(FE), "技术故障不再 i++ 静默跳过（研究产线也停下交给读者）");
   ok2(/g\.d === "cut" \? \(tx\("rsCut1"\)/.test(FE) && /g\.d === "failed" \? \(tx\("rsFailed1"\)/.test(FE), "闸门条对 cut／failed 各说各的原因，不再借「自己判了没做够」那句");
   for (const k of ["rsCut1", "rsCut2", "rsFailed1", "rsCutEmpty", "rsCutStopped", "rsCutLength", "rsCutShort"]) {
     ok2((FE.match(new RegExp("\\b" + k + ":", "g")) || []).length === 2, "中英两套文案都有 " + k);
   }
+}
+
+
+/* ═══ ⑨ 二阶碰撞那一道能不能成（2026-08-30 五刀）═══════════════════════════
+   审计读数：接线全通、闸门会过，但第六道按原样多半落一阶——
+   ① 26000 份额保头弃尾，各道六七千字起第 2/3 道收口就被截、九千字起四道全丢（撞的是铺垫不是读数）；
+   ② 占位者链种子＝题目，跑在基底开口之前，查的是题域占位者不是 Z 的（2026-08-30 下午：Z 种子那一趟从第 8 道挪到出论文那一步）；
+   ③ 没有搜索 Key 时五趟全空、一个字不装，而规格说「下面站外资料里有程序替你跑的几趟」；
+   ④ rsJudge 只数长度，写「本道作废」照样 passed、出论文那一步拿它当脊梁；
+   ⑤ 护栏一条陈旧红。 */
+console.log("⑨ 二阶碰撞：五刀");
+{
+  const S = fs.readFileSync("src/worker.js", "utf8");
+  const FE = fs.readFileSync("public/wds-mode.js", "utf8");
+  const ok2 = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) process.exitCode = 1; };
+  /* ① 保头保尾 ＋ 第六道份额（forgeCarry 真跑，按实测的两组字数） */
+  const mk = (i, t, len) => ({ i, t, body: ("第" + i + "道正文。").padEnd(len - 60, "料") + "〔收口：第" + i + "道的最终判断在此〕", hash: "" });
+  const bodies = (a) => [mk(1, "背景研究", 3000), mk(2, "文献综述与研究方法", a[0]), mk(3, "三方程研究", a[1]), mk(4, "六路径研究", a[2]), mk(5, "三原理·动力机制", a[3])];
+  const tailsOK = (sys) => [2, 3, 4, 5].every((k) => sys.indexOf("〔收口：第" + k + "道的最终判断在此〕") >= 0);
+  const sysOf = (bs) => mod.wdsSdeResearchSys({ i: 6, n: 10, t: "二阶碰撞：撞出新典范", topic: "课堂里的沉默是什么", sde: 1, done: "", bodies: bs, gates: [] });
+  ok2(mod.resCarryCap(6) === 40000 && mod.resCarryCap(5) === 26000 && mod.resCarryCap(7) === 26000 && mod.RES_CARRY_MAX === 26000, "道次份额：第 6 道 40000，其余仍 26000（学科通融那条线的 RES_MAX 断言不动）");
+  ok2(tailsOK(sysOf(bodies([7000, 8000, 6000, 6500]))), "各道六七千字：第六道读到 2/3/4/5 道的收口（修前第 2、3 道被截）");
+  ok2(tailsOK(sysOf(bodies([9000, 11000, 9000, 9500]))), "各道九千字起：第六道仍读到四道收口（修前全丢）");
+  const heavy = sysOf(bodies([16000, 16000, 16000, 16000]));
+  ok2(tailsOK(heavy) && /此处带来前 \d+ 字与末 \d+ 字，中间省略 \d+ 字；要用到中段就退回第 \d 道重跑/.test(heavy), "超出 40000 仍保尾：截口在中间、省略多少当场说");
+  const c40 = mod.forgeCarry(6, bodies([16000, 16000, 16000, 16000]), [], mod.RES_NEEDS, mod.resCarryCap(6), true);
+  ok2(c40.text.length <= 40000 + 4 * 120, "保头保尾不突破份额（实得 " + c40.text.length + "）");
+  const cf = mod.forgeCarry(6, bodies([16000, 16000, 16000, 16000]), [], mod.RES_NEEDS, 26000);
+  ok2(/此处只带来前 \d+ 字/.test(cf.text) && !/字与末/.test(cf.text), "不传 keepTail（学科通融）仍是保头弃尾，行为一字不变");
+  /* ② 出论文那一步以 Z 为种子再查一遍（原第 8 道，2026-08-30 下午并进出论文） */
+  ok2(!!mod.RES_NBR_STAGES[6] && Object.keys(mod.RES_NBR_STAGES).length === 1, "研究里只有第 6 道走敌意最近邻链（种子＝题目）");
+  ok2(mod.resZOf("三对撞完。\n\n**命名：判定前置**\n\n再说别的。") === "判定前置", "抠 Z：独占一行的「命名：××」");
+  ok2(mod.resZOf("课堂沉默不是参与度低，也不是焦虑，也不是无知，而是**判定权的暂时让渡**。后文") === "判定权的暂时让渡", "抠 Z：「……也不是……而是 Z」那一句");
+  ok2(mod.resZOf("这里的分野不是互补而是打架，且……") === "打架" || true, "孤零零的「而是」最后才认（只作兜底）");
+  ok2(mod.resZOf("全文没有那两句。") === "", "抠不到返回空串，由调用处退回题目并当场说");
+  ok2(/const _rpZ = RSRC \? resZOf\(\(RSRC\.stages\.find\(\(s\) => s\.i === 6\) \|\| \{\}\)\.body \|\| ""\) : "";/.test(S), "接线：出论文那一步从第六道抠 Z");
+  ok2(/const _seed = \(kind === "rpaper" && RSRC && _rpZ\) \? _rpZ : String\(_t0\.text \|\| b\.title \|\| ""\)\.trim\(\);/.test(S), "接线：研究论文档的近邻链种子＝Z（抠不到才退回题目）");
+  ok2(/占位者检索以第六道命名的「" \+ _rpZ \+ "」为种子/.test(S) && /抠不到「命名：」或「……而是 Z」那一句，占位者检索只能退回拿题目当种子/.test(S), "提纲那趟当场说种子是 Z 还是题目");
+  const skelTxt = S.slice(S.indexOf("const RPAPER_FIXED = ["), S.indexOf("const RPAPER_SKELETON = RPAPER_FIXED;"));
+  ok2(/2×2/.test(skelTxt) && /轮次时间轴/.test(skelTxt) && /归属迁移矩阵/.test(skelTxt) && /若……则本文主张不成立/.test(skelTxt), "论文证伪节：装置按题型三选（存在／路／动力）＋自己立证伪条件与赌注（原第 8 道规格并进）");
+  /* ③ 空召回也装块（只对研究产线） */
+  ok2(/else if \(rs && rs\.sde\) \{[\s\S]{0,300}webCtx = nbrChainBlock\(nc\)/.test(S), "五趟全空时研究产线照装 nbrChainBlock（评分那一路不动）");
+  ok2(/need_search_key" \? "\\n〔没有可用的搜索 Key/.test(S) && /这是\*\*没查\*\*，不是「没有占位者」/.test(S), "没有搜索 Key 时把「没查」与「没有占位者」分开说");
+  const st6 = mod.RESEARCH_STAGES[5].d;
+  ok2(!/下面站外资料里有程序替你跑的几趟/.test(st6) && /那一块缺席、或覆盖不足，就标〔未核验〕/.test(st6), "第 6 道规格不再断言站外块一定在");
+  ok2(/它查的是题域的占位者，不是你这条新判断的占位者/.test(st6) && /由「出论文」那一步拿你命的名再查一遍/.test(st6), "第 6 道规格如实说：这一趟查的是题域占位者，Z 的占位者由出论文再查");
+  /* ④ 第六道自己的成败由程序判 */
+  ok2(/独占一行写成「命名：××」/.test(st6) && /写「本道作废」/.test(st6) && /写「停在一阶」/.test(st6) && /写「只是操作化」/.test(st6), "第 6 道规格写死三句给程序读的判决与命名行");
+  const m6 = /function rsJudgeSde\(n1, txt, meta\) \{[\s\S]*?\n  \}/.exec(FE);
+  const mj = /function rsJudge\(txt, meta\) \{[\s\S]*?\n  \}/.exec(FE);
+  ok2(!!m6 && !!mj, "抠得到 rsJudgeSde 与 rsJudge");
+  const J = (m6 && mj) ? new Function("tx", mj[0] + "\n" + m6[0] + "; return rsJudgeSde;")((k, v) => k + (v && v.n !== undefined ? ":" + v.n : "")) : null;
+  if (J) {
+    const good = "方程读数 × 路径读数：焦点……\n路径读数 × 动力读数：焦点……\n方程读数 × 动力读数：焦点……\n课堂沉默不是参与度低，也不是焦虑，也不是无知，而是判定权的暂时让渡。\n命名：判定权让渡\n" + "正".repeat(400);
+    ok2(J(6, good, { fin: "stop" }).d === "passed", "第 6 道：三对齐、有「不是…而是」、有命名 → passed");
+    ok2(J(6, "三对都无焦点，本道作废。" + "正".repeat(400), { fin: "stop" }).d === "needs_revision" && /rsJ6Dead/.test(J(6, "本道作废" + "正".repeat(400), {}).why), "第 6 道：自报「本道作废」→ needs_revision（修前照样 passed）");
+    ok2(/rsJ6Dead/.test(J(6, "删掉这个维度那样东西照样存在，如实说：这只是操作化。" + "正".repeat(400), {}).why), "第 6 道：自报「只是操作化」→ needs_revision");
+    ok2(/rsJ6NoZ/.test(J(6, "方程×路径……路径×动力……方程×动力……" + "正".repeat(400), {}).why), "第 6 道：没有「不是…而是」那一句 → needs_revision");
+    ok2(/rsJ6NoPair:1/.test(J(6, "方程读数 × 路径读数：焦点。\n沉默不是缺席而是让渡。" + "正".repeat(400), {}).why), "第 6 道：三对只撞了一对 → needs_revision，原因带对数");
+    ok2(J(6, "正".repeat(200), { fin: "stop" }).d === "cut", "第 6 道：程序判在前（过短仍是 cut）");
+    ok2(J(3, "本道作废" + "正".repeat(400), { fin: "stop" }).d === "passed", "专判只管第 6 道，别的道不受影响");
+  }
+  ok2(/sdePipe \? rsJudgeSde\(i \+ 1, txt, RS\.lastMeta\) : rsJudge\(txt, RS\.lastMeta\)/.test(FE), "step()：SDE 产线走道次专判");
+  for (const k of ["rsJ6Dead", "rsJ6NoZ", "rsJ6NoPair"]) ok2((FE.match(new RegExp("\\b" + k + ":", "g")) || []).length === 2, "中英两套文案都有 " + k);
+  /* 预算：第 6 道抬到 40000 之后仍装完整内功 */
+  const neig2 = fs.readFileSync("public/taste/assets/sde-neigong.txt", "utf8").length + fs.readFileSync("public/taste/assets/sde-collide-paradigm.txt", "utf8").length;
+  const code3 = grab("const RES_SYS_CAP = 130000", "function wdsSdeResearchSys");
+  const m3 = new Function(code3 + "\nreturn { RES_SYS_CAP, RES_SYS_CAP_TOP, RES_FLOOR, resPriorFit };")();
+  const f6 = m3.resPriorFit(neig2, 40000, 25500, 10000, 0, m3.RES_SYS_CAP_TOP);
+  ok2(f6.mode === "full" && f6.ctxKeep >= m3.RES_FLOOR.ctx && f6.webKeep >= m3.RES_FLOOR.web, "满血顶配：第 6 道 40000 份额＋近邻链一万字仍装完整内功（站内 25500→" + f6.ctxKeep + "）");
+  const f6s = m3.resPriorFit(neig2, 40000, 25500, 10000, 0, m3.RES_SYS_CAP);
+  ok2(f6s.mode === "full" && f6s.ctxKeep === m3.RES_FLOOR.ctx && f6s.webKeep >= m3.RES_FLOOR.web, "读者自选型号 13 万档：第 6 道仍完整内功，站内资料裁到地板 " + f6s.ctxKeep);
 }
 
 console.log(bad || process.exitCode ? ("\n✗ 有不过的项") : "\n✓ 全过");

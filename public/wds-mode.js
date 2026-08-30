@@ -983,7 +983,7 @@
       kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
       kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
       kPaper1: "凝成两万字论文 · 一趟写完", kPaper1S: "照金点子发生器那台已经跑熟的口径：**一次调用出全篇**，十六节体例写进提示语、字数服从内容（18000–22000 字），出 Word 与 PDF。写得快，中途不会停在某一节。",
-      kRpaper: "研究论文 · 一万字（深度研究第 11 步）", kRpaperS: "把深度研究的十道产出**按第七道论文大纲逐章展开**成约一万字的学术论文（章目由大纲定，每章一趟，规程按《正规学术论文写作规范》选配；出 Word 与 PDF）。只从深度研究里进，不在菜单上",
+      kRpaper: "研究论文 · 一万字（深度研究·出论文）", kRpaperS: "把深度研究的六道产出**按十节学术体例逐节展开**成约一万字的学术论文（每节一趟，规程按《正规学术论文写作规范》；出 Word 与 PDF）。深度研究跑完直接进这一步，不在菜单上",
       kPaper: "凝成两万字论文 · 分十六趟", kPaperS: "按《正规学术论文写作规范》十六节投稿体例：结构化中英摘要 · 研究问题 · 文献述评 · 概念界定 · 研究设计与方法 · 分析三节 · 可裁决判据 · 稳健性与证伪 · 效度威胁 · 声明组 · 参考文献与附录，约两万字（出 Word 与 PDF）",
       kSumdoc: "总结载入的文章", kSumdocS: "读完那篇：它在说什么 · 承重句 · 哪里脆 · 没看见什么 · 千字概写（需先载入文章）",
       // 四档创作体（2026-08-22）。与上面几档的分别：那几档要判断立得住，这四档要读得下去。
@@ -1253,7 +1253,7 @@
       kEssay: "Forge into an essay", kEssayS: "A piece that stands on its own, about 3,000 words",
       kOutline: "Writing outline", kOutlineS: "A motif plus a chapter skeleton you can write from",
       kPaper1: "Forge a 20,000-word paper (single pass)", kPaper1S: "One call writes the whole thing, the way the idea generator already does it: all sixteen sections specified in the prompt, length serving content (18,000-22,000 characters). Exports to Word and PDF.",
-      kRpaper: "Research paper · 10,000 chars (deep research step 11)", kRpaperS: "Expands the stage-7 paper outline chapter by chapter into a ~10,000-character paper (chapters fixed by the outline, one pass each, rules from the academic-paper standard; Word and PDF). Reached only from deep research, not from this menu",
+      kRpaper: "Research paper · 10,000 chars (deep research · paper)", kRpaperS: "Expands the six research stages section by section along the ten-section academic template into a ~10,000-character paper (one pass each, rules from the academic-paper standard; Word and PDF). Deep research runs straight into this step; not on this menu",
       kPaper: "Forge a 20,000-word paper (sixteen passes)", kPaperS: "Sixteen sections in full submission format: structured bilingual abstract, research questions, literature review, conceptual definitions, design and methods, three analysis sections, a modal-free test, robustness and falsifiers, validity threats, declarations, references (exports to Word and PDF)",
       kSumdoc: "Read the loaded article", kSumdocS: "What it claims \u00b7 its load-bearing line \u00b7 where it is brittle \u00b7 a 1,000-word condensation",
       kWechat: "Column piece (3,000 characters)", kWechatS: "A concrete scene in the first three lines; short sections, short sentences, one thing to do tomorrow",
@@ -1517,11 +1517,12 @@
       cvSegOk: "只改选中的这一段（{n} 字）", cvSegNo: "选中的这一段在源码里定位不到，这一次会改整版——想精确改某一段，先切到「源码」再选。",
       cvNewVer: "改好的已存成第 {n} 版", cvGone: "画布上那一件已经不在了，回稿留在对话里。",
       cvAskPre: "下面这段来自画布《{t}》，请照我的要求改写它，只输出改好的整段、不要解说：",
-      rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "十道工序：背景 → 文献与方法 → 三条基本关系 → 六条生成路径 → 三条动力机制 → 二阶对撞出新判断 → 论文大纲 → 可证伪 → 总结 → 参考文献，最后出一份可导出 Word 的报告（会用掉若干次额度）",
-      rsPaperBtn: "📄 ＋一万字论文", rsPaperTip: "第 11 步（可选）：研究跑完后，按第七道「论文大纲」逐章展开成约一万字的学术论文（章目由大纲定，每章一趟，另出一份 Word）。不选就不做。",
+      rsBtn: "🔬 深度研究", rsOn: "深度研究：开", rsTip: "六道工序：背景 → 文献与方法 → 三条基本关系 → 六条生成路径 → 三条动力机制 → 二阶对撞出新判断，然后直接写成一篇约一万字的学术论文（出 Word；不另出研究报告；会用掉十几次额度）",
       rsCut1: "这一道没写完（", rsCut2: "）——已停在这里，没有往下跑：断稿传下去，下游会拿着半截材料写得头头是道。",
       rsFailed1: "这一道没跑成（技术故障）：", rsCutEmpty: "一个字都没写出来", rsCutStopped: "你按了停止", rsCutLength: "上游预算顶穿，稿子断在半句", rsCutShort: "只写出 {n} 字",
-      rsPaperStep: "第 11 步 · 学术论文（一万字）", rsPaperWait: "十道跑完，正在按第七道大纲逐章写作（每章一趟，几分钟到十几分钟）——成文窗口里可以看着它长出来；写完会回到这里，另出一份 Word。",
+      rsJ6Dead: "第六道自报作废／停在一阶／只是操作化——没有撞出判断，不能当脊梁往下传", rsJ6NoZ: "第六道没写出「X 不是……而是 Z」那一句——没有判断就没有可撞、可排、可证伪的东西", rsJ6NoPair: "第六道三对只撞了 {n} 对（方程×路径／路径×动力／方程×动力）",
+      rsToPaper: "六道跑完 · 直接出论文（不另出研究报告）", rsPartial: "研究只跑了 {n}/{m} 道，没到二阶碰撞，不出论文——已写完的几道都在。",
+      rsPaperStep: "出论文 · 学术论文（一万字）", rsPaperWait: "六道跑完，正在按十节学术体例逐节写作（每节一趟，几分钟到十几分钟）——成文窗口里可以看着它长出来；写完会回到这里，出一份 Word。",
       rsPaperDone: "论文写完 · {n} 字（与研究报告分开，单独一份 Word）", rsPaperFail: "论文这一步没写成：", rsPaperRetry: "重写第 11 步", rsPaperDocx: "⤓ 论文 .docx",
       rsPlan: "正在铺工序…", rsPlanFail: "拆题没成：", rsSteps: "这次研究分 {n} 步", rsCost: "约用掉 {n} 次额度",
       rsStep: "第 {i}/{n} 步", rsDoing: "正在查…", rsDone: "写完", rsFinal: "在下总判断…",
@@ -1664,11 +1665,12 @@
       cvSegOk: "Revising only the selected passage ({n} chars)", cvSegNo: "The selection could not be located in the source, so the whole version will be revised. Switch to Source view to select precisely.",
       cvNewVer: "Saved as version {n}", cvGone: "That canvas item is gone; the reply stayed in the conversation.",
       cvAskPre: "The passage below comes from the canvas \u201c{t}\u201d. Rewrite it as I ask; output the revised passage only, no commentary:",
-      rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Ten stages: background → literature & method → three basic relations → six generative paths → three drivers → second-order collision → paper outline → falsifiability → summary → references. Ends in a report you can export to Word (uses several turns)",
-      rsPaperBtn: "📄 + 10k-word paper", rsPaperTip: "Optional step 11: once the ten stages finish, expand the stage-7 paper outline chapter by chapter into a ~10,000-character paper (chapters fixed by the outline, one pass each, exported as a separate Word file). Off by default.",
+      rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Six stages: background → literature & method → three basic relations → six generative paths → three drivers → second-order collision, then straight into a ~10,000-character academic paper (Word export; no separate report; uses a dozen or so turns)",
       rsCut1: "This stage did not finish (", rsCut2: ") — stopped here, nothing passed downstream: a truncated stage would be written up fluently on half the material.",
       rsFailed1: "This stage failed (technical): ", rsCutEmpty: "no text came back", rsCutStopped: "you pressed stop", rsCutLength: "the model hit its output budget mid-sentence", rsCutShort: "only {n} characters",
-      rsPaperStep: "Step 11 · Academic paper (10k)", rsPaperWait: "Ten stages done; writing the paper chapter by chapter along the stage-7 outline (one pass per chapter, several minutes). Watch it grow in the writing window; it comes back here with its own Word export.",
+      rsJ6Dead: "Stage 6 declared itself void / first-order / mere operationalisation — no judgment came out, so it cannot be the spine", rsJ6NoZ: "Stage 6 never wrote the 'X is not … but Z' sentence — without a judgment there is nothing to outline or falsify", rsJ6NoPair: "Stage 6 collided only {n} of the three pairs (equations×paths / paths×dynamics / equations×dynamics)",
+      rsToPaper: "Six stages done · writing the paper directly (no separate research report)", rsPartial: "Only {n}/{m} stages ran — the collision stage was not reached, so no paper is written; the finished stages are kept.",
+      rsPaperStep: "Paper · Academic paper (10k)", rsPaperWait: "Six stages done; writing the paper section by section along the ten-section academic template (one pass per section, several minutes). Watch it grow in the writing window; it comes back here with a Word export.",
       rsPaperDone: "Paper done · {n} characters (separate Word file from the report)", rsPaperFail: "Step 11 did not complete: ", rsPaperRetry: "Rewrite step 11", rsPaperDocx: "⤓ paper .docx",
       rsPlan: "Laying out the stages\u2026", rsPlanFail: "Could not break it down: ", rsSteps: "{n} steps", rsCost: "about {n} turns",
       rsStep: "Step {i}/{n}", rsDoing: "Digging\u2026", rsDone: "done", rsFinal: "Writing the verdict\u2026",
@@ -2321,7 +2323,6 @@
           "<button class='wdsm-mode' data-k='web'></button>" +
           "<button class='wdsm-mode' data-k='nosde'></button>" +
           "<button class='wdsm-mode wdsm-rsbtn'></button>" +
-          "<button class='wdsm-mode wdsm-rspbtn' style='display:none'></button>" +
           "<button class='wdsm-mode wdsm-lnkbtn'></button>" +
           "<button class='wdsm-mode wdsm-findbtn'></button>" +
           "<button class='wdsm-mode wdsm-dubtn'></button>" +
@@ -6668,32 +6669,18 @@
      一趟满功率写整篇必吐 0 字（老教训），所以研究是**多趟小任务**：
      拆题（非满功率、有界 JSON）→ 每步一趟（走 /api/wds/chat 那条熟产线，带 rs 字段）→ 总判断一趟。
      每步都是独立请求：一步卡死只损失一步，且都能被停。 */
-  /* paper：第 11 步开关（2026-08-29）。记在本机，跨场保留——它是读者的一个习惯，不是一次性的选择。
-     只在深度研究亮着时露出来：不跑研究时它没有意义。 */
-  var RS = { on: false, running: false, stop: false, paper: false };
-  try { RS.paper = localStorage.getItem("sde_wds_rs_paper") === "1"; } catch (e) {}
+  /* 2026-08-30：深度研究**直接出论文**，不再出研究报告——08-29 那个「＋一万字论文」开关随之撤掉，
+     出论文是终末必跑的一步（sdePipe 六道跑完即进 rsPaperStep）。 */
+  var RS = { on: false, running: false, stop: false };
   var rsBtn = layer.querySelector(".wdsm-rsbtn");
-  var rspBtn = layer.querySelector(".wdsm-rspbtn");
   function rsPaint() {
     if (!rsBtn) return;
     rsBtn.textContent = tx("rsBtn");
     rsBtn.title = tx("rsTip");
     if (RS.on) rsBtn.classList.add("on"); else rsBtn.classList.remove("on");
-    if (rspBtn) {
-      rspBtn.textContent = tx("rsPaperBtn");
-      rspBtn.title = tx("rsPaperTip");
-      rspBtn.style.display = RS.on ? "" : "none";
-      if (RS.paper) rspBtn.classList.add("on"); else rspBtn.classList.remove("on");
-    }
     try { toolsPaint(); } catch (e) {}
   }
   if (rsBtn) rsBtn.onclick = function () { if (RS.running) return; RS.on = !RS.on; rsPaint(); };
-  if (rspBtn) rspBtn.onclick = function () {
-    if (RS.running) return;
-    RS.paper = !RS.paper;
-    try { localStorage.setItem("sde_wds_rs_paper", RS.paper ? "1" : "0"); } catch (e) {}
-    rsPaint();
-  };
   function rsPost(body) {
     return fetch("/api/wds/research", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(body)) });
   }
@@ -6856,6 +6843,24 @@
     if (n < 300) return { d: "cut", why: tx("rsCutShort", { n: n }) };
     return { d: "passed", why: "" };
   }
+  /* ⭐ SDE 研究产线的道次专判（2026-08-30）。长度闸判不出「有没有撞出来」——写「无焦点，本道作废」也能有一千字，
+     照样 passed，出论文那一步拿它当脊梁。能数的仍不问模型：
+       第六道：自报作废／停在一阶／只是操作化 ⇒ needs_revision；没有「不是……而是」那一句 ⇒ needs_revision；
+               三对（方程×路径／路径×动力／方程×动力）缺一 ⇒ needs_revision（重跑本道，或读者记降级往下）。
+     只在程序判 passed 之后才看这几条；判词的三句是第六道规格里写死给程序读的。 */
+  function rsJudgeSde(n1, txt, meta) {
+    var s = String(txt || "");
+    var j = rsJudge(txt, meta);
+    if (j.d !== "passed") return j;
+    if (n1 === 6) {
+      if (/本道作废|整道作废|三对[^\n]{0,8}作废|判断停在一阶|本道停在一阶|仍停在一阶|停在了一阶|只是操作化|属于操作化|如实[^\n]{0,4}操作化|做的是操作化/.test(s)) return { d: "needs_revision", back: 0, why: tx("rsJ6Dead") };
+      if (!/不是[\s\S]{1,300}?而是/.test(s)) return { d: "needs_revision", back: 0, why: tx("rsJ6NoZ") };
+      var pairs = [/方程[^\n]{0,24}路径|路径[^\n]{0,24}方程/, /路径[^\n]{0,24}动力|动力[^\n]{0,24}路径/, /方程[^\n]{0,24}动力|动力[^\n]{0,24}方程/]
+        .filter(function (re) { return re.test(s); }).length;
+      if (pairs < 3) return { d: "needs_revision", back: 0, why: tx("rsJ6NoPair", { n: pairs }) };
+    }
+    return j;
+  }
   function rsRun(topic, fg, resume) {
     var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { rsRun(topic, fg, resume); }); return; }
     RS.running = true; RS.stop = false; streaming = true;
@@ -6869,9 +6874,7 @@
     cell.a.innerHTML = ""; cell.a.appendChild(card);
     var base = { key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG };
     var steps = [], secs = [], title = topic, degraded = [];
-    var sdePipe = false;                       // 这一趟是不是 SDE 研究产线（由 plan 的回执定）
-    /* 第 11 步开关在开跑那一刻定格：读者中途改开关不影响这一趟（学科通融不带这一步）。 */
-    var wantPaper = !fg && !!RS.paper;
+    var sdePipe = false;                       // 这一趟是不是 SDE 研究产线（由 plan 的回执定；跑完六道直接出论文）
     /* 一趟＝一个 run。attempt 按道次记，幂等键 run:stage:attempt——
        同一次重试不该在服务端算成两趟。 */
     var runid = (resume && resume.run) || runId(), attempts = {};
@@ -6943,7 +6946,7 @@
            ——第九道就是研究总结，再来一段只会把结论摆到论证前面。 */
         sdePipe = !!j.sde;
         note.textContent = (fg ? tx("fgSteps", { n: steps.length }) : tx("rsSteps", { n: steps.length }))
-          + " \u00b7 " + tx("rsCost", { n: steps.length + ((fg || sdePipe) ? 0 : 1) })
+          + " \u00b7 " + tx("rsCost", { n: steps.length + (sdePipe ? 11 : (fg ? 0 : 1)) })
           + (fg && fg.judge ? (" \u00b7 " + tx("fgJudge")) : "");
         var rows = steps.map(function (s, i) {
           var box = el("div", "wdsm-rstep");
@@ -7063,7 +7066,8 @@
                  都来不及写，读者看到的是「没交出判决」，分不出它是不肯判还是没写完，于是一路
                  「仍要往下跑」——那趟十八道里七道就是这样带着半截稿子被强行带下去的。
                  程序判不出问题的，才轮到基底的【闸门】那一行。 */
-              var g = fg ? (function () { var j = rsJudge(txt, RS.lastMeta); return j.d === "passed" ? forgeGate(txt) : j; })() : rsJudge(txt, RS.lastMeta);
+              var g = fg ? (function () { var j = rsJudge(txt, RS.lastMeta); return j.d === "passed" ? forgeGate(txt) : j; })()
+                : (sdePipe ? rsJudgeSde(i + 1, txt, RS.lastMeta) : rsJudge(txt, RS.lastMeta));   // 2026-08-30：SDE 产线加道次专判（第 6／7 道）
               r.stat.textContent = (g.d === "passed" ? tx("rsDone") : ("\u26a0 " + tx("fgGateNo"))) + " \u00b7 " + txt.length;
               secs.push({ t: s.t, body: txt, gate: g.d, hash: fnv1a64(txt), at: Date.now() });
               saveRun();
@@ -7091,9 +7095,12 @@
           // 学科通融不跑「总判断」那一步：最后一道工序就是交付自查，再加一段总结
           // 只会把结论摆到论证前面（本产线明令禁止的写法），还白烧一次额度。
           if (fg) return done("");
-          /* SDE 研究同理：第九道就是「研究总结」、第十道是参考文献，
-             再跑一次总判断只会把结论摆到论证前面，还白烧一次额度。 */
-          if (sdePipe) return done("");
+          /* ⭐ SDE 研究（2026-08-30）：**不出研究报告，直接出论文**。六道没跑完（读者按停）就不出——
+             论文的承重是第六道那条判断，没有它写出来的是一篇没有脊梁的稿子。 */
+          if (sdePipe) {
+            if (secs.length < steps.length) return fail(tx("rsPartial", { n: secs.length, m: steps.length }));
+            return donePaper();
+          }
           note.textContent = tx("rsFinal");
           var vb = el("div", "wdsm-rstep open");
           var vh = el("div", "sh"); vh.appendChild(el("b", null, "\u25c6 " + tx("rsFinal")));
@@ -7104,6 +7111,13 @@
           }, function (txt) { vs.innerHTML = mdRender(txt); if (stick) scrollBottom(); })
             .then(function (verdict) { done(verdict); })
             .catch(function (e) { vs.textContent = "\u2717 " + ((e && e.message) || "?"); done(""); });
+        }
+        /* SDE 产线的收尾：不装报告、不给报告的下载钮，六道正文留在各自的行里可展开；成品只有那篇论文。
+           读者按「仍要往下跑」带下来的道次（degraded）交给论文那一行显著写出——没过闸的材料写出的论文不该和全过闸的长得一样。 */
+        function donePaper() {
+          note.textContent = tx("rsToPaper");
+          endRs("");
+          rsPaperStep(card, topic, title, secs, degraded);
         }
         function done(verdict) {
           var md = "# " + title + "\n\n> " + tx("rsReport") + " \u00b7 " + topic + "\n\n";
@@ -7142,20 +7156,17 @@
           row.appendChild(c1); row.appendChild(c2); row.appendChild(c3); row.appendChild(c4);
           card.appendChild(row);
           endRs(md);
-          /* ⭐ 第 11 步（可选，2026-08-29）：把撞出来的新判断展开成一万字学术论文，单独出 Word。
-             只在 SDE 产线 ＋ 读者选了这一步时跑；报告已经落地（endRs 之后），这一步坏了不伤报告。 */
-          if (sdePipe && wantPaper && secs.length >= 6) rsPaperStep(card, topic, title, secs);
         }
         return step();
       })
       .catch(function (e) { fail(tx("rsPlanFail") + ((e && e.message) || "?")); });
   }
 
-  /* ── 深度研究第 11 步：一万字学术论文（2026-08-29）──
-     材料＝十道产出（rsrc），机器＝成文机的拆趟产线（kind=rpaper，骨架由 Skill §二之二 编译）。
+  /* ── 深度研究·出论文：一万字学术论文（2026-08-29 立；2026-08-30 起为终末必跑步，研究不另出报告）──
+     材料＝六道产出（rsrc），机器＝成文机的拆趟产线（kind=rpaper，骨架由 Skill §二之二 编译）。
      写作在成文窗口里进行（那台机器的重试、断点、字数闸、祖宗闸、Word/PDF 出口全在那儿）；
-     写完回到研究卡片这一行，另出一份 Word——与研究报告那份分开。 */
-  function rsPaperStep(card, topic, title, secs) {
+     写完回到研究卡片这一行，出一份 Word。 */
+  function rsPaperStep(card, topic, title, secs, degraded) {
     var row = el("div", "wdsm-rstep open");
     var sh = el("div", "sh");
     sh.appendChild(el("b", null, tx("rsPaperStep")));
@@ -7166,6 +7177,12 @@
     var ln = el("div", null, tx("rsPaperWait"));
     ln.style.cssText = "font-size:12.5px;line-height:1.7;margin:6px 0 0;color:#8B7B5E";
     sb.appendChild(ln);
+    /* 【降级要看得见】读者按了「仍要往下跑」的那几道，在论文这一行显著写出——报告没了，这一行是唯一留痕处。 */
+    if (degraded && degraded.length) {
+      var dg = el("div", null, "\u26a0 " + tx("fgDegraded") + degraded.join("\u3001"));
+      dg.style.cssText = "font-size:12.5px;line-height:1.7;margin:6px 0 0;color:#c8785a";
+      sb.appendChild(dg);
+    }
     var rsrc = { topic: topic, stages: secs.map(function (x, k) {
       return { i: k + 1, t: x.t, body: String(x.body || "").replace(/\n*【闸门】[^\n]*\s*$/, "") }; }) };
     function go() {
