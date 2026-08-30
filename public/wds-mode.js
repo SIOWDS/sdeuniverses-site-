@@ -9184,6 +9184,11 @@
           var before = text.length, tail0 = text.slice(-1200);
           var need = Math.max(400, Math.round((parseInt(secs[i].words, 10) || 4000) * 0.4));
           function accept() {
+            /* 【书名去重·兜底】长篇的唯一一行 `# 书名` 由客户端写在最前（见 startParts 开头）。
+               若这一趟又吐出一行 `# …`（H1），删掉它，别让书名出现两次——服务端已明令基底别再写书名，
+               这里再拦一道，纵使基底偶尔犯轴也不会有双标题。只吃 H1（单个 `#`），`## 第X部`/`## 章名` 不动。 */
+            var _leg = text.slice(before), _m = /^\s*#[ \t]+[^\n]*\n?/.exec(_leg);
+            if (_m) text = text.slice(0, before) + _leg.slice(_m[0].length);
             if (text.slice(-2) !== "\n\n") text += "\n\n";
             paintD(false);
             dProgress = i + 1;

@@ -123,8 +123,8 @@ ok("★ noHead 档不挂学术投稿规程（PFIX 把它排除掉）",
    /const NOHD = !!SPEC\.noHead;/.test(W) && /Array\.isArray\(SPEC\.fixed\) && SPEC\.fixed\.length > 0 && !NOHD/.test(W));
 ok("★ noHead 档的 part 提示语不写 `## 小标题`",
    /NOHD[\s\S]{0,400}只是\*\*内部分工的叫法，绝不许写进正文\*\*/.test(W));
-ok("noHead 档第一趟才写标题，后面几趟明令不重写标题",
-   /第一行写这篇的标题/.test(W) && /不重新开题、不再写一次标题/.test(W));
+ok("noHead 档：客户端独占书名，各趟一律不再写书名/标题（修双标题）",
+   /绝不要再写一次书名或标题/.test(W) && /不重新开题、不再写一次标题/.test(W));
 ok("★ noHead 档的 plan 那一趟不许把趟名改成小标题",
    /FIXED && SPEC\.noHead/.test(W) && /一个字都不要改、不要加序号/.test(W));
 ok("noHead 档不发「结尾留一个开口」（散文/小说的收法各不相同）",
