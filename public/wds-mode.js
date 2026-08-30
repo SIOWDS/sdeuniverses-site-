@@ -1048,6 +1048,7 @@
       kProse: "散文（5000字）", kProseS: "不讲道理讲经验：从一个场面进去，道理藏在事里，收在一个具体画面上",
       kStory: "短篇小说（2400字）", kStoryS: "一个场景、一到三个人；判断由情节自己撞出来，结尾不解决不点题",
       kNovella: "中篇小说（24000字）", kNovellaS: "三幕八节、一主一反两条线；第二节那个选择会在第七节原样重来一次，只有动作不同",
+      kNovel: "长篇小说（10万字·四部）", kNovelS: "四部三到四条线、十万字。一次写不完：随时可停，回来点「接着往下写」从上次停的地方接着写。世界快照带卷次时间线，人物与设定全书守恒",
       kScript: "剧本（6000字）", kScriptS: "只写看得见与听得见的；写得出「他心里想」的那一句，一定是错的",
       lnPick: "先定体量", lnUnit: " 字",
       lnNote: "三千字与八千字不是同一篇的两种长度：**短的那一档要砍掉一条线，长的那一档要多一个人**。所以体量在动笔之前定，不是写完再删——删出来的稿子逻辑是断的。",
@@ -1069,6 +1070,7 @@
       mDocx: "\u2913 Word (.docx)", mDocxS: "把这一篇存成 Word 文档",
       mPdfx: "\u2913 PDF", mPdfxS: "把这一篇排成印刷稿并存成 PDF（打印框里把「目标」选成「另存为 PDF」）",
       mGoOn: "\u21bb 继续写缺的几节", mGoOnS: "扫描这一稿，只重跑没写够的那几节，写完插回原位（不动已经写好的）",
+      mSeqGoOn: "\u21bb 接着往下写", mSeqGoOnS: "从上次停下的那一章接着往下写（前面已经写好的不动）；随时可以再停，回来再点它",
       mGoOnNo: "这一稿没有分节表，续写要有提纲才知道补哪一节。", mGoOnDone: "扫了一遍，每一节都写够了，没有要补的。",
       mGoOnAt: "正在补第 ", mGoOnEnd1: "这一趟补好了 ", mGoOnEnd2: " 节。", mGoOnEnd3: "仍没写够的：第 ",
       dChars: " 字",
@@ -1242,6 +1244,12 @@
     dHidSum1: "\u26a0 这一趟里标签页被切到后台 ", dHidSum2: " 次、累计 ", dHidSum3: " 秒。长文是一趟连着十几次请求跑下来的，中途切走很容易把流掐断。下次跑的时候把它留在前台。",
     dThrifty1: "\u26a0 到第 ", dThrifty2: " 节为止连着三节没写够。**没有停**——后面的节照常写下去，只是从这里起每节只打一遍、不再重试也不再等二十秒（真是上游在挡就少烧几次；不是的话后面这几节照样写得出来）。",
     dThriftyEnd: "这一趟跑到了最后一节。没写够的那几节已列在上面——点「\u21bb 继续写缺的几节」单独补，那时是单节请求，压力比一口气十六节小得多。",
+    /* 长篇断点续写：一次写不完是常态，写到哪停在哪、下次接着跑。N/M 由代码拼进来。 */
+    dSeqPaused1: "\u26a0 这是一部长篇，一次写不完很正常。已经写到第 ", dSeqPaused2: " 章、共 ", dSeqPaused3: " 章——点上面的「\u21bb 接着往下写」从这里继续；随时可以再停，每写完一章都存进「成文记录」，稿子丢不了。",
+    dSeqDone: "\u2713 长篇写到最后一章了。若要回炉某一部，可在「成文记录」取回后手改，或整篇重写。",
+    dSeqReopen1: "从「成文记录」取回的长篇：已写到第 ", dSeqReopen2: " 章、共 ", dSeqReopen3: " 章。点「\u21bb 接着往下写」从这里接着往下跑。",
+    dSeqReopenNoPlan: "\u26a0 这份长篇是早先的版本，没有把「卷次时间线／人物设定」一起存下来，接不上了——只能整篇重写。（本次更新之后新写的长篇都能续写。）",
+    dSeqAt1: "接着写第 ", dSeqAt2: "/", dSeqAt3: " 章…",
     dLegErr: "第 ", dLegErr2: " 节这一趟自己出岔子了，已跳过接着往下走（原因：",
     dAutoSaved: "已自动存进「成文记录」——就算这里显示出问题，稿子也在（成文菜单 → ↺ 成文记录）。",
     dCloseBusy: "正在写作中，点空白处不会关掉它（免得误点丢稿）。要关就按 Esc、或点右上角的 ✕ —— 两条路都会先把已写的部分存进「成文记录」。",
@@ -1317,6 +1325,7 @@
       kProse: "Personal essay (5,000 characters)", kProseS: "Experience, not argument: enter through a scene, keep the point inside the events, end on an image",
       kStory: "Short story (2,400 characters)", kStoryS: "One scene, one to three people; the claim has to surface through what happens — no moral at the end",
       kNovella: "Novella (24,000 characters)", kNovellaS: "Eight sections in three acts, one main line and one rival; the choice in section 2 returns unchanged in section 7 — only the action differs",
+      kNovel: "Novel (100,000 characters, four parts)", kNovelS: "Four parts, three to four lines, 100k characters. Too long for one sitting: stop anytime, come back and hit \u201ckeep writing\u201d to resume where you left off. A volume timeline in the world snapshot keeps people and setting consistent throughout",
       kScript: "Screenplay (6,000 characters)", kScriptS: "Only what can be seen and heard; any line saying what someone thinks is a wrong line",
       lnPick: "Pick a length first", lnUnit: " chars",
       lnNote: "Three thousand and eight thousand are not two lengths of one piece: **the short one has to lose a thread, the long one has to gain a person.** So length is settled before writing, not by cutting afterwards — a cut-down draft has a broken spine.",
@@ -7429,6 +7438,11 @@
        ⚠ 它是全站第一个吃「世界快照」的档（服务端 SPEC.world + SPEC.threads）：
           提纲那一趟产出设定表与线索表，八趟正文逐趟原样回灌。八趟＝八次调用，写一次要几分钟。 */
     { k: "novella", t: "kNovella", sty: 1, doc: 1, w: 24000, c: 1, wo: [16000, 24000, 40000] },
+    /* 长篇小说（2026-08-30）。十万字一次写不完是常态，所以它多一个 seq:1 ＝ **断点续写**：
+       逐章存稿（saveProgress 连提纲一起存），中断后从已写章数接着往下跑，而不是靠中篇那条
+       「按小标题定位缺节」的续写路——noHead 稿没有小标题可定位（那条路对 noHead 一律回全稿缺）。
+       ⚠ 服务端白名单／SPEC／DIST_WORDS／DIST_WORD_OPTS 四处都已加 novel；只改这里会「菜单点得到、后端认不出」。 */
+    { k: "novel", t: "kNovel", sty: 1, doc: 1, w: 100000, c: 1, seq: 1, wo: [60000, 100000, 160000] },
     /* 剧本与小说最容易被当成一回事，而承重物不同：小说是演出（读者读叙述），剧本是可排演
        （只写看得见与听得见的）。⚠ 它给 sty（腔调可学）但**不给 verse**（它不是诗体排版）。 */
     { k: "script", t: "kScript", sty: 1, doc: 1, w: 6000, c: 1, wo: [3000, 6000, 12000] },
@@ -7717,7 +7731,17 @@
           var st = "", mSt = /\u00b7\s*[^:：]*[:：]\s*(.+)$/.exec(String(head));
           if (mSt) { var nm0 = mSt[1].trim(); for (var wi = 0; wi < WRITERS.length; wi++) if (WRITERS[wi].n === nm0) st = WRITERS[wi].k; }
           if (!k) k = /【摘要】|【关键词】|参考文献|Keywords/.test(body.slice(0, 4000)) ? "paper" : "report";
-          distill(k, body, head, "", null, st);
+          /* 长篇断点续写：把与正文一同存下的提纲（世界快照＋卷次时间线＋线索表＋分章表＋已写章数）
+             取回来，交给 distill 装回去。这一条 role:"plan" 是内部的，只有长篇（seq）才存。 */
+          var _restore = null;
+          (rec.turns || []).forEach(function (x) {
+            if (x && x.role === "plan" && x.text) { try { _restore = JSON.parse(x.text); } catch (e) {} }
+          });
+          if (_restore && _restore.kind && _restore.plan) {
+            distill(_restore.kind, body, head, "", null, _restore.style || st, _restore.words || 0, { restore: _restore });
+          } else {
+            distill(k, body, head, "", null, st);
+          }
         },
       });
     }
@@ -8186,6 +8210,7 @@
     }
     var dSecs = null;          // 提纲拿到的分节表：收尾判「写够没有」要拿它当分母
     var dPlanObj = null;       // 提纲那一趟的全部产物：续写时要原样回传给 part 阶段
+    var dProgress = 0;         // 长篇（seq）断点续写：已经写完的章数——续写从这里往下跑
     // sawDone：有没有收到 worker 的收尾信号 [DONE]。空产出时这一位决定死因说得对不对——
     // 收到了＝基底真的一个字没写；没收到＝这一趟被平台在半路掐掉（worker 自己都没来得及报诊断）。
     var sawDone = false, lastSec = 0;
@@ -8267,6 +8292,9 @@
        投稿口收的是文章不是幻灯片稿。两组条件分开写，别再合成一个 if——
        合着写正是「加了四档新体裁、Word 却没跟上」的来路。 */
     var _kd = kindDef(kind), _isDoc = !!(_kd && _kd.doc), _isPaperish = (kind === "essay" || kind === "paper" || kind === "paper1");
+    /* _isSeq ＝ 长篇：分章连续写 ＋ 断点续写。它的续写钮不走「按小标题定位缺节」那条路
+       （noHead 稿没有小标题，那条路对它一律回全稿缺），改按**已写章数**接着往下跑。 */
+    var _isSeq = !!(_kd && _kd.seq);
     /* 续写钮的资格 ＝ **这一档会不会分节写**，不是「它是不是论文」。
        原来钉的是 _isPaperish，于是 2026-08-22/23 新加的九档里凡是拆趟的
        （公众号/散文/小说/剧本/方案/总结/讲话）缺一节只能整篇重来 ——
@@ -8301,13 +8329,22 @@
       /* 续写钮：只在「确实有缺节」时才亮，免得在一份完整稿上摆一颗没用的按钮。
          ⚠ 而且只给 essay/paper/paper1——续写靠的是提纲那张分节表，
          散文与诗根本没有分节，摆上去就是一颗按了会说「没有提纲」的按钮。 */
-      var goOn = _canGoOn ? el("button", "wdsm-tbtn dgoon", t("mGoOn")) : null;
+      var goOn = _canGoOn ? el("button", "wdsm-tbtn dgoon", _isSeq ? t("mSeqGoOn") : t("mGoOn")) : null;
       if (goOn) {
-      goOn.title = t("mGoOnS");
+      goOn.title = _isSeq ? t("mSeqGoOnS") : t("mGoOnS");
       goOn.style.display = "none";
       dlBtn.parentNode.insertBefore(goOn, dlBtn);
       goOnBtn = goOn;
       goOn.onclick = function () {
+        /* 长篇（seq）：不按小标题找缺节（noHead 稿没有小标题可找），按**已写章数**接着往下跑。
+           取回的旧版长篇若没存下提纲（dPlanObj 为空），接不上，只能整篇重写。 */
+        if (_isSeq) {
+          if (!dPlanObj || !dSecs || !dSecs.length) { dNote(t("dSeqReopenNoPlan"), 1); return; }
+          if (dProgress >= dSecs.length) { dNote(t("dSeqDone")); goOn.style.display = "none"; return; }
+          goOn.style.display = "none"; dStopped = false;
+          startParts(dPlanObj, dProgress, text);
+          return;
+        }
         var secs = dSecs, plan = dPlanObj;
         if (!secs || !secs.length) { dNote(t("mGoOnNo"), 1); return; }
         var miss = missingSecs(text, secs);
@@ -8437,7 +8474,10 @@
          下次面板根本不会把那行痕迹摆出来。而两次白屏都指着最后一节之后这一段。
          所以：心跳贯穿整个收尾，每一步打标，ok 留到最后一步做完才置。 */
       pTrace.leg = "收尾·存稿"; traceSave();
-      if (text && text.length > 200 && !existing) {
+      /* ⚠ 长篇（seq）不在这里另存：done() 在每一次「暂停」都会被调一遍，而它的 distSave 每调一次
+         就新开一条会话 ⇒ 一部长篇分十几次写完就会攒出十几条重复记录。长篇的存稿全走 saveProgress
+         那一条 dsess（逐章覆盖同一条），这里放手。 */
+      if (text && text.length > 200 && !existing && !_isSeq) {
         try {
           distSave(distLabel(kind, style, text), text, function (okv) {
             if (okv) dNote(t("dAutoSaved"));
@@ -8868,7 +8908,26 @@
           + ((_pt.beatGap || 0) > 6000 ? t("dLastFroze") : t("dLastAlive")));
       }
     } catch (e) {}
-    if (existing) { text = existing; done(); return; }
+    if (existing) {
+      text = existing;
+      /* 长篇（seq）取回：把存下来的提纲（世界快照＋卷次时间线＋线索表＋分章表）与已写章数装回来，
+         亮出「接着往下写」。没有提纲的老版长篇接不上，明说只能整篇重写。 */
+      if (_isSeq) {
+        var _rp = (ext && ext.restore) ? ext.restore : null;
+        if (_rp && _rp.plan && _rp.plan.sections && _rp.plan.sections.length) {
+          dPlanObj = _rp.plan; dSecs = _rp.plan.sections; dProgress = _rp.done || 0;
+          done();
+          try {
+            if (dProgress < dSecs.length) {
+              if (goOnBtn) goOnBtn.style.display = "";
+              dNote(t("dSeqReopen1") + dProgress + t("dSeqReopen2") + dSecs.length + t("dSeqReopen3"), 0);
+            } else { dNote(t("dSeqDone"), 0); }
+          } catch (e) {}
+        } else { done(); dNote(t("dSeqReopenNoPlan"), 1); }
+        return;
+      }
+      done(); return;
+    }
     out.innerHTML = "<span class='cur'>▊</span>";
     dBump();
 
@@ -8983,8 +9042,16 @@
              取回时两处都认得出（反查扫全段）。 */
           var _dl = distLabel(kind, style, text);
           if (!dsess) dsess = A.session({ agent: AGENT_DIST, scope: "", scopeLabel: _dl });
-          dsess.save([{ role: "reader", text: _dl + " · " + new Date().toLocaleString() + (tag ? ("（" + tag + "）") : "") },
-                      { role: "wds", text: text }]);
+          var _turns = [{ role: "reader", text: _dl + " · " + new Date().toLocaleString() + (tag ? ("（" + tag + "）") : "") },
+                        { role: "wds", text: text }];
+          /* 长篇（seq）断点续写：把提纲那一趟的全部产物（世界快照＋卷次时间线＋线索表＋分章表）与已写章数
+             一起存下来——noHead 稿没有小标题可定位，续写只能靠"已写到第几章"接着往下跑。
+             这一条 role 是内部的：取回时读它，导出成文本时跳过它（见 wds-store asText）。只给 seq 档存，
+             别的档一字未改。 */
+          if (_kd && _kd.seq && dPlanObj) {
+            try { _turns.push({ role: "plan", text: JSON.stringify({ v: 1, kind: kind, style: style || "", words: words || 0, done: dProgress, plan: dPlanObj }) }); } catch (e) {}
+          }
+          dsess.save(_turns);
         } catch (e) {}
       }
       if (window.WDSStore) { window.WDSStore.load(put); return; }
@@ -9054,14 +9121,84 @@
       startParts(plan);
     });
 
-    function startParts(plan) {
+    /* _startIdx / _preText：长篇（seq）断点续写用。从「成文记录」取回后接着往下写时，
+       text 已经是存下来的正文（含书名与前 _startIdx 章），不能再加一遍书名，i 从 _startIdx 起。
+       别的档一律 _startIdx=0、_preText 空，行为与从前一模一样。 */
+    function startParts(plan, _startIdx, _preText) {
       var secs = plan.sections; dSecs = secs; dPlanObj = plan;
-      text += "# " + String(plan.title || kindT(kind)) + "\n\n";
-      if (plan.sub) text += "**" + String(plan.sub) + "**\n\n";
-      paintD(false);
-      dNote(t("dPlanGot") + secs.length + t("dPlanGot2")
-        + secs.map(function (s, i) { return (i + 1) + "、" + String((s && s.h) || ""); }).join("\u3000"));
-      var i = 0;
+      var i = _startIdx || 0;
+      if (i > 0) {
+        if (typeof _preText === "string") text = _preText;   // 接着已写好的正文往下写
+        dProgress = i;
+        paintD(false);
+        dNote(t("dSeqAt1") + (i + 1) + t("dSeqAt2") + secs.length + t("dSeqAt3"));
+      } else {
+        text += "# " + String(plan.title || kindT(kind)) + "\n\n";
+        if (plan.sub) text += "**" + String(plan.sub) + "**\n\n";
+        paintD(false);
+        dNote(t("dPlanGot") + secs.length + t("dPlanGot2")
+          + secs.map(function (s, i2) { return (i2 + 1) + "、" + String((s && s.h) || ""); }).join("\u3000"));
+      }
+      /* ══ 长篇（seq）走它自己那条更简单的顺序写法 ══════════════════════
+         为什么不套用下面那台 step()：那台是给「一次跑完的十六节学术论文」写的——省电模式(thrifty)
+         会在撞墙后**继续往下把后面每一节都白打一遍**、短了的节按 shortSecs 记账而 dProgress 照样加。
+         对长篇这两条都反了：① 十万字一次跑不完，撞墙就该**就地停**、把额度留给下次；
+         ② 续写是按「已写到第几章」接着来的，所以一章没写成时 dProgress **不能**加过去，
+            否则续写会跳过那一章、留一个永远补不上的窟窿。 */
+      if (_isSeq) {
+        var SEQ_BATCH = 8;               // 一次续写最多写几章，写满就暂停请读者再点「接着往下写」
+        var RETRY_WAIT_SEQ = 15000;
+        var _seqStart = i;
+        function seqPause(msg, bad) {
+          try { if (goOnBtn && dProgress < secs.length) goOnBtn.style.display = ""; } catch (e) {}
+          if (msg) dNote(msg, bad ? 1 : 0);
+          done();
+        }
+        function seqStep() {
+          if (dStopped) { seqPause("", 0); return; }
+          if (i >= secs.length) { dNote(t("dSeqDone"), 0); done(); return; }
+          if (i - _seqStart >= SEQ_BATCH) {
+            seqPause(t("dSeqPaused1") + dProgress + t("dSeqPaused2") + secs.length + t("dSeqPaused3"), 0);
+            return;
+          }
+          stat.textContent = t("dPart") + (i + 1) + "/" + secs.length + " · " + String(secs[i].h || "");
+          pTrace.leg = "长篇第 " + (i + 1) + "/" + secs.length + " 章"; traceSave();
+          var before = text.length, tail0 = text.slice(-1200);
+          var need = Math.max(400, Math.round((parseInt(secs[i].words, 10) || 4000) * 0.4));
+          function accept() {
+            if (text.slice(-2) !== "\n\n") text += "\n\n";
+            paintD(false);
+            dProgress = i + 1;
+            try { saveProgress("长篇 · 写到第 " + (i + 1) + "/" + secs.length + " 章"); } catch (e) {}
+            i++;
+            setTimeout(seqStep, 2000);            // 让出主线程，给上游的每分钟限流留空
+          }
+          runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
+            .then(function () {
+              if (text.slice(before).length >= need) { accept(); return; }
+              // 这一章没写够：回滚，退避重试一次
+              text = text.slice(0, before);
+              dNote(t("dPartRetry") + (i + 1) + t("dPartRetry2"));
+              return new Promise(function (res) { setTimeout(res, RETRY_WAIT_SEQ); }).then(function () {
+                if (dStopped) { seqPause("", 0); return; }
+                return runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 }).then(function () {
+                  if (text.slice(before).length >= need) { accept(); return; }
+                  /* 两遍都没写出来：回滚，**就地停在这一章**（不往下写，续写从这一章接着来）。 */
+                  text = text.slice(0, before);
+                  seqPause("\u26a0 第 " + (i + 1) + " 章两遍都没写出来（多半是上游把流掐断或到了高峰）。已写好的 "
+                    + dProgress + "/" + secs.length + " 章都存进了「成文记录」——隔一会儿点「\u21bb 接着往下写」从第 "
+                    + (i + 1) + " 章接着来。", 1);
+                });
+              });
+            })
+            .catch(function (e) {
+              try { text = text.slice(0, before); } catch (e2) {}
+              seqPause(t("dLegErr") + (i + 1) + t("dLegErr2") + ((e && e.message) || "未知") + "）", 1);
+            });
+        }
+        seqStep();
+        return;
+      }
       /* 【短产出＝这一节没写成，不是写完了】旧版只在 out===0 时补写：一节只吐了几十字、
          断在半句上的，照样被当作"这一节完成"收下。两万字十四节里只要后几节撞上限流，
          读者拿到的就是一份**看起来完整的断稿**——标题都在、正文没了。
@@ -9207,6 +9344,7 @@
             try {
               if (text.length > before && text.slice(-2) !== "\n\n") text += "\n\n";
               paintD(false);
+              dProgress = i + 1;   // 这一章写完了：续写从下一章起（存稿把它一并落盘）
               saveProgress("写到第 " + (i + 1) + "/" + secs.length + " 节");
             } catch (e) {}
             i++;

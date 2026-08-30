@@ -17,10 +17,11 @@ const FSRC = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");
 
 /* ═══ 一、把 planOnce ＋ 回退那一段抠出来真跑 ═══ */
 const a = FSRC.indexOf("    var FLOOR = 400;");
-/* 终点锚改到 `function startParts(plan)` 这一行之前：写正文那一大段已被抽成具名函数，
-   切到这里括号正好是平的，不必再补合成收尾（上一版补的 `});` 现在会多一个右括号）。
-   startParts 在壳里用替身接住——这一份只测开工那两趟，不测写正文。 */
-const b = FSRC.indexOf("    function startParts(plan) {", a);
+/* 终点锚是 `function startParts(plan` 这一行之前：写正文那一大段已被抽成具名函数，
+   切到这里括号正好是平的，不必再补合成收尾。startParts 在壳里用替身接住——这一份只测开工那两趟，不测写正文。
+   ⚠ 2026-08-30：长篇（seq）把 startParts 的签名从 `(plan)` 扩成 `(plan, _startIdx, _preText)`，
+   所以这里按前缀 `function startParts(plan` 认，别再钉死那对括号。 */
+const b = FSRC.indexOf("    function startParts(plan", a);
 const SRC = (a > 0 && b > a) ? FSRC.slice(a, b) : "";
 ok("抠得到 planOnce 与回退那一段", SRC.indexOf("planOnce") > 0 && SRC.indexOf("runLeg({})") > 0);
 ok("切片括号是平的（不必补合成收尾）", SRC.split("{").length === SRC.split("}").length);

@@ -258,7 +258,10 @@
       + (rec.scopeLabel ? "篇目：" + rec.scopeLabel + "\n" : "")
       + "时间：" + new Date(rec.createdAt).toLocaleString("zh-CN") + "\n"
       + "来源：SDE Universes · sdeuniverses.com\n\n";
-    var body = (rec.turns || []).map(function (t) {
+    var body = (rec.turns || []).filter(function (t) {
+      /* role:"plan" 是长篇断点续写的内部存档（世界快照＋分章表的 JSON），不是给人读的正文——导出时跳过。 */
+      return t && t.role !== "plan";
+    }).map(function (t) {
       return (t.role === "reader" ? "【我】\n" : "【WDS】\n") + (t.text || "") + "\n";
     }).join("\n");
     return head + body;

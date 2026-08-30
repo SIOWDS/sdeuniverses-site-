@@ -431,11 +431,37 @@ ok(SKILL.indexOf("sde-story-writing.md") >= 0, "总纲第五节没有指向小�
 LAWS.story.forEach((code) => ok(STORY.indexOf("### " + code + " ·") >= 0, "小说分册缺硬律条文 " + code));
 /* 附录 A 要与机器层对上，且必须写明中长篇没有机器层（否则下一个人会以为漏了） */
 ok(/`story`[^\n]*2400[^\n]*10000/.test(STORY), "小说分册附录 A 的 story 行与机器层字数/预算对不上");
-/* 2026-08-23：中篇已有机器层，欠条只剩长篇那一件（快照的增量更新）。
-   这条断言的用意没变——**分册必须写明哪一件还没做**，否则下一个人会以为机器层漏了。 */
-ok(/长篇仍然只有规范层|长篇还不能/.test(STORY), "小说分册没写明长篇仍无机器层");
-ok(STORY.indexOf("快照的增量更新") >= 0, "小说分册没写明长篇缺的到底是哪一件");
+/* 附录 A 要与机器层对上。2026-08-30：长篇也上机器了（novel 档），A.2 欠条清零。
+   这一族断言的用意没变——**分册附录 A 必须与成文机 SPEC 逐条对上**；机器层加了 novel，就在分册与本护栏同时补上它的镜像，
+   否则就是「加了体裁、规范与护栏没跟上」的老来路。 */
+ok(/`story`[^\n]*2400[^\n]*10000/.test(STORY), "小说分册附录 A 的 story 行与机器层字数/预算对不上");
 ok(STORY.indexOf("`novella`") >= 0, "小说分册附录 A 没把中篇挪进已实现那一张表");
+ok(STORY.indexOf("`novel`") >= 0, "小说分册附录 A 没把长篇挪进已实现那一张表");
+ok(STORY.indexOf("卷次时间线") >= 0, "小说分册没写明长篇跨部状态靠什么承重（卷次时间线）");
+/* 长篇的机器层：novel 档，noHead，四部，world＋threads＋timeline，前端 seq 断点续写。逐条与 worker.js / wds-mode.js 对上。 */
+{
+  const MODE2 = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");
+  const nv = specBlock("novel");
+  ok(!!nv, "worker.js 里找不到 novel 档");
+  if (nv) {
+    ok(nv.name.indexOf("长篇小说") >= 0, "novel 档名不对：" + nv.name);
+    LAWS.story.forEach((c) => ok(nv.body.indexOf(c) >= 0, "novel 拼上 STORY_CORE 之后仍缺 " + c));
+    ["L-1", "L-2", "L-3", "L-4", "L-5", "L-6"].forEach((c) => ok(nv.body.indexOf(c) >= 0, "novel SPEC 里没有 " + c));
+    ok(nv.body.indexOf("卷次时间线") >= 0, "novel SPEC 没写卷次时间线（timeline 的正文回灌指令）");
+  }
+  ok(/\n        novel: \{[^\n]*world: 1/.test(W), "novel 档没开 world");
+  ok(/\n        novel: \{[^\n]*threads: 1/.test(W), "novel 档没开 threads");
+  ok(/\n        novel: \{[^\n]*timeline: 1/.test(W), "novel 档没开 timeline（跨部状态的承重件）");
+  ok(/\n        novel: \{[^\n]*noHead: 1/.test(W), "novel 档不是 noHead");
+  ok(/SPEC\.timeline \?/.test(W), "plan 那一趟没有按 SPEC.timeline 下发卷次时间线");
+  ok(/novel: 1/.test(W), "novel 不在服务端白名单里");
+  ok(/novel: 100000/.test(W), "DIST_WORDS 里没有 novel");
+  ok(/novel:\[60000,100000,160000\]/.test(W.replace(/\s/g, "")), "DIST_WORD_OPTS 里 novel 不是 60000/100000/160000");
+  ok(/k: "novel"[^}]*w: 100000/.test(MODE2), "前端 KIND_DEF 里没有 novel，或目标字数对不上");
+  ok(/k: "novel"[^}]*[,{]\s*c: 1/.test(MODE2), "novel 没标 c:1（不走拆趟，四五十趟会挤成一趟）");
+  ok(/k: "novel"[^}]*[,{]\s*seq: 1/.test(MODE2), "novel 没标 seq:1（断点续写靠它）");
+  ok(MODE2.indexOf("kNovel:") >= 0, "前端没有 kNovel 的文案");
+}
 ok(/2000\/1750\/1250/.test(PROSE), "分册附录 A 没写 ChatSDE 的三趟分法");
 LAWS.prose.forEach((code) => ok(PROSE.indexOf("### " + code + " ·") >= 0, "散文分册缺硬律条文 " + code));
 
