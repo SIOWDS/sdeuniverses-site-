@@ -338,9 +338,19 @@ export class VisitCounter {
 /* 2026-09-01 加 Claude 与 GPT 两家（见 WDS_VENDORS 的头注释）。深度档取各自的旗舰：
    claude-opus-5（Anthropic 当前最强）／gpt-5.6-sol（OpenAI 旗舰，别名 gpt-5.6）。 */
 const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3", anthropic: "claude-opus-5", openai: "gpt-5.6-sol" };
-function wdsTopVC(vd) {
+/* 【手动钉住的型号有最终裁定权 —— 2026-09-01】原来这两个构造器**根本不看读者填的型号**：
+   凡走它们的那几条路（开工学内功、SDE 对谈、陪读、记忆更新、朋友圈），读者在菜单里钉了 luna，
+   跑起来仍是 sol——而界面上还显示着 luna。那不是「自动优先」，是**说了不算**，是骗。
+   现在一律先问一句 want（就是读者钉的那个型号名），钉了就用它，没钉才回到本档默认。
+   ⚠ 钉的是型号，不是功率：top 标记与 reasoning_effort 仍由这一步的性质与难度条决定——
+     这两件本就是两个旋钮，钉死型号不等于要把思考也关掉。 */
+function wdsTopVC(vd, want) {
   const base = WDS_VENDORS[vd];
-  return { url: base.url, model: WDS_TOP_MODEL[vd] || base.model, name: base.name, top: 1 };
+  return { url: base.url, model: wdsPickModel(vd, want, 1), name: base.name, top: 1, vd: vd, umodel: !!String(want || "").trim() };
+}
+function wdsStdVC(vd, want) {
+  const base = WDS_VENDORS[vd];
+  return { url: base.url, model: wdsPickModel(vd, want, 0), name: base.name, vd: vd, umodel: !!String(want || "").trim() };
 }
 // 给请求体挂上思考模式（仅 DeepSeek 且处于最强档时）
 // SDE 对谈全线口径：一律满功率（reasoning_effort=max）＋一律要最大输出预算。
@@ -10656,7 +10666,7 @@ export default {
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "开工学习也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
       const vd = wdsVendorOf(b.vendor);
-      const VC = wdsTopVC(vd);   // 开工学内功＝最费脑的一步，直接最强档
+      const VC = wdsTopVC(vd, String(b.model || ""));   // 开工学内功＝最费脑的一步，默认最强档（读者钉了型号则听他的）
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("dlg", ip, userKey)));
@@ -10734,7 +10744,7 @@ export default {
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
       const vd = wdsVendorOf(b.vendor);
-      const VC = b.guide ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const VC = b.guide ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
@@ -11047,7 +11057,7 @@ export default {
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步用你自己的 API Key 运行（在上方设置里填入，只存你的浏览器本地）。" }, 400);
       const vd = wdsVendorOf(b.vendor);
       const deep = b.tier !== "fast";   // 缺省深度思考档（DeepSeek v4-pro 思考模式 / GLM-5）；fast=快速档（flash/plus）
-      const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const VC = deep ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
@@ -11100,7 +11110,7 @@ export default {
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步用你自己的 API Key 运行（在上方设置里填入，只存你的浏览器本地）。" }, 400);
       const vd = wdsVendorOf(b.vendor);
       const deep = b.tier !== "fast";
-      const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const VC = deep ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
@@ -11242,7 +11252,7 @@ export default {
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "SDE 助教用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
       const vd = wdsVendorOf(b.vendor);
       // SDE 对谈（guide）走最强档：DeepSeek v4-pro + 思考模式 max；陪读维持轻档保响应速度
-      const VC = b.guide ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const VC = b.guide ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
       const KEY = userKey, rvendor = wdsShort(vd);
       // 限流（系统额度与自带 Key 各用独立配额桶，不互挤）
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
@@ -11754,7 +11764,9 @@ export default {
             if (G.on && !canSee) {
               VC.top = gK.top ? 1 : 0;
               /* 难度条 → 型号档（2026-09-01）：第 1 档「轻」既然已经关思考、只给 2600 预算、只带 4 篇资料，
-                 就没有理由还骑着中档型号；3 档以上照旧上最强档。这一句只对有第三级的两家有效果。 */
+                 就没有理由还骑着中档型号；3 档以上照旧上最强档。这一句只对有第三级的两家有效果。
+                 ⭐ 但读者钉了型号就轮不到它：wdsPickModel 里 want 本来就压过档位，这里显式写出来，
+                    免得日后谁把这一行改成"按档重算"——手动是最终裁定权，自动只在没人钉时才说话。 */
               VC.model = wdsPickModel(vd, umodel, gK.top ? 1 : (gK.lv === 1 ? "lite" : 0));
               if (gK.top && gK.effort) VC.effort = gK.effort; else delete VC.effort;
             }
@@ -12366,7 +12378,7 @@ export default {
       })).filter((s) => s.body);
       if (!secs.length) return _sseResp([{ t: "error", v: "没有可用的分步正文，写不了总判断。" }]);
       const deep = b.mode2 === "deep" || !!b.deep;
-      const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, String(b.model || ""), 0), name: WDS_VENDORS[vd].name };
+      const VC = deep ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("chat", ip, KEY)));
@@ -13030,7 +13042,7 @@ export default {
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "成文用你自己的 API Key 运行（在 ⚙ Key 里填入，只存在你的浏览器本地）。", code: "need_key" }]);
       const vd = wdsVendorOf(b.vendor);
-      const VC = { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, String(b.model || ""), 1), name: WDS_VENDORS[vd].name, top: 1 };  // 成文＝最费脑的一步，直接最强档
+      const VC = wdsTopVC(vd, String(b.model || ""));  // 成文＝最费脑的一步，默认最强档（读者钉了型号则听他的）
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
