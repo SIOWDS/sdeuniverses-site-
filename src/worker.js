@@ -4480,13 +4480,41 @@ async function loadCoords(env, url) {
 // 峰值内存远超单个 isolate 的上限——线上实测子请求会直接被平台判 503（"超出资源上限"），
 // 更早的表现则是答题流跑到一半无声中断。这里改成：**一片一片地扫，扫完就丢，只留下候选段**，
 // 峰值内存＝一个分片＋候选表（几百 KB），召回口径与 retrieve() 保持一致。
+// ===== 大白话近义扩展（确定性）=====
+// 站内检索是中文二元组词面匹配，够不到"大白话↔领域词"的鸿沟：问"儿子不找女朋友"，
+// 命不中只用"不婚/催婚/子女"写的文章（两边字面零重合）。这里补一张近义簇表：
+// 每簇一组同类说法，提问里出现簇内任一词（子串命中）→ 把整簇其余词灌进扩展词 exp。
+// 触发只收无歧义的说法（女朋友/谈恋爱/儿子/结婚…），不收"对象/工作/研究"这类两字泛词，防误触发。
+// 这是种子表，按需往下加一行一簇即可；exp 命中在 retrieve 里按 1.2 加权、且每篇最多取 2 段，过扩风险有界。
+const SYN_CLUSTERS = [
+  ["女朋友","男朋友","找对象","处对象","搞对象","谈恋爱","恋爱","相亲","婚恋","择偶","不婚","单身"],
+  ["结婚","不结婚","不想结婚","成家","嫁人","娶媳妇","催婚","逼婚","婚姻","婚育"],
+  ["生孩子","要孩子","生娃","丁克","备孕","生育","孙辈","传宗接代"],
+  ["儿子","女儿","独生子","独生女","子女","成年子女","独生子女","孩子"],
+  ["养老","啃老","养儿防老","赡养","晚年"],
+  ["上学","读书","补课","高考","鸡娃","学区房","应试","升学","教育","学习"],
+  ["找工作","上班","打工","职场","失业","裁员","内卷","就业","职业"],
+  ["看病","生病","得病","体检","养生","疾病","医疗","健康"],
+  ["想不开","抑郁","内耗","精神内耗","焦虑","心理","情绪"],
+  ["chatgpt","deepseek","大模型","人工智能","生成式","大语言模型"],
+];
+function synExpand(q){
+  if(!q) return [];
+  const s=String(q).toLowerCase(); const out=[];
+  for(const cl of SYN_CLUSTERS){
+    let hit=false;
+    for(const w of cl){ if(w.length>=2 && s.indexOf(w.toLowerCase())>=0){ hit=true; break; } }
+    if(hit) for(const w of cl) out.push(w);
+  }
+  return out.filter((v,i,a)=>a.indexOf(v)===i);
+}
 function ragKeys(q, expTerms) {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
   const zh = q.replace(/[^\u4e00-\u9fff]/g, "");
   const grams = [];
   for (let i = 0; i + 2 <= zh.length; i++) grams.push(zh.slice(i, i + 2));
   const baseKeys = terms.concat(grams).filter((v, i, a) => v && a.indexOf(v) === i);
-  const exp = (expTerms || []).map((t) => String(t).toLowerCase()).filter((v, i, a) => v && v.length >= 2 && a.indexOf(v) === i && baseKeys.indexOf(v) < 0);
+  const exp = (expTerms || []).concat(synExpand(q)).map((t) => String(t).toLowerCase()).filter((v, i, a) => v && v.length >= 2 && a.indexOf(v) === i && baseKeys.indexOf(v) < 0);
   return { baseKeys, exp };
 }
 // LIGHT_TWO_STAGE：SDE 对谈的检索走"两段式轻量索引"，不碰 60MB 的大分片。
@@ -4992,7 +5020,7 @@ function retrieve(corpus, q, k, expTerms) {
   const grams = [];
   for (let i = 0; i + 2 <= zh.length; i++) grams.push(zh.slice(i, i + 2)); // 中文无空格→补 bigram 提召回
   const baseKeys = terms.concat(grams).filter((v, i, a) => v && a.indexOf(v) === i);
-  const exp = (expTerms || []).map((t) => t.toLowerCase()).filter((v, i, a) => v && v.length >= 2 && a.indexOf(v) === i && baseKeys.indexOf(v) < 0); // SDE 词义扩展词
+  const exp = (expTerms || []).concat(synExpand(q)).map((t) => t.toLowerCase()).filter((v, i, a) => v && v.length >= 2 && a.indexOf(v) === i && baseKeys.indexOf(v) < 0); // SDE 词义扩展词 ＋ 大白话近义扩展
   const coords = corpus.coords; // {docIdx: Set(SDE术语)} 或 null
   const scored = [];
   for (const ck of corpus.chunks) {
