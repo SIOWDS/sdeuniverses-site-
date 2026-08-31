@@ -1797,7 +1797,11 @@ function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
    其余五家取不到就退回标准档，行为一字不变。
    ⚠ 型号档与投入档（reasoning_effort）是两个旋钮，别混为一谈：gpt-5.6 的 luna 开 high，
      常常比 sol 开 none 更能答对——所以难度条改的从来是「型号＋功率」这一对，不是单换型号。 */
-const WDS_LITE_MODEL = { openai: "gpt-5.6-luna", anthropic: "claude-haiku-4-5-20251001" };
+/* 2026-09-01 加智谱的轻档 glm-4.7-flash：智谱开放平台上**免费调用**的那一款
+   （30B-A3B 混合思考，200K 上下文；2026-01 起接替已下线的 glm-4.5-flash，老名字会被自动路由过去）。
+   ⚠ 名字里带 x 的 glm-4.7-flashx 是付费轻量档，只差一个字母，抄错就开始走账。
+   放在轻档而不是标准档：免费档的并发很紧，产线那些多路并发的道次不该默认压到它头上。 */
+const WDS_LITE_MODEL = { openai: "gpt-5.6-luna", anthropic: "claude-haiku-4-5-20251001", zhipu: "glm-4.7-flash" };
 function wdsLiteModel(vd) { return WDS_LITE_MODEL[vd] || (WDS_VENDORS[vd] && WDS_VENDORS[vd].model); }
 function wdsPickModel(vd, want, top) {
   const w = String(want || "").trim();
