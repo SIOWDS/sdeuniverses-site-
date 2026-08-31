@@ -51,6 +51,8 @@ on:
     - cron: '20 5 * * *'    # 13:20 新加坡时
     - cron: '20 15 * * *'   # 23:20 新加坡时
   workflow_dispatch:                 # 想立刻跑：Actions 页面 → search-index → Run workflow
+  repository_dispatch:               # 【2026-08-31 加回·仅按需手动】王德生令"手动建立 reindex"；用 PAT 走 repository_dispatch(event_type: reindex)按需触发，不接自动化、不每次 publish 都跑
+    types: [reindex]
   # 【2026-08-21 删掉 repository_dispatch —— 王德生令："停掉，不需要每次都 reindex"】
   #   它 2026-08-02 加进来时写的是"**只是多一条手动入口，不改频率**"。实际走向相反：
   #   对每个新对话里的助手来说，它是一根摆在手边、拉一下就能让刚发的文章立刻进搜索的绳子，
