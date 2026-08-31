@@ -4457,24 +4457,53 @@
     }
     paintCh();
 
+    /* 测试连通＝把这家的**三档各探一次**（2026-09-01）。为什么不是只探一档：
+       三级型号梯接上之后，一把 Key 在轻档通不代表在最强档通——各家按型号发权限、按型号计费，
+       只探一档等于把「哪一档不能用」留到读者真跑一篇长文时才发现。
+       读者自己填了型号覆盖时只探他填的那一个（他要验的就是那个）。
+       同名去重：没有第三级的家（轻档退回标准档）不会被白探两次。 */
     m.querySelector(".ktest").onclick = function () {
       stash();
       var k = draft[vend].k;
       if (k.length < 8) { kres.style.color = "#E8A8A0"; kres.textContent = t("setKeyPh"); return; }
+      var mo = draft[vend].mo;
+      var tiers = mo ? [{ tier: "", lab: "指定型号" }]
+                     : [{ tier: "lite", lab: "轻" }, { tier: "", lab: "标准" }, { tier: "top", lab: "深" }];
       kres.style.color = "#8B98A5"; kres.textContent = t("testing");
-      fetch("/api/wds/ping", { method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ vendor: vend, key: k, model: draft[vend].mo, deep: thinkMode === "deep" }) })
-        .then(function (r) { return r.json(); })
-        .then(function (j) {
-          if (j && j.ok) { kres.style.color = "#8ED0D0"; kres.textContent = t("testOk") + j.model; return; }
-          var why = ({ bad_key: t("testBadKey"), no_credit: t("testNoCredit"), bad_model: t("testBadModel"), net: t("testNet") })[j && j.code] || (t("testFail") + ((j && j.status) || "?"));
-          // 上游原话必须显出来：只报「没通 · 400」等于把唯一的线索藏起来——接新基底那天，
-          // 差的就是这一句（是型号不对、参数不认、还是账户没开通，全在这段字里）。
-          var raw = "";
-          try { raw = String((j && j.msg) || "").replace(/\s+/g, " ").trim(); } catch (e) {}
-          kres.style.color = "#E8A8A0"; kres.textContent = why + (raw ? " · " + raw.slice(0, 200) : "");
-        })
-        .catch(function (e) { kres.style.color = "#E8A8A0"; kres.textContent = t("testNet"); });
+      var lines = [], seen = {};
+      function one(i) {
+        if (i >= tiers.length) {
+          var bad = lines.some(function (x) { return !x.ok; });
+          kres.style.color = bad ? "#E8A8A0" : "#8ED0D0";
+          kres.innerHTML = lines.map(function (x) {
+            return esc(x.lab + " " + x.model + " " + (x.ok ? "✓" : "✗ " + x.why));
+          }).join("<br>");
+          return;
+        }
+        var T = tiers[i];
+        fetch("/api/wds/ping", { method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ vendor: vend, key: k, model: mo, tier: T.tier }) })
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            var mm = (j && j.model) || "?";
+            if (seen[mm]) { one(i + 1); return; }   // 这家没有第三级，别把同一个型号探两遍
+            seen[mm] = 1;
+            var why = "";
+            if (!(j && j.ok)) {
+              why = ({ bad_key: t("testBadKey"), no_credit: t("testNoCredit"), bad_model: t("testBadModel"), net: t("testNet") })[j && j.code] || (t("testFail") + ((j && j.status) || "?"));
+              // 上游原话必须显出来：只报「没通 · 400」等于把唯一的线索藏起来——接新基底那天，
+              // 差的就是这一句（是型号不对、参数不认、还是账户没开通，全在这段字里）。
+              var raw = "";
+              try { raw = String((j && j.msg) || "").replace(/\s+/g, " ").trim(); } catch (e) {}
+              if (raw) why += " · " + raw.slice(0, 160);
+            }
+            lines.push({ ok: !!(j && j.ok), model: mm, lab: T.lab, why: why });
+            kres.textContent = t("testing") + "（" + lines.length + "/" + tiers.length + "）";
+            one(i + 1);
+          })
+          .catch(function (e) { lines.push({ ok: false, model: "?", lab: T.lab, why: t("testNet") }); one(i + 1); });
+      }
+      one(0);
     };
     m.querySelector(".kcancel").onclick = function () { m.remove(); };
     m.querySelector(".ksave").onclick = function () {

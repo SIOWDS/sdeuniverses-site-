@@ -12885,7 +12885,11 @@ export default {
       const vd = wdsVendorOf(b.vendor);
       const key = String(b.key || "").trim();
       if (key.length < 8) return Response.json({ ok: false, code: "need_key", msg: "先填这家的 Key。" }, { headers: _cors() });
-      const model = wdsPickModel(vd, String(b.model || ""), !!b.deep);
+      /* 档位（2026-09-01）：tier="lite"／"top"／其余＝标准。三级型号梯接上之后，
+         「通不通」得按档问——同一把 Key 在 luna 上通、在 sol 上未必开通（各家按型号发权限）。
+         老客户端只发 deep 布尔，照旧当两档解。 */
+      const _tier = String(b.tier || "").toLowerCase();
+      const model = wdsPickModel(vd, String(b.model || ""), _tier === "lite" ? "lite" : (_tier === "top" || (!_tier && !!b.deep) ? 1 : 0));
       const ctrl = new AbortController();
       const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 25000);
       try {
