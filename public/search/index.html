@@ -457,6 +457,32 @@ function highlight(text, terms){
 /* 查询分析：中文连写没有空格分词，整串 indexOf 就是"完全匹配"病根。
    拆法与 worker 侧 retrieve 同一路数：中文连续段→二元组(bigram)软匹配，
    拉丁/数字→整词；runs 保留用户可见词段，用于整段短语加分与高亮。 */
+/* 大白话近义扩展（与 worker.js 同一张表）：站内检索是中文二元组词面匹配，够不到
+   "大白话↔领域词"的鸿沟（问"儿子不找女朋友"，命不中只用"不婚/子女"写的文章）。
+   提问里出现簇内任一词（子串命中）→ 把整簇其余词作为扩展词，只加分、不进覆盖率分母。
+   触发只收无歧义说法，"对象/工作/研究"这类两字泛词不当触发词。种子表，按需加簇。 */
+var SYN_CLUSTERS=[
+  ["女朋友","男朋友","找对象","处对象","搞对象","谈恋爱","恋爱","相亲","婚恋","择偶","不婚","单身"],
+  ["结婚","不结婚","不想结婚","成家","嫁人","娶媳妇","催婚","逼婚","婚姻","婚育"],
+  ["生孩子","要孩子","生娃","丁克","备孕","生育","孙辈","传宗接代"],
+  ["儿子","女儿","独生子","独生女","子女","成年子女","独生子女","孩子"],
+  ["养老","啃老","养儿防老","赡养","晚年"],
+  ["上学","读书","补课","高考","鸡娃","学区房","应试","升学","教育","学习"],
+  ["找工作","上班","打工","职场","失业","裁员","内卷","就业","职业"],
+  ["看病","生病","得病","体检","养生","疾病","医疗","健康"],
+  ["想不开","抑郁","内耗","精神内耗","焦虑","心理","情绪"],
+  ["chatgpt","deepseek","大模型","人工智能","生成式","大语言模型"]
+];
+function synExpand(q){
+  if(!q) return [];
+  var t=String(q).toLowerCase(), out=[], seen={};
+  for(var c=0;c<SYN_CLUSTERS.length;c++){
+    var cl=SYN_CLUSTERS[c], hit=false;
+    for(var i=0;i<cl.length;i++){ if(cl[i].length>=2 && t.indexOf(cl[i].toLowerCase())>=0){ hit=true; break; } }
+    if(hit) for(var j=0;j<cl.length;j++){ var w=cl[j].toLowerCase(); if(!seen[w]){ seen[w]=1; out.push(w); } }
+  }
+  return out;
+}
 function analyzeQuery(raw){
   var runs=[], keys=[], seen={};
   function addKey(k){ if(k && !seen[k]){ seen[k]=1; keys.push(k); } }
@@ -470,7 +496,8 @@ function analyzeQuery(raw){
     });
     la.forEach(function(w){ runs.push(w); addKey(w); });
   });
-  return { runs:runs, keys:keys, full:raw.toLowerCase() };
+  var expKeys=[]; synExpand(raw).forEach(function(t){ if(t.length>=2 && !seen[t]){ seen[t]=1; expKeys.push(t); } });
+  return { runs:runs, keys:keys, expKeys:expKeys, full:raw.toLowerCase() };
 }
 function countCap(hay, key, cap){ // 出现次数，封顶 cap（防单块刷屏）
   var n=0, p=hay.indexOf(key);
@@ -485,9 +512,11 @@ function softScore(lowerText, Q){
     var n=countCap(lowerText, Q.keys[i], 3);
     if(n){ hitKeys++; tf+=n; }
   }
-  if(!hitKeys) return 0;
-  var coverage=hitKeys/Q.keys.length;
-  var sc=tf*(0.25+0.75*coverage);
+  var expTf=0;
+  if(Q.expKeys) for(var e=0;e<Q.expKeys.length;e++){ var m=countCap(lowerText, Q.expKeys[e], 3); if(m) expTf+=m; }
+  if(!hitKeys && !expTf) return 0;
+  var coverage=Q.keys.length ? hitKeys/Q.keys.length : 0;
+  var sc=tf*(0.25+0.75*coverage) + expTf*0.35;  // 近义扩展弱于直命中，且不稀释覆盖率
   for(var j=0;j<Q.runs.length;j++){ if(Q.runs[j].length>=2 && lowerText.indexOf(Q.runs[j])>=0) sc+=3; }
   if(Q.full.length>=2 && lowerText.indexOf(Q.full)>=0) sc+=8;
   return sc<0.9 ? 0 : sc; // 噪声地板：孤零零一个二元组蹭一下不算命中
