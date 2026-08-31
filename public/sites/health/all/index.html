@@ -135,8 +135,8 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--pine);outline-offset
 <header class="top"><div class="wrap">
   <a class="brand" href="/">健康发生学<em>HU MIN</em></a>
   <nav>
-    <a href="/#books">账册</a>
-    <a href="/#cols">栏目</a>
+    <a href="/site/#books">账册</a>
+    <a href="/site/#cols">栏目</a>
     <a href="/all/">全部篇目</a>
     <a href="/library/">母站论文选</a>
     <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
@@ -286,6 +286,6 @@ a:focus-visible,input:focus-visible{outline:2px solid var(--pine);outline-offset
 var as=document.querySelectorAll("a[href]");
 for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
 if(h==="/"){as[i].setAttribute("href",b+"/");}
-else if(h.indexOf("/#")===0||h.indexOf("/all/")===0){as[i].setAttribute("href",b+h);}}})();
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0||h.indexOf("/site/")===0){as[i].setAttribute("href",b+h);}}})();
 </script>
 </body></html>

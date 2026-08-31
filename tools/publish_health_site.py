@@ -3,8 +3,10 @@
 """生成 health.sdeuniverses.com 分站（胡敏 · 健康发生学）。
 
 产物：
-  public/sites/health/index.html       首页（体检报告单式 hero + 账册 + 各栏摘录）
+  public/sites/health/site/index.html  健康浏览首页（体检报告单式 hero + 账册 + 各栏摘录）
   public/sites/health/all/index.html   全部篇目（按栏分组 + 即时筛选）
+  （根路径 /sites/health/index.html 是「总入口」三门页，手写，非本脚本产物）
+  ⚠ site/index.html 与 all/index.html 现均为手工维护，本脚本默认不写盘，详见 main()。
 
 数据源：public/students/publications.json（胡敏条目），只做筛选与排版，不改任何原稿。
 路由：Worker 把 health.sdeuniverses.com 的请求前缀到 /sites/health/，
@@ -477,10 +479,20 @@ def main():
     if "--dry" in sys.argv:
         return
 
+    # ⚠ 2026-08-31：首页已迁到 /site/。根路径 /sites/health/index.html 现在是「总入口」
+    # （健康浏览 · ChatHM · HM 社区 三门，手写）。首页(site/index.html)与全部篇目(all/index.html)
+    # 此后由手工维护——已增补 ChatHM 段、母站论文选段与多条导航，本生成器输出并不含这些。
+    # 直接重跑会回退这些手工增补，故默认不写盘；确需用本生成器重排，先把手工段并回本文件，
+    # 再 HEALTH_REGEN=1 强制。本脚本绝不写 /sites/health/index.html（那是总入口，非本脚本产物）。
+    if not os.environ.get("HEALTH_REGEN"):
+        print("已停用自动写盘（首页/全部篇目现为手工维护）。"
+              "要强制重排：HEALTH_REGEN=1 python tools/publish_health_site.py")
+        return
+    os.makedirs(os.path.join(OUT, "site"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "all"), exist_ok=True)
-    open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(build_index(buckets))
+    open(os.path.join(OUT, "site", "index.html"), "w", encoding="utf-8").write(build_index(buckets))
     open(os.path.join(OUT, "all", "index.html"), "w", encoding="utf-8").write(build_all(buckets))
-    print("写出：", os.path.join(OUT, "index.html"), os.path.join(OUT, "all", "index.html"))
+    print("写出：", os.path.join(OUT, "site", "index.html"), os.path.join(OUT, "all", "index.html"))
 
 
 if __name__ == "__main__":
