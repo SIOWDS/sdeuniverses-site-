@@ -5267,6 +5267,30 @@ function wdsGradePick(deep, req, g, ctx) {
   const lv = (g && g.lv >= 1 && g.lv <= 5) ? g.lv : 4;
   return { on: true, lv: lv, auto: true, pin: 0, k: wdsGradeKnobs(lv), why: g ? "auto" : "norag" };
 }
+/* ⭐ 记忆按难度档配给（2026-09-01）。客户端在本机把三层组成三段递上来
+   （umem3：L 长期常驻／P 当前这条线索／K 按这一问检索到的旧事），带哪几段、各带多少在这里定。
+   **存 10 万字与这一轮喂几千字是两个数**——分层的全部意义就在这里。
+   1 档只留称呼层：一句「你好」不该去翻他半年的旧账，翻了还要挤掉本场对话。
+   2 档（也是标准档）只带长期——一般情况下就是长期记忆。
+   3 档加当前线索（"我们正在做什么"），4 档再加按问检索，5 档把检索那段放宽到 4500。
+   老客户端只递 umem 字符串 ⇒ 这里不介入，一字不改走老路。 */
+const MEM_BY_LV = { 1: { L: 200,  P: 0,    K: 0 },
+                    2: { L: 2000, P: 0,    K: 0 },
+                    3: { L: 2000, P: 1500, K: 0 },
+                    4: { L: 2000, P: 1500, K: 3000 },
+                    5: { L: 2000, P: 1500, K: 4500 } };
+function wdsMemByGrade(m, G) {
+  /* 定不了档的几条路（产线道次／三家对撞／看图／老客户端）按第 4 档给＝老行为；
+     标准档按第 2 档——它本来就约等于第 2 档，记忆跟着走，不另立一根轴。 */
+  const lv = (G && G.on && G.lv >= 1 && G.lv <= 5) ? G.lv : ((G && G.why === "std") ? 2 : 4);
+  const c = MEM_BY_LV[lv] || MEM_BY_LV[4];
+  const L = (c.L && m && m.L) ? String(m.L).slice(0, c.L) : "";
+  const P = (c.P && m && m.P) ? String(m.P).slice(0, c.P) : "";
+  const K = (c.K && m && m.K) ? String(m.K).slice(0, c.K) : "";
+  const text = [L, P, K].filter(Boolean).join("\n").slice(0, UMEM_MAX);
+  return { lv: lv, text: text, n: text.length,
+           has: [L ? "长期" : "", P ? "线索" : "", K ? "旧事" : ""].filter(Boolean).join("＋") };
+}
 
 // ===== 深度档·两次内功提智 =====
 let NEIGONG = null; // 完整 SDE 内功先验（模块级缓存，isolate 内复用）
@@ -5806,7 +5830,9 @@ const NBR_TOK = 2200;
 const NBR_MAX_CARDS = 12;
 // 每答垫进去的长期记忆上限（字符）。为什么要有硬上限：本场原文已经吃掉 12 万预算的大头，
 // 跨场记忆再无节制地灌，只会把本场对话挤出上下文——记性不能以牺牲现场为代价。
-const UMEM_MAX = 6000;
+// 2026-09-01 由 6000 提到 7000：记忆分了三层，一轮要带长期常驻(2000)＋当前线索(1500)＋检索命中(3000)。
+// 这与「存量」始终是两个数——本机可以存到 10 万字，每轮进上下文的只有这 7 千。
+const UMEM_MAX = 7000;
 const WDS_MAX_TURNS = 100;          // 最多记 100 轮
 const WDS_HIST_BUDGET = 60000;      // 送进基底的历史字数预算（约 4 万 token，超出从最旧处裁）
 const WDS_GUIDE_HIST_BUDGET = 120000; // SDE 对谈（高级会话）：尽量全量记忆——每答携带尽可能多的对话原文；约 8 万 token，留出 system+心得+站内资料的余量，仍溢出时由 CONTEXT_OVERFLOW 逐级砍半（原 30 万字符≈20万token 超过多数基底输入窗，深聊必 400）
@@ -10254,23 +10280,35 @@ export default {
         const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_MEMO_PER_MIN + BYOK_NO_DAY))).json());
         if (!lr.ok) return J({ ok: false, code: "rate", msg: lr.reason === "day" ? ("这把 Key 今天已更新 " + (lr.inDay || 0) + "/" + WDS_MEMO_PER_DAY + " 条记忆，明天再续（记忆额度与对话额度分开计）。") : "更新得太快了，过十几秒再继续——已经做好的不会丢。" }, 429);
       } catch (e) {}
-      const mode = b.mode === "profile" ? "profile" : "one";
+      const mode = b.mode === "profile" ? "profile" : (b.mode === "proj" ? "proj" : "one");
       const text = String(b.text || "").slice(0, MEMO_IN_MAX);
       if (!text.trim()) return J({ ok: false, msg: "没有可摘要的内容。" }, 400);
-      const sys = mode === "profile"
-        ? "你在为一位读者维护他的【长期记忆画像】。下面是他与 WDS 历次对话的逐条摘要。请提炼出这位读者本人的画像：他反复关心的问题域、他自己的立场与判断（不是 WDS 的）、他已经掌握的概念、他悬而未决的困惑、他提问的习惯路数。\n只输出 JSON，不要任何其他文字：{\"profile\":\"约 400 字的连贯画像，第二人称写成'你…'\",\"keys\":[\"关键词\",\"…\"]}\nkeys 给 10-16 个最能代表他关切的词（概念名、领域名、他自造的说法都算）。"
+      // 中期层的「归并」：把同一条线索上的若干场压成一段，答题时整段带上，不靠检索碰运气。
+      const SYS_PROJ = "你在为一位读者维护他的【中期记忆】。下面是他在同一条线索上先后谈过的若干场，按时间从早到晚排列。把它们归并成这条线索的一段现状。\n只输出 JSON，不要任何其他文字：{\"name\":\"这条线索的名字，不超过 16 字\",\"sum\":\"约 500 字\",\"keys\":[\"关键词\",\"…\"]}\nsum 按这个次序写，用连贯中文不分点：这条线索在做什么；已经定下来的判断与命名；中途改过口的地方（改前是什么、为什么改）；此刻还悬着的。\n**要写出先后**——归并的价值在于看得见它怎么走到今天，只把几场拼在一起是白归并。\n凡这几场里没谈过的，一个字都不要补；早先说过又被推翻的，写成「一度……后改为……」，不要直接删掉。";
+      const sys = mode === "proj" ? SYS_PROJ : mode === "profile"
+        ? "你在为一位读者维护他的【长期记忆画像】。下面是他与 WDS 历次对话的逐条摘要。请提炼出这位读者本人的画像：他反复关心的问题域、他自己的立场与判断（不是 WDS 的）、他已经掌握的概念、他悬而未决的困惑、他提问的习惯路数。\n只输出 JSON，不要任何其他文字：{\"profile\":\"约 400 字的连贯画像，第二人称写成'你…'\",\"keys\":[\"关键词\",\"…\"],\"facts\":[\"一条\",\"…\"]}\nkeys 给 10-16 个最能代表他关切的词（概念名、领域名、他自造的说法都算）。\nfacts 是**每一轮都会被带上的常驻要点**，所以只收跨多场反复出现、已经稳定下来的：他的身份与在做的事、他定下的口径与忌讳、他自造并一直在用的说法。8-16 条，每条不超过 40 字，一条一件事。只在一两场里出现过的、还在变的、以及任何猜测，一律不要——宁可少几条。"
         : "你在为一位读者维护他的【长期记忆】。下面是他与 WDS 的一整场对话记录。把它压成一条可被日后检索到的记忆条目。\n只输出 JSON，不要任何其他文字：{\"gist\":\"一句话主旨，不超过 40 字\",\"keys\":[\"关键词\",\"…\"],\"points\":\"约 300 字要点\",\"stance\":\"这位读者本人在这场里的关切与立场，不超过 60 字\"}\nkeys 给 8-16 个检索用关键词：概念名、人名书名、领域名、以及这场里出现的新命名，宁可具体不要笼统。\npoints 写这三样：谈的是什么问题、达成了哪些关键判断与新命名、还悬着什么没解决；丢掉寒暄与铺陈，用连贯中文，不分点。\n凡这场里没谈过的，一个字都不要补。";
-      const usr = mode === "profile" ? ("【历次对话摘要】\n" + text) : ((b.title ? ("【这场对话的标题】" + String(b.title).slice(0, 120) + "\n") : "") + "【对话记录】\n" + text);
+      const usr = mode === "profile" ? ("【历次对话摘要】\n" + text)
+        : mode === "proj" ? ((b.title ? ("【这条线索现在的名字】" + String(b.title).slice(0, 120) + "\n") : "") + "【这条线索上的历次对话，由早到晚】\n" + text)
+        : ((b.title ? ("【这场对话的标题】" + String(b.title).slice(0, 120) + "\n") : "") + "【对话记录】\n" + text);
       try {
         const _stat = {};
-        const out = await llmText(VC, KEY, sys, usr, mode === "profile" ? 1800 : 1600, MEMO_MS, _stat);
+        const out = await llmText(VC, KEY, sys, usr, mode === "profile" ? 1800 : (mode === "proj" ? 2000 : 1600), MEMO_MS, _stat);
         // Key 用不了是**硬错**：不报清楚的话，一次批量更新会拿同一把坏 Key 连撞几十场，每场都回一句"再点一次"。
         if (_stat.status === 401 || _stat.status === 402 || _stat.status === 429)
           return J({ ok: false, code: "bad_key", msg: "你的 Key 用不了（" + _stat.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个——已经做好的记忆不会丢。" }, 400);
         const j = looseJSON(out);
         if (!j) return J({ ok: false, msg: "这一条没提炼出来（基底没给出可用结果），可以再点一次。" }, 502);
         if (mode === "profile") {
-          return J({ ok: true, profile: String(j.profile || "").slice(0, 1200), keys: (Array.isArray(j.keys) ? j.keys : []).slice(0, 20).map((x) => String(x).slice(0, 24)) });
+          return J({ ok: true, profile: String(j.profile || "").slice(0, 1200),
+                     keys: (Array.isArray(j.keys) ? j.keys : []).slice(0, 20).map((x) => String(x).slice(0, 24)),
+                     facts: (Array.isArray(j.facts) ? j.facts : []).slice(0, 16).map((x) => String(x).slice(0, 60)) });
+        }
+        if (mode === "proj") {
+          const sum = String(j.sum || "").slice(0, 1600);
+          if (!sum) return J({ ok: false, msg: "这条线索归并出来是空的，可以再点一次。" }, 502);
+          return J({ ok: true, name: String(j.name || "").slice(0, 32), sum: sum,
+                     keys: (Array.isArray(j.keys) ? j.keys : []).slice(0, 20).map((x) => String(x).slice(0, 24)) });
         }
         const gist = String(j.gist || "").slice(0, 120);
         const points = String(j.points || "").slice(0, 1200);
@@ -11340,7 +11378,11 @@ export default {
       // 与 LONGASK 同一条纪律——挂在当轮 user 消息上、**不进 system**：
       // ①system 是可被基底前缀缓存的固定段，每轮换内容会把缓存打散；②这几条只对这一问相关，不该长驻。
       // 明确告诉它这是摘要不是原文，免得它照着复述、或假装记得摘要里没写的事。
-      const umem = String(b.umem || "").slice(0, UMEM_MAX);
+      let umem = String(b.umem || "").slice(0, UMEM_MAX);
+      /* 分层记忆（2026-09-01）：新客户端递 umem3 三段，等定完档再按档配给（见 wdsMemByGrade）。
+         这里先接住，档还没算出来——自动档要等站内检索跑完才知道深浅。 */
+      const umem3 = (b && b.umem3 && typeof b.umem3 === "object") ? b.umem3 : null;
+      let memPick = null;
       /* ── nosite：跳过全站检索 ────────────────────────────────
          作文共创那四台（共创／修改／编辑／接着写）改的是**读者自己的稿子**，
          不是回答站内问题；全站检索对它们一点用没有，却是最重的一段
@@ -11618,6 +11660,8 @@ export default {
                ⚠ VC 是 const 对象，这里改的是它的字段（看图那条路 VC.top 本就为 0，不碰）。 */
             const G = wdsGradePick(deep, gradeReq, ragG, { rsLong: !!(rs && (rs.forge || rs.sde)), duel: !!duel, canSee: canSee });
             const gK = G.k;
+            /* ⭐ 记忆按这一档配给。放在这里而不是更早，是因为自动档要等 ragG 出来才知道档次。 */
+            if (umem3) { memPick = wdsMemByGrade(umem3, G); umem = memPick.text; }
             if (G.on && !canSee) {
               VC.top = gK.top ? 1 : 0;
               VC.model = wdsPickModel(vd, umodel, gK.top);
@@ -11647,6 +11691,7 @@ export default {
               model: VC.model, top: VC.top ? 1 : 0,
               think: canSee ? "看图档" : (gPlain ? "关" : ((G.on ? gK.plain : false) ? "关不掉（这家常开）" : (VC.top ? ((VC.effort || "max") === "max" ? "满功率" : "高") : "随基底默认"))),
               method: mFull ? "完整工序" : "精简工序", tok: tokGrade, ng: !!(G.on && gK.ng && !prof),
+              mem: memPick ? { lv: memPick.lv, n: memPick.n, has: memPick.has } : null,   // 这一答带了哪几层记忆、共多少字
             } }));
             // 可点清单：把这一轮所有能引的篇目与真网址列成一份，附在站内资料末尾。
             // 只列这一份、且要求它只准照抄——凭印象拼站内网址必然拼错（篇名≠路径）。

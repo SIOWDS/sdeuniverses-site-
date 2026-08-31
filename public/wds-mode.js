@@ -1009,6 +1009,7 @@
       gLineLv: "难度 {n}/5·{name}", gLineAuto: "自动", gLineNoRag: "自动·检索没接上，按 4 档", gLinePin: "钉死", gLineStd: "标准档（未按此加深）",
       gLineLand: "落点：{list}", gLineBy: "由「{by}」", gLineHits: "站内 {docs} 篇·锚定 {a}/{h} 段", gLineCore: "核心 {c} 段", gLineExact: "题面原句在站", gLineNone: "站内无锚定命中",
       gLineThink: "思考{think}", gLineNg: "＋完整内功",
+      gLineMem: "记忆 {has}·{n} 字", gLineMemNo: "记忆 未带",
       tipNoSde: " · 无 SDE：纯基底对话，不套 SDE 框架、不挂站内语料，可当一个称职的通用助手用",
       ph: "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…",
       /* 🔴 原文写的是「只存在浏览器本地」，而每一次提问的请求体里都带着 key 打到本站 Worker。
@@ -1264,13 +1265,24 @@
     bMem: "⌾ 记忆", memTitle: "全局记忆 · 我的历史对话",
     memHd: "本机共 <b>{n}</b> 场对话（含其它 WDS 智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场",
     memGo: "开始更新", memProf: "重炼画像", memExp: "导出记忆", memClr: "清空记忆",
+    memTL: "长期 · 常驻，每答必带", memTM: "中期 · 按线索整段带", memTS: "短期 · 本场原文，另有预算",
+    memTLs: "画像与已经稳定下来的几条", memTMs: "关键词重叠的场归成一条线索", memTSs: "谈完之后沉淀成中期的一条",
+    memCap: "已存 <b>{u}</b> / {c} 字　长期 {l} · 中期 {m}",
+    memCapFull: "存量到顶：最旧线索的要点已折叠 <b>{f}</b> 场（主旨与关键词仍在，仍检索得到）",
+    memInj: "每答垫进去最多 {k} 字：长期 {a} ＋ 当前线索 {b} ＋ 检索命中 {c}",
+    memPrj: "线索", memPrjN: "还没有线索——聊过几场、炼出记忆之后它自己会长出来。",
+    memPrjS: "{n} 场", memPrjSum: "归并", memPrjDone: "已归并",
+    memFacts: "常驻要点",
     memSwOn: "答题时启用我的记忆", memK1: "每答垫入", memK2: "条",
+    memSwAuto: "谈完一场自动更新记忆",
+    memSwAutoT: "开了它，每开一次新对话就把刚谈完那一场自动炼成一条（一场一次调用，花你自己的 Key）。关着就还是你按「开始更新」才做。",
+    memAutoAsk: "开了之后，每谈完一场会自动花你自己 Key 的一次调用来炼这一条。要开吗？",
     memNone: "还没有记忆条目——聊过几场之后点「开始更新」，它才记得住你。",
     memNoKey: "更新记忆也用你自己的 Key（右上 ⚙ 设置）。",
     memProfH: "我的画像",
     memDelAsk: "删掉这一条记忆？（原对话不受影响）",
     memClrAsk: "清空全部记忆条目与画像？（对话原文不受影响）",
-    memNote: "摘要与画像只存在你这台设备的浏览器里，不上传本站、不同步。更新时对话原文随你自己的 Key 发往你选的基底，走的是与平常问答同一条路——即经本站边缘服务内存转发，本站不写入数据库、不写进日志。删除某一场对话时它的记忆一并删除；被自动淘汰的旧对话（超 60 场）只丢原文、记忆仍留着。",
+    memNote: "摘要与画像只存在你这台设备的浏览器里，不上传本站、不同步。更新时对话原文随你自己的 Key 发往你选的基底，走的是与平常问答同一条路——即经本站边缘服务内存转发，本站不写入数据库、不写进日志。删除某一场对话时它的记忆一并删除；被自动淘汰的旧对话（超 60 场）只丢原文、记忆仍留着。分线索、折叠、检索这三件全在你这台机器上做，不发一次调用；存量到 7 万字后，最旧线索里那些场的「要点」会被压成一句存根——条目不删、主旨与关键词仍在，仍检索得到。",
     arIn: "输入你的问题", arSend: "发送", arStop: "停止生成", arToBot: "回到最新", arMenu: "对话列表", arMsgs: "对话内容",
       cbCopy: "复制", cbCopied: "已复制", dropHint: "松手即作为附件加入本场（图片只读得出其中的文字，走本机 OCR）",
       pasteAdd: "已把粘贴的文件加为附件",
@@ -1292,6 +1304,7 @@
       gLineLv: "Level {n}/5·{name}", gLineAuto: "auto", gLineNoRag: "auto · retrieval failed, using 4", gLinePin: "pinned", gLineStd: "standard mode (not deepened)",
       gLineLand: "landing: {list}", gLineBy: "via “{by}”", gLineHits: "{docs} site docs · {a}/{h} anchored chunks", gLineCore: "core {c}", gLineExact: "exact phrase found", gLineNone: "no anchored site hits",
       gLineThink: "reasoning {think}", gLineNg: "+ full groundwork",
+      gLineMem: "memory {has}·{n} chars", gLineMemNo: "memory none",
       tipWeb: " · Web search on (needs a Zhipu key)",
       tipNoSde: " · No SDE: plain conversation, no SDE framework, no site corpus — just a capable general assistant",
       ph: "ChatSDE anything about SDE, or ask it what to read here…",
@@ -1476,9 +1489,20 @@
     b9Tip: "Unity·Diversity·Harmony (how it sits) | Completeness·Vitality·Singleness (which kind) | Love·Freedom·Peace (how it feels)",
     deckFoot: "SDE Universes · sdeuniverses.com",
     bMem: "⌾ Memory", memTitle: "Global memory · your past chats",
+    memTL: "Long term · always sent", memTM: "Mid term · sent by thread", memTS: "Short term · this chat, own budget",
+    memTLs: "Your profile and the few things that have settled", memTMs: "Chats sharing keywords form one thread", memTSs: "Settles into a mid-term entry once the chat ends",
+    memCap: "<b>{u}</b> / {c} chars stored　long {l} · mid {m}",
+    memCapFull: "At capacity: details folded on <b>{f}</b> chats in the oldest threads (gist and keywords remain, still searchable)",
+    memInj: "Up to {k} chars per answer: long {a} + current thread {b} + retrieved {c}",
+    memPrj: "Threads", memPrjN: "No threads yet — they form once a few chats have been distilled.",
+    memPrjS: "{n} chats", memPrjSum: "Merge", memPrjDone: "merged",
+    memFacts: "Settled points",
     memHd: "<b>{n}</b> chats on this device (all SDE agents), <b>{m}</b> distilled, <b>{p}</b> pending",
     memGo: "Update now", memProf: "Rebuild profile", memExp: "Export", memClr: "Clear",
     memSwOn: "Use my memory when answering", memK1: "Inject", memK2: "per answer",
+    memSwAuto: "Distil each chat when it ends",
+    memSwAutoT: "When on, starting a new chat distils the one you just finished (one call per chat, on your own key). Off = only when you press Update.",
+    memAutoAsk: "Once on, finishing a chat spends one call on your own key to distil it. Turn it on?",
     memNone: "No memory yet — chat a few times, then hit Update so it can remember you.",
     memNoKey: "Updating memory also runs on your own Key (⚙ top right).",
     memProfH: "Your profile",
@@ -2313,6 +2337,18 @@
     ".wdsm-memi button:hover{color:#E8A8A0}" +
     ".wdsm-memsw{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--wdim);padding:12px 0 0}" +
     ".wdsm-memnote{font-size:11.5px;color:var(--wdim2);line-height:1.7;margin-top:10px}" +
+    ".wdsm-memcap{margin:0 0 12px}" +
+    ".wdsm-memcap .bar{height:6px;border-radius:3px;background:var(--wfill);border:1px solid var(--wline);overflow:hidden;display:flex}" +
+    ".wdsm-memcap .bar i{display:block;height:100%}" +
+    ".wdsm-memcap .bar i.l{background:var(--wgold2);opacity:.85}" +
+    ".wdsm-memcap .bar i.m{background:var(--wgold2);opacity:.45}" +
+    ".wdsm-memcap .lg{font-size:11.5px;color:var(--wdim2);margin-top:5px;line-height:1.7}" +
+    ".wdsm-memtier{font-size:12px;color:var(--wgold2);letter-spacing:.04em;margin:14px 0 6px;padding-top:10px;border-top:1px solid var(--wline)}" +
+    ".wdsm-memtier span{color:var(--wdim2);letter-spacing:0}" +
+    ".wdsm-memprj{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--wline);font-size:12.5px;color:var(--wdim)}" +
+    ".wdsm-memprj b{color:var(--wtx);font-weight:600;font-size:13px;display:block;margin-bottom:2px}" +
+    ".wdsm-memprj button{flex:none;background:none;border:1px solid var(--wline2);border-radius:6px;color:var(--wdim);cursor:pointer;font-size:11.5px;padding:3px 8px}" +
+    ".wdsm-memprj button:hover{color:var(--wgold2);border-color:var(--wgold2)}" +
     ".wdsm-help{position:fixed;inset:0;z-index:100004;background:var(--wmask);display:flex;align-items:center;justify-content:center;padding:20px}" +
     ".wdsm-help-b{max-width:420px;width:100%;background:var(--wpanel);border:1px solid var(--wline2);border-radius:16px;padding:22px 24px}" +
     ".wdsm-help-b h4{margin:0 0 14px;font-size:16px;color:var(--wtx2)}" +
@@ -2492,12 +2528,12 @@
         store: stApi, agent: AGENT_CHAT, agents: "all", profileKey: "profile:global",
         currentId: function () { return stSess ? stSess.id() : ""; },
       });
-      MEM.refresh(function () { memBadge(); });
+      MEM.refresh(function () { memBadge(); memAutoRun(); });   // 开着自动档就顺手把上次没炼的那一场补上
     }
     if (window.WDSMemo) { go(); return; }
     if (!document.head || !document.head.appendChild) return;   // 桩环境/异常页面：静默降级，绝不抛
     var sc = document.createElement("script");
-    sc.src = "/assets/wds-memo.js"; sc.async = true;
+    sc.src = "/assets/wds-memo.js?v=20260901a"; sc.async = true;
     sc.onload = go; sc.onerror = function () {};
     document.head.appendChild(sc);
   }
@@ -2732,7 +2768,40 @@
     topFit();          // 收起来的时候角标要跟到「⋯」上
   }
   function memRecall(q) { try { return MEM ? MEM.recall(q) : ""; } catch (e) { return ""; } }
+  /* 三段分开递给服务端：带哪几段由那一答的难度档定（见 worker 的 wdsMemByGrade）。
+     ⚠ 递 umem3 时 umem 一定要留空——两个字段都填等于把同一段记忆送两遍，白烧一倍预算。
+     老模块（还没有 recall3 的缓存版本）退回老口径，只递 umem。 */
+  function memRecall3(q) {
+    try { return (MEM && MEM.recall3) ? MEM.recall3(q) : null; } catch (e) { return null; }
+  }
+  /* ⌾ 谈完自动更新（2026-09-01）
+     默认关。开了之后：点「＋新对话」时，把**刚谈完那一场**自动炼成一条；下次进来还会补做没做完的。
+     与「手动更新、不偷跑」那条老规矩的分界：偷跑指的是没打招呼就花读者的钱——
+     这里是他自己按下的常开档，开的时候明说每场一次调用，面板上写着，随时可关，且**一次只做一场**。
+     没有 Key 就静静不做，绝不为它弹一个窗打断人。 */
+  var LS_MEMAUTO = "sde_wds_memauto";
+  var memAuto = (function () { try { return localStorage.getItem(LS_MEMAUTO) === "1"; } catch (e) { return false; } })();
+  var memAutoBusy = false;
+  function memAutoRun() {
+    if (!memAuto || memAutoBusy || !MEM || !MEM.state || !MEM.state.ready) return;
+    var kv = null; try { kv = wdsKeyGet(); } catch (e) {}
+    if (!kv) return;
+    var cur = ""; try { cur = stSess ? stSess.id() : ""; } catch (e) {}
+    var todo = MEM.pending().filter(function (m) { return m && m.id !== cur; });
+    if (!todo.length) return;
+    memAutoBusy = true;
+    var fin = function () { memAutoBusy = false; try { MEM.refresh(function () { memBadge(); }); } catch (e) {} };
+    try { MEM.one(todo[0], kv).then(fin, fin); } catch (e) { memAutoBusy = false; }
+  }
 
+  /* 三层各一个小标题：层名 + 一句「它凭什么在这一层」。
+     只写层名等于让读者自己猜三层的分工，那这套分层在界面上就白分了。 */
+  function tierHd(k, sub) {
+    var d = el("div", "wdsm-memtier");
+    d.appendChild(document.createTextNode(t(k) + "　"));
+    d.appendChild(el("span", null, t(sub)));
+    return d;
+  }
   function memPanel() {
     var m = el("div", "wdsm-help");                 // 复用遮罩层样式
     var box = el("div", "wdsm-memb");
@@ -2744,7 +2813,15 @@
     var st = el("span", "st", "");
     row.appendChild(goB); row.appendChild(prB); row.appendChild(exB); row.appendChild(clB); row.appendChild(st);
     box.appendChild(row);
+    var cap = el("div", "wdsm-memcap");
+    var capBar = el("div", "bar"), capL = el("i", "l"), capM = el("i", "m");
+    capBar.appendChild(capL); capBar.appendChild(capM);
+    var capLg = el("div", "lg");
+    cap.appendChild(capBar); cap.appendChild(capLg); box.appendChild(cap);
+    box.appendChild(tierHd("memTL", "memTLs"));
     var prof = el("div", "wdsm-memp"); box.appendChild(prof);
+    box.appendChild(tierHd("memTM", "memTMs"));
+    var plist = el("div", "wdsm-meml"); box.appendChild(plist);
     var list = el("div", "wdsm-meml"); box.appendChild(list);
     var sw = el("div", "wdsm-memsw");
     var cb = document.createElement("input"); cb.type = "checkbox";
@@ -2752,7 +2829,10 @@
     var kSel = document.createElement("select");
     [1, 2, 3, 4, 5].forEach(function (k) { var op = document.createElement("option"); op.value = String(k); op.textContent = String(k); kSel.appendChild(op); });
     var lk = el("label"); lk.appendChild(document.createTextNode(t("memK1") + " ")); lk.appendChild(kSel); lk.appendChild(document.createTextNode(" " + t("memK2")));
-    sw.appendChild(lb); sw.appendChild(lk); box.appendChild(sw);
+    var cbA = document.createElement("input"); cbA.type = "checkbox";
+    var lbA = el("label"); lbA.appendChild(cbA); lbA.appendChild(document.createTextNode(" " + t("memSwAuto")));
+    lbA.title = t("memSwAutoT");
+    sw.appendChild(lb); sw.appendChild(lk); sw.appendChild(lbA); box.appendChild(sw);
     box.appendChild(el("div", "wdsm-memnote", t("memNote")));
     m.appendChild(box);
     m.onclick = function (ev) { if (!ev || ev.target === m) { if (MEM) MEM.stop(); if (m.parentNode) m.parentNode.removeChild(m); } };
@@ -2763,12 +2843,60 @@
     cb.onchange = function () { MEM.setOn(cb.checked); };
     kSel.value = String(MEM.topK());
     kSel.onchange = function () { MEM.setTopK(kSel.value); };
+    cbA.checked = memAuto;
+    cbA.onchange = function () {
+      /* 开的时候必须问一句——它要花读者自己的 Key，默不作声地开等于替他花钱。关不用问。 */
+      if (cbA.checked && !confirm(t("memAutoAsk"))) { cbA.checked = false; return; }
+      memAuto = cbA.checked;
+      try { localStorage.setItem(LS_MEMAUTO, memAuto ? "1" : "0"); } catch (e) {}
+      if (memAuto) memAutoRun();
+    };
 
     function paint() {
       var S = MEM.state;
       hd.innerHTML = t("memHd").replace("{n}", String(S.metas.length)).replace("{m}", String(S.memos.length)).replace("{p}", String(MEM.pending().length));
-      prof.style.display = S.profile ? "" : "none";
-      prof.textContent = S.profile ? (t("memProfH") + "：" + S.profile) : "";
+      /* 容量条：长期与中期各占一段，读者一眼看得出 10 万字用掉多少、用在哪一层。
+         不画这条，"存 10 万"就只是个说法，折叠发生时更是无声无息。 */
+      var z = MEM.sizes ? MEM.sizes() : null;
+      if (z) {
+        capL.style.width = Math.min(100, z.long / z.capTotal * 100) + "%";
+        capM.style.width = Math.min(100 - Math.min(100, z.long / z.capTotal * 100), z.mid / z.capTotal * 100) + "%";
+        var lg = t("memCap").replace("{u}", String(z.total)).replace("{c}", String(z.capTotal))
+          .replace("{l}", String(z.long)).replace("{m}", String(z.mid));
+        if (z.folded) lg += "<br>" + t("memCapFull").replace("{f}", String(z.folded));
+        var C = (window.WDSMemo && window.WDSMemo.CAPS) || {};
+        lg += "<br>" + t("memInj").replace("{k}", String(window.WDSMemo ? window.WDSMemo.CAP : 7000))
+          .replace("{a}", String(C.injLong || 2000)).replace("{b}", String(C.injProj || 1500)).replace("{c}", String(C.injPick || 3000));
+        capLg.innerHTML = lg;
+      }
+      var facts = (S.facts || []);
+      prof.style.display = (S.profile || facts.length) ? "" : "none";
+      prof.textContent = (S.profile ? (t("memProfH") + "：" + S.profile) : "")
+        + (facts.length ? ((S.profile ? "\n\n" : "") + t("memFacts") + "：\n· " + facts.join("\n· ")) : "");
+      /* 线索：可以改名、可以花一次调用归并成一段。判错了归属，读者改得动——
+         这正是"用零调用的粗判 + 看得见改得动"换掉"每次多花一次调用去判准"的那笔交易。 */
+      plist.innerHTML = "";
+      var pjs = MEM.projects ? MEM.projects() : [];
+      if (!pjs.length) plist.appendChild(el("div", "wdsm-memnote", t("memPrjN")));
+      pjs.slice(0, 40).forEach(function (pj) {
+        var it = el("div", "wdsm-memprj");
+        var tx = el("div"); tx.style.flex = "1";
+        var nb = el("b", null, pj.name || "—");
+        nb.title = t("memPrj");
+        tx.appendChild(nb);
+        tx.appendChild(document.createTextNode(t("memPrjS").replace("{n}", String(pj.ids.length))
+          + (pj.sum ? ("　· " + t("memPrjDone")) : "") + (pj.folded ? ("　· " + pj.folded) : "")
+          + (pj.keys && pj.keys.length ? ("　" + pj.keys.slice(0, 6).join("、")) : "")));
+        it.appendChild(tx);
+        var sb = el("button", null, t("memPrjSum"));
+        sb.onclick = function () {
+          var kv = wdsKeyGet();
+          if (!kv) { say(t("memNoKey")); wdsKeyPanel(function () {}); return; }
+          MEM.projSum(kv, pj.id, say).then(paint);
+        };
+        it.appendChild(sb);
+        plist.appendChild(it);
+      });
       list.innerHTML = "";
       if (!S.memos.length) { list.appendChild(el("div", "wdsm-memnote", t("memNone"))); }
       S.memos.forEach(function (r) {
@@ -2800,13 +2928,17 @@
     };
     exB.onclick = function () {
       download(fileTag("WDS") + "-memory-" + stampName() + ".json",
-        JSON.stringify({ site: "sdeuniverses.com", kind: "wds-global-memory", at: new Date().toISOString(), profile: MEM.state.profile, memos: MEM.state.memos }, null, 2));
+        JSON.stringify({ site: "sdeuniverses.com", kind: "wds-global-memory", at: new Date().toISOString(),
+                         profile: MEM.state.profile, facts: MEM.state.facts || [],
+                         projects: MEM.state.projs || [], memos: MEM.state.memos,
+                         sizes: MEM.sizes ? MEM.sizes() : null }, null, 2));
     };
     clB.onclick = function () {
       if (window.confirm && !window.confirm(t("memClrAsk"))) return;
       var ids = MEM.state.memos.map(function (r) { return r.id; });
       var p = ids.reduce(function (acc, id) { return acc.then(function () { return stApi.memoDel(id); }); }, Promise.resolve());
       p.then(function () { return stApi.kvSet("profile:global", null); })
+       .then(function () { return stApi.kvSet(MEM.projKey || "proj:index", null); })
        .then(function () { MEM.refresh(function () { MEM.state.profile = ""; paint(); say(""); }); })
        .catch(function () { say("清空没成功。"); });
     };
@@ -3180,6 +3312,9 @@
     if (v.hits) parts.push(gFmt("gLineHits", { docs: v.docs || 0, a: v.ahits || 0, h: v.hits || 0 }) + (v.chits ? ("·" + gFmt("gLineCore", { c: v.chits })) : "") + (v.exact ? ("·" + t("gLineExact")) : ""));
     else if (v.deep) parts.push(t("gLineNone"));
     if (v.on) parts.push((v.model || "") + (v.think ? (" · " + gFmt("gLineThink", { think: v.think })) : "") + (v.method ? (" · " + v.method) : "") + (v.ng ? (" " + t("gLineNg")) : ""));
+    /* 这一答带了哪几层记忆、共多少字，摆在难度读数同一行——
+       读者看得见它读了什么，才谈得上信它；看不见的记忆是最难被信任的那一种。 */
+    if (v.mem) parts.push(v.mem.n ? gFmt("gLineMem", { has: v.mem.has, n: v.mem.n }) : t("gLineMemNo"));
     if (parts.length) { d.appendChild(document.createTextNode(" ｜ ")); var ii = el("i", null, parts.join(" ｜ ")); d.appendChild(ii); }
     if (typeof v.score === "number") d.title = "score " + v.score + " = 量 " + v.amount + " + 准 " + v.acc + " + 落点 " + v.landing + (v.anchors && v.anchors.length ? (" · 锚：" + v.anchors.join("/")) : "");
     cell.turn.insertBefore(d, cell.a);
@@ -3474,6 +3609,7 @@
     applyLang();
   };
   layer.querySelector(".wdsm-newbtn").onclick = function () {
+    try { memAutoRun(); } catch (e) {}          // 开新的之前，先把刚谈完这一场炼进记忆（只在自动档开着时）
     history = []; compReset(); cvReset(); if (stSess) stSess.reset(); msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
     atts = []; paintAtts();                          // 附件跟着这一场，新开一场就该清干净
     inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph"); updTurns();   // dayLeft 不复位：今日额度按本机计
@@ -4582,7 +4718,8 @@
     // nosde 单独用 !PROFILE 再兜一道：即便分身页因为共用 localStorage 而读到了 noSdeOn=true
     // （按钮在分身页本就不出现，读者按不到它，但状态是跨页共享的同一把 key），也绝不把它发出去——
     // 分身是一份策展过的人格，不该因为一个借来的开关状态就被静默拆穿。
-    var payload = { q: q, history: histPack(compFrom()), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1) };
+    var _m3 = memRecall3(q);
+    var payload = { q: q, history: histPack(compFrom()), umem: _m3 ? "" : memRecall(q), umem3: _m3 || undefined, key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1) };
     if (thinkMode === "deep") payload.grade = gradePin ? gradePin : "auto";   // 难度条：自动按检索定档，或读者钉死的档
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
     var pics = imgsForSend();
