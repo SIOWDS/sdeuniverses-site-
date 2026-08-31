@@ -420,8 +420,16 @@ function wdsUpFix(u, body) {
     // 不写这一句就是官方默认 medium——推理 token 照吃预算，而调用方以为自己要的是「快答一句」。
     if (body.reasoning_effort == null) body.reasoning_effort = "low";
   } else if (u.indexOf("api.anthropic.com") >= 0) {
+    // 官方支持表（2026-09-01 查证）：stream / stream_options / top_p / max_tokens 全支持，
+    // reasoning_effort、presence/frequency_penalty 等是**静默忽略**不报错——所以这里不必剥字段。
+    // temperature 只收 0–1，超了官方自己会夹；我们先夹一次，免得日后它改成报错。
     if (typeof body.temperature === "number" && body.temperature > 1) body.temperature = 1;
-    delete body.stream_options; delete body.reasoning_effort;
+    /* ⭐ 这一家的预算有地板。Claude 5 系**思考默认就开着**（兼容层不暴露开关，关不掉），
+       思考与正文吃同一份 max_tokens；预算比思考所需还小时，上游直接 400，
+       报的是预算不是型号——「测试连通」那一次 max_tokens=16 的最小探测就是这么死的（用户 2026-09-01 实撞）。
+       ⇒ 凡打这一家，预算不足 1024 一律抬到 1024。抬的是地板不是天花板：正常对话的预算远高于它，不受影响。 */
+    if (body.max_tokens != null && body.max_tokens < 1024) body.max_tokens = 1024;
+    if (body.max_completion_tokens != null && body.max_completion_tokens < 1024) body.max_completion_tokens = 1024;
   }
   return body;
 }
