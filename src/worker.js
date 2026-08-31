@@ -443,16 +443,48 @@ function wdsUpFix(u, body) {
   }
   return body;
 }
-function wdsUp(url, init) {
+/* 【投入档不是每个型号都吃同一套 —— 2026-09-01 实撞】难度条第 5 档给 reasoning_effort="max"，
+   gpt-5.6-sol 认，**luna 不认**（它只到 xhigh），于是整轮 400：
+   "does not support 'max' with this model. Supported values are: 'none','low','medium','high','xhigh'"。
+   型号档与投入档是两个旋钮 ⇒ 两个旋钮就能转出非法组合，而合法集合各型号不同、还会随版本变。
+   ⇒ 不去猜哪个型号支持到哪一档（猜错的样子就是今天这个 400），而是**读上游自己报的那张表**：
+   它把 Supported values 明明白白列在错误里，我们照它退到最高的那一档、原样重发一次，
+   并把这个型号的上限记在 isolate 里，同一台机器后面的请求直接按上限发，不再白撞一次。
+   ⚠ 只在「上游明确报了 reasoning_effort 不支持」时才动，别的 400 一律原样回给调用方——
+     wdsFetchMax 的预算阶梯还等着看那些 400 的原文。 */
+const WDS_EFFORT_CAP = new Map();   // model → 这个型号实际接受的最高投入档
+const WDS_EFFORT_ORDER = ["xhigh", "high", "medium", "low", "none"];
+function wdsEffortPick(txt) {
+  const m = String(txt || "").match(/Supported values are:([^"]+)/i);
+  if (!m) return "";
+  const okSet = (m[1].match(/'([a-z]+)'/gi) || []).map((x) => x.replace(/'/g, "").toLowerCase());
+  for (const e of WDS_EFFORT_ORDER) if (okSet.indexOf(e) >= 0) return e;
+  return "";
+}
+async function wdsUp(url, init) {
   const u = String(url || "");
-  if (u.indexOf("api.openai.com") >= 0 || u.indexOf("api.anthropic.com") >= 0) {
-    try {
-      if (init && typeof init.body === "string" && init.body.charAt(0) === "{") {
-        init = Object.assign({}, init, { body: JSON.stringify(wdsUpFix(u, JSON.parse(init.body))) });
-      }
-    } catch (e) {}   // 解析不了就原样发：适配失败可以是一次 400，不能是把请求吃掉
-  }
-  return fetch(url, init);
+  if (u.indexOf("api.openai.com") < 0 && u.indexOf("api.anthropic.com") < 0) return fetch(url, init);
+  let body = null;
+  try {
+    if (init && typeof init.body === "string" && init.body.charAt(0) === "{") {
+      body = wdsUpFix(u, JSON.parse(init.body));
+      // 这台机器已经吃过一次亏的型号：直接按已知上限发，不再撞第二次
+      const cap = WDS_EFFORT_CAP.get(String(body.model || ""));
+      if (cap && body.reasoning_effort && body.reasoning_effort !== cap
+          && WDS_EFFORT_ORDER.indexOf(body.reasoning_effort) < 0) body.reasoning_effort = cap;
+      if (cap && body.reasoning_effort === "max") body.reasoning_effort = cap;
+      init = Object.assign({}, init, { body: JSON.stringify(body) });
+    }
+  } catch (e) { body = null; }   // 解析不了就原样发：适配失败可以是一次 400，不能是把请求吃掉
+  const resp = await fetch(url, init);
+  if (resp.ok || resp.status !== 400 || !body || !body.reasoning_effort) return resp;
+  let txt = ""; try { txt = (await resp.clone().text()).slice(0, 600); } catch (e) { return resp; }
+  if (!/reasoning_effort/i.test(txt) || !/unsupported_value|does not support/i.test(txt)) return resp;
+  const nx = wdsEffortPick(txt);
+  if (!nx || nx === body.reasoning_effort) return resp;
+  WDS_EFFORT_CAP.set(String(body.model || ""), nx);
+  body.reasoning_effort = nx;
+  return fetch(url, Object.assign({}, init, { body: JSON.stringify(body) }));
 }
 async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage, ladderOverride, plain) {
   const ladder = (ladderOverride && ladderOverride.length) ? ladderOverride : wdsLadder(VC, want);
