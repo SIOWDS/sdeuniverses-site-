@@ -664,7 +664,10 @@ function wdsMMFlush(st) {
    两家都不需要读者过 CORS（服务端转发），所以不必像浏览器直连那样另配测试页。 */
 const WDS_VENDORS = {
   deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-flash", name: "DeepSeek", apply: "platform.deepseek.com" },
-  zhipu: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5-air", name: "\u667a\u8c31 GLM", apply: "open.bigmodel.cn" },
+  /* 2026-09-01 实测：glm-5-air **已不在架**（上游回 {"code":"1214","message":"modelCode: 不存在"}），
+     也就是说智谱这一家的标准档一直在报错，而深度档 glm-5 是通的——单探一档的测法看不出这种事。
+     换成当前在架的 glm-5.3-flash。⚠ 型号名是字符串，写错不报错、只在跑的时候 1214，改这里必须当场探一次。 */
+  zhipu: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5.3-flash", name: "\u667a\u8c31 GLM", apply: "open.bigmodel.cn" },
   kimi: { url: "https://api.moonshot.cn/v1/chat/completions", model: "kimi-k2.6", name: "Kimi", apply: "platform.moonshot.cn" },
   qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen", apply: "bailian.console.aliyun.com" },
   minimax: { url: "https://api.minimax.io/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax", apply: "platform.minimax.io" },
@@ -12929,7 +12932,11 @@ export default {
         const r = await wdsUp(WDS_VENDORS[vd].url, {
           method: "POST",
           headers: { "content-type": "application/json", authorization: "Bearer " + key },
-          body: JSON.stringify({ model, stream: false, max_tokens: 16, messages: [{ role: "user", content: "ping" }] }),
+          /* ⚠ 2026-09-01：探针原来是裸 body ＋ max_tokens 16，于是**混合思考的家一律探不通**——
+             glm-4.7-flash 思考默认开着、与正文共用 max_tokens，16 个 token 全被思考吃掉，
+             25 秒到点被 abort，屏幕上报成「连不上这家的接口」。可它其实是通的。
+             走 wdsPlainBody 显式关思考（各家关法不同，那函数是唯一一处口径），地板抬到 64。 */
+          body: JSON.stringify(wdsPlainBody({ url: WDS_VENDORS[vd].url, model }, { model, stream: false, max_tokens: 64, messages: [{ role: "user", content: "ping" }] })),
           signal: ctrl.signal,
         });
         if (r.ok) return Response.json({ ok: true, vendor: vd, model, name: WDS_VENDORS[vd].name }, { headers: _cors() });

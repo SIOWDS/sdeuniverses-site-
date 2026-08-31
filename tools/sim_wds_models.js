@@ -19,6 +19,21 @@ ok(!/flashx/.test(LITE) && !/flashx/.test(TOP), "**没有** flashx —— 只差
 ok(!/"glm-4\.5-flash"/.test(W), "没有一处把已下线的 glm-4.5-flash 当型号值用（它会被上游静默路由，是一处查不出来的隐性依赖）");
 ok(/免费/.test(W.slice(Math.max(0, W.indexOf("const WDS_LITE_MODEL") - 600), W.indexOf("const WDS_LITE_MODEL"))), "注释里写明它凭什么在轻档，后来人不必再去查一遍");
 
+console.log("\n[一之二] 已经不在架的名字，一个都不许当值用");
+/* 2026-09-01 实测钉死：glm-5-air 上游回 1214「modelCode: 不存在」，
+   而它当时正是智谱的**标准档**——也就是说这一家的标准档一直在报错，没人发现。
+   下面这张表只进「探过、确认不在架」的名字，不进猜的。 */
+["glm-5-air", "glm-4.5-flash"].forEach(function (dead) {
+  ok(W.indexOf('"' + dead + '"') < 0, "没有一处把 " + dead + " 当型号值用（实测已不在架）");
+});
+
+console.log("\n[一之三] 探针必须显式关思考");
+/* 混合思考的家（GLM 4.7-flash、DeepSeek、Qwen…）思考与正文共用 max_tokens。
+   探针给 16 个 token、又不关思考，token 全被思考吃掉 ⇒ 超时 abort ⇒ 屏幕上报「连不上」，
+   而那一家其实是通的。这是 2026-09-01 glm-4.7-flash 探不通的真因。 */
+ok(/body: JSON\.stringify\(wdsPlainBody\(\{ url: WDS_VENDORS\[vd\]\.url, model \}/.test(W), "ping 走 wdsPlainBody（关思考的口径只有那一处，探针不许另写一份）");
+ok(/max_tokens: 64, messages: \[\{ role: "user", content: "ping" \}\]/.test(W), "探针的 token 地板抬到 64，不再是 16");
+
 console.log("\n[二] 取不到轻档的家，退回标准档（行为一字不变）");
 ok(/function wdsLiteModel\(vd\) \{ return WDS_LITE_MODEL\[vd\] \|\| \(WDS_VENDORS\[vd\] && WDS_VENDORS\[vd\]\.model\); \}/.test(W),
    "wdsLiteModel 缺档即退回该家标准型号，不返回 undefined");
