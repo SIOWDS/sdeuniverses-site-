@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>转轨抽税与互斥双轨劳动：AI 时代学生焦虑的一个结构解释 | AI时代的新教育 · SDE Universes</title>
+<meta name="description" content="AI 时代最焦虑的不是位置最差的学生，而是旧体系里位置最好的。本文的判断：这不是压力叠加，而是转轨成本的单向转嫁——AI 引发职业能力标准断裂，产生巨大转轨成本，制度不作为使其无法社会分摊，最终以「互斥双轨劳动」落在最无议价权的学生身上。焦虑不随单一轨道任务量上升，只随两轨的互斥强度上升。用税收归宿把「为何落在学生身上」从断言变成推导，用中国「双减」这一自然实验裁决核心预测。王德生。">
+<meta property="og:title" content="转轨抽税与互斥双轨劳动：AI 时代学生焦虑的结构解释">
+<meta property="og:description" content="不是负担变重，是两条轨道互相否认；焦虑不在承受方，在东西本身。">
+<meta property="og:type" content="article">
+<style>
+:root{--bg:#F6F2E9;--card:#FCF9F1;--gold:#8A6817;--gold2:#5E4710;--text:#241E12;--muted:#8A7C5E;--border:rgba(94,71,16,0.16);--ink:#181206;--ink-gold:#D4B25E;--red:#8A2E2E}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:2.05;font-size:17px}
+a{color:var(--gold2);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:768px;width:100%;margin:0 auto;padding:0 24px}
+nav{position:sticky;top:0;background:rgba(246,242,233,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:20}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:900px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
+.nav-back{font-size:14px;color:var(--muted)}
+header.hero{position:relative;background:radial-gradient(ellipse at 50% 30%,#3a2a1a 0%,#241a10 45%,#180f08 100%);color:#F3ECD9;padding:96px 0 78px;text-align:center;overflow:hidden}
+.hero-inner{position:relative;z-index:2;padding:0 20px}
+.hero-eyebrow{font-size:12.5px;letter-spacing:0.5em;color:var(--ink-gold);margin-bottom:30px}
+.hero-title{font-size:clamp(32px,6vw,54px);font-weight:700;letter-spacing:0.08em;line-height:1.5}
+.hero-epi{font-size:clamp(15px,2.2vw,19px);color:var(--ink-gold);margin-top:28px;letter-spacing:0.08em;line-height:2.3;font-weight:300}
+.hero-meta{margin-top:30px;font-size:13px;color:#8C7E5E;letter-spacing:0.16em}
+.toc{background:var(--card);border:1px solid var(--border);border-radius:3px;max-width:768px;margin:-34px auto 0;position:relative;z-index:5;padding:26px 30px 20px}
+.toc-label{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:12px;text-align:center}
+.toc-grid{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center}
+.toc-grid a{font-size:14px;color:var(--muted);letter-spacing:0.03em}
+.toc-grid a:hover{color:var(--gold2)}
+article{padding:56px 0 40px}
+.chapter{margin:0 0 26px}
+.ch-head{text-align:center;margin:64px 0 40px}
+.chapter:first-child .ch-head{margin-top:0}
+.ch-label{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:12px}
+.ch-title{font-size:clamp(24px,3.6vw,32px);font-weight:700;letter-spacing:0.05em;color:var(--gold2);line-height:1.5}
+.ch-orn{font-size:10px;color:var(--ink-gold);letter-spacing:0.7em;margin-top:16px}
+p{margin-bottom:22px;text-align:justify;text-indent:2em}
+p b{color:var(--gold2)}
+p.jing{text-align:center;text-indent:0;font-size:19px;line-height:2.2;margin:30px 0;letter-spacing:0.04em;font-weight:700;color:var(--red)}
+p.ba{font-size:15.5px;color:var(--muted)}
+.disp{text-align:center;text-indent:0;margin:26px 0;font-size:16.5px;letter-spacing:0.02em;color:var(--gold2);font-family:"Cambria Math",Cambria,Georgia,serif}
+.abs{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold2);border-radius:0 6px 6px 0;max-width:768px;margin:40px auto 0;padding:22px 28px}
+.abs p{text-indent:0;font-size:15.5px;color:#4A4235;margin-bottom:0;line-height:1.95}
+.card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 6px 6px 0;margin:26px 0;padding:18px 24px}
+.card p{text-indent:0;font-size:15.5px;color:#4A4235;margin-bottom:10px;line-height:1.95}
+.card p:last-child{margin-bottom:0}
+.card .h{font-size:13px;letter-spacing:0.28em;color:var(--gold);text-indent:0;margin-bottom:10px}
+.refs{margin-top:8px}
+.refs .rg{text-indent:0;font-weight:700;color:var(--gold2);margin:24px 0 10px;font-size:15px;letter-spacing:0.06em}
+.refs .rr{text-indent:-1.6em;padding-left:1.6em;font-size:14.3px;line-height:1.85;color:#463E30;margin-bottom:9px;text-align:left}
+.refs .rr em{color:var(--gold);font-style:normal}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#3a2a1a 0%,#241a10 60%,#180f08 100%);color:#F3ECD9;text-align:center;padding:66px 24px 60px;margin-top:30px;border-bottom:1px solid rgba(212,178,94,0.2)}
+.endbox p{color:#CBB98A;max-width:600px;margin:0 auto 30px;text-align:center;text-indent:0;font-size:15.5px}
+footer{background:var(--ink);color:#8C7E5C;text-align:center;padding:34px 0 44px;font-size:13px;letter-spacing:0.08em}
+footer a{color:var(--ink-gold)}
+@media(max-width:560px){.toc{margin:-24px 16px 0}}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><a class="nav-logo" href="/browse/">SDE Universes</a><a class="nav-back" href="/new-education/">← 返回 AI时代的新教育</a></div></nav>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">A I 时 代 的 新 教 育</div>
+    <h1 class="hero-title">转轨抽税</h1>
+    <div class="hero-epi">最焦虑的，不是位置最差的学生，是旧体系里位置最好的；<br>焦虑不在承受方，在东西本身；<br>不是负担变重，是两条轨道互相否认。</div>
+    <div class="hero-meta">副题 · 互斥双轨劳动与 AI 时代学生焦虑的一个结构解释 &nbsp;|&nbsp; 王德生 著 &nbsp;|&nbsp; 二〇二六年八月</div>
+  </div>
+</header>
+<div class="abs"><p><b>提要：</b>既有研究把 AI 时代学生焦虑分别归因于压力过大、社会比较加剧与能力不适，三者都预设焦虑增量是「某种新压力源的简单叠加」。本文提出一个不同框架：当前学生焦虑的本质不是压力叠加，而是<b>转轨成本的单向转嫁</b>——AI 引发的职业能力标准断裂产生巨大的转轨成本，而制度整体的不作为使这一成本无法被社会分摊，最终以「<b>互斥双轨劳动</b>」的形式落在最无议价权的学生个体身上：学生被要求同时为两个互相否认的未来工作，旧文凭轨道兑换力衰减却仍强制运行，新能力轨道价值上升却缺乏制度供给与回报保证；两轨的投入被彼此标记为无效劳动，产生结构性净亏损。本文与它真正的近邻——Spence／Arrow 的信号与筛选、Collins／Dore 的文凭病、Berg 的过度教育、Hacker 的风险大转移、Doeringer‑Piore 的双重劳动力市场、Kerr「奖励 A 却指望 B」、Schelling／Granovetter 的临界—级联——逐条划开分界，并用<b>税收归宿</b>把「为何偏偏落在学生身上」从断言改写成推导：转轨成本的归宿由各方退出弹性决定，而学生的退出弹性趋近于零。本文给出一个反直觉且可裁决的核心预测——单边减负不降焦虑、反而升高最优绩层的焦虑——并以中国「双减」这一现成的自然实验对它做了一次真跑。</p></div>
+<div class="toc"><div class="toc-label">目 录</div><div class="toc-grid">
+      <a href="#ch1">一 · 问题的提出</a>
+      <a href="#ch2">二 · 三种归因与共同盲区</a>
+      <a href="#ch3">三 · 转轨抽税：从比喻到归宿</a>
+      <a href="#ch4">四 · 互斥双轨劳动</a>
+      <a href="#ch5">五 · 三套互斥双轨：学生·教师·家长</a>
+      <a href="#ch6">六 · 稳态与破局：裂隙为何在雇主内部</a>
+      <a href="#ch7">七 · 一次自然实验的裁决：双减</a>
+      <a href="#ch8">八 · 证伪条件与可裁决判据</a>
+      <a href="#ch9">结 · 加大正确答案供给解决不了的处境</a>
+      <a href="#ref">参考文献</a>
+</div></div>
+<article><div class="wrap">
+
+<section class="chapter" id="ch1">
+<div class="ch-head"><div class="ch-label">一</div><div class="ch-title">问题的提出</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<p>一个悖论构成本文的起点：<b>最焦虑的学生并非处于最不利位置的学生，而是在旧教育体系里处于最有利位置的学生。</b></p>
+<p>这一观察在学生工作的日常经验里反复出现。成绩拔尖的学生常呈现更高的焦虑水平，而他们焦虑的内容常常不是「担心考不好」，而是「不知成绩还能换来什么」。如果焦虑是压力的简单函数，那么压力源越多、应对资源越少的群体理应越焦虑——这一预测与观测明显不符。成绩差的学生担心就业，冷门专业的学生担心淘汰，那些风险暴露最大的人焦虑反而不那么突出，而绩点最高的那批学生却说：「我知道我成绩很好，但我忽然不知道这些成绩还能换来什么了。」</p>
+<p>这个「还能换来什么」的追问，是关键所在。它表明这并非能力不足导致的失败恐惧，也不是任务压力导致的身心超载，而是<b>对象本身的价值在当事人面前变得可疑</b>。</p>
+<p class="jing">焦虑不在承受方，而在东西本身。</p>
+<p>这正是 AI 时代的学生焦虑区别于此前一切焦虑类型的结构特征。它不能被纳入「压力—应激」模型，不能被纳入「相对剥夺—社会比较」模型，也不能被「学业倦怠—自我效能」模型充分解释。本文的承重命题如下。</p>
+<div class="card"><div class="h">承 重 命 题</div><p>AI 时代的学生焦虑，是大规模出现的<b>转轨焦虑</b>——当职业能力标准发生断裂、旧凭证与新能力不再指向同一个未来时，学生被迫在两个互相否认对方的轨道上同时投入，形成一种<b>互斥双轨劳动</b>；而这一转轨成本没有在任何制度层面被分摊，它被整体转嫁给了教育体系中最无议价权的个体——学生。</p></div>
+<p>与已有解释的分离点在如下事实：已有框架预测焦虑是各类负担的函数，本文预测焦虑是<b>两条轨道之间互相否定的交集</b>的函数。两条轨道各自的任务量不改变，只要否定关系存在，焦虑就会产生。这个区别不是措辞之别，而是会被观测结果检验的实质差异——第八节给出正式的判定判据，第七节给出一次已执行的裁决。</p>
+</section>
+
+<section class="chapter" id="ch2">
+<div class="ch-head"><div class="ch-label">二</div><div class="ch-title">三种归因与共同盲区</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<p>学生焦虑本是教育心理研究的常规主题。但在 AI 时代，一批异常现象迅速积累，构成对既有框架的反常经验储备。先检视三个最成熟的归因传统，并说明它们各自越界在哪里。</p>
+
+<p><b>其一，压力归因：焦虑是任务量的增函数。</b>这是最古老的框架，其经典形态是 Lazarus &amp; Folkman（1984）的应对资源模型：任务要求超过个人应对资源时，焦虑产生，要求越重，焦虑越深。据此，AI 进场后焦虑上升应当来自任务上升。但问题在于，AI 恰恰<b>减少</b>了可量化的学习任务：标准计算被瞬间完成，文献综述被代劳，作业时间显著下降。如果焦虑是任务量的函数，AI 带来的应当是成本下降、压力缓解，而观测到的却是焦虑上升，且成绩越好越焦虑。这是对压力归因的一个直接反证。压力归因真正解释的时区是 2010 年以前的焦虑——那时焦虑的重心在「做不完」「考不过」；而今天学生的焦虑表述已经偏移到「我做的这些还有没有用」。这一偏移本身就是证据。</p>
+
+<p><b>其二，社会比较归因：焦虑是比较网的函数。</b>它上承 Festinger（1954），并有 Twenge 等（2018）、Duffy‑Twenge‑Joiner（2019）关于美国大学生情绪障碍队列上升、Curran &amp; Hill（2019）关于完美主义代际上升的实证支撑。它抓住了绩优生焦虑的一部分：高位置对应高竞争的比较网，社交媒体又提供无上限的参照系。但它在一条证据前失效：当学生在认知上明确意识到「大家都在同一条没有出口的轨道上」之后，焦虑并不下降，甚至上升。若焦虑来自「别人比我强」，那么认识到人人都是输家、社会比较劣势消失，焦虑本应缓解；可「分数不管用了」这一认知普及后，最优秀学生的焦虑反而加重。原因在于：<b>社会比较需要一个有意义的比较轴。一旦比较轴本身失去它所悬附的价值，比较就找不到锚，而比较框架不会消失，只会退化为持续的空转。</b>焦虑不是比较网的张力，而是比较轴断裂后比较网仍被强制转动的代价。这与位置品理论（Hirsch；van de Werfhorst, 2011）承接、又向前一步：位置品讲的是稀缺位置的零和竞争，本文讲的是位置的<b>计价单位</b>本身正在作废。</p>
+
+<p><b>其三，能力不适归因：技能—市场错配。</b>这是 AI 时代最省事的解释，其严肃版本是自动化与技能偏向型技术变迁文献：Autor‑Levy‑Murnane（2003）的任务模型、Autor（2015）、Acemoglu &amp; Restrepo（2020）的替代证据、Frey &amp; Osborne（2017）的岗位可计算化预测。它的默认解是培训。但它解释的是「焦虑的表面表述」，不是「焦虑的结构生成」。技能错配并不必然产生焦虑：历史上多数技术转型期，错配都随培训与代际替换化解，19 世纪的排字工人在产业过渡结束时错配消失、焦虑也消失。今天的学生并不是面对某一个可培训补足的错配技能，而是面对一个<b>无法确认该学什么的不可定向性</b>——旧地图完全失效，新地图尚未画出。错配有可补的缺口，不可定向性没有可自主补足的缺口。学生的问题不是「我缺了什么」，而是「我该往哪里投」。</p>
+
+<p>值得一并指出：当下 AI 焦虑的实证研究，几乎都仍落在这三类之内——用挑战／阻碍评价、保护动机理论、生涯适应力、核心自评这些「把焦虑当作对负担的评价」的框架来测量与解释。它们把焦虑当作<b>输入性负担</b>的产物，只在「负担从哪来」上分歧，从不质询「负担为什么在这个时点、以这个形态、落在这群人身上」。这恰是它们无法解释「优秀学生反而更焦虑」的原因。</p>
+
+<p>本文的切入点是反过来问：焦虑是否根本不是输入性负担的产物，而是<b>通道结构本身</b>的产物？当一个人被要求同时在两个互斥的方向上投入全部精力，而两个方向各自都从投入者的角度给予负反馈——旧文凭轨道给他「你在浪费生命」的隐晦信号，新能力轨道给他「你的努力不构成回报」的直接信号——焦虑就不需要超载的额外解释了，它直接从结构冲突中产生。</p>
+</section>
+
+<section class="chapter" id="ch3">
+<div class="ch-head"><div class="ch-label">三</div><div class="ch-title">转轨抽税：从比喻到归宿</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<p><b>定义。</b>转轨抽税，是指当一种既有制度职能被技术冲击削弱、但尚未被新的替代结构取代时，制度过渡的成本没有在承担制度收益的主体之间进行社会分摊，而是以劳动、时间与心理负债的形式被转嫁到最无资源、也最无讨价还价能力的个体身上。这里必须先向一位近邻致意并划界：Hacker（2006）的「风险大转移」已经命名了「结构性风险从制度系统性地卸载到个体与家庭」这一过程。本文承接它的方向，但补上两件它未做的事——其一，指认转移的<b>具体载体</b>是互斥双轨劳动（第四节）；其二，把「为何落在这一方」从社会学观察升级为一条可推导的归宿律。</p>
+
+<p><b>归宿由退出弹性决定。</b>「抽税」一旦被当作机制而非比喻，就必须回答税收理论的核心问题：税负最终落在谁身上？公共经济学的标准结论是——<b>税收归宿落在退出弹性最小的一方</b>，与名义上「谁被课征」无关。转轨成本同理。设三方在旧文凭轨道上的退出弹性：</p>
+<p class="disp">学生 ε<sub>s</sub> ≈ 0 &nbsp;≪&nbsp; 学校 ε<sub>c</sub> &nbsp;&lt;&nbsp; 雇主 ε<sub>e</sub></p>
+<p>学生几乎不能退出这条轨道：他不能私自宣布不参加考试、不修绩点，正如个人不能私下拒收一种法定货币——这一点的机理正是 Spence（1973）与 Arrow（1973）：文凭是一个被制度共同信守的信号／筛选装置，单个持有者退出信号博弈的代价近乎无限。学校的退出弹性高得多：它可以保留旧评价、延迟建立新评价，几乎零成本；雇主更可以继续用学历预筛，把筛选失误的风险留在流程里（第六节）。三方之中退出弹性最低的是学生，于是转轨成本的归宿落在学生。<b>「为何偏偏是学生」由此不再是一句愤慨，而是一条归宿律的推论</b>：不是谁心肠硬，是弹性差决定了落点。</p>
+
+<p><b>与信号理论的分界。</b>此处必须把承接说清，否则容易被读成旧词。经典信号理论有一个隐含假设：信号成本与能力<b>负相关</b>——高能力者付更低的成本发出同一信号，于是信号可分离出能力。AI 的冲击恰恰击穿这个假设的另一端：AI 让文凭所认证的内容，正好是它已经包办的那部分可复现智力劳动。于是文凭认证的，不再是 AI 无法做到的，而恰恰是 AI 已经做到的。这不是信号强度的衰减，而是<b>信号指向的反转</b>——它指向的能力与稀缺能力之间，出现了一个历史上从未有过的负间隔。这一步是信号理论没有覆盖的：它讨论过信号如何贬值，没讨论过信号如何指反。</p>
+</section>
+
+<section class="chapter" id="ch4">
+<div class="ch-head"><div class="ch-label">四</div><div class="ch-title">互斥双轨劳动</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<p>上一节给出成本为何落在学生。这一节铺开它落下来的<b>形态</b>：学生在两条互相否定的轨道上同时工作。</p>
+
+<p><b>旧文凭轨道：兑换力衰减，强制流通不变。</b>文凭信用依赖一条沉默的兑换链：文凭作为信号被雇主用作能力代理，学生以时间换信号，信号在市场上兑换为职业入口。AI 击中这条链最脆的一环——可复现的知识。这里要与 Collins（1979）的文凭社会、Dore（1976）的文凭病划界：二者讲的是<b>供给过剩导致的渐进通胀</b>（同一张文凭随人人都有而慢慢不值钱）；本文讲的不是通胀，是<b>断裂</b>——不是文凭多了所以贬值，是文凭所锚的那类能力被一次性外包给机器，兑换率发生结构性跳变。同样，与 Berg（1971）的过度教育划界：过度教育说的是「学得比岗位需要的多」，本文说的是「学的方向被证伪」，不是量的过剩，是向的失效。而断裂是渐进、不均匀的：大量仍用学历预筛的雇主使文凭在宏观上像一种「官方失效、民间仍全面使用的货币」——国家没宣布作废，任何人也不敢私自拒收。学生因此无法主动退出，兑换力下降而强制流通不变，这一组合本身就是一台抽税装置。</p>
+
+<p><b>新能力轨道：付出不确定，回报也不确定。</b>与旧轨道「确定付出、衰减回报」相反，新轨道是「不确定付出、不确定回报」。它的内容不是可背诵的技能清单，而是一组只能自己生发的元能力：在没有标准答案处定义一个值得问的问题、在多个可能中做判断并承担后果、在被推翻后重建判断。这些能力至今没有进入正规课程主干，学生只能到学校边界之外找路——竞赛、开源、创业、自由职业、小团队实习——而这些路的共同特征是：它们在旧轨道的记分簿上不留痕迹。任何一份保研、评优、绩点规则里，都不存在「不可伪造的差异推进记录」这一评价格。个体面对新轨道的典型体验是一种<b>契约空白</b>：投入没有回报承诺，产出没有评价单位，进步没有可比较的码尺。这不是「多努力」能修补的，因为要补的原料——可确认的反馈——恰好是制度没有供给的东西。</p>
+
+<p><b>两轨的核心关系不是并列，而是互斥。</b>第一层是时间上的互斥：一天的可用时间是零和预算，旧轨道减量却加严（改革的后坐力表现为补课、刷题、对标），新轨道又要课外项目，二者在一天之内无法同时满足。第二层更具结构性，是<b>回报计算上的互斥</b>：旧轨道不承认新轨道的积累，新轨道不兑换旧轨道的分数。他耗在旧轨道上的每一小时，新轨道的雇主视为空白；他耗在新轨道上的每一小时，旧轨道的评价视为「不务正业」的减分项。设可用时间总量 T，旧轨投入 T<sub>o</sub>、新轨投入 T<sub>n</sub>，两轨回报 R<sub>o</sub>、R<sub>n</sub> 的交叉导数不满足一般互补性，反而非正：</p>
+<p class="disp">∂R<sub>o</sub> ⁄ ∂T<sub>n</sub> ≤ 0 ，&nbsp; ∂R<sub>n</sub> ⁄ ∂T<sub>o</sub> ≤ 0 ，&nbsp; T<sub>o</sub> + T<sub>n</sub> = T</p>
+<p>在正常的多任务结构里，一套投入在不同目标上的回报彼此独立或互补；在互斥双轨结构中，<b>每一套投入都对另一套产生非正的外部性，没有哪一项投入是帕累托安全的</b>。这个式子的实质是：任何努力都可能「白投」，而且正好投向了会被另一轨否认的那一侧。这与压力模型有根本区别——常规模型里更多努力至少产生方向意义上的回报，互斥双轨里更多努力可能恰好落在被否定的一侧。这一结构在组织理论里有一个精确的先声：Kerr（1975）「奖励 A 却指望 B 的愚蠢」——旧轨道奖励的是 A（绩点、名次），指望的却是 B（判断力、真实能力），而两套评价互不通兑。本文把 Kerr 的组织错配，下移到了个体在一天时间预算里的身体承担。</p>
+
+<div class="card"><div class="h">互 斥 强 度（可测量的核心量）</div><p>把中心命题收成一个可运算的量。定义两轨之间的<b>互斥强度</b> μ = 一方投入被另一方标记为无效的比例（等价地，负交叉外部性的绝对量）。本文的中心断言可写成一句不依赖任何引文即可成立的话：</p><p class="jing" style="margin:6px 0">焦虑 = f(μ)，∂焦虑⁄∂μ &gt; 0；而 ∂焦虑⁄∂T<sub>o</sub>、∂焦虑⁄∂T<sub>n</sub> 不必为正。</p><p>焦虑随互斥强度上升，不随单一轨道任务量上升。删掉全文所有引用，这一条仍然成立——它不是任何一个既有命题的改写，而是「负担之和」被换成了「否定之交」。</p></div>
+
+<p><b>互斥在身体上的三个日常症状。</b>其一，<b>成功羞耻</b>：学生在旧轨道上获奖、拿高分，却无法再从中获得身份确认——他知道这是什么，但不再想让人知道。成功羞耻不同于失败焦虑，它更隐蔽、更难被支援系统捕获，因为传统心理支持是为失败者建立的，一个羞于成功的人没有现成的求助语汇。其二，<b>未证投入焦虑</b>：一切非学业投入中，他无法确定自己是在成长还是在浪费；做了三个月项目、被懂行的人指出判断漏洞，这一刻对他同时是收获与毁灭，因为没有制度的标记系统告诉他「这在向你指认你的真实水平」。其三，<b>空闲恐慌</b>：他什么也不投入的时刻焦虑最甚——这与总负担理论构成硬性分歧，负担理论预测无事可做时焦虑最低，互斥双轨预测无事可做时学生被迫直面「两条轨道都不提供我会走向哪里」的无方向感，焦虑最高。这解释了大量教师报告的现象：学生不是在考试前最焦虑，而是在放假、课后、没有明确任务的深夜最焦虑。</p>
+
+<p><b>与三个同名近邻的分界。</b>「双轨」一词容易被误认。其一，与劳动经济学的<b>双重劳动力市场</b>（Doeringer &amp; Piore, 1971）不同：后者是市场在不同劳动者之间的分割（主要／次要部门），本文是<b>同一个劳动者</b>被迫同时跑的两条互相否定的投入轨道。其二，与心理学的<b>双通径</b>（挑战／阻碍评价）不同：后者是同一压力源被分成两种评价路径，本文是两个各自否认对方回报的结构，不是评价的分岔。其三，与角色冲突／工作—家庭冲突不同：后者是两个角色争夺同一份时间，本文的关键不在争时间，而在<b>回报的负交叉</b>——一轨的成就被另一轨记为减分。三者都占了「二」这个字，都停在没有负交叉外部性的地方。</p>
+</section>
+
+<section class="chapter" id="ch5">
+<div class="ch-head"><div class="ch-label">五</div><div class="ch-title">三套互斥双轨：学生·教师·家长</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<p>转轨抽税不完全由学生承担。它在同一个结构里还制造两类次生焦虑——教师焦虑与家长焦虑。这不是三个相互独立的痛苦，而是同一台结构机器上三个不同位置的受迫振动。分开看各自都无处下药，合起来看它们共享一个源。</p>
+
+<p><b>教师：目证焦虑与免责之格的空缺。</b>教师不缺方向——他在现场目击学生在哪一步失去了什么：看见学生在标准答案前不敢提「没有答案的问题」，看见一个学生的眼睛在某个瞬间亮起来、又被评分表按下去。但这个「看见」无法进入制度可证明的范畴：他不能把「我看见他的问题感长出来了」写进绩效，不能凭感觉给分，更不能对职业共同体说「我今天最重要的工作是让学生暴露了不会」。这形成教师的双重否定——他不能证明自己看见了，而「看见」这件事又在否定他所做的一切可证明的事（批卷、填表、完成审核）。站内文献《教育者的目证焦虑》已精确指认这一机制：教育者面对学生真实的认知发生时，因无法把「我看见了他的发生」转化为可评价的教学行动而产生存在感晃动，却以介入、命名、评价为在场提供可证明的痕迹，最终在无意中闭合了本应保持开放的学生缺口。其后果是：教师也在做互斥双轨劳动——他的教育判断在评价中分文不值，而他的可评价行为反噬他的判断。</p>
+
+<p><b>家长：关心被转码为监视劳动。</b>家长的处境更具欺骗性。表面上，家长焦虑是「为孩子未来忧虑」这种人人都有的角色焦虑；但 AI 时代它有一个被忽视的结构异变——被技术工具系统性地<b>转码</b>为监视劳动。站内文献《从监工到隐身》追踪过这个转码闭环：家长输入的是关心，界面返回的是一整套比较排序与未完成清单——在同一个操作瞬间，「查看孩子的学习状况」与「确认自己在同龄家长中的位置」被做成了同一个动作。这不是善恶判断，是交互设计的结构性事实：教育监控产品为了留存，必须持续制造「还差一点」的状态，否则用户就没有下一次打开的理由。家长的关心需要出口，而今日教育现场不为「非监控式关心」提供任何制度化接口，选择只有两个：退化为旁观（不被承认、自己也不安），或拿起监控工具（被转码为劳动）。这是家长的互斥双轨。</p>
+
+<p>由此可给出一个全景判断：<b>学生</b>在旧文凭轨道与新能力轨道之间互斥，<b>教师</b>在教育的看见与可证明的教学动作之间互斥，<b>家长</b>在关心的本义与关心被转码成的监控劳动之间互斥。三套互斥双轨，是同一个转轨在三个位置上的不同旋转。因此补救不能按三套分别配药——给教师做心理支持只是让最痛的刀口暂时不流血，给家长提供「非监控的关心工具」会在下一轮被平台重新转码，给学生减负只是让他在空闲里更直接地面对无方向感。要动的不是三套疼痛，是那个产生疼痛的共源：转轨成本没有承担者。</p>
+</section>
+
+<section class="chapter" id="ch6">
+<div class="ch-head"><div class="ch-label">六</div><div class="ch-title">稳态与破局：裂隙为何在雇主内部</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<p>互斥双轨给每个个体都施加显性代价，但在制度层面它是一种稳态——不仅没崩溃，反而被三方持续加固。这里的机理需要慎读，它承接协调博弈与制度变迁的既有工具（Schelling, 1978；North, 1990），但补上一个方向性的预测。</p>
+
+<p><b>三方恐惧循环。</b>雇主端：企业主体并不愿率先改用能力证据替代学历——不是能力证据没有预测力，而是 HR 的职业安全依赖一个可辩护的筛选程序。当候选人的优劣未来无法用绩效反推，「你应该预见到他不行」的指控随时可能落在 HR 头上，此时引用学历是最安全的事，即使学历的信号熵已经衰减，在防守意义上它仍有效。学校端：学校售卖的不是教育而是认证，只要家长愿为认证预付学费，学校就没有动机改造教学——教学改造意味着在教师评价、课程学分、考试机制的连锁修改中承担巨大内部摩擦，没有哪个校长会在生源没下降时主动拆自己的承重墙。家庭端：家庭是信号最敏感的读取者，它无力独立判断哪条新轨道可靠，只能看别人怎么选；当别的家庭都还在旧轨道上押注时，任何单独转向都构成不可接受的风险暴露，于是每个家庭都在已贬值的资产上追加投入，等待一个别人的信号。这是一个由恐惧维护的均衡：三方都怕自己成为唯一先动的人。</p>
+
+<p><b>裂隙为何必然出现在雇主内部。</b>三方恐惧循环有一个结构上的不均匀点：雇主不是一个行为者，而是数量最庞大的职业群体，其内部生死线上的感受完全不同。一个百年高校不在乎文凭信用迟几年衰亡，一个创业公司招错一个「高学历却无战力」的人可能当场死亡；小团队没有 HR 层级，老板亲自判断能力，对招聘失误 100% 承重。因此，最先敢甩开学历、用能力证据录用人的，必然是这些人——他们也已经在这么做，只是数量、规模、声量还在缓慢积蓄。<b>一旦出现第一组公开的对比数据</b>——团队在放弃学历预筛后人效上升、淘汰成本下降——维持稳态的风险计算就出现裂缝。这里要请出临界—级联的机制：Schelling（1978）给了临界点的思路，Granovetter（1978）的阈值模型给了更精确的机制——每个行为者有各自的转向阈值（需要看到多少同类先动才肯动），一旦最低阈值者被数据触发，就可能沿阈值分布逐个引爆。数据是唯一能让家长、学生乃至学校重新评估风险的东西：在那之前，所有「学历不值钱了」的论述都只是意见；在那之后，一个对比组就能撬动整个信息场。所以本文认为破局顺序不是观念先改、也不是政策先改，而是<b>雇主内部小团队的数据先泄露</b>。</p>
+
+<p><b>与「身份隔离先崩」的次序之争。</b>此处须排除一个更常见的候选解释：有人会预测身份隔离先瓦解——名校的符号价值先崩盘，文凭信用随后塌。本文的异议是，这个顺序在结构上不可能。身份隔离不是文凭信用的原因，而是它的下游：圈子令人挤，不是因为人们爱圈子，而是因为好位置先分配到圈内；职业筛选是上游，身份圈层是下游。只要就业市场的主筛选仍按学历运行，身份隔离就会持续吸收新申请者。正确顺序只可能是：<b>就业筛选分化 → 对比数据公开 → 家庭转向 → 报考分流 → 信用出血 → 身份隔离松懈。</b>这一顺序本身就是一个可证伪预测：若观测到某地区身份贬值先于雇主筛选用法的变化，本框架需重大修正。</p>
+</section>
+
+<section class="chapter" id="ch7">
+<div class="ch-head"><div class="ch-label">七</div><div class="ch-title">一次自然实验的裁决：双减</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<p>本文的核心预测里，最值钱、也最该被拿去枪毙的一句是：<b>在互斥双轨结构不变的条件下，单边减负不降焦虑，甚至升高最优绩层的焦虑。</b>所有减负政策的信念基础恰好相反——它们假设焦虑是负担的增函数，去掉一部分负担焦虑就该下降。这两条预测是对立的、可裁决的。而我们手上正好有一次现成的自然实验：中国的「双减」。</p>
+
+<p>双减在结构上正是一次<b>单边减负、评价不变</b>的干预：它大幅削减校内作业与校外学科培训的负担（去掉旧轨道的一部分任务量），而中考、高考这条评价轴——即两轨之间那个否定关系所悬附的地方——原封未动。按负担论，减负应当带来焦虑普降；按互斥双轨论，减负只去掉一条轨的任务量、不去掉两轨的否定关系，焦虑不该降，且任务量下降后，剩下的投入在评价轴上被否定的痕迹反而更暴露、更容易被感觉到。两条预测在这里正面相撞。</p>
+
+<div class="card"><div class="h">裁 决 结 果</div><p>已发表的实证与本文预测同向，与负担论相反。对双减前后家长教育焦虑变化的分析报告了一个分裂的结构：负担型的焦虑确有缓解——择校焦虑、由作业管理不当引发的焦虑得到有效化解；但挂在<b>未变的评价轴</b>上的焦虑不降反升——升学焦虑依旧高位，<b>学业成就焦虑成为主要表现形式，学业评价焦虑进一步强化和扩大</b>（《新疆师范大学学报》2022 年第 2 期）。另一项分析直指机制：单纯限制资本的介入并不能从根本上解决家长的教育焦虑，症结在教育系统自身的衔接真空，「不能将改革的成败寄希望于家长的转变，必须以整体的思维推动学校自身的改革」（《广西师范大学学报》2021 年第 12 期）。对城市家长焦虑生成与维持机制的质性研究，进一步描出这套焦虑如何被结构性地再生产而非被减负消解（邓林园等，《教育学报》2024 年第 1 期）。</p></div>
+
+<p>这三条证据合起来，构成对本文核心预测的一次正面通过：<b>去掉一条轨的负担，焦虑并不随之下降；被否定关系所悬附的评价轴一旦不动，挂在它上面的焦虑反而强化、扩大。</b>这正是「焦虑 = f(μ)、不随单轨任务量下降」在真实政策数据上的表现。</p>
+
+<p><b>诚实记账：这次真跑没有做完，也不该假装做完。</b>上述证据主要落在<b>家长</b>焦虑上，而非学生本人；测的是焦虑的<b>类别</b>（择校／升学／学业评价）此消彼长，而非同一把量表在学生身上的均值与<b>分层</b>变化。因此它对本文预测的支持是强的、但不是终判的。要把这条预测钉死，还需要一项本文尚未执行、但设计明确的研究——也正是它最可能被驳倒的地方：<b>用同一把已验证的学生焦虑量表，在「减负但评价不变」与「减负且评价改制」两类学校之间做纵向对照，并按成绩分层。如果在评价不变的一侧，最优绩层学生的焦虑在减负后显著下降，本文的核心预测即被证伪。</b>这条研究是本文最便宜、也最危险的下一步。找到那条能驳倒它的数据，比再找八条支持它的更有用。</p>
+</section>
+
+<section class="chapter" id="ch8">
+<div class="ch-head"><div class="ch-label">八</div><div class="ch-title">证伪条件与可裁决判据</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<p>本文不做不可错的宣称。它在如下三点提供可检验的后果。</p>
+<p><b>证伪条件一（针对单边减负）。</b>预测：在互斥双轨结构不变时，任意执行任务量单边减负，学生焦虑均值不降反升或持平，最优绩层上升。<b>本条已对中国双减自然实验做过一次裁决，结果与预测同向</b>（第七节）；若后续多项以学生为对象、按成绩分层的减负实验显示焦虑明显下降，则本假说作废。</p>
+<p><b>证伪条件二（针对置换能力证据）。</b>预测：若制度改革允许能力证据替代相当比例的学分或绩点（即部分拆除旧轨道的强制流通），学生焦虑显著下降，且降幅大于任何减负政策。此预测在不同学校间形成天然对照；若证据置换实施后焦虑不降，则本假说作废。</p>
+<p><b>证伪条件三（针对雇主分化）。</b>预测：第一批公开「放弃学历预筛」且有良好绩效数据的团队，将集中在没有 HR 层级、决策者亲自把关的人群里；若首例出现在建制完整的大企业，则本框架对机制的理解有误。</p>
+<p>此外，第六节末尾给出一条次序型证伪：若身份贬值先于雇主筛选用法的变化被观测到，本框架需重大修正。</p>
+</section>
+
+<section class="chapter" id="ch9">
+<div class="ch-head"><div class="ch-label">结</div><div class="ch-title">加大正确答案供给解决不了的处境</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<p>本文所做的，是把学生的日常痛苦翻译成一个可分析的结构问题。学生不是不努力，不是太挑剔，更不是新一代的脆弱。他的可悲之处在于，他被要求同时为两个彼此否认对方的未来工作，而这一互斥的结构不来自他的任何选择。转轨抽税的本质，是分担机制的丧失：技术的冲击先到，制度的转轨后至，而中间的真空期，由一个退出弹性趋近于零、因而议价权也趋近于零的群体，以身体和心灵买单。</p>
+<p>那么谁该负责？答案不落在任何道德主体上，而落在结构的调节能力上。<b>旧文凭必须被给予一个官方的死亡证明，新能力必须被给予一个官方的出生证明，二者必须指向同一条时间轴。</b>在那之前，焦虑不会消失——但对结构有悟的人，至少可以先从互斥双轨里退一步，停止把「自己不该这样焦虑」再叠加成第二层焦虑。</p>
+<p>若问下一步从哪里开始，本文的答案是：从小团队入口开始。第一个用「不可伪造的过程记录」替代学历招聘的雇主，不需要是英雄，只需要把招聘漏斗的旧筛子换成一个新零件。这个零件一旦被看到，就会流传。</p>
+<p class="jing">这是一个加大正确答案供给解决不了的处境；<br>它只能靠把一条轨道正式送葬、把另一条轨道正式接生来解决。</p>
+<p class="ba">附记 · 本文是《焦虑的货币：AI 时代大学里，最优秀的学生为什么最焦虑》的姊妹篇。前者从「身份货币贬值」入手，是这一现象的散文式诊断；本文从「转轨成本的归宿」入手，给同一现象一个可推导、可证伪的经济—结构模型。两篇可对读。</p>
+</section>
+
+<section class="chapter" id="ref">
+<div class="ch-head"><div class="ch-label">附</div><div class="ch-title">参考文献</div><div class="ch-orn">◆ ◆ ◆</div></div>
+<div class="refs">
+<p style="text-indent:0;font-size:14.5px;color:#4A4235;margin-bottom:14px">凡本文承重论点，均有文献对位支撑；引不动论点、只作装点的文献一概不列。以下每一条都在正文某一处承力。</p>
+<div class="rg">外文（按作者字母序）</div>
+<p class="rr">Acemoglu, D., &amp; Restrepo, P. (2020). Robots and jobs: Evidence from US labor markets. <em>Journal of Political Economy</em>, 128(6), 2188–2244.</p>
+<p class="rr">Arrow, K. J. (1973). Higher education as a filter. <em>Journal of Public Economics</em>, 2(3), 193–216.</p>
+<p class="rr">Autor, D. H. (2015). Why are there still so many jobs? The history and future of workplace automation. <em>Journal of Economic Perspectives</em>, 29(3), 3–30.</p>
+<p class="rr">Autor, D. H., Levy, F., &amp; Murnane, R. J. (2003). The skill content of recent technological change: An empirical exploration. <em>Quarterly Journal of Economics</em>, 118(4), 1279–1333.</p>
+<p class="rr">Berg, I. (1971). <em>Education and Jobs: The Great Training Robbery</em>. Boston: Beacon Press.</p>
+<p class="rr">Bourdieu, P., &amp; Passeron, J.-C. (1977). <em>Reproduction in Education, Society and Culture</em>. London: Sage.</p>
+<p class="rr">Brynjolfsson, E., &amp; McAfee, A. (2014). <em>The Second Machine Age: Work, Progress, and Prosperity in a Time of Brilliant Technologies</em>. New York: W. W. Norton.</p>
+<p class="rr">Collins, R. (1979). <em>The Credential Society: An Historical Sociology of Education and Stratification</em>. New York: Academic Press.</p>
+<p class="rr">Curran, T., &amp; Hill, A. P. (2019). Perfectionism is increasing over time: A meta-analysis of birth cohort differences from 1989 to 2016. <em>Psychological Bulletin</em>, 145(4), 410–429.</p>
+<p class="rr">Doeringer, P. B., &amp; Piore, M. J. (1971). <em>Internal Labor Markets and Manpower Analysis</em>. Lexington, MA: D. C. Heath.</p>
+<p class="rr">Dore, R. (1976). <em>The Diploma Disease: Education, Qualification and Development</em>. Berkeley: University of California Press.</p>
+<p class="rr">Duffy, M. E., Twenge, J. M., &amp; Joiner, T. E. (2019). Trends in mood and anxiety symptoms and suicide-related outcomes among U.S. undergraduates, 2007–2018. <em>Journal of Adolescent Health</em>, 65(5), 590–598.</p>
+<p class="rr">Festinger, L. (1954). A theory of social comparison processes. <em>Human Relations</em>, 7(2), 117–140.</p>
+<p class="rr">Frey, C. B., &amp; Osborne, M. A. (2017). The future of employment: How susceptible are jobs to computerisation? <em>Technological Forecasting and Social Change</em>, 114, 254–280.</p>
+<p class="rr">Granovetter, M. (1978). Threshold models of collective behavior. <em>American Journal of Sociology</em>, 83(6), 1420–1443.</p>
+<p class="rr">Hacker, J. S. (2006). <em>The Great Risk Shift: The Assault on American Jobs, Families, Health Care, and Retirement</em>. New York: Oxford University Press.</p>
+<p class="rr">Kerr, S. (1975). On the folly of rewarding A, while hoping for B. <em>Academy of Management Journal</em>, 18(4), 769–783.</p>
+<p class="rr">Lazarus, R. S., &amp; Folkman, S. (1984). <em>Stress, Appraisal, and Coping</em>. New York: Springer.</p>
+<p class="rr">North, D. C. (1990). <em>Institutions, Institutional Change and Economic Performance</em>. Cambridge: Cambridge University Press.</p>
+<p class="rr">Ryan, R. M., &amp; Deci, E. L. (2000). Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being. <em>American Psychologist</em>, 55(1), 68–78.</p>
+<p class="rr">Schelling, T. C. (1978). <em>Micromotives and Macrobehavior</em>. New York: W. W. Norton.</p>
+<p class="rr">Spence, M. (1973). Job market signaling. <em>Quarterly Journal of Economics</em>, 87(3), 355–374.</p>
+<p class="rr">Twenge, J. M., Joiner, T. E., Rogers, M. L., &amp; Martin, G. N. (2018). Increases in depressive symptoms, suicide-related outcomes, and suicide rates among U.S. adolescents after 2010 and links to increased new media screen time. <em>Clinical Psychological Science</em>, 6(1), 3–17.</p>
+<p class="rr">van de Werfhorst, H. G. (2011). Skills, positional good or social closure? The role of education across structural–institutional labour market settings. <em>Journal of Education and Work</em>, 24(5), 521–548.</p>
+<div class="rg">中文（站内文献与双减实证）</div>
+<p class="rr">王德生. 《SIO 教育学修订文库》. SDE Universes.</p>
+<p class="rr">王德生. 《SIO 心理学》. 德麦国际专著, SDE Universes.</p>
+<p class="rr">王德生. 《意义三律入门》. 德麦国际专著, SDE Universes.</p>
+<p class="rr">王德生. 《SIO 膨胀律与 AI 典范转移：从 AGI 到 AEI——〈内卷与突围〉第 2 章》. SDE Universes.</p>
+<p class="rr">《教育者的目证焦虑》. SDE Universes 站内篇目.</p>
+<p class="rr">《从监工到隐身》. SDE Universes 站内篇目.</p>
+<p class="rr">「双减」政策背景下如何安放家长的教育焦虑——基于幼小衔接的分析. 《广西师范大学学报（哲学社会科学版）》, 2021 年第 12 期.</p>
+<p class="rr">「双减」背景下家长的教育焦虑及消解路径. 《新疆师范大学学报（哲学社会科学版）》, 2022 年第 2 期.</p>
+<p class="rr">邓林园, 唐逸文, 王婧怡, 李蓓蕾. 我国城市中小学生家长教育焦虑生成与维持机制的质性研究. 《教育学报》, 2024 年第 1 期.</p>
+</div>
+</section>
+
+</div></article>
+<div class="endbox">
+  <p>旧文凭必须被给予一个官方的死亡证明，<br>新能力必须被给予一个官方的出生证明，<br>二者必须指向同一条时间轴。</p>
+  <p style="color:#8C7E5E;font-size:13px;letter-spacing:0.16em">AI时代的新教育 · 王德生</p>
+</div>
+<footer>
+爱思乐园 SDE Universes · <a href="/new-education/">AI时代的新教育</a> · <a href="/column/currency-of-anxiety/">姊妹篇：焦虑的货币</a><br>
+<a href="/browse/">全部栏目</a> · <a href="/today/">今日文章</a> · <a href="/search/">全站检索</a>
+</footer>
+</body>
+</html>
