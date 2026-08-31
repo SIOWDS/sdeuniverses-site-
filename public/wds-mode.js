@@ -4332,7 +4332,11 @@
         .then(function (j) {
           if (j && j.ok) { kres.style.color = "#8ED0D0"; kres.textContent = t("testOk") + j.model; return; }
           var why = ({ bad_key: t("testBadKey"), no_credit: t("testNoCredit"), bad_model: t("testBadModel"), net: t("testNet") })[j && j.code] || (t("testFail") + ((j && j.status) || "?"));
-          kres.style.color = "#E8A8A0"; kres.textContent = why;
+          // 上游原话必须显出来：只报「没通 · 400」等于把唯一的线索藏起来——接新基底那天，
+          // 差的就是这一句（是型号不对、参数不认、还是账户没开通，全在这段字里）。
+          var raw = "";
+          try { raw = String((j && j.msg) || "").replace(/\s+/g, " ").trim(); } catch (e) {}
+          kres.style.color = "#E8A8A0"; kres.textContent = why + (raw ? " · " + raw.slice(0, 200) : "");
         })
         .catch(function (e) { kres.style.color = "#E8A8A0"; kres.textContent = t("testNet"); });
     };
