@@ -1625,7 +1625,7 @@
       cpOn: "已把前 {n} 轮压成账本", cpView: "看账本", cpTitle: "本场账本", cpBusy: "正在压缩前情…",
       cpNote: "更早的对话已经压成下面这份账本随每一问带上（原文不再上送）。压缩用的是你自己的 Key。",
       imgSee: "直接看图", imgNo: "当前基底看不了图", imgOcr: "改用本机 OCR 转文字", imgOcrGo: "正在识别…",
-      imgHint: "能看图的是 智谱 GLM / 千问 Qwen / Kimi；DeepSeek 与 MiniMax 在本站的接口下只能读文字。",
+      imgHint: "能看图的是 智谱 GLM / 千问 Qwen / Kimi / Claude / GPT；DeepSeek 与 MiniMax 在本站的接口下只能读文字。",
       tlMap: "结构图", tlMapS: "把这一问里的结构画成图（落在右侧画布里），并说清哪条边最承重",
       tlGenesis: "发生场", tlGenesisS: "不答题，先布一场发生：摆料、上张力，交出五到八条自带分岔与作废条件的候选分辨",
       lnkBtn: "🔗 链接", lnkTip: "贴一个网址，把那一篇读进来当附件（本站只抓正文，不带你的任何凭证）",
@@ -1774,7 +1774,7 @@
       cpOn: "First {n} turns compacted into a ledger", cpView: "View ledger", cpTitle: "Session ledger", cpBusy: "Compacting earlier turns\u2026",
       cpNote: "Earlier turns are now carried as this ledger instead of raw text. Compaction runs on your own Key.",
       imgSee: "seen directly", imgNo: "this model can't see images", imgOcr: "run local OCR instead", imgOcrGo: "reading\u2026",
-      imgHint: "Vision works with Zhipu GLM / Qwen / Kimi; DeepSeek and MiniMax are text-only on this site.",
+      imgHint: "Vision works with Zhipu GLM / Qwen / Kimi / Claude / GPT; DeepSeek and MiniMax are text-only on this site.",
       tlMap: "Structure map", tlMapS: "Draw the structure behind this question (renders on the canvas) and say which edge carries the weight",
       tlGenesis: "Genesis field", tlGenesisS: "Stage a genesis instead of answering: lay out the stock, set up the clash, deliver 5-8 candidate distinctions each with its fork and kill condition",
       lnkBtn: "🔗 Link", lnkTip: "Paste a URL and this page is pulled in as an attachment (text only, no credentials sent)",
@@ -2533,7 +2533,7 @@
     if (window.WDSMemo) { go(); return; }
     if (!document.head || !document.head.appendChild) return;   // 桩环境/异常页面：静默降级，绝不抛
     var sc = document.createElement("script");
-    sc.src = "/assets/wds-memo.js?v=20260901a"; sc.async = true;
+    sc.src = "/assets/wds-memo.js?v=20260831a"; sc.async = true;
     sc.onload = go; sc.onerror = function () {};
     document.head.appendChild(sc);
   }
@@ -3362,7 +3362,7 @@
     atts.forEach(function (d) { if (d.img) out.push({ n: d.name, d: d.img }); });
     return out.slice(0, 4);
   }
-  function visionOk(v) { return v === "glm" || v === "qwen" || v === "kimi"; }
+  function visionOk(v) { return v === "glm" || v === "qwen" || v === "kimi" || v === "cl" || v === "gpt"; }
   function docsForQuery(q) {
     var atts0 = atts;
     atts = atts.filter(function (d) { return !d.img && d.text; });   // 图不进文档预算
@@ -4342,7 +4342,10 @@
      ds/glm 沿用旧键名（金点子发生器等其它工具也读这两个），新三家另起键名。
      mmcn（MiniMax 国内）2026-08-29 加：域名（api.minimaxi.com，比国际多一个 i）与账号
      体系跟国际站完全独立，Key 不互通，所以按「另一条基底身份」接，不是给 mm 加个开关——
-     那样切换时要连 Key／型号覆盖／心得缓存一起清，比单独一条身份更容易出错。 ── */
+     那样切换时要连 Key／型号覆盖／心得缓存一起清，比单独一条身份更容易出错。
+     cl（Claude）与 gpt（GPT）2026-09-01 加：都由 Worker 服务端转发各自的 OpenAI 兼容口，
+     两家的请求体差别（gpt 只认 max_completion_tokens、Claude 的 temperature 上限 1.0）在后端
+     wdsUpFix 一处抹平，前端除了多两条身份之外什么都不用管。 ── */
   var VENDORS = [
     { v: "ds", name: "DeepSeek", ks: "sde_ds_key", apply: "https://platform.deepseek.com" },
     { v: "glm", name: "智谱 GLM", ks: "sde_glm_key", apply: "https://open.bigmodel.cn" },
@@ -4350,6 +4353,8 @@
     { v: "qwen", name: "千问 Qwen", ks: "sde_qwen_key", apply: "https://bailian.console.aliyun.com" },
     { v: "mm", name: "MiniMax", ks: "sde_mm_key", apply: "https://platform.minimax.io" },
     { v: "mmcn", name: "MiniMax（国内）", ks: "sde_mmcn_key", apply: "https://platform.minimaxi.com" },
+    { v: "cl", name: "Claude", ks: "sde_cl_key", apply: "https://platform.claude.com" },
+    { v: "gpt", name: "GPT", ks: "sde_gpt_key", apply: "https://platform.openai.com" },
   ];
   function vinfo(v) { for (var i = 0; i < VENDORS.length; i++) if (VENDORS[i].v === v) return VENDORS[i]; return VENDORS[0]; }
   function vkeyGet(v) { try { return (localStorage.getItem(vinfo(v).ks) || "").trim(); } catch (e) { return ""; } }

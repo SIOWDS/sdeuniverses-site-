@@ -290,7 +290,7 @@
     if (window.WDSMemo) { umEngine(); if (then) then(); return; }
     if (!document.head || !document.head.appendChild) { if (then) then(); return; }   // 没法加载就静默降级，绝不抛
     var sc = document.createElement("script");
-    sc.src = "/assets/wds-memo.js?v=20260901a"; sc.async = true;
+    sc.src = "/assets/wds-memo.js?v=20260831a"; sc.async = true;
     sc.onload = function () { umEngine(); if (then) then(); };
     sc.onerror = function () { if (then) then(); };
     document.head.appendChild(sc);

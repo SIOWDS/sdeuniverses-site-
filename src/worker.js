@@ -335,7 +335,9 @@ export class VisitCounter {
 // ⚠️ kimi 深度档一度写成 kimi-k3 —— Kimi 平台的模型表里**没有**这个名字（2026-07-31 实查：
 //    现存 kimi-k2.7-code / kimi-k2.7-code-highspeed / kimi-k2.6 / kimi-k2.5；下线的是 kimi-k2-*-preview 那一批）。
 //    发一个不存在的型号＝这家深度档一直在 400。改回 k2.6（Kimi 自己标的"迄今最智能"）。
-const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3" };
+/* 2026-09-01 加 Claude 与 GPT 两家（见 WDS_VENDORS 的头注释）。深度档取各自的旗舰：
+   claude-opus-5（Anthropic 当前最强）／gpt-5.6-sol（OpenAI 旗舰，别名 gpt-5.6）。 */
+const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3", anthropic: "claude-opus-5", openai: "gpt-5.6-sol" };
 function wdsTopVC(vd) {
   const base = WDS_VENDORS[vd];
   return { url: base.url, model: WDS_TOP_MODEL[vd] || base.model, name: base.name, top: 1 };
@@ -366,7 +368,7 @@ const WDS_TOK_LADDER = [WDS_TOK_MAX, 32000, 12000];
 //   宁可保守，也不要拿一个没核过的数去换 400。哪家核实了再往这里加，并在这行注明核实日期。
 //   ⚠ 上限不是目标：本文件通篇记着「预算是油门不是容器」。这张表只决定**阶梯的第一档能有多高**，
 //   真正的刹车仍然是那三样：早于平台的时钟、阶梯降档、关思考兜底重跑。
-const WDS_TOK_CAP = { deepseek: 384000 };   // 2026-08-13 核实：官方文档「最大输出 384K」
+const WDS_TOK_CAP = { deepseek: 384000, openai: 128000 };   // 2026-08-13 核实 DeepSeek「最大输出 384K」；2026-09-01 核实 gpt-5.6 系「Max output 128K / 上下文 1.05M」
 function wdsTokCap(VC) {
   const u = String((VC && VC.url) || "");
   for (const vd in WDS_TOK_CAP) {
@@ -400,6 +402,40 @@ function wdsLadder(VC, want) {
 // 一律返回 [64000,32000,12000]；那是既有几个调用点依赖着的行为，不在本次射程内，所以不动它，
 // 而是让需要"非满功率也按自己的预算走阶梯"的调用方（askCore 的 iq 档）把阶梯直接递进来。
 // plain：显式关思考。与满预算一起用，就是「预算全归正文」那一档——长文实测唯一稳定的形态。
+/* 【上游口径适配 —— 只为 Claude 与 GPT 这两家】
+   五家国产基底的 OpenAI 兼容口径彼此一致，于是本文件通篇按「一份 body 走天下」写，
+   十六处直接打上游的 fetch 各自现拼 body。2026-09-01 接这两家时撞上的差别不是风格问题，是当场 400：
+   ① gpt-5.x 在 chat/completions 上**不认 max_tokens**（只认 max_completion_tokens），
+      temperature / top_p / penalty 也一概报错而不是忽略；
+   ② Anthropic 兼容层的 temperature 上限 1.0，且不吃 stream_options 这类 OpenAI 扩展字段。
+   逐处去改十六个拼 body 的地方，必然漏一处、而漏掉的那一处只会在某个功能上悄悄 400。
+   所以统一收口：**凡打厂商的 fetch 一律走 wdsUp**，差别只在 wdsUpFix 里改一次。
+   非这两家的 URL 原样透传（连 body 都不解析），对现有五家零行为变化。 */
+function wdsUpFix(u, body) {
+  if (u.indexOf("api.openai.com") >= 0) {
+    if (body.max_tokens != null && body.max_completion_tokens == null) body.max_completion_tokens = body.max_tokens;
+    delete body.max_tokens;
+    delete body.temperature; delete body.top_p; delete body.presence_penalty; delete body.frequency_penalty;
+    // 那十六处里有一半不经过 wdsTopBody/wdsPlainBody（各自现拼 body），给它们一个明确的默认档：
+    // 不写这一句就是官方默认 medium——推理 token 照吃预算，而调用方以为自己要的是「快答一句」。
+    if (body.reasoning_effort == null) body.reasoning_effort = "low";
+  } else if (u.indexOf("api.anthropic.com") >= 0) {
+    if (typeof body.temperature === "number" && body.temperature > 1) body.temperature = 1;
+    delete body.stream_options; delete body.reasoning_effort;
+  }
+  return body;
+}
+function wdsUp(url, init) {
+  const u = String(url || "");
+  if (u.indexOf("api.openai.com") >= 0 || u.indexOf("api.anthropic.com") >= 0) {
+    try {
+      if (init && typeof init.body === "string" && init.body.charAt(0) === "{") {
+        init = Object.assign({}, init, { body: JSON.stringify(wdsUpFix(u, JSON.parse(init.body))) });
+      }
+    } catch (e) {}   // 解析不了就原样发：适配失败可以是一次 400，不能是把请求吃掉
+  }
+  return fetch(url, init);
+}
 async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage, ladderOverride, plain) {
   const ladder = (ladderOverride && ladderOverride.length) ? ladderOverride : wdsLadder(VC, want);
   let resp = null;
@@ -408,7 +444,7 @@ async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage, l
     // 让上游随流回报用量：空产出时这是唯一能说清"到底喂进去多少、吐出来多少"的证据。
     // 只在调用方明确要时才加——有的家不认这个字段，加了反而 400。
     if (stream && withUsage) body.stream_options = { include_usage: true };
-    resp = await fetch(VC.url, {
+    resp = await wdsUp(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
       body: JSON.stringify(plain ? wdsPlainBody(VC, body) : wdsTopBody(VC, body)),
@@ -497,6 +533,9 @@ function wdsPlainBody(VC, body) {
   if (u.indexOf("api.deepseek.com") >= 0) body.thinking = { type: "disabled" };
   else if (u.indexOf("open.bigmodel.cn") >= 0) body.thinking = { type: "disabled" };
   else if (u.indexOf("dashscope.aliyuncs.com") >= 0) body.enable_thinking = false;
+  // gpt-5.x 是推理模型，关思考不是布尔开关而是投入档的最低档：reasoning_effort="none"（合法值 none/low/medium/high/xhigh/max）。
+  // Claude 走的是 Anthropic 的 OpenAI 兼容层，那一层不暴露思考开关——所以它不在 wdsCanPlain 里，plain 对它是空指令。
+  else if (u.indexOf("api.openai.com") >= 0) body.reasoning_effort = "none";
   return body;
 }
 /* 【MiniMax 的思考默认混在正文里回来 —— 2026-08-29 用户实测「回答有重复」的病灶】
@@ -526,7 +565,8 @@ function wdsCanPlain(VC) {
   const u = String((VC && VC.url) || "");
   return u.indexOf("api.deepseek.com") >= 0
       || u.indexOf("open.bigmodel.cn") >= 0
-      || u.indexOf("dashscope.aliyuncs.com") >= 0;
+      || u.indexOf("dashscope.aliyuncs.com") >= 0
+      || u.indexOf("api.openai.com") >= 0;   // reasoning_effort="none"，见 wdsPlainBody
 }
 function wdsTopBody(VC, body) {
   wdsMiniSplit(VC, body);   // 放在 top 闸之前：标准档也要带（见 wdsMiniSplit 头注释）
@@ -543,7 +583,14 @@ function wdsTopBody(VC, body) {
     body.thinking = { type: "enabled" };
   } else if (u.indexOf("dashscope.aliyuncs.com") >= 0) {
     body.enable_thinking = true;               // 千问用的是这个名字，不是 thinking
+  } else if (u.indexOf("api.openai.com") >= 0) {
+    // gpt-5.6 的投入档名字与合法值跟 DeepSeek 只差一个档（多了 none/medium/xhigh），所以 VC.effort 原样透传。
+    // 默认给 high 不给 max：推理 token 与正文吃同一份 max_completion_tokens，而这一家是新接的、
+    // 站上还没有它「想到被掐死」那条曲线的真数据——先按 DeepSeek 那条教训保守一档，量过再说。
+    body.reasoning_effort = (VC && VC.effort) ? VC.effort : "high";
+    delete body.temperature; delete body.top_p;
   }
+  // Claude（Anthropic 兼容层）：思考不在这一层暴露，什么都不加——同 Kimi/MiniMax 那条口径。
   // Kimi K3 与 MiniMax M2.x/M3：思考常开、无开关参数，塞了反而可能被判非法字段——什么都不加。
   return body;
 }
@@ -590,6 +637,13 @@ function wdsMMFlush(st) {
    模型名两边一致（MiniMax-M3／M2.7 等，官方文档同名），只有 url／申请入口不同，所以按「另一个
    基底身份」接（短码 mmcn），不是给 minimax 那一条加分支——两边独立缓存心得、独立存 Key，
    互不覆盖，也互不依赖对方是否配置过。 */
+/* 【2026-09-01 加 Claude 与 GPT】两家都走各自的 OpenAI 兼容 chat/completions，仍由 Worker 服务端转发。
+   · Claude：Anthropic 官方兼容层，base 就是 https://api.anthropic.com/v1/，Bearer 认证，型号名用 Anthropic 自己的
+     （claude-opus-5 / claude-sonnet-5）。它是**兼容层不是原生**：思考、prompt caching、PDF 这些拿不到，
+     纯文本对话与看图够用。Anthropic 侧 temperature 上限是 1.0（OpenAI 是 2.0）——超了会 400，见 wdsUpFix。
+   · GPT：gpt-5.6 系（sol 旗舰 / terra 均衡 / luna 便宜）。**推理模型在 chat/completions 上不认 max_tokens**，
+     只认 max_completion_tokens，temperature/top_p/penalty 一律报错不是忽略——同样在 wdsUpFix 里一次性抹平。
+   两家都不需要读者过 CORS（服务端转发），所以不必像浏览器直连那样另配测试页。 */
 const WDS_VENDORS = {
   deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-flash", name: "DeepSeek", apply: "platform.deepseek.com" },
   zhipu: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5-air", name: "\u667a\u8c31 GLM", apply: "open.bigmodel.cn" },
@@ -597,6 +651,8 @@ const WDS_VENDORS = {
   qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen", apply: "bailian.console.aliyun.com" },
   minimax: { url: "https://api.minimax.io/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax", apply: "platform.minimax.io" },
   minimax_cn: { url: "https://api.minimaxi.com/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax\uff08\u56fd\u5185\uff09", apply: "platform.minimaxi.com" },
+  anthropic: { url: "https://api.anthropic.com/v1/chat/completions", model: "claude-sonnet-5", name: "Claude", apply: "platform.claude.com" },
+  openai: { url: "https://api.openai.com/v1/chat/completions", model: "gpt-5.6-terra", name: "GPT", apply: "platform.openai.com" },
 };
 // ── 看图（视觉档）。**只有这三家**在本站的转发口径下能直接吃图；DeepSeek / MiniMax 走不了，
 //    读者选了它们又传图，我们如实说一句「这家看不了图」，绝不拿 OCR 出来的字冒充"它看过了"。
@@ -1510,6 +1566,10 @@ const WDS_VISION = {
   zhipu: ["glm-5v", "glm-4.6v"],
   qwen: ["qwen-vl-max", "qwen3-vl-plus"],
   kimi: ["kimi-k2.6", "moonshot-v1-32k-vision-preview"],
+  // 2026-09-01：Claude 与 GPT 两家的当代型号都吃 OpenAI 式 image_url（含 base64 data URL），
+  // 所以看图不必另挑视觉专用型号，退一格给同系的另一个型号即可。
+  anthropic: ["claude-sonnet-5", "claude-opus-5"],
+  openai: ["gpt-5.6-terra", "gpt-5.6-sol"],
 };
 function wdsVisionLadder(vd, want) {
   const base = WDS_VISION[vd] || [];
@@ -1617,12 +1677,15 @@ function reflectLite(txt, cap) {
    WDS_PLATFORM_FALLBACK=false ⇒ 没带 Key 就如实说，不拿平台的钱替他答；
    改成 true 即恢复旧行为（平台兜底），一行可切。 */
 const WDS_PLATFORM_FALLBACK = false;
-const WDS_VD_ALIAS = { ds: "deepseek", glm: "zhipu", deepseek: "deepseek", zhipu: "zhipu", kimi: "kimi", qwen: "qwen", minimax: "minimax" };
+const WDS_VD_ALIAS = { ds: "deepseek", glm: "zhipu", deepseek: "deepseek", zhipu: "zhipu", kimi: "kimi", qwen: "qwen", minimax: "minimax",
+  cl: "anthropic", claude: "anthropic", anthropic: "anthropic", gpt: "openai", openai: "openai" };
 function wdsByok(raw) {
   try {
     if (!raw || typeof raw !== "object") return null;
     const k = String(raw.key || "").trim();
-    if (k.length < 8 || k.length > 200) return null;
+    // 上限原为 200：sk-ant-… 与 sk-proj-… 这两家的 Key 本身就一百六七十位，遇到带组织前缀的会顶到 200 以上，
+    // 于是一把好 Key 被我们自己判成「格式无效」。2026-09-01 抬到 300（仍是防呆，不是防攻击）。
+    if (k.length < 8 || k.length > 300) return null;
     const vd = WDS_VD_ALIAS[String(raw.vendor || "ds").toLowerCase()];
     if (!vd || !WDS_VENDORS[vd]) return null;
     return { key: k, vd: vd };
@@ -1656,9 +1719,10 @@ function wdsPickImgs(list) {
    于是一把好端端的 DeepSeek Key 被发去智谱、上游回 401，而我们告诉读者「你的 Key 用不了」。
    2026-08-19 我自己写探针时就栽在这上面，查了二十分钟才发现是发错了家。
    读者的前端只发短名，但任何别处调这个接口的人都会先想到全名。 */
-const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax", mmcn: "minimax_cn",
-  deepseek: "deepseek", zhipu: "zhipu", glm5: "zhipu", moonshot: "kimi", minimax: "minimax", minimax_cn: "minimax_cn", qwen3: "qwen" };
-const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm", minimax_cn: "mmcn" };
+const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax", mmcn: "minimax_cn", cl: "anthropic", gpt: "openai",
+  deepseek: "deepseek", zhipu: "zhipu", glm5: "zhipu", moonshot: "kimi", minimax: "minimax", minimax_cn: "minimax_cn", qwen3: "qwen",
+  anthropic: "anthropic", claude: "anthropic", openai: "openai" };
+const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm", minimax_cn: "mmcn", anthropic: "cl", openai: "gpt" };
 // LONG_ASK：读者这一问要的是"答一段话"还是"写一篇"？两者对预算与口径的要求完全不同。
 // 不识别它，就会出现最难看的那种失败：读者写"先写 8000 字"，而我们给的 max_tokens 是 8000（约等于 8000 汉字的极限），
 // 同时 system 里还写着"一次两三段以内、别写论文"——两条指令互相打架，基底就在思考里反复权衡、
@@ -3416,7 +3480,7 @@ async function drScan(ctx) {
     try {
       const ctrl = new AbortController();
       const to = setTimeout(() => ctrl.abort(), tier === "deep" ? 90000 : 40000);
-      const resp = await fetch(VC.url, {
+      const resp = await wdsUp(VC.url, {
         method: "POST",
         headers: { "content-type": "application/json", "authorization": "Bearer " + key },
         body: JSON.stringify({ model: VC.model, temperature: 0.6, max_tokens: tier === "deep" ? 1200 : 800, messages: [{ role: "system", content: sys }, ...hist, { role: "user", content: usr + _modeInstr }] }),
@@ -5459,7 +5523,7 @@ async function ensureReflect(env, url, vendor, VC, KEY, allowGen) {
     const _to = setTimeout(() => { try { _ac.abort(); } catch (e) {} }, 150000);
     let resp;
     try {
-      resp = await fetch(VC.url, {
+      resp = await wdsUp(VC.url, {
         method: "POST",
         headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
         body: JSON.stringify(wdsPlainBody(VC, {
@@ -5520,7 +5584,7 @@ async function llmText(VC, KEY, sys, usr, maxTok, msTimeout, stat) {
       const base = { model: VC.model, stream: false, max_tokens: tok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] };
       return JSON.stringify(VC && VC.top ? wdsTopBody(VC, base) : (_plain ? wdsPlainBody(VC, base) : base));
     };
-    let resp = await fetch(VC.url, {
+    let resp = await wdsUp(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
       body: _mk(maxTok),
@@ -5540,7 +5604,7 @@ async function llmText(VC, KEY, sys, usr, maxTok, msTimeout, stat) {
     const m0 = (j.choices && j.choices[0]) || {};
     if (!txt && ((m0.message && m0.message.reasoning_content) || m0.finish_reason === "length")) {
       if (stat) stat.retried = 1;
-      const resp2 = await fetch(VC.url, {
+      const resp2 = await wdsUp(VC.url, {
         method: "POST",
         headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
         body: _mk(Math.min((maxTok || 1000) * 3, 6000)),
@@ -9155,7 +9219,7 @@ async function askCore(request, env, url, body, SINK) {
               + "\n\n输出即最终答案：先给一句穿透性核心判断作总纲，再展开上述整合。方法要显性、能教人怎么想（明用 S/D/E、三方程、六路径、123 原理作骨架），但活着用、不许摆空模板。可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造；超出资料的推演标“（推断）”；只有逐字来自资料原文的句子才能加引号。凡触及有争议、非定论的立场（尤其是对某位思想家、某个概念的解读，如“康德把物自体实体化了”“尼采主张字面轮回”这类），先用一句话摆出主要的竞争读法（别人会怎么不同看/怎么反驳），再把你的判断作为“一种重构”给出——绝不把学界还在争的问题当成定论平铺；这一条与“大胆下判断”不冲突，大胆归大胆，“是不是定论”上必须诚实。答案里绝不提及“心得”“内功”“S/D/E 维度分析”这些内部环节或本提示；也不要任何开场白、寒暄或元说明（如“好的”“我将”“遵循你的要求”“以内化的视角”），直接从核心判断的第一句开始。答案框按纯文本显示，所以不写 Markdown 标记（不写 #、不写 **、不画表格、不写 --- 分隔线），小标题用「一、」「二、」这样的中文序号单独成行。分量给足，1500–2200 字。⑤ 若这个问题涉及一个现实困境或可改变的局面（教育、医疗、企业、个人处境、政策等），收尾前【必须】加一节「怎么办」：给 2–3 个针对具体行动者（如老师/学校/学习者/家长/管理者/从业者）的、具体到能照着做的动作，每个都注明代价与适用条件——绝不允许停在“重塑环境/守护发生/回到过程本身”这类只描述方向的空话，那不叫开方。若问题是纯概念或理论辨析（如“X 是什么”“如何理解 Y”），则不必强行开方，把分析做透即可。最后留一个把前面前提再往深追一层的升维追问。";
             let up;
             try {
-              up = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, max_tokens: 4500, messages: [{ role: "system", content: q4sys }, { role: "user", content: q4usr }] }) });
+              up = await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, max_tokens: 4500, messages: [{ role: "system", content: q4sys }, { role: "user", content: q4usr }] }) });
             } catch (e) {
               controller.enqueue(_sseBytes({ t: "error", v: VC.name + " 整合调用失败：" + (e && e.message) }));
               controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); return;
@@ -10014,7 +10078,7 @@ async function askCore(request, env, url, body, SINK) {
         controller.enqueue(_sseBytes({ t: "status", v: "⚠ 基底这一轮" + _why + "——正在关掉思考重跑一次…" }));
         let r2 = null;
         try {
-          const up2 = await fetch(VC.url, {
+          const up2 = await wdsUp(VC.url, {
             method: "POST",
             headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
             // 关思考之外还要降档：站内既有硬教训是「预算越大，思考拖得越久，越容易被平台
@@ -10704,7 +10768,7 @@ export default {
                 + "② 正文分 " + (PN >= 6 ? "六" : "三") + " 个部分，每部分一个简短小标题 + 充分展开的论证，各部分构成完整论证链（问题的提出 → 逐个核心判断 → 对最强反驳的回应 → 结论与限度），部分之间不重复、层层递进；\n"
                 + "③ 直接从标题写起，不要开场白、不要目录、不要“以下是”之类的话。";
               let upstream;
-              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: WDS_TOK_SAFE, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+              try { upstream = await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: WDS_TOK_SAFE, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
               catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 200);
@@ -11088,7 +11152,7 @@ export default {
             const vbody = { model: VC.model, stream: true, max_tokens: tok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] };
             let up;
             try {
-              up = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, vbody)) });
+              up = await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, vbody)) });
             } catch (e) { return fin8({ t: "error", v: VC.name + " 连接失败：" + ((e && e.message) || "") }); }
             if (!up || !up.ok) {
               const st = up ? up.status : 0;
@@ -12008,7 +12072,7 @@ export default {
                    不会因为一个数字整道断掉。普通问答仍是原来那一发。 */
                 upstream = rsLong
                   ? await wdsFetchMax(VC, KEY, messages, true, tokWant, clk.signal, false, undefined, rsPlain)
-                  : await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(gPlain ? wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages }) : wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
+                  : await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(gPlain ? wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages }) : wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
                 if (upstream.ok || !canSee || vi + 1 >= visLadder.length) break;
                 if (upstream.status !== 400 && upstream.status !== 404) break;
                 let et = ""; try { et = (await upstream.clone().text()).slice(0, 300); } catch (e2) {}
@@ -12138,7 +12202,7 @@ export default {
               try {
                 const up2 = rsLong
                   ? await wdsFetchMax(VC, KEY, messages, true, tok2, clk2.signal, false, undefined, true)
-                  : await fetch(VC.url, {
+                  : await wdsUp(VC.url, {
                   method: "POST",
                   headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
                   body: JSON.stringify(wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: tok2, messages })),
@@ -12568,7 +12632,7 @@ export default {
             const csys = johnComposeSys(ckind, cpart, CK.parts, cper,
               String(cb.prev || "").slice(-800), cctx);
             send({ t: "meta", v: { kind: ckind, part: cpart, parts: CK.parts, label: CK.label } });
-            const up = await fetch(CVC.url, {
+            const up = await wdsUp(CVC.url, {
               method: "POST",
               headers: { "content-type": "application/json", authorization: "Bearer " + ckey },
               // ⚠ 必须显式关思考。第一版没关，实测 56 秒后 reasoning_content 吃光 max_tokens、
@@ -12663,7 +12727,7 @@ export default {
       try {
         const ctrl2 = new AbortController();
         const tm = setTimeout(() => { try { ctrl2.abort(); } catch (e) {} }, 45000);
-        const up = await fetch(NVC.url, {
+        const up = await wdsUp(NVC.url, {
           method: "POST",
           headers: { "content-type": "application/json", authorization: "Bearer " + nkey },
           body: JSON.stringify(wdsPlainBody(NVC, {
@@ -12741,7 +12805,7 @@ export default {
             const jsys = JOHN_SYS + (rag.text ? ("\n\n════ 这一轮的站内材料（原文摘录，可直接引用并给链接）════\n" + rag.text) : "");
             const body = { model: JVC.model, stream: true, max_tokens: jdeep ? WDS_TOK_SAFE : 2600, temperature: 0.7,
                            messages: [{ role: "system", content: jsys }].concat(msgs) };
-            const up = await fetch(JVC.url, {
+            const up = await wdsUp(JVC.url, {
               method: "POST",
               headers: { "content-type": "application/json", authorization: "Bearer " + jkey },
               body: JSON.stringify(jdeep ? wdsTopBody(JVC, body) : wdsPlainBody(JVC, body)),
@@ -12802,7 +12866,7 @@ export default {
       const ctrl = new AbortController();
       const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 25000);
       try {
-        const r = await fetch(WDS_VENDORS[vd].url, {
+        const r = await wdsUp(WDS_VENDORS[vd].url, {
           method: "POST",
           headers: { "content-type": "application/json", authorization: "Bearer " + key },
           body: JSON.stringify({ model, stream: false, max_tokens: 16, messages: [{ role: "user", content: "ping" }] }),
@@ -14801,7 +14865,7 @@ export default {
               const _retryTok = Math.min(16000, SPEC.tok);
               const clk2 = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
               try {
-                const up2 = await fetch(VC.url, {
+                const up2 = await wdsUp(VC.url, {
                   method: "POST",
                   headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
                   // 【2026-08-12 修】原来只是"不走 wdsTopBody"，那只等于没加 reasoning_effort——

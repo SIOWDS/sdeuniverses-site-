@@ -600,7 +600,7 @@ window.WDSM_PAGE = 1;
 window.WDSM_PROFILE = "read";
 </script>
 <script src="/taste/assets/sde-handoff.js?v=20260817c"></script>
-<script src="/wds-mode.js?v=20260831c" defer></script>
+<script src="/wds-mode.js?v=20260901b" defer></script>
 </body>
 </html>
 """
@@ -621,7 +621,7 @@ def _agent_stub(profile, name, title, desc):
         'window.WDSM_PAGE = 1;\n'
         f'window.WDSM_PROFILE = "{profile}";\n</script>\n'
         '<script src="/taste/assets/sde-handoff.js?v=20260817c"></script>\n'
-        '<script src="/wds-mode.js?v=20260831c" defer></script>\n</body>\n</html>\n')
+        '<script src="/wds-mode.js?v=20260901b" defer></script>\n</body>\n</html>\n')
 
 SDEJIE_STUB = _agent_stub("sdejie", "SDE解读",
     "SDE解读 · 用 SDE 发生学解读经典 | 德麦国际读书馆",
