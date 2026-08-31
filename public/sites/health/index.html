@@ -3,14 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>健康发生学 · 胡敏 · 系统入口</title>
-<meta name="description" content="健康发生学（胡敏主持）系统入口：健康浏览 · 健康对话 ChatHM · HM 社区。三个入口，互不隶属。SDE 发生学健康分站，收四部账册与一百一十九篇健康判断。">
+<title>健康大世界 · 胡敏 · 系统入口</title>
+<meta name="description" content="健康大世界：胡敏的健康发生学总入口。健康浏览 · ChatHM · HM 社区，三个板块并列而立、随时互切。SDE 发生学健康分站，收四部账册与一百一十九篇健康判断。">
 <link rel="canonical" href="https://health.sdeuniverses.com/">
-<meta property="og:title" content="健康发生学 · 胡敏 · 系统入口">
+<meta property="og:title" content="健康大世界 · 胡敏 · 系统入口">
 <meta property="og:url" content="https://health.sdeuniverses.com/">
-<meta property="og:description" content="健康浏览 · 健康对话 ChatHM · HM 社区——三个入口，互不隶属。">
+<meta property="og:description" content="健康浏览 · ChatHM · HM 社区——三个板块，并列而立，随时互切。">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#1E4D3E">
+<meta name="theme-color" content="#0C0906">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="健康大世界">
+<!-- 入口层：同步引入 hm-portal.js（**不得 defer/async**——它要赶在 <body> 落地前把页面
+     按住、只放三角这一层出来，否则会先闪一下下面的静态门再盖上）。hm-portal.js 克隆自主站
+     sde-portal.js，只换了三节点文案/链接、正中名与门规常量。下面 <main> 是无脚本/爬虫看到的
+     真内容（体检报告单式健康门），有脚本时被盖在星座三角之下。 -->
+<script src="/assets/hm-portal.js"></script>
 <style>
   :root{
     --paper:#F1F3EF; --card:#FAFBF9; --ink:#14201B; --ink2:#5B6B62; --ink3:#8A968E;
@@ -26,7 +35,7 @@
   .wrap{max-width:720px;width:100%}
   .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.34em;color:var(--gold);
            text-transform:uppercase;margin-bottom:1.1rem}
-  h1{font-size:clamp(1.9rem,6vw,2.8rem);font-weight:600;letter-spacing:.06em;color:var(--pine)}
+  h1{font-size:clamp(1.9rem,6vw,2.8rem);font-weight:600;letter-spacing:.08em;color:var(--pine)}
   h1 em{font-style:normal;font-family:var(--mono);font-size:.44em;letter-spacing:.26em;
         color:var(--ink3);margin-left:.9em;vertical-align:.28em}
   .sub{color:var(--ink2);margin-top:.7rem;font-size:.96rem;letter-spacing:.02em}
@@ -62,8 +71,8 @@
 <body>
 <main class="wrap">
   <div class="chop">未病</div>
-  <p class="eyebrow">SDE 健康发生学 · HU MIN</p>
-  <h1>健康发生学<em>胡敏 主持</em></h1>
+  <p class="eyebrow">健康大世界 · HU MIN</p>
+  <h1>健康大世界<em>胡敏 主持</em></h1>
   <p class="sub">健康，怎样重新长回身体里面？——SDE 发生学健康分站</p>
 
   <div class="three">
@@ -84,7 +93,7 @@
     </a>
   </div>
 
-  <p class="line">三个入口，<b>互不隶属</b>：读判断去「浏览」，问自己的情况去 ChatHM，跟同路人说话去社区。</p>
+  <p class="line">三个板块，<b>并列而立</b>，随时互切：读判断去「浏览」，问自己的情况去 ChatHM，跟同路人说话去社区。</p>
 
   <p class="more">
     <a href="/library/">母站论文选</a>·<a href="/all/">全部篇目</a>·<a href="/site/#books">四部账册</a>·<a href="/students/hu-min/">关于胡敏</a>·<a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
