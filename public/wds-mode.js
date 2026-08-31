@@ -8181,6 +8181,35 @@
      提示语在服务端——见 WRITERS 上方那段注释。空串＝本色写。 */
   /* ext（2026-08-29）：由别的产线调用时的外挂——rsrc（研究论文的材料：十道产出）、onDone(text)、onFail(msg)。
      成文菜单不传它，一切照旧。 */
+  /* 【长篇正文清洗 · 纯函数，供 sim 单测】长篇分趟连写，脚手架偶尔漏进正文，读者看到的机器痕迹有四类：
+     ① 书名被重印（客户端已在最前写死唯一一行 `# 书名`）；② "第X部／部名／章名"这类**没被替换的占位符**；
+     ③ 内部分工名（"一部·起手·2/5"）连同 ·n/m 计数器被基底照抄进正文；④ 接缝处把上一趟结尾整段逐字复述。
+     这里逐行删①②③、再把④那段逐字重复去掉。**只删脚手架与逐字重复，绝不动正文。**
+     opt：h＝本趟内部分工名，title/sub＝书名与副题，prev＝已写好的前文。 */
+  function wdsNovelClean(leg, opt) {
+    opt = opt || {};
+    var h = String(opt.h || "").trim(), title = String(opt.title || "").trim(),
+        sub = String(opt.sub || "").trim(), prev = String(opt.prev || "");
+    var out = String(leg || "").split("\n").filter(function (ln) {
+      var s = ln.trim();
+      if (!s) return true;                                                            // 空行留着
+      if (/^#[ \t]+\S/.test(s)) return false;                                         // 一级标题＝书名（只此一处，客户端已写在最前）
+      if (/^#{0,3}[ \t]*(第[ \t]*[Xx×][ \t]*部|部名|章名|书名)([ \t\u3000]|$)/.test(s)) return false; // 没替换的占位符
+      if (title && (s === title || s === "# " + title || s === "**" + title + "**")) return false;   // 书名被当普通行重印
+      if (sub && (s === sub || s === "**" + sub + "**")) return false;                // 副题重印
+      if (h && (s === h || s === "## " + h || s === "### " + h || s === "#### " + h)) return false;  // 内部分工名被照抄
+      if (s.length <= 46 && /[·・][ \t]*\d+[ \t]*\/[ \t]*\d+[ \t]*$/.test(s)) return false;           // …·2/3 计数器短行
+      return true;
+    }).join("\n");
+    // 接缝去重：本趟开头逐字重复了前文结尾（回看 1600 字），删掉那段重复
+    var head = out.replace(/^\s+/, ""), tail = prev.slice(-1600);
+    for (var L = Math.min(head.length, 500); L >= 24; L--) {
+      var pre = head.slice(0, L);
+      if (pre.replace(/\s/g, "").length >= 24 && tail.indexOf(pre) >= 0) { head = head.slice(L); break; }
+    }
+    return head.replace(/^\s+/, "");
+  }
+
   function distill(kind, existing, title, tpl, again, style, words, ext) {
     var kv = existing ? {} : wdsKeyGet();
     /* ⚠ 填 Key 那一跳必须把 tpl 与 style 一并带回来——第一版只递了 kind，
@@ -9184,11 +9213,13 @@
           var before = text.length, tail0 = text.slice(-1200);
           var need = Math.max(400, Math.round((parseInt(secs[i].words, 10) || 4000) * 0.4));
           function accept() {
-            /* 【书名去重·兜底】长篇的唯一一行 `# 书名` 由客户端写在最前（见 startParts 开头）。
-               若这一趟又吐出一行 `# …`（H1），删掉它，别让书名出现两次——服务端已明令基底别再写书名，
-               这里再拦一道，纵使基底偶尔犯轴也不会有双标题。只吃 H1（单个 `#`），`## 第X部`/`## 章名` 不动。 */
-            var _leg = text.slice(before), _m = /^\s*#[ \t]+[^\n]*\n?/.exec(_leg);
-            if (_m) text = text.slice(0, before) + _leg.slice(_m[0].length);
+            /* 【正文清洗·兜底】脚手架偶尔漏进正文（书名重印／第X部·部名·章名占位符／内部分工名连 ·2/3
+               计数器被照抄／接缝处整段逐字复述）。服务端已明令基底别写，这里再逐行拦一道并去重，
+               纵使基底犯轴也不落到稿里。见 wdsNovelClean（纯函数，sim 单测）。 */
+            var _before = text.slice(0, before);
+            var _clean = wdsNovelClean(text.slice(before),
+              { h: (secs[i] && secs[i].h) || "", title: (plan && plan.title) || "", sub: (plan && plan.sub) || "", prev: _before });
+            text = _before.replace(/\s+$/, "") + (_clean ? ("\n\n" + _clean) : "");
             if (text.slice(-2) !== "\n\n") text += "\n\n";
             paintD(false);
             dProgress = i + 1;

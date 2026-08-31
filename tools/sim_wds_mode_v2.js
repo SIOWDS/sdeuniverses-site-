@@ -1928,6 +1928,28 @@ console.log("⑧ 成文（distill）");
     ok(/topShowT:/.test(src) && (src.match(/topShowT:/g) || []).length === 2, "唤回钮的说明中英两套都齐");
   }
 
+  // ── 长篇正文清洗 wdsNovelClean：脚手架漏进正文 + 接缝逐字重复（读者报「分拣机」那篇的四类机器痕迹）──
+  {
+    const _m = /function wdsNovelClean\(leg, opt\) \{[\s\S]*?\n  \}/.exec(src);
+    ok(!!_m, "★ 抠得到 wdsNovelClean");
+    if (_m) {
+      const clean = new Function(_m[0] + "; return wdsNovelClean;")();
+      const para = "粉笔灰在斜光里浮着，缓缓落向讲台。那台旧录音机还在讲台下层，被几本落了灰的参考书挡住，只有一角磁带露出来。";
+      ok(clean("分拣机里的第二次选择\n第X部\n" + para + "\n下课后林念没有马上走。",
+            { title: "分拣机里的第二次选择", h: "一部·裂纹·1/2", prev: "讲台上。" + para + " 学生离开。" })
+         === "下课后林念没有马上走。", "★ 书名重印+第X部占位符+整段逐字重复 全清掉");
+      ok(clean("一幕·第一次选择 · 2/3\n周明河从窗边往回走。", { h: "一幕·第一次选择·2/3" })
+         === "周明河从窗边往回走。", "★ 内部分工名与 ·2/3 计数器不落正文");
+      ok(clean("## 第一部　旧规矩还在\n九月的雨。", { h: "一部·起手·1/4" })
+         === "## 第一部　旧规矩还在\n九月的雨。", "★ 真部标题（第一部）保留，不误删");
+      ok(clean("## 码头对峙\n她走到讲台前。", { h: "三部·争夺·2/5" })
+         === "## 码头对峙\n她走到讲台前。", "★ 真章名保留，不误删");
+      ok(clean("他说：“好。”然后走了。", { prev: "她说：“好。”" })
+         === "他说：“好。”然后走了。", "★ 短重合不误删（≥24 字逐字才算重复）");
+    }
+    ok(/wdsNovelClean\(text\.slice\(before\)/.test(src), "★ accept() 收稿前调用了 wdsNovelClean");
+  }
+
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
 })();
