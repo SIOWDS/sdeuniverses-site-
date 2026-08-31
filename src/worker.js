@@ -1791,9 +1791,18 @@ const FORGE_TOTAL_MS = 600000;            // 每一道的总时长闸（首帧�
 function wdsVendorOf(v) { return WDS_VMAP[String(v || "").toLowerCase()] || "zhipu"; }
 function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
 // 读者自填的型号覆盖默认值。只放行像模型名的字符串，别让它变成往上游注入别的东西的口子。
+/* 【三级型号梯 —— 2026-09-01】此前只有两级：标准档＝WDS_VENDORS[vd].model，深度档＝WDS_TOP_MODEL[vd]。
+   OpenAI 与 Anthropic 各自明摆着有三级（luna/terra/sol 与 haiku/sonnet/opus），只用两级等于
+   把最轻的活也交给中档去干。所以补一张轻档表：**只在这两家有第三级的地方生效**，
+   其余五家取不到就退回标准档，行为一字不变。
+   ⚠ 型号档与投入档（reasoning_effort）是两个旋钮，别混为一谈：gpt-5.6 的 luna 开 high，
+     常常比 sol 开 none 更能答对——所以难度条改的从来是「型号＋功率」这一对，不是单换型号。 */
+const WDS_LITE_MODEL = { openai: "gpt-5.6-luna", anthropic: "claude-haiku-4-5-20251001" };
+function wdsLiteModel(vd) { return WDS_LITE_MODEL[vd] || (WDS_VENDORS[vd] && WDS_VENDORS[vd].model); }
 function wdsPickModel(vd, want, top) {
   const w = String(want || "").trim();
   if (w && w.length <= 60 && /^[A-Za-z0-9._:\/-]+$/.test(w)) return w;
+  if (top === "lite") return wdsLiteModel(vd);
   return (top ? (WDS_TOP_MODEL[vd] || WDS_VENDORS[vd].model) : WDS_VENDORS[vd].model);
 }
 async function getActiveVendor(env) {
@@ -8737,7 +8746,11 @@ function sdeExpandTok(VC) {
   return (u.indexOf("moonshot") >= 0 || u.indexOf("minimax") >= 0) ? 1500 : 300;
 }
 async function sdeExpandQuery(VC, KEY, q, ms) {
-  const LC = (VC && VC.top) ? { url: VC.url, model: VC.model, name: VC.name } : VC;
+  /* 配菜＝机械活（把一句话铺成二十个检索词），既卸满功率，也没有理由用贵档型号：
+     这一步的产物随后要被检索器覆盖检验，选错词的代价是多召回几篇，不是答错。
+     ⚠ 读者自己覆盖过型号时不动它——他填的那个才是他要的。 */
+  const _lcM = (VC && VC.vd && !VC.umodel) ? wdsLiteModel(VC.vd) : ((VC && VC.model) || "");
+  const LC = (VC && (VC.top || _lcM !== VC.model)) ? { url: VC.url, model: _lcM || VC.model, name: VC.name } : VC;
   const out = await llmText(LC, KEY, SDE_LEXICON, "用户问题：" + q + "\n\n请只输出 SDE 检索术语（顿号分隔）：", sdeExpandTok(VC), ms || SDE_EXPAND_MS);
   if (!out) return [];
   return out.replace(/\n/g, "、").split(/[、,，;；\s]+/).map((s) => s.trim()).filter((s) => s.length >= 2 && s.length <= 12).slice(0, 24);
@@ -11610,7 +11623,7 @@ export default {
       // 看图时一律卸掉满功率档：视觉档型号多半没有思考开关，且这一步的活是"看清"不是"想久"。
       const VC = canSee
         ? { url: WDS_VENDORS[vd].url, model: visLadder[0], name: WDS_VENDORS[vd].name, top: 0 }
-        : { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, umodel, deep), name: WDS_VENDORS[vd].name, top: deep ? 1 : 0 };
+        : { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, umodel, deep), name: WDS_VENDORS[vd].name, top: deep ? 1 : 0, vd: vd, umodel: !!String(umodel || "").trim() };
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       let dayLeft = null;
@@ -11736,7 +11749,9 @@ export default {
             if (umem3) { memPick = wdsMemByGrade(umem3, G); umem = memPick.text; }
             if (G.on && !canSee) {
               VC.top = gK.top ? 1 : 0;
-              VC.model = wdsPickModel(vd, umodel, gK.top);
+              /* 难度条 → 型号档（2026-09-01）：第 1 档「轻」既然已经关思考、只给 2600 预算、只带 4 篇资料，
+                 就没有理由还骑着中档型号；3 档以上照旧上最强档。这一句只对有第三级的两家有效果。 */
+              VC.model = wdsPickModel(vd, umodel, gK.top ? 1 : (gK.lv === 1 ? "lite" : 0));
               if (gK.top && gK.effort) VC.effort = gK.effort; else delete VC.effort;
             }
             const mFull = G.on ? !!gK.method : deep;                      // 方法论块：完整工序还是精简工序
