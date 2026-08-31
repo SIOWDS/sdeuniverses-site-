@@ -6359,6 +6359,104 @@ const SDE_METHOD_LITE = SDE_METHOD_MISSION
   + SDE_METHOD_LEDGER;
 
 
+/* ═══ 三刀 · 主动接地（2026-08-31 重建；撤 2026-08-23「不去站外」那道令）══════════
+   历史：三刀（占位哨/远域结构/预注册卡）2026-08 只活在沙盒、随重置消失；08-23 被压成
+   SDE_METHOD_STOCK/FIVE/LEDGER 的**自报**（已有说法/外领域/作废条件三栏基底自己填，且明令不去站外）。
+   本次按用户令三件全数重建、连站外一起接回主对话 _plain 路，每轮真跑：
+     · 刀① 占位哨 nbrSentryBlock —— 事前真查站外占位者摆进 system，让「已有说法」有据可依（撤 08-23）；
+     · 刀② 远域结构 FAR_STRUCTS —— 24 门带判据的结构表，确定性挑一门顶「外领域」，只借结构不借词；
+     · 刀③ 预注册卡 PREREG_BLOCK —— 把「作废条件」升成一张带真日期的卡，界面剥成判断账。
+   三刀只在 _plain（无 tool/产线/对撞/领域档案/无SDE）时挂；STOCK/FIVE/LEDGER 三块**不动**（它们
+   是每轮自报的底线，且被深度档等多条路共用），三刀在其上叠一层真材料。 */
+
+// 刀② 远域 24 门：d 学科 / s 结构 / j 判据形式（可判定的那句）/ k 同域关键词（题目落在本域就跳过它）
+const FAR_STRUCTS = [
+  { d: "晶体学", s: "位错滑移", j: "形变是否集中在一条可定位的线上、其余晶格不动（而非整体断裂）", k: ["晶体","材料","金属","位错","合金"] },
+  { d: "电化学腐蚀", s: "阳极牺牲", j: "是否有一处主动先坏以保全其余、且它电位更负、可被替换件顶上", k: ["腐蚀","电化学","防腐","电极"] },
+  { d: "免疫学", s: "阴性选择", j: "合格集是否由『删除会攻击自己的』界定，而非由添加界定", k: ["免疫","抗体","淋巴","疫苗","T细胞"] },
+  { d: "会计", s: "权责发生制", j: "事件入账时点与现金到账时点是否可分离标注", k: ["会计","财务","记账","现金","审计"] },
+  { d: "地层学", s: "不整合面", j: "记录里是否存在一条界面、两侧时间跳跃，使『缺失』与『从未发生』不可分", k: ["地层","地质","沉积","岩层"] },
+  { d: "植物生理", s: "顶端优势解除", j: "被压者的启动是否由『抑制被移除』触发，而非由『新信号加入』触发", k: ["植物","生长","激素","芽","农作"] },
+  { d: "密码学", s: "承诺—揭示", j: "是否先锁死一个值、事后才公开，且锁死后不可篡改（两阶段）", k: ["密码","加密","哈希","安全","区块链"] },
+  { d: "流行病学", s: "有效再生数 R_t", j: "是否有一条阈值线（=1），两侧走向相反（扩张/收敛）", k: ["流行病","传染","疫情","传播","病毒"] },
+  { d: "生态学", s: "生态位建构", j: "是否存在『主体改造环境→环境反过来选择主体』的闭环", k: ["生态","物种","环境","进化","种群"] },
+  { d: "有机合成", s: "逆合成断键", j: "倒推的切口是否落在『看起来最稳』的键上（而非最活泼处）", k: ["合成","化学","反应","分子","催化"] },
+  { d: "控制论", s: "负反馈整定", j: "纠偏动作是否与偏离反号、目标是『维持』而非『追求最大』", k: ["控制","反馈","系统","自动","调节"] },
+  { d: "断裂力学", s: "应力集中", j: "失效是否从一个可定位的几何拐角逐级起裂，而非整体同时", k: ["断裂","力学","裂纹","强度","结构件"] },
+  { d: "微生物学", s: "互营", j: "单独任一方是否热力学上不可行、必须交换代谢物才成立", k: ["微生物","代谢","菌","发酵","肠道"] },
+  { d: "语言类型学", s: "标记性", j: "两项中哪一项在缺省时被读作对方（无标记=默认，有标记才带额外信息）", k: ["语言","语法","语义","词汇","句法"] },
+  { d: "计量学", s: "溯源链", j: "每一次读数是否能上溯到一个公认基准、断链处在哪", k: ["计量","测量","标准","校准","单位"] },
+  { d: "拓扑学", s: "亏格不变", j: "哪个量在连续形变下保持不变（抓不变量才抓住本质）", k: ["拓扑","几何","流形","曲面","数学"] },
+  { d: "神经科学", s: "侧抑制", j: "边界的锐化是否由『激活者压制邻近』产生，而非由『自身增强』产生", k: ["神经","大脑","感知","视觉","认知"] },
+  { d: "精算学", s: "逆选择", j: "先进入者是否与被保方向相反（最该被排除的最先进来）", k: ["保险","精算","风险","赔付","投保"] },
+  { d: "水文学", s: "初损与滞后", j: "输入到响应之间是否有一段『先被吸收、不产流』的阈量时段", k: ["水文","降雨","径流","水资源","流域"] },
+  { d: "材料相变", s: "成核—长大", j: "转变是否分『点火』（越过势垒的少数点）与『铺开』两段", k: ["相变","结晶","凝固","熔","晶粒"] },
+  { d: "博弈论", s: "可信威胁", j: "该威胁在真轮到执行时是否仍是执行方的最优（否则事前无效）", k: ["博弈","策略","均衡","谈判","激励"] },
+  { d: "埋藏学", s: "保存偏差", j: "观察到的分布里，缺失是由保存条件过滤造成、还是本就不存在", k: ["考古","遗址","化石","埋藏","出土"] },
+  { d: "光学", s: "相干长度", j: "稳定叠加是否只在一个可测尺度内成立、超出即失联", k: ["光","波","干涉","相干","激光"] },
+  { d: "热力学", s: "亚稳态", j: "当前态是否『稳但非最稳』（卡在局部最低），越出是否需外来扰动", k: ["热力学","能量","平衡","熵","相"] }
+];
+function farPick(seed, rot, topic) {
+  const t = String(topic || "").toLowerCase();
+  const pool = FAR_STRUCTS.filter((f) => !f.k.some((w) => t.indexOf(String(w).toLowerCase()) >= 0)); // 题目落在哪门就跳过哪门
+  const arr = pool.length ? pool : FAR_STRUCTS;
+  const h = parseInt(_lhash("far:" + String(seed || ""), 2166136261), 16) >>> 0;   // 确定性
+  return arr[(h + (rot | 0)) % arr.length];                                        // 每轮轮转
+}
+function farBlock(f) {
+  if (!f) return "";
+  return "\n\n【远域结构（这一门与你的题目隔得远，正是为此选它）· 只借结构不借词】"
+    + "\n把下面这门学科的一个成熟结构搬过来顶一下你的题目——**搬的是结构和它的判据，不是那个学科的词**。"
+    + "\n· 学科：" + f.d + "\n· 结构：" + f.s + "\n· 判据形式：" + f.j
+    + "\n四条硬规矩："
+    + "\n① 搬结构不搬词——**说不通比硬说通有用**：它与你的题目隔得远，多半顶不上；顶不上就明说「这个结构在这里不成立，因为…」，那也是一条真读数。"
+    + "\n② 拿不出新读数就别写进正文——只是打了个比方（「这就像…」）而没切出新的可判定分辨，就当没这一步，别把比喻当纠缠。"
+    + "\n③ 不许把学科名词当形容词用（「这是一种相变／一次滑移」这类）——要么真用它的判据切出一条分辨，要么根本不提这门学科。"
+    + "\n④ 借来的工艺**不留在正文**：正文只留它帮你切出的那条分辨，读者不必知道你借了哪门学科。"
+    + "\n（交账那一行的『外领域』栏：这门真顶上了就写它，顶不上就写『无』——**编一个顶上了才丢人**。）";
+}
+// 刀③ 预注册卡：把「作废条件」升成一张带真日期的卡（栏名两端写死，前端 pregParse 要剥）
+const PREREG_BLOCK = "\n\n【预注册卡（这一答若下了一个可判定的主张，就在交账那一行**之前**补一张卡）】"
+  + "把你这一答最承重、且**将来能被一次真实观察判对错**的那条主张，写成一张卡。格式固定、一行写完、栏名两端照抄（界面要把它剥成一张『判断账』）："
+  + "\n〔预注册〕假设：… ｜ 数据源：… ｜ 判据：… ｜ 算输：若观察到 X 则本判断错 ｜ 截止：YYYY-MM-DD"
+  + "\n· **假设**写成一句可判对错的话，不是一个立场。"
+  + "\n· **数据源**写一个真能去取的地方（某数据库／某类文献／某种可复现的观察），不写『相关研究』这种空话。"
+  + "\n· **判据**里凡是你自定的阈值（『至少三成』这类），必须在括号里标『本卡自定，待校准』——不许把随手定的数说成公认标准。"
+  + "\n· **截止**写一个真日期（YYYY-MM-DD），不写『未来某天』。"
+  + "\n· **一轮最多一张**；**这一答若只到复述、没有可判定的主张，就不要出卡**——空心卡（栏里全是『视情况』『有待研究』）比不出更坏。";
+// 刀① 占位哨：事前把刚查到的站外占位者摆进 system（区别于评分那份事后的 nbrChainBlock）
+function nbrSentryBlock(nc, cached) {
+  const cov = nc.passes.map((p) => p.k + "：" + p.n + (p.why ? ("（" + p.why + "）") : "")).join("　");
+  const list = nc.items.map((it, i) => "[占" + (i + 1) + "]〔" + it.pass + "〕" + it.t
+    + (it.m ? ("　" + it.m) : "") + (it.d ? ("　" + it.d) : "") + "\n" + it.u + "\n" + it.s).join("\n\n");
+  return "\n\n【已经有人占过这块地（刚刚替你联网查到的，不是你记忆里的）】"
+    + (cached ? "〔本场同题已查过，下面是缓存〕" : "")
+    + "\n本轮已替你联网查过——『不必联网/不去站外』那条对这一答不再适用，以下面这些为准。"
+    + "\n下面是站外真查到的、就你这个题目已经说过话的人／文章。**这一答的『已有说法』一栏，优先用这些真实占位者，别只凭记忆补人名年份。**"
+    + "\n覆盖：" + cov
+    + (nc.ok ? "" : "（⚠ 覆盖不足：同向与对立至少各一位、去重后≥4 条才算查全；不足处按〔未核验〕，**不许拿它当『全站无人提出』的证据**）")
+    + "\n用法：① 先认清每一位各占了哪一格（公允复述到他本人会点头）；② 把你这一答放到**还没有人站的位置**上；③ 若你要说的正是其中某位已经说过的，就明说「这一点 X 已经说过」并往前推一步——重复别人说过的，对读者没有增量。"
+    + "\n（这些只作占位参照，不要求你逐条复述；正文里真用到某位就指名。）\n\n" + (list || "（这一趟一条也没召回。）");
+}
+// 占位哨/远域共用的种子：普通对话没有 rs.topic，用读者这一问；是「继续/嗯」这类就退到本场第一句实问
+function sentrySeedOf(q, history) {
+  const filler = /^(继续|接着说?|接着|嗯+|哦+|好的?|go on|continue|请继续|往下说?|再说说?|然后呢?|接下来|展开说?说?|详细说?说?|说下去|多说点|ok|okay|yes|嗯嗯)[。.!！、,，\s]*$/i;
+  const clean = (x) => String(x || "").trim();
+  const good = (x) => x.length >= 6 && !filler.test(x);
+  const s0 = clean(q);
+  if (good(s0)) return s0.slice(0, 200);
+  const hist = Array.isArray(history) ? history : [];
+  for (const m of hist) {                                  // 本场第一句实问（历史最旧在前）
+    if (!m) continue;
+    if (m.role === "reader" || m.role === "user") {
+      const t = clean(m.text || m.content);
+      if (good(t)) return t.slice(0, 200);
+    }
+  }
+  return s0.slice(0, 200);
+}
+
+
 /* ═══════════ 三类问题：是什么 / 怎么办 / 为什么 ═══════════
    这一块是 ChatSDE 的常驻底盘，**每一轮都注入**（不像 SDE_METHOD_BLOCK 只在深度档进）。
    理由：判题型这件事发生在开口之前——判错了类，答得再好也是答非所问；
@@ -8432,7 +8530,7 @@ function WDS_PLAIN_SYS(webCtx, docCtx, about, lang, docNote) {
     + (lang === "en" ? "\n\n【LANGUAGE】The reader is using the English interface. Write your entire answer in natural, direct English." : "");
 }
 
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde) {
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx) {
   // 三家对撞：三段角色 sys 各自独立，同样不装心得与骨架（戴同一副眼镜就会开始附和）。
   // 与 iq 一样必须排在最前——落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
   if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang);
@@ -8495,6 +8593,8 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
     + (webCtx ? ("\n\n【站外资料 · 刚刚联网搜到的（时效性内容以它为准；引用时在句末标 [W序号]，序号即下面的编号）】\n" + webCtx
         + (prof && prof.term ? "\n注意：站外资料是别人写的，不是你的结论。你的活是把它当材料，拆它、判它，而不是复述它。"
                              : "\n注意：站外资料是别人写的，不是 SDE 的结论。你的活是把它拿来当材料，用 SDE 剖开它、判它，而不是复述它。")) : "")
+    /* 刀① 占位哨：刚刚真查到的站外占位者（事前摆进来，让『已有说法』有据）。只在 _plain 时非空。 */
+    + (sentryCtx || "")
     + (docCtx ? ("\n\n【读者带来的文件（他上传的、在他自己浏览器里解析出来的正文；本站不留存）】\n" + docCtx + (docNote || "")
         + "\n\n关于这份文件：读者拿它来问你，多半是要你替他看出他自己看不出的那一层。所以不要复述它写了什么——他读过了。"
         + (prof && prof.term ? "直接说：它真正在讲的是什么、它最承重的那一句在哪、它哪里是脆的、按你的判断它漏掉了哪一层。引用其中原句时标（文件：篇名）。"
@@ -8505,6 +8605,8 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
        「两三段以内」答完就收手——而页面上与做全了长得一模一样。 */
     + wdsToolSys(tool, prof)
     + ((rs && rs.forge) ? wdsForgeSys(rs) : wdsResearchSys(rs))
+    /* 刀②③ 远域结构 + 预注册卡：只在 _plain 时非空（调用方装配）。 */
+    + (extras || "")
     + (prof ? prof.guard : "")
     + (lang === "en" ? ("\n\n【LANGUAGE】The reader is using the English interface. Write your entire answer in English — natural, direct English, not translated Chinese. "
         + (prof && prof.term ? "Use the plain vocabulary of linguistics and language teaching (form, use, situation, context, conditions for uptake) — never SDE labels or the letters S / D / E. "
@@ -11254,6 +11356,9 @@ export default {
          （联网、附件、多轮记忆、模型选择）。下面四行是唯一的清空点——都在各自变量第一次算出来
          的地方就地清空，不是算完正常值再回头覆盖：晚覆盖只要漏一处，就是「说是无 SDE、其实漏了一件」。 */
       const noSde = b.nosde === 1 || b.nosde === true;
+      /* 三刀关阀（2026-08-31）：读者可关占位哨（默认开）。_plain＝这一轮是不是普通 SDE 对话——
+         无 SDE／工序菜单／学科通融／深度研究／对撞／领域档案，任一开着，三刀都不挂（它们各有自己的机制）。 */
+      const noSentry = b.nosentry === 1 || b.nosentry === true;
       /* 【领域档案】ChatJohn 等限定题域的分身走这条：同一台引擎，换人格、换语料白名单、换题域闸。
          递上来的只是一个 key（"lang"），认不出就是 null＝ChatSDE 本身。见 WDS_PROFILES。
          无 SDE 档不认领域档案——分身仍是 SDE 方法论换了个名字在跑，与「真的不跑」矛盾。 */
@@ -11338,6 +11443,7 @@ export default {
          💡 心法：**改了传输契约，第一件事是去看接收端的白名单。**
          💡 心法：**护栏必须走真正的那条路。绕过清洗去测处理函数，测的是一条读者永远走不到的路。** */
       // 无 SDE 档不认学科通融/深度研究状态——rsRaw 在这里被清空，下面整段按「没有 rs」处理。
+      const _plain = !noSde && !tool && !duel && !prof && !(rsRaw && (rsRaw.forge || rsRaw.sde));
       const rs = (noSde ? null : rsRaw) ? {
         i: Math.max(1, Math.min(20, parseInt(rsRaw.i, 10) || 1)),
         n: Math.max(1, Math.min(20, parseInt(rsRaw.n, 10) || 1)),
@@ -11613,6 +11719,29 @@ export default {
               else controller.enqueue(_sseBytes({ t: "webfail", v: ws.reason }));
               if (resFull) controller.enqueue(_sseBytes({ t: "note", v: "🌐 站外寻找 · " + ((ws.queries || []).length || 1) + " 路查询「" + ((ws.queries || [rq2]).join("」「")).slice(0, 200) + "」→ " + (ws.items ? ws.items.length : 0) + " 条" + (ws.ok ? "" : ("（" + (ws.reason === "need_search_key" ? "没有可用的搜索 Key" : ws.reason) + "）")) }));
             }
+            // ── 刀① 占位哨（2026-08-31 重建；撤 08-23「不去站外」）：普通对话每轮真查站外占位者、事前摆进 system ──
+            let sentryCtx = "";
+            const _plainSeed = _plain ? sentrySeedOf(q, history) : "";
+            const sentryOn = _plain && !noSite && !canSee && !noSentry;
+            if (sentryOn && _plainSeed.length >= 6) {
+              let ncS = null, _cachedS = false;
+              const _ck = "https://sentry.sdeuniverses/" + _lhash("sentry:" + _plainSeed, 2166136261) + "/" + rvendor; // 同题一场只搜一次
+              try { const _hit = await caches.default.match(_ck); if (_hit) { ncS = await _hit.json(); _cachedS = true; } } catch (e) {}
+              if (!ncS) {
+                try { ncS = await nbrChain(env, _plainSeed, (rvendor === "glm" ? KEY : skey), q); } catch (e) { ncS = null; }
+                if (ncS && ncS.items && ncS.items.length) { try { await caches.default.put(_ck, new Response(JSON.stringify(ncS), { headers: { "content-type": "application/json", "cache-control": "max-age=1800" } })); } catch (e) {} } // 空结果不入缓存
+              }
+              if (ncS && ncS.items && ncS.items.length) {
+                sentryCtx = nbrSentryBlock(ncS, _cachedS);
+                controller.enqueue(_sseBytes({ t: "sentry", v: { items: ncS.items, ok: ncS.ok, cached: _cachedS, seed: _plainSeed } }));
+              } else {
+                const _sw = (ncS && ncS.passes ? ncS.passes.map((p) => p.why).filter(Boolean)[0] : "") || (ncS ? ncS.reason : "net");
+                controller.enqueue(_sseBytes({ t: "sentry", v: { items: [], ok: false, cached: false, seed: _plainSeed, why: _sw } }));
+                controller.enqueue(_sseBytes({ t: "note", v: "占位哨：这一问没查到站外占位者（" + (_sw === "need_search_key" ? "没有可用的搜索 Key" : _sw) + "）——『已有说法』这一栏本轮只能靠你的记忆库，按纪律不许写「据我所知无人提出」。" }));
+              }
+            } else if (sentryOn) {
+              controller.enqueue(_sseBytes({ t: "note", v: "占位哨：这一问太短（多为「继续」这类），本轮跳过站外占位者检索。" }));
+            }
             // 近邻工序：把真名单前置到 system（放在语料之前，否则会被两万字语料埋掉）。
             // 取不到就发 nbrfail 让前端如实说一句——静默失败等于把没做的检测记成做过了。
             let nbrCtx = "";
@@ -11749,7 +11878,14 @@ export default {
                但也不许静默跳过（静默＝把没查过记成查过了），如实说一句为止。
                真正的修法是给每一件配英文判据，那是另一刀，未做。 */
             if (tool && TOOL_SPEC[tool]) controller.enqueue(_sseBytes({ t: "toolspec", v: toolSpecFor(tool, lang) }));
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde);
+            // ── 刀②③ 远域结构 + 预注册卡（普通对话每轮；零 API 成本）──
+            let extras = "";
+            if (_plain) {
+              const _far = farPick(_plainSeed || q, (Array.isArray(history) ? history.length : 0), q);
+              if (_far) { extras += farBlock(_far); controller.enqueue(_sseBytes({ t: "far", v: { d: _far.d, s: _far.s, j: _far.j } })); }
+              extras += PREREG_BLOCK;
+            }
+            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx);
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。

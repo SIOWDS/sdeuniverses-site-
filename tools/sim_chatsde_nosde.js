@@ -19,7 +19,7 @@ ok(plainSeg.length > 400, "有实体内容（不是空壳），实得 " + plainS
 console.log("② 改道排在最前——落进 WDS_CHAT_SYS 那串 + 号就已经晚了");
 const chatSigIdx = W.indexOf("function WDS_CHAT_SYS(");
 const chatSeg = W.slice(chatSigIdx, chatSigIdx + 1400);
-ok(/function WDS_CHAT_SYS\([^)]*\bnoSde\)/.test(chatSeg), "WDS_CHAT_SYS 签名收得到 noSde（且是最后一个形参）");
+ok(/function WDS_CHAT_SYS\([^)]*\bnoSde(?:, extras, sentryCtx)?\)/.test(chatSeg), "WDS_CHAT_SYS 签名收得到 noSde（在形参表里；其后可跟 extras/sentryCtx）");
 ok(/if \(noSde\) return WDS_PLAIN_SYS\(webCtx, docCtx, about, lang, docNote\);/.test(chatSeg), "noSde 整段改道到 WDS_PLAIN_SYS");
 const posIq = chatSeg.indexOf('if (tool === "iq") return WDS_IQ_SYS(');
 const posNoSde = chatSeg.indexOf("if (noSde) return WDS_PLAIN_SYS(");
@@ -57,7 +57,7 @@ ok(/const duelRaw = noSde \? null : /.test(handlerSeg), "③ duelRaw 就地清�
 ok(/const rs = \(noSde \? null : rsRaw\) \? \{/.test(handlerSeg), "④ rs 就地清空（不认学科通融/深度研究状态）");
 ok(/if \(!noSite && !noSde\) try \{/.test(handlerSeg), "noSite 强制跟 noSde 一起关——语料关不掉，人格换了也没用");
 ok(/if \(!noSde\) try \{ reflect = await ensureReflect/.test(handlerSeg), "ensureReflect 直接跳过，不装了也不白算一次");
-ok(/duel, prof, noSde\);/.test(handlerSeg), "调用点把 noSde 真的递给了 WDS_CHAT_SYS（收了不用等于没收）");
+ok(/duel, prof, noSde(?:, extras, sentryCtx)?\);/.test(handlerSeg), "调用点把 noSde 真的递给了 WDS_CHAT_SYS（收了不用等于没收）");
 
 console.log("⑥ 反向验证：把这几处改回旧样子，断言必须当场红");
 // ⑥a 去掉整段改道 —— ②的两条必须红
@@ -82,8 +82,8 @@ console.log("⑥ 反向验证：把这几处改回旧样子，断言必须当场
 }
 // ⑥e 调用点漏传 noSde —— ⑤的最后一条必须红
 {
-  const mut = handlerSeg.replace("duel, prof, noSde);", "duel, prof);");
-  ok(!/duel, prof, noSde\);/.test(mut), "反向⑥e：调用点漏传 noSde 后，⑤的断言会红");
+  const mut = handlerSeg.replace("duel, prof, noSde, extras, sentryCtx);", "duel, prof, extras, sentryCtx);");
+  ok(!/duel, prof, noSde(?:, extras, sentryCtx)?\);/.test(mut), "反向⑥e：调用点漏传 noSde 后，⑤的断言会红");
 }
 // ⑥f WDS_PLAIN_SYS 里混进 SDEM —— ③的断言必须红（模拟"顺手也把骨架搭上"这种回归）
 {

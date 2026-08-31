@@ -50,6 +50,7 @@
   var LS_GRADE = "sde_wds_grade";         // 难度条："0" 自动（按站内检索定档）| "1".."5" 读者钉死的档
   var LS_WEB = "sde_wds_web";             // "1" | "0"
   var LS_NOSDE = "sde_wds_nosde";         // "1" | "0" —— 无 SDE 问对（只在 ChatSDE 本体页出现，分身页不读）
+  var LS_NOSENTRY = "sde_wds_nosentry";   // "1"=关占位哨 | "0"/缺=开（默认开；三刀之一，2026-08-31）
   var LS_LANG = "sde_wds_lang";           // "zh" | "en"
   var PAGE = !!window.WDSM_PAGE;
   /* ════════ 领域档案（profile）════════════════════════════════════
@@ -996,7 +997,7 @@
       tabNormal: "常规", tabBack: "\u2190 返回浏览", tabPortal: "\u2726 \u7cfb\u7edf\u5165\u53e3",
       bDistill: "\u270e 成文 · PPT", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
       egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
-      mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网", mNoSde: "\u2298 无 SDE",
+      mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网", mNoSde: "\u2298 无 SDE", mSentry: "\ud83d\udef0 占位哨", tipNoSentry: " · 占位哨已关（不查站外占位者）",
       mtHide: "收起工具", mtShow: "工具", mtHideT: "把档位条收起来，把屏幕让给答案",
       topShowT: "把顶栏叫回来（往上翻一下也会回来）",
       mtShowT: "展开档位条（现在开着的）",
@@ -1278,7 +1279,7 @@
       tabNormal: "Browse", tabBack: "\u2190 Back to site", tabPortal: "\u2726 Entry",
       bDistill: "\u270e Write up · Deck", bHist: "\u21ba History", bSet: "\u2699 Settings", bNew: "\uff0b New chat",
       egs: ["What separates Show from structure in SDE?", "How would SDE read the onset of a chronic disease?", "What is entanglement of features? Give an example.", "Point me at a few pieces to start with"],
-      mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web", mNoSde: "\u2298 No SDE",
+      mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web", mNoSde: "\u2298 No SDE", mSentry: "\ud83d\udef0 Sentry", tipNoSentry: " · sentry off",
       mtHide: "Hide tools", mtShow: "Tools", mtHideT: "Collapse the mode bar and give the screen to the answer",
       topShowT: "Bring the top bar back (scrolling up does it too)",
       mtShowT: "Show the mode bar (currently on)",
@@ -2393,6 +2394,7 @@
             "<button data-g='0'></button><button data-g='1'>1</button><button data-g='2'>2</button><button data-g='3'>3</button><button data-g='4'>4</button><button data-g='5'>5</button>" +
             "<em></em></span>" +
           "<button class='wdsm-mode' data-k='web'></button>" +
+          "<button class='wdsm-mode' data-k='nosentry'></button>" +
           "<button class='wdsm-mode' data-k='nosde'></button>" +
           "<button class='wdsm-mode wdsm-rsbtn'></button>" +
           "<button class='wdsm-mode wdsm-lnkbtn'></button>" +
@@ -2966,6 +2968,8 @@
        让它露出「不套 SDE」的开关，等于把分身自己的存在理由拆掉了一半。 */
     var _nsBtn = q(".wdsm-mode[data-k='nosde']");
     if (_nsBtn) { _nsBtn.textContent = t("mNoSde"); _nsBtn.style.display = PROFILE ? "none" : ""; }
+    var _syBtn = q(".wdsm-mode[data-k='nosentry']");
+    if (_syBtn) { _syBtn.textContent = t("mSentry"); _syBtn.style.display = PROFILE ? "none" : ""; }
     q(".wdsm-note").textContent = t("note");
     q(".wdsm-mic").title = t("micIdle");
     if (!inEl.disabled) inEl.placeholder = t("ph");
@@ -3017,7 +3021,7 @@
   // 只是换一台更强的基底跑纯对话，深浅这条轴与套不套 SDE 是两件事）。
   // PROFILE 页强制当关：分身共用同一个 localStorage，读者可能在本体页开过它、
   // 再跳来分身页——分身没有这颗按钮，但状态不能跟着漏进来。
-  var thinkMode = "std", webOn = false, noSdeOn = false;
+  var thinkMode = "std", webOn = false, noSdeOn = false, sentryOnUI = true;
   /* ⭐ 难度条（2026-08-30）：gradePin 0＝自动（按站内检索定档），1–5＝读者钉死；gradeLast＝上一答的读数。
      [stated] 作者：深度思考要做成难度条，档位按站内检索对核心词的材料多少与准确度定。 */
   var gradePin = 0, gradeLast = null;
@@ -3028,6 +3032,7 @@
     thinkMode = localStorage.getItem(LS_MODE) === "deep" ? "deep" : "std";
     webOn = localStorage.getItem(LS_WEB) === "1";
     noSdeOn = !PROFILE && localStorage.getItem(LS_NOSDE) === "1";
+    sentryOnUI = localStorage.getItem(LS_NOSENTRY) !== "1";   // 默认开
     var _gp = parseInt(localStorage.getItem(LS_GRADE) || "0", 10); gradePin = (_gp >= 1 && _gp <= 5) ? _gp : 0;
   } catch (e) {}
   /* ════ 档位条的收放（2026-08-29）════════════════════════════════
@@ -3095,10 +3100,10 @@
     for (var i = 0; i < bs.length; i++) {
       var k = bs[i].getAttribute("data-k");
       if (!k) continue;                        // 附件按钮借了 .wdsm-mode 的样式，但不是档位，跳过
-      var on = (k === "web") ? webOn : (k === "nosde") ? noSdeOn : (thinkMode === k);
+      var on = (k === "web") ? webOn : (k === "nosde") ? noSdeOn : (k === "nosentry") ? sentryOnUI : (thinkMode === k);
       if (on) bs[i].classList.add("on"); else bs[i].classList.remove("on");
     }
-    tipEl.textContent = (thinkMode === "deep" ? t("tipDeep") : t("tipStd")) + (webOn ? t("tipWeb") : "") + (noSdeOn ? t("tipNoSde") : "");
+    tipEl.textContent = (thinkMode === "deep" ? t("tipDeep") : t("tipStd")) + (webOn ? t("tipWeb") : "") + (noSdeOn ? t("tipNoSde") : "") + ((!PROFILE && !sentryOnUI) ? t("tipNoSentry") : "");
     paintGrade();                              // 难度条只在深度档露面
     toolsPaint();                              // 档位一变，折叠钮上的摘要跟着变
   }
@@ -3188,6 +3193,7 @@
           var k = b.getAttribute("data-k");
           if (!k) return;                      // 同上：附件按钮另有自己的 onclick
           if (k === "web") { webOn = !webOn; try { localStorage.setItem(LS_WEB, webOn ? "1" : "0"); } catch (e) {} }
+          else if (k === "nosentry") { if (PROFILE) return; sentryOnUI = !sentryOnUI; try { localStorage.setItem(LS_NOSENTRY, sentryOnUI ? "0" : "1"); } catch (e) {} }
           else if (k === "nosde") {
             /* 双重保险：分身页这颗按钮本来就 display:none，这里再挡一次——
                就算哪天样式没跟上（或读者用某种手段绕过隐藏点到了它），也不能真的生效。
@@ -4576,7 +4582,7 @@
     // nosde 单独用 !PROFILE 再兜一道：即便分身页因为共用 localStorage 而读到了 noSdeOn=true
     // （按钮在分身页本就不出现，读者按不到它，但状态是跨页共享的同一把 key），也绝不把它发出去——
     // 分身是一份策展过的人格，不该因为一个借来的开关状态就被静默拆穿。
-    var payload = { q: q, history: histPack(compFrom()), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
+    var payload = { q: q, history: histPack(compFrom()), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1) };
     if (thinkMode === "deep") payload.grade = gradePin ? gradePin : "auto";   // 难度条：自动按检索定档，或读者钉死的档
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
     var pics = imgsForSend();
@@ -4653,6 +4659,8 @@
             /* 交账那一行必须在这里剥掉：再往下就进 history、进成文稿、进导出 PDF 了。 */
             var _led = ledgerTake(answer);
             if (_led) answer = _led.body;
+            var _preg = pregTake(answer);
+            if (_preg && _preg.body != null) answer = _preg.body;   // 预注册卡也剥出正文（同交账，不进历史/成文/PDF）
             cell.a.innerHTML = mdRender(answer);
             if (stoppedByUser) { var n = el("div", null, t("stopped")); n.style.cssText = "color:#6b7684;font-size:12px;margin-top:8px"; cell.a.appendChild(n); }
             /* ⭐ 工序交付审计：缺件就在这里如实标出来。放在 flushSrcs 之前——
@@ -4662,6 +4670,7 @@
             flushSrcs();                                  // 先正文，后文献
             history.push({ role: "wds", text: answer }); stSave(history); mountActs(cell, answer);
             if (_led) ledgerRender(cell, _led, answer);      // 记分牌挂在正文之外，不进导出稿
+            if (_preg && !_preg.empty) pregRender(cell, _preg);   // 预注册卡→判断账（正文之外）
             cvTake(answer);                                 // 先看是不是「就地改」的回稿（收成下一版），否则扫围栏块
             compTick();                                     // 够长了就把更早的压成账本
           } else if (timedOut) {
@@ -4732,6 +4741,8 @@
               else if (j.t === "grade") { gradeLine(cell, j.v); }
               else if (j.t === "nbr") { renderNbr(cell, j.v || []); }
               else if (j.t === "nbrfail") { nbrFailNote(cell); }
+              else if (j.t === "sentry") { renderSentry(cell, j.v || {}); }
+              else if (j.t === "far") { renderFar(cell, j.v || {}); }
               else if (j.t === "toolspec") { toolSpec = j.v; }
               else if (j.t === "follow") { renderFollows(cell, j.v); }
               else if (j.t === "token") { answer += j.v; paint(); }
@@ -9528,6 +9539,67 @@
     return null;
   }
   // 近邻名单卡：把后端取到的真名单摊在答案上方，读者能自己核对它到底交代了哪几篇
+  /* ════ 三刀 · 主动接地的前端痕迹（2026-08-31）════ */
+  function renderSentry(cell, v) {                    // 刀① 占位哨：站外占位者摆在正文之前
+    if (!cell || cell._sentry) return;
+    var items = (v && v.items) || [];
+    var box = el("div", "wdsm-nbr");
+    var head = (LANG === "en" ? "\ud83d\udef0 Sentry \u00b7 occupants already here" : "\ud83d\udef0 占位哨 \u00b7 已经有人占过这块地");
+    if (v && v.cached) head += (LANG === "en" ? " (cached)" : "\uff08缓存\uff09");
+    box.appendChild(el("div", "wdsm-nbr-h", head + " \u00b7 " + items.length));
+    if (!items.length) {
+      var why = (v && v.why) || "";
+      var wtxt = why === "need_search_key" ? (LANG === "en" ? "no search key" : "没有搜索 Key") : why;
+      box.appendChild(el("div", "wdsm-nbr-h", (LANG === "en" ? "none found" : "没查到") + (wtxt ? ("\uff08" + wtxt + "\uff09") : "")));
+    } else {
+      items.forEach(function (x, i) {
+        var a = el("a"); a.href = x.u; a.target = "_blank"; a.rel = "noopener";
+        a.appendChild(document.createTextNode((i + 1) + "\u3001" + (x.pass ? ("\u3014" + x.pass + "\u3015") : "") + x.t));
+        box.appendChild(a);
+      });
+    }
+    cell.turn.insertBefore(box, cell.a); cell._sentry = box;
+  }
+  function renderFar(cell, v) {                       // 刀② 远域结构：一行痕迹（正文里不留）
+    if (!cell || cell._far || !v || !v.d) return;
+    var box = el("div", null, (LANG === "en" ? "\ud83e\udded Far structure \u00b7 " : "\ud83e\udded 远域结构 \u00b7 ") + v.d + (v.s ? (" \u00b7 " + v.s) : ""));
+    box.style.cssText = "color:#6E7B8B;font-size:12.5px;margin:2px 0 10px"; box.title = (v.j || "");
+    cell.turn.insertBefore(box, cell.a); cell._far = box;
+  }
+  var PREG_RE = /\n*[\u3014\u3010\[]\s*预注册\s*[\u3015\u3011\]][^\n]*/;   // 刀③ 预注册卡
+  function pregField(line, name) { var re = new RegExp(name + "\\s*[\uff1a:]\\s*([^\uff5c|]*)"); var m = line.match(re); return m ? String(m[1]).replace(/^\s+|\s+$/g, "") : ""; }
+  function pregEmpty(v) { return !v || /^(无|none|-|—|视情况|有待|待定|待校准)$/i.test(v); }
+  function pregTake(text) {
+    var s2 = String(text || ""); var m = s2.match(PREG_RE);
+    if (!m) return null;
+    var line = m[0].replace(/^\s+/, "");
+    var body = s2.replace(PREG_RE, "").replace(/\s+$/, "");
+    var c = { body: body, line: line, hypo: pregField(line, "假设"), src: pregField(line, "数据源"),
+      crit: pregField(line, "判据"), lose: pregField(line, "算输"), due: pregField(line, "截止") };
+    if (pregEmpty(c.hypo) && pregEmpty(c.lose)) return { body: body, empty: true };   // 空心卡剥掉但不摆
+    return c;
+  }
+  function pregRender(cell, card) {
+    if (!card || card.empty || cell._preg) return;
+    var box = el("div");
+    box.style.cssText = "margin-top:8px;padding:8px 11px;border:1px dashed var(--wline);border-radius:9px;background:var(--wfill);font-size:12.5px;color:var(--wdim);line-height:1.5";
+    var h = el("b", null, (LANG === "en" ? "Pre-registered bet" : "预注册 \u00b7 判断账")); h.style.cssText = "color:var(--wgold2);display:block;margin-bottom:3px"; box.appendChild(h);
+    function row(lab, val) { if (!val) return; var r = el("div"); r.style.margin = "1px 0"; r.appendChild(el("b", null, lab)); r.appendChild(document.createTextNode(val)); box.appendChild(r); }
+    row(LANG === "en" ? "Claim: " : "假设：", card.hypo);
+    row(LANG === "en" ? "Source: " : "数据源：", card.src);
+    row(LANG === "en" ? "Criterion: " : "判据：", card.crit);
+    row(LANG === "en" ? "Loses if: " : "算输：", card.lose);
+    row(LANG === "en" ? "Due: " : "截止：", card.due);
+    try {
+      var K = "sde_wds_preg", arr = JSON.parse(localStorage.getItem(K) || "[]");
+      if (card.hypo && !arr.some(function (x) { return x.hypo === card.hypo; })) {
+        arr.push({ hypo: card.hypo, src: card.src, crit: card.crit, lose: card.lose, due: card.due, at: Date.now() });
+        localStorage.setItem(K, JSON.stringify(arr.slice(-200)));
+      }
+      if (arr.length) { var pn = el("i", null, (LANG === "en" ? ("Ledger: " + arr.length) : ("判断账已存 " + arr.length + " 条"))); pn.style.cssText = "display:block;margin-top:3px;color:var(--wdim2);font-style:normal;font-size:11.5px"; box.appendChild(pn); }
+    } catch (e) {}
+    cell.turn.appendChild(box); cell._preg = box;
+  }
   function renderNbr(cell, list) {
     if (!cell || cell._nbr) return;
     var box = el("div", "wdsm-nbr");

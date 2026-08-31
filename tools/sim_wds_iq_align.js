@@ -21,7 +21,7 @@ const iqSeg = W.slice(W.indexOf("function WDS_IQ_SYS("), W.indexOf("function wds
 ok(iqSeg.length > 2500, "评分规程有实体内容（不是空壳），实得 " + iqSeg.length + " 字符");
 
 console.log("② 改道排在最前——落进那串 + 号就已经晚了");
-const chatSeg = W.slice(W.indexOf("function WDS_CHAT_SYS("), W.indexOf("function WDS_CHAT_SYS(") + 1200);
+const chatSeg = W.slice(W.indexOf("function WDS_CHAT_SYS("), W.indexOf("function WDS_CHAT_SYS(") + 1500);  // 1200→1500：WDS_CHAT_SYS 签名加了 extras/sentryCtx（+19字），把人格 return 推出了原窗口
 ok(/if \(tool === "iq"\) return WDS_IQ_SYS\(/.test(chatSeg), "WDS_CHAT_SYS 开头对 iq 整段改道");
 const posGate = chatSeg.indexOf('if (tool === "iq")');
 /* ⚠ 锚点原来钉在 `return "你是 SDE 本体论的老师` 上。领域档案（prof）把人格头包成了
