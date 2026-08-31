@@ -12878,6 +12878,23 @@ export default {
       return new Response(jstream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
 
+    /* /api/wds/models：把各家的三档型号名交给前端，让「手动选档」的菜单有一份**唯一数据源**。
+       为什么不在前端也抄一份：型号名各家改得比本站勤，抄两份必然有一天两处不一致，
+       而不一致的样子最难查——菜单上写着 sol、真发出去的是 terra。这里现算现给，前端只显示。 */
+    if (url.pathname === "/api/wds/models") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      const out = {};
+      for (const vd in WDS_VENDORS) {
+        out[WDS_VSHORT[vd] || vd] = {
+          name: WDS_VENDORS[vd].name,
+          lite: wdsLiteModel(vd),
+          std: WDS_VENDORS[vd].model,
+          top: WDS_TOP_MODEL[vd] || WDS_VENDORS[vd].model,
+        };
+      }
+      return Response.json({ ok: true, v: out }, { headers: { ..._cors(), "cache-control": "public, max-age=300" } });
+    }
+
     if (url.pathname === "/api/wds/ping") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });

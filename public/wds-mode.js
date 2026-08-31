@@ -1188,6 +1188,7 @@
       nbrOwn: "本人已发",
       thDark: "深色", thLight: "浅色", thAuto: "跟随系统", thTitle: "外观",
       mpTitle: "选基底与档位", mpStd: "标准", mpDeep: "深度", mpModel: "型号 / Key 设置…", mpNoKey: "未填 Key",
+      mpTier: "型号档（钉住就不再跟难度条走）", mpTierAuto: "自动 · 跟难度条", mpTierLite: "轻档", mpTierStd: "标准档", mpTierTop: "最强档",
       stTitle: "写作风格", stP: "选一种口吻。它会跟着每次提问上行，不动你的自定义指令。",
       stDefault: "WDS 本色", stDefaultS: "犀利、直给、一句顶十句",
       stSharp: "更狠", stSharpS: "只留判断，先给最反直觉那一句，不铺垫",
@@ -1457,6 +1458,7 @@
       nbrOwn: "by you",
       thDark: "Dark", thLight: "Light", thAuto: "System", thTitle: "Appearance",
       mpTitle: "Model & effort", mpStd: "Standard", mpDeep: "Deep", mpModel: "Model / key settings…", mpNoKey: "No key",
+      mpTier: "Model tier (pinning it overrides the difficulty bar)", mpTierAuto: "Auto · follow difficulty bar", mpTierLite: "Light", mpTierStd: "Standard", mpTierTop: "Strongest",
       stTitle: "Writing style", stP: "Pick a voice. It rides along with each question and leaves your custom instructions alone.",
       stDefault: "WDS default", stDefaultS: "Sharp, direct, one line doing the work of ten",
       stSharp: "Sharper", stSharpS: "Judgement only — most counter-intuitive line first, no runway",
@@ -9935,6 +9937,17 @@
     return menu;
   }
 
+  /* 各家的三档型号名：从 /api/wds/models 取，前端**不抄第二份**——抄了就会有一天
+     菜单上写着 sol、真发出去的是 terra。取不到就退回「没有第三档可选」，菜单少一节，不报错。 */
+  var MTIERS = null, mtiersAsked = 0;
+  function mtiersLoad(cb) {
+    if (MTIERS || mtiersAsked) { cb && cb(); return; }
+    mtiersAsked = 1;
+    fetch("/api/wds/models").then(function (r) { return r.json(); })
+      .then(function (j) { if (j && j.ok) MTIERS = j.v; cb && cb(); })
+      .catch(function () { cb && cb(); });
+  }
+
   /* ════════════════ 顶栏模型选择器：VENDORS 全量 × 标准/深度 就地可切 ════════════════ */
   var mpEl = layer.querySelector(".wdsm-mp");
   // 标签用 JS 建子节点（不靠 innerHTML 里的嵌套）——顺手也让桩环境取得到，
@@ -9945,7 +9958,12 @@
     var v = kv ? kv.vendor : (function () { try { return localStorage.getItem("sde_wds_vendor") || "ds"; } catch (e) { return "ds"; } })();
     mpEl.innerHTML = "";
     mpEl.appendChild(el("span", "mpn", vinfo(v).name));
-    mpEl.appendChild(el("span", "mpk", "· " + (thinkMode === "deep" ? t("mpDeep") : t("mpStd")) + (kv ? "" : " · " + t("mpNoKey"))));
+    // 手动钉了型号就显示型号本身（去掉厂商前缀，只留辨识度那一段）：
+    // 「GPT · 深度」在钉住 luna 时是**假话**——档位写着深度，跑的却是最轻那一档。
+    var _pin = vmodelGet(v);
+    var _tail = _pin ? _pin.replace(/^(gpt-|claude-)/, "").replace(/-\d{8}$/, "")
+                     : (thinkMode === "deep" ? t("mpDeep") : t("mpStd"));
+    mpEl.appendChild(el("span", "mpk", "· " + _tail + (kv ? "" : " · " + t("mpNoKey"))));
     mpEl.title = t("mpTitle");
   }
   if (mpEl) mpEl.onclick = function () {
@@ -9982,6 +10000,31 @@
       mo.appendChild(document.createTextNode(t("mpModel")));
       mo.onclick = function () { closeMenu(); wdsKeyPanel(function () { paintMp(); }); };
       menu.appendChild(mo);
+      /* 型号档：自动（跟难度条）／轻／标准／深。钉住＝写进这家的型号覆盖，
+         之后难度条只再管功率、预算与资料条数，型号由你说了算。 */
+      mtiersLoad(function () {
+        var T = MTIERS && MTIERS[cur];
+        if (!T) return;
+        /* 只有两档的家（轻档取不到、退回标准档）不该显示一个和「标准」一模一样的「轻档」——
+           同名去重，去重后剩不到两档就整节不显示。 */
+        var pin = vmodelGet(cur), sec = el("div", "mh", t("mpTier")), used = {};
+        var rows = [["", t("mpTierAuto"), ""], ["lite", t("mpTierLite"), T.lite], ["std", t("mpTierStd"), T.std], ["top", t("mpTierTop"), T.top]]
+          .filter(function (r) { if (!r[0]) return true; if (!r[2] || used[r[2]]) return false; used[r[2]] = 1; return true; });
+        if (rows.length < 3) return;   // 自动 + 至少两个真型号才值得给一节
+        var frag = [sec];
+        rows.forEach(function (r) {
+          var on = r[0] ? (pin === r[2]) : !pin;
+          var b = el("button");
+          if (on) b.classList.add("on");
+          b.appendChild(document.createTextNode((on ? "\u2713 " : "") + r[1]));
+          if (r[2]) b.appendChild(el("span", "sub", r[2]));
+          b.onclick = function () { closeMenu(); vmodelSet(cur, r[2] || ""); paintMp(); };
+          frag.push(b);
+        });
+        // 菜单可能已被关掉（读者手快）——节点还在才插
+        if (menu && menu.parentNode) frag.forEach(function (x) { menu.insertBefore(x, mo); });
+      });
+
     });
   };
 
