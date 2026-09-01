@@ -118,7 +118,9 @@ if (box) {
   ok("第 3 档：顶配基底、思考 high 不 max、完整工序、时钟在两档之间", k3.top === 1 && k3.effort === "high" && k3.method === 1 && k3.first > 90000 && k3.first < 240000 && k3.total > 240000 && k3.total < 420000);
   const k1 = box.wdsGradeKnobs(1), k2 = box.wdsGradeKnobs(2);
   ok("第 1 档：标准基底＋关思考＋标准时钟＋精简工序（寒暄快车道）", k1.top === 0 && k1.plain === 1 && k1.first === 90000 && k1.method === 0 && k1.tok <= 2600);
-  ok("第 2 档：标准基底、思考随默认、不关", k2.top === 0 && k2.plain === 0 && k2.method === 0);
+  // 2026-09-01：第 2 档也关思考。plain=0 不是「不思考」而是「随基底默认」，
+  // 在思考默认开着的家等于把 3200 的预算先让思考吃掉，正文写不出字（真人读数：智谱·钉2）。
+  ok("第 2 档：标准基底、关思考（不要求思考的档不替思考付账）", k2.top === 0 && k2.plain === 1 && k2.method === 0);
   ok("五档预算与资料量单调不减", [1, 2, 3, 4, 5].every((n, i, arr) => i === 0 || (box.wdsGradeKnobs(n).tok >= box.wdsGradeKnobs(arr[i - 1]).tok && box.wdsGradeKnobs(n).src >= box.wdsGradeKnobs(arr[i - 1]).src && box.wdsGradeKnobs(n).ctx >= box.wdsGradeKnobs(arr[i - 1]).ctx)));
   ok("认不出的档退到标准配方（lv 0）", box.wdsGradeKnobs(9).lv === 0 && box.wdsGradeKnobs("x").lv === 0);
 
@@ -161,7 +163,9 @@ ok("找得到 /api/wds/chat 那一段", CHAT.length > 5000);
 ok("收 grade 字段（走解析器，不原样用）", /const gradeReq = wdsGradeReq\(b\.grade\);/.test(CHAT));
 ok("子请求成功时把 grade 收下（ragG）", /ragG = \(jr\.grade && typeof jr\.grade === "object"\) \? jr\.grade : null;/.test(CHAT));
 ok("定档：deep／请求／读数／不适用三条路一起递进 wdsGradePick", /const G = wdsGradePick\(deep, gradeReq, ragG, \{ rsLong: !!\(rs && \(rs\.forge \|\| rs\.sde\)\), duel: !!duel, canSee: canSee \}\);/.test(CHAT));
-ok("按档改 VC 时看图那条路不碰", /if \(G\.on && !canSee\) \{\s*VC\.top = gK\.top \? 1 : 0;\s*VC\.model = wdsPickModel\(vd, umodel, gK\.top\);/.test(CHAT));
+// 按用意写（原来钉的是三行连排的字面，中间一插注释、型号表达式一改就假红——「钉字面」这病第五次了）
+ok("按档改 VC 时看图那条路不碰", /if \(G\.on && !canSee\) \{/.test(CHAT)
+   && /VC\.top = gK\.top \? 1 : 0;/.test(CHAT) && /VC\.model = wdsPickModel\(vd, umodel,/.test(CHAT));
 ok("功率档随档给（3 档 high／4–5 档 max），非顶配时不留 effort", /if \(gK\.top && gK\.effort\) VC\.effort = gK\.effort; else delete VC\.effort;/.test(CHAT));
 ok("方法论块按档给（mFull），不再直接看 deep", /WDS_CHAT_SYS\(reflect, SDEM, \(nbrCtx \? nbrCtx \+ "\\n" : ""\) \+ ctxText, webCtx, mFull,/.test(CHAT) && /const mFull = G\.on \? !!gK\.method : deep;/.test(CHAT));
 ok("预算按档给，工序保底 4000；不适用时是老账（6000／4000／2600）", /const tokGrade = G\.on \? Math\.max\(gK\.tok, tool \? 4000 : 0\) : \(deep \? 6000 : \(tool \? 4000 : 2600\)\);/.test(CHAT) && /: \(rsLong \? FORGE_STAGE_TOK : \(rs \? \(deep \? 6000 : 4000\) : tokGrade\)\)/.test(CHAT));

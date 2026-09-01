@@ -5373,11 +5373,18 @@ function ragGrade(q, picked, nHit, docsN, chars, core) {
            exact: exact, core: kept.map((c) => ({ n: c.n, by: c.by, via: c.via })), anchors: anchors.slice(0, 8), nhit: nHit || 0 };
 }
 /* 每一档改什么。第 4 档 ＝ 从前的深度档一字不差（顶配基底／满功率／6000／完整工序／240s·420s／10 篇）；
-   第 5 档在它之上再装完整内功、预算 8000；第 1–2 档退到标准基底（1 档还关思考——寒暄与站外题的快车道）。 */
+   第 5 档在它之上再装完整内功、预算 8000；第 1–2 档退到标准基底并**关思考**——寒暄与站外题的快车道。
+   ⚠ 第 2 档的 plain 原来是 0（2026-09-01 改）。思考与正文**共用同一份 max_tokens**，而 plain=0
+     不是「不思考」，是「随基底默认」——在思考默认开着的家（glm-4.7-flash、glm-5.3 一族）就等于全开。
+     于是这一档既没要思考、又替思考付了账：3200 的预算先被想掉两千，正文一个字写不出来，
+     撞上思考看门狗（线 3400）被就地掐掉。真人读数：智谱·钉2·钉住 glm-4.7-flash，
+     两遍都是正文 0 字。**档位表把基底／功率／预算／工序／时钟都按档给了，唯独思考开关留白**，
+     这一格留白就把预算账搅乱了。纪律照旧（见空产出兜底处）：**解法是关思考，不是加预算**。
+     「深」从第 3 档起——这与条上 1 轻 2 常 3 深 4 满 5 极 的命名本来就是一致的。 */
 function wdsGradeKnobs(lv) {
   switch (lv | 0) {
     case 1: return { lv: 1, name: "轻", top: 0, plain: 1, effort: "", tok: 2600, method: 0, first: CHAT_FIRST_MS, total: CHAT_TOTAL_MS, src: 4, ctx: 6000, ng: 0 };
-    case 2: return { lv: 2, name: "常", top: 0, plain: 0, effort: "", tok: 3200, method: 0, first: CHAT_FIRST_MS, total: CHAT_TOTAL_MS, src: 6, ctx: 10000, ng: 0 };
+    case 2: return { lv: 2, name: "常", top: 0, plain: 1, effort: "", tok: 3200, method: 0, first: CHAT_FIRST_MS, total: CHAT_TOTAL_MS, src: 6, ctx: 10000, ng: 0 };
     case 3: return { lv: 3, name: "深", top: 1, plain: 0, effort: "high", tok: 4500, method: 1, first: CHAT_FIRST_MID_MS, total: CHAT_TOTAL_MID_MS, src: 8, ctx: 16000, ng: 0 };
     case 4: return { lv: 4, name: "满", top: 1, plain: 0, effort: "max", tok: 6000, method: 1, first: CHAT_FIRST_DEEP_MS, total: CHAT_TOTAL_DEEP_MS, src: 10, ctx: 30000, ng: 0 };
     case 5: return { lv: 5, name: "极", top: 1, plain: 0, effort: "max", tok: 8000, method: 1, first: CHAT_FIRST_DEEP_MS, total: CHAT_TOTAL_DEEP_MS, src: 10, ctx: 30000, ng: 1 };
@@ -12312,14 +12319,25 @@ export default {
                  **正文**算作首帧——45 秒首帧闸会把它们的重答冤杀在思考期，读者看到的是「重答也没接上」。给 120 秒。 */
               const clk2 = wdsClock((rsLong && !wdsCanPlain(VC)) ? 120000 : CHAT_RETRY_FIRST_MS, rsLong ? FORGE_TOTAL_MS : CHAT_RETRY_TOTAL_MS);
               try {
-                const up2 = rsLong
-                  ? await wdsFetchMax(VC, KEY, messages, true, tok2, clk2.signal, false, undefined, true)
-                  : await wdsUp(VC.url, {
-                  method: "POST",
-                  headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-                  body: JSON.stringify(wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: tok2, messages })),
-                  signal: clk2.signal,
-                });
+                /* 限流退让一次（2026-09-01）：429／503 是「此刻排队」，不是「配置不对」——
+                   而第一遍刚把这把 Key 打热，兜底这一遍撞上的概率最高。它是最后一次机会，
+                   被一句「稍后再来」判死，读者拿到的就是零字。代价两秒半，收益是这一答有没有。
+                   只退让一次：无限重试会把一次限流拖成一场空转，也会把 clk2 的首帧闸耗光。 */
+                let up2, _b2 = 0;
+                for (;;) {
+                  up2 = rsLong
+                    ? await wdsFetchMax(VC, KEY, messages, true, tok2, clk2.signal, false, undefined, true)
+                    : await wdsUp(VC.url, {
+                    method: "POST",
+                    headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+                    body: JSON.stringify(wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: tok2, messages })),
+                    signal: clk2.signal,
+                  });
+                  if (up2.ok || _b2 || (up2.status !== 429 && up2.status !== 503)) break;
+                  _b2 = 1;
+                  controller.enqueue(_sseBytes({ t: "note", v: "上游这一刻在限流（" + up2.status + "），等 2.5 秒再发一次…" }));
+                  await new Promise((r) => setTimeout(r, 2500));
+                }
                 if (!up2.ok) throw new Error("上游 " + up2.status);
                 const rd2 = up2.body.getReader();
                 let bf2 = "";

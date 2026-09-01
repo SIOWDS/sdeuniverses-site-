@@ -43,6 +43,20 @@ ok(/不等它想完了，现在关掉思考重答一次/.test(chatSeg), "兜底�
 ok(/wdsPlainBody\(VC, \{ model: VC\.model, stream: true, max_tokens: tok2/.test(chatSeg),
   "重答那一遍走 wdsPlainBody（关思考），不是原样再来一次");
 ok(!/_thinkCap = \d{3,}/.test(chatSeg), "没有把额度线写成一个与预算脱钩的常数");
+/* 兜底是最后一次机会：被上游一句「此刻排队」（429／503）判死，读者拿到的就是零字。
+   真人读数 2026-09-01：第一遍思考撞线被掐，第二遍「上游 429」，两遍合起来一个字没有。 */
+ok(/up2\.status !== 429 && up2\.status !== 503/.test(chatSeg), "兜底那一遍认得出限流／临时不可用，不当成配置错");
+ok(/上游这一刻在限流/.test(chatSeg), "退让时说得出为什么在等，不是静默停住");
+ok(/if \(up2\.ok \|\| _b2 \|\|/.test(chatSeg), "只退让一次（_b2 上闩）——无限重试会把一次限流拖成一场空转");
+/* 档位表里「不要求思考」的两档必须显式关思考。plain=0 不是不思考，是随基底默认；
+   在思考默认开着的家，它等于让思考与正文共用一份小预算，正文必然写不出字。 */
+{
+  var kn = W.slice(W.indexOf("function wdsGradeKnobs"), W.indexOf("function wdsGradeReq"));
+  ok(/case 1: return \{ lv: 1[^}]*plain: 1/.test(kn) && /case 2: return \{ lv: 2[^}]*plain: 1/.test(kn),
+    "第 1–2 档都关思考（预算全归正文）");
+  ok(/case 3: return \{ lv: 3[^}]*plain: 0/.test(kn) && /case 4: return \{ lv: 4[^}]*plain: 0/.test(kn),
+    "第 3 档起才开思考——与条上「1 轻 2 常 3 深」的命名对得上");
+}
 
 console.log("② 客户端 · 空答分三种死法");
 hasLine(M, /^\s+var tStart = Date\.now\(\), frames = 0, sawDone = false, lastBeat = null;$/m,
@@ -121,7 +135,10 @@ ok(/^\s+let _nof = setTimeout\(\(\) => \{ if \(!_st\.think && !_st\.out\) _stg\(
   "看门狗接在「基底作答」之后（注释掉当场红）");
 ok((chatSeg.match(/clearTimeout\(_nof\)/g) || []).length === 3 && (chatSeg.match(/_nof = null/g) || []).length === 3,
   "首帧（think/content 两处）与收流后各撤一次，实得 " + (chatSeg.match(/clearTimeout\(_nof\)/g) || []).length);
-ok(/d\.reasoning_content\) \{ clk\.firstFrame\(\); if \(_nof\)/.test(chatSeg) && /d\.content\) \{ clk\.firstFrame\(\); if \(_nof\)/.test(chatSeg),
+// 按用意写：要守的是「两处首帧（think／content）都在 clk.firstFrame() 紧邻处撤看门狗」，
+// 不是那一行的排版。原来钉的是单行字面，content 那一支换行之后就假红。
+ok(/d\.reasoning_content\) \{[\s\S]{0,40}clk\.firstFrame\(\);[\s\S]{0,20}if \(_nof\)/.test(chatSeg)
+   && /d\.content\) \{[\s\S]{0,40}clk\.firstFrame\(\);[\s\S]{0,20}if \(_nof\)/.test(chatSeg),
   "撤看门狗与撤首帧护栏钉在同一处——正常长思考不会被误报成卡死");
 ok(!/_stg\("基底作答·上游还没回第一个字"\)[\s\S]{0,200}ac\.abort|_nof[\s\S]{0,60}abort/.test(chatSeg),
   "看门狗只改说法、不掐流（掐流是时钟的活）");
