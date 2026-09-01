@@ -29,6 +29,7 @@ PAGES = {
         back=("/students/qin-li/", "← 秦莉 · Profile", "← 返回秦莉 Profile"),
         base="/students/qin-li/essays/",
         footer="© 德麦国际 Demai International · SDE 文学 · 作者专栏 · 秦莉",
+        native_longread=True,
     ),
     "wds": dict(
         data="wds_essays.json",
@@ -138,7 +139,10 @@ def render(cfg):
                 cat += "<i>%s</i>" % esc(r["series"])
             meta = [x for x in (r.get("author", ""), r["src"]) if x]
             if r.get("pages"):
-                meta.append("原始 PDF %d 页" % r["pages"])
+                if cfg.get("native_longread"):
+                    meta.append("网页长文")
+                else:
+                    meta.append("原始 PDF %d 页" % r["pages"])
             st = ('<div class="st">%s</div>' % esc(r["subtitle"])) if r.get("subtitle") else ""
             items.append(
                 '<a class="item" href="%s%s/">'
@@ -155,7 +159,10 @@ def render(cfg):
 
     lede = "%d 篇按发表年份排列，最近的在最前，最早的一篇在页面末尾。" % n
     if n_wechat:
-        lede += "其中 %d 篇原载「321互动艺术」公众号，本站保留原始 PDF、完整署名与原载日期" % n_wechat
+        if cfg.get("native_longread"):
+            lede += "其中 %d 篇原载「321互动艺术」公众号，本站均按网页长文重新排版，并保留完整署名、原载日期与可核验的原文链接" % n_wechat
+        else:
+            lede += "其中 %d 篇原载「321互动艺术」公众号，本站保留原始 PDF、完整署名与原载日期" % n_wechat
         lede += ("；另 %d 篇为本站首发的长文与作者稿。" % n_site) if n_site else "。"
     note = ('\n  <p class="note">%s</p>' % esc(cfg["note"])) if cfg.get("note") else ""
 
