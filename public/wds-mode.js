@@ -1192,6 +1192,7 @@
       mpTitle: "选基底与档位", mpStd: "标准", mpDeep: "深度", mpModel: "型号 / Key 设置…", mpNoKey: "未填 Key",
       mpTier: "型号档（钉住就不再跟难度条走）", mpTierAuto: "自动 · 跟难度条", mpTierLite: "轻档", mpTierStd: "标准档", mpTierTop: "最强档",
       mpVis: "看图档（带图的那一轮用哪个）", mpVisPin: "钉住这个",
+      mpTierNo: "型号表没取到 · 点此重取",
       stTitle: "写作风格", stP: "选一种口吻。它会跟着每次提问上行，不动你的自定义指令。",
       stDefault: "WDS 本色", stDefaultS: "犀利、直给、一句顶十句",
       stSharp: "更狠", stSharpS: "只留判断，先给最反直觉那一句，不铺垫",
@@ -1465,6 +1466,7 @@
       mpTitle: "Model & effort", mpStd: "Standard", mpDeep: "Deep", mpModel: "Model / key settings…", mpNoKey: "No key",
       mpTier: "Model tier (pinning it overrides the difficulty bar)", mpTierAuto: "Auto · follow difficulty bar", mpTierLite: "Light", mpTierStd: "Standard", mpTierTop: "Strongest",
       mpVis: "Vision model (used on turns with images)", mpVisPin: "Pin this one",
+      mpTierNo: "Model list unavailable · tap to retry",
       stTitle: "Writing style", stP: "Pick a voice. It rides along with each question and leaves your custom instructions alone.",
       stDefault: "WDS default", stDefaultS: "Sharp, direct, one line doing the work of ten",
       stSharp: "Sharper", stSharpS: "Judgement only — most counter-intuitive line first, no runway",
@@ -10057,16 +10059,30 @@
      菜单上写着 sol、真发出去的是 terra。取不到就退回「没有第三档可选」，菜单少一节，不报错。 */
   var MTIERS = null, mtiersAsked = 0;
   function mtiersLoad(cb) {
-    if (MTIERS || mtiersAsked) { cb && cb(); return; }
+    if (MTIERS) { cb && cb(); return; }
+    /* ⚠ 取不到不上闩（2026-09-01 第二刀）：原来是 `MTIERS || mtiersAsked` 一起挡，
+       于是**只要第一次取失败**（网络抖一下、边缘 503、开着菜单就切页），这一场就再也不会重取，
+       型号那一节从此静默消失，读者点多少次都一样——「还是不能选择」就是这么来的。
+       在飞的那一次仍不重复发：把回调排队等它。 */
+    if (mtiersAsked) { MTIERS_Q.push(cb); return; }
     mtiersAsked = 1;
     /* ⚠ 不许吃缓存（2026-09-01）：这个端点带 max-age=300，而型号表**当天就会变**
        ——glm-5-air 下线、glm-5v 下线、轻档新接 glm-4.7-flash 都发生在同一天。
        读者点开菜单看到的若是五分钟前那份，「智谱怎么没有型号可选」就是这么来的：
        旧表里 lite 与 std 同名，同名去重后不足两档，整节被判为不值得显示。 */
     fetch("/api/wds/models", { cache: "no-store" }).then(function (r) { return r.json(); })
-      .then(function (j) { if (j && j.ok) MTIERS = j.v; cb && cb(); })
-      .catch(function () { cb && cb(); });
+      .then(function (j) { if (j && j.ok) MTIERS = j.v; mtiersDone(cb); })
+      .catch(function () { mtiersDone(cb); });
   }
+  var MTIERS_Q = [];
+  function mtiersDone(cb) {
+    mtiersAsked = MTIERS ? 1 : 0;          // 没拿到就把闩放开，下次打开菜单再取一次
+    var q = MTIERS_Q; MTIERS_Q = [];
+    cb && cb();
+    q.forEach(function (f) { try { f(); } catch (e) {} });
+  }
+  // 页面一起来就先取一份（闲时）：菜单第一次打开时就有表，不必等那 200 毫秒的空窗
+  setTimeout(function () { try { mtiersLoad(null); } catch (e) {} }, 1200);
 
   /* ════════════════ 顶栏模型选择器：VENDORS 全量 × 标准/深度 就地可切 ════════════════ */
   var mpEl = layer.querySelector(".wdsm-mp");
@@ -10122,9 +10138,22 @@
       menu.appendChild(mo);
       /* 型号档：自动（跟难度条）／轻／标准／深。钉住＝写进这家的型号覆盖，
          之后难度条只再管功率、预算与资料条数，型号由你说了算。 */
+      /* 这一节插在菜单**最上面**（2026-09-01 第二刀）：它原来插在最后一颗按钮之前，
+         而今天刚添了 Claude 与 GPT 两家、厂商列表长了两行——从贴着屏幕底的那颗按钮弹上来时，
+         菜单高度被 maxHeight 卡住，型号档正好落在要往下滚才看得见的地方。
+         滚动条只有 10px 宽，看不见就等于不能选。主用途的那一节该在手指第一眼落到的位置。 */
+      var _mpTop = (menu.children && menu.children.length > 1) ? menu.children[1] : menu.firstChild;   // 摆在标题那一行之下
+      function _mpIns(x) { if (menu && menu.parentNode) { if (_mpTop) menu.insertBefore(x, _mpTop); else menu.appendChild(x); } }
       mtiersLoad(function () {
         var T = MTIERS && MTIERS[cur];
-        if (!T) return;
+        /* 取不到别静默：静默的样子和「这家没有第三档」一模一样，读者无从分辨，也无从自救。 */
+        if (!T) {
+          var rb = el("button");
+          rb.appendChild(document.createTextNode(t("mpTierNo")));
+          rb.onclick = function () { closeMenu(); MTIERS = null; mtiersAsked = 0; mtiersLoad(function () { if (mpEl && mpEl.onclick) mpEl.onclick(); }); };
+          _mpIns(rb);
+          return;
+        }
         /* 只有两档的家（轻档取不到、退回标准档）不该显示一个和「标准」一模一样的「轻档」——
            同名去重，去重后剩不到两档就整节不显示。 */
         var pin = vmodelGet(cur), sec = el("div", "mh", t("mpTier")), used = {};
@@ -10158,7 +10187,7 @@
           });
         }
         // 菜单可能已被关掉（读者手快）——节点还在才插
-        if (menu && menu.parentNode) frag.forEach(function (x) { menu.insertBefore(x, mo); });
+        frag.forEach(_mpIns);
       });
 
     });
