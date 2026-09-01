@@ -581,7 +581,8 @@ function wdsPlainBody(VC, body) {
   wdsMiniSplit(VC, body);   // MiniMax 的「回法」参数与开不开思考无关，两条路都要带（见函数头注释）
   const u = String((VC && VC.url) || "");
   if (u.indexOf("api.deepseek.com") >= 0) body.thinking = { type: "disabled" };
-  else if (u.indexOf("open.bigmodel.cn") >= 0) body.thinking = { type: "disabled" };
+  // 智谱两派：关得掉的关掉；关不掉的（5.3 一族）退而求其次，给最低投入档 low。
+  else if (u.indexOf("open.bigmodel.cn") >= 0) body.thinking = glmAlwaysThinks(body.model || (VC && VC.model)) ? { type: "low" } : { type: "disabled" };
   else if (u.indexOf("dashscope.aliyuncs.com") >= 0) body.enable_thinking = false;
   // gpt-5.x 是推理模型，关思考不是布尔开关而是投入档的最低档：reasoning_effort="none"（合法值 none/low/medium/high/xhigh/max）。
   // Claude 走的是 Anthropic 的 OpenAI 兼容层，那一层不暴露思考开关——所以它不在 wdsCanPlain 里，plain 对它是空指令。
@@ -611,6 +612,13 @@ function wdsMiniSplit(VC, body) {
    与同一份时钟。Kimi 与 MiniMax 思考常开、无开关参数，于是 `plain=true` 在它们身上是**空指令**：
    调用方以为「整份预算都归正文」，实际正文只分到剩下的那一点，时钟也被思考先吃掉一大截。
    ⚠ 凡按「思考已关」来配的常数（max_tokens、总时长闸），都必须先问这一句。 */
+/* 【GLM 里有一族关不掉思考的 —— 2026-09-01 实测】
+   glm-5.3-flash 收到 thinking:{type:"disabled"} 当场 400：
+   {"code":"1210","message":"该模型始终思考，不支持关闭思考；请使用 low、high 或 max。"}
+   也就是说智谱这一家内部分两派：4.x 与 glm-5 认 disabled，5.3 一族只认投入档。
+   关思考的口径全站只有 wdsPlainBody 一处，所以分派写在这里，别处不许再判一次。
+   ⚠ 认的是**型号名**不是地址——同一个 open.bigmodel.cn 底下两派并存。 */
+function glmAlwaysThinks(model) { return /^glm-5\.3/i.test(String(model || "")); }
 function wdsCanPlain(VC) {
   const u = String((VC && VC.url) || "");
   return u.indexOf("api.deepseek.com") >= 0
@@ -1616,7 +1624,9 @@ function wdsProfInScope(prof, u) {
   return prof.pre.some((p) => s.indexOf(p) >= 0);
 }
 const WDS_VISION = {
-  zhipu: ["glm-5v", "glm-4.6v"],
+  /* 2026-09-01 实测：glm-5v 上游回 1214「modelCode: 不存在」——与同日查出下线的 glm-5-air 同一批老名字。
+     换成当前在架的 glm-5.3-flash（智谱文档把它列在 vlm/ 目录下，是这一家现在的多模态档）。 */
+  zhipu: ["glm-5.3-flash"],
   qwen: ["qwen-vl-max", "qwen3-vl-plus"],
   kimi: ["kimi-k2.6", "moonshot-v1-32k-vision-preview"],
   // 2026-09-01：Claude 与 GPT 两家的当代型号都吃 OpenAI 式 image_url（含 base64 data URL），
@@ -12989,7 +12999,9 @@ export default {
         });
         if (r.ok) return Response.json({ ok: true, vendor: vd, model, name: WDS_VENDORS[vd].name }, { headers: _cors() });
         const txt = (await r.text()).slice(0, 300);
-        const code = (r.status === 401 || r.status === 403) ? "bad_key" : (r.status === 402 ? "no_credit" : (r.status === 404 || /model/i.test(txt) ? "bad_model" : "http"));
+        /* 429 单列（2026-09-01）：免费档挤是常态，它说明「型号对、Key 对，只是此刻排队」，
+           与「型号不对」「Key 不对」是完全不同的下一步——混成一句「没通」会让人去改根本没坏的配置。 */
+        const code = (r.status === 401 || r.status === 403) ? "bad_key" : (r.status === 402 ? "no_credit" : (r.status === 429 ? "busy" : (r.status === 404 || /model/i.test(txt) ? "bad_model" : "http")));
         return Response.json({ ok: false, code, status: r.status, model, msg: txt }, { headers: _cors() });
       } catch (e) {
         return Response.json({ ok: false, code: "net", model, msg: (e && e.message) || "connect failed" }, { headers: _cors() });

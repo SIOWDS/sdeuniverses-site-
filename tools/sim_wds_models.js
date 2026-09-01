@@ -34,6 +34,17 @@ console.log("\n[一之三] 探针必须显式关思考");
 ok(/body: JSON\.stringify\(wdsPlainBody\(\{ url: WDS_VENDORS\[vd\]\.url, model \}/.test(W), "ping 走 wdsPlainBody（关思考的口径只有那一处，探针不许另写一份）");
 ok(/model, stream: false, max_tokens: 64,/.test(W) && !/max_tokens: 16,/.test(W), "探针的 token 地板抬到 64，全文再无 16 那个值");
 
+console.log("\n[一之四] 智谱内部两派：关得掉思考的与关不掉的");
+/* 2026-09-01 实测：glm-5.3-flash 收到 thinking:{type:"disabled"} 当场 400（1210
+   「该模型始终思考，不支持关闭思考；请使用 low、high 或 max」），
+   而 glm-5 / glm-4.x 认 disabled。同一个地址底下两派并存 ⇒ 只能按**型号名**分派。 */
+ok(/function glmAlwaysThinks\(model\) \{ return \/\^glm-5\\\.3\/i\.test/.test(W), "有一处按型号判「这个型号关不掉思考」");
+ok(/glmAlwaysThinks\(body\.model \|\| \(VC && VC\.model\)\) \? \{ type: "low" \} : \{ type: "disabled" \}/.test(W), "关不掉的退到最低投入档 low，不再硬发 disabled");
+ok((W.match(/glmAlwaysThinks\(/g) || []).length === 2, "分派只写在 wdsPlainBody 一处（定义＋一次调用），别处不许再判一次");
+ok(/r\.status === 429 \? "busy"/.test(W), "429 单列为 busy —— 「型号对、Key 对、只是排队」与「型号不对」是两条完全不同的下一步");
+ok(/zhipu: \["glm-5\.3-flash"\]/.test(W), "视觉梯换掉实测不存在的 glm-5v");
+ok(W.indexOf('"glm-5v"') < 0, "glm-5v 不再出现在任何表里（实测 1214 不存在）");
+
 console.log("\n[二] 取不到轻档的家，退回标准档（行为一字不变）");
 ok(/function wdsLiteModel\(vd\) \{ return WDS_LITE_MODEL\[vd\] \|\| \(WDS_VENDORS\[vd\] && WDS_VENDORS\[vd\]\.model\); \}/.test(W),
    "wdsLiteModel 缺档即退回该家标准型号，不返回 undefined");

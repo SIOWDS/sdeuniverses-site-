@@ -1127,7 +1127,7 @@
       setVendorH: "选一家基底", setModelH: "型号（可空）",
       setModelP: "留空就用默认型号。各家改名或下线时，你可以自己填一个当下有效的型号，不必等本站改代码。",
       setTest: "测试连通", testing: "正在测…", testNoVis: "—— 这家在本站接口下看不了图",
-      testOk: "通了 · ", testBadKey: "Key 不对或没权限", testNoCredit: "余额不足", testBadModel: "型号不对：这家现在没有这个型号", testNet: "连不上这家的接口", testFail: "没通 · ",
+      testOk: "通了 · ", testBadKey: "Key 不对或没权限", testNoCredit: "余额不足", testBadModel: "型号不对：这家现在没有这个型号", testNet: "连不上这家的接口", testBusy: "这家此刻在排队（型号与 Key 都没问题，免费档挤的时候常见）", testFail: "没通 · ",
       applyAt: "申请 Key：",
       micIdle: "说话输入", micListen: "在听…（再点一下结束）", micRec: "录音中 ", micStop: "点一下结束",
       micWorking: "正在转文字…", micNoApi: "这台设备用不了语音输入", micDenied: "没拿到麦克风权限——浏览器地址栏里放行一下",
@@ -1409,7 +1409,7 @@
       setVendorH: "Pick a model provider", setModelH: "Model (optional)",
       setModelP: "Leave it blank for the default. When a provider renames or retires a model, put a working model name here yourself — you don't have to wait for this site to ship a change.",
       setTest: "Test connection", testing: "Testing…", testNoVis: "— no vision model at this vendor here",
-      testOk: "Connected · ", testBadKey: "Key rejected, or no permission", testNoCredit: "Out of credit", testBadModel: "No such model at this provider right now", testNet: "Couldn't reach this provider", testFail: "Failed · ",
+      testOk: "Connected · ", testBadKey: "Key rejected, or no permission", testNoCredit: "Out of credit", testBadModel: "No such model at this provider right now", testNet: "Couldn't reach this provider", testBusy: "Provider is busy right now (model and key are fine)", testFail: "Failed · ",
       applyAt: "Get a key: ",
       micIdle: "Speak", micListen: "Listening… (tap again to finish)", micRec: "Recording ", micStop: "tap to finish",
       micWorking: "Transcribing…", micNoApi: "Voice input isn't available on this device", micDenied: "No microphone permission — allow it from the address bar",
@@ -4516,7 +4516,7 @@
             if (T.tier !== "vis") { if (seen[mm]) { one(i + 1); return; } seen[mm] = 1; }
             var why = "";
             if (!(j && j.ok)) {
-              why = ({ bad_key: t("testBadKey"), no_credit: t("testNoCredit"), bad_model: t("testBadModel"), net: t("testNet") })[j && j.code] || (t("testFail") + ((j && j.status) || "?"));
+              why = ({ bad_key: t("testBadKey"), no_credit: t("testNoCredit"), bad_model: t("testBadModel"), net: t("testNet"), busy: t("testBusy") })[j && j.code] || (t("testFail") + ((j && j.status) || "?"));
               // 上游原话必须显出来：只报「没通 · 400」等于把唯一的线索藏起来——接新基底那天，
               // 差的就是这一句（是型号不对、参数不认、还是账户没开通，全在这段字里）。
               var raw = "";
