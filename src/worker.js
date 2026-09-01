@@ -5405,7 +5405,11 @@ function wdsGradeKnobs(lv) {
     case 3: return { lv: 3, name: "深", top: 1, plain: 0, effort: "high", tok: 4500, method: 1, first: CHAT_FIRST_MID_MS, total: CHAT_TOTAL_MID_MS, src: 8, ctx: 16000, ng: 0 };
     case 4: return { lv: 4, name: "满", top: 1, plain: 0, effort: "max", tok: 6000, method: 1, first: CHAT_FIRST_DEEP_MS, total: CHAT_TOTAL_DEEP_MS, src: 10, ctx: 30000, ng: 0 };
     case 5: return { lv: 5, name: "极", top: 1, plain: 0, effort: "max", tok: 8000, method: 1, first: CHAT_FIRST_DEEP_MS, total: CHAT_TOTAL_DEEP_MS, src: 10, ctx: 30000, ng: 1 };
-    default: return { lv: 0, name: "标准", top: 0, plain: 1, effort: "", tok: 2600, method: 0, first: CHAT_FIRST_MS, total: CHAT_TOTAL_MS, src: 6, ctx: 30000, ng: 0 };
+    /* 标准档 2600 → 8000（2026-09-01，读者定）：思考关掉之后这一份**整份归正文**，
+       2600 就成了平白的天花板——答一半被截住的那种「不够」，与从前「被思考吃光」的不够不是一回事。
+       预算是上限不是目标：基底不会因为给了 8000 就写 8000，只是不再在半路上被我们截断。
+       ⚠ 与站内老纪律不冲突：那条说的是「空产出别靠加预算去救」，此处思考已关、正文有产出，是另一件事。 */
+    default: return { lv: 0, name: "标准", top: 0, plain: 1, effort: "", tok: 8000, method: 0, first: CHAT_FIRST_MS, total: CHAT_TOTAL_MS, src: 6, ctx: 30000, ng: 0 };
   }
 }
 /* 这一问是不是 SDE 深度研究的一道（rs.sde），在 rs 白名单重建之前就要知道（联网开关在那之前算）。 */
@@ -11873,7 +11877,10 @@ export default {
                  老深度档（deep 而无难度条 ⇒ knobs(4)）plain 是 0，这一句对它没有效果。
                关不掉思考的家（Kimi／MiniMax）wdsCanPlain 为假，照旧。 */
             const gPlain = !!(gK.plain && wdsCanPlain(VC));
-            const tokGrade = G.on ? Math.max(gK.tok, tool ? 4000 : 0) : (deep ? 6000 : (tool ? 4000 : 2600));
+            /* 预算一律读 gK.tok（2026-09-01）：G.on 为假时 gK 就是 knobs(0)／knobs(4)，
+               与从前那两个字面量 2600／6000 一模一样——所以这里不再抄第二份。
+               抄两份的代价刚付过：标准档的 tok 改在表里，这一行还写着 2600，就会改了等于没改。 */
+            const tokGrade = Math.max(gK.tok, tool ? 4000 : 0);
             sources = sources.slice(0, resFull ? RES_RAG.srcn : (G.on ? gK.src : (deep ? 10 : 6)));
             if (G.on && ctxText.length > gK.ctx) {
               const _cl = ctxText.length;

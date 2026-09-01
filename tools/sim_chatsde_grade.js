@@ -168,7 +168,15 @@ ok("按档改 VC 时看图那条路不碰", /if \(G\.on && !canSee\) \{/.test(CH
    && /VC\.top = gK\.top \? 1 : 0;/.test(CHAT) && /VC\.model = wdsPickModel\(vd, umodel,/.test(CHAT));
 ok("功率档随档给（3 档 high／4–5 档 max），非顶配时不留 effort", /if \(gK\.top && gK\.effort\) VC\.effort = gK\.effort; else delete VC\.effort;/.test(CHAT));
 ok("方法论块按档给（mFull），不再直接看 deep", /WDS_CHAT_SYS\(reflect, SDEM, \(nbrCtx \? nbrCtx \+ "\\n" : ""\) \+ ctxText, webCtx, mFull,/.test(CHAT) && /const mFull = G\.on \? !!gK\.method : deep;/.test(CHAT));
-ok("预算按档给，工序保底 4000；不适用时是老账（6000／4000／2600）", /const tokGrade = G\.on \? Math\.max\(gK\.tok, tool \? 4000 : 0\) : \(deep \? 6000 : \(tool \? 4000 : 2600\)\);/.test(CHAT) && /: \(rsLong \? FORGE_STAGE_TOK : \(rs \? \(deep \? 6000 : 4000\) : tokGrade\)\)/.test(CHAT));
+/* 2026-09-01：预算不再抄第二份字面量。G.on 为假时 gK 就是 knobs(0)／knobs(4)，
+   这一行读 gK.tok 即可——抄两份的代价刚付过一次（表里改了 tok，这行还写着 2600）。 */
+ok("预算一律读 gK.tok，工序保底 4000（不再有第二份字面量）",
+   /const tokGrade = Math\.max\(gK\.tok, tool \? 4000 : 0\);/.test(CHAT)
+   && !/deep \? 6000 : \(tool \? 4000 : 2600\)/.test(CHAT)
+   && /: \(rsLong \? FORGE_STAGE_TOK : \(rs \? \(deep \? 6000 : 4000\) : tokGrade\)\)/.test(CHAT));
+ok("标准档预算 8000（读者 2026-09-01 定；思考已关，整份归正文）", box && box.wdsGradeKnobs(0).tok === 8000);
+ok("老深度档（无难度条）仍是 6000，与从前的字面量一致——收口径不许顺手改掉别的档",
+   box && box.wdsGradeKnobs(4).tok === 6000);
 ok("时钟按档给，产线与长篇的总时长照旧最长", /const gFirst = G\.on \? gK\.first : \(deep \? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS\);/.test(CHAT) && /const clk = wdsClock\(gFirst,\s*rsLong \? FORGE_TOTAL_MS : \(askLen \? CHAT_TOTAL_LONG_MS : gTotal\)\);/.test(CHAT));
 ok("零帧提示报的是这一档真实的首帧闸", /const _lim = Math\.round\(gFirst \/ 1000\);/.test(CHAT));
 ok("出处条数与站内资料量按档裁，裁了要说（研究道次另有满血条数）", /sources = sources\.slice\(0, resFull \? RES_RAG\.srcn : \(G\.on \? gK\.src : \(deep \? 10 : 6\)\)\);/.test(CHAT) && /if \(G\.on && ctxText\.length > gK\.ctx\)/.test(CHAT) && /站内资料只带前/.test(CHAT));
