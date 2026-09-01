@@ -1126,7 +1126,7 @@
       noSpeak: "此浏览器不支持朗读",
       setVendorH: "选一家基底", setModelH: "型号（可空）",
       setModelP: "留空就用默认型号。各家改名或下线时，你可以自己填一个当下有效的型号，不必等本站改代码。",
-      setTest: "测试连通", testing: "正在测…",
+      setTest: "测试连通", testing: "正在测…", testNoVis: "—— 这家在本站接口下看不了图",
       testOk: "通了 · ", testBadKey: "Key 不对或没权限", testNoCredit: "余额不足", testBadModel: "型号不对：这家现在没有这个型号", testNet: "连不上这家的接口", testFail: "没通 · ",
       applyAt: "申请 Key：",
       micIdle: "说话输入", micListen: "在听…（再点一下结束）", micRec: "录音中 ", micStop: "点一下结束",
@@ -1408,7 +1408,7 @@
       noSpeak: "This browser can't read aloud",
       setVendorH: "Pick a model provider", setModelH: "Model (optional)",
       setModelP: "Leave it blank for the default. When a provider renames or retires a model, put a working model name here yourself — you don't have to wait for this site to ship a change.",
-      setTest: "Test connection", testing: "Testing…",
+      setTest: "Test connection", testing: "Testing…", testNoVis: "— no vision model at this vendor here",
       testOk: "Connected · ", testBadKey: "Key rejected, or no permission", testNoCredit: "Out of credit", testBadModel: "No such model at this provider right now", testNet: "Couldn't reach this provider", testFail: "Failed · ",
       applyAt: "Get a key: ",
       micIdle: "Speak", micListen: "Listening… (tap again to finish)", micRec: "Recording ", micStop: "tap to finish",
@@ -4469,8 +4469,12 @@
       var k = draft[vend].k;
       if (k.length < 8) { kres.style.color = "#E8A8A0"; kres.textContent = t("setKeyPh"); return; }
       var mo = draft[vend].mo;
+      /* 2026-09-01 加第四探「看图」：看图档的型号出自另一张表（服务端 WDS_VISION），
+         文本三档探不到它——glm-5v 这些名字与当天被查出已下线的 glm-5-air 是同一批，
+         而它坏了只会在读者传图那一刻才露面。这一探真发一张 1×1 的图，连"吃不吃图"一起验。
+         读者自己钉了型号时仍只探他钉的那一个（他要验的就是那个）。 */
       var tiers = mo ? [{ tier: "", lab: "指定型号" }]
-                     : [{ tier: "lite", lab: "轻" }, { tier: "", lab: "标准" }, { tier: "top", lab: "深" }];
+                     : [{ tier: "lite", lab: "轻" }, { tier: "", lab: "标准" }, { tier: "top", lab: "深" }, { tier: "vis", lab: "看图" }];
       kres.style.color = "#8B98A5"; kres.textContent = t("testing");
       var lines = [], seen = {};
       function one(i) {
@@ -4478,7 +4482,7 @@
           var bad = lines.some(function (x) { return !x.ok; });
           kres.style.color = bad ? "#E8A8A0" : "#8ED0D0";
           kres.innerHTML = lines.map(function (x) {
-            return esc(x.lab + " " + x.model + " " + (x.ok ? "✓" : "✗ " + x.why));
+            return esc(x.lab + " " + x.model + " " + (x.note ? x.note : (x.ok ? "✓" : "✗ " + x.why)));
           }).join("<br>");
           return;
         }
@@ -4488,8 +4492,12 @@
           .then(function (r) { return r.json(); })
           .then(function (j) {
             var mm = (j && j.model) || "?";
-            if (seen[mm]) { one(i + 1); return; }   // 这家没有第三级，别把同一个型号探两遍
-            seen[mm] = 1;
+            /* 这家在本站接口下看不了图：如实写一行，但**不算红**——它不是故障，是这家没有这项。 */
+            if (j && j.code === "no_vis") { lines.push({ ok: true, model: "\u2014", lab: T.lab, note: t("testNoVis") }); one(i + 1); return; }
+            /* 去重只管文本三档（没有第三级的家，轻档退回标准档，别白探两遍）。
+               看图档不参与去重：它可能与文本档同名（如 Kimi 两处都是 kimi-k2.6），
+               但探的是**另一件事**（吃不吃图），跳掉就等于没探。 */
+            if (T.tier !== "vis") { if (seen[mm]) { one(i + 1); return; } seen[mm] = 1; }
             var why = "";
             if (!(j && j.ok)) {
               why = ({ bad_key: t("testBadKey"), no_credit: t("testNoCredit"), bad_model: t("testBadModel"), net: t("testNet") })[j && j.code] || (t("testFail") + ((j && j.status) || "?"));

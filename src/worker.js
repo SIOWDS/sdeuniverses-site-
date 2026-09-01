@@ -12941,6 +12941,9 @@ export default {
           lite: wdsLiteModel(vd),
           std: WDS_VENDORS[vd].model,
           top: WDS_TOP_MODEL[vd] || WDS_VENDORS[vd].model,
+          /* 看图档也交出来（2026-09-01）：它和文本三档是**另一张表**（WDS_VISION），
+             从前谁也探不到它——glm-5v / glm-4.6v 这些名字和刚被查出下线的 glm-5-air 是同一批。 */
+          vis: wdsVisionLadder(vd, "")[0] || "",
         };
       }
       return Response.json({ ok: true, v: out }, { headers: { ..._cors(), "cache-control": "public, max-age=300" } });
@@ -12957,7 +12960,15 @@ export default {
          「通不通」得按档问——同一把 Key 在 luna 上通、在 sol 上未必开通（各家按型号发权限）。
          老客户端只发 deep 布尔，照旧当两档解。 */
       const _tier = String(b.tier || "").toLowerCase();
-      const model = wdsPickModel(vd, String(b.model || ""), _tier === "lite" ? "lite" : (_tier === "top" || (!_tier && !!b.deep) ? 1 : 0));
+      /* 看图档单独一路：型号取自 WDS_VISION 那张表，而且**真发一张 1×1 的图**——
+         只发文字探得出「型号在不在」，探不出「这个型号在本站的接口下吃不吃图」，
+         而后者正是看图档会坏的那一半。这家没有视觉梯就如实回 no_vis，不当红算。 */
+      const _vis = _tier === "vis";
+      const _lad = _vis ? wdsVisionLadder(vd, String(b.model || "")) : [];
+      if (_vis && !_lad.length) return Response.json({ ok: false, code: "no_vis", model: "", vendor: vd }, { headers: _cors() });
+      const model = _vis ? _lad[0]
+        : wdsPickModel(vd, String(b.model || ""), _tier === "lite" ? "lite" : (_tier === "top" || (!_tier && !!b.deep) ? 1 : 0));
+      const PING_PX = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
       const ctrl = new AbortController();
       const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 25000);
       try {
@@ -12968,7 +12979,12 @@ export default {
              glm-4.7-flash 思考默认开着、与正文共用 max_tokens，16 个 token 全被思考吃掉，
              25 秒到点被 abort，屏幕上报成「连不上这家的接口」。可它其实是通的。
              走 wdsPlainBody 显式关思考（各家关法不同，那函数是唯一一处口径），地板抬到 64。 */
-          body: JSON.stringify(wdsPlainBody({ url: WDS_VENDORS[vd].url, model }, { model, stream: false, max_tokens: 64, messages: [{ role: "user", content: "ping" }] })),
+          body: JSON.stringify(wdsPlainBody({ url: WDS_VENDORS[vd].url, model }, {
+            model, stream: false, max_tokens: 64,
+            messages: [{ role: "user", content: _vis
+              ? [{ type: "text", text: "ping" }, { type: "image_url", image_url: { url: PING_PX } }]
+              : "ping" }],
+          })),
           signal: ctrl.signal,
         });
         if (r.ok) return Response.json({ ok: true, vendor: vd, model, name: WDS_VENDORS[vd].name }, { headers: _cors() });

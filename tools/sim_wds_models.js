@@ -32,7 +32,7 @@ console.log("\n[一之三] 探针必须显式关思考");
    探针给 16 个 token、又不关思考，token 全被思考吃掉 ⇒ 超时 abort ⇒ 屏幕上报「连不上」，
    而那一家其实是通的。这是 2026-09-01 glm-4.7-flash 探不通的真因。 */
 ok(/body: JSON\.stringify\(wdsPlainBody\(\{ url: WDS_VENDORS\[vd\]\.url, model \}/.test(W), "ping 走 wdsPlainBody（关思考的口径只有那一处，探针不许另写一份）");
-ok(/max_tokens: 64, messages: \[\{ role: "user", content: "ping" \}\]/.test(W), "探针的 token 地板抬到 64，不再是 16");
+ok(/model, stream: false, max_tokens: 64,/.test(W) && !/max_tokens: 16,/.test(W), "探针的 token 地板抬到 64，全文再无 16 那个值");
 
 console.log("\n[二] 取不到轻档的家，退回标准档（行为一字不变）");
 ok(/function wdsLiteModel\(vd\) \{ return WDS_LITE_MODEL\[vd\] \|\| \(WDS_VENDORS\[vd\] && WDS_VENDORS\[vd\]\.model\); \}/.test(W),
@@ -50,6 +50,21 @@ console.log("\n[三] 三张表里的每一个型号名，都要过得了 wdsPick
   const bad = names.filter((n) => !RE.test(n));
   ok(names.length > 8, "取到了足够多的型号名来检（共 " + names.length + " 个）");
   ok(bad.length === 0, "没有一个型号名会被那道正则拒掉" + (bad.length ? ("：" + bad.join("、")) : ""));
+}
+
+console.log("\n[三之二] 看图档也在探针的射程里");
+/* 2026-09-01：看图档的型号出自另一张表（WDS_VISION），文本三档探不到。
+   glm-5v / glm-4.6v 与当天查出已下线的 glm-5-air 是同一批名字，
+   而看图档坏了只在读者传图那一刻才露面——所以它必须进「测试连通」。 */
+ok(/const _vis = _tier === "vis";/.test(W) && /_lad = _vis \? wdsVisionLadder\(vd, String\(b\.model \|\| ""\)\)/.test(W), "ping 认 tier=vis，型号取自视觉梯");
+ok(/code: "no_vis"/.test(W), "这家没有视觉梯时如实回 no_vis（前端据此写成中性一行，不当红算）");
+ok(/type: "image_url", image_url: \{ url: PING_PX \}/.test(W), "**真发一张图** —— 只发文字探不出「这个型号在本站接口下吃不吃图」");
+ok(/vis: wdsVisionLadder\(vd, ""\)\[0\] \|\| "",/.test(W), "/api/wds/models 把看图档也交出来，前端仍只有这一份数据源");
+{
+  const C = fs.readFileSync(__dirname + "/../public/wds-mode.js", "utf8");
+  ok(/\{ tier: "vis", lab: "看图" \}/.test(C), "前端四探：轻／标准／深／看图");
+  ok(/if \(T\.tier !== "vis"\) \{ if \(seen\[mm\]\)/.test(C), "看图档不参与同名去重 —— 它可能与文本档同名（Kimi），但探的是另一件事");
+  ok(/j\.code === "no_vis"/.test(C) && /testNoVis/.test(C), "看不了图的家写成中性一行，不把「这家没这项」显示成故障");
 }
 
 console.log("\n[四] /api/wds/models 是前端菜单的唯一数据源");
