@@ -13085,6 +13085,17 @@ export default {
       // 内环（只调摆法）在浏览器里跑；外环（改内容）必须由基底来——摆法救不了"缺一页边界"。
       const fixNote = String(b.fix || "").slice(0, 3000);
       const prevDraft = String(b.prev || "").slice(0, 20000);
+      /* 【主题范围 —— 2026-09-01 王德生令】一场对话通常谈过好几件事，而成文这一步从前只有一个入口：
+         「把这场谈话锻成一件东西」。于是基底自己挑重心，挑中哪一件全看哪一段说得多、说得晚——
+         读者想写的那一件，可能正好是他只说了三句的那一件。⇒ 给他一个能说清「只写哪一块」的口子。
+         这不是筛选材料（筛错就丢证据），是给一道**取材闸**：范围之外的话题不进正文，
+         范围之内材料不够时如实说不够，**不许拿别的话题凑字数**——后者才是这道闸真正要防的事。 */
+      const scope = String(b.scope || "").replace(/\s+/g, " ").trim().slice(0, 300);
+      const scopeBlock = scope ? ("\n\n【主题范围（读者指定 · 硬约束）】\n本篇只写这一块：" + scope
+        + "\n· 先在材料里认出与它相关的部分，再动笔。范围之外的话题一律不进正文——不作背景、不作例子、不作过渡，也不许在引言里「顺带提一句」。"
+        + "\n· 题名、承重命题、判据、案例、附录，全部落在这个范围之内。"
+        + "\n· 若范围之内的材料撑不起本档字数：**宁可短，也不许扩题**；并在方法那一节如实写明材料只覆盖到哪一步。"
+        + "\n· 读者给的这句话是范围不是提纲：不要把它当小标题逐字抄进正文，也不要为了贴合它而把材料里没有的判断说成有。") : "";
       /* ⭐ 研究论文档的材料是六道产出，不是这场对话（rsrc 只在 kind=rpaper 下被认，别的档递上来也不认）。 */
       const RSRC = rpaperSource(b.rsrc, kind);
       const turns = RSRC ? RSRC.turns : (Array.isArray(b.history) ? b.history : []);   // 整场收下，长短由 readConvoText 处理
@@ -14229,7 +14240,9 @@ export default {
         const _t0 = (turns.find((t) => t && t.role !== "wds" && String(t.text || "").trim()) || {});
         /* ⭐ 研究论文档（2026-08-30）：种子＝第六道命名的 Z。第 6 道那趟查的是题域占位者；「Z 有没有人占过」
            只有 Z 落地之后才问得出，而出论文正是 Z 落地之后的第一趟。抠不到才退回题目（提纲那趟已当场说）。 */
-        const _seed = (kind === "rpaper" && RSRC && _rpZ) ? _rpZ : String(_t0.text || b.title || "").trim();
+        /* ⭐ 读者指定了主题范围，种子就取它：这一场的第一问多半问的是别的话题，
+           拿它去查占位者＝为另一篇文章找祖宗。 */
+        const _seed = (kind === "rpaper" && RSRC && _rpZ) ? _rpZ : (scope || String(_t0.text || b.title || "").trim());
         if (!_seed) { _distNbrP = Promise.resolve(null); return _distNbrP; }
         _distNbrP = nbrChain(env, _seed, (rvendor === "glm" ? KEY : ""), convo.slice(0, 20000))
           .catch(() => null);
@@ -14296,7 +14309,7 @@ export default {
                  就来自它在最末）；③ 英文那句直接命令它保留 S/D/E。带术语闸的档案一律换成本地版，
                  底盘走这一档自己那份（prof.neigong 同源，见 lang-neigong.txt）。ChatSDE 一字未动。 */
               const _langProf = !!(prof && prof.term);
-              const BASE = (prof ? (prof.sys + prof.guard) : "你是 SDE 本体论的老师（SDE 由王德生创立）。")
+              const BASE = scopeBlock + (prof ? (prof.sys + prof.guard) : "你是 SDE 本体论的老师（SDE 由王德生创立）。")
                 + (_langProf ? "" : "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律；发生学——追问事物为何如此发生，而非如何被发现。")
                 + (_langProf ? "" : (reflect ? ("\n\n【SDE 内化心得·思考底盘（别复述、别提\"心得/内功\"）】\n" + reflect) : ""))
                 + (dlang === "en" ? (_langProf
@@ -14824,7 +14837,7 @@ export default {
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             _st.stage = SPEC.name;
             const _langProf2 = !!(prof && prof.term);
-            const sys = (prof ? (prof.sys + prof.guard + "\n\n现在要把一场你与读者的谈话，锻成一件能留下来的东西。")
+            const sys = scopeBlock + (prof ? (prof.sys + prof.guard + "\n\n现在要把一场你与读者的谈话，锻成一件能留下来的东西。")
                               : "你是 SDE 本体论的老师（SDE 由王德生创立）。现在要把一场你与读者的谈话，锻成一件能留下来的东西。")
               + (_langProf2 ? "" : "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律；发生学——追问事物为何如此发生，而非如何被发现。")
               + (_langProf2 ? "" : (reflect ? ("\n\n【SDE 内化心得·思考底盘（别复述、别提\"心得/内功\"）】\n" + reflect) : ""))

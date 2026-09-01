@@ -1053,6 +1053,8 @@
       kNovel: "长篇小说（10万字以上·四部）", kNovelS: "四部三到四条线、十万字起。一次写不完：随时可停，回来点「接着往下写」从上次停的地方接着写。世界快照带卷次时间线，人物与设定全书守恒",
       kScript: "剧本（6000字）", kScriptS: "只写看得见与听得见的；写得出「他心里想」的那一句，一定是错的",
       lnPick: "先定体量", lnUnit: " 字",
+      scPick: "先说这一篇写哪一块", scNote: "一场对话通常谈过好几件事。**留空就整场都写**（和从前一样）；写一句范围，就只写那一块——范围之外的话题不进正文，材料不够时它会写短并说明，而不是拿别的话题凑字数。",
+      scPh: "例如：只写「大模型时代教育焦虑」那一段，不要谈评价制度改革", scGo: "按这个范围写", scAll: "整场都写", scAllS: "不限范围，由它自己定重心（旧行为）",
       lnNote: "三千字与八千字不是同一篇的两种长度：**短的那一档要砍掉一条线，长的那一档要多一个人**。所以体量在动笔之前定，不是写完再删——删出来的稿子逻辑是断的。",
       lnShort: "短", lnMid: "常用", lnLong: "长", lnDefault: "　这一档的默认体量",
       lnLegs1: "　分 ", lnLegs2: " 趟写（每趟一次调用，烧你自己的 Key）",
@@ -1344,6 +1346,8 @@
       kNovel: "Novel (100,000+ characters, four parts)", kNovelS: "Four parts, three to four lines, 100k characters and up. Too long for one sitting: stop anytime, come back and hit \u201ckeep writing\u201d to resume where you left off. A volume timeline in the world snapshot keeps people and setting consistent throughout",
       kScript: "Screenplay (6,000 characters)", kScriptS: "Only what can be seen and heard; any line saying what someone thinks is a wrong line",
       lnPick: "Pick a length first", lnUnit: " chars",
+      scPick: "What should this piece cover?", scNote: "One conversation usually covers several things. **Leave it blank to use the whole session** (the old behaviour). Name a scope and only that gets written — anything outside it stays out, and if the material runs thin it writes short and says so rather than padding with another topic.",
+      scPh: "e.g. only the part about learning evidence under LLMs, not assessment policy", scGo: "Write within this scope", scAll: "Use the whole session", scAllS: "No scope; let it pick the centre of gravity (old behaviour)",
       lnNote: "Three thousand and eight thousand are not two lengths of one piece: **the short one has to lose a thread, the long one has to gain a person.** So length is settled before writing, not by cutting afterwards — a cut-down draft has a broken spine.",
       lnShort: "Short", lnMid: "Usual", lnLong: "Long", lnDefault: "　default for this kind",
       lnLegs1: "　", lnLegs2: " passes (one upstream call each, on your own key)",
@@ -2684,6 +2688,47 @@
      所以体量在**动笔之前**问，不是写完再删——删出来的稿子逻辑是断的（讲话档那条 J-9 说的就是这件事）。
      ⚠ 选中的数只是一个提议，服务端只认它自己那张 DIST_WORD_OPTS 里的三个数；
         不在表里一律退回默认体量，不报错——**别让浏览器决定一趟写多少字**。 */
+  /* 【先问主题范围】(2026-09-01 王德生令)
+     一场对话通常谈过好几件事，而成文从前只有一个入口：「把这场谈话锻成一件东西」——
+     由基底自己挑重心，挑中哪一件全看哪一段说得多、说得晚；读者真正想写的那一件，
+     可能正好是他只说了三句的那一件。这一步就是把选题权交回给他。
+     ⚠ 留空＝整场都写（旧行为一字不变），所以这道问必须能一键跳过，不能变成每次成文都要填的表。
+     ⚠ 范围只进提示语的取材闸，**不在浏览器里筛材料**——筛错就是把证据丢在客户端，服务端再也看不见。 */
+  var lastScope = "";
+  function scopeMenu(kind, next) {
+    var m = el("div", "wdsm-help");
+    var box = el("div", "wdsm-tplb");
+    box.appendChild(el("h4", null, t("scPick") + "\u3000" + kindT(kind)));
+    var note = el("div", "wdsm-tplnote");
+    note.innerHTML = esc(t("scNote")).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+    box.appendChild(note);
+    var ta = el("textarea");
+    ta.rows = 3; ta.placeholder = t("scPh"); ta.value = lastScope;
+    ta.style.cssText = "width:100%;box-sizing:border-box;margin:0 0 12px;padding:10px;border-radius:9px;"
+      + "background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#F5EFE0;font:14px/1.6 inherit;resize:vertical;outline:none";
+    box.appendChild(ta);
+    var go = el("button", "wdsm-tplitem");
+    go.appendChild(el("b", null, t("scGo")));
+    go.onclick = function () {
+      lastScope = ta.value.trim().slice(0, 300);
+      if (m.parentNode) m.parentNode.removeChild(m);
+      next(lastScope);
+    };
+    box.appendChild(go);
+    var all = el("button", "wdsm-tplitem");
+    all.appendChild(el("b", null, t("scAll")));
+    all.appendChild(el("span", null, t("scAllS")));
+    all.onclick = function () { lastScope = ""; if (m.parentNode) m.parentNode.removeChild(m); next(""); };
+    box.appendChild(all);
+    var cx = el("button", "wdsm-tplitem");
+    cx.appendChild(el("b", null, t("cancel") || "\u53d6\u6d88"));
+    cx.onclick = function () { if (m.parentNode) m.parentNode.removeChild(m); };
+    box.appendChild(cx);
+    m.appendChild(box);
+    m.onclick = function (e) { if (e.target === m) m.parentNode.removeChild(m); };
+    layer.appendChild(m);
+    setTimeout(function () { try { ta.focus(); } catch (e) {} }, 60);
+  }
   function lenMenu(kind, next) {
     var d = kindDef(kind), opts = (d && d.wo) || [];
     if (!opts.length) { next(0); return; }
@@ -2711,7 +2756,7 @@
     m.onclick = function (e) { if (e.target === m) m.parentNode.removeChild(m); };
     layer.appendChild(m);
   }
-  function writerMenu(kind, words) {
+  function writerMenu(kind, words, scope) {
     var m = el("div", "wdsm-help");
     var box = el("div", "wdsm-tplb");
     box.appendChild(el("h4", null, t("wsPick") + "　" + t("wsCount")));
@@ -2724,7 +2769,7 @@
     inp.type = "text"; inp.placeholder = t("wsSearch");
     inp.style.cssText = "width:100%;margin:0 0 12px;box-sizing:border-box";
     box.appendChild(inp);
-    var go = function (id) { if (m.parentNode) m.parentNode.removeChild(m); distill(kind, null, null, "", null, id, words || 0); };
+    var go = function (id) { if (m.parentNode) m.parentNode.removeChild(m); distill(kind, null, null, "", null, id, words || 0, null, scope || ""); };
     var none = el("button", "wdsm-tplitem");
     none.appendChild(el("b", null, t("wsNone")));
     none.appendChild(el("span", null, t("wsNoneS")));
@@ -7735,9 +7780,13 @@
         var d0 = kindDef(k) || {};
         /* 次序：先问体量（它决定拆几趟、每趟写多少），再问笔法（腔调不改体量）。
            两个都没有的档直接开写。 */
-        lenMenu(k, function (w) {
-          if (d0.sty) { writerMenu(k, w); return; }
-          distill(k, null, null, "", null, "", w);
+        /* 次序：先问主题范围（它决定写哪一块），再问体量（决定拆几趟），最后问笔法（腔调不改前两者）。
+           装书与 PPT 在上面已各自 return，不走这条。 */
+        scopeMenu(k, function (sc) {
+          lenMenu(k, function (w) {
+            if (d0.sty) { writerMenu(k, w, sc); return; }
+            distill(k, null, null, "", null, "", w, null, sc);
+          });
         });
       };
       menu.appendChild(b);
@@ -8422,11 +8471,11 @@
     return head.replace(/^\s+/, "");
   }
 
-  function distill(kind, existing, title, tpl, again, style, words, ext) {
+  function distill(kind, existing, title, tpl, again, style, words, ext, scope) {
     var kv = existing ? {} : wdsKeyGet();
     /* ⚠ 填 Key 那一跳必须把 tpl 与 style 一并带回来——第一版只递了 kind，
        表现是「点了作家 → 弹出填 Key → 填完写出来却是本色」，而且没有任何报错。 */
-    if (!existing && !kv) { wdsKeyPanel(function () { distill(kind, null, title, tpl, again, style, words, ext); }); return; }
+    if (!existing && !kv) { wdsKeyPanel(function () { distill(kind, null, title, tpl, again, style, words, ext, scope); }); return; }
     var extDone = false;                     // onDone/onFail 只回一次（收尾与关窗都可能到）
     var wrap = el("div", "wdsm-dist");
     wrap.innerHTML = "<div class='wdsm-dist-box'>"
@@ -9196,7 +9245,7 @@
     /* 研究论文档：材料是十道产出（rsrc），对话与附件一概不送——送了只会稀释，且研究那十道早已消费过附件。 */
     var _rsrc = (ext && ext.rsrc) ? ext.rsrc : null;
     var BASEP = { kind: kind, history: _rsrc ? [] : history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "",
-        style: style || "", words: wsel,
+        style: style || "", words: wsel, scope: String(scope || "").slice(0, 300),
         // 载入的文章一并送过去：sumdoc 那一档拿它当正主，其余几档只作背景。
         // 这里送**全文**而不是按问题取段——成文是一次性的活，取段会让它读到半篇就下判断。
         docs: _rsrc ? [] : (typeof atts !== "undefined" ? atts : []).filter(function (d) { return d && d.text && !d.img; })
