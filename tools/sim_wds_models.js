@@ -78,6 +78,20 @@ ok(/vis: wdsVisionLadder\(vd, ""\)\[0\] \|\| "",/.test(W), "/api/wds/models 把�
   ok(/j\.code === "no_vis"/.test(C) && /testNoVis/.test(C), "看不了图的家写成中性一行，不把「这家没这项」显示成故障");
 }
 
+console.log("\n[三之三] 型号菜单：智谱要看得见、点得到");
+{
+  const C = fs.readFileSync(__dirname + "/../public/wds-mode.js", "utf8");
+  /* 2026-09-01 用户报「智谱没有型号选择」。真因不在菜单代码，在**缓存**：
+     端点带 max-age=300，读者拿到的是改表之前那一份（lite 与 std 都还是 glm-5-air），
+     同名去重后不足两档 ⇒ 整节被判为不值得显示。型号表当天就会变，这里不许吃缓存。 */
+  ok(/fetch\("\/api\/wds\/models", \{ cache: "no-store" \}\)/.test(C), "取型号表时 no-store —— 型号当天就会变，菜单不能显示五分钟前那份");
+  ok(/if \(rows\.length < 3\) return;/.test(C), "少于两个真型号才整节不显示（这条本身是对的，别为了这次问题把它删掉）");
+  /* 看图档：覆盖位 sde_wds_vmodel_* 一直存在，却从来没有设置它的界面。 */
+  ok(/function vmodelVisSet\(v, m\)/.test(C), "看图档的覆盖位终于有了设置它的函数");
+  ok(/if \(T\.vis\) \{/.test(C) && /mpVis/.test(C), "菜单里给看图档单独一节（它与文本三档不是同一根轴）");
+  ok(/vmodelVisSet\(cur, r\[2\] \|\| ""\)/.test(C), "点了真的写进覆盖位，不是只画个样子");
+}
+
 console.log("\n[四] /api/wds/models 是前端菜单的唯一数据源");
 ok(/if \(url\.pathname === "\/api\/wds\/models"\)/.test(W), "端点在");
 ok(/lite: wdsLiteModel\(vd\),/.test(W) && /std: WDS_VENDORS\[vd\]\.model,/.test(W) && /top: WDS_TOP_MODEL\[vd\] \|\| WDS_VENDORS\[vd\]\.model,/.test(W),

@@ -1191,6 +1191,7 @@
       thDark: "深色", thLight: "浅色", thAuto: "跟随系统", thTitle: "外观",
       mpTitle: "选基底与档位", mpStd: "标准", mpDeep: "深度", mpModel: "型号 / Key 设置…", mpNoKey: "未填 Key",
       mpTier: "型号档（钉住就不再跟难度条走）", mpTierAuto: "自动 · 跟难度条", mpTierLite: "轻档", mpTierStd: "标准档", mpTierTop: "最强档",
+      mpVis: "看图档（带图的那一轮用哪个）", mpVisPin: "钉住这个",
       stTitle: "写作风格", stP: "选一种口吻。它会跟着每次提问上行，不动你的自定义指令。",
       stDefault: "WDS 本色", stDefaultS: "犀利、直给、一句顶十句",
       stSharp: "更狠", stSharpS: "只留判断，先给最反直觉那一句，不铺垫",
@@ -1463,6 +1464,7 @@
       thDark: "Dark", thLight: "Light", thAuto: "System", thTitle: "Appearance",
       mpTitle: "Model & effort", mpStd: "Standard", mpDeep: "Deep", mpModel: "Model / key settings…", mpNoKey: "No key",
       mpTier: "Model tier (pinning it overrides the difficulty bar)", mpTierAuto: "Auto · follow difficulty bar", mpTierLite: "Light", mpTierStd: "Standard", mpTierTop: "Strongest",
+      mpVis: "Vision model (used on turns with images)", mpVisPin: "Pin this one",
       stTitle: "Writing style", stP: "Pick a voice. It rides along with each question and leaves your custom instructions alone.",
       stDefault: "WDS default", stDefaultS: "Sharp, direct, one line doing the work of ten",
       stSharp: "Sharper", stSharpS: "Judgement only — most counter-intuitive line first, no runway",
@@ -4425,6 +4427,7 @@
   function vmodelGet(v) { try { return (localStorage.getItem("sde_wds_model_" + v) || "").trim(); } catch (e) { return ""; } }
   // 视觉档的型号覆盖单独一族（sde_wds_vmodel_<短码>）——与文本档同名只差一个字母，早晚看错
   function vmodelVis(v) { try { return (localStorage.getItem("sde_wds_vmodel_" + v) || "").trim(); } catch (e) { return ""; } }
+  function vmodelVisSet(v, m) { try { if (m) localStorage.setItem("sde_wds_vmodel_" + v, m); else localStorage.removeItem("sde_wds_vmodel_" + v); } catch (e) {} }
   function vmodelSet(v, m) { try { if (m) localStorage.setItem("sde_wds_model_" + v, m); else localStorage.removeItem("sde_wds_model_" + v); } catch (e) {} }
 
   // 先看当前选中的那家有没有 Key；没有就按顺序找第一把能用的，并把选中项挪过去（免得读者被卡在一家空档上）
@@ -10016,7 +10019,11 @@
   function mtiersLoad(cb) {
     if (MTIERS || mtiersAsked) { cb && cb(); return; }
     mtiersAsked = 1;
-    fetch("/api/wds/models").then(function (r) { return r.json(); })
+    /* ⚠ 不许吃缓存（2026-09-01）：这个端点带 max-age=300，而型号表**当天就会变**
+       ——glm-5-air 下线、glm-5v 下线、轻档新接 glm-4.7-flash 都发生在同一天。
+       读者点开菜单看到的若是五分钟前那份，「智谱怎么没有型号可选」就是这么来的：
+       旧表里 lite 与 std 同名，同名去重后不足两档，整节被判为不值得显示。 */
+    fetch("/api/wds/models", { cache: "no-store" }).then(function (r) { return r.json(); })
       .then(function (j) { if (j && j.ok) MTIERS = j.v; cb && cb(); })
       .catch(function () { cb && cb(); });
   }
@@ -10094,6 +10101,22 @@
           b.onclick = function () { closeMenu(); vmodelSet(cur, r[2] || ""); paintMp(); };
           frag.push(b);
         });
+        /* 看图档单独一节（2026-09-01）：它与上面三档**不是同一根轴**——
+           上面选的是「这一答用哪个型号」，这里选的是「带了图的时候用哪个」。
+           覆盖位 sde_wds_vmodel_* 早就有，却一直没有任何界面去设它，等于一个谁也按不到的旋钮。 */
+        if (T.vis) {
+          var vpin = vmodelVis(cur);
+          frag.push(el("div", "mh", t("mpVis")));
+          [["", t("mpTierAuto"), ""], ["vis", t("mpVisPin"), T.vis]].forEach(function (r) {
+            var on = r[2] ? (vpin === r[2]) : !vpin;
+            var b = el("button");
+            if (on) b.classList.add("on");
+            b.appendChild(document.createTextNode((on ? "\u2713 " : "") + r[1]));
+            if (r[2]) b.appendChild(el("span", "sub", r[2]));
+            b.onclick = function () { closeMenu(); vmodelVisSet(cur, r[2] || ""); paintMp(); };
+            frag.push(b);
+          });
+        }
         // 菜单可能已被关掉（读者手快）——节点还在才插
         if (menu && menu.parentNode) frag.forEach(function (x) { menu.insertBefore(x, mo); });
       });
