@@ -175,7 +175,12 @@ ok("出处条数与站内资料量按档裁，裁了要说（研究道次另有�
 ok("发 grade 帧，且标准档也发（读者看得见这一问的高级度）", /if \(ragG \|\| G\.on \|\| deep\) controller\.enqueue\(_sseBytes\(\{ t: "grade", v: \{/.test(CHAT));
 ok("grade 帧里带落点、量、准、配方", /core: ragG \? \(ragG\.core \|\| \[\]\) : \[\]/.test(CHAT) && /method: mFull \? "完整工序" : "精简工序", tok: tokGrade, ng: !!\(G\.on && gK\.ng && !prof\)/.test(CHAT));
 ok("第 1 档主答走关思考的请求体（普通问答那一发）", /body: JSON\.stringify\(gPlain \? wdsPlainBody\(VC, \{ model: VC\.model, stream: true, max_tokens: tokWant, messages \}\) : wdsTopBody\(VC, \{ model: VC\.model, stream: true, max_tokens: tokWant, messages \}\)\)/.test(CHAT));
-ok("关思考只对关得掉的家（gPlain 带 wdsCanPlain）", /const gPlain = !!\(G\.on && gK\.plain && wdsCanPlain\(VC\)\);/.test(CHAT));
+// 2026-09-01：gPlain 不再要求 G.on。标准档走的是 G.on=false 那条路、gK 就是 knobs(0)，
+// 而它同样只有 2600 预算却把思考开关留白——同一笔账，换了个档位又发作一次。
+ok("关思考只对关得掉的家（gPlain 带 wdsCanPlain）", /const gPlain = !!\(gK\.plain && wdsCanPlain\(VC\)\);/.test(CHAT));
+ok("标准档（knobs 的 default 一格）也关思考——它自称「快答档，够用且省」，没有理由替思考付账",
+   /default: return \{ lv: 0, name: "标准", top: 0, plain: 1,/.test(SRC));
+ok("老深度档（无难度条时的 knobs(4)）不受影响，思考照开", /case 4: return \{ lv: 4[^}]*plain: 0/.test(SRC));
 const i5 = CHAT.indexOf("if (G.on && gK.ng && !prof && !(rs && rs.sde)) {");
 ok("第 5 档装完整内功：只在普通问答上、走 resPriorFit 预算闸、装不下退精简并说明", i5 > 0
   && CHAT.slice(i5, i5 + 2600).indexOf("resPriorFit(_ng5.length, 0, ctxText.length, webCtx.length, docCtx.length,") > 0
