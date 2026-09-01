@@ -192,9 +192,37 @@ console.log("⑨ 基底代号认不出时不许静默换一家（2026-08-19）")
   ["deepseek", "zhipu", "minimax"].forEach((k) => ok(new RegExp("\\b" + k + ": \"").test(vm), "全名也认：" + k));
   ok(/\|\| "zhipu";/.test(W), "退路本身保留（认不出总得有个去处），但常见全名不再落进来");
   ok(/这一把是发给「" \+ VC\.name \+ "」的/.test(W),
-    "★ 401/402/429 的判词说清发给了哪一家——不说就等于把好 Key 判成坏 Key");
-  ok((W.match(/这一把是发给「" \+ VC\.name \+ "」的/g) || []).length >= 2,
-    "两条读者路径都改了（chat 与 read），实得 " + (W.match(/这一把是发给「" \+ VC\.name \+ "」的/g) || []).length);
+    "★ 判词说清这把 Key 是发给哪一家的——不说就等于把好 Key 判成坏 Key");
+  /* 2026-09-01：判词从十几处各写各的收成一处口径（wdsUpWhy），所以不再数「改了几处」，
+     改数「还有没有第二处在自己判」——那才是会漏改的东西。 */
+  ok(/function wdsUpWhy\(/.test(W) && /function wdsUpStop\(/.test(W), "上游拒收的判词与「要不要停」只有一处口径");
+  ok((W.match(/status === 401 \|\| \w+\.status === 402 \|\| \w+\.status === 429/g) || []).length <= 1,
+    "各路不再自己把 401/402/429 混判成一件事，实得 " + (W.match(/status === 401 \|\| \w+\.status === 402 \|\| \w+\.status === 429/g) || []).length + " 处（只剩系统 Key 那一条另有判词）");
+}
+
+/* ⑨ 429 ≠ 坏 Key（2026-09-01 真人读数：智谱免费档 429，屏幕写「你的 Key 用不了」，他去查了额度） */
+console.log("⑨ 限流不是 Key 的毛病");
+{
+  var _w0 = W.indexOf("function wdsUpWhy(");
+  var _w1 = W.indexOf("function wdsTopBody(", _w0);
+  var why = null;
+  try { why = new Function(W.slice(_w0, _w1) + "\nreturn { wdsUpWhy, wdsUpStop };")(); }
+  catch (e) { ok(false, "抠得出 wdsUpWhy 并装得起来：" + (e && e.message)); }
+  if (why) {
+    ok(true, "抠得出 wdsUpWhy 并装得起来");
+    ok(why.wdsUpWhy(429, { name: "智谱 GLM" }).code === "busy", "429 判成 busy，不是 bad_key（bad_key 会让前端自动弹 Key 面板）");
+    ok(/限流/.test(why.wdsUpWhy(429, null).msg) && !/Key 用不了/.test(why.wdsUpWhy(429, null).msg), "429 的话说的是限流，不是叫人去换钥匙");
+    ok(why.wdsUpWhy(503, null).code === "busy" && why.wdsUpWhy(502, null).code === "busy", "上游 5xx 也归 busy");
+    ok(why.wdsUpWhy(402, null).code === "no_credit", "402 是额度用完，单列");
+    ok(why.wdsUpWhy(401, null).code === "bad_key" && why.wdsUpWhy(403, null).code === "bad_key", "401/403 才是坏 Key");
+    ok(why.wdsUpWhy(500, null).code === "" && why.wdsUpWhy(500, null).msg === "", "认不出的状态不硬判，留给原来那句「基底返回错误 N」带上游原文");
+    ok(why.wdsUpStop(429) && why.wdsUpStop(401) && !why.wdsUpStop(500) && !why.wdsUpStop(200),
+      "「要不要就此停住」与判词同一处口径，不另写一份条件");
+  }
+  // 主发一发与兜底那一遍都要退让一次（只一次）
+  ok((W.match(/这一家这一刻在限流（" \+ \w+\.status \+ "），等 2\.5 秒再发一次…/g) || []).length >= 1
+     || /等 2\.5 秒再发一次/.test(W), "撞限流时先退让一次再说，不是当场判死");
+  ok(/for \(let _rl = 0; ; _rl = 1\)/.test(W), "主发那一发的退让只做一次（_rl 上闩）");
 }
 
 console.log("\n" + (FAIL ? "✗ " : "✓ ") + PASS + " 项通过，" + FAIL + " 项失败");

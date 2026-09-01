@@ -626,6 +626,23 @@ function wdsCanPlain(VC) {
       || u.indexOf("dashscope.aliyuncs.com") >= 0
       || u.indexOf("api.openai.com") >= 0;   // reasoning_effort="none"，见 wdsPlainBody
 }
+/* 【上游拒收 ⇒ 判词】只该有一处口径（2026-09-01）。
+   全站十几处把 401/402/429 混成一句「你的 Key 用不了」。可 429 说的是**Key 对、型号对、
+   只是此刻排队**——把它判成坏 Key，读者就被打发去换一把根本没坏的钥匙，前端还会因为
+   code=bad_key 自动弹出 Key 面板，等于替他把错方向也指好了。真人读数 2026-09-01：
+   智谱免费档 429，屏幕上写「你的 Key 用不了」，他去查了额度。
+   判错的代价不是少一句话，是让人去修没坏的东西。/api/wds/ping 早分开了，正文这些路一直混着。 */
+function wdsUpWhy(status, VC) {
+  const s = status | 0;
+  const who = (VC && VC.name) ? ("，这一把是发给「" + VC.name + "」的") : "";
+  if (s === 429) return { code: "busy", msg: "这一家这一刻在限流（429）——Key 和型号都没问题，只是排队的人多。等十几秒再问一次；免费档尤其容易挤，也可以在型号档换一档或换一家基底。" };
+  if (s === 502 || s === 503 || s === 504) return { code: "busy", msg: "这一家的接口这一刻不可用（" + s + "）——不是你的 Key。等一下再问一次，或换一家基底。" };
+  if (s === 402) return { code: "no_credit", msg: "这把 Key 的额度用完了（402" + who + "）。去这家的控制台充值，或者换一把。" };
+  if (s === 401 || s === 403) return { code: "bad_key", msg: "这把 Key 用不了（" + s + who + "）：填错了，或者这把 Key 不是这一家的。去设置里检查或换一个。" };
+  return { code: "", msg: "" };
+}
+/* 「这个状态要不要就此停住」与判词同一处口径——两个判断分开写，早晚会有一处漏改。 */
+function wdsUpStop(status) { const s = status | 0; return !!wdsUpWhy(s, null).msg; }
 function wdsTopBody(VC, body) {
   wdsMiniSplit(VC, body);   // 放在 top 闸之前：标准档也要带（见 wdsMiniSplit 头注释）
   if (!VC || !VC.top) return body;
@@ -10473,8 +10490,7 @@ export default {
         const _stat = {};
         const out = await llmText(VC, KEY, sys, usr, mode === "profile" ? 1800 : (mode === "proj" ? 2000 : 1600), MEMO_MS, _stat);
         // Key 用不了是**硬错**：不报清楚的话，一次批量更新会拿同一把坏 Key 连撞几十场，每场都回一句"再点一次"。
-        if (_stat.status === 401 || _stat.status === 402 || _stat.status === 429)
-          return J({ ok: false, code: "bad_key", msg: "你的 Key 用不了（" + _stat.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个——已经做好的记忆不会丢。" }, 400);
+        if (wdsUpStop(_stat.status)) { const _w = wdsUpWhy(_stat.status, VC); return J({ ok: false, code: _w.code, msg: _w.msg + "（已经做好的记忆不会丢。）" }, 400); }
         const j = looseJSON(out);
         if (!j) return J({ ok: false, msg: "这一条没提炼出来（基底没给出可用结果），可以再点一次。" }, 502);
         if (mode === "profile") {
@@ -10572,8 +10588,7 @@ export default {
       try {
         const _stat = {};
         const out = await llmText(VC, KEY, sys, usr, NBR_TOK, NBR_MS, _stat);
-        if (_stat.status === 401 || _stat.status === 402 || _stat.status === 429)
-          return J({ ok: false, code: "bad_key", msg: "你的 Key 用不了（" + _stat.status + "）：额度不足或填错了。" }, 400);
+        if (wdsUpStop(_stat.status)) { const _w = wdsUpWhy(_stat.status, VC); return J({ ok: false, code: _w.code, msg: _w.msg }, 400); }
         const j = looseJSON(out);
         if (!j) return J({ ok: false, msg: "这一次没判出来（基底没给出可用结果），可以再点一次。" }, 502);
 
@@ -10773,7 +10788,7 @@ export default {
             if (!resp.ok) {
               clk.stop();
               const et = (await resp.text()).slice(0, 200);
-              if (resp.status === 401 || resp.status === 402 || resp.status === 429) return { err: "你的 Key 用不了（" + resp.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个。", code: "bad_key" };
+              if (wdsUpStop(resp.status)) { const _w = wdsUpWhy(resp.status, VC); return { err: _w.msg, code: _w.code }; }
               return { err: "基底返回错误 " + resp.status + "：" + et };
             }
             const reader = resp.body.getReader(); const dec = new TextDecoder(); let buf = "";
@@ -10886,7 +10901,7 @@ export default {
               catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 200);
-                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" })); return fin(); }
+                if (wdsUpStop(upstream.status)) { const _w = wdsUpWhy(upstream.status, VC); controller.enqueue(_sseBytes({ t: "error", v: _w.msg, code: _w.code })); return fin(); }
                 controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
               }
               const reader = upstream.body.getReader(); const dec = new TextDecoder(); let buf = "";
@@ -10925,7 +10940,7 @@ export default {
               catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 200);
-                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" })); return fin(); }
+                if (wdsUpStop(upstream.status)) { const _w = wdsUpWhy(upstream.status, VC); controller.enqueue(_sseBytes({ t: "error", v: _w.msg, code: _w.code })); return fin(); }
                 controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
               }
               const reader = upstream.body.getReader(); const dec = new TextDecoder(); let buf = "";
@@ -10976,7 +10991,7 @@ export default {
                 if (!upstream.ok) {
                   clk.stop();
                   const errtxt = (await upstream.text()).slice(0, 200);
-                  if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { err: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" };
+                  if (wdsUpStop(upstream.status)) { const _w = wdsUpWhy(upstream.status, VC); return { err: _w.msg, code: _w.code }; }
                   return { err: "基底返回错误 " + upstream.status + "：" + errtxt };
                 }
                 const reader = upstream.body.getReader(); const dec = new TextDecoder(); let buf = "", content = "";
@@ -11071,7 +11086,7 @@ export default {
                 if (!upstream.ok) {
                   clk.stop();
                   const errtxt = (await upstream.text()).slice(0, 200);
-                  if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { hard: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" };
+                  if (wdsUpStop(upstream.status)) { const _w = wdsUpWhy(upstream.status, VC); return { hard: _w.msg, code: _w.code }; }
                   if (upstream.status >= 500) return { soft: "基底返回错误 " + upstream.status + "：" + errtxt };
                   return { hard: "基底返回错误 " + upstream.status + "：" + errtxt };
                 }
@@ -11463,7 +11478,7 @@ export default {
               if (!upstream.ok) {
                 _clear();
                 const errtxt = (await upstream.text()).slice(0, 300);
-                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { hard: "你的 Key 用不了（" + upstream.status + "，这一把是发给「" + VC.name + "」的）：额度不足、填错了，或者这把 Key 不是这一家的。去设置里检查或换一个。", code: "bad_key" };
+                if (wdsUpStop(upstream.status)) { const _w = wdsUpWhy(upstream.status, uVC || VC); return { hard: _w.msg, code: _w.code }; }
                 // CONTEXT_OVERFLOW：深聊时历史+资料超过基底输入窗口，基底回 400 且报的是上下文/长度过长。
                 // 不直接报错——返回 overflow 让上层把历史预算砍半、重建 messages 重跑。max_tokens 类 400 已由 wdsFetchMax 处理，走不到这里。
                 if (upstream.status === 400 && /context|too long|too large|maximum context|length limit|exceed|输入.*过长|上下文|token/i.test(errtxt) && b.guide && histBudget > 24000) {
@@ -12184,6 +12199,10 @@ export default {
             }, CHAT_WAIT_NOTE_MS);
             let upstream;
             try {
+             /* 限流退让一次（2026-09-01）：429／503 说的是「此刻排队」，不是「配置不对」。
+                原来主发这一发一撞 429 就直接判词收工，读者连兜底那一遍都走不到——
+                而免费档挤是常态，等两秒半往往就过去了。只退让一次，且只对这两个状态。 */
+             for (let _rl = 0; ; _rl = 1) {
               // 视觉档型号会改名/下线：认不出就沿备用名退一格重发一次（只在看图这条路上，且只退到列表用完）。
               for (let vi = 0; ; vi++) {
                 /* 产线道次要的是顶配预算，而只有 deepseek 一格的上限核实过：别家收不收 64000 没查。
@@ -12199,6 +12218,10 @@ export default {
                 VC.model = visLadder[vi + 1];
                 controller.enqueue(_sseBytes({ t: "note", v: "视觉档型号换成了 " + VC.model + "（上一个这家已经不认了）。" }));
               }
+              if (upstream.ok || _rl || (upstream.status !== 429 && upstream.status !== 503)) break;
+              controller.enqueue(_sseBytes({ t: "note", v: "这一家这一刻在限流（" + upstream.status + "），等 2.5 秒再发一次…" }));
+              await new Promise((r) => setTimeout(r, 2500));
+             }
             } catch (e) {
               clk.stop();
               controller.enqueue(_sseBytes({ t: "error", v: (clk.cut ? clk.why("基底") : ("接不上基底：" + (e && e.message))) + "（可再问一次）" }));
@@ -12206,7 +12229,7 @@ export default {
             }
             if (!upstream.ok) {
               const errtxt = (await upstream.text()).slice(0, 300);
-              if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "，这一把是发给「" + VC.name + "」的）：额度不足、填错了，或者这把 Key 不是这一家的。去设置里检查或换一个。", code: "bad_key" })); return fin(); }
+              if (wdsUpStop(upstream.status)) { const _w = wdsUpWhy(upstream.status, VC); controller.enqueue(_sseBytes({ t: "error", v: _w.msg, code: _w.code })); return fin(); }
               controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
             }
             const reader = upstream.body.getReader();
@@ -12507,7 +12530,7 @@ export default {
             }
             if (!upstream.ok) {
               const errtxt = (await upstream.text()).slice(0, 300);
-              if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）。", code: "bad_key" })); return fin(); }
+              if (wdsUpStop(upstream.status)) { const _w = wdsUpWhy(upstream.status, VC); controller.enqueue(_sseBytes({ t: "error", v: _w.msg, code: _w.code })); return fin(); }
               controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
             }
             const reader = upstream.body.getReader();
@@ -14779,7 +14802,7 @@ export default {
                     want: want, fin: "http_" + up.status, ptok: 0, ctok: 0, rtok: 0,
                     cut: sclk.cut || "", secs: secs.length } }));
                   controller.enqueue(_sseBytes({ t: "error", v: "第 " + (partIdx + 1) + " 节基底返回 " + up.status + "：" + et,
-                    code: (up.status === 401 || up.status === 402 || up.status === 429) ? "bad_key" : "" }));
+                    code: wdsUpWhy(up.status, VC).code }));
                   sclk.stop(); return fin();
                 }
                 const rd = up.body.getReader(); const dc = new TextDecoder(); let bf = "";
@@ -14973,10 +14996,9 @@ export default {
             if (!upstream.ok) {
               const errtxt = (await upstream.text()).slice(0, 300);
               // 同一句话发两遍：error 给新版界面，token 给旧版界面——**报错不能被界面吞掉**。
-              const emsg = (upstream.status === 401 || upstream.status === 402 || upstream.status === 429)
-                ? ("你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。")
-                : ("基底返回错误 " + upstream.status + "：" + errtxt);
-              controller.enqueue(_sseBytes({ t: "error", v: emsg, code: (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) ? "bad_key" : "" }));
+              const _w = wdsUpWhy(upstream.status, VC);
+              const emsg = _w.msg || ("基底返回错误 " + upstream.status + "：" + errtxt);
+              controller.enqueue(_sseBytes({ t: "error", v: emsg, code: _w.code })); 
               controller.enqueue(_sseBytes({ t: "token", v: "（" + emsg + "）" }));
               return fin();
             }
