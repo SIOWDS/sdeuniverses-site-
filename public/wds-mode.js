@@ -8894,6 +8894,20 @@
       /* 状态栏那一行容易被略过（它就在角落里）。写短了另发一条 note，把差多少说清、把下一步给出来。 */
       if (text && _want && text.length < _floor) dNote(t("dShortW1") + text.length + "/" + _want + t("dShortW2"), 1);
       if (dCutAny) dNote(t("dCut"), 1);
+      /* 术语泄漏闸只对「要以目标学科母语发表」的几档开：报告／提纲／总结是站内自用的，
+         本来就说母体话，对它们报警只会教人忽略这条提示。 */
+      try {
+        if (text && LEAK_KINDS[kind]) {
+          var _lk = termLeak(text);
+          if (_lk.hard.length) {
+            dNote("\u26a0 \u672f\u8bed\u6cc4\u6f0f\u95f8\uff1a\u6b63\u6587\u91cc\u8fd8\u7559\u7740\u6bcd\u4f53\u672f\u8bed "
+              + _lk.hard.length + " \u79cd\uff08" + _lk.hard.join("\u3001") + "\uff09"
+              + (_lk.soft.length ? ("\uff1b\u53e6\u6709\u5404\u81ea\u90fd\u6709\u6b63\u5f53\u7528\u6cd5\u3001\u53ea\u4f9b\u5224\u8bfb\u7684\uff1a" + _lk.soft.join("\u3001")) : "")
+              + "\u3002\u8fd9\u4e00\u6863\u7684\u7a3f\u5b50\u662f\u8981\u4ee5\u76ee\u6807\u5b66\u79d1\u6bcd\u8bed\u53d1\u8868\u7684\uff0c\u5e26\u7740\u8fd9\u4e9b\u5b57\u4e0a\u7ad9\u7b49\u4e8e\u81ea\u62a5\u5bb6\u95e8\u3002"
+              + "\u7528\u300c/\u6539\u59d3\u300d\u6539\u5199\u6210\u540c\u884c\u7684\u8bdd\uff0c\u6216\u81ea\u5df1\u9010\u5904\u66ff\u6389\u3002", 1);
+          }
+        }
+      } catch (e) {}
       /* 整趟的账：切走过几次、一共多久。**这一行是给下一次判读用的**——
          若失败集中在标签页藏起来的那几分钟，那就不是上游的事。 */
       try {
@@ -9004,6 +9018,43 @@
        却断在 Kuhn 那条「才被」上——长度闸放它过去，读者拿到的是一份看起来完整的断稿。
        末字是字、或停在逗号顿号冒号破折号上，就是没写完。
        ⚠ 这道闸敢开，是因为下面 betterOf 兜着：判错了最多多打一趟，绝不会把稿子弄短。 */
+    /* 【术语泄漏闸】2026-09-02 补。同题同配方的一对实测里，一家把 S=F(D,E)、显露／差异序列／
+       特征纠缠／六路径通篇写进正文，另一家一个没漏——同一份内功、同一道指令。
+       ⇒ 改姓这件事不能只写在提示语里，得在出口上量一次。
+       词表口径在 104 篇已上站成品上校准过（误报 1 篇，且那一篇是方法论页，本就该 SDE-laden）：
+         ① 只数硬词。软词（显露／回写／发生学／差异路径…）各有正当用法，单独命中在校准集上
+            零真阳性、全是噪声 ⇒ 只列出供人判读，不构成命中。
+         ② 参考文献／声明组／致谢之后不数——那里的 SDE 是**出处**不是泄漏（三篇成品栽在这上面）。
+         ③ 「SDE Universes」是站名，正文引它是引文，先剔掉再数。
+       ⚠ 只报不改：改姓要重跑一趟两万字＝另一次调用，按不按由读者定。 */
+    var LEAK_KINDS = { paper: 1, paper1: 1, rpaper: 1, essay: 1, wechat: 1 };
+    var LEAK_HARD = ["差异序列", "特征纠缠", "三大方程", "六路径", "中心位轮转", "三界九库",
+      "意义三律", "介生态", "存在三态", "龙爪手", "改姓爪", "结构显露态", "三视角误差互消",
+      "S=F(D,E)", "D=G(S,E)", "E=H(S,D)", "SDE"];
+    var LEAK_SOFT = ["显露", "纠缠", "回写", "三视角", "显影", "底盘", "发生学", "差异路径", "解冻", "裂缝"];
+    var LEAK_TAIL = ["参考文献", "声明组", "利益冲突", "作者贡献", "致谢", "AI使用声明", "注释"];
+    function leakCount(sx, w) { return sx.split(w).length - 1; }
+    function termLeak(sx) {
+      var b = String(sx || "");
+      /* 尾段从**后六成**里找起：正文中间也会出现「参考文献」三个字（如「本文不列参考文献」），
+         从头找会把整篇正文切掉，闸门就永远沉默了。 */
+      var cut = b.length, from = Math.floor(b.length * 0.6);
+      for (var k = 0; k < LEAK_TAIL.length; k++) {
+        var i = b.indexOf(LEAK_TAIL[k], from);
+        if (i >= 0 && i < cut) cut = i;
+      }
+      b = b.slice(0, cut).split("SDE Universes").join("");
+      var hard = [], soft = [], n;
+      for (var a = 0; a < LEAK_HARD.length; a++) {
+        n = leakCount(b, LEAK_HARD[a]);
+        if (n > 0) hard.push(LEAK_HARD[a] + "\u00d7" + n);
+      }
+      for (var c = 0; c < LEAK_SOFT.length; c++) {
+        n = leakCount(b, LEAK_SOFT[c]);
+        if (n > 0) soft.push(LEAK_SOFT[c] + "\u00d7" + n);
+      }
+      return { hard: hard, soft: soft };
+    }
     function tailCut(sx) {
       var x = String(sx || "").replace(/[\s>*_`~\u3000]+$/g, "");
       if (!x) return false;                                   // 空的归长度闸管，这里不重复判
