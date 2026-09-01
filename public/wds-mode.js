@@ -3026,10 +3026,23 @@
     if (forever) { try { localStorage.setItem(TIP_KEY, "1"); } catch (e) {} }
   }
   function atBottom() { return bodyEl.scrollHeight - bodyEl.scrollTop - bodyEl.clientHeight < 90; }
+  /* 【自动贴底会被误读成「读者在往上翻」—— 2026-09-01 查实的屏幕闪烁】
+     流式每帧整篇重排（paint 里那句 innerHTML），而**重排后的高度不一定比上一帧高**：
+     代码围栏闭合、表格补齐、列表重排、光标 ▊ 换行，都会让 scrollHeight 当场缩一截，
+     scrollTop 随之被浏览器夹小 —— 一次「向上滚动」的假动作就这样发出去了。
+     顶栏与工具条的随读收起靠滚动方向判断，于是：假上滚 ⇒ 现；下一帧贴底 ⇒ 收；再一帧 ⇒ 现……
+     两条 .2s 过渡的横条以每秒七八次的频率一开一合，而 .hid 是**真的不占位**，
+     正文跟着上下跳 —— 读者看到的就是「整屏在闪」。DeepSeek 最明显：它出字最快，
+     帧间隔压在 110ms 的下限上，正好把这个来回振荡顶到最容易看见的频率。
+     ⇒ 记下每次程序贴底的时刻，滚动处理里据此**只让收、不让现**。 */
+  var progScrollAt = 0;
   function scrollBottom(smooth) {
+    progScrollAt = Date.now();
     try { bodyEl.scrollTo({ top: bodyEl.scrollHeight, behavior: smooth ? "smooth" : "auto" }); }
     catch (e) { bodyEl.scrollTop = bodyEl.scrollHeight; }
   }
+  // 刚刚是我们自己把页面滚下去的（不是读者的手指）
+  function progScrolling() { return Date.now() - progScrollAt < 400; }
   function setStick(on) { stick = !!on; if (toBotEl) toBotEl.style.display = stick ? "none" : "block"; }
   /* ════ 顶栏随读收起（2026-08-29）════════════════════════════════
      诉求同档位条：把屏幕让给答案。判据用滚动方向，不用「是不是在流式」——
@@ -3055,9 +3068,11 @@
     var y = bodyEl.scrollTop || 0;
     /* 到顶必现；往下读 8px 就收（流式贴底也会一直往下，于是读答案时它一直不在）；
        往上翻 24px 才现——阈值不对称，是为了防手指微抖把它抖出来。 */
+    /* 到顶必现这一条照旧（读者真滚到最上面了）；「往上翻就现」在程序贴底期间**不算数**——
+       那多半是重排把 scrollTop 夹出来的假上滚，不是读者的手指。 */
     if (y < 40) topSet(false);
     else if (y > topLastY + 8) topSet(true);
-    else if (y < topLastY - 24) topSet(false);
+    else if (!progScrolling() && y < topLastY - 24) topSet(false);
     topLastY = y;
   }
   bodyEl.addEventListener("scroll", function () { setStick(atBottom()); topOnScroll(); toolsOnScroll(); }, { passive: true });
@@ -3223,9 +3238,10 @@
   function toolsOnScroll() {
     if (toolsPinned !== null) return;
     var y = bodyEl.scrollTop || 0;
+    // 与顶栏同一条：程序贴底期间的「上滚」是假动作，不许把工具条抖出来
     if (y < 40) toolsSet(true, false);
     else if (y > toolsLastY + 8) toolsSet(false, false);
-    else if (y < toolsLastY - 24) toolsSet(true, false);
+    else if (!progScrolling() && y < toolsLastY - 24) toolsSet(true, false);
     toolsLastY = y;
   }
   try { inEl.addEventListener("focus", function () { if (toolsPinned === null) toolsSet(true, false); }); } catch (e) {}
