@@ -10034,8 +10034,13 @@
   function menuAt(anchor, fill) {
     if (document.querySelector(".wdsm-menu")) { closeMenu(); return null; }
     var menu = el("div", "wdsm-menu");
+    /* ⚠ fill() 跑在 appendChild **之前**，这一段里 menu.parentNode 一直是 null。
+       凡在 fill 里异步补内容的节（型号档就是），若拿 parentNode 当「菜单还开着」的凭据，
+       就会把「还没挂上」错判成「已经关掉」而整节丢掉——而且只在数据已缓存、回调同步跑到的那一次丢。
+       挂上之后打一个戳：有戳无 parentNode ＝真的关了，无戳 ＝还在装配中。 */
     fill(menu);
     document.body.appendChild(menu);
+    menu.__shown = 1;
     try {
       var r = anchor.getBoundingClientRect();
       menu.style.left = Math.max(8, Math.min(r.left, (window.innerWidth || 1200) - 240)) + "px";
@@ -10143,7 +10148,11 @@
          菜单高度被 maxHeight 卡住，型号档正好落在要往下滚才看得见的地方。
          滚动条只有 10px 宽，看不见就等于不能选。主用途的那一节该在手指第一眼落到的位置。 */
       var _mpTop = (menu.children && menu.children.length > 1) ? menu.children[1] : menu.firstChild;   // 摆在标题那一行之下
-      function _mpIns(x) { if (menu && menu.parentNode) { if (_mpTop) menu.insertBefore(x, _mpTop); else menu.appendChild(x); } }
+      /* ⚠ 2026-09-01 第三刀：守卫原来只认 menu.parentNode，于是**型号表已在手**的那条路整节消失——
+         页面起来 1.2 秒时已预取过一份，再打开菜单时 mtiersLoad 的回调是**同步**跑的，
+         此刻还在 fill() 里、菜单尚未 appendChild，parentNode 是 null，于是一个也没插进去。
+         从前的模拟每次都强制走异步 fetch，正好把这条唯一会发生在真人身上的路绕开了。 */
+      function _mpIns(x) { if (!menu) return; if (menu.__shown && !menu.parentNode) return; if (_mpTop) menu.insertBefore(x, _mpTop); else menu.appendChild(x); }
       mtiersLoad(function () {
         var T = MTIERS && MTIERS[cur];
         /* 取不到别静默：静默的样子和「这家没有第三档」一模一样，读者无从分辨，也无从自救。 */

@@ -415,6 +415,27 @@ function menuBtns() {
   lite.click();
   ok2(store["sde_wds_model_glm"] === "glm-4.7-flash", "点了真写进覆盖位，实得 " + store["sde_wds_model_glm"]);
 
+  /* ③ 表**已在手**时再打开——真人每一次都走这条路（页面起来 1.2 秒就预取过一份），
+        而前两节每次都强制走异步 fetch，正好把它绕开了。
+        回调同步跑在 fill() 里，此刻菜单还没 appendChild、parentNode 是 null：
+        插入守卫若拿 parentNode 当「菜单还开着」的凭据，整节静默丢掉——线上「智谱还是只有一个」就是这一处。 */
+  console.log("\n③ 型号表已缓存：回调同步跑在挂载之前，那一节仍须在（真人唯一走的路）");
+  document.dispatch("click", { target: document.body });
+  const before3 = MODEL_HITS.length;
+  mp.click();
+  bs = menuBtns();          // ⚠ 不 await：同步路径必须当场就有，等一下再看就掩盖了病灶
+  ok2(MODEL_HITS.length === before3, "没有再发请求，确系走的缓存同步路，实得 " + before3 + " → " + MODEL_HITS.length);
+  ok2(bs.some((x) => /glm-4\.7-flash/.test(x)) && bs.some((x) => /glm-5\.3-flash/.test(x)) && bs.some((x) => /glm-5$/.test(x)),
+      "三档仍在，实得 " + JSON.stringify(bs.filter((x) => /glm-/.test(x))));
+  const iT3 = bs.findIndex((x) => /glm-4\.7-flash/.test(x)), iV3 = bs.findIndex((x) => /DeepSeek/.test(x));
+  ok2(iT3 >= 0 && iV3 >= 0 && iT3 < iV3, "位置照旧在厂商列表之前，实得 型号#" + iT3 + " 厂商#" + iV3);
+  /* 反向核对：菜单**真被关掉之后**才回来的插入，仍要被挡住（守卫不能一放到底） */
+  const m3 = document.body.querySelector(".wdsm-menu");
+  ok2(!!m3 && m3.__shown === 1, "挂上之后打了戳，「已关闭」与「装配中」才分得开");
+  await new Promise((r) => setTimeout(r, 20));   // 外点监听是 setTimeout(0) 才挂上的
+  document.dispatch("click", { target: document.body });
+  ok2(!document.body.querySelector(".wdsm-menu"), "点外面照旧关得掉");
+
   console.log("\n===== " + P2 + " PASS / " + F2 + " FAIL =====");
   process.exit(F2 ? 1 : 0);
 })();
