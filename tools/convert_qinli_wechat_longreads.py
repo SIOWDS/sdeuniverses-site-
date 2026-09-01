@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert Qin Li's legacy WeChat PDF readers into native long-form HTML.
+"""Convert legacy SDE Literature WeChat PDF readers into native long-form HTML.
 
 The PDFs remain in object storage as source material, but the public pages no
 longer embed, download, or visually reproduce the WeChat/PDF wrapper.  Article
@@ -8,7 +8,7 @@ and rendered with the shared SDE Literature long-read theme.
 
 Usage:
     python3 tools/convert_qinli_wechat_longreads.py \
-      --pdf-root /path/to/source-pdfs [--check]
+      --pdf-root /path/to/source-pdfs [--collection all] [--check]
 """
 
 from __future__ import annotations
@@ -27,10 +27,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
 QINLI = PUBLIC / "students" / "qin-li"
+WANG_DESHENG = PUBLIC / "students" / "wang-desheng" / "essays"
 PDF_READER_MARK = "liter-pdf-reader"
 WECHAT_URL_RE = re.compile(r"https://mp\.weixin\.qq\.com/s/[A-Za-z0-9_-]+")
 TIMESTAMP_RE = re.compile(r"^\d{4}/\d{1,2}/\d{1,2}\s+\d{1,2}:\d{2}(?::\d{2})?$")
 PAGE_RE = re.compile(r"^\d+\s*/\s*\d+$")
+SEPARATOR_RE = re.compile(r"^[=＝_—–-]{4,}$")
+PUBLISH_SIGNATURE_RE = re.compile(
+    r"^(?:20\d{2}[.年/]\d{1,2}(?:[.月/]\d{1,2})?.{0,18}(?:发表于)?三视角|"
+    r"\d{1,2}\.\d{1,2}\s+\d{1,2}:\d{2}\s+(?:发表于)?三视角)$"
+)
 DATE_LINE_RE = re.compile(r"^[（(]?\d{4}[./年-]\d{1,2}(?:[./月-]\d{1,2})?.{0,20}[)）]?$", re.I)
 CN_NUM = "一二三四五六七八九十百零〇两"
 END_MARKERS = (
@@ -80,6 +86,8 @@ class PageMeta:
     category: str
     back_url: str
     back_label: str
+    all_works_url: str
+    all_works_label: str
 
 
 def strip_tags(value: str) -> str:
@@ -100,18 +108,34 @@ def attr_match(pattern: str, source: str, default: str = "") -> str:
 
 def parse_meta(page: Path, source: str, pdf_text: str) -> PageMeta:
     rel = page.relative_to(PUBLIC).as_posix()
-    if "/poems/" in f"/{rel}":
+    if rel.startswith("students/wang-desheng/essays/"):
+        category = "早期讲稿 · 原作"
+        back_url = "/students/wang-desheng/essays/"
+        back_label = "王德生 · 早期讲稿"
+        all_works_url = "/students/wang-desheng/"
+        all_works_label = "王德生作品页"
+        default_author = "王德生"
+    elif "/poems/" in f"/{rel}":
         category = "诗歌 · 原作"
         back_url = "/students/qin-li/poems/"
         back_label = "秦莉 · 诗歌"
+        all_works_url = "/students/qin-li/works/"
+        all_works_label = "秦莉全部作品"
+        default_author = "秦莉"
     elif "/fiction/" in f"/{rel}":
         category = "小说 · 原作"
         back_url = "/students/qin-li/fiction/"
         back_label = "秦莉 · 小说"
+        all_works_url = "/students/qin-li/works/"
+        all_works_label = "秦莉全部作品"
+        default_author = "秦莉"
     else:
         category = "评论 · 随笔"
         back_url = "/students/qin-li/essays/"
         back_label = "秦莉 · 评论随笔"
+        all_works_url = "/students/qin-li/works/"
+        all_works_label = "秦莉全部作品"
+        default_author = "秦莉"
 
     title = first_match(r"<h1[^>]*>(.*?)</h1>", source)
     description = attr_match(r'<meta\s+name="description"\s+content="([^"]*)"', source)
@@ -120,7 +144,7 @@ def parse_meta(page: Path, source: str, pdf_text: str) -> PageMeta:
     eyebrow = first_match(r'<div\s+class="eyebrow"[^>]*>(.*?)</div>', source, category)
     eyebrow = re.sub(r"\s*·?\s*原\s*作\s*完\s*整\s*收\s*录\s*", "", eyebrow).strip(" ·")
     eyebrow = re.sub(r"\s*·?\s*网\s*页\s*长\s*文\s*", "", eyebrow).strip(" ·")
-    byline = first_match(r'<(?:p|div)\s+class="(?:byline|author)"[^>]*>(.*?)</(?:p|div)>', source, "秦莉")
+    byline = first_match(r'<(?:p|div)\s+class="(?:byline|author)"[^>]*>(.*?)</(?:p|div)>', source, default_author)
     old_meta = first_match(r'<(?:p|div)\s+class="meta"[^>]*>(.*?)</(?:p|div)>', source)
     intro = first_match(r'<(?:p|div)\s+class="(?:intro|lead-box)"[^>]*>(.*?)</(?:p|div)>', source, description)
 
@@ -157,6 +181,8 @@ def parse_meta(page: Path, source: str, pdf_text: str) -> PageMeta:
         category=category,
         back_url=back_url,
         back_label=back_label,
+        all_works_url=all_works_url,
+        all_works_label=all_works_label,
     )
 
 
@@ -180,21 +206,42 @@ def clean_pdf_pages(pdf_text: str, title: str) -> list[list[str]]:
             if byline_at is not None:
                 raw_lines = raw_lines[byline_at + 1:]
 
+        signature_indexes = {
+            index for index, value in enumerate(raw_lines)
+            if PUBLISH_SIGNATURE_RE.match(value)
+        }
+        account_label_indexes: set[int] = set()
+        for signature_index in signature_indexes:
+            for candidate in range(signature_index - 1, max(-1, signature_index - 4), -1):
+                if raw_lines[candidate]:
+                    if len(raw_lines[candidate]) <= 30:
+                        account_label_indexes.add(candidate)
+                    break
         lines: list[str] = []
         nonempty_seen = 0
-        for line in raw_lines:
+        for index, line in enumerate(raw_lines):
             if line:
                 nonempty_seen += 1
             if not line:
                 lines.append("")
                 continue
+            line = re.sub(r"\s*[=＝]{4,}\s*", "", line).strip()
+            if not line:
+                continue
             if TIMESTAMP_RE.match(line) or PAGE_RE.match(line):
+                continue
+            if SEPARATOR_RE.match(line):
                 continue
             if WECHAT_URL_RE.fullmatch(line):
                 continue
             if line in {"原创", "原创文章", "321互动艺术"}:
                 continue
             if "321互动艺术" in line and re.search(r"\d{4}年\d{1,2}月\d{1,2}日", line):
+                continue
+            if index in signature_indexes:
+                continue
+            if index in account_label_indexes:
+                # Account/column signatures immediately preceding a publish stamp.
                 continue
             if nonempty_seen <= 7 and is_title_fragment(line, title):
                 continue
@@ -204,6 +251,26 @@ def clean_pdf_pages(pdf_text: str, title: str) -> list[list[str]]:
             if line in {"分享", "收藏", "点赞", "在看", "写留言", "阅读原文"}:
                 continue
             lines.append(re.sub(r"[ \t]+", " ", line))
+
+        # PDF export often wraps one parenthetical learner response over two
+        # or three physical lines.  Rejoin it before paragraph classification.
+        reflowed: list[str] = []
+        response_lines: list[str] = []
+        for line in lines:
+            if response_lines:
+                if line:
+                    response_lines.append(line)
+                if line.endswith(("）", ")")):
+                    reflowed.append(join_lines(response_lines))
+                    response_lines = []
+                continue
+            if line.startswith(("（", "(")) and not line.endswith(("）", ")")):
+                response_lines = [line]
+                continue
+            reflowed.append(line)
+        if response_lines:
+            reflowed.extend(response_lines)
+        lines = reflowed
 
         while lines and not lines[0]:
             lines.pop(0)
@@ -238,6 +305,10 @@ def heading_kind(line: str) -> tuple[int, str] | None:
         return 2, text
     if re.match(rf"^[{CN_NUM}]+[、.．]\s*\S", text):
         return 2, text
+    if re.match(rf"^(?:<|〈)[{CN_NUM}0-9]+(?:>|〉)$", text):
+        return 2, text.strip("<>〈〉")
+    if re.match(rf"^[{CN_NUM}]+、?$", text):
+        return 2, text.rstrip("、")
     if re.match(r"^\d+[、]\s*\S", text) and len(text) <= 58 and "：" not in text and ":" not in text:
         return 2, text
     if re.match(r"^\d+[.．]\s+\S", text) and len(text) <= 38 and not re.search(r"[：:；;。]", text):
@@ -257,7 +328,7 @@ def heading_kind(line: str) -> tuple[int, str] | None:
 
 
 def list_item(line: str) -> str | None:
-    match = re.match(rf"^(?:[-•●▪◆◇*]\s*|(?:\d+|[{CN_NUM}]+)[.)）．]\s+|[（(](?:\d+|[{CN_NUM}]+)[)）]\s*)(.+)$", line)
+    match = re.match(rf"^(?:[-•●▪◆◇*]\s*|(?:\d+|[{CN_NUM}]+)[.)）．]\s*|[（(](?:\d+|[{CN_NUM}]+)[)）]\s*)(.+)$", line)
     return match.group(1).strip() if match else None
 
 
@@ -273,7 +344,7 @@ def join_lines(lines: list[str]) -> str:
     return re.sub(r"\s+([，。！？；：、,.!?;:])", r"\1", result).strip()
 
 
-def prose_blocks(pages: list[list[str]]) -> list[Block]:
+def prose_blocks(pages: list[list[str]], transcript: bool = False) -> list[Block]:
     all_pages: list[list[Block]] = []
     for page in pages:
         blocks: list[Block] = []
@@ -303,7 +374,25 @@ def prose_blocks(pages: list[list[str]]) -> list[Block]:
                 buffer_kind = "li"
                 buffer = [item]
                 continue
+            if transcript and re.match(r"^[（(].+[）)]$", line):
+                flush()
+                blocks.append(Block("response", line))
+                continue
+            if transcript and re.match(r"^(?:整理|讲课时间|括号内为学员)", line):
+                flush()
+                blocks.append(Block("response", line))
+                continue
+            if transcript and re.match(r"^[^：:]{1,12}[：:]\s*\S{1,24}$", line):
+                flush()
+                blocks.append(Block("datum", line))
+                continue
             buffer.append(line)
+            if transcript and (
+                (len(join_lines(buffer)) >= 64 and re.search(r"[。！？!?；;：:）)】》”’]$", line))
+                or (len(join_lines(buffer)) >= 20 and re.search(r"[？?]$", line))
+                or len(join_lines(buffer)) >= 180
+            ):
+                flush()
         all_pages.append(blocks)
 
     merged: list[Block] = []
@@ -444,6 +533,10 @@ def render_blocks(blocks: list[Block], category: str) -> tuple[str, str]:
                 classes.append("pull")
             class_attr = f' class="{" ".join(classes)}"' if classes else ""
             output.append(f"<p{class_attr}>{html.escape(block.text)}</p>")
+        elif block.kind == "response":
+            output.append(f'<p class="dialogue-response">{html.escape(block.text)}</p>')
+        elif block.kind == "datum":
+            output.append(f'<p class="datum">{html.escape(block.text)}</p>')
     close_list()
     output.append('<div class="end-mark">· 完 ·</div>')
     return "\n".join(output), "\n".join(plain)
@@ -476,13 +569,13 @@ def render_page(meta: PageMeta, body_html: str, plain_text: str, date_value: str
         safe_url = html.escape(meta.source_url, quote=True)
         source_link = (
             f'<a class="origin-link" href="{safe_url}" target="_blank" rel="noopener noreferrer">'
-            "公众号原文 · 321互动艺术</a>"
+            "查看对应原文</a>"
         )
         source_note = (
             '<section class="source-note" aria-label="原文出处">'
             '<div class="label">原文出处</div>'
             '<p>正文依据作者原文整理为网页长文；公众号界面元素、关注提示、二维码与翻页标记均未带入。</p>'
-            f'<a href="{safe_url}" target="_blank" rel="noopener noreferrer">查看对应公众号原文 ↗</a>'
+            f'<a href="{safe_url}" target="_blank" rel="noopener noreferrer">查看对应原文 ↗</a>'
             '</section>'
         )
 
@@ -511,7 +604,7 @@ def render_page(meta: PageMeta, body_html: str, plain_text: str, date_value: str
 <meta property="og:title" content="{html.escape(meta.title, quote=True)}">
 <meta property="og:description" content="{html.escape(meta.description, quote=True)}">
 <meta property="og:type" content="article"><meta property="og:url" content="{html.escape(meta.canonical, quote=True)}">
-<link rel="stylesheet" href="/assets/liter-longread.css?v=20260901a">
+<link rel="stylesheet" href="/assets/liter-longread.css?v=20260901b">
 <script type="application/ld+json">{json.dumps(json_ld, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')}</script>
 </head><body>
 <a class="skip-link" href="#article-body">跳到正文</a>
@@ -550,7 +643,7 @@ def render_page(meta: PageMeta, body_html: str, plain_text: str, date_value: str
 
 <div class="article-footer">
   <a href="{meta.back_url}">← 返回{html.escape(meta.back_label)}</a>
-  <a href="/students/qin-li/works/">秦莉全部作品</a>
+  <a href="{meta.all_works_url}">{html.escape(meta.all_works_label)}</a>
 </div>
 <footer class="site-footer">© 德麦国际 Demai International · SDE 文学 · 作者专栏 · <a href="/browse/">sdeuniverses.com</a></footer>
 <script src="/assets/liter-longread.js?v=20260901a" defer></script>
@@ -579,13 +672,16 @@ def convert(page: Path, pdf_root: Path, check: bool) -> dict[str, object]:
     pdf_name = Path(iframe.group(1)).name if iframe else page.parent.name + ".pdf"
     pdf = pdf_root / rel_dir / pdf_name
     if not pdf.exists():
+        pdf = pdf_root / pdf_name
+    if not pdf.exists():
         raise FileNotFoundError(pdf)
 
     pdf_text = extract_pdf(pdf)
     meta = parse_meta(page, source, pdf_text)
     pages = clean_pdf_pages(pdf_text, meta.title)
     is_poem = "/poems/" in f"/{page.relative_to(PUBLIC).as_posix()}"
-    blocks = poem_blocks(pages) if is_poem else prose_blocks(pages)
+    is_transcript = page.is_relative_to(WANG_DESHENG)
+    blocks = poem_blocks(pages) if is_poem else prose_blocks(pages, transcript=is_transcript)
     body_html, plain_text = render_blocks(blocks, meta.category)
     if len(re.sub(r"\s", "", plain_text)) < 80:
         raise ValueError(f"too little extracted body text: {page}")
@@ -604,17 +700,19 @@ def convert(page: Path, pdf_root: Path, check: bool) -> dict[str, object]:
 def refresh_catalog_labels(check: bool) -> int:
     """Keep archive cards consistent with pages already converted to long-read."""
     hrefs = set()
-    for page in QINLI.rglob("index.html"):
-        source = page.read_text(encoding="utf-8", errors="ignore")
-        if "liter-longread.css" not in source:
-            continue
-        rel = page.relative_to(PUBLIC).as_posix().removesuffix("index.html")
-        hrefs.add("/" + rel)
+    for root in (QINLI, WANG_DESHENG):
+        for page in root.rglob("index.html"):
+            source = page.read_text(encoding="utf-8", errors="ignore")
+            if "liter-longread.css" not in source:
+                continue
+            rel = page.relative_to(PUBLIC).as_posix().removesuffix("index.html")
+            hrefs.add("/" + rel)
 
     changed = 0
     for catalog in (
         PUBLIC / "students" / "qin-li" / "works" / "index.html",
         PUBLIC / "sites" / "liter" / "all" / "index.html",
+        PUBLIC / "students" / "wang-desheng" / "essays" / "index.html",
     ):
         if not catalog.exists():
             continue
@@ -643,10 +741,19 @@ def main() -> int:
     parser.add_argument("--pdf-root", type=Path, required=True)
     parser.add_argument("--check", action="store_true", help="extract and validate without writing pages")
     parser.add_argument("--rebuild", action="store_true", help="also rebuild pages already using the long-read theme")
+    parser.add_argument(
+        "--collection", choices=("all", "qin-li", "wang-desheng"), default="all",
+        help="limit conversion to one literature collection",
+    )
     args = parser.parse_args()
 
+    roots = []
+    if args.collection in ("all", "qin-li"):
+        roots.append(QINLI)
+    if args.collection in ("all", "wang-desheng"):
+        roots.append(WANG_DESHENG)
     targets = sorted(
-        page for page in QINLI.rglob("index.html")
+        page for root in roots for page in root.rglob("index.html")
         if (
             PDF_READER_MARK in page.read_text(encoding="utf-8", errors="ignore")
             or (args.rebuild and "liter-longread.css" in page.read_text(encoding="utf-8", errors="ignore"))
@@ -654,7 +761,7 @@ def main() -> int:
     )
     if not targets:
         catalogs = refresh_catalog_labels(args.check)
-        print(f"No Qin Li PDF reader pages found; refreshed {catalogs} catalog(s).")
+        print(f"No PDF reader pages found; refreshed {catalogs} catalog(s).")
         return 0
 
     reports = []
