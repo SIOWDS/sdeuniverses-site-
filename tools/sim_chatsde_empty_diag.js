@@ -141,9 +141,13 @@ ok((chatSeg.match(/clearTimeout\(_nof\)/g) || []).length === 3 && (chatSeg.match
   "首帧（think/content 两处）与收流后各撤一次，实得 " + (chatSeg.match(/clearTimeout\(_nof\)/g) || []).length);
 // 按用意写：要守的是「两处首帧（think／content）都在 clk.firstFrame() 紧邻处撤看门狗」，
 // 不是那一行的排版。原来钉的是单行字面，content 那一支换行之后就假红。
-ok(/d\.reasoning_content\) \{[\s\S]{0,40}clk\.firstFrame\(\);[\s\S]{0,20}if \(_nof\)/.test(chatSeg)
+// 2026-09-01：思考字段收进 wdsRsn（OpenRouter 走 delta.reasoning，不是 reasoning_content），
+// 所以这里认的是「拿到思考的那一支」，不是那个字段名。
+ok(/if \(_rsn\) \{[\s\S]{0,40}clk\.firstFrame\(\);[\s\S]{0,20}if \(_nof\)/.test(chatSeg)
    && /d\.content\) \{[\s\S]{0,40}clk\.firstFrame\(\);[\s\S]{0,20}if \(_nof\)/.test(chatSeg),
   "撤看门狗与撤首帧护栏钉在同一处——正常长思考不会被误报成卡死");
+ok(/const _rsn = wdsRsn\(d\);/.test(chatSeg) && /_st\.think \+= _rsn\.length/.test(chatSeg),
+  "主答那一处的思考走 wdsRsn（各家字段名不同），思考字数照旧计入看门狗");
 ok(!/_stg\("基底作答·上游还没回第一个字"\)[\s\S]{0,200}ac\.abort|_nof[\s\S]{0,60}abort/.test(chatSeg),
   "看门狗只改说法、不掐流（掐流是时钟的活）");
 

@@ -4427,6 +4427,11 @@
     { v: "mmcn", name: "MiniMax（国内）", ks: "sde_mmcn_key", apply: "https://platform.minimaxi.com" },
     { v: "cl", name: "Claude", ks: "sde_cl_key", apply: "https://platform.claude.com" },
     { v: "gpt", name: "GPT", ks: "sde_gpt_key", apply: "https://platform.openai.com" },
+    /* or（OpenRouter）2026-09-01 加：一把 Key 通到几百个型号的转发站，本站三档取的都是 :free 的那一族。
+       接它是为了有条退路——别家免费档一挤住就没地方去，而它的免费型号横跨多个供应商。
+       ⚠ 免费名单会轮换（官方不保证一直提供），型号名过期时在设置里覆盖即可。
+       ⚠ 配额：:free 一族 20 RPM；credits 不足 10 美元每天 50 次，充够 10 美元每天 1000 次。 */
+    { v: "or", name: "OpenRouter", ks: "sde_or_key", apply: "https://openrouter.ai/keys" },
   ];
   function vinfo(v) { for (var i = 0; i < VENDORS.length; i++) if (VENDORS[i].v === v) return VENDORS[i]; return VENDORS[0]; }
   function vkeyGet(v) { try { return (localStorage.getItem(vinfo(v).ks) || "").trim(); } catch (e) { return ""; } }

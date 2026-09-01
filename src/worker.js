@@ -337,7 +337,8 @@ export class VisitCounter {
 //    发一个不存在的型号＝这家深度档一直在 400。改回 k2.6（Kimi 自己标的"迄今最智能"）。
 /* 2026-09-01 加 Claude 与 GPT 两家（见 WDS_VENDORS 的头注释）。深度档取各自的旗舰：
    claude-opus-5（Anthropic 当前最强）／gpt-5.6-sol（OpenAI 旗舰，别名 gpt-5.6）。 */
-const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3", anthropic: "claude-opus-5", openai: "gpt-5.6-sol" };
+const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3", anthropic: "claude-opus-5", openai: "gpt-5.6-sol",
+  openrouter: "nvidia/nemotron-3-ultra-550b-a55b:free" };
 /* 【手动钉住的型号有最终裁定权 —— 2026-09-01】原来这两个构造器**根本不看读者填的型号**：
    凡走它们的那几条路（开工学内功、SDE 对谈、陪读、记忆更新、朋友圈），读者在菜单里钉了 luna，
    跑起来仍是 sol——而界面上还显示着 luna。那不是「自动优先」，是**说了不算**，是骗。
@@ -592,6 +593,11 @@ function wdsPlainBody(VC, body) {
   // gpt-5.x 是推理模型，关思考不是布尔开关而是投入档的最低档：reasoning_effort="none"（合法值 none/low/medium/high/xhigh/max）。
   // Claude 走的是 Anthropic 的 OpenAI 兼容层，那一层不暴露思考开关——所以它不在 wdsCanPlain 里，plain 对它是空指令。
   else if (u.indexOf("api.openai.com") >= 0) body.reasoning_effort = "none";
+  /* OpenRouter：开关在 reasoning 对象上，不是 thinking／enable_thinking／reasoning_effort 那几个名字。
+     用 enabled:false 而不是 effort:"none"——官方说思考「必选」的型号会拒收 effort:"none"，
+     而本站三档取的都是 mandatory:false 的型号（2026-09-01 从 /api/v1/models 逐个核过）。
+     也不用 exclude:true：那只是不把思考回给我们，token 照吃——正是我们要省的那一份。 */
+  else if (u.indexOf("openrouter.ai") >= 0) body.reasoning = { enabled: false };
   return body;
 }
 /* 【MiniMax 的思考默认混在正文里回来 —— 2026-08-29 用户实测「回答有重复」的病灶】
@@ -607,6 +613,16 @@ function wdsPlainBody(VC, body) {
    （与 wdsTopBody 里「Kimi/MiniMax 什么都不加」同一条教训）。
    ⚠ 必须放在 wdsTopBody 第一行 `if (!VC.top) return` 那道闸**之前**调用——
    标准档（无 top）也要带这个参数，否则只有深度档得救。 */
+/* 【思考字段各家叫法不同 —— 一处口径】(2026-09-01 接 OpenRouter 时逼出来的)
+   多数家走 delta.reasoning_content；**OpenRouter 走 delta.reasoning**（官方 Reasoning Tokens 文档）。
+   照旧只读 reasoning_content 的话，思考面板全程空着、_st.think 恒为 0，思考看门狗在这一家身上失明——
+   与 MiniMax 那次「思考混在 content 里」是同一类病，只是这次思考换了个字段名而不是换了个位置。
+   ⚠ 另有 reasoning_details 数组（结构化的那份），这里只认字符串那一份，认不出就当没有，不猜。 */
+function wdsRsn(d) {
+  if (!d) return "";
+  const r = (d.reasoning_content != null) ? d.reasoning_content : d.reasoning;
+  return (typeof r === "string") ? r : "";
+}
 function wdsMiniSplit(VC, body) {
   const u = String((VC && VC.url) || "");
   if ((u.indexOf("api.minimax.io") >= 0 || u.indexOf("api.minimaxi.com") >= 0)
@@ -629,7 +645,8 @@ function wdsCanPlain(VC) {
   return u.indexOf("api.deepseek.com") >= 0
       || u.indexOf("open.bigmodel.cn") >= 0
       || u.indexOf("dashscope.aliyuncs.com") >= 0
-      || u.indexOf("api.openai.com") >= 0;   // reasoning_effort="none"，见 wdsPlainBody
+      || u.indexOf("api.openai.com") >= 0     // reasoning_effort="none"，见 wdsPlainBody
+      || u.indexOf("openrouter.ai") >= 0;      // reasoning:{enabled:false}
 }
 /* 【上游拒收 ⇒ 判词】只该有一处口径（2026-09-01）。
    全站十几处把 401/402/429 混成一句「你的 Key 用不了」。可 429 说的是**Key 对、型号对、
@@ -695,6 +712,12 @@ function wdsTopBody(VC, body) {
     // 站上还没有它「想到被掐死」那条曲线的真数据——先按 DeepSeek 那条教训保守一档，量过再说。
     body.reasoning_effort = (VC && VC.effort) ? VC.effort : "high";
     delete body.temperature; delete body.top_p;
+  } else if (u.indexOf("openrouter.ai") >= 0) {
+    /* 一律 high，**不透传 VC.effort**。这一家背后是几百个型号，每个型号的 supported_efforts 各不相同
+       （nemotron-ultra 只到 high、glm-5.2 是 xhigh/high、gemma 根本不给档），而难度条第 5 档要的是 max——
+       型号档与投入档两个旋钮转出非法组合、整轮 400，这个坑 gpt-5.6-luna 上刚踩过一次（见 wdsUpFix 上方）。
+       high 是这三档的交集，也是它们各自的 default_effort。 */
+    body.reasoning = { effort: "high" };
   }
   // Claude（Anthropic 兼容层）：思考不在这一层暴露，什么都不加——同 Kimi/MiniMax 那条口径。
   // Kimi K3 与 MiniMax M2.x/M3：思考常开、无开关参数，塞了反而可能被判非法字段——什么都不加。
@@ -762,6 +785,17 @@ const WDS_VENDORS = {
   minimax_cn: { url: "https://api.minimaxi.com/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax\uff08\u56fd\u5185\uff09", apply: "platform.minimaxi.com" },
   anthropic: { url: "https://api.anthropic.com/v1/chat/completions", model: "claude-sonnet-5", name: "Claude", apply: "platform.claude.com" },
   openai: { url: "https://api.openai.com/v1/chat/completions", model: "gpt-5.6-terra", name: "GPT", apply: "platform.openai.com" },
+  /* 【2026-09-01 加 OpenRouter】一把 Key 通到几百个型号的转发站，OpenAI 兼容口，仍由 Worker 服务端再转发一次。
+     接它的理由是**退路**：站上七家各自的免费档一挤住就没别的地方去，而这一家的 `:free` 一族是横跨多个
+     供应商的，同一时刻全挤住的概率低得多。
+     ⚠ 三档取的都是 **:free** 型号（读数取自 GET /api/v1/models，2026-09-01 实拉 420 个型号、其中 21 个零价）：
+       轻 gemma-4-31b（思考默认关、262K）／标准 glm-5.2（256K）／最强 nemotron-3-ultra-550b（550B 推理、1M 上下文）。
+     ⚠⚠ **免费名单是会轮换的**：官方自己说不保证一直提供，slug 每周都在变。所以这三个名字比别家更容易过期，
+        过期的样子是上游 404／"model not found"。读者可在设置里覆盖型号，不必等改代码。
+     ⚠ 配额：`:free` 一族 20 RPM；账户 credits 不足 10 美元时每天 50 次，充够 10 美元后每天 1000 次。
+        50 次／天在 ChatSDE 上撑不了多久——它是退路，不是主力。
+     ⚠ 思考字段与别家不同：OpenRouter 走 `delta.reasoning`（不是 reasoning_content），开关走 `reasoning:{}`。 */
+  openrouter: { url: "https://openrouter.ai/api/v1/chat/completions", model: "z-ai/glm-5.2:free", name: "OpenRouter", apply: "openrouter.ai/keys" },
 };
 // ── 看图（视觉档）。**只有这三家**在本站的转发口径下能直接吃图；DeepSeek / MiniMax 走不了，
 //    读者选了它们又传图，我们如实说一句「这家看不了图」，绝不拿 OCR 出来的字冒充"它看过了"。
@@ -1681,6 +1715,8 @@ const WDS_VISION = {
   // 所以看图不必另挑视觉专用型号，退一格给同系的另一个型号即可。
   anthropic: ["claude-sonnet-5", "claude-opus-5"],
   openai: ["gpt-5.6-terra", "gpt-5.6-sol"],
+  // OpenRouter：gemma-4 与 minimax-m3 的 :free 两档都吃 OpenAI 式 image_url；退一格给后者（1M 上下文，也收视频帧）
+  openrouter: ["google/gemma-4-31b-it:free", "minimax/minimax-m3:free"],
 };
 function wdsVisionLadder(vd, want) {
   const base = WDS_VISION[vd] || [];
@@ -1830,10 +1866,10 @@ function wdsPickImgs(list) {
    于是一把好端端的 DeepSeek Key 被发去智谱、上游回 401，而我们告诉读者「你的 Key 用不了」。
    2026-08-19 我自己写探针时就栽在这上面，查了二十分钟才发现是发错了家。
    读者的前端只发短名，但任何别处调这个接口的人都会先想到全名。 */
-const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax", mmcn: "minimax_cn", cl: "anthropic", gpt: "openai",
+const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax", mmcn: "minimax_cn", cl: "anthropic", gpt: "openai", or: "openrouter",
   deepseek: "deepseek", zhipu: "zhipu", glm5: "zhipu", moonshot: "kimi", minimax: "minimax", minimax_cn: "minimax_cn", qwen3: "qwen",
-  anthropic: "anthropic", claude: "anthropic", openai: "openai" };
-const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm", minimax_cn: "mmcn", anthropic: "cl", openai: "gpt" };
+  anthropic: "anthropic", claude: "anthropic", openai: "openai", openrouter: "openrouter" };
+const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm", minimax_cn: "mmcn", anthropic: "cl", openai: "gpt", openrouter: "or" };
 // LONG_ASK：读者这一问要的是"答一段话"还是"写一篇"？两者对预算与口径的要求完全不同。
 // 不识别它，就会出现最难看的那种失败：读者写"先写 8000 字"，而我们给的 max_tokens 是 8000（约等于 8000 汉字的极限），
 // 同时 system 里还写着"一次两三段以内、别写论文"——两条指令互相打架，基底就在思考里反复权衡、
@@ -1904,7 +1940,8 @@ function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
    （30B-A3B 混合思考，200K 上下文；2026-01 起接替已下线的 glm-4.5-flash，老名字会被自动路由过去）。
    ⚠ 名字里带 x 的 glm-4.7-flashx 是付费轻量档，只差一个字母，抄错就开始走账。
    放在轻档而不是标准档：免费档的并发很紧，产线那些多路并发的道次不该默认压到它头上。 */
-const WDS_LITE_MODEL = { openai: "gpt-5.6-luna", anthropic: "claude-haiku-4-5-20251001", zhipu: "glm-4.7-flash" };
+const WDS_LITE_MODEL = { openai: "gpt-5.6-luna", anthropic: "claude-haiku-4-5-20251001", zhipu: "glm-4.7-flash",
+  openrouter: "google/gemma-4-31b-it:free" };
 function wdsLiteModel(vd) { return WDS_LITE_MODEL[vd] || (WDS_VENDORS[vd] && WDS_VENDORS[vd].model); }
 function wdsPickModel(vd, want, top) {
   const w = String(want || "").trim();
@@ -12327,7 +12364,8 @@ export default {
                 if (j.usage) _cd.usage = j.usage;
                 if (j.choices && j.choices[0] && j.choices[0].finish_reason) _cd.finish = String(j.choices[0].finish_reason);
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; clearTimeout(_nof2); } if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                const _rsn = wdsRsn(d);   // 各家字段名不同，见 wdsRsn
+                if (_rsn) { clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; clearTimeout(_nof2); } if (_st) _st.think += _rsn.length; controller.enqueue(_sseBytes({ t: "think", v: _rsn })); }
                 if (d.content) {
                   clk.firstFrame(); if (_nof) { clearTimeout(_nof); _nof = null; clearTimeout(_nof2); }
                   // MiniMax 兜底：reasoning_split 没生效时思考仍包在 content 的 <think> 里（见 wdsMMFeed 头注释）。
