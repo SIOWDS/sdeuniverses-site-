@@ -514,9 +514,14 @@ async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage, l
 function wdsClock(firstMs, totalMs) {
   const ac = new AbortController();
   const st = { cut: "", signal: ac.signal };
+  const _t0 = Date.now();
   st.t1 = setTimeout(() => { st.cut = "首帧"; try { ac.abort(); } catch (e) {} }, firstMs);
   st.t2 = setTimeout(() => { st.cut = st.cut || "总时长"; try { ac.abort(); } catch (e) {} }, totalMs);
-  st.firstFrame = () => { try { clearTimeout(st.t1); } catch (e) {} };
+  /* 还剩多少毫秒这口钟就要自己掐（2026-09-01 为限流排队加的）。
+     排队重投必须问它：无界重投在读者那边是永远转圈，在平台这边是一个 isolate 白占着不放。
+     首帧闸没解除时归它管（firstMs ≤ totalMs），解除之后才轮到总时长。 */
+  st.left = () => (st.got ? (_t0 + totalMs) : (_t0 + Math.min(firstMs, totalMs))) - Date.now();
+  st.firstFrame = () => { st.got = true; try { clearTimeout(st.t1); } catch (e) {} };
   st.stop = () => { try { clearTimeout(st.t1); } catch (e) {} try { clearTimeout(st.t2); } catch (e) {} };
   st.why = (what) => st.cut === "首帧"
     ? (what + "在 " + Math.round(firstMs / 1000) + " 秒内一个字都没回（已掐断）")
@@ -632,6 +637,32 @@ function wdsCanPlain(VC) {
    code=bad_key 自动弹出 Key 面板，等于替他把错方向也指好了。真人读数 2026-09-01：
    智谱免费档 429，屏幕上写「你的 Key 用不了」，他去查了额度。
    判错的代价不是少一句话，是让人去修没坏的东西。/api/wds/ping 早分开了，正文这些路一直混着。 */
+/* 【撞限流就排队重投，投到接上为止】（2026-09-01，读者定：「要做成持续排队投送 一直到接上」）
+   429／502–504 说的是「此刻排队的人多」，不是「配置不对」——等一下多半就过去了，
+   免费档尤其如此。所以不是退让一次就判死，而是排着队一直投，直到三件事之一发生：
+   接上了／换成了一个重投也解决不了的状态／这一答的钟到点。
+   ⚠ 上界只能是**时钟**，不能是一个自己拍的次数。次数拍小了等于没排队，拍大了就成了无界重投。
+   ⚠ 间隔必须递增（2→4→6→8→10 秒封顶）：固定间隔撞上按分钟计的免费额度窗，只是把同一堵墙
+     敲得更密，敲不开还把配额烧完。上游给了 Retry-After 就听它的（它知道窗口什么时候开）。
+   ⚠ 收手要留余地：排到钟响前最后一刻才接上，等于接上就被掐。留 8 秒给真正的第一个字。
+   ⚠ 丢弃的那些响应体要主动关掉，否则每重投一次就漏一条流。 */
+const WDS_BUSY_ST = { 429: 1, 502: 1, 503: 1, 504: 1 };
+const WDS_Q_STEP = 2000, WDS_Q_CAP = 10000, WDS_Q_RESERVE = 8000;
+async function wdsQueue(send, clk, say) {
+  for (let n = 0; ; n++) {
+    const r = await send();
+    if (r.ok || !WDS_BUSY_ST[r.status | 0] || !clk || clk.cut) return r;
+    let w = Math.min(WDS_Q_CAP, WDS_Q_STEP * (n + 1));
+    let ra = 0;
+    try { ra = parseFloat((r.headers && r.headers.get && r.headers.get("retry-after")) || ""); } catch (e) {}
+    if (ra > 0 && ra <= 60) w = Math.max(w, Math.round(ra * 1000));
+    const left = clk.left ? clk.left() : 0;
+    if (left < w + WDS_Q_RESERVE) return r;          // 排不下了：把这一次的状态原样交回去，由判词那一处说话
+    try { if (r.body && r.body.cancel) await r.body.cancel(); } catch (e) {}
+    if (say) say(r.status, n + 1, Math.round(w / 1000), Math.round(left / 1000));
+    await new Promise((res) => setTimeout(res, w));
+  }
+}
 function wdsUpWhy(status, VC) {
   const s = status | 0;
   const who = (VC && VC.name) ? ("，这一把是发给「" + VC.name + "」的") : "";
@@ -12200,11 +12231,14 @@ export default {
             /* 零帧要说出来。读者盯着「正在想 45s · 基底作答」，分不出「它在想」和「它卡死了」——
                而这两种的下一步完全不同（前者等，后者切标准档）。上游 25 秒还没回第一个字就把
                阶段改成实话，心跳自会把它带出去。首帧一到立刻撤，正常长思考不误报。 */
-            let _nof = setTimeout(() => { if (!_st.think && !_st.out) _stg("基底作答·上游还没回第一个字"); }, ANS_NOFRAME_MS);
+            /* 排队期间两个零帧看门狗都闭嘴（2026-09-01）：它们说的是「上游还没回第一个字」，
+               而排队时连接都还没建上——这句话既不准，又会把「正在第 N 次重投」那一行盖掉。 */
+            let _qing = 0;
+            let _nof = setTimeout(() => { if (!_qing && !_st.think && !_st.out) _stg("基底作答·上游还没回第一个字"); }, ANS_NOFRAME_MS);
             /* 第二段：护栏放宽到 4 分钟之后，光改阶段名不够——读者得知道还要等多久、以及有没有别的出路。
                只发 note，不掐流。掐流是时钟的活。 */
             let _nof2 = setTimeout(() => {
-              if (_st.think || _st.out) return;
+              if (_qing || _st.think || _st.out) return;
               const _lim = Math.round(gFirst / 1000);
               controller.enqueue(_sseBytes({ t: "note", v: "上游到现在一个字都没回（已等 " + Math.round(CHAT_WAIT_NOTE_MS / 1000) + " 秒）。"
                 + (VC.top ? ("这一档是" + ((VC.effort || "max") === "max" ? "满功率" : "高功率") + "思考，开口慢是常事——最长等到 " + _lim + " 秒，再没有就自动关掉思考重答一次。等不及可以按 Esc，切到「标准」档或把难度条钉到低档重问。")
@@ -12212,10 +12246,13 @@ export default {
             }, CHAT_WAIT_NOTE_MS);
             let upstream;
             try {
-             /* 限流退让一次（2026-09-01）：429／503 说的是「此刻排队」，不是「配置不对」。
-                原来主发这一发一撞 429 就直接判词收工，读者连兜底那一遍都走不到——
-                而免费档挤是常态，等两秒半往往就过去了。只退让一次，且只对这两个状态。 */
-             for (let _rl = 0; ; _rl = 1) {
+             /* 撞限流就排队重投，投到接上为止（2026-09-01，读者定；策略在 wdsQueue 头上）。
+                主发这一发从前一撞 429 就判词收工，读者连兜底那一遍都走不到；后来改成退让一次，
+                仍然不够——免费档的额度窗按分钟算，两秒半只是把同一堵墙敲得更密。
+                现在由 wdsQueue 排队：间隔递增、听 Retry-After、上界交给这一答的钟。
+                看图那道退型号的梯子留在 send 里面：每一次重投都从头走一遍，
+                因为「型号被换掉」与「这一刻在排队」是两回事，不该互相吃掉对方的重试机会。 */
+             upstream = await wdsQueue(async () => {
               // 视觉档型号会改名/下线：认不出就沿备用名退一格重发一次（只在看图这条路上，且只退到列表用完）。
               for (let vi = 0; ; vi++) {
                 /* 产线道次要的是顶配预算，而只有 deepseek 一格的上限核实过：别家收不收 64000 没查。
@@ -12231,10 +12268,13 @@ export default {
                 VC.model = visLadder[vi + 1];
                 controller.enqueue(_sseBytes({ t: "note", v: "视觉档型号换成了 " + VC.model + "（上一个这家已经不认了）。" }));
               }
-              if (upstream.ok || _rl || (upstream.status !== 429 && upstream.status !== 503)) break;
-              controller.enqueue(_sseBytes({ t: "note", v: "这一家这一刻在限流（" + upstream.status + "），等 2.5 秒再发一次…" }));
-              await new Promise((r) => setTimeout(r, 2500));
-             }
+              return upstream;
+             }, clk, (st0, n, w, left) => {
+              _qing = 1;
+              _stg("排队等这一家（第 " + n + " 次重投）");
+              controller.enqueue(_sseBytes({ t: "note", v: "这一家这一刻在排队（" + st0 + "）· 第 " + n + " 次重投，等 " + w + " 秒再发。"
+                + "会一直投到接上为止，最多还能排 " + left + " 秒；等不及可以按 Esc，或换一家基底。" }));
+             });
             } catch (e) {
               clk.stop();
               controller.enqueue(_sseBytes({ t: "error", v: (clk.cut ? clk.why("基底") : ("接不上基底：" + (e && e.message))) + "（可再问一次）" }));
@@ -12355,25 +12395,20 @@ export default {
                  **正文**算作首帧——45 秒首帧闸会把它们的重答冤杀在思考期，读者看到的是「重答也没接上」。给 120 秒。 */
               const clk2 = wdsClock((rsLong && !wdsCanPlain(VC)) ? 120000 : CHAT_RETRY_FIRST_MS, rsLong ? FORGE_TOTAL_MS : CHAT_RETRY_TOTAL_MS);
               try {
-                /* 限流退让一次（2026-09-01）：429／503 是「此刻排队」，不是「配置不对」——
-                   而第一遍刚把这把 Key 打热，兜底这一遍撞上的概率最高。它是最后一次机会，
-                   被一句「稍后再来」判死，读者拿到的就是零字。代价两秒半，收益是这一答有没有。
-                   只退让一次：无限重试会把一次限流拖成一场空转，也会把 clk2 的首帧闸耗光。 */
-                let up2, _b2 = 0;
-                for (;;) {
-                  up2 = rsLong
-                    ? await wdsFetchMax(VC, KEY, messages, true, tok2, clk2.signal, false, undefined, true)
-                    : await wdsUp(VC.url, {
+                /* 兜底这一遍也排队（同一处策略 wdsQueue）。第一遍刚把这把 Key 打热，
+                   撞限流的概率在这里最高；而它是最后一次机会，被一句「稍后再来」判死，
+                   读者拿到的就是零字。上界是 clk2 自己的钟，不是第一遍那口。 */
+                const up2 = await wdsQueue(async () => (rsLong
+                  ? await wdsFetchMax(VC, KEY, messages, true, tok2, clk2.signal, false, undefined, true)
+                  : await wdsUp(VC.url, {
                     method: "POST",
                     headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
                     body: JSON.stringify(wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: tok2, messages })),
                     signal: clk2.signal,
-                  });
-                  if (up2.ok || _b2 || (up2.status !== 429 && up2.status !== 503)) break;
-                  _b2 = 1;
-                  controller.enqueue(_sseBytes({ t: "note", v: "上游这一刻在限流（" + up2.status + "），等 2.5 秒再发一次…" }));
-                  await new Promise((r) => setTimeout(r, 2500));
-                }
+                  })), clk2, (st0, n, w, left) => {
+                  _stg("排队等这一家（重答第 " + n + " 次重投）");
+                  controller.enqueue(_sseBytes({ t: "note", v: "重答这一遍也撞上排队（" + st0 + "）· 第 " + n + " 次重投，等 " + w + " 秒；最多还能排 " + left + " 秒。" }));
+                });
                 if (!up2.ok) { const _w2 = wdsUpWhy(up2.status, VC); const _e0 = new Error(_w2.msg || ("上游 " + up2.status)); _e0.verdict = !!_w2.msg; throw _e0; }
                 const rd2 = up2.body.getReader();
                 let bf2 = "";

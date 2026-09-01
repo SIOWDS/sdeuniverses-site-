@@ -45,9 +45,10 @@ ok(/wdsPlainBody\(VC, \{ model: VC\.model, stream: true, max_tokens: tok2/.test(
 ok(!/_thinkCap = \d{3,}/.test(chatSeg), "没有把额度线写成一个与预算脱钩的常数");
 /* 兜底是最后一次机会：被上游一句「此刻排队」（429／503）判死，读者拿到的就是零字。
    真人读数 2026-09-01：第一遍思考撞线被掐，第二遍「上游 429」，两遍合起来一个字没有。 */
-ok(/up2\.status !== 429 && up2\.status !== 503/.test(chatSeg), "兜底那一遍认得出限流／临时不可用，不当成配置错");
-ok(/上游这一刻在限流/.test(chatSeg), "退让时说得出为什么在等，不是静默停住");
-ok(/if \(up2\.ok \|\| _b2 \|\|/.test(chatSeg), "只退让一次（_b2 上闩）——无限重试会把一次限流拖成一场空转");
+/* 2026-09-01 第二刀：退让一次 → 排队重投到接上。策略收进 wdsQueue，两条路都走它。 */
+ok(/const up2 = await wdsQueue\(async \(\) => \(rsLong/.test(chatSeg), "兜底那一遍也走排队重投，不是自己再写一套");
+ok(/\)\), clk2, \(st0, n, w, left\) => \{/.test(chatSeg), "兜底那一遍排队的上界是它自己的钟（clk2），不是第一遍那口");
+ok(/重答这一遍也撞上排队/.test(chatSeg), "排队时说得出为什么在等、还能排多久，不是静默停住");
 /* 档位表里「不要求思考」的两档必须显式关思考。plain=0 不是不思考，是随基底默认；
    在思考默认开着的家，它等于让思考与正文共用一份小预算，正文必然写不出字。 */
 {
@@ -131,8 +132,11 @@ ok(/const ANS_NOFRAME_MS = (\d+);/.test(W), "零帧看门狗常数存在");
   var m2 = W.match(/const ANS_NOFRAME_MS = (\d+);/), m3 = W.match(/const CHAT_FIRST_MS = (\d+);/);
   ok(m2 && m3 && +m2[1] < +m3[1], "看门狗早于首帧护栏开口（晚于它就永远轮不到）");
 }
-ok(/^\s+let _nof = setTimeout\(\(\) => \{ if \(!_st\.think && !_st\.out\) _stg\("基底作答·上游还没回第一个字"\); \}, ANS_NOFRAME_MS\);$/m.test(chatSeg),
+// 按用意写：守的是「零帧看门狗存在、只看有没有出字、挂在 ANS_NOFRAME_MS 上」，不是那一行的排版
+ok(/let _nof = setTimeout\(\(\) => \{[^\n]*!_st\.think && !_st\.out[^\n]*_stg\("基底作答·上游还没回第一个字"\); \}, ANS_NOFRAME_MS\);/.test(chatSeg),
   "看门狗接在「基底作答」之后（注释掉当场红）");
+ok(/let _nof = setTimeout\(\(\) => \{ if \(!_qing &&/.test(chatSeg),
+  "排队期间看门狗闭嘴——那句「上游还没回第一个字」在连接都没建上时既不准，又会盖掉「第 N 次重投」");
 ok((chatSeg.match(/clearTimeout\(_nof\)/g) || []).length === 3 && (chatSeg.match(/_nof = null/g) || []).length === 3,
   "首帧（think/content 两处）与收流后各撤一次，实得 " + (chatSeg.match(/clearTimeout\(_nof\)/g) || []).length);
 // 按用意写：要守的是「两处首帧（think／content）都在 clk.firstFrame() 紧邻处撤看门狗」，
@@ -174,7 +178,7 @@ ok(/const CHAT_WAIT_NOTE_MS = (\d+);/.test(W), "报信时点常数存在");
   ok(w1 && d2 && +w1[1] < +d2[1], "报信早于深度档掐断（晚了就永远轮不到）");
 }
 ok(/^\s+let _nof2 = setTimeout\(\(\) => \{$/m.test(chatSeg), "第二段看门狗接在源码里（注释掉当场红）");
-ok(/if \(_st\.think \|\| _st\.out\) return;/.test(chatSeg), "已经开口就不报信（不对正常长思考喊话）");
+ok(/if \(_qing \|\| _st\.think \|\| _st\.out\) return;/.test(chatSeg), "已经开口、或正在排队，都不报信（不对正常长思考喊话，也不盖掉排队那一行）");
 ok(/t: "note"/.test(chatSeg.slice(chatSeg.indexOf("let _nof2"), chatSeg.indexOf("let _nof2") + 900)),
   "第二段只发 note —— 报信不掐流，掐流是时钟的活");
 ok(!/_nof2[\s\S]{0,400}ac\.abort|_nof2[\s\S]{0,400}clk\.signal/.test(chatSeg), "第二段没碰 abort");
@@ -219,10 +223,9 @@ console.log("⑨ 限流不是 Key 的毛病");
     ok(why.wdsUpStop(429) && why.wdsUpStop(401) && !why.wdsUpStop(500) && !why.wdsUpStop(200),
       "「要不要就此停住」与判词同一处口径，不另写一份条件");
   }
-  // 主发一发与兜底那一遍都要退让一次（只一次）
-  ok((W.match(/这一家这一刻在限流（" \+ \w+\.status \+ "），等 2\.5 秒再发一次…/g) || []).length >= 1
-     || /等 2\.5 秒再发一次/.test(W), "撞限流时先退让一次再说，不是当场判死");
-  ok(/for \(let _rl = 0; ; _rl = 1\)/.test(W), "主发那一发的退让只做一次（_rl 上闩）");
+  ok(/upstream = await wdsQueue\(async \(\) => \{/.test(W), "主发那一发走排队重投，不是当场判死");
+  ok(/会一直投到接上为止，最多还能排/.test(W), "屏幕上说得出「会一直投到接上」以及还能排多久");
+  ok(/看图那道退型号的梯子留在 send 里面/.test(W), "看图退型号的梯子留在每一次重投里——它与「这一刻在排队」是两回事");
   /* 退让过了还是 429 时，兜底那一遍的收场白要说得出「限流」，不是「流中断：上游 429」——
      裹一层之后读者既不知道 429 是什么，也不知道下一步该做什么。 */
   ok(/_e0\.verdict = !!_w2\.msg;/.test(W), "兜底那一发的失败带着判词抛出，不只丢一个状态码");
@@ -233,5 +236,78 @@ console.log("⑨ 限流不是 Key 的毛病");
   ok(/已经是标准档了/.test(W), "标准档那一支给的是另一条出路（成文一篇／换基底）");
 }
 
-console.log("\n" + (FAIL ? "✗ " : "✓ ") + PASS + " 项通过，" + FAIL + " 项失败");
-process.exit(FAIL ? 1 : 0);
+/* ⑩ 排队重投真跑（不是数正则，是把 wdsQueue 抠出来喂假响应跑一遍）
+   注入假 setTimeout：等待立刻返回、但把要等的毫秒记下来，这样真常数、真退避算式都在测。 */
+console.log("⑩ 排队重投·真跑");
+{
+  const seg = W.slice(W.indexOf("const WDS_BUSY_ST"), W.indexOf("function wdsUpWhy("));
+  let box2 = null, waits = [];
+  try {
+    box2 = new Function("setTimeout", seg + "\nreturn { wdsQueue, WDS_Q_STEP, WDS_Q_CAP, WDS_Q_RESERVE };")
+      ((cb, ms) => { waits.push(ms); cb(); });
+  } catch (e) { ok(false, "抠得出 wdsQueue 并装得起来：" + (e && e.message)); }
+  const R = (status, hdr) => ({ ok: status === 200, status: status,
+    headers: { get: (k) => (hdr && hdr[k.toLowerCase()]) || null },
+    body: { cancel: async () => { R._cancelled = (R._cancelled | 0) + 1; } } });
+  const CLK = (leftMs) => ({ cut: "", left: () => leftMs });
+  if (box2) {
+    ok(true, "抠得出 wdsQueue 并装得起来");
+    (async () => {
+      // ① 排到接上为止：连撞四次 429，第五次通
+      waits = []; let n1 = 0;
+      let r1 = await box2.wdsQueue(async () => { n1++; return R(n1 < 5 ? 429 : 200); }, CLK(600000), () => {});
+      ok(r1.ok && n1 === 5, "一直投到接上为止（撞 4 次 429 后第 5 次通），实得 " + n1 + " 次");
+      ok(JSON.stringify(waits) === JSON.stringify([2000, 4000, 6000, 8000]),
+        "间隔递增、不是固定值，实得 " + JSON.stringify(waits));
+
+      // ② 封顶 10 秒：撞很多次也不会越等越离谱
+      waits = []; let n2 = 0;
+      await box2.wdsQueue(async () => { n2++; return R(n2 < 9 ? 429 : 200); }, CLK(600000), () => {});
+      ok(Math.max.apply(null, waits) === box2.WDS_Q_CAP, "间隔封顶 " + box2.WDS_Q_CAP + " 毫秒，实得 " + Math.max.apply(null, waits));
+
+      /* ③④ 这两条守的是「排队有没有上界」。⚠ 上界一旦被拆掉，循环就是**不收敛**的——
+         直接跑会把这份护栏挂住，而挂住不是红，是没人看得见的哑。所以给个绊线：
+         投超过 30 次就抛，红着交回来。（变异检验第一版就栽在这里：拆了上界，sim 静默转圈。） */
+      const TRIP = 30;
+      waits = []; let n3 = 0, r3 = null, e3 = "";
+      try { r3 = await box2.wdsQueue(async () => { if (++n3 > TRIP) throw new Error("排队没有上界"); return R(429); }, CLK(box2.WDS_Q_RESERVE + 1000), () => {}); }
+      catch (e) { e3 = String(e && e.message); }
+      ok(!e3 && n3 === 1 && waits.length === 0 && r3 && r3.status === 429,
+        "钟快到点就不再排（留 " + box2.WDS_Q_RESERVE + " 毫秒给接上之后的第一个字），实得投了 " + n3 + " 次" + (e3 ? ("／" + e3) : ""));
+
+      // ④ 只对「排队类」状态排队：401 是配置错，排一万次也没用
+      let n4 = 0, r4 = null, e4 = "";
+      try { r4 = await box2.wdsQueue(async () => { if (++n4 > TRIP) throw new Error("排队没有上界"); return R(401); }, CLK(600000), () => {}); }
+      catch (e) { e4 = String(e && e.message); }
+      ok(!e4 && n4 === 1 && r4 && r4.status === 401, "401 不排队（重投解决不了的状态当场交回），实得 " + n4 + " 次" + (e4 ? ("／" + e4) : ""));
+      let n5 = 0;
+      await box2.wdsQueue(async () => { n5++; return R(n5 < 3 ? 503 : 200); }, CLK(600000), () => {});
+      ok(n5 === 3, "503 也排队（上游临时不可用与限流同类），实得 " + n5 + " 次");
+
+      // ⑤ 听 Retry-After：上游知道窗口什么时候开，我们不该比它更聪明
+      waits = []; let n6 = 0;
+      await box2.wdsQueue(async () => { n6++; return n6 < 2 ? R(429, { "retry-after": "7" }) : R(200); }, CLK(600000), () => {});
+      ok(waits[0] === 7000, "Retry-After 说等 7 秒就等 7 秒（比自己的退避长时听它的），实得 " + waits[0]);
+
+      // ⑥ 时钟已经掐了就别再投
+      let n7 = 0;
+      await box2.wdsQueue(async () => { n7++; return R(429); }, { cut: "首帧", left: () => 600000 }, () => {});
+      ok(n7 === 1, "钟已经掐断就不再投，实得 " + n7 + " 次");
+
+      // ⑦ 丢掉的响应体要关掉，否则每重投一次漏一条流
+      R._cancelled = 0; let n8 = 0;
+      await box2.wdsQueue(async () => { n8++; return R(n8 < 4 ? 429 : 200); }, CLK(600000), () => {});
+      ok(R._cancelled === 3, "丢弃的响应体逐条关掉，实得 " + R._cancelled + " / 3");
+
+      // ⑧ 每一次重投都通知读者（不通知＝屏幕上和卡死一模一样）
+      let says = [], n9 = 0;
+      await box2.wdsQueue(async () => { n9++; return R(n9 < 4 ? 429 : 200); }, CLK(600000), (st0, k, w) => says.push(k + ":" + w));
+      ok(says.length === 3 && says[0] === "1:2" && says[2] === "3:6",
+        "每一次重投都报一行（第几次、等几秒），实得 " + JSON.stringify(says));
+
+      console.log("\n" + (FAIL ? "✗ " : "✓ ") + PASS + " 项通过，" + FAIL + " 项失败");
+      process.exit(FAIL ? 1 : 0);
+    })();
+  }
+}
+if (!W.includes("const WDS_BUSY_ST")) { console.log("\n✗ 抠不到 wdsQueue —— 第 ⑩ 节整节没跑"); process.exit(1); }
