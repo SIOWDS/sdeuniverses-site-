@@ -8547,6 +8547,12 @@
        dCutAny：这一整篇里有没有哪一趟被掐过（dTimedOut 现在每趟复位——否则一趟被掐，
        此后每一节的死因都被写成"被掐断"，读数就废了）。 */
     var dAC = null, dCutAny = false, lastMeta = null;
+    /* 【缓存账 —— 2026-09-02】每一道 SDE 工序都带着 7 万多字的内功＋方法论，这份前缀逐字不变，
+       各家的上下文缓存正按前缀命中（DeepSeek 命中价是未命中的 1/30，OpenAI 约 1/10）。
+       此前**一处也没量过命中率**——省没省下来全靠推断。这三个数逐趟累加，收尾报一次。
+       ⚠ dHRep 数的是「上游报了这个字段的趟数」：一趟都没报 ≠ 一次都没命中，
+         两者要分得开，否则会照着一个假读数去改前缀。 */
+    var dPtok = 0, dHtok = 0, dHRep = 0;
     /* 【标签页有没有被切走，这是目前唯一还没被排除的那条】
        2026-08-12 夜里三次实测把别的都排掉了：上游连打八次重请求全成功、
        第 7／8 节单独打站内那条路也各写出 2200 字、fin 都是 stop、时钟没掐。
@@ -8894,6 +8900,24 @@
       /* 状态栏那一行容易被略过（它就在角落里）。写短了另发一条 note，把差多少说清、把下一步给出来。 */
       if (text && _want && text.length < _floor) dNote(t("dShortW1") + text.length + "/" + _want + t("dShortW2"), 1);
       if (dCutAny) dNote(t("dCut"), 1);
+      /* 【缓存账】收尾报一次：这一趟到底有没有吃到前缀缓存。
+         报得出数才谈得上省钱——从前这条产线对此完全是瞎的。 */
+      try {
+        if (dPtok > 0) {
+          if (!dHRep) {
+            dNote("【缓存账】这一趟入参共 " + dPtok + " tok，但上游没报缓存字段——"
+              + "这一家要么不支持上下文缓存，要么走的是不报这个数的兼容层。"
+              + "内功＋方法论那七万多字是不是每趟都在按全价重算，此处量不出来。", 1);
+          } else {
+            var _hp = Math.round(dHtok * 100 / dPtok);
+            dNote("【缓存账】这一趟入参共 " + dPtok + " tok，缓存命中 " + dHtok + " tok（" + _hp + "%）。"
+              + (_hp < 40
+                  ? "⚠ 命中率偏低。固定前缀（内功＋方法论）本该逐字不变、趟趟命中；命中不了只有两种可能——"
+                    + "前缀里混进了每趟都变的东西（时间、随机序号、检索段落排在了前面），或这一家的缓存窗已过期。"
+                  : "固定前缀在被复用，这一段按命中价计费。"), _hp < 40 ? 1 : 0);
+          }
+        }
+      } catch (e) {}
       /* 术语泄漏闸只对「要以目标学科母语发表」的几档开：报告／提纲／总结是站内自用的，
          本来就说母体话，对它们报警只会教人忽略这条提示。 */
       try {
@@ -9397,7 +9421,15 @@
                   else if (j.t === "plan") { res.plan = j.v; }
                   /* meta：服务端每一趟的读数（收束理由／用量／思考字数）。撞墙那句话
                      终于说得出凭什么这么判——追了一整天没拿到的就是这一行。 */
-                  else if (j.t === "meta") { res.meta = j.v; lastMeta = j.v; }
+                  else if (j.t === "meta") {
+                    res.meta = j.v; lastMeta = j.v;
+                    try {
+                      if (j.v && j.v.ptok) {
+                        dPtok += j.v.ptok;
+                        if (typeof j.v.htok === "number" && j.v.htok >= 0) { dHtok += j.v.htok; dHRep++; }
+                      }
+                    } catch (e) {}
+                  }
                   else if (j.t === "beat") { if (j.v && j.v.sec) lastSec = j.v.sec; if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0) + (j.v.stage ? " · " + j.v.stage : ""); }
                   else if (j.t === "note") { dNote(j.v); }
                   else if (j.t === "error") { res.err = j.v; dNote(j.v, 1); if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }

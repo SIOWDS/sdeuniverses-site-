@@ -422,6 +422,30 @@ function wdsLadder(VC, want) {
    逐处去改十六个拼 body 的地方，必然漏一处、而漏掉的那一处只会在某个功能上悄悄 400。
    所以统一收口：**凡打厂商的 fetch 一律走 wdsUp**，差别只在 wdsUpFix 里改一次。
    非这两家的 URL 原样透传（连 body 都不解析），对现有五家零行为变化。 */
+/* 【缓存命中读数 —— 2026-09-02】所有 SDE 工序每一趟都要带上 7 万多字的内功＋方法论；
+   这份前缀逐字不变，各家的上下文缓存正是按前缀命中的（DeepSeek 缓存命中价是未命中的 1/30，
+   OpenAI 是 1/10）。**但此前一处都没量过命中率**——省没省下来全靠推断。
+   各家字段名不一样，且只在 usage 里露一次面：
+     · DeepSeek：prompt_cache_hit_tokens（另有 prompt_cache_miss_tokens）
+     · OpenAI／智谱／Kimi／Qwen：prompt_tokens_details.cached_tokens
+     · Anthropic：cache_read_input_tokens（原生字段；走兼容层时多半根本不报）
+   ⚠ 回 -1 表示「上游没报这个字段」，回 0 表示「报了，一个都没命中」——
+     两者必须分得开，否则会把「没量到」写成「没命中」，照着去改前缀就是白改。 */
+function wdsCacheTok(u) {
+  if (!u) return -1;
+  const d = u.prompt_tokens_details || u.promptTokensDetails || null;
+  if (d && typeof d.cached_tokens === "number") return d.cached_tokens;
+  if (typeof u.prompt_cache_hit_tokens === "number") return u.prompt_cache_hit_tokens;
+  if (typeof u.cache_read_input_tokens === "number") return u.cache_read_input_tokens;
+  if (typeof u.cached_tokens === "number") return u.cached_tokens;
+  return -1;
+}
+function wdsCacheSay(u) {
+  const h = wdsCacheTok(u), pt = (u && u.prompt_tokens) || 0;
+  if (h < 0) return "；缓存：上游没报";
+  if (!pt) return "；缓存命中 " + h + " tok";
+  return "；缓存命中 " + h + "/" + pt + " tok（" + Math.round(h * 100 / pt) + "%）";
+}
 function wdsUpFix(u, body) {
   if (u.indexOf("api.openai.com") >= 0) {
     if (body.max_tokens != null && body.max_completion_tokens == null) body.max_completion_tokens = body.max_tokens;
@@ -14933,6 +14957,7 @@ export default {
                 idx: partIdx + 1, out: wrote, think: _st.think, want: want, fin: pfin,
                 ptok: (pusage && pusage.prompt_tokens) || 0,
                 ctok: (pusage && pusage.completion_tokens) || 0,
+                htok: wdsCacheTok(pusage),
                 rtok: _rtok, cut: sclk.cut || "", secs: secs.length } }));
               /* 【产出很少也是失败，也要有仪表】与单趟那条路同一口径（那边 2026-08-12 就补上了，
                  这条路漏了）。finish_reason 是这里最值钱的字段：
@@ -14969,7 +14994,7 @@ export default {
                 + "思考 " + _st.think + " 字"
                 + (pusage ? ("；上游自报：入 " + (pusage.prompt_tokens || "?") + " tok、出 "
                     + (pusage.completion_tokens || "?") + " tok"
-                    + (_rtok ? ("（其中思考 " + _rtok + "）") : "")) : "")
+                    + (_rtok ? ("（其中思考 " + _rtok + "）") : "") + wdsCacheSay(pusage)) : "")
                 + (pfin ? ("；上游给的收束理由：" + pfin) : "；上游没给收束理由（多半是流被掐断）")
                 + (sclk.cut ? ("；本地时钟：" + sclk.cut + "闸已掐") : "") + "。";
               if (wrote && wrote < PART_SHORT) controller.enqueue(_sseBytes({ t: "note",
@@ -15134,12 +15159,24 @@ export default {
                客户端那道 FLOOR 闸会回滚残字再重写一遍，重来放在能回滚的那一侧才干净）。
                finish_reason 是这里最值钱的一个字段：
                  length ⇒ 预算被吃光（多半是思考）｜stop ⇒ 上游自己收的口｜空 ⇒ 流被掐断。 */
+            /* 【单趟档也发一帧 meta —— 2026-09-02】此前只有拆趟档逐趟发 meta，
+               而「一趟写完」恰恰是最贵的一档（一次调用带满 7 万多字前缀）。
+               前端靠这一帧才算得出这一趟的缓存命中率。⚠ 无条件发：只在失败时发的读数，
+               正是在一切正常、我们最需要知道省了多少钱的时候沉默。 */
+            try {
+              controller.enqueue(_sseBytes({ t: "meta", v: {
+                idx: 1, out: wrote, think: _st.think, fin: finish,
+                ptok: (usage && usage.prompt_tokens) || 0,
+                ctok: (usage && usage.completion_tokens) || 0,
+                htok: wdsCacheTok(usage), secs: 1 } }));
+            } catch (e) {}
             const SHORT_OUT = 400;
             if (wrote && wrote < SHORT_OUT) {
               const u3 = usage ? ("；上游自报：入 " + (usage.prompt_tokens || "?") + " tok、出 "
                 + (usage.completion_tokens || "?") + " tok"
                 + (usage.completion_tokens_details && usage.completion_tokens_details.reasoning_tokens
-                  ? ("（其中思考 " + usage.completion_tokens_details.reasoning_tokens + "）") : "")) : "";
+                  ? ("（其中思考 " + usage.completion_tokens_details.reasoning_tokens + "）") : "")
+                + wdsCacheSay(usage)) : "";
               controller.enqueue(_sseBytes({ t: "note", v:
                 "⚠ 这一趟只写出 " + wrote + " 字就停了（要的是 " + SPEC.name + "）。"
                 + "要了 " + tokWant + " 的输出预算〔本档上限 " + SPEC.tok + "〕，思考 " + _st.think + " 字；"
@@ -15153,7 +15190,7 @@ export default {
             if (!wrote) {
               const uinfo = usage ? ("；上游自报：入 " + (usage.prompt_tokens || "?") + " tok、出 "
                 + (usage.completion_tokens || "?") + " tok" + (usage.completion_tokens_details && usage.completion_tokens_details.reasoning_tokens
-                  ? ("（其中思考 " + usage.completion_tokens_details.reasoning_tokens + "）") : "")) : "";
+                  ? ("（其中思考 " + usage.completion_tokens_details.reasoning_tokens + "）") : "") + wdsCacheSay(usage)) : "";
               const diag = "（第一遍没写出正文：要了 " + tokWant + " 的输出预算〔本档上限 " + SPEC.tok + "〕，"
                 + "思考 " + _st.think + " 字、正文 0 字；入参 system " + sys.length + " 字 ＋ 对话 " + convo.length + " 字"
                 + (finish ? ("；上游给的收束理由：" + finish) : "") + uinfo + "。正在关掉思考重来一次…）\n\n";
