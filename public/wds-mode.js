@@ -1661,6 +1661,8 @@
       duCmp: "⇄ 让 WDS 对照这两份", duCmpQ: "下面是同一个问题交给两家基底得到的两份回答。请对照它们，只说四件事：①两边各自看见了对方没看见的什么；②它们在哪一点上正面矛盾（指到具体句子）；③哪一份更经得起反驳、为什么；④两份都漏掉的是什么。不要复述它们的内容。",
       duNeed: "并排需要两家都填了 Key（在设置里填）。",
       triBtn: "⚔ 三家对撞", triOn: "⚔ 三家对撞：开",
+      triMore: "↻ 继续对撞", triRd: "第 {n} 轮 · 座位左轮一格",
+      triMoreT: "拿这一轮的结算当下一轮的靶子，三席各挪一位——出判断的改结算、攻的改出判断。撞不动了它会直说撞到底了。",
       triTip: "同一问三家接力：第一家给判断，第二家读到原文专门拆它，第三家找出他们俩都默认、却谁也没提的那样东西。三家各是不同厂商——别处不会请对手来拆自己的台。",
       triNeed: "对撞需要至少两家填了 Key（在设置里填）。填满三家最好：第三家没参与前面的写作，结算才算数。",
       triA: "① 出判断", triB: "② 攻击它", triC: "③ 他们都没说的那一条",
@@ -1810,6 +1812,8 @@
       duCmp: "⇄ Have SDE compare these", duCmpQ: "Below are two answers to the same question from two different models. Compare them and say only four things: (1) what each saw that the other missed; (2) where they flatly contradict each other (point to the sentences); (3) which holds up better under attack, and why; (4) what both missed. Do not restate their content.",
       duNeed: "Side-by-side needs a key for both models (add them in settings).",
       triBtn: "\u2694 Three-way clash", triOn: "\u2694 Three-way clash: on",
+      triMore: "\u21bb Collide again", triRd: "Round {n} · seats rotate one place",
+      triMoreT: "Take this round's verdict as the next round's target and shift every seat by one. If it cannot be pushed further it will say so.",
       triTip: "One question, three models in relay: the first makes a claim, the second reads it verbatim and attacks it, the third finds the premise neither of them said out loud. Three different vendors \u2014 nowhere else will a model invite a rival to tear it apart.",
       triNeed: "A clash needs keys for at least two models (add them in settings). Three is better: the third one did not write anything earlier, which is what makes its verdict worth something.",
       triA: "1. The claim", triB: "2. The attack", triC: "3. The shared premise",
@@ -2005,6 +2009,7 @@
     ".wdsm-tric{border-left:2px solid var(--wline);padding-left:12px}" +
     ".wdsm-tric .wdsm-duh b{color:var(--wgold)}" +
     ".wdsm-menu .mnote{font-size:12px;color:var(--wdim);padding:4px 10px 8px;line-height:1.5}" +
+    ".wdsm-trird{font-size:12px;color:var(--wgold);letter-spacing:.04em;margin:14px 0 2px;padding-top:10px;border-top:1px dashed var(--wline2)}" +
     ".wdsm-tinote{font-size:12px;color:var(--wdim);border:1px solid var(--wline);border-radius:6px;padding:8px 10px;line-height:1.6}" +
     "@media(max-width:760px){.wdsm-du{flex-direction:column;gap:18px}}" +
     "@media(max-width:900px){.wdsm-cv{position:absolute;inset:0;width:auto;z-index:30;border-left:none}}";
@@ -5268,79 +5273,114 @@
     seats.degraded = degraded;
     return seats;
   }
+  /* 【继续对撞 —— 2026-09-01】一轮撞完并不等于撞到底：结算出的那句话自己又是一条可攻的判断。
+     继续＝拿上一轮的结算当这一轮的靶子，**并且座位左轮一格**（上一轮攻的改出判断、结算的改攻、
+     出判断的改结算）。不轮座，出判断这一席永远是同一家，题的定法就被它垄断了，
+     后面几轮撞的还是它第一轮划下的那条线。反空转的条款写在服务端每一席的提示语里。 */
   function sendTri(q, cell) {
-    var seats = triSeats();
-    if (!seats) { toast(t("triNeed")); return false; }
+    var seats0 = triSeats();
+    if (!seats0) { toast(t("triNeed")); return false; }
     history.push({ role: "reader", text: q }); updTurns();
-    streaming = true; stoppedByUser = false; RS.stop = false;
-    busyUI(true); stopBarShow(true);
-
-    var wrap = el("div", "wdsm-tri");
-    var LB = [t("triA"), t("triB"), t("triC")];
-    var rows = seats.map(function (who, i) {
-      var c = el("div", "wdsm-tric");
-      var hd = el("div", "wdsm-duh");
-      hd.appendChild(el("b", null, LB[i]));
-      hd.appendChild(el("i", null, vinfo(who.vendor).name));
-      var bd = el("div", "wdsm-a plain");
-      bd.textContent = i === 0 ? "\u258a" : t("triWait");
-      c.appendChild(hd); c.appendChild(bd); wrap.appendChild(c);
-      return { who: who, bd: bd, text: "" };
-    });
-    cell.a.innerHTML = ""; cell.a.appendChild(wrap);
-    if (seats.degraded) {
-      var warn = el("div", "wdsm-tinote");
-      warn.textContent = t("triSame");
-      wrap.appendChild(warn);
-    }
 
     var ROLES = ["a", "b", "c"];
-    function step(i, prior) {
-      var row = rows[i];
-      row.bd.className = "wdsm-a";
-      row.bd.innerHTML = "<span class='cur'>\u258a</span>";
-      var pl = {
-        q: q, history: histPack(compFrom()), umem: memRecall(q),
-        key: row.who.key, vendor: row.who.vendor, model: row.who.model,
-        mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(),
-        about: aboutPlus(), lang: LANG,
-        duel: { role: ROLES[i], prior: prior }
-      };
-      if (COMP.text) pl.comp = COMP.text;
-      return rsStream(API, pl, function (txt) {
-        row.text = txt; row.bd.innerHTML = mdRender(txt) + "<span class='cur'>\u258a</span>";
-      }).then(function (txt) {
-        row.text = txt; row.bd.innerHTML = mdRender(txt);
-        return txt;
-      }).catch(function (e) {
-        row.bd.className = "wdsm-a plain wdsm-err";
-        row.bd.textContent = (e && e.message) || "?";
-        return "";
+    var LB = [t("triA"), t("triB"), t("triC")];
+    var ROUNDS = [];          // 每轮的全文，保存到画布与写进 history 时一起带走
+
+    function runRound(seats, rd, carry) {
+      var wrap = el("div", "wdsm-tri");
+      if (rd > 1) wrap.appendChild(el("div", "wdsm-trird", t("triRd").replace("{n}", String(rd))));
+      var rows = seats.map(function (who, i) {
+        var c = el("div", "wdsm-tric");
+        var hd = el("div", "wdsm-duh");
+        hd.appendChild(el("b", null, LB[i]));
+        hd.appendChild(el("i", null, vinfo(who.vendor).name));
+        var bd = el("div", "wdsm-a plain");
+        bd.textContent = i === 0 ? "\u258a" : t("triWait");
+        c.appendChild(hd); c.appendChild(bd); wrap.appendChild(c);
+        return { who: who, bd: bd, text: "" };
+      });
+      if (seats.degraded) {
+        var warn = el("div", "wdsm-tinote");
+        warn.textContent = t("triSame");
+        wrap.appendChild(warn);
+      }
+      cell.a.appendChild(wrap);
+
+      function step(i, prior) {
+        var row = rows[i];
+        row.bd.className = "wdsm-a";
+        row.bd.innerHTML = "<span class='cur'>\u258a</span>";
+        var pl = {
+          q: q, history: histPack(compFrom()), umem: memRecall(q),
+          key: row.who.key, vendor: row.who.vendor, model: row.who.model,
+          mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(),
+          about: aboutPlus(), lang: LANG,
+          // rd 只在第二轮起才递：第一轮的三席提示语一个字都不该变
+          duel: { role: ROLES[i], prior: prior, rd: rd > 1 ? rd : 0 }
+        };
+        if (COMP.text) pl.comp = COMP.text;
+        return rsStream(API, pl, function (txt) {
+          row.text = txt; row.bd.innerHTML = mdRender(txt) + "<span class='cur'>\u258a</span>";
+        }).then(function (txt) {
+          row.text = txt; row.bd.innerHTML = mdRender(txt);
+          return txt;
+        }).catch(function (e) {
+          row.bd.className = "wdsm-a plain wdsm-err";
+          row.bd.textContent = (e && e.message) || "?";
+          return "";
+        });
+      }
+      // 串行：下一家必须拿到上一家的原文才动。任一步空手，后面就没有可攻/可裁的东西了——
+      // 这时如实停下并说明，不要让空文本一路流下去凑满三栏。
+      return step(0, carry).then(function (a) {
+        if (!a) { rows[1].bd.textContent = t("triFail"); rows[2].bd.textContent = t("triFail"); return null; }
+        return step(1, a).then(function (b) {
+          if (!b) { rows[2].bd.textContent = t("triFail"); return null; }
+          var both = "【" + vinfo(seats[0].vendor).name + " · 判断】\n" + a
+            + "\n\n【" + vinfo(seats[1].vendor).name + " · 攻击】\n" + b;
+          return step(2, both).then(function () { return rows; });
+        });
+      }).then(function (done) {
+        var all = (rd > 1 ? ("【第 " + rd + " 轮】\n") : "") + rows.map(function (r, i) {
+          return "【" + LB[i] + " · " + vinfo(r.who.vendor).name + "】\n" + r.text;
+        }).join("\n\n");
+        ROUNDS.push(all);
+        return { ok: !!done, verdict: rows[2].text || "" };
       });
     }
-    // 串行：下一家必须拿到上一家的原文才动。任一步空手，后面就没有可攻/可裁的东西了——
-    // 这时如实停下并说明，不要让空文本一路流下去凑满三栏。
-    step(0, "").then(function (a) {
-      if (!a) { rows[1].bd.textContent = t("triFail"); rows[2].bd.textContent = t("triFail"); return; }
-      return step(1, a).then(function (b) {
-        if (!b) { rows[2].bd.textContent = t("triFail"); return; }
-        var both = "【" + vinfo(seats[0].vendor).name + " · 判断】\n" + a
-          + "\n\n【" + vinfo(seats[1].vendor).name + " · 攻击】\n" + b;
-        return step(2, both);
+
+    function startRound(seats, rd, carry) {
+      streaming = true; stoppedByUser = false; RS.stop = false;
+      busyUI(true); stopBarShow(true);
+      if (cell.acts && cell.acts.parentNode) { cell.acts.parentNode.removeChild(cell.acts); cell.acts = null; }
+      runRound(seats, rd, carry).then(function (res) {
+        streaming = false; curReader = null;
+        busyUI(false); stopBarShow(false);
+        var all = ROUNDS.join("\n\n");
+        history.push({ role: "wds", text: all }); stSave(history); updTurns(); compTick();
+        var row2 = el("div", "wdsm-acts");
+        var sv = el("button", "wdsm-act", t("triSave"));
+        sv.onclick = function () { cvAdd("md", q.slice(0, 24), "# " + q + "\n\n" + ROUNDS.join("\n\n")); };
+        row2.appendChild(sv);
+        /* 只有这一轮真的撞完（三席都有产出）才给「继续」——半截的一轮没有可当靶子的结算。
+           座位左轮一格；上一轮的结算原样当下一轮第一家的靶子。 */
+        if (res && res.ok && res.verdict) {
+          var go = el("button", "wdsm-act", t("triMore"));
+          go.title = t("triMoreT");
+          go.onclick = function () {
+            if (streaming) return;
+            var nx = seats.slice(1).concat(seats.slice(0, 1));
+            nx.degraded = seats.degraded;
+            startRound(nx, rd + 1, res.verdict);
+          };
+          row2.appendChild(go);
+        }
+        cell.turn.appendChild(row2); cell.acts = row2;
       });
-    }).then(function () {
-      streaming = false; curReader = null;
-      busyUI(false); stopBarShow(false);
-      var all = rows.map(function (r, i) {
-        return "【" + LB[i] + " · " + vinfo(r.who.vendor).name + "】\n" + r.text;
-      }).join("\n\n");
-      history.push({ role: "wds", text: all }); stSave(history); updTurns(); compTick();
-      var row2 = el("div", "wdsm-acts");
-      var sv = el("button", "wdsm-act", t("triSave"));
-      sv.onclick = function () { cvAdd("md", q.slice(0, 24), "# " + q + "\n\n" + all); };
-      row2.appendChild(sv);
-      cell.turn.appendChild(row2); cell.acts = row2;
-    });
+    }
+
+    cell.a.innerHTML = "";
+    startRound(seats0, 1, "");
     return true;
   }
 

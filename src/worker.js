@@ -8045,9 +8045,33 @@ function WDS_IQ_SYS(siteCtx, docCtx, docNote, lang, webCtx, prof) {
 // （与 FORGE_STAGES 同口径）。三段都**不装心得、不装 SDE 骨架**——攻击者和裁决者
 // 一旦戴上同一副眼镜，就会开始互相附和，对撞当场退化成合唱。
 const DUEL_ROLES = { a: 1, b: 1, c: 1 };
-function WDS_DUEL_SYS(role, prior, siteCtx, lang) {
+/* 【继续对撞 —— 2026-09-01】一轮撞完（判断→攻击→结算）常常并没有撞到底：
+   结算出的那句话自己又是一条可攻的判断。继续对撞＝**拿上一轮的结算当这一轮的靶子**，
+   同时**座位左轮一格**：上一轮攻的那家改出判断、结算的那家改攻、出判断的那家改结算。
+   为什么必须轮座：不轮，出判断这一席永远是同一家，题的定法就被那一家垄断了，
+   后面几轮撞的其实还是它第一轮划下的那条线。
+   这一轮最大的危险不是撞不出来，是**同义重述**——把上一轮的结论换个说法再说一遍，
+   三栏都满、读起来还挺像样，却一层也没往下走。所以下面每一席都写死了反空转条款。 */
+function WDS_DUEL_SYS(role, prior, siteCtx, lang, rd) {
+  const RD = (rd | 0) >= 2 ? (rd | 0) : 0;
+  const RDH = RD ? ("\n\n【这是第 " + RD + " 轮】前面几轮已经撞过，下面那段是上一轮的结算。") : "";
   const EN = (lang === "en") ? "\n\n【LANGUAGE】Write your entire answer in English." : "";
   const SITE = "\n\n【站内已有的相关文本（参照系，不是要你复述它）】\n" + (siteCtx || "（这次没检索到相关篇目）");
+
+  if (role === "a" && RD) {
+    return "你是这一轮的**第一家**（座位每轮轮转，上一轮你不在这个位子上）。" + RDH
+      + "\n\n你的活**不是重开一个题**，也不是把上一轮的结算复述一遍——是把它**没有结清的那一处**"
+      + "挑出来，做成这一轮可被攻击的新判断。"
+      + "\n\n· 先用一句话说清：上一轮那句结算，**哪一个词**是它自己没有交代清楚的（不是「哪一方面」，是哪个词）。"
+      + "\n· 然后就着那个词出一条新判断，仍然要有承重命题，仍然要偏、要狠、要给得出可攻击的表面。"
+      + "\n· **同义重述是这一轮唯一不许出现的产物**：把上一轮的结论换个说法再说一遍，三栏会照样填满，"
+      + "但一层也没往下走。你必须在末尾明说这一条：**这一轮的判断与上一轮那句话的差别，落在哪一个词上。**"
+      + "\n· 上一轮如果已经撞到底了（那句结算你攻不动、也挑不出没交代的词），**就直说到底了、这一轮不该跑**——"
+      + "如实停下比凑一轮有价值得多。"
+      + "\n· 六百字以内。"
+      + "\n\n【上一轮的结算（逐字）】\n" + (prior || "（上一轮没有产出）")
+      + SITE + EN;
+  }
 
   if (role === "a") {
     return "你是三家对撞里的**第一家**。你的活是把读者这一问答成一个**能被攻击的判断**。"
@@ -8060,7 +8084,7 @@ function WDS_DUEL_SYS(role, prior, siteCtx, lang) {
   }
 
   if (role === "b") {
-    return "你是三家对撞里的**第二家**，**由另一家模型写下的判断刚刚摆在你面前**。"
+    return "你是三家对撞里的**第二家**，**由另一家模型写下的判断刚刚摆在你面前**。" + RDH
       + "\n你的活只有一件：**攻击它**。"
       + "\n\n· **不许补充，不许附和，不许「它说得对，我再补一点」。**你和它出自不同的训练语料、不同的取舍，"
       + "你能看见的恰恰是它看不见的那部分——那才是你被请来的理由。附和等于弃权。"
@@ -8074,7 +8098,10 @@ function WDS_DUEL_SYS(role, prior, siteCtx, lang) {
   }
 
   // c：裁决者。它没参与前两步的写作，所以它是全场唯一有资格结算的人。
-  return "你是三家对撞里的**第三家**。前两家已经交过手：一家出判断，另一家攻它。"
+  return "你是三家对撞里的**第三家**。前两家已经交过手：一家出判断，另一家攻它。" + RDH
+    + (RD ? ("\n\n【这一轮你多一件事 · 反空转】结算之前先判一句：**这一轮相对上一轮，真的往下走了一层吗？**"
+      + "判据只有一条——这一轮的产物能不能由上一轮那句结算直接推出。能，就是同义重述，"
+      + "**直说这一轮空转、指明是在哪一步空的，然后停**，不要再往下凑一句漂亮的结算。") : "")
     + "\n**你没有参与前面任何一步的写作**——所以这一场只有你有资格结算。你不是裁判长，不是和事佬，"
     + "你的活也不是宣布谁赢。"
     + "\n\n你要做的是这件事：**找出他们两个共有的那个没有说出口的前提。**"
@@ -8699,7 +8726,7 @@ function WDS_PLAIN_SYS(webCtx, docCtx, about, lang, docNote) {
 function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx) {
   // 三家对撞：三段角色 sys 各自独立，同样不装心得与骨架（戴同一副眼镜就会开始附和）。
   // 与 iq 一样必须排在最前——落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
-  if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang);
+  if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang, duel.rd || 0);
   // iq 工序整段改道：评分者不装心得/骨架/方法论，也不用老师人格（防过度通胀，见 WDS_IQ_SYS 注释）。
   // 必须排在最前——一旦落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
   /* ⭐ 评分这一路原来**收不到站外资料**（签名里根本没有 webCtx）：
@@ -11614,7 +11641,8 @@ export default {
       // 无 SDE 档不认对撞——它本来就是要用同一副 SDE 眼镜的三家去互相顶撞。
       const duelRaw = noSde ? null : ((b && typeof b.duel === "object" && b.duel) ? b.duel : null);
       const duel = (duelRaw && DUEL_ROLES[String(duelRaw.role || "")])
-        ? { role: String(duelRaw.role), prior: String(duelRaw.prior || "").slice(0, 24000) } : null;
+        ? { role: String(duelRaw.role), prior: String(duelRaw.prior || "").slice(0, 24000),
+            rd: Math.max(0, Math.min(9, parseInt(duelRaw.rd, 10) || 0)) } : null;
       // COMPACTION：本场更早的对话已在读者本机压成一份「账本」（只留判断/否决/分离线/悬案）。
       // 它替代的是被裁掉的原文，所以位置在历史之前、且必须**标明它是账本不是原文**——
       // 否则它会照着账本复述，把压缩过的结论当成自己刚说过的话。
