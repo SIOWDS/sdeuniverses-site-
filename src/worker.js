@@ -10407,6 +10407,22 @@ export default {
       r.headers.set("cdn-cache-control", "no-store");
       return r;
     }
+    // /api/lit/arxiv：文献选优（/taste/lit-picker/）用的 arXiv 代理。
+    // export.arxiv.org 的 Atom API 不带 CORS 头，浏览器直连拿不到；OpenAlex 有 CORS，前端直连。
+    // 只转 GET、只认 q/max 两个参数、上限 100 条，结果边缘缓存 10 分钟，避免替人扫库。
+    if (url.pathname === "/api/lit/arxiv") {
+      const q = (url.searchParams.get("q") || "").trim().slice(0, 300);
+      const max = Math.min(100, Math.max(1, parseInt(url.searchParams.get("max") || "50", 10) || 50));
+      if (!q) return new Response("missing q", { status: 400 });
+      const target = "https://export.arxiv.org/api/query?search_query=all:" + encodeURIComponent(q) + "&start=0&max_results=" + max + "&sortBy=relevance";
+      try {
+        const r = await fetch(target, { headers: { "user-agent": "SDE-LitPicker/1.0 (sdeuniverses.com)" }, cf: { cacheTtl: 600, cacheEverything: true } });
+        const body = await r.text();
+        return new Response(body, { status: r.status, headers: { "content-type": "application/atom+xml; charset=utf-8", "cache-control": "public, max-age=600", "access-control-allow-origin": "*" } });
+      } catch (e) {
+        return new Response("arxiv upstream error: " + String((e && e.message) || e), { status: 502 });
+      }
+    }
     if (url.pathname === "/api/visits") {
       // 计数坏了不许把整页拖成 500：DO 绑定脱开时（2026-08-18 那次 IndexMemory 迁移的后遗症）
       // 这里回一个 total:null + why，前端照样静默降级，运维一 curl 就看得见真正的错。

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文献选优 · arXiv + OpenAlex · SDE Universes</title>
+<meta name="description" content="填一个题目，同时查 arXiv 与 OpenAlex 两个开放学术库，去重后按相关度、被引与年份排序，勾选后直达开放全文 PDF。不需要账号，走官方 API。">
+<link rel="canonical" href="https://sdeuniverses.com/taste/lit-picker/">
+<style>
+:root{--bg:#0E1116;--card:#161B22;--gold:#D4B25E;--gold2:#E5C86E;--ink:#E6EDF3;--sub:#8B98A5;--line:rgba(212,178,94,0.28);--ok:#5FBF7F;--warn:#E0A045}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;font-size:14.5px;line-height:1.7}
+a{color:var(--gold);text-decoration:none}
+.wrap{max-width:1280px;margin:0 auto;padding:0 18px}
+header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0E1116,#10151B);padding:12px 0}
+.hrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hback{font-size:13px;color:var(--sub)}
+.htitle{font-size:19px;font-weight:800}
+.htitle b{background:linear-gradient(120deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.badge{font-size:11px;letter-spacing:.14em;color:var(--gold);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.hero{padding:22px 0 4px;text-align:center}
+.hero h1{font-size:clamp(22px,3.2vw,30px);font-weight:800;margin:0 0 8px}
+.hero h1 b{background:linear-gradient(120deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--sub);max-width:820px;margin:0 auto;font-size:14px}
+.panel{background:var(--card);border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:14px 16px;margin:14px 0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+label.f{display:block;font-size:12px;color:var(--sub);margin:0 0 4px}
+input[type=text],input[type=number]{background:#0E1218;color:var(--ink);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:8px 10px;font-size:14px}
+input[type=text]{width:min(560px,100%)}
+input[type=number]{width:84px}
+.chk{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--sub);padding-bottom:9px}
+button{background:linear-gradient(120deg,var(--gold),var(--gold2));color:#0F0B07;border:none;border-radius:9px;padding:9px 16px;font-weight:700;font-size:14px;cursor:pointer}
+button.ghost{background:transparent;color:var(--gold);border:1px solid var(--line)}
+button:disabled{opacity:.5;cursor:default}
+.status{font-size:12.5px;color:var(--sub);margin-top:8px;white-space:pre-wrap;font-family:Consolas,Menlo,monospace}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,0.07);vertical-align:top}
+th{color:var(--gold);text-align:left;font-weight:600;font-size:12px;letter-spacing:.06em;white-space:nowrap;cursor:pointer;user-select:none}
+th.c,td.c{text-align:center}
+tr:hover td{background:rgba(212,178,94,0.05)}
+td.t{min-width:320px}
+td.t a{color:var(--ink)}
+td.t a:hover{color:var(--gold2)}
+.au{color:var(--sub);font-size:12px}
+.src{font-size:11px;border:1px solid var(--line);border-radius:6px;padding:0 6px;color:var(--gold);white-space:nowrap}
+.pdf{color:var(--ok);font-weight:700}
+.nopdf{color:var(--sub)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.tools .n{color:var(--sub);font-size:13px;margin-left:auto}
+.foot{color:var(--sub);font-size:12.5px;margin:18px 0 40px}
+@media(max-width:760px){td.t{min-width:200px}.hide-m{display:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap hrow">
+  <a class="hback" href="/taste/">← SDE 智能体</a>
+  <div class="htitle"><b>文献选优</b> · arXiv + OpenAlex</div>
+  <span class="badge">OPEN API</span>
+</div></header>
+
+<div class="wrap">
+<div class="hero">
+  <h1>填一个题目，<b>两个开放学术库</b>同时查，排好序，勾选直达全文</h1>
+  <p>走 arXiv 与 OpenAlex 的官方接口，不需要任何账号。结果去重后按「相关度为主、被引与年份为辅」排序；有开放全文的一键打开 PDF，没有的去出版商页。</p>
+</div>
+
+<div class="panel">
+  <div class="row">
+    <div><label class="f">检索词（英文效果最好）</label><input type="text" id="q" placeholder="例：attribution responsibility large language models" autofocus></div>
+    <div><label class="f">年份从</label><input type="number" id="y1" value="2018" min="1990" max="2030"></div>
+    <div><label class="f">到</label><input type="number" id="y2" min="1990" max="2030"></div>
+    <div><label class="f">每库最多</label><input type="number" id="n" value="50" min="10" max="100" step="10"></div>
+    <label class="chk"><input type="checkbox" id="useOA" checked> OpenAlex</label>
+    <label class="chk"><input type="checkbox" id="useAX" checked> arXiv</label>
+    <button id="go">① 检索并排序</button>
+  </div>
+  <div class="status" id="st">就绪。</div>
+</div>
+
+<div class="panel" id="resPanel" style="display:none">
+  <div class="tools">
+    <button class="ghost" id="selPdf">全选有 PDF 的</button>
+    <button class="ghost" id="selNone">清空勾选</button>
+    <button id="openSel">② 打开勾选的 PDF / 网页</button>
+    <button class="ghost" id="csv">导出候选表 CSV</button>
+    <span class="n" id="cnt"></span>
+  </div>
+  <div style="overflow:auto">
+  <table id="tbl">
+    <thead><tr>
+      <th class="c">勾</th><th class="c" data-k="score">分数</th><th class="c" data-k="cites">被引</th><th class="c" data-k="year">年份</th>
+      <th class="c hide-m">库</th><th class="c">全文</th><th data-k="title">题名 / 作者</th><th class="hide-m" data-k="venue">期刊 / 类别</th>
+    </tr></thead>
+    <tbody id="tb"></tbody>
+  </table>
+  </div>
+</div>
+
+<p class="foot">分数 ＝ 相关度名次（0–40）＋ min(√被引, 30) ＋ 近六年加分（每年 3）。arXiv 条目的被引数由 OpenAlex 按 DOI 补齐。浏览器会拦截多个弹窗时，请允许本站弹出窗口，或逐条点题名旁的链接。</p>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+$('y2').value=new Date().getFullYear();
+let items=[], sortK='score', sortD=-1;
+const log=m=>{$('st').textContent=m;};
+
+function scoreOf(it,y){const rec=it.year?Math.max(0,6-(y-it.year)):0;const rel=Math.max(0,40-(it.rank??40));return Math.round((rel+Math.min(Math.sqrt(it.cites||0),30)+3*rec)*10)/10;}
+const key=it=>((it.doi||it.title)||'').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]/g,'');
+
+async function searchOA(q,lo,hi,n){
+  const p=new URLSearchParams({search:q,filter:`publication_year:${lo}-${hi}`,'per-page':Math.min(n,200),sort:'relevance_score:desc',select:'id,doi,title,publication_year,cited_by_count,authorships,primary_location,best_oa_location,open_access'});
+  const r=await fetch('https://api.openalex.org/works?'+p);if(!r.ok)throw new Error('OpenAlex '+r.status);
+  const d=await r.json();
+  return (d.results||[]).map((w,rank)=>{const oa=w.best_oa_location||{};return{db:'OpenAlex',title:w.title||'',year:w.publication_year||0,cites:w.cited_by_count||0,
+    authors:(w.authorships||[]).slice(0,4).map(a=>a.author&&a.author.display_name||'').join(', '),
+    venue:((w.primary_location||{}).source||{}).display_name||'',pdf:oa.pdf_url||'',
+    url:oa.landing_page_url||(w.open_access||{}).oa_url||w.doi||w.id,doi:(w.doi||'').replace('https://doi.org/',''),rank};});
+}
+async function searchAX(q,lo,hi,n){
+  const r=await fetch('/api/lit/arxiv?'+new URLSearchParams({q,max:Math.min(n,100)}));if(!r.ok)throw new Error('arXiv '+r.status);
+  const x=new DOMParser().parseFromString(await r.text(),'application/xml');
+  const NS='http://www.w3.org/2005/Atom', tx=(e,t)=>{const k=e.getElementsByTagNameNS(NS,t)[0];return k?k.textContent.trim():'';};
+  const out=[];let rank=0;
+  for(const e of x.getElementsByTagNameNS(NS,'entry')){
+    const year=parseInt(tx(e,'published').slice(0,4))||0; if(year&&(year<lo||year>hi))continue;
+    const id=tx(e,'id'), short=id.split('/abs/').pop();
+    let pdf='';for(const l of e.getElementsByTagNameNS(NS,'link'))if(l.getAttribute('title')==='pdf')pdf=l.getAttribute('href');
+    const cat=e.getElementsByTagName('category')[0];
+    out.push({db:'arXiv',title:tx(e,'title').replace(/\s+/g,' '),year,cites:0,authors:[...e.getElementsByTagNameNS(NS,'author')].slice(0,4).map(a=>tx(a,'name')).join(', '),
+      venue:'arXiv '+(cat?cat.getAttribute('term'):''),pdf:pdf||('https://arxiv.org/pdf/'+short),url:id,doi:'10.48550/arXiv.'+short.replace(/v\d+$/,''),rank:rank++});
+  }
+  return out;
+}
+async function enrich(ax){
+  for(let i=0;i<ax.length;i+=50){const c=ax.slice(i,i+50);
+    try{const p=new URLSearchParams({filter:'doi:'+c.map(t=>t.doi).join('|'),'per-page':50,select:'doi,cited_by_count'});
+      const r=await fetch('https://api.openalex.org/works?'+p);if(!r.ok)continue;const d=await r.json();const m={};
+      for(const w of d.results||[])m[(w.doi||'').replace('https://doi.org/','').toLowerCase()]=w.cited_by_count||0;
+      for(const t of c)t.cites=m[t.doi.toLowerCase()]||0;}catch(e){}}
+}
+function merge(lists){const seen={},out=[];for(const it of lists.flat()){const k=key(it);if(k in seen){const o=out[seen[k]];if(it.cites>o.cites)o.cites=it.cites;if(!o.pdf&&it.pdf)o.pdf=it.pdf;o.rank=Math.min(o.rank,it.rank);continue;}seen[k]=out.length;out.push(it);}return out;}
+
+function render(){
+  const tb=$('tb');tb.innerHTML='';
+  const sorted=[...items].sort((a,b)=>{const x=a[sortK],y=b[sortK];return (typeof x==='string'?x.localeCompare(y):(x-y))*sortD;});
+  for(const it of sorted){const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="c"><input type="checkbox" data-i="${it.i}" ${it.sel?'checked':''}></td><td class="c">${it.score}</td><td class="c">${it.cites}</td><td class="c">${it.year||''}</td>
+    <td class="c hide-m"><span class="src">${it.db}</span></td><td class="c">${it.pdf?`<a class="pdf" href="${it.pdf}" target="_blank" rel="noopener">PDF</a>`:'<span class="nopdf">—</span>'}</td>
+    <td class="t"><a href="${it.url}" target="_blank" rel="noopener">${esc(it.title)}</a><div class="au">${esc(it.authors)}</div></td><td class="hide-m">${esc(it.venue)}</td>`;
+    tb.appendChild(tr);}
+  $('cnt').textContent=`共 ${items.length} 篇（去重后），有开放全文 ${items.filter(t=>t.pdf).length} 篇`;
+  $('resPanel').style.display='';
+}
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('tb').addEventListener('change',e=>{if(e.target.type==='checkbox')items[+e.target.dataset.i].sel=e.target.checked;});
+document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortK===k)sortD*=-1;else{sortK=k;sortD=(k==='title'||k==='venue')?1:-1;}render();});
+
+$('go').onclick=async()=>{
+  const q=$('q').value.trim();if(!q){log('先填检索词。');return;}
+  const lo=+$('y1').value||1990,hi=+$('y2').value||2030,n=+$('n').value||50;
+  $('go').disabled=true;items=[];
+  try{
+    const lists=[];
+    if($('useOA').checked){log('OpenAlex 查询中…');lists.push(await searchOA(q,lo,hi,n));}
+    if($('useAX').checked){log('arXiv 查询中…');const ax=await searchAX(q,lo,hi,n);log('给 arXiv 结果补被引数…');await enrich(ax);lists.push(ax);}
+    const y=new Date().getFullYear();items=merge(lists);items.forEach((it,i)=>{it.i=i;it.sel=false;it.score=scoreOf(it,y);});
+    sortK='score';sortD=-1;render();log(`完成：${items.length} 篇。勾选后点 ②，或直接点每行的 PDF / 题名。`);
+  }catch(e){log('出错：'+e.message);}
+  $('go').disabled=false;
+};
+$('selPdf').onclick=()=>{items.forEach(t=>t.sel=!!t.pdf);render();};
+$('selNone').onclick=()=>{items.forEach(t=>t.sel=false);render();};
+$('openSel').onclick=()=>{const s=items.filter(t=>t.sel);if(!s.length){log('先勾选几篇。');return;}
+  s.slice(0,15).forEach((t,k)=>setTimeout(()=>window.open(t.pdf||t.url,'_blank'),k*250));if(s.length>15)log('一次最多打开 15 个标签，其余请分批。');};
+$('csv').onclick=()=>{if(!items.length)return;const cols=['score','cites','year','db','title','authors','venue','doi','pdf','url'];
+  const csv='\ufeff'+[cols.join(',')].concat(items.map(t=>cols.map(c=>'"'+String(t[c]??'').replace(/"/g,'""')+'"').join(','))).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='candidates.csv';a.click();};
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click();});
+})();
+</script>
+</body>
+</html>
