@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第十二章　一份共同的实验 · 下一步才算数 · 德麦国际专著</title>
+<meta name="description" content="下一步才算数——语言的十个判据。胡志英著。第十二章　一份共同的实验">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:22px;margin:1.6em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}p.li{margin:.35em 0 .35em 1em}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);
+background:var(--card);color:#F0EDE4}
+.tw{overflow-x:auto;margin:1.2em 0}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#171D23;color:var(--gold)}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;
+padding-top:18px;border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--gold)}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);
+color:var(--dim);font-size:12.5px;text-align:center}
+</style></head><body><div class="bar"><a href="/books/m/105/">← 专著首页</a><a href="/books/m/105/text/">目录</a> <a href="/books/m/105/read.html">📄 在线 PDF</a><a href="/books/m/105/next-step-counts.pdf">⬇ 下载</a> <span style="color:var(--dim)">德麦国际专著第 105 号</span></div><div class="wrap"><h1>第十二章　一份共同的实验</h1><p style="color:var(--dim)">——一张能同时算出十个读数的事件表，与看数据之前写死的三种处置</p>
+<h2>一、十个读数需要的是同一种数据</h2>
+<p>前十章各自提出了最低成本真跑，用的材料互不相同：CHILDES 的 163 个修复实例、Hansard 的部长更正、RFC 9580 的 22 条勘误、573 个课堂错误、2053 次他人发起修复、纽约 43,448 家餐馆、蒙特利尔议定书的修正、Python 的七份治理提案。材料不同掩盖了一件事：十个读数需要的数据结构是<b>同一种</b>——事件级、保留下一步、带对照、带延迟探针。把十章的最低字段并起来，得到一张表：</p>
+<div class="tw"><table><tr><th>字段</th><th>含义</th><th>供给哪些读数</th></tr><tr><td>event_id</td><td>一次可归属的语言事件</td><td>全部</td></tr><tr><td>T_p</td><td>形式生产停止时点</td><td>DCO、SFP、FRE</td></tr><tr><td>T_s / update_actor / accepted</td><td>结算落定时点、有权更新者、更新是否进入版本</td><td>DCO</td></tr><tr><td>candidate_pair / substitution_direction</td><td>受控替换的候选对与方向</td><td>SFP</td></tr><tr><td>partner_next_action_matches</td><td>伙伴下一步是否按学习者版本／信息执行</td><td>FRE、DDC</td></tr><tr><td>deadline / dependence</td><td>决策截止与信息非冗余</td><td>DDC</td></tr><tr><td>L / O / A / U</td><td>定位、承担、替代尝试、延迟独立改变</td><td>LGD</td></tr><tr><td>veto_clause_id / deletion_test</td><td>缺席条件与删除后行动是否改变</td><td>AVP</td></tr><tr><td>threshold_side / next_gate</td><td>阈值侧与下一步可达门</td><td>SRD²</td></tr><tr><td>branch_status / reentry_rule / reentry_event</td><td>分支状态、重入规则、重入事件</td><td>PBR</td></tr><tr><td>operator_part / variant_share_before_after</td><td>触及的算子部件与变体份额变化</td><td>ESO</td></tr><tr><td>third_party_reuse / certification / successor</td><td>第三方无提示沿用、认证、后继吸收</td><td>SFP、RLU</td></tr></table></div>
+<p>这张表的最低配置只有四项：<b>跨轮次配对</b>（同一事件在 T_p 与 T_next 两个时点各有记录）、<b>条件对照</b>（替换、删除或阈值两侧）、<b>延迟探针</b>（至少一次事后无提示观察）、<b>第三方探针</b>（至少一名非原参与者）。缺任何一项，十个读数中至少有三个报 NA。</p>
+<h2>二、现成语料各能供给什么</h2>
+<p>没有一份公开语料能填满这张表，但有几份能填一半以上，而且互不重叠。CHILDES 的 Forrester 语料能供 T_p、伙伴下一步与替换候选，可以同时算 FRR 与 T_SF，加上伙伴按新版本行动的时点还能算 Tₛ——<b>这是三章共用一份数据的唯一现成机会</b>，也是全书应当最先做的一件事。Hansard、RFC errata 与 PEP 三份制度语料能供 T_s、更新权限、认证与后继吸收，可以同时算 Lₛ、RLSR 与 BRR，它们共同的缺口是没有任何伙伴级下一步。纽约餐馆检查数据与蒙特利尔修正记录能供阈值侧与算子部件，可以算 SRD² 的 RDD 与 OSR，缺口是没有替换对照。课堂观察语料能供 L—O—A—U 与依赖门，缺口是延迟探针几乎从不记录。第七章的缺席否决位没有任何现成语料，只能靠匹配协作实验。</p>
+<h2>三、看数据之前写死的三种处置</h2>
+<p><b>处置一：两型合并。</b> 若单步型与跨手型读数在同一语料上相关高于 0.8，全书压成两章。第十一章已写死。</p>
+<p><b>处置二：逐章并入祖宗。</b> 十章各自末节写死了"最近的祖宗"能完整预测本章读数时应并入的条件。若某章的读数被其祖宗的现成量完整预测，该章从本书删除，不保留为"应用"。作者预期第五章最先触发——任务类型学的事前分类与 TPD 的事件级编码在多数课堂里可能高度一致。</p>
+<p><b>处置三：参与率盲区。</b> 十个读数全部是事件量，没有一个是分布量。一个班级可以十项全部达标，而全部合格事件集中在三个学生身上；一个共同体可以拥有很高的 OSR，而修改权集中在极少数人手里（第十章第四十节已承认）。本书因此强制要求：任何报告十个读数的研究必须同时报告<b>参与率</b>（有多少比例的参与者至少贡献一个合格事件）与<b>事件集中度</b>（合格事件的基尼系数或前 20% 参与者占比）。若参与率与集中度对任何后果变量的预测力超过读数本身，本书的全部教育情境主张作废。</p>
+<h2>四、最便宜的第一步</h2>
+<p>不必等一份新语料。CHILDES Forrester 语料的 163 个修复实例已经定位、已经公开，第四章的预注册协议已经写好。把它们按第十一章第一节的判定字段全量重编码，同时算三个量：儿童修订是否被伙伴按其版本行动（FRR 分子）、涉及的候选形式对是否此后不再互换（T_SF）、伙伴按新版本行动距儿童改口多久（Lₛ）。三个量若在同一批事件上给出不同的分布，本书第一编与第二编之间的分界第一次获得数据；若三个量近乎同一，第十一章第四节第一对的合并条件被触发，本书至少少一章。作者把这一步的结果写死为本书第二版是否存在的前提。</p><div class="nav"><a href="/books/m/105/text/c11/">← 第十一章　十把尺子量的是同一个"下一步"吗</a><a href="/books/m/105/text/c13/">第十三章　这套理论共同的对手，与全书的合并规则 →</a></div><div class="foot">© 德麦国际出版社 · 胡志英《下一步才算数》· ISBN 979-8-90690-040-1</div></div></body></html>
