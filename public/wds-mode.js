@@ -1220,6 +1220,8 @@
     kDeck: "对外 PPT", kDeckS: "做成一套汇报幻灯片，可直接下载 .pptx",
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
     dPptxOk: "已生成 幻灯片 ",
+    dPptxAuto: "已自动保存 .pptx（幻灯片 ",
+    dPptxAutoS: "）。要另存一份，再点「存为 .pptx」。",
     dEmptyHint: "两种可能：这一场太长把输入窗吃满了，或基底把预算全用在思考上。换标准档、或新开一场再成文。",
     dLast1: "上一次成文没有正常收尾：写到「", dLast2: "」，已出 ", dLast3: " 字；排版 ", dLast4: " 次，最慢一次 ", dLast5: " 毫秒。（那一稿存在「成文记录」里。）",
     dLastHeal: "；顶栏被重建过 ", dLastHeal2: " 次",
@@ -1494,6 +1496,8 @@
     kDeck: "Slide deck", kDeckS: "Turn this chat into a deck — download as .pptx",
     dPptx: "⤓ Save as .pptx", dPptxWait: "Building .pptx…", dPptxNo: "This draft has no slides to cut (needs ## titles and - bullets)",
     dPptxOk: "Deck ready · slides ",
+    dPptxAuto: "Saved .pptx automatically (slides ",
+    dPptxAutoS: "). Click \"Save as .pptx\" for another copy.",
     dEmptyHint: "Either this chat is too long for the input window, or the model spent its budget on thinking. Try the standard tier, or a fresh chat.",
     b9Score: "Beauty grid ", b9Polish: "↻ Polish once more against the grid", b9Good: "The grid is satisfied",
     b9Tip: "Unity·Diversity·Harmony (how it sits) | Completeness·Vitality·Singleness (which kind) | Love·Freedom·Peace (how it feels)",
@@ -8631,22 +8635,28 @@
     var stBtn = el("button", "wdsm-tbtn dstop", "\u25a0 " + t("stopGen"));
     svBtn.parentNode.insertBefore(stBtn, svBtn);
     stBtn.onclick = function () { dStopped = true; try { if (dr) dr.cancel(); } catch (e) {} };
-    var pxBtn = null;
+    var pxBtn = null, pxSave = null, dAutoSaved = false;
     if (kind === "deck") {
       pptxBoot(function () {});                       // 先拉模块，别等点击那一刻才去加载
       pxBtn = el("button", "wdsm-tbtn dpx", t("dPptx"));
       dlBtn.parentNode.insertBefore(pxBtn, dlBtn);
-      pxBtn.onclick = function () {
+      /* auto=true：稿子写完、配图取回之后由收尾自动调一次（见 done() 里的 deckPrep 回调）——
+         PPT 一生成就落盘，读者不必在一排按钮里认准哪一颗；按钮仍在，想另存一份照旧点。
+         自动这一趟没有用户手势，目录 API 若这一刻没授权会自己回退成普通下载（savedir 里 silent 路径），产出不会丢。 */
+      pxSave = function (auto) {
         if (!text) return;
-        if (!window.WDSPptx) { stat.textContent = t("dPptxWait"); pptxBoot(function (ok) { if (ok) pxBtn.onclick(); }); return; }
+        if (!window.WDSPptx) { stat.textContent = t("dPptxWait"); pptxBoot(function (ok) { if (ok) pxSave(auto); }); return; }
         var d = deckReady || deckOf(text);        // 预取过就用预取的那份（带配图）
         if (!d) { stat.textContent = t("dPptxNo"); return; }
         if (tpl && !d.theme) d.theme = tplTheme(tpl);      // 模板定的主题（稿子里写了 theme: 则以稿子为准）
         var blob = window.WDSPptx.blob(d);            // 同步造好字节，再去要目录/下载（手势还新鲜）
         var nm = fileTag("WDS") + "-" + safeName(d.title || kindT(kind)) + "-" + stampName() + ".pptx";
-        stat.textContent = t("dPptxOk") + (d.slides.length + 1) + " · 渲染器 v" + (window.WDSPptx.VERSION || "?");
-        saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = msg; });
+        var head = auto ? (t("dPptxAuto") + (d.slides.length + 1) + t("dPptxAutoS"))
+                        : (t("dPptxOk") + (d.slides.length + 1) + " · 渲染器 v" + (window.WDSPptx.VERSION || "?"));
+        stat.textContent = head;
+        saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = auto ? (head + " " + msg) : msg; });
       };
+      pxBtn.onclick = function () { pxSave(false); };
     }
     /* ── Word 与投稿：成文此前只能出 Markdown 与「打印成 PDF」，拿不出一份能直接投出去的稿子。
        两颗都只在**文章类**档位上摆（deck 是 PPT，报告/提纲不是投稿物）。 */
@@ -8951,7 +8961,14 @@
         /* 早退：正文里一个《》都没有时，这一趟纯属白跑（TreeWalker 要遍历整篇的每个文本节点）。
            按《正规学术论文写作规范》成的稿走作者—年份制，几乎不出现书名号——恰恰是最该早退的一档。 */
         try { if (text && text.length <= 40000 && text.indexOf("\u300a") >= 0) autoLink(out, text); } catch (e) {}
-        try { if (text && kind === "deck") deckPrep(text, function () { b9Show(text); }); } catch (e) {}
+        try {
+          if (text && kind === "deck") deckPrep(text, function (d) {
+            b9Show(text);
+            /* 自动保存：只在**这一场刚写完**（不是从成文记录取回）、且不是读者自己按停的情况下落盘一次。
+               取回的旧稿再自动下载一份只会制造重复文件；按停的半份稿不该替读者做主。 */
+            if (d && !existing && !dStopped && !dAutoSaved && pxSave) { dAutoSaved = true; try { pxSave(true); } catch (e) {} }
+          });
+        } catch (e) {}
         pTrace.leg = "收尾·挂链接完"; traceSave();
       }, 80);
       /* 精华自动进思想库存。这里是「报告／成文／提纲」三种锻造产物的唯一收口。
