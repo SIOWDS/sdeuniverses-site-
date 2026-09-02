@@ -33,10 +33,10 @@ def main():
         D = load(pre + 'd')
         for e in entries:
             n = e['n']
-            for idx, sent in D.ADD.get(n, []) + getattr(D, 'ADD2', {}).get(n, []) + getattr(D, 'ADD3', {}).get(n, []):
-                t, k = e['ps'][idx-1]; e['ps'][idx-1] = (t + sent, k)
             if n in D.P6:
                 e['ps'].append((D.P6[n], e['ps'][-1][1]))
+            for idx, sent in D.ADD.get(n, []) + getattr(D, 'ADD2', {}).get(n, []) + getattr(D, 'ADD3', {}).get(n, []) + getattr(D, 'ADD4', {}).get(n, []):
+                t, k = e['ps'][idx-1]; e['ps'][idx-1] = (t + sent, k)
             if n in D.FAM:
                 pos, pre_s = D.FAM[n]
                 e['col']['预设'] = pre_s
