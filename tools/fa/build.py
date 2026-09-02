@@ -28,6 +28,22 @@ def main():
     A = load(pre + 'a').ACT1; B = load(pre + 'b').ACT2; C = load(pre + 'c'); REFS = load('refs' + num).REFS
     entries = A + B
     assert len(entries) == 20, len(entries)
+    # v8 升级层（可选模块 <前缀>d.py：P6 第六段 / ADD 增厚句 / FAM 位置与预设重排）
+    try:
+        D = load(pre + 'd')
+        for e in entries:
+            n = e['n']
+            for idx, sent in D.ADD.get(n, []) + getattr(D, 'ADD2', {}).get(n, []) + getattr(D, 'ADD3', {}).get(n, []):
+                t, k = e['ps'][idx-1]; e['ps'][idx-1] = (t + sent, k)
+            if n in D.P6:
+                e['ps'].append((D.P6[n], e['ps'][-1][1]))
+            if n in D.FAM:
+                pos, pre_s = D.FAM[n]
+                e['col']['预设'] = pre_s
+                e['col']['位置'] = pos + e['col']['位置'][1:]
+        print('v8 层已套用')
+    except FileNotFoundError:
+        pass
 
     order = []  # ref keys in first-use order
     def rn(k):
@@ -96,6 +112,13 @@ def main():
     ym = re.findall(r'另见第 (\d+) 号', txt)
     ym_ext = sorted(set(ym))
     plens = [len(re.findall(r'[\u4e00-\u9fff]', t)) for e in entries for t, _ in e['ps']]
+    per = [(e['n'], sum(len(re.findall(r'[\u4e00-\u9fff]', t)) for t, _ in e['ps'])) for e in entries]
+    low = [(n, c) for n, c in per if c < 800]
+    fam_pos = collections.defaultdict(set)
+    for e in entries:
+        m = re.search(r'〔(\d+)', e['col']['预设']); fam_pos[m.group(1)].add(e['col']['位置'][0])
+    triples = [f for f, p in fam_pos.items() if p >= {'S','D','E'}]
+    print(f'单条汉字 {min(c for _,c in per)}–{max(c for _,c in per)}; <800 的: {low}; 三元组 {len(triples)} 组 {sorted(triples)}')
     print(f'{slug}: 汉字 {cjk}; 位置 S{pos["S"]}/D{pos["D"]}/E{pos["E"]}; 失效反号 {rev}/20; 前提族 {len(fams)} 种 {dict(fams)}; 自曝 {zb}/20 种; 异名指向 {ym_ext}; 文献 {len(order)} 条; 段落汉字 {min(plens)}–{max(plens)} 均 {sum(plens)//len(plens)}')
     return ym_ext
 
