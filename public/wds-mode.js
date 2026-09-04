@@ -1674,7 +1674,7 @@
       triA: "① 出判断", triB: "② 攻击它", triC: "③ 他们都没说的那一条",
       triIdle: "上一席交出的是同义重述，这一轮当场停下，没有跑。",
       triIdleN: "⚠ 本轮判为同义重述（第一席没有说清与上一轮的差别落在哪个词，也没有说撞到底了），已停在第一席——凑满三栏比停下更坏。",
-      triSpun: "⚠ 结算席自报这一场没往下走。不再给「继续对撞」——拿一句空转当下一轮的靶子只会越撞越空。",
+      triSpun: "⚠ 结算席自报这一场没往下走（空转，或两家落在同一维上）。不再给「继续对撞」——拿一句假结算当下一轮的靶子只会越撞越空。",
       triWait: "（等上一家写完）",
       triSame: "⚠ 只有两家有 Key，第三家沿用了第一家——结算者参与过写作，这一轮的结论只作参考。填第三家的 Key 可解。",
       triFail: "上一家没写出东西，这一步没法往下走。",
@@ -1828,7 +1828,7 @@
       triA: "1. The claim", triB: "2. The attack", triC: "3. The shared premise",
       triIdle: "The previous seat only restated the last round; this round stopped here.",
       triIdleN: "\u26a0 This round was judged a restatement (seat one named no differing word and did not say the clash had bottomed out). Stopped at seat one.",
-      triSpun: "\u26a0 The settling seat reported that this round went nowhere. No \u201ckeep clashing\u201d button \u2014 aiming the next round at an idle verdict only compounds it.",
+      triSpun: "\u26a0 The settling seat reported that this round went nowhere (idle, or both seats landed on the same dimension). No \u201ckeep clashing\u201d button \u2014 aiming the next round at an idle verdict only compounds it.",
       triWait: "(waiting for the previous model)",
       triSame: "\u26a0 Only two keys found, so the third seat reuses the first model \u2014 the judge also wrote. Treat this verdict as provisional; add a third key to fix it.",
       triFail: "The previous model produced nothing, so this step cannot proceed.",
@@ -5408,7 +5408,9 @@
            座位左轮一格；上一轮的结算原样当下一轮第一家的靶子。 */
         /* 【2026-09-04】此前只看三席有没有产出：第三席说「本轮空转」也算一个合格的结算，
            按钮照出，下一轮的靶子就是这句空转——越撞越空。这里把它挡掉。 */
-        var spun = res && res.verdict && /(这一轮空转|本轮空转|空转|撞不出来|撞到底了|不该跑)/.test(String(res.verdict).replace(/\s+/g, ""));
+        /* 【2026-09-04 · B】第三席现在先量一句两家是不是站在同一维上；同维复述与空转同等对待——
+           两个人拿同一副眼镜看同一处，看见的当然一样，那不是这道题的共有前提。 */
+        var spun = res && res.verdict && /(这一轮空转|本轮空转|空转|撞不出来|撞到底了|不该跑|同维复述)/.test(String(res.verdict).replace(/\s+/g, ""));
         if (res && res.idle) {
           var n1 = el("div", "wdsm-tinote"); n1.textContent = t("triIdleN"); row2.appendChild(n1);
         } else if (spun) {
