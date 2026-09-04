@@ -1672,6 +1672,9 @@
       triTip: "同一问三家接力：第一家给判断，第二家读到原文专门拆它，第三家找出他们俩都默认、却谁也没提的那样东西。三家各是不同厂商——别处不会请对手来拆自己的台。",
       triNeed: "对撞需要至少两家填了 Key（在设置里填）。填满三家最好：第三家没参与前面的写作，结算才算数。",
       triA: "① 出判断", triB: "② 攻击它", triC: "③ 他们都没说的那一条",
+      triIdle: "上一席交出的是同义重述，这一轮当场停下，没有跑。",
+      triIdleN: "⚠ 本轮判为同义重述（第一席没有说清与上一轮的差别落在哪个词，也没有说撞到底了），已停在第一席——凑满三栏比停下更坏。",
+      triSpun: "⚠ 结算席自报这一场没往下走。不再给「继续对撞」——拿一句空转当下一轮的靶子只会越撞越空。",
       triWait: "（等上一家写完）",
       triSame: "⚠ 只有两家有 Key，第三家沿用了第一家——结算者参与过写作，这一轮的结论只作参考。填第三家的 Key 可解。",
       triFail: "上一家没写出东西，这一步没法往下走。",
@@ -1823,6 +1826,9 @@
       triTip: "One question, three models in relay: the first makes a claim, the second reads it verbatim and attacks it, the third finds the premise neither of them said out loud. Three different vendors \u2014 nowhere else will a model invite a rival to tear it apart.",
       triNeed: "A clash needs keys for at least two models (add them in settings). Three is better: the third one did not write anything earlier, which is what makes its verdict worth something.",
       triA: "1. The claim", triB: "2. The attack", triC: "3. The shared premise",
+      triIdle: "The previous seat only restated the last round; this round stopped here.",
+      triIdleN: "\u26a0 This round was judged a restatement (seat one named no differing word and did not say the clash had bottomed out). Stopped at seat one.",
+      triSpun: "\u26a0 The settling seat reported that this round went nowhere. No \u201ckeep clashing\u201d button \u2014 aiming the next round at an idle verdict only compounds it.",
       triWait: "(waiting for the previous model)",
       triSame: "\u26a0 Only two keys found, so the third seat reuses the first model \u2014 the judge also wrote. Treat this verdict as provisional; add a third key to fix it.",
       triFail: "The previous model produced nothing, so this step cannot proceed.",
@@ -5345,13 +5351,38 @@
       // 这时如实停下并说明，不要让空文本一路流下去凑满三栏。
       return step(0, carry).then(function (a) {
         if (!a) { rows[1].bd.textContent = t("triFail"); rows[2].bd.textContent = t("triFail"); return null; }
+        /* 【2026-09-04】空转发生在第一席，此前却要跑完三席才由第三席发现——代价白付。
+           续轮在这里设闸：a 席必须明说这一轮与上一轮的差别落在哪一个词上（提示语已要求），
+           或如实说撞到底了。两样都没有，就是同义重述，当场停这一轮，不跑 b 与 c。 */
+        if (rd > 1) {
+          var flat = String(a).replace(/\s+/g, "");
+          var moved = /(差别|不同|区别)[^。；\n]{0,12}(落在|在于|是)/.test(flat) || /(落在|在于)[^。；\n]{0,8}(这个词|那个词|一词)/.test(flat);
+          var ended = /(撞到底了|已经撞到底|这一轮不该跑|攻不动|挑不出)/.test(flat);
+          if (!moved && !ended) {
+            rows[1].bd.className = "wdsm-a plain"; rows[1].bd.textContent = t("triIdle");
+            rows[2].bd.className = "wdsm-a plain"; rows[2].bd.textContent = t("triIdle");
+            return "IDLE";
+          }
+        }
         return step(1, a).then(function (b) {
           if (!b) { rows[2].bd.textContent = t("triFail"); return null; }
+          /* 【2026-09-04】第三席在续轮被要求判「这一轮能否由上一轮那句结算直接推出」，
+             而它此前只拿到本轮的判断与攻击——判据要求做的事，代码没给材料。这里补上。 */
           var both = "【" + vinfo(seats[0].vendor).name + " · 判断】\n" + a
             + "\n\n【" + vinfo(seats[1].vendor).name + " · 攻击】\n" + b;
+          if (rd > 1 && carry) {
+            both += "\n\n【上一轮的结算（逐字，你要拿这一轮跟它比）】\n" + carry;
+          }
           return step(2, both).then(function () { return rows; });
         });
       }).then(function (done) {
+        if (done === "IDLE") {
+          var note = el("div", "wdsm-tinote"); note.textContent = t("triIdleN");
+          wrap.appendChild(note);
+          ROUNDS.push((rd > 1 ? ("【第 " + rd + " 轮】\n") : "") + "【" + LB[0] + " · "
+            + vinfo(rows[0].who.vendor).name + "】\n" + rows[0].text + "\n\n（本轮判为同义重述，未往下跑）");
+          return { ok: false, idle: true, verdict: "" };
+        }
         var all = (rd > 1 ? ("【第 " + rd + " 轮】\n") : "") + rows.map(function (r, i) {
           return "【" + LB[i] + " · " + vinfo(r.who.vendor).name + "】\n" + r.text;
         }).join("\n\n");
@@ -5375,14 +5406,25 @@
         row2.appendChild(sv);
         /* 只有这一轮真的撞完（三席都有产出）才给「继续」——半截的一轮没有可当靶子的结算。
            座位左轮一格；上一轮的结算原样当下一轮第一家的靶子。 */
-        if (res && res.ok && res.verdict) {
+        /* 【2026-09-04】此前只看三席有没有产出：第三席说「本轮空转」也算一个合格的结算，
+           按钮照出，下一轮的靶子就是这句空转——越撞越空。这里把它挡掉。 */
+        var spun = res && res.verdict && /(这一轮空转|本轮空转|空转|撞不出来|撞到底了|不该跑)/.test(String(res.verdict).replace(/\s+/g, ""));
+        if (res && res.idle) {
+          var n1 = el("div", "wdsm-tinote"); n1.textContent = t("triIdleN"); row2.appendChild(n1);
+        } else if (spun) {
+          var n2 = el("div", "wdsm-tinote"); n2.textContent = t("triSpun"); row2.appendChild(n2);
+        } else if (res && res.ok && res.verdict) {
           var go = el("button", "wdsm-act", t("triMore"));
           go.title = t("triMoreT");
           go.onclick = function () {
             if (streaming) return;
             var nx = seats.slice(1).concat(seats.slice(0, 1));
             nx.degraded = seats.degraded;
-            startRound(nx, rd + 1, res.verdict);
+            /* 【2026-09-04】此前把结算席的五节全文当靶子递过去，第一席最易抓住的反而是
+               ①那段复述——同义重述的入口。这里只取【结算】那一句；取不到才回落全文。 */
+            var m = /【结算】([\s\S]*?)(?:\n\s*\n|$)/.exec(res.verdict || "");
+            var tgt = (m && m[1].trim()) ? ("【上一轮的结算句】" + m[1].trim()) : res.verdict;
+            startRound(nx, rd + 1, tgt);
           };
           row2.appendChild(go);
         }
