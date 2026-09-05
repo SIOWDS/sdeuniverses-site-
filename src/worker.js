@@ -11416,7 +11416,12 @@ export default {
       const clean = (s, n) => String(s || "").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").slice(0, n);
       const topic = clean(b.topic, 200), question = clean(b.question, 400);
       const HEAD = "【综述主题】" + topic + "\n【研究问题】" + question + "\n【类型】" + REVIEW_TYPE_NAME[type] + "\n";
-      const packCards = (cards, n) => (Array.isArray(cards) ? cards : []).slice(0, 60).map((c) => "［" + (parseInt(c.i, 10) || 0) + "］《" + clean(c.title, 140) + "》" + (c.layer ? "（" + clean(c.layer, 6) + "层）" : "") + "\n" + clean(c.card, n)).join("\n\n");
+      const packCards = (cards, n) => {
+        // 2026-09-05：47 张卡×1100 字的整图提示把基底撑到「一个字没写」——卡包按总预算收口：N 张共用 46000 字，每张不低于 320 字
+        const arr = (Array.isArray(cards) ? cards : []).slice(0, 60);
+        const eff = Math.max(320, Math.min(n, Math.floor(46000 / Math.max(1, arr.length))));
+        return arr.map((c) => "［" + (parseInt(c.i, 10) || 0) + "］《" + clean(c.title, 140) + "》" + (c.layer ? "（" + clean(c.layer, 6) + "层）" : "") + "\n" + clean(c.card, eff)).join("\n\n");
+      };
       const refsList = (refs) => (Array.isArray(refs) ? refs : []).slice(0, 60).map((r, i) => "［" + (i + 1) + "］" + clean(r, 200)).join("\n");
       let sys = "", usr = "", tok = 0;
 
@@ -11552,44 +11557,65 @@ export default {
           try {
             send({ t: "stage", v: STAGE[rmode] || "…" });
             const body = { model: VC.model, stream: true, max_tokens: tok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] };
-            let up;
-            try {
-              up = await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, body)) });
-            } catch (e) { return fin({ t: "error", v: VC.name + " 连接失败：" + ((e && e.message) || "") }); }
-            if (!up || !up.ok) {
-              const st = up ? up.status : 0;
-              let et = ""; try { et = (await up.text()).slice(0, 240); } catch (e) {}
-              const msg = (st === 401 || st === 403) ? "这把 Key 用不了（" + VC.name + " 返回 " + st + "）。"
-                : st === 402 ? VC.name + " 账户余额不足。"
-                : st === 429 ? VC.name + " 那边限流了，过一会儿再试。"
-                : VC.name + " 返回错误 " + st + "：" + et;
-              return fin({ t: "error", v: msg });
-            }
-            const dec = new TextDecoder();
-            const rd = up.body.getReader();
-            let buf = "", out = 0, think = 0, why = "";
-            while (true) {
-              const rr = await rd.read();
-              if (rr.done) break;
-              buf += dec.decode(rr.value, { stream: true });
-              let idx;
-              while ((idx = buf.indexOf("\n")) >= 0) {
-                const line = buf.slice(0, idx).trim();
-                buf = buf.slice(idx + 1);
-                if (!line.startsWith("data:")) continue;
-                const pl = line.slice(5).trim();
-                if (pl === "[DONE]") continue;
-                let j; try { j = JSON.parse(pl); } catch (e) { continue; }
-                if (j.error) { send({ t: "error", v: (j.error && j.error.message) || "基底流内错误" }); continue; }
-                const c0 = (j.choices && j.choices[0]) || {};
-                if (c0.finish_reason) why = c0.finish_reason;
-                const dl = c0.delta || {};
-                if (dl.reasoning_content) { think += dl.reasoning_content.length; send({ t: "think", v: think }); }
-                if (dl.content) { out += dl.content.length; send({ t: "token", v: dl.content }); }
+            // 一次上游调用。返回 { fatal, out, think, why, errFirst, rawHead }。
+            // 2026-09-05 修：流里的 j.error（多为输入过长／内容过滤）从前会被末尾那句「基底没写出内容」盖掉——现在记第一条真错误并原样报出；
+            // 上游给 200 却不是 SSE（整块 JSON）的，也抓前 200 字报出来；纯空流（无错、无思考、无正文）自动再试一次。
+            const callUp = async () => {
+              let up;
+              try {
+                up = await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, body)) });
+              } catch (e) { fin({ t: "error", v: VC.name + " 连接失败：" + ((e && e.message) || "") }); return { fatal: true }; }
+              if (!up || !up.ok) {
+                const st = up ? up.status : 0;
+                let et = ""; try { et = (await up.text()).slice(0, 240); } catch (e) {}
+                const msg = (st === 401 || st === 403) ? "这把 Key 用不了（" + VC.name + " 返回 " + st + "）。"
+                  : st === 402 ? VC.name + " 账户余额不足。"
+                  : st === 429 ? VC.name + " 那边限流了，过一会儿再试。"
+                  : VC.name + " 返回错误 " + st + "：" + et;
+                fin({ t: "error", v: msg }); return { fatal: true };
               }
+              const dec = new TextDecoder();
+              const rd = up.body.getReader();
+              let buf = "", out = 0, think = 0, why = "", errFirst = "", rawHead = "", nonSse = 0;
+              while (true) {
+                const rr = await rd.read();
+                if (rr.done) break;
+                buf += dec.decode(rr.value, { stream: true });
+                let idx;
+                while ((idx = buf.indexOf("\n")) >= 0) {
+                  const line = buf.slice(0, idx).trim();
+                  buf = buf.slice(idx + 1);
+                  if (!line) continue;
+                  if (!line.startsWith("data:")) { if (line.charAt(0) === "{" && !rawHead) rawHead = line.slice(0, 200); nonSse++; continue; }
+                  const pl = line.slice(5).trim();
+                  if (pl === "[DONE]") continue;
+                  let j; try { j = JSON.parse(pl); } catch (e) { continue; }
+                  if (j.error) { const em = (j.error && (j.error.message || j.error.code)) || "基底流内错误"; if (!errFirst) errFirst = String(em).slice(0, 240); continue; }
+                  const c0 = (j.choices && j.choices[0]) || {};
+                  if (c0.finish_reason) why = c0.finish_reason;
+                  const dl = c0.delta || {};
+                  if (dl.reasoning_content) { think += dl.reasoning_content.length; send({ t: "think", v: think }); }
+                  if (dl.content) { out += dl.content.length; send({ t: "token", v: dl.content }); }
+                }
+              }
+              if (!rawHead && buf.trim().charAt(0) === "{") rawHead = buf.trim().slice(0, 200);
+              return { fatal: false, out: out, think: think, why: why, errFirst: errFirst, rawHead: rawHead };
+            };
+            let r = await callUp();
+            if (r.fatal) return;
+            if (!r.out && !r.think && !r.errFirst && !r.rawHead) {
+              send({ t: "stage", v: "基底回了个空流，自动再试一次…" });
+              r = await callUp();
+              if (r.fatal) return;
             }
-            if (!out) return fin({ t: "error", v: think ? ("基底把额度全烧在思考上了（想了 " + think + " 字，正文一个字没写）。换成快速档再试。") : "基底没写出内容，重试一次。" });
-            fin({ t: "end", v: { out: out, think: think, why: why, truncated: why === "length" } });
+            if (!r.out) {
+              const v = r.errFirst ? (VC.name + " 流内报错：" + r.errFirst + (/context|length|token|too long|exceed/i.test(r.errFirst) ? "（输入可能过长——换快速档、减少入选篇数，或从断点继续让卡包自动缩短）" : ""))
+                : r.rawHead ? (VC.name + " 没有按流返回：" + r.rawHead)
+                : r.think ? ("基底把额度全烧在思考上了（想了 " + r.think + " 字，正文一个字没写）。换成快速档再试。")
+                : ("基底两次都没写出内容（finish_reason＝" + (r.why || "无") + "）。换快速档或换一家基底再试；已完成的工序已保存。");
+              return fin({ t: "error", v: v });
+            }
+            fin({ t: "end", v: { out: r.out, think: r.think, why: r.why, truncated: r.why === "length" } });
           } catch (e) {
             fin({ t: "error", v: "出错了：" + ((e && e.message) || e) });
           }

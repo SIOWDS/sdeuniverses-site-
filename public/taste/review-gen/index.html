@@ -732,9 +732,11 @@ function sseOnce(body,onTok,onStage){
       var ct=r.headers.get("content-type")||"";
       if(ct.indexOf("text/event-stream")<0){ return r.json().catch(function(){return {ok:false,msg:"HTTP "+r.status};}).then(function(j){ rej(new Error(j.msg||("HTTP "+r.status))); }); }
       var rd=r.body.getReader(), dec=new TextDecoder(), buf="", out="", errMsg="";
+      /* 2026-09-05：无数据看门狗——上游断流而连接不关时，从前会永远停在「出卡 N / M」；240 秒无任何字节即掐断并按瞬时错误重试 */
+      var lastAt=Date.now(), wd=setInterval(function(){ if(Date.now()-lastAt>240000){ clearInterval(wd); errMsg="超时：基底 240 秒无响应，重试"; try{ if(ac) ac.abort(); }catch(e){} } },5000);
       function pump(){
-        return rd.read().then(function(rr){
-          if(rr.done){ if(errMsg&&!out) rej(new Error(errMsg)); else res(out); return; }
+        return rd.read().then(function(rr){ lastAt=Date.now();
+          if(rr.done){ clearInterval(wd); if(errMsg&&!out) rej(new Error(errMsg)); else res(out); return; }
           buf+=dec.decode(rr.value,{stream:true});
           var i;
           while((i=buf.indexOf("\n"))>=0){
@@ -751,7 +753,7 @@ function sseOnce(body,onTok,onStage){
           return pump();
         });
       }
-      pump().catch(rej);
+      pump().catch(function(e){ clearInterval(wd); rej(errMsg&&!out?new Error(errMsg):e); });
     }).catch(function(e){ rej(stopReq?new Error("已停止"):e); });
   }).finally(function(){ if(ac){ var k=aborters.indexOf(ac); if(k>=0) aborters.splice(k,1); } });
 }
