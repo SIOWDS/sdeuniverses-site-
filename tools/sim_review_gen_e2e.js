@@ -16,14 +16,14 @@ function canned(b){
   switch(b.mode){
     case "frame": return JSON.stringify({surface:"表面",genesis:"从哪一维起手落在哪一维",aliases:["supervisory control","joint cognitive systems","alarm management","ecological interface","procedural assistance","mistake detection","copilot","operator 4.0"],queries:["operator assistance process industry","alarm management","ecological interface design","procedure mistake detection egocentric","operator training simulator","digital twin process operator"],classicHint:"Bainbridge"});
     case "card": { const retry=/【机检退回】/.test(b.text); if(retry) calls.retryCards++; return HOWCARD(b.idx, b.idx%7===0&&!retry); }
-    case "map": return "格位分布\nS→E→D｜1,2,3｜1\n挤格：S→E→D 最挤\n空格：D→S→E 一篇没有——起名「显露即介入」\n自撞：无\n断链：「区分先于显露」——若不成立 D→E→S 整格塌\n越位文献与悬位：无";
+    case "map": return "格位分布\nS→E→D｜1,2,3｜1\n挤格：S→E→D 最挤\n空格：D→S→E 一篇没有——起名「显露即介入」（摘要级空格；降级条件：全文重出卡后站进三篇即降为半空格）\n自撞：无\n断链：「区分先于显露」——若不成立 D→E→S 整格塌\n越位文献与悬位：无";
     case "neighbors": return JSON.stringify([{item:"显露即介入",kind:"gap",neighbors:["中断科学","临床告警","注意力感知系统"],queries:["interruption task performance","alert timing attention-aware"]},{item:"区分先于显露",kind:"chain",neighbors:["认知科学表征效应","框架效应","显示设计"],queries:["representational effect distributed cognition","framing effect display"]}]);
     case "verdict": return "项名｜判｜命中｜猜想可落的那一段\n显露即介入｜语料空｜Bailey & Konstan 2006 CHB 22(4):685-708，锚句“users require from 3% to 27% more time”｜时机之外的位置改变\n区分先于显露｜语料空｜Zhang & Norman 1994 Cognitive Science 18:87-122，锚句“different isomorphic representations”｜从偏差改判为发生\n三判分布：语料空 2／全语料空 0／本地空 0";
     case "surface": return "1｜“alarm floods”｜［1］［2］｜2\n2｜“errors outside the procedure”｜［3］｜1";
     case "challenges": return "表面与发生之间隔着一张图。\n挑战一：把操作员接进 E\n定位：(a)……\n挑战二：显露被当终点\n定位：(b)……\n挑战三：判据无回写\n定位：(c)\n挑战四：区分先于显露\n定位：(d)\n挑战五：读数错位\n定位：(e)";
     case "gaps": return "挑战一的现有方案：站在 E→D→S；缺维\n挑战二：错位\n挑战三：无回写\n挑战四：读数错位\n挑战五：读数错位\n四型分布：缺维1 错位1 无回写1 读数错位2";
-    case "conjectures": return ["一","二","三","四","五"].map((k,i)=>`猜想${k}：X 不是 Y，而是 Z${i}\n所站的位：D→S→E\n读数：ζ${i}，[0,1]，取法……\n预测：［1］［2］\n可证伪条件：若……删第 9 节`).join("\n\n")+"\n===QUERIES===\n"+JSON.stringify([1,2,3,4,5].map(k=>({k,queries:["q"+k+"a","q"+k+"b"]})));
-    case "occupants": return "猜想一：占位者 Bailey 2006……分离线……读数命名闸：本轮实搜未命中，不等于没有。";
+    case "conjectures": return ["一","二","三","四","五"].map((k,i)=>`猜想${k}：X 不是 Y，而是 Z${i}\n所站的位：D→S→E\n读数：ζ${i}，[0,1]，取法……\n预测：［1］［2］\n可证伪条件：若……（每千次报警约 3 次）删第 9 节\n撤下条件：若隔壁已有 W${i}，整条撤`).join("\n\n")+"\n\n五条之间：五个读数排成一条路，守恒式 β×N＝p×M，闭环删除条件……"+"\n===QUERIES===\n"+JSON.stringify([1,2,3,4,5].map(k=>({k,reading:"ζ"+k,shape:["差型","改写型","介入型","周期型","分歧型"][k-1],freq:"每千次报警约 3 次",queries:["q"+k+"a","q"+k+"b"]})));
+    case "occupants": return ["一","二","三","四","五"].map(k=>"猜想"+k+"：占位者 Bailey 2006（库：Crossref）……分离线……读数命名闸：近邻量 work-as-done……撤下条件：若隔壁已有……整条撤").join("\n")+"\n检索盲区：三库只索引题名摘要；OECD 1990 未取到。";
     case "write": { const sec=b.sec; if(sec===0) return "主类：How。发生层改写：从哪一维起手。"+"正文".repeat(50); return "第"+(sec+1)+"节正文，引［1］［2］。"+"正文".repeat(60); }
   }
   return "？";
@@ -40,6 +40,9 @@ w.addEventListener("error",e=>errs.push(e.message)); dom.virtualConsole.on("jsdo
 w.fetch=async function(url,init){
   const u=String(url);
   if(u.indexOf("/api/wds/review-gen")>=0){ const b=JSON.parse(init.body); await new Promise(r=>setTimeout(r,2)); return sseResp(canned(b)); }
+  if(u.indexOf("/api/wds/review-shapes")>=0){ return new Response(JSON.stringify({version:"1.3",shapes:[{shape:"差型",words:["work-as-imagined work-as-done","prescribed task actual activity","compliance reliance warning"]},{shape:"改写型",words:["model repair process mining"]},{shape:"介入型",words:["behavioural adaptation assistance"]},{shape:"周期型",words:["incident learning cycle"]},{shape:"分歧型",words:["representational effect"]},{shape:"比例型",words:["appropriate reliance"]}]}),{status:200,headers:{"content-type":"application/json"}}); }
+  if(u.indexOf("api.crossref.org")>=0){ calls.cr=(calls.cr||0)+1; const q=new URL(u).searchParams.get("query.bibliographic"); return new Response(JSON.stringify({message:{items:[{DOI:"10.2/cr"+q.replace(/\W/g,"").slice(0,5),title:["CR "+q],issued:{"date-parts":[[2004]]},"container-title":["Transp Res F"],author:[{given:"A",family:"B"}],volume:"7",issue:"2",page:"59-76"}]}}),{status:200,headers:{"content-type":"application/json"}}); }
+  if(u.indexOf("api.semanticscholar.org")>=0){ calls.s2=(calls.s2||0)+1; const q=new URL(u).searchParams.get("query"); return new Response(JSON.stringify({data:[{title:"S2 "+q,year:2015,venue:"Inf Syst",externalIds:{DOI:"10.3/s2"+q.replace(/\W/g,"").slice(0,5)},abstract:"model repair abstract",authors:[{name:"Fahland"}],citationCount:100}]}),{status:200,headers:{"content-type":"application/json"}}); }
   if(u.indexOf("api.openalex.org")>=0){ calls.oa++; const p=new URL(u).searchParams; return new Response(JSON.stringify(oaResults(p.get("search"),+p.get("per-page"))),{status:200,headers:{"content-type":"application/json"}}); }
   throw new Error("unexpected fetch "+u);
 };
@@ -71,7 +74,7 @@ async function until(fn,ms){ const t=Date.now(); while(Date.now()-t<ms){ if(fn()
   const chk=[...w.document.querySelectorAll("[data-check], .chk, .selfcheck li, .sc li")];
   const scText=(R.match(/自检[\s\S]{0,900}/)||[""])[0];
   console.log("自检片段：", scText.replace(/\s+/g," ").slice(0,700));
-  console.log("mode 调用次数：", JSON.stringify(calls.modes), " OpenAlex 次数：", calls.oa, " 机检重出：", calls.retryCards);
+  console.log("mode 调用次数：", JSON.stringify(calls.modes), " OpenAlex 次数：", calls.oa, " Crossref：", calls.cr||0, " S2：", calls.s2||0, " 机检重出：", calls.retryCards);
   console.log("送往端点的 vendor/model：", [...calls.vendors], [...calls.models]);
   console.log("请求体缺字段：", calls.badBodies.length?calls.badBodies.slice(0,5):"无");
   console.log("页面脚本错误：", errs.length?errs.slice(0,8):"无");

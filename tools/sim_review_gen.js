@@ -94,7 +94,20 @@ if (fs.existsSync(PAGE_P)) {
   ok("页面无 href=\"#\" 死链", !/href="#"/.test(PG));
   ok("页面有工序⑤之二敌拓闸阶段（neighbors/verdict）", PG.indexOf('mode:"neighbors"') > 0 && PG.indexOf('mode:"verdict"') > 0);
   ok("页面有 How-卡路径机检 routeCheck", PG.indexOf("function routeCheck(") > 0);
-  ok("Skill 是 v1.2 且含工序⑤之二", /version:\s*1\.2/.test(SKILL) && SKILL.indexOf("工序⑤之二 敌拓闸") > 0);
+  ok("Skill 是 v1.3 且含工序⑤之二两道", /version:\s*1\.3/.test(SKILL) && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0);
+  /* v1.3：读数形状六型表 ↔ REVIEW_SHAPES */
+  const mSh = WSRC.match(/const REVIEW_SHAPES = (\[[\s\S]*?\n\]);\n/);
+  ok("抠得到 REVIEW_SHAPES", !!mSh);
+  const SH = mSh ? new Function("return " + mSh[1] + ";")() : [];
+  const shRows = []; sliceSec("| 读数形状 |").split("\n").forEach((ln) => { const m = ln.match(/^\|\s*\*\*([^*]+)\*\*\s*\|/); if (m) shRows.push(m[1].trim()); });
+  ok("Skill 形状表解析到 " + shRows.length + " 型", shRows.length === 6);
+  ok("形状名 Skill==机器逐行一字不差", shRows.length === SH.length && shRows.every((r, i) => SH[i] && SH[i].shape === r));
+  ok("每型至少三个对象词", SH.every((x) => Array.isArray(x.words) && x.words.length >= 3));
+  ok("worker 有 GET /api/wds/review-shapes", WSRC.indexOf('url.pathname === "/api/wds/review-shapes"') > 0);
+  ok("conjectures 的 QUERIES 带 shape 与 freq", /\\"shape\\"/.test(WSRC) && /\\"freq\\"/.test(WSRC));
+  ok("occupants 提示含撤下条件与检索盲区", WSRC.indexOf("撤下条件") > 0 && WSRC.indexOf("检索盲区") > 0);
+  ok("页面三库实搜（searchCR/searchS2/loadShapes）", PG.indexOf("function searchCR(") > 0 && PG.indexOf("function searchS2(") > 0 && PG.indexOf("function loadShapes(") > 0 && PG.indexOf("/api/wds/review-shapes") > 0);
+  ok("页面自检 17 项", PG.indexOf("自检 17 项") > 0 && (PG.match(/out\.push\(\{n:/g) || []).length === 17);
   ok("worker 占位者栏只引⑤之二（prompt 里有三判）", WSRC.indexOf("只许引给定的敌拓闸三判结果") > 0);
 }
 

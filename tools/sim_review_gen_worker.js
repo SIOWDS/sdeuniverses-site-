@@ -6,7 +6,7 @@ function grab(re){const m=W.match(re); if(!m) throw new Error("grab fail "+re); 
 const consts=[
   grab(/const REVIEW_CARD_FIELDS = \{[\s\S]*?\n\};\n/),
   grab(/const _RS_HEAD = \[[\s\S]*?\n\];\nconst _RS_TAIL = \[[\s\S]*?\n\];\nconst REVIEW_SKELETON = \{[\s\S]*?\n\};\n/),
-  grab(/const REVIEW_TYPE_NAME = .*\n/), grab(/const REVIEW_TOOL_TEXT = \{[\s\S]*?\n\};\n/), grab(/const REVIEW_QUESTION_FORM = .*\n/),
+  grab(/const REVIEW_TYPE_NAME = .*\n/), grab(/const REVIEW_TOOL_TEXT = \{[\s\S]*?\n\};\n/), grab(/const REVIEW_SHAPES = \[[\s\S]*?\n\];\n/), grab(/const REVIEW_SHAPE_NAMES = .*\n/), grab(/const REVIEW_QUESTION_FORM = .*\n/),
   grab(/function reviewType\(t\).*\n/), grab(/function reviewFieldTable\(type\).*\n/), grab(/const REVIEW_SDEM = .*\n/), grab(/const REVIEW_STYLE = .*\n/),
 ].join("\n");
 const a=W.indexOf('if (url.pathname === "/api/wds/review-gen") {');
@@ -61,6 +61,9 @@ const cases=[
     if(c.mode==="conjectures"&&!/语料空/.test(r.sys+r.usr)) flags.push("conjectures 未吃三判");
     if(c.mode==="conjectures"&&!/加一路|通道/.test(r.sys)) flags.push("conjectures 缺 S 侧加通道警报");
     if(c.mode==="occupants"&&/凭记忆点一位/.test(r.sys)) flags.push("occupants 仍允许凭记忆");
+    if(c.mode==="occupants"&&!(/撤下条件/.test(r.sys)&&/检索盲区/.test(r.sys)&&/Crossref/.test(r.sys))) flags.push("occupants 缺 v1.3 撤下条件/盲区/三库");
+    if(c.mode==="conjectures"&&!(/撤下条件/.test(r.sys)&&/形状/.test(r.sys)&&/闭环/.test(r.sys)&&/频率/.test(r.sys))) flags.push("conjectures 缺 v1.3 撤下/形状/闭环/频率");
+    if(c.mode==="map"&&!/摘要级/.test(r.sys)) flags.push("map 缺空格分级");
     if(c.mode==="write"&&c.sec>=5&&!/敌拓闸/.test(r.usr)) flags.push("write sec"+c.sec+" 未喂三判");
     if(c.mode==="write"&&c.sec<5&&/敌拓闸/.test(r.usr)) flags.push("write sec"+c.sec+" 多喂三判");
     if(/undefined/.test(r.sys+r.usr)) flags.push("prompt 里出现 undefined");
