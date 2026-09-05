@@ -71,6 +71,7 @@ svg .ln{fill:none;stroke-width:2.2}
 <nav>
   <a class="lg" href="/business/operator-assistance/">SDE 工业应用</a>
   <div class="nl">
+    <a href="#demo">动画演示</a>
     <a href="#paradox">印证悖论</a>
     <a href="#line">产线演示</a>
     <a href="#design">系统设计</a>
@@ -88,6 +89,88 @@ svg .ln{fill:none;stroke-width:2.2}
 </header>
 
 <main>
+
+<section id="demo">
+  <h2>三十秒动画：一只吨袋走完全程</h2>
+  <p>下面是同一条包装产线的两条并行处理方式。<b>上排是现行做法</b>，下排是<b>接了一路判别性证据之后</b>。两排的传感器完全一样，差别只有一样：下排在贴标那一刻把卡与袋绑上了，并在卡点扫一次。</p>
+  <div class="panel">
+    <div id="oa-stage">
+      <svg id="oa-svg" viewBox="0 0 720 306" style="width:100%;height:auto" role="img" aria-label="包装产线绑定演示动画">
+        <defs>
+          <linearGradient id="oaBagA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3E6CE"/><stop offset="1" stop-color="#E3D2B0"/></linearGradient>
+          <linearGradient id="oaBagB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E6EEF4"/><stop offset="1" stop-color="#CCDDE9"/></linearGradient>
+        </defs>
+        <g font-family="'Noto Serif SC',serif">
+          <text x="8" y="20" font-size="12" fill="#98886C" letter-spacing="1">工位</text>
+          <g font-size="12" fill="#6B5D47" text-anchor="middle">
+            <text x="120" y="20">① 贴标</text>
+            <text x="300" y="20">② 复秤</text>
+            <text x="470" y="20">③ 热封</text>
+            <text x="628" y="20">④ 入库</text>
+          </g>
+          <g stroke="rgba(138,104,23,0.20)" stroke-dasharray="3 4">
+            <line x1="205" y1="30" x2="205" y2="286"/>
+            <line x1="385" y1="30" x2="385" y2="286"/>
+            <line x1="548" y1="30" x2="548" y2="286"/>
+          </g>
+
+          <rect x="8" y="38" width="704" height="112" rx="8" fill="#F0E8D3" stroke="rgba(138,104,23,0.22)"/>
+          <text x="20" y="58" font-size="12.5" fill="#9A2B26" font-weight="600">A · 现行做法：证据齐全，指称靠人</text>
+          <line x1="20" y1="118" x2="700" y2="118" stroke="rgba(138,104,23,0.28)" stroke-width="2"/>
+          <g id="oa-a7" transform="translate(0,0)" style="transition:transform .75s ease">
+            <rect x="72" y="74" width="48" height="38" rx="5" fill="url(#oaBagA)" stroke="#8A6817"/>
+            <text x="96" y="99" font-size="16" fill="#2A2315" text-anchor="middle" font-weight="600">7</text>
+          </g>
+          <g id="oa-a8" transform="translate(0,0)" style="transition:transform .75s ease">
+            <rect x="132" y="74" width="48" height="38" rx="5" fill="url(#oaBagA)" stroke="#8A6817"/>
+            <text x="156" y="99" font-size="16" fill="#2A2315" text-anchor="middle" font-weight="600">8</text>
+          </g>
+          <text id="oa-a-note" x="694" y="62" font-size="12" fill="#6B5D47" text-anchor="end"></text>
+          <g id="oa-a-badge" opacity="0">
+            <rect x="586" y="72" width="112" height="42" rx="6" fill="#E3EFE7" stroke="#2E6E4E"/>
+            <text x="642" y="90" font-size="13" fill="#2E6E4E" text-anchor="middle" font-weight="600">通　过</text>
+            <text id="oa-a-badge2" x="642" y="106" font-size="11" fill="#9A2B26" text-anchor="middle"></text>
+          </g>
+
+          <rect x="8" y="162" width="704" height="112" rx="8" fill="#EDF2F6" stroke="rgba(47,93,124,0.30)"/>
+          <text x="20" y="182" font-size="12.5" fill="#2F5D7C" font-weight="600">B · 绑定感知：贴标即绑定，卡点扫码</text>
+          <line x1="20" y1="242" x2="700" y2="242" stroke="rgba(47,93,124,0.32)" stroke-width="2"/>
+          <g id="oa-b7" transform="translate(0,0)" style="transition:transform .75s ease">
+            <rect x="72" y="198" width="48" height="38" rx="5" fill="url(#oaBagB)" stroke="#2F5D7C"/>
+            <text x="96" y="223" font-size="16" fill="#17303F" text-anchor="middle" font-weight="600">7</text>
+            <text id="oa-b7code" x="96" y="192" font-size="10.5" fill="#2F5D7C" text-anchor="middle" opacity="0">⌗B-0007</text>
+          </g>
+          <g id="oa-b8" transform="translate(0,0)" style="transition:transform .75s ease">
+            <rect x="132" y="198" width="48" height="38" rx="5" fill="url(#oaBagB)" stroke="#2F5D7C"/>
+            <text x="156" y="223" font-size="16" fill="#17303F" text-anchor="middle" font-weight="600">8</text>
+            <text id="oa-b8code" x="156" y="192" font-size="10.5" fill="#2F5D7C" text-anchor="middle" opacity="0">⌗B-0008</text>
+          </g>
+          <text id="oa-b-note" x="694" y="182" font-size="12" fill="#2F5D7C" text-anchor="end"></text>
+          <g id="oa-b-badge" opacity="0">
+            <rect id="oa-b-box" x="586" y="196" width="112" height="42" rx="6" fill="#F5EBD6" stroke="#B0761A"/>
+            <text id="oa-b-badge1" x="642" y="214" font-size="13" fill="#B0761A" text-anchor="middle" font-weight="600">证据不足</text>
+            <text id="oa-b-badge2" x="642" y="230" font-size="11" fill="#6B5D47" text-anchor="middle"></text>
+          </g>
+
+          <g id="oa-scale" opacity="0">
+            <rect x="252" y="284" width="120" height="20" rx="4" fill="#2A2315"/>
+            <text x="312" y="298" font-size="12.5" fill="#E9D9A8" text-anchor="middle" font-family="ui-monospace,Menlo,monospace">1002.4 kg</text>
+          </g>
+        </g>
+      </svg>
+      <div id="oa-bar" style="height:3px;background:rgba(138,104,23,0.16);border-radius:2px;margin:0.6rem 0 0.8rem"><div id="oa-fill" style="height:3px;width:0%;background:#2F5D7C;border-radius:2px;transition:width .3s linear"></div></div>
+      <p id="oa-cap" style="min-height:3.4em;margin:0 0 0.9rem;font-size:0.96rem">按「播放」开始。两排的传感器完全相同，请只盯住一件事：读数被记到了哪一袋名下。</p>
+      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center">
+        <button id="oa-play">▶ 播放</button>
+        <button id="oa-replay" class="ghost">↺ 重播</button>
+        <button id="oa-prev" class="ghost">‹ 上一步</button>
+        <button id="oa-next" class="ghost">下一步 ›</button>
+        <span class="note" id="oa-step" style="margin-left:auto"></span>
+      </div>
+    </div>
+  </div>
+  <p class="note">动画为合成演示，不是真实产线录像。它演的是本页第三节那套判定规则在一个具体批次上的走法：一次叉车调序，就足以让四路互相印证的证据全部记到错误的对象名下，而没有任何一路会报警。</p>
+</section>
 
 <section id="why">
   <h2>一、它要解决的那件事</h2>
@@ -291,6 +374,114 @@ svg .ln{fill:none;stroke-width:2.2}
   document.getElementById('code').addEventListener('change',runBatch);
   document.getElementById('param').addEventListener('change',runBatch);
   runBatch();
+})();
+</script>
+<script>
+/* 动画演示：一只吨袋走完全程 */
+(function(){
+  var S = function(id){ return document.getElementById(id); };
+  var svg = S('oa-svg');
+  if(!svg) return;
+  var a7=S('oa-a7'), a8=S('oa-a8'), b7=S('oa-b7'), b8=S('oa-b8');
+  var aNote=S('oa-a-note'), bNote=S('oa-b-note');
+  var aBadge=S('oa-a-badge'), aBadge2=S('oa-a-badge2');
+  var bBadge=S('oa-b-badge'), bBox=S('oa-b-box'), bB1=S('oa-b-badge1'), bB2=S('oa-b-badge2');
+  var b7c=S('oa-b7code'), b8c=S('oa-b8code'), scale=S('oa-scale');
+  var cap=S('oa-cap'), fill=S('oa-fill'), stepLbl=S('oa-step');
+  var btnPlay=S('oa-play'), btnReplay=S('oa-replay'), btnPrev=S('oa-prev'), btnNext=S('oa-next');
+
+  // 每格：7号与8号在 A/B 两道的横向位移
+  var STAGES = [
+    { x:[0,0,0,0], code:0, scale:0, an:'', bn:'',
+      cap:'① 贴标台。两只吨袋各打印一张物料卡。A 道把卡放进袋口口袋就算完；B 道贴完当场扫一次，卡与袋在这一刻绑定。' },
+    { x:[0,0,0,0], code:1, scale:0, an:'卡已放入袋口', bn:'码已绑定：B-0007 / B-0008',
+      cap:'差别只在这里：A 道的卡是一张可以移动的纸，B 道的卡从这一刻起有了一个机器读得到的身份。' },
+    { x:[68,-64,68,-64], code:1, scale:0, an:'', bn:'',
+      cap:'② 缓冲区。叉车为腾位置调了顺序——8 号被挪到了 7 号前面。这一步不在任何记录里，它本来也不需要在。' },
+    { x:[68,144,68,144], code:1, scale:1, an:'当前作业单：7 号', bn:'扫码读到：B-0008',
+      cap:'③ 复秤。地磅打出 1002.4 kg。现在的问题只有一个：这个读数属于哪一袋？' },
+    { x:[68,144,68,144], code:1, scale:1, an:'1002.4 kg → 记入 7 号', bn:'1002.4 kg → 记入 8 号',
+      cap:'A 道按「当前作业中的那一袋」归属，记给了 7 号——错了，而没有任何一路证据会反对，因为四路证据都没在回答「哪一袋」。B 道按扫到的码归属，记给 8 号。' },
+    { x:[240,316,240,316], code:1, scale:0, an:'热封参数：本班设定值', bn:'热封参数：按袋时间戳快照',
+      cap:'④ 热封。A 道记录的是本班的设定值——班中途参数若漂过，事后说不出是哪几袋受影响。B 道按这一袋的时间戳抓一次快照。' },
+    { x:[404,470,404,470], code:1, scale:0, an:'视觉·动作·物态：全部一致', bn:'7 号的重量事件从未被绑定',
+      cap:'⑤ 判定。A 道：四路证据全部一致，7 号判「通过」——而它名下那个重量，其实是 8 号的。B 道：7 号缺一条能分辨对象的证据，判「证据不足」。' },
+    { x:[404,470,404,470], code:1, scale:0, an:'', bn:'补扫后重新复秤 → 通过',
+      cap:'⑥ B 道把 7 号退回补扫，重新复秤后通过，并写下承接人：系统 ＋ 当班授权人。这一条是判定之所以成立的条件——不承接错误的裁定，不是弱裁定，是非裁定。' },
+    { x:[404,470,404,470], code:1, scale:0, an:'签发里错的占 12.6%', bn:'签发里错的占 9.3%',
+      cap:'⑦ 同一批数据、同样的传感器：A 道签发的判定里错的占 12.6%，B 道 9.3%。差别不在看得多清楚，在有没有一路证据能回答「是哪一袋」。' }
+  ];
+
+  var i = 0, timer = null, playing = false;
+
+  function mv(el, dx){ el.setAttribute('transform', 'translate(' + dx + ',0)'); }
+
+  function render(n){
+    var s = STAGES[n];
+    mv(a7, s.x[0]); mv(a8, s.x[1]); mv(b7, s.x[2]); mv(b8, s.x[3]);
+    b7c.setAttribute('opacity', s.code ? '1' : '0');
+    b8c.setAttribute('opacity', s.code ? '1' : '0');
+    scale.setAttribute('opacity', s.scale ? '1' : '0');
+    aNote.textContent = s.an;
+    bNote.textContent = s.bn;
+    cap.textContent = s.cap;
+
+    aBadge.setAttribute('opacity', n >= 6 ? '1' : '0');
+    aBadge2.textContent = n >= 6 ? '（这一次是错的）' : '';
+    bBadge.setAttribute('opacity', n >= 6 ? '1' : '0');
+    if(n >= 7){
+      bBox.setAttribute('fill', '#E3EFE7');
+      bBox.setAttribute('stroke', '#2E6E4E');
+      bB1.setAttribute('fill', '#2E6E4E');
+      bB1.textContent = '通　过';
+      bB2.textContent = '承接人：系统＋授权人';
+    } else {
+      bBox.setAttribute('fill', '#F5EBD6');
+      bBox.setAttribute('stroke', '#B0761A');
+      bB1.setAttribute('fill', '#B0761A');
+      bB1.textContent = '证据不足';
+      bB2.textContent = '退回补扫';
+    }
+    fill.style.width = Math.round((n + 1) / STAGES.length * 100) + '%';
+    stepLbl.textContent = '第 ' + (n + 1) + ' / ' + STAGES.length + ' 步';
+  }
+
+  function stop(){
+    playing = false;
+    if(timer){ clearInterval(timer); timer = null; }
+    btnPlay.textContent = '▶ 播放';
+  }
+
+  function start(){
+    if(playing) { stop(); return; }
+    if(i >= STAGES.length - 1){ i = 0; render(i); }
+    playing = true;
+    btnPlay.textContent = '❚❚ 暂停';
+    timer = setInterval(function(){
+      if(i >= STAGES.length - 1){ stop(); return; }
+      i += 1;
+      render(i);
+    }, 3600);
+  }
+
+  btnPlay.addEventListener('click', start);
+  btnReplay.addEventListener('click', function(){ stop(); i = 0; render(i); });
+  btnPrev.addEventListener('click', function(){ stop(); i = Math.max(0, i - 1); render(i); });
+  btnNext.addEventListener('click', function(){ stop(); i = Math.min(STAGES.length - 1, i + 1); render(i); });
+
+  render(0);
+
+  // 滚到视野内自动播一次；尊重「减少动态效果」偏好
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce && 'IntersectionObserver' in window){
+    var once = false;
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting && !once){ once = true; start(); }
+      });
+    }, { threshold: 0.45 });
+    io.observe(svg);
+  }
 })();
 </script>
 </body>
