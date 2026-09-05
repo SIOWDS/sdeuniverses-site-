@@ -73,7 +73,9 @@ svg .ln{fill:none;stroke-width:2.2}
   <div class="nl">
     <a href="#demo">动画演示</a>
     <a href="#paradox">印证悖论</a>
-    <a href="#line">产线演示</a>
+    <a href="#line">跑一个批次</a>
+    <a href="#score">这条线几分</a>
+    <a href="#selfcheck">给你的线打分</a>
     <a href="#design">系统设计</a>
     <a href="#method">方法说明</a>
     <a href="/business/">商业与经济 ↗</a>
@@ -91,22 +93,23 @@ svg .ln{fill:none;stroke-width:2.2}
 <main>
 
 <section id="demo">
-  <h2>三十秒动画：一只吨袋走完全程</h2>
-  <p>下面是同一条包装产线的两条并行处理方式。<b>上排是现行做法</b>，下排是<b>接了一路判别性证据之后</b>。两排的传感器完全一样，差别只有一样：下排在贴标那一刻把卡与袋绑上了，并在卡点扫一次。</p>
+  <h2>三十秒动画：一只吨袋走完 ZWCN/SOP-QMD-039</h2>
+  <p>下面这条线是真的：某电池材料自动化车间的包装工序，作业指导书编号 <span class="kbd">ZWCN/SOP-QMD-039</span>，A/0 版，八大流程约六十步。动画只取其中四步——<b>4.11 打印物料卡 → 7.3 复秤 → 7.9~7.11 三次热合 → 8.8 转运待检区</b>。</p>
+  <p>上排是这条线<b>现在</b>的做法，下排是<b>加了一路判别性证据之后</b>。两排的检查项、仪器、人员完全一样，差别只有一件：下排的物料卡带码，贴上就扫一次。</p>
   <div class="panel">
     <div id="oa-stage">
-      <svg id="oa-svg" viewBox="0 0 720 306" style="width:100%;height:auto" role="img" aria-label="包装产线绑定演示动画">
+      <svg id="oa-svg" viewBox="0 0 720 306" style="width:100%;height:auto" role="img" aria-label="包装工序绑定演示动画">
         <defs>
           <linearGradient id="oaBagA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3E6CE"/><stop offset="1" stop-color="#E3D2B0"/></linearGradient>
           <linearGradient id="oaBagB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E6EEF4"/><stop offset="1" stop-color="#CCDDE9"/></linearGradient>
         </defs>
         <g font-family="'Noto Serif SC',serif">
-          <text x="8" y="20" font-size="12" fill="#98886C" letter-spacing="1">工位</text>
-          <g font-size="12" fill="#6B5D47" text-anchor="middle">
-            <text x="120" y="20">① 贴标</text>
-            <text x="300" y="20">② 复秤</text>
-            <text x="470" y="20">③ 热封</text>
-            <text x="628" y="20">④ 入库</text>
+          <text x="8" y="20" font-size="12" fill="#98886C" letter-spacing="1">SOP</text>
+          <g font-size="11.5" fill="#6B5D47" text-anchor="middle">
+            <text x="126" y="20">4.11 物料卡</text>
+            <text x="302" y="20">7.3 复秤</text>
+            <text x="472" y="20">7.9 三次热合</text>
+            <text x="628" y="20">8.8 待检区</text>
           </g>
           <g stroke="rgba(138,104,23,0.20)" stroke-dasharray="3 4">
             <line x1="205" y1="30" x2="205" y2="286"/>
@@ -115,51 +118,51 @@ svg .ln{fill:none;stroke-width:2.2}
           </g>
 
           <rect x="8" y="38" width="704" height="112" rx="8" fill="#F0E8D3" stroke="rgba(138,104,23,0.22)"/>
-          <text x="20" y="58" font-size="12.5" fill="#9A2B26" font-weight="600">A · 现行做法：证据齐全，指称靠人</text>
+          <text x="20" y="58" font-size="12.5" fill="#9A2B26" font-weight="600">A · 这条线现在的做法：检查项齐全，指称靠人</text>
           <line x1="20" y1="118" x2="700" y2="118" stroke="rgba(138,104,23,0.28)" stroke-width="2"/>
           <g id="oa-a7" transform="translate(0,0)" style="transition:transform .75s ease">
             <rect x="72" y="74" width="48" height="38" rx="5" fill="url(#oaBagA)" stroke="#8A6817"/>
-            <text x="96" y="99" font-size="16" fill="#2A2315" text-anchor="middle" font-weight="600">7</text>
+            <text x="96" y="99" font-size="15" fill="#2A2315" text-anchor="middle" font-weight="600">7</text>
           </g>
           <g id="oa-a8" transform="translate(0,0)" style="transition:transform .75s ease">
             <rect x="132" y="74" width="48" height="38" rx="5" fill="url(#oaBagA)" stroke="#8A6817"/>
-            <text x="156" y="99" font-size="16" fill="#2A2315" text-anchor="middle" font-weight="600">8</text>
+            <text x="156" y="99" font-size="15" fill="#2A2315" text-anchor="middle" font-weight="600">8</text>
           </g>
-          <text id="oa-a-note" x="694" y="62" font-size="12" fill="#6B5D47" text-anchor="end"></text>
+          <text id="oa-a-note" x="694" y="62" font-size="11.5" fill="#6B5D47" text-anchor="end"></text>
           <g id="oa-a-badge" opacity="0">
             <rect x="586" y="72" width="112" height="42" rx="6" fill="#E3EFE7" stroke="#2E6E4E"/>
             <text x="642" y="90" font-size="13" fill="#2E6E4E" text-anchor="middle" font-weight="600">通　过</text>
-            <text id="oa-a-badge2" x="642" y="106" font-size="11" fill="#9A2B26" text-anchor="middle"></text>
+            <text id="oa-a-badge2" x="642" y="106" font-size="10.5" fill="#9A2B26" text-anchor="middle"></text>
           </g>
 
           <rect x="8" y="162" width="704" height="112" rx="8" fill="#EDF2F6" stroke="rgba(47,93,124,0.30)"/>
-          <text x="20" y="182" font-size="12.5" fill="#2F5D7C" font-weight="600">B · 绑定感知：贴标即绑定，卡点扫码</text>
+          <text x="20" y="182" font-size="12.5" fill="#2F5D7C" font-weight="600">B · 物料卡带码：4.12 放卡即扫，卡点复扫</text>
           <line x1="20" y1="242" x2="700" y2="242" stroke="rgba(47,93,124,0.32)" stroke-width="2"/>
           <g id="oa-b7" transform="translate(0,0)" style="transition:transform .75s ease">
             <rect x="72" y="198" width="48" height="38" rx="5" fill="url(#oaBagB)" stroke="#2F5D7C"/>
-            <text x="96" y="223" font-size="16" fill="#17303F" text-anchor="middle" font-weight="600">7</text>
-            <text id="oa-b7code" x="96" y="192" font-size="10.5" fill="#2F5D7C" text-anchor="middle" opacity="0">⌗B-0007</text>
+            <text x="96" y="223" font-size="15" fill="#17303F" text-anchor="middle" font-weight="600">7</text>
+            <text id="oa-b7code" x="96" y="192" font-size="10" fill="#2F5D7C" text-anchor="middle" opacity="0">⌗2601-07</text>
           </g>
           <g id="oa-b8" transform="translate(0,0)" style="transition:transform .75s ease">
             <rect x="132" y="198" width="48" height="38" rx="5" fill="url(#oaBagB)" stroke="#2F5D7C"/>
-            <text x="156" y="223" font-size="16" fill="#17303F" text-anchor="middle" font-weight="600">8</text>
-            <text id="oa-b8code" x="156" y="192" font-size="10.5" fill="#2F5D7C" text-anchor="middle" opacity="0">⌗B-0008</text>
+            <text x="156" y="223" font-size="15" fill="#17303F" text-anchor="middle" font-weight="600">8</text>
+            <text id="oa-b8code" x="156" y="192" font-size="10" fill="#2F5D7C" text-anchor="middle" opacity="0">⌗2601-08</text>
           </g>
-          <text id="oa-b-note" x="694" y="182" font-size="12" fill="#2F5D7C" text-anchor="end"></text>
+          <text id="oa-b-note" x="694" y="182" font-size="11.5" fill="#2F5D7C" text-anchor="end"></text>
           <g id="oa-b-badge" opacity="0">
             <rect id="oa-b-box" x="586" y="196" width="112" height="42" rx="6" fill="#F5EBD6" stroke="#B0761A"/>
             <text id="oa-b-badge1" x="642" y="214" font-size="13" fill="#B0761A" text-anchor="middle" font-weight="600">证据不足</text>
-            <text id="oa-b-badge2" x="642" y="230" font-size="11" fill="#6B5D47" text-anchor="middle"></text>
+            <text id="oa-b-badge2" x="642" y="230" font-size="10.5" fill="#6B5D47" text-anchor="middle"></text>
           </g>
 
           <g id="oa-scale" opacity="0">
-            <rect x="252" y="284" width="120" height="20" rx="4" fill="#2A2315"/>
-            <text x="312" y="298" font-size="12.5" fill="#E9D9A8" text-anchor="middle" font-family="ui-monospace,Menlo,monospace">1002.4 kg</text>
+            <rect x="248" y="284" width="128" height="20" rx="4" fill="#2A2315"/>
+            <text x="312" y="298" font-size="12" fill="#E9D9A8" text-anchor="middle" font-family="ui-monospace,Menlo,monospace">1002.4 kg</text>
           </g>
         </g>
       </svg>
       <div id="oa-bar" style="height:3px;background:rgba(138,104,23,0.16);border-radius:2px;margin:0.6rem 0 0.8rem"><div id="oa-fill" style="height:3px;width:0%;background:#2F5D7C;border-radius:2px;transition:width .3s linear"></div></div>
-      <p id="oa-cap" style="min-height:3.4em;margin:0 0 0.9rem;font-size:0.96rem">按「播放」开始。两排的传感器完全相同，请只盯住一件事：读数被记到了哪一袋名下。</p>
+      <p id="oa-cap" style="min-height:3.6em;margin:0 0 0.9rem;font-size:0.96rem">按「播放」开始。两排的检查项完全一样，请只盯住一件事：地磅那个读数被记到了哪一袋名下。</p>
       <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center">
         <button id="oa-play">▶ 播放</button>
         <button id="oa-replay" class="ghost">↺ 重播</button>
@@ -169,7 +172,7 @@ svg .ln{fill:none;stroke-width:2.2}
       </div>
     </div>
   </div>
-  <p class="note">动画为合成演示，不是真实产线录像。它演的是本页第三节那套判定规则在一个具体批次上的走法：一次叉车调序，就足以让四路互相印证的证据全部记到错误的对象名下，而没有任何一路会报警。</p>
+  <p class="note">动画为合成演示，不是真实产线录像；步骤号、检查项与工艺参数取自该作业指导书原文。它演的是这样一件事：SOP 里 7.1 与 7.6 两处「移位」都用叉车，而叉车挪动的先后不进任何记录——只要这一次挪动改了顺序，四路互相印证的检查就会全部记到错误的袋名下，而没有任何一项会报警。</p>
 </section>
 
 <section id="why">
@@ -225,22 +228,84 @@ svg .ln{fill:none;stroke-width:2.2}
 </section>
 
 <section id="line">
-  <h2>三、一条包装产线（可交互）</h2>
-  <p>下面模拟一条吨袋包装线的一个批次。每袋要走完四个卡点：贴标、复秤、热封、入库。系统对每袋给出三值判定——<span class="tag t-ok">通过</span>、<span class="tag t-bad">不合格</span>、<span class="tag t-inc">证据不足</span>。<b>「证据不足」是一等公民，不是错误状态。</b></p>
+  <h2>三、这条产线跑一个批次（可交互）</h2>
+  <p>下面按 ZWCN/SOP-QMD-039 的实际卡点模拟一个批次的十只吨袋：<span class="kbd">4.12 物料卡</span> → <span class="kbd">7.4 复秤读数</span> → <span class="kbd">7.7 热封参数</span> → <span class="kbd">7.12 热封检查</span>。系统对每袋给出三值判定——<span class="tag t-ok">通过</span>、<span class="tag t-bad">不合格</span>、<span class="tag t-inc">证据不足</span>。<b>「证据不足」是一等公民，不是错误状态。</b></p>
   <div class="panel">
     <div style="display:flex;gap:0.7rem;flex-wrap:wrap;align-items:center;margin-bottom:0.9rem">
       <button id="run">跑一个批次</button>
-      <label class="sw"><input type="checkbox" id="code" checked> 启用对象码（贴标即绑定，卡点扫码）</label>
-      <label class="sw"><input type="checkbox" id="param" checked> 关键参数按袋抓时间戳快照</label>
+      <label class="sw"><input type="checkbox" id="code" checked> 物料卡带码，4.12 放卡即扫</label>
+      <label class="sw"><input type="checkbox" id="param" checked> 热封三参数按袋抓时间戳快照</label>
     </div>
-    <div style="overflow-x:auto"><table id="tbl"><thead><tr><th>袋号</th><th>贴标绑定</th><th>复秤</th><th>热封参数</th><th>判定</th><th>承接人</th></tr></thead><tbody id="tb"></tbody></table></div>
+    <div style="overflow-x:auto"><table id="tbl"><thead><tr><th>吨袋</th><th>4.12 物料卡</th><th>7.4 复秤</th><th>7.7 热封参数</th><th>7.12 热封检查</th><th>判定</th><th>承接人</th></tr></thead><tbody id="tb"></tbody></table></div>
     <p class="note" id="line-note" style="margin-bottom:0"></p>
   </div>
-  <p class="note">关掉「对象码」，你会看到判定几乎全变成「通过」——不是因为它更准了，而是因为系统失去了追问「这是哪一袋」的能力，于是每一条证据都被默认算在当前这袋头上。关掉「参数快照」，热封那一列会退回班次级：出了问题说不出是哪几袋受影响。</p>
+  <p class="note">关掉「物料卡带码」，判定几乎全变成「通过」——不是因为查得更准，而是系统失去了追问「这是哪一袋」的能力，于是每一条证据都被默认算在当前这袋头上。关掉「按袋快照」，热封那一列退回班次级：SOP 现在就是这样，1.10 除铁器状态与 7.7 热封参数都是「每班次根据《工艺通知单》确认」，而质量责任是按袋走的。</p>
+</section>
+
+<section id="score">
+  <h2>四、这条产线现在得几分</h2>
+  <p>按下面六个维度给 ZWCN/SOP-QMD-039 这条线打分。这不是既有行业标准，是从上面那套判定框架推出来的量表——每一维问的都是「判定成不成立」所依赖的一件事。</p>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>维度</th><th style="width:8%">权重</th><th style="width:9%">现在</th><th style="width:9%">改后</th><th>依据</th></tr></thead>
+    <tbody>
+      <tr><td>指称接地（哪一袋）</td><td class="num">0.25</td><td class="num"><b>3</b></td><td class="num" style="color:#2E6E4E"><b>7</b></td><td class="note">批次级已数字化（4.2 选包装线、4.3 选批次号）；袋级身份寄生在一张人工撕贴的纸卡上，吨袋本身无机读标识</td></tr>
+      <tr><td>发生次绑定（哪一遍）</td><td class="num">0.20</td><td class="num"><b>2</b></td><td class="num" style="color:#2E6E4E"><b>7</b></td><td class="note">7.2 去皮清零与 7.4 读数不带袋号；6.6 综合样跨包合并，主动抹掉发生次信息</td></tr>
+      <tr><td>判据显式化</td><td class="num">0.15</td><td class="num"><b>7</b></td><td class="num">7</td><td class="note">温湿度 5–40℃／≤50%、地磅五点 20kg 砝码、热合每次上移 2–3cm、压条插入 10–15cm——判据写得很实；扣分在关键参数一律外引《工艺通知单》</td></tr>
+      <tr><td>证据—对象对齐</td><td class="num">0.20</td><td class="num"><b>2</b></td><td class="num" style="color:#2E6E4E"><b>7</b></td><td class="note">★油温、★励磁电流、☆热合三时间全是班次级人工确认，而质量责任是袋级——班中途漂了，说不出是哪几袋</td></tr>
+      <tr><td>冲突与不确定表达</td><td class="num">0.10</td><td class="num"><b>3</b></td><td class="num">3</td><td class="note">多处有「如有异常立即上报」的人工通道，但只有合格／异常两态，没有「证据不足」这一档</td></tr>
+      <tr><td>承接位</td><td class="num">0.10</td><td class="num"><b>5</b></td><td class="num">5</td><td class="note">1.12 点检有记录人＋确认人两人制，4.4 有操作人署名；复秤读数、热封检查、外观检查无署名</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="out" style="margin-top:1rem">
+    <div class="metric"><span class="m-k">现在</span><span class="m-v">34</span></div>
+    <div class="metric hi"><span class="m-k">三条改动之后</span><span class="m-v">64</span></div>
+    <div class="metric"><span class="m-k">跨越档位</span><span class="m-v" style="font-size:1rem">批次级 → 对象级</span></div>
+  </div>
+  <h3>三条改动，都不增加工人的动作负担</h3>
+  <ol>
+    <li><b>物料卡加二维码，4.6／4.12 贴完当场扫一次。</b>扫码枪现成的——6.9 送样处已经在用。这一扫把纸卡从「可移动的纸」变成「被记录过一次的身份」。</li>
+    <li><b>7.3 复秤时扫一次码。</b>把地磅读数事件绑到那张卡上。一次改动同时治绑定和发生次，是六条里性价比最高的一条。</li>
+    <li><b>关键参数从班次级降到袋级。</b>★励磁电流、★除铁器油温、☆热合／真空／冷却三时间，在每袋 7.11 完成的时刻抓一次快照写进该袋记录。不需要新传感器，只要在系统里按时间戳截取已有的实时值——纯后台。</li>
+  </ol>
+  <p class="note">另外两处与判定无关但值得顺手改：8.8 重号（「转运至待检区」与「包装房清洁、除磁」都编了 8.8，后者应为 8.9）；相关表单编号写作 <span class="kbd">R ZWN/SOP-Q.PMD-350-01</span>，与文件号 <span class="kbd">ZWCN/SOP-QMD-039</span> 的前缀不一致，体系审核时会被开不符合项。</p>
+</section>
+
+<section id="selfcheck">
+  <h2>五、给你自己的产线打分</h2>
+  <p>六道题，按你现场的实际情况选。算法与上一节完全相同，当场出分和档位。<b>不收集任何信息，全部在你的浏览器里算完。</b></p>
+  <p class="note">量表的选项比上一节的逐条评分粗，因此同一条产线在这里得到的分数通常比手评高几分：把 ZWCN/SOP-QMD-039 的画像填进去得 36（手评 34），三条改动之后得 72（手评 64）。看档位比看小数点更有用。</p>
+  <div class="panel">
+    <div id="sc-qs"></div>
+    <div class="out" style="margin-top:1.2rem">
+      <div class="metric hi"><span class="m-k">总分</span><span class="m-v" id="sc-total">—</span></div>
+      <div class="metric"><span class="m-k">档位</span><span class="m-v" id="sc-band" style="font-size:1rem">—</span></div>
+    </div>
+    <div id="sc-bars" style="margin-top:1.1rem"></div>
+    <p id="sc-advice" class="note" style="margin:1rem 0 0"></p>
+    <div style="margin-top:1rem"><button id="sc-reset" class="ghost">重选</button></div>
+  </div>
+  <div class="two" style="margin-top:1.2rem">
+    <div class="panel tight" style="margin:0">
+      <h3 style="margin-top:0">档位怎么读</h3>
+      <ul style="margin-bottom:0">
+        <li><b>0–20</b>　纸面 SOP，无数字系统</li>
+        <li><b>20–40</b>　数字化到批次级，对象级靠人</li>
+        <li><b>40–60</b>　对象级机读身份已建立，关键事件与对象绑定</li>
+        <li><b>60–80</b>　参数与对象自动对齐，系统能报「证据不足」</li>
+        <li><b>80+</b>　系统能陈述支持与反对自己判定的证据，且判定错误有承接位</li>
+      </ul>
+    </div>
+    <div class="panel tight" style="margin:0">
+      <h3 style="margin-top:0">一句提醒</h3>
+      <p style="margin-bottom:0">分数低不等于落后。多数规范产线都卡在 20–40 这一档，因为批次级的信息化已经建成，而对象级的物理—数字接地一步没走。<b>真正要紧的不是总分，是最低的那两维</b>——它们决定了你签发的判定里错的比例，而那个比例不会因为你多装几个摄像头而下降。</p>
+    </div>
+  </div>
 </section>
 
 <section id="design">
-  <h2>四、系统怎么搭</h2>
+  <h2>六、系统怎么搭</h2>
   <table>
     <thead><tr><th>层</th><th>做什么</th><th>关键约束</th></tr></thead>
     <tbody>
@@ -262,7 +327,7 @@ svg .ln{fill:none;stroke-width:2.2}
 </section>
 
 <section id="method">
-  <h2>五、这套设计从哪来</h2>
+  <h2>七、这套设计从哪来</h2>
   <p>它来自 SDE 发生学的第一方程 <span class="kbd">S = F(D, E)</span>——显露由差异与纠缠共同发生。</p>
   <p>把它翻译成车间的话：一句「这一步完成了」是<b>显露</b>；每增加一路传感通道，是在<b>差异</b>侧做加法；而位号体系、资产登记簿、批次系统这些让所有人指同一件东西的东西，是<b>纠缠</b>侧的共同依赖场。</p>
   <p>现行做法的困境在于：判定被当成可以靠差异侧单独堆出来的东西，于是通道越加越多，而共同依赖场在现场那一端始终是断的——纸卡靠人贴、地磅读数不带对象号、关键参数只到班次。<b>顶不上的两侧，逼着显露改形态</b>：这就是为什么信息越多，判定反而越内卷。</p>
@@ -341,39 +406,6 @@ svg .ln{fill:none;stroke-width:2.2}
   els.disc.addEventListener('change',upd);
   upd();
 
-  var tb=document.getElementById('tb');
-  function runBatch(){
-    var useCode=document.getElementById('code').checked;
-    var useParam=document.getElementById('param').checked;
-    var rows='',nOk=0,nInc=0,nBad=0,hidden=0;
-    for(var i=1;i<=10;i++){
-      var bag='B-'+(2601+i);
-      var bindOk = useCode ? true : (rnd()<0.88);
-      var wTrue = 1000 + Math.round((rnd()-0.5)*14);
-      var wOk = wTrue>=995 && wTrue<=1005;
-      var pOk = rnd()<0.93;
-      var bindTxt = useCode ? '<span class="tag t-ok">扫码 · 已绑定</span>' : (bindOk?'<span class="tag t-inc">人工核对</span>':'<span class="tag t-inc">人工核对</span>');
-      var wTxt = (useCode?'':'<span class="note">未绑袋 </span>')+wTrue+' kg';
-      var pTxt = useParam ? (pOk?'<span class="tag t-ok">窗内</span>':'<span class="tag t-bad">超窗</span>') : '<span class="tag t-inc">班次级</span>';
-      var verdict, who;
-      if(useCode && !wOk){verdict='<span class="tag t-bad">不合格</span>';who='系统 ＋ 当班授权人';nBad++}
-      else if(useCode && useParam && !pOk){verdict='<span class="tag t-bad">不合格</span>';who='系统 ＋ 当班授权人';nBad++}
-      else if(useCode && useParam){verdict='<span class="tag t-ok">通过</span>';who='系统 ＋ 当班授权人';nOk++}
-      else if(useCode && !useParam){verdict='<span class="tag t-inc">证据不足</span>';who='待人工确认';nInc++}
-      else {verdict='<span class="tag t-ok">通过</span>';who='—（无署名）';nOk++; if(!bindOk)hidden++}
-      rows+='<tr><td>'+bag+'</td><td>'+bindTxt+'</td><td class="num">'+wTxt+'</td><td>'+pTxt+'</td><td>'+verdict+'</td><td class="note">'+who+'</td></tr>';
-    }
-    tb.innerHTML=rows;
-    var msg='本批 10 袋：通过 '+nOk+'，不合格 '+nBad+'，证据不足 '+nInc+'。';
-    if(!useCode){ msg+=' 未启用对象码时，全批都判「通过」，且其中约 '+hidden+' 袋的证据实际上属于别的袋——这类错误不会被任何一条现有证据发现。'; }
-    else if(!useParam){ msg+=' 参数只到班次级，因此热封这一步无法对单袋裁定，系统只能给「证据不足」并升级人工确认。'; }
-    else { msg+=' 每一条判定都带承接人；「不合格」的袋会在入库前被硬拦。'; }
-    document.getElementById('line-note').textContent=msg;
-  }
-  document.getElementById('run').addEventListener('click',runBatch);
-  document.getElementById('code').addEventListener('change',runBatch);
-  document.getElementById('param').addEventListener('change',runBatch);
-  runBatch();
 })();
 </script>
 <script>
@@ -393,23 +425,23 @@ svg .ln{fill:none;stroke-width:2.2}
   // 每格：7号与8号在 A/B 两道的横向位移
   var STAGES = [
     { x:[0,0,0,0], code:0, scale:0, an:'', bn:'',
-      cap:'① 贴标台。两只吨袋各打印一张物料卡。A 道把卡放进袋口口袋就算完；B 道贴完当场扫一次，卡与袋在这一刻绑定。' },
-    { x:[0,0,0,0], code:1, scale:0, an:'卡已放入袋口', bn:'码已绑定：B-0007 / B-0008',
-      cap:'差别只在这里：A 道的卡是一张可以移动的纸，B 道的卡从这一刻起有了一个机器读得到的身份。' },
+      cap:'① 步骤 4.11「确认打印信息」——重量、型号、成品批号、包装日期、包装人核对无误后打印物料卡；4.12 把卡放进吨袋自带的标签口袋。A 道到此为止。' },
+    { x:[0,0,0,0], code:1, scale:0, an:'卡已放入吨袋标签口袋', bn:'放卡即扫：2601-07 / 2601-08',
+      cap:'B 道只多做一个动作：卡上印二维码，放进口袋时扫一次。差别在于——A 道的卡是一张可以从这个口袋挪到那个口袋的纸，B 道的卡从这一刻起有了机器读得到的身份。' },
     { x:[68,-64,68,-64], code:1, scale:0, an:'', bn:'',
-      cap:'② 缓冲区。叉车为腾位置调了顺序——8 号被挪到了 7 号前面。这一步不在任何记录里，它本来也不需要在。' },
-    { x:[68,144,68,144], code:1, scale:1, an:'当前作业单：7 号', bn:'扫码读到：B-0008',
-      cap:'③ 复秤。地磅打出 1002.4 kg。现在的问题只有一个：这个读数属于哪一袋？' },
+      cap:'② 步骤 7.1「移位」与 7.6「移位」都用叉车转运。这一趟为腾出热封机位置，把 8 号先叉了出来——顺序变了。SOP 没有要求记录叉车挪动的先后，本来也不需要。' },
+    { x:[68,144,68,144], code:1, scale:1, an:'当前作业单：7 号', bn:'扫码读到：2601-08',
+      cap:'③ 步骤 7.2「地磅清零」→ 7.3「复秤」→ 7.4「读数」。地磅打出 1002.4 kg，在包装规格范围内。现在的问题只有一个：这个读数属于哪一袋？' },
     { x:[68,144,68,144], code:1, scale:1, an:'1002.4 kg → 记入 7 号', bn:'1002.4 kg → 记入 8 号',
-      cap:'A 道按「当前作业中的那一袋」归属，记给了 7 号——错了，而没有任何一路证据会反对，因为四路证据都没在回答「哪一袋」。B 道按扫到的码归属，记给 8 号。' },
-    { x:[240,316,240,316], code:1, scale:0, an:'热封参数：本班设定值', bn:'热封参数：按袋时间戳快照',
-      cap:'④ 热封。A 道记录的是本班的设定值——班中途参数若漂过，事后说不出是哪几袋受影响。B 道按这一袋的时间戳抓一次快照。' },
-    { x:[404,470,404,470], code:1, scale:0, an:'视觉·动作·物态：全部一致', bn:'7 号的重量事件从未被绑定',
-      cap:'⑤ 判定。A 道：四路证据全部一致，7 号判「通过」——而它名下那个重量，其实是 8 号的。B 道：7 号缺一条能分辨对象的证据，判「证据不足」。' },
-    { x:[404,470,404,470], code:1, scale:0, an:'', bn:'补扫后重新复秤 → 通过',
-      cap:'⑥ B 道把 7 号退回补扫，重新复秤后通过，并写下承接人：系统 ＋ 当班授权人。这一条是判定之所以成立的条件——不承接错误的裁定，不是弱裁定，是非裁定。' },
+      cap:'A 道按「当前正在作业的那一袋」归属，记给了 7 号——错了。SOP 7.4 那条注「只能从吨袋减料，不能向吨袋加料」是一处很见功力的设计，它让重量不能事后凑数；但它管不住这个读数被记到谁名下。' },
+    { x:[240,316,240,316], code:1, scale:0, an:'热封参数：本班《工艺通知单》设定值', bn:'热封参数：按袋抓时间戳快照',
+      cap:'④ 步骤 7.7 确认☆热合时间、☆真空时间、☆冷却时间在工艺范围内，7.9~7.11 真空热合与两次上移 2~3cm 的补热合。A 道记的是本班设定值——班中途参数若漂过，事后说不出是哪几袋受影响；B 道按这一袋的时间戳抓一次快照。' },
+    { x:[404,470,404,470], code:1, scale:0, an:'7.12 热封检查：整齐无褶皱', bn:'7 号的复秤事件从未被绑定',
+      cap:'⑤ 步骤 7.12 目视检查热封整齐、无褶皱、无不严。A 道：全部检查项一致，7 号判「通过」——而它名下那个 1002.4 kg 其实是 8 号的。B 道：7 号缺一条能分辨对象的证据，判「证据不足」。' },
+    { x:[404,470,404,470], code:1, scale:0, an:'8.7 罩袋 → 8.8 转运待检区', bn:'退回补扫 → 重新复秤 → 通过',
+      cap:'⑥ B 道把 7 号退回，补扫后重新过一次 7.2~7.4，通过，并写下承接人：系统 ＋ 当班授权人。SOP 里只有 1.12 点检那一处有「记录人／确认人」两人制；复秤读数、热封检查、外观检查现在都没有署名。' },
     { x:[404,470,404,470], code:1, scale:0, an:'签发里错的占 12.6%', bn:'签发里错的占 9.3%',
-      cap:'⑦ 同一批数据、同样的传感器：A 道签发的判定里错的占 12.6%，B 道 9.3%。差别不在看得多清楚，在有没有一路证据能回答「是哪一袋」。' }
+      cap:'⑦ 同一条线、同样的检查项、同样的人：A 道签发的判定里错的占 12.6%，B 道 9.3%。差别不在查得多仔细，在有没有一条证据能回答「是哪一袋」。' }
   ];
 
   var i = 0, timer = null, playing = false;
@@ -482,6 +514,173 @@ svg .ln{fill:none;stroke-width:2.2}
     }, { threshold: 0.45 });
     io.observe(svg);
   }
+})();
+</script>
+<script>
+/* 产线批次（按 ZWCN/SOP-QMD-039 卡点）＋ 自评量表 */
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var seed = 20260905;
+  function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+
+  /* ---- 三、跑一个批次 ---- */
+  var tb = $('tb');
+  function runBatch(){
+    var useCode = $('code').checked, useParam = $('param').checked;
+    var rows = '', nOk = 0, nInc = 0, nBad = 0, hidden = 0;
+    for(var i = 1; i <= 10; i++){
+      var bag = '2601-' + (i < 10 ? '0' + i : i);
+      var bindOk = useCode ? true : (rnd() < 0.88);
+      var w = 1000 + Math.round((rnd() - 0.5) * 14);
+      var wOk = w >= 995 && w <= 1005;
+      var pOk = rnd() < 0.93;
+      var sOk = rnd() < 0.96;
+      var bindTxt = useCode
+        ? '<span class="tag t-ok">扫码 · 已绑定</span>'
+        : '<span class="tag t-inc">人工放卡</span>';
+      var wTxt = (useCode ? '' : '<span class="note">未绑袋 </span>') + w + ' kg';
+      var pTxt = useParam
+        ? (pOk ? '<span class="tag t-ok">窗内</span>' : '<span class="tag t-bad">超窗</span>')
+        : '<span class="tag t-inc">班次级</span>';
+      var sTxt = sOk ? '<span class="tag t-ok">合格</span>' : '<span class="tag t-bad">褶皱</span>';
+      var verdict, who;
+      if(useCode && (!wOk || !sOk)){ verdict = '<span class="tag t-bad">不合格</span>'; who = '系统 ＋ 当班授权人'; nBad++; }
+      else if(useCode && useParam && !pOk){ verdict = '<span class="tag t-bad">不合格</span>'; who = '系统 ＋ 当班授权人'; nBad++; }
+      else if(useCode && useParam){ verdict = '<span class="tag t-ok">通过</span>'; who = '系统 ＋ 当班授权人'; nOk++; }
+      else if(useCode && !useParam){ verdict = '<span class="tag t-inc">证据不足</span>'; who = '待人工确认'; nInc++; }
+      else { verdict = '<span class="tag t-ok">通过</span>'; who = '—（无署名）'; nOk++; if(!bindOk) hidden++; }
+      rows += '<tr><td>' + bag + '</td><td>' + bindTxt + '</td><td class="num">' + wTxt
+            + '</td><td>' + pTxt + '</td><td>' + sTxt + '</td><td>' + verdict
+            + '</td><td class="note">' + who + '</td></tr>';
+    }
+    tb.innerHTML = rows;
+    var msg = '本批 10 袋：通过 ' + nOk + '，不合格 ' + nBad + '，证据不足 ' + nInc + '。';
+    if(!useCode){
+      msg += ' 物料卡不带码时全批都判「通过」，其中约 ' + hidden
+           + ' 袋的复秤读数实际上属于别的袋——这类错误不会被 7.12 的目视检查、也不会被任何一条现有检查项发现。';
+    } else if(!useParam){
+      msg += ' 热封三参数只到班次级，因此 7.7 这一步无法对单袋裁定，系统只能给「证据不足」并升级人工确认。';
+    } else {
+      msg += ' 每一条判定都带承接人；「不合格」的袋在 8.8 转运待检区之前被硬拦。';
+    }
+    $('line-note').textContent = msg;
+  }
+  $('run').addEventListener('click', runBatch);
+  $('code').addEventListener('change', runBatch);
+  $('param').addEventListener('change', runBatch);
+  runBatch();
+
+  /* ---- 五、自评量表 ---- */
+  var DIMS = [
+    { k:'指称接地', w:0.25, q:'现场作业时，系统靠什么知道这一次操作的是哪一台设备／哪一件产品？', o:[
+      ['靠人记住，或在界面上人工选择', 1],
+      ['有纸质卡或工单跟着走，但没有机器读', 3],
+      ['关键卡点有条码／RFID 扫读', 7],
+      ['每个关键事件都自动带对象码，无码不成事', 10]]},
+    { k:'发生次绑定', w:0.20, q:'同一台设备、同一工位反复做同样的操作，系统分得清是哪一遍吗？', o:[
+      ['分不清，只记到班次或批次', 1],
+      ['靠时间先后人工推断', 4],
+      ['关键事件带时间戳，并有窗口规则', 7],
+      ['事件绑到（对象，发生次），窗口经过实测调优', 10]]},
+    { k:'判据显式化', w:0.15, q:'作业指导书里的「完成」，写到什么程度？', o:[
+      ['写「确认」「检查」，没有具体数值', 1],
+      ['部分步骤有数值范围', 4],
+      ['关键步骤都有可判数值与时限', 7],
+      ['判据机器可执行，并列明所需证据清单', 10]]},
+    { k:'证据—对象对齐', w:0.20, q:'关键工艺参数记录到什么粒度？', o:[
+      ['班次级，人工填表', 1],
+      ['班次级，系统自动记', 3],
+      ['批次级', 6],
+      ['单件／单袋级，按时间戳快照', 10]]},
+    { k:'冲突与不确定', w:0.10, q:'证据互相矛盾或缺失时，系统输出什么？', o:[
+      ['只有合格／不合格两种', 1],
+      ['靠人判断，系统没有对应状态', 3],
+      ['有「待确认」状态', 7],
+      ['有分项冲突状态，并区分冲突类型', 10]]},
+    { k:'承接位', w:0.10, q:'一条判定事后被发现错了，谁承担？', o:[
+      ['没写，实际落在操作工身上', 1],
+      ['有记录人签名', 4],
+      ['记录人＋确认人两人制', 7],
+      ['每条自动判定都指定承接人，并有复核通道', 10]]}
+  ];
+  var picks = [];
+
+  function bandOf(t){
+    if(t < 20) return '纸面 SOP';
+    if(t < 40) return '批次级数字化';
+    if(t < 60) return '对象级已建立';
+    if(t < 80) return '参数与对象对齐';
+    return '可陈述证据';
+  }
+
+  function render(){
+    var html = '';
+    DIMS.forEach(function(d, i){
+      html += '<div style="margin-bottom:1.1rem"><div style="font-size:0.93rem;margin-bottom:0.4rem"><b>' + (i + 1) + '. ' + d.k + '</b>　<span class="note">' + d.q + '</span></div>';
+      d.o.forEach(function(op, j){
+        var on = picks[i] === j;
+        html += '<label class="sw" style="margin-bottom:0.35rem;' + (on ? 'border-color:#2F5D7C;background:#EDF2F6' : '') + '">'
+              + '<input type="radio" name="sc' + i + '" data-d="' + i + '" data-o="' + j + '"' + (on ? ' checked' : '') + '> '
+              + op[0] + '</label>';
+      });
+      html += '</div>';
+    });
+    $('sc-qs').innerHTML = html;
+    Array.prototype.forEach.call($('sc-qs').querySelectorAll('input[type=radio]'), function(el){
+      el.addEventListener('change', function(){
+        picks[parseInt(el.getAttribute('data-d'), 10)] = parseInt(el.getAttribute('data-o'), 10);
+        render();
+      });
+    });
+    score();
+  }
+
+  function score(){
+    var done = 0, total = 0, bars = '', low = [];
+    DIMS.forEach(function(d, i){
+      var p = picks[i];
+      if(p === undefined){ bars += bar(d.k, 0, true); return; }
+      done++;
+      var v = d.o[p][1];
+      total += d.w * v * 10;
+      low.push({ k: d.k, v: v, w: d.w, i: i });
+      bars += bar(d.k, v, false);
+    });
+    $('sc-bars').innerHTML = bars;
+    if(done < DIMS.length){
+      $('sc-total').textContent = '—';
+      $('sc-band').textContent = '还有 ' + (DIMS.length - done) + ' 题';
+      $('sc-advice').textContent = '六题选完后出分。';
+      return;
+    }
+    var t = Math.round(total);
+    $('sc-total').textContent = t;
+    $('sc-band').textContent = bandOf(t);
+    low.sort(function(a, b){ return (a.v * a.w) - (b.v * b.w); });
+    var TIPS = [
+      '给对象一个机读身份：卡片或工件上加码，产生的那一刻绑定，第一个卡点就扫一次。',
+      '把关键读数事件绑到（对象，发生次）上，并定一个短于节拍的时间窗——窗太宽会把上一遍的证据吃进来。',
+      '把「确认」「检查」这类措辞换成可判数值与时限，并写明这一步需要哪几条证据才算数。',
+      '关键参数从班次级降到对象级：在每件完成的时刻按时间戳截取已有的实时值，通常不需要新传感器。',
+      '给系统加一档「证据不足」，让它在证据不齐时可以不开口，而不是被迫二选一。',
+      '每条自动判定都写上承接人；不承接错误的裁定，在制度上不成立。'
+    ];
+    $('sc-advice').innerHTML = '<b>最该先补的两条：</b>「' + low[0].k + '」与「' + low[1].k
+      + '」。<br>· ' + TIPS[low[0].i] + '<br>· ' + TIPS[low[1].i]
+      + '<br><br>提醒：在这两条补上之前，增加摄像头、动作识别一类的通道不会提高你签发判定的可靠性——它们的指称是从同一次判断里继承来的。';
+  }
+
+  function bar(k, v, empty){
+    var pctv = v * 10;
+    return '<div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.35rem;font-size:0.85rem">'
+      + '<span style="width:7.5em;color:#6B5D47">' + k + '</span>'
+      + '<span style="flex:1;height:8px;background:rgba(138,104,23,0.14);border-radius:4px;overflow:hidden">'
+      + '<span style="display:block;height:8px;width:' + pctv + '%;background:' + (v >= 7 ? '#2E6E4E' : (v >= 4 ? '#B0761A' : '#9A2B26')) + '"></span></span>'
+      + '<span style="width:2.2em;text-align:right;font-variant-numeric:tabular-nums">' + (empty ? '—' : v) + '</span></div>';
+  }
+
+  $('sc-reset').addEventListener('click', function(){ picks = []; render(); });
+  render();
 })();
 </script>
 </body>
