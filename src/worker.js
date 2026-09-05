@@ -11628,7 +11628,7 @@ export default {
               if (r.fatal) return;
             }
             if (!r.out) {
-              const v = r.errFirst ? (VC.name + " 流内报错：" + r.errFirst + (/context|length|token|too long|exceed/i.test(r.errFirst) ? "（输入可能过长——换快速档、减少入选篇数，或从断点继续让卡包自动缩短）" : "")
+              const v = r.errFirst ? (VC.name + " 流内报错：" + r.errFirst + (/context|length|token|too long|exceed/i.test(r.errFirst) ? "（输入可能过长——换快速档、减少入选篇数，或从断点继续让卡包自动缩短）" : ""))
                 : r.rawHead ? (VC.name + " 没有按流返回：" + r.rawHead)
                 : r.think ? ("基底把额度全烧在思考上了（想了 " + r.think + " 字，正文一个字没写；已自动关思考重试一次仍如此）。换一家基底，或从断点继续。")
                 : ("基底两次都没写出内容（第一次：" + (retried || "无") + "；第二次已关思考、额度 ×1.6，finish_reason＝" + (r.why || "无") + "）。换一家基底再试；已完成的工序已保存。");
