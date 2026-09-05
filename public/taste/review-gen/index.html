@@ -240,6 +240,8 @@ input[type=text].wide{max-width:none}
   <div class="card">
     <div class="actions">
       <button class="btn" id="goBtn" disabled>① 立题 → ② 采集文献</button>
+      <label class="muted" style="font-size:13px;margin-left:6px"><input type="checkbox" id="autoAll"> 全自动（②采完不等勾选，直接跑到成文；中断自动续跑）</label>
+      <label class="muted" style="font-size:13px;margin-left:6px"><input type="checkbox" id="cardFast"> 出卡用快档（快一倍，卡略粗）</label>
       <button class="btn" id="runBtn" style="display:none">③～⑩ 出卡、整图、挑战、猜想、成文</button>
       <button class="btn ghost" id="stopBtn" style="display:none">停止（已完成的工序都保留）</button>
       <button class="btn ghost" id="mdBtn" style="display:none">下载 .md</button>
@@ -708,23 +710,40 @@ document.querySelectorAll("#typeSeg button").forEach(function(x){x.classList.tog
 document.querySelectorAll("#nSeg button").forEach(function(b){b.onclick=function(){ targetN=parseInt(b.dataset.n,10); localStorage.setItem("sde_rev_n",String(targetN)); document.querySelectorAll("#nSeg button").forEach(function(x){x.classList.toggle("on",parseInt(x.dataset.n,10)===targetN);}); };});
 document.querySelectorAll("#nSeg button").forEach(function(x){x.classList.toggle("on",parseInt(x.dataset.n,10)===targetN);});
 ["#topic","#question"].forEach(function(s){ $(s).addEventListener("input",updateBtns); });
+if($("#autoAll")){ $("#autoAll").checked=localStorage.getItem("sde_rev_auto")==="1"; $("#autoAll").onchange=function(){ localStorage.setItem("sde_rev_auto",this.checked?"1":"0"); }; }
+if($("#cardFast")){ $("#cardFast").checked=localStorage.getItem("sde_rev_cardfast")==="1"; $("#cardFast").onchange=function(){ localStorage.setItem("sde_rev_cardfast",this.checked?"1":"0"); }; }
 
 /* ---- SSE ---- */
 var stopReq=false, aborters=[];
 function abortAll(){ aborters.forEach(function(a){ try{ a.abort(); }catch(e){} }); aborters=[]; }
 function transient(msg){ return /HTTP 5\d\d|HTTP 429|Failed to fetch|NetworkError|network|超时|timeout|限流|稍后|too many|overloaded|rate/i.test(String(msg||"")); }
 /* 一次基底调用：瞬时错误（网络断、5xx、429、限流）自动重试两次，退避 4s/10s；401/400 这类不重试。stop 后立即抛「已停止」。 */
+/* 2026-09-05 批 1：重试梯。瞬时错误（网络/5xx）退避 4s/10s/20s；限流（429/太快/限流）按 30 次/分钟的窗退避 20s/45s/60s；
+   基底级错误（没写出内容／烧在思考上／流内报错／输入过长／没有按流返回）不再直接抛——同一副参数再来也是同一副脸，
+   改成**换快档（关思考、小额度）再试一次**；仍不行才抛。stop 后立即抛「已停止」。 */
+function baseErr(m){ return /没写出内容|烧在思考|流内报错|没有按流返回|too long|context|exceed|length|额度/i.test(String(m||"")); }
+function rateErr(m){ return /HTTP 429|429|太快|限流|too many|rate/i.test(String(m||"")); }
 async function sse(body,onTok,onStage){
-  var last;
-  for(var attempt=0;attempt<3;attempt++){
+  var last, fastTried=false;
+  for(var attempt=0;attempt<4;attempt++){
     if(stopReq) throw new Error("已停止");
     try{ return await sseOnce(body,onTok,onStage); }
-    catch(e){ last=e; if(stopReq||!transient(e&&e.message)||attempt===2) throw e; if(onStage) onStage("基底瞬时出错（"+(e&&e.message||e)+"），"+[4,10][attempt]+" 秒后重试…"); await new Promise(function(r){ setTimeout(r,[4000,10000][attempt]); }); }
+    catch(e){
+      last=e; var m=e&&e.message||String(e);
+      if(stopReq) throw e;
+      if(baseErr(m)&&!fastTried&&(body._tier||tier)!=="fast"){ fastTried=true; body._tier="fast"; if(onStage) onStage("基底级错误（"+m+"），换快档（关思考）再试一次…"); continue; }
+      if(!transient(m)&&!rateErr(m)) throw e;
+      if(attempt===3) throw e;
+      if(rateErr(m)) noteRate();
+      var wait=rateErr(m)?[20000,45000,60000][attempt]:[4000,10000,20000][attempt];
+      if(onStage) onStage((rateErr(m)?"撞限流（":"基底瞬时出错（")+m+"），"+Math.round(wait/1000)+" 秒后重试…");
+      await new Promise(function(r){ setTimeout(r,wait); });
+    }
   }
   throw last;
 }
 function sseOnce(body,onTok,onStage){
-  body.tier=tier; body.type=kind; body.topic=$("#topic").value.trim(); body.question=$("#question").value.trim();
+  body.tier=body._tier||tier; body.type=kind; body.topic=$("#topic").value.trim(); body.question=$("#question").value.trim();
   if(PIN_MODEL[body.vendor]) body.model=PIN_MODEL[body.vendor];
   var ac=(typeof AbortController!=="undefined")?new AbortController():null; if(ac) aborters.push(ac);
   return new Promise(function(res,rej){
@@ -761,6 +780,23 @@ async function pool(items,worker,cc){
   var idx=0, runners=[], n=Math.min(cc,items.length);
   for(var i=0;i<n;i++){ runners.push((async function(){ while(idx<items.length){ var j=idx++; await worker(items[j],j); } })()); }
   await Promise.all(runners);
+}
+/* 2026-09-05 批 1：自适应并发池（出卡用）。起 6 路；任一路撞限流（429/太快/限流）就把并发上限砍半（最低 2），
+   60 秒没再撞就升回一级。限流由 sse 内部重试消化，这里只调"同时在飞几路"。 */
+var _rl={last:0};
+function noteRate(){ _rl.last=Date.now(); }
+async function apool(items,worker,cc){
+  var idx=0, cap=cc, active=0, doneN=0;
+  var t0=Date.now();
+  return new Promise(function(resolve){
+    function tick(){
+      if(idx>=items.length&&active===0){ resolve(); return; }
+      if(_rl.last&&Date.now()-_rl.last<60000&&cap>2) cap=Math.max(2,Math.floor(cap/2)), _rl.last=0;
+      else if(!_rl.last&&Date.now()-t0>60000&&cap<cc){ cap=Math.min(cc,cap*2); t0=Date.now(); }
+      while(active<cap&&idx<items.length){ (function(j){ active++; Promise.resolve().then(function(){ return worker(items[j],j); }).catch(function(){}).then(function(){ active--; doneN++; tick(); }); })(idx++); }
+    }
+    tick();
+  });
 }
 function esc2(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function parseJson(t){ t=String(t||"").replace(/```json|```/g,""); var a=t.indexOf("{"), b=t.lastIndexOf("}"); if(a<0||b<a) return null; try{ return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; } }
@@ -913,7 +949,12 @@ $("#goBtn").onclick=async function(){
     setStage("frame","on"); setStatus(spin("① 立题闸…"));
     state.frameText=await sse({mode:"frame",key:kv.key,vendor:kv.vendor},function(full){ state.frameText=full; },function(s){ setStatus(spin("①："+esc2(s))); });
     state.frame=parseJson(state.frameText);
-    if(!state.frame||!Array.isArray(state.frame.queries)||!state.frame.queries.length) throw new Error("立题闸没有返回可读的检索词，重试一次。");
+    if(!state.frame||!Array.isArray(state.frame.queries)||!state.frame.queries.length){
+      setStatus(spin("① 立题闸没回 JSON，换快档重试一次…"));
+      state.frameText=await sse({mode:"frame",_tier:"fast",key:kv.key,vendor:kv.vendor},function(full){ state.frameText=full; },function(s){ setStatus(spin("①："+esc2(s))); });
+      state.frame=parseJson(state.frameText);
+      if(!state.frame||!Array.isArray(state.frame.queries)||!state.frame.queries.length) throw new Error("立题闸两次都没有返回可读的检索词。");
+    }
     state.log.f1="题面卡：表面形态＝"+(state.frame.surface||"")+"；发生层改写＝"+(state.frame.genesis||"")+"；别名 "+(state.frame.aliases||[]).length+" 个；检索词 "+state.frame.queries.length+" 条。";
     setStage("frame","done"); renderResults();
     setStage("lit","on");
@@ -923,8 +964,9 @@ $("#goBtn").onclick=async function(){
     state.log.f2="文献清单：OpenAlex 取回 "+state.lit.length+" 条（去重后），预选 "+state.lit.filter(function(x){return x.sel;}).length+" 篇＋上传 "+analyzable().length+" 篇；经典/现代/前沿＝"+c.classic+"/"+c.modern+"/"+c.frontier+"；无摘要条目 "+state.lit.filter(function(x){return x.material==="none";}).length+" 条不入选。";
     setStage("lit","done"); ckptSave();
     setStatus("② 清单已备好。勾掉不想要的、补上你自己的论文，然后点「③～⑩」。"+(c.classic<6?"⚠ 经典层不足 6 篇，可改检索词后重跑，或上传经典文献全文。":""));
-  }catch(e){ setStatus("中断："+esc2(e&&e.message||e)); }
+  }catch(e){ setStatus("中断："+esc2(e&&e.message||e)); running=false; updateBtns(); renderResults(); return; }
   running=false; updateBtns(); renderResults();
+  if($("#autoAll")&&$("#autoAll").checked){ setStatus("全自动：② 已采完，直接进入 ③～⑩…"); setTimeout(function(){ $("#runBtn").onclick(); },300); }
 };
 
 /* ═══ ③～⑩ ═══ */
@@ -942,11 +984,35 @@ function routeCheck(card){
   return {ok:got.indexOf(want)>=0,want:want,why:"路径栏「"+p+"」≠ 算出的 "+want};
 }
 function cardsPayload(items){ return items.filter(function(x){return x.card&&x.card.indexOf("【出卡失败")!==0;}).map(function(x){ return {i:x.i,title:x.title,card:x.card,layer:LAYER_NAME[x.layer]}; }); }
+/* 2026-09-05 批 1：③～⑩ 拆成 runAll（幂等：已完成的工序不重跑）＋ 外层自动续跑 3 次（15s/30s/60s；stop 不续）；
+   网络恢复（online）也触发续跑。承重工序（整图／挑战／不足／碰撞卡／猜想）失败仍停；软工序（表面／敌拓三判／真跑／占位者／领地／改姓）失败记「【工序缺】」继续。 */
+var MISSING="【工序缺】";
+function isMissing(s){ return String(s||"").indexOf(MISSING)===0; }
+async function soft(name,logKey,fn,fallback){
+  try{ await fn(); }
+  catch(e){ if(stopReq) throw e; var m=e&&e.message||String(e); fallback(MISSING+name+"未产出（"+m+"）——出稿前须人工补，可点该件「重跑」。"); state.log[logKey]=(state.log[logKey]||"")+"；"+name+"缺（"+m.slice(0,80)+"）"; renderResults(); ckptSave(); }
+}
 $("#runBtn").onclick=async function(){
   var kv=curKey(); if(!kv||running) return;
   var items=litSelected(); if(items.length<2){ setStatus("至少选两篇。"); return; }
   running=true; stopReq=false; updateBtns(); $("#stopBtn").style.display="inline-block";
-  try{
+  var ok=false, lastErr=null;
+  for(var round=0;round<4;round++){
+    try{ await runAll(kv,items); ok=true; break; }
+    catch(e){
+      lastErr=e; ckptSave(); document.querySelectorAll("#stages span.on").forEach(function(x){x.classList.remove("on");});
+      if(stopReq||round===3) break;
+      var wait=[15000,30000,60000][round];
+      setStatus("中断："+esc2(e&&e.message||e)+"　已完成的工序已保存；"+Math.round(wait/1000)+" 秒后自动续跑（第 "+(round+1)+"/3 次）…");
+      await new Promise(function(r){ var t=setTimeout(r,wait); window.addEventListener("online",function on(){ window.removeEventListener("online",on); clearTimeout(t); r(); }); });
+      if(stopReq) break;
+    }
+  }
+  if(!ok){ setStatus((stopReq?"已停止：":"中断：")+esc2(lastErr&&lastErr.message||lastErr)+"　已完成的工序已保存，稍后点「从断点继续」，不会重来。"); $("#runBtn").textContent="从断点继续 ③～⑩（已完成的工序不重跑）"; }
+  running=false; $("#stopBtn").style.display="none"; updateBtns(); renderResults();
+};
+async function runAll(kv,items){
+  {
     /* ③④ 出卡（断点续跑：已出好的卡不重出） */
     setStage("card","on");
     var done=0;
@@ -954,21 +1020,38 @@ $("#runBtn").onclick=async function(){
     todo.forEach(function(x){ x.card=""; x.cardState="running"; });
     done=items.length-todo.length;
     renderResults();
-    await pool(todo,async function(x){
+    var cardFast=$("#cardFast")&&$("#cardFast").checked;
+    await apool(todo,async function(x){
       if(stopReq) return;
       try{
         var text=x.material==="fulltext"?x.text.slice(0,PERTEXT):x.abstract;
-        x.card=await sse({mode:"card",title:x.title,text:text,idx:x.i,material:x.material==="fulltext"?"fulltext":"abstract",meta:refString(x),key:kv.key,vendor:kv.vendor},function(full){ x.card=full; renderCardInline(x); });
+        x.card=await sse({mode:"card",_tier:cardFast?"fast":undefined,title:x.title,text:text,idx:x.i,material:x.material==="fulltext"?"fulltext":"abstract",meta:refString(x),key:kv.key,vendor:kv.vendor},function(full){ x.card=full; renderCardInline(x); });
         var rc=routeCheck(x.card);
         if(!rc.ok){
-          x.card=await sse({mode:"card",title:x.title,text:text+"\n\n【机检退回】上一张卡的路径栏不合规："+rc.why+"。重出：所走路径必须逐字等于「起手维→中间维→落点维」"+(rc.want?"（按你上张卡的起手与落点应为 "+rc.want+"，除非起手/落点本身判错）":"")+"；外位卡写「外位（不计路径）」。",idx:x.i,material:x.material==="fulltext"?"fulltext":"abstract",meta:refString(x),key:kv.key,vendor:kv.vendor},function(full){ x.card=full; renderCardInline(x); });
+          x.card=await sse({mode:"card",_tier:"fast",title:x.title,text:text+"\n\n【机检退回】上一张卡的路径栏不合规："+rc.why+"。重出：所走路径必须逐字等于「起手维→中间维→落点维」"+(rc.want?"（按你上张卡的起手与落点应为 "+rc.want+"，除非起手/落点本身判错）":"")+"；外位卡写「外位（不计路径）」。",idx:x.i,material:x.material==="fulltext"?"fulltext":"abstract",meta:refString(x),key:kv.key,vendor:kv.vendor},function(full){ x.card=full; renderCardInline(x); });
           rc=routeCheck(x.card); x.routeOk=rc.ok; x.routeWhy=rc.ok?"":rc.why;
         } else { x.routeOk=true; x.routeWhy=""; }
         x.cardState="done";
       }catch(e){ x.cardState="error"; x.card="【出卡失败："+(e&&e.message||e)+"】"; }
-      done++; setStatus(spin("③④ 出卡 "+done+" / "+items.length+" 篇…")); renderResults(); ckptSave();
-    },3);
+      done++; setStatus(spin("③④ 出卡 "+done+" / "+items.length+" 篇（并发自适应，起 6 路）…")); renderResults(); ckptSave();
+    },6);
     if(stopReq) throw new Error("已停止");
+    /* 批 1：第二轮——失败的卡换快档、并发 2 补出一次；仍失败才剔除 */
+    var failed=items.filter(function(x){ return x.cardState==="error"; });
+    if(failed.length){
+      setStatus(spin("③④ 第二轮补出 "+failed.length+" 张失败卡（快档）…"));
+      await pool(failed,async function(x){
+        if(stopReq) return;
+        try{
+          var text=x.material==="fulltext"?x.text.slice(0,PERTEXT):x.abstract;
+          x.cardState="running"; x.card="";
+          x.card=await sse({mode:"card",_tier:"fast",title:x.title,text:text,idx:x.i,material:x.material==="fulltext"?"fulltext":"abstract",meta:refString(x),key:kv.key,vendor:kv.vendor},function(full){ x.card=full; renderCardInline(x); });
+          var rc=routeCheck(x.card); x.routeOk=rc.ok; x.routeWhy=rc.ok?"":rc.why; x.cardState="done";
+        }catch(e){ x.cardState="error"; x.card="【出卡失败："+(e&&e.message||e)+"】"; }
+        renderResults(); ckptSave();
+      },2);
+      if(stopReq) throw new Error("已停止");
+    }
     var okCards=cardsPayload(items);
     var badRoute=items.filter(function(x){return x.cardState==="done"&&x.routeOk===false;}).length;
     state.log.f4="出卡 "+okCards.length+" 张（失败 "+(items.length-okCards.length)+"；路径机检重出后仍不过 "+badRoute+" 张；摘要卡 "+items.filter(function(x){return x.material!=="fulltext"&&x.cardState==="done";}).length+"、全文卡 "+items.filter(function(x){return x.material==="fulltext"&&x.cardState==="done";}).length+"）。";
@@ -978,6 +1061,7 @@ $("#runBtn").onclick=async function(){
     if(!state.mapText) await stepText("map","mapText",{mode:"map",cards:okCards,key:kv.key,vendor:kv.vendor},"⑤ 摆整图…"); else setStage("map","done");
     /* ⑤之二 敌拓闸：邻近行实搜 → 三判 */
     if(!state.verdict||/三判生成中/.test(state.verdict)){
+    await soft("⑤之二 敌拓三判","f5b",async function(){
     setStage("neighbors","on"); state.planText=""; state.verdict=""; state.nhits=""; renderResults();
     setStatus(spin("⑤之二 列邻近行与检索词…"));
     var planRaw=await sse({mode:"neighbors",map:state.mapText,aliases:((state.frame||{}).aliases||[]).join("；"),key:kv.key,vendor:kv.vendor},null,function(s){ setStatus(spin("⑤之二："+esc2(s))); });
@@ -993,9 +1077,10 @@ $("#runBtn").onclick=async function(){
     else { state.verdict="敌拓闸未取得检索计划（整图里没有可识别的空格/断链，或基底未返回 JSON）；三判缺——出稿前须人工补。"; }
     state.log.f5b="敌拓闸第一道：空格/断链 "+state.plan.length+" 项；实搜 "+nq.length+" 趟×两库（OpenAlex、Crossref），取回 "+nh.length+" 条记录；三判分布见产出件。";
     setStage("neighbors","done"); renderResults(); ckptSave();
+    },function(t){ state.verdict=t; setStage("neighbors","done"); });
     } else setStage("neighbors","done");
     /* ⑥ 表面 */
-    if(!state.surface) await stepText("surface","surface",{mode:"surface",cards:items.map(function(x){return {i:x.i,title:x.title,card:(x.material==="fulltext"?"":"【摘要】"+(x.abstract||"")+"\n")+(x.card||""),layer:LAYER_NAME[x.layer]};}),key:kv.key,vendor:kv.vendor},"⑥ 抄表面挑战…");
+    if(!state.surface) await soft("⑥ 表面挑战","f6",async function(){ await stepText("surface","surface",{mode:"surface",cards:items.map(function(x){return {i:x.i,title:x.title,card:(x.material==="fulltext"?"":"【摘要】"+(x.abstract||"")+"\n")+(x.card||""),layer:LAYER_NAME[x.layer]};}),key:kv.key,vendor:kv.vendor},"⑥ 抄表面挑战…"); },function(t){ state.surface=t; setStage("surface","done"); });
     else setStage("surface","done");
     /* ⑦ 挑战 */
     if(!state.challenges) await stepText("challenges","challenges",{mode:"challenges",map:state.mapText,verdict:state.verdict,surface:state.surface,cards:okCards,key:kv.key,vendor:kv.vendor},"⑦ 读发生挑战…");
@@ -1004,14 +1089,17 @@ $("#runBtn").onclick=async function(){
     if(!state.gaps) await stepText("gaps","gaps",{mode:"gaps",challenges:state.challenges,map:state.mapText,key:kv.key,vendor:kv.vendor},"⑧ 写不足…");
     else setStage("gaps","done");
     /* ⑧之二 维度碰撞（学科内：三维代表卡 × 断链）＋ 最小真跑 */
-    if(!state.collideRun) await runCollide(kv,items); else setStage("collide","done");
+    if(!state.collideRun) await runCollide(kv,items,false); else setStage("collide","done");
     /* ⑨ 猜想 ＋ 占位者实搜 */
     if(!state.occupants){
     setStage("conjectures","on");
+    if(!state.conjectures||!state.conjQueries){
     var raw=await sse({mode:"conjectures",challenges:state.challenges,gaps:state.gaps,map:state.mapText,verdict:state.verdict,collide:state.collide,collideRun:state.collideRun,key:kv.key,vendor:kv.vendor},function(full){ state.conjectures=full.split("===QUERIES===")[0]; renderArtInline("conjectures"); },function(s){ setStatus(spin("⑨："+esc2(s))); });
     var sp=raw.split("===QUERIES===");
     state.conjectures=sp[0].trim(); state.conjQueries=parseJsonArr(sp[1]||"")||[];
-    renderResults();
+    renderResults(); ckptSave();
+    }
+    await soft("⑨ 占位者与分离线","f9",async function(){
     var hits=[], shapeHits=0, shapeQs=0;
     if(state.conjQueries.length){
       var shapes=await loadShapes();
@@ -1025,22 +1113,26 @@ $("#runBtn").onclick=async function(){
     var shDist={}; state.conjQueries.forEach(function(c){ var k=c.shape||"未归型"; shDist[k]=(shDist[k]||0)+1; });
     state.log.f9="猜想 5 条；⑤之二第二道：读数 "+state.conjQueries.length+" 个，形状分布 "+Object.keys(shDist).map(function(k){return k+" "+shDist[k];}).join("、")+"；检索词 "+state.conjQueries.length*2+"（读数名）＋ "+shapeQs+"（形状对象词）条，库 3 个（OpenAlex、Crossref、Semantic Scholar），取回 "+hits.length+" 条记录（其中形状道 "+shapeHits+" 条）；删除条件事件频率："+state.conjQueries.map(function(c){return (c.freq||"未写");}).join("／")+"；占位者只引⑤之二两道。";
     await stepText("conjectures","occupants",{mode:"occupants",conjectures:state.conjectures,verdict:state.verdict,hits:state.hits||"（读数实搜未取回记录）",key:kv.key,vendor:kv.vendor},"⑨ 写分离线与读数命名闸…");
+    },function(t){ state.occupants=t; });
     setStage("conjectures","done"); renderResults(); ckptSave();
     } else setStage("conjectures","done");
     /* ⑨之二 新研究领地：领地卡 → 领地敌拓（三库两道）→ 退界裁定与定级 */
-    if(!state.territoryCheck) await runTerritory(kv,items); else setStage("territory","done");
+    if(!state.territoryCheck) await soft("⑨之二 研究领地","f9b",async function(){ await runTerritory(kv,items,false); },function(t){ if(!state.territory) state.territory=t; state.territoryCheck=t; setStage("territory","done"); }); else setStage("territory","done");
     /* ⑩之二 SDE 改性：术语映射表与学科化节名（成文之前必过） */
-    if(!state.rename) await runRename(kv,items); else setStage("rename","done");
+    if(!state.rename&&!isMissing(state.renameText)) await soft("⑩之二 改姓映射表","f10b",async function(){ await runRename(kv,items); },function(t){ state.rename=null; state.renameText=t; setStage("rename","done"); }); else setStage("rename","done");
     /* ⑩ 成文（只写没写成的节） */
     await runWrite(kv,items);
     setStage("check","on"); renderResults(); setStage("check","done");
-    setStatus("完成。可下载 .md 或打印为 PDF；任一工序产出件可单独重跑。断点已保留，下次打开可继续或丢弃。");
-  }catch(e){ ckptSave(); document.querySelectorAll("#stages span.on").forEach(function(x){x.classList.remove("on");}); setStatus((stopReq?"已停止：":"中断：")+esc2(e&&e.message||e)+"　已完成的工序已保存，稍后点「从断点继续」，不会重来。"); $("#runBtn").textContent="从断点继续 ③～⑩（已完成的工序不重跑）"; }
-  running=false; $("#stopBtn").style.display="none"; updateBtns(); renderResults();
-};
-async function runCollide(kv,items){
+    var miss=["surface","verdict","collideRun","occupants","territory","territoryCheck","renameText"].filter(function(k){return isMissing(state[k]);}).length;
+    setStatus("完成。"+(miss?"⚠ 有 "+miss+" 件工序产出缺（标【工序缺】），出稿前请点该件「重跑」补齐。":"")+"可下载 .md 或打印为 PDF；任一工序产出件可单独重跑。断点已保留，下次打开可继续或丢弃。");
+  }
+}
+async function runCollide(kv,items,force){
   var allCards=cardsPayload(items);
-  setStage("collide","on"); state.collide=""; state.collideRun=""; state.collideJson=null; renderResults(); setStatus(spin("⑧之二 维度碰撞…"));
+  setStage("collide","on"); renderResults();
+  /* 批 1：碰撞卡与真跑分开存断点——已有碰撞卡（预注册已写）就不重出，只补真跑；force（点「重跑」）才整场重来 */
+  if(force||!state.collide){
+  state.collide=""; state.collideRun=""; state.collideJson=null; renderResults(); setStatus(spin("⑧之二 维度碰撞…"));
   var raw=await sse({mode:"collide",map:state.mapText,verdict:state.verdict,challenges:state.challenges,gaps:state.gaps,cards:allCards,key:kv.key,vendor:kv.vendor},function(full){ state.collide=full.split("===Z===")[0]; renderArtInline("collide"); },function(s){ setStatus(spin("⑧之二："+esc2(s))); });
   var sp=raw.split("===Z===");
   state.collide=sp[0].trim();
@@ -1053,18 +1145,27 @@ async function runCollide(kv,items){
     homesOk=dims.every(function(d){return d;})&&(kind!=="how"||new Set(dims.filter(function(d){return d!=="?";})).size===Math.min(3,dims.filter(function(d){return d!=="?";}).length));
   }
   state.log.f8b="主碰撞 1 场；Z＝"+(j&&j.z?j.z:"未解析")+"；旗舰读数＝"+(j&&j.reading?j.reading:"未解析")+"；六型对照＝"+(j?(j.shapeFree?"不归入":"归入（降为改判）"):"未解析")+"；三家＝"+(j&&j.homes?"［"+j.homes.join("］［")+"］":"未解析")+(homesOk===false?"（机检：三家不全在清单内或同维）":homesOk?"（机检过）":"")+"；预注册＝"+(j&&j.prereg?j.prereg:"未写");
-  renderResults(); setStatus(spin("⑧之二 真跑：把 Z 施于全部卡…"));
+  renderResults(); ckptSave();
+  }
+  setStatus(spin("⑧之二 真跑：把 Z 施于全部卡…"));
+  await soft("⑧之二 碰撞真跑","f8b",async function(){
   state.collideRun=await sse({mode:"collide_run",collide:state.collide,cards:allCards,key:kv.key,vendor:kv.vendor},function(full){ state.collideRun=full; if(document.querySelector('[data-art="collideRun"]')) renderArtInline("collideRun"); else renderResults(); },function(s){ setStatus(spin("⑧之二 真跑："+esc2(s))); });
   state.log.f8b+="；真跑＝"+(/判负/.test(state.collideRun)&&!/支持/.test(state.collideRun.split("判负")[0].slice(-40))?"判负照登":/支持/.test(state.collideRun)?"支持":"未判");
+  },function(t){ state.collideRun=t; });
   setStage("collide","done"); renderResults(); ckptSave();
 }
-async function runTerritory(kv,items){
-  setStage("territory","on"); state.territory=""; state.territoryJson=null; state.territoryHits=""; state.territoryCheck=""; state.territoryLibs={}; renderResults(); setStatus(spin("⑨之二 划领地…"));
+async function runTerritory(kv,items,force){
+  setStage("territory","on"); renderResults();
   if(!state.collide){ state.territoryCheck="⑨之二未执行：没有碰撞卡，领地只能是 D1。"; state.log.f9b="研究领地：未划（无碰撞卡）；级别＝D1"; setStage("territory","done"); renderResults(); return; }
+  var j=null;
+  /* 批 1：领地卡与敌拓裁定分开存断点——已有领地卡就不重出，只补裁定；force 才重来 */
+  if(force||!state.territory||isMissing(state.territory)){
+  state.territory=""; state.territoryJson=null; state.territoryHits=""; state.territoryCheck=""; state.territoryLibs={}; renderResults(); setStatus(spin("⑨之二 划领地…"));
   var raw=await sse({mode:"territory",collide:state.collide,collideRun:state.collideRun,conjectures:state.conjectures,map:state.mapText,verdict:state.verdict,occupants:state.occupants,key:kv.key,vendor:kv.vendor},function(full){ state.territory=full.split("===TERRITORY===")[0]; if(document.querySelector('[data-art="territory"]')) renderArtInline("territory"); else renderResults(); },function(s){ setStatus(spin("⑨之二："+esc2(s))); });
   var sp=raw.split("===TERRITORY==="); state.territory=sp[0].trim();
-  var j=null; try{ var m=(sp[1]||"").match(/\{[\s\S]*\}/); j=m?JSON.parse(m[0]):null; }catch(e){ j=null; }
-  state.territoryJson=j; renderResults();
+  try{ var m=(sp[1]||"").match(/\{[\s\S]*\}/); j=m?JSON.parse(m[0]):null; }catch(e){ j=null; }
+  state.territoryJson=j; renderResults(); ckptSave();
+  } else { j=state.territoryJson||null; state.territoryCheck=""; state.territoryLibs=state.territoryLibs||{}; }
   /* 领地敌拓：两道三库 */
   var qs=(j&&Array.isArray(j.queries)?j.queries:[]).slice(0,6).map(function(q,k){ return {q:String(q),pass:k<2?1:2}; });
   var hits=[], dn=0, before=Object.assign({},state.libs);
@@ -1126,8 +1227,8 @@ async function rerun(field){
     else if(field==="verdict") await stepText("neighbors","verdict",{mode:"verdict",plan:state.planText,hits:state.nhits||"（实搜未取回任何记录）",key:kv.key,vendor:kv.vendor},"⑤之二 重判…");
     else if(field==="challenges") await stepText("challenges","challenges",{mode:"challenges",map:state.mapText,verdict:state.verdict,surface:state.surface,cards:okCards,key:kv.key,vendor:kv.vendor},"⑦ 重读挑战…");
     else if(field==="gaps") await stepText("gaps","gaps",{mode:"gaps",challenges:state.challenges,map:state.mapText,key:kv.key,vendor:kv.vendor},"⑧ 重写不足…");
-    else if(field==="collide") await runCollide(kv,items);
-    else if(field==="territory") await runTerritory(kv,items);
+    else if(field==="collide") await runCollide(kv,items,true);
+    else if(field==="territory") await runTerritory(kv,items,true);
     else if(field==="rename") await runRename(kv,items);
     else if(field==="occupants") await stepText("conjectures","occupants",{mode:"occupants",conjectures:state.conjectures,verdict:state.verdict,hits:state.hits||"（读数实搜未取回记录）",key:kv.key,vendor:kv.vendor},"⑨ 重写分离线…");
   }catch(e){ setStatus("失败："+esc2(e&&e.message||e)); }
