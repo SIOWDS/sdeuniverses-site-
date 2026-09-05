@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#050913" />
-    <meta name="description" content="霓虹突击：一款适合青少年的无血腥3D科幻枪战游戏，包含多英雄、多地图、多武器和丰富特效。" />
+    <meta name="description" content="霓虹突击：适合青少年的无血腥3D科幻枪战游戏，包含4名英雄、4张地图、120种武器、三武器出战配置和丰富特效。" />
     <link rel="canonical" href="https://sdeuniverses.com/games/neon-strike/" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/assets/app/favicon-32.png" sizes="32x32" />
@@ -24,7 +24,7 @@
               <p class="eyebrow">NEON STRIKE // 青少年特遣队</p>
               <h1 id="game-title">霓虹突击</h1>
             </div>
-            <span class="safety-badge">无血腥科幻战斗</span>
+            <span class="safety-badge">120种武器 · 三武器出战</span>
           </div>
 
           <div class="selection-grid">
@@ -43,6 +43,21 @@
               </div>
               <div id="map-list" class="map-list"></div>
             </section>
+
+            <section class="selector loadout-selector" aria-labelledby="loadout-title">
+              <div class="section-heading">
+                <span>03</span>
+                <h2 id="loadout-title">配置三武器</h2>
+                <em>120 种可选</em>
+              </div>
+              <div class="loadout-row">
+                <div id="menu-loadout" class="menu-loadout" aria-label="当前三武器配置"></div>
+                <button id="open-armory-button" class="armory-button" type="button">
+                  <span>打开武器库</span>
+                  <small>10 个家族 · 120 种型号</small>
+                </button>
+              </div>
+            </section>
           </div>
 
           <div class="launch-row">
@@ -50,7 +65,7 @@
               <span><kbd>WASD</kbd> 移动</span>
               <span><kbd>鼠标</kbd> 瞄准</span>
               <span><kbd>点击</kbd> 射击</span>
-              <span><kbd>1–4</kbd> 换枪</span>
+              <span><kbd>1–3</kbd> 换枪</span>
               <span><kbd>Shift</kbd> 冲刺</span>
             </div>
             <button id="start-button" class="primary-button" type="button">
@@ -106,6 +121,32 @@
             <strong><b id="ammo-label">30</b><small id="reserve-label"> / 180</small></strong>
             <div id="weapon-slots" class="weapon-slots"></div>
           </div>
+        </div>
+      </section>
+
+      <section id="armory-screen" class="screen overlay armory-screen" aria-labelledby="armory-title">
+        <div class="armory-panel">
+          <header class="armory-header">
+            <div>
+              <p class="eyebrow">120 WEAPONS // 三武器整备</p>
+              <h2 id="armory-title">霓虹武器库</h2>
+              <p>先点选一个出战槽位，再从武器库选择型号。</p>
+            </div>
+            <button id="close-armory-button" class="close-button" type="button" aria-label="关闭武器库">完成整备</button>
+          </header>
+          <div id="armory-loadout" class="armory-loadout" aria-label="三个出战武器槽位"></div>
+          <div class="armory-tools">
+            <label class="weapon-search">
+              <span>搜索</span>
+              <input id="weapon-search-input" type="search" placeholder="输入武器或家族名称" autocomplete="off" />
+            </label>
+            <div id="family-filters" class="family-filters" aria-label="按武器家族筛选"></div>
+          </div>
+          <div class="armory-summary">
+            <strong id="armory-count">120 种武器</strong>
+            <span>每种均拥有独立战斗参数</span>
+          </div>
+          <div id="armory-grid" class="armory-grid"></div>
         </div>
       </section>
 

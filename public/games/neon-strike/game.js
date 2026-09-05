@@ -14,10 +14,10 @@
   const isTouch = matchMedia("(pointer: coarse)").matches;
 
   const heroes = [
-    { id: "vanguard", name: "先锋·洛克", role: "均衡突击", note: "厚重护甲，适合第一次出击", hp: 120, shield: 45, speed: 3.2, weapon: 0, color: "#25e7ff", mark: "V", stat: 4 },
-    { id: "scout", name: "疾影·米娅", role: "高速侦察", note: "移动最快，冲刺恢复更迅速", hp: 88, shield: 30, speed: 4.25, weapon: 2, color: "#b8ff59", mark: "S", stat: 5 },
-    { id: "engineer", name: "机巧·阿拓", role: "护盾工程", note: "能量护盾更强，近战火力凶猛", hp: 100, shield: 78, speed: 3.05, weapon: 1, color: "#ff9d3b", mark: "E", stat: 4 },
-    { id: "sentinel", name: "星卫·诺亚", role: "精准射手", note: "远距离伤害高，弹药管理关键", hp: 102, shield: 42, speed: 3.45, weapon: 3, color: "#a77bff", mark: "N", stat: 5 }
+    { id: "vanguard", name: "先锋·洛克", role: "均衡突击", note: "厚重护甲，适合第一次出击", hp: 120, shield: 45, speed: 3.2, color: "#25e7ff", mark: "V", stat: 4 },
+    { id: "scout", name: "疾影·米娅", role: "高速侦察", note: "移动最快，冲刺恢复更迅速", hp: 88, shield: 30, speed: 4.25, color: "#b8ff59", mark: "S", stat: 5 },
+    { id: "engineer", name: "机巧·阿拓", role: "护盾工程", note: "能量护盾更强，近战火力凶猛", hp: 100, shield: 78, speed: 3.05, color: "#ff9d3b", mark: "E", stat: 4 },
+    { id: "sentinel", name: "星卫·诺亚", role: "精准射手", note: "远距离伤害高，弹药管理关键", hp: 102, shield: 42, speed: 3.45, color: "#a77bff", mark: "N", stat: 5 }
   ];
 
   const maps = [
@@ -43,12 +43,58 @@
     }
   ];
 
-  const weapons = [
-    { name: "脉冲步枪", short: "PR", mag: 30, reserve: 180, damage: 24, cooldown: 118, reload: 1250, spread: 0.018, pellets: 1, range: 15, color: "#25e7ff", kick: 7 },
-    { name: "星火霰射器", short: "SG", mag: 8, reserve: 48, damage: 13, cooldown: 620, reload: 1450, spread: 0.11, pellets: 7, range: 8, color: "#ff9d3b", kick: 16 },
-    { name: "离子连发器", short: "IX", mag: 42, reserve: 210, damage: 15, cooldown: 82, reload: 1100, spread: 0.035, pellets: 1, range: 12, color: "#b8ff59", kick: 5 },
-    { name: "极光轨道枪", short: "RG", mag: 6, reserve: 36, damage: 82, cooldown: 820, reload: 1650, spread: 0.005, pellets: 1, range: 22, color: "#b584ff", kick: 22 }
+  const weaponFamilies = [
+    { id: "pulse", name: "脉冲步枪", short: "PR", mag: 30, reserve: 180, damage: 24, cooldown: 118, reload: 1250, spread: .018, pellets: 1, range: 15, color: "#25e7ff", kick: 7, form: 0, pitch: 170 },
+    { id: "scatter", name: "星火霰射器", short: "SG", mag: 8, reserve: 48, damage: 13, cooldown: 620, reload: 1450, spread: .11, pellets: 7, range: 8, color: "#ff9d3b", kick: 16, form: 1, pitch: 105 },
+    { id: "ion", name: "离子连发器", short: "IX", mag: 42, reserve: 210, damage: 15, cooldown: 82, reload: 1100, spread: .035, pellets: 1, range: 12, color: "#b8ff59", kick: 5, form: 3, pitch: 250 },
+    { id: "rail", name: "极光轨道枪", short: "RG", mag: 6, reserve: 36, damage: 82, cooldown: 820, reload: 1650, spread: .005, pellets: 1, range: 22, color: "#b584ff", kick: 22, form: 2, pitch: 78 },
+    { id: "burst", name: "棱镜三连枪", short: "BX", mag: 27, reserve: 162, damage: 18, cooldown: 155, reload: 1180, spread: .022, pellets: 3, range: 14, color: "#ff6fd8", kick: 9, form: 0, pitch: 205 },
+    { id: "beam", name: "日冕光束器", short: "CB", mag: 55, reserve: 275, damage: 11, cooldown: 68, reload: 1380, spread: .012, pellets: 1, range: 17, color: "#ffe45f", kick: 4, form: 3, pitch: 310 },
+    { id: "comet", name: "彗星爆能炮", short: "CX", mag: 5, reserve: 30, damage: 108, cooldown: 980, reload: 1780, spread: .025, pellets: 1, range: 13, color: "#ff5d5d", kick: 26, form: 1, pitch: 62 },
+    { id: "cryo", name: "寒潮卡宾枪", short: "FC", mag: 24, reserve: 144, damage: 29, cooldown: 145, reload: 1210, spread: .014, pellets: 1, range: 16, color: "#72b9ff", kick: 8, form: 0, pitch: 190 },
+    { id: "arc", name: "雷弧发射器", short: "AL", mag: 14, reserve: 84, damage: 31, cooldown: 280, reload: 1320, spread: .065, pellets: 2, range: 10, color: "#70ffbb", kick: 12, form: 2, pitch: 135 },
+    { id: "photon", name: "光子手炮", short: "PH", mag: 12, reserve: 84, damage: 48, cooldown: 360, reload: 960, spread: .016, pellets: 1, range: 14, color: "#ff8fb3", kick: 14, form: 3, pitch: 118 }
   ];
+
+  const weaponSeries = [
+    { name: "零式", trait: "均衡核心", rarity: "标准", power: 1, speed: 1, mag: 0, precision: 1 },
+    { name: "曙光", trait: "快速装填", rarity: "标准", power: 1.02, speed: .98, mag: 1, precision: .98 },
+    { name: "跃迁", trait: "增容弹仓", rarity: "标准", power: .98, speed: .97, mag: 4, precision: 1.02 },
+    { name: "幻影", trait: "低散布", rarity: "稀有", power: 1.04, speed: .96, mag: 2, precision: .88 },
+    { name: "烈星", trait: "高能弹头", rarity: "稀有", power: 1.12, speed: 1.06, mag: 0, precision: 1.02 },
+    { name: "天穹", trait: "远程聚焦", rarity: "稀有", power: 1.08, speed: .94, mag: 2, precision: .86 },
+    { name: "深空", trait: "稳定循环", rarity: "史诗", power: 1.1, speed: .9, mag: 5, precision: .9 },
+    { name: "超新星", trait: "爆发增幅", rarity: "史诗", power: 1.2, speed: 1.04, mag: 1, precision: .96 },
+    { name: "奇点", trait: "贯穿聚能", rarity: "史诗", power: 1.23, speed: 1.08, mag: 0, precision: .78 },
+    { name: "量子", trait: "极速循环", rarity: "传说", power: 1.16, speed: .82, mag: 6, precision: .84 },
+    { name: "永昼", trait: "全域强化", rarity: "传说", power: 1.28, speed: .86, mag: 4, precision: .76 },
+    { name: "神谕", trait: "终极校准", rarity: "传说", power: 1.36, speed: .9, mag: 3, precision: .7 }
+  ];
+
+  const rarityColors = { "标准": "#94a6c4", "稀有": "#25e7ff", "史诗": "#b584ff", "传说": "#ffca55" };
+
+  const weapons = weaponFamilies.flatMap((family, familyIndex) => weaponSeries.map((series, seriesIndex) => ({
+    id: `${family.id}-${seriesIndex + 1}`,
+    family: family.id,
+    familyName: family.name,
+    name: `${series.name}·${family.name}`,
+    code: `${family.short}-${String(seriesIndex + 1).padStart(2, "0")}`,
+    short: family.short,
+    trait: series.trait,
+    rarity: series.rarity,
+    mag: Math.max(3, family.mag + series.mag + (seriesIndex % 3 === 2 ? 1 : 0)),
+    reserve: Math.round((family.reserve + series.mag * 5) * (1 + seriesIndex * .018)),
+    damage: Math.round(family.damage * series.power * (1 + familyIndex * .003)),
+    cooldown: Math.max(52, Math.round(family.cooldown * series.speed)),
+    reload: Math.max(720, Math.round(family.reload * (1 - seriesIndex * .012))),
+    spread: Math.max(.003, family.spread * series.precision),
+    pellets: family.pellets,
+    range: Number((family.range + seriesIndex * .28).toFixed(1)),
+    color: family.color,
+    kick: Math.round(family.kick * (1 + seriesIndex * .018)),
+    form: family.form,
+    pitch: family.pitch + seriesIndex * 5
+  })));
 
   const enemyKinds = {
     scout: { name: "侦察机", hp: 42, speed: 1.25, damage: 6, range: 6.5, cooldown: 1200, size: 0.72, color: "#54efff", score: 100 },
@@ -62,6 +108,10 @@
     mode: "menu",
     selectedHero: 0,
     selectedMap: 0,
+    loadout: [0, 16, 44],
+    selectedSlot: 0,
+    armoryFamily: "all",
+    armorySearch: "",
     map: [],
     player: null,
     enemies: [],
@@ -164,17 +214,26 @@
     });
 
     const slots = $("#weapon-slots");
-    weapons.forEach((weapon, index) => {
+    for (let index = 0; index < 3; index++) {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "weapon-slot";
-      button.textContent = `${index + 1} ${weapon.short}`;
-      button.setAttribute("aria-label", `切换到${weapon.name}`);
-      button.addEventListener("click", () => switchWeapon(index));
+      button.addEventListener("click", () => switchWeaponSlot(index));
       slots.appendChild(button);
-    });
+    }
+
+    loadSavedLoadout();
+    buildFamilyFilters();
+    renderLoadoutUI();
+    renderArmory();
 
     $("#start-button").addEventListener("click", startGame);
+    $("#open-armory-button").addEventListener("click", openArmory);
+    $("#close-armory-button").addEventListener("click", closeArmory);
+    $("#weapon-search-input").addEventListener("input", event => {
+      state.armorySearch = event.target.value.trim().toLowerCase();
+      renderArmory();
+    });
     $("#pause-button").addEventListener("click", pauseGame);
     $("#resume-button").addEventListener("click", resumeGame);
     $("#restart-button").addEventListener("click", startGame);
@@ -186,6 +245,123 @@
     setupInput();
     resize();
     drawBackdrop();
+  }
+
+  function loadSavedLoadout() {
+    try {
+      const saved = JSON.parse(localStorage.getItem("neon-strike-loadout") || "null");
+      if (Array.isArray(saved) && saved.length === 3 && new Set(saved).size === 3 && saved.every(id => Number.isInteger(id) && weapons[id])) state.loadout = saved;
+    } catch {}
+  }
+
+  function saveLoadout() {
+    try { localStorage.setItem("neon-strike-loadout", JSON.stringify(state.loadout)); } catch {}
+  }
+
+  function buildFamilyFilters() {
+    const host = $("#family-filters");
+    const options = [{ id: "all", name: "全部" }, ...weaponFamilies];
+    options.forEach(option => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `family-filter${option.id === "all" ? " active" : ""}`;
+      button.textContent = option.name;
+      button.addEventListener("click", () => {
+        state.armoryFamily = option.id;
+        host.querySelectorAll(".family-filter").forEach(el => el.classList.toggle("active", el === button));
+        renderArmory();
+      });
+      host.appendChild(button);
+    });
+  }
+
+  function createLoadoutSlot(slotIndex, armoryMode) {
+    const weaponId = state.loadout[slotIndex];
+    const weapon = weapons[weaponId];
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `loadout-slot${state.selectedSlot === slotIndex ? " selected" : ""}`;
+    button.dataset.slot = `槽位 ${slotIndex + 1}`;
+    button.style.setProperty("--slot-color", weapon.color);
+    button.innerHTML = `<strong>${weapon.name}</strong><small>${weapon.code} · ${weapon.trait}</small>`;
+    button.addEventListener("click", () => {
+      state.selectedSlot = slotIndex;
+      renderLoadoutUI();
+      renderArmory();
+      if (!armoryMode) openArmory();
+    });
+    return button;
+  }
+
+  function renderLoadoutUI() {
+    const menu = $("#menu-loadout");
+    const armory = $("#armory-loadout");
+    menu.innerHTML = "";
+    armory.innerHTML = "";
+    for (let slot = 0; slot < 3; slot++) {
+      menu.appendChild(createLoadoutSlot(slot, false));
+      armory.appendChild(createLoadoutSlot(slot, true));
+    }
+    document.querySelectorAll(".weapon-slot").forEach((button, slot) => {
+      const weapon = weapons[state.loadout[slot]];
+      button.textContent = `${slot + 1} ${weapon.short}`;
+      button.setAttribute("aria-label", `切换到${weapon.name}`);
+      button.style.setProperty("--slot-color", weapon.color);
+    });
+  }
+
+  function renderArmory() {
+    const host = $("#armory-grid");
+    const query = state.armorySearch;
+    const visible = weapons.filter(weapon => {
+      const familyMatch = state.armoryFamily === "all" || weapon.family === state.armoryFamily;
+      const queryMatch = !query || `${weapon.name} ${weapon.familyName} ${weapon.code} ${weapon.trait} ${weapon.rarity}`.toLowerCase().includes(query);
+      return familyMatch && queryMatch;
+    });
+    $("#armory-count").textContent = `${visible.length} 种武器`;
+    host.innerHTML = "";
+    if (!visible.length) {
+      host.innerHTML = '<p class="armory-empty">没有找到匹配武器，试试其他关键词。</p>';
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    visible.forEach(weapon => {
+      const weaponId = weapons.indexOf(weapon);
+      const equippedSlot = state.loadout.indexOf(weaponId);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `weapon-card${equippedSlot >= 0 ? " equipped" : ""}`;
+      button.style.setProperty("--weapon-color", weapon.color);
+      button.style.setProperty("--rarity-color", rarityColors[weapon.rarity]);
+      button.innerHTML = `<span class="weapon-top"><span class="weapon-code">${weapon.code}</span><span class="rarity">${weapon.rarity}</span></span><strong>${weapon.name}</strong><small>${weapon.trait}</small><span class="weapon-stats"><span class="weapon-stat">伤害 <b>${weapon.damage}</b></span><span class="weapon-stat">弹匣 <b>${weapon.mag}</b></span><span class="weapon-stat">射速 <b>${Math.round(60000 / weapon.cooldown)}</b></span><span class="weapon-stat">射程 <b>${weapon.range}</b></span></span>${equippedSlot >= 0 ? `<span class="equipped-tag">已装备在槽位 ${equippedSlot + 1}</span>` : ""}`;
+      button.addEventListener("click", () => equipWeapon(weaponId));
+      fragment.appendChild(button);
+    });
+    host.appendChild(fragment);
+  }
+
+  function equipWeapon(weaponId) {
+    const existingSlot = state.loadout.indexOf(weaponId);
+    if (existingSlot >= 0) {
+      state.selectedSlot = existingSlot;
+    } else {
+      state.loadout[state.selectedSlot] = weaponId;
+      saveLoadout();
+      tone(390 + state.selectedSlot * 75, 0.06, "triangle", 0.035);
+    }
+    renderLoadoutUI();
+    renderArmory();
+  }
+
+  function openArmory() {
+    if (state.mode !== "menu") return;
+    $("#armory-screen").classList.add("active");
+    renderLoadoutUI();
+    renderArmory();
+  }
+
+  function closeArmory() {
+    $("#armory-screen").classList.remove("active");
   }
 
   function selectHero(index) {
@@ -209,7 +385,8 @@
       hp: hero.hp, maxHp: hero.hp,
       shield: hero.shield, maxShield: hero.shield,
       speed: hero.speed,
-      weapon: hero.weapon,
+      weapon: state.loadout[0],
+      weaponSlot: 0,
       ammo: weapons.map(w => w.mag),
       reserve: weapons.map(w => w.reserve),
       shieldDelay: 0
@@ -222,6 +399,7 @@
       mode: "playing"
     });
     $("#start-screen").classList.remove("active");
+    $("#armory-screen").classList.remove("active");
     $("#pause-screen").classList.remove("active");
     $("#result-screen").classList.remove("active");
     $("#hud").classList.add("active");
@@ -241,6 +419,7 @@
     $("#touch-controls").classList.remove("active");
     $("#pause-screen").classList.remove("active");
     $("#result-screen").classList.remove("active");
+    $("#armory-screen").classList.remove("active");
     $("#start-screen").classList.add("active");
     drawBackdrop();
   }
@@ -276,9 +455,10 @@
   function setupInput() {
     addEventListener("keydown", event => {
       state.keys[event.code] = true;
-      if (["Digit1","Digit2","Digit3","Digit4"].includes(event.code)) switchWeapon(Number(event.code.slice(-1)) - 1);
+      if (["Digit1","Digit2","Digit3"].includes(event.code)) switchWeaponSlot(Number(event.code.slice(-1)) - 1);
       if (event.code === "KeyR") reload();
       if (event.code === "Escape" && state.mode === "playing") pauseGame();
+      if (event.code === "Escape" && state.mode === "menu") closeArmory();
       if (event.code === "KeyP") state.mode === "playing" ? pauseGame() : resumeGame();
       if (event.code === "ShiftLeft" || event.code === "ShiftRight") dash();
     });
@@ -296,7 +476,7 @@
     canvas.addEventListener("wheel", event => {
       if (state.mode !== "playing") return;
       event.preventDefault();
-      switchWeapon((state.player.weapon + (event.deltaY > 0 ? 1 : weapons.length - 1)) % weapons.length);
+      switchWeaponSlot((state.player.weaponSlot + (event.deltaY > 0 ? 1 : 2)) % 3);
     }, { passive: false });
     addEventListener("blur", () => { if (state.mode === "playing") pauseGame(); });
     addEventListener("resize", resize);
@@ -339,7 +519,7 @@
     pad.addEventListener("touchend", resetPad, { passive: false });
     $("#touch-fire").addEventListener("touchstart", event => { event.preventDefault(); state.firing = true; }, { passive: false });
     $("#touch-fire").addEventListener("touchend", event => { event.preventDefault(); state.firing = false; }, { passive: false });
-    $("#touch-swap").addEventListener("click", () => switchWeapon((state.player.weapon + 1) % weapons.length));
+    $("#touch-swap").addEventListener("click", () => switchWeaponSlot((state.player.weaponSlot + 1) % 3));
     $("#touch-dash").addEventListener("click", dash);
   }
 
@@ -470,8 +650,7 @@
       $("#hit-marker").classList.add("active");
       tone(690, 0.025, "square", 0.025);
     }
-    const pitch = [170, 105, 250, 78][p.weapon];
-    tone(pitch, weapon.cooldown / 2200, p.weapon === 2 ? "square" : "sawtooth", p.weapon === 3 ? 0.075 : 0.045);
+    tone(weapon.pitch, weapon.cooldown / 2200, weapon.form === 3 ? "square" : "sawtooth", weapon.form === 2 ? 0.075 : 0.045);
     updateHUD();
   }
 
@@ -526,11 +705,12 @@
     tone(520, 0.05, "triangle", 0.03);
   }
 
-  function switchWeapon(index) {
-    if (!state.player || state.mode === "menu" || !weapons[index]) return;
-    state.player.weapon = index;
+  function switchWeaponSlot(slotIndex) {
+    if (!state.player || state.mode !== "playing" || !weapons[state.loadout[slotIndex]]) return;
+    state.player.weaponSlot = slotIndex;
+    state.player.weapon = state.loadout[slotIndex];
     state.reloading = false;
-    tone(320 + index * 60, 0.045, "triangle", 0.025);
+    tone(320 + slotIndex * 70, 0.045, "triangle", 0.025);
     updateHUD();
   }
 
@@ -865,12 +1045,12 @@
     const scale = clamp(width / 960, 0.7, 1.45);
     ctx.scale(scale, scale);
     ctx.beginPath();
-    if (state.player.weapon === 1) { ctx.moveTo(-132,-6); ctx.lineTo(-94,-106); ctx.lineTo(72,-112); ctx.lineTo(138,-20); }
-    else if (state.player.weapon === 3) { ctx.moveTo(-88,-4); ctx.lineTo(-70,-118); ctx.lineTo(112,-92); ctx.lineTo(128,-10); }
+    if (weapon.form === 1) { ctx.moveTo(-132,-6); ctx.lineTo(-94,-106); ctx.lineTo(72,-112); ctx.lineTo(138,-20); }
+    else if (weapon.form === 2) { ctx.moveTo(-88,-4); ctx.lineTo(-70,-118); ctx.lineTo(112,-92); ctx.lineTo(128,-10); }
     else { ctx.moveTo(-102,-2); ctx.lineTo(-82,-96); ctx.lineTo(82,-104); ctx.lineTo(112,-8); }
     ctx.closePath(); ctx.fill(); ctx.stroke();
     ctx.fillStyle = weapon.color;
-    ctx.fillRect(-52,-84,98,state.player.weapon === 3 ? 8 : 12);
+    ctx.fillRect(-52,-84,98,weapon.form === 2 ? 8 : 12);
     ctx.fillStyle = hero.color;
     ctx.fillRect(-26,-47,52,10);
     ctx.fillStyle = "rgba(255,255,255,.7)";
@@ -919,7 +1099,10 @@
     $("#weapon-label").textContent = state.reloading ? "装填中…" : weapon.name;
     $("#ammo-label").textContent = p.ammo[p.weapon];
     $("#reserve-label").textContent = ` / ${p.reserve[p.weapon]}`;
-    document.querySelectorAll(".weapon-slot").forEach((el, i) => el.classList.toggle("active", i === p.weapon));
+    document.querySelectorAll(".weapon-slot").forEach((el, i) => {
+      el.classList.toggle("active", i === p.weaponSlot);
+      el.style.setProperty("--slot-color", weapons[state.loadout[i]].color);
+    });
   }
 
   function showAnnouncement(message, duration = 1400) {
