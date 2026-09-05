@@ -867,6 +867,7 @@ $("#runBtn").onclick=async function(){
     var nh=[], dn=0;
     await pool(nq,async function(o){ try{ var L=await searchOA(o.q,5); L.forEach(function(it){ nh.push("【项 "+o.k+"「"+o.item+"」｜检索词："+o.q+"】"+it.title+"（"+(it.authors||"")+"，"+(it.year||"")+"，"+(it.venue||"")+(it.doi?"，doi:"+it.doi:"")+"）"+(it.abstract?"\n摘要："+it.abstract.slice(0,400):"")); }); }catch(e){} dn++; setStatus(spin("⑤之二 实搜 "+dn+" / "+nq.length+" 趟…")); },3);
     state.nhits=nh.join("\n\n");
+    state.verdict=state.planText?("检索计划：\n"+state.planText+"\n\n（三判生成中…）"):""; renderResults();
     if(state.plan.length){ await stepText("neighbors","verdict",{mode:"verdict",plan:state.planText,hits:state.nhits||"（实搜未取回任何记录）",key:kv.key,vendor:kv.vendor},"⑤之二 三判…"); }
     else { state.verdict="敌拓闸未取得检索计划（整图里没有可识别的空格/断链，或基底未返回 JSON）；三判缺——出稿前须人工补。"; }
     state.log.f5b="敌拓闸：空格/断链 "+state.plan.length+" 项；实搜 "+nq.length+" 趟，取回 "+nh.length+" 条记录；三判分布见产出件。";
@@ -1011,6 +1012,7 @@ function renderResults(){
   if(state.planText||state.verdict||state.stage==="verdict"){
     html+='<div class="rcard lit"><div class="rhead"><b>⑤之二 敌拓闸 · 邻近行实搜（'+((state.nhits||"").split("【项").length-1)+' 条记录）与三判</b>'+(state.verdict?'<button class="rbtn" data-copy="verdict">复制</button>'+(!running?'<button class="rbtn" data-rerun="verdict">重判</button>':""):"")+'</div>'+(state.planText?'<div class="artbody" style="font-size:12.5px;color:var(--muted)">'+esc2(state.planText)+'</div>':"")+(state.verdict?'<div class="artbody" data-art="verdict" style="margin-top:10px">'+esc2(state.verdict)+"</div>":'<div class="r-load">'+spin("三判中…")+"</div>")+"</div>";
   }
+  html+=artCard("⑤ 之二 · 敌拓闸：语料空 / 全语料空 / 本地空（空格与断链 "+((state.plan||[]).length)+" 项，隔壁行实搜 "+((state.nhits||"").split("【项 ").length-1)+" 条记录）","verdict","cls","verdict");
   html+=artCard("⑥ 表面挑战清单（论文原话）","surface","");
   html+=artCard("⑦ 五大发生挑战","challenges","cls","challenges");
   html+=artCard("⑧ 现有方案的不足","gaps","","gaps");
