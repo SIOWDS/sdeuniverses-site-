@@ -280,9 +280,9 @@ var SKELETON={
   why:HEAD.concat([{h:"原理一：D×E 矛盾推动 S 改变",words:2000},{h:"原理二：S×E 矛盾推动 D 改变",words:2000},{h:"原理三：S×D 矛盾推动 E 改变",words:2000}],TAIL)
 };
 var TYPE_NAME={what:"What-综述（知识型 · 三方程）",how:"How-综述（技术型 · 六路径）",why:"Why-综述（动力机制型 · 三原理）"};
-var LAYER_NAME={classic:"经典",modern:"现代",frontier:"前沿",upload:"上传全文"};
+var LAYER_NAME={classic:"经典",modern:"现代",frontier:"前沿",upload:"上传全文",expand:"敌拓补采",outer:"外位·敌拓"};
 var state=null;
-function fresh(){ state={type:kind,frame:null,frameText:"",lit:[],mapText:"",plan:[],planText:"",nhits:"",verdict:"",surface:"",challenges:"",gaps:"",collide:"",collideJson:null,collideRun:"",territory:"",territoryJson:null,territoryHits:"",territoryCheck:"",territoryLibs:{},rename:null,renameText:"",conjectures:"",conjQueries:[],hits:"",shapeHits:0,libs:{},occupants:"",sections:[],title:"",log:{},stage:""}; }
+function fresh(){ state={type:kind,frame:null,frameText:"",lit:[],mapText:"",plan:[],planText:"",nhits:"",verdict:"",surface:"",challenges:"",gaps:"",collide:"",collideJson:null,collideRun:"",territory:"",territoryJson:null,territoryHits:"",territoryCheck:"",territoryLibs:{},rename:null,renameText:"",conjectures:"",conjQueries:[],hits:"",shapeHits:0,libs:{},occupants:"",sections:[],title:"",log:{},stage:"",verdictHits:[],expandDone:false,expandNote:""}; }
 fresh();
 
 /* ---- 设置：基底 / 档位 / Key ---- */
@@ -1062,10 +1062,8 @@ async function runAll(kv,items){
     if(okCards.length<2) throw new Error("成功的卡不足两张。");
     /* ⑤ 整图 ∥ ⑥ 表面（表面只依赖卡，与整图同时跑） */
     var surfP=null;
-    if(!state.surface) surfP=soft("⑥ 表面挑战","f6",async function(){ await stepText("surface","surface",{mode:"surface",cards:items.map(function(x){return {i:x.i,title:x.title,card:(x.material==="fulltext"?"":"【摘要】"+(x.abstract||"")+"\n")+(x.card||""),layer:LAYER_NAME[x.layer]};}),key:kv.key,vendor:kv.vendor},"⑥ 抄表面挑战…"); },function(t){ state.surface=t; setStage("surface","done"); });
     if(!state.mapText) await stepText("map","mapText",{mode:"map",cards:okCards,key:kv.key,vendor:kv.vendor},"⑤ 摆整图…"); else setStage("map","done");
-    /* 提速：第 1–6 节只依赖整图与卡，整图一出就在后台开写（3 路），与⑤之二～⑨之二重叠 */
-    var earlyP=startWrite(kv,items,function(i){ return i<=5; }); earlyP.catch(function(){});   // 先挂个 catch 免得 stop 时报 unhandled；真正的错在下面 await 处再抛
+
     /* ⑤之二 敌拓闸：邻近行实搜 → 三判 */
     if(!state.verdict||/三判生成中/.test(state.verdict)){
     await soft("⑤之二 敌拓三判","f5b",async function(){
@@ -1080,13 +1078,22 @@ async function runAll(kv,items){
     await pool(nq,async function(o){ try{ var L=await searchLibs(o.q,5,["oa","cr"]); L.forEach(function(it){ nh.push(hitLine("项 "+o.k+"「"+o.item+"」｜检索词："+o.q,it)); }); }catch(e){} dn++; setStatus(spin("⑤之二 实搜 "+dn+" / "+nq.length+" 趟（两库）…")); },3);
     state.nhits=nh.join("\n\n");
     state.verdict=state.planText?("检索计划：\n"+state.planText+"\n\n（三判生成中…）"):""; renderResults();
-    if(state.plan.length){ await stepText("neighbors","verdict",{mode:"verdict",plan:state.planText,hits:state.nhits||"（实搜未取回任何记录）",key:kv.key,vendor:kv.vendor},"⑤之二 三判…"); }
+    if(state.plan.length){ await stepText("neighbors","verdict",{mode:"verdict",plan:state.planText,hits:state.nhits||"（实搜未取回任何记录）",key:kv.key,vendor:kv.vendor},"⑤之二 三判…"); splitHits("verdict","verdictHits"); }
     else { state.verdict="敌拓闸未取得检索计划（整图里没有可识别的空格/断链，或基底未返回 JSON）；三判缺——出稿前须人工补。"; }
     state.log.f5b="敌拓闸第一道：空格/断链 "+state.plan.length+" 项；实搜 "+nq.length+" 趟×两库（OpenAlex、Crossref），取回 "+nh.length+" 条记录；三判分布见产出件。";
     setStage("neighbors","done"); renderResults(); ckptSave();
     },function(t){ state.verdict=t; setStage("neighbors","done"); });
     } else setStage("neighbors","done");
-    /* ⑥ 表面：等与整图并跑的那一支收尾（⑦要用它） */
+    /* ⑤之三 敌拓补采回环（只一轮）：三判里判本地空的命中进语料、判语料空的进外位；出卡→整图重摆→三判重判 */
+    if(!state.expandDone){
+      await soft("⑤之三 敌拓补采","f5c",async function(){ await expandFromHits(kv); },function(t){ state.expandNote=t; });
+      state.expandDone=true; ckptSave();
+      items=litSelected();
+    }
+    /* 提速：第 1–6 节只依赖整图与卡，整图（补采后的终版）一出就在后台开写（3 路），与⑦～⑨之二重叠 */
+    var earlyP=startWrite(kv,items,function(i){ return i<=5; }); earlyP.catch(function(){});
+    /* ⑥ 表面（与第一波成文并行；补采后的终版卡） */
+    if(!state.surface) surfP=soft("⑥ 表面挑战","f6",async function(){ await stepText("surface","surface",{mode:"surface",cards:items.map(function(x){return {i:x.i,title:x.title,card:(x.material==="fulltext"?"":"【摘要】"+(x.abstract||"")+"\n")+(x.card||""),layer:LAYER_NAME[x.layer]};}),key:kv.key,vendor:kv.vendor},"⑥ 抄表面挑战…"); },function(t){ state.surface=t; setStage("surface","done"); });
     if(surfP) await surfP; else setStage("surface","done");
     /* ⑦ 挑战 */
     if(!state.challenges) await stepText("challenges","challenges",{mode:"challenges",map:state.mapText,verdict:state.verdict,surface:state.surface,cards:okCards,key:kv.key,vendor:kv.vendor},"⑦ 读发生挑战…");
@@ -1118,7 +1125,7 @@ async function runAll(kv,items){
     state.hits=hits.join("\n\n"); state.shapeHits=shapeHits;
     var shDist={}; state.conjQueries.forEach(function(c){ var k=c.shape||"未归型"; shDist[k]=(shDist[k]||0)+1; });
     state.log.f9="猜想 5 条；⑤之二第二道：读数 "+state.conjQueries.length+" 个，形状分布 "+Object.keys(shDist).map(function(k){return k+" "+shDist[k];}).join("、")+"；检索词 "+state.conjQueries.length*2+"（读数名）＋ "+shapeQs+"（形状对象词）条，库 3 个（OpenAlex、Crossref、Semantic Scholar），取回 "+hits.length+" 条记录（其中形状道 "+shapeHits+" 条）；删除条件事件频率："+state.conjQueries.map(function(c){return (c.freq||"未写");}).join("／")+"；占位者只引⑤之二两道。";
-    await stepText("conjectures","occupants",{mode:"occupants",conjectures:state.conjectures,verdict:state.verdict,hits:state.hits||"（读数实搜未取回记录）",key:kv.key,vendor:kv.vendor},"⑨ 写分离线与读数命名闸…");
+    await stepText("conjectures","occupants",{mode:"occupants",conjectures:state.conjectures,verdict:state.verdict,hits:state.hits||"（读数实搜未取回记录）",key:kv.key,vendor:kv.vendor},"⑨ 写分离线与读数命名闸…"); splitHits("occupants","occupantHits");
     },function(t){ state.occupants=t; });
     setStage("conjectures","done"); renderResults(); ckptSave();
     } else setStage("conjectures","done");
@@ -1133,6 +1140,56 @@ async function runAll(kv,items){
     var miss=["surface","verdict","collideRun","occupants","territory","territoryCheck","renameText"].filter(function(k){return isMissing(state[k]);}).length;
     setStatus("完成。"+(miss?"⚠ 有 "+miss+" 件工序产出缺（标【工序缺】），出稿前请点该件「重跑」补齐。":"")+"可下载 .md 或打印为 PDF；任一工序产出件可单独重跑。断点已保留，下次打开可继续或丢弃。");
   }
+}
+function splitHits(field,hitsField){ var sp=String(state[field]||"").split("===HITS==="); if(sp.length<2) return; state[field]=sp[0].trim(); state[hitsField]=(parseJsonArr(sp[1])||[]).filter(function(x){return x&&x.title;}); }
+async function oaByDoi(doi){
+  var p=new URLSearchParams({select:"id,doi,title,publication_year,cited_by_count,authorships,primary_location,abstract_inverted_index",mailto:"contact@sdeuniverses.com"});
+  var r=await fetch("https://api.openalex.org/works/doi:"+encodeURIComponent(doi)+"?"+p); if(!r.ok) throw new Error("OpenAlex "+r.status);
+  var w=await r.json();
+  return {title:w.title||"",year:w.publication_year||0,cites:w.cited_by_count||0,authors:(w.authorships||[]).slice(0,4).map(function(a){return a.author&&a.author.display_name||"";}).filter(Boolean).join(", "),venue:(w.primary_location&&w.primary_location.source&&w.primary_location.source.display_name)||"",doi:w.doi?String(w.doi).replace(/^https?:\/\/doi\.org\//,""):doi,url:w.doi||"",abstract:absFromIdx(w.abstract_inverted_index),rank:0};
+}
+/* 敌拓补采回环：从三判 ===HITS=== 取命中，本地空→核心语料（层「敌拓补采」），语料空→外位（层「外位·敌拓」）；封顶 15 篇、只一轮。
+   取摘要走 OpenAlex（有 doi 按 doi，无 doi 按题名搜第一条且题名相似）；无摘要的不出卡只进清单（不勾选）。出卡后整图重摆、三判重判一次。 */
+async function expandFromHits(kv){
+  var H=(state.verdictHits||[]);
+  var loc=H.filter(function(x){return /本地空/.test(x.verdict||"");}), out=H.filter(function(x){return /语料空/.test(x.verdict||"");});
+  var pick=loc.slice(0,15); pick=pick.concat(out.slice(0,Math.max(0,15-pick.length)));
+  var have={}; litAll().forEach(function(x){ have[litKey(x)]=1; });
+  var added=[], noAbs=0, dn=0;
+  await pool(pick,async function(x){
+    var it=null;
+    try{ if(x.doi) it=await oaByDoi(String(x.doi).replace(/^https?:\/\/doi\.org\//,"")); }catch(e){}
+    if(!it){ try{ var L=await searchOA(x.title,3); var t0=String(x.title).toLowerCase().replace(/[^a-z0-9]/g,""); it=L.filter(function(y){ var t1=String(y.title).toLowerCase().replace(/[^a-z0-9]/g,""); return t1&&(t1.indexOf(t0.slice(0,40))>=0||t0.indexOf(t1.slice(0,40))>=0); })[0]||null; }catch(e){} }
+    dn++; setStatus(spin("⑤之三 补采取摘要 "+dn+" / "+pick.length+"…"));
+    if(!it) return;
+    var k=litKey(it); if(have[k]) return; have[k]=1;
+    it.layer=/本地空/.test(x.verdict||"")?"expand":"outer"; it.material=it.abstract?"abstract":"none"; it.sel=!!it.abstract; it.score=0; it.expandItem=x.item||""; it.anchor=x.anchor||"";
+    if(!it.abstract) noAbs++;
+    state.lit.push(it); added.push(it);
+  },3);
+  state.log.f5c="敌拓补采：三判命中 "+H.length+" 条（本地空 "+loc.length+"／语料空 "+out.length+"），取 "+pick.length+"，新进语料 "+added.length+" 篇（核心 "+added.filter(function(x){return x.layer==="expand";}).length+"、外位 "+added.filter(function(x){return x.layer==="outer";}).length+"；无摘要未勾选 "+noAbs+"）";
+  renderQueue(); renderResults(); ckptSave();
+  var todo=added.filter(function(x){return x.sel;});
+  if(!todo.length){ state.expandNote="敌拓补采：无可出卡的新文献（命中 "+H.length+" 条）。"; return; }
+  var items=litSelected();
+  await apool(todo,async function(x){
+    if(stopReq) return;
+    try{
+      x.cardState="running"; x.card="";
+      var note=x.layer==="outer"?"\n\n【本篇由敌拓闸从隔壁行补进，是外位卡：路径栏一律写「外位（不计路径）」，只出它对本领域断链／空格的证据。】":"\n\n【本篇由敌拓闸判「本地空」补进：它站在本领域"+(x.expandItem?"「"+x.expandItem+"」":"")+"这一处，出卡时把它对该空格／断链的位置写进承重命题。】";
+      x.card=await sse({mode:"card",title:x.title,text:(x.abstract||"")+note,idx:x.i,material:"abstract",meta:refString(x),key:kv.key,vendor:kv.vendor},function(full){ x.card=full; renderCardInline(x); });
+      var rc=routeCheck(x.card); x.routeOk=rc.ok; x.routeWhy=rc.ok?"":rc.why; x.cardState="done";
+    }catch(e){ x.cardState="error"; x.card="【出卡失败："+(e&&e.message||e)+"】"; }
+    renderResults(); ckptSave();
+  },6);
+  if(stopReq) throw new Error("已停止");
+  var okCards=cardsPayload(items);
+  setStatus(spin("⑤之三 补采后重摆整图…"));
+  await stepText("map","mapText",{mode:"map",cards:okCards,key:kv.key,vendor:kv.vendor},"⑤ 补采后重摆整图…");
+  var addedList=todo.map(function(x){return "［"+x.i+"］"+x.title+"（"+LAYER_NAME[x.layer]+"）";}).join("；");
+  await stepText("neighbors","verdict",{mode:"verdict",plan:state.planText+"\n\n【补采说明】以下文献已按上一轮三判补进语料并出卡，本轮据此重判（已进语料的不再是本地空）："+addedList,hits:state.nhits||"（实搜未取回任何记录）",key:kv.key,vendor:kv.vendor},"⑤之三 补采后重判三判…");
+  splitHits("verdict","verdictHits2");
+  state.expandNote="敌拓补采：新进 "+todo.length+" 篇并出卡，整图与三判已重做一次（"+addedList.slice(0,300)+"）。";
 }
 async function runCollide(kv,items,force){
   var allCards=cardsPayload(items);
@@ -1179,7 +1236,7 @@ async function runTerritory(kv,items,force){
   await pool(qs,async function(o){ try{ var L=await searchLibs(o.q,5,["oa","cr","s2"]); L.forEach(function(it){ hits.push(hitLine("领地敌拓 第"+(o.pass===1?"一道·名字":"二道·对象")+"｜检索词："+o.q,it)); }); }catch(e){} dn++; setStatus(spin("⑨之二 领地敌拓 "+dn+" / "+qs.length+"（三库）…")); },3);
   ["oa","cr","s2"].forEach(function(L){ if((state.libs[L]||0)>(before[L]||0)) state.territoryLibs[L]=1; });
   state.territoryHits=hits.join("\n\n");
-  if(qs.length){ setStatus(spin("⑨之二 退界裁定…")); state.territoryCheck=await sse({mode:"territory_check",territory:state.territory,hits:state.territoryHits||"（领地敌拓未取回记录）",key:kv.key,vendor:kv.vendor},function(full){ state.territoryCheck=full; if(document.querySelector('[data-art="territoryCheck"]')) renderArtInline("territoryCheck"); else renderResults(); },function(s){ setStatus(spin("⑨之二："+esc2(s))); }); }
+  if(qs.length){ setStatus(spin("⑨之二 退界裁定…")); state.territoryCheck=await sse({mode:"territory_check",territory:state.territory,hits:state.territoryHits||"（领地敌拓未取回记录）",key:kv.key,vendor:kv.vendor},function(full){ state.territoryCheck=full; if(document.querySelector('[data-art="territoryCheck"]')) renderArtInline("territoryCheck"); else renderResults(); },function(s){ setStatus(spin("⑨之二："+esc2(s))); }); splitHits("territoryCheck","territoryCheckHits"); }
   else { state.territoryCheck="领地卡未给出检索词——领地敌拓未执行，按规范层级别只能记 D1。"; }
   var c=(j&&j.changes)||{}, nCh=["object","unit","questions","evaluation"].filter(function(k){return !!c[k];}).length;
   var lvl=(j&&j.level)||"未判"; if(/T1/.test(state.territoryCheck)) lvl="T0（敌拓裁定不得抬到 T1）"; else if(/(并入|撤下|降为 D1|降级为 D1|退界触发)/.test(state.territoryCheck)) lvl="D1（领地敌拓触发退界）";
@@ -1305,7 +1362,7 @@ function selfCheck(){
 }
 function logText(){
   var L=state.log, sel=litSelected();
-  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑧之二 碰撞："+(L.f8b||"未跑"),"工序⑨ "+(L.f9||"未跑"),"工序⑨之二 "+(L.f9b||"未跑"),"工序⑩之二 "+(L.f10b||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 34 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
+  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑤之三 "+(state.log.f5c||state.expandNote||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑧之二 碰撞："+(L.f8b||"未跑"),"工序⑨ "+(L.f9||"未跑"),"工序⑨之二 "+(L.f9b||"未跑"),"工序⑩之二 "+(L.f10b||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 34 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
 }
 
 /* ---- 渲染 ---- */

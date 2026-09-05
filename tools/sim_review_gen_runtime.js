@@ -31,7 +31,7 @@ function body(mode, b) {
     case "card": { const mid = "SDE".replace(H, "")[0], end = "SDE".replace(H, "")[1]; return "承重命题：p" + b.idx + "\n起手维：" + H + "\n中间维：" + mid + "\n落点维：" + end + "\n所走路径：" + H + "→" + mid + "→" + end + "\n原文锚句：“a”\n失效条件：f\n余数：r\n" + "x".repeat(400); }
     case "map": return "格位分布\n挤格：S→D→E［1］［4］\n空格：D→S→E「甲」\n断链：乙\n" + "m".repeat(2000);
     case "neighbors": return JSON.stringify([{ item: "甲", kind: "gap", neighbors: ["n1", "n2", "n3"], queries: ["k1", "k2"] }, { item: "乙", kind: "chain", neighbors: ["n1"], queries: ["k3"] }]);
-    case "verdict": return "甲｜语料空｜…\n乙｜全语料空\n三判分布 1/1/0";
+    case "verdict": return "甲｜语料空｜…\n乙｜本地空｜命中 Shewchuk 2002\n三判分布 1/0/1\n===HITS===\n" + JSON.stringify([{ item: "乙", verdict: "本地空", title: "What is a good linear element", year: 2002, doi: "10.9/shew", anchor: "a" }, { item: "甲", verdict: "语料空", title: "Neighbor paper", year: 2010, doi: "", anchor: "b" }]);
     case "surface": return "1｜“x”｜［1］｜3";
     case "challenges": return "挑战 1：…\n" + "c".repeat(3000);
     case "gaps": return "不足…" + "g".repeat(1500);
@@ -50,13 +50,15 @@ w.fetch = async (url, init) => {
   const u = String(url);
   const R = (txt, ct, status) => ({ ok: (status || 200) < 300, status: status || 200, headers: { get: () => ct }, json: async () => JSON.parse(txt), text: async () => txt, body: { getReader() { let done = false; return { read: async () => done ? { done: true } : (done = true, { done: false, value: new TextEncoder().encode(txt) }) }; } } });
   if (u.indexOf("/api/wds/review-shapes") >= 0) return R(JSON.stringify({ shapes: [{ shape: "差型", words: ["delta", "gap"] }] }), "application/json");
+  if (u.indexOf("api.openalex.org/works/doi:") >= 0) return R(JSON.stringify({ id: "W9", doi: "https://doi.org/10.9/shew", title: "What is a good linear element", publication_year: 2002, cited_by_count: 500, authorships: [{ author: { display_name: "Shewchuk" } }], primary_location: { source: { display_name: "IMR" } }, abstract_inverted_index: { "shape": [0], "measures": [1] } }), "application/json");
+  if (u.indexOf("api.openalex.org") >= 0 && /search=Neighbor/.test(u)) return R(JSON.stringify({ results: [{ id: "W10", doi: "10.9/nb", title: "Neighbor paper", publication_year: 2010, cited_by_count: 5, authorships: [], primary_location: {}, abstract_inverted_index: { "x": [0] } }] }), "application/json");
   if (u.indexOf("api.openalex.org") >= 0) { const res = []; for (let i = 0; i < N_PAPERS; i++) res.push({ id: "W" + i, doi: "10.1/" + i, title: "Paper " + i, publication_year: 1990 + i * 3, cited_by_count: 10, authorships: [{ author: { display_name: "A" } }], primary_location: { source: { display_name: "J" } }, abstract_inverted_index: { "abstract": [0], "text": [1], "of": [2], "paper": [3] } }); return R(JSON.stringify({ results: res }), "application/json"); }
   if (u.indexOf("api.crossref.org") >= 0) return R(JSON.stringify({ message: { items: [{ DOI: "10.2/x", title: ["CR hit"], issued: { "date-parts": [[2001]] }, author: [{ given: "B", family: "C" }] }] } }), "application/json");
   if (u.indexOf("semanticscholar") >= 0) return R(JSON.stringify({ data: [{ title: "S2 hit", year: 2005, abstract: "abs" }] }), "application/json");
   if (u.indexOf("/api/wds/review-gen") >= 0) {
     const b = JSON.parse(init.body); const m = b.mode;
     if (b.tier === "fast") calls.fastTier++;
-    calls.tierByMode[m] = b.tier;
+    calls.tierByMode[m] = b.tier; calls[m] = (calls[m] || 0) + (m === "map" || m === "verdict" ? 1 : 0);
     if (m === "collide") calls.collideSeen = true;
     if (m === "write") { if (!calls.collideSeen) calls.firstWriteBeforeCollide = true; calls.writeActive++; calls.maxWriteParallel = Math.max(calls.maxWriteParallel, calls.writeActive); _st(() => { calls.writeActive--; }, 50); }
     if (m === "card") { calls.card++; if (b.idx === 3 && calls.card429 < 2) { calls.card429++; return R(JSON.stringify({ ok: false, msg: "太快啦，过十几秒再试。" }), "application/json", 429); } }
@@ -99,6 +101,10 @@ const $ = (s) => w.document.querySelector(s);
   ok(calls.tierByMode.surface === "fast" && calls.tierByMode.verdict === "fast" && calls.tierByMode.map === "deep" && calls.tierByMode.collide === "deep", "按工序定档：表面／三判快档，整图／碰撞深度档");
   ok(calls.maxWriteParallel >= 2, "成文并行（同时在飞 " + calls.maxWriteParallel + " 节）");
   ok(calls.firstWriteBeforeCollide, "第一波成文在碰撞之前就开写");
+  const ex = S.lit.filter((x) => x.layer === "expand"), ou = S.lit.filter((x) => x.layer === "outer");
+  ok(ex.length === 1 && ou.length === 1 && ex[0].cardState === "done" && ou[0].cardState === "done", "敌拓补采：本地空 1 篇进核心、语料空 1 篇进外位，均已出卡");
+  ok(calls.map === 2 && calls.verdict === 2 && S.expandDone, "补采后整图重摆＋三判重判各一次（map " + calls.map + "／verdict " + calls.verdict + "）");
+  ok(!/===HITS===/.test(S.verdict) && S.verdictHits && S.verdictHits.length === 2, "===HITS=== 已从三判正文剥离并解析");
   console.log(fail ? "\n" + fail + " FAILED" : "\nALL PASSED");
   process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error("harness error", e); process.exit(2); });
