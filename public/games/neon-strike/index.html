@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#050913" />
+    <meta name="description" content="霓虹突击：一款适合青少年的无血腥3D科幻枪战游戏，包含多英雄、多地图、多武器和丰富特效。" />
+    <link rel="canonical" href="https://sdeuniverses.com/games/neon-strike/" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/assets/app/favicon-32.png" sizes="32x32" />
+    <title>霓虹突击：多维战场</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="game-shell">
+      <canvas id="game-canvas" aria-label="3D科幻枪战游戏画面"></canvas>
+
+      <section id="start-screen" class="screen active" aria-labelledby="game-title">
+        <div class="start-panel">
+          <a class="site-back" href="/games/">← 爱思乐园 · 游戏实验室</a>
+          <div class="brand-row">
+            <span class="brand-mark" aria-hidden="true">NS</span>
+            <div>
+              <p class="eyebrow">NEON STRIKE // 青少年特遣队</p>
+              <h1 id="game-title">霓虹突击</h1>
+            </div>
+            <span class="safety-badge">无血腥科幻战斗</span>
+          </div>
+
+          <div class="selection-grid">
+            <section class="selector" aria-labelledby="hero-title">
+              <div class="section-heading">
+                <span>01</span>
+                <h2 id="hero-title">选择英雄</h2>
+              </div>
+              <div id="hero-list" class="card-list"></div>
+            </section>
+
+            <section class="selector" aria-labelledby="map-title">
+              <div class="section-heading">
+                <span>02</span>
+                <h2 id="map-title">选择战场</h2>
+              </div>
+              <div id="map-list" class="map-list"></div>
+            </section>
+          </div>
+
+          <div class="launch-row">
+            <div class="controls-copy">
+              <span><kbd>WASD</kbd> 移动</span>
+              <span><kbd>鼠标</kbd> 瞄准</span>
+              <span><kbd>点击</kbd> 射击</span>
+              <span><kbd>1–4</kbd> 换枪</span>
+              <span><kbd>Shift</kbd> 冲刺</span>
+            </div>
+            <button id="start-button" class="primary-button" type="button">
+              <span>进入战场</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="hud" class="hud" aria-label="战斗状态">
+        <div class="hud-top">
+          <div class="mission-block">
+            <span id="map-label" class="hud-label">霓虹港</span>
+            <strong id="wave-label">第 1 波</strong>
+            <span id="enemy-count">目标 0</span>
+          </div>
+          <div class="score-block">
+            <span>积分</span>
+            <strong id="score-label">000000</strong>
+            <em id="combo-label">x1 连击</em>
+          </div>
+          <div class="action-buttons">
+            <button id="sound-button" class="icon-button" type="button" aria-label="开启或关闭声音">声音</button>
+            <button id="fullscreen-button" class="icon-button" type="button" aria-label="进入全屏">全屏</button>
+            <button id="pause-button" class="icon-button" type="button" aria-label="暂停游戏">暂停</button>
+          </div>
+        </div>
+
+        <div id="crosshair" class="crosshair" aria-hidden="true"><i></i><b></b><i></i><b></b></div>
+        <div id="damage-flash" aria-hidden="true"></div>
+        <div id="hit-marker" aria-hidden="true"><span></span><span></span></div>
+        <div id="announcement" role="status" aria-live="polite"></div>
+
+        <div class="hud-bottom">
+          <div class="vitals">
+            <div class="hero-chip">
+              <span id="hero-monogram">V</span>
+              <div>
+                <small id="hero-label">先锋</small>
+                <strong id="health-label">100</strong>
+              </div>
+            </div>
+            <div class="meters">
+              <div class="meter health"><i id="health-bar"></i></div>
+              <div class="meter shield"><i id="shield-bar"></i></div>
+              <small><span>生命</span><span>护盾</span></small>
+            </div>
+          </div>
+          <canvas id="minimap" width="180" height="180" aria-label="战场小地图"></canvas>
+          <div class="weapon-block">
+            <span id="weapon-label">脉冲步枪</span>
+            <strong><b id="ammo-label">30</b><small id="reserve-label"> / 180</small></strong>
+            <div id="weapon-slots" class="weapon-slots"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pause-screen" class="screen overlay" aria-labelledby="pause-title">
+        <div class="modal-panel">
+          <p class="eyebrow">任务暂停</p>
+          <h2 id="pause-title">稍作休整</h2>
+          <p>战场状态已冻结，准备好再继续。</p>
+          <button id="resume-button" class="primary-button" type="button">继续战斗</button>
+          <button id="restart-button" class="secondary-button" type="button">重新开始</button>
+          <button id="menu-button" class="text-button" type="button">返回英雄选择</button>
+          <a class="lab-link" href="/games/">返回游戏实验室</a>
+        </div>
+      </section>
+
+      <section id="result-screen" class="screen overlay" aria-labelledby="result-title">
+        <div class="modal-panel result-panel">
+          <p id="result-kicker" class="eyebrow">本次任务结束</p>
+          <h2 id="result-title">继续挑战</h2>
+          <div class="result-stats">
+            <div><span>得分</span><strong id="result-score">0</strong></div>
+            <div><span>最高波次</span><strong id="result-wave">1</strong></div>
+            <div><span>命中率</span><strong id="result-accuracy">0%</strong></div>
+          </div>
+          <button id="retry-button" class="primary-button" type="button">再战一次</button>
+          <button id="result-menu-button" class="text-button" type="button">更换英雄或地图</button>
+          <a class="lab-link" href="/games/">返回游戏实验室</a>
+        </div>
+      </section>
+
+      <div id="touch-controls" aria-hidden="true">
+        <div id="move-pad" class="touch-pad"><span></span></div>
+        <div class="touch-actions">
+          <button id="touch-swap" type="button">换枪</button>
+          <button id="touch-dash" type="button">冲刺</button>
+          <button id="touch-fire" type="button">射击</button>
+        </div>
+      </div>
+    </main>
+    <script src="./game.js"></script>
+  </body>
+</html>

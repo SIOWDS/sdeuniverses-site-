@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>歇一歇 · 休闲小游戏 · SDE Universes</title>
-<meta name="description" content="爱思乐园的休闲角：3D 枪战《星际突击》，以及 2048 与贪吃蛇两个经典小游戏，带人机对手。不烧 Key、无需注册，最高分只记在你自己的浏览器里。">
+<meta name="description" content="爱思乐园的游戏实验室：《霓虹突击》《星际突击》两款3D科幻枪战游戏，以及2048与贪吃蛇经典小游戏。无需注册，浏览器直接开玩。">
 <link rel="canonical" href="https://sdeuniverses.com/games/">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/assets/app/favicon-32.png" sizes="32x32">
@@ -33,6 +33,10 @@ h1 .em{display:inline-block;animation:bob 2.2s ease-in-out infinite}
 .lede{color:var(--text2);font-size:.92rem;max-width:52ch;margin:.4rem auto 1.1rem}
 .ss{display:block;position:relative;overflow:hidden;text-decoration:none;color:#e8f0ff;text-align:left;border:3px solid var(--ink);border-radius:18px;background:radial-gradient(ellipse at 30% 20%,#2a1a5e 0%,#0b0930 55%,#04050f 100%);box-shadow:6px 6px 0 var(--ink);margin:0 auto 1.3rem;max-width:560px;transition:transform .15s}
 .ss:hover{transform:translate(-2px,-2px)}
+.ss.neon{background:radial-gradient(ellipse at 24% 18%,#073452 0%,#07162e 48%,#09051b 100%);border-color:#10263a;box-shadow:6px 6px 0 #10263a,0 0 28px rgba(37,231,255,.16)}
+.ss.neon .ss-grid{background-image:linear-gradient(rgba(37,231,255,.42) 1px,transparent 1px),linear-gradient(90deg,rgba(37,231,255,.42) 1px,transparent 1px)}
+.ss.neon .ss-body b{text-shadow:0 0 16px rgba(37,231,255,.95),0 0 30px rgba(141,92,255,.65)}
+.ss.neon .ss-body em{background:linear-gradient(90deg,#25e7ff,#8d5cff);color:#031017}
 .ss-grid{position:absolute;inset:auto 0 -20px 0;height:120px;background-image:linear-gradient(rgba(90,120,255,.45) 1px,transparent 1px),linear-gradient(90deg,rgba(90,120,255,.45) 1px,transparent 1px);background-size:26px 26px;transform:perspective(220px) rotateX(60deg);transform-origin:50% 100%;opacity:.7}
 .ss-body{position:relative;display:block;padding:1.1rem 1.3rem 1.2rem}
 .ss-body b{display:block;font-size:1.35rem;letter-spacing:.14em;text-shadow:0 0 16px rgba(120,220,255,.9),0 0 30px rgba(60,120,255,.6)}
@@ -101,7 +105,17 @@ footer a{color:var(--gold2);text-decoration:none;margin:0 .35rem}
 <main>
   <p class="eyebrow">REST CORNER · 歇一歇</p>
   <h1><span class="em">🎮</span> 休闲小游戏</h1>
-  <p class="lede">读累了撞累了，玩两把再回来。带人机对手，不烧 Key、无需注册，最高分只记在你自己的浏览器里。</p>
+  <p class="lede">读累了撞累了，玩两把再回来。两款 3D 科幻枪战与经典小游戏，浏览器直接开玩；无需注册，不烧 Key。</p>
+
+  <!-- ===== 霓虹突击（3D 枪战，独立页） ===== -->
+  <a class="ss neon" href="/games/neon-strike/" title="霓虹突击 · 多维战场">
+    <span class="ss-grid" aria-hidden="true"></span>
+    <span class="ss-body">
+      <b>⚡ 霓虹突击 NEON STRIKE</b>
+      <span>第一人称 3D 科幻枪战 · 4 位英雄 · 4 张地图 · 4 种武器 · 5 类机器人敌人 · 电脑与手机均可玩。</span>
+      <em>进 入 多 维 战 场 →</em>
+    </span>
+  </a>
 
   <!-- ===== 星际突击（3D 枪战，独立页） ===== -->
   <a class="ss" href="/games/star-strike/" title="星际突击 · 3D 第一人称枪战">
