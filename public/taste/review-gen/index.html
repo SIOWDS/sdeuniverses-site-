@@ -743,7 +743,10 @@ async function sse(body,onTok,onStage){
   throw last;
 }
 function sseOnce(body,onTok,onStage){
-  body.tier=body._tier||tier; body.type=kind; body.topic=$("#topic").value.trim(); body.question=$("#question").value.trim();
+  /* 2026-09-05 提速：思考只给承重工序。核对与抄录类工序（表面／邻近行／三判／真跑重读／占位者／领地裁定／改姓表）一律快档——
+     它们要的是可核的列表不是深思，开思考只多烧 1–3 分钟。 */
+  var FAST_MODES={surface:1,neighbors:1,verdict:1,collide_run:1,occupants:1,territory_check:1,rename:1};
+  body.tier=body._tier||(FAST_MODES[body.mode]?"fast":tier); body.type=kind; body.topic=$("#topic").value.trim(); body.question=$("#question").value.trim();
   if(PIN_MODEL[body.vendor]) body.model=PIN_MODEL[body.vendor];
   var ac=(typeof AbortController!=="undefined")?new AbortController():null; if(ac) aborters.push(ac);
   return new Promise(function(res,rej){
@@ -1057,8 +1060,12 @@ async function runAll(kv,items){
     state.log.f4="出卡 "+okCards.length+" 张（失败 "+(items.length-okCards.length)+"；路径机检重出后仍不过 "+badRoute+" 张；摘要卡 "+items.filter(function(x){return x.material!=="fulltext"&&x.cardState==="done";}).length+"、全文卡 "+items.filter(function(x){return x.material==="fulltext"&&x.cardState==="done";}).length+"）。";
     setStage("card","done"); ckptSave();
     if(okCards.length<2) throw new Error("成功的卡不足两张。");
-    /* ⑤ 整图 */
+    /* ⑤ 整图 ∥ ⑥ 表面（表面只依赖卡，与整图同时跑） */
+    var surfP=null;
+    if(!state.surface) surfP=soft("⑥ 表面挑战","f6",async function(){ await stepText("surface","surface",{mode:"surface",cards:items.map(function(x){return {i:x.i,title:x.title,card:(x.material==="fulltext"?"":"【摘要】"+(x.abstract||"")+"\n")+(x.card||""),layer:LAYER_NAME[x.layer]};}),key:kv.key,vendor:kv.vendor},"⑥ 抄表面挑战…"); },function(t){ state.surface=t; setStage("surface","done"); });
     if(!state.mapText) await stepText("map","mapText",{mode:"map",cards:okCards,key:kv.key,vendor:kv.vendor},"⑤ 摆整图…"); else setStage("map","done");
+    /* 提速：第 1–6 节只依赖整图与卡，整图一出就在后台开写（3 路），与⑤之二～⑨之二重叠 */
+    var earlyP=startWrite(kv,items,function(i){ return i<=5; }); earlyP.catch(function(){});   // 先挂个 catch 免得 stop 时报 unhandled；真正的错在下面 await 处再抛
     /* ⑤之二 敌拓闸：邻近行实搜 → 三判 */
     if(!state.verdict||/三判生成中/.test(state.verdict)){
     await soft("⑤之二 敌拓三判","f5b",async function(){
@@ -1079,9 +1086,8 @@ async function runAll(kv,items){
     setStage("neighbors","done"); renderResults(); ckptSave();
     },function(t){ state.verdict=t; setStage("neighbors","done"); });
     } else setStage("neighbors","done");
-    /* ⑥ 表面 */
-    if(!state.surface) await soft("⑥ 表面挑战","f6",async function(){ await stepText("surface","surface",{mode:"surface",cards:items.map(function(x){return {i:x.i,title:x.title,card:(x.material==="fulltext"?"":"【摘要】"+(x.abstract||"")+"\n")+(x.card||""),layer:LAYER_NAME[x.layer]};}),key:kv.key,vendor:kv.vendor},"⑥ 抄表面挑战…"); },function(t){ state.surface=t; setStage("surface","done"); });
-    else setStage("surface","done");
+    /* ⑥ 表面：等与整图并跑的那一支收尾（⑦要用它） */
+    if(surfP) await surfP; else setStage("surface","done");
     /* ⑦ 挑战 */
     if(!state.challenges) await stepText("challenges","challenges",{mode:"challenges",map:state.mapText,verdict:state.verdict,surface:state.surface,cards:okCards,key:kv.key,vendor:kv.vendor},"⑦ 读发生挑战…");
     else setStage("challenges","done");
@@ -1120,7 +1126,8 @@ async function runAll(kv,items){
     if(!state.territoryCheck) await soft("⑨之二 研究领地","f9b",async function(){ await runTerritory(kv,items,false); },function(t){ if(!state.territory) state.territory=t; state.territoryCheck=t; setStage("territory","done"); }); else setStage("territory","done");
     /* ⑩之二 SDE 改性：术语映射表与学科化节名（成文之前必过） */
     if(!state.rename&&!isMissing(state.renameText)) await soft("⑩之二 改姓映射表","f10b",async function(){ await runRename(kv,items); },function(t){ state.rename=null; state.renameText=t; setStage("rename","done"); }); else setStage("rename","done");
-    /* ⑩ 成文（只写没写成的节） */
+    /* ⑩ 成文：第一波（1–6 节）已在后台；这里等它收尾，再 3 路并写第 7–12 节 */
+    await earlyP;
     await runWrite(kv,items);
     setStage("check","on"); renderResults(); setStage("check","done");
     var miss=["surface","verdict","collideRun","occupants","territory","territoryCheck","renameText"].filter(function(k){return isMissing(state[k]);}).length;
@@ -1198,19 +1205,31 @@ async function runRename(kv,items){
   state.log.f10b="改性：术语 "+(state.rename?state.rename.terms.length:0)+" 条（右栏含 SDE 字面 "+bad+" 条；落不到学科 "+un+" 条）；学科化节名 "+(state.rename?Object.keys(state.rename.sections||{}).length:0)+" 节；残留机检见成文后自检。";
   setStage("rename","done"); renderResults(); ckptSave();
 }
-async function runWrite(kv,items){
-  setStage("write","on");
+function ensureSections(){
   var sk=SKELETON[state.type];
   var keep=state.sections&&state.sections.length===sk.length&&state.sections.every(function(S,i){return S.h===sk[i].h;});
   if(!keep) state.sections=sk.map(function(s){return {h:s.h,words:s.words,text:"",status:s.words?"pending":"auto"};});
   state.title=($("#topic").value.trim()||"综述")+"："+TYPE_NAME[state.type].replace(/（.*$/,"");
-  renderResults();
-  for(var i=0;i<state.sections.length;i++){ if(!state.sections[i].words) continue; if(state.sections[i].status==="done"&&state.sections[i].text) continue; if(stopReq) throw new Error("已停止"); await writeSec(kv,items,i); }
+}
+/* 2026-09-05 提速：成文改分波并行。pick(i) 选本波要写的节；同波 3 路并写；已写成的节不重写；stop 时抛。 */
+async function startWrite(kv,items,pick){
+  ensureSections();
+  var todo=[]; state.sections.forEach(function(S,i){ if(!S.words) return; if(S.status==="done"&&S.text) return; if(pick(i)) todo.push(i); });
+  if(!todo.length) return;
+  setStage("write","on"); renderResults();
+  var err=null;
+  await pool(todo,async function(i){ if(stopReq) return; try{ await writeSec(kv,items,i); }catch(e){ err=e; } },3);
+  if(stopReq) throw new Error("已停止");
+  if(err) throw err;
+}
+async function runWrite(kv,items){
+  ensureSections(); renderResults();
+  await startWrite(kv,items,function(){ return true; });
   setStage("write","done"); renderResults();
 }
 async function writeSec(kv,items,i){
   var S=state.sections[i]; S.status="running"; S.text=""; renderResults();
-  var prev=state.sections.slice(0,i).filter(function(x){return x.text;}).map(function(x){return "《"+x.h+"》："+x.text.replace(/\s+/g," ").slice(0,160)+"…";}).join("\n");
+  var prev=state.sections.slice(0,i).filter(function(x){return x.status==="done"&&x.text;}).map(function(x){return "《"+x.h+"》："+x.text.replace(/\s+/g," ").slice(0,160)+"…";}).join("\n");
   setStatus(spin("⑩ 写第 "+(i+1)+" 节《"+esc2(S.h)+"》…"));
   var art={frame:state.frameText,map:state.mapText,verdict:state.verdict,surface:state.surface,challenges:state.challenges,gaps:state.gaps,collide:state.collide,collideRun:state.collideRun,conjectures:state.conjectures,occupants:state.occupants,territory:state.territory,territoryCheck:state.territoryCheck};
   try{

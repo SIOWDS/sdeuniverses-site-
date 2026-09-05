@@ -23,7 +23,7 @@ w.scrollTo = () => {};
 /* ---- 假 SSE ---- */
 function sse(text, extra) { const chunks = []; for (let i = 0; i < text.length; i += 80) chunks.push("data: " + JSON.stringify({ t: "token", v: text.slice(i, i + 80) }) + "\n\n"); chunks.push("data: " + JSON.stringify({ t: "end", v: { out: text.length, think: 0, why: "stop" } }) + "\n\n"); chunks.push("data: [DONE]\n\n"); return chunks.join(""); }
 function sseErr(msg) { return "data: " + JSON.stringify({ t: "error", v: msg }) + "\n\ndata: [DONE]\n\n"; }
-const calls = { card: 0, card429: 0, neighbors: 0, collide_run: 0, write8: 0, fastTier: 0 };
+const calls = { card: 0, card429: 0, neighbors: 0, collide_run: 0, write8: 0, fastTier: 0, tierByMode: {}, writeActive: 0, maxWriteParallel: 0, firstWriteBeforeCollide: false, collideSeen: false };
 function body(mode, b) {
   const H = ["S", "D", "E"][b.idx % 3];
   switch (mode) {
@@ -56,6 +56,9 @@ w.fetch = async (url, init) => {
   if (u.indexOf("/api/wds/review-gen") >= 0) {
     const b = JSON.parse(init.body); const m = b.mode;
     if (b.tier === "fast") calls.fastTier++;
+    calls.tierByMode[m] = b.tier;
+    if (m === "collide") calls.collideSeen = true;
+    if (m === "write") { if (!calls.collideSeen) calls.firstWriteBeforeCollide = true; calls.writeActive++; calls.maxWriteParallel = Math.max(calls.maxWriteParallel, calls.writeActive); _st(() => { calls.writeActive--; }, 50); }
     if (m === "card") { calls.card++; if (b.idx === 3 && calls.card429 < 2) { calls.card429++; return R(JSON.stringify({ ok: false, msg: "太快啦，过十几秒再试。" }), "application/json", 429); } }
     if (m === "neighbors") { calls.neighbors++; if (calls.neighbors === 1) return R(sseErr("基底两次都没写出内容（…）"), "text/event-stream"); }
     if (m === "collide_run") { calls.collide_run++; return R(sseErr("DeepSeek 流内报错：content filter"), "text/event-stream"); }
@@ -93,6 +96,9 @@ const $ = (s) => w.document.querySelector(s);
   ok(secs.filter((s) => s.status === "done").length === secs.length - 1, "其余 " + (secs.length - 1) + " 节全部写完");
   ok(S.territoryCheck && S.rename && S.occupants, "领地裁定／改姓表／占位者三件都在");
   ok(/工序产出缺/.test(st) && /1 件/.test(st), "完成语报出缺 1 件");
+  ok(calls.tierByMode.surface === "fast" && calls.tierByMode.verdict === "fast" && calls.tierByMode.map === "deep" && calls.tierByMode.collide === "deep", "按工序定档：表面／三判快档，整图／碰撞深度档");
+  ok(calls.maxWriteParallel >= 2, "成文并行（同时在飞 " + calls.maxWriteParallel + " 节）");
+  ok(calls.firstWriteBeforeCollide, "第一波成文在碰撞之前就开写");
   console.log(fail ? "\n" + fail + " FAILED" : "\nALL PASSED");
   process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error("harness error", e); process.exit(2); });
