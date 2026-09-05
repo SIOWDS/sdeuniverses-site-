@@ -986,6 +986,12 @@ function routeCheck(card){
   var got=p.replace(/\s/g,"").replace(/[-−–]>/g,"→").replace(/->/g,"→");
   return {ok:got.indexOf(want)>=0,want:want,why:"路径栏「"+p+"」≠ 算出的 "+want};
 }
+/* 批 4：一张卡站哪一维——How 看起手维、What 看所站方程、Why 看所站原理（三家机检与按节筛卡共用） */
+function cardDimOf(card){
+  if(kind==="how"){ return dimOf(pick(card,"起手维")); }
+  if(kind==="what"){ var v=pick(card,"所站方程").replace(/\s/g,""); return /S=F/.test(v)?"S":/D=G/.test(v)?"D":/E=H/.test(v)?"E":/外位/.test(v)?"X":"?"; }
+  var w=pick(card,"所站原理"); return /原理一|一/.test(w)?"S":/原理二|二/.test(w)?"D":/原理三|三/.test(w)?"E":/外位/.test(w)?"X":"?";
+}
 function cardsPayload(items){ return items.filter(function(x){return x.card&&x.card.indexOf("【出卡失败")!==0;}).map(function(x){ return {i:x.i,title:x.title,card:x.card,layer:LAYER_NAME[x.layer]}; }); }
 /* 2026-09-05 批 1：③～⑩ 拆成 runAll（幂等：已完成的工序不重跑）＋ 外层自动续跑 3 次（15s/30s/60s；stop 不续）；
    网络恢复（online）也触发续跑。承重工序（整图／挑战／不足／碰撞卡／猜想）失败仍停；软工序（表面／敌拓三判／真跑／占位者／领地／改姓）失败记「【工序缺】」继续。 */
@@ -1205,8 +1211,8 @@ async function runCollide(kv,items,force){
   /* 机检：三家必须是清单内篇号，且按卡上的起手维／方程／原理各站一维（How 看起手维） */
   var homesOk=null;
   if(j&&Array.isArray(j.homes)&&j.homes.length===3){
-    var dims=j.homes.map(function(n){ var x=items.filter(function(y){return y.i===parseInt(n,10);})[0]; if(!x||!x.card) return null; var m2=x.card.match(/起手维[：:]\s*([SDE])/); return m2?m2[1]:"?"; });
-    homesOk=dims.every(function(d){return d;})&&(kind!=="how"||new Set(dims.filter(function(d){return d!=="?";})).size===Math.min(3,dims.filter(function(d){return d!=="?";}).length));
+    var dims=j.homes.map(function(n){ var x=items.filter(function(y){return y.i===parseInt(n,10);})[0]; if(!x||!x.card) return null; return cardDimOf(x.card); });
+    homesOk=dims.every(function(d){return d;})&&new Set(dims.filter(function(d){return d!=="?"&&d!=="X";})).size===Math.min(3,dims.filter(function(d){return d!=="?"&&d!=="X";}).length);
   }
   state.log.f8b="主碰撞 1 场；Z＝"+(j&&j.z?j.z:"未解析")+"；旗舰读数＝"+(j&&j.reading?j.reading:"未解析")+"；六型对照＝"+(j?(j.shapeFree?"不归入":"归入（降为改判）"):"未解析")+"；三家＝"+(j&&j.homes?"［"+j.homes.join("］［")+"］":"未解析")+(homesOk===false?"（机检：三家不全在清单内或同维）":homesOk?"（机检过）":"")+"；预注册＝"+(j&&j.prereg?j.prereg:"未写");
   renderResults(); ckptSave();
@@ -1239,7 +1245,9 @@ async function runTerritory(kv,items,force){
   if(qs.length){ setStatus(spin("⑨之二 退界裁定…")); state.territoryCheck=await sse({mode:"territory_check",territory:state.territory,hits:state.territoryHits||"（领地敌拓未取回记录）",key:kv.key,vendor:kv.vendor},function(full){ state.territoryCheck=full; if(document.querySelector('[data-art="territoryCheck"]')) renderArtInline("territoryCheck"); else renderResults(); },function(s){ setStatus(spin("⑨之二："+esc2(s))); }); splitHits("territoryCheck","territoryCheckHits"); }
   else { state.territoryCheck="领地卡未给出检索词——领地敌拓未执行，按规范层级别只能记 D1。"; }
   var c=(j&&j.changes)||{}, nCh=["object","unit","questions","evaluation"].filter(function(k){return !!c[k];}).length;
-  var lvl=(j&&j.level)||"未判"; if(/T1/.test(state.territoryCheck)) lvl="T0（敌拓裁定不得抬到 T1）"; else if(/(并入|撤下|降为 D1|降级为 D1|退界触发)/.test(state.territoryCheck)) lvl="D1（领地敌拓触发退界）";
+  var lvl=(j&&j.level)||"未判"; var tc=state.territoryCheck||"";
+  if(/级别[：:]\s*T1/.test(tc)) lvl="T0（敌拓裁定不得抬到 T1）";
+  else if(/级别[：:]\s*D1|退界触发[＝=：:]?\s*(是|触发|整块)|整块并入|(^|[^未不否])撤下本领地|(^|[^未不否])并入[^，。；]{0,12}领域/.test(tc)) lvl="D1（领地敌拓触发退界）";
   state.log.f9b="研究领地：名称＝"+(j&&j.nameZh?j.nameZh+"／"+(j.nameEn||""):"未解析")+"；对象＝"+(j&&j.object?j.object:"—")+"；最小单位＝"+(j&&j.unit?j.unit:"—")+"；四改＝"+nCh+"/4（对象改＝"+(c.object?"是":"否")+"）；基本量＝"+(j&&j.quantities!=null?j.quantities:"—")+"个；五问＝"+(j&&j.questions===5?"齐":"缺")+"；重绘＝"+(j&&j.cells!=null?j.cells:"—")+"格、"+(j&&j.families!=null?j.families:"—")+"族；汇入路线＝"+(j&&j.routesIn!=null?j.routesIn:"—")+"条；领地敌拓＝"+(j&&j.neighbors?j.neighbors.length:0)+"领域、"+Object.keys(state.territoryLibs).length+"库、"+qs.length+"趟、取回 "+hits.length+" 条；自生测试＝"+(j&&j.selfGen?"通过":"不通过")+"；退界条件＝"+(j&&j.exits?["corpus","data","map"].filter(function(k){return j.exits[k];}).length:0)+"/3；级别＝"+lvl;
   setStage("territory","done"); renderResults(); ckptSave();
 }
@@ -1291,6 +1299,8 @@ async function writeSec(kv,items,i){
   var art={frame:state.frameText,map:state.mapText,verdict:state.verdict,surface:state.surface,challenges:state.challenges,gaps:state.gaps,collide:state.collide,collideRun:state.collideRun,conjectures:state.conjectures,occupants:state.occupants,territory:state.territory,territoryCheck:state.territoryCheck};
   try{
     S.text=await sse({mode:"write",sec:i,art:art,cards:cardsPayload(items),refs:items.map(refString),prev:prev,rename:state.rename||undefined,key:kv.key,vendor:kv.vendor},function(full){ S.text=full; renderSecInline(i); },function(s){ setStatus(spin("第 "+(i+1)+" 节："+esc2(s))); });
+    /* 批 4：改姓残留机检——映射表在手而本节 SDE 字面 >3 处，带着残留清单重写一次（只一次） */
+    if(state.rename){ var rz=residue(S.text,i===1); if(rz.n>3){ var lst=Object.keys(rz.hits).map(function(w){return w+"×"+rz.hits[w];}).join("、"); setStatus(spin("第 "+(i+1)+" 节残留 "+rz.n+" 处 SDE 字面，重写一次…")); var t2=await sse({mode:"write",sec:i,art:art,cards:cardsPayload(items),refs:items.map(refString),prev:prev,rename:state.rename,residue:lst,key:kv.key,vendor:kv.vendor},function(full){ S.text=full; renderSecInline(i); },function(s){ setStatus(spin("第 "+(i+1)+" 节（重写）："+esc2(s))); }); if(residue(t2,i===1).n<=rz.n) S.text=t2; S.rewrote=rz.n+"→"+residue(S.text,i===1).n; } }
     S.status="done";
   }catch(e){ if(stopReq){ S.status="pending"; S.text=""; renderResults(); throw e; } S.status="error"; S.text="【本节生成失败："+(e&&e.message||e)+"，可点「重写此节」。】"; }
   renderResults(); ckptSave();

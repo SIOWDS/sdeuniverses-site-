@@ -11418,11 +11418,19 @@ export default {
       const HEAD = "【综述主题】" + topic + "\n【研究问题】" + question + "\n【类型】" + REVIEW_TYPE_NAME[type] + "\n";
       const packCards = (cards, n) => {
         // 2026-09-05：47 张卡×1100 字的整图提示把基底撑到「一个字没写」——卡包按总预算收口：N 张共用 46000 字，每张不低于 320 字
-        const arr = (Array.isArray(cards) ? cards : []).slice(0, 60);
+        const arr = (Array.isArray(cards) ? cards : []).slice(0, 90);   // 2026-09-05：60→90（补采后 48+15 已过 60）
         const eff = Math.max(320, Math.min(n, Math.floor(46000 / Math.max(1, arr.length))));
         return arr.map((c) => "［" + (parseInt(c.i, 10) || 0) + "］《" + clean(c.title, 140) + "》" + (c.layer ? "（" + clean(c.layer, 6) + "层）" : "") + "\n" + clean(c.card, eff)).join("\n\n");
       };
-      const refsList = (refs) => (Array.isArray(refs) ? refs : []).slice(0, 60).map((r, i) => "［" + (i + 1) + "］" + clean(r, 200)).join("\n");
+      const refsList = (refs, n) => (Array.isArray(refs) ? refs : []).slice(0, 90).map((r, i) => "［" + (i + 1) + "］" + clean(r, n || 200)).join("\n");
+      /* 2026-09-05 批 2：按节筛卡——第 3–5 节只喂本节那一维的卡（How 看起手维／What 看所站方程／Why 看所站原理），其余节不喂卡或只喂节选 */
+      const cardDim = (c) => {
+        const t = String(c.card || "");
+        const pick = (nm) => { const m = t.match(new RegExp("(?:^|\\n)" + nm + "[：:]\\s*([^\\n]*)")); return m ? m[1] : ""; };
+        if (type === "how") { const v = pick("起手维"); if (/外位/.test(v)) return "X"; const m = v.match(/[SDE]/); return m ? m[0] : "?"; }
+        if (type === "what") { const v = pick("所站方程").replace(/\s/g, ""); return /S=F/.test(v) ? "S" : /D=G/.test(v) ? "D" : /E=H/.test(v) ? "E" : /外位/.test(v) ? "X" : "?"; }
+        const v = pick("所站原理"); return /原理一|一/.test(v) ? "S" : /原理二|二/.test(v) ? "D" : /原理三|三/.test(v) ? "E" : /外位/.test(v) ? "X" : "?";
+      };
       let sys = "", usr = "", tok = 0;
 
       if (rmode === "frame") {
@@ -11519,24 +11527,50 @@ export default {
         if (!(sec >= 0 && sec < sk.length) || !sk[sec].words) return J({ ok: false, msg: "bad sec" }, 400);
         const S = sk[sec];
         const art = b.art || {};
+        /* 2026-09-05 批 2：每节只带它要编排的件（从前 12 节每节都喂全部件，末几节 9 万字，既烧钱又撞 32K 基底）。
+           矩阵：节序 0 问题与判类｜1 解构方法｜2–4 三格｜5 整图｜6 表面与挑战｜7 不足｜8 碰撞｜9 猜想｜10 领地｜11 总纲 */
         const parts = [];
-        parts.push("【文献清单（篇号→条目；只能引这些）】\n" + refsList(b.refs));
-        if (art.frame) parts.push("【题面卡】\n" + clean(art.frame, 2500));
-        if (art.map) parts.push("【整图（已定，不得改动归位）】\n" + clean(art.map, 9000));
-        if (art.verdict && (sec === 5 || sec >= 6)) parts.push("【敌拓闸三判（第 6 节须把每个空格／断链的三判之一写进去；命中的带出处与锚句）】\n" + clean(art.verdict, 6000));
-        if (sec >= 2 && sec <= 4) parts.push("【本节涉及的解构卡】\n" + packCards(b.cards, 900));
-        else if (sec === 1 || sec === 5) parts.push("【解构卡（节选）】\n" + packCards(b.cards, 400));
-        if (sec >= 6) { if (art.surface) parts.push("【表面挑战清单】\n" + clean(art.surface, 3000)); if (art.challenges) parts.push("【五大发生挑战】\n" + clean(art.challenges, 9000)); }
-        if (sec >= 7) { if (art.gaps) parts.push("【现有方案的不足】\n" + clean(art.gaps, 6000)); }
-        if (sec >= 6) { if (art.collide) parts.push("【碰撞卡（⑧之二；第 7 节的第六条碰撞挑战、第 8 之二节全文、第 9 节碰撞级猜想都只许引它）】\n" + clean(art.collide, 7000)); if (art.collideRun) parts.push("【碰撞真跑结果（支持／判负照登）】\n" + clean(art.collideRun, 4000)); }
-        if (sec >= 9) { if (art.conjectures) parts.push("【五条猜想】\n" + clean(art.conjectures, 9000)); if (art.occupants) parts.push("【占位者与分离线】\n" + clean(art.occupants, 5000)); }
-        if (sec >= 10) { if (art.territory) parts.push("【领地卡（⑨之二；第 9 之二节按此成文、第 10 节总纲引它；级别与结论已定，不得抬级）】\n" + clean(art.territory, 8000)); if (art.territoryCheck) parts.push("【领地敌拓与退界裁定（照登；定级以此为准）】\n" + clean(art.territoryCheck, 4000)); }
-        if (b.prev) parts.push("【已写各节（只列标题与首段，用来避免重复，不要复述）】\n" + clean(b.prev, 4000));
+        const need = (k) => ({
+          map:        [0, 1, 2, 3, 4, 5, 6, 8, 9, 11], mapShort: [0, 1, 6, 8, 9, 11],
+          verdict:    [5, 6, 8, 9], verdictShort: [8, 9],
+          surface:    [6], challenges: [6, 7, 11], challengesShort: [11], gaps: [7],
+          collide:    [6, 7, 8, 9, 10], collideShort: [6, 7, 9, 10], collideRun: [8, 9],
+          conjectures:[9, 10, 11], conjecturesShort: [10, 11], occupants: [9],
+          territory:  [10, 11], territoryShort: [11], territoryCheck: [10],
+        })[k].indexOf(sec) >= 0;
+        const sh = (k) => need(k + "Short") ? 2500 : 0;
+        parts.push("【文献清单（篇号→条目；只能引这些）】\n" + refsList(b.refs, (sec >= 2 && sec <= 5) ? 200 : 110));
+        if (art.frame && (sec <= 1 || sec === 11)) parts.push("【题面卡】\n" + clean(art.frame, 2500));
+        if (art.map && need("map")) parts.push("【整图（已定，不得改动归位）】\n" + clean(art.map, sh("map") || 9000));
+        if (art.verdict && need("verdict")) parts.push("【敌拓闸三判（第 6 节须把每个空格／断链的三判之一写进去；命中的带出处与锚句）】\n" + clean(art.verdict, sh("verdict") || 6000));
+        if (sec >= 2 && sec <= 4) {
+          const want = ["S", "D", "E"][sec - 2];
+          const mine = (Array.isArray(b.cards) ? b.cards : []).filter((c) => { const d = cardDim(c); return d === want || d === "?"; });
+          parts.push("【本节涉及的解构卡（只有站在本节这一维的卡；别的维的卡不在本节写）】\n" + packCards(mine, 900));
+        } else if (sec === 1 || sec === 5) parts.push("【解构卡（节选）】\n" + packCards(b.cards, sec === 5 ? 400 : 250));
+        if (art.surface && need("surface")) parts.push("【表面挑战清单】\n" + clean(art.surface, 3000));
+        if (art.challenges && need("challenges")) parts.push("【五大发生挑战】\n" + clean(art.challenges, sh("challenges") || 9000));
+        if (art.gaps && need("gaps")) parts.push("【现有方案的不足】\n" + clean(art.gaps, 6000));
+        if (art.collide && need("collide")) parts.push("【碰撞卡（⑧之二；第 7 节的第六条碰撞挑战、第 8 之二节全文、第 9 节碰撞级猜想都只许引它）】\n" + clean(art.collide, sh("collide") || 7000));
+        if (art.collideRun && need("collideRun")) parts.push("【碰撞真跑结果（支持／判负照登）】\n" + clean(art.collideRun, 4000));
+        if (art.conjectures && need("conjectures")) parts.push("【五条猜想】\n" + clean(art.conjectures, sh("conjectures") || 9000));
+        if (art.occupants && need("occupants")) parts.push("【占位者与分离线】\n" + clean(art.occupants, 5000));
+        if (art.territory && need("territory")) parts.push("【领地卡（⑨之二；第 9 之二节按此成文、第 10 节总纲引它；级别与结论已定，不得抬级）】\n" + clean(art.territory, sh("territory") || 8000));
+        if (art.territoryCheck && need("territoryCheck")) parts.push("【领地敌拓与退界裁定（照登；定级以此为准）】\n" + clean(art.territoryCheck, 4000));
+        if (b.prev) parts.push("【已写各节（只列标题与首段，用来避免重复，不要复述）】\n" + clean(b.prev, 1500));
+        if (b.residue) parts.push("【上一稿残留的 SDE 字面（改姓机检抓到的，这一稿一处都不许再出现，用映射表右栏重说）】\n" + clean(b.residue, 600));
         const rn = b.rename && typeof b.rename === "object" ? b.rename : null;
         const dispH = rn && rn.sections && rn.sections[S.h] ? clean(rn.sections[S.h], 120) : "";
         if (rn) parts.push("【⑩之二 术语映射表（改性：正文只许用右栏的学科说法）】\n" + clean((rn.terms || []).map((t) => (t.sde || "") + " → " + (t.disc || "") + (t.def ? "（" + t.def + "）" : "")).join("\n"), 5000) + (rn.zName ? "\nZ 的学科名：" + clean(rn.zName, 120) : "") + (sec === 1 && rn.frameBox ? "\n第 2 节末尾方框「本文的分析框架」（原样放在本节末尾，≤300 字，本节唯一许提 SDE 的地方）：" + clean(rn.frameBox, 600) : ""));
         sys = "你是 SDE 学派的综述作者，正在写一篇「" + REVIEW_TYPE_NAME[type] + "」的第 " + (sec + 1) + " 节，节名《" + S.h + "》。综述按格写、不按篇写：任何一节不得出现「论文一……论文二……」的顺序复述，篇只作为格里的证据出现。\n" + REVIEW_TOOL_TEXT[type] + REVIEW_SDEM +
           "\n硬律：每篇被引用的论文在其所在格至少引一句原文锚句（取自卡）；空格必须起名；自撞必须点名合并；断链必须写到能塌格；只引给定清单里的篇号；本节所用的工序产出件（整图／挑战／不足／猜想）已经定下，本节是把它们编排成文，不得改其结论；不要在正文里重写本节标题，直接从正文写起。" + (rn ? "\n改性硬律（⑩之二）：本节是给本学科审稿人读的学科语言版——「显露」「差异序列」「特征纠缠」「S=F(D,E)」「三方程」「六路径」「三原理」「起手维」「落点维」「中间维」「断链」「空格」「挤格」「自撞」「敌拓」「落格」「典范级」「碰撞级」「改判级」「回写」「测量原语」「S→」「→D」「→E」这些字面一次都不许出现" + (sec === 1 ? "（本节末尾的方框除外）" : "") + "；每处判断用映射表右栏的学科说法重说（删掉任何括号里的 SDE 词句子仍成立），不许括号注释；格名写成学科化路名（如「显示→现场→判断」）、Z 只用它的学科名；结论、篇号、数字、级别一字不改。学科化标题：" + (dispH || "（未给，按节名意译）") : "") + REVIEW_STYLE;
+        /* 总预算：按基底给上下文——OpenRouter 免费型号与 32K 基底 28000 字，其余 60000 字；超了从最长的件开始等比压，不整件丢 */
+        const CAP = (/openrouter\.ai/.test(String(VC.url)) || /free|32k/i.test(String(VC.model))) ? 28000 : 60000;
+        let total = parts.reduce((a, p) => a + p.length, 0);
+        if (total > CAP) {
+          const ratio = Math.max(0.25, (CAP - 3000) / total);
+          for (let i = 1; i < parts.length; i++) { const lim = Math.max(1200, Math.round(parts[i].length * ratio)); if (parts[i].length > lim) parts[i] = parts[i].slice(0, lim) + "\n…（按基底上下文预算截断）"; }
+        }
         usr = HEAD + "\n" + parts.join("\n\n") + "\n\n现在写第 " + (sec + 1) + " 节《" + S.h + "》。本节要写的：" + S.ask + "\n目标约 " + S.words + " 汉字（±20%）。可用短小小节标题分层。直接从正文写起，不要开场白，不要写节名。";
         tok = deep ? Math.min(9500, Math.round(S.words * 2.6) + 1200) : Math.min(7500, Math.round(S.words * 2.2) + 800);
       } else {
