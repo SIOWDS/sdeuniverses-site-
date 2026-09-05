@@ -73,7 +73,7 @@ TYPES.forEach((t) => {
 /* ═══ 路由静态检查 ═══ */
 console.log("── 路由与页面 ──");
 ok("worker.js 里有 /api/wds/review-gen 路由", WSRC.indexOf('url.pathname === "/api/wds/review-gen"') > 0);
-["frame", "card", "map", "surface", "challenges", "gaps", "conjectures", "occupants", "write"].forEach((m) => ok("mode " + m + " 有分支", WSRC.indexOf('rmode === "' + m + '"') > 0));
+["frame", "card", "map", "neighbors", "verdict", "surface", "challenges", "gaps", "conjectures", "occupants", "write"].forEach((m) => ok("mode " + m + " 有分支", WSRC.indexOf('rmode === "' + m + '"') > 0));
 ok("worker.js 写明权威出处", WSRC.indexOf("tools/skills/sde-review-genesis.md") > 0);
 const PAGE_P = path.join(ROOT, "public/taste/review-gen/index.html");
 ok("页面在仓库里", fs.existsSync(PAGE_P));
@@ -92,6 +92,10 @@ if (fs.existsSync(PAGE_P)) {
     ok("页面 SKELETON 与机器逐节一致", TYPES.every((t) => PS[t] && PS[t].length === SKEL[t].length && PS[t].every((s, i) => s.h === SKEL[t][i].h && s.words === SKEL[t][i].words)));
   }
   ok("页面无 href=\"#\" 死链", !/href="#"/.test(PG));
+  ok("页面有工序⑤之二敌拓闸阶段（neighbors/verdict）", PG.indexOf('mode:"neighbors"') > 0 && PG.indexOf('mode:"verdict"') > 0);
+  ok("页面有 How-卡路径机检 routeCheck", PG.indexOf("function routeCheck(") > 0);
+  ok("Skill 是 v1.2 且含工序⑤之二", /version:\s*1\.2/.test(SKILL) && SKILL.indexOf("工序⑤之二 敌拓闸") > 0);
+  ok("worker 占位者栏只引⑤之二（prompt 里有三判）", WSRC.indexOf("只许引给定的敌拓闸三判结果") > 0);
 }
 
 console.log("\n" + pass + " passed, " + fail + " failed");
