@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>综述论文生成器 · N 篇论文进，一篇综述出：SDE 系统解构器各按其位 | SDE Universes</title>
-<meta name="description" content="上传 3–30 篇论文（Word .docx / PDF / 图片 / 纯文本，文件只在你本机解析、绝不上传），生成器先判类（What-综述按三方程／How-综述按六路径／Why-综述按三原理），再用 SDE 系统解构器给每篇论文出一张解构卡，把 N 张卡摆成整图（挤格·空格·自撞·断链），最后按格写、不按篇写，分节生成一篇一万余字的综述论文。用你自己的大模型 Key（只存本地）。">
+<title>综述论文生成器 · 十道工序：主题与研究问题进，研究指导总纲出 | SDE Universes</title>
+<meta name="description" content="输入学科主题、研究问题，注明 What／How／Why 类型，按《SDE 综述生成 Skill》十道工序生成一篇作为研究指导总纲的综述：立题闸→文献采集（OpenAlex，三层×可核出处）→逐篇 SDE 解构卡→整图→表面挑战→五大发生挑战→现有方案的不足→SDE 猜想解决（含占位者实搜）→分节成文。可另上传自己的论文全文。用你自己的大模型 Key（只存本地）。">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -108,6 +108,46 @@ textarea:focus{outline:none;border-color:var(--gold)}
 .refs{font-size:13.5px;color:#DCE3EA;line-height:1.8}
 .refs div{padding:2px 0}
 input[type=text].topic{max-width:640px}
+.seg button.t-what.on{background:rgba(212,178,94,0.18);color:var(--gold2)}
+.seg button.t-how.on{background:rgba(61,165,165,0.2);color:#7FD4C8}
+.seg button.t-why.on{background:rgba(155,123,212,0.22);color:#C7B5F0}
+.stages{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;font-size:12px}
+.stages span{background:var(--panel2);border:1px solid var(--border);border-radius:16px;padding:4px 11px;color:var(--muted)}
+.stages span.on{border-color:var(--gold);color:var(--gold2)}
+.stages span.done{border-color:rgba(63,185,80,0.5);color:var(--ok)}
+.rcard.cls{border-top:3px solid var(--gold)}
+.rcard.map{border-top:3px solid var(--teal)}
+.rcard.paper{border-top:3px solid #C7B5F0}
+.rcard.lit{border-top:3px solid #5FBF7F}
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.dcard{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.7}
+.dcard b{display:block;color:var(--gold2);font-size:13.5px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dcard .f{color:#DCE3EA;white-space:pre-wrap;max-height:220px;overflow:auto}
+.dcard .f.open{max-height:none}
+.dcard .more{font-size:12px;color:var(--muted);cursor:pointer;margin-top:6px}
+.sec{margin:26px 0 0}
+.sec h3{font-size:17px;color:var(--gold2);margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.sec .body p{margin:0 0 12px;font-size:14.8px;line-height:1.9;color:#DCE3EA}
+.sec .body h4{font-size:14.5px;color:#C9B27A;margin:16px 0 6px}
+.sec .tools,.rtools{display:flex;gap:10px;align-items:center;margin:4px 0 8px;font-size:12px;color:var(--muted)}
+.chk{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.chk span{font-size:12px;border-radius:14px;padding:4px 11px;border:1px solid var(--border);color:var(--muted)}
+.chk span.ok{border-color:rgba(63,185,80,0.5);color:var(--ok)}
+.chk span.bad{border-color:rgba(248,81,73,0.5);color:#FCA5A5}
+.refs{font-size:13.5px;color:#DCE3EA;line-height:1.8}
+.refs div{padding:2px 0}
+input[type=text].wide{max-width:none}
+.lit{width:100%;border-collapse:collapse;font-size:12.8px}
+.lit th,.lit td{border-bottom:1px solid var(--border);padding:6px 6px;text-align:left;vertical-align:top}
+.lit th{color:var(--muted);font-weight:600;white-space:nowrap}
+.lit td.c{text-align:center;white-space:nowrap}
+.lit a{color:var(--gold2)}
+.lay{display:inline-block;border-radius:10px;padding:1px 8px;font-size:11.5px;border:1px solid var(--border)}
+.lay.classic{color:#C9B27A}.lay.modern{color:#7FD4C8}.lay.frontier{color:#C7B5F0}.lay.upload{color:var(--ok)}
+.litbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:10px 0;font-size:13px;color:var(--muted)}
+.artbody{white-space:pre-wrap;font-size:14px;line-height:1.85;color:#DCE3EA}
+.more{cursor:pointer;color:var(--muted);font-size:12px}
+.more:hover{color:var(--text)}
 </style>
 </head>
 <body>
@@ -118,11 +158,11 @@ input[type=text].topic{max-width:640px}
 
 <header class="hero">
   <div class="hero-glow"></div>
-  <div class="eyebrow">品尝系列 · 综述论文生成器</div>
+  <div class="eyebrow">品尝系列 · 综述论文生成器 · 十道工序</div>
   <h1>综述<span class="grad">论文生成器</span></h1>
-  <p class="sub">N 篇论文进，一篇综述出。<b>文件只在你本机解析、绝不上传</b>（Word .docx / PDF / 图片 / 纯文本，最多 30 篇）。生成器先<b>判类</b>——知识型综述按<b>三方程</b>、技术型综述按<b>六路径</b>、动力机制型综述按<b>三原理</b>；再用 <b>SDE 系统解构器</b>给每篇论文出一张解构卡，把 N 张卡摆成<b>整图</b>（挤格 · 空格 · 自撞 · 断链），最后<b>按格写、不按篇写</b>，分节写出一篇一万余字的综述。读边不读画：综述交出来的是那张带着空格的整图，不是 N 段摘要。</p>
+  <p class="sub">填一个<b>学科主题</b>、一个<b>研究问题</b>，注明是 <b>What／How／Why</b> 哪一类，机器按《SDE 综述生成 Skill》十道工序走到底：立题闸 → 文献采集（<b>OpenAlex 开放学术库，三层×可核出处</b>）→ 逐篇 <b>SDE 系统解构卡</b> → 整图 → 表面挑战 → <b>五大发生挑战</b>（不是论文自己说的那种）→ 现有方案的不足 → <b>SDE 猜想解决</b>（含占位者实搜）→ 分节成文。出来的不是文献摘要清单，是一份<b>研究指导总纲</b>。可另上传你自己的论文全文（本机解析、不上传）。</p>
   <div class="flow">
-    <span>上传 N 篇</span><span class="arr">→</span><span>判类 What/How/Why</span><span class="arr">→</span><span>逐篇解构卡</span><span class="arr">→</span><span>整图</span><span class="arr">→</span><span>分节成文</span>
+    <span>① 立题</span><span class="arr">→</span><span>② 文献</span><span class="arr">→</span><span>③④ 出卡</span><span class="arr">→</span><span>⑤ 整图</span><span class="arr">→</span><span>⑥⑦ 挑战</span><span class="arr">→</span><span>⑧ 不足</span><span class="arr">→</span><span>⑨ 猜想</span><span class="arr">→</span><span>⑩ 成文</span>
   </div>
 </header>
 
@@ -150,29 +190,39 @@ input[type=text].topic{max-width:640px}
       <div class="kwrap"><input id="glmKey" type="password" placeholder="只存你的浏览器本地，本站不经手"><button class="ktog" data-for="glmKey">显示</button></div>
       <div class="khint">还没有 Key？去 <a href="https://open.bigmodel.cn" target="_blank" rel="noopener">open.bigmodel.cn</a> 申请。深度思考档跑 GLM-5 思考模式。</div>
     </div>
-    <div class="lbl" style="margin-top:6px">综述类型</div>
-    <div class="row" style="margin-bottom:10px">
+  </div>
+
+  <div class="card">
+    <h2><span class="n">②</span>题面</h2>
+    <div class="lbl">学科主题</div>
+    <input id="topic" class="wide" type="text" placeholder="例：Operator Assistance in Process Industry（流程工业操作员辅助）">
+    <div class="lbl" style="margin-top:12px">研究问题</div>
+    <input id="question" class="wide" type="text" placeholder="例：现场操作员究竟被「辅助」了什么？它与自动化、与监控的分界在哪？">
+    <div class="lbl" style="margin-top:12px">类型（必选）</div>
+    <div class="row" style="margin-bottom:8px">
       <div class="seg" id="typeSeg">
-        <button data-k="auto" class="on">自动判类</button>
         <button data-k="what" class="t-what">What-综述 · 三方程</button>
         <button data-k="how" class="t-how">How-综述 · 六路径</button>
         <button data-k="why" class="t-why">Why-综述 · 三原理</button>
       </div>
+      <div class="seg" id="nSeg" style="margin-left:auto">
+        <button data-n="30" class="on">30 篇</button>
+        <button data-n="45">45 篇</button>
+        <button data-n="60">60 篇</button>
+      </div>
     </div>
-    <div class="khint" style="margin-bottom:12px">知识型／理论型（谁决定谁）→ What；技术型／应用型（从哪起手到哪落地）→ How；动力机制型（凭什么持续发生）→ Why。三类混杂时主类由多数决定，副类归「越位文献」一节，不硬塞。</div>
-    <div class="lbl">综述主题（可不填，由文献自己长出来）</div>
-    <input id="topic" class="topic" type="text" placeholder="例：流程工业操作员辅助的工序验证">
+    <div class="khint">知识型／理论型（谁决定谁）→ What；技术型／应用型（从哪起手到哪落地）→ How；动力机制型（凭什么持续发生）→ Why。一个问题通常写三篇，构成三个指导方向。文献篇数是工序②的目标数：经典层（≥20 年）≥6、现代层（5–20 年）≥12、前沿层（≤5 年）≥12。</div>
   </div>
 
   <div class="card">
-    <h2><span class="n">②</span>上传论文</h2>
+    <h2><span class="n">③</span>另加你自己的论文（可选）</h2>
     <div class="drop" id="drop">
       <div class="di">⧉</div>
       <div class="dt">点这里选文件，或把 Word/PDF 拖进来（可一次多选）</div>
-      <div class="ds">支持 Word .docx · PDF（数字版与扫描版都读）· 图片 png/jpg/webp · 纯文本 .txt/.md · 网页 .html · .rtf　｜　单篇 ≤ 100MB · 最多 30 篇</div>
+      <div class="ds">Word .docx · PDF（数字版与扫描版）· 图片 · .txt/.md/.html/.rtf　｜　单篇 ≤ 100MB · 最多 30 篇 · 本机解析，绝不上传</div>
     </div>
     <input type="file" id="fileIn" accept=".docx,.pdf,.txt,.md,.markdown,.html,.htm,.rtf,.png,.jpg,.jpeg,.webp,.bmp,.gif,.tif,.tiff,image/*" multiple style="display:none">
-    <div class="tip">PDF 自动<b>识别双栏／多栏版面</b>按阅读顺序还原；数字 PDF 里<b>夹着的扫描页会自动逐页 OCR</b>；整篇扫描版标为「可 OCR」，点该行「🔍 OCR 提取」在本机识别。旧版 .doc 请另存为 .docx，或把正文粘到下面。文件顺序即参考文献序号。</div>
+    <div class="tip">上传的论文进入工序②清单时标为「上传全文」层，出卡用全文；OpenAlex 取回的条目只有摘要，出卡标「摘要卡」——摘要撑不住的格会如实写「写不出」，不编。</div>
     <div id="queue" style="display:none"></div>
     <div class="pastebox">
       <div class="lbl" style="margin-top:6px">或粘贴一篇正文</div>
@@ -183,22 +233,21 @@ input[type=text].topic{max-width:640px}
 
   <div class="card">
     <div class="actions">
-      <button class="btn" id="goBtn" disabled>生成综述</button>
-      <button class="btn ghost" id="mapBtn" style="display:none">重摆整图</button>
-      <button class="btn ghost" id="writeBtn" style="display:none">重写全文</button>
+      <button class="btn" id="goBtn" disabled>① 立题 → ② 采集文献</button>
+      <button class="btn" id="runBtn" style="display:none">③～⑩ 出卡、整图、挑战、猜想、成文</button>
       <button class="btn ghost" id="mdBtn" style="display:none">下载 .md</button>
       <button class="btn ghost" id="pdfBtn" style="display:none">打印 / PDF</button>
       <span class="status" id="status"></span>
     </div>
     <div class="stages" id="stages">
-      <span data-s="cls">判类</span><span data-s="card">逐篇出卡</span><span data-s="map">整图</span><span data-s="write">分节成文</span><span data-s="check">自检</span>
+      <span data-s="frame">①立题</span><span data-s="lit">②文献</span><span data-s="card">③④出卡</span><span data-s="map">⑤整图</span><span data-s="surface">⑥表面</span><span data-s="challenges">⑦挑战</span><span data-s="gaps">⑧不足</span><span data-s="conjectures">⑨猜想</span><span data-s="write">⑩成文</span><span data-s="check">自检</span>
     </div>
   </div>
 
   <div id="results"></div>
 </main>
 
-<div class="foot">由大模型生成，观点供思考参考；引注只取自你上传的文献，请以原文核对。文件解析全部在你本机浏览器内完成（PDF.js 版面重排／mammoth／tesseract.js 本机 OCR），文件绝不上传；正文与 API Key 只在你选定基底时发往该基底，本站不留存。规范层：SDE 学派《学科综述论文写作 Skill》v1.0。sdeuniverses.com</div>
+<div class="foot">由大模型生成，观点供思考参考；引注只取自工序②清单，每条自带 DOI／出处，请以原文核对。文献采集走 OpenAlex 官方开放接口（浏览器直连，不经本站）；上传文件全部在你本机浏览器内解析，绝不上传；正文与 API Key 只在你选定基底时发往该基底，本站不留存。规范层：SDE 学派《SDE 综述生成 Skill》v1.1（十道工序）。sdeuniverses.com</div>
 
 <script>
 (function(){
@@ -206,19 +255,25 @@ input[type=text].topic{max-width:640px}
 var $=function(s,r){return (r||document).querySelector(s);};
 var MAXFILES=30, MAXSIZE=100*1024*1024, PERTEXT=60000;
 var ENDPOINT="/api/wds/review-gen";
-var articles=[];           // {id,title,text,chars,status,result(卡),err}
+var articles=[];           // 上传：{id,title,text,chars,status,result,err}
 var running=false, seq=0;
 var vendor=localStorage.getItem("sde_wds_vendor")||"ds";
 var tier=localStorage.getItem("sde_rev_tier")||"deep";
-var kind=localStorage.getItem("sde_rev_kind")||"auto";   // auto|what|how|why
-/* 章目表——唯一权威 tools/skills/sde-review-writing.md §五，这里是它的编译产物（words=0 的参考文献由本页拼装） */
+var kind=localStorage.getItem("sde_rev_kind")||"";        // what|how|why，必选
+var targetN=parseInt(localStorage.getItem("sde_rev_n")||"30",10);
+/* 章目表——唯一权威 tools/skills/sde-review-genesis.md §10.1 之二，这里是它的编译产物（words=0 的参考文献由本页拼装） */
+var HEAD=[{h:"问题与判类",words:900},{h:"解构方法",words:1000}];
+var TAIL=[{h:"整图：挤格、空格、自撞、断链",words:2000},{h:"表面挑战与发生挑战",words:3000},{h:"现有方案的不足",words:1500},{h:"SDE 猜想解决",words:3000},{h:"研究总纲：三个指导方向里的这一个",words:1000},{h:"参考文献",words:0}];
 var SKELETON={
-  what:[{h:"问题与判类",words:900},{h:"解构方法",words:900},{h:"站在 S=F(D,E) 上的文献",words:2200},{h:"站在 D=G(S,E) 上的文献",words:2200},{h:"站在 E=H(S,D) 上的文献",words:2200},{h:"整图：挤格、空格、自撞、断链",words:2000},{h:"共有前提与越位文献",words:1200},{h:"议程：下一篇该往哪写",words:900},{h:"参考文献",words:0}],
-  how:[{h:"任务与判类",words:900},{h:"解构方法",words:900},{h:"从 S 起手的方法（S→D→E／S→E→D）",words:2000},{h:"从 D 起手的方法（D→S→E／D→E→S）",words:2000},{h:"从 E 起手的方法（E→S→D／E→D→S）",words:2000},{h:"读数与失效条件对照",words:1500},{h:"整图：挤路、空路、自撞、断链",words:2000},{h:"共有前提与越位文献",words:1200},{h:"议程：下一代方法该走哪条路",words:900},{h:"参考文献",words:0}],
-  why:[{h:"现象与判类",words:900},{h:"解构方法",words:900},{h:"原理一：D×E 矛盾推动 S 改变",words:2200},{h:"原理二：S×E 矛盾推动 D 改变",words:2200},{h:"原理三：S×D 矛盾推动 E 改变",words:2200},{h:"存续论证与可替代性对照",words:1500},{h:"整图：挤格、空格、自撞、断链",words:2000},{h:"共有前提与越位文献",words:1200},{h:"议程：哪条动力还没人论证",words:900},{h:"参考文献",words:0}]
+  what:HEAD.concat([{h:"站在 S=F(D,E) 上的文献",words:2000},{h:"站在 D=G(S,E) 上的文献",words:2000},{h:"站在 E=H(S,D) 上的文献",words:2000}],TAIL),
+  how:HEAD.concat([{h:"从 S 起手的方法（S→D→E／S→E→D）",words:2000},{h:"从 D 起手的方法（D→S→E／D→E→S）",words:2000},{h:"从 E 起手的方法（E→S→D／E→D→S）",words:2000}],TAIL),
+  why:HEAD.concat([{h:"原理一：D×E 矛盾推动 S 改变",words:2000},{h:"原理二：S×E 矛盾推动 D 改变",words:2000},{h:"原理三：S×D 矛盾推动 E 改变",words:2000}],TAIL)
 };
 var TYPE_NAME={what:"What-综述（知识型 · 三方程）",how:"How-综述（技术型 · 六路径）",why:"Why-综述（动力机制型 · 三原理）"};
-var state={type:"",clsText:"",clsReason:"",perPaper:{},mapText:"",mapState:"",sections:[],title:""};
+var LAYER_NAME={classic:"经典",modern:"现代",frontier:"前沿",upload:"上传全文"};
+var state=null;
+function fresh(){ state={type:kind,frame:null,frameText:"",lit:[],mapText:"",surface:"",challenges:"",gaps:"",conjectures:"",conjQueries:[],hits:"",occupants:"",sections:[],title:"",log:{},stage:""}; }
+fresh();
 
 /* ---- 设置：基底 / 档位 / Key ---- */
 var dsKey=$("#dsKey"), glmKey=$("#glmKey");
@@ -625,29 +680,31 @@ function renderQueue(){
 
 function analyzable(){ return articles.filter(function(a){return a.text&&a.text.replace(/\s/g,"").length>=30;}); }
 function updateBtns(){
-  var canRun=!running&&analyzable().length>=1&&!!curKey();
-  $("#goBtn").disabled=!canRun;
-  $("#goBtn").textContent=running?"生成中…":"生成综述";
-  var cards=articles.filter(function(a){return a.status==="done"&&a.result;});
-  $("#mapBtn").style.display=(cards.length>=2&&!running)?"inline-block":"none";
-  $("#writeBtn").style.display=(state.mapText&&!running)?"inline-block":"none";
+  var ready=!running&&!!curKey()&&!!kind&&$("#topic").value.trim()&&$("#question").value.trim();
+  $("#goBtn").disabled=!ready;
+  $("#goBtn").textContent=running?"进行中…":"① 立题 → ② 采集文献";
+  var selN=state.lit.filter(function(x){return x.sel;}).length;
+  $("#runBtn").style.display=(state.frame&&selN>=2&&!running)?"inline-block":"none";
   var written=state.sections.filter(function(s){return s.text;}).length;
   $("#mdBtn").style.display=written?"inline-block":"none";
   $("#pdfBtn").style.display=written?"inline-block":"none";
 }
 function setStatus(t){ $("#status").innerHTML=t||""; }
 function setStage(s,mode){ document.querySelectorAll("#stages span").forEach(function(x){ if(x.dataset.s===s){ x.classList.remove("on","done"); if(mode) x.classList.add(mode); } }); }
-document.querySelectorAll("#typeSeg button").forEach(function(b){b.onclick=function(){ if(running) return; kind=b.dataset.k; localStorage.setItem("sde_rev_kind",kind); document.querySelectorAll("#typeSeg button").forEach(function(x){x.classList.toggle("on",x.dataset.k===kind);}); };});
+document.querySelectorAll("#typeSeg button").forEach(function(b){b.onclick=function(){ if(running) return; kind=b.dataset.k; localStorage.setItem("sde_rev_kind",kind); document.querySelectorAll("#typeSeg button").forEach(function(x){x.classList.toggle("on",x.dataset.k===kind);}); updateBtns(); };});
 document.querySelectorAll("#typeSeg button").forEach(function(x){x.classList.toggle("on",x.dataset.k===kind);});
+document.querySelectorAll("#nSeg button").forEach(function(b){b.onclick=function(){ targetN=parseInt(b.dataset.n,10); localStorage.setItem("sde_rev_n",String(targetN)); document.querySelectorAll("#nSeg button").forEach(function(x){x.classList.toggle("on",parseInt(x.dataset.n,10)===targetN);}); };});
+document.querySelectorAll("#nSeg button").forEach(function(x){x.classList.toggle("on",parseInt(x.dataset.n,10)===targetN);});
+["#topic","#question"].forEach(function(s){ $(s).addEventListener("input",updateBtns); });
 
-/* ---- SSE 调用：四个 mode 全走流式；onTok 逐字回调，resolve 全文 ---- */
+/* ---- SSE ---- */
 function sse(body,onTok,onStage){
-  body.tier=tier;
+  body.tier=tier; body.type=kind; body.topic=$("#topic").value.trim(); body.question=$("#question").value.trim();
   return new Promise(function(res,rej){
     fetch(ENDPOINT,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)}).then(function(r){
       var ct=r.headers.get("content-type")||"";
       if(ct.indexOf("text/event-stream")<0){ return r.json().catch(function(){return {ok:false,msg:"HTTP "+r.status};}).then(function(j){ rej(new Error(j.msg||("HTTP "+r.status))); }); }
-      var rd=r.body.getReader(), dec=new TextDecoder(), buf="", out="", errMsg="", ended=false;
+      var rd=r.body.getReader(), dec=new TextDecoder(), buf="", out="", errMsg="";
       function pump(){
         return rd.read().then(function(rr){
           if(rr.done){ if(errMsg&&!out) rej(new Error(errMsg)); else res(out); return; }
@@ -656,13 +713,13 @@ function sse(body,onTok,onStage){
           while((i=buf.indexOf("\n"))>=0){
             var line=buf.slice(0,i).trim(); buf=buf.slice(i+1);
             if(line.indexOf("data:")!==0) continue;
-            var pl=line.slice(5).trim(); if(pl==="[DONE]"){ ended=true; continue; }
+            var pl=line.slice(5).trim(); if(pl==="[DONE]") continue;
             var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
             if(j.t==="token"){ out+=j.v; if(onTok) onTok(out,j.v); }
             else if(j.t==="think"){ if(onStage) onStage("思考中 "+j.v+" 字…"); }
             else if(j.t==="stage"){ if(onStage) onStage(j.v); }
             else if(j.t==="error"){ errMsg=j.v||"出错"; }
-            else if(j.t==="end"){ if(j.v&&j.v.truncated&&onStage) onStage("（本段触及长度上限，已截断）"); }
+            else if(j.t==="end"){ if(j.v&&j.v.truncated&&onStage) onStage("（触及长度上限，已截断）"); }
           }
           return pump();
         });
@@ -677,124 +734,184 @@ async function pool(items,worker,cc){
   await Promise.all(runners);
 }
 function esc2(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-function parseJson(t){
-  t=String(t||"").replace(/```json|```/g,"");
-  var a=t.indexOf("{"), b=t.lastIndexOf("}");
-  if(a<0||b<a) return null;
-  try{ return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; }
-}
+function parseJson(t){ t=String(t||"").replace(/```json|```/g,""); var a=t.indexOf("{"), b=t.lastIndexOf("}"); if(a<0||b<a) return null; try{ return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; } }
+function parseJsonArr(t){ t=String(t||"").replace(/```json|```/g,""); var a=t.indexOf("["), b=t.lastIndexOf("]"); if(a<0||b<a) return null; try{ return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; } }
+function spin(t){ return '<span class="spinner"></span> '+t; }
 
-/* ═══ 主流程：判类 → 逐篇出卡 → 整图 → 分节成文 → 自检 ═══ */
+/* ═══ 工序② 文献采集：OpenAlex 直连（有 CORS），不经基底 ═══ */
+var YEAR=new Date().getFullYear();
+function layerOf(y){ if(!y) return "modern"; var age=YEAR-y; return age>=20?"classic":(age<=5?"frontier":"modern"); }
+function absFromIdx(ii){ if(!ii) return ""; var arr=[]; Object.keys(ii).forEach(function(w){ (ii[w]||[]).forEach(function(p){ arr[p]=w; }); }); return arr.filter(Boolean).join(" ").slice(0,2500); }
+async function searchOA(q,n){
+  var p=new URLSearchParams({search:q,"per-page":String(Math.min(n,50)),sort:"relevance_score:desc",select:"id,doi,title,publication_year,cited_by_count,authorships,primary_location,abstract_inverted_index",mailto:"contact@sdeuniverses.com"});
+  var r=await fetch("https://api.openalex.org/works?"+p); if(!r.ok) throw new Error("OpenAlex "+r.status);
+  var d=await r.json();
+  return (d.results||[]).map(function(w,rank){ return {title:w.title||"",year:w.publication_year||0,cites:w.cited_by_count||0,
+    authors:(w.authorships||[]).slice(0,4).map(function(a){return a.author&&a.author.display_name||"";}).filter(Boolean).join(", "),
+    venue:((w.primary_location||{}).source||{}).display_name||"",doi:(w.doi||"").replace("https://doi.org/",""),url:w.doi||w.id,abstract:absFromIdx(w.abstract_inverted_index),rank:rank,q:q}; });
+}
+function litKey(it){ return ((it.doi||it.title)||"").toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]/g,""); }
+function litScore(it){ var rel=Math.max(0,30-(it.rank||0)); return rel+Math.min(Math.sqrt(it.cites||0),25); }
+async function collectLit(queries){
+  var lists=[], done=0;
+  await pool(queries,async function(q){ try{ lists.push(await searchOA(q,25)); }catch(e){ lists.push([]); } done++; setStatus(spin("② 采集文献 "+done+" / "+queries.length+" 条检索词…")); },3);
+  var seen={}, out=[];
+  lists.forEach(function(L){ L.forEach(function(it){ if(!it.title) return; var k=litKey(it); if(k in seen){ var o=out[seen[k]]; o.rank=Math.min(o.rank,it.rank); if(!o.abstract&&it.abstract) o.abstract=it.abstract; return; } seen[k]=out.length; out.push(it); }); });
+  out.forEach(function(it){ it.layer=layerOf(it.year); it.score=litScore(it); it.material=it.abstract?"abstract":"none"; it.sel=false; });
+  return out;
+}
+function selectLit(items){
+  var quota={classic:6,modern:12,frontier:12};
+  var by={classic:[],modern:[],frontier:[]};
+  items.forEach(function(it){ if(it.material==="none") return; by[it.layer].push(it); });
+  Object.keys(by).forEach(function(k){ by[k].sort(function(a,b){return b.score-a.score;}); });
+  var picked=[];
+  Object.keys(quota).forEach(function(k){ by[k].slice(0,quota[k]).forEach(function(it){ it.sel=true; picked.push(it); }); });
+  var rest=items.filter(function(it){return !it.sel&&it.material!=="none";}).sort(function(a,b){return b.score-a.score;});
+  var need=targetN-picked.length; rest.slice(0,Math.max(0,need)).forEach(function(it){ it.sel=true; });
+}
+function litAll(){
+  var up=analyzable().map(function(a){ return {title:a.title,year:0,cites:0,authors:"",venue:"上传全文",doi:"",url:"",abstract:"",layer:"upload",material:"fulltext",text:a.text,sel:true,score:999,upId:a.id}; });
+  return up.concat(state.lit);
+}
+function litSelected(){ return litAll().filter(function(x){return x.sel;}).map(function(x,i){ x.i=i+1; return x; }); }
+function refString(x){ return (x.authors?x.authors+". ":"")+(x.year?x.year+". ":"")+x.title+(x.venue?". "+x.venue:"")+(x.doi?". doi:"+x.doi:"")+(x.layer==="upload"?"（上传全文）":""); }
+
+/* ═══ ① 立题 → ② 采集 ═══ */
 $("#goBtn").onclick=async function(){
-  var kv=curKey(); if(!kv){ setStatus("请先在上方填入所选基底的 API Key。"); return; }
-  var todo=analyzable();
-  if(!todo.length){ setStatus("先加入至少一篇能解析出文字的论文。"); return; }
-  running=true; updateBtns(); renderQueue();
-  state={type:"",clsText:"",clsReason:"",perPaper:{},mapText:"",mapState:"",sections:[],title:""};
-  articles.forEach(function(a){ a.result=""; if(a.status==="done"||a.status==="analyzing") a.status="ready"; });
-  ["cls","card","map","write","check"].forEach(function(s){setStage(s,"");});
-  renderResults();
+  var kv=curKey(); if(!kv||!kind) return;
+  running=true; fresh(); state.type=kind; updateBtns(); renderResults();
+  document.querySelectorAll("#stages span").forEach(function(x){x.classList.remove("on","done");});
   try{
-    /* ① 判类 */
-    setStage("cls","on");
-    if(kind==="auto"){
-      setStatus('<span class="spinner"></span> 判类中（各篇取前 1500 字）…');
-      var items=todo.map(function(a){return {title:a.title,head:a.text.slice(0,1500)};});
-      var raw="";
-      try{ raw=await sse({mode:"classify",items:items,key:kv.key,vendor:kv.vendor},null,function(s){setStatus('<span class="spinner"></span> 判类：'+esc2(s));}); }catch(e){ raw=""; }
-      var j=parseJson(raw);
-      if(j&&j.type){ state.type=/^(what|how|why)$/.test(j.type)?j.type:"what"; state.clsReason=j.reason||""; (j.papers||[]).forEach(function(p){ state.perPaper[p.i]=p; }); }
-      else { state.type="what"; state.clsReason="判类调用未返回可读结果，按规则归入 What-综述（三方程是最粗的刀，切什么都能站住）。"; }
-    } else { state.type=kind; state.clsReason="由用户指定。"; }
-    state.clsText=TYPE_NAME[state.type];
-    setStage("cls","done"); renderResults();
-    /* ② 逐篇出卡（3 并发） */
+    setStage("frame","on"); setStatus(spin("① 立题闸…"));
+    state.frameText=await sse({mode:"frame",key:kv.key,vendor:kv.vendor},function(full){ state.frameText=full; },function(s){ setStatus(spin("①："+esc2(s))); });
+    state.frame=parseJson(state.frameText);
+    if(!state.frame||!Array.isArray(state.frame.queries)||!state.frame.queries.length) throw new Error("立题闸没有返回可读的检索词，重试一次。");
+    state.log.f1="题面卡：表面形态＝"+(state.frame.surface||"")+"；发生层改写＝"+(state.frame.genesis||"")+"；别名 "+(state.frame.aliases||[]).length+" 个；检索词 "+state.frame.queries.length+" 条。";
+    setStage("frame","done"); renderResults();
+    setStage("lit","on");
+    state.lit=await collectLit(state.frame.queries.slice(0,10));
+    selectLit(state.lit);
+    var c={classic:0,modern:0,frontier:0}; state.lit.forEach(function(it){ if(it.sel) c[it.layer]++; });
+    state.log.f2="文献清单：OpenAlex 取回 "+state.lit.length+" 条（去重后），预选 "+state.lit.filter(function(x){return x.sel;}).length+" 篇＋上传 "+analyzable().length+" 篇；经典/现代/前沿＝"+c.classic+"/"+c.modern+"/"+c.frontier+"；无摘要条目 "+state.lit.filter(function(x){return x.material==="none";}).length+" 条不入选。";
+    setStage("lit","done");
+    setStatus("② 清单已备好。勾掉不想要的、补上你自己的论文，然后点「③～⑩」。"+(c.classic<6?"⚠ 经典层不足 6 篇，可改检索词后重跑，或上传经典文献全文。":""));
+  }catch(e){ setStatus("中断："+esc2(e&&e.message||e)); }
+  running=false; updateBtns(); renderResults();
+};
+
+/* ═══ ③～⑩ ═══ */
+function cardsPayload(items){ return items.filter(function(x){return x.card&&x.card.indexOf("【出卡失败")!==0;}).map(function(x){ return {i:x.i,title:x.title,card:x.card,layer:LAYER_NAME[x.layer]}; }); }
+$("#runBtn").onclick=async function(){
+  var kv=curKey(); if(!kv||running) return;
+  var items=litSelected(); if(items.length<2){ setStatus("至少选两篇。"); return; }
+  running=true; updateBtns();
+  try{
+    /* ③④ 出卡 */
     setStage("card","on");
     var done=0;
-    todo.forEach(function(a){ a.status="analyzing"; a.result=""; });
-    renderQueue(); renderResults();
-    await pool(todo,async function(a,i){
+    items.forEach(function(x){ x.card=""; x.cardState="running"; });
+    renderResults();
+    await pool(items,async function(x){
       try{
-        var txt=await sse({mode:"card",type:state.type,title:a.title,text:a.text.slice(0,PERTEXT),idx:todo.indexOf(a)+1,key:kv.key,vendor:kv.vendor},function(full){ a.result=full; renderCardInline(a); });
-        a.result=txt; a.status="done";
-      }catch(e){ a.status="error"; a.result="【出卡失败："+(e&&e.message||e)+"】"; }
-      done++; setStatus('<span class="spinner"></span> 出卡 '+done+" / "+todo.length+" 篇…"); renderQueue(); renderResults();
+        var text=x.material==="fulltext"?x.text.slice(0,PERTEXT):x.abstract;
+        x.card=await sse({mode:"card",title:x.title,text:text,idx:x.i,material:x.material==="fulltext"?"fulltext":"abstract",meta:refString(x),key:kv.key,vendor:kv.vendor},function(full){ x.card=full; renderCardInline(x); });
+        x.cardState="done";
+      }catch(e){ x.cardState="error"; x.card="【出卡失败："+(e&&e.message||e)+"】"; }
+      done++; setStatus(spin("③④ 出卡 "+done+" / "+items.length+" 篇…")); renderResults();
     },3);
+    var okCards=cardsPayload(items);
+    state.log.f4="出卡 "+okCards.length+" 张（失败 "+(items.length-okCards.length)+"；摘要卡 "+items.filter(function(x){return x.material!=="fulltext"&&x.cardState==="done";}).length+"、全文卡 "+items.filter(function(x){return x.material==="fulltext"&&x.cardState==="done";}).length+"）。";
     setStage("card","done");
-    var cards=todo.filter(function(a){return a.status==="done"&&a.result;});
-    if(cards.length<2){ throw new Error("至少两张卡才能摆整图（成功 "+cards.length+" 张）。可重试失败的那几篇。"); }
-    /* ③ 整图 */
-    await runMap(kv,todo);
-    /* ④ 分节成文 */
-    await runWrite(kv,todo);
-    /* ⑤ 自检 */
+    if(okCards.length<2) throw new Error("成功的卡不足两张。");
+    /* ⑤ 整图 */
+    await stepText("map","mapText",{mode:"map",cards:okCards,key:kv.key,vendor:kv.vendor},"⑤ 摆整图…");
+    /* ⑥ 表面 */
+    await stepText("surface","surface",{mode:"surface",cards:items.map(function(x){return {i:x.i,title:x.title,card:(x.material==="fulltext"?"":"【摘要】"+(x.abstract||"")+"\n")+(x.card||""),layer:LAYER_NAME[x.layer]};}),key:kv.key,vendor:kv.vendor},"⑥ 抄表面挑战…");
+    /* ⑦ 挑战 */
+    await stepText("challenges","challenges",{mode:"challenges",map:state.mapText,surface:state.surface,cards:okCards,key:kv.key,vendor:kv.vendor},"⑦ 读发生挑战…");
+    /* ⑧ 不足 */
+    await stepText("gaps","gaps",{mode:"gaps",challenges:state.challenges,map:state.mapText,key:kv.key,vendor:kv.vendor},"⑧ 写不足…");
+    /* ⑨ 猜想 ＋ 占位者实搜 */
+    setStage("conjectures","on");
+    var raw=await sse({mode:"conjectures",challenges:state.challenges,gaps:state.gaps,map:state.mapText,key:kv.key,vendor:kv.vendor},function(full){ state.conjectures=full.split("===QUERIES===")[0]; renderArtInline("conjectures"); },function(s){ setStatus(spin("⑨："+esc2(s))); });
+    var sp=raw.split("===QUERIES===");
+    state.conjectures=sp[0].trim(); state.conjQueries=parseJsonArr(sp[1]||"")||[];
+    renderResults();
+    var hits=[];
+    if(state.conjQueries.length){
+      var qs=[]; state.conjQueries.forEach(function(c){ (c.queries||[]).slice(0,2).forEach(function(q){ qs.push({k:c.k,q:q}); }); });
+      var doneQ=0;
+      await pool(qs,async function(o){ try{ var L=await searchOA(o.q,5); L.forEach(function(it){ hits.push("【猜想 "+o.k+"｜检索词："+o.q+"】"+it.title+"（"+(it.authors||"")+"，"+(it.year||"")+"，"+(it.venue||"")+(it.doi?"，doi:"+it.doi:"")+"）"+(it.abstract?"\n摘要："+it.abstract.slice(0,400):"")); }); }catch(e){} doneQ++; setStatus(spin("⑨ 占位者实搜 "+doneQ+" / "+qs.length+"…")); },3);
+    }
+    state.hits=hits.join("\n\n");
+    state.log.f9="猜想 5 条；占位者实搜 "+state.conjQueries.length*2+" 条检索词，命中 "+hits.length+" 条记录。";
+    if(hits.length){ await stepText("conjectures","occupants",{mode:"occupants",conjectures:state.conjectures,hits:state.hits,key:kv.key,vendor:kv.vendor},"⑨ 写分离线…"); }
+    else { state.occupants="本轮占位者实搜未取回记录（检索词无结果或网络受限）；分离线未写，投稿前须人工补。"; }
+    setStage("conjectures","done"); renderResults();
+    /* ⑩ 成文 */
+    await runWrite(kv,items);
     setStage("check","on"); renderResults(); setStage("check","done");
-    setStatus("完成。可下载 .md 或打印为 PDF；单节可重写。");
+    setStatus("完成。可下载 .md 或打印为 PDF；任一工序产出件可单独重跑。");
   }catch(e){ setStatus("中断："+esc2(e&&e.message||e)); }
-  running=false; updateBtns(); renderQueue(); renderResults();
+  running=false; updateBtns(); renderResults();
 };
-function cardsOf(todo){ return todo.map(function(a,i){return {i:i+1,title:a.title,card:a.result||""};}).filter(function(c){return c.card&&c.card.indexOf("【出卡失败")!==0;}); }
-async function runMap(kv,todo){
-  setStage("map","on"); state.mapState="running"; state.mapText=""; renderResults();
-  setStatus('<span class="spinner"></span> 摆整图…');
-  state.mapText=await sse({mode:"map",type:state.type,cards:cardsOf(todo),key:kv.key,vendor:kv.vendor},function(full){ state.mapText=full; renderMapInline(); },function(s){ setStatus('<span class="spinner"></span> 整图：'+esc2(s)); });
-  state.mapState="done"; setStage("map","done"); renderResults();
+async function stepText(stage,field,body,label){
+  setStage(stage,"on"); state[field]=""; renderResults(); setStatus(spin(label));
+  state[field]=await sse(body,function(full){ state[field]=full; renderArtInline(field); },function(s){ setStatus(spin(label+esc2(s))); });
+  setStage(stage,"done"); renderResults();
 }
-async function runWrite(kv,todo){
+async function runWrite(kv,items){
   setStage("write","on");
   var sk=SKELETON[state.type];
   state.sections=sk.map(function(s){return {h:s.h,words:s.words,text:"",status:s.words?"pending":"auto"};});
-  var refs=todo.map(function(a){return a.title;});
-  var topic=$("#topic").value.trim();
-  state.title=(topic||"文献综述")+"："+TYPE_NAME[state.type].replace(/（.*$/,"");
+  state.title=($("#topic").value.trim()||"综述")+"："+TYPE_NAME[state.type].replace(/（.*$/,"");
   renderResults();
-  for(var i=0;i<state.sections.length;i++){ if(!state.sections[i].words) continue; await writeSec(kv,todo,i,refs,topic); }
+  for(var i=0;i<state.sections.length;i++){ if(!state.sections[i].words) continue; await writeSec(kv,items,i); }
   setStage("write","done"); renderResults();
 }
-async function writeSec(kv,todo,i,refs,topic){
+async function writeSec(kv,items,i){
   var S=state.sections[i]; S.status="running"; S.text=""; renderResults();
   var prev=state.sections.slice(0,i).filter(function(x){return x.text;}).map(function(x){return "《"+x.h+"》："+x.text.replace(/\s+/g," ").slice(0,160)+"…";}).join("\n");
-  setStatus('<span class="spinner"></span> 写第 '+(i+1)+' 节《'+esc2(S.h)+'》…');
+  setStatus(spin("⑩ 写第 "+(i+1)+" 节《"+esc2(S.h)+"》…"));
+  var art={frame:state.frameText,map:state.mapText,surface:state.surface,challenges:state.challenges,gaps:state.gaps,conjectures:state.conjectures,occupants:state.occupants};
   try{
-    S.text=await sse({mode:"write",type:state.type,sec:i,map:state.mapText,cards:cardsOf(todo),refs:refs,prev:prev,topic:topic,key:kv.key,vendor:kv.vendor},function(full){ S.text=full; renderSecInline(i); },function(s){ setStatus('<span class="spinner"></span> 第 '+(i+1)+' 节：'+esc2(s)); });
+    S.text=await sse({mode:"write",sec:i,art:art,cards:cardsPayload(items),refs:items.map(refString),prev:prev,key:kv.key,vendor:kv.vendor},function(full){ S.text=full; renderSecInline(i); },function(s){ setStatus(spin("第 "+(i+1)+" 节："+esc2(s))); });
     S.status="done";
   }catch(e){ S.status="error"; S.text="【本节生成失败："+(e&&e.message||e)+"，可点「重写此节」。】"; }
   renderResults();
 }
-$("#mapBtn").onclick=async function(){ var kv=curKey(); if(!kv||running) return; running=true; updateBtns(); try{ await runMap(kv,analyzable()); }catch(e){ setStatus("整图失败："+esc2(e&&e.message||e)); } running=false; updateBtns(); renderResults(); };
-$("#writeBtn").onclick=async function(){ var kv=curKey(); if(!kv||running||!state.mapText) return; running=true; updateBtns(); try{ await runWrite(kv,analyzable()); setStatus("重写完成。"); }catch(e){ setStatus("成文失败："+esc2(e&&e.message||e)); } running=false; updateBtns(); renderResults(); };
-
-/* ---- 单篇重出卡 / 单节重写 ---- */
-async function retryCard(id){
-  var todo=analyzable(); var a=todo.filter(function(x){return x.id===id;})[0]; if(!a||running) return;
-  var kv=curKey(); if(!kv){ setStatus("请先填入 API Key。"); return; }
-  if(!state.type){ setStatus("先点「生成综述」跑一遍判类。"); return; }
-  running=true; a.status="analyzing"; a.result=""; updateBtns(); renderQueue(); renderResults();
-  try{ a.result=await sse({mode:"card",type:state.type,title:a.title,text:a.text.slice(0,PERTEXT),idx:todo.indexOf(a)+1,key:kv.key,vendor:kv.vendor},function(full){a.result=full;renderCardInline(a);}); a.status="done"; }
-  catch(e){ a.status="error"; a.result="【出卡失败："+(e&&e.message||e)+"】"; }
-  running=false; updateBtns(); renderQueue(); renderResults();
-}
-async function rewriteSec(i){
-  var kv=curKey(); if(!kv||running||!state.mapText) return;
-  var todo=analyzable(); running=true; updateBtns();
-  await writeSec(kv,todo,i,todo.map(function(a){return a.title;}),$("#topic").value.trim());
+async function rerun(field){
+  var kv=curKey(); if(!kv||running) return; var items=litSelected(); running=true; updateBtns();
+  try{
+    var okCards=cardsPayload(items);
+    if(field==="mapText") await stepText("map","mapText",{mode:"map",cards:okCards,key:kv.key,vendor:kv.vendor},"⑤ 重摆整图…");
+    else if(field==="challenges") await stepText("challenges","challenges",{mode:"challenges",map:state.mapText,surface:state.surface,cards:okCards,key:kv.key,vendor:kv.vendor},"⑦ 重读挑战…");
+    else if(field==="gaps") await stepText("gaps","gaps",{mode:"gaps",challenges:state.challenges,map:state.mapText,key:kv.key,vendor:kv.vendor},"⑧ 重写不足…");
+    else if(field==="occupants") await stepText("conjectures","occupants",{mode:"occupants",conjectures:state.conjectures,hits:state.hits,key:kv.key,vendor:kv.vendor},"⑨ 重写分离线…");
+  }catch(e){ setStatus("失败："+esc2(e&&e.message||e)); }
   running=false; updateBtns(); renderResults();
 }
+async function rewriteSec(i){ var kv=curKey(); if(!kv||running) return; running=true; updateBtns(); await writeSec(kv,litSelected(),i); running=false; updateBtns(); renderResults(); }
 
-/* ---- 自检（规范层 §八 里能机检的几条） ---- */
+/* ---- 自检（规范层 §10.3 里能机检的） ---- */
 function selfCheck(){
-  var sec=state.sections, all=sec.map(function(s){return s.text||"";}).join("\n");
-  if(!all.trim()) return [];
-  var s1=(sec[0]&&sec[0].text)||"", mapSec=sec.filter(function(s){return /^整图/.test(s.h);})[0], agenda=sec.filter(function(s){return /^议程/.test(s.h);})[0];
-  var bodySecs=sec.filter(function(s){return s.words>=2000&&!/^整图/.test(s.h);});
-  var out=[];
-  out.push({n:"判类已写明",ok:/主类/.test(s1)&&/副类/.test(s1)});
-  out.push({n:"只引输入文献（篇号 ≤ "+analyzable().length+"）",ok:!(function(){var m=all.match(/［\s*(\d+)\s*］/g)||[];var N=analyzable().length;return m.some(function(x){return parseInt(x.replace(/[^\d]/g,""),10)>N;});})()});
-  out.push({n:"空格已起名（无「有待研究」）",ok:!/有待研究|值得进一步|有待进一步/.test(((mapSec&&mapSec.text)||"")+((agenda&&agenda.text)||""))});
-  out.push({n:"每格有锚句",ok:bodySecs.length>0&&bodySecs.every(function(s){return /[“「]/.test(s.text||"");})});
-  out.push({n:"自撞点名",ok:/重复降落|同一命题|同一副骨架|同一个命题/.test((mapSec&&mapSec.text)||"")});
-  out.push({n:"无自评",ok:!/首次|系统性地|填补(了)?空白/.test(all)});
+  var sec=state.sections, all=sec.map(function(s){return s.text||"";}).join("\n"); if(!all.trim()) return [];
+  var N=litSelected().length, out=[];
+  out.push({n:"类型已注明且发生层改写在第 1 节",ok:/主类/.test((sec[0]||{}).text||"")&&/(谁决定谁|起手|凭什么持续)/.test((sec[0]||{}).text||"")});
+  var cnt={classic:0,modern:0,frontier:0}; litSelected().forEach(function(x){ if(cnt[x.layer]!=null) cnt[x.layer]++; });
+  out.push({n:"文献 ≥30 且三层达最少篇数（"+cnt.classic+"/"+cnt.modern+"/"+cnt.frontier+"）",ok:N>=30&&cnt.classic>=6&&cnt.modern>=12&&cnt.frontier>=12});
+  out.push({n:"只引清单文献（篇号 ≤ "+N+"）",ok:!(function(){var m=all.match(/［\s*(\d+)\s*］/g)||[];return m.some(function(x){return parseInt(x.replace(/[^\d]/g,""),10)>N;});})()});
+  out.push({n:"空格已起名（无「有待研究」）",ok:!/有待研究|值得进一步|有待进一步/.test(all)});
+  out.push({n:"五大挑战恰五条",ok:(state.challenges.match(/挑战\s*[一二三四五1-5]/g)||[]).length>=5});
+  out.push({n:"五条猜想各有读数与可证伪条件",ok:(state.conjectures.match(/读数[：:]/g)||[]).length>=5&&(state.conjectures.match(/可证伪/g)||[]).length>=5});
+  out.push({n:"占位者已实搜",ok:!!state.hits});
+  out.push({n:"无自评词",ok:!/首次|系统性地|填补(了)?空白/.test(all)});
   return out;
+}
+function logText(){
+  var L=state.log, sel=litSelected();
+  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑨ "+(L.f9||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项红。"].join("\n");
 }
 
 /* ---- 渲染 ---- */
@@ -806,102 +923,102 @@ function fmt(t){
     return "<p>"+esc2(seg).replace(/\n/g,"<br>")+"</p>";
   }).join("");
 }
-function renderCardInline(a){ var el=document.querySelector('[data-card="'+a.id+'"]'); if(el) el.textContent=a.result||""; }
-function renderMapInline(){ var el=$("#mapBody"); if(el) el.innerHTML=fmt(state.mapText); }
+function renderCardInline(x){ var el=document.querySelector('[data-card="'+x.i+'"]'); if(el) el.textContent=x.card||""; }
+function renderArtInline(field){ var el=document.querySelector('[data-art="'+field+'"]'); if(el) el.textContent=state[field]||""; }
 function renderSecInline(i){ var el=document.querySelector('[data-sec="'+i+'"]'); if(el) el.innerHTML=fmt(state.sections[i].text); }
+function artCard(title,field,cls,rerunKey){
+  if(!state[field]&&state.stage!==field) return "";
+  var body=state[field]?'<div class="artbody" data-art="'+field+'">'+esc2(state[field])+"</div>":'<div class="r-load">'+spin("生成中…")+"</div>";
+  return '<div class="rcard '+cls+'"><div class="rhead"><b>'+title+'</b>'+(state[field]?'<button class="rbtn" data-copy="'+field+'">复制</button>':"")+(rerunKey&&state[field]&&!running?'<button class="rbtn" data-rerun="'+rerunKey+'">重跑</button>':"")+'</div>'+body+"</div>";
+}
 function renderResults(){
-  var box=$("#results");
-  var todo=analyzable();
-  var hasCards=articles.some(function(a){return a.status==="analyzing"||a.status==="done"||(a.status==="error"&&a.result);});
-  if(!state.type&&!hasCards){ box.style.display="none"; box.innerHTML=""; return; }
+  var box=$("#results"), html="";
+  var sel=litAll();
+  if(!state.frame&&!state.frameText&&!sel.length){ box.style.display="none"; box.innerHTML=""; return; }
   box.style.display="block";
-  var html="";
-  if(state.type){
-    html+='<div class="rcard cls"><div class="rhead"><b>判类 · '+esc2(state.clsText)+'</b></div><div class="rbody"><p>'+esc2(state.clsReason||"")+'</p>';
-    var pp=Object.keys(state.perPaper);
-    if(pp.length){ html+='<p style="font-size:13px;color:var(--muted)">各篇初判：'+pp.map(function(k){var p=state.perPaper[k];return "［"+k+"］"+esc2(p.type||"")+(p.claim?"——"+esc2(p.claim):"");}).join("；")+"</p>"; }
-    html+="</div></div>";
+  if(state.frameText){
+    var f=state.frame||{};
+    html+='<div class="rcard cls"><div class="rhead"><b>① 题面卡 · '+esc2(TYPE_NAME[state.type]||"")+'</b></div><div class="rbody">'
+      +(f.genesis?'<p><b>发生层改写：</b>'+esc2(f.genesis)+'</p><p style="color:var(--muted)"><b>表面形态：</b>'+esc2(f.surface||"")+'</p><p style="font-size:13px;color:var(--muted)"><b>别名：</b>'+esc2((f.aliases||[]).join("；"))+'</p><p style="font-size:13px;color:var(--muted)"><b>检索词：</b>'+esc2((f.queries||[]).join(" ｜ "))+'</p>':'<div class="artbody">'+esc2(state.frameText)+"</div>")
+      +"</div></div>";
   }
-  if(hasCards){
-    html+='<div class="rcard"><div class="rhead"><b>解构卡 · 每篇一张（'+(articles.filter(function(a){return a.status==="done";}).length)+" / "+todo.length+'）</b></div><div class="cardgrid">';
-    todo.forEach(function(a,i){
-      var body=a.status==="analyzing"&&!a.result?'<span class="spinner"></span>解构中…':(a.result||"");
-      var tools=(a.status==="error"||a.status==="done")?'<span class="more" data-retry="'+a.id+'">重出此卡</span>':"";
-      html+='<div class="dcard"><b>［'+(i+1)+'］'+esc2(a.title)+'</b><div class="f" data-card="'+a.id+'">'+esc2(body)+'</div><div class="tools" style="display:flex;gap:10px"><span class="more" data-open="'+a.id+'">展开／收起</span>'+tools+"</div></div>";
+  if(sel.length){
+    var cnt={classic:0,modern:0,frontier:0,upload:0}; sel.forEach(function(x){ if(x.sel) cnt[x.layer]++; });
+    html+='<div class="rcard lit"><div class="rhead"><b>② 文献清单 · 已选 '+sel.filter(function(x){return x.sel;}).length+' 篇（经典 '+cnt.classic+' · 现代 '+cnt.modern+' · 前沿 '+cnt.frontier+' · 上传 '+cnt.upload+'）</b></div>'
+      +'<div class="litbar"><span class="more" data-litall="1">全选</span><span class="more" data-litall="0">全不选</span><span>勾选即入清单；篇号按下表顺序在出卡时重排。无摘要的条目不能出卡，已置灰。</span></div>'
+      +'<table class="lit"><tr><th></th><th>层</th><th>年</th><th>被引</th><th>题名 · 作者 · 出处</th></tr>';
+    sel.forEach(function(x,k){
+      var dis=x.material==="none";
+      html+='<tr style="'+(dis?"opacity:.45":"")+'"><td class="c"><input type="checkbox" data-lit="'+k+'" '+(x.sel?"checked":"")+(dis?" disabled":"")+'></td><td class="c"><span class="lay '+x.layer+'">'+LAYER_NAME[x.layer]+'</span></td><td class="c">'+(x.year||"—")+'</td><td class="c">'+(x.cites||0)+'</td><td>'+(x.url?'<a href="'+esc2(x.url)+'" target="_blank" rel="noopener">'+esc2(x.title)+'</a>':esc2(x.title))+'<div style="color:var(--muted);font-size:12px">'+esc2((x.authors||"")+(x.venue?" · "+x.venue:"")+(x.doi?" · "+x.doi:""))+(x.cardState==="done"?" · <span class=\"q-ok\">已出卡</span>":x.cardState==="running"?" · 出卡中":x.cardState==="error"?" · <span class=\"q-err\">出卡失败</span>":"")+'</div></td></tr>';
     });
+    html+="</table></div>";
+  }
+  var items=litSelected().filter(function(x){return x.card||x.cardState;});
+  if(items.length){
+    html+='<div class="rcard"><div class="rhead"><b>③④ 解构卡（'+items.filter(function(x){return x.cardState==="done";}).length+" / "+items.length+'）</b></div><div class="cardgrid">';
+    items.forEach(function(x){ html+='<div class="dcard"><b>［'+x.i+'］'+esc2(x.title)+'</b><div class="f" data-card="'+x.i+'">'+esc2(x.cardState==="running"&&!x.card?"解构中…":(x.card||""))+'</div><div class="tools"><span class="more" data-open="'+x.i+'">展开／收起</span></div></div>'; });
     html+="</div></div>";
   }
-  if(state.mapState){
-    html+='<div class="rcard map"><div class="rhead"><b>整图 · 挤格 / 空格 / 自撞 / 断链</b>'+(state.mapText?'<button class="rbtn" data-copy="__map">复制</button>':"")+'</div><div class="rbody" id="mapBody">'+(state.mapState==="running"&&!state.mapText?'<div class="r-load"><span class="spinner"></span> 正在把 N 张卡摆进格子…</div>':fmt(state.mapText))+"</div></div>";
-  }
+  html+=artCard("⑤ 整图 · 挤格 / 空格 / 自撞 / 断链","mapText","map","mapText");
+  html+=artCard("⑥ 表面挑战清单（论文原话）","surface","");
+  html+=artCard("⑦ 五大发生挑战","challenges","cls","challenges");
+  html+=artCard("⑧ 现有方案的不足","gaps","","gaps");
+  html+=artCard("⑨ SDE 猜想解决","conjectures","map");
+  html+=artCard("⑨ 之二 · 占位者与分离线（实搜 "+((state.hits||"").split("【猜想").length-1)+" 条记录）","occupants","","occupants");
   if(state.sections.length){
-    html+='<div class="rcard paper"><div class="rhead"><b>'+esc2(state.title||"综述")+'</b><button class="rbtn" data-copy="__all">复制全文</button></div>';
+    var refs=litSelected();
+    html+='<div class="rcard paper"><div class="rhead"><b>⑩ '+esc2(state.title||"综述")+'</b><button class="rbtn" data-copy="__all">复制全文</button></div>';
     state.sections.forEach(function(s,i){
       html+='<div class="sec"><h3>'+(i+1)+"、"+esc2(s.h)+"</h3>";
-      if(!s.words){ html+='<div class="refs">'+todo.map(function(a,k){return "<div>［"+(k+1)+"］"+esc2(a.title)+(a.status==="done"?"":"（未读／未出卡）")+"</div>";}).join("")+"</div>"; }
-      else {
-        html+='<div class="tools">'+(s.status==="running"?'<span class="spinner"></span>生成中':s.status==="pending"?"待写":"")+(s.status==="done"||s.status==="error"?'<span class="more" data-rewrite="'+i+'">重写此节</span>':"")+"</div>";
-        html+='<div class="body" data-sec="'+i+'">'+fmt(s.text)+"</div>";
-      }
+      if(!s.words){ html+='<div class="refs">'+refs.map(function(x){return "<div>［"+x.i+"］"+esc2(refString(x))+"</div>";}).join("")+"</div>"; }
+      else { html+='<div class="tools">'+(s.status==="running"?spin("生成中"):s.status==="pending"?"待写":"")+(s.status==="done"||s.status==="error"?'<span class="more" data-rewrite="'+i+'">重写此节</span>':"")+"</div><div class=\"body\" data-sec=\""+i+"\">"+fmt(s.text)+"</div>"; }
       html+="</div>";
     });
+    html+='<div class="sec"><h3>附录 A · 工序日志</h3><div class="artbody">'+esc2(logText())+"</div></div>";
     var chk=selfCheck();
-    if(chk.length){ html+='<div class="sec"><h3>出稿前自检</h3><div class="chk">'+chk.map(function(c){return '<span class="'+(c.ok?"ok":"bad")+'">'+(c.ok?"✓ ":"✕ ")+esc2(c.n)+"</span>";}).join("")+'</div><p style="font-size:12.5px;color:var(--muted);margin-top:8px">红的那几条按规范层 §八 属于出稿前必改项；机检只能查形式，内容仍须人读。</p></div>'; }
+    if(chk.length){ html+='<div class="sec"><h3>出稿前自检</h3><div class="chk">'+chk.map(function(c){return '<span class="'+(c.ok?"ok":"bad")+'">'+(c.ok?"✓ ":"✕ ")+esc2(c.n)+"</span>";}).join("")+'</div><p style="font-size:12.5px;color:var(--muted);margin-top:8px">红的按规范层 §10.3 属出稿前必改；机检只查形式，内容仍须人读。</p></div>'; }
     html+="</div>";
   }
   box.innerHTML=html;
+  box.querySelectorAll("[data-lit]").forEach(function(cb){ cb.onchange=function(){ if(running){ cb.checked=!cb.checked; return; } var all=litAll(); var x=all[+cb.dataset.lit]; if(x) x.sel=cb.checked; updateBtns(); renderResults(); }; });
+  box.querySelectorAll("[data-litall]").forEach(function(bt){ bt.onclick=function(){ if(running) return; var v=bt.dataset.litall==="1"; litAll().forEach(function(x){ if(x.material!=="none") x.sel=v; }); updateBtns(); renderResults(); }; });
   box.querySelectorAll("[data-open]").forEach(function(bt){bt.onclick=function(){var f=box.querySelector('[data-card="'+bt.dataset.open+'"]'); if(f) f.classList.toggle("open");};});
-  box.querySelectorAll("[data-retry]").forEach(function(bt){bt.onclick=function(){retryCard(bt.dataset.retry);};});
   box.querySelectorAll("[data-rewrite]").forEach(function(bt){bt.onclick=function(){rewriteSec(+bt.dataset.rewrite);};});
+  box.querySelectorAll("[data-rerun]").forEach(function(bt){bt.onclick=function(){rerun(bt.dataset.rerun);};});
   box.querySelectorAll("[data-copy]").forEach(function(bt){bt.onclick=function(){
-    var txt=bt.dataset.copy==="__map"?state.mapText:fullText();
-    try{ navigator.clipboard.writeText(txt); bt.textContent="已复制"; setTimeout(function(){bt.textContent=bt.dataset.copy==="__map"?"复制":"复制全文";},1500); }catch(e){}
+    var k=bt.dataset.copy, txt=k==="__all"?fullText():(state[k]||"");
+    try{ navigator.clipboard.writeText(txt); var o=bt.textContent; bt.textContent="已复制"; setTimeout(function(){bt.textContent=o;},1500); }catch(e){}
   };});
 }
+/* 上传队列变化时也刷新清单 */
+var _rq=renderQueue; renderQueue=function(){ _rq(); if(state.frame) renderResults(); };
 
 /* ---- 导出 ---- */
 function fullText(){
-  var todo=analyzable(), out=(state.title||"综述")+"\n\n";
-  state.sections.forEach(function(s,i){
-    out+=(i+1)+"、"+s.h+"\n\n";
-    if(!s.words) out+=todo.map(function(a,k){return "［"+(k+1)+"］"+a.title;}).join("\n")+"\n\n";
-    else out+=(s.text||"")+"\n\n";
-  });
+  var refs=litSelected(), out=(state.title||"综述")+"\n\n";
+  state.sections.forEach(function(s,i){ out+=(i+1)+"、"+s.h+"\n\n"; out+=(!s.words?refs.map(function(x){return "［"+x.i+"］"+refString(x);}).join("\n"):(s.text||""))+"\n\n"; });
+  out+="附录 A · 工序日志\n\n"+logText()+"\n";
   return out;
 }
 $("#mdBtn").onclick=function(){
-  var todo=analyzable(), md="# "+(state.title||"综述")+"\n\n> "+state.clsText+"　"+state.clsReason.replace(/\n/g," ")+"\n\n";
-  state.sections.forEach(function(s,i){
-    md+="## "+(i+1)+"、"+s.h+"\n\n";
-    if(!s.words) md+=todo.map(function(a,k){return "["+(k+1)+"] "+a.title;}).join("  \n")+"\n\n";
-    else md+=(s.text||"")+"\n\n";
-  });
-  md+="\n---\n\n### 附：整图\n\n"+state.mapText+"\n\n### 附：解构卡\n\n"+todo.map(function(a,k){return "#### ["+(k+1)+"] "+a.title+"\n\n"+(a.result||"（未出卡）");}).join("\n\n")+"\n";
+  var refs=litSelected(), md="# "+(state.title||"综述")+"\n\n";
+  var f=state.frame||{};
+  md+="```\n主题："+$("#topic").value.trim()+"\n问题："+$("#question").value.trim()+"\n类型："+TYPE_NAME[state.type]+"\n表面形态："+(f.surface||"")+"\n发生层改写："+(f.genesis||"")+"\n```\n\n";
+  state.sections.forEach(function(s,i){ md+="## "+(i+1)+"、"+s.h+"\n\n"; md+=(!s.words?refs.map(function(x){return "["+x.i+"] "+refString(x);}).join("  \n"):(s.text||""))+"\n\n"; });
+  md+="## 附录 A · 工序日志\n\n```\n"+logText()+"\n```\n\n## 附录 B · 解构卡全集\n\n"+refs.map(function(x){return "#### ["+x.i+"] "+x.title+"\n\n"+(x.card||"（未出卡）");}).join("\n\n")+"\n\n## 附录 C · 工序产出件\n\n### ⑤ 整图\n\n"+state.mapText+"\n\n### ⑥ 表面挑战\n\n"+state.surface+"\n\n### ⑦ 五大发生挑战\n\n"+state.challenges+"\n\n### ⑧ 不足\n\n"+state.gaps+"\n\n### ⑨ 猜想\n\n"+state.conjectures+"\n\n### ⑨ 之二 占位者\n\n"+state.occupants+"\n";
   var blob=new Blob([md],{type:"text/markdown;charset=utf-8"});
-  var u=URL.createObjectURL(blob), el=document.createElement("a"); el.href=u; el.download=(state.title||"综述").replace(/[\\/:*?"<>|]/g,"_").slice(0,60)+".md"; document.body.appendChild(el); el.click(); setTimeout(function(){URL.revokeObjectURL(u); el.remove();},800);
+  var u=URL.createObjectURL(blob), el=document.createElement("a"); el.href=u; el.download=(state.title||"综述").replace(/[\\\/:*?"<>|]/g,"_").slice(0,60)+".md"; document.body.appendChild(el); el.click(); setTimeout(function(){URL.revokeObjectURL(u); el.remove();},800);
 };
 $("#pdfBtn").onclick=function(){
-  var w=window.open("","_blank");
-  if(!w){ setStatus("浏览器拦了新窗口，允许弹窗后重试。"); return; }
-  var todo=analyzable(), html="";
+  var w=window.open("","_blank"); if(!w){ setStatus("浏览器拦了新窗口，允许弹窗后重试。"); return; }
+  var refs=litSelected(), html="";
   state.sections.forEach(function(s,i){
     html+="<h2>"+(i+1)+"、"+esc2(s.h)+"</h2>";
-    if(!s.words) html+=todo.map(function(a,k){return "<p class='ref'>［"+(k+1)+"］"+esc2(a.title)+"</p>";}).join("");
+    if(!s.words) html+=refs.map(function(x){return "<p class='ref'>［"+x.i+"］"+esc2(refString(x))+"</p>";}).join("");
     else html+=(s.text||"").split(/\n+/).map(function(x){ x=x.trim(); if(!x) return ""; if(x.length<=24&&!/[。！？.?!：；]$/.test(x)) return "<h3>"+esc2(x)+"</h3>"; return "<p>"+esc2(x)+"</p>"; }).join("");
   });
-  w.document.write("<!DOCTYPE html><html><head><meta charset='utf-8'><title>"+esc2(state.title||"综述")+"</title><style>"
-    +"@page{size:A4;margin:22mm}"
-    +"body{font-family:'Songti SC','Noto Serif CJK SC','SimSun',serif;color:#111;line-height:2;font-size:12.5pt}"
-    +"h1{font-size:19pt;margin:0 0 6pt}.meta{font-size:9.5pt;color:#666;margin:0 0 22pt;padding-bottom:10pt;border-bottom:.6pt solid #999}"
-    +"h2{font-size:15pt;margin:22pt 0 8pt;padding-top:8pt;border-top:.6pt solid #bbb}h3{font-size:13pt;margin:14pt 0 6pt}"
-    +"p{margin:0;text-indent:2em}p.ref{text-indent:0;font-size:11pt}"
-    +".foot{margin-top:26pt;padding-top:8pt;border-top:.6pt solid #999;font-size:8.5pt;color:#777}"
-    +"@media print{.noprint{display:none}}.noprint{position:fixed;top:12px;right:12px;background:#141A24;color:#fff;border:none;border-radius:8px;padding:10px 18px;font:600 14px -apple-system,'PingFang SC',sans-serif;cursor:pointer}"
-    +"</style></head><body><button class='noprint' onclick='window.print()'>打印 / 存为 PDF</button>"
-    +"<h1>"+esc2(state.title||"综述")+"</h1><div class='meta'>"+esc2(state.clsText)+" · SDE 系统解构器 · SDE Universes</div>"+html
-    +"<div class='foot'>由大模型生成，引注只取自上传文献，请以原文核对。sdeuniverses.com</div></body></html>");
-  w.document.close();
-  setTimeout(function(){try{w.print();}catch(e){}},700);
+  w.document.write("<!DOCTYPE html><html><head><meta charset='utf-8'><title>"+esc2(state.title||"综述")+"</title><style>@page{size:A4;margin:22mm}body{font-family:'Songti SC','Noto Serif CJK SC','SimSun',serif;color:#111;line-height:2;font-size:12.5pt}h1{font-size:19pt;margin:0 0 6pt}.meta{font-size:9.5pt;color:#666;margin:0 0 22pt;padding-bottom:10pt;border-bottom:.6pt solid #999}h2{font-size:15pt;margin:22pt 0 8pt;padding-top:8pt;border-top:.6pt solid #bbb}h3{font-size:13pt;margin:14pt 0 6pt}p{margin:0;text-indent:2em}p.ref{text-indent:0;font-size:11pt}.foot{margin-top:26pt;padding-top:8pt;border-top:.6pt solid #999;font-size:8.5pt;color:#777}@media print{.noprint{display:none}}.noprint{position:fixed;top:12px;right:12px;background:#141A24;color:#fff;border:none;border-radius:8px;padding:10px 18px;font:600 14px -apple-system,'PingFang SC',sans-serif;cursor:pointer}</style></head><body><button class='noprint' onclick='window.print()'>打印 / 存为 PDF</button><h1>"+esc2(state.title||"综述")+"</h1><div class='meta'>"+esc2(TYPE_NAME[state.type]||"")+" · SDE 综述生成 Skill 十道工序 · SDE Universes</div>"+html+"<div class='foot'>由大模型生成，引注只取自工序②清单，请以原文核对。sdeuniverses.com</div></body></html>");
+  w.document.close(); setTimeout(function(){try{w.print();}catch(e){}},700);
 };
 
 updateBtns();

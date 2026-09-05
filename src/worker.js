@@ -6069,65 +6069,56 @@ function wdsBucket(kind, ip, key) {
   if (k.length >= 8) return "byok:" + kind + ":k" + _lhash("sde-lim-a:" + k, 2166136261) + _lhash("sde-lim-b:" + k, 5381);
   return "byok:" + kind + ":" + ip;   // 没带 Key 时（理论上到不了限流这步）才按 IP
 }
-/* ══ 综述论文生成器（2026-09-05）——规范层 tools/skills/sde-review-writing.md，这里是它的编译产物 ══
-   三类综述×三把刀：What=三方程 / How=六路径 / Why=三原理。§三 三张解构卡的字段表 → REVIEW_CARD_FIELDS；
-   §五 三张章目表 → REVIEW_SKELETON（words=0 的「参考文献」由页面端按输入序号拼装，不经基底）。
+/* ══ 综述论文生成器 v2（2026-09-05）——规范层 tools/skills/sde-review-genesis.md（十道工序），这里是它的编译产物 ══
+   输入＝学科主题＋研究问题＋类型（What/How/Why，用户注明）；工序①立题闸→②文献采集（页面端走 OpenAlex，不经基底）→③刀与格→④逐篇卡
+   →⑤整图→⑥表面挑战→⑦五大发生挑战→⑧现有方案的不足→⑨SDE 猜想（含占位者实搜）→⑩分节成文。
+   §三 三张解构卡字段表 → REVIEW_CARD_FIELDS；§10.1 章目表（按类型展开）→ REVIEW_SKELETON（words=0 的「参考文献」页面端拼装）。
    护栏：tools/sim_review_gen.js 从 Skill 解析两组表与这里逐条比对，对不上即红。 */
 const REVIEW_CARD_FIELDS = {
   what: ["承重命题", "S 的取法", "D 的取法", "E 的取法", "所站方程", "当作给定", "推翻对象", "余数", "原文锚句"],
   how: ["承重命题", "起手维", "落点维", "所走路径", "中间维处置", "判据与读数", "失效条件", "推翻对象", "余数", "原文锚句"],
   why: ["承重命题", "所站原理", "矛盾的两端", "被推动的一维", "回写", "不做会失去什么", "可替代性", "推翻对象", "余数", "原文锚句"],
 };
+const _RS_HEAD = [
+  { h: "问题与判类", words: 900, ask: "题面卡展开：主题、问题、类型、问题的表面形态与发生层改写；为何写这一类、另两类各由哪篇承担。必须写明主类、副类与判类依据。" },
+  { h: "解构方法", words: 1000, ask: "本篇用的刀与格、卡的字段、归位规则、文献三层口径（经典/现代/前沿）与别名先于人名的采集法——让读者能复现归位。" },
+];
+const _RS_TAIL = [
+  { h: "整图：挤格、空格、自撞、断链", words: 2000, ask: "先出格位分布表（每格一行：格名｜篇号清单｜该格内不同承重命题数），再读四样并点名到篇号：挤格；空格——每个空格必须起名（若有人站到这格，承重命题会是什么样），禁写「有待研究」；自撞——同一命题的重复降落点名合并；断链——共同依赖却无人检验的前提，写到「它若不成立，哪几格整格塌」。" },
+  { h: "表面挑战与发生挑战", words: 3000, ask: "先原样列出各篇自述的挑战/局限（标篇号、按频次），再用一段讲清表面与发生之间隔着什么，然后给五大发生挑战，每条六栏：一句命名（动词在前）／定位（a 某维被当给定 b 某格无人走 c 回写缺席 d 共有前提无人检验 e 读数错位）／表面对照／塌格范围／证据（≥3 篇号各一句锚句）／日常类比一句。五条须落不同格或不同定位类型。" },
+  { h: "现有方案的不足", words: 1500, ask: "对五条挑战逐条：现有方案站在哪格（篇号）；够不到的机制——不是「做得不够好」而是「在这一格里做多好都到不了那一格」，按四型标注（错位／缺维／无回写／读数错位）；它们做对的部分（不许全盘否定）。每条回指整图的一个读法。" },
+  { h: "SDE 猜想解决", words: 3000, ask: "对五条挑战各给一条猜想，六栏：X 不是 Y 而是 Z／所站的位（须是空格或断链所在格）／读数（名字、取值范围、怎么取）／预测（至少两篇现有文献的结果应被重新解释成什么）／可证伪条件（写到删哪一节）／占位者（给定的实搜结果里谁最近，分离线是什么；无命中就写「本轮实搜未命中，不等于没有」）。全部标「猜想」。至少三条站不同格；不许互相依赖成链。" },
+  { h: "研究总纲：三个指导方向里的这一个", words: 1000, ask: "五条猜想按可投入次序排成课题清单，每条一句开题句；写明本篇与另两类综述的接口；三篇的五大挑战不得重合。不写展望套话，不自评。" },
+  { h: "参考文献", words: 0, ask: "" },
+];
 const REVIEW_SKELETON = {
-  what: [
-    { h: "问题与判类", words: 900, ask: "这个领域在问什么；为何是知识型综述；本综述按三方程编排的理由。必须写明主类、副类与判类依据。" },
-    { h: "解构方法", words: 900, ask: "三方程各是什么、卡的九个字段、判类规则——让读者能复现你的归位。" },
-    { h: "站在 S=F(D,E) 上的文献", words: 2200, ask: "挤格读法：只写站在这条方程上的论文，按不同承重命题分小节；每篇至少一句原文锚句（≤40字，短引号）。同一命题多次降落的合写成一组。" },
-    { h: "站在 D=G(S,E) 上的文献", words: 2200, ask: "同上，只写站在 D=G(S,E) 上的论文。" },
-    { h: "站在 E=H(S,D) 上的文献", words: 2200, ask: "同上，只写站在 E=H(S,D) 上的论文。" },
-    { h: "整图：挤格、空格、自撞、断链", words: 2000, ask: "四样全部点名到篇号：哪格最挤、其中几个不同命题；哪格空着——每个空格必须起名（若有人站到这格，承重命题会是什么样）；哪几篇是同一命题的重复降落；各篇共同依赖却无一篇检验过的前提。" },
-    { h: "共有前提与越位文献", words: 1200, ask: "那条共有前提一旦不成立哪几格整格塌；副类论文各在何位（不硬塞进主类格子）。" },
-    { h: "议程：下一篇该往哪写", words: 900, ask: "只写空格清单与每格一句承重命题预告；不写展望套话，不自评。" },
-    { h: "参考文献", words: 0, ask: "" },
-  ],
-  how: [
-    { h: "任务与判类", words: 900, ask: "这个领域要做成什么；为何是技术型综述；按六路径编排的理由。必须写明主类、副类与判类依据。" },
-    { h: "解构方法", words: 900, ask: "六路径各是什么、卡的十个字段、判类规则。" },
-    { h: "从 S 起手的方法（S→D→E／S→E→D）", words: 2000, ask: "只写起手维为 S 的方法，两条路径各一小节；每个方法写清起手、落点、中间维处置、判据与读数；每篇至少一句原文锚句。" },
+  what: _RS_HEAD.concat([
+    { h: "站在 S=F(D,E) 上的文献", words: 2000, ask: "挤格读法：只写站在这条方程上的论文，按不同承重命题分小节；每篇至少一句原文锚句（≤40字，短引号）；同一命题多次降落的合写成一组。" },
+    { h: "站在 D=G(S,E) 上的文献", words: 2000, ask: "同上，只写站在 D=G(S,E) 上的论文。" },
+    { h: "站在 E=H(S,D) 上的文献", words: 2000, ask: "同上，只写站在 E=H(S,D) 上的论文。" },
+  ], _RS_TAIL),
+  how: _RS_HEAD.concat([
+    { h: "从 S 起手的方法（S→D→E／S→E→D）", words: 2000, ask: "只写起手维为 S 的方法，两条路径各一小节；每个方法写清起手、中间维处置、落点、判据与读数、失效条件；每篇至少一句原文锚句；重复降落合写。" },
     { h: "从 D 起手的方法（D→S→E／D→E→S）", words: 2000, ask: "同上，只写起手维为 D 的方法。" },
     { h: "从 E 起手的方法（E→S→D／E→D→S）", words: 2000, ask: "同上，只写起手维为 E 的方法。" },
-    { h: "读数与失效条件对照", words: 1500, ask: "各方法拿什么数说自己成了、各自承认在哪不灵；没有读数的写明「未给读数」；能列表就用「｜」分隔的行表。" },
-    { h: "整图：挤路、空路、自撞、断链", words: 2000, ask: "四样全部点名到篇号；空路必须起名（若有方法走这条路，会长什么样）；同一方法投两次的点名合并；共有前提写到能塌路。" },
-    { h: "共有前提与越位文献", words: 1200, ask: "那条共有前提一旦不成立哪几条路整条塌；副类论文各在何位。" },
-    { h: "议程：下一代方法该走哪条路", words: 900, ask: "只写空路清单与每条一句方法预告；不写展望套话，不自评。" },
-    { h: "参考文献", words: 0, ask: "" },
-  ],
-  why: [
-    { h: "现象与判类", words: 900, ask: "要解释的是什么在持续发生；为何是动力机制型综述；按三原理编排的理由。必须写明主类、副类与判类依据。" },
-    { h: "解构方法", words: 900, ask: "三原理各是什么、卡的十个字段、判类规则。" },
-    { h: "原理一：D×E 矛盾推动 S 改变", words: 2200, ask: "只写站在原理一上的论文；每篇写清矛盾两端、被推动的一维、有无回写；每篇至少一句原文锚句；重复降落的合写成一组。" },
-    { h: "原理二：S×E 矛盾推动 D 改变", words: 2200, ask: "同上，只写站在原理二上的论文。" },
-    { h: "原理三：S×D 矛盾推动 E 改变", words: 2200, ask: "同上，只写站在原理三上的论文。" },
-    { h: "存续论证与可替代性对照", words: 1500, ask: "各篇「不做会失去什么」并排；哪些存续能由别的东西供给；写不出存续论证的标明只是功能解释。" },
-    { h: "整图：挤格、空格、自撞、断链", words: 2000, ask: "四样全部点名到篇号；空格必须起名；重复降落点名合并；共有前提写到能塌格。" },
-    { h: "共有前提与越位文献", words: 1200, ask: "那条共有前提一旦不成立哪几格整格塌；副类论文各在何位。" },
-    { h: "议程：哪条动力还没人论证", words: 900, ask: "只写空格清单与每格一句存续命题预告；不写展望套话，不自评。" },
-    { h: "参考文献", words: 0, ask: "" },
-  ],
+  ], _RS_TAIL),
+  why: _RS_HEAD.concat([
+    { h: "原理一：D×E 矛盾推动 S 改变", words: 2000, ask: "只写站在原理一上的论文；每篇写清矛盾两端、被推动的一维、有无回写、不做会失去什么；每篇至少一句原文锚句；重复降落合写。" },
+    { h: "原理二：S×E 矛盾推动 D 改变", words: 2000, ask: "同上，只写站在原理二上的论文。" },
+    { h: "原理三：S×D 矛盾推动 E 改变", words: 2000, ask: "同上，只写站在原理三上的论文。" },
+  ], _RS_TAIL),
 };
 const REVIEW_TYPE_NAME = { what: "What-综述（知识型／理论型，按三方程解构）", how: "How-综述（技术型／应用型，按六路径解构）", why: "Why-综述（动力机制型，按三原理解构）" };
 const REVIEW_TOOL_TEXT = {
-  what: "三方程：S=F(D,E)（显露由差异与纠缠决定）／D=G(S,E)（差异由显露与纠缠决定）／E=H(S,D)（纠缠由显露与差异决定）。一篇论文的位＝它认为哪一维是被另两维决定的。",
+  what: "三方程：S=F(D,E)（显露由差异与纠缠决定）／D=G(S,E)／E=H(S,D)。一篇论文的位＝它认为哪一维是被另两维决定的。",
   how: "六路径：S→D→E／S→E→D／D→S→E／D→E→S／E→S→D／E→D→S，即从 S、D、E 哪一维起手、经哪一维、落到哪一维。一个方法的位＝它实际走的那条次序。",
   why: "三原理：原理一 D×E 矛盾→推动 S 改变｜原理二 S×E 矛盾→推动 D 改变｜原理三 S×D 矛盾→推动 E 改变。一篇论文的位＝它认为哪两维的矛盾在推动第三维。",
 };
+const REVIEW_QUESTION_FORM = { what: "在这个问题里，谁决定谁？", how: "要做成这件事，从哪一维起手、最终落在哪一维？", why: "这件事凭什么持续发生？不做，什么撑不住？" };
 function reviewType(t) { t = String(t || "").toLowerCase(); return (t === "how" || t === "why") ? t : "what"; }
-function reviewFieldTable(type) {
-  const f = REVIEW_CARD_FIELDS[type];
-  return f.map((n, i) => (i + 1) + "．" + n).join("\n");
-}
-const REVIEW_SDEM = "\n\nSDE 方法论：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；三原理（原理一 D×E 矛盾→S 改变｜原理二 S×E 矛盾→D 改变｜原理三 S×D 矛盾→E 改变）；发生学——追问事物为何如此发生，而非如何被发现。";
-const REVIEW_STYLE = "\n用严谨的汉语学术语言；不摆空模板、不注水、不写开场白、不写「本文」以外的自评（不说首次、系统性、填补空白）；不要用 #、* 等 markdown 符号，小节标题单独成行即可；引用论文一律用方括号篇号如［3］，篇号只能取自给定清单，不得引用清单以外的任何文献。";
+function reviewFieldTable(type) { return REVIEW_CARD_FIELDS[type].map((n, i) => (i + 1) + "．" + n).join("\n"); }
+const REVIEW_SDEM = "\n\nSDE 方法论：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；三原理（原理一 D×E 矛盾→S 改变｜原理二 S×E 矛盾→D 改变｜原理三 S×D 矛盾→E 改变）；发生学——追问事物为何如此发生，而非如何被发现。写「发生」不写「产生」，写「纠缠」不写「关系」。";
+const REVIEW_STYLE = "\n用严谨的汉语学术语言；不摆空模板、不注水、不写开场白、不自评（不说首次、系统性、填补空白）；不要用 #、* 等 markdown 符号，小节标题单独成行即可；引用文献一律用方括号篇号如［3］，篇号只能取自给定清单，不得引用清单以外的任何文献；给定材料若只是摘要，就只凭摘要说话，写不出的格写「写不出——」并说明。";
 // SDE 对谈（高级会话）单独配额：一整场＝开工 1 + 对话 100 + 总结 1 + 拟题 1 + 分部 6 ＝ 109 次，
 // 共用 100/天会在第 99 轮掐断、走不到万字论文；给 130/天留余量。分钟档提到 20：成文一次连发 7 次调用。
 const WDS_DLG_PER_DAY = 300, WDS_DLG_PER_MIN = 25;
@@ -11375,9 +11366,10 @@ export default {
 
       return J({ ok: false, msg: "bad mode" }, 400);
     }
-    // /api/wds/review-gen：综述论文生成器（2026-09-05）。N 篇论文（浏览器本机解析成纯文字，文件不上传）→ 判类 → 逐篇解构卡 → 整图 → 按章目表分节成文。
-    // 唯一权威 tools/skills/sde-review-writing.md；纯 BYOK；四个 mode 全走 SSE（卡与整图输入都长、思考档动笔前会沉默，一次性调用必撞 55 秒护栏）：
-    //   classify（各篇前 1500 字→判类 JSON）| card（一篇→一张卡）| map（N 张卡→整图）| write（整图＋卡→一节正文）
+    // /api/wds/review-gen：综述论文生成器 v2（2026-09-05，十道工序）。唯一权威 tools/skills/sde-review-genesis.md；纯 BYOK；全部 mode 走 SSE。
+    //   frame（①立题闸：主题+问题+类型→题面卡+别名+检索词 JSON）| card（④一篇→一张卡）| map（⑤整图）| surface（⑥表面挑战原话清单）
+    //   challenges（⑦五大发生挑战）| gaps（⑧现有方案的不足）| conjectures（⑨五猜想 + 每条占位者检索词 JSON）| occupants（⑨之二：按实搜结果写分离线）| write（⑩逐节成文）
+    //   工序②文献采集不经基底：页面端直连 OpenAlex（有 CORS），按年份分三层；全部条目自带 DOI/出处。
     if (url.pathname === "/api/wds/review-gen") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
@@ -11388,7 +11380,7 @@ export default {
       const vd = wdsVendorOf(b.vendor);
       const deep = b.tier !== "fast";
       const VC = deep ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
-      const KEY = userKey, rvendor = wdsShort(vd);
+      const KEY = userKey;
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("review", ip, userKey)));
@@ -11398,55 +11390,84 @@ export default {
       const rmode = String(b.mode || "");
       const type = reviewType(b.type);
       const clean = (s, n) => String(s || "").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").slice(0, n);
+      const topic = clean(b.topic, 200), question = clean(b.question, 400);
+      const HEAD = "【综述主题】" + topic + "\n【研究问题】" + question + "\n【类型】" + REVIEW_TYPE_NAME[type] + "\n";
+      const packCards = (cards, n) => (Array.isArray(cards) ? cards : []).slice(0, 60).map((c) => "［" + (parseInt(c.i, 10) || 0) + "］《" + clean(c.title, 140) + "》" + (c.layer ? "（" + clean(c.layer, 6) + "层）" : "") + "\n" + clean(c.card, n)).join("\n\n");
+      const refsList = (refs) => (Array.isArray(refs) ? refs : []).slice(0, 60).map((r, i) => "［" + (i + 1) + "］" + clean(r, 200)).join("\n");
       let sys = "", usr = "", tok = 0;
 
-      if (rmode === "classify") {
-        const items = (Array.isArray(b.items) ? b.items : []).slice(0, 30);
-        if (items.length < 1) return J({ ok: false, msg: "先加入论文。" }, 400);
-        const packed = items.map((it, i) => "［" + (i + 1) + "］《" + clean(it.title, 120) + "》\n" + clean(it.head, 1500)).join("\n\n");
-        sys = "你是 SDE 学派的综述编辑，现在只做一件事：判类。综述分三类——What-综述（知识型：多数论文的承重命题在回答「谁决定谁」，工具＝三方程）、How-综述（技术型：多数论文在回答「从哪起手到哪落地」，工具＝六路径）、Why-综述（动力机制型：多数论文在回答「凭什么持续发生、不做会失去什么」，工具＝三原理）。判类规则：看多数论文的承重命题在回答哪一问，不看题目里的字；判不出来的归 what。" + REVIEW_SDEM + "\n只输出一个 JSON 对象，不要任何前后文、不要代码围栏。格式：{\"type\":\"what|how|why\",\"reason\":\"一两句判类依据\",\"papers\":[{\"i\":1,\"type\":\"what|how|why\",\"claim\":\"该篇承重命题一句\"}]}，papers 必须覆盖每一个篇号。";
-        usr = "下面是 " + items.length + " 篇论文各自的开头（标题＋前约 1500 字）：\n\n" + packed + "\n\n判类，只回 JSON。";
-        tok = deep ? 3000 : 2200;
+      if (rmode === "frame") {
+        if (!topic || !question) return J({ ok: false, msg: "先填主题与研究问题。" }, 400);
+        sys = "你是 SDE 学派的综述编辑，现在只做工序①立题闸。把用户的主题与研究问题改写成发生层的形状：" + REVIEW_QUESTION_FORM[type] + "——改写必须能让不懂本领域的人看出问题的形状。然后做工序②的准备：别名先于人名——列出这个问题在其他学科、其他年代、其他名字底下叫什么（至少 8 个，中英各可），再给出 6–10 条英文检索词（每条 2–6 个词，适合学术库 search 字段，覆盖经典层／现代层／前沿层）。" + REVIEW_SDEM +
+          "\n只输出一个 JSON 对象，不要前后文、不要代码围栏：{\"surface\":\"问题的表面形态（本领域通常怎么问）\",\"genesis\":\"发生层改写一句\",\"aliases\":[\"…\"],\"queries\":[\"…\"],\"classicHint\":\"经典层该找哪一批人/概念，一句\"}";
+        usr = HEAD + "\n出题面卡与检索准备，只回 JSON。";
+        tok = deep ? 2200 : 1600;
       } else if (rmode === "card") {
         const title = clean(b.title, 200) || "（未命名）";
         const text = String(b.text || "").slice(0, 60000);
-        if (text.replace(/\s/g, "").length < 30) return J({ ok: false, msg: "这篇没解析出足够文字。" }, 400);
+        if (text.replace(/\s/g, "").length < 30) return J({ ok: false, msg: "这篇没有足够文字。" }, 400);
         const idx = Math.max(1, parseInt(b.idx, 10) || 1);
+        const isAbs = b.material === "abstract";
         sys = "你是 SDE 系统解构器：把一篇论文当作一个 SDE 系统拆开，出一张「" + REVIEW_TYPE_NAME[type] + "」用的解构卡。卡上没有「它说了什么」，只有「它在哪里发生了什么」——读边不读画。\n" + REVIEW_TOOL_TEXT[type] + REVIEW_SDEM +
-          "\n出卡纪律：只凭给你的正文出卡，不补外部知识；每格一到三句，全卡 300–600 字，写长了就是摘要；第 1 格与「原文锚句」必须能互相落回（锚句 ≤40 字、必须是原文、加短引号）；写不出某格就写「写不出——」并说明这意味着什么；同时站两条方程／路径／原理时按承重命题所在那条归位，另一条记在余数。" +
-          "\n输出格式：严格按下面的字段顺序，每格一行「字段名：内容」，字段名一字不改，不加序号、不加任何别的东西：\n" + reviewFieldTable(type);
-        usr = "【篇号】［" + idx + "］\n【标题】《" + title + "》\n【正文（从 Word/PDF 提取，格式可能略乱，抓主干）】\n" + text + "\n\n出卡。";
+          "\n出卡纪律：只凭给你的材料出卡，不补外部知识；每格一到三句，全卡 300–600 字；第 1 格与「原文锚句」必须能互相落回（锚句 ≤40 字、必须是材料原文、加短引号）；写不出某格就写「写不出——」并说明意味着什么；同时站两格时按承重命题所在那格归位，另一条记在余数。" + (isAbs ? "\n本篇只有摘要（与题名、出处），卡首行先写「【摘要卡】」，凡摘要撑不住的格一律写「写不出——摘要未及」，不许编。" : "") +
+          "\n输出格式：严格按下面的字段顺序，每格一行「字段名：内容」，字段名一字不改：\n" + reviewFieldTable(type);
+        usr = HEAD + "【篇号】［" + idx + "］\n【标题】《" + title + "》" + (b.meta ? "\n【出处】" + clean(b.meta, 300) : "") + "\n【材料" + (isAbs ? "（摘要）" : "（正文，从文件提取，格式可能略乱）") + "】\n" + text + "\n\n出卡。";
         tok = deep ? 2600 : 2000;
       } else if (rmode === "map") {
-        const cards = (Array.isArray(b.cards) ? b.cards : []).slice(0, 30);
+        const cards = Array.isArray(b.cards) ? b.cards : [];
         if (cards.length < 2) return J({ ok: false, msg: "至少两张卡才能摆整图。" }, 400);
-        const packed = cards.map((c) => "［" + (parseInt(c.i, 10) || 0) + "］《" + clean(c.title, 120) + "》\n" + clean(c.card, 1200)).join("\n\n");
         const grid = type === "how" ? "六条路径各一格" : (type === "why" ? "三条原理各一格" : "三条方程各一格");
-        sys = "你是 SDE 学派的综述编辑，现在把 N 张解构卡摆成整图。综述类型：" + REVIEW_TYPE_NAME[type] + "；格子＝" + grid + "，另加一个「外位区」放不属于本类的副类论文。\n" + REVIEW_TOOL_TEXT[type] + REVIEW_SDEM +
-          "\n整图只读四样东西，每样都必须点名到篇号：挤格（哪格最多篇、其中几个不同承重命题）；空格（哪格一篇没有——每个空格必须起名：若有人站到这格，承重命题会是什么样，禁写「有待研究」）；自撞（起手／落点／方程／原理与承重命题都相同的几篇＝同一命题的重复降落，点名合并）；断链（各篇共同依赖、却无一篇检验过的前提，写到「它若不成立，哪几格整格塌」）。另两条纪律：同题不同位不写成争论；不同题同位写成同一副骨架的两次降落。" +
-          REVIEW_STYLE;
-        usr = "下面是 " + cards.length + " 张解构卡：\n\n" + packed + "\n\n按以下顺序输出，直接从正文写起：\n格位分布（每格一行：格名｜篇号清单｜该格内不同承重命题的个数）\n挤格\n空格（逐格起名）\n自撞\n断链\n越位文献（副类论文各在何位）\n全文 1500–2500 字。";
-        tok = deep ? 5000 : 3600;
+        sys = "你是 SDE 学派的综述编辑，现在做工序⑤：把 N 张解构卡摆成整图。类型：" + REVIEW_TYPE_NAME[type] + "；格子＝" + grid + "，另加「外位区」放副类论文、「悬位」放判不出的。\n" + REVIEW_TOOL_TEXT[type] + REVIEW_SDEM +
+          "\n整图只读四样东西，每样都必须点名到篇号：挤格（哪格最多篇、其中几个不同承重命题）；空格（哪格一篇没有——每个空格必须起名：若有人站到这格，承重命题会是什么样，禁写「有待研究」）；自撞（起手／落点／方程／原理与承重命题都相同的几篇＝同一命题的重复降落，点名合并；不同题同位写成同一副骨架的两次降落）；断链（各篇共同依赖、却无一篇检验过的前提，写到「它若不成立，哪几格整格塌」）。同题不同位不写成争论。" + REVIEW_STYLE;
+        usr = HEAD + "\n下面是 " + cards.length + " 张解构卡：\n\n" + packCards(cards, 1100) + "\n\n按顺序输出：\n格位分布（每格一行：格名｜篇号清单｜该格内不同承重命题的个数）\n挤格\n空格（逐格起名）\n自撞\n断链\n越位文献与悬位\n全文 1800–2800 字。";
+        tok = deep ? 5200 : 3800;
+      } else if (rmode === "surface") {
+        const cards = Array.isArray(b.cards) ? b.cards : [];
+        sys = "你做工序⑥：表面挑战清单。只从给定材料（各篇的摘要或正文摘录、解构卡的「失效条件」「余数」栏）里抄各篇自己说的挑战／局限／未来工作，原话短引号，标篇号，按出现频次排序，最多 10 条。只抄不评，不补外部知识，材料里没有的不写。" + REVIEW_STYLE;
+        usr = HEAD + "\n【各篇材料与卡】\n" + packCards(cards, 700) + "\n\n输出表面挑战清单，每条一行：序号｜原话（短引号）｜篇号清单｜出现篇数。";
+        tok = deep ? 2200 : 1600;
+      } else if (rmode === "challenges") {
+        sys = "你做工序⑦：从整图（不是从表面清单）读出恰好五条发生挑战。每条六栏：挑战 k：一句命名（动词在前）／定位：(a) 某一维被整个领域当作给定 (b) 某条方程／路径／原理无人走 (c) 回写缺席 (d) 共有前提无人检验 (e) 读数错位——写出是哪一格哪一维／表面对照：表面清单里哪几条其实是它的影子、为什么那些说法只是现象／塌格范围：它若不解决整图上哪几格站不住／证据：至少三个篇号、各一句锚句（取自卡）／日常类比：一句，讲给不懂本领域的人听。五条必须落在不同定位类型或不同的格上；至少一条来自空格、至少一条来自断链。反面清单（写出即不合格）：数据不足、缺乏统一框架、可解释性有待提高、需要更多实证。" + REVIEW_SDEM + REVIEW_STYLE;
+        usr = HEAD + "\n【整图】\n" + clean(b.map, 9000) + "\n\n【表面挑战清单】\n" + clean(b.surface, 3000) + "\n\n【解构卡（供取锚句）】\n" + packCards(b.cards, 500) + "\n\n先写一段「表面与发生之间隔着什么」，再给五条，六栏齐全。";
+        tok = deep ? 5200 : 3800;
+      } else if (rmode === "gaps") {
+        sys = "你做工序⑧：现有方案的不足。对五条挑战逐条写三栏：它们站在哪格（篇号清单）／够不到的机制——不是「做得不够好」，而是「它在这一格里无论做多好都到不了那一格」，按四型标注：错位（在 S 侧加通道去解 D／E 的缺口）｜缺维（三维只取两维）｜无回写（一次性判定、不改判据）｜读数错位（量的不是要解的事）／它们做对的部分（哪一步要保留，不许全盘否定）。每条必须回指整图的一个读法（挤格／空格／自撞／断链）。最后一行给四型分布。" + REVIEW_SDEM + REVIEW_STYLE;
+        usr = HEAD + "\n【五大发生挑战】\n" + clean(b.challenges, 9000) + "\n\n【整图】\n" + clean(b.map, 6000) + "\n\n逐条写。";
+        tok = deep ? 3600 : 2800;
+      } else if (rmode === "conjectures") {
+        sys = "你做工序⑨：对五条挑战各给一条猜想。每条固定六栏：猜想 k：X 不是 Y，而是 Z／所站的位：" + (type === "how" ? "哪条路径" : type === "why" ? "哪条原理" : "哪条方程") + "（必须是整图里的空格或断链所在格）／读数：一个能测的量——名字、取值范围、怎么取／预测：按这个猜想，现有文献里哪几篇的结果应当被重新解释成什么（至少两篇、写篇号）／可证伪条件：什么数据、什么读数落在什么范围，这条猜想就得删（写到删哪一节）／占位者检索：给 2 条英文检索词，用来去学术库找「谁在别的学科、别的年代、别的名字下已经说过接近的话」。全部标「猜想」，不写本文提出、本文证明。五条至少三条站不同格；不许互相依赖成链。" + REVIEW_SDEM + REVIEW_STYLE +
+          "\n输出：先按上面六栏写五条正文；正文结束后另起一行写 ===QUERIES=== ，其后只输出一个 JSON 数组：[{\"k\":1,\"queries\":[\"…\",\"…\"]},…]，不要代码围栏。";
+        usr = HEAD + "\n【五大发生挑战】\n" + clean(b.challenges, 9000) + "\n\n【现有方案的不足】\n" + clean(b.gaps, 6000) + "\n\n【整图（空格与断链）】\n" + clean(b.map, 5000) + "\n\n写五条猜想。";
+        tok = deep ? 6000 : 4200;
+      } else if (rmode === "occupants") {
+        sys = "你做工序⑨之二：占位者分离线。给你五条猜想与每条的实搜结果（学术库返回的题名／年份／出处／摘要片段）。对每条猜想：从实搜结果里找出最近的正主（可为空），写出「它已经说了什么」与「本猜想比它多走的一步」（分离线）；若实搜结果里没有接近的，写「本轮实搜未命中，不等于没有」，并可另凭记忆点一位可能的正主但必须标「未实搜」。不许把无关结果硬说成占位者。" + REVIEW_STYLE;
+        usr = HEAD + "\n【五条猜想】\n" + clean(b.conjectures, 9000) + "\n\n【实搜结果（按猜想编号分组）】\n" + clean(b.hits, 12000) + "\n\n逐条写占位者与分离线，每条 150–300 字。";
+        tok = deep ? 3200 : 2400;
       } else if (rmode === "write") {
         const sk = REVIEW_SKELETON[type];
         const sec = parseInt(b.sec, 10);
         if (!(sec >= 0 && sec < sk.length) || !sk[sec].words) return J({ ok: false, msg: "bad sec" }, 400);
         const S = sk[sec];
-        const map = clean(b.map, 9000);
-        const cards = (Array.isArray(b.cards) ? b.cards : []).slice(0, 30);
-        const packed = cards.map((c) => "［" + (parseInt(c.i, 10) || 0) + "］《" + clean(c.title, 120) + "》\n" + clean(c.card, 900)).join("\n\n");
-        const refs = (Array.isArray(b.refs) ? b.refs : []).slice(0, 30).map((r, i) => "［" + (i + 1) + "］" + clean(r, 160)).join("\n");
-        const prev = clean(b.prev, 4000);
-        const topic = clean(b.topic, 200);
+        const art = b.art || {};
+        const parts = [];
+        parts.push("【文献清单（篇号→条目；只能引这些）】\n" + refsList(b.refs));
+        if (art.frame) parts.push("【题面卡】\n" + clean(art.frame, 2500));
+        if (art.map) parts.push("【整图（已定，不得改动归位）】\n" + clean(art.map, 9000));
+        if (sec >= 2 && sec <= 4) parts.push("【本节涉及的解构卡】\n" + packCards(b.cards, 900));
+        else if (sec === 1 || sec === 5) parts.push("【解构卡（节选）】\n" + packCards(b.cards, 400));
+        if (sec >= 6) { if (art.surface) parts.push("【表面挑战清单】\n" + clean(art.surface, 3000)); if (art.challenges) parts.push("【五大发生挑战】\n" + clean(art.challenges, 9000)); }
+        if (sec >= 7) { if (art.gaps) parts.push("【现有方案的不足】\n" + clean(art.gaps, 6000)); }
+        if (sec >= 8) { if (art.conjectures) parts.push("【五条猜想】\n" + clean(art.conjectures, 9000)); if (art.occupants) parts.push("【占位者与分离线】\n" + clean(art.occupants, 5000)); }
+        if (b.prev) parts.push("【已写各节（只列标题与首段，用来避免重复，不要复述）】\n" + clean(b.prev, 4000));
         sys = "你是 SDE 学派的综述作者，正在写一篇「" + REVIEW_TYPE_NAME[type] + "」的第 " + (sec + 1) + " 节，节名《" + S.h + "》。综述按格写、不按篇写：任何一节不得出现「论文一……论文二……」的顺序复述，篇只作为格里的证据出现。\n" + REVIEW_TOOL_TEXT[type] + REVIEW_SDEM +
-          "\n硬律：每篇被引用的论文在其所在格至少引一句原文锚句（≤40 字，短引号，取自卡上的锚句）；空格必须起名；自撞必须点名合并；断链必须写到能塌格；只引给定清单里的篇号；节名照表——不要在正文里重写本节标题，直接从正文写起。" + REVIEW_STYLE;
-        usr = (topic ? "【综述主题】" + topic + "\n\n" : "") + "【文献清单（篇号→标题）】\n" + refs + "\n\n【整图（判类与格位分布，已定，不得改动归位）】\n" + map + "\n\n【解构卡】\n" + packed + (prev ? "\n\n【已写各节（只列标题与首段，用来避免重复，不要复述）】\n" + prev : "") +
-          "\n\n现在写第 " + (sec + 1) + " 节《" + S.h + "》。本节要写的：" + S.ask + "\n目标约 " + S.words + " 汉字（±20%）。可用短小小节标题分层。直接从正文写起，不要开场白，不要写节名。";
-        tok = deep ? Math.min(9000, Math.round(S.words * 2.6) + 1200) : Math.min(7000, Math.round(S.words * 2.2) + 800);
+          "\n硬律：每篇被引用的论文在其所在格至少引一句原文锚句（取自卡）；空格必须起名；自撞必须点名合并；断链必须写到能塌格；只引给定清单里的篇号；本节所用的工序产出件（整图／挑战／不足／猜想）已经定下，本节是把它们编排成文，不得改其结论；不要在正文里重写本节标题，直接从正文写起。" + REVIEW_STYLE;
+        usr = HEAD + "\n" + parts.join("\n\n") + "\n\n现在写第 " + (sec + 1) + " 节《" + S.h + "》。本节要写的：" + S.ask + "\n目标约 " + S.words + " 汉字（±20%）。可用短小小节标题分层。直接从正文写起，不要开场白，不要写节名。";
+        tok = deep ? Math.min(9500, Math.round(S.words * 2.6) + 1200) : Math.min(7500, Math.round(S.words * 2.2) + 800);
       } else {
         return J({ ok: false, msg: "bad mode" }, 400);
       }
 
+      const STAGE = { frame: "立题…", card: "解构中…", map: "摆整图…", surface: "抄表面挑战…", challenges: "读发生挑战…", gaps: "写不足…", conjectures: "造猜想…", occupants: "写分离线…", write: "成文中…" };
       const rstream = new ReadableStream({
         async start(controller) {
           const hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": hb\n\n")); } catch (e) {} }, 15000);
@@ -11458,7 +11479,7 @@ export default {
             try { if (o) send(o); controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {}
           };
           try {
-            send({ t: "stage", v: rmode === "classify" ? "判类中…" : rmode === "card" ? "解构中…" : rmode === "map" ? "摆整图…" : "成文中…" });
+            send({ t: "stage", v: STAGE[rmode] || "…" });
             const body = { model: VC.model, stream: true, max_tokens: tok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] };
             let up;
             try {
