@@ -11556,14 +11556,22 @@ export default {
           };
           try {
             send({ t: "stage", v: STAGE[rmode] || "…" });
-            const body = { model: VC.model, stream: true, max_tokens: tok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] };
+            const mkBody = (plain) => {
+              // 2026-09-05 修（用户截图：⑤之二那一步「基底两次都没写出内容（finish_reason＝length）」）：
+              // 病灶＝深度档开着思考，思考与正文吃同一份 max_tokens（neighbors 深度档只给 2400），思考把额度吃光、正文零字、
+              // finish_reason 回 length；而这里从前只认 delta.reasoning_content，OpenRouter 的 delta.reasoning 与 MiniMax 包在
+              // content 里的 <think> 一律看不见 ⇒ think 恒 0，报出来的话把「烧在思考上」误报成「没写出内容」，再试也是同一副参数。
+              // 现在：第二次调用**关掉思考（wdsPlainBody，卸 top）并把额度放大 1.6 倍**——这一步要的是可核的列表不是深思，关了不亏。
+              const B = { model: VC.model, stream: true, max_tokens: plain ? Math.round(tok * 1.6) : tok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] };
+              return plain ? wdsPlainBody({ url: VC.url, model: VC.model, name: VC.name }, B) : wdsTopBody(VC, B);
+            };
             // 一次上游调用。返回 { fatal, out, think, why, errFirst, rawHead }。
             // 2026-09-05 修：流里的 j.error（多为输入过长／内容过滤）从前会被末尾那句「基底没写出内容」盖掉——现在记第一条真错误并原样报出；
             // 上游给 200 却不是 SSE（整块 JSON）的，也抓前 200 字报出来；纯空流（无错、无思考、无正文）自动再试一次。
-            const callUp = async () => {
+            const callUp = async (plain) => {
               let up;
               try {
-                up = await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, body)) });
+                up = await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(mkBody(!!plain)) });
               } catch (e) { fin({ t: "error", v: VC.name + " 连接失败：" + ((e && e.message) || "") }); return { fatal: true }; }
               if (!up || !up.ok) {
                 const st = up ? up.status : 0;
@@ -11577,6 +11585,7 @@ export default {
               const dec = new TextDecoder();
               const rd = up.body.getReader();
               let buf = "", out = 0, think = 0, why = "", errFirst = "", rawHead = "", nonSse = 0;
+              const _mm = { on: /minimax/i.test(String(VC.url || "")), in: false, hold: "" };   // MiniMax <think> 剥离（见 wdsMMFeed）
               while (true) {
                 const rr = await rd.read();
                 if (rr.done) break;
@@ -11594,25 +11603,35 @@ export default {
                   const c0 = (j.choices && j.choices[0]) || {};
                   if (c0.finish_reason) why = c0.finish_reason;
                   const dl = c0.delta || {};
-                  if (dl.reasoning_content) { think += dl.reasoning_content.length; send({ t: "think", v: think }); }
-                  if (dl.content) { out += dl.content.length; send({ t: "token", v: dl.content }); }
+                  const _rsn = wdsRsn(dl);   // 各家字段名不同（reasoning_content／reasoning），见 wdsRsn
+                  if (_rsn) { think += _rsn.length; send({ t: "think", v: think }); }
+                  if (dl.content) {
+                    let _tk = dl.content, _th = "";
+                    if (_mm.on) { const r0 = wdsMMFeed(_mm, dl.content); _tk = r0.out; _th = r0.think; }
+                    if (_th) { think += _th.length; send({ t: "think", v: think }); }
+                    if (_tk) { out += _tk.length; send({ t: "token", v: _tk }); }
+                  }
                 }
               }
               if (!rawHead && buf.trim().charAt(0) === "{") rawHead = buf.trim().slice(0, 200);
               return { fatal: false, out: out, think: think, why: why, errFirst: errFirst, rawHead: rawHead };
             };
-            let r = await callUp();
+            let r = await callUp(false);
             if (r.fatal) return;
-            if (!r.out && !r.think && !r.errFirst && !r.rawHead) {
-              send({ t: "stage", v: "基底回了个空流，自动再试一次…" });
-              r = await callUp();
+            let retried = "";
+            if (!r.out && !r.errFirst && !r.rawHead) {
+              // 正文零字而流本身没报错：三种脸——思考烧光（think>0）、额度用尽但思考看不见（why=length）、纯空流。
+              // 三种都走同一条路：关思考、放大额度再来一次。
+              retried = r.think ? ("思考吃掉了 " + r.think + " 字额度") : (r.why === "length" ? "额度被思考吃光（finish_reason＝length）" : "基底回了个空流");
+              send({ t: "stage", v: retried + "，自动关掉思考、放大额度再试一次…" });
+              r = await callUp(true);
               if (r.fatal) return;
             }
             if (!r.out) {
-              const v = r.errFirst ? (VC.name + " 流内报错：" + r.errFirst + (/context|length|token|too long|exceed/i.test(r.errFirst) ? "（输入可能过长——换快速档、减少入选篇数，或从断点继续让卡包自动缩短）" : ""))
+              const v = r.errFirst ? (VC.name + " 流内报错：" + r.errFirst + (/context|length|token|too long|exceed/i.test(r.errFirst) ? "（输入可能过长——换快速档、减少入选篇数，或从断点继续让卡包自动缩短）" : "")
                 : r.rawHead ? (VC.name + " 没有按流返回：" + r.rawHead)
-                : r.think ? ("基底把额度全烧在思考上了（想了 " + r.think + " 字，正文一个字没写）。换成快速档再试。")
-                : ("基底两次都没写出内容（finish_reason＝" + (r.why || "无") + "）。换快速档或换一家基底再试；已完成的工序已保存。");
+                : r.think ? ("基底把额度全烧在思考上了（想了 " + r.think + " 字，正文一个字没写；已自动关思考重试一次仍如此）。换一家基底，或从断点继续。")
+                : ("基底两次都没写出内容（第一次：" + (retried || "无") + "；第二次已关思考、额度 ×1.6，finish_reason＝" + (r.why || "无") + "）。换一家基底再试；已完成的工序已保存。");
               return fin({ t: "error", v: v });
             }
             fin({ t: "end", v: { out: r.out, think: r.think, why: r.why, truncated: r.why === "length" } });

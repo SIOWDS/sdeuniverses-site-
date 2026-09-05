@@ -94,9 +94,12 @@ if (fs.existsSync(PAGE_P)) {
   ok("页面无 href=\"#\" 死链", !/href="#"/.test(PG));
   ok("页面有工序⑤之二敌拓闸阶段（neighbors/verdict）", PG.indexOf('mode:"neighbors"') > 0 && PG.indexOf('mode:"verdict"') > 0);
   ok("页面有 How-卡路径机检 routeCheck", PG.indexOf("function routeCheck(") > 0);
-  ok("Skill 是 v1.6 且含⑤之二两道、⑧之二维度碰撞、典范判据、⑨之二新研究领地、⑩之二 SDE 改性", /version:\s*1\.6/.test(SKILL) && SKILL.indexOf("工序⑩之二 SDE 改性") > 0 && SKILL.indexOf("工序⑨之二 新研究领地发生") > 0 && SKILL.indexOf("典范判据") > 0 && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
+  ok("Skill 是 v1.6.2 且含⑤之二两道＋操作性饱和、⑧之二维度碰撞、典范判据、⑨之二新研究领地＋反土地四击、⑩之二 SDE 改姓、R-41", /version:\s*1\.6\.2/.test(SKILL) && SKILL.indexOf("工序⑩之二 SDE 改姓") > 0 && SKILL.indexOf("操作性饱和") > 0 && SKILL.indexOf("反土地四击闸") > 0 && SKILL.indexOf("R-41") > 0 && SKILL.indexOf("候选发生挑战与核心五条") > 0 && SKILL.indexOf("工序⑨之二 新研究领地发生") > 0 && SKILL.indexOf("典范判据") > 0 && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
   /* v1.4：⑧之二 学科内维度碰撞 */
   ok("collide 提示：三家取自清单内、不得同维、共有前提＝断链、六型对照、删维测试、碰撞挑战", /rmode === "collide"[\s\S]*?不得同维[\s\S]*?六型[\s\S]*?删维测试[\s\S]*?碰撞挑战/.test(WSRC));
+  /* 2026-09-05：正文零字的重试路——关思考、放大额度；思考字段走 wdsRsn；MiniMax <think> 剥离 */
+  ok("review-gen 正文零字时自动关思考重试（mkBody plain→wdsPlainBody、额度×1.6）", /const mkBody = \(plain\)[\s\S]*?tok \* 1\.6[\s\S]*?wdsPlainBody\(\{ url: VC\.url/.test(WSRC) && /r = await callUp\(true\)/.test(WSRC));
+  ok("review-gen 思考字段走 wdsRsn 且 MiniMax 用 wdsMMFeed 剥 <think>", /const _rsn = wdsRsn\(dl\)/.test(WSRC) && /wdsMMFeed\(_mm, dl\.content\)/.test(WSRC));
   ok("collide_run 提示：判负照登、不得改口", /rmode === "collide_run"[\s\S]*?判负照登/.test(WSRC));
   ok("conjectures 带三档级别（典范／碰撞／改判）且 QUERIES 带 level", WSRC.indexOf("级别：典范级") > 0 && WSRC.indexOf("级别：碰撞级") > 0 && /\\"level\\"/.test(WSRC));
   ok("collide 提示含 v1.4.5 要素（How 主家／测量原语同构闸／借用／级别裁定／领地接口）", WSRC.indexOf("起手维等于落格路径落点维") > 0 && WSRC.indexOf("测量原语卡") > 0 && WSRC.indexOf("借用") > 0 && WSRC.indexOf("级别裁定") > 0 && WSRC.indexOf("领地接口") > 0);
