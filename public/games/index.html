@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>歇一歇 · 休闲小游戏 · SDE Universes</title>
+<meta name="description" content="爱思乐园的休闲角：2048 与贪吃蛇两个经典小游戏。不烧 Key、无需注册，最高分只记在你自己的浏览器里。">
+<link rel="canonical" href="https://sdeuniverses.com/games/">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/assets/app/favicon-32.png" sizes="32x32">
+<meta name="theme-color" content="#F5EFE0">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F5EFE0;--surface:#EBE3CE;--card:#FAF6EC;--card2:#F0E8D3;
+  --gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+  --border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);
+  --dark:#1A1410;--dgold:#D4B25E;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','Songti SC',Georgia,serif;line-height:1.7;min-height:100vh;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:1.4rem;padding:.7rem 1.4rem;background:rgba(245,239,224,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+nav .logo{color:var(--gold);font-weight:700;text-decoration:none;letter-spacing:.06em}
+nav a.lnk{color:var(--text2);text-decoration:none;font-size:.85rem;letter-spacing:.08em}
+nav a.lnk:hover{color:var(--gold)}
+nav .sp{flex:1}
+main{max-width:720px;margin:0 auto;padding:1.6rem 1rem 4rem;text-align:center}
+.eyebrow{font-size:.7rem;letter-spacing:.4em;color:var(--gold2);margin-bottom:.5rem}
+h1{font-size:clamp(1.5rem,4.5vw,2.1rem);font-weight:700;letter-spacing:.04em}
+.lede{color:var(--text2);font-size:.92rem;max-width:52ch;margin:.5rem auto 1.3rem}
+.tabs{display:inline-flex;border:1px solid var(--border);border-radius:24px;overflow:hidden;background:var(--card);margin-bottom:1.2rem}
+.tabs button{border:0;background:transparent;font:inherit;padding:.45rem 1.3rem;cursor:pointer;color:var(--text2);letter-spacing:.1em}
+.tabs button.on{background:var(--gold);color:#fff}
+.panel{display:none}.panel.on{display:block}
+.bar{display:flex;justify-content:center;gap:.7rem;margin-bottom:.9rem;flex-wrap:wrap}
+.box{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:.35rem 1rem;min-width:96px}
+.box small{display:block;font-size:.66rem;letter-spacing:.2em;color:var(--muted)}
+.box b{font-size:1.25rem}
+.btn{font:inherit;border:1px solid var(--border);background:var(--card);color:var(--gold);padding:.45rem 1.1rem;border-radius:8px;cursor:pointer;letter-spacing:.08em}
+.btn:hover{background:var(--card2)}
+.btn.primary{background:var(--gold);color:#fff;border-color:var(--gold)}
+.stage{position:relative;display:inline-block;touch-action:none;user-select:none}
+/* 2048 */
+#g2048{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:var(--dark);padding:8px;border-radius:10px;width:min(88vw,360px);height:min(88vw,360px)}
+.cell{border-radius:6px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.5rem;font-family:Georgia,'Noto Serif SC',serif;transition:transform .08s}
+.cell.pop{animation:pop .12s ease-out}
+@keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+.v2{background:#EFE3C4;color:#4A3B1F}.v4{background:#E8D6A2;color:#4A3B1F}.v8{background:#E2B97A;color:#fff}.v16{background:#D9A05B;color:#fff}
+.v32{background:#D1863E;color:#fff}.v64{background:#C8702A;color:#fff}.v128{background:#C9A227;color:#fff;font-size:1.25rem}.v256{background:#B8912A;color:#fff;font-size:1.25rem}
+.v512{background:#A58022;color:#fff;font-size:1.25rem}.v1024{background:#8A6817;color:#fff;font-size:1.05rem}.v2048{background:#3B2E10;color:#F2D889;font-size:1.05rem;box-shadow:0 0 18px rgba(212,178,94,.6)}
+.vbig{background:#1A1410;color:#F2D889;font-size:.95rem}
+/* snake */
+#snake{background:var(--dark);border-radius:10px;width:min(88vw,360px);height:min(88vw,360px);display:block}
+.overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:.7rem;background:rgba(26,20,16,.78);border-radius:10px;color:#EFE9DD}
+.overlay.on{display:flex}
+.overlay b{font-size:1.4rem}
+.pad{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px);gap:6px;justify-content:center;margin-top:1rem}
+.pad button{font:inherit;font-size:1.2rem;border:1px solid var(--border);background:var(--card);border-radius:10px;color:var(--gold);cursor:pointer}
+.pad button:active{background:var(--card2)}
+.pad .e{visibility:hidden}
+.hint{color:var(--muted);font-size:.8rem;margin-top:.9rem}
+@media(hover:hover) and (pointer:fine){.pad{display:none}}
+footer{text-align:center;color:var(--muted);font-size:.78rem;padding:1.5rem 1rem 2.5rem;border-top:1px solid var(--border2)}
+footer a{color:var(--gold2);text-decoration:none;margin:0 .35rem}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">爱思乐园</a>
+  <a class="lnk" href="/brain-gym/">健脑三件</a>
+  <a class="lnk" href="/directory/">栏目总目录</a>
+  <span class="sp"></span>
+  <a class="lnk" href="/browse/">SDE 浏览</a>
+</nav>
+<main>
+  <p class="eyebrow">REST CORNER · 歇一歇</p>
+  <h1>休闲小游戏</h1>
+  <p class="lede">读累了撞累了，玩两把再回来。不烧 Key、无需注册，最高分只记在你自己的浏览器里。</p>
+
+  <div class="tabs" role="tablist">
+    <button class="on" data-tab="t2048">2048</button>
+    <button data-tab="tsnake">贪吃蛇</button>
+  </div>
+
+  <!-- ===== 2048 ===== -->
+  <section class="panel on" id="t2048">
+    <div class="bar">
+      <div class="box"><small>SCORE · 得分</small><b id="s2048">0</b></div>
+      <div class="box"><small>BEST · 最高</small><b id="b2048">0</b></div>
+      <button class="btn" id="r2048">重来</button>
+    </div>
+    <div class="stage" id="st2048">
+      <div id="g2048"></div>
+      <div class="overlay" id="o2048"><b id="o2048t">游戏结束</b><span id="o2048s"></span><button class="btn primary" id="o2048b">再来一局</button></div>
+    </div>
+    <div class="pad" data-for="2048">
+      <span class="e"></span><button data-d="up">↑</button><span class="e"></span>
+      <button data-d="left">←</button><span class="e"></span><button data-d="right">→</button>
+      <span class="e"></span><button data-d="down">↓</button><span class="e"></span>
+    </div>
+    <p class="hint">方向键或滑动合并数字，拼出 2048。</p>
+  </section>
+
+  <!-- ===== SNAKE ===== -->
+  <section class="panel" id="tsnake">
+    <div class="bar">
+      <div class="box"><small>SCORE · 得分</small><b id="ssnake">0</b></div>
+      <div class="box"><small>BEST · 最高</small><b id="bsnake">0</b></div>
+      <button class="btn" id="rsnake">开始</button>
+    </div>
+    <div class="stage" id="stsnake">
+      <canvas id="snake" width="360" height="360"></canvas>
+      <div class="overlay on" id="osnake"><b id="osnaket">贪吃蛇</b><span id="osnakes">按开始或任意方向键</span><button class="btn primary" id="osnakeb">开始</button></div>
+    </div>
+    <div class="pad" data-for="snake">
+      <span class="e"></span><button data-d="up">↑</button><span class="e"></span>
+      <button data-d="left">←</button><button data-d="pause">‖</button><button data-d="right">→</button>
+      <span class="e"></span><button data-d="down">↓</button><span class="e"></span>
+    </div>
+    <p class="hint">方向键或滑动控制，空格暂停。吃得越多，跑得越快。</p>
+  </section>
+</main>
+<footer>
+  <a href="/brain-gym/">回健脑三件</a>·<a href="/directory/">栏目总目录</a>·<a href="/">系统入口</a>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id);};
+var store={get:function(k){try{return +localStorage.getItem(k)||0;}catch(e){return 0;}},set:function(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+
+/* ---------- tabs ---------- */
+var active='t2048';
+document.querySelectorAll('.tabs button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('on');});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');$(b.dataset.tab).classList.add('on');active=b.dataset.tab;
+    if(active!=='tsnake')Snake.pause();
+  });
+});
+
+/* ---------- swipe ---------- */
+function swipe(el,cb){
+  var sx=0,sy=0,on=false;
+  el.addEventListener('pointerdown',function(e){sx=e.clientX;sy=e.clientY;on=true;});
+  el.addEventListener('pointerup',function(e){
+    if(!on)return;on=false;
+    var dx=e.clientX-sx,dy=e.clientY-sy;
+    if(Math.abs(dx)<24&&Math.abs(dy)<24)return;
+    cb(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'));
+  });
+  el.addEventListener('pointercancel',function(){on=false;});
+}
+var KEYS={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
+
+/* ================= 2048 ================= */
+var G2048=(function(){
+  var N=4,grid,score,best=store.get('sde_g2048_best'),over,cells=[];
+  var el=$('g2048');
+  for(var i=0;i<N*N;i++){var c=document.createElement('div');c.className='cell';el.appendChild(c);cells.push(c);}
+  $('b2048').textContent=best;
+  function empties(){var a=[];for(var r=0;r<N;r++)for(var c=0;c<N;c++)if(!grid[r][c])a.push([r,c]);return a;}
+  function spawn(){var e=empties();if(!e.length)return;var p=e[Math.floor(Math.random()*e.length)];grid[p[0]][p[1]]=Math.random()<0.9?2:4;cells[p[0]*N+p[1]].classList.add('pop');}
+  function render(){
+    for(var r=0;r<N;r++)for(var c=0;c<N;c++){var v=grid[r][c],d=cells[r*N+c];
+      d.textContent=v||'';d.className='cell'+(v?(v>2048?' vbig':' v'+v):'')+(d.classList.contains('pop')?' pop':'');
+    }
+    setTimeout(function(){cells.forEach(function(d){d.classList.remove('pop');});},130);
+    $('s2048').textContent=score;
+    if(score>best){best=score;store.set('sde_g2048_best',best);}
+    $('b2048').textContent=best;
+  }
+  function slideRow(row){ // left
+    var a=row.filter(Boolean),out=[],moved=false,gain=0;
+    for(var i=0;i<a.length;i++){
+      if(a[i]===a[i+1]){out.push(a[i]*2);gain+=a[i]*2;i++;}else out.push(a[i]);
+    }
+    while(out.length<N)out.push(0);
+    for(var j=0;j<N;j++)if(out[j]!==row[j])moved=true;
+    return {row:out,moved:moved,gain:gain};
+  }
+  function move(dir){
+    if(over)return;
+    var moved=false,gain=0,r,c,line,res;
+    var g=grid.map(function(x){return x.slice();});
+    if(dir==='left'||dir==='right'){
+      for(r=0;r<N;r++){line=g[r].slice();if(dir==='right')line.reverse();res=slideRow(line);if(dir==='right')res.row.reverse();g[r]=res.row;moved=moved||res.moved;gain+=res.gain;}
+    }else{
+      for(c=0;c<N;c++){line=[];for(r=0;r<N;r++)line.push(g[r][c]);if(dir==='down')line.reverse();res=slideRow(line);if(dir==='down')res.row.reverse();for(r=0;r<N;r++)g[r][c]=res.row[r];moved=moved||res.moved;gain+=res.gain;}
+    }
+    if(!moved)return;
+    grid=g;score+=gain;spawn();render();
+    if(!canMove()){over=true;$('o2048t').textContent='游戏结束';$('o2048s').textContent='得分 '+score;$('o2048').classList.add('on');}
+    else if(!won&&grid.some(function(row){return row.indexOf(2048)>=0;})){won=true;$('o2048t').textContent='拼出 2048 了！';$('o2048s').textContent='可以继续往上冲';$('o2048b').textContent='继续';$('o2048').classList.add('on');}
+  }
+  var won=false;
+  function canMove(){
+    if(empties().length)return true;
+    for(var r=0;r<N;r++)for(var c=0;c<N;c++){var v=grid[r][c];if((c<N-1&&grid[r][c+1]===v)||(r<N-1&&grid[r+1][c]===v))return true;}
+    return false;
+  }
+  function reset(){grid=[];for(var r=0;r<N;r++){grid.push([0,0,0,0]);}score=0;over=false;won=false;$('o2048').classList.remove('on');$('o2048b').textContent='再来一局';spawn();spawn();render();}
+  $('r2048').addEventListener('click',reset);
+  $('o2048b').addEventListener('click',function(){if(over)reset();else $('o2048').classList.remove('on');});
+  swipe($('st2048'),move);
+  document.querySelector('.pad[data-for="2048"]').addEventListener('click',function(e){var d=e.target.dataset.d;if(d)move(d);});
+  reset();
+  return {move:move};
+})();
+
+/* ================= SNAKE ================= */
+var Snake=(function(){
+  var cv=$('snake'),ctx=cv.getContext('2d'),N=20,CS=cv.width/N;
+  var snake=[[10,10],[9,10],[8,10]],dir,nextDir,food,score,best=store.get('sde_snake_best'),timer=null,speed,alive=false,paused=false;
+  $('bsnake').textContent=best;
+  function rnd(){return Math.floor(Math.random()*N);}
+  function placeFood(){do{food=[rnd(),rnd()];}while(snake.some(function(s){return s[0]===food[0]&&s[1]===food[1];}));}
+  function draw(){
+    ctx.fillStyle='#1A1410';ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle='rgba(212,178,94,.08)';ctx.lineWidth=1;
+    for(var i=1;i<N;i++){ctx.beginPath();ctx.moveTo(i*CS,0);ctx.lineTo(i*CS,cv.height);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*CS);ctx.lineTo(cv.width,i*CS);ctx.stroke();}
+    if(food){ctx.fillStyle='#E23B3B';ctx.beginPath();ctx.arc(food[0]*CS+CS/2,food[1]*CS+CS/2,CS*0.36,0,Math.PI*2);ctx.fill();}
+    snake.forEach(function(s,i){
+      var t=i/snake.length;
+      ctx.fillStyle=i===0?'#F2D889':'rgb('+Math.round(212-60*t)+','+Math.round(178-50*t)+','+Math.round(94-30*t)+')';
+      rr(s[0]*CS+1.5,s[1]*CS+1.5,CS-3,CS-3,5);
+    });
+  }
+  function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();ctx.fill();}
+  var D={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+  function step(){
+    dir=nextDir;
+    var h=[snake[0][0]+D[dir][0],snake[0][1]+D[dir][1]];
+    if(h[0]<0||h[1]<0||h[0]>=N||h[1]>=N||snake.some(function(s){return s[0]===h[0]&&s[1]===h[1];})){return die();}
+    snake.unshift(h);
+    if(h[0]===food[0]&&h[1]===food[1]){
+      score+=10;$('ssnake').textContent=score;
+      if(score>best){best=score;store.set('sde_snake_best',best);$('bsnake').textContent=best;}
+      placeFood();
+      if(speed>70){speed-=4;clearInterval(timer);timer=setInterval(step,speed);}
+    }else snake.pop();
+    draw();
+  }
+  function die(){
+    alive=false;clearInterval(timer);timer=null;
+    $('osnaket').textContent='撞了';$('osnakes').textContent='得分 '+score;$('osnakeb').textContent='再来一局';$('osnake').classList.add('on');
+    $('rsnake').textContent='开始';
+  }
+  function start(){
+    snake=[[10,10],[9,10],[8,10]];dir='right';nextDir='right';score=0;speed=150;alive=true;paused=false;
+    $('ssnake').textContent=0;placeFood();draw();
+    $('osnake').classList.remove('on');$('rsnake').textContent='暂停';
+    clearInterval(timer);timer=setInterval(step,speed);
+  }
+  function pause(){
+    if(!alive)return;
+    if(paused){paused=false;timer=setInterval(step,speed);$('osnake').classList.remove('on');$('rsnake').textContent='暂停';}
+    else{paused=true;clearInterval(timer);timer=null;$('osnaket').textContent='暂停中';$('osnakes').textContent='得分 '+score;$('osnakeb').textContent='继续';$('osnake').classList.add('on');$('rsnake').textContent='继续';}
+  }
+  function turn(d){
+    if(!alive){start();}
+    else if(paused){pause();}
+    var opp={up:'down',down:'up',left:'right',right:'left'};
+    if(opp[d]!==dir)nextDir=d;
+  }
+  $('rsnake').addEventListener('click',function(){alive?pause():start();});
+  $('osnakeb').addEventListener('click',function(){alive?pause():start();});
+  swipe($('stsnake'),turn);
+  document.querySelector('.pad[data-for="snake"]').addEventListener('click',function(e){var d=e.target.dataset.d;if(!d)return;d==='pause'?pause():turn(d);});
+  draw();
+  return {turn:turn,pause:function(){if(alive&&!paused)pause();},toggle:pause};
+})();
+
+/* ---------- keyboard ---------- */
+document.addEventListener('keydown',function(e){
+  var d=KEYS[e.key];
+  if(active==='t2048'){if(d){e.preventDefault();G2048.move(d);}}
+  else{if(d){e.preventDefault();Snake.turn(d);}else if(e.key===' '){e.preventDefault();Snake.toggle();}}
+});
+})();
+</script>
+</body>
+</html>
