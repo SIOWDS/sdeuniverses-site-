@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>综述论文生成器 · 十道工序：主题与研究问题进，研究指导总纲出 | SDE Universes</title>
-<meta name="description" content="输入学科主题、研究问题，注明 What／How／Why 类型，按《SDE 综述生成 Skill》十道工序生成一篇作为研究指导总纲的综述：立题闸→文献采集（OpenAlex，三层×可核出处）→逐篇 SDE 解构卡→整图→表面挑战→五大发生挑战→现有方案的不足→SDE 猜想解决（占位者实搜＋读数按形状去 OpenAlex／Crossref／Semantic Scholar 三库查隔壁的名字）→分节成文。可另上传自己的论文全文。用你自己的大模型 Key（只存本地）。">
+<meta name="description" content="输入学科主题、研究问题，注明 What／How／Why 类型，按《SDE 综述生成 Skill》十道工序生成一篇作为研究指导总纲的综述：立题闸→文献采集（OpenAlex，三层×可核出处）→逐篇 SDE 解构卡→整图→表面挑战→五大发生挑战→现有方案的不足→SDE 维度碰撞（学科内：三维代表卡×断链撞出 Z，并把 Z 施于全部卡做真跑）→SDE 猜想解决（碰撞级／改判级；占位者实搜＋读数按形状去 OpenAlex／Crossref／Semantic Scholar 三库查隔壁的名字）→分节成文。可另上传自己的论文全文。用你自己的大模型 Key（只存本地）。">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -160,7 +160,7 @@ input[type=text].wide{max-width:none}
   <div class="hero-glow"></div>
   <div class="eyebrow">品尝系列 · 综述论文生成器 · 十道工序</div>
   <h1>综述<span class="grad">论文生成器</span></h1>
-  <p class="sub">填一个<b>学科主题</b>、一个<b>研究问题</b>，注明是 <b>What／How／Why</b> 哪一类，机器按《SDE 综述生成 Skill》十道工序走到底：立题闸 → 文献采集（<b>OpenAlex 开放学术库，三层×可核出处</b>）→ 逐篇 <b>SDE 系统解构卡</b>（How-卡路径栏机检）→ 整图 → <b>敌拓闸</b>（每个空格与断链去邻近行实搜，三判：语料空／全语料空／本地空）→ 表面挑战 → <b>五大发生挑战</b>（不是论文自己说的那种）→ 现有方案的不足 → <b>SDE 猜想解决</b>（占位者实搜；每个读数再按它的<b>形状</b>——差型／改写型／介入型／周期型／分歧型／比例型——去 <b>OpenAlex、Crossref、Semantic Scholar 三库</b>查隔壁早有的名字，写分离线与撤下条件）→ 分节成文。出来的不是文献摘要清单，是一份<b>研究指导总纲</b>。可另上传你自己的论文全文（本机解析、不上传）。</p>
+  <p class="sub">填一个<b>学科主题</b>、一个<b>研究问题</b>，注明是 <b>What／How／Why</b> 哪一类，机器按《SDE 综述生成 Skill》十道工序走到底：立题闸 → 文献采集（<b>OpenAlex 开放学术库，三层×可核出处</b>）→ 逐篇 <b>SDE 系统解构卡</b>（How-卡路径栏机检）→ 整图 → <b>敌拓闸</b>（每个空格与断链去邻近行实搜，三判：语料空／全语料空／本地空）→ 表面挑战 → <b>五大发生挑战</b>（不是论文自己说的那种）→ 现有方案的不足 → <b>SDE 维度碰撞</b>（学科内：从整图上取 S、D、E 三维各一张代表卡，以断链为共有前提撞出一个此前不存在的 Z，再把 Z 施于全部卡做真跑，判负照登）→ <b>SDE 猜想解决</b>（碰撞级／改判级；占位者实搜；每个读数再按它的<b>形状</b>——差型／改写型／介入型／周期型／分歧型／比例型——去 <b>OpenAlex、Crossref、Semantic Scholar 三库</b>查隔壁早有的名字，写分离线与撤下条件）→ 分节成文。出来的不是文献摘要清单，是一份<b>研究指导总纲</b>。可另上传你自己的论文全文（本机解析、不上传）。</p>
   <div class="flow">
     <span>① 立题</span><span class="arr">→</span><span>② 文献</span><span class="arr">→</span><span>③④ 出卡</span><span class="arr">→</span><span>⑤ 整图</span><span class="arr">→</span><span>⑤之二 敌拓闸</span><span class="arr">→</span><span>⑥⑦ 挑战</span><span class="arr">→</span><span>⑧ 不足</span><span class="arr">→</span><span>⑨ 猜想</span><span class="arr">→</span><span>⑩ 成文</span>
   </div>
@@ -246,14 +246,14 @@ input[type=text].wide{max-width:none}
       <span class="status" id="status"></span>
     </div>
     <div class="stages" id="stages">
-      <span data-s="frame">①立题</span><span data-s="lit">②文献</span><span data-s="card">③④出卡</span><span data-s="map">⑤整图</span><span data-s="neighbors">⑤之二敌拓</span><span data-s="surface">⑥表面</span><span data-s="challenges">⑦挑战</span><span data-s="gaps">⑧不足</span><span data-s="conjectures">⑨猜想</span><span data-s="write">⑩成文</span><span data-s="check">自检</span>
+      <span data-s="frame">①立题</span><span data-s="lit">②文献</span><span data-s="card">③④出卡</span><span data-s="map">⑤整图</span><span data-s="neighbors">⑤之二敌拓</span><span data-s="surface">⑥表面</span><span data-s="challenges">⑦挑战</span><span data-s="gaps">⑧不足</span><span data-s="collide">⑧之二碰撞</span><span data-s="conjectures">⑨猜想</span><span data-s="write">⑩成文</span><span data-s="check">自检</span>
     </div>
   </div>
 
   <div id="results"></div>
 </main>
 
-<div class="foot">由大模型生成，观点供思考参考；引注只取自工序②清单，每条自带 DOI／出处，请以原文核对。文献采集走 OpenAlex 官方开放接口（浏览器直连，不经本站）；上传文件全部在你本机浏览器内解析，绝不上传；正文与 API Key 只在你选定基底时发往该基底，本站不留存。敌拓闸第二道走 Crossref 与 Semantic Scholar 的公开接口（同样浏览器直连）。规范层：SDE 学派《SDE 综述生成 Skill》v1.3（十道工序＋敌拓闸两道）。sdeuniverses.com</div>
+<div class="foot">由大模型生成，观点供思考参考；引注只取自工序②清单，每条自带 DOI／出处，请以原文核对。文献采集走 OpenAlex 官方开放接口（浏览器直连，不经本站）；上传文件全部在你本机浏览器内解析，绝不上传；正文与 API Key 只在你选定基底时发往该基底，本站不留存。敌拓闸第二道走 Crossref 与 Semantic Scholar 的公开接口（同样浏览器直连）。规范层：SDE 学派《SDE 综述生成 Skill》v1.4（十道工序＋敌拓闸两道＋⑧之二学科内维度碰撞）。sdeuniverses.com</div>
 
 <script>
 (function(){
@@ -269,7 +269,7 @@ var kind=localStorage.getItem("sde_rev_kind")||"";        // what|how|why，必�
 var targetN=parseInt(localStorage.getItem("sde_rev_n")||"30",10);
 /* 章目表——唯一权威 tools/skills/sde-review-genesis.md §10.1 之二，这里是它的编译产物（words=0 的参考文献由本页拼装） */
 var HEAD=[{h:"问题与判类",words:900},{h:"解构方法",words:1000}];
-var TAIL=[{h:"整图：挤格、空格、自撞、断链",words:2000},{h:"表面挑战与发生挑战",words:3000},{h:"现有方案的不足",words:1500},{h:"SDE 猜想解决",words:3000},{h:"研究总纲：三个指导方向里的这一个",words:1000},{h:"参考文献",words:0}];
+var TAIL=[{h:"整图：挤格、空格、自撞、断链",words:2000},{h:"表面挑战与发生挑战",words:3000},{h:"现有方案的不足",words:1500},{h:"维度碰撞：从断链到 Z",words:2500},{h:"SDE 猜想解决",words:3000},{h:"研究总纲：三个指导方向里的这一个",words:1000},{h:"参考文献",words:0}];
 var SKELETON={
   what:HEAD.concat([{h:"站在 S=F(D,E) 上的文献",words:2000},{h:"站在 D=G(S,E) 上的文献",words:2000},{h:"站在 E=H(S,D) 上的文献",words:2000}],TAIL),
   how:HEAD.concat([{h:"从 S 起手的方法（S→D→E／S→E→D）",words:2000},{h:"从 D 起手的方法（D→S→E／D→E→S）",words:2000},{h:"从 E 起手的方法（E→S→D／E→D→S）",words:2000}],TAIL),
@@ -278,7 +278,7 @@ var SKELETON={
 var TYPE_NAME={what:"What-综述（知识型 · 三方程）",how:"How-综述（技术型 · 六路径）",why:"Why-综述（动力机制型 · 三原理）"};
 var LAYER_NAME={classic:"经典",modern:"现代",frontier:"前沿",upload:"上传全文"};
 var state=null;
-function fresh(){ state={type:kind,frame:null,frameText:"",lit:[],mapText:"",plan:[],planText:"",nhits:"",verdict:"",surface:"",challenges:"",gaps:"",conjectures:"",conjQueries:[],hits:"",shapeHits:0,libs:{},occupants:"",sections:[],title:"",log:{},stage:""}; }
+function fresh(){ state={type:kind,frame:null,frameText:"",lit:[],mapText:"",plan:[],planText:"",nhits:"",verdict:"",surface:"",challenges:"",gaps:"",collide:"",collideJson:null,collideRun:"",conjectures:"",conjQueries:[],hits:"",shapeHits:0,libs:{},occupants:"",sections:[],title:"",log:{},stage:""}; }
 fresh();
 
 /* ---- 设置：基底 / 档位 / Key ---- */
@@ -909,9 +909,11 @@ $("#runBtn").onclick=async function(){
     await stepText("challenges","challenges",{mode:"challenges",map:state.mapText,verdict:state.verdict,surface:state.surface,cards:okCards,key:kv.key,vendor:kv.vendor},"⑦ 读发生挑战…");
     /* ⑧ 不足 */
     await stepText("gaps","gaps",{mode:"gaps",challenges:state.challenges,map:state.mapText,key:kv.key,vendor:kv.vendor},"⑧ 写不足…");
+    /* ⑧之二 维度碰撞（学科内：三维代表卡 × 断链）＋ 最小真跑 */
+    await runCollide(kv,items);
     /* ⑨ 猜想 ＋ 占位者实搜 */
     setStage("conjectures","on");
-    var raw=await sse({mode:"conjectures",challenges:state.challenges,gaps:state.gaps,map:state.mapText,verdict:state.verdict,key:kv.key,vendor:kv.vendor},function(full){ state.conjectures=full.split("===QUERIES===")[0]; renderArtInline("conjectures"); },function(s){ setStatus(spin("⑨："+esc2(s))); });
+    var raw=await sse({mode:"conjectures",challenges:state.challenges,gaps:state.gaps,map:state.mapText,verdict:state.verdict,collide:state.collide,collideRun:state.collideRun,key:kv.key,vendor:kv.vendor},function(full){ state.conjectures=full.split("===QUERIES===")[0]; renderArtInline("conjectures"); },function(s){ setStatus(spin("⑨："+esc2(s))); });
     var sp=raw.split("===QUERIES===");
     state.conjectures=sp[0].trim(); state.conjQueries=parseJsonArr(sp[1]||"")||[];
     renderResults();
@@ -936,6 +938,26 @@ $("#runBtn").onclick=async function(){
   }catch(e){ setStatus("中断："+esc2(e&&e.message||e)); }
   running=false; updateBtns(); renderResults();
 };
+async function runCollide(kv,items){
+  var allCards=cardsPayload(items);
+  setStage("collide","on"); state.collide=""; state.collideRun=""; state.collideJson=null; renderResults(); setStatus(spin("⑧之二 维度碰撞…"));
+  var raw=await sse({mode:"collide",map:state.mapText,verdict:state.verdict,challenges:state.challenges,gaps:state.gaps,cards:allCards,key:kv.key,vendor:kv.vendor},function(full){ state.collide=full.split("===Z===")[0]; renderArtInline("collide"); },function(s){ setStatus(spin("⑧之二："+esc2(s))); });
+  var sp=raw.split("===Z===");
+  state.collide=sp[0].trim();
+  var j=null; try{ var m=(sp[1]||"").match(/\{[\s\S]*\}/); j=m?JSON.parse(m[0]):null; }catch(e){ j=null; }
+  state.collideJson=j;
+  /* 机检：三家必须是清单内篇号，且按卡上的起手维／方程／原理各站一维（How 看起手维） */
+  var homesOk=null;
+  if(j&&Array.isArray(j.homes)&&j.homes.length===3){
+    var dims=j.homes.map(function(n){ var x=items.filter(function(y){return y.i===parseInt(n,10);})[0]; if(!x||!x.card) return null; var m2=x.card.match(/起手维[：:]\s*([SDE])/); return m2?m2[1]:"?"; });
+    homesOk=dims.every(function(d){return d;})&&(kind!=="how"||new Set(dims.filter(function(d){return d!=="?";})).size===Math.min(3,dims.filter(function(d){return d!=="?";}).length));
+  }
+  state.log.f8b="主碰撞 1 场；Z＝"+(j&&j.z?j.z:"未解析")+"；旗舰读数＝"+(j&&j.reading?j.reading:"未解析")+"；六型对照＝"+(j?(j.shapeFree?"不归入":"归入（降为改判）"):"未解析")+"；三家＝"+(j&&j.homes?"［"+j.homes.join("］［")+"］":"未解析")+(homesOk===false?"（机检：三家不全在清单内或同维）":homesOk?"（机检过）":"")+"；预注册＝"+(j&&j.prereg?j.prereg:"未写");
+  renderResults(); setStatus(spin("⑧之二 真跑：把 Z 施于全部卡…"));
+  state.collideRun=await sse({mode:"collide_run",collide:state.collide,cards:allCards,key:kv.key,vendor:kv.vendor},function(full){ state.collideRun=full; if(document.querySelector('[data-art="collideRun"]')) renderArtInline("collideRun"); else renderResults(); },function(s){ setStatus(spin("⑧之二 真跑："+esc2(s))); });
+  state.log.f8b+="；真跑＝"+(/判负/.test(state.collideRun)&&!/支持/.test(state.collideRun.split("判负")[0].slice(-40))?"判负照登":/支持/.test(state.collideRun)?"支持":"未判");
+  setStage("collide","done"); renderResults();
+}
 async function stepText(stage,field,body,label){
   setStage(stage,"on"); state[field]=""; renderResults(); setStatus(spin(label));
   state[field]=await sse(body,function(full){ state[field]=full; renderArtInline(field); },function(s){ setStatus(spin(label+esc2(s))); });
@@ -954,7 +976,7 @@ async function writeSec(kv,items,i){
   var S=state.sections[i]; S.status="running"; S.text=""; renderResults();
   var prev=state.sections.slice(0,i).filter(function(x){return x.text;}).map(function(x){return "《"+x.h+"》："+x.text.replace(/\s+/g," ").slice(0,160)+"…";}).join("\n");
   setStatus(spin("⑩ 写第 "+(i+1)+" 节《"+esc2(S.h)+"》…"));
-  var art={frame:state.frameText,map:state.mapText,verdict:state.verdict,surface:state.surface,challenges:state.challenges,gaps:state.gaps,conjectures:state.conjectures,occupants:state.occupants};
+  var art={frame:state.frameText,map:state.mapText,verdict:state.verdict,surface:state.surface,challenges:state.challenges,gaps:state.gaps,collide:state.collide,collideRun:state.collideRun,conjectures:state.conjectures,occupants:state.occupants};
   try{
     S.text=await sse({mode:"write",sec:i,art:art,cards:cardsPayload(items),refs:items.map(refString),prev:prev,key:kv.key,vendor:kv.vendor},function(full){ S.text=full; renderSecInline(i); },function(s){ setStatus(spin("第 "+(i+1)+" 节："+esc2(s))); });
     S.status="done";
@@ -969,6 +991,7 @@ async function rerun(field){
     else if(field==="verdict") await stepText("neighbors","verdict",{mode:"verdict",plan:state.planText,hits:state.nhits||"（实搜未取回任何记录）",key:kv.key,vendor:kv.vendor},"⑤之二 重判…");
     else if(field==="challenges") await stepText("challenges","challenges",{mode:"challenges",map:state.mapText,verdict:state.verdict,surface:state.surface,cards:okCards,key:kv.key,vendor:kv.vendor},"⑦ 重读挑战…");
     else if(field==="gaps") await stepText("gaps","gaps",{mode:"gaps",challenges:state.challenges,map:state.mapText,key:kv.key,vendor:kv.vendor},"⑧ 重写不足…");
+    else if(field==="collide") await runCollide(kv,items);
     else if(field==="occupants") await stepText("conjectures","occupants",{mode:"occupants",conjectures:state.conjectures,verdict:state.verdict,hits:state.hits||"（读数实搜未取回记录）",key:kv.key,vendor:kv.vendor},"⑨ 重写分离线…");
   }catch(e){ setStatus("失败："+esc2(e&&e.message||e)); }
   running=false; updateBtns(); renderResults();
@@ -998,11 +1021,16 @@ function selfCheck(){
   out.push({n:"每条删除条件的事件写了频率且非稀发",ok:(state.conjQueries||[]).length>=5&&(state.conjQueries||[]).every(function(c){return c.freq&&c.freq.length>2;})&&(state.conjectures.match(/可证伪/g)||[]).length>=5});
   out.push({n:"「五条之间」写了读数关系或独立声明",ok:/五条之间/.test(state.conjectures+all)&&/闭环|守恒|不等式|独立/.test(state.conjectures+all)});
   out.push({n:"检索盲区已申报（库、索引层、未取到的经典条目）",ok:/盲区/.test(state.occupants+all)});
+  /* v1.4 三项：⑧之二学科内维度碰撞 */
+  var cj=state.collideJson||{};
+  out.push({n:"主碰撞卡齐全；三家各站一维且全在清单内；旗舰读数不归入六型",ok:!!state.collide&&/共有前提[：:]/.test(state.collide)&&/Z[：:]/.test(state.collide)&&/旗舰读数[：:]/.test(state.collide)&&/碰撞挑战[：:]/.test(state.collide)&&Array.isArray(cj.homes)&&cj.homes.length===3&&cj.homes.every(function(n){return parseInt(n,10)>=1&&parseInt(n,10)<=N;})&&cj.shapeFree===true&&!/机检：三家/.test(state.log.f8b||"")});
+  out.push({n:"主碰撞真跑已执行并照登（支持／判负）",ok:!!state.collideRun&&/支持|判负/.test(state.collideRun)});
+  out.push({n:"五条猜想各标级，至少一条碰撞级；第 7 节有第六条碰撞挑战",ok:(state.conjectures.match(/级别[：:]\s*(碰撞级|改判级)/g)||[]).length>=5&&(/级别[：:]\s*碰撞级/.test(state.conjectures)||/判负/.test(state.collideRun))&&/碰撞挑战|挑战\s*[六6]/.test(state.challenges+all)});
   return out;
 }
 function logText(){
   var L=state.log, sel=litSelected();
-  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑨ "+(L.f9||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 17 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
+  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑧之二 碰撞："+(L.f8b||"未跑"),"工序⑨ "+(L.f9||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 20 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
 }
 
 /* ---- 渲染 ---- */
@@ -1058,6 +1086,8 @@ function renderResults(){
   html+=artCard("⑥ 表面挑战清单（论文原话）","surface","");
   html+=artCard("⑦ 五大发生挑战","challenges","cls","challenges");
   html+=artCard("⑧ 现有方案的不足","gaps","","gaps");
+  html+=artCard("⑧ 之二 · SDE 维度碰撞（学科内：三维代表卡 × 断链 → Z）"+(state.collideJson&&state.collideJson.z?" · Z＝"+esc2(String(state.collideJson.z)):""),"collide","cls","collide");
+  html+=artCard("⑧ 之二 · 碰撞真跑：把 Z 施于全部解构卡（支持／判负照登）","collideRun","");
   html+=artCard("⑨ SDE 猜想解决","conjectures","map");
   html+=artCard("⑨ 之二 · 占位者分离线、读数命名闸与撤下条件（读数实搜 "+((state.hits||"").split("【猜想").length-1)+" 条记录，其中形状道三库 "+(state.shapeHits||0)+" 条）","occupants","","occupants");
   if(state.sections.length){
@@ -1100,7 +1130,7 @@ $("#mdBtn").onclick=function(){
   var f=state.frame||{};
   md+="```\n主题："+$("#topic").value.trim()+"\n问题："+$("#question").value.trim()+"\n类型："+TYPE_NAME[state.type]+"\n表面形态："+(f.surface||"")+"\n发生层改写："+(f.genesis||"")+"\n```\n\n";
   state.sections.forEach(function(s,i){ md+="## "+(i+1)+"、"+s.h+"\n\n"; md+=(!s.words?refs.map(function(x){return "["+x.i+"] "+refString(x);}).join("  \n"):(s.text||""))+"\n\n"; });
-  md+="## 附录 A · 工序日志\n\n```\n"+logText()+"\n```\n\n## 附录 B · 解构卡全集\n\n"+refs.map(function(x){return "#### ["+x.i+"] "+x.title+"\n\n"+(x.card||"（未出卡）");}).join("\n\n")+"\n\n## 附录 C · 工序产出件\n\n### ⑤ 整图\n\n"+state.mapText+"\n\n### ⑤之二 敌拓闸\n\n"+state.planText+"\n\n"+state.verdict+"\n\n### ⑥ 表面挑战\n\n"+state.surface+"\n\n### ⑦ 五大发生挑战\n\n"+state.challenges+"\n\n### ⑧ 不足\n\n"+state.gaps+"\n\n### ⑨ 猜想\n\n"+state.conjectures+"\n\n### ⑨ 之二 占位者\n\n"+state.occupants+"\n\n### ⑤之二 第二道 · 读数实搜取回记录（三库，原样节选）\n\n"+(state.hits||"（无）").slice(0,30000)+"\n";
+  md+="## 附录 A · 工序日志\n\n```\n"+logText()+"\n```\n\n## 附录 B · 解构卡全集\n\n"+refs.map(function(x){return "#### ["+x.i+"] "+x.title+"\n\n"+(x.card||"（未出卡）");}).join("\n\n")+"\n\n## 附录 C · 工序产出件\n\n### ⑤ 整图\n\n"+state.mapText+"\n\n### ⑤之二 敌拓闸\n\n"+state.planText+"\n\n"+state.verdict+"\n\n### ⑥ 表面挑战\n\n"+state.surface+"\n\n### ⑦ 五大发生挑战\n\n"+state.challenges+"\n\n### ⑧ 不足\n\n"+state.gaps+"\n\n### ⑧之二 维度碰撞卡\n\n"+(state.collide||"（未跑）")+"\n\n### ⑧之二 碰撞真跑\n\n"+(state.collideRun||"（未跑）")+"\n\n### ⑨ 猜想\n\n"+state.conjectures+"\n\n### ⑨ 之二 占位者\n\n"+state.occupants+"\n\n### ⑤之二 第二道 · 读数实搜取回记录（三库，原样节选）\n\n"+(state.hits||"（无）").slice(0,30000)+"\n";
   var blob=new Blob([md],{type:"text/markdown;charset=utf-8"});
   var u=URL.createObjectURL(blob), el=document.createElement("a"); el.href=u; el.download=(state.title||"综述").replace(/[\\\/:*?"<>|]/g,"_").slice(0,60)+".md"; document.body.appendChild(el); el.click(); setTimeout(function(){URL.revokeObjectURL(u); el.remove();},800);
 };
