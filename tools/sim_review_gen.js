@@ -55,25 +55,25 @@ TYPES.forEach((t) => {
   const src = sliceSec(SKEL_MARK[t]);
   const rows = [];
   src.split("\n").forEach((ln) => {
-    const m = ln.match(/^\|\s*(\d+(?:\s*之二)?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|/);
+    const m = ln.match(/^\|\s*(\d+(?:\s*之二|[AB])?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|/);
     if (m) rows.push({ n: m[1].replace(/\s+/g, ""), h: m[2], words: /^\d+$/.test(m[3]) ? +m[3] : 0 });
   });
   ok(t + "：Skill 章目表解析到 " + rows.length + " 行", rows.length >= 9);
-  ok(t + "：序号连续（含 8 之二）", rows.map((r) => r.n).join(",") === ["1","2","3","4","5","6","7","8","8之二","9","10","11"].join(","));
+  ok(t + "：序号连续（含 8 之二、9 之二、11A、11B）", rows.map((r) => String(r.n).replace(/\s+/g, "")).join(",") === ["1","2","3","4","5","6","7","8","8之二","9","9之二","10","11A","11B"].join(","));
   ok(t + "：节数 Skill==机器（" + rows.length + " vs " + SKEL[t].length + "）", rows.length === SKEL[t].length);
   ok(t + "：逐节节名一字不差", rows.every((r, i) => SKEL[t][i] && SKEL[t][i].h === r.h));
   ok(t + "：逐节字数一一相等", rows.every((r, i) => SKEL[t][i] && SKEL[t][i].words === r.words));
   const total = SKEL[t].reduce((a, s) => a + s.words, 0);
-  ok(t + "：合计 " + total + " 汉字落在 19500–23000（v1.4 含 8 之二）", total >= 19500 && total <= 23000);
-  ok(t + "：末节是参考文献且 words=0（页面端拼装）", SKEL[t][SKEL[t].length - 1].h === "参考文献" && SKEL[t][SKEL[t].length - 1].words === 0);
-  ok(t + "：其余各节都有 ask", SKEL[t].slice(0, -1).every((s) => s.ask && s.ask.length > 10));
+  ok(t + "：合计 " + total + " 汉字落在 22000–26500（v1.4.5 含 8 之二、9 之二）", total >= 22000 && total <= 26500);
+  ok(t + "：末两节是 11A 核心语料／11B 敌拓与领地边界参考文献且 words=0（页面端拼装）", SKEL[t][SKEL[t].length - 2].h === "核心语料参考文献" && SKEL[t][SKEL[t].length - 1].h === "敌拓与领地边界参考文献" && SKEL[t].slice(-2).every((s) => s.words === 0));
+  ok(t + "：其余各节都有 ask", SKEL[t].slice(0, -2).every((s) => s.ask && s.ask.length > 10));
   ok(t + "：节名互不重复", new Set(SKEL[t].map((s) => s.h)).size === SKEL[t].length);
 });
 
 /* ═══ 路由静态检查 ═══ */
 console.log("── 路由与页面 ──");
 ok("worker.js 里有 /api/wds/review-gen 路由", WSRC.indexOf('url.pathname === "/api/wds/review-gen"') > 0);
-["frame", "card", "map", "neighbors", "verdict", "surface", "challenges", "gaps", "collide", "collide_run", "conjectures", "occupants", "write"].forEach((m) => ok("mode " + m + " 有分支", WSRC.indexOf('rmode === "' + m + '"') > 0));
+["frame", "card", "map", "neighbors", "verdict", "surface", "challenges", "gaps", "collide", "collide_run", "conjectures", "occupants", "territory", "territory_check", "write"].forEach((m) => ok("mode " + m + " 有分支", WSRC.indexOf('rmode === "' + m + '"') > 0));
 ok("worker.js 写明权威出处", WSRC.indexOf("tools/skills/sde-review-genesis.md") > 0);
 const PAGE_P = path.join(ROOT, "public/taste/review-gen/index.html");
 ok("页面在仓库里", fs.existsSync(PAGE_P));
@@ -94,12 +94,14 @@ if (fs.existsSync(PAGE_P)) {
   ok("页面无 href=\"#\" 死链", !/href="#"/.test(PG));
   ok("页面有工序⑤之二敌拓闸阶段（neighbors/verdict）", PG.indexOf('mode:"neighbors"') > 0 && PG.indexOf('mode:"verdict"') > 0);
   ok("页面有 How-卡路径机检 routeCheck", PG.indexOf("function routeCheck(") > 0);
-  ok("Skill 是 v1.4.1 且含工序⑤之二两道与⑧之二维度碰撞、典范判据", /version:\s*1\.4\.1/.test(SKILL) && SKILL.indexOf("典范判据") > 0 && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
+  ok("Skill 是 v1.4.5 且含⑤之二两道、⑧之二维度碰撞、典范判据、⑨之二新研究领地", /version:\s*1\.4\.5/.test(SKILL) && SKILL.indexOf("工序⑨之二 新研究领地发生") > 0 && SKILL.indexOf("典范判据") > 0 && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
   /* v1.4：⑧之二 学科内维度碰撞 */
   ok("collide 提示：三家取自清单内、不得同维、共有前提＝断链、六型对照、删维测试、碰撞挑战", /rmode === "collide"[\s\S]*?不得同维[\s\S]*?六型[\s\S]*?删维测试[\s\S]*?碰撞挑战/.test(WSRC));
   ok("collide_run 提示：判负照登、不得改口", /rmode === "collide_run"[\s\S]*?判负照登/.test(WSRC));
   ok("conjectures 带三档级别（典范／碰撞／改判）且 QUERIES 带 level", WSRC.indexOf("级别：典范级") > 0 && WSRC.indexOf("级别：碰撞级") > 0 && /\\"level\\"/.test(WSRC));
-  ok("collide 提示含 v1.4.1 六处修补（How 主家／对象对照／借用／级别裁定）", WSRC.indexOf("起手维等于落格路径落点维") > 0 && WSRC.indexOf("它数的是〈什么〉") > 0 && WSRC.indexOf("借用") > 0 && WSRC.indexOf("级别裁定") > 0);
+  ok("collide 提示含 v1.4.5 要素（How 主家／测量原语同构闸／借用／级别裁定／领地接口）", WSRC.indexOf("起手维等于落格路径落点维") > 0 && WSRC.indexOf("测量原语卡") > 0 && WSRC.indexOf("借用") > 0 && WSRC.indexOf("级别裁定") > 0 && WSRC.indexOf("领地接口") > 0);
+  ok("worker territory 提示含四改／六族重绘／五问／退界／最高自判 T0；territory_check 含并入或退界与盲区", WSRC.indexOf("===TERRITORY===") > 0 && WSRC.indexOf("四项至少三项必须改写") > 0 && WSRC.indexOf("6 个族") > 0 && WSRC.indexOf("最高只能自判 T0") > 0 && WSRC.indexOf("并入该领域、改名或退界") > 0);
+  ok("页面有 ⑨之二 阶段、runTerritory、11B 拼装 refsB", PG.indexOf('mode:"territory"') > 0 && PG.indexOf('mode:"territory_check"') > 0 && PG.indexOf("function runTerritory(") > 0 && PG.indexOf('data-s="territory"') > 0 && PG.indexOf("function refsB(") > 0);
   ok("conjectures 守恒式两边不同事件集", WSRC.indexOf("不同的事件集") > 0);
   ok("页面有 ⑧之二 阶段与 runCollide", PG.indexOf('mode:"collide"') > 0 && PG.indexOf('mode:"collide_run"') > 0 && PG.indexOf("function runCollide(") > 0 && PG.indexOf('data-s="collide"') > 0);
   ok("页面导出 md 含 ⑧之二", PG.indexOf("### ⑧之二 维度碰撞卡") > 0);
@@ -115,7 +117,7 @@ if (fs.existsSync(PAGE_P)) {
   ok("conjectures 的 QUERIES 带 shape 与 freq", /\\"shape\\"/.test(WSRC) && /\\"freq\\"/.test(WSRC));
   ok("occupants 提示含撤下条件与检索盲区", WSRC.indexOf("撤下条件") > 0 && WSRC.indexOf("检索盲区") > 0);
   ok("页面三库实搜（searchCR/searchS2/loadShapes）", PG.indexOf("function searchCR(") > 0 && PG.indexOf("function searchS2(") > 0 && PG.indexOf("function loadShapes(") > 0 && PG.indexOf("/api/wds/review-shapes") > 0);
-  ok("页面自检 20 项", PG.indexOf("自检 20 项") > 0 && (PG.match(/out\.push\(\{n:/g) || []).length === 20);
+  ok("页面自检 28 项", PG.indexOf("自检 28 项") > 0 && (PG.match(/out\.push\(\{n:/g) || []).length === 28);
   ok("worker 占位者栏只引⑤之二（prompt 里有三判）", WSRC.indexOf("只许引给定的敌拓闸三判结果") > 0);
 }
 

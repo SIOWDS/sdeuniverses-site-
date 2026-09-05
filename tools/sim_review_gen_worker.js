@@ -46,7 +46,9 @@ const cases=[
  {mode:"collide_run",collide:"Z：…",cards:cards.concat([{i:3,title:"C",card:"承重命题：x3\n起手维：D",layer:"现代"}])},
  {mode:"conjectures",challenges:"C",gaps:"G",map:"M",verdict:"V",collide:"Z：…",collideRun:"支持"},
  {mode:"occupants",conjectures:"C",verdict:"V",hits:"H"},
- ...[0,1,2,3,4,5,6,7,8,9,10,11].map(sec=>({mode:"write",sec,art:{frame:"F",map:"M",verdict:"V",surface:"S",challenges:"C",gaps:"G",collide:"Z",collideRun:"R",conjectures:"J",occupants:"O"},cards,refs:["r1","r2"],prev:"P"})),
+ {mode:"territory",collide:"K",collideRun:"R",conjectures:"J",map:"M",verdict:"V",occupants:"O"},
+ {mode:"territory_check",territory:"T",hits:"H"},
+ ...[0,1,2,3,4,5,6,7,8,9,10,11,12,13].map(sec=>({mode:"write",sec,art:{frame:"F",map:"M",verdict:"V",surface:"S",challenges:"C",gaps:"G",collide:"Z",collideRun:"R",conjectures:"J",occupants:"O",territory:"T",territoryCheck:"TC"},cards,refs:["r1","r2"],prev:"P"})),
  {mode:"bogus"},
  {mode:"frame",key:"short"},
 ];
@@ -55,7 +57,7 @@ const cases=[
  for(const c of cases){
   const body=Object.assign({},K,c);
   try{ const r=await build(body);
-    if(r&&r.__json){ console.log("• "+c.mode+(c.sec!=null?" sec"+c.sec:"")+" → 早退 "+r.status+" "+r.__json.msg); if(!(c.mode==="bogus"||c.key==="short"||(c.mode==="write"&&c.sec===11))) bad++; continue; }
+    if(r&&r.__json){ console.log("• "+c.mode+(c.sec!=null?" sec"+c.sec:"")+" → 早退 "+r.status+" "+r.__json.msg); if(!(c.mode==="bogus"||c.key==="short"||(c.mode==="write"&&(c.sec===12||c.sec===13)))) bad++; continue; }
     const ok=r.sys.length>50&&r.usr.length>10&&r.tok>0&&r.VC.model==="gpt-5.6-luna";
     // 内容检查：v1.2 要素
     const flags=[];
@@ -69,6 +71,11 @@ const cases=[
     if(c.mode==="collide"&&!(/不得同维/.test(r.sys)&&/断链/.test(r.sys)&&/六型/.test(r.sys)&&/碰撞挑战/.test(r.sys))) flags.push("collide 缺 v1.4 纪律");
     if(c.mode==="collide"&&!(/起手维等于落格路径落点维/.test(r.sys)&&/借用/.test(r.sys)&&/典范级/.test(r.sys))) flags.push("collide 缺 v1.4.1 修补");
     if(c.mode==="conjectures"&&!/典范级/.test(r.sys)) flags.push("conjectures 缺三档");
+    if(c.mode==="conjectures"&&!/领地接口/.test(r.sys)) flags.push("conjectures 缺领地接口");
+    if(c.mode==="territory"&&!(/===TERRITORY===/.test(r.sys)&&/四改|四项至少三项/.test(r.sys)&&/退界/.test(r.sys))) flags.push("territory 缺要素");
+    if(c.mode==="territory_check"&&!(/并入/.test(r.sys)&&/盲区/.test(r.sys))) flags.push("territory_check 缺要素");
+    if(c.mode==="write"&&c.sec===10&&!/领地卡/.test(r.usr)) flags.push("write sec10 未喂领地卡");
+    if(c.mode==="write"&&c.sec===9&&/领地卡/.test(r.usr)) flags.push("write sec9 多喂领地卡");
     if(c.mode==="collide_run"&&!/判负照登/.test(r.sys)) flags.push("collide_run 缺判负照登");
     if(c.mode==="conjectures"&&!(/碰撞级/.test(r.sys)&&/碰撞卡/.test(r.usr))) flags.push("conjectures 未吃碰撞卡/未标级");
     if(c.mode==="write"&&c.sec>=6&&c.sec<11&&!/碰撞卡/.test(r.usr)) flags.push("write sec"+c.sec+" 未喂碰撞卡");

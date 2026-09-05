@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>综述论文生成器 · 十道工序：主题与研究问题进，研究指导总纲出 | SDE Universes</title>
-<meta name="description" content="输入学科主题、研究问题，注明 What／How／Why 类型，按《SDE 综述生成 Skill》十道工序生成一篇作为研究指导总纲的综述：立题闸→文献采集（OpenAlex，三层×可核出处）→逐篇 SDE 解构卡→整图→表面挑战→五大发生挑战→现有方案的不足→SDE 维度碰撞（学科内：三维代表卡×断链撞出 Z，并把 Z 施于全部卡做真跑）→SDE 猜想解决（典范级／碰撞级／改判级；占位者实搜＋读数按形状去 OpenAlex／Crossref／Semantic Scholar 三库查隔壁的名字）→分节成文。可另上传自己的论文全文。用你自己的大模型 Key（只存本地）。">
+<meta name="description" content="输入学科主题、研究问题，注明 What／How／Why 类型，按《SDE 综述生成 Skill》十道工序生成一篇作为研究指导总纲的综述：立题闸→文献采集（OpenAlex，三层×可核出处）→逐篇 SDE 解构卡→整图→表面挑战→五大发生挑战→现有方案的不足→SDE 维度碰撞（学科内：三维代表卡×断链撞出 Z，并把 Z 施于全部卡做真跑）→SDE 猜想解决（典范级／碰撞级／改判级；领地接口）→新研究领地发生（领地卡、四改、六族重绘、五问、领地敌拓三库两道、退界条件，D1／T0／T1）→分节成文（含 11A 核心语料／11B 敌拓与领地边界两类参考文献）。占位者与读数按形状去 OpenAlex／Crossref／Semantic Scholar 三库实搜。可另上传自己的论文全文。用你自己的大模型 Key（只存本地）。">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -246,14 +246,14 @@ input[type=text].wide{max-width:none}
       <span class="status" id="status"></span>
     </div>
     <div class="stages" id="stages">
-      <span data-s="frame">①立题</span><span data-s="lit">②文献</span><span data-s="card">③④出卡</span><span data-s="map">⑤整图</span><span data-s="neighbors">⑤之二敌拓</span><span data-s="surface">⑥表面</span><span data-s="challenges">⑦挑战</span><span data-s="gaps">⑧不足</span><span data-s="collide">⑧之二碰撞</span><span data-s="conjectures">⑨猜想</span><span data-s="write">⑩成文</span><span data-s="check">自检</span>
+      <span data-s="frame">①立题</span><span data-s="lit">②文献</span><span data-s="card">③④出卡</span><span data-s="map">⑤整图</span><span data-s="neighbors">⑤之二敌拓</span><span data-s="surface">⑥表面</span><span data-s="challenges">⑦挑战</span><span data-s="gaps">⑧不足</span><span data-s="collide">⑧之二碰撞</span><span data-s="conjectures">⑨猜想</span><span data-s="territory">⑨之二领地</span><span data-s="write">⑩成文</span><span data-s="check">自检</span>
     </div>
   </div>
 
   <div id="results"></div>
 </main>
 
-<div class="foot">由大模型生成，观点供思考参考；引注只取自工序②清单，每条自带 DOI／出处，请以原文核对。文献采集走 OpenAlex 官方开放接口（浏览器直连，不经本站）；上传文件全部在你本机浏览器内解析，绝不上传；正文与 API Key 只在你选定基底时发往该基底，本站不留存。敌拓闸第二道走 Crossref 与 Semantic Scholar 的公开接口（同样浏览器直连）。规范层：SDE 学派《SDE 综述生成 Skill》v1.4.1（十道工序＋敌拓闸两道＋⑧之二学科内维度碰撞，三档标级：典范级／碰撞级／改判级）。sdeuniverses.com</div>
+<div class="foot">由大模型生成，观点供思考参考；引注只取自工序②清单，每条自带 DOI／出处，请以原文核对。文献采集走 OpenAlex 官方开放接口（浏览器直连，不经本站）；上传文件全部在你本机浏览器内解析，绝不上传；正文与 API Key 只在你选定基底时发往该基底，本站不留存。敌拓闸第二道走 Crossref 与 Semantic Scholar 的公开接口（同样浏览器直连）。规范层：SDE 学派《SDE 综述生成 Skill》v1.4.5（十道主工序＋三道之二闸：⑤之二敌拓、⑧之二学科内维度碰撞、⑨之二新研究领地；三档标级典范级／碰撞级／改判级；领地 D1／T0／T1）。sdeuniverses.com</div>
 
 <script>
 (function(){
@@ -269,7 +269,7 @@ var kind=localStorage.getItem("sde_rev_kind")||"";        // what|how|why，必�
 var targetN=parseInt(localStorage.getItem("sde_rev_n")||"30",10);
 /* 章目表——唯一权威 tools/skills/sde-review-genesis.md §10.1 之二，这里是它的编译产物（words=0 的参考文献由本页拼装） */
 var HEAD=[{h:"问题与判类",words:900},{h:"解构方法",words:1000}];
-var TAIL=[{h:"整图：挤格、空格、自撞、断链",words:2000},{h:"表面挑战与发生挑战",words:3000},{h:"现有方案的不足",words:1500},{h:"维度碰撞：从断链到 Z",words:2500},{h:"SDE 猜想解决",words:3000},{h:"研究总纲：三个指导方向里的这一个",words:1000},{h:"参考文献",words:0}];
+var TAIL=[{h:"整图：挤格、空格、自撞、断链",words:2000},{h:"表面挑战与发生挑战",words:3000},{h:"现有方案的不足",words:1500},{h:"维度碰撞：从断链到 Z",words:2500},{h:"SDE 猜想解决",words:3000},{h:"新研究领地：从 Z 到新地图",words:2500},{h:"研究总纲：新土地与这个指导方向",words:1200},{h:"核心语料参考文献",words:0},{h:"敌拓与领地边界参考文献",words:0}];
 var SKELETON={
   what:HEAD.concat([{h:"站在 S=F(D,E) 上的文献",words:2000},{h:"站在 D=G(S,E) 上的文献",words:2000},{h:"站在 E=H(S,D) 上的文献",words:2000}],TAIL),
   how:HEAD.concat([{h:"从 S 起手的方法（S→D→E／S→E→D）",words:2000},{h:"从 D 起手的方法（D→S→E／D→E→S）",words:2000},{h:"从 E 起手的方法（E→S→D／E→D→S）",words:2000}],TAIL),
@@ -278,7 +278,7 @@ var SKELETON={
 var TYPE_NAME={what:"What-综述（知识型 · 三方程）",how:"How-综述（技术型 · 六路径）",why:"Why-综述（动力机制型 · 三原理）"};
 var LAYER_NAME={classic:"经典",modern:"现代",frontier:"前沿",upload:"上传全文"};
 var state=null;
-function fresh(){ state={type:kind,frame:null,frameText:"",lit:[],mapText:"",plan:[],planText:"",nhits:"",verdict:"",surface:"",challenges:"",gaps:"",collide:"",collideJson:null,collideRun:"",conjectures:"",conjQueries:[],hits:"",shapeHits:0,libs:{},occupants:"",sections:[],title:"",log:{},stage:""}; }
+function fresh(){ state={type:kind,frame:null,frameText:"",lit:[],mapText:"",plan:[],planText:"",nhits:"",verdict:"",surface:"",challenges:"",gaps:"",collide:"",collideJson:null,collideRun:"",territory:"",territoryJson:null,territoryHits:"",territoryCheck:"",territoryLibs:{},conjectures:"",conjQueries:[],hits:"",shapeHits:0,libs:{},occupants:"",sections:[],title:"",log:{},stage:""}; }
 fresh();
 
 /* ---- 设置：基底 / 档位 / Key ---- */
@@ -817,6 +817,14 @@ function litAll(){
   return up.concat(state.lit);
 }
 function litSelected(){ return litAll().filter(function(x){return x.sel;}).map(function(x,i){ x.i=i+1; return x; }); }
+/* 11B 敌拓与领地边界参考文献：⑤之二两道、⑨读数实搜、⑨之二领地敌拓取回的记录里，DOI 出现在任一产出件或正文里的那些（页面机械拼装，不计入工序②篇数） */
+function refsB(){
+  var pool=[state.nhits,state.hits,state.territoryHits].join("\n"), body=[state.verdict,state.occupants,state.collide,state.territory,state.territoryCheck].concat(state.sections.map(function(s){return s.text||"";})).join("\n");
+  var seen={}, out=[]; var re=/【([^】]*)】([^\n]*?)（([^）]*)，doi:([^）\s]+)）/g, m;
+  while((m=re.exec(pool))){ var doi=m[4].replace(/[,.;]+$/,""); if(seen[doi]) continue; if(body.indexOf(doi)<0) continue; seen[doi]=1; out.push(m[2]+"（"+m[3]+"，doi:"+doi+"）"); }
+  return out;
+}
+function refBlock(s,refs,fmt){ if(/敌拓与领地边界/.test(s.h)){ var b=refsB(); return b.length?b.map(function(t,i){return fmt("B"+(i+1),t);}):[fmt("—","（本轮产出件与正文未引用任何敌拓命中；或命中记录无 DOI）")]; } return refs.map(function(x){return fmt(x.i,refString(x));}); }
 function refString(x){ return (x.authors?x.authors+". ":"")+(x.year?x.year+". ":"")+x.title+(x.venue?". "+x.venue:"")+(x.doi?". doi:"+x.doi:"")+(x.layer==="upload"?"（上传全文）":""); }
 
 /* ═══ ① 立题 → ② 采集 ═══ */
@@ -931,6 +939,8 @@ $("#runBtn").onclick=async function(){
     state.log.f9="猜想 5 条；⑤之二第二道：读数 "+state.conjQueries.length+" 个，形状分布 "+Object.keys(shDist).map(function(k){return k+" "+shDist[k];}).join("、")+"；检索词 "+state.conjQueries.length*2+"（读数名）＋ "+shapeQs+"（形状对象词）条，库 3 个（OpenAlex、Crossref、Semantic Scholar），取回 "+hits.length+" 条记录（其中形状道 "+shapeHits+" 条）；删除条件事件频率："+state.conjQueries.map(function(c){return (c.freq||"未写");}).join("／")+"；占位者只引⑤之二两道。";
     await stepText("conjectures","occupants",{mode:"occupants",conjectures:state.conjectures,verdict:state.verdict,hits:state.hits||"（读数实搜未取回记录）",key:kv.key,vendor:kv.vendor},"⑨ 写分离线与读数命名闸…");
     setStage("conjectures","done"); renderResults();
+    /* ⑨之二 新研究领地：领地卡 → 领地敌拓（三库两道）→ 退界裁定与定级 */
+    await runTerritory(kv,items);
     /* ⑩ 成文 */
     await runWrite(kv,items);
     setStage("check","on"); renderResults(); setStage("check","done");
@@ -958,6 +968,26 @@ async function runCollide(kv,items){
   state.log.f8b+="；真跑＝"+(/判负/.test(state.collideRun)&&!/支持/.test(state.collideRun.split("判负")[0].slice(-40))?"判负照登":/支持/.test(state.collideRun)?"支持":"未判");
   setStage("collide","done"); renderResults();
 }
+async function runTerritory(kv,items){
+  setStage("territory","on"); state.territory=""; state.territoryJson=null; state.territoryHits=""; state.territoryCheck=""; state.territoryLibs={}; renderResults(); setStatus(spin("⑨之二 划领地…"));
+  if(!state.collide){ state.territoryCheck="⑨之二未执行：没有碰撞卡，领地只能是 D1。"; state.log.f9b="研究领地：未划（无碰撞卡）；级别＝D1"; setStage("territory","done"); renderResults(); return; }
+  var raw=await sse({mode:"territory",collide:state.collide,collideRun:state.collideRun,conjectures:state.conjectures,map:state.mapText,verdict:state.verdict,occupants:state.occupants,key:kv.key,vendor:kv.vendor},function(full){ state.territory=full.split("===TERRITORY===")[0]; if(document.querySelector('[data-art="territory"]')) renderArtInline("territory"); else renderResults(); },function(s){ setStatus(spin("⑨之二："+esc2(s))); });
+  var sp=raw.split("===TERRITORY==="); state.territory=sp[0].trim();
+  var j=null; try{ var m=(sp[1]||"").match(/\{[\s\S]*\}/); j=m?JSON.parse(m[0]):null; }catch(e){ j=null; }
+  state.territoryJson=j; renderResults();
+  /* 领地敌拓：两道三库 */
+  var qs=(j&&Array.isArray(j.queries)?j.queries:[]).slice(0,6).map(function(q,k){ return {q:String(q),pass:k<2?1:2}; });
+  var hits=[], dn=0, before=Object.assign({},state.libs);
+  await pool(qs,async function(o){ try{ var L=await searchLibs(o.q,5,["oa","cr","s2"]); L.forEach(function(it){ hits.push(hitLine("领地敌拓 第"+(o.pass===1?"一道·名字":"二道·对象")+"｜检索词："+o.q,it)); }); }catch(e){} dn++; setStatus(spin("⑨之二 领地敌拓 "+dn+" / "+qs.length+"（三库）…")); },3);
+  ["oa","cr","s2"].forEach(function(L){ if((state.libs[L]||0)>(before[L]||0)) state.territoryLibs[L]=1; });
+  state.territoryHits=hits.join("\n\n");
+  if(qs.length){ setStatus(spin("⑨之二 退界裁定…")); state.territoryCheck=await sse({mode:"territory_check",territory:state.territory,hits:state.territoryHits||"（领地敌拓未取回记录）",key:kv.key,vendor:kv.vendor},function(full){ state.territoryCheck=full; if(document.querySelector('[data-art="territoryCheck"]')) renderArtInline("territoryCheck"); else renderResults(); },function(s){ setStatus(spin("⑨之二："+esc2(s))); }); }
+  else { state.territoryCheck="领地卡未给出检索词——领地敌拓未执行，按规范层级别只能记 D1。"; }
+  var c=(j&&j.changes)||{}, nCh=["object","unit","questions","evaluation"].filter(function(k){return !!c[k];}).length;
+  var lvl=(j&&j.level)||"未判"; if(/T1/.test(state.territoryCheck)) lvl="T0（敌拓裁定不得抬到 T1）"; else if(/(并入|撤下|降为 D1|降级为 D1|退界触发)/.test(state.territoryCheck)) lvl="D1（领地敌拓触发退界）";
+  state.log.f9b="研究领地：名称＝"+(j&&j.nameZh?j.nameZh+"／"+(j.nameEn||""):"未解析")+"；对象＝"+(j&&j.object?j.object:"—")+"；最小单位＝"+(j&&j.unit?j.unit:"—")+"；四改＝"+nCh+"/4（对象改＝"+(c.object?"是":"否")+"）；基本量＝"+(j&&j.quantities!=null?j.quantities:"—")+"个；五问＝"+(j&&j.questions===5?"齐":"缺")+"；重绘＝"+(j&&j.cells!=null?j.cells:"—")+"格、"+(j&&j.families!=null?j.families:"—")+"族；汇入路线＝"+(j&&j.routesIn!=null?j.routesIn:"—")+"条；领地敌拓＝"+(j&&j.neighbors?j.neighbors.length:0)+"领域、"+Object.keys(state.territoryLibs).length+"库、"+qs.length+"趟、取回 "+hits.length+" 条；自生测试＝"+(j&&j.selfGen?"通过":"不通过")+"；退界条件＝"+(j&&j.exits?["corpus","data","map"].filter(function(k){return j.exits[k];}).length:0)+"/3；级别＝"+lvl;
+  setStage("territory","done"); renderResults();
+}
 async function stepText(stage,field,body,label){
   setStage(stage,"on"); state[field]=""; renderResults(); setStatus(spin(label));
   state[field]=await sse(body,function(full){ state[field]=full; renderArtInline(field); },function(s){ setStatus(spin(label+esc2(s))); });
@@ -976,7 +1006,7 @@ async function writeSec(kv,items,i){
   var S=state.sections[i]; S.status="running"; S.text=""; renderResults();
   var prev=state.sections.slice(0,i).filter(function(x){return x.text;}).map(function(x){return "《"+x.h+"》："+x.text.replace(/\s+/g," ").slice(0,160)+"…";}).join("\n");
   setStatus(spin("⑩ 写第 "+(i+1)+" 节《"+esc2(S.h)+"》…"));
-  var art={frame:state.frameText,map:state.mapText,verdict:state.verdict,surface:state.surface,challenges:state.challenges,gaps:state.gaps,collide:state.collide,collideRun:state.collideRun,conjectures:state.conjectures,occupants:state.occupants};
+  var art={frame:state.frameText,map:state.mapText,verdict:state.verdict,surface:state.surface,challenges:state.challenges,gaps:state.gaps,collide:state.collide,collideRun:state.collideRun,conjectures:state.conjectures,occupants:state.occupants,territory:state.territory,territoryCheck:state.territoryCheck};
   try{
     S.text=await sse({mode:"write",sec:i,art:art,cards:cardsPayload(items),refs:items.map(refString),prev:prev,key:kv.key,vendor:kv.vendor},function(full){ S.text=full; renderSecInline(i); },function(s){ setStatus(spin("第 "+(i+1)+" 节："+esc2(s))); });
     S.status="done";
@@ -992,6 +1022,7 @@ async function rerun(field){
     else if(field==="challenges") await stepText("challenges","challenges",{mode:"challenges",map:state.mapText,verdict:state.verdict,surface:state.surface,cards:okCards,key:kv.key,vendor:kv.vendor},"⑦ 重读挑战…");
     else if(field==="gaps") await stepText("gaps","gaps",{mode:"gaps",challenges:state.challenges,map:state.mapText,key:kv.key,vendor:kv.vendor},"⑧ 重写不足…");
     else if(field==="collide") await runCollide(kv,items);
+    else if(field==="territory") await runTerritory(kv,items);
     else if(field==="occupants") await stepText("conjectures","occupants",{mode:"occupants",conjectures:state.conjectures,verdict:state.verdict,hits:state.hits||"（读数实搜未取回记录）",key:kv.key,vendor:kv.vendor},"⑨ 重写分离线…");
   }catch(e){ setStatus("失败："+esc2(e&&e.message||e)); }
   running=false; updateBtns(); renderResults();
@@ -1025,12 +1056,21 @@ function selfCheck(){
   var cj=state.collideJson||{};
   out.push({n:"主碰撞卡齐全；三家各站一维且全在清单内；旗舰读数不归入六型",ok:!!state.collide&&/共有前提[：:]/.test(state.collide)&&/Z[：:]/.test(state.collide)&&/旗舰读数[：:]/.test(state.collide)&&/碰撞挑战[：:]/.test(state.collide)&&Array.isArray(cj.homes)&&cj.homes.length===3&&cj.homes.every(function(n){return parseInt(n,10)>=1&&parseInt(n,10)<=N;})&&cj.shapeFree===true&&!/机检：三家/.test(state.log.f8b||"")});
   out.push({n:"主碰撞真跑已执行并照登（支持／判负）",ok:!!state.collideRun&&/支持|判负/.test(state.collideRun)});
+  var tj=state.territoryJson||{}, tc=tj.changes||{};
+  out.push({n:"五条猜想各写领地接口；至少三条汇入同一复合对象",ok:(state.conjectures.match(/领地接口[：:]/g)||[]).length>=5&&(state.conjQueries||[]).filter(function(c){return /汇入/.test(String(c.territory||""));}).length>=3});
+  out.push({n:"领地卡有中文名／英文名、领地句、新对象与最小单位",ok:!!state.territory&&!!(tj.nameZh&&tj.nameEn&&tj.object&&tj.unit)&&/领地句/.test(state.territory)});
+  out.push({n:"四改至少三改，且研究对象改变＝是",ok:!!tc.object&&["object","unit","questions","evaluation"].filter(function(k){return !!tc[k];}).length>=3});
+  out.push({n:"已重绘至少 6 个文献族、2 个旧格",ok:(tj.families||0)>=6&&(tj.cells||0)>=2});
+  out.push({n:"第一代基本量 3–5 个，逐个有测量原语卡",ok:(tj.quantities||0)>=3&&(tj.quantities||0)<=5&&(state.territory.match(/M＝|事件集/g)||[]).length>=3});
+  out.push({n:"五个奠基问题恰好五个、覆盖 What／How／Why",ok:tj.questions===5&&/What/.test(state.territory)&&/How/.test(state.territory)&&/Why/.test(state.territory)});
+  out.push({n:"领地敌拓完成三领域×三库×两道；命中有分离线；盲区申报",ok:(tj.neighbors||[]).length>=3&&Object.keys(state.territoryLibs||{}).length>=3&&/分离线|无关|并入/.test(state.territoryCheck)&&/盲区/.test(state.territoryCheck)});
+  out.push({n:"三类退界条件齐全；级别至少 T0；自生测试通过",ok:!!(tj.exits&&tj.exits.corpus&&tj.exits.data&&tj.exits.map)&&!!tj.selfGen&&/T0/.test(String(tj.level||""))&&!/D1（领地敌拓触发退界）/.test(state.log.f9b||"")});
   out.push({n:"五条猜想各标级（典范／碰撞／改判三档），至少一条碰撞级或典范级（不计判负）；第 7 节有第六条碰撞挑战",ok:(state.conjectures.match(/级别[：:]\s*(典范级|碰撞级|改判级)/g)||[]).length>=5&&(/级别[：:]\s*(典范级|碰撞级)(?!·判负)/.test(state.conjectures)||/判负/.test(state.collideRun))&&/碰撞挑战|挑战\s*[六6]/.test(state.challenges+all)});
   return out;
 }
 function logText(){
   var L=state.log, sel=litSelected();
-  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑧之二 碰撞："+(L.f8b||"未跑"),"工序⑨ "+(L.f9||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 20 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
+  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑧之二 碰撞："+(L.f8b||"未跑"),"工序⑨ "+(L.f9||"未跑"),"工序⑨之二 "+(L.f9b||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 28 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
 }
 
 /* ---- 渲染 ---- */
@@ -1089,13 +1129,15 @@ function renderResults(){
   html+=artCard("⑧ 之二 · SDE 维度碰撞（学科内：三维代表卡 × 断链 → Z）"+(state.collideJson&&state.collideJson.z?" · Z＝"+esc2(String(state.collideJson.z)):""),"collide","cls","collide");
   html+=artCard("⑧ 之二 · 碰撞真跑：把 Z 施于全部解构卡（支持／判负照登）","collideRun","");
   html+=artCard("⑨ SDE 猜想解决","conjectures","map");
-  html+=artCard("⑨ 之二 · 占位者分离线、读数命名闸与撤下条件（读数实搜 "+((state.hits||"").split("【猜想").length-1)+" 条记录，其中形状道三库 "+(state.shapeHits||0)+" 条）","occupants","","occupants");
+  html+=artCard("⑨ 之二 · 新研究领地（领地卡）","territory","","territory");
+  if(state.territoryCheck){ html+='<div class="sec"><h3>⑨ 之二 · 领地敌拓与退界裁定（三库两道，取回 '+((state.territoryHits||"").split("【领地敌拓").length-1)+' 条）</h3><div class="artbody" data-art="territoryCheck">'+esc2(state.territoryCheck)+"</div></div>"; }
+  html+=artCard("⑨ 之三 · 占位者分离线、读数命名闸与撤下条件（读数实搜 "+((state.hits||"").split("【猜想").length-1)+" 条记录，其中形状道三库 "+(state.shapeHits||0)+" 条）","occupants","","occupants");
   if(state.sections.length){
     var refs=litSelected();
     html+='<div class="rcard paper"><div class="rhead"><b>⑩ '+esc2(state.title||"综述")+'</b><button class="rbtn" data-copy="__all">复制全文</button></div>';
     state.sections.forEach(function(s,i){
       html+='<div class="sec"><h3>'+(i+1)+"、"+esc2(s.h)+"</h3>";
-      if(!s.words){ html+='<div class="refs">'+refs.map(function(x){return "<div>［"+x.i+"］"+esc2(refString(x))+"</div>";}).join("")+"</div>"; }
+      if(!s.words){ html+='<div class="refs">'+refBlock(s,refs,function(i,t){return "<div>［"+i+"］"+esc2(t)+"</div>";}).join("")+"</div>"; }
       else { html+='<div class="tools">'+(s.status==="running"?spin("生成中"):s.status==="pending"?"待写":"")+(s.status==="done"||s.status==="error"?'<span class="more" data-rewrite="'+i+'">重写此节</span>':"")+"</div><div class=\"body\" data-sec=\""+i+"\">"+fmt(s.text)+"</div>"; }
       html+="</div>";
     });
@@ -1121,7 +1163,7 @@ var _rq=renderQueue; renderQueue=function(){ _rq(); if(state.frame) renderResult
 /* ---- 导出 ---- */
 function fullText(){
   var refs=litSelected(), out=(state.title||"综述")+"\n\n";
-  state.sections.forEach(function(s,i){ out+=(i+1)+"、"+s.h+"\n\n"; out+=(!s.words?refs.map(function(x){return "［"+x.i+"］"+refString(x);}).join("\n"):(s.text||""))+"\n\n"; });
+  state.sections.forEach(function(s,i){ out+=(i+1)+"、"+s.h+"\n\n"; out+=(!s.words?refBlock(s,refs,function(i,t){return "［"+i+"］"+t;}).join("\n"):(s.text||""))+"\n\n"; });
   out+="附录 A · 工序日志\n\n"+logText()+"\n";
   return out;
 }
@@ -1129,8 +1171,8 @@ $("#mdBtn").onclick=function(){
   var refs=litSelected(), md="# "+(state.title||"综述")+"\n\n";
   var f=state.frame||{};
   md+="```\n主题："+$("#topic").value.trim()+"\n问题："+$("#question").value.trim()+"\n类型："+TYPE_NAME[state.type]+"\n表面形态："+(f.surface||"")+"\n发生层改写："+(f.genesis||"")+"\n```\n\n";
-  state.sections.forEach(function(s,i){ md+="## "+(i+1)+"、"+s.h+"\n\n"; md+=(!s.words?refs.map(function(x){return "["+x.i+"] "+refString(x);}).join("  \n"):(s.text||""))+"\n\n"; });
-  md+="## 附录 A · 工序日志\n\n```\n"+logText()+"\n```\n\n## 附录 B · 解构卡全集\n\n"+refs.map(function(x){return "#### ["+x.i+"] "+x.title+"\n\n"+(x.card||"（未出卡）");}).join("\n\n")+"\n\n## 附录 C · 工序产出件\n\n### ⑤ 整图\n\n"+state.mapText+"\n\n### ⑤之二 敌拓闸\n\n"+state.planText+"\n\n"+state.verdict+"\n\n### ⑥ 表面挑战\n\n"+state.surface+"\n\n### ⑦ 五大发生挑战\n\n"+state.challenges+"\n\n### ⑧ 不足\n\n"+state.gaps+"\n\n### ⑧之二 维度碰撞卡\n\n"+(state.collide||"（未跑）")+"\n\n### ⑧之二 碰撞真跑\n\n"+(state.collideRun||"（未跑）")+"\n\n### ⑨ 猜想\n\n"+state.conjectures+"\n\n### ⑨ 之二 占位者\n\n"+state.occupants+"\n\n### ⑤之二 第二道 · 读数实搜取回记录（三库，原样节选）\n\n"+(state.hits||"（无）").slice(0,30000)+"\n";
+  state.sections.forEach(function(s,i){ md+="## "+(i+1)+"、"+s.h+"\n\n"; md+=(!s.words?refBlock(s,refs,function(i,t){return "["+i+"] "+t;}).join("  \n"):(s.text||""))+"\n\n"; });
+  md+="## 附录 A · 工序日志\n\n```\n"+logText()+"\n```\n\n## 附录 B · 解构卡全集\n\n"+refs.map(function(x){return "#### ["+x.i+"] "+x.title+"\n\n"+(x.card||"（未出卡）");}).join("\n\n")+"\n\n## 附录 C · 工序产出件\n\n### ⑤ 整图\n\n"+state.mapText+"\n\n### ⑤之二 敌拓闸\n\n"+state.planText+"\n\n"+state.verdict+"\n\n### ⑥ 表面挑战\n\n"+state.surface+"\n\n### ⑦ 五大发生挑战\n\n"+state.challenges+"\n\n### ⑧ 不足\n\n"+state.gaps+"\n\n### ⑧之二 维度碰撞卡\n\n"+(state.collide||"（未跑）")+"\n\n### ⑧之二 碰撞真跑\n\n"+(state.collideRun||"（未跑）")+"\n\n### ⑨之二 新研究领地（领地卡＋敌拓裁定）\n\n"+(state.territory||"")+"\n\n"+(state.territoryCheck||"")+"\n\n### ⑨ 猜想\n\n"+state.conjectures+"\n\n### ⑨ 之二 占位者\n\n"+state.occupants+"\n\n### ⑤之二 第二道 · 读数实搜取回记录（三库，原样节选）\n\n"+(state.hits||"（无）").slice(0,30000)+"\n";
   var blob=new Blob([md],{type:"text/markdown;charset=utf-8"});
   var u=URL.createObjectURL(blob), el=document.createElement("a"); el.href=u; el.download=(state.title||"综述").replace(/[\\\/:*?"<>|]/g,"_").slice(0,60)+".md"; document.body.appendChild(el); el.click(); setTimeout(function(){URL.revokeObjectURL(u); el.remove();},800);
 };
@@ -1139,7 +1181,7 @@ $("#pdfBtn").onclick=function(){
   var refs=litSelected(), html="";
   state.sections.forEach(function(s,i){
     html+="<h2>"+(i+1)+"、"+esc2(s.h)+"</h2>";
-    if(!s.words) html+=refs.map(function(x){return "<p class='ref'>［"+x.i+"］"+esc2(refString(x))+"</p>";}).join("");
+    if(!s.words) html+=refBlock(s,refs,function(i,t){return "<p class='ref'>［"+i+"］"+esc2(t)+"</p>";}).join("");
     else html+=(s.text||"").split(/\n+/).map(function(x){ x=x.trim(); if(!x) return ""; if(x.length<=24&&!/[。！？.?!：；]$/.test(x)) return "<h3>"+esc2(x)+"</h3>"; return "<p>"+esc2(x)+"</p>"; }).join("");
   });
   w.document.write("<!DOCTYPE html><html><head><meta charset='utf-8'><title>"+esc2(state.title||"综述")+"</title><style>@page{size:A4;margin:22mm}body{font-family:'Songti SC','Noto Serif CJK SC','SimSun',serif;color:#111;line-height:2;font-size:12.5pt}h1{font-size:19pt;margin:0 0 6pt}.meta{font-size:9.5pt;color:#666;margin:0 0 22pt;padding-bottom:10pt;border-bottom:.6pt solid #999}h2{font-size:15pt;margin:22pt 0 8pt;padding-top:8pt;border-top:.6pt solid #bbb}h3{font-size:13pt;margin:14pt 0 6pt}p{margin:0;text-indent:2em}p.ref{text-indent:0;font-size:11pt}.foot{margin-top:26pt;padding-top:8pt;border-top:.6pt solid #999;font-size:8.5pt;color:#777}@media print{.noprint{display:none}}.noprint{position:fixed;top:12px;right:12px;background:#141A24;color:#fff;border:none;border-radius:8px;padding:10px 18px;font:600 14px -apple-system,'PingFang SC',sans-serif;cursor:pointer}</style></head><body><button class='noprint' onclick='window.print()'>打印 / 存为 PDF</button><h1>"+esc2(state.title||"综述")+"</h1><div class='meta'>"+esc2(TYPE_NAME[state.type]||"")+" · SDE 综述生成 Skill 十道工序 · SDE Universes</div>"+html+"<div class='foot'>由大模型生成，引注只取自工序②清单，请以原文核对。sdeuniverses.com</div></body></html>");
