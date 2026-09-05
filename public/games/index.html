@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>歇一歇 · 休闲小游戏 · SDE Universes</title>
-<meta name="description" content="爱思乐园的休闲角：2048 与贪吃蛇两个经典小游戏，带人机对手。不烧 Key、无需注册，最高分只记在你自己的浏览器里。">
+<meta name="description" content="爱思乐园的休闲角：3D 枪战《星际突击》，以及 2048 与贪吃蛇两个经典小游戏，带人机对手。不烧 Key、无需注册，最高分只记在你自己的浏览器里。">
 <link rel="canonical" href="https://sdeuniverses.com/games/">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/assets/app/favicon-32.png" sizes="32x32">
@@ -31,6 +31,13 @@ h1{font-size:clamp(1.5rem,4.5vw,2.1rem);font-weight:700;letter-spacing:.04em}
 h1 .em{display:inline-block;animation:bob 2.2s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-6px) rotate(6deg)}}
 .lede{color:var(--text2);font-size:.92rem;max-width:52ch;margin:.4rem auto 1.1rem}
+.ss{display:block;position:relative;overflow:hidden;text-decoration:none;color:#e8f0ff;text-align:left;border:3px solid var(--ink);border-radius:18px;background:radial-gradient(ellipse at 30% 20%,#2a1a5e 0%,#0b0930 55%,#04050f 100%);box-shadow:6px 6px 0 var(--ink);margin:0 auto 1.3rem;max-width:560px;transition:transform .15s}
+.ss:hover{transform:translate(-2px,-2px)}
+.ss-grid{position:absolute;inset:auto 0 -20px 0;height:120px;background-image:linear-gradient(rgba(90,120,255,.45) 1px,transparent 1px),linear-gradient(90deg,rgba(90,120,255,.45) 1px,transparent 1px);background-size:26px 26px;transform:perspective(220px) rotateX(60deg);transform-origin:50% 100%;opacity:.7}
+.ss-body{position:relative;display:block;padding:1.1rem 1.3rem 1.2rem}
+.ss-body b{display:block;font-size:1.35rem;letter-spacing:.14em;text-shadow:0 0 16px rgba(120,220,255,.9),0 0 30px rgba(60,120,255,.6)}
+.ss-body span{display:block;font-size:.85rem;color:#b8c8f0;margin-top:.35rem;line-height:1.6}
+.ss-body em{display:inline-block;font-style:normal;margin-top:.7rem;padding:.4rem 1.1rem;border-radius:8px;font-weight:700;letter-spacing:.2em;background:linear-gradient(90deg,#2b8cff,#7b3cff);color:#fff;box-shadow:0 0 16px rgba(90,120,255,.6)}
 .tabs{display:inline-flex;border:3px solid var(--ink);border-radius:30px;overflow:hidden;background:#fff;margin-bottom:1rem;box-shadow:4px 4px 0 var(--ink)}
 .tabs button{border:0;background:transparent;font:inherit;font-weight:700;padding:.45rem 1.3rem;cursor:pointer;color:var(--ink);letter-spacing:.1em}
 .tabs button.on{background:#FFD166;color:var(--ink)}
@@ -95,6 +102,16 @@ footer a{color:var(--gold2);text-decoration:none;margin:0 .35rem}
   <p class="eyebrow">REST CORNER · 歇一歇</p>
   <h1><span class="em">🎮</span> 休闲小游戏</h1>
   <p class="lede">读累了撞累了，玩两把再回来。带人机对手，不烧 Key、无需注册，最高分只记在你自己的浏览器里。</p>
+
+  <!-- ===== 星际突击（3D 枪战，独立页） ===== -->
+  <a class="ss" href="/games/star-strike/" title="星际突击 · 3D 第一人称枪战">
+    <span class="ss-grid" aria-hidden="true"></span>
+    <span class="ss-body">
+      <b>🚀 星际突击 STAR STRIKE</b>
+      <span>3D 第一人称枪战 · 6 位英雄 · 4 张地图 · 5 种敌人 + Boss · 无尽波次。电脑 + 鼠标键盘。</span>
+      <em>开 始 游 戏 →</em>
+    </span>
+  </a>
 
   <div class="tabs" role="tablist">
     <button class="on" data-tab="t2048">🧩 2048</button>
