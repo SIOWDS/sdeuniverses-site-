@@ -143,6 +143,26 @@ canvas#gl{position:fixed;inset:0;display:block}
 .pilot select,.pilot input{background:rgba(0,0,0,.4);border:1px solid rgba(140,190,255,.35);border-radius:8px;color:#fff;padding:7px 10px;font-size:13px;outline:none}
 .pilot input{width:min(360px,60vw)}
 .pilot label{color:#fff}
+/* 将军模式 */
+#squad{position:absolute;left:22px;bottom:22px;display:none;gap:8px;pointer-events:auto}
+#squad.on{display:flex}
+.sq{width:150px;border:2px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(6,10,28,.8);padding:8px 10px;cursor:pointer;font-size:12px;color:#cfe0ff;position:relative}
+.sq.sel{border-color:var(--c);box-shadow:0 0 16px var(--c)}
+.sq.dead{opacity:.35;filter:grayscale(1)}
+.sq b{display:block;color:#fff;font-size:14px}
+.sq .k{position:absolute;top:6px;right:8px;font-size:11px;color:#8fa3c8}
+.sq .bar{height:7px;margin-top:5px}
+.sq .st{margin-top:4px;color:#9fd0ff;font-size:11px;height:15px;overflow:hidden;white-space:nowrap}
+#gcmd{position:absolute;right:22px;bottom:22px;display:none;flex-direction:column;gap:6px;pointer-events:auto;align-items:flex-end}
+#gcmd.on{display:flex}
+#gcmd .row{justify-content:flex-end}
+#gcmd button{cursor:pointer;background:rgba(6,10,28,.85);border:1px solid rgba(140,190,255,.4);color:#e8f0ff;border-radius:8px;padding:7px 12px;font-size:12.5px;letter-spacing:.05em}
+#gcmd button:hover{background:#2b8cff}
+#gcmd .hint{font-size:11px;color:#8fa3c8;text-align:right;line-height:1.6}
+#hud.general #cross,#hud.general #hitm,#hud.general .hbox,#hud.general .skill,#hud.general .abox{display:none}
+#hud.general .energy{bottom:130px}
+#hud.general #aipanel{bottom:210px}
+#gcmd .hint{max-width:520px}
 #mobile{display:none;position:fixed;inset:0;background:#05060f;z-index:9;padding:30px;text-align:center;line-height:1.9;flex-direction:column;justify-content:center;font-size:16px;color:#cfe0ff}
 @media (pointer:coarse) and (max-width:900px){#mobile{display:flex}}
 </style>
@@ -170,9 +190,11 @@ canvas#gl{position:fixed;inset:0;display:block}
       <div class="en" id="enE" style="--c:#7dff7a"><small>3</small><b>E</b>纠缠·雷击<div class="fill"></div></div>
     </div>
     <div class="hbox"><div class="lbl"><span>生命</span><span id="hpn">100</span></div><div class="bar" id="hpbar"><div></div></div><div id="o2"><div class="lbl"><span>氧气</span><span id="o2n"></span></div><div class="bar"><div id="o2bar"></div></div></div></div>
-    <div id="aipanel"><div class="hd">🤖 AI 战士 · <b id="aibase">规则脑</b><span class="st" id="aist">待命</span></div><div id="ailog"></div>
+    <div id="aipanel"><div class="hd"><span>🤖 AI 战士 · </span><b id="aibase">规则脑</b><span class="st" id="aist">待命</span></div><div id="ailog"></div>
       <div class="tools"><button id="takeover">🎮 我接管</button><button id="aiHint">提示：可以说「先打E」「撤」「回血」「去目标」「守住」「潜下去」</button></div>
       <div class="in"><input id="advice" placeholder="给战士出主意…（回车发送）" maxlength="80"><button id="adviceBtn">出主意</button></div></div>
+    <div id="squad"></div>
+    <div id="gcmd"><div class="row"><button data-o="objective">🎯 去目标</button><button data-o="hold">🛡 原地守</button><button data-o="retreat">↩ 集合到我</button><button data-o="hunt">⚔ 追击</button><button data-o="skill">✨ 放技能</button></div><div class="hint">左键点地面＝派选中的兵去那里（点敌人＝集火） · 1-4 选人 · Tab 全选 · WASD 移镜头 · Q/E 转 · 右键拖动转视角 · 滚轮缩放 · 空格回到小队<br>能量释放：Z 护壁 · X 爆发 · C 雷击</div></div>
     <div class="skill" id="skill"><b id="skkey">Q</b><span id="skname">技能</span><div class="cd" id="skcd"></div></div>
     <div class="abox"><div class="ammo"><span id="ammo">30</span><small>/ <span id="ammomax">30</span></small></div><div class="wname" id="wname">突击步枪</div><div class="rel" id="rel"></div></div>
   </div>
@@ -193,7 +215,7 @@ canvas#gl{position:fixed;inset:0;display:block}
         <span style="border-color:#7dff7a"><b style="color:#7dff7a">E 纠缠者</b>——用光链把附近的敌人连起来，被连上的都有护盾。<b>先打 E！</b></span>
         <span style="border-color:#ffd166"><b style="color:#ffd166">能量</b>——打爆敌人掉 S/D/E 三色能量。攒满按 1/2/3 释放：S 护壁 · D 爆发 · E 雷击。</span>
       </div></div>
-      <div class="sec"><h3>谁来打<i></i></h3><div class="row" id="pilots"><button class="btn sel" data-p="me">🎮 我自己打</button><button class="btn" data-p="ai">🤖 AI 战士代打 · 我当参谋</button></div>
+      <div class="sec"><h3>谁来打<i></i></h3><div class="row" id="pilots"><button class="btn sel" data-p="me">🎮 我自己打</button><button class="btn" data-p="ai">🤖 AI 战士代打 · 我当参谋</button><button class="btn" data-p="general">🎖 我当将军 · 指挥小队</button></div>
         <div class="pilot" id="pilotBox" style="display:none;margin-top:10px">
           <div class="row"><label>战士的基底：</label><select id="baseSel">
             <option value="local">规则脑（不用 Key，本机运行）</option>
@@ -207,6 +229,7 @@ canvas#gl{position:fixed;inset:0;display:block}
             <option value="gemini:flash">🌐 Gemini 2.5 Flash（经代理）</option>
           </select></div>
           <div class="row" id="keyRow" style="display:none;margin-top:8px"><label id="keyLabel">API Key：</label><input id="apiKey" type="password" placeholder="只存在你自己的浏览器里，直连厂商"></div>
+          <div id="generalNote" style="display:none;margin-top:6px;color:#ffd166">将军模式：在下面点选 2–4 位英雄组成小队（再点一次取消）。你不拿枪，从空中指挥：点地面派兵、按键下令、在面板里用话下令；基底给每个兵下达战术，你可以随时改。</div>
           <div style="margin-top:6px">基底每隔几秒读一次战场态势，下达战术（打谁、往哪走、什么时候放技能和能量）；执行层由战士本体完成。你在左侧面板给他出主意，他会听，也会告诉你他为什么这么打。选「规则脑」不需要 Key，随时能玩。</div>
         </div></div>
       <div class="sec"><h3>选择英雄 · 星际小队<i></i></h3><div class="cards" id="heroes"></div></div>
@@ -506,7 +529,7 @@ function updateEnv(dt){
 var player={pos:new THREE.Vector3(0,0,0),vel:new THREE.Vector3(),yaw:0,pitch:0,hp:100,maxhp:100,r:.5,h:1.7,onGround:true,dead:false,shield:0,hero:null,speed:1,o2:100,swim:false,boostT:0,wallT:0,cloak:0,jet:0};
 var keys={},mouseDown=false,rightDown=false;
 var ctl={fwd:0,side:0,jump:false,dive:false,sprint:false,fire:false,zoom:false};
-var aiMode=false,takeover=false;
+var aiMode=false,takeover=false,general=false;
 function readHumanCtl(){ctl.fwd=(keys.KeyW?1:0)-(keys.KeyS?1:0);ctl.side=(keys.KeyD?1:0)-(keys.KeyA?1:0);ctl.jump=!!keys.Space;ctl.dive=!!keys.KeyC;ctl.sprint=!!(keys.ShiftLeft||keys.ShiftRight);ctl.fire=mouseDown;ctl.zoom=rightDown;}
 var gun=null,gunBase=new THREE.Vector3(.26,-.22,-.42),gunKick=0,kick2=0;
 function makeGunModel(w){var gun=new THREE.Group();var body=new THREE.MeshStandardMaterial({color:0x4a5070,roughness:.5,metalness:.5,emissive:0x101425});var acc=new THREE.MeshStandardMaterial({color:w.color,emissive:w.color,emissiveIntensity:.9});
@@ -622,13 +645,15 @@ function updateProjs(dt){
   if(m.position.y<H(m.position.x,m.position.z)||Math.abs(m.position.x)>HALF||Math.abs(m.position.z)>HALF)hit=true;
   else{for(var k=0;k<obstacles.length;k++){var o=obstacles[k];if(m.position.y<o.h&&m.position.x>o.minx&&m.position.x<o.maxx&&m.position.z>o.minz&&m.position.z<o.maxz){hit=true;break;}}}
   if(!hit){if(p.mine){for(var k=0;k<enemies.length;k++){var e=enemies[k];if(e.dead)continue;var dx=m.position.x-e.pos.x,dy=m.position.y-(e.pos.y+e.def.size*.9),dz=m.position.z-e.pos.z;var rr=e.def.size*1.1+.3;if(dx*dx+dy*dy+dz*dz<rr*rr){hit=true;hp=e;break;}}}
+   else if(general){for(var k=0;k<allies.length;k++){var a=allies[k];if(a.dead)continue;var dx=m.position.x-a.pos.x,dy=m.position.y-(a.pos.y+.9),dz=m.position.z-a.pos.z;if(dx*dx+dy*dy+dz*dz<1.3){hit=true;hp=a;break;}}}
    else{var dx=m.position.x-player.pos.x,dy=m.position.y-(player.pos.y+.9),dz=m.position.z-player.pos.z;if(dx*dx+dy*dy+dz*dz<1.0){hit=true;hp='player';}}}
   if(hit||p.life<=0){
    if(p.firepool){var fx0=m.position.x,fz0=m.position.z;firePools.push({x:fx0,z:fz0,y:H(fx0,fz0),life:7,r:4.5});explosion(fx0,H(fx0,fz0)+.5,fz0,1.5,0xff8a3c);}
    if(p.splash>0&&!p.firepool){explosion(m.position.x,m.position.y,m.position.z,p.splash*.5,p.arrow?0xa8c85a:0xffa030);
     if(p.mine){for(var k=0;k<enemies.length;k++){var e=enemies[k];if(e.dead)continue;var d=e.pos.distanceTo(m.position);if(d<p.splash)damageEnemy(e,p.dmg*(1-d/p.splash*.6),e.pos.clone().setY(e.pos.y+1),false);}}
+    else if(general){allies.forEach(function(a){if(a.dead)return;var d=a.pos.distanceTo(m.position);if(d<p.splash)squad.hurt(a,p.dmg*(1-d/p.splash*.6));});}
     else{var d=player.pos.distanceTo(m.position);if(d<p.splash)hurtPlayer(p.dmg*(1-d/p.splash*.6));}}
-   else{if(hp==='player')hurtPlayer(p.dmg);else if(hp){damageEnemy(hp,p.dmg,m.position.clone(),false);weapon.hits++;}else burst(m.position.x,m.position.y,m.position.z,5,p.col,4,.8,.3,8);}
+   else{if(hp==='player')hurtPlayer(p.dmg);else if(hp&&hp.hero){squad.hurt(hp,p.dmg);}else if(hp){damageEnemy(hp,p.dmg,m.position.clone(),false);weapon.hits++;}else burst(m.position.x,m.position.y,m.position.z,5,p.col,4,.8,.3,8);}
    world.remove(m);m.material.dispose();projs.splice(i,1);}
  }
 }
@@ -670,8 +695,9 @@ function updateEnemies(dt){
  linkPairs.forEach(function(p,i){var a=p[0].pos.clone().setY(p[0].pos.y+1),b=p[1].pos.clone().setY(p[1].pos.y+p[1].def.size);linkLines[i].geometry.setFromPoints([a,b]);linkLines[i].material.opacity=.4+Math.sin(tNow*10+i)*.3;if(Math.random()<.3)spawnP(lerp(a.x,b.x,Math.random()),lerp(a.y,b.y,Math.random()),lerp(a.z,b.z,Math.random()),0,.5,0,.4,.9,0x7dff7a,0);});
  var look=new THREE.Vector3(-Math.sin(player.yaw),0,-Math.cos(player.yaw));
  for(var i=enemies.length-1;i>=0;i--){var e=enemies[i];if(e.dead)continue;var def=e.def;e.t+=dt;
-  var toP=player.pos.clone().sub(e.pos);var dy=toP.y;toP.y=0;var dist=toP.length();
-  var blind=player.cloak>0&&dist>5;
+  var TU=nearestUnit(e.pos);if(!TU){e.mesh.position.copy(e.pos);continue;}var TP=TU.pos,TV=TU.vel;
+  var toP=TP.clone().sub(e.pos);var dy=toP.y;toP.y=0;var dist=toP.length();
+  var blind=(TU===player?player.cloak:TU.cloak||0)>0&&dist>5;
   if(!frozen){
    var want=toP.clone().normalize();
    var ideal=def.suicide||def.melee?0:def.range*.6;
@@ -682,7 +708,7 @@ function updateEnemies(dt){
     var facing=look.dot(want.clone().negate());if(facing>.3&&dist>8){var sd=new THREE.Vector3(-want.z,0,want.x).multiplyScalar(e.side);want.add(sd.multiplyScalar(1.4)).normalize();}}
    if(def.link){ // E 纠缠者：躲在同伴身后
     var friend=null,fd=1e9;enemies.forEach(function(o){if(o===e||o.dead||o.def.link)return;var d=o.pos.distanceTo(e.pos);if(d<fd){fd=d;friend=o;}});
-    if(friend){var behind=friend.pos.clone().sub(player.pos).normalize().multiplyScalar(6).add(friend.pos);want=behind.sub(e.pos).setY(0);if(want.length()<2)want.set(0,0,0);else want.normalize();ideal=0;}}
+    if(friend){var behind=friend.pos.clone().sub(TP).normalize().multiplyScalar(6).add(friend.pos);want=behind.sub(e.pos).setY(0);if(want.length()<2)want.set(0,0,0);else want.normalize();ideal=0;}}
    if(dist<ideal)want.multiplyScalar(-.6);
    var side=new THREE.Vector3(-want.z,0,want.x).multiplyScalar(Math.sin(e.t*.8)*e.side*.5);want.add(side);
    var probe=e.pos.clone().addScaledVector(want,def.size+1.5);var ph=H(probe.x,probe.z);
@@ -693,15 +719,15 @@ function updateEnemies(dt){
    var sp=def.speed*(def.boss?1:1+alert*.03);e.vel.x=lerp(e.vel.x,want.x*sp,.1);e.vel.z=lerp(e.vel.z,want.z*sp,.1);
    var gh=H(e.pos.x,e.pos.z);
    if(def.fly){var ty=Math.max(gh,SEA)+(def.link?6:4)+Math.sin(e.t*1.5)*2;e.vel.y=lerp(e.vel.y,(ty-e.pos.y)*2,.1);e.pos.y+=e.vel.y*dt;e.pos.x+=e.vel.x*dt;e.pos.z+=e.vel.z*dt;e.pos.x=clamp(e.pos.x,-HALF+2,HALF-2);e.pos.z=clamp(e.pos.z,-HALF+2,HALF-2);}
-   else if(def.swim){var ty=clamp(player.pos.y+.5,gh+1,SEA-1);e.vel.y=lerp(e.vel.y,(ty-e.pos.y)*2,.1);e.pos.y+=e.vel.y*dt;e.pos.x+=e.vel.x*dt;e.pos.z+=e.vel.z*dt;}
+   else if(def.swim){var ty=clamp(TP.y+.5,gh+1,SEA-1);e.vel.y=lerp(e.vel.y,(ty-e.pos.y)*2,.1);e.pos.y+=e.vel.y*dt;e.pos.x+=e.vel.x*dt;e.pos.z+=e.vel.z*dt;}
    else {moveAABB(e.pos,def.size*.5,e.vel,dt);e.pos.y=lerp(e.pos.y,floorAt(e.pos.x,e.pos.z,e.pos.y,def.size*.5),.4);}
    e.cool-=dt;
    var d3=Math.sqrt(dist*dist+dy*dy);
    if(blind){}
-   else if(def.suicide){if(d3<def.range){killEnemy(e,true);hurtPlayer(def.dmg*diff.mul);continue;}}
-   else if(def.melee){if(d3<def.range&&e.cool<=0){e.cool=1.1;hurtPlayer(def.dmg*diff.mul);burst(player.pos.x,player.pos.y+1,player.pos.z,20,0xff3cac,6,1.2,.4,0);}}
-   else if(dist<def.range&&e.cool<=0){var from=e.pos.clone().setY(e.pos.y+def.size*1.5);var tgt=player.pos.clone().setY(player.pos.y+1);if(los(from,tgt)){e.cool=def.rate*rnd(.8,1.2);alert=Math.min(alert+.02,99);
-     var dir=tgt.sub(from);var lead=def.pspeed>40?0:.15;dir.add(player.vel.clone().multiplyScalar(lead));dir.normalize();dir.x+=rnd(-.03,.03);dir.y+=rnd(-.02,.02);dir.normalize();
+   else if(def.suicide){if(d3<def.range){killEnemy(e,true);hurtUnit(TU,def.dmg*diff.mul);continue;}}
+   else if(def.melee){if(d3<def.range&&e.cool<=0){e.cool=1.1;hurtUnit(TU,def.dmg*diff.mul);burst(TP.x,TP.y+1,TP.z,20,0xff3cac,6,1.2,.4,0);}}
+   else if(dist<def.range&&e.cool<=0){var from=e.pos.clone().setY(e.pos.y+def.size*1.5);var tgt=TP.clone().setY(TP.y+1);if(los(from,tgt)){e.cool=def.rate*rnd(.8,1.2);alert=Math.min(alert+.02,99);
+     var dir=tgt.sub(from);var lead=def.pspeed>40?0:.15;dir.add(TV.clone().multiplyScalar(lead));dir.normalize();dir.x+=rnd(-.03,.03);dir.y+=rnd(-.02,.02);dir.normalize();
      var w={type:def.boss?'rocket':'plasma',dmg:def.dmg*diff.mul,pspeed:def.pspeed,pcolor:def.color,splash:def.boss?4:0};
      if(def.boss){for(var s=-1;s<=1;s+=2){var o=from.clone().add(new THREE.Vector3(-dir.z*s*1.5,0,dir.x*s*1.5));spawnProj(o,dir,w,false);}}else spawnProj(from,dir,w,false);
      flashLight(from.x,from.y,from.z,def.color,6,.15);if(e.kind==='sniper')tracer(from,from.clone().addScaledVector(dir,70),def.color,.5);}}
@@ -714,6 +740,8 @@ function updateEnemies(dt){
   if(e.shielded&&Math.random()<.15)spawnP(e.pos.x+rnd(-1,1)*def.size,e.pos.y+rnd(0,2)*def.size,e.pos.z+rnd(-1,1)*def.size,0,.6,0,.5,1.2,0x7dff7a,0);
  }
 }
+function nearestUnit(p){if(!general)return player.dead?null:player;var best=null,bd=1e9;for(var i=0;i<allies.length;i++){var a=allies[i];if(a.dead)continue;var d=a.pos.distanceTo(p);if(d<bd){bd=d;best=a;}}return best;}
+function hurtUnit(u,d){if(u===player)hurtPlayer(d);else if(u)squad.hurt(u,d);}
 function damageEnemy(e,dmg,point,crit){
  if(e.dead)return;
  if(e.shielded){dmg*=.25;burst(point.x,point.y,point.z,10,0x7dff7a,6,1.2,.3,0);}
@@ -754,14 +782,14 @@ function spawnOrb(x,y,z,kind,amt){var col=ROLECOL[kind];var m=new THREE.Mesh(orb
 function spawnPickup(x,z,kind){var col=kind==='hp'?0x3cff8a:0xffd166;var y=Math.max(H(x,z),SEA-30);var m=new THREE.Mesh(new THREE.BoxGeometry(.9,.9,.9),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:.6,roughness:.3,metalness:.6}));m.position.set(x,y+.8,z);world.add(m);var L=new THREE.PointLight(col,1.2,8);m.add(L);
  var ring=new THREE.Mesh(new THREE.RingGeometry(.9,1.1,24),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.6,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.set(x,y+.06,z);world.add(ring);pickups.push({m:m,ring:ring,kind:kind,life:40,x:x,z:z,y:y});}
 function updateItems(dt){
- for(var i=orbs.length-1;i>=0;i--){var o=orbs[i];o.life-=dt;var m=o.m;var toP=camera.position.clone().sub(m.position);var d=toP.length();
+ for(var i=orbs.length-1;i>=0;i--){var o=orbs[i];o.life-=dt;var m=o.m;var nu=general?nearestUnit(m.position):null;var toP=(nu?nu.pos.clone().setY(nu.pos.y+1):camera.position.clone()).sub(m.position);var d=toP.length();
   if(d<14){m.position.addScaledVector(toP.normalize(),dt*(24-d));}else{o.v.y-=12*dt;m.position.addScaledVector(o.v,dt);var gh=H(m.position.x,m.position.z)+.5;if(m.position.y<gh){m.position.y=gh;o.v.y*=-.4;o.v.x*=.8;o.v.z*=.8;}}
   m.rotation.y+=dt*4;m.rotation.x+=dt*2;
   if(d<1.6||o.life<=0){if(d<1.6){energy[o.kind]=Math.min(EMAX,energy[o.kind]+o.amt);SFX.energy(o.kind==='S'?520:o.kind==='D'?700:880);score+=5;if(energy[o.kind]>=EMAX&&energy[o.kind]-o.amt<EMAX)log(o.kind+' 能量已满 · 按 '+(o.kind==='S'?1:o.kind==='D'?2:3)+' 释放');}
    world.remove(m);m.material.dispose();orbs.splice(i,1);}}
  for(var i=pickups.length-1;i>=0;i--){var p=pickups[i];p.life-=dt;p.m.rotation.y+=dt*2;p.m.position.y=p.y+.9+Math.sin(tNow*3)*.15;p.ring.scale.setScalar(1+Math.sin(tNow*4)*.1);
-  var dx=p.x-player.pos.x,dz=p.z-player.pos.z,dy=p.y-player.pos.y;
-  if(dx*dx+dz*dz<2.4&&Math.abs(dy)<2.5){if(p.kind==='hp'){player.hp=Math.min(player.maxhp,player.hp+40);log('+40 生命');}else{weapon.ammo=player.hero.weapon.mag;weapon.reloading=0;$('rel').textContent='';log('弹药补满');}SFX.pick();burst(p.x,p.y+1,p.z,30,p.kind==='hp'?0x3cff8a:0xffd166,6,1.4,.6,0);p.life=0;}
+  var pu=general?nearestUnit(new THREE.Vector3(p.x,p.y,p.z)):player;if(!pu)continue;var dx=p.x-pu.pos.x,dz=p.z-pu.pos.z,dy=p.y-pu.pos.y;
+  if(dx*dx+dz*dz<2.4&&Math.abs(dy)<2.5){if(pu!==player){if(p.kind==='hp'){pu.hp=Math.min(pu.maxhp,pu.hp+40);cmd.sys(pu.hero.name+' 回血 +40');}else{pu.ammo=pu.hero.weapon.mag;pu.reload=0;}}else if(p.kind==='hp'){player.hp=Math.min(player.maxhp,player.hp+40);log('+40 生命');}else{weapon.ammo=player.hero.weapon.mag;weapon.reloading=0;$('rel').textContent='';log('弹药补满');}SFX.pick();burst(p.x,p.y+1,p.z,30,p.kind==='hp'?0x3cff8a:0xffd166,6,1.4,.6,0);p.life=0;}
   if(p.life<=0){world.remove(p.m);world.remove(p.ring);pickups.splice(i,1);}}
 }
 /* ---------- 技能与能量 ---------- */
@@ -786,6 +814,7 @@ function useSkill(){
 }
 function groundRing(x,z,col,size,life){var ring=new THREE.Mesh(new THREE.RingGeometry(.8,1.2,48),new THREE.MeshBasicMaterial({color:col,transparent:true,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.set(x,H(x,z)+.2,z);world.add(ring);fx.push({t:0,life:life,fn:function(k){ring.scale.setScalar(1+k*size);ring.material.opacity=1-k;},end:function(){world.remove(ring);}});}
 function useEnergy(k){
+ if(general){squad.useEnergy(k);return;}
  if(player.dead||energy[k]<EMAX)return;energy[k]=0;SFX.skill();
  if(k==='S'){player.wallT=12;player.hp=Math.min(player.maxhp,player.hp+30);log('S 护壁：12 秒减伤 60% · +30 生命');groundRing(player.pos.x,player.pos.z,0x3cc8ff,12,.6);}
  else if(k==='D'){player.boostT=10;log('D 爆发：10 秒双倍伤害 · 加速');groundRing(player.pos.x,player.pos.z,0xff3cac,12,.6);}
@@ -811,7 +840,7 @@ function updateObjective(dt){
  pathT+=dt;if(pathT>.12&&d>12){pathT=0;var dir=new THREE.Vector3(dx,0,dz).normalize();for(var i=1;i<=6;i++){var px=player.pos.x+dir.x*i*4,pz=player.pos.z+dir.z*i*4;var py=Math.max(H(px,pz),b.under?-99:SEA)+.6;spawnP(px,py,pz,0,.4,0,.9,1.6,b.col,0);}}
  if(b.boss){$('obj').querySelector('.bar').style.display='none';return;}
  var bar=$('obj').querySelector('.bar');bar.style.display='block';
- var inside=d<7&&Math.abs(player.pos.y-b.y)<6;
+ var inside=general?allies.some(function(a){return !a.dead&&Math.hypot(a.pos.x-b.x,a.pos.z-b.z)<7&&Math.abs(a.pos.y-b.y)<6}):(d<7&&Math.abs(player.pos.y-b.y)<6);
  if(inside&&b.under)player.o2=Math.min(100,player.o2+dt*40);
  if(inside&&!b.done){if(b.prog===0){announce('信标激活','守住 '+b.need+' 秒！');SFX.beacon();}b.prog=Math.min(b.need,b.prog+dt);
   if(Math.random()<.5)spawnP(b.x+rnd(-5,5),b.y+rnd(0,2),b.z+rnd(-5,5),0,3,0,1.2,1.4,b.col,0);
@@ -821,7 +850,7 @@ function updateObjective(dt){
 }
 function director(dt){ // SDE 智能体调度
  var b=curObj();var active=b&&!b.boss&&b.prog>0&&!b.done;var reg=regionOf(player.pos.x,player.pos.z);
- var cap=(active?10:5)+Math.floor(alert*1.2)+(endless?4:0);
+ var cap=(active?10:5)+Math.floor(alert*1.2)+(endless?4:0)+(general?4:0);
  spawnT-=dt;
  if(enemies.length<cap&&spawnT<=0){spawnT=active?rnd(.6,1.4):rnd(2.5,5)/(1+alert*.1);
   var pool;var underw=underwater||(b&&b.under&&b.prog>0);
@@ -832,7 +861,7 @@ function director(dt){ // SDE 智能体调度
   else pool=['drone','drone','wasp','bomber','heavy','linker','sniper'];
   if(alert<2)pool=pool.filter(function(k){return k!=='heavy'&&k!=='sniper'});
   if(enemies.filter(function(e){return e.def.link}).length>=2)pool=pool.filter(function(k){return k!=='linker'});
-  var kind=pool[Math.floor(Math.random()*pool.length)];spawnEnemy(kind,active?{x:b.x,z:b.z}:null);}
+  var kind=pool[Math.floor(Math.random()*pool.length)];spawnEnemy(kind,active?{x:b.x,z:b.z}:(general?squad.center():null));}
  alert=Math.max(alert,1);
  $('wave').textContent=Math.floor(alert);$('left').textContent='敌人 '+enemies.length;$('score').textContent=score;$('kills').textContent='击破 '+kills;
  if(streakT>0){streakT-=dt;if(streakT<=0)streak=0;}
@@ -851,45 +880,49 @@ function drawMini(){var c=mctx;c.clearRect(0,0,150,150);c.save();c.beginPath();c
  c.restore();c.fillStyle='#fff';c.beginPath();c.moveTo(75,68);c.lineTo(80,78);c.lineTo(70,78);c.fill();}
 
 /* ---------- 流程 ---------- */
-var selHero=0,selDiff=1,selPilot='me';
+var selHero=0,selDiff=1,selPilot='me',selSquad=[0,1,2];
 function best(){try{return JSON.parse(localStorage.getItem('ss2_best')||'{}')}catch(e){return{}}}
 function showBest(){var b=best();$('best').textContent=b.score?('最高纪录：'+b.score+' 分 · 信标 '+b.obj+'/4 · '+b.hero+(b.win?' · 已通关':'')):'还没有纪录，来创造一个！';}
 function buildMenu(){
- var Hh=$('heroes'),H2=$('heroes2');HEROES.forEach(function(h,i){var d=document.createElement('div');d.className='card'+(i===selHero?' sel':'');d.style.setProperty('--c',h.color);d.innerHTML='<div class="sw">'+(h.icon?'<span class="ic">'+h.icon+'</span>':'')+'</div><b>'+h.name+'</b><small>'+h.desc.replace('\n','<br>')+'</small><div class="stat"><span style="--v:'+(h.stats[0]*100)+'%"></span><span style="--v:'+(h.stats[1]*100)+'%"></span><span style="--v:'+(h.stats[2]*100)+'%"></span></div>';d.onclick=function(){selHero=i;[].forEach.call(Hh.children,function(c){c.classList.remove('sel')});[].forEach.call(H2.children,function(c){c.classList.remove('sel')});d.classList.add('sel');tone(660,.08,'sine',.08);};(h.legend?H2:Hh).appendChild(d);});
+ var Hh=$('heroes'),H2=$('heroes2');HEROES.forEach(function(h,i){var d=document.createElement('div');d.className='card'+(i===selHero?' sel':'');d.style.setProperty('--c',h.color);d.innerHTML='<div class="sw">'+(h.icon?'<span class="ic">'+h.icon+'</span>':'')+'</div><b>'+h.name+'</b><small>'+h.desc.replace('\n','<br>')+'</small><div class="stat"><span style="--v:'+(h.stats[0]*100)+'%"></span><span style="--v:'+(h.stats[1]*100)+'%"></span><span style="--v:'+(h.stats[2]*100)+'%"></span></div>';d.dataset.i=i;d.onclick=function(){if(selPilot==='general'){var k=selSquad.indexOf(i);if(k>=0){if(selSquad.length>2)selSquad.splice(k,1);}else if(selSquad.length<4)selSquad.push(i);refreshHeroSel();}else{selHero=i;refreshHeroSel();}tone(660,.08,'sine',.08);};(h.legend?H2:Hh).appendChild(d);});
+ function refreshHeroSel(){document.querySelectorAll('#heroes .card,#heroes2 .card').forEach(function(c){var i=+c.dataset.i;c.classList.toggle('sel',selPilot==='general'?selSquad.indexOf(i)>=0:i===selHero);});}
  var D=$('diffs');DIFFS.forEach(function(x,i){var b=document.createElement('button');b.className='btn'+(i===selDiff?' sel':'');b.textContent=x.name;b.onclick=function(){selDiff=i;[].forEach.call(D.children,function(c,k){c.classList.toggle('sel',k===i)});};D.appendChild(b);});
- var Pp=$('pilots');[].forEach.call(Pp.children,function(b){b.onclick=function(){selPilot=b.dataset.p;[].forEach.call(Pp.children,function(c){c.classList.toggle('sel',c===b)});$('pilotBox').style.display=selPilot==='ai'?'block':'none';};});
+ var Pp=$('pilots');[].forEach.call(Pp.children,function(b){b.onclick=function(){selPilot=b.dataset.p;[].forEach.call(Pp.children,function(c){c.classList.toggle('sel',c===b)});$('pilotBox').style.display=selPilot==='me'?'none':'block';$('generalNote').style.display=selPilot==='general'?'block':'none';refreshHeroSel();};});
  $('baseSel').onchange=refreshKeyUI;$('apiKey').onchange=function(){try{localStorage.setItem(keyStoreName(),$('apiKey').value.trim());}catch(e){}};refreshKeyUI();
  showBest();}
 function clearWorld(){
  if(world){scene.remove(world);world.traverse(function(o){if(o.isMesh||o.isLine||o.isPoints){if(o.geometry&&o.geometry!==debrisGeo&&o.geometry!==projGeo&&o.geometry!==orbGeo&&o!==particles)o.geometry.dispose();if(o.material&&o.material.dispose&&o!==particles)o.material.dispose();}});}
  scene.children.slice().forEach(function(c){if(c!==camera)scene.remove(c);});
- world=null;enemies=[];projs=[];orbs=[];pickups=[];fx=[];lightPool=[];linkLines=[];bossRef=null;$('boss').style.display='none';for(var i=0;i<PMAX;i++)P[i].life=0;}
+ world=null;stars=null;allies=[];enemies=[];projs=[];orbs=[];pickups=[];fx=[];lightPool=[];linkLines=[];bossRef=null;$('boss').style.display='none';for(var i=0;i<PMAX;i++)P[i].life=0;}
 function startGame(){
  audio();clearWorld();diff=DIFFS[selDiff];buildWorld();if(!miniBg)buildMini();scene.add(camera);resetPlayer(HEROES[selHero]);
- objIdx=0;alert=1;score=0;kills=0;streak=0;logs=[];$('log').innerHTML='';endless=false;spawnT=2;startT=performance.now();dayT=.3;rainAmt=0;setObjectiveUI();
+ objIdx=0;alert=1;score=0;kills=0;streak=0;logs=[];$('log').innerHTML='';endless=false;spawnT=2;startT=performance.now();dayT=.3;rainAmt=0;setObjectiveUI();if(selPilot==='general'){player.hp=1e9;player.maxhp=1e9;}
  running=true;paused=false;$('menu').classList.add('hidden');$('over').classList.add('hidden');$('pause').classList.add('hidden');$('win').classList.add('hidden');$('hud').classList.add('on');
- aiMode=(selPilot==='ai');takeover=false;$('aipanel').classList.toggle('on',aiMode);$('takeover').textContent='🎮 我接管';$('takeover').classList.remove('on');
- if(aiMode){bot.reset();cmd.reset();}else{lockPointer();}
+ aiMode=(selPilot!=='me');general=(selPilot==='general');takeover=false;$('aipanel').classList.toggle('on',aiMode);$('aipanel').querySelector('.hd span').textContent=general?'🎖 参谋 · ':'🤖 AI 战士 · ';$('takeover').textContent='🎮 我接管';$('takeover').classList.remove('on');$('takeover').style.display=general?'none':'';
+ $('hud').classList.toggle('general',general);$('squad').classList.toggle('on',general);$('gcmd').classList.toggle('on',general);
+ if(gun){gun.visible=!general;if(gun.userData.twin)gun.userData.twin.visible=!general;}
+ if(general){squad.init();cmd.reset();}else if(aiMode){bot.reset();cmd.reset();}else{lockPointer();}
  announce('第一站：平原信标',aiMode?'AI 战士出发 · 你当参谋':'跟着上方箭头走');}
 function die(){
- player.dead=true;running=false;if(aiMode){cmd.say('……我倒了。再来一局，这次听你的。');}explosion(player.pos.x,player.pos.y+1,player.pos.z,2,0xff4040);
- var b=best();var done=beacons.filter(function(x){return x.done&&!x.boss}).length;var nb=score>(b.score||0);if(nb)localStorage.setItem('ss2_best',JSON.stringify({score:score,obj:done,hero:player.hero.name,win:b.win||false}));
- setTimeout(function(){document.exitPointerLock&&document.exitPointerLock();$('hud').classList.remove('on');$('over').classList.remove('hidden');$('overmsg').textContent='阵亡于 '+regionOf(player.pos.x,player.pos.z)+' · '+player.hero.name+' · '+diff.name;
+ player.dead=true;running=false;if(general)cmd.say('全队阵亡……将军，我们再来。');if(aiMode){cmd.say('……我倒了。再来一局，这次听你的。');}explosion(player.pos.x,player.pos.y+1,player.pos.z,2,0xff4040);
+ var b=best();var done=beacons.filter(function(x){return x.done&&!x.boss}).length;var nb=score>(b.score||0);if(nb)localStorage.setItem('ss2_best',JSON.stringify({score:score,obj:done,hero:general?'将军':player.hero.name,win:b.win||false}));
+ setTimeout(function(){document.exitPointerLock&&document.exitPointerLock();$('hud').classList.remove('on');$('over').classList.remove('hidden');$('overmsg').textContent=(general?'小队全灭于 ':'阵亡于 ')+regionOf(player.pos.x,player.pos.z)+' · '+(general?'将军模式':player.hero.name)+' · '+diff.name;
   $('oscore').textContent=score;$('okills').textContent=kills;$('oobj').textContent=done+'/4';$('oacc').textContent=weapon.shots?Math.round(100*Math.min(1,weapon.hits/weapon.shots))+'%':'0%';$('obest').textContent=nb?'🏆 新纪录！':('最高纪录 '+(b.score||0)+' 分');showBest();},1400);}
-function win(){running=false;announce('胜 利','泰坦机甲击破');var b=best();localStorage.setItem('ss2_best',JSON.stringify({score:Math.max(score,b.score||0),obj:4,hero:player.hero.name,win:true}));
+function win(){running=false;announce('胜 利','泰坦机甲击破');var b=best();localStorage.setItem('ss2_best',JSON.stringify({score:Math.max(score,b.score||0),obj:4,hero:general?'将军':player.hero.name,win:true}));
  setTimeout(function(){document.exitPointerLock&&document.exitPointerLock();$('hud').classList.remove('on');$('win').classList.remove('hidden');$('wscore').textContent=score;$('wkills').textContent=kills;var t=Math.round((performance.now()-startT)/1000);$('wtime').textContent=Math.floor(t/60)+':'+String(t%60).padStart(2,'0');$('wacc').textContent=weapon.shots?Math.round(100*Math.min(1,weapon.hits/weapon.shots))+'%':'0%';},2000);}
 function continueEndless(){endless=true;if(aiMode)cmd.say('无尽模式，我继续打。');running=true;paused=false;$('win').classList.add('hidden');$('hud').classList.add('on');objIdx=99;setObjectiveUI();alert+=2;lockPointer();announce('无尽模式','敌人无休止 · 看你能撑多久');}
 function pauseGame(){if(!running||paused)return;paused=true;keys={};mouseDown=false;rightDown=false;ctl.fire=false;$('pause').classList.remove('hidden');}
 function resumeGame(){paused=false;$('pause').classList.add('hidden');lockPointer();}
-function toMenu(){running=false;paused=false;aiMode=false;$('aipanel').classList.remove('on');document.exitPointerLock&&document.exitPointerLock();clearWorld();$('hud').classList.remove('on');$('pause').classList.add('hidden');$('over').classList.add('hidden');$('win').classList.add('hidden');$('menu').classList.remove('hidden');scene.background=new THREE.Color(0x05060f);scene.fog=null;showBest();}
+function toMenu(){running=false;paused=false;aiMode=false;general=false;$('aipanel').classList.remove('on');$('squad').classList.remove('on');$('gcmd').classList.remove('on');$('hud').classList.remove('general');document.exitPointerLock&&document.exitPointerLock();clearWorld();$('hud').classList.remove('on');$('pause').classList.add('hidden');$('over').classList.add('hidden');$('win').classList.add('hidden');$('menu').classList.remove('hidden');scene.background=new THREE.Color(0x05060f);scene.fog=null;showBest();}
 function lockPointer(){if(aiMode&&!takeover)return;try{canvas.requestPointerLock();}catch(e){}}
 /* ---------- 输入 ---------- */
-document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='advice')return;keys[e.code]=true;if(e.code==='Space')e.preventDefault();if(e.code==='KeyR')startReload();if(e.code==='KeyQ')useSkill();if(e.code==='Digit1')useEnergy('S');if(e.code==='Digit2')useEnergy('D');if(e.code==='Digit3')useEnergy('E');if(e.code==='Escape'){if(running&&!paused)pauseGame();}});
+document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='advice')return;keys[e.code]=true;if(e.code==='Space')e.preventDefault();if(general){squad.key(e);}else{if(e.code==='KeyR')startReload();if(e.code==='KeyQ')useSkill();if(e.code==='Digit1')useEnergy('S');if(e.code==='Digit2')useEnergy('D');if(e.code==='Digit3')useEnergy('E');}if(e.code==='Escape'){if(running&&!paused)pauseGame();}});
 document.addEventListener('keyup',function(e){keys[e.code]=false;});
-canvas.addEventListener('mousedown',function(e){if(!running||paused)return;if(aiMode&&!takeover)return;if(document.pointerLockElement!==canvas){lockPointer();return;}if(e.button===0)mouseDown=true;if(e.button===2)rightDown=true;});
+canvas.addEventListener('mousedown',function(e){if(!running||paused)return;if(general){gcam.click(e);return;}if(aiMode&&!takeover)return;if(document.pointerLockElement!==canvas){lockPointer();return;}if(e.button===0)mouseDown=true;if(e.button===2)rightDown=true;});
 document.addEventListener('mouseup',function(e){if(e.button===0)mouseDown=false;if(e.button===2)rightDown=false;});
 document.addEventListener('contextmenu',function(e){e.preventDefault();});
-document.addEventListener('mousemove',function(e){if(document.pointerLockElement!==canvas||!running||paused)return;if(aiMode&&!takeover)return;var s=.0022*(rightDown&&player.hero&&player.hero.weapon.zoom?.4:1);player.yaw-=e.movementX*s;player.pitch=clamp(player.pitch-e.movementY*s,-1.45,1.45);});
+canvas.addEventListener('wheel',function(e){if(general){gcam.dist=clamp(gcam.dist+e.deltaY*.03,14,90);e.preventDefault();}},{passive:false});
+document.addEventListener('mousemove',function(e){if(general){gcam.move(e);return;}if(document.pointerLockElement!==canvas||!running||paused)return;if(aiMode&&!takeover)return;var s=.0022*(rightDown&&player.hero&&player.hero.weapon.zoom?.4:1);player.yaw-=e.movementX*s;player.pitch=clamp(player.pitch-e.movementY*s,-1.45,1.45);});
 document.addEventListener('pointerlockchange',function(){if(aiMode&&!takeover)return;if(document.pointerLockElement!==canvas&&running&&!paused&&!player.dead){pauseGame();}});
 $('start').onclick=startGame;$('resume').onclick=resumeGame;$('quit').onclick=toMenu;$('again').onclick=startGame;$('tomenu').onclick=toMenu;$('wcont').onclick=continueEndless;$('wmenu').onclick=toMenu;
 buildMenu();
@@ -992,12 +1025,13 @@ function headersFor(v,key){var h={'Content-Type':'application/json'};
 function extractText(v,j){try{if(v==='claude')return j.content.map(function(c){return c.text||''}).join('');if(v==='gemini')return j.candidates[0].content.parts.map(function(p){return p.text||''}).join('');var c=j.choices[0].message.content||'';return c.replace(/<think>[\s\S]*?<\/think>/g,'');}catch(e){return '';}}
 var cmd={
  busy:false,advice:[],events:[],lastCall:0,period:7,fails:0,
- reset:function(){this.busy=false;this.advice=[];this.events=[];this.lastCall=4;this.fails=0;$('ailog').innerHTML='';var v=vendorOf();$('aibase').textContent=v==='local'?'规则脑':VENDOR_NAME[v];this.status('待命','');this.say(v==='local'?'规则脑就位。我先去点平原信标，有主意随时说。':'基底已接入，我边打边想。你出主意，我来执行。');},
+ reset:function(){this.busy=false;this.advice=[];this.events=[];this.lastCall=4;this.fails=0;$('ailog').innerHTML='';var v=vendorOf();$('aibase').textContent=v==='local'?'规则脑':VENDOR_NAME[v];this.status('待命','');this.say(general?(v==='local'?'小队集结完毕，将军。点地面派兵，或直接说「全体去目标」。':'基底参谋就位。将军下令，我给每个兵派活。'):(v==='local'?'规则脑就位。我先去点平原信标，有主意随时说。':'基底已接入，我边打边想。你出主意，我来执行。'));},
  status:function(s,cls){var el=$('aist');el.textContent=s;el.className='st '+(cls||'');},
  say:function(s){var d=document.createElement('div');d.className='ai';d.innerHTML='<small>战士</small>'+String(s).replace(/</g,'&lt;');$('ailog').appendChild(d);$('ailog').scrollTop=1e9;},
  sys:function(s){var d=document.createElement('div');d.className='sys';d.textContent='· '+s;$('ailog').appendChild(d);$('ailog').scrollTop=1e9;this.events.push(s);if(this.events.length>6)this.events.shift();},
  me:function(s){var d=document.createElement('div');d.className='me';d.innerHTML='<small>参谋</small>'+String(s).replace(/</g,'&lt;');$('ailog').appendChild(d);$('ailog').scrollTop=1e9;this.advice.push(s);if(this.advice.length>3)this.advice.shift();this.lastCall=999;this.localAdvice(s);},
  localAdvice:function(s){ // 关键词即时响应（不管有没有基底，先动起来）
+  if(general){this.generalAdvice(s);return;}
   var r=null;if(/E|纠缠|绿|光链/.test(s)){bot.prio=['E','D','S'];r='明白，优先打纠缠者，先断光链。';}
   else if(/D|差异|自爆|粉|红/.test(s)){bot.prio=['D','E','S'];r='盯住差异者，它们爱绕后，我多回头看。';}
   else if(/S|显露|重装|蓝/.test(s)){bot.prio=['S','E','D'];r='先啃硬骨头，重装我上。';}
@@ -1008,15 +1042,23 @@ var cmd={
   if(/潜|下去|海底/.test(s)){bot.mode='objective';r='下潜，盯着氧气。';}
   if(/技能|Q/.test(s))bot.skillWant=true;if(/雷击|3/.test(s))bot.energyWant='E';if(/爆发|2/.test(s))bot.energyWant='D';if(/护壁|1/.test(s))bot.energyWant='S';
   if(r)this.say(r);},
- stateText:function(){var b=curObj();var w=player.hero.weapon;var t=bot.tgt;
+ squadText:function(){return allies.map(function(a){return a.id+'号'+a.hero.name+'('+a.hero.weapon.name+'/'+a.hero.skill.name+') 血'+Math.round(a.hp)+'/'+Math.round(a.maxhp)+' 弹'+a.ammo+' 状态'+a.mode+(a.dead?' 阵亡':'')+(a.tgt?' 正打'+a.tgt.def.name:'')}).join('\n');},
+ generalAdvice:function(s){var m=s.match(/([1-4])\s*号/);var who=m?allies.filter(function(a){return a.id===+m[1]&&!a.dead}):(/全体|全队|所有|大家/.test(s)?allies.filter(function(a){return !a.dead}):squad.sel.slice());if(!who.length)who=allies.filter(function(a){return !a.dead});var r=null;
+  if(/E|纠缠|绿|光链/.test(s)){who.forEach(function(a){a.prio=['E','D','S']});r='先打纠缠者。';}else if(/D|差异|自爆|粉/.test(s)){who.forEach(function(a){a.prio=['D','E','S']});r='盯差异者。';}else if(/S|显露|重装|蓝/.test(s)){who.forEach(function(a){a.prio=['S','E','D']});r='先啃重装。';}
+  if(/撤|集合|回来|退/.test(s)){who.forEach(function(a){a.mode='retreat'});r='收到，集合到将军位置。';}else if(/守|别动|站住/.test(s)){who.forEach(function(a){a.mode='hold'});r='原地守。';}else if(/冲|追|杀|集火|上/.test(s)){who.forEach(function(a){a.mode='hunt'});r='追击！';}else if(/目标|信标|前进|走|去/.test(s)){who.forEach(function(a){a.mode='objective'});r='向目标推进。';}
+  if(/技能|大招/.test(s)){who.forEach(function(a){a.skillWant=true});r=(r||'')+'放技能。';}if(/雷击/.test(s))useEnergy('E');if(/爆发/.test(s))useEnergy('D');if(/护壁|护盾/.test(s))useEnergy('S');
+  if(r)this.say((m?m[1]+'号：':'')+r);squad.renderCards();},
+ stateText:function(){if(general)return this.generalText();var b=curObj();var w=player.hero.weapon;var t=bot.tgt;
   var es=enemies.filter(function(e){return !e.dead}).map(function(e){return{e:e,d:e.pos.distanceTo(player.pos)}}).sort(function(a,b){return a.d-b.d}).slice(0,8).map(function(x){return x.e.def.role+x.e.def.name+' '+Math.round(x.d)+'m'+(x.e.shielded?'(有盾)':'')+(x.e.def.boss?'(BOSS)':'')}).join('；');
   return '英雄 '+player.hero.name+'('+w.name+'，技能'+player.hero.skill.name+(skillCd<=0?'就绪':'冷却'+Math.ceil(skillCd)+'s')+')\n生命 '+Math.round(player.hp)+'/'+player.maxhp+' 氧气 '+Math.round(player.o2)+' 弹药 '+weapon.ammo+'/'+w.mag+'\n能量 S'+Math.round(energy.S)+' D'+Math.round(energy.D)+' E'+Math.round(energy.E)+'（满100可放：S护壁/D爆发/E雷击）\n地形 '+regionOf(player.pos.x,player.pos.z)+(underwater?'·水下':'')+' 海拔 '+Math.round(player.pos.y)+' 警报 '+Math.floor(alert)+' 得分 '+score+' 击破 '+kills
    +'\n目标 '+(b?(objIdx+1)+'/5 '+b.name+' 距离'+Math.round(Math.hypot(b.x-player.pos.x,b.z-player.pos.z))+'m'+(b.boss?'':' 激活'+Math.round(100*b.prog/b.need)+'%'):'无尽模式')
    +'\n当前打法 mode='+bot.mode+' prio='+bot.prio.join('')+' aggr='+bot.aggr+(t?' 正在打 '+t.def.name:'')
    +'\n敌人('+enemies.length+')：'+(es||'无')+'\n近况：'+(this.events.join('；')||'无')+'\n参谋建议（最近）：'+(this.advice.join(' / ')||'无');},
+ generalText:function(){var b=curObj();var c=squad.center();var es=enemies.filter(function(e){return !e.dead}).map(function(e){return{e:e,d:e.pos.distanceTo(c)}}).sort(function(a,b){return a.d-b.d}).slice(0,10).map(function(x){return x.e.def.role+x.e.def.name+' '+Math.round(x.d)+'m'+(x.e.shielded?'(有盾)':'')+(x.e.def.boss?'(BOSS)':'')}).join('；');
+  return '小队：\n'+this.squadText()+'\n能量 S'+Math.round(energy.S)+' D'+Math.round(energy.D)+' E'+Math.round(energy.E)+' 警报 '+Math.floor(alert)+' 得分 '+score+' 击破 '+kills+'\n地形 '+regionOf(c.x,c.z)+'\n目标 '+(b?(objIdx+1)+'/5 '+b.name+' 距离'+Math.round(Math.hypot(b.x-c.x,b.z-c.z))+'m'+(b.boss?'':' 激活'+Math.round(100*b.prog/b.need)+'%'):'无尽模式')+'\n敌人('+enemies.length+')：'+(es||'无')+'\n近况：'+(this.events.join('；')||'无')+'\n将军命令（最近）：'+(this.advice.join(' / ')||'无');},
  tick:function(dt){ if(!running||paused||player.dead)return;var v=vendorOf();if(v==='local'){this.localBrain(dt);return;}
   this.lastCall+=dt;if(this.busy||this.lastCall<this.period)return;this.lastCall=0;this.callBase(v);},
- localBrain:function(dt){this.lastCall+=dt;if(this.lastCall<6)return;this.lastCall=0;var hpF=player.hp/player.maxhp;var b=curObj();var near=enemies.filter(function(e){return !e.dead&&e.pos.distanceTo(player.pos)<25});var link=near.filter(function(e){return e.def.link});
+ localBrain:function(dt){this.lastCall+=dt;if(this.lastCall<6)return;this.lastCall=0;if(general){var b=curObj();var low=allies.filter(function(a){return !a.dead&&a.hp/a.maxhp<.3&&a.mode!=='retreat'});low.forEach(function(a){a.mode='retreat';});if(low.length){this.say(low.map(function(a){return a.id+'号'}).join('、')+'血量低，先撤回来。');squad.renderCards();return;}var back=allies.filter(function(a){return !a.dead&&a.mode==='retreat'&&a.hp/a.maxhp>.65});back.forEach(function(a){a.mode='objective'});if(back.length){this.say(back.map(function(a){return a.id+'号'}).join('、')+'缓过来了，归队。');squad.renderCards();return;}var link=enemies.filter(function(e){return !e.dead&&e.def.link});if(link.length){allies.forEach(function(a){a.prio=['E','D','S']});this.say('有纠缠者，全队优先打它。');return;}this.say(b?(b.boss?'全队回平原围攻泰坦。':'小队向'+b.name+'推进，'+(b.prog>0?'激活'+Math.round(100*b.prog/b.need)+'%':'还没到')+'。'):'无尽模式，保持队形。');return;}var hpF=player.hp/player.maxhp;var b=curObj();var near=enemies.filter(function(e){return !e.dead&&e.pos.distanceTo(player.pos)<25});var link=near.filter(function(e){return e.def.link});
   if(hpF<.35&&bot.mode!=='pickup'&&bot.mode!=='retreat'){bot.mode='retreat';this.say('血只剩'+Math.round(hpF*100)+'%，我先拉开距离。');}
   else if(link.length){bot.prio=['E','D','S'];this.say('看到纠缠者了，它把'+near.length+'个敌人连起来了，先打它。');}
   else if(b&&!b.boss&&b.prog>0&&!b.done){bot.mode='objective';this.say('守信标，'+Math.round(100*b.prog/b.need)+'%了，敌人从'+(near.length?'四周':'远处')+'来。');}
@@ -1025,17 +1067,106 @@ var cmd={
   else{var msgs=['一路往'+(b?b.region:'前')+'走，顺手清路。','弹药'+weapon.ammo+'，够。','看一眼小地图，敌人在'+(near.length?'附近':'远处')+'。','这段路安静，加速。'];this.say(msgs[Math.floor(Math.random()*msgs.length)]);}},
  callBase:function(v){var key=localStorage.getItem(keyStoreName())||'';if(!key){this.status('无 Key，用规则脑','err');this.localBrain(99);return;}
   var self=this;this.busy=true;this.status('基底思考中…','busy');var t0=performance.now();
-  var sys='你是 3D 枪战游戏《星际突击》里的 AI 战士（单兵精英）。敌人分三类：S显露者（守信标、有护甲）、D差异者（绕后突袭、自爆）、E纠缠者（给18m内同伴上护盾，先打它）。任务：依次激活信标（站进光圈守住），最后打BOSS。人类参谋会给建议，一般要听，但你可以否决并说理由。只输出一个JSON对象，不要其它文字：{"say":"对参谋说的一句话（20字内，口语，像战友）","prio":"E/D/S的优先顺序如EDS","mode":"objective|hold|retreat|hunt|pickup|boss","aggr":0到1,"skill":true|false,"energy":"S|D|E|null"}';
-  var user='战场态势：\n'+this.stateText()+'\n\n给出下一阶段（约7秒）的打法。';
+  var sys=general?'你是 3D 枪战游戏《星际突击》里一支 AI 小队的战术参谋，人类是将军。敌人分三类：S显露者（守信标、有护甲）、D差异者（绕后突袭、自爆）、E纠缠者（给18m内同伴上护盾，先打它）。任务：依次激活信标（有人站进光圈守住即可），最后打BOSS。将军的命令要执行，你负责把它变成每个兵的具体打法，并简短汇报。只输出一个JSON对象：{"say":"对将军说的一句话（25字内）","orders":[{"id":1,"mode":"objective|hold|retreat|hunt","prio":"EDS","skill":false}]}':'你是 3D 枪战游戏《星际突击》里的 AI 战士（单兵精英）。敌人分三类：S显露者（守信标、有护甲）、D差异者（绕后突袭、自爆）、E纠缠者（给18m内同伴上护盾，先打它）。任务：依次激活信标（站进光圈守住），最后打BOSS。人类参谋会给建议，一般要听，但你可以否决并说理由。只输出一个JSON对象，不要其它文字：{"say":"对参谋说的一句话（20字内，口语，像战友）","prio":"E/D/S的优先顺序如EDS","mode":"objective|hold|retreat|hunt|pickup|boss","aggr":0到1,"skill":true|false,"energy":"S|D|E|null"}';
+  var user='战场态势：\n'+this.stateText()+'\n\n给出下一阶段（约7秒）的'+(general?'每个兵的打法':'打法')+'。';
   var url=OVERSEAS.indexOf(v)>=0?PROXY_URL:API_URLS[v];var ac=new AbortController();var killer=setTimeout(function(){ac.abort()},25000);
   fetch(url,{method:'POST',headers:headersFor(v,key),body:JSON.stringify(buildBody(v,sys,user)),signal:ac.signal}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(j){clearTimeout(killer);var txt=extractText(v,j);var m=txt.match(/\{[\s\S]*\}/);if(!m)throw new Error('没有JSON');var d=JSON.parse(m[0]);self.apply(d);self.fails=0;self.status(VENDOR_NAME[v]+' · '+Math.round((performance.now()-t0)/1000*10)/10+'s','');})
   .catch(function(e){clearTimeout(killer);self.fails++;self.status('基底出错：'+e.message,'err');if(self.fails>=3){self.sys('基底连续失败，规则脑接管');self.localBrain(99);}}).then(function(){self.busy=false;});},
- apply:function(d){if(d.say)this.say(d.say);if(d.prio&&/^[SDE]{1,3}$/.test(d.prio))bot.prio=d.prio.split('');if(d.mode&&/^(objective|hold|retreat|hunt|pickup|boss)$/.test(d.mode))bot.mode=d.mode;if(typeof d.aggr==='number')bot.aggr=clamp(d.aggr,0,1);if(d.skill)bot.skillWant=true;if(d.energy&&/^[SDE]$/.test(d.energy))bot.energyWant=d.energy;}
+ apply:function(d){if(d.say)this.say(d.say);if(general&&d.orders&&d.orders.length){d.orders.forEach(function(o){var a=allies.filter(function(x){return x.id===+o.id&&!x.dead})[0];if(!a)return;if(o.mode&&/^(objective|hold|retreat|hunt)$/.test(o.mode))a.mode=o.mode;if(o.prio&&/^[SDE]{1,3}$/.test(o.prio))a.prio=o.prio.split('');if(o.skill)a.skillWant=true;});squad.renderCards();}if(general)return;if(d.prio&&/^[SDE]{1,3}$/.test(d.prio))bot.prio=d.prio.split('');if(d.mode&&/^(objective|hold|retreat|hunt|pickup|boss)$/.test(d.mode))bot.mode=d.mode;if(typeof d.aggr==='number')bot.aggr=clamp(d.aggr,0,1);if(d.skill)bot.skillWant=true;if(d.energy&&/^[SDE]$/.test(d.energy))bot.energyWant=d.energy;}
 };
 $('adviceBtn').onclick=function(){var s=$('advice').value.trim();if(!s||!aiMode)return;$('advice').value='';cmd.me(s);};
 $('advice').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('adviceBtn').onclick();}e.stopPropagation();});
 $('takeover').onclick=function(){if(!aiMode)return;takeover=!takeover;this.textContent=takeover?'🤖 交还给 AI':'🎮 我接管';this.classList.toggle('on',takeover);if(takeover){cmd.sys('参谋接管操作');lockPointer();}else{cmd.sys('交还 AI 战士');bot.reset();document.exitPointerLock&&document.exitPointerLock();}};
-$('aiHint').onclick=function(){cmd.sys('例：「先打E」「盯自爆虫」「撤」「回血」「守住」「冲」「去目标」「潜下去」「放技能」「放雷击」');};
+$('aiHint').onclick=function(){if(general){cmd.sys('例：「全体去目标」「2号守住」「1号追击」「先打E」「集合」「放技能」「雷击」');return;}cmd.sys('例：「先打E」「盯自爆虫」「撤」「回血」「守住」「冲」「去目标」「潜下去」「放技能」「放雷击」');};
+
+
+/* ===================== 将军模式：小队 ===================== */
+var allies=[];
+var squad={
+ sel:[],selT:0,
+ init:function(){allies=[];var self=this;selSquad.forEach(function(hi,i){var hero=HEROES[hi];var a={id:i+1,hero:hero,pos:new THREE.Vector3(),vel:new THREE.Vector3(),yaw:0,hp:hero.hp*1.6,maxhp:hero.hp*1.6,ammo:hero.weapon.mag,reload:0,cool:0,skillCd:0,mode:'objective',goal:null,tgt:null,dead:false,prio:['E','D','S'],sideT:0,side:1,cloak:0,shield:0,boost:0,stuck:0,t:rnd(0,9),lastLabel:0,skillWant:false};
+   var ang=i*6.283/selSquad.length;a.pos.set(Math.cos(ang)*4,0,Math.sin(ang)*4);a.pos.y=H(a.pos.x,a.pos.z);
+   var col=parseInt(hero.color.slice(1),16);a.mesh=buildEnemy({build:'biped',color:col,size:1});a.mesh.traverse(function(o){if(o.isMesh)o.userData.ally=a;});world.add(a.mesh);
+   var cv=document.createElement('canvas');cv.width=256;cv.height=64;a.cv=cv;a.tex=new THREE.CanvasTexture(cv);a.label=new THREE.Sprite(new THREE.SpriteMaterial({map:a.tex,transparent:true,depthWrite:false}));a.label.scale.set(4,1,1);a.label.position.y=3.2;a.mesh.add(a.label);
+   allies.push(a);});
+  this.sel=allies.slice();this.renderCards();gcam.reset();},
+ center:function(){var c=new THREE.Vector3(),n=0;allies.forEach(function(a){if(a.dead)return;c.add(a.pos);n++;});return n?c.multiplyScalar(1/n):gcam.focus.clone();},
+ drawLabel:function(a){var x=a.cv.getContext('2d');x.clearRect(0,0,256,64);x.fillStyle='rgba(0,0,0,.55)';x.fillRect(0,0,256,64);x.fillStyle=a.hero.color;x.font='bold 26px sans-serif';x.fillText(a.id+' '+a.hero.name,10,30);x.fillStyle='#222';x.fillRect(10,42,236,12);x.fillStyle=a.hp/a.maxhp<.3?'#ff4040':'#3cff8a';x.fillRect(10,42,236*Math.max(0,a.hp/a.maxhp),12);if(this.sel.indexOf(a)>=0){x.strokeStyle='#fff';x.lineWidth=4;x.strokeRect(2,2,252,60);}a.tex.needsUpdate=true;},
+ renderCards:function(){var self=this;var el=$('squad');el.innerHTML='';allies.forEach(function(a){var d=document.createElement('div');d.className='sq'+(self.sel.indexOf(a)>=0?' sel':'')+(a.dead?' dead':'');d.style.setProperty('--c',a.hero.color);d.innerHTML='<span class="k">'+a.id+'</span><b>'+a.hero.name+'</b><span>'+a.hero.weapon.name+' '+a.ammo+'/'+a.hero.weapon.mag+'</span><div class="bar"><div style="width:'+(100*a.hp/a.maxhp)+'%"></div></div><div class="st">'+(a.dead?'阵亡':({objective:'→ 目标',goto:'→ 指定点',hold:'原地守',retreat:'集合',hunt:'追击'}[a.mode]||a.mode)+(a.tgt?' · 打'+a.tgt.def.name:''))+'</div>';d.onclick=function(ev){if(a.dead)return;if(ev.shiftKey){var k=self.sel.indexOf(a);if(k>=0)self.sel.splice(k,1);else self.sel.push(a);}else self.sel=[a];self.renderCards();};el.appendChild(d);});},
+ order:function(mode,goal){var n=0;this.sel.forEach(function(a){if(a.dead)return;a.mode=mode;a.goal=goal?goal.clone():null;n++;if(mode==='goto'&&goal){groundRing(goal.x,goal.z,0x7ee8ff,6,.6);}});if(n)cmd.sys('命令：'+({objective:'去目标',goto:'去指定点',hold:'原地守',retreat:'集合到将军',hunt:'追击'}[mode]||mode)+' → '+this.sel.filter(function(a){return !a.dead}).map(function(a){return a.id}).join(','));this.renderCards();},
+ key:function(e){var m={Digit1:0,Digit2:1,Digit3:2,Digit4:3}[e.code];if(m!=null&&allies[m]&&!allies[m].dead){this.sel=[allies[m]];this.renderCards();}
+  if(e.code==='Tab'){e.preventDefault();this.sel=allies.filter(function(a){return !a.dead});this.renderCards();}
+  if(e.code==='KeyF')this.order('objective');if(e.code==='KeyG')this.order('hold');if(e.code==='KeyH')this.order('retreat');
+  if(e.code==='KeyZ')useEnergy('S');if(e.code==='KeyX')useEnergy('D');if(e.code==='KeyC')useEnergy('E');},
+ useEnergy:function(k){if(energy[k]<EMAX)return;var a=this.sel.filter(function(x){return !x.dead})[0]||allies.filter(function(x){return !x.dead})[0];if(!a)return;energy[k]=0;SFX.skill();
+  if(k==='S'){allies.forEach(function(x){if(!x.dead){x.shield=8;x.hp=Math.min(x.maxhp,x.hp+40);}});cmd.sys('S 护壁：全队 8 秒护盾 +40 血');groundRing(a.pos.x,a.pos.z,0x3cc8ff,14,.7);}
+  else if(k==='D'){allies.forEach(function(x){if(!x.dead)x.boost=10;});cmd.sys('D 爆发：全队 10 秒双倍伤害');groundRing(a.pos.x,a.pos.z,0xff3cac,14,.7);}
+  else{var from=a.pos.clone().setY(a.pos.y+1.5);var ts=enemies.filter(function(e){return !e.dead&&e.pos.distanceTo(a.pos)<35}).sort(function(p,q){return p.pos.distanceTo(a.pos)-q.pos.distanceTo(a.pos)});
+   ts.forEach(function(e,i){setTimeout(function(){if(e.dead||!running)return;var to=e.pos.clone().setY(e.pos.y+e.def.size);tracer(from,to,0x7dff7a,.35);burst(to.x,to.y,to.z,25,0x7dff7a,8,1.4,.5,0);flashLight(to.x,to.y,to.z,0x7dff7a,20,.3);SFX.zap();e.shielded=0;damageEnemy(e,e.def.link?9999:120,to,true);from.copy(to);},i*90);});cmd.sys('E 雷击：'+ts.length+' 个目标');}},
+ hurt:function(a,d){if(a.dead)return;if(a.shield>0)d*=.25;if(a.cloak>0)a.cloak=0;a.hp-=d;burst(a.pos.x,a.pos.y+1.2,a.pos.z,6,0xff6060,4,1,.3,6);
+  if(a.hp<=0){a.hp=0;a.dead=true;explosion(a.pos.x,a.pos.y+1,a.pos.z,1.6,0xff4040);debris(a.pos.x,a.pos.y+1,a.pos.z,parseInt(a.hero.color.slice(1),16),10,7);world.remove(a.mesh);var k=this.sel.indexOf(a);if(k>=0)this.sel.splice(k,1);cmd.say(a.id+' 号 '+a.hero.name+' 倒下了！');this.renderCards();
+   if(!allies.some(function(x){return !x.dead})){die();}}},
+ pickTarget:function(a){var best=null,bs=-1e9;for(var i=0;i<enemies.length;i++){var e=enemies[i];if(e.dead)continue;var d=e.pos.distanceTo(a.pos);if(d>70)continue;var s=100-d;var pi=a.prio.indexOf(e.def.role);if(pi>=0)s+=(3-pi)*30;if(e.def.suicide&&d<14)s+=120;if(e.shielded)s-=25;if(e.def.link)s+=35;if(e.def.boss)s+=40;if(s>bs){bs=s;best=e;}}return best;},
+ update:function(dt){var self=this;var b=curObj();this.selT+=dt;
+  allies.forEach(function(a,idx){if(a.dead)return;a.t+=dt;var w=a.hero.weapon;a.skillCd=Math.max(0,a.skillCd-dt);a.cloak=Math.max(0,a.cloak-dt);a.shield=Math.max(0,a.shield-dt);a.boost=Math.max(0,a.boost-dt);
+   if(a.t%.3<dt||!a.tgt||a.tgt.dead)a.tgt=self.pickTarget(a);var t=a.tgt;var td=t?t.pos.distanceTo(a.pos):999;
+   var goal=null;if(a.mode==='goto'&&a.goal){goal=a.goal;if(Math.hypot(goal.x-a.pos.x,goal.z-a.pos.z)<2.5){a.mode='hold';a.goal=null;self.renderCards();}}
+   else if(a.mode==='retreat'){goal=gcam.focus.clone();}
+   else if(a.mode==='hunt'&&t){goal=t.pos.clone();}
+   else if(a.mode==='objective'&&b){var ang=idx*6.283/allies.length;goal=new THREE.Vector3(b.x+Math.cos(ang)*3.5,b.y,b.z+Math.sin(ang)*3.5);}
+   var gd=goal?Math.hypot(goal.x-a.pos.x,goal.z-a.pos.z):0;var holding=b&&!b.boss&&Math.hypot(a.pos.x-b.x,a.pos.z-b.z)<5.5;
+   var mv=new THREE.Vector3();
+   if(goal&&gd>1.5&&!(a.mode==='objective'&&holding)){mv.set(goal.x-a.pos.x,0,goal.z-a.pos.z).normalize();
+    var probe=a.pos.clone().addScaledVector(mv,2);var ph=H(probe.x,probe.z);if(!freeOf(probe.x,probe.z,.5)||ph-a.pos.y>1.6){mv.set(-mv.z,0,mv.x).multiplyScalar(a.side);a.stuck+=dt;}else a.stuck=Math.max(0,a.stuck-dt);if(a.stuck>1.2){a.side*=-1;a.stuck=0;}}
+   if(t&&td<35){a.sideT-=dt;if(a.sideT<=0){a.sideT=rnd(.8,2);a.side*=-1;}var f=t.pos.clone().sub(a.pos).setY(0).normalize();mv.add(new THREE.Vector3(-f.z,0,f.x).multiplyScalar(a.side*.6));if(t.def.suicide&&td<8)mv.add(f.clone().negate().multiplyScalar(1.5));if(holding){var back=a.pos.clone().sub(new THREE.Vector3(b.x,0,b.z)).setY(0);if(back.length()>4)mv.add(back.normalize().multiplyScalar(-1));}}
+   if(mv.length()>0)mv.normalize();var sp=7*a.hero.speed*(t?1:1.4);a.vel.x=lerp(a.vel.x,mv.x*sp,.15);a.vel.z=lerp(a.vel.z,mv.z*sp,.15);
+   moveAABB(a.pos,.45,a.vel,dt);a.pos.y=lerp(a.pos.y,floorAt(a.pos.x,a.pos.z,a.pos.y,.45),.35);
+   var face=t?t.pos.clone().sub(a.pos):(mv.length()>0?mv:null);if(face)a.yaw=Math.atan2(face.x,face.z);a.mesh.position.copy(a.pos);a.mesh.rotation.y=a.yaw;
+   var walk=Math.min(1,a.vel.length()/7);a.mesh.userData.legs.forEach(function(l,k){l.rotation.x=Math.sin(a.t*10+k*Math.PI)*.5*walk;});
+   a.cool-=dt;if(a.reload>0){a.reload-=dt;if(a.reload<=0)a.ammo=w.mag;}
+   var range=w.dmg>80?110:(w.pellets>1?16:55);
+   if(t&&td<range&&a.reload<=0&&a.cool<=0&&!(a.cloak>2&&td>12)){var from=a.pos.clone().setY(a.pos.y+1.6),to=t.pos.clone().setY(t.pos.y+t.def.size*(t.def.fly||t.def.link?0:1));
+    if(los(from,to)){a.cool=w.rate*(w.auto?1.1:1.3);var shots=w.burst||1;a.ammo-=Math.min(a.ammo,shots);var mul=(a.boost>0?2:1);
+     var acc=.72-td/range*.35;var hitp=w.pellets>1?.9:acc;var muz=from.clone().addScaledVector(to.clone().sub(from).normalize(),.8);
+     if(Math.random()<hitp){var crit=Math.random()<.15;damageEnemy(t,w.dmg*(w.pellets||1)*.7*shots*mul*(crit?(w.crit||1.8):1),to,crit);tracer(muz,to,w.color);}else{var miss=to.clone().add(new THREE.Vector3(rnd(-3,3),rnd(-1,2),rnd(-3,3)));tracer(muz,miss,w.color);}
+     if(Math.random()<.3)flashLight(muz.x,muz.y,muz.z,w.color,4,.1);if(w.silenced)tone(140,.05,'sine',.03,40);else if(Math.random()<.4)SFX.shoot(w);
+     if(a.ammo<=0){a.reload=w.reload;}}}
+   else if(!t&&a.ammo<w.mag*.5&&a.reload<=0)a.reload=w.reload;
+   var near=enemies.filter(function(e){return !e.dead&&e.pos.distanceTo(a.pos)<16}).length;var hpF=a.hp/a.maxhp;var k=a.hero.skill.kind;
+   if(a.skillCd<=0&&(a.skillWant||(k==='heal'&&hpF<.5)||(k==='shield'&&hpF<.5&&near)||(k==='cloak'&&hpF<.4)||(near>=3)||(t&&td<28&&/arrow|grenade|fire|strike/.test(k)&&near>=2))){a.skillWant=false;a.skillCd=a.hero.skill.cd;self.skill(a,t);}
+   if(a.t-a.lastLabel>.25){a.lastLabel=a.t;self.drawLabel(a);}
+  });
+  if(this.selT>.5){this.selT=0;this.renderCards();}
+ },
+ skill:function(a,t){var k=a.hero.skill.kind;var col=parseInt(a.hero.color.slice(1),16);var p=a.pos.clone().setY(a.pos.y+1);
+  if(k==='heal'||k==='slowmo'){a.hp=Math.min(a.maxhp,a.hp+40);burst(p.x,p.y,p.z,30,0x3cff8a,4,1.2,.7,-3);cmd.sys(a.hero.name+'：自我修复');}
+  else if(k==='shield'){a.shield=5;cmd.sys(a.hero.name+'：护盾');}
+  else if(k==='cloak'){a.cloak=6;cmd.sys(a.hero.name+'：隐身');}
+  else if(k==='dash'||k==='jet'){if(t){var away=a.pos.clone().sub(t.pos).setY(0).normalize().multiplyScalar(9);a.pos.add(away);a.pos.y=floorAt(a.pos.x,a.pos.z,a.pos.y+3,.45);burst(p.x,p.y,p.z,30,col,6,1.2,.5,0);cmd.sys(a.hero.name+'：闪开');}}
+  else if(k==='emp'){empT=2.5;burst(p.x,p.y,p.z,150,0x7dff7a,20,1.4,.8,0);groundRing(a.pos.x,a.pos.z,0x7dff7a,30,.8);cmd.sys(a.hero.name+'：EMP');}
+  else if(k==='strike'&&t){var c=t.pos.clone();for(var i=0;i<5;i++)(function(i){setTimeout(function(){if(!running)return;var x=c.x+rnd(-6,6),z=c.z+rnd(-6,6),y=H(x,z);tracer(new THREE.Vector3(x,y+80,z),new THREE.Vector3(x,y,z),0xff7a3c);explosion(x,y+.5,z,3,0xff7a3c);enemies.forEach(function(e){if(e.dead)return;var d=Math.hypot(e.pos.x-x,e.pos.z-z);if(d<7)damageEnemy(e,80*(1-d/7*.5),e.pos.clone().setY(e.pos.y+1),false);});},i*180);})(i);cmd.sys(a.hero.name+'：轨道轰炸');}
+  else if((k==='arrow'||k==='grenade'||k==='fire')&&t){var dir=t.pos.clone().setY(t.pos.y+1).sub(p);var d=dir.length();dir.normalize();dir.y+=d*.012;dir.normalize();spawnProj(p,dir,k==='arrow'?{type:'rocket',dmg:260,splash:9,pspeed:55,color:0xa8c85a,arrow:true,grav:6,life:5}:k==='grenade'?{type:'rocket',dmg:140,splash:7,pspeed:30,color:0x9adf7a,grav:22,life:4}:{type:'plasma',dmg:20,splash:4,pspeed:24,color:0xff8a3c,grav:20,life:3,firepool:true},true,1);cmd.sys(a.hero.name+'：'+a.hero.skill.name);}
+  else if(k==='fan'){var ts=enemies.filter(function(e){return !e.dead&&e.pos.distanceTo(a.pos)<40}).slice(0,6);ts.forEach(function(e,i){setTimeout(function(){if(e.dead||!running)return;var to=e.pos.clone().setY(e.pos.y+1);tracer(p,to,0xd9a05a);damageEnemy(e,110,to,true);},i*110);});cmd.sys(a.hero.name+'：扇射 ×'+ts.length);}
+ }
+};
+var gcam={focus:new THREE.Vector3(),yaw:0,dist:34,pitch:.95,
+ reset:function(){this.focus.copy(squad.center());this.yaw=Math.PI*.25;this.dist=34;camera.position.copy(this.focus).add(new THREE.Vector3(0,30,30));},
+ update:function(dt){var f=new THREE.Vector3(-Math.sin(this.yaw),0,-Math.cos(this.yaw)),r=new THREE.Vector3(-f.z,0,f.x);var sp=(keys.ShiftLeft?60:30)*dt;
+  if(keys.KeyW)this.focus.addScaledVector(f,sp);if(keys.KeyS)this.focus.addScaledVector(f,-sp);if(keys.KeyD)this.focus.addScaledVector(r,sp);if(keys.KeyA)this.focus.addScaledVector(r,-sp);
+  if(keys.KeyQ)this.yaw+=dt*1.6;if(keys.KeyE)this.yaw-=dt*1.6;if(keys.Space){this.focus.lerp(squad.center(),.1);}
+  this.focus.x=clamp(this.focus.x,-HALF,HALF);this.focus.z=clamp(this.focus.z,-HALF,HALF);this.focus.y=Math.max(H(this.focus.x,this.focus.z),SEA);
+  var cp=this.focus.clone().add(new THREE.Vector3(Math.sin(this.yaw)*Math.cos(this.pitch)*this.dist,Math.sin(this.pitch)*this.dist,Math.cos(this.yaw)*Math.cos(this.pitch)*this.dist));
+  cp.y=Math.max(cp.y,H(cp.x,cp.z)+3,SEA+3);camera.position.lerp(cp,.15);camera.lookAt(this.focus.x,this.focus.y+1,this.focus.z);camera.fov=lerp(camera.fov,BASE_FOV,.2);camera.updateProjectionMatrix();
+  player.pos.copy(this.focus);player.yaw=this.yaw;player.vel.set(0,0,0);underwater=false;
+  ['S','D','E'].forEach(function(k){var el=$('en'+k);el.className='en'+(energy[k]>=EMAX?' full':'');el.lastChild.style.height=(100*energy[k]/EMAX)+'%';});
+  $('region').textContent='将军视角 · '+regionOf(this.focus.x,this.focus.z)+' · 小队 '+allies.filter(function(a){return !a.dead}).length+'/'+allies.length;},
+ click:function(e){if(e.button!==0)return;var nx=(e.clientX/innerWidth)*2-1,ny=-(e.clientY/innerHeight)*2+1;var v=new THREE.Vector3(nx,ny,.5).unproject(camera);var dir=v.sub(camera.position).normalize();var gt=groundHit(camera.position,dir,400);
+  if(gt<0&&dir.y<0){var tW=(SEA-camera.position.y)/dir.y;if(tW>0)gt=tW;}if(gt<0)return;var pt=camera.position.clone().addScaledVector(dir,gt);pt.y=H(pt.x,pt.z);
+  var near=null,nd=6;enemies.forEach(function(en){if(en.dead)return;var d=Math.hypot(en.pos.x-pt.x,en.pos.z-pt.z);if(d<nd){nd=d;near=en;}});
+  if(near){squad.sel.forEach(function(a){if(!a.dead){a.mode='hunt';a.tgt=near;}});cmd.sys('命令：集火 '+near.def.name);squad.renderCards();}else squad.order('goto',pt);},
+ move:function(e){if(e.buttons===2||e.buttons===4){this.yaw-=e.movementX*.004;this.pitch=clamp(this.pitch+e.movementY*.003,.35,1.35);}}
+};
+$('gcmd').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var o=b.dataset.o;if(o==='skill'){squad.sel.forEach(function(a){a.skillWant=true;});cmd.sys('命令：放技能');}else squad.order(o);});
 
 /* ---------- 主循环 ---------- */
 var tNow=0,last=performance.now();
@@ -1043,8 +1174,8 @@ var camLight=new THREE.PointLight(0xffffff,.5,3);camLight.position.set(0,.3,0);c
 function loop(now){
  requestAnimationFrame(loop);var dt=Math.min(.05,(now-last)/1000);last=now;
  if(running&&!paused){var gdt=dt;if(slowmo>0){slowmo-=dt;gdt=dt*.35;}if(empT>0)empT-=dt;tNow+=gdt;
-  if(aiMode&&!takeover)bot.update(dt);if(aiMode)cmd.tick(dt);
-  updatePlayer(dt);updateEnemies(gdt);updateProjs(gdt);updateItems(gdt);updateFire(gdt);updateObjective(gdt);director(gdt);updateP(gdt);updateFx(gdt);updateEnv(gdt);drawMini();
+  if(general){squad.update(gdt);gcam.update(dt);}else{if(aiMode&&!takeover)bot.update(dt);updatePlayer(dt);}
+  if(aiMode)cmd.tick(dt);updateEnemies(gdt);updateProjs(gdt);updateItems(gdt);updateFire(gdt);updateObjective(gdt);director(gdt);updateP(gdt);updateFx(gdt);updateEnv(gdt);drawMini();
   $('flash').style.opacity=slowmo>0?.05:0;}
  else if(world&&!running&&(player.dead||$('win').classList.contains('hidden')===false)){tNow+=dt;updateP(dt);updateFx(dt);updateProjs(dt);updateEnv(dt);}
  renderer.render(scene,camera);}
