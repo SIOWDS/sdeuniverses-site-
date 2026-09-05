@@ -73,7 +73,7 @@ TYPES.forEach((t) => {
 /* ═══ 路由静态检查 ═══ */
 console.log("── 路由与页面 ──");
 ok("worker.js 里有 /api/wds/review-gen 路由", WSRC.indexOf('url.pathname === "/api/wds/review-gen"') > 0);
-["frame", "card", "map", "neighbors", "verdict", "surface", "challenges", "gaps", "collide", "collide_run", "conjectures", "occupants", "territory", "territory_check", "write"].forEach((m) => ok("mode " + m + " 有分支", WSRC.indexOf('rmode === "' + m + '"') > 0));
+["frame", "card", "map", "neighbors", "verdict", "surface", "challenges", "gaps", "collide", "collide_run", "conjectures", "occupants", "territory", "territory_check", "rename", "write"].forEach((m) => ok("mode " + m + " 有分支", WSRC.indexOf('rmode === "' + m + '"') > 0));
 ok("worker.js 写明权威出处", WSRC.indexOf("tools/skills/sde-review-genesis.md") > 0);
 const PAGE_P = path.join(ROOT, "public/taste/review-gen/index.html");
 ok("页面在仓库里", fs.existsSync(PAGE_P));
@@ -94,7 +94,7 @@ if (fs.existsSync(PAGE_P)) {
   ok("页面无 href=\"#\" 死链", !/href="#"/.test(PG));
   ok("页面有工序⑤之二敌拓闸阶段（neighbors/verdict）", PG.indexOf('mode:"neighbors"') > 0 && PG.indexOf('mode:"verdict"') > 0);
   ok("页面有 How-卡路径机检 routeCheck", PG.indexOf("function routeCheck(") > 0);
-  ok("Skill 是 v1.4.5 且含⑤之二两道、⑧之二维度碰撞、典范判据、⑨之二新研究领地", /version:\s*1\.4\.5/.test(SKILL) && SKILL.indexOf("工序⑨之二 新研究领地发生") > 0 && SKILL.indexOf("典范判据") > 0 && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
+  ok("Skill 是 v1.6 且含⑤之二两道、⑧之二维度碰撞、典范判据、⑨之二新研究领地、⑩之二 SDE 改性", /version:\s*1\.6/.test(SKILL) && SKILL.indexOf("工序⑩之二 SDE 改性") > 0 && SKILL.indexOf("工序⑨之二 新研究领地发生") > 0 && SKILL.indexOf("典范判据") > 0 && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
   /* v1.4：⑧之二 学科内维度碰撞 */
   ok("collide 提示：三家取自清单内、不得同维、共有前提＝断链、六型对照、删维测试、碰撞挑战", /rmode === "collide"[\s\S]*?不得同维[\s\S]*?六型[\s\S]*?删维测试[\s\S]*?碰撞挑战/.test(WSRC));
   ok("collide_run 提示：判负照登、不得改口", /rmode === "collide_run"[\s\S]*?判负照登/.test(WSRC));
@@ -109,15 +109,17 @@ if (fs.existsSync(PAGE_P)) {
   const mSh = WSRC.match(/const REVIEW_SHAPES = (\[[\s\S]*?\n\]);\n/);
   ok("抠得到 REVIEW_SHAPES", !!mSh);
   const SH = mSh ? new Function("return " + mSh[1] + ";")() : [];
-  const shRows = []; sliceSec("| 读数形状 |").split("\n").forEach((ln) => { const m = ln.match(/^\|\s*\*\*([^*]+)\*\*\s*\|/); if (m) shRows.push(m[1].trim()); });
-  ok("Skill 形状表解析到 " + shRows.length + " 型", shRows.length === 6);
+  const shRows = []; sliceSec("| 读数形状 |").split("\n").forEach((ln) => { const m = ln.match(/^\|\s*\*\*([^*]+)\*\*[^|]*\|/); if (m) shRows.push(m[1].trim()); });
+  ok("Skill 形状表解析到 " + shRows.length + " 型（v1.5 起七型含位次型）", shRows.length === 7 && shRows[6] === "位次型");
   ok("形状名 Skill==机器逐行一字不差", shRows.length === SH.length && shRows.every((r, i) => SH[i] && SH[i].shape === r));
   ok("每型至少三个对象词", SH.every((x) => Array.isArray(x.words) && x.words.length >= 3));
   ok("worker 有 GET /api/wds/review-shapes", WSRC.indexOf('url.pathname === "/api/wds/review-shapes"') > 0);
   ok("conjectures 的 QUERIES 带 shape 与 freq", /\\"shape\\"/.test(WSRC) && /\\"freq\\"/.test(WSRC));
   ok("occupants 提示含撤下条件与检索盲区", WSRC.indexOf("撤下条件") > 0 && WSRC.indexOf("检索盲区") > 0);
   ok("页面三库实搜（searchCR/searchS2/loadShapes）", PG.indexOf("function searchCR(") > 0 && PG.indexOf("function searchS2(") > 0 && PG.indexOf("function loadShapes(") > 0 && PG.indexOf("/api/wds/review-shapes") > 0);
-  ok("页面自检 28 项", PG.indexOf("自检 28 项") > 0 && (PG.match(/out\.push\(\{n:/g) || []).length === 28);
+  ok("页面自检 34 项", PG.indexOf("自检 34 项") > 0 && (PG.match(/out\.push\(\{n:/g) || []).length === 34);
+  ok("worker rename 提示与 write 改性硬律；collide 语料内正主／非构造性预测／第二读者；collide_run 判负对象", WSRC.indexOf('rmode === "rename"') > 0 && WSRC.indexOf("改性硬律（⑩之二）") > 0 && WSRC.indexOf("语料内正主：") > 0 && WSRC.indexOf("非构造性预测：") > 0 && WSRC.indexOf("第二读者协议：") > 0 && WSRC.indexOf("判负的对象") > 0);
+  ok("页面 runRename／残留机检 residue／学科化标题渲染", PG.indexOf("function runRename(") > 0 && PG.indexOf("function residue(") > 0 && PG.indexOf('data-s="rename"') > 0 && PG.indexOf("附录 D · SDE 改性") > 0);
   ok("worker 占位者栏只引⑤之二（prompt 里有三判）", WSRC.indexOf("只许引给定的敌拓闸三判结果") > 0);
 }
 

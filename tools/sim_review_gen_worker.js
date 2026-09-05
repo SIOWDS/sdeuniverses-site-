@@ -48,7 +48,8 @@ const cases=[
  {mode:"occupants",conjectures:"C",verdict:"V",hits:"H"},
  {mode:"territory",collide:"K",collideRun:"R",conjectures:"J",map:"M",verdict:"V",occupants:"O"},
  {mode:"territory_check",territory:"T",hits:"H"},
- ...[0,1,2,3,4,5,6,7,8,9,10,11,12,13].map(sec=>({mode:"write",sec,art:{frame:"F",map:"M",verdict:"V",surface:"S",challenges:"C",gaps:"G",collide:"Z",collideRun:"R",conjectures:"J",occupants:"O",territory:"T",territoryCheck:"TC"},cards,refs:["r1","r2"],prev:"P"})),
+ {mode:"rename",frame:"F",map:"M",collide:"K",territory:"T",conjectures:"J",cards},
+ ...[0,1,2,3,4,5,6,7,8,9,10,11,12,13].map(sec=>({mode:"write",sec,art:{frame:"F",map:"M",verdict:"V",surface:"S",challenges:"C",gaps:"G",collide:"Z",collideRun:"R",conjectures:"J",occupants:"O",territory:"T",territoryCheck:"TC"},rename:{terms:[{sde:"显露",disc:"画面",def:"d",src:"[1]",secs:"3"}],sections:{"问题与判类":"这个问题在问什么"},zName:"落锁位／Lock-in position",frameBox:"本文的分析框架……"},cards,refs:["r1","r2"],prev:"P"})),
  {mode:"bogus"},
  {mode:"frame",key:"short"},
 ];
@@ -75,6 +76,10 @@ const cases=[
     if(c.mode==="territory"&&!(/===TERRITORY===/.test(r.sys)&&/四改|四项至少三项/.test(r.sys)&&/退界/.test(r.sys))) flags.push("territory 缺要素");
     if(c.mode==="territory_check"&&!(/并入/.test(r.sys)&&/盲区/.test(r.sys))) flags.push("territory_check 缺要素");
     if(c.mode==="write"&&c.sec===10&&!/领地卡/.test(r.usr)) flags.push("write sec10 未喂领地卡");
+    if(c.mode==="rename"&&!(/terms/.test(r.sys)&&/学科化/.test(r.sys))) flags.push("rename 缺要素");
+    if(c.mode==="write"&&c.rename&&!/改性硬律/.test(r.sys)) flags.push("write 未吃映射表");
+    if(c.mode==="write"&&c.rename&&c.sec===1&&!/方框/.test(r.usr)) flags.push("write sec1 未放方框");
+    if(c.mode==="collide"&&!/语料内正主/.test(r.sys)) flags.push("collide 缺语料内正主");
     if(c.mode==="write"&&c.sec===9&&/领地卡/.test(r.usr)) flags.push("write sec9 多喂领地卡");
     if(c.mode==="collide_run"&&!/判负照登/.test(r.sys)) flags.push("collide_run 缺判负照登");
     if(c.mode==="conjectures"&&!(/碰撞级/.test(r.sys)&&/碰撞卡/.test(r.usr))) flags.push("conjectures 未吃碰撞卡/未标级");
