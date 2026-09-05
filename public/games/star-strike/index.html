@@ -24,6 +24,7 @@ canvas#gl{position:fixed;inset:0;display:block}
 .card:hover{transform:translateY(-3px);border-color:rgba(160,210,255,.6)}
 .card.sel{border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 0 24px color-mix(in srgb,var(--c) 45%,transparent);background:rgba(20,30,70,.9)}
 .card .sw{width:100%;height:56px;border-radius:6px;background:linear-gradient(135deg,var(--c),#000 140%);margin-bottom:8px;position:relative}
+.card .sw .ic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;z-index:1;filter:drop-shadow(0 0 6px rgba(0,0,0,.6))}
 .card .sw:after{content:"";position:absolute;inset:14px 30% 14px 30%;border-radius:4px;background:rgba(255,255,255,.18);box-shadow:0 0 14px var(--c)}
 .card b{font-size:16px;display:block}
 .card small{color:#a9bde0;font-size:12px;display:block;line-height:1.4;margin-top:3px}
@@ -208,11 +209,12 @@ canvas#gl{position:fixed;inset:0;display:block}
           <div class="row" id="keyRow" style="display:none;margin-top:8px"><label id="keyLabel">API Key：</label><input id="apiKey" type="password" placeholder="只存在你自己的浏览器里，直连厂商"></div>
           <div style="margin-top:6px">基底每隔几秒读一次战场态势，下达战术（打谁、往哪走、什么时候放技能和能量）；执行层由战士本体完成。你在左侧面板给他出主意，他会听，也会告诉你他为什么这么打。选「规则脑」不需要 Key，随时能玩。</div>
         </div></div>
-      <div class="sec"><h3>选择英雄<i></i></h3><div class="cards" id="heroes"></div></div>
+      <div class="sec"><h3>选择英雄 · 星际小队<i></i></h3><div class="cards" id="heroes"></div></div>
+      <div class="sec"><h3>选择英雄 · 特工与战场传奇（原创角色）<i></i></h3><div class="cards" id="heroes2"></div></div>
       <div class="sec"><h3>难度<i></i></h3><div class="row" id="diffs"></div></div>
       <div class="row" style="justify-content:center;margin-top:24px"><button class="btn big" id="start">出 发</button></div>
       <div class="best" style="text-align:center" id="best"></div>
-      <div class="help"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动 · 鼠标 瞄准 · 左键 开火 · 右键 瞄准镜 · <kbd>Shift</kbd> 冲刺 · <kbd>空格</kbd> 跳/上浮 · <kbd>C</kbd> 下潜 · <kbd>R</kbd> 换弹 · <kbd>Q</kbd> 技能 · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 能量 · <kbd>Esc</kbd> 暂停<br>任务：按顺序点亮平原、河道、高山、深海四座信标，再回平原干掉泰坦机甲。跟着屏幕上方的箭头走。<br>「AI 战士代打」：将来的机器人战场，今天在游戏里先练单兵精英——你出主意，它来打。</div>
+      <div class="help"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动 · 鼠标 瞄准 · 左键 开火 · 右键 瞄准镜 · <kbd>Shift</kbd> 冲刺 · <kbd>空格</kbd> 跳/上浮 · <kbd>C</kbd> 下潜 · <kbd>R</kbd> 换弹 · <kbd>Q</kbd> 技能 · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 能量 · <kbd>Esc</kbd> 暂停<br>任务：按顺序点亮平原、河道、高山、深海四座信标，再回平原干掉泰坦机甲。跟着屏幕上方的箭头走。<br>十二位英雄（六位星际小队＋六位特工与战场传奇，全是原创角色）。「AI 战士代打」：将来的机器人战场，今天在游戏里先练单兵精英——你出主意，它来打。</div>
     </div>
   </div>
 
@@ -263,7 +265,20 @@ var HEROES=[
  {id:'pulse',name:'脉冲',color:'#7dff7a',desc:'等离子枪 · 高射速\n技能：EMP 冻住全场',hp:100,speed:1.0,
   weapon:{name:'等离子枪',type:'plasma',dmg:10,mag:40,rate:.06,reload:1.8,spread:.03,pellets:1,auto:true,recoil:.25,color:0x7dff7a,pspeed:60},skill:{name:'EMP',cd:15,kind:'emp'},stats:[.6,.6,.7]},
  {id:'hawk',name:'猎鹰',color:'#ffe95a',desc:'双持手枪 · 灵活\n技能：纳米修复',hp:90,speed:1.15,
-  weapon:{name:'双持手枪',type:'hitscan',dmg:24,mag:24,rate:.14,reload:1.3,spread:.012,pellets:1,auto:false,recoil:.6,color:0xffe95a,dual:true},skill:{name:'纳米修复',cd:12,kind:'heal'},stats:[.5,.7,1]}
+  weapon:{name:'双持手枪',type:'hitscan',dmg:24,mag:24,rate:.14,reload:1.3,spread:.012,pellets:1,auto:false,recoil:.6,color:0xffe95a,dual:true},skill:{name:'纳米修复',cd:12,kind:'heal'},stats:[.5,.7,1]},
+ /* ---- 特工与战场传奇（原创角色，取各路枪战英雄的“型”） ---- */
+ {id:'agent',name:'王牌特工',icon:'🕴',color:'#cfd8e8',desc:'消音手枪 · 爆头 ×3\n技能：隐身 6 秒（敌人失去目标）',hp:95,speed:1.12,legend:true,
+  weapon:{name:'消音手枪',type:'hitscan',dmg:40,crit:3,mag:12,rate:.2,reload:1.2,spread:.006,pellets:1,auto:false,recoil:.4,color:0xcfd8e8,silenced:true},skill:{name:'隐身',cd:16,kind:'cloak'},stats:[.5,.8,.9]},
+ {id:'jungle',name:'丛林战神',icon:'🏹',color:'#7a9a3a',desc:'重机枪 · 100 发不停火\n技能：爆炸箭（一箭清场）',hp:190,speed:.8,legend:true,
+  weapon:{name:'重机枪',type:'hitscan',dmg:9,mag:100,rate:.05,reload:3.2,spread:.05,pellets:1,auto:true,recoil:.3,color:0xa8c85a},skill:{name:'爆炸箭',cd:14,kind:'arrow'},stats:[1,.7,.4]},
+ {id:'gunslinger',name:'西部快枪手',icon:'🤠',color:'#d9a05a',desc:'左轮 · 六发大威力\n技能：扇射（转轮全清，自动锁定 6 个目标）',hp:100,speed:1.05,legend:true,
+  weapon:{name:'左轮手枪',type:'hitscan',dmg:60,crit:2.2,mag:6,rate:.25,reload:2.4,spread:.008,pellets:1,auto:false,recoil:1.0,color:0xd9a05a},skill:{name:'扇射',cd:12,kind:'fan'},stats:[.6,.9,.7]},
+ {id:'marine',name:'陆战队长',icon:'🪖',color:'#5a8a5a',desc:'卡宾枪 · 稳准狠\n技能：榴弹（抛物线，炸一片）',hp:130,speed:.95,legend:true,
+  weapon:{name:'卡宾枪',type:'hitscan',dmg:16,mag:25,rate:.11,reload:1.7,spread:.014,pellets:1,auto:true,recoil:.35,color:0x9adf7a},skill:{name:'榴弹',cd:9,kind:'grenade'},stats:[.8,.7,.6]},
+ {id:'street',name:'街头猎手',icon:'🧢',color:'#ff8a3c',desc:'冲锋枪 · 泼水一样快\n技能：燃烧瓶（火海持续烧）',hp:100,speed:1.2,legend:true,
+  weapon:{name:'冲锋枪',type:'hitscan',dmg:8,mag:50,rate:.045,reload:1.6,spread:.04,pellets:1,auto:true,recoil:.2,color:0xff8a3c},skill:{name:'燃烧瓶',cd:13,kind:'fire'},stats:[.5,.6,1]},
+ {id:'ranger',name:'太空游骑兵',icon:'🚀',color:'#8ab4ff',desc:'脉冲步枪 · 三连发\n技能：喷射背包（飞 3 秒，翻山跨河）',hp:110,speed:1.0,legend:true,
+  weapon:{name:'脉冲步枪',type:'hitscan',dmg:18,burst:3,mag:30,rate:.32,reload:1.8,spread:.012,pellets:1,auto:true,recoil:.5,color:0x8ab4ff},skill:{name:'喷射背包',cd:12,kind:'jet'},stats:[.7,.7,.8]}
 ];
 var DIFFS=[{name:'轻松',mul:.7,hp:.75},{name:'普通',mul:1,hp:1},{name:'困难',mul:1.35,hp:1.35},{name:'噩梦',mul:1.8,hp:1.8}];
 /* ---------- 敌人（SDE 智能体：role = S 显露者 / D 差异者 / E 纠缠者） ---------- */
@@ -488,7 +503,7 @@ function updateEnv(dt){
 }
 
 /* ---------- 玩家 ---------- */
-var player={pos:new THREE.Vector3(0,0,0),vel:new THREE.Vector3(),yaw:0,pitch:0,hp:100,maxhp:100,r:.5,h:1.7,onGround:true,dead:false,shield:0,hero:null,speed:1,o2:100,swim:false,boostT:0,wallT:0};
+var player={pos:new THREE.Vector3(0,0,0),vel:new THREE.Vector3(),yaw:0,pitch:0,hp:100,maxhp:100,r:.5,h:1.7,onGround:true,dead:false,shield:0,hero:null,speed:1,o2:100,swim:false,boostT:0,wallT:0,cloak:0,jet:0};
 var keys={},mouseDown=false,rightDown=false;
 var ctl={fwd:0,side:0,jump:false,dive:false,sprint:false,fire:false,zoom:false};
 var aiMode=false,takeover=false;
@@ -499,6 +514,8 @@ function makeGunModel(w){var gun=new THREE.Group();var body=new THREE.MeshStanda
  if(w.type==='rocket'){part(new THREE.CylinderGeometry(.09,.09,.9,12).rotateX(Math.PI/2),body,0,0,-.2);part(new THREE.CylinderGeometry(.11,.11,.15,12).rotateX(Math.PI/2),acc,0,0,-.62);part(new THREE.BoxGeometry(.06,.14,.2),body,0,-.1,.1);}
  else if(w.pellets>1){part(new THREE.BoxGeometry(.09,.1,.7),body,0,0,-.15);part(new THREE.CylinderGeometry(.03,.03,.6,8).rotateX(Math.PI/2),body,0,.05,-.3);part(new THREE.BoxGeometry(.07,.08,.25),acc,0,-.04,-.35);part(new THREE.BoxGeometry(.06,.14,.14),body,0,-.1,.1);}
  else if(w.zoom){part(new THREE.BoxGeometry(.07,.09,.55),body,0,0,0);part(new THREE.CylinderGeometry(.025,.025,.8,8).rotateX(Math.PI/2),body,0,.02,-.55);part(new THREE.CylinderGeometry(.04,.04,.22,10).rotateX(Math.PI/2),acc,0,.1,-.1);part(new THREE.BoxGeometry(.06,.14,.14),body,0,-.1,.12);}
+ else if(w.silenced){part(new THREE.BoxGeometry(.06,.09,.3),body,0,0,-.05);part(new THREE.CylinderGeometry(.035,.035,.34,10).rotateX(Math.PI/2),new THREE.MeshStandardMaterial({color:0x222630,roughness:.6}),0,.01,-.36);part(new THREE.BoxGeometry(.05,.13,.08),body,0,-.1,.08);part(new THREE.BoxGeometry(.02,.02,.08),acc,0,.06,-.1);}
+ else if(w.crit&&w.mag===6){part(new THREE.BoxGeometry(.05,.08,.34),body,0,0,-.08);part(new THREE.CylinderGeometry(.06,.06,.12,8).rotateX(Math.PI/2),acc,0,-.01,.02);part(new THREE.BoxGeometry(.05,.13,.08),new THREE.MeshStandardMaterial({color:0x6a3a1a,roughness:.8}),0,-.11,.1);}
  else if(w.dual){part(new THREE.BoxGeometry(.05,.08,.28),body,0,0,-.05);part(new THREE.BoxGeometry(.04,.12,.08),body,0,-.09,.08);part(new THREE.BoxGeometry(.03,.03,.1),acc,0,.03,-.15);}
  else if(w.type==='plasma'){part(new THREE.BoxGeometry(.1,.11,.5),body,0,0,-.1);part(new THREE.SphereGeometry(.07,10,10),acc,0,.03,-.38);part(new THREE.TorusGeometry(.08,.015,6,16),acc,0,0,-.2);part(new THREE.BoxGeometry(.06,.14,.14),body,0,-.1,.12);}
  else {part(new THREE.BoxGeometry(.08,.1,.5),body,0,0,-.1);part(new THREE.CylinderGeometry(.02,.02,.4,8).rotateX(Math.PI/2),body,0,.02,-.5);part(new THREE.BoxGeometry(.05,.16,.06),body,0,-.12,-.05);part(new THREE.BoxGeometry(.06,.14,.14),body,0,-.1,.12);part(new THREE.BoxGeometry(.03,.02,.2),acc,0,.07,-.1);}
@@ -509,7 +526,7 @@ function buildGun(hero){if(gun){camera.remove(gun);if(gun.userData.twin)camera.r
 var weapon={ammo:30,reloading:0,cool:0,shots:0,hits:0,side:1};
 var skillCd=0,slowmo=0,empT=0,dashT=0,dashDir=new THREE.Vector3();
 var energy={S:0,D:0,E:0};var EMAX=100;
-function resetPlayer(hero){player.hero=hero;player.maxhp=hero.hp;player.hp=hero.hp;player.pos.set(0,H(0,0),0);player.vel.set(0,0,0);player.yaw=Math.PI*.25;player.pitch=0;player.dead=false;player.shield=0;player.speed=hero.speed;player.o2=100;player.boostT=0;player.wallT=0;
+function resetPlayer(hero){player.hero=hero;player.maxhp=hero.hp;player.hp=hero.hp;player.pos.set(0,H(0,0),0);player.vel.set(0,0,0);player.yaw=Math.PI*.25;player.pitch=0;player.dead=false;player.shield=0;player.speed=hero.speed;player.o2=100;player.boostT=0;player.wallT=0;player.cloak=0;player.jet=0;burstLeft=0;firePools=[];
  weapon.ammo=hero.weapon.mag;weapon.reloading=0;weapon.cool=0;weapon.shots=0;weapon.hits=0;skillCd=0;slowmo=0;empT=0;energy={S:0,D:0,E:0};
  buildGun(hero);$('wname').textContent=hero.weapon.name;$('ammomax').textContent=hero.weapon.mag;$('skname').textContent=hero.skill.name;}
 function moveAABB(pos,r,vel,dt){
@@ -536,7 +553,8 @@ function updatePlayer(dt){
   if(underwater){player.o2-=dt*(ctl.sprint?6:3.5);if(player.o2<=0){player.o2=0;hurtPlayer(6*dt,true);}if(Math.random()<.2)spawnP(player.pos.x,player.pos.y+1.5,player.pos.z,rnd(-.3,.3),1.5,rnd(-.3,.3),1.2,.8,0xcfefff,0);}
   else player.o2=Math.min(100,player.o2+dt*25);
   player.onGround=false;
- } else { player.o2=Math.min(100,player.o2+dt*25);player.vel.y-=28*dt;if(ctl.jump&&player.onGround){player.vel.y=11;player.onGround=false;} }
+ } else { player.o2=Math.min(100,player.o2+dt*25);player.vel.y-=28*dt;if(ctl.jump&&player.onGround){player.vel.y=11;player.onGround=false;}
+  if(player.jet>0){player.jet-=dt;if(ctl.jump||player.jet>2.4){player.vel.y=Math.min(player.vel.y+60*dt,14);}player.vel.x*=1.02;player.vel.z*=1.02;player.onGround=false;spawnP(player.pos.x,player.pos.y+.2,player.pos.z,rnd(-1,1),-6,rnd(-1,1),.5,1.6,0xffb040,0);spawnP(player.pos.x,player.pos.y+.1,player.pos.z,rnd(-2,2),-3,rnd(-2,2),.8,2,0x666666,0);} }
  var old=player.pos.clone();
  moveAABB(player.pos,player.r,player.vel,dt);
  // 坡度限制：太陡上不去
@@ -557,9 +575,10 @@ function updatePlayer(dt){
  if(weapon.reloading>0){weapon.reloading-=dt;if(weapon.reloading<=0){weapon.ammo=player.hero.weapon.mag;$('rel').textContent='';}}
  else if(ctl.fire&&weapon.cool<=0){if(weapon.ammo>0){fire();if(!player.hero.weapon.auto){mouseDown=false;ctl.fire=false;}}else{startReload();mouseDown=false;ctl.fire=false;}}
  if(!player.hero.weapon.auto&&mouseDown){mouseDown=false;ctl.fire=false;}
- skillCd=Math.max(0,skillCd-dt);player.boostT=Math.max(0,player.boostT-dt);player.wallT=Math.max(0,player.wallT-dt);
+ skillCd=Math.max(0,skillCd-dt);player.boostT=Math.max(0,player.boostT-dt);player.wallT=Math.max(0,player.wallT-dt);if(player.cloak>0){player.cloak-=dt;if(Math.random()<.3)spawnP(player.pos.x+rnd(-.6,.6),player.pos.y+rnd(0,1.8),player.pos.z+rnd(-.6,.6),0,.3,0,.5,.8,0xcfd8e8,0);}
+ $('flash').style.background=player.cloak>0?'#8fb0ff':'#fff';
  // HUD
- $('hpn').textContent=Math.ceil(player.hp)+(player.shield>0||player.wallT>0?' 🛡':'');var hb=$('hpbar');hb.firstChild.style.width=(100*player.hp/player.maxhp)+'%';hb.className='bar'+(player.hp<player.maxhp*.3?' low':'');
+ $('hpn').textContent=Math.ceil(player.hp)+(player.shield>0||player.wallT>0?' 🛡':'')+(player.cloak>0?' 👻'+Math.ceil(player.cloak):'')+(player.jet>0?' 🚀':'');var hb=$('hpbar');hb.firstChild.style.width=(100*player.hp/player.maxhp)+'%';hb.className='bar'+(player.hp<player.maxhp*.3?' low':'');
  $('o2').style.display=(player.o2<100)?'block':'none';$('o2bar').style.width=player.o2+'%';$('o2n').textContent=Math.round(player.o2);
  $('ammo').textContent=weapon.ammo;var sk=$('skill');sk.className='skill'+(skillCd<=0?' ready':'');$('skcd').style.height=(100*skillCd/player.hero.skill.cd)+'%';
  ['S','D','E'].forEach(function(k){var el=$('en'+k);el.className='en'+(energy[k]>=EMAX?' full':'');el.lastChild.style.height=(100*energy[k]/EMAX)+'%';});
@@ -568,12 +587,13 @@ function updatePlayer(dt){
 }
 function startReload(){if(weapon.reloading>0||weapon.ammo===player.hero.weapon.mag)return;weapon.reloading=player.hero.weapon.reload;$('rel').textContent='换弹中…';SFX.reload();}
 var ray=new THREE.Raycaster();
-function fire(){
+function fire(fromBurst){
  var w=player.hero.weapon;weapon.cool=w.rate;weapon.ammo--;gunKick=w.recoil;shake(w.recoil*.12);player.pitch+=w.recoil*.01;weapon.shots++;
  if(w.dual){weapon.side*=-1;if(weapon.side<0){kick2=w.recoil;gunKick=0;}}
  var mf=(w.dual&&weapon.side<0)?gun.userData.twin.userData.mf:gun.userData.mf;mf.material.opacity=1;mf.scale.setScalar(rnd(.7,1.4));gun.userData.ml.intensity=3;
  fx.push({t:0,life:.07,fn:function(k){mf.material.opacity=1-k;gun.userData.ml.intensity=3*(1-k);},end:function(){mf.material.opacity=0;gun.userData.ml.intensity=0;}});
- SFX.shoot(w);var dmgMul=player.boostT>0?2:1;
+ if(w.silenced){tone(140,.06,'sine',.07,40);noise(.05,.12,1800);}else SFX.shoot(w);var dmgMul=player.boostT>0?2:1;
+ if(!w.silenced&&aiMode!==null)alertEnemies();
  var origin=camera.position.clone();var zoom=ctl.zoom&&w.zoom;
  var muzzle=new THREE.Vector3(w.dual&&weapon.side<0?-.3:.3,-.2,-.9).applyQuaternion(camera.quaternion).add(camera.position);
  for(var i=0;i<w.pellets;i++){
@@ -582,26 +602,30 @@ function fire(){
    ray.set(origin,dir);ray.far=300;var hits=ray.intersectObjects(solids,false);var h=hits[0];var gt=groundHit(origin,dir,300);
    var end;if(h&&(gt<0||h.distance<gt))end=h.point;else if(gt>=0){end=origin.clone().addScaledVector(dir,gt);h=null;}else{end=origin.clone().addScaledVector(dir,300);h=null;}
    tracer(muzzle,end,w.color);
-   if(h){var en=h.object.userData.enemy;if(en){var crit=h.object.userData.head?1.8:1;damageEnemy(en,w.dmg*crit*dmgMul,h.point,crit>1);weapon.hits+=1/w.pellets;}else burst(end.x,end.y,end.z,6,0xffe0a0,6,.9,.35,10);}
+   if(h){var en=h.object.userData.enemy;if(en){var crit=h.object.userData.head?(w.crit||1.8):1;damageEnemy(en,w.dmg*crit*dmgMul,h.point,crit>1);weapon.hits+=1/w.pellets;}else burst(end.x,end.y,end.z,6,0xffe0a0,6,.9,.35,10);}
    else if(gt>=0)burst(end.x,end.y,end.z,6,0xc0b090,5,.9,.35,10);
   } else spawnProj(muzzle,dir,w,true,dmgMul);
  }
- if(weapon.ammo<=0)startReload();
+ if(w.burst&&!fromBurst){burstLeft=w.burst-1;var bt=setInterval(function(){if(burstLeft<=0||weapon.ammo<=0||!running){clearInterval(bt);burstLeft=0;if(weapon.ammo<=0)startReload();return;}burstLeft--;var save=weapon.cool;fire(true);weapon.cool=save;},60);}
+ if(weapon.ammo<=0&&!burstLeft)startReload();
 }
+var burstLeft=0;
 /* ---------- 投射物 ---------- */
 var projs=[];var projGeo=new THREE.SphereGeometry(.16,8,8);
 function spawnProj(pos,dir,w,mine,mul){var col=mine?w.color:w.pcolor;var m=new THREE.Mesh(projGeo,new THREE.MeshBasicMaterial({color:col}));m.position.copy(pos);if(w.type==='rocket')m.scale.set(1,1,2.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),dir);world.add(m);
- var L=new THREE.PointLight(col,1.2,7);m.add(L);projs.push({m:m,v:dir.clone().multiplyScalar(w.pspeed),life:4,dmg:w.dmg*(mul||1),splash:w.splash||0,mine:mine,col:col,rocket:w.type==='rocket'});}
+ var L=new THREE.PointLight(col,1.2,7);m.add(L);projs.push({m:m,v:dir.clone().multiplyScalar(w.pspeed),life:w.life||4,dmg:w.dmg*(mul||1),splash:w.splash||0,mine:mine,col:col,rocket:w.type==='rocket',grav:w.grav||0,arrow:!!w.arrow});}
 function updateProjs(dt){
  for(var i=projs.length-1;i>=0;i--){var p=projs[i];p.life-=dt;var m=p.m;var prev=m.position.clone();m.position.addScaledVector(p.v,dt);
-  if(p.rocket){spawnP(prev.x,prev.y,prev.z,rnd(-1,1),rnd(-1,1),rnd(-1,1),.5,1.6,0xff9a40,0);spawnP(prev.x,prev.y,prev.z,0,.5,0,.9,2,0x555555,0);}else if(!p.mine)spawnP(prev.x,prev.y,prev.z,0,0,0,.18,1.1,p.col,0);
+  if(p.grav){p.v.y-=p.grav*dt;m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),p.v.clone().normalize());}
+  if(p.rocket||p.arrow){spawnP(prev.x,prev.y,prev.z,rnd(-1,1),rnd(-1,1),rnd(-1,1),.5,1.6,p.arrow?0xa8c85a:0xff9a40,0);spawnP(prev.x,prev.y,prev.z,0,.5,0,.9,2,0x555555,0);}else if(!p.mine)spawnP(prev.x,prev.y,prev.z,0,0,0,.18,1.1,p.col,0);
   var hit=false,hp=null;
   if(m.position.y<H(m.position.x,m.position.z)||Math.abs(m.position.x)>HALF||Math.abs(m.position.z)>HALF)hit=true;
   else{for(var k=0;k<obstacles.length;k++){var o=obstacles[k];if(m.position.y<o.h&&m.position.x>o.minx&&m.position.x<o.maxx&&m.position.z>o.minz&&m.position.z<o.maxz){hit=true;break;}}}
   if(!hit){if(p.mine){for(var k=0;k<enemies.length;k++){var e=enemies[k];if(e.dead)continue;var dx=m.position.x-e.pos.x,dy=m.position.y-(e.pos.y+e.def.size*.9),dz=m.position.z-e.pos.z;var rr=e.def.size*1.1+.3;if(dx*dx+dy*dy+dz*dz<rr*rr){hit=true;hp=e;break;}}}
    else{var dx=m.position.x-player.pos.x,dy=m.position.y-(player.pos.y+.9),dz=m.position.z-player.pos.z;if(dx*dx+dy*dy+dz*dz<1.0){hit=true;hp='player';}}}
   if(hit||p.life<=0){
-   if(p.splash>0){explosion(m.position.x,m.position.y,m.position.z,p.splash*.5,0xffa030);
+   if(p.firepool){var fx0=m.position.x,fz0=m.position.z;firePools.push({x:fx0,z:fz0,y:H(fx0,fz0),life:7,r:4.5});explosion(fx0,H(fx0,fz0)+.5,fz0,1.5,0xff8a3c);}
+   if(p.splash>0&&!p.firepool){explosion(m.position.x,m.position.y,m.position.z,p.splash*.5,p.arrow?0xa8c85a:0xffa030);
     if(p.mine){for(var k=0;k<enemies.length;k++){var e=enemies[k];if(e.dead)continue;var d=e.pos.distanceTo(m.position);if(d<p.splash)damageEnemy(e,p.dmg*(1-d/p.splash*.6),e.pos.clone().setY(e.pos.y+1),false);}}
     else{var d=player.pos.distanceTo(m.position);if(d<p.splash)hurtPlayer(p.dmg*(1-d/p.splash*.6));}}
    else{if(hp==='player')hurtPlayer(p.dmg);else if(hp){damageEnemy(hp,p.dmg,m.position.clone(),false);weapon.hits++;}else burst(m.position.x,m.position.y,m.position.z,5,p.col,4,.8,.3,8);}
@@ -647,9 +671,11 @@ function updateEnemies(dt){
  var look=new THREE.Vector3(-Math.sin(player.yaw),0,-Math.cos(player.yaw));
  for(var i=enemies.length-1;i>=0;i--){var e=enemies[i];if(e.dead)continue;var def=e.def;e.t+=dt;
   var toP=player.pos.clone().sub(e.pos);var dy=toP.y;toP.y=0;var dist=toP.length();
+  var blind=player.cloak>0&&dist>5;
   if(!frozen){
    var want=toP.clone().normalize();
    var ideal=def.suicide||def.melee?0:def.range*.6;
+   if(blind){want.set(Math.sin(e.t*.7),0,Math.cos(e.t*.7));ideal=0;}
    if(def.role==='S'&&curObj()&&!curObj().boss&&curObj().prog>0){ // S 显露者守信标
     var b=curObj();var toB=new THREE.Vector3(b.x-e.pos.x,0,b.z-e.pos.z);if(toB.length()>10){want=toB.normalize();ideal=0;}}
    if(def.flank){ // D 差异者：绕到你视线之外
@@ -671,7 +697,8 @@ function updateEnemies(dt){
    else {moveAABB(e.pos,def.size*.5,e.vel,dt);e.pos.y=lerp(e.pos.y,floorAt(e.pos.x,e.pos.z,e.pos.y,def.size*.5),.4);}
    e.cool-=dt;
    var d3=Math.sqrt(dist*dist+dy*dy);
-   if(def.suicide){if(d3<def.range){killEnemy(e,true);hurtPlayer(def.dmg*diff.mul);continue;}}
+   if(blind){}
+   else if(def.suicide){if(d3<def.range){killEnemy(e,true);hurtPlayer(def.dmg*diff.mul);continue;}}
    else if(def.melee){if(d3<def.range&&e.cool<=0){e.cool=1.1;hurtPlayer(def.dmg*diff.mul);burst(player.pos.x,player.pos.y+1,player.pos.z,20,0xff3cac,6,1.2,.4,0);}}
    else if(dist<def.range&&e.cool<=0){var from=e.pos.clone().setY(e.pos.y+def.size*1.5);var tgt=player.pos.clone().setY(player.pos.y+1);if(los(from,tgt)){e.cool=def.rate*rnd(.8,1.2);alert=Math.min(alert+.02,99);
      var dir=tgt.sub(from);var lead=def.pspeed>40?0:.15;dir.add(player.vel.clone().multiplyScalar(lead));dir.normalize();dir.x+=rnd(-.03,.03);dir.y+=rnd(-.02,.02);dir.normalize();
@@ -697,6 +724,7 @@ function damageEnemy(e,dmg,point,crit){
  setTimeout(function(){e.mesh.traverse(function(o){if(o.isMesh&&o.material.emissive&&o.material._e!=null){o.material.emissive.setHex(o.material._e);o.material.emissiveIntensity=o.material._ei;}});},60);
  if(e.def.boss)$('bossbar').style.width=(100*Math.max(0,e.hp)/e.maxhp)+'%';
  if(e.hp<=0)killEnemy(e,false);}
+function alertEnemies(){if(player.cloak>0){player.cloak=0;log('开火暴露了位置');}}
 var streak=0,streakT=0;
 function killEnemy(e,silent){
  if(e.dead)return;e.dead=true;var p=e.pos.clone().setY(e.pos.y+e.def.size);
@@ -718,7 +746,10 @@ function hurtPlayer(d,quiet){
  if(player.hp<=0){player.hp=0;die();}}
 
 /* ---------- 能量球与补给 ---------- */
-var orbs=[],pickups=[];var orbGeo=new THREE.OctahedronGeometry(.4,0);
+var orbs=[],pickups=[],firePools=[];
+function updateFire(dt){for(var i=firePools.length-1;i>=0;i--){var f=firePools[i];f.life-=dt;for(var k=0;k<5;k++)spawnP(f.x+rnd(-f.r,f.r),f.y+.2,f.z+rnd(-f.r,f.r),rnd(-.5,.5),rnd(2,5),rnd(-.5,.5),rnd(.4,.9),rnd(1.5,3),k%3?0xff7a20:0xffd060,0);
+  enemies.forEach(function(e){if(e.dead||e.def.fly)return;if(Math.hypot(e.pos.x-f.x,e.pos.z-f.z)<f.r&&Math.random()<dt*6)damageEnemy(e,22,e.pos.clone().setY(e.pos.y+1),false);});
+  if(f.life<=0)firePools.splice(i,1);}}var orbGeo=new THREE.OctahedronGeometry(.4,0);
 function spawnOrb(x,y,z,kind,amt){var col=ROLECOL[kind];var m=new THREE.Mesh(orbGeo,new THREE.MeshBasicMaterial({color:col}));m.position.set(x,y,z);world.add(m);var L=new THREE.PointLight(col,1,6);m.add(L);orbs.push({m:m,kind:kind,amt:amt,life:30,v:new THREE.Vector3(rnd(-2,2),4,rnd(-2,2))});}
 function spawnPickup(x,z,kind){var col=kind==='hp'?0x3cff8a:0xffd166;var y=Math.max(H(x,z),SEA-30);var m=new THREE.Mesh(new THREE.BoxGeometry(.9,.9,.9),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:.6,roughness:.3,metalness:.6}));m.position.set(x,y+.8,z);world.add(m);var L=new THREE.PointLight(col,1.2,8);m.add(L);
  var ring=new THREE.Mesh(new THREE.RingGeometry(.9,1.1,24),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.6,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.set(x,y+.06,z);world.add(ring);pickups.push({m:m,ring:ring,kind:kind,life:40,x:x,z:z,y:y});}
@@ -743,6 +774,15 @@ function useSkill(){
   for(var i=0;i<7;i++){(function(i){setTimeout(function(){if(!running)return;var x=c.x+rnd(-8,8),z=c.z+rnd(-8,8),y=H(x,z);tracer(new THREE.Vector3(x,y+80,z),new THREE.Vector3(x,y,z),0xff7a3c);explosion(x,y+.5,z,3.2,0xff7a3c);for(var k=0;k<enemies.length;k++){var e=enemies[k];if(e.dead)continue;var d=Math.hypot(e.pos.x-x,e.pos.z-z);if(d<7)damageEnemy(e,90*(1-d/7*.5),e.pos.clone().setY(e.pos.y+1),false);}if(Math.hypot(player.pos.x-x,player.pos.z-z)<5)hurtPlayer(15);},i*180);})(i);}}
  else if(sk.kind==='emp'){empT=3;log('EMP！全场冻结 3 秒');burst(player.pos.x,player.pos.y+1,player.pos.z,200,0x7dff7a,26,1.4,.8,0);groundRing(player.pos.x,player.pos.z,0x7dff7a,40,.8);}
  else if(sk.kind==='heal'){player.hp=Math.min(player.maxhp,player.hp+40);log('+40 生命');burst(player.pos.x,player.pos.y+1,player.pos.z,40,0x3cff8a,4,1.4,.8,-3);}
+ else if(sk.kind==='cloak'){player.cloak=6;log('隐身 6 秒：敌人失去目标（开火会暴露）');burst(player.pos.x,player.pos.y+1,player.pos.z,60,0xcfd8e8,5,1.4,.8,0);}
+ else if(sk.kind==='arrow'){log('爆炸箭！');var dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);var o=new THREE.Vector3(.2,-.1,-.6).applyQuaternion(camera.quaternion).add(camera.position);spawnProj(o,dir,{type:'rocket',dmg:260,splash:9,pspeed:55,color:0xa8c85a,arrow:true,grav:6,life:5},true,1);tone(600,.15,'triangle',.15,200);}
+ else if(sk.kind==='grenade'){log('榴弹！');var dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);dir.y+=.25;dir.normalize();var o=new THREE.Vector3(.2,-.1,-.6).applyQuaternion(camera.quaternion).add(camera.position);spawnProj(o,dir,{type:'rocket',dmg:140,splash:7,pspeed:30,color:0x9adf7a,grav:22,life:4},true,1);tone(200,.12,'square',.12,80);}
+ else if(sk.kind==='fire'){log('燃烧瓶！');var dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);dir.y+=.2;dir.normalize();var o=new THREE.Vector3(.2,-.1,-.6).applyQuaternion(camera.quaternion).add(camera.position);spawnProj(o,dir,{type:'plasma',dmg:20,splash:4,pspeed:24,color:0xff8a3c,grav:20,life:3,firepool:true},true,1);}
+ else if(sk.kind==='jet'){player.jet=3;player.vel.y=12;player.onGround=false;log('喷射背包：3 秒飞行，按住空格上升');SFX.zap();}
+ else if(sk.kind==='fan'){var n=weapon.ammo;if(n<=0){skillCd=1;log('转轮空了，先换弹');return;}var ts=enemies.filter(function(e){return !e.dead&&e.pos.distanceTo(player.pos)<45}).sort(function(a,b){return a.pos.distanceTo(player.pos)-b.pos.distanceTo(player.pos)}).slice(0,n);
+  if(!ts.length){skillCd=2;log('扇射：射程内没目标');return;}log('扇射 ×'+ts.length+'！');var from=camera.position.clone();weapon.ammo-=ts.length;weapon.shots+=ts.length;
+  ts.forEach(function(e,i){setTimeout(function(){if(e.dead||!running)return;var to=e.pos.clone().setY(e.pos.y+e.def.size*1.2);tracer(new THREE.Vector3(.3,-.2,-.9).applyQuaternion(camera.quaternion).add(camera.position),to,0xd9a05a);SFX.shoot(player.hero.weapon);gunKick=1;shake(.15);var toC=to.clone().sub(camera.position);player.yaw=Math.atan2(-toC.x,-toC.z);damageEnemy(e,110,to,true);weapon.hits++;},i*110);});
+  if(weapon.ammo<=0)setTimeout(startReload,ts.length*110+100);}
 }
 function groundRing(x,z,col,size,life){var ring=new THREE.Mesh(new THREE.RingGeometry(.8,1.2,48),new THREE.MeshBasicMaterial({color:col,transparent:true,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.set(x,H(x,z)+.2,z);world.add(ring);fx.push({t:0,life:life,fn:function(k){ring.scale.setScalar(1+k*size);ring.material.opacity=1-k;},end:function(){world.remove(ring);}});}
 function useEnergy(k){
@@ -815,7 +855,7 @@ var selHero=0,selDiff=1,selPilot='me';
 function best(){try{return JSON.parse(localStorage.getItem('ss2_best')||'{}')}catch(e){return{}}}
 function showBest(){var b=best();$('best').textContent=b.score?('最高纪录：'+b.score+' 分 · 信标 '+b.obj+'/4 · '+b.hero+(b.win?' · 已通关':'')):'还没有纪录，来创造一个！';}
 function buildMenu(){
- var Hh=$('heroes');HEROES.forEach(function(h,i){var d=document.createElement('div');d.className='card'+(i===selHero?' sel':'');d.style.setProperty('--c',h.color);d.innerHTML='<div class="sw"></div><b>'+h.name+'</b><small>'+h.desc.replace('\n','<br>')+'</small><div class="stat"><span style="--v:'+(h.stats[0]*100)+'%"></span><span style="--v:'+(h.stats[1]*100)+'%"></span><span style="--v:'+(h.stats[2]*100)+'%"></span></div>';d.onclick=function(){selHero=i;[].forEach.call(Hh.children,function(c,k){c.classList.toggle('sel',k===i)});tone(660,.08,'sine',.08);};Hh.appendChild(d);});
+ var Hh=$('heroes'),H2=$('heroes2');HEROES.forEach(function(h,i){var d=document.createElement('div');d.className='card'+(i===selHero?' sel':'');d.style.setProperty('--c',h.color);d.innerHTML='<div class="sw">'+(h.icon?'<span class="ic">'+h.icon+'</span>':'')+'</div><b>'+h.name+'</b><small>'+h.desc.replace('\n','<br>')+'</small><div class="stat"><span style="--v:'+(h.stats[0]*100)+'%"></span><span style="--v:'+(h.stats[1]*100)+'%"></span><span style="--v:'+(h.stats[2]*100)+'%"></span></div>';d.onclick=function(){selHero=i;[].forEach.call(Hh.children,function(c){c.classList.remove('sel')});[].forEach.call(H2.children,function(c){c.classList.remove('sel')});d.classList.add('sel');tone(660,.08,'sine',.08);};(h.legend?H2:Hh).appendChild(d);});
  var D=$('diffs');DIFFS.forEach(function(x,i){var b=document.createElement('button');b.className='btn'+(i===selDiff?' sel':'');b.textContent=x.name;b.onclick=function(){selDiff=i;[].forEach.call(D.children,function(c,k){c.classList.toggle('sel',k===i)});};D.appendChild(b);});
  var Pp=$('pilots');[].forEach.call(Pp.children,function(b){b.onclick=function(){selPilot=b.dataset.p;[].forEach.call(Pp.children,function(c){c.classList.toggle('sel',c===b)});$('pilotBox').style.display=selPilot==='ai'?'block':'none';};});
  $('baseSel').onchange=refreshKeyUI;$('apiKey').onchange=function(){try{localStorage.setItem(keyStoreName(),$('apiKey').value.trim());}catch(e){}};refreshKeyUI();
@@ -898,7 +938,7 @@ var bot={
   ctl.fwd=mvDir.dot(f);ctl.side=mvDir.dot(rt);ctl.sprint=!t&&gd>25;
   // 水：目标在下面就潜，氧气少就浮
   if(player.swim){var wantY=goal?goal.y:SEA;ctl.dive=(wantY<player.pos.y-2)&&player.o2>20;ctl.jump=(player.o2<18&&!holding)||(wantY>player.pos.y+2);}
-  else{if(this.tick>.1)ctl.jump=false;}
+  else{if(this.tick>.1)ctl.jump=false;if(player.jet>0)ctl.jump=true;}
   // 卡住检测
   if(player.pos.distanceTo(this.lastPos)<.05&&(ctl.fwd||ctl.side)){this.stuckT+=dt;if(this.stuckT>.8){ctl.jump=true;this.strafeDir*=-1;this.stuckT=0;}}else this.stuckT=0;this.lastPos.copy(player.pos);
   // 4. 瞄准与开火
@@ -911,7 +951,7 @@ var bot={
    var aligned=Math.abs(dy)<.06+ (w.pellets>1?.1:0)&&Math.abs(player.pitch-wp)<.08;
    ctl.zoom=!!w.zoom&&tdist>25;
    var from=camera.position,tgt=t.pos.clone().setY(t.pos.y+1);
-   ctl.fire=aligned&&weapon.reloading<=0&&weapon.ammo>0&&los(from,tgt)&&(!w.splash||tdist>7);
+   ctl.fire=aligned&&weapon.reloading<=0&&weapon.ammo>0&&los(from,tgt)&&(!w.splash||tdist>7)&&!(player.cloak>2&&tdist>12&&!w.silenced);
    if(!ctl.fire&&weapon.ammo===0)startReload();
   } else { ctl.fire=false;ctl.zoom=false;
    if(goal&&gd>3){var to2=new THREE.Vector3(goal.x-player.pos.x,0,goal.z-player.pos.z);var wy2=Math.atan2(-to2.x,-to2.z);var dy2=wy2-player.yaw;while(dy2>Math.PI)dy2-=6.283;while(dy2<-Math.PI)dy2+=6.283;player.yaw+=dy2*Math.min(1,dt*4);}
@@ -919,7 +959,7 @@ var bot={
    if(weapon.ammo<w.mag*.5&&weapon.reloading<=0)startReload();}
   // 5. 技能与能量（默认规则，指挥层可强制）
   var near=enemies.filter(function(e){return !e.dead&&e.pos.distanceTo(player.pos)<16}).length;var hpF=player.hp/player.maxhp;var sk=player.hero.skill.kind;
-  var want=this.skillWant||(sk==='heal'&&hpF<.5)||(sk==='shield'&&hpF<.5&&near>0)||(sk==='dash'&&t&&t.def.suicide&&tdist<7)||(sk==='emp'&&near>=3)||(sk==='strike'&&near>=3)||(sk==='slowmo'&&near>=3);
+  var want=this.skillWant||(sk==='cloak'&&hpF<.45&&near>=2)||(sk==='arrow'&&near>=2&&t&&tdist>10)||(sk==='grenade'&&near>=2&&t&&tdist>9&&tdist<30)||(sk==='fire'&&near>=3&&t&&tdist<25)||(sk==='fan'&&near>=3&&weapon.ammo>=3)||(sk==='jet'&&goal&&goal.y-player.pos.y>12&&gd<60)||(sk==='heal'&&hpF<.5)||(sk==='shield'&&hpF<.5&&near>0)||(sk==='dash'&&t&&t.def.suicide&&tdist<7)||(sk==='emp'&&near>=3)||(sk==='strike'&&near>=3)||(sk==='slowmo'&&near>=3);
   if(want&&skillCd<=0){useSkill();this.skillWant=false;}
   var linkNear=enemies.some(function(e){return !e.dead&&e.def.link&&e.pos.distanceTo(player.pos)<35});
   var ew=this.energyWant;
@@ -1004,7 +1044,7 @@ function loop(now){
  requestAnimationFrame(loop);var dt=Math.min(.05,(now-last)/1000);last=now;
  if(running&&!paused){var gdt=dt;if(slowmo>0){slowmo-=dt;gdt=dt*.35;}if(empT>0)empT-=dt;tNow+=gdt;
   if(aiMode&&!takeover)bot.update(dt);if(aiMode)cmd.tick(dt);
-  updatePlayer(dt);updateEnemies(gdt);updateProjs(gdt);updateItems(gdt);updateObjective(gdt);director(gdt);updateP(gdt);updateFx(gdt);updateEnv(gdt);drawMini();
+  updatePlayer(dt);updateEnemies(gdt);updateProjs(gdt);updateItems(gdt);updateFire(gdt);updateObjective(gdt);director(gdt);updateP(gdt);updateFx(gdt);updateEnv(gdt);drawMini();
   $('flash').style.opacity=slowmo>0?.05:0;}
  else if(world&&!running&&(player.dead||$('win').classList.contains('hidden')===false)){tNow+=dt;updateP(dt);updateFx(dt);updateProjs(dt);updateEnv(dt);}
  renderer.render(scene,camera);}
