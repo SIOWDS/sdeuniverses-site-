@@ -43,7 +43,10 @@ const w=dom.window; const errs=[];
 w.addEventListener("error",e=>errs.push(e.message)); dom.virtualConsole.on("jsdomError",e=>errs.push(String(e.message||e).slice(0,120)));
 w.fetch=async function(url,init){
   const u=String(url);
-  if(u.indexOf("/api/wds/review-gen")>=0){ const b=JSON.parse(init.body); await new Promise(r=>setTimeout(r,2)); return sseResp(canned(b)); }
+  if(u.indexOf("/api/wds/review-gen")>=0){ const b=JSON.parse(init.body); await new Promise(r=>setTimeout(r,2));
+    if(b.mode==="gaps"&&!calls.gapsFailed){ calls.gapsFailed=1; return new Response(JSON.stringify({ok:false,msg:"HTTP 503"}),{status:503,headers:{"content-type":"application/json"}}); }
+    if(b.mode==="challenges"&&!calls.stopped){ calls.stopped=1; setTimeout(()=>$("#stopBtn").click(),1); await new Promise(r=>setTimeout(r,30)); }
+    return sseResp(canned(b)); }
   if(u.indexOf("/api/wds/review-shapes")>=0){ return new Response(JSON.stringify({version:"1.4",shapes:[{shape:"差型",words:["work-as-imagined work-as-done","prescribed task actual activity","compliance reliance warning"]},{shape:"改写型",words:["model repair process mining"]},{shape:"介入型",words:["behavioural adaptation assistance"]},{shape:"周期型",words:["incident learning cycle"]},{shape:"分歧型",words:["representational effect"]},{shape:"比例型",words:["appropriate reliance"]}]}),{status:200,headers:{"content-type":"application/json"}}); }
   if(u.indexOf("api.crossref.org")>=0){ calls.cr=(calls.cr||0)+1; const q=new URL(u).searchParams.get("query.bibliographic"); return new Response(JSON.stringify({message:{items:[{DOI:"10.2/cr"+q.replace(/\W/g,"").slice(0,5),title:["CR "+q],issued:{"date-parts":[[2004]]},"container-title":["Transp Res F"],author:[{given:"A",family:"B"}],volume:"7",issue:"2",page:"59-76"}]}}),{status:200,headers:{"content-type":"application/json"}}); }
   if(u.indexOf("api.semanticscholar.org")>=0){ calls.s2=(calls.s2||0)+1; const q=new URL(u).searchParams.get("query"); return new Response(JSON.stringify({data:[{title:"S2 "+q,year:2015,venue:"Inf Syst",externalIds:{DOI:"10.3/s2"+q.replace(/\W/g,"").slice(0,5)},abstract:"model repair abstract",authors:[{name:"Fahland"}],citationCount:100}]}),{status:200,headers:{"content-type":"application/json"}}); }
@@ -69,8 +72,17 @@ async function until(fn,ms){ const t=Date.now(); while(Date.now()-t<ms){ if(fn()
   console.log("①②：", ok1, $("#status").textContent.slice(0,80));
   console.log("文献表行数：", w.document.querySelectorAll("table.lit tr").length-1, " 选中：", w.document.querySelectorAll("input[data-lit]:checked").length);
   $("#runBtn").click();
+  const okS=await until(()=>/已停止：|完成|中断/.test($("#status").textContent),60000);
+  console.log("第一趟（⑦处点停）：", okS, $("#status").textContent.slice(0,60), " runBtn=", $("#runBtn").textContent);
+  const before=JSON.stringify(calls.modes);
+  await sleep(600);
+  console.log("续跑前阶段：",[...w.document.querySelectorAll("#stages span")].map(x=>x.textContent+":"+(x.className||"-")).join(" "));
+  $("#runBtn").click();
+  await sleep(300); console.log("续跑中状态：",$("#status").textContent.slice(0,80));
   const ok2=await until(()=>/完成|中断|失败/.test($("#status").textContent),60000);
   console.log("③–⑩：", ok2, $("#status").textContent.slice(0,100));
+  console.log("续跑前 mode 计数：", before);
+  console.log("gaps 瞬时 503 重试：", calls.gapsFailed?"触发":"未触发", " 有无 localStorage 断点：", !!w.localStorage.getItem("sde_rev_ckpt_v1"));
   const R=$("#results").textContent;
   const stages=[...w.document.querySelectorAll("#stages span")].map(x=>x.textContent+":"+(x.className||"-")).join(" ");
   console.log("阶段：",stages);
@@ -84,4 +96,15 @@ async function until(fn,ms){ const t=Date.now(); while(Date.now()-t<ms){ if(fn()
   console.log("页面脚本错误：", errs.length?errs.slice(0,8):"无");
   // 导出 md
   try{ $("#mdBtn").click(); console.log("导出 .md 点击：无异常"); }catch(e){ console.log("导出 .md 异常：",e.message); }
+  // 第二个窗口：模拟刷新页面后从断点恢复
+  await sleep(700); const snap=w.localStorage.getItem("sde_rev_ckpt_v1");
+  const dom2=new JSDOM(html,{url:"https://sdeuniverses.com/taste/review-gen/",runScripts:"dangerously",resources:undefined,pretendToBeVisual:true,beforeParse(win){ win.localStorage.setItem("sde_rev_ckpt_v1",snap); win.localStorage.setItem("sde_gpt_key","sk-testkey-0123456789"); win.localStorage.setItem("sde_wds_vendor","gpt"); win.fetch=w.fetch; win.TextDecoder=TextDecoder; win.TextEncoder=TextEncoder; win.HTMLElement.prototype.scrollIntoView=function(){}; }});
+  const w2=dom2.window, $2=q=>w2.document.querySelector(q);
+  await sleep(300);
+  console.log("刷新后断点条：", $2("#ckptBar").style.display, "|", $2("#ckptBar").textContent.replace(/\s+/g," ").slice(0,90));
+  $2("#ckptResume").click(); await sleep(100);
+  console.log("恢复后：", $2("#status").textContent.slice(0,60), "| runBtn=", $2("#runBtn").textContent, "| 已出卡=", w2.document.querySelectorAll(".q-ok").length, "| 节数=", w2.document.querySelectorAll("[data-sec]").length);
+  const b2=JSON.stringify(calls.modes);
+  $2("#runBtn").click(); const ok3=await until(()=>/完成|中断|失败/.test($2("#status").textContent),30000);
+  console.log("恢复后续跑：", ok3, $2("#status").textContent.slice(0,30), "| 新增调用：", JSON.stringify(calls.modes)===b2?"无（全部工序已保留）":JSON.stringify(calls.modes));
 })();
