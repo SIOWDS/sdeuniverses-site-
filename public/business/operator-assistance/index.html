@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>操作员智能辅助 · 绑定感知验证系统 | SDE 工业应用演示</title>
+<meta name="description" content="一套把「这一步真的完成了吗」变成可裁定问题的工业演示系统。多加通道不会提高签发判定的可靠性——本页用可复算的模拟把这件事摆出来。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--steel:#2F5D7C;--ok:#2E6E4E;--warn:#B0761A;--bad:#9A2B26}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.6rem 2rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2);font-size:0.86rem}
+nav .nl{display:flex;gap:1.1rem;flex-wrap:wrap}
+nav a{text-decoration:none;color:var(--text2)}
+nav a:hover{color:var(--steel)}
+nav .lg{font-weight:600;color:var(--gold);letter-spacing:0.04em}
+header.hero{padding:7rem 2rem 3rem;max-width:960px;margin:0 auto;text-align:center}
+.eyebrow{font-size:0.76rem;letter-spacing:0.22em;color:var(--steel);margin-bottom:1rem}
+h1{font-size:clamp(1.7rem,4.4vw,2.7rem);font-weight:600;line-height:1.3;margin-bottom:0.9rem}
+.sub{color:var(--text2);font-size:1.02rem;max-width:720px;margin:0 auto}
+.badge{display:inline-flex;align-items:center;gap:0.5rem;margin-top:1.5rem;padding:0.4rem 1rem;border:1px solid var(--border);border-radius:2rem;font-size:0.78rem;color:var(--muted);background:var(--card)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--steel)}
+main{max-width:940px;margin:0 auto;padding:0 1.4rem 5rem}
+section{margin-bottom:3.2rem}
+h2{font-size:1.34rem;font-weight:600;margin:0 0 0.9rem;padding-left:0.7rem;border-left:3px solid var(--steel)}
+h3{font-size:1.02rem;font-weight:600;margin:1.6rem 0 0.6rem;color:var(--text)}
+p{margin-bottom:0.9rem}
+.lead{font-size:1.05rem}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.4rem 1.5rem;margin:1.2rem 0}
+.panel.tight{padding:1.1rem 1.2rem}
+.note{font-size:0.87rem;color:var(--muted);line-height:1.7}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem 1.6rem;margin-bottom:1.2rem}
+.ctl label{display:block;font-size:0.86rem;color:var(--text2);margin-bottom:0.3rem}
+.ctl input[type=range]{width:100%;accent-color:var(--steel)}
+.val{font-weight:600;color:var(--steel)}
+.sw{display:flex;align-items:center;gap:0.6rem;font-size:0.9rem;padding:0.5rem 0.8rem;border:1px solid var(--border);border-radius:8px;background:var(--card2);cursor:pointer;user-select:none}
+.sw input{accent-color:var(--steel);width:16px;height:16px}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.9rem;margin-top:0.4rem}
+.metric{background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:0.85rem 0.9rem;text-align:center}
+.metric .m-k{font-size:0.76rem;color:var(--muted);letter-spacing:0.04em;display:block;margin-bottom:0.3rem}
+.metric .m-v{font-size:1.5rem;font-weight:600;font-variant-numeric:tabular-nums}
+.metric.hi{border-color:var(--steel);background:#EDF2F6}
+.metric.hi .m-v{color:var(--steel)}
+table{width:100%;border-collapse:collapse;font-size:0.88rem;margin:0.8rem 0}
+th,td{padding:0.5rem 0.6rem;border-bottom:1px solid var(--border2);text-align:left}
+th{color:var(--text2);font-weight:600;font-size:0.82rem;background:var(--card2)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;padding:0.1rem 0.5rem;border-radius:4px;font-size:0.78rem;font-weight:600}
+.t-ok{background:#E3EFE7;color:var(--ok)}
+.t-inc{background:#F5EBD6;color:var(--warn)}
+.t-bad{background:#F5E1E0;color:var(--bad)}
+button{font-family:inherit;font-size:0.9rem;padding:0.55rem 1.2rem;border:1px solid var(--steel);background:var(--steel);color:#fff;border-radius:6px;cursor:pointer}
+button.ghost{background:transparent;color:var(--steel)}
+button:hover{opacity:0.88}
+ul,ol{margin:0 0 0.9rem 1.3rem}
+li{margin-bottom:0.4rem}
+.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:0.86em;background:var(--card2);padding:0.1rem 0.35rem;border-radius:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+@media(max-width:720px){.two{grid-template-columns:1fr}header.hero{padding-top:6rem}nav{padding:0.5rem 1rem}}
+footer{border-top:1px solid var(--border2);padding:2rem 1.4rem 3rem;text-align:center;color:var(--muted);font-size:0.84rem}
+svg .ln{fill:none;stroke-width:2.2}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="lg" href="/business/operator-assistance/">SDE 工业应用</a>
+  <div class="nl">
+    <a href="#paradox">印证悖论</a>
+    <a href="#line">产线演示</a>
+    <a href="#design">系统设计</a>
+    <a href="#method">方法说明</a>
+    <a href="/business/">商业与经济 ↗</a>
+    <a href="/browse/">爱思乐园 ↗</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="eyebrow">SDE 工业应用 · 产品演示</div>
+  <h1>操作员智能辅助<br>绑定感知的工序验证系统</h1>
+  <p class="sub">把「这一步真的完成了吗」变成一个可裁定的问题。<br>本页是可交互的演示，所有读数由页内实时模拟算出，可自行改参数复算。</p>
+  <div class="badge"><span class="dot"></span>演示版 · 合成数据 · 非真实产线读数</div>
+</header>
+
+<main>
+
+<section id="why">
+  <h2>一、它要解决的那件事</h2>
+  <p class="lead">灶上并排两口一样的锅。你要确认的是：左边这锅，盐加过了没有。</p>
+  <p>你尝一口——咸的。看盐罐——少了一勺。回想动作——手确实抬起来过。四条证据互相印证，信心很高。但这四条没有一条回答「是哪一锅」。它们都在说「有一锅被加了盐」。如果你刚才加的是右边那锅，四条证据每一条都是真的，而结论是错的。</p>
+  <p>工厂里这口锅叫 V-103，或者叫一只吨袋、一台并联反应釜、流水线上的第几件工件。现场辅助系统这些年增长的能力——第一人称视觉、动作识别、物态变化检测——<b>全都属于「再叫一个人来尝」这一类</b>：它们描述发生了什么，但它们对「说的是哪一个」这件事本身不提供任何信息，因为它们的指称是从同一次判断里继承来的。</p>
+  <div class="panel tight">
+    <p style="margin:0"><b>本系统的设计原则只有两条。</b>其一：系统只做两件事——把每一次操作绑定到（对象，发生次）上，然后按显式判据裁定。其二：任何一路证据，如果它的指称是从别处继承来的，就不进入判定链，只作参考。</p>
+  </div>
+</section>
+
+<section id="paradox">
+  <h2>二、印证悖论台（可交互）</h2>
+  <p>下面这个模拟回答一个反直觉的问题：<b>往系统里加传感通道，签发判定会变得更可靠吗？</b>拖动滑块看两个读数怎么走——「误判率」会下降，而「签发里的错误占比」不动。</p>
+
+  <div class="panel">
+    <div class="ctl">
+      <div>
+        <label>继承型通道数 <span class="val" id="lk">4</span> <span class="note">（视觉／动作／物态，指称同源）</span></label>
+        <input type="range" id="k" min="1" max="12" value="4">
+      </div>
+      <div>
+        <label>相似对象数 <span class="val" id="lm">4</span> <span class="note">（同款并联设备／同批工件）</span></label>
+        <input type="range" id="m" min="2" max="12" value="4">
+      </div>
+      <div>
+        <label>定位可靠度 <span class="val" id="ls">0.90</span></label>
+        <input type="range" id="s" min="50" max="99" value="90">
+      </div>
+      <div>
+        <label>重复作业率 <span class="val" id="lr">0.09</span> <span class="note">（同一对象上一遍的证据落进窗内）</span></label>
+        <input type="range" id="r" min="0" max="40" value="9">
+      </div>
+    </div>
+    <label class="sw"><input type="checkbox" id="disc"> 接入 <b>一路判别性证据</b>（位号级回讯／对象码扫描）</label>
+
+    <div class="out" style="margin-top:1.1rem">
+      <div class="metric"><span class="m-k">签发率</span><span class="m-v" id="o-sat">—</span></div>
+      <div class="metric"><span class="m-k">误判率 FVR</span><span class="m-v" id="o-fvr">—</span></div>
+      <div class="metric hi"><span class="m-k">签发里的错误占比 FDR</span><span class="m-v" id="o-fdr">—</span></div>
+      <div class="metric"><span class="m-k">指称错误率</span><span class="m-v" id="o-eb">—</span></div>
+    </div>
+
+    <h3>通道数从 1 加到 12 时，两条曲线各自怎么走</h3>
+    <svg id="chart" viewBox="0 0 700 260" style="width:100%;height:auto"></svg>
+    <p class="note" id="chart-note" style="margin-bottom:0"></p>
+  </div>
+
+  <div class="panel tight">
+    <p style="margin:0"><b>该怎么读这张图。</b>下滑的那条是误判率：加通道确实让它下降。持平的那条是签发里的错误占比：它不动。两者同时为真，是因为加通道并没有让系统判得更准，只是让它<b>更不肯开口</b>——签发的次数少了，签发里错的比例分毫未动。而车间的压力永远是催着多签发，不是催着少签发。所以这是一个<b>在检查时好看、在生产中难看</b>的失效模式。把判别性证据那一路打开，才会看到第三条读数真正落下去。</p>
+  </div>
+</section>
+
+<section id="line">
+  <h2>三、一条包装产线（可交互）</h2>
+  <p>下面模拟一条吨袋包装线的一个批次。每袋要走完四个卡点：贴标、复秤、热封、入库。系统对每袋给出三值判定——<span class="tag t-ok">通过</span>、<span class="tag t-bad">不合格</span>、<span class="tag t-inc">证据不足</span>。<b>「证据不足」是一等公民，不是错误状态。</b></p>
+  <div class="panel">
+    <div style="display:flex;gap:0.7rem;flex-wrap:wrap;align-items:center;margin-bottom:0.9rem">
+      <button id="run">跑一个批次</button>
+      <label class="sw"><input type="checkbox" id="code" checked> 启用对象码（贴标即绑定，卡点扫码）</label>
+      <label class="sw"><input type="checkbox" id="param" checked> 关键参数按袋抓时间戳快照</label>
+    </div>
+    <div style="overflow-x:auto"><table id="tbl"><thead><tr><th>袋号</th><th>贴标绑定</th><th>复秤</th><th>热封参数</th><th>判定</th><th>承接人</th></tr></thead><tbody id="tb"></tbody></table></div>
+    <p class="note" id="line-note" style="margin-bottom:0"></p>
+  </div>
+  <p class="note">关掉「对象码」，你会看到判定几乎全变成「通过」——不是因为它更准了，而是因为系统失去了追问「这是哪一袋」的能力，于是每一条证据都被默认算在当前这袋头上。关掉「参数快照」，热封那一列会退回班次级：出了问题说不出是哪几袋受影响。</p>
+</section>
+
+<section id="design">
+  <h2>四、系统怎么搭</h2>
+  <table>
+    <thead><tr><th>层</th><th>做什么</th><th>关键约束</th></tr></thead>
+    <tbody>
+      <tr><td>Layer 0 · 身份骨干</td><td>打印标签那一刻生成一袋一码，与批次、产线、包装人绑定</td><td>打印即绑定诞生；无码的事件不进判定</td></tr>
+      <tr><td>Layer 1 · 事件采集</td><td>四处扫码卡点、地磅读数带时间戳、设备参数按时间戳取</td><td>视觉只进满足层，不承担绑定职责</td></tr>
+      <tr><td>Layer 2 · 工序契约</td><td>每步写成「参照·要求·充分性·时窗·异常」五件</td><td>充分性必须点名哪一路是判别性证据</td></tr>
+      <tr><td>Layer 3 · 判定引擎</td><td>三值输出：通过／不合格／证据不足</td><td>任何「通过」必须含至少一条判别性证据</td></tr>
+      <tr><td>Layer 4 · 介入策略</td><td>六十多步里只硬拦三处，其余静默记录</td><td>拦得越少，拦得越准，越不会被关掉</td></tr>
+      <tr><td>Layer 5 · 承接位</td><td>每条判定带承接人；系统自动判定的写「系统＋当班授权人」</td><td>不承接错误的裁定不成立</td></tr>
+    </tbody>
+  </table>
+  <h3>三条最低成本的改动</h3>
+  <ol>
+    <li><b>物料卡加码，贴完当场扫一次。</b>把一张可移动的纸，变成一次被记录过的身份。</li>
+    <li><b>复秤时扫一次码。</b>把地磅读数绑到那张卡上——一次改动同时治「哪一个」和「哪一遍」。</li>
+    <li><b>关键参数按对象抓快照。</b>不加传感器，只在系统里按时间戳截取已有的实时值。</li>
+  </ol>
+  <p class="note">三条都不增加操作工的动作负担：第二条是一次扫码，第三条是纯后台。而它们把一条典型产线上仅有的判别性证据从一处扩到三处。</p>
+</section>
+
+<section id="method">
+  <h2>五、这套设计从哪来</h2>
+  <p>它来自 SDE 发生学的第一方程 <span class="kbd">S = F(D, E)</span>——显露由差异与纠缠共同发生。</p>
+  <p>把它翻译成车间的话：一句「这一步完成了」是<b>显露</b>；每增加一路传感通道，是在<b>差异</b>侧做加法；而位号体系、资产登记簿、批次系统这些让所有人指同一件东西的东西，是<b>纠缠</b>侧的共同依赖场。</p>
+  <p>现行做法的困境在于：判定被当成可以靠差异侧单独堆出来的东西，于是通道越加越多，而共同依赖场在现场那一端始终是断的——纸卡靠人贴、地磅读数不带对象号、关键参数只到班次。<b>顶不上的两侧，逼着显露改形态</b>：这就是为什么信息越多，判定反而越内卷。</p>
+  <p>反过来的做法很简单：先把纠缠侧接上（一物一码、卡点扫码、参数按对象落位），再谈往差异侧加东西。三条最低成本的改动，做的全是这一件事。</p>
+  <div class="panel tight">
+    <p style="margin:0" class="note"><b>关于本演示。</b>页内两处模拟均在浏览器实时运算，参数与代码公开可查（查看网页源代码即可）。数据为合成数据，用于说明机制，不代表任何真实产线的实测读数。本页为德麦国际 SDE 工业应用方向的产品展示，处早期演示阶段。</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  SDE Universes · 工业应用演示 · 德麦国际<br>
+  <a href="/business/">← 回商业与经济</a> · <a href="/browse/">爱思乐园</a>
+</footer>
+
+<script>
+(function(){
+  function rnd(){return Math.random()}
+  function sim(o){
+    var n=20000, k=o.k, m=o.m, s=o.s, rho=o.rho, qB=0.55, qO=0.95, a=0.90, d=0.85;
+    var sat=0, fv=0, ebc=0;
+    for(var i=0;i<n;i++){
+      var correct = (rnd()<s) ? true : (Math.floor(rnd()*m)===0);
+      if(!correct) ebc++;
+      var phi = correct ? true : (rnd()<qB);
+      var occErr = correct && (rnd()<rho);
+      var truly = correct && !occErr;
+      var ok=true;
+      for(var j=0;j<k;j++){ var rep = phi ? (rnd()<a) : (rnd()<(1-a)); if(!rep){ok=false;break} }
+      if(occErr && ok){ ok = (rnd()<qO) }
+      if(o.disc && !correct && rnd()<d) ok=false;
+      if(ok){ sat++; if(!truly) fv++ }
+    }
+    return {sat:sat/n, fvr:fv/n, fdr: sat? fv/sat : 0, eb: ebc/n};
+  }
+  var els={k:document.getElementById('k'),m:document.getElementById('m'),s:document.getElementById('s'),r:document.getElementById('r'),disc:document.getElementById('disc')};
+  function read(){return {k:+els.k.value, m:+els.m.value, s:(+els.s.value)/100, rho:(+els.r.value)/100, disc:els.disc.checked}}
+  function pct(x){return (x*100).toFixed(1)+'%'}
+  function draw(o){
+    var W=700,H=260,L=52,R=16,T=18,B=34;
+    var fdr=[],fvr=[];
+    for(var kk=1;kk<=12;kk++){var t=sim({k:kk,m:o.m,s:o.s,rho:o.rho,disc:o.disc});fdr.push(t.fdr);fvr.push(t.fvr)}
+    var mx=Math.max.apply(null,fdr.concat(fvr));mx=Math.max(mx,0.05)*1.25;
+    function X(i){return L+(W-L-R)*i/11}
+    function Y(v){return T+(H-T-B)*(1-v/mx)}
+    function path(arr){return arr.map(function(v,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)}).join(' ')}
+    var g='';
+    for(var t2=0;t2<=4;t2++){var v=mx*t2/4;var y=Y(v).toFixed(1);
+      g+='<line x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'" stroke="rgba(138,104,23,0.14)"/>';
+      g+='<text x="'+(L-8)+'" y="'+(+y+4)+'" text-anchor="end" font-size="11" fill="#98886C">'+(v*100).toFixed(0)+'%</text>';}
+    for(var i2=0;i2<12;i2+=2){g+='<text x="'+X(i2).toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle" font-size="11" fill="#98886C">'+(i2+1)+'</text>'}
+    g+='<text x="'+(W/2)+'" y="'+(H-1)+'" text-anchor="middle" font-size="11" fill="#98886C">继承型通道数</text>';
+    g+='<path class="ln" d="'+path(fvr)+'" stroke="#B0761A" stroke-dasharray="5 4"/>';
+    g+='<path class="ln" d="'+path(fdr)+'" stroke="#2F5D7C"/>';
+    g+='<text x="'+(L+10)+'" y="'+(Y(fdr[0])-9).toFixed(1)+'" font-size="12" fill="#2F5D7C">签发里的错误占比（不动）</text>';
+    g+='<text x="'+(L+10)+'" y="'+(Y(fvr[0])+18).toFixed(1)+'" font-size="12" fill="#B0761A">误判率（在下降）</text>';
+    document.getElementById('chart').innerHTML=g;
+    var d0=fdr[0],d11=fdr[11],f0=fvr[0],f11=fvr[11];
+    document.getElementById('chart-note').textContent='通道 1→12：误判率 '+pct(f0)+' → '+pct(f11)+'（降了 '+((1-f11/(f0||1))*100).toFixed(0)+'%），而签发里的错误占比 '+pct(d0)+' → '+pct(d11)+'。前者是系统更少开口的结果，后者才是每一次签发的可靠性。';
+  }
+  function upd(){
+    var o=read();
+    document.getElementById('lk').textContent=o.k;
+    document.getElementById('lm').textContent=o.m;
+    document.getElementById('ls').textContent=o.s.toFixed(2);
+    document.getElementById('lr').textContent=o.rho.toFixed(2);
+    var t=sim(o);
+    document.getElementById('o-sat').textContent=pct(t.sat);
+    document.getElementById('o-fvr').textContent=pct(t.fvr);
+    document.getElementById('o-fdr').textContent=pct(t.fdr);
+    document.getElementById('o-eb').textContent=pct(t.eb);
+    draw(o);
+  }
+  ['k','m','s','r'].forEach(function(id){els[id].addEventListener('input',upd)});
+  els.disc.addEventListener('change',upd);
+  upd();
+
+  var tb=document.getElementById('tb');
+  function runBatch(){
+    var useCode=document.getElementById('code').checked;
+    var useParam=document.getElementById('param').checked;
+    var rows='',nOk=0,nInc=0,nBad=0,hidden=0;
+    for(var i=1;i<=10;i++){
+      var bag='B-'+(2601+i);
+      var bindOk = useCode ? true : (rnd()<0.88);
+      var wTrue = 1000 + Math.round((rnd()-0.5)*14);
+      var wOk = wTrue>=995 && wTrue<=1005;
+      var pOk = rnd()<0.93;
+      var bindTxt = useCode ? '<span class="tag t-ok">扫码 · 已绑定</span>' : (bindOk?'<span class="tag t-inc">人工核对</span>':'<span class="tag t-inc">人工核对</span>');
+      var wTxt = (useCode?'':'<span class="note">未绑袋 </span>')+wTrue+' kg';
+      var pTxt = useParam ? (pOk?'<span class="tag t-ok">窗内</span>':'<span class="tag t-bad">超窗</span>') : '<span class="tag t-inc">班次级</span>';
+      var verdict, who;
+      if(useCode && !wOk){verdict='<span class="tag t-bad">不合格</span>';who='系统 ＋ 当班授权人';nBad++}
+      else if(useCode && useParam && !pOk){verdict='<span class="tag t-bad">不合格</span>';who='系统 ＋ 当班授权人';nBad++}
+      else if(useCode && useParam){verdict='<span class="tag t-ok">通过</span>';who='系统 ＋ 当班授权人';nOk++}
+      else if(useCode && !useParam){verdict='<span class="tag t-inc">证据不足</span>';who='待人工确认';nInc++}
+      else {verdict='<span class="tag t-ok">通过</span>';who='—（无署名）';nOk++; if(!bindOk)hidden++}
+      rows+='<tr><td>'+bag+'</td><td>'+bindTxt+'</td><td class="num">'+wTxt+'</td><td>'+pTxt+'</td><td>'+verdict+'</td><td class="note">'+who+'</td></tr>';
+    }
+    tb.innerHTML=rows;
+    var msg='本批 10 袋：通过 '+nOk+'，不合格 '+nBad+'，证据不足 '+nInc+'。';
+    if(!useCode){ msg+=' 未启用对象码时，全批都判「通过」，且其中约 '+hidden+' 袋的证据实际上属于别的袋——这类错误不会被任何一条现有证据发现。'; }
+    else if(!useParam){ msg+=' 参数只到班次级，因此热封这一步无法对单袋裁定，系统只能给「证据不足」并升级人工确认。'; }
+    else { msg+=' 每一条判定都带承接人；「不合格」的袋会在入库前被硬拦。'; }
+    document.getElementById('line-note').textContent=msg;
+  }
+  document.getElementById('run').addEventListener('click',runBatch);
+  document.getElementById('code').addEventListener('change',runBatch);
+  document.getElementById('param').addEventListener('change',runBatch);
+  runBatch();
+})();
+</script>
+</body>
+</html>
