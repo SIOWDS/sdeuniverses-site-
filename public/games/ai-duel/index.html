@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人与AI比智 · 创新智商擂台 · SDE Universes</title>
+<meta name="description" content="人与AI比智：由一个基底随机出一道日常生活题，你和另一个大模型基底各自作答、互相批评、各自回应，再由裁判基底按创新智商五维盲评。谁的想法经得住批评，谁就留下来。七个基底可选，用你自己的 Key。">
+<link rel="canonical" href="https://sdeuniverses.com/games/ai-duel/">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/assets/app/favicon-32.png" sizes="32x32">
+<meta name="theme-color" content="#151B2E">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#151B2E;--bg2:#1B2340;--panel:#212B4C;--line:rgba(232,228,216,.14);--line2:rgba(232,228,216,.06);
+  --paper:#E8E4D8;--paper2:#B8B3A4;--dim:#7E7A70;
+  --man:#F2B441;--man2:#A97A1B;--ai:#4FD1E8;--ai2:#1C8DA3;--judge:#C98BFF;--ok:#4ADE80;--bad:#F87171;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--paper);font-family:'Noto Serif SC','Songti SC',Georgia,serif;line-height:1.75;min-height:100vh;
+  background-image:radial-gradient(ellipse at 15% 0%,rgba(242,180,65,.10),transparent 45%),radial-gradient(ellipse at 85% 0%,rgba(79,209,232,.10),transparent 45%)}
+nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:1.2rem;padding:.65rem 1.3rem;background:rgba(21,27,46,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line2)}
+nav .logo{color:var(--man);font-weight:700;text-decoration:none;letter-spacing:.06em}
+nav a.lnk{color:var(--paper2);text-decoration:none;font-size:.85rem}
+nav a.lnk:hover{color:var(--paper)}
+nav .sp{flex:1}
+main{max-width:1040px;margin:0 auto;padding:1.4rem 1rem 4rem}
+h1{font-size:clamp(1.7rem,4.6vw,2.5rem);font-weight:700;letter-spacing:.12em;text-align:center;line-height:1.3}
+h1 i{font-style:normal;color:var(--man)} h1 em{font-style:normal;color:var(--ai)}
+.lede{color:var(--paper2);text-align:center;max-width:62ch;margin:.5rem auto 1.4rem;font-size:.95rem}
+.lede a{color:var(--man)}
+/* ── 存在计：整页唯一的重头戏 ── */
+.gauge{max-width:720px;margin:0 auto 1.4rem;border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:.9rem 1rem}
+.gauge .names{display:flex;justify-content:space-between;font-size:.9rem;font-weight:700}
+.gauge .names .m{color:var(--man)} .gauge .names .a{color:var(--ai)}
+.gauge .names small{font-weight:400;color:var(--paper2);margin-left:.4rem;font-size:.78rem}
+.gauge .lives{display:flex;justify-content:space-between;margin:.35rem 0 .5rem;font-size:1.05rem;letter-spacing:.18em}
+.gauge .lives .m{color:var(--man)} .gauge .lives .a{color:var(--ai)}
+.gauge .lives .lost{opacity:.22}
+.gauge .bar{position:relative;height:18px;border-radius:9px;overflow:hidden;background:#0E1326;border:1px solid var(--line)}
+.gauge .bar .fm{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--man2),var(--man));transition:width .9s cubic-bezier(.2,.9,.2,1)}
+.gauge .bar .fa{position:absolute;right:0;top:0;bottom:0;background:linear-gradient(270deg,var(--ai2),var(--ai));transition:width .9s cubic-bezier(.2,.9,.2,1)}
+.gauge .bar .mid{position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:var(--paper);opacity:.5}
+.gauge .cap{display:flex;justify-content:space-between;font-size:.76rem;color:var(--paper2);margin-top:.35rem}
+.gauge .cap b{color:var(--paper)}
+/* ── 设置台 ── */
+.setup{border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:1.1rem 1.2rem;margin-bottom:1.4rem}
+.setup h2{font-size:1.02rem;margin-bottom:.6rem;letter-spacing:.06em}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fld{display:block;margin-bottom:.7rem}
+.fld span{display:block;font-size:.82rem;color:var(--paper2);margin-bottom:.25rem}
+.fld select,.fld input{width:100%;font:inherit;font-size:.92rem;background:#0E1326;color:var(--paper);border:1px solid var(--line);border-radius:8px;padding:.5rem .6rem;outline:none}
+.fld select:focus,.fld input:focus,textarea:focus{border-color:var(--man)}
+.fld .row{display:flex;gap:.5rem}
+.fld .row select{flex:1} .fld .row select.tier{flex:0 0 96px}
+.keyline{font-size:.76rem;color:var(--dim);margin-top:.2rem}
+.keyline a{color:var(--paper2)}
+.opts{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.3rem}
+.opts label{font-size:.84rem;color:var(--paper2);display:flex;align-items:center;gap:.3rem}
+.opts select{font:inherit;font-size:.86rem;background:#0E1326;color:var(--paper);border:1px solid var(--line);border-radius:6px;padding:.25rem .4rem}
+.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:.62rem 1.3rem;cursor:pointer;letter-spacing:.08em;color:#151B2E;background:var(--paper);transition:transform .08s,filter .15s}
+.btn:hover{filter:brightness(1.06)} .btn:active{transform:translateY(1px)}
+.btn.man{background:var(--man)} .btn.ai{background:var(--ai)} .btn.ghost{background:transparent;color:var(--paper2);border:1px solid var(--line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+.btnrow{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.6rem}
+.warn{font-size:.82rem;color:var(--bad);margin-top:.5rem;display:none}
+/* ── 擂台 ── */
+.arena{display:none}
+.arena.on{display:block}
+.qcard{border:1px solid var(--line);border-left:4px solid var(--judge);border-radius:12px;background:var(--panel);padding:1rem 1.2rem;margin-bottom:1rem}
+.qcard .k{font-size:.78rem;color:var(--judge);margin-bottom:.25rem}
+.qcard .q{font-size:1.12rem;font-weight:700;line-height:1.6}
+.qcard .s{color:var(--paper2);font-size:.9rem;margin-top:.35rem}
+.qcard .brief{color:var(--paper2);font-size:.82rem;margin-top:.55rem;border-top:1px dashed var(--line);padding-top:.5rem}
+.steps{display:flex;gap:.4rem;justify-content:center;margin:.2rem 0 1rem;flex-wrap:wrap}
+.steps span{font-size:.76rem;padding:.2rem .7rem;border-radius:20px;border:1px solid var(--line);color:var(--dim)}
+.steps span.on{color:var(--paper);border-color:var(--paper);background:rgba(232,228,216,.06)}
+.steps span.done{color:var(--paper2);border-color:var(--paper2)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.side{border:1px solid var(--line);border-radius:12px;background:var(--bg2);padding:.9rem 1rem;min-height:120px}
+.side.man{border-top:3px solid var(--man)} .side.ai{border-top:3px solid var(--ai)}
+.side h3{font-size:.9rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.side.man h3{color:var(--man)} .side.ai h3{color:var(--ai)}
+.side h3 small{font-weight:400;color:var(--paper2);font-size:.76rem}
+.side .timer{font-family:ui-monospace,Menlo,monospace;font-size:.85rem;color:var(--paper2)}
+.side .timer.low{color:var(--bad)}
+textarea{width:100%;font:inherit;font-size:.93rem;line-height:1.7;background:#0E1326;color:var(--paper);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;min-height:150px;resize:vertical;outline:none}
+.cnt{font-size:.74rem;color:var(--dim);text-align:right;margin-top:.2rem}
+.txt{white-space:pre-wrap;font-size:.93rem;line-height:1.75}
+.veil{color:var(--dim);font-size:.86rem;font-style:italic}
+.spin{display:inline-block;width:10px;height:10px;border:2px solid var(--paper2);border-top-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-1px;margin-right:.35rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+.stack{margin-top:1rem}
+.blk{border:1px solid var(--line2);border-radius:10px;padding:.7rem .9rem;margin-top:.6rem;background:rgba(14,19,38,.45)}
+.blk .lab{font-size:.76rem;color:var(--paper2);margin-bottom:.25rem}
+/* ── 裁判 ── */
+.verdict{display:none;margin-top:1.2rem;border:1px solid var(--judge);border-radius:14px;background:var(--panel);padding:1rem 1.2rem}
+.verdict.on{display:block}
+.verdict h3{color:var(--judge);font-size:1rem;margin-bottom:.6rem;letter-spacing:.06em}
+.score{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.sc{border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem;background:var(--bg2)}
+.sc.man{border-color:var(--man2)} .sc.ai{border-color:var(--ai2)}
+.sc .who{font-weight:700;display:flex;justify-content:space-between;align-items:baseline}
+.sc.man .who{color:var(--man)} .sc.ai .who{color:var(--ai)}
+.sc .who b{font-size:1.5rem}
+.dims{display:grid;grid-template-columns:repeat(5,1fr);gap:.3rem;margin:.5rem 0}
+.dims div{text-align:center;font-size:.72rem;color:var(--paper2);border:1px solid var(--line2);border-radius:6px;padding:.25rem 0}
+.dims div b{display:block;font-size:.95rem;color:var(--paper)}
+.dims div.gate b{color:var(--judge)}
+.sc .surv{font-size:.84rem;color:var(--paper2)} .sc .surv b{color:var(--paper)}
+.sc .exist{margin-top:.35rem;font-size:.9rem} .sc .exist b{font-size:1.25rem}
+.sc .note{font-size:.84rem;color:var(--paper2);margin-top:.4rem;border-top:1px dashed var(--line2);padding-top:.35rem}
+.final{margin-top:.8rem;font-size:1.05rem;text-align:center}
+.final b.m{color:var(--man)} .final b.a{color:var(--ai)}
+.jw{margin-top:.5rem;font-size:.9rem;color:var(--paper2);white-space:pre-wrap}
+.blind{font-size:.76rem;color:var(--dim);margin-top:.5rem}
+.err{border:1px solid var(--bad);border-radius:10px;padding:.7rem .9rem;color:var(--bad);font-size:.88rem;margin-top:.8rem;display:none;white-space:pre-wrap}
+.err.on{display:block}
+/* ── 终局 ── */
+.endcard{display:none;text-align:center;border:2px solid var(--paper);border-radius:14px;padding:1.4rem 1rem;margin-top:1.2rem;background:var(--bg2)}
+.endcard.on{display:block}
+.endcard .big{font-size:1.9rem;font-weight:700;letter-spacing:.1em}
+.endcard .big.m{color:var(--man)} .endcard .big.a{color:var(--ai)}
+.endcard p{color:var(--paper2);margin:.4rem 0 .8rem;font-size:.92rem}
+/* ── 战绩 ── */
+.log{margin-top:1.6rem;border-top:1px solid var(--line2);padding-top:1rem}
+.log h2{font-size:.95rem;color:var(--paper2);letter-spacing:.06em;margin-bottom:.5rem}
+.log table{width:100%;border-collapse:collapse;font-size:.84rem}
+.log th,.log td{text-align:left;padding:.35rem .4rem;border-bottom:1px solid var(--line2);vertical-align:top}
+.log th{color:var(--dim);font-weight:400}
+.log td.m{color:var(--man)} .log td.a{color:var(--ai)}
+.rules{margin-top:1.6rem;border-top:1px solid var(--line2);padding-top:1rem;color:var(--paper2);font-size:.88rem}
+.rules h2{font-size:.95rem;color:var(--paper);letter-spacing:.06em;margin-bottom:.4rem}
+.rules p{margin-bottom:.45rem}
+.rules b{color:var(--paper)}
+footer{text-align:center;color:var(--dim);font-size:.78rem;padding:1.5rem 1rem 2.5rem;border-top:1px solid var(--line2)}
+footer a{color:var(--paper2);text-decoration:none;margin:0 .35rem}
+@media(max-width:720px){.grid2,.cols,.score{grid-template-columns:1fr}.dims{grid-template-columns:repeat(5,1fr)}}
+@media(prefers-reduced-motion:reduce){.gauge .bar .fm,.gauge .bar .fa{transition:none}.spin{animation:none}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">爱思乐园</a>
+  <a class="lnk" href="/games/">游戏实验室</a>
+  <a class="lnk" href="/taste/iq-scorer/">创新智商评分</a>
+  <span class="sp"></span>
+  <a class="lnk" href="/browse/">SDE 浏览</a>
+</nav>
+<main>
+  <h1><i>人</i> 与 <em>AI</em> 比智</h1>
+  <p class="lede">一个基底随机出一道日常生活题。你和另一个基底各自作答，互相批评，各自回应；最后由裁判基底按<a href="/taste/iq-scorer/">创新智商五维</a>盲评。谁的想法经得住批评，谁就留下来；三条命，输光即消失。</p>
+
+  <!-- ===== 存在计 ===== -->
+  <div class="gauge" id="gauge">
+    <div class="names"><span class="m">人 <small id="gNameM">你</small></span><span class="a"><small id="gNameA">对手</small> AI</span></div>
+    <div class="lives"><span class="m" id="livesM">● ● ●</span><span class="a" id="livesA">● ● ●</span></div>
+    <div class="bar"><div class="fm" id="barM" style="width:0"></div><div class="fa" id="barA" style="width:0"></div><div class="mid"></div></div>
+    <div class="cap"><span>存在值 <b id="capM">—</b></span><span id="capMid">第 0 题</span><span><b id="capA">—</b> 存在值</span></div>
+  </div>
+
+  <!-- ===== 设置台 ===== -->
+  <section class="setup" id="setup">
+    <h2>选定对手与裁判</h2>
+    <div class="grid2">
+      <div>
+        <label class="fld"><span>出题与裁判基底（负责出题、盲评）</span>
+          <div class="row"><select id="selJ"></select><select class="tier" id="tierJ"><option value="fast">快</option><option value="pro">强</option></select></div>
+        </label>
+        <label class="fld"><span>裁判 Key</span><input id="keyJ" type="password" autocomplete="off" placeholder="只存在你的浏览器本地"><div class="keyline" id="applyJ"></div></label>
+      </div>
+      <div>
+        <label class="fld"><span>对手基底（与你同题作答、互批）</span>
+          <div class="row"><select id="selA"></select><select class="tier" id="tierA"><option value="fast">快</option><option value="pro">强</option></select></div>
+        </label>
+        <label class="fld"><span>对手 Key</span><input id="keyA" type="password" autocomplete="off" placeholder="同一家可用同一把"><div class="keyline" id="applyA"></div></label>
+      </div>
+    </div>
+    <div class="opts">
+      <label>你的称呼 <input id="myName" style="width:110px;font:inherit;font-size:.86rem;background:#0E1326;color:var(--paper);border:1px solid var(--line);border-radius:6px;padding:.25rem .4rem" maxlength="10" placeholder="人"></label>
+      <label>作答限时 <select id="optT"><option value="180">3 分钟</option><option value="300" selected>5 分钟</option><option value="480">8 分钟</option><option value="0">不限</option></select></label>
+      <label>字数上限 <select id="optL"><option value="300">300 字</option><option value="500" selected>500 字</option><option value="800">800 字</option></select></label>
+      <label>命数 <select id="optH"><option value="1">1</option><option value="3" selected>3</option><option value="5">5</option></select></label>
+    </div>
+    <div class="btnrow">
+      <button class="btn man" id="btnStart">开擂：出第一题</button>
+      <span style="font-size:.8rem;color:var(--dim)">Key 直连各家官网（境外三家经本站纯转发），本站不经手、不保存。</span>
+    </div>
+    <div class="warn" id="warn"></div>
+  </section>
+
+  <!-- ===== 擂台 ===== -->
+  <section class="arena" id="arena">
+    <div class="steps" id="steps">
+      <span data-s="1">① 出题</span><span data-s="2">② 作答</span><span data-s="3">③ 互批</span><span data-s="4">④ 回应</span><span data-s="5">⑤ 裁决</span>
+    </div>
+    <div class="qcard">
+      <div class="k" id="qk">出题中</div>
+      <div class="q" id="qText"><span class="spin"></span>裁判基底正在出题……</div>
+      <div class="s" id="qScene"></div>
+      <div class="brief" id="qBrief"></div>
+    </div>
+
+    <div class="cols">
+      <!-- 人 -->
+      <div class="side man">
+        <h3><span id="hM">你的回答</span><span class="timer" id="timer"></span></h3>
+        <div id="mAnswerBox">
+          <textarea id="mAnswer" placeholder="用大白话写。追求的不是写得全，而是切出一个别人没切出的分辨，并说出它在什么情况下会被推翻。"></textarea>
+          <div class="cnt"><span id="cntM">0</span> / <span id="capL">500</span> 字</div>
+          <div class="btnrow"><button class="btn man" id="btnM">交卷</button></div>
+        </div>
+        <div class="stack" id="mStack"></div>
+      </div>
+      <!-- AI -->
+      <div class="side ai">
+        <h3><span id="hA">对手的回答</span><span class="timer" id="aiState"></span></h3>
+        <div id="aBody"><div class="veil">对手已开始作答；你交卷之后才会揭晓，免得抄。</div></div>
+        <div class="stack" id="aStack"></div>
+      </div>
+    </div>
+
+    <div class="err" id="err"></div>
+
+    <!-- 裁决 -->
+    <div class="verdict" id="verdict">
+      <h3>裁判裁决（盲评：裁判只见甲乙，不知谁是人）</h3>
+      <div class="score">
+        <div class="sc man" id="scM"></div>
+        <div class="sc ai" id="scA"></div>
+      </div>
+      <div class="final" id="finalLine"></div>
+      <div class="jw" id="jw"></div>
+      <div class="blind" id="blindNote"></div>
+      <div class="btnrow" style="justify-content:center">
+        <button class="btn" id="btnNext">下一题</button>
+        <button class="btn ghost" id="btnExport">导出本场记录</button>
+      </div>
+    </div>
+
+    <div class="endcard" id="endcard">
+      <div class="big" id="endBig"></div>
+      <p id="endP"></p>
+      <div class="btnrow" style="justify-content:center">
+        <button class="btn man" id="btnAgain">再来一场</button>
+        <button class="btn ghost" id="btnExport2">导出本场记录</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 战绩 ===== -->
+  <div class="log" id="log">
+    <h2>本机战绩（只存在你的浏览器）</h2>
+    <div id="logBody"><span style="font-size:.84rem;color:var(--dim)">还没有打过。</span></div>
+  </div>
+
+  <div class="rules">
+    <h2>比法</h2>
+    <p><b>出题。</b>裁判基底从几十个生活场景里抽一个，出一道没有标准答案、但人人都有真实经验的题。你和对手基底拿到的是一模一样的题与一模一样的要求。</p>
+    <p><b>作答。</b>两边同时写。对手的答案在你交卷之前是盖着的。</p>
+    <p><b>互批。</b>你批对手，对手批你——批的不是文采，是「这条分辨到底切不切得开」「什么情况下它会被推翻」。</p>
+    <p><b>回应。</b>各自回应对方的批评：认账、修正，或顶住。</p>
+    <p><b>裁决。</b>裁判基底只看到甲、乙两方（谁是甲随机），按 S 显露精确度、D 差异锐度、E 纠缠深度、I 不可还原性、F 可证伪性打分（100 = 基底默认回答的水平，130 = 资深，150 = 长出了一个新结构），再判每一方的核心主张在经过批评与回应之后还剩多少。<b>存在值 = 创新智商 × 幸存率</b>。存在值低的一方掉一条命；命数归零，即被判「消失」。</p>
+    <p>裁判也是基底，会偏心、会看走眼——所以裁决之下附了它的判词，你可以不服。想换个裁判再打一场，也行。</p>
+  </div>
+</main>
+<footer>
+  <a href="/games/">游戏实验室</a>·<a href="/taste/iq-scorer/">创新智商评分器</a>·<a href="/directory/">栏目总目录</a>·<a href="/">系统入口</a>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id);};
+var MOCK = /[?&]mock=1/.test(location.search);
+
+/* ───────── 七家基底（与站内其它智能体共用同一套 Key 存档） ───────── */
+var VENDORS = [
+  { v:'ds',    name:'DeepSeek',     ks:['sde_ds_key'],                 apply:'https://platform.deepseek.com',        url:'https://api.deepseek.com/v1/chat/completions' },
+  { v:'glm',   name:'智谱 GLM',     ks:['sde_glm_key'],                apply:'https://open.bigmodel.cn',             url:'https://open.bigmodel.cn/api/paas/v4/chat/completions' },
+  { v:'kimi',  name:'Kimi',         ks:['sde_kimi_key'],               apply:'https://platform.moonshot.cn',         url:'https://api.moonshot.cn/v1/chat/completions' },
+  { v:'qwen',  name:'千问 Qwen',    ks:['sde_qwen_key'],               apply:'https://bailian.console.aliyun.com',   url:'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions' },
+  { v:'gpt',   name:'GPT',          ks:['sde_gpt_key'],                apply:'https://platform.openai.com',          url:'https://api.openai.com/v1/chat/completions', overseas:true },
+  { v:'claude',name:'Claude',       ks:['sde_claude_key','sde_cl_key'],apply:'https://platform.claude.com',          url:'https://api.anthropic.com/v1/messages', overseas:true },
+  { v:'gemini',name:'Gemini',       ks:['sde_gemini_key'],             apply:'https://aistudio.google.com/apikey',   url:'https://generativelanguage.googleapis.com/v1beta/models', overseas:true }
+];
+var PROXY='/api/llm-proxy';
+function vinfo(v){ for(var i=0;i<VENDORS.length;i++) if(VENDORS[i].v===v) return VENDORS[i]; return VENDORS[0]; }
+function keyGet(v){ var vi=vinfo(v); for(var i=0;i<vi.ks.length;i++){ try{ var k=(localStorage.getItem(vi.ks[i])||'').trim(); if(k.length>=8) return k; }catch(e){} } return ''; }
+function keySet(v,k){ try{ localStorage.setItem(vinfo(v).ks[0],k); }catch(e){} }
+
+function payload(v,tier,sys,user,maxTok){
+  var cap=maxTok||3000;
+  var base={stream:false,messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:cap};
+  if(v==='ds'){ if(tier==='pro'){base.model='deepseek-v4-pro';base.thinking={type:'enabled'};base.reasoning_effort='high';} else {base.model='deepseek-v4-flash';base.thinking={type:'disabled'};base.temperature=0.9;} }
+  else if(v==='glm'){ if(tier==='pro'){base.model='glm-5';base.thinking={type:'enabled'};} else {base.model='glm-4-flash';base.temperature=0.9;} }
+  else if(v==='kimi'){ base.model=(tier==='pro')?'kimi-k2.6':'moonshot-v1-32k'; base.temperature=0.9; }
+  else if(v==='qwen'){ base.model=(tier==='pro')?'qwen3.7-max':'qwen-plus'; base.temperature=0.9; base.max_tokens=Math.min(cap,8192); }
+  else if(v==='gpt'){ base.model=(tier==='pro')?'gpt-5.5':'gpt-5.4'; base.max_completion_tokens=Math.max(cap,4000); delete base.max_tokens; base.reasoning_effort=(tier==='pro')?'high':'low'; }
+  else if(v==='claude'){ return {model:(tier==='pro')?'claude-opus-4-8':'claude-sonnet-4-6',max_tokens:cap,stream:false,system:sys,messages:[{role:'user',content:user}]}; }
+  else if(v==='gemini'){ return {systemInstruction:{parts:[{text:sys}]},contents:[{role:'user',parts:[{text:user}]}],generationConfig:{maxOutputTokens:cap,temperature:0.9}}; }
+  return base;
+}
+function extract(v,j){
+  var text='';
+  if(v==='claude'){ if(j.type==='error') throw new Error((j.error&&j.error.message)||'Anthropic 接口错误'); text=(j.content||[]).filter(function(b){return b&&b.type==='text';}).map(function(b){return b.text||'';}).join(''); }
+  else if(v==='gemini'){ var c=j.candidates&&j.candidates[0]; var p=c&&c.content&&c.content.parts; text=Array.isArray(p)?p.map(function(x){return x.text||'';}).join(''):''; if(!text&&j.promptFeedback&&j.promptFeedback.blockReason) throw new Error('Gemini 拦截：'+j.promptFeedback.blockReason); }
+  else { var ch=j.choices&&j.choices[0]; var m=(ch&&ch.message)||{}; text=m.content||''; if(Array.isArray(text)) text=text.map(function(x){return (x&&x.text)||'';}).join(''); }
+  return (text||'').trim();
+}
+var ABORTS=[];
+function stopAll(){ ABORTS.forEach(function(a){try{a.abort();}catch(e){}}); ABORTS=[]; }
+function call(v,tier,key,sys,user,maxTok,label){
+  if(MOCK) return mockCall(label,user);
+  var vi=vinfo(v), headers={'Content-Type':'application/json'}, url=vi.url;
+  if(vi.overseas){
+    url=PROXY;
+    if(v==='gpt'){ headers['Authorization']='Bearer '+key; headers['x-target-url']=vi.url; }
+    else if(v==='claude'){ headers['x-api-key']=key; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true'; headers['x-target-url']=vi.url; }
+    else if(v==='gemini'){ var gm=(tier==='pro')?'gemini-3.1-pro-preview':'gemini-2.5-flash'; headers['x-target-url']=vi.url+'/'+gm+':generateContent?key='+encodeURIComponent(key); }
+  } else headers['Authorization']='Bearer '+key;
+  var ac=new AbortController(); ABORTS.push(ac);
+  var killer=setTimeout(function(){try{ac.abort();}catch(e){}}, 10*60*1000);
+  return fetch(url,{method:'POST',headers:headers,body:JSON.stringify(payload(v,tier,sys,user,maxTok)),signal:ac.signal})
+    .catch(function(e){ throw new Error(label+'：'+(e.name==='AbortError'?'已中止或超时':'网络请求失败 '+e.message)); })
+    .then(function(r){
+      clearTimeout(killer);
+      if(!r.ok) return r.text().then(function(raw){ var d=''; try{var jj=JSON.parse(raw); d=(jj.error&&(jj.error.message||jj.error.type))||raw.slice(0,200);}catch(_){d=raw.slice(0,200)||r.statusText;} throw new Error(label+'：API '+r.status+' — '+d); });
+      return r.json().then(function(j){ if(j&&j.error) throw new Error(label+'：'+(j.error.message||j.error.code||'接口报错')); var t=extract(v,j); if(!t) throw new Error(label+'：返回为空'); return t; });
+    });
+}
+function parseJSON(t){
+  var s=String(t||'').replace(/```json|```/g,'').trim();
+  var a=s.indexOf('{'), b=s.lastIndexOf('}');
+  if(a>=0&&b>a) s=s.slice(a,b+1);
+  return JSON.parse(s);
+}
+
+/* ───────── 出题：几十个生活场景，随机抽 ───────── */
+var SCENES=['厨房里剩菜怎么处理','早高峰通勤','孩子写作业拖拉','邻居半夜太吵','手机电量总是不够','衣柜里的旧衣服','排队时的等待','家里的杂物抽屉','周末赖床','和父母打电话','家庭群里的养生文章','外卖点多了','朋友借钱','超市促销','养的植物总是死','丢三落四','失眠','减肥反弹','孩子问「为什么」','搬家收拾','请客吃饭点菜','老同学聚会','手机相册几万张照片','快递被放错','家务分工','宠物拆家','买了不用的健身卡','洗碗谁来','孩子不肯吃青菜','旅行前打包','堵车时的心情','社区停车位之争','退休后的一天','老人学用智能手机','孩子沉迷手机','同事的口头禅','闲鱼卖旧货','菜市场砍价','一个人吃饭','下雨没带伞','冰箱里过期的东西','早餐吃什么','电梯里遇到熟人','忘记密码','约会迟到','年夜饭吃什么','装修选颜色','孩子的压岁钱','跳广场舞','换灯泡','小区快递柜总满','送礼送什么','家里 Wi-Fi 很慢','热水器坏了','周末带娃去哪','记不住人名','拖延交水电费','做饭放多少盐','早起晨跑坚持不了','夜里刷短视频停不下来'];
+var SYS_ASK='你是「人与AI比智」擂台的出题官。出一道日常生活题：普通人都有真实经验、没有标准答案、但能比出思考深度——不是脑筋急转弯、不是知识问答、不是「怎么办」式的技巧题，而是那种一想就会发现自己从没想清楚过的问题。题面一句话，不超过 45 字；再配一句具体情境（不超过 60 字）帮助进入。不要出现任何学术术语。只输出 JSON：{"q":"题面","scene":"情境"}，不要别的文字、不要代码围栏。';
+function askQuestion(cfg,avoid){
+  var sc=SCENES[Math.floor(Math.random()*SCENES.length)];
+  var u='场景：'+sc+'\n随机数：'+Math.floor(Math.random()*9000+1000)+'\n'+(avoid.length?('这些题已经出过，避开同样的落点：\n- '+avoid.join('\n- ')+'\n'):'')+'请出题。';
+  return call(cfg.jv,cfg.jt,cfg.jk,SYS_ASK,u,800,'出题').then(function(t){ var j=parseJSON(t); if(!j.q) throw new Error('出题：没有题面'); return {q:String(j.q).trim(),scene:String(j.scene||'').trim(),sc:sc}; });
+}
+
+/* ───────── 参赛要求（人与 AI 一字不差） ───────── */
+function briefText(lim){ return '要求（双方相同）：用大白话，不超过 '+lim+' 字。别把常识重述一遍，别列一二三四；争取切出一条别人没切出的分辨——「这件事不是 X，而是 Z」——并说清它在什么情况下会被推翻。'; }
+function SYS_PLAYER(lim){ return '你是「人与AI比智」擂台的参赛者，对面是一个人。你们拿到同一道日常生活题。'+briefText(lim)+' 直接给出答案正文，不加标题、不加前言、不自报身份。'; }
+var SYS_CRITIC='你是「人与AI比智」擂台的参赛者，现在轮到你批评对方的回答。批的不是文采，是三件事：①对方那条核心分辨到底切不切得开——它能不能被一个大家早就知道的说法一比一换掉；②它在哪种常见情况下会被推翻；③它有没有回避掉这道题最难的那一处。不超过 250 字，大白话，直接写，不加标题、不客套。';
+var SYS_REPLY='你是「人与AI比智」擂台的参赛者，对方刚批评了你的回答。现在回应：哪一点你认账并修正，哪一点你顶住并说出为什么。不许推倒重写，不许换一个新答案。不超过 200 字，大白话，直接写。';
+
+/* ───────── 裁判（盲评） ───────── */
+var SYS_JUDGE='你是「人与AI比智」擂台的裁判，按「创新智商」五维给甲、乙两方盲评。你不知道谁是人谁是AI，也不要猜，更不要因此偏袒任何一方。\n五维（每维 60–170）：S 显露精确度（说得清不清、能不能被别人复述）；D 差异锐度（有没有切出一条旧说法切不开的分辨——权重最重）；E 纠缠深度（有没有让另一片经验真正进来顶住论证，而不只是借个比喻）；I 不可还原性（核心句能不能被一个现成的常识说法一比一换掉，能换掉就低）；F 可证伪性（有没有说出什么情况下自己会错；说不出的 F≤100）。\n刻度：100＝一个大模型不加提示的默认回答；130＝资深的人把已有道理讲得更好；150＝真的长出了一个此前没有的分辨。给高于 140 的分必须能指出具体证据，指不出一律降到 135 以下。\n再判「幸存率」（0–100）：经过对方的批评与本方的回应之后，这一方的核心主张还剩下多少立得住。被批中要害而回应只是嘴硬，幸存率要低；批评没打中，或回应真的修正并守住了，幸存率高。\n同时判两条批评各自的命中程度（0–10）。\n只输出 JSON，不要别的文字、不要代码围栏：{"jia":{"S":n,"D":n,"E":n,"I":n,"F":n,"surv":n,"note":"一句评语（≤60字）"},"yi":{同上},"hitJia":n,"hitYi":n,"verdict":"判词（≤150字，说清是哪一击决定了胜负）"}';
+function judgeDossier(q,scene,A,B){
+  return '题：'+q+'\n情境：'+scene+'\n\n【甲的回答】\n'+A.answer+'\n\n【乙的回答】\n'+B.answer+'\n\n【甲对乙的批评】\n'+A.critique+'\n\n【乙对甲的批评】\n'+B.critique+'\n\n【甲的回应】\n'+A.reply+'\n\n【乙的回应】\n'+B.reply+'\n\n请裁决。';
+}
+function weighted(d){ return d.S*0.20+d.D*0.25+d.E*0.20+d.I*0.20+d.F*0.15; }
+function clampDim(x){ x=Number(x); if(!isFinite(x)) return 100; return Math.max(60,Math.min(170,Math.round(x))); }
+function normSide(o){ o=o||{}; return {S:clampDim(o.S),D:clampDim(o.D),E:clampDim(o.E),I:clampDim(o.I),F:clampDim(o.F),surv:Math.max(0,Math.min(100,Math.round(Number(o.surv)||0))),note:String(o.note||'').slice(0,120)}; }
+
+/* ───────── 模拟（?mock=1）：不烧 Key 走一遍全流程 ───────── */
+function mockCall(label,user){
+  return new Promise(function(res){ setTimeout(function(){
+    if(label==='出题') res('{"q":"为什么剩菜总是被留到不能吃了才扔？","scene":"周三晚上，冰箱最里面那盒周日的红烧肉又被你往里推了推。"}');
+    else if(label==='对手作答') res('剩菜不是食物，是一张「我没有浪费」的收据。真正被留着的不是那盒肉，而是不必承认浪费的资格；扔掉的那一刻资格作废，所以我们等它自己变坏——坏掉的东西扔起来不算浪费。什么时候这条会被推翻：如果有人把剩菜留到坏，却从不觉得扔掉新鲜的东西有什么不妥，那这套「收据」的说法就不成立。');
+    else if(label==='对手批评') res('对方说的「舍不得」是大家早就知道的话，一比一就能换成「节俭习惯」，切不开新东西。而且它没回答最难的一处：为什么人明知会坏还往里推——「舍不得」解释不了明知故犯。');
+    else if(label==='对手回应') res('认账一点：「收据」这个说法确实还没说清为什么是冰箱而不是桌面承担这个功能——冰箱是「还没决定」的合法暂存处，我补上这一层。顶住一点：对方说这是自欺，但自欺是结果不是机制，我给的机制是「扔掉即结算」，这条我不让。');
+    else if(label==='裁决') res('{"jia":{"S":128,"D":141,"E":121,"I":132,"F":126,"surv":72,"note":"「收据」这条分辨切开了舍不得与不敢结算，但机制层仍薄。"},"yi":{"S":118,"D":109,"E":104,"I":98,"F":92,"surv":38,"note":"停在「舍不得」一层，被一比一换掉，且没给推翻条件。"},"hitJia":7,"hitYi":3,"verdict":"决定胜负的是甲那一击：乙的核心句能被「节俭习惯」原样替换，且没有说出自己何时会错。甲的回应补上了冰箱作为暂存处这一层，主张大体站住。"}');
+    else res('模拟输出：'+user.slice(0,40));
+  }, 500+Math.random()*700); });
+}
+
+/* ───────── 状态 ───────── */
+var G=null; // 本场
+var round=null; // 本题
+var timerId=null;
+
+function readCfg(){
+  var jv=$('selJ').value, av=$('selA').value;
+  var cfg={jv:jv,jt:$('tierJ').value,jk:($('keyJ').value||'').trim(),av:av,at:$('tierA').value,ak:($('keyA').value||'').trim(),
+    tlim:+$('optT').value,lim:+$('optL').value,hp:+$('optH').value,name:($('myName').value||'').trim()||'人'};
+  if(!MOCK){
+    if(cfg.jk.length<8) return {err:'裁判基底还没有 Key。'};
+    if(cfg.ak.length<8) return {err:'对手基底还没有 Key。'};
+  }
+  return cfg;
+}
+function setSteps(n){ var ss=$('steps').querySelectorAll('span'); ss.forEach(function(s){ var k=+s.getAttribute('data-s'); s.className=k<n?'done':(k===n?'on':''); }); }
+function hp(n,total){ var s=''; for(var i=0;i<total;i++) s+=(i<n?'●':'<span class="lost">●</span>')+(i<total-1?' ':''); return s; }
+function gaugeRender(){
+  if(!G) return;
+  $('gNameM').textContent=G.cfg.name; $('gNameA').textContent=vinfo(G.cfg.av).name;
+  $('livesM').innerHTML=hp(G.hpM,G.cfg.hp); $('livesA').innerHTML=hp(G.hpA,G.cfg.hp);
+  $('capMid').textContent='第 '+G.n+' 题';
+  var em=G.lastM, ea=G.lastA;
+  if(em==null){ $('barM').style.width='0'; $('barA').style.width='0'; $('capM').textContent='—'; $('capA').textContent='—'; return; }
+  var tot=em+ea||1; $('barM').style.width=(em/tot*100).toFixed(1)+'%'; $('barA').style.width=(ea/tot*100).toFixed(1)+'%';
+  $('capM').textContent=em.toFixed(1); $('capA').textContent=ea.toFixed(1);
+}
+function err(msg){ var e=$('err'); e.textContent=msg; e.classList.add('on'); }
+function errOff(){ $('err').classList.remove('on'); }
+function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+function blk(parent,lab,text,spin){ var d=document.createElement('div'); d.className='blk'; d.innerHTML='<div class="lab">'+esc(lab)+'</div><div class="txt">'+(spin?'<span class="spin"></span><span class="veil">'+esc(text)+'</span>':esc(text))+'</div>'; parent.appendChild(d); return d; }
+function cjkLen(s){ return String(s||'').replace(/\s/g,'').length; }
+
+/* ───────── 开擂 ───────── */
+$('btnStart').addEventListener('click',function(){
+  var cfg=readCfg(); if(cfg.err){ $('warn').textContent=cfg.err; $('warn').style.display='block'; return; }
+  $('warn').style.display='none';
+  if(!MOCK){ keySet(cfg.jv,cfg.jk); keySet(cfg.av,cfg.ak); }
+  G={cfg:cfg,hpM:cfg.hp,hpA:cfg.hp,n:0,lastM:null,lastA:null,rounds:[],asked:[],start:new Date()};
+  $('setup').style.display='none'; $('arena').classList.add('on'); $('endcard').classList.remove('on');
+  gaugeRender(); newRound();
+});
+$('btnNext').addEventListener('click',newRound);
+$('btnAgain').addEventListener('click',function(){ stopAll(); $('arena').classList.remove('on'); $('setup').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); });
+
+function newRound(){
+  if(!G) return; stopAll(); errOff();
+  G.n++; round={n:G.n,q:'',scene:'',m:{},a:{},blind:Math.random()<0.5?'MA':'AM',judge:null};
+  $('verdict').classList.remove('on'); $('mStack').innerHTML=''; $('aStack').innerHTML='';
+  $('mAnswer').value=''; $('cntM').textContent='0'; $('capL').textContent=G.cfg.lim; $('mAnswer').disabled=true; $('btnM').disabled=true;
+  $('mAnswerBox').style.display='block'; $('hM').textContent='你的回答'; $('hA').textContent='对手的回答';
+  $('aBody').innerHTML='<div class="veil">等出题。</div>'; $('aiState').textContent=''; $('timer').textContent='';
+  $('qk').textContent='第 '+G.n+' 题 · 出题中'; $('qText').innerHTML='<span class="spin"></span>'+esc(vinfo(G.cfg.jv).name)+' 正在出题……'; $('qScene').textContent=''; $('qBrief').textContent='';
+  setSteps(1); gaugeRender();
+  window.scrollTo({top:$('gauge').offsetTop-60,behavior:'smooth'});
+  askQuestion(G.cfg,G.asked.slice(-6)).then(function(r){
+    round.q=r.q; round.scene=r.scene; G.asked.push(r.q);
+    $('qk').textContent='第 '+G.n+' 题 · 场景「'+r.sc+'」 · 出题：'+vinfo(G.cfg.jv).name;
+    $('qText').textContent=r.q; $('qScene').textContent=r.scene; $('qBrief').textContent=briefText(G.cfg.lim);
+    startAnswer();
+  }).catch(function(e){ err(String(e.message||e)+'\n可以点「下一题」重新出题。'); showNext(); });
+}
+function showNext(){ $('verdict').classList.add('on'); $('scM').innerHTML=''; $('scA').innerHTML=''; $('finalLine').innerHTML=''; $('jw').textContent=''; $('blindNote').textContent=''; }
+
+/* ② 作答：AI 与人同时开写，AI 的先盖着 */
+function startAnswer(){
+  setSteps(2);
+  $('mAnswer').disabled=false; $('btnM').disabled=false; $('mAnswer').focus();
+  $('aBody').innerHTML='<div class="veil">对手已开始作答；你交卷之后才会揭晓，免得抄。</div>';
+  $('aiState').innerHTML='<span class="spin"></span>作答中';
+  var u='题：'+round.q+'\n情境：'+round.scene;
+  round.a.answerP=call(G.cfg.av,G.cfg.at,G.cfg.ak,SYS_PLAYER(G.cfg.lim),u,2500,'对手作答')
+    .then(function(t){ round.a.answer=t; $('aiState').textContent='已交卷'; return t; })
+    .catch(function(e){ round.a.answerErr=String(e.message||e); $('aiState').textContent='作答失败'; throw e; });
+  round.a.answerP.catch(function(){});
+  if(G.cfg.tlim>0){ var end=Date.now()+G.cfg.tlim*1000; clearInterval(timerId); timerId=setInterval(function(){ var left=Math.max(0,Math.round((end-Date.now())/1000)); var m=Math.floor(left/60), s=left%60; var t=$('timer'); t.textContent=m+':'+(s<10?'0':'')+s; t.className='timer'+(left<=30?' low':''); if(left<=0){ clearInterval(timerId); submitAnswer(true); } },500); }
+  else $('timer').textContent='不限时';
+}
+$('mAnswer').addEventListener('input',function(){ $('cntM').textContent=cjkLen(this.value); });
+$('btnM').addEventListener('click',function(){ submitAnswer(false); });
+function submitAnswer(auto){
+  if(!round||round.m.answer!=null) return;
+  var v=($('mAnswer').value||'').trim();
+  if(!auto && cjkLen(v)<10){ $('mAnswer').focus(); return; }
+  if(cjkLen(v)>G.cfg.lim*1.2){ alert('超过字数上限太多了，请删到 '+G.cfg.lim+' 字左右。'); return; }
+  clearInterval(timerId); $('timer').textContent=auto?'时间到':'已交卷';
+  round.m.answer=v||'（未作答）';
+  $('mAnswer').disabled=true; $('btnM').disabled=true;
+  $('mAnswerBox').style.display='none'; blk($('mStack'),'你的回答',round.m.answer);
+  // 揭晓对手答案
+  $('aBody').innerHTML='<div class="veil"><span class="spin"></span>等对手交卷……</div>';
+  round.a.answerP.then(function(t){ $('aBody').innerHTML='<div class="txt">'+esc(t)+'</div>'; startCritique(); })
+    .catch(function(e){ $('aBody').innerHTML='<div class="veil">对手作答失败。</div>'; err(String(e.message||e)+'\n本题作废，点「下一题」重出。'); showNext(); });
+}
+
+/* ③ 互批 */
+function startCritique(){
+  setSteps(3); errOff();
+  var ms=$('mStack'), as=$('aStack');
+  // AI 批人（并发跑）
+  var u='题：'+round.q+'\n情境：'+round.scene+'\n\n【你的回答】\n'+round.a.answer+'\n\n【对方的回答】\n'+round.m.answer+'\n\n请批评对方的回答。';
+  var aiBlk=blk(as,'对手对你的批评','对手正在写批评；你写完自己的再揭晓。',true);
+  round.a.critP=call(G.cfg.av,G.cfg.at,G.cfg.ak,SYS_CRITIC,u,1200,'对手批评').then(function(t){ round.a.critique=t; return t; });
+  round.a.critP.catch(function(){});
+  // 人批 AI
+  var d=document.createElement('div'); d.className='blk';
+  d.innerHTML='<div class="lab">你对对手的批评（≤250 字）</div><textarea id="mCrit" placeholder="它那条分辨切得开吗？能不能被一句大家早就知道的话一比一换掉？它在哪种常见情况下会被推翻？它躲开了这道题最难的哪一处？"></textarea><div class="cnt"><span id="cntC">0</span> / 250 字</div><div class="btnrow"><button class="btn man" id="btnC">提交批评</button></div>';
+  ms.appendChild(d); $('mCrit').focus();
+  $('mCrit').addEventListener('input',function(){ $('cntC').textContent=cjkLen(this.value); });
+  $('btnC').addEventListener('click',function(){
+    var v=($('mCrit').value||'').trim(); if(cjkLen(v)<6){ $('mCrit').focus(); return; }
+    round.m.critique=v; d.innerHTML='<div class="lab">你对对手的批评</div><div class="txt">'+esc(v)+'</div>';
+    round.a.critP.then(function(t){ aiBlk.innerHTML='<div class="lab">对手对你的批评</div><div class="txt">'+esc(t)+'</div>'; startReply(); })
+      .catch(function(e){ aiBlk.innerHTML='<div class="lab">对手对你的批评</div><div class="veil">对手没写出来。</div>'; round.a.critique='（未能提交批评）'; startReply(); });
+  });
+}
+
+/* ④ 回应 */
+function startReply(){
+  setSteps(4); errOff();
+  var ms=$('mStack'), as=$('aStack');
+  var u='题：'+round.q+'\n\n【你的回答】\n'+round.a.answer+'\n\n【对方对你的批评】\n'+round.m.critique+'\n\n请回应。';
+  var aiBlk=blk(as,'对手的回应','对手正在回应；你写完自己的再揭晓。',true);
+  round.a.replyP=call(G.cfg.av,G.cfg.at,G.cfg.ak,SYS_REPLY,u,1000,'对手回应').then(function(t){ round.a.reply=t; return t; });
+  round.a.replyP.catch(function(){});
+  var d=document.createElement('div'); d.className='blk';
+  d.innerHTML='<div class="lab">你的回应（≤200 字）</div><textarea id="mRep" placeholder="哪一点你认账并修正？哪一点你顶住，为什么？不推倒重写。"></textarea><div class="cnt"><span id="cntR">0</span> / 200 字</div><div class="btnrow"><button class="btn man" id="btnR">提交回应</button></div>';
+  ms.appendChild(d); $('mRep').focus();
+  $('mRep').addEventListener('input',function(){ $('cntR').textContent=cjkLen(this.value); });
+  $('btnR').addEventListener('click',function(){
+    var v=($('mRep').value||'').trim(); if(cjkLen(v)<4){ $('mRep').focus(); return; }
+    round.m.reply=v; d.innerHTML='<div class="lab">你的回应</div><div class="txt">'+esc(v)+'</div>';
+    round.a.replyP.then(function(t){ aiBlk.innerHTML='<div class="lab">对手的回应</div><div class="txt">'+esc(t)+'</div>'; startJudge(); })
+      .catch(function(){ aiBlk.innerHTML='<div class="lab">对手的回应</div><div class="veil">对手没写出来。</div>'; round.a.reply='（未能回应）'; startJudge(); });
+  });
+}
+
+/* ⑤ 裁决（盲：甲乙随机） */
+function startJudge(){
+  setSteps(5); errOff();
+  $('verdict').classList.add('on');
+  $('scM').innerHTML='<span class="spin"></span><span class="veil">'+esc(vinfo(G.cfg.jv).name)+' 裁判正在盲评……</span>'; $('scA').innerHTML='';
+  $('finalLine').innerHTML=''; $('jw').textContent=''; $('blindNote').textContent='';
+  $('btnNext').disabled=true;
+  var jia = round.blind==='MA'?round.m:round.a, yi = round.blind==='MA'?round.a:round.m;
+  call(G.cfg.jv,G.cfg.jt,G.cfg.jk,SYS_JUDGE,judgeDossier(round.q,round.scene,jia,yi),2000,'裁决')
+    .then(function(t){
+      var j=parseJSON(t);
+      var J=normSide(j.jia), Y=normSide(j.yi);
+      var RM = round.blind==='MA'?J:Y, RA = round.blind==='MA'?Y:J;
+      var hitM = round.blind==='MA'?j.hitJia:j.hitYi, hitA = round.blind==='MA'?j.hitYi:j.hitJia;
+      RM.iq=weighted(RM); RA.iq=weighted(RA); RM.exist=RM.iq*RM.surv/100; RA.exist=RA.iq*RA.surv/100;
+      round.judge={m:RM,a:RA,hitM:+hitM||0,hitA:+hitA||0,verdict:String(j.verdict||'')};
+      settle();
+    })
+    .catch(function(e){ err('裁决失败：'+String(e.message||e)+'\n可以重新裁决一次。'); $('scM').innerHTML=''; $('btnNext').disabled=false; var b=document.createElement('button'); b.className='btn ghost'; b.textContent='重新裁决'; b.onclick=function(){ b.remove(); startJudge(); }; $('err').appendChild(document.createElement('br')); $('err').appendChild(b); });
+}
+function scCard(el,who,R,hit,name){
+  var g=function(k){ return '<div'+((k==='I'||k==='F')?' class="gate"':'')+'><b>'+R[k]+'</b>'+k+'</div>'; };
+  el.innerHTML='<div class="who"><span>'+esc(name)+'</span><b>'+R.iq.toFixed(1)+'</b></div>'
+    +'<div class="dims">'+g('S')+g('D')+g('E')+g('I')+g('F')+'</div>'
+    +'<div class="surv">经批评与回应后幸存率 <b>'+R.surv+'%</b> · 你打出的批评命中 <b>'+hit+'/10</b></div>'
+    +'<div class="exist">存在值 <b>'+R.exist.toFixed(1)+'</b></div>'
+    +(R.note?'<div class="note">'+esc(R.note)+'</div>':'');
+}
+function settle(){
+  var j=round.judge, RM=j.m, RA=j.a;
+  scCard($('scM'),'m',RM,j.hitM,G.cfg.name); scCard($('scA'),'a',RA,j.hitA,vinfo(G.cfg.av).name);
+  var win = RM.exist>RA.exist+0.05?'M':(RA.exist>RM.exist+0.05?'A':'T');
+  if(win==='A') G.hpM--; else if(win==='M') G.hpA--;
+  G.lastM=RM.exist; G.lastA=RA.exist;
+  round.win=win; G.rounds.push(round);
+  var fl=$('finalLine');
+  if(win==='M') fl.innerHTML='本题 <b class="m">'+esc(G.cfg.name)+'</b> 存在，'+esc(vinfo(G.cfg.av).name)+' 掉一条命';
+  else if(win==='A') fl.innerHTML='本题 <b class="a">'+esc(vinfo(G.cfg.av).name)+'</b> 存在，你掉一条命';
+  else fl.innerHTML='本题打平，双方都留下来';
+  $('jw').textContent=j.verdict;
+  $('blindNote').textContent='盲评编号：本题你是「'+(round.blind==='MA'?'甲':'乙')+'」。创新智商＝S×.20＋D×.25＋E×.20＋I×.20＋F×.15；存在值＝创新智商×幸存率。';
+  $('btnNext').disabled=false; gaugeRender(); saveStats();
+  if(G.hpM<=0||G.hpA<=0){
+    var e=$('endcard'), b=$('endBig');
+    if(G.hpM<=0){ b.className='big a'; b.textContent=vinfo(G.cfg.av).name+' 存在，'+G.cfg.name+' 消失'; $('endP').textContent='这一场 '+G.n+' 题。裁判是 '+vinfo(G.cfg.jv).name+'，它也可能看走眼——换个裁判、换个对手，再打。'; }
+    else { b.className='big m'; b.textContent=G.cfg.name+' 存在，'+vinfo(G.cfg.av).name+' 消失'; $('endP').textContent='这一场 '+G.n+' 题。想更有说服力，换一家更强的对手基底、把裁判切到「强」档再打一场。'; }
+    e.classList.add('on'); $('btnNext').disabled=true;
+    setTimeout(function(){ e.scrollIntoView({behavior:'smooth',block:'center'}); },300);
+  }
+}
+
+/* ───────── 战绩与导出 ───────── */
+var SK='sde_duel_stats';
+function loadStats(){ try{ return JSON.parse(localStorage.getItem(SK)||'[]'); }catch(e){ return []; } }
+function saveStats(){
+  var st=loadStats(); var id=G.start.getTime();
+  var rec={id:id,t:G.start.toISOString().slice(0,16).replace('T',' '),name:G.cfg.name,ai:G.cfg.av,judge:G.cfg.jv,n:G.n,wM:G.rounds.filter(function(r){return r.win==='M';}).length,wA:G.rounds.filter(function(r){return r.win==='A';}).length,over:G.hpM<=0?'A':(G.hpA<=0?'M':'')};
+  var i=-1; for(var k=0;k<st.length;k++) if(st[k].id===id){ i=k; break; }
+  if(i>=0) st[i]=rec; else st.push(rec);
+  if(st.length>40) st=st.slice(-40);
+  try{ localStorage.setItem(SK,JSON.stringify(st)); }catch(e){}
+  renderStats();
+}
+function renderStats(){
+  var st=loadStats(); if(!st.length) return;
+  var h='<table><tr><th>时间</th><th>人</th><th>对手</th><th>裁判</th><th>题数</th><th>人胜</th><th>AI胜</th><th>终局</th></tr>';
+  st.slice().reverse().forEach(function(r){ h+='<tr><td>'+esc(r.t)+'</td><td class="m">'+esc(r.name)+'</td><td class="a">'+esc(vinfo(r.ai).name)+'</td><td>'+esc(vinfo(r.judge).name)+'</td><td>'+r.n+'</td><td class="m">'+r.wM+'</td><td class="a">'+r.wA+'</td><td>'+(r.over==='M'?'人存在':(r.over==='A'?'AI 存在':'未完'))+'</td></tr>'; });
+  $('logBody').innerHTML=h+'</table>';
+}
+function exportMd(){
+  if(!G) return;
+  var an=vinfo(G.cfg.av).name, jn=vinfo(G.cfg.jv).name;
+  var s='# 人与AI比智 · 对局记录\n\n- 时间：'+G.start.toLocaleString()+'\n- 人：'+G.cfg.name+'\n- 对手基底：'+an+'（'+G.cfg.at+'）\n- 出题与裁判基底：'+jn+'（'+G.cfg.jt+'）\n- 命数：'+G.cfg.hp+'\n\n';
+  G.rounds.forEach(function(r){
+    var j=r.judge||{};
+    s+='## 第 '+r.n+' 题\n\n**题：**'+r.q+'\n\n**情境：**'+r.scene+'\n\n### '+G.cfg.name+' 的回答\n\n'+r.m.answer+'\n\n### '+an+' 的回答\n\n'+r.a.answer+'\n\n### '+G.cfg.name+' 批 '+an+'\n\n'+(r.m.critique||'')+'\n\n### '+an+' 批 '+G.cfg.name+'\n\n'+(r.a.critique||'')+'\n\n### '+G.cfg.name+' 的回应\n\n'+(r.m.reply||'')+'\n\n### '+an+' 的回应\n\n'+(r.a.reply||'')+'\n\n';
+    if(j.m){ var f=function(R){ return 'S'+R.S+' D'+R.D+' E'+R.E+' I'+R.I+' F'+R.F+' → 创新智商 '+R.iq.toFixed(1)+'，幸存率 '+R.surv+'%，存在值 '+R.exist.toFixed(1)+(R.note?'（'+R.note+'）':''); };
+      s+='### 裁决（'+jn+'，盲评，本题人为「'+(r.blind==='MA'?'甲':'乙')+'」）\n\n- '+G.cfg.name+'：'+f(j.m)+'\n- '+an+'：'+f(j.a)+'\n- 批评命中：'+G.cfg.name+' '+j.hitM+'/10，'+an+' '+j.hitA+'/10\n- 判词：'+j.verdict+'\n- 本题：'+(r.win==='M'?G.cfg.name+' 存在':(r.win==='A'?an+' 存在':'平'))+'\n\n'; }
+  });
+  s+='---\n\n剩余命数：'+G.cfg.name+' '+G.hpM+' / '+an+' '+G.hpA+'\n\n生成于 sdeuniverses.com/games/ai-duel/\n';
+  var b=new Blob([s],{type:'text/markdown;charset=utf-8'}); var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='人与AI比智-'+G.start.toISOString().slice(0,10)+'.md'; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },800);
+}
+$('btnExport').addEventListener('click',exportMd); $('btnExport2').addEventListener('click',exportMd);
+
+/* ───────── 设置台初始化 ───────── */
+function fillSel(sel,def){ VENDORS.forEach(function(v){ var o=document.createElement('option'); o.value=v.v; o.textContent=v.name; sel.appendChild(o); }); sel.value=def; }
+function wireKey(selId,keyId,applyId){
+  var sel=$(selId), key=$(keyId), ap=$(applyId);
+  var fill=function(){ var vi=vinfo(sel.value); key.value=keyGet(sel.value); ap.innerHTML=(key.value?'已从本机带出。':'还没有 Key：')+'<a href="'+vi.apply+'" target="_blank" rel="noopener">去 '+esc(vi.name)+' 申请</a>'+(vi.overseas?' · 境外家，经本站纯转发':''); };
+  sel.addEventListener('change',fill); fill();
+  key.addEventListener('input',function(){ var v=(key.value||'').trim(); if(v.length>=8) keySet(sel.value,v); });
+}
+fillSel($('selJ'),'ds'); fillSel($('selA'),'glm');
+wireKey('selJ','keyJ','applyJ'); wireKey('selA','keyA','applyA');
+renderStats();
+if(MOCK){ $('keyJ').value='mock-mock-mock'; $('keyA').value='mock-mock-mock'; $('warn').textContent='模拟模式：不调用任何基底，所有回答都是假的，只为走一遍流程。'; $('warn').style.display='block'; }
+window.__duel={get G(){return G;},get round(){return round;},submitAnswer:submitAnswer,VENDORS:VENDORS};
+})();
+</script>
+</body>
+</html>
