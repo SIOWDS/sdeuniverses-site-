@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>综述论文生成器 · 十道工序：主题与研究问题进，研究指导总纲出 | SDE Universes</title>
-<meta name="description" content="输入学科主题、研究问题，注明 What／How／Why 类型，按《SDE 综述生成 Skill》十道工序生成一篇作为研究指导总纲的综述：立题闸→文献采集（OpenAlex，三层×可核出处）→逐篇 SDE 解构卡→整图→表面挑战→五大发生挑战→现有方案的不足→SDE 维度碰撞（学科内：三维代表卡×断链撞出 Z，并把 Z 施于全部卡做真跑）→SDE 猜想解决（碰撞级／改判级；占位者实搜＋读数按形状去 OpenAlex／Crossref／Semantic Scholar 三库查隔壁的名字）→分节成文。可另上传自己的论文全文。用你自己的大模型 Key（只存本地）。">
+<meta name="description" content="输入学科主题、研究问题，注明 What／How／Why 类型，按《SDE 综述生成 Skill》十道工序生成一篇作为研究指导总纲的综述：立题闸→文献采集（OpenAlex，三层×可核出处）→逐篇 SDE 解构卡→整图→表面挑战→五大发生挑战→现有方案的不足→SDE 维度碰撞（学科内：三维代表卡×断链撞出 Z，并把 Z 施于全部卡做真跑）→SDE 猜想解决（典范级／碰撞级／改判级；占位者实搜＋读数按形状去 OpenAlex／Crossref／Semantic Scholar 三库查隔壁的名字）→分节成文。可另上传自己的论文全文。用你自己的大模型 Key（只存本地）。">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -253,7 +253,7 @@ input[type=text].wide{max-width:none}
   <div id="results"></div>
 </main>
 
-<div class="foot">由大模型生成，观点供思考参考；引注只取自工序②清单，每条自带 DOI／出处，请以原文核对。文献采集走 OpenAlex 官方开放接口（浏览器直连，不经本站）；上传文件全部在你本机浏览器内解析，绝不上传；正文与 API Key 只在你选定基底时发往该基底，本站不留存。敌拓闸第二道走 Crossref 与 Semantic Scholar 的公开接口（同样浏览器直连）。规范层：SDE 学派《SDE 综述生成 Skill》v1.4（十道工序＋敌拓闸两道＋⑧之二学科内维度碰撞）。sdeuniverses.com</div>
+<div class="foot">由大模型生成，观点供思考参考；引注只取自工序②清单，每条自带 DOI／出处，请以原文核对。文献采集走 OpenAlex 官方开放接口（浏览器直连，不经本站）；上传文件全部在你本机浏览器内解析，绝不上传；正文与 API Key 只在你选定基底时发往该基底，本站不留存。敌拓闸第二道走 Crossref 与 Semantic Scholar 的公开接口（同样浏览器直连）。规范层：SDE 学派《SDE 综述生成 Skill》v1.4.1（十道工序＋敌拓闸两道＋⑧之二学科内维度碰撞，三档标级：典范级／碰撞级／改判级）。sdeuniverses.com</div>
 
 <script>
 (function(){
@@ -1025,7 +1025,7 @@ function selfCheck(){
   var cj=state.collideJson||{};
   out.push({n:"主碰撞卡齐全；三家各站一维且全在清单内；旗舰读数不归入六型",ok:!!state.collide&&/共有前提[：:]/.test(state.collide)&&/Z[：:]/.test(state.collide)&&/旗舰读数[：:]/.test(state.collide)&&/碰撞挑战[：:]/.test(state.collide)&&Array.isArray(cj.homes)&&cj.homes.length===3&&cj.homes.every(function(n){return parseInt(n,10)>=1&&parseInt(n,10)<=N;})&&cj.shapeFree===true&&!/机检：三家/.test(state.log.f8b||"")});
   out.push({n:"主碰撞真跑已执行并照登（支持／判负）",ok:!!state.collideRun&&/支持|判负/.test(state.collideRun)});
-  out.push({n:"五条猜想各标级，至少一条碰撞级；第 7 节有第六条碰撞挑战",ok:(state.conjectures.match(/级别[：:]\s*(碰撞级|改判级)/g)||[]).length>=5&&(/级别[：:]\s*碰撞级/.test(state.conjectures)||/判负/.test(state.collideRun))&&/碰撞挑战|挑战\s*[六6]/.test(state.challenges+all)});
+  out.push({n:"五条猜想各标级（典范／碰撞／改判三档），至少一条碰撞级或典范级（不计判负）；第 7 节有第六条碰撞挑战",ok:(state.conjectures.match(/级别[：:]\s*(典范级|碰撞级|改判级)/g)||[]).length>=5&&(/级别[：:]\s*(典范级|碰撞级)(?!·判负)/.test(state.conjectures)||/判负/.test(state.collideRun))&&/碰撞挑战|挑战\s*[六6]/.test(state.challenges+all)});
   return out;
 }
 function logText(){

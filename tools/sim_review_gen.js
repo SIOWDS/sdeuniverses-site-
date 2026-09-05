@@ -94,11 +94,12 @@ if (fs.existsSync(PAGE_P)) {
   ok("页面无 href=\"#\" 死链", !/href="#"/.test(PG));
   ok("页面有工序⑤之二敌拓闸阶段（neighbors/verdict）", PG.indexOf('mode:"neighbors"') > 0 && PG.indexOf('mode:"verdict"') > 0);
   ok("页面有 How-卡路径机检 routeCheck", PG.indexOf("function routeCheck(") > 0);
-  ok("Skill 是 v1.4 且含工序⑤之二两道与⑧之二维度碰撞", /version:\s*1\.4/.test(SKILL) && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
+  ok("Skill 是 v1.4.1 且含工序⑤之二两道与⑧之二维度碰撞、典范判据", /version:\s*1\.4\.1/.test(SKILL) && SKILL.indexOf("典范判据") > 0 && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
   /* v1.4：⑧之二 学科内维度碰撞 */
   ok("collide 提示：三家取自清单内、不得同维、共有前提＝断链、六型对照、删维测试、碰撞挑战", /rmode === "collide"[\s\S]*?不得同维[\s\S]*?六型[\s\S]*?删维测试[\s\S]*?碰撞挑战/.test(WSRC));
   ok("collide_run 提示：判负照登、不得改口", /rmode === "collide_run"[\s\S]*?判负照登/.test(WSRC));
-  ok("conjectures 带级别（碰撞级／改判级）且 QUERIES 带 level", WSRC.indexOf("级别：碰撞级") > 0 && /\\"level\\"/.test(WSRC));
+  ok("conjectures 带三档级别（典范／碰撞／改判）且 QUERIES 带 level", WSRC.indexOf("级别：典范级") > 0 && WSRC.indexOf("级别：碰撞级") > 0 && /\\"level\\"/.test(WSRC));
+  ok("collide 提示含 v1.4.1 六处修补（How 主家／对象对照／借用／级别裁定）", WSRC.indexOf("起手维等于落格路径落点维") > 0 && WSRC.indexOf("它数的是〈什么〉") > 0 && WSRC.indexOf("借用") > 0 && WSRC.indexOf("级别裁定") > 0);
   ok("conjectures 守恒式两边不同事件集", WSRC.indexOf("不同的事件集") > 0);
   ok("页面有 ⑧之二 阶段与 runCollide", PG.indexOf('mode:"collide"') > 0 && PG.indexOf('mode:"collide_run"') > 0 && PG.indexOf("function runCollide(") > 0 && PG.indexOf('data-s="collide"') > 0);
   ok("页面导出 md 含 ⑧之二", PG.indexOf("### ⑧之二 维度碰撞卡") > 0);

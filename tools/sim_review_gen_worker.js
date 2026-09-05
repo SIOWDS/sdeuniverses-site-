@@ -67,6 +67,8 @@ const cases=[
     if(c.mode==="conjectures"&&!(/撤下条件/.test(r.sys)&&/形状/.test(r.sys)&&/闭环/.test(r.sys)&&/频率/.test(r.sys))) flags.push("conjectures 缺 v1.3 撤下/形状/闭环/频率");
     if(c.mode==="map"&&!/摘要级/.test(r.sys)) flags.push("map 缺空格分级");
     if(c.mode==="collide"&&!(/不得同维/.test(r.sys)&&/断链/.test(r.sys)&&/六型/.test(r.sys)&&/碰撞挑战/.test(r.sys))) flags.push("collide 缺 v1.4 纪律");
+    if(c.mode==="collide"&&!(/起手维等于落格路径落点维/.test(r.sys)&&/借用/.test(r.sys)&&/典范级/.test(r.sys))) flags.push("collide 缺 v1.4.1 修补");
+    if(c.mode==="conjectures"&&!/典范级/.test(r.sys)) flags.push("conjectures 缺三档");
     if(c.mode==="collide_run"&&!/判负照登/.test(r.sys)) flags.push("collide_run 缺判负照登");
     if(c.mode==="conjectures"&&!(/碰撞级/.test(r.sys)&&/碰撞卡/.test(r.usr))) flags.push("conjectures 未吃碰撞卡/未标级");
     if(c.mode==="write"&&c.sec>=6&&c.sec<11&&!/碰撞卡/.test(r.usr)) flags.push("write sec"+c.sec+" 未喂碰撞卡");
