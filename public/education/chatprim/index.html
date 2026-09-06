@@ -202,8 +202,11 @@ function paintPick(){
   seedsEl.innerHTML=h;
   var ss=seedsEl.querySelectorAll(".seed");
   for(var j=0;j<ss.length;j++) ss[j].onclick=function(){ ask(this.textContent); };
+  paintCtx();
+}
+function paintCtx(){
   ctx.innerHTML='<span><b>'+["","","","","四","五","六"][+GRADE()]+'年级</b> · <b>'+SUBJ[SUB()].n+'</b>'+
-    (NICK()?(' · '+esc(NICK())):'')+'</span><button type="button" id="ctxChg">换一换</button>';
+    (NICK()?(' · '+esc(NICK())):'')+((PROF().done||[]).length?(' · ✨ 已做成 <b>'+(PROF().done||[]).length+'</b> 件'):'')+'</span><button type="button" id="ctxChg">换一换</button>';
   document.getElementById("ctxChg").onclick=function(){ if(busy) return; if(HIST.length&&!confirm("换年级或学科会开一场新对话，好吗？")) return; newChat(); };
 }
 hero.addEventListener("click",function(e){
@@ -357,6 +360,7 @@ function ask(text,redo){
     if(ok&&sp.text){
       var got=mergeProf(sp.prof);
       if(got.length){ var l=document.createElement("div"); l.className="learned"; l.textContent="📒 记进档案："+got.join("；"); m.body.appendChild(l); }
+      paintCtx();
       mk("重答",function(){ if(busy) return; feed.removeChild(m.box); if(HIST.length&&HIST[HIST.length-1].role==="assistant") HIST.pop();
         ask(HIST.length?HIST[HIST.length-1].content:"",true); });
       HIST.push({role:"assistant",content:sp.text});
