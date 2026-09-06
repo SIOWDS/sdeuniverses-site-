@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<title>合并工厂 · 乘法发生学小游戏 · ChatPrim</title>
+<meta name="description" content="合并工厂：把「几个几」做成 2048 的合并机制。格子是「3个4」这样的货箱，合并就是个数相加；第一次出现新个数时先猜积再落格，× 号在你猜对之后才亮起来。三关：基数 3 → 基数 6 → 你来定基数。">
+<link rel="canonical" href="https://sdeuniverses.com/education/chatprim/games/merge/">
+<meta name="theme-color" content="#FFF8EC">
+<style>
+:root{--paper:#FFF8EC;--paper2:#fff;--ink:#2B2A33;--ink2:#6E6A7A;--edge:rgba(43,42,51,.14);--sky:#2E7DD1;--peach:#E8734A;--leaf:#3C9A6A;--sun:#E9A32B;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.7;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 12px 30px}
+a{color:var(--sky);text-decoration:none}
+button{font:inherit}
+.top{width:100%;max-width:520px;display:flex;align-items:center;gap:10px;height:54px}
+.top a.b{color:var(--ink2);font-size:13px}
+.top .t{font-weight:700;font-size:19px}
+.top .sp{margin-left:auto}
+.top button{border:1px solid var(--edge);background:#fff;border-radius:10px;padding:4px 10px;cursor:pointer;font-size:13px;color:var(--ink2)}
+.hud{width:100%;max-width:520px;display:flex;gap:8px;margin:4px 0 10px;flex-wrap:wrap}
+.hud .c{flex:1 1 auto;background:#fff;border:1px solid var(--edge);border-radius:12px;padding:6px 12px;min-width:90px}
+.hud .k{font-size:11px;letter-spacing:.12em;color:var(--ink2);font-family:var(--mono)}
+.hud .v{font-size:20px;font-weight:700}
+.hud .v small{font-size:13px;color:var(--ink2);font-weight:400;margin-left:4px}
+.board{position:relative;touch-action:none;width:min(92vw,440px);height:min(92vw,440px);background:#E9DDC4;border-radius:16px;padding:8px;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:8px}
+.cell{background:rgba(255,255,255,.45);border-radius:12px}
+.tile{position:absolute;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;transition:left .12s,top .12s;line-height:1.15;user-select:none}
+.tile .n{font-size:clamp(14px,4.2vw,22px)}
+.tile .x{font-size:clamp(11px,3vw,15px);font-weight:600;opacity:.85;font-family:var(--mono)}
+.tile .q{font-size:clamp(18px,5vw,26px)}
+.tile.pop{animation:pop .18s ease-out}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+.tile.gold{box-shadow:0 0 0 3px var(--sun) inset}
+.lgd{width:100%;max-width:520px;margin-top:12px;font-size:13.5px;color:#4E4A5C;background:#fff;border:1px solid var(--edge);border-radius:12px;padding:10px 14px}
+.lgd b{color:var(--ink)}
+.found{width:100%;max-width:520px;margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+.found span{font-family:var(--mono);font-size:12.5px;background:rgba(60,154,106,.12);color:var(--leaf);border-radius:999px;padding:2px 10px}
+.mask{position:fixed;inset:0;background:rgba(43,42,51,.5);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
+.panel{background:#fff;border-radius:18px;padding:22px 22px 18px;width:100%;max-width:400px;text-align:center}
+.panel h2{margin:0 0 6px;font-size:20px}
+.panel p{margin:0 0 12px;color:#4E4A5C;font-size:15px}
+.panel .big{font-size:30px;font-weight:700;margin:6px 0 12px}
+.opts{display:grid;gap:8px}
+.opts button{border:1.5px solid var(--edge);background:var(--paper);border-radius:12px;padding:11px;font-size:20px;font-weight:700;cursor:pointer}
+.opts button:hover{border-color:var(--sky)}
+.opts button.bad{border-color:var(--peach);background:rgba(232,115,74,.12);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.panel .row{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.panel .row button{border:0;background:var(--sky);color:#fff;border-radius:12px;padding:9px 18px;font-size:15px;font-weight:600;cursor:pointer}
+.panel .row button.sec{background:#fff;color:var(--ink);border:1.5px solid var(--edge)}
+.panel input{width:90px;font-size:22px;text-align:center;border:1.5px solid var(--edge);border-radius:10px;padding:6px}
+.hint{font-size:13px;color:var(--ink2)}
+.ok{color:var(--leaf);font-weight:700}
+</style>
+</head>
+<body>
+<div class="top"><a class="b" href="/education/chatprim/">← ChatPrim</a><span class="t">🏭 合并工厂</span><span class="sp"></span><button id="btnHow" type="button">怎么玩</button><button id="btnNew" type="button">重开</button></div>
+<div class="hud">
+  <div class="c"><div class="k">关卡</div><div class="v" id="hLv">1<small id="hBase"></small></div></div>
+  <div class="c"><div class="k">自己找到的</div><div class="v" id="hFound">0</div></div>
+  <div class="c"><div class="k">出厂货箱</div><div class="v" id="hShip">0<small>/ 3</small></div></div>
+</div>
+<div class="board" id="board"></div>
+<div class="found" id="found"></div>
+<div class="lgd" id="lgd"></div>
+<script>
+(function(){
+"use strict";
+var LV=[{base:3,name:"第 1 关 · 每箱 3 颗"},{base:6,name:"第 2 关 · 每箱 6 颗"},{base:0,name:"第 3 关 · 你来定每箱几颗"}];
+var lv=0, base=3, grid, tiles, found={}, foundN=0, ship=0, busy=false, idc=0, pending=[];
+var board=document.getElementById("board"), foundEl=document.getElementById("found");
+var CAP=10, NEED=3;
+function ls(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }
+function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+for(var i=0;i<16;i++){ var c=document.createElement("div"); c.className="cell"; board.appendChild(c); }
+function cellPos(r,c){ var w=(board.clientWidth-16-24)/4; return {x:8+c*(w+8),y:8+r*(w+8),w:w}; }
+function color(k){ var h=[200,150,90,30,330,270,20,110,240,50][k%10]; return "hsl("+h+" 70% "+(88-k*3)+"%)"; }
+
+function legend(){
+  document.getElementById("hLv").innerHTML=(lv+1)+'<small id="hBase">每箱 '+base+' 颗</small>';
+  document.getElementById("hFound").textContent=foundN;
+  document.getElementById("hShip").innerHTML=ship+'<small>/ '+NEED+'</small>';
+  document.getElementById("lgd").innerHTML='<b>'+esc(LV[lv].name)+'</b> · 方向键或滑动，把货箱推到一起就<b>并箱</b>：「2个'+base+'」＋「3个'+base+'」＝「5个'+base+'」。第一次出现一个新个数，先猜这箱一共几颗，猜对了 × 才亮。凑满 <b>10个'+base+'</b> 的大箱就出厂，出厂 '+NEED+' 箱过关。';
+  var h=""; for(var k=1;k<=CAP;k++) if(found[k]) h+='<span>'+k+'×'+base+'='+(k*base)+'</span>';
+  foundEl.innerHTML=h;
+}
+function setup(){
+  grid=[]; tiles={}; found={}; foundN=0; ship=0; pending=[]; busy=false;
+  for(var r=0;r<4;r++){ grid.push([null,null,null,null]); }
+  var old=board.querySelectorAll(".tile"); for(var i=0;i<old.length;i++) board.removeChild(old[i]);
+  spawn(); spawn(); legend(); paint();
+}
+function spawn(){
+  var empt=[]; for(var r=0;r<4;r++) for(var c=0;c<4;c++) if(!grid[r][c]) empt.push([r,c]);
+  if(!empt.length) return false;
+  var p=empt[Math.floor(Math.random()*empt.length)];
+  var k=Math.random()<.75?1:2;
+  grid[p[0]][p[1]]={id:++idc,k:k,r:p[0],c:p[1],fresh:true};
+  return true;
+}
+function tileHTML(t){
+  var seen=!!found[t.k];
+  return '<div class="n">'+t.k+'个'+base+'</div>'+(seen?('<div class="x">'+t.k+'×'+base+'='+(t.k*base)+'</div>'):'<div class="q">?</div>');
+}
+function paint(){
+  var live={};
+  for(var r=0;r<4;r++) for(var c=0;c<4;c++){ var t=grid[r][c]; if(!t) continue; live[t.id]=1;
+    var el=tiles[t.id]; var p=cellPos(r,c);
+    if(!el){ el=document.createElement("div"); el.className="tile pop"; board.appendChild(el); tiles[t.id]=el; }
+    el.style.left=p.x+"px"; el.style.top=p.y+"px"; el.style.width=p.w+"px"; el.style.height=p.w+"px";
+    el.style.background=color(t.k); el.innerHTML=tileHTML(t); el.className="tile"+(t.fresh?" pop":"")+(t.k>=CAP?" gold":""); t.fresh=false;
+  }
+  for(var id in tiles){ if(!live[id]){ board.removeChild(tiles[id]); delete tiles[id]; } }
+}
+/* 一次推动：行列压缩；相邻两箱个数之和 ≤ 10 就并（不是只并相同的），并箱产生的新个数若首次出现，入猜积队列 */
+function move(dir){
+  if(busy) return;
+  var moved=false, lines=[];
+  for(var i=0;i<4;i++){
+    var line=[]; for(var j=0;j<4;j++){ var rc=idx(dir,i,j); var t=grid[rc[0]][rc[1]]; if(t) line.push(t); }
+    var out=[], j2=0;
+    while(j2<line.length){
+      var a=line[j2], b=line[j2+1];
+      if(b&&a.k+b.k<=CAP&&!a.locked&&!b.locked){ var m={id:++idc,k:a.k+b.k,fresh:true}; out.push(m); if(!found[m.k]) pending.push(m.k); j2+=2; }
+      else { out.push(a); j2++; }
+    }
+    lines.push(out);
+  }
+  for(var i2=0;i2<4;i2++){ for(var j3=0;j3<4;j3++){ var rc2=idx(dir,i2,j3); var nt=lines[i2][j3]||null; var ot=grid[rc2[0]][rc2[1]];
+    if((nt&&!ot)||(!nt&&ot)||(nt&&ot&&nt.id!==ot.id)) moved=true; grid[rc2[0]][rc2[1]]=nt; } }
+  if(!moved) return;
+  spawn(); paint(); legend();
+  askNext();
+}
+function idx(dir,i,j){ /* dir: 0上 1右 2下 3左；i=线号，j=沿推动方向从落点起 */
+  if(dir===0) return [j,i]; if(dir===2) return [3-j,i]; if(dir===3) return [i,j]; return [i,3-j];
+}
+function askNext(){
+  var dedup=[]; for(var i=0;i<pending.length;i++) if(!found[pending[i]]&&dedup.indexOf(pending[i])<0) dedup.push(pending[i]);
+  pending=dedup;
+  if(!pending.length){ shipCheck(); return; }
+  var k=pending.shift(); busy=true;
+  var right=k*base, opts=[right]; 
+  var wrongs=[k*base+base,(k-1)*base,k*base-1,k+base,k*base+1,(k+1)*base];
+  for(var w=0;w<wrongs.length&&opts.length<3;w++) if(wrongs[w]>0&&opts.indexOf(wrongs[w])<0) opts.push(wrongs[w]);
+  opts.sort(function(){ return Math.random()-.5; });
+  var mask=document.createElement("div"); mask.className="mask";
+  var hint=(k>1&&found[k-1])?('<p class="hint">你已经知道 '+(k-1)+'个'+base+' 是 '+((k-1)*base)+' 颗，这箱只多了一箱。</p>'):('<p class="hint">'+base+'＋'+base+(k>2?"＋…":"")+'，一共 '+k+' 个 '+base+'。</p>');
+  mask.innerHTML='<div class="panel"><h2>新箱子出现了</h2><p>并出了一箱「<b>'+k+'个'+base+'</b>」。这箱一共几颗？</p>'+hint+'<div class="opts" id="ops"></div><p class="hint" id="pm" style="margin-top:10px;min-height:1.4em"></p></div>';
+  document.body.appendChild(mask);
+  var ops=mask.querySelector("#ops"), pm=mask.querySelector("#pm"), tries=0;
+  opts.forEach(function(v){ var b=document.createElement("button"); b.type="button"; b.textContent=v; b.onclick=function(){
+    if(v===right){ found[k]=1; foundN++; pm.innerHTML='<span class="ok">对，'+k+'×'+base+'＝'+right+'。这是你自己找到的。</span>';
+      setTimeout(function(){ document.body.removeChild(mask); busy=false; paint(); legend(); askNext(); },900); }
+    else { tries++; b.className="bad"; pm.textContent=tries<2?"再看一眼：一箱是 "+base+" 颗，一共 "+k+" 箱。":"要不先数一数："+Array(k+1).join(base+"＋").slice(0,-1)+" ＝？"; }
+  }; ops.appendChild(b); });
+}
+function shipCheck(){
+  var any=false;
+  for(var r=0;r<4;r++) for(var c=0;c<4;c++){ var t=grid[r][c]; if(t&&t.k>=CAP){ grid[r][c]=null; ship++; any=true; } }
+  if(any){ paint(); legend(); if(ship>=NEED){ levelUp(); return; } }
+  if(!canMove()) gameOver();
+}
+function canMove(){
+  for(var r=0;r<4;r++) for(var c=0;c<4;c++){ var t=grid[r][c]; if(!t) return true;
+    var rt=c<3?grid[r][c+1]:null, dt=r<3?grid[r+1][c]:null;
+    if(rt&&t.k+rt.k<=CAP) return true; if(dt&&t.k+dt.k<=CAP) return true; }
+  return false;
+}
+function overlay(html){ var mask=document.createElement("div"); mask.className="mask"; mask.innerHTML='<div class="panel">'+html+'</div>'; document.body.appendChild(mask); return mask; }
+function levelUp(){
+  busy=true;
+  var best=+ls("sde_prim_merge_lv",0); if(lv+1>best) lset("sde_prim_merge_lv",lv+1);
+  if(lv>=LV.length-1){
+    var m=overlay('<h2>🏁 三关通了</h2><p>每箱 '+base+' 颗是你自己定的，'+foundN+' 个积是你自己找到的。回 ChatPrim 跟它说「我玩通了合并工厂」，它接着带你走第 5 关（拆开算）。</p><div class="row"><button id="a" type="button">回 ChatPrim</button><button id="b" class="sec" type="button">再玩一遍</button></div>');
+    m.querySelector("#a").onclick=function(){ location.href="/education/chatprim/"; };
+    m.querySelector("#b").onclick=function(){ document.body.removeChild(m); lv=0; base=3; setup(); };
+    return;
+  }
+  var nl=lv+1;
+  if(LV[nl].base===0){
+    var m2=overlay('<h2>🏁 过关 '+(lv+1)+'/3</h2><p>第 3 关轮到你：每箱几颗，你来定（2 到 12）。定了就是你的工厂，规则不变。</p><input id="bi" type="number" min="2" max="12" value="7"><div class="row"><button id="a" type="button">开工</button></div>');
+    m2.querySelector("#a").onclick=function(){ var v=+m2.querySelector("#bi").value; if(!(v>=2&&v<=12)) return; document.body.removeChild(m2); lv=nl; base=v; setup(); };
+  } else {
+    var m3=overlay('<h2>🏁 过关 '+(lv+1)+'/3</h2><p>这一关你自己找到了 '+foundN+' 个积。下一关每箱 '+LV[nl].base+' 颗——箱子换了，并箱的规矩不变。</p><div class="row"><button id="a" type="button">进下一关</button></div>');
+    m3.querySelector("#a").onclick=function(){ document.body.removeChild(m3); lv=nl; base=LV[nl].base; setup(); };
+  }
+}
+function gameOver(){
+  busy=true;
+  var m=overlay('<h2>😵 没地方推了</h2><p>这一局自己找到了 '+foundN+' 个积，出厂 '+ship+' 箱。找到的积下一局还认。</p><div class="row"><button id="a" type="button">再来一局</button></div>');
+  m.querySelector("#a").onclick=function(){ document.body.removeChild(m); var f=found; setup(); found=f; foundN=0; for(var k in f) foundN++; paint(); legend(); };
+}
+function how(){
+  var m=overlay('<h2>怎么玩</h2><p style="text-align:left">工厂里的货箱写着「几个几」，比如「3个'+base+'」就是 3 箱、每箱 '+base+' 颗。方向键或滑动把箱子推到一起，两箱相碰就<b>并成一箱</b>：个数相加，最多并到 10 个。<br><br>并出一个<b>没见过的个数</b>时，先猜这箱一共几颗——猜对了，箱子上的 × 才亮；猜错不扣分，再猜。<br><br>凑满「10个'+base+'」的大箱自动出厂，出厂 3 箱过关。第 3 关每箱几颗由你定。</p><div class="row"><button id="a" type="button">开始</button></div>');
+  m.querySelector("#a").onclick=function(){ document.body.removeChild(m); };
+}
+document.getElementById("btnHow").onclick=how;
+document.getElementById("btnNew").onclick=function(){ if(confirm("重开这一关？")) setup(); };
+document.addEventListener("keydown",function(e){ var d={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3}[e.key]; if(d===undefined) return; e.preventDefault(); move(d); });
+var tx=0,ty=0;
+board.addEventListener("touchstart",function(e){ var t=e.touches[0]; tx=t.clientX; ty=t.clientY; },{passive:true});
+board.addEventListener("touchend",function(e){ var t=e.changedTouches[0], dx=t.clientX-tx, dy=t.clientY-ty; if(Math.abs(dx)<24&&Math.abs(dy)<24) return;
+  move(Math.abs(dx)>Math.abs(dy)?(dx>0?1:3):(dy>0?2:0)); });
+window.addEventListener("resize",paint);
+setup();
+if(!ls("sde_prim_merge_seen","")){ lset("sde_prim_merge_seen","1"); how(); }
+})();
+</script>
+</body>
+</html>
