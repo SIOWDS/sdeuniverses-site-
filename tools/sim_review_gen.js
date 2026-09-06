@@ -60,15 +60,12 @@ TYPES.forEach((t) => {
   });
   ok(t + "：Skill 章目表解析到 " + rows.length + " 行", rows.length >= 9);
   ok(t + "：序号连续（v1.7：含 7 之二、8 之二、8 之三、9 之二、9 之三、9 之四、11A、11B）", rows.map((r) => String(r.n).replace(/\s+/g, "")).join(",") === ["1","2","3","4","5","6","7之二","7","8","8之二","8之三","9","9之二","9之三","9之四","10","11A","11B"].join(","));
-  // v1.7 机器待办：四个新节尚无 mode，机器层暂不含；比对时剔除，并单独登记为待办（登了就是承认，不算伪报）。
-  const PENDING_V17 = ["领域共识与它默认了什么", "最小模型测试", "全量安装：新地图", "新路"];
-  const rowsM = rows.filter((r) => PENDING_V17.indexOf(r.h) < 0);
-  ok(t + "：v1.7 待办四节（7 之二／8 之三／9 之三／9 之四）在 Skill 里齐、机器里尚无", PENDING_V17.every((h) => rows.some((r) => r.h === h)) && PENDING_V17.every((h) => !SKEL[t].some((s) => s.h === h)));
-  ok(t + "：节数 Skill(去待办)==机器（" + rowsM.length + " vs " + SKEL[t].length + "）", rowsM.length === SKEL[t].length);
-  ok(t + "：逐节节名一字不差（去待办）", rowsM.every((r, i) => SKEL[t][i] && SKEL[t][i].h === r.h));
-  ok(t + "：逐节字数一一相等（去待办）", rowsM.every((r, i) => SKEL[t][i] && SKEL[t][i].words === r.words));
+  ok(t + "：节数 Skill==机器（" + rows.length + " vs " + SKEL[t].length + "）", rows.length === SKEL[t].length);
+  ok(t + "：逐节节名一字不差", rows.every((r, i) => SKEL[t][i] && SKEL[t][i].h === r.h));
+  ok(t + "：逐节字数一一相等", rows.every((r, i) => SKEL[t][i] && SKEL[t][i].words === r.words));
+  ok(t + "：v1.7 四节（7 之二／8 之三／9 之三／9 之四）机器已含且各有 ask", ["领域共识与它默认了什么", "最小模型测试", "全量安装：新地图", "新路"].every((h) => SKEL[t].some((s) => s.h === h && s.ask && s.ask.length > 30)));
   const total = SKEL[t].reduce((a, s) => a + s.words, 0);
-  ok(t + "：合计 " + total + " 汉字落在 22000–27500（v1.7 第 10 节 1200→2000）", total >= 22000 && total <= 27500);
+  ok(t + "：合计 " + total + " 汉字落在 28000–33500（v1.7 加四节）", total >= 28000 && total <= 33500);
   ok(t + "：末两节是 11A 核心语料／11B 敌拓与领地边界参考文献且 words=0（页面端拼装）", SKEL[t][SKEL[t].length - 2].h === "核心语料参考文献" && SKEL[t][SKEL[t].length - 1].h === "敌拓与领地边界参考文献" && SKEL[t].slice(-2).every((s) => s.words === 0));
   ok(t + "：其余各节都有 ask", SKEL[t].slice(0, -2).every((s) => s.ask && s.ask.length > 10));
   ok(t + "：节名互不重复", new Set(SKEL[t].map((s) => s.h)).size === SKEL[t].length);
@@ -98,7 +95,10 @@ if (fs.existsSync(PAGE_P)) {
   ok("页面无 href=\"#\" 死链", !/href="#"/.test(PG));
   ok("页面有工序⑤之二敌拓闸阶段（neighbors/verdict）", PG.indexOf('mode:"neighbors"') > 0 && PG.indexOf('mode:"verdict"') > 0);
   ok("页面有 How-卡路径机检 routeCheck", PG.indexOf("function routeCheck(") > 0);
-  ok("Skill 是 v1.7 且含⑦之二共识／⑧之三最小模型／⑨之三全量安装／⑨之四新路／R-48／§10 未来方向，并含⑤之二两道＋操作性饱和、⑧之二维度碰撞、典范判据、⑨之二新研究领地＋反土地四击、⑩之二 SDE 改姓、R-41", /version:\s*1\.7\b/.test(SKILL) && SKILL.indexOf("工序⑦之二 共识闸") > 0 && SKILL.indexOf("工序⑧之三 最小模型算子") > 0 && SKILL.indexOf("工序⑨之三 全量安装") > 0 && SKILL.indexOf("工序⑨之四 新路发生") > 0 && SKILL.indexOf("R-48") > 0 && SKILL.indexOf("未来方向与分年目标") > 0 && SKILL.indexOf("工序⑩之二 SDE 改姓") > 0 && SKILL.indexOf("操作性饱和") > 0 && SKILL.indexOf("反土地四击闸") > 0 && SKILL.indexOf("R-41") > 0 && SKILL.indexOf("候选发生挑战与核心五条") > 0 && SKILL.indexOf("工序⑨之二 新研究领地发生") > 0 && SKILL.indexOf("典范判据") > 0 && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
+  ok("worker 含 v1.7 四个 mode（consensus／minmodel／install／newroute）与 ===CONS===／===MIN===／===INST===／===ROUTE=== 分隔符", ["consensus","minmodel","install","newroute"].every((m) => WSRC.indexOf('rmode === "' + m + '"') > 0) && ["===CONS===","===MIN===","===INST===","===ROUTE==="].every((k) => WSRC.indexOf(k) > 0));
+const PAGE = fs.readFileSync(PAGE_P, "utf8");
+ok("页面含 v1.7 四步（runConsensus／runMinModel／runInstall／runNewRoute）与四个 stage", ["runConsensus","runMinModel","runInstall","runNewRoute"].every((f) => PAGE.indexOf("async function " + f) > 0) && ["consensus","minmodel","install","newroute"].every((k) => PAGE.indexOf('data-s="' + k + '"') > 0));
+ok("Skill 是 v1.7 且含⑦之二共识／⑧之三最小模型／⑨之三全量安装／⑨之四新路／R-48／§10 未来方向，并含⑤之二两道＋操作性饱和、⑧之二维度碰撞、典范判据、⑨之二新研究领地＋反土地四击、⑩之二 SDE 改姓、R-41", /version:\s*1\.7\b/.test(SKILL) && SKILL.indexOf("工序⑦之二 共识闸") > 0 && SKILL.indexOf("工序⑧之三 最小模型算子") > 0 && SKILL.indexOf("工序⑨之三 全量安装") > 0 && SKILL.indexOf("工序⑨之四 新路发生") > 0 && SKILL.indexOf("R-48") > 0 && SKILL.indexOf("未来方向与分年目标") > 0 && SKILL.indexOf("工序⑩之二 SDE 改姓") > 0 && SKILL.indexOf("操作性饱和") > 0 && SKILL.indexOf("反土地四击闸") > 0 && SKILL.indexOf("R-41") > 0 && SKILL.indexOf("候选发生挑战与核心五条") > 0 && SKILL.indexOf("工序⑨之二 新研究领地发生") > 0 && SKILL.indexOf("典范判据") > 0 && SKILL.indexOf("工序⑤之二 敌拓闸") > 0 && SKILL.indexOf("第二道：按读数形状查对象词") > 0 && SKILL.indexOf("工序⑧之二 SDE 维度碰撞") > 0 && SKILL.indexOf("学科内") > 0);
   /* v1.4：⑧之二 学科内维度碰撞 */
   ok("collide 提示：三家取自清单内、不得同维、共有前提＝断链、六型对照、删维测试、碰撞挑战", /rmode === "collide"[\s\S]*?不得同维[\s\S]*?六型[\s\S]*?删维测试[\s\S]*?碰撞挑战/.test(WSRC));
   /* 2026-09-05：正文零字的重试路——关思考、放大额度；思考字段走 wdsRsn；MiniMax <think> 剥离 */
@@ -124,7 +124,7 @@ if (fs.existsSync(PAGE_P)) {
   ok("conjectures 的 QUERIES 带 shape 与 freq", /\\"shape\\"/.test(WSRC) && /\\"freq\\"/.test(WSRC));
   ok("occupants 提示含撤下条件与检索盲区", WSRC.indexOf("撤下条件") > 0 && WSRC.indexOf("检索盲区") > 0);
   ok("页面三库实搜（searchCR/searchS2/loadShapes）", PG.indexOf("function searchCR(") > 0 && PG.indexOf("function searchS2(") > 0 && PG.indexOf("function loadShapes(") > 0 && PG.indexOf("/api/wds/review-shapes") > 0);
-  ok("页面自检 34 项", PG.indexOf("自检 34 项") > 0 && (PG.match(/out\.push\(\{n:/g) || []).length === 34);
+  ok("页面自检 38 项（v1.7 加四项）", PG.indexOf("自检 38 项") > 0 && (PG.match(/out\.push\(\{n:/g) || []).length === 38);
   ok("worker rename 提示与 write 改性硬律；collide 语料内正主／非构造性预测／第二读者；collide_run 判负对象", WSRC.indexOf('rmode === "rename"') > 0 && WSRC.indexOf("改性硬律（⑩之二）") > 0 && WSRC.indexOf("语料内正主：") > 0 && WSRC.indexOf("非构造性预测：") > 0 && WSRC.indexOf("第二读者协议：") > 0 && WSRC.indexOf("判负的对象") > 0);
   ok("页面 runRename／残留机检 residue／学科化标题渲染", PG.indexOf("function runRename(") > 0 && PG.indexOf("function residue(") > 0 && PG.indexOf('data-s="rename"') > 0 && PG.indexOf("附录 D · SDE 改性") > 0);
   ok("worker 占位者栏只引⑤之二（prompt 里有三判）", WSRC.indexOf("只许引给定的敌拓闸三判结果") > 0);

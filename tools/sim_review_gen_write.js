@@ -11,10 +11,10 @@ const src = consts + '\nconst REVIEW_SDEM="", REVIEW_STYLE="";\nfunction reviewF
   'function run(b,type,VC){ const clean=(x,n)=>String(x||"").slice(0,n); const J=(o)=>({err:o}); const HEAD="H\\n"; const deep=true;\n' + helpers + '\n let sys="",usr="",tok=0; {\n' + wr + '\n } return {sys,usr,tok}; }\n module.exports=run;';
 const run = eval("(function(){" + src + " return run; })()");
 function mk(type) { const c = []; for (let i = 1; i <= 70; i++) { const d = i % 3; const f = type === "how" ? "起手维：" + "SDE"[d] : type === "what" ? "所站方程：" + ["S=F(D,E)", "D=G(S,E)", "E=H(S,D)"][d] : "所站原理：" + ["原理一", "原理二", "原理三"][d]; c.push({ i, title: "P" + i, card: "承重命题：x\n" + f + "\n落点维：D\n所走路径：S→E→D\n" + "y".repeat(900) }); } return c; }
-const art = { frame: "f".repeat(3000), map: "m".repeat(12000), verdict: "v".repeat(8000), surface: "s".repeat(4000), challenges: "c".repeat(12000), gaps: "g".repeat(8000), collide: "k".repeat(9000), collideRun: "r".repeat(5000), conjectures: "j".repeat(12000), occupants: "o".repeat(6000), territory: "t".repeat(10000), territoryCheck: "q".repeat(5000) };
+const art = { frame: "f".repeat(3000), map: "m".repeat(12000), verdict: "v".repeat(8000), surface: "s".repeat(4000), challenges: "c".repeat(12000), gaps: "g".repeat(8000), collide: "k".repeat(9000), collideRun: "r".repeat(5000), conjectures: "j".repeat(12000), occupants: "o".repeat(6000), territory: "t".repeat(10000), territoryCheck: "q".repeat(5000), consensus: "n".repeat(5000), minmodel: "i".repeat(6000), install: "e".repeat(20000), newroute: "w".repeat(5000) };
 const refs = []; for (let i = 1; i <= 70; i++) refs.push("Author. 2000. Title " + i + ". Venue. doi:10.1/" + i);
 let fail = 0, maxLen = 0;
-for (const type of ["how", "what", "why"]) for (let sec = 0; sec < 12; sec++) {
+for (const type of ["how", "what", "why"]) for (let sec = 0; sec < 16; sec++) {
   const r = run({ sec, art, cards: mk(type), refs, prev: "p".repeat(5000), rename: { terms: [{ sde: "显露", disc: "显示" }], sections: {} }, residue: "显露×4" }, type, { url: "https://api.deepseek.com/v1", model: "deepseek-v4-pro", name: "DS" });
   if (r.err) { console.log("  ✗ ERR", type, sec, JSON.stringify(r.err)); fail++; continue; }
   const len = r.usr.length; maxLen = Math.max(maxLen, len);
@@ -24,8 +24,8 @@ for (const type of ["how", "what", "why"]) for (let sec = 0; sec < 12; sec++) {
   if (sec >= 6 && nCards) { console.log("  ✗ 第 7 节起不该喂卡", type, sec); fail++; }
   if (!/上一稿残留/.test(r.usr)) { console.log("  ✗ residue 未带", type, sec); fail++; }
 }
-const r2 = run({ sec: 11, art, cards: mk("how"), refs, prev: "p".repeat(5000) }, "how", { url: "https://openrouter.ai/api/v1", model: "nvidia/nemotron:free", name: "OR" });
+const r2 = run({ sec: 15, art, cards: mk("how"), refs, prev: "p".repeat(5000) }, "how", { url: "https://openrouter.ai/api/v1", model: "nvidia/nemotron:free", name: "OR" });
 if (r2.usr.length > 30000) { console.log("  ✗ OpenRouter 预算", r2.usr.length); fail++; }
 console.log("  最长一节输入 " + maxLen + " 字；OpenRouter 总纲 " + r2.usr.length + " 字");
-console.log(fail ? fail + " FAILED" : "WRITE BRANCH OK (36 sections × 4 checks)");
+console.log(fail ? fail + " FAILED" : "WRITE BRANCH OK (48 sections × 4 checks)");
 process.exit(fail ? 1 : 0);
