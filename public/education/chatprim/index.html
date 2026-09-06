@@ -80,6 +80,14 @@ button{font:inherit}
 @keyframes bl{50%{opacity:0}}
 .wait{color:var(--ink2);font-family:var(--mono);font-size:13px}
 .learned{margin-top:7px;font-size:12.5px;color:var(--leaf)}
+.game{margin:0 0 8px;border:1.5px solid rgba(233,163,43,.55);background:linear-gradient(135deg,#FFF4DC,#FFE9BF);border-radius:14px;padding:10px 14px;display:flex;gap:10px;align-items:center}
+.game .gi{font-size:24px;flex:none}
+.game .gn{font-weight:700;font-size:16px}
+.game .gw{font-size:13.5px;color:#6B5A2E}
+.game .gl{margin-left:auto;flex:none;font-family:var(--mono);font-size:12px;color:#B8791A;border:1px solid rgba(184,121,26,.4);border-radius:999px;padding:2px 9px}
+.pass{margin:0 0 8px;display:inline-block;background:rgba(60,154,106,.14);color:var(--leaf);border-radius:999px;padding:3px 12px;font-size:13.5px;font-weight:600;animation:pop .5s ease-out}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+.tools button.swap{color:#B8791A}
 .run{margin:0 0 6px;border:1px dashed var(--edge);border-radius:10px;background:var(--paper3)}
 .run summary{cursor:pointer;padding:4px 10px;font-size:12px;color:var(--ink2);font-family:var(--mono)}
 .run pre{margin:0;padding:4px 12px 10px;font-size:12.5px;color:#4E4A5C;white-space:pre-wrap;font-family:var(--sans)}
@@ -138,7 +146,7 @@ button{font:inherit}
   <div class="hero" id="hero">
     <div class="sub">四五六年级 · 语文 · 数学 · 英语</div>
     <h1>你好，我是 ChatPrim 🌱</h1>
-    <p>我不报答案，也不替你写作文。你先说说你是怎么想的，卡在哪一步，我陪你一步一步把它弄明白——弄明白的东西才是你自己的。</p>
+    <p>我不上课，我开局。你说今天要学什么——一个词、一道题、一句英文——我把它做成一局游戏：有世界、有角色、三关。前两关你把道理自己找出来，第三关轮到你来出题、改规则。玩通了的东西才是你自己的。</p>
     <div class="pick"><span class="lb">年级</span>
       <button class="pill" data-g="4" type="button">四年级</button>
       <button class="pill" data-g="5" type="button">五年级</button>
@@ -157,7 +165,7 @@ button{font:inherit}
 <div class="dock"><div class="wrap">
   <div class="ctx" id="ctx"></div>
   <div class="box">
-    <textarea id="q" rows="1" placeholder="把题目、句子或你的想法写在这里……（Enter 发送，Shift+Enter 换行）" aria-label="输入"></textarea>
+    <textarea id="q" rows="1" placeholder="今天学什么？写一个词、一道题、一句英文，我来开局……（Enter 发送）" aria-label="输入"></textarea>
     <button id="go" type="button">发送</button>
   </div>
   <p class="foot">用<strong>家长自己的</strong>国内大模型 API Key 运行（DeepSeek／智谱／Kimi／千问／MiniMax），Key 和学习档案只存在这台设备的浏览器里，本站不保存也看不到。 · 不代写作业，不问真名。 · <a href="https://sdeuniverses.com/">SDE Universes</a></p>
@@ -169,16 +177,16 @@ button{font:inherit}
 var feed=document.getElementById("feed"), log=document.getElementById("log"), hero=document.getElementById("hero"),
     q=document.getElementById("q"), go=document.getElementById("go"), ctx=document.getElementById("ctx"),
     nickEl=document.getElementById("nick"), seedsEl=document.getElementById("seeds");
-var HIST=[], busy=false, ctrl=null;
+var HIST=[], busy=false, ctrl=null, GAME="";
 
 var VENDORS={deepseek:{n:"DeepSeek",a:"platform.deepseek.com"},zhipu:{n:"智谱 GLM",a:"open.bigmodel.cn"},
              kimi:{n:"Kimi",a:"platform.moonshot.cn"},qwen:{n:"千问 Qwen",a:"bailian.console.aliyun.com"},
              minimax_cn:{n:"MiniMax（国内）",a:"platform.minimaxi.com"}};
 var SUBJ={chinese:{n:"语文",c:"zh"},math:{n:"数学",c:"ma"},english:{n:"英语",c:"en"}};
 var SEEDS={
-  chinese:["这个词「恍然大悟」是什么意思？我在课文里看到的。","老师让写「我最难忘的一件事」，我不知道写什么。","这段课文的中心思想我说不出来。","「春眠不觉晓」这首诗背不下来。"],
-  math:["3/4 和 5/8 哪个大？我比不出来。","一道应用题：小明有 24 颗糖，分给 6 个同学……我算错了。","小数点为什么要对齐？","长方形的面积公式我记得，但换成组合图形就不会了。"],
-  english:["there 和 their 我老是搞混。","What are you doing? 这句为什么用 doing？","我造了一句：I go to school yesterday. 对吗？","这个单词 beautiful 老是记不住。"]
+  chinese:["开一局：「恍然大悟」这个词","开一局：作文「我最难忘的一件事」","开一局：怎么找一段课文的中心意思","开一局：背《春晓》"],
+  math:["开一局：3/4 和 5/8 哪个大","开一局：24 颗糖分给 6 个同学","开一局：小数点为什么要对齐","开一局：组合图形的面积"],
+  english:["开一局：there 和 their","开一局：What are you doing? 为什么用 doing","开一局：I go to school yesterday 对不对","开一局：记住 beautiful"]
 };
 function ls(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }
 function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
@@ -276,7 +284,7 @@ function profPanel(){
 document.getElementById("btnProf").onclick=profPanel;
 
 function newChat(){
-  HIST=[]; var ms=feed.querySelectorAll(".msg"); for(var i=0;i<ms.length;i++) feed.removeChild(ms[i]);
+  HIST=[]; GAME=""; var ms=feed.querySelectorAll(".msg"); for(var i=0;i<ms.length;i++) feed.removeChild(ms[i]);
   hero.hidden=false; paintPick(); q.focus();
 }
 document.getElementById("btnNew").onclick=function(){ if(busy) return; if(HIST.length&&!confirm("清空当前对话，开一场新的？")) return; newChat(); };
@@ -292,11 +300,19 @@ function splitRun(acc){
   if(RUN_OPEN.test(acc)) return {text:"",run:acc.replace(RUN_OPEN,"").trim(),open:true};
   return {text:acc,run:null,open:false};
 }
+var OPEN_RE=/^\s*【开局】([^\n]*?)【\/开局】\s*\n?/, PASS_RE=/\n?\s*【过关】\s*(\d+)\s*\/\s*(\d+)\s*【\/过关】\s*/g;
+function splitGame(t){
+  var open=null, pass=null, m=t.match(OPEN_RE);
+  if(m){ var f=m[1].split("｜"); open={name:(f[0]||"").trim(),world:(f[1]||"").trim(),levels:(f[2]||"").trim()}; t=t.slice(m[0].length); }
+  t=t.replace(PASS_RE,function(_,a,b){ pass={n:a,m:b}; return "\n"; });
+  t=t.replace(/^\s*【开局】[^\n]*$/,"");   /* 还没流完的半行不露出来 */
+  return {text:t.replace(/^\s+/,""),open:open,pass:pass};
+}
 function splitProf(acc){
-  var r=splitRun(acc), t=r.text;
-  var m=t.match(PROF_RE); if(!m) return {text:t,prof:null,run:r.run,open:r.open};
+  var r=splitRun(acc), g=splitGame(r.text), t=g.text;
+  var m=t.match(PROF_RE); if(!m) return {text:t,prof:null,run:r.run,open:r.open,game:g.open,pass:g.pass};
   var js=null; try{ js=JSON.parse(m[1].trim()); }catch(e){}
-  return {text:t.slice(0,m.index).replace(/\s+$/,""),prof:js,run:r.run,open:r.open};
+  return {text:t.slice(0,m.index).replace(/\s+$/,""),prof:js,run:r.run,open:r.open,game:g.open,pass:g.pass};
 }
 function mergeProf(js){
   var p=PROF(); p.done=p.done||[]; p.stuck=p.stuck||[]; p.turns=(p.turns||0)+1;
@@ -371,6 +387,10 @@ function ask(text,redo){
   function finish(ok){
     try{ m.bd.removeChild(cur); }catch(e){}
     var sp=splitProf(acc); m.bd.innerHTML=md(sp.text);
+    if(sp.game&&sp.game.name){ var gc=document.createElement("div"); gc.className="game";
+      gc.innerHTML='<span class="gi">🎮</span><div><div class="gn"></div><div class="gw"></div></div>'+(sp.game.levels?'<span class="gl">'+esc(sp.game.levels)+'</span>':'');
+      gc.querySelector(".gn").textContent=sp.game.name; gc.querySelector(".gw").textContent=sp.game.world; m.body.insertBefore(gc,m.bd); GAME=sp.game.name; }
+    if(sp.pass){ var pc=document.createElement("div"); pc.className="pass"; pc.textContent="🏁 过关 "+sp.pass.n+"/"+sp.pass.m+(sp.pass.n===sp.pass.m?" · 这局通了！":""); m.body.insertBefore(pc,m.bd); }
     if(SHOW_RUN&&sp.run){ var rd=document.createElement("details"); rd.className="run";
       rd.innerHTML='<summary>🔬 运行</summary><pre></pre>'; rd.querySelector("pre").textContent=sp.run; m.body.insertBefore(rd,m.bd); }
     var tools=document.createElement("div"); tools.className="tools";
@@ -381,8 +401,9 @@ function ask(text,redo){
       paintCtx();
       mk("重答",function(){ if(busy) return; feed.removeChild(m.box); if(HIST.length&&HIST[HIST.length-1].role==="assistant") HIST.pop();
         ask(HIST.length?HIST[HIST.length-1].content:"",true); });
+      var sw=mk("🎮 换个玩法",function(){ ask("换个玩法"); }); sw.className="swap";
       /* 运行块随历史回送：发动机要记得上一轮走到六步里的哪一步；孩子看不到，基底看得到。 */
-      HIST.push({role:"assistant",content:(sp.run?("【运行】\n"+sp.run+"\n【/运行】\n"):"")+sp.text});
+      HIST.push({role:"assistant",content:(sp.run?("【运行】\n"+sp.run+"\n【/运行】\n"):"")+(sp.game&&sp.game.name?("【开局】"+sp.game.name+"｜"+sp.game.world+"｜"+sp.game.levels+"【/开局】\n"):"")+sp.text+(sp.pass?("\n【过关】"+sp.pass.n+"/"+sp.pass.m+"【/过关】"):"")});
     } else {
       mk("重试",function(){ if(busy) return; feed.removeChild(m.box); ask(HIST.length?HIST[HIST.length-1].content:"",true); });
     }
