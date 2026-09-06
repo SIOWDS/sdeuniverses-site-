@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<title>分数蛇 · 分数发生学游戏 · ChatPrim</title>
+<meta name="description" content="分数蛇：贪吃蛇的机制 × 分数。吃下的果子进篮子，篮子刚好凑成门上的分数，门才开。半与半 → 三分 → 通分门 → 比大小赛道 → 人机蛇抢食 → 你来造门。分母不是教给你的，是在门口凑出来的。">
+<link rel="canonical" href="https://sdeuniverses.com/education/chatprim/games/fraction-snake/">
+<meta name="theme-color" content="#FFF8EC">
+<style>
+:root{--paper:#FFF8EC;--ink:#2B2A33;--ink2:#6E6A7A;--edge:rgba(43,42,51,.14);--sky:#2E7DD1;--peach:#E8734A;--leaf:#3C9A6A;--sun:#E9A32B;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.7;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 12px 30px}
+a{color:var(--sky);text-decoration:none}
+button{font:inherit}
+.top{width:100%;max-width:560px;display:flex;align-items:center;gap:10px;height:54px}
+.top a.b{color:var(--ink2);font-size:13px}
+.top .t{font-weight:700;font-size:19px}
+.top .sp{margin-left:auto}
+.top button{border:1px solid var(--edge);background:#fff;border-radius:10px;padding:4px 10px;cursor:pointer;font-size:13px;color:var(--ink2)}
+.hud{width:100%;max-width:560px;display:flex;gap:8px;margin:2px 0 8px;flex-wrap:wrap}
+.hud .c{flex:1 1 auto;background:#fff;border:1px solid var(--edge);border-radius:12px;padding:5px 12px;min-width:84px}
+.hud .k{font-size:11px;letter-spacing:.12em;color:var(--ink2);font-family:var(--mono)}
+.hud .v{font-size:19px;font-weight:700}
+.hud .v small{font-size:12px;color:var(--ink2);font-weight:400;margin-left:4px}
+.basket{width:100%;max-width:560px;background:#fff;border:1px solid var(--edge);border-radius:12px;padding:8px 12px;margin-bottom:8px}
+.basket .row{display:flex;align-items:center;gap:10px}
+.basket .lb{font-size:12px;color:var(--ink2);font-family:var(--mono);letter-spacing:.1em;flex:none}
+.bar{flex:1 1 auto;height:22px;border:1.5px solid var(--ink);border-radius:6px;overflow:hidden;display:flex;background:#fff;position:relative}
+.bar i{display:block;height:100%;border-right:1px solid rgba(0,0,0,.25)}
+.bar .goal{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--peach)}
+.basket .sum{font-family:var(--mono);font-weight:700;font-size:16px;min-width:64px;text-align:right}
+.basket .pieces{font-size:12.5px;color:var(--ink2);margin-top:3px;min-height:1.4em}
+canvas{background:#F3EAD3;border:3px solid var(--ink);border-radius:14px;box-shadow:5px 5px 0 var(--ink);touch-action:none;width:min(94vw,520px);height:min(94vw,520px)}
+.lgd{width:100%;max-width:560px;margin-top:12px;font-size:13.5px;color:#4E4A5C;background:#fff;border:1px solid var(--edge);border-radius:12px;padding:9px 14px}
+.lgd b{color:var(--ink)}
+.keys{width:100%;max-width:560px;margin-top:8px;font-size:12px;color:var(--ink2);font-family:var(--mono);text-align:center}
+.mask{position:fixed;inset:0;background:rgba(43,42,51,.5);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
+.panel{background:#fff;border-radius:18px;padding:22px 22px 18px;width:100%;max-width:420px;text-align:center}
+.panel h2{margin:0 0 6px;font-size:20px}
+.panel p{margin:0 0 12px;color:#4E4A5C;font-size:15px}
+.panel p.l{text-align:left}
+.opts{display:grid;gap:8px}
+.opts button{border:1.5px solid var(--edge);background:var(--paper);border-radius:12px;padding:10px;font-size:20px;font-weight:700;cursor:pointer;font-family:var(--mono)}
+.opts button:hover{border-color:var(--sky)}
+.opts button.bad{border-color:var(--peach);background:rgba(232,115,74,.12);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.panel .row{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.panel .row button{border:0;background:var(--sky);color:#fff;border-radius:12px;padding:9px 18px;font-size:15px;font-weight:600;cursor:pointer}
+.panel .row button.sec{background:#fff;color:var(--ink);border:1.5px solid var(--edge)}
+.panel input{width:64px;font-size:20px;text-align:center;border:1.5px solid var(--edge);border-radius:10px;padding:5px;font-family:var(--mono)}
+.panel .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 8px}
+.panel .frac span{display:block;width:70px;border-top:2px solid var(--ink);height:6px}
+.panel label.ck{display:inline-block;margin:4px 6px;font-size:15px}
+.hint{font-size:13px;color:var(--ink2)}
+.ok{color:var(--leaf);font-weight:700}
+</style>
+</head>
+<body>
+<div class="top"><a class="b" href="/education/chatprim/">← ChatPrim</a><span class="t">🐍 分数蛇</span><span class="sp"></span><button id="btnHow" type="button">怎么玩</button><button id="btnNew" type="button">重开本关</button></div>
+<div class="hud">
+  <div class="c"><div class="k">关卡</div><div class="v" id="hLv">1</div></div>
+  <div class="c"><div class="k">生命</div><div class="v" id="hLife">❤❤❤</div></div>
+  <div class="c"><div class="k">自己凑出的门</div><div class="v" id="hGate">0</div></div>
+  <div class="c"><div class="k">人机蛇</div><div class="v" id="hBot">—</div></div>
+</div>
+<div class="basket">
+  <div class="row"><span class="lb">篮子</span><div class="bar" id="bar"><div class="goal" id="goal"></div></div><span class="sum" id="sum">0</span></div>
+  <div class="pieces" id="pieces">篮子是空的。吃到的果子会放进来。</div>
+</div>
+<canvas id="cv" width="520" height="520"></canvas>
+<div class="lgd" id="lgd"></div>
+<div class="keys">方向键／滑动 移动 · 空格 暂停 · ⌫ 或双击画面 吐出最后一个果子</div>
+<script>
+(function(){
+"use strict";
+/* ───── 分数工具 ───── */
+function gcd(a,b){ while(b){ var t=a%b; a=b; b=t; } return a; }
+function F(n,d){ if(n===0) return {n:0,d:1}; var g=gcd(Math.abs(n),d); return {n:n/g,d:d/g}; }
+function add(a,b){ return F(a.n*b.d+b.n*a.d,a.d*b.d); }
+function eq(a,b){ return a.n*b.d===b.n*a.d; }
+function lt(a,b){ return a.n*b.d<b.n*a.d; }
+function fs(f){ return f.n===0?"0":(f.d===1?String(f.n):(f.n+"/"+f.d)); }
+function sumOf(list){ var s={n:0,d:1}; for(var i=0;i<list.length;i++) s=add(s,list[i]); return s; }
+function reachable(target,dens,maxPieces){ /* 用这些分母的单位分数（每种任意个）能不能刚好凑出 target？ */
+  var L=1; dens.forEach(function(d){ L=L*d/gcd(L,d); }); L=L*target.d/gcd(L,target.d);
+  var T=target.n*L/target.d, steps=dens.map(function(d){ return L/d; });
+  var can=new Array(T+1).fill(99); can[0]=0;
+  for(var v=1;v<=T;v++) steps.forEach(function(s){ if(v>=s&&can[v-s]+1<can[v]) can[v]=can[v-s]+1; });
+  return can[T]<=maxPieces;
+}
+
+/* ───── 关卡表：分母集合、门的分数、道具 ───── */
+var LV=[
+ {name:"第 1 关 · 半与半",dens:[2,4],gates:[[1,2],[3,4],[1,1]],bot:false,cmp:false,
+  hint:"果子上写着 1/2、1/4。门上写着 3/4：篮子里刚好凑成 3/4 门才开。多了会卡住——按 ⌫ 吐出最后一个。"},
+ {name:"第 2 关 · 三分",dens:[2,3,6],gates:[[2,3],[5,6],[1,1]],bot:false,cmp:false,
+  hint:"新果子 1/3、1/6 来了。门上要 5/6：哪两个果子加起来刚好？篮子条会把它们摆到一起给你看。"},
+ {name:"第 3 关 · 通分门",dens:[3,4,6,12],gates:[[7,12],[11,12],[5,6]],bot:false,cmp:false,
+  hint:"门上是 7/12——可果子里没有一个是 12 分之几。1/4 和 1/3 放在同一个篮子里，条上会变成多少格？"},
+ {name:"第 4 关 · 比大小赛道",dens:[2,3,4,5,6],gates:[[3,5],[2,3],[5,8],[3,4]],bot:false,cmp:true,
+  hint:"这一关每次开两道门，进**大的那一道**。篮子不用凑，看清哪个大就行——进错了掉一条命。"},
+ {name:"第 5 关 · 人机蛇抢食",dens:[2,3,6],gates:[[1,1],[1,1],[1,1]],bot:true,cmp:false,
+  hint:"人机蛇也在吃果子。门上是 1：用 1/2、1/3、1/6 刚好凑成 1，一共有几种凑法？被它抢走一个，你就得换一种。"},
+ {name:"第 6 关 · 你来造门",dens:null,gates:null,bot:false,cmp:false,custom:true,
+  hint:"门上写什么、果子是几分之几，你来定。定完我先算一遍：用这些果子凑不出的门，我会告诉你。"}
+];
+var N=20, cv=document.getElementById("cv"), ctx=cv.getContext("2d"), CS=cv.width/N;
+var lv=0, life=3, gatesDone=0, snake, dir, ndir, basket, fruits, gate, gate2, bot, tick, timer, over=false, paused=false, busy=false, speed=170, asked={}, custom=null;
+var COL={2:"#E8734A",3:"#2E7DD1",4:"#3C9A6A",5:"#B26A1A",6:"#7A4E9E",8:"#146C94",12:"#A6791F"};
+function ls(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }
+function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function cur(){ return custom||LV[lv]; }
+
+/* ───── 关卡装载 ───── */
+function load(){
+  var L=cur(); over=false; paused=false; busy=false; asked={};
+  snake=[{x:5,y:10},{x:4,y:10},{x:3,y:10}]; dir={x:1,y:0}; ndir=dir; basket=[]; fruits=[]; tick=0;
+  bot=L.bot?{body:[{x:15,y:15},{x:16,y:15},{x:17,y:15}],dir:{x:-1,y:0},ate:0}:null;
+  gate=null; gate2=null; L._gi=0; nextGate(); for(var i=0;i<5;i++) spawnFruit();
+  document.getElementById("hLv").textContent=(lv+1);
+  document.getElementById("hBot").textContent=bot?"抢走 0":"—";
+  document.getElementById("lgd").innerHTML="<b>"+esc(L.name)+"</b> · "+L.hint.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+  hud(); drawBasket(); restart();
+}
+function nextGate(){
+  var L=cur(); var g=L.gates[L._gi%L.gates.length]; L._gi++;
+  var f=F(g[0],g[1]);
+  if(L.cmp){ /* 两道门并排在右墙，一大一小 */
+    var alt=L.gates[(L._gi)%L.gates.length]; var f2=F(alt[0],alt[1]); if(eq(f,f2)) f2=F(alt[0]+1,alt[1]+2);
+    var top=Math.random()<.5;
+    gate={x:N-1,y:top?5:14,f:f,big:!lt(f,f2)}; gate2={x:N-1,y:top?14:5,f:f2,big:!lt(f2,f)};
+  } else { gate={x:N-1,y:4+Math.floor(Math.random()*12),f:f}; gate2=null; }
+}
+function free(x,y){
+  if(snake.some(function(s){return s.x===x&&s.y===y;})) return false;
+  if(bot&&bot.body.some(function(s){return s.x===x&&s.y===y;})) return false;
+  if(fruits.some(function(s){return s.x===x&&s.y===y;})) return false;
+  return true;
+}
+function spawnFruit(){
+  var L=cur(), dens=L.dens; for(var t=0;t<60;t++){
+    var x=1+Math.floor(Math.random()*(N-3)), y=1+Math.floor(Math.random()*(N-2));
+    if(!free(x,y)) continue;
+    var d=dens[Math.floor(Math.random()*dens.length)], n=1;
+    if(!L.cmp&&Math.random()<.2&&d>2) n=2;  /* 偶尔来个 2/3、2/4 这样的 */
+    fruits.push({x:x,y:y,f:F(n,d),d:d}); return;
+  }
+}
+/* ───── HUD 与篮子条（显露：篮子里的分数摆到一起是什么样） ───── */
+function hud(){ document.getElementById("hLife").textContent=life>0?"❤".repeat(life):"💔"; document.getElementById("hGate").textContent=gatesDone; if(bot) document.getElementById("hBot").textContent="抢走 "+bot.ate; }
+function drawBasket(){
+  var bar=document.getElementById("bar"), s=sumOf(basket), L=cur();
+  var goalF=(L.cmp||!gate)?null:gate.f, span=Math.max(1,goalF?Math.ceil(goalF.n/goalF.d):1,Math.ceil(s.n/s.d)||1);
+  var h=""; basket.forEach(function(f){ h+='<i style="width:'+(100*f.n/f.d/span)+'%;background:'+(COL[f.d]||"#999")+'"></i>'; });
+  h+='<div class="goal" style="left:'+(goalF?(100*goalF.n/goalF.d/span):100)+'%;display:'+(goalF?"block":"none")+'"></div>';
+  bar.innerHTML=h;
+  document.getElementById("sum").textContent=fs(s);
+  document.getElementById("pieces").textContent=basket.length?("篮子里："+basket.map(fs).join(" + ")+" = "+fs(s)+(goalF?("　门上要 "+fs(goalF)+(eq(s,goalF)?"　✓ 刚好":(lt(goalF,s)?"　多了，吐一个":""))):"")):(L.cmp?"这一关不用凑篮子，看清两道门哪个大。":"篮子是空的。吃到的果子会放进来。");
+}
+/* ───── 画面 ───── */
+function drawFrac(x,y,f,c,size){
+  ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,size,0,Math.PI*2); ctx.fill();
+  /* 扇形显示大小：分数是「一整个里的这么多」 */
+  ctx.fillStyle="rgba(255,255,255,.85)"; ctx.beginPath(); ctx.moveTo(x,y); ctx.arc(x,y,size-2,-Math.PI/2,-Math.PI/2+Math.PI*2*f.n/f.d); ctx.closePath(); ctx.fill();
+  ctx.fillStyle=c; ctx.font="bold "+Math.round(size*0.9)+"px "+"ui-monospace,Menlo,monospace"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(fs(f),x,y+size*1.55);
+}
+function draw(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle="rgba(43,42,51,.06)"; for(var i=1;i<N;i++){ ctx.beginPath(); ctx.moveTo(i*CS,0); ctx.lineTo(i*CS,cv.height); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,i*CS); ctx.lineTo(cv.width,i*CS); ctx.stroke(); }
+  [gate,gate2].forEach(function(g){ if(!g) return; var s=sumOf(basket), open=cur().cmp?true:eq(s,g.f);
+    ctx.fillStyle=open?"#3C9A6A":"#B8791A"; ctx.fillRect(g.x*CS,g.y*CS-CS*0.6,CS,CS*2.2);
+    ctx.fillStyle="#fff"; ctx.font="bold 13px ui-monospace,Menlo,monospace"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.save(); ctx.translate(g.x*CS+CS/2,g.y*CS+CS/2); ctx.rotate(-Math.PI/2); ctx.fillText((open?"门开 ":"门 ")+fs(g.f),0,0); ctx.restore(); });
+  fruits.forEach(function(f){ drawFrac(f.x*CS+CS/2,f.y*CS+CS/2-2,f.f,COL[f.d]||"#999",CS*0.34); });
+  if(bot){ bot.body.forEach(function(s,i){ ctx.fillStyle=i?"#8E94A3":"#5C6377"; ctx.fillRect(s.x*CS+2,s.y*CS+2,CS-4,CS-4); }); }
+  snake.forEach(function(s,i){ ctx.fillStyle=i?"#2E7DD1":"#1B4F86"; ctx.beginPath(); ctx.roundRect?ctx.roundRect(s.x*CS+1.5,s.y*CS+1.5,CS-3,CS-3,5):ctx.rect(s.x*CS+1.5,s.y*CS+1.5,CS-3,CS-3); ctx.fill(); });
+  var hd=snake[0]; ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(hd.x*CS+CS/2+dir.x*4,hd.y*CS+CS/2+dir.y*4,3,0,Math.PI*2); ctx.fill();
+  if(paused){ ctx.fillStyle="rgba(255,248,236,.7)"; ctx.fillRect(0,0,cv.width,cv.height); ctx.fillStyle="#2B2A33"; ctx.font="bold 22px sans-serif"; ctx.textAlign="center"; ctx.fillText("暂停 · 按空格继续",cv.width/2,cv.height/2); }
+}
+/* ───── 一步 ───── */
+function step(){
+  if(over||paused||busy) return;
+  dir=ndir; var L=cur(); var h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+  var atGate=[gate,gate2].find(function(g){ return g&&h.x===g.x&&(h.y===g.y||h.y===g.y+1||h.y===g.y-1); });
+  if(atGate){ enterGate(atGate); return; }
+  if(h.x<0||h.y<0||h.x>=N||h.y>=N||snake.some(function(s,i){return i&&s.x===h.x&&s.y===h.y;})||(bot&&bot.body.some(function(s){return s.x===h.x&&s.y===h.y;}))){ die("撞到了"); return; }
+  snake.unshift(h);
+  var fi=fruits.findIndex(function(f){return f.x===h.x&&f.y===h.y;});
+  if(fi>=0){ var f=fruits.splice(fi,1)[0]; if(!L.cmp){ basket.push(f.f); drawBasket(); maybeAsk(); } spawnFruit(); }
+  else snake.pop();
+  if(bot) botStep();
+  tick++; draw();
+}
+function botStep(){
+  var b=bot, h=b.body[0], target=null, best=1e9;
+  fruits.forEach(function(f){ var d=Math.abs(f.x-h.x)+Math.abs(f.y-h.y); if(d<best){best=d;target=f;} });
+  var opts=[{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}].filter(function(o){ return !(o.x===-b.dir.x&&o.y===-b.dir.y); });
+  opts.sort(function(p,q){ var dp=target?Math.abs(h.x+p.x-target.x)+Math.abs(h.y+p.y-target.y):0, dq=target?Math.abs(h.x+q.x-target.x)+Math.abs(h.y+q.y-target.y):0; return dp-dq+(Math.random()-.5)*.8; });
+  for(var i=0;i<opts.length;i++){ var o=opts[i], nx=h.x+o.x, ny=h.y+o.y;
+    if(nx<1||ny<0||nx>=N-1||ny>=N) continue; if(b.body.some(function(s){return s.x===nx&&s.y===ny;})) continue; if(snake.some(function(s){return s.x===nx&&s.y===ny;})) continue;
+    b.dir=o; b.body.unshift({x:nx,y:ny});
+    var fi=fruits.findIndex(function(f){return f.x===nx&&f.y===ny;});
+    if(fi>=0){ fruits.splice(fi,1); b.ate++; hud(); spawnFruit(); if(b.body.length>7) b.body.pop(); } else b.body.pop();
+    return; }
+}
+function enterGate(g){
+  var L=cur(), s=sumOf(basket);
+  if(L.cmp){ if(g.big){ gatesDone++; hud(); flash("对，"+fs(g.f)+" 比 "+fs((g===gate?gate2:gate).f)+" 大。",true); nextGate(); draw(); if(L._gi>L.gates.length) levelUp(); } else { die("进错门了："+fs(g.f)+" 比 "+fs((g===gate?gate2:gate).f)+" 小"); } return; }
+  if(eq(s,g.f)){ gatesDone++; basket=[]; hud(); drawBasket(); flash("门开了："+fs(g.f)+" 是你凑出来的。",true); nextGate(); draw(); if(L._gi>L.gates.length){ levelUp(); } }
+  else { flash(lt(g.f,s)?("篮子里 "+fs(s)+"，门上要 "+fs(g.f)+"——多了，吐出一个再来。"):("篮子里才 "+fs(s)+"，门上要 "+fs(g.f)+"，还差 "+fs(add(g.f,{n:-s.n,d:s.d}))+"。"),false);
+    /* 撞门不死，弹回一格 */ ndir=dir={x:-dir.x,y:-dir.y}; }
+}
+function spit(){ if(over||busy||!basket.length) return; basket.pop(); drawBasket(); draw(); }
+var flashT=null;
+function flash(msg,good){ var p=document.getElementById("pieces"); p.innerHTML='<span class="'+(good?"ok":"")+'">'+esc(msg)+"</span>"; clearTimeout(flashT); flashT=setTimeout(drawBasket,2600); }
+function die(why){
+  life--; hud(); stop();
+  if(life<=0){ over=true; var m=overlay('<h2>😵 '+esc(why)+'</h2><p>这一局自己凑出了 '+gatesDone+' 道门。凑出来的门下一局还认。</p><div class="row"><button id="a" type="button">再来这一关</button></div>');
+    m.querySelector("#a").onclick=function(){ document.body.removeChild(m); life=3; load(); }; return; }
+  var m2=overlay('<h2>💔 '+esc(why)+'</h2><p>还有 '+life+' 条命。篮子里的果子保住了。</p><div class="row"><button id="a" type="button">继续</button></div>');
+  m2.querySelector("#a").onclick=function(){ document.body.removeChild(m2); snake=[{x:5,y:10},{x:4,y:10},{x:3,y:10}]; dir=ndir={x:1,y:0}; restart(); };
+}
+/* ───── 猜篮子：第一次两种分母碰到一起时，先猜和是多少（差异→显露） ───── */
+function maybeAsk(){
+  var L=cur(); if(L.cmp||basket.length<2) return;
+  var a=basket[basket.length-2], b=basket[basket.length-1]; if(a.d===b.d) return;
+  var key=[Math.min(a.d,b.d),Math.max(a.d,b.d)].join("-"); if(asked[key]) return; asked[key]=1;
+  var right=add(a,b); var opts=[fs(right)];
+  var wr=[F(a.n+b.n,a.d+b.d),F(a.n+b.n,Math.max(a.d,b.d)),F(a.n*b.n,a.d*b.d),F(a.n+b.n,Math.min(a.d,b.d))];
+  wr.forEach(function(w){ var s=fs(w); if(opts.length<3&&opts.indexOf(s)<0&&w.n>0) opts.push(s); });
+  opts.sort(function(){return Math.random()-.5;});
+  busy=true; stop();
+  var m=overlay('<h2>两种果子碰到一起了</h2><p>'+fs(a)+' 和 '+fs(b)+' 放进同一个篮子。篮子里现在是多少？</p><p class="hint">看篮子条：'+fs(a)+' 那一段和 '+fs(b)+' 那一段接起来，占了整条的多少？</p><div class="opts" id="ops"></div><p class="hint" id="pm" style="margin-top:10px;min-height:1.4em"></p>');
+  var ops=m.querySelector("#ops"), pm=m.querySelector("#pm"), tries=0;
+  opts.forEach(function(v){ var bt=document.createElement("button"); bt.type="button"; bt.textContent=v; bt.onclick=function(){
+    if(v===fs(right)){ pm.innerHTML='<span class="ok">对，'+fs(a)+' + '+fs(b)+' = '+fs(right)+'。分母不一样的两块，要先切成一样大的小块才能数——你自己数出来的。</span>';
+      setTimeout(function(){ document.body.removeChild(m); busy=false; restart(); },1600); }
+    else { tries++; bt.className="bad"; pm.textContent=tries<2?"再看条：一整条分成 "+right.d+" 格的话，"+fs(a)+" 占几格、"+fs(b)+" 占几格？":("把两块都切成 "+right.d+" 分之一的小块：一共几块？"); }
+  }; ops.appendChild(bt); });
+}
+/* ───── 过关 ───── */
+function levelUp(){
+  stop(); busy=true; var best=+ls("sde_prim_fsnake_lv",0); if(lv+1>best) lset("sde_prim_fsnake_lv",lv+1);
+  if(custom){ var m=overlay('<h2>🏁 你造的门，你自己凑开了</h2><p>门上是 '+fs(custom.gates[0].length?F(custom.gates[0][0],custom.gates[0][1]):{n:1,d:1})+'，果子是你选的分母。回 ChatPrim 说「我造了一道门」，让它接着带你。</p><div class="row"><button id="a" type="button">再造一道</button><button id="b" class="sec" type="button">回 ChatPrim</button></div>');
+    m.querySelector("#a").onclick=function(){ document.body.removeChild(m); customPanel(); }; m.querySelector("#b").onclick=function(){ location.href="/education/chatprim/"; }; return; }
+  var nl=lv+1;
+  if(LV[nl].custom){ var m2=overlay('<h2>🏁 过关 '+(lv+1)+'/6</h2><p>最后一关轮到你造门。</p><div class="row"><button id="a" type="button">去造门</button></div>'); m2.querySelector("#a").onclick=function(){ document.body.removeChild(m2); lv=nl; customPanel(); }; return; }
+  var m3=overlay('<h2>🏁 过关 '+(lv+1)+'/6</h2><p>凑开了 '+gatesDone+' 道门。下一关：'+esc(LV[nl].name)+'。</p><div class="row"><button id="a" type="button">进下一关</button></div>');
+  m3.querySelector("#a").onclick=function(){ document.body.removeChild(m3); lv=nl; life=3; load(); };
+}
+function customPanel(){
+  stop(); busy=true;
+  var m=overlay('<h2>🛠 你来造门</h2><p class="l">门上写几分之几？<br><span class="frac"><input id="cn" type="number" min="1" max="24" value="5"><span></span><input id="cd" type="number" min="2" max="12" value="8"></span></p>'+
+    '<p class="l">果子有哪些？<br>'+[2,3,4,5,6,8,12].map(function(d){ return '<label class="ck"><input type="checkbox" value="'+d+'"'+(d===2||d===4||d===8?" checked":"")+'> 1/'+d+'</label>'; }).join("")+'</p>'+
+    '<p class="hint" id="pm" style="min-height:1.4em"></p><div class="row"><button id="a" type="button">先算一遍，能凑就开工</button></div>');
+  m.querySelector("#a").onclick=function(){
+    var n=+m.querySelector("#cn").value, d=+m.querySelector("#cd").value, dens=[].slice.call(m.querySelectorAll("input[type=checkbox]:checked")).map(function(c){return +c.value;});
+    var pm=m.querySelector("#pm");
+    if(!(n>=1&&d>=2&&d<=12)||!dens.length){ pm.textContent="门上要一个分数，果子至少选一种。"; return; }
+    var tf=F(n,d);
+    if(!reachable(tf,dens,8)){ pm.textContent="用 "+dens.map(function(x){return "1/"+x;}).join("、")+" 这些果子，8 个以内凑不出刚好 "+fs(tf)+"。想想为什么——分母 "+d+" 跟这些分母有什么关系？改一改再算。"; return; }
+    custom={name:"第 6 关 · 你造的门 "+fs(tf),dens:dens,gates:[[n,d]],bot:false,cmp:false,hint:"门上 "+fs(tf)+" 是你定的，果子 "+dens.map(function(x){return "1/"+x;}).join("、")+" 是你选的。规矩不变：刚好凑成才开。"};
+    document.body.removeChild(m); life=3; load();
+  };
+}
+/* ───── 循环与输入 ───── */
+function stop(){ clearInterval(timer); timer=null; }
+function restart(){ stop(); busy=false; timer=setInterval(step,Math.max(90,speed-lv*12)); draw(); }
+function overlay(html){ var mask=document.createElement("div"); mask.className="mask"; mask.innerHTML='<div class="panel">'+html+'</div>'; document.body.appendChild(mask); return mask; }
+function how(){
+  stop(); var m=overlay('<h2>怎么玩</h2><p class="l">你是蛇，吃到的果子进<b>篮子</b>。果子上写着 1/2、1/3 这样的分数，圆饼画出它有多大。<br><br>右墙上有一道<b>门</b>，门上写着一个分数。篮子里的果子<b>刚好加成门上的数</b>，门才开——多了不开，少了不开。多了按 ⌫ 吐出最后一个。<br><br>篮子条会把果子一段一段摆到一起，两种不一样的分母第一次碰到，先猜猜加起来是多少。<br><br>撞墙、撞自己、进错门，掉一条命。六关：半与半 → 三分 → 通分门 → 比大小赛道 → 人机蛇抢食 → 你来造门。</p><div class="row"><button id="a" type="button">开始</button></div>');
+  m.querySelector("#a").onclick=function(){ document.body.removeChild(m); if(!over) restart(); };
+}
+document.getElementById("btnHow").onclick=how;
+document.getElementById("btnNew").onclick=function(){ if(!confirm("重开这一关？")) return; life=3; if(LV[lv].custom&&!custom) customPanel(); else load(); };
+document.addEventListener("keydown",function(e){
+  var d={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0}}[e.key];
+  if(d){ e.preventDefault(); if(!(d.x===-dir.x&&d.y===-dir.y)) ndir=d; return; }
+  if(e.key===" "){ e.preventDefault(); if(!over&&!busy){ paused=!paused; draw(); } }
+  if(e.key==="Backspace"){ e.preventDefault(); spit(); }
+});
+var tx=0,ty=0,lastTap=0;
+cv.addEventListener("touchstart",function(e){ var t=e.touches[0]; tx=t.clientX; ty=t.clientY; },{passive:true});
+cv.addEventListener("touchend",function(e){ var t=e.changedTouches[0], dx=t.clientX-tx, dy=t.clientY-ty;
+  if(Math.abs(dx)<20&&Math.abs(dy)<20){ var now=Date.now(); if(now-lastTap<350) spit(); lastTap=now; return; }
+  var d=Math.abs(dx)>Math.abs(dy)?(dx>0?{x:1,y:0}:{x:-1,y:0}):(dy>0?{x:0,y:1}:{x:0,y:-1}); if(!(d.x===-dir.x&&d.y===-dir.y)) ndir=d; });
+cv.addEventListener("dblclick",spit);
+window.__fsTest={levelUp:levelUp,load:load,lv:function(v){ if(v!==undefined) lv=v; return lv; }};   /* 仅供模拟脚本走关卡链，页面上不用 */
+load();
+if(!ls("sde_prim_fsnake_seen","")){ lset("sde_prim_fsnake_seen","1"); how(); }
+})();
+</script>
+</body>
+</html>
