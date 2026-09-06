@@ -1218,7 +1218,7 @@ async function runCollide(kv,items,force){
   var sp=raw.split("===Z===");
   state.collide=sp[0].trim();
   var j=null; try{ var m=(sp[1]||"").match(/\{[\s\S]*\}/); j=m?JSON.parse(m[0]):null; }catch(e){ j=null; }
-  state.collideJson=j;
+  state.collideJson=j; state.pairsN=(j&&Array.isArray(j.pairs))?j.pairs.filter(function(q){return q&&q.a!=null&&q.b!=null;}).length:((state.collide.match(/矛盾对[\s\S]*?(?=\n碰撞挑战)/)||[""])[0].match(/[［\[]\s*\d+\s*[］\]]\s*[↔与和]/g)||[]).length;
   /* 机检：三家必须是清单内篇号，且按卡上的起手维／方程／原理各站一维（How 看起手维） */
   var homesOk=null;
   if(j&&Array.isArray(j.homes)&&j.homes.length===3){
@@ -1242,21 +1242,21 @@ function checkupMetrics(mapText,items){
   lines.forEach(function(ln){ var m=ln.match(/^\s*[|｜]?\s*([^|｜\n]{2,40}?)\s*[|｜]\s*([^|｜\n]*?)\s*[|｜]\s*(\d+)\s*[|｜]?/); if(m&&/[［\[]?\d/.test(m[2])){ var ids=(m[2].match(/\d+/g)||[]).length; rows.push({cell:m[1].trim(),papers:ids,props:+m[3]||1}); } });
   var ext=0; rows.forEach(function(r){ if(/外位/.test(r.cell)) ext+=r.papers; });
   var grid=rows.filter(function(r){return !/外位|悬位/.test(r.cell);});
-  var crowd=0, crowdCell="—"; grid.forEach(function(r){ var v=r.papers/Math.max(1,r.props); if(v>crowd){ crowd=v; crowdCell=r.cell+"（"+r.papers+" 篇／"+r.props+" 命题）"; } });
+  var crowd=0, crowdLo=0, crowdCell="—"; grid.forEach(function(r){ var v=r.papers/Math.max(1,r.props); if(v>crowd){ crowd=v; crowdLo=r.papers/(Math.max(1,r.props)+1); crowdCell=r.cell+"（"+r.papers+" 篇／"+r.props+" 命题；再多算一条命题＝"+(Math.round(r.papers/(r.props+1)*100)/100)+"）"; } });
   var rep=0; var sec=String(mapText||"").split(/自撞/)[1]||""; (sec.split(/断链|越位|悬位/)[0].match(/[［\[]\d+[］\]]/g)||[]).forEach(function(){ rep++; });
   var repRate=Math.min(1,rep/N), extRate=ext/N;
-  return {rows:grid.length,crowd:Math.round(crowd*100)/100,crowdCell:crowdCell,repRate:Math.round(repRate*1000)/10,extRate:Math.round(extRate*1000)/10,
-    text:"挤格比＝"+(Math.round(crowd*100)/100)+"（最挤格："+crowdCell+"；阈值 ≥"+CHK_THRESH.crowd+" 判内卷）\n重复降落率＝"+(Math.round(repRate*1000)/10)+"%（自撞篇 "+rep+" / N="+N+"；阈值 ≥"+Math.round(CHK_THRESH.repeat*100)+"% 判轮回）\n外位占比＝"+(Math.round(extRate*1000)/10)+"%（单次体检；两次之间上升判耗散）\n（格位行解析 "+grid.length+" 行；解析不到的格按 0 计，人工核）"};
+  return {rows:grid.length,crowd:Math.round(crowd*100)/100,crowdLo:Math.round(crowdLo*100)/100,crowdCell:crowdCell,repRate:Math.round(repRate*1000)/10,extRate:Math.round(extRate*1000)/10,
+    text:"挤格比区间＝["+(Math.round(crowdLo*100)/100)+", "+(Math.round(crowd*100)/100)+"]（v1.7.2 R-58：全区间 ≥"+CHK_THRESH.crowd+" 内卷，仅上界 ≥"+CHK_THRESH.crowd+" 内卷（边缘））；上界（最挤格："+crowdCell+"；阈值 ≥"+CHK_THRESH.crowd+" 判内卷）\n重复降落率＝"+(Math.round(repRate*1000)/10)+"%（自撞篇 "+rep+" / N="+N+"；阈值 ≥"+Math.round(CHK_THRESH.repeat*100)+"% 判轮回）\n外位占比＝"+(Math.round(extRate*1000)/10)+"%（单次体检；两次之间上升判耗散）\n（格位行解析 "+grid.length+" 行；解析不到的格按 0 计，人工核）"};
 }
 async function runCheckup(kv,items){
   setStage("checkup","on"); state.checkup=""; state.chkJson=null; renderResults(); setStatus(spin("⑤之三 体检…"));
   var M=checkupMetrics(state.mapText,items); state.chkMetrics=M;
   var raw=await sse({mode:"checkup",map:state.mapText,metrics:M.text,cards:cardsPayload(items).map(function(c){ var x=items.filter(function(y){return y.i===c.i;})[0]; c.layer=x?LAYER_NAME[x.layer]:""; return c; }),key:kv.key,vendor:kv.vendor},function(full){ state.checkup=full.split("===CHK===")[0]; renderArtInline("checkup"); },function(s){ setStatus(spin("⑤之三："+esc2(s))); });
   var sp=raw.split("===CHK==="); state.checkup="体检报告（"+new Date().toISOString().slice(0,10)+"）\n\n"+sp[0].trim(); var j=parseJson(sp[1]||""); state.chkJson=j;
-  var mech=[]; if(M.crowd>=CHK_THRESH.crowd) mech.push("内卷"); if(M.repRate>=CHK_THRESH.repeat*100) mech.push("轮回");
-  if(j&&Array.isArray(j.outcomes)){ if(j.leap) mech=["跃迁"]; else j.outcomes.forEach(function(o){ if(mech.indexOf(o)<0&&/内卷|轮回|耗散/.test(o)) mech.push(o); }); }
+  var mech=[]; if(M.crowdLo>=CHK_THRESH.crowd) mech.push("内卷"); else if(M.crowd>=CHK_THRESH.crowd) mech.push("内卷（边缘）"); if(M.repRate>=CHK_THRESH.repeat*100) mech.push("轮回");
+  if(j&&Array.isArray(j.outcomes)){ if(j.leap) mech=["跃迁"]; else j.outcomes.forEach(function(o){ if(mech.indexOf(o)<0&&/轮回|耗散/.test(o)) mech.push(o); }); }
   if(j) j.outcomes=mech;
-  state.log.f5d="体检：挤格比 "+M.crowd+"（≥4 内卷）／重复降落率 "+M.repRate+"%（≥30 轮回）／外位占比 "+M.extRate+"%；释读：新命题率 "+(j&&j.novelty!=null?j.novelty:"—")+"／断链检验率 "+(j&&j.chainTested!=null?j.chainTested:"—")+"／空格填充 "+(j&&j.gapFilling?j.gapFilling:"—")+"；结局＝"+(mech.join("＋")||"未判")+"；阈值＝默认；"+(j&&j.leap?"判跃迁→只出体检、止于此":"开诊断书");
+  state.log.f5d="体检：挤格比区间 ["+M.crowdLo+", "+M.crowd+"]（全区间≥4 内卷／仅上界≥4 内卷边缘，边缘开诊须持有者原话支撑）／重复降落率 "+M.repRate+"%（≥30 轮回）／外位占比 "+M.extRate+"%；释读：新命题率 "+(j&&j.novelty!=null?j.novelty:"—")+"／断链检验率 "+(j&&j.chainTested!=null?j.chainTested:"—")+"／空格填充 "+(j&&j.gapFilling?j.gapFilling:"—")+"；结局＝"+(mech.join("＋")||"未判")+"；阈值＝默认；"+(j&&j.leap?"判跃迁→只出体检、止于此":"开诊断书");
   setStage("checkup","done"); renderResults(); ckptSave();
 }
 /* v1.7 ⑦之二 共识闸 */
@@ -1274,7 +1274,7 @@ async function runMinModel(kv,items){
   if(!state.collide){ state.minmodel="⑧之三未执行：没有碰撞卡。"; state.log.f8c="最小模型：未跑（无碰撞卡）"; setStage("minmodel","done"); renderResults(); return; }
   var raw=await sse({mode:"minmodel",collide:state.collide,collideRun:state.collideRun,map:state.mapText,cards:cardsPayload(items),key:kv.key,vendor:kv.vendor},function(full){ state.minmodel=full.split("===MIN===")[0]; renderArtInline("minmodel"); },function(s){ setStatus(spin("⑧之三："+esc2(s))); });
   var sp=raw.split("===MIN==="); state.minmodel=sp[0].trim(); var j=parseJson(sp[1]||""); state.minJson=j;
-  state.log.f8c="最小模型："+(j&&j.model?j.model:"未解析")+"；型＝"+(j&&j.kind?j.kind:"—")+"；N 卡图真跑＝"+(j?(j.support?"支持":"判负照登"):"未判")+"（移动 "+(j&&j.moved!=null?j.moved:"—")+" 篇、新邻居 "+(j&&j.pairs!=null?j.pairs:"—")+" 对）；脚本版＝"+(j&&j.scriptPending?"待用户在容器里按预注册跑":"不适用")+"；证据后缀＝"+(j&&j.suffix?j.suffix:"R");
+  state.log.f8c="最小模型："+(j&&j.model?j.model:"未解析")+"；型＝"+(j&&j.kind?j.kind:"—")+"；N 卡图真跑＝"+(j?(j.support?"支持":"判负照登"):"未判")+"（移动 "+(j&&j.moved!=null?j.moved:"—")+" 篇、新邻居 "+(j&&j.pairs!=null?j.pairs:"—")+" 对）；脚本版＝"+(j&&j.scriptPending?"待用户在容器里按预注册跑":"不适用")+"；新场合候选＝"+(j?(j.newSetting?"有":"无（全旧场合，后缀只许 S(旧)）"):"—")+"；证据后缀＝"+(j&&j.suffix?j.suffix:"R");
   setStage("minmodel","done"); renderResults(); ckptSave();
 }
 /* v1.7 ⑨之三 全量安装：每批 ≤20 张卡，3 路并行，逐篇一行 */
@@ -1291,12 +1291,14 @@ async function runInstall(kv,items){
   state.installRows=rows;
   var N=cards.length, inst=rows.filter(function(r){return r.verdict==="安装";}).length, ext=rows.filter(function(r){return r.verdict==="外位";}).length, neg=rows.filter(function(r){return r.verdict==="反例";}).length, cross=rows.filter(function(r){return r.cross;}).length;
   var denom=Math.max(1,N-ext), rate=Math.round(inst/denom*1000)/10;
-  var moved=rows.filter(function(r){return r.verdict==="安装"&&(r.reread||(r.old&&r.new&&r.old!==r.new));}).length, alpha=Math.round(moved/Math.max(1,N)*100)/100; state.installAlpha=alpha;
+  var movedRows=rows.filter(function(r){return r.verdict==="安装"&&(r.reread||(r.old&&r.new&&r.old!==r.new));}), moved=movedRows.length, alpha=Math.round(moved/Math.max(1,N)*100)/100;
+  var propCnt={}, effMoved=0; movedRows.forEach(function(r){ var k=String(r.prop||r.new||"").replace(/[\s，。；：、（）()]/g,"").slice(0,16)||"_"; propCnt[k]=(propCnt[k]||0)+1; if(propCnt[k]<=5) effMoved++; });
+  var mProps=Object.keys(propCnt).length, maxProp=Object.keys(propCnt).reduce(function(a,k){return Math.max(a,propCnt[k]);},0), alphaEff=Math.round(effMoved/Math.max(1,N)*100)/100; state.installAlpha=alpha; state.installAlphaEff=alphaEff; state.installProps=mProps;
   var mv={}; rows.forEach(function(r){ if(r.old&&r.new&&r.old!==r.new){ var k=r.old+"→"+r.new; mv[k]=(mv[k]||0)+1; } });
   var top=Object.keys(mv).sort(function(a,b){return mv[b]-mv[a];}).slice(0,3).map(function(k){return k+"（"+mv[k]+" 篇）";}).join("、");
-  var head="覆盖率 c＝"+rate+"%（安装 "+inst+" / 分母 "+denom+"，外位 "+ext+" 不计；反例 "+neg+"；未出行 "+(N-rows.length)+"）"+(rate<90?" ⚠ 低于承重线 90%":"")+"\n移动率 α＝"+alpha+"（移动或重读含未陈述命题 "+moved+" / N="+N+"；T0-S ≥0.5、T0-R ≥0.3）"+(alpha<0.3?" ⚠ 低于 T0-R 档线→D1":alpha<0.5?" ⚠ 低于 T0-S 档线→抽样安装":"")+"\n移动最多：\n"+(top||"（无移动或未解析）")+"\n原互不引用的新邻居：\n"+cross+" 篇带此类邻居\n反例篇号：\n"+(rows.filter(function(r){return r.verdict==="反例";}).map(function(r){return "［"+r.i+"］";}).join("")||"（无）")+"\n";
+  var head="覆盖率 c＝"+rate+"%（安装 "+inst+" / 分母 "+denom+"，外位 "+ext+" 不计；反例 "+neg+"；未出行 "+(N-rows.length)+"）"+(rate<90?" ⚠ 低于承重线 90%":"")+"\n移动率 α＝"+alpha+"（移动或重读含未陈述命题 "+moved+" / N="+N+"）；有效移动率 α_eff＝"+alphaEff+"（v1.7.2 R-60：同一重读命题最多计 5 篇；重读命题 m＝"+mProps+"，最大单命题 "+maxProp+" 篇；档线按 α_eff：T0-S ≥0.5、T0-R ≥0.3）"+(alphaEff<0.3?" ⚠ 低于 T0-R 档线→D1":alphaEff<0.5?" ⚠ 低于 T0-S 档线→抽样安装":"")+(mProps<=3?" ⚠ 一句话安装（m ≤3），须第二读者复核":"")+"\n移动最多：\n"+(top||"（无移动或未解析）")+"\n原互不引用的新邻居：\n"+cross+" 篇带此类邻居\n反例篇号：\n"+(rows.filter(function(r){return r.verdict==="反例";}).map(function(r){return "［"+r.i+"］";}).join("")||"（无）")+"\n";
   state.install=head+"\n【安装表（附录 E）】\n"+texts.filter(Boolean).join("\n");
-  state.log.f9c="全量安装：N="+N+"，安装 "+inst+"／外位 "+ext+"／反例 "+neg+"；覆盖率 c＝"+rate+"%（≥90）；移动率 α＝"+alpha+"（T0-S ≥0.5／T0-R ≥0.3）；移动最多＝"+(top||"—")+"；原互不引用新邻居 "+cross+" 篇；反例应进退界条件 "+neg+" 条";
+  state.log.f9c="全量安装：N="+N+"，安装 "+inst+"／外位 "+ext+"／反例 "+neg+"；覆盖率 c＝"+rate+"%（≥90）；移动率 α＝"+alpha+"／α_eff＝"+alphaEff+"（重读命题 m＝"+mProps+"，最大单命题 "+maxProp+" 篇；档线按 α_eff：T0-S ≥0.5／T0-R ≥0.3）；移动最多＝"+(top||"—")+"；原互不引用新邻居 "+cross+" 篇；反例应进退界条件 "+neg+" 条";
   setStage("install","done"); renderResults(); ckptSave();
 }
 /* v1.7 ⑨之四 新路发生 */
@@ -1419,7 +1421,10 @@ function selfCheck(){
   var sec=state.sections, all=sec.map(function(s){return s.text||"";}).join("\n"); if(!all.trim()) return [];
   var N=litSelected().length, out=[];
   out.push({n:"体检四结局已判、阈值默认（v1.7.1）",ok:!!(state.chkJson&&state.chkJson.outcomes&&state.chkJson.outcomes.length)});
-  out.push({n:"安装移动率 α 达档线（T0-R ≥0.3）（v1.7.1）",ok:(state.installAlpha||0)>=0.3});
+  out.push({n:"安装有效移动率 α_eff 达档线（T0-R ≥0.3）（v1.7.2）",ok:(state.installAlphaEff!=null?state.installAlphaEff:(state.installAlpha||0))>=0.3});
+  out.push({n:"矛盾对 ≥2 对（v1.7.2 R-56）",ok:(state.pairsN||0)>=2});
+  out.push({n:"最小模型含新场合候选，后缀非 S(旧)（v1.7.2 R-57）",ok:!!(state.minJson&&state.minJson.newSetting&&!/S\(旧\)/.test(String(state.minJson.suffix||"")))});
+  out.push({n:"挤格比已报区间；边缘内卷未单凭挤格比开诊（v1.7.2 R-58）",ok:!!(state.chkMetrics&&state.chkMetrics.crowdLo!=null&&(!(state.chkJson&&(state.chkJson.outcomes||[]).some(function(o){return /边缘/.test(o);}))||!!(state.consJson&&state.consJson.some(function(c){return c&&c.pass;}))))});
   out.push({n:"各节末字为句末（v1.7.1）",ok:state.sections.filter(function(s){return s.words&&s.text;}).every(function(s){return /[。！？」』）)|]\s*$/.test(s.text);})});
   out.push({n:"共识原话照录带出处，≥两作者群持有（v1.7）",ok:!!(state.consJson&&state.consJson.some(function(c){return c&&c.pass;}))});
   out.push({n:"最小模型预注册在前、判定照登并传到后缀（v1.7）",ok:!!(state.minJson&&/预注册/.test(state.minmodel||""))});
@@ -1471,7 +1476,7 @@ function selfCheck(){
 }
 function logText(){
   var L=state.log, sel=litSelected();
-  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之三体检 "+(L.f5d||"未跑"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑤之三 "+(state.log.f5c||state.expandNote||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦之二 "+(L.f7b||"未跑"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑧之二 碰撞："+(L.f8b||"未跑"),"工序⑧之三 "+(L.f8c||"未跑"),"工序⑨ "+(L.f9||"未跑"),"工序⑨之二 "+(L.f9b||"未跑"),"工序⑨之三 "+(L.f9c||"未跑"),"工序⑨之四 "+(L.f9d||"未跑"),"工序⑩之二 "+(L.f10b||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 41 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
+  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之三体检 "+(L.f5d||"未跑"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑤之三 "+(state.log.f5c||state.expandNote||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦之二 "+(L.f7b||"未跑"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑧之二 碰撞："+(L.f8b||"未跑"),"工序⑧之三 "+(L.f8c||"未跑"),"工序⑨ "+(L.f9||"未跑"),"工序⑨之二 "+(L.f9b||"未跑"),"工序⑨之三 "+(L.f9c||"未跑"),"工序⑨之四 "+(L.f9d||"未跑"),"工序⑩之二 "+(L.f10b||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 44 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
 }
 
 /* ---- 渲染 ---- */
@@ -1523,7 +1528,7 @@ function renderResults(){
   if(state.planText||state.verdict||state.stage==="verdict"){
     html+='<div class="rcard lit"><div class="rhead"><b>⑤之二 敌拓闸 · 邻近行实搜（'+((state.nhits||"").split("【项").length-1)+' 条记录）与三判</b>'+(state.verdict?'<button class="rbtn" data-copy="verdict">复制</button>'+(!running?'<button class="rbtn" data-rerun="verdict">重判</button>':""):"")+'</div>'+(state.planText?'<div class="artbody" style="font-size:12.5px;color:var(--muted)">'+esc2(state.planText)+'</div>':"")+(state.verdict?'<div class="artbody" data-art="verdict" style="margin-top:10px">'+esc2(state.verdict)+"</div>":'<div class="r-load">'+spin("三判中…")+"</div>")+"</div>";
   }
-  html+=artCard("⑤ 之三 · 体检报告：四机检读数与领域结局（阈值：内卷 4／轮回 30%）","checkup","cls","checkup");
+  html+=artCard("⑤ 之三 · 体检报告：四机检读数与领域结局（阈值：内卷 4（挤格比区间）／轮回 30%）","checkup","cls","checkup");
   html+=artCard("⑤ 之二 · 敌拓闸：语料空 / 全语料空 / 本地空（空格与断链 "+((state.plan||[]).length)+" 项，隔壁行实搜 "+((state.nhits||"").split("【项 ").length-1)+" 条记录）","verdict","cls","verdict");
   html+=artCard("⑥ 表面挑战清单（论文原话）","surface","");
   html+=artCard("⑦ 之二 · 共识闸：领域原话与它默认了什么","consensus","cls","consensus");
