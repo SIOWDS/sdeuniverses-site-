@@ -80,6 +80,9 @@ button{font:inherit}
 @keyframes bl{50%{opacity:0}}
 .wait{color:var(--ink2);font-family:var(--mono);font-size:13px}
 .learned{margin-top:7px;font-size:12.5px;color:var(--leaf)}
+.run{margin:0 0 6px;border:1px dashed var(--edge);border-radius:10px;background:var(--paper3)}
+.run summary{cursor:pointer;padding:4px 10px;font-size:12px;color:var(--ink2);font-family:var(--mono)}
+.run pre{margin:0;padding:4px 12px 10px;font-size:12.5px;color:#4E4A5C;white-space:pre-wrap;font-family:var(--sans)}
 .tools{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .tools button{border:1px solid transparent;background:transparent;color:var(--ink2);font-size:12px;padding:2px 8px;cursor:pointer;border-radius:8px}
 .tools button:hover{color:var(--ink);border-color:var(--edge)}
@@ -280,10 +283,20 @@ document.getElementById("btnNew").onclick=function(){ if(busy) return; if(HIST.l
 
 /* 剥出末尾的 【档案】{…} 行：正文与档案分家。流式中也剥，免得孩子看到半截 JSON。 */
 var PROF_RE=/\n?\s*【档案】\s*(\{[\s\S]*)$/;
+/* 开头的 【运行】…【/运行】 是发动机的五格，孩子看不到；带 ?run=1 打开页面（或 localStorage sde_prim_run=1）时折叠着给家长／老师看。 */
+var RUN_RE=/^\s*【运行】([\s\S]*?)【\/运行】\s*/, RUN_OPEN=/^\s*【运行】/;
+var SHOW_RUN=(/[?&]run=1/.test(location.search)||ls("sde_prim_run","0")==="1");
+if(/[?&]run=1/.test(location.search)) lset("sde_prim_run","1");
+function splitRun(acc){
+  var m=acc.match(RUN_RE); if(m) return {text:acc.slice(m[0].length),run:m[1].trim(),open:false};
+  if(RUN_OPEN.test(acc)) return {text:"",run:acc.replace(RUN_OPEN,"").trim(),open:true};
+  return {text:acc,run:null,open:false};
+}
 function splitProf(acc){
-  var m=acc.match(PROF_RE); if(!m) return {text:acc,prof:null};
+  var r=splitRun(acc), t=r.text;
+  var m=t.match(PROF_RE); if(!m) return {text:t,prof:null,run:r.run,open:r.open};
   var js=null; try{ js=JSON.parse(m[1].trim()); }catch(e){}
-  return {text:acc.slice(0,m.index).replace(/\s+$/,""),prof:js};
+  return {text:t.slice(0,m.index).replace(/\s+$/,""),prof:js,run:r.run,open:r.open};
 }
 function mergeProf(js){
   var p=PROF(); p.done=p.done||[]; p.stuck=p.stuck||[]; p.turns=(p.turns||0)+1;
@@ -351,10 +364,15 @@ function ask(text,redo){
   var m=addMsg("p","ChatPrim","🌱"), acc="";
   var cur=document.createElement("span"); cur.className="cursor"; m.bd.appendChild(cur);
   ctrl=new AbortController();
-  function paint(){ m.bd.innerHTML=md(splitProf(acc).text); m.bd.appendChild(cur); bottom(); }
+  function paint(){ var sp=splitProf(acc);
+    if(sp.open&&!sp.text){ m.bd.innerHTML='<span class="wait">想一想…</span>'; }
+    else m.bd.innerHTML=md(sp.text);
+    m.bd.appendChild(cur); bottom(); }
   function finish(ok){
     try{ m.bd.removeChild(cur); }catch(e){}
     var sp=splitProf(acc); m.bd.innerHTML=md(sp.text);
+    if(SHOW_RUN&&sp.run){ var rd=document.createElement("details"); rd.className="run";
+      rd.innerHTML='<summary>🔬 运行</summary><pre></pre>'; rd.querySelector("pre").textContent=sp.run; m.body.insertBefore(rd,m.bd); }
     var tools=document.createElement("div"); tools.className="tools";
     function mk(label,fn){ var b=document.createElement("button"); b.type="button"; b.textContent=label; b.onclick=fn; tools.appendChild(b); return b; }
     if(ok&&sp.text){
@@ -363,7 +381,8 @@ function ask(text,redo){
       paintCtx();
       mk("重答",function(){ if(busy) return; feed.removeChild(m.box); if(HIST.length&&HIST[HIST.length-1].role==="assistant") HIST.pop();
         ask(HIST.length?HIST[HIST.length-1].content:"",true); });
-      HIST.push({role:"assistant",content:sp.text});
+      /* 运行块随历史回送：发动机要记得上一轮走到六步里的哪一步；孩子看不到，基底看得到。 */
+      HIST.push({role:"assistant",content:(sp.run?("【运行】\n"+sp.run+"\n【/运行】\n"):"")+sp.text});
     } else {
       mk("重试",function(){ if(busy) return; feed.removeChild(m.box); ask(HIST.length?HIST[HIST.length-1].content:"",true); });
     }
