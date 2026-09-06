@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ChatPrimary · 按课题自学 | SDE 教育</title>
+  <meta name="description" content="四、五、六年级语文、数学、英语自学。说出想法，发现差异，换个例子再试一次。基于 SDE 知识发生学的对话学习。">
+  <link rel="canonical" href="https://sdeuniverses.com/education/chatprimary/">
+  <link rel="stylesheet" href="/education/chatprimary/style.css?v=1">
+  <script src="/education/chatprimary/app.js?v=1" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/education/chatprimary/" aria-label="ChatPrimary 首页"><span class="brand-mark">Cp</span><span>ChatPrimary <small>小学自学伙伴</small></span></a>
+    <nav aria-label="页面导航"><a href="https://sdeuniverses.com/education/">教育栏目</a><button id="open-settings" class="quiet">家长／老师设置</button></nav>
+  </header>
+  <main class="workspace">
+    <aside class="lesson-panel" aria-label="课程选择">
+      <div class="section-label">我的自学课 <span>01</span></div>
+      <h1>今天，学懂一小步。</h1>
+      <p class="muted intro">从你会的地方出发，慢慢找到自己的答案。</p>
+      <form id="lesson-form">
+        <fieldset id="course-controls">
+          <label for="grade">我在读</label>
+          <select id="grade"><option value="4">四年级</option><option value="5">五年级</option><option value="6">六年级</option></select>
+          <label id="subject-label">我想学</label>
+          <div class="subjects" role="group" aria-labelledby="subject-label">
+            <button type="button" data-subject="chinese" aria-pressed="false"><b>文</b>语文</button>
+            <button type="button" data-subject="math" aria-pressed="true"><b>数</b>数学</button>
+            <button type="button" data-subject="english" aria-pressed="false"><b>Aa</b>英语</button>
+          </div>
+          <label for="topic">课题或知识点</label>
+          <input id="topic" maxlength="120" placeholder="例如：小数的意义" required>
+          <div id="topics" class="topic-chips" aria-label="可选课题"></div>
+          <details class="material"><summary>带上我的课本或题目（选填）</summary>
+            <label for="edition">教材版本 / 单元</label><input id="edition" maxlength="80" placeholder="例如：人教版，四年级下册">
+            <label for="material">粘贴原文或题目</label><textarea id="material" rows="4" maxlength="2000" placeholder="需要按某篇课文学习时，请把相关段落贴在这里。"></textarea>
+          </details>
+          <div class="two-fields"><div><label for="pace">学习节奏</label><select id="pace"><option value="gentle">慢慢来</option><option value="steady" selected>一步一步</option><option value="challenge">试试挑战</option></select></div>
+          <div><label for="interest">举例时用</label><select id="interest"><option value="daily">日常生活</option><option value="nature">动物与自然</option><option value="sport">运动与游戏</option><option value="space">太空探索</option></select></div></div>
+        </fieldset>
+        <button type="submit" id="start" class="primary wide">开始这节自学课 <span aria-hidden="true">→</span></button>
+      </form>
+      <button id="reset" class="quiet wide" hidden>换一节课</button>
+      <p id="course-hint" class="small">课题是学习起点；具体内容以你提供的教材为准。</p>
+      <div class="method-note"><b>SDE 知识发生学</b><p>先把想法说出来，在比较和尝试中改变它，再用自己的话讲明白。</p></div>
+    </aside>
+
+    <section class="chat-panel" aria-label="自学对话">
+      <div class="chat-heading"><div><span class="section-label">一起想，一起试</span><h2 id="lesson-title">准备好你的第一个想法</h2></div><span class="version">简版 1.0</span></div>
+      <ol class="steps" aria-label="学习环节">
+        <li data-stage="diagnose" aria-current="step"><span>1</span>先试一试</li><li data-stage="explore"><span>2</span>找找差异</li><li data-stage="explain"><span>3</span>自己说懂</li><li data-stage="transfer"><span>4</span>换题试试</li><li data-stage="reflect"><span>5</span>收获回看</li>
+      </ol>
+      <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="对话记录">
+        <article class="message assistant welcome"><span class="speaker">ChatPrimary</span><div class="bubble"><h3>你好！不确定，也可以先说说看。</h3><p>选一个课题，我们先做一个小尝试。你可以说“我觉得……”，也可以直接说“我卡住了”。</p><p>我会听你的思路，给一点提示，再陪你试一次。</p></div></article>
+        <div class="starter-note"><b>你来想，我来帮。</b><span>每次一个小问题，不着急把整节课学完。</span></div>
+      </div>
+      <div id="status" class="status" role="status"></div>
+      <div id="error-box" class="error-box" role="alert" hidden><span id="error-text"></span><button id="retry" class="quiet">重新发送</button></div>
+      <div class="composer-wrap">
+        <div class="help-actions" aria-label="学习帮助"><button data-help="hint" disabled>给我一点提示</button><button data-help="example" disabled>换个例子</button><button data-help="challenge" disabled>换题考考我</button><button data-help="summary" disabled>看看我的收获</button></div>
+        <form id="chat-form" class="composer"><label for="answer" class="sr-only">说说你的想法</label><textarea id="answer" rows="2" maxlength="2000" placeholder="先选课题，开始自学。" disabled></textarea><button id="send" type="submit" class="primary" disabled>发送</button><button id="stop" type="button" class="quiet" hidden>停止</button></form>
+        <div class="composer-footer"><span>AI 也会出错，有疑问请和老师一起核对。</span><span>Enter 发送 · Shift+Enter 换行</span></div>
+      </div>
+    </section>
+
+    <aside class="reflection-panel" aria-label="本次学习记录">
+      <div class="section-label">我的学习足迹 <span>02</span></div>
+      <h2>每一步，都有来处。</h2>
+      <div class="note-card"><span class="note-label">这次我说出来了</span><p id="evidence">你的想法会成为下一步学习的起点。</p></div>
+      <div class="note-card next"><span class="note-label">接下来试什么</span><p id="next-step">选一个课题，从一个小问题开始。</p></div>
+      <p class="small">根据本次回答生成的学习观察，供你回看，不是能力评分。</p>
+      <label class="remember"><input id="remember" type="checkbox"> 在这台设备保留本次学习</label>
+      <p id="storage-note" class="small">未勾选时，离开页面就会清空。不要输入姓名、学校、电话等个人信息。</p>
+      <button id="clear" class="quiet">清空本次记录</button>
+      <details class="about"><summary>家长和老师可以了解</summary><p>ChatPrimary 依据王德生博士的 SDE 知识发生学设计：观察孩子表达的理解（S），围绕差异设计尝试路径（D），结合材料、情境和提示调整学习条件（E），让新理解在互动中形成。</p><p>第一版支持文字自学，不承诺覆盖某套教材全册。对话会通过本站转发到家长选择的国内模型服务；密钥仅在本页面内存中使用，不写入学习记录。本站不保存本次学习正文，模型服务按其自身规则处理请求。</p></details>
+    </aside>
+  </main>
+
+  <dialog id="settings" aria-labelledby="settings-title"><form id="settings-form">
+    <div class="dialog-heading"><h2 id="settings-title">家长／老师设置</h2><button type="button" id="close-settings" class="quiet" aria-label="关闭设置">关闭</button></div>
+    <p>请由家长或老师连接国内模型，再交给孩子学习。沿用本站自带密钥的方式，调用费用由对应模型账户承担。</p>
+    <label for="vendor">国内模型</label><select id="vendor"><option value="deepseek">DeepSeek</option><option value="qwen">通义千问</option><option value="zhipu">智谱 GLM</option></select>
+    <label for="api-key">API Key</label><input id="api-key" type="password" autocomplete="off" spellcheck="false" maxlength="300" placeholder="粘贴所选模型的 API Key">
+    <p class="small">只在本页内存中使用，刷新后需要重新填入。若本站已保存同一国内模型的设置，会在本页沿用；不会显示或写入孩子的学习记录。</p>
+    <p id="settings-status" role="status"></p>
+    <div class="dialog-actions"><button type="button" id="forget-key" class="quiet">断开本页连接</button><button type="submit" class="primary">保存到本次学习</button></div>
+  </form></dialog>
+  <dialog id="reset-dialog" aria-labelledby="reset-title"><h2 id="reset-title">开始新的学习？</h2><p>当前对话和这台设备保留的本次记录将清空。模型连接会继续保留到页面关闭。</p><div class="dialog-actions"><button id="cancel-reset" class="quiet">继续这节课</button><button id="confirm-reset" class="primary">清空并换课</button></div></dialog>
+  <noscript>请开启浏览器 JavaScript 后使用 ChatPrimary。</noscript>
+</body>
+</html>

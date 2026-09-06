@@ -1,4 +1,5 @@
 // SDE Universes site worker: visit counter + static assets
+import { handleChatPrimary } from "./chatprimary.js";
 
 // ── 主站 / 四个正式子站：唯一归属、canonical 与统一统计 ────────────
 // 唯一数据源在 public/sites/site-data.json：Worker 用它判路由、改首页统计与
@@ -10605,6 +10606,9 @@ export default {
     console.log("[idx-daily]", JSON.stringify(ir));
   },
   async fetch(request, env, ctx) {
+    if (new URL(request.url).pathname === "/api/chatprimary") {
+      return handleChatPrimary(request, env, { vendors: WDS_VENDORS, liteModel: wdsLiteModel, plainBody: wdsPlainBody, upstream: wdsUp });
+    }
     if (env) { IM_ENV = env; if (env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
     const url = new URL(request.url);
     // /fresh：永不缓存的首页镜像，用于验证最新版本
