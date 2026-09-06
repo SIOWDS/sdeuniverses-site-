@@ -250,7 +250,7 @@ input[type=text].wide{max-width:none}
     </div>
     <div id="ckptBar" style="display:none;margin-top:10px;padding:10px 12px;border:1px dashed var(--gold);border-radius:9px;font-size:13px;color:var(--text)"></div>
     <div class="stages" id="stages">
-      <span data-s="frame">①立题</span><span data-s="lit">②文献</span><span data-s="card">③④出卡</span><span data-s="map">⑤整图</span><span data-s="neighbors">⑤之二敌拓</span><span data-s="surface">⑥表面</span><span data-s="consensus">⑦之二共识</span><span data-s="challenges">⑦挑战</span><span data-s="gaps">⑧不足</span><span data-s="collide">⑧之二碰撞</span><span data-s="minmodel">⑧之三最小模型</span><span data-s="conjectures">⑨猜想</span><span data-s="territory">⑨之二领地</span><span data-s="install">⑨之三安装</span><span data-s="newroute">⑨之四新路</span><span data-s="rename">⑩之二改性</span><span data-s="write">⑩成文</span><span data-s="check">自检</span>
+      <span data-s="frame">①立题</span><span data-s="lit">②文献</span><span data-s="card">③④出卡</span><span data-s="map">⑤整图</span><span data-s="checkup">⑤之三体检</span><span data-s="neighbors">⑤之二敌拓</span><span data-s="surface">⑥表面</span><span data-s="consensus">⑦之二共识</span><span data-s="challenges">⑦挑战</span><span data-s="gaps">⑧不足</span><span data-s="collide">⑧之二碰撞</span><span data-s="minmodel">⑧之三最小模型</span><span data-s="conjectures">⑨猜想</span><span data-s="territory">⑨之二领地</span><span data-s="install">⑨之三安装</span><span data-s="newroute">⑨之四新路</span><span data-s="rename">⑩之二改性</span><span data-s="write">⑩成文</span><span data-s="check">自检</span>
     </div>
   </div>
 
@@ -273,7 +273,7 @@ var kind=localStorage.getItem("sde_rev_kind")||"";        // what|how|why，必�
 var targetN=parseInt(localStorage.getItem("sde_rev_n")||"30",10);
 /* 章目表——唯一权威 tools/skills/sde-review-genesis.md §10.1 之二，这里是它的编译产物（words=0 的参考文献由本页拼装） */
 var HEAD=[{h:"问题与判类",words:900},{h:"解构方法",words:1000}];
-var TAIL=[{h:"整图：挤格、空格、自撞、断链",words:2000},{h:"领域共识与它默认了什么",words:800},{h:"表面挑战与发生挑战",words:3000},{h:"现有方案的不足",words:1500},{h:"维度碰撞：从断链到 Z",words:2500},{h:"最小模型测试",words:1500},{h:"SDE 猜想解决",words:3000},{h:"新研究领地：从 Z 到新地图",words:2500},{h:"全量安装：新地图",words:1500},{h:"新路",words:2000},{h:"未来方向与分年目标",words:2000},{h:"核心语料参考文献",words:0},{h:"敌拓与领地边界参考文献",words:0}];
+var TAIL=[{h:"整图：挤格、空格、自撞、断链",words:2000},{h:"体检读数与领域结局",words:600},{h:"领域共识与它默认了什么",words:800},{h:"表面挑战与发生挑战",words:3000},{h:"现有方案的不足",words:1500},{h:"维度碰撞：从断链到 Z",words:2500},{h:"最小模型测试",words:1500},{h:"SDE 猜想解决",words:3000},{h:"新研究领地：从 Z 到新地图",words:2500},{h:"全量安装：新地图",words:1500},{h:"新路",words:2000},{h:"未来方向与分年目标",words:2000},{h:"核心语料参考文献",words:0},{h:"敌拓与领地边界参考文献",words:0}];
 var SKELETON={
   what:HEAD.concat([{h:"站在 S=F(D,E) 上的文献",words:2000},{h:"站在 D=G(S,E) 上的文献",words:2000},{h:"站在 E=H(S,D) 上的文献",words:2000}],TAIL),
   how:HEAD.concat([{h:"从 S 起手的方法（S→D→E／S→E→D）",words:2000},{h:"从 D 起手的方法（D→S→E／D→E→S）",words:2000},{h:"从 E 起手的方法（E→S→D／E→D→S）",words:2000}],TAIL),
@@ -745,7 +745,7 @@ async function sse(body,onTok,onStage){
 function sseOnce(body,onTok,onStage){
   /* 2026-09-05 提速：思考只给承重工序。核对与抄录类工序（表面／邻近行／三判／真跑重读／占位者／领地裁定／改姓表）一律快档——
      它们要的是可核的列表不是深思，开思考只多烧 1–3 分钟。 */
-  var FAST_MODES={surface:1,neighbors:1,verdict:1,collide_run:1,occupants:1,territory_check:1,rename:1,install:1};
+  var FAST_MODES={surface:1,neighbors:1,verdict:1,collide_run:1,occupants:1,territory_check:1,rename:1,install:1,checkup:1};
   body.tier=body._tier||(FAST_MODES[body.mode]?"fast":tier); body.type=kind; body.topic=$("#topic").value.trim(); body.question=$("#question").value.trim();
   if(PIN_MODEL[body.vendor]) body.model=PIN_MODEL[body.vendor];
   var ac=(typeof AbortController!=="undefined")?new AbortController():null; if(ac) aborters.push(ac);
@@ -906,7 +906,7 @@ function ckptLoad(){ return idbGet(CKPT_KEY).catch(function(){ return null; }).t
 function ckptStageName(snap){
   var st=snap.state||{}; var secs=(st.sections||[]).filter(function(x){return x.text;}).length;
   if(secs) return "⑩ 成文（已写 "+secs+" 节）"; if(st.rename) return "⑩之二 改性"; if(st.newroute) return "⑨之四 新路"; if(st.install) return "⑨之三 安装"; if(st.territoryCheck) return "⑨之二 领地"; if(st.occupants) return "⑨ 猜想";
-  if(st.minmodel) return "⑧之三 最小模型"; if(st.collideRun) return "⑧之二 碰撞"; if(st.gaps) return "⑧ 不足"; if(st.challenges) return "⑦ 挑战"; if(st.consensus) return "⑦之二 共识"; if(st.surface) return "⑥ 表面";
+  if(st.minmodel) return "⑧之三 最小模型"; if(st.collideRun) return "⑧之二 碰撞"; if(st.gaps) return "⑧ 不足"; if(st.challenges) return "⑦ 挑战"; if(st.consensus) return "⑦之二 共识"; if(st.surface) return "⑥ 表面"; if(st.checkup) return "⑤之三 体检";
   if(st.verdict&&!/三判生成中/.test(st.verdict)) return "⑤之二 敌拓"; if(st.mapText) return "⑤ 整图";
   var cards=(st.lit||[]).filter(function(x){return x.cardState==="done";}).length+(snap.uploads||[]).filter(function(u){return u.cardState==="done";}).length;
   if(cards) return "③④ 出卡（已出 "+cards+" 张）"; if((st.lit||[]).length) return "② 文献清单"; return "① 立题";
@@ -1090,7 +1090,7 @@ async function runAll(kv,items){
     setStage("neighbors","done"); renderResults(); ckptSave();
     },function(t){ state.verdict=t; setStage("neighbors","done"); });
     } else setStage("neighbors","done");
-    /* ⑤之三 敌拓补采回环（只一轮）：三判里判本地空的命中进语料、判语料空的进外位；出卡→整图重摆→三判重判 */
+    /* ⑤之三 敌拓补采回环（只一轮；v1.7.1 起编号让给体检，此处仍记 f5c）：三判里判本地空的命中进语料、判语料空的进外位；出卡→整图重摆→三判重判 */
     if(!state.expandDone){
       await soft("⑤之三 敌拓补采","f5c",async function(){ await expandFromHits(kv); },function(t){ state.expandNote=t; });
       state.expandDone=true; ckptSave();
@@ -1101,6 +1101,9 @@ async function runAll(kv,items){
     /* ⑥ 表面（与第一波成文并行；补采后的终版卡） */
     if(!state.surface) surfP=soft("⑥ 表面挑战","f6",async function(){ await stepText("surface","surface",{mode:"surface",cards:items.map(function(x){return {i:x.i,title:x.title,card:(x.material==="fulltext"?"":"【摘要】"+(x.abstract||"")+"\n")+(x.card||""),layer:LAYER_NAME[x.layer]};}),key:kv.key,vendor:kv.vendor},"⑥ 抄表面挑战…"); },function(t){ state.surface=t; setStage("surface","done"); });
     if(surfP) await surfP; else setStage("surface","done");
+    /* ⑤之三 体检闸（v1.7.1）：机检读数在页面算，结局由基底判；判跃迁→止于此 */
+    if(!state.checkup) await soft("⑤之三 体检","f5d",async function(){ await runCheckup(kv,items); },function(t){ state.checkup=t; setStage("checkup","done"); }); else setStage("checkup","done");
+    if(state.chkJson&&state.chkJson.leap){ setStage("check","done"); renderResults(); setStatus("体检判「跃迁」：健康领域只出体检报告，不开诊断书（R-48）。流程止于此；如要强行继续，点⑤之三「重跑」并在日志写理由。"); return; }
     /* ⑦之二 共识闸（v1.7）：断链落到领域原话 */
     if(!state.consensus) await soft("⑦之二 共识闸","f7b",async function(){ await runConsensus(kv,items); },function(t){ state.consensus=t; setStage("consensus","done"); }); else setStage("consensus","done");
     /* ⑦ 挑战 */
@@ -1151,7 +1154,7 @@ async function runAll(kv,items){
     await earlyP;
     await runWrite(kv,items);
     setStage("check","on"); renderResults(); setStage("check","done");
-    var miss=["surface","consensus","verdict","collideRun","minmodel","occupants","territory","territoryCheck","install","newroute","renameText"].filter(function(k){return isMissing(state[k]);}).length;
+    var miss=["surface","checkup","consensus","verdict","collideRun","minmodel","occupants","territory","territoryCheck","install","newroute","renameText"].filter(function(k){return isMissing(state[k]);}).length;
     setStatus("完成。"+(miss?"⚠ 有 "+miss+" 件工序产出缺（标【工序缺】），出稿前请点该件「重跑」补齐。":"")+"可下载 .md 或打印为 PDF；任一工序产出件可单独重跑。断点已保留，下次打开可继续或丢弃。");
   }
 }
@@ -1232,6 +1235,30 @@ async function runCollide(kv,items,force){
   },function(t){ state.collideRun=t; });
   setStage("collide","done"); renderResults(); ckptSave();
 }
+/* v1.7.1 ⑤之三 体检闸：机检读数按格位分布表在页面算（阈值写死：内卷 4／轮回 30%） */
+var CHK_THRESH={crowd:4,repeat:0.30};
+function checkupMetrics(mapText,items){
+  var N=items.length||1, lines=String(mapText||"").split("\n"), rows=[];
+  lines.forEach(function(ln){ var m=ln.match(/^\s*[|｜]?\s*([^|｜\n]{2,40}?)\s*[|｜]\s*([^|｜\n]*?)\s*[|｜]\s*(\d+)\s*[|｜]?/); if(m&&/[［\[]?\d/.test(m[2])){ var ids=(m[2].match(/\d+/g)||[]).length; rows.push({cell:m[1].trim(),papers:ids,props:+m[3]||1}); } });
+  var ext=0; rows.forEach(function(r){ if(/外位/.test(r.cell)) ext+=r.papers; });
+  var grid=rows.filter(function(r){return !/外位|悬位/.test(r.cell);});
+  var crowd=0, crowdCell="—"; grid.forEach(function(r){ var v=r.papers/Math.max(1,r.props); if(v>crowd){ crowd=v; crowdCell=r.cell+"（"+r.papers+" 篇／"+r.props+" 命题）"; } });
+  var rep=0; var sec=String(mapText||"").split(/自撞/)[1]||""; (sec.split(/断链|越位|悬位/)[0].match(/[［\[]\d+[］\]]/g)||[]).forEach(function(){ rep++; });
+  var repRate=Math.min(1,rep/N), extRate=ext/N;
+  return {rows:grid.length,crowd:Math.round(crowd*100)/100,crowdCell:crowdCell,repRate:Math.round(repRate*1000)/10,extRate:Math.round(extRate*1000)/10,
+    text:"挤格比＝"+(Math.round(crowd*100)/100)+"（最挤格："+crowdCell+"；阈值 ≥"+CHK_THRESH.crowd+" 判内卷）\n重复降落率＝"+(Math.round(repRate*1000)/10)+"%（自撞篇 "+rep+" / N="+N+"；阈值 ≥"+Math.round(CHK_THRESH.repeat*100)+"% 判轮回）\n外位占比＝"+(Math.round(extRate*1000)/10)+"%（单次体检；两次之间上升判耗散）\n（格位行解析 "+grid.length+" 行；解析不到的格按 0 计，人工核）"};
+}
+async function runCheckup(kv,items){
+  setStage("checkup","on"); state.checkup=""; state.chkJson=null; renderResults(); setStatus(spin("⑤之三 体检…"));
+  var M=checkupMetrics(state.mapText,items); state.chkMetrics=M;
+  var raw=await sse({mode:"checkup",map:state.mapText,metrics:M.text,cards:cardsPayload(items).map(function(c){ var x=items.filter(function(y){return y.i===c.i;})[0]; c.layer=x?LAYER_NAME[x.layer]:""; return c; }),key:kv.key,vendor:kv.vendor},function(full){ state.checkup=full.split("===CHK===")[0]; renderArtInline("checkup"); },function(s){ setStatus(spin("⑤之三："+esc2(s))); });
+  var sp=raw.split("===CHK==="); state.checkup="体检报告（"+new Date().toISOString().slice(0,10)+"）\n\n"+sp[0].trim(); var j=parseJson(sp[1]||""); state.chkJson=j;
+  var mech=[]; if(M.crowd>=CHK_THRESH.crowd) mech.push("内卷"); if(M.repRate>=CHK_THRESH.repeat*100) mech.push("轮回");
+  if(j&&Array.isArray(j.outcomes)){ if(j.leap) mech=["跃迁"]; else j.outcomes.forEach(function(o){ if(mech.indexOf(o)<0&&/内卷|轮回|耗散/.test(o)) mech.push(o); }); }
+  if(j) j.outcomes=mech;
+  state.log.f5d="体检：挤格比 "+M.crowd+"（≥4 内卷）／重复降落率 "+M.repRate+"%（≥30 轮回）／外位占比 "+M.extRate+"%；释读：新命题率 "+(j&&j.novelty!=null?j.novelty:"—")+"／断链检验率 "+(j&&j.chainTested!=null?j.chainTested:"—")+"／空格填充 "+(j&&j.gapFilling?j.gapFilling:"—")+"；结局＝"+(mech.join("＋")||"未判")+"；阈值＝默认；"+(j&&j.leap?"判跃迁→只出体检、止于此":"开诊断书");
+  setStage("checkup","done"); renderResults(); ckptSave();
+}
 /* v1.7 ⑦之二 共识闸 */
 async function runConsensus(kv,items){
   setStage("consensus","on"); state.consensus=""; state.consJson=null; renderResults(); setStatus(spin("⑦之二 找共识原话…"));
@@ -1264,11 +1291,12 @@ async function runInstall(kv,items){
   state.installRows=rows;
   var N=cards.length, inst=rows.filter(function(r){return r.verdict==="安装";}).length, ext=rows.filter(function(r){return r.verdict==="外位";}).length, neg=rows.filter(function(r){return r.verdict==="反例";}).length, cross=rows.filter(function(r){return r.cross;}).length;
   var denom=Math.max(1,N-ext), rate=Math.round(inst/denom*1000)/10;
+  var moved=rows.filter(function(r){return r.verdict==="安装"&&(r.reread||(r.old&&r.new&&r.old!==r.new));}).length, alpha=Math.round(moved/Math.max(1,N)*100)/100; state.installAlpha=alpha;
   var mv={}; rows.forEach(function(r){ if(r.old&&r.new&&r.old!==r.new){ var k=r.old+"→"+r.new; mv[k]=(mv[k]||0)+1; } });
   var top=Object.keys(mv).sort(function(a,b){return mv[b]-mv[a];}).slice(0,3).map(function(k){return k+"（"+mv[k]+" 篇）";}).join("、");
-  var head="安装率 "+rate+"%（安装 "+inst+" / 分母 "+denom+"，外位 "+ext+" 不计；反例 "+neg+"；未出行 "+(N-rows.length)+"）"+(rate<90?" ⚠ 低于承重线 90%":"")+"\n移动最多：\n"+(top||"（无移动或未解析）")+"\n原互不引用的新邻居：\n"+cross+" 篇带此类邻居\n反例篇号：\n"+(rows.filter(function(r){return r.verdict==="反例";}).map(function(r){return "［"+r.i+"］";}).join("")||"（无）")+"\n";
+  var head="覆盖率 c＝"+rate+"%（安装 "+inst+" / 分母 "+denom+"，外位 "+ext+" 不计；反例 "+neg+"；未出行 "+(N-rows.length)+"）"+(rate<90?" ⚠ 低于承重线 90%":"")+"\n移动率 α＝"+alpha+"（移动或重读含未陈述命题 "+moved+" / N="+N+"；T0-S ≥0.5、T0-R ≥0.3）"+(alpha<0.3?" ⚠ 低于 T0-R 档线→D1":alpha<0.5?" ⚠ 低于 T0-S 档线→抽样安装":"")+"\n移动最多：\n"+(top||"（无移动或未解析）")+"\n原互不引用的新邻居：\n"+cross+" 篇带此类邻居\n反例篇号：\n"+(rows.filter(function(r){return r.verdict==="反例";}).map(function(r){return "［"+r.i+"］";}).join("")||"（无）")+"\n";
   state.install=head+"\n【安装表（附录 E）】\n"+texts.filter(Boolean).join("\n");
-  state.log.f9c="全量安装：N="+N+"，安装 "+inst+"／外位 "+ext+"／反例 "+neg+"；安装率 "+rate+"%（≥90 承重）；移动最多＝"+(top||"—")+"；原互不引用新邻居 "+cross+" 篇；反例应进退界条件 "+neg+" 条";
+  state.log.f9c="全量安装：N="+N+"，安装 "+inst+"／外位 "+ext+"／反例 "+neg+"；覆盖率 c＝"+rate+"%（≥90）；移动率 α＝"+alpha+"（T0-S ≥0.5／T0-R ≥0.3）；移动最多＝"+(top||"—")+"；原互不引用新邻居 "+cross+" 篇；反例应进退界条件 "+neg+" 条";
   setStage("install","done"); renderResults(); ckptSave();
 }
 /* v1.7 ⑨之四 新路发生 */
@@ -1353,9 +1381,11 @@ async function writeSec(kv,items,i){
   var S=state.sections[i]; S.status="running"; S.text=""; renderResults();
   var prev=state.sections.slice(0,i).filter(function(x){return x.status==="done"&&x.text;}).map(function(x){return "《"+x.h+"》："+x.text.replace(/\s+/g," ").slice(0,160)+"…";}).join("\n");
   setStatus(spin("⑩ 写第 "+(i+1)+" 节《"+esc2(S.h)+"》…"));
-  var art={frame:state.frameText,map:state.mapText,verdict:state.verdict,surface:state.surface,challenges:state.challenges,gaps:state.gaps,collide:state.collide,collideRun:state.collideRun,conjectures:state.conjectures,occupants:state.occupants,territory:state.territory,territoryCheck:state.territoryCheck,consensus:state.consensus,minmodel:state.minmodel,install:state.install,newroute:state.newroute};
+  var art={frame:state.frameText,map:state.mapText,verdict:state.verdict,surface:state.surface,challenges:state.challenges,gaps:state.gaps,collide:state.collide,collideRun:state.collideRun,conjectures:state.conjectures,occupants:state.occupants,territory:state.territory,territoryCheck:state.territoryCheck,checkup:state.checkup,consensus:state.consensus,minmodel:state.minmodel,install:state.install,newroute:state.newroute};
   try{
     S.text=await sse({mode:"write",sec:i,art:art,cards:cardsPayload(items),refs:items.map(refString),prev:prev,rename:state.rename||undefined,key:kv.key,vendor:kv.vendor},function(full){ S.text=full; renderSecInline(i); },function(s){ setStatus(spin("第 "+(i+1)+" 节："+esc2(s))); });
+    /* v1.7.1 R-55 句末校验：末字不是句末（。！？」）」或表格行尾 |）→ 送尾段续写一次 */
+    if(S.text&&S.text.length>200&&!/[。！？」』）)|]\s*$/.test(S.text)){ setStatus(spin("第 "+(i+1)+" 节断在半句，续写…")); try{ var tail=S.text.slice(-900); var more=await sse({mode:"write",sec:i,art:art,cards:cardsPayload(items),refs:items.map(refString),prev:prev,rename:state.rename||undefined,continueFrom:tail,key:kv.key,vendor:kv.vendor},null,function(s){ setStatus(spin("第 "+(i+1)+" 节续写："+esc2(s))); }); if(more&&more.trim()) S.text=S.text.replace(/[^。！？」』）)]*$/,"")+more.trim(); }catch(e){} }
     /* 批 4：改姓残留机检——映射表在手而本节 SDE 字面 >3 处，带着残留清单重写一次（只一次） */
     if(state.rename){ var rz=residue(S.text,i===1); if(rz.n>3){ var lst=Object.keys(rz.hits).map(function(w){return w+"×"+rz.hits[w];}).join("、"); setStatus(spin("第 "+(i+1)+" 节残留 "+rz.n+" 处 SDE 字面，重写一次…")); var t2=await sse({mode:"write",sec:i,art:art,cards:cardsPayload(items),refs:items.map(refString),prev:prev,rename:state.rename,residue:lst,key:kv.key,vendor:kv.vendor},function(full){ S.text=full; renderSecInline(i); },function(s){ setStatus(spin("第 "+(i+1)+" 节（重写）："+esc2(s))); }); if(residue(t2,i===1).n<=rz.n) S.text=t2; S.rewrote=rz.n+"→"+residue(S.text,i===1).n; } }
     S.status="done";
@@ -1372,6 +1402,7 @@ async function rerun(field){
     else if(field==="gaps") await stepText("gaps","gaps",{mode:"gaps",challenges:state.challenges,map:state.mapText,key:kv.key,vendor:kv.vendor},"⑧ 重写不足…");
     else if(field==="collide") await runCollide(kv,items,true);
     else if(field==="territory") await runTerritory(kv,items,true);
+    else if(field==="checkup") await runCheckup(kv,items);
     else if(field==="consensus") await runConsensus(kv,items);
     else if(field==="minmodel") await runMinModel(kv,items);
     else if(field==="install") await runInstall(kv,items);
@@ -1387,6 +1418,9 @@ async function rewriteSec(i){ var kv=curKey(); if(!kv||running) return; running=
 function selfCheck(){
   var sec=state.sections, all=sec.map(function(s){return s.text||"";}).join("\n"); if(!all.trim()) return [];
   var N=litSelected().length, out=[];
+  out.push({n:"体检四结局已判、阈值默认（v1.7.1）",ok:!!(state.chkJson&&state.chkJson.outcomes&&state.chkJson.outcomes.length)});
+  out.push({n:"安装移动率 α 达档线（T0-R ≥0.3）（v1.7.1）",ok:(state.installAlpha||0)>=0.3});
+  out.push({n:"各节末字为句末（v1.7.1）",ok:state.sections.filter(function(s){return s.words&&s.text;}).every(function(s){return /[。！？」』）)|]\s*$/.test(s.text);})});
   out.push({n:"共识原话照录带出处，≥两作者群持有（v1.7）",ok:!!(state.consJson&&state.consJson.some(function(c){return c&&c.pass;}))});
   out.push({n:"最小模型预注册在前、判定照登并传到后缀（v1.7）",ok:!!(state.minJson&&/预注册/.test(state.minmodel||""))});
   out.push({n:"安装率 ≥90%，反例已列（v1.7）",ok:!!(state.installRows&&state.installRows.length&&/安装率 (9\d|100)(\.\d+)?%/.test(state.install||""))});
@@ -1437,7 +1471,7 @@ function selfCheck(){
 }
 function logText(){
   var L=state.log, sel=litSelected();
-  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑤之三 "+(state.log.f5c||state.expandNote||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦之二 "+(L.f7b||"未跑"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑧之二 碰撞："+(L.f8b||"未跑"),"工序⑧之三 "+(L.f8c||"未跑"),"工序⑨ "+(L.f9||"未跑"),"工序⑨之二 "+(L.f9b||"未跑"),"工序⑨之三 "+(L.f9c||"未跑"),"工序⑨之四 "+(L.f9d||"未跑"),"工序⑩之二 "+(L.f10b||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 38 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
+  return ["工序① "+(L.f1||"未跑"),"工序② "+(L.f2||"未跑")+" 最终入选 "+sel.length+" 篇。","工序③ 刀与格："+TYPE_NAME[state.type]+"。","工序④ "+(L.f4||"未跑"),"工序⑤ 整图："+(state.mapText?"已出":"未出"),"工序⑤之三体检 "+(L.f5d||"未跑"),"工序⑤之二 "+(state.log.f5b||"未跑"),"工序⑤之三 "+(state.log.f5c||state.expandNote||"未跑"),"工序⑥ 表面挑战："+(state.surface?"已出":"未出"),"工序⑦之二 "+(L.f7b||"未跑"),"工序⑦ 发生挑战："+(state.challenges?"已出":"未出"),"工序⑧ 不足："+(state.gaps?"已出":"未出"),"工序⑧之二 碰撞："+(L.f8b||"未跑"),"工序⑧之三 "+(L.f8c||"未跑"),"工序⑨ "+(L.f9||"未跑"),"工序⑨之二 "+(L.f9b||"未跑"),"工序⑨之三 "+(L.f9c||"未跑"),"工序⑨之四 "+(L.f9d||"未跑"),"工序⑩之二 "+(L.f10b||"未跑"),"工序⑩ 成文 "+state.sections.filter(function(s){return s.text;}).length+" 节；自检 41 项，红 "+selfCheck().filter(function(c){return !c.ok;}).length+" 项。"].join("\n");
 }
 
 /* ---- 渲染 ---- */
@@ -1489,6 +1523,7 @@ function renderResults(){
   if(state.planText||state.verdict||state.stage==="verdict"){
     html+='<div class="rcard lit"><div class="rhead"><b>⑤之二 敌拓闸 · 邻近行实搜（'+((state.nhits||"").split("【项").length-1)+' 条记录）与三判</b>'+(state.verdict?'<button class="rbtn" data-copy="verdict">复制</button>'+(!running?'<button class="rbtn" data-rerun="verdict">重判</button>':""):"")+'</div>'+(state.planText?'<div class="artbody" style="font-size:12.5px;color:var(--muted)">'+esc2(state.planText)+'</div>':"")+(state.verdict?'<div class="artbody" data-art="verdict" style="margin-top:10px">'+esc2(state.verdict)+"</div>":'<div class="r-load">'+spin("三判中…")+"</div>")+"</div>";
   }
+  html+=artCard("⑤ 之三 · 体检报告：四机检读数与领域结局（阈值：内卷 4／轮回 30%）","checkup","cls","checkup");
   html+=artCard("⑤ 之二 · 敌拓闸：语料空 / 全语料空 / 本地空（空格与断链 "+((state.plan||[]).length)+" 项，隔壁行实搜 "+((state.nhits||"").split("【项 ").length-1)+" 条记录）","verdict","cls","verdict");
   html+=artCard("⑥ 表面挑战清单（论文原话）","surface","");
   html+=artCard("⑦ 之二 · 共识闸：领域原话与它默认了什么","consensus","cls","consensus");

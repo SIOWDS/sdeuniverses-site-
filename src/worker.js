@@ -6256,6 +6256,7 @@ const _RS_HEAD = [
 ];
 const _RS_TAIL = [
   { h: "整图：挤格、空格、自撞、断链", words: 2000, ask: "先出格位分布表（每格一行：格名｜篇号清单｜该格内不同承重命题数），再读四样并点名到篇号：挤格；空格——每个空格必须起名（若有人站到这格，承重命题会是什么样），禁写「有待研究」，并标全文级／摘要级，摘要级的写成条件句并给降级条件；自撞——同一命题的重复降落点名合并；断链——共同依赖却无人检验的前提，写到「它若不成立，哪几格整格塌」。" },
+  { h: "体检读数与领域结局", words: 600, ask: "工序⑤之三体检闸：把给定的体检报告编排成文，不得改其结论——四机检读数各一句（挤格比与阈值 4、重复降落率与阈值 30%、外位占比变化、空格填充）、三释读读数（新命题率、断链检验率、空格填充趋势）、结局（可并存）、阈值是否改动（改了写数值与理由）、为何开诊断书（判内卷／轮回／耗散）。判跃迁的题面不该走到这里——若走到，本节只写「体检判跃迁，本篇只作体检报告」。不展望、不自评。" },
   { h: "领域共识与它默认了什么", words: 800, ask: "工序⑦之二共识闸：把给定的共识卡编排成文，不得改其结论——每条共识：原话照录（短引号，≤40 字，英文照录）、出处（篇号或 11B 可核文献）、持有者族（哪些篇号引用或复述它）、它默认了什么（一句可证伪陈述）、对应哪条断链、推翻它要引的材料（清单内篇号，两处皆空的写「未证共识」）。只写过闸的共识；单篇论断不写成共识；不评价、不展望。" },
   { h: "表面挑战与发生挑战", words: 3000, ask: "先原样列出各篇自述的挑战/局限（标篇号、按频次），再用一段讲清表面与发生之间隔着什么，然后给五大发生挑战，每条六栏：一句命名（动词在前）／定位（a 某维被当给定 b 某格无人走 c 回写缺席 d 共有前提无人检验 e 读数错位）／表面对照／塌格范围／证据（≥3 篇号各一句锚句）／日常类比一句。五条须落不同格或不同定位类型。最后补第六条「碰撞挑战」（定位 f 碰撞生成）：按碰撞卡里的 Z 重读整图，写出哪一格里两篇原本相安的承重命题按 Z 读互相矛盾——它不从文献里读，只从 Z 里读。" },
   { h: "现有方案的不足", words: 1500, ask: "对五条挑战逐条：现有方案站在哪格（篇号）；够不到的机制——不是「做得不够好」而是「在这一格里做多好都到不了那一格」，按五型标注（错位／缺维／无回写／读数错位／无 Z——它们的语言里没有碰撞卡里的那个量）；它们做对的部分（不许全盘否定）。每条回指整图的一个读法。" },
@@ -11685,6 +11686,13 @@ export default {
         sys = "你做工序⑨之二的领地敌拓与退界裁定。给你领地卡，以及按两道检索词（第一道领地名与别名、第二道新研究对象＋最小单位＋五问形状）在三个库取回的记录。查的不是名字空不空，而是对象是否已有：邻近领域若已有同一最小单位、边界和问题集，本领地必须并入该领域、改名或退界；只是名字撞车而对象不同的，写分离线保留。逐条记录判：同对象（并入／退界）／近邻（写分离线：本领地多出的对象、单位或机制）／无关。然后按领地卡的退界条件裁定：语料退界触发＝整块并入或撤下；未触发＝维持。最后定级：只许 D1／T0，本轮无第一入口证据不得标 T1；并写检索盲区（三库只索引题名摘要、哪些经典条目取不到）。命中必须给可核出处与 ≤40 字锚句；不许凭记忆补命中；两道三库都跑过且都无关才许写「本轮实搜未命中，不等于没有」。" + REVIEW_STYLE;
         usr = HEAD + "\n【领地卡】\n" + clean(b.territory, 8000) + "\n\n【领地敌拓实搜记录（按道与库分组）】\n" + clean(b.hits, 14000) + "\n\n逐条判，出裁定与定级，末段检索盲区。\n\n正文写完后另起一行写 ===HITS=== ，其后只输出一个 JSON 数组（不要代码围栏），把上面判为命中的每一条记录列出：[{\"item\":\"同对象|近邻\",\"verdict\":\"本地空|语料空\",\"title\":\"篇名（照抄记录）\",\"year\":2002,\"doi\":\"照抄记录里的 doi，没有则空串\",\"anchor\":\"≤40 字锚句\"}]。verdict 只许两值：本领域自己的文献写本地空，隔壁行的写语料空；未命中的项不列。没有任何命中就输出 []。";
         tok = deep ? 5000 : 3800;
+      } else if (rmode === "checkup") {
+        /* v1.7.1 ⑤之三 体检闸：页面已算出机检读数（挤格比／重复降落率／外位占比），这里只出释读读数与结局，不许改机检数 */
+        if (!b.map) return J({ ok: false, msg: "先出整图。" }, 400);
+        sys = "你做工序⑤之三体检闸：给领域体出一页体检报告。给你整图、格位分布与页面已按格位分布算出的机检读数（挤格比＝最挤格篇数／该格不同承重命题数，阈值 ≥4 判内卷；重复降落率＝自撞篇数／N，阈值 ≥30% 判轮回；外位占比；这些数不许改）。你补三个释读读数（新命题率＝前沿层新承重命题数／前沿层篇数；空格填充趋势＝近五年前沿层是否站进了起名的空格；断链检验率＝共同前提近十年被至少一篇正面检验的比例，每个都点名到篇号），再按规则判结局：内卷（挤格比达阈）、轮回（重复降落率达阈）、耗散（前沿层篇数与命题数双降）、跃迁（新命题率高且断链有人检、空格在填）；四结局可并存，跃迁与内卷同触以跃迁为准。写清阈值是本文件默认值。判跃迁的写「只出体检报告，不开诊断书」；判内卷／轮回／耗散的写一句「为何开诊断书」。体检报告是独立文件：页眉写「体检报告」，一页，不署综述题名，不展望。" + REVIEW_STYLE +
+          "\n输出格式：栏名一字不改——机检读数：（照抄给定数与阈值）\n释读读数：\n结局：\n阈值：默认\n开不开诊断书：\n正文结束后另起一行写 ===CHK=== ，其后只输出一个 JSON 对象（不要代码围栏）：{\"outcomes\":[\"内卷|轮回|耗散|跃迁\"],\"leap\":false,\"novelty\":0.0,\"chainTested\":0.0,\"gapFilling\":\"是|否|不适用\"}";
+        usr = HEAD + "\n【整图】\n" + clean(b.map, 9000) + "\n\n【页面机检读数（不许改）】\n" + clean(b.metrics, 1200) + "\n\n【解构卡（节选，按层标注；释读读数点名篇号用）】\n" + packCards(b.cards, 260) + "\n\n出体检报告，再出 JSON。";
+        tok = deep ? 3200 : 2400;
       } else if (rmode === "consensus") {
         /* v1.7 ⑦之二 共识闸：断链落到领域自己写在纸上的原话 */
         if (!b.map) return J({ ok: false, msg: "先出整图。" }, 400);
@@ -11705,8 +11713,8 @@ export default {
         if (!b.territory) return J({ ok: false, msg: "先出领地卡。" }, 400);
         const cards = Array.isArray(b.cards) ? b.cards : [];
         if (!cards.length) return J({ ok: false, msg: "本批没有卡。" }, 400);
-        sys = "你做工序⑨之三全量安装：用领地卡的新研究对象、最小单位、第一代基本量与 Z，把给你的每一篇文献重新放一遍——这不是抽样重绘，是每篇都要有一行。逐篇写一行，栏名一字不改、用「｜」分隔：篇号｜旧位置（整图上的格）｜新位置（按新对象与基本量说它站在哪，写出所涉基本量名）｜一句重读（≤40 字，说这篇在新体系里数的是什么）｜新邻居（本批或全清单里按新位置最近的 1–3 个篇号；原互不引用的加「原互不引用」）｜判定（安装／外位／反例）。反例＝按新体系读后与 Z 或基本量冲突的篇，须一句写清冲突处（它将进退界条件）；外位＝相关性闸已判外位或本就不在领域内的篇。纪律：只凭卡与领地卡，不补外部知识；不许把反例改判成安装。" + REVIEW_STYLE +
-          "\n本批写完后另起一行写 ===INST=== ，其后只输出一个 JSON 数组（不要代码围栏）：[{\"i\":篇号,\"old\":\"旧格\",\"new\":\"新位置\",\"verdict\":\"安装|外位|反例\",\"nb\":[篇号],\"cross\":true}]（cross＝新邻居里有原互不引用的）";
+        sys = "你做工序⑨之三全量安装：用领地卡的新研究对象、最小单位、第一代基本量与 Z，把给你的每一篇文献重新放一遍——这不是抽样重绘，是每篇都要有一行。逐篇写一行，栏名一字不改、用「｜」分隔：篇号｜旧位置（整图上的格）｜新位置（按新对象与基本量说它站在哪，写出所涉基本量名）｜一句重读（≤40 字，说这篇在新体系里数的是什么）｜新邻居（本批或全清单里按新位置最近的 1–3 个篇号；原互不引用的加「原互不引用」）｜判定（安装／外位／反例）｜移动（格位移动／重读含未陈述命题／不动＋一句为何在新体系下也不动）。重述不是重读：重读句必须含该篇自己没写的命题。反例＝按新体系读后与 Z 或基本量冲突的篇，须一句写清冲突处（它将进退界条件）；外位＝相关性闸已判外位或本就不在领域内的篇。纪律：只凭卡与领地卡，不补外部知识；不许把反例改判成安装。" + REVIEW_STYLE +
+          "\n本批写完后另起一行写 ===INST=== ，其后只输出一个 JSON 数组（不要代码围栏）：[{\"i\":篇号,\"old\":\"旧格\",\"new\":\"新位置\",\"verdict\":\"安装|外位|反例\",\"reread\":true,\"nb\":[篇号],\"cross\":true}]（cross＝新邻居里有原互不引用的；reread＝重读句含该篇自己没写的命题，只是重述则 false——v1.7.1 移动率 α 只数格位移动或 reread 为真的篇）";
         usr = HEAD + "\n【领地卡（新对象／最小单位／基本量／边界从这里取）】\n" + clean(b.territory, 6000) + "\n\n【Z 与旗舰读数】\n" + clean(b.collide, 2500) + "\n\n【整图（旧位置从这里取）】\n" + clean(b.map, 4000) + "\n\n【本批解构卡（" + cards.length + " 张，逐篇一行）】\n" + packCards(cards, 700) + "\n\n逐篇安装，再出 JSON。";
         tok = deep ? 5200 : 4200;
       } else if (rmode === "newroute") {
@@ -11737,12 +11745,13 @@ export default {
         const parts = [];
         const H = S.h;
         const NM = {
-          "问题与判类": "q", "解构方法": "m", "整图：挤格、空格、自撞、断链": "map", "领域共识与它默认了什么": "cons", "表面挑战与发生挑战": "chal", "现有方案的不足": "gap",
+          "问题与判类": "q", "解构方法": "m", "整图：挤格、空格、自撞、断链": "map", "体检读数与领域结局": "chk", "领域共识与它默认了什么": "cons", "表面挑战与发生挑战": "chal", "现有方案的不足": "gap",
           "维度碰撞：从断链到Z": "col", "最小模型测试": "min", "SDE猜想解决": "conj", "新研究领地：从Z到新地图": "terr", "全量安装：新地图": "inst", "新路": "route", "未来方向与分年目标": "fut",
         };
         const key = (sec >= 2 && sec <= 4) ? "grid" : (NM[H.replace(/\s+/g, "")] || "?");
         const need = (k) => (({
-          map:        ["q", "m", "grid", "map", "cons", "chal", "col", "conj", "inst", "route", "fut"], mapShort: ["q", "m", "cons", "chal", "col", "conj", "inst", "route", "fut"],
+          map:        ["q", "m", "grid", "map", "chk", "cons", "chal", "col", "conj", "inst", "route", "fut"], mapShort: ["q", "m", "chk", "cons", "chal", "col", "conj", "inst", "route", "fut"],
+          checkup:    ["chk", "fut"], checkupShort: ["fut"],
           verdict:    ["map", "cons", "chal", "col", "conj"], verdictShort: ["cons", "col", "conj"],
           surface:    ["cons", "chal"], challenges: ["chal", "gap", "fut"], challengesShort: ["fut"], gaps: ["gap"],
           consensus:  ["cons", "chal", "col", "fut"], consensusShort: ["chal", "col", "fut"],
@@ -11772,11 +11781,14 @@ export default {
         if (art.occupants && need("occupants")) parts.push("【占位者与分离线】\n" + clean(art.occupants, 5000));
         if (art.territory && need("territory")) parts.push("【领地卡（⑨之二；第 9 之二节按此成文、第 10 节总纲引它；级别与结论已定，不得抬级）】\n" + clean(art.territory, sh("territory") || 8000));
         if (art.territoryCheck && need("territoryCheck")) parts.push("【领地敌拓与退界裁定（照登；定级以此为准）】\n" + clean(art.territoryCheck, 4000));
+        if (art.checkup && need("checkup")) parts.push("【体检报告（⑤之三；机检读数与结局已定，不得改）】\n" + clean(art.checkup, sh("checkup") || 4000));
         if (art.consensus && need("consensus")) parts.push("【共识卡（⑦之二；第 7 之二节按此成文，原话只许照录不许改写）】\n" + clean(art.consensus, sh("consensus") || 5000));
         if (art.minmodel && need("minmodel")) parts.push("【最小模型卡（⑧之三；判定与后缀影响已定，判负照登）】\n" + clean(art.minmodel, sh("minmodel") || 6000));
         if (art.install && need("install")) parts.push("【全量安装摘要（⑨之三；安装率与反例已定，全表在附录 E 不入正文）】\n" + clean(art.install, sh("install") || 5000));
         if (art.newroute && need("newroute")) parts.push("【新路卡（⑨之四；六栏与删除条件已定）】\n" + clean(art.newroute, sh("newroute") || 5000));
         if (b.prev) parts.push("【已写各节（只列标题与首段，用来避免重复，不要复述）】\n" + clean(b.prev, 1500));
+        /* v1.7.1 R-55 句末校验：上一稿断在半句（finish_reason=length）时页面把尾段送回来续写 */
+        if (b.continueFrom) parts.push("【续写：上一稿断在半句，下面是它的末尾——从断处接着写完本节余下部分，不重复已写内容，不重写开头，末字必须是句号】\n" + clean(b.continueFrom, 1500));
         if (b.residue) parts.push("【上一稿残留的 SDE 字面（改姓机检抓到的，这一稿一处都不许再出现，用映射表右栏重说）】\n" + clean(b.residue, 600));
         const rn = b.rename && typeof b.rename === "object" ? b.rename : null;
         const dispH = rn && rn.sections && rn.sections[S.h] ? clean(rn.sections[S.h], 120) : "";
@@ -11790,13 +11802,13 @@ export default {
           const ratio = Math.max(0.25, (CAP - 3000) / total);
           for (let i = 1; i < parts.length; i++) { const lim = Math.max(1200, Math.round(parts[i].length * ratio)); if (parts[i].length > lim) parts[i] = parts[i].slice(0, lim) + "\n…（按基底上下文预算截断）"; }
         }
-        usr = HEAD + "\n" + parts.join("\n\n") + "\n\n现在写第 " + (sec + 1) + " 节《" + S.h + "》。本节要写的：" + S.ask + "\n目标约 " + S.words + " 汉字（±20%）。可用短小小节标题分层。直接从正文写起，不要开场白，不要写节名。";
+        usr = HEAD + "\n" + parts.join("\n\n") + "\n\n现在写第 " + (sec + 1) + " 节《" + S.h + "》。本节要写的：" + S.ask + "\n目标约 " + S.words + " 汉字（±20%）。可用短小小节标题分层。直接从正文写起，不要开场白，不要写节名。" + (b.continueFrom ? "\n（本次只写续段：接着上面的末尾往下写到本节结束。）" : "");
         tok = deep ? Math.min(9500, Math.round(S.words * 2.6) + 1200) : Math.min(7500, Math.round(S.words * 2.2) + 800);
       } else {
         return J({ ok: false, msg: "bad mode" }, 400);
       }
 
-      const STAGE = { frame: "立题…", card: "解构中…", map: "摆整图…", neighbors: "列邻近行…", verdict: "三判…", surface: "抄表面挑战…", challenges: "读发生挑战…", gaps: "写不足…", collide: "维度碰撞…", collide_run: "碰撞真跑…", territory: "划领地…", territory_check: "领地敌拓…", rename: "改性…", consensus: "找共识原话…", minmodel: "最小模型…", install: "全量安装…", newroute: "写新路…", conjectures: "造猜想…", occupants: "写分离线…", write: "成文中…" };
+      const STAGE = { frame: "立题…", card: "解构中…", map: "摆整图…", neighbors: "列邻近行…", verdict: "三判…", surface: "抄表面挑战…", challenges: "读发生挑战…", gaps: "写不足…", collide: "维度碰撞…", collide_run: "碰撞真跑…", territory: "划领地…", territory_check: "领地敌拓…", rename: "改性…", checkup: "体检…", consensus: "找共识原话…", minmodel: "最小模型…", install: "全量安装…", newroute: "写新路…", conjectures: "造猜想…", occupants: "写分离线…", write: "成文中…" };
       const rstream = new ReadableStream({
         async start(controller) {
           const hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": hb\n\n")); } catch (e) {} }, 15000);
