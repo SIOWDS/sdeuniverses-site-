@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<title>句子突击 SENTENCE STRIKE · 英语发生学射击游戏 · ChatPrim</title>
+<meta name="description" content="句子突击：星际突击的 S/D/E 三种敌人搬进英语。天上掉的是单词，按英文的顺序打下来才进句子；名词是站得住的显露者，动词是会变形的差异者（go→went→goes，得在对的形态时打），连词是把两个词连起来加盾的纠缠者——先打它才拆得开。语序、时态、连词、Boss 长句、你来造句，五关。">
+<link rel="canonical" href="https://sdeuniverses.com/education/chatprim/games/sentence-strike/">
+<meta name="theme-color" content="#07162e">
+<style>
+:root{--bg:#07162e;--bg2:#0b2244;--ink:#EAF2FF;--ink2:#8FA6C9;--cyan:#25E7FF;--gold:#FFD166;--red:#FF5E7A;--green:#5BF29A;--violet:#B58CFF;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(ellipse at 50% 0%,#12305e 0%,var(--bg) 55%,#020814 100%);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;display:flex;flex-direction:column;align-items:center;padding:0 10px 20px;overflow:hidden}
+a{color:var(--cyan);text-decoration:none}
+button{font:inherit}
+.top{width:100%;max-width:560px;display:flex;align-items:center;gap:10px;height:48px}
+.top a.b{color:var(--ink2);font-size:13px}
+.top .t{font-weight:800;font-size:18px;letter-spacing:.06em;color:var(--cyan);text-shadow:0 0 12px rgba(37,231,255,.5)}
+.top .sp{margin-left:auto}
+.top button{border:1px solid rgba(37,231,255,.35);background:rgba(37,231,255,.08);color:var(--ink2);border-radius:8px;padding:3px 10px;cursor:pointer;font-size:13px}
+.hud{width:100%;max-width:560px;display:flex;gap:6px;margin:0 0 6px;flex-wrap:wrap;font-family:var(--mono);font-size:12px}
+.hud .c{flex:1 1 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:3px 10px;min-width:70px}
+.hud .k{font-size:10px;letter-spacing:.14em;color:var(--ink2)}
+.hud .v{font-size:16px;font-weight:700}
+.hp{height:6px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden;margin-top:3px}
+.hp i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));transition:width .2s}
+.mission{width:100%;max-width:560px;background:rgba(255,255,255,.06);border:1px solid rgba(37,231,255,.25);border-radius:12px;padding:7px 12px;margin-bottom:6px}
+.mission .cn{font-size:14px;color:var(--gold)}
+.mission .slots{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.slot{font-family:var(--mono);font-size:15px;font-weight:700;border:1.5px dashed rgba(255,255,255,.3);border-radius:8px;padding:2px 10px;min-width:44px;text-align:center;color:var(--ink2)}
+.slot.done{border-style:solid;border-color:var(--green);color:var(--green);background:rgba(91,242,154,.1)}
+.slot.next{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 10px rgba(37,231,255,.5);animation:blink 1s infinite}
+@keyframes blink{50%{box-shadow:0 0 2px rgba(37,231,255,.2)}}
+canvas{background:transparent;border:2px solid rgba(37,231,255,.35);border-radius:14px;box-shadow:0 0 30px rgba(37,231,255,.15);touch-action:none;width:min(96vw,560px);height:min(126vw,600px)}
+.msg{width:100%;max-width:560px;min-height:1.6em;font-size:13.5px;color:var(--ink2);margin-top:6px;text-align:center}
+.msg.bad{color:var(--red)} .msg.good{color:var(--green)}
+.keys{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-top:4px;text-align:center}
+.mask{position:fixed;inset:0;background:rgba(2,8,20,.78);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.panel{background:var(--bg2);border:1px solid rgba(37,231,255,.4);border-radius:16px;padding:20px;width:100%;max-width:440px;text-align:center;box-shadow:0 0 40px rgba(37,231,255,.2)}
+.panel h2{margin:0 0 6px;font-size:20px;color:var(--cyan)}
+.panel p{margin:0 0 10px;color:#C8D6F0;font-size:14.5px}
+.panel p.l{text-align:left}
+.panel .row{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.panel .row button{border:0;background:var(--cyan);color:#062033;border-radius:10px;padding:9px 18px;font-size:15px;font-weight:700;cursor:pointer}
+.panel .row button.sec{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.3)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:6px 0}
+.chip{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.06);color:var(--ink);border-radius:999px;padding:3px 11px;cursor:pointer;font-family:var(--mono);font-size:14px}
+.chip.s{border-color:var(--gold)} .chip.d{border-color:var(--violet)} .chip.e{border-color:var(--cyan)}
+.built{min-height:2em;font-family:var(--mono);font-size:17px;color:var(--green);margin:6px 0}
+.hint{font-size:12.5px;color:var(--ink2)}
+.legend{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;font-size:12.5px;margin:6px 0}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="top"><a class="b" href="/education/chatprim/">← ChatPrim</a><span class="t">✦ 句子突击</span><span class="sp"></span><button id="btnHow" type="button">怎么玩</button><button id="btnNew" type="button">重开本关</button></div>
+<div class="hud">
+  <div class="c"><div class="k">关卡</div><div class="v" id="hLv">1</div></div>
+  <div class="c" style="flex:2"><div class="k">护盾</div><div class="hp"><i id="hHp" style="width:100%"></i></div></div>
+  <div class="c"><div class="k">连击</div><div class="v" id="hCombo">0</div></div>
+  <div class="c"><div class="k">自己打出的句子</div><div class="v" id="hDone">0</div></div>
+</div>
+<div class="mission"><div class="cn" id="mCn">任务加载中…</div><div class="slots" id="mSlots"></div></div>
+<canvas id="cv" width="560" height="600"></canvas>
+<div class="msg" id="msg"></div>
+<div class="keys">← → 或 A/D 移动 · 自动开火 · 手机：按住左右半边移动</div>
+<script>
+(function(){
+"use strict";
+/* ───── 词库与关卡：每个词有类型 S（名词／代词，站得住）D（动词，会变形）E（连词／介词，连别人加盾） ───── */
+/* 一句任务：cn 中文，en 顺序数组；decoys 是这一波会一起出现的错词，每个带「为什么错」——打错就炸，同时把这句话亮给他 */
+var LV=[
+ {name:"第 1 关 · 顺序",rule:"中文说「我 喜欢 苹果」，英文也是这个顺序——可「我 昨天 去 学校」，英文把「昨天」放最后。按英文的顺序打。",
+  waves:[
+   {cn:"我喜欢苹果。",en:["I","like","apples"],decoys:[]},
+   {cn:"我昨天去了公园。",en:["I","went","to","the","park","yesterday"],decoys:[["Yesterday","英文里「昨天」多半放最后：…the park yesterday"]]},
+   {cn:"她每天读书。",en:["She","reads","books","every day"],decoys:[["Every day","「每天」也放最后：…books every day"]]}
+  ]},
+ {name:"第 2 关 · 变形（差异者）",rule:"动词会变形：go → went → goes 轮着变。任务里有「昨天」就等它变成 went 再打；有「她」就等 goes。打错形态会炸。",
+  waves:[
+   {cn:"我昨天去了学校。",en:["I","went","to","school","yesterday"],decoys:[],morph:{went:["go","goes","went"]}},
+   {cn:"她每天去学校。",en:["She","goes","to","school","every day"],decoys:[],morph:{goes:["go","went","goes"]}},
+   {cn:"他们上周看了一部电影。",en:["They","watched","a","movie","last week"],decoys:[],morph:{watched:["watch","watches","watched"]}}
+  ]},
+ {name:"第 3 关 · 连接（纠缠者）",rule:"and / but / to / at 这些词会把旁边两个词连起来、给它们加盾。先打连它们的那个词把链拆开（这一枪不算打错），盾破了再按顺序打；连词自己等它的位次。",
+  waves:[
+   {cn:"我喜欢猫和狗。",en:["I","like","cats","and","dogs"],decoys:[],link:{and:["cats","dogs"]}},
+   {cn:"他个子小但很强壮。",en:["He","is","small","but","strong"],decoys:[["and","「但」是 but，and 是「和」"]],link:{but:["small","strong"]}},
+   {cn:"我们十点去公园。",en:["We","go","to","the park","at","ten"],decoys:[["in","「在十点」用 at，不用 in"]],link:{to:["go","the park"],at:["the park","ten"]}}
+  ]},
+ {name:"第 4 关 · BOSS 长句",rule:"三种敌人一起来，句子更长，落得更快。护盾只有这一条。",
+  waves:[
+   {cn:"昨天我和哥哥去了动物园。",en:["Yesterday","my brother","and","I","went","to","the zoo"],decoys:[["go","有 yesterday，要用 went"],["brother and me","作主语要说 my brother and I"]],morph:{went:["go","goes","went"]},link:{and:["my brother","I"],to:["went","the zoo"]}},
+   {cn:"她喜欢苹果，但她弟弟喜欢香蕉。",en:["She","likes","apples","but","her brother","likes","bananas"],decoys:[["like","she 后面是 likes"],["and","「但」是 but"]],morph:{likes:["like","liked","likes"]},link:{but:["apples","her brother"]}}
+  ]},
+ {name:"第 5 关 · 你来造句",rule:"用词块拼一句你自己的话，然后自己把它打出来。",custom:true,waves:[]}
+];
+var TYPE={};
+["I","She","He","They","We","apples","books","cats","dogs","school","the park","park","the","a","movie","ten","my brother","the zoo","her brother","bananas","yesterday","every day","last week","Yesterday","Every day","small","strong","you","it"].forEach(function(w){TYPE[w]="S";});
+["like","likes","liked","went","go","goes","reads","read","watched","watch","watches","is","are","was","ate","eat","eats"].forEach(function(w){TYPE[w]="D";});
+["and","but","to","at","in","on","with"].forEach(function(w){TYPE[w]="E";});
+var COLOR={S:"#FFD166",D:"#B58CFF",E:"#25E7FF"};
+
+var cv=document.getElementById("cv"), ctx=cv.getContext("2d"), W=cv.width, H=cv.height;
+var lv=0, wave=0, hp=100, combo=0, done=0, custom=null, over=false, busy=false, raf=null, last=0;
+var player={x:W/2,vx:0,cool:0}, bullets=[], enemies=[], parts=[], slots=[], need=0, keys={}, touchDir=0, shake=0, wins=0;
+function ls(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }
+function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function cur(){ return custom||LV[lv]; }
+/* 音效：WebAudio 小滴声，不加载文件 */
+var AC=null; function beep(f,t,type){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); var o=AC.createOscillator(), g=AC.createGain(); o.type=type||"square"; o.frequency.value=f; g.gain.value=.05; o.connect(g); g.connect(AC.destination); o.start(); g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+t); o.stop(AC.currentTime+t); }catch(e){} }
+
+/* ───── 一波：布阵 ───── */
+function startWave(){
+  var L=cur(); if(wave>=L.waves.length){ levelUp(); return; }
+  var wv=L.waves[wave]; slots=wv.en.slice(); need=0; enemies=[]; bullets=[]; parts=[];
+  document.getElementById("mCn").textContent="任务："+wv.cn;
+  var all=wv.en.map(function(w){ return {w:w,decoy:null}; }).concat(wv.decoys.map(function(d){ return {w:d[0],decoy:d[1]}; }));
+  all.sort(function(){ return Math.random()-.5; });
+  var cols=Math.min(all.length,4), sp=W/(cols+1);
+  all.forEach(function(it,i){
+    var t=TYPE[it.w]||(it.decoy?"S":"S"), row=Math.floor(i/cols), col=i%cols;
+    var e={w:it.w,show:it.w,type:t,decoy:it.decoy,x:Math.max(40,Math.min(W-40,sp*(col+1)+(Math.random()*30-15))),y:-40-row*70,vy:(0.28+lv*0.06)*(1+Math.random()*.3),hp:t==="S"?2:1,ph:Math.random()*6,dead:false,sh:0,by:[],linked:[]};
+    if(wv.morph&&wv.morph[it.w]){ e.forms=wv.morph[it.w]; e.fi=0; e.show=e.forms[0]; e.ft=0; }
+    enemies.push(e);
+  });
+  if(wv.link){ for(var k in wv.link){ var conn=enemies.find(function(e){return e.w===k&&!e.decoy;}); if(!conn) continue;
+    wv.link[k].forEach(function(name){ var tg=enemies.find(function(e){return e.w===name&&!e.decoy;}); if(tg){ tg.sh++; tg.by.push(conn); conn.linked.push(tg); } }); } }
+  paintSlots(); say("这一波："+wv.en.length+" 个词"+(wv.decoys.length?("，混进了 "+wv.decoys.length+" 个错词"):"")+"。先找第 1 个。","");
+  hud();
+}
+function paintSlots(){ var h=""; slots.forEach(function(w,i){ h+='<span class="slot'+(i<need?" done":(i===need?" next":""))+'">'+(i<need?esc(w):(i===need?"?":"·"))+'</span>'; }); document.getElementById("mSlots").innerHTML=h; }
+function hud(){ document.getElementById("hLv").textContent=(lv+1); document.getElementById("hHp").style.width=Math.max(0,hp)+"%"; document.getElementById("hCombo").textContent=combo; document.getElementById("hDone").textContent=done; }
+var sayT=null; function say(t,cls){ var m=document.getElementById("msg"); m.textContent=t; m.className="msg "+(cls||""); clearTimeout(sayT); if(cls) sayT=setTimeout(function(){ m.className="msg"; },2600); }
+
+/* ───── 命中：这里就是知识发生的地方 ───── */
+function hit(e){
+  var want=slots[need];
+  if(e.sh>0){ var by=e.by.filter(function(c){return !c.dead;})[0]; hurt(4); boom(e.x,e.y,"#25E7FF",6); say("这个词被「"+(by?by.w:"连词")+"」连着，有盾。先打 "+(by?by.w:"连它的词")+"。","bad"); combo=0; hud(); return; }
+  if(e.decoy){ hurt(14); boom(e.x,e.y,"#FF5E7A",18); shake=10; say("💥 "+e.w+"：错——"+e.decoy,"bad"); combo=0; e.dead=true; beep(120,.25,"sawtooth"); hud(); return; }
+  /* 纠缠者：不在它的位次上打它，不算打错——那一枪是「拆链」：把它连着的词的盾破掉，它自己留在天上等它的位次 */
+  if(e.type==="E"&&e.linked.some(function(t){return !t.dead&&t.sh>0;})&&e.w!==want){ e.linked.forEach(function(t){ t.sh=Math.max(0,t.sh-1); }); e.linked=[]; boom(e.x,e.y,"#25E7FF",10); beep(900,.08,"triangle"); say("⚡ 拆开了："+e.w+" 连着的词没盾了。"+e.w+" 自己等它的位次再打。","good"); return; }
+  if(e.forms&&e.show!==e.w){ hurt(10); boom(e.x,e.y,"#B58CFF",12); shake=6; say("💥 现在它是 "+e.show+"——这句要的是 "+e.w+"（看任务里的时间词）。等它变过来再打。","bad"); combo=0; beep(160,.2,"sawtooth"); hud(); return; }
+  if(e.w!==want){
+    var idx=slots.indexOf(e.w);
+    hurt(10); boom(e.x,e.y,"#FF5E7A",12); shake=6; combo=0; beep(150,.2,"sawtooth");
+    say("💥 "+e.w+" 是对的词，但不是现在——它在第 "+(idx+1)+" 位，现在要第 "+(need+1)+" 个。","bad"); hud(); return;
+  }
+  if(e.hp>1){ e.hp--; boom(e.x,e.y,COLOR[e.type],4); beep(500,.05); return; }
+  e.dead=true; need++; combo++; boom(e.x,e.y,COLOR[e.type],14); beep(700+need*80,.08,"triangle");
+  e.linked.forEach(function(t){ t.sh=Math.max(0,t.sh-1); });
+  paintSlots(); hud();
+  if(need>=slots.length){ done++; wins++; hud(); var s=slots.join(" ").replace(/\s+([,.])/g,"$1")+"."; say("✔ "+s,"good"); speak(s); wave++; busy=true; setTimeout(function(){ busy=false; startWave(); },1400); }
+  else say("第 "+need+" 个 ✔　下一个？","good");
+}
+function speak(s){ try{ if(!window.speechSynthesis) return; var u=new SpeechSynthesisUtterance(s); u.lang="en-US"; u.rate=.9; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){} }
+function hurt(n){ hp-=n; if(hp<=0){ hp=0; hud(); gameOver(); } }
+function boom(x,y,c,n){ for(var i=0;i<n;i++) parts.push({x:x,y:y,vx:(Math.random()-.5)*6,vy:(Math.random()-.5)*6,l:1,c:c}); }
+
+/* ───── 主循环 ───── */
+function loop(ts){
+  raf=requestAnimationFrame(loop); if(over||busy){ draw(); return; }
+  var dt=Math.min(40,ts-last||16); last=ts; var f=dt/16;
+  var dir=(keys.ArrowLeft||keys.a?-1:0)+(keys.ArrowRight||keys.d?1:0)+touchDir; player.x=Math.max(30,Math.min(W-30,player.x+dir*6*f));
+  player.cool-=f; if(player.cool<=0){ bullets.push({x:player.x,y:H-60,vy:-9}); player.cool=9; }
+  bullets.forEach(function(b){ b.y+=b.vy*f; }); bullets=bullets.filter(function(b){ return b.y>-10; });
+  enemies.forEach(function(e){ if(e.dead) return; e.y+=e.vy*f; e.ph+=.04*f; e.x+=Math.sin(e.ph)*0.6*f;
+    if(e.forms){ e.ft+=dt; if(e.ft>1500){ e.ft=0; e.fi=(e.fi+1)%e.forms.length; e.show=e.forms[e.fi]; } }
+    if(e.type==="D"&&!e.forms&&Math.random()<.004) e.x+=(Math.random()-.5)*60;   /* 差异者会突然横跳 */
+    if(e.y>H-70){ if(e.decoy){ e.dead=true; boom(e.x,e.y,"#8FA6C9",6); } else { hurt(8); shake=8; say("「"+e.w+"」落地了，回到天上重来。","bad"); e.y=-40; combo=0; hud(); } } });
+  bullets.forEach(function(b){ if(b.dead) return; enemies.forEach(function(e){ if(e.dead||b.dead) return;
+    var w=e.show.length*9+22; if(Math.abs(b.x-e.x)<w/2&&Math.abs(b.y-e.y)<16){ b.dead=true; hit(e); } }); });
+  bullets=bullets.filter(function(b){ return !b.dead; });
+  parts.forEach(function(p){ p.x+=p.vx; p.y+=p.vy; p.l-=.04; }); parts=parts.filter(function(p){ return p.l>0; });
+  if(shake>0) shake--;
+  draw();
+}
+function draw(){
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,H);
+  if(shake) ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+  /* 星空 */
+  ctx.fillStyle="rgba(255,255,255,.25)"; for(var i=0;i<40;i++){ var sx=(i*137)%W, sy=((i*89)+(performance.now()/40*(1+(i%3))))%H; ctx.fillRect(sx,sy,1.5,1.5); }
+  /* 纠缠光链 */
+  enemies.forEach(function(e){ if(e.dead) return; e.linked.forEach(function(t){ if(t.dead||t.sh<=0) return; ctx.strokeStyle="rgba(37,231,255,.55)"; ctx.lineWidth=2; ctx.setLineDash([6,4]); ctx.beginPath(); ctx.moveTo(e.x,e.y); ctx.lineTo(t.x,t.y); ctx.stroke(); ctx.setLineDash([]); }); });
+  enemies.forEach(function(e){ if(e.dead) return; var w=e.show.length*9+22, c=COLOR[e.type];
+    ctx.fillStyle=e.sh>0?"rgba(37,231,255,.18)":"rgba(255,255,255,.08)"; ctx.strokeStyle=c; ctx.lineWidth=e.type==="S"?3:1.5;
+    rr(e.x-w/2,e.y-15,w,30,8); ctx.fill(); ctx.stroke();
+    if(e.sh>0){ ctx.strokeStyle="rgba(37,231,255,.9)"; ctx.setLineDash([3,3]); rr(e.x-w/2-5,e.y-20,w+10,40,12); ctx.stroke(); ctx.setLineDash([]); }
+    ctx.fillStyle=c; ctx.font="bold 15px ui-monospace,Menlo,monospace"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(e.show,e.x,e.y+1);
+    if(e.forms){ ctx.fillStyle="rgba(181,140,255,.8)"; ctx.font="10px sans-serif"; ctx.fillText("↻ 变形中",e.x,e.y-22); }
+    if(e.type==="S"&&e.hp>1){ ctx.fillStyle="rgba(255,209,102,.7)"; ctx.fillRect(e.x-w/2,e.y+17,w,2); } });
+  ctx.fillStyle="#25E7FF"; bullets.forEach(function(b){ ctx.fillRect(b.x-2,b.y-8,4,12); });
+  parts.forEach(function(p){ ctx.globalAlpha=p.l; ctx.fillStyle=p.c; ctx.fillRect(p.x,p.y,3,3); }); ctx.globalAlpha=1;
+  /* 炮台 */
+  ctx.fillStyle="#EAF2FF"; ctx.beginPath(); ctx.moveTo(player.x,H-64); ctx.lineTo(player.x-22,H-30); ctx.lineTo(player.x+22,H-30); ctx.closePath(); ctx.fill();
+  ctx.fillStyle="#25E7FF"; ctx.fillRect(player.x-3,H-74,6,14);
+  ctx.setTransform(1,0,0,1,0,0);
+}
+function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+/* ───── 关卡 ───── */
+function overlay(html){ var m=document.createElement("div"); m.className="mask"; m.innerHTML='<div class="panel">'+html+'</div>'; document.body.appendChild(m); return m; }
+function loadLevel(){ over=false; busy=false; hp=100; combo=0; wave=0; var L=cur(); hud();
+  var m=overlay('<h2>'+esc(L.name)+'</h2><p class="l">'+esc(L.rule)+'</p><div class="legend"><span><i style="background:#FFD166"></i>名词 · 站得住，两枪</span><span><i style="background:#B58CFF"></i>动词 · 会变形／横跳</span><span><i style="background:#25E7FF"></i>连词 · 连别人加盾</span></div><div class="row"><button id="a" type="button">出击</button></div>');
+  m.querySelector("#a").onclick=function(){ document.body.removeChild(m); startWave(); }; }
+function levelUp(){ busy=true; var best=+ls("sde_prim_sstrike_lv",0); if(lv+1>best) lset("sde_prim_sstrike_lv",lv+1);
+  if(custom){ var m=overlay('<h2>🏁 你造的句子，你自己打下来了</h2><p>'+esc(custom.waves[0].en.join(" "))+'。回 ChatPrim 说「我造了一句打下来了」，让它接着带你。</p><div class="row"><button id="a" type="button">再造一句</button><button id="b" class="sec" type="button">回 ChatPrim</button></div>');
+    m.querySelector("#a").onclick=function(){ document.body.removeChild(m); customPanel(); }; m.querySelector("#b").onclick=function(){ location.href="/education/chatprim/"; }; return; }
+  var nl=lv+1;
+  var m2=overlay('<h2>🏁 过关 '+(lv+1)+'/5</h2><p>这一关自己打出了 '+wins+' 句。'+(LV[nl].custom?"最后一关轮到你造句。":("下一关："+esc(LV[nl].name)))+'</p><div class="row"><button id="a" type="button">'+(LV[nl].custom?"去造句":"进下一关")+'</button></div>');
+  wins=0; m2.querySelector("#a").onclick=function(){ document.body.removeChild(m2); lv=nl; if(LV[nl].custom) customPanel(); else loadLevel(); }; }
+function gameOver(){ over=true; busy=true; var m=overlay('<h2>💥 护盾没了</h2><p>这一关自己打出了 '+wins+' 句，一共 '+done+' 句。打错的词炸了你，炸你的那句话就是这一关要学的。</p><div class="row"><button id="a" type="button">再来这一关</button></div>');
+  m.querySelector("#a").onclick=function(){ document.body.removeChild(m); wins=0; loadLevel(); }; }
+/* ───── 你来造句：词块拼句，按他自己的顺序打 ───── */
+var BANK=["I","She","He","They","We","like","likes","liked","went","go","goes","is","are","cats","dogs","apples","school","the park","the zoo","and","but","to","at","yesterday","every day"];
+function customPanel(){
+  busy=true; var built=[];
+  var m=overlay('<h2>🛠 你来造句</h2><p>点词块拼一句你自己的话（三个词以上）。拼好了它就变成一波敌人，按你拼的顺序打。</p><div class="built" id="bt">（还没拼）</div><div class="chips" id="ch"></div><p class="hint" id="pm" style="min-height:1.4em"></p><div class="row"><button id="u" class="sec" type="button">退一个</button><button id="a" type="button">出击</button></div>');
+  var ch=m.querySelector("#ch"), bt=m.querySelector("#bt"), pm=m.querySelector("#pm");
+  BANK.forEach(function(w){ var b=document.createElement("button"); b.type="button"; b.className="chip "+(TYPE[w]||"S").toLowerCase(); b.textContent=w; b.onclick=function(){ if(built.length<8){ built.push(w); bt.textContent=built.join(" "); } }; ch.appendChild(b); });
+  m.querySelector("#u").onclick=function(){ built.pop(); bt.textContent=built.join(" ")||"（还没拼）"; };
+  m.querySelector("#a").onclick=function(){
+    if(built.length<3){ pm.textContent="至少三个词。"; return; }
+    if(!built.some(function(w){return TYPE[w]==="D";})){ pm.textContent="句子里得有一个动词（紫色的）。"; return; }
+    var decoys=[]; built.forEach(function(w){ var alt={like:"likes",likes:"like",went:"go",go:"went",goes:"go",is:"are",are:"is"}[w]; if(alt&&built.indexOf(alt)<0&&decoys.length<2) decoys.push([alt,"你这句里用的是 "+w]); });
+    var link={}; built.forEach(function(w,i){ if(TYPE[w]==="E"&&i>0&&i<built.length-1) link[w]=[built[i-1],built[i+1]]; });
+    custom={name:"第 5 关 · 你的句子",rule:"按你拼的顺序打。",waves:[{cn:"你自己拼的：「"+built.join(" ")+"」",en:built,decoys:decoys,link:link}]};
+    document.body.removeChild(m); loadLevel();
+  };
+}
+/* ───── 输入 ───── */
+document.addEventListener("keydown",function(e){ if(e.key in {ArrowLeft:1,ArrowRight:1,a:1,d:1}){ keys[e.key]=true; e.preventDefault(); } });
+document.addEventListener("keyup",function(e){ delete keys[e.key]; });
+function tpos(t){ var r=cv.getBoundingClientRect(); return (t.clientX-r.left)/r.width; }
+cv.addEventListener("touchstart",function(e){ touchDir=tpos(e.touches[0])<.5?-1:1; e.preventDefault(); },{passive:false});
+cv.addEventListener("touchmove",function(e){ touchDir=tpos(e.touches[0])<.5?-1:1; e.preventDefault(); },{passive:false});
+cv.addEventListener("touchend",function(){ touchDir=0; });
+cv.addEventListener("mousedown",function(e){ touchDir=tpos(e)<.5?-1:1; }); document.addEventListener("mouseup",function(){ touchDir=0; });
+document.getElementById("btnHow").onclick=function(){ busy=true; var m=overlay('<h2>怎么玩</h2><p class="l">天上掉的是<b>单词</b>。任务栏是一句中文，你要把它的英文<b>按顺序</b>一个一个打下来——打中第 1 个词它就飞进第 1 格，再打第 2 个。<br><br>打错会炸你：顺序错、动词形态错、打了混进来的错词，都炸。炸的时候屏幕上会说<b>为什么</b>——那句话就是这一关要学的东西。<br><br>三种敌人：<span style="color:#FFD166">名词</span>站得住要两枪；<span style="color:#B58CFF">动词</span>会 go→went→goes 轮着变形、还会横跳，等它变对了再打；<span style="color:#25E7FF">连词</span>把旁边两个词连起来加盾，先打它。<br><br>句子打完会读一遍。护盾归零就重来这一关。</p><div class="row"><button id="a" type="button">明白</button></div>'); m.querySelector("#a").onclick=function(){ document.body.removeChild(m); busy=false; }; };
+document.getElementById("btnNew").onclick=function(){ if(!confirm("重开这一关？")) return; wins=0; if(LV[lv].custom&&!custom) customPanel(); else loadLevel(); };
+window.__ssTest={levelUp:levelUp,hit:hit,enemies:function(){return enemies;},startWave:startWave,want:function(){return slots[need];}};   /* 仅供模拟脚本 */
+loadLevel(); raf=requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
