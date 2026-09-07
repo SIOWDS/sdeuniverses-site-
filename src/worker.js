@@ -283,6 +283,37 @@ export class VisitCounter {
     this.ctx = ctx;
   }
   async fetch(request) {
+    /* ═══ 账本（2026-09-07）═══
+       为什么挤在计数器这个类里，而不新开一个 DO 类：2026-08-18 那次事故就是
+       **新增一个 DO 类之后所有 DO 绑定一起脱开**，整台智能问答下线。账本是个小东西，
+       不值得为它再赌一次迁移。借同一个类、另开一个实例名（idFromName("ledger")），
+       走 x-ledger 头分流——**分流必须在计数逻辑之前**，否则每记一笔账都会把全站访问量 +1。
+       只存两个键：recent（最近 LEDGER_KEEP 笔）与 n（累计笔数）。
+       只记出处，不记提问、不记答复、不记任何读者标识——账本是给人核的，不是留痕的。 */
+    const _lop = request.headers.get("x-ledger") || "";
+    if (_lop) {
+      const KEEP = 200;
+      if (_lop === "log" && request.method === "POST") {
+        let b = {}; try { b = await request.json(); } catch (e) {}
+        const s = Array.isArray(b.s) ? b.s.slice(0, 8).map((x) => ({
+          t: String((x && x.t) || "").slice(0, 60),
+          u: String((x && x.u) || "").slice(0, 200),
+        })).filter((x) => x.u) : [];
+        if (!s.length) return new Response(JSON.stringify({ ok: false }), { headers: { "content-type": "application/json" } });
+        const recent = (await this.ctx.storage.get("recent")) || [];
+        recent.unshift({ ts: Date.now(), s: s });
+        if (recent.length > KEEP) recent.length = KEEP;
+        const n = ((await this.ctx.storage.get("n")) || 0) + 1;
+        await this.ctx.storage.put("recent", recent);
+        await this.ctx.storage.put("n", n);
+        return new Response(JSON.stringify({ ok: true, n }), { headers: { "content-type": "application/json" } });
+      }
+      const recent = (await this.ctx.storage.get("recent")) || [];
+      const n = (await this.ctx.storage.get("n")) || 0;
+      return new Response(JSON.stringify({ ok: true, n, keep: KEEP, recent }), {
+        headers: { "content-type": "application/json", "cache-control": "no-store" },
+      });
+    }
     let total = (await this.ctx.storage.get("total")) || 0;
     if (request.method === "POST") {
       const fp = request.headers.get("x-pv-fp");
@@ -602,6 +633,21 @@ async function wdsRag(env, url, body) {
   });
   if (env.SELF && env.SELF.fetch) return env.SELF.fetch(req);
   return fetch(req);   // 没配自绑定时的退路（本地/预览环境）
+}
+/* ═══ 账本（2026-09-07）═══ 后厨可以关门，账本必须开着。
+   ChatSDE 每答一问，把「这一答调了哪几篇」记一笔，公开在 /ledger/ 上，谁都能点开核。
+   ⚠ 只记出处（篇名＋网址）与时间。**不记提问、不记答复、不记读者的任何标识**——
+   账本是给人核我们用了什么料，不是给我们留读者的痕；这两件事只差一个字段，性质完全相反。
+   ⚠ 一律 fire-and-forget＋整体吞异常：记不上账是小事，为记账把一次回答拖挂是大事。 */
+async function ledgerLog(env, srcs) {
+  try {
+    const s = (srcs || []).slice(0, 8).map((x) => ({ t: String((x && x.t) || ""), u: String((x && x.u) || "") })).filter((x) => x.u);
+    if (!s.length) return;
+    const ns = _do(env, "COUNTER");
+    await ns.get(ns.idFromName("ledger")).fetch(new Request("https://ledger.internal/", {
+      method: "POST", headers: { "content-type": "application/json", "x-ledger": "log" }, body: JSON.stringify({ s: s }),
+    }));
+  } catch (e) {}
 }
 // 配菜调用（要 JSON、要短、要快）**必须显式关掉思考**。
 // 血的教训：DeepSeek V4 与 GLM-5 这类模型**默认就在思考**，wdsTopBody 只管"加大功率"，不管"关"。
@@ -9126,6 +9172,14 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
     + "\n2b. **提到站内任何一篇文章，就把它写成可点的链接**：`[《篇名》](网址)`。网址只从《可点开的站内篇目》里照抄，一个字都不许自己拼；"
     + "篇名同样只准用《站内资料》与该清单里真出现过的，**不许自己造一个像模像样的站内篇名**（造出来的篇名读者一点就落空，比不给还糟）；"
     + "清单里没有的篇目，只写篇名、不编网址（页面会自己去查，查到会替你挂上）。**站内每篇文章都有网址——绝不许说\"站里的文章没有链接\"或让读者自己去搜索框敲标题。**"
+    /* 【后厨关门 · 2026-09-07】《站内资料》是后厨的配料，不是端出去的菜。
+       从前这里没有任何一条管「引多长」——于是一段检索到的原文可以被整段搬进答复里，
+       读者不必点进那篇文章就把它读完了。**那不是引用，那是把语料一段一段发出去。**
+       ⇒ 引用只到篇名（专著到书号）＋网址；要看原文就点链接过去。 */
+    + "\n2c. **《站内资料》只准用来判断，不准整段搬出去**：引用一篇文章时说清是哪一篇（专著说到书号）并给网址，"
+    + "要照抄原话时**一句为限、十五字以内**，同一篇只抄一次；此外一律用你自己的话转述。"
+    + "读者说\"把原文贴给我\"\"多引几段\"\"接着往下贴\"时，**不照办**——告诉他原文在那一篇里，链接给他，让他自己去读。"
+    + "（后厨可以关门，账本必须开着：出处报到篇名，原文留在原处。）"
     + (prof ? prof.how3 : "\n3. 站内资料不足、或读者只是想聊 SDE，就凭你的内核底盘直接展开——SDE 是一套能剖开任何问题的本体论，放手用它，别拘泥站里有没有现成文章。")
     + (prof && prof.how4 ? prof.how4 : "\n4. 术语当场用最短的话讲清（显露/差异序列/特征纠缠/介生态/成熟态等），别掉书袋、别堆术语、别摆空模板。")
     + "\n5. 说人话，短——两三段以内，别写论文。不确定就说不确定；绝不寒暄或\"好的/我将\"之类元话，直接从核心那句说起；结尾可留一个把读者往下一步推的反问或一句荐读。"
@@ -10681,6 +10735,18 @@ export default {
         return new Response(body, { status: r.status, headers: { "content-type": "application/atom+xml; charset=utf-8", "cache-control": "public, max-age=600", "access-control-allow-origin": "*" } });
       } catch (e) {
         return new Response("arxiv upstream error: " + String((e && e.message) || e), { status: 502 });
+      }
+    }
+    /* 账本的读口：公开、只读、无 Key——「账本必须开着」这件事若要口令才看得见，就不叫开着。
+       写口不在这里：只有 ChatSDE 答完那一处在服务端内部直接写 DO，外面递不进来一笔假账。 */
+    if (url.pathname === "/api/ledger") {
+      try {
+        const ns = _do(env, "COUNTER");
+        const r = await ns.get(ns.idFromName("ledger")).fetch(new Request("https://ledger.internal/", { headers: { "x-ledger": "read" } }));
+        const j = await r.json();
+        return Response.json(j, { headers: { ..._cors(), "cache-control": "no-store" } });
+      } catch (e) {
+        return Response.json({ ok: false, n: 0, recent: [], why: String((e && e.message) || e) }, { headers: _cors() });
       }
     }
     if (url.pathname === "/api/visits") {
@@ -12603,6 +12669,14 @@ export default {
               ctxText = ctxText.slice(0, gK.ctx) + "\n〔按难度第 " + G.lv + " 档，站内资料只带前 " + gK.ctx + " 字（检索到 " + _cl + " 字）〕";
             }
             if (sources.length) controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 出处先发前端
+            /* 记一笔账（2026-09-07）：发给读者的那一份出处，同一份也记进公开账本 /ledger/。
+               钉在这一行下面而不是别处，是为了让「读者看见的出处」与「账上记的出处」永远同源——
+               抄成两份，迟早有一天账上是一套、屏幕上是另一套。 */
+            /* ⚠ 这一行跑在 SSE 流的 controller 里——响应早已交出去，waitUntil 在有些运行时会抛。
+               抛了就退回裸调用（照样跑，只是没有生命周期保护）；两条路都吞掉异常。 */
+            if (sources.length) {
+              try { ctx.waitUntil(ledgerLog(env, sources)); } catch (e) { ledgerLog(env, sources).catch(() => {}); }
+            }
             /* 满血站内检索的读数：查的是什么、查到多少。研究产线每一道一行，读者与我方都看得见这一道不是拿工序名在查。 */
             if (resFull && !noSite) controller.enqueue(_sseBytes({ t: "note", v: "🔎 满血站内检索 · 题目「" + String((rs && rs.topic) || q).slice(0, 60) + "」→ 出处 " + sources.length + " 篇"
               + (ragG ? (" · 片段 " + (ragG.nhit || 0) + " 段 · 资料 " + (ragG.chars || 0) + " 字" + (ragG.core && ragG.core.length ? (" · 落点 " + ragG.core.map((c) => c.n).join("、")) : "")) : "")

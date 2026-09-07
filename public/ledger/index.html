@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>出处账本 · ChatSDE 用了哪些料 | SDE Universes</title>
+<meta name="description" content="ChatSDE 每答一问调了哪几篇站内文章，逐笔记在这里，公开可核。后厨可以关门（原文留在原处），账本必须开着（出处报到篇名）。">
+<link rel="canonical" href="https://sdeuniverses.com/ledger/">
+<link rel="icon" href="/assets/app/favicon-32.png" sizes="32x32">
+<meta name="theme-color" content="#F5EFE0">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;
+  --gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
+  --border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);
+}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','Songti SC',Georgia,serif;line-height:1.75;-webkit-tap-highlight-color:transparent}
+nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:1.2rem;padding:.7rem 1.2rem;background:rgba(245,239,224,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+nav a{text-decoration:none;font-size:.85rem;letter-spacing:.08em;color:var(--text2)}
+nav a.logo{color:var(--gold);font-weight:700;letter-spacing:.06em}
+nav a:hover{color:var(--gold)}
+nav .sp{flex:1}
+main{max-width:780px;margin:0 auto;padding:1.6rem 1.1rem 4rem}
+.eyebrow{font-size:.68rem;letter-spacing:.4em;color:var(--gold2)}
+h1{font-size:clamp(1.45rem,4.4vw,2rem);font-weight:700;letter-spacing:.04em;margin:.35rem 0 .6rem}
+.lede{color:var(--text2);font-size:.93rem;max-width:60ch}
+.rule{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.9rem 1.1rem;margin:1.2rem 0;font-size:.9rem;color:var(--text2)}
+.rule b{color:var(--gold);font-weight:700}
+.rule p+p{margin-top:.5rem}
+.stats{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.2rem 0 .4rem}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.5rem .95rem;min-width:8.5rem}
+.stat small{display:block;font-size:.66rem;letter-spacing:.2em;color:var(--muted)}
+.stat b{font-size:1.35rem;color:var(--gold)}
+h2{font-size:1rem;letter-spacing:.12em;color:var(--gold);margin:2rem 0 .7rem;font-weight:700}
+h2 span{font-size:.72rem;letter-spacing:.04em;color:var(--muted);font-weight:400;margin-left:.5rem}
+ol.top{list-style:none;counter-reset:t}
+ol.top li{counter-increment:t;display:flex;gap:.7rem;align-items:baseline;padding:.42rem 0;border-bottom:1px solid var(--border2);font-size:.9rem}
+ol.top li::before{content:counter(t);color:var(--muted);font-size:.75rem;min-width:1.3rem}
+ol.top a{color:var(--text);text-decoration:none;border-bottom:1px solid var(--border)}
+ol.top a:hover{color:var(--gold)}
+ol.top .n{margin-left:auto;color:var(--gold2);font-size:.8rem;white-space:nowrap}
+.entry{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.75rem .95rem;margin-bottom:.7rem}
+.entry .when{font-size:.72rem;letter-spacing:.12em;color:var(--muted)}
+.entry ul{list-style:none;margin-top:.4rem}
+.entry li{padding:.16rem 0;font-size:.89rem}
+.entry a{color:var(--text);text-decoration:none;border-bottom:1px solid var(--border)}
+.entry a:hover{color:var(--gold)}
+.by{display:inline-block;font-size:.68rem;letter-spacing:.08em;color:var(--gold2);background:var(--card2);border-radius:5px;padding:.05rem .42rem;margin-right:.4rem;vertical-align:.08em}
+.msg{color:var(--muted);font-size:.9rem;padding:1.2rem 0}
+footer{margin-top:2.6rem;padding-top:1.1rem;border-top:1px solid var(--border2);color:var(--muted);font-size:.78rem;line-height:1.9}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">爱思乐园</a>
+  <a href="/taste/chatsde/">ChatSDE</a>
+  <a href="/browse/">浏览</a>
+  <span class="sp"></span>
+  <a href="/about/">平台介绍</a>
+</nav>
+<main>
+  <p class="eyebrow">SDE UNIVERSES · 公开账</p>
+  <h1>出处账本</h1>
+  <p class="lede">ChatSDE 每答一问，都会先到站内检索一遍，把找到的篇目当作答的料。这里逐笔记着它调了哪几篇——篇名、归谁名下、什么时候调的，点开就能核。</p>
+
+  <div class="rule">
+    <p><b>后厨可以关门。</b>站内原文是配料，不是端出去的菜。ChatSDE 引用一篇文章时只报到篇名（专著报到书号）并给网址，不整段搬运原文；要读原文，点链接到那篇文章里读。</p>
+    <p><b>账本必须开着。</b>它用了谁的东西，逐笔记在这一页，谁都能看。</p>
+    <p style="color:var(--muted);font-size:.84rem">账上只记出处与时间。<b style="color:var(--muted)">不记提问、不记答复、不记任何读者标识</b>——这本账是给人核我们用了什么料的，不是用来留读者的痕的。</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><small>累计记账</small><b id="n">—</b></div>
+    <div class="stat"><small>本页留存</small><b id="k">—</b></div>
+    <div class="stat"><small>涉及篇目</small><b id="d">—</b></div>
+  </div>
+
+  <h2>被调得最多的篇目<span>按本页留存的这几笔算</span></h2>
+  <ol class="top" id="top"></ol>
+
+  <h2>流水<span>最近的在最上面</span></h2>
+  <div id="flow"><p class="msg">正在读账……</p></div>
+
+  <footer>
+    账本由服务端在 ChatSDE 每次交出出处的同一处写入，与读者屏幕上看到的那一份同源。<br>
+    只保留最近的若干笔；累计笔数是从开账那天起的总数。<br>
+    <a href="/taste/chatsde/" style="color:var(--gold2)">去 ChatSDE 问一问</a> · <a href="/browse/" style="color:var(--gold2)">浏览全站</a>
+  </footer>
+</main>
+<script>
+(function () {
+  var flow = document.getElementById('flow');
+  var roster = {};   // slug -> 中文名
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  // 归属只从网址里判——服务端一个字都不必存归属，将来改了作者页也不会留下一本错账。
+  function attrib(u) {
+    var p = '';
+    try { p = new URL(u, location.origin).pathname; } catch (e) { p = String(u || ''); }
+    var m = p.match(/^\/students\/([a-z0-9-]+)\//);
+    if (m) return roster[m[1]] || m[1];
+    m = p.match(/^\/books\/m\/(\d+)/);
+    if (m) return '专著 ' + m[1] + ' 号';
+    if (p.indexOf('/frontier/') === 0) return '新思想前沿';
+    if (p.indexOf('/column/') === 0 || p.indexOf('/paradigm/') === 0 || p.indexOf('/confluence/') === 0) return '王德生';
+    return '站方';
+  }
+
+  function when(ts) {
+    var d = new Date(ts);
+    if (isNaN(d.getTime())) return '';
+    var p = function (x) { return (x < 10 ? '0' : '') + x; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  function title(t) { return String(t || '').split(' · ')[0] || '（未命名）'; }
+
+  function render(j) {
+    var rec = (j && j.recent) || [];
+    document.getElementById('n').textContent = (j && j.n) || 0;
+    document.getElementById('k').textContent = rec.length;
+
+    var tally = {}, order = [];
+    rec.forEach(function (e) {
+      (e.s || []).forEach(function (s) {
+        if (!tally[s.u]) { tally[s.u] = { t: title(s.t), u: s.u, n: 0 }; order.push(s.u); }
+        tally[s.u].n++;
+      });
+    });
+    document.getElementById('d').textContent = order.length;
+
+    var top = order.map(function (u) { return tally[u]; }).sort(function (a, b) { return b.n - a.n; }).slice(0, 12);
+    document.getElementById('top').innerHTML = top.map(function (x) {
+      return '<li><a href="' + esc(x.u) + '">《' + esc(x.t) + '》</a>'
+        + '<span class="n">' + x.n + ' 次</span></li>';
+    }).join('') || '<li style="color:var(--muted)">还没有记到账。</li>';
+
+    if (!rec.length) { flow.innerHTML = '<p class="msg">账本刚开，还没有第一笔。去 ChatSDE 问一问，这里就会长出来。</p>'; return; }
+    flow.innerHTML = rec.map(function (e) {
+      return '<div class="entry"><div class="when">' + esc(when(e.ts)) + '　调了 ' + ((e.s || []).length) + ' 篇</div><ul>'
+        + (e.s || []).map(function (s) {
+            return '<li><span class="by">' + esc(attrib(s.u)) + '</span><a href="' + esc(s.u) + '">《' + esc(title(s.t)) + '》</a></li>';
+          }).join('')
+        + '</ul></div>';
+    }).join('');
+  }
+
+  // 名册取不到不算错：归属退回 slug，账照样开着。
+  fetch('/students/roster.json').then(function (r) { return r.json(); }).then(function (j) {
+    ((j && j.students) || []).forEach(function (s) { if (s && s.slug) roster[s.slug] = s.name || s.slug; });
+  }).catch(function () {}).then(function () {
+    return fetch('/api/ledger', { cache: 'no-store' });
+  }).then(function (r) { return r.json(); }).then(render).catch(function () {
+    flow.innerHTML = '<p class="msg">这会儿读不到账（接口没接上）。刷新一下再试。</p>';
+  });
+})();
+</script>
+</body>
+</html>
