@@ -2210,6 +2210,10 @@
     ".wdsm-src-h{font-size:11px;letter-spacing:1px;color:var(--wdim);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:2px 0}" +
     ".wdsm-src-h:hover{color:var(--wtx)}.wdsm-src-h .sg{margin-left:auto;color:var(--wdim2)}" +
     ".wdsm-src-l{display:none;margin-top:6px}.wdsm-src.on .wdsm-src-l{display:block}" +
+    /* 兑现钮：调用不等于兑现——上了几道菜是流水，回头客才是裁定。 */
+    ".wdsm-cash{margin-top:8px;font-size:11px;letter-spacing:.5px;color:var(--wdim);background:none;border:1px solid var(--wline);border-radius:999px;padding:3px 11px;cursor:pointer;font-family:inherit}" +
+    ".wdsm-cash:hover{color:var(--wtx);border-color:var(--wdim)}" +
+    ".wdsm-cash.done{cursor:default;opacity:.62}.wdsm-cash.done:hover{color:var(--wdim);border-color:var(--wline)}" +
     ".wdsm-src-a{display:block;color:var(--wgold2);font-size:13.5px;text-decoration:none;padding:5px 0;border-bottom:1px solid var(--wline)}" +
     ".wdsm-src-a:hover{color:var(--wgold);text-decoration:underline}" +
     ".wdsm-web .wdsm-src-a{color:var(--wteal)}.wdsm-web .wdsm-src-a:hover{opacity:.8}" +
@@ -3983,7 +3987,7 @@
     });
   }
 
-  function renderSources(cell, srcs, kind) {
+  function renderSources(cell, srcs, kind, cashId) {
     if (!srcs || !srcs.length) return null;
     var box = el("div", "wdsm-src" + (kind === "web" ? " wdsm-web" : ""));
     var head = el("div", "wdsm-src-h");
@@ -4004,6 +4008,20 @@
       list.appendChild(l);
     });
     box.appendChild(list);
+    /* 兑现钮只挂在站内出处上，且只在这一答真记了账（服务端发回 cashid）时才出现。
+       ⚠ 按一下只往服务端送这一串 id，不送任何身份、不送提问、不送答复——
+         账本那条底线（不记读者是谁）在这里也一个字不让。 */
+    if (kind === "site" && /^[0-9a-f]{12}$/.test(String(cashId || ""))) {
+      var cb = el("button", "wdsm-cash", "这一答我用上了");
+      cb.onclick = function () {
+        if (cb.classList.contains("done")) return;
+        cb.classList.add("done"); cb.textContent = "记上了 · 谢谢";
+        fetch("/api/ledger/cash", {
+          method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: cashId }),
+        }).catch(function () {});   // 记不上是小事，绝不让它在读者面前报错
+      };
+      box.appendChild(cb);
+    }
     if (cell.follows) cell.turn.insertBefore(box, cell.follows); else cell.turn.appendChild(box);
     if (kind === "web") bindRefs(cell);
     return box;
@@ -4869,9 +4887,10 @@
     }
     var answer = "", srcDone = false, thinkTxt = "", lastPaint = 0, errShown = false;
     var pendSite = null, pendWeb = null;                 // 来源先收着，等正文写完再渲染
+    var cashId = "";                                     // 这一答在出处账本里的那一笔（服务端随流下发）
     var toolSpec = null;                                 // 这一轮的交付规格（服务端下发，前端不留副本）
     function flushSrcs() {
-      if (pendSite) { renderSources(cell, pendSite, "site"); pendSite = null; }
+      if (pendSite) { renderSources(cell, pendSite, "site", cashId); pendSite = null; }
       if (pendWeb) { renderSources(cell, pendWeb, "web"); pendWeb = null; }
     }
     var wd = null, timedOut = false;   // 存活看门狗:靠心跳字节喂,45s 无字节判定连接已死
@@ -4994,6 +5013,7 @@
               frames++;
               if (j.t === "quota") { if (j.v && typeof j.v.left === "number") { dayLeft = j.v.left; updTurns(); } }
               else if (j.t === "sources") { if (!srcDone) { srcDone = true; pendSite = j.v; lkPut(j.v); } }
+              else if (j.t === "cashid") { cashId = String(j.v || ""); }
               else if (j.t === "web") { pendWeb = j.v; }
               else if (j.t === "webfail") {
                 var why = j.v === "need_search_key" ? t("webNeedKey") : (j.v === "bad_search_key" ? t("webBadKey") : t("webNone"));

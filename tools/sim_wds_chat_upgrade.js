@@ -267,7 +267,7 @@ console.log("── 十四 · 客户端：成文说明与稿互不覆盖、看�
   ok(/WDS_CHAT_Q_MAX=20000/.test(wm), "注释里写的是现行上限");
   // 版本戳只能往前：断言认"今天的、比 e 更新的"，别把具体字母写死（今天已经 d→e→f 三次）
   // 已跨到 0731，判据放宽成"今年七月底之后的任一戳"，别再钉死日期与字母
-  ok(/wds-mode\.js\?v=20260[78]\d\d[a-z]/.test(shell), "版本戳再 bump（本轮又动了 wds-mode.js）");
+  ok(/wds-mode\.js\?v=2026\d{4}[a-z]/.test(shell), "版本戳再 bump（本轮又动了 wds-mode.js）");
 }
 
 console.log("── 十四点五 · 追问建议改成六路径引导");

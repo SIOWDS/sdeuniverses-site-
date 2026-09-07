@@ -54,7 +54,8 @@ console.log("\n[② 账本开着 · 库与写口]");
   ok("累计笔数单独一个键（n），不跟 recent 挤在一起", /storage\.put\("n", n\)/.test(cls));
   ok("没有新开 DO 类（借 VisitCounter，免一次迁移）", !/export class Ledger/.test(W));
 }
-ok("ledgerLog 在位", /async function ledgerLog\(env, srcs\)/.test(W));
+ok("ledgerLog 在位", /async function ledgerLog\(env, srcs, id\)/.test(W));
+ok("ledgerId 在位（12 位十六进制的能力票）", /function ledgerId\(\) \{[\s\S]{0,200}?padStart\(2, "0"\)/.test(W));
 ok("ledgerLog 走 COUNTER 的 ledger 实例", /idFromName\("ledger"\)/.test(W));
 ok("ledgerLog 只送 t/u", /\.map\(\(x\) => \(\{ t: String\(\(x && x\.t\) \|\| ""\), u: String\(\(x && x\.u\) \|\| ""\) \}\)\)/.test(W));
 ok("ledgerLog 整体吞异常（记不上账不许拖挂回答）", /async function ledgerLog[\s\S]{0,900}?catch \(e\) \{\}\n\}/.test(W));
@@ -64,11 +65,43 @@ console.log("\n[② 账本开着 · 记账的落点]");
   /* ⚠ 钉唯一结构位：`{t:"sources"}` 这一行全站有两处（另一处在四步法那条流里），
      裸查会撞上前一处、把距离算成二十几万字符。带上它后面那句注释才唯一。 */
   const i = W.indexOf('v: sources })); // 出处先发前端');
-  const j = W.indexOf("ledgerLog(env, sources)");
+  const j = W.indexOf("ledgerLog(env, sources, _lid)");
   ok("记账紧跟「出处发前端」那一行（同源，不许抄成两份）", i > 0 && j > i && (j - i) < 800);
   const line = W.slice(i, j + 400);
   ok("🔴 记账入参只有 sources——没有提问、没有答复", !/ledgerLog\(env,\s*(q|rq|question|answer|text|ctxText)/.test(W));
-  ok("记账不占回答的生命周期（waitUntil，且抛了有退路）", /ctx\.waitUntil\(ledgerLog\(env, sources\)\)/.test(line) && /catch \(e\) \{ ledgerLog\(env, sources\)\.catch/.test(line));
+  ok("记账不占回答的生命周期（waitUntil，且抛了有退路）", /ctx\.waitUntil\(ledgerLog\(env, sources, _lid\)\)/.test(line) && /catch \(e\) \{ ledgerLog\(env, sources, _lid\)\.catch/.test(line));
+}
+
+console.log("\n[③ 兑现 · 调用不等于兑现]");
+{
+  const cls = W.slice(W.indexOf("export class VisitCounter"), W.indexOf("export class CommentBox"));
+  ok("写口给每一笔存 id 与兑现数 c", /recent\.unshift\(\{ ts: Date\.now\(\), id: id, s: s, c: 0 \}\)/.test(cls));
+  ok("id 形状校验（12 位十六进制，能力票）", (cls.match(/\^\[0-9a-f\]\{12\}\$/g) || []).length >= 2);
+  ok("兑现口在位且认 id", /_lop === "cash" && request\.method === "POST"/.test(cls));
+  ok("同一笔有上限（按烂了也刷不出天文数字）", /const CAP = 50;/.test(cls));
+  ok("翻出 recent 的笔不再接受兑现（账不倒改）", /if \(!e\) return new Response\(JSON\.stringify\(\{ ok: false, gone: 1 \}\)/.test(cls));
+  ok("🔴 读口不吐 id（吐了谁都能替别人兑现）", /const pub = recent\.map\(\(e\) => \(\{ ts: e\.ts, s: e\.s, c: e\.c \| 0 \}\)\)/.test(cls) && !/recent: recent \}/.test(cls));
+  ok("读口回累计兑现数", /cashed = \(await this\.ctx\.storage\.get\("cashed"\)\)/.test(cls));
+}
+ok("id 在调用点生成、随流下发", /const _lid = ledgerId\(\);/.test(W) && /_sseBytes\(\{ t: "cashid", v: _lid \}\)/.test(W));
+{
+  /* 契约纪律：cashid 必须是**新事件**，不许改 sources 的形状——
+     搜索页与前沿搜索页都把 j.v 当数组读。 */
+  ok("没动 sources 事件的形状", /_sseBytes\(\{ t: "sources", v: sources \}\)/.test(W));
+}
+ok("/api/ledger/cash 路由在位、只收 POST", /url\.pathname === "\/api\/ledger\/cash"/.test(W) && /\/api\/ledger\/cash"[\s\S]{0,300}?Method Not Allowed/.test(W));
+{
+  const M = fs.readFileSync(path.join(ROOT, "public", "wds-mode.js"), "utf8");
+  ok("前端接住 cashid", /else if \(j\.t === "cashid"\) \{ cashId = String\(j\.v \|\| ""\); \}/.test(M));
+  ok("兑现钮挂在站内出处上（web 出处不挂）", /kind === "site" && \/\^\[0-9a-f\]\{12\}\$\/\.test\(String\(cashId/.test(M));
+  ok("renderSources 收得到 cashId（站内那一路真传了）", /renderSources\(cell, pendSite, "site", cashId\)/.test(M));
+  ok("🔴 按钮只送 id——不送身份、不送提问、不送答复", /body: JSON\.stringify\(\{ id: cashId \}\)/.test(M));
+  ok("按钮失败不在读者面前报错", /\/api\/ledger\/cash[\s\S]{0,400}?\.catch\(function \(\) \{\}\)/.test(M));
+}
+{
+  const H = fs.readFileSync(path.join(ROOT, "public", "ledger", "index.html"), "utf8");
+  ok("页面写明「调用不等于兑现」", /调用不等于兑现/.test(H) && /回头客才是裁定/.test(H));
+  ok("页面有累计兑现与逐笔兑现数", /id="c"/.test(H) && /人说用上了/.test(H));
 }
 
 console.log("\n[② 账本开着 · 读口与页面]");

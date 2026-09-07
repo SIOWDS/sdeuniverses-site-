@@ -300,17 +300,43 @@ export class VisitCounter {
           u: String((x && x.u) || "").slice(0, 200),
         })).filter((x) => x.u) : [];
         if (!s.length) return new Response(JSON.stringify({ ok: false }), { headers: { "content-type": "application/json" } });
+        /* id 由调用方带来（那一边要在同一刻把它发给读者），只做形状校验。
+           它同时是**能力票**：只有真收到过这一答的人手里才有这串，别人猜不到，
+           所以兑现口不需要任何身份，也就不必知道按钮是谁按的。 */
+        const id = /^[0-9a-f]{12}$/.test(String(b.id || "")) ? String(b.id) : "";
         const recent = (await this.ctx.storage.get("recent")) || [];
-        recent.unshift({ ts: Date.now(), s: s });
+        recent.unshift({ ts: Date.now(), id: id, s: s, c: 0 });
         if (recent.length > KEEP) recent.length = KEEP;
         const n = ((await this.ctx.storage.get("n")) || 0) + 1;
         await this.ctx.storage.put("recent", recent);
         await this.ctx.storage.put("n", n);
         return new Response(JSON.stringify({ ok: true, n }), { headers: { "content-type": "application/json" } });
       }
+      /* ═══ 兑现（2026-09-07）═══ 「调用不等于兑现」：上了几道菜是流水，回头客才是裁定。
+         读者按一下「这一答我用上了」，这一笔的 c +1，并计入总兑现数。
+         ⚠ 仍然不记读者是谁：没有 uid、没有指纹、没有 IP。能按这个按钮本身就是凭据（见上面那串 id）。
+         ⚠ 只有还留在 recent 里的那 KEEP 笔可兑现——翻出去的笔就此定案，账不倒改。 */
+      if (_lop === "cash" && request.method === "POST") {
+        let b = {}; try { b = await request.json(); } catch (e) {}
+        const id = String(b.id || "");
+        if (!/^[0-9a-f]{12}$/.test(id)) return new Response(JSON.stringify({ ok: false }), { headers: { "content-type": "application/json" } });
+        const recent = (await this.ctx.storage.get("recent")) || [];
+        const e = recent.find((x) => x && x.id === id);
+        if (!e) return new Response(JSON.stringify({ ok: false, gone: 1 }), { headers: { "content-type": "application/json" } });
+        const CAP = 50;   // 同一笔的上限：按钮点烂了也只是 50，账不会被一个人刷成天文数字
+        if ((e.c | 0) >= CAP) return new Response(JSON.stringify({ ok: true, c: e.c, capped: 1 }), { headers: { "content-type": "application/json" } });
+        e.c = (e.c | 0) + 1;
+        const cashed = ((await this.ctx.storage.get("cashed")) || 0) + 1;
+        await this.ctx.storage.put("recent", recent);
+        await this.ctx.storage.put("cashed", cashed);
+        return new Response(JSON.stringify({ ok: true, c: e.c, cashed }), { headers: { "content-type": "application/json" } });
+      }
       const recent = (await this.ctx.storage.get("recent")) || [];
       const n = (await this.ctx.storage.get("n")) || 0;
-      return new Response(JSON.stringify({ ok: true, n, keep: KEEP, recent }), {
+      const cashed = (await this.ctx.storage.get("cashed")) || 0;
+      /* 读口不吐 id——那是能力票，公开出去谁都能替别人兑现。只吐这一笔的兑现数。 */
+      const pub = recent.map((e) => ({ ts: e.ts, s: e.s, c: e.c | 0 }));
+      return new Response(JSON.stringify({ ok: true, n, cashed, keep: KEEP, recent: pub }), {
         headers: { "content-type": "application/json", "cache-control": "no-store" },
       });
     }
@@ -639,13 +665,14 @@ async function wdsRag(env, url, body) {
    ⚠ 只记出处（篇名＋网址）与时间。**不记提问、不记答复、不记读者的任何标识**——
    账本是给人核我们用了什么料，不是给我们留读者的痕；这两件事只差一个字段，性质完全相反。
    ⚠ 一律 fire-and-forget＋整体吞异常：记不上账是小事，为记账把一次回答拖挂是大事。 */
-async function ledgerLog(env, srcs) {
+function ledgerId() { return [...crypto.getRandomValues(new Uint8Array(6))].map((x) => x.toString(16).padStart(2, "0")).join(""); }
+async function ledgerLog(env, srcs, id) {
   try {
     const s = (srcs || []).slice(0, 8).map((x) => ({ t: String((x && x.t) || ""), u: String((x && x.u) || "") })).filter((x) => x.u);
     if (!s.length) return;
     const ns = _do(env, "COUNTER");
     await ns.get(ns.idFromName("ledger")).fetch(new Request("https://ledger.internal/", {
-      method: "POST", headers: { "content-type": "application/json", "x-ledger": "log" }, body: JSON.stringify({ s: s }),
+      method: "POST", headers: { "content-type": "application/json", "x-ledger": "log" }, body: JSON.stringify({ s: s, id: String(id || "") }),
     }));
   } catch (e) {}
 }
@@ -10739,6 +10766,22 @@ export default {
     }
     /* 账本的读口：公开、只读、无 Key——「账本必须开着」这件事若要口令才看得见，就不叫开着。
        写口不在这里：只有 ChatSDE 答完那一处在服务端内部直接写 DO，外面递不进来一笔假账。 */
+    /* 兑现口：公开可写，但只认那串 12 位的 id——它只发给真收到过那一答的人。
+       写不进假账靠的不是口令，是「你手上得有那张票」。 */
+    if (url.pathname === "/api/ledger/cash") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      try {
+        const ns = _do(env, "COUNTER");
+        const r = await ns.get(ns.idFromName("ledger")).fetch(new Request("https://ledger.internal/", {
+          method: "POST", headers: { "content-type": "application/json", "x-ledger": "cash" }, body: JSON.stringify({ id: String(b.id || "") }),
+        }));
+        return Response.json(await r.json(), { headers: { ..._cors(), "cache-control": "no-store" } });
+      } catch (e) {
+        return Response.json({ ok: false, why: String((e && e.message) || e) }, { headers: _cors() });
+      }
+    }
     if (url.pathname === "/api/ledger") {
       try {
         const ns = _do(env, "COUNTER");
@@ -12675,7 +12718,14 @@ export default {
             /* ⚠ 这一行跑在 SSE 流的 controller 里——响应早已交出去，waitUntil 在有些运行时会抛。
                抛了就退回裸调用（照样跑，只是没有生命周期保护）；两条路都吞掉异常。 */
             if (sources.length) {
-              try { ctx.waitUntil(ledgerLog(env, sources)); } catch (e) { ledgerLog(env, sources).catch(() => {}); }
+              /* id 在这里生成、同一刻发给读者，不等 waitUntil——记账是异步的，
+                 要是等它回来再发，读者就得为一笔账多等一个来回。 */
+              const _lid = ledgerId();
+              try { ctx.waitUntil(ledgerLog(env, sources, _lid)); } catch (e) { ledgerLog(env, sources, _lid).catch(() => {}); }
+              /* 新事件类型，不动 sources 的形状——搜索页与前沿搜索页都把 j.v 当数组读，
+                 改了那个契约就要去改三处接收端（2026-08-12 rs.bodies 那次的教训）。
+                 老客户端认不得 cashid，else-if 链直接略过，什么都不会坏。 */
+              controller.enqueue(_sseBytes({ t: "cashid", v: _lid }));
             }
             /* 满血站内检索的读数：查的是什么、查到多少。研究产线每一道一行，读者与我方都看得见这一道不是拿工序名在查。 */
             if (resFull && !noSite) controller.enqueue(_sseBytes({ t: "note", v: "🔎 满血站内检索 · 题目「" + String((rs && rs.topic) || q).slice(0, 60) + "」→ 出处 " + sources.length + " 篇"

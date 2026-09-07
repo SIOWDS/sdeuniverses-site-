@@ -46,6 +46,7 @@ ol.top .n{margin-left:auto;color:var(--gold2);font-size:.8rem;white-space:nowrap
 .entry li{padding:.16rem 0;font-size:.89rem}
 .entry a{color:var(--text);text-decoration:none;border-bottom:1px solid var(--border)}
 .entry a:hover{color:var(--gold)}
+.cash{float:right;color:var(--gold2);letter-spacing:.06em}
 .by{display:inline-block;font-size:.68rem;letter-spacing:.08em;color:var(--gold2);background:var(--card2);border-radius:5px;padding:.05rem .42rem;margin-right:.4rem;vertical-align:.08em}
 .msg{color:var(--muted);font-size:.9rem;padding:1.2rem 0}
 footer{margin-top:2.6rem;padding-top:1.1rem;border-top:1px solid var(--border2);color:var(--muted);font-size:.78rem;line-height:1.9}
@@ -67,6 +68,7 @@ footer{margin-top:2.6rem;padding-top:1.1rem;border-top:1px solid var(--border2);
   <div class="rule">
     <p><b>后厨可以关门。</b>站内原文是配料，不是端出去的菜。ChatSDE 引用一篇文章时只报到篇名（专著报到书号）并给网址，不整段搬运原文；要读原文，点链接到那篇文章里读。</p>
     <p><b>账本必须开着。</b>它用了谁的东西，逐笔记在这一页，谁都能看。</p>
+    <p><b>调用不等于兑现。</b>上了几道菜是流水，回头客才是裁定。读者在 ChatSDE 那一答下面按一下「这一答我用上了」，这一笔才算兑现——下面每笔后面的「✓ n」就是它。按钮不问你是谁，也不需要你是谁。</p>
     <p style="color:var(--muted);font-size:.84rem">账上只记出处与时间。<b style="color:var(--muted)">不记提问、不记答复、不记任何读者标识</b>——这本账是给人核我们用了什么料的，不是用来留读者的痕的。</p>
   </div>
 
@@ -74,6 +76,7 @@ footer{margin-top:2.6rem;padding-top:1.1rem;border-top:1px solid var(--border2);
     <div class="stat"><small>累计记账</small><b id="n">—</b></div>
     <div class="stat"><small>本页留存</small><b id="k">—</b></div>
     <div class="stat"><small>涉及篇目</small><b id="d">—</b></div>
+    <div class="stat"><small>累计兑现</small><b id="c">—</b></div>
   </div>
 
   <h2>被调得最多的篇目<span>按本页留存的这几笔算</span></h2>
@@ -84,7 +87,8 @@ footer{margin-top:2.6rem;padding-top:1.1rem;border-top:1px solid var(--border2);
 
   <footer>
     账本由服务端在 ChatSDE 每次交出出处的同一处写入，与读者屏幕上看到的那一份同源。<br>
-    只保留最近的若干笔；累计笔数是从开账那天起的总数。<br>
+    只保留最近的若干笔；累计笔数与累计兑现是从开账那天起的总数。<br>
+    翻出本页留存之外的笔就此定案，不再接受兑现——账不倒改。<br>
     <a href="/taste/chatsde/" style="color:var(--gold2)">去 ChatSDE 问一问</a> · <a href="/browse/" style="color:var(--gold2)">浏览全站</a>
   </footer>
 </main>
@@ -120,6 +124,7 @@ footer{margin-top:2.6rem;padding-top:1.1rem;border-top:1px solid var(--border2);
   function render(j) {
     var rec = (j && j.recent) || [];
     document.getElementById('n').textContent = (j && j.n) || 0;
+    document.getElementById('c').textContent = (j && j.cashed) || 0;
     document.getElementById('k').textContent = rec.length;
 
     var tally = {}, order = [];
@@ -139,7 +144,9 @@ footer{margin-top:2.6rem;padding-top:1.1rem;border-top:1px solid var(--border2);
 
     if (!rec.length) { flow.innerHTML = '<p class="msg">账本刚开，还没有第一笔。去 ChatSDE 问一问，这里就会长出来。</p>'; return; }
     flow.innerHTML = rec.map(function (e) {
-      return '<div class="entry"><div class="when">' + esc(when(e.ts)) + '　调了 ' + ((e.s || []).length) + ' 篇</div><ul>'
+      var c = e.c | 0;
+      return '<div class="entry"><div class="when">' + esc(when(e.ts)) + '　调了 ' + ((e.s || []).length) + ' 篇'
+        + (c ? '<span class="cash">✓ ' + c + ' 人说用上了</span>' : '') + '</div><ul>'
         + (e.s || []).map(function (s) {
             return '<li><span class="by">' + esc(attrib(s.u)) + '</span><a href="' + esc(s.u) + '">《' + esc(title(s.t)) + '》</a></li>';
           }).join('')
