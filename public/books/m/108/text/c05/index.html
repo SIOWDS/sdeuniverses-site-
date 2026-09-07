@@ -1,0 +1,172 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第五章　可寻址承诺与符号故障域：承诺粒度如何决定修复传播半径 · 语言符号的智慧 · 德麦国际专著</title>
+<meta name="description" content="语言符号的智慧——十个对象，十条可撤回的资格线。胡志英著。第五章　可寻址承诺与符号故障域：承诺粒度如何决定修复传播半径">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:22px;margin:1.6em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}p.li{margin:.35em 0 .35em 1em}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);
+background:var(--card);color:#F0EDE4}
+.tw{overflow-x:auto;margin:1.2em 0}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#171D23;color:var(--gold)}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;
+padding-top:18px;border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--gold)}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);
+color:var(--dim);font-size:12.5px;text-align:center}
+</style></head><body><div class="bar"><a href="/books/m/108/">← 专著首页</a><a href="/books/m/108/text/">目录</a><a href="/students/hu-zhiying/">作者专栏</a><a href="https://lang.sdeuniverses.com/">语言发生学分站</a></div>
+<div class="wrap"><h1>第五章　可寻址承诺与符号故障域：承诺粒度如何决定修复传播半径</h1><p style="color:var(--dim)">——从协调成功到局部回滚</p>
+<div class="motif"><b>提要</b>　沟通成功并不保证内部表征对齐，2026年的控制研究已直接展示二者可分离；因此“无需完全理解也能协作”不再是本文的创新。本文把可寻址承诺收窄为一项局部回滚机制：互动中被公开提交的承诺具有不同粒度，这一粒度预测故障暴露后必须重开的依赖节点范围，即修复传播半径RPR。若承诺只绑定一个对象属性，修复应局部化；若承诺绑定整个场景或计划，修复应传播更远。PhotoBook八例只作编码演示，主研究要求至少300个修复事件并在第二耦合语料复现；控制话轮邻接、词汇重叠、故障类型、表达长度与任务难度后，可寻址性须预测RPR至少0.3个标准差，否则理论并入会话修复或一般grounding。English Title and AbstractWhy Are Linguistic Signs Intelligent? Addressable Commitment and Symbolic Fault DomainsThis paper asks why linguistic signs can support robust coordination even when interlocutors do not fully align their internal representations and when local misunderstandings remain frequent. Three source disciplines are placed in genuine causal conflict. Distributed consensus shows that a public state can be committed without requiring every replica to be identical at the same moment; model predictive control limits action commitment by executing only the first part of a repeatedly recomputed plan; evolutionary biology shows that early locally beneficial commitments may close later adaptive paths through historical contingency. Their collision rejects the premise that intelligent coordination requires maximal, early and global convergence. The paper proposes the Addressable Commitment Mechanism (ACM): a linguistic sign discretizes a high-dimensional coordination problem into public commitments that can be pointed to, accepted, rejected and revised locally. This makes possible a symbolic fault domain, operationalized by the Repair Propagation Radius (RPR): the number of previously settled public commitments, beyond the current trouble item, that must be reopened when one symbolic commitment is corrected. A preregistered low-cost audit of eight repair/negation/re-description episodes in the public PhotoBook Game 91 transcript yields RPR=0 in all eight frozen cases. One episode contains an explicit local rollback from a common to a different image judgment without reopening unrelated prior decisions. This result does not establish a universal law; the task architecture itself favors local referential units, and highly coupled discourse such as law, identity classification or institutional naming may produce larger fault domains. The proposed theory therefore predicts not that language always repairs locally, but that linguistic symbols are intelligent to the extent that they make coordination errors addressable and contain the propagation of revision while preserving enough commitment for action.</div>
+<p style="color:var(--dim);font-size:14px">关键词：语言符号；可寻址承诺；符号故障域；修复传播半径；分布式共识；模型预测控制；历史偶然性；会话修复</p>
+<h2>一、问题重置：语言符号的智慧不等于“共享得更多”</h2>
+<p>“符号为什么有智慧”听起来像一个赞美式问题。只要把语言符号列出的功能足够多——储存经验、压缩复杂性、跨时空传递、建立概念、协调行动、保存文化——似乎就已经得到答案。问题在于，这些都是“符号能做什么”，并没有解释“它为什么能够在不完美条件下仍然做成这些事”。真实语言从来不是在两颗完全同步的大脑之间运行。说话者不可能把自己的全部背景知识、感受、注意状态和意图复制给听者；听者也不会在每个词到来时重建与说话者完全相同的内部模型。更反常的是，人类交流并没有因此持续崩溃。大量互动在内部理解存在余差的情况下仍能完成指称、交接、承诺、拒绝、计划和协作。</p>
+<p>2026年8月10日，Yamamoto等在《Frontiers in Computer Science》发表研究，把这一反常现象直接做成了可测实验。他们区分“符号对齐”与“表征对齐”：前者看接收方能否正确识别发送方指称的对象，后者看发送者与接收者内部生成的图像表征在特征空间里是否相似。在“语言模块学习＋辨别学习”条件下，指称成功显著上升，而内部表征相似度反而下降。研究者据此警告，不能用单一任务成功率直接替代“共同理解”。这篇刚发表不到一个月的工作使一个看似新颖的结论立刻失去创新资格：本文不能再把“交际成功不需要完全内部一致”当作自己的发现。它必须向后再走一步。</p>
+<p>再向后一步就会碰到会话修复研究。Schegloff、Jefferson与Sacks以来的会话分析早已发现，交谈者会把某个片段标记为trouble source，并通过重复、澄清请求、候选理解、自我修正等方式在局部解决问题。Healey、Eshghi与Howes等2018年的“Running Repairs”研究甚至提出，语义协调主要由对具体局部差异的在线修复驱动；Dingemanse等跨12种语言的研究表明，其他发起修复大约每1.4分钟出现一次，并具有跨语言的共同组织原则；2024年的《Trends in Cognitive Sciences》综述进一步把interactive repair视为人类语言韧性、复杂性和社会问责的基础。于是第二个看似新颖的答案——“语言智慧来自可修复性”——同样必须放弃。</p>
+<p>真正仍然没有被解释的是：为什么语言错误往往能够被局部化？为什么一句“你说的是哪一个bank？”、“你刚才说十点还是一点？”、“我不是说A，我说B”，可以把问题压到一个可指出的词、一个指称、一个数值或一个回合，而不必把整个对话历史清空？换一种说法：会话修复描述了“人们能够修”，但还可以继续追问“什么样的符号结构，使错误拥有地址，使修复拥有边界？”如果一个沟通系统只能感到“整体不对”，却不能指出哪一项承诺出了错，它就必须反复全局重置；如果每纠正一个词都迫使所有既有共同理解重新验证，语言的实时协作成本将极高。</p>
+<p>本文因此把“智慧”从褒义形容词压成一个机制问题：语言符号是否能够把高维度、连续、私有而不完全可比的内部状态，切成一系列公开、可寻址、可局部提交与可局部撤回的协调单位？若能，一个错误就获得“故障域”；我们可以问它向外传播多远。于是语言符号的智慧第一次可以用一个不评价人的问题来检验：当某个符号承诺被纠正时，除当前故障项之外，有多少已经建立的公共承诺必须跟着重新打开？</p>
+<h2>二、理论缺口与强基线</h2>
+<p>分布式提交、模型预测控制和历史路径依赖说明局部承诺如何可能，但不构成语言证据。最强基线来自会话修复、共同地面与2026年“沟通成功—表征对齐分离”研究。本文必须进一步预测一次故障会沿既有承诺依赖图传播多远。</p>
+<p>研究单位不是抽象的共同世界，而是一项可定位提交及其依赖节点。理论只在承诺粒度对RPR有跨语料增量时成立。</p>
+<h2>四、分布式系统：公共提交不要求所有副本同时完全一致</h2>
+<p>分布式系统面对一个与语言交流结构上相似、但技术上更苛刻的问题：多个节点看到的状态不可能时时完全相同，消息会延迟，节点会宕机，网络会分区，但系统仍需要在某些时刻对外宣布“这件事已经提交”。若把智慧等同于“所有节点立刻拥有同一内部状态”，分布式系统几乎无法工作。工程真正追求的不是无限同步，而是在明确故障模型下建立足以安全推进的公共提交条件。</p>
+<p>Ongaro与Ousterhout的Raft把共识拆成领导者选举、日志复制与安全性。其关键不是要求每台机器在每个瞬间完全一致，而是把共享历史写成可定位的日志条目，并通过多数关系决定何时一个条目可以被视为提交。Raft还用重叠多数处理成员变更，使公共历史可以在节点增删中持续。SDE分布式系统面板把近二十年的转向概括为：共识本身越来越便宜，真正昂贵的是语义冲突、运维权限、退出路径和跨组织问责；“副本更多、共识完成”不能自动等于“系统可信”。这里已经出现本文需要的第一条反直觉材料：公共推进与内部全同步是两件事。</p>
+<p>更重要的是“日志条目”这一对象。日志不是一团不可分割的系统状态，而是一列拥有索引、任期、前后关系和提交位置的可寻址单位。某个条目出现冲突时，系统可以定位冲突发生在哪里，并按照日志匹配关系纠正后续，而不是把“系统整体不一致”当成唯一错误。分布式系统由此把故障从全局灾难变成有地址的状态差异。语言符号若具有类似结构，其智慧便可能不是“像数据库一样精确”，而是它也让公共互动拥有可指出的提交项：是这个数字错了、这个名字错了、这个指称错了，而不是“你整个人的理解都错了”。</p>
+<p>分布式系统同时给本文一个反向约束。并不是故障域越小越好。若两个日志条目在业务语义上强耦合，技术上分别提交仍可能产生违反业务不变量的状态。CRDT也说明“最终收敛”不等于业务不变量自动成立。因此，把语言切成可修单元不能被误写成“所有意义都可局部修复”。有些制度性词语会重排许多下游承诺，一次修改必须触发更广范围的重算。分布式系统迫使本文把“局部性”理解为可测的传播半径，而不是道德上的好。</p>
+<h2>五、模型预测控制：聪明控制只承诺眼前必须执行的一步</h2>
+<p>控制与自动化提供第二种完全不同的答案。一个控制器拥有模型、目标和约束，理论上可以计算未来一长串最优动作。但现实世界不断产生扰动，模型参数并不完美，传感器给出的新状态也会使旧计划失效。模型预测控制（MPC）的基本策略因此不是“把未来算得最完整以后一次执行到底”，而是在每个采样时刻求解有限时域优化，只执行最前面的动作或第一小段，然后读取新的状态，把预测窗口向前滚动并重新求解。SDE控制面板正把这一点概括为“滚动求解受约束有限时域优化并只执行首步”。</p>
+<p>2026年的概率推断MPC综述与MPC—强化学习综述都继续以receding horizon为核心框架。该机制的智慧不来自“计划得少”，而来自把“计划范围”与“行动承诺范围”分开：系统可以对较长未来进行计算，却只把当前必需的一步变成不可逆执行。下一次观测到来以后，后续计划仍是候选，不是已经发生的历史。若预测域越长、计算越复杂却错过采样时限，一个数学上更优的计划反而会成为过期动作。于是第二条反直觉材料出现：智慧不是最大化承诺深度，而是控制承诺的时间半径。</p>
+<p>把这一结构映射到语言符号，关键不是把每句话类比成控制指令，而是区分“可以想很多”与“现在必须共同决定多少”。说“把那本红色的书递给我”，双方内部可以保留对“红”“那本”“书架区域”的大量不同表征；为了完成当前动作，他们只需把某一个对象—动作关系暂时闭合。下一轮如果发现拿错了，可以修正“不是这本，是旁边那本”，不需要事先把房间里所有颜色分类、物体概念和空间坐标彻底对齐。符号把高维预测压成一个当前可执行的公共微承诺。</p>
+<p>MPC也提供第三个重要限制：只执行一步并不意味着永远犹豫。系统必须在采样周期内给出动作，否则“保留未来选择”会退化成不行动。语言同样如此。若每一个词都因为担心未来歧义而拒绝进入公共承诺，协作不会发生。本文因此不把“开放”视为智慧，而要求同时满足两个条件：当前任务有足够的公共闭合，且闭合的错误传播半径可控。这与站内“语言开域环”强调“闭合后是否改写下一轮可能域”不同；本文看的不是有没有新增未来问题，而是当前一个错误要回滚多少已经完成的承诺。</p>
+<h2>六、进化生物学：早期成功可能成为未来路径的锁</h2>
+<p>若分布式系统说明“没有全同步也能提交”，MPC说明“不要把整个未来一次执行”，进化生物学则给出更残酷的第三条动力：一次在当前看来有利的改变，会通过历史依赖改变以后什么还做得到。适应并不是在固定菜单上每一轮重新选最优项；已有突变、发育背景、空间结构和环境相互作用会改变后续路径的可达性。</p>
+<p>2026年《Evolution Letters》发表的“Historical contingency limits adaptive diversification in a spatially structured environment”用实验演化指出，早期有利突变可能把谱系困在局部适应峰上，使原本更优的路径变得不可达，除非出现替代或补偿性突变。文章把历史偶然性与基因型×环境相互作用放在同一个可检验框架中：适应轨迹不仅取决于现在的选择压力，还取决于过去已经发生了什么。SDE进化生物学面板也把“可预测性与历史偶然性”列为当前核心争议。</p>
+<p>这一来源看似离语言最远，实际对“智慧”施加了最强反向约束。一个沟通系统如果为了当前清楚而把每一次解释都写成高耦合、不可撤销的全局决定，那么局部成功会持续收窄未来。术语过早标准化可能压掉尚未理解的差异；标签一旦进入制度，后来修正一个词可能牵动档案、资格、责任和身份；儿童若把某次偶然映射过早固化为唯一类别，后续输入就必须付出更大重组代价。符号承诺不仅有即时准确率，还有路径成本。</p>
+<p>进化材料迫使本文加入“不可逆性”维度。故障传播半径小，只说明错误纠正时少重开几个当前承诺；若某一符号已经进入法律、算法、身份分类和资源分配，表面上只改一个词也可能改变大量未来路径。因此“语言符号的智慧”不能简单等于“修复局部”。更准确的说法是：符号系统把承诺做成可寻址单位，使共同体能够在需要时限制承诺的范围和深度；一旦耦合已经不可逆，理论必须预测故障域扩大，而不能继续称其为局部。</p>
+<h2>七、三家共同默认的地板：越早、越广的一致越聪明</h2>
+<p>三家表面上互不相干，却都围绕“承诺”形成冲突。分布式系统问：多少副本一致以后可以把某一状态写成公共历史？MPC问：未来计划中到底多少应当现在执行？进化生物学问：当前适应究竟会关闭多少后续路径？如果把它们放进一个最普通的理性主义直觉，会得到共同前提：不确定性越少越好，因此越早、越广、越彻底的一致，系统越聪明。</p>
+<p>这条前提在语言研究中也极有吸引力。共同基础理论容易被粗糙地理解为“共享越多，沟通越好”；互动对齐模型容易被外推成“各层表征越趋同，协作越成功”；语言教学容易把理解目标写成“学生与教师的正确意义完全一致”；术语治理容易把统一口径当成智慧本身。若这个前提成立，语言符号最理想的状态应该是：每出现一个符号，双方立即在形式、指称、概念、背景推论和未来使用上全面对齐。</p>
+<p>但三家自己的硬材料共同推翻它。Raft只需要满足安全提交的多数与日志条件，而不要求所有副本瞬时完全一致；MPC只把第一步变成现实，不把整个预测轨迹一次锁定；历史偶然性说明早期局部最优甚至会封死未来更优路线。2026年的Yamamoto等又从语言—认知接口直接补上第四块证据：指称成功可以升高，而内部表征相似度下降。于是“越多一致越聪明”不再是一条安全的默认。</p>
+<p>然而，如果把新结论写成“少对齐更聪明”，同样错误。Raft并不崇拜不一致，MPC也不崇拜犹豫，进化系统更不会主动追求适应失败。三家共同要求的是一种更精细的结构：把必须共享的状态做成可公共提交单位，把暂时不必共享的状态留在局部；把必须执行的动作推出去，把尚可等待的信息留到下一轮；把当前选择的效果记录下来，同时尽量不把无关未来一并锁死。这里涌现出的不是“开放性”，而是“承诺的地址化与故障的边界化”。</p>
+<h2>八、核心理论：可寻址承诺把故障限制在依赖子图</h2>
+<p>定义承诺节点a及其依赖图G。每个节点记录对象、属性、行动、提出者、接受证据与后续依赖。故障发生时，符号故障域F(a)是为恢复协调而必须重新打开的最小节点集合；RPR是F(a)在G中的加权半径。理论主张：承诺的可寻址粒度越细，非灾难性故障的RPR越小。</p>
+<h3>8.1 可寻址不等于多说细节</h3>
+<p>可寻址性要求后续参与者能指明“哪一项提交需要回滚”，而不是把发话切成更多词。过细地址会增加维护成本，过粗地址会扩大修复传播；因此理论预测U形成本，而非粒度越细越好。</p>
+<h3>8.2 故障域不是误解大小</h3>
+<p>同样严重的误解，在不同承诺结构中可能只重开一个属性，也可能重开整个计划。RPR测量结构传播，不以情绪强度、字数或错误严重度替代。</p>
+<h2>九、形式化：符号故障域、修复传播半径与承诺深度</h2>
+<p>设一次互动在时刻t之前已经形成公共承诺集合 C_t={c₁,c₂,…,cₙ}。这里的“承诺”不是哲学意义上的人格承诺，而是日志中可观察的公共结算，例如“图像A被双方标为common”“术语X在当前文档被定义为Y”“指令中的对象被选为第3项”“课堂答案被共同暂定为P”。在时刻t出现一个可寻址的故障源 e_t，并在后续修复中被改写。</p>
+<p>定义故障域 F(e_t) 为：因修复e_t而必须撤回、重新验证或修改的既有承诺集合。若只修当前故障项，且所有其他已结算项目保持，则|F(e_t)|=0；若还要重开两个无关的旧决定，则|F(e_t)|=2。为了跨不同大小任务比较，定义修复传播半径 RPR(e_t)=|F(e_t)|/|C_t^*|，其中C_t^*只包含在故障发生前可明确判定为已结算且仍相关的承诺。无可判定承诺时记NA。</p>
+<p>单独的RPR仍不够，因为“故障没有传播”可能只是系统没有发现依赖。再定义依赖漏报率 DMR：事后证明应被重开的相关承诺中，没有被修复传播触及的比例。一个智慧系统不是RPR最低，而是在DMR接近0的前提下避免无关传播。可把理想状态写成“低无关传播＋低依赖漏报”。这里没有把两个读数强行合成一个神秘总分，因为两者方向不同且需分别审计。</p>
+<p>第三个变量是承诺深度 CD。它指一次符号结算直接关闭的后续选择层数或下游决策数量。MPC提供的启发是：可以预测很远，但只执行短的一段；语言也可以允许丰富推论，却不必把所有推论自动写成公共事实。比如“孩子今天没来”不等于共同承诺“他生病了”；把推测与已结算事实分开，就是限制承诺深度。CD越深，当前协作可能越快，但错误时故障域更容易扩大。</p>
+<p>于是本文提出一个2×2辨别格。横轴为当前任务闭合度：是否已经形成足以行动的公共决定；纵轴为修复传播的真实依赖匹配度：纠错是否只触及必要依赖。低闭合＋低匹配是漂散状态；低闭合＋高匹配是探索状态；高闭合＋低匹配是脆性闭合——短期快速，却可能把错误静默扩散；高闭合＋高匹配才是可寻址协调。这个格子的目标不是评价人，而是评价一次记录结构。</p>
+<p>零情态词判据因此可以写成三个连续问题：①本次故障源能否被日志定位到一个明确符号/回合/指称？②修复后，有哪几个已经结算的旧项目被重新打开？③事后检查，有没有真实依赖却没有被重开的项目？这三个问题都问记录，不问“参与者是否聪明”。只要同一编码手册能在课堂、翻译、对话代理和制度文档上跑出不同答案，理论才具备外部兑现力。</p>
+<p>九（二）、机制轮次：从差异暴露到局部回滚，再到下一轮承诺重配</p>
+<p>如果“可寻址承诺”只是一个静态属性，本文仍然没有完成Why题。Why型需要把动力写成轮次。本文把一次语言符号智慧事件压成五步：第一步，私有状态出现差异，但差异未必立刻成为公共问题；第二步，当前任务要求形成一个可执行公共结算，参与者用符号把高维差异压到一个可寻址承诺；第三步，新的证据、反馈或行动后果暴露该承诺中的故障；第四步，修复沿依赖关系回滚，保留无关的既有结算；第五步，修复后的公共状态成为下一轮新的起点，决定什么还需要对齐、什么已经不必再谈。智慧发生在这五步的循环里，不存在一个永恒的“正确符号状态”。</p>
+<p>第一轮由“任务压力”先动。两个人即使对一个对象拥有不同内部表征，只要眼前需要共同选择、移动、确认或记录，就必须把某一差异变成公共承诺。这里分布式系统提供第一动力：并不等待每个内部副本全部一致，而是寻找足以安全推进的提交条件。语言中的“yes”“这个”“第三个”“明天十点”之所以重要，不是因为它们把整个内部世界复制出来，而是它们把一个当前决策压成可以被双方引用的公共条目。若没有任务压力，很多潜在差异可以长期不显现，也就没有必要形成这个条目。</p>
+<p>第二轮由“新观测或反馈”先动。公共条目一旦进入行动，现实会回话：对方拿错了书、地图路线走不通、听者追问“哪个bank”、学生在新题里再次犯错、机器执行结果与预测不符。MPC的结构在这里获得语言对应：旧的承诺不是因为曾经成功就永久有效，新状态到来以后必须重新估计。关键不是把整段历史全部忘掉，而是判断新证据究竟击中了哪一个地址。一个好的修复信号把故障从“我们互相不理解”缩成“你刚才说的X我理解成Y，对吗？”</p>
+<p>第三轮由“依赖传播”先动。故障地址找到后，系统必须决定修到哪里停。若“明天”改成“后天”，只改日历提醒可能不够，接送、会议室和截止时间都与之相依；若只是把一个人名的拼写从Jon改为John，而身份对象未变，其他承诺可能无需重开。这里分布式系统的业务不变量与进化生物学的路径依赖同时施压：修复不能为了局部而局部，真正相依的状态必须重算；但也不能为了保险把整个历史全部推翻。符号故障域因此不是自然给定的圆圈，而是由承诺网络的依赖结构决定的实际传播集合。</p>
+<p>第四轮由“历史后果”先动。某些语言承诺一旦执行，其后果会反过来改变下一轮修复成本。一个术语只在草稿里使用时，修改可能影响一处；同一术语写进教材、考试、合同、数据库字段和自动化规则以后，改一个定义就必须沿更多路径传播。这不是因为词本身变得“更有意义”，而是因为公共历史增加了依赖边。进化生物学提供的正是这一轮：过去的成功会改变未来可达路径。故障域是一种历史变量，而不是词典属性。</p>
+<p>第五轮重新回到“任务压力”，但发起条件已经改变。一次成功修复会留下新的公共记录，使相同故障下一次更容易被定位；一次失败修复也可能增加防御性确认，使后来每一步都需要更多验证。于是语言符号的智慧包含学习效应：系统不是每次面对同一个固定问题，而是在修复历史中逐渐改变承诺粒度、地址精度和依赖图。若某个词反复出错，共同体可能创造更精确的术语；若某个精确区分长期没有行动后果，又可能在使用中被合并。</p>
+<p>这五轮给出一个比“语言有反馈”更强的序列预测。若本文正确，故障事件前后应出现可测的发起权迁移：先由任务要求触发公共提交，再由反馈触发故障定位，再由依赖关系决定传播，最后由历史后果改变下一次承诺粒度。若真实数据始终显示修复传播完全由当下词汇相似度决定，与既有承诺网络和历史耦合无关，则第三、第四轮不存在，理论应退回一般会话修复。</p>
+<p>它也给出一个反噬预测：一个系统如果不断追求“从不出错”，可能反而失去故障地址。课堂中教师把所有表达预先规定到唯一模板，短期错误率下降，但学生没有机会学习指出自己的局部不确定；组织中所有决策必须领导一次性拍板，表面没有协商错误，却没有可局部撤回的中间承诺；AI系统每次纠错都重新生成整段答案，文本看起来流畅，却无法保留用户已经确认的旧部分。这些情形的共同退化不是错误多，而是错误一旦出现只能全局重做。</p>
+<p>相反，允许局部失败并不自动智慧。一个系统把任务切得过细，每个词都有地址，却没有任何跨项依赖图，会产生“修一处、坏别处”的静默漂移。真正的可寻址承诺必须同时拥有版本和依赖：我们不仅知道“改哪里”，还知道“这一改动应该通知谁”。这就是为什么本文同时保留RPR与DMR，不把低传播当作单轴优化目标。它们共同把分布式系统的提交纪律、MPC的滚动纪律和进化历史性的路径纪律压进同一语言判据。</p>
+<h2>十、双语料经验方案：从八例演示到三百修复事件</h2>
+<p>PhotoBook Game 91的八个事件只证明承诺节点与局部修复可以被编码；它们不能估计效应，也不能排除话轮邻接、词汇重叠和故障类型。升级版把八例降为编码手册中的示例。</p>
+<p>主研究在PhotoBook抽取≥300个修复事件，并在GrounDialog或另一耦合任务语料复现。两名盲标者编码承诺粒度、依赖图、故障类型和实际重开节点；主要模型预测标准化RPR，控制邻接距离、词汇重叠、表达长度、任务难度和修复发起者。</p>
+<h2>十一、最近近邻的敌意划界：哪些理论已经说到了哪里</h2>
+<p>创新最危险的阶段不是找反对者，而是找那些“几乎已经把你的话说完”的近邻。本文至少处理十二个占位者。下表不以“侧重点不同”蒙混，而给出可以让二者输赢的分离线。</p>
+<p>最危险的两个直接占位者是Yamamoto等2026和Running Repairs。前者迫使本文放弃“成功≠内部一致”作为创新；后者迫使本文放弃“局部修复”作为创新。本文最终只保留二者之间尚未被充分显式化的一条结构：符号把公共协调做成可寻址承诺，因此不仅可以观察有没有修复，还可以计算一次修复向既有承诺网络传播多远。这一判断如果不能在未来数据中给出额外预测，就应被近邻吸收，而不应靠新名词生存。</p>
+<h2>十二、十二个跨场景预测：新判据必须在不同材料上兑现</h2>
+<p>十二个预测的共同结构是：对同一任务成功率，RPR和DMR可以不同；对同一RPR，真实依赖耦合也可以不同。因而理论不是把“沟通效率”换一个名字，而是增加第二张账——纠错传播账。若未来十个场景中，故障传播始终能被现有的词频、歧义度、共同基础大小或对齐度完全解释，ACM应退出，而不能继续以跨学科命名自保。</p>
+<h2>十三、三条反向约束：什么时候“局部化”反而会制造愚蠢</h2>
+<p>第一条反向约束来自分布式系统：局部提交可能违反全局不变量。语言中对应的情形是定义之间存在硬依赖。例如把“及格”阈值从60改为70，学生资格、奖学金、补考名单和统计报表都应重算。若系统只改定义文本却保留下游旧结论，看起来RPR极低，实际上DMR极高。因此本文不能把“越少重开越聪明”写成单调规律。</p>
+<p>第二条反向约束来自MPC：过短承诺可能造成短视。若每一次交流只处理眼前一词而拒绝建立跨句、跨章节和跨项目的稳定结构，修复当然局部，但长期协作成本上升。法律、医学、科学理论等领域恰恰需要较深承诺。智慧不是永远缩短预测域，而是在新观测频率、错误代价和耦合强度之间调整承诺深度。</p>
+<p>第三条反向约束来自进化生物学：已经发生的历史不能总被无成本回滚。一个侮辱性标签进入公共记录后，即使说话者改口，社会后果可能继续存在；一项错误制度分类造成资源剥夺后，修正文档不等于修复既有损失。语言符号的可寻址性只能帮助定位责任和传播链，不能把不可逆历史重新变成未发生。故障域理论必须把补偿、追溯和路径依赖纳入，而不是宣称“改词即可修世界”。</p>
+<p>这三条反约束直接削弱了本文原本可以写得更强的句子。若没有它们，本文会声称“符号越离散、修复越局部，语言越智慧”；加入反约束后，只能声称“符号越能把承诺与真实依赖一起地址化，系统越有能力把修订传播限制在必要范围”。这一步削弱反而提高可证伪性，因为理论必须同时解释不传播与必须传播。</p>
+<h2>十四、可证伪研究方案与2028年写死日期的赌注</h2>
+<p>最强竞争解释可以写成：“你说的不过是会话修复。哪里有误解就修哪里，根本不需要可寻址承诺和故障域。”要让本文存活，未来实验必须证明“是否发生修复”不足以预测协作韧性，而“修复传播结构”在控制修复次数、任务难度和成功率以后仍有独立解释力。</p>
+<p>第一项实验可使用指称游戏。随机操纵故障地址精度：A组只能发送开放式修复信号（如“什么？”），B组允许部分重复定位词项，C组允许候选理解。保持目标、图像、错误率和总轮数接近，记录每次修复后被重新讨论的旧目标数、额外轮数和最终错误。本文预测：地址越精确，非必要旧承诺的重开越少；但在真实依赖跨目标时，过强局部化会提高DMR。若地址精度只影响时间、不影响传播结构，则ACM被削弱。</p>
+<p>第二项实验面向LLM多智能体。给两个代理相同任务成功率预算，分别使用整段自然语言状态与结构化可寻址承诺日志；周期性注入一个已提交事实的纠错。主要因变量不是token数，而是纠错后被重写的既有状态项数量、错误继续传播到后续决策的比例、以及不应受影响的状态被意外覆盖的数量。若两种架构在控制上下文长度后没有稳定差异，可寻址性对鲁棒协调的主张失败。</p>
+<p>第三项研究面向高耦合制度文本。选择版本历史可追踪的政策、合同或技术标准，建立定义—条款依赖图。每次定义修订时测量实际被联动修改的条款数，并由专家标注“应联动但未联动”的漏修。本文预测：同样修改一个符号单位，故障域由依赖网络而非字面编辑距离决定。若字面变化幅度已经完全解释传播规模，理论的“承诺网络”部分失败。</p>
+<p>写死日期的赌注：到2028年12月31日前，若至少两个公开、可复现的多轮协作语料或多智能体基准在控制任务成功率、对话长度和修复次数后，仍显示“故障地址精度/承诺可寻址性”对修复传播范围没有独立预测力，且RPR可被词汇重叠、对齐度或共同基础大小完全替代，则本文应撤回“可寻址承诺是语言符号智慧的独立机制”这一强主张，只保留为会话修复的工程化描述。反之，只有出现独立预测，并在至少一个高耦合场景中同时验证DMR，才算命中；单纯“某系统效果更好”不算命中。</p>
+<h2>十五、与邻近本体的批次分离</h2>
+<p>重识域决定两个出现何时仍算同一符号；可寻址承诺决定一次公开提交能否被局部点名；符号故障域测量提交出错后需重开的依赖范围。三者分别处理身份、提交与传播，不能以“边界/地址”母公式互相替代。</p>
+<h2>十六、对语言学习、翻译、术语治理与AI智能体的意义</h2>
+<p>对语言学习而言，传统纠错常把学生答案分成“整句对/整句错”。这会把故障域人为扩大：一个介词错了，整个表达被否定；一个时态错了，已经正确建立的词汇、论元和语序关系一起失去公共保留。可寻址承诺的教学含义不是“少纠错”，而是把正确部分继续提交，把真正的故障源单独地址化。学生因此能够在旧结构上打补丁，而不是每次从零生成。</p>
+<p>这也解释了为什么成熟学习者会主动问更精确的问题。初学者常说“I don’t understand.”，故障地址覆盖整段；能力提高后会问“Here, does ‘bank’ mean the river side or a financial institution?”、“Why do we use ‘had’ here?”。后者不只是元语言更丰富，而是在缩小故障地址。2025年关于初级二语课堂会话修复的研究也把开放式修复、部分重复、候选理解等资源按定位强度排列。教学若显式训练这些资源，预测上应降低无关重做范围。</p>
+<p>对翻译而言，优秀的术语表、translation memory和审校批注共同做的事，是把跨文档承诺地址化。译者改一个术语时，可以追踪所有依赖位置；若一个术语在不同章节被隐含地漂移，修订就必须靠全篇重读。这里故障域既是成本指标，也是质量指标：太小可能漏改，太大可能造成无关重写。</p>
+<p>对知识生产线而言，可寻址承诺比“统一话术”更重要。一本顶级专著如果把核心概念、定义版本、证据来源、适用边界和被哪些章节调用记录清楚，那么后续教材、文章、视频脚本和课程更新可以沿地址传播；若知识产品只是散文式复制，同一个核心概念一旦修订，整条产品矩阵会出现版本漂移。符号智慧在这里直接转化为知识治理能力。</p>
+<p>对AI智能体而言，当前大模型最常见的脆弱点之一，是所有信息都塞在一段上下文里。用户说“刚才第三点不是周二，是周四”，模型若没有可寻址状态，就可能重写过多或漏掉相关计划。未来多智能体协议可以把自然语言消息与承诺日志分离：消息允许丰富表述，日志只登记已经共同结算的最小事项；纠错先定位日志项，再依据依赖图传播。这样做不保证更“像人”，但给出了一个可工程检验的符号智慧假设。</p>
+<p>最后，对“语言符号”本身的理解也发生变化。符号不只是在内部意义与外部对象之间建立映射，它还是公共协作中的一个错误定位装置。一个没有任何人能够再次指出、引用、否定、改写的表达，即使造成影响，也很难形成稳定的公共语言制度。可重复、可指称、可修订共同把符号从一次性刺激变成历史可管理的协调单位。</p>
+<h2>十七、伦理、自反与理论适用边界</h2>
+<p>故障域指标必须针对“承诺位置”，不能针对“人”。不能说“这个孩子故障半径大”“这个人语言不智慧”。RPR的对象是一段可审计的互动记录：某个故障被修复时，哪些既有决定被重新打开。把它人格化会把机制指标变成标签，尤其在教育、临床和组织评价中具有明显伦理风险。</p>
+<p>第二，低RPR不能成为绩效目标。Goodhart式问题在这里非常直接：为了让“修复传播少”，教师或系统可以拒绝承认真正的跨项依赖，造成低RPR、高DMR的伪优秀。任何涉及奖惩、资格或高风险决策的应用，必须同时公开依赖编码规则、漏修复核通道和人工申诉机制。</p>
+<p>第三，本文对自己执行同一标准。论文提出“可寻址承诺”，因此自身每条核心主张也应有地址。若未来Yamamoto类型研究证明“表征分离”只存在于特殊生成模型，本论文不必全部撤回，只需撤回把该结果当作语言侧辅助证据的段落；若未来发现RPR对协作韧性没有独立预测力，则核心机制必须撤回；若只发现PhotoBook任务偏置，则只撤回该经验压力测试的外推。一个理论若要求别人局部可修，自己却只能整篇“信或不信”，它在自反测试中失败。</p>
+<p>第四，理论的适用域限于存在可观察公共承诺与可追踪修复的互动。独白诗歌、无反馈的历史文本、私人内言或无法确定承诺状态的材料，不宜强行计算RPR。它们可以讨论符号意义，但不一定有本文意义上的公共故障域。</p>
+<p>第五，语言与工程系统的对应关系是结构迁移，不是本体同一。人不是Raft节点，句子不是控制输入，语义变化也不是突变。三家来源只提供相互冲突的“承诺机制”与反例纪律；如果正文把技术术语直接当成人类心理机制，就会从学科通融退化成类比。本文因此所有形式化量都最终落回可观察的对话选择、修订日志和依赖关系。</p>
+<p>十七之一、判决性升级：把局部修复变成传播模型</p>
+<h3>（一）不可替代命题</h3>
+<p>可寻址承诺的粒度应预测故障暴露后必须重开的依赖节点范围；符号故障域是这一范围，不是误解的泛称。</p>
+<h3>（二）最强竞争解释与判决性分离</h3>
+<h3>（三）预注册压力测试</h3>
+<p>在PhotoBook编码≥300个修复事件并于第二耦合语料复现；双盲编码α≥0.80。控制邻接、词汇重叠、故障类型、长度和难度后，可寻址性对RPR效应≥0.3SD。</p>
+<h3>（四）十域兑现矩阵</h3>
+<p>矩阵不是类比清单。每一行都把同一承重变量落到可识别对象、独有预测与撤回结果；任一领域只负责提供潜在反例，不能单独证明上位理论。</p>
+<h3>（五）证据边界与撤回规则</h3>
+<p>八例只是编码演示。若RPR无法稳定标注、第二语料不复现、或控制变量后效应低于0.3SD，撤回独立故障域，保留为会话修复的描述性指标。</p>
+<h2>十八、结论：智慧表现为可局部回滚，而不是完全一致</h2>
+<p>语言符号的协调智慧不在于把所有内部表征变成一样，而在于把公开提交切成可点名、可追责和可局部回滚的节点。可寻址承诺只有在其粒度稳定预测修复传播半径、并跨两个耦合语料复现时才成立；否则，会话修复与共同地面理论已经足够。</p>
+<p>附录C：符号故障域最小编码手册</p>
+<p>Haber, J., et al. (2019). The PhotoBook Dataset: Building Common Ground through Visually-Grounded Dialogue. ACL 2019, 1895–1910. https://aclanthology.org/P19-1184/</p>
+<p>Yamamoto, T., Morita, J., Higashinaka, R., &amp; Takeuchi, Y. (2026). Dissociating communicative success from representational alignment in common ground formation. Frontiers in Computer Science, 8, 1873726. https://doi.org/10.3389/fcomp.2026.1873726</p>
+<p>Zhang, X., Divekar, R., Ubale, R., &amp; Yu, Z. (2023). GrounDialog: A Dataset for Repair and Grounding in Task-oriented Spoken Dialogues. BEA 2023, 300–314. https://doi.org/10.18653/v1/2023.bea-1.26</p>
+<p>参考文献</p>
+<h3>1. Saussure, F. de. (1916/1983). Course in General Linguistics. Duckworth.</h3>
+<h3>2. Lewis, D. (1969). Convention: A Philosophical Study. Harvard University Press.</h3>
+<h3>3. Grice, H. P. (1975). Logic and conversation. In Syntax and Semantics, Vol. 3.</h3>
+<h3>4. Schegloff, E. A., Jefferson, G., &amp; Sacks, H. (1977). The preference for self-correction in the organization of repair in conversation. Language, 53, 361–382.</h3>
+<h3>5. Clark, H. H., &amp; Wilkes-Gibbs, D. (1986). Referring as a collaborative process. Cognition, 22, 1–39.</h3>
+<h3>6. Clark, H. H., &amp; Schaefer, E. F. (1989). Contributing to discourse. Cognitive Science, 13, 259–294.</h3>
+<h3>7. Clark, H. H., &amp; Brennan, S. E. (1991). Grounding in communication. In Perspectives on Socially Shared Cognition.</h3>
+<h3>8. Brennan, S. E., &amp; Clark, H. H. (1996). Conceptual pacts and lexical choice in conversation. Journal of Experimental Psychology: Learning, Memory, and Cognition, 22, 1482–1493.</h3>
+<h3>9. Pickering, M. J., &amp; Garrod, S. (2004). Toward a mechanistic psychology of dialogue. Behavioral and Brain Sciences, 27, 169–226.</h3>
+<h3>10. Ongaro, D., &amp; Ousterhout, J. (2014). In Search of an Understandable Consensus Algorithm. USENIX ATC 2014, 305–319.</h3>
+<h3>11. Dingemanse, M., Roberts, S. G., Baranova, J., et al. (2015). Universal principles in the repair of communication problems. PLOS ONE, 10(9), e0136100.</h3>
+<h3>12. Rawlings, J. B., Mayne, D. Q., &amp; Diehl, M. (2017). Model Predictive Control: Theory, Computation, and Design. Nob Hill.</h3>
+<h3>13. Healey, P. G. T., Eshghi, A., &amp; Howes, C. (2018). Running repairs: Coordinating meaning in dialogue. Topics in Cognitive Science, 10, 367–388.</h3>
+<h3>14. Albert, S., &amp; de Ruiter, J. P. (2018). Repair: The interface between interaction and cognition. Topics in Cognitive Science, 10, 279–313.</h3>
+<h3>15. Haber, J., Baumgärtner, T., Takmaz, E., et al. (2019). The PhotoBook Dataset: Building Common Ground through Visually-Grounded Dialogue. ACL 2019.</h3>
+<h3>16. Schmid, H.-J. (2020). The Dynamics of the Linguistic System: Usage, Conventionalization, and Entrenchment. Oxford University Press.</h3>
+<h3>17. Dingemanse, M., &amp; Enfield, N. J. and related authors. (2024). Interactive repair and the foundations of language. Trends in Cognitive Sciences, 28(1), 30–42.</h3>
+<h3>18. D’Ambrosio, J. (2025). Manipulative Underspecification. The Philosophical Review, 134(3), 241–284. doi:10.1215/00318108-11873748.</h3>
+<h3>19. Yu, D., &amp; Thompson, B. (2025). Adaptive use of vagueness to coordinate joint action. Proceedings of the Cognitive Science Society / eScholarship.</h3>
+<h3>20. Saparina, I., &amp; Lapata, M. (2025). Disambiguate First, Parse Later: Generating Interpretations for Ambiguity Resolution in Semantic Parsing. Findings of ACL 2025.</h3>
+<h3>21. Morozova, N., &amp; Stoll, S. (2025). Language-Invariant Strategies of Navigating Transitions in Joint Activities. Cognitive Science. doi:10.1111/cogs.70133.</h3>
+<h3>22. Rodd, J. M. (2026). Building word meanings from memories and predictions. Trends in Cognitive Sciences. doi:10.1016/j.tics.2026.05.003.</h3>
+<h3>23. Yamamoto, T., Morita, J., Higashinaka, R., &amp; Takeuchi, Y. (2026). Dissociating communicative success from representational alignment in common ground formation. Frontiers in Computer Science, 8. doi:10.3389/fcomp.2026.1873726.</h3>
+<h3>24. Ofoegbu, E., &amp; Adeleke, K. (2026). Optimising complex systems: model predictive control in engineering applications. Journal of Engineering and Applied Science, 73, 108.</h3>
+<h3>25. Model Predictive Control via Probabilistic Inference: A tutorial and survey. (2026). Annual Reviews in Control, 61, 101052.</h3>
+<h3>26. Synthesis of model predictive control and reinforcement learning: Survey and classification. (2026). Annual Reviews in Control, 61, 101045.</h3>
+<h3>27. Historical contingency limits adaptive diversification in a spatially structured environment. (2026). Evolution Letters, 10(1), 118–134. doi:10.1093/evlett/qraf048.</h3>
+<h3>28. Sono, T., &amp; Osawa, H. (2026). Symbolism and Hesitation: Guideline for Merging Teleoperation with Multiple Users. International Journal of Social Robotics, 18, 55.</h3>
+<h3>29. 王德生（2026）《分布式系统与区块链·新思想前沿》，SDE Universes，2026年8月。</h3>
+<h3>30. 王德生（2026）《控制与自动化·新思想前沿》，SDE Universes，2026年8月。</h3>
+<h3>31. 王德生（2026）《进化生物学·新思想前沿》，SDE Universes，2026年8月。</h3>
+<h3>32. 王德生（2026）《系统与网络生物学·新思想前沿》，SDE Universes，2026年8月（用于换源排除与邻近比较）。</h3>
+<h3>33. 王德生（2026）《语言的智慧》第二章“说定一件事，就是重画下一轮还能问什么”，德麦国际专著 / SDE Universes。</h3>
+<h3>34. SDE Universes（2026）《研究纲领方法说明·新思想前沿》：100领域与1000条命题总表。</h3>
+<h3>35. 《sde-collide-paradigm-SKILL-v4.0》（2026-08-20），内部研究工艺文档。</h3>
+<h3>36. PhotoBook Task and Dataset. Dataset, sample transcript Game 91, reference-chain documentation. University of Amsterdam Dialogue Modeling Group.</h3>
+<h3>37. “什么是语言符号？——语言符号作为‘重识域’的理论”（2026-09-03），上一轮研究稿，用于批次自撞与同根检查。</h3><div class="nav"><a href="/books/m/108/text/c04/">← 第四章　续判关系：被继承的不是旧词，而是一项可撤回的公共判决</a><a href="/books/m/108/text/c06/">第六章　符号分辨调度链：只切开当前行动分区，分支唯一时停止 →</a></div><div class="foot">© 德麦国际出版社 · 胡志英《语言符号的智慧》· ISBN （书号申领中）</div></div></body></html>
