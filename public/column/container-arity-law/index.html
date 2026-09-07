@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>容器元数律：为何「学生-AI」进账时总被切回一个名字 | 教育专栏 | SDE Universes</title>
+<meta name="description" content="记账单位不由生产决定，也不由测量决定，而由分配容器的元数决定：录取、发证、追责都是单数容器，任何学生-AI耦合场进账时都被切回一个名字。补入 Goodhart–Campbell、Abbott–Collins、延展心智三位祖宗；以驾驶证准驾车型与飞行执照型别等级为模板，把「学席」落为登记规格：席名＋席配置＋按配置分开的责任回收率。">
+<link rel="canonical" href="https://sdeuniverses.com/column/container-arity-law/">
+<meta property="og:title" content="代理坍缩与空值结算——"学生—AI"为何拒绝被记成一个学生"><meta property="og:type" content="article"><meta property="og:url" content="https://sdeuniverses.com/column/container-arity-law/">
+<style>
+:root{--bg:#F5F1E8;--card:#FBF8F0;--red:#8A2323;--red2:#6B1717;--gold:#8A6817;--gold2:#B08A2E;--text:#231D16;--muted:#7A6F5E;--line:rgba(138,35,35,0.16);--ink-gold:#D9B45B;--ink-red:#D9836B}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC","Noto Serif CJK SC",Georgia,serif;line-height:2.02;font-size:17px}
+a{color:var(--red);text-decoration:none}a:hover{text-decoration:underline}
+.w{max-width:820px;margin:0 auto;padding:0 24px}
+nav{position:sticky;top:0;background:rgba(245,241,232,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:10}
+nav .w{display:flex;align-items:center;justify-content:space-between;height:58px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}.nav-back{font-size:14px;color:var(--muted)}
+header.art{background:linear-gradient(158deg,#1C120A 0%,#191008 100%);color:#F2E8D8;padding:78px 0 58px;text-align:center;position:relative;overflow:hidden}
+.eyebrow{font-size:12px;letter-spacing:0.4em;color:var(--ink-gold);margin-bottom:24px}
+.art-title{font-size:clamp(27px,5vw,42px);font-weight:700;letter-spacing:0.05em;line-height:1.5;color:#F5ECDC}
+.art-sub{font-size:clamp(15px,2.2vw,18px);color:var(--ink-red);margin-top:16px;letter-spacing:0.05em;line-height:1.7}
+.art-meta{margin-top:28px;font-size:12.5px;color:#8A7A62;letter-spacing:0.12em}
+.brand-line{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:120px;height:3px;background:linear-gradient(90deg,transparent,var(--ink-red),transparent)}
+.modes{border-bottom:1px solid var(--line);background:var(--card)}
+.modes .w{display:flex;gap:12px;justify-content:center;padding:16px 24px;flex-wrap:wrap}
+.modebtn{cursor:pointer;font-family:inherit;font-size:14px;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:6px;padding:9px 18px;transition:all .15s;letter-spacing:0.03em}
+.modebtn:hover{color:var(--text)}.modebtn.on{color:#fff;background:var(--red);border-color:var(--red);font-weight:700}.modebtn .ic{margin-right:6px}
+.panel{display:none}.panel.on{display:block}
+#web{padding:52px 0 20px}
+.deck{max-width:820px;margin:0 auto 40px;padding:22px 26px;background:var(--card);border-left:3px solid var(--gold2);border-radius:0 8px 8px 0;color:#4A4235;font-size:16px;line-height:1.95;font-style:italic}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:22px 28px;margin-bottom:44px}
+.toc .tl{font-size:12px;letter-spacing:0.42em;color:var(--red);margin-bottom:14px}
+.toc a{display:block;padding:5px 0;color:#3E362A;font-size:15px;border-bottom:1px dashed rgba(138,35,35,0.10)}.toc a:last-child{border-bottom:none}
+article h2{font-size:22px;font-weight:700;margin:52px 0 20px;padding-top:16px;letter-spacing:0.03em;color:var(--red2);border-top:1px solid var(--line)}
+article p{margin:0 0 20px;text-align:justify}article strong{color:var(--red2);font-weight:700}article em{font-style:italic;color:#4A4235}
+.rdr{max-width:920px;margin:0 auto}
+.rdr-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:center;padding:14px 12px;position:sticky;top:58px;background:rgba(251,248,240,0.97);z-index:6;border-bottom:1px solid var(--line)}
+.rbtn{background:#fff;border:1px solid var(--line);color:var(--red);padding:7px 15px;border-radius:5px;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:0.02em}
+.rbtn:hover:not(:disabled){background:var(--card)}.rbtn:disabled{opacity:0.35;cursor:not-allowed}
+.rbtn.dl{background:var(--red);color:#fff;border-color:var(--red)}.rbtn.dl:hover{background:var(--red2);text-decoration:none}
+.pbox{font-size:14px;color:var(--text)}.pbox input{width:52px;background:#fff;border:1px solid var(--line);color:var(--red);padding:6px;border-radius:4px;text-align:center;font-family:inherit;font-size:14px}.pbox .ptot{color:var(--muted)}
+.zm{display:flex;gap:4px}
+.rdr-stage{position:relative;display:flex;justify-content:center;padding:26px 8px 34px;min-height:62vh;background:#E7E0D2;border-radius:0 0 8px 8px}
+#cwrap{box-shadow:0 16px 46px rgba(0,0,0,0.28);background:#fff;border-radius:2px;overflow:hidden;max-width:100%}
+#pcv{display:block;max-width:100%;height:auto}
+.rload{text-align:center;color:var(--muted);padding:72px 20px;font-size:15px}
+.spin{width:38px;height:38px;border:3px solid rgba(138,35,35,0.2);border-top-color:var(--red);border-radius:50%;margin:0 auto 18px;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rerr{text-align:center;color:#9A3B2B;padding:50px 20px;line-height:1.9}.rerr a{color:var(--red);font-weight:700}
+.tapL,.tapR{position:absolute;top:0;bottom:0;width:14%;cursor:pointer;z-index:3}.tapL{left:0}.tapR{right:0}
+.rhint{text-align:center;font-size:12px;color:var(--muted);padding:12px 0 44px}
+#dl{padding:40px 0 70px}#dl .card{max-width:560px;margin:0 auto;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:48px 32px}
+#dl h2{font-size:22px;color:var(--red2);margin-bottom:10px}#dl .sz{color:var(--muted);font-size:13px;margin-top:16px;line-height:1.9}
+.btn{display:inline-block;margin-top:22px;background:var(--red);color:#fff;font-weight:700;padding:14px 32px;border-radius:8px;letter-spacing:0.04em}.btn:hover{background:var(--red2);text-decoration:none}
+footer{border-top:1px solid var(--line);padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.art-title{font-size:26px}body{font-size:16px}.tapL,.tapR{width:20%}}
+
+.abs{background:var(--card2,#F0E8D3);border-left:4px solid #A32E4E;padding:20px 24px;margin:0 0 26px;font-size:15.5px;line-height:1.95}
+.abs .l{font-size:12px;letter-spacing:.34em;color:#A32E4E;margin-bottom:9px}
+.kw{font-size:14px;color:#6B5D47;margin:0 0 28px;padding-bottom:20px;border-bottom:1px solid rgba(138,104,23,.22)}
+.kw b{color:#A32E4E}
+
+article h3{font-size:18px;font-weight:700;margin:30px 0 12px;color:#4A3A1E;letter-spacing:0.02em}
+article ul{margin:0 0 20px 1.6em}article li{margin:0 0 8px}
+</style></head><body>
+<nav><div class="w"><a class="nav-logo" href="/browse/">SDE Universes</a><a class="nav-back" href="/education/">← 教育专栏</a></div></nav>
+<header class="art">
+<div class="eyebrow">教育 · 专栏 · 论文</div>
+<h1 class="art-title">容器元数律：为何「学生-AI」进账时总被切回一个名字</h1>
+<div class="art-sub">——悬空判断的教育例与学席的历史模板</div>
+<div class="art-meta">王德生 著 · 约 13 千字 · 发表于2026年9月7日</div>
+<div class="brand-line"></div>
+</header>
+<div id="web" class="panel on"><div class="w">
+<div style="text-align:center;margin:0 0 30px"><a class="btn" style="margin-top:0" href="/column/container-arity-law/paper.pdf" download>下载论文 PDF（17 页 · 0.3 MB）</a></div>
+<div class="toc"><div class="tl">目 录</div>
+<a href="#c1">一、引言：一份没有对象的分数</a>
+<a href="#c2">二、文献述评：三条脉络与三位缺席祖宗</a>
+<a href="#c3">三、理论出发点与概念界定</a>
+<a href="#c4">四、核心命题：容器元数律</a>
+<a href="#c5">五、最近邻盘点与占位划界</a>
+<a href="#c6">六、可裁决判据与可观测指标</a>
+<a href="#c7">七、稳健性检验与证伪条件</a>
+<a href="#c8">八、研究设计与方法</a>
+<a href="#c9">九、分析（一）：三条改革路线在容器前的对撞</a>
+<a href="#c10">十、分析（二）：类型学与辨别格</a>
+<a href="#c11">十一、型别等级：单数容器登记人-器具单位的历史模板</a>
+<a href="#c12">十二、讨论</a>
+<a href="#c13">十三、效度威胁与研究局限</a>
+<a href="#c14">十四、结论</a>
+</div>
+<div class="abs"><div class="l">摘 要</div>生成式人工智能进入教育现场后，作业、考试与资格签发仍以「学生」为记账单位，而产出已由「学生-AI」耦合场完成，分数由此成为失去对象的读数。既有研究把这一现象归入检测失灵、诚信缺失或主体分布化，三条脉络共享一个未经审视的前提：只要测量足够细，新单位终能被读出。本文提出并维护另一条判断：<strong>记账单位不是由生产决定的，也不是由测量决定的，而是由分配容器的元数决定的。</strong> 录取、发证、追责、评奖都是单数容器——每格只收一个名字；任何耦合场在进入这些容器的一刻，无论生产端多么纠缠、测量端多么精细，都会被切回一个名字。「学生-AI 拒绝被约简」因此不是本体上的任务敏感性，而是制度几何的必然：容器是单数，切名就发生。本文把这一命题写为「容器元数律」，并给出四条成立条件、三层可裁决读数（来源栏三档、责任回收率、容器元数读数）与三条数值化自否决条款；以八位最近邻与三位缺席祖宗（Goodhart–Campbell、Abbott–Collins、Clark–Chalmers–Hutchins）划出分离线；用「来源可见性 × 容器元数」二维辨别格给出四格各自独有的预测；再以驾驶执照的车型分级与飞行员的型别等级为历史模板，说明单数容器无需变成复数即可登记「人-器具」单位——办法是把名字之下的那一格改写为「席位配置」。由此，教育变革的第一步不是把考题做难，也不是把容器改成复数，而是在容器不变的前提下，把「学生」一栏改写为「学席」：名字＋器具配置＋责任回收读数。文末给出五条证伪条款与两处本文解释不了的洞。</div>
+<p class="kw"><b>关键词：</b>学生-AI；悬空判断；学席；分配容器；容器元数律；来源栏；责任回收率；型别等级</p>
+<div class="abs"><div class="l">Abstract</div>When generative AI enters educational production, assignments, examinations, and credentials continue to book the “student” as the unit of account, while output is produced by a student-AI coupling field; scores thereby become readings without an object. Existing work files this under detection failure, integrity failure, or distributed agency. All three share an unexamined premise: with sufficiently fine measurement, the new unit will eventually be read. This paper defends a different claim: <strong>the unit of account is determined neither by production nor by measurement, but by the arity of the distribution container.</strong> Admission, licensing, liability, and awards are singular containers — each cell accepts exactly one name. Any coupling field, however entangled at production and however finely measured, is cut back to a single name at the moment it enters such a container. “Student-AI resists reduction” is therefore not an ontological property of task-sensitivity but a consequence of institutional geometry. The paper formalizes this as the Arity Law of the Container; supplies conditions of validity, three layers of decidable readings (source column, responsibility recovery rate, container arity reading) and three numerically specified self-veto clauses; separates the claim from eight nearest neighbours and three absent ancestors; derives grid-specific predictions from a two-axis typology (source visibility × container arity); and identifies a historical template — vehicle-class driving licences and aircraft type ratings — in which singular containers register a “person-instrument” unit without becoming plural, by rewriting the cell beneath the name as a seat configuration. The first move of educational reform is thus neither harder questions nor plural containers, but rewriting the “student” cell as a <em>seat</em>: name + instrument configuration + responsibility-recovery reading. Five falsification clauses and two unexplained holes close the paper.</div>
+<p class="kw"><b>Keywords:</b> student-AI; suspended judgment; seat; distribution container; arity law; source column; responsibility recovery rate; type rating</p>
+<article>
+<h2 id="c1">一、引言：一份没有对象的分数</h2>
+<h3>1.1 场景</h3>
+<p>一所普通高校的写作课，教师布置文献综述。交上来的文本结构完整、引用规范、论点圆熟，检测软件不报警，评分标准全部满足。随堂追问时，部分学生复述不出文中一个核心论证。这份作业没有触发任何制度警报，分数照常进入成绩单。教师清楚：这个分数是空转的。</p>
+<p>反常不在「考试无效」，而在「考试仍在考核，却不知道自己在考核谁」。同一个分数背后并存两种生产：一种由学生独立完成，一种由学生调用模型完成理解、构思、组织与表达。分数仍然存在，分数的对象已不稳定。</p>
+<h3>1.2 悬空判断</h3>
+<p>这个场景是「悬空判断」的一个教育例。悬空判断指：某个行业的生产单位已经换成「人-器具」的复合体，评估与责任的投放仍朝向旧单位「人」，于是判断投向一个已不在那里的位置。人与器具不可分割是一个本体论认知——厨师的手艺离不开刀、灶与材料，评估厨艺从来不是评估一双手。AI 到来后，学生-AI、老师-AI 这两个新单位已在发生，考试与评估仍在旧频道。每一种工具诞生后，这件事都会发生一次。</p>
+<p>本文要做的不是重述悬空判断，而是回答它留下的一道题：<strong>旧单位为什么退不下来？</strong> 常见答案有三种：检测工具还不够细；学生不肯如实申报；主体已经分布化、旧单位在概念上过时了。三种答案共享一个前提——只要测量足够细，新单位终能被读出、被记入。本文要推翻的正是这个前提。</p>
+<h3>1.3 承重命题</h3>
+<p><strong>记账单位不是由生产决定的，也不是由测量决定的，而是由分配容器的元数决定的。</strong></p>
+<p>录取名单每格一个人，执业证书每张一个名字，追责判决落在一个自然人或法人，奖学金发给一个账户。这些容器是单数的：一格只收一个名字。生产端可以是任意纠缠的耦合场，测量端可以做到任意精细的贡献分解，可只要产出要进入这些容器，它就会在入口处被切回一个名字。「学生-AI 拒绝被约简为一个单位」因此不是本体上的任务敏感性，而是制度几何的必然：<strong>容器是单数，切名就发生。</strong> 本文把这条命题叫作「容器元数律」。</p>
+<p>这条命题改变了问题的位置。它把「怎样测出学生-AI」这道题挪成「单数容器如何登记一个人-器具单位」，而后一道题在教育之外早已被解过：驾驶执照按车型分级，飞行员执照按机型给型别等级，证书上仍只有一个名字，名字之下的那一格却写着「此人被批准在何种器具配置下作业」。容器没有变成复数，名字之下的格子被改写了。这就是「学席」的历史模板。</p>
+<h3>1.4 研究问题</h3>
+<p>RQ1：旧账本在哪一个环节失去记账能力？失去的是测量能力还是登记能力？</p>
+<p>RQ2：为什么更细的测量、更严的申报、更深的考题都不能把新单位记进账本？阻力在生产端、测量端还是容器端？</p>
+<p>RQ3：单数容器在不改元数的前提下，能否登记「人-器具」单位？历史上是否已有先例？</p>
+<p>RQ4：教育变革若只能先改一项配置，应改哪一项？</p>
+<h3>1.5 贡献声明</h3>
+<p>第一，提出容器元数律，把「新单位拒绝入账」的原因从本体（耦合场任务敏感）挪到制度几何（分配容器单数），并给出可裁决的成立条件。</p>
+<p>第二，证明「测量精细化」与「单位入账」是两道独立的题：测量可以任意细，切名照样发生；因此过程性评价、贡献声明、更难的考题都在解错的那道题。</p>
+<p>第三，从驾驶执照车型分级与航空型别等级中抽出「席位配置」这一登记格式，说明单数容器登记人-器具单位的可行方式，并据此把「学席」从命名落到登记规格：名字＋器具配置＋责任回收读数。</p>
+<h2 id="c2">二、文献述评：三条脉络与三位缺席祖宗</h2>
+<h3>2.1 教育评估脉络：把问题当成测量工具落后</h3>
+<p>Swiecki 等（2022）、Dawson（2021）、Bearman 等（2023）最早面对生成式 AI 对终结性评价的冲击，提出把评价对象从终稿移到过程：口试、即时生成任务、过程展示、人机协作元数据框架。这一脉握住的变量是「任务形式」与「检测条件」，其最锋利的判断是：评估对象不应是文本，而是生产文本的过程。</p>
+<p>它的失效点很具体。过程性评价假设起点在课堂上。学生只要提前让模型做「理解性准备」——不做终稿，做大纲、关键思路、问答对、修改策略——课堂上的即时修改就成了记忆输出，表现平滑，不引发警报。当堂紧盯把在家外包的「终稿」环节逼成在家外包的「理解」环节，再用课堂表演把这次搬迁藏起来。日志越厚，被填充的日志与生产之间的差距越隐蔽。过程一变厚，过程本身成了可制造物。</p>
+<p>更要紧的是：即使过程性评价成功读出了人的贡献份额，成绩单上仍只有一格，这份额还是要被压回一个数。这一脉从未问过测量结果往哪里放。</p>
+<h3>2.2 学术诚信脉络：把问题当成贡献归属不清</h3>
+<p>Ellis 等（2020）、Perkins（2023）、Cotton 等（2024）、Bozkurt 等（2023）转向产出真实性与贡献归属，主张学生明确声明哪些由模型生成、哪些由本人完成，并把透明度本身列为评分维度。这一脉接近本文后文的「来源栏」，其判断是：没有来源声明，任何真实性判断都无法落地。</p>
+<p>它的解释变量始终是「学生自报的规范性」。一旦生产单位是耦合场，声明的承担者就出了问题：声明者仍是「学生」这个旧单位，而非「学生-AI」这个实际单位。一名学生让模型生成十个选题选一个，用模型写六百字引言删二十字，再让模型按课堂笔记重排三点结论改一个小标题——要他按环节写清哪段文本、哪条判断由哪一方承载，超出了单次回忆能复现的范围。声明由此变成故事，不是读数。不是学生撒谎，而是他们自己也只有一个模糊的故事。这一脉让旧单位去承担新单位的自我报告义务，而旧单位在测量层已经失效。</p>
+<h3>2.3 分布式认知与后人类教育脉络：把问题当成主体扩展</h3>
+<p>Bearman &amp; Ajjawi（2023）、Markauskaite 等（2022）、Selwyn（2024）、Chiu（2024）承认知识与能力已分布于人机系统，「测量个体能力」的前提本身有问题，一些作者主张以「共生能力」「系统能力」取代「个人能力」。这一脉在概念上最激进，也最贴近现象。</p>
+<p>它在关键处停下：成绩单上那一栏究竟填谁的什么？同一名学生在不同任务中配比不同的共生体，如何登记为可比较的学业记录？一个学生带着「系统作品集」去申请一个只收个人名字的资格，新账本签发不出主体资格；同一个作品集可以带去十所学校，作品集里的模型也在场——<strong>系统不是人，不能作为申请人。</strong> 这一脉成功说出了账本不可信，却造出一个填不上姓名的账本。它批判了旧单位，没有说明新账本怎么记；而它记不了的原因，恰是本文要指出的：它想改的是单位，卡住它的是容器。</p>
+<h3>2.4 三位缺席祖宗</h3>
+<p>三条脉络都没引的三位祖宗，分别占住了本文命题的三个部件。不把他们请出来，本文的判断就会被误认为自创。</p>
+<p><strong>Goodhart（1984）与 Campbell（1979）。</strong> 一个量一旦被用作分配依据，就不再是好的测量；行为向最低成本满足该量的方式收敛。本文「假读数」「路径向最便宜的通过方式收敛」的机制，本名在这里。分离线：Goodhart–Campbell 说的是量被分配功能腐蚀，测量对象仍是同一个人；本文说的是测量对象本身在入账时被换掉——腐蚀发生在量上，切名发生在单位上，二者可以独立出现。一份从未用于分配的作业照样会被切回一个名字；一个用于分配的量也可以对应稳定的单位。</p>
+<p><strong>Abbott（1988）与 Collins（1979）。</strong> 职业系统通过管辖权之争划定谁有资格做什么；文凭社会把学历当作职业准入的通货。本文「准入共同体以险定真值」「学校分数兼具测量功能与分配功能」两句在他们那里有现成的账。分离线：Abbott–Collins 解释资格如何被垄断与兑换，不解释资格证书为何每张只写一个名字；本文要解释的正是这个「一张一名」的几何如何反过来规定了教育端的记账单位。</p>
+<p><strong>Clark &amp; Chalmers（1998）与 Hutchins（1995）。</strong> 延展心智论证认知过程可以延伸到头骨之外的工具与记号；《荒野中的认知》证明导航是舰桥上人与仪器共同完成的计算。本文「人与器具不可分割」「学生-AI 是耦合场」的本体论支撑在此。分离线：延展心智与分布式认知回答的是「认知在哪里发生」，不回答「认知的结果记在谁名下」；本文的增量是：登记不跟随发生——发生可以延展到舰桥全体，登记仍落在船长一人。</p>
+<h3>2.5 缺口的精确位置</h3>
+<p>三条脉络加三位祖宗，覆盖了「过程—产品」「贡献—声明」「主体—边界」「量—分配」「资格—垄断」「认知—工具」六组关系，没有一条正面回答：<strong>当生产单位耦合化之后，记账单位由什么决定？</strong> 三条脉络默认由测量决定，三位祖宗默认单位不变。本文站进去的位置是：由容器决定。</p>
+<h2 id="c3">三、理论出发点与概念界定</h2>
+<h3>3.1 出发点：从测量前件看账本</h3>
+<p>现代学校教育的一切度量与责任装置，建立在「独立个体」这个最小记账单位之上。课程问「学生应知什么」，考题问「学生自己会不会」，成绩单问「学生本人做了什么」。这不是教育理念的偏好，而是记账所必需的本体前提：没有单位，就没有可计量的项。</p>
+<p>本文因此不从「怎样测」出发，而从「测出来的数往哪里放」出发。放数的地方是容器，容器有元数。测量装置读出的读数，进入容器前要被容器的元数重新切分。这一切分独立于测量的精度，也独立于生产的形态。</p>
+<h3>3.2 名义定义</h3>
+<p><strong>学生-AI 耦合场</strong>：在某一具体任务中，学生与人工智能系统以双方贡献不可从成品中稳定分解的方式共同完成教育产出的实际生产单位。「耦合场」而非「新主体」，因为每次任务的配比都不同：今天模型只提示一个词，明天模型代写九成，同一学生在不同任务里呈现为不同的学生-AI。</p>
+<p><strong>旧账本</strong>：以「学生作为独立生产主体」为最小单位，以分数、绩点、通过与否为记录符号，并以这些记录作为资格分配依据的制度装置。</p>
+<p><strong>分配容器</strong>：接收账本读数并据以分配位置、资格、资源或责任的制度格式——录取名单、执业证书、学位证书、判决书、奖学金账户、招聘名额。</p>
+<p><strong>容器元数</strong>：一个分配容器的单个格位能够容纳的责任主体数量。单数容器每格收一个名字；复数容器每格可收一个集合（团队、机构、项目组）。</p>
+<p><strong>切名</strong>：一个耦合场的产出进入单数容器时，被压缩为该容器格位所能容纳的唯一名字的过程。切名不依赖任何人的意图，由容器元数触发。</p>
+<p><strong>悬空判断</strong>：评估与责任的投放朝向旧单位，而生产已由新单位完成，判断落在一个已不在那里的位置。</p>
+<p><strong>学席</strong>：单数容器中登记学生-AI 单位的格式——名字＋器具配置＋责任回收读数。名字仍是单数，名字之下的格子从「学生」改写为「席位」。</p>
+<p><strong>中间账</strong>：位于产出生成与分配容器之间、记录来源构成、生成路径与责任承担的评价层。它不替代分数，而在分数进容器前留下切名之外的痕迹。</p>
+<h3>3.3 操作性读数</h3>
+<p>本文用三层读数承载上述概念，三层各有单次取值程序，均不依赖学生自报。</p>
+<p><strong>来源栏 S（三档类别）。</strong> 对任一份计分产出：1＝独立完成（未借助模型或仅作格式与检索工具）；2＝人机协作（学生承担可观察的关键生成过程，模型承担辅助、组织或润色）；3＝模型代做（关键生成过程不可在学生处观察到）。赋值由教师在收件时依据可观察的课堂生成事实与学生当场复述、修改能力做出；读不出的单列「不可归因」，不进入比较。不允许在两档之间插档。</p>
+<p><strong>责任回收率 RR（等比）。</strong> 在模型产出出现错误（人工设置或自然出现）时，学生能独立发现、说明来源、指出后果并完成修正的比例。仅改对答案不计入。RR 区分「工具熟练」与「承担判断」：一名学生可以熟练调用模型完成诊断建议，却发现不了模型遗漏的危险病史——工具调用成功率高，RR 为零。</p>
+<p><strong>容器元数读数 A（二值）。</strong> 对任一分配容器：A＝1 若单个格位只能登记一个责任主体的名字；A＝n 若可登记一个集合。取值直接读容器的登记格式（申请表、证书版式、判决书主文、奖项名单），不做推断。</p>
+<p>三层读数分工：S 记生产端，RR 记责任端，A 记容器端。容器元数律的经验形态是：<strong>无论 S 与 RR 如何分布，只要 A＝1，进账后的记录只剩一个名字。</strong></p>
+<h2 id="c4">四、核心命题：容器元数律</h2>
+<h3>4.1 正式形态</h3>
+<p>Z：记账单位由分配容器的元数决定。当容器为单数（A＝1）时，任何耦合场的产出在进账时被切回一个名字；测量端的精细化（更细的 S、更高信度的 RR）改变的是名字之下能附带多少信息，不改变名字的数量。</p>
+<p>它所否定的两个候选：</p>
+<p>Y₁：「学生-AI 之所以记不进账本，是因为测量工具还不够细。」（评估脉络）</p>
+<p>Y₂：「学生-AI 之所以记不进账本，是因为它本体上是任务敏感的耦合场，不存在跨任务的共同分母。」（分布式认知脉络，也是本文两篇前身稿的表述）</p>
+<p>Z 与 Y₂ 的差别最要紧。Y₂ 把不可约简放在生产端，于是逻辑上留下一个出口：若有一天出现稳定的跨任务分解协议，新单位就能入账。Z 把不可约简放在容器端：即使分解协议出现，A＝1 的容器照样只登记一个名字——分解出来的份额会成为名字之下的附注，不会成为第二个名字。Y₂ 对的地方是耦合场确实任务敏感；它错的地方是把这当成了入账失败的原因。</p>
+<h3>4.2 成立条件</h3>
+<p>第一，存在至少一类分配容器，其格位只登记一个责任主体（A＝1），且该容器接收教育端的读数（分数、学分、通过与否）作为分配依据。</p>
+<p>第二，教育现场存在至少一类高频产出，其来源栏在生产端不为 1（S∈{2,3} 或不可归因）。</p>
+<p>第三，该产出在进入容器时，来源信息不被保留为容器格位的一部分——格位上只有名字与一个数。</p>
+<p>第四，同一名义读数背后存在生产形态不同的至少两条路径，且路径差异在容器中不可见。</p>
+<p>四条同时成立，切名成立，悬空判断成立。</p>
+<h3>4.3 不成立条件</h3>
+<p>若出现一类分配容器，其格位可登记「人-器具」配置且该配置进入分配后果（例如某执业证书上的器具配置项影响可执业范围与追责范围），而教育端的读数按同一格式登记，则本文关于「切名不可避免」的判断在该容器上不成立——但这恰是本文第十一节所主张的出路，不是对 Z 的否定，而是 Z 的实现形态：容器元数未变，格位改写。</p>
+<p>若出现单数容器直接登记两个名字（学生与模型各一），Z 被推翻。本文预测这不会发生，理由在 4.5。</p>
+<h3>4.4 两句复合测试</h3>
+<p>Z 能否由两位最近邻的两句话无损复合？取 Bearman 与 Ellis 各自最强的一句：前者说知识与学习已分布于人机系统，个体测量的假设在瓦解；后者说没有来源声明的作品不能进入评价。两句合起来说的是「单位分布化了，所以要有人声明」。它们盖不住的那条缝是：<strong>声明主体与分布主体在制度上被当成同一个人，而这不是谁的疏忽，是容器只有一格。</strong> 两句都没问：贡献声明这个动作应由谁承担、承担之后填到哪里。本文的增量只落在这一处：填不到哪里去，因为格位是单数。</p>
+<h3>4.5 为什么容器不会变成复数</h3>
+<p>一个自然反驳：把容器改成复数不就行了？让录取名单登记「某生＋某模型配置」，让证书写两个名字。</p>
+<p>三处卡死。其一，责任不可分割地落在能承担后果的一方，模型不能被吊销执照、不能被追究刑责、不能被退学；一个不能承担后果的名字写进追责容器，等于没写。其二，分配的稀缺性要求排他：一个录取名额给一个人，名额上多出一个模型的名字，稀缺资源的排他性无处安放。其三，同一个模型配置可以出现在一万个申请人的名字旁边，它作为「第二个名字」没有区分度，在分配上是空的。容器保持单数不是保守，而是分配与追责的功能要求。因此出路不在元数，而在格位。</p>
+<h2 id="c5">五、最近邻盘点与占位划界</h2>
+<p>以下八位最近邻与三位祖宗各占一个位置。每一栏都写实；判决性反例是在同一案例上两家读数不同的那一点。</p>
+<p><strong>Bearman, M.</strong> 邻接命题：知识与学习分布在人机系统中，个体测量假设瓦解。分离线：她认为测量对象要重新考虑；本文认为对象怎么考虑都要在入口被切回一个名字。判决性反例：学生用模型完成全部研究设计，课堂答辩能复述不理解。按她：分布式学习一例，应发展新评价单位。按本文：新评价单位造出来也进不了录取名单，问题在名单不在评价。</p>
+<p><strong>Ellis, C.</strong> 邻接命题：必须记录生成式 AI 的使用方式，否则评价无效。分离线：她主张增加声明；本文主张声明填不到容器里去。判决性反例：文档由六次交互拼接，学生只能回忆一段。按她：需要更细的声明指导。按本文：声明可行性被过程不可召回破坏，即使可召回，声明也只能做名字之下的附注。</p>
+<p><strong>Dawson, P.</strong> 邻接命题：检测失效，评估设计应转向动态任务。分离线：他认为任务可重设计以恢复真实性；本文认为任务改变被旧土壤翻译成「更难」，且再难的任务也只产出一个进单数容器的数。判决性反例：高认知开放任务仍按标准评分收口，两年内被题库与代训模板接管。</p>
+<p><strong>Bretag, T.</strong> 邻接命题：诚信研究应从抓作弊转向能力培养。分离线：她修复责任者；本文关心责任者在容器里只有一格。判决性反例：学生训练模型学自己文风生成初稿再少量修改。按她：不透明协作，需培养诚信。按本文：S 不可归因，账本无栏。</p>
+<p><strong>Perkins, M.</strong> 邻接命题：把 AI 使用纳入评估矩阵。分离线：他调整变量维度；本文调整的是变量进容器时被切掉的那一步。判决性反例：作业满足含声明的新矩阵，声明中的人机份额不可复现。按他：矩阵成立。按本文：份额是类别贴纸，进容器时被削平。</p>
+<p><strong>Cotton, D. R. E.</strong> 邻接命题：重设考核任务防止被 AI 绕过。分离线：他假定任务到达个人后由个人承担；本文不假定承担者与人同形。判决性反例：小组项目写作全交模型，每人准备答辩。按他：个别答辩补测。按本文：答辩测复述，不测昨日生成的份额。</p>
+<p><strong>Bozkurt, A.</strong> 邻接命题：生成式 AI 模糊原创与生成边界，需新伦理框架。分离线：他把边界当伦理问题；本文把边界归因于单位不再是一个受伦理约束的实体。判决性反例：学生说「我们和模型共同完成」，不是说谎，也给不出可登记的贡献。</p>
+<p><strong>Selwyn, N.</strong> 邻接命题：AI 推动教育治理与数据权力重组。分离线：他观察治理如何重构；本文观察重构之前容器与单位如何互锁。判决性反例：某国强制 AI 进教材，平台大量新增，成绩单版式不变。按他：技术被治理收编。按本文：新单位只能在生产侧增殖，进不了结算侧，因为结算侧版式没动。</p>
+<p><strong>Goodhart / Campbell</strong>（祖宗一）：量被分配腐蚀 vs 单位被容器切换，见 2.4。<strong>Abbott / Collins</strong>（祖宗二）：资格如何垄断兑换 vs 证书为何一张一名。<strong>Clark–Chalmers / Hutchins</strong>（祖宗三）：认知在哪里发生 vs 结果记在谁名下。</p>
+<p>列表摆出来可以看清：没有任何一位把「账本无来源栏」「单位不可约简」「容器每格一名」三件事连成一条命题。他们都踩到了洞的边缘，没有一个把脚落进去。</p>
+<h2 id="c6">六、可裁决判据与可观测指标</h2>
+<h3>6.1 判别式</h3>
+<p>在不依赖受试者自报、不引入新评价形式的前提下，对同一批产出试加 S 栏，同时读取这批产出最终进入的分配容器的 A 值：</p>
+<p>若 S∈{2,3} 的产出占比不低（预设阈值下文），且 A＝1，且容器格位上不出现 S 信息，则切名成立，本文命题在该场景上成立。</p>
+<p>若 S∈{2,3} 占比高但容器格位登记了 S 或等价的器具配置信息并使之进入分配后果，则该场景已经完成第十一节所说的格位改写，切名在此被抵消。</p>
+<p>若 S∈{2,3} 占比低于阈值，本文命题在该场景上无用武之地——不是被否，而是没有耦合场需要进账。</p>
+<p>判别式不含「应当」「合理」「恰当」。它读三个事实：来源栏分布、容器元数、格位是否登记来源。</p>
+<h3>6.2 阈值</h3>
+<p>S∈{2,3} 占比的预设阈值为 30%。这不是自然常数，是为提出可复核判据设的起点，须经敏感性分析。RR 与最终成绩之间的偏离以「成绩位于前 40% 而 RR 位于后 40%」定义为一次可重复的倒挂；同一学生在三次以上任务中出现倒挂即记为稳定倒挂。</p>
+<h3>6.3 三条自否决条款</h3>
+<p><strong>信度条款。</strong> 两名独立观察者对同一批产出逐份赋 S 值，Cohen’s Kappa 低于 0.70，读数不稳，不得作为制度依据；RR 在两周内、难度相近的重测中组内相关低于 0.70，同样不得用于高风险决策。</p>
+<p><strong>改名条款。</strong> 若 S 栏在控制任务难度后可被「在场时间」或「文本相似度」完全替代（相关系数 ≥0.80 且增量解释率 &lt;0.05），它只是已有量的改名，必须放弃；RR 若与「作业完成度」「学习投入度」高度重合到同一标准，同样放弃。</p>
+<p><strong>自报条款。</strong> 若某次 S 或 RR 赋值必须事后问学生「这是不是你写的」，或必须读取模型检测软件，该读数已退化为他报与机器猜测，不可采用。概率与倾向只可用于群体估计，不得倒灌为单个学生单次任务的事实判定。</p>
+<h3>6.4 四格各自独有的预测（先于第十节给出，便于对照）</h3>
+<p>来源不可见 × A＝1：校内高分与责任回收率不相关或负相关。</p>
+<p>来源可见 × A＝1：过程记录逐年加厚，学生独立解释能力不随记录改善——制度拿到了过程数据，没拿到责任主体。</p>
+<p>来源不可见 × A＝n：集体成品质量上升，个体退出无痕，团队内部搭便车不可识别。</p>
+<p>来源可见 × A＝n：模型参与程度与个体责任能力不再简单负相关，可能在复杂任务中共同提高，但依赖错误暴露—解释—修正机制。</p>
+<h2 id="c7">七、稳健性检验与证伪条件</h2>
+<p>以下条款凡标 [未执行] 者，本文均无权声称已证实。它们的价值是划出本文一旦遇到就自认失败的边界。</p>
+<p><strong>第一条</strong> [未执行]：若五年内至少三个国家或地区的官方学历或执业资格制度在证书格位上直接登记两个责任主体名字（学生与模型各一），并使两个名字各自承担分配与追责后果，容器元数律被推翻。现有解释预测不出这件事不会发生；本文预测它不会发生，理由在 4.5。</p>
+<p><strong>第二条</strong> [未执行]：若某一分配容器保持 A＝1，且未在格位上登记任何器具配置信息，却在连续三届中使 S∈{2,3} 的产出与 S＝1 的产出在分配后果上稳定分开，则切名可以被测量端单独抵消，本文关于「测量与入账独立」的判断被削弱。</p>
+<p><strong>第三条</strong> [未执行]：取同一批学生同一内容，一班课堂限时生成加当堂追问，一班回家作业加事后检测；若三个月后迁移成绩无差异，本文关于「产出时点」止损作用的判断被否。这一条只涉及测量端，不涉及容器端。</p>
+<p><strong>第四条</strong> [未执行]：若某类模型能一并生成「人的错误模式」，使当堂追问也无法区分人与模型的理解，则 RR 读数的取值程序失效，本文的第二层读数须撤回。</p>
+<p><strong>第五条</strong> [未执行]：若企业招聘、职业准入与学校考试长期维持相同的分数信任结构，即使执业出现可观察风险，资格制度也不转向「格位改写」，则本文关于「格位改写将先从高风险准入容器开始」的判断不成立。</p>
+<p><strong>替代解释。</strong> 其一，来源不可分解只是教师没时间没训练；给足资源即可分解。可削弱本文的测量层，不触及容器层：分解出来的份额仍要面对 A＝1。其二，旧账本不退是既得利益，不是几何。若多数教师在无利益受损且可匿名表态时仍选择保留单数格位，利益不是主因；本文预测他们会保留，理由是 4.5 的三处功能卡死。其三，切名只是暂时的技术状态。若出现对所有任务可复现交互过程且可分解贡献的协议，Y₂ 的最强表述被否，Z 不受影响。</p>
+<h2 id="c8">八、研究设计与方法</h2>
+<h3>8.1 立场与类型</h3>
+<p>本文是概念分析与结构论证，不采集人类被试数据。方法论上站在批判制度分析：把一个制度经验现象（假读数）还原到其构成的单位前提，再追问该前提由什么决定。不采用问卷、实验或检测工具基准测试，因为本文要抓的不是行为频率而是测量前件——单位与容器在测量开始前就必须稳定；用问卷去测它们，等于用一把刻度有问题的尺子量尺子。路线是：结构分析—判准设计—反例检证—历史模板比对。</p>
+<h3>8.2 材料</h3>
+<p>全部例子取自公开可见的教育场景（高校作业、随堂问答、编程作业、实验报告、职业培训、入职考核）、公开的容器版式（录取名单、证书、判决书、奖项名单）与公开的许可制度（机动车驾驶证准驾车型、航空器型别等级）。没有私人教学数据、访谈或问卷，不构成经验抽样问题；本文对实践类型不做频率声称，只做形态判定。</p>
+<h3>8.3 程序</h3>
+<p>先确定旧账本的最小记账单位与其对接的分配容器；陈列三条脉络与三位祖宗；提出容器元数律；把它放回课堂—声明—考题三条改革路线，推出三者的限度；用二维辨别格分格给出独有预测；最后以许可制度中的型别等级为模板，导出学席的登记规格。每一环可复现，不依赖某位研究者的特殊眼光。</p>
+<h3>8.4 信度</h3>
+<p>本文不编码人类被试材料，不引入编码员一致性；第六章已为 S、RR 设置未来可靠性门槛与单次取值程序，为概念化转经验研究预置了质量控制入口。</p>
+<h2 id="c9">九、分析（一）：三条改革路线在容器前的对撞</h2>
+<p>本节让三条改革路线以最强形式入局，与容器元数律对撞。只交结果。</p>
+<h3>9.1 课堂路线：当堂紧盯</h3>
+<p>最强形式：当堂限时修改、中途打乱任务、口头追问与自评，足以区分学生会什么不会什么。</p>
+<p>对撞结果：这些做法全部假设起点在课堂。学生提前让模型做理解性准备，课堂上的即时修改成为记忆输出，表现平滑不报警。课堂路线优化的是「人在不在场上」，不是「人的生成是否起于此刻」。退一步，即使课堂路线成功读出了人的份额，这份额进入成绩单时仍只有一格。课堂路线解错了题：它解的是测量，题是登记。</p>
+<h3>9.2 声明路线：来源自报</h3>
+<p>最强形式：每个学生提交时声明哪些部分用了模型、用在哪一步；惩罚不申报，奖励透明。</p>
+<p>对撞结果：本文不回答「学生不可信」。本文回答：一旦模型贡献成为产出的组成部分，要声明的不是「用没用」，而是「在生成的哪一步、替换了原应属于人的哪一个生成行为」，这超出单次回忆能复现的范围。更要紧的是，即使声明精确，它填到哪里？录取表上没有那一栏。声明路线让旧单位承担新单位的报告义务，再让报告无处安放。</p>
+<h3>9.3 考题路线：做难做深</h3>
+<p>最强形式：标准题易被模型接管，转向开放问题、真实项目、跨学科任务，迫使学生动用判断。</p>
+<p>对撞结果：题目开放、材料复杂、没有单一答案，培训机构与模型可以先生成项目框架、数据解释与展示脚本，学生按模板执行。开放性本身成为模板化服务的市场机会。题目越「深」，越值得被市场化为新题库。而且再难的题最终仍收口为一个进单数容器的数——考题路线改变的是被测问题，不是生产路径，更不是容器。</p>
+<h3>9.4 分布式账本路线：测系统不测个人</h3>
+<p>最强形式：既然单位已分布，就让账本也分布——建立学生-AI 作品集，记录每轮交互，录取看作品集。</p>
+<p>对撞结果：结算处卡死。作品集里的失败谁负责？分数挂谁？奖学金、排名、毕业证、追责都是单数容器。一个学生带着系统作品集去申请只收个人名字的资格，新账本签发不出主体资格。系统不是人，不能作为申请人。分布式账本一接触分配，就在「谁被录取」这个最简单的问题上卡死——不是理论不完整，是容器是单数。</p>
+<p>四条路线的反例指向同一位置：任何在旧流程内改进人或方法的路径，最终都撞上「找不到与生产单位同构的登记格位」。</p>
+<h2 id="c10">十、分析（二）：类型学与辨别格</h2>
+<h3>10.1 两轴的确立与候选轴的排除</h3>
+<p>第一轴取自本文核心：<strong>来源可见性</strong>——账本是否拥有可用且不依赖自报的路径信息。</p>
+<p>第二轴候选有四。「任务难度」是来源不可见的压迫因素，不是结构轴，排除。「学科类型」影响人机贡献如何分布，是表现不是结构，排除。「学生动机」偏个体内部状态，不可观察，排除。「账外分发的硬度」（职业准入是否已介入）有吸引力，但它是容器的一种强度，而容器的结构变量是元数：外硬容器与外泡容器都可以是单数。故第二轴取<strong>容器元数</strong> A∈{1, n}。</p>
+<p>两轴相关但不重合：来源可见与否不改变容器元数，容器元数不改变来源是否可见；前者决定账本能读到什么，后者决定读到的东西进账时被切成什么。</p>
+<h3>10.2 四格</h3>
+<p><strong>A 格：来源不可见 × A＝1——隐蔽切名。</strong> 终稿、分数、资格读数都在，理解、构思、生成如何发生无人知道，进账时切回一个名字。遍及大量声誉老、排名高、毕业去向与专业能力已脱钩的普通文理专业。独有预测：校内高分与责任回收率不相关甚至负相关；阅读量无显著增加而作业平均分逐年微涨——不是学生更聪明，是可外包的路径越来越顺。</p>
+<p><strong>B 格：来源可见 × A＝1——可追踪切名。</strong> 学校记录了学生何时调用模型、用了哪些输出、做了哪些修改，进账时仍切回一个名字。常见于已推行过程性评价、日志与版本历史的院系。独有预测：来源记录逐年加厚，学生独立解释能力不随记录改善；制度获得了过程数据，没有获得责任主体。这一格是过程性评价改革的终点，也是它的天花板。</p>
+<p><strong>C 格：来源不可见 × A＝n——集体成品。</strong> 团队作业、项目组交付、机构署名，容器收一个集合，个体来源不可见。独有预测：集体成品质量上升，个体退出无痕，搭便车不可识别；集合内部的切名从容器挪到了团队内部。</p>
+<p><strong>D 格：来源可见 × A＝n——责任型协作。</strong> 两轴皆高的实例：手术团队的手术记录登记主刀、一助、器械与麻醉，每个名字下有器具与职责；庭审记录登记律师、书记员与辅助系统的使用，律师对事实主张与法律立场当庭负责。独有预测：模型参与程度与个体责任能力不再简单负相关，可能共同提高，但依赖错误暴露—解释—修正机制。</p>
+<p>四格不可互相替代。A 与 B 的差别是能否看见路径；B 与 D 的差别是容器元数；C 与 D 的差别是集合内部是否可见。教育端的分配容器几乎全在 A＝1 一列，所以教育变革若在两轴上只能动一轴，动来源可见性只能从 A 格走到 B 格——切名照旧。</p>
+<h2 id="c11">十一、型别等级：单数容器登记人-器具单位的历史模板</h2>
+<h3>11.1 两个先例</h3>
+<p>机动车驾驶证是单数容器：一证一名。但证上有「准驾车型」一栏——C1、B2、A1——此人被批准在何种器具配置下作业。器具配置进入了分配后果（能开什么车）与追责后果（超出准驾车型驾驶，责任加重）。容器元数没有变，名字之下的格子被改写了。</p>
+<p>民航飞行员执照同样一证一名。执照之下有「型别等级」（type rating）：此人被批准操纵何种机型。型别等级要单独训练、单独考核、定期复训；换机型要重新签注。执照没有写第二个名字，写的是「此人＋此器具」的组合被批准的范围。</p>
+<p>两个先例共有的登记格式是：<strong>名字（单数）＋器具配置（可多项）＋该配置下的作业范围与责任范围。</strong> 这就是「席位配置」。</p>
+<h3>11.2 为什么这个模板能解本文的题</h3>
+<p>容器元数律说：单数容器只登记一个名字。型别等级说：一个名字之下可以登记器具配置。两句合起来：<strong>人-器具单位不需要第二个名字，它需要名字之下的第二格。</strong> 学生-AI 进账时被切回「学生」一名，是因为「学生」这一格下面没有器具配置栏；加上那一栏，切名仍然发生（名字只有一个），但被切掉的不再是器具，而只是器具之外的耦合细节——而这正是可以接受的损失，因为责任本来就要落在能承担后果的一方。</p>
+<p>这也解释了 4.5 中容器不会变成复数的三处卡死为何在型别等级上都不成问题：责任仍落在飞行员一人；名额仍排他；机型本身不是申请人，它是名字之下的限定词。</p>
+<h3>11.3 学席的登记规格</h3>
+<p>据此，学席不是一个新名字替换「学生」，而是「学生」这一格的改写：</p>
+<ul>
+<li><strong>席名</strong>：单数，仍是学生本人；</li>
+<li><strong>席配置</strong>：此学生在本次评价中被批准的器具配置（无模型／指定模型与用途／自选模型），对应来源栏 S 的三档；</li>
+<li><strong>席读数</strong>：责任回收率 RR 与配置绑定——同一学生在「无模型」配置下的 RR 与在「自选模型」配置下的 RR 分开登记，不折算为一个数；</li>
+<li><strong>席范围</strong>：该配置下已被检验的作业范围，作为向下游容器（录取、准入）传递的内容。</li>
+</ul>
+<p>教席同理：教师之名单数，之下登记批改与命题所用的器具配置及其责任回收读数——模型生成评语、教师仅确认提交的，登记为一种配置；教师保留批改证据并对错误评语负责的，登记为另一种。新单位先在账房一侧合法出生（教师-AI 提高结算效率不威胁分配秩序）这一不对称，在席配置栏上会第一次变得可见。</p>
+<h3>11.4 谁会先做</h3>
+<p>型别等级出现在航空而非小学，不是偶然：器具配置差异直接对应事故风险，准入共同体以「险」定真值。同理，席配置最可能先从公共风险高、资格与执业许可紧密相连的领域（临床、工程签字、法律执业、航空与核设施操作）的准入容器开始，倒逼上游教育端的成绩单改版式；文凭地带的普通文理专业最后跟进。这一顺序是本文的可检验预测（第七条第五款）。</p>
+<h2 id="c12">十二、讨论</h2>
+<h3>12.1 理论意涵</h3>
+<p>第一，教育评估不是测量准确性问题，也不是诚信文化问题，而是「单位能否作为容器前提」的问题。讨论「如何考」之前先问「考什么单位」，问「考什么单位」之前先问「单位由什么决定」。本文的答案是：由容器决定。</p>
+<p>第二，测量精细化与单位入账是两道独立的题。这一分离把过程性评价、贡献声明、深度考题三条路线放到了同一个位置上：它们都在解测量题，而卡住教育的是登记题。这不否定它们的价值——B 格比 A 格有更多路径信息——它否定的是它们对「单位危机」的承诺。</p>
+<p>第三，新单位入账不需要新的考核理论，需要的是格位改写；格位改写在许可制度中已有百年先例。教育不是在发明一件新事，是在追认一件别的行业早已做完的事。</p>
+<h3>12.2 实践意涵</h3>
+<p>第一步不是新课、不是新题、不是过程日志，而是在成绩单与课程记录的「学生」一栏之下加一格「席配置」，把来源栏三档挂在配置上。哪怕三档粗糙，也把「无分解」从暗账变成明账。</p>
+<p>第二，RR 按配置分开登记，不折算。折算即切名的重演。</p>
+<p>第三，资格容器的改版由高风险准入共同体先做，教育端跟进；教育端单独改版式而下游不认，会退回 B 格。</p>
+<h3>12.3 适用边界与反向约束</h3>
+<p>其一，任务本身对来源不敏感的领域（肌肉训练、体育技能、器乐、手工技术）不进入本文的单位困境；这条削掉「教育系统全部陷入单位危机」的言外之意。其二，外部不分配资格的场所（兴趣班、公益工作坊、成人进修）假读数再普遍也无严重后果；本文的严格立场是「凡以分数分配人的位置的教育场才进入危机」。其三，模型仅承担格式转换、语法校对、机械计算且不改变理解与判断的场景，来源栏为 1，席配置栏为空，本文命题不触发。其四，风险后果弱、责任可逆、市场不依赖正式资格的行业，雇主可通过作品集与试做识别能力，准入容器未必成为改版入口。</p>
+<h3>12.4 反噬</h3>
+<p>按本文建议走，最省事的做法是给每份作业加一个「AI 使用申报表」，勾选独立、协作、外包，作为新的合规指标。这会毁掉本文想保住的东西：学生把复杂过程压成对自己有利的类别；学校把席配置变成纪律工具，勾外包即扣分而不问模型究竟承担了什么；教师把填表数量当过程性评价。席配置由此不是打开路径，而是新增一张表，中间账成为旧账本的附属票据。</p>
+<p>本文能给的防御只有两条。其一，席配置与 RR 必须由人在生成现场读出，不能由机器事后产出，也不能由学生事后自述——流程读出，不是表格读出。其二，席配置必须允许「不可归因」，必须禁止把模型参与程度直接换算为扣分；否则制度会再次把耦合场压回一个数，只是换了一个更现代的数。</p>
+<h2 id="c13">十三、效度威胁与研究局限</h2>
+<p><strong>构念效度。</strong> 「切名」可能被理解为「测量粗糙」的换名。防线在于两者可独立出现：测量任意精细，A＝1 照样切名；测量粗糙，A＝n 也不切名。但本文尚无经验材料同时变动两轴。质性对应问题是可信性：读者是否相信「容器元数」是独立机制而非重新命名旧现象。后续可由教育测量研究者与制度研究者共建编码本，对同一批产出同时读 S、RR、A，两个学期得初步结果。</p>
+<p><strong>内部效度。</strong> 本文无法排除：新单位不能入账，不是因为容器几何，而是因为制度没有意愿支付改版成本。若是后者，「切名」多一层政治经济学意味。本文保留这一空间，尚无材料区分「不能」与「不愿」——型别等级先例说明「能」，但不说明教育端「愿」。</p>
+<p><strong>外部效度。</strong> 最适用于高风险、强资格、以书面成绩分配机会的场景；幼儿教育、非正式学习、导师制环境须降低力度。不同学科对「关键判断」要求不同，RR 不能共用一套错误设置。</p>
+<p><strong>可靠性。</strong> S 与 RR 的赋值受教师判断影响；第六章的自否决条款是门槛而非结果。</p>
+<p><strong>本文解释不了的两个洞。</strong> 其一，若未来模型能内化并预测某个使用者独特的学习历史，使代做与自做的区分被模型吸收，来源栏的整套思路失去根基；席配置栏仍可登记，但登记的内容会变成空的。其二，在长期、低风险、兴趣驱动的学习中，行动者可能主动增加困难、保留不确定性、追问模型错误，而非沿最低成本路径行动；本文的切名机制不解释为何有人拒绝被切——这里可能存在一种本文未说明的自我界面机制。</p>
+<h2 id="c14">十四、结论</h2>
+<p>回到四个研究问题。</p>
+<p>RQ1：旧账本失去的不是测量能力而是登记能力，环节在读数进入分配容器的入口——不在评分标准里，在「学生」那一格之下缺了一栏。</p>
+<p>RQ2：更细的测量、更严的申报、更深的考题都不能把新单位记进账本，因为它们都在测量端用力，而阻力在容器端：A＝1，切名就发生。这是几何，不是技术落后，也不是利益。</p>
+<p>RQ3：单数容器在不改元数的前提下可以登记人-器具单位，先例是驾驶证的准驾车型与飞行执照的型别等级——名字单数，名字之下登记器具配置与该配置下的作业范围。</p>
+<p>RQ4：教育变革若只能先改一项配置，应把「学生」一栏改写为「学席」：席名＋席配置＋按配置分开登记的责任回收率。这一步微小、粗糙，却把悬空判断从一个哲学判断变成制度里可追踪、可争吵、可修订的一栏。</p>
+<p>本文没有完成任何经验裁决，只交出判据与证伪条款。将来的工作应回到证书版式、录取表格与准入共同体，看谁最先、以何种方式、在什么压力下，在名字之下加上那一格。那时，「学生-AI」的争论才不只是教育哲学话题，而是一场有账可查的改版。</p>
+<p><strong>【注释】</strong> 本文无注释。</p>
+<p><strong>【作者贡献】</strong> 概念化、方法、写作与修订：王德生。无人类被试。</p>
+<p><strong>【利益冲突声明】</strong> 作者声明不存在与本文相关的经济或非经济利益冲突。</p>
+<p><strong>【数据与材料可得性声明】</strong> 本文为概念分析与结构论证，不含实验、访谈或问卷数据；所涉场景、容器版式与许可制度均为公开可识别的类型。</p>
+<p><strong>【伦理声明】</strong> 不涉及人类被试、动物实验或私人数据。</p>
+<p><strong>【AI 使用声明】</strong> 本文由作者在 ChatSDE 平台上先以同一承重命题生成两篇前身稿（《主体间能力的新单位难题》《从”学生”到”学生—AI”》，2026-09-07），再由作者与 Claude 共同将两稿合一、补入三位祖宗、把承重命题从本体位置挪到容器位置并引入型别等级模板。作者对全文判断、论证责任与事实边界负完全责任。按本文自己的规格登记：席名王德生；席配置为「自选模型，用于两稿合并、文献核对与文字修订」；关键判断（容器元数律、型别等级模板）的责任回收由作者当场承担。</p>
+</article>
+</div></div>
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">参考文献 · References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">下列文献为文中所涉理论的原典与代表性研究，供读者对读与查证；本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+<li style="margin:0 0 9px;padding-left:6px">Abbott, A. (1988). <em>The system of professions: An essay on the division of expert labor</em>. University of Chicago Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Bearman, M., &amp; Ajjawi, R. (2023). Learning to work with the black box: Pedagogy for a world with artificial intelligence. <em>British Journal of Educational Technology, 54</em>(5), 1160–1173.</li>
+<li style="margin:0 0 9px;padding-left:6px">Bearman, M., Boud, D., &amp; Ajjawi, R. (2023). New directions for assessment in a digital world. In <em>Rethinking assessment in higher education</em>. Routledge.</li>
+<li style="margin:0 0 9px;padding-left:6px">Bozkurt, A., et al. (2023). Speculative futures on ChatGPT and generative artificial intelligence (AI): A collective reflection from the educational landscape. <em>Asian Journal of Distance Education, 18</em>(1), 53–130.</li>
+<li style="margin:0 0 9px;padding-left:6px">Bretag, T. (2019). From “have to” to “want to”: Academic integrity in a changing world. <em>International Journal for Educational Integrity, 15</em>(1).</li>
+<li style="margin:0 0 9px;padding-left:6px">Campbell, D. T. (1979). Assessing the impact of planned social change. <em>Evaluation and Program Planning, 2</em>(1), 67–90.</li>
+<li style="margin:0 0 9px;padding-left:6px">Chiu, T. K. F. (2024). The impact of generative AI (GenAI) on practices, policies and research direction in education: A case of ChatGPT and Midjourney. <em>Interactive Learning Environments, 32</em>(6), 2860–2874.</li>
+<li style="margin:0 0 9px;padding-left:6px">Clark, A., &amp; Chalmers, D. (1998). The extended mind. <em>Analysis, 58</em>(1), 7–19.</li>
+<li style="margin:0 0 9px;padding-left:6px">Collins, R. (1979). <em>The credential society: An historical sociology of education and stratification</em>. Academic Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Cotton, D. R. E., Cotton, P. A., &amp; Shipway, J. R. (2024). Chatting and cheating: Ensuring academic integrity in the era of ChatGPT. <em>Innovations in Education and Teaching International, 61</em>(2), 228–239.</li>
+<li style="margin:0 0 9px;padding-left:6px">Dawson, P. (2021). <em>Defending assessment security in a digital world: Preventing e-cheating and supporting academic integrity in higher education</em>. Routledge.</li>
+<li style="margin:0 0 9px;padding-left:6px">Ellis, C., van Haeringen, K., Harper, R., Bretag, T., Zucker, I., McBride, N., Rozenberg, P., Newton, P., &amp; Saddiqui, S. (2020). Does authentic assessment assure academic integrity? Evidence from contract cheating data. <em>Higher Education Research &amp; Development, 39</em>(3), 454–469.</li>
+<li style="margin:0 0 9px;padding-left:6px">Goodhart, C. A. E. (1984). Problems of monetary management: The U.K. experience. In <em>Monetary theory and practice: The UK experience</em> (pp. 91–121). Macmillan.</li>
+<li style="margin:0 0 9px;padding-left:6px">Hutchins, E. (1995). <em>Cognition in the wild</em>. MIT Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Markauskaite, L., et al. (2022). Rethinking the entwinement of humans and artificial intelligence in education. <em>Computers and Education: Artificial Intelligence, 3</em>, 100056.</li>
+<li style="margin:0 0 9px;padding-left:6px">Perkins, M. (2023). Academic integrity considerations of AI large language models in the post-pandemic era: ChatGPT and beyond. <em>Journal of University Teaching &amp; Learning Practice, 20</em>(2).</li>
+<li style="margin:0 0 9px;padding-left:6px">Selwyn, N. (2024). On the limits of artificial intelligence (AI) in education. <em>Nordic Journal of Digital Literacy, 19</em>(1), 5–14.</li>
+<li style="margin:0 0 9px;padding-left:6px">Swiecki, Z., et al. (2022). Assessment in the age of artificial intelligence. <em>Computers and Education: Artificial Intelligence, 3</em>, 100075.</li>
+</ol>
+</section>
+
+<div style="max-width:722px;margin:40px auto 8px;padding:0 24px;text-align:center"><a class="btn" href="/column/container-arity-law/paper.pdf" download>下载论文 PDF</a></div>
+
+<footer style="background:#EDE4CE;text-align:center;padding:32px 24px;color:#6B5D47;font-size:13px;border-top:1px solid rgba(138,104,23,.22)">
+© 德麦国际 Demai International · 教育专栏 · <a href="/browse/" style="color:#A32E4E">sdeuniverses.com</a>
+</footer>
+
+<!-- SDE 陪读浮层 -->
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260907a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body></html>
