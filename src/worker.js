@@ -305,9 +305,27 @@ export class VisitCounter {
            所以兑现口不需要任何身份，也就不必知道按钮是谁按的。 */
         const id = /^[0-9a-f]{12}$/.test(String(b.id || "")) ? String(b.id) : "";
         const recent = (await this.ctx.storage.get("recent")) || [];
-        recent.unshift({ ts: Date.now(), id: id, s: s, c: 0 });
+        const now = Date.now();
+        recent.unshift({ ts: now, id: id, s: s, c: 0 });
         if (recent.length > KEEP) recent.length = KEEP;
         const n = ((await this.ctx.storage.get("n")) || 0) + 1;
+        /* ═══ 首次进账（2026-09-07）═══ 吸收时距的量具：一篇文章**第一次**被调进某一答的时刻。
+           为什么不能从 recent 里算：recent 只留 200 笔，一篇早就进过账的文章翻出窗口之后，
+           在窗内看到的那次会被误当成"第一次"——那样量出来的不是吸收时距，是重复调用的间隔。
+           所以首次进账必须单独长期记，且**只写一次，永不覆盖**。
+           上限 FKEEP：DO 单键 128KB，按最早的先淘汰（淘汰掉的是老账，不影响新文章的读数）。 */
+        const FKEEP = 800;
+        const firsts = (await this.ctx.storage.get("firsts")) || {};
+        let added = 0;
+        for (const x of s) if (!firsts[x.u]) { firsts[x.u] = now; added++; }
+        if (added) {
+          const keys = Object.keys(firsts);
+          if (keys.length > FKEEP) {
+            keys.sort((p1, p2) => firsts[p1] - firsts[p2]);
+            for (const k of keys.slice(0, keys.length - FKEEP)) delete firsts[k];
+          }
+          await this.ctx.storage.put("firsts", firsts);
+        }
         await this.ctx.storage.put("recent", recent);
         await this.ctx.storage.put("n", n);
         return new Response(JSON.stringify({ ok: true, n }), { headers: { "content-type": "application/json" } });
@@ -336,7 +354,8 @@ export class VisitCounter {
       const cashed = (await this.ctx.storage.get("cashed")) || 0;
       /* 读口不吐 id——那是能力票，公开出去谁都能替别人兑现。只吐这一笔的兑现数。 */
       const pub = recent.map((e) => ({ ts: e.ts, s: e.s, c: e.c | 0 }));
-      return new Response(JSON.stringify({ ok: true, n, cashed, keep: KEEP, recent: pub }), {
+      const firsts = (await this.ctx.storage.get("firsts")) || {};
+      return new Response(JSON.stringify({ ok: true, n, cashed, keep: KEEP, recent: pub, firsts: firsts }), {
         headers: { "content-type": "application/json", "cache-control": "no-store" },
       });
     }

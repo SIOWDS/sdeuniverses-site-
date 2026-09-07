@@ -75,7 +75,7 @@ console.log("\n[② 账本开着 · 记账的落点]");
 console.log("\n[③ 兑现 · 调用不等于兑现]");
 {
   const cls = W.slice(W.indexOf("export class VisitCounter"), W.indexOf("export class CommentBox"));
-  ok("写口给每一笔存 id 与兑现数 c", /recent\.unshift\(\{ ts: Date\.now\(\), id: id, s: s, c: 0 \}\)/.test(cls));
+  ok("写口给每一笔存 id 与兑现数 c", /recent\.unshift\(\{ ts: now, id: id, s: s, c: 0 \}\)/.test(cls));
   ok("id 形状校验（12 位十六进制，能力票）", (cls.match(/\^\[0-9a-f\]\{12\}\$/g) || []).length >= 2);
   ok("兑现口在位且认 id", /_lop === "cash" && request\.method === "POST"/.test(cls));
   ok("同一笔有上限（按烂了也刷不出天文数字）", /const CAP = 50;/.test(cls));
@@ -102,6 +102,35 @@ ok("/api/ledger/cash 路由在位、只收 POST", /url\.pathname === "\/api\/led
   const H = fs.readFileSync(path.join(ROOT, "public", "ledger", "index.html"), "utf8");
   ok("页面写明「调用不等于兑现」", /调用不等于兑现/.test(H) && /回头客才是裁定/.test(H));
   ok("页面有累计兑现与逐笔兑现数", /id="c"/.test(H) && /人说用上了/.test(H));
+}
+
+console.log("\n[④ 吸收时距 · 首次进账]");
+{
+  const cls = W.slice(W.indexOf("export class VisitCounter"), W.indexOf("export class CommentBox"));
+  ok("首次进账单独长期记（不能从 recent 里算）", /const firsts = \(await this\.ctx\.storage\.get\("firsts"\)\) \|\| \{\};/.test(cls));
+  ok("🔴 只写一次、永不覆盖（覆盖了量到的就是重复调用的间隔）", /for \(const x of s\) if \(!firsts\[x\.u\]\) \{ firsts\[x\.u\] = now; added\+\+; \}/.test(cls));
+  ok("有上限且按最早先淘汰（DO 单键 128KB）", /const FKEEP = 800;/.test(cls) && /keys\.sort\(\(p1, p2\) => firsts\[p1\] - firsts\[p2\]\)/.test(cls));
+  ok("没有新增就不写盘（省一次 DO 写）", /if \(added\) \{/.test(cls));
+  ok("读口把 firsts 一起交出去", /recent: pub, firsts: firsts/.test(cls));
+  ok("recent 与 firsts 用同一个 now（两处时间戳不许各取各的）", /const now = Date\.now\(\);[\s\S]{0,200}?recent\.unshift\(\{ ts: now,/.test(cls));
+}
+{
+  const fs2 = require("fs");
+  const B = path.join(ROOT, "public", "data", "page-birth.json");
+  ok("上站日期表在位", fs2.existsSync(B));
+  if (fs2.existsSync(B)) {
+    const j = JSON.parse(fs2.readFileSync(B, "utf8"));
+    const keys = Object.keys(j);
+    ok("表里有像样的页数（>3000）", keys.length > 3000);
+    ok("键是以 / 开头、以 / 结尾的路径", keys.slice(0, 50).every((k) => k.startsWith("/") && k.endsWith("/")));
+    ok("值是 YYYY-MM-DD", keys.slice(0, 50).every((k) => /^\d{4}-\d{2}-\d{2}$/.test(j[k])));
+    ok("覆盖到账本自己那一页", !!j["/ledger/"]);
+  }
+  const H = fs2.readFileSync(path.join(ROOT, "public", "ledger", "index.html"), "utf8");
+  ok("页面算吸收时距", /function renderAbsorb\(firsts\)/.test(H) && /page-birth\.json/.test(H));
+  ok("🔴 老文章与新文章分开报（老的只是上界）", /LEDGER_OPEN/.test(H) && /r\.fresh \? "" : "≤ "/.test(H));
+  ok("负时距丢掉（首次进账早于上站日＝数据有问题）", /if \(lag < 0\) return;/.test(H));
+  ok("页面写明只有开张后上站的文章才是真读数", /才是真的吸收时距|读数才是真的吸收时距/.test(H));
 }
 
 console.log("\n[② 账本开着 · 读口与页面]");
