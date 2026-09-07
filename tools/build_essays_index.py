@@ -183,7 +183,7 @@ def render(cfg):
         "<footer>%s · <a href=\"/browse/\">sdeuniverses.com</a></footer>\n" % esc(cfg["footer"]) +
         '<script>window.WDS_READ={profile:"liter"};</script>\n'
         '<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>\n'
-        '<script src="/wds-mode.js?v=20260907a" defer></script>\n'
+        '<script src="/wds-mode.js?v=20260907b" defer></script>\n'
         "</body></html>\n"
     )
 

@@ -2727,8 +2727,14 @@
     box.appendChild(note);
     var ta = el("textarea");
     ta.rows = 3; ta.placeholder = t("scPh"); ta.value = lastScope;
+    /* ⚠ 这几行必须走 var(--…)，不许写死颜色（2026-09-07 修）：外面那层 .wdsm-tplb 的底色是
+       var(--wpanel)，浅色皮肤下它是 #FFFDF8；而这里原本写死着深色皮肤那套
+       （底 rgba(255,255,255,.06)、框 rgba(255,255,255,.15)、字 #F5EFE0）——
+       白底上再铺一层白、描一道白框、写一行米白字，**整个输入框连同提示语一起隐形**，
+       读者只看见「先说这一篇写哪一块」这句话，找不到往哪儿打字。
+       深色皮肤下三个变量的取值与原来的写死值几乎相同，所以老样子一点没变。 */
     ta.style.cssText = "width:100%;box-sizing:border-box;margin:0 0 12px;padding:10px;border-radius:9px;"
-      + "background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#F5EFE0;font:14px/1.6 inherit;resize:vertical;outline:none";
+      + "background:var(--wfill);border:1px solid var(--wline2);color:var(--wtx2);font:14px/1.6 inherit;resize:vertical;outline:none";
     box.appendChild(ta);
     var go = el("button", "wdsm-tplitem");
     go.appendChild(el("b", null, t("scGo")));
@@ -7748,9 +7754,9 @@
     var old = box.querySelector(".wdsm-subpan");
     if (old) { old.parentNode.removeChild(old); return; }
     var pan = el("div", "wdsm-subpan");
-    pan.style.cssText = "margin:10px 0 0;padding:11px 12px;border:1px solid rgba(255,255,255,.14);border-radius:6px;background:rgba(255,255,255,.03)";
+    pan.style.cssText = "margin:10px 0 0;padding:11px 12px;border:1px solid var(--wline);border-radius:6px;background:var(--wfill)";
     pan.innerHTML =
-      "<div style='font-size:13px;font-weight:600;color:#E6EDF3;margin-bottom:4px'></div>"
+      "<div style='font-size:13px;font-weight:600;color:var(--wtx);margin-bottom:4px'></div>"
       + "<div class='sp' style='font-size:11.5px;color:#8B7B5E;line-height:1.75;margin-bottom:8px'></div>"
       + "<input class='sn' type='text' style='width:100%;box-sizing:border-box;margin-bottom:6px'>"
       + "<input class='sk' type='password' autocomplete='off' style='width:100%;box-sizing:border-box'>"
@@ -8431,7 +8437,7 @@
     var wBtn = wrap.querySelector(".bkw"), mBtn = wrap.querySelector(".bkm"), kBtn = wrap.querySelector(".bkk");
     wBtn.textContent = t("bkWord"); mBtn.textContent = t("bkMd"); kBtn.textContent = t("bkKeep");
     wBtn.disabled = mBtn.disabled = kBtn.disabled = true;
-    var IN = "box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:9px 11px;color:var(--wtx2);font:13.5px inherit;outline:none";
+    var IN = "box-sizing:border-box;background:var(--wfill);border:1px solid var(--wline2);border-radius:9px;padding:9px 11px;color:var(--wtx2);font:13.5px inherit;outline:none";
     fBox.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px";
     function inp(ph, w) { var x = document.createElement("input"); x.type = "text"; x.placeholder = ph; x.style.cssText = IN + ";width:100%" + (w ? ";grid-column:1 / -1" : ""); return x; }
     var inT = inp(t("bkName"), true), inS = inp(t("bkSub"), true), inA = inp(t("bkAuthor")), inP = inp(t("bkPub"));
