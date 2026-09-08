@@ -675,6 +675,13 @@
     MATH.push({ s: src, b: !!blk });
     return "\u0000M" + (MATH.length - 1) + "\u0000";
   }
+
+  /* 行内公式的中文闸要用的：把 \text{…} \mathrm{…} 这类**文本命令**的花括号内容挖空，
+     只留命令壳。命令内部本来就该放中文（量具名常写成 $\text{拒收率}R_x$），
+     花括号外还有中文才说明这两个 $ 分属两处、不是一条公式。
+     ⚠ 花括号不做嵌套解析（[^{}]*）：真嵌套极罕见，漏挖只会退回旧行为（拦下），不会误放。 */
+  var TEX_TXTCMD = /\\(?:text|textbf|textit|textrm|textsf|texttt|textnormal|mathrm|mathbf|mathit|mathsf|mathtt|operatorname)\s*\{[^{}]*\}/g;
+  function texStripText(s) { return String(s).replace(TEX_TXTCMD, "\\text{}"); }
   /* 「复制」要的是能直接贴进邮件/文档的纯文本，「原文」要的是原始 Markdown。
      两个按钮以前调的是同一个函数、同一个字符串——等于其中一个是白按的。 */
   function plainOf(md) {
@@ -829,7 +836,10 @@
                if (/\s$/.test(c)) return m;
                // 式子里出现汉字或全角标点 ⇒ 这两个 $ 多半分属两处（「他花了 $5 买咖啡；变量 A$B」），
                // 不是一条公式。左边界放宽之后这道闸是必须的，否则会把半句话排成数学。
-               if (/[\u3000-\u303F\u4E00-\u9FFF\uFF00-\uFFEF]/.test(c)) return m;
+               // ⚠️ 例外：\text{中文} 这类文本命令的花括号内部本来就该放中文——立题卡里的量具名
+               //   几乎都长成 $\text{拒收率}R_x$、$\text{增量}R^2$。先挖空这些花括号再查汉字：
+               //   命令内的中文放行，命令外的中文照旧拦（A$B 那种一个字都挖不掉，仍被挡住）。
+               if (/[\u3000-\u303F\u4E00-\u9FFF\uFF00-\uFFEF]/.test(texStripText(c))) return m;
                return pre + texStub(c, 0);
              });
     var s2 = esc(raw);
