@@ -6603,6 +6603,10 @@ const FOLLOW_KINDS_CN = ["是什么", "怎么做", "为什么"];
 
 function followSys(prof) {
   const L = !!(prof && prof.term);          // 分身档（语言/健康等）：不许出现内部术语
+  /* 🔴 2026-09-08 王德生定：三条追问**保持原状**——每次自动出 What／How／Why 三条，
+     「这样丰富材料」。深由工序那一侧承担（What/How/Why 问对沿一件工具层层深入，见 WDS_TOOLS.whatq
+     那一族与 posNext 的接力格），追问这一侧只管把三个维度的下一问都铺出来。
+     一度改成过「两深一广」，当天撤回：追问是备料，不是递进的载体。 */
   return (L ? "你是这场谈话的旁观者，也是引路人。" : "你是对话的旁观者，也是 SDE 的引路人。")
   + "看完一问一答，给读者三条自然的下一问。**三条必须各用一件不同的工具，恰好是一个 What、一个 How、一个 Why。**"
   + "\n\n【第一条 · What" + (L ? "" : " · 三大方程") + "】问的是「它是什么关系、什么结构」。三条里挑最能撬动这一答的一条：\n"
@@ -6657,6 +6661,66 @@ function parseFollows(out, prof) {
     rows.push({ p: kind, q: qq, w: tool });
   }
   return rows.slice(0, 3);
+}
+
+/* ═══ 问对的落位与接力（2026-09-08）═══
+   王德生令：追问＝三方程／六路径／三原理的层层深入。为了让"下一层"是**算出来的**而不是
+   基底临场发挥，答末那行〔落位〕由基底自报（它才知道自己实际站了哪条、把哪项当了给定），
+   下一格由这里算。🔴 只认自报，不做前端推算：读者中途自己打字提问时，按点击历史推算立刻错位。 */
+const POS_RE = /〔落位〕([^\n]*)/;
+const PROBE_TOOLS = { whatq: "What", howq: "How", whyq: "Why" };
+function posParse(text) {
+  const m = String(text || "").match(POS_RE);
+  if (!m) return null;
+  const f = {};
+  for (const seg of String(m[1]).split(/[|｜]/)) {
+    const kv = seg.split(/[：:]/);
+    if (kv.length >= 2) f[kv[0].trim()] = kv.slice(1).join(":").trim();
+  }
+  const col = /what/i.test(f["列"] || "") ? "What" : (/how/i.test(f["列"] || "") ? "How" : (/why/i.test(f["列"] || "") ? "Why" : ""));
+  if (!col) return null;
+  return { col: col, pos: f["位"] || "", given: f["给定"] || "", done: f["已解释"] || "", from: f["起手"] || "", to: f["落点"] || "", res: f["结果项"] || "" };
+}
+/* 下一格。三条推进规则各自可判定：
+   What＝把上一答当作给定的那一项提为待解释项（换到以它为左边的方程）；
+   How ＝上一条的落点维即下一条的起手维（首尾相衔）；
+   Why ＝上一次的结果项成为下一次矛盾的一端（原理链传动）。
+   拿不到落位就返回空串——**空串的意思是"这一轮不指定"**，不是"随便走"：
+   工序正文里那一条"若上游指定了就照它走"自然不触发，基底照第①步自己站位。 */
+const _EQ_OF = { S: "S=F(D,E)", D: "D=G(S,E)", E: "E=H(S,D)" };
+const _PR_OF = { S: "原理二 S×E→D（或原理三 S×D→E）", D: "原理一 D×E→S（或原理三 S×D→E）", E: "原理一 D×E→S（或原理二 S×E→D）" };
+function posNext(p) {
+  if (!p) return "";
+  if (p.col === "What") {
+    const g = (p.given.match(/[SDE]/g) || [])[0];
+    if (!g) return "";
+    return "【本轮该站的方程】" + (_EQ_OF[g] || "") + "——上一答把 " + g + " 当作给定在用，这一轮把 " + g + " 本身提为待解释项："
+      + g + " 又是被哪些差异、在哪片纠缠里写出来的。不许绕回「" + (p.pos || "上一条方程") + "」重讲一遍。";
+  }
+  if (p.col === "How") {
+    const to = (p.to.match(/[SDE]/g) || [])[0];
+    if (!to) return "";
+    return "【本轮的起手维】" + to + "——上一条路径落在 " + to + "，按首尾相衔，这一条必须从 " + to + " 起手（"
+      + to + "→…→…）。换一条不相衔的路径重走，判为未推进。";
+  }
+  if (p.col === "Why") {
+    const r = (p.res.match(/[SDE]/g) || [])[0];
+    if (!r) return "";
+    return "【本轮该站的原理】" + (_PR_OF[r] || "") + "——上一答推动的是 " + r + "，按原理链传动，这一轮 " + r
+      + " 要作为矛盾的一端出现：它改成这样之后，又逼得哪一维非改不可。回头把同一次矛盾再说一遍，判为未推进。";
+  }
+  return "";
+}
+/* 从整场 history 里取**最近一条**带落位的答复（读者中途插几句闲话不影响接力）。 */
+function posFromHistory(history, col) {
+  const h = Array.isArray(history) ? history : [];
+  for (let i = h.length - 1; i >= 0; i--) {
+    const it = h[i] || {};
+    if (it.role === "user") continue;
+    const p = posParse(it.text || it.a || "");
+    if (p && (!col || p.col === col)) return p;
+  }
+  return null;
 }
 
 /* 兜底三问（2026-09-08）：配菜叫不动时，这一栏也不许空着。
@@ -7919,6 +7983,44 @@ const WDS_TOOLS = {
      省掉它，三段就退化成三个并列的说法，而"三者相互影响"是一句永远对因而永远无用的话。
      每件末尾都指回它对应的那台完整机器。 */
 
+  /* ═══ 三道问对（2026-09-08 王德生令：「不断地追问，进入 SDE 更广和更深的关联，
+       就是三方程、六路径、三原理的层层深入。对 What 是三方程的层层深入，对 How 是六路径的，
+       对 Why 是三原理的」）═══
+     ⚠ 与下面 what/how/why 三道**轻松版**的分别：那三道是一轮交付完就结束；
+     这三道是**一场接一场**——每一轮必须比上一轮在同一件工具上多走一格，靠的是〔落位〕行接力。
+     🔴 王德生同日的另一句定调，改这三道之前先读：**「平的就是深度，即 SDE 的维度扩张；
+     通常的『深度』其实是形式逻辑」**——所以"下一层"永远是**换一个维/换一条方程/换一个原理**，
+     不是把同一件事问得更细。把追问写成"再展开一点""再举个例子"就是背着这条走。
+     下一格由 posNext() 在服务端**算**出来，不由基底自由发挥；基底只负责把算出来的那一格答满。 */
+  whatq: "【本轮工序 · What 问对（三方程的层层深入）】这一场沿三方程往下走：S=F(D,E) 显露由差异与纠缠长成／D=G(S,E)／E=H(S,D)。"
+    + "\n① 先说清这一答**站在哪一条方程上**，以及你把哪一（几）项**当作给定**在用。"
+    + "\n② 把站定的那条方程答实：被解释的那一维，是经哪些差异、在哪片纠缠里长成现在这样的。要具体到这一问的材料，不许写通式。"
+    + "\n③ **深，不是把它问得更细，而是把背景提成前景**：这一答里凡被你当作给定的项，都要在末尾点名——它们是下一层要解释的东西。"
+    + "\n④ 若本轮已由上游指定了「本轮该换的方程」，照它走，不许绕回上一层那条方程重讲一遍。"
+    + "\n⑤ 走完一圈（三条方程各站过一次）时，多答一句：这一圈回环里，**哪一项被改写了**——最初当作给定的那一项，现在还是原样吗。"
+    + "\n\n**答完必须单起一行交〔落位〕**（放在〔交账〕行之前，格式照抄，下一问要接它）："
+    + "\n〔落位〕列：What ｜ 位：S=F(D,E) ｜ 给定：E、D ｜ 已解释：S",
+
+  howq: "【本轮工序 · How 问对（六路径的层层深入）】这一场沿六条路径往下走：S→D→E／S→E→D／D→S→E／D→E→S／E→S→D／E→D→S。"
+    + "\n① 先写死这一答走的是哪一条（X→Y→Z），并说明**为什么从 X 起手**——判据是：显露、做法、条件这三样里你现在动得了哪一样。"
+    + "\n② 三段各一段：起手维怎么下手、中间维怎么过、落点维怎么成。每段要有能照着做的动作，不是原则。"
+    + "\n③ **接力是这一道的命根子**：上一答的**落点维**就是这一答的**起手维**。前一场落在 E，这一场必须从 E 起手——"
+    + "换一条不相衔的路径重走，等于回到原地另遛一圈，判为未推进。"
+    + "\n④ 若本轮已由上游指定了起手维，照它走，不许改。"
+    + "\n⑤ 每接一段，报一次**已相衔的段数**；六条走满时多答一句：这一路走下来，最初那个落点还成立吗。"
+    + "\n\n**答完必须单起一行交〔落位〕**（放在〔交账〕行之前，格式照抄，下一问要接它）："
+    + "\n〔落位〕列：How ｜ 位：D→S→E ｜ 起手：D ｜ 落点：E",
+
+  whyq: "【本轮工序 · Why 问对（三原理的层层深入）】这一场沿三原理往下走：原理一 D×E 矛盾→推动 S 改变｜原理二 S×E 矛盾→推动 D 改变｜原理三 S×D 矛盾→推动 E 改变。"
+    + "\n① 先说清这一答**站在哪一条原理上**：是哪两维的矛盾，在推动哪一维改变。矛盾的两端要指名道姓，不许写成「多种因素」。"
+    + "\n② 把这次推动答实：矛盾在哪一步不能再共存、被推动的那一维改成了什么样子。"
+    + "\n③ **传动是这一道的命根子**：上一答的**结果项**（被推动的那一维），是这一答矛盾的一端。上一场推动了 S，这一场就得问 S×E→D 或 S×D→E——"
+    + "回头把同一次矛盾再说一遍，判为未推进。"
+    + "\n④ 若本轮已由上游指定了本轮该站的原理，照它走，不许改。"
+    + "\n⑤ 每传一环，报一次**已扣的环数**；扣满一圈时多答一句：这一圈转回来，最初那次矛盾还在原处吗。"
+    + "\n\n**答完必须单起一行交〔落位〕**（放在〔交账〕行之前，格式照抄，下一问要接它）："
+    + "\n〔落位〕列：Why ｜ 位：原理一 D×E→S ｜ 结果项：S",
+
   what: "【本轮工序 · 是什么（轻松版）】这一轮只回答一件事：这东西到底是什么。不给对策，也不讲它会怎么演变。"
     + "\n**① 先定位到格**（照常驻底盘那张九格表）：他问的是 S 维哪一格（S1 对比·变化·分布／S2 粒子·波·场／S3 真·善·美）、D 维哪一格（D1 创造·自由·幸福／D2 六步九步的内容／D3 最小误差·冗余·亏损）、还是 E 维哪一格（E1 三界／E2 符号·逻辑·数学／E3 内能·动能·势能）？"
     + "说清楚是哪一格，并**先把那一格的具体内容答出来**——这是他真正要的东西，别急着往下撞。问得含混就把最贴的两三格摆出来让他自己认。"
@@ -8781,6 +8883,24 @@ const TOOL_SPEC = {
     { k: "承重命题写成三重否定「不是…也不是…而是」", re: "不是[^\n]{0,80}而是" , ke: "The load-bearing proposition as a triple negation (not X, not Y, but Z)", en: "[Nn]ot [^\n]{0,140}but" },
     { k: "一句不含情态词的判据", re: "判据" , ke: "One criterion with no modal words", en: "([Cc]riterion|[Yy]ardstick|[Tt]est:)" },
   ] },
+  /* 三道问对（2026-09-08）。件数少是故意的：一轮只走一格，件多了会把一场接力压成一篇论文。
+     🔴 三件里最要紧的是〔落位〕行——**接力全靠它**：漏了这一行，posNext 就算不出下一格，
+     整场退化成三条平的追问，而且没有任何人会发现（答案照样通顺）。所以它必须进机检面。 */
+  whatq: { min: 800, items: [
+    { k: "写明这一答站在哪一条方程上", re: "(S=F|D=G|E=H)" , ke: "Which of the three equations this answer stands on" },
+    { k: "点名哪几项是当作给定在用", re: "给定" , ke: "Name what is being taken as given", en: "([Tt]aken as given|[Gg]iven:)" },
+    { k: "〔落位〕行（列／位／给定／已解释）", re: "落位" , ke: "The position line", en: "[Pp]osition line" },
+  ] },
+  howq: { min: 800, items: [
+    { k: "这一条路径写成 X→Y→Z", re: "→", n: 2 , ke: "This turn's route written X -> Y -> Z", en: "(→|->)" },
+    { k: "说明为什么从这一维起手（现在动得了哪一样）", re: "(起手|动得了)" , ke: "Why start from this dimension", en: "([Ss]tart(ing)? from|[Ee]ntry point)" },
+    { k: "〔落位〕行（列／位／起手／落点）", re: "落位" , ke: "The position line", en: "[Pp]osition line" },
+  ] },
+  whyq: { min: 800, items: [
+    { k: "写明这一答站在哪一条原理上", re: "原理[一二三]" , ke: "Which of the three principles this answer stands on", en: "[Pp]rinciple (one|two|three|1|2|3)" },
+    { k: "矛盾的两端指名道姓（不许写成「多种因素」）", re: "矛盾" , ke: "Both ends of the contradiction, named", en: "[Cc]ontradiction" },
+    { k: "〔落位〕行（列／位／结果项）", re: "落位" , ke: "The position line", en: "[Pp]osition line" },
+  ] },
   what: { min: 1200, items: [
     { k: "先定位到格并把那一格的内容答出来", re: "(S1|S2|S3|D1|D2|D3|E1|E2|E3)" , ke: "Locate the cell first and answer that cell's own content" },
     { k: "显露这一刀：看见什么／看不见什么", re: "显露" , ke: "The Show blade: what it sees and what it cannot see", en: "[Ss]how" },
@@ -8887,7 +9007,13 @@ function toolSpecFor(tool, lang) {
   };
 }
 
-function wdsToolSys(tool, prof) {
+/* 这一轮该走哪一格：只对三道问对有意义。拿不到上一答的落位就返回空串
+   （空串＝这一轮不指定，不是"随便走"）。 */
+function _rungOf(tool, history) {
+  if (!PROBE_TOOLS[tool]) return "";
+  return posNext(posFromHistory(history, PROBE_TOOLS[tool]));
+}
+function wdsToolSys(tool, prof, rung) {
   // 这一档没开的工序，递上来也不认（见 WDS_PROFILES 里那张 tools 表）。
   if (prof && prof.tools && prof.tools.indexOf(tool) < 0) return "";
   /* 带术语闸的档案先查改姓版；查不到才落回通用那份（动作一样，只是说法没换）。 */
@@ -8913,7 +9039,11 @@ function wdsToolSys(tool, prof) {
     ? ("\n\n【本轮长度 · 覆盖《怎么答》第 5 条】走工序的这一轮，「两三段以内、别写论文」**当轮解除**："
        + "该写多长就写多长，下限约 " + _sp.min + " 字。**宁可长，不许省件**——省件正是这道工序唯一的失败方式。")
     : "";
-  return "\n\n" + b + (tool === "nine" ? nineDrawBlock() : "") + _fbNote + _lenLine + toolNeedBlock(tool)
+  /* 问对三道的接力格：由 posNext() 从上一答的〔落位〕行**算**出来（不是基底自由发挥），
+     所以它必须钉在工序正文之后、长度令之前——工序正文里那句"若上游指定了就照它走"等的就是它。
+     rung 为空＝这一场的第一轮（或上一答没交落位）：那一条不触发，基底照工序第①步自己站位。 */
+  const _rung = (rung && PROBE_TOOLS[tool]) ? ("\n\n" + rung) : "";
+  return "\n\n" + b + _rung + (tool === "nine" ? nineDrawBlock() : "") + _fbNote + _lenLine + toolNeedBlock(tool)
     + "\n（工序只管这一轮要交付什么，不改你的口吻：仍然直接、犀利、说人话，不要复述工序名、不要把小标题写成「工序①」；"
     + "**但长度与交付件按本工序来，不受《怎么答》第 5 条约束**。）";
 }
@@ -9236,7 +9366,7 @@ function WDS_PLAIN_SYS(webCtx, docCtx, about, lang, docNote) {
     + (lang === "en" ? "\n\n【LANGUAGE】The reader is using the English interface. Write your entire answer in natural, direct English." : "");
 }
 
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx) {
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, rung) {
   // 三家对撞：三段角色 sys 各自独立，同样不装心得与骨架（戴同一副眼镜就会开始附和）。
   // 与 iq 一样必须排在最前——落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
   if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang, duel.rd || 0);
@@ -9317,7 +9447,7 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
     /* ⭐ 这一轮的活（工序／产线）压在所有材料之后：读物在前，任务在后。
        挪到这里之前，一道工序的三百字被一两万字语料压在中段，基底常常照着
        「两三段以内」答完就收手——而页面上与做全了长得一模一样。 */
-    + wdsToolSys(tool, prof)
+    + wdsToolSys(tool, prof, rung)
     + ((rs && rs.forge) ? wdsForgeSys(rs) : wdsResearchSys(rs))
     /* 刀②③ 远域结构 + 预注册卡：只在 _plain 时非空（调用方装配）。 */
     + (extras || "")
@@ -13044,7 +13174,7 @@ export default {
               if (_far) { extras += farBlock(_far); controller.enqueue(_sseBytes({ t: "far", v: { d: _far.d, s: _far.s, j: _far.j } })); }
               extras += PREREG_BLOCK;
             }
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx);
+            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history));
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。
