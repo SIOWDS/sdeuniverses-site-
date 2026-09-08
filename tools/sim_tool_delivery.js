@@ -26,7 +26,14 @@ const SRC = W.slice(nineA, nineB) + W.slice(toolsA, toolsB) + W.slice(a, c)
 let S;
 try { S = new Function(SRC)(); } catch (e) { console.log("  FAIL 服务端段抠不出来：" + e.message); process.exit(1); }
 
-const KEYS = ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why", "grid", "nine", "map", "genesis"];
+/* 🔴 键表**从 worker.js 现取，不许写死**（2026-09-08）——写死那一版从三道问对上线那天起
+   就一直红着「规格表不多不少」，红的却是「多了」，被当成噪音；如果那天看了这条红，
+   白名单漏掉 whatq/howq/whyq 当天就能抓到。同 sim_wds_follow_glm 里「型号不许写死」一个道理。 */
+const KEYS = (function () {
+  const m = /const WDS_TOOL_KEYS = \[([^\]]+)\]/.exec(W);
+  if (!m) { console.log("  FAIL 抠不到 WDS_TOOL_KEYS"); process.exit(1); }
+  return m[1].split(",").map((s) => s.trim().replace(/^"|"$/g, "")).filter(Boolean);
+})();
 
 console.log("① 规格表齐全、每一件都判得动");
 const mKeys = W.match(/const WDS_TOOL_KEYS = \[([^\]]+)\]/);

@@ -1179,6 +1179,7 @@
       tlWhatq: "What 问对", tlWhatqS: "一场沿三方程往下走：每问一次，把上一答当作给定的那一项提为待解释项",
       tlHowq: "How 问对", tlHowqS: "一场沿六路径接力：上一条的落点维就是下一条的起手维，走满六条",
       tlWhyq: "Why 问对", tlWhyqS: "一场沿三原理传动：上一次被推动的那一维，成为下一次矛盾的一端",
+      tlBook9: "九问专著", tlBook9S: "写专著九题里的一题：带上整本立题卡（附件切「全篇全带」），另外八题当边界——只写本题、不碰别题的靶位",
       goDeep: "⇥ 进入细节：", goDeepH: "轻松版只给一个当场能拿走的判断；要进细节，就交给对口的那一台跑完整一趟（新标签打开，只填不跑）。",
       fgTitle: "学科通融 · 二阶碰撞", fgPlan: "十八道工序，顺序不可换", fgSteps: "这一趟 {n} 道工序",
       fgGateNo: "这一道没过闸",
@@ -1471,6 +1472,7 @@
       tlWhatq: "What probe", tlWhatqS: "A whole session down the three equations: each turn promotes what was taken as given into what must be explained",
       tlHowq: "How probe", tlHowqS: "A relay along the six routes: each turn starts where the last one landed, until all six are linked",
       tlWhyq: "Why probe", tlWhyqS: "A drive train along the three principles: whatever moved last becomes one end of the next contradiction",
+      tlBook9: "Nine-question monograph", tlBook9S: "Write one of a book's nine questions: bring the whole question-card set as an attachment (set to whole document); the other eight are the boundary, not material",
       goDeep: "⇥ Go deeper with ", goDeepH: "The short form gives one claim you can take away now; for detail, hand it to the matching agent for a full run (new tab, filled not started).",
       fgTitle: "Cross-discipline forge", fgPlan: "Eighteen stages, order fixed", fgSteps: "{n} stages",
       fgJudge: "stop at the claim, no full draft",
@@ -9934,6 +9936,10 @@
     { k: "whatq", n: "tlWhatq", s: "tlWhatqS", cmd: ["what问对", "whatq", "方程问对"] },
     { k: "howq", n: "tlHowq", s: "tlHowqS", cmd: ["how问对", "howq", "路径问对"] },
     { k: "whyq", n: "tlWhyq", s: "tlWhyqS", cmd: ["why问对", "whyq", "原理问对"] },
+    /* 九问专著（2026-09-08 王德生令）：写专著里的其中一题，带着整本立题书当边界。
+       与上面三道问对的分别：列不用自己选（W→三方程／H→六路径／Y→三原理，由题号定），
+       多出来的是「另外八题是禁区」那一套。用法：附件带上九题立题卡并切成「全篇全带」。 */
+    { k: "book9", n: "tlBook9", s: "tlBook9S", cmd: ["九问专著", "book9", "专著", "立题书"] },
     { k: "grid", n: "tlGrid", s: "tlGridS", cmd: ["坐标", "grid", "宫格"] },
     { k: "nine", n: "tlNine", s: "tlNineS", cmd: ["九宫", "nine"] },
     { k: "map", n: "tlMap", s: "tlMapS", cmd: ["结构图", "map", "导图"] },
