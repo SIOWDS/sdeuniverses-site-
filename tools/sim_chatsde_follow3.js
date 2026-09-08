@@ -72,7 +72,8 @@ if (SB) {
 
   // 边界：太短、太长、空
   ok(SB.parseFollows('', {}).length === 0, '空输入回空');
-  ok(SB.parseFollows('What·x｜太短\nHow·y｜' + '长'.repeat(50), {}).length === 0, '太短太长都丢掉');
+  // 上限 2026-08-29 从 40 抬到 60（话多的那一家），所以这里必须用 61 字才测得到「太长」
+  ok(SB.parseFollows('What·x｜太短\nHow·y｜' + '长'.repeat(61), {}).length === 0, '太短太长都丢掉');
   const r3 = SB.parseFollows(good + '\nWhat·多余｜这一条不该被收下', {});
   ok(r3.length === 3, '最多只取三条');
 
@@ -83,9 +84,12 @@ if (SB) {
 }
 
 console.log('【四】预算与前端接线');
-ok(/460, WDS_FOLLOW_MS/.test(src), '预算抬到 460（三行各多带一个工具名）');
+ok(/_slow \? WDS_FOLLOW_TOK_SLOW : 460, _slow \? WDS_FOLLOW_MS_SLOW : WDS_FOLLOW_MS/.test(src),
+  '预算与截止按基底分档（别家 460／12s，关不掉思考的家 1400／20s）');
 ok(/短截止（WDS_FOLLOW_MS）/.test(src), '短截止的理由注释还在');
-ok(/const fs = await followUps\(fVC, KEY, q, outText, lang, prof\)/.test(src), '调用点没被动过');
+ok(/const fs = await followUps\(fVC, KEY, q, outText, lang, prof,/.test(src), '调用点还在（带备胎与 onFail 两参）');
+ok(/function fallbackFollows\(q, prof, lang\)/.test(src), '兜底三问在（配菜叫不动时这一栏不许空）');
+ok(/if \(lang === "en"\) return \[\];/.test(src), '英文场不硬挂中文兜底句');
 ok(/tag\.title = w \|\| t\("pathTip"\)/.test(mjs), '前端把工具名挂进 tooltip');
 ok(/String\(item\.w \|\| ""\)/.test(mjs), '前端读 w 字段');
 ok(mjs.indexOf('兼容两种形状') >= 0, '前端「老形状也认」的兼容说明还在');

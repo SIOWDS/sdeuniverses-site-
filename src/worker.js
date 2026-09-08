@@ -6087,6 +6087,16 @@ function looseJSON(s) {
 // ===== 陪读额度与全程记忆 =====
 // 解禁后：每台机器每天最多 100 次对话（原 60），每分钟 12 次（原 8）。两个 BYOK 入口共用同一配额桶。
 const WDS_FOLLOW_MS = 12000;                 // 追问建议的短截止（配菜不许拖住正菜，见 followUps）
+/* 🔴 2026-09-08：12 秒对**关不掉思考的那几家**（Kimi/MiniMax）等于永远够不到。实测症状＝
+   「配菜那台 kimi-k2.6 返回 200：连接异常：AbortError The operation was aborted」——
+   headers 早已回 200（stat.status 因此是 200），正文还在 reasoning 里，到点被自己 abort。
+   更要命的是 460 的额度会先被 reasoning 吃光 → llmText 内部还要再发一次 3 倍预算的重试，
+   **两次生成塞进 12 秒，怎么都不够**。⇒ 这几家单独一档：首发就给足额度（免掉那次内部重试）＋放宽到 20 秒。
+   🔴 别把 12000 一起抬上去：能关思考的家（智谱/DeepSeek）本来两三秒就回，抬高只会让读者
+   多等操作行——追问跑在 [DONE] 之前，客户端要收到 [DONE] 才 mountActs。 */
+const WDS_FOLLOW_SLOW = /kimi|moonshot|minimax|k2|thinking|reason/i;   // 关不掉思考的那几家
+const WDS_FOLLOW_MS_SLOW = 20000;
+const WDS_FOLLOW_TOK_SLOW = 1400;
 // ── 字号档：写稿的人得知道"一行能放多少字"，否则字数一超就必然溢出或被自动缩到看不清。
 //    这是渲染端的实际字号，写进提示里让基底按它控制字数。
 const DECK_SIZES = "【字号与字数（渲染端实际值，按它控字数）】\n"
@@ -6649,6 +6659,32 @@ function parseFollows(out, prof) {
   return rows.slice(0, 3);
 }
 
+/* 兜底三问（2026-09-08）：配菜叫不动时，这一栏也不许空着。
+   兜底不是随便凑三句——**仍是三件工具各出一问、What/How/Why 各一**，只是问句由本地按读者这一问的
+   题目现拼，不经基底。诚实处落在 onFail 那句话上：读者会被告知这三条是兜底出来的。
+   🔴 兜底句必须扣着题目：抠不出题目就一条都不给。宁可空着，也不许挂
+   「能再详细讲讲吗」那种放到哪一答都成立的万能句——那正是 followSys 规矩③禁的东西，兜底也不许犯。
+   🔴 英文场不兜底：兜底句是现拼的中文，硬挂上去比空着更糟。 */
+function fallbackFollows(q, prof, lang) {
+  if (lang === "en") return [];
+  const L = !!(prof && prof.term);
+  let topic = String(q || "")
+    .replace(/[。？?！!，,、：:；;“”"'《》()（）\[\]]/g, " ")
+    .replace(/^(请|帮我|麻烦|我想|想问|问一下|谈谈|说说|讲讲)\s*/, "")
+    .replace(/(是什么|为什么|怎么样|怎么办|如何|怎样|吗|呢)/g, " ")
+    .trim().split(/\s+/)[0] || "";
+  topic = topic.slice(0, 12);
+  if (topic.length < 2) return [];
+  const T = (L ? [FOLLOW_EQ_LANG, FOLLOW_PATHS_LANG, FOLLOW_PR_LANG]
+               : [SDE_EQUATIONS, SDE_PATHS, SDE_PRINCIPLES]).map((x) => x.split("｜")[0].trim());
+  const K = L ? FOLLOW_KINDS_CN : FOLLOW_KINDS;
+  return [
+    { p: K[0], w: T[0], q: topic + "是经什么差异长成现在这样的？" },
+    { p: K[1], w: T[1], q: "照这条路走下去，" + topic + "该先改哪一步？" },
+    { p: K[2], w: T[2], q: "是什么张力把" + topic + "逼成了现在这样？" },
+  ];
+}
+
 /* 追问建议。**两条来路，不是一条**（2026-08-29 修）：
    原来它只用 `WDS_VENDORS[vd].model` 那台便宜档，写死在表里、也不认读者在设置里覆盖的型号。
    于是只要那一台改了名或对这把 Key 不可用（各家型号的更替比本站快得多），
@@ -6665,18 +6701,26 @@ async function followUps(VC, KEY, q, ans, lang, prof, alt, onFail) {
     // 预算 260→460：三行现在各多带一个工具名，260 会把第三行截在半句上（第三行正是 Why，最不该丢的那条）。
     const usr = "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：";
     const st = {};
-    let out = await llmText(VC, KEY, sys, usr, 460, WDS_FOLLOW_MS, st);
+    // 关不掉思考的那几家单独一档（见 WDS_FOLLOW_SLOW 上面那段）：足额度 + 放宽截止，一次调用就够。
+    const _slow = WDS_FOLLOW_SLOW.test(String((VC && VC.model) || ""));
+    let out = await llmText(VC, KEY, sys, usr, _slow ? WDS_FOLLOW_TOK_SLOW : 460, _slow ? WDS_FOLLOW_MS_SLOW : WDS_FOLLOW_MS, st);
     let why = out ? "" : (st.status ? ("配菜那台 " + VC.model + " 返回 " + st.status + (st.err ? ("：" + String(st.err).slice(0, 120)) : "")) : ("配菜那台 " + VC.model + " 超时或没接上"));
     if (!out && alt && alt.model && alt.model !== VC.model) {
       const st2 = {};
-      out = await llmText(alt, KEY, sys, usr, 460, WDS_FOLLOW_MS, st2);
+      // 🔴 备胎只吃基础截止：两遍都放宽 ＝ 读者要为一碟配菜多等 40 秒才见到操作行。
+      const _s2 = WDS_FOLLOW_SLOW.test(String(alt.model));
+      out = await llmText(alt, KEY, sys, usr, _s2 ? WDS_FOLLOW_TOK_SLOW : 460, WDS_FOLLOW_MS, st2);
       if (!out) why += "；换成 " + alt.model + " 再试也没写出来" + (st2.status ? ("（" + st2.status + "）") : "");
     }
-    if (!out) { if (onFail) onFail(why); return []; }
+    if (!out) { const fb = fallbackFollows(q, prof, lang); if (onFail) onFail(why, fb.length > 0); return fb; }
     const rows = parseFollows(out, prof);
-    if (!rows.length && onFail) onFail("基底写回来了，但三行的格式没解析出来");
+    if (!rows.length) {
+      const fb = fallbackFollows(q, prof, lang);
+      if (onFail) onFail("基底写回来了，但三行的格式没解析出来", fb.length > 0);
+      return fb;
+    }
     return rows;
-  } catch (e) { if (onFail) onFail((e && e.message) || "未知原因"); return []; }
+  } catch (e) { const fb = fallbackFollows(q, prof, lang); if (onFail) onFail((e && e.message) || "未知原因", fb.length > 0); return fb; }
 }
 
 // ===== 联网搜索（站外资料）=====
@@ -13292,7 +13336,9 @@ export default {
               const fVC = { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, umodel, 0) };
               const fs = await followUps(fVC, KEY, q, outText, lang, prof,
                 { url: VC.url, model: VC.model },                    // 备胎＝刚写完正文那台（当场验证过活着）
-                (why) => controller.enqueue(_sseBytes({ t: "note", v: "这一答没能配上追问建议（" + why + "）。" })));
+                (why, fb) => controller.enqueue(_sseBytes({ t: "note",
+                  v: fb ? ("配菜那一路没叫动（" + why + "），下面三条是本地兜底出的。")
+                        : ("这一答没能配上追问建议（" + why + "）。") })));
               if (fs.length) controller.enqueue(_sseBytes({ t: "follow", v: fs }));
             }
           } catch (e) {

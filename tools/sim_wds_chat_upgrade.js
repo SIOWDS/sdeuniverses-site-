@@ -237,7 +237,9 @@ console.log("── 十一 · 成文（distill）：整场可见 + 时钟 + 断�
 console.log("── 十二 · 追问建议不许拖住已答完的一轮");
 {
   ok(/WDS_FOLLOW_MS = 12000/.test(wk), "追问建议有短截止常量");
-  ok(/"\\n\\n三行：", \d+, WDS_FOLLOW_MS\)/.test(wk), "followUps 真把短截止传进 llmText（原来吃缺省 55 秒）");
+  // 2026-09-08：usr 抽成变量、截止按基底分档，这条断言的旧形状早已过期（一直红着没人看）
+  ok(/"\\n\\n三行："/.test(wk) && /WDS_FOLLOW_MS_SLOW : WDS_FOLLOW_MS, st\)/.test(wk),
+    "followUps 真把短截止传进 llmText（原来吃缺省 55 秒；现按基底分档）");
 }
 
 console.log("── 十三 · 会烧站方 Key 的两个端点都上了限流");
