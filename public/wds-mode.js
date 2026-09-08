@@ -1038,6 +1038,7 @@
          所以①按上一答走到哪一步推一条，②每颗写清点了会得到什么，③把选法写成一句话摆在标题下。
          推荐只是默认，另外两条一样能点——不收窄选择权，只是让不用选的人不用选。 */
       followsHint: "刚冒出新说法就点 What，说清楚了点 How，能落地了点 Why；写虚了往 How 拉，写碎了往 Why 拉。",
+      progH: "本篇进度", progOf: "格", progTodo: "还欠", progOK: "十格已齐，可以成文", progNo: "未走完，先别成文",
       followRecT: "按上一答走到哪一步推的；另外两条一样能点",
       followGet: ["点它会得到：把刚出现的那个说法钉成定义与结构",
                   "点它会得到：一套怎么走、怎么取值的做法",
@@ -1345,6 +1346,7 @@
       followAll: "Ask all three", followAllT: "Send all three as one message; answered in one pass, numbered",
       followAllQ: "All three at once \u2014 answer each in turn:",
       followsHint: "New term just appeared? Take What. Clear already? Take How. Workable already? Take Why.",
+      progH: "PROGRESS", progOf: "cells", progTodo: "still missing", progOK: "All ten cells done \u2014 ready to write up", progNo: "Not finished \u2014 don't write it up yet",
       followRecT: "Suggested from where the last answer got to; the other two still work",
       followGet: ["You get: the new term pinned down as a definition and a structure",
                   "You get: a workable method \u2014 how to run it, how to read it off",
@@ -2323,6 +2325,13 @@
     ".wdsm-follow.dim{opacity:.62}" +
     ".wdsm-follow.dim:hover{opacity:1}" +
     ".wdsm-follows-t{width:100%;font-size:11.5px;line-height:1.7;color:var(--wdim2);margin:-2px 0 4px}" +
+    /* 九问专著的进度条：读者不读底册也要判得出「走到第几格、还欠什么、能不能成文」 */
+    ".wdsm-prog{margin-top:12px;padding:9px 12px;border:1px solid var(--wline);border-radius:10px;background:var(--wfill)}" +
+    ".wdsm-prog-h{font-size:11px;letter-spacing:1px;color:var(--wdim2);margin-bottom:6px}" +
+    ".wdsm-prog-h b{color:var(--wgold);font-weight:600;letter-spacing:0}" +
+    ".wdsm-prog-bar{height:6px;border-radius:999px;background:var(--wfill2);overflow:hidden}" +
+    ".wdsm-prog-in{height:100%;background:var(--wgold2);border-radius:999px}" +
+    ".wdsm-prog-t{font-size:11.5px;line-height:1.7;color:var(--wdim2);margin-top:6px}" +
     ".wdsm-follows-h{width:100%;font-size:11px;letter-spacing:1px;color:var(--wdim2);margin-bottom:2px}" +
     /* 一起问：与追问 chip 同形，金边区分——它不是第四条追问，是把上面三条一起发出去的那颗 */
     ".wdsm-follow-all{background:none;border:1px solid var(--wgold2);color:var(--wgold);border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer}" +
@@ -3797,7 +3806,7 @@
     (rec.turns || []).forEach(function (t) {
       if (!t || !t.text) return;
       if (t.role === "reader") { cell = addTurn(t.text); cell.a.innerHTML = ""; history.push({ role: "reader", text: t.text }); }
-      else { if (cell) { cell.a.innerHTML = mdRender(t.text); mountActs(cell, t.text); } history.push({ role: "wds", text: t.text }); }
+      else { if (cell) { cell.a.innerHTML = mdRender(t.text); progRender(cell, progParse(t.text)); mountActs(cell, t.text); } history.push({ role: "wds", text: t.text }); }
     });
     if (stSess) stSess.adopt(rec);
     VERS = [];                                  // 换了一场，上一场的版本堆作废
@@ -4156,6 +4165,39 @@
     if (ops >= 3) return 2;
     if (named && !pinned) return 0;
     return 1;
+  }
+
+  /* 〔进度〕行（2026-09-09 王德生令）：九问专著一轮只走一格，从前只有〔落位〕报「站在哪」，
+     报不了「第几格、还欠什么、够不够成文」——只能靠旁边有人数。基底自报，这里只渲染。
+     🔴 认不出就不画：宁可没有条，不许画一根猜出来的条。 */
+  function progParse(text) {
+    var m = String(text || "").match(/〔进度〕([^\n]*)/);
+    if (!m) return null;
+    var s = m[1];
+    var n = s.match(/第\s*(\d+)\s*\/\s*(\d+)\s*格/);
+    if (!n) return null;
+    var cur = parseInt(n[1], 10), tot = parseInt(n[2], 10);
+    if (!(tot > 0) || !(cur >= 0) || cur > tot) return null;
+    function seg(k) { var r = s.match(new RegExp(k + "[：:]\\s*([^｜|]*)")); return r ? r[1].trim() : ""; }
+    return { cur: cur, tot: tot, todo: seg("未完成"), out: seg("本格产出"), ok: /可成文[：:]\s*是/.test(s) };
+  }
+
+  function progRender(cell, p) {
+    if (!p || cell.prog) return;
+    var box = el("div", "wdsm-prog");
+    var hd = el("div", "wdsm-prog-h");
+    hd.appendChild(document.createTextNode(t("progH") + " · "));
+    var b = el("b", null, p.cur + "/" + p.tot + " " + t("progOf"));
+    hd.appendChild(b);
+    if (p.out) hd.appendChild(document.createTextNode(" · " + p.out));
+    box.appendChild(hd);
+    var bar = el("div", "wdsm-prog-bar");
+    var inn = el("div", "wdsm-prog-in");
+    inn.style.width = Math.round(p.cur / p.tot * 100) + "%";
+    bar.appendChild(inn); box.appendChild(bar);
+    var tail = p.ok ? t("progOK") : (t("progNo") + (p.todo ? ("　·　" + t("progTodo") + "：" + p.todo) : ""));
+    box.appendChild(el("div", "wdsm-prog-t", tail));
+    cell.turn.appendChild(box); cell.prog = box;
   }
 
   function renderFollows(cell, qs, ansText) {
@@ -5026,7 +5068,7 @@
                否则它会被挂到操作按钮下面，读者以为是页脚。 */
             if (toolSpec && !stoppedByUser) toolAuditRender(cell, answer, toolSpec);
             flushSrcs();                                  // 先正文，后文献
-            history.push({ role: "wds", text: answer }); stSave(history); mountActs(cell, answer);
+            history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); mountActs(cell, answer);
             if (_led) ledgerRender(cell, _led, answer);      // 记分牌挂在正文之外，不进导出稿
             if (_preg && !_preg.empty) pregRender(cell, _preg);   // 预注册卡→判断账（正文之外）
             cvTake(answer);                                 // 先看是不是「就地改」的回稿（收成下一版），否则扫围栏块
@@ -5115,7 +5157,7 @@
       .catch(function (e) {
         clearTimeout(wd);
         if (!stoppedByUser) { cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = t("errNet") + (e && e.message) + t("errNetEnd"); }
-        else if (answer) { cell.a.innerHTML = mdRender(answer); history.push({ role: "wds", text: answer }); stSave(history); mountActs(cell, answer); }
+        else if (answer) { cell.a.innerHTML = mdRender(answer); history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); mountActs(cell, answer); }
         endUI();
       });
   }
