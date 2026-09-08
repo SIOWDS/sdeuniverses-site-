@@ -6160,6 +6160,41 @@ const DECK_BEAUTY9 = "【美的九宫格：整份稿子按这九格自我要求�
   + "· **平安**：不刺眼不喧哗——不用惊叹号堆情绪、不制造焦虑、一句话页别写得又长又绕；"
   + "全篇语气平稳，让人读完是安定不是被推搡。\n";
 
+/* ── 成文那一路的【数学写法】（2026-09-08 王德生令：成文 PPT 里的文章要能装数学符号）──
+   ChatSDE 的对话早就有这一段（WDS_CHAT_SYS／WDS_PLAIN_SYS），成文这一路一直没有 ⇒
+   一进成文，写 LaTeX 的要求就没了，基底自由发挥，稿子里的式子排不出来。
+   🔴 **必须分档**：文章类的预览走 mdRender＋KaTeX，写 LaTeX 才排得出；
+      而 deck 出的是真 .pptx，生成器（/assets/wds-pptx.js）是纯文本 XML、没有 KaTeX
+      ⇒ 幻灯片里写 $…$ 只会把美元符号原样投到墙上。deck 一档反过来要求 Unicode 符号。 */
+function DIST_MATH_BLOCK(kind, lang) {
+  const en = lang === "en";
+  if (kind === "deck") {
+    return en
+      ? "\n\n【MATH IN SLIDES】This deck is exported as a real .pptx, which cannot typeset LaTeX."
+        + " Never write $…$ or \\frac — the dollar signs would show up on the wall."
+        + " Use plain Unicode instead: × ÷ ≤ ≥ ≠ ± √ ∑ ∫ ∞ → α β θ π Δ κ, superscripts ² ³ ⁿ, subscripts ₁ ₂;"
+        + " write fractions as a/b, and keep any formula on a slide to one short line."
+      : "\n\n【幻灯片里的数学】这一档最后导出的是**真 .pptx**，幻灯片排不了 LaTeX。"
+        + "**绝不要写 $…$、$$…$$ 或 \\frac 这类命令**——那两个美元符号会原样投到墙上。"
+        + "要写数学就直接用 Unicode 符号：× ÷ ≤ ≥ ≠ ± √ ∑ ∫ ∞ → α β θ π Δ κ，"
+        + "上标写 ² ³ ⁿ，下标写 ₁ ₂，分式写 a/b。"
+        + "一页里的式子控制在一行以内；复杂推导拆成文字说清，不要往幻灯片上堆公式。";
+  }
+  return en
+    ? "\n\n【MATH】The draft is rendered with KaTeX, so write every formula in LaTeX, not keyboard notation."
+      + " Inline in $…$, display in $$…$$; \\frac{a}{b}, \\sqrt{x}, $e^{i3\\theta}$, $x_{1}$, \\cos 3\\theta, \\Delta, \\kappa, \\le, \\ge, \\times."
+      + " Chinese or English words inside a formula go in \\text{…}."
+      + " Never put a formula inside a code fence — it would be shown as code, not typeset."
+    : "\n\n【数学写法（成稿用 KaTeX 排版，写错了就排不出来）】"
+      + "\n· 凡是数学式子一律用 LaTeX 写，**不许用键盘代码写法**：行内式包在 $…$ 里，独立成行的式子包在 $$…$$ 里。"
+      + "\n· 指数写 $e^{i3\\theta}$ 不写 e^(i3θ)；下标写 $x_{1}$ 不写 x_1；希腊字母写 \\theta \\pi \\alpha \\lambda \\kappa \\Delta，不直接打 θ π α λ κ Δ。"
+      + "\n· 分式写 \\frac{a}{b}，根号写 \\sqrt{x}，乘号写 \\cdot 或 \\times，不等号写 \\le \\ge \\neq，求和积分写 \\sum \\int。"
+      + "\n· **式子里要带中文（读数名、量具名）就写进 \\text{…}**：例如 $\\text{拒收率}R_x$、$\\text{增量}R^{2}$、$\\Delta\\text{AUC}$——"
+      + "行内式里裸露的中文会被当成不是公式而排不出来，包进 \\text{} 才认。"
+      + "\n· **绝不要把公式放进代码块（``` 或 `）里**——那会被当代码原样显示，不排版成公式。"
+      + "\n· 正文里单独提一个符号（S、D、E 这类）不必套 $，只有真是式子时才套。";
+}
+
 // ── DECK_TPL：20 套模板。一套 ＝ 页面骨架 ＋ 写作纪律 ＋ 视觉方案（配色/底纹/字号档），三件绑死。
 //    分三档：simple 白底一色（正式、投影仪最保险）｜mid 染色底＋淡底纹｜rich 深底/渐变＋图案（对外形象）。
 //    骨架里「只写一条要点」的页会被放大成整页一句话；写成 `数字 ｜ 说明` 的页自动出大数字卡片；
@@ -15526,6 +15561,7 @@ export default {
                 + (dlang === "en" ? (_langProf
                     ? "\n\n【LANGUAGE】Write in natural English prose, in the plain vocabulary of linguistics and language teaching (form, use, situation, context, conditions for uptake) — never SDE labels or the letters S / D / E."
                     : "\n\n【LANGUAGE】Write in natural English prose. Keep SDE terms as Show / Difference / Entanglement.") : "")
+                + DIST_MATH_BLOCK(kind, dlang)           // 数学写法：deck 走 Unicode，文章类走 LaTeX
                 + (prof && prof.term ? prof.term : "");   // 术语闸必须留在最末
               /* 占位者名单**排在术语闸之后**是刻意的：它是材料不是人格，压不到闸上；
                  而它必须进 BASE —— 提纲那一趟就要靠它决定「最近邻盘点」那一节写谁。 */
