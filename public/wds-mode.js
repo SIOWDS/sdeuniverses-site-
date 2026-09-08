@@ -4191,7 +4191,7 @@
   }
 
   function progRender(cell, p) {
-    if (!p || cell.prog) return;
+    if (!p || cell.prog || cell.tool !== "book9") return;   // 同上：进度条也只属于九问专著
     var box = el("div", "wdsm-prog");
     var hd = el("div", "wdsm-prog-h");
     hd.appendChild(document.createTextNode(t("progH") + " · "));
@@ -4219,7 +4219,10 @@
        降为备料，全部压暗。🔴 认不出进度行、或十格已齐，就什么都不加，退回原来的三条。 */
     var pg = progParse(ansText || (cell.a && cell.a.textContent) || "");
     var CELLS = t("progCells") || [];
-    var nextChip = (pg && !pg.ok && pg.next != null && CELLS[pg.next]) ? {
+    /* 🔴 主道只属于九问专著这道工序（2026-09-09 王德生令：「这个是给工序专门，如果没有工序，
+       仍然要保持自然追问方法」）。判据取本轮实跑的 cell.tool，不取 curTool——读者答完随手换了工序，
+       curTool 已经不是这一轮的了。别的工序、以及不选工序的日常问答，一律走原来那三条自然追问。 */
+    var nextChip = (cell.tool === "book9" && pg && !pg.ok && pg.next != null && CELLS[pg.next]) ? {
       i: pg.next, tot: pg.tot, name: CELLS[pg.next],
     } : null;
     if (qs.length >= 2) box.appendChild(el("div", "wdsm-follows-t", t("followsHint")));
