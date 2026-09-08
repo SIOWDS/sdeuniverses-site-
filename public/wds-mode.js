@@ -1039,6 +1039,8 @@
          推荐只是默认，另外两条一样能点——不收窄选择权，只是让不用选的人不用选。 */
       followsHint: "刚冒出新说法就点 What，说清楚了点 How，能落地了点 Why；写虚了往 How 拉，写碎了往 Why 拉。",
       progH: "本篇进度", progOf: "格", progTodo: "还欠", progOK: "十格已齐，可以成文", progNo: "未走完，先别成文",
+      progNext: "走下一格", progNextT: "按〔进度〕行报的未完成格算出来的；三条追问是备料，这一颗是主道",
+      progCells: ["本篇不管什么", "五家逐家交手", "承重命题与靶位 Z", "土壤条件", "量具取值与编码", "检验设计与材料来源", "证伪条款与阈值", "辨别格", "反噬与误诊阻挡", "两个洞与引证自查"],
       followRecT: "按上一答走到哪一步推的；另外两条一样能点",
       followGet: ["点它会得到：把刚出现的那个说法钉成定义与结构",
                   "点它会得到：一套怎么走、怎么取值的做法",
@@ -1347,6 +1349,8 @@
       followAllQ: "All three at once \u2014 answer each in turn:",
       followsHint: "New term just appeared? Take What. Clear already? Take How. Workable already? Take Why.",
       progH: "PROGRESS", progOf: "cells", progTodo: "still missing", progOK: "All ten cells done \u2014 ready to write up", progNo: "Not finished \u2014 don't write it up yet",
+      progNext: "Next cell", progNextT: "Computed from the cells the progress line reports as unfinished",
+      progCells: ["What this piece does not cover", "Facing all five occupants", "Load-bearing claim and the blank target", "Ground conditions", "Instrument values and coding", "Test design and materials", "Falsifiers and thresholds", "Discrimination grid", "Backfire and misdiagnosis blocks", "The two holes and citation self-check"],
       followRecT: "Suggested from where the last answer got to; the other two still work",
       followGet: ["You get: the new term pinned down as a definition and a structure",
                   "You get: a workable method \u2014 how to run it, how to read it off",
@@ -4179,7 +4183,11 @@
     var cur = parseInt(n[1], 10), tot = parseInt(n[2], 10);
     if (!(tot > 0) || !(cur >= 0) || cur > tot) return null;
     function seg(k) { var r = s.match(new RegExp(k + "[：:]\\s*([^｜|]*)")); return r ? r[1].trim() : ""; }
-    return { cur: cur, tot: tot, todo: seg("未完成"), out: seg("本格产出"), ok: /可成文[：:]\s*是/.test(s) };
+    var todo = seg("未完成");
+    // 下一格＝未完成里第一个圈号；报"无/全部完成"或认不出就不算（宁可不摆按钮）
+    var CIR = "①②③④⑤⑥⑦⑧⑨⑩", nx = null;
+    for (var i = 0; i < todo.length; i++) { var k = CIR.indexOf(todo.charAt(i)); if (k >= 0) { nx = k; break; } }
+    return { cur: cur, tot: tot, todo: todo, out: seg("本格产出"), ok: /可成文[：:]\s*是/.test(s), next: nx };
   }
 
   function progRender(cell, p) {
@@ -4206,7 +4214,27 @@
     box.appendChild(el("div", "wdsm-follows-h", t("followsH")));
     var rec = pickFollow(ansText || (cell.a && cell.a.textContent) || "");
     var GET = t("followGet") || [];
+    /* 格的进度与追问挂钩（2026-09-09 王德生令）：九问专著里"下一步该干什么"不是由答案的语气
+       推出来的，是〔进度〕行**已经报出来的**——未完成的第一格就是主道。有它在，三条维度追问
+       降为备料，全部压暗。🔴 认不出进度行、或十格已齐，就什么都不加，退回原来的三条。 */
+    var pg = progParse(ansText || (cell.a && cell.a.textContent) || "");
+    var CELLS = t("progCells") || [];
+    var nextChip = (pg && !pg.ok && pg.next != null && CELLS[pg.next]) ? {
+      i: pg.next, tot: pg.tot, name: CELLS[pg.next],
+    } : null;
     if (qs.length >= 2) box.appendChild(el("div", "wdsm-follows-t", t("followsHint")));
+    if (nextChip) {
+      var nb = el("button", "wdsm-follow rec");
+      nb.appendChild(el("i", "pt", t("progNext")));
+      nb.appendChild(document.createTextNode("①②③④⑤⑥⑦⑧⑨⑩".charAt(nextChip.i) + " " + nextChip.name));
+      nb.title = t("progNextT");
+      nb.onclick = function () {
+        if (streaming) return;
+        send("走第 " + (nextChip.i + 1) + "/" + nextChip.tot + " 格：" + nextChip.name
+           + "。只走这一格，不要提前铺开后面几格；答完照旧交〔本篇边界〕〔进度〕〔用料〕〔落位〕四行。");
+      };
+      box.appendChild(nb);
+    }
     var qList = [];                       // 三条问句本身（给「一起问」用；路径名不进去）
     qs.slice(0, 3).forEach(function (item) {
       var q = (item && typeof item === "object") ? String(item.q || "") : String(item || "");
@@ -4221,7 +4249,8 @@
       // 三条齐了才谈推荐：只回来一两条时，压暗任何一颗都只是添乱
       var idx = qList.length;
       if (GET[idx]) b.title = GET[idx];
-      if (qs.length >= 3) {
+      if (nextChip) b.className = "wdsm-follow dim";        // 主道已在，三条降为备料
+      else if (qs.length >= 3) {
         if (idx === rec) { b.className = "wdsm-follow rec"; b.title = (GET[idx] || "") + "\n" + t("followRecT"); }
         else b.className = "wdsm-follow dim";
       }
