@@ -1034,6 +1034,14 @@
       /* 一起问（2026-08-30）：三条追问并成一问一次发出。followAllQ 是并起来那条消息的头一句，读者看得见、可改。 */
       followAll: "一起问", followAllT: "三个都问：并成一条消息一次发出，一趟答完、逐条标号",
       followAllQ: "三个问题一起问，逐条标号作答：",
+      /* 三选一的指路（2026-09-08 王德生令）：读者判断不了抽象的维度名，判断得了"我现在要不要一个定义"。
+         所以①按上一答走到哪一步推一条，②每颗写清点了会得到什么，③把选法写成一句话摆在标题下。
+         推荐只是默认，另外两条一样能点——不收窄选择权，只是让不用选的人不用选。 */
+      followsHint: "刚冒出新说法就点 What，说清楚了点 How，能落地了点 Why；写虚了往 How 拉，写碎了往 Why 拉。",
+      followRecT: "按上一答走到哪一步推的；另外两条一样能点",
+      followGet: ["点它会得到：把刚出现的那个说法钉成定义与结构",
+                  "点它会得到：一套怎么走、怎么取值的做法",
+                  "点它会得到：这一步为什么非得这样、卡在哪儿"],
       ledH: "这一答走了几步", ledStock: "家底", ledField: "外领域", ledFal: "作废条件", ledNew: "新在",
       srcN: " 篇", toBot: "回到最新",
       aCopy: "\u29c9 复制", aCopied: "已复制", aRead: "\ud83d\udd0a 朗读", aStop: "\u23f9 停止", aRegen: "\u21bb 重答", aEdit: "\u270e 改问",
@@ -1336,6 +1344,11 @@
       srcSite: "ON-SITE SOURCES", srcWeb: "WEB SOURCES", followsH: "ASK NEXT",
       followAll: "Ask all three", followAllT: "Send all three as one message; answered in one pass, numbered",
       followAllQ: "All three at once \u2014 answer each in turn:",
+      followsHint: "New term just appeared? Take What. Clear already? Take How. Workable already? Take Why.",
+      followRecT: "Suggested from where the last answer got to; the other two still work",
+      followGet: ["You get: the new term pinned down as a definition and a structure",
+                  "You get: a workable method \u2014 how to run it, how to read it off",
+                  "You get: why it has to be this way, and where it jams"],
     ledH: "STEPS TAKEN", ledStock: "prior views", ledField: "other field", ledFal: "falsifier", ledNew: "what's new",
       srcN: "", toBot: "Jump to latest",
       aCopy: "\u29c9 Copy", aCopied: "Copied", aRead: "\ud83d\udd0a Read", aStop: "\u23f9 Stop", aRegen: "\u21bb Retry", aEdit: "\u270e Edit",
@@ -2305,6 +2318,11 @@
     ".wdsm-follows{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}" +
     ".wdsm-follow{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer;text-align:left}" +
     ".wdsm-follow:hover{border-color:var(--wline2);color:var(--wgold)}" +
+    /* 推荐的那一颗：金边＋前导三角；另两颗压暗但不禁用 */
+    ".wdsm-follow.rec{border-color:var(--wgold2);color:var(--wgold)}" +
+    ".wdsm-follow.dim{opacity:.62}" +
+    ".wdsm-follow.dim:hover{opacity:1}" +
+    ".wdsm-follows-t{width:100%;font-size:11.5px;line-height:1.7;color:var(--wdim2);margin:-2px 0 4px}" +
     ".wdsm-follows-h{width:100%;font-size:11px;letter-spacing:1px;color:var(--wdim2);margin-bottom:2px}" +
     /* 一起问：与追问 chip 同形，金边区分——它不是第四条追问，是把上面三条一起发出去的那颗 */
     ".wdsm-follow-all{background:none;border:1px solid var(--wgold2);color:var(--wgold);border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer}" +
@@ -4124,10 +4142,29 @@
     cell.turn.appendChild(box); cell.ledger = box; cell.ledgerAudit = a;
   }
 
-  function renderFollows(cell, qs) {
+  /* 三条追问推荐哪一条：由**上一答走到哪一步**决定，不由读者的偏好决定。
+     规则就是 followsHint 那一句：已经很碎（步骤/读数密集）→ 往 Why 拉；
+     冒出一个还没钉住的新说法 → 先 What；其余一律 How（逼它给一次取值，治"写虚"）。
+     返回 0/1/2 对应 What/How/Why —— 服务端 parseFollows 就是按这个序出的三行。
+     🔴 它只改默认，不禁用另外两颗：推错了读者一眼就能改，代价是一次点击。 */
+  function pickFollow(ans) {
+    var s = String(ans || "");
+    if (!s) return 1;
+    var ops = (s.match(/第[一二三四五六七八九十]步|步骤|操作|取值|读数|量具|阈值|流程|清单|①|②|③/g) || []).length;
+    var pinned = /不是[^。！？\n]{0,40}(而是|才是)|定义为|称之为|叫做|记作|＝/.test(s);
+    var named = /「[^」]{2,14}」|【[^】]{2,14}】|“[^”]{2,14}”/.test(s);
+    if (ops >= 3) return 2;
+    if (named && !pinned) return 0;
+    return 1;
+  }
+
+  function renderFollows(cell, qs, ansText) {
     if (!qs || !qs.length || cell.follows) return;
     var box = el("div", "wdsm-follows");
     box.appendChild(el("div", "wdsm-follows-h", t("followsH")));
+    var rec = pickFollow(ansText || (cell.a && cell.a.textContent) || "");
+    var GET = t("followGet") || [];
+    if (qs.length >= 2) box.appendChild(el("div", "wdsm-follows-t", t("followsHint")));
     var qList = [];                       // 三条问句本身（给「一起问」用；路径名不进去）
     qs.slice(0, 3).forEach(function (item) {
       var q = (item && typeof item === "object") ? String(item.q || "") : String(item || "");
@@ -4139,6 +4176,13 @@
       var w = (item && typeof item === "object") ? String(item.w || "") : "";
       if (p) { var tag = el("i", "pt", p); tag.title = w || t("pathTip"); b.appendChild(tag); }
       b.appendChild(document.createTextNode(q));
+      // 三条齐了才谈推荐：只回来一两条时，压暗任何一颗都只是添乱
+      var idx = qList.length;
+      if (GET[idx]) b.title = GET[idx];
+      if (qs.length >= 3) {
+        if (idx === rec) { b.className = "wdsm-follow rec"; b.title = (GET[idx] || "") + "\n" + t("followRecT"); }
+        else b.className = "wdsm-follow dim";
+      }
       b.onclick = function () { if (!streaming) send(q); };   // 只发问句，路径名是给人看的
       box.appendChild(b);
       qList.push(q);
@@ -5059,7 +5103,7 @@
               else if (j.t === "sentry") { renderSentry(cell, j.v || {}); }
               else if (j.t === "far") { renderFar(cell, j.v || {}); }
               else if (j.t === "toolspec") { toolSpec = j.v; }
-              else if (j.t === "follow") { renderFollows(cell, j.v); }
+              else if (j.t === "follow") { renderFollows(cell, j.v, answer); }
               else if (j.t === "token") { answer += j.v; paint(); }
               else if (j.t === "error") { errShown = true; cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = j.v; if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
             }
