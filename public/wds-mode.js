@@ -1715,6 +1715,18 @@
       triWait: "（等上一家写完）",
       triSame: "⚠ 只有两家有 Key，第三家沿用了第一家——结算者参与过写作，这一轮的结论只作参考。填第三家的 Key 可解。",
       triDupNoMore: "⚠ 降级场不给「继续对撞」：第三席就是第一席，这一轮不出结算，也就没有可当下一轮靶子的东西。填第三家的 Key 即可正常续轮。",
+      mobBtn: "⚔ 群碰", mobOn: "⚔ 群碰：开",
+      mobTip: "N 席一起撞：一席用平常话出判断，若干席各挑一处攻（不许攻同一处），最后两席**并行且互不读**各出一份结算。\n\n为什么要两份结算：一份结算没有对照，看不出它是结清了还是自说自话。两份一致＝那一处结清了；两份不一致＝那里恰恰没结清，分歧点就是下一轮的靶子。\n\n座次仍是一吃两不吃：判断席与攻击席既不读本站语料、也不用这套术语，只有结算席吃 SDE。至少要 4 家 Key。",
+      mobSeatH: "几席一起撞",
+      mobHave: "现在有 {n} 家 Key 可坐（判断 1 ＋ 攻击 N-3 ＋ 结算 2）",
+      mobNeed: "⚠ 群碰至少需要 4 家填了 Key（判断 1 ＋ 攻击 1 ＋ 结算 2）。同一家不重复占座——自己攻自己不算攻。",
+      mobAuto: "自动（有几家用几家）", mobSeatN: " 席",
+      mobGo: "开始群碰", mobStop: "停止群碰",
+      mobA: "判断", mobM: "攻", mobS: "结算",
+      mobNone: "（还没有人攻过）", mobUnk: "未指名",
+      mobMore: "拿两份结算的分歧继续",
+      mobMoreT: "下一轮的靶子不是某一份结论，是两份结算判得不一样的那一处——一致的那部分算已结清，不再动它。座位左轮一格。",
+      mobNoTwo: "⚠ 两份结算里没有两句都收口的【结算】，这一轮不给「继续」——没有可比的分歧，就没有下一轮的靶子。",
       duelHb: "攻击面", duelHc: "对撞",
       duelLoad: "承重", duelLoadT: "攻在承重命题上的处数。只挑边角料的错是假攻击——这一格为 0 就是没真攻。",
       duelFix: "改法", duelFixT: "带出改法（改条件／缩范围／撤回）的处数。提不出改法的意见不算攻击：它没有可被处置的东西。",
@@ -1875,6 +1887,18 @@
       triIdle: "The previous seat only restated the last round; this round stopped here.",
       triIdleN: "\u26a0 This round was judged a restatement (seat one named no differing word and did not say the clash had bottomed out). Stopped at seat one.",
       triDupNoMore: "\u26a0 Degraded round: seat three is seat one, so no verdict is issued and there is nothing to aim the next round at. Add a third key to continue.",
+      mobBtn: "\u2694 Mob", mobOn: "\u2694 Mob: on",
+      mobTip: "N seats at once: one states a judgment in plain language, several each attack a different spot (never the same one), and the last two settle in parallel without reading each other. Two settlements give you a comparison: agreement means that part is settled; disagreement marks exactly what is not, and becomes the next round\u2019s target. Needs at least 4 keys.",
+      mobSeatH: "How many seats",
+      mobHave: "{n} keyed houses available (1 judge + N-3 attackers + 2 settlers)",
+      mobNeed: "\u26a0 Mob needs at least 4 keyed houses. No house takes two seats \u2014 attacking yourself is not an attack.",
+      mobAuto: "Auto (use all keyed)", mobSeatN: " seats",
+      mobGo: "Start mob", mobStop: "Stop mob",
+      mobA: "Judge", mobM: "Atk", mobS: "Settle",
+      mobNone: "(nothing attacked yet)", mobUnk: "unnamed",
+      mobMore: "Continue from the disagreement",
+      mobMoreT: "The next target is where the two settlements differ, not either conclusion. Seats rotate one place.",
+      mobNoTwo: "\u26a0 Fewer than two closed verdicts, so there is no disagreement to aim at.",
       duelHb: "Attack", duelHc: "Clash",
       duelLoad: "Load-bearing", duelLoadT: "Hits on the load-bearing claim. Nitpicking the trim is not an attack \u2014 zero here means nothing real was hit.",
       duelFix: "Fixes", duelFixT: "Hits that come with a fix (tighten the condition / narrow the scope / withdraw). An objection with no fix cannot be acted on.",
@@ -2533,6 +2557,7 @@
           "<button class='wdsm-mode wdsm-findbtn'></button>" +
           "<button class='wdsm-mode wdsm-dubtn'></button>" +
           "<button class='wdsm-mode wdsm-tribtn'></button>" +
+          "<button class='wdsm-mode wdsm-mobbtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
@@ -5009,6 +5034,13 @@
       if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       return;
     }
+    // 群碰挂着时：一问走 N 席（排在最前——三者互斥，群碰最重）
+    if (mobOn && !streaming) {
+      var kmb = wdsKeyGet(); if (!kmb) { wdsKeyPanel(function () { send(q); }); return; }
+      if (turns() >= MAX) { updTurns(); return; }
+      if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      if (sendMob(q, addTurn(q))) return;
+    }
     // 三家对撞挂着时：一问串行走三家（排在并排之前——两者互斥，对撞更重）
     if (triOn && !streaming) {
       var ktr = wdsKeyGet(); if (!ktr) { wdsKeyPanel(function () { send(q); }); return; }
@@ -5413,6 +5445,198 @@
         });
     }
     cols.forEach(one);
+    return true;
+  }
+
+  /* ══════════════ 群碰（N 席）══════════════
+     三家对撞是定席定序：A 出判断 → B 攻 A → C 结算。群碰放开两处，而这两处各带一个必然的坑：
+       ① **攻击席自选目标** ⇒ 每席都挑最脆的那个打，N 席全攻同一处，看着热闹只攻了一处。
+          解法＝把【已被攻过】的清单随材料递下去，并在提示语里写死"不许攻同一处、优先攻没人碰过的席"。
+       ② **两个结算席** ⇒ 若串行，第二席读得到第一席，多半附和或微调，那不是两份独立结算。
+          解法＝**两席并行、互不读**；两份的分歧点本身就是下一轮的靶子（服务端 a 席的群碰续轮分支）。
+     席位：1 席判断（平常话·不吃语料）＋ (N-3) 席攻击（不吃）＋ 2 席结算（吃 SDE）。
+     🔴 绝不重复占座：同一家坐两个位子，在攻击轮等于自己攻自己。Key 不够就减席，减到 4 以下不跑。 */
+  var mobOn = false;
+  var mobBtn = layer.querySelector(".wdsm-mobbtn");
+  var mobN = 0;                       // 0＝自动（有几家 Key 用几家，上限 8）
+  function mobPaint() {
+    if (!mobBtn) return;
+    var seats = mobSeats();
+    mobBtn.textContent = mobOn ? (t("mobOn") + (seats ? (" " + seats.length) : "")) : t("mobBtn");
+    mobBtn.title = t("mobTip");
+    if (mobOn) mobBtn.classList.add("on"); else mobBtn.classList.remove("on");
+  }
+  /* 排座：主基底坐判断席，其余按 VENDORS 顺序取"有 Key 且没坐过"的。
+     只回一次去重后的名单；不足 4 家回 null（判断1＋攻击1＋结算2 是最小可跑的形状）。 */
+  function mobSeats() {
+    var mine = null; try { mine = wdsKeyGet(); } catch (e) { return null; }
+    if (!mine) return null;
+    var seats = [{ vendor: mine.vendor, key: mine.key, model: mine.model || "" }];
+    for (var i = 0; i < VENDORS.length; i++) {
+      var v = VENDORS[i].v, k = vkeyGet(v);
+      if (!k) continue;
+      var dup = false;
+      for (var j = 0; j < seats.length; j++) if (seats[j].vendor === v) dup = true;
+      if (dup) continue;
+      seats.push({ vendor: v, key: k, model: vmodelGet(v) || "" });
+    }
+    if (seats.length < 4) return null;
+    var cap = mobN > 0 ? Math.min(mobN, seats.length) : seats.length;
+    return seats.slice(0, Math.min(cap, 8));
+  }
+  function mobFill(menu) {
+    var seats = mobSeats();
+    menu.appendChild(el("div", "mh", t("mobSeatH")));
+    var note = el("div", "mnote");
+    note.textContent = seats
+      ? t("mobHave").replace("{n}", String(seats.length))
+      : t("mobNeed");
+    menu.appendChild(note);
+    if (seats) {
+      var opts = [0]; for (var k = 4; k <= seats.length; k++) opts.push(k);
+      opts.forEach(function (v) {
+        var b = el("button");
+        b.appendChild(document.createTextNode((mobN === v ? "\u2713 " : "") + (v === 0 ? t("mobAuto") : (v + t("mobSeatN")))));
+        b.onclick = function () { mobN = v; mobPaint(); closeMenu(); };
+        menu.appendChild(b);
+      });
+      var go = el("button", null, mobOn ? t("mobStop") : t("mobGo"));
+      go.onclick = function () {
+        closeMenu(); mobOn = !mobOn;
+        if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); }   // 三者互斥
+        mobPaint();
+      };
+      menu.appendChild(go);
+    }
+  }
+  if (mobBtn) mobBtn.onclick = function () { if (streaming) return; menuAt(mobBtn, mobFill); };
+
+  function sendMob(q, cell) {
+    var seats = mobSeats();
+    if (!seats) { toast(t("mobNeed")); return false; }
+    history.push({ role: "reader", text: q }); updTurns();
+    var ROUNDS = [];
+
+    function runRound(seats, rd, carry) {
+      var nAtk = Math.max(1, seats.length - 3);            // 判断1 ＋ 攻击 nAtk ＋ 结算2
+      var wrap = el("div", "wdsm-tri");
+      if (rd > 1) wrap.appendChild(el("div", "wdsm-trird", t("triRd").replace("{n}", String(rd))));
+      var rows = seats.map(function (who, i) {
+        var lab = i === 0 ? t("mobA") : (i <= nAtk ? (t("mobM") + (i)) : (t("mobS") + (i - nAtk)));
+        var c = el("div", "wdsm-tric");
+        var hd = el("div", "wdsm-duh");
+        hd.appendChild(el("b", null, lab));
+        hd.appendChild(el("i", null, vinfo(who.vendor).name));
+        var bd = el("div", "wdsm-a plain");
+        bd.textContent = i === 0 ? "\u258a" : t("triWait");
+        c.appendChild(hd); c.appendChild(bd); wrap.appendChild(c);
+        return { who: who, bd: bd, text: "", lab: lab };
+      });
+      cell.a.appendChild(wrap);
+
+      function step(i, role, prior) {
+        var row = rows[i];
+        row.bd.className = "wdsm-a";
+        row.bd.innerHTML = "<span class='cur'>\u258a</span>";
+        var pl = {
+          q: q, history: histPack(compFrom()), umem: memRecall(q),
+          key: row.who.key, vendor: row.who.vendor, model: row.who.model,
+          mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(),
+          about: aboutPlus(), lang: LANG,
+          duel: { role: role, prior: prior, rd: rd > 1 ? rd : 0, mob: 1 }
+        };
+        if (COMP.text) pl.comp = COMP.text;
+        return rsStream(API, pl, function (txt) {
+          row.text = txt; row.bd.innerHTML = mdRender(txt) + "<span class='cur'>\u258a</span>";
+        }).then(function (txt) {
+          row.text = txt; row.bd.innerHTML = mdRender(txt);
+          try { duelRender(row.bd.parentNode, duelParse(txt)); } catch (e2) {}
+          return txt;
+        }).catch(function (e) {
+          row.bd.className = "wdsm-a plain wdsm-err";
+          row.bd.textContent = (e && e.message) || "?";
+          return "";
+        });
+      }
+      /* 覆盖表：把每一席自报的「攻的是：第N席」收起来，随材料递给下一席。
+         🔴 只收它自报的，认不出就不记——宁可清单短，不许替它填一个猜的。 */
+      function coverLine(atk) {
+        if (!atk.length) return t("mobNone");
+        return atk.map(function (a) { return a.who + "←" + a.by; }).join("；");
+      }
+
+      return step(0, "a", carry).then(function (a) {
+        if (!a) { rows.forEach(function (r, i) { if (i) r.bd.textContent = t("triFail"); }); return null; }
+        var blocks = ["【" + rows[0].lab + " · " + vinfo(rows[0].who.vendor).name + " · 判断】\n" + a];
+        var cover = [];
+        // 攻击席串行：每一席都要看到前面全部产出与覆盖表
+        function atkStep(k) {
+          if (k > nAtk) return Promise.resolve(true);
+          var prior = blocks.join("\n\n") + "\n\n【已被攻过】" + coverLine(cover);
+          return step(k, "m", prior).then(function (m) {
+            if (m) {
+              blocks.push("【" + rows[k].lab + " · " + vinfo(rows[k].who.vendor).name + " · 攻击】\n" + m);
+              var mm = String(m).match(/攻的是[：:]\s*第?\s*(\d+)\s*席/);
+              cover.push({ who: mm ? ("第" + mm[1] + "席") : t("mobUnk"), by: rows[k].lab });
+            }
+            return atkStep(k + 1);
+          });
+        }
+        return atkStep(1).then(function () {
+          // 两个结算席**并行**：同一份材料，互不读对方
+          var mat = blocks.join("\n\n");
+          if (rd > 1 && carry) mat += "\n\n【上一轮的结算（逐字，供比对）】\n" + carry;
+          var s1 = seats.length - 2, s2 = seats.length - 1;
+          return Promise.all([step(s1, "s", mat), step(s2, "s", mat)]).then(function (two) {
+            return { blocks: blocks, two: two };
+          });
+        });
+      }).then(function (done) {
+        if (!done) return { ok: false, verdicts: [] };
+        var all = (rd > 1 ? ("【第 " + rd + " 轮】\n") : "") + rows.map(function (r) {
+          return "【" + r.lab + " · " + vinfo(r.who.vendor).name + "】\n" + r.text;
+        }).join("\n\n");
+        ROUNDS.push(all);
+        return { ok: true, verdicts: done.two.filter(Boolean) };
+      });
+    }
+
+    function startRound(seats, rd, carry) {
+      streaming = true; stoppedByUser = false; RS.stop = false;
+      busyUI(true); stopBarShow(true);
+      if (cell.acts && cell.acts.parentNode) { cell.acts.parentNode.removeChild(cell.acts); cell.acts = null; }
+      runRound(seats, rd, carry).then(function (res) {
+        streaming = false; curReader = null;
+        busyUI(false); stopBarShow(false);
+        history.push({ role: "wds", text: ROUNDS.join("\n\n") }); stSave(history); updTurns(); compTick();
+        var row2 = el("div", "wdsm-acts");
+        var sv = el("button", "wdsm-act", t("triSave"));
+        sv.onclick = function () { cvAdd("md", q.slice(0, 24), "# " + q + "\n\n" + ROUNDS.join("\n\n")); };
+        row2.appendChild(sv);
+        /* 续轮的靶子＝**两份结算的分歧点**（不是某一份的结论）。两份都在才给按钮：
+           只有一份，就没有分歧可挑，那退化成三家对撞的续轮。 */
+        var vs = (res.verdicts || []).filter(function (v) { return /【结算】/.test(String(v)); });
+        if (res.ok && vs.length === 2) {
+          var go = el("button", "wdsm-act", t("mobMore"));
+          go.title = t("mobMoreT");
+          go.onclick = function () {
+            if (streaming) return;
+            var nx = seats.slice(1).concat(seats.slice(0, 1));    // 座位左轮一格
+            var tgt = vs.map(function (v, i) {
+              var m = /【结算】([\s\S]*?)(?:\n\s*\n|$)/.exec(v);
+              return "【结算 " + (i + 1) + "】" + ((m && m[1].trim()) || v);
+            }).join("\n\n");
+            startRound(nx, rd + 1, tgt);
+          };
+          row2.appendChild(go);
+        } else if (res.ok) {
+          var nn = el("div", "wdsm-tinote"); nn.textContent = t("mobNoTwo"); row2.appendChild(nn);
+        }
+        cell.turn.appendChild(row2); cell.acts = row2;
+      });
+    }
+    cell.a.innerHTML = "";
+    startRound(seats, 1, "");
     return true;
   }
 
