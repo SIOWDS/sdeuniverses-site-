@@ -1727,6 +1727,13 @@
       mobRowM: "② 攻击 · 第",
       mobRowS: "③ 结算（吃 SDE·并行互不读）· 第",
       mobTaken: "（已被别席点名）",
+      mobZ: "④ 总结（收本轮·出下一轮靶子）",
+      mobZH: "小结",
+      mobZClosed: "已结清", mobZClosedT: "两份结算一致的处数——判为本轮已结清，下一轮不再动它。",
+      mobZOpen: "仍未结清", mobZOpenT: "两份结算判得不一样的处数。分歧不是缺点：它标出的正是这一场没结清的地方。为 0 且没有新靶子，多半是撞到底了。",
+      mobZUn: "没人碰的维：", mobZUnT: "这一轮的判断与所有攻击都没碰过的那一样（显露／路径／纠缠）。它往往正是这道题真正的所在。",
+      mobZTgt: "下一轮靶子", mobZTgtT: "总结席有没有交出一条可被攻击的新判断。没有就不给「继续」——没有靶子的下一轮只会空转。",
+      mobZSelf: "⚠ 席数只有 4，总结席由判断席兼任——它在总结自己写下的那条判断，这一轮的小结只作参考。加到 5 席即可让没写过判断的那一位来总结。",
       mobGo: "开始群碰", mobStop: "停止群碰",
       mobA: "判断", mobM: "攻", mobS: "结算",
       mobNone: "（还没有人攻过）", mobUnk: "未指名",
@@ -1907,6 +1914,13 @@
       mobRowM: "2. Attacker #",
       mobRowS: "3. Settler (eats SDE, parallel) #",
       mobTaken: "(taken by another seat)",
+      mobZ: "4. Summing up (closes the round, sets the next target)",
+      mobZH: "Summary",
+      mobZClosed: "Settled", mobZClosedT: "Points where the two settlements agree \u2014 treated as closed; the next round leaves them alone.",
+      mobZOpen: "Still open", mobZOpenT: "Points where the two settlements differ. Disagreement is not a defect: it marks exactly what this round did not settle.",
+      mobZUn: "Untouched axis: ", mobZUnT: "The axis (showing / path / entanglement) neither the claim nor any attack touched \u2014 often where the question actually lives.",
+      mobZTgt: "Next target", mobZTgtT: "Whether the summary produced a new attackable claim. Without one there is no Continue \u2014 a round with no target just spins.",
+      mobZSelf: "\u26a0 With only 4 seats the summary is written by the seat that stated the claim \u2014 it is summing up its own judgment, so treat this summary as indicative. Add a fifth seat to fix it.",
       mobGo: "Start mob", mobStop: "Stop mob",
       mobA: "Judge", mobM: "Atk", mobS: "Settle",
       mobNone: "(nothing attacked yet)", mobUnk: "unnamed",
@@ -4279,6 +4293,15 @@
       return { kind: "b", load: num("承重"), edge: num("边角"), fix: num("改法"),
                decisive: /有/.test(seg(L, "判决性对照")), stuck: /有/.test(seg(L, "攻不动")) };
     }
+    var z = s.match(/〔小结〕([^\n]*)/);
+    if (z) {
+      var L3 = z[1];
+      function num3(k) { var v = seg(L3, k), m = v.match(/(\d+)/); return m ? parseInt(m[1], 10) : null; }
+      var dim3 = seg(L3, "没人碰的维");
+      return { kind: "z", closed: num3("已结清"), open: num3("仍未结清"),
+               untouched: (/无/.test(dim3) ? "" : dim3),
+               target: /出/.test(seg(L3, "靶子")) && !/未出/.test(seg(L3, "靶子")) };
+    }
     var c = s.match(/〔对撞〕([^\n]*)/);
     if (c) {
       var L2 = c[1];
@@ -4294,10 +4317,17 @@
   function duelRender(box, d) {
     if (!d) return null;
     var w = el("div", "wdsm-led");
-    w.appendChild(el("i", "lh", d.kind === "b" ? t("duelHb") : t("duelHc")));
+    w.appendChild(el("i", "lh", d.kind === "b" ? t("duelHb") : d.kind === "z" ? t("mobZH") : t("duelHc")));
     function chip(okv, label, tip, neutral) {
       var c = el("i", "lc" + (neutral ? " nu" : (okv ? " ok" : " no")), label);
       c.title = tip || ""; w.appendChild(c);
+    }
+    if (d.kind === "z") {
+      chip(true, t("mobZClosed") + " " + (d.closed == null ? "—" : d.closed), t("mobZClosedT"), true);
+      chip(d.open > 0, t("mobZOpen") + " " + (d.open == null ? "—" : d.open), t("mobZOpenT"));
+      chip(!!d.untouched, (d.untouched ? (t("mobZUn") + d.untouched) : (t("mobZUn") + "—")), t("mobZUnT"), !d.untouched);
+      chip(d.target, t("mobZTgt") + (d.target ? " ✓" : " —"), t("mobZTgtT"));
+      box.appendChild(w); return w;
     }
     if (d.kind === "b") {
       chip(d.load > 0, t("duelLoad") + " " + (d.load == null ? "—" : d.load), t("duelLoadT"));
@@ -5604,8 +5634,20 @@
       });
       cell.a.appendChild(wrap);
 
-      function step(i, role, prior) {
+      /* label 传了就**另开一行**（同一家在同一轮里跑第二个角色——总结席就是这种情形：
+         它复用某个已跑过的席位，若直接写回原来那一行，前面那段攻击就被覆盖没了）。 */
+      function step(i, role, prior, label) {
         var row = rows[i];
+        if (label) {
+          var c2 = el("div", "wdsm-tric");
+          var hd2 = el("div", "wdsm-duh");
+          hd2.appendChild(el("b", null, label));
+          hd2.appendChild(el("i", null, vinfo(rows[i].who.vendor).name));
+          var bd2 = el("div", "wdsm-a plain"); bd2.textContent = t("triWait");
+          c2.appendChild(hd2); c2.appendChild(bd2); wrap.appendChild(c2);
+          row = { who: rows[i].who, bd: bd2, text: "", lab: label };
+          rows.push(row);
+        }
         row.bd.className = "wdsm-a";
         row.bd.innerHTML = "<span class='cur'>\u258a</span>";
         var pl = {
@@ -5658,16 +5700,37 @@
           if (rd > 1 && carry) mat += "\n\n【上一轮的结算（逐字，供比对）】\n" + carry;
           var s1 = seats.length - 2, s2 = seats.length - 1;
           return Promise.all([step(s1, "s", mat), step(s2, "s", mat)]).then(function (two) {
-            return { blocks: blocks, two: two };
+            /* 【总结席 · 2026-09-09 王德生令】两份结算之后再加一席收束本轮，并交出下一轮的靶子。
+               🔴 由**没参与结算的那一席**来坐——自己总结自己的结算就是自评。
+               取法：攻击席里的最后一位（它既不是判断的作者，也没做过结算）；
+               席数不够（只有 4 席时攻击只有一位）就退回判断席，并如实标注。 */
+            var zi = nAtk >= 2 ? nAtk : 0;          // nAtk≥2 用最后一个攻击席；否则用判断席
+            var zmat = blocks.join("\n\n")
+              + "\n\n【结算 1 · " + vinfo(seats[s1].vendor).name + "】\n" + (two[0] || "（无产出）")
+              + "\n\n【结算 2 · " + vinfo(seats[s2].vendor).name + "】\n" + (two[1] || "（无产出）");
+            return step(zi, "z", zmat, t("mobZ")).then(function (z) {
+              return { blocks: blocks, two: two, z: z, zi: zi, zSelf: zi === 0 };
+            });
           });
         });
       }).then(function (done) {
-        if (!done) return { ok: false, verdicts: [] };
+        if (!done) return { ok: false, verdicts: [], target: "" };
         var all = (rd > 1 ? ("【第 " + rd + " 轮】\n") : "") + rows.map(function (r) {
           return "【" + r.lab + " · " + vinfo(r.who.vendor).name + "】\n" + r.text;
         }).join("\n\n");
         ROUNDS.push(all);
-        return { ok: true, verdicts: done.two.filter(Boolean) };
+        /* 下一轮的靶子＝**总结席给的那一句**（不是某一份结算的结论）。
+           取不到就回落到两份结算的分歧（老口径），两样都没有才不给续轮。 */
+        var zt = /【下一轮的靶子】([\s\S]*?)(?:\n\s*\n|$)/.exec(String(done.z || ""));
+        var target = (zt && zt[1].trim()) ? ("【上一轮总结席给的靶子】" + zt[1].trim()) : "";
+        if (!target) {
+          var vs0 = (done.two || []).filter(function (v) { return /【结算】/.test(String(v)); });
+          if (vs0.length === 2) target = vs0.map(function (v, i) {
+            var m = /【结算】([\s\S]*?)(?:\n\s*\n|$)/.exec(v);
+            return "【结算 " + (i + 1) + "】" + ((m && m[1].trim()) || v);
+          }).join("\n\n");
+        }
+        return { ok: true, verdicts: (done.two || []).filter(Boolean), target: target, zSelf: !!done.zSelf };
       });
     }
 
@@ -5685,18 +5748,16 @@
         row2.appendChild(sv);
         /* 续轮的靶子＝**两份结算的分歧点**（不是某一份的结论）。两份都在才给按钮：
            只有一份，就没有分歧可挑，那退化成三家对撞的续轮。 */
-        var vs = (res.verdicts || []).filter(function (v) { return /【结算】/.test(String(v)); });
-        if (res.ok && vs.length === 2) {
+        if (res.ok && res.zSelf) {
+          var nz = el("div", "wdsm-tinote"); nz.textContent = t("mobZSelf"); row2.appendChild(nz);
+        }
+        if (res.ok && res.target) {
           var go = el("button", "wdsm-act", t("mobMore"));
           go.title = t("mobMoreT");
           go.onclick = function () {
             if (streaming) return;
             var nx = seats.slice(1).concat(seats.slice(0, 1));    // 座位左轮一格
-            var tgt = vs.map(function (v, i) {
-              var m = /【结算】([\s\S]*?)(?:\n\s*\n|$)/.exec(v);
-              return "【结算 " + (i + 1) + "】" + ((m && m[1].trim()) || v);
-            }).join("\n\n");
-            startRound(nx, rd + 1, tgt);
+            startRound(nx, rd + 1, res.target);
           };
           row2.appendChild(go);
         } else if (res.ok) {
