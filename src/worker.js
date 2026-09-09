@@ -17431,6 +17431,93 @@ export default {
       return handleAsk(request, env, url);
     }
     // ===== 注册入口 =====
+
+    /* ══════════════ 私密书库（2026-09-09 王德生令）══════════════
+       口令：只存 SHA-256，源码里没有明文。可用环境变量 PLIB_PW 覆盖（Workers → Variables → Encrypt）。
+
+       🔴 为什么门开在 Worker 上、内容放 R2，而不是做一个前端口令页：
+       ① **前端口令不是门**——静态站上查看源码、直接敲子页 URL、翻 JS 都能绕过；
+       ② **更要命的是仓库**：本仓是公开仓（见 IM_PW 那段注释）。内容只要落进 public/，
+          即使网站这边挡住了，**GitHub 上仍然人人可读**。所以书库正文一个字也不进仓库，
+          只进 R2（前缀 plib/），由这道门验过口令再从桶里取。
+       ③ 凭证是 HttpOnly Cookie，JS 读不到；口令只在 POST 里走一次，不落 URL、不进日志。
+
+       ⚠ 与「可被检索与 RAZ 使用」的关系：服务端取 R2 是可以的（ChatSDE 那条路在服务端）；
+       但**站内公开检索若收了它，片段就是公开的**——那等于半公开。故本门只放行页面，
+       索引口径另裁（见交付说明）。 */
+    if (url.pathname === "/private-library" || url.pathname.startsWith("/private-library/")) {
+      const PLIB_FALLBACK = "da69a6de36f8e5b813d2e72192b5b7cd1a3600d41df6359cdb9d0d819b3351a6";
+      const want = String((env && env.PLIB_PW) || "") || null;
+      const okPass = async (pw) => {
+        if (!pw) return false;
+        if (want) return String(pw) === want;
+        return (await sha256hex(pw)) === PLIB_FALLBACK;
+      };
+      const tokenFor = async () => (await sha256hex("plib1:" + (want || PLIB_FALLBACK))).slice(0, 32);
+      const loginPage = (bad) => new Response(
+        '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<meta name="robots" content="noindex,nofollow">' +
+        '<title>私密书库 · 需要口令 | SDE Universes</title><style>' +
+        'body{margin:0;background:#0F0B07;color:#F5EFE0;font-family:"Songti SC","Noto Serif SC",Georgia,serif;' +
+        'display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}' +
+        '.box{max-width:420px;width:100%;border:1px solid rgba(212,178,94,.25);border-radius:8px;padding:34px 28px;background:#15100A}' +
+        'h1{font-size:20px;letter-spacing:.16em;color:#D4B25E;margin:0 0 10px;font-weight:700}' +
+        'p{font-size:13.5px;line-height:1.9;color:#8B7E5E;margin:0 0 18px}' +
+        'input{width:100%;padding:11px 13px;background:#0F0B07;border:1px solid rgba(212,178,94,.3);' +
+        'border-radius:5px;color:#F5EFE0;font-size:15px;letter-spacing:.06em}' +
+        'button{width:100%;margin-top:12px;padding:11px;background:#D4B25E;border:0;border-radius:5px;' +
+        'color:#0F0B07;font-size:15px;font-weight:700;cursor:pointer}' +
+        '.bad{color:#C0522A;font-size:13px;margin-top:10px}' +
+        'a{color:#8B7E5E;font-size:12.5px;text-decoration:none;display:block;margin-top:16px}' +
+        '</style></head><body><div class="box"><h1>私密书库</h1>' +
+        '<p>这一栏不公开。口令验过之后才取书；正文不在本站仓库里。</p>' +
+        '<form method="POST"><input type="password" name="pw" autofocus autocomplete="current-password" placeholder="口令">' +
+        '<button type="submit">进入</button></form>' +
+        (bad ? '<div class="bad">口令不对。</div>' : "") +
+        '<a href="/drwang/">← 返回「王博士与 SDE」</a></div></body></html>',
+        { status: bad ? 401 : 401, headers: { "content-type": "text/html;charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex" } });
+
+      if (request.method === "POST") {
+        const form = await request.formData().catch(() => null);
+        const pw = form && form.get("pw");
+        if (!(await okPass(pw))) return loginPage(true);
+        const tok = await tokenFor();
+        return new Response(null, { status: 303, headers: {
+          location: url.pathname.endsWith("/") ? url.pathname : url.pathname + "/",
+          "set-cookie": "sde_plib=" + tok + "; Path=/private-library; Max-Age=2592000; HttpOnly; Secure; SameSite=Lax",
+          "cache-control": "no-store" } });
+      }
+      const ck = String(request.headers.get("cookie") || "");
+      const has = new RegExp("(?:^|;\\s*)sde_plib=([a-f0-9]{32})").exec(ck);
+      if (!has || has[1] !== (await tokenFor())) return loginPage(false);
+
+      // 验过了：从 R2 取。plib/ 前缀，仓库里没有这些字节。
+      const rest = url.pathname.replace(/^\/private-library\/?/, "");
+      const key = "plib/" + (rest === "" || rest.endsWith("/") ? (rest + "index.html") : rest);
+      if (env && env.PDFS) {
+        const obj = await env.PDFS.get(key, { range: request.headers, onlyIf: request.headers });
+        if (obj && obj.body) {
+          const h = new Headers();
+          obj.writeHttpMetadata(h);
+          if (!h.get("content-type")) h.set("content-type", key.endsWith(".html") ? "text/html;charset=utf-8" : "application/octet-stream");
+          h.set("cache-control", "private, no-store");     // 私密件不进边缘缓存
+          h.set("x-robots-tag", "noindex, nofollow");
+          return new Response(obj.body, { status: obj.range ? 206 : 200, headers: h });
+        }
+      }
+      // 桶里还没有东西：给一句能看懂的话，不要 404 让人以为门坏了
+      return new Response(
+        '<!DOCTYPE html><meta charset="utf-8"><meta name="robots" content="noindex">' +
+        '<title>私密书库</title><body style="margin:0;background:#0F0B07;color:#F5EFE0;font-family:Georgia,serif;padding:40px">' +
+        '<h1 style="color:#D4B25E;font-size:20px;letter-spacing:.14em">私密书库 · 已进门，架上还空着</h1>' +
+        '<p style="color:#8B7E5E;line-height:1.9;font-size:14px;max-width:640px">口令已验过（这台机器三十天内不用再输）。' +
+        '书还没有上架——正文按设计不进本站仓库（公开仓），只进 R2 桶的 <code>plib/</code> 前缀。' +
+        '上架之后这里就是书库目录。</p>' +
+        '<p style="margin-top:24px"><a href="/drwang/" style="color:#8B7E5E;font-size:13px">← 返回「王博士与 SDE」</a></p></body>',
+        { status: 200, headers: { "content-type": "text/html;charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex" } });
+    }
+
     if (url.pathname === "/api/register" && (request.method === "POST" || request.method === "OPTIONS")) {
       return handleRegister(request, env);
     }
