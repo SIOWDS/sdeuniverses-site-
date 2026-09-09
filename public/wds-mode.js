@@ -1040,6 +1040,7 @@
       followsHint: "刚冒出新说法就点 What，说清楚了点 How，能落地了点 Why；写虚了往 How 拉，写碎了往 Why 拉。",
       progH: "本篇进度", progOf: "格", progTodo: "还欠", progOK: "十格已齐，可以成文", progNo: "未走完，先别成文",
       progNext: "走下一格", progNextT: "按〔进度〕行报的未完成格算出来的；三条追问是备料，这一颗是主道",
+      razH: "底册审查 · 这一答违反了本书自己定的规矩", razT: "以下各条全部取自底册里已写下的条款，由正则比对得出，不经过基底。看到它就回去改，别往下走。",
       progCells: ["本篇不管什么", "五家逐家交手", "承重命题与靶位 Z", "土壤条件", "量具取值与编码", "检验设计与材料来源", "证伪条款与阈值", "辨别格", "反噬与误诊阻挡", "两个洞与引证自查"],
       followRecT: "按上一答走到哪一步推的；另外两条一样能点",
       followGet: ["点它会得到：把刚出现的那个说法钉成定义与结构",
@@ -1350,6 +1351,7 @@
       followsHint: "New term just appeared? Take What. Clear already? Take How. Workable already? Take Why.",
       progH: "PROGRESS", progOf: "cells", progTodo: "still missing", progOK: "All ten cells done \u2014 ready to write up", progNo: "Not finished \u2014 don't write it up yet",
       progNext: "Next cell", progNextT: "Computed from the cells the progress line reports as unfinished",
+      razH: "RAZ CHECK \u2014 this answer breaks the book's own rules", razT: "Every check below comes from a clause already written in the RAZ, matched by regex, with no model call.",
       progCells: ["What this piece does not cover", "Facing all five occupants", "Load-bearing claim and the blank target", "Ground conditions", "Instrument values and coding", "Test design and materials", "Falsifiers and thresholds", "Discrimination grid", "Backfire and misdiagnosis blocks", "The two holes and citation self-check"],
       followRecT: "Suggested from where the last answer got to; the other two still work",
       followGet: ["You get: the new term pinned down as a definition and a structure",
@@ -2412,6 +2414,11 @@
     ".wdsm-prog-bar{height:6px;border-radius:999px;background:var(--wfill2);overflow:hidden}" +
     ".wdsm-prog-in{height:100%;background:var(--wgold2);border-radius:999px}" +
     ".wdsm-prog-t{font-size:11.5px;line-height:1.7;color:var(--wdim2);margin-top:6px}" +
+    ".wdsm-raz{margin-top:10px;padding:9px 12px;border:1px solid var(--wgold2);border-left:3px solid var(--wgold);border-radius:10px;background:var(--wfill2)}" +
+    ".wdsm-raz-h{font-size:11.5px;letter-spacing:.5px;color:var(--wgold);font-weight:600;margin-bottom:6px}" +
+    ".wdsm-raz-r{font-size:12.5px;line-height:1.8;color:var(--wtx)}" +
+    ".wdsm-raz-r b{color:var(--wgold2);font-weight:600}" +
+    ".wdsm-raz-t{font-size:11px;line-height:1.65;color:var(--wdim2);margin-top:6px}" +
     ".wdsm-follows-h{width:100%;font-size:11px;letter-spacing:1px;color:var(--wdim2);margin-bottom:2px}" +
     /* 一起问：与追问 chip 同形，金边区分——它不是第四条追问，是把上面三条一起发出去的那颗 */
     ".wdsm-follow-all{background:none;border:1px solid var(--wgold2);color:var(--wgold);border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer}" +
@@ -4248,6 +4255,126 @@
     return 1;
   }
 
+  /* ═══ 底册 RAZ：本书的宪法（2026-09-09 王德生令）═══
+     从前底册只是开场那一条普通用户消息，越往后越被前面几格的正文推远，而内功每轮都在眼前。
+     现在：本场第一次挂底册时把它扣下来，此后**每轮随 payload 送**，服务端提到 system 级
+     （内功之后、语料之前）。只在九问专著这道工序里生效。 */
+  var RAZ = { text: "", turn: 0 };
+
+  // 认底册：够长 ＋ 至少三个只有底册才有的结构词。宁可认不出，不许把别的长文当宪法。
+  function razDetect(s) {
+    var t = String(s || "");
+    if (t.length < 2000) return "";
+    var hit = 0;
+    ["分工索引", "交手台账", "占位者", "作废纪律", "核验", "底册"].forEach(function (k) { if (t.indexOf(k) >= 0) hit++; });
+    return hit >= 3 ? t : "";
+  }
+
+  /* 违宪审查：拿底册里现成的字段扫这一答，不调模型、不花额度。
+     四条都取自底册自己写下的条款，所以它判的是「有没有违反你自己定的规矩」。 */
+  function razFields(raz) {
+    var t = String(raz || "");
+    var f = { readings: [], daikao: [], primed: [], must: [] };
+    /* 读数名有两种写法：①行文体「读数：X」②表格体「| 判定单位 | 读数列 | 它不管什么 |」。
+       表格体取「篇号行」的倒数第二格——九行索引的固定列序是 篇号/判什么/单位/读数/不管什么。
+       实测教训：只认①时，真底册（表格体）一条也抽不出，审查等于没开。 */
+    (t.match(/读数[：:＝=]\s*([^｜|\n，。]{2,24})/g) || []).forEach(function (m) {
+      var v = m.replace(/^读数[：:＝=]\s*/, "").trim(); if (v && f.readings.indexOf(v) < 0) f.readings.push(v);
+    });
+    t.split("\n").forEach(function (ln) {
+      if (ln.indexOf("|") < 0) return;
+      var c = ln.split("|").map(function (x) { return x.replace(/\*/g, "").trim(); }).filter(function (x) { return x !== ""; });
+      if (c.length !== 5) return;
+      if (!/^[WHY][123]$/.test(c[0])) return;              // 只认篇号行，表头与分隔行自动落空
+      c[3].split(/[、，,]/).forEach(function (v) {
+        v = v.trim(); if (v.length >= 2 && v.length <= 24 && f.readings.indexOf(v) < 0) f.readings.push(v);
+      });
+    });
+    /* 只认真撇号 U+2032（′），不认 ASCII 单引号——后者会把 Int'l、don't 这类英文缩写误当带撇符号。 */
+    (t.match(/[A-Za-z][A-Za-z_0-9]{0,8}\u2032/g) || []).forEach(function (m) { if (f.primed.indexOf(m) < 0) f.primed.push(m); });
+    (t.match(/[^\n]{0,60}〔待核[^〕]*〕/g) || []).forEach(function (m) {
+      var n = (m.match(/《([^》]{2,30})》/) || m.match(/([A-Z][A-Za-z&.\s]{3,24}\d{4})/) || [])[1];
+      if (n && f.daikao.indexOf(n) < 0) f.daikao.push(n);
+    });
+    /* 必引读数：按字符长度降序取前 6——长的那些（"37.86 亿元""82.42%"）才是经验支点，
+       短的（"5 家""11 家"）多半是行文里的顺口数字，拿它们当必引会把审查变成噪声。 */
+    (t.match(/\d[\d,.]*\s*(亿元|亿|万元|万|%|％|家|例|份)/g) || []).forEach(function (m) {
+      m = m.trim(); if (f.must.indexOf(m) < 0) f.must.push(m);
+    });
+    f.must = f.must.sort(function (x, y) { return y.length - x.length; }).slice(0, 6);
+    return f;
+  }
+
+  function razAudit(ans, raz) {
+    if (!raz || !ans) return null;
+    var f = razFields(raz), a = String(ans), out = [];
+    var borrowed = f.readings.filter(function (r) { return r && a.indexOf(r) >= 0; });
+    var lostPrime = f.primed.filter(function (s) {
+      var bare = s.slice(0, -1);
+      return a.indexOf(s) < 0 && new RegExp("(^|[^A-Za-z])" + bare + "(?![\u2032'A-Za-z])").test(a);
+    });
+    var badSupport = f.daikao.filter(function (n) {
+      var i = a.indexOf(n); if (i < 0) return false;
+      return a.slice(Math.max(0, i - 120), i + 120).indexOf("分离线") >= 0;
+    });
+    var usedMust = f.must.filter(function (m) { return a.indexOf(m) >= 0; });
+    if (borrowed.length > 1) out.push({ k: "可能借用了别题的读数名", v: borrowed.slice(0, 4).join("、") });
+    if (lostPrime.length) out.push({ k: "带撇符号掉了撇", v: lostPrime.slice(0, 4).join("、") });
+    if (badSupport.length) out.push({ k: "〔待核〕者被当分离线支点", v: badSupport.slice(0, 3).join("、") });
+    if (f.must.length && !usedMust.length) out.push({ k: "必引读数一个都没用", v: f.must.slice(0, 4).join("、") });
+    return out.length ? out : null;
+  }
+
+  /* 分层重送（2026-09-09）：底册两万字符 × 十几轮是真实的输入量，烧的是读者自己的 Key。
+     但**不能因此就只在开场挂一次**——那正是要治的病。折中：
+     · 每 5 格重送全文（含全部九格台账，供划界用）
+     · 其余各轮只送「常用件」＝头页纪律＋第一部分九行索引＋当前题那一格台账＋作废纪律＋术语纪律
+     常用件是每一格都用得着的；其余八题的台账只在划界那一格用得着。
+     🔴 认不出分节结构（不是标准底册体例）就一律送全文——宁可贵，不许送残的宪法。 */
+  // 当前是哪一题：从最近一条带〔进度〕行的答案里读「本题：X1」。读不到就返回空 → 送全文。
+  function razCurQ() {
+    for (var i = history.length - 1; i >= 0; i--) {
+      var m = String(history[i] && history[i].text || "").match(/〔进度〕[^\n]*?本题[：:]\s*([WHY][123])/);
+      if (m) return m[1];
+    }
+    return "";
+  }
+
+  function razSlice(raz, curQ, turn) {
+    var t = String(raz || "");
+    if (!t) return "";
+    if (turn % 5 === 0) return t;                       // 第 0、5、10… 格送全文
+    if (!curQ || !/^[WHY][123]$/.test(curQ)) return t;  // 不知道当前是哪一题，送全文
+    var lines = t.split("\n"), keep = [], mode = "head", hitQ = false;
+    for (var i = 0; i < lines.length; i++) {
+      var ln = lines[i];
+      if (/^# 第二部分/.test(ln)) { mode = "ledger"; keep.push(ln); continue; }
+      if (/^# 第[四七]部分/.test(ln)) { mode = "skip"; continue; }
+      if (/^# 第[五六]部分/.test(ln)) { mode = "head"; keep.push(ln); continue; }
+      if (mode === "ledger" && /^## /.test(ln)) { hitQ = ln.indexOf(curQ) >= 0; if (hitQ) keep.push(ln); continue; }
+      if (mode === "head") keep.push(ln);
+      else if (mode === "ledger" && hitQ) keep.push(ln);
+    }
+    var out = keep.join("\n");
+    // 切完反而没短多少，或短得不像话（结构没认出来），就退回全文
+    if (out.length < 800 || out.length > t.length * 0.9) return t;
+    return out + "\n\n〔本轮为分层重送：只带九行索引、" + curQ + " 那一格台账与两条纪律；其余八格台账每 5 格随全文重送一次。划界时若需别题台账，直接说「重挂全底册」。〕";
+  }
+
+  function razRender(cell, list) {
+    if (!list || cell.razbox || cell.tool !== "book9") return;
+    var box = el("div", "wdsm-raz");
+    box.appendChild(el("div", "wdsm-raz-h", t("razH")));
+    list.forEach(function (v) {
+      var r = el("div", "wdsm-raz-r");
+      r.appendChild(el("b", null, v.k));
+      r.appendChild(document.createTextNode("　" + v.v));
+      box.appendChild(r);
+    });
+    box.appendChild(el("div", "wdsm-raz-t", t("razT")));
+    cell.turn.appendChild(box); cell.razbox = box;
+  }
+
   /* 〔进度〕行（2026-09-09 王德生令）：九问专著一轮只走一格，从前只有〔落位〕报「站在哪」，
      报不了「第几格、还欠什么、够不够成文」——只能靠旁边有人数。基底自报，这里只渲染。
      🔴 认不出就不画：宁可没有条，不许画一根猜出来的条。 */
@@ -5160,7 +5287,9 @@
     // （按钮在分身页本就不出现，读者按不到它，但状态是跨页共享的同一把 key），也绝不把它发出去——
     // 分身是一份策展过的人格，不该因为一个借来的开关状态就被静默拆穿。
     var _m3 = memRecall3(q);
-    var payload = { q: q, history: histPack(compFrom()), umem: _m3 ? "" : memRecall(q), umem3: _m3 || undefined, key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1) };
+    // 本场第一次挂底册时扣下来，此后每轮随 payload 送（只在九问专著里）
+    if (curTool === "book9" && !RAZ.text) { var _r = razDetect(q); if (_r) { RAZ.text = _r; RAZ.turn = history.length; } }
+    var payload = { q: q, history: histPack(compFrom()), umem: _m3 ? "" : memRecall(q), umem3: _m3 || undefined, key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1), raz: (curTool === "book9" && RAZ.text) ? razSlice(RAZ.text, razCurQ(), RAZ.turn++) : undefined };
     if (thinkMode === "deep") payload.grade = gradePin ? gradePin : "auto";   // 难度条：自动按检索定档，或读者钉死的档
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
     var pics = imgsForSend();
@@ -5247,7 +5376,7 @@
                否则它会被挂到操作按钮下面，读者以为是页脚。 */
             if (toolSpec && !stoppedByUser) toolAuditRender(cell, answer, toolSpec);
             flushSrcs();                                  // 先正文，后文献
-            history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); mountActs(cell, answer);
+            history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer);
             if (_led) ledgerRender(cell, _led, answer);      // 记分牌挂在正文之外，不进导出稿
             if (_preg && !_preg.empty) pregRender(cell, _preg);   // 预注册卡→判断账（正文之外）
             cvTake(answer);                                 // 先看是不是「就地改」的回稿（收成下一版），否则扫围栏块
@@ -5336,7 +5465,7 @@
       .catch(function (e) {
         clearTimeout(wd);
         if (!stoppedByUser) { cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = t("errNet") + (e && e.message) + t("errNetEnd"); }
-        else if (answer) { cell.a.innerHTML = mdRender(answer); history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); mountActs(cell, answer); }
+        else if (answer) { cell.a.innerHTML = mdRender(answer); history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer); }
         endUI();
       });
   }

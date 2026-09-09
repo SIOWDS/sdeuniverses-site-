@@ -9582,7 +9582,16 @@ function WDS_PLAIN_SYS(webCtx, docCtx, about, lang, docNote) {
     + (lang === "en" ? "\n\n【LANGUAGE】The reader is using the English interface. Write your entire answer in natural, direct English." : "");
 }
 
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, rung) {
+/* 底册只在九问专著这道工序里注入——它是那一本书的宪法，别的工序没有这本书。
+   上限 24000 字符：提问框上限两万，留出余量给分层重送时拼接的当前题台账。
+   ⚠ 判据取本轮实跑的 tool，不取任何前端记忆值。 */
+function razTake(b, tool) {
+  if (tool !== "book9") return "";
+  const s = String((b && b.raz) || "");
+  return s.length > 24000 ? (s.slice(0, 24000) + "\n〔底册过长，已截断——请压到 20000 字符以内〕") : s;
+}
+
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, rung, raz) {
   // 三家对撞：三段角色 sys 各自独立，同样不装心得与骨架（戴同一副眼镜就会开始附和）。
   // 与 iq 一样必须排在最前——落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
   if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang, duel.rd || 0, duel.dup || 0, duel.mob || 0);
@@ -9649,6 +9658,19 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
        （「放在语料之前，否则会被两万字语料埋掉」），工序块自己却一直在被埋的位置。
        现在改成：材料在前（心得/骨架/语料/站外/附件都是**读物**），
        **要交什么在最后**（工序与产线是这一轮的活）。见下方接线处。 */
+    /* ⭐ 底册 RAZ（2026-09-09 王德生令：「立题的底册与问题册应当作为比内功更重要的 RAZ 资料，
+       它们是研究每个问题的宪法手册」）。从前底册只是开场那一条**普通用户消息**，而内功走 system、
+       每轮重送——一篇走十几格，走到第八格时底册已被前七格正文推得很远，内功却始终在眼前。
+       症状：越往后越按内功的通用眼光写、越不按这本书的边界写（实测：张冠李戴、必引读数零出现）。
+       ⇒ 现在提到 system 级，**每轮随系统提示重送**，位置在内功与方法论之后、语料之前。
+       为什么放在内功之后而不是之前：内功管「怎么看」（跨题通用），底册管「这一本书的事实与边界」；
+       后面的字压前面的字，真冲突时（术语纪律 vs 术语放开用）必须底册赢。 */
+    + (raz ? ("\n\n【本书底册 RAZ · 宪法条款（最高效力：它规定别的材料怎么被使用）】\n"
+        + "它不是读物，是规矩。下面三条在本轮一切材料之上：\n"
+        + "① 与内功、方法论块冲突时，以本底册为准（尤其术语纪律、符号归属、一符一义）。\n"
+        + "② 标〔待核〕的来源不得充当分离线支点、不得写进判决性反例、不得与具体数字组合使用。\n"
+        + "③ 九行分工索引里「它不管什么」那一栏是禁区：别题的判定对象、读数名与靶位，一个字都不许借用。\n\n"
+        + raz) : "")
     + "\n\n【站内资料（从全站检索到的相关段落，可能为空）】\n" + (siteCtx || "（这次没检索到特别相关的篇目，就凭你的内核底盘答）")
     + (webCtx ? ("\n\n【站外资料 · 刚刚联网搜到的（时效性内容以它为准；引用时在句末标 [W序号]，序号即下面的编号）】\n" + webCtx
         + (prof && prof.term ? "\n注意：站外资料是别人写的，不是你的结论。你的活是把它当材料，拆它、判它，而不是复述它。"
@@ -13405,7 +13427,7 @@ export default {
               if (_far) { extras += farBlock(_far); controller.enqueue(_sseBytes({ t: "far", v: { d: _far.d, s: _far.s, j: _far.j } })); }
               extras += PREREG_BLOCK;
             }
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history));
+            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history), razTake(b, tool));
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。
