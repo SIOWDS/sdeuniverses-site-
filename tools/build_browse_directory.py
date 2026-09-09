@@ -245,7 +245,7 @@ try{ var _l=localStorage.getItem('sde_wds_lang'); if(_l==='en') setLang('en'); }
   }catch(e){}
 })();
 </script>
-<script src="/wds-mode.js?v=20260909n" defer></script>
+<script src="/wds-mode.js?v=20260909p" defer></script>
 </body>
 </html>
 """

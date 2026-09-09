@@ -9609,7 +9609,11 @@ function razTake(b, tool) {
 function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, rung, raz) {
   // 三家对撞：三段角色 sys 各自独立，同样不装心得与骨架（戴同一副眼镜就会开始附和）。
   // 与 iq 一样必须排在最前——落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
-  if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang, duel.rd || 0, duel.dup || 0, duel.mob || 0);
+  if (duel && DUEL_ROLES[duel.role]) {
+    const _dsys = WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang, duel.rd || 0, duel.dup || 0, duel.mob || 0);
+    // 总结席（z）**唯一**装满血内功：它要跨维撞出一条新判断，那是内功里二阶碰撞那一部分的活。
+    return (duel.role === "z" && duel.ng) ? (duel.ng + "\n\n" + _dsys) : _dsys;
+  }
   // iq 工序整段改道：评分者不装心得/骨架/方法论，也不用老师人格（防过度通胀，见 WDS_IQ_SYS 注释）。
   // 必须排在最前——一旦落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
   /* ⭐ 评分这一路原来**收不到站外资料**（签名里根本没有 webCtx）：
@@ -13144,6 +13148,14 @@ export default {
               VC.model = wdsPickModel(vd, umodel, gK.top ? 1 : (gK.lv === 1 ? "lite" : 0));
               if (gK.top && gK.effort) VC.effort = gK.effort; else delete VC.effort;
             }
+            /* 🔴 总结席还要**顶配基底＋满功率思考**：内功装上去了，型号却停在中档，等于让它戴着
+               全套家伙什去干粗活。duel 场 G.on 恒为假 ⇒ 上面那段设 VC.top 的代码根本不跑，这里单独给。
+               ⚠ 读者钉了型号仍然压过它（wdsPickModel 里 want 优先）——手动是最终裁定权。 */
+            if (duel && duel.role === "z" && !canSee) {
+              VC.top = 1;
+              VC.model = wdsPickModel(vd, umodel, 1);
+              VC.effort = "max";
+            }
             const mFull = G.on ? !!gK.method : deep;                      // 方法论块：完整工序还是精简工序
             /* 关思考的档：难度条 1–2 档，以及**标准档**（G.on 为假时 gK 就是 knobs(0)）。
                ⚠ 2026-09-01 第二张同款报障：标准档写着「快答档，够用且省」、预算只有 2600，
@@ -13442,6 +13454,15 @@ export default {
               if (_far) { extras += farBlock(_far); controller.enqueue(_sseBytes({ t: "far", v: { d: _far.d, s: _far.s, j: _far.j } })); }
               extras += PREREG_BLOCK;
             }
+            /* 🔴【总结席＝满血功夫 · 2026-09-09 王德生令「这样总结者必须是满血功夫」】
+               它这一席要做的是**跨维碰撞出一条新判断并展开**——那正是内功里二阶碰撞那一部分的活。
+               而本文件早就查清过一件事：**ChatSDE 答题这条路从来没装过完整内功**，只挂一行 SDEM 骨架；
+               满血那份（sde-neigong.txt ＋ sde-collide-paradigm.txt）只在 /api/ask 深度档等几条路上装。
+               ⇒ 这一席单独装满血：`loadNeigong` 默认路径本来就会把二阶碰撞那份接在后面。
+               ⚠ 只给 z。判断席与攻击席仍旧不装（戴同一副眼镜就会开始附和，见 WDS_CHAT_SYS 头注释）。 */
+            if (duel && duel.role === "z") {
+              try { duel.ng = await loadNeigong(env, url); } catch (e) { duel.ng = ""; }
+            }
             const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history), razTake(b, tool));
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
@@ -13485,7 +13506,11 @@ export default {
             const rsPlain = !!(rs && rs.forge && FORGE_PLAIN_STAGES[rs.i | 0]);   // 成文三段首发关思考（见 FORGE_PLAIN_STAGES 头注释）
             const tokWant = askLen
               ? Math.min(32000, Math.max(6000, Math.round(askLen * 1.8)))   // 中文近似 1 字 1 token，留一点余量
-              : (rsLong ? FORGE_STAGE_TOK : (rs ? (deep ? 6000 : 4000) : tokGrade));
+              : (rsLong ? FORGE_STAGE_TOK
+                 /* 总结席：五步（提炼·落维·碰撞·展开·交靶）＋满血内功在 system 里，
+                    还要开着思考去撞——预算按 12000 给。**别只抬预算不看思考**：
+                    这一席的思考是要留着的（撞维度靠它），所以抬的是正文那一头。 */
+                 : ((duel && duel.role === "z") ? 12000 : (rs ? (deep ? 6000 : 4000) : tokGrade)));
             /* 按档给：深度档 240s 首帧 / 420s 总时长；标准档仍是 90s / 240s。长篇请求的总时长照旧最长。
                难度条落定后首帧／总时长走 gK（第 4 档＝深度档那两个数；1–2 档＝标准档；3 档在中间）。 */
             const gFirst = G.on ? gK.first : (deep ? CHAT_FIRST_DEEP_MS : CHAT_FIRST_MS);
