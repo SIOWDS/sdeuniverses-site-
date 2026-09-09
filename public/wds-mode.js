@@ -5349,17 +5349,33 @@
        混成一句「没生出来」等于什么都没说。这四个读数是**客户端唯一还留得住的证据**——
        服务端 note 挂在 cell.turn 上，导出 PDF 只取 .wdsm-a，一导出全丢。 */
     var tStart = Date.now(), frames = 0, sawDone = false, lastBeat = null;
+    var lastHTML = "";                 // 上一次真正贴上去的 HTML：一样就不重建（见 paint 里的注释）
 
     function paint() {
       var now = Date.now();
       // 这里仍是整篇重排（对话区一答通常两三段，改造收益不抵风险）。
       // 但长答会退化成 O(N²)，所以节流随长度放宽：越长越少排，最慢每 700ms 一次。
       // 真正的增量渲染在成文面板那一侧（一万字起步的是它）。
-      if (now - lastPaint < Math.min(700, 110 + answer.length / 30)) return;
+      if (now - lastPaint < Math.min(700, 180 + answer.length / 30)) return;
       lastPaint = now;
-      cell.a.innerHTML = mdRender(ledgerStrip(answer)) + "<span class='cur'>▊</span>";
-      typesetSync(cell.a);            // 与贴 innerHTML 同一个任务里排完，浏览器只画最终形态 ⇒ 不闪
-      if (stick) scrollBottom();
+      var _html = mdRender(ledgerStrip(answer)) + "<span class='cur'>▊</span>";
+      /* 🔴【闪屏 · 2026-09-09 王德生报障「问对出现闪屏」】
+         这一行是**整段 innerHTML 替换**——每重排一次，正文里的 KaTeX 节点、代码块、表格
+         全部被销毁再重建。短答看不出来；三道问对那种**带公式的长答**，一秒重建好几次，
+         就是读者看见的那一闪一闪。
+         两处改法（都不改渲染结果，只改重建次数与重建内容）：
+         ① **内容没变就不贴**——流式收尾、心跳、以及节流边界上会出现同一段文本重排两次，
+            那两次纯属白重建。字符串比一次的代价远小于一次 DOM 重建。
+         ② **流式期间不排公式**：`typesetSync` 每次都要把新建的 raw 节点重新渲染一遍，
+            而下一次重排又把它们扔掉。改为**收尾时排一次**（finish 里已经有 mdRender，
+            那里补一次 typeset 即可）。流式中公式暂以 `$…$` 原文显示——它本来就是
+            金色等宽的 raw 样式，读者看得出那是待排的式子。
+         ⚠ 不动节流公式的上限（700ms），只把下限从 110 抬到 180：110ms 对长答等于每秒九次全量重建。 */
+      if (_html !== lastHTML) {
+        lastHTML = _html;
+        cell.a.innerHTML = _html;
+        if (stick) scrollBottom();
+      }
     }
     /* 诊断行**贴进 .wdsm-a**（不是 cell.turn）：只有写在正文里，导出 PDF 才带得走。
        上一次排障就是栽在这儿——用户交来的导出稿里一条服务端 note 都没有。 */
@@ -5403,6 +5419,7 @@
             var _preg = pregTake(answer);
             if (_preg && _preg.body != null) answer = _preg.body;   // 预注册卡也剥出正文（同交账，不进历史/成文/PDF）
             cell.a.innerHTML = mdRender(answer);
+            typeset(cell.a);              // 公式在这里排一次（流式期间不排，见 paint 里那段闪屏注释）
             if (stoppedByUser) { var n = el("div", null, t("stopped")); n.style.cssText = "color:#6b7684;font-size:12px;margin-top:8px"; cell.a.appendChild(n); }
             /* ⭐ 工序交付审计：缺件就在这里如实标出来。放在 flushSrcs 之前——
                它属于正文的读数，不属于文献区；也必须在 mountActs 之前，
