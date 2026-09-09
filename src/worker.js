@@ -8734,8 +8734,9 @@ const DUEL_ROLES = { a: 1, b: 1, c: 1 };
    后面几轮撞的其实还是它第一轮划下的那条线。
    这一轮最大的危险不是撞不出来，是**同义重述**——把上一轮的结论换个说法再说一遍，
    三栏都满、读起来还挺像样，却一层也没往下走。所以下面每一席都写死了反空转条款。 */
-function WDS_DUEL_SYS(role, prior, siteCtx, lang, rd) {
+function WDS_DUEL_SYS(role, prior, siteCtx, lang, rd, dup) {
   const RD = (rd | 0) >= 2 ? (rd | 0) : 0;
+  const DUP = dup ? 1 : 0;
   const RDH = RD ? ("\n\n【这是第 " + RD + " 轮】前面几轮已经撞过，下面那段是上一轮的结算。") : "";
   const EN = (lang === "en") ? "\n\n【LANGUAGE】Write your entire answer in English." : "";
   const SITE = "\n\n【站内已有的相关文本（参照系，不是要你复述它）】\n" + (siteCtx || "（这次没检索到相关篇目）");
@@ -8766,6 +8767,9 @@ function WDS_DUEL_SYS(role, prior, siteCtx, lang, rd) {
   }
 
   if (role === "b") {
+    /* 【异质席 · 2026-09-09】攻击席**不喂站内语料**。三席都读同一批站内文本，
+       攻击就会从同一副语料里长出来——那是同源共振，不是独立检验。
+       它要读的只有一样：第一家逐字写下的原文。 */
     return "你是三家对撞里的**第二家**，**由另一家模型写下的判断刚刚摆在你面前**。" + RDH
       + "\n你的活只有一件：**攻击它**。"
       + "\n\n· **不许补充，不许附和，不许「它说得对，我再补一点」。**你和它出自不同的训练语料、不同的取舍，"
@@ -8774,13 +8778,24 @@ function WDS_DUEL_SYS(role, prior, siteCtx, lang, rd) {
       + "［事实错／概念偷换／推理跳步／循环论证／隐藏前提／类比不说理／不可证伪］。"
       + "\n· 其中**至少一处必须是它的承重命题**——只挑边角料的错，是假攻击。"
       + "\n· 给一条**判决性对照**：如果某个观测结果是 X，那么它错、你对。要具体到能去查。"
+      + "\n· **每一处攻击都必须带一条改法**：若这一处成立，它那条判断应当怎么改——"
+      + "［改成立条件／缩适用范围／整条撤回］三选一，并把改后的话写出来。"
+      + "**提不出改法的意见不算攻击**：它没有可被处置的东西，下一家也无从结算。"
       + "\n· 最后一句留给诚实：它有没有哪一处是你攻不动的？攻不动就直说攻不动，**不要为了显得锋利而硬凑**。"
+      + "\n\n【末尾必须单起一行自报一句，逐字照这个格式，不要解释】"
+      + "\n〔攻击面〕承重：N 处｜边角：N 处｜改法：N 条｜判决性对照：有/无｜攻不动：有/无"
       + "\n\n【第一家写下的判断（逐字，就是你要攻的东西）】\n" + (prior || "（上一家没有产出，直接说无从攻起）")
-      + SITE + EN;
+      + "\n\n【你不读站内参照系】这一席不给你本站的相关篇目——三席读同一批语料，攻击就会从同一副语料里长出来。"
+      + "你要读的只有上面那段原文。"
+      + EN;
   }
 
   // c：裁决者。它没参与前两步的写作，所以它是全场唯一有资格结算的人。
-  return "你是三家对撞里的**第三家**。前两家已经交过手：一家出判断，另一家攻它。" + RDH
+  const DUPN = DUP ? ("\n\n🔴【本轮降级 · 你参与过写作】只有两家填了 Key，第三席沿用了第一席——"
+    + "**你就是写下第一条判断的那一家**。评估者参与过写作，这一场的结算不作数。"
+    + "**所以本轮全文不许出现「【结算】」四个字**，改为在末尾写一句「待结算：…」并注明本轮降级。"
+    + "该做的量维、共有前提、推翻材料照做，只是不许收口。") : "";
+  return "你是三家对撞里的**第三家**。前两家已经交过手：一家出判断，另一家攻它。" + RDH + DUPN
     + (RD ? ("\n\n【这一轮你多一件事 · 反空转】下面那段材料的**末尾附着上一轮的结算原文**。"
       + "结算之前先判一句：**这一轮相对上一轮，真的往下走了一层吗？**"
       + "判据只有一条——这一轮的产物能不能由上一轮那句结算直接推出。能，就是同义重述，"
@@ -8815,6 +8830,8 @@ function WDS_DUEL_SYS(role, prior, siteCtx, lang, rd) {
     + "同维复述没有可当靶子的东西。"
     + "\n\n**这一场撞不出东西，就直说撞不出来，并指明卡在哪一步**——两家其实在说同一件事、或者攻击没落到承重位，都是撞不出来的正当理由。"
     + "**不要为了交差凑一个漂亮的合题**：温和综合（「双方各有道理，应辩证看待」）是这套流程唯一不许出现的产物。"
+    + "\n\n【末尾必须单起一行自报一句，逐字照这个格式，不要解释】"
+    + "\n〔对撞〕维：异维/同维｜攻中承重：N 处｜改法：N 条｜结算：出/未出｜降级：是/否"
     + "\n\n【第一家的判断与第二家的攻击（逐字）】\n" + (prior || "（前两步没有产出）")
     + SITE + EN;
 }
@@ -9467,7 +9484,7 @@ function WDS_PLAIN_SYS(webCtx, docCtx, about, lang, docNote) {
 function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, rung) {
   // 三家对撞：三段角色 sys 各自独立，同样不装心得与骨架（戴同一副眼镜就会开始附和）。
   // 与 iq 一样必须排在最前——落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
-  if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang, duel.rd || 0);
+  if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang, duel.rd || 0, duel.dup || 0);
   // iq 工序整段改道：评分者不装心得/骨架/方法论，也不用老师人格（防过度通胀，见 WDS_IQ_SYS 注释）。
   // 必须排在最前——一旦落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
   /* ⭐ 评分这一路原来**收不到站外资料**（签名里根本没有 webCtx）：
@@ -12784,7 +12801,9 @@ export default {
       const duelRaw = noSde ? null : ((b && typeof b.duel === "object" && b.duel) ? b.duel : null);
       const duel = (duelRaw && DUEL_ROLES[String(duelRaw.role || "")])
         ? { role: String(duelRaw.role), prior: String(duelRaw.prior || "").slice(0, 24000),
-            rd: Math.max(0, Math.min(9, parseInt(duelRaw.rd, 10) || 0)) } : null;
+            rd: Math.max(0, Math.min(9, parseInt(duelRaw.rd, 10) || 0)),
+            // dup=1：只有两家有 Key，第三席沿用了第一席 ⇒ 结算者参与过写作，本轮不许出【结算】。
+            dup: (duelRaw.dup ? 1 : 0) } : null;
       // COMPACTION：本场更早的对话已在读者本机压成一份「账本」（只留判断/否决/分离线/悬案）。
       // 它替代的是被裁掉的原文，所以位置在历史之前、且必须**标明它是账本不是原文**——
       // 否则它会照着账本复述，把压缩过的结论当成自己刚说过的话。

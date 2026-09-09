@@ -1714,6 +1714,15 @@
       triSpun: "⚠ 结算席自报这一场没往下走（空转，或两家落在同一维上）。不再给「继续对撞」——拿一句假结算当下一轮的靶子只会越撞越空。",
       triWait: "（等上一家写完）",
       triSame: "⚠ 只有两家有 Key，第三家沿用了第一家——结算者参与过写作，这一轮的结论只作参考。填第三家的 Key 可解。",
+      triDupNoMore: "⚠ 降级场不给「继续对撞」：第三席就是第一席，这一轮不出结算，也就没有可当下一轮靶子的东西。填第三家的 Key 即可正常续轮。",
+      duelHb: "攻击面", duelHc: "对撞",
+      duelLoad: "承重", duelLoadT: "攻在承重命题上的处数。只挑边角料的错是假攻击——这一格为 0 就是没真攻。",
+      duelFix: "改法", duelFixT: "带出改法（改条件／缩范围／撤回）的处数。提不出改法的意见不算攻击：它没有可被处置的东西。",
+      duelDec: "判决性对照", duelDecT: "有没有给出「若观测到 X 则它错」这种能去查的对照。",
+      duelStuck: "攻不动", duelStuckT: "它自报有没有攻不动的地方。如实说攻不动是好事，不标红。",
+      duelDiff: "异维", duelSame: "同维复述",
+      duelDimT: "两家是不是落在同一样东西上（显露／路径／纠缠）。同维＝两人拿同一副眼镜看同一处，看见的当然一样，那不是这道题的共有前提。",
+      duelSet: "结算", duelSetT: "这一场有没有收口出一句谁都没单独说过的话。降级场按规矩不出结算，此格标灰不标红。",
       triFail: "上一家没写出东西，这一步没法往下走。",
       triSave: "⤓ 存这一场",
       triSeat: "对撞三席", triFixed: "① 出判断（你当前的基底）",
@@ -1865,6 +1874,15 @@
       triA: "1. The claim", triB: "2. The attack", triC: "3. The shared premise",
       triIdle: "The previous seat only restated the last round; this round stopped here.",
       triIdleN: "\u26a0 This round was judged a restatement (seat one named no differing word and did not say the clash had bottomed out). Stopped at seat one.",
+      triDupNoMore: "\u26a0 Degraded round: seat three is seat one, so no verdict is issued and there is nothing to aim the next round at. Add a third key to continue.",
+      duelHb: "Attack", duelHc: "Clash",
+      duelLoad: "Load-bearing", duelLoadT: "Hits on the load-bearing claim. Nitpicking the trim is not an attack \u2014 zero here means nothing real was hit.",
+      duelFix: "Fixes", duelFixT: "Hits that come with a fix (tighten the condition / narrow the scope / withdraw). An objection with no fix cannot be acted on.",
+      duelDec: "Decisive test", duelDecT: "Did it give a checkable if-we-observe-X test?",
+      duelStuck: "Held", duelStuckT: "Whether it admits something it could not attack. Saying so honestly is good \u2014 not flagged.",
+      duelDiff: "Different axes", duelSame: "Same axis",
+      duelDimT: "Whether both landed on the same thing (showing / path / entanglement). Same axis = same glasses on the same spot.",
+      duelSet: "Verdict", duelSetT: "Did the round close on a sentence neither side said alone? Degraded rounds issue none by rule \u2014 greyed, not flagged.",
       triSpun: "\u26a0 The settling seat reported that this round went nowhere (idle, or both seats landed on the same dimension). No \u201ckeep clashing\u201d button \u2014 aiming the next round at an idle verdict only compounds it.",
       triWait: "(waiting for the previous model)",
       triSame: "\u26a0 Only two keys found, so the third seat reuses the first model \u2014 the judge also wrote. Treat this verdict as provisional; add a third key to fix it.",
@@ -4208,6 +4226,53 @@
     cell.turn.appendChild(box); cell.prog = box;
   }
 
+  /* 〔攻击面〕〔对撞〕两行机检面（2026-09-09）：对撞此前只有正文，判不出这一场是真撞还是互相客气。
+     两席各自报一行，这里只渲染——**认不出就不画**，与进度条同一条纪律。 */
+  function duelParse(text) {
+    var s = String(text || "");
+    function seg(line, k) { var r = line.match(new RegExp(k + "[：:]\\s*([^｜|\\n]*)")); return r ? r[1].trim() : ""; }
+    var b = s.match(/〔攻击面〕([^\n]*)/);
+    if (b) {
+      var L = b[1];
+      function num(k) { var v = seg(L, k), m = v.match(/(\d+)/); return m ? parseInt(m[1], 10) : null; }
+      return { kind: "b", load: num("承重"), edge: num("边角"), fix: num("改法"),
+               decisive: /有/.test(seg(L, "判决性对照")), stuck: /有/.test(seg(L, "攻不动")) };
+    }
+    var c = s.match(/〔对撞〕([^\n]*)/);
+    if (c) {
+      var L2 = c[1];
+      function num2(k) { var v = seg(L2, k), m = v.match(/(\d+)/); return m ? parseInt(m[1], 10) : null; }
+      var dim = seg(L2, "维");
+      return { kind: "c", same: /同维/.test(dim), load: num2("攻中承重"), fix: num2("改法"),
+               settled: /出/.test(seg(L2, "结算")) && !/未出/.test(seg(L2, "结算")),
+               dup: /是/.test(seg(L2, "降级")) };
+    }
+    return null;
+  }
+  /* 一行 chip，复用账本那套皮（wdsm-led）。绿＝做到，红＝没做到，灰＝中性如实申报。 */
+  function duelRender(box, d) {
+    if (!d) return null;
+    var w = el("div", "wdsm-led");
+    w.appendChild(el("i", "lh", d.kind === "b" ? t("duelHb") : t("duelHc")));
+    function chip(okv, label, tip, neutral) {
+      var c = el("i", "lc" + (neutral ? " nu" : (okv ? " ok" : " no")), label);
+      c.title = tip || ""; w.appendChild(c);
+    }
+    if (d.kind === "b") {
+      chip(d.load > 0, t("duelLoad") + " " + (d.load == null ? "—" : d.load), t("duelLoadT"));
+      chip(d.fix > 0, t("duelFix") + " " + (d.fix == null ? "—" : d.fix), t("duelFixT"));
+      chip(d.decisive, t("duelDec") + (d.decisive ? " ✓" : " —"), t("duelDecT"));
+      chip(true, t("duelStuck") + (d.stuck ? " ✓" : " —"), t("duelStuckT"), true);
+    } else {
+      chip(!d.same, (d.same ? t("duelSame") : t("duelDiff")), t("duelDimT"));
+      chip(d.load > 0, t("duelLoad") + " " + (d.load == null ? "—" : d.load), t("duelLoadT"));
+      chip(d.fix > 0, t("duelFix") + " " + (d.fix == null ? "—" : d.fix), t("duelFixT"));
+      chip(d.settled && !d.dup, t("duelSet") + (d.settled ? " ✓" : " —"), t("duelSetT"), d.dup);
+    }
+    box.appendChild(w);
+    return w;
+  }
+
   function renderFollows(cell, qs, ansText) {
     if (!qs || !qs.length || cell.follows) return;
     var box = el("div", "wdsm-follows");
@@ -5495,13 +5560,17 @@
           mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(),
           about: aboutPlus(), lang: LANG,
           // rd 只在第二轮起才递：第一轮的三席提示语一个字都不该变
-          duel: { role: ROLES[i], prior: prior, rd: rd > 1 ? rd : 0 }
+          // dup=1：只有两家 Key、第三席沿用第一席。递上去让 c 席自己知道要禁结算——
+          // 光在前端画一句提示不管用，它照样会收口，下一轮就拿这个假结算当靶子。
+          duel: { role: ROLES[i], prior: prior, rd: rd > 1 ? rd : 0, dup: (seats.degraded && i === 2) ? 1 : 0 }
         };
         if (COMP.text) pl.comp = COMP.text;
         return rsStream(API, pl, function (txt) {
           row.text = txt; row.bd.innerHTML = mdRender(txt) + "<span class='cur'>\u258a</span>";
         }).then(function (txt) {
           row.text = txt; row.bd.innerHTML = mdRender(txt);
+          // 这一席自报的那行机检面，画在它自己那一栏下面（认不出就不画）
+          try { duelRender(row.bd.parentNode, duelParse(txt)); } catch (e2) {}
           return txt;
         }).catch(function (e) {
           row.bd.className = "wdsm-a plain wdsm-err";
@@ -5577,6 +5646,10 @@
           var n1 = el("div", "wdsm-tinote"); n1.textContent = t("triIdleN"); row2.appendChild(n1);
         } else if (spun) {
           var n2 = el("div", "wdsm-tinote"); n2.textContent = t("triSpun"); row2.appendChild(n2);
+        } else if (seats.degraded) {
+          /* 【2026-09-09】降级场（第三席＝第一席）本来就不许出结算，自然也没有可当靶子的东西。
+             此前照给「继续」，下一轮就拿一个自评的结论当靶子——越撞越自证。 */
+          var n3 = el("div", "wdsm-tinote"); n3.textContent = t("triDupNoMore"); row2.appendChild(n3);
         } else if (res && res.ok && res.verdict) {
           var go = el("button", "wdsm-act", t("triMore"));
           go.title = t("triMoreT");
