@@ -5510,6 +5510,8 @@
     }
   }
   if (mobBtn) mobBtn.onclick = function () { if (streaming) return; menuAt(mobBtn, mobFill); };
+  mobPaint();                        // 🔴 初始就要有字——不画一次就是一颗**零宽空框**，读者在模式条上根本看不见它。
+                                     // 三家对撞那一行的注释里写着这条"模式条空按钮的老漏法"，我这次还是踩了。
 
   function sendMob(q, cell) {
     var seats = mobSeats();
