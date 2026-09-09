@@ -1721,6 +1721,12 @@
       mobHave: "现在有 {n} 家 Key 可坐（判断 1 ＋ 攻击 N-3 ＋ 结算 2）",
       mobNeed: "⚠ 群碰至少需要 4 家填了 Key（判断 1 ＋ 攻击 1 ＋ 结算 2）。同一家不重复占座——自己攻自己不算攻。",
       mobAuto: "自动（有几家用几家）", mobSeatN: " 席",
+      mobManual: "先定几席，再逐席点名谁坐哪一位。留「自动」＝按顺序取还没坐过的；同一家不能坐两个位子。",
+      mobAssign: "逐席指派",
+      mobRowA: "① 出判断（平常话·不吃语料）",
+      mobRowM: "② 攻击 · 第",
+      mobRowS: "③ 结算（吃 SDE·并行互不读）· 第",
+      mobTaken: "（已被别席点名）",
       mobGo: "开始群碰", mobStop: "停止群碰",
       mobA: "判断", mobM: "攻", mobS: "结算",
       mobNone: "（还没有人攻过）", mobUnk: "未指名",
@@ -1737,7 +1743,9 @@
       duelSet: "结算", duelSetT: "这一场有没有收口出一句谁都没单独说过的话。降级场按规矩不出结算，此格标灰不标红。",
       triFail: "上一家没写出东西，这一步没法往下走。",
       triSave: "⤓ 存这一场",
-      triSeat: "对撞三席", triFixed: "① 出判断（你当前的基底）",
+      triSeat: "对撞三席 · 逐席指派", triFixed: "① 出判断（你当前的基底）",
+      triManual: "三席都可以点名。留「自动」＝ ① 用你当前的基底，②③ 按顺序取还没坐过的。",
+      triPick1: "① 出判断（平常话，不吃站内语料）",
       triPick2: "② 攻击它的用谁", triPick3: "③ 结算的用谁",
       triAuto: "自动（按已填 Key 依次取）",
       triDupWarn: "（与前一席同家，撞不出异质）", triGo: "⚔ 开始对撞", triStop: "不对撞",
@@ -1893,6 +1901,12 @@
       mobHave: "{n} keyed houses available (1 judge + N-3 attackers + 2 settlers)",
       mobNeed: "\u26a0 Mob needs at least 4 keyed houses. No house takes two seats \u2014 attacking yourself is not an attack.",
       mobAuto: "Auto (use all keyed)", mobSeatN: " seats",
+      mobManual: "Pick how many seats, then name who sits where. Auto takes the next unused keyed house; no house may take two seats.",
+      mobAssign: "Assign each seat",
+      mobRowA: "1. States the claim (plain, no corpus)",
+      mobRowM: "2. Attacker #",
+      mobRowS: "3. Settler (eats SDE, parallel) #",
+      mobTaken: "(taken by another seat)",
       mobGo: "Start mob", mobStop: "Stop mob",
       mobA: "Judge", mobM: "Atk", mobS: "Settle",
       mobNone: "(nothing attacked yet)", mobUnk: "unnamed",
@@ -1912,7 +1926,9 @@
       triSame: "\u26a0 Only two keys found, so the third seat reuses the first model \u2014 the judge also wrote. Treat this verdict as provisional; add a third key to fix it.",
       triFail: "The previous model produced nothing, so this step cannot proceed.",
       triSave: "\u2913 Save this clash",
-      triSeat: "The three seats", triFixed: "1. The claim (your current model)",
+      triSeat: "Assign the three seats", triFixed: "1. The claim (your current model)",
+      triManual: "All three seats can be named. Leaving Auto means seat 1 uses your current model and 2\u20133 take the next unused keyed houses.",
+      triPick1: "1. States the claim (plain language, no site corpus)",
       triPick2: "2. Who attacks it", triPick3: "3. Who settles it",
       triAuto: "Auto (take keyed models in order)",
       triDupWarn: "(same vendor as the seat before \u2014 no heterogeneity)", triGo: "\u2694 Start the clash", triStop: "No clash",
@@ -5459,6 +5475,9 @@
   var mobOn = false;
   var mobBtn = layer.querySelector(".wdsm-mobbtn");
   var mobN = 0;                       // 0＝自动（有几家 Key 用几家，上限 8）
+  /* 逐席指派（2026-09-09 王德生令「碰撞和三家碰撞，都要采取手动选择」）：
+     mobPick[i] ＝ 第 i 席点名的厂商；空＝自动。点名了却没 Key、或与前席重号，一律当没点名回落自动。 */
+  var mobPick = [];
   function mobPaint() {
     if (!mobBtn) return;
     var seats = mobSeats();
@@ -5468,46 +5487,95 @@
   }
   /* 排座：主基底坐判断席，其余按 VENDORS 顺序取"有 Key 且没坐过"的。
      只回一次去重后的名单；不足 4 家回 null（判断1＋攻击1＋结算2 是最小可跑的形状）。 */
-  function mobSeats() {
-    var mine = null; try { mine = wdsKeyGet(); } catch (e) { return null; }
-    if (!mine) return null;
-    var seats = [{ vendor: mine.vendor, key: mine.key, model: mine.model || "" }];
+  // 有 Key 的厂商清单（去重后的可坐席池）
+  function mobPool() {
+    var pool = [];
     for (var i = 0; i < VENDORS.length; i++) {
       var v = VENDORS[i].v, k = vkeyGet(v);
-      if (!k) continue;
-      var dup = false;
-      for (var j = 0; j < seats.length; j++) if (seats[j].vendor === v) dup = true;
-      if (dup) continue;
-      seats.push({ vendor: v, key: k, model: vmodelGet(v) || "" });
+      if (k) pool.push({ vendor: v, key: k, model: vmodelGet(v) || "" });
     }
-    if (seats.length < 4) return null;
-    var cap = mobN > 0 ? Math.min(mobN, seats.length) : seats.length;
-    return seats.slice(0, Math.min(cap, 8));
+    return pool;
+  }
+  /* 排座：**先按 mobPick 逐席落点名的**，其余位子再按 VENDORS 顺序补没坐过的。
+     🔴 点名与自动都不许重号——同一家坐两个位子，在攻击轮等于自己攻自己。 */
+  function mobSeats() {
+    var pool = mobPool();
+    if (pool.length < 4) return null;
+    var mine = null; try { mine = wdsKeyGet(); } catch (e) {}
+    var cap = Math.min(mobN > 0 ? mobN : pool.length, pool.length, 8);
+    var seats = [], used = {};
+    function put(v) {
+      if (!v || used[v]) return false;
+      for (var i = 0; i < pool.length; i++) if (pool[i].vendor === v) { seats.push(pool[i]); used[v] = 1; return true; }
+      return false;
+    }
+    for (var i = 0; i < cap; i++) {                       // 先落点名
+      if (seats.length >= cap) break;
+      if (mobPick[i]) put(mobPick[i]);
+      else seats.push(null);                              // 占位，稍后补
+    }
+    // 把占位换成还没坐过的（主基底优先坐它没被点名时的第一个空位）
+    var fill = [];
+    if (mine && !used[mine.vendor]) { for (var a = 0; a < pool.length; a++) if (pool[a].vendor === mine.vendor) fill.push(pool[a]); }
+    for (var b = 0; b < pool.length; b++) if (!used[pool[b].vendor] && (!mine || pool[b].vendor !== mine.vendor)) fill.push(pool[b]);
+    var out = [], fi = 0;
+    for (var c = 0; c < seats.length; c++) {
+      if (seats[c]) { out.push(seats[c]); continue; }
+      while (fi < fill.length && used[fill[fi].vendor]) fi++;
+      if (fi < fill.length) { used[fill[fi].vendor] = 1; out.push(fill[fi]); fi++; }
+    }
+    if (out.length < 4) return null;
+    return out;
+  }
+  // 菜单原地重绘（同三家对撞：选完一席还要选下一席）。必须放 setTimeout，否则关闭监听会当场把菜单关掉。
+  function mobRedraw() {
+    setTimeout(function () {
+      var m = document.querySelector(".wdsm-menu");
+      if (!m) return;
+      while (m.firstChild) m.removeChild(m.firstChild);
+      mobFill(m);
+    }, 0);
   }
   function mobFill(menu) {
-    var seats = mobSeats();
+    var pool = mobPool();
     menu.appendChild(el("div", "mh", t("mobSeatH")));
-    var note = el("div", "mnote");
-    note.textContent = seats
-      ? t("mobHave").replace("{n}", String(seats.length))
-      : t("mobNeed");
-    menu.appendChild(note);
-    if (seats) {
-      var opts = [0]; for (var k = 4; k <= seats.length; k++) opts.push(k);
-      opts.forEach(function (v) {
+    if (pool.length < 4) { menu.appendChild(el("div", "mnote", t("mobNeed"))); return; }
+    menu.appendChild(el("div", "mnote", t("mobManual")));
+    // ① 席数
+    var opts = [0]; for (var k = 4; k <= Math.min(pool.length, 8); k++) opts.push(k);
+    opts.forEach(function (v) {
+      var b = el("button");
+      b.appendChild(document.createTextNode((mobN === v ? "\u2713 " : "") + (v === 0 ? t("mobAuto") : (v + t("mobSeatN")))));
+      b.onclick = function () { mobN = v; mobPick = mobPick.slice(0, v || mobPick.length); mobPaint(); mobRedraw(); };
+      menu.appendChild(b);
+    });
+    // ② 逐席指派：判断 1 ＋ 攻击 n-3 ＋ 结算 2
+    var seats = mobSeats(); if (!seats) return;
+    var n = seats.length, nAtk = Math.max(1, n - 3);
+    menu.appendChild(el("div", "mh", t("mobAssign")));
+    for (var i = 0; i < n; i++) (function (i) {
+      var lab = i === 0 ? t("mobRowA") : (i <= nAtk ? (t("mobRowM") + i) : (t("mobRowS") + (i - nAtk)));
+      menu.appendChild(el("div", "mh", lab + "　→　" + (seats[i] ? vinfo(seats[i].vendor).name : "—")));
+      var au = el("button");
+      au.appendChild(document.createTextNode((mobPick[i] ? "" : "\u2713 ") + t("triAuto")));
+      au.onclick = function () { mobPick[i] = ""; mobPaint(); mobRedraw(); };
+      menu.appendChild(au);
+      pool.forEach(function (pv) {
         var b = el("button");
-        b.appendChild(document.createTextNode((mobN === v ? "\u2713 " : "") + (v === 0 ? t("mobAuto") : (v + t("mobSeatN")))));
-        b.onclick = function () { mobN = v; mobPaint(); closeMenu(); };
+        b.appendChild(document.createTextNode((mobPick[i] === pv.vendor ? "\u2713 " : "") + vinfo(pv.vendor).name));
+        // 已被别的席点名的，标一下——重号会被排座丢弃，不如当场说清
+        for (var j = 0; j < n; j++) if (j !== i && mobPick[j] === pv.vendor) b.appendChild(el("span", "sub", t("mobTaken")));
+        b.onclick = function () { mobPick[i] = pv.vendor; mobPaint(); mobRedraw(); };
         menu.appendChild(b);
       });
-      var go = el("button", null, mobOn ? t("mobStop") : t("mobGo"));
-      go.onclick = function () {
-        closeMenu(); mobOn = !mobOn;
-        if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); }   // 三者互斥
-        mobPaint();
-      };
-      menu.appendChild(go);
-    }
+    })(i);
+    var go = el("button", null, mobOn ? t("mobStop") : t("mobGo"));
+    go.onclick = function () {
+      closeMenu(); mobOn = !mobOn;
+      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); }   // 三者互斥
+      mobPaint();
+    };
+    menu.appendChild(go);
   }
   if (mobBtn) mobBtn.onclick = function () { if (streaming) return; menuAt(mobBtn, mobFill); };
   mobPaint();                        // 🔴 初始就要有字——不画一次就是一颗**零宽空框**，读者在模式条上根本看不见它。
@@ -5658,9 +5726,10 @@
     if (triOn) triBtn.classList.add("on"); else triBtn.classList.remove("on");
   }
   triPaint();                        // 初始就要有字——不画一次就是一颗空框（模式条空按钮的老漏法）
-  // 读者指定的 ②③ 两席（空＝自动）。① 不给选：它就是设置里当前那家，
-  // 另开一个"出判断的用谁"只会和设置面板打架。
-  var triB2 = "", triB3 = "";
+  /* 读者指定的三席（空＝自动）。**① 席原本不给选**——理由是"它就是设置里当前那家"；
+     2026-09-09 王德生令「碰撞和三家碰撞，都要采取手动选择」⇒ ① 也开放指派。
+     不冲突：空着仍沿用设置里那家，点名了就以点名为准。 */
+  var triB1 = "", triB2 = "", triB3 = "";
   // 菜单原地重绘：选完一席还要选下一席，关掉再点太难用。
   // **重绘必须放进 setTimeout**——menuAt 挂在 document 上的关闭监听要看 menu.contains(ev.target)，
   // 同步清空会让 target 先脱离 DOM，contains 返回 false，菜单当场把自己关掉。
@@ -5699,10 +5768,11 @@
     var mine = null; try { mine = wdsKeyGet(); } catch (e) {}
     menu.appendChild(el("div", "mh", t("triSeat")));
     var fx = el("div", "mnote");
-    fx.textContent = t("triFixed") + "：" + (mine ? vinfo(mine.vendor).name : "—");
+    fx.textContent = t("triManual");
     menu.appendChild(fx);
-    triSeatRow(menu, t("triPick2"), triB2, function (v) { triB2 = v; }, mine ? mine.vendor : null);
-    triSeatRow(menu, t("triPick3"), triB3, function (v) { triB3 = v; }, triB2 || (mine ? mine.vendor : null));
+    triSeatRow(menu, t("triPick1"), triB1, function (v) { triB1 = v; }, null);
+    triSeatRow(menu, t("triPick2"), triB2, function (v) { triB2 = v; }, triB1 || (mine ? mine.vendor : null));
+    triSeatRow(menu, t("triPick3"), triB3, function (v) { triB3 = v; }, triB2 || triB1 || (mine ? mine.vendor : null));
     var go = el("button", null, triOn ? t("triStop") : t("triGo"));
     go.onclick = function () {
       closeMenu();
@@ -5721,7 +5791,10 @@
   function triSeats() {
     var mine = null; try { mine = wdsKeyGet(); } catch (e) {}
     if (!mine) return null;
-    var seats = [{ vendor: mine.vendor, key: mine.key, model: mine.model || "" }];
+    // ① 席：点名了就用点名那家，没点名沿用设置里当前那家
+    var s0 = { vendor: mine.vendor, key: mine.key, model: mine.model || "" };
+    if (triB1) { var k1 = vkeyGet(triB1); if (k1) s0 = { vendor: triB1, key: k1, model: vmodelGet(triB1) || "" }; }
+    var seats = [s0];
     // 读者点名的两席优先坐下；点名了却没 Key 的当没点名（不拦路，回落自动）
     [triB2, triB3].forEach(function (v) {
       if (!v || seats.length >= 3) return;
