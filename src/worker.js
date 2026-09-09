@@ -13084,7 +13084,18 @@ export default {
                  正文 0 字，撞看门狗（线 2380）被掐——与难度条第 2 档一模一样的账，只是换了个档位。
                  老深度档（deep 而无难度条 ⇒ knobs(4)）plain 是 0，这一句对它没有效果。
                关不掉思考的家（Kimi／MiniMax）wdsCanPlain 为假，照旧。 */
-            const gPlain = !!(gK.plain && wdsCanPlain(VC));
+            /* 🔴【结算席首发关思考 —— 2026-09-09 线上实测逼出来的】
+               群碰真跑时「结算2」两遍都没写出正文：第一遍只思考了 8161 字就撞上看门狗的线（8160），
+               6000 tok 预算全被 reasoning 吃光，一个正文字都没有。
+               病根与成文三段（FORGE_PLAIN_STAGES）同一个：**这一席的活不是想一个新点子，
+               是照着已有材料按固定六步写出来**——而它材料最长（判断＋N 席攻击＋上轮结算）、
+               结构要求最多（复述·量维·共有前提·推翻材料·结算·证伪＋自报行），
+               于是一开口就把预算想没了。本文件记过四次的口径在这里同样成立：
+               **解法是关思考，不是加预算。**
+               ⚠ 只关结算席（c 与 s）。出判断（a）与攻击（b/m）要的正是判断力，思考照开。
+               ⚠ 关得掉与否由 wdsCanPlain 定：关不掉的家照旧共用预算，至少不会更差。 */
+            const duelPlain = !!(duel && (duel.role === "c" || duel.role === "s") && wdsCanPlain(VC));
+            const gPlain = !!((gK.plain || duelPlain) && wdsCanPlain(VC));
             /* 预算一律读 gK.tok（2026-09-01）：G.on 为假时 gK 就是 knobs(0)／knobs(4)，
                与从前那两个字面量 2600／6000 一模一样——所以这里不再抄第二份。
                抄两份的代价刚付过：标准档的 tok 改在表里，这一行还写着 2600，就会改了等于没改。 */
@@ -13123,7 +13134,7 @@ export default {
               chars: ragG ? ragG.chars : 0, exact: !!(ragG && ragG.exact), core: ragG ? (ragG.core || []) : [], anchors: ragG ? (ragG.anchors || []) : [],
               rlv: ragG ? ragG.lv : 0,                                     // 检索自己算出的档（钉死时与 lv 不同）
               model: VC.model, top: VC.top ? 1 : 0,
-              think: canSee ? "看图档" : (gPlain ? "关" : ((G.on ? gK.plain : false) ? "关不掉（这家常开）" : (VC.top ? ((VC.effort || "max") === "max" ? "满功率" : "高") : "随基底默认"))),
+              think: canSee ? "看图档" : (duelPlain ? "关（结算席）" : gPlain ? "关" : ((G.on ? gK.plain : false) ? "关不掉（这家常开）" : (VC.top ? ((VC.effort || "max") === "max" ? "满功率" : "高") : "随基底默认"))),
               method: mFull ? "完整工序" : "精简工序", tok: tokGrade, ng: !!(G.on && gK.ng && !prof),
               mem: memPick ? { lv: memPick.lv, n: memPick.n, has: memPick.has } : null,   // 这一答带了哪几层记忆、共多少字
             } }));
