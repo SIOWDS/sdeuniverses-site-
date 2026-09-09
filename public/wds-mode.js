@@ -1734,6 +1734,7 @@
       mobZClosed: "已结清", mobZClosedT: "两份结算一致的处数——判为本轮已结清，下一轮不再动它。",
       mobZOpen: "仍未结清", mobZOpenT: "两份结算判得不一样的处数。分歧不是缺点：它标出的正是这一场没结清的地方。为 0 且没有新靶子，多半是撞到底了。",
       mobZUn: "没人碰的维：", mobZUnT: "这一轮的判断与所有攻击都没碰过的那一样（显露／路径／纠缠）。它往往正是这道题真正的所在。",
+      mobZHit: "撞点：", mobZHitT: "这一轮撞的是哪两维、撞出了第三维上的哪一条（形如「路径×纠缠⇒显露」）。**没有撞点就没有新观点**——那一轮的总结只是把几家的话归拢了一遍。",
       mobZTgt: "下一轮靶子", mobZTgtT: "总结席有没有交出一条可被攻击的新判断。没有就不给「继续」——没有靶子的下一轮只会空转。",
       mobSeatNow: "本轮座次",
       mobRotated: "座位已左轮 {n} 格：上一轮出判断的这一轮去结算，上一轮攻击的这一轮出判断——没有一家长期占着结算或总结",
@@ -1923,6 +1924,7 @@
       mobZClosed: "Settled", mobZClosedT: "Points where the two settlements agree \u2014 treated as closed; the next round leaves them alone.",
       mobZOpen: "Still open", mobZOpenT: "Points where the two settlements differ. Disagreement is not a defect: it marks exactly what this round did not settle.",
       mobZUn: "Untouched axis: ", mobZUnT: "The axis (showing / path / entanglement) neither the claim nor any attack touched \u2014 often where the question actually lives.",
+      mobZHit: "Collision: ", mobZHitT: "Which two axes were struck against each other and what came out on the third (e.g. path \u00d7 entanglement \u21d2 showing). No collision means no new claim \u2014 only a tidy restatement.",
       mobZTgt: "Next target", mobZTgtT: "Whether the summary produced a new attackable claim. Without one there is no Continue \u2014 a round with no target just spins.",
       mobSeatNow: "Seating this round",
       mobRotated: "rotated {n} place(s): last round\u2019s claimant now settles, last round\u2019s attacker now claims \u2014 no house keeps the settling or summing seat",
@@ -4429,8 +4431,11 @@
       var L3 = z[1];
       function num3(k) { var v = seg(L3, k), m = v.match(/(\d+)/); return m ? parseInt(m[1], 10) : null; }
       var dim3 = seg(L3, "没人碰的维");
+      var hit = seg(L3, "撞点");
       return { kind: "z", closed: num3("已结清"), open: num3("仍未结清"),
                untouched: (/无/.test(dim3) ? "" : dim3),
+               // 撞点要认出「X×Y⇒Z」这个形状；写"无"或认不出就算没撞
+               hit: (/[×x✕]/.test(hit) && /[⇒=>→]/.test(hit)) ? hit : "",
                target: /出/.test(seg(L3, "靶子")) && !/未出/.test(seg(L3, "靶子")) };
     }
     var c = s.match(/〔对撞〕([^\n]*)/);
@@ -4457,6 +4462,7 @@
       chip(true, t("mobZClosed") + " " + (d.closed == null ? "—" : d.closed), t("mobZClosedT"), true);
       chip(d.open > 0, t("mobZOpen") + " " + (d.open == null ? "—" : d.open), t("mobZOpenT"));
       chip(!!d.untouched, (d.untouched ? (t("mobZUn") + d.untouched) : (t("mobZUn") + "—")), t("mobZUnT"), !d.untouched);
+      chip(!!d.hit, (d.hit ? (t("mobZHit") + d.hit) : (t("mobZHit") + "—")), t("mobZHitT"));
       chip(d.target, t("mobZTgt") + (d.target ? " ✓" : " —"), t("mobZTgtT"));
       box.appendChild(w); return w;
     }
