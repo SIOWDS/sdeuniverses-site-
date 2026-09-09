@@ -1040,6 +1040,7 @@
       followsHint: "刚冒出新说法就点 What，说清楚了点 How，能落地了点 Why；写虚了往 How 拉，写碎了往 Why 拉。",
       progH: "本篇进度", progOf: "格", progTodo: "还欠", progOK: "十格已齐，可以成文", progNo: "未走完，先别成文",
       progNext: "走下一格", progNextT: "按〔进度〕行报的未完成格算出来的；三条追问是备料，这一颗是主道",
+      razBadge: "已作为本书底册扣留（{n} 字符）· 此后每轮随系统提示重送，第 5、10 格送全文",
       razH: "底册审查 · 这一答违反了本书自己定的规矩", razT: "以下各条全部取自底册里已写下的条款，由正则比对得出，不经过基底。看到它就回去改，别往下走。",
       progCells: ["本篇不管什么", "五家逐家交手", "承重命题与靶位 Z", "土壤条件", "量具取值与编码", "检验设计与材料来源", "证伪条款与阈值", "辨别格", "反噬与误诊阻挡", "两个洞与引证自查"],
       followRecT: "按上一答走到哪一步推的；另外两条一样能点",
@@ -1351,6 +1352,7 @@
       followsHint: "New term just appeared? Take What. Clear already? Take How. Workable already? Take Why.",
       progH: "PROGRESS", progOf: "cells", progTodo: "still missing", progOK: "All ten cells done \u2014 ready to write up", progNo: "Not finished \u2014 don't write it up yet",
       progNext: "Next cell", progNextT: "Computed from the cells the progress line reports as unfinished",
+      razBadge: "Held as this book's RAZ ({n} chars) \u2014 re-sent with the system prompt every turn; full text on cells 5 and 10",
       razH: "RAZ CHECK \u2014 this answer breaks the book's own rules", razT: "Every check below comes from a clause already written in the RAZ, matched by regex, with no model call.",
       progCells: ["What this piece does not cover", "Facing all five occupants", "Load-bearing claim and the blank target", "Ground conditions", "Instrument values and coding", "Test design and materials", "Falsifiers and thresholds", "Discrimination grid", "Backfire and misdiagnosis blocks", "The two holes and citation self-check"],
       followRecT: "Suggested from where the last answer got to; the other two still work",
@@ -2416,6 +2418,7 @@
     ".wdsm-prog-bar{height:6px;border-radius:999px;background:var(--wfill2);overflow:hidden}" +
     ".wdsm-prog-in{height:100%;background:var(--wgold2);border-radius:999px}" +
     ".wdsm-prog-t{font-size:11.5px;line-height:1.7;color:var(--wdim2);margin-top:6px}" +
+    ".wdsm-razb{margin-top:8px;padding:6px 11px;border:1px dashed var(--wgold2);border-radius:999px;display:inline-block;font-size:11.5px;line-height:1.6;color:var(--wgold)}" +
     ".wdsm-raz{margin-top:10px;padding:9px 12px;border:1px solid var(--wgold2);border-left:3px solid var(--wgold);border-radius:10px;background:var(--wfill2)}" +
     ".wdsm-raz-h{font-size:11.5px;letter-spacing:.5px;color:var(--wgold);font-weight:600;margin-bottom:6px}" +
     ".wdsm-raz-r{font-size:12.5px;line-height:1.8;color:var(--wtx)}" +
@@ -3898,6 +3901,7 @@
       if (t.role === "reader") { cell = addTurn(t.text); cell.a.innerHTML = ""; history.push({ role: "reader", text: t.text }); }
       else { if (cell) { cell.a.innerHTML = mdRender(t.text); progRender(cell, progParse(t.text)); mountActs(cell, t.text); } history.push({ role: "wds", text: t.text }); }
     });
+    razRestore();                               // 底册在历史里，捡回来，否则此后各轮静悄悄不再注入宪法
     if (stSess) stSess.adopt(rec);
     VERS = [];                                  // 换了一场，上一场的版本堆作废
     inEl.disabled = false; sendEl.disabled = false; updTurns(); sbRender();
@@ -4361,6 +4365,27 @@
     // 切完反而没短多少，或短得不像话（结构没认出来），就退回全文
     if (out.length < 800 || out.length > t.length * 0.9) return t;
     return out + "\n\n〔本轮为分层重送：只带九行索引、" + curQ + " 那一格台账与两条纪律；其余八格台账每 5 格随全文重送一次。划界时若需别题台账，直接说「重挂全底册」。〕";
+  }
+
+  /* 从历史里把底册捡回来（2026-09-09 补）。
+     RAZ 是内存变量，刷新页面或从侧栏装载旧会话之后它是空的——而历史消息还在，
+     底册本来就在里面。不捡回来的症状最坏：之后每轮都不再注入宪法，**答案照样出、界面看不出**。
+     从后往前扫，取最早的那一条（底册总在第一条，题卡与后续追问都在它后面）。 */
+  function razRestore() {
+    RAZ.text = ""; RAZ.turn = 0;
+    if (curTool !== "book9") return;
+    for (var i = 0; i < history.length; i++) {
+      if (history[i] && history[i].role !== "reader") continue;
+      var r = razDetect(history[i] && history[i].text);
+      if (r) { RAZ.text = r; RAZ.turn = i; return; }
+    }
+  }
+
+  /* 扣下底册时给一行看得见的回执：掉了能一眼看出来（此前发底册与发普通消息毫无分别）。 */
+  function razBadge(cell, n) {
+    if (!cell || cell.razbadge) return;
+    var b = el("div", "wdsm-razb", t("razBadge").replace("{n}", String(n)));
+    cell.turn.appendChild(b); cell.razbadge = b;
   }
 
   function razRender(cell, list) {
@@ -5285,6 +5310,7 @@
     var cell = addTurn(q);
     cell.a.innerHTML = "<span class='cur'>▊</span>";
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
+    if (_razNew) razBadge(cell, _razNew);
     streaming = true; stoppedByUser = false;
     gradeClose();                                   // 发问即收难度条
     busyUI(true);
@@ -5294,7 +5320,8 @@
     // 分身是一份策展过的人格，不该因为一个借来的开关状态就被静默拆穿。
     var _m3 = memRecall3(q);
     // 本场第一次挂底册时扣下来，此后每轮随 payload 送（只在九问专著里）
-    if (curTool === "book9" && !RAZ.text) { var _r = razDetect(q); if (_r) { RAZ.text = _r; RAZ.turn = history.length; } }
+    var _razNew = 0;
+    if (curTool === "book9" && !RAZ.text) { var _r = razDetect(q); if (_r) { RAZ.text = _r; RAZ.turn = history.length; _razNew = _r.length; } }
     var payload = { q: q, history: histPack(compFrom()), umem: _m3 ? "" : memRecall(q), umem3: _m3 || undefined, key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1), raz: (curTool === "book9" && RAZ.text) ? razSlice(RAZ.text, razCurQ(), RAZ.turn++) : undefined };
     if (thinkMode === "deep") payload.grade = gradePin ? gradePin : "auto";   // 难度条：自动按检索定档，或读者钉死的档
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
