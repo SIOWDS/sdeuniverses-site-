@@ -1733,6 +1733,8 @@
       mobZOpen: "仍未结清", mobZOpenT: "两份结算判得不一样的处数。分歧不是缺点：它标出的正是这一场没结清的地方。为 0 且没有新靶子，多半是撞到底了。",
       mobZUn: "没人碰的维：", mobZUnT: "这一轮的判断与所有攻击都没碰过的那一样（显露／路径／纠缠）。它往往正是这道题真正的所在。",
       mobZTgt: "下一轮靶子", mobZTgtT: "总结席有没有交出一条可被攻击的新判断。没有就不给「继续」——没有靶子的下一轮只会空转。",
+      mobSeatNow: "本轮座次",
+      mobRotated: "座位已左轮 {n} 格：上一轮出判断的这一轮去结算，上一轮攻击的这一轮出判断——没有一家长期占着结算或总结",
       mobZSelf: "⚠ 席数只有 4，总结席由判断席兼任——它在总结自己写下的那条判断，这一轮的小结只作参考。加到 5 席即可让没写过判断的那一位来总结。",
       mobGo: "开始群碰", mobStop: "停止群碰",
       mobA: "判断", mobM: "攻", mobS: "结算",
@@ -1920,6 +1922,8 @@
       mobZOpen: "Still open", mobZOpenT: "Points where the two settlements differ. Disagreement is not a defect: it marks exactly what this round did not settle.",
       mobZUn: "Untouched axis: ", mobZUnT: "The axis (showing / path / entanglement) neither the claim nor any attack touched \u2014 often where the question actually lives.",
       mobZTgt: "Next target", mobZTgtT: "Whether the summary produced a new attackable claim. Without one there is no Continue \u2014 a round with no target just spins.",
+      mobSeatNow: "Seating this round",
+      mobRotated: "rotated {n} place(s): last round\u2019s claimant now settles, last round\u2019s attacker now claims \u2014 no house keeps the settling or summing seat",
       mobZSelf: "\u26a0 With only 4 seats the summary is written by the seat that stated the claim \u2014 it is summing up its own judgment, so treat this summary as indicative. Add a fifth seat to fix it.",
       mobGo: "Start mob", mobStop: "Stop mob",
       mobA: "Judge", mobM: "Atk", mobS: "Settle",
@@ -5621,6 +5625,11 @@
       var nAtk = Math.max(1, seats.length - 3);            // 判断1 ＋ 攻击 nAtk ＋ 结算2
       var wrap = el("div", "wdsm-tri");
       if (rd > 1) wrap.appendChild(el("div", "wdsm-trird", t("triRd").replace("{n}", String(rd))));
+      /* 轮换要看得见：每轮把「谁坐什么」摆在最上面。座位每轮左轮一格 ⇒
+         上一轮出判断的这一轮去结算、上一轮攻击的这一轮出判断——**没有一家长期占着结算或总结**。 */
+      wrap.appendChild(el("div", "wdsm-tinote", t("mobSeatNow") + "：" + seats.map(function (w2, i2) {
+        return (i2 === 0 ? t("mobA") : (i2 <= nAtk ? (t("mobM") + i2) : (t("mobS") + (i2 - nAtk)))) + "＝" + vinfo(w2.vendor).name;
+      }).join("　·　") + (rd > 1 ? ("　（" + t("mobRotated").replace("{n}", String(rd - 1)) + "）") : "")));
       var rows = seats.map(function (who, i) {
         var lab = i === 0 ? t("mobA") : (i <= nAtk ? (t("mobM") + (i)) : (t("mobS") + (i - nAtk)));
         var c = el("div", "wdsm-tric");
@@ -5704,7 +5713,12 @@
                🔴 由**没参与结算的那一席**来坐——自己总结自己的结算就是自评。
                取法：攻击席里的最后一位（它既不是判断的作者，也没做过结算）；
                席数不够（只有 4 席时攻击只有一位）就退回判断席，并如实标注。 */
-            var zi = nAtk >= 2 ? nAtk : 0;          // nAtk≥2 用最后一个攻击席；否则用判断席
+            /* 【总结席也轮换 · 2026-09-09 王德生令「结算席、总结席、普通席不能固定，要轮换」】
+               原来永远取"最后一个攻击席"这个位置——座位虽然每轮左轮一格，
+               但**角色与位置的对应关系是死的**，"谁总结"只跟着座位漂、自己不转。
+               现在总结席在**攻击席之间按轮次轮转**：第 1 轮取攻击 1、第 2 轮取攻击 2……绕回。
+               🔴 仍绕开两个结算席（自己总结自己的结算＝自评）；攻击席只有一位时退回判断席并标注。 */
+            var zi = nAtk >= 2 ? (1 + ((rd - 1) % nAtk)) : 0;
             var zmat = blocks.join("\n\n")
               + "\n\n【结算 1 · " + vinfo(seats[s1].vendor).name + "】\n" + (two[0] || "（无产出）")
               + "\n\n【结算 2 · " + vinfo(seats[s2].vendor).name + "】\n" + (two[1] || "（无产出）");
