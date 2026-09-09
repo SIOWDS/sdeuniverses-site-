@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>异质发生与奇幻价值：科幻叙事中三条时间线的错位 · 秦莉 · SDE 学员专栏</title>
+<meta name="description" content="科学上说得通、文本内不矛盾，读者仍然觉得不可信——这个现象在现有科幻理论里是一个无主的洞。本文把它拆成三条互不相通的时间线：设定被撤除时塌几层（撤除斧）、读者在结局揭晓前有没有权利判断（冻结斧）、两稿之间一次改动是修错还是伤好（差分斧）。本文给出删除重建测试作为唯一判据，并公开更正了初稿中一处无效论证与一条不可触发的证伪条款；同时正面承认，读者事前判断权这一直觉，范·达因 1928 年的公平游戏公约早已提出。">
+<style>
+:root{--gold:#B5860F;--gold2:#D0A22A;--ink:#F0E9D8;--paper:#2A2013;--muted:#7C6E4E;--bg:#0E0B08;--panel:#171310}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(181,134,15,0.32)}
+body{background:var(--bg);color:#EAE2CE;font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+a{color:var(--gold);text-decoration:none}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(181,134,15,0.28);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#CBBE94;font-size:13px;letter-spacing:0.04em}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(181,134,15,0.5);color:#D9CDA0;letter-spacing:0.03em}
+.rb-btn.cur{background:var(--gold);color:#1A1410;font-weight:700;border-color:var(--gold)}
+.art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
+.art-series{font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:22px}
+.art-title{font-size:clamp(24px,4.2vw,36px);font-weight:800;line-height:1.55;color:#F5EFE0;letter-spacing:0.02em}
+.art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--gold2);margin-top:18px;line-height:1.85;letter-spacing:0.01em}
+.art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.12em}
+.wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
+.abstract{background:linear-gradient(160deg,#1C1712,#141009);border-left:3px solid var(--gold);padding:22px 26px;margin:20px 0 26px;font-size:15.5px;line-height:1.95}
+.abstract .ab-lbl{font-size:12px;letter-spacing:0.3em;color:var(--gold);margin-bottom:10px}
+.abstract p{color:#CFC6AE;text-align:justify}
+.keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 30px;padding-bottom:24px;border-bottom:1px solid rgba(181,134,15,0.2)}
+.keywords strong{color:var(--gold)}
+.wrap h2{font-size:22px;font-weight:800;color:#F2ECDC;margin:44px 0 18px;letter-spacing:0.02em;padding-top:8px;border-bottom:1px solid rgba(181,134,15,0.18);padding-bottom:8px}
+.wrap h3{font-size:18px;font-weight:700;color:#E6DCC2;margin:30px 0 12px;letter-spacing:0.01em}
+.wrap p{margin-bottom:20px;text-align:justify;color:#DED6BF;text-indent:2em}
+.wrap p.ref{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:8px;text-indent:-2em;padding-left:2em;text-align:left}
+.wrap blockquote.pull{margin:26px 0;padding:18px 24px;background:linear-gradient(160deg,#1C1712,#15100a);border-left:3px solid var(--gold2);color:#EDE3C6;font-size:16.5px;line-height:1.9;text-align:justify}
+.wrap blockquote.pull strong{color:var(--gold2)}
+.wrap strong{color:var(--gold2);font-weight:700}
+.wrap em{color:#E0D5B4;font-style:italic}
+.iqnote{max-width:760px;margin:0 auto;padding:0 24px}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a12 0%,#150f08 60%,#0c0805 100%);text-align:center;padding:60px 24px;margin-top:40px;border-radius:4px}
+.endbox .lbl{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:16px}
+.endbox .big{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.06em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:1.95}
+.endbox a{display:inline-block;padding:12px 30px;font-size:14.5px;letter-spacing:0.08em;border-radius:2px;margin:5px;text-decoration:none}
+.endbox .solid{background:var(--gold);color:#150F08;font-weight:700}
+.endbox .ghost{border:1px solid var(--gold);color:var(--gold)}
+footer{background:#120E07;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid rgba(181,134,15,0.15)}
+footer a{color:var(--gold)}
+@media(max-width:640px){body{font-size:16.5px}}
+
+/* ===== 统稿增补 ===== */
+.lead{max-width:760px;margin:0 auto;padding:30px 24px 0}
+.innov{background:linear-gradient(135deg,#3a2f18,#2a2212 60%,#1c1710);border:1px solid rgba(201,168,76,0.35);border-radius:12px;padding:24px 28px;margin:0 0 22px;box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.innov .lbl{font-size:12px;letter-spacing:0.28em;color:#D4B25E;margin-bottom:12px;font-weight:700}
+.innov .lbl::before{content:"✦ ";color:#F0C860}
+.innov .txt{font-size:16.5px;line-height:1.92;color:#EDE3CC}
+.innov .txt b{color:#F0C860;font-weight:700}
+.daodu{background:#181310;border:1px solid rgba(201,168,76,0.3);border-left:4px solid #C9A84C;border-radius:10px;padding:24px 28px;margin:0 0 6px}
+.daodu .lbl{display:inline-block;font-size:12px;letter-spacing:0.22em;color:#1a140c;background:#C9A84C;padding:5px 14px;border-radius:20px;margin-bottom:14px;font-weight:700}
+.daodu h4{font-size:17.5px;color:#EDE3CC;margin:0 0 16px;font-weight:800}
+.daodu .row{margin:12px 0;line-height:1.88;color:#CDC0A6;font-size:15.5px}
+.daodu .row .k{color:#D4B25E;font-weight:800}
+.hl2{background:rgba(201,168,76,0.16);border-bottom:2px solid #C9A84C;padding:1px 4px;font-weight:700;color:#F0E4C8;border-radius:2px}
+
+/* ── 阅读进度：顶部一线，长读时知道自己在哪 ───────────────── */
+#prog{position:fixed;top:0;left:0;height:2px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .12s linear}
+
+/* ── 摘要：原渲染器丢了这一块，恢复并给它应有的分量 ───────── */
+.abs{margin:26px 0 4px;padding:24px 28px;background:linear-gradient(158deg,#1C1712,#141009);
+  border-left:3px solid var(--gold);position:relative}
+.abs .lb{font-size:11.5px;letter-spacing:.44em;color:var(--gold2);display:block;margin-bottom:12px}
+.abs p{margin:0;text-indent:0;font-size:16.5px;line-height:2.0;color:#E4DCC6;text-align:justify}
+.kw{margin:14px 0 0;font-size:14px;color:var(--muted);letter-spacing:.04em;text-indent:0}
+.kw b{color:var(--gold);font-weight:400;letter-spacing:.16em}
+
+/* ── 签名元素 · 对手榜：把这篇论文画出的那条分离线渲成看得见的 ── */
+.cut{margin:30px 0 6px;border:1px solid rgba(181,134,15,0.22);background:#120E0A}
+.cut .cap{font-size:11px;letter-spacing:.42em;color:var(--gold2);padding:14px 20px 0}
+.cut .row{display:grid;grid-template-columns:minmax(0,auto) 1px minmax(0,1fr);
+  gap:0 22px;align-items:stretch;padding:14px 20px 18px}
+.cut .me{align-self:center;font-size:19px;font-weight:800;color:#F2ECDC;letter-spacing:.03em;
+  white-space:nowrap;padding-right:4px}
+.cut .sep{background:linear-gradient(180deg,transparent,var(--gold) 22%,var(--gold) 78%,transparent)}
+.cut ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 10px}
+.cut li{font-size:13px;color:#C8BC9C;border:1px solid rgba(181,134,15,0.26);padding:5px 11px;
+  line-height:1.5;background:rgba(181,134,15,0.05)}
+.cut li i{font-style:normal;color:var(--muted);margin-left:7px;font-size:12px}
+.cut li.add{border-style:dashed;border-color:rgba(142,134,116,0.5);color:#A9A18C;
+  background:rgba(142,134,116,0.06)}
+.cut .foot{font-size:12.5px;color:var(--muted);padding:0 20px 16px;line-height:1.8}
+.cut .foot b{color:#A9A18C;font-weight:400}
+@media(max-width:600px){.cut .row{grid-template-columns:1fr;gap:12px}
+  .cut .sep{height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+  .cut .me{white-space:normal}}
+
+/* ── 目录：长读的落脚点，纯 CSS 折叠 ─────────────────────── */
+.toc{margin:24px 0 8px;border:1px solid rgba(181,134,15,0.20);background:#120E0A}
+.toc>summary{cursor:pointer;list-style:none;padding:13px 20px;font-size:12.5px;
+  letter-spacing:.32em;color:var(--gold2)}
+.toc>summary::-webkit-details-marker{display:none}
+.toc>summary::after{content:"＋";float:right;letter-spacing:0;color:var(--muted)}
+.toc[open]>summary::after{content:"－"}
+.toc ol{margin:0;padding:2px 22px 18px 42px;columns:2;column-gap:30px}
+.toc li{font-size:14px;line-height:2.0;color:#C8BC9C;break-inside:avoid}
+.toc a{color:#C8BC9C}
+.toc a:hover{color:var(--gold2)}
+@media(max-width:640px){.toc ol{columns:1}}
+
+/* ── 正文节奏 ────────────────────────────────────────────── */
+.wrap h2[id]{scroll-margin-top:70px}
+.wrap article>p:first-of-type{text-indent:0}
+
+/* ── 编辑增补：另一个说话人，用羊皮灰而不是金色 ──────────── */
+.suppwrap{margin:56px 0 0;border-top:1px solid rgba(142,134,116,0.34);padding-top:6px}
+.supphead{font-size:12px;letter-spacing:.40em;color:#A9A18C;margin:18px 0 8px;
+  border:0;padding:0}
+.supptip{font-size:14px;color:var(--muted);line-height:1.95;text-indent:0;margin:0 0 6px;
+  max-width:40em}
+.supp{border:0;border-left:2px solid rgba(142,134,116,0.55);background:transparent;
+  border-radius:0;padding:2px 0 2px 22px;margin:26px 0}
+.supp h2{font-size:17.5px;color:#CFC6AE;border:0;padding:0;margin:0 0 10px;
+  font-weight:700;letter-spacing:.02em}
+.supp h2::before{content:"编辑增补";display:block;font-size:10.5px;letter-spacing:.34em;
+  color:#8E8674;font-weight:400;margin-bottom:7px}
+.supp p{text-indent:0;font-size:16px;line-height:2.0;color:#CEC5AD;text-align:justify;margin:0}
+
+/* ── 参考文献 ────────────────────────────────────────────── */
+.ref{font-size:14px;padding-left:2em;text-indent:-2em;color:#B3A98D;line-height:1.85;margin:0 0 7px}
+.refhead{font-size:12px;letter-spacing:.36em;color:var(--gold2);border:0;padding:0;margin:34px 0 12px}
+.refhead.ed{color:#A9A18C}
+
+/* ── 分数条 ──────────────────────────────────────────────── */
+.scorebox{border:0;border-left:3px solid var(--gold);background:linear-gradient(158deg,#1B1611,#130F0A);
+  padding:16px 24px;margin:22px 0 0;font-size:14.5px;color:#C8BC9C;line-height:1.9}
+.scorebox b{color:var(--gold2);font-size:15px;letter-spacing:.03em}
+.scorebox p{margin:6px 0 0;text-indent:0;font-size:13.5px;color:var(--muted)}
+
+.endbox{text-align:center;border-top:1px solid rgba(181,134,15,0.24);margin-top:52px;
+  padding:38px 20px;color:var(--muted);font-size:14px}
+.endbox a{color:var(--gold)}
+@media(prefers-reduced-motion:reduce){#prog{transition:none}*{scroll-behavior:auto}}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.wrap h3{font-size:17px;margin:22px 0 8px;color:#D4B25E;font-weight:700}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.wrap h3{font-size:17px;margin:22px 0 8px;color:#D4B25E;font-weight:700}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.kw{font-size:14.5px;margin:0 0 18px;opacity:.9}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+
+/* 组内上下篇 */
+.pnbar{display:flex;gap:14px;margin:44px 0 8px;padding-top:22px;border-top:1px solid currentColor;
+ border-top-color:rgba(138,104,23,.28)}
+.pnbar a,.pnbar span{flex:1;min-width:0;display:block;padding:14px 16px;border-radius:9px;
+ border:1px solid rgba(138,104,23,.26);text-decoration:none;color:inherit;font-size:14px;line-height:1.6}
+.pnbar a:hover{border-color:rgba(200,145,23,.62);background:rgba(200,145,23,.07)}
+.pnbar .pn-l{opacity:.6;font-size:12px;letter-spacing:.14em;display:block;margin-bottom:5px}
+.pnbar .pn-t{display:block;font-weight:600}
+.pnbar .pn-none{opacity:.34;border-style:dashed}
+.pnbar .pn-next{text-align:right}
+@media(max-width:640px){.pnbar{flex-direction:column;gap:10px}.pnbar .pn-next{text-align:left}}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.wrap h3{font-size:17px;margin:22px 0 8px;color:#D4B25E;font-weight:700}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.kw{font-size:14.5px;margin:0 0 18px;opacity:.9}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+</style><style id="sde-fm">.sde-fm-abs{border-left:3px solid currentColor;padding:16px 20px;margin:20px 0 18px;background:rgba(128,128,128,.07);border-radius:2px;font-size:.96em;line-height:1.95;opacity:.97}.sde-fm-abs p{margin:0 0 10px;text-align:justify}.sde-fm-abs p:last-child{margin-bottom:0}.sde-fm-lbl{font-size:12px;letter-spacing:.3em;opacity:.7;margin-bottom:9px}.sde-fm-kw{font-size:.9em;opacity:.75;margin:0 0 22px;padding-bottom:16px;border-bottom:1px solid rgba(128,128,128,.25);line-height:1.85}.sde-fm-note{font-size:.86em;opacity:.72;line-height:1.85;margin:0 0 24px;padding:11px 16px;border:1px dashed rgba(128,128,128,.35);border-radius:3px}.sde-fm-ref{font-size:.87em;line-height:1.75;opacity:.78;margin:0 0 9px;text-indent:-1.9em;padding-left:1.9em;text-align:left}
+.sde-fm-sub{font-size:1.02em;opacity:.85;margin:0 0 20px;line-height:1.8}</style>
+<link rel="stylesheet" href="/sde-read.css">
+
+<style>
+.wrap table.tbl{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px;line-height:1.75}
+.wrap table.tbl th{text-align:left;padding:10px 12px;border-bottom:2px solid rgba(181,134,15,.45);color:#F0C860;font-weight:700}
+.wrap table.tbl td{padding:10px 12px;border-bottom:1px solid rgba(181,134,15,.18);color:#DED6BF;vertical-align:top;text-indent:0}
+.wrap ul.lst,.wrap ol.lst{margin:0 0 20px 1.6em;color:#DED6BF}
+.wrap ul.lst li,.wrap ol.lst li{margin-bottom:10px;line-height:1.95;text-align:justify}
+.wrap code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;color:#F0C860;background:rgba(181,134,15,.12);padding:1px 5px;border-radius:3px}
+</style>
+</head>
+<body class="sde-read">
+<div class="readbar">
+  <a class="nav-back" href="/students/qin-li/works/">‹ 秦莉 · 全部作品</a>
+  <div class="rb-modes" aria-label="三种阅读方式">
+    <span class="rb-btn cur">📖 长文阅读</span>
+    <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+    <a class="rb-btn" href="heterogeneous-genesis.pdf" download>⬇ 下载 PDF</a>
+  </div>
+</div>
+<header class="art">
+  <div class="art-series">学员专栏 · 秦莉 · 科幻发生学 · 叙事接受研究</div>
+  <h1 class="art-title">异质发生与奇幻价值：科幻叙事中三条时间线的错位</h1>
+  <div class="art-subtitle">读得懂设定、承认自洽，却仍然觉得「不可信」——那道裂缝不在语义，在三条互不相通的时间线上</div>
+  <div class="art-meta">作者 秦莉（斐索） · SDE 学员 · 约 0.9 万字 · 修订版 · 发表于 2026 年 9 月 9 日</div>
+</header>
+<div class="wrap">
+<div class="abstract"><span class="ab-lbl">摘 要</span><p>读一部科幻小说，你可能完全看懂了它的科学设定，也承认这个世界内部自洽，却仍然在某个转折处觉得"不可信"。这种不可信不是因为你知识不够，也不是因为你抓到了逻辑矛盾。</p><p>本文主张：这类接受失败的来源，不在科学设定的语义（"这个设定新不新、硬不硬"），而在于<strong>三条互不相通的时间线同时压在同一段文字上</strong>。三条线分别是——设定在故事生成中沉积下来的功能（撤除斧）、读者在读到结局前有没有权利做出判断（冻结斧）、编辑在两稿之间裁定一次改动是修错还是伤好（差分斧）。三条线各有各的时间方向：一条向后追溯，一条向前推进，一条在平行稿次之间横移。</p><p>本文提出<strong>三斧正交</strong>这一判断，并给出它的判别式（删除重建测试）、三条自我否决条款与可触发的证伪条件。全文对读者的承诺仅限于此：<strong>提出一个可被反驳的结构判据，并说明它尚未被真实材料检验。</strong></p></div>
+<div class="keywords"><strong>关键词：</strong>科幻叙事；接受失败；设定功能；读者权限；版本裁决；三斧正交</div>
+<blockquote class="pull"><strong>本文的诚实边界（放在最前，不放脚注）</strong><br>一、核心判别式（删除重建测试）<strong>本轮尚未在任何真实材料上执行</strong>，全文所有"三斧不可互推"的表述都是待检验主张，不是已证结论。<br>二、占位者的核验状态逐家标注，标〔待核〕的不充当分离线支点。<br>三、本文不再使用初稿摘要中"本体性失重""理念界悬空"两个说法——正文没有交付它们。</blockquote>
+<h2>一、引言：一个说不清的阅读经验</h2>
+<h3>1.1 现象</h3>
+<p>刘慈欣《乡村教师》的结局前，碳基文明作为一个此前没出现过的前提被引入，让故事得以收束。很多读者能把这个设定的逻辑复述得清清楚楚，却仍然觉得这里"断了一下"。</p>
+<p>再换一个场景。一位作者在终稿里补进了一项前稿中不存在的救场能力。只读终稿的读者觉得一切合理；而全程跟过修改的编辑，可能会说这里"作弊"。同一段文字，两种判断，而两人的科学素养、逻辑能力都不成问题。</p>
+<p>这个现象在创作与批评里长期存在，却总被三种说法打发掉。</p>
+<h3>1.2 三种打发法，和它们各自的破绽</h3>
+<p><strong>说法一：读者科学素养不够。</strong> 破绽在于，具备同等科学背景的编辑和读者会给出相反的判断——素养解释不了分叉。</p>
+<p><strong>说法二：作者笔力不行。</strong> 这是用结果替换机制。"笔力"不说明失效发生在什么结构上，因此也无法预测下一次会不会再犯。</p>
+<p><strong>说法三：文本不够自洽。</strong> 这条最正规，也最不对症。本文开头那个现象恰恰是：科学上说得通、文本内不矛盾，可信性判断<strong>仍然</strong>分叉。</p>
+<p>刘慈欣研究里已有人碰到过边上。李广益反对把刘慈欣的作品只当作经验的民族投射〔待核〕，但没有进一步去切分读者接受的时间结构。</p>
+<p><strong>科学正确 ＋ 内部自洽 ＋ 仍然不可信</strong>——这在现有框架里是一个无主的洞。</p>
+<h3>1.3 本文的承重命题</h3>
+<p>科幻叙事中的可信性、设定功能与读者判断，<strong>不是同一条差异轴上的三个属性，而是三条不同的时间线</strong>：</p>
+<ul class="lst"><li><strong>D₁ 设定功能</strong>：一个设定在故事生成中沉积下来的承重方式。方向是<strong>向后追溯</strong>——把它撤掉，哪几层塌？</li><li><strong>D₂ 读者权限</strong>：读者在读到结局之前，有没有理由对某件尚未写出的事作出判断。方向是<strong>向前推进</strong>——到这一句为止，我够不够格判？</li><li><strong>D₃ 版本裁决</strong>：一次改动是修掉了真错，还是伤了合法的变化。方向是<strong>平行横移</strong>——旧稿新稿并排看。</li></ul>
+<p>传统理论把这三条都投影到同一个文本特征序列上（也就是"设定本身怎么样"），"不可信"的真正来源因此被遮住。</p>
+<p>写成一句排他命题：</p>
+<blockquote class="pull"><strong>科幻叙事的接受失败，不是科学设定的语义不足，而是 D₁、D₂、D₃ 三条时间线在同一段文字上发生了不可通约的错位。</strong></blockquote>
+<p>它的反面很清楚：若接受失败只是文本特征的缺失，那么认知陌生化、世界一致性与叙事可信性三套理论早该穷尽这个现象。本文要显示它们没有——因为它们分不开这三条线。</p>
+<h3>1.4 三个研究问题</h3>
+<ul class="lst"><li><strong>RQ1</strong>：科学正确与文本自洽都满足时，"不可信"由什么结构因素引起？</li><li><strong>RQ2</strong>：设定在故事里承担的多种功能（推事件、给感知、迫选择、供判断），能不能还原成同一种"设定—情节"依赖？若不能，差别落在哪一层？</li><li><strong>RQ3</strong>：同一段文字被三种审查同时处理时，三条路径各自产出什么不能互相替代的判断？</li></ul>
+<h3>1.5 贡献声明</h3>
+<p>一、提出<strong>三斧正交</strong>模型，用撤除、冻结、差分三个动作分开设定功能、读者权限与版本裁决；</p>
+<p>二、给出<strong>删除重建测试</strong>作为唯一的正交判据，并明写它尚未执行；</p>
+<p>三、给出可操作的分诊流程，使三类接受失败在编辑流程与记录层面可被区分，而不再依赖专家直觉。</p>
+<h2>二、既有解释走到哪里为止</h2>
+<p>这一节要说的是：三条主要脉络各自握着什么变量，以及各自在哪一类案例上失效。</p>
+<h3>2.1 三条脉络</h3>
+<p><strong>第一条：认知陌生化。</strong> 苏文（Darko Suvin）1979 年的《科幻小说变形记》把科幻性放在文本的认知潜能上——作品引入一个"新异"（novum），使读者从现实的默认框架中疏离出来，由此获得反思的维度〔待核到原文页码〕。此后大批研究把科幻判定与这一机制绑定，"设定有没有认知功能"成了价值判断的主入口。</p>
+<p><strong>第二条：可能世界叙事学。</strong> 莱恩（Marie-Laure Ryan）的"最小偏离原则"指出：读者建构叙事世界时，默认它遵循与现实相同的规律，除非作者另行指明〔待核〕。这条脉络的长处是能处理自洽性——后补事实与前设冲突时，它能指出冲突落在哪个命题上。短处是它判定的标准是"逻辑上矛不矛盾"，对读者读到某一点时的<strong>资格感受</strong>几乎没有话语权。</p>
+<p><strong>第三条：叙事可信性研究。</strong> 由修辞叙事伦理、亚里士多德"可能—可信"的古典区分，以及近年的实验研究组成〔待核〕。它最接近本文的问题，但落脚点仍在读者的主体状态（沉浸、信任、期待）或文本的类型信号上。</p>
+<h3>2.2 各自的失效条件</h3>
+<table class="tbl"><thead><tr><th>脉络</th><th>握着的变量</th><th>在哪一类案例上失效</th></tr></thead><tbody><tr><td>认知陌生化</td><td>设定有无认知功能</td><td><strong>不产生陌生化、却承担结构功能</strong>的设定。《乡村教师》里的碳基文明既不陌生化也不反思，它只是让故事能结束</td></tr><tr><td>可能世界</td><td>世界的逻辑闭合</td><td><strong>不产生逻辑矛盾、却动摇资格基础</strong>的后补。它与前文完全一致，但读者本该有权提前判断，机会被拿走了</td></tr><tr><td>可信性研究</td><td>读者信任</td><td><strong>落差来自时间结构而非情绪强度</strong>的案例。编辑与读者的不可信感强度可以相近，来源完全不同：编辑来自版本责任，读者来自权限被剥夺</td></tr></tbody></table>
+<h3>2.3 缺口</h3>
+<p>三条失效条件指向同一处：接受失败里有一个<strong>由时间结构决定、而非由语义内容决定</strong>的维度。</p>
+<p>现有脉络之所以够不着，是因为每一条都只处理了"文本特征与某一条时间线"的对应，没有处理<strong>时间线与时间线之间的异质性</strong>。</p>
+<h2>三、三把斧子：概念与操作</h2>
+<h3>3.1 为什么用发生学的眼光</h3>
+<p>本文的出发点是：一个对象不由它当下的特征集合界定，而由这些特征取得当下形状的<strong>差异序列</strong>、以及这些特征相互纠缠的方式共同界定。落到本题上就是一句话——同一段文字之所以产生不同的接受结果，是因为它同时站在几条不同的生成路径上。</p>
+<p>选择这条路径而非上述三家，理由很实际：那三家各自在自己的层内自洽，但没有一家能在同一个框架里同时容纳三条互不通约的时间线。本文用"三斧"把这一层做成可操作的动作，让抽象的差异维被经验研究够得着。</p>
+<h3>3.2 三把斧子各是什么</h3>
+<p><strong>撤除斧</strong>（管 D₁ 设定功能）：把某个设定从文本里删掉，看哪几层塌。时间方向向后追溯。</p>
+<p>标记词只用：<strong>本来／原先／若不</strong>。</p>
+<p><strong>冻结斧</strong>（管 D₂ 读者权限）：在读到结局前把阅读冻住，问读者对一件尚未写出的事能不能判、判什么。时间方向向前推进。</p>
+<p>标记词只用：<strong>此前／尚未／未写</strong>。</p>
+<p><strong>差分斧</strong>（管 D₃ 版本裁决）：两稿并排，逐条判定每处差异是"修掉真错"还是"误修合法变化"。时间方向平行横移。</p>
+<p>标记词只用：<strong>旧稿／新稿／两稿并列</strong>。</p>
+<p>三个关键定义，各用一句话说死：</p>
+<ul class="lst"><li><strong>设定功能</strong>不由设定自身的语义或术语新颖度定义，而<strong>由撤除它时产生的损失层级定义</strong>。</li><li><strong>读者权限</strong>不由"世界内是否一致"决定，而由"读者事前有没有理由相信"决定。</li><li><strong>编辑裁决</strong>的根据不是单稿内的自洽，而是<strong>两稿之间那处变化的性质</strong>。</li></ul>
+<h3>3.3 怎么取值</h3>
+<p><strong>撤除斧</strong>：读数是设定被删后的功能损失标签集，覆盖"事件链—感知—选择—判断"四层，取值为四层中的零个或多个（类别变量）。取法：编码者对照读原文与删设定版，标记哪几层的阅读记录发生可观察变化。</p>
+<p><strong>及格线</strong>：至少有一层被稳定标记。</p>
+<p><strong>冻结斧</strong>：读数是冻结点之后、结局揭晓之前，读者对某项后补事实给出"许可／暂不能裁定／禁止"的判断一致率（顺序变量）。取法：双盲冻结阅读协议，读完结局后与判断比对。</p>
+<p><strong>及格线</strong>：一致率 ≥75% 才有讨论意义。</p>
+<p><strong>差分斧</strong>：读数是一次编辑的双栏审计标签，取"真错误修复／合法变化误修／暂不能裁定"之一（类别变量）。取法：两稿逐条对比，按预先规定的规则判定性质。</p>
+<p><strong>及格线</strong>：不得用一张综合分掩盖三栏。</p>
+<h2>四、核心命题与它的成立条件</h2>
+<h3>4.1 命题</h3>
+<blockquote class="pull">科幻叙事的奇幻价值，不在科学正确的语义内容，也不在读者沉浸的主观感受，而在<strong>三条时间线各自独立地压过同一段文字时，交叠处那一点异质发生</strong>。</blockquote>
+<h3>4.2 什么叫"正交"（本节已修订）</h3>
+<p>初稿在这里把两个不同的数学条件混成了一句。现在分开写。</p>
+<p><strong>正交的定义（结构条件）</strong>：对任一段文字，<strong>一条斧的输出不能推出另一条斧的输出</strong>。撤除斧的功能标记不构成冻结斧权限判断的理由，冻结斧的权限判断也不构成差分斧裁决的根据。</p>
+<p><strong>正交的检验（经验条件）</strong>：由<strong>删除重建测试</strong>执行——遮住另外两斧的全部输出，只用本斧的记录，能否重建本斧的完整判断链。能，则不可互推；不能，则本斧实际上在借另一斧的信息。</p>
+<p>⚠ 初稿写过一句"若两者之间不存在可检测的相关性，则判定正交"。<strong>这一句已删除。</strong> 统计上的低相关与结构上的不可互推是两个不同的条件：三条斧完全可以在同一批材料上高度相关（因为好设定往往同时满足三项），却仍然互不可推。<strong>相关性不是正交的判据，重建才是。</strong></p>
+<h3>4.3 五条独立可核的判定条件</h3>
+<ol class="lst"><li>撤除斧的损失层级<strong>不能</strong>推出冻结斧的权限判定。"这个设定承担了不可替代的事件链功能"不等于"它没写出来时读者有权期待它"。</li><li>冻结斧的权限判定<strong>不能</strong>推出差分斧的裁决。"读者事前有权相信"不等于"作者后补进来是合法的"。</li><li>每一斧的判断记录必须<strong>在没有另两斧输出的条件下可被完整重建</strong>（即删除重建测试）。</li><li>三斧的时间标记词<strong>不可互换</strong>。任一斧出现另一斧的标记词，判为串味。</li><li>三斧在同一段文字上产生的判断输出，<strong>至少有一条不重合</strong>。</li></ol>
+<h3>4.4 与最强的两位近邻复合对质</h3>
+<p>能在本文框架之外构成威胁的，是杜勒泽尔（Doležel）的"虚构世界不完备"与米科宁（Mikkonen）的"模态判断悬置"〔Mikkonen 2011, <em>Journal of Literary Semantics</em> 40:111–131，已核验卷期页码〕。</p>
+<p>把两句拼起来可以说：读者对未写事实的不可信感，只是把文本的不完备误当成事实缺失，从而做了过度的模态判断。</p>
+<p>这个复合表述确实覆盖了一部分现象。<strong>但本文的增量在一处分离</strong>：</p>
+<blockquote class="pull">米科宁的悬置是<strong>判断的心理状态</strong>——悬而未决、暂不判定，可以在任何时刻被更新而不损结构。<br>本文的读者权限是<strong>判断的时间资格</strong>——它一旦错过那个时间点，就永远失去复位的机会。</blockquote>
+<p>所以米科宁解释不了这一句：为什么一个在逻辑上与前文一致、在模态上完全可以被合理悬置的后补事实，仍然让读者感到"作者作弊"。这种作弊感不是"我没办法判断"，而是"我本来有权在读到结局前判断，作者没给我这个权利"。</p>
+<h2>五、最近邻盘点与占位划界</h2>
+<h3>5.1 检索与核验状态</h3>
+<p>本轮的占位者分两类：〔已核验〕指查到了原文、条目或通行书目；〔待核〕指内容层可信但本轮未核到一手来源。<strong>标〔待核〕的不充当分离线支点，也不写进判决性反例。</strong></p>
+<h3>5.2 三家此前完全没交手的正主（本次新增）</h3>
+<p>初稿的十位占位者全部落在科幻理论与叙事学内部。<strong>本节补进三家来自别处、却正面压在本文命题上的先行者。</strong></p>
+<p><strong>一、范·达因《推理小说二十条》规则一（1928）与诺克斯《十诫》第十条（1929）</strong>〔已核验〕</p>
+<ul class="lst"><li><strong>它已经占了什么</strong>：读者必须与侦探拥有同等的解谜机会，一切线索必须交代清楚；范·达因明确用了"作弊"（cheat at bridge）这个词。诺克斯第十条禁止使用事先未介绍的双胞胎或替身——正是"后补能力"这一类。</li><li><strong>本文承认什么</strong>：<strong>这是本文 D₂（读者事前有权判断、作者后补即作弊）的九十七年前先行版，而且说得比本文早、比本文有名。</strong> 本文不主张这一直觉是新的。</li><li><strong>分离线</strong>：公平游戏是<strong>规范性的文类公约</strong>——只管侦探小说、只说"不许"、没有量具、没有跨读者一致率。本文的读者权限是<strong>结构性主张＋冻结协议＋可测的一致率</strong>，且不限于某一文类：它要回答的是权限在什么条件下成立、如何被剥夺、剥夺能否被观测到，而不是宣布哪些手法不许用。</li><li><strong>判决性反例</strong>：若把冻结协议用在一部<strong>并不违反公平游戏任何一条</strong>的作品上，仍能测出显著的权限剥夺读数，则本文的读者权限不能被公平游戏公约还原；反之，若权限剥夺读数与"是否违反二十条"完全同步，本文这一维就只是旧公约的新说法，须作废。</li><li><strong>撤名条件</strong>：若查出公平游戏传统中已有对"权限剥夺"的可测判据与跨读者一致率设计，本文关于 D₂ 的原创性主张须撤销，即使冻结协议的经验结果仍然成立。</li></ul>
+<p><strong>二、发生批评（critique génétique）与校勘学的版本研究</strong>〔待核〕</p>
+<ul class="lst"><li><strong>它已经占了什么</strong>：以前文本（avant-texte）、草稿谱系、逐版异文比对——<strong>这是差分斧的本行学科</strong>，它有整套成熟的方法论、术语与档案实践。</li><li><strong>本文承认什么</strong>：本文对 D₃ 的处理远不如这一传统细密；初稿把整门学科漏在外面，是重大缺口。</li><li><strong>分离线</strong>：发生批评的目的是<strong>重建创作过程、解释作品如何成为现在这样</strong>；差分斧的目的是<strong>裁定一次改动的性质</strong>（修掉真错，还是误伤了合法变化）。前者是解释性的，后者是裁定性的——它要产出一个可用于编辑流程的判断，且要求这个判断不能借用另外两斧的信息。</li><li><strong>撤名条件</strong>：若发生批评中已有对"误修合法变化"的成型判据，本文差分斧一节须并入该传统，不另立。</li></ul>
+<p><strong>三、"机械降神"（deus ex machina）与"契诃夫之枪"</strong>〔待核〕</p>
+<ul class="lst"><li><strong>它已经占了什么</strong>：这是本文所说现象在手艺层的两个老名字。亚里士多德已谴责机械降神；契诃夫之枪则从正面规定了预设与兑现的对称。《乡村教师》碳基文明那个例子，在文类批评里本来就是一次机械降神的讨论。</li><li><strong>本文承认什么</strong>：现象不是本文发现的，本文只是给它换了一副可测的骨架。</li><li><strong>分离线</strong>：这两个名字是<strong>评价性标签</strong>——用完即止，无法区分"读者本来有权判断"与"设定本身承重不足"这两种不同的失败。三斧的价值恰恰在<strong>分诊</strong>：同一句"这里太巧了"，可能是撤除斧的问题（设定不承重），也可能是冻结斧的问题（权限被剥夺），还可能是差分斧的问题（改动误伤）。</li></ul>
+<h3>5.3 原有十位占位者的位置</h3>
+<p>苏文与德拉尼在文本特征层做了深切，但没有时间箭头；莱恩与杜勒泽尔处理了虚构世界的逻辑结构，但其中没有读者的资格问题；米科宁在模态判断上推进了一步，止步于状态描述；赫尔曼与莱姆在非人叙事的理解上提供了独立入口，但没有触及"撤掉之后会怎样"。以上均按〔待核〕处理。</p>
+<h3>5.4 本文的增量落在哪里（压成一句）</h3>
+<blockquote class="pull">十三家里，<strong>没有一家同时处理设定功能、读者权限与版本裁决三条序列，并要求它们之间不可互推。</strong> 本文的全部增量就在这个"同时且不可互推"上——而它成不成立，取决于第六节那个尚未执行的测试。</blockquote>
+<h2>六、判别式与读数</h2>
+<h3>6.1 唯一的正交判据：删除重建测试（本节已重写）</h3>
+<p>⚠ <strong>初稿在这里犯了一个错，现予公开更正。</strong></p>
+<p>初稿用五个场景（A–E）说明"三斧对同一段文字给出的答案互不相同"，并以此作为正交的证据。<strong>这个论证是无效的</strong>：三把斧本来就在问三个不同的问题，答案不同是平凡真理，不构成任何正交证据。</p>
+<p>正交要证的不是"答案不同"，而是"<strong>一斧的输出不能推出另一斧的输出</strong>"。能证这一点的只有一个测试：</p>
+<blockquote class="pull"><strong>删除重建测试</strong>：给编码者只提供某一斧的完整记录，遮去另外两斧的全部输出，要求他重建该斧的判断链；再反向要求他仅凭本斧记录去预测另一斧的输出。若预测准确率显著高于随机，则两斧不正交。</blockquote>
+<p><strong>执行状态：本轮未执行，零材料。</strong> 全文一切关于"三斧不可互推"的表述，都是待检验主张。</p>
+<p><strong>最低可行的执行方案</strong>（成本极低，供后续执行）：取 20 组真实编辑记录（原稿、终稿、编辑批注三件齐全），两名编码者盲态作业，先各自只拿一斧的材料重建判断链，再交叉预测另一斧。20 组材料在任何一家出版社的编辑档案里都够得着。</p>
+<h3>6.2 三条自我否决条款</h3>
+<ul class="lst"><li><strong>信度</strong>：同一批材料重测，冻结斧一致率的组内相关低于 0.80，或两名编码者对撤除斧损失层级的一致率低于 0.80，读数判为不稳。</li><li><strong>改名嫌疑</strong>：若三斧读数与"编辑经验年限"或"读者对该文类的熟悉度"的相关高于 0.80，且遮住这两项后三斧不再解释任何差异，则三斧只是熟练度的改名。</li><li><strong>测错东西</strong>：若三斧读数与"阅读愉悦度"的相关高于它与接受失败判断的相关，则测错了对象。</li></ul>
+<h2>七、证伪条件</h2>
+<h3>7.1 证伪条款（第一条已重写为可触发）</h3>
+<p><strong>〔未执行〕条款一（原条款不可触发，已重写）。</strong></p>
+<p>初稿的写法是"若三斧读数完全同一，则正交被推翻"——三把斧问的是三个问题，读数完全同一几乎不可能出现，这条实际上永远不会被触发，等于没有证伪条款。</p>
+<p>现改为：<strong>在删除重建测试中，若任一斧仅凭本斧记录即可预测另一斧输出，且准确率显著高于随机（预设阈值 κ&gt;0.60），则该两斧不正交，本文承重命题即被推翻。</strong></p>
+<p><strong>〔未执行〕条款二</strong>：若冻结斧的跨读者一致率长期低于 0.75，则读者权限不是一个稳定的结构变量，只是个体差异，D₂ 一节须删除。</p>
+<p><strong>〔未执行〕条款三</strong>：若把冻结协议用在完全遵守公平游戏公约的作品上测不出任何权限剥夺，而在违反公约的作品上读数与"违反了第几条"完全同步，则读者权限可被公平游戏公约还原，本文该维须并入侦探小说文类研究。</p>
+<p><strong>〔未执行〕条款四</strong>：若三斧的分诊结论与资深编辑的直觉判断在 20 组材料上完全一致，则本文没有提供直觉之外的增量，分诊流程降级为直觉的记录格式。</p>
+<h3>7.2 撤稿级条件</h3>
+<p>若删除重建测试在 20 组以上真实材料中显示任意两斧可互推（κ&gt;0.60），本文核心命题与三斧模型须整体撤回，不保留较弱版本。</p>
+<h2>八、研究设计与方法</h2>
+<p><strong>方法论立场</strong>：本文为概念分析，不实施实验。判据只有一条——他人依照同一套材料筛选与编码程序，能否得到同一判断。</p>
+<p><strong>材料来源</strong>：论证材料限于本文引用的公开作品与理论文献。<strong>本文没有采集编辑档案、没有招募读者、没有执行冻结协议。</strong>上文所有"读数""一致率""阈值"均为拟议设计，不是已得结果。</p>
+<p><strong>研究者立场与防范</strong>：作者持发生学立场，预期三斧不可互推，存在确认自身命题的风险。防范措施：把删除重建测试设为唯一判据（而非用场景说明代替）、把"可被公平游戏公约还原"设为撤稿条件、明示测试未执行。</p>
+<h2>九、竞争解释的逐项裁决</h2>
+<p><strong>苏文式解释</strong>最强的版本是：科幻性取决于设定是否产生认知陌生化。它预测——不陌生化的设定不承担科幻价值。本文预测——<strong>不陌生化但承重的设定同样承担价值</strong>（《乡村教师》碳基文明）。分离检验：对一批不产生陌生化却在撤除时造成事件链塌陷的设定，苏文框架判"科幻性弱"，本文判"D₁ 承重强"。若两者判断在所有材料上同步，本文的分离线不成立。</p>
+<p><strong>莱恩式解释</strong>最强的版本是：叙事世界的可信性取决于逻辑闭合与最小偏离。它预测——不产生矛盾的后补不会引起接受失败。本文预测——<strong>不矛盾的后补仍可能因剥夺权限而失败</strong>。分离检验：取一批逻辑完全一致的后补事实，测冻结点上的权限判断。若权限读数与逻辑一致性同步，本文的 D₂ 被覆盖。</p>
+<p><strong>米科宁式解释</strong>见 4.4，此处不重复。分离点是状态与资格之别，检验方式是"错过时间点后能否复位"。</p>
+<p><strong>公平游戏式解释</strong>（本次新增）最强的版本是：读者的作弊感来自作者违反了文类公约。它预测——<strong>读数应与"违反了第几条"同步</strong>。本文预测——<strong>在不违反任何一条的作品上仍可测出权限剥夺</strong>。这是本文与它之间唯一的判决点，见 7.1 条款三。</p>
+<h2>十、类型学与辨别格</h2>
+<h3>10.1 排除掉的候选轴</h3>
+<ul class="lst"><li><strong>"设定硬不硬"</strong>排除：这是被解释项本身，拿它当轴等于同义反复。</li><li><strong>"读者是否喜欢"</strong>排除：结果变量倒装为解释变量。</li><li><strong>"文本长度／出版年代"</strong>排除：与三条时间线无结构关系。</li></ul>
+<h3>10.2 两轴</h3>
+<ul class="lst"><li><strong>第一轴：设定承重度</strong>（撤除斧读数——删掉它，塌几层）</li><li><strong>第二轴：权限完整度</strong>（冻结斧读数——读者在事前有没有判断的根据）</li></ul>
+<p>两轴相关但不重合：承重的设定通常也会被提前铺垫，但<strong>承重而未铺垫</strong>（机械降神）与<strong>铺垫而不承重</strong>（闲笔伏线）都真实存在，正是这两格让两轴分得开。</p>
+<h3>10.3 四格与各自的独有预测</h3>
+<table class="tbl"><thead><tr><th></th><th>高权限完整度</th><th>低权限完整度</th></tr></thead><tbody><tr><td><strong>高承重</strong></td><td><strong>健全格</strong>。预测：撤除测试塌多层，冻结点判断与结局高度一致（≥0.75）。读者事后回想不会觉得被骗</td><td><strong>机械降神格</strong>。预测：撤除塌多层，但冻结点上读者普遍判"禁止"或"暂不能裁定"，与结局背离。<strong>编辑与读者会给出方向相反的诊断</strong></td></tr><tr><td><strong>低承重</strong></td><td><strong>闲笔格</strong>。预测：撤除几乎不塌，冻结点判断一致但无所谓。读者不会觉得被骗，只会觉得这一笔可有可无</td><td><strong>杂音格</strong>。预测：撤除不塌、冻结也测不出稳定判断。这一格里"不可信"的抱怨最少，因为读者根本没在意</td></tr></tbody></table>
+<p><strong>机械降神格是本文唯一带反向预测的一格</strong>，也是最容易被证伪的一格：如果在这一格里编辑与读者的诊断方向一致，本文关于两类失败可分诊的主张就站不住。</p>
+<h2>十一、讨论</h2>
+<h3>11.1 理论意涵</h3>
+<p>本文的增量不在于给科幻性换一个新定义，而在于<strong>改变判定单位</strong>：从"这个设定怎么样"改成"三条时间线在这一句上怎么排布"。由此，接受失败不再是一个笼统的负面评价，而是一个<strong>可分诊的结构读数</strong>。</p>
+<h3>11.2 实践意涵</h3>
+<p>对编辑而言，最有用的一条是：<strong>"这里太巧了"这句话必须先分诊，再动手。</strong> 三种病要三种改法——</p>
+<ul class="lst"><li>撤除斧的病（设定不承重）：改法是让它在别处也起作用，而不是把它写得更硬。</li><li>冻结斧的病（权限被剥夺）：改法是往前埋一处<strong>可判但不点破</strong>的根据，而不是在原地加解释。</li><li>差分斧的病（误修合法变化）：改法是回到旧稿把那处变化恢复，而不是在新稿上继续修补。</li></ul>
+<p><strong>这三种改法互相不通用。</strong> 用错一种，症状会转移而不是消失——这也是本文可被实践证伪的地方：若三种改法在真实修改中效果无差别，分诊就没有意义。</p>
+<h3>11.3 适用边界（这里削掉了本文原想说的一句）</h3>
+<p>本文原本想说"三斧适用于一切叙事的接受失败"。<strong>这句话必须削掉。</strong>准确的说法是：三斧只适用于<strong>有版本痕迹可查、且读者判断可被冻结采集</strong>的叙事。口头叙事、即兴表演、无草稿留存的作品，差分斧无处落脚；一次性阅读、无法冻结的媒介，冻结斧同样跑不动。</p>
+<h3>11.4 反噬</h3>
+<p>本文最省事的执行方式，恰好可能毁掉它要保住的东西：把三斧做成一张编辑检查表，要求每篇稿子填三栏、打三个勾。这样做会产生<strong>表演性分诊</strong>——为了填满栏目而给出标签，标签之间的不可互推反而被填表习惯抹平。</p>
+<p>因此，三斧一旦离开删除重建测试，就只是三个好听的名字。<strong>本文要保住的不是三个标签，而是"一斧的输出不能借另一斧的信息"这条约束；一旦检查表替代了这条约束，三斧立刻退化为分类表演。</strong></p>
+<h2>十二、效度威胁与研究局限</h2>
+<p><strong>构念效度</strong>：三斧测到的可能只是"编辑经验的三种表述方式"，而非三条独立的结构序列。自我否决条款二针对的就是这一点，但它尚未执行。</p>
+<p><strong>内部效度</strong>：即使删除重建测试显示不可互推，也可能是三套记录格式差异造成的假独立。后续应由第三方设计统一记录格式后重测。</p>
+<p><strong>外部效度</strong>：本文的例子集中在中国当代科幻（以刘慈欣为主），推广到其他语种、其他文类前须重跑。<strong>不能把三斧宣称为叙事的普遍属性。</strong></p>
+<p><strong>两个本文解释不了的洞</strong>：</p>
+<p>一、若一部作品同时在三斧上都读数良好，读者仍报告"不可信"，本文无法解释这种剩余——它可能来自文体、节奏或译文，也可能来自三斧之外的第四条时间线。</p>
+<p>二、本文无法解释：在机械降神格里，究竟是权限剥夺本身让读者不适，还是读者<strong>事后察觉自己曾被剥夺</strong>才不适。两者的干预方式完全不同，而现有设计区分不了。</p>
+<h2>十三、结论</h2>
+<p><strong>RQ1</strong> 的答案：科学正确与文本自洽都满足时，"不可信"来自三条时间线在同一段文字上的错位，而不是语义不足。</p>
+<p><strong>RQ2</strong> 的答案：设定的多种功能不能还原为同一种依赖关系。差别不在设定的内容，而在<strong>撤除它时的损失层级</strong>——这是一个可测的类别变量，不是一个评价。</p>
+<p><strong>RQ3</strong> 的答案：三条审查各自产出不可替代的输出，这一点由删除重建测试判定。<strong>该测试本轮未执行，因此本文交出的是判据与量具，不是结论。</strong></p>
+<p>三点启示：一、批评应把"不可信"先分诊再评价；二、编辑流程应把三栏记录分开保存，不合并成一张综合分；三、创作教学里"埋伏笔"这条老规矩，可以被重述为一个可测的权限问题，而不再只是手艺经验。</p>
+<h2>声明组</h2>
+<p><strong>【作者贡献】</strong> 概念化、方法、写作与修订由斐索完成。</p>
+<p><strong>【与既有传统的优先权声明】</strong> 本文明确承认：读者事前判断权与"作者后补即作弊"这一直觉，范·达因（1928）与诺克斯（1929）早已提出，且比本文有名；草稿谱系与逐版比对是发生批评的本行；"机械降神"与"契诃夫之枪"是本文现象在手艺层的旧名。<strong>本文不主张这些直觉是新的</strong>，只主张把它们分成三条互不可推的序列、并给出可测判据这一步是新的——而这一步尚待检验。</p>
+<p><strong>【利益冲突】</strong> 无。</p>
+<p><strong>【数据与材料可得性】</strong> 本文为概念分析，未采集数据，无可供下载的数据集。文中一切读数与阈值均为拟议设计。</p>
+<p><strong>【AI 使用声明】</strong> 本文的结构整理、文字压缩与表述校订曾由生成式人工智能协助完成；作者对概念来源、论证边界、事实准确性与全文最终版本承担全部责任。</p>
+<p><strong>【本次修订说明】</strong> 本文相对初稿有五处实质更改，均为公开更正而非静默改数：① 删去 6.1 用"三斧答案不同"充当正交证据的无效论证，改以删除重建测试为唯一判据并标明未执行；② 重写证伪条款一，使其可被触发（原条款几乎不可能被触发）；③ 分开"统计相关"与"结构不可互推"两个条件，删去把前者当作正交判据的表述；④ 补入三家此前完全未交手的占位者（公平游戏公约、发生批评、机械降神传统），并写明本文对 D₂ 的直觉不具优先权；⑤ 摘要不再许诺正文未交付的"本体性失重""理念界悬空"。</p>
+<h2>参考文献与核验分级</h2>
+<p><strong>〔已核验〕</strong></p>
+<p>Van Dine, S. S. (1928). Twenty Rules for Writing Detective Stories. <em>The American Magazine</em>, September 1928.</p>
+<p>Knox, R. A. (1929). "A Detective Story Decalogue," in <em>The Best Detective Stories of 1928</em>.</p>
+<p>Mikkonen, J. (2011). Modal Judgements and Literary Fiction. <em>Journal of Literary Semantics</em>, 40, 111–131.</p>
+<p><strong>〔待核〕</strong>（本轮未核到一手来源，不充当分离线支点）</p>
+<p>Suvin, D. (1979). <em>Metamorphoses of Science Fiction</em>. Yale University Press.</p>
+<p>Ryan, M.-L. 最小偏离原则；<em>Fictional Reality</em> 相关论述。</p>
+<p>Doležel, L. 虚构世界的不完备性。</p>
+<p>发生批评（critique génétique）与 avant-texte 传统。</p>
+<p>Lewis, D. (1979). Scorekeeping in a Language Game.</p>
+<p>李广益关于刘慈欣研究的相关论述。</p>
+<p><strong>说明</strong>：本表只保留正文实际使用、且能承担相应范围论证的条目。〔待核〕条目仅用于说明既有解释的位置，不承担优先权判断。</p>
+<div class="endbox">
+  <div class="lbl">三 种 读 法</div>
+  <div class="big">网页长文 · 在线 PDF 翻页 · PDF 下载</div>
+  <p>本文为修订版。相对初稿的每一处实质更改都写在文末「本次修订说明」里，是公开更正，不是静默改数。</p>
+  <a class="solid" href="heterogeneous-genesis.pdf" download>⬇ 下载 PDF</a>
+  <a class="ghost" href="/students/qin-li/works/">返回 秦莉 全部作品</a>
+</div>
+</div>
+<script>window.WDS_READ={selector:".wrap",profile:"liter"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260909c" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>

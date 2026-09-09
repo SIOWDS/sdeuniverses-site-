@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>判据窗口的闭合与翻盘：科幻写作里「换件」与「换己」的分界 · 秦莉 · SDE 学员专栏</title>
+<meta name="description" content="一个成熟作者改稿改了一年，每一次修改都让作品更「对」，作品却仍然不成立。本文分开两种改稿：在同一套标准之内换材料（换件），与换掉那套标准本身（换己）。承重命题是——换己不是主动的创新姿态，而是换件路径用尽、旧标准对某个对象两判都给不出之后被迫走的那一步。本文与阿吉里斯与舍恩的双环学习、索默斯 1980 年的修改策略研究正面交手，并删去了初稿中与前五条不协调的条件六。">
+<style>
+:root{--gold:#B5860F;--gold2:#D0A22A;--ink:#F0E9D8;--paper:#2A2013;--muted:#7C6E4E;--bg:#0E0B08;--panel:#171310}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(181,134,15,0.32)}
+body{background:var(--bg);color:#EAE2CE;font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+a{color:var(--gold);text-decoration:none}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(181,134,15,0.28);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#CBBE94;font-size:13px;letter-spacing:0.04em}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(181,134,15,0.5);color:#D9CDA0;letter-spacing:0.03em}
+.rb-btn.cur{background:var(--gold);color:#1A1410;font-weight:700;border-color:var(--gold)}
+.art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
+.art-series{font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:22px}
+.art-title{font-size:clamp(24px,4.2vw,36px);font-weight:800;line-height:1.55;color:#F5EFE0;letter-spacing:0.02em}
+.art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--gold2);margin-top:18px;line-height:1.85;letter-spacing:0.01em}
+.art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.12em}
+.wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
+.abstract{background:linear-gradient(160deg,#1C1712,#141009);border-left:3px solid var(--gold);padding:22px 26px;margin:20px 0 26px;font-size:15.5px;line-height:1.95}
+.abstract .ab-lbl{font-size:12px;letter-spacing:0.3em;color:var(--gold);margin-bottom:10px}
+.abstract p{color:#CFC6AE;text-align:justify}
+.keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 30px;padding-bottom:24px;border-bottom:1px solid rgba(181,134,15,0.2)}
+.keywords strong{color:var(--gold)}
+.wrap h2{font-size:22px;font-weight:800;color:#F2ECDC;margin:44px 0 18px;letter-spacing:0.02em;padding-top:8px;border-bottom:1px solid rgba(181,134,15,0.18);padding-bottom:8px}
+.wrap h3{font-size:18px;font-weight:700;color:#E6DCC2;margin:30px 0 12px;letter-spacing:0.01em}
+.wrap p{margin-bottom:20px;text-align:justify;color:#DED6BF;text-indent:2em}
+.wrap p.ref{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:8px;text-indent:-2em;padding-left:2em;text-align:left}
+.wrap blockquote.pull{margin:26px 0;padding:18px 24px;background:linear-gradient(160deg,#1C1712,#15100a);border-left:3px solid var(--gold2);color:#EDE3C6;font-size:16.5px;line-height:1.9;text-align:justify}
+.wrap blockquote.pull strong{color:var(--gold2)}
+.wrap strong{color:var(--gold2);font-weight:700}
+.wrap em{color:#E0D5B4;font-style:italic}
+.iqnote{max-width:760px;margin:0 auto;padding:0 24px}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a12 0%,#150f08 60%,#0c0805 100%);text-align:center;padding:60px 24px;margin-top:40px;border-radius:4px}
+.endbox .lbl{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:16px}
+.endbox .big{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.06em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:1.95}
+.endbox a{display:inline-block;padding:12px 30px;font-size:14.5px;letter-spacing:0.08em;border-radius:2px;margin:5px;text-decoration:none}
+.endbox .solid{background:var(--gold);color:#150F08;font-weight:700}
+.endbox .ghost{border:1px solid var(--gold);color:var(--gold)}
+footer{background:#120E07;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid rgba(181,134,15,0.15)}
+footer a{color:var(--gold)}
+@media(max-width:640px){body{font-size:16.5px}}
+
+/* ===== 统稿增补 ===== */
+.lead{max-width:760px;margin:0 auto;padding:30px 24px 0}
+.innov{background:linear-gradient(135deg,#3a2f18,#2a2212 60%,#1c1710);border:1px solid rgba(201,168,76,0.35);border-radius:12px;padding:24px 28px;margin:0 0 22px;box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.innov .lbl{font-size:12px;letter-spacing:0.28em;color:#D4B25E;margin-bottom:12px;font-weight:700}
+.innov .lbl::before{content:"✦ ";color:#F0C860}
+.innov .txt{font-size:16.5px;line-height:1.92;color:#EDE3CC}
+.innov .txt b{color:#F0C860;font-weight:700}
+.daodu{background:#181310;border:1px solid rgba(201,168,76,0.3);border-left:4px solid #C9A84C;border-radius:10px;padding:24px 28px;margin:0 0 6px}
+.daodu .lbl{display:inline-block;font-size:12px;letter-spacing:0.22em;color:#1a140c;background:#C9A84C;padding:5px 14px;border-radius:20px;margin-bottom:14px;font-weight:700}
+.daodu h4{font-size:17.5px;color:#EDE3CC;margin:0 0 16px;font-weight:800}
+.daodu .row{margin:12px 0;line-height:1.88;color:#CDC0A6;font-size:15.5px}
+.daodu .row .k{color:#D4B25E;font-weight:800}
+.hl2{background:rgba(201,168,76,0.16);border-bottom:2px solid #C9A84C;padding:1px 4px;font-weight:700;color:#F0E4C8;border-radius:2px}
+
+/* ── 阅读进度：顶部一线，长读时知道自己在哪 ───────────────── */
+#prog{position:fixed;top:0;left:0;height:2px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .12s linear}
+
+/* ── 摘要：原渲染器丢了这一块，恢复并给它应有的分量 ───────── */
+.abs{margin:26px 0 4px;padding:24px 28px;background:linear-gradient(158deg,#1C1712,#141009);
+  border-left:3px solid var(--gold);position:relative}
+.abs .lb{font-size:11.5px;letter-spacing:.44em;color:var(--gold2);display:block;margin-bottom:12px}
+.abs p{margin:0;text-indent:0;font-size:16.5px;line-height:2.0;color:#E4DCC6;text-align:justify}
+.kw{margin:14px 0 0;font-size:14px;color:var(--muted);letter-spacing:.04em;text-indent:0}
+.kw b{color:var(--gold);font-weight:400;letter-spacing:.16em}
+
+/* ── 签名元素 · 对手榜：把这篇论文画出的那条分离线渲成看得见的 ── */
+.cut{margin:30px 0 6px;border:1px solid rgba(181,134,15,0.22);background:#120E0A}
+.cut .cap{font-size:11px;letter-spacing:.42em;color:var(--gold2);padding:14px 20px 0}
+.cut .row{display:grid;grid-template-columns:minmax(0,auto) 1px minmax(0,1fr);
+  gap:0 22px;align-items:stretch;padding:14px 20px 18px}
+.cut .me{align-self:center;font-size:19px;font-weight:800;color:#F2ECDC;letter-spacing:.03em;
+  white-space:nowrap;padding-right:4px}
+.cut .sep{background:linear-gradient(180deg,transparent,var(--gold) 22%,var(--gold) 78%,transparent)}
+.cut ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 10px}
+.cut li{font-size:13px;color:#C8BC9C;border:1px solid rgba(181,134,15,0.26);padding:5px 11px;
+  line-height:1.5;background:rgba(181,134,15,0.05)}
+.cut li i{font-style:normal;color:var(--muted);margin-left:7px;font-size:12px}
+.cut li.add{border-style:dashed;border-color:rgba(142,134,116,0.5);color:#A9A18C;
+  background:rgba(142,134,116,0.06)}
+.cut .foot{font-size:12.5px;color:var(--muted);padding:0 20px 16px;line-height:1.8}
+.cut .foot b{color:#A9A18C;font-weight:400}
+@media(max-width:600px){.cut .row{grid-template-columns:1fr;gap:12px}
+  .cut .sep{height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+  .cut .me{white-space:normal}}
+
+/* ── 目录：长读的落脚点，纯 CSS 折叠 ─────────────────────── */
+.toc{margin:24px 0 8px;border:1px solid rgba(181,134,15,0.20);background:#120E0A}
+.toc>summary{cursor:pointer;list-style:none;padding:13px 20px;font-size:12.5px;
+  letter-spacing:.32em;color:var(--gold2)}
+.toc>summary::-webkit-details-marker{display:none}
+.toc>summary::after{content:"＋";float:right;letter-spacing:0;color:var(--muted)}
+.toc[open]>summary::after{content:"－"}
+.toc ol{margin:0;padding:2px 22px 18px 42px;columns:2;column-gap:30px}
+.toc li{font-size:14px;line-height:2.0;color:#C8BC9C;break-inside:avoid}
+.toc a{color:#C8BC9C}
+.toc a:hover{color:var(--gold2)}
+@media(max-width:640px){.toc ol{columns:1}}
+
+/* ── 正文节奏 ────────────────────────────────────────────── */
+.wrap h2[id]{scroll-margin-top:70px}
+.wrap article>p:first-of-type{text-indent:0}
+
+/* ── 编辑增补：另一个说话人，用羊皮灰而不是金色 ──────────── */
+.suppwrap{margin:56px 0 0;border-top:1px solid rgba(142,134,116,0.34);padding-top:6px}
+.supphead{font-size:12px;letter-spacing:.40em;color:#A9A18C;margin:18px 0 8px;
+  border:0;padding:0}
+.supptip{font-size:14px;color:var(--muted);line-height:1.95;text-indent:0;margin:0 0 6px;
+  max-width:40em}
+.supp{border:0;border-left:2px solid rgba(142,134,116,0.55);background:transparent;
+  border-radius:0;padding:2px 0 2px 22px;margin:26px 0}
+.supp h2{font-size:17.5px;color:#CFC6AE;border:0;padding:0;margin:0 0 10px;
+  font-weight:700;letter-spacing:.02em}
+.supp h2::before{content:"编辑增补";display:block;font-size:10.5px;letter-spacing:.34em;
+  color:#8E8674;font-weight:400;margin-bottom:7px}
+.supp p{text-indent:0;font-size:16px;line-height:2.0;color:#CEC5AD;text-align:justify;margin:0}
+
+/* ── 参考文献 ────────────────────────────────────────────── */
+.ref{font-size:14px;padding-left:2em;text-indent:-2em;color:#B3A98D;line-height:1.85;margin:0 0 7px}
+.refhead{font-size:12px;letter-spacing:.36em;color:var(--gold2);border:0;padding:0;margin:34px 0 12px}
+.refhead.ed{color:#A9A18C}
+
+/* ── 分数条 ──────────────────────────────────────────────── */
+.scorebox{border:0;border-left:3px solid var(--gold);background:linear-gradient(158deg,#1B1611,#130F0A);
+  padding:16px 24px;margin:22px 0 0;font-size:14.5px;color:#C8BC9C;line-height:1.9}
+.scorebox b{color:var(--gold2);font-size:15px;letter-spacing:.03em}
+.scorebox p{margin:6px 0 0;text-indent:0;font-size:13.5px;color:var(--muted)}
+
+.endbox{text-align:center;border-top:1px solid rgba(181,134,15,0.24);margin-top:52px;
+  padding:38px 20px;color:var(--muted);font-size:14px}
+.endbox a{color:var(--gold)}
+@media(prefers-reduced-motion:reduce){#prog{transition:none}*{scroll-behavior:auto}}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.wrap h3{font-size:17px;margin:22px 0 8px;color:#D4B25E;font-weight:700}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.wrap h3{font-size:17px;margin:22px 0 8px;color:#D4B25E;font-weight:700}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.kw{font-size:14.5px;margin:0 0 18px;opacity:.9}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+
+/* 组内上下篇 */
+.pnbar{display:flex;gap:14px;margin:44px 0 8px;padding-top:22px;border-top:1px solid currentColor;
+ border-top-color:rgba(138,104,23,.28)}
+.pnbar a,.pnbar span{flex:1;min-width:0;display:block;padding:14px 16px;border-radius:9px;
+ border:1px solid rgba(138,104,23,.26);text-decoration:none;color:inherit;font-size:14px;line-height:1.6}
+.pnbar a:hover{border-color:rgba(200,145,23,.62);background:rgba(200,145,23,.07)}
+.pnbar .pn-l{opacity:.6;font-size:12px;letter-spacing:.14em;display:block;margin-bottom:5px}
+.pnbar .pn-t{display:block;font-weight:600}
+.pnbar .pn-none{opacity:.34;border-style:dashed}
+.pnbar .pn-next{text-align:right}
+@media(max-width:640px){.pnbar{flex-direction:column;gap:10px}.pnbar .pn-next{text-align:left}}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.wrap h3{font-size:17px;margin:22px 0 8px;color:#D4B25E;font-weight:700}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.kw{font-size:14.5px;margin:0 0 18px;opacity:.9}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+</style><style id="sde-fm">.sde-fm-abs{border-left:3px solid currentColor;padding:16px 20px;margin:20px 0 18px;background:rgba(128,128,128,.07);border-radius:2px;font-size:.96em;line-height:1.95;opacity:.97}.sde-fm-abs p{margin:0 0 10px;text-align:justify}.sde-fm-abs p:last-child{margin-bottom:0}.sde-fm-lbl{font-size:12px;letter-spacing:.3em;opacity:.7;margin-bottom:9px}.sde-fm-kw{font-size:.9em;opacity:.75;margin:0 0 22px;padding-bottom:16px;border-bottom:1px solid rgba(128,128,128,.25);line-height:1.85}.sde-fm-note{font-size:.86em;opacity:.72;line-height:1.85;margin:0 0 24px;padding:11px 16px;border:1px dashed rgba(128,128,128,.35);border-radius:3px}.sde-fm-ref{font-size:.87em;line-height:1.75;opacity:.78;margin:0 0 9px;text-indent:-1.9em;padding-left:1.9em;text-align:left}
+.sde-fm-sub{font-size:1.02em;opacity:.85;margin:0 0 20px;line-height:1.8}</style>
+<link rel="stylesheet" href="/sde-read.css">
+
+<style>
+.wrap table.tbl{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px;line-height:1.75}
+.wrap table.tbl th{text-align:left;padding:10px 12px;border-bottom:2px solid rgba(181,134,15,.45);color:#F0C860;font-weight:700}
+.wrap table.tbl td{padding:10px 12px;border-bottom:1px solid rgba(181,134,15,.18);color:#DED6BF;vertical-align:top;text-indent:0}
+.wrap ul.lst,.wrap ol.lst{margin:0 0 20px 1.6em;color:#DED6BF}
+.wrap ul.lst li,.wrap ol.lst li{margin-bottom:10px;line-height:1.95;text-align:justify}
+.wrap code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;color:#F0C860;background:rgba(181,134,15,.12);padding:1px 5px;border-radius:3px}
+</style>
+</head>
+<body class="sde-read">
+<div class="readbar">
+  <a class="nav-back" href="/students/qin-li/works/">‹ 秦莉 · 全部作品</a>
+  <div class="rb-modes" aria-label="三种阅读方式">
+    <span class="rb-btn cur">📖 长文阅读</span>
+    <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+    <a class="rb-btn" href="criterion-window.pdf" download>⬇ 下载 PDF</a>
+  </div>
+</div>
+<header class="art">
+  <div class="art-series">学员专栏 · 秦莉 · 科幻发生学 · 写作过程研究</div>
+  <h1 class="art-title">判据窗口的闭合与翻盘：科幻写作里「换件」与「换己」的分界</h1>
+  <div class="art-subtitle">改了一年还不成立，最后让它成立的不是又一次更聪明的修改，而是放弃了「什么才算成立」这把尺子</div>
+  <div class="art-meta">作者 秦莉（斐索） · SDE 学员 · 约 0.8 万字 · 修订版 · 发表于 2026 年 9 月 9 日</div>
+</header>
+<div class="wrap">
+<div class="abstract"><span class="ab-lbl">摘 要</span><p>一个成熟的科幻作者改稿改了一年，作品仍然不成立。他很清楚每一次修改都让作品更"对"——更合乎他心里那套"科幻之为科幻"的标准。最后让它成立的，不是又一次更聪明的修改，而是<strong>他放弃了那套标准本身</strong>。这个放弃在第十二个月还不存在，第十三个月却成了唯一可走的路。</p><p>本文要分开的就是这两种改稿：<strong>在同一套标准之内换材料（换件）</strong>，与<strong>换掉那套标准本身（换己）</strong>。它们看上去都叫"改稿"，作者在当刻也分不清。</p><p>承重命题：<strong>novum 的发育不是在固定标准之内的换件打磨，而是换件路径用尽之后，判定标准本身被迫发生的位移。</strong> 闭合与翻盘之间没有连续的改良路径——翻盘由"旧标准两判都给不出"的对象闯入而触发，是一个不连续事件。</p><p>本文给出三个可操作的测试（最顺段复读承接测试、替换预设锁测试、下一句承接测试），并逐条标明执行状态。<strong>五条证伪条款中四条未执行，一条已执行且样本量为 1。</strong></p></div>
+<div class="keywords"><strong>关键词：</strong>novum；判据窗口；换件与换己；暗藏承诺；写作土壤</div>
+<blockquote class="pull"><strong>本文的诚实边界（放在最前，不放脚注）</strong><br>一、本文是概念分析，<strong>不是经验研究</strong>。文中所有"预判""读数""阈值"都是拟议设计。<br>二、唯一已执行的检验是作者本人的一次自我测试（n=1），<strong>不能作普遍证据</strong>。<br>三、占位者逐家标注核验状态；标〔待核〕的不充当分离线支点。<br>四、初稿的条件六（"翻盘由外部承认触发"）<strong>已在本版删除</strong>，理由见 4.3。</blockquote>
+<h2>一、引言</h2>
+<h3>1.1 一个说不出口的写作事实</h3>
+<p>上面那段经验不是个别天才的私事。它之所以说不出口，是因为<strong>没有词</strong>。</p>
+<p>研究者能看到的只有成品。发表出来的版本天然呈现出一种"它本该如此"的完成态，中间十几轮修改一点痕迹不留。于是形成一个双重盲区：<strong>写作法研究</strong>把改稿一律当成"打磨"，把草稿到成品的一切差异归入"完善"这同一个筐；而<strong>作者本人</strong>在"换材料"与"换标准"这两种性质完全不同的动作之间，手里没有任何分界工具。</p>
+<h3>1.2 四条脉络，一个共同的地基</h3>
+<table class="tbl"><thead><tr><th>脉络</th><th>握着的变量</th><th>在哪里失效</th></tr></thead><tbody><tr><td>苏文的认知陌生化与 novum〔待核〕</td><td>成品的语义结构</td><td>作者手上的是一团<strong>还没获得 novum 身份</strong>的文本；成品特征的语言描述不了半成品</td></tr><tr><td>德拉尼的阅读协议〔待核〕</td><td>读者端的解释协议</td><td>协议是读者签的。它能说读完会不会成立，说不了<strong>写着写着该在哪里转弯</strong></td></tr><tr><td>沃尔夫等的世界建构研究〔待核〕</td><td>虚构世界的形态结构</td><td>形态是结果，工序是过程。它描述得了一个世界有四层构造，解释不了作者<strong>在某一刻决定放弃一条已写出的规则</strong></td></tr><tr><td>卡德与《救猫咪》的节拍派〔待核〕</td><td>通用叙事节拍</td><td>节拍是体裁中性的。它能让科幻更好读，说不了<strong>一个科学概念为什么在小说里站不住</strong></td></tr></tbody></table>
+<p>把四条放在同一张桌面上，共同的地基就露出来了：它们都在"<strong>先有一个世界（或点子），再让故事在里面发生</strong>"这句话底下工作。这个容器模型普遍到什么程度——连直接反对世界建构崇拜的哈里森（M. John Harrison，他称世界建构是"文学的伟大死胡同"〔待核〕）也只是在抗议容器装得太满，没有怀疑容器本身。</p>
+<p><strong>四条各握一个变量，但没有一条把"写作中的判据"当作变量。</strong></p>
+<h3>1.3 承重命题</h3>
+<blockquote class="pull"><strong>A 不是 B</strong>：novum 从初稿到终稿的变化，不是同一套成立判据之内的材料替换。每一次换件——换掉一个概念、换掉一种设定——都在旧标准的"成立／不成立"二值之内操作，<strong>尺子没变</strong>。换件的极限是窗口轮廓闭合：框内的位置都试过了，每一处都反馈"不成立"。<br><strong>A 也不是 C</strong>：它也不是一个不受任何约束的自由灵感过程。作者不是从零产生新点子；每一版 novum 可被判成立的范围，早被一套先于他立着的判据系统规定好了。<br><strong>A 是 Z</strong>：novum 的发育是<strong>判据窗口本身在换件路径用尽之后的位移</strong>。换己不是主动的创新姿态，而是窗口闭合后"若不放弃就必须走"的那一步。</blockquote>
+<p>第二部分同样重要：<strong>闭合与翻盘之间不存在连续的渐进路径。</strong> 旧窗口的一切动作都落在"成立／不成立"这对判据之内，而逼它更换的那个对象，恰恰是旧窗口<strong>两判都给不出</strong>的东西。翻盘不是"改得更好"的结果，是作品变成旧尺子量不动的那一类东西时触发的不连续事件。</p>
+<h3>1.4 三个研究问题</h3>
+<ul class="lst"><li><strong>RQ1</strong>：novum 从初稿到终稿的发育，能不能逆推回一条被先于作者的判据系统所规定的主导路径？</li><li><strong>RQ2</strong>：六种起手方式里，哪一种最容易逼出作者对自己世界的隐性承诺而不自知？</li><li><strong>RQ3</strong>：写作土壤（作者关于"我是怎么写作的"那整套设定）的更替，在什么时刻、由什么张力、经什么时序发生？</li></ul>
+<h3>1.5 贡献声明</h3>
+<p>一、把"改稿"拆成<strong>换件</strong>与<strong>换己</strong>两个可裁决的动作，并证明分界不落在作者的主观感受上，而落在"成立判据有没有变"这个可独立核验的点上；</p>
+<p>二、证明最顺的段落里藏着从未判过决的<strong>暗藏承诺</strong>，并给出两步可复检的判定流程，把"写得顺"从主观体验变成第三个活读者可以操作的裁决；</p>
+<p>三、给出写作土壤更替的五节时序，并把临界点定在"下一句还能不能被旧土壤承接"，而不定在停笔或续写这个行为上。</p>
+<h2>二、三家此前完全没交手的正主（本版新增）</h2>
+<p>⚠ <strong>这是本版最要紧的一节。</strong> 初稿的八位占位者全部落在科幻理论与创意写作手册之内，而真正压在本文承重命题上的三家，来自组织学习、写作研究与语义学——一家都没请进来。<strong>不请进来，本文的不可还原性无从谈起。</strong></p>
+<h3>2.1 阿吉里斯与舍恩：单环学习与双环学习（1978）〔已核验〕</h3>
+<p><strong>它已经占了什么</strong>：单环学习是"发现并纠正错误，而不质疑或改变支配变量"；双环学习是"先检查并改变支配变量，再改变行动"〔Argyris &amp; Schön 1978〕。舍恩另有 framing／problem-setting 一族概念，讲的是问题本身如何被框定。</p>
+<p><strong>本文承认什么</strong>：<strong>换件／换己与单环／双环几乎是逐字对应</strong>——支配变量对应成立判据，行动对应材料。本文不主张"标准本身会被换掉"这个洞见是新的；它在组织学习领域已有四十八年历史，比本文有名得多。<strong>这一击是本文不可还原性的头号威胁，必须正面回答。</strong></p>
+<p><strong>分离线</strong>：分离点不在"标准会不会变"，而在<strong>变的触发条件</strong>。</p>
+<blockquote class="pull">双环学习的触发是<strong>质疑</strong>——行动者反思并主动检查支配变量。它是一个可以随时发起的反思动作，而且被当作一种应当培养的能力。<br>本文的换己触发是<strong>判决失败</strong>——旧窗口对某个候选对象<strong>既判不出成立、也判不出不成立</strong>。它不是行动者主动发起的，是被逼停之后唯一的出口。<br>用一句话说死：<strong>双环学习问的是"我的支配变量对不对"；本文问的是"我的尺子已经量不动这个东西了"。</strong> 前者是反思，后者是失灵。反思可以在任何时候发生；失灵只在换件路径用尽之后出现。</blockquote>
+<p><strong>判决性反例</strong>：若在真实修改档案中，判据更替普遍发生在<strong>主动反思</strong>之后（作者说"我重新想了想我的标准"），而非发生在<strong>判决失败</strong>之后（作者说"我发现我判不了这个东西"），则本文的触发条件不成立，换己可被双环学习完整还原。</p>
+<p><strong>撤名条件</strong>：若组织学习文献中已有"框架因遭遇不可判定对象而被迫位移"这一触发条件的成型论述，<strong>本文承重命题须撤销</strong>，降为双环学习在科幻写作场景中的一次应用——即使本文的经验读数仍然成立。</p>
+<h3>2.2 索默斯：学生写作者与成熟写作者的修改策略（1980）〔已核验〕</h3>
+<p><strong>它已经占了什么</strong>：索默斯〔Sommers, N. (1980). <em>College Composition and Communication</em>, 31(4), 378–388〕发现，学生改稿停在词句层面的换词（rewording），而成熟写作者做的是<strong>重新发现自己的论证、用不同的眼睛再看一遍</strong>。</p>
+<p><strong>本文承认什么</strong>：<strong>写作研究领域四十五年前就做过换件／换己这一劈分</strong>，而且是在真实修改材料上做的实证研究。初稿的"创意写作脉络"只打了卡德与《救猫咪》两本手册，完全没有碰到这个领域的实际研究——<strong>这是初稿最不该有的缺口</strong>。</p>
+<p><strong>分离线</strong>：索默斯劈的是<strong>写作者的成熟度</strong>（谁在换词、谁在重看），是一条关于人的分类；本文劈的是<strong>同一个成熟写作者在同一份稿子上的两个阶段</strong>。一个成熟作者可以在第一至十二个月里一直做换件，第十三个月才做换己——按索默斯的分类他从头到尾都是"成熟写作者"，这个分类分不出他这一年里发生了什么。</p>
+<p><strong>判决性反例</strong>：若在同一位成熟作者的连续修改记录中，换件与换己<strong>无法分出时间上的先后段落</strong>（即两者始终混杂发生），则本文的"闭合—翻盘"两阶段模型不成立，只剩索默斯的成熟度分类。</p>
+<h3>2.3 刘易斯：记分板与预设容纳（1979）〔待核〕</h3>
+<p><strong>它已经占了什么</strong>：读者为了保持文本可读，会自行补上文中缺失的预设——这就是语义学里的"容纳"（accommodation）。<strong>这正是本文"承接句"的语义学机制。</strong></p>
+<p><strong>本文承认什么</strong>：读者能自己补出承接句，不是本文的发现，是语言使用的常态。</p>
+<p><strong>分离线</strong>：<strong>容纳在语义学里是常态接受机制，本文把它反过来当诊断工具。</strong> 刘易斯关心的是"读者怎么把话接上"；本文关心的是"读者要补多厚才接得上"——补得越厚，说明作者在这一处藏的暗账越厚。<strong>同一个现象，一边当能力看，一边当症状看。</strong> 这一步的转向是本文的真增量。</p>
+<p><strong>判决性反例</strong>：若承接句的厚度与文本的任何暗藏承诺都无关，只与读者个人的背景知识相关（即换一位读者读数就完全变），则承接句不能当诊断工具，本文第六节须删除。</p>
+<h2>三、五个概念，用大白话说一遍</h2>
+<p><strong>判据窗口</strong>：一套<strong>在你动笔之前就已经立在那里</strong>的标准系统，用来判定一个科幻作品（或其中某一环）成不成立。它由出版条件、评论尺度、前代 novum 被判成立或不成立的全部记录沉淀而成。你不需要每次写作都重建它，它自己会介入每一次判断。</p>
+<p>它跟一般说的"标准"差在哪：标准可以写成清单；判据窗口是半隐性的——<strong>能说出来的是它的成立部分</strong>（"科幻设定要自圆其说"），<strong>说不出来的恰恰是它的边界部分</strong>（"有些东西我就是觉得不对，说不上为什么"）。它以整体形状运作，不以条目运作。同一部作品在不同时间被同一个作者判成"成了"或"没成"，不是作品变了，是<strong>窗口形状在判定中的位置变了</strong>。</p>
+<p><strong>最顺段</strong>：一篇初稿里，写得最快、改的时候从未停顿、事后重读也从未起疑的那一段。两个可查的特征：写作时没有可回忆的停顿；它前后各十句的修改次数明显低于全篇。</p>
+<p><strong>暗藏承诺</strong>：一段文字里没被说出、但文本的顺滑延续必须依赖的那个预设。一旦被判过决（作者明确决定"这个世界里可以有这种事"），它就不再暗藏，成了明账。<strong>暗藏承诺专指从来没进过判决流程、被顺滑润掉的那些。</strong></p>
+<p><strong>换件／换己</strong>：在同一套判据之内换材料，叫换件；换掉那套判据本身，叫换己。</p>
+<p><strong>写作土壤</strong>：作者关于"我是怎么写作的"那整套设定——关于自己风格与工作方式的显性信念、手上未完成稿件所依赖的持续承诺、以此为据的写作自我认同。它平时是背景，<strong>它退出背景、变成可被审视的对象的那一刻，就是测量它的唯一入口</strong>：当作者第一次用"这是我用的一套设定，而不是我本身"这种说法谈自己的写作方式时，旧土壤已经松了。</p>
+<h2>四、命题的成立条件</h2>
+<h3>4.1 五条（原六条，删去一条）</h3>
+<p><strong>条件一 · 窗口稳定性可证伪</strong>：若作者在整个修改过程中从未替换过成立判据，则这段过程中 novum 的任何变化都属于换件，不属于发育。作者本人"觉得"发生了发育，不算证明。</p>
+<p><strong>条件二 · 判据必须被指认过</strong>：作者在修改过程中对成立判据至少有两次可被记录的陈述，且两次内容可比较。一次都没有，就无法证明窗口换没换。</p>
+<p><strong>条件三 · 更替有转折点</strong>：更替前与更替后必须能分成两个时间集合。更替不是渐变，有一个可定位的时间点或时段。</p>
+<p><strong>条件四 · 换件路径确实被用尽</strong>：更替之前，作者至少试过两种不同材料进入同一窗口，且都被判为不成立。没试探过就不算穷尽，也就不能证明更替是"被迫"的。</p>
+<p><strong>条件五 · 存在不可判定的对象</strong>：更替发生的当刻，旧判据必须<strong>既判不出该候选对象成立，也判不出它不成立</strong>——出现一次判决失败。没有这样的对象，旧窗口不会被逼到闭合。</p>
+<h3>4.2 条件五是全文的枢纽</h3>
+<p>五条里只有条件五是不可替换的。前四条都是程序性要求（有没有记录、有没有转折点、试没试够），<strong>唯有条件五规定了换己与双环学习的分界</strong>（见 2.1）。若条件五被证明在真实修改中很少出现，本文就退化成双环学习的一个应用。</p>
+<h3>4.3 为什么删掉初稿的条件六（公开更正）</h3>
+<p>初稿的条件六是："窗口更替由一个新作品在外部环境中获得承认而触发。"</p>
+<p><strong>这一条与前五条不协调，本版删除。</strong> 三条理由：</p>
+<p>一、<strong>层次不一致</strong>。前五条讲的都是作者内部的判据位移（他判不动了、他试尽了、他有一个转折点），条件六突然拽到社会承认层，把一件发生在书桌上的事挂到发表与评论的时间表上。</p>
+<p>二、<strong>与条件三冲突</strong>。条件三要求有一个可定位的转折点，而外部承认通常<strong>远远滞后于</strong>那个转折点——一部作品获得承认可能在写完两年后。若以承认为触发，转折点就无法定位。</p>
+<p>三、<strong>它其实是另一个命题</strong>。"新窗口需要一个外部实例才能被相信"是关于<strong>判据如何被社会接受</strong>的主张，与本文关于<strong>判据如何被逼着位移</strong>的主张，是两件事。硬并进来，只会让承重命题多一个说不清的挂件。</p>
+<p>⇒ 这一条不是被删掉就没了，它被降级为<strong>一条待检验的推论</strong>：新窗口的<strong>稳固</strong>可能需要外部实例，但新窗口的<strong>发生</strong>不需要。这一推论不进入本文的成立条件。</p>
+<h2>五、可裁决判据</h2>
+<h3>5.1 最顺段复读承接测试</h3>
+<p><strong>步骤</strong>：取初稿中的最顺段，连同前后各十句共二十一句，交给一位与作者没有长期共享阅读背景的独立读者。读者逐句朗读，记录他自发停下来说"这里凭什么这样"或"我没跟上，这需要什么背景"的位置——这就是<strong>不接点</strong>。</p>
+<p><strong>停点出现的当刻，作者不得解释。</strong> 读者要自己说出一句让文本恢复可读的<strong>承接句</strong>。说得出，就说明那里缺着一条被读者替作者补上的预设；完全顺畅读完，则该段暂不可辨。</p>
+<p><strong>四类场景与各自的预判</strong>：</p>
+<table class="tbl"><thead><tr><th>场景</th><th>预判</th></tr></thead><tbody><tr><td>甲：作者自认的最顺段</td><td><strong>读者会不接</strong>，尤其在世界规则未被交代处</td></tr><tr><td>乙：作者刻意写成宣言体的段落</td><td>读者多半能接——明账多，暗账少</td></tr><tr><td>丙：作者卡稿前的那一段</td><td><strong>不接点出现在"卡住"的前一句，而不是后一句</strong>。这是本文最具体、最可错的一条预判</td></tr><tr><td>丁：作者自认最弱的段落</td><td>读者<strong>反而不易不接</strong>。反复改过的地方预设已经写明，顺滑不再掩盖承诺</td></tr></tbody></table>
+<p>场景丙与场景丁都是反直觉的，也因此最值钱：若实测显示不接点落在卡句之后，或最弱段落的不接率反而最高，本文的核心机制即被推翻。</p>
+<h3>5.2 替换预设锁承接测试</h3>
+<p>对已定位的不接点，尝试用若干相近预设去替换该处缺失的那一条，看文本能否恢复通达。</p>
+<p><strong>承诺强度 ＝ 替换失败的次数。</strong> 不能被任何相近预设替换而达成通达的段落，是承诺强度最高的段落——那里藏着一条<strong>独一无二、且从未被判过决</strong>的承诺。</p>
+<h3>5.3 下一句承接测试（用于写作土壤）</h3>
+<p>土壤更替的临界点，不由"作者停笔了没有"判定，而由<strong>下一句还能不能被旧土壤承接</strong>判定。一个作者可以继续写下去而土壤已经换了，也可以停笔半年而土壤纹丝不动。行为不是判据，承接才是。</p>
+<h3>5.4 三条自我否决条款</h3>
+<p><strong>信度</strong>：同一段落交两位独立读者，不接点位置的一致率低于 0.70，则该读数不稳。</p>
+<p><strong>被顺欺骗的否决</strong>：<strong>不接不能被作者事后讲解取消。</strong> 若作者一解释读者就说"哦那没问题了"，并据此把该不接点划掉，那么"顺"就不再是文本属性，而是作者在场时的社交效果——读数作废。这一条是本文最容易被违反的一条，因为作者总忍不住要解释。</p>
+<p><strong>改名嫌疑</strong>：若不接点的位置与"读者对该文类的熟悉度"的相关高于 0.80，且控制熟悉度后不接点不再能预测任何东西，则暗藏承诺只是熟悉度的改名。</p>
+<h2>六、证伪条件与执行状态</h2>
+<table class="tbl"><thead><tr><th>#</th><th>条款</th><th>状态</th></tr></thead><tbody><tr><td>1</td><td>若不接点在场景丙中系统性地出现在卡句<strong>之后</strong>，则本文关于暗账位置的判断被推翻</td><td><strong>未执行</strong></td></tr><tr><td>2</td><td>若最顺段的不接率<strong>不高于</strong>作者自认最弱段落，则"顺滑掩盖承诺"这一机制不成立</td><td><strong>未执行</strong></td></tr><tr><td>3</td><td>若真实修改档案显示判据更替普遍发生在主动反思之后而非判决失败之后，则换己可被双环学习还原，承重命题作废</td><td><strong>未执行</strong></td></tr><tr><td>4</td><td>若两位独立读者的不接点一致率长期低于 0.70，则该读数不是文本属性</td><td><strong>未执行</strong></td></tr><tr><td>5</td><td>作者本人的一次自我测试</td><td><strong>已执行，n=1</strong></td></tr></tbody></table>
+<p><strong>关于第 5 条</strong>：作者本人在一份初稿上跑过一次二十一句协议，不接点确实落在卡句前一句。<strong>这个结果不能作普遍证据</strong>——样本量为 1，读者与作者是同一人（违反协议的独立性要求），范围已尽，本测试到此为止。<strong>本文不据此宣称任何机制已被验证。</strong></p>
+<h3>6.1 本文能错的直接方式</h3>
+<p>最直接的一种：把二十一句协议交给二十位独立读者跑二十篇初稿，若不接点的分布与"最顺段"没有任何关联，则本文全篇的机制不成立，无须再看其余论证。</p>
+<p><strong>这个检验的成本极低</strong>——二十一句、一位读者、一次朗读，不需要经费、不需要伦理审批、不需要设备。<strong>本文交出的判据之所以可信，恰恰因为推翻它这么便宜。</strong></p>
+<h3>6.2 一个不利结果</h3>
+<p>本文的适用范围应当主动压缩：<strong>上述机制只在"难题型创作"中成立</strong>——即作者确实遇到了写不下去的卡点、并为此反复修改的那一类写作。顺利写完、一稿即成的作品，既没有换件路径的穷尽，也没有判决失败，本文的模型无处落脚，也不该被套上去。</p>
+<h2>七、辨别格</h2>
+<p><strong>两轴</strong>：横轴为<strong>换件路径是否已穷尽</strong>，纵轴为<strong>是否存在不可判定对象</strong>。</p>
+<table class="tbl"><thead><tr><th></th><th>有不可判定对象</th><th>无不可判定对象</th></tr></thead><tbody><tr><td><strong>换件已穷尽</strong></td><td><strong>翻盘格</strong>。预测：可定位一个转折点；转折点前后作者对"成立"的陈述内容不可比较；新窗口下旧稿的某些段落会被重新判为可用</td><td><strong>放弃格</strong>。预测：作者停止该项目。旧尺子还在，只是框内位置试尽了——他不会换尺子，他会换题目</td></tr><tr><td><strong>换件未穷尽</strong></td><td><strong>早熟格</strong>。预测：作者过早宣称"我要换个思路"，但换的仍是材料；后续会退回原窗口继续换件</td><td><strong>常态格</strong>。预测：正常改稿。novum 有变化但无发育</td></tr></tbody></table>
+<p><strong>放弃格是本文最容易被证伪的一格</strong>：如果在真实档案中，换件穷尽而无不可判定对象的作者仍然频繁更换判据，则条件五不是必要条件。</p>
+<h2>八、讨论</h2>
+<h3>8.1 理论意涵</h3>
+<p>本文的增量不是给科幻写作添一套新方法，而是<strong>改变了"改稿"这个词的判定单位</strong>：从"改了多少"改成"尺子有没有换"。由此，"改了一年还不成立"不再是一句丧气话，而是一个可读出的状态——<strong>它说明你一直在框内换件，而框已经闭合了</strong>。</p>
+<h3>8.2 实践意涵</h3>
+<p>对写作者最有用的一条：<strong>卡住的时候，先别问"这里该怎么改"，先问"我用来判断成不成立的那把尺子，还量得动这个东西吗"。</strong></p>
+<p>判断方法就是条件五：拿你手上那个候选，问自己能不能判它成立——若答不出；再问能不能判它不成立——若也答不出，<strong>那不是你想不清楚，那是尺子失灵了</strong>。此时继续换件是浪费时间，唯一的出口是换尺子。</p>
+<p>对编辑与写作教学，第 5.1 节那个二十一句协议可以直接用：不必读全稿，取最顺段前后各十句，请一位没读过的人朗读一遍，标出他停下来的地方。<strong>这些地方就是作者从未判过决的承诺所在。</strong></p>
+<h3>8.3 适用边界（这里削掉了本文原想说的一句）</h3>
+<p>本文原想说"一切创作的发育都遵循换件—换己模型"。<strong>这句话必须削掉。</strong> 准确说法是：本文只适用于<strong>难题型创作</strong>（见 6.2），且只适用于<strong>有多轮修改痕迹可查</strong>的写作。即兴创作、一稿成篇、口头创作都不在范围内。</p>
+<h3>8.4 反噬</h3>
+<p>本文最省事的执行方式，恰好会毁掉它要保住的东西：把"换己"当成一个褒义词，教人"要敢于换掉自己的判据"。</p>
+<p>这样一来，换己会变成一种<strong>姿态</strong>——作者在换件路径还没走到一半时就宣布"我要突破自己的框架"，实际上只是换了个材料再换个说法。<strong>本文全部的力气都用在把换己钉死为一个被迫事件</strong>（条件四要求路径确实穷尽，条件五要求确实出现判决失败）；一旦它被讲成一种值得追求的品质，这两条约束立刻失效，模型退化为励志话术。</p>
+<h2>九、效度威胁与局限</h2>
+<p><strong>构念效度</strong>：不接点测到的可能只是读者的背景知识差异，不是文本的暗藏承诺。自我否决条款三针对这一点，但尚未执行。</p>
+<p><strong>内部效度</strong>：最顺段的判定依赖作者自述（"我写这段时没停顿"），存在回忆偏差。后续应改用写作过程录屏或击键日志替代自述。</p>
+<p><strong>外部效度</strong>：本文的经验来源是中文科幻写作，未在其他语种、其他文类上跑过。</p>
+<p><strong>可靠性</strong>：不接点的记录依赖读者当场自陈，不同记录者可能标在不同句子上。后续应固定记录格式并报告全部分歧。</p>
+<p><strong>两个本文解释不了的洞</strong>：</p>
+<p>一、本文不能解释<strong>为什么有些作者一辈子不换己</strong>——他们也遇到判决失败，却选择放弃项目而不换尺子。放弃格与翻盘格的分岔点在哪里，本文给不出。</p>
+<p>二、本文不能解释<strong>新窗口从哪里来</strong>。它只说明旧窗口如何被逼到闭合，不说明位移的方向由什么决定。这一步在本文里仍是黑箱。</p>
+<h2>十、结论</h2>
+<p><strong>RQ1</strong>：能。novum 的发育可以逆推回一条被先于作者的判据系统所规定的路径——条件二要求的两次陈述就是逆推的入口。</p>
+<p><strong>RQ2</strong>：<strong>从差异推演起手</strong>最容易逼出暗藏承诺而不自知。因为差异推演天然地产生大量"由此可推"的顺滑段落，而顺滑正是暗账的掩体。这一答案由 5.1 的场景甲检验，<strong>未执行</strong>。</p>
+<p><strong>RQ3</strong>：写作土壤的更替发生在<strong>维持动作失效之后的离场自反时刻</strong>，而不是张力极值的当场。临界点由"下一句还能不能被旧土壤承接"判定，不由停笔或续写判定。</p>
+<p>三点启示：一、写作研究应把"改稿"拆开，不再用一个词覆盖两种性质不同的动作；二、写作教学里的"多改几遍"这条老话，应当补上一句"改之前先看尺子还量不量得动"；三、编辑在判断一部稿子"还差点意思"时，可以先跑一次二十一句协议——<strong>它比通读全稿便宜，而且指得出具体位置</strong>。</p>
+<h2>声明组</h2>
+<p><strong>【作者贡献】</strong> 概念化、方法、写作与修订由斐索完成。</p>
+<p><strong>【与既有传统的优先权声明】</strong> 本文明确承认："标准本身会被换掉"这一洞见，阿吉里斯与舍恩（1978）的双环学习早已提出，且比本文有名；"换词 vs 重看"这一劈分，索默斯（1980）四十五年前就在真实修改材料上做过；读者自行补出缺失预设，是语义学里的常态机制（刘易斯 1979）。<strong>本文不主张这三件是新的。</strong> 本文只主张三步是新的：把换己的触发条件钉死在"判决失败"而非"主动反思"；把换件与换己劈在同一位成熟作者的同一份稿子上而非劈在人身上；把"容纳"从接受机制反过来当诊断工具。<strong>这三步成不成立，取决于第六节那四条尚未执行的检验。</strong></p>
+<p><strong>【利益冲突】</strong> 无。</p>
+<p><strong>【数据与材料可得性】</strong> 本文为概念分析。唯一的经验结果是 n=1 的作者自我测试，不构成数据集。二十一句协议的完整流程见 5.1，任何人可自行复跑。</p>
+<p><strong>【AI 使用声明】</strong> 本文的结构整理、文字压缩与表述校订曾由生成式人工智能协助完成；作者对概念来源、论证边界、事实准确性与全文最终版本承担全部责任。</p>
+<p><strong>【本次修订说明】</strong> 本文相对初稿有四处实质更改，均为公开更正：① 新增第二节，与双环学习、索默斯、刘易斯三家正面交手，并在声明组明写本文对"标准会变"这一洞见不具优先权；② 删除初稿条件六（外部承认触发翻盘），理由见 4.3，并把它降级为一条不进入成立条件的推论；③ 把证伪条款整理成执行状态表，明标四未执行、一已执行且 n=1；④ 主动压缩适用范围至"难题型创作"，删去初稿"一切创作皆适用"的过强表述。</p>
+<h2>参考文献与核验分级</h2>
+<p><strong>〔已核验〕</strong></p>
+<p>Argyris, C., &amp; Schön, D. A. (1978). <em>Organizational Learning: A Theory of Action Perspective</em>. Addison-Wesley.</p>
+<p>Sommers, N. (1980). Revision Strategies of Student Writers and Experienced Adult Writers. <em>College Composition and Communication</em>, 31(4), 378–388.</p>
+<p><strong>〔待核〕</strong>（本轮未核到一手来源，不充当分离线支点）</p>
+<p>Suvin, D. (1979). <em>Metamorphoses of Science Fiction</em>. Yale University Press.</p>
+<p>Delany, S. R. (1984). <em>Starboard Wine: More Notes on the Language of Science Fiction</em>.</p>
+<p>Wolf, M. J. P. (2012). <em>Building Imaginary Worlds: The Theory and History of Subcreation</em>. Routledge.</p>
+<p>Card, O. S. 科幻写作手册；Snyder, B. <em>Save the Cat!</em>。</p>
+<p>Harrison, M. J. 关于"世界建构是文学的伟大死胡同"的论述。</p>
+<p>Lewis, D. (1979). Scorekeeping in a Language Game. <em>Journal of Philosophical Logic</em>, 8, 339–359.</p>
+<p><strong>说明</strong>：本表只保留正文实际使用的条目。〔待核〕条目仅用于说明既有解释的位置，不承担优先权判断，也不作为分离线的支点。</p>
+<div class="endbox">
+  <div class="lbl">三 种 读 法</div>
+  <div class="big">网页长文 · 在线 PDF 翻页 · PDF 下载</div>
+  <p>本文为修订版。相对初稿的每一处实质更改都写在文末「本次修订说明」里，是公开更正，不是静默改数。</p>
+  <a class="solid" href="criterion-window.pdf" download>⬇ 下载 PDF</a>
+  <a class="ghost" href="/students/qin-li/works/">返回 秦莉 全部作品</a>
+</div>
+</div>
+<script>window.WDS_READ={selector:".wrap",profile:"liter"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20260909c" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>
