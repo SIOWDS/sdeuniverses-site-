@@ -1739,8 +1739,8 @@
       mobGo: "开始群碰", mobStop: "停止群碰",
       mobA: "判断", mobM: "攻", mobS: "结算",
       mobNone: "（还没有人攻过）", mobUnk: "未指名",
-      mobMore: "拿两份结算的分歧继续",
-      mobMoreT: "下一轮的靶子不是某一份结论，是两份结算判得不一样的那一处——一致的那部分算已结清，不再动它。座位左轮一格。",
+      mobMore: "↻ 攻这条总结 · 开下一轮",
+      mobMoreT: "下一轮不再重新出判断：总结席给的那句靶子**就是**下一轮要攻的判断，全员（除两个结算席）直接开攻。座位左轮一格，总结席在攻击席之间再往前挪一位。\n\n总结席没给靶子时，退回拿两份结算的分歧当靶子。",
       mobNoTwo: "⚠ 两份结算里没有两句都收口的【结算】，这一轮不给「继续」——没有可比的分歧，就没有下一轮的靶子。",
       duelHb: "攻击面", duelHc: "对撞",
       duelLoad: "承重", duelLoadT: "攻在承重命题上的处数。只挑边角料的错是假攻击——这一格为 0 就是没真攻。",
@@ -1928,8 +1928,8 @@
       mobGo: "Start mob", mobStop: "Stop mob",
       mobA: "Judge", mobM: "Atk", mobS: "Settle",
       mobNone: "(nothing attacked yet)", mobUnk: "unnamed",
-      mobMore: "Continue from the disagreement",
-      mobMoreT: "The next target is where the two settlements differ, not either conclusion. Seats rotate one place.",
+      mobMore: "\u21bb Attack this summary \u2192 next round",
+      mobMoreT: "The next round states no new claim: the summary\u2019s target line IS the claim, and everyone but the two settlers attacks it directly. Seats rotate one place. Falls back to the settlements\u2019 disagreement if the summary gave no target.",
       mobNoTwo: "\u26a0 Fewer than two closed verdicts, so there is no disagreement to aim at.",
       duelHb: "Attack", duelHc: "Clash",
       duelLoad: "Load-bearing", duelLoadT: "Hits on the load-bearing claim. Nitpicking the trim is not an attack \u2014 zero here means nothing real was hit.",
@@ -5621,23 +5621,30 @@
     history.push({ role: "reader", text: q }); updTurns();
     var ROUNDS = [];
 
-    function runRound(seats, rd, carry) {
-      var nAtk = Math.max(1, seats.length - 3);            // 判断1 ＋ 攻击 nAtk ＋ 结算2
+    /* 【第二轮直接攻总结 · 2026-09-09 王德生令「应该是对总结进行攻击，开始第二轮碰撞」】
+       fromZ＝上一轮总结席交出了【下一轮的靶子】。这时**本轮不再出判断**——
+       那句靶子本身就是判断，再让一席重写一遍等于把它稀释掉，还多烧一次额度。
+       ⇒ 本轮从攻击直接开始，攻击席多一位（原来判断席那一位改攻）。 */
+    function runRound(seats, rd, carry, fromZ) {
+      var nAtk = fromZ ? Math.max(1, seats.length - 2)     // 靶子现成：全员除两结算席外都攻
+                       : Math.max(1, seats.length - 3);    // 判断1 ＋ 攻击 nAtk ＋ 结算2
       var wrap = el("div", "wdsm-tri");
       if (rd > 1) wrap.appendChild(el("div", "wdsm-trird", t("triRd").replace("{n}", String(rd))));
       /* 轮换要看得见：每轮把「谁坐什么」摆在最上面。座位每轮左轮一格 ⇒
          上一轮出判断的这一轮去结算、上一轮攻击的这一轮出判断——**没有一家长期占着结算或总结**。 */
       wrap.appendChild(el("div", "wdsm-tinote", t("mobSeatNow") + "：" + seats.map(function (w2, i2) {
-        return (i2 === 0 ? t("mobA") : (i2 <= nAtk ? (t("mobM") + i2) : (t("mobS") + (i2 - nAtk)))) + "＝" + vinfo(w2.vendor).name;
+        return (fromZ ? (i2 < nAtk ? (t("mobM") + (i2 + 1)) : (t("mobS") + (i2 - nAtk + 1)))
+                      : (i2 === 0 ? t("mobA") : (i2 <= nAtk ? (t("mobM") + i2) : (t("mobS") + (i2 - nAtk))))) + "＝" + vinfo(w2.vendor).name;
       }).join("　·　") + (rd > 1 ? ("　（" + t("mobRotated").replace("{n}", String(rd - 1)) + "）") : "")));
       var rows = seats.map(function (who, i) {
-        var lab = i === 0 ? t("mobA") : (i <= nAtk ? (t("mobM") + (i)) : (t("mobS") + (i - nAtk)));
+        var lab = fromZ ? (i < nAtk ? (t("mobM") + (i + 1)) : (t("mobS") + (i - nAtk + 1)))
+                        : (i === 0 ? t("mobA") : (i <= nAtk ? (t("mobM") + (i)) : (t("mobS") + (i - nAtk))));
         var c = el("div", "wdsm-tric");
         var hd = el("div", "wdsm-duh");
         hd.appendChild(el("b", null, lab));
         hd.appendChild(el("i", null, vinfo(who.vendor).name));
         var bd = el("div", "wdsm-a plain");
-        bd.textContent = i === 0 ? "\u258a" : t("triWait");
+        bd.textContent = (!fromZ && i === 0) ? "\u258a" : t("triWait");
         c.appendChild(hd); c.appendChild(bd); wrap.appendChild(c);
         return { who: who, bd: bd, text: "", lab: lab };
       });
@@ -5686,13 +5693,21 @@
         return atk.map(function (a) { return a.who + "←" + a.by; }).join("；");
       }
 
-      return step(0, "a", carry).then(function (a) {
+      /* fromZ：靶子现成（上一轮总结席给的），跳过出判断这一步，直接从攻击开始。
+         🔴 攻击席的下标也跟着从 0 起——不改的话第一席会被跳过，白坐一轮。 */
+      var head = fromZ
+        ? Promise.resolve("【上一轮总结席给的靶子（＝本轮要攻的判断）】\n" + String(carry || ""))
+        : step(0, "a", carry).then(function (a) {
+            return a ? ("【" + rows[0].lab + " · " + vinfo(rows[0].who.vendor).name + " · 判断】\n" + a) : "";
+          });
+      return head.then(function (a) {
         if (!a) { rows.forEach(function (r, i) { if (i) r.bd.textContent = t("triFail"); }); return null; }
-        var blocks = ["【" + rows[0].lab + " · " + vinfo(rows[0].who.vendor).name + " · 判断】\n" + a];
+        var blocks = [a];
         var cover = [];
+        var k0 = fromZ ? 0 : 1, kN = fromZ ? (nAtk - 1) : nAtk;
         // 攻击席串行：每一席都要看到前面全部产出与覆盖表
         function atkStep(k) {
-          if (k > nAtk) return Promise.resolve(true);
+          if (k > kN) return Promise.resolve(true);
           var prior = blocks.join("\n\n") + "\n\n【已被攻过】" + coverLine(cover);
           return step(k, "m", prior).then(function (m) {
             if (m) {
@@ -5703,10 +5718,10 @@
             return atkStep(k + 1);
           });
         }
-        return atkStep(1).then(function () {
+        return atkStep(k0).then(function () {
           // 两个结算席**并行**：同一份材料，互不读对方
           var mat = blocks.join("\n\n");
-          if (rd > 1 && carry) mat += "\n\n【上一轮的结算（逐字，供比对）】\n" + carry;
+          if (rd > 1 && carry && !fromZ) mat += "\n\n【上一轮的结算（逐字，供比对）】\n" + carry;
           var s1 = seats.length - 2, s2 = seats.length - 1;
           return Promise.all([step(s1, "s", mat), step(s2, "s", mat)]).then(function (two) {
             /* 【总结席 · 2026-09-09 王德生令】两份结算之后再加一席收束本轮，并交出下一轮的靶子。
@@ -5718,12 +5733,12 @@
                但**角色与位置的对应关系是死的**，"谁总结"只跟着座位漂、自己不转。
                现在总结席在**攻击席之间按轮次轮转**：第 1 轮取攻击 1、第 2 轮取攻击 2……绕回。
                🔴 仍绕开两个结算席（自己总结自己的结算＝自评）；攻击席只有一位时退回判断席并标注。 */
-            var zi = nAtk >= 2 ? (1 + ((rd - 1) % nAtk)) : 0;
+            var zi = nAtk >= 2 ? ((fromZ ? 0 : 1) + ((rd - 1) % nAtk)) : 0;
             var zmat = blocks.join("\n\n")
               + "\n\n【结算 1 · " + vinfo(seats[s1].vendor).name + "】\n" + (two[0] || "（无产出）")
               + "\n\n【结算 2 · " + vinfo(seats[s2].vendor).name + "】\n" + (two[1] || "（无产出）");
             return step(zi, "z", zmat, t("mobZ")).then(function (z) {
-              return { blocks: blocks, two: two, z: z, zi: zi, zSelf: zi === 0 };
+              return { blocks: blocks, two: two, z: z, zi: zi, zSelf: !fromZ && zi === 0 };
             });
           });
         });
@@ -5744,15 +5759,15 @@
             return "【结算 " + (i + 1) + "】" + ((m && m[1].trim()) || v);
           }).join("\n\n");
         }
-        return { ok: true, verdicts: (done.two || []).filter(Boolean), target: target, zSelf: !!done.zSelf };
+        return { ok: true, verdicts: (done.two || []).filter(Boolean), target: target, zSelf: !!done.zSelf, fromZ: !!(zt && zt[1] && zt[1].trim()) };
       });
     }
 
-    function startRound(seats, rd, carry) {
+    function startRound(seats, rd, carry, fromZ) {
       streaming = true; stoppedByUser = false; RS.stop = false;
       busyUI(true); stopBarShow(true);
       if (cell.acts && cell.acts.parentNode) { cell.acts.parentNode.removeChild(cell.acts); cell.acts = null; }
-      runRound(seats, rd, carry).then(function (res) {
+      runRound(seats, rd, carry, fromZ).then(function (res) {
         streaming = false; curReader = null;
         busyUI(false); stopBarShow(false);
         history.push({ role: "wds", text: ROUNDS.join("\n\n") }); stSave(history); updTurns(); compTick();
@@ -5771,7 +5786,7 @@
           go.onclick = function () {
             if (streaming) return;
             var nx = seats.slice(1).concat(seats.slice(0, 1));    // 座位左轮一格
-            startRound(nx, rd + 1, res.target);
+            startRound(nx, rd + 1, res.target, !!res.fromZ);
           };
           row2.appendChild(go);
         } else if (res.ok) {
@@ -5996,11 +6011,11 @@
       });
     }
 
-    function startRound(seats, rd, carry) {
+    function startRound(seats, rd, carry, fromZ) {
       streaming = true; stoppedByUser = false; RS.stop = false;
       busyUI(true); stopBarShow(true);
       if (cell.acts && cell.acts.parentNode) { cell.acts.parentNode.removeChild(cell.acts); cell.acts = null; }
-      runRound(seats, rd, carry).then(function (res) {
+      runRound(seats, rd, carry, fromZ).then(function (res) {
         streaming = false; curReader = null;
         busyUI(false); stopBarShow(false);
         var all = ROUNDS.join("\n\n");
