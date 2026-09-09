@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>每篇最可能在哪儿失灵｜《与 AI 一起成长》· 专著栏目 | SDE Universes</title>
+<meta name="description" content="使用提示，不是免责声明">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#C0522A;--accent2:#DB7440}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#C0522A1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.75rem,4.1vw,2.55rem);font-weight:700;line-height:1.32;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.98rem,1.9vw,1.13rem);color:var(--text2);max-width:660px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.72}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:2.4rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h3{font-family:'Noto Serif SC',serif;font-size:1.06rem;font-weight:700;color:var(--text);margin:2.2rem 0 0.9rem;line-height:1.5}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#C0522A22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.9rem 0;padding:1.15rem 1.5rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.05rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+</style>
+
+
+<style>
+:root{--bg:#F3F2EC;--card:#FAF9F4;--card2:#EAE9E0;--gold:#3E4488;--text:#20222B;--text2:#474B5A;--muted:#868A99;--border:rgba(62,68,136,0.22);--border2:rgba(62,68,136,0.10);--accent:#4A54A6;--accent2:#6B76C8}
+.ednote{background:#EFEFF8;border:1px solid rgba(74,84,166,0.28);border-left:3px solid #4A54A6;border-radius:4px;padding:1.05rem 1.2rem;margin:0 0 1.6rem;font-size:0.93rem;line-height:1.85;color:#37453F}
+.ednote .l{font-size:0.72rem;letter-spacing:0.22em;color:#4A54A6;margin-bottom:0.5rem}
+article h3{font-size:1.02rem;font-weight:700;margin:1.9rem 0 0.7rem;color:var(--gold)}
+.chnav{max-width:760px;margin:2.4rem auto 0;padding:1.2rem 2rem 0;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:0.86rem;border-top:1px solid var(--border2)}
+.chnav a{color:var(--accent);text-decoration:none}
+.partline{font-size:0.72rem;letter-spacing:0.2em;color:var(--accent);margin-bottom:0.8rem}
+</style>
+
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/monographs/" class="sib">专著栏目</a>
+    <a href="/books/logic/" class="here">SIO逻辑学导论</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/monographs/">专著栏目</a> · <a href="/books/logic/">《SIO逻辑学导论》</a></div>
+  <div class="partline">卷首</div>
+  <h1 class="art-title">前言：从逻辑救赎到文明自救</h1>
+  <p class="art-sub">文明之所以需要救赎，首先不是因为技术不够先进，而是因为理性失位。</p>
+  <div class="art-meta">王德生 著 · 《SIO逻辑学导论》卷首 · 约 0.7 万字</div>
+</header>
+
+<style>
+article .li{font-size:0.99rem;line-height:1.95;color:var(--text);margin:0 0 0.5rem;padding-left:1.15rem;position:relative;text-align:justify}
+article .li::before{content:"—";position:absolute;left:0;color:var(--accent);opacity:.55}
+article .lab{font-size:0.86rem;font-weight:700;letter-spacing:0.08em;color:var(--accent);margin:1.5rem 0 0.55rem}
+article h4{font-size:0.99rem;font-weight:700;color:var(--text2);margin:1.5rem 0 0.6rem}
+.gbox{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent2);border-radius:5px;padding:1.15rem 1.35rem;margin:1.9rem 0}
+.gbox .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.5rem}
+.gbox p{font-size:0.95rem;line-height:1.92;color:var(--text2);margin:0;text-align:justify}
+.addch{background:#FFF8E8;border:1px solid rgba(160,120,20,.3);border-left:3px solid #A07814;border-radius:4px;padding:0.9rem 1.15rem;margin:0 0 1.4rem;font-size:0.88rem;line-height:1.8;color:#5A4A22}
+.addch b{color:#8A6817}
+.reflist{max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#F4F4FA;border:1px solid #D9DAEA;border-radius:6px}
+.reflist h2{font-size:20px;letter-spacing:0.14em;color:#3E4488;margin:0 0 10px}
+.reflist .n{font-size:13.5px;line-height:1.9;color:#7B7F95;margin:0 0 20px}
+.reflist ol{margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#414455}
+.reflist li{margin:0 0 9px;padding-left:6px}
+</style>
+<main class="wrap">
+<section class="body">
+<div class="ednote"><div class="l">编 者 按</div>使用提示，不是免责声明</div>
+<article>
+<h2>用之前要知道的九件事</h2>
+<p><b>这一份不是免责声明，是使用提示。</b>每一篇最可能在哪儿失灵、你第一次用的时候该先验哪一件——逐篇写明。</p>
+<p><b>总的一条</b>：本书四十一条检验一条也没执行完，量具全是自造的。<b>所以每一条判据，第一次用都要当作待验的东西用</b>：先在小范围试一次，试出你自己的成立条件，再往下推。</p>
+<hr>
+<h2>第一篇《何谓账外》——判断一件事有没有被记账</h2>
+<p><b>最可能失灵的地方</b>：判定靠的是&quot;这本账上有没有一个数会变&quot;，而<b>这一问要求你真的去看那张表、那个系统的字段</b>。凭印象判，十有八九判错（书里第十三节那四种误诊，我自己犯过其中一种）。</p>
+<p><b>第一次用先验</b>：拿一件你确信&quot;没人管&quot;的事，<b>去把那本账真的调出来看一眼</b>。多数人这一步就会发现自己判错了。</p>
+<p><b>书里那三处现场是复原的</b>，日期与细节做过处理，<b>不能当研究数据引用</b>，只能当示范看。</p>
+<hr>
+<h2>第二篇《新行业是什么》——五道检验的筛子</h2>
+<p><b>最可能失灵的地方</b>：第一道（第三人称检验）承担了全篇一半的判定量，而<b>它最脆</b>：预防型的产出（&quot;一件坏事没发生&quot;）它判不了，团队产出（&quot;我们第一次自己跑完&quot;）它判不准。</p>
+<p><b>第一次用先验</b>：先拿三个你<b>确定不是</b>这个行业的东西去筛，看筛子会不会误放。<b>筛子的可信度靠它筛掉什么，不靠它留下什么。</b></p>
+<p><b>四十六个样本的判定全是我做的，没有访谈过任何一家。</b>遇到你熟悉的那一格，以你的判断为准。</p>
+<hr>
+<h2>第三篇《何谓个人知识》——条目的四件结构</h2>
+<p><b>最可能失灵的地方</b>：<b>事后编成立条件</b>。一次没管用，最省事的处理是加一行条件把这次排除掉；加着加着，这条主张变得永远正确。<b>它和&quot;条件在变细&quot;长得一模一样。</b></p>
+<p><b>判别法（用之前记住这一句）</b>：新加的那行条件，<b>能不能事先说出下一次会在哪儿失败</b>。只能解释过去的，是编的。</p>
+<p><b>另一处</b>：本书标 ○ 的示范条目是构造的，<b>不是任何人的实践证据</b>。</p>
+<hr>
+<h2>第四篇《怎样找到那个位置》——七步侦查</h2>
+<p><b>最可能失灵的地方</b>：<b>为了保住一条线索而发明一个区分</b>。这是排除法最常见的死法，我在书里完整记了自己追错的两天。</p>
+<p><b>判别法</b>：这个区分，是你查之前就有的，还是查到障碍之后才想出来的？后者一律作废。</p>
+<p><b>这套流程只被走过一次（我走的），而且我事先知道结论。</b>你走出来的结果如果跟我不同，那是正常的，不是你走错了。</p>
+<hr>
+<h2>第五篇《怎样把默会练成条目》——三问与追问</h2>
+<p><b>最可能失灵的地方</b>：<b>追问者在第三轮心软</b>。前两轮出来的东西多半是对方早就说惯了的，<b>第三轮才是要紧的那轮</b>，而那一轮你会很想放过他。</p>
+<p><b>第一次用先验</b>：找一个人追问一次，<b>只看一个数——他卡壳了几次</b>。零卡壳且很顺利的那一场，多半没成（书里场四就是这样，我当时还以为成功了）。</p>
+<p><b>用 AI 当追问者时的一条</b>：问&quot;什么时候会失败&quot;的时候，<b>不要同时说出你以为会在哪儿失败</b>——它会顺着你说，而你会觉得那正是你想说的。</p>
+<hr>
+<h2>第六篇《怎样开单》——那张成事约定书</h2>
+<p><b>最可能失灵的地方</b>：<b>入场费定太高</b>。一旦高到&quot;客户没做成你也活得很好&quot;，半年之内这门生意会自己退回按月收费，而中间没有一天发生过可以被指出来的错误。</p>
+<p><b>用之前必须知道</b>：这张单据<b>没有经过任何一次真实交易，也没有经过法律审查</b>。税、退款条款效力、监管准入这五处我一条也答不了。<b>真要用，先找专业人士重写一遍。</b></p>
+<p><b>另有一条我自认最可能被推翻</b>：严禁供给方代做，可能是过度限制——客户未必要那条更难更慢的路。</p>
+<hr>
+<h2>第七篇《制度只能加栏或退场》——三变量与补栏时距</h2>
+<p><b>最可能失灵的地方</b>：<b>十个案子里只有三个的日期是我实查过的</b>（网约车、骑手职伤、生成式 AI 两办法），其余是通行说法。<b>四千六百年、两百六十年那些数字只有量级意义，不要拿去做趋势论证。</b></p>
+<p><b>能直接用的</b>：三变量的排查（欠费／野生科目成熟度／账本所有者与当事人的重合度）。<b>三项里只有第二项完全在你手上——你现在就可以开始把野生科目做熟。</b></p>
+<hr>
+<h2>第八篇《为何同向不自动》——三条跳过机制</h2>
+<p><b>最可能失灵的地方</b>：这一篇全是推理，<b>我没有数据</b>。而这件事已经有人在测（认知卸载那一支），<b>结论仍在互相打架</b>。</p>
+<p><b>所以用它的正确方式</b>：不要把&quot;AI 越强人越会跳过&quot;当结论，<b>当成一个你要在自己身上验的假设</b>——最省事的验法就是书里那个跳过率：一次用完 AI，你手上多了一个答案，还是多了一条你自己的判断？</p>
+<hr>
+<h2>第九篇《教育最小单元换成圈》——那份学校规程</h2>
+<p><b>最可能失灵的地方</b>：<b>升学接口无解</b>。这份规程办不了要升学的学校，只能用在成人、课外、家庭与小组。</p>
+<p><b>另外两处</b>：收费方式没解决（按学期落进月费那一格，按圈会惩罚跑得最慢也最好的学生）；三个读数<b>一旦进考核当天变质</b>——它们只能给办学的人自己看。</p>
+<p><b>能直接用的只有一件</b>：每两周留一个半天，什么也不安排，三个人互相追问。<b>这一件做不成，整份规程也办不成。</b></p>
+<hr>
+<h2>第十篇《这条链上的前人经验》</h2>
+<p><b>它不是理论综述，是一份&quot;别人在哪儿卡住过&quot;的清单。</b>用之前值得翻一遍，主要为了两件事：<b>知道哪几段已经有人做过很久了</b>（外化、循环、复检、按结果结算），以及<b>知道他们各自卡在哪儿</b>——那些卡点很可能也是你会卡的地方。</p>
+</article>
+<div class="foot-nav"><div class="cl"><a href="/books/growing-with-ai/preface/">← 这本书是干什么用的</a><a href="/books/growing-with-ai/">本书目录</a><a href="/books/growing-with-ai/w1/">何谓账外 →</a></div></div>
+</section>
+</main>
+
+  </section>
+</main>
+
+<div class="chnav"><a href="/books/logic/">全书目录 ↑</a><a href="/books/logic/axioms/">第一编 总纲编 →</a></div>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  © 德麦国际 Demai International · 专著栏目 · 《SIO逻辑学导论》 · <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260909q" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

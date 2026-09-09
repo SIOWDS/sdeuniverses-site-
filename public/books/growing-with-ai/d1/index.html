@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>这条链上的前人经验｜《与 AI 一起成长》· 专著栏目 | SDE Universes</title>
+<meta name="description" content="九支各走到哪儿、各卡在哪儿">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#C0522A;--accent2:#DB7440}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#C0522A1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.75rem,4.1vw,2.55rem);font-weight:700;line-height:1.32;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.98rem,1.9vw,1.13rem);color:var(--text2);max-width:660px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.72}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:2.4rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h3{font-family:'Noto Serif SC',serif;font-size:1.06rem;font-weight:700;color:var(--text);margin:2.2rem 0 0.9rem;line-height:1.5}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#C0522A22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.9rem 0;padding:1.15rem 1.5rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.05rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+</style>
+
+
+<style>
+:root{--bg:#F3F2EC;--card:#FAF9F4;--card2:#EAE9E0;--gold:#3E4488;--text:#20222B;--text2:#474B5A;--muted:#868A99;--border:rgba(62,68,136,0.22);--border2:rgba(62,68,136,0.10);--accent:#4A54A6;--accent2:#6B76C8}
+.ednote{background:#EFEFF8;border:1px solid rgba(74,84,166,0.28);border-left:3px solid #4A54A6;border-radius:4px;padding:1.05rem 1.2rem;margin:0 0 1.6rem;font-size:0.93rem;line-height:1.85;color:#37453F}
+.ednote .l{font-size:0.72rem;letter-spacing:0.22em;color:#4A54A6;margin-bottom:0.5rem}
+article h3{font-size:1.02rem;font-weight:700;margin:1.9rem 0 0.7rem;color:var(--gold)}
+.chnav{max-width:760px;margin:2.4rem auto 0;padding:1.2rem 2rem 0;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:0.86rem;border-top:1px solid var(--border2)}
+.chnav a{color:var(--accent);text-decoration:none}
+.partline{font-size:0.72rem;letter-spacing:0.2em;color:var(--accent);margin-bottom:0.8rem}
+</style>
+
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/monographs/" class="sib">专著栏目</a>
+    <a href="/books/logic/" class="here">SIO逻辑学导论</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/monographs/">专著栏目</a> · <a href="/books/logic/">《SIO逻辑学导论》</a></div>
+  <div class="partline">卷首</div>
+  <h1 class="art-title">前言：从逻辑救赎到文明自救</h1>
+  <p class="art-sub">文明之所以需要救赎，首先不是因为技术不够先进，而是因为理性失位。</p>
+  <div class="art-meta">王德生 著 · 《SIO逻辑学导论》卷首 · 约 0.7 万字</div>
+</header>
+
+<style>
+article .li{font-size:0.99rem;line-height:1.95;color:var(--text);margin:0 0 0.5rem;padding-left:1.15rem;position:relative;text-align:justify}
+article .li::before{content:"—";position:absolute;left:0;color:var(--accent);opacity:.55}
+article .lab{font-size:0.86rem;font-weight:700;letter-spacing:0.08em;color:var(--accent);margin:1.5rem 0 0.55rem}
+article h4{font-size:0.99rem;font-weight:700;color:var(--text2);margin:1.5rem 0 0.6rem}
+.gbox{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent2);border-radius:5px;padding:1.15rem 1.35rem;margin:1.9rem 0}
+.gbox .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.5rem}
+.gbox p{font-size:0.95rem;line-height:1.92;color:var(--text2);margin:0;text-align:justify}
+.addch{background:#FFF8E8;border:1px solid rgba(160,120,20,.3);border-left:3px solid #A07814;border-radius:4px;padding:0.9rem 1.15rem;margin:0 0 1.4rem;font-size:0.88rem;line-height:1.8;color:#5A4A22}
+.addch b{color:#8A6817}
+.reflist{max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#F4F4FA;border:1px solid #D9DAEA;border-radius:6px}
+.reflist h2{font-size:20px;letter-spacing:0.14em;color:#3E4488;margin:0 0 10px}
+.reflist .n{font-size:13.5px;line-height:1.9;color:#7B7F95;margin:0 0 20px}
+.reflist ol{margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#414455}
+.reflist li{margin:0 0 9px;padding-left:6px}
+</style>
+<main class="wrap">
+<section class="body">
+<div class="ednote"><div class="l">编 者 按</div>九支各走到哪儿、各卡在哪儿</div>
+<article>
+<h2>第十篇　这条链上的前人经验</h2>
+<h2>——九支各走到哪儿，各卡在哪儿</h2>
+<p><b>文体</b>：经验清单。这一篇不判归属、不比贡献、不谈原创——<b>这一篇不比新旧：谁先说的，对用它的人没有用处。</b></p>
+<p><b>它只做一件事：把这条链上每一段前人已经走到的地方、以及他们卡住的地方，摆出来给用这本书的人看。</b></p>
+<hr>
+<h2>卷首　为什么要看这一篇</h2>
+<p>本书主张的那条链是：<b>外化 → 条目 → 复检与撤回 → 按发生结算。</b></p>
+<p>这条链上的每一段，都有人走过很久了，而且<b>没有一支走完全程</b>。</p>
+<p><b>看这一篇的理由只有一个：他们卡住的地方，很可能也是你会卡的地方。</b></p>
+<ul><li>有一支把&quot;把说不清的东西说出来&quot;做了四十年，<b>卡在一对一追问太贵</b>；</li><li>有一支把&quot;自己研究自己&quot;做了二十年，<b>没有复检与撤回这两步</b>；</li><li>有一支把&quot;丢掉过时的知识&quot;做了近五十年，<b>对象是组织，不是个人，也不结算</b>；</li><li>有一支把&quot;从经验到知识的循环&quot;做成了教育学最常用的模型，<b>而它不产生一个可撤回的存量条目</b>；</li><li>有一支正在测&quot;人会不会因为工具而跳过那一步&quot;，<b>有数据，但结论仍在打架</b>；</li><li>有一支做&quot;按结果收费&quot;，<b>而结果由别人造成</b>；</li><li>教练业早就承认&quot;那一步只能客户自己做&quot;，<b>它的处理方式是免责，不是承担</b>。</li></ul>
+<p><b>下面九节逐一说清：每一支占了什么、你能从它那里拿走什么、以及它在哪儿停下。</b></p>
+<p><b>一件必须先说的</b>：以下九支我都没有读原文，全部依据检索摘要与概念印象。<b>所以这一篇给的是方位，不是定论</b>——你若要真用其中某一支的东西，去读它自己的书。</p>
+<hr>
+<h2>一　九族名单</h2>
+<p>按它们与本书的距离排，不按学科排。</p>
+<p><b>第一族　默会知识</b>（波兰尼、野中的 SECI、Schön 的反思性实践、知识启发与认知任务分析）</p>
+<p><b>第二族　单例与个人化知识</b>（n-of-1 试验、精准医疗、个性化学习、个人知识管理、建构主义）</p>
+<p><b>第三族　计量与治理</b>（可读性与国家视角、Goodhart 定律、Campbell 定律、计量的暴政）</p>
+<p><b>第四族　技术与劳动经济学</b>（技能偏向型技术变迁、任务模型、互补性资产、生产率悖论、去技能化）</p>
+<p><b>第五族　制度变迁与统计分类</b>（路径依赖、断续均衡、监管俘获、非正规经济、卫星账户）</p>
+<p><b>第六族　价值与结算</b>（体验与转型经济、成果导向合同、风险代理、社会效应债券、保险）</p>
+<p><b>第七族　创新与找法</b>（蓝海、待办任务、破坏性创新、生态位构建、用户创新）</p>
+<p><b>第八族　教育</b>（掌握学习与 2-sigma、项目式学习、能力本位、学习分析、去学校化）</p>
+<p><b>第九族　自我、行动与匠艺</b>（实用主义、工程知识论、匠人、劳动与行动之分）</p>
+<p><b>为什么是这九族</b>：前八族是从九篇的分离线里归并出来的；<b>第九族是这一章新加的，因为它是本书价值前提的所在地，而全书没有一篇碰过它。</b></p>
+<p><b>第三族与第九族是这一章的重点</b>，因为它们是本书未交手而伤害最大的两族。</p>
+<hr>
+<h2>二　第一族　默会知识</h2>
+<p><b>占了什么</b>：所有认知都含有认知者的个人参与，我们知道的比能说出来的多（波兰尼）；默会知识可以经由社会化—外化—组合—内化的循环转成组织可共享的知识（野中）；实践者在行动中与行动后反思（Schön）；以及一整套从专家身上抽取规则的技术（知识启发、认知任务分析、关键事件法）。</p>
+<p><b>本书承认</b>：第三篇与第五篇的全部工艺，都在这一族的射程里。<b>如果本书只是说&quot;知识里有个人成分&quot;或&quot;要把默会的东西说出来&quot;，这一族六十年前到四十年前已经说完了。</b></p>
+<p><b>分离线三条</b>：</p>
+<p><b>其一，终点不同。</b>外化的终点是组织共享，要消除个体差异；本书的终点是本人的条目账，且不公开，要保住个体差异。</p>
+<p><b>其二，本书多担一副担子。</b>波兰尼的个人知识以不可完全言说为特征，因而<b>不可结算</b>；本书要求它可判定、可复检、可撤回。</p>
+<p><b>其三，也是本书唯一可能的实质增量：卡点不同。</b>这一族卡了四十年，卡在<b>一对一追问的人力成本</b>上；本书的主张是那个成本刚刚被解开。</p>
+<p><b>判决性反例</b>：若能证明成立条件在原理上不可完全言说（即四件结构里的第二件无法填写），第一条与第二条分离线同时塌，本书退回默会知识论。<b>这一条我认为存在真实的可能性</b>——第五篇场七那位护理员就是一个例子，她的判断确实说不出来，而我只能停手。</p>
+<p><b>这一族的判决</b>：本书站得住，但<b>增量只有第三条</b>，且那一条是关于成本的经验主张，不是关于知识的理论主张。</p>
+<hr>
+<h2>三　第二族　单例与个人化知识</h2>
+<p><b>占了什么</b>：单个病人自身对照的严谨设计（n-of-1）；按个体特征分层的诊疗（精准医疗）；按学生水平推送的学习路径；收集组织外部知识的个人系统；以及学习者自己建构知识的教育立场。</p>
+<p><b>本书承认</b>：n-of-1 比本书的条目账严格得多——它有随机、有洗脱期、有时能设盲。<b>本书的证据等级永远低于它。</b></p>
+<p><b>分离线</b>：</p>
+<ul><li>对 n-of-1：它在医学内部，服务于医学结论，多个单例可以合并做元分析；<b>本书的条目不汇入任何地方，终点就是本人</b>。</li><li>对精准医疗与个性化学习：它们仍是公共知识，只是分组更细——<b>更细的迁移，不是取消迁移</b>。</li><li>对个人知识管理：它收集别人的知识，价值随存量涨；本书的账价值随验证次数涨，<b>而且它有&quot;撤回&quot;这个动作，卡片盒没有</b>。</li><li>对建构主义：它改过程，产出仍收敛到标准答案；本书要求<b>产出整齐即失败</b>。</li></ul>
+<p><b>判决性反例</b>：若&quot;取消迁移&quot;这件事在实践中做不到——即所有的所谓个人知识，最终都能被还原为某个更细分组的公共知识——则本书第三篇的核心命题塌。</p>
+<p><b>这一族的判决</b>：分离线成立，<b>而本书在严谨性上处于劣势</b>。第三篇自己承认过：无设盲，读数全是估值。</p>
+<hr>
+<h2>四　第三族　计量与治理　🔴</h2>
+<p><b>这一族是本书最该交手而一直没交手的一族，也是我认为伤害最大的一族。</b></p>
+<p><b>占了什么</b>（四条，逐条对着本书）：</p>
+<p><b>其一，为了管理而把复杂现实简化成可读的形式，这个动作本身会改造被管理的对象。</b>（国家视角那一支。）</p>
+<p>森林被简化成木材产量之后，森林本身被改造成了单一树种的人工林；地方性的、复杂的、不可通约的实践，在被记入之后失去了它原本的形态。</p>
+<p><b>其二，一个指标一旦成为目标，它就不再是一个好指标。</b>（Goodhart 定律。）</p>
+<p><b>其三，越是被用于重大决策的社会指标，它越容易被操纵，也越容易扭曲它本要测量的社会过程。</b>（Campbell 定律。）</p>
+<p><b>其四，用计量替代判断的冲动本身有害。</b>（计量的暴政那一支。）</p>
+<p><b>这四条对本书的打击有多重，我逐一算。</b></p>
+<p><b>打击一：本书的整个&quot;加栏&quot;叙事，可能站在错的一边。</b></p>
+<p>第一篇与第七篇的主线是：一件事在账外，当事人不能主张、不能积累、不能定价；出路是加栏。</p>
+<p><b>而这一族说的恰恰相反：被记入，往往是被改造的开始。</b></p>
+<p>第一篇第十一节那个&quot;拒栏型&quot;（教师的整体判断，一记下来就变形）<b>其实就是这一族的核心命题</b>，而我当时是自己撞出来的，没有引用任何人——<b>我把一整支学问的核心结论，当成了自己观察到的一个特例。</b></p>
+<p><b>这是本书最该被指出的一处。</b></p>
+<p><b>本书还剩什么</b>：第一篇确实写了&quot;指出一件事在账外，不构成任何应然主张&quot;，也写了拒栏型与&quot;折算不是加栏&quot;。<b>这三条与这一族是一致的。</b></p>
+<p><b>所以本书不是与它冲突，是它的一个应用</b>——而我此前不知道自己在应用它。</p>
+<p><b>打击二：本书那三个读数，全部撞在 Goodhart 定律上。</b></p>
+<p>相异度、复检率、撤回数——<b>第九篇第四节我自己写过：读数一旦纳入考核，当天变质</b>（撤回数会被刷、复检会走过场、相异度会被表演）。</p>
+<p><b>这一整段就是 Goodhart 定律，而我写的时候没有意识到。</b></p>
+<p><b>这一处不构成打击，构成的是欠账</b>：我把一条有名字的定律当成自己的观察写了出来。<b>应当补上出处，并且承认第九篇那一节的原创性为零。</b></p>
+<p><b>打击三：本书的立场里有一个未被检验的偏向——它整体上偏向&quot;要计量&quot;。</b></p>
+<p>九篇里每一篇都给读数，全书给了二十几个。<b>而这一族会问：为什么每件事都要有读数？</b></p>
+<p><b>我的回答是</b>：本书的读数几乎全部是<b>给当事人自己用的</b>（条目账的读数给本人、单据的读数给经营者、学校的三个读数明写&quot;只给教师自己看，不进入任何比较&quot;）。<b>而这一族批评的是用于外部管理与比较的计量。</b></p>
+<p><b>这条回答成立，但只成立一半。</b>因为第六篇那张单据的读数是<b>用于交易的</b>——按发生结算的收入占比、不成事退款率——<b>一旦它们被用于同业比较或监管，Goodhart 定律立刻适用。</b></p>
+<p><b>判决性反例</b>：若在真实经营中，本书主张公开的那些读数（第八篇第十节说的&quot;公开读数与同行换手&quot;）出现了可观察的操纵，则本书的截断方案失败，而 Goodhart 一族全胜。</p>
+<p><b>这一族的判决</b>：<b>本书输在没有交手，不输在立场。</b></p>
+<p>立场上本书与它大部分一致（拒栏型、折算不是加栏、读数只给自己看）；<b>而本书把它的几条核心结论当成了自己的发现。</b></p>
+<p><b>必须做的三件事</b>（列入第十二节）：</p>
+<ul><li>第一篇第十一节（拒栏型）补上这一族的出处，并改写为&quot;本书在此重新发现了一条已知结论&quot;；</li><li>第九篇第四节（读数进考核会变质）补上 Goodhart 与 Campbell，并声明原创性为零；</li><li>第六篇的读数增加一条使用限制：<b>不得用于同业排名</b>。</li></ul>
+<hr>
+<h2>五　第四族　技术与劳动经济学</h2>
+<p><b>占了什么</b>：技术变迁偏向某些技能因而拉开工资差距；把职业拆成任务、看哪些任务可被自动化；互补性资产决定谁从技术中获益；生产率悖论（技术随处可见，唯独不在生产率统计里）；以及去技能化那一支——技术把手艺拆碎、把判断收归管理层。</p>
+<p><b>本书承认</b>：第八篇乐观派的第二条（互补性）直接来自这一族，而<b>我在那一场里没有赢</b>。任务模型比本书的&quot;六个堵点动词&quot;成熟得多，而且有数据。</p>
+<p><b>分离线两条</b>：</p>
+<p><b>其一，分析单位不同。</b>这一族的单位是<b>任务与职业</b>，问的是哪些任务被替代、工资怎么变；本书的单位是<b>一个具体的人身上一次不可撤销的改变</b>，而这个东西不出现在任何职业分类里。</p>
+<p><b>其二，本书处理的是这一族的一处空白：需求侧的那一步。</b></p>
+<p>任务模型能说清&quot;接入&quot;这个任务由谁做、值多少钱；<b>它不能处理&quot;这一步只能由那个具体的人自己做、且他可能不做&quot;这件事</b>——因为经济学的分析对象是可交易的任务，而不可外包给任何人的动作不构成一项任务。</p>
+<p><b>判决性反例</b>：若能在任务模型的框架里给出一个&quot;不可外包给他人的任务&quot;类别，并处理其供给（那个人肯不肯做），则本书第八篇整篇是这一族的一个未展开的推论。<b>这一条我认为很可能成立</b>——去技能化那一支里关于&quot;工人被剥夺判断&quot;的讨论，已经很接近这件事。</p>
+<p><b>这一族的判决</b>：<b>本书处于弱势。</b>这一族有数据、有模型、有几十年积累；本书有推理。<b>第八篇被迫弱化两次主张，根源就在这里。</b></p>
+<hr>
+<h2>六　第五族　制度变迁与统计分类</h2>
+<p><b>占了什么</b>：制度为什么难变（路径依赖）；变化为什么是突然的（断续均衡）；规则为什么常常有利于在位者（监管俘获）；哪些活动落在正式统计之外（非正规经济、影子经济）；以及如何把无酬劳动折算进账（卫星账户）。</p>
+<p><b>本书承认</b>：第七篇已经逐家划过线，此处只补一条那一篇没写的：<b>统计分类这件事本身有一整支研究</b>（分类如何被制定、如何被争夺、如何反过来塑造被分类者），<b>而第七篇一句也没提。</b></p>
+<p><b>分离线</b>：第七篇给的那条最清楚——那四家回答的是&quot;制度为什么难变&quot;&quot;变化为什么突然&quot;&quot;规则有利于谁&quot;，<b>而本书问的是一个更窄也更笨的问题：从这件事开始发生，到它第一次有自己的科目，隔了多久，为什么。</b></p>
+<p><b>判决性反例</b>：若&quot;补栏时距&quot;在既有文献中已有等价物且定义更严，则第七篇只剩案例整理。<b>这一条第七篇自己写进了撤名条件，而我至今没有查。</b></p>
+<p><b>这一族的判决</b>：分离线可能成立，<b>但未经检验</b>。而且第七篇那十个案子里，有五个的日期只是通行说法。</p>
+<hr>
+<h2>七　第六族　价值与结算</h2>
+<p><b>占了什么</b>：经济价值从商品、产品、服务走向体验，再走向&quot;转型&quot;——卖的是顾客自身的改变（体验/转型经济）；按结果而非投入付费的各种合同形式（成果导向合同、风险代理、社会效应债券）；以及按概率经营的保险。</p>
+<p><b>本书承认</b>：<b>转型经济是全书最强的占位者</b>，第二篇已经点明。它比本书早得多，而且它的&quot;转型&quot;与本书的「第一次」几乎同名。</p>
+<p><b>分离线两条</b>：</p>
+<p><b>其一，转型经济讲的是价值阶梯与定价方式，本书讲的是行业身份的判据。</b></p>
+<p><b>其二，也是更硬的一条：转型经济里没有&quot;必然输入&quot;这一维。</b>它不问这件事依赖什么，只问卖什么。<b>因此它无法区分第二篇里样本 20（办完那件拖了三年的事，是门好生意）与样本 15（居家康复，是新行业）</b>——而本书的整篇工作就在这个区分上。</p>
+<p><b>对成果导向合同那一支的分离线</b>：它们的结果<b>发生在别人身上或由外部裁判给出</b>；本书的结果<b>发生在客户自己身上，只能由他造成</b>。本书据此曾主张这是一个客户自己造成结果的产业。</p>
+<blockquote><b>⚠ 复核修订（2026-09-08）</b>：初稿此处写的是「<b>这是唯一一个客户就是生产者的产业</b>」，并把它当作最能自证的一句话。<b>这句话不成立，&quot;唯一&quot;已撤回。</b><br>理由：服务主导逻辑（Vargo 与 Lusch，2004）的公理级命题就是<b>顾客永远是价值的共同创造者、共同生产者</b>——「客户参与生产」不是本书的分界线，它二十多年前就被普遍化了，而且主张对<b>一切服务</b>成立。<br><b>分界线要往里收一格</b>：不是<b>客户是否参与</b>，是<b>供给方是否被合同禁止参与</b>（第六篇 5.2、5.3）。前者是关于一切交换的本体论，后者是一条可写进合同、可被违反、可被判定的禁令。<br><b>顺带逼出一条更硬的分界</b>：<b>一个说&quot;永远如此&quot;的理论，无法用来判定某一个行业</b>——这与本书对转型经济的批评（它没有「必然输入」那一维）是同一条。</blockquote>
+<p><b>判决性反例</b>：若转型经济的既有文献中已含等价于&quot;必然输入第三档&quot;的判据，本书第二篇的结构条件部分应撤回，改写为对该框架的应用。<b>这是全书最大的一处撤名风险，而我未查。</b></p>
+<p><b>这一族的判决</b>：分离线在概念上成立，<b>在文献上未经检验</b>。</p>
+<hr>
+<h2>八　第七族　创新与找法</h2>
+<p><b>占了什么</b>：在既有产业的要素上做加减以寻找无人竞争的空间（蓝海）；不问客户是谁而问他要完成什么任务（待办任务）；新进入者如何从低端或新市场颠覆在位者（破坏性创新）；生物改变环境从而改变自己的选择压力（生态位构建）；创新常由使用者而非厂商完成（用户创新）。</p>
+<p><b>本书承认</b>：第四篇的找法与待办任务最近，而且<b>那一条分离线不强</b>——JTBD 也可以说新技术创造新任务。</p>
+<p><b>分离线</b>：本书的起点是<b>工具的过剩物</b>，不是既有产业（蓝海）、既有任务（JTBD）、竞争结构（破坏性创新）或选择压力（生态位）。</p>
+<p><b>判决性反例</b>：若能用蓝海的四步动作框架从既有产业出发，稳定推出第四篇那三个位置，则本书的找法是它的一个特例。</p>
+<p><b>这一族的判决</b>：<b>本书最弱的一族之一。</b>第四篇自己承认：撤名概率不低，且样本量是一次。</p>
+<hr>
+<h2>九　第八族　教育</h2>
+<p><b>占了什么</b>：不设时间上限、学会了再走下一步（掌握学习）；一对一辅导显著优于常规课堂而负担不起（2-sigma 问题）；长周期真实问题的项目式学习；按能力而非学时认定的能力本位教育；用数据分析学习过程（学习分析）；以及主张废除学校制度本身的那一支（去学校化）。</p>
+<p><b>本书承认</b>：第九篇借了掌握学习的一半（不设年限）；而 2-sigma 问题是全书最重要的一个历史坐标——<b>本书的整个成本论证可以表述为&quot;AI 是 2-sigma 问题的第一个可行解&quot;。</b></p>
+<p><b>分离线三条</b>：</p>
+<ul><li>对掌握学习：它的&quot;掌握&quot;相对于一个外部标准，因而仍需统一目标与测验；<b>本书没有外部标准可掌握</b>。</li><li>对项目式学习：它的产出是作品（可团队完成、可代做），<b>且它没有复检那一步</b>。</li><li>对学习分析：它测的是过程数据；<b>本书测的是产出的相异度与撤回，而且明写读数不进入比较。</b></li></ul>
+<p><b>这一族里有一家本书完全没交手，而它可能最接近</b>：<b>去学校化那一支。</b></p>
+<p><b>它占了什么</b>：制度化的教育把学习变成了对文凭的消费，而真正的学习发生在制度之外；它主张的替代形态是<b>学习网络</b>——把想学的人与愿意教的人直接连起来。</p>
+<p><b>这与第九篇第五之二节那个结论几乎撞在一起</b>：本书说这份规程的最小可运行形态不是一所学校，是一个五到十五人的小组。<b>而那正是学习网络的说法，早了五十年。</b></p>
+<p><b>分离线（我能给出的唯一一条）</b>：那一支给的是<b>连接的形态</b>（谁和谁在一起），本书给的是<b>单元的形态</b>（一次学习是什么）。<b>这条分离线很细，我不确定它守得住。</b></p>
+<p><b>这一族的判决</b>：<b>又一处&quot;我以为自己发现了的东西，别人早就说过&quot;。</b></p>
+<hr>
+<h2>九之二　第十族？一个我不确定该不该单列的对手</h2>
+<p>九族排完，还剩一个我拿不准的。它不是一个学派，是一类作品：<b>关于 AI 与人的关系的当代写作本身。</b></p>
+<p><b>为什么犹豫</b>：这一类的多数不是研究，是评论；它们没有可被交手的判据。<b>而其中有几条主张已经进入公共语汇，本书如果不理它们，读者会自动拿它们来读本书。</b></p>
+<p><b>四条最常见的，逐条处理：</b></p>
+<p><b>其一，&quot;AI 是人的增强&quot;。</b></p>
+<p><b>与本书的关系</b>：本书第八篇整篇在争这一条能不能自动成立。<b>本书的立场不是反对增强，是指出增强需要一个不可外包的动作。</b></p>
+<p><b>其二，&quot;人机协作&quot;。</b></p>
+<p>第八篇卷首说过：这个说法太松，&quot;它做我审&quot;与&quot;我做它改&quot;都能装进去。<b>本书的贡献（如果有）恰恰是把这个松口袋收紧成一个判据</b>——第二篇的第一道检验。</p>
+<p><b>其三，&quot;AI 时代最重要的是提出好问题&quot;。</b></p>
+<p><b>这一条流传最广，而本书对它是反对的。</b></p>
+<p>第五篇整篇说的是：好问题不是提出来的，是被追问逼出来的；一个人自己提得出的问题，多半是他已经知道答案的那些。<b>&quot;会提问&quot;这个能力如果可教可考，它就落在第二篇筛子的第一道之外（提示词培训那一格，反同向）。</b></p>
+<p><b>这是本书与流行说法最直接的一处冲突，值得单列。</b></p>
+<p><b>其四，&quot;AI 让人变笨&quot;。</b></p>
+<p>本书第八篇第八节那三条跳过机制与这条相近，<b>而本书明确不主张净效应为负</b>——第八篇原话：&quot;我没说是负的，我说的是它不确定。&quot;</p>
+<p><b>判决</b>：这一类不构成一族（无判据、无检验），<b>但第三条（提出好问题）应当在第五篇里被正面点名交手</b>，因为它与本书的核心工艺直接相反，而本书至今只是绕过它。</p>
+<p><b>这是本章为九篇找出的第四处必改</b>（第十二节那三处之外）。</p>
+<hr>
+<h2>十　第九族　自我、行动与匠艺　🔴</h2>
+<p><b>这一族全书没有一篇碰过，而它是本书价值前提的所在地。</b></p>
+<p><b>占了什么</b>（四条）：</p>
+<p><b>其一，实用主义那一支：有用即真，观念的意义在于它带来的实际后果。</b></p>
+<p><b>这一家与本书的&quot;兑现&quot;&quot;改道&quot;&quot;发生&quot;距离极近</b>，而全书零交手。</p>
+<p><b>其二，工程知识论：知识由造出来的东西能不能用来验证。</b>（工程师知道什么、工程与技术的分野。）</p>
+<p><b>其三，匠艺那一支：把一件事做好本身是人的一种基本欲求，而现代分工与评价制度在损害它。</b></p>
+<p><b>其四，劳动、工作与行动的区分</b>（那一支政治哲学）：劳动是维持生命的循环，工作是造出持存之物，行动是在他人面前显现自身。<b>这三者的区分，与本书的三样损失（不能主张、不能积累、不能定价）有直接的对应关系，而我写第一篇时对此一无所知。</b></p>
+<p><b>这一族对本书的打击是最深的一处，因为它打的不是结论，是前提：</b></p>
+<blockquote><b>本书从头到尾假定&quot;人应当在他做的事情上变强&quot;，而这个假定从未被论证。</b></blockquote>
+<p>第八篇里那位怀疑者已经问过这一句，<b>而我当时的回答是划清适用范围（本书面向已经想做成一件事的人），并明写&quot;那个问题我回答不了，也不打算假装回答&quot;。</b></p>
+<p><b>在这一章里，我要补一句更准确的：那个问题不是我回答不了，是我应当去读这一族的书。</b>这一族花了几十年在讨论&quot;人为什么要把一件事做好&quot;&quot;什么样的活动值得过一生&quot;，<b>而我把它当成了一个可以搁置的前提。</b></p>
+<p><b>分离线（我勉强给得出的两条）</b>：</p>
+<p><b>其一</b>，实用主义把&quot;有用&quot;抬进了真理的判据；<b>本书把它留在真理之外，只用它决定一个人在不在场。</b>本书从不主张一条条目&quot;因为管用所以真&quot;，只主张&quot;因为管用所以他还在这件事里&quot;。</p>
+<p><b>其二</b>，匠艺那一支讲的是<b>做好一件事的欲求与它的社会条件</b>；本书讲的是<b>做成一件事的记账与结算</b>。前者是伦理与人格的问题，后者是制度与交易的问题。</p>
+<p><b>这两条分离线我给得很虚</b>，因为<b>我没有读过足够的原始文献来判断它们成不成立。</b></p>
+<p><b>判决性反例</b>：若这一族中已有人系统处理过&quot;个人在无外部承认的条件下如何维持一项长期实践&quot;（这几乎肯定有），则本书第三篇与第八篇的大部分内容是那个讨论的一个当代应用。</p>
+<p><b>这一族的判决</b>：<b>本书完全没有交手，而且它可能已经回答了本书最深的那个问题。</b></p>
+<hr>
+<h2>十之三　三场当面交手</h2>
+<p>上面九节是我对着九族说话。这一节让三位最硬的对手开口。<b>三位都是我构造的，因此他们说的话仍然出自我——但我尽量让他们说我不愿意听的。</b></p>
+<h3>交手一：一位研究计量与治理的人</h3>
+<blockquote><b>她</b>：你这本书写了二十万字，交出了二十几个读数。而你在第九篇亲口写：读数一旦进考核，当天变质。<br><br><b>那你为什么还要造这么多读数？</b></blockquote>
+<p><b>我</b>：因为不造读数，这本书就只有主张，没有可以被推翻的东西。</p>
+<blockquote><b>她</b>：这个回答我听过很多次。<b>它成立的前提是&quot;可测量&quot;与&quot;可被推翻&quot;是同一回事，而这一点恰恰不成立。</b><br><br>一个主张可以被案例推翻、被历史推翻、被一次反例推翻——<b>不必被数字推翻。</b>你把&quot;可证伪&quot;窄化成了&quot;可测量&quot;，然后为了可测量而造了一堆量具，而每一个量具都会带来它自己的扭曲。</blockquote>
+<p><b>我</b>：（这一句我没有准备）……我承认这个窄化存在。<b>本书的证伪条件里，确实绝大多数是&quot;测一个数&quot;，很少是&quot;找一个案例&quot;。</b></p>
+<blockquote><b>她</b>：而且你比多数人更该小心。你的书的对象是个人的、不可比较的、只对一个人有效的东西——<b>这恰恰是最不该被计量的那一类。</b>你自己写了&quot;折算不是加栏&quot;，然后转身给它造了二十几个读数。</blockquote>
+<p><b>我</b>：<b>这一击我接。</b></p>
+<p>我能守的只有一条：本书的读数<b>绝大多数是给当事人自己用的</b>，不进入比较。第九篇明写&quot;三个读数只给教师自己看&quot;。</p>
+<blockquote><b>她</b>：那第六篇呢？按发生结算的收入占比、不成事退款率——<b>你在第八篇还主张把它们公开。</b></blockquote>
+<p><b>我</b>：那一处是冲突的。第十二节其三我已经加了限制（不得用于同业排名），<b>而公开又不排名能不能做到，我不知道。</b></p>
+<blockquote><b>她</b>：这就是全部问题了。<b>&quot;公开而不比较&quot;在现实中几乎不存在</b>——数字一旦公开，比较会自己发生，不需要谁去组织。</blockquote>
+<p><b>我</b>：<b>这一句我没有回答。</b></p>
+<h3>交手二：一位劳动经济学家</h3>
+<blockquote><b>他</b>：你第八篇那三条跳过机制，我们这行叫别的名字，而且有数据。你有数据吗？</blockquote>
+<p><b>我</b>：没有。第八篇全部是推理。</p>
+<blockquote><b>他</b>：那我给你一个更麻烦的问题。<b>你整本书的分析单位是&quot;一个人身上一次不可撤销的改变&quot;。这个单位不出现在任何一套统计里。</b><br><br>没有统计，就没有总量、没有分布、没有趋势。<b>你怎么知道你说的这件事正在发生，而不是你观察到的几十个人？</b></blockquote>
+<p><b>我</b>：我不知道。第一篇的三处现场是选择性取样，第七篇的十个案子是我挑的，第五篇的八场是我选的——<b>每一篇我都写了这句话。</b></p>
+<blockquote><b>他</b>：写了不等于解决了。<b>一本书如果每一篇都承认样本不足，那不是诚实，那是这本书的方法本身选错了。</b>你应该先做一个能出总量的研究，再写这本书。</blockquote>
+<p><b>我</b>：<b>这一击我部分接受，部分不接受。</b></p>
+<p>接受的部分：若要主张&quot;这件事正在大规模发生&quot;，我确实没有资格。</p>
+<p><b>不接受的部分</b>：本书主张的不是规模，是<b>结构</b>——那个位置存在、它有这些性质、可以这样开单。<b>结构可以用少数案例说明，规模不能。</b></p>
+<blockquote><b>他</b>：那你的书名就该改。&quot;与 AI 一起成长&quot;是一个关于所有人的说法。</blockquote>
+<p><b>我</b>：（停）……这一条我认。<b>书名比内容大。</b></p>
+<h3>交手三：一位关心匠艺与行动的人</h3>
+<blockquote><b>他</b>：我只问一句。你这本书里，那个人为什么要做成那件事？</blockquote>
+<p><b>我</b>：因为他自己想。</p>
+<blockquote><b>他</b>：那如果他不想呢？</blockquote>
+<p><b>我</b>：本书对他没有话说。</p>
+<blockquote><b>他</b>：那你这本书的读者是谁？<b>已经想做成一件事的人，本来就会去做</b>——他不需要一本书告诉他怎么记账。而不想的那些人，你说你没有话对他们说。<br><br><b>那么你的书是写给一个空集的。</b></blockquote>
+<p><b>我</b>：不是空集。<b>想做成一件事、而做不成的人，是一个很大的集合。</b></p>
+<blockquote><b>他</b>：那他们做不成，是因为缺你说的那套方法吗？还是因为别的？<br><br>你在第一篇里写了那个施工员，他后来换了公司。<b>他缺的是条目账，还是缺一个肯给他一栏的地方？</b></blockquote>
+<p><b>我</b>：（这一击很准）……<b>他缺的是后者。</b>而本书给他的是前者。</p>
+<blockquote><b>他</b>：所以你给的东西，未必是他缺的东西。</blockquote>
+<p><b>我</b>：<b>这一处我守不住。</b></p>
+<p>我唯一能说的是：后者不由他控制，前者由他控制。<b>给一个人他能控制的那一样，不是因为它更重要，是因为它是他能拿到的那一样。</b></p>
+<blockquote><b>他</b>：这个回答很实际，也很小。<b>它配不上你那个书名。</b></blockquote>
+<p><b>我</b>：<b>这是今天第二个人这么说。</b></p>
+<hr>
+<h2>十一　用这本书之前，最该知道的三件事</h2>
+<p>（原为「十二处打击」，按对使用者的价值重排。）</p>
+<p><b>第一处（最重）：本书的价值前提未经论证，而有一整族在处理它。</b>（第九族）</p>
+<p>本书假定人应当在做的事情上变强，从未论证，而自我与匠艺那一族已经讨论了几十年。</p>
+<p><b>处置</b>：本书不能在这一版补上——补上需要真读那些书。<b>能做的只有把这个缺口写明</b>，见第十二节其一。</p>
+<p><b>第二处：本书把&quot;记入会改造被记之物&quot;当成了自己的发现。</b>（第三族）</p>
+<p>第一篇的拒栏型是这一族的核心结论，而我是自己撞出来的。</p>
+<p><b>处置</b>：补出处，并声明该节原创性为零。</p>
+<p><b>第三处：本书那些读数全部撞在 Goodhart 与 Campbell 上，而我写的时候不知道。</b>（第三族）</p>
+<p>第九篇第四节整段是这两条定律的复述。</p>
+<p><b>处置</b>：补出处，并给第六篇的读数加一条使用限制（不得用于同业排名）。</p>
+<p><b>第四处：转型经济可能已经覆盖了第二篇的大部分。</b>（第六族）</p>
+<p><b>处置</b>：不能不查。这是全书最大的撤名风险。</p>
+<p><b>第五处：任务模型可能已经能容纳第八篇。</b>（第四族）</p>
+<p>若&quot;不可外包给他人的任务&quot;能被纳入任务模型，第八篇整篇是那一族的推论。</p>
+<p><b>第六处：去学校化那一支五十年前就给出过&quot;小组而非学校&quot;的形态。</b>（第八族）</p>
+<p>第九篇第五之二节那个结论不新。</p>
+<p><b>第七处：补栏时距可能已有等价物。</b>（第五族）</p>
+<p>第七篇自己写进撤名条件，至今未查。</p>
+<p><b>第八处：本书的找法可能是蓝海或 JTBD 的特例。</b>（第七族）</p>
+<p>第四篇自认撤名概率不低。</p>
+<p><b>第九处：本书的证据等级低于 n-of-1。</b>（第二族）</p>
+<p>无设盲，读数全是估值。<b>这不是可以补的，是结构性的。</b></p>
+<p><b>第十处：默会知识那一族的&quot;成立条件不可完全言说&quot;若成立，第三篇的四件结构塌一件。</b>（第一族）</p>
+<p>第五篇场七那位护理员是活的例子。</p>
+<p><b>第十一处：统计分类那一整支本书一句没提。</b>（第五族）</p>
+<p><b>第十二处：实用主义与本书的&quot;兑现&quot;距离极近，零交手。</b>（第九族）</p>
+<h3>一个必须说出口的总判</h3>
+<p><b>十二处里，有五处（第二、三、六、十一、十二）的性质是同一种：我以为是自己想到的，别人早就说过了。</b></p>
+<p><b>这不是抄袭，是无知。</b>而无知在思想工作里的后果，比抄袭轻得多，也难看得多——<b>抄袭至少说明他读过。</b></p>
+<p><b>这五处集中说明一件事：本书的敌意拓宽做得远远不够。</b>九篇里每一篇都写了&quot;未做系统检索&quot;，<b>而把它们汇总起来看，那句话的分量比单篇里读起来重得多。</b></p>
+<hr>
+<h2>十二　已经据此改掉的四处（记录，供追溯）</h2>
+<p><b>其一，补一节&quot;本书的价值前提&quot;，放在全书序里。</b></p>
+<p>内容不必长，必须写清三件事：</p>
+<ul><li>本书假定人应当在他做的事情上变强；</li><li>这个假定本书未加论证；</li><li><b>有一整族学问在处理它，而本书没有读。</b></li></ul>
+<p><b>不许把这个缺口写成&quot;本书聚焦于操作层面，价值问题留待他人&quot;</b>——那是把无知包装成分工。<b>要写成：这是一处欠账。</b></p>
+<p><b>其二，第一篇第十一节与第九篇第四节，补出处并降级。</b></p>
+<p>第一篇第十一节（拒栏型）改写为：&quot;本书在此重新发现了一条已知结论&quot;，并给出这一族的位置。</p>
+<p>第九篇第四节（读数进考核会变质）明写&quot;本节原创性为零，它是 Goodhart 与 Campbell 两条定律在本书场景下的复述&quot;。</p>
+<p><b>为什么要主动降级</b>：因为不降级的代价更大——<b>一个读者如果在读到第九篇第四节时想起 Goodhart，他会开始怀疑前面八篇里还有多少这样的东西。</b>主动认掉一处，比被抓出一处强。</p>
+<p><b>其三，第六篇的读数加使用限制。</b></p>
+<p>那四个读数（按发生结算占比、不成事退款率、定义修改率、争议率）加一条：<b>不得用于同业排名或监管评级。</b></p>
+<p>理由已在第四节：一旦用于比较，Goodhart 立刻适用，而这门生意的防伪机制正好建立在那些读数的真实性上。</p>
+<p><b>这一条与第八篇第十节的截断方案有冲突</b>——那一节说&quot;公开的读数就是那道截断&quot;。<b>公开而不排名，能不能做到，我不知道。这一处冲突留给统稿。</b></p>
+<p><b>其四（本章新增）</b>：第五篇应当正面交手&quot;AI 时代最重要的是提出好问题&quot;这一流行说法。</p>
+<p><b>理由</b>：本书的核心工艺与它直接相反——<b>好问题不是提出来的，是被追问逼出来的</b>；而这一说法流传极广，读者会拿它来读第五篇。</p>
+<p><b>处置</b>：在第五篇的占位者节新增一家，并给出分离线与判决性反例（若能证明&quot;提问能力&quot;可教可考且随基底变强而更值钱，则本书的追问工艺是它的一个下位技能，第五篇要改写）。</p>
+<hr>
+<h2>十三之二　三处跨篇冲突，本章能裁的与不能裁的</h2>
+<p>九篇写完之后留下三处跨篇冲突。本章看得见全书，先裁两处，第三处裁不了。</p>
+<h3>冲突一：定义修改是病还是常态</h3>
+<p><b>第六篇</b>把&quot;定义修改率&quot;当作需要控制的现象（健康区间 0.05–0.15），因为签订时把那件事写死是这门生意的地基。</p>
+<p><b>第四篇</b>在追错的那两天里发现：&quot;要什么&quot;是在挑的过程中长出来的，不是先想清楚再挑。</p>
+<p><b>本章的裁定</b>：两者都对，冲突来自把两件事混成了一件。</p>
+<ul><li><b>&quot;那件事是什么&quot;</b>（第一条 1.1 那一行）<b>不该改</b>——它是交易的标的，改了就没有交易；</li><li><b>&quot;我为什么要这件事&quot;</b>（他的动机与判据）<b>会一路在变，而且应该变</b>——那正是第四篇说的东西。</li></ul>
+<p><b>处置</b>：第六篇的定义修改率保留，但加一句说明：<b>它测的是标的的稳定性，不测当事人认识的稳定性；后者变化是正常的，且不应触发单据修改。</b></p>
+<h3>冲突二：学校按什么收费</h3>
+<p><b>第九篇</b>认掉了：按学期收落进&quot;退回月费&quot;那一格；按圈收会惩罚跑得最慢也最好的学生。</p>
+<p><b>第六篇</b>要求按发生结算。</p>
+<p><b>本章的裁定</b>：<b>这一处第六篇让步。</b></p>
+<p>理由：第六篇那张单据是为<b>一对一、双方自愿、可随时终止</b>的关系设计的。学校不是这种关系——<b>学生不能&quot;这个月不成事就走&quot;，他要在那里读几年。</b></p>
+<p><b>处置</b>：第九篇按学期收费，<b>不视为退回月费</b>，但必须补一条替代的牙齿：<b>若一名学生连续两个学期既无完成的圈也无有效撤回，学校退还该学期学费的一部分。</b></p>
+<p><b>这一条比按圈收费温和，且不惩罚乙那样跑得慢的学生</b>（他有一圈，而且有复检）。</p>
+<h3>冲突三：位置会长成生意还是岗位——裁不了</h3>
+<p><b>第四篇</b>演练二暴露：这套找法找得到位置，找不到组织形态。若那三个位置最后长成企业内的岗位，<b>第六篇整篇失效</b>（岗位领工资，不开单据）。</p>
+<p><b>本章裁不了这一处</b>，理由是它不是逻辑冲突，是一个<b>关于未来的经验问题</b>。</p>
+<p><b>能做的只有两件</b>：</p>
+<p><b>其一，把它写进第六篇的作废条件</b>（现在那一篇的四条作废条件里没有这一条）；</p>
+<p><b>其二，给一个可观察的早期信号</b>——<b>如果在两年内，招聘市场上开始出现以&quot;陪跑&quot;&quot;成事&quot;&quot;交付达成&quot;为职责的固定岗位，那么组织形态倾向岗位，第六篇要改写为岗位的职责说明书而不是交易单据。</b></p>
+<p><b>这一条是本书目前唯一一个&quot;两年内可观察&quot;的形态判断。</b></p>
+<hr>
+<h2>十五　这一章不管的事</h2>
+<p><b>不管九篇各自的分离线。</b>每一篇的占位者节仍然有效，本章只做跨篇的、与地基相撞的那些。<b>两处不一致时以本章为准</b>（因为本章看得见全书）。</p>
+<p><b>不管本书的结论对不对。</b>本章只处理&quot;这些结论是不是已经有人说过&quot;，不处理&quot;它们成不成立&quot;。</p>
+<p><b>不管怎么补上这些欠账。</b>第十二节只给了三处必须改的，<b>而真正的补法是去读那些书</b>——那不是这一章能做的事。</p>
+<hr>
+<h2>卷末</h2>
+<p>九支看完，最该带走的不是&quot;谁先说的&quot;，是<b>他们各自停在哪里</b>。</p>
+<p>四十年没解决一对一追问的成本；二十年的自我研究没有复检与撤回；近五十年的遗忘研究没走到个人与结算；最常用的学习循环不产生一个会过期的条目；正在积累的那批数据还在互相打架；按结果收费的合同里，结果由别人造成。</p>
+<p><b>这些不是空白，是别人试过之后停下来的地方。</b></p>
+<p>而本书那条链——外化、条目、复检与撤回、按发生结算——<b>是把这些段落接起来的一次尝试，仅此而已。</b>它没有比任何一支更聪明，它只是不肯在其中任何一处停下。</p>
+<p><b>所以用这本书的人，最该留意的正是那些卡点。</b>如果你在某一段卡住了，不必以为是自己不行——<b>那一段已经卡了几十年。</b></p>
+<p>而如果你在某一段真的走通了，<b>那就是这本书里所有推理都换不来的一件东西。</b></p>
+</article>
+<div class="foot-nav"><div class="cl"><a href="/books/growing-with-ai/y3/">← 教育的最小单元必须从课换成圈</a><a href="/books/growing-with-ai/">本书目录</a><a href="/books/growing-with-ai/raz/">ChatSDE 条目库 →</a></div></div>
+</section>
+</main>
+
+  </section>
+</main>
+
+<div class="chnav"><a href="/books/logic/">全书目录 ↑</a><a href="/books/logic/axioms/">第一编 总纲编 →</a></div>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  © 德麦国际 Demai International · 专著栏目 · 《SIO逻辑学导论》 · <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260909q" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>

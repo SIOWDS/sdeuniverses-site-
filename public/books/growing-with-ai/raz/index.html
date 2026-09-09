@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChatSDE 条目库｜《与 AI 一起成长》· 专著栏目 | SDE Universes</title>
+<meta name="description" content="十九条，每条四件，直接拿去用">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#C0522A;--accent2:#DB7440}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#C0522A1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.75rem,4.1vw,2.55rem);font-weight:700;line-height:1.32;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.98rem,1.9vw,1.13rem);color:var(--text2);max-width:660px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.72}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:2.4rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h3{font-family:'Noto Serif SC',serif;font-size:1.06rem;font-weight:700;color:var(--text);margin:2.2rem 0 0.9rem;line-height:1.5}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#C0522A22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.9rem 0;padding:1.15rem 1.5rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.05rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+</style>
+
+
+<style>
+:root{--bg:#F3F2EC;--card:#FAF9F4;--card2:#EAE9E0;--gold:#3E4488;--text:#20222B;--text2:#474B5A;--muted:#868A99;--border:rgba(62,68,136,0.22);--border2:rgba(62,68,136,0.10);--accent:#4A54A6;--accent2:#6B76C8}
+.ednote{background:#EFEFF8;border:1px solid rgba(74,84,166,0.28);border-left:3px solid #4A54A6;border-radius:4px;padding:1.05rem 1.2rem;margin:0 0 1.6rem;font-size:0.93rem;line-height:1.85;color:#37453F}
+.ednote .l{font-size:0.72rem;letter-spacing:0.22em;color:#4A54A6;margin-bottom:0.5rem}
+article h3{font-size:1.02rem;font-weight:700;margin:1.9rem 0 0.7rem;color:var(--gold)}
+.chnav{max-width:760px;margin:2.4rem auto 0;padding:1.2rem 2rem 0;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:0.86rem;border-top:1px solid var(--border2)}
+.chnav a{color:var(--accent);text-decoration:none}
+.partline{font-size:0.72rem;letter-spacing:0.2em;color:var(--accent);margin-bottom:0.8rem}
+</style>
+
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/monographs/" class="sib">专著栏目</a>
+    <a href="/books/logic/" class="here">SIO逻辑学导论</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/monographs/">专著栏目</a> · <a href="/books/logic/">《SIO逻辑学导论》</a></div>
+  <div class="partline">卷首</div>
+  <h1 class="art-title">前言：从逻辑救赎到文明自救</h1>
+  <p class="art-sub">文明之所以需要救赎，首先不是因为技术不够先进，而是因为理性失位。</p>
+  <div class="art-meta">王德生 著 · 《SIO逻辑学导论》卷首 · 约 0.7 万字</div>
+</header>
+
+<style>
+article .li{font-size:0.99rem;line-height:1.95;color:var(--text);margin:0 0 0.5rem;padding-left:1.15rem;position:relative;text-align:justify}
+article .li::before{content:"—";position:absolute;left:0;color:var(--accent);opacity:.55}
+article .lab{font-size:0.86rem;font-weight:700;letter-spacing:0.08em;color:var(--accent);margin:1.5rem 0 0.55rem}
+article h4{font-size:0.99rem;font-weight:700;color:var(--text2);margin:1.5rem 0 0.6rem}
+.gbox{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent2);border-radius:5px;padding:1.15rem 1.35rem;margin:1.9rem 0}
+.gbox .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.5rem}
+.gbox p{font-size:0.95rem;line-height:1.92;color:var(--text2);margin:0;text-align:justify}
+.addch{background:#FFF8E8;border:1px solid rgba(160,120,20,.3);border-left:3px solid #A07814;border-radius:4px;padding:0.9rem 1.15rem;margin:0 0 1.4rem;font-size:0.88rem;line-height:1.8;color:#5A4A22}
+.addch b{color:#8A6817}
+.reflist{max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#F4F4FA;border:1px solid #D9DAEA;border-radius:6px}
+.reflist h2{font-size:20px;letter-spacing:0.14em;color:#3E4488;margin:0 0 10px}
+.reflist .n{font-size:13.5px;line-height:1.9;color:#7B7F95;margin:0 0 20px}
+.reflist ol{margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#414455}
+.reflist li{margin:0 0 9px;padding-left:6px}
+</style>
+<main class="wrap">
+<section class="body">
+<div class="ednote"><div class="l">编 者 按</div>十九条，每条四件，直接拿去用</div>
+<article>
+<h2>ChatSDE 条目库 v1　《与 AI 一起成长》可调用条目</h2>
+<p><b>用途</b>：这不是给人读的稿子，是给 ChatSDE 调用的条目。</p>
+<p><b>体例</b>：每条四件——<b>用户会怎么问／怎么判怎么做／做对了的信号与做砸了的信号／什么时候不适用</b>。</p>
+<p><b>纪律</b>：条目里不出现&quot;本书主张&quot;&quot;新提出&quot;&quot;前人未见&quot;这类话。<b>用户不关心谁先说的，只关心能不能用。</b></p>
+<p><b>底册</b>：十篇正文保留为底册，供追溯推导过程与现场；本库是前台。</p>
+<hr>
+<h2>一组　我做的事没人当回事</h2>
+<p><b>条目 A1｜我做了很多，考核上一点没体现</b></p>
+<p><b>用户会这么问</b>：领导知道我在做，但跟考核没关系／我做的这些没人认／干了三年简历上写不出来。</p>
+<p><b>怎么判</b>：去把那本账真的调出来看——考核表、评分表、系统字段。<b>只问一句：这件事发生了之后，那上面有没有任何一个数会变？</b></p>
+<p>没有数会变 → 这件事在账外，<b>不是你不够努力，是那里没有格子</b>。</p>
+<p>有数会变（哪怕只在某人心里，比如老板会给你多发红包） → 它在账内，问题是别的。</p>
+<p><b>做对了的信号</b>：你能说出那本账叫什么、缺的是哪一栏。</p>
+<p><b>做砸了的信号</b>：只凭印象说&quot;公司不重视&quot;。</p>
+<p><b>不适用</b>：还没真正发生的事；以及你其实只是想要一句表扬。</p>
+<hr>
+<p><b>条目 A2｜账外的三种缺法，决定你能做什么</b></p>
+<p><b>怎么判</b>：缺的是<b>字段</b>（数据有、没那一栏）、<b>位置</b>（证据在你手上、但你没有说话的身份）、还是<b>判据</b>（大家心里有数、但没有尺子）。</p>
+<p><b>怎么做</b>：</p>
+<ul><li>缺字段 → 别指望换系统，去争那一栏；</li><li>缺位置 → <b>多半争不到，换一本已经有那一栏的账更快</b>（换岗、换公司、换客户）；</li><li>缺判据 → 先把那把尺子说清楚（见 C 组），说不清就永远争不了。</li></ul>
+<p><b>不适用</b>：一件事若在别的账上也完全没有痕迹（谁都没记过），那是另一种处境——先想办法留下痕迹。</p>
+<hr>
+<p><b>条目 A3｜争取被承认之前，先自己记</b></p>
+<p><b>怎么做</b>：不管有没有人认，<b>现在就开一张表</b>：日期、来源、投入、结果、返修。五栏就够。</p>
+<p><b>为什么</b>：机会来的时候，手上有账和没账的人处境完全不同。<b>没记的那几个月，实际上等于没做过</b>——你自己也会忘。</p>
+<p><b>做对了的信号</b>：一个月后你能说出&quot;这个月比上个月多，但赚得少，因为熟人多&quot;这种句子。<b>这种句子在没有账之前想都想不出来。</b></p>
+<p><b>不适用</b>：如果你要的是别人认可，这一条帮不上——记账只解决积累，不解决主张与定价。</p>
+<hr>
+<h2>二组　这门生意值不值得做</h2>
+<p><b>条目 B1｜五问筛子</b></p>
+<p><b>用户会这么问</b>：我想做 XX，AI 时代这个方向行不行？</p>
+<p><b>依次问，前一问不过就停</b>：</p>
+<ul><li>把你卖的东西用第三人称说一遍——&quot;XX 被交付了&quot;说得通吗？说得通就停。</li><li>所有大模型明天关掉，你这门生意当天死吗？不死就停。</li><li>你的产出和同行的能不能互换？能就停。</li><li>基底再强十倍，你的生意会变好吗？不变好就停。</li><li>成本主要落在客户自己身上吗？落在你这边就危险。</li></ul>
+<p><b>最后一问</b>：<b>你上一个客户的&quot;第一次&quot;是什么？用他的第一人称说出来。</b>说不出来，前面五问多半是自我说服。</p>
+<p><b>不适用</b>：判一件事该不该做（值不值、喜不喜欢），这套筛子不管。</p>
+<hr>
+<p><b>条目 B2｜「改结算即是」——最常见的一格</b></p>
+<p><b>用户会这么问</b>：我做的是陪练／辅导／咨询，好像不算你说的那种？</p>
+<p><b>怎么判</b>：看你<b>收钱的依据</b>，不看你的文案。</p>
+<p>按月费、按课时、按次数 → 你卖的是过程。</p>
+<p>按&quot;他第一次做成了什么&quot; → 你卖的是发生。</p>
+<p><b>怎么做</b>：不必一步到位。<b>保留现有报价的七成做入场费，三成挂在那件事发生上。</b></p>
+<p><b>底线（很硬）</b>：入场费不能高到&quot;客户没做成，你也活得很好&quot;。过了这条线，半年内会自己退回按月收费，<b>而中间不会发生任何一件可以被指出来的错事</b>。</p>
+<p><b>不适用</b>：那件事的结果不由客户造成的（名额、评审、行情在别人手里），不能这么改。</p>
+<hr>
+<p><b>条目 B3｜三种会把这门生意做坏的样式</b></p>
+<p><b>征兆（共同的一条）</b>：你开始用总量说话——多少人报名、多少课时、完课率——<b>而说不出上一个客户叫什么、卡在哪一步。</b></p>
+<p><b>三种</b>：</p>
+<ul><li><b>退回月费</b>：成事费越来越像奖金 → 查&quot;上季度有几笔成事费到账&quot;；</li><li><b>变成证书</b>：为了可比较、可展示，给&quot;第一次&quot;加标准，标准变等级，等级变证书 → 查&quot;两个客户的成果能不能比较&quot;，能比较就是在往证书走；</li><li><b>变成保险</b>：按成事率和概率经营，不再关心单个客户 → 查&quot;你上个客户卡在哪&quot;。</li></ul>
+<p><b>不适用</b>：规模很小、还没有第十个客户的时候，这三条先不用查。</p>
+<hr>
+<h2>三组　我说不清我是怎么做到的</h2>
+<p><b>条目 C1｜三个问题，顺序不能换</b></p>
+<p><b>用户会这么问</b>：我这行做久了有点感觉，但说不出来／我想把经验教给新人，教不了。</p>
+<p><b>依次问</b>：</p>
+<ul><li><b>你在哪件事上做得跟标准做法不一样，而且效果更好，但说不清为什么？</b></li></ul>
+<p>（几乎所有人第一次都答&quot;没有&quot;。破法：换成行为——&quot;有没有哪次你没按流程做&quot;；或换成事故——&quot;有没有哪次出了岔子，之后你改了做法&quot;。）</p>
+<ul><li><b>什么时候这样做会失败？</b></li></ul>
+<p>（<b>不要问&quot;为什么有效&quot;</b>——人对自己成功的解释多半是事后编的。对失败边界的记忆骗不了人。）</p>
+<ul><li><b>下一次你敢不敢按相反的方式做一遍？</b></li></ul>
+<p><b>做对了的信号</b>：他卡壳了，说&quot;我想想&quot;，第三轮之后说出一个他自己也没想过的条件。</p>
+<p><b>做砸了的信号</b>：<b>全程流畅、每问都有漂亮答案</b>——那是话术，不是默会知识。</p>
+<p><b>不适用</b>：对方给的是整体判断（&quot;我就是知道&quot;）而不是模糊的规则——那种追不出来，硬追他会开始编。</p>
+<hr>
+<p><b>条目 C2｜追问者的四条纪律</b></p>
+<ul><li><b>不许替对方把话说完</b>——你说出的那半句，从此就是你的，不是他的。</li><li><b>不许在提问里暗示答案</b>——那样只会得到&quot;对&quot;，而&quot;对&quot;不是知识，是同意。</li><li><b>虚了就要例，不要要定义</b>——他给抽象答案时，问&quot;最近一次是什么情况&quot;。</li><li><b>第三轮不许给台阶</b>——那一轮才是东西要出来的时候。<b>破法：沉默五到十秒，什么也别说。</b></li></ul>
+<p><b>不适用</b>：对方明确不愿意被追问的场合。</p>
+<hr>
+<p><b>条目 C3｜用 AI 当追问者</b></p>
+<p><b>怎么做</b>（可以直接念）：</p>
+<ul><li>「你只能问问题，不许给建议，不许替我把话说完。」</li><li>「问我：我在哪件事上做得跟标准做法不一样、效果还更好，但说不清为什么？」</li><li>「再问：什么时候我这样做会失败？<b>不要提示我可能的失败场景，让我自己说。</b>」</li><li>（若答&quot;没失败过&quot;）「换个问法：有没有哪次我这么做了但效果没平常好？」</li><li>「写成四件：主张、成立条件、验证记录、最近复检。<b>成立条件里凡是我没亲口说过的，标出来。</b>」</li><li>「用我自己的话重写一遍，不要改得比我说的漂亮。」</li></ul>
+<p><b>做砸了的信号</b>：它给出的成立条件，每一条都能在你自己刚才的话里找到出处——<b>那一轮是空转，它只是替你整理了一遍。</b></p>
+<p><b>不适用</b>：需要设盲才能判的问题（你希望它成立的那种）。</p>
+<hr>
+<h2>四组　我记下来的东西怎么才算数</h2>
+<p><b>条目 D1｜一条经验写全了是四件</b></p>
+<p><b>主张</b>（一句话）／<b>成立条件</b>（什么时候不成立）／<b>验证记录</b>（用过几次、哪次没管用）／<b>最近复检</b>（什么时候回头看的）。</p>
+<p><b>缺哪一件就退回成什么</b>：</p>
+<p>缺条件 → 格言（听着哪儿都对，哪儿都用不上）</p>
+<p>缺验证 → 信念</p>
+<p>缺复检 → 过期库存</p>
+<p>缺主张 → 日记</p>
+<p><b>做对了的信号</b>：条件比主张长。<b>一条只对你有效的经验，价值几乎全在条件里</b>——主张那句多半是老话。</p>
+<hr>
+<p><b>条目 D2｜怎么分辨真条件与编出来的条件</b></p>
+<p><b>最常见的一种自欺</b>：一次没管用，就加一行条件把这次排除掉；加着加着，这条主张变得永远正确。</p>
+<p><b>判别法（只有一句）</b>：<b>新加的那行条件，能不能事先说出下一次会在哪儿失败？</b></p>
+<p>能 → 真的。</p>
+<p>只能解释过去那次 → 编的。</p>
+<hr>
+<p><b>条目 D3｜复检怎么做才不是走过场</b></p>
+<p>三句，按顺序问：</p>
+<ul><li><b>这一年我在什么场合真的用了它？</b>（举不出场合 → 标&quot;本期无法复检&quot;，停。<b>不许写&quot;成立&quot;。</b>）</li><li><b>有没有哪一次它没管用？</b>（没有 → 警惕：要么条件写虚了，要么用得太少。）</li><li><b>成立条件里哪一条，今年被现实碰过？</b>（被碰过的那条通常要改写。）</li></ul>
+<p><b>做对了的信号</b>：这一期你撤回了一两条。</p>
+<p><b>做砸了的信号</b>：一本账上全是&quot;成立&quot;——那多半没真复检过。</p>
+<hr>
+<p><b>条目 D4｜哪些经验是月级的，必须重测不是复检</b></p>
+<p><b>凡是成立条件里含&quot;当前模型能力&quot;的</b>（什么样的提问跑得动、哪道工序有效、哪个基底适合哪类活），<b>保质期以月计</b>，基底一换代当场作废，<b>而且作废时不会有任何提示</b>——它会继续给出看起来正常的结果。</p>
+<p><b>怎么做</b>：每次基底换代，把这一族整族<b>重跑一遍</b>（重测），不是问&quot;还成立吗&quot;（复检）。</p>
+<hr>
+<h2>五组　带人</h2>
+<p><b>条目 E1｜带人的一条主线</b></p>
+<p><b>带一个人做出一件他自己的东西，比讲清楚一套方法有效得多。</b></p>
+<p><b>条件</b>：那件东西必须有<b>外部读数</b>（书出没出、钱到没到、能不能自己走十米），否则做不成也看不出来。</p>
+<p><b>不适用</b>：完全没有基础的人（先得讲）；以及只想了解不想做的人（对他们，讲清楚就是正确的交付）。</p>
+<hr>
+<p><b>条目 E2｜可以传什么，不可以传什么</b></p>
+<p><b>可以传</b>：结构（四件、三档保质期、三个读数）与工艺（怎么追问、怎么从失败逼条件）。</p>
+<p><b>不可以传</b>：你自己的条目——<b>它们对别人一律无效</b>，最多当范例，而且要讲清是从哪次失败里长出来的。</p>
+<p><b>最常见的错</b>：把自己的条目当方法讲给别人听。听的人拿去用不上，<b>因为他不知道这句话是针对哪次失败长出来的。</b></p>
+<hr>
+<p><b>条目 E3｜判一个人有没有长进</b></p>
+<p><b>看他撤回过什么，不看他产出了什么。</b></p>
+<p>产出多而从不修正自己的，一年后多半在原地；<b>撤回过自己前一版主张的，通常在往前走。</b></p>
+<p><b>注意</b>：这是观察，不是检验——没有对照，也没量化过。<b>用它当线索，不要当结论。</b></p>
+<hr>
+<h2>六组　三条要记住的边界</h2>
+<p><b>条目 F1｜结果不由客户造成的，不能按成事结算</b></p>
+<p>名额在别人手里（升学、评奖、职称）、评审在别人手里、行情在别人手里——<b>这类事供给方无法承担一个自己和客户都控制不了的结果。</b></p>
+<p><b>折中写法</b>：把结果换成他能完全控制的那一步。不写&quot;拿到录取&quot;，写&quot;我独立完成并提交了全部材料，且通过了约定的自查清单&quot;。</p>
+<hr>
+<p><b>条目 F2｜&quot;AI 时代最重要的是提出好问题&quot;这句话要小心</b></p>
+<p><b>对模型是对的</b>（把问题问清楚确实决定输出质量）。</p>
+<p><b>对人是反的</b>：<b>好问题不是提出来的，是被追问逼出来的。</b>一个人自己提得出的问题，多半是他已经知道答案的那些。</p>
+<hr>
+<p><b>条目 F3｜别把这套东西做成表单</b></p>
+<p>四件结构、三个读数一旦进考核、进比较、进排名——<b>当天变质</b>：撤回数会被刷，复检会走过场，人会开始为读者写。</p>
+<p><b>这本账的所有者必须是本人。</b>可以主动拿出来给人看，<b>不能被要求交上去。</b></p>
+<hr>
+<h2>附　这套东西自己也没被验过</h2>
+<p>本库里所有判据与读数都没有跑过完整的检验。<b>第一次用的时候，把它当作待验的东西用</b>：先在小范围试一次，试出你自己的成立条件，再往下推。</p>
+<p><b>这正是本库自己教的方法</b>——一条主张的价值在它的成立条件里，而条件只能自己长。<b>对这套东西本身也适用。</b></p>
+</article>
+<div class="foot-nav"><div class="cl"><a href="/books/growing-with-ai/d1/">← 这条链上的前人经验</a><a href="/books/growing-with-ai/">本书目录</a></div></div>
+</section>
+</main>
+
+  </section>
+</main>
+
+<div class="chnav"><a href="/books/logic/">全书目录 ↑</a><a href="/books/logic/axioms/">第一编 总纲编 →</a></div>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+
+<footer>
+  © 德麦国际 Demai International · 专著栏目 · 《SIO逻辑学导论》 · <a href="/browse/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20260909q" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
+</body>
+</html>
