@@ -1154,6 +1154,7 @@
       setTest: "测试连通", testing: "正在测…", testNoVis: "—— 这家在本站接口下看不了图",
       testOk: "通了 · ", testBadKey: "Key 不对或没权限", testNoCredit: "余额不足", testBadModel: "型号不对：这家现在没有这个型号", testNet: "连不上这家的接口", testBusy: "这家此刻在排队（型号与 Key 都没问题，免费档挤的时候常见）", testFail: "没通 · ",
       applyAt: "申请 Key：",
+      nvHow: "免费领 Key 三步：① 打开 build.nvidia.com，用邮箱注册（即加入 NVIDIA 开发者计划，不绑卡）；② 进上面这个 API Keys 页，点 Generate API Key，复制 nvapi- 开头那一串（只显示一次，先存好）；③ 贴进上面这一栏，点「测试连通」。免费档按速率限流（常见每分钟约 40 次），官方口径是个人试用与学习；想长期重度使用，请换一家付费基底。",
       micIdle: "说话输入", micListen: "在听…（再点一下结束）", micRec: "录音中 ", micStop: "点一下结束",
       micWorking: "正在转文字…", micNoApi: "这台设备用不了语音输入", micDenied: "没拿到麦克风权限——浏览器地址栏里放行一下",
       micShort: "太短了，没听清", micEmpty: "没听出内容，再说一次",
@@ -1456,6 +1457,7 @@
       setTest: "Test connection", testing: "Testing…", testNoVis: "— no vision model at this vendor here",
       testOk: "Connected · ", testBadKey: "Key rejected, or no permission", testNoCredit: "Out of credit", testBadModel: "No such model at this provider right now", testNet: "Couldn't reach this provider", testBusy: "Provider is busy right now (model and key are fine)", testFail: "Failed · ",
       applyAt: "Get a key: ",
+      nvHow: "Free key in three steps: (1) sign up at build.nvidia.com with an email (joins the NVIDIA Developer Program, no card); (2) on the API Keys page above, click Generate API Key and copy the nvapi- string (shown once — save it); (3) paste it above and hit Test connection. The free tier is rate-limited (commonly ~40 requests/min) and meant for personal trial and learning; for heavy long-term use, switch to a paid provider.",
       micIdle: "Speak", micListen: "Listening… (tap again to finish)", micRec: "Recording ", micStop: "tap to finish",
       micWorking: "Transcribing…", micNoApi: "Voice input isn't available on this device", micDenied: "No microphone permission — allow it from the address bar",
       micShort: "Too short to catch", micEmpty: "Nothing came through — say it again",
@@ -4900,6 +4902,11 @@
        ⚠ 免费名单会轮换（官方不保证一直提供），型号名过期时在设置里覆盖即可。
        ⚠ 配额：:free 一族 20 RPM；credits 不足 10 美元每天 50 次，充够 10 美元每天 1000 次。 */
     { v: "or", name: "OpenRouter", ks: "sde_or_key", apply: "https://openrouter.ai/keys" },
+    /* nv（NVIDIA 免费档）2026-09-10 加（王德生令）：build.nvidia.com 邮箱注册即得 nvapi- Key，不绑卡、不花钱；
+       仍是 BYOK——限额（常见每分钟约 40 次）算在读者自己头上，本站不替任何人出钱。
+       服务端 WDS_VENDORS.nvidia 转发；标准档 deepseek-v4-flash、深度档 deepseek-v4-pro。
+       how：设置面板在申请链接下再给一段三步领 Key 的说明（t() 键名），别家没有这一栏就不显示。 */
+    { v: "nv", name: "NVIDIA 免费", ks: "sde_nv_key", apply: "https://build.nvidia.com/settings/api-keys", how: "nvHow" },
   ];
   function vinfo(v) { for (var i = 0; i < VENDORS.length; i++) if (VENDORS[i].v === v) return VENDORS[i]; return VENDORS[0]; }
   function vkeyGet(v) { try { return (localStorage.getItem(vinfo(v).ks) || "").trim(); } catch (e) { return ""; } }
@@ -4979,7 +4986,8 @@
         b.onclick = function () { stash(); vend = x.v; load(); };
         kvs.appendChild(b);
       });
-      klink.innerHTML = esc(t("applyAt")) + "<a href='" + vinfo(vend).apply + "' target='_blank' rel='noopener' style='color:#C9A227'>" + esc(vinfo(vend).apply.replace(/^https:\/\//, "")) + "</a>";
+      klink.innerHTML = esc(t("applyAt")) + "<a href='" + vinfo(vend).apply + "' target='_blank' rel='noopener' style='color:#C9A227'>" + esc(vinfo(vend).apply.replace(/^https:\/\//, "")) + "</a>"
+        + (vinfo(vend).how ? "<div style='margin-top:6px;color:#8B98A5'>" + esc(t(vinfo(vend).how)) + "</div>" : "");
     }
     function load() { kin.value = draft[vend].k; kmod.value = draft[vend].mo; kres.textContent = ""; paintV(); }
     load();

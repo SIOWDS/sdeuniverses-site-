@@ -415,7 +415,9 @@ export class VisitCounter {
 /* 2026-09-01 加 Claude 与 GPT 两家（见 WDS_VENDORS 的头注释）。深度档取各自的旗舰：
    claude-opus-5（Anthropic 当前最强）／gpt-5.6-sol（OpenAI 旗舰，别名 gpt-5.6）。 */
 const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3", anthropic: "claude-opus-5", openai: "gpt-5.6-sol",
-  openrouter: "nvidia/nemotron-3-ultra-550b-a55b:free" };
+  openrouter: "nvidia/nemotron-3-ultra-550b-a55b:free",
+  /* 2026-09-10 加 NVIDIA 免费档：深度档＝DeepSeek V4 Pro（型号名带日期后缀，取自 GET integrate.api.nvidia.com/v1/models 当日实拉）。 */
+  nvidia: "deepseek-ai/deepseek-v4-pro-0813" };
 /* 【手动钉住的型号有最终裁定权 —— 2026-09-01】原来这两个构造器**根本不看读者填的型号**：
    凡走它们的那几条路（开工学内功、SDE 对谈、陪读、记忆更新、朋友圈），读者在菜单里钉了 luna，
    跑起来仍是 sol——而界面上还显示着 luna。那不是「自动优先」，是**说了不算**，是骗。
@@ -913,6 +915,16 @@ const WDS_VENDORS = {
         50 次／天在 ChatSDE 上撑不了多久——它是退路，不是主力。
      ⚠ 思考字段与别家不同：OpenRouter 走 `delta.reasoning`（不是 reasoning_content），开关走 `reasoning:{}`。 */
   openrouter: { url: "https://openrouter.ai/api/v1/chat/completions", model: "z-ai/glm-5.2:free", name: "OpenRouter", apply: "openrouter.ai/keys" },
+  /* 【2026-09-10 加 NVIDIA 免费档（王德生令）】build.nvidia.com 的托管目录，OpenAI 兼容口，仍由 Worker 服务端转发
+     （该口不回 Access-Control-Allow-Origin，浏览器直连会被 CORS 拦——2026-09-10 实测预检 200 但无 ACAO 头）。
+     · Key：读者在 build.nvidia.com 用邮箱注册即得（nvapi- 开头，不绑卡）；仍是 BYOK，限额算在读者自己头上。
+     · 型号：标准档 deepseek-v4-flash、深度档 deepseek-v4-pro（名字带日期后缀，GET /v1/models 当日实拉，公开可查不需 Key）。
+       没有轻档（退回标准档）；没有看图档（如实回 no_vis）。
+     · 思考开关：**什么都不加**——NIM 各型号的开关叫法不一（chat_template_kwargs 等），未经真 Key 逐型号验过之前不猜，
+       同 Kimi／MiniMax 那条口径；故也**不进 wdsCanPlain**。思考字段若走 reasoning_content，wdsRsn 照常认得。
+     · 配额：免费档按速率限流，常见每分钟约 40 次（按型号不同、官方不公布统一数）；官方口径是开发／试用用途，不是生产服务。
+     ⚠ 型号名会过时：过期的样子是上游 404／model not found，读者可在设置里覆盖型号。 */
+  nvidia: { url: "https://integrate.api.nvidia.com/v1/chat/completions", model: "deepseek-ai/deepseek-v4-flash-0731", name: "NVIDIA \u514d\u8d39", apply: "build.nvidia.com/settings/api-keys" },
 };
 // ── 看图（视觉档）。**只有这三家**在本站的转发口径下能直接吃图；DeepSeek / MiniMax 走不了，
 //    读者选了它们又传图，我们如实说一句「这家看不了图」，绝不拿 OCR 出来的字冒充"它看过了"。
@@ -2147,10 +2159,10 @@ function wdsPickImgs(list) {
    于是一把好端端的 DeepSeek Key 被发去智谱、上游回 401，而我们告诉读者「你的 Key 用不了」。
    2026-08-19 我自己写探针时就栽在这上面，查了二十分钟才发现是发错了家。
    读者的前端只发短名，但任何别处调这个接口的人都会先想到全名。 */
-const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax", mmcn: "minimax_cn", cl: "anthropic", gpt: "openai", or: "openrouter",
+const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax", mmcn: "minimax_cn", cl: "anthropic", gpt: "openai", or: "openrouter", nv: "nvidia",
   deepseek: "deepseek", zhipu: "zhipu", glm5: "zhipu", moonshot: "kimi", minimax: "minimax", minimax_cn: "minimax_cn", qwen3: "qwen",
-  anthropic: "anthropic", claude: "anthropic", openai: "openai", openrouter: "openrouter" };
-const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm", minimax_cn: "mmcn", anthropic: "cl", openai: "gpt", openrouter: "or" };
+  anthropic: "anthropic", claude: "anthropic", openai: "openai", openrouter: "openrouter", nvidia: "nvidia" };
+const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm", minimax_cn: "mmcn", anthropic: "cl", openai: "gpt", openrouter: "or", nvidia: "nv" };
 // LONG_ASK：读者这一问要的是"答一段话"还是"写一篇"？两者对预算与口径的要求完全不同。
 // 不识别它，就会出现最难看的那种失败：读者写"先写 8000 字"，而我们给的 max_tokens 是 8000（约等于 8000 汉字的极限），
 // 同时 system 里还写着"一次两三段以内、别写论文"——两条指令互相打架，基底就在思考里反复权衡、
@@ -12410,7 +12422,7 @@ export default {
         sys = "你是 SDE 学派的综述作者，正在写一篇「" + REVIEW_TYPE_NAME[type] + "」的第 " + (sec + 1) + " 节，节名《" + S.h + "》。综述按格写、不按篇写：任何一节不得出现「论文一……论文二……」的顺序复述，篇只作为格里的证据出现。\n" + REVIEW_TOOL_TEXT[type] + REVIEW_SDEM +
           "\n硬律：每篇被引用的论文在其所在格至少引一句原文锚句（取自卡）；空格必须起名；自撞必须点名合并；断链必须写到能塌格；只引给定清单里的篇号；本节所用的工序产出件（整图／挑战／不足／猜想）已经定下，本节是把它们编排成文，不得改其结论；不要在正文里重写本节标题，直接从正文写起。" + (rn ? "\n改性硬律（⑩之二）：本节是给本学科审稿人读的学科语言版——「显露」「差异序列」「特征纠缠」「S=F(D,E)」「三方程」「六路径」「三原理」「起手维」「落点维」「中间维」「断链」「空格」「挤格」「自撞」「敌拓」「落格」「典范级」「碰撞级」「改判级」「回写」「测量原语」「S→」「→D」「→E」这些字面一次都不许出现" + (sec === 1 ? "（本节末尾的方框除外）" : "") + "；每处判断用映射表右栏的学科说法重说（删掉任何括号里的 SDE 词句子仍成立），不许括号注释；格名写成学科化路名（如「显示→现场→判断」）、Z 只用它的学科名；结论、篇号、数字、级别一字不改。学科化标题：" + (dispH || "（未给，按节名意译）") : "") + REVIEW_STYLE;
         /* 总预算：按基底给上下文——OpenRouter 免费型号与 32K 基底 28000 字，其余 60000 字；超了从最长的件开始等比压，不整件丢 */
-        const CAP = (/openrouter\.ai/.test(String(VC.url)) || /free|32k/i.test(String(VC.model))) ? 28000 : 60000;
+        const CAP = (/openrouter\.ai|integrate\.api\.nvidia\.com/.test(String(VC.url)) || /free|32k/i.test(String(VC.model))) ? 28000 : 60000;
         let total = parts.reduce((a, p) => a + p.length, 0);
         if (total > CAP) {
           const ratio = Math.max(0.25, (CAP - 3000) / total);
@@ -12464,7 +12476,7 @@ export default {
               const dec = new TextDecoder();
               const rd = up.body.getReader();
               let buf = "", out = 0, think = 0, why = "", errFirst = "", rawHead = "", nonSse = 0;
-              const _mm = { on: /minimax/i.test(String(VC.url || "")), in: false, hold: "" };   // MiniMax <think> 剥离（见 wdsMMFeed）
+              const _mm = { on: /minimax|integrate\.api\.nvidia\.com/i.test(String(VC.url || "")), in: false, hold: "" };   // MiniMax <think> 剥离（见 wdsMMFeed）
               while (true) {
                 const rr = await rd.read();
                 if (rr.done) break;
@@ -13656,7 +13668,7 @@ export default {
                预算 2600 还剩三分之二，却已被判"想光了"）。 */
             const _thinkCap = Math.round(Math.max(1000, tokWant - 1200) * 1.7);
             // <think> 剥离只在 minimax 域名下启用（api.minimax.io 与 api.minimaxi.com 都含 "minimax"）。
-            const _mm = { on: String(VC.url).indexOf("minimax") >= 0, in: false, hold: "" };
+            const _mm = { on: /minimax|integrate\.api\.nvidia\.com/i.test(String(VC.url || "")), in: false, hold: "" };   // NVIDIA 托管的推理型号也可能把思考包进 content
             try {
             while (true) {
               const { done: rdone, value } = await reader.read();
@@ -17360,6 +17372,7 @@ export default {
         "https://generativelanguage.googleapis.com/",
         "https://api.minimaxi.com/",
         "https://api.minimax.io/",
+        "https://integrate.api.nvidia.com/",   // 2026-09-10 NVIDIA 免费档（人与AI比智走浏览器→本代理；该口不回 CORS 头）
       ];
       // Azure 语音合成端点：<region>.tts.speech.microsoft.com（TTS 音频，走同一转发通道，BYOK）
       const azureTts = /^https:\/\/[a-z0-9-]+\.tts\.speech\.microsoft\.com\//i.test(target);

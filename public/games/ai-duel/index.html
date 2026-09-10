@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>人与AI比智 · 创新智商擂台 · SDE Universes</title>
-<meta name="description" content="人与AI比智：由一个基底随机出一道日常生活题，你和另一个大模型基底各自作答、互相批评、各自回应，再由裁判基底按创新智商五维盲评。谁的想法经得住批评，谁就留下来。七个基底可选，用你自己的 Key。">
+<meta name="description" content="人与AI比智：由一个基底随机出一道日常生活题，你和另一个大模型基底各自作答、互相批评、各自回应，再由裁判基底按创新智商五维盲评。谁的想法经得住批评，谁就留下来。八个基底可选（含一个 NVIDIA 免费档），用你自己的 Key。">
 <link rel="canonical" href="https://sdeuniverses.com/games/ai-duel/">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/assets/app/favicon-32.png" sizes="32x32">
@@ -55,6 +55,7 @@ h1 i{font-style:normal;color:var(--man)} h1 em{font-style:normal;color:var(--ai)
 .fld .row select{flex:1} .fld .row select.tier{flex:0 0 96px}
 .keyline{font-size:.76rem;color:var(--dim);margin-top:.2rem}
 .keyline a{color:var(--paper2)}
+.keyline .freehow{margin-top:.3rem;line-height:1.6}
 .opts{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.3rem}
 .opts label{font-size:.84rem;color:var(--paper2);display:flex;align-items:center;gap:.3rem}
 .opts select{font:inherit;font-size:.86rem;background:#0E1326;color:var(--paper);border:1px solid var(--line);border-radius:6px;padding:.25rem .4rem}
@@ -184,7 +185,7 @@ footer a{color:var(--paper2);text-decoration:none;margin:0 .35rem}
     </div>
     <div class="btnrow">
       <button class="btn man" id="btnStart">开擂：出第一题</button>
-      <span style="font-size:.8rem;color:var(--dim)">Key 直连各家官网（境外三家经本站纯转发），本站不经手、不保存。</span>
+      <span style="font-size:.8rem;color:var(--dim)">Key 直连各家官网（境外三家与 NVIDIA 经本站纯转发），本站不经手、不保存。没有 Key？选「NVIDIA 免费」，三步免费领一把。</span>
     </div>
     <div class="warn" id="warn"></div>
   </section>
@@ -274,7 +275,10 @@ footer a{color:var(--paper2);text-decoration:none;margin:0 .35rem}
 var $=function(id){return document.getElementById(id);};
 var MOCK = /[?&]mock=1/.test(location.search);
 
-/* ───────── 七家基底（与站内其它智能体共用同一套 Key 存档） ───────── */
+/* ───────── 八家基底（与站内其它智能体共用同一套 Key 存档） ─────────
+   nv（NVIDIA 免费档）2026-09-10 加：build.nvidia.com 邮箱注册即得 nvapi- Key、不绑卡；该口不回 CORS 头，
+   所以与境外三家一样经 /api/llm-proxy 纯转发（白名单已加 integrate.api.nvidia.com）。快＝DeepSeek V4 Flash，强＝V4 Pro。
+   ks 与 ChatSDE 同名（sde_nv_key）：在任一处存过，另一处自动带出。 */
 var VENDORS = [
   { v:'ds',    name:'DeepSeek',     ks:['sde_ds_key'],                 apply:'https://platform.deepseek.com',        url:'https://api.deepseek.com/v1/chat/completions' },
   { v:'glm',   name:'智谱 GLM',     ks:['sde_glm_key'],                apply:'https://open.bigmodel.cn',             url:'https://open.bigmodel.cn/api/paas/v4/chat/completions' },
@@ -282,7 +286,8 @@ var VENDORS = [
   { v:'qwen',  name:'千问 Qwen',    ks:['sde_qwen_key'],               apply:'https://bailian.console.aliyun.com',   url:'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions' },
   { v:'gpt',   name:'GPT',          ks:['sde_gpt_key'],                apply:'https://platform.openai.com',          url:'https://api.openai.com/v1/chat/completions', overseas:true },
   { v:'claude',name:'Claude',       ks:['sde_claude_key','sde_cl_key'],apply:'https://platform.claude.com',          url:'https://api.anthropic.com/v1/messages', overseas:true },
-  { v:'gemini',name:'Gemini',       ks:['sde_gemini_key'],             apply:'https://aistudio.google.com/apikey',   url:'https://generativelanguage.googleapis.com/v1beta/models', overseas:true }
+  { v:'gemini',name:'Gemini',       ks:['sde_gemini_key'],             apply:'https://aistudio.google.com/apikey',   url:'https://generativelanguage.googleapis.com/v1beta/models', overseas:true },
+  { v:'nv',    name:'NVIDIA 免费',  ks:['sde_nv_key'],                 apply:'https://build.nvidia.com/settings/api-keys', url:'https://integrate.api.nvidia.com/v1/chat/completions', overseas:true, free:true }
 ];
 var PROXY='/api/llm-proxy';
 function vinfo(v){ for(var i=0;i<VENDORS.length;i++) if(VENDORS[i].v===v) return VENDORS[i]; return VENDORS[0]; }
@@ -298,6 +303,7 @@ function payload(v,tier,sys,user,maxTok){
   else if(v==='qwen'){ base.model=(tier==='pro')?'qwen3.7-max':'qwen-plus'; base.temperature=0.9; base.max_tokens=Math.min(cap,8192); }
   else if(v==='gpt'){ base.model=(tier==='pro')?'gpt-5.5':'gpt-5.4'; base.max_completion_tokens=Math.max(cap,4000); delete base.max_tokens; base.reasoning_effort=(tier==='pro')?'high':'low'; }
   else if(v==='claude'){ return {model:(tier==='pro')?'claude-opus-4-8':'claude-sonnet-4-6',max_tokens:cap,stream:false,system:sys,messages:[{role:'user',content:user}]}; }
+  else if(v==='nv'){ base.model=(tier==='pro')?'deepseek-ai/deepseek-v4-pro-0813':'deepseek-ai/deepseek-v4-flash-0731'; base.temperature=0.9; }
   else if(v==='gemini'){ return {systemInstruction:{parts:[{text:sys}]},contents:[{role:'user',parts:[{text:user}]}],generationConfig:{maxOutputTokens:cap,temperature:0.9}}; }
   return base;
 }
@@ -315,7 +321,7 @@ function call(v,tier,key,sys,user,maxTok,label){
   var vi=vinfo(v), headers={'Content-Type':'application/json'}, url=vi.url;
   if(vi.overseas){
     url=PROXY;
-    if(v==='gpt'){ headers['Authorization']='Bearer '+key; headers['x-target-url']=vi.url; }
+    if(v==='gpt'||v==='nv'){ headers['Authorization']='Bearer '+key; headers['x-target-url']=vi.url; }
     else if(v==='claude'){ headers['x-api-key']=key; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true'; headers['x-target-url']=vi.url; }
     else if(v==='gemini'){ var gm=(tier==='pro')?'gemini-3.1-pro-preview':'gemini-2.5-flash'; headers['x-target-url']=vi.url+'/'+gm+':generateContent?key='+encodeURIComponent(key); }
   } else headers['Authorization']='Bearer '+key;
@@ -597,7 +603,7 @@ $('btnExport').addEventListener('click',exportMd); $('btnExport2').addEventListe
 function fillSel(sel,def){ VENDORS.forEach(function(v){ var o=document.createElement('option'); o.value=v.v; o.textContent=v.name; sel.appendChild(o); }); sel.value=def; }
 function wireKey(selId,keyId,applyId){
   var sel=$(selId), key=$(keyId), ap=$(applyId);
-  var fill=function(){ var vi=vinfo(sel.value); key.value=keyGet(sel.value); ap.innerHTML=(key.value?'已从本机带出。':'还没有 Key：')+'<a href="'+vi.apply+'" target="_blank" rel="noopener">去 '+esc(vi.name)+' 申请</a>'+(vi.overseas?' · 境外家，经本站纯转发':''); };
+  var fill=function(){ var vi=vinfo(sel.value); key.value=keyGet(sel.value); ap.innerHTML=(key.value?'已从本机带出。':'还没有 Key：')+'<a href="'+vi.apply+'" target="_blank" rel="noopener">去 '+esc(vi.name)+' 申请</a>'+(vi.free?' · 经本站纯转发':(vi.overseas?' · 境外家，经本站纯转发':''))+(vi.free?'<div class="freehow">免费领 Key 三步：① 用邮箱在 build.nvidia.com 注册（不绑卡）；② 点上面的申请链接进 API Keys 页，点 Generate API Key，复制 nvapi- 开头那串（只显示一次）；③ 贴进上面这一栏。快档跑 DeepSeek V4 Flash，强档跑 V4 Pro；免费档每分钟约 40 次，一场比智几十次调用，偶尔排队属正常。官方口径只供个人试用与学习。</div>':''); };
   sel.addEventListener('change',fill); fill();
   key.addEventListener('input',function(){ var v=(key.value||'').trim(); if(v.length>=8) keySet(sel.value,v); });
 }
