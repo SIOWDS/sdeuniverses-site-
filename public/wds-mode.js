@@ -8791,8 +8791,11 @@
      ⚠️ **不复用 typeset()**：它按 MATH[data-m] 取源码，而 MATH 是上一次 mdRender 留下的
         全局数组——导出这一刻它装的是别的回答的公式，下标撞上就会渲染出**另一条式子**
         （比空着更坏：错得像对的）。这里一律以 DOM 里的 $…$ 原文为准。 */
-  function pdfMath(then) {
-    var raws = msgsEl ? msgsEl.querySelectorAll(".wdsm-tex.raw") : [];
+  function pdfMath(then, root) {
+    /* root 默认对话区；长档预览面板（.wdsm-dist-c）不在 msgsEl 里，
+       原来写死 msgsEl ⇒ 面板与它的 PDF 导出里公式一律停在 $…$ 原文。 */
+    var _r = root || msgsEl;
+    var raws = _r ? _r.querySelectorAll(".wdsm-tex.raw") : [];
     if (!raws || !raws.length) { then(); return; }
     var done = false, go = function () { if (done) return; done = true; then(); };
     setTimeout(go, 6000);                       // KaTeX 拉不动也要出稿，只是公式保持 $…$ 原样
@@ -9654,11 +9657,28 @@
       pdfB.onclick = function () {
         if (!text) return;
         stat.textContent = t("pdfWait");
+        try { katexBoot(function () {}); } catch (e0) {}   // 先把 KaTeX 拉起来，下面排公式要用
         pdfBoot(function (ok) {
           if (!ok) { stat.textContent = t("pdfNo"); return; }
           var ttl = firstTitleOf(text) || kindT(kind), body = "";
           /* 排版失败也得出得来一份：纯文本是底线形态，白屏不是。 */
           try { body = mdRender(text); } catch (e) { body = "<pre>" + esc(text) + "</pre>"; }
+          /* 公式：mdRender 只把 $…$ 摘成 .wdsm-tex.raw，没人排它就一路原样进 PDF。
+             这里在一个游离容器里排完再取 HTML——不碰面板 DOM，排不动就保持原样。 */
+          try {
+            var _mb = document.createElement("div"); _mb.innerHTML = body;
+            var _rs = _mb.querySelectorAll(".wdsm-tex.raw");
+            if (_rs.length && window.katex) {
+              for (var _i = 0; _i < _rs.length; _i++) {
+                var _e = _rs[_i], _s = String(_e.textContent || "").trim();
+                var _blk = String(_e.className).indexOf("blk") >= 0 || /^\$\$/.test(_s);
+                var _src = _s.replace(/^\$\$([\s\S]*)\$\$$/, "$1").replace(/^\$([\s\S]*)\$$/, "$1");
+                if (!_src) continue;
+                try { _e.innerHTML = window.katex.renderToString(_src, { displayMode: _blk, throwOnError: false }); _e.classList.remove("raw"); } catch (_x) {}
+              }
+              body = _mb.innerHTML;
+            }
+          } catch (_x2) {}
           window.WDSPdf.print({
             title: ttl,
             file: fileTag("WDS") + "-" + safeName(ttl) + "-" + stampName(),
@@ -9721,7 +9741,7 @@
       pTrace.leg = "收尾·排版"; traceSave();
       try {
         // 收尾**不再整篇重排**（那正是压垮主线程的最后一下）：只把还没定稿的尾巴排完。
-        if (text) paintD(true);
+        if (text) { paintD(true); try { typeset(out); } catch (e3) {} }
         else out.innerHTML = esc(t("dEmpty"));
       } catch (e) {
         out.textContent = text || "";

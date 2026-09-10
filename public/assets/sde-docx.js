@@ -100,8 +100,58 @@
     return out;
   }
 
+  /* 行内公式 → Unicode（2026-09-10）。
+     Word 里正确显示数学要 OMML，那是另一件工程；在它做出来之前，
+     裸着的 $D_{t}$ 会原样印进 .docx——读者看到的是源码，不是式子。
+     这里做一层保底：常见的下标/上标/希腊字母换成 Unicode 字符。
+     三条纪律（都是模拟抓出来的）：
+       ① 货币不许误吃：$ 后面紧跟数字或空白的，不是公式定界符（"价格 $100 到 $200"）；
+       ② 转不干净就整体回退原样——半转换的 "\text未知宏_q" 比 "$\text{未知宏}_{q}$" 更难读；
+       ③ 只处理行内 $…$；块级 $$…$$ 留给 OMML，那一格仍是明账。 */
+  var SUB = { "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉",
+              "+":"₊","-":"₋","=":"₌","(":"₍",")":"₎","a":"ₐ","e":"ₑ","i":"ᵢ","j":"ⱼ","o":"ₒ",
+              "r":"ᵣ","u":"ᵤ","v":"ᵥ","x":"ₓ","k":"ₖ","l":"ₗ","m":"ₘ","n":"ₙ","p":"ₚ","s":"ₛ","t":"ₜ","h":"ₕ" };
+  var SUP = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+              "+":"⁺","-":"⁻","=":"⁼","(":"⁽",")":"⁾","n":"ⁿ","i":"ⁱ" };
+  var GRK = { alpha:"α",beta:"β",gamma:"γ",delta:"δ",epsilon:"ε",zeta:"ζ",eta:"η",theta:"θ",
+              iota:"ι",kappa:"κ",lambda:"λ",mu:"μ",nu:"ν",xi:"ξ",pi:"π",rho:"ρ",sigma:"σ",
+              tau:"τ",phi:"φ",chi:"χ",psi:"ψ",omega:"ω",
+              Gamma:"Γ",Delta:"Δ",Theta:"Θ",Lambda:"Λ",Xi:"Ξ",Pi:"Π",Sigma:"Σ",Phi:"Φ",Psi:"Ψ",Omega:"Ω",
+              times:"×",cdot:"·",leq:"≤",geq:"≥",neq:"≠",approx:"≈",to:"→",in:"∈",infty:"∞",
+              sum:"∑",prod:"∏",forall:"∀",exists:"∃",partial:"∂",pm:"±",ldots:"…",cdots:"⋯" };
+  function mapRun(s, tbl) {
+    var o = "", i;
+    for (i = 0; i < s.length; i++) { if (!tbl[s[i]]) return null; o += tbl[s[i]]; }
+    return o;
+  }
+  function texToUni(src) {
+    var s = String(src);
+    s = s.replace(/\\([A-Za-z]+)/g, function (m, w2) { return GRK[w2] !== undefined ? GRK[w2] : m; });
+    s = s.replace(/_\{([^{}]*)\}|_([A-Za-z0-9])/g, function (m, a, b) {
+      var r = mapRun(a !== undefined ? a : b, SUB); return r === null ? m : r;
+    });
+    s = s.replace(/\^\{([^{}]*)\}|\^([A-Za-z0-9])/g, function (m, a, b) {
+      var r = mapRun(a !== undefined ? a : b, SUP); return r === null ? m : r;
+    });
+    return s;
+  }
+  function deTex(line) {
+    var s = String(line), blk = [];
+    /* ③ 块级 $$…$$ 先摘走：不摘的话行内那条正则会从第二个 $ 起手，
+       把 "$$x=1$$" 吃成 "$x=1$"——少一层 $，块级就废了（模拟抓到的）。 */
+    s = s.replace(/\$\$[\s\S]*?\$\$/g, function (m) { blk.push(m); return "\u0000B" + (blk.length - 1) + "\u0000"; });
+    s = s.replace(/\$([^$\n]{1,200})\$/g, function (m, src) {
+      if (/^[\s0-9]/.test(src)) return m;              // ① 货币：$100 / $ 开头留白，不是公式
+      var out = texToUni(src);
+      if (/[\\{}]/.test(out)) return m;                // ② 转不干净：整体回退原样
+      return out;
+    });
+    return s.replace(/\u0000B(\d+)\u0000/g, function (m, i) { return blk[+i]; });
+  }
+
   // 一行里的 **粗体** 切成若干 run；其余原样
   function runs(text, base) {
+    text = deTex(text);
     var xs = [], parts = String(text).split(/\*\*/), i;
     for (i = 0; i < parts.length; i++) {
       if (!parts[i]) continue;
