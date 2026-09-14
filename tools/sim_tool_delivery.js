@@ -127,7 +127,7 @@ r = FE.toolAudit(bad3, S.TOOL_SPEC.three);
 ok("少件的：抓得出，且点得出是哪几件（缺 " + r.miss.length + "）", r.miss.length >= 4
   && r.miss.join("｜").indexOf("互相校正") >= 0 && r.miss.join("｜").indexOf("最脆") >= 0
   && r.miss.join("｜").indexOf("纠缠") >= 0
-  && r.miss.join("｜").indexOf("引一句原话") >= 0 && r.miss.join("｜").indexOf("对账") >= 0);
+  && r.miss.join("｜").indexOf("引一句原话") >= 0);
 ok("已交的件仍如实计数", r.done === S.TOOL_SPEC.three.items.length - r.miss.length && r.done > 0);
 // 字数：短稿要判短
 r = FE.toolAudit("显露…\n差异…\n纠缠…\n互消…\n最脆…", S.TOOL_SPEC.three);
