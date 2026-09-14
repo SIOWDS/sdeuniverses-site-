@@ -1040,6 +1040,12 @@
       followsHint: "刚冒出新说法就点 What，说清楚了点 How，能落地了点 Why；写虚了往 How 拉，写碎了往 Why 拉。",
       progH: "本篇进度", progOf: "格", progTodo: "还欠", progOK: "十格已齐，可以成文", progNo: "未走完，先别成文",
       progNext: "走下一格", progNextT: "按〔进度〕行报的未完成格算出来的；三条追问是备料，这一颗是主道",
+      /* 工序序列条（2026-09-14）：走工序时这一条取代了三条通用追问。 */
+      seqH: "这一道的下一步", seqPt: "下一格", seqNext: "下一格",
+      seqNextT: "由上一答的〔落位〕行算出来的，不是从几个方向里挑的——点它就接着走这一格",
+      seqHint: "这一道一轮只走一格：换一条方程／一条路径／一条原理，不是把同一件事问得更细。",
+      seqPtFix: "接力断了", seqMiss: "这一答没交〔落位〕行，下一格算不出来——不补上，后面每一轮都只能从头猜。",
+      seqMissT: "让它只补那一行，不重写正文",
       razBadge: "已作为本书底册扣留（{n} 字符）· 此后每轮随系统提示重送，第 5、10 格送全文",
       razH: "底册审查 · 这一答违反了本书自己定的规矩", razT: "以下各条全部取自底册里已写下的条款，由正则比对得出，不经过基底。看到它就回去改，别往下走。",
       progCells: ["本篇不管什么", "五家逐家交手", "承重命题与靶位 Z", "土壤条件", "量具取值与编码", "检验设计与材料来源", "证伪条款与阈值", "辨别格", "反噬与误诊阻挡", "两个洞与引证自查"],
@@ -1353,6 +1359,11 @@
       followsHint: "New term just appeared? Take What. Clear already? Take How. Workable already? Take Why.",
       progH: "PROGRESS", progOf: "cells", progTodo: "still missing", progOK: "All ten cells done \u2014 ready to write up", progNo: "Not finished \u2014 don't write it up yet",
       progNext: "Next cell", progNextT: "Computed from the cells the progress line reports as unfinished",
+      seqH: "NEXT STEP IN THIS TRACK", seqPt: "Next", seqNext: "Next",
+      seqNextT: "Computed from the position line of the last answer, not picked from a few directions",
+      seqHint: "One cell per turn: switch equation / route / principle, not ask the same thing in finer detail.",
+      seqPtFix: "Relay broken", seqMiss: "No position line in this answer — the next cell cannot be computed.",
+      seqMissT: "Ask it to supply just that line, without rewriting the answer",
       razBadge: "Held as this book's RAZ ({n} chars) \u2014 re-sent with the system prompt every turn; full text on cells 5 and 10",
       razH: "RAZ CHECK \u2014 this answer breaks the book's own rules", razT: "Every check below comes from a clause already written in the RAZ, matched by regex, with no model call.",
       progCells: ["What this piece does not cover", "Facing all five occupants", "Load-bearing claim and the blank target", "Ground conditions", "Instrument values and coding", "Test design and materials", "Falsifiers and thresholds", "Discrimination grid", "Backfire and misdiagnosis blocks", "The two holes and citation self-check"],
@@ -4508,36 +4519,55 @@
     return w;
   }
 
+  /* ═══ 工序序列条（2026-09-14 王德生令：「工序应该有自己独特的序列，这个『接着问』要去掉」）═══
+     走工序时不再挂三条通用追问——那三条与服务端算出来的那一格脱钩，点哪一颗都走同一格，
+     按钮文字反而误导。这里挂的是**算出来的下一步**：
+       · 三道问对 → 服务端 posSeq 回的 seq 帧（列／下一格／点下去发的那一问）；
+       · 九问专著 → 前端从〔进度〕行算（原来长在 renderFollows 里的主道钮，这次摘出来独立）。
+     🔴 算不出来时**不许静默**：接力断了而答案照样通顺，是这条产线上最难被发现的一种坏。
+     缺〔落位〕就把话说破，并给一颗当场补交的钮。
+     🔴 认不出、或这一道本来就没有序列 ⇒ 什么都不画（日常问答照旧走三条自然追问）。 */
+  function renderSeq(cell, ansText, sq) {
+    if (!cell || cell.seqbox) return;
+    var txt = ansText || (cell.a && cell.a.textContent) || "";
+    var head = "", line = "", btn = null;
+    if (cell.tool === "book9") {
+      var pg = progParse(txt), CELLS = t("progCells") || [];
+      if (!pg || pg.ok || pg.next == null || !CELLS[pg.next]) return;
+      head = t("seqH") + " · " + t("tlBook9");
+      btn = { lab: "①②③④⑤⑥⑦⑧⑨⑩".charAt(pg.next) + " " + CELLS[pg.next],
+              q: "走第 " + (pg.next + 1) + "/" + pg.tot + " 格：" + CELLS[pg.next]
+                 + "。只走这一格，不要提前铺开后面几格；答完照旧交〔本篇边界〕〔进度〕〔用料〕〔落位〕四行。" };
+    } else if (sq && sq.send) {
+      head = t("seqH") + " · " + (sq.col || "");
+      if (sq.miss) { line = t("seqMiss"); btn = { lab: t("seqFix"), q: sq.send, warn: 1 }; }
+      else { btn = { lab: t("seqNext") + "：" + (sq.label || ""), q: sq.send }; }
+    } else return;
+    var box = el("div", "wdsm-follows");
+    box.appendChild(el("div", "wdsm-follows-h", head));
+    if (line) box.appendChild(el("div", "wdsm-follows-t", line));
+    var b = el("button", "wdsm-follow rec");
+    if (btn.warn) b.className = "wdsm-follow";
+    b.appendChild(el("i", "pt", btn.warn ? t("seqPtFix") : t("seqPt")));
+    b.appendChild(document.createTextNode(btn.lab));
+    b.title = btn.warn ? t("seqMissT") : t("seqNextT");
+    b.onclick = function () { if (!streaming) send(btn.q); };
+    box.appendChild(b);
+    if (!btn.warn) box.appendChild(el("div", "wdsm-follows-t", t("seqHint")));
+    cell.turn.appendChild(box); cell.seqbox = box;
+  }
+
   function renderFollows(cell, qs, ansText) {
     if (!qs || !qs.length || cell.follows) return;
     var box = el("div", "wdsm-follows");
     box.appendChild(el("div", "wdsm-follows-h", t("followsH")));
     var rec = pickFollow(ansText || (cell.a && cell.a.textContent) || "");
     var GET = t("followGet") || [];
-    /* 格的进度与追问挂钩（2026-09-09 王德生令）：九问专著里"下一步该干什么"不是由答案的语气
-       推出来的，是〔进度〕行**已经报出来的**——未完成的第一格就是主道。有它在，三条维度追问
-       降为备料，全部压暗。🔴 认不出进度行、或十格已齐，就什么都不加，退回原来的三条。 */
-    var pg = progParse(ansText || (cell.a && cell.a.textContent) || "");
-    var CELLS = t("progCells") || [];
-    /* 🔴 主道只属于九问专著这道工序（2026-09-09 王德生令：「这个是给工序专门，如果没有工序，
-       仍然要保持自然追问方法」）。判据取本轮实跑的 cell.tool，不取 curTool——读者答完随手换了工序，
-       curTool 已经不是这一轮的了。别的工序、以及不选工序的日常问答，一律走原来那三条自然追问。 */
-    var nextChip = (cell.tool === "book9" && pg && !pg.ok && pg.next != null && CELLS[pg.next]) ? {
-      i: pg.next, tot: pg.tot, name: CELLS[pg.next],
-    } : null;
+    /* 主道钮（九问专著的〔进度〕格）2026-09-09 曾长在这里，压暗三条当备料；
+       2026-09-14 王德生令「工序应该有自己独特的序列，这个『接着问』要去掉」之后，
+       它连同三道问对的下一格一起搬进 renderSeq，走工序时服务端根本不再配这三条。
+       这里只剩没有工序的日常问答那一路——三条全亮，谁也不压暗。 */
     if (qs.length >= 2) box.appendChild(el("div", "wdsm-follows-t", t("followsHint")));
-    if (nextChip) {
-      var nb = el("button", "wdsm-follow rec");
-      nb.appendChild(el("i", "pt", t("progNext")));
-      nb.appendChild(document.createTextNode("①②③④⑤⑥⑦⑧⑨⑩".charAt(nextChip.i) + " " + nextChip.name));
-      nb.title = t("progNextT");
-      nb.onclick = function () {
-        if (streaming) return;
-        send("走第 " + (nextChip.i + 1) + "/" + nextChip.tot + " 格：" + nextChip.name
-           + "。只走这一格，不要提前铺开后面几格；答完照旧交〔本篇边界〕〔进度〕〔用料〕〔落位〕四行。");
-      };
-      box.appendChild(nb);
-    }
     var qList = [];                       // 三条问句本身（给「一起问」用；路径名不进去）
     qs.slice(0, 3).forEach(function (item) {
       var q = (item && typeof item === "object") ? String(item.q || "") : String(item || "");
@@ -4552,8 +4582,7 @@
       // 三条齐了才谈推荐：只回来一两条时，压暗任何一颗都只是添乱
       var idx = qList.length;
       if (GET[idx]) b.title = GET[idx];
-      if (nextChip) b.className = "wdsm-follow dim";        // 主道已在，三条降为备料
-      else if (qs.length >= 3) {
+      if (qs.length >= 3) {
         if (idx === rec) { b.className = "wdsm-follow rec"; b.title = (GET[idx] || "") + "\n" + t("followRecT"); }
         else b.className = "wdsm-follow dim";
       }
@@ -5348,6 +5377,7 @@
     var pendSite = null, pendWeb = null;                 // 来源先收着，等正文写完再渲染
     var cashId = "";                                     // 这一答在出处账本里的那一笔（服务端随流下发）
     var toolSpec = null;                                 // 这一轮的交付规格（服务端下发，前端不留副本）
+    var seqV = null;                                     // 这一轮工序算出来的下一格（seq 帧；没有工序时始终为空）
     function flushSrcs() {
       if (pendSite) { renderSources(cell, pendSite, "site", cashId); pendSite = null; }
       if (pendWeb) { renderSources(cell, pendWeb, "web"); pendWeb = null; }
@@ -5436,7 +5466,7 @@
             // 三角互消这一道另加两把程序尺子（环三·评估）：交付件数不出「三段是不是真独立」。
             if (toolSpec && toolSpec.k === "three" && !stoppedByUser) { try { triEchoRender(cell, answer); } catch (e) {} }
             flushSrcs();                                  // 先正文，后文献
-            history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer);
+            history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer); renderSeq(cell, answer, seqV);
             if (_led) ledgerRender(cell, _led, answer);      // 记分牌挂在正文之外，不进导出稿
             if (_preg && !_preg.empty) pregRender(cell, _preg);   // 预注册卡→判断账（正文之外）
             cvTake(answer);                                 // 先看是不是「就地改」的回稿（收成下一版），否则扫围栏块
@@ -5514,6 +5544,7 @@
               else if (j.t === "far") { renderFar(cell, j.v || {}); }
               else if (j.t === "toolspec") { toolSpec = j.v; }
               else if (j.t === "follow") { renderFollows(cell, j.v, answer); }
+              else if (j.t === "seq") { seqV = j.v; }        // 序列帧在正文之后、done 之前到，存下来等收尾渲染
               else if (j.t === "token") { answer += j.v; paint(); }
               else if (j.t === "error") { errShown = true; cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = j.v; if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
             }
@@ -5525,7 +5556,7 @@
       .catch(function (e) {
         clearTimeout(wd);
         if (!stoppedByUser) { cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = t("errNet") + (e && e.message) + t("errNetEnd"); }
-        else if (answer) { cell.a.innerHTML = mdRender(answer); history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer); }
+        else if (answer) { cell.a.innerHTML = mdRender(answer); history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer); renderSeq(cell, answer, seqV); }
         endUI();
       });
   }

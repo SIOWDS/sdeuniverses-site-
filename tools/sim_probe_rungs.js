@@ -18,7 +18,7 @@ let PASS = 0, FAIL = 0;
 const ok = (c, m, x) => { if (c) { PASS++; console.log("  ✓ " + m); } else { FAIL++; console.log("  ✗ " + m + (x ? "  ← " + x : "")); } };
 
 function grab(a, b) { const i = W.indexOf(a), j = W.indexOf(b, i); if (i < 0 || j < 0) throw new Error("找不到 " + a); return W.slice(i, j); }
-const SB = new Function(grab("const POS_RE =", "/* 兜底三问") + "\nreturn { posParse, posNext, posFromHistory, PROBE_TOOLS };")();
+const SB = new Function(grab("const POS_RE =", "/* 兜底三问") + "\nreturn { posParse, posNext, posFromHistory, PROBE_TOOLS, posSeq, TOOL_SEQ };")();
 
 console.log("① 落位行解析（三列各一）");
 {
@@ -90,7 +90,7 @@ console.log("⑥ 三道工序的接线（服务端）");
   ok(/const PROBE_TOOLS = \{ whatq: "What", howq: "How", whyq: "Why" \};/.test(W), "三道与三列的对应表只有一份");
   ok(/function _rungOf\(tool, history\)/.test(W) && /wdsToolSys\(tool, prof, rung\)/.test(W),
     "接力格算好后挂进工序 system");
-  ok(/sentryCtx, _rungOf\(tool, history\)\);/.test(W), "调用点真把它算出来传进去（不是留了个空参数）");
+  ok(/sentryCtx, _rungOf\(tool, history\)[,)]/.test(W), "调用点真把它算出来传进去（不是留了个空参数）");
   ok(/const _rung = \(rung && PROBE_TOOLS\[tool\]\)/.test(W), "只有三道问对吃这一格，别的工序不受影响");
   // 必交件：〔落位〕行必须进机检面，否则漏了没人发现
   ["whatq", "howq", "whyq"].forEach((k) => {
@@ -111,6 +111,47 @@ console.log("⑧ ⭐ 追问仍是 What/How/Why 三条 —— 2026-09-08 王德�
   ok(/三条必须各用一件不同的工具，恰好是一个 What、一个 How、一个 Why/.test(W), "追问的规矩没被问对改掉");
   ok(!/两深一广/.test(W.replace(/\/\*[\s\S]*?\*\//g, "")), "「两深一广」只许留在注释里的撤回记录，不许留在活代码里");
   ok(/function followSys\(prof\) \{/.test(W), "followSys 没有多出 probe 参数");
+}
+
+console.log("⑨ ⭐ 工序自己的序列 —— 2026-09-14 王德生令「工序应该有自己独特的序列，这个『接着问』要去掉」");
+{
+  // ── 真跑 posSeq：下一格是算出来的，连点下去发的那一问一起算 ──
+  const a = SB.posSeq("whatq", "正文\n〔落位〕列：What ｜ 位：S=F(D,E) ｜ 给定：E、D ｜ 已解释：S");
+  ok(a && !a.miss && /E=H\(S,D\)/.test(a.label) && /E/.test(a.send), "What：给定 E ⇒ 下一格 E=H(S,D)", JSON.stringify(a));
+  const b = SB.posSeq("howq", "〔落位〕列：How ｜ 位：D→S→E ｜ 起手：D ｜ 落点：E");
+  ok(b && !b.miss && /从 E 起手/.test(b.label), "How：落点 E ⇒ 下一条从 E 起手", JSON.stringify(b));
+  const c = SB.posSeq("whyq", "〔落位〕列：Why ｜ 位：原理一 D×E→S ｜ 结果项：S");
+  ok(c && !c.miss && /原理二|原理三/.test(c.label), "Why：结果项 S ⇒ 传到下一条原理", JSON.stringify(c));
+  // ── 🔴 断链必须显形：这是这一道存在的主要理由（答案照样通顺，从前一点看不出来）──
+  const m1 = SB.posSeq("whatq", "一段完全没有交落位行的正文。");
+  ok(m1 && m1.miss === 1 && /〔落位〕/.test(m1.send) && /不要重写正文/.test(m1.send), "没交〔落位〕⇒ miss 1 并给补交的那一句", JSON.stringify(m1));
+  const m2 = SB.posSeq("whatq", "〔落位〕列：What ｜ 位：S=F(D,E) ｜ 给定：其他因素 ｜ 已解释：S");
+  ok(m2 && m2.miss === 2, "给定写成「其他因素」（抠不出 S/D/E）⇒ miss 2，不许硬给一格", JSON.stringify(m2));
+  // ── 只有三道问对吃这条：别的工序拿不到序列帧 ──
+  ok(SB.posSeq("nine", "〔落位〕列：What ｜ 给定：E") === null && SB.posSeq("book9", "x") === null,
+     "非问对工序不出 seq 帧（九问专著的下一格在前端从〔进度〕行算）");
+
+  // ── 名单：一轮交付完的工序不许进 TOOL_SEQ，否则「接着问」变成拖延 ──
+  ok(SB.TOOL_SEQ.whatq && SB.TOOL_SEQ.howq && SB.TOOL_SEQ.whyq && SB.TOOL_SEQ.book9, "四道自带序列的工序都在表里");
+  ok(!SB.TOOL_SEQ.what && !SB.TOOL_SEQ.how && !SB.TOOL_SEQ.why && !SB.TOOL_SEQ.nine && !SB.TOOL_SEQ.forge,
+     "轻松版三道与九宫格/通融单轮版不在表里（它们一轮交付完就结束）");
+
+  // ── 闸：走工序时不再配三条通用追问；没有工序照旧配 ──
+  ok(/outText\.length > 150 && !rs && !TOOL_SEQ\[tool\]/.test(W), "自带序列的工序不再调 followUps（三条与那一格脱钩，点哪颗都走同一格）");
+  ok(/outText\.length > 150 && !rs && PROBE_TOOLS\[tool\]/.test(W) && /t: "seq"/.test(W), "三道问对改发 seq 帧");
+  ok(W.indexOf('!TOOL_SEQ[tool]') > W.indexOf('t: "seq"'), "seq 帧排在追问那一闸之前（两者互斥，先出算好的那一颗）");
+
+  // ── 前端接线 ──
+  ok(/function renderSeq\(cell, ansText, sq\)/.test(M), "前端有独立的序列条 renderSeq");
+  ok(/j\.t === "seq"/.test(M) && /seqV = j\.v/.test(M), "seq 帧收得到");
+  ok((M.match(/renderSeq\(cell, answer, seqV\);/g) || []).length === 2, "两条收尾路（正常结束与中断保底）都挂序列条");
+  ok(/cell\.tool === "book9"/.test(M.slice(M.indexOf("function renderSeq"), M.indexOf("function renderFollows"))),
+     "九问专著的主道钮已搬进 renderSeq");
+  ok(!/nextChip/.test(M), "追问框里不再留主道钮与压暗逻辑（已搬走）");
+  ok(/seqH: "这一道的下一步"/.test(M) && /seqH: "NEXT STEP IN THIS TRACK"/.test(M), "中英文案都有");
+  ok(/seqMiss: "这一答没交〔落位〕行/.test(M), "断链那句话在前端也说破了，不只在帧里");
+  // 🔴 词条在不等于它会被画出来：miss 分支必须活着（变异检验专设——上一版只验词条，改坏分支照样全绿）
+  ok(/if \(sq\.miss\) \{ line = t\("seqMiss"\);/.test(M), "miss 分支真的会画出来（不是只有词条躺在表里）");
 }
 
 console.log("\n===== " + PASS + " PASS / " + FAIL + " FAIL =====");

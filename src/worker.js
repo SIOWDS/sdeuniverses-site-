@@ -6716,6 +6716,13 @@ function parseFollows(out, prof) {
    下一格由这里算。🔴 只认自报，不做前端推算：读者中途自己打字提问时，按点击历史推算立刻错位。 */
 const POS_RE = /〔落位〕([^\n]*)/;
 const PROBE_TOOLS = { whatq: "What", howq: "How", whyq: "Why" };
+/* 自带序列的工序（2026-09-14）：这几道的「下一步」是**算出来的**，不是从三条通用追问里挑的，
+   所以走它们时不再配那三条（见 posSeq 上方那段）。三道问对的下一格由服务端 posSeq 算并回帧；
+   九问专著的下一格由前端从〔进度〕行算（progParse，2026-09-09 就有了，这次只是把它从
+   renderFollows 里摘出来独立挂）。
+   🔴 一轮交付完就结束的那些工序（轻松版 what/how/why、九宫格、学科通融单轮简版…）**不许进这张表**：
+   给它们安一个「下一步」，就是把接着问从递进变成拖延。没有工序的日常问答同样照旧走三条自然追问。 */
+const TOOL_SEQ = { whatq: 1, howq: 1, whyq: 1, book9: 1 };
 function posParse(text) {
   const m = String(text || "").match(POS_RE);
   if (!m) return null;
@@ -6758,6 +6765,37 @@ function posNext(p) {
   }
   return "";
 }
+/* ═══ 工序自己的序列钮（2026-09-14 王德生令：「工序应该有自己独特的序列，这个『接着问』要去掉」）═══
+   从前跑工序时屏幕上挂的是三条通用追问（followSys 出的 What/How/Why 各一条）。那三条与
+   posNext 算出来的那一格**完全脱钩**：服务端已经定死这一轮该站 D=G(S,E)，钮上写的却是
+   另外三个方向，点哪一颗都走同一格——按钮文字只起误导作用。所以走工序时不再配那三条，
+   改把算好的下一格回给前端挂成一颗钮（见 TOOL_SEQ）。
+   🔴 这一道最要紧的是 miss 那两档：这一答没交〔落位〕，接力从此断掉，而答案照样通顺，
+   从前只有服务端悄悄退回「这一轮不指定」，屏幕上一点看不出来（whatq 注释里自己标过这一处）。
+   现在它必须显形，并给一颗当场补交的钮。 */
+const _SEQ_ASK = {
+  What: (g) => "接着走：把 " + g + " 提为待解释项——" + g + " 本身又是被哪些差异、在哪片纠缠里写成现在这样的？",
+  How:  (g) => "接着走：从 " + g + " 起手的下一条路径（" + g + "→…→…）——这一段怎么下手、怎么过、怎么成？",
+  Why:  (g) => "接着走：" + g + " 被改成这样之后，又逼得哪一维非改不可？",
+};
+function posSeq(tool, text) {
+  if (!PROBE_TOOLS[tool]) return null;
+  const col = PROBE_TOOLS[tool];
+  const p = posParse(text);
+  if (!p) return { miss: 1, col: col, send: "上一答没有交〔落位〕行，接力算不出下一格。请只把那一行补出来（列／位／"
+    + (col === "What" ? "给定／已解释" : (col === "How" ? "起手／落点" : "结果项")) + "），不要重写正文。" };
+  const key = p.col === "What" ? (p.given.match(/[SDE]/g) || [])[0]
+            : p.col === "How"  ? (p.to.match(/[SDE]/g) || [])[0]
+            :                    (p.res.match(/[SDE]/g) || [])[0];
+  if (!key) return { miss: 2, col: p.col, send: "上一答的〔落位〕行里"
+    + (p.col === "What" ? "「给定」" : (p.col === "How" ? "「落点」" : "「结果项」"))
+    + "没有写出是 S、D、E 里的哪一个，接力算不出下一格。请只把这一行重写一遍。" };
+  const label = p.col === "What" ? (_EQ_OF[key] || "")
+              : p.col === "How"  ? ("从 " + key + " 起手")
+              :                    (_PR_OF[key] || "");
+  return { col: p.col, label: label, from: (p.pos || ""), send: _SEQ_ASK[p.col](key) };
+}
+
 /* 从整场 history 里取**最近一条**带落位的答复（读者中途插几句闲话不影响接力）。 */
 function posFromHistory(history, col) {
   const h = Array.isArray(history) ? history : [];
@@ -14001,7 +14039,13 @@ export default {
             if (rs) controller.enqueue(_sseBytes({ t: "fin", v: { fin: _cd.finish || "", cut: _cd.cut || _cd.partCut || "", err: !!_cd.err, out: outText.length } }));
             // 追问建议：正文已经吐完（读者已在读了），再花一次便宜档补三个「接着可以问什么」。
             // 走 WDS_VENDORS 的快档而非满血档——这一步要快，慢了读者早就自己打字了；失败一律吞掉。
-            if (outText.length > 150 && !rs) {
+            /* 走自带序列的工序时，把算好的那一格回给前端挂成钮（三道问对；九问专著在前端自己算）。
+               放在追问那一闸之前：两者互斥，这一颗出来了就不该再挂三条脱钩的按钮。 */
+            if (outText.length > 150 && !rs && PROBE_TOOLS[tool]) {
+              const _sq = posSeq(tool, outText);
+              if (_sq) controller.enqueue(_sseBytes({ t: "seq", v: _sq }));
+            }
+            if (outText.length > 150 && !rs && !TOOL_SEQ[tool]) {
               const fVC = { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, umodel, 0) };
               const fs = await followUps(fVC, KEY, q, outText, lang, prof,
                 { url: VC.url, model: VC.model },                    // 备胎＝刚写完正文那台（当场验证过活着）
