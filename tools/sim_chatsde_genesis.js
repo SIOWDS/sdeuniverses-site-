@@ -117,8 +117,12 @@ ok(!/【本轮工序/.test(F), "前端仍不含任何工序正文（正文只在
 console.log("【十二】护栏的护栏：sim_wds_sde_tools 的 KEYS 已带上第 15 道");
 try {
   const g = fs.readFileSync(path.join(ROOT, "tools/sim_wds_sde_tools.js"), "utf8");
-  const gk = g.match(/const KEYS = \[([^\]]+)\]/);
-  ok(!!gk && gk[1].indexOf('"genesis"') >= 0, "sim_wds_sde_tools 的 KEYS 含 genesis（否则它按 14 道数「本轮工序」当场红）");
+  /* ⚠ 2026-09-14 按用意重写：那份 sim 的 KEYS 原来写死成一串字面量，现在改成从 WDS_TOOL_KEYS 现取
+     （它自己文件里就写着「别写死数量，跟着白名单走」）。要守的用意没变——genesis 必须在它数的那一串里，
+     否则它按少了一道去数「本轮工序」当场红。所以现在查的是：它跟着白名单走，而白名单里有 genesis。 */
+  ok(/const KEYS = mKeys \?/.test(g) && /WDS_TOOL_KEYS/.test(g),
+     "sim_wds_sde_tools 的 KEYS 跟着白名单走（不再写死）");
+  ok(/"genesis"/.test(W), "白名单 WDS_TOOL_KEYS 里有 genesis（否则上面那份按少一道数「本轮工序」当场红）");
 } catch (e) { ok(false, "sim_wds_sde_tools 读得到", e.message); }
 
 console.log("【十三】平台名录对账（模型自己得知道手上有这道）");

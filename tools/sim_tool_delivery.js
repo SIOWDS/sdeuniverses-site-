@@ -103,25 +103,38 @@ try { FE = new Function(FSRC)(); } catch (e) { console.log("  FAIL 前端审计�
 console.log("⑤ 前端审计真跑：做全的放行，少件的逐件点名");
 // 一份「三视角」做全了的稿子（照规格的五件写）
 const good3 = [
-  "显露这一刀：它当下呈现成一个可辨认的单位……",
-  "差异这一刀：它从一处落差里长出来，第三步不可逆……",
-  "纠缠这一刀：抽掉考核这一根它就散……",
+  /* 六环试点（2026-09-14）：环一押注卡写在三段之前，环六对账行收尾。 */
+  "押注一：会被判错的是显露与纠缠两段。押注二：形状大概是「它不是甲，而是乙」。押注三：最脆的一环大概押在判据可数上。",
+  "① 只从显露看：它当下呈现成一个可辨认的单位……",
+  "② 只从差异看：它从一处落差里长出来，第三步不可逆……",
+  "③ 只从纠缠看：抽掉考核这一根它就散……",
   "互相校正：显露那一刀看漏了时间，差异那一刀看错了主语。",
+  /* 加厚 v2（2026-09-14）新增的第 6 件：从三段各引一句原话。 */
+  "逐字引：显露那一段写的是「呈现成一个可辨认的单位」；差异那一段写的是「第三步不可逆」；纠缠那一段写的是「抽掉考核这一根它就散」。",
   "最脆的一环：判据落不到具体读数上。",
+  "对账：押注一〔押中〕· 押注二〔押偏〕· 押注三〔押中〕",
 ].join("\n") + "正文".repeat(500);
 let r = FE.toolAudit(good3, S.TOOL_SPEC.three);
-ok("做全的：零缺件", r.miss.length === 0 && r.done === 5);
+/* 件数从规格现取，不写死——加厚 v2 之前这里钉着 5，一加件就红，而红的是断言不是被测的东西。 */
+ok("做全的：零缺件", r.miss.length === 0 && r.done === S.TOOL_SPEC.three.items.length);
 // 少两件：删掉互消与最脆
 const bad3 = good3.split("\n").slice(0, 3).join("\n") + "正文".repeat(500);
 r = FE.toolAudit(bad3, S.TOOL_SPEC.three);
-ok("少件的：抓得出，且点得出是哪两件", r.miss.length === 2
-  && r.miss.join("｜").indexOf("互相校正") >= 0 && r.miss.join("｜").indexOf("最脆") >= 0);
-ok("已交的件仍如实计数", r.done === 3);
+/* 砍掉后半 ⇒ 少「互相校正」「逐字引」「最脆」三件；反向件（三段不许回指）在这份稿子上本就该判过。 */
+/* 砍掉后半 ⇒ 少「互相校正」「逐字引」「最脆」「对账」四件（押注卡在前半，仍在）。 */
+/* 砍掉后半 ⇒ 少「纠缠段」「互相校正」「逐字引」「最脆」「对账」五件；押注卡在前半，仍在。
+   ⚠ 这里不写死件数了：写死一次，加一件就红一次，而红的是断言不是被测的东西（本轮已付过两次）。 */
+ok("少件的：抓得出，且点得出是哪几件（缺 " + r.miss.length + "）", r.miss.length >= 4
+  && r.miss.join("｜").indexOf("互相校正") >= 0 && r.miss.join("｜").indexOf("最脆") >= 0
+  && r.miss.join("｜").indexOf("纠缠") >= 0
+  && r.miss.join("｜").indexOf("引一句原话") >= 0 && r.miss.join("｜").indexOf("对账") >= 0);
+ok("已交的件仍如实计数", r.done === S.TOOL_SPEC.three.items.length - r.miss.length && r.done > 0);
 // 字数：短稿要判短
 r = FE.toolAudit("显露…\n差异…\n纠缠…\n互消…\n最脆…", S.TOOL_SPEC.three);
 ok("被截短的稿子字数读数拿得到", r.len < S.TOOL_SPEC.three.min * 0.7 && r.min === S.TOOL_SPEC.three.min);
 // 结构图那道：认围栏与关系动词
-const goodMap = "```mermaid\nflowchart TD\nA -->|约束| B\nB -->|反过来锁死| A\n```\n这张图最承重的是那条锁死边；不确定的是 A→B；抽掉 B 整张图就散。";
+/* 加厚 v2：边数下限提到 4、并新增「最可能错在哪」一件 ⇒ 这份样稿照新工序正文补齐。 */
+const goodMap = "```mermaid\nflowchart TD\nA -->|约束| B\nB -->|反过来锁死| A\nB -->|触发| C\nC -->|消耗| A\n```\n这张图最承重的是那条锁死边；不确定的是 A→B；抽掉 B 整张图就散。这张图最可能错在 C 那一条边上。";
 r = FE.toolAudit(goodMap, S.TOOL_SPEC.map);
 ok("结构图：围栏＋关系动词＋图下三句，零缺件", r.miss.length === 0);
 r = FE.toolAudit("我给你描述一下这张结构图：A 约束 B，B 又锁死 A。", S.TOOL_SPEC.map);

@@ -5433,6 +5433,8 @@
                它属于正文的读数，不属于文献区；也必须在 mountActs 之前，
                否则它会被挂到操作按钮下面，读者以为是页脚。 */
             if (toolSpec && !stoppedByUser) toolAuditRender(cell, answer, toolSpec);
+            // 三角互消这一道另加两把程序尺子（环三·评估）：交付件数不出「三段是不是真独立」。
+            if (toolSpec && toolSpec.k === "three" && !stoppedByUser) { try { triEchoRender(cell, answer); } catch (e) {} }
             flushSrcs();                                  // 先正文，后文献
             history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer);
             if (_led) ledgerRender(cell, _led, answer);      // 记分牌挂在正文之外，不进导出稿
@@ -10916,10 +10918,80 @@
         var m = body.match(new RegExp(it.re, "g"));
         hit = m ? m.length : 0;
       } catch (e) { continue; }        // 正则在这台浏览器上跑不起来：跳过这一件，不冒充查过
-      if (hit >= (it.n || 1)) done++; else miss.push(it.k);
+      /* 反向件（neg）：这一件说的是「不许出现」，所以判法要倒过来——
+         命中够了 n 次才叫违规。第一版没有这个分支，五件禁项会被静默判成"未交付"
+         （因为它们永远命中 0 次），页面于是天天报一条永远消不掉的缺件。 */
+      if (it.neg) { if (hit >= (it.n || 1)) miss.push(it.k); else done++; }
+      else if (hit >= (it.n || 1)) done++; else miss.push(it.k);
     }
     // 汉字数（不含空白与标点计不准，取全文长度即可——这里只用来判「是不是被截短了」）
     return { miss: miss, done: done, total: spec.items.length, len: body.replace(/\s/g, "").length, min: spec.min || 0 };
+  }
+  /* ════════ 三角互消闭环 · 环三「评估」（2026-09-14 试点）════════
+     一道工序的交付件只数「有没有写」，数不出「是不是真做了」。three 这一道的全部价值
+     押在**三段真独立**上，而独立没法事后自证——写三个标题谁都会。
+     所以这里加两把程序尺子（都只报不改，判还是读者的事）：
+       ① 三段独立度：①②③两两之间的四字窗重叠率。高 ⇒ 三段是同一套话换了三个标题。
+       ② 互消句复述度：④里那句互消判断，被①②③各段覆盖了多少。高 ⇒ 它是复述，不是互消。
+     💡 心法沿用本仓那一条：**能数出来的东西不要问模型**——问「你三段独立吗」等于问被告。
+     ⚠ 抠不出段落就返回 null，不冒充算过（静默算错比不算坏）。 */
+  function triGram(s, k) {
+    var t = String(s || "").replace(/[\s\u3000-\u303f\uff00-\uff0f\uff1a-\uff20，。！？；：、（）「」『』…—·\-*#>|]/g, "");
+    var set = {}, n = 0;
+    for (var i = 0; i + k <= t.length; i++) { var g = t.slice(i, i + k); if (!set[g]) { set[g] = 1; n++; } }
+    return { set: set, n: n };
+  }
+  function triJac(a, b) {
+    if (!a.n || !b.n) return 0;
+    var hit = 0; for (var g in a.set) if (b.set[g]) hit++;
+    return hit / (a.n + b.n - hit);
+  }
+  function triCover(a, b) {            // a 被 b 覆盖了多少（不是对称的）
+    if (!a.n) return 0;
+    var hit = 0; for (var g in a.set) if (b.set[g]) hit++;
+    return hit / a.n;
+  }
+  function triEcho(text) {
+    var t = String(text || "");
+    var marks = ["①", "②", "③", "④", "⑤"], pos = marks.map(function (m) { return t.indexOf(m); });
+    for (var i = 0; i < 4; i++) if (pos[i] < 0 || (pos[i + 1] >= 0 && pos[i + 1] < pos[i])) return null;
+    var seg = [t.slice(pos[0], pos[1]), t.slice(pos[1], pos[2]), t.slice(pos[2], pos[3])];
+    var g = seg.map(function (x) { return triGram(x, 4); });
+    var ind = [triJac(g[0], g[1]), triJac(g[0], g[2]), triJac(g[1], g[2])];
+    /* 互消句：④那一段里带「互消」二字的那一句；找不到就取④的最后一句。 */
+    var four = t.slice(pos[3], pos[4] > 0 ? pos[4] : undefined);
+    var sents = four.split(/[。；\n]/).filter(function (x) { return x.replace(/\s/g, "").length > 8; });
+    var line = "";
+    for (var j = 0; j < sents.length; j++) if (sents[j].indexOf("互消") >= 0) line = sents[j];
+    if (!line && sents.length) line = sents[sents.length - 1];
+    var lg = triGram(line, 4);
+    var echo = Math.max(triCover(lg, g[0]), triCover(lg, g[1]), triCover(lg, g[2]));
+    var bets = (t.match(/押中|押偏/g) || []).length, hits = (t.match(/押中/g) || []).length;
+    return { ind: ind, echo: echo, bets: bets, hits: hits,
+             dup: Math.max(ind[0], ind[1], ind[2]) > 0.25, rep: echo > 0.5, allHit: bets >= 3 && hits >= 3 };
+  }
+  function triEchoRender(cell, text) {
+    var a = triEcho(text);
+    if (!a) return;
+    function p(x) { return Math.round(x * 100) + "%"; }
+    var bad = a.dup || a.rep || a.allHit;
+    var d = el("div", null, "");
+    d.style.cssText = "color:" + (bad ? "#B07A4E" : "#6f8f6f") + ";font-size:12px;line-height:1.7;margin:8px 0 0";
+    d.appendChild(el("div", null, (LANG === "en" ? "Triangulation read-out · " : "三角互消读数 · ")
+      + (LANG === "en" ? "independence " : "三段独立度 ")
+      + "①②" + p(a.ind[0]) + " ①③" + p(a.ind[1]) + " ②③" + p(a.ind[2])
+      + (LANG === "en" ? " · echo " : " · 互消句复述度 ") + p(a.echo)
+      + (a.bets ? (LANG === "en" ? (" · bets " + a.hits + "/" + a.bets) : ("　·　押注 " + a.hits + "/" + a.bets + " 押中")) : "")));
+    if (a.dup) d.appendChild(el("div", null, LANG === "en"
+      ? "Two of the three passes overlap above 25% — they are likely one analysis under three headings."
+      : "⚠ 三段里有两段重叠超过 25%——多半是同一套话换了三个标题，第④步消不掉任何东西。"));
+    if (a.rep) d.appendChild(el("div", null, LANG === "en"
+      ? "The cross-corrected judgement repeats one pass almost verbatim — that is a restatement, not a cross-correction."
+      : "⚠ 互消出的那句被某一段覆盖过半——它是复述，不是互消。"));
+    if (a.allHit) d.appendChild(el("div", null, LANG === "en"
+      ? "All three bets hit: the conclusion was already in hand before the passes were written."
+      : "⚠ 三条押注全中——结论在动笔前就已经有了，三段并没有独立跑过。这一条比互消出的判断更值得看。"));
+    cell.a.appendChild(d);
   }
   function toolAuditRender(cell, text, spec) {
     var a = toolAudit(text, spec);

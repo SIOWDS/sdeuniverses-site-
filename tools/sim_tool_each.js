@@ -66,14 +66,20 @@ A.iq = pad([
   "综合分：118×0.20 + 132×0.25 + 121×0.20 + 126×0.20 + 108×0.15 = 122.5，层级为有真判断、未到资深学者线。",
   "敌意最近邻：Rowe 1974 的等待时间已占「提问后那段时长」这块地；Garfinkel 1967 的索引性已占「未言明之事如何被读出」；Bao 2010 的沉默素养已占「沉默可读性」。三位都在，且都比本文更早。",
   "三条最短提升路径：一、对着 Rowe 1974 划一条可裁决的分离线，D 与 I 一起动；二、让第三门学科交一个读数而不是一个比喻，E 的 18 分扣项能收回；三、给证伪条款配一个今天就能查的语料，F 上 120。",
+  "扣分记录一：D 维，原文写着「无人接管的那一拍」，标题比正文锐，从 144 扣到 132。",
+  "扣分记录二：E 维，原文写着「会计学的确认时点」，删掉整段论证仍成立，从 139 扣到 121。",
+  "敌意最近邻逐位：本文若与 Rowe 1974 撞上，输在她有实测数据；与 Garfinkel 1967 撞上，输在他的范围更宽；与 Bao 2010 撞上，本文赢在时段切分。",
 ].join("\n"), S.TOOL_SPEC.iq.min);
 
 A.three = pad([
-  "只从显露看：沉默当下呈现成一段没有人说话的时长，它的边界是上一句话的句末与下一句话的开头，跟连续发言比才被切出来。",
-  "只从差异看：它从一次提问与一次不作答的落差里长出来，路径是提问—扫视—点名，点名那一步不可逆。",
-  "只从纠缠看：它与座位表、评分办法、录像设备缠在一起，抽掉评分办法这一根它就散。",
+  "押注一：会被判错的是第一段与第三段。押注二：形状大概是「沉默不是一段时长，而是一段没有责任人的时间」。押注三：最脆的一环大概押在责任人可数这个假定上。",
+  "① 只从显露看：沉默当下呈现成一段没有人说话的时长，它的边界是上一句话的句末与下一句话的开头，跟连续发言比才被切出来。",
+  "② 只从差异看：它从一次提问与一次不作答的落差里长出来，路径是提问—扫视—点名，点名那一步不可逆。",
+  "③ 只从纠缠看：它与座位表、评分办法、录像设备缠在一起，抽掉评分办法这一根它就散。",
   "三视角互相校正：显露那一刀看漏了时长相同的两段沉默并不是同一件事；差异那一刀看错了主语，推动的不是教师而是记录制度。互消之后剩下的判断是：沉默是一段没有归属人的时间。",
   "这个判断最脆的一环：归属人这个说法目前还落不到可数的对象上。",
+  "对账：押注一〔押中〕· 押注二〔押中〕· 押注三〔押偏〕",
+  "④ 逐字引：显露那一段写的是「它的边界是上一句话的句末与下一句话的开头」；差异那一段写的是「点名那一步不可逆」；纠缠那一段写的是「抽掉评分办法这一根它就散」。",
 ].join("\n"), S.TOOL_SPEC.three.min);
 
 A.motif = pad([
@@ -84,6 +90,9 @@ A.motif = pad([
   "逐篇校验：第一篇贴，贴在「谁来接下一句」那一句上；第二篇贴，贴在结尾那句；第三篇贴不上——它谈的是评分，属母题太窄，不是那一篇偏了。",
   "母题定稿：沉默是一段还没有人认领的时间。",
   "可证伪条件：若课堂录像里的沉默段一律能在三秒内指认出责任人，本母题作废。",
+  "候选母题一 反驳位：若纪律其实是一次性建立、此后不再转手，这一句就错。",
+  "候选母题二 反驳位：若每段沉默都能当场指认出责任人，这一句就错。",
+  "反向检验：这条母题不适用于考试时全班安静的那种沉默——那一段时间有明确的责任人，母题罩不住它。",
 ].join("\n"), S.TOOL_SPEC.motif.min);
 
 A.nbr = pad([
@@ -94,6 +103,7 @@ A.nbr = pad([
   "库外：Rowe 1974（学科：教育心理学）说到等待时间与应答质量的相关，分离线在于长度对归属；判决性对照预测：若延长等待即可提升应答而与责任归属无关，则她对我错。",
   "库外：Garfinkel 1967（学科：社会学）说到索引性与常规破坏，分离线在于他不做时段切分；判决性对照预测：若破坏实验里沉默段不出现归属争夺，则他对我错。",
   "库外：Bao 2010（学科：语用学）说到沉默的可读性，分离线在于他把沉默当讯号不当时段；判决性对照预测：若沉默一律可被读成一个讯号且无剩余，则他对我错。",
+  "最近的那一个是 Rowe 1974：它离得最近，近到只剩半步——她已经把那段时长切出来了，只差没问它归谁。",
 ].join("\n"), S.TOOL_SPEC.nbr.min);
 
 A.rename = pad([
@@ -104,6 +114,9 @@ A.rename = pad([
   "原说法：差异序列 → 换成：互动序列 → 为什么：会话分析里序列是现成的分析单位。",
   "原说法：特征纠缠 → 换成：情境依赖 → 为什么：课堂研究一向用情境依赖谈这层关系。",
   "自查：交给课堂话语研究的同行看，他不会觉得是外人写的；唯一可能露口音的是「责任归属栏」这一句，本学科更常说「归因编码」。",
+  "口音清单：① 三重否定连发的句式；② 先立本体论再落到现象的论证姿态；③ 显露这一类词；④ 只引自家篇目的引用习惯；⑤ 底盘这个说法。",
+  "最可疑的三句：一是责任归属栏那一句，可疑在它是自造词；二是开头那句，可疑在句式；三是结尾那句，可疑在论证顺序。",
+  "判断守恒核：原承重句与改后承重句并排——原：沉默是一段没有责任人的时间；改后：该时段在编码手册里缺少责任归属字段。意思没有走样。",
 ].join("\n"), S.TOOL_SPEC.rename.min);
 
 A.gap = pad([
@@ -112,6 +125,8 @@ A.gap = pad([
   "新概念：无主时段。定义：一段没有任何人被记为责任人的课堂时间。成立条件：现场至少两人、且记录制度不强制指派责任人。可证伪条件：若任一现行编码手册已含责任人字段，本概念作废。",
   "分离线：与 Rowe 1974 的等待时间最近，分离线在于她测长度、本概念测归属；与 Garfinkel 1967 的索引性也近，分离线在于他不切时段。",
   "已被填过没有：查到的最近工作只填了长度那一半，归属那一半没有人填；若后来发现已被填过，那就是这道工序最大的失败，本节会如实改口。",
+  "卡住那一句：材料最后一个还站得住的判断是「等待时间越长，应答质量越高」，往下就接不上了。",
+  "分离线写成可判决的一句：在同一段沉默被两位教师分别结束的情形下，旧概念预测两次记录相同，本概念预测两次记录不同。",
 ].join("\n"), S.TOOL_SPEC.gap.min);
 
 A.collide = pad([
@@ -122,6 +137,9 @@ A.collide = pad([
   "撞出来的判断：责任不是被承担的，是被记录制度分配的；沉默里没有责任人，是因为记录格式里没有那一栏。",
   "为什么非要三篇同时在场：单看教育学只会追问教师该不该管；单看记录制度只会说没写就没有；单看法哲学只会讨论效力。三者共享的前提是责任先于记录而存在，拆穿它才出得来这一句。",
   "三篇篇名与站内链接：《谁也没接的那一拍》 https://sdeuniverses.com/column/ ；《空签》 https://sdeuniverses.com/art/ ；《作保的半秒》 https://sdeuniverses.com/column/ 。",
+  "门类三分闸：这三篇不会发表在同一本刊上，互相不引用，内行也不会把它们读成内部分歧——三问全否。",
+  "拆穿的材料来自档案学那一篇自己，它写着「未登记的事件在系统里不产生任何后果」——这一句恰好说明沉默并非记录之前就已完整存在。",
+  "去掉任一篇：去掉档案学那一篇，这个判断就不成立，只剩教育学与语用学的并列。",
 ].join("\n"), S.TOOL_SPEC.collide.min);
 
 A.forge = pad([
@@ -177,6 +195,8 @@ A.grid = pad([
   "中心位现在轮转到二号位互动：凭据是所有现行编码都只记往返，不记客体属性也不记责任人。",
   "若中心位轮到三号位，这件事会变成：编码手册必须先指认责任人才能记录时长，等长的两段沉默会被记成两件事，这一条可以被反驳——只要拿出一本已经这样记的手册。",
   "三号位是最后才显影的：在这件事里它还没有显影，卡在编码手册没有责任人字段这一步。",
+  "三轴凭据：C 轴落在互动内容那一格，凭据是争的是那一段时间归谁；M 轴落在编码方法那一格，判据是分歧全部出现在记录方式上；V 轴落在责任价值那一格，依据是双方都在争谁该负责。",
+  "若中心位轮到二号位，到那时应当能看到编码手册的修订频率上升，而教师个人的处置差异下降。",
 ].join("\n"), S.TOOL_SPEC.grid.min);
 
 A.nine = pad([
@@ -186,7 +206,7 @@ A.nine = pad([
   "撞成一条判断：当分布上集中的那类沉默（S1）里可选做法最少（D1），而心里那一份从不进档案（E1），沉默就成了唯一一段无人认领的课堂时间。本轮走的是同号位那一组。",
 ].join("\n"), S.TOOL_SPEC.nine.min);
 
-A.map = [
+A.map = pad([
   "```mermaid",
   "flowchart TD",
   "A[提问] -->|开启| B[沉默段]",
@@ -195,7 +215,8 @@ A.map = [
   "D -->|反过来锁死| B",
   "```",
   "这张图最承重的是编码手册反过来锁死沉默段那一条边；我不确定的是提问到沉默那一条是不是唯一入口；抽掉编码手册这个节点，整张图就散。",
-].join("\n");
+  "这张图最可能错在编码手册那一条回边——锁死的也许不是沉默段，而是责任人。",
+].join("\n"), S.TOOL_SPEC.map.min);
 
 A.genesis = pad([
   "摆料：站内《谁也没接的那一拍》说到无主时段为止；记忆库里，教育心理学的等待时间研究说到长度为止，档案学的登记理论说到可追溯性为止，语用学的沉默研究说到讯号为止。站外对手：未核验。",
@@ -270,15 +291,24 @@ console.log("⑥ 英文界面：拿中文判据去判英文答会怎样（这一
    这就是 2026-08-28 第一刀先把英文界面整段停判的理由；第二刀（ke/en）把它判得动，
    下面 ⑦ 逐道验。这条断言留着，是为了别哪天有人把 lang 分支删掉又退回原样。 */
 const EN3 = [
+  "Bet one: passes one and three will be judged wrong. Bet two: the shape will be that silence is not a length. Bet three: the weakest link sits on counting.",
   "Seen only as Show: the silence appears as a stretch of time in which nobody speaks.",
   "Seen only as Difference: it grows out of a gap between a question asked and an answer withheld.",
   "Seen only as Entanglement: it is tangled with the seating chart and the grading scheme.",
   "Cross-correction: the first view missed that two equally long silences are not the same thing.",
+  "Verbatim quotes: the first says \"a stretch of time in which nobody speaks\"; the second says \"a gap between a question asked and an answer withheld\"; the third says \"tangled with the seating chart\".",
   "The weakest link is that ownership cannot yet be counted.",
+  "Reconciliation: bet one hit, bet two missed, bet three missed.",
 ].join("\n") + " filler.".repeat(200);
-ok("中文判据判英文答 ⇒ 逐件全判缺（" + FE.toolAudit(EN3, S.TOOL_SPEC.three).done + "/5）",
-  FE.toolAudit(EN3, S.TOOL_SPEC.three).done === 0);
-ok("同一份英文答走英文规格 ⇒ 判得动", FE.toolAudit(EN3, S.toolSpecFor("three", "en")).done === 5);
+/* ⚠ 2026-09-14 按用意重写（不是删）：原来这两条把件数写死成 5，而加厚 v2 给 three 加到 7 件，
+   其中一件是**反向件**（neg：三段不许互相回指）。反向件在英文答上本来就该判「过」——
+   它说的是"不许出现"，英文答里当然没有那几个中文回指词。所以第一条的用意要精确成
+   「**正向件**逐件全判缺」，第二条的件数改为从规格现取，不再写死。 */
+const _posN = S.TOOL_SPEC.three.items.filter((it) => !it.neg).length;
+const _negN = S.TOOL_SPEC.three.items.length - _posN;
+ok("中文判据判英文答 ⇒ 正向件逐件全判缺（" + FE.toolAudit(EN3, S.TOOL_SPEC.three).done + "/" + S.TOOL_SPEC.three.items.length + "，其中 " + _negN + " 件是反向件）",
+  FE.toolAudit(EN3, S.TOOL_SPEC.three).done === _negN);
+ok("同一份英文答走英文规格 ⇒ 判得动", FE.toolAudit(EN3, S.toolSpecFor("three", "en")).done === S.TOOL_SPEC.three.items.length);
 
 /* ════════ 英文界面：同样十五道，逐道再走一遍（2026-08-28 第二刀）════════
    规格现在按 lang 取（toolSpecFor）：ke 换件名、en 换判据、地板乘 EN_MIN_RATIO。
@@ -290,11 +320,14 @@ const E = {};
 function SPE(k) { return S.toolSpecFor(k, "en"); }
 
 E.three = padE([
+  "Bet one: the first and third passes are the ones that will be judged wrong. Bet two: the shape will be that silence is not a length of time but a stretch with no one answerable for it. Bet three: the weakest link will sit on whether ownership can be counted.",
   "Seen only as Show: the silence appears as a stretch of time in which nobody speaks; its edges are the end of one utterance and the start of the next.",
   "Seen only as Difference: it grows out of the gap between a question asked and an answer withheld, and the naming step is the irreversible one.",
   "Seen only as Entanglement: it is tangled with the seating chart, the grading scheme and the camera; pull out the grading scheme and it falls apart.",
   "Cross-correction: the first pass missed that two equally long silences are not the same thing; the second got the subject wrong, since what pushes is the record, not the teacher.",
   "The weakest link in this judgement is that ownership still cannot be counted.",
+  "Reconciliation: bet one hit, bet two hit, bet three missed.",
+  "Verbatim quotes: the first pass says \"its edges are the end of one utterance and the start of the next\"; the second says \"the naming step is the irreversible one\"; the third says \"pull out the grading scheme and it falls apart\".",
 ].join("\n"), SPE("three").min);
 
 E.motif = padE([
@@ -305,6 +338,9 @@ E.motif = padE([
   "Piece by piece: the first piece fits, on the sentence about who speaks next; the second fits at its closing line; the third does not fit, and the motif is too narrow rather than that piece being off.",
   "Final motif: silence is a stretch of time nobody has claimed yet.",
   "Falsification condition: if classroom recordings let anyone name the responsible party within three seconds, the motif is void.",
+  "Candidate one, rebuttal point: if discipline is established once and never handed on again, this sentence is wrong.",
+  "Candidate two, rebuttal point: if every silence can be traced to a responsible party on the spot, this sentence is wrong.",
+  "Reverse check: the motif does not apply to the whole-class quiet of an examination, where the responsible party is fixed in advance.",
 ].join("\n"), SPE("motif").min);
 
 E.nbr = padE([
@@ -315,6 +351,7 @@ E.nbr = padE([
   "Outside: Rowe 1974 holds the ground on wait time; it separates from mine as length against ownership; decisive contrasting prediction, if lengthening the wait raises answers with no ownership effect, she is right and I am wrong.",
   "Outside: Garfinkel 1967 holds indexicality; it separates in that he never cuts time into stretches; decisive prediction, if breaching experiments show no fight over ownership, he is right.",
   "Outside: Bao 2010 holds silence literacy; it separates in that he reads silence as a signal, not a stretch; decisive prediction, if every silence reads as one signal with no remainder, he is right.",
+  "The closest one is Rowe 1974: it sits half a step away, since she already cut out that stretch of time and only stopped short of asking whom it belongs to.",
 ].join("\n"), SPE("nbr").min);
 
 E.rename = padE([
@@ -325,6 +362,9 @@ E.rename = padE([
   "Difference sequence -> interaction sequence -> conversation analysis already works in sequences",
   "Entanglement -> context dependence -> classroom research has always talked this way",
   "Self-check: a colleague in this field would not read it as an outsider's work; the one line with an accent is responsibility column, where the field would say attribution coding.",
+  "Accent list: the triple-negative sentence pattern; the habit of settling ontology first; the word Show; citing only in-house pieces; the word chassis. Accent is what gives an outsider away.",
+  "The three most suspect sentences: the responsibility-slot line, suspect because the term is coined here; the opening line, suspect in its syntax; the closing line, suspect in its order of argument.",
+  "Load-bearing claim before and after, side by side: before, silence is a stretch of time with no responsible party; after, the interval lacks a responsibility field in the coding manual. The meaning has not drifted.",
 ].join("\n"), SPE("rename").min);
 
 E.gap = padE([
@@ -333,6 +373,8 @@ E.gap = padE([
   "New concept, call it the ownerless stretch. Definition: a stretch of classroom time with nobody on record as responsible for it. Condition for it to hold: at least two people present and no rule forcing an assignment. Falsification condition: if any current coding manual already carries a responsibility field, the concept is void.",
   "Separation from the nearest existing concept: Rowe 1974 is nearest and separates as length against ownership; Garfinkel 1967 separates in that he never cuts stretches.",
   "Has it been filled already: the nearest work fills only the length half; if it turns out to have been filled, that is this procedure's worst failure and I will say so.",
+  "The sentence where it stalls: \"the longer the wait time, the better the response quality\" is the last claim that still holds.",
+  "Separation line as a decidable sentence: where one silence is ended by two different teachers, the old concept predicts identical records and this concept predicts different ones. Both predict, and only one can be right.",
 ].join("\n"), SPE("gap").min);
 
 E.collide = padE([
@@ -343,6 +385,9 @@ E.collide = padE([
   "The judgement that came out of it: responsibility is not borne, it is allotted by the recording format; there is no responsible party in a silence because the format has no column for one.",
   "Why all three had to be present: education alone only asks whether the teacher should intervene; recording alone says unwritten is nothing; legal philosophy alone debates force. Any one alone leaves the shared premise standing.",
   "Titles and links: The Beat Nobody Took https://sdeuniverses.com/column/ ; Blank Signature https://sdeuniverses.com/art/ ; The Half Second https://sdeuniverses.com/column/ .",
+  "Three-way split gate: these three would not appear in the same journal, they do not cite each other, and no insider would read them as an internal dispute.",
+  "The material that breaks the shared premise comes from the archival piece itself: \"an unregistered event produces no consequences in the system\".",
+  "Drop any one: remove the archival piece and the judgement no longer holds, leaving only two parallel claims.",
 ].join("\n"), SPE("collide").min);
 
 E.forge = padE([
@@ -398,6 +443,8 @@ E.grid = padE([
   "The centre has rotated to the second position: every current coding records only the traffic, neither the object's properties nor the responsible party.",
   "If the centre rotated to the third position, the manual would have to name a responsible party before recording any duration, and two equal stretches would be recorded as two different things. This can be refuted by producing one manual that already does so.",
   "The third position surfaces last: here it has not surfaced at all, and it is stuck at the manual having no responsibility field.",
+  "Evidence per axis: the content axis falls on interaction, on the grounds that the dispute is over whom the interval belongs to; the method axis falls on coding, on the grounds that every disagreement shows up in how it is recorded; the value axis falls on responsibility, on the grounds that both sides argue over who should answer for it.",
+  "If the centre rotated to the second position, we should then see the coding manual revised more often and individual teachers diverging less.",
 ].join("\n"), SPE("grid").min);
 
 E.nine = padE([
@@ -407,7 +454,7 @@ E.nine = padE([
   "Putting the three cells together: when the clustered silences (S1) leave the fewest options (D1) and the inner share never enters the file (E1), silence becomes the one stretch of classroom time nobody has claimed. This draw is the same tier class.",
 ].join("\n"), SPE("nine").min);
 
-E.map = [
+E.map = padE([
   "```mermaid",
   "flowchart TD",
   "A[Question] -->|opens| B[Silent stretch]",
@@ -416,7 +463,8 @@ E.map = [
   "D -->|locks back onto| B",
   "```",
   "The load-bearing edge is the manual locking back onto the stretch; what I am uncertain about is whether the question is the only way in; remove the manual node and the whole diagram falls apart.",
-].join("\n");
+  "Where this diagram is most likely wrong: the feedback edge from the coding manual may lock the responsible party rather than the interval itself.",
+].join("\n"), SPE("map").min);
 
 E.genesis = padE([
   "Step one, what is on the table: on this site, The Beat Nobody Took gets as far as the ownerless stretch. From memory, educational psychology gets as far as duration, archival theory as far as traceability, pragmatics as far as signal. Outside placeholders: not verified.",
@@ -445,6 +493,9 @@ E.iq = padE([
   "Composite: 118 x 0.20 + 132 x 0.25 + 121 x 0.20 + 126 x 0.20 + 108 x 0.15 = 122.5, tier is a real judgement short of the senior scholar line.",
   "Hostile nearest neighbours: Rowe 1974 already holds the stretch after a question; Garfinkel 1967 holds how unstated things get read; Bao 2010 holds silence literacy. All three are earlier.",
   "Three shortest routes to raise it: draw a decidable separation from Rowe 1974, which moves D and I together; make the third discipline produce a reading rather than a metaphor, which wins back the 18 deducted on E; give the falsification clause a corpus that can be checked today, and F clears 120.",
+  "Deduction one: on D, the text says \"the beat nobody took\"; the title is sharper than the body, docked from 144 to 132.",
+  "Deduction two: on E, the text says \"the moment of recognition in accounting\"; delete the section and the argument still stands, docked from 139 to 121.",
+  "Each neighbour: against Rowe 1974 this piece would lose on measured data; against Garfinkel 1967 it would lose on scope; against Bao 2010 it wins on cutting the interval.",
 ].join("\n"), SPE("iq").min);
 
 console.log("⑦ 英文界面：同样十五道逐道走一遍（规格按 lang 取）");

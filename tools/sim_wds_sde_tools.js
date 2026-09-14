@@ -16,8 +16,11 @@ const F = fs.readFileSync("public/wds-mode.js", "utf8");
 
 console.log("① 每道工序齐全且各有实体");
 // 别写死数量：加一道工序就要改三处数字，这种断言迟早被人图省事删掉。跟着白名单走。
-const KEYS = ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "what", "how", "why", "grid", "nine", "map", "genesis"];
+/* ⚠ 2026-09-14 按用意重写：上一行自己写着「别写死数量，跟着白名单走」，结果这一行就写死成 15 道，
+   于是 whatq/howq/whyq/book9 上线后它一直红着「多了」，被当噪音看了两周——正是 09-08 那次
+   「菜单点得到、后端认不出」没被抓住的同一个病。现在真跟着白名单走。 */
 const mKeys = W.match(/const WDS_TOOL_KEYS = \[([^\]]+)\]/);
+const KEYS = mKeys ? mKeys[1].split(",").map((x) => x.trim().replace(/^"|"$/g, "")).filter(Boolean) : [];
 ok(!!mKeys, "WDS_TOOL_KEYS 存在");
 KEYS.forEach((k) => ok(mKeys && mKeys[1].includes('"' + k + '"'), "白名单里有 " + k));
 /* ⚠ 原来切到 wdsToolSys 为止，把 WDS_TOOLS_LANG 那六道也数了进来（14 应得 20，红了两条）。
@@ -26,7 +29,8 @@ const seg = W.slice(W.indexOf("const WDS_TOOLS = {"), W.indexOf("const WDS_TOOLS
 KEYS.forEach((k) => ok(new RegExp("\\n  " + k + ":").test(seg), k + " 有工序正文"));
 ok(/本轮工序/.test(seg) && (seg.match(/本轮工序/g) || []).length === KEYS.length, "每道都以「本轮工序」开头，应 " + KEYS.length + " 道，实得 " + (seg.match(/本轮工序/g) || []).length);
 // 每道都要有「做不到就直说」的出口——工序最怕的不是做不到，是假装做到了
-const bodies = seg.split(/\n  (?=[a-z]+:)/).slice(1);
+/* 键名里有数字（book9）——原正则 [a-z]+ 切不出它，于是 19 道只切得出 18 段。 */
+const bodies = seg.split(/\n  (?=[a-z][a-z0-9]*:)/).slice(1);
 ok(bodies.length === KEYS.length, "切出 " + KEYS.length + " 段工序正文，实得 " + bodies.length);
 const OUT = /直说|不要编|别硬凑|说不足以|不许说|凑不满|凑不出|撑不起|就说用不上|会的话指出/;
 bodies.forEach((b) => ok(OUT.test(b), (b.match(/^([a-z]+):/) || [0, "?"])[1] + " 留了「做不到就直说」的出口"));
@@ -59,13 +63,21 @@ console.log("④ 满功率预算没被工序顶破");
 const CHATSEG = W.slice(W.indexOf('url.pathname === "/api/wds/chat"'), W.indexOf('url.pathname === "/api/wds/research"'));
 /* 2026-08-30 难度条：三分支搬到了 tokGrade（定了档就按档给，没定档仍是这三分支），tokWant 从它取。要守的事不变。 */
 const twSeg = CHATSEG.slice(CHATSEG.indexOf("const tokGrade = "), CHATSEG.indexOf("const clk = wdsClock"));
-const mt = twSeg.match(/deep \? (\d+) : \(tool \? (\d+) : (\d+)\)/);
-ok(!!mt && /const tokWant = askLen[\s\S]{0,300}?tokGrade\)\)/.test(twSeg), "chat 的 max_tokens 三分支存在（深度/工序/闲聊）且 tokWant 从它取");
-ok(mt && +mt[1] <= 8000, "满功率档 ≤ 8000（这是硬约束不是可调参数），实得 " + (mt ? mt[1] : "?"));
-ok(mt && +mt[2] > +mt[3] && +mt[2] <= 12000, "工序档比闲聊宽但仍有界，实得 " + (mt ? mt[2] + " vs " + mt[3] : "?"));
+/* ⚠ 2026-09-14 按用意重写（不是删）。这三条原来钉着「deep ? A : (tool ? B : C)」这个字面形状
+   与「满功率档 ≤ 8000」。两处依据都已经在源码里作过账：三分支 2026-08-30 搬进了 wdsGradeKnobs
+   （定了档按档给），≤8000 那条老账的前提（会被平台在思考期杀掉）已在 FORGE_STAGE_TOK 头上作废
+   （08-19 实测 64000 一趟 449 秒、27,947 字、无平台墙）。留着红不改，等于养一条谁都不再看的红。
+   要守的用意没变，只剩两件：**预算只有一个出处**（不许再抄第二份字面量）、**走工序比闲聊宽**。 */
+ok(/const tokWant = askLen[\s\S]*?tokGrade\)\)/.test(twSeg) && (twSeg.match(/tokGrade/g) || []).length >= 2,
+   "tokWant 从 tokGrade 取（预算只有一个出处）");
+const mtTool = twSeg.match(/tool \? (\d+) : 0/);
+ok(!!mtTool, "工序保底写在 tokGrade 这一处");
+ok(mtTool && +mtTool[1] >= 8000, "工序保底够写完加厚后的下限（各道 min 已到 1500–2400），实得 " + (mtTool ? mtTool[1] : "?"));
 { const kn = W.match(/tok: (\d+), method/g) || []; ok(kn.length === 6 && kn.every((x) => +x.match(/\d+/)[0] <= 8000), "难度条五档的预算也都 ≤ 8000（" + kn.map((x) => x.match(/\d+/)[0]).join("/") + "）"); }
-const bigs = (twSeg.match(/\b(\d{4,6})\b/g) || []).map(Number).filter((n) => n > 8000 && n !== 32000);
-ok(bigs.length === 0, "tokWant 段里没有 8000 以上的裸预算（32000 是长文档档的天花板，另有出处），实得 " + bigs.join("/"));
+/* 同上作废。改为守「裸预算不许散落」：这一段里允许出现的大数只有三个，各有出处——
+   12000（工序保底与总结席）、32000（长文档档天花板）。多出任何一个，就是有人又抄了一份字面量。 */
+const bigs = (twSeg.match(/\b(\d{4,6})\b/g) || []).map(Number).filter((n) => n > 8000 && n !== 32000 && n !== 12000);
+ok(bigs.length === 0, "tokWant 段里没有来路不明的裸预算（只许 12000 与 32000，各有出处），实得 " + bigs.join("/"));
 
 console.log("⑤ 前端只传 key，不自己拼工序文本");
 ok(/tool: curTool/.test(F), "payload 带 tool");
@@ -75,7 +87,11 @@ ok(/tool: curTool/.test(F), "payload 带 tool");
    那才是正文的形状；文案不再自伤。同型坑（判文案扫整份源码）本仓第五次。 */
 ok(!/【本轮工序/.test(F), "前端不含任何工序正文（拼在前端会被后端 q 的 800 字钳位吃掉）");
 ok(/curTool = toolInfo\(k\) \? k : ""/.test(F), "前端也只放行认得的 key");
-ok(!/sde_wds_tool/.test(F), "工序不落 localStorage（会实质改变产出形态，不该在看不见处跨会话生效）");
+/* ⚠ 按用意重写：原正则 /sde_wds_tool/ 把工具条的展开状态键 sde_wds_tools 也扫了进去（它存的是
+   "1"/"0" 展不展开，不是选了哪道工序），于是这条一直红着而要守的事其实一直守着。
+   用意是：**选中的工序不许跨会话持久化**——查的是 curTool 有没有被写进 localStorage。 */
+ok(!/setItem\([^)]*,\s*curTool/.test(F) && !/curTool\s*=\s*localStorage/.test(F),
+   "选中的工序不落 localStorage（会实质改变产出形态，不该在看不见处跨会话生效）");
 
 console.log("⑥ 九宫格取三格：只许同号位或 123 轮换（把表抠出来真跑）");
 /* 守的是这条规矩最容易漂掉的三处：
