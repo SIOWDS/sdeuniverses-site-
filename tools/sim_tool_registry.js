@@ -75,7 +75,7 @@ if (spec) {
 
 /* ── 接力：book9 的列由题号决定，不预设 ── */
 ok("book9 · _rungOf 里不筛列（posFromHistory(history, null)）",
-   /if \(tool === "book9"\) return posNext\(posFromHistory\(history, null\)\);/.test(W));
+   /if \(tool === "book9"\) return posNext\(posFromHistory\(history, null\)[,)]/.test(W));
 
 /* ── 正文里那几条边界（这一道存在的理由，删了就退化成普通问对）── */
 const b9 = /  book9: "([\s\S]*?)\n\n  [a-z]/.exec(BODY);

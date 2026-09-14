@@ -18,7 +18,7 @@ let PASS = 0, FAIL = 0;
 const ok = (c, m, x) => { if (c) { PASS++; console.log("  ✓ " + m); } else { FAIL++; console.log("  ✗ " + m + (x ? "  ← " + x : "")); } };
 
 function grab(a, b) { const i = W.indexOf(a), j = W.indexOf(b, i); if (i < 0 || j < 0) throw new Error("找不到 " + a); return W.slice(i, j); }
-const SB = new Function(grab("const POS_RE =", "/* 兜底三问") + "\nreturn { posParse, posNext, posFromHistory, PROBE_TOOLS, posSeq, TOOL_SEQ };")();
+const SB = new Function(grab("const POS_RE =", "/* 兜底三问") + "\nreturn { posParse, posNext, posFromHistory, PROBE_TOOLS, posSeq, TOOL_SEQ, posSeen };")();
 
 console.log("① 落位行解析（三列各一）");
 {
@@ -152,6 +152,39 @@ console.log("⑨ ⭐ 工序自己的序列 —— 2026-09-14 王德生令「工�
   ok(/seqMiss: "这一答没交〔落位〕行/.test(M), "断链那句话在前端也说破了，不只在帧里");
   // 🔴 词条在不等于它会被画出来：miss 分支必须活着（变异检验专设——上一版只验词条，改坏分支照样全绿）
   ok(/if \(sq\.miss\) \{ line = t\("seqMiss"\);/.test(M), "miss 分支真的会画出来（不是只有词条躺在表里）");
+}
+
+console.log("⑩ ⭐ 隔轮回摆与圈数 —— 2026-09-14 补的那一刀（posNext 从前只看给定第一项，不看已解释）");
+{
+  const ans = (col, pos, given, done) => ({ role: "wds",
+    text: "正文\n〔落位〕列：" + col + " ｜ 位：" + pos + " ｜ 给定：" + given + " ｜ 已解释：" + done });
+  // 一场：R1 站 S（给定 E、D）→ R2 站 E（给定 S、D，S 已站过）
+  const hist = [{ role: "user", text: "问" }, ans("What", "S=F(D,E)", "E、D", "S"),
+                { role: "user", text: "再问" }, ans("What", "E=H(S,D)", "S、D", "E")];
+  ok(SB.posSeen(hist, "What") === "SE", "累计已站过的维扫得出来（S、E）", SB.posSeen(hist, "What"));
+  const p = SB.posFromHistory(hist, "What");
+  const nx = SB.posNext(p, SB.posSeen(hist, "What"));
+  // 给定写的是「S、D」：第一项 S 已站过 ⇒ 必须跳到 D，否则就是 S↔E 来回摆
+  ok(/D=G\(S,E\)/.test(nx) && !/S=F\(D,E\)/.test(nx), "⭐ 给定第一项已站过 ⇒ 跳到没站过的那一维（不回摆）", nx.slice(0, 60));
+  ok(/这一圈的第 3 条／共 3/.test(nx), "文案报出本圈第几条", nx.slice(-80));
+  ok(!/回环检查/.test(nx), "没走满三条时不催回环");
+  // 走满三条 ⇒ 清零重来，并催回环检查
+  const hist3 = hist.concat([{ role: "user", text: "三" }, ans("What", "D=G(S,E)", "S、E", "D")]);
+  ok(SB.posSeen(hist3, "What").length === 3, "三条站满＝一圈");
+  const nx3 = SB.posNext(SB.posFromHistory(hist3, "What"), SB.posSeen(hist3, "What"));
+  ok(/回环检查/.test(nx3) && /这一圈的第 1 条/.test(nx3), "⭐ 走满一圈 ⇒ 清零重开并催第⑤条回环检查", nx3.slice(-70));
+  // 旧行为保住：没有累计时仍按给定第一项走（第一轮、或读者中途插话）
+  ok(/E=H\(S,D\)/.test(SB.posNext(SB.posParse(ans("What", "S=F(D,E)", "E、D", "S").text))), "不传累计时仍按给定第一项（老路不变）");
+  // ⭐ 钮上那一格必须与下一轮真跑的那一格一致，否则读者按图索骥、服务端另走一条
+  const sq = SB.posSeq("whatq", ans("What", "E=H(S,D)", "S、D", "E").text, hist.slice(0, 2));
+  ok(sq && sq.label === "D=G(S,E)", "序列钮算的格与 posNext 一致", JSON.stringify(sq && sq.label));
+  ok(sq && sq.ring && sq.ring.i === 3 && sq.ring.tot === 3, "序列钮带圈数读数", JSON.stringify(sq && sq.ring));
+  const sqF = SB.posSeq("whatq", ans("What", "D=G(S,E)", "S、E", "D").text, hist);
+  ok(sqF && sqF.ring && sqF.ring.full && /回环检查/.test(sqF.send), "走满一圈时钮发出的那一问里带着回环检查");
+  // How/Why 不受这一刀影响
+  ok(/从 E 起手/.test(SB.posNext(SB.posParse("〔落位〕列：How ｜ 位：D→S→E ｜ 起手：D ｜ 落点：E"), "SDE")), "How 列不吃圈数（它自己报段数）");
+  ok(/seqRing: "三条方程已各站过一次/.test(M) && /seqRing: "All three equations/.test(M), "圈数满的提示中英都有");
+  ok(/sq\.ring\.i \+ "\/" \+ sq\.ring\.tot/.test(M), "钮上真把圈数画出来");
 }
 
 console.log("\n===== " + PASS + " PASS / " + FAIL + " FAIL =====");

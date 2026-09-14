@@ -1046,6 +1046,7 @@
       seqHint: "这一道一轮只走一格：换一条方程／一条路径／一条原理，不是把同一件事问得更细。",
       seqPtFix: "接力断了", seqMiss: "这一答没交〔落位〕行，下一格算不出来——不补上，后面每一轮都只能从头猜。",
       seqMissT: "让它只补那一行，不重写正文",
+      seqRing: "三条方程已各站过一次——这一圈先交一句回环检查：哪一项被改写了？没有一项被改写，这一圈就是白走的。",
       razBadge: "已作为本书底册扣留（{n} 字符）· 此后每轮随系统提示重送，第 5、10 格送全文",
       razH: "底册审查 · 这一答违反了本书自己定的规矩", razT: "以下各条全部取自底册里已写下的条款，由正则比对得出，不经过基底。看到它就回去改，别往下走。",
       progCells: ["本篇不管什么", "五家逐家交手", "承重命题与靶位 Z", "土壤条件", "量具取值与编码", "检验设计与材料来源", "证伪条款与阈值", "辨别格", "反噬与误诊阻挡", "两个洞与引证自查"],
@@ -1364,6 +1365,7 @@
       seqHint: "One cell per turn: switch equation / route / principle, not ask the same thing in finer detail.",
       seqPtFix: "Relay broken", seqMiss: "No position line in this answer — the next cell cannot be computed.",
       seqMissT: "Ask it to supply just that line, without rewriting the answer",
+      seqRing: "All three equations have been visited — close the loop before starting a new one.",
       razBadge: "Held as this book's RAZ ({n} chars) \u2014 re-sent with the system prompt every turn; full text on cells 5 and 10",
       razH: "RAZ CHECK \u2014 this answer breaks the book's own rules", razT: "Every check below comes from a clause already written in the RAZ, matched by regex, with no model call.",
       progCells: ["What this piece does not cover", "Facing all five occupants", "Load-bearing claim and the blank target", "Ground conditions", "Instrument values and coding", "Test design and materials", "Falsifiers and thresholds", "Discrimination grid", "Backfire and misdiagnosis blocks", "The two holes and citation self-check"],
@@ -4541,7 +4543,13 @@
     } else if (sq && sq.send) {
       head = t("seqH") + " · " + (sq.col || "");
       if (sq.miss) { line = t("seqMiss"); btn = { lab: t("seqFix"), q: sq.send, warn: 1 }; }
-      else { btn = { lab: t("seqNext") + "：" + (sq.label || ""), q: sq.send }; }
+      else {
+        /* 圈数（What 列才有）：一圈＝三条方程各站一次。走满时钮上直接说破，省得读者
+           以为还在往下走——第⑤条那句回环检查从前没有任何触发口。 */
+        var ring = sq.ring ? ("　" + sq.ring.i + "/" + sq.ring.tot) : "";
+        btn = { lab: t("seqNext") + "：" + (sq.label || "") + ring, q: sq.send };
+        if (sq.ring && sq.ring.full) line = t("seqRing");
+      }
     } else return;
     var box = el("div", "wdsm-follows");
     box.appendChild(el("div", "wdsm-follows-h", head));

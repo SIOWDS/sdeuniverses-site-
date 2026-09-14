@@ -6743,13 +6743,23 @@ function posParse(text) {
    工序正文里那一条"若上游指定了就照它走"自然不触发，基底照第①步自己站位。 */
 const _EQ_OF = { S: "S=F(D,E)", D: "D=G(S,E)", E: "E=H(S,D)" };
 const _PR_OF = { S: "原理二 S×E→D（或原理三 S×D→E）", D: "原理一 D×E→S（或原理三 S×D→E）", E: "原理一 D×E→S（或原理二 S×E→D）" };
-function posNext(p) {
+function posNext(p, seen) {
   if (!p) return "";
   if (p.col === "What") {
-    const g = (p.given.match(/[SDE]/g) || [])[0];
-    if (!g) return "";
+    /* 走满三条＝一圈。满了就清零重来，并在这一轮把第⑤条的回环检查催出来——
+       从前它写在工序正文里（「走完一圈时多答一句」），可程序不知道走没走满，于是从没被触发过。 */
+    const all = String(seen || "");
+    const full = all.length >= 3;
+    const eff = full ? "" : all;
+    const gs = (p.given.match(/[SDE]/g) || []);
+    if (!gs.length) return "";
+    // 优先挑这一圈还没站过的那一项；都站过就退回第一项（不硬拦，只是不再优先）
+    const g = gs.find((c) => eff.indexOf(c) < 0) || gs[0];
     return "【本轮该站的方程】" + (_EQ_OF[g] || "") + "——上一答把 " + g + " 当作给定在用，这一轮把 " + g + " 本身提为待解释项："
-      + g + " 又是被哪些差异、在哪片纠缠里写出来的。不许绕回「" + (p.pos || "上一条方程") + "」重讲一遍。";
+      + g + " 又是被哪些差异、在哪片纠缠里写出来的。不许绕回「" + (p.pos || "上一条方程") + "」重讲一遍。"
+      + "\n（这一圈的第 " + (eff.length + 1) + " 条／共 3；本圈已站过：" + (eff || "无") + "）"
+      + (full ? "\n⚠ 上一圈三条方程已各站过一次。开这一圈之前，先按第⑤条交一句**回环检查**："
+          + "上一圈里哪一项被改写了？最初当作给定的那一项，现在还是原样吗？一项都没被改写，就说这一圈白走了——别跳过这一句直接开新一圈。" : "");
   }
   if (p.col === "How") {
     const to = (p.to.match(/[SDE]/g) || [])[0];
@@ -6778,13 +6788,18 @@ const _SEQ_ASK = {
   How:  (g) => "接着走：从 " + g + " 起手的下一条路径（" + g + "→…→…）——这一段怎么下手、怎么过、怎么成？",
   Why:  (g) => "接着走：" + g + " 被改成这样之后，又逼得哪一维非改不可？",
 };
-function posSeq(tool, text) {
+function posSeq(tool, text, history) {
   if (!PROBE_TOOLS[tool]) return null;
   const col = PROBE_TOOLS[tool];
   const p = posParse(text);
   if (!p) return { miss: 1, col: col, send: "上一答没有交〔落位〕行，接力算不出下一格。请只把那一行补出来（列／位／"
     + (col === "What" ? "给定／已解释" : (col === "How" ? "起手／落点" : "结果项")) + "），不要重写正文。" };
-  const key = p.col === "What" ? (p.given.match(/[SDE]/g) || [])[0]
+  /* What 的挑法必须与 posNext 一字不差，否则钮上写的那一格与下一轮真跑的那一格会岔开
+     （读者按图索骥，服务端另走一条，谁也不会发现）。所以这里同样看全场已站过的维。 */
+  const _all = p.col === "What" ? posSeen(history, "What", text) : "";
+  const _full = _all.length >= 3, _eff = _full ? "" : _all;
+  const _gs = p.col === "What" ? (p.given.match(/[SDE]/g) || []) : [];
+  const key = p.col === "What" ? (_gs.find((c) => _eff.indexOf(c) < 0) || _gs[0])
             : p.col === "How"  ? (p.to.match(/[SDE]/g) || [])[0]
             :                    (p.res.match(/[SDE]/g) || [])[0];
   if (!key) return { miss: 2, col: p.col, send: "上一答的〔落位〕行里"
@@ -6793,7 +6808,26 @@ function posSeq(tool, text) {
   const label = p.col === "What" ? (_EQ_OF[key] || "")
               : p.col === "How"  ? ("从 " + key + " 起手")
               :                    (_PR_OF[key] || "");
-  return { col: p.col, label: label, from: (p.pos || ""), send: _SEQ_ASK[p.col](key) };
+  const ring = p.col === "What" ? { i: _eff.length + 1, tot: 3, full: _full } : null;
+  return { col: p.col, label: label, from: (p.pos || ""), ring: ring,
+    send: _SEQ_ASK[p.col](key) + (_full ? "（上一圈三条方程已各站过一次：开这一圈之前，先交一句回环检查——上一圈里哪一项被改写了？）" : "") };
+}
+
+/* 全场已站过哪几维（2026-09-14）。只有 What 列用得上：三条方程各由「已解释」那一项认领，
+   三项集齐＝走满一圈。存在的理由是 posNext 从前只看最近一答的「给定」第一项，**不看已解释**
+   （done 字段 posParse 一直解得出来，一直没人用），于是 S→E→S→E 来回摆是合法的，D 一次没站过
+   也没人拦——工序正文那句「不许绕回」只管相邻一轮，管不住隔轮回摆。
+   alsoText 是这一答的正文：算「下一格」时要把它自己的落位也算进已站过的，算「本轮该站」时不传。 */
+function posSeen(history, col, alsoText) {
+  const h = Array.isArray(history) ? history : [];
+  let s = "";
+  const eat = (p) => {
+    if (!p || (col && p.col !== col)) return;
+    for (const c of (String(p.done || "").match(/[SDE]/g) || [])) if (s.indexOf(c) < 0) s += c;
+  };
+  for (const it of h) { if ((it || {}).role === "user") continue; eat(posParse((it || {}).text || (it || {}).a || "")); }
+  if (alsoText) eat(posParse(alsoText));
+  return s;
 }
 
 /* 从整场 history 里取**最近一条**带落位的答复（读者中途插几句闲话不影响接力）。 */
@@ -9515,9 +9549,10 @@ function toolSpecFor(tool, lang) {
 function _rungOf(tool, history) {
   /* 九问专著：走哪一列由**题号**决定（W→What／H→How／Y→Why），不预设 ⇒ 取最近一条带落位的答，
      不筛列。一场只写一题，列不会中途变；筛了反而在第一轮拿不到（那时还不知道是哪一列）。 */
-  if (tool === "book9") return posNext(posFromHistory(history, null));
+  if (tool === "book9") return posNext(posFromHistory(history, null), posSeen(history, null));
   if (!PROBE_TOOLS[tool]) return "";
-  return posNext(posFromHistory(history, PROBE_TOOLS[tool]));
+  const _c = PROBE_TOOLS[tool];
+  return posNext(posFromHistory(history, _c), posSeen(history, _c));
 }
 function wdsToolSys(tool, prof, rung) {
   // 这一档没开的工序，递上来也不认（见 WDS_PROFILES 里那张 tools 表）。
@@ -14042,7 +14077,7 @@ export default {
             /* 走自带序列的工序时，把算好的那一格回给前端挂成钮（三道问对；九问专著在前端自己算）。
                放在追问那一闸之前：两者互斥，这一颗出来了就不该再挂三条脱钩的按钮。 */
             if (outText.length > 150 && !rs && PROBE_TOOLS[tool]) {
-              const _sq = posSeq(tool, outText);
+              const _sq = posSeq(tool, outText, history);
               if (_sq) controller.enqueue(_sseBytes({ t: "seq", v: _sq }));
             }
             if (outText.length > 150 && !rs && !TOOL_SEQ[tool]) {
