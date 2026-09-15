@@ -1,0 +1,44 @@
+# 期刊论文栏目 · 题录数据上 R2（2026-09-16）
+# 数据不进 git：生成端把 journals/ 目录打成 tar.gz，作为 GitHub Release 附件上传；
+# 本工作流按需手动触发，下载附件、解包、同步到 R2 的 journals/ 前缀。
+# 只增不删（不带 --delete）：第二批不会把第一批抹掉。manifest.json 每次整份覆盖。
+name: journals-data
+on:
+  workflow_dispatch:
+    inputs:
+      asset_url:
+        description: "Release 附件的 API 地址（https://api.github.com/repos/.../releases/assets/<id>）"
+        required: true
+concurrency:
+  group: journals-data
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - name: 下载并解包
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -sSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/octet-stream" "${{ inputs.asset_url }}" -o j.tgz
+          mkdir -p out && tar -xzf j.tgz -C out
+          test -f out/journals/manifest.json
+          find out/journals -name '*.json' | wc -l
+      - name: 同步到 R2
+        env:
+          AWS_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: |
+          EP=https://d3ea22f828ce19cf113a457ceba2c930.r2.cloudflarestorage.com
+          B=s3://sdeuniverses-pdf
+          aws configure set default.s3.max_concurrent_requests 32
+          aws configure set default.s3.max_queue_size 10000
+          aws s3 sync out/journals/ "$B/journals/" --endpoint-url "$EP" --exclude manifest.json --content-type "application/json; charset=utf-8" --only-show-errors
+          aws s3 cp out/journals/manifest.json "$B/journals/manifest.json" --endpoint-url "$EP" --content-type "application/json; charset=utf-8"
+          echo done

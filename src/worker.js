@@ -11512,6 +11512,25 @@ export default {
       r.headers.set("cdn-cache-control", "no-store");
       return r;
     }
+    // /journals/data/*：期刊论文栏目的题录数据（2026-09-16）。一刊一年一份 JSON，体量上百 MB，
+    // 不进 git（.git 已 2.4G），写在 R2 的 journals/ 前缀下，由 journals-data.yml 从 Release 附件同步。
+    // R2 先答，落空回落 ASSETS（第一批 124 刊仍在仓库 public/journals/data/ 里，迁移期两边并存）。
+    // 只认 manifest.json 与 <slug>/<年>.json 两种键，其余一律 ASSETS。
+    if ((request.method === "GET" || request.method === "HEAD") && env.PDFS && url.pathname.startsWith("/journals/data/")) {
+      const _jk = "journals/" + decodeURIComponent(url.pathname.slice("/journals/data/".length));
+      if (/^journals\/(?:manifest\.json|[a-z0-9-]+\/20\d\d\.json)$/.test(_jk)) {
+        try {
+          const obj = await env.PDFS.get(_jk);
+          if (obj) {
+            const h = new Headers();
+            h.set("etag", obj.httpEtag);
+            h.set("content-type", "application/json; charset=utf-8");
+            h.set("cache-control", _jk.endsWith("manifest.json") ? "no-cache" : "public, max-age=86400");
+            return new Response(request.method === "HEAD" ? null : obj.body, { status: 200, headers: h });
+          }
+        } catch (e) { /* 落到 ASSETS */ }
+      }
+    }
     // /api/lit/arxiv：文献选优（/taste/lit-picker/）用的 arXiv 代理。
     // export.arxiv.org 的 Atom API 不带 CORS 头，浏览器直连拿不到；OpenAlex 有 CORS，前端直连。
     // 只转 GET、只认 q/max 两个参数、上限 100 条，结果边缘缓存 10 分钟，避免替人扫库。
