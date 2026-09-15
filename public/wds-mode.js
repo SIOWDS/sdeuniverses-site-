@@ -1179,6 +1179,10 @@
       micChanH: "语音输入走哪条", micChanAuto: "自动", micChanWeb: "浏览器听写", micChanLocal: "本机（免费）", micChanGlm: "智谱转写",
       micChanP: "自动＝先试浏览器自带的听写；连不上时，你若已填了智谱 Key 就用智谱转写（最准，约 0.06 元/分钟计在你自己的 Key 上），没填就用本机转写（免费、离线，首次下 80MB）。",
       micSwitchGlm: "浏览器自带的听写在你这边连不上，已改用智谱转写（用你自己那把 Key，约 0.06 元/分钟）。",
+      sesHd: "打开着的场", sesRun: "跑动中", sesNewName: "新的一场", sesClose: "关掉这一场（记录仍在历史里）",
+      sesBg: "后台 {n} 场", sesFull: "同时最多开 6 场——先关掉一场再开新的。",
+      sesRs: "这一趟产线（深度研究／学科通融）是整趟多次请求，还没分场：等它跑完，或先按停止，再开新的一场。",
+      sesKept: "刚才那一场转到后台接着跑；跑完在左边「打开着的场」里点回去。",
       sbNew: "＋ 新对话", sbSearch: "搜索对话", sbNone: "还没有对话记录", sbToday: "今天", sbYest: "昨天",
       sbWeek: "近 7 天", sbMonth: "近 30 天", sbOlder: "更早", sbRename: "重命名", sbDel: "删除",
       sbDelAsk: "删掉这一场对话？", sbRenameAsk: "给这一场改个名字：", sbFold: "收起侧栏", sbUnfold: "展开侧栏",
@@ -1489,6 +1493,10 @@
       micChanH: "Voice input channel", micChanAuto: "Auto", micChanWeb: "Browser dictation", micChanLocal: "On-device (free)", micChanGlm: "Zhipu",
       micChanP: "Auto tries the browser's own dictation first. If it can't connect, it uses Zhipu when you already have a Zhipu key (most accurate, about ¥0.06 a minute on your own key), and on-device transcription when you don't (free and offline, 80MB the first time).",
       micSwitchGlm: "The browser's own dictation can't reach its service from here, so Zhipu transcription is used instead (your own key, about ¥0.06 a minute).",
+      sesHd: "Open chats", sesRun: "running", sesNewName: "New chat", sesClose: "Close this one (the record stays in history)",
+      sesBg: "{n} in background", sesFull: "Six open chats is the limit — close one first.",
+      sesRs: "This run (deep research / cross-field forge) spans many requests and is not split by chat yet: let it finish, or stop it, before opening a new one.",
+      sesKept: "That one keeps running in the background; pick it up again under \u201cOpen chats\u201d on the left.",
       sbNew: "＋ New chat", sbSearch: "Search chats", sbNone: "No saved chats yet", sbToday: "Today", sbYest: "Yesterday",
       sbWeek: "Last 7 days", sbMonth: "Last 30 days", sbOlder: "Older", sbRename: "Rename", sbDel: "Delete",
       sbDelAsk: "Delete this chat?", sbRenameAsk: "Rename this chat:", sbFold: "Collapse sidebar", sbUnfold: "Expand sidebar",
@@ -2179,6 +2187,18 @@
     ".wdsm-fold{margin-left:auto;background:none;border:none;color:var(--wdim);font-size:15px;cursor:pointer;padding:4px 6px;border-radius:6px;line-height:1}" +
     ".wdsm-fold:hover{background:var(--wfill);color:var(--wgold)}" +
     ".wdsm-nc{margin:0 12px 10px;background:var(--wfill);border:1px solid var(--wline2);color:var(--wtx2);font:600 13.5px/1 inherit;padding:11px 13px;border-radius:11px;cursor:pointer;text-align:left}" +
+    ".wdsm-ses{margin:0 12px 12px;display:none}" +
+    ".wdsm-ses.on{display:block}" +
+    ".wdsm-ses .sh{color:var(--wtx2);opacity:.6;font-size:11.5px;letter-spacing:.04em;margin:0 2px 6px}" +
+    ".wdsm-ses .si{display:flex;align-items:center;gap:7px;background:none;border:1px solid transparent;color:var(--wtx2);font:13px/1.5 inherit;padding:7px 8px;border-radius:9px;cursor:pointer}" +
+    ".wdsm-ses .si:hover{background:var(--wfill)}" +
+    ".wdsm-ses .si.cur{border-color:var(--wline2);background:var(--wfill)}" +
+    ".wdsm-ses .si b{font-weight:400;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+    ".wdsm-ses .si i{font-style:normal;font-size:11px;color:var(--wgold)}" +
+    ".wdsm-ses .si em{font-style:normal;font-size:11px;color:var(--wtx2);opacity:.55}" +
+    ".wdsm-ses .si .x{font-size:13px;color:var(--wtx2);opacity:.5;padding:0 3px;cursor:pointer}" +
+    ".wdsm-ses .si .x:hover{opacity:1;color:var(--wgold)}" +
+    ".wdsm-sesbtn.run{color:var(--wgold);border-color:var(--wgold)}" +
     ".wdsm-nc:hover{border-color:var(--wgold);color:var(--wgold)}" +
     ".wdsm-schwrap{padding:0 12px 8px}" +
     ".wdsm-sch{width:100%;box-sizing:border-box;background:var(--wfill);border:1px solid var(--wline);border-radius:9px;padding:8px 10px;color:var(--wtx);font:13px/1.4 inherit;outline:none}" +
@@ -2559,6 +2579,7 @@
     "<div class='wdsm-side'>" +
       "<div class='wdsm-sbrand'><a href='" + PAGE_URL + "'>" + esc(BRAND) + "</a><button class='wdsm-fold'>\u00ab</button></div>" +
       "<button class='wdsm-nc'></button>" +
+      "<div class='wdsm-ses'></div>" +
       "<div class='wdsm-pjwrap'><button class='wdsm-pj'></button></div>" +
       "<div class='wdsm-schwrap'><input class='wdsm-sch' type='text'></div>" +
       "<div class='wdsm-list'></div>" +
@@ -2591,6 +2612,7 @@
         "<button class='wdsm-tbtn wdsm-membtn'><span class='mb'></span><i class='wdsm-mbadge' style='display:none'></i></button>" +
         "<button class='wdsm-tbtn wdsm-keybtn'></button>" +
         "<button class='wdsm-tbtn wdsm-morebtn'>\u22ef<i class='wdsm-mbadge' style='display:none'></i></button>" +
+        "<button class='wdsm-tbtn wdsm-sesbtn' style='display:none'></button>" +
         "<button class='wdsm-newbtn'></button>" +
       "</div>" +
       "<div class='wdsm-body empty'>" +
@@ -3797,6 +3819,13 @@
     sc.onload = go; sc.onerror = function () { stApi = false; };
     document.head.appendChild(sc);
   }
+  /* 后台那一场收尾时，全局 stSess 早已是别场的了——所以存盘要认**它自己那一个** session。 */
+  function sesSave(s, hh, ss) {
+    ss = ss || (s ? s.sess : stSess);
+    if (ss && hh && hh.length) { try { ss.save(hh); } catch (e) {} }
+    if (!s || s === sesCur()) { sbSoon(); if (MEM && MEM.state.ready) setTimeout(function () { MEM.refresh(memBadge); }, 900); }
+    else sesPaint();
+  }
   function stSave(h) {
     if (stSess && h && h.length) { stSess.save(h); sbSoon(); }
     if (MEM && MEM.state.ready) setTimeout(function () { MEM.refresh(memBadge); }, 900);   // 本场变长了＝多一场待更新
@@ -3853,15 +3882,176 @@
     try { localStorage.setItem(LS_LANG, LANG); } catch (e) {}
     applyLang();
   };
-  layer.querySelector(".wdsm-newbtn").onclick = function () {
+  /* ══════════════ 多场并行（2026-09-15 王德生令） ══════════════
+     「新的对话和没有完成的对话互相独立，即可以并行进行对话」。
+     旧版「＋新对话」是**就地清空**：history 清、DOM 抹掉、stSess.reset()。可那条还在跑的流
+     并没有被停下——它照旧往已经被抹掉的节点里写字，收尾时把答案 push 进**新的** history、
+     存进**新的** session。于是老场的答案落到新场名下，两场一起废。
+     现在改成「场」：一场自带 history / DOM / 附件 / 本机记录 / 账本 / 队列。前台只挂一场，
+     其余的收在后台接着跑，跑完落回它自己那一份，前台一个字都不动。
+     ⚠ 只覆盖普通问答这条流。深度研究与学科通融是整趟几十次请求的产线（RS.*），还没分场，
+        跑着的时候不开新场——当面说清楚，不静默吞掉。 */
+  var SES = [], SESi = -1, SES_CAP = 6;
+  function sesCur() { return SESi >= 0 ? SES[SESi] : null; }
+  function sesMake() {
+    return { id: "s" + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36),
+             hist: [], sess: null, atts: [], vers: [], queue: [], qPaused: false,
+             comp: { text: "", upto: 0, turns: 0 }, raz: { text: "", turn: 0 }, tool: "",
+             streaming: false, reader: null, stopReq: false, needComp: false, dom: null, scroll: 0 };
+  }
+  /* 头一次用到「场」时，把眼下这一场（可能已经聊了几轮）原样收成 0 号——不新开、不清空。 */
+  function sesHere() {
+    if (SESi < 0) { SES.push(sesMake()); SESi = 0; sesSync(); }
+    return SES[SESi];
+  }
+  /* 把全局状态写回当前这一场（不搬 DOM）。凡是换掉 history / stSess 的地方都要调一次，
+     否则场里记的还是上一份引用，切回来就成了别人的对话。 */
+  function sesSync() {
+    var s = SESi >= 0 ? SES[SESi] : null; if (!s) return null;
+    s.hist = history; s.sess = stSess; s.atts = atts; s.vers = VERS; s.queue = QUEUE; s.qPaused = qPaused;
+    s.tool = curTool; s.streaming = streaming; s.reader = curReader;
+    s.comp = { text: COMP.text, upto: COMP.upto, turns: COMP.turns };
+    s.raz = { text: RAZ.text, turn: RAZ.turn };
+    return s;
+  }
+  /* 收进后台：状态写回 ＋ DOM 整段摘走。节点是**搬走**不是抹掉，所以后台那条流
+     手里攥着的 cell.a 仍然活着，照写不误；切回来再整段搬回去。 */
+  function sesPark() {
+    var s = sesSync(); if (!s) return null;
+    if (!s.dom) s.dom = el("div");
+    try { s.scroll = bodyEl.scrollTop || 0; } catch (e) {}
+    /* 一个个**摘下来再挂过去**：靠 appendChild 的隐式搬移是能跑，但摘不干净时就是死循环
+       （护栏的 DOM 桩当场把这一处捅穿了）。显式 removeChild 在哪儿都对。 */
+    while (msgsEl.firstChild) { var _nd = msgsEl.firstChild; msgsEl.removeChild(_nd); s.dom.appendChild(_nd); }
+    return s;
+  }
+  function sesTitle(s) {
+    var hh = s ? s.hist : null;
+    for (var i = 0; hh && i < hh.length; i++) if (hh[i] && hh[i].role === "reader" && hh[i].text) return String(hh[i].text).slice(0, 22);
+    return t("sesNewName");
+  }
+  function sesTurns(s) { var n = 0, hh = (s && s.hist) || []; for (var i = 0; i < hh.length; i++) if (hh[i].role === "reader") n++; return n; }
+  function sesShow(i) {
+    var s = SES[i]; if (!s || i === SESi) return;
+    sesPark();
+    SESi = i;
+    history = s.hist; stSess = s.sess; atts = s.atts; VERS = s.vers; QUEUE = s.queue; qPaused = s.qPaused;
+    streaming = !!s.streaming; curReader = s.reader || null; stoppedByUser = false;
+    COMP.text = s.comp.text; COMP.upto = s.comp.upto; COMP.turns = s.comp.turns; COMP.busy = false;
+    RAZ.text = s.raz.text; RAZ.turn = s.raz.turn;
+    msgsEl.innerHTML = "";
+    if (s.dom) while (s.dom.firstChild) { var _nd2 = s.dom.firstChild; s.dom.removeChild(_nd2); msgsEl.appendChild(_nd2); }
+    var has = !!(msgsEl.children && msgsEl.children.length);
+    msgsEl.style.display = has ? "" : "none";
+    if (has) bodyEl.classList.remove("empty"); else bodyEl.classList.add("empty");
+    var hero = layer.querySelector(".wdsm-hero"); if (hero) hero.style.display = has ? "none" : "";
+    try { cvReset(); } catch (e) {}                 // 画布属于一场对话，不跟着换场走（与旧版「新对话即清画布」同一口径）
+    try { toolSet(s.tool || ""); } catch (e) {}
+    try { paintAtts(); } catch (e) {}
+    try { compPaint(); qPaint(); } catch (e) {}
+    busyUI(streaming); stopBarShow(streaming);
+    inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph");
+    updTurns();
+    if (s.needComp) { s.needComp = false; try { compTick(); } catch (e) {} }   // 后台跑完时没压的账，回到前台补压
+    sesPaint(); sbRender();
+    try { bodyEl.scrollTop = s.scroll || bodyEl.scrollHeight; } catch (e) {}
+  }
+  function sesStop(i) {
+    var s = SES[i]; if (!s || !s.streaming) return;
+    s.stopReq = true;
+    if (i === SESi) { doStop(); return; }
+    try { if (s.reader) s.reader.cancel(); } catch (e) {}
+  }
+  function sesClose(i) {
+    var s = SES[i]; if (!s) return;
+    if (s.streaming) sesStop(i);
+    if (i === SESi) {
+      var j = i > 0 ? i - 1 : (SES.length > 1 ? 1 : -1);
+      if (j < 0) { SES.splice(i, 1); SESi = -1; sesBlank(); return; }   // 只剩这一场：退回「就地重开」
+      sesShow(j); i = SES.indexOf(s);
+    }
+    if (i >= 0) { SES.splice(i, 1); if (SESi > i) SESi--; }
+    sesPaint();
+  }
+  function sesPaint() {
+    var box = layer.querySelector(".wdsm-ses");
+    if (box) {
+      box.innerHTML = "";
+      if (SES.length < 2) box.classList.remove("on");
+      else {
+        box.classList.add("on");
+        box.appendChild(el("div", "sh", t("sesHd")));
+        SES.forEach(function (s, i) {
+          var it = el("div", "si" + (i === SESi ? " cur" : ""));
+          it.appendChild(el("b", null, sesTitle(s)));
+          it.appendChild(s.streaming ? el("i", null, "\u25cf " + t("sesRun"))
+                                     : el("em", null, sesTurns(s) + t("sbTurnsN")));
+          var x = el("span", "x", "\u00d7"); x.title = t("sesClose");
+          x.onclick = function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); sesClose(i); };
+          it.appendChild(x);
+          it.onclick = function () { sesShow(i); drawer(false); };
+          box.appendChild(it);
+        });
+      }
+    }
+    var btn = layer.querySelector(".wdsm-sesbtn");
+    if (!btn) return;
+    var other = 0, run = 0;
+    SES.forEach(function (s, i) { if (i !== SESi) { other++; if (s.streaming) run++; } });
+    if (!other) { btn.style.display = "none"; btn.classList.remove("run"); return; }
+    btn.style.display = "";
+    btn.textContent = (run ? "\u25d0 " : "\u2637 ") + tx("sesBg", { n: other });
+    btn.title = t("sesHd");
+    if (run) btn.classList.add("run"); else btn.classList.remove("run");
+    btn.onclick = function () {
+      menuAt(btn, function (menu) {
+        menu.appendChild(el("div", "mh", t("sesHd")));
+        SES.forEach(function (s, i) {
+          var b = el("button");
+          b.appendChild(document.createTextNode((i === SESi ? "\u2713 " : "") + sesTitle(s)));
+          b.appendChild(el("span", "sub", s.streaming ? ("\u25cf " + t("sesRun")) : (sesTurns(s) + t("sbTurnsN"))));
+          b.onclick = function () { closeMenu(); sesShow(i); };
+          menu.appendChild(b);
+        });
+      });
+    };
+  }
+  /* 就地重开（老行为）：这一场没在跑时不攒空场，省得侧栏堆一排白纸。 */
+  function sesBlank() {
     try { memAutoRun(); } catch (e) {}          // 开新的之前，先把刚谈完这一场炼进记忆（只在自动档开着时）
     history = []; compReset(); cvReset(); if (stSess) stSess.reset(); msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
     atts = []; paintAtts();                          // 附件跟着这一场，新开一场就该清干净
     inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph"); updTurns();   // dayLeft 不复位：今日额度按本机计
     layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = ""; inEl.focus();
-    VERS = []; sbRender();
+    VERS = []; sesSync(); sbRender(); sesPaint();
     try { topSet(false); topLastY = 0; } catch (e) {}   // 清空后不再有滚动事件，顶栏得自己回来
-  };
+  }
+  /* ＋新对话：跑着的那一场收进后台，前台开一张白纸；没在跑就照旧就地重开。 */
+  function sesOpenNew() {
+    sesHere();
+    if (RS && RS.running) { toast(t("sesRs")); return; }
+    if (!streaming) { sesBlank(); return; }
+    if (SES.length >= SES_CAP) { toast(t("sesFull")); return; }
+    sesPark();
+    var n = sesMake(); SES.push(n); SESi = SES.length - 1;
+    history = n.hist; atts = n.atts; VERS = n.vers; QUEUE = n.queue; qPaused = false;
+    streaming = false; curReader = null; stoppedByUser = false;
+    COMP.text = ""; COMP.upto = 0; COMP.turns = 0; COMP.busy = false; compPaint();
+    RAZ.text = ""; RAZ.turn = 0;
+    /* 新场＝本机记录里新的一条。这里**绝不能**用 stSess.reset()：那个对象是后台那一场的，
+       一 reset 就把它的落点挪到新 id 上，后台跑完的答案会写进新场的记录里。 */
+    stSess = null; try { stMakeSession(); } catch (e) {}
+    n.sess = stSess;
+    msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
+    try { cvReset(); } catch (e) {}
+    paintAtts(); qPaint(); busyUI(false); stopBarShow(false);
+    layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = "";
+    inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph"); inEl.focus();
+    updTurns(); sesPaint(); sbRender();
+    try { toast(t("sesKept")); } catch (e) {}
+    try { topSet(false); topLastY = 0; } catch (e) {}
+  }
+  layer.querySelector(".wdsm-newbtn").onclick = function () { sesOpenNew(); };
 
   // —— 注入导航切换按钮 ——
   function injectNav() {
@@ -3920,6 +4110,7 @@
     if (stSess) stSess.adopt(rec);
     VERS = [];                                  // 换了一场，上一场的版本堆作废
     inEl.disabled = false; sendEl.disabled = false; updTurns(); sbRender();
+    sesSync(); sesPaint();                      // history 是新数组、session 已改指——这一场里记的那两个引用得跟上
     bodyEl.scrollTop = bodyEl.scrollHeight;
   }
 
@@ -5354,9 +5545,16 @@
     _keepVers = false;
     var cell = addTurn(q);
     cell.a.innerHTML = "<span class='cur'>▊</span>";
+    /* ⭐ 多场并行：这一轮**认死发问时的那一场**。中途开了新场，全局 history/stSess 会换成
+       新场那一份；下面这三个引用是当场扣下来的，后台这条流收尾时仍落回它自己那一场。 */
+    var SL = sesHere(), H = history, SS = stSess;
+    function fgSL() { return !SL || SL === sesCur(); }
+    function stopMine() { return fgSL() ? stoppedByUser : !!(SL && SL.stopReq); }
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     if (_razNew) razBadge(cell, _razNew);
     streaming = true; stoppedByUser = false;
+    if (SL) { SL.streaming = true; SL.stopReq = false; SL.hist = H; SL.sess = SS; }
+    sesPaint();
     gradeClose();                                   // 发问即收难度条
     busyUI(true);
     stopBarShow(true); tipDeckHide(false);
@@ -5381,6 +5579,7 @@
       tag.style.cssText = "text-align:right;color:#6f8f8f;font-size:12px;margin:-8px 0 12px";
       cell.turn.insertBefore(tag, cell.a);
     }
+    var RZT = RAZ.text;                                  // 本轮的底册：后台收尾时全局 RAZ 已经是别场的了
     var answer = "", srcDone = false, thinkTxt = "", lastPaint = 0, errShown = false;
     var pendSite = null, pendWeb = null;                 // 来源先收着，等正文写完再渲染
     var cashId = "";                                     // 这一答在出处账本里的那一笔（服务端随流下发）
@@ -5420,7 +5619,7 @@
       if (_html !== lastHTML) {
         lastHTML = _html;
         cell.a.innerHTML = _html;
-        if (stick) scrollBottom();
+        if (stick && fgSL()) scrollBottom();
       }
     }
     /* 诊断行**贴进 .wdsm-a**（不是 cell.turn）：只有写在正文里，导出 PDF 才带得走。
@@ -5435,18 +5634,22 @@
       cell.a.appendChild(d);
     }
     function endUI() {
-      streaming = false; curReader = null;
-      busyUI(false);
-      stopBarShow(false);
-      if (stoppedByUser && answer) noteLine(cell, t("stopped"));
-      if (answer) setTimeout(tipDeckShow, 600);           // 答完才提示，别在半路上打断阅读
+      /* 这一场先结自己的账（无论前台后台），界面只有前台那一场才动——
+         后台收尾时若照旧 streaming=false、busyUI(false)，等于替**正在写字的前台**收工。 */
+      if (SL) { SL.streaming = false; SL.reader = null; }
+      var _fg = fgSL();
+      if (_fg) { streaming = false; curReader = null; busyUI(false); stopBarShow(false); }
+      if (stopMine() && answer) noteLine(cell, t("stopped"));
+      if (answer && _fg) setTimeout(tipDeckShow, 600);    // 答完才提示，别在半路上打断阅读
       if (cell.thinkL && thinkTxt) cell.thinkL.textContent = t("thought") + thinkTxt.length + t("chars");
       // 等待行等完就该走。原来只有 mountActs()（有正文时才调）摘它，
       // 于是空答那一轮它永远留在页面上写着「正在想…」，读者只能理解为"卡住了"。
       if (cell.wait && cell.wait.parentNode) { cell.wait.parentNode.removeChild(cell.wait); cell.wait = null; }
       flushSrcs();                                        // 出错/中途停下时也把收着的来源补上
+      if (!_fg) { sesPaint(); return; }                   // 后台这一场：界面归前台，只把场列表上的 ● 熄掉
       updTurns();
       if (stick) scrollBottom();
+      sesPaint();
     }
 
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(payload)) })
@@ -5466,29 +5669,30 @@
             if (_preg && _preg.body != null) answer = _preg.body;   // 预注册卡也剥出正文（同交账，不进历史/成文/PDF）
             cell.a.innerHTML = mdRender(answer);
             typeset(cell.a);              // 公式在这里排一次（流式期间不排，见 paint 里那段闪屏注释）
-            if (stoppedByUser) { var n = el("div", null, t("stopped")); n.style.cssText = "color:#6b7684;font-size:12px;margin-top:8px"; cell.a.appendChild(n); }
+            if (stopMine()) { var n = el("div", null, t("stopped")); n.style.cssText = "color:#6b7684;font-size:12px;margin-top:8px"; cell.a.appendChild(n); }
             /* ⭐ 工序交付审计：缺件就在这里如实标出来。放在 flushSrcs 之前——
                它属于正文的读数，不属于文献区；也必须在 mountActs 之前，
                否则它会被挂到操作按钮下面，读者以为是页脚。 */
-            if (toolSpec && !stoppedByUser) toolAuditRender(cell, answer, toolSpec);
+            if (toolSpec && !stopMine()) toolAuditRender(cell, answer, toolSpec);
             // 三角互消这一道另加两把程序尺子（环三·评估）：交付件数不出「三段是不是真独立」。
-            if (toolSpec && toolSpec.k === "three" && !stoppedByUser) { try { triEchoRender(cell, answer); } catch (e) {} }
+            if (toolSpec && toolSpec.k === "three" && !stopMine()) { try { triEchoRender(cell, answer); } catch (e) {} }
             flushSrcs();                                  // 先正文，后文献
-            history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer); renderSeq(cell, answer, seqV);
+            H.push({ role: "wds", text: answer }); sesSave(SL, H, SS); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RZT)); mountActs(cell, answer); renderSeq(cell, answer, seqV);
             if (_led) ledgerRender(cell, _led, answer);      // 记分牌挂在正文之外，不进导出稿
             if (_preg && !_preg.empty) pregRender(cell, _preg);   // 预注册卡→判断账（正文之外）
-            cvTake(answer);                                 // 先看是不是「就地改」的回稿（收成下一版），否则扫围栏块
-            compTick();                                     // 够长了就把更早的压成账本
+            if (fgSL()) cvTake(answer);                     // 先看是不是「就地改」的回稿（收成下一版），否则扫围栏块（画布只归前台）
+            if (fgSL()) compTick();                         // 够长了就把更早的压成账本
+            else if (SL) SL.needComp = true;                // 后台这一场回到前台时再补压（compTick 只认全局 history）
           } else if (timedOut) {
             cell.a.className = "wdsm-a plain wdsm-err";
             cell.a.textContent = t("errDead");
             emptyDiag();
-          } else if (stoppedByUser) {
+          } else if (stopMine()) {
             cell.a.className = "wdsm-a plain"; cell.a.textContent = t("stoppedOnly");
           } else if (!errShown) {
             /* 【被掐断且零正文：自动重问一次】判据必须是 !sawDone —— 收到过 [DONE]
                说明服务端把话说完了（那是"只思考没写字"，重问一遍多半还是那样，不自动重来）。 */
-            if (!sawDone && !stoppedByUser && Date.now() - _cutRetryAt > 60000) {
+            if (!sawDone && !stopMine() && fgSL() && Date.now() - _cutRetryAt > 60000) {
               _cutRetryAt = Date.now();
               cell.a.className = "wdsm-a plain";
               cell.a.textContent = t("errCutAuto");
@@ -11360,7 +11564,9 @@
         };
         it.appendChild(rn); it.appendChild(dl); it.appendChild(rm);
         it.onclick = function () {
-          if (streaming) return;
+          /* 旧版这里是 `if (streaming) return;`——正在答就一声不吭地不给点，读者只当侧栏坏了。
+             现在：把跑着的那一场收进后台，历史在新开的一场里打开，两边互不相干。 */
+          if (streaming) { if (RS && RS.running) { toast(t("sesRs")); return; } sesOpenNew(); }
           stApi.get(m.id).then(function (r) { if (r) { stRestore(r); drawer(false); } });
         };
         sbListEl.appendChild(it);

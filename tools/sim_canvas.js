@@ -538,7 +538,8 @@ sec("⑤ 刷新留存与换场清空");
 /* ══ ⑥ 接线（能区分「调用了」和「被注释掉了」）══ */
 sec("⑥ 接线");
 {
-  ok(/^ {12}cvTake\(answer\);/m.test(SRC), "定稿处没有调用 cvTake（或被注释掉了）");
+  // 2026-09-15 多场并行：画布只归前台那一场（后台收版会把别人的稿收进当前画布）
+  ok(/^ {12}if \(fgSL\(\)\) cvTake\(answer\);/m.test(SRC), "定稿处没有调用 cvTake（或被注释掉了）");
   ok(!/^ {12}cvScan\(answer\);/m.test(SRC), "定稿处还留着旧的 cvScan(answer)");
   ok(/if \(CV\.want && q\.indexOf\(CV\.want\.pre\) < 0\) CV\.want = null;/.test(SRC),
     "send() 里没有放弃过期的改写意图（读者改问别的，回稿仍会被塞成新版本）");

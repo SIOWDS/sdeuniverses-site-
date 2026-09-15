@@ -433,7 +433,9 @@ ROUTE["/api/wds/chat"] = [
   T("stopGen 一定置 stoppedByUser（否则「停下」会被当成「出错」）", /function stopGen\(\)[\s\S]{0,160}stoppedByUser = true/.test(wm));
   T("开始流式就显示、收尾就隐藏", /stopBarShow\(true\)/.test(wm) && /stopBarShow\(false\)/.test(wm));
   T("与「回到最新」同一位置时不叠在一起", /wdsm-tobot"\);\s*if \(tb\) tb\.style\.display = "none"/.test(wm));
-  T("停下之后说一句「已停下，写出来的留着了」", /stopped: "已停下/.test(wm) && /stoppedByUser && answer\) noteLine/.test(wm));
+  // 2026-09-15 多场并行：这一轮「是不是读者停的」改认**本场**的（后台那一场看 SL.stopReq，前台仍看 stoppedByUser）
+  T("停下之后说一句「已停下，写出来的留着了」", /stopped: "已停下/.test(wm) && /stopMine\(\) && answer\) noteLine/.test(wm));
+  T("停止判据按场分（后台那一场不看前台的 stoppedByUser）", /function stopMine\(\) \{ return fgSL\(\) \? stoppedByUser : !!\(SL && SL\.stopReq\); \}/.test(wm));
   T("成文那条流也有停止键（原来只有关闭）", /wdsm-tbtn dstop/.test(wm) && /dStopped = true/.test(wm));
   T("成文停下同样保住已写的稿", /dStopped && text\) dNote\(t\("stopped"\)\)/.test(wm));
   T("写完就把停止键撤掉", /stBtn\.parentNode\.removeChild\(stBtn\)/.test(wm));

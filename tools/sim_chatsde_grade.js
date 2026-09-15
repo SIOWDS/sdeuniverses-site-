@@ -205,7 +205,7 @@ ok("难度条挂在深度思考那颗钮旁边（自动＋1–5）", /data-k='de
 ok("标准档或没展开时整条不显示（动态隐藏）", /if \(thinkMode !== "deep" \|\| !gradeOpen\) \{ gradeEl\.style\.display = "none"; return; \}/.test(FE));
 ok("深度思考钮上露当前档（折叠摘要 toolsSum 读的就是它）", /deepBtn\.textContent = t\("mDeep"\) \+ \(thinkMode === "deep" \? gradeSuffix\(\) : ""\);/.test(FE));
 ok("已在深度档再点一次＝展开/收起；切进深度档时展开一次", /else if \(k === "deep" && thinkMode === "deep"\) \{ gradeOpen = !gradeOpen; \}/.test(FE) && /gradeOpen = \(k === "deep"\);/.test(FE));
-ok("选完即收、发问即收、点到别处也收", /gradeOpen = false;\s*\/\/ 选完就收/.test(FE) && /streaming = true; stoppedByUser = false;\s*gradeClose\(\);/.test(FE) && /document\.addEventListener\("click", function \(e\) \{\s*if \(!gradeOpen\) return;/.test(FE));
+ok("选完即收、发问即收、点到别处也收", /gradeOpen = false;\s*\/\/ 选完就收/.test(FE) && /streaming = true; stoppedByUser = false;[\s\S]{0,240}gradeClose\(\);/.test(FE) && /document\.addEventListener\("click", function \(e\) \{\s*if \(!gradeOpen\) return;/.test(FE));
 ok("tipDeep 说明了「再点一次展开」", /再点一次「深度思考」展开 1–5/.test(FE) && /Click Deep again to unfold/.test(FE));
 ok("档位一变就重画难度条", /paintGrade\(\);\s*\/\/ 难度条只在深度档露面\s*toolsPaint\(\);/.test(FE));
 ok("点数字钉死、点自动回 0，都落 localStorage", /gradePin = \(g >= 1 && g <= 5\) \? g : 0;\s*try \{ localStorage\.setItem\(LS_GRADE, String\(gradePin\)\); \} catch \(e\) \{\}/.test(FE));

@@ -223,10 +223,12 @@ const FILES = Object.assign({
   /* ═══ 七、客户端：断流零正文自动重问一次 ═══ */
   console.log("\n七、客户端 wds-mode.js");
   const CLI = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");
+  // 2026-09-15 多场并行：判据多了两件——停止认本场（stopMine），且只有前台那一场自动重问
   ok("自动重问只在 !sawDone（没收到收尾标记）时触发",
-    /if \(!sawDone && !stoppedByUser && Date\.now\(\) - _cutRetryAt > 60000\)/.test(CLI));
+    /if \(!sawDone && !stopMine\(\) && fgSL\(\) && Date\.now\(\) - _cutRetryAt > 60000\)/.test(CLI));
   ok("60 秒内只自动重问一次", /var _cutRetryAt = 0;/.test(CLI) && /_cutRetryAt = Date\.now\(\);/.test(CLI));
-  ok("读者按了停止就不自动重问", /!stoppedByUser && Date\.now\(\) - _cutRetryAt/.test(CLI));
+  ok("读者按了停止就不自动重问", /!stopMine\(\) && fgSL\(\) && Date\.now\(\) - _cutRetryAt/.test(CLI));
+  ok("后台那一场不自动重问（regen 会按前台的场发出去）", /&& fgSL\(\) && Date\.now\(\) - _cutRetryAt/.test(CLI));
   ok("中英两份都有 errCutAuto 文案", (CLI.match(/errCutAuto:/g) || []).length === 2);
 
   console.log("\n──────── " + pass + " passed, " + fail + " failed ────────");

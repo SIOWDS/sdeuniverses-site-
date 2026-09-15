@@ -164,7 +164,7 @@ ok("审计贴进 .wdsm-a（写在正文里，导出 PDF 才带得走）", /cell\
    扫整份源码就是自伤（本仓同型坑第四次）。只剥块注释，够用且不会误伤字符串里的 // 。 */
 const F_CODE = F.replace(/\/\*[\s\S]*?\*\//g, "");
 ok("前端不留规格副本（唯一来源在服务端）", !/TOOL_SPEC/.test(F_CODE));
-ok("停下来的那一轮不判缺件（它本来就没写完）", /if \(toolSpec && !stoppedByUser\)/.test(F));
+ok("停下来的那一轮不判缺件（它本来就没写完）", /if \(toolSpec && !stopMine\(\)\)/.test(F));
 
 console.log("\n" + (FAIL ? "✗ " : "✓ ") + PASS + " PASS / " + FAIL + " FAIL\n");
 process.exit(FAIL ? 1 : 0);
