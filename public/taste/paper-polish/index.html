@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>论文打磨与投稿 · Polish & Submit | SDE Universes</title>
+<meta name="description" content="上传论文 → 独立盲评 → 按评分卡打磨（保留原稿结构）→ 复评 → 出稿检查 → 一键投进学员收件箱。">
+<style>
+:root{--gold:#C9A84C;--gold2:#E4CB7E;--ink:#F0E9D8;--ink2:#B8AE96;--mute:#7E755F;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--ok:#7FB77E;--err:#D98B7A;--warn:#E0B062}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.85}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .w{max-width:880px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
+.hero{max-width:760px;margin:0 auto;padding:56px 24px 6px;text-align:center}
+.hero .eyebrow{font-size:11px;letter-spacing:0.42em;color:var(--gold);margin-bottom:16px}
+.hero h1{font-size:clamp(28px,5vw,40px);font-weight:800;line-height:1.2;margin-bottom:16px;color:#F5EFE0}
+.hero .lead{font-size:15px;color:var(--ink2);max-width:600px;margin:0 auto}
+.flow{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:22px auto 0;max-width:760px;padding:0 24px}
+.flow span{font-size:12.5px;border:1px solid var(--line);border-radius:20px;padding:4px 12px;color:var(--ink2)}
+.flow span.on{border-color:var(--gold);color:var(--gold)}
+.flow span.done{background:rgba(201,168,76,0.14);color:#F5E6BF;border-color:rgba(201,168,76,0.5)}
+.wrap{max-width:880px;margin:0 auto;padding:10px 24px 90px}
+.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:26px 24px;margin-top:24px}
+.card h2{font-size:17px;color:var(--gold);letter-spacing:0.06em;margin-bottom:6px}
+.card .sub{font-size:13px;color:var(--ink2);margin-bottom:16px}
+label.l{display:block;font-size:12.5px;letter-spacing:0.12em;color:var(--gold);margin:14px 0 7px}
+input[type=text],input[type=password],textarea,select{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:9px;color:var(--ink);font-family:inherit;font-size:14.5px;padding:10px 12px;line-height:1.7}
+input:focus,textarea:focus,select:focus{outline:none;border-color:rgba(201,168,76,0.65)}
+textarea{resize:vertical}
+#src{min-height:200px;font-size:13.5px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1;min-width:160px}
+.btn{display:inline-block;background:var(--gold);color:#1A1410;border:none;border-radius:9px;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:0.05em;padding:11px 20px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--gold);border:1px solid rgba(201,168,76,0.55)}
+.btn:disabled{opacity:0.45;cursor:not-allowed}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.file-btn{display:inline-block;border:1px dashed rgba(201,168,76,0.55);color:var(--gold);border-radius:9px;padding:10px 16px;cursor:pointer;font-size:14px;flex:0 0 auto}
+#file{display:none}
+.stat{margin-top:12px;font-size:13.5px;color:var(--ink2);min-height:1.2em;white-space:pre-wrap}
+.stat.ok{color:var(--ok)}.stat.err{color:var(--err)}.stat.warn{color:var(--warn)}
+.live{margin-top:12px;max-height:340px;overflow:auto;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:9px;padding:12px 14px;font-size:13px;white-space:pre-wrap;display:none}
+.live.show{display:block}
+.bar{height:5px;background:rgba(255,255,255,0.07);border-radius:5px;margin-top:10px;overflow:hidden;display:none}
+.bar.show{display:block}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .3s}
+.score{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:2px solid var(--gold);padding-bottom:8px;margin:14px 0 10px}
+.score b{font-size:34px;line-height:1}
+.score .lv{font-size:13px;color:var(--ink2)}
+.dim{display:grid;grid-template-columns:130px 48px 1fr;gap:4px 10px;font-size:13px;margin:5px 0}
+.dim .n{color:var(--ink2)}
+.dim .w{color:var(--mute);font-size:12px}
+.meter{height:5px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;align-self:center}
+.meter i{display:block;height:100%}
+.list{font-size:13px;color:var(--ink2);margin-top:8px}
+.list div{margin:4px 0;padding-left:14px;text-indent:-14px}
+.list h4{color:var(--gold2);font-size:13px;margin-top:10px;font-weight:600}
+.cmp{font-size:14px;margin-top:8px}
+.checks div{font-size:13.5px;margin:4px 0}
+.hide{display:none!important}
+.note{font-size:12.5px;color:var(--mute);margin-top:12px;line-height:1.8}
+.pill{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:14px;padding:1px 9px;margin-left:6px;color:var(--ink2)}
+footer{border-top:1px solid var(--line);margin-top:30px;padding:26px 24px;text-align:center;color:#6B6250;font-size:13px}
+footer a{color:var(--gold);text-decoration:none}
+@media (max-width:560px){.dim{grid-template-columns:110px 40px 1fr}.card{padding:20px 16px}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.12.3/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.2/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+</head>
+<body>
+<nav><div class="w">
+  <a href="/browse/">SDE Universes</a>
+  <div class="row" style="flex:0 0 auto;gap:16px">
+    <a href="/taste/">品尝系列</a><a href="/students/">学员专栏</a><a href="/students/submit/">直接投稿</a>
+  </div>
+</div></nav>
+
+<header class="hero">
+  <div class="eyebrow">PAPER POLISH · SUBMIT</div>
+  <h1>论文打磨与投稿</h1>
+  <p class="lead">把写好的论文交进来：先做一次独立盲评，拿评分卡当作业单逐份打磨，再复评、做出稿检查，最后一键投进学员收件箱。<b style="color:#F5E6BF">录取线 140</b>，达线的稿件由编辑部审读后署名发表。</p>
+</header>
+<div class="flow" id="flow">
+  <span data-s="1">① 交稿</span><span data-s="2">② 盲评</span><span data-s="3">③ 打磨</span><span data-s="4">④ 复评</span><span data-s="5">⑤ 出稿检查</span><span data-s="6">⑥ 投稿</span>
+</div>
+
+<main class="wrap">
+
+<section class="card">
+  <h2>基底</h2>
+  <div class="sub">默认用站上的系统额度；额度用完或想跑自己的账户，就填自己的 Key。Key 只存在你这台浏览器里，服务端只在内存中转发，不记录。</div>
+  <div class="row">
+    <select id="keyMode"><option value="sys">系统额度</option><option value="own">自带 Key</option></select>
+    <select id="vendor"><option value="ds">DeepSeek</option><option value="glm">智谱 GLM</option></select>
+    <input type="password" id="userKey" class="hide" placeholder="你的 API Key" autocomplete="off">
+  </div>
+</section>
+
+<section class="card">
+  <h2>① 交稿</h2>
+  <div class="sub">支持 .docx / .md / .txt，也可以直接粘贴。建议全文不超过十万字。</div>
+  <div class="row">
+    <label class="file-btn" for="file">选择文件</label>
+    <input type="file" id="file" accept=".docx,.md,.markdown,.txt">
+    <span id="fname" style="font-size:13px;color:var(--ink2);flex:1">尚未选择文件</span>
+  </div>
+  <label class="l">论文题目</label>
+  <input type="text" id="title" maxlength="200" placeholder="读入文件后自动取第一行，可改">
+  <label class="l">正文 <span class="pill" id="srcLen">0 字</span></label>
+  <textarea id="src" placeholder="把论文全文粘贴在这里，或在上面选择文件"></textarea>
+  <div class="btns"><button class="btn" id="bIq">② 开始盲评</button><button class="btn ghost" id="bSkip">跳过盲评，直接打磨</button></div>
+  <div class="stat" id="s1"></div>
+</section>
+
+<section class="card hide" id="cIq">
+  <h2>② 盲评 <span class="pill">原稿</span></h2>
+  <div class="sub">五维独立打分，综合分由页面按固定权重计算。评分卡会作为下一步打磨的作业单。</div>
+  <div class="stat" id="s2"></div>
+  <div id="card1"></div>
+  <div class="btns hide" id="afterIq"><button class="btn" id="bPolish">③ 按评分卡打磨</button><button class="btn ghost" id="bGoSubmit1">原稿已达线，直接去投稿</button></div>
+</section>
+
+<section class="card hide" id="cPol">
+  <h2>③ 打磨 <span class="pill" id="segInfo"></span></h2>
+  <div class="sub">按原稿自己的章节切成几份逐份修改：题目、章节结构与已经写对的段落保留，只清评分卡上的账。每份约一两分钟，请勿关闭页面。</div>
+  <div class="bar" id="pbar"><i id="pfill"></i></div>
+  <div class="stat" id="s3"></div>
+  <div class="live" id="live"></div>
+  <div class="btns hide" id="afterPol">
+    <button class="btn" id="bIq2">④ 复评打磨稿</button>
+    <button class="btn ghost" id="bDlDocx">下载打磨稿 Word</button>
+    <button class="btn ghost" id="bDlMd">下载 Markdown</button>
+  </div>
+</section>
+
+<section class="card hide" id="cIq2">
+  <h2>④ 复评 <span class="pill">打磨稿</span></h2>
+  <div class="stat" id="s4"></div>
+  <div class="cmp" id="cmp"></div>
+  <div id="card2"></div>
+</section>
+
+<section class="card hide" id="cChk">
+  <h2>⑤ 出稿检查</h2>
+  <div class="sub">机检只报不改：拼接残留、重复开头、断在半句、学派术语外露、参考文献是否在。</div>
+  <div class="checks" id="checks"></div>
+</section>
+
+<section class="card hide" id="cSub">
+  <h2>⑥ 投稿</h2>
+  <div class="sub">打包成 ZIP 投进学员收件箱。评分记录会随稿附上，供编辑部审读参考；最终是否录用以编辑部审读为准。</div>
+  <label class="l">投稿版本</label>
+  <select id="ver"><option value="pol">打磨稿</option><option value="orig">原稿</option></select>
+  <div class="row">
+    <div><label class="l">投稿密码</label><input type="password" id="pass" autocomplete="off" placeholder="学员投稿密码"></div>
+    <div><label class="l">署名</label><input type="text" id="student" maxlength="80" placeholder="希望如何署名"></div>
+  </div>
+  <label class="l">备注 <span class="pill">学科、想说明的事</span></label>
+  <textarea id="note" maxlength="300" style="min-height:64px"></textarea>
+  <div class="btns"><button class="btn" id="bSubmit">打包投稿</button></div>
+  <div class="bar" id="ubar"><i id="ufill"></i></div>
+  <div class="stat" id="s6"></div>
+  <div class="note">没有投稿密码的，请先在 <a href="/register/" style="color:var(--gold)">注册页</a> 申请加入学员名录。</div>
+</section>
+
+</main>
+<footer>© 德麦国际 · SDE Universes　·　<a href="/taste/">返回品尝系列</a>　·　<a href="/students/submit/">直接上传 ZIP</a></footer>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){ return document.getElementById(id); };
+var LS={get:function(k){ try{ return localStorage.getItem(k)||''; }catch(e){ return ''; } }, set:function(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }};
+var ST={orig:'', origFile:null, origName:'', card1:null, card2:null, pol:'', polDone:0, polTotal:0, busy:false, cutlog:[]};
+
+/* ---------- 流程条 ---------- */
+function flow(n, done){
+  var sp=$('flow').querySelectorAll('span');
+  for(var i=0;i<sp.length;i++){
+    var s=+sp[i].getAttribute('data-s');
+    if(done && s===n){ sp[i].className='done'; }
+    else if(s===n){ sp[i].className='on'; }
+  }
+}
+function show(id){ $(id).classList.remove('hide'); }
+function stat(id, msg, cls){ var e=$(id); e.textContent=msg||''; e.className='stat'+(cls?' '+cls:''); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function busy(on){ ST.busy=on; ['bIq','bSkip','bPolish','bIq2','bSubmit','bGoSubmit1'].forEach(function(id){ var b=$(id); if(b) b.disabled=on; }); }
+
+/* ---------- 基底与 Key ---------- */
+function keyStore(){ return $('vendor').value==='ds'?'sde_ds_key':'sde_glm_key'; }
+function syncKey(){
+  var own=$('keyMode').value==='own';
+  $('userKey').classList.toggle('hide', !own);
+  if(own) $('userKey').value=LS.get(keyStore());
+}
+$('keyMode').addEventListener('change', function(){ LS.set('pp_keymode', this.value); syncKey(); });
+$('vendor').addEventListener('change', function(){ LS.set('pp_vendor', this.value); syncKey(); });
+$('userKey').addEventListener('change', function(){ LS.set(keyStore(), this.value.trim()); });
+if(LS.get('pp_vendor')) $('vendor').value=LS.get('pp_vendor');
+if(LS.get('pp_keymode')) $('keyMode').value=LS.get('pp_keymode');
+syncKey();
+function auth(){
+  var b={vendor:$('vendor').value};
+  if($('keyMode').value==='own'){
+    var k=$('userKey').value.trim();
+    if(k.length<8) throw new Error('已选「自带 Key」，请先填入 API Key。');
+    b.key=k;
+  }
+  return b;
+}
+
+/* ---------- 读稿 ---------- */
+function setLen(){ $('srcLen').textContent=$('src').value.replace(/\s/g,'').length.toLocaleString()+' 字'; }
+$('src').addEventListener('input', setLen);
+$('file').addEventListener('change', function(){
+  var f=this.files&&this.files[0]; if(!f) return;
+  $('fname').textContent=f.name; ST.origFile=f; ST.origName=f.name;
+  var done=function(t){
+    t=String(t||'').replace(/\r\n?/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+    $('src').value=t; setLen();
+    if(!$('title').value.trim()){
+      var first=(t.split('\n').filter(function(x){ return x.trim(); })[0]||'').replace(/^#+\s*/,'').replace(/\*\*/g,'').trim();
+      $('title').value=first.slice(0,200);
+    }
+    stat('s1','已读入 '+t.replace(/\s/g,'').length.toLocaleString()+' 字。','ok');
+  };
+  if(/\.docx$/i.test(f.name)){
+    if(typeof mammoth==='undefined'){ stat('s1','Word 解析库没加载成功，请刷新页面，或把正文直接粘贴进来。','err'); return; }
+    f.arrayBuffer().then(function(buf){ return mammoth.extractRawText({arrayBuffer:buf}); })
+      .then(function(r){ done(r.value); })
+      .catch(function(e){ stat('s1','读取 Word 失败：'+(e.message||e),'err'); });
+  } else {
+    f.text().then(done).catch(function(e){ stat('s1','读取失败：'+(e.message||e),'err'); });
+  }
+});
+function takeSrc(){
+  var t=$('src').value.trim();
+  if(t.replace(/\s/g,'').length<800) throw new Error('正文太短（至少 800 字）。');
+  if(t.length>118000) throw new Error('全文超过约十一万字符，超出单次打磨的读入上限。请拆成两篇分别处理。');
+  if(!$('title').value.trim()) throw new Error('请填写论文题目。');
+  return t;
+}
+
+/* ---------- 通用流式调用 ---------- */
+function ask(body, onTok, onStat){
+  var ac=new AbortController(), wd=null, stalled=false, frames=0, out='';
+  var bump=function(ms){ clearTimeout(wd); wd=setTimeout(function(){ stalled=true; try{ ac.abort(); }catch(e){} }, ms); };
+  bump(180000);
+  return fetch('/api/ask',{method:'POST',headers:{'content-type':'application/json'},signal:ac.signal,body:JSON.stringify(body)})
+  .then(function(resp){
+    if(!resp.ok) return resp.text().then(function(t){ throw new Error('HTTP '+resp.status+' '+t.slice(0,160)); });
+    var rd=resp.body.getReader(), dec=new TextDecoder(), buf='';
+    return new Promise(function(res,rej){
+      (function pump(){
+        rd.read().then(function(r){
+          if(r.done){ clearTimeout(wd); res({text:out, frames:frames}); return; }
+          buf+=dec.decode(r.value,{stream:true});
+          var lines=buf.split('\n'); buf=lines.pop();
+          for(var i=0;i<lines.length;i++){
+            var s=lines[i].trim(); if(s.indexOf('data:')!==0) continue;
+            var p=s.slice(5).trim(); if(p==='[DONE]') continue;
+            var j; try{ j=JSON.parse(p); }catch(e){ continue; }
+            frames++; bump(90000);
+            if(j.t==='token'){ out+=j.v; onTok&&onTok(out); }
+            else if(j.t==='status'){ onStat&&onStat(j.v); }
+            else if(j.t==='think'){ onStat&&onStat('基底思考中…'); }
+            else if(j.t==='beat' && !out){ var v=j.v||{}; onStat&&onStat('处理中 · 第 '+(v.sec||0)+' 秒'+(v.think?' · 已推演 '+v.think+' 字':'')); }
+            else if(j.t==='error'){ clearTimeout(wd); rej(new Error(j.v||'基底返回错误')); return; }
+          }
+          pump();
+        }).catch(function(e){ clearTimeout(wd); rej(stalled?new Error('连接超过 90 秒没有任何动静，已中止。'):e); });
+      })();
+    });
+  });
+}
+
+/* ---------- 评分卡 ---------- */
+var W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15};
+var NAMES={S:'S 结构精确度',D:'D 差异锐度',E:'E 纠缠深度',I:'I 不可还原性',F:'F 可证伪性'};
+var LEVELS=[[80,'大众水平'],[100,'受过高校训练'],[110,'专业人士'],[125,'高级专家'],[135,'资深学者'],[140,'录取线'],[145,'优秀的资深学者产出'],[150,'本体论级阈值'],[160,'典范级']];
+function lvl(s){ var n=LEVELS[0][1]; for(var i=0;i<LEVELS.length;i++){ if(s>=LEVELS[i][0]) n=LEVELS[i][1]; } return n; }
+function num(v){ var n=parseInt(v,10); return isFinite(n)?Math.max(0,Math.min(200,n)):0; }
+function bankRound(x){ var f=Math.floor(x), r=x-f; if(Math.abs(r-0.5)<1e-9) return f%2===0?f:f+1; return Math.round(x); }
+function total(d){ return bankRound(d.S*W.S+d.D*W.D+d.E*W.E+d.I*W.I+d.F*W.F); }
+function hasDims(j){ return !!j && ['S','D','E','I','F'].every(function(k){ return j[k] && isFinite(parseInt(j[k].score,10)); }); }
+function repair(s){
+  var out='', inStr=false, es=false, st=[];
+  for(var i=0;i<s.length;i++){
+    var ch=s.charAt(i);
+    if(inStr){
+      if(es){ out+=ch; es=false; continue; }
+      if(ch==='\\'){ var nc=s.charAt(i+1); if(nc && '"\\/bfnrtu'.indexOf(nc)>=0){ out+=ch; es=true; } continue; }
+      if(ch==='"'){ var k=i+1; while(k<s.length && ' \t\r\n'.indexOf(s.charAt(k))>=0) k++; var nx=s.charAt(k)||'';
+        if(nx===''||nx===','||nx===':'||nx==='}'||nx===']'){ inStr=false; out+=ch; } else out+='\\"'; continue; }
+      if(ch==='\n'){ out+='\\n'; continue; } if(ch==='\r'||ch==='\t'){ out+=' '; continue; }
+      if(ch<' ') continue; out+=ch; continue;
+    }
+    if(ch==='"'){ inStr=true; out+=ch; continue; }
+    if(ch==='{'||ch==='['){ st.push(ch==='{'?'}':']'); out+=ch; continue; }
+    if(ch==='}'||ch===']'){ if(st.length) st.pop(); out+=ch; continue; }
+    out+=ch;
+  }
+  if(inStr) out+='"';
+  out=out.replace(/,\s*$/,'').replace(/,?\s*"[^"]*"\s*:\s*$/,'').replace(/,(\s*[}\]])/g,'$1');
+  while(st.length) out+=st.pop();
+  return out;
+}
+function salvage(s){
+  var j={_salvaged:true}, got=0;
+  ['S','D','E','I','F'].forEach(function(k){
+    var m=new RegExp('"'+k+'"\\s*:\\s*\\{([\\s\\S]{0,1500}?)(?:\\}|$)').exec(s); if(!m) return;
+    var sc=/"score"\s*:\s*(\d{2,3})/.exec(m[1]); if(!sc) return; got++;
+    var wh=/"why"\s*:\s*"([\s\S]*?)"\s*(?:[,}]|$)/.exec(m[1]);
+    j[k]={score:parseInt(sc[1],10), why:wh?wh[1]:''};
+  });
+  return got===5?j:null;
+}
+function parseCard(raw){
+  var s=String(raw||'').replace(/```json/gi,'').replace(/```/g,'').trim();
+  var a=s.indexOf('{'); if(a<0) throw new Error('这一轮没交回评分卡，请再点一次或换一个基底。');
+  var b=s.lastIndexOf('}'); var body=b>a?s.slice(a,b+1):s.slice(a);
+  var j=null; try{ j=JSON.parse(body); }catch(e){}
+  if(!hasDims(j)){ try{ var r=JSON.parse(repair(body)); if(hasDims(r)){ r._repaired=true; j=r; } }catch(e){} }
+  if(hasDims(j)) return j;
+  var sv=salvage(s.slice(a)); if(sv) return sv;
+  throw new Error('评分卡缺维或格式损坏，未能算出综合分。请再评一次。');
+}
+function mkCard(j){
+  var d={}; ['S','D','E','I','F'].forEach(function(k){ d[k]=num(j[k].score); });
+  return {raw:j, dims:d, total:total(d)};
+}
+function renderCard(el, c){
+  var j=c.raw, d=c.dims, col=c.total>=150?'#8FCB8E':(c.total>=140?'#E4CB7E':'#D9A07A');
+  var h='<div class="score"><b style="color:'+col+'">'+c.total+'</b><span class="lv">'+esc(lvl(c.total))+(c.total>=140?'　· 已达录取线':'　· 距录取线 140 还差 '+(140-c.total)+' 分')+'</span></div>';
+  if(j._repaired||j._salvaged) h+='<div class="stat warn">评分卡格式有损，页面已'+(j._salvaged?'逐项抢救出五维分，其余栏目可能缺失':'自动修复')+'。</div>';
+  ['S','D','E','I','F'].forEach(function(k){
+    var gate=(k==='I'||k==='F'), bad=gate&&d[k]<120;
+    var pct=Math.max(0,Math.min(100,(d[k]-80)/95*100));
+    h+='<div class="dim"><span class="n">'+NAMES[k]+'<span class="w"> ×'+W[k].toFixed(2)+(gate?' 闸门':'')+'</span></span><b style="color:'+(bad?'var(--err)':'inherit')+'">'+d[k]+'</b>'
+      +'<span class="meter"><i style="width:'+pct.toFixed(0)+'%;background:'+(bad?'#B23B2E':'#C9A84C')+'"></i></span></div>';
+    if(j[k].why) h+='<div class="list" style="margin:0 0 6px 0"><div>'+esc(String(j[k].why).slice(0,240))+'</div></div>';
+  });
+  var L='';
+  var un=(j.neighbors||[]).filter(function(x){ return !x.handled; });
+  if(un.length) L+='<h4>正文尚未交手的已有研究</h4>'+un.slice(0,6).map(function(x){ return '<div>· '+esc(x.name)+'：'+esc(String(x.overlap||'').slice(0,160))+'</div>'; }).join('');
+  if((j.deductions||[]).length) L+='<h4>扣分记录</h4>'+j.deductions.slice(0,4).map(function(x){ return '<div>· ['+esc(x.dim||'')+'] 「'+esc(String(x.quote||'').slice(0,90))+'」 '+esc(String(x.why||'').slice(0,160))+'</div>'; }).join('');
+  if((j.upgrades||[]).length) L+='<h4>提升动作</h4>'+j.upgrades.slice(0,4).map(function(x){ return '<div>· ['+esc(x.dim||'')+'] '+esc(String(x.action||'').slice(0,200))+(x.gain?'（'+esc(x.gain)+'）':'')+'</div>'; }).join('');
+  if(L) h+='<div class="list">'+L+'</div>';
+  el.innerHTML=h;
+}
+function cardText(c){
+  if(!c) return '';
+  var j=c.raw, d=c.dims;
+  var t='综合分 '+c.total+'（S'+d.S+' D'+d.D+' E'+d.E+' I'+d.I+' F'+d.F+'）· '+lvl(c.total)+'\n';
+  ['S','D','E','I','F'].forEach(function(k){ if(j[k]&&j[k].why) t+='['+k+'='+d[k]+'] '+String(j[k].why).slice(0,220)+'\n'; });
+  var un=(j.neighbors||[]).filter(function(x){ return !x.handled; });
+  if(un.length){ t+='\n【未在正文交手的占位者——本次必须逐一请进正文指名交手，并各写一句可裁决差异】\n'; un.forEach(function(x){ t+='· '+String(x.name||'').slice(0,60)+'：'+String(x.overlap||'').slice(0,200)+'\n'; }); }
+  if((j.deductions||[]).length){ t+='\n【必须逐条清账的扣分记录】\n'; j.deductions.forEach(function(x){ t+='· ['+(x.dim||'')+'] 原文「'+String(x.quote||'').slice(0,150)+'」：'+String(x.why||'').slice(0,200)+'\n'; }); }
+  if((j.upgrades||[]).length){ t+='\n【指定提升动作】\n'; j.upgrades.forEach(function(x){ t+='· ['+(x.dim||'')+'] '+String(x.action||'').slice(0,260)+'（'+(x.gain||'')+'）\n'; }); }
+  return t;
+}
+function runIq(text, statId, cardEl){
+  var a; try{ a=auth(); }catch(e){ stat(statId,e.message,'err'); return Promise.reject(e); }
+  stat(statId,'盲评中：五维独立打分，并去查这个想法在别处是否已经有人说过…（一般 1–3 分钟）');
+  cardEl.innerHTML='';
+  var body=Object.assign({mode:'iq', q:$('title').value.trim().slice(0,280), text:text.slice(0,120000)}, a);
+  var tries=0;
+  var go=function(){
+    tries++;
+    return ask(body, function(t){ stat(statId,'盲评中…已写评分卡 '+t.length+' 字'); }, function(v){ stat(statId,v); })
+      .then(function(r){ return mkCard(parseCard(r.text)); })
+      .catch(function(e){ if(tries<2){ stat(statId,'第一次没拿到完整评分卡（'+e.message+'），自动重评一次…','warn'); return go(); } throw e; });
+  };
+  return go().then(function(c){ renderCard(cardEl,c); stat(statId,'✓ 盲评完成 · 综合分 '+c.total,'ok'); return c; });
+}
+
+/* ---------- 切份：按原稿自己的章节 ---------- */
+var HEAD_RE=/^(#{1,4}\s+\S|[一二三四五六七八九十]{1,3}[、．.]\s*\S|第[一二三四五六七八九十百]+[章节部编]|\d{1,2}(\.\d{1,2}){0,2}[\s、．]\s*\S|(摘\s*要|关键词|参考文献|结\s*语|结\s*论|引\s*言|Abstract|References)\s*[:：]?\s*$)/;
+function splitDoc(t){
+  var paras=t.split(/\n+/);
+  var blocks=[], cur=[];
+  paras.forEach(function(p){
+    var s=p.trim(); if(!s) return;
+    if(HEAD_RE.test(s) && s.length<80 && cur.length){ blocks.push(cur.join('\n\n')); cur=[]; }
+    cur.push(s);
+  });
+  if(cur.length) blocks.push(cur.join('\n\n'));
+  var len=t.length, n=Math.min(5, Math.max(1, Math.ceil(len/5500)));
+  var target=len/n;
+  /* 过长的单块按段落再拆，免得一份超出读入上限 */
+  var fine=[];
+  blocks.forEach(function(b){
+    if(b.length<=target*1.6){ fine.push(b); return; }
+    var ps=b.split('\n\n'), acc='';
+    ps.forEach(function(p){ if(acc && acc.length+p.length>target){ fine.push(acc); acc=p; } else acc=acc?acc+'\n\n'+p:p; });
+    if(acc) fine.push(acc);
+  });
+  var segs=[], buf='', left=len;
+  for(var i=0;i<fine.length;i++){
+    var b=fine[i], remainSlots=n-segs.length;
+    if(buf && remainSlots>1 && buf.length+b.length/2>left/remainSlots){ segs.push(buf); left-=buf.length; buf=b; }
+    else buf=buf?buf+'\n\n'+b:b;
+  }
+  if(buf) segs.push(buf);
+  return segs;
+}
+
+/* ---------- 打磨 ---------- */
+var SEG_CN=['第一','第二','第三','第四','第五'];
+var END_RE=/〔(?:第[一二三四五]段完·待续|全文完)〕\s*$/;
+function looksCut(s){ return !/[。！？”」』）\)\]\.!?]\s*$/.test(String(s).trim()); }
+function doPolish(){
+  if(ST.busy) return;
+  var t; try{ t=takeSrc(); auth(); }catch(e){ stat('s1',e.message,'err'); return; }
+  ST.orig=t;
+  var segs=splitDoc(t), N=segs.length;
+  ST.polTotal=N; ST.polDone=0; ST.pol=''; ST.cutlog=[];
+  show('cPol'); flow(3); busy(true);
+  $('segInfo').textContent='共 '+N+' 份';
+  $('live').classList.add('show'); $('live').textContent='';
+  $('pbar').classList.add('show'); $('pfill').style.width='0%';
+  $('afterPol').classList.add('hide');
+  var card=cardText(ST.card1), head='', acc='';
+  var runSeg=function(i, attempt){
+    attempt=attempt||1;
+    var seg=segs[i], minLen=Math.round(seg.length*0.55);
+    stat('s3','正在改第 '+(i+1)+'／'+N+' 份（原文 '+seg.length+' 字）'+(attempt>1?' · 重试':'')+'…');
+    var body=Object.assign({mode:'polish', keepStruct:true, part:i+1, segTotal:N, seg:seg, orig:t, card:card, q:$('title').value.trim().slice(0,280)}, auth());
+    if(i>0){ body.head=head; body.tail=acc.slice(-1000); }
+    return ask(body, function(x){ $('live').textContent=acc+(acc?'\n\n':'')+x; $('live').scrollTop=$('live').scrollHeight; }, function(v){ stat('s3','第 '+(i+1)+'／'+N+' 份 · '+v); })
+      .then(function(r){
+        var raw=r.text.trim(), ended=END_RE.test(raw), c=raw.replace(END_RE,'').trim();
+        var cut=!ended && looksCut(c);
+        if((c.length<minLen || cut) && attempt<2) return runSeg(i, attempt+1);
+        /* 两次都没交够：宁可这一份保留原文，也不让半截改稿顶掉整份原文（那是静默丢稿） */
+        if(c.length<seg.length*0.35){ ST.cutlog.push('第 '+(i+1)+' 份两次都没改成，已保留原文'); return seg; }
+        if(cut) ST.cutlog.push('第 '+(i+1)+' 份断在半句');
+        else if(c.length<minLen) ST.cutlog.push('第 '+(i+1)+' 份明显短于原文（'+c.length+'／'+seg.length+' 字）');
+        return c;
+      }, function(e){ if(attempt<2) return runSeg(i, attempt+1); throw e; });
+  };
+  var step=function(i){
+    if(i>=N) return Promise.resolve();
+    return runSeg(i).then(function(c){
+      acc=acc?acc+'\n\n'+c:c;
+      if(i===0) head=c.slice(0,1200);
+      ST.pol=acc; ST.polDone=i+1;
+      $('pfill').style.width=((i+1)/N*100).toFixed(0)+'%';
+      $('live').textContent=acc;
+      return step(i+1);
+    });
+  };
+  step(0).then(function(){
+    stat('s3',(ST.cutlog.length?'打磨完成，有 '+ST.cutlog.length+' 处需留意：'+ST.cutlog.join('；')+'　· ':'✓ 打磨完成 · ')+N+' 份 · '+ST.pol.length.toLocaleString()+' 字', ST.cutlog.length?'warn':'ok');
+    flow(3,true);
+  }).catch(function(e){
+    stat('s3','✗ '+e.message+(ST.pol?'　已改好的前 '+ST.polDone+' 份（'+ST.pol.length+' 字）保留在上面。':''),'err');
+  }).then(function(){
+    busy(false);
+    if(ST.pol){ $('afterPol').classList.remove('hide'); runChecks(); show('cSub'); }
+  });
+}
+
+/* ---------- 出稿检查 ---------- */
+var LEAK=['SDE','显露','差异序列','特征纠缠','发生学','本体论','三视角','龙爪手','金点子','改姓','去母体化','德麦'];
+function runChecks(){
+  var t=ST.pol||ST.orig, out=[];
+  var add=function(ok,msg){ out.push('<div style="color:'+(ok?'var(--ok)':'var(--warn)')+'">'+(ok?'✓ ':'⚠ ')+esc(msg)+'</div>'); };
+  var glue=['按你的要求','以下为第','续写正文如下','接着写第','修改说明','本份原文','评分卡'].filter(function(w){ return t.indexOf(w)>=0; });
+  add(!glue.length, glue.length?'拼接或指令残留：'+glue.join('、'):'无拼接残留');
+  var title=$('title').value.trim().slice(0,16);
+  var dupT=title && t.split(title).length-1>=2;
+  var dupA=['摘要','Abstract','关键词'].filter(function(k){ return (t.match(new RegExp('(^|\\n)\\s*[【\\[]?'+k+'[】\\]]?\\s*[:：]?','g'))||[]).length>=2; });
+  add(!dupT && !dupA.length, (dupT||dupA.length)?'疑似重复开头：'+(dupT?'题目出现两次 ':'')+dupA.join('、'):'只有一个开头');
+  add(!looksCut(t), looksCut(t)?'全文末尾停在半句':'全文收尾完整');
+  var hits=LEAK.map(function(w){ var n=t.split(w).length-1; return n?w+'×'+n:''; }).filter(Boolean);
+  add(!hits.length, hits.length?'学派术语外露（投稿后编辑部会改成学科本地说法，自己先改更好）：'+hits.join('、'):'无学派术语外露');
+  var ref=/参考文献|References|引用文献/.test(t);
+  add(ref, ref?'有参考文献部分':'没有找到参考文献部分');
+  if(ST.cutlog.length) add(false,'打磨过程记录：'+ST.cutlog.join('；'));
+  $('checks').innerHTML=out.join('');
+  show('cChk'); flow(5,true);
+}
+
+/* ---------- Word ---------- */
+function toDocx(text, title){
+  if(typeof docx==='undefined') return Promise.reject(new Error('Word 生成库没加载成功，请刷新页面。'));
+  var D=docx, kids=[];
+  var lines=String(text).split(/\n+/).map(function(x){ return x.trim(); }).filter(Boolean);
+  lines.forEach(function(s, idx){
+    var plain=s.replace(/^#+\s*/,'').replace(/\*\*/g,'');
+    if(idx===0){
+      kids.push(new D.Paragraph({alignment:D.AlignmentType.CENTER, spacing:{after:240}, children:[new D.TextRun({text:plain, bold:true, size:36, font:'SimSun'})]}));
+      return;
+    }
+    var h1=/^#{1,2}\s/.test(s) || /^[一二三四五六七八九十]{1,3}[、．]/.test(s) && s.length<60 || /^第[一二三四五六七八九十]+章/.test(s);
+    var h2=/^#{3,4}\s/.test(s) || /^\d{1,2}\.\d{1,2}(\.\d{1,2})?\s/.test(s) && s.length<60;
+    if(h1||h2){
+      kids.push(new D.Paragraph({heading:h1?D.HeadingLevel.HEADING_1:D.HeadingLevel.HEADING_2, spacing:{before:240,after:120}, children:[new D.TextRun({text:plain, bold:true, size:h1?30:26, font:'SimHei'})]}));
+    } else {
+      kids.push(new D.Paragraph({spacing:{line:360,after:80}, indent:{firstLine:480}, children:[new D.TextRun({text:plain, size:24, font:'SimSun'})]}));
+    }
+  });
+  var doc=new D.Document({creator:$('student').value.trim()||'SDE Universes', title:title, sections:[{properties:{page:{margin:{top:1440,bottom:1440,left:1300,right:1300}}}, children:kids}]});
+  return D.Packer.toBlob(doc);
+}
+function saveBlob(blob, name){ var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1500); }
+function safeName(s){ return String(s||'paper').replace(/[\\\/:*?"<>|\s]+/g,'_').slice(0,40)||'paper'; }
+
+/* ---------- 投稿 ---------- */
+function scoreLine(){
+  var p=[];
+  if(ST.card1) p.push('原稿盲评 '+ST.card1.total);
+  if(ST.card2) p.push('打磨稿复评 '+ST.card2.total);
+  return p.join('；');
+}
+function doSubmit(){
+  if(ST.busy) return;
+  var pass=$('pass').value, who=$('student').value.trim(), ver=$('ver').value;
+  if(!pass){ stat('s6','请填写投稿密码。','err'); return; }
+  if(!who){ stat('s6','请填写署名。','err'); return; }
+  if(ver==='pol' && !ST.pol){ stat('s6','还没有打磨稿，请先完成第 ③ 步，或改选「原稿」。','err'); return; }
+  var orig; try{ orig=ST.orig||takeSrc(); }catch(e){ stat('s6',e.message,'err'); return; }
+  var title=$('title').value.trim(), base=safeName(title);
+  busy(true); $('ubar').classList.add('show'); $('ufill').style.width='15%';
+  stat('s6','正在打包…');
+  var zip=new JSZip();
+  var p;
+  if(ver==='orig' && ST.origFile && /\.docx$/i.test(ST.origName)){
+    p=ST.origFile.arrayBuffer().then(function(b){ zip.file(base+'_原稿.docx', b); });
+  } else {
+    var body=ver==='pol'?ST.pol:orig;
+    p=toDocx(body, title).then(function(b){ zip.file(base+(ver==='pol'?'_打磨稿':'_原稿')+'.docx', b); });
+  }
+  var rec=['题目：'+title,'署名：'+who,'投稿版本：'+(ver==='pol'?'打磨稿（论文打磨与投稿智能体产出）':'原稿'),
+    '基底：'+($('vendor').value==='ds'?'DeepSeek':'智谱 GLM'),'评分：'+(scoreLine()||'未评'),'提交时间：'+new Date().toISOString(),'',
+    '出稿检查：', $('checks').innerText||'（未做）','','原稿评分卡：',cardText(ST.card1)||'（无）','','打磨稿评分卡：',cardText(ST.card2)||'（无）'].join('\n');
+  p.then(function(){
+    zip.file('评审记录.txt', rec);
+    $('ufill').style.width='45%';
+    return zip.generateAsync({type:'blob'});
+  }).then(function(blob){
+    if(blob.size>24*1024*1024) throw new Error('打包后超过 25MB。');
+    var fd=new FormData();
+    fd.append('pass', pass); fd.append('student', who);
+    var note=('【打磨投稿】'+title+'｜'+(ver==='pol'?'打磨稿':'原稿')+'｜'+(scoreLine()||'未评')+'｜'+$('note').value.trim()).slice(0,500);
+    fd.append('note', note);
+    fd.append('file', blob, base+'.zip');
+    stat('s6','正在上传…'); $('ufill').style.width='70%';
+    return fetch('/api/submit',{method:'POST',body:fd}).then(function(r){ return r.json(); });
+  }).then(function(j){
+    $('ufill').style.width='100%';
+    if(!j.ok) throw new Error(j.msg||'上传失败');
+    stat('s6','✓ 已投进学员收件箱。编辑部审读后会署名发表；未达 140 的稿件会留档待定。','ok');
+    flow(6,true);
+  }).catch(function(e){
+    stat('s6','✗ '+(e.message||e),'err');
+  }).then(function(){ busy(false); });
+}
+
+/* ---------- 按钮 ---------- */
+$('bIq').addEventListener('click', function(){
+  if(ST.busy) return;
+  var t; try{ t=takeSrc(); }catch(e){ stat('s1',e.message,'err'); return; }
+  ST.orig=t; ST.card1=null; ST.card2=null;
+  flow(1,true); show('cIq'); flow(2); busy(true);
+  $('afterIq').classList.add('hide');
+  runIq(t,'s2',$('card1')).then(function(c){
+    ST.card1=c; flow(2,true);
+    $('afterIq').classList.remove('hide');
+    $('bGoSubmit1').classList.toggle('hide', c.total<140);
+    show('cSub');
+  }).catch(function(e){ stat('s2','✗ '+e.message,'err'); }).then(function(){ busy(false); });
+});
+$('bSkip').addEventListener('click', function(){ ST.card1=null; flow(1,true); doPolish(); });
+$('bPolish').addEventListener('click', doPolish);
+$('bGoSubmit1').addEventListener('click', function(){ $('ver').value='orig'; show('cSub'); $('cSub').scrollIntoView({behavior:'smooth'}); });
+$('bIq2').addEventListener('click', function(){
+  if(ST.busy||!ST.pol) return;
+  show('cIq2'); flow(4); busy(true); $('cmp').innerHTML='';
+  runIq(ST.pol,'s4',$('card2')).then(function(c){
+    ST.card2=c; flow(4,true);
+    if(ST.card1){
+      var d=c.total-ST.card1.total;
+      $('cmp').innerHTML='原稿 <b>'+ST.card1.total+'</b> → 打磨稿 <b>'+c.total+'</b>　<span style="color:'+(d>0?'var(--ok)':'var(--err)')+'">'+(d>=0?'+':'')+d+'</span>'
+        +(d<=0?'<div class="stat warn">打磨稿没有高于原稿。投稿版本建议选「原稿」，或换一个基底再打磨一次。</div>':'');
+      if(d<=0) $('ver').value='orig';
+    }
+    $('cSub').scrollIntoView({behavior:'smooth'});
+  }).catch(function(e){ stat('s4','✗ '+e.message,'err'); }).then(function(){ busy(false); });
+});
+$('bDlDocx').addEventListener('click', function(){
+  toDocx(ST.pol,$('title').value.trim()).then(function(b){ saveBlob(b, safeName($('title').value)+'_打磨稿.docx'); }).catch(function(e){ stat('s3','✗ '+e.message,'err'); });
+});
+$('bDlMd').addEventListener('click', function(){ saveBlob(new Blob([ST.pol],{type:'text/markdown;charset=utf-8'}), safeName($('title').value)+'_打磨稿.md'); });
+$('bSubmit').addEventListener('click', doSubmit);
+if(LS.get('pp_student')) $('student').value=LS.get('pp_student');
+$('student').addEventListener('change', function(){ LS.set('pp_student', this.value.trim()); });
+flow(1);
+window.__PP={splitDoc:splitDoc, parseCard:parseCard, total:total, runChecks:runChecks, ST:ST};
+})();
+</script>
+</body></html>
