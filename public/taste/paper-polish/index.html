@@ -97,7 +97,7 @@ footer a{color:var(--gold);text-decoration:none}
 
 <section class="card">
   <h2>① 交稿</h2>
-  <div class="sub">支持 .docx / .md / .txt，也可以直接粘贴。建议全文不超过十万字。</div>
+  <div class="sub">支持 .docx / .md / .txt，也可以直接粘贴。<b style="color:#F5E6BF">全文最多 2 万字</b>（按去掉空白后的字数计），超出请先拆成两篇。</div>
   <div class="row">
     <label class="file-btn" for="file">选择文件</label>
     <input type="file" id="file" accept=".docx,.md,.markdown,.txt">
@@ -210,7 +210,9 @@ function auth(){
 }
 
 /* ---------- 读稿 ---------- */
-function setLen(){ $('srcLen').textContent=$('src').value.replace(/\s/g,'').length.toLocaleString()+' 字'; }
+var MAX_CHARS=20000;
+function countChars(t){ return String(t||'').replace(/\s/g,'').length; }
+function setLen(){ var n=countChars($('src').value); var e=$('srcLen'); e.textContent=n.toLocaleString()+' / '+MAX_CHARS.toLocaleString()+' 字'+(n>MAX_CHARS?' · 超出上限':''); e.style.color=n>MAX_CHARS?'var(--err)':''; e.style.borderColor=n>MAX_CHARS?'var(--err)':''; }
 $('src').addEventListener('input', setLen);
 $('file').addEventListener('change', function(){
   var f=this.files&&this.files[0]; if(!f) return;
@@ -222,7 +224,9 @@ $('file').addEventListener('change', function(){
       var first=(t.split('\n').filter(function(x){ return x.trim(); })[0]||'').replace(/^#+\s*/,'').replace(/\*\*/g,'').trim();
       $('title').value=first.slice(0,200);
     }
-    stat('s1','已读入 '+t.replace(/\s/g,'').length.toLocaleString()+' 字。','ok');
+    var n=countChars(t);
+    if(n>MAX_CHARS) stat('s1','已读入 '+n.toLocaleString()+' 字，超过 2 万字上限，请删减或拆成两篇后再评分打磨。','err');
+    else stat('s1','已读入 '+n.toLocaleString()+' 字。','ok');
   };
   if(/\.docx$/i.test(f.name)){
     if(typeof mammoth==='undefined'){ stat('s1','Word 解析库没加载成功，请刷新页面，或把正文直接粘贴进来。','err'); return; }
@@ -235,8 +239,9 @@ $('file').addEventListener('change', function(){
 });
 function takeSrc(){
   var t=$('src').value.trim();
-  if(t.replace(/\s/g,'').length<800) throw new Error('正文太短（至少 800 字）。');
-  if(t.length>118000) throw new Error('全文超过约十一万字符，超出单次打磨的读入上限。请拆成两篇分别处理。');
+  var n=countChars(t);
+  if(n<800) throw new Error('正文太短（至少 800 字）。');
+  if(n>MAX_CHARS) throw new Error('全文 '+n.toLocaleString()+' 字，超过 2 万字上限（多出 '+(n-MAX_CHARS).toLocaleString()+' 字）。请删减或拆成两篇分别处理。');
   if(!$('title').value.trim()) throw new Error('请填写论文题目。');
   return t;
 }
