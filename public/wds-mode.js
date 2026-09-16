@@ -50,6 +50,7 @@
   var LS_GRADE = "sde_wds_grade";         // 难度条："0" 自动（按站内检索定档）| "1".."5" 读者钉死的档
   var LS_WEB = "sde_wds_web";             // "1" | "0"
   var LS_NOSDE = "sde_wds_nosde";         // "1" | "0" —— 无 SDE 问对（只在 ChatSDE 本体页出现，分身页不读）
+  var LS_COACH = "sde_wds_coach";         // "1"=陪练档（读者先说、ChatSDE 来碰）| 缺/"0"=代劳档（2026-09-16）
   var LS_NOSENTRY = "sde_wds_nosentry";   // "1"=关占位哨 | "0"/缺=开（默认开；三刀之一，2026-08-31）
   var LS_LANG = "sde_wds_lang";           // "zh" | "en"
   var PAGE = !!window.WDSM_PAGE;
@@ -1007,7 +1008,7 @@
       tabNormal: "常规", tabBack: "\u2190 返回浏览", tabPortal: "\u2726 \u7cfb\u7edf\u5165\u53e3",
       bDistill: "\u270e 成文 · PPT", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
       egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
-      mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网", mNoSde: "\u2298 无 SDE", mSentry: "\ud83d\udef0 占位哨", tipNoSentry: " · 占位哨已关（不查站外占位者）",
+      mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网", mNoSde: "\u2298 无 SDE", mCoach: "\u270b 陪练", mCoachT: "陪练档：你先说判断、ChatSDE 来碰；想休息时关掉它，让它代劳", tipCoach: " · 陪练：这一场你先说，ChatSDE 来碰", tipCoachTool: " · 陪练（工序进行中暂不生效）", ownAsk: "\u270e 我自己想问的", ownAskT: "不点现成的三条，用你自己的话问", ownPh: "用你自己的话问——哪怕只是一句「我觉得……对不对？」", ownStat: "本场：你自己提的 {own} 问 · 顺着按钮点的 {btn} 问", ownNudge: "这几轮都是顺着按钮点下来的。要不要停一下，用你自己的话说说你现在怎么想？", mSentry: "\ud83d\udef0 占位哨", tipNoSentry: " · 占位哨已关（不查站外占位者）",
       mtHide: "收起工具", mtShow: "工具", mtHideT: "把档位条收起来，把屏幕让给答案",
       topShowT: "把顶栏叫回来（往上翻一下也会回来）",
       mtShowT: "展开档位条（现在开着的）",
@@ -1337,7 +1338,7 @@
       tabNormal: "Browse", tabBack: "\u2190 Back to site", tabPortal: "\u2726 Entry",
       bDistill: "\u270e Write up · Deck", bHist: "\u21ba History", bSet: "\u2699 Settings", bNew: "\uff0b New chat",
       egs: ["What separates Show from structure in SDE?", "How would SDE read the onset of a chronic disease?", "What is entanglement of features? Give an example.", "Point me at a few pieces to start with"],
-      mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web", mNoSde: "\u2298 No SDE", mSentry: "\ud83d\udef0 Sentry", tipNoSentry: " · sentry off",
+      mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web", mNoSde: "\u2298 No SDE", mCoach: "\u270b Coach", mCoachT: "Coach mode: you state your view first and ChatSDE pushes back; switch off when you want it to do the work", tipCoach: " · Coach: you speak first, ChatSDE pushes back", tipCoachTool: " · Coach (paused while a procedure is running)", ownAsk: "\u270e My own question", ownAskT: "Skip the three suggestions and ask in your own words", ownPh: "Ask in your own words — even just \"I think… is that right?\"", ownStat: "This session: {own} questions of your own · {btn} clicked from suggestions", ownNudge: "The last few rounds all came from the suggestion buttons. Want to pause and say, in your own words, what you think now?", mSentry: "\ud83d\udef0 Sentry", tipNoSentry: " · sentry off",
       mtHide: "Hide tools", mtShow: "Tools", mtHideT: "Collapse the mode bar and give the screen to the answer",
       topShowT: "Bring the top bar back (scrolling up does it too)",
       mtShowT: "Show the mode bar (currently on)",
@@ -2635,6 +2636,7 @@
           "<button class='wdsm-mode' data-k='web'></button>" +
           "<button class='wdsm-mode' data-k='nosentry'></button>" +
           "<button class='wdsm-mode' data-k='nosde'></button>" +
+          "<button class='wdsm-mode' data-k='coach'></button>" +
           "<button class='wdsm-mode wdsm-rsbtn'></button>" +
           "<button class='wdsm-mode wdsm-lnkbtn'></button>" +
           "<button class='wdsm-mode wdsm-findbtn'></button>" +
@@ -3366,6 +3368,8 @@
        让它露出「不套 SDE」的开关，等于把分身自己的存在理由拆掉了一半。 */
     var _nsBtn = q(".wdsm-mode[data-k='nosde']");
     if (_nsBtn) { _nsBtn.textContent = t("mNoSde"); _nsBtn.style.display = PROFILE ? "none" : ""; }
+    var _coBtn = q(".wdsm-mode[data-k='coach']");
+    if (_coBtn) { _coBtn.textContent = t("mCoach"); _coBtn.title = t("mCoachT"); }
     var _syBtn = q(".wdsm-mode[data-k='nosentry']");
     if (_syBtn) { _syBtn.textContent = t("mSentry"); _syBtn.style.display = PROFILE ? "none" : ""; }
     q(".wdsm-note").textContent = t("note");
@@ -3420,6 +3424,11 @@
   // PROFILE 页强制当关：分身共用同一个 localStorage，读者可能在本体页开过它、
   // 再跳来分身页——分身没有这颗按钮，但状态不能跟着漏进来。
   var thinkMode = "std", webOn = false, noSdeOn = false, sentryOnUI = true;
+  /* ⭐ 双腿开关（2026-09-16 王德生令·理念艺术家原则）：coachOn＝陪练档。
+     askStats＝本场「自己提的问」与「顺着按钮点的问」——运动手环，让读者看得见自己的肌肉；
+     askRun＝连续点按钮的轮数，到 3 轮提示一句（只提示、不拦截）。换新对话清零。 */
+  var coachOn = false, askStats = { own: 0, btn: 0 }, askRun = 0, SEND_VIA = "";
+  function askReset() { askStats = { own: 0, btn: 0 }; askRun = 0; SEND_VIA = ""; }
   /* ⭐ 难度条（2026-08-30）：gradePin 0＝自动（按站内检索定档），1–5＝读者钉死；gradeLast＝上一答的读数。
      [stated] 作者：深度思考要做成难度条，档位按站内检索对核心词的材料多少与准确度定。 */
   var gradePin = 0, gradeLast = null;
@@ -3431,6 +3440,7 @@
     webOn = localStorage.getItem(LS_WEB) === "1";
     noSdeOn = !PROFILE && localStorage.getItem(LS_NOSDE) === "1";
     sentryOnUI = localStorage.getItem(LS_NOSENTRY) !== "1";   // 默认开
+    coachOn = localStorage.getItem(LS_COACH) === "1";          // 默认代劳档
     var _gp = parseInt(localStorage.getItem(LS_GRADE) || "0", 10); gradePin = (_gp >= 1 && _gp <= 5) ? _gp : 0;
   } catch (e) {}
   /* ════ 档位条的收放（2026-08-29）════════════════════════════════
@@ -3499,10 +3509,10 @@
     for (var i = 0; i < bs.length; i++) {
       var k = bs[i].getAttribute("data-k");
       if (!k) continue;                        // 附件按钮借了 .wdsm-mode 的样式，但不是档位，跳过
-      var on = (k === "web") ? webOn : (k === "nosde") ? noSdeOn : (k === "nosentry") ? sentryOnUI : (thinkMode === k);
+      var on = (k === "web") ? webOn : (k === "nosde") ? noSdeOn : (k === "coach") ? coachOn : (k === "nosentry") ? sentryOnUI : (thinkMode === k);
       if (on) bs[i].classList.add("on"); else bs[i].classList.remove("on");
     }
-    tipEl.textContent = (thinkMode === "deep" ? t("tipDeep") : t("tipStd")) + (webOn ? t("tipWeb") : "") + (noSdeOn ? t("tipNoSde") : "") + ((!PROFILE && !sentryOnUI) ? t("tipNoSentry") : "");
+    tipEl.textContent = (thinkMode === "deep" ? t("tipDeep") : t("tipStd")) + (webOn ? t("tipWeb") : "") + (noSdeOn ? t("tipNoSde") : "") + (coachOn ? (curTool ? t("tipCoachTool") : t("tipCoach")) : "") + ((!PROFILE && !sentryOnUI) ? t("tipNoSentry") : "");
     paintGrade();                              // 难度条只在深度档露面
     toolsPaint();                              // 档位一变，折叠钮上的摘要跟着变
   }
@@ -3595,6 +3605,12 @@
           var k = b.getAttribute("data-k");
           if (!k) return;                      // 同上：附件按钮另有自己的 onclick
           if (k === "web") { webOn = !webOn; try { localStorage.setItem(LS_WEB, webOn ? "1" : "0"); } catch (e) {} }
+          else if (k === "coach") {
+            coachOn = !coachOn;
+            try { localStorage.setItem(LS_COACH, coachOn ? "1" : "0"); } catch (e) {}
+            /* 互斥：无 SDE 整段改道，陪练块挂不上——两个同时亮着就是界面在说谎。 */
+            if (coachOn && noSdeOn) { noSdeOn = false; try { localStorage.setItem(LS_NOSDE, "0"); } catch (e) {} }
+          }
           else if (k === "nosentry") { if (PROFILE) return; sentryOnUI = !sentryOnUI; try { localStorage.setItem(LS_NOSENTRY, sentryOnUI ? "0" : "1"); } catch (e) {} }
           else if (k === "nosde") {
             /* 双重保险：分身页这颗按钮本来就 display:none，这里再挡一次——
@@ -3606,6 +3622,7 @@
             // 互斥：无 SDE 与工序都是「这一轮走不走 SDE 方法论」这同一件事的两种说法，
             // 开一个就该把另一个关掉，否则界面上会显示两个互相矛盾的档位同时选中。
             if (noSdeOn && curTool) toolSet("");
+            if (noSdeOn && coachOn) { coachOn = false; try { localStorage.setItem(LS_COACH, "0"); } catch (e) {} }
           }
           else if (k === "deep" && thinkMode === "deep") { gradeOpen = !gradeOpen; }   // 已在深度档：再点＝展开/收起难度条
           else { thinkMode = k; gradeOpen = (k === "deep"); try { localStorage.setItem(LS_MODE, k); } catch (e) {} }   // 切进深度档时展开一次让人看见它在
@@ -4019,7 +4036,7 @@
   /* 就地重开（老行为）：这一场没在跑时不攒空场，省得侧栏堆一排白纸。 */
   function sesBlank() {
     try { memAutoRun(); } catch (e) {}          // 开新的之前，先把刚谈完这一场炼进记忆（只在自动档开着时）
-    history = []; compReset(); cvReset(); if (stSess) stSess.reset(); msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
+    history = []; askReset(); compReset(); cvReset(); if (stSess) stSess.reset(); msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
     atts = []; paintAtts();                          // 附件跟着这一场，新开一场就该清干净
     inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph"); updTurns();   // dayLeft 不复位：今日额度按本机计
     layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = ""; inEl.focus();
@@ -4099,7 +4116,7 @@
     };
   }
   function stRestore(rec) {
-    history = []; compReset(); cvReset(); msgsEl.innerHTML = "";
+    history = []; askReset(); compReset(); cvReset(); msgsEl.innerHTML = "";
     var cell = null;
     (rec.turns || []).forEach(function (t) {
       if (!t || !t.text) return;
@@ -4785,7 +4802,7 @@
         if (idx === rec) { b.className = "wdsm-follow rec"; b.title = (GET[idx] || "") + "\n" + t("followRecT"); }
         else b.className = "wdsm-follow dim";
       }
-      b.onclick = function () { if (!streaming) send(q); };   // 只发问句，路径名是给人看的
+      b.onclick = function () { if (!streaming) { SEND_VIA = "btn"; send(q); } };   // 只发问句，路径名是给人看的
       box.appendChild(b);
       qList.push(q);
     });
@@ -4798,10 +4815,19 @@
       all.onclick = function () {
         if (streaming) return;
         var marks = ["\u2460", "\u2461", "\u2462"];
+        SEND_VIA = "btn";
         send(t("followAllQ") + "\n" + qList.map(function (x, i) { return marks[i] + " " + x; }).join("\n"));
       };
       box.appendChild(all);
     }
+    /* 第四格（2026-09-16）：三条现成的问之外，永远留一个「我自己想问的」——
+       点了不发任何东西，只把光标放回输入框。火种得是他自己的。 */
+    var own = el("button", "wdsm-follow-all", t("ownAsk"));
+    own.title = t("ownAskT");
+    own.onclick = function () { try { inEl.placeholder = t("ownPh"); inEl.focus(); } catch (e) {} };
+    box.appendChild(own);
+    if (askStats.own + askStats.btn >= 2) box.appendChild(el("div", "wdsm-follows-t", gFmt("ownStat", { own: askStats.own, btn: askStats.btn })));
+    if (askRun >= 3) box.appendChild(el("div", "wdsm-follows-t", t("ownNudge")));
     cell.turn.appendChild(box); cell.follows = box;
   }
 
@@ -5465,6 +5491,10 @@
   function send(forceQ) {
     var q = String(forceQ != null ? forceQ : inEl.value).trim();
     if (!q) return;
+    /* 运动手环：按钮点的记 btn，输入框打的记 own；其余程序转发（取 Key 后回调等）不记，免得一问记两次。 */
+    if (SEND_VIA === "btn") { askStats.btn++; askRun++; }
+    else if (forceQ == null) { askStats.own++; askRun = 0; }
+    SEND_VIA = "";
     /* 问出第一句之后，屏幕的主业就从「挑档位」变成「读答案」——档位条自动收起。
        只对没表过态的读者生效；点过折叠钮的人按他自己的来（见 toolsSet 的 byUser）。 */
     try { toolsAutoFold(); } catch (e) {}
@@ -5565,7 +5595,7 @@
     // 本场第一次挂底册时扣下来，此后每轮随 payload 送（只在九问专著里）
     var _razNew = 0;
     if (curTool === "book9" && !RAZ.text) { var _r = razDetect(q); if (_r) { RAZ.text = _r; RAZ.turn = history.length; _razNew = _r.length; } }
-    var payload = { q: q, history: histPack(compFrom()), umem: _m3 ? "" : memRecall(q), umem3: _m3 || undefined, key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1), raz: (curTool === "book9" && RAZ.text) ? razSlice(RAZ.text, razCurQ(), RAZ.turn++) : undefined };
+    var payload = { q: q, history: histPack(compFrom()), umem: _m3 ? "" : memRecall(q), umem3: _m3 || undefined, key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1), coach: coachOn ? 1 : undefined, raz: (curTool === "book9" && RAZ.text) ? razSlice(RAZ.text, razCurQ(), RAZ.turn++) : undefined };
     if (thinkMode === "deep") payload.grade = gradePin ? gradePin : "auto";   // 难度条：自动按检索定档，或读者钉死的档
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
     var pics = imgsForSend();
