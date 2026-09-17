@@ -1,0 +1,60 @@
+// Run with NODE_PATH pointing to a jsdom installation.
+const {JSDOM} = require('jsdom');
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert/strict');
+const root = path.resolve(__dirname, '../..');
+const html = fs.readFileSync(path.join(root, 'public/journals/index.html'), 'utf8');
+const script = fs.readFileSync(path.join(root, 'public/journals/journals.js'), 'utf8');
+const catalog = JSON.parse(fs.readFileSync(path.join(root, 'public/journals/reading/catalog.json')));
+const tick = () => new Promise(resolve => setTimeout(resolve, 15));
+const ok = data => ({ok: true, json: async () => data});
+const manifest = {journals: {Nature: {slug:'nature',issn:[],n:2,years:{2025:1,2026:1},src:'test'}}};
+function setup(fetch) {
+ const dom = new JSDOM(html,{url:'https://example.test/journals/',runScripts:'outside-only'});
+ dom.window.fetch=fetch;dom.window.scrollTo=()=>{};dom.window.eval(script);
+ return dom;
+}
+(async () => {
+ let retry=false;
+ const one=setup(async url => url.includes('manifest') ? retry ? ok(manifest) : {ok:false,status:503} : ok(catalog));
+ await tick();
+ const d=one.window.document;
+ assert.match(d.getElementById('load-status').textContent,/失败/);
+ assert(!d.getElementById('retry-manifest').classList.contains('hide'));
+ assert.equal(d.querySelectorAll('.reading-card').length,21);
+ assert.match(d.getElementById('done').textContent,/部分/);
+ assert.equal(d.querySelectorAll('#p-cn .tile.live').length,17);
+ assert.equal(d.querySelector('[data-j="Nature"] .st').textContent,'目录状态未确认');
+ retry=true;d.getElementById('retry-manifest').click();await tick();
+ assert.equal(d.getElementById('done').textContent,'18');
+ assert(d.getElementById('retry-manifest').classList.contains('hide'));
+ // Curated journal remains readable even when the archive was unavailable.
+ one.window.location.hash='cn-education-424';await tick();
+ assert.match(d.getElementById('jc').textContent,/10 条/);
+ assert.equal(d.querySelectorAll('#journal-reading a').length,4);
+ assert(!d.getElementById('jq').disabled);
+ one.window.close();
+ let pending={};
+ const two=setup(async url=>url.includes('manifest')?ok(manifest):url.includes('catalog')?ok(catalog):new Promise((resolve,reject)=>pending[url]={resolve,reject}));
+ await tick();two.window.location.hash='nature';await tick();
+ const dd=two.window.document;
+ assert(dd.getElementById('jq').disabled);
+ dd.querySelector('[data-y="2025"]').click();await tick();
+ pending['data/nature/2025.json'].resolve(ok([{t:'Current 2025 title',d:'2025'}]));await tick();
+ pending['data/nature/2026.json'].reject(new Error('stale failure'));await tick();
+ assert.match(dd.getElementById('jl').textContent,/Current 2025 title/);
+ assert(!dd.getElementById('jc').textContent.includes('失败'));
+ dd.getElementById('jq').value='no match';dd.getElementById('jq').dispatchEvent(new two.window.Event('input'));
+ assert.match(dd.getElementById('jc').textContent,/没有符合/);
+ dd.querySelector('[data-y="2026"]').click();await tick();dd.getElementById('back').click();
+ pending['data/nature/2026.json'].resolve(ok([{t:'Must not resurrect view',d:'2026'}]));await tick();
+ assert(dd.getElementById('jv').classList.contains('hide'));
+ assert(!dd.getElementById('jl').textContent.includes('resurrect'));
+ two.window.close();
+ const three=setup(async()=>({ok:true,json:async()=>({bad:'schema'})}));await tick();
+ assert.match(three.window.document.getElementById('reading-status').textContent,/失败/);
+ assert.match(three.window.document.getElementById('load-status').textContent,/失败/);
+ three.window.close();
+ console.log('PASS: partial availability, all 17 journals, retry, curated reading, stale responses, return navigation, empty search, invalid data.');
+})().catch(e=>{console.error(e);process.exitCode=1;});
