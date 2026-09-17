@@ -1,12 +1,12 @@
 // 新增一篇解构：在数组顶部加一行对象（含中英字段）即可，卡片自动并列生成。
   window.__DECONSTRUCTIONS__ = [
     {
-      chip:"专著雏形 · 德勒兹", chipEn:"Monograph Draft · Deleuze",
+      chip:"专著 · 德勒兹", chipEn:"Monograph · Deleuze",
       title:"普通人都能懂的《差异与重复》",
       titleEn:"Deleuze\u2019s Difference and Repetition, for Ordinary Readers",
-      hook:"不同在先，相同在后——一本出了名难读的书，用河流与沙洲、副歌、海浪、心跳、图书馆、骰子、种子、菜谱二十多个比方讲透。先把德勒兹的一生当作一条「在土里走一条路长出形状」的发生序列来讲，再用 S＝F(D,E) 量出它缺一个变量 E、缺一道回写的箭头；第六编把两万字学术论文《SDE 解构德勒兹》全部翻成大白话：差异能生同一，可长它的土里已经有同一；第七编再把《尼采与哲学》《柏格森主义》《意义的逻辑》《千高原》逐本解构；第八编与德勒兹对话：巴迪欧、德兰达、拉图尔、马拉布各补了他缺的一格，却都绕开了同一格——差异往哪走；第九编把同一把尺子放进教育、健康、个人事业三片土。",
+      hook:"不同在先，相同在后——一本出了名难读的书，用河流与沙洲、副歌、海浪、心跳、图书馆、骰子、种子、菜谱二十多个比方讲透。先把德勒兹的一生当作一条「在土里走一条路长出形状」的发生序列来讲，再用 S＝F(D,E) 量出它缺一个变量 E、缺一道回写的箭头；第六编把两万字学术论文《SDE 解构德勒兹》全部翻成大白话：差异能生同一，可长它的土里已经有同一；第七编再把《尼采与哲学》《柏格森主义》《意义的逻辑》《千高原》逐本解构；第八编与德勒兹对话：巴迪欧、德兰达、拉图尔、马拉布各补了他缺的一格，却都绕开了同一格——差异往哪走；第九编把同一把尺子放进教育、健康、个人事业三片土；前言、导读、导论、结语、四个附录与一百三十种参考书目俱全。",
       hookEn:"Difference first, sameness after \u2014 a notoriously hard book told through twenty everyday analogies: river and sandbar, chorus, waves, heartbeat, library, dice, seed, recipe. Deleuze\u2019s life is read as a genesis sequence, and the three steps where the book stops are named plainly.",
-      words:"约 17 万字 · 专著雏形 · 三种读法", wordsEn:"~170,000 chars · monograph draft · 3 reading modes",
+      words:"约 20 万字 · 专著 · 三种读法", wordsEn:"~200,000 chars · monograph · 3 reading modes",
       slug:"deleuze-difference-repetition", pdf:"deleuze-difference-repetition.pdf"
     },
     {
