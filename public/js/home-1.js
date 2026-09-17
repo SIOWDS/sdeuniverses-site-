@@ -4,9 +4,9 @@
       chip:"导读篇 · 德勒兹", chipEn:"Guide · Deleuze",
       title:"普通人都能懂的《差异与重复》",
       titleEn:"Deleuze\u2019s Difference and Repetition, for Ordinary Readers",
-      hook:"不同在先，相同在后——一本出了名难读的书，用河流与沙洲、副歌、海浪、心跳、图书馆、骰子、种子、菜谱二十多个比方讲透。先把德勒兹的一生当作一条「在土里走一条路长出形状」的发生序列来讲，最后诚实地说出这本书停下的三步。",
+      hook:"不同在先，相同在后——一本出了名难读的书，用河流与沙洲、副歌、海浪、心跳、图书馆、骰子、种子、菜谱二十多个比方讲透。先把德勒兹的一生当作一条「在土里走一条路长出形状」的发生序列来讲，最后用 S＝F(D,E) 量出它缺一个变量 E、缺一道回写的箭头。",
       hookEn:"Difference first, sameness after \u2014 a notoriously hard book told through twenty everyday analogies: river and sandbar, chorus, waves, heartbeat, library, dice, seed, recipe. Deleuze\u2019s life is read as a genesis sequence, and the three steps where the book stops are named plainly.",
-      words:"约 4 万字 · 三种读法", wordsEn:"~40,000 chars · 3 reading modes",
+      words:"约 5 万字 · 三种读法", wordsEn:"~50,000 chars · 3 reading modes",
       slug:"deleuze-difference-repetition", pdf:"deleuze-difference-repetition.pdf"
     },
     {
