@@ -1,0 +1,71 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 6 章之二　条件定理：优势迁移的形式版本 · 从最强大脑到最强复合大脑 · 德麦国际专著</title>
+<meta name="description" content="从最强大脑到最强复合大脑——思想主体性的革命。王德生著，德麦国际专著第 115 号。最强大脑不是被打败了，是被普及了；今天不是最强大脑，是最强复合大脑——最强在耦合，不在两端；个人的思想主体性还在，它只是不再单独站在领奖台上。第 6 章之二　条件定理：优势迁移的形式版本">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="成稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——命题、判据、读数定义、分离线、作废条件；无真跑数据、五个读数全未取值">
+<meta name="cite_ok" content="true">
+<meta name="source" content="合作">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+h4{font-size:15.5px;margin:1.3em 0 .4em;color:#C9B78A;font-weight:600}
+p{margin:.85em 0;text-align:justify}p.li{margin:.35em 0 .35em 1em}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);
+background:var(--card);color:#F0EDE4}blockquote p{margin:.4em 0}
+pre.card{white-space:pre-wrap;background:var(--card);border:1px solid var(--line);
+padding:12px 14px;font:12.5px/1.75 ui-monospace,Menlo,Consolas,monospace;overflow-x:auto}
+code{font:13px ui-monospace,Menlo,Consolas,monospace;color:#C9B78A}
+.tw{overflow-x:auto;margin:1.2em 0}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold)}
+hr{border:0;border-top:1px solid var(--line);margin:1.6em 0}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.toc a{display:block;padding:9px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a.pt{color:var(--gold);font-weight:600;margin-top:12px}
+.toc a:hover{color:var(--gold)}
+.nav{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);display:flex;
+justify-content:space-between;gap:14px;font-size:14px}
+.dl{display:inline-block;margin:.4em 10px .4em 0;padding:9px 16px;border:1px solid var(--gold);
+border-radius:3px;color:var(--gold);font-size:14px}
+.dl:hover{background:var(--gold);color:#0B0E12;text-decoration:none}
+.motif{margin:1.4em 0;padding:.9em 1.1em;border:1px solid var(--line);
+background:var(--card);border-left:3px solid var(--gold);font-size:15px}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);
+color:var(--dim);font-size:12.5px;text-align:center}
+</style></head><body><div class="bar"><a href="/books/m/115/">← 专著首页</a><a href="/books/m/115/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><h1>第 6 章之二　条件定理：优势迁移的形式版本</h1>
+<p class="meta">从最强大脑到最强复合大脑 · 思想主体性的革命 · 王德生 著 · 德麦国际专著第 115 号</p>
+<blockquote><p>本章据另一个基底独立写成的论文《从发现到发生：AI时代思考竞争力的典范转移》（附篇一全文收录，盲评 136）第六章改写。那篇给了第 6 章"结算面迁移"一个形式证明；本章把它翻成本书的语言，并标出它与本书的一处分歧。</p></blockquote>
+<h3>6之二.1　把结算面迁移写成一个函数</h3>
+<p>第 6 章说竞争力的核心在差异被结算的那一层，而那一层从个人迁到了复合体之间。附篇一把这件事写成了一个可以证明的定理，设三个量：</p>
+<p><b>a</b>，AI 提供的候选供给率——全在场对每个人同样发出的那一份：论证、反驳、方案、材料。</p>
+<p><b>r</b>，个人沿现有路径补充的候选供给率——他自己再找的数据、再想的例子；用本书的话说，他在发现簿上的存量。</p>
+<p><b>b(g)</b>，有效转化率——候选怎样变成有效的认识：问题匹配、证据核验、比较选择、把失败写回下一轮；它由一种组织能力 g 决定，g 越高 b 越高。</p>
+<p>绩效写成一个最小值函数：<b>Y ＝ min{ a ＋ r ，b(g) }</b>。意思是：有效产出受两道工序里较慢的那一道限制——候选再多，转化不动，产出不动；转化再快，没有候选，也不动。</p>
+<h3>6之二.2　定理</h3>
+<p>附篇一的证明只有几行，这里照录其意：</p>
+<p>当 a ＋ r 已经大于 b(g)——候选供给过剩，转化是瓶颈——再增加 r（个人多找几条候选），产出仍是 b(g)，不变；而只要提高 g 一点，使 b(g＋ε) 仍小于 a ＋ r，产出就变成 b(g＋ε)，上升。<b>所以在候选过剩的区间里，提高转化能力比增加同类候选更有效。</b></p>
+<p>附篇一还用一个平滑的互补函数（CES 形式）证明了同一结论：两种改进的单位成本边际收益之比 𝓜，随 a 的增大而增大；当 𝓜 大于 1，改善 g 比改善 r 划算。平滑模型说明结论不依赖最小值函数那种硬拐点。</p>
+<h3>6之二.3　它证明了第 6 章的哪一半</h3>
+<p>把它翻回本书的语言。</p>
+<p>a 就是全在场——基底对每个人同样发出的那一份供给，而且随基底变强而变大。r 就是最强大脑的三样：存、调、认，个人在发现簿上的存量。定理说：<b>当 a 变大到候选过剩，r 的边际贡献归零。</b>这正是第 5 章"稀缺的算术"的形式版本——不是 r 变小了，是它不再改变产出。</p>
+<p>b(g) 就是结算面迁到的那一层。定理说产出的差别从此由 g 决定。第 6 章说"核心在差异被结算的那一层"，定理说那一层是 b(g) 而不是 r。<b>这就把"结算面迁移"从一个判据变成了一个可以证明的命题</b>，条件写在明处：a ＋ r ＞ b(g)，也就是候选供给已经不是主要约束。</p>
+<p>定理还顺手证明了第 11 章第 7 节：为什么更强的基底不解决镜子。更强的基底是更大的 a，两边一起变大；a 不进入差别（两边相消），进入差别的只有 b(g)——而 g 不随 a 变。</p>
+<h3>6之二.4　一处分歧：g 在谁身上</h3>
+<p>附篇一把 g 叫"发生学组织能力"，放在个人身上；本书把它放在这一对之间，叫场。这是两篇之间真实的分歧，本书不抹平它。</p>
+<p>附篇一自己在第九章退了一步："发生条件的组织功能，可以由人、AI、其他人或外部工具共同承担"，并且明写"这种能力并不天然属于人"。退到这一步，g 已经不再是个人的属性，它是"具体的人—AI—环境互动"的属性——这正是本书说的场。所以本书读 b(g) 时，把 g 读成这一对的场的读数：跨边界换维的密度与次序（第 18 章）。</p>
+<p>谁对，不由争论决定，由卷八的方差比决定：固定人换复合体的方差大于固定复合体换人的方差，g 就在这一对之间；反之，g 在个人身上，附篇一对，本书的命题二作废。附篇一提出的 3×2 平行组设计，卷八第 47 章收为本书的第二个实验，与辩论赛四臂并列。</p>
+<h3>6之二.5　定理不能给的两样</h3>
+<p>第一，定理证的是局部优势，不是"核心"。附篇一自己说得清楚：某种能力在一个区间边际收益高，不足以证明它在整个社会最重要；要称核心，还要看它在有代表性的任务集合上持续出现并能迁移。本书的"核心"判据（结算面）与它是互补的：定理说哪一道工序卡着产出，结算面判据说差别在哪一层被计入；两者合起来才是第 6 章的全部。</p>
+<p>第二，定理不是本书的发明，也不是附篇一的。它的骨架是经济学里早有的两件东西：一个投入变便宜，与它互补的投入升值（预测机器的判断升值那条线）；最小值生产函数（弱环理论）。附篇一没有与它们交手，本书替它记在这里，也因此不把这个定理当作本书 I 维上的增量。本书从这个定理拿走的是形式，不是新颖。</p>
+<hr><div class="nav"><a href="/books/m/115/text/c06/">← 第 6 章　结算面迁移了</a><a href="/books/m/115/text/c07/">第 7 章　器具成了变量：计算器与 AI 的分界 →</a></div><div class="foot">© 德麦国际出版社 · 王德生《从最强大脑到最强复合大脑》· ISBN 979-8-90690-065-4</div></div></body></html>
