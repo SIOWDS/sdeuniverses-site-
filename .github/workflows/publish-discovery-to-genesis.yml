@@ -1,0 +1,45 @@
+name: Stage discovery-to-genesis paper
+on:
+  push:
+    branches: [publication/discovery-to-genesis-stage-20260918]
+    paths: ['.publication/discovery-to-genesis/ready']
+permissions:
+  contents: write
+concurrency:
+  group: publication-discovery-to-genesis-20260918
+  cancel-in-progress: false
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Verify and unpack the complete article
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, zlib, hashlib
+          root = Path('.publication/discovery-to-genesis')
+          parts = sorted(root.glob('part-*.b64'))
+          assert len(parts) == 7, 'Incomplete publication payload'
+          encoded = ''.join(p.read_text().strip() for p in parts)
+          page = zlib.decompress(base64.b64decode(encoded, validate=True))
+          assert hashlib.sha256(page).hexdigest() == '387ca77177cbfabfff55bcd758593c6da573e56bd164aa9dcb65204ecd65b894', 'Payload checksum mismatch'
+          Path('/tmp/discovery-to-genesis.html').write_bytes(page)
+          Path('/tmp/install-discovery-to-genesis.py').write_bytes((root/'install.py').read_bytes())
+          print('Verified 111659 bytes of complete HTML.')
+          PY
+      - name: Prepare publication against the latest main branch
+        run: |
+          git fetch origin main --depth=1
+          git checkout -B publication/discovery-to-genesis-result-20260918 FETCH_HEAD
+          python3 /tmp/install-discovery-to-genesis.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/column/discovery-to-genesis/index.html public/today/index.html public/new-education/index.html
+          git diff --cached --check
+          git commit -m 'Publish discovery-to-genesis paper with long-read and education entries'
+          git push origin HEAD:refs/heads/publication/discovery-to-genesis-result-20260918
+          echo "Publication candidate: $(git rev-parse HEAD)"
