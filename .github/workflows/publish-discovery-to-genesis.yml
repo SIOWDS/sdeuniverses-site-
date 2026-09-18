@@ -28,7 +28,12 @@ jobs:
           page = bz2.decompress(base64.b64decode(encoded, validate=True))
           assert hashlib.sha256(page).hexdigest() == '387ca77177cbfabfff55bcd758593c6da573e56bd164aa9dcb65204ecd65b894', 'Payload checksum mismatch'
           Path('/tmp/discovery-to-genesis.html').write_bytes(page)
-          Path('/tmp/install-discovery-to-genesis.py').write_bytes((root/'install.py').read_bytes())
+          install = (root/'install.py').read_text()
+          old = "    assert s.count(anchor) == 1, 'Long-read anchor changed; stop without overwriting'"
+          assert install.count(old) == 1
+          install = install.replace(old, "    start = s.index('<section id=\"today-longread\"')\n    end = s.index('</section>', start)\n    assert s.find(anchor, start, end) >= 0, 'Missing long-read anchor in section'")
+          install = install.replace('    pos = s.index(anchor)', '    pos = s.index(anchor, start, end)', 1)
+          Path('/tmp/install-discovery-to-genesis.py').write_text(install)
           print('Verified 111659 bytes of complete HTML.')
           PY
       - name: Prepare publication against the latest main branch
