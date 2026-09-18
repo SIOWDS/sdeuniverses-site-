@@ -139,7 +139,7 @@
       const data = await json('reading/catalog.json');
       if (!data.journals || !Array.isArray(data.articles)) throw new Error('Invalid reading catalog');
       extra = data.journals; readingState = 'ready';
-      $('reading-status').textContent = `${data.articles.length} 篇站内可读 · 中文摘要导读与英文原文摘要 / 中文全译 · 更新于 ${data.updated}`;
+      $('reading-status').textContent = `${data.articles.length} 篇站内可读 · 中文全文、摘要导读与英文摘要 / 译文 · 更新于 ${data.updated}`;
       $('reading-cards').innerHTML = data.articles.map(a => `<a class="reading-card" href="${esc(safeURL(a.read))}"><span>${esc(a.journal)} · ${esc(a.date)}</span><h3>${esc(a.title)}</h3><p>${esc(a.description)}</p><strong>${esc(a.kind)} →</strong></a>`).join('');
     } catch {
       readingState = 'error'; $('reading-status').textContent = '阅读目录暂时加载失败，可重试或直接打开下面的阅读入口。'; $('retry-reading').classList.remove('hide');
