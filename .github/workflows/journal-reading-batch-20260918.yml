@@ -5,11 +5,12 @@ on:
     branches: [main]
     paths:
       - tools/journal_reading_batch_20260918.py
+      - .github/workflows/journal-reading-batch-20260918.yml
 permissions:
   contents: write
 concurrency:
   group: journal-reading-batch-20260918
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,6 +20,11 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/journal_reading_batch_20260918.py
+            /public/journals/reading/
+            /public/journals/journals.js
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -30,8 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: journal-reading-batch-20260918-review
-          path: |
-            /tmp/journal-reading-batch-20260918
+          path: /tmp/journal-reading-batch-20260918
           if-no-files-found: ignore
       - name: Commit only this reading batch
         run: |
