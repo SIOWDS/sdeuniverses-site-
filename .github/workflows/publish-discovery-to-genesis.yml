@@ -20,12 +20,12 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import base64, zlib, hashlib
+          import base64, bz2, hashlib
           root = Path('.publication/discovery-to-genesis')
           parts = sorted(root.glob('part-*.b64'))
-          assert len(parts) == 7, 'Incomplete publication payload'
+          assert len(parts) == 20, 'Incomplete publication payload'
           encoded = ''.join(p.read_text().strip() for p in parts)
-          page = zlib.decompress(base64.b64decode(encoded, validate=True))
+          page = bz2.decompress(base64.b64decode(encoded, validate=True))
           assert hashlib.sha256(page).hexdigest() == '387ca77177cbfabfff55bcd758593c6da573e56bd164aa9dcb65204ecd65b894', 'Payload checksum mismatch'
           Path('/tmp/discovery-to-genesis.html').write_bytes(page)
           Path('/tmp/install-discovery-to-genesis.py').write_bytes((root/'install.py').read_bytes())
