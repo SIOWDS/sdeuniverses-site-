@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第五十四章　条款一·规模消解检验与不可消解度 κ · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第五十四章　条款一·规模消解检验与不可消解度 κ——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第六编　三条款</p><h2
+id="第五十四章-条款一规模消解检验与不可消解度-κ">第五十四章　条款一·规模消解检验与不可消解度
+κ</h2>
+<hr />
+<h3 id="一要判的是什么">一、要判的是什么</h3>
+<p>先在论从不否认不同路径会得到不同结果。它对这件事有一个标准解释，而且这个解释在工程界几乎是常识：<strong>资源不足。</strong></p>
+<p>数据还不够多，步数还不够长，模型还不够大，优化还没收敛到该去的地方。在这个解释里，路径差异是暂时的，是尚未被填平的坑；只要资源继续加上去，坑会被填平，不同路径终将落到同一处。</p>
+<p>这个解释有一个不可回避的经验后果，而正是这个后果使它成为可判的：<strong>差异必须随资源增加而衰减。</strong></p>
+<p>不是”可以衰减”，是”必须衰减”。如果加资源不让差异变小，那么”资源不足”这个解释就失去了它的解释对象。它可以衰减得慢，可以在某一段先升后降，可以在不同的量上以不同速率衰减——但方向必须是那个方向，极限必须是零或纯噪声水平。</p>
+<p>条款一就是去量这个衰减。它是三条条款里最弱的一条，也是唯一一条可以在现成的公开材料上首跑、不需要训练任何新模型的一条。</p>
+<h3 id="二路径散度-δn-与它的三种误读">二、路径散度 Δ(N)
+与它的三种误读</h3>
+<p><strong>定义。</strong> 固定语料 C、架构族 A、判准 L，固定模型规模
+N。取 m
+个只在路径上不同的运行——换随机种子、换数据呈现次序、或两者都换——得到 m
+个结果 R₁ … R_m。定义规模 N 处的<strong>路径散度</strong>：</p>
+<blockquote>
+<p><strong>Δ(N) = E[ d(R_i, R_j) ]</strong>，对所有 i ≠ j 取平均</p>
+</blockquote>
+<p>其中 d
+是结果距离，它的构造规范是下一章的全部内容，也是本条款最容易被做坏的地方。</p>
+<p>先在论预测 Δ(N) 随 N
+单调衰减并趋于零，或趋于纯测量噪声的水平。造成论预测 Δ(N)
+趋于一个正的常数。<strong>两个预言对同一个可测量的量给出了相反的值</strong>，这是第五十二章那次拆词换来的东西。</p>
+<p>这个定义看起来简单，但在实际使用中已经被误读过三次，每一次都会让条款一变成一个别的东西。</p>
+<p><strong>误读一：把 Δ 当成模型之间的差异。</strong> 不是。Δ
+量的是<strong>路径差异所造成的结果差异</strong>，因此那 m
+个运行必须只在路径上不同。语料换了、架构换了、判准换了，量出来的东西与本条款无关。这一条听起来是废话，但公开材料里满足”只在路径上不同”的模型系列极少，这正是首跑必须挑材料的原因。</p>
+<p><strong>误读二：把 Δ 当成不确定性或方差。</strong>
+工程文献里有大量关于随机种子导致的性能方差的报告，那些量的分母是任务分数，测的是”同一个能力的实现有多稳”。Δ
+不是这个。Δ
+测的是<strong>结果本身有多不同</strong>，而不是结果在某个判准的投影上有多不同。这两件事的区别就是下一章第一条硬规定的全部内容。</p>
+<p><strong>误读三：把 Δ 的某一次取值当成结论。</strong> Δ 是一个以 N
+为自变量的函数，条款一判的是这个函数的<strong>极限行为</strong>，不是它在任何单一规模上的取值。一个在某规模上很大的
+Δ，与先在论完全相容；一个在某规模上很小的
+Δ，与造成论也完全相容。<strong>单点读数在本条款下没有判别力</strong>，这句话要记住，它在第六节还要用一次。</p>
+<h3 id="三κ-与有限规模序列的拟合问题">三、κ
+与有限规模序列的拟合问题</h3>
+<p>定义<strong>不可消解度</strong>：</p>
+<blockquote>
+<p><strong>κ = lim_{N→∞} Δ(N)</strong></p>
+</blockquote>
+<p>这是本条款要判的量。先在论主张 κ = 0（或 κ
+不可与噪声基线区分）；造成论主张 κ &gt; 0。</p>
+<p>麻烦在于 N 不能趋于无穷。实际能做的只有：在一列有限的规模点上测出
+Δ，拟合一条衰减律，外推它的渐近值。若取衰减律为</p>
+<blockquote>
+<p>Δ(N) ≈ a·N^(−b) + κ</p>
+</blockquote>
+<p>则 κ 是拟合出来的截距，需要连同它的置信区间一起报告。</p>
+<p>这里有三件必须事先讲明的事，每一件都会决定读数能不能被采信。</p>
+<p><strong>第一，拟合族的选择本身是一个自由参数。</strong>
+幂律加常数只是一个选择。换成指数衰减加常数、换成对数形式，拟合出来的截距会不同，有时差得很远。因此拟合族必须列入冻结清单，在看到任何读数之前确定，并且给出模型选择准则——而不是事后挑一个截距最好看的。这一条写在第五十九章的冻结项里。</p>
+<p><strong>第二，规模点的数量决定了外推有没有意义。</strong>
+拟合一条三参数曲线，至少需要四个点才不欠定，而四个点拟合三参数等于零自由度，区间无从估计。要让
+κ
+的置信区间有意义，规模点的数量必须明显多于参数个数，而且跨度要大到足以让
+N^(−b) 这一项在区间内显著变化。</p>
+<p><strong>第三，“多少个点才够”这个问题，本书没有一般性的答案。</strong>
+诚实的说法是：不知道。能确定的只有下界——<strong>四个点不够</strong>，而这正是首跑的处境。</p>
+<h3 id="四趋势不是极限">四、趋势不是极限</h3>
+<p>这一节是本章的心脏。</p>
+<p>先在论今天手上最硬的经验材料，形式上正是 Δ(N)
+递减：一批工作报告了不同架构、不同模态、不同训练数据的模型，其内部表征之间的相似度随规模与性能提升而系统性上升。相似度上升，等价于距离下降。<strong>这在形式上就是条款一所要求的衰减方向。</strong></p>
+<p>所以必须把话讲清楚：这批材料给出的是<strong>趋势</strong>，不是<strong>极限</strong>。而条款一要求的恰恰是极限。</p>
+<p>两者的区别不是修辞上的。设想两个量，一个从 0.5 衰减到 0，另一个从 0.5
+衰减到
+0.3。在中间规模上，它们的曲线可以几乎重合，肉眼、图示、乃至”显著递减”的统计检验，都无法把它们分开。把它们分开需要的不是更强的信念，也不是更多的直觉，而是两样很具体的东西：<strong>足够长的规模跨度</strong>，以及<strong>在该跨度上拟合出的渐近值的置信区间</strong>。</p>
+<p>这就是条款一存在的全部理由：<strong>它把”看起来在收敛”与”收敛到零”分开。</strong></p>
+<p>由此也可以把本书对先在论那件旗舰武器的态度说准。本书不主张那批表征收敛工作有误；恰恰相反，本书认为它们是这场辩论里做得最扎实的经验工作之一，第八编第六十八章会正面处理它赢的条件。本书主张的只有一句：<strong>它们迄今给出的是趋势，条款一要求它们给出极限。</strong>
+这是一个可以被满足的要求——只要有人在足够大的规模跨度上做出拟合并报告区间，条款一就会立刻给出判决，而判决有可能是本书判负。</p>
+<p>反过来，这个要求对本书同样有效，而且更狠。造成论若只报告”某规模上路径差异很大”，那不过是同一种错误的镜像：它给出的也只是趋势，甚至连趋势都不是，只是单点。<strong>单点读数在本条款下没有判别力</strong>——这句话在上一节说过，现在要用它来约束自己。</p>
+<h3 id="五判据与判负条件">五、判据与判负条件</h3>
+<p>条款一的判据，在任何读数产生之前写死如下：</p>
+<blockquote>
+<p><strong>通过</strong>：κ 的置信下界显著大于噪声基线。
+<strong>判负</strong>：κ 的置信上界不显著区别于噪声基线。
+<strong>既不通过也不判负</strong>：拟合不能把 κ
+与噪声基线分开，或所用规模点不足以支持外推——此时结论写”未能分辨”。</p>
+</blockquote>
+<p>三条并列，第三条不是敷衍，是必须被允许出现的结果。第六十四章会专章论证这一点。</p>
+<p>若条款一判负，本书的让步在第五十八章写死：放弃核心命题，承认在这一现场先在论成立，并承认由此可推出一条更一般的结论——至少在”以固定语料为材料的知识形成”这一类过程中，路径不进入结果的规定。这是一条真正的败绩条件，不是修辞上的谦虚。</p>
+<h3
+id="六首跑在这条条款上实际跑出了什么">六、首跑在这条条款上实际跑出了什么</h3>
+<p>条款一已经跑过一次。全部细节在第七编，这里只交代它与本章判据的对应关系。</p>
+<p>材料是一组公开的多种子检查点，四个规模点，每个规模五个只在路径上不同的运行，探针集在执行之前冻结。两个通道各给出一列读数。</p>
+<p><strong>表征通道</strong>：路径间距离在四个规模点上依次为
+0.352、0.445、0.441、0.411。先升后基本持平，<strong>没有向零衰减的迹象</strong>。作为对照，同一条训练轨迹内相邻检查点之间的同一个量，在最大规模上是
+0.031。</p>
+<p><strong>行为通道</strong>：路径间距离依次为
+0.263、0.221、0.171、0.116，<strong>单调下降</strong>。归一化之后，由基线的
+6.45 倍降到 2.37 倍。</p>
+<p>按本章第五节的判据：表征通道满足通过方向（不向零衰减），行为通道满足判负方向的前半条（单调下降），但不满足后半条——它在最大规模上仍是基线的两倍以上，并未落到不可区分的程度。两通道结论不一致，按预注册的第三款判<strong>未能分辨</strong>。</p>
+<p>关于这次首跑，本章必须写明三件事。</p>
+<p><strong>其一，本跑没有报告 κ，本书也不报告 κ。</strong>
+四个规模点不支持任何外推，拟合出来的截距没有意义，区间更没有意义。按第三节的标准，这次首跑连”能不能做拟合”这道门槛都没过。<strong>本章全章不出现
+κ 的任何数值</strong>，这不是疏漏，是纪律。</p>
+<p><strong>其二，它恰好落在本章第四节所警告的那个位置上。</strong>
+行为通道单调下降，正是”看起来在收敛”的典型形状；若换一个立场的人拿着同一张表，完全可以写成”路径差异正在随规模消失”。他不会说谎，他只是把趋势当成了极限。而本书事先写死的判据不允许自己这样做——<strong>这一条纪律在首跑里第一次真的挡住了一样东西，挡住的是本书自己想要的结论的反面，也挡住了本书自己。</strong></p>
+<p><strong>其三，若只报一个通道，这一跑可以被写成任何结论。</strong>
+只报表征通道，它是条款一的一次漂亮通过；只报行为通道，它是一次清楚的败绩。两种写法都能成文，两种都是作弊。为什么”未能分辨”本身是一个结论而不是一次没有结论，由第六十四章专章处理。</p>
+<p>下一章处理结果距离
+d——上面每一个数字都依赖于它，而它有四种做坏的方式，其中一种是首跑之后才看清的。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c53/">← 第五十三章　案例的天花板：为什么此前的造成论</a><a href="/books/m/124/text/c55/">第五十五章　条款一的三条硬规定，与首跑之后补 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

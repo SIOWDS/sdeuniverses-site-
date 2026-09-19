@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>附四　复现清单 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="附四　复现清单——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">附录</p><h2 id="附四-复现清单">附四　复现清单</h2>
+<h3 id="一模型">一、模型</h3>
+<ul>
+<li>模型族：公开的多种子、多规模检查点系列（详见第六十一章）。</li>
+<li>使用：四个规模（14M、31M、70M、160M），每规模五个种子，取最终检查点。</li>
+<li>噪声基线：每规模一号种子的倒数第二个公开检查点与最终检查点。</li>
+<li>未使用：410M 及以上（磁盘与算力所限）。</li>
+<li>附加消融（探索性，不计入判决）：最大规模上的”只换数据次序”与”只换权重初始化”两组各三个。</li>
+</ul>
+<p><strong>检查点总数：24 个（主系列 20 + 基线 4），另加探索性 6
+个。</strong></p>
+<h3 id="二探针集">二、探针集</h3>
+<ul>
+<li>总数 112 条：分布内 64 条，分布外三类各 16 条。</li>
+<li><strong>摘要值前十六位：<code>e3b9d8a2795cceee</code></strong></li>
+<li>复现的第一步是重建探针集并核对此值。<strong>若不一致，后续一切读数不可比</strong>——这是本清单中唯一有确定通过标准的检验。</li>
+</ul>
+<h3 id="三脚本">三、脚本</h3>
+<p>四个，功能如下：</p>
+<ol type="1">
+<li><strong>探针生成</strong>：重建探针集并计算摘要值。</li>
+<li><strong>表示抽取</strong>：逐模型下载、前向、抽取隐藏状态与输出分布。</li>
+<li><strong>条款一分析</strong>：计算表征距离、行为距离、基线与比值，按探针分组输出。</li>
+<li><strong>消融对比分析</strong>：最大规模上三组干预的对照。</li>
+</ol>
+<h3 id="四原始读数">四、原始读数</h3>
+<p>两份，构成本书全部数字的唯一来源：主系列四个规模的全部读数（含分组），以及三组干预的对照读数。</p>
+<p><strong>本书正文中的每一个数字都可追到这两份文件。</strong></p>
+<h3 id="五硬件与环境">五、硬件与环境</h3>
+<ul>
+<li>单核处理器，3 GB 内存，单精度浮点。</li>
+<li>最大规模上单个模型前向约需数分钟；整跑时间主要花在下载与前向上。</li>
+<li>磁盘为硬约束：每跑完一个模型必须立刻清理缓存。</li>
+</ul>
+<h3 id="六四个已踩过的坑">六、四个已踩过的坑</h3>
+<ol type="1">
+<li><strong>磁盘会爆</strong>——逐个模型下载、抽取、清理。</li>
+<li><strong>散度会因零概率项下溢为无效值</strong>——必须显式把零概率项按零处理。这是实现修复，不改变距离定义。</li>
+<li><strong>不要在已具不变性的度量之前再加一层对齐</strong>——多加的那一层只引入新的自由参数。</li>
+<li><strong>开跑前做自配对返零检验</strong>——同一检查点与自身配对，走完全部计算，每一格应为零。首跑未做，代价是一次返工（第六十一章第六节）。</li>
+</ol>
+<h3 id="七复现到什么程度">七、复现到什么程度</h3>
+<ul>
+<li><strong>完全可复现</strong>：探针集（有确定通过标准）、距离计算（给定同一批状态，结果确定）。</li>
+<li><strong>可复现但有代价</strong>：前向计算，需逐个取用检查点。</li>
+<li><strong>不可完全复现</strong>：不同硬件或精度下，隐藏状态有末位差异，距离在小数第三位上可能不同。<strong>复现的标准是同一量级与同一相对关系，不是逐位相同。</strong></li>
+<li><strong>无法复现</strong>：若所用公开检查点被撤下或替换。本书能做的只有把名称、版本号与摘要值全部写明。</li>
+</ul>
+<h3 id="八这份清单挡不住的三件事">八、这份清单挡不住的三件事</h3>
+<p>清单写完，把它挡不住的写出来，与附三第八节同一个用意。</p>
+<p><strong>挡不住之一：材料消失。</strong>
+见第七节。若公开检查点被撤下，本跑不可复现，而这不是复现者的问题，也不是本书能预防的问题。</p>
+<p><strong>挡不住之二：判据错误。</strong>
+一份完整的复现清单能保证别人跑出同样的数字，不能保证那些数字有意义。首跑的噪声基线是可复现的——任何人按清单跑都会得到同样的
+0.0306——而它跨规模不可比这件事，复现一百次也不会显形。<strong>复现性与正确性是两件事，而本清单只管前者。</strong></p>
+<p><strong>挡不住之三：同一套设备的系统偏向。</strong>
+若所有复现者都用同一批公开模型、同一套工具、同一类探针，那么他们复现的不只是读数，也复现了那批材料所携带的偏向。第四十六章第二节列过三处错配——规模点分布、检查点间隔、种子数量——它们对每一个复现者同样生效。</p>
+<p><strong>因此本清单的正确用法是</strong>：用它核对”我跑的是不是同一件事”，而不是用它论证”这件事是对的”。</p>
+<p><strong>三件合起来给出一条对复现这个概念的限制</strong>，它与第九章第二节那条论证是同一个形状：<strong>复现所保证的，是在被认可的操作等价类内部结果稳定；而等价类的边界是被定的。</strong>
+本清单第七节那三档（完全可复现、有代价、不可完全复现）就是本书为这次实验划下的边界，写明它，是为了让别人能质疑这条边界本身，而不是只能在边界之内重跑。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/ap3/">← 附三　预注册模板</a><a href="/books/m/124/text/ap5/">附五　与相邻立场的分界 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

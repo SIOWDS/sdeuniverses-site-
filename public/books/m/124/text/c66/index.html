@@ -1,0 +1,160 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第六十六章　一条探索性读数，与下一跑的清单 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第六十六章　一条探索性读数，与下一跑的清单——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第七编　首跑</p><h2
+id="第六十六章-一条探索性读数与下一跑的清单">第六十六章　一条探索性读数，与下一跑的清单</h2>
+<hr />
+<h3 id="一这条读数是怎么来的">一、这条读数是怎么来的</h3>
+<p>首跑所用的那组公开检查点，除了”换种子”的主系列之外，在最大规模上另有两组消融：一组固定权重初始化、<strong>只换数据次序</strong>；一组固定数据次序、<strong>只换权重初始化</strong>。</p>
+<p>这恰好是第五十六章形式三——可交换性检验——所需要的材料的一个粗糙版本。模型已经下载在盘上，测一次几乎不增加成本，于是顺手测了。</p>
+<p>它是预注册之外的附加测量，在偏离记录里被明确标记为探索性，<strong>不计入条款一的判决</strong>。本章把它摆出来，连同它的全部弱点。</p>
+<h3 id="二读数">二、读数</h3>
+<p>最大规模（160M）上，四种条件下的距离：</p>
+<table>
+<thead>
+<tr class="header">
+<th>干预</th>
+<th>对数</th>
+<th>表征距离</th>
+<th>行为距离</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>两者都换</td>
+<td>10</td>
+<td>0.411 ± 0.206</td>
+<td>0.116 ± 0.008</td>
+</tr>
+<tr class="even">
+<td><strong>只换数据次序</strong></td>
+<td>3</td>
+<td>0.101 ± 0.027</td>
+<td><strong>0.138 ± 0.011</strong></td>
+</tr>
+<tr class="odd">
+<td>只换权重初始化</td>
+<td>3</td>
+<td>0.096 ± 0.022</td>
+<td>0.118 ± 0.006</td>
+</tr>
+<tr class="even">
+<td>基线（相邻检查点）</td>
+<td>1</td>
+<td>0.031</td>
+<td>0.049</td>
+</tr>
+</tbody>
+</table>
+<p>两件事值得记下来。</p>
+<p><strong>其一，只换数据次序所造成的行为差异是 0.138，不小于两者都换的
+0.116，是基线 0.049 的 2.8 倍。</strong></p>
+<p>把这个条件说清楚：材料是同一个集合，判准相同，架构相同，权重初始化相同——<strong>只有呈现顺序不同</strong>。</p>
+<p>如果”材料决定结果”这句话在字面上成立，那么同一个集合以不同顺序呈现，在充分训练之后应当收敛到可交换的结果。这一读数不是这样。这是那句话在行为层面上第一次被直接顶了一下。</p>
+<p><strong>其二，表征通道呈现强超加性。</strong> 单换任一项各约
+0.10，两项同换
+0.41，远大于两者相加。这提示路径变量之间存在交互，不能按独立因素分解。</p>
+<h3 id="三它的三处弱点">三、它的三处弱点</h3>
+<p>现在写弱点，而且要写足——本章的大部分篇幅在这里。</p>
+<p><strong>弱点一：样本量是 3 对。</strong></p>
+<p>三对样本不支持任何统计推断。表上那个标准差是三个数的标准差，它本身的不确定度极大。0.138
+与 0.116
+之间的差别，在这个样本量下不具备可辩护的显著性。把它写成”大于”已经是本书在语气上所能允许的极限，写成”显著大于”就是越界。</p>
+<p><strong>弱点二，也是最重的一处：三组的对内共享条件不齐。</strong></p>
+<ul>
+<li>“只换数据次序”那一组的三个模型，<strong>共享同一个权重初始化</strong>。</li>
+<li>“只换权重初始化”那一组，<strong>共享同一个数据次序</strong>。</li>
+<li>“两者都换”那一组，<strong>两样都不共享</strong>。</li>
+</ul>
+<p>三组的对内相似度本来就不在同一条件下。前两组各自被一项共享条件”拉近”，第三组没有。因此三组之间的任何比较——包括上一节那个看起来很强的超加性——都被这一处混淆污染。</p>
+<p><strong>超加性不能当结论。</strong>
+它可以完全是这个共享结构的产物，而不是路径变量交互的产物。它的正确位置是下一跑的预注册项：设计一组对内条件严格对齐的消融，再看超加性是否还在。</p>
+<p>这正是第五十六章第五节那条实验规格的来处。那条规格里写着”组内共享条件要对齐，否则三组的对内相似度本来就不在同一条件下”——那句话不是从原理推出来的，是从这次读数栽的跟头里长出来的。</p>
+<p><strong>弱点三：它只是顶了一下。</strong></p>
+<p>不得把这个 0.138
+写成”材料决定结果已被证伪”。证伪那句话需要的是形式三的完整实验：成对的次序反转、严格对齐的控制、事先指定的收敛判据、跨规模的重复。以上一件都没有。本跑用的是现成的消融材料，它们当初被制作出来的目的不是回答这个问题。</p>
+<h3 id="四那么它还剩下什么">四、那么它还剩下什么</h3>
+<p>三条弱点写完，这条读数还剩下什么？</p>
+<p>剩下一件，而且只剩这一件：<strong>它把形式三从一个漂亮的想法，变成了一个值得花钱去跑的实验。</strong></p>
+<p>在这条读数之前，可交换性检验是一个纸面上的设计——论证很锋利，但没有任何迹象表明它会给出非平凡的结果。完全可能的情况是：真的去做次序反转实验，跑完发现差异微乎其微，整条设计作废。</p>
+<p>这条读数改变了这个判断。它表明，在一个虽然粗糙但方向正确的近似实现里，次序单独造成的行为差异并不小，甚至不比”次序加初始化一起换”更小。这不构成证据，但它构成<strong>理由</strong>——去做那个昂贵实验的理由。</p>
+<p>这是探索性读数在本书中被允许扮演的唯一角色：<strong>它可以决定下一笔钱花在哪里，不可以进入任何一条判决。</strong></p>
+<h3 id="五下一跑清单">五、下一跑清单</h3>
+<p>把本编所有章节里散落的”下一跑必须改什么”收在一处，按优先级排列。</p>
+<p><strong>第一，换基线。</strong>
+本跑暴露出的第一优先项。改用同种子、同次序、仅数值非确定性的重训，或同一轨迹内多对等距检查点的分布下界。理由与两种修法的代价见第六十五章。在此之前，任何跨规模的归一化读数都不可采信。</p>
+<p><strong>第二，补规模点。</strong> 至少加到 410M，若条件允许加到 1B
+及以上。四个点不足以拟合，更不足以外推。只有在规模跨度显著扩大之后，才谈得上给出不可消解度及其置信区间——而在那之前，<strong>本书不报告这个量的任何数值</strong>。</p>
+<p><strong>第三，换分布外探针。</strong>
+现有的分布外探针由本实验构造，其中中文一组尤其脆弱，不是第三方公开基准。下一跑必须改用第三方基准，或至少并行报告自造探针与第三方基准两套读数。这一条的理由在第五十五章第三节已经写过：探针配比是本书最脆弱的自由参数，而分组读数证明结论对它高度敏感。</p>
+<p><strong>第四，把次序可交换性做成正式实验。</strong>
+按第五十六章第五节的规格：成对次序反转、组内共享条件严格对齐、事先指定收敛判据、不得改用分数作距离。需要自训练，是这份清单上最贵的一项。</p>
+<p><strong>第五，判据表述随基线一并修订。</strong>
+现行判据写在归一化量上，而分母已被证明不可靠。下一跑的判据要么改写到绝对量加独立标定的噪声水平上，要么等基线换好之后再用比值。二选一，执行前定死。</p>
+<p><strong>第六，在前两条完成之前，不报告不可消解度。</strong>
+这一条是纪律，不是建议。首跑没有报告它，下一跑在第一、二条完成之前也不应报告。</p>
+<h3 id="六这份清单要花多少钱">六、这份清单要花多少钱</h3>
+<p>清单列完，必须交代它的代价，否则它只是一份愿望。六条的成本相差很大，按量级排三档。</p>
+<p><strong>近乎免费的三条。</strong>
+保留逐对读数、保留逐层读数、并行报告自造探针与第三方基准——这三条不增加任何前向计算，只是把已经算出来的东西记下来，或换一批现成的探针文本。它们之所以在首跑里没做，原因是设计疏忽而不是资源不足。下一跑没有任何理由不做。</p>
+<p><strong>中等代价的两条。</strong>
+补规模点与换基线中的第二种修法，都只需要更大的机器，不需要重新训练：前者是把更大的公开检查点取下来跑前向，后者是在已有轨迹上多取几对快照。它们的代价是存储与算力，在本跑那种单核、3GB
+的条件下做不了，在一台常规的工作站上做得了。这一档的瓶颈是设备，不是方法。</p>
+<p><strong>昂贵的两条。</strong>
+换基线的第一种修法（同种子重训）与正式的次序可交换性实验，都必须从头训练模型。前者要在每个规模上各重训一次，后者要成对地训练次序反转的模型，且组内共享条件必须严格对齐。这一档的代价是数量级上的跳跃：它不再是”借用别人已经训好的东西”，而是”自己训”。</p>
+<p>这个分档有一个直接的推论，它也是本编给出的最实际的一条建议：</p>
+<blockquote>
+<p><strong>下一跑应当先把前两档全部做完，再决定第三档做不做。</strong></p>
+</blockquote>
+<p>理由是：前两档做完之后，本跑的三条局限里已经解决了两条（规模点、探针），第三条（基线）也至少被改善到可用。在那个状态下重跑一次条款一，很可能就能给出通过或判负——而不是又一次”未能分辨”。只有当那一跑仍然判不出来，或者判出了通过而需要继续往条款二推进时，第三档的花费才有正当理由。</p>
+<p><strong>把昂贵的实验押后，不是保守，是顺序问题。</strong>
+条款三是本书开出的支票，而在条款一还没兑现之前就去兑第三张支票，即使成功也无人采信——因为那时人们会正确地指出：第一条都没判出来。</p>
+<h3 id="七这一编交出了什么">七、这一编交出了什么</h3>
+<p>第七编到此结束。把它交出来的东西盘一次，不多说也不少说。</p>
+<p><strong>它没有交出判决。</strong>
+条款一的结论是”未能分辨”，四条败绩条件一条都没有被触发。</p>
+<p><strong>它交出了一次真实执行。</strong> 二十四个公开检查点、112
+条冻结探针、两个通道、全部脚本与原始读数公开。任何人可以重跑并核对摘要值。</p>
+<p><strong>它交出了一份修订清单。</strong>
+上一节六条，其中第一条是首跑自己把自己的判据证伪的产物。</p>
+<p><strong>它交出了一条线索。</strong>
+本章那条探索性读数，不能当结论，但足以决定下一笔投入的方向。</p>
+<p><strong>最后，它交出了一次纪律的实测。</strong>
+预注册的第三条防作弊规则——不以趋势代极限——在本跑中第一次真的挡住了一样东西。它挡住的不是对手，是本书自己：表征通道给了本书想要的读数，行为通道没给，而规则不允许本书把这两件事加权成一句”总体倾向于支持”。</p>
+<p>这件事的分量，要到本书的某一条条款真的被判负、而本书照章让步的那一天，才能完全兑现。在那之前，本编只能记下它第一次生效的样子。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c65/">← 第六十五章　首跑暴露的方法论缺陷：归一化基线</a><a href="/books/m/124/text/c67/">第六十七章　先在论今天有实证武器，而且很硬 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

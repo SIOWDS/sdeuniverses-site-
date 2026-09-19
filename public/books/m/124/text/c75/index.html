@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第七十五章　第一记·极小点集合本来就在那里 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第七十五章　第一记·极小点集合本来就在那里——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第九编　反击与边界</p><h2
+id="第七十五章-第一记极小点集合本来就在那里">第七十五章　第一记·极小点集合本来就在那里</h2>
+<hr />
+<h3 id="一这一记的形式">一、这一记的形式</h3>
+<p>把它按最强的形式复述一遍。</p>
+<blockquote>
+<p>训练不过是在一个由语料与架构共同确定的损失景观上做下降。那个景观——它的全部局部极小、全部鞍点、全部盆地——在第一步训练之前就已经被完全确定了。路径决定你落进哪一个坑，但<strong>坑早就在那儿挖好了</strong>。</p>
+</blockquote>
+<blockquote>
+<p>因此，一切路径依赖都只是”选择了哪一个先在者”，而不是”造成了一个新东西”。凸优化里路径依赖为零，非凸里不为零——但目标函数在两种情况下同样先在。造成论把非凸性误当成了本体论。</p>
+</blockquote>
+<p>（以上两段是这一记的原样复述，按第六十七章第三节那条纪律，不作简化、不作稀释。）</p>
+<p><strong>这是本书所知对核心命题最强的一击。</strong></p>
+<p>它强在三处：</p>
+<p><strong>其一，它不需要任何经验读数。</strong>
+前一编那四件武器都要靠实验，因而都可以被实验推翻。这一记不靠实验。它只需要一个数学事实，而那个事实为真——给定数据与架构，损失函数确实在训练之前就完全确定了。</p>
+<p><strong>其二，它可以毫发无伤地接受本书的全部读数。</strong>
+假设条款一通过、κ
+是一个正数，这一记照样成立：当然有一个正的常数，因为坑不止一个。第七编那些数字对它构不成任何威胁。</p>
+<p><strong>其三，它是先在论的最后阵地。</strong>
+第八编那四件武器里的任何一件被推翻，这一记都还在。它不依赖表征收敛、不依赖彩票假说、不依赖模式连通，甚至不依赖任何一篇具体的论文。</p>
+<p>一个不靠实验、能容纳对手全部读数、且不依赖任何具体证据的论证，在辩论中是极难对付的东西。本章与下一章用两章来对付它。</p>
+<h3
+id="二回答的第一步承认它为真并指出它证明得太多">二、回答的第一步：承认它为真，并指出它证明得太多</h3>
+<p>第一步不是反驳，是承认。那个数学事实为真，本书不与之争一个字。</p>
+<p>但要接着问：这个论证的适用范围有多大？</p>
+<p>同样的论证可以毫无阻碍地应用到任何一个物理过程上。给定初始条件与动力学，演化的全部可能轨迹”早就在那儿”。于是：</p>
+<ul>
+<li>寒武纪之后的一切生命形态也都先在。</li>
+<li>人类历史的一切走向也都先在。</li>
+<li>每一部尚未被写出的小说，在它被写出之前也都先在。</li>
+<li>每一件尚未被制造的器物，在它被制造之前也都先在。</li>
+</ul>
+<p>这个版本的先在论把整个宇宙判成一本早已写好的书。</p>
+<p><strong>它可能是对的。</strong>
+本书不主张决定论为假，这件事本书没有立场，也不需要有立场。</p>
+<p>但它有一个代价，而这个代价足以使它退出本案：</p>
+<blockquote>
+<p><strong>它不再是关于知识的主张，而是关于决定论的主张。</strong></p>
+</blockquote>
+<p>而且它付出的代价是取消了”造成”这个概念在任何地方的适用性——包括在制造、艺术、立法、生育这些没有任何人会否认其为造成的地方。</p>
+<p>一个使”造成”一词在宇宙中无处可指的论证，不是赢了这场争论，<strong>是解散了这场争论</strong>。</p>
+<p>这里要补一句，因为它关系到本章的分寸：<strong>指出一个论证证明得太多，不等于证明它错了。</strong>
+一个证明得太多的论证仍然可能为真，只是它不再能用来区分本案的两方——而不能做区分的东西不能用来判案。这与下一章第三节将要用到的那个判据是同一条原则。</p>
+<h3
+id="三这一记不是新的新的是它第一次可以被请下来">三、这一记不是新的，新的是它第一次可以被请下来</h3>
+<p>这一记在哲学上有很长的家谱，值得点一句，因为家谱决定了它为什么这么难缠。</p>
+<p>它的一般形式是：给定初始条件与演化律，后来的一切都已被确定，因此没有任何东西是真正被造成的。这个论证在近代以决定论的形式出现过，在更早以”一切可能者已在”的形式出现过。它在每一次出现时都有同一个特点——<strong>它不能被经验触及，因此既不能被经验推翻，也不能被经验支持。</strong></p>
+<p>正因为如此，它在两千年里一直是先在论的保险。无论经验层面发生什么，这一记都还在。</p>
+<p><strong>本案的新处不在于这一记变弱了，而在于它第一次有了一个可以被指认的载体。</strong></p>
+<p>在自然界里，“那个先定的结构在哪里”这个问题没有答案可查——没有人能把宇宙的初始条件与演化律取出来看一眼。而在大模型训练里，那个被说成先定的东西有一个名字、有一个定义、有一段可以打印出来的代码：损失函数由数据与架构确定，而数据和架构都是人写下的、可以逐位检查的对象。</p>
+<p>于是一个此前只能在原则上讨论的问题，变成了一个可以动手查的问题：</p>
+<blockquote>
+<p><strong>把那个先定的集合写出来。</strong></p>
+</blockquote>
+<p>这就是下一章要做的事。<strong>能做这件事，是换现场换来的。</strong>
+第四编论证过为什么是大模型而不是量子测量或实验演化，那里给的理由是可重跑与可缩放；这里可以补上第三个理由——<strong>在这个现场，先在论所主张的那个先在者，是一个可以被要求出示的对象。</strong></p>
+<h3
+id="四这一记与计算性路径依赖是同一件事">四、这一记与计算性路径依赖是同一件事</h3>
+<p>把这一记放回第五十二章的框架，它的位置立刻清楚了。</p>
+<p>它说的是：路径造成的结果差异，其原因在于求解过程在一个先定的景观上的有限行走。不同的路径落进不同的坑，而坑是先定的。</p>
+<p>这正是<strong>计算性路径依赖</strong>的定义——“你还没走到”的一个变体，准确地说是”你走到了另一个已经存在的地方”。</p>
+<p>第五十二章第二节写过一句话，现在要兑现它：<strong>迄今为止机器学习中所报告的绝大多数路径依赖，都是先在论的自家话。</strong>
+这一记就是那句话的哲学形态。本书从一开始就没有打算靠”路径差异存在”来赢，正是因为这一记在那里等着。</p>
+<p>由此也可以说清本编与第六编的关系：<strong>第六编的三条条款，整个就是为对付这一记而设计的。</strong></p>
+<ul>
+<li>条款一问：这些坑之间的差别会不会随资源消失？</li>
+<li>条款二问：这些坑能不能被一个不提路径的描述写出来？</li>
+<li>条款三问：有没有哪个坑是从某条路走过去根本到不了的？</li>
+</ul>
+<p>三条都是在向这一记索要它所承诺的那个”先定的集合”的具体形态。</p>
+<h3 id="五这一记的可辩护形态">五、这一记的可辩护形态</h3>
+<p>经过上面两步，这一记被压缩了。压缩后的形态是这样的：</p>
+<blockquote>
+<p><strong>结果的规定可由 C、A、L 写出，路径只是选择器。</strong></p>
+</blockquote>
+<p>这句话与它的原始形态有两处不同。</p>
+<p><strong>第一，它放弃了”在数学上必然为真”的地位。</strong>
+原始形态说的是一个数学事实——损失函数由数据与架构确定。压缩后的形态说的是一个关于<strong>描述</strong>的主张：那个先定的集合可以被写出来。这不是一个数学事实，是一个待证的经验命题。</p>
+<p><strong>第二，它变成了可测的。</strong>
+一旦要求把集合写出来，就有了检验：写出来的描述能不能覆盖实际到达的结果。这就是条款二。</p>
+<p><strong>这一步转换是本书全部工作的目的。</strong>
+不是赢下这一击——本书赢不下它，它在自己的地盘上是安全的——而是把它逼成一个可以拿数据说话的命题。</p>
+<p>一个只在形而上学层面成立的论证，无法被任何实验触及，因此也无法被任何实验支持。先在论若停在原始形态上，它就同时失去了被判负的可能与被判赢的可能。把它请下来，对它是公平的，对本案是必需的。</p>
+<p>下一章做那件索要工作：向它要一个地址。</p>
+<h3 id="六为什么这一记排在本编第一">六、为什么这一记排在本编第一</h3>
+<p>最后说明本编的排序，因为排序本身是一个判断。</p>
+<p>本编五记，按本书认为的分量从重到轻排：极小点集合先在（本章）、表征不是知识（第七十七章）、临时程序只是激活（第七十八章）、给相对主义开门（第七十九章）、度量的产物（第八十章）。</p>
+<p>这个排序有一处可能引起异议：<strong>第七十八章那一记是本书接不住的，为什么不排第一？</strong></p>
+<p>理由是接不住与分量大是两件事。</p>
+<p>第七十八章那一记接不住，但它的<strong>射程很窄</strong>——它只打到条款三的第三个候选，而本书已经把那个候选降为第三顺位并附加了一条几乎过不去的门槛。一记打在一个本书已经主动放弃的位置上，即使接不住，也不改变判决。</p>
+<p>本章这一记射程最宽：它不需要实验、能容纳本书的全部读数、且不依赖任何具体证据。它若成立于原始形态，本书的全部工作都是在一个已经输掉的问题上做技术改进。</p>
+<p><strong>而第八十章那一记排在最后，理由也要说明</strong>：它是方法论上最危险的一记，但它攻击的是本书的执行而不是本书的立场；一个执行上的缺陷可以靠更好的执行修复，而修复方案本书已经写在第六十六章那份清单里。危险与致命是两回事。</p>
+<p>排序不是评分，它只说明本书认为该把最多的篇幅花在哪里。读者若不同意这个排序，各章是独立的，可以按别的次序读。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c74/">← 第七十四章　欠规定性与多种子基准：被当作工程</a><a href="/books/m/124/text/c76/">第七十六章　向它要一个地址 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

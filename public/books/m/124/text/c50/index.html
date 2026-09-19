@@ -1,0 +1,149 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第五十章　三处翻译陷阱 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第五十章　三处翻译陷阱——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第五编　翻译</p><h2 id="第五十章-三处翻译陷阱">第五十章　三处翻译陷阱</h2>
+<hr />
+<p>翻译中偷渡的任何一点，都会使判决失效。本章写四处，每一处都会使整套论证变成循环。</p>
+<p>前三处按危险程度排，第四处是首跑之后才浮出来的。</p>
+<h3 id="一陷阱一不能用性能代替结果">一、陷阱一：不能用性能代替结果</h3>
+<p><strong>陷阱的样子。</strong> 把 R
+取成基准测试分数——在若干任务上各跑一遍，把分数向量当作结果。</p>
+<p>这个做法顺手到几乎不需要理由：分数是现成的，可比的，有大量工具支持，而且所有人都在用。</p>
+<p><strong>它为什么会自动出某个结论。</strong></p>
+<p>分数是判准 L 在结果上的投影，而 L 是本案里被固定住的那一项。</p>
+<p>用 L 的投影当结果，等于事先规定：<strong>凡是 L
+看不出来的差别都不算差别。</strong></p>
+<p>而先在论要论证的恰恰是”差别只在标号上，在实质上不存在”。于是这个取法把结论塞进了度量。</p>
+<p><strong>后果是可预测的</strong>：在训练分布上，不同种子的模型分数高度接近——这本来就是它们被训练出来的目的。于是”不同种子的模型分数接近”会被误读为路径无关，条款一以一种看上去很干净的方式判负，而判负的原因不是路径差异消失了，是度量把它压掉了。</p>
+<p><strong>这一处陷阱在本书里出现了五次</strong>，每次的对象不同，值得列出来，因为它说明这不是一个孤立的技术要求：</p>
+<ul>
+<li><strong>第五十五章第一条</strong>：本书自己的结果距离不得用任务分数。</li>
+<li><strong>第七十二章</strong>：缩放律是关于损失的规律，而损失是判准的投影，因此它对本案不构成证据。</li>
+<li><strong>第七十三章第五节</strong>：那条种子间双峰的读数落在下游任务表现上，因此只能作旁证。</li>
+<li><strong>第八十三章第一节</strong>：现行评估测的是结果在判准上的投影，因此看不见结构差异。</li>
+<li><strong>第九章第四节</strong>：可重复性这个程序本身就是被设计来排除路径效应的。</li>
+</ul>
+<p><strong>五次是同一条</strong>：一个被设计来压平差异的量，不能用来测量差异。</p>
+<h3
+id="二陷阱二不能事后定义实质不等价">二、陷阱二：不能事后定义”实质不等价”</h3>
+<p><strong>陷阱的样子。</strong> 先看读数，再决定什么算实质差别。</p>
+<p>这个陷阱不像第一个那样有一个明确的技术动作，它是一种时间顺序上的错误，因此更难被发现——<strong>做的人常常不知道自己在做。</strong></p>
+<p><strong>它为什么会自动出某个结论。</strong></p>
+<p>第四十九章第四节已经写过：任何两个独立训练的模型都有无数种差别，也有无数种相同。想找差别，取一个足够细的指标；想找相同，取一个足够粗的指标。<strong>两种都能做到，而且都不需要说谎。</strong></p>
+<p>于是若定义在读数之后做出，结论完全由指标选择决定。</p>
+<p><strong>本书的处理，以及它的实际执行情况。</strong></p>
+<p>处理是预注册：距离的完整定义、探针集的全部条目、判负条件，全部在接触任何读数之前冻结并公开摘要值（第五十九章、第六十章）。</p>
+<p><strong>执行情况是：这一条被遵守了，而且它真的挡住了一样东西。</strong></p>
+<p>首跑的两个通道给出相反方向的读数。若定义可以事后调整，最自然的做法是把表征通道说成主要的、行为通道说成次要的，然后报告一个方向。而第
+4
+条第三款在执行前就写着”两通道结论不一致则判未能分辨”，于是本书什么也没说（第六十四章）。</p>
+<p><strong>但这一条也有它没能挡住的</strong>：第五十九章第六节那句话——预注册保护的是”事后不许改判据”，它不保护”事前把判据写错”。首跑的噪声基线就是事前写错的一例。<strong>这一处陷阱被挡住了，另一处没有。</strong></p>
+<h3
+id="三陷阱三不能把工程缺陷读成本体论">三、陷阱三：不能把工程缺陷读成本体论</h3>
+<p><strong>陷阱的样子。</strong>
+看到一批关于”不同种子给出不同结果”的报告，直接把它们当作造成论的证据。</p>
+<p><strong>这是本书这一侧最容易掉进去的陷阱，而且它比前两处更难察觉，因为掉进去的人得到的是对自己有利的结论。</strong></p>
+<p><strong>它为什么不成立。</strong></p>
+<p>第五十二章第二节写过：迄今为止机器学习中所报告的绝大多数路径依赖，都是先在论的自家话。非凸优化的局部极小当然依赖初始点，但目标函数由
+C 与 A 给定，极小点集合在训练开始之前就已确定。</p>
+<p>那些报告说的是”路径差异存在”。而本案要判的是”路径差异是否随资源消失”。<strong>前者不蕴含后者</strong>，而且前者与先在论完全相容。</p>
+<p><strong>因此第七十四章那批材料——欠规定性、多种子基准、次序效应——在本书里只能作为理由，不能作为读数。</strong>
+那一章第八节把这一点写死。</p>
+<p><strong>这一处陷阱还有一个更细的版本，值得单独点出。</strong></p>
+<p>工程文献里的路径依赖报告，其因变量几乎全是性能或可靠性指标。于是它们同时踩中陷阱一与陷阱三：<strong>既用了判准的投影，又把差异的存在当成了差异的不可消除。</strong></p>
+<p><strong>本书对这类材料的正确用法只有一个</strong>：把它们当作”这类效应不是虚构的”的说明，以及当作设计实验的理由。第六十六章第四节那条探索性读数的处理方式，就是这个用法的标准形态——它把形式三从一个想法变成一个值得花钱去跑的实验，仅此而已。</p>
+<h3
+id="四第四处不能把装置的限制读成对象的性质">四、第四处：不能把装置的限制读成对象的性质</h3>
+<p>上面三处是论文阶段就识别出来的。首跑之后浮出第四处，它比前三处更隐蔽，因为它不发生在设计阶段，发生在读数阶段。</p>
+<p><strong>陷阱的样子。</strong>
+把一个由装置或判据造成的现象，读成被研究对象的性质。</p>
+<p><strong>首跑提供了一个干净的实例。</strong></p>
+<p>归一化后的比值在最大规模处从 40.4 掉到
+13.4。若只看这一列，自然的读法是”路径差异在大模型上急剧衰减”——一个关于对象的结论。</p>
+<p>而实际情况是：分子只从 0.441 降到 0.411，分母从 0.0109 跳到
+0.0306。<strong>那次坍缩主要是分母造成的，而分母是判据的一部分，不是对象的性质</strong>（第六十五章）。</p>
+<p><strong>第二个实例在同一跑里。</strong></p>
+<p>分组比值在最大规模上四组全线下降，其中中文那一组掉到
+1.37，接近噪声。而那一组的基线在同一处从 0.045 跳到
+0.121——<strong>同样是分母（第六十三章第六节）。</strong></p>
+<p><strong>为什么这一处比前三处隐蔽？</strong></p>
+<p>因为前三处发生在设计阶段，一个认真的人在动手之前有机会发现；而这一处发生在数据已经出来之后，那时人已经在看一条曲线，而曲线看起来像是在说对象的事。</p>
+<p><strong>本书的处理办法，是一条很便宜的程序规定</strong>：</p>
+<blockquote>
+<p><strong>报告分母。凡使用任何归一化，把分子、分母、以及比值三者分别列出。</strong></p>
+</blockquote>
+<p>这一条不增加任何计算成本，却能把一整类隐形错误变成可见的。第六十五章第七节把它作为一条超出本案的建议提出，本章把它补进翻译陷阱的清单，因为它的根在翻译阶段——<strong>一个量若是复合的，它的成分必须可被拆开检查，否则它就不是一个合格的翻译产物。</strong></p>
+<p><strong>这一处陷阱也有它对两侧的对称性</strong>：第八十章第七节指出，表征收敛那一线的读数同样很少报告”同一路径内的正常波动有多大”，因而同样面临”上升是否只是度量的产物”这一问。</p>
+<h3 id="五四处陷阱的共同形状">五、四处陷阱的共同形状</h3>
+<p>把四处并排：</p>
+<table>
+<thead>
+<tr class="header">
+<th>陷阱</th>
+<th>错在哪一步</th>
+<th>谁容易掉进去</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>用性能代替结果</td>
+<td>度量选错</td>
+<td>两侧都会，先在论受益</td>
+</tr>
+<tr class="even">
+<td>事后定义实质不等价</td>
+<td>时间顺序错</td>
+<td>两侧都会，结论由指标决定</td>
+</tr>
+<tr class="odd">
+<td>把工程缺陷读成本体论</td>
+<td>推论跨了一步</td>
+<td>造成论一侧，本书受益</td>
+</tr>
+<tr class="even">
+<td>把装置的限制读成对象的性质</td>
+<td>读数阶段归因错</td>
+<td>两侧都会，且事后才显形</td>
+</tr>
+</tbody>
+</table>
+<p><strong>四处的共同点是：它们都不需要任何人说谎。</strong></p>
+<p>每一处都可以由一个诚实、认真、方法上无可指摘的研究者踩中。陷阱一是行业惯例；陷阱二是人正常工作的方式；陷阱三是一个看起来只差半步的推论。</p>
+<p><strong>这解释了为什么本书用了这么多篇幅在程序上</strong>——预注册、冻结、双通道、败绩条件、六条不主张。若这四处陷阱只有不诚实的人会踩，那么呼吁诚实就够了；而既然诚实的人也会踩，就只能靠事先写死的程序。</p>
+<p><strong>最后补一句对本书不利的</strong>：本章列了四处，不等于只有四处。第四十八章第二节那三处约定、第七十一章那条变换群的界线、第八十章那三个自由参数，各自都是翻译在别处可能被攻破的地方。<strong>四处是本书能想到的，不是全部。</strong></p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c49/">← 第四十九章　分歧的最终形式</a><a href="/books/m/124/text/c51/">第五十一章　判一个实例不等于判全称 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

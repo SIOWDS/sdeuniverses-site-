@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第六十三章　读数（二）：行为通道——单调下降 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第六十三章　读数（二）：行为通道——单调下降——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第七编　首跑</p><h2
+id="第六十三章-读数二行为通道单调下降">第六十三章　读数（二）：行为通道——单调下降</h2>
+<hr />
+<h3 id="一读数">一、读数</h3>
+<p>同一批模型，同一批探针，同一套采样位置。量的不再是内部状态，而是输出分布。</p>
+<table>
+<thead>
+<tr class="header">
+<th>规模</th>
+<th>路径间距离（均值 ± 标准差）</th>
+<th>同轨迹相邻检查点基线</th>
+<th>比值</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>14M</td>
+<td>0.263 ± 0.067</td>
+<td>0.0407</td>
+<td>6.45</td>
+</tr>
+<tr class="even">
+<td>31M</td>
+<td>0.221 ± 0.030</td>
+<td>0.0398</td>
+<td>5.57</td>
+</tr>
+<tr class="odd">
+<td>70M</td>
+<td>0.171 ± 0.010</td>
+<td>0.0307</td>
+<td>5.56</td>
+</tr>
+<tr class="even">
+<td>160M</td>
+<td>0.116 ± 0.008</td>
+<td>0.0487</td>
+<td>2.37</td>
+</tr>
+</tbody>
+</table>
+<p>这一列是<strong>先在论方向的读数</strong>。它必须与上一章同等分量地写出，这是预注册的第二条防作弊纪律。</p>
+<h3 id="二这一列说了什么">二、这一列说了什么</h3>
+<p><strong>第一，它单调下降，而且降得干净。</strong>
+0.263、0.221、0.171、0.116。四个点、三段下降，没有一段反向。规模增加了十倍多，路径造成的行为差异降到了不足原来的一半。</p>
+<p><strong>第二，标准差随规模收缩。</strong>
+0.067、0.030、0.010、0.008。这与上一章那列形成了刺眼的对照——那里标准差在最大规模上膨胀到
+0.206，这里收缩到
+0.008。越大的模型，它们在行为上越一致，而且这种一致性本身也越稳定。</p>
+<p><strong>第三，这正是先在论所预测的形状。</strong>
+资源不足的解释要求差异随资源衰减，这一列给出的就是衰减。如果只看这一列，条款一的前半条判负条件已经满足了。</p>
+<p>这三句话本书照写，不加任何缓冲。</p>
+<h3
+id="三但它没有满足判负条件的后半条">三、但它没有满足判负条件的后半条</h3>
+<p>第五十四章第五节写死的判负条件有两半：<strong>单调下降，且在最大规模处不显著区别于基线。</strong></p>
+<p>前半条满足了。后半条没有。</p>
+<p>在最大规模上，路径间行为距离是 0.116，同轨迹相邻检查点基线是
+0.0487，比值
+2.37。它降了很多，但它没有降到噪声里去——仍然是基线的两倍以上。</p>
+<p>这个区别不是技术性的挑剔。“衰减”与”衰减到零”的分别，正是第五十四章第四节整节在讲的那件事，而那一节讲的时候用的是针对先在论的语气。现在轮到它被用在本书自己身上：<strong>本书不能因为这一列在下降就判自己输，正如先在论不能因为它在下降就宣布自己赢。</strong>
+两边受同一条纪律约束。</p>
+<p>所以这一列的准确读法是：它向着判负的方向走了很长一段，但在本跑所及的最大规模上还没有走到。它是否会在更大规模上走完，这四个点答不了。</p>
+<h3
+id="四分组读数一个对本书有利的事实和一个对本书不利的事实">四、分组读数：一个对本书有利的事实和一个对本书不利的事实</h3>
+<p>行为通道按探针组分开记录。四组在四个规模上的读数：</p>
+<table>
+<thead>
+<tr class="header">
+<th>规模</th>
+<th>A（分布内）</th>
+<th>B1（归纳）</th>
+<th>B2（模算术）</th>
+<th>B3（中文）</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>14M</td>
+<td>0.184</td>
+<td>0.459</td>
+<td>0.146</td>
+<td>0.496</td>
+</tr>
+<tr class="even">
+<td>31M</td>
+<td>0.174</td>
+<td>0.344</td>
+<td>0.200</td>
+<td>0.312</td>
+</tr>
+<tr class="odd">
+<td>70M</td>
+<td>0.141</td>
+<td>0.316</td>
+<td>0.123</td>
+<td>0.193</td>
+</tr>
+<tr class="even">
+<td>160M</td>
+<td>0.105</td>
+<td>0.146</td>
+<td>0.077</td>
+<td>0.166</td>
+</tr>
+</tbody>
+</table>
+<p>两件事同时成立，都要写。</p>
+<p><strong>有利的一件：种子差异在分布外显著大于分布内。</strong>
+在最小规模上，B1 是 A 的约 2.5 倍，B3 是 A 的约 2.7
+倍。这与关于欠规定性的那批文献的核心发现完全一致——同一套训练规格下的不同种子，在训练分布上表现相同，在分布外行为上系统地不同。</p>
+<p>这条读数直接证明了第五十五章第三条硬规定的必要性：<strong>若 d
+只在分布内测量，整条差异会被压掉。</strong> 看 A 那一列就知道：它从
+0.184 降到 0.105，降幅比总均值更平缓，但绝对值一直很小。只测
+A，本跑会得到一份干净、无趣、且倾向于判负的读数。</p>
+<p><strong>不利的一件：这个差距随规模收窄。</strong> B1 从 A 的 2.5
+倍降到 1.4 倍，B3 从 2.7 倍降到 1.6
+倍。也就是说，分布外这个”路径差异的藏身之处”，正在随规模变浅。</p>
+<p>本书不淡化这件事，也不给它加任何解释性的缓冲。它是一条实打实的不利读数。</p>
+<p><strong>还有一件要写明</strong>：B2 那一列不单调，14M 到 31M
+之间反而上升（0.146 到
+0.200）。一列本该随规模衰减的量在中间反弹，最可能的解释是这一组探针的构造带来的噪声——模算术串的内容在不同随机构造下差别很大，而每组只有
+16 条。这是样本量不足的迹象，不是发现。记下来，不据此说任何事。</p>
+<h3 id="五分组基线一处更难看的读数">五、分组基线：一处更难看的读数</h3>
+<p>上一节只用了分组的路径间距离。四组各自还有自己的噪声基线，而那一列比主表更难看。</p>
+<p>各组的路径间距离除以各组自己的基线：</p>
+<table>
+<thead>
+<tr class="header">
+<th>规模</th>
+<th>A（分布内）</th>
+<th>B1（归纳）</th>
+<th>B2（模算术）</th>
+<th>B3（中文）</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>14M</td>
+<td>5.16</td>
+<td>8.08</td>
+<td>9.24</td>
+<td>7.12</td>
+</tr>
+<tr class="even">
+<td>31M</td>
+<td>5.10</td>
+<td>5.54</td>
+<td>5.02</td>
+<td>7.77</td>
+</tr>
+<tr class="odd">
+<td>70M</td>
+<td>5.95</td>
+<td>6.76</td>
+<td>4.27</td>
+<td>4.30</td>
+</tr>
+<tr class="even">
+<td>160M</td>
+<td><strong>3.66</strong></td>
+<td><strong>2.39</strong></td>
+<td><strong>1.75</strong></td>
+<td><strong>1.37</strong></td>
+</tr>
+</tbody>
+</table>
+<p>（由上一节的路径间距离与各组基线逐格相除得到，两列均为首跑的原始读数。）</p>
+<p>这张表要逐条读，不许跳过任何一格。</p>
+<p><strong>第一，四组在最大规模上全线坍缩。</strong>
+前三个规模上，四组的比值大多在 4 到 9 之间，没有明显的规模趋势；到
+160M，四格同时掉到 3.66、2.39、1.75、1.37。</p>
+<p><strong>第二，最脆弱的那一格恰好在本书最看重的那一组上。</strong> B3
+中文组的比值从 14M 的 7.12 掉到 160M 的 1.37。<strong>1.37
+已经接近噪声。</strong>
+若条款一的判负条件只在这一组上执行，它会满足——单调下降，且在最大规模处已经很难与基线区分。</p>
+<p>这一格是首跑里对本书最不利的一个数字。它写在这里，位置与其他读数相同，字号与其他读数相同。</p>
+<p><strong>第三，B2 那一格是 1.75，同样接近噪声。</strong></p>
+<p>所以行为通道的处境比主表所显示的更不利：主表的比值在最大规模上是
+2.37，那是四组平均的结果；拆开看，有两组已经落到 2 以下。</p>
+<h3
+id="六但这张表本身也被下一章那件事污染了">六、但这张表本身也被下一章那件事污染了</h3>
+<p>写完上面三条，必须立刻接一句，否则这一节会变成一次挑选性的悲观。</p>
+<p>B3 那一格的基线，在最大规模上是 0.121。而它在三个较小规模上分别是
+0.070、0.040、0.045。<strong>基线自己在最大规模上翻了两三倍。</strong></p>
+<p>也就是说，B3 比值从 4.30 掉到 1.37
+这一段，分母的贡献远大于分子的贡献——分子只从 0.193 降到 0.166，分母却从
+0.045 跳到 0.121。</p>
+<p>这与第六十五章要处理的那件事是同一回事，而且这里给出的是它最极端的一个实例：<strong>噪声基线不仅跨规模不可比，它在不同探针组之间的不可比程度还不一样。</strong></p>
+<p>于是这张表的准确读法只能是：</p>
+<blockquote>
+<p>在最大规模上，四组的比值全部下降，其中两组已接近噪声；但这次下降中有多少来自路径差异真的变小、有多少来自分母失控，本跑分不开。</p>
+</blockquote>
+<p>“分不开”三个字要照写。既不能用它来解释掉那个
+1.37——那是回避不利读数；也不能拿着 1.37
+直接判负——那是把一个被污染的量当作判据。</p>
+<p>这两条纪律的方向是相反的，而它们同时有效。一份读数既不利于本书、又不可靠，处理它的正确方式是把两件事都写出来，然后把它列进下一跑必须重做的清单——而不是从中挑一件来用。</p>
+<h3 id="七行为距离只看了一个词元">七、行为距离只看了一个词元</h3>
+<p>这一节写这个通道在构造上的一处窄化，它比上面两节的任何一条都更根本，而且对两个方向都不利。</p>
+<p>行为距离的定义是：取每条探针<strong>末位置</strong>的下一词元分布，算两个模型之间的散度，在
+112 条探针上平均。</p>
+<p>也就是说，一条 128
+个词元的探针，只有一个位置被用来测行为——最后那个。前面 127
+个词元的作用仅仅是提供语境。</p>
+<p>这个选择有它的理由：末位置的预测依赖于全部前文，因此是信息量最大的单点；而且它的定义干净，没有位置权重的自由度。表征通道则不同，它在八个位置上采样。</p>
+<p>但代价要说清楚。</p>
+<p><strong>其一，它把”行为”窄化成了”一步预测”。</strong>
+模型之间的行为差异可以体现在很多地方：长程一致性、多步生成中的分歧累积、对同一提示的不同延续方式。这些全部不在本跑的测量范围内。<strong>本跑测到的”行为差异随规模下降”，严格地说只是”单步下一词元分布的差异随规模下降”。</strong></p>
+<p><strong>其二，单步预测恰好是最容易被训练压平的那一层。</strong>
+所有模型都在同一个目标上被优化，而那个目标就是单步预测。用它来测差异，等于在模型被最用力地对齐过的那个位置上找分歧。这一点对本书不利的方向和有利的方向同时存在：不利的是，这个位置上的差异本来就该小；有利的是，<strong>即便在这个最被压平的位置上，最大规模的路径间差异仍是基线的两倍以上</strong>。</p>
+<p><strong>其三，散度的取值范围造成的错觉。</strong> 所用的散度以 2
+为底，取值落在 0 到 1 之间。0.116
+看起来是一个很小的数，但这个量在分布几乎相同的两个模型之间会非常接近
+0——同轨迹基线 0.049 就是这个量级。<strong>判断 0.116
+大不大，只能靠与基线比，不能靠它离 1 有多远。</strong>
+这与第六十二章第四节对表征通道说过的是同一个问题。</p>
+<p>下一跑应当在单步之外加测至少一种多步行为，并保留逐探针的读数而不只是组均值。这两条都写进第六十六章的清单。</p>
+<h3
+id="八这一列把什么问题逼到了台前">八、这一列把什么问题逼到了台前</h3>
+<p>把两章并排看，局面是这样的：<strong>同一次实验的两个读数口，给出了方向相反的答案。</strong></p>
+<p>内部表征上，路径差异不衰减；输出行为上，路径差异单调衰减。两个通道用的是同一批模型、同一批探针、同一套位置，区别只在量的是什么。</p>
+<p>这不是矛盾，它在技术上完全可能——两个模型可以用相当不同的内部组织，产生相当接近的输出。这件事本身甚至是一个值得单独研究的现象。但对本案来说，它把一个此前一直藏在背后的问题顶到了台前：</p>
+<blockquote>
+<p><strong>“结果”究竟指什么？是模型内部所形成的东西，还是它表现出来的行为？</strong></p>
+</blockquote>
+<p>条款一判的是”路径差异是否随规模衰减”。如果”结果”指内部组织，答案是否；如果指输出行为，答案是接近于是。两个答案都由同一次实验给出。</p>
+<p>这个问题不是本跑造成的，它一直在那里，只是此前没有材料把它逼出来。第九编第七十七章处理它的哲学形态——“这只是表征的形成，不是知识的形成”。而在判决层面，预注册第三款事先就为这种情况写好了处理方式。</p>
+<p>下一章讲那条处理方式为什么是一个结论。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c62/">← 第六十二章　读数（一）：表征通道——不向零衰</a><a href="/books/m/124/text/c64/">第六十四章　&quot;未能分辨&quot;是一个结论 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

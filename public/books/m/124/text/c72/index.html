@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第七十二章　缩放律：它支持哪一侧，以及它默认了什么 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第七十二章　缩放律：它支持哪一侧，以及它默认了什么——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第八编　对手</p><h2
+id="第七十二章-缩放律它支持哪一侧以及它默认了什么">第七十二章　缩放律：它支持哪一侧，以及它默认了什么</h2>
+<hr />
+<h3 id="一先讲明本章不做什么">一、先讲明本章不做什么</h3>
+<p>本章<strong>不是</strong>对缩放律的反驳。</p>
+<p>缩放律是成立的。它是这个领域里最可靠的经验规律之一，在多个数量级上被反复验证，被用作真实的工程规划工具。本书不挑战它的经验内容，一个字也不挑战。</p>
+<p>本章要做的只有一件事：<strong>指出它的证据落点。</strong>
+一条正确的经验规律，未必对每一个问题都构成证据；它构成证据的范围，由它所测量的那个量决定。</p>
+<p>这一区分必须在章首讲明，否则整章会被读成一次外行的质疑。</p>
+<h3 id="二缩放律的两代形式">二、缩放律的两代形式</h3>
+<p><strong>第一代</strong>：Kaplan
+等人（2020）在跨越多个数量级的模型上报告，交叉熵测试损失与非嵌入参数量、数据集规模、训练算力之间存在干净的幂律关系。他们据此给出了算力分配的处方：给定算力预算，绝大部分应当投入模型规模，少部分投入数据量。</p>
+<p><strong>第二代</strong>：Hoffmann
+等人（2022）在固定算力下重新做了一次更仔细的扫描（四百余个模型），得到不同的最优分配——模型规模与训练词元数应当大致等比例增长，经验法则是每个参数约二十个词元。按这个分配训练出的模型，在同等算力下胜过了按第一代处方训练的更大的模型。</p>
+<p>两代之间的差别值得记一笔：<strong>第一代的常数是错的，框架活了下来。</strong>
+这本身是一个健康的科学过程，也提醒了一件与本案相关的事——<strong>幂律的指数不是普适常数，它依赖于训练协议、架构与数据分布。</strong></p>
+<h3
+id="三它被当作先在论证据的通常读法">三、它被当作先在论证据的通常读法</h3>
+<p>在公共讨论里，缩放律常被这样使用：</p>
+<blockquote>
+<p>结果可以由材料、架构与算力预测，因此路径不进入结果。</p>
+</blockquote>
+<p>这个读法有它的道理。缩放律确实给出了一个只以 C、A
+与算力为自变量的函数，而且它预测得相当准。按第五十六章的说法，这看起来正是先在论所需要的那个描述
+Φ——一个不提路径、却能定出结果的描述。</p>
+<p>若这个读法成立，条款二当场判负。</p>
+<h3 id="四这个读法的隐含前提">四、这个读法的隐含前提</h3>
+<p>但它有一个前提，而这个前提通常不被明说：</p>
+<blockquote>
+<p><strong>“结果”被等同于损失，或等同于基准分数。</strong></p>
+</blockquote>
+<p>缩放律预测的是交叉熵损失。第二代的参数化形式甚至明确写成”两个随规模衰减的项，加上一个不可约的常数”——那个常数是自然语言本身的熵，是损失能降到的下界。</p>
+<p>也就是说，缩放律是一条关于<strong>判准投影</strong>的规律。它说的是：不同的模型，在损失这一个标量上的取值，可以由材料、架构与算力预测。</p>
+<p>而第五十五章第一条硬规定写的正是：<strong>不得用任务分数作结果距离。</strong></p>
+<p>那一条的理由在这里原样适用：损失是判准 L 在结果上的投影，而 L
+是本案里被固定住的那一项。用 L 的投影当结果，等于事先规定”凡是 L
+看不出来的差别都不算差别”。而先在论要论证的恰恰是”差别只在标号上，在实质上不存在”——用判准的投影去论证它，是把结论塞进了度量。</p>
+<h3
+id="五为什么这个等同是争点而不是前提">五、为什么这个等同是争点，而不是前提</h3>
+<p>把上一节的话说得更准确些。</p>
+<p>两个模型的损失相同，不蕴含它们是同一个模型。<strong>损失是一个标量，模型是一个函数。</strong>
+一个标量相同的两个函数，可以在无数个地方不同——只要那些不同发生在损失的测量分布上出现概率极低的地方。</p>
+<p>而第七编第六十三章的分组读数，正好给出了这件事的一个实测形态：种子差异在训练分布上被压得很平，在分布外探针上大得多。分布内正是损失被测量的地方。</p>
+<p>于是局面很清楚：</p>
+<blockquote>
+<p><strong>缩放律测的是那个被压平的方向。它在那个方向上的精确预测，与另一个方向上的分化，可以同时成立。</strong></p>
+</blockquote>
+<p>两个损失相同而结构不同的模型，缩放律看不见。这不是缩放律的缺陷——它从来没有声称要看见这个。这是使用者的越界。</p>
+<h3 id="六缩放律实际支持的是什么">六、缩放律实际支持的是什么</h3>
+<p>本节把本书愿意承认的东西一次写足，不留余地。</p>
+<p><strong>本书完全承认</strong>：在判准投影上，结果具有高度的可预测性；这种可预测性由材料、架构与算力决定，与路径无关；这一点在多个数量级上被验证，且是工程实践的可靠基础。</p>
+<p><strong>本书不与之争的还有一件</strong>：第二代形式中那个不可约的常数，说明这个领域已经习惯于用”随规模衰减的项加上一个非零渐近值”这样的拟合族来描述自己的量，并且承认那个渐近值可以不是零。</p>
+<p>这一点顺带回答了一种可能的质疑：本书第五十四章要求把不可消解度作为一个可能为正的渐近值拟合出来，是不是一个异想天开的要求？不是。<strong>对手在自己的损失曲线上用的正是同一个拟合族，而且承认渐近值非零。</strong>
+本书只是要求在另一个量上做同样的事。</p>
+<p><strong>本书唯一主张的是</strong>：以上全部与本案的争点不接触。争点是两个损失相同的模型是否持有结构相同的知识，而缩放律对这个问题一言未发。</p>
+<h3
+id="七一处比上面更要紧的事指数依赖于协议">七、一处比上面更要紧的事：指数依赖于协议</h3>
+<p>上面几节处理的是”缩放律测的是判准投影”。本节处理一件更靠近本案核心的事，它出自缩放律自身的历史。</p>
+<p>第二节提到，两代缩放律的分歧不是数学错误，而是实验设计的差异——其中最关键的一项是学习率安排在扫描中如何处理。第一代在整个扫描中沿用了一套锚定在最大运行上的安排；第二代对每一次运行分别调整。换了这一项，最优分配的指数就变了。</p>
+<p>由此得到一个不常被说出口的结论：</p>
+<blockquote>
+<p><strong>缩放律的指数不是普适常数。它依赖于训练协议、架构与数据分布。</strong></p>
+</blockquote>
+<p>这件事对第三节那个通常读法的打击，比前面几节都重。</p>
+<p>那个读法说：结果可由材料、架构与算力预测，因此路径不进入。现在看：<strong>做出这个预测的那条规律，其参数本身依赖于协议。</strong>
+而协议是什么？学习率怎么降、预热多长、批量多大、数据怎么排——这些正是本书所说的路径的一部分。</p>
+<p>于是那句话的完整形式应当写成：</p>
+<blockquote>
+<p>给定协议，结果可由材料、架构与算力预测。</p>
+</blockquote>
+<p>加上”给定协议”这四个字之后，这条论证对本案的效力就变了性质。它不再说”路径不进入结果”，它说的是”在路径的某些方面被固定之后，结果可由其余三项预测”。这是一个弱得多、也诚实得多的陈述，而且它与本书的核心命题并不冲突——本书从不主张固定了一切之后结果还会乱跳。</p>
+<p><strong>必须立刻补上对这一节的限制，否则它会被用过头。</strong></p>
+<p>其一，<strong>协议依赖不等于路径进入了结果的规定。</strong>
+对手可以完全合理地说：协议是可以被最优化掉的，存在一个”最好的协议”，而它同样由
+C 与 A
+决定；两代扫描的分歧正是因为第一代没有把协议调到位，第二代调到位了。这个回答有力，而且从科学史上看它似乎正在应验——后续工作确实是朝着”更仔细地调协议”的方向收敛的。</p>
+<p>其二，<strong>随机种子不在协议里。</strong>
+协议是可调的，种子不是——把种子”调好”这句话没有意义。因此本节的观察不直接支持条款一，它支持的只是一件更弱的事：<strong>“只由
+C、A、算力决定”这句话在字面上不成立，至少要补一个自变量。</strong></p>
+<p>其三，本节完全建立在文献的方法学记录上，<strong>本书没有做过任何相关的测量</strong>。它是一条论证，不是一份读数。</p>
+<h3 id="八用可达集的语言重述一遍">八、用可达集的语言重述一遍</h3>
+<p>把前面几节的结论翻译成第五编的记号，会更清楚。</p>
+<p>可达集 Reach(C,A,L)
+是固定材料、装置与判准时，一切路径所能到达的结果的集合。缩放律说的是什么？</p>
+<p>它说的是：<strong>这个集合在损失这一根轴上的投影，其位置可由 C、A
+与算力预测。</strong>
+更准确些，它预测的是这个投影的下端——在给定资源下能达到的最好损失。</p>
+<p>它没有说这个集合有多大。它没有说集合里的成员在别的方向上分布得多开。它甚至没有说集合是不是一个点——<strong>一个集合在某根轴上的投影收缩成一点，完全不蕴含这个集合本身收缩成一点。</strong></p>
+<p>这就是本章全部论证的几何形式。一条把投影预测得很准的规律，对集合本身的形状一言未发；而本案问的恰恰是集合的形状。</p>
+<p><strong>由此也可以说清本章与第六十八章的关系。</strong>
+表征收敛那件武器是冲着集合本身来的——它主张模型的表征在趋同，那是对集合形状的主张，因此它落在本案的现场上，是真正的对手。缩放律不是。两者常被一起引用来支持同一个立场，但它们的证据落点差着一层。</p>
+<h3 id="九这一章对接的是什么">九、这一章对接的是什么</h3>
+<p>本章不对接三条条款中的任何一条。它对接的是<strong>第五十五章第一条硬规定</strong>：不得用任务分数作结果距离。</p>
+<p>那一条在第六编是作为一条自我约束提出的——本书不许用分数，免得把结论塞进度量。本章是它在文献层面上的正面论证：<strong>当别人用分数做这件事时，得出的结论同样不能进入本案。</strong></p>
+<p>一条自我约束若只约束自己，那是洁癖；若它同时使一整类外部论证失效，那它就是一条判据。本章把第五十五章第一条从前者变成了后者。</p>
+<p><strong>最后留一处交接。</strong>
+两个损失相同的人是否持有结构不同的知识，这个问题在本编只能被提出，不能被回答。它的后果——如果答案是肯定的，教育、评估与人才选拔该怎么办——由第十编第八十三章处理。</p>
+<p>下一章回到动力学层，处理一件近年来长出了两个相反分支的材料。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c71/">← 第七十一章　线性模式连通与置换对齐：标号与实</a><a href="/books/m/124/text/c73/">第七十三章　grokking 与相变：同一批 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

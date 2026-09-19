@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第七十三章　grokking 与相变：同一批现象的两种读法 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第七十三章　grokking 与相变：同一批现象的两种读法——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第八编　对手</p><h2
+id="第七十三章-grokking-与相变同一批现象的两种读法">第七十三章　grokking
+与相变：同一批现象的两种读法</h2>
+<hr />
+<h3 id="一现象清单">一、现象清单</h3>
+<p>有一批现象，形状相同：某个能力或某个内部结构，在训练过程中或沿着规模轴，<strong>不是逐渐出现的，而是在某一点突然完成的</strong>。</p>
+<p><strong>grokking</strong>（Power
+等，2022）：模型在小型算术任务上先是完全过拟合——训练集全对，验证集接近随机——然后在继续训练很久之后，验证性能突然跃升到接近完美。</p>
+<p><strong>机制性进展度量</strong>（Nanda、Chan、Lieberum、Smith、Steinhardt，ICLR
+2023）：对上述现象的逆向分析表明，模型在那段看似停滞的时期里，内部正在逐步形成一套可识别的周期性表示，而外在性能的跃升对应于这套机制完成并接管的时刻。</p>
+<p><strong>归纳回路的形成</strong>（Olsson
+等，2022）：在语言模型的训练过程中，某类用于复制与类比的注意力结构会在某一段突然形成，并伴随着一次可观察的损失曲线偏折。</p>
+<p><strong>能力涌现</strong>（Wei
+等，2022）：某些下游能力在小模型上几乎不存在，在超过某个规模之后出现。</p>
+<p>四者的共同形状是：<strong>离散的、有时刻的、事后可识别的结构出现。</strong></p>
+<h3 id="二读法一先在论">二、读法一·先在论</h3>
+<p>先在论对这批现象有一个自然的读法，而且是有力的读法：</p>
+<blockquote>
+<p>相变是<strong>同一个必然结构被达到</strong>的时刻。那套周期性表示、那个归纳回路，是由任务结构与数据分布唯一决定的；它是这个问题的正确解法，任何足够大、训练得足够久的模型迟早都会找到它。早晚由资源决定，而”找到什么”由材料决定。</p>
+</blockquote>
+<p>这个读法有一条很强的经验支持：<strong>同一类任务上，不同的模型往往形成看起来相同的机制。</strong>
+模算术任务上的周期性表示、语言模型中的归纳回路，都被在多个模型上反复识别出来。若机制是路径决定的，为什么大家找到的是同一个？</p>
+<p>在本书第五十二章的框架里，这是一个典型的计算性路径依赖的图景：不同的路径以不同的速度到达同一个地方。</p>
+<h3 id="三读法二造成论">三、读法二·造成论</h3>
+<p>造成论的读法是：</p>
+<blockquote>
+<p>相变的发生与否，以及形成哪一套机制，依赖于路径。看起来”大家都找到了同一个”，可能是因为看的粒度太粗——被识别为”同一个归纳回路”的东西，在细处可以是不同的实现；也可能是因为观察者只报告了成功的那些运行。</p>
+</blockquote>
+<p>这两条备择解释值得各补一句，因为它们决定了读法二能不能被认真对待。</p>
+<p><strong>关于粒度</strong>：机制识别是在一个描述层上做的。说两个模型都形成了”用于复制的注意力结构”，是在一个相当粗的层上说的；在更细的层上——它由哪几个头承担、在第几层、与哪些通路耦合——两个模型完全可以不同。而”同一个机制”这句话的分量，取决于它是在哪一层上成立的。这与第七十一章的变换群是同一个问题的另一副面孔：<strong>粗的描述层相当于一个大的变换群，它把更多的差异划进了标号。</strong></p>
+<p><strong>关于报告</strong>：机制识别的文献通常从一个已经表现出目标能力的模型出发，去找它是怎么做到的。这个工作方式极有价值，但它天然不采样失败的那些运行。于是”大家都找到了同一个”这句话，在证据上可能只覆盖了找到了的那些。</p>
+<p>这两条都不是指控，它们是备择解释；而备择解释要变成主张，需要一个判据。</p>
+<h3 id="四一个把两种读法分开的判据">四、一个把两种读法分开的判据</h3>
+<p>判据的形状在第五十七章已经写过，这里把它与本章的现象对上。</p>
+<blockquote>
+<p><strong>在同语料、同规模下，某一机制在一部分种子中出现、在另一部分中始终不出现，而两者的总体性能相当。</strong></p>
+</blockquote>
+<p>若这件事发生，那就是条款三候选一所要的读数：同样的材料，同样的判准，得到了<strong>结构上不同的知识</strong>。</p>
+<p>若不发生——即机制在所有种子上都出现，只是时刻不同——那么读法一成立，本书在这个候选上判负。</p>
+<p>这个判据的好处是它不需要争论”什么算实质差异”。它只需要一个二值事实：有，还是没有。</p>
+<p>而近年来出现的一批工作，把这个判据从纸面上推到了可触及的位置。</p>
+<h3
+id="五一条把判据推近的结果与它为什么还不能直接用">五、一条把判据推近的结果，与它为什么还不能直接用</h3>
+<p>Zhao、Qin、Alvarez-Melis、Kakade 与 Saphra
+的《涌现能力的随机缩放》（arXiv:2502.17356）报告了这样一件事：某些能力在固定规模上的表现，在不同随机种子之间呈<strong>双峰分布</strong>——同一个规模上的不同模型，要么可靠地解出某个任务，要么完全失败，而不是分布在中间；成功的概率随规模上升。</p>
+<p>他们由此提出：所谓的”突破”不是某个规模阈值被跨过，而是<strong>训练结果的概率分布在连续变化</strong>。他们的图示中，同样的数据、同样的超参数，不同的随机种子给出的缩放趋势有的是突变式的，有的是线性的。用他们的话说，在这些规模上，“涌现”是一个<strong>随机的性质</strong>。</p>
+<p>这批结果对本案的分量很重，值得逐条说清它给了什么、又不能给什么。</p>
+<p><strong>它给了什么。</strong>
+它给出了本书第四节那个判据所要找的<strong>形状</strong>：不是连续分化，而是双峰——要么有，要么没有。一个连续分布的种子间差异，可以被读成”大家都在同一条路上，只是走得远近不同”；一个双峰分布不容易这样读。它同时坐实了一件本书需要的事实：<strong>在固定的
+C、A、L 之下，结果的分化不是量的分化，而可能是类的分化。</strong></p>
+<p><strong>它不能直接用作条款三的读数，理由有二。</strong></p>
+<p>其一，<strong>它测的是下游任务表现，即判准的投影。</strong>
+按第五十五章第一条硬规定与第七十二章的论证，落在判准投影上的读数不得充当结果距离。条款三候选一要的是”机制出现与否”，而不是”任务做得对不对”。这两者高度相关，但不是同一件事——一个模型可能形成了机制却在该任务的格式上失手，也可能靠别的途径把题做对。</p>
+<p>其二，<strong>它的作者是把这件事当作缩放律的修正提出的</strong>，而不是当作本案的证据。他们的结论指向的是”外推下游指标时必须预测成功的概率，而不只是成功者的表现”。这是一个方法学结论，不是一个本体论结论。本书若把它直接搬来用，就是在替他们下一个他们没有下的结论。</p>
+<p><strong>因此本书的用法是：把它列为条款三候选一的一条强旁证，并把它作为设计正式实验的直接依据。</strong>
+正式实验必须把观测量从任务表现换成机制检测，其余设计——同语料、同规模、多种子、性能相当性的事先定义——照第五十七章的规格。</p>
+<p>顺带记一笔：这批工作的作者之一，也是本书首跑所用那套多种子检查点的作者之一。同一批人既造了材料，又在材料上看出了分化的形状。这一点在第七十四章还会再出现一次。</p>
+<h3 id="六度量伪影这一侧的反击">六、度量伪影这一侧的反击</h3>
+<p>处理完上面那一条，必须立刻处理它的对头，而且这个对头对本书同样不利。</p>
+<p>Schaeffer、Miranda 与 Koyejo（NeurIPS
+2023，arXiv:2304.15004）提出：所谓涌现能力可能是一种假象，主要由研究者选择的度量所造成——非线性或不连续的度量会把平滑变化的逐词元错误率变形为突兀的跃升；换用线性或连续的度量，同一批模型输出呈现的是平滑、连续、可预测的变化。</p>
+<p>这一记针对的是第一节那批现象的<strong>突然性</strong>。若突然性是度量造的，那么”相变”这个说法本身就要重估。</p>
+<p><strong>必须写明：这一记同时削弱本书在第四节提出的判据，而不只是削弱对手。</strong></p>
+<p>理由是直接的。第四节的判据依赖于一个二值判断——机制”出现”还是”不出现”。而机制检测本身也要有阈值：相似度超过多少算形成，某个结构的强度超过多少算存在。<strong>阈值就是非线性。</strong>
+若”某些种子始终不出现”这个观察是检测阈值造成的，那么本书的判据与被它批评的那批”涌现”报告犯的是同一个错误。</p>
+<p>本书不得只用这一记去打对手。它落在本书自己头上的那一半，必须与落在对手头上的那一半同等分量地写出——这正是第五十九章第二条防作弊纪律的要求。</p>
+<p><strong>本书对它的正面回应只有一条，而且是设计上的</strong>：条款三候选一的机制检测，必须报告<strong>检测量本身的分布</strong>，而不只是报告阈值判断后的有无。若双峰在连续量上就已经出现，那么阈值只是在给一个本来就分开的分布画界；若连续量是单峰的，那么”有无”就是阈值造出来的，判据作废。这一条写入第五十七章那份规格的修订。</p>
+<h3 id="七本章不下结论的理由">七、本章不下结论的理由</h3>
+<p>本章没有判决，这是有意的。</p>
+<p>两种读法目前都活着。读法一有”不同模型形成相同机制”的反复观察支持；读法二有种子间双峰分布的新结果支持；而两者共同的地基——相变的突然性是不是真的——又被度量伪影那一记动摇。</p>
+<p>三样东西互相牵制，而把它们分开所需要的实验尚未被执行。在这种状态下写出任何一个方向的结论，都属于第六十四章所定义的那种”用倾向于代替判决”的做法。</p>
+<p>本章能交出的只有一件：<strong>一个把两种读法分开的判据，以及它必须满足的两个条件</strong>——观测量不得落在判准投影上，检测量的分布必须与阈值判断一并报告。</p>
+<p>这件东西的位置在条款三候选一。而条款三，按第五十七章末尾那句话，是本书开出的支票，不是本书交出的读数。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c72/">← 第七十二章　缩放律：它支持哪一侧，以及它默认</a><a href="/books/m/124/text/c74/">第七十四章　欠规定性与多种子基准：被当作工程 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第四十四章　大模型训练的四条工程事实 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第四十四章　大模型训练的四条工程事实——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第四编　实验台</p><h2
+id="第四十四章-大模型训练的四条工程事实">第四十四章　大模型训练的四条工程事实</h2>
+<hr />
+<h3 id="一先说明理由不在哪里">一、先说明理由不在哪里</h3>
+<p>本书主张大规模语言模型的训练是第一台满足四条的装置。</p>
+<p>在给出理由之前，先排除一个不是理由的东西：</p>
+<blockquote>
+<p><strong>理由不在于它”像人脑”。</strong></p>
+</blockquote>
+<p>本书完全不需要这个类比，而且明确拒绝它。第四十五章整章处理为什么不使用”理解”“意识”“智能”这三个词，以及为什么不使用它们论证反而更强。</p>
+<p>理由只在于四条工程性质。它们是冷的、可查的、与任何关于心智的判断无关的事实。</p>
+<p>本章逐条给出它们，并逐条给出它在公开材料上的实现方式——按第二编所立的标准，一条性质若不能被指出它在哪里以什么形式存在，它就只是一个说法。</p>
+<h3 id="二可重跑">二、可重跑</h3>
+<blockquote>
+<p><strong>训练是一个确定的计算过程。</strong></p>
+</blockquote>
+<p>给定语料、架构、优化器、随机种子与硬件的数值行为，它可以被从头再跑一遍。</p>
+<p><strong>这不是隐喻意义上的”再来一次”，是字面意义上的同一过程重新执行。</strong>
+输入的每一个词元、每一步的梯度、每一次参数更新，都由那几样东西决定。</p>
+<p><strong>必须写明它不完全确定的那一处</strong>：在实际的并行硬件上，浮点运算的次序可能随调度而变，因而两次”完全相同”的训练会有末位差异。这个差异很小，但它不是零。</p>
+<p>这一处不确定性恰恰有用：<strong>它给出了噪声基线的正确定义</strong>——同种子、同数据次序、仅由数值非确定性造成的重训之间的距离。第八十章第二节论证过，这条基线是条款一得以成立的结构；而第六十五章记录了首跑没能用上它、改用代理基线所付的代价。</p>
+<h3 id="三可干预且干预是外科式的">三、可干预，且干预是外科式的</h3>
+<blockquote>
+<p><strong>可以只换随机种子而保持其余一切不变；只换数据的呈现次序而保持数据集合不变；只换课程安排而保持总量不变。</strong></p>
+</blockquote>
+<p>这正是对照组的严格形式：<strong>单变量地改变路径，而不改变材料。</strong></p>
+<p>“外科式”这个说法在这里是字面的。数据次序是一个可以被精确指定的序列；改变它不需要改变任何一条数据。这与第四十章第三节所要求的”精确地只改一项，其余逐位对齐”完全吻合。</p>
+<p><strong>把这一条与人类知识史对照，差别的量级才看得清楚</strong>：你无法让同一群十七世纪的人以不同次序读同一批书。不是很难，是这个说法本身没有指称——没有两群同一的人。</p>
+<p><strong>这一条也有它的限制，必须写明。</strong>
+第七编第六十六章记录了一件事：首跑所用的那两组消融材料，三组的对内共享条件不齐——只换次序那一组共享同一个权重初始化，只换初始化那一组共享同一个数据次序。<strong>外科式干预是这台装置能做到的，但不是自动做到的</strong>；做不好，读数照样被污染。第五十六章第五节那条实验规格就是为此写的。</p>
+<h3 id="四可消融">四、可消融</h3>
+<blockquote>
+<p><strong>可以从语料中精确删除某一子集、某一文体、某一语言、某一时间段，然后重跑，观察缺失如何改变结果。</strong></p>
+</blockquote>
+<p>这是”没有盖伦会怎样”这类问题第一次有了字面的回答方式。</p>
+<p>在第十三章那里，这类问题只能被推测地回答，而且推测是循环的（第十三章第四节）。在这里，它是一次可以执行的实验：把那一部分删掉，重跑，看结果。</p>
+<p><strong>这一条的代价要写明</strong>：消融需要重新训练，因而是四条里最贵的一条。首跑完全没有用到它——首跑用的是现成的公开检查点，而消融必须自己训练。条款三与条款二形式三都依赖这一条，这也是它们至今未跑的主要原因（第六十六章第六节的成本分档）。</p>
+<h3 id="五全程可观测">五、全程可观测</h3>
+<blockquote>
+<p><strong>中间状态不是被推测的，是被保存的。</strong></p>
+</blockquote>
+<p>一批公开发布的模型系列，把训练途中的状态成千上万地存了下来，连同当时的数据次序一并放在那里。任何人要看某一时刻的完整内部状态，取回来就是。</p>
+<p>具体到本书所用的那一份：五个模型规模、每个规模十个种子、约七千个新增检查点，全部公开（第七十四章第三节）。检查点的密度在训练早期按二的幂次取点，此后每千步一个。</p>
+<p><strong>这一条与人类知识史的对照最刺眼</strong>：</p>
+<blockquote>
+<p>人类知识史留给我们的是成品；这里留给我们的是<strong>全程录像，加上可换带重放</strong>。</p>
+</blockquote>
+<p><strong>限制同样要写。</strong>
+“全程”是相对的：每千步一个快照，意味着两个快照之间发生的事看不见。而第六十五章第三节正好证明了这个间隔不是无关紧要的——那个间隔本身成了噪声基线定义里一个未被识别的自由参数。<strong>记录得再密，它仍然是抽样；只是这个抽样的密度可以被选择，而历史的抽样密度不能。</strong></p>
+<h3 id="六四条同时满足这是第一次">六、四条同时满足，这是第一次</h3>
+<p>把四条并排，与前三个候选对照：</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>可重跑</th>
+<th>可干预</th>
+<th>可消融</th>
+<th>可观测</th>
+<th>对象是知识主张形式</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>量子测量</td>
+<td>✓</td>
+<td>✓（对象错位）</td>
+<td>✓</td>
+<td>部分</td>
+<td>✗</td>
+</tr>
+<tr class="even">
+<td>实验演化</td>
+<td>✓</td>
+<td>✓</td>
+<td>部分</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr class="odd">
+<td>遗传算法／人工生命</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr class="even">
+<td>大模型训练</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p>前三个候选在四条清单上的表现都不差——第三个甚至全通过。<strong>区别落在最后一列上</strong>，而那一列正是第四十章规则三所说的、四条之外的那一步：翻译能不能做成。</p>
+<p>这一列在本书里的地位要说准：<strong>它不是第五条性质，它是第五编的入口。</strong>
+第四十七章至第五十一章处理它，包括它可能失败的三个地方。</p>
+<h3 id="七这台装置的四处不足">七、这台装置的四处不足</h3>
+<p>四条全通过，不等于没有代价。把代价列出来，因为它们各自都在后面的章节里真的发作过。</p>
+<p><strong>不足一：规模轴是唯一的资源轴，而它很贵。</strong></p>
+<p>条款一要判的是差异随资源的走向，而”资源”在这里主要由模型规模与训练量承担。往这个轴上多取几个点，成本按数量级增长。首跑止步于四个规模点，正是因为这个（第六十一章第一节）。<strong>一台可缩放的装置，不等于一台你缩放得起的装置。</strong></p>
+<p><strong>不足二：干预的完备性没有保证。</strong></p>
+<p>第四十三章第五节提到的那处漏洞在这里发作：路径由哪些变量构成，没有一份公认的完备清单。首跑用的那两组消融材料，组内共享条件不齐（第六十六章第三节），就是这一处的实例。<strong>外科式干预是这台装置允许的，不是它保证的。</strong></p>
+<p><strong>不足三：观测是抽样，而抽样的间隔会变成自由参数。</strong></p>
+<p>公开检查点每千步一个，而那个间隔后来成了噪声基线定义里一个未被识别的自由参数（第六十五章第三节）。<strong>“全程录像”这个说法，严格说是”高频抽样”，而抽样频率不是本书选的。</strong></p>
+<p><strong>不足四：材料是别人为别的目的做的。</strong></p>
+<p>规模点的分布、检查点的间隔、种子的数量，全部由制作者按他们自己的问题定（第七十四章第五节）。本书用它问另一个问题，刻度总有对不上的地方。第四十六章整章处理这一层。</p>
+<p><strong>四处不足有一个共同点</strong>：它们都不是这台装置的原理缺陷，而是<strong>它作为一件现成的、为别的用途制造的设备所带来的</strong>。这个区别很重要——原理缺陷不可修，这四处都可修，而且第六十六章那份清单里有三条就是在修它们。</p>
+<p><strong>但可修不等于已修。</strong>
+本书至今只跑过一次，而那一次四处不足全部发作了。</p>
+<h3
+id="八一个常见的误解这台装置不是模拟知识形成">八、一个常见的误解：这台装置不是”模拟知识形成”</h3>
+<p>在写主张之前，先挡掉一个误解，它几乎必然会出现。</p>
+<p><strong>误解是</strong>：本书把大模型训练当作人类知识形成的一个<strong>模拟</strong>，然后从模拟的行为推断被模拟者的行为。</p>
+<p><strong>若是这样，本书的全部论证都建立在”模拟得像不像”上，而那是一个无穷无尽的争论。</strong></p>
+<p>本书不是这样做的，而区别落在一个具体的地方：</p>
+<blockquote>
+<p><strong>本书不把训练当作某件别的事情的模型，本书把它当作那条全称命题的一个实例。</strong></p>
+</blockquote>
+<p>先在论要论证的那条命题说：<strong>任何</strong>以材料为输入、以判准为约束的知识形成过程，其结果由材料与判准唯一决定。</p>
+<p>大模型训练是不是以材料为输入的？是——语料。是不是以判准为约束的？是——损失与评估。它的产物是不是知识主张形式的？第四十三章第三节论证过：可以被评价为对或错，可以与世界上的事情对照，可以在对照失败时被修改。</p>
+<p><strong>三条都满足，它就落在那条命题的范围内。</strong>
+落在范围内的东西，不需要”像”任何别的东西——它自己就是一个实例。</p>
+<p><strong>这个区别决定了本书全部论证的强度来源</strong>，也决定了它的边界：</p>
+<ul>
+<li><strong>来源</strong>：一个实例足以削弱一条全称命题，而这不需要相似性判断（第七十七章第二节）。</li>
+<li><strong>边界</strong>：一个实例不给出另一条全称命题，因此本书不推出人类知识是被造成的（第七十七章第三节）。</li>
+</ul>
+<p><strong>有人会问：那么这台装置与人类知识形成有什么关系？</strong></p>
+<p>回答是：<strong>除了同属那条全称命题的范围之外，本书不主张任何关系。</strong>
+这个回答听起来很冷，而冷正是它的用处——它使本书的结论不能被”模型不像人”这句话推翻，同时也使本书的结论不能被扩大到人身上。两头都收紧，这是本书愿意付的价钱。</p>
+<h3 id="九本书对这台装置的全部主张">九、本书对这台装置的全部主张</h3>
+<p>最后把主张写死，防止它被读得太重。</p>
+<p><strong>本书主张的</strong>：大模型训练是一台实验设备，它同时满足四条，并且它的产物具有知识主张的形式。</p>
+<p><strong>本书不主张的</strong>：它是一个认识主体；它拥有知识、理解或智能；它与人类的学习是同一类过程。</p>
+<p>这三条不主张，第八十一章列得更全。这里重申，是因为接下来的论证若被误读为”机器会思考所以知识是被造成的”，那就完全跑偏了。</p>
+<p><strong>本书的主张是冷的：它是一台实验设备。</strong></p>
+<p>下一章说明为什么把那三个词排除在外，反而使论证更强。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c43/">← 第四十三章　为什么不是早期人工生命与遗传算法</a><a href="/books/m/124/text/c45/">第四十五章　本书不使用的三样：理解、意识、智 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

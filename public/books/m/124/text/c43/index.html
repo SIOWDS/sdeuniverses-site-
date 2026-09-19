@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第四十三章　为什么不是早期人工生命与遗传算法 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第四十三章　为什么不是早期人工生命与遗传算法——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第四编　实验台</p><h2
+id="第四十三章-为什么不是早期人工生命与遗传算法">第四十三章　为什么不是早期人工生命与遗传算法</h2>
+<hr />
+<h3
+id="一这个候选看起来已经把事情做完了">一、这个候选看起来已经把事情做完了</h3>
+<p>第三个候选与前两个不同：它是一个<strong>人工系统</strong>，而且它从一开始就是为了研究演化与适应而造的。</p>
+<p>遗传算法、演化策略、人工生命仿真——在这些系统里，一个种群在一个被明确写下的适应度函数上演化。研究者可以：</p>
+<ul>
+<li>从同一个初始种群出发跑很多次（可重跑）。</li>
+<li>只换随机种子而保持其余一切不变（可干预）。</li>
+<li>删掉某个算子、某个种群、某段历史再跑（可消融）。</li>
+<li>记录每一代的全部个体（可观测）。</li>
+</ul>
+<p><strong>四条全通过，而且通过得干净利落。</strong></p>
+<p>不仅如此，这些系统在二三十年前就已经报告了路径依赖的现象：不同的随机种子导致不同的最终种群；某些解只在某些运行中出现；适应度相当的两个种群可以在结构上相当不同。</p>
+<p>于是一个自然的问题：<strong>这件事不是早就做完了吗？</strong></p>
+<p>本章要回答的正是这个问题，而回答会比前两章更细，因为这个候选与本案的距离最近，因而它的错位也最不明显。</p>
+<h3 id="二四条之外的那一条">二、四条之外的那一条</h3>
+<p>第四十章第七节的规则三写过：<strong>四条是必要条件，不是充分条件。</strong>
+还需要第五编那一步——把待判的命题翻译成这台装置能回答的形式。</p>
+<p>这个候选在四条上全通过，而在翻译那一步上卡住了。</p>
+<p>卡在哪里？卡在一个很具体的地方：</p>
+<blockquote>
+<p><strong>产物不构成知识主张。</strong></p>
+</blockquote>
+<p>一个遗传算法跑出来的最终种群，是一组参数、一组规则、一组在适应度函数上得分很高的个体。它是一个<strong>解</strong>，而不是一个<strong>关于什么的陈述</strong>。</p>
+<p>而本案所争的对象是知识——被知道的东西。要判”被知道的东西是被发现的还是被造成的”，需要产物是某种能被说成”关于世界如何”的东西。</p>
+<p>一组在某个人造适应度函数上得高分的参数，不是这样的东西。</p>
+<h3 id="三可重跑但无内容">三、“可重跑但无内容”</h3>
+<p>把上一节压成一句：</p>
+<blockquote>
+<p><strong>这类系统可重跑，但无内容。</strong></p>
+</blockquote>
+<p>“无内容”这个说法要说准，因为它容易被读成贬低。它不是说这些系统不重要、不精巧、不出成果。它说的是一件特定的事：</p>
+<p><strong>那些系统里被优化的目标函数，是研究者为研究本身而写下的</strong>；它不指向系统之外的任何东西。于是得到的解，其”正确”只相对于那个函数而言。</p>
+<p>对比一下本案所需要的：语料是关于世界的（它由人写下的关于各种事物的陈述构成）；模型学到的东西，可以被问”它关于世界说了什么”这个问题，而且这个问题有意义。</p>
+<p><strong>这个对比要小心，因为它是本章最容易被攻击的一处。</strong></p>
+<p>反方可以说：语料也不过是一堆符号，模型学到的也不过是符号上的统计结构；把它说成”关于世界的”，正是在偷渡一个未经论证的假设。</p>
+<p><strong>这个反驳有力量，本书部分接受它。</strong>
+本书的回答是有限度的：本书不主张模型的产物<strong>是</strong>知识（第八十一章第一条明写不主张）。本书主张的只是一个更弱的东西——那些产物是<strong>知识主张形式的</strong>：它们可以被评价为对或错，可以与世界上的事情对照，可以在对照失败时被修改。</p>
+<p>而一组遗传算法的参数不具备这个形式：它没有”对不对”的问题，只有”在这个函数上得多少分”的问题。</p>
+<p><strong>这个区别是否足够，本书承认是一个开放问题。</strong>
+第七十七章那一记处理的正是它的一般形式，而那一章的结论是：本书的论证靠反例结构站住，而反例结构要求实例落在那条全称命题的范围内——“以材料为输入、以判准为约束的知识形成”。一个不产生知识主张形式的产物的过程，不在那个范围内。</p>
+<h3 id="四另一处更技术性的错位">四、另一处更技术性的错位</h3>
+<p>除了内容问题，还有一处错位值得单独写，因为它关系到第六编那三条条款能不能用。</p>
+<p><strong>在这类系统里，“材料”与”判准”往往是同一个东西。</strong></p>
+<p>遗传算法的适应度函数既规定了什么算好（判准），又是唯一的信息来源（材料）——种群除了适应度反馈之外，不从任何别处获得关于目标的信息。</p>
+<p>而本案的设定要求 C、A、L
+三者可分：材料是语料，判准是损失与评估，它们不是同一个对象。第五编第四十八章定义可达集时，这三者的可分性是前提。</p>
+<p><strong>若材料与判准合一，条款二就无从谈起</strong>——条款二问的是”结果差异能否由
+C、A、L 的量预测”，而当 C 与 L 是同一个函数时，这个问题退化了。</p>
+<p>这一处错位比内容问题更技术，但它更硬：<strong>它不是一个可以靠论证争的问题，它是一个设定上的不匹配。</strong></p>
+<h3 id="五一个边界案例开放式演化">五、一个边界案例：开放式演化</h3>
+<p>上面的排除针对的是有明确适应度函数的系统。有一类系统试图绕开这一点，值得单独处理，因为它是这个候选里离本案最近的一个。</p>
+<p><strong>开放式演化</strong>的目标是构造一个不预设固定适应度函数的系统——个体之间相互构成彼此的环境，“什么算好”随系统自身的演化而变，而不是由外部写死。</p>
+<p><strong>这个变体绕开了第四节那处错位</strong>：材料与判准不再合一，因为判准本身是内生的。</p>
+<p><strong>而它引入了一个新问题，这个问题对本案是致命的。</strong></p>
+<p>若判准是内生的、随过程而变，那么第五编那套翻译就无从应用——本书的可达集定义为”固定
+C、A、L 时一切路径所能到达的结果集合”，而这里 L 不固定。</p>
+<p><strong>这正是第七十七章第五节那一记的形态</strong>：判准可变的过程，也许根本不是本案所处理的那一类过程。那一节的结论是，本书对此没有办法；第八十七章第五节把它列为第三种不可判，并写明”无解法”。</p>
+<p><strong>于是这一节给出一个整齐的两难，它比单纯的排除更有信息量</strong>：</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>判准固定</th>
+<th>判准内生</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>翻译能否应用</td>
+<td>能</td>
+<td>不能</td>
+</tr>
+<tr class="even">
+<td>本案能否被提问</td>
+<td>能</td>
+<td>无从提起</td>
+</tr>
+<tr class="odd">
+<td>例子</td>
+<td>遗传算法、大模型训练</td>
+<td>开放式演化</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两难的形状是：判准固定的系统落进第二节那个”无内容”的问题（除非产物具有知识主张形式），判准内生的系统落进”无从翻译”的问题。</strong></p>
+<p>大模型训练之所以是本书的选择，正是因为它同时避开了两边：判准固定（损失与评估是写死的），而产物具有知识主张的形式（第四十四章第七节）。</p>
+<p><strong>这个位置很窄。</strong>
+写明它有多窄，比声称它有多合适更诚实——<strong>本书所依赖的，是一个恰好落在两个失败模式之间的现场，而不是一个在各方面都理想的现场。</strong></p>
+<h3
+id="六这个候选给出的一条普遍教训">六、这个候选给出的一条普遍教训</h3>
+<p>在清点它留给本书的东西之前，先提一条从它身上得到的普遍教训，因为它比这个候选本身更有用。</p>
+<p><strong>教训是：四条清单可以被一个系统轻易满足，而满足得越轻易，越要检查翻译那一步。</strong></p>
+<p>遗传算法与人工生命系统满足四条，靠的是它们<strong>就是为满足四条而造的</strong>——它们本来就是研究者写出来的仿真，可重跑、可干预、可消融、可观测是它们的设计目标之一。</p>
+<p>于是出现一个反直觉的情形：<strong>一个系统在清单上表现得越完美，它越可能是一个为清单而造的系统，因而越可能与真实的对象脱节。</strong></p>
+<p>这条教训有一个可操作的形式，本书称之为<strong>造物者检验</strong>：</p>
+<blockquote>
+<p><strong>问一句：这个系统是谁为了什么造的？若它是为研究本案而造的，那么它满足四条这件事不提供任何信息，因为那是设计出来的。</strong></p>
+</blockquote>
+<p>按这条检验看四个候选：</p>
+<ul>
+<li><strong>量子测量装置</strong>：为研究物理而造，不为本案。通过检验。</li>
+<li><strong>实验演化系统</strong>：为研究演化而造，不为本案。通过检验。</li>
+<li><strong>遗传算法／人工生命</strong>：为研究适应与搜索而造，其满足四条是设计目标。<strong>不通过。</strong></li>
+<li><strong>大模型训练</strong>：为工程用途而造，不为本案。通过检验。</li>
+</ul>
+<p><strong>第四十六章整章所讲的那个”装置自己也是被造出来的”，在这里有了一个正面的用处</strong>：正因为这台装置不是为本案造的，它满足四条这件事才携带信息。一台为了通过检验而造的机器，通过检验不说明任何事。</p>
+<p><strong>这条教训也有它的限度</strong>：不为本案而造，不等于它的参数选择对本案友好。第四十四章第七节那四处不足、第四十六章第二节那三处错配，说的正是这件事。<strong>造物者检验只挡住一类问题（设计性的循环），挡不住另一类（参数的错配）。</strong></p>
+<h3 id="七它留给本书的东西">七、它留给本书的东西</h3>
+<p>与上一章一样，排除它不等于否定它。</p>
+<p><strong>其一，它提供了”路径依赖在人工系统里真实存在”的早期证据。</strong>
+那些关于不同种子给出不同最终种群的报告，在时间上远早于本书所依赖的那批材料。</p>
+<p><strong>其二，它提供了一个警示，而这个警示对本书直接有用。</strong></p>
+<p>那些系统里的路径依赖，几乎全部被处理为<strong>需要被控制的随机性</strong>：跑多次取平均、固定种子以便复现、调参数以减少方差。</p>
+<p><strong>没有人问过它是否会随资源消失。</strong></p>
+<p>这正是第七十四章第八节与第八十四章第五节所说的那个机制——关切决定了哪些问题被提出来。而它在这里的实例比在语言模型上的实例早了二三十年：<strong>同一个问题在一个可重跑的人工系统上本来早就可以被问，而它没有被问，因为没有人需要它的答案。</strong></p>
+<p><strong>其三，一条对本书不利的</strong>：既然这类系统早就满足四条，而本案并没有因此被判，那么”四条满足就会改变问题类型”这条推论（第十三章第六节）在这里遇到了一个反例——或者至少是一个需要解释的案例。</p>
+<p>本书的解释是第二节与第四节给出的两处错位：四条满足了，但翻译失败了。<strong>而这个解释是事后的</strong>，本书承认这一点。它不是一个独立的辩护，它只是指出了失败发生在哪一步。</p>
+<p><strong>若有人认为这个解释不够</strong>，那么第十三章那条推论就应当被削弱成一个更谨慎的版本：四条满足是问题改变类型的<strong>必要而非充分</strong>条件。本书接受这个削弱，并把它记在这里。</p>
+<p>下一章处理最后一个候选，也是本书主张四条全通过、且翻译可行的那一个。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c42/">← 第四十二章　为什么不是实验演化</a><a href="/books/m/124/text/c44/">第四十四章　大模型训练的四条工程事实 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>

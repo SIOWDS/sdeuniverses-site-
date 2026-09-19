@@ -1,0 +1,126 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第七十一章　线性模式连通与置换对齐：标号与实质的边界 · 可判性的到来 · 德麦国际专著第 124 号</title>
+<meta name="description" content="第七十一章　线性模式连通与置换对齐：标号与实质的边界——《可判性的到来：发现还是发生？》，王德生著，德麦国际专著第 124 号。">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="统稿">
+<meta name="tier_reason" content="Q3第一刀：全文为主张层——计算性/构成性路径依赖的承重区分、三条条款、四个量、六条写死的败绩条件、与各家的分离线；首跑为已判负/未能分辨的记录，按六条边界裁定属信用资产，应公开">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<meta name="isbn" content="979-8-90690-092-0">
+<meta name="book_no" content="124">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.7em 0 .6em;color:var(--fg)}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.85em 0;text-align:justify}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.3em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.8em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+</style>
+</head><body><div class="bar"><a href="/books/m/124/">← 专著首页</a><a href="/books/m/124/text/">目录</a><a href="/books/">专著栏目</a></div>
+<div class="wrap"><p class="ptx">第八编　对手</p><h2
+id="第七十一章-线性模式连通与置换对齐标号与实质的边界">第七十一章　线性模式连通与置换对齐：标号与实质的边界</h2>
+<hr />
+<h3
+id="一置换不变性以及它为什么必须被消去">一、置换不变性，以及它为什么必须被消去</h3>
+<p>神经网络有一组已知的对称性。同一层内的神经元可以任意重新编号——只要下一层的连接跟着换——网络计算的仍是同一个函数。某些结构下整层可以乘一个正数再在下一层除回来。某些表示可以整体旋转。</p>
+<p>这些都是编号，不是内容。</p>
+<p>第五十五章第二条硬规定已经写过本书为什么必须消去它们：不消去，条款一会因为纯粹的编号差异而假通过，而那是本书最不愿意赢的赢法。这里不重复那条论证，只接着往下问一个那里没问的问题：</p>
+<p><strong>已知对称性的清单，是谁定的？</strong></p>
+<h3 id="二猜想与证据">二、猜想与证据</h3>
+<p>2021 年，Entezari、Sedghi、Saukh 与 Neyshabur
+提出一个猜想（arXiv:2110.06296，ICLR
+2022）：大多数随机梯度下降找到的解，都属于这样一个集合——其中的元素可以被适当地置换，使得它们之间的线性插值路径上不存在损失的障碍。用这一线工作的术语说，它们在消去置换之后是<strong>线性模式连通</strong>的。</p>
+<p>线性模式连通这个概念本身来自 Frankle、Dziugaite、Roy 与 Carbin 2020
+年那篇工作（即上一章那篇），最初用于同一初始化出发的网络；Entezari
+等人把猜想推广到<strong>不同初始化</strong>训练出的网络。</p>
+<p>2022 至 2023 年，Ainsworth、Hayase 与 Srinivasa
+给出了强有力的经验支持（《Git Re-Basin》，arXiv:2209.04836，ICLR
+2023）。他们提出三种匹配算法，把一个模型的单元置换到与参考模型对齐的位置上，由此得到一组功能上等价、却落在参考模型附近一个近似凸的盆地里的权重。他们在多个架构与数据集上展示了这一现象，其中包括在独立训练的残差网络之间实现零障碍线性模式连通。</p>
+<p><strong>这是先在论的强读数，必须写足。</strong></p>
+<p>若这条线成立，结论是直接的：不同种子训练出的解，在消去置换之后属于同一个盆地；而同一个盆地的极小点集合，是由数据与架构完全决定的。于是不同种子之间的差别就只是<strong>标号差别</strong>，而标号差别按定义不是实质差别。条款二形式一判负，本书降级。</p>
+<p>本书不质疑这批实验。它们做得扎实，可复现，而且作者们自己在进一步的工作中不断加强它。</p>
+<h3
+id="三三处反面材料全部出自这条线自己的文献">三、三处反面材料，全部出自这条线自己的文献</h3>
+<p><strong>其一，Git Re-Basin 原文自己报告了一个反例。</strong>
+在提出单盆地现象的同一篇论文里，作者们讨论了线性模式连通假说的不足，并给出了一个针对单盆地理论的反例。一篇在自己的主张旁边放一个反例的论文，值得被更认真地对待，而不是更少。</p>
+<p><strong>其二，线性模式连通并非总是成立。</strong> Juneja
+等人（2022）报告，即使在微调的情形下，线性模式连通也不总是成立。这不是一个边缘结果：微调的两个模型共享了大量的训练历史，若连它们之间都可能存在障碍，那么”消去置换之后就在同一个盆地里”这句话就不是一条普遍规律，而是一个在某些条件下成立的经验现象。</p>
+<p><strong>其三，零障碍常常需要一道额外的手续。</strong>
+Jordan、Sedghi、Saukh、Entezari 与 Neyshabur 提出了 REPAIR（ICLR
+2023）：在对齐之后的插值过程中，中间点的激活统计会发生系统性的偏移，需要重新标定才能把损失障碍消掉。</p>
+<p>第三条最值得细看，因为它把问题从”是不是同一个盆地”推到了另一个地方。</p>
+<h3 id="四本章的承重论证">四、本章的承重论证</h3>
+<p>把上一节第三条的含义展开。</p>
+<p>要把两个独立训练的解连起来，实际需要的机器是：<strong>一次置换匹配，再加一次激活重标定。</strong>
+前者是把编号对上，后者是把中间点的统计分布修回来。</p>
+<p>于是要问：这两道手续，是在<strong>揭示</strong>两个解本来就在同一个盆地里，还是在<strong>制造</strong>这个事实？</p>
+<p>这个问题不是一个诡辩。它有一个精确的形式，而这个形式正是本编的那条贯穿线：</p>
+<blockquote>
+<p><strong>标号差异与实质差异的界线，等于所允许的变换群。</strong></p>
+</blockquote>
+<p>若只允许置换，某些解之间有障碍；若允许置换加激活重标定，障碍消失。允许的变换越多，越多的差异被划进”标号”；允许的变换越少，越多的差异被算作”实质”。</p>
+<p><strong>而允许哪些变换，不是一个自然事实。</strong>
+置换之所以被公认为无关紧要，是因为它严格保持函数不变——换编号之后，网络对每一个输入的输出逐位相同。这是一个硬标准。但激活重标定不满足这个标准：它改变的是插值路径上那些<strong>中间模型</strong>的行为，而那些中间模型并不是原来的两个解中的任何一个。</p>
+<p>于是这条线在自己的技术细节里给出了本案最锋利的一处形式：</p>
+<blockquote>
+<p><strong>对齐所需要的机器越多，“它们只是标号不同”这句话就越弱。</strong></p>
+</blockquote>
+<p>这句话可以被操作化。给定一组被允许的变换，定义”标号”为该群的轨道，定义”实质差异”为轨道之间的距离。争论的实质不是两个模型像不像，而是<strong>那个群该有多大</strong>。</p>
+<p>本书对这个问题的立场是：群的边界应当由”严格保持函数不变”来划定。置换、正交变换、各向同性缩放在合适的架构条件下满足这个标准，因此本书的读数消去了它们；而任何改变了被比较对象行为的手续，不得计入标号。</p>
+<p><strong>这是一个可以被反驳的立场</strong>，而不是一个定义。反驳的方式是指出：某些不严格保持函数不变的变换，其造成的行为差异在任何实际判准下都无法被察觉，因此把它们排除在标号之外是过于严苛的。这个反驳有力量，本书接受它是一个开放问题。</p>
+<h3 id="五变换群的三个层级">五、变换群的三个层级</h3>
+<p>上一节说争论的实质是”那个群该有多大”。本节把可能的答案排成三层，因为混用这三层是这类讨论里最常见的混乱来源。</p>
+<p><strong>第一层·严格保持函数不变。</strong>
+变换之后，网络对每一个输入的输出逐位相同。神经元置换在任何架构下都满足；正交变换与各向同性缩放在合适的架构条件下满足。这一层是硬的：满足它的差异，没有任何人会主张是实质差异。</p>
+<p><strong>第二层·保持行为在任何实际判准下不可察觉。</strong>
+变换之后网络的输出并非逐位相同，但差别小到在任何实际使用中都测不出来。这一层比第一层大得多，而且它的边界是模糊的——“任何实际判准”是一个开放的集合，今天测不出来不等于明天测不出来。</p>
+<p><strong>第三层·保持性能相当。</strong>
+变换之后网络在既定基准上的分数相当。这一层最大，也最没有资格算作标号——它正是第五十五章第一条硬规定所禁止的那个等同。两个分数相同的模型可以在分布外差得很远，第七编第六十三章的分组读数就是实测。</p>
+<p><strong>争论全部发生在第二层。</strong></p>
+<p>第一层没有争议，第三层不应被采纳。而第二层里住着本章前面讲的那道额外手续：激活重标定改变的是插值路径上中间模型的行为，因此它不在第一层；它之所以被接受，理由是那种改变被认为无关紧要——这正是第二层的论证形式。</p>
+<p>把三层排出来之后，几件事变得清楚：</p>
+<p><strong>其一，“消去对称性”这个说法本身是歧义的。</strong>
+说自己消去了对称性，必须说明消到第几层。本书消到第一层，并在第六十二章写明了所用度量的不变性。任何一份不说明层级的对齐结果，都无法与另一份比较。</p>
+<p><strong>其二，第二层的扩张是单向的。</strong>
+每当有人提出一类新的”无关紧要的变换”并被接受，界线就向”标号”一侧移动一格，而且很难移回来——因为要移回来，必须证明那类变换造成的差异在某处<strong>是</strong>要紧的，而这需要找出一个能测出它的判准。</p>
+<p><strong>其三，本案的最终形式因此可以写成一句话</strong>：</p>
+<blockquote>
+<p><strong>争的不是两个模型像不像，而是第二层该延伸到哪里。</strong></p>
+</blockquote>
+<p>本书的立场在上一节已经写明——界线应划在第一层，凡改变了被比较对象行为的手续不得计入标号。这个立场偏保守，它使本书的读数偏大，因此它对本书有利；正因为它对本书有利，下一节必须把它的代价写足。</p>
+<h3 id="六这对本书同样不利的一面">六、这对本书同样不利的一面</h3>
+<p>上一节的论证有一个对称的后果，本节必须写足。</p>
+<p>既然界线随变换群移动，那么<strong>本书自己的读数也只是某一个特定群下的读数</strong>。</p>
+<p>第六十二章报告的表征距离，用的度量对置换、正交变换与各向同性缩放三者不变。这意味着本书消去的是这三类。若有人指出第四类——一类此前未被消去、而仍应算作标号的变换群——本书的读数会变小，可能变小很多。</p>
+<p>这正是第五十五章第二节末尾那条额外败绩条件所承诺的东西，现在把它落到具体形式上：</p>
+<blockquote>
+<p><strong>若有人指出一类此前未被消去的对称性，且消去之后条款一的读数落入噪声水平，条款一判负。</strong></p>
+</blockquote>
+<p>这一条不在第五十八章那四条之内，它是本书为自己写下的第五条败绩条件，理由就在本章。</p>
+<p>还要补一句更不利的：本书没有能力证明自己所用的那三类已经穷尽了标号。<strong>没有人能证明这件事</strong>，因为”标号的全体”不是一个可以从原理上界定的集合，它只能被一条一条地发现。于是本书的读数在原则上永远处在可被削减的状态。这不是本书的缺陷，是这类论证的固有处境——但它必须被写出来，而不是被读者自己发现。</p>
+<h3 id="七与条款二形式一的对接">七、与条款二形式一的对接</h3>
+<p><strong>它若成立</strong>——即在条款一测出正读数的那些规模上，对齐后的连通率随规模上升并趋于一——本书条款二形式一判负。</p>
+<p>按第五十八章第二条，本书将核心命题降级为”路径影响到达解集中的哪一个成员，但不影响解集本身”，并承认判决未成。</p>
+<p><strong>本书对这条检验的具体要求，写在这里供人执行</strong>：报告连通率随规模的变化，而不只是在单一规模上报告若干成功案例；写明所用的对齐机器（只置换，还是置换加重标定），因为按第四节，这两者对应着不同大小的变换群，因而是两个不同的主张；若使用了重标定，同时报告未使用时的障碍高度。</p>
+<p>三条要求都不苛刻，而第三条尤其关键——它让读者自己看见那道额外手续究竟承担了多少。</p>
+<p>下一章处理一件被广泛当作先在论证据、而其实落在本案之外的东西。</p>
+<hr />
+<div class="nav"><a href="/books/m/124/text/c70/">← 第七十章　旗舰二·彩票假说</a><a href="/books/m/124/text/c72/">第七十二章　缩放律：它支持哪一侧，以及它默认 →</a></div><div class="foot">《可判性的到来——发现还是发生？》· 王德生 著 · 德麦国际专著第 124 号 · ISBN 979-8-90690-092-0</div></div></body></html>
