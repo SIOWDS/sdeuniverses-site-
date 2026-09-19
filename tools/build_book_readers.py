@@ -6,7 +6,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 import json,html
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='20260919-reader-v1'
+VERSION='20260919-reader-v2'
 DATA=json.loads((ROOT/'public/books/catalog.json').read_text())
 def esc(value):return html.escape(str(value),quote=True)
 def build(book):
