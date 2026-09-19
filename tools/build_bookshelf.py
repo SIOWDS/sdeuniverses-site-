@@ -4,7 +4,7 @@ from pathlib import Path
 import json,html,collections
 ROOT=Path(__file__).resolve().parents[1]
 DATA=json.loads((ROOT/'public/books/catalog.json').read_text())
-BOOKS=DATA['books'];CATS=DATA['categories'];VERSION='20260919-bookshelf-v2'
+BOOKS=DATA['books'];CATS=DATA['categories'];VERSION='20260919-bookshelf-v3'
 assert len({b['id'] for b in BOOKS})==len(BOOKS)
 assert len({b['detailUrl'] for b in BOOKS})==len(BOOKS)
 assert all(not b.get('flipUrl') or b['readUrl']==b['flipUrl'] for b in BOOKS), 'Keep flip readers as the primary reading action'

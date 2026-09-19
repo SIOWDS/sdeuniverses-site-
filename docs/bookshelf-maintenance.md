@@ -17,3 +17,5 @@ python3 tools/build_bookshelf.py
 本次书目清洁仅整理展示与阅读入口，不擅自改动书号登记。两组已发现的异书同ISBN仍需对照出版社台账处理。
 
 翻页阅读和章节阅读是不同入口。现有翻页器记录为 `flipUrl`，并始终作为 `readUrl` 主按钮，全文标「在线翻页阅读」，试读标「在线翻页试读」。网页版目录另存 `chapterUrl`，显示「章节阅读」。不要用章节目录或直接PDF替换现有翻页器；未有翻页器的书不得仅改标签冒充翻页。阅读筛选中的「在线翻页」涵盖全文和明确标注的试读版。
+
+有全文但尚无翻页器的图书：在目录填写 `reader: {format: "pdf" | "html", sources: [{title, url}]}`，再运行 `python3 tools/build_book_readers.py` 和 `python3 tools/build_bookshelf.py`。PDF源按原始版面翻页；HTML源必须逐章按既有目录顺序列全，阅读器按屏幕分页并连续跨章阅读。新书发布时必须同时检查翻页器、书架主入口和书籍详情入口。只有介绍、尚未核实完整正文的书不能标为全文。
