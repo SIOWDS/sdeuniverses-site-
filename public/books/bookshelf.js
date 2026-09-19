@@ -25,7 +25,7 @@
  function apply(resetLimit=true,updateURL=true){
   if(resetLimit)limit=24;
   const terms=q.value.trim().split(/\s+/).map(normalize).filter(Boolean);
-  matched=cards.filter(c=>(category==='all'||c.dataset.category===category)&&(!author.value||JSON.parse(c.dataset.authors).includes(author.value))&&(!availability.value||c.dataset.reading===availability.value)&&terms.every(t=>searchIndex.get(c).includes(t)));
+  matched=cards.filter(c=>(category==='all'||c.dataset.category===category)&&(!author.value||JSON.parse(c.dataset.authors).includes(author.value))&&(!availability.value||(availability.value==='flip'?c.dataset.flip==='true':c.dataset.reading===availability.value))&&terms.every(t=>searchIndex.get(c).includes(t)));
   matched.sort((a,b)=>{
    if(sort.value==='number')return (Number(a.dataset.number)||9999)-(Number(b.dataset.number)||9999)||initialOrder.get(a)-initialOrder.get(b);
    if(sort.value==='title')return a.dataset.title.localeCompare(b.dataset.title,'zh-CN');
