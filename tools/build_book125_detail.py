@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+"""Write /books/m/125/index.html (detail page) and read.html config entry inputs."""
+import html, pathlib, re
+SITE = pathlib.Path('/home/claude/site')
+NO, ISBN = 125, '979-8-90690-095-1'
+BASE = f'/books/m/{NO}'
+OUT = SITE / f'public/books/m/{NO}'
+src = (SITE / 'tools/build_book125.py').read_text(encoding='utf-8')
+HEAD = re.search(r"HEAD = '''(.*?)'''", src, re.S).group(1)
+TIER = re.search(r"TIER_REASON = '(.*?)'\n", src, re.S).group(1)
+TITLE = '番茄炒蛋是谁发现的？'
+SUB = '一台引擎，三扇门：知识、技术、艺术的发生学'
+FOOT = f'<div class="foot">《{TITLE}——{SUB}》· 王德生 著 · 德麦国际专著第 {NO} 号 · ISBN {ISBN}</div>'
+
+body = f'''<div class="wrap"><h1>{TITLE}</h1>
+<div class="sde-reader-entry" style="margin:18px 0;padding:14px 18px;border:1px solid #b49a59;border-radius:6px"><a href="https://sdeuniverses.com{BASE}/read.html" style="display:inline-block;background:#b49a59;color:#171b13;text-decoration:none;font-weight:700;padding:10px 20px;border-radius:4px">在线翻页阅读 →</a><span style="display:inline-block;margin-left:12px;font-size:13px">支持上一页、下一页、页码跳转</span></div>
+<p class="book-cover" style="margin:16px 0 6px"><img src="{BASE}/cover.jpg" alt="《{TITLE}》封面" style="max-width:280px;width:56%;border:1px solid rgba(212,178,94,.32);box-shadow:4px 6px 18px rgba(0,0,0,.45)"></p>
+
+<p class="meta">{SUB} · 王德生 著 · 德麦国际专著第 {NO} 号 · ISBN {ISBN}</p>
+<p><span class="pill">封面·版权信息·作者介绍·前言·导读·目录（带页码）＋导论＋九卷（每卷含卷序）四十章＋结语＋参考书目＋附录四则</span><span class="pill">约 183,000 汉字</span><span class="pill">A5 278 页</span><span class="pill">59 个单元</span><span class="pill">tier: L0 公开</span></p>
+<p><a href="{BASE}/text/"><strong>→ 在线翻阅全书（目录）</strong></a>　·　<a href="{BASE}/tomato-egg.pdf"><strong>→ PDF 全本</strong></a><span class="meta">（A5 278 页，向量文字，可检索可复制）</span></p>
+
+<div class="card"><h3>这本书要改的，是一句人人相信的话</h3>
+<blockquote><b>知识是发现学，技术是发明学，艺术是发生学。</b></blockquote>
+<p>翻成大白话：知识是找到的，技术是造出来的，艺术是自己长出来的。这句话管着经费的分栏、学校的分科、法律的三本账，也管着一个孩子从小被问"长大当科学家还是艺术家"。它不只是一句话，是一副戴了两百年的眼镜。</p>
+<p>本书的改写只有一句：<b>三样都是发生。发现与发明是发生之后的两种记账法——把路抹掉的一种叫发现，把路记在某人名下的一种叫发明——而发生不是第三种记法，是被记的那件事本身。</b></p></div>
+
+<div class="card"><h3>为什么从一盘番茄炒蛋开始</h3>
+<p>大东西早被三套制度领走了：定律进了教科书，电灯进了专利局，画进了美术馆，各贴好标签。一盘家常菜没人领走，所以它还是一整块的。</p>
+<p>问它三个问题：谁发现的？——番茄明末才进中国，这盘菜二十世纪才成形，你不能发现一样还不存在的东西。谁发明的？——没有发明人，没有图纸，几亿个厨房各改了一遍。那它是"发生"的？——可老话说发生是艺术的事。<b>三块地一块也不肯站，只能说明地画错了。</b></p></div>
+
+<div class="card"><h3>一台引擎，三扇门</h3>
+<p>引擎只有三样零件：<b>形</b>（显出来的样子）、<b>步</b>（一步一步的差别）、<b>土</b>（搅在一起的那一整团）。一句话把它们串起来：<b>在土里，经过步，显成形。</b></p>
+<p>出货的时候只能递一样、留两样。递形，是<b>点</b>——知识；递步，是<b>路</b>——技术；递土，是<b>火</b>——艺术。</p>
+<table><tr><th></th><th>交出去的货</th><th>验法</th><th>从里面看像</th><th>门的病</th></tr>
+<tr><td>知识</td><td>不动的点</td><td>重跑：换个人做还在不在</td><td>找到的</td><td>搬来的炭不着火</td></tr>
+<tr><td>技术</td><td>走熟的路</td><td>换人：交给另一双手到不到</td><td>造出来的</td><td>走熟的路不认土</td></tr>
+<tr><td>艺术</td><td>点起的火</td><td>回写：对方身上变没变</td><td>凭空来的</td><td>只等火不备燃料</td></tr></table></div>
+
+<div class="card"><h3>承重的一句：验法造出看法</h3>
+<blockquote><b>三种看法，是三种验法养出来的。</b></blockquote>
+<p>天天验重跑的人，验的货不带路，验久了就觉得货本来就在；天天验换人的人，验的货有起点有先后有人排，验久了就觉得货是人造的；天天验回写的人，验的只是一下，看不见撞出这一下的三样，验久了就觉得货是凭空来的。</p>
+<p>那句老话因此不是胡说，是三扇窗看出去的三句老实报告——<b>它错在三个"是"字：把看到的样子当成了出身。</b></p></div>
+
+<div class="card"><h3>不认路，不等于早就在</h3>
+<p>山顶不认路——从东边西边上去都是同一个顶；水面的平也不认路——从哪边倒水都平。可是山顶早就在，水面的平不是：盆是空的时候，平在哪儿？</p>
+<p><b>稳是重跑的性质，验得了；早就在是出身的说法，验不了。</b>"找到"这套记法，是拿一件验得了的事冒充一件验不了的事。第十六章看点怎么挪（水在高原不到一百度开）、怎么散（以太、地心说）——散掉的点不是"从来不存在"，是"曾经站住，后来停不住了"。</p></div>
+
+<div class="card"><h3>AI 把两个门占了</h3>
+<p>机器写的一句话，既不在任何架子上（不是找到的），也没有任何人设计过（不是造出来的）。用本书的话说：<b>它不找也不造，它显。</b></p>
+<p>凡是能找到的它都能找到——"找到"这件事不是变难或变易，是<b>消失了</b>：东西与人之间那点距离没了，就没有"走过去"这个动作。凡是写得下的路它多半能走。<b>老话留给人的两块地，都不姓人了。</b></p>
+<p>剩下的是老话划给艺术的那一块。可火不是一块地，<b>火是引擎的心</b>：它在知识里烧（开普勒不肯放过那八分），在技术里烧（磨到第七遍忽然觉得对），在一盘菜里烧。机器递燃料，撞那一下得在活的土里——它的土是灰，不回写。</p></div>
+
+<div class="card"><h3>本书自己写下的作废条件</h3>
+<ul>
+<li>若某一制度改了验法而其从业者的"来路看法"不随之改，<b>"验法造出看法"被驳</b>。</li>
+<li>若存在一样能过重跑却在任何土里都不能被搬运的知识，<b>"不认路所以能搬"被驳</b>。</li>
+<li>若一件作品在同一团未变的土上第二次点起与第一次同质的火，<b>"回写只能一次"被驳</b>。</li>
+<li>若机器在不回写自身土的前提下，能在一团具体的活土里点火并被回写验出，<b>"机器占不了引擎的心"被驳</b>。</li>
+<li>若找得到一样只从一个门出、门里不含另两样的纯点、纯路或纯火，<b>"混合是常态"被驳</b>。</li>
+</ul></div>
+
+<p><a href="{BASE}/text/intro/"><b>→ 先读导论</b></a>　·　<a href="{BASE}/text/c40/"><b>→ 直接读结语</b></a>　·　<a href="{BASE}/text/fm2/"><b>→ 读前言</b></a></p>
+
+<h2>全书结构</h2>
+<table><tr><th>卷</th><th>内容</th><th>它回答什么</th></tr>
+<tr><td>一</td><td>一盘菜的三个问题</td><td>老话为什么活着；找到与造出是一本账的两页</td></tr>
+<tr><td>二</td><td>三样东西原来是一块的</td><td>三个格子是三套制度切出来的，切得很晚</td></tr>
+<tr><td>三</td><td>一台引擎</td><td>形步土、三方程、六路径、三原理、三扇门</td></tr>
+<tr><td>四</td><td>知识：不动的点</td><td>为什么知识看着像找到的</td></tr>
+<tr><td>五</td><td>技术：走熟的路</td><td>为什么技术看着像造出来的</td></tr>
+<tr><td>六</td><td>艺术：点起的火</td><td>为什么火看着像凭空来的</td></tr>
+<tr><td>七</td><td>三扇窗，一场发生</td><td>重推老话；混合是常态；四个反对</td></tr>
+<tr><td>八</td><td>AI 把两个门占了</td><td>机器占了哪两扇，人守哪一扇</td></tr>
+<tr><td>九</td><td>结语</td><td>一句话改写</td></tr></table>
+
+<h2>若只读三章</h2>
+<p><a href="{BASE}/text/c14/"><b>第十四章</b></a>　三个说法，一台引擎，三扇门——全书的承重章。<br>
+<a href="{BASE}/text/c23/"><b>第二十三章</b></a>　一个笑话的三层——解释为什么杀死笑话。<br>
+<a href="{BASE}/text/c39/"><b>第三十九章</b></a>　土会变薄——机器时代最实在的那一条。</p>
+
+<h2>写给谁</h2>
+<p>写给没读过哲学的人：做饭的，带孩子的，教书的，带团队的，写东西的，用机器的。不需要任何底子——做过一盘菜、讲过一个笑话、学过骑车，书里的话就接得上。每章开头是一件家里的事，末尾有"回家试试"和"一句话带走"。</p>
+
+<div class="nav"><a href="/books/m/124/">← 第 124 号　可判性的到来</a><a href="{BASE}/text/">全书目录 →</a></div>
+{FOOT}</div></body></html>
+'''
+page = HEAD.format(title=f'{TITLE} · {SUB} · 德麦国际专著',
+                   desc=f'《{TITLE}：{SUB}》· 王德生 著 · 德麦国际专著第 {NO} 号 · ISBN {ISBN}。九卷四十章，约 18.3 万汉字，A5 278 页。三样都是发生：知识交点，技术交路，艺术交火。',
+                   reason=html.escape(TIER, quote=True), isbn=ISBN, no=NO, base=BASE) + body
+(OUT / 'index.html').write_text(page, encoding='utf-8')
+print('detail page written', len(page))
