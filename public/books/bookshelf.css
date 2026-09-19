@@ -8,3 +8,119 @@
 
 /* Keep flip reading and chapter reading separate and visible. */
 .book-actions{flex-wrap:wrap;gap:6px 12px}.book[data-flip=true] .read-button{flex-basis:100%;text-align:center}.list-view .book[data-flip=true] .read-button{flex-basis:auto}
+
+/* ============================================================
+   墨金主题 · 2026-09-19
+   覆盖层：让书架与全站（深墨底 · 金线 · 宣纸字）同一副面孔。
+   只追加、不改上面的规则，回退时删掉本段即可。
+   ============================================================ */
+:root{
+  color-scheme:dark;
+  --paper:#0F0B07;
+  --card:#1A1410;
+  --ink:#F5EFE0;
+  --muted:#A99B7E;
+  --line:rgba(212,178,94,.22);
+  --accent:#D4B25E;
+  --soft:#221B14;
+  --gold:#D4B25E;
+  --gold2:#B8901F;
+  --cream:#F5EFE0;
+}
+html{background:var(--paper)}
+body{
+  background:
+    radial-gradient(1200px 600px at 50% -200px, rgba(212,178,94,.07), transparent 70%),
+    linear-gradient(180deg,#0F0B07 0%,#14100B 60%,#0F0B07 100%);
+  color:var(--ink);
+}
+a{color:var(--gold)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* 顶栏 */
+.topbar{background:rgba(15,11,7,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{color:var(--cream)}
+.brand small{color:var(--muted)}
+.toplinks a{color:var(--muted)}
+.toplinks a:hover{color:var(--gold)}
+.toplinks .current{color:var(--gold);border-bottom:1px solid var(--gold)}
+
+/* 标题区 */
+.eyebrow{color:var(--gold2);letter-spacing:.22em}
+.heading h1{color:var(--cream);font-weight:600;letter-spacing:.04em}
+.heading p{color:var(--muted)}
+.shelf-total{color:var(--muted)}
+.shelf-total strong{color:var(--gold);font-weight:500}
+
+/* 工具区：搜索、筛选、分类 */
+.tools{background:rgba(26,20,16,.7);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.searchbox input{background:#0F0B07;border:1px solid rgba(212,178,94,.35);color:var(--cream)}
+.searchbox input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,178,94,.12)}
+.searchbox input::placeholder{color:#7d7259}
+.searchbox svg{color:var(--gold2)}
+.control{color:var(--muted)}
+.control select,.sort select{background:#0F0B07;border:1px solid rgba(212,178,94,.35);color:var(--cream)}
+.categories{border-top:1px solid var(--line)}
+.category{color:var(--muted);border:1px solid transparent}
+.category span{color:#7d7259}
+.category:hover{color:var(--gold);border-color:rgba(212,178,94,.35);background:rgba(212,178,94,.06)}
+.category[aria-pressed=true]{background:var(--gold);color:#1A1410;border-color:var(--gold)}
+.category[aria-pressed=true] span{color:#3a2e12}
+.clear-search{color:var(--muted)}
+.results-bar{border-bottom:1px solid var(--line)}
+.result-left h2{color:var(--cream);font-weight:500}
+.result-count{color:var(--muted)}
+.sort>span{color:var(--muted)}
+.view-toggle{background:#0F0B07;border:1px solid rgba(212,178,94,.3)}
+.view-toggle button{color:var(--muted)}
+.view-toggle button[aria-pressed=true]{background:var(--gold);color:#1A1410}
+
+/* 书卡：像立在暗架上的书 */
+.book{
+  background:linear-gradient(180deg,rgba(245,239,224,.035),rgba(245,239,224,.015));
+  border:1px solid var(--line);
+  border-radius:6px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(212,178,94,.06);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.book:hover{transform:translateY(-3px);border-color:rgba(212,178,94,.55);box-shadow:0 16px 40px rgba(0,0,0,.5),0 0 0 1px rgba(212,178,94,.18)}
+.cover{background:#221B14;border:1px solid rgba(212,178,94,.18);box-shadow:4px 6px 14px rgba(0,0,0,.55)}
+.cover img{background:#221B14}
+.cover .no-cover{color:var(--muted);background:linear-gradient(160deg,#2A2118,#1A1410)}
+.book-tag{color:var(--gold2);letter-spacing:.08em}
+.book-tag .ordinal{color:#7d7259}
+.book h3,.book-copy h3{color:var(--cream);font-weight:600}
+.book h3 a:hover{color:var(--gold)}
+.byline{color:var(--muted)}
+.description{color:#B9AC93}
+.book-meta{border-top:1px solid var(--line)}
+.book-meta .format{color:var(--muted)}
+.reading-state{color:#CFC29F}
+.reading-state.info{color:#7d7259}
+.reading-state.preview{color:var(--gold2)}
+
+/* 按钮 */
+.read-button{background:var(--gold);color:#1A1410;border:1px solid var(--gold);font-weight:600;letter-spacing:.06em}
+.read-button:hover{background:#E4C878;border-color:#E4C878;color:#1A1410}
+.read-button.secondary{background:transparent;border-color:rgba(212,178,94,.45);color:var(--gold)}
+.read-button.secondary:hover{background:rgba(212,178,94,.1)}
+.detail-button{color:var(--muted);border-color:transparent}
+.detail-button:hover{color:var(--gold)}
+.pdf-link{color:var(--muted)}
+.pdf-link:hover{color:var(--gold)}
+.load-more{background:transparent;border:1px solid rgba(212,178,94,.45);color:var(--gold)}
+.load-more:hover{background:rgba(212,178,94,.1)}
+.load-progress{color:var(--muted)}
+.empty{background:var(--card);border:1px solid var(--line)}
+.empty h3{color:var(--cream)}
+.empty p{color:var(--muted)}
+.empty button{background:var(--gold);color:#1A1410}
+.no-js{color:var(--muted)}
+
+/* 列表视图 */
+.list-view .book{background:rgba(245,239,224,.025)}
+.list-view .cover{box-shadow:3px 4px 10px rgba(0,0,0,.5)}
+
+/* 页脚 */
+footer{border-top:1px solid var(--line);color:var(--muted)}
+footer a{color:var(--gold2)}

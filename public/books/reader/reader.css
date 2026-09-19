@@ -1,3 +1,36 @@
 :root{color-scheme:light;--paper:#fffdf7;--ink:#292d25;--muted:#626b5b;--line:#d8dccf;--gold:#786137;--font:18px}*{box-sizing:border-box}body{margin:0;background:#e9ebe3;color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif}button,input,select{font:inherit}button,a,select,input{-webkit-tap-highlight-color:transparent}a{color:var(--gold)}button{cursor:pointer}button:disabled{cursor:default;opacity:.4}button,input,select{border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--ink);min-height:38px}button{padding:7px 12px}button:hover:enabled{background:#eff2e8}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #a9894b;outline-offset:3px}[hidden]{display:none!important}.reader-header{padding:12px 24px;border-bottom:1px solid var(--line);background:#fafbf7;display:flex;align-items:center;justify-content:space-between;gap:15px}.reader-header h1{font-size:17px;font-weight:600;margin:3px 0;line-height:1.6}.reader-header p{font-size:12px;color:var(--muted);margin:0}.reader-header nav{display:flex;gap:16px;white-space:nowrap;font-size:13px}.reader-header a{text-decoration:none}.toolbar{position:sticky;top:0;z-index:10;padding:10px 20px;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;background:#fafbf7;border-bottom:1px solid var(--line);font-size:14px}.page-number{display:flex;align-items:center;gap:6px;white-space:nowrap}.page-number input{width:58px;text-align:center;padding:5px}.source-picker{display:flex;align-items:center;gap:6px}.source-picker select{max-width:340px;width:25vw;padding:6px;font-size:13px}.stage{padding:20px 16px 8px;min-height:300px}.html-paper{max-width:880px;height:clamp(350px,calc(100dvh - 245px),840px);margin:auto;background:var(--paper);padding:30px 42px;box-shadow:0 6px 28px #27331916;border:1px solid #d8dbce;border-radius:3px}.text-viewport{height:100%;width:100%;overflow:hidden}.text-flow{height:100%;width:100%;column-fill:auto;column-gap:70px;font-family:"Noto Serif SC","Songti SC",serif;font-size:var(--font);line-height:1.95;overflow-wrap:anywhere;text-align:justify}.text-flow h1{font-size:1.45em;line-height:1.65;margin:0 0 1em}.text-flow h2{font-size:1.2em;line-height:1.65;margin:1.2em 0 .6em;break-after:avoid}.text-flow h3{font-size:1.05em;break-after:avoid}.text-flow p{margin:0 0 .9em}.text-flow ul,.text-flow ol{padding-left:1.6em}.text-flow blockquote{margin:1em 0;padding:.4em 1em;border-left:3px solid #a99b74;background:#f2f1e9}.text-flow table{border-collapse:collapse;width:100%;font-size:.82em;table-layout:fixed}.text-flow td,.text-flow th{border:1px solid #ccc;padding:5px;overflow-wrap:anywhere}.text-flow tr{break-inside:avoid}.text-flow img{max-width:100%;height:auto;max-height:65vh;object-fit:contain}.text-flow pre{white-space:pre-wrap;font-size:.85em}.text-flow .meta{font-size:.8em;color:var(--muted)}.pdf-paper{position:relative;margin:0 auto;background:white;box-shadow:0 6px 28px #27331920;line-height:0}.pdf-paper canvas{display:block}.pdf-stage{overflow:auto}.textLayer{position:absolute;inset:0;overflow:hidden;line-height:1;opacity:1;text-align:initial}.textLayer span,.textLayer br{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}.textLayer ::selection{background:#87baa76b}.reader-status{max-width:880px;margin:0 auto;padding:12px 18px;text-align:center;color:var(--muted);font-size:13px;min-height:43px}.reader-error{max-width:760px;margin:25px auto;padding:24px;border:1px solid #e2b7a1;background:#fff6ec;border-radius:6px;line-height:1.8}.reader-error p{margin:0 0 12px}.reader-hint{max-width:880px;margin:auto;text-align:center;padding:4px 12px 18px;color:#777d70;font-size:12px}.source-fallback{max-width:900px;margin:25px auto;background:white;padding:20px}.source-fallback li{margin:12px}.source-link{font-size:12px}.busy{opacity:.65}.reader-note{padding:10px 18px;background:#fff7df;color:#7b5b18;font-size:13px;text-align:center}
 @media(max-width:650px){.reader-header{padding:10px 14px;align-items:flex-start}.reader-header h1{font-size:15px}.reader-header nav{font-size:12px;gap:10px}.reader-header nav a.secondary-nav{display:none}.toolbar{padding:8px 10px;gap:7px;font-size:13px}.toolbar button{padding:6px 10px;min-height:36px}.source-picker{order:2;width:100%;justify-content:center}.source-picker select{width:calc(100% - 60px);max-width:560px;min-height:34px}.stage{padding:12px 10px 4px}.html-paper{padding:20px 19px;height:calc(100dvh - 258px);min-height:300px;max-height:900px}.text-flow{line-height:1.85;column-gap:38px}.reader-status{font-size:12px;padding:10px}.reader-hint{font-size:11px}.reader-header p{font-size:11px}.reader-header nav a{line-height:30px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* ============================================================
+   墨金主题 · 2026-09-19
+   与 /books/bookshelf.css 的覆盖层同一副面孔。
+   只追加、不改上面的规则，回退时删掉本段即可。
+   ============================================================ */
+:root{
+  color-scheme:dark;
+  --paper:#0F0B07;
+  --ink:#F5EFE0;
+  --muted:#A99B7E;
+  --line:rgba(212,178,94,.22);
+  --gold:#D4B25E;
+}
+body{background:linear-gradient(180deg,#0F0B07,#14100B 60%,#0F0B07);color:var(--ink)}
+.reader-header{background:rgba(15,11,7,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.reader-header h1{color:#F5EFE0}
+.reader-header p{color:var(--muted)}
+.reader-header a{color:var(--gold)}
+.reader-header a:hover{color:#E4C878}
+.toolbar{background:rgba(26,20,16,.8);border-bottom:1px solid var(--line)}
+.toolbar button,.toolbar select,.toolbar input{
+  background:#0F0B07;border:1px solid rgba(212,178,94,.38);color:var(--gold)}
+.toolbar button:hover:not(:disabled){background:rgba(212,178,94,.14)}
+.toolbar button:disabled{opacity:.35}
+.toolbar label,.toolbar span{color:var(--muted)}
+.stage,main{background:transparent}
+canvas{box-shadow:0 10px 40px rgba(0,0,0,.6);border:1px solid rgba(212,178,94,.16);background:#fff}
+.status,.hint,footer{color:var(--muted)}
+footer a{color:var(--gold)}
+.notice,.error-box{background:rgba(26,20,16,.9);border:1px solid rgba(212,178,94,.35);color:var(--ink)}
+.notice button{background:var(--gold);color:#1A1410;border:1px solid var(--gold)}
+.notice a{color:var(--gold)}
