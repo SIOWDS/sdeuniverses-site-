@@ -164,7 +164,7 @@ def browser():
                 if url==BATCH:
                     page.locator('#q').fill('蜜糖');page.wait_for_function('document.querySelector("#found").textContent==="1"');assert page.locator('.card:visible').count()==1;page.locator('#q').fill('');page.wait_for_function('document.querySelector("#found").textContent==="50"')
                 else:
-                    before=page.locator('.prose').evaluate('e=>parseFloat(getComputedStyle(e).fontSize)');page.locator('[data-size="1"]').click();assert page.locator('.prose').evaluate('e=>parseFloat(getComputedStyle(e).fontSize)')>before;page.locator('[data-size="-1"]').click();page.locator('[data-theme]').click();assert page.evaluate('document.documentElement.dataset.theme')=='dark';page.locator('[data-theme]').click()
+                    before=page.locator('.prose').evaluate('e=>parseFloat(getComputedStyle(e).fontSize)');page.locator('[data-size="1"]').click();assert page.locator('.prose').evaluate('e=>parseFloat(getComputedStyle(e).fontSize)')>before;page.locator('[data-size="-1"]').click();page.locator('button[data-theme]').click();assert page.evaluate('document.documentElement.dataset.theme')=='dark';page.locator('button[data-theme]').click()
                     if mode=='mobile':page.locator('.mobile-toc summary').click();assert page.locator('.mobile-toc').get_attribute('open') is not None;page.locator('.mobile-toc summary').click()
                 page.screenshot(path=str(out/(mode+'-'+url.strip('/').replace('/','-')+'.png')));checks.append({'viewport':mode,'url':url,'passed':True})
             c.close()
