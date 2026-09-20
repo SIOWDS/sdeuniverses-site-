@@ -1,0 +1,84 @@
+name: wechat-2025-anchor-resolution
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/wechat-2025-anchor-resolution.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pymupdf==1.26.3 beautifulsoup4==4.13.4
+      - name: Search actual text, including compressed HTML and existing public search corpus
+        run: |
+          python - <<'PY'
+          import base64,collections,concurrent.futures,gzip,hashlib,html,json,re,unicodedata,urllib.request,zlib
+          from pathlib import Path
+          import fitz
+          from bs4 import BeautifulSoup
+          out=Path('artifacts/wechat-2025-anchor-resolution');out.mkdir(parents=True,exist_ok=True)
+          anchors=json.loads(Path('tools/wechat-2025-source-anchors.json').read_text())
+          matches={k:[] for k in anchors};corpus=[];saved=set();errors=[]
+          def norm(s):return re.sub(r'[\W_]+','',unicodedata.normalize('NFKC',s)).lower()
+          def inspect(body,source):
+              txt=norm(body)
+              hits={k:sum(a in txt for a in aa) for k,aa in anchors.items()}
+              hits={k:v for k,v in hits.items() if v}
+              if not hits:return
+              digest=hashlib.sha256(body.encode()).hexdigest();name=digest+'.txt'
+              if digest not in saved:
+                  (out/name).write_text(body);saved.add(digest)
+                  corpus.append({**source,'file':name,'sha256':digest,'characters':len(body)})
+              for k,num in hits.items():matches[k].append({**source,'file':name,'sha256':digest,'matched_anchors':num,'characters':len(body)})
+          for path in Path('public').rglob('index.html'):
+              try:
+                  raw=path.read_text(errors='ignore')
+                  if 'DecompressionStream' in raw:
+                      parts=re.search(r'const\s+parts\s*=\s*\[([^\]]*)\]',raw)
+                      if parts:
+                          names=re.findall(r'"([^\"]+\.b64)"',parts[1]);blob=base64.b64decode(''.join((path.parent/n).read_text().strip() for n in names))
+                          try:raw=gzip.decompress(blob).decode()
+                          except Exception:raw=zlib.decompress(blob).decode()
+                  s=BeautifulSoup(raw,'html.parser')
+                  for el in s(['script','style','nav','footer','header']):el.decompose()
+                  inspect(s.get_text('\n',strip=True),{'kind':'html','repository_path':path.as_posix()})
+              except Exception as e:errors.append([str(path),str(e)[:150]])
+          for path in Path('public').rglob('*.pdf'):
+              try:
+                  with fitz.open(path) as doc:body='\n'.join(p.get_text() for p in doc)
+                  inspect(body,{'kind':'pdf','repository_path':path.as_posix()})
+              except Exception:pass
+          # Read already-built public search documents; do not rebuild or write the R2 index.
+          def get(path):
+              req=urllib.request.Request('https://sdeuniverses.com'+path,headers={'User-Agent':'SDE-authorized-source-comparison/1.0'})
+              with urllib.request.urlopen(req,timeout=90) as r:return json.loads(r.read())
+          try:
+              manifest=get('/search/manifest.json');docs={x['i']:x for x in manifest['docs']}
+              shard_names=[f for section in manifest['sections'] for f in section.get('files',[section['key']])]
+              gathered=collections.defaultdict(list)
+              def get_shard(name):return get('/search/shard-'+name+'.json')['chunks']
+              with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+                  for chunks in pool.map(get_shard,shard_names):
+                      for c in chunks:gathered[c['d']].append(c['t'])
+              for ix,chunks in gathered.items():inspect('\n'.join(chunks),{'kind':'search-index','url':docs[ix]['u'],'title':docs[ix]['t'],'doc_id':ix,'index_built':manifest.get('built')})
+          except Exception as e:errors.append(['public-search',str(e)])
+          for k in matches:matches[k].sort(key=lambda x:(-x['matched_anchors'],x['characters']))
+          summary={'inputs':len(anchors),'with_any_body_match':sum(bool(v) for v in matches.values()),'with_four_body_matches':sum(any(c['matched_anchors']==4 for c in v) for v in matches.values()),'unresolved':[k for k,v in matches.items() if not v],'errors':errors[:20]}
+          (out/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2));(out/'matches.json').write_text(json.dumps(matches,ensure_ascii=False,indent=2));(out/'corpus.json').write_text(json.dumps(corpus,ensure_ascii=False,indent=2))
+          print(json.dumps(summary,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wechat-2025-anchor-resolution
+          path: artifacts/wechat-2025-anchor-resolution
+          retention-days: 7
