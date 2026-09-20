@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib, html, io, json, math, re, shutil
 from pathlib import Path
 from bs4 import BeautifulSoup, Tag
-import fitz
+import pymupdf as fitz
 from PIL import Image
 
 VERSION = '20260920-longform-v2'
@@ -131,17 +131,19 @@ def render_source(root: Path, spec: dict) -> tuple[list[dict],str]:
     doc = fitz.open(pdf)
     if len(doc) != spec['pages']:
         raise AssertionError('Source page count changed: ' + str(pdf))
+    # get_images() includes unused shared page resources; get_image_info()
+    # reports images actually displayed by this page's content stream.
     for number in range(1, len(doc)+1):
         if number not in spec['useful']:
             page = doc[number-1]
-            if page.get_text().strip() or page.get_images(full=True):
+            if page.get_text().strip() or page.get_image_info():
                 raise AssertionError('A supposedly blank page contains content')
     figures = []
     for page_number in spec['useful']:
         page = doc[page_number-1]
-        images = page.get_images(full=True)
-        if spec['code']=='b162' and len(images)==1:
-            source = doc.extract_image(images[0][0])['image']
+        images = page.get_image_info(xrefs=True)
+        if spec['code']=='b162' and len(images)==1 and images[0].get('xref',0)>0:
+            source = doc.extract_image(images[0]['xref'])['image']
             image = Image.open(io.BytesIO(source)).convert('RGB')
             if page_number==5 and image.height>image.width:
                 image = image.rotate(90, expand=True)
