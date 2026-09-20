@@ -1,0 +1,100 @@
+name: three-views-longform-20260920
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - tools/three_views_longform_20260920.py
+      - .github/workflows/three-views-longform-20260920.yml
+permissions:
+  contents: write
+concurrency:
+  group: three-views-longform-20260920
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install conversion dependencies
+        run: python -m pip install beautifulsoup4==4.13.4 pymupdf==1.26.3 Pillow==11.3.0
+      - name: Build faithful full-text pages and check source retention
+        run: |
+          python -m py_compile tools/three_views_longform_20260920.py
+          python tools/three_views_longform_20260920.py
+      - name: Rebuild full-site search in the same publication
+        run: python tools/build_search_index.py
+      - name: Package publication and audit for verification
+        run: |
+          python - <<'PY'
+          import pathlib, subprocess, zipfile
+          root=pathlib.Path('.')
+          names=set(subprocess.check_output(['git','diff','--name-only'],text=True).splitlines())
+          names.update(subprocess.check_output(['git','ls-files','--others','--exclude-standard'],text=True).splitlines())
+          dest=pathlib.Path('artifacts/three-views-longform')
+          dest.mkdir(parents=True,exist_ok=True)
+          with zipfile.ZipFile(dest/'publication.zip','w',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+              for name in sorted(names):
+                  p=root/name
+                  if p.is_file() and (name.startswith('public/three-views/') or name.startswith('public/search/')):
+                      z.write(p,name)
+          PY
+      - name: Commit this publication without overwriting concurrent changes
+        run: |
+          git config user.name 'SDE Longform Publisher'
+          git config user.email 'longform-publisher@users.noreply.github.com'
+          git add public/three-views public/search
+          if git diff --cached --quiet; then echo 'No content changes'; exit 0; fi
+          git commit -m 'Publish Three Views as full static long-form articles; preserve PDFs and original readers'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Verify deployed catalog, entry point and every article
+        run: |
+          python - <<'PY'
+          import concurrent.futures,json,pathlib,time,urllib.request
+          host='https://sdeuniverses.com'
+          root=pathlib.Path('artifacts/three-views-longform')
+          manifest=json.loads(pathlib.Path('public/three-views/longform/manifest.json').read_text())
+          def fetch(path):
+              req=urllib.request.Request(host+path,headers={'User-Agent':'SDE-publication-verification/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=45) as r:return r.read().decode('utf-8')
+          for attempt in range(30):
+              try:
+                  report=json.loads(fetch('/three-views/longform/report.json?verify=20260920-'+str(attempt)))
+                  if report.get('version')=='20260920-longform-v1':break
+              except Exception as e:print('Waiting for Pages deployment',attempt,type(e).__name__)
+              time.sleep(20)
+          else:raise RuntimeError('Publication committed; Pages deployment not confirmed within ten minutes')
+          results=[]
+          def verify(row):
+              for attempt in range(3):
+                  try:
+                      text=fetch(row['url']+'?verify=20260920-longform')
+                      ok='data-source-retention="1.0"' in text and '在线翻阅原稿' in text and row['title'] in text
+                      return {'url':row['url'],'ok':ok,'html_bytes':len(text.encode())}
+                  except Exception as e:
+                      error=type(e).__name__+': '+str(e)
+                      time.sleep(2*(attempt+1))
+              return {'url':row['url'],'ok':False,'error':error}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:results=list(pool.map(verify,manifest))
+          entry='three-views-longform-entry' in fetch('/three-views/?verify=20260920-longform')
+          final={'entry_point_verified':entry,'articles_checked':len(results),'passed':sum(x['ok'] for x in results),'failed':[x for x in results if not x['ok']],'results':results}
+          (root/'live-verification.json').write_text(json.dumps(final,ensure_ascii=False,indent=2))
+          print(json.dumps({k:v for k,v in final.items() if k!='results'},ensure_ascii=False,indent=2))
+          if not entry or final['failed']:raise RuntimeError('Live verification needs follow-up; inspect audit')
+          PY
+      - name: Preserve publication package, source audit and live receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: three-views-longform-20260920
+          path: artifacts/three-views-longform
+          retention-days: 30
+          if-no-files-found: ignore
