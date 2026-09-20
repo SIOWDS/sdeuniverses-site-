@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - tools/three_views_archive_reconcile_20260920.py
+      - .github/workflows/three-views-archive-reconcile-20260920.yml
   workflow_dispatch:
 permissions:
   contents: write
@@ -37,7 +38,8 @@ jobs:
           out=pathlib.Path('artifacts/three-views-archive');out.mkdir(parents=True,exist_ok=True)
           server=http.server.ThreadingHTTPServer(('127.0.0.1',8765),functools.partial(http.server.SimpleHTTPRequestHandler,directory='public'))
           threading.Thread(target=server.serve_forever,daemon=True).start()
-          report=json.loads(pathlib.Path('public/three-views/longform/archive-reconciliation-report.json').read_text())
+          report_path=pathlib.Path('public/three-views/longform/archive-reconciliation-report.json')
+          report=json.loads(report_path.read_text())
           urls=['/three-views/library/','/three-views/longform/']+[x['url'] for x in report['supplements']]
           checks=[]
           with sync_playwright() as pw:
@@ -56,12 +58,16 @@ jobs:
                       if '/read/' in url or '/doc/' in url:
                           assert page.locator('.archive-supplement').count()==1
                           page.locator('.archive-supplement').scroll_into_view_if_needed()
-                      page.screenshot(path=str(out/(str(width)+'-'+url.strip('/').replace('/','-')+'.png'))
+                      screenshot_file=out/(str(width)+'-'+url.strip('/').replace('/','-')+'.png')
+                      page.screenshot(path=str(screenshot_file))
                       checks.append({'url':url,'width':width,'passed':True})
                   page.close()
               browser.close()
           server.shutdown()
           (out/'browser-checks.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2))
+          report['browser_validation']={'viewports':2,'checks_passed':len(checks),'all_passed':True}
+          report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          (out/'archive-reconciliation-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
           PY
       - name: Commit verified publication without overwriting concurrent changes
         run: |
