@@ -1,0 +1,45 @@
+name: Continue Three Views publication
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/continue_three_views_20260920.py
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: three-views-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the current publication branch
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout: |
+            scripts
+            public/three-views
+      - name: Install document processors
+        run: python -m pip install --disable-pip-version-check beautifulsoup4 PyMuPDF Pillow
+      - name: Restore omitted sources and validate retained content
+        run: python scripts/continue_three_views_20260920.py
+      - name: Publish validated pages without overwriting concurrent work
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- public/three-views
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo 'No additional publication changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Complete 三视角 continuation: two diagram sources and faithful web reading cleanup'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          git show --stat --oneline HEAD
