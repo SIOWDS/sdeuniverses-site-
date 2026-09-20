@@ -19,6 +19,7 @@ PUB = os.path.join(ROOT, "public")
 OUT = os.path.join(PUB, "search")
 
 SECTION_LABELS = {
+    "three-views": "三视角专栏",
     "column": "长文专栏", "students": "学员专栏", "books": "专著导读",
     "frontier": "新思想前沿",
     "philosophy": "思想宇宙", "hotspot": "今日热点", "taste": "智能体·工具",
@@ -59,7 +60,7 @@ def _check_stale():
     for dirpath, dirnames, filenames in os.walk(PUB):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
         for fn in filenames:
-            if not fn.endswith(".html") or fn == "read.html":
+            if not fn.endswith(".html") or fn == "read.html" or (fn == "original.html" and "/three-views/" in dirpath.replace(os.sep, "/") + "/"):
                 continue
             rel = os.path.relpath(os.path.join(dirpath, fn), PUB)
             u = canon_url(rel)
@@ -291,7 +292,7 @@ for dp, dns, fns in os.walk(PUB):
         full = os.path.join(dp, fn)
         rel = os.path.relpath(full, PUB)
         if fn.endswith(".html"):
-            if fn == "read.html":
+            if fn == "read.html" or (fn == "original.html" and "/three-views/" in dp.replace(os.sep, "/") + "/"):
                 continue  # PDF 阅读器空壳：无独立正文，PDF 内容已折叠进目录 URL 文档
             url = canon_url(rel)
             if any(s in url for s in SKIP_URL_SUBSTR):

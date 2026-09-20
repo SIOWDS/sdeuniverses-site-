@@ -1,18 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>教育27宫格 · 三视角文库 · 教育智慧</title>
-<meta name="description" content="教育27宫格——王德生三视角文章，收在「教育智慧」子频道，共 1 页。">
-<link rel="canonical" href="https://sdeuniverses.com/three-views/doc/b121/">
-<meta property="og:type" content="article">
-<meta property="og:title" content="教育27宫格 · 三视角文库 · 教育智慧">
-<meta property="og:description" content="教育27宫格——王德生三视角文章，收在「教育智慧」子频道，共 1 页。">
-<meta property="og:url" content="https://sdeuniverses.com/three-views/doc/b121/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<meta content="教育27宫格——王德生三视角文章，收在「教育智慧」子频道，共 1 页。" name="description"/>
+<link href="https://sdeuniverses.com/three-views/doc/b121/" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="教育27宫格 · 三视角文库 · 教育智慧" property="og:title"/>
+<meta content="教育27宫格——王德生三视角文章，收在「教育智慧」子频道，共 1 页。" property="og:description"/>
+<meta content="https://sdeuniverses.com/three-views/doc/b121/" property="og:url"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&amp;family=Noto+Serif+SC:wght@300;400;500;600&amp;display=swap" media="print" onload="this.media='all';this.onload=null" rel="stylesheet"/>
 <style>
 :root{--bg:#F5EFE0;--card:#FAF6EC;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;
  --border:rgba(138,104,23,.22);--border2:rgba(138,104,23,.12);--ac:#2C7FA8}
@@ -106,7 +107,7 @@ details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-hei
  font-size:.68rem;color:var(--muted);border:1px solid var(--border2);vertical-align:.08em}
 </style>
 </head>
-<body>
+<body><a href="/three-views/doc/b121/" id="back-to-longform" style="display:block;padding:12px 20px;text-align:center;background:#eaf3f2;color:#09677d;font-weight:bold">← 返回网页长文</a>
 <header class="tv-top">
 <a class="tv-brand" href="/three-views/"><b>三视角专栏</b><span>Three Views</span></a>
 <nav><a href="/three-views/">图册二十一篇</a><a href="/three-views/articles/">扫码原文</a><a href="/three-views/library/">三视角文章</a><a class="cur" href="/three-views/library/education/">教育智慧</a></nav>
@@ -118,18 +119,18 @@ details.plain .body{margin-top:1rem;white-space:pre-wrap;font-size:1rem;line-hei
 <p class="tv-sub">共 1 页 · 约 0 字　|　王德生　|　子频道：<a href="/three-views/library/education/">教育智慧</a></p>
 </header>
 <div class="bar">
-<button class="btn" id="prev" disabled>‹ 上一页</button>
-<div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span>/ <span id="totalPages">…</span></span></div>
-<button class="btn" id="next" disabled>下一页 ›</button>
+<button class="btn" disabled="" id="prev">‹ 上一页</button>
+<div class="pagebox"><input id="pageInput" min="1" type="number" value="1"/><span>/ <span id="totalPages">…</span></span></div>
+<button class="btn" disabled="" id="next">下一页 ›</button>
 <button class="btn" id="zoomOut">−</button>
 <button class="btn" id="zoomIn">＋</button>
-<a class="btn dl" href="/three-views/doc/b121/b121.pdf" download="教育27宫格.pdf">⬇ 下载 PDF</a>
+<a class="btn dl" download="教育27宫格.pdf" href="/three-views/doc/b121/b121.pdf">⬇ 下载 PDF</a>
 <a class="btn" href="/three-views/library/education/">回「教育智慧」</a>
 </div>
 <div class="stage" id="stage">
-<div id="loading" class="loading"><div class="spinner"></div>正在载入本篇…</div>
+<div class="loading" id="loading"><div class="spinner"></div>正在载入本篇…</div>
 <div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
-<div id="error" class="err" style="display:none"></div>
+<div class="err" id="error" style="display:none"></div>
 </div>
 <p class="hint">← → 方向键翻页 · 选中正文任意一句可问 WDS</p>
 <div class="tv-note">本篇原件是整页图表（无文字层），只能看图或下载 PDF。</div>
@@ -217,7 +218,7 @@ window.WDS_READ={title:DOC_TITLE,
   docTextFn:function(){return curText?('【'+DOC_TITLE+' · 第 '+pageNum+' 页 / 共 '
     +(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+curText):'';}};
 </script>
-<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
-<script src="/wds-mode.js?v=20260916a" defer></script>
+<script defer="" src="/taste/wds-companion/wds-read.js?v=20260817c"></script>
+<script defer="" src="/wds-mode.js?v=20260916a"></script>
 </body>
 </html>

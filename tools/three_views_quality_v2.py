@@ -25,7 +25,7 @@ def metadata(text,title):
     for i,s in enumerate(lines):
         m=re.match(r'^(作者|主讲|整理|记录)\s*[:：]\s*(.{2,45})$',s)
         if m and i<40:
-            result.setdefault('credit',s); moves[i]='credit'
+            result['credit']=' · '.join(dict.fromkeys([result['credit'],s])) if result.get('credit') else s; moves[i]='credit'
         if re.fullmatch(r'20\d{2}[-/]\d{1,2}[-/]\d{1,2}\s+\d\d:\d\d',s) and any('原创'==x for x in lines[max(0,i-2):i+3]):
             result['source_date']=s;moves[i]='date'
             if i and re.fullmatch(r'[\u4e00-\u9fff·\s、]{2,24}',lines[i-1]) and titlekey(lines[i-1])!=titlekey(title):
@@ -55,10 +55,12 @@ def join_text(a,b):
 def reflow(text,title):
     original,_,meta0=metadata(text,title)
     prepared=PREPARED.get(sourcekey(text,title),text)
+    prepared=re.sub(r'(?m)^摘\s*\n\s*要(?=[:：])','摘要',prepared)
     lines,moves,meta=metadata(prepared,title); meta={**meta0,**meta}
     cleaned=[];removed=[];moved=[];ad=False
     for i,s in enumerate(lines):
         if not s:continue
+        if title=='皮尔士范畴理论探析' and re.fullmatch(r'晋阳学刊\s*2009\s*年第\s*4\s*期',s):removed.append({'text':s,'reason':'running-header'});continue
         if title=='皮尔士范畴理论探析' and ('免费论文查重' in s or '论文降重、修改、代写请扫码' in s):ad=True
         if i>len(lines)*.85 and s.startswith('收录于合集') and any(('上一篇' in x or '下一篇' in x) for x in lines[i:]):ad=True
         if ad:removed.append({'text':s,'reason':'source-advertisement'});continue
@@ -75,19 +77,21 @@ def reflow(text,title):
         tag='blockquote' if dialogue else 'p';cls=' class="list-item"' if re.match(r'^\d+[.．、]\s*',s) else ''
         pieces.append(f'<{tag}{cls}>{escape(s)}</{tag}>');buf='';paren=0;dialogue=False
     for s in cleaned:
-        lev=level(s)
+        lev=(2 if compact(s).rstrip('：:') in {'一、基本范畴的提出','二、范畴的推导与证明','三、3个基本范畴的各种形式','参考文献'} else 0) if title=='皮尔士范畴理论探析' else level(s)
         if lev and not paren:
             flush();anchor=f'section-{len(toc)+1}';toc.append((anchor,s,lev));pieces.append(f'<h{lev} id="{anchor}">{escape(s)}</h{lev}>');continue
         new_dialogue=s.startswith(('（学员','(学员','学员：','学员:','学员回答'))
         numbered=bool(re.match(r'^\d+[.．、]\s*',s))
         new_teacher=s.startswith(('老师：','老师:','王老师：','王老师:'))
+        new_label=bool(re.match(r'^(关键词|中图分类号|文献标识码|文章编号|作者简介|收稿日期|基金项目)[:：]',s))
+        if new_label:flush()
         if new_dialogue or new_teacher or (numbered and not paren):flush()
         if not buf:dialogue=new_dialogue
         buf=join_text(buf,s)
         paren=max(0,paren+s.count('（')+s.count('(')-s.count('）')-s.count(')'))
         complete=bool(re.search(r'[。！？!?；;][”’"）)]*$',s))
         label=s.endswith(('：',':')) and len(buf)<80 and not dialogue
-        if (not paren and (complete or label)) or (len(buf)>700 and complete):flush()
+        if new_label or (not paren and (complete or label)) or (len(buf)>700 and complete):flush()
     flush();markup='\n'.join(pieces);visible=fragment(markup).get_text()
     assert compact(visible)==compact(''.join(cleaned)),f'Output text conservation failed: {title}'
     recovered=''.join(cleaned)+''.join(x['text'] for x in removed)+''.join(x['text'] for x in moved)
