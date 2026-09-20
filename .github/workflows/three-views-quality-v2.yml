@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - tools/three_views_quality_v2.py
+      - tools/three_views_final_polish.py
       - .github/workflows/three-views-quality-v2.yml
 permissions:
   contents: write
@@ -25,12 +26,13 @@ jobs:
           python-version: '3.12'
       - name: Install document and browser tools
         run: |
-          python -m pip install beautifulsoup4==4.13.4 pymupdf==1.26.3 Pillow==11.3.0 playwright
+          python -m pip install beautifulsoup4==4.13.4 pymupdf==1.26.3 Pillow==11.3.0 pypdf cryptography playwright
           python -m playwright install --with-deps chromium
       - name: Regenerate audited long-form pages
         run: |
-          python -m py_compile tools/three_views_quality_v2.py
+          python -m py_compile tools/three_views_quality_v2.py tools/three_views_final_polish.py
           python tools/three_views_quality_v2.py
+          python tools/three_views_final_polish.py
           python tools/build_search_index.py
       - name: Check every article, anchor and preserved source
         run: |
@@ -64,6 +66,8 @@ jobs:
           catalog=BeautifulSoup((out/'index.html').read_text(),'html.parser');assert len(catalog.select('.card'))==len(manifest)
           for id in ['b121','b162']:
               s=BeautifulSoup((root/'three-views/doc'/id/'index.html').read_text(),'html.parser');assert s.select('.figure img');assert '0 字' not in s.select_one('.meta').get_text()
+          for id,folder,credit in [('a009','read','杨彼得'),('a028','read','韩燕红'),('a143','read','巩丽萍'),('b215','doc','翟文颖'),('b232','doc','凤春红')]:
+              s=BeautifulSoup((root/'three-views'/folder/id/'index.html').read_text(),'html.parser');assert credit in s.select_one('.meta').get_text()
           search=json.loads((root/'search/manifest.json').read_text());assert not any('/three-views/' in x['u'] and x['u'].endswith('original.html') for x in search['docs'])
           indexed={x['u']:x for x in search['docs']}
           for r in manifest:assert indexed[r['url']]['s']=='three-views',r['url']
@@ -89,7 +93,7 @@ jobs:
                   page=context.new_page()
                   page.route('**/wds-mode.js*',lambda route:route.fulfill(status=200,body=''))
                   for url in urls:
-                      page.goto('http://127.0.0.1:8765'+url,wait_until='networkidle')
+                      page.goto('http://127.0.0.1:8765'+url,wait_until='networkidle',timeout=60000)
                       page.evaluate('localStorage.clear();document.documentElement.dataset.readingTheme="light"')
                       assert page.locator('h1').count()==1,url
                       assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+1'),(mode,url,'horizontal overflow')
@@ -111,8 +115,11 @@ jobs:
                           page.locator('.figure a').first.click();assert page.locator('dialog[open]').count()==1
                           page.locator('[data-zoom]').click();assert page.locator('dialog.is-zoomed').count()==1
                           page.keyboard.press('Escape');assert page.locator('dialog[open]').count()==0
-                      page.evaluate('window.scrollTo(0,0)');page.screenshot(path=str(out/(mode+'-'+url.strip('/').replace('/','-')+'.png'))
+                      page.evaluate('window.scrollTo(0,0)')
+                      shot_name=mode+'-'+url.strip('/').replace('/','-')+'.png'
+                      page.screenshot(path=str(out/shot_name))
                       tests.append({'mode':mode,'url':url,'passed':True})
+                      (out/'progress.json').write_text(json.dumps(tests,ensure_ascii=False,indent=2))
                   context.close()
               b.close()
           server.shutdown()
@@ -124,9 +131,9 @@ jobs:
         run: |
           git config user.name 'SDE Quality Publisher'
           git config user.email 'quality-publisher@users.noreply.github.com'
-          git add public/three-views public/search tools/build_search_index.py
+          git add public/three-views public/search tools/build_search_index.py tools/three_views_quality_v2.py
           if git diff --cached --quiet; then echo 'No content changes'; exit 0; fi
-          git commit -m 'Refine 436 Three Views pages: diagram completion, source credits, readable paragraphs, search and tested mobile UI'
+          git commit -m 'Refine 436 Three Views pages: diagram completion, complete credits, readable paragraphs, search and tested mobile UI'
           git pull --rebase origin main
           git push origin HEAD:main
       - name: Verify all deployed article pages
@@ -176,7 +183,7 @@ jobs:
           with zipfile.ZipFile(dest/'publication.zip','w',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as z:
               for p in pathlib.Path('public/three-views').rglob('*'):
                   if p.is_file() and p.suffix in {'.html','.css','.js','.json','.webp','.xml'}:z.write(p,p.as_posix())
-              for p in [pathlib.Path('tools/three_views_longform_20260920.py'),pathlib.Path('tools/three_views_quality_v2.py'),pathlib.Path('tools/build_search_index.py')]:
+              for p in [pathlib.Path('tools/three_views_longform_20260920.py'),pathlib.Path('tools/three_views_quality_v2.py'),pathlib.Path('tools/three_views_final_polish.py'),pathlib.Path('tools/build_search_index.py')]:
                   if p.exists():z.write(p,p.as_posix())
           PY
       - name: Preserve quality evidence and desktop/mobile screenshots
