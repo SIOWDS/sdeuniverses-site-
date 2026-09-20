@@ -1,0 +1,20 @@
+name: creativity321-2025-publication-verification
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/creativity321-2025-publication-verification.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools
+            public/wechat-picks/2025/creativity321
+          filter: blob:none
+      - run: python tools/creativity321_2025_live_verify.py
