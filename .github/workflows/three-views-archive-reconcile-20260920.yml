@@ -1,0 +1,109 @@
+name: Three Views archive reconciliation
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/three_views_archive_reconcile_20260920.py
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: three-views-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            public/three-views
+            public/search
+      - name: Install publication and browser tools
+        run: |
+          python -m pip install beautifulsoup4 playwright
+          python -m playwright install --with-deps chromium
+      - name: Reconcile source text and classifications
+        run: python tools/three_views_archive_reconcile_20260920.py
+      - name: Check desktop and mobile readers
+        run: |
+          python - <<'PY'
+          import functools,http.server,json,pathlib,threading
+          from playwright.sync_api import sync_playwright
+          out=pathlib.Path('artifacts/three-views-archive');out.mkdir(parents=True,exist_ok=True)
+          server=http.server.ThreadingHTTPServer(('127.0.0.1',8765),functools.partial(http.server.SimpleHTTPRequestHandler,directory='public'))
+          threading.Thread(target=server.serve_forever,daemon=True).start()
+          report=json.loads(pathlib.Path('public/three-views/longform/archive-reconciliation-report.json').read_text())
+          urls=['/three-views/library/','/three-views/longform/']+[x['url'] for x in report['supplements']]
+          checks=[]
+          with sync_playwright() as pw:
+              browser=pw.chromium.launch()
+              for width,height in [(1440,1000),(390,844)]:
+                  page=browser.new_page(viewport={'width':width,'height':height})
+                  page.route('**/wds-mode.js*',lambda r:r.fulfill(status=200,body=''))
+                  page.route('**/fonts.googleapis.com/**',lambda r:r.fulfill(status=200,body=''))
+                  for url in urls:
+                      page.goto('http://127.0.0.1:8765'+url,wait_until='networkidle')
+                      assert page.locator('h1').count()==1
+                      assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),url
+                      if '/longform/' in url:
+                          page.locator('#cat').select_option(label='三视角基础理论')
+                          assert page.locator('.card:visible').count()>50
+                      if '/read/' in url or '/doc/' in url:
+                          assert page.locator('.archive-supplement').count()==1
+                          page.locator('.archive-supplement').scroll_into_view_if_needed()
+                      page.screenshot(path=str(out/(str(width)+'-'+url.strip('/').replace('/','-')+'.png'))
+                      checks.append({'url':url,'width':width,'passed':True})
+                  page.close()
+              browser.close()
+          server.shutdown()
+          (out/'browser-checks.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2))
+          PY
+      - name: Commit verified publication without overwriting concurrent changes
+        run: |
+          set -euo pipefail
+          git add -- public/three-views public/search
+          git diff --cached --check
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'SDE Archive Publisher'
+          git config user.email 'archive-publisher@users.noreply.github.com'
+          git commit -m 'Restore 125 classification entries and 5 original-source supplements; preserve every original reader'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          git rev-parse HEAD > artifacts/three-views-archive/publication-commit.txt
+      - name: Verify public deployment and supplement bodies
+        run: |
+          python - <<'PY'
+          import json,pathlib,time,urllib.request
+          base='https://sdeuniverses.com'
+          version='20260920-archive-reconcile-v1'
+          def get(path):
+              req=urllib.request.Request(base+path,headers={'Cache-Control':'no-cache','User-Agent':'SDE-Archive-Publication-Check'})
+              with urllib.request.urlopen(req,timeout=25) as r:return r.read().decode('utf-8')
+          for attempt in range(20):
+              try:
+                  report=json.loads(get('/three-views/longform/archive-reconciliation-report.json?check='+str(attempt)))
+                  if report.get('version')==version:break
+              except Exception as e:print('Waiting for deployment',attempt,type(e).__name__)
+              time.sleep(12)
+          else:raise RuntimeError('Publication committed, live deployment not yet confirmed')
+          checks=[]
+          for item in report['supplements']:
+              text=get(item['url']+'?archive='+version)
+              assert version in text and 'supplement-text' in text,item['url']
+              checks.append({'url':item['url'],'passed':True})
+          assert 'archive-reconciliation-note' in get('/three-views/library/?archive='+version)
+          assert 'archive-release-note' in get('/three-views/longform/?archive='+version)
+          pathlib.Path('artifacts/three-views-archive/live-checks.json').write_text(json.dumps({'version':version,'passed':True,'checks':checks},ensure_ascii=False,indent=2))
+          print(json.dumps({'live_verified':True,'supplement_pages':len(checks),'classification_entries_added':report['new_classification_entries']}))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: three-views-archive-reconciliation
+          path: artifacts/three-views-archive
+          retention-days: 30
