@@ -13,7 +13,7 @@ def clean(s,titles):
 def job(r):
  if not r['candidates']:return
  c=r['candidates'][0]
- with urllib.request.urlopen('https://sdeuniverses.com'+c['href'],timeout=60) as f:b=f.read()
+ with urllib.request.urlopen(urllib.request.Request('https://sdeuniverses.com'+c['href'],headers={'User-Agent':'SDE-Article-Deduplication/1.0'}),timeout=60) as f:b=f.read()
  d=fitz.open(stream=b,filetype='pdf');t='\n'.join(p.get_text() for p in d)
  if r['id']==29:print('WDS_OLD_TEXT '+json.dumps(t,ensure_ascii=False),flush=True)
  titles=[norm(r['title']),norm(c['title'])];a=clean(r['text'],titles);b=clean(t,titles)
