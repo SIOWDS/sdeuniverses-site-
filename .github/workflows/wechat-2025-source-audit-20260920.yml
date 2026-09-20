@@ -1,0 +1,72 @@
+name: wechat-2025-source-audit-20260920
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/wechat-2025-source-audit-20260920.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pymupdf==1.26.3 beautifulsoup4==4.13.4
+      - name: Match source files and preserve evidence
+        run: |
+          python - <<'PY'
+          import csv,hashlib,json,re,unicodedata,zipfile
+          from pathlib import Path
+          from difflib import SequenceMatcher
+          import fitz
+          from bs4 import BeautifulSoup
+          out=Path('artifacts/wechat-2025-audit');out.mkdir(parents=True,exist_ok=True)
+          rows=list(csv.DictReader(Path('tools/wechat-2025-incoming-20260920.tsv').read_text().splitlines(),delimiter='\t'))
+          def norm(s):
+              s=re.sub(r'^20\d{6}','',s).replace('.pdf','')
+              s=re.sub(r'(?:321互动吧\s*)?\d+\s*页\s*$','',s)
+              return re.sub(r'[^\w\u4e00-\u9fff]','',unicodedata.normalize('NFKC',s)).lower().replace('_','')
+          for r in rows:r['title_key']=norm(r['filename']);r['candidates']=[]
+          pdf_count=0
+          for path in Path('public').rglob('*.pdf'):
+              try:
+                  d=fitz.open(path); title=d.metadata.get('title',''); pages=len(d); first=d[0].get_text()[:1500] if pages else '';d.close();pdf_count+=1
+              except Exception:continue
+              keys=[norm(title),norm(path.stem)]+[norm(s) for s in first.splitlines()[:6] if len(s.strip())>4]
+              for r in rows:
+                  best=max((SequenceMatcher(None,r['title_key'],k).ratio() for k in keys if k),default=0)
+                  if best>=.79:
+                      sha=hashlib.sha256(path.read_bytes()).hexdigest()
+                      r['candidates'].append({'path':path.as_posix(),'title':title,'pages':pages,'sha256':sha,'exact_pdf':sha==r['sha256'],'title_score':round(best,4),'first':first})
+          for path in Path('public').rglob('*.html'):
+              if path.name not in ['index.html']:continue
+              try:
+                  raw=path.read_text(errors='ignore');s=BeautifulSoup(raw,'html.parser'); titles=[s.title.get_text(' ',strip=True) if s.title else '',s.h1.get_text(' ',strip=True) if s.h1 else '']
+                  keys=[norm(t.split('｜')[0].split(' | ')[0]) for t in titles]
+                  for r in rows:
+                      best=max((SequenceMatcher(None,r['title_key'],k).ratio() for k in keys if k),default=0)
+                      if best>=.88:r['candidates'].append({'path':path.as_posix(),'title':titles[-1] or titles[0],'title_score':round(best,4),'html':True})
+              except Exception:continue
+          for r in rows:r['candidates'].sort(key=lambda x:(not x.get('exact_pdf'),-x['title_score'],x['path']))
+          summary={'inputs':len(rows),'pdfs_scanned':pdf_count,'exact_pdf_inputs':sum(any(c.get('exact_pdf') for c in r['candidates']) for r in rows),'title_candidate_inputs':sum(bool(r['candidates']) for r in rows),'missing':[r['filename'] for r in rows if not r['candidates']]}
+          (out/'matches.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2));(out/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2))
+          with zipfile.ZipFile(out/'existing-sources.zip','w',zipfile.ZIP_DEFLATED,compresslevel=5) as z:
+              paths={c['path'] for r in rows for c in r['candidates'][:3]}
+              paths.update(['public/wechat-picks/index.html','public/wechat-picks/2025/index.html','public/wechat-picks/2024/index.html'])
+              paths.update(['tools/wechat-2025-incoming-20260920.tsv'])
+              for name in sorted(paths):
+                  p=Path(name)
+                  if p.exists():z.write(p,name)
+          print(json.dumps(summary,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wechat-2025-source-audit
+          path: artifacts/wechat-2025-audit
+          retention-days: 7
