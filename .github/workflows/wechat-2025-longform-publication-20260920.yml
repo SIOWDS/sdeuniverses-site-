@@ -37,13 +37,13 @@ jobs:
           sudo apt-get install -y fonts-noto-cjk
       - name: Apply source-preserving quality fixes and enforce source hashes
         run: |
-          python -m py_compile tools/wechat_2025_longform.py tools/wechat_2025_publish_20260920.py tools/wechat_2025_final_quality.py
+          python -m py_compile tools/wechat_2025_longform.py tools/wechat_2025_publish_20260920.py tools/wechat_2025_final_quality.py tools/wechat_2025_reconcile_catalog.py
           python tools/wechat_2025_final_quality.py prepare
           python tools/wechat_2025_publish_20260920.py build
           python tools/wechat_2025_final_quality.py finish
       - name: Test desktop and mobile reading and filters
         run: python tools/wechat_2025_publish_20260920.py browser
-      - name: Publish only this column and preserve concurrent changes
+      - name: Publish while preserving concurrent catalog additions
         run: |
           git config user.name 'SDE WeChat Publisher'
           git config user.email 'wechat-publisher@users.noreply.github.com'
@@ -51,8 +51,18 @@ jobs:
           git rm -f --ignore-unmatch tools/wechat-2025-book-bridge-compact.b64
           if git diff --cached --quiet; then echo 'No publication changes'; exit 0; fi
           git commit -m 'Publish 56 verified WeChat full texts, 11 new annual entries, original source access and tested reading UI'
-          git pull --rebase origin main
-          git push origin HEAD:main
+          for attempt in 1 2 3; do
+            if ! git pull --rebase origin main; then
+              python tools/wechat_2025_reconcile_catalog.py
+              GIT_EDITOR=true git rebase --continue
+            fi
+            python tools/wechat_2025_publish_20260920.py static
+            if git push origin HEAD:main; then exit 0; fi
+            echo 'Repository changed again; re-read catalogs rather than force pushing.'
+            sleep 3
+          done
+          echo 'Publication not pushed after three concurrent-update attempts.'
+          exit 1
       - name: Verify all deployed article bodies and annual entry points
         run: python tools/wechat_2025_publish_20260920.py live
       - name: Preserve exact publication and QA evidence
