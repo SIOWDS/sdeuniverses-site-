@@ -41,7 +41,7 @@ def check_catalog():
     items = cat['books']
     bad = 0
     for it in items:
-        for k in ('detailUrl', 'readUrl', 'chapterUrl', 'pdfUrl', 'coverUrl'):
+        for k in ('detailUrl', 'readUrl', 'chapterUrl', 'articlesUrl', 'pdfUrl', 'coverUrl'):
             u = it.get(k)
             p = local_of(u)
             if not p:
@@ -148,7 +148,7 @@ def check_online():
             return 'ERR'
 
     def chk(it):
-        ks = ['detailUrl', 'readUrl', 'chapterUrl', 'pdfUrl', 'coverUrl']
+        ks = ['detailUrl', 'readUrl', 'chapterUrl', 'articlesUrl', 'pdfUrl', 'coverUrl']
         codes = [probe((it.get(k), k in ('pdfUrl', 'coverUrl'))) for k in ks]
         return it.get('number'), it['title'][:14], dict(zip(ks, codes))
 
