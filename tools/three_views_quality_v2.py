@@ -18,6 +18,11 @@ def titlekey(s): return re.sub(r'\W+','',s).lower()
 def escape(s): return html.escape(str(s),quote=True)
 def read_json(p): return json.loads(p.read_text(encoding='utf8'))
 def write_json(p,obj): p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(obj,ensure_ascii=False,indent=2),encoding='utf8')
+def editorial_locked(p):
+    """编辑稿闸门：带 data-editorial 标记的页面由 tools/three_views_editorial.py 定稿，本生成器一律跳过。"""
+    p=Path(p)
+    return p.exists() and 'data-editorial' in p.read_text(encoding='utf8')
+
 def fragment(s): return BeautifulSoup(s,'html.parser')
 
 def metadata(text,title):
@@ -161,6 +166,7 @@ def enhance():
     for r in manifest:categories[r['category']].append(r)
     files=sorted(list((ROOT/'doc').glob('*/index.html'))+list((ROOT/'read').glob('*/index.html')))
     for p in files:
+        if editorial_locked(p):continue
         soup=fragment(p.read_text(encoding='utf8'));url='/'+p.parent.relative_to(PUBLIC).as_posix()+'/'
         if not soup.select_one('.prose'):raise RuntimeError(f'Unconverted article: {url}')
         title=soup.h1.get_text(' ',strip=True);row=byurl.get(aliases.get(url,url));original_soup=fragment(p.with_name('original.html').read_text(encoding='utf8'));original_plain=original_soup.select_one('details.plain .body');original_text=original_plain.get_text('\n',strip=False) if original_plain else '';tr=TRANSFORMS[sourcekey(original_text,title)];meta=tr['metadata'];prose=soup.select_one('.prose');prose['data-quality-release']=VERSION
@@ -192,7 +198,9 @@ def enhance():
         update_schema(old,aliases.get(url,url),title,meta);original.write_text(str(old),encoding='utf8')
     catalog=fragment((OUT/'index.html').read_text(encoding='utf8'))
     for card in catalog.select('.card'):
-        a=card.select_one('h2 a');r=byurl[a['href']]
+        a=card.select_one('h2 a')
+        if editorial_locked(PUBLIC/a['href'].lstrip('/')/'index.html'):continue
+        r=byurl[a['href']]
         r['excerpt']=re.sub(r'\s+',' ',fragment((PUBLIC/r['url'].lstrip('/')/'index.html').read_text()).select_one('.prose').get_text(' ',strip=True))[:125]
         card.select_one('p').string=(r['excerpt']+'…') if r['chars'] else '本篇为图示资料，打开即可查看并放大原图。'
         small=card.select_one('.small')
@@ -241,11 +249,12 @@ def main():
     assert old in base,'Legacy generator changed: manual reconciliation required'
     base=base.replace(old,"if plain is None and path.parent.name not in {'b121','b162'}:skipped.append(str(path.relative_to(public)));continue",1)
     base=base.replace("text=plain.get_text('\\n',strip=False);title=", "text=plain.get_text('\\n',strip=False) if plain else '';title=",1)
+    base=base.replace("path.write_text(document(title,url,body,rec['excerpt']),encoding='utf8')","(None if editorial_locked(path) else path.write_text(document(title,url,body,rec['excerpt']),encoding='utf8'))",1)
     base=base.replace("digest=hashlib.sha256(norm(clean).encode()).hexdigest()","digest=hashlib.sha256(re.sub(r'\\s+','',clean).encode()).hexdigest()",1)
     oldkey="key=r['text_sha256']+(r['media_sha256'] or '') if r['chars']<500 else r['text_sha256']"
     assert oldkey in base;base=base.replace(oldkey,"key=r['text_sha256']+(r['media_sha256'] or '')",1)
     ns={'__name__':'three_views_legacy_import'};exec(compile(base,'three_views_legacy_import','exec'),ns)
-    ns.update({'VERSION':VERSION,'reflow':reflow,'media_from_pdf':media});ns['CSS']+=CSS_EXTRA;ns['JS']+=JS_EXTRA
+    ns.update({'VERSION':VERSION,'reflow':reflow,'media_from_pdf':media,'editorial_locked':editorial_locked});ns['CSS']+=CSS_EXTRA;ns['JS']+=JS_EXTRA
     sys.argv=[sys.argv[0],'--audit-dir',str(AUDIT/'legacy')];ns['main']()
     report=enhance();patch_search();assert report['converted_urls']==436 and not report['skipped_pages'],report
     print(json.dumps(report,ensure_ascii=False,indent=2))

@@ -66,6 +66,7 @@ def main():
         r['author']=meta.get('credit',r['author']);r['credit_polish_verified']=True
         hmeta=soup.select_one('.article-head .meta');hmeta.string=r['author']+f'　·　正文约 {r["chars"]:,} 字　·　约 {r["reading_minutes"]} 分钟'+('　·　原稿时间：'+meta['source_date'] if meta.get('source_date') else '')
         q.update_schema(soup,aliases.get(url,url),title,meta);soup.select_one('.prose')['data-polish-release']='v2-final'
+        if 'data-editorial' in p.read_text():continue  # 编辑稿闸门
         p.write_text(str(soup));changed.append({'url':url,'title':title,'credit':r['author'],'credits_retained':credits})
     q.write_json(OUT/'manifest.json',manifest)
     catalog=BeautifulSoup((OUT/'index.html').read_text(),'html.parser')

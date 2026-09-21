@@ -54,7 +54,9 @@ def main():
  supplements=json.loads(read(ROOT/'tools/three_views_archive_supplements_20260920.json'))
  supplement_reports=[]
  for item in supplements:
-  r=lookup[item['url']];p=page(r['url']);s=soup(p);prose=s.select_one('.prose');assert prose is not None
+  r=lookup[item['url']];p=page(r['url'])
+  if 'data-editorial' in p.read_text(encoding='utf-8'):continue  # 编辑稿闸门：定稿页不再自动补录
+  s=soup(p);prose=s.select_one('.prose');assert prose is not None
   anchor=f'archive-supplement-{item["source_id"]}'
   if s.find(id=anchor):continue
   before=compact(prose.get_text());pdf=PUBLIC/r['pdf'].lstrip('/')
