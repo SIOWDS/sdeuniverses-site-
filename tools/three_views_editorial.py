@@ -206,7 +206,7 @@ def assemble(spec: dict, sents: list[str]):
             pieces = []
             for mark in b['at']:
                 k = rest.find(mark)
-                if k <= 0:
+                if k < 0:
                     raise AssertionError(f'{aid}: 第 {i} 句里找不到断点 {mark!r}')
                 pieces.append(rest[:k])
                 rest = rest[k:]
@@ -247,6 +247,11 @@ def assemble(spec: dict, sents: list[str]):
             raise AssertionError(f'{aid}: 申报的改动 {old!r} 在原文里找不到')
         src = src.replace(old, new)
         got = got.replace(old, new)
+    for pat in spec.get('strip', []):
+        if not re.search(pat, src):
+            raise AssertionError(f'{aid}: 申报要删的样式 {pat!r} 在原文里找不到')
+        src = re.sub(pat, '', src)
+        got = re.sub(pat, '', got)
     if spec.get('punct'):
         src, got = normalize_punct(src), normalize_punct(got)
     if compact(src) != compact(got):
@@ -260,6 +265,8 @@ def assemble(spec: dict, sents: list[str]):
             text = blk[1]
             for old, new in spec.get('fixes', []):
                 text = text.replace(old, new)
+            for pat in spec.get('strip', []):
+                text = re.sub(pat, '', text)
             if spec.get('punct'):
                 text = normalize_punct(text)
             text = re.sub(r'[\ufeff\u200b]+', '', text).strip()
