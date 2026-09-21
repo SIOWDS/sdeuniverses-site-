@@ -93,6 +93,25 @@ def sentences_of(article_id: str) -> tuple[list[str], BeautifulSoup]:
     return out, soup
 
 
+ZW = '\ufeff\u200b'
+
+
+def strip_zw(s: str) -> str:
+    return re.sub(f'[{ZW}]', '', s)
+
+
+def consume_prefix(cur: str, cut: str):
+    """按忽略零宽标记的方式吃掉前缀；吃不掉返回 None。"""
+    target = strip_zw(cut)
+    seen, i = '', 0
+    while i < len(cur) and len(seen) < len(target):
+        ch = cur[i]
+        if ch not in ZW:
+            seen += ch
+        i += 1
+    return cur[i:] if seen == target else None
+
+
 def join(a: str, b: str) -> str:
     if not a:
         return b
@@ -101,7 +120,8 @@ def join(a: str, b: str) -> str:
 
 
 def compact(s: str) -> str:
-    return re.sub(r'\s+', '', s)
+    # 零宽标记（原稿换行残留）不计入正文核对
+    return re.sub(r'[\s\ufeff\u200b]+', '', s)
 
 
 CJK = r'\u3400-\u9fff\u3000-\u303f\uff00-\uffef'
@@ -145,10 +165,11 @@ def assemble(spec: dict, sents: list[str]):
             if cut:
                 i = b['from']
                 cur = left[i].lstrip()
-                if not cur.startswith(cut):
+                rest = consume_prefix(cur, cut)
+                if rest is None:
                     raise AssertionError(f'{aid}: 第 {i} 句不以 {cut!r} 开头：{cur[:40]!r}')
-                left[i] = cur[len(cut):]
-                audit.append(cut)
+                audit.append(cur[:len(cur) - len(rest)])
+                left[i] = rest
             if 'h2' in b:
                 blocks.append(('h2', b['h2']))
             elif not b.get('why'):
@@ -163,11 +184,20 @@ def assemble(spec: dict, sents: list[str]):
                 head = join(head, piece)
             i = b['from']
             cur = left[i].lstrip()
-            if not cur.startswith(cut):
+            rest = consume_prefix(cur, cut)
+            if rest is None:
                 raise AssertionError(f'{aid}: 第 {i} 句不以 {cut!r} 开头：{cur[:40]!r}')
-            left[i] = cur[len(cut):]
-            audit.append(cut)
-            blocks.append((kind, join(head, cut).strip(), b.get('who', '学员') if kind == 'q' else ''))
+            taken = cur[:len(cur) - len(rest)]
+            audit.append(taken)
+            left[i] = rest
+            blocks.append((kind, join(head, strip_zw(taken)).strip(), b.get('who', '学员') if kind == 'q' else ''))
+        elif 'pbom' in b:
+            i = b['pbom']
+            text = take(i)
+            audit.append(text)
+            for piece in re.split(r'[\ufeff\u200b]+', text):
+                if piece.strip():
+                    blocks.append(('p', piece.strip(), ''))
         elif 'psplit' in b:
             i = b['psplit']
             text = take(i)
@@ -232,6 +262,7 @@ def assemble(spec: dict, sents: list[str]):
                 text = text.replace(old, new)
             if spec.get('punct'):
                 text = normalize_punct(text)
+            text = re.sub(r'[\ufeff\u200b]+', '', text).strip()
             out.append((blk[0], text, blk[2]))
         else:
             out.append(blk)
