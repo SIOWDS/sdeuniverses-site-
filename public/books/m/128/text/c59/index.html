@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第五十九章　那个没算出来的第二个数 · 上市公司会计造假的SDE神探 · 德麦国际专著</title>
+<meta name="description" content="《上市公司会计造假的SDE神探——三张报表的系统解构》· 王德生 著 · 德麦国际专著第 128 号 · 第五十九章　那个没算出来的第二个数。 一个整体，要拆成几块  第十四章讲过商誉：买公司时多付的钱。那本专著在商誉上还发现了一个更细的问题，关于分配。  一家公司收购了另一家公司，确认了一笔商誉。按照国际会计准则，这笔商誉要分配到预期能从这次合并的协同效应中">
+<meta name="tier" content="L0">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自著">
+<meta name="isbn" content="979-8-90690-072-2">
+<meta name="book_no" content="128">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B;--hl:#1B1608}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/2.0 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:780px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.9em 0 .6em;color:var(--fg);border-left:3px solid var(--gold);padding-left:11px}
+h3{font-size:17px;margin:1.6em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.9em 0;text-align:justify}
+strong{color:#F2E4C4;font-weight:700;border-bottom:1px solid rgba(217,164,65,.42);padding-bottom:1px}
+em{font-style:normal;color:var(--dim)}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.9em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+.head{background:linear-gradient(180deg,#141A20,#10151A);border:1px solid #2C3540;border-left:4px solid var(--gold);border-radius:4px;padding:15px 18px;margin:1.4em 0 2em}
+.head p{margin:.5em 0;font-size:15.5px}
+.keynote{background:var(--hl);border-left:3px solid var(--gold);padding:.65em 1em;margin:1.15em 0;border-radius:0 4px 4px 0}
+.keynote strong{border-bottom:none;color:#FBE9C2}
+.dict{margin:.55em 0;padding-left:1.15em;text-indent:-1.15em;font-size:15.5px;color:#D6D2C8}
+.dict b{color:var(--gold);font-weight:700}
+.tip{color:var(--dim);font-size:13px;border:1px dashed var(--line);border-radius:4px;padding:9px 12px;margin:1.2em 0}
+mark{background:rgba(217,164,65,.17);color:#F6E7C6;padding:0 2px;border-radius:2px}
+</style>
+</head><body>
+<div class="bar"><a href="/books/m/128/">← 专著首页</a><a href="/books/m/128/text/">目录</a><a href="/books/m/128/read.html">翻页阅读</a><a href="/books/m/128/sde-detective.pdf">PDF 全本</a><a href="/books/">专著栏目</a></div>
+<div class="wrap">
+<h1>第五十九章　那个没算出来的第二个数</h1>
+<p class="meta">上市公司会计造假的SDE神探——三张报表的系统解构 · 王德生 著 · 德麦国际专著第 128 号</p>
+<h2>一个整体，要拆成几块</h2>
+<p>第十四章讲过商誉：买公司时多付的钱。那本专著在商誉上还发现了一个更细的问题，关于<strong>分配</strong>。</p>
+<p>一家公司收购了另一家公司，确认了一笔商誉。按照国际会计准则，这笔商誉要<strong>分配</strong>到预期能从这次合并的协同效应中受益的各个“现金产出单元”——可以理解为公司内部相对独立、能单独产生现金流的业务块——以后每年分别做减值测试。</p>
+<p>准则规定了要分配到哪里：分配到预期受益的单元，并且这些单元要对应公司内部管理商誉的最低层级、不能大于一个经营分部。<strong>但准则没有规定用什么方法去衡量“受益多少”。</strong>按各单元的相对价值分，按合并前后价值的变化分，都在准则文本之内。</p>
+<h2>同一笔商誉，两种分法，两个结论</h2>
+<p>那本书用一个构造的例子，把这件事算得清清楚楚：</p>
+<p>一家企业收购后确认商誉100，协同效应同时惠及两个单元A和B。</p>
+<div style="overflow-x:auto"><table><thead><tr><th>单元</th><th>合并前公允价值</th><th>合并后公允价值</th><th>协同增量</th></tr></thead><tbody><tr><td>A</td><td>600</td><td>640</td><td>40</td></tr><tr><td>B</td><td>400</td><td>460</td><td>60</td></tr><tr><td>合计</td><td>1,000</td><td>1,100</td><td>100</td></tr></tbody></table></div>
+<p><strong>方法一</strong>：按合并后公允价值的比例分——A分到约58.18，B分到约41.82。</p>
+<p><strong>方法二</strong>：按协同增量的比例分——A分到40，B分到60。</p>
+<p>第二年做减值测试时，两个单元的可辨认净资产账面价值分别是500和350，可收回金额分别是545和400：</p>
+<div style="overflow-x:auto"><table><thead><tr><th>单元</th><th>方法</th><th>含商誉账面</th><th>可收回金额</th><th>结论</th></tr></thead><tbody><tr><td>A</td><td>一</td><td>558.18</td><td>545</td><td>减值13.18</td></tr><tr><td>A</td><td>二</td><td>540.00</td><td>545</td><td>不减值</td></tr><tr><td>B</td><td>一</td><td>391.82</td><td>400</td><td>不减值</td></tr><tr><td>B</td><td>二</td><td>410.00</td><td>400</td><td>减值10.00</td></tr></tbody></table></div>
+<p>同一年、同一套可收回金额，<strong>换一种分法，减值就从A跳到了B，当年计入损益的减值总额也从13.18变成了10.00。</strong></p>
+<p>（这个例子是构造的，用来说明可能性；第二种分法在某个具体事实下是否恰当，需要逐案判断。）</p>
+<h2>最关键的一句：准则要求解释选择，不要求生成备选</h2>
+<p>那本书在这里有一个很锋利的发现。</p>
+<p>美国上市公司审计准则规定：<strong>在公司已经确定不同方法会导致显著不同估计的情形下</strong>，审计师应了解公司所选方法的理由，并评价其适当性。</p>
+<p>请注意前面那个条件：“在公司已经确定……”。也就是说：<strong>如果公司从来不去算第二种分法的结果，它就永远不会“确定”两种方法会产生显著不同的估计，这条要求也就永远不会被触发。</strong></p>
+<p>那本书把这句话写成：<strong>制度把触发自己的那把钥匙，交给了被规制的人。</strong></p>
+<h2>这和造假有什么关系</h2>
+<p>这不是说分配商誉就是造假。而是说：<strong>在所有“准则允许多种做法、却只要求公司算一种”的地方，公司天然掌握着选择权——而且外人看不到它没选的那一种。</strong></p>
+<p>商誉的分配是一个例子。收入确认的总额法与净额法、研发支出资本化的起点、工程进度的计算方法、公允价值的估值模型……都有类似的空间。</p>
+<h2>神探的用法</h2>
+<ol>
+<li><strong>找到商誉在各单元之间的分配</strong>：附注的商誉减值测试部分，会列出商誉分配到了哪些单元、各多少。</li>
+<li><strong>看减值结论落在哪里</strong>：减值是不是总落在“不要紧”的单元上？那些余量很薄、差一点就要减值的单元，分到的商誉是不是偏少？</li>
+<li><strong>看分配有没有变过</strong>：公司重组、调整分部时，商誉是否被重新分配？重新分配之后，原来接近减值的单元是否“安全”了？第十四章的宏达新材案，改变的正是减值测试的范围。</li>
+<li><strong>把这个问题推广</strong>：在任何一个“有多种合规做法”的地方，问一句——<strong>如果换另一种做法，结论会不会不一样？</strong></li>
+</ol>
+<p><strong>报表只告诉你公司算出来的那个数。</strong>那个没算出来的第二个数，常常才是关键。</p>
+<div class="nav"><span><a href="../c58/">← 第五十八章　价值跨过公司边界时</a></span><span><a href="../c60/">第六十章　谁有权说它值多少 →</a></span></div>
+<div class="foot">德麦国际出版社　Demai International Press　·　ISBN 979-8-90690-072-2　·　US$19.80</div>
+</div></body></html>

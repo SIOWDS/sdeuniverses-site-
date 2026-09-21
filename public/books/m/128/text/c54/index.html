@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第五十四章　一个假设，撑起一大片数字 · 上市公司会计造假的SDE神探 · 德麦国际专著</title>
+<meta name="description" content="《上市公司会计造假的SDE神探——三张报表的系统解构》· 王德生 著 · 德麦国际专著第 128 号 · 第五十四章　一个假设，撑起一大片数字。 数字之间的秘密  上一章讲的是一个数字的内部。这一章，我们看数字之间。  老王的包子铺打算开三家分店，每家都做了一份预算，预算都“很稳健”。可仔细一看，三份预算都建立在同一个假设上：明年面粉价格不会涨。  单看每一份预">
+<meta name="tier" content="L0">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自著">
+<meta name="isbn" content="979-8-90690-072-2">
+<meta name="book_no" content="128">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B;--hl:#1B1608}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/2.0 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:780px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.9em 0 .6em;color:var(--fg);border-left:3px solid var(--gold);padding-left:11px}
+h3{font-size:17px;margin:1.6em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.9em 0;text-align:justify}
+strong{color:#F2E4C4;font-weight:700;border-bottom:1px solid rgba(217,164,65,.42);padding-bottom:1px}
+em{font-style:normal;color:var(--dim)}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.9em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+.head{background:linear-gradient(180deg,#141A20,#10151A);border:1px solid #2C3540;border-left:4px solid var(--gold);border-radius:4px;padding:15px 18px;margin:1.4em 0 2em}
+.head p{margin:.5em 0;font-size:15.5px}
+.keynote{background:var(--hl);border-left:3px solid var(--gold);padding:.65em 1em;margin:1.15em 0;border-radius:0 4px 4px 0}
+.keynote strong{border-bottom:none;color:#FBE9C2}
+.dict{margin:.55em 0;padding-left:1.15em;text-indent:-1.15em;font-size:15.5px;color:#D6D2C8}
+.dict b{color:var(--gold);font-weight:700}
+.tip{color:var(--dim);font-size:13px;border:1px dashed var(--line);border-radius:4px;padding:9px 12px;margin:1.2em 0}
+mark{background:rgba(217,164,65,.17);color:#F6E7C6;padding:0 2px;border-radius:2px}
+</style>
+</head><body>
+<div class="bar"><a href="/books/m/128/">← 专著首页</a><a href="/books/m/128/text/">目录</a><a href="/books/m/128/read.html">翻页阅读</a><a href="/books/m/128/sde-detective.pdf">PDF 全本</a><a href="/books/">专著栏目</a></div>
+<div class="wrap">
+<h1>第五十四章　一个假设，撑起一大片数字</h1>
+<p class="meta">上市公司会计造假的SDE神探——三张报表的系统解构 · 王德生 著 · 德麦国际专著第 128 号</p>
+<h2>数字之间的秘密</h2>
+<p>上一章讲的是一个数字的内部。这一章，我们看<strong>数字之间</strong>。</p>
+<p>老王的包子铺打算开三家分店，每家都做了一份预算，预算都“很稳健”。可仔细一看，三份预算都建立在同一个假设上：<strong>明年面粉价格不会涨。</strong></p>
+<p>单看每一份预算，都没有问题。但三份预算放在一起，就有了一个共同的软肋：面粉一涨价，三家店会<strong>同时</strong>出问题。</p>
+<p>那本专著把这种关系叫作<strong>共载依赖</strong>：多个会计数字，共同依赖同一个关键假设。</p>
+<h2>报表上的“同一个假设”</h2>
+<p>上市公司的报表里，这种共用的假设比比皆是：</p>
+<ul>
+<li><strong>折现率</strong>：商誉减值测试、长期资产减值、长期负债的计量、养老金义务……很多项目都要用到折现率。它常常是同一个数，或者同一套方法算出来的。</li>
+<li><strong>收入增长率</strong>：多个现金产出单元的减值测试，可能都假设了相近的未来增长。</li>
+<li><strong>大宗商品价格</strong>：一家资源类公司，它的存货、矿产资产、长期合同，可能都建立在对同一种商品价格的预期上。</li>
+</ul>
+<p>这些项目在报表上分散在不同的科目里，看起来互不相干。可它们是被<strong>同一根绳子</strong>拴在一起的。</p>
+<h2>一致，不等于没有共用</h2>
+<p>有人会说：审计准则不是要求审计师检查各项估计所用的假设是否一致吗？</p>
+<p>确实，美国上市公司审计准则要求审计师评价重大假设的合理性，并评价它们是否与其他估计中使用的假设相一致。那本专著专门讨论过这一点，结论是：<strong>“一致”和“共用”是两回事。</strong></p>
+<ul>
+<li>一致，问的是这些假设“打不打架”：A项目假设利率上升、B项目假设利率下降，就不一致。</li>
+<li>共用，问的是这些假设是不是“同一个”：A、B、C三个项目用的是同一个折现率，它们就共用。</li>
+</ul>
+<p>三个项目共用同一个折现率，完全一致，毫不矛盾——可正因为共用，一旦这个折现率被证明太乐观，<strong>三个项目会同时出问题</strong>。</p>
+<h2>这和造假有什么关系</h2>
+<p>对造假者来说，共载依赖是一个非常方便的杠杆：<strong>调一个假设，就能同时“救”一大片数字。</strong></p>
+<p>把折现率调低半个百分点，所有需要做减值测试的资产，可收回金额都会变高，减值都可以少提或者不提。把收入增长率调高两个点，所有商誉都可以“撑”住。第十四章的宏达新材，第四十六章的东芝，都能看到这种“一个判断朝一个方向偏”的影子。</p>
+<p>反过来，对神探来说，共载依赖也提供了一个很好的检查角度：<strong>找到那个被共用的关键假设，问它合不合理。</strong></p>
+<h2>神探的用法</h2>
+<ol>
+<li><strong>找出关键假设</strong>：附注里的减值测试、公允价值计量、预计负债，通常会披露关键假设——折现率、增长率、价格。把它们列成一张表。</li>
+<li><strong>看它们是不是同一个</strong>：不同项目用的折现率、增长率是否相同？是否一年比一年乐观？</li>
+<li><strong>看敏感性</strong>：公司是否披露了“假设变动一个百分点，结果会怎样”？如果折现率上升一个点，多少项目会同时需要减值？<strong>同时出问题的项目越多，这个假设就越要紧。</strong></li>
+<li><strong>和外面比</strong>：公司用的折现率，和市场利率、同行用的折现率比如何？增长率和行业增速比如何？</li>
+</ol>
+<p><strong>数字之间也有网。</strong>一根被很多数字共用的绳子，是整张网上最值得检查的那一根。</p>
+<div class="nav"><span><a href="../c53/">← 第五十三章　同样的100，不一样的明天</a></span><span><a href="../c55/">第五十五章　报告日的快照抹掉了什么 →</a></span></div>
+<div class="foot">德麦国际出版社　Demai International Press　·　ISBN 979-8-90690-072-2　·　US$19.80</div>
+</div></body></html>

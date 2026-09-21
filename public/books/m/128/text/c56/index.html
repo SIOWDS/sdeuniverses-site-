@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第五十六章　一个点值背后的区间 · 上市公司会计造假的SDE神探 · 德麦国际专著</title>
+<meta name="description" content="《上市公司会计造假的SDE神探——三张报表的系统解构》· 王德生 著 · 德麦国际专著第 128 号 · 第五十六章　一个点值背后的区间。 会计必须给出一个数  很多会计数字，本来不是一个数，而是一个区间。  老王的一个老客户欠了他1万元。这笔钱能收回多少？也许全额收回，也许收回一半，也许一分都收不回来。老王心里有一个大概的范围：可能收回8000到1万元之">
+<meta name="tier" content="L0">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自著">
+<meta name="isbn" content="979-8-90690-072-2">
+<meta name="book_no" content="128">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B;--hl:#1B1608}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/2.0 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:780px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.9em 0 .6em;color:var(--fg);border-left:3px solid var(--gold);padding-left:11px}
+h3{font-size:17px;margin:1.6em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.9em 0;text-align:justify}
+strong{color:#F2E4C4;font-weight:700;border-bottom:1px solid rgba(217,164,65,.42);padding-bottom:1px}
+em{font-style:normal;color:var(--dim)}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.9em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+.head{background:linear-gradient(180deg,#141A20,#10151A);border:1px solid #2C3540;border-left:4px solid var(--gold);border-radius:4px;padding:15px 18px;margin:1.4em 0 2em}
+.head p{margin:.5em 0;font-size:15.5px}
+.keynote{background:var(--hl);border-left:3px solid var(--gold);padding:.65em 1em;margin:1.15em 0;border-radius:0 4px 4px 0}
+.keynote strong{border-bottom:none;color:#FBE9C2}
+.dict{margin:.55em 0;padding-left:1.15em;text-indent:-1.15em;font-size:15.5px;color:#D6D2C8}
+.dict b{color:var(--gold);font-weight:700}
+.tip{color:var(--dim);font-size:13px;border:1px dashed var(--line);border-radius:4px;padding:9px 12px;margin:1.2em 0}
+mark{background:rgba(217,164,65,.17);color:#F6E7C6;padding:0 2px;border-radius:2px}
+</style>
+</head><body>
+<div class="bar"><a href="/books/m/128/">← 专著首页</a><a href="/books/m/128/text/">目录</a><a href="/books/m/128/read.html">翻页阅读</a><a href="/books/m/128/sde-detective.pdf">PDF 全本</a><a href="/books/">专著栏目</a></div>
+<div class="wrap">
+<h1>第五十六章　一个点值背后的区间</h1>
+<p class="meta">上市公司会计造假的SDE神探——三张报表的系统解构 · 王德生 著 · 德麦国际专著第 128 号</p>
+<h2>会计必须给出一个数</h2>
+<p>很多会计数字，本来不是一个数，而是一个<strong>区间</strong>。</p>
+<p>老王的一个老客户欠了他1万元。这笔钱能收回多少？也许全额收回，也许收回一半，也许一分都收不回来。老王心里有一个大概的范围：可能收回8000到1万元之间。</p>
+<p>可账本上只能写一个数。老王最后写了9000元。</p>
+<p>那本专著把这个动作叫作<strong>落点</strong>：从一个可能的区间，压缩成一个正式的点值。它提出的问题是：<strong>那些没有被选中的可能性，去了哪里？</strong></p>
+<h2>被压缩掉的信息</h2>
+<p>上市公司的报表里，这样的落点无处不在：</p>
+<ul>
+<li><strong>坏账准备</strong>：应收账款能收回多少，是一个区间，报表上只写一个数。</li>
+<li><strong>存货跌价</strong>：存货能卖多少钱，是一个区间。</li>
+<li><strong>预计负债</strong>：一场官司可能赔多少，是一个区间。</li>
+<li><strong>商誉和长期资产的减值测试</strong>：未来现金流、增长率、折现率，每一个都是一个区间，最后压成一个“可收回金额”。</li>
+<li><strong>公允价值第三层次</strong>：没有公开报价，模型的每一个输入都是一个区间。</li>
+</ul>
+<p>那本书的一个发现是：<strong>被舍弃的可能性，并不总是消失了。</strong>它们可能留在附注的敏感性分析里，留在估值模型和审计底稿里，下一年还可能被重新拿出来用。</p>
+<h2>这和造假有什么关系</h2>
+<p>每一个落点，都是一次选择。<strong>在一个合理的区间里，选靠上的那一端还是靠下的那一端，往往都“说得过去”。</strong></p>
+<p>问题在于方向。如果一家公司在每一个需要落点的地方，都选了对利润最有利的那一端——坏账选少的、跌价选少的、预计负债选少的、可收回金额选多的——那么，每一个单独的选择都说得过去，合在一起，就是第八章和第四十六章讲的“一串同方向的偏差”。</p>
+<h2>敏感性分析：被压缩掉的区间，留下的影子</h2>
+<p>好在，准则要求公司披露一部分被压缩掉的信息。</p>
+<p>国际财务报告准则要求公司披露那些<strong>可能在下一个财务年度导致资产负债账面金额发生重大调整的估计不确定性来源</strong>，并举例说明可以披露的内容：假设的性质、结果对方法和假设的敏感性、合理可能的结果区间，以及过去假设的变化。</p>
+<p>这些披露，就是那个区间留下的<strong>影子</strong>。读懂它们，你就能大致知道：公司的那个点值，落在区间的什么位置。</p>
+<h2>神探的用法</h2>
+<ol>
+<li><strong>找到“重大估计”一节</strong>：年报附注里通常有“重要会计估计和判断”的说明，列出公司认为最重要的估计。</li>
+<li><strong>读敏感性分析</strong>：“折现率上升一个百分点，可收回金额下降多少”“增长率下降一个百分点，是否需要减值”。<strong>如果一个小小的假设变动，就会让结论翻转，说明这个点值离“悬崖”很近。</strong></li>
+<li><strong>看余量</strong>：减值测试里，可收回金额比账面价值高出多少？余量越薄，越要小心。</li>
+<li><strong>看方向</strong>：把多个估计放在一起，看它们的落点是否总是朝着对利润有利的方向。</li>
+<li><strong>看下一年</strong>：上一年的落点，下一年是否被大幅修正？修正的方向是否总是一样？<strong>一个点值如果总是在下一年被向下修正，说明当初的落点一直偏高。</strong></li>
+</ol>
+<p><strong>一个点值，是一次选择的结果。</strong>看见那个区间，你才能判断这次选择是否公道。</p>
+<div class="nav"><span><a href="../c55/">← 第五十五章　报告日的快照抹掉了什么</a></span><span><a href="../c57/">第五十七章　调节表：报表里最诚实的证人 →</a></span></div>
+<div class="foot">德麦国际出版社　Demai International Press　·　ISBN 979-8-90690-072-2　·　US$19.80</div>
+</div></body></html>

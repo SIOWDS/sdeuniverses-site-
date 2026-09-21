@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第二章　第一只眼：看它的“脸” · 上市公司会计造假的SDE神探 · 德麦国际专著</title>
+<meta name="description" content="《上市公司会计造假的SDE神探——三张报表的系统解构》· 王德生 著 · 德麦国际专著第 128 号 · 第二章　第一只眼：看它的“脸”。 一份报表，先看它怎么说话  我们到医院看病，医生不会一上来就开化验单。他先看你的脸色，听你说话，问你哪里不舒服。脸色发黄、说话吞吞吐吐、问什么都绕着答——这些本身就是线索。  读报表也一样。在算任何一个比率之前，神探先">
+<meta name="tier" content="L0">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自著">
+<meta name="isbn" content="979-8-90690-072-2">
+<meta name="book_no" content="128">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B;--hl:#1B1608}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/2.0 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:780px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.9em 0 .6em;color:var(--fg);border-left:3px solid var(--gold);padding-left:11px}
+h3{font-size:17px;margin:1.6em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.9em 0;text-align:justify}
+strong{color:#F2E4C4;font-weight:700;border-bottom:1px solid rgba(217,164,65,.42);padding-bottom:1px}
+em{font-style:normal;color:var(--dim)}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.9em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+.head{background:linear-gradient(180deg,#141A20,#10151A);border:1px solid #2C3540;border-left:4px solid var(--gold);border-radius:4px;padding:15px 18px;margin:1.4em 0 2em}
+.head p{margin:.5em 0;font-size:15.5px}
+.keynote{background:var(--hl);border-left:3px solid var(--gold);padding:.65em 1em;margin:1.15em 0;border-radius:0 4px 4px 0}
+.keynote strong{border-bottom:none;color:#FBE9C2}
+.dict{margin:.55em 0;padding-left:1.15em;text-indent:-1.15em;font-size:15.5px;color:#D6D2C8}
+.dict b{color:var(--gold);font-weight:700}
+.tip{color:var(--dim);font-size:13px;border:1px dashed var(--line);border-radius:4px;padding:9px 12px;margin:1.2em 0}
+mark{background:rgba(217,164,65,.17);color:#F6E7C6;padding:0 2px;border-radius:2px}
+</style>
+</head><body>
+<div class="bar"><a href="/books/m/128/">← 专著首页</a><a href="/books/m/128/text/">目录</a><a href="/books/m/128/read.html">翻页阅读</a><a href="/books/m/128/sde-detective.pdf">PDF 全本</a><a href="/books/">专著栏目</a></div>
+<div class="wrap">
+<h1>第二章　第一只眼：看它的“脸”</h1>
+<p class="meta">上市公司会计造假的SDE神探——三张报表的系统解构 · 王德生 著 · 德麦国际专著第 128 号</p>
+<h2>一份报表，先看它怎么说话</h2>
+<p>我们到医院看病，医生不会一上来就开化验单。他先看你的脸色，听你说话，问你哪里不舒服。脸色发黄、说话吞吞吐吐、问什么都绕着答——这些本身就是线索。</p>
+<p>读报表也一样。在算任何一个比率之前，神探先看这份报表<strong>怎么说话</strong>：它把什么摆在明面上，把什么藏在后面；它用什么词；有没有突然换了说法；替它签字担保的人，签得痛不痛快。</p>
+<p>这就是第一只眼：<strong>看显露</strong>。一家公司让你看到的样子，本身就是证据。</p>
+<h2>线索一：审计意见——最短的那段话，最重要</h2>
+<p>每一份上市公司的年报里，都有一份会计师事务所出具的审计报告。普通读者往往直接跳过，因为它看起来全是套话。</p>
+<p>但这段套话里，藏着整份年报最重要的一个词。</p>
+<p>审计师看完公司的账，要给出一个结论。最常见的是<strong>标准无保留意见</strong>，意思是：“我查过了，没发现大问题。”如果审计师有保留，就会出具<strong>保留意见</strong>，意思是：“大体可以，但有些地方我不认可，或者没法查清。”再严重一些，是<strong>无法表示意见</strong>（“我查不下去”）和<strong>否定意见</strong>（“这份报表不可信”）。</p>
+<p>你不需要读懂审计报告的全部内容。你只需要看<strong>那一个词</strong>，然后问：<strong>它和去年一样吗？</strong></p>
+<p>康美药业的审计机构，对它2016年和2017年的财务报表，出具的都是标准无保留意见。到了2018年的财务报表，意见变成了<strong>保留意见</strong>。</p>
+<p>从“没问题”变成“有保留”，这个变化本身，就是报表在对你说话。后来证监会认定，这家审计机构出具的这三份审计报告都存在虚假记载——但即便是在当时，一个普通读者也能看到：签字的人，开始不那么痛快了。</p>
+<p><strong>神探的第一条规矩：审计意见只要不是“标准无保留”，就停下来，先弄明白为什么。</strong></p>
+<h2>线索二：换医生</h2>
+<p>还有一个信号比审计意见更早出现：<strong>公司换了会计师事务所。</strong></p>
+<p>公司当然可以换审计师，理由可能很正常：费用、服务、集团统一安排。但如果一家公司频繁地换，或者在业绩“特别好”的年份突然换，或者换掉了一家大所、换上了一家名不见经传的小所——你就要多问一句：是公司不满意审计师，还是审计师不愿意再签了？</p>
+<p>这就像一个病人，每换一家医院，就换掉前一个医生的诊断。医生换得越勤，病越值得怀疑。</p>
+<p><strong>神探的第二条规矩：留意换所，尤其是在关键年份换所。</strong>年报和公司公告里都会写明聘请的是哪家事务所，把最近五年的名字排成一列，一眼就能看出来。</p>
+<h2>线索三：用词——“差错”还是“造假”</h2>
+<p>序章里我们讲过，康美药业把三百亿元现金“没了”这件事，写成了一份<strong>“会计差错更正”</strong>公告。</p>
+<p>“差错”这个词，意思是“算错了”“记错了”。一家公司承认自己记错了几万元、几百万元，并不稀奇。但把占公司总资产四成多的现金叫作“差错”，这个词本身就不诚实——上海证券交易所在随后的问询函里，专门要求公司“严格区分会计准则理解错误和管理层有意财务舞弊行为性质的不同”。</p>
+<p><strong>神探的第三条规矩：看公司用什么词描述坏消息。</strong>坏消息越大，用词越轻，越要警惕。</p>
+<p>类似的轻描淡写还有很多。“受行业波动影响”“基于谨慎性原则”“部分款项回收周期延长”——这些话可能是真的，也可能是在用一句无法核实的话，替一个巨大的数字打圆场。它们不能直接证明什么，但它们告诉你：<strong>这里有东西，公司不想说清楚。</strong></p>
+<h2>线索四：大事写在小字里</h2>
+<p>年报的正文部分，通常是公司最想让你看到的：业绩增长、战略、荣誉。而真正要紧的信息，常常在后面的<strong>附注</strong>里——那些密密麻麻的小字和表格。</p>
+<p>有几类信息，神探一定要翻到附注里去找：</p>
+<ul>
+<li><strong>关联交易</strong>：公司和自己的大股东、大股东控制的其他公司之间做了多少生意、借了多少钱？康美药业的违法事实之一，就是没有按规定披露控股股东及其关联方占用公司资金的情况。钱被“自己人”拿走了，却不写在报表里。</li>
+<li><strong>受限资金</strong>：账上的钱，有多少是被冻结、被质押、不能自由动用的？</li>
+<li><strong>会计政策和会计估计的变更</strong>：公司今年有没有改变算账的方法？比如把设备的使用年限从五年改成十年，每年的折旧就少了一半，利润自然就“多”出来了。</li>
+<li><strong>期后事项</strong>：年报截止日之后、发布之前，发生了什么大事？</li>
+</ul>
+<p>这些信息大都“写了”，只是写在不显眼的地方。<strong>神探的第四条规矩：正文看公司想说什么，附注看公司不得不说什么。</strong></p>
+<h2>线索五：说法变了</h2>
+<p>最后一个线索，需要你拿出两年的年报，放在一起看。</p>
+<p>同一个科目，去年叫这个名字，今年换了个名字；去年单独列一行，今年并进了“其他”；去年附注里有一张明细表，今年没了。</p>
+<p>说法变了，往往意味着<strong>比较变难了</strong>。而让比较变难，恰恰是藏东西最省力的办法。</p>
+<h2>一个提醒：脸色不是诊断</h2>
+<p>看显露，只能告诉你<strong>哪里值得怀疑</strong>，不能告诉你<strong>是不是造假</strong>。审计意见有保留，可能只是一个技术争议；换会计师事务所，可能只是费用问题；用词含糊，可能只是写报告的人文笔不好。</p>
+<p>所以第一只眼的任务，不是下结论，而是<strong>圈出重点</strong>。它告诉另外两只眼睛：往这里看。</p>
+<h2>本章小结</h2>
+<ol>
+<li>看报表先看它怎么“说话”：它让你看到什么、怎么说、谁替它担保。</li>
+<li>五个线索：审计意见、更换事务所、描述坏消息的用词、附注里的小字、说法的变化。</li>
+<li>第一只眼只负责“圈重点”，不负责“下结论”。</li>
+</ol>
+<h2>动手练习</h2>
+<p>找你关心的公司最近五年的年报，做一张小表：</p>
+<div style="overflow-x:auto"><table><thead><tr><th>年份</th><th>会计师事务所</th><th>审计意见</th></tr></thead><tbody></tbody></table></div>
+<p>五行填满，看看有没有变化。有变化的那一年，就是你下一步要重点看的一年。</p>
+<div class="nav"><span><a href="../c01/">← 第一章　三张报表，其实是一张网</a></span><span><a href="../c03/">第三章　第二只眼：看它的“来路” →</a></span></div>
+<div class="foot">德麦国际出版社　Demai International Press　·　ISBN 979-8-90690-072-2　·　US$19.80</div>
+</div></body></html>

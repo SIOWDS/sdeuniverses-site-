@@ -1,0 +1,144 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第一章　三张报表，其实是一张网 · 上市公司会计造假的SDE神探 · 德麦国际专著</title>
+<meta name="description" content="《上市公司会计造假的SDE神探——三张报表的系统解构》· 王德生 著 · 德麦国际专著第 128 号 · 第一章　三张报表，其实是一张网。 老王的包子铺  我们先不看上市公司，先看一家包子铺。  老王在街口开了一家包子铺。年底，他想弄清楚这一年干得怎么样。他需要回答三个问题：  第一个问题：这一年赚了多少？  老王算了一笔账：一年卖包子收入30万元；买面粉">
+<meta name="tier" content="L0">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自著">
+<meta name="isbn" content="979-8-90690-072-2">
+<meta name="book_no" content="128">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B;--hl:#1B1608}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/2.0 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:780px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.9em 0 .6em;color:var(--fg);border-left:3px solid var(--gold);padding-left:11px}
+h3{font-size:17px;margin:1.6em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.9em 0;text-align:justify}
+strong{color:#F2E4C4;font-weight:700;border-bottom:1px solid rgba(217,164,65,.42);padding-bottom:1px}
+em{font-style:normal;color:var(--dim)}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.9em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+.head{background:linear-gradient(180deg,#141A20,#10151A);border:1px solid #2C3540;border-left:4px solid var(--gold);border-radius:4px;padding:15px 18px;margin:1.4em 0 2em}
+.head p{margin:.5em 0;font-size:15.5px}
+.keynote{background:var(--hl);border-left:3px solid var(--gold);padding:.65em 1em;margin:1.15em 0;border-radius:0 4px 4px 0}
+.keynote strong{border-bottom:none;color:#FBE9C2}
+.dict{margin:.55em 0;padding-left:1.15em;text-indent:-1.15em;font-size:15.5px;color:#D6D2C8}
+.dict b{color:var(--gold);font-weight:700}
+.tip{color:var(--dim);font-size:13px;border:1px dashed var(--line);border-radius:4px;padding:9px 12px;margin:1.2em 0}
+mark{background:rgba(217,164,65,.17);color:#F6E7C6;padding:0 2px;border-radius:2px}
+</style>
+</head><body>
+<div class="bar"><a href="/books/m/128/">← 专著首页</a><a href="/books/m/128/text/">目录</a><a href="/books/m/128/read.html">翻页阅读</a><a href="/books/m/128/sde-detective.pdf">PDF 全本</a><a href="/books/">专著栏目</a></div>
+<div class="wrap">
+<h1>第一章　三张报表，其实是一张网</h1>
+<p class="meta">上市公司会计造假的SDE神探——三张报表的系统解构 · 王德生 著 · 德麦国际专著第 128 号</p>
+<h2>老王的包子铺</h2>
+<p>我们先不看上市公司，先看一家包子铺。</p>
+<p>老王在街口开了一家包子铺。年底，他想弄清楚这一年干得怎么样。他需要回答三个问题：</p>
+<p><strong>第一个问题：这一年赚了多少？</strong></p>
+<p>老王算了一笔账：一年卖包子收入30万元；买面粉、肉、菜花了12万元；房租6万元；雇了一个帮工，工资5万元；水电燃气2万元。</p>
+<p>30 − 12 − 6 − 5 − 2 = 5万元。</p>
+<p>这一年，老王赚了5万元。</p>
+<p>这张算“赚了多少”的账，就叫<strong>利润表</strong>。它像一张<strong>成绩单</strong>，告诉你一段时间里（通常是一年）干得好不好。</p>
+<p><strong>第二个问题：年底这一天，我家底有多少？</strong></p>
+<p>12月31日晚上关了店门，老王盘点：收银箱和银行卡里一共有8万元；店里的蒸笼、冰柜、桌椅值4万元；冷库里还有没用完的面粉和肉，值1万元；隔壁单位食堂订了包子还没给钱，欠老王2万元。</p>
+<p>加起来，老王有15万元的东西。</p>
+<p>但老王也欠着别人的钱：年初借了表哥3万元装修还没还；肉铺的货款还有1万元没结。一共欠4万元。</p>
+<p>15 − 4 = 11万元，这才是真正属于老王自己的家底。</p>
+<p>这张在某一天“拍一张照片”、记下有什么、欠什么的账，就叫<strong>资产负债表</strong>。它像一张<strong>家底照片</strong>。注意，它只是某一天的照片，不是一段时间的录像。</p>
+<p><strong>第三个问题：钱，到底进来了多少、出去了多少？</strong></p>
+<p>老王有点纳闷：明明赚了5万元，可年初卡里有5万元，年底才8万元，只多了3万元。另外2万元去哪了？</p>
+<p>他翻了翻流水：隔壁食堂有2万元的包子钱还没付——包子卖出去了，收入算进了成绩单，可钱还没到手。</p>
+<p>这张记录“现金实实在在进出了多少”的账，就叫<strong>现金流量表</strong>。它像一本<strong>钱包流水账</strong>。</p>
+<h2>三张账，说的是同一件事</h2>
+<p>现在，请你注意一件非常重要的事情。</p>
+<p>老王的三张账，看起来各说各的：成绩单说赚了5万，家底照片说有8万现金，流水账说现金只增加了3万。</p>
+<p>但它们<strong>说的是同一年、同一家包子铺、同一堆包子</strong>。所以它们之间必须对得上：</p>
+<ul>
+<li>成绩单说赚了5万元，其中2万元还是别人欠着的（家底照片里的“别人欠我的钱”），所以真正变成现金的是3万元——正好等于流水账里现金增加的3万元。</li>
+<li>家底照片上的现金8万元，等于年初的5万元，加上流水账里这一年现金净增加的3万元。</li>
+<li>成绩单里赚的5万元，会让老王的“自己的家底”增加5万元——家底照片里看得到这一点。</li>
+</ul>
+<p>你看，三张账像三个人手拉着手。任何一个人往前走一步，另外两个人都得跟着动。</p>
+<p><strong>这就是本书最重要的一句话：三张报表，其实是一张网。</strong></p>
+<h2>如果老王想吹牛</h2>
+<p>现在假设老王想吹牛。明年他要找亲戚借一大笔钱开分店，他想让自己的包子铺看起来更赚钱。</p>
+<p>他把成绩单上的收入从30万改成40万。这样一来，利润就从5万变成了15万。</p>
+<p>改完了吗？没有。</p>
+<p>他马上会发现问题：多出来的10万元收入，钱在哪里？</p>
+<ul>
+<li>如果说钱已经收到了，那家底照片上的现金就该多10万，流水账上也该多10万进账。可银行卡里明明只有8万元，亲戚一问银行就露馅。</li>
+<li>如果说钱还没收到，是别人欠着的，那家底照片上“别人欠我的钱”就该从2万变成12万。可谁欠你这10万？欠了多久？为什么一个包子铺的客人会欠你将近半年的包子钱？</li>
+<li>多卖了10万元的包子，就得多买面粉和肉。成本怎么没涨？如果成本没涨，那你的包子毛利怎么一下子比全街的包子铺都高？</li>
+<li>多卖了三分之一的包子，就得多用三分之一的面粉、多烧三分之一的煤气。煤气费怎么没涨？</li>
+</ul>
+<p>你看，老王改了<strong>一个数字</strong>，却要跟着改<strong>一串数字</strong>。改得越多，漏洞越多；有些数字他根本改不了——比如银行卡里的余额，比如煤气公司的账单。</p>
+<p><strong>造假的人能改一个数字，改不动一张网。</strong>这就是我们在序章里说的那句话，在一家包子铺里的样子。</p>
+<h2>上市公司的三张报表</h2>
+<p>上市公司的报表比包子铺复杂得多，但骨架完全一样。</p>
+<p><strong>利润表（成绩单）</strong>：一段时间里，收入多少，成本和各种费用多少，最后赚了多少。最上面一行是“营业收入”，最下面一行是“净利润”。</p>
+<p><strong>资产负债表（家底照片）</strong>：某一天，公司有什么（资产），欠别人什么（负债），剩下的属于股东（所有者权益）。它永远满足一个等式：</p>
+<p class="keynote">有的东西 ＝ 欠别人的 ＋ 属于自己的</p>
+<p>这就是为什么它叫“平衡表”——左右两边永远相等。</p>
+<p><strong>现金流量表（钱包流水）</strong>：一段时间里，现金实实在在地进出了多少。它把钱的进出分成三类：</p>
+<ul>
+<li><strong>经营活动</strong>：做生意本身收的钱、付的钱，比如卖货收款、付工资、交税；</li>
+<li><strong>投资活动</strong>：买设备、建厂房、买别的公司，或者卖掉这些东西；</li>
+<li><strong>筹资活动</strong>：向银行借钱、还钱，向股东要钱、给股东分红。</li>
+</ul>
+<p>三张表的关系，和老王的包子铺一模一样：</p>
+<ul>
+<li>利润表赚的钱，会变成资产负债表里股东的家底；</li>
+<li>资产负债表里现金从年初到年底的变化，正好等于现金流量表里这一年现金的净增加；</li>
+<li>利润表说赚了钱，现金流量表里的“经营活动现金流”就应该大体跟得上——赚钱的生意，迟早会收到钱。</li>
+</ul>
+<h2>神探的第一条直觉</h2>
+<p>有了这张网，你就有了神探的第一条直觉：</p>
+<p class="keynote"><strong>一个数字好看，不要急着相信；先看它的邻居有没有跟着好看。</strong></p>
+<ul>
+<li>利润涨了很多，经营现金流跟上了吗？</li>
+<li>收入涨了很多，应收账款（别人欠的钱）是不是涨得更快？</li>
+<li>账上现金很多，利息收入有没有相应地多？公司为什么还在借钱？</li>
+<li>固定资产、在建工程一直在增加，产能、产量、电费跟上了吗？</li>
+</ul>
+<p>这些问题，一个都不需要会计专业知识。它们只需要你相信一件事：<strong>真实的生意，数字之间是互相配合的。</strong></p>
+<h2>三只眼睛，对应这张网的三个方向</h2>
+<p>在序章里，我们说神探有三只眼睛。现在，你可以看得更清楚了。</p>
+<p>一个数字在这张网里，有三个方向的联系：</p>
+<p><strong>向外，是它的“脸”</strong>——它以什么样子出现在报表上，叫什么名字，放在哪一行，附注里怎么解释它。这是<strong>第一只眼：看显露</strong>。第二章会讲。</p>
+<p><strong>向后，是它的“来路”</strong>——它去年是多少，前年是多少，每个季度怎么变，同行是多少。这是<strong>第二只眼：看差异</strong>。第三章会讲。</p>
+<p><strong>向旁边，是它的“邻居”</strong>——同一张表里的其他数字，另外两张表里的数字，以及公司之外世界里的数字。这是<strong>第三只眼：看纠缠</strong>。第四章会讲。</p>
+<p>真实的数字，三个方向都通。造假的数字，总有一个方向不通。</p>
+<h2>本章小结</h2>
+<ol>
+<li>利润表是成绩单，资产负债表是家底照片，现金流量表是钱包流水。</li>
+<li>三张报表说的是同一件事，所以它们之间必须对得上。</li>
+<li>造假者改一个数字，必须跟着改一串数字；有些数字改不了，于是留下破绽。</li>
+<li>神探的第一条直觉：一个数字好看，先看它的邻居有没有跟着好看。</li>
+</ol>
+<h2>动手练习</h2>
+<p>找一家你关心的上市公司，在交易所网站或公司官网下载它最近一年的年报，只做三件事：</p>
+<ol>
+<li>找到利润表最下面的“净利润”；</li>
+<li>找到现金流量表里的“经营活动产生的现金流量净额”；</li>
+<li>把两个数放在一起比一比：它们差不多吗？如果利润远远大于经营现金流，而且连续好几年都是这样，把这家公司记在你的小本子上。</li>
+</ol>
+<p>下一章，我们学习怎么看一张报表的“脸”。</p>
+<div class="nav"><span><a href="../p01/">← 第一部　神探的工具箱</a></span><span><a href="../c02/">第二章　第一只眼：看它的“脸” →</a></span></div>
+<div class="foot">德麦国际出版社　Demai International Press　·　ISBN 979-8-90690-072-2　·　US$19.80</div>
+</div></body></html>

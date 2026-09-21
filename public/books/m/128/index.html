@@ -1,0 +1,100 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>上市公司会计造假的SDE神探：三张报表的系统解构 · 德麦国际专著</title>
+<meta name="description" content="《上市公司会计造假的SDE神探——三张报表的系统解构》· 王德生 著 · 德麦国际专著第 128 号 · ISBN 979-8-90690-072-2 · 定价 US$19.80。前言·导读·序章·十一部六十四章·终章·十三个附录，约 13.3 万汉字，250 页。造假的人能改一个数字，改不动一张网。">
+<meta name="tier" content="L0">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自著">
+<meta name="isbn" content="979-8-90690-072-2">
+<meta name="book_no" content="128">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B;--hl:#1B1608}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/2.0 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:780px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.9em 0 .6em;color:var(--fg);border-left:3px solid var(--gold);padding-left:11px}
+h3{font-size:17px;margin:1.6em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.9em 0;text-align:justify}
+strong{color:#F2E4C4;font-weight:700;border-bottom:1px solid rgba(217,164,65,.42);padding-bottom:1px}
+em{font-style:normal;color:var(--dim)}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.9em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+.head{background:linear-gradient(180deg,#141A20,#10151A);border:1px solid #2C3540;border-left:4px solid var(--gold);border-radius:4px;padding:15px 18px;margin:1.4em 0 2em}
+.head p{margin:.5em 0;font-size:15.5px}
+.keynote{background:var(--hl);border-left:3px solid var(--gold);padding:.65em 1em;margin:1.15em 0;border-radius:0 4px 4px 0}
+.keynote strong{border-bottom:none;color:#FBE9C2}
+.dict{margin:.55em 0;padding-left:1.15em;text-indent:-1.15em;font-size:15.5px;color:#D6D2C8}
+.dict b{color:var(--gold);font-weight:700}
+.tip{color:var(--dim);font-size:13px;border:1px dashed var(--line);border-radius:4px;padding:9px 12px;margin:1.2em 0}
+mark{background:rgba(217,164,65,.17);color:#F6E7C6;padding:0 2px;border-radius:2px}
+</style>
+</head><body>
+<div class="bar"><a href="/books/">← 专著栏目</a><a href="/books/m/128/text/">在线阅读全书</a><a href="/books/m/128/read.html">翻页阅读</a><a href="/books/m/128/sde-detective.pdf">PDF 全本</a><a href="/books/m/127/">第 127 号</a><a href="/books/m/129/">第 129 号</a></div>
+<div class="wrap">
+
+<h1>上市公司会计造假的SDE神探</h1>
+<div class="sde-reader-entry" style="margin:18px 0;padding:14px 18px;border:1px solid #b49a59;border-radius:6px"><a href="https://sdeuniverses.com/books/m/128/read.html" style="display:inline-block;background:#b49a59;color:#171b13;text-decoration:none;font-weight:700;padding:10px 20px;border-radius:4px">在线翻页阅读 →</a><span style="display:inline-block;margin-left:12px;font-size:13px">支持上一页、下一页、页码跳转</span></div>
+<p class="meta">三张报表的系统解构 · 王德生 著 · 德麦国际专著第 128 号 · ISBN 979-8-90690-072-2　·　定价 US$19.80</p>
+<p><img src="/books/m/128/cover.jpg" alt="《上市公司会计造假的SDE神探》封面" style="max-width:300px;width:62%;border:1px solid var(--line)"></p>
+<p><span class="pill">前言·导读·序章·十一部六十四章·终章·十三个附录</span><span class="pill">约 13.3 万汉字</span><span class="pill">16 开 250 页</span><span class="pill">二十多个已认定的真实案件</span><span class="pill">tier: L0 公开</span></p>
+<p><a href="/books/m/128/text/"><strong>→ 在线翻阅全书（六十四章全文）</strong></a>　·　<a href="/books/m/128/sde-detective.pdf"><strong>→ PDF 全本（含封面，可检索可复制）</strong></a></p>
+
+<div class="card"><h3>这本书只说一句话</h3>
+<p class="keynote"><strong>造假的人能改一个数字，改不动一张网。</strong></p>
+<p>公司报表上的每一个数字都不是孤零零写在纸上的：利润表上的收入，连着资产负债表上的应收和存货，连着现金流量表上真实收到的钱；连着去年、前年的同一个数字；连着同行；还连着报表外面的真实世界——工厂的用电、港口的运输、门店的顾客、海上渔船的航迹。真实的数字三个方向都通，假的数字总有一根线接不上。</p></div>
+
+<div class="card"><h3>三只眼睛</h3>
+<ul>
+<li><strong>看它的样子</strong>——报表说了什么，怎么说的，谁替它担保，有没有换了说法。</li>
+<li><strong>看它的来路</strong>——它这些年是怎么变过来的，和同行比、在要紧的年份是什么样子。</li>
+<li><strong>看它的邻居</strong>——另外两张表、报表外面的世界，能不能为它作证。</li>
+</ul>
+<p>三只眼睛来自 SDE 方法：显露（Show）、差异（Difference）、纠缠（Entanglement）。全书用一家街边包子铺讲清三张报表；不需要任何会计知识。</p></div>
+
+<div class="card"><h3>读完手里有什么</h3>
+<ul>
+<li><strong>一套五步破案流程</strong>：定位 → 看脸 → 拉时间线 → 对口供 → 追问（第十八章）。</li>
+<li><strong>一张十二个断口的随身清单</strong>：利润长现金不长、欠条比收入长得快、钱不生钱、有钱还借钱、年末好看年初反弹、刚好过线然后断崖、大股东缺钱公司“有钱”……（第十九章）</li>
+<li><strong>八个行业的检查卡</strong>：农林牧渔、医药、软件与互联网、工程与建筑、贸易与供应链、制造与新能源、餐饮零售与消费、房地产（第六部）。</li>
+<li><strong>写给六类读者的建议</strong>：投资者、财务人员与管理者、董事与审计委员会、审计师等看门人、记者研究者与学生、开小店的“老王们”（第八部）。</li>
+<li><strong>十三个附录</strong>：案件卷宗、三表速读卡、指标公式卡、查资料指南、五十词小词典、读者十问、十二道练习题、年报阅读路线图、处罚决定书读法、五步工作底稿……</li>
+</ul></div>
+
+<div class="card"><h3>书里的案子</h3>
+<p>康美药业、獐子岛、瑞幸咖啡、万福生科、广誉远、康得新、欣泰电气、宏达新材、未来股份、宜华生活、*ST济堂、辅仁药业、雅百特、必康股份、*ST新亿；世通、安然、威卡、萨蒂扬、东芝。所有案件事实均依据监管机构的处罚决定与通报、司法判决、交易所文件、公司公告或权威报道，出处集中列在书末“资料来源说明”；做空机构与媒体的指称与官方认定分开写明。</p>
+<p class="keynote"><strong>这本书只教提问，不教定罪。</strong>认定一家公司是否造假，是监管机构和法院的事；普通人要做的，是在得不到满意回答的时候，保护好自己。</p></div>
+
+<div class="card"><h3>十一部</h3>
+<ul>
+<li><strong>第一部　神探的工具箱</strong>　三张报表是一张网；三只眼睛</li>
+<li><strong>第二部　利润表的案子</strong>　虚构收入／提前确认／费用资本化／洗大澡与抹平</li>
+<li><strong>第三部　资产负债表的案子</strong>　假现金／存贷双高／海外的钱／期末魔术／在建工程／商誉／表外</li>
+<li><strong>第四部　现金流量表的案子</strong>　经营现金流的化妆术／闭环交易与空转贸易</li>
+<li><strong>第五部　系统解构</strong>　五步流程／十二个断口／反侦察／人工智能时代／复盘康美</li>
+<li><strong>第六部　行业篇</strong>　八个行业，八张检查卡</li>
+<li><strong>第七部　复盘篇</strong>　獐子岛／瑞幸／康得新／欣泰电气／万福生科</li>
+<li><strong>第八部　给不同的人</strong>　每个人手里的一根线</li>
+<li><strong>第九部　海外篇</strong>　世通／安然／威卡／萨蒂扬／东芝</li>
+<li><strong>第十部　新案篇</strong>　宜华生活／*ST济堂／辅仁药业／雅百特／必康股份／*ST新亿</li>
+<li><strong>第十一部　深入篇</strong>　从学术专著《会计价值的发生》取出的十二把钥匙：一个正常的会计数字本来就藏着哪些报表上看不见的东西</li>
+</ul></div>
+
+<p><a href="/books/m/128/text/"><strong>→ 开始在线阅读</strong></a>　·　<a href="/books/m/128/sde-detective.pdf">PDF 全本（2.6 MB · 252 页含封面）</a></p>
+<p><img src="/books/m/128/backcover.jpg" alt="封底" style="max-width:300px;width:62%;border:1px solid var(--line)"></p>
+
+<div class="foot">德麦国际出版社　Demai International Press　·　ISBN 979-8-90690-072-2　·　US$19.80</div>
+</div></body></html>

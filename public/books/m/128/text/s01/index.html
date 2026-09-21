@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第二部破案演练：一家虚构的“星河食品” · 上市公司会计造假的SDE神探 · 德麦国际专著</title>
+<meta name="description" content="《上市公司会计造假的SDE神探——三张报表的系统解构》· 王德生 著 · 德麦国际专著第 128 号 · 第二部破案演练：一家虚构的“星河食品”。学了四种手法，我们来做一次完整的演练。下面是一家虚构的上市公司——星河食品——的五年数据（单位：亿元）。它不对应任何真实公司，只用来练习。   项目  第1年  第2年  第3年  第4年  第5年    营业收入  1">
+<meta name="tier" content="L0">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自著">
+<meta name="isbn" content="979-8-90690-072-2">
+<meta name="book_no" content="128">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B;--hl:#1B1608}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/2.0 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:780px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.9em 0 .6em;color:var(--fg);border-left:3px solid var(--gold);padding-left:11px}
+h3{font-size:17px;margin:1.6em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.9em 0;text-align:justify}
+strong{color:#F2E4C4;font-weight:700;border-bottom:1px solid rgba(217,164,65,.42);padding-bottom:1px}
+em{font-style:normal;color:var(--dim)}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.9em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+.head{background:linear-gradient(180deg,#141A20,#10151A);border:1px solid #2C3540;border-left:4px solid var(--gold);border-radius:4px;padding:15px 18px;margin:1.4em 0 2em}
+.head p{margin:.5em 0;font-size:15.5px}
+.keynote{background:var(--hl);border-left:3px solid var(--gold);padding:.65em 1em;margin:1.15em 0;border-radius:0 4px 4px 0}
+.keynote strong{border-bottom:none;color:#FBE9C2}
+.dict{margin:.55em 0;padding-left:1.15em;text-indent:-1.15em;font-size:15.5px;color:#D6D2C8}
+.dict b{color:var(--gold);font-weight:700}
+.tip{color:var(--dim);font-size:13px;border:1px dashed var(--line);border-radius:4px;padding:9px 12px;margin:1.2em 0}
+mark{background:rgba(217,164,65,.17);color:#F6E7C6;padding:0 2px;border-radius:2px}
+</style>
+</head><body>
+<div class="bar"><a href="/books/m/128/">← 专著首页</a><a href="/books/m/128/text/">目录</a><a href="/books/m/128/read.html">翻页阅读</a><a href="/books/m/128/sde-detective.pdf">PDF 全本</a><a href="/books/">专著栏目</a></div>
+<div class="wrap">
+<h1>第二部破案演练：一家虚构的“星河食品”</h1>
+<p class="meta">上市公司会计造假的SDE神探——三张报表的系统解构 · 王德生 著 · 德麦国际专著第 128 号</p>
+<p>学了四种手法，我们来做一次完整的演练。下面是一家<strong>虚构</strong>的上市公司——星河食品——的五年数据（单位：亿元）。它不对应任何真实公司，只用来练习。</p>
+<div style="overflow-x:auto"><table><thead><tr><th>项目</th><th>第1年</th><th>第2年</th><th>第3年</th><th>第4年</th><th>第5年</th></tr></thead><tbody><tr><td>营业收入</td><td>10.0</td><td>12.0</td><td>15.0</td><td>19.0</td><td>24.0</td></tr><tr><td>净利润</td><td>1.0</td><td>1.3</td><td>1.7</td><td>2.2</td><td>2.8</td></tr><tr><td>经营活动现金流净额</td><td>1.1</td><td>1.0</td><td>0.6</td><td>0.3</td><td>－0.2</td></tr><tr><td>应收账款</td><td>1.5</td><td>2.2</td><td>3.6</td><td>5.8</td><td>8.9</td></tr><tr><td>存货</td><td>2.0</td><td>2.3</td><td>2.6</td><td>2.9</td><td>3.2</td></tr><tr><td>在建工程</td><td>0.5</td><td>1.5</td><td>3.0</td><td>4.8</td><td>6.9</td></tr><tr><td>四季度收入占全年</td><td>27%</td><td>29%</td><td>34%</td><td>38%</td><td>41%</td></tr><tr><td>会计师事务所</td><td>甲所</td><td>甲所</td><td>甲所</td><td>乙所</td><td>乙所</td></tr></tbody></table></div>
+<p>公司的背景：第2年收购了一家子公司，卖方承诺第3年到第5年的利润；第4年，公司发行了一笔债券。</p>
+<p>请你先自己看五分钟，再往下读。</p>
+<p><strong>第一只眼（看显露）</strong></p>
+<ul>
+<li>第4年，会计师事务所从甲所换成了乙所——正好是发债的那一年。这是一个要圈出来的年份。</li>
+<li>公司有业绩对赌，对赌期是第3年到第5年。第5年是考卷的最后一年。</li>
+</ul>
+<p><strong>第二只眼（看差异）</strong></p>
+<ul>
+<li>收入和利润的增长，一年比一年快，五年里收入翻了一倍多，利润几乎翻了两倍——增长得非常整齐，而且在加速。</li>
+<li>四季度收入的占比，从27%一路升到41%。越来越多的收入，集中在年底。</li>
+</ul>
+<p><strong>第三只眼（看纠缠）</strong></p>
+<p>逐对检查第四章的证人：</p>
+<ul>
+<li><strong>利润和现金</strong>：利润从1亿涨到2.8亿，经营现金流却从1.1亿一路降到了负数。第5年，公司报告赚了2.8亿，做生意本身却净流出了0.2亿现金。——<strong>断口一</strong>。</li>
+<li><strong>收入和应收账款</strong>：收入涨了1.4倍，应收账款涨了将近5倍。算一下周转天数：第1年大约55天，第5年大约135天。——<strong>断口二</strong>，而且和“四季度占比越来越高”指向同一件事：年底压货、提前确认。</li>
+<li><strong>收入和存货</strong>：存货只是温和增长。这说明问题不在公司自己的仓库里——如果是压货，货在经销商那里。</li>
+<li><strong>资产和产出</strong>：在建工程从0.5亿涨到6.9亿，五年都没有转成固定资产。一个“永远在建”的工程在不断长大。——<strong>断口三</strong>，它可能是费用资本化，也可能是体外循环的钱的“落脚点”（回想第五章的守恒定律）。</li>
+</ul>
+<p><strong>结论</strong></p>
+<p>三只眼睛看到的东西，指向了同一个地方：<strong>第3年以后，尤其是对赌期和发债年份，星河食品的利润越来越依赖“还没收回来的钱”和“永远建不完的工程”</strong>。</p>
+<p>这并不能证明它造假——也许它真的在激进扩张，真的给了客户很长的账期，真的在建一个大工程。但作为一个神探，你已经可以提出三个非常具体的问题：</p>
+<ol>
+<li>为什么利润年年创新高，经营现金流却年年下降、最后变成负数？</li>
+<li>为什么收入越来越集中在四季度，回款天数从55天拉长到135天？</li>
+<li>那个在建工程是什么？建了五年，进度如何，什么时候投产，投产后能带来多少收入？</li>
+</ol>
+<p>如果公司对这三个问题都给不出说得通的答案，你就应该离它远一点。</p>
+<p><strong>这就是神探的工作：不是替监管机构下结论，而是在所有人之前，问出那个对的问题。</strong></p>
+<div class="nav"><span><a href="../c08/">← 第八章　挪来挪去：洗大澡与抹平利润</a></span><span><a href="../s02/">第二部小结：利润表的四种病 →</a></span></div>
+<div class="foot">德麦国际出版社　Demai International Press　·　ISBN 979-8-90690-072-2　·　US$19.80</div>
+</div></body></html>

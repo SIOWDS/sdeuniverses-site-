@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第四章　第三只眼：看它的“邻居” · 上市公司会计造假的SDE神探 · 德麦国际专著</title>
+<meta name="description" content="《上市公司会计造假的SDE神探——三张报表的系统解构》· 王德生 著 · 德麦国际专著第 128 号 · 第四章　第三只眼：看它的“邻居”。 口供对不上  警察审案子，有一个最基本的方法：分开问。  把几个当事人分别带到不同的房间，问同一件事。如果他们说的是真话，口供自然对得上——因为他们经历的是同一件事。如果他们在编故事，事先再怎么串通，细节上也总会有出入">
+<meta name="tier" content="L0">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自著">
+<meta name="isbn" content="979-8-90690-072-2">
+<meta name="book_no" content="128">
+<style>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B;--hl:#1B1608}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/2.0 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(11,14,18,.96);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:780px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h2{font-size:21px;margin:1.9em 0 .6em;color:var(--fg);border-left:3px solid var(--gold);padding-left:11px}
+h3{font-size:17px;margin:1.6em 0 .5em;color:var(--gold);font-weight:600}
+p{margin:.9em 0;text-align:justify}
+strong{color:#F2E4C4;font-weight:700;border-bottom:1px solid rgba(217,164,65,.42);padding-bottom:1px}
+em{font-style:normal;color:var(--dim)}
+.meta{color:var(--dim);font-size:13.5px;margin:.4em 0 1.8em;line-height:1.75}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--gold);background:var(--card);color:var(--dim)}
+ul{padding-left:1.4em}li{margin:.35em 0}
+hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:14px;margin-top:3.2em;padding-top:1.3em;border-top:1px solid var(--line);font-size:14px}
+.foot{margin-top:2.4em;color:var(--dim);font-size:12px;text-align:center}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line)}
+.ptx{margin:1.9em 0 .5em;color:var(--gold);font-size:14px;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin:1.3em 0}
+.card h3{margin-top:0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--dim);margin:0 6px 6px 0}
+.head{background:linear-gradient(180deg,#141A20,#10151A);border:1px solid #2C3540;border-left:4px solid var(--gold);border-radius:4px;padding:15px 18px;margin:1.4em 0 2em}
+.head p{margin:.5em 0;font-size:15.5px}
+.keynote{background:var(--hl);border-left:3px solid var(--gold);padding:.65em 1em;margin:1.15em 0;border-radius:0 4px 4px 0}
+.keynote strong{border-bottom:none;color:#FBE9C2}
+.dict{margin:.55em 0;padding-left:1.15em;text-indent:-1.15em;font-size:15.5px;color:#D6D2C8}
+.dict b{color:var(--gold);font-weight:700}
+.tip{color:var(--dim);font-size:13px;border:1px dashed var(--line);border-radius:4px;padding:9px 12px;margin:1.2em 0}
+mark{background:rgba(217,164,65,.17);color:#F6E7C6;padding:0 2px;border-radius:2px}
+</style>
+</head><body>
+<div class="bar"><a href="/books/m/128/">← 专著首页</a><a href="/books/m/128/text/">目录</a><a href="/books/m/128/read.html">翻页阅读</a><a href="/books/m/128/sde-detective.pdf">PDF 全本</a><a href="/books/">专著栏目</a></div>
+<div class="wrap">
+<h1>第四章　第三只眼：看它的“邻居”</h1>
+<p class="meta">上市公司会计造假的SDE神探——三张报表的系统解构 · 王德生 著 · 德麦国际专著第 128 号</p>
+<h2>口供对不上</h2>
+<p>警察审案子，有一个最基本的方法：<strong>分开问</strong>。</p>
+<p>把几个当事人分别带到不同的房间，问同一件事。如果他们说的是真话，口供自然对得上——因为他们经历的是同一件事。如果他们在编故事，事先再怎么串通，细节上也总会有出入：你说那天下雨，他说那天出太阳；你说是八点，他说是十点。</p>
+<p>第三只眼做的，就是这件事：<strong>让不同的证人分别开口，看口供对不对得上。</strong>我们把它叫作<strong>看纠缠</strong>——真实的数字，和周围的数字是缠在一起的，一个动，别的都得跟着动。</p>
+<p>证人有两类：一类在报表<strong>里面</strong>，一类在报表<strong>外面</strong>。</p>
+<h2>报表里面的证人</h2>
+<p>第一章我们讲过，三张报表是一张网。现在，我们把这张网上最重要的几根线挑出来，每一根线，都是一对可以互相作证的证人。</p>
+<p><strong>第一对证人：利润和现金。</strong></p>
+<p>利润表说赚了钱，现金流量表就要能证明钱进来了。一年两年，利润高于经营现金流，可能是正常的——比如生意扩张，很多货款还没收回来。但如果<strong>连续好几年</strong>，利润都很好看，经营活动的现金流却一直很少、甚至是负的，那就等于一个人年年说自己挣了大钱，银行卡里却从来没见过钱。</p>
+<p><strong>第二对证人：收入和应收账款。</strong></p>
+<p>公司卖了货，钱没收到，就记成“应收账款”——别人欠我的钱。收入增长，应收账款跟着增长，这很正常。但如果应收账款<strong>涨得比收入快得多</strong>，就说明越来越多的“收入”只是一张欠条。欠条是最容易编的东西之一。</p>
+<p><strong>第三对证人：收入和存货。</strong></p>
+<p>卖得多了，通常要备更多的货。但如果收入没怎么涨，存货却一年比一年堆得高，要么是货卖不出去，要么是有些“存货”根本不存在——还记得獐子岛吗？它最大的存货在海底。</p>
+<p><strong>第四对证人：现金和利息，现金和借款。</strong></p>
+<p>这是序章里康美药业那一对。账上有巨额现金，就应该有相应的利息收入，就不应该大量借钱。<strong>“存贷双高”</strong>——存款很多，贷款也很多——是近年来被监管机构反复问询的信号。</p>
+<p><strong>第五对证人：资产和产出。</strong></p>
+<p>公司说自己建了很多厂房、买了很多设备（固定资产、在建工程一年比一年多），那产能、产量、销量、电费就应该跟着涨。一座“永远建不完”的在建工程，或者一批“没有带来任何产出”的新设备，都值得问一问：钱真的花在这里了吗？</p>
+<p>这五对证人，你都不需要会计知识就能问。你只需要把两个数字放在一起，问一句：<strong>它们是一起变的吗？</strong></p>
+<h2>报表外面的证人</h2>
+<p>报表里面的证人，造假者也知道。所以老练的造假者会“串供”：编了现金，就编利息；编了收入，就编应收和成本。康美药业就给假现金配上了假利息。</p>
+<p>但是，报表<strong>外面</strong>还有更多的证人——它们不归公司管，公司很难让它们一起说谎。</p>
+<p><strong>还记得獐子岛的船吗？</strong></p>
+<p>獐子岛可以在报表里写：我们在哪片海域捕捞了多少扇贝，在哪些点位做了抽测。这些都是公司自己记的，外人看不到。</p>
+<p>但是，捕捞船和科研船在海上航行，会留下<strong>卫星定位的航迹</strong>。这些航迹不是獐子岛记的，是船上的定位系统记的。</p>
+<p>调查人员把公司记录的捕捞区域，和捕捞船只实际的作业航迹放在一起比对，发现两者<strong>存在明显出入</strong>：公司说在这里捞过，船却没去；公司说那里没捞，船却去过。秋季抽测那120个点位里，有60多个点位，船根本没有经过。</p>
+<p>扇贝在海底，谁也看不见。<strong>但船在海上，天上看得见。</strong></p>
+<p>这就是报表外面的证人的力量：<strong>它们和公司的数字缠在一起，却不受公司控制。</strong></p>
+<h2>一千五百个人数杯子</h2>
+<p>再看一个案子。</p>
+<p>瑞幸咖啡2019年5月在美国纳斯达克上市，从创立到上市只用了十八个月。上市后它公布的业绩增长极快，股价在几个月里大幅上涨。</p>
+<p>2020年1月底，做空机构浑水公司公开了一份匿名报告，指称瑞幸咖啡的业绩是编造的。这份报告最引人注目的，是它的取证方法：据报告称，调查方组织了92名全职和1418名兼职人员，在瑞幸的门店现场记录客流，共录下了11260小时的门店视频，逐一数进出的顾客和卖出的杯数。</p>
+<p>他们的结论是：瑞幸每家门店每天实际卖出的商品数量，远低于公司披露的数字——2019年第三季度至少被夸大了69%，第四季度至少被夸大了88%。</p>
+<p>这份报告当时只是做空机构的指控，公司予以否认。但两个月后，2020年4月，瑞幸咖啡自己发布公告，承认公司首席运营官等人从2019年第二季度起捏造交易。后来，中国财政部的检查查明：从2019年4月到2019年底，瑞幸咖啡通过虚构商品券业务，<strong>虚增收入21.19亿元，占其对外披露收入的41.16%</strong>。</p>
+<p>注意这个案子里的证人：不是报表，不是账本，而是<strong>门口进出的顾客、手里端着的杯子</strong>。一家咖啡店卖了多少杯咖啡，它可以在系统里写任何数字；但每一杯真实的咖啡，都需要一个真实的人走进门、拿起它、走出去。</p>
+<p><strong>你可以编一个数字，但你很难编一千个人走进门。</strong></p>
+<h2>外部证人清单</h2>
+<p>把獐子岛的船和瑞幸的杯子推广开来，神探可以找的外部证人非常多。有些是公开的，普通人也能查到：</p>
+<ul>
+<li><strong>用电、用水、用气</strong>：一家工厂说自己产量翻了一倍，电费却没怎么涨？</li>
+<li><strong>运输和物流</strong>：卖出去那么多货，运货的车、船、快递单在哪里？</li>
+<li><strong>纳税</strong>：收入和利润大涨，交的增值税、所得税跟上了吗？</li>
+<li><strong>员工人数和工资</strong>：业务规模翻番，员工人数和工资总额有没有相应变化？</li>
+<li><strong>客户和供应商</strong>：公司说的大客户，是真实存在的企业吗？它的规模买得起这么多货吗？它和公司的大股东有没有关系？</li>
+<li><strong>行业总量</strong>：一家公司声称自己卖出的产品，是否已经超过了整个行业的总销量？</li>
+<li><strong>现场</strong>：厂房里有没有机器在转？门店里有没有顾客？海上有没有船？</li>
+</ul>
+<p>这些证人，每一个都和公司报表上的某个数字“缠”在一起。<strong>公司可以改报表，却很难同时改掉电力公司的账、税务局的记录、卫星的航迹和一千个顾客的脚步。</strong></p>
+<h2>三只眼睛，一起用</h2>
+<p>到这里，神探的三只眼睛都拿到手了。最后要说的是：它们不是三种独立的方法，而是<strong>一套方法的三个方向</strong>。</p>
+<p>回头看獐子岛：</p>
+<ul>
+<li><strong>第一只眼（看显露）</strong>：公司两次用“冷水团”“饵料不足”这类外人无法核实的自然原因，解释巨额损失；秋季抽测的公告和年终盘点的结论前后矛盾。</li>
+<li><strong>第二只眼（看差异）</strong>：利润亏、亏、刚好过线、大亏；同一批扇贝，四个月从“无减值风险”到大量死亡。</li>
+<li><strong>第三只眼（看纠缠）</strong>：公司记录的捕捞区域，和船只的真实航迹对不上。</li>
+</ul>
+<p>任何一只眼睛单独看到的，都只是“可疑”。三只眼睛看到的东西<strong>指向同一个地方</strong>的时候，那里就是断口。</p>
+<p>这就是本书的全部方法：</p>
+<p class="keynote"><strong>看它的样子，看它的来路，看它的邻居。真实的数字三个方向都通；造假的数字，总有一个方向不通。</strong></p>
+<p>从下一部开始，我们带着这三只眼睛，一个一个地破案。</p>
+<h2>本章小结</h2>
+<ol>
+<li>第三只眼“看纠缠”：让不同的证人分别开口，看口供对不对得上。</li>
+<li>报表里面的五对证人：利润和现金、收入和应收、收入和存货、现金和利息与借款、资产和产出。</li>
+<li>报表外面的证人更难串供：船的航迹、门店的客流、电费、税、物流、员工……</li>
+<li>三只眼睛指向同一个地方时，那里就是断口。</li>
+</ol>
+<h2>动手练习</h2>
+<p>继续用你关心的那家公司，填一张“五对证人”表（每一行都用最近三年的数字）：</p>
+<div style="overflow-x:auto"><table><thead><tr><th>证人对</th><th>第一个数字的变化</th><th>第二个数字的变化</th><th>一起变了吗？</th></tr></thead><tbody><tr><td>净利润 / 经营现金流</td><td></td><td></td><td></td></tr><tr><td>营业收入 / 应收账款</td><td></td><td></td><td></td></tr><tr><td>营业收入 / 存货</td><td></td><td></td><td></td></tr><tr><td>货币资金 / 利息收入与借款</td><td></td><td></td><td></td></tr><tr><td>固定资产和在建工程 / 营业收入</td><td></td><td></td><td></td></tr></tbody></table></div>
+<p>有一行对不上，就去附注里找解释；解释说服不了你，就把它记在小本子上。</p>
+<div class="nav"><span><a href="../c03/">← 第三章　第二只眼：看它的“来路”</a></span><span><a href="../p02/">第二部　利润表的案子 →</a></span></div>
+<div class="foot">德麦国际出版社　Demai International Press　·　ISBN 979-8-90690-072-2　·　US$19.80</div>
+</div></body></html>
