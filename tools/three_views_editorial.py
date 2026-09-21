@@ -75,10 +75,20 @@ def split_sentences(par: str) -> list[str]:
 
 
 def sentences_of(article_id: str) -> tuple[list[str], BeautifulSoup]:
+    """句子取自冻结的原文快照；第一次构建时从当时的页面抽出并存档，之后只认快照。"""
     path = ROOT / article_id / 'index.html'
     soup = BeautifulSoup(path.read_text(encoding='utf8'), 'html.parser')
+    frozen = SPECS / 'source' / (article_id.replace('/', '-') + '.txt')
+    if frozen.exists():
+        pars = [x for x in frozen.read_text(encoding='utf8').split('\n') if x.strip()]
+    else:
+        if soup.body.get('data-editorial'):
+            raise AssertionError(f'{article_id}: 页面已是编辑稿，却没有原文快照——请从 git 历史取回原页面再冻结')
+        pars = source_paragraphs(soup)
+        frozen.parent.mkdir(parents=True, exist_ok=True)
+        frozen.write_text('\n'.join(pars), encoding='utf8')
     out = []
-    for par in source_paragraphs(soup):
+    for par in pars:
         out.extend(split_sentences(par))
     return out, soup
 
@@ -158,6 +168,22 @@ def assemble(spec: dict, sents: list[str]):
             left[i] = cur[len(cut):]
             audit.append(cut)
             blocks.append((kind, join(head, cut).strip(), b.get('who', '学员') if kind == 'q' else ''))
+        elif 'psplit' in b:
+            i = b['psplit']
+            text = take(i)
+            audit.append(text)
+            rest = text
+            pieces = []
+            for mark in b['at']:
+                k = rest.find(mark)
+                if k <= 0:
+                    raise AssertionError(f'{aid}: 第 {i} 句里找不到断点 {mark!r}')
+                pieces.append(rest[:k])
+                rest = rest[k:]
+            pieces.append(rest)
+            for piece in pieces:
+                if piece.strip():
+                    blocks.append(('p', piece.strip(), ''))
         elif 'p' in b or 'q' in b:
             key = 'p' if 'p' in b else 'q'
             text = ''
@@ -234,7 +260,10 @@ def render_prose(blocks, spec) -> tuple[str, list[tuple[str, str]]]:
             cls = ' class="list-item"' if re.match(r'^\d+[.．、]\s*', blk[1]) else ''
             parts.append(f'<p{cls}>{esc(blk[1])}</p>')
         elif blk[0] == 'q':
-            who = f'<em>{esc(blk[2])}</em>' if blk[2] else ''
+            label = blk[2]
+            if label and blk[1].lstrip('（(').startswith(label.rstrip('（(')[:2]):
+                label = ''
+            who = f'<em>{esc(label)}</em>' if label else ''
             parts.append(f'<blockquote class="dlg">{who}{esc(blk[1])}</blockquote>')
         elif blk[0] == 'fig':
             src = blk[1]
