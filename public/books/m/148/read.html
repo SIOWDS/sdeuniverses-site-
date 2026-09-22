@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>在线翻页阅读 · 普通人都能懂的洛克 | SDE Universes</title>
+<meta name="description" content="《普通人都能懂的洛克——一个人、一张白纸，与 SDE 的解构》在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
+<meta name="tier" content="L0">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/148/read.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0C0F13; --bg2:#141A21; --fg:#E9E6DE; --dim:#8E97A1; --line:#242D36;
+  --gold:#D9A441; --paper:#FBF7EE; --paper2:#F2ECDF; --ink:#1A1713;
+  --shadow:0 30px 80px rgba(0,0,0,.55);
+}
+html.sepia{--paper:#F6ECD8;--paper2:#EEE1C7}
+html.day{--bg:#E8E4DB;--bg2:#F2EFE7;--fg:#22262B;--dim:#5C646D;--line:#CFC9BD}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,var(--bg2),var(--bg)) fixed;
+  color:var(--fg);font:15px/1.7 "Noto Serif SC","EB Garamond",Georgia,serif;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);
+  overflow:hidden}
+
+/* ── 顶栏 ── */
+.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;align-items:center;gap:.8rem;
+  padding:.55rem 1rem calc(.55rem);background:rgba(12,15,19,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding-top:calc(.55rem + env(safe-area-inset-top,0))}
+html.day .top{background:rgba(232,228,219,.8)}
+.top .ttl{font-weight:600;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{color:var(--dim);font-size:.78rem;margin-left:.2rem;white-space:nowrap}
+.spacer{margin-left:auto}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);
+  border-radius:8px;padding:.3rem .6rem;cursor:pointer;transition:.18s}
+button:hover:not(:disabled),select:hover{border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.on{border-color:var(--gold);color:var(--gold)}
+.ico{font-size:1rem;line-height:1}
+
+/* ── 舞台 ── */
+.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:center;overflow:hidden}
+.book{position:relative;display:flex;gap:0;filter:drop-shadow(0 24px 60px rgba(0,0,0,.5));
+  transform-style:preserve-3d;perspective:2600px}
+.leaf{position:relative;background:var(--paper);overflow:hidden}
+.leaf canvas{display:block;width:100%;height:100%}
+.leaf .svg{position:absolute;inset:0;display:none}
+.leaf .svg svg{display:block;width:100%;height:100%}
+.leaf.vec canvas{display:none}
+.leaf.vec .svg{display:block}
+.leaf.l{border-radius:4px 0 0 4px;box-shadow:inset -22px 0 34px -26px rgba(0,0,0,.55)}
+.leaf.r{border-radius:0 4px 4px 0;box-shadow:inset 22px 0 34px -26px rgba(0,0,0,.55)}
+.single .leaf{border-radius:4px}
+.gutter{position:absolute;top:0;bottom:0;left:50%;width:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.20),rgba(0,0,0,0));pointer-events:none;z-index:3}
+.single .gutter{display:none}
+.pno{position:absolute;bottom:6px;font-size:11px;color:#9a8f7c;letter-spacing:.08em;z-index:4}
+.leaf.l .pno{left:14px}.leaf.r .pno{right:14px}
+
+/* 翻页动画 */
+.flip{position:absolute;top:0;bottom:0;z-index:9;background:var(--paper);
+  transform-origin:left center;backface-visibility:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,.35);border-radius:0 4px 4px 0}
+.flip.back{transform-origin:right center;border-radius:4px 0 0 4px}
+.flip canvas{display:block;width:100%;height:100%}
+@keyframes fwd{from{transform:rotateY(0)}to{transform:rotateY(-178deg)}}
+@keyframes bwd{from{transform:rotateY(0)}to{transform:rotateY(178deg)}}
+.flip.go{animation:fwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+.flip.back.go{animation:bwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+@media (prefers-reduced-motion:reduce){.flip.go,.flip.back.go{animation-duration:.01s}}
+
+/* 文本层（可选可搜） */
+.tl{position:absolute;inset:0;overflow:hidden;opacity:.01;line-height:1;z-index:2}
+.tl span{position:absolute;white-space:pre;transform-origin:0 0;color:transparent;cursor:text}
+.tl ::selection{background:rgba(217,164,65,.35)}
+.tl mark{background:rgba(217,164,65,.55);color:transparent;border-radius:2px}
+
+/* ── 底栏 ── */
+.bot{position:fixed;inset:auto 0 0 0;z-index:40;display:flex;align-items:center;gap:.7rem;
+  padding:.5rem 1rem calc(.5rem + env(safe-area-inset-bottom,0));
+  background:rgba(12,15,19,.72);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+html.day .bot{background:rgba(232,228,219,.8)}
+.rail{position:relative;flex:1;height:22px;display:flex;align-items:center;cursor:pointer}
+.rail .bar{position:absolute;left:0;right:0;height:3px;background:var(--line);border-radius:3px}
+.rail .fill{position:absolute;left:0;height:3px;background:linear-gradient(90deg,var(--gold),#F0CE86);border-radius:3px}
+.rail .knob{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--gold);
+  transform:translateX(-50%);box-shadow:0 0 0 4px rgba(217,164,65,.18)}
+.pg{font-variant-numeric:tabular-nums;color:var(--dim);font-size:.82rem;white-space:nowrap}
+.pg input{width:3.4rem;text-align:center;background:transparent;border:1px solid var(--line);
+  border-radius:6px;color:var(--fg);font:inherit;padding:.12rem .2rem}
+
+/* ── 抽屉 ── */
+.drawer{position:fixed;top:52px;bottom:62px;left:0;width:min(330px,86vw);z-index:45;
+  background:rgba(16,21,27,.97);border-right:1px solid var(--line);
+  transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;backdrop-filter:blur(10px)}
+html.day .drawer{background:rgba(242,239,231,.97)}
+.drawer.open{transform:none}
+.drawer h3{margin:0;padding:.8rem 1rem .5rem;font-size:.8rem;letter-spacing:.24em;color:var(--dim);font-weight:400}
+.dlist{flex:1;overflow:auto;padding:0 .4rem 1rem}
+.dlist a{display:flex;gap:.5rem;align-items:baseline;padding:.32rem .6rem;border-radius:7px;
+  color:var(--fg);text-decoration:none;font-size:.86rem}
+.dlist a:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.dlist a.l1{font-weight:600;margin-top:.5rem}
+.dlist a.l2{padding-left:1.5rem;color:var(--dim);font-size:.8rem}
+.dlist a .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.76rem}
+.sbox{padding:.5rem 1rem}
+.sbox input{width:100%;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--fg);font:inherit;padding:.4rem .6rem}
+.hit{padding:.35rem .6rem;border-radius:7px;font-size:.8rem;color:var(--dim);cursor:pointer}
+.hit:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.hit b{color:var(--gold);font-weight:600}
+
+/* 缩略图 */
+.thumbs{position:fixed;left:0;right:0;bottom:62px;z-index:44;display:flex;gap:.5rem;
+  padding:.6rem 1rem;overflow-x:auto;background:rgba(12,15,19,.92);border-top:1px solid var(--line);
+  transform:translateY(120%);transition:transform .28s}
+.thumbs.open{transform:none}
+.thumbs canvas{height:112px;width:auto;border-radius:3px;cursor:pointer;opacity:.62;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);transition:.18s}
+.thumbs canvas:hover,.thumbs canvas.cur{opacity:1;outline:2px solid var(--gold)}
+
+.msg{position:fixed;inset:0;display:grid;place-items:center;z-index:60;color:var(--dim);
+  background:rgba(12,15,19,.9);text-align:center;padding:2rem}
+.msg.hide{display:none}
+.msg .sp{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--gold);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:50;
+  background:rgba(0,0,0,.66);border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .9rem;font-size:.76rem;color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
+.hint.show{opacity:1}
+@media (max-width:860px){.top .sub,.hideS{display:none}.stage{inset:48px 0 56px 0}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
+  <span class="ttl">普通人都能懂的洛克</span><span class="sub hideS">一个人、一座学园、一部对话集 · 阅读友好版</span>
+  <span class="spacer"></span>
+  <button id="btnSpread" class="hideS" title="单页 / 双页 (D)">双页</button>
+  <button id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)">矢量</button>
+  <button id="btnZoomOut" title="缩小">A−</button>
+  <button id="btnZoomIn" title="放大">A＋</button>
+  <button id="btnThumbs" class="hideS" title="缩略图">▤</button>
+  <button id="btnTheme" title="夜 / 日 / 纸 (N)">夜</button>
+  <button id="btnFull" class="hideS" title="全屏 (F)">⛶</button>
+  <a href="/books/m/148/read-print.html" style="color:var(--dim);text-decoration:none;font-size:.8rem;margin-right:.6rem">印刷版</a><a href="/books/m/148/" style="color:var(--dim);text-decoration:none;font-size:.82rem">详情</a>
+</header>
+
+<aside class="drawer" id="drawer">
+  <div class="sbox"><input id="q" type="search" placeholder="全书检索（回车）…"></div>
+  <h3 id="dHead">目　录</h3>
+  <div class="dlist" id="dlist"></div>
+</aside>
+
+<main class="stage" id="stage">
+  <div class="book" id="book">
+    <div class="leaf l" id="leafL"><canvas id="cL"></canvas><div class="svg" id="sL"></div><div class="tl" id="tL"></div><div class="pno" id="nL"></div></div>
+    <div class="leaf r" id="leafR"><canvas id="cR"></canvas><div class="svg" id="sR"></div><div class="tl" id="tR"></div><div class="pno" id="nR"></div></div>
+    <div class="gutter"></div>
+  </div>
+</main>
+
+<div class="thumbs" id="thumbs"></div>
+
+<footer class="bot">
+  <button id="btnPrev" title="上一页 (←)">‹</button>
+  <div class="rail" id="rail"><div class="bar"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
+  <button id="btnNext" title="下一页 (→)">›</button>
+  <span class="pg">第 <input id="pi" type="number" min="1" value="1"> / <span id="pt">…</span> 页</span>
+</footer>
+
+<div class="hint" id="hint"></div>
+<div class="msg" id="msg"><div><div class="sp"></div><div id="msgT">正在载入书页…</div></div></div>
+
+<script type="application/json" id="cfg">
+{"pdf":"https://sdeuniverses.com/books/m/148/locke-for-everyone-reader.pdf","key":"locke-friendly-v1","offset":6}
+</script>
+<script type="application/json" id="toc">[{"t": "前言　一张纸，写满了三百年", "p": 1, "l": 1}, {"t": "导读　他的天才在哪儿：第一个把\"心\"交给经验的人", "p": 8, "l": 1}, {"t": "导论　白纸、盖章与发生：本书带的三件工具", "p": 21, "l": 1}, {"t": "第一编　一个医生出身的哲学家", "p": 28, "l": 1}, {"t": "第一章　清教徒律师的儿子：内战里长大的孩子", "p": 29, "l": 2}, {"t": "第二章　牛津的无聊与波义耳的实验室：一个医生的眼睛", "p": 35, "l": 2}, {"t": "第三章　年轻的洛克怎样想道德：一份没发表的讲稿", "p": 42, "l": 2}, {"t": "第四章　救了沙夫茨伯里的命：银管子与政治的门", "p": 46, "l": 2}, {"t": "第五章　达马里斯·马沙姆：一位女哲学家和洛克", "p": 52, "l": 2}, {"t": "第六章　五六个朋友的一场争论：《人类理解论》是怎么开始的", "p": 56, "l": 2}, {"t": "第七章　法国四年：一个医生的旅行笔记", "p": 62, "l": 2}, {"t": "第八章　流亡荷兰：一个用假名活着的人", "p": 66, "l": 2}, {"t": "第九章　一六八九年：三本书与一个晚年", "p": 72, "l": 2}, {"t": "第一编小结　洛克一生的 SDE 序列表", "p": 78, "l": 2}, {"t": "第二编　拆掉天赋观念：白纸是怎样被提出来的", "p": 80, "l": 1}, {"t": "第十章　\"人人心里生来就有的\"：洛克要推倒的是什么", "p": 81, "l": 2}, {"t": "第十一章　小孩、旅行者的报告与各地的风俗：天赋道德的反证", "p": 87, "l": 2}, {"t": "第十二章　今天的\"天赋论\"：一份孩子的\"天赋基因检测\"报告", "p": 93, "l": 2}, {"t": "第十三章　白纸：一个比喻的力量与代价", "p": 97, "l": 2}, {"t": "第十四章　\"白板\"这个词，比洛克老两千年", "p": 103, "l": 2}, {"t": "第十五章　SDE 看白纸：纸从来不是白的", "p": 106, "l": 2}, {"t": "第十六章　十个月：白纸在出生之前，已经被写了十个月", "p": 112, "l": 2}, {"t": "第十七章　康德的回答：纸是白的，但纸上有格子", "p": 125, "l": 2}, {"t": "第十八章　父亲的十个月", "p": 132, "l": 2}, {"t": "第十九章　早产的孩子：提前离开了那片场", "p": 135, "l": 2}, {"t": "第二十章　双胞胎：同一个子宫，两个不同的孩子", "p": 138, "l": 2}, {"t": "第三编　观念从哪里来", "p": 142, "l": 1}, {"t": "第二十一章　两扇窗：感觉与反省", "p": 143, "l": 2}, {"t": "第二十二章　反省这扇窗，今天被谁占了", "p": 147, "l": 2}, {"t": "第二十三章　简单观念：一块一块的积木", "p": 150, "l": 2}, {"t": "第二十四章　盲人怎样\"看见\"一间屋子", "p": 155, "l": 2}, {"t": "第二十五章　复杂观念：心怎样搭房子", "p": 159, "l": 2}, {"t": "第二十六章　\"内卷\"\"躺平\"：一个新词是怎样长出来的", "p": 164, "l": 2}, {"t": "第二十七章　观念的联想：洛克晚年补的一章", "p": 167, "l": 2}, {"t": "第二十八章　SDE 看积木：没有现成的积木，只有排出来的序列", "p": 173, "l": 2}, {"t": "第四编　物体、性质与\"我不知道是什么\"", "p": 177, "l": 1}, {"t": "第二十九章　雪球的白与圆：第一性质与第二性质", "p": 178, "l": 2}, {"t": "第三十章　颜色真的在心里吗：一条裙子的争论", "p": 184, "l": 2}, {"t": "第三十一章　实体：\"某种我不知道是什么的东西\"", "p": 188, "l": 2}, {"t": "第三十二章　乌龟底下还有什么：今天物理学里的\"实体\"", "p": 194, "l": 2}, {"t": "第三十三章　莫利纽兹问题：一个盲人复明以后", "p": 197, "l": 2}, {"t": "第三十四章　SDE 看实体：康德物自体的前身", "p": 203, "l": 2}, {"t": "第四编小结", "p": 207, "l": 2}, {"t": "第五编　我是谁：人格同一性", "p": 209, "l": 1}, {"t": "第三十五章　王子和鞋匠：换了身体，还是不是你", "p": 210, "l": 2}, {"t": "第三十六章　一个只有三十秒记忆的人，还是他自己吗", "p": 216, "l": 2}, {"t": "第三十七章　意识与记忆：洛克的\"我\"", "p": 219, "l": 2}, {"t": "第三十八章　忘了的事，算不算我做的", "p": 225, "l": 2}, {"t": "第三十九章　SDE 看\"我\"：一片场，不是一串记忆", "p": 231, "l": 2}, {"t": "第四十章　刷脸的时代：今天谁来证明\"你是你\"", "p": 236, "l": 2}, {"t": "第五编小结", "p": 240, "l": 2}, {"t": "第六编　词语与知识", "p": 241, "l": 1}, {"t": "第四十一章　词语是观念的记号", "p": 242, "l": 2}, {"t": "第四十二章　\"妈妈\"这个词，是怎样长出来的", "p": 247, "l": 2}, {"t": "第四十三章　名义本质与实在本质：金子到底是什么", "p": 250, "l": 2}, {"t": "第四十四章　冥王星不再是行星了：种类的边界是人划的", "p": 255, "l": 2}, {"t": "第四十五章　知识的三个等级，与一根测深绳", "p": 258, "l": 2}, {"t": "第四十六章　一条转了一千次的消息：洛克怎样对付谣言", "p": 264, "l": 2}, {"t": "第四十七章　理解力的行为：怎样训练自己的头脑", "p": 269, "l": 2}, {"t": "第四十八章　SDE 看语言：名是指针", "p": 275, "l": 2}, {"t": "第六编小结", "p": 280, "l": 2}, {"t": "第七编　政府论：权力从哪里来", "p": 281, "l": 1}, {"t": "第四十九章　自然状态：没有政府的时候", "p": 282, "l": 2}, {"t": "第五十章　霍布斯、洛克、卢梭：三种\"没有政府的时候\"", "p": 288, "l": 2}, {"t": "第五十一章　劳动与财产：掺进去的那一份", "p": 292, "l": 2}, {"t": "第五十二章　劳动的后代：斯密和马克思", "p": 299, "l": 2}, {"t": "第五十三章　同意与信托：政府凭什么有权", "p": 303, "l": 2}, {"t": "第五十四章　一个小区的业主委员会：同意与多数", "p": 309, "l": 2}, {"t": "第五十五章　反抗的权利：当政府背信", "p": 313, "l": 2}, {"t": "第五十六章　光荣革命：一场几乎没有流血的换王", "p": 318, "l": 2}, {"t": "第五十七章　卡罗来纳与奴隶：洛克的暗处", "p": 322, "l": 2}, {"t": "第五十八章　SDE 看契约：从点到场", "p": 328, "l": 2}, {"t": "第七编小结", "p": 332, "l": 2}, {"t": "第八编　宽容：信仰不能被强迫", "p": 333, "l": 1}, {"t": "第五十九章　《论宽容》：国家管身体，不管灵魂", "p": 334, "l": 2}, {"t": "第六十章　宽容的边界：洛克不宽容谁", "p": 339, "l": 2}, {"t": "第六十一章　《基督教的合理性》：一个信徒的理性", "p": 344, "l": 2}, {"t": "第六十二章　SDE 看宽容：两片场怎样相处", "p": 349, "l": 2}, {"t": "第六十三章　一栋楼里的宽容：两户邻居", "p": 353, "l": 2}, {"t": "第八编小结", "p": 357, "l": 2}, {"t": "第九编　教育：《教育漫话》", "p": 358, "l": 1}, {"t": "第六十四章　健全的心灵寓于健全的身体", "p": 359, "l": 2}, {"t": "第六十五章　先严后宽：洛克心里的父亲", "p": 364, "l": 2}, {"t": "第六十六章　孩子撒谎了怎么办", "p": 368, "l": 2}, {"t": "第六十七章　习惯比规则重要：不打孩子的教育", "p": 371, "l": 2}, {"t": "第六十八章　在家里请老师，还是送去学校", "p": 377, "l": 2}, {"t": "第六十九章　把《教育漫话》放进今天：四条还用得上的话", "p": 380, "l": 2}, {"t": "第七十章　洛克之后的教育接力：蒙台梭利和杜威", "p": 385, "l": 2}, {"t": "第九编小结", "p": 389, "l": 2}, {"t": "第十编　SDE 总解构与洛克之后", "p": 390, "l": 1}, {"t": "第七十一章　判词：盖章的比喻", "p": 391, "l": 2}, {"t": "第七十二章　三根承重梁：白纸、积木、单行道", "p": 396, "l": 2}, {"t": "第七十三章　闪光点清单：只差一步的地方", "p": 400, "l": 2}, {"t": "第七十四章　一位没见过几次面的朋友：莫利纽兹", "p": 406, "l": 2}, {"t": "第七十五章　死法诊断：洛克的体系为什么\"能死\"", "p": 410, "l": 2}, {"t": "第七十六章　一位主教的笔战：斯蒂林弗利特怎样逼洛克改书", "p": 415, "l": 2}, {"t": "第七十七章　贝克莱与休谟：白纸被推到尽头", "p": 418, "l": 2}, {"t": "第七十八章　里德：常识的反击", "p": 424, "l": 2}, {"t": "第七十九章　美国独立与现代人：他的政治活在我们身上", "p": 428, "l": 2}, {"t": "第八十章　伏尔泰眼里的洛克", "p": 433, "l": 2}, {"t": "第八十一章　白板之争：从行为主义到大模型", "p": 436, "l": 2}, {"t": "第八十二章　小阿尔伯特：一个被\"写上\"恐惧的婴儿", "p": 442, "l": 2}, {"t": "第八十三章　乔姆斯基和大模型：三百年争论的最新一场", "p": 446, "l": 2}, {"t": "第十编小结", "p": 450, "l": 2}, {"t": "第十一编　普通人拿走什么", "p": 452, "l": 1}, {"t": "第八十四章　教育：孩子不是白纸，也不是出厂的机器", "p": 453, "l": 2}, {"t": "第八十五章　从出生到三岁：场里最早的三年", "p": 459, "l": 2}, {"t": "第八十六章　二胎家庭：\"老大变得不懂事了\"", "p": 465, "l": 2}, {"t": "第八十七章　\"别人家的孩子\"：比较怎样伤到孩子的场", "p": 470, "l": 2}, {"t": "第八十八章　青春期：孩子关上了房门", "p": 475, "l": 2}, {"t": "第八十九章　刷题、分数与好奇心：一个小学生的晚上", "p": 480, "l": 2}, {"t": "第九十章　一位老师和一个\"差生\"：班级是一片场", "p": 485, "l": 2}, {"t": "第九十一章　放不下的手机游戏", "p": 490, "l": 2}, {"t": "第九十二章　高三：焦虑的孩子，和更焦虑的父母", "p": 494, "l": 2}, {"t": "第九十三章　爷爷奶奶带大的孩子", "p": 498, "l": 2}, {"t": "第九十四章　大二的迷茫：\"我不知道自己喜欢什么\"", "p": 502, "l": 2}, {"t": "第九十五章　领养的孩子：两片土壤", "p": 507, "l": 2}, {"t": "第九十六章　孩子问：\"我是从哪里来的？\"", "p": 510, "l": 2}, {"t": "第九十七章　健康：习惯怎样被写进身体", "p": 513, "l": 2}, {"t": "第九十八章　孕期：给十个月一片好的场", "p": 518, "l": 2}, {"t": "第九十九章　产后：一个新手妈妈的场塌了", "p": 522, "l": 2}, {"t": "第一百章　网上查病，越查越怕：相信的程度要和证据相称", "p": 526, "l": 2}, {"t": "第一百零一章　一张药单和一位七十岁的老人", "p": 530, "l": 2}, {"t": "第一百零二章　一把椅子写出来的身体", "p": 534, "l": 2}, {"t": "第一百零三章　压力写进身体：胃疼、头疼和\"查不出毛病\"", "p": 538, "l": 2}, {"t": "第一百零四章　照顾中风的父亲：照顾者的身体", "p": 542, "l": 2}, {"t": "第一百零五章　凌晨一点还在刷手机的年轻人", "p": 546, "l": 2}, {"t": "第一百零六章　挑食的孩子：味道是十个月和三年写出来的", "p": 550, "l": 2}, {"t": "第一百零七章　戒不掉的烟：一只粘了二十年的箱子", "p": 553, "l": 2}, {"t": "第一百零八章　把 AI 当健康顾问：说得流利，不等于说得对", "p": 557, "l": 2}, {"t": "第一百零九章　一场手术以后：身体要重新长一遍", "p": 561, "l": 2}, {"t": "第一百一十章　健康板块小结：身体是一片被写的场", "p": 565, "l": 2}, {"t": "第一百一十一章　事业与财产：劳动掺进去的那一份，今天怎么算", "p": 568, "l": 2}, {"t": "第一百一十二章　第一份工作：\"我什么都不会\"", "p": 574, "l": 2}, {"t": "第一百一十三章　\"你不适合这一行\"：一句话怎样变成出厂设置", "p": 577, "l": 2}, {"t": "第一百一十四章　四十岁转行：不是从零开始", "p": 580, "l": 2}, {"t": "第一百一十五章　开一家小店的第一年", "p": 583, "l": 2}, {"t": "第一百一十六章　第一次当主管", "p": 586, "l": 2}, {"t": "第一百一十七章　一张绩效表格能看见什么", "p": 589, "l": 2}, {"t": "第一百一十八章　办公室里的\"箱子\"：一个同事让你莫名反感", "p": 592, "l": 2}, {"t": "第一百一十九章　被裁员以后：像洛克一样流亡一次", "p": 595, "l": 2}, {"t": "第一百二十章　签下的合同：同意是一次，还是每一天", "p": 598, "l": 2}, {"t": "第一百二十一章　副业与斜杠：一个人的劳动掺进了几样东西", "p": 601, "l": 2}, {"t": "第一百二十二章　退休：一个人的场突然空了", "p": 604, "l": 2}, {"t": "第一百二十三章　新人没有练手的活了", "p": 607, "l": 2}, {"t": "第一百二十四章　谈加薪：把你掺进去的劳动说清楚", "p": 610, "l": 2}, {"t": "第一百二十五章　把家族生意交给下一代", "p": 613, "l": 2}, {"t": "第一百二十六章　老员工和\"00 后\"：两片场在一个办公室里", "p": 616, "l": 2}, {"t": "第一百二十七章　事业板块小结：你的劳动，掺进了一片场", "p": 620, "l": 2}, {"t": "第一百二十八章　练习一：在你家里找三根梁", "p": 623, "l": 2}, {"t": "第一百二十九章　练习二：给你心里最坚定的一个想法，写一条死法", "p": 626, "l": 2}, {"t": "第一百三十章　一位老人写回忆录：把一生排成一条序列", "p": 630, "l": 2}, {"t": "第十一编小结　洛克的白纸，今天怎么用", "p": 633, "l": 2}, {"t": "结语　纸不白，手也在纸上", "p": 635, "l": 1}, {"t": "参考书目", "p": 639, "l": 1}, {"t": "附录一　洛克年表与人生 SDE 序列表", "p": 646, "l": 1}, {"t": "附录二　洛克术语大白话词典", "p": 651, "l": 1}, {"t": "附录三　关键原文出处对照", "p": 663, "l": 1}, {"t": "附录四　洛克与 SDE 核心判断对照表", "p": 669, "l": 1}, {"t": "后记", "p": 673, "l": 1}]</script>
+
+<script>
+(function(){
+'use strict';
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var TOC = JSON.parse(document.getElementById('toc').textContent);
+var $ = function(id){ return document.getElementById(id); };
+
+var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var themes=['','day','sepia'], ti=0;
+var cache={}, textCache={};
+
+function msg(t, spin){ $('msgT').textContent=t; $('msg').classList.remove('hide');
+  $('msg').querySelector('.sp').style.display = spin===false?'none':''; }
+function hideMsg(){ $('msg').classList.add('hide'); }
+function hint(t){ var h=$('hint'); h.textContent=t; h.classList.add('show');
+  clearTimeout(h._t); h._t=setTimeout(function(){h.classList.remove('show');},1400); }
+
+/* ── 版心尺寸：按舞台可用空间算，双页则一半 ── */
+function box(){
+  var st=$('stage'), W=st.clientWidth-40, H=st.clientHeight-30;
+  var n = spread?2:1;
+  return {W:W, H:H, n:n};
+}
+function fit(vp){
+  var b=box();
+  var maxW=(b.W/b.n), maxH=b.H;
+  var s=Math.min(maxW/vp.width, maxH/vp.height)*zoom;
+  return s;
+}
+
+/* ── 渲染一页：优先矢量(SVG)，失败回落高清 canvas ── */
+function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
+  var leaf = canvasEl.parentNode;
+  if(pageNo<1||pageNo>total){ leaf.style.visibility='hidden'; if(tlEl) tlEl.innerHTML=''; cb&&cb(); return; }
+  leaf.style.visibility='visible';
+  doc.getPage(pageNo).then(function(pg){
+    var vp0=pg.getViewport({scale:1});
+    var sc=fit(vp0), vp=pg.getViewport({scale:sc});
+    leaf.style.width=Math.round(vp.width)+'px';
+    leaf.style.height=Math.round(vp.height)+'px';
+    if(vector && svgEl && window.pdfjsLib && pdfjsLib.SVGGraphics){
+      leaf.classList.add('vec');
+      pg.getOperatorList().then(function(ops){
+        var g=new pdfjsLib.SVGGraphics(pg.commonObjs, pg.objs);
+        g.embedFonts=true;
+        return g.getSVG(ops, vp);
+      }).then(function(svg){
+        svg.setAttribute('width', Math.round(vp.width));
+        svg.setAttribute('height', Math.round(vp.height));
+        svgEl.innerHTML=''; svgEl.appendChild(svg);
+        if(tlEl) buildText(pg, vp, tlEl);
+        cb&&cb();
+      }).catch(function(){
+        vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
+        hint('此文档的矢量渲染不可用，已切回高清位图');
+        leaf.classList.remove('vec');
+        drawCanvas(pg, vp, canvasEl, tlEl, cb);
+      });
+    }else{
+      leaf.classList.remove('vec');
+      drawCanvas(pg, vp, canvasEl, tlEl, cb);
+    }
+  }).catch(function(){ cb&&cb(); });
+}
+
+function drawCanvas(pg, vp, canvasEl, tlEl, cb){
+  var dpr=Math.min(window.devicePixelRatio||1, 3);
+  canvasEl.width=Math.round(vp.width*dpr); canvasEl.height=Math.round(vp.height*dpr);
+  canvasEl.style.width=Math.round(vp.width)+'px'; canvasEl.style.height=Math.round(vp.height)+'px';
+  var ctx=canvasEl.getContext('2d',{alpha:false});
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#FBF7EE'; ctx.fillRect(0,0,vp.width,vp.height);
+  pg.render({canvasContext:ctx, viewport:vp, intent:'display'}).promise.then(function(){
+    if(tlEl) buildText(pg, vp, tlEl);
+    cb&&cb();
+  }).catch(function(){ cb&&cb(); });
+}
+
+function buildText(pg, vp, el){
+  el.innerHTML='';
+  pg.getTextContent().then(function(tc){
+    var frag=document.createDocumentFragment();
+    tc.items.forEach(function(it){
+      if(!it.str) return;
+      var tx=pdfjsLib.Util.transform(vp.transform, it.transform);
+      var s=document.createElement('span');
+      s.textContent=it.str;
+      var h=Math.hypot(tx[2],tx[3]);
+      s.style.left=tx[4]+'px'; s.style.top=(tx[5]-h)+'px';
+      s.style.fontSize=h+'px'; s.style.fontFamily='sans-serif';
+      frag.appendChild(s);
+    });
+    el.appendChild(frag);
+  }).catch(function(){});
+}
+
+/* ── 展示当前跨页 ── */
+function show(cb){
+  if(rendering){ return; }
+  rendering=true;
+  document.getElementById('book').classList.toggle('single', !spread);
+  $('leafR').style.display = spread?'':'none';
+  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  if(left<1) left=0;
+  var right= left+1;
+  var done=0, need=spread?2:1;
+  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
+  if(spread){
+    $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
+    $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
+    renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
+    renderInto(right, $('cR'), $('tR'), fin, $('sR'));
+  }else{
+    $('nL').textContent = cur-CFG.offset+1>0?(cur-CFG.offset+1):'';
+    renderInto(cur, $('cL'), $('tL'), fin, $('sL'));
+  }
+}
+
+function sync(){
+  var printed = Math.max(1, cur-CFG.offset+1);
+  $('pi').value = printed;
+  $('pt').textContent = Math.max(1,total-CFG.offset+1);
+  var r = (cur-1)/Math.max(1,total-1);
+  $('fill').style.width=(r*100)+'%';
+  $('knob').style.left=(r*100)+'%';
+  try{ localStorage.setItem(CFG.key, String(cur)); }catch(e){}
+  Array.prototype.forEach.call($('thumbs').children, function(c){
+    c.classList.toggle('cur', +c.dataset.p===cur);
+  });
+}
+
+/* ── 翻页（带动画） ── */
+function step(dir){
+  var n = spread?2:1;
+  var t = cur + dir*n;
+  if(t<1) t=1; if(t>total) t=total;
+  if(t===cur) return;
+  animate(dir, function(){ cur=t; show(); });
+}
+function animate(dir, after){
+  var src = dir>0 ? $('leafR') : $('leafL');
+  if(!spread || !src || src.style.display==='none'){ after(); return; }
+  var fl=document.createElement('div');
+  fl.className='flip'+(dir>0?'':' back');
+  var w=src.offsetWidth, h=src.offsetHeight;
+  fl.style.width=w+'px'; fl.style.height=h+'px';
+  fl.style.left = dir>0 ? (w+'px') : '0px';
+  var live = src.classList.contains('vec') ? src.querySelector('.svg svg') : src.querySelector('canvas');
+  if(live){
+    var cl = live.cloneNode(true);
+    cl.style.width='100%'; cl.style.height='100%'; cl.style.display='block';
+    fl.appendChild(cl);
+  }
+  $('book').appendChild(fl);
+  requestAnimationFrame(function(){ fl.classList.add('go'); });
+  setTimeout(function(){ fl.remove(); after(); }, 620);
+}
+function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+
+/* ── 目录 ── */
+function buildToc(){
+  var box=$('dlist'); box.innerHTML='';
+  TOC.forEach(function(e){
+    var a=document.createElement('a');
+    a.className = e.l===1?'l1':'l2';
+    a.href='#'; a.innerHTML='<span>'+e.t.replace(/</g,'&lt;')+'</span><span class="n">'+e.p+'</span>';
+    a.onclick=function(ev){ ev.preventDefault(); go(e.p+CFG.offset-1); closeDrawer(); };
+    box.appendChild(a);
+  });
+}
+function closeDrawer(){ $('drawer').classList.remove('open'); }
+
+/* ── 全书检索 ── */
+function search(q){
+  if(!q){ $('dHead').textContent='目　录'; buildToc(); return; }
+  var box=$('dlist'); box.innerHTML=''; $('dHead').textContent='检索：'+q;
+  var found=0, scanned=0;
+  msg('正在检索全书…');
+  function scan(i){
+    if(i>total || found>=120){ hideMsg(); if(!found){ box.innerHTML='<div class="hit">没有找到。</div>'; } return; }
+    var pr = textCache[i] ? Promise.resolve(textCache[i])
+      : doc.getPage(i).then(function(p){ return p.getTextContent(); })
+          .then(function(tc){ var s=tc.items.map(function(x){return x.str;}).join(''); textCache[i]=s; return s; });
+    pr.then(function(s){
+      var k=s.indexOf(q);
+      if(k>=0){
+        found++;
+        var d=document.createElement('div'); d.className='hit';
+        var a=Math.max(0,k-16), b=Math.min(s.length,k+q.length+22);
+        d.innerHTML='<b>'+(i-CFG.offset+1)+'</b>　'+s.slice(a,k).replace(/</g,'&lt;')+
+          '<b>'+q.replace(/</g,'&lt;')+'</b>'+s.slice(k+q.length,b).replace(/</g,'&lt;');
+        d.onclick=function(){ go(i); closeDrawer(); };
+        box.appendChild(d);
+      }
+      scanned++;
+      if(scanned%12===0){ $('msgT').textContent='正在检索全书…  '+Math.round(i/total*100)+'%'; }
+      scan(i+1);
+    }).catch(function(){ scan(i+1); });
+  }
+  scan(1);
+}
+
+/* ── 缩略图 ── */
+var thumbsBuilt=false;
+function buildThumbs(){
+  if(thumbsBuilt) return; thumbsBuilt=true;
+  var wrap=$('thumbs');
+  var i=1;
+  function one(){
+    if(i>total) return;
+    var p=i;
+    doc.getPage(p).then(function(pg){
+      var vp=pg.getViewport({scale:1});
+      var s=150/vp.height, v=pg.getViewport({scale:s});
+      var c=document.createElement('canvas');
+      c.width=v.width; c.height=v.height; c.dataset.p=p;
+      c.onclick=function(){ go(p); };
+      wrap.appendChild(c);
+      return pg.render({canvasContext:c.getContext('2d'), viewport:v}).promise;
+    }).then(function(){ i++; setTimeout(one, 0); }).catch(function(){ i++; setTimeout(one,0); });
+  }
+  one();
+}
+
+/* ── 事件 ── */
+$('btnPrev').onclick=function(){ step(-1); };
+$('btnNext').onclick=function(){ step(1); };
+$('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
+$('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
+$('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);
+  this.textContent=vector?'矢量':'位图'; hint(vector?'矢量源渲染':'高清位图'); show(); };
+$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'%'); };
+$('btnZoomOut').onclick=function(){ zoom=Math.max(.5, zoom/1.15); show(); hint('缩小 '+Math.round(zoom*100)+'%'); };
+$('btnThumbs').onclick=function(){ $('thumbs').classList.toggle('open'); if($('thumbs').classList.contains('open')) buildThumbs(); };
+$('btnTheme').onclick=function(){ ti=(ti+1)%3; document.documentElement.className=themes[ti];
+  this.textContent=['夜','日','纸'][ti]; show(); };
+$('btnFull').onclick=function(){ if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); };
+$('q').onkeydown=function(e){ if(e.key==='Enter'){ search(this.value.trim()); } };
+$('rail').onclick=function(e){ var r=this.getBoundingClientRect();
+  go(Math.round((e.clientX-r.left)/r.width*(total-1))+1); };
+
+document.addEventListener('keydown',function(e){
+  if(/input|textarea|select/i.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){ step(-1); e.preventDefault(); }
+  else if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ step(1); e.preventDefault(); }
+  else if(e.key==='Home'){ go(1); } else if(e.key==='End'){ go(total); }
+  else if(e.key==='t'||e.key==='T'){ $('btnToc').click(); }
+  else if(e.key==='d'||e.key==='D'){ $('btnSpread').click(); }
+  else if(e.key==='v'||e.key==='V'){ $('btnVec').click(); }
+  else if(e.key==='n'||e.key==='N'){ $('btnTheme').click(); }
+  else if(e.key==='f'||e.key==='F'){ $('btnFull').click(); }
+});
+var sx=0, sy=0;
+$('stage').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+$('stage').addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.4){ step(dx<0?1:-1); }
+},{passive:true});
+var rt=null;
+window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ show(); },160); });
+
+/* ── 启动 ── */
+function boot(){
+  if(!window.pdfjsLib){ setTimeout(boot,120); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  $('btnVec').classList.add('on');
+  msg('正在载入《普通人都能懂的洛克》…');
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144}).promise.then(function(d){
+    doc=d; total=d.numPages;
+    buildToc();
+    var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
+    cur = (saved>0&&saved<=total) ? saved : 1;
+    if(window.innerWidth<820) spread=false, $('btnSpread').textContent='单页';
+    show(function(){ if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
+  }).catch(function(err){
+    msg('书页载入失败。可直接打开原文 PDF：'+CFG.pdf, false);
+  });
+}
+boot();
+})();
+</script>
+</body>
+</html>
