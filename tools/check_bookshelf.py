@@ -28,6 +28,7 @@ def local_of(url):
         return None
     if url.startswith(SITE):
         url = url[len(SITE):]
+    url = url.split('#', 1)[0].split('?', 1)[0]  # 缓存参数（?v=…）不属于文件路径
     if not url.startswith('/'):
         return None
     p = os.path.join(PUB, urllib.parse.unquote(url).lstrip('/'))
