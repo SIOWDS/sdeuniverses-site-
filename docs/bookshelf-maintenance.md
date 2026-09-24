@@ -107,3 +107,26 @@ PDF.js 3.11 默认用 OffscreenCanvas 把图片解成 ImageBitmap，`imgData.dat
 所以现行这一行是：
 `pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false})`
 两个参数缺一不可。两个都开了仍退回位图的，才是 PDF 本身含 SVGGraphics 不支持的东西，要改 PDF，不是改阅读器。
+
+---
+
+# 追记 · 2026-09-24（三）　全部翻页阅读器统一为矢量渲染（旧式位图阅读器整批迁移）
+
+**结果**：专著书架下凡是 PDF 源的翻页阅读器，全部走 PDF.js SVGGraphics 矢量渲染，`getDocument` 一律带
+`fontExtraProperties:true, isOffscreenCanvasSupported:false`。
+
+| 类 | 数 | 做法 |
+|---|---|---|
+| 旧式位图阅读器（`PDF_URL` 那一种） | 66 | `tools/build_flip_reader.py migrate` 整批迁到矢量模板；目录从 PDF 书签生成（书签过细时只留第一层；没有书签的书，浏览器端再兜一次）；页码按物理页（offset 1）；**保留 WDS 陪读**（`WDS_READ` ＋ wds-read.js / wds-mode.js） |
+| 手写矢量阅读器 | 43 | 加**逐页回退**（188、192 原本就是）：某页画不了矢量只那一页用高清位图，其余页照旧矢量；连续失败 6 页以上且失败多于成功，才整本切位图 |
+| 共享 `books/reader/reader.js`（19 本 PDF 源＋10 本 HTML 源） | 1 个文件 | 加矢量渲染＋逐页回退，两个参数照抄；版本号升 `20260924-reader-v3` |
+| `lion-city-glory` | 1 | 自有版式，未动，单独维护 |
+
+**模板与生成器**：模板 `tools/flip_reader_template.html`（`tools/book_read_template.html` 与它相同）；
+生成器 `tools/build_flip_reader.py`：`one`（新书）、`migrate`（旧阅读器整批迁移）。
+
+**一个差点出事的坑**：`tools/build_book_readers.py` 会按 catalog 里的 `reader` 字段重建阅读器，
+m/34、130、133 在 catalog 里也有 `reader` 字段——一跑就把它们的手写矢量阅读器冲回 reader.js 位图版。
+已加保护：**已存在且含 SVGGraphics 的阅读器不再被覆盖**。
+
+**体检**：`tools/check_bookshelf.py` 新增第 ⑦ 道——PDF 源阅读器缺 SVGGraphics、缺两个参数之一，即报错。

@@ -6,7 +6,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 import json,html
 ROOT=Path(__file__).resolve().parents[1]
-VERSION='20260919-reader-v2'
+VERSION='20260924-reader-v3'
 DATA=json.loads((ROOT/'public/books/catalog.json').read_text())
 def esc(value):return html.escape(str(value),quote=True)
 def build(book):
@@ -24,8 +24,12 @@ def build(book):
 <main><div id="reader-error" class="reader-error" role="alert" hidden><p id="error-message"></p><button id="retry" type="button">重新载入</button> <a id="error-source" href="'''+esc(cfg['sources'][0]['url'])+'''">打开原文</a></div><div id="stage" class="stage"><div id="html-paper" class="html-paper" hidden><div id="text-viewport" class="text-viewport"><article id="text-flow" class="text-flow"></article></div></div><div id="pdf-paper" class="pdf-paper" hidden><canvas id="pdfCanvas" aria-label="当前书页"></canvas><div id="textLayer" class="textLayer"></div></div></div><div id="reader-status" class="reader-status" role="status" aria-live="polite">正在载入书页…</div><div class="reader-hint">上一页 / 下一页 · 输入页码跳转 · ← → 方向键翻页 · 自动记住阅读位置　<a id="source-link" class="source-link" href="'''+esc(cfg['sources'][0]['url'])+'''">原文</a></div><noscript><section class="source-fallback"><p>启用 JavaScript 即可翻页阅读，也可直接打开原文：</p><ol>'''+fallback+'''</ol></section></noscript></main>
 <script type="application/json" id="reader-config">'''+config+'''</script></body></html>'''
  path=ROOT/('public'+urlsplit(book['flipUrl']).path)
+ # 手写的矢量翻页阅读器（含 SVGGraphics）不许被本脚本覆盖——2026-09-24 曾把 m/34、130、133 冲回位图版
+ if path.exists() and 'SVGGraphics' in path.read_text(errors='ignore'):
+  return None
  path.parent.mkdir(parents=True,exist_ok=True);path.write_text(out)
  return str(path.relative_to(ROOT))
 if __name__=='__main__':
  paths=[build(b) for b in DATA['books'] if b.get('reader')]
- print('Built',len(paths),'complete-book readers.')
+ kept=paths.count(None)
+ print('Built',len(paths)-kept,'complete-book readers;',kept,'hand-made vector readers kept.')

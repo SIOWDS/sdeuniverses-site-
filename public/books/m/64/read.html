@@ -192,7 +192,7 @@ var $ = function(id){ return document.getElementById(id); };
 
 var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
 var themes=['','day','sepia'], ti=0;
-var cache={}, textCache={};
+var cache={}, textCache={}, vecOK=0, vecFail=0;
 
 function msg(t, spin){ $('msgT').textContent=t; $('msg').classList.remove('hide');
   $('msg').querySelector('.sp').style.display = spin===false?'none':''; }
@@ -230,14 +230,20 @@ function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
         g.embedFonts=true;
         return g.getSVG(ops, vp);
       }).then(function(svg){
+        vecOK++;
         svg.setAttribute('width', Math.round(vp.width));
         svg.setAttribute('height', Math.round(vp.height));
         svgEl.innerHTML=''; svgEl.appendChild(svg);
         if(tlEl) buildText(pg, vp, tlEl);
         cb&&cb();
       }).catch(function(){
-        vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
-        hint('此文档的矢量渲染不可用，已切回高清位图');
+        /* 逐页回退：这一页含矢量后端不支持的内容（多为位图封面、插图），只这一页用高清位图；
+           其余页照旧矢量。连续失败过多才整本切到位图。 */
+        vecFail++;
+        if(vecFail>=6 && vecFail>vecOK){
+          vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
+          hint('此文档的矢量渲染不可用，已切回高清位图');
+        }
         leaf.classList.remove('vec');
         drawCanvas(pg, vp, canvasEl, tlEl, cb);
       });

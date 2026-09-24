@@ -58,6 +58,28 @@ def check_catalog():
         fails.append(f'catalog 指向不存在的本地文件 {bad} 处')
 
 
+
+def check_vector_readers():
+    """⑦ 翻页阅读器的矢量渲染：PDF 源阅读器必须走 SVGGraphics，且 getDocument 带 fontExtraProperties"""
+    print('⑦ 翻页阅读器矢量渲染')
+    allow = {'books/lion-city-glory/read.html'}  # 自有版式阅读器，单独维护
+    bad = 0
+    shared = open(os.path.join(PUB, 'books/reader/reader.js'), encoding='utf-8').read()
+    if 'SVGGraphics' not in shared or 'fontExtraProperties' not in shared or 'isOffscreenCanvasSupported:false' not in shared:
+        print('   ✗ books/reader/reader.js 缺矢量渲染或 fontExtraProperties'); bad += 1
+    for r in sorted(glob.glob(os.path.join(PUB, 'books/**/read*.html'), recursive=True)):
+        rp = os.path.relpath(r, PUB).replace(os.sep, '/')
+        h = open(r, encoding='utf-8', errors='ignore').read()
+        if 'reader-config' in h or 'getDocument' not in h or rp in allow:
+            continue
+        if 'SVGGraphics' not in h:
+            print(f'   ✗ {rp} 仍是位图阅读器（用 tools/build_flip_reader.py migrate 迁移）'); bad += 1
+        elif 'fontExtraProperties' not in h or 'isOffscreenCanvasSupported:false' not in h:
+            print(f'   ✗ {rp} getDocument 缺 fontExtraProperties 或 isOffscreenCanvasSupported:false（矢量会静默退回位图）'); bad += 1
+    print(f'   异常 {bad}')
+    if bad:
+        fails.append(f'翻页阅读器矢量渲染异常 {bad} 处')
+
 def check_pdf_url():
     """③ 老阅读器的 PDF 源：存在性、中文未编码、指向已迁走的路径"""
     print('③ 老阅读器 PDF_URL')
@@ -214,6 +236,7 @@ if __name__ == '__main__':
     check_catalog()
     check_covers()
     check_pdf_url()
+    check_vector_readers()
     check_abs_refs()
     if a.online:
         check_online()

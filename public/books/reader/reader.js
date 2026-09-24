@@ -5,6 +5,8 @@
  const prev=$('prev'),next=$('next'),input=$('pageInput'),totalEl=$('totalPages'),select=$('chapter'),status=$('reader-status');
  const paper=$('html-paper'),flow=$('text-flow'),viewport=$('text-viewport'),pdfPaper=$('pdf-paper'),canvas=$('pdfCanvas'),layer=$('textLayer');
  const pdfMode=cfg.format==='pdf',cache=new Map(),storageKey='sde-book-page:'+cfg.id;
+ /* 矢量渲染：PDF.js SVGGraphics，失败自动退回高清位图（getDocument 必须带 fontExtraProperties，见 docs/bookshelf-maintenance.md 2026-09-24） */
+ let vec=true,vecOK=0,vecFail=0;const svgBox=document.createElement('div');svgBox.className='pdf-svg';svgBox.style.display='none';if(pdfPaper)pdfPaper.insertBefore(svgBox,canvas);
  let section=0,page=1,total=1,zoom=1,font=18,busy=false,token=0,doc=null,renderTask=null,textTask=null,stride=0,resizeTimer,htmlText='';
  const params=new URLSearchParams(location.hash.slice(1));
  let saved={};try{saved=JSON.parse(localStorage.getItem(storageKey)||'{}');}catch(e){}
@@ -58,7 +60,14 @@
    const scale=Math.min(1.55,available/natural.width)*zoom,vp=pdfPage.getViewport({scale});const ratio=Math.min(devicePixelRatio||1,2);
    canvas.width=Math.floor(vp.width*ratio);canvas.height=Math.floor(vp.height*ratio);canvas.style.width=vp.width+'px';canvas.style.height=vp.height+'px';
    pdfPaper.style.width=vp.width+'px';pdfPaper.style.height=vp.height+'px';layer.replaceChildren();layer.style.setProperty('--scale-factor',scale);
-   const ctx=canvas.getContext('2d');renderTask=pdfPage.render({canvasContext:ctx,viewport:vp,transform:ratio===1?null:[ratio,0,0,ratio,0,0]});await renderTask.promise;if(current!==token)return;renderTask=null;
+   let drawn=false;
+   if(vec&&window.pdfjsLib&&pdfjsLib.SVGGraphics){
+    try{const ops=await pdfPage.getOperatorList();if(current!==token)return;const g=new pdfjsLib.SVGGraphics(pdfPage.commonObjs,pdfPage.objs);g.embedFonts=true;const svg=await g.getSVG(ops,vp);if(current!==token)return;
+     svg.setAttribute('width',vp.width);svg.setAttribute('height',vp.height);svg.style.display='block';svgBox.replaceChildren(svg);svgBox.style.display='block';canvas.style.display='none';drawn=true;vecOK++;}
+    catch(e){vecFail++;if(vecFail>=6&&vecFail>vecOK)vec=false;console.warn('Book reader: page '+page+' falls back to bitmap (unsupported by the vector backend)',e);}
+   }
+   if(!drawn){svgBox.style.display='none';svgBox.replaceChildren();canvas.style.display='';
+   const ctx=canvas.getContext('2d');renderTask=pdfPage.render({canvasContext:ctx,viewport:vp,transform:ratio===1?null:[ratio,0,0,ratio,0,0]});await renderTask.promise;if(current!==token)return;renderTask=null;}
    const tc=await pdfPage.getTextContent();if(current!==token)return;
    htmlText=tc.items.map(x=>x.str).join(' ');textTask=pdfjsLib.renderTextLayer({textContentSource:tc,container:layer,viewport:vp,textDivs:[]});await textTask.promise;if(current!==token)return;
    busy=false;paint();persist();
@@ -72,7 +81,7 @@
     if(!window.pdfjsLib)throw Error('PDF library unavailable');
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     if(doc){await doc.destroy();doc=null;}
-    doc=await pdfjsLib.getDocument(source.url).promise;pdfPaper.hidden=false;await renderPDF(requested);
+    doc=await pdfjsLib.getDocument({url:source.url,fontExtraProperties:true,isOffscreenCanvasSupported:false}).promise;pdfPaper.hidden=false;await renderPDF(requested);
    }else{
     let html=cache.get(source.url);if(!html){const response=await fetch(source.url);if(!response.ok)throw Error('HTTP '+response.status);html=cleanHTML(await response.text(),source.url);cache.set(source.url,html);}
     flow.innerHTML=html;htmlText=flow.textContent;paper.hidden=false;
