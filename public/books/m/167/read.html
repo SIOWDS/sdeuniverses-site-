@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>友好阅读 · 在线翻页 · 普通人都能懂的奎因 | SDE Universes</title>
+<meta name="description" content="《普通人都能懂的奎因——一个人、一句「存在就是被感知」，与 SDE 的解构》在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
+<meta name="tier" content="L0">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/167/read.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0C0F13; --bg2:#141A21; --fg:#E9E6DE; --dim:#8E97A1; --line:#242D36;
+  --gold:#D9A441; --paper:#FBF7EE; --paper2:#F2ECDF; --ink:#1A1713;
+  --shadow:0 30px 80px rgba(0,0,0,.55);
+}
+html.sepia{--paper:#F6ECD8;--paper2:#EEE1C7}
+html.day{--bg:#E8E4DB;--bg2:#F2EFE7;--fg:#22262B;--dim:#5C646D;--line:#CFC9BD}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,var(--bg2),var(--bg)) fixed;
+  color:var(--fg);font:15px/1.7 "Noto Serif SC","EB Garamond",Georgia,serif;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);
+  overflow:hidden}
+
+/* ── 顶栏 ── */
+.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;align-items:center;gap:.8rem;
+  padding:.55rem 1rem calc(.55rem);background:rgba(12,15,19,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding-top:calc(.55rem + env(safe-area-inset-top,0))}
+html.day .top{background:rgba(232,228,219,.8)}
+.top .ttl{font-weight:600;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{color:var(--dim);font-size:.78rem;margin-left:.2rem;white-space:nowrap}
+.spacer{margin-left:auto}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);
+  border-radius:8px;padding:.3rem .6rem;cursor:pointer;transition:.18s}
+button:hover:not(:disabled),select:hover{border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.on{border-color:var(--gold);color:var(--gold)}
+.ico{font-size:1rem;line-height:1}
+
+/* ── 舞台 ── */
+.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:center;overflow:hidden}
+.book{position:relative;display:flex;gap:0;filter:drop-shadow(0 24px 60px rgba(0,0,0,.5));
+  transform-style:preserve-3d;perspective:2600px}
+.leaf{position:relative;background:var(--paper);overflow:hidden}
+.leaf canvas{display:block;width:100%;height:100%}
+.leaf .svg{position:absolute;inset:0;display:none}
+.leaf .svg svg{display:block;width:100%;height:100%}
+.leaf.vec canvas{display:none}
+.leaf.vec .svg{display:block}
+.leaf.l{border-radius:4px 0 0 4px;box-shadow:inset -22px 0 34px -26px rgba(0,0,0,.55)}
+.leaf.r{border-radius:0 4px 4px 0;box-shadow:inset 22px 0 34px -26px rgba(0,0,0,.55)}
+.single .leaf{border-radius:4px}
+.gutter{position:absolute;top:0;bottom:0;left:50%;width:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.20),rgba(0,0,0,0));pointer-events:none;z-index:3}
+.single .gutter{display:none}
+.pno{position:absolute;bottom:6px;font-size:11px;color:#9a8f7c;letter-spacing:.08em;z-index:4}
+.leaf.l .pno{left:14px}.leaf.r .pno{right:14px}
+
+/* 翻页动画 */
+.flip{position:absolute;top:0;bottom:0;z-index:9;background:var(--paper);
+  transform-origin:left center;backface-visibility:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,.35);border-radius:0 4px 4px 0}
+.flip.back{transform-origin:right center;border-radius:4px 0 0 4px}
+.flip canvas{display:block;width:100%;height:100%}
+@keyframes fwd{from{transform:rotateY(0)}to{transform:rotateY(-178deg)}}
+@keyframes bwd{from{transform:rotateY(0)}to{transform:rotateY(178deg)}}
+.flip.go{animation:fwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+.flip.back.go{animation:bwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+@media (prefers-reduced-motion:reduce){.flip.go,.flip.back.go{animation-duration:.01s}}
+
+/* 文本层（可选可搜） */
+.tl{position:absolute;inset:0;overflow:hidden;opacity:.01;line-height:1;z-index:2}
+.tl span{position:absolute;white-space:pre;transform-origin:0 0;color:transparent;cursor:text}
+.tl ::selection{background:rgba(217,164,65,.35)}
+.tl mark{background:rgba(217,164,65,.55);color:transparent;border-radius:2px}
+
+/* ── 底栏 ── */
+.bot{position:fixed;inset:auto 0 0 0;z-index:40;display:flex;align-items:center;gap:.7rem;
+  padding:.5rem 1rem calc(.5rem + env(safe-area-inset-bottom,0));
+  background:rgba(12,15,19,.72);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+html.day .bot{background:rgba(232,228,219,.8)}
+.rail{position:relative;flex:1;height:22px;display:flex;align-items:center;cursor:pointer}
+.rail .bar{position:absolute;left:0;right:0;height:3px;background:var(--line);border-radius:3px}
+.rail .fill{position:absolute;left:0;height:3px;background:linear-gradient(90deg,var(--gold),#F0CE86);border-radius:3px}
+.rail .knob{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--gold);
+  transform:translateX(-50%);box-shadow:0 0 0 4px rgba(217,164,65,.18)}
+.pg{font-variant-numeric:tabular-nums;color:var(--dim);font-size:.82rem;white-space:nowrap}
+.pg input{width:3.4rem;text-align:center;background:transparent;border:1px solid var(--line);
+  border-radius:6px;color:var(--fg);font:inherit;padding:.12rem .2rem}
+
+/* ── 抽屉 ── */
+.drawer{position:fixed;top:52px;bottom:62px;left:0;width:min(330px,86vw);z-index:45;
+  background:rgba(16,21,27,.97);border-right:1px solid var(--line);
+  transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;backdrop-filter:blur(10px)}
+html.day .drawer{background:rgba(242,239,231,.97)}
+.drawer.open{transform:none}
+.drawer h3{margin:0;padding:.8rem 1rem .5rem;font-size:.8rem;letter-spacing:.24em;color:var(--dim);font-weight:400}
+.dlist{flex:1;overflow:auto;padding:0 .4rem 1rem}
+.dlist a{display:flex;gap:.5rem;align-items:baseline;padding:.32rem .6rem;border-radius:7px;
+  color:var(--fg);text-decoration:none;font-size:.86rem}
+.dlist a:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.dlist a.l1{font-weight:600;margin-top:.5rem}
+.dlist a.l2{padding-left:1.5rem;color:var(--dim);font-size:.8rem}
+.dlist a .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.76rem}
+.sbox{padding:.5rem 1rem}
+.sbox input{width:100%;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--fg);font:inherit;padding:.4rem .6rem}
+.hit{padding:.35rem .6rem;border-radius:7px;font-size:.8rem;color:var(--dim);cursor:pointer}
+.hit:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.hit b{color:var(--gold);font-weight:600}
+
+/* 缩略图 */
+.thumbs{position:fixed;left:0;right:0;bottom:62px;z-index:44;display:flex;gap:.5rem;
+  padding:.6rem 1rem;overflow-x:auto;background:rgba(12,15,19,.92);border-top:1px solid var(--line);
+  transform:translateY(120%);transition:transform .28s}
+.thumbs.open{transform:none}
+.thumbs canvas{height:112px;width:auto;border-radius:3px;cursor:pointer;opacity:.62;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);transition:.18s}
+.thumbs canvas:hover,.thumbs canvas.cur{opacity:1;outline:2px solid var(--gold)}
+
+.msg{position:fixed;inset:0;display:grid;place-items:center;z-index:60;color:var(--dim);
+  background:rgba(12,15,19,.9);text-align:center;padding:2rem}
+.msg.hide{display:none}
+.msg .sp{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--gold);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:50;
+  background:rgba(0,0,0,.66);border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .9rem;font-size:.76rem;color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
+.hint.show{opacity:1}
+@media (max-width:860px){.top .sub,.hideS{display:none}.stage{inset:48px 0 56px 0}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
+  <span class="ttl">普通人都能懂的奎因</span><span class="sub hideS">一个人、一句「存在就是被感知」，与 SDE 的解构</span>
+  <span class="spacer"></span>
+  <button id="btnSpread" class="hideS" title="单页 / 双页 (D)">双页</button>
+  <button id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)">矢量</button>
+  <button id="btnZoomOut" title="缩小">A−</button>
+  <button id="btnZoomIn" title="放大">A＋</button>
+  <button id="btnThumbs" class="hideS" title="缩略图">▤</button>
+  <button id="btnTheme" title="夜 / 日 / 纸 (N)">夜</button>
+  <button id="btnFull" class="hideS" title="全屏 (F)">⛶</button>
+  <a href="/books/m/167/" style="color:var(--dim);text-decoration:none;font-size:.82rem">详情</a>
+</header>
+
+<aside class="drawer" id="drawer">
+  <div class="sbox"><input id="q" type="search" placeholder="全书检索（回车）…"></div>
+  <h3 id="dHead">目　录</h3>
+  <div class="dlist" id="dlist"></div>
+</aside>
+
+<main class="stage" id="stage">
+  <div class="book" id="book">
+    <div class="leaf l" id="leafL"><canvas id="cL"></canvas><div class="svg" id="sL"></div><div class="tl" id="tL"></div><div class="pno" id="nL"></div></div>
+    <div class="leaf r" id="leafR"><canvas id="cR"></canvas><div class="svg" id="sR"></div><div class="tl" id="tR"></div><div class="pno" id="nR"></div></div>
+    <div class="gutter"></div>
+  </div>
+</main>
+
+<div class="thumbs" id="thumbs"></div>
+
+<footer class="bot">
+  <button id="btnPrev" title="上一页 (←)">‹</button>
+  <div class="rail" id="rail"><div class="bar"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
+  <button id="btnNext" title="下一页 (→)">›</button>
+  <span class="pg">第 <input id="pi" type="number" min="1" value="1"> / <span id="pt">…</span> 页</span>
+</footer>
+
+<div class="hint" id="hint"></div>
+<div class="msg" id="msg"><div><div class="sp"></div><div id="msgT">正在载入书页…</div></div></div>
+
+<script type="application/json" id="cfg">{"pdf": "https://sdeuniverses.com/books/m/167/quine-for-everyone.pdf?v=20260924", "key": "quine-for-everyone-v1", "offset": 6}</script>
+<script type="application/json" id="toc">[{"t": "封面", "p": "", "g": 1, "l": 2}, {"t": "作者介绍", "p": "", "g": 5, "l": 2}, {"t": "前言　一张体检单，一张网", "p": "1", "g": 7, "l": 2}, {"t": "导读　五条判决，一张地图", "p": "11", "g": 17, "l": 2}, {"t": "目录", "p": "15", "g": 21, "l": 2}, {"t": "导论　一座边住边修的老房子", "p": "19", "g": 25, "l": 2}, {"t": "第一编　一个人：一生是雨林，学说是荒漠", "p": "27", "g": 33, "l": 1}, {"t": "第一章　阿克伦的地图少年", "p": "28", "g": 34, "l": 2}, {"t": "第二章　数学里哪一块是讲道理的", "p": "32", "g": 38, "l": 2}, {"t": "第三章　两年拿下博士：把老师的书剃薄", "p": "36", "g": 42, "l": 2}, {"t": "第四章　1932 年的欧洲：被卡尔纳普撞出来", "p": "41", "g": 47, "l": 2}, {"t": "第五章　葡萄牙语讲台与德军电报：一生都在和别人一起翻译", "p": "45", "g": 51, "l": 2}, {"t": "第六章　哈佛六十年：一台改了键的打字机，一百多个国家", "p": "49", "g": 55, "l": 2}, {"t": "第七章　编末：一生是雨林，学说是荒漠", "p": "53", "g": 59, "l": 2}, {"t": "第二编　他接手的题：一条划在句子上的线", "p": "57", "g": 63, "l": 1}, {"t": "第八章　休谟的叉子与康德的格子", "p": "58", "g": 64, "l": 2}, {"t": "第九章　卡尔纳普的报销单：为什么数学不用报销", "p": "62", "g": 68, "l": 2}, {"t": "第十章　没说出口的前提：意思住在博物馆里", "p": "66", "g": 72, "l": 2}, {"t": "第十一章　第一道裂缝，与他是怎样被撞出来的", "p": "70", "g": 76, "l": 2}, {"t": "第三编　没有一句话单独出庭：打开了缠，只剩一界", "p": "75", "g": 81, "l": 1}, {"t": "第十二章　你怎么知道单身汉没结婚", "p": "76", "g": 82, "l": 2}, {"t": "第十三章　衣柜里的正式与休闲", "p": "80", "g": 86, "l": 2}, {"t": "第十四章　体检单上一项不对", "p": "84", "g": 90, "l": 2}, {"t": "第十五章　改窗帘与改承重墙", "p": "88", "g": 94, "l": 2}, {"t": "第十六章　网是用什么织的", "p": "92", "g": 98, "l": 2}, {"t": "第十七章　总账：他把缠讲硬了，却把缠织进了一界", "p": "97", "g": 103, "l": 2}, {"t": "第四编　海上修船：打开了回写，船上没有人", "p": "101", "g": 107, "l": 1}, {"t": "第十八章　没有船坞：纽拉特的船", "p": "102", "g": 108, "l": 2}, {"t": "第十九章　两条修船规矩：少改，简单", "p": "106", "g": 112, "l": 2}, {"t": "第二十章　海王星与火神星", "p": "110", "g": 116, "l": 2}, {"t": "第二十一章　谁换的板，谁付的账", "p": "114", "g": 120, "l": 2}, {"t": "第二十二章　事先说好先改哪一块", "p": "118", "g": 124, "l": 2}, {"t": "第二十三章　总账：船在修，却不记航海日志", "p": "122", "g": 128, "l": 2}, {"t": "第五编　一只叫 gavagai 的兔子：拆了博物馆，也剃掉了那只手指", "p": "127", "g": 133, "l": 1}, {"t": "第二十四章　意义的博物馆，他拆得对", "p": "128", "g": 134, "l": 2}, {"t": "第二十五章　丛林里的语言学家", "p": "132", "g": 138, "l": 2}, {"t": "第二十六章　兔子、兔子的一部分、兔子的一段时光", "p": "136", "g": 142, "l": 2}, {"t": "第二十七章　孩子是怎样学会「妈妈」的", "p": "140", "g": 146, "l": 2}, {"t": "第二十八章　那只手指", "p": "145", "g": 151, "l": 2}, {"t": "第二十九章　总账：定不下来，不等于没有事实", "p": "149", "g": 155, "l": 2}, {"t": "第六编　存在就是成为变项的值：剃刀、胡子与荒漠", "p": "155", "g": 161, "l": 1}, {"t": "第三十章　柏拉图的胡子", "p": "156", "g": 162, "l": 2}, {"t": "第三十一章　物料清单：你的话答应了世上有什么", "p": "161", "g": 167, "l": 2}, {"t": "第三十二章　「我喜欢荒漠般的景观」", "p": "166", "g": 172, "l": 2}, {"t": "第三十三章　一切都要翻进一种写法才算数", "p": "170", "g": 176, "l": 2}, {"t": "第三十四章　可能、必然和意思，被请出了门", "p": "175", "g": 181, "l": 2}, {"t": "第三十五章　总账：存在是显露，不是一个变项的值", "p": "179", "g": 185, "l": 2}, {"t": "第七编　自然化：从「凭什么」到「怎么长」，却不判了", "p": "185", "g": 191, "l": 1}, {"t": "第三十六章　扶手椅上的认识论失败了", "p": "186", "g": 192, "l": 2}, {"t": "第三十七章　从神经末梢到科学", "p": "190", "g": 196, "l": 2}, {"t": "第三十八章　相似是长出来的", "p": "194", "g": 200, "l": 2}, {"t": "第三十九章　规范是工程：他晚年打的补丁", "p": "198", "g": 204, "l": 2}, {"t": "第四十章　只有约束，没有目标", "p": "202", "g": 208, "l": 2}, {"t": "第四十一章　总账：发生本身带着判断", "p": "206", "g": 212, "l": 2}, {"t": "第八编　SDE 总解构：剃成荒漠", "p": "211", "g": 217, "l": 1}, {"t": "第四十二章　判词完整版与三方程体检", "p": "212", "g": 218, "l": 2}, {"t": "第四十三章　三根承重梁，和本书的替换", "p": "216", "g": 222, "l": 2}, {"t": "第四十四章　十八处闪光", "p": "220", "g": 226, "l": 2}, {"t": "第四十五章　保底：他在什么条件下一点不差", "p": "224", "g": 230, "l": 2}, {"t": "第四十六章　SDE 要向他学的，与五条分界线", "p": "228", "g": 234, "l": 2}, {"t": "第四十七章　病根与死法：他为什么非剃不可", "p": "232", "g": 238, "l": 2}, {"t": "第九编　身后：谁把剃掉的长回来", "p": "237", "g": 243, "l": 1}, {"t": "第四十八章　戴维森：把第二个人请回来", "p": "238", "g": 244, "l": 2}, {"t": "第四十九章　普特南与克里普克：把世界和历史请回名字里", "p": "242", "g": 248, "l": 2}, {"t": "第五十章　乔姆斯基与刘易斯：一个在脑子里种满，一个在可能世界里种满", "p": "246", "g": 252, "l": 2}, {"t": "第五十一章　罗蒂与布兰顿：从网走到对话，从描述回到规范", "p": "250", "g": 256, "l": 2}, {"t": "第五十二章　奎因到中国", "p": "254", "g": 260, "l": 2}, {"t": "第十编　AI 时代重读奎因", "p": "259", "g": 265, "l": 1}, {"t": "第五十三章　大模型：一张只由句子织成的网", "p": "260", "g": 266, "l": 2}, {"t": "第五十四章　gavagai 回来了：器具不再可消", "p": "263", "g": 269, "l": 2}, {"t": "第十一编　用得上：教育、健康、个人事业", "p": "267", "g": 273, "l": 1}, {"t": "第五十五章　孩子考砸了，改哪根线", "p": "268", "g": 274, "l": 2}, {"t": "第五十六章　孩子学说话、学概念：那只手指", "p": "272", "g": 278, "l": 2}, {"t": "第五十七章　作文里的空话，和用 AI 写作业", "p": "276", "g": 282, "l": 2}, {"t": "第五十八章　体检单上一项不对：一张网和一位医生", "p": "280", "g": 286, "l": 2}, {"t": "第五十九章　养生法的无限补丁，和「事先说好」", "p": "285", "g": 291, "l": 2}, {"t": "第六十章　边航边修的身体：康复与照顾", "p": "290", "g": 296, "l": 2}, {"t": "第六十一章　复盘：你总在改哪一层", "p": "295", "g": 301, "l": 2}, {"t": "第六十二章　新团队的黑话：一次彻底翻译", "p": "300", "g": 306, "l": 2}, {"t": "第六十三章　四十岁转行：在海上换船板", "p": "305", "g": 311, "l": 2}, {"t": "结语　回到那张地图", "p": "311", "g": 317, "l": 2}, {"t": "参考书目", "p": "317", "g": 323, "l": 2}, {"t": "附录", "p": "323", "g": 329, "l": 2}, {"t": "后记", "p": "333", "g": 339, "l": 2}, {"t": "封底", "p": "", "g": 340, "l": 2}]</script>
+
+<script>
+(function(){
+'use strict';
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var TOC = JSON.parse(document.getElementById('toc').textContent);
+var $ = function(id){ return document.getElementById(id); };
+
+var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var themes=['','day','sepia'], ti=0;
+var cache={}, textCache={};
+
+function msg(t, spin){ $('msgT').textContent=t; $('msg').classList.remove('hide');
+  $('msg').querySelector('.sp').style.display = spin===false?'none':''; }
+function hideMsg(){ $('msg').classList.add('hide'); }
+function hint(t){ var h=$('hint'); h.textContent=t; h.classList.add('show');
+  clearTimeout(h._t); h._t=setTimeout(function(){h.classList.remove('show');},1400); }
+
+/* ── 版心尺寸：按舞台可用空间算，双页则一半 ── */
+function box(){
+  var st=$('stage'), W=st.clientWidth-40, H=st.clientHeight-30;
+  var n = spread?2:1;
+  return {W:W, H:H, n:n};
+}
+function fit(vp){
+  var b=box();
+  var maxW=(b.W/b.n), maxH=b.H;
+  var s=Math.min(maxW/vp.width, maxH/vp.height)*zoom;
+  return s;
+}
+
+/* ── 渲染一页：优先矢量(SVG)，失败回落高清 canvas ── */
+function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
+  var leaf = canvasEl.parentNode;
+  if(pageNo<1||pageNo>total){ leaf.style.visibility='hidden'; if(tlEl) tlEl.innerHTML=''; cb&&cb(); return; }
+  leaf.style.visibility='visible';
+  doc.getPage(pageNo).then(function(pg){
+    var vp0=pg.getViewport({scale:1});
+    var sc=fit(vp0), vp=pg.getViewport({scale:sc});
+    leaf.style.width=Math.round(vp.width)+'px';
+    leaf.style.height=Math.round(vp.height)+'px';
+    if(vector && svgEl && window.pdfjsLib && pdfjsLib.SVGGraphics){
+      leaf.classList.add('vec');
+      pg.getOperatorList().then(function(ops){
+        var g=new pdfjsLib.SVGGraphics(pg.commonObjs, pg.objs);
+        g.embedFonts=true;
+        return g.getSVG(ops, vp);
+      }).then(function(svg){
+        svg.setAttribute('width', Math.round(vp.width));
+        svg.setAttribute('height', Math.round(vp.height));
+        svgEl.innerHTML=''; svgEl.appendChild(svg);
+        if(tlEl) buildText(pg, vp, tlEl);
+        cb&&cb();
+      }).catch(function(){
+        vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
+        hint('此文档的矢量渲染不可用，已切回高清位图');
+        leaf.classList.remove('vec');
+        drawCanvas(pg, vp, canvasEl, tlEl, cb);
+      });
+    }else{
+      leaf.classList.remove('vec');
+      drawCanvas(pg, vp, canvasEl, tlEl, cb);
+    }
+  }).catch(function(){ cb&&cb(); });
+}
+
+function drawCanvas(pg, vp, canvasEl, tlEl, cb){
+  var dpr=Math.min(window.devicePixelRatio||1, 3);
+  canvasEl.width=Math.round(vp.width*dpr); canvasEl.height=Math.round(vp.height*dpr);
+  canvasEl.style.width=Math.round(vp.width)+'px'; canvasEl.style.height=Math.round(vp.height)+'px';
+  var ctx=canvasEl.getContext('2d',{alpha:false});
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#FBF7EE'; ctx.fillRect(0,0,vp.width,vp.height);
+  pg.render({canvasContext:ctx, viewport:vp, intent:'display'}).promise.then(function(){
+    if(tlEl) buildText(pg, vp, tlEl);
+    cb&&cb();
+  }).catch(function(){ cb&&cb(); });
+}
+
+function buildText(pg, vp, el){
+  el.innerHTML='';
+  pg.getTextContent().then(function(tc){
+    var frag=document.createDocumentFragment();
+    tc.items.forEach(function(it){
+      if(!it.str) return;
+      var tx=pdfjsLib.Util.transform(vp.transform, it.transform);
+      var s=document.createElement('span');
+      s.textContent=it.str;
+      var h=Math.hypot(tx[2],tx[3]);
+      s.style.left=tx[4]+'px'; s.style.top=(tx[5]-h)+'px';
+      s.style.fontSize=h+'px'; s.style.fontFamily='sans-serif';
+      frag.appendChild(s);
+    });
+    el.appendChild(frag);
+  }).catch(function(){});
+}
+
+/* ── 展示当前跨页 ── */
+function show(cb){
+  if(rendering){ return; }
+  rendering=true;
+  document.getElementById('book').classList.toggle('single', !spread);
+  $('leafR').style.display = spread?'':'none';
+  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  if(left<1) left=0;
+  var right= left+1;
+  var done=0, need=spread?2:1;
+  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
+  if(spread){
+    $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
+    $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
+    renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
+    renderInto(right, $('cR'), $('tR'), fin, $('sR'));
+  }else{
+    $('nL').textContent = cur-CFG.offset+1>0?(cur-CFG.offset+1):'';
+    renderInto(cur, $('cL'), $('tL'), fin, $('sL'));
+  }
+}
+
+function sync(){
+  var printed = Math.max(1, cur-CFG.offset+1);
+  $('pi').value = printed;
+  $('pt').textContent = Math.max(1,total-CFG.offset+1);
+  var r = (cur-1)/Math.max(1,total-1);
+  $('fill').style.width=(r*100)+'%';
+  $('knob').style.left=(r*100)+'%';
+  try{ localStorage.setItem(CFG.key, String(cur)); }catch(e){}
+  Array.prototype.forEach.call($('thumbs').children, function(c){
+    c.classList.toggle('cur', +c.dataset.p===cur);
+  });
+}
+
+/* ── 翻页（带动画） ── */
+function step(dir){
+  var n = spread?2:1;
+  var t = cur + dir*n;
+  if(t<1) t=1; if(t>total) t=total;
+  if(t===cur) return;
+  animate(dir, function(){ cur=t; show(); });
+}
+function animate(dir, after){
+  var src = dir>0 ? $('leafR') : $('leafL');
+  if(!spread || !src || src.style.display==='none'){ after(); return; }
+  var fl=document.createElement('div');
+  fl.className='flip'+(dir>0?'':' back');
+  var w=src.offsetWidth, h=src.offsetHeight;
+  fl.style.width=w+'px'; fl.style.height=h+'px';
+  fl.style.left = dir>0 ? (w+'px') : '0px';
+  var live = src.classList.contains('vec') ? src.querySelector('.svg svg') : src.querySelector('canvas');
+  if(live){
+    var cl = live.cloneNode(true);
+    cl.style.width='100%'; cl.style.height='100%'; cl.style.display='block';
+    fl.appendChild(cl);
+  }
+  $('book').appendChild(fl);
+  requestAnimationFrame(function(){ fl.classList.add('go'); });
+  setTimeout(function(){ fl.remove(); after(); }, 620);
+}
+function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+
+/* ── 目录 ── */
+function buildToc(){
+  var box=$('dlist'); box.innerHTML='';
+  TOC.forEach(function(e){
+    var a=document.createElement('a');
+    a.className = e.l===1?'l1':'l2';
+    a.href='#'; a.innerHTML='<span>'+e.t.replace(/</g,'&lt;')+'</span><span class="n">'+e.p+'</span>';
+    a.onclick=function(ev){ ev.preventDefault(); go(e.g ? e.g : e.p+CFG.offset-1); closeDrawer(); };
+    box.appendChild(a);
+  });
+}
+function closeDrawer(){ $('drawer').classList.remove('open'); }
+
+/* ── 全书检索 ── */
+function search(q){
+  if(!q){ $('dHead').textContent='目　录'; buildToc(); return; }
+  var box=$('dlist'); box.innerHTML=''; $('dHead').textContent='检索：'+q;
+  var found=0, scanned=0;
+  msg('正在检索全书…');
+  function scan(i){
+    if(i>total || found>=120){ hideMsg(); if(!found){ box.innerHTML='<div class="hit">没有找到。</div>'; } return; }
+    var pr = textCache[i] ? Promise.resolve(textCache[i])
+      : doc.getPage(i).then(function(p){ return p.getTextContent(); })
+          .then(function(tc){ var s=tc.items.map(function(x){return x.str;}).join(''); textCache[i]=s; return s; });
+    pr.then(function(s){
+      var k=s.indexOf(q);
+      if(k>=0){
+        found++;
+        var d=document.createElement('div'); d.className='hit';
+        var a=Math.max(0,k-16), b=Math.min(s.length,k+q.length+22);
+        d.innerHTML='<b>'+(i-CFG.offset+1)+'</b>　'+s.slice(a,k).replace(/</g,'&lt;')+
+          '<b>'+q.replace(/</g,'&lt;')+'</b>'+s.slice(k+q.length,b).replace(/</g,'&lt;');
+        d.onclick=function(){ go(i); closeDrawer(); };
+        box.appendChild(d);
+      }
+      scanned++;
+      if(scanned%12===0){ $('msgT').textContent='正在检索全书…  '+Math.round(i/total*100)+'%'; }
+      scan(i+1);
+    }).catch(function(){ scan(i+1); });
+  }
+  scan(1);
+}
+
+/* ── 缩略图 ── */
+var thumbsBuilt=false;
+function buildThumbs(){
+  if(thumbsBuilt) return; thumbsBuilt=true;
+  var wrap=$('thumbs');
+  var i=1;
+  function one(){
+    if(i>total) return;
+    var p=i;
+    doc.getPage(p).then(function(pg){
+      var vp=pg.getViewport({scale:1});
+      var s=150/vp.height, v=pg.getViewport({scale:s});
+      var c=document.createElement('canvas');
+      c.width=v.width; c.height=v.height; c.dataset.p=p;
+      c.onclick=function(){ go(p); };
+      wrap.appendChild(c);
+      return pg.render({canvasContext:c.getContext('2d'), viewport:v}).promise;
+    }).then(function(){ i++; setTimeout(one, 0); }).catch(function(){ i++; setTimeout(one,0); });
+  }
+  one();
+}
+
+/* ── 事件 ── */
+$('btnPrev').onclick=function(){ step(-1); };
+$('btnNext').onclick=function(){ step(1); };
+$('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
+$('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
+$('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);
+  this.textContent=vector?'矢量':'位图'; hint(vector?'矢量源渲染':'高清位图'); show(); };
+$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'%'); };
+$('btnZoomOut').onclick=function(){ zoom=Math.max(.5, zoom/1.15); show(); hint('缩小 '+Math.round(zoom*100)+'%'); };
+$('btnThumbs').onclick=function(){ $('thumbs').classList.toggle('open'); if($('thumbs').classList.contains('open')) buildThumbs(); };
+$('btnTheme').onclick=function(){ ti=(ti+1)%3; document.documentElement.className=themes[ti];
+  this.textContent=['夜','日','纸'][ti]; show(); };
+$('btnFull').onclick=function(){ if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); };
+$('q').onkeydown=function(e){ if(e.key==='Enter'){ search(this.value.trim()); } };
+$('rail').onclick=function(e){ var r=this.getBoundingClientRect();
+  go(Math.round((e.clientX-r.left)/r.width*(total-1))+1); };
+
+document.addEventListener('keydown',function(e){
+  if(/input|textarea|select/i.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){ step(-1); e.preventDefault(); }
+  else if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ step(1); e.preventDefault(); }
+  else if(e.key==='Home'){ go(1); } else if(e.key==='End'){ go(total); }
+  else if(e.key==='t'||e.key==='T'){ $('btnToc').click(); }
+  else if(e.key==='d'||e.key==='D'){ $('btnSpread').click(); }
+  else if(e.key==='v'||e.key==='V'){ $('btnVec').click(); }
+  else if(e.key==='n'||e.key==='N'){ $('btnTheme').click(); }
+  else if(e.key==='f'||e.key==='F'){ $('btnFull').click(); }
+});
+var sx=0, sy=0;
+$('stage').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+$('stage').addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.4){ step(dx<0?1:-1); }
+},{passive:true});
+var rt=null;
+window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ show(); },160); });
+
+/* ── 启动 ── */
+function boot(){
+  if(!window.pdfjsLib){ setTimeout(boot,120); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  $('btnVec').classList.add('on');
+  msg('正在载入《普通人都能懂的奎因》…');
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144}).promise.then(function(d){
+    doc=d; total=d.numPages;
+    buildToc();
+    var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
+    cur = (saved>0&&saved<=total) ? saved : 1;
+    if(window.innerWidth<820) spread=false, $('btnSpread').textContent='单页';
+    show(function(){ if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
+  }).catch(function(err){
+    msg('书页载入失败。可直接打开原文 PDF：'+CFG.pdf, false);
+  });
+}
+boot();
+})();
+</script>
+</body>
+</html>
