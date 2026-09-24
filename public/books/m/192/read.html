@@ -346,7 +346,7 @@ function buildToc(){
     var a=document.createElement('a');
     a.className = e.l===1?'l1':'l2';
     a.href='#'; a.innerHTML='<span>'+e.t.replace(/</g,'&lt;')+'</span><span class="n">'+e.p+'</span>';
-    a.onclick=function(ev){ ev.preventDefault(); go(e.g ? e.g : e.p+CFG.offset-1); closeDrawer(); };
+    a.onclick=function(ev){ ev.preventDefault(); go(e.g ? e.g : (+e.p)+CFG.offset-1); closeDrawer(); };
     box.appendChild(a);
   });
 }
