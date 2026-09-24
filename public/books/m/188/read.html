@@ -234,8 +234,7 @@ function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
         if(tlEl) buildText(pg, vp, tlEl);
         cb&&cb();
       }).catch(function(){
-        vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
-        hint('此文档的矢量渲染不可用，已切回高清位图');
+        /* 只对这一页回落高清位图，其余页面继续矢量渲染 */
         leaf.classList.remove('vec');
         drawCanvas(pg, vp, canvasEl, tlEl, cb);
       });
@@ -450,7 +449,7 @@ function boot(){
   pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   $('btnVec').classList.add('on');
   msg('正在载入《普通人都能懂的奥古斯丁》…');
-  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144}).promise.then(function(d){
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true}).promise.then(function(d){
     doc=d; total=d.numPages;
     buildToc();
     var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
