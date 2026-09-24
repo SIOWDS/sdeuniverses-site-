@@ -96,10 +96,14 @@ grep -o 'PDF_URL = [^;]*' public/books/m/*/read.html
 页面 200、PDF 200、翻页正常——所有可达性检查都看不出来。
 
 **修**：41 个带 SVGGraphics 的阅读器统一为
-`pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true})`
+`pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true})`（后来又补一个参数，见下）
 （其中 167、173、178、188、192 已先由各自的发书提交修好，本次补齐其余 35 个）。
 
 **新书纪律**：复制阅读器时照抄这一行；发布后用无头浏览器打开 `read.html`，等 10 秒，
 读 `#btnVec` 的文字——是「矢量」才算过，是「位图」就回来查。
-开了参数仍退回位图的，是 PDF 本身含 SVGGraphics 不支持的东西（渐变填充、软蒙版、透明组等），
-要改 PDF，不是改阅读器。
+**第二个病（同日查出）**：只开 `fontExtraProperties` 还不够。凡 PDF 里有位图（多数书的封面、封底是贴图），
+PDF.js 3.11 默认用 OffscreenCanvas 把图片解成 ImageBitmap，`imgData.data` 为空，SVGGraphics 读图时抛
+`Cannot read properties of null (reading 'subarray')`，同样静默退回位图——实测 42 个阅读器里有 33 个是这样。
+所以现行这一行是：
+`pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false})`
+两个参数缺一不可。两个都开了仍退回位图的，才是 PDF 本身含 SVGGraphics 不支持的东西，要改 PDF，不是改阅读器。
