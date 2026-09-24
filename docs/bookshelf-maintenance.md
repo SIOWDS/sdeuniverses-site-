@@ -85,3 +85,21 @@ grep -o 'PDF_URL = [^;]*' public/books/m/*/read.html
 1. **改书目页别用整页重生成。** 书目页常有后期手加的内容（封面、结构段、特殊说明），脚本重生成会静默冲掉。要改就定点插改，改完 `grep cover.jpg` 核一遍。
 2. **CSS/JS 引用用站内绝对路径 `/books/…`，不要写 `https://sdeuniverses.com/…`。** 后者会让本地预览加载线上文件，改了看不见效果，容易误判"没生效"。
 3. **迁移任何 PDF 之后，必须回头 grep 一遍谁在引用它。** 这次 `721c93a3` 迁了 18 个文件，书目页的链接改了，`read.html` 里的 `PDF_URL` 没改——而后者才是阅读器真正用的那个。
+
+---
+
+# 追记 · 2026-09-24　翻页阅读器的「矢量」模式曾全站静默失效
+
+**病**：翻页阅读器默认用 PDF.js 的 SVGGraphics 做矢量渲染，但 `getDocument` 没开 `fontExtraProperties`。
+只要 PDF 里嵌了字体（几乎所有书都嵌了），SVGGraphics 一执行 `setFont` 就抛
+`addFontStyle: No font data available`，阅读器随即**不提示地**退回位图，右上角按钮从「矢量」变成「位图」。
+页面 200、PDF 200、翻页正常——所有可达性检查都看不出来。
+
+**修**：41 个带 SVGGraphics 的阅读器统一为
+`pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true})`
+（其中 167、173、178、188、192 已先由各自的发书提交修好，本次补齐其余 35 个）。
+
+**新书纪律**：复制阅读器时照抄这一行；发布后用无头浏览器打开 `read.html`，等 10 秒，
+读 `#btnVec` 的文字——是「矢量」才算过，是「位图」就回来查。
+开了参数仍退回位图的，是 PDF 本身含 SVGGraphics 不支持的东西（渐变填充、软蒙版、透明组等），
+要改 PDF，不是改阅读器。

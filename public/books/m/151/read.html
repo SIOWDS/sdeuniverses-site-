@@ -452,7 +452,7 @@ function boot(){
   pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   $('btnVec').classList.add('on');
   msg('正在载入《翻译信达雅三大原理》…');
-  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144}).promise.then(function(d){
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true}).promise.then(function(d){
     doc=d; total=d.numPages;
     buildToc();
     var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
