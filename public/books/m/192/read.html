@@ -454,9 +454,10 @@ function boot(){
     doc=d; total=d.numPages;
     buildToc();
     var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
-    cur = (saved>0&&saved<=total) ? saved : 1;
+    var qp=0; try{ var mm=location.hash.match(/p=(\d+)/)||location.search.match(/[?&]p=(\d+)/); if(mm) qp=parseInt(mm[1],10)||0; }catch(e){}
+    cur = (qp>0&&qp+CFG.offset-1<=total) ? (qp+CFG.offset-1) : ((saved>0&&saved<=total) ? saved : 1);
     if(window.innerWidth<820) spread=false, $('btnSpread').textContent='单页';
-    show(function(){ if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
+    show(function(){ if(qp>0) return; if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
   }).catch(function(err){
     msg('书页载入失败。可直接打开原文 PDF：'+CFG.pdf, false);
   });
