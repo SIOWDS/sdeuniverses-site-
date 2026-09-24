@@ -65,7 +65,7 @@ def check_vector_readers():
     allow = {'books/lion-city-glory/read.html'}  # 自有版式阅读器，单独维护
     bad = 0
     shared = open(os.path.join(PUB, 'books/reader/reader.js'), encoding='utf-8').read()
-    if 'SVGGraphics' not in shared or 'fontExtraProperties' not in shared or 'isOffscreenCanvasSupported:false' not in shared:
+    if 'SVGGraphics' not in shared or 'fontExtraProperties' not in shared or 'isOffscreenCanvasSupported:false' not in shared or 'cMapUrl' not in shared:
         print('   ✗ books/reader/reader.js 缺矢量渲染或 fontExtraProperties'); bad += 1
     for r in sorted(glob.glob(os.path.join(PUB, 'books/**/read*.html'), recursive=True)):
         rp = os.path.relpath(r, PUB).replace(os.sep, '/')
@@ -76,6 +76,8 @@ def check_vector_readers():
             print(f'   ✗ {rp} 仍是位图阅读器（用 tools/build_flip_reader.py migrate 迁移）'); bad += 1
         elif 'fontExtraProperties' not in h or 'isOffscreenCanvasSupported:false' not in h:
             print(f'   ✗ {rp} getDocument 缺 fontExtraProperties 或 isOffscreenCanvasSupported:false（矢量会静默退回位图）'); bad += 1
+        elif 'cMapUrl' not in h:
+            print(f'   ✗ {rp} getDocument 缺 cMapUrl/cMapPacked（用预置 CMap 的 CJK 字体会报 CMap baseUrl，该页退回位图或缺字）'); bad += 1
     print(f'   异常 {bad}')
     if bad:
         fails.append(f'翻页阅读器矢量渲染异常 {bad} 处')

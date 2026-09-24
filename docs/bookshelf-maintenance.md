@@ -130,3 +130,20 @@ m/34、130、133 在 catalog 里也有 `reader` 字段——一跑就把它们�
 已加保护：**已存在且含 SVGGraphics 的阅读器不再被覆盖**。
 
 **体检**：`tools/check_bookshelf.py` 新增第 ⑦ 道——PDF 源阅读器缺 SVGGraphics、缺两个参数之一，即报错。
+
+---
+
+# 追记 · 2026-09-24（四）　第三个参数组：CMap 与标准字体；狮城荣耀并入矢量
+
+**病**：两个参数都开了，m/49 仍有页面退回位图，控制台报
+`The CMap "baseUrl" parameter must be specified, ensure that the "cMapUrl" and "cMapPacked" API parameters are provided`。
+用预置 CMap（如 UniGB-UCS2-H）编码的 CJK 字体、以及没嵌入的 14 种标准字体，PDF.js 要去取 CMap／标准字体文件；不给地址就解析失败，
+那一页退回位图，严重时缺字。
+
+**修**：全部 PDF 源阅读器（112 个 read.html、共享 reader.js、模板）的 `getDocument` 再加
+`cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'`。
+**注意用 jsdelivr，不用 cdnjs**：cdnjs 的 pdf.js 3.11.174 只放了 pdf.min.js，`/cmaps/`、`/standard_fonts/` 一律 403（实测）。
+
+`lion-city-glory` 的自有版式阅读器保留原样式，只把渲染换成 SVGGraphics＋逐页回退，并补齐四组参数。
+
+`check_bookshelf.py` 第 ⑦ 道增加 `cMapUrl` 检查。

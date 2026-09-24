@@ -81,7 +81,7 @@
     if(!window.pdfjsLib)throw Error('PDF library unavailable');
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     if(doc){await doc.destroy();doc=null;}
-    doc=await pdfjsLib.getDocument({url:source.url,fontExtraProperties:true,isOffscreenCanvasSupported:false}).promise;pdfPaper.hidden=false;await renderPDF(requested);
+    doc=await pdfjsLib.getDocument({url:source.url,fontExtraProperties:true,isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise;pdfPaper.hidden=false;await renderPDF(requested);
    }else{
     let html=cache.get(source.url);if(!html){const response=await fetch(source.url);if(!response.ok)throw Error('HTTP '+response.status);html=cleanHTML(await response.text(),source.url);cache.set(source.url,html);}
     flow.innerHTML=html;htmlText=flow.textContent;paper.hidden=false;

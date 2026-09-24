@@ -52,6 +52,7 @@ canvas{display:block;max-width:100%;height:auto}
 .load{text-align:center;padding:70px 20px;color:var(--khaki);font-family:var(--disp);letter-spacing:.2em;font-size:13px}
 @media (max-width:640px){ .tap{display:none} .bar .ttl{display:none} }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.pdf-svg svg{display:block;max-width:100%;height:auto;margin:0 auto;background:#fff}
 </style></head>
 <body>
 
@@ -116,6 +117,20 @@ canvas{display:block;max-width:100%;height:auto}
   var $ = function(id){ return document.getElementById(id); };
   var doc = null, page = 1, busy = false, queued = null, scale = 1.3;
   var cv = $("cv"), ctx = cv.getContext("2d");
+  /* 矢量渲染：PDF.js SVGGraphics；某页画不了就只这一页退回高清位图（见 docs/bookshelf-maintenance.md 2026-09-24） */
+  var vec = true, vecOK = 0, vecFail = 0;
+  var svgBox = document.createElement("div"); svgBox.className = "pdf-svg"; svgBox.style.display = "none";
+  cv.parentNode.insertBefore(svgBox, cv);
+  function drawCanvas(pg, vp){
+    var dpr = Math.min(window.devicePixelRatio || 1, 3);
+    cv.width = Math.floor(vp.width * dpr);
+    cv.height = Math.floor(vp.height * dpr);
+    cv.style.width = Math.floor(vp.width) + "px";
+    cv.style.height = Math.floor(vp.height) + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    svgBox.style.display = "none"; cv.style.display = "";
+    return pg.render({ canvasContext: ctx, viewport: vp }).promise;
+  }
 
   var jump = $("jump");
   jump.appendChild(new Option("跳到卷 / 章…", ""));
@@ -128,17 +143,28 @@ canvas{display:block;max-width:100%;height:auto}
     busy = true;
     doc.getPage(n).then(function(pg){
       var vp = pg.getViewport({ scale: scale });
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      cv.width = Math.floor(vp.width * dpr);
-      cv.height = Math.floor(vp.height * dpr);
-      cv.style.width = Math.floor(vp.width) + "px";
-      cv.style.height = Math.floor(vp.height) + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      return pg.render({ canvasContext: ctx, viewport: vp }).promise;
+      if (vec && window.pdfjsLib && pdfjsLib.SVGGraphics){
+        return pg.getOperatorList().then(function(ops){
+          var g = new pdfjsLib.SVGGraphics(pg.commonObjs, pg.objs);
+          g.embedFonts = true;
+          return g.getSVG(ops, vp);
+        }).then(function(svg){
+          svg.setAttribute("width", Math.floor(vp.width));
+          svg.setAttribute("height", Math.floor(vp.height));
+          svg.style.display = "block";
+          svgBox.replaceChildren(svg); svgBox.style.display = "block"; cv.style.display = "none";
+          vecOK++;
+        }).catch(function(e){
+          vecFail++; if (vecFail >= 6 && vecFail > vecOK) vec = false;
+          if (window.console) console.warn("Book reader: page " + n + " falls back to bitmap", e);
+          return drawCanvas(pg, vp);
+        });
+      }
+      return drawCanvas(pg, vp);
     }).then(function(){
       busy = false;
       if (queued !== null){ var q = queued; queued = null; render(q); }
-    });
+    }, function(){ busy = false; });
     $("cur").textContent = n;
     $("prev").disabled = (n <= 1);
     $("next").disabled = (doc && n >= doc.numPages);
@@ -165,7 +191,7 @@ canvas{display:block;max-width:100%;height:auto}
     if (e.key === "ArrowRight") go(page + 1);
   });
 
-  pdfjsLib.getDocument(SRC).promise.then(function(pdf){
+  pdfjsLib.getDocument({url:SRC, fontExtraProperties:true, isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise.then(function(pdf){
     doc = pdf;
     $("tot").textContent = pdf.numPages;
     $("load").hidden = true;

@@ -4,7 +4,7 @@
 所有 PDF 源的翻页阅读器都用 tools/flip_reader_template.html 生成：
 PDF.js SVGGraphics 矢量渲染（失败自动退回高清位图）、双页对开、真实翻页、
 目录跳转（无手工目录时从 PDF 书签生成）、全书检索。
-getDocument 固定带 fontExtraProperties:true 与 isOffscreenCanvasSupported:false——缺一个，矢量模式就会静默退回位图（见
+getDocument 固定带 fontExtraProperties:true 与 isOffscreenCanvasSupported:false（另带 cMapUrl/cMapPacked/standardFontDataUrl，指向 jsdelivr 的 pdfjs-dist@3.11.174）——缺一个，矢量模式就会静默退回位图（见
 docs/bookshelf-maintenance.md「追记 · 2026-09-24」）。
 
 用法：

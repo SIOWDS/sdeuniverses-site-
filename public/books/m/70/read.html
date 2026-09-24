@@ -489,7 +489,7 @@ function boot(){
   pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   $('btnVec').classList.add('on');
   msg('正在载入《SDE数学解构导论》…');
-  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false}).promise.then(function(d){
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise.then(function(d){
     doc=d; total=d.numPages;
     buildToc();
     if(!TOC.length){ outlineToc(d).then(function(t){ if(t.length){ TOC=t; buildToc(); } }); }
