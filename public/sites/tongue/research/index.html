@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>中医舌诊的现代研究 · 舌诊发生学</title>
+<meta name="description" content="客观化设备、ISO 20498、可靠性研究、舌苔菌群与 AI 舌象诊断。">
+<link rel="canonical" href="https://tongue.sdeuniverses.com/research/">
+<meta property="og:title" content="中医舌诊的现代研究 · 舌诊发生学">
+<meta property="og:description" content="客观化设备、ISO 20498、可靠性研究、舌苔菌群与 AI 舌象诊断。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F1F3EF">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="成稿">
+<meta name="tier_reason" content="Q2无拟定标签（台账记标签缺项）→Q3第一刀：公开文献汇编与公有领域古籍，主张层为主，无真跑数据与占位者名录全貌">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 26'%3E%3Cpath d='M3 2C2 9 2 15 6 20c2 3 4 4 5 4s3-1 5-4c4-5 4-11 3-18C15 1 7 1 3 2Z' fill='%23E8BCC2' stroke='%23A3364B' stroke-width='1.4'/%3E%3C/svg%3E">
+<style>
+:root{
+  --tai:#F1F3EF; --sheet:#FAFBF8; --ink:#20262A; --ink2:#535D62; --ink3:#838C90;
+  --line:#D3D8D2; --line2:#E3E7E1;
+  --rose:#A3364B; --rose-l:#E8BCC2; --rose-f:#F4DDE0;
+  --indigo:#2E4C69; --indigo-l:#C9D6E3;
+  --ochre:#8E6E22; --ochre-l:#F0E3BF;
+  --moss:#3F6A52;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:70px}
+body{margin:0;background:var(--tai);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.8}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:2px solid var(--indigo);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+.top{position:sticky;top:0;z-index:20;background:rgba(241,243,239,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;min-height:56px;flex-wrap:wrap}
+.brand{font-family:var(--serif);font-weight:700;font-size:19px;letter-spacing:.12em;text-decoration:none;display:flex;align-items:center;gap:9px}
+.brand svg{flex:none}
+.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--ink2)}
+.top nav a{text-decoration:none;padding:4px 0;border-bottom:2px solid transparent}
+.top nav a:hover,.top nav a[aria-current]{color:var(--ink);border-bottom-color:var(--rose)}
+.top nav a.main{color:var(--ink3)}
+footer{margin-top:72px;border-top:1px solid var(--line);background:var(--sheet);font-size:13.5px;color:var(--ink2)}
+footer .wrap{padding-top:28px;padding-bottom:40px;display:grid;grid-template-columns:1.4fr 1fr;gap:34px}
+footer h4{margin:0 0 6px;font-size:14px;color:var(--ink)}
+footer p{margin:0 0 10px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:8px 0 0}
+.ev{display:inline-block;font-family:var(--sans);font-size:.72em;line-height:1.5;padding:0 .45em;margin:0 .15em;border-radius:3px;vertical-align:.12em;white-space:nowrap;border:1px solid transparent;font-weight:500}
+.ev-a{background:#DCEADF;color:#2C5A3E}
+.ev-b{background:var(--rose-f);color:#7E2839}
+.ev-cc{background:#E3E7EC;color:#3F4C5A}
+.ev-p,.ev.pend{background:transparent;border-color:#C9A451;color:#7A5C14}
+.ev-a.pend,.ev-b.pend,.ev-cc.pend{border-style:dashed}
+@media (max-width:760px){footer .wrap{grid-template-columns:1fr}.top{position:static}.top .wrap{gap:4px;padding-top:8px;padding-bottom:4px}.top nav{margin-left:0;gap:14px;font-size:14px;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;width:100%;padding-bottom:4px}html{scroll-padding-top:10px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.art-head{padding:44px 0 18px;border-bottom:1px solid var(--line)}
+.crumb{font-size:13.5px;color:var(--ink3)}
+.crumb a{text-decoration:none;color:var(--ink2)}
+.crumb a:hover{color:var(--rose)}
+.art-head h1{font-family:var(--serif);font-size:clamp(27px,4.4vw,40px);line-height:1.32;margin:.3em 0 .35em;font-weight:700;letter-spacing:.02em}
+.art-head .blurb{color:var(--ink2);max-width:40em;margin:0}
+.meta{margin-top:14px;font-size:13px;color:var(--ink3);display:flex;flex-wrap:wrap;gap:6px 18px}
+.meta b{color:var(--ink2);font-weight:600}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:48px;align-items:start;margin-top:30px}
+.toc{position:sticky;top:78px;max-height:calc(100vh - 100px);overflow:auto;font-size:13.5px;border-left:1px solid var(--line);padding-left:16px}
+.toc h2{font-size:12.5px;color:var(--ink3);font-weight:600;margin:0 0 8px;letter-spacing:.06em}
+.toc a{display:block;text-decoration:none;color:var(--ink2);padding:3px 0;line-height:1.5}
+.toc a:hover{color:var(--rose)}
+.toc a.l3{padding-left:1em;font-size:12.8px}
+article{font-family:var(--serif);font-size:17px;line-height:2;max-width:40em}
+article h2{font-size:23px;line-height:1.45;margin:2.1em 0 .6em;padding-top:.3em;border-top:1px solid var(--line2)}
+article h3{font-size:19px;margin:1.8em 0 .5em}
+article h4{font-size:17px;margin:1.5em 0 .4em;color:var(--ink2)}
+article p{margin:0 0 1.05em;text-align:justify}
+article b{font-weight:700}
+article ul,article ol{padding-left:1.4em;margin:0 0 1.1em}
+article li{margin:.25em 0}
+article blockquote{margin:1.2em 0;padding:.8em 1.1em;background:var(--sheet);border-left:3px solid var(--ochre);font-size:15.5px;line-height:1.9;font-family:var(--sans);color:var(--ink2)}
+article blockquote p{margin:.2em 0;text-align:left}
+article hr{border:0;border-top:1px solid var(--line);margin:2.2em 0}
+.tbl{overflow-x:auto;margin:1.2em 0 1.6em;border:1px solid var(--line);background:var(--sheet)}
+.tbl table{border-collapse:collapse;min-width:100%;font-family:var(--sans);font-size:14px;line-height:1.7}
+.tbl th,.tbl td{border-bottom:1px solid var(--line2);padding:8px 11px;text-align:left;vertical-align:top}
+.tbl th{background:#E8ECE6;font-weight:600;white-space:nowrap}
+.tbl td:first-child{min-width:6.5em}
+article hr+h2{border-top:0;padding-top:0;margin-top:1.2em}
+article a.url{color:var(--indigo);word-break:break-all}
+.tbl tr:last-child td{border-bottom:0}
+.classic article{font-size:17.5px;line-height:2.1}
+.classic article h2{color:var(--rose)}
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:52px 0 0;max-width:40em}
+.pn a{display:block;padding:14px 16px;border:1px solid var(--line);background:var(--sheet);text-decoration:none}
+.pn a:hover{border-color:var(--rose)}
+.pn small{display:block;color:var(--ink3);font-size:12.5px}
+.pn .nx{text-align:right}
+.status{margin:18px 0 0;padding:10px 14px;border:1px dashed #C9A451;background:#FBF6E6;font-size:13.5px;color:#6C5415;max-width:52em}
+@media (max-width:900px){.layout{grid-template-columns:1fr}.toc{display:none}article{font-size:16.5px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="/"><svg width="22" height="26" viewBox="0 0 22 26" aria-hidden="true"><path d="M3 2C2 9 2 15 6 20c2 3 4 4 5 4s3-1 5-4c4-5 4-11 3-18C15 1 7 1 3 2Z" fill="#E8BCC2" stroke="#A3364B" stroke-width="1.4"/><path d="M11 5v14" stroke="#A3364B" stroke-width="1" stroke-dasharray="2 2"/></svg>舌诊发生学</a><nav aria-label="子站导航"><a href="/#tcm">中医</a><a href="/#western">西医</a><a href="/interface/">对照</a><a href="/genesis/">发生学</a><a href="/#classics">古籍</a><a href="/all/">全部篇目</a><a class="main" href="https://sdeuniverses.com/">主站</a></nav></div></header><main class="wrap">
+<div class="art-head"><div class="crumb"><a href="/">舌诊发生学</a> ／ <a href="/#data">研究与数据</a> ／ 第 05 编</div><h1>中医舌诊的现代研究</h1><p class="blurb">客观化设备、ISO 20498、可靠性研究、舌苔菌群与 AI 舌象诊断。</p><div class="meta"><span><b>编纂材料</b></span><span>约 3,705 字（纯汉字）</span><span><span class="ev ev-a">A</span> 26 处</span><span><span class="ev ev-cc">C</span> 4 处</span><span><span class="ev ev-p">待核</span> 4 处</span></div><p class="status">本编有 4 处标着「待核」：编写时没在检索结果里直接见到原文。它们照原样标出，没有补核前请不要当定论引用。</p></div>
+<div class="layout"><div><article>
+<blockquote><p>本编按六条线整理：客观化与设备、标准化、可靠性、舌苔的细胞与分子、舌苔微生物组、人工智能。</p><p>本编大部分条目为<span class="ev ev-a" title="证据标签">A</span>（2026-09-25 实搜核实）。数字均转述自原文摘要，未作改动；样本量与效应量一并给出，以便日后评估证据强度。</p></blockquote>
+<hr>
+<h2 id="s1">一、客观化：从「医生的眼睛」到「标定过的相机」</h2>
+<h3 id="s2">1. 为什么要客观化</h3>
+<p>中医舌诊长期依赖医生的肉眼与经验，受三类干扰：光源（色温、显色指数）、观察者（经验、色觉、疲劳）、被观察者（伸舌方式、时间、饮食）。客观化研究的目标，是把这三类干扰尽量压到可控范围内，让「舌色偏红」变成一个可以测、可以比、可以复现的数。</p>
+<h3 id="s3">2. 设备演变<span class="ev ev-a" title="证据标签">A／C</span></h3>
+<ul><li>早期：色度计、分光光度计点测舌面颜色。<span class="ev ev-cc" title="证据标签">C</span></li><li>中期：单反相机加标准光源、色卡校正。<span class="ev ev-cc" title="证据标签">C</span></li><li>当代：带积分球或均匀照明腔体、自动色彩校正、舌体自动分割的专用舌象仪，以及手机拍摄加算法校正。《世界中医药》2017 年第 12 卷第 2 期有综述系统梳理舌诊仪的发展及其在舌诊客观化研究中的应用。<span class="ev ev-a" title="证据标签">A</span></li><li>监管：《中国医疗器械杂志》2023 年有专文讨论中医舌诊设备的产品名称、性能指标参数、图像处理功能、使用方式与临床评价等技术审评要点，并分析了安全风险与有效性指标。<span class="ev ev-a" title="证据标签">A</span></li></ul>
+<h3 id="s4">3. 颜色的表达<span class="ev ev-cc" title="证据标签">C</span></h3>
+<p>舌色与苔色的客观表达，多采用 CIE L\*a\*b\* 等设备无关的色彩空间：L\* 表示明度，a\* 表示红绿轴，b\* 表示黄蓝轴。舌色偏红，大致对应 a\* 升高；苔色偏黄，大致对应 b\* 升高。高光谱成像也被用于舌像分类研究，2007 年即有高光谱舌像分类的工作发表。【A：见 Zhi L, Zhang D 等 2007 年论文题名】</p>
+<hr>
+<h2 id="s5">二、标准化</h2>
+<h3 id="s6">1. ISO 20498 系列<span class="ev ev-a" title="证据标签">A</span></h3>
+<p>国际标准化组织「中医」技术委员会（ISO/TC 249）发布的计算机舌象分析系统（CTIS）系列：</p>
+<div class="tbl"><table><thead><tr><th>编号</th><th>名称</th><th>类型与年份</th><th>要点</th></tr></thead><tbody><tr><td>ISO 20498-1</td><td>通用要求</td><td>国际标准，2019 年 3 月，11 页</td><td>规定 CTIS 的通用要求，范围限于安全与技术要求，<b>明确不包括舌象的诊断或判读</b></td></tr><tr><td>ISO 20498-2</td><td>光照环境</td><td>国际标准，2017 年</td><td>规定 CTIS 运行所需的光照环境，不含照明部件的电气安全与生物相容性</td></tr><tr><td>ISO 20498-3</td><td>色卡</td><td><span class="ev ev-p pend" title="证据标签">待核</span></td><td></td></tr><tr><td>ISO/TS 20498-4</td><td>外围视觉设备</td><td>技术规范，2020 年 10 月第一版</td><td>规定外围视觉设备的性能指标：色彩还原、畸变、分辨率</td></tr><tr><td>ISO/TR 20498-5</td><td>舌色与苔色的采集与表达方法</td><td>技术报告，2019 年 1 月，2019 年 12 月更正版</td><td>描述采集舌图像并表达舌色、苔色的方法，<b>不涵盖临床舌诊结果</b></td></tr></tbody></table></div>
+<p>第 1 部分的目录显示，其技术要求包括舌体定位、照明部分、图像采集部分（空间分辨率、颜色分量及其获取）、数据处理部分、显示，以及安全。<span class="ev ev-a" title="证据标签">A</span></p>
+<p>值得记下的一点：ISO 标准只管「怎么把舌头拍准」，把「怎么读」明确排除在外。这恰好把本库说的两层分开了——显露的采集可以标准化，显露的解读仍然属于各自的理论体系。</p>
+<h3 id="s7">2. 国内团体标准与行业文件<span class="ev ev-a" title="证据标签">A</span></h3>
+<ul><li>T/CIATCM 110—2024：中国中医药信息学会归口，中国中医科学院医学实验中心提出，起草单位包括中国中医科学院、清华大学、上海中医药大学、成都中医药大学、北京中医药大学东直门医院等。引言说明其目的是规范中医临床四诊信息采集的方法、内容、流程、数据格式与数据质量，使同一诊断模式下不同设备采集的数据能够科学比较。<span class="ev ev-a pend" title="证据标签">A：标准号、归口与起草单位已见；确切标题待核</span></li><li>《中医数据采集规范与数据协议规范　第 1 部分：舌象》（征求意见稿）：中国生物医学工程学会团体标准，2022 年第三季度立项，天津市医疗器械审评查验中心等单位起草，规定舌象信息采集设备的数据采集、传输、存储要求。<span class="ev ev-a" title="证据标签">A</span></li><li>《中医舌象数据交换格式》：世界中医药学会联合会标准项目，上海道生医疗科技有限公司主起草，加拿大、日本、匈牙利、韩国等国学者参与，2019 年 11 月启动。<span class="ev ev-a pend" title="证据标签">A：发布状态待核</span></li></ul>
+<hr>
+<h2 id="s8">三、可靠性：医生之间看得一样吗</h2>
+<p>这是舌诊研究中最容易被忽略、又最关键的一条线。如果两个训练有素的医生看同一张舌图，结论经常不同，那么任何「舌象与疾病相关」的研究都要打折扣。</p>
+<h3 id="s9">1. 代表性研究<span class="ev ev-a" title="证据标签">A</span></h3>
+<div class="tbl"><table><thead><tr><th>研究</th><th>设计</th><th>主要结果</th></tr></thead><tbody><tr><td>Kim M, Cobbin D, Zaslawski C. J Altern Complement Med 2008;14(5):527–536</td><td>30 名中医师看 10 张仿真舌幻灯片，两次采集</td><td>考察医师间与医师内部对特定舌征的一致性</td></tr><tr><td>德国系列研究，Forsch Komplementmed 2009;16:98–104（作者待核）</td><td>两个预试验各 15 例、一个确证研究 101 例，2—3 名有经验的医师盲评数码舌照</td><td>第一次预试验 kappa −0.15 至 0.76，多数项目一致性弱或中等；改进方法后第二次预试验 18 项中 7 项 kappa ≥ 0.75；确证研究 kappa 0.15 至 0.83。作者结论：形态特征的描述具有可接受的可靠性，但需要改进方法</td></tr><tr><td>Lo LC 等，Evid Based Complement Alternat Med 2012，doi:10.1155/2012/505063</td><td>20 名患者，相隔 1 小时拍两组舌照，比较自动舌诊系统与中医师</td><td>自动系统自身一致性显著高于医师（kappa 0.93±0.06 对 0.64±0.13，P&lt;0.001）</td></tr><tr><td>台湾彰化基督教医院研究（PMC3133885）</td><td>15 例患者舌照，10 名中医师分胖、中、瘦三类</td><td>Krippendorff α 约 0.73</td></tr><tr><td>Wang ZC, Zhang SP, Yuen PC. JMIR Mhealth Uhealth 2020;8(7):e16018</td><td>智能手机舌照，准德尔菲流程</td><td>医师间对舌苔的一致性为中等（Gwet AC2 0.49—0.55），对舌体颜色与特征的一致性为一般</td></tr><tr><td>越南萎缩性胃炎研究（Vietnam J Community Med 2025，66 卷特刊 15）</td><td>120 例萎缩性胃炎患者舌照，专家各评两次</td><td>专家自身一致性 kappa 0.70—0.84；专家间一致性仅中等，kappa 0.46；裂纹一项专家间一致性最高，kappa 0.67</td></tr></tbody></table></div>
+<h3 id="s10">2. 从这组数据能读出什么</h3>
+<ul><li>同一个医生前后看两次，比较稳定；不同医生之间，一致性多在中等水平。</li><li>形态类特征（裂纹、胖瘦、齿痕）一致性较高；颜色类特征（舌色深浅、苔色）一致性较低。</li><li>机器自身的一致性明显高于人。但机器一致，只说明它每次都给出同一个答案，不说明那个答案对。</li><li>这组数据对建子站很重要：凡是引用「某舌象与某病相关」的研究，都应同时交代这项研究的判读者一致性如何。</li></ul>
+<hr>
+<h2 id="s11">四、舌苔的细胞与分子</h2>
+<h3 id="s12">1. 舌苔脱落细胞<span class="ev ev-cc" title="证据标签">C／A</span></h3>
+<p>国内自二十世纪七八十年代起，大量研究采集舌苔脱落细胞做细胞学分析。一般认为：正常的薄白苔，在细胞层面上是按时脱落的舌角化层细胞的堆积；舌苔脱落细胞由鳞状上皮细胞等上皮细胞，以及红细胞、白细胞等非上皮细胞构成；上皮细胞的正常增殖与稳定的口腔 pH 值是维持薄白苔的关键；若细胞增殖紊乱、代谢异常，使角化层细胞脱落延迟或角化不全，细胞便大量堆积于舌面，形成厚苔。<span class="ev ev-a" title="证据标签">A：见《内蒙古医科大学学报》相关论文引言的转述</span></p>
+<p>这一路研究还用凋亡蛋白（Bcl-2、Bax、Fas 等）、增殖指标等去比较不同证型患者的舌苔脱落细胞。<span class="ev ev-a" title="证据标签">A：同上</span></p>
+<h3 id="s13">2. 舌苔形成的调控机制<span class="ev ev-a" title="证据标签">A</span></h3>
+<p>《南京中医药大学学报》2024 年刊文综述舌苔形成的调控机制，指出：越来越多证据显示舌苔图像及其成分对系统性疾病有诊断价值，但舌苔形成的细胞与分子生物学机制仍缺乏系统深入研究；文章分析了免疫—神经—内分泌系统、生物毒素、物理因素对舌苔形成的调控，提出从舌苔微环境（微生物、免疫、内分泌、机械拉伸、温度等）探索舌苔形成机制的思路。（doi:10.14148/j.issn.1672-0482.2024.0201）</p>
+<h3 id="s14">3. 舌苔代谢组<span class="ev ev-a" title="证据标签">A</span></h3>
+<p>2013 年有研究比较慢性乙型肝炎患者不同舌苔的代谢物差异（Zhao Y 等，Evid Based Complement Alternat Med 2013）。<span class="ev ev-a" title="证据标签">A：题名已见</span></p>
+<hr>
+<h2 id="s15">五、舌苔微生物组</h2>
+<p>这是近十五年中医舌诊研究里最活跃的一条线，也是中西两套机制第一次在同一块「舌面土壤」上正面相遇的地方。</p>
+<h3 id="s16">1. 寒证热证与舌苔菌群（2012）<span class="ev ev-a" title="证据标签">A</span></h3>
+<p>Jiang B 等，Sci Rep 2012;2:936。研究者设计了 Illumina 双端、双条码 16S rRNA 测序方案，每个样本获得约 370 万条 V6 标签；鉴定出在寒证、热证患者中分别富集的 123 个和 258 个种水平 OTU，称为「冷菌群」「热菌群」，并构建了与寒热证相关的舌苔菌群失衡网络。作者推测：菌群组成是影响舌苔外观的关键因素之一，舌苔所定义的寒热证与胃病特征的关联，可能植根于菌群特征与机体健康状态的关联。</p>
+<h3 id="s17">2. 舌苔菌群与胃炎癌前级联（2019）<span class="ev ev-a" title="证据标签">A</span></h3>
+<p>Cui J 等，Protein &amp; Cell 2019;10:496–509。基于 78 例胃炎患者与 50 名健康者，发现舌苔菌群的变异与胃炎的发生发展相关；鉴定出 21 个可区分胃炎与健康人舌苔菌群的微生物种；胃炎患者中环境多样代谢、抗生素合成、细菌趋化等通路上调；简明弯曲菌（Campylobacter concisus）丰度与胃癌前级联相关。</p>
+<h3 id="s18">3. 舌苔菌群与胃癌风险（2018）<span class="ev ev-a" title="证据标签">A</span></h3>
+<p>J Cancer 2018;9(21):4039–4048（第一作者待核）。57 例新诊断胃腺癌与 80 名健康对照，焦磷酸测序 16S rRNA。发现厚壁菌门相对丰度较高、拟杆菌门较低与胃癌风险升高相关；属水平上，链球菌有升高风险的趋势，奈瑟菌、普雷沃菌、Prevotella7、卟啉单胞菌与较低风险相关。病例来自江苏省中医院 2011—2012 年。</p>
+<h3 id="s19">4. 健康人不同舌苔类型的菌群（PMC8317956）<span class="ev ev-a pend" title="证据标签">A：期刊与年份待核</span></h3>
+<p>对 94 名健康人按颜色、厚薄、润燥分成八种舌苔类型，做宏基因组测序。总体上各类型舌苔的菌群组成差别不大，但每种苔型都有自己的特征菌，其中不少关键菌已被报道与疾病有关；纳入糖尿病患者后，在同样的苔型中发现了疾病特异性富集的二氧化碳嗜纤维菌属（Capnocytophaga）。文章还概括，舌苔菌群主要包括拟杆菌、梭杆菌、放线菌、厚壁菌等门类，其组成受宿主上皮营养、唾液及其相互作用塑造。</p>
+<p>这一条很关键：<b>同样看起来是「黄腻苔」，健康人和糖尿病患者舌上的菌并不一样</b>。也就是说，肉眼看到的显露相同，背后的差异路径可以不同。</p>
+<h3 id="s20">5. 舌苔菌群与新冠严重程度（2023）<span class="ev ev-a" title="证据标签">A</span></h3>
+<p>Jiang Z 等，J Oral Microbiol 2023;15(1):2236429。南京的研究，健康对照 37 人、轻中症 49 人、重症与危重症 44 人，考察舌苔菌群与新冠病情严重程度的关系，目的是尽早识别重症倾向。</p>
+<h3 id="s21">6. 舌苔菌群与胃癌（2023，见下文 AI 部分）<span class="ev ev-a" title="证据标签">A</span></h3>
+<p>Yuan L 等的研究同时用舌图像与舌苔菌群诊断胃癌，菌群模型 AUC 在属水平达 0.94、种水平达 0.95。</p>
+<hr>
+<h2 id="s22">六、人工智能与舌图像</h2>
+<h3 id="s23">1. 标志性研究：舌图像诊断胃癌（2023）<span class="ev ev-a" title="证据标签">A</span></h3>
+<p>Yuan L, Yang L, Zhang S 等，EClinicalMedicine 2023;57:101834，doi:10.1016/j.eclinm.2023.101834。浙江省肿瘤医院牵头，西湖大学等多单位参与。</p>
+<ul><li>第一阶段（2020 年 5 月—2021 年 1 月）：同时采集 328 例新诊断胃癌患者与 304 例非胃癌参与者的舌图像和舌苔样本，16S rDNA 测序刻画舌苔菌群，建立深度学习模型。舌图像模型 AUC 0.89；舌苔菌群模型 AUC 属水平 0.94、种水平 0.95。</li><li>第二阶段（2020 年 5 月—2022 年 3 月）：全国 10 个中心前瞻性纳入 937 例胃癌与 1911 例非胃癌参与者；另在 7 个中心的独立外部验证队列纳入 294 例胃癌与 521 例非胃癌参与者。三种舌图像模型内部验证 AUC 0.88—0.92，独立外部验证 0.83—0.88，显著优于八项血液标志物的组合。</li><li>作者结论：舌图像可以作为胃癌诊断的一种稳定方法，所建模型能区分胃癌与非胃癌参与者，甚至包括早期胃癌与萎缩性胃炎等癌前病变。</li><li>注册号：ClinicalTrials.gov NCT01090362。</li></ul>
+<p>编者提示：这项研究的对照组是「非胃癌参与者」，其构成对 AUC 影响很大；研究在中国多中心开展，能否推广到其他人群、其他拍摄设备，需要进一步外部验证。后续该团队已登记用舌像筛查鼻咽癌等研究（NCT06129201、NCT06078930 等）。<span class="ev ev-a" title="证据标签">A</span></p>
+<h3 id="s24">2. 其他疾病方向<span class="ev ev-a" title="证据标签">A</span></h3>
+<div class="tbl"><table><thead><tr><th>方向</th><th>文献</th></tr></thead><tbody><tr><td>胃癌前病变筛查</td><td>Ma CZ 等，J Pers Med 2023;13(2):271</td></tr><tr><td>非酒精性脂肪性肝病</td><td>Jiang T 等，Comput Biol Med 2021;135:104622</td></tr><tr><td>糖尿病风险预测</td><td>Li J 等，Int J Med Inform 2021;149:104429</td></tr><tr><td>初诊胃癌患者舌象特征客观化</td><td>姜楠、袁莉、汪莉等，中华中医药杂志 2023;38(1):427–433</td></tr><tr><td>点刺检测</td><td>Wang XZ 等，Evid Based Complement Alternat Med 2022:5899975</td></tr><tr><td>舌体分割</td><td>Li MY 等，J Healthc Eng 2021:5853128（U-Net 加全局卷积模块）</td></tr><tr><td>两阶段分割与特征识别</td><td>Yi TX 等，World J Tradit Chin Med 2024;10(4):460–464（594 张舌图）</td></tr><tr><td>舌部病变分类（口腔医学方向）</td><td>Tiryaki B 等，BMC Med Imaging 2024;24:59（623 例，四类病变加正常，五分类融合后准确率 88.76%）</td></tr><tr><td>舌诊能力电子评估（日本）</td><td>Segawa M 等，Front Med Technol 2023;5:1050909</td></tr></tbody></table></div>
+<h3 id="s25">3. 综述<span class="ev ev-a" title="证据标签">A</span></h3>
+<ul><li>Liu Q, Li Y, Yang P 等，Digital Health 2023;9，综述近五年舌图像的校正、检测、分割，以及疾病、证候、症状体征的分类。</li><li>许家佗等，Digital Chinese Medicine 2024;7(1):3–12，综述基于机器学习的舌图像诊断分析现状与展望。</li></ul>
+<h3 id="s26">4. AI 线的三个共同问题（编者归纳，非文献原话）</h3>
+<ol><li>标签从哪里来：多数舌象分类模型的训练标签来自医生判读，而医生间一致性只有中等（见本编第三节）。机器学会的，可能是某一批医生的共同习惯。</li><li>跨设备、跨人群：同一模型换一台相机、换一个地区的人群，性能往往下降。</li><li>读的是什么：模型给出高 AUC，并不说明它读到的是中医理论所说的「证」，还是西医意义上的某个局部病变，还是拍摄条件里混进来的偏差。这正是两套机制之间需要一个第三方框架的原因。</li></ol>
+<hr>
+<h2 id="s27">七、给子站的一句提要</h2>
+<p>中医舌诊的现代研究走了六条线：把相机标准化，把数据格式标准化，测医生之间看得准不准，剖开舌苔看细胞，测序舌苔看菌群，训练算法看图像。最有分量的发现是两条：一是医生之间的一致性只有中等，二是舌苔菌群与舌图像都对某些消化系统疾病有可观的区分力。前一条提醒我们显露的判读有噪声，后一条提醒我们显露背后确实有路径可循。</p>
+</article><div class="pn"><a href="/tcm/practice/"><small>上一编 · 04</small>中医舌诊操作与临床应用</a><a class="nx" href="/western/anatomy/"><small>下一编 · 06</small>舌的解剖、组织与胚胎发生</a></div></div><nav class="toc" aria-label="本编目录"><h2>本编目录</h2><a class="l2" href="#s1">一、客观化：从「医生的眼睛」到「标定过的相机」</a><a class="l2" href="#s5">二、标准化</a><a class="l2" href="#s8">三、可靠性：医生之间看得一样吗</a><a class="l2" href="#s11">四、舌苔的细胞与分子</a><a class="l2" href="#s15">五、舌苔微生物组</a><a class="l2" href="#s22">六、人工智能与舌图像</a><a class="l2" href="#s27">七、给子站的一句提要</a></nav></div>
+</main>
+<footer><div class="wrap">
+<div><h4>这里不是看病的地方</h4><p>本站材料只用于思想研究和知识普及，不构成诊断或治疗建议。舌头上的任何持续改变——尤其是两周以上不愈的溃疡、白斑、红斑、硬结、出血，伸舌偏斜，舌肌萎缩或颤动，吞咽和说话困难——都应及时到正规医疗机构就诊，不能靠自己对着镜子判断。中医舌诊须由执业中医师四诊合参，西医舌部病变须由口腔科、耳鼻喉科、神经科等专科医师评估。古籍所载方药只作史料，不作用药依据。</p></div>
+<div><h4>证据怎么标</h4><div class="legend"><span><span class="ev ev-a">A</span> 编写时实搜见到原文献</span><span><span class="ev ev-b">B</span> 古籍原文</span><span><span class="ev ev-cc">C</span> 教材通识</span><span><span class="ev ev-p">待核</span> 上站后仍须补核</span></div>
+<p style="margin-top:14px">舌诊材料库 v1.0 · 2026-09-25<br>Claude 编纂 · 依王德生令 · <a href="https://sdeuniverses.com/">SDE Universes</a> 子站</p></div>
+</div></footer>
+</body>
+</html>

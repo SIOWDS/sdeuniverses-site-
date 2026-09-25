@@ -1,9 +1,10 @@
 // 复现 worker.js 11296 附近的分站分流逻辑（与源码逐字一致的那两行）
-const SUBSITES = { health: "/sites/health", lang: "/sites/lang", liter: "/sites/liter", edu: "/sites/edu" };
+const SUBSITES = { health: "/sites/health", lang: "/sites/lang", liter: "/sites/liter", edu: "/sites/edu", tongue: "/sites/tongue" };
 const EXIST = new Set(["/sites/lang/index.html","/sites/health/index.html","/sites/health/all/index.html",
   "/sites/liter/index.html","/sites/edu/index.html","/sites/edu/join/index.html","/sites/edu/all/index.html","/sites/edu/chatyang/index.html",
   "/index.html","/students/hu-zhiying/index.html","/students/yang-yong/index.html",
-  "/books/m/62/index.html","/books/m/57/index.html","/assets/sde-talk.js"]);
+  "/books/m/62/index.html","/books/m/57/index.html","/assets/sde-talk.js",
+  "/sites/tongue/index.html","/sites/tongue/all/index.html","/sites/tongue/genesis/index.html","/sites/tongue/classics/bianzheng/index.html"]);
 function assetExists(p){ return EXIST.has(p) || EXIST.has(p.replace(/\/$/,"/index.html")); }
 function route(host, pathname){
   const subHost = host.toLowerCase();
@@ -32,6 +33,11 @@ const cases=[
  ["edu.sdeuniverses.com","/students/yang-yong/","/students/yang-yong/",true],
  ["edu.sdeuniverses.com","/books/m/57/","/books/m/57/",true],
  ["liter.sdeuniverses.com","/","/sites/liter/",false],
+ ["tongue.sdeuniverses.com","/","/sites/tongue/",false],
+ ["tongue.sdeuniverses.com","/all/","/sites/tongue/all/",false],
+ ["tongue.sdeuniverses.com","/genesis/","/sites/tongue/genesis/",false],
+ ["tongue.sdeuniverses.com","/classics/bianzheng/","/sites/tongue/classics/bianzheng/",false],
+ ["tongue.sdeuniverses.com","/assets/sde-talk.js","/assets/sde-talk.js",true],
  ["evil.example.com","/","/",false],
 ];
 let pass=0,fail=0;

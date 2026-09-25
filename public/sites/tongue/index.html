@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>舌诊发生学 · 一条舌头，两套读法</title>
+<meta name="description" content="同一条舌头，中医读成全身的显露，西医查成一个器官。舌诊发生学把两套机制的材料并排摆开，再问舌象是怎样一步步发生的。材料库 v1.0，含六种公有领域舌诊古籍原文。">
+<link rel="canonical" href="https://tongue.sdeuniverses.com/">
+<meta property="og:title" content="舌诊发生学 · 一条舌头，两套读法">
+<meta property="og:description" content="同一条舌头，中医读成全身的显露，西医查成一个器官。舌诊发生学把两套机制的材料并排摆开，再问舌象是怎样一步步发生的。材料库 v1.0，含六种公有领域舌诊古籍原文。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F1F3EF">
+<meta name="tier" content="L0">
+<meta name="tier_set_at" content="成稿">
+<meta name="tier_reason" content="Q2无拟定标签（台账记标签缺项）→Q3第一刀：公开文献汇编与公有领域古籍，主张层为主，无真跑数据与占位者名录全貌">
+<meta name="cite_ok" content="true">
+<meta name="source" content="自撰">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 26'%3E%3Cpath d='M3 2C2 9 2 15 6 20c2 3 4 4 5 4s3-1 5-4c4-5 4-11 3-18C15 1 7 1 3 2Z' fill='%23E8BCC2' stroke='%23A3364B' stroke-width='1.4'/%3E%3C/svg%3E">
+<style>
+:root{
+  --tai:#F1F3EF; --sheet:#FAFBF8; --ink:#20262A; --ink2:#535D62; --ink3:#838C90;
+  --line:#D3D8D2; --line2:#E3E7E1;
+  --rose:#A3364B; --rose-l:#E8BCC2; --rose-f:#F4DDE0;
+  --indigo:#2E4C69; --indigo-l:#C9D6E3;
+  --ochre:#8E6E22; --ochre-l:#F0E3BF;
+  --moss:#3F6A52;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:70px}
+body{margin:0;background:var(--tai);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.8}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:2px solid var(--indigo);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+.top{position:sticky;top:0;z-index:20;background:rgba(241,243,239,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;min-height:56px;flex-wrap:wrap}
+.brand{font-family:var(--serif);font-weight:700;font-size:19px;letter-spacing:.12em;text-decoration:none;display:flex;align-items:center;gap:9px}
+.brand svg{flex:none}
+.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--ink2)}
+.top nav a{text-decoration:none;padding:4px 0;border-bottom:2px solid transparent}
+.top nav a:hover,.top nav a[aria-current]{color:var(--ink);border-bottom-color:var(--rose)}
+.top nav a.main{color:var(--ink3)}
+footer{margin-top:72px;border-top:1px solid var(--line);background:var(--sheet);font-size:13.5px;color:var(--ink2)}
+footer .wrap{padding-top:28px;padding-bottom:40px;display:grid;grid-template-columns:1.4fr 1fr;gap:34px}
+footer h4{margin:0 0 6px;font-size:14px;color:var(--ink)}
+footer p{margin:0 0 10px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:8px 0 0}
+.ev{display:inline-block;font-family:var(--sans);font-size:.72em;line-height:1.5;padding:0 .45em;margin:0 .15em;border-radius:3px;vertical-align:.12em;white-space:nowrap;border:1px solid transparent;font-weight:500}
+.ev-a{background:#DCEADF;color:#2C5A3E}
+.ev-b{background:var(--rose-f);color:#7E2839}
+.ev-cc{background:#E3E7EC;color:#3F4C5A}
+.ev-p,.ev.pend{background:transparent;border-color:#C9A451;color:#7A5C14}
+.ev-a.pend,.ev-b.pend,.ev-cc.pend{border-style:dashed}
+@media (max-width:760px){footer .wrap{grid-template-columns:1fr}.top{position:static}.top .wrap{gap:4px;padding-top:8px;padding-bottom:4px}.top nav{margin-left:0;gap:14px;font-size:14px;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;width:100%;padding-bottom:4px}html{scroll-padding-top:10px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:40px;align-items:center;padding:52px 0 36px}
+.hero h1{font-family:var(--serif);font-size:clamp(34px,5.6vw,58px);line-height:1.22;margin:0 0 .45em;font-weight:700;letter-spacing:.04em}
+.hero .lede{font-size:17px;color:var(--ink2);max-width:30em;margin:0 0 1.1em}
+.hero .lede b{color:var(--ink);font-weight:600}
+.facts{font-size:14px;color:var(--ink2);border-top:1px solid var(--line);padding-top:14px;max-width:32em}
+.facts p{margin:.2em 0}
+.fig{margin:0;background:var(--sheet);border:1px solid var(--line);padding:14px 14px 16px}
+.switch{display:flex;gap:0;border:1px solid var(--line);width:max-content;margin:0 auto 6px}
+.switch button{font:inherit;font-size:14.5px;padding:6px 16px;background:transparent;border:0;cursor:pointer;color:var(--ink2)}
+.switch button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.switch button[data-m="tcm"][aria-pressed="true"]{background:var(--rose)}
+.switch button[data-m="west"][aria-pressed="true"]{background:var(--indigo)}
+.tongue{display:block;width:100%;height:auto}
+.tongue .lab text{font-family:var(--serif);font-size:21px;fill:#3A2A2E;font-weight:700}
+.tongue .lab text.sub{font-family:var(--sans);font-size:15px;font-weight:500;fill:#5B4A4E}
+.tongue .lab.west text{font-family:var(--sans);font-size:16px;font-weight:600;fill:#23384D}
+.tongue .lab.west text.sub{font-size:12.5px;font-weight:400;fill:#5C6B78}
+.tongue .g-tcm,.tongue .g-west{transition:opacity .35s ease}
+.fig[data-mode="tcm"] .g-west,.fig[data-mode="west"] .g-tcm{opacity:0;pointer-events:none}
+.cap{font-size:14px;color:var(--ink2);line-height:1.75;margin:6px 4px 0;min-height:4.5em}
+.cap[hidden]{display:none}
+.band{border-top:1px solid var(--line);padding:40px 0 10px}
+.band>h2,.gh h2{font-family:var(--serif);font-size:26px;margin:0 0 .2em;letter-spacing:.03em}
+.band>p.sub{color:var(--ink2);margin:0 0 22px;max-width:40em}
+.cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-top:2px solid var(--ink)}
+.case{padding:18px 20px 16px 0;border-bottom:1px solid var(--line)}
+.case:nth-child(2n){padding-left:20px;border-left:1px solid var(--line)}
+.case h3{font-family:var(--serif);font-size:20px;margin:0 0 8px}
+.case dl{margin:0}
+.case dl div{display:grid;grid-template-columns:4.2em 1fr;gap:8px;margin:0 0 6px;font-size:14.5px;line-height:1.7}
+.case dt{font-weight:600}
+.case dt.t{color:var(--rose)} .case dt.w{color:var(--indigo)}
+.case dd{margin:0;color:var(--ink2)}
+.verdict{margin:10px 0 0;font-size:14.5px}
+.verdict b{color:var(--ochre)}
+.more{margin:16px 0 0;font-size:14.5px}
+.more a{color:var(--indigo)}
+.grp{border-top:1px solid var(--line);padding:34px 0 8px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:10px 34px}
+.gh p{color:var(--ink2);font-size:14.5px;margin:.2em 0 0}
+.gnote{grid-column:2;margin:0 0 6px;font-size:14.5px;color:var(--ink2);max-width:44em;background:var(--sheet);border-left:3px solid var(--ochre);padding:9px 13px}
+.rows{grid-column:2;list-style:none;margin:0;padding:0}
+.rows li a{display:grid;grid-template-columns:2.4em minmax(0,15em) minmax(0,1fr) 6.2em;gap:14px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line2);text-decoration:none}
+.rows li a:hover .tt{color:var(--rose)}
+.rows .no{font-family:var(--serif);color:var(--ink3);font-size:15px}
+.rows .tt{font-family:var(--serif);font-weight:700;font-size:17px}
+.rows .bl{color:var(--ink2);font-size:14px;line-height:1.65}
+.rows .wc{color:var(--ink3);font-size:13px;text-align:right;white-space:nowrap}
+@media (max-width:900px){.hero{grid-template-columns:1fr}.grp{grid-template-columns:1fr}.gnote,.rows{grid-column:1}.rows li a{grid-template-columns:2.2em 1fr;}.rows .bl{grid-column:2}.rows .wc{grid-column:2;text-align:left}.cases{grid-template-columns:1fr}.case:nth-child(2n){padding-left:0;border-left:0}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="/"><svg width="22" height="26" viewBox="0 0 22 26" aria-hidden="true"><path d="M3 2C2 9 2 15 6 20c2 3 4 4 5 4s3-1 5-4c4-5 4-11 3-18C15 1 7 1 3 2Z" fill="#E8BCC2" stroke="#A3364B" stroke-width="1.4"/><path d="M11 5v14" stroke="#A3364B" stroke-width="1" stroke-dasharray="2 2"/></svg>舌诊发生学</a><nav aria-label="子站导航"><a href="/#tcm">中医</a><a href="/#western">西医</a><a href="/interface/">对照</a><a href="/genesis/">发生学</a><a href="/#classics">古籍</a><a href="/all/">全部篇目</a><a class="main" href="https://sdeuniverses.com/">主站</a></nav></div></header><main class="wrap">
+<section class="hero">
+<div>
+<h1>一条舌头，<br>两套读法</h1>
+<p class="lede">中医把舌头读成<b>全身的显露</b>：色淡还是红，苔厚还是薄，都指向体内的寒热虚实。西医把舌头当成<b>一个器官</b>来查：它有自己的肌肉、神经和菌群，只在少数情况下替全身亮灯。这里把两边的材料并排摆开，再问第三个问题：舌象是怎样一步步发生的。</p>
+<div class="facts"><p>材料库 v1.0（2026-09-25）：编纂材料约 4.2 万字，古籍原文与导读约 7.6 万字。</p><p>每条材料都挂证据标签；编纂材料里仍有 56 处标着「待核」，照原样公开。</p></div>
+</div>
+<figure class="fig" id="fig" data-mode="tcm">
+<div class="switch" role="group" aria-label="切换读法"><button type="button" data-m="tcm" aria-pressed="true">中医怎么分</button><button type="button" data-m="west" aria-pressed="false">西医怎么分</button></div>
+<svg viewBox="0 0 520 470" role="img" aria-labelledby="tg-t" class="tongue">
+<title id="tg-t">舌背示意：中医分区与西医解剖结构</title>
+<defs>
+ <clipPath id="tg-clip"><path d="M 128 58 Q 260 36 392 58 C 420 140 424 252 386 332 C 356 402 306 446 260 446 C 214 446 164 402 134 332 C 96 252 100 140 128 58 Z"/></clipPath>
+ <pattern id="tg-fili" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".95" fill="#B77A84"/><circle cx="5.5" cy="5.5" r=".95" fill="#B77A84"/></pattern>
+</defs>
+<g class="g-tcm">
+ <g clip-path="url(#tg-clip)">
+  <rect x="0" y="0" width="520" height="470" fill="#DCD3E8"/>
+  <ellipse cx="260" cy="240" rx="88" ry="96" fill="#CDE3D3"/>
+  <rect x="0" y="0" width="520" height="138" fill="#E8D8A8"/>
+  <rect x="0" y="334" width="520" height="140" fill="#F3C3CB"/>
+ </g>
+ <path d="M 128 58 Q 260 36 392 58 C 420 140 424 252 386 332 C 356 402 306 446 260 446 C 214 446 164 402 134 332 C 96 252 100 140 128 58 Z" fill="none" stroke="#7A3140" stroke-width="2"/>
+ <g class="lab" text-anchor="middle">
+  <text x="260" y="96">舌根</text><text x="260" y="121" class="sub">候肾</text>
+  <text x="260" y="236">舌中</text><text x="260" y="261" class="sub">候脾胃</text>
+  <text x="260" y="388">舌尖</text><text x="260" y="413" class="sub">候心肺</text>
+  <text x="144" y="206">舌</text><text x="144" y="230">边</text><text x="144" y="258" class="sub">肝</text><text x="144" y="278" class="sub">胆</text>
+  <text x="376" y="206">舌</text><text x="376" y="230">边</text><text x="376" y="258" class="sub">肝</text><text x="376" y="278" class="sub">胆</text>
+ </g>
+</g>
+<g class="g-west">
+ <path d="M 128 58 Q 260 36 392 58 C 420 140 424 252 386 332 C 356 402 306 446 260 446 C 214 446 164 402 134 332 C 96 252 100 140 128 58 Z" fill="#F0CDD2"/>
+ <g clip-path="url(#tg-clip)"><rect x="0" y="202" width="520" height="280" fill="url(#tg-fili)" opacity=".85"/></g>
+ <path d="M 128 58 Q 260 36 392 58 C 420 140 424 252 386 332 C 356 402 306 446 260 446 C 214 446 164 402 134 332 C 96 252 100 140 128 58 Z" fill="none" stroke="#2E4C69" stroke-width="2"/>
+ <polyline points="126.6,132 260,182 393.4,132" fill="none" stroke="#2E4C69" stroke-width="1.7" stroke-dasharray="5 4"/>
+ <circle cx="260" cy="185" r="4.5" fill="#2E4C69"/>
+ <g fill="#E7A9B2" stroke="#8A3446" stroke-width="1.3"><circle cx="153.3" cy="157.0" r="6.5"/><circle cx="366.7" cy="157.0" r="6.5"/><circle cx="180.0" cy="167.0" r="6.5"/><circle cx="340.0" cy="167.0" r="6.5"/><circle cx="206.6" cy="177.0" r="6.5"/><circle cx="313.4" cy="177.0" r="6.5"/><circle cx="233.3" cy="187.0" r="6.5"/><circle cx="286.7" cy="187.0" r="6.5"/><circle cx="260" cy="198" r="6.5"/></g>
+ <g stroke="#8A3446" stroke-width="1.7"><line x1="110.9" y1="156" x2="117.9" y2="159"/><line x1="409.1" y1="156" x2="402.1" y2="159"/><line x1="110.0" y1="168" x2="117.0" y2="171"/><line x1="410.0" y1="168" x2="403.0" y2="171"/><line x1="109.5" y1="180" x2="116.5" y2="183"/><line x1="410.5" y1="180" x2="403.5" y2="183"/><line x1="109.2" y1="192" x2="116.2" y2="195"/><line x1="410.8" y1="192" x2="403.8" y2="195"/></g>
+ <g fill="#C8485E" clip-path="url(#tg-clip)"><circle cx="121.4" cy="236" r="3.2"/><circle cx="398.6" cy="236" r="3.2"/><circle cx="126.6" cy="270" r="3.2"/><circle cx="393.4" cy="270" r="3.2"/><circle cx="135.7" cy="304" r="3.2"/><circle cx="384.3" cy="304" r="3.2"/><circle cx="155" cy="338" r="3.2"/><circle cx="365" cy="338" r="3.2"/><circle cx="171" cy="366" r="3.2"/><circle cx="349" cy="366" r="3.2"/><circle cx="200" cy="390" r="3.2"/><circle cx="320" cy="390" r="3.2"/><circle cx="220" cy="410" r="3.2"/><circle cx="300" cy="410" r="3.2"/><circle cx="240" cy="424" r="3.2"/><circle cx="280" cy="424" r="3.2"/><circle cx="260" cy="430" r="3.2"/><circle cx="232" cy="398" r="3.2"/><circle cx="288" cy="398" r="3.2"/><circle cx="260" cy="412" r="3.2"/><circle cx="210" cy="372" r="3.2"/><circle cx="310" cy="372" r="3.2"/></g>
+ <line x1="260" y1="216" x2="260" y2="396" stroke="#9C6570" stroke-width="1.2" stroke-dasharray="3 5"/>
+ <g stroke="#6B7A86" stroke-width="1" fill="none">
+  <path d="M 64 112 L 168 112 L 173.3 149.5"/>
+  <path d="M 64 186 L 112.3 186"/>
+  <path d="M 64 368 L 200 390"/>
+  <path d="M 456 150 L 348 150 L 264 183"/>
+  <path d="M 456 206 L 313.4 177.0"/>
+  <path d="M 456 272 L 312 272"/>
+ </g>
+ <g class="lab west">
+  <text x="60" y="107" text-anchor="end">界沟</text>
+  <text x="60" y="181" text-anchor="end">叶状</text><text x="60" y="200" text-anchor="end">乳头</text>
+  <text x="60" y="363" text-anchor="end">菌状</text><text x="60" y="382" text-anchor="end">乳头</text>
+  <text x="460" y="146">舌盲孔</text>
+  <text x="460" y="202">轮廓</text><text x="460" y="221">乳头</text>
+  <text x="460" y="268">丝状</text><text x="460" y="287">乳头</text>
+ </g>
+</g>
+</svg>
+<figcaption>
+<p class="cap" data-m="tcm">舌尖候心肺，舌中候脾胃，舌边候肝胆，舌根候肾——这是教材里最通行的一种分法。古籍里还有按三焦、按胃脘分的，彼此并不统一，见<a href="/tcm/mechanism/">第 02 编</a>。</p>
+<p class="cap" data-m="west" hidden>西医看到的是另一张图：界沟把舌分成前三分之二和后三分之一，两部分的胚胎来源不同，感觉也由不同的脑神经管；舌肌的运动几乎全归舌下神经，只有腭舌肌例外。见<a href="/western/anatomy/">第 06 编</a>。</p>
+</figcaption>
+</figure>
+</section>
+
+<section class="band">
+<h2>同一个舌象，两边各读成什么</h2>
+<p class="sub">第 10 编逐项对照了二十五个舌象。下面四个，分别代表四种情形：接得最好的、分得最开的、只有一边有的、一边比另一边细的。</p>
+<div class="cases"><div class="case"><h3>光滑舌（镜面舌）</h3><dl><div><dt class="t">中医读</dt><dd>胃阴枯竭、胃气大伤</dd></div><div><dt class="w">西医读</dt><dd>萎缩性舌炎：多见于铁、维生素 B12、叶酸缺乏，也见于念珠菌感染、口干</dd></div></dl><p class="verdict"><b>对接最好的一处。</b>两边都读成严重的全身性亏损，西医还指出了缺的是哪几种营养素。</p></div><div class="case"><h3>地图舌</h3><dl><div><dt class="t">中医读</dt><dd>剥苔：胃气胃阴不足；小儿多责之脾虚、食积</dd></div><div><dt class="w">西医读</dt><dd>良性游走性舌炎，多数不必治疗</dd></div></dl><p class="verdict"><b>分歧最大的一处。</b>同一个样子，一边读成病，一边读成无害的个体差异。</p></div><div class="case"><h3>腻苔</h3><dl><div><dt class="t">中医读</dt><dd>湿浊、痰饮、食积</dd></div><div><dt class="w">西医读</dt><dd>没有这个概念；可能与菌膜结构、黏液、清除变慢有关</dd></div></dl><p class="verdict"><b>西医空白。</b>中医分得很细的一个维度，西医的分类里找不到对应项。</p></div><div class="case"><h3>伸舌歪斜</h3><dl><div><dt class="t">中医读</dt><dd>中风、风痰</dd></div><div><dt class="w">西医读</dt><dd>舌下神经或其上位通路受损；看偏向哪一侧，能判断病变在哪一级</dd></div></dl><p class="verdict"><b>西医更细。</b>两边都说「看到就要警惕」，西医还能据方向定位。</p></div></div>
+<p class="more"><a href="/interface/">看全部二十五项对照</a></p>
+</section>
+
+<section class="grp" id="tcm"><div class="gh"><h2>中医读法</h2><p>中医把舌头读成全身的显露</p></div><ol class="rows"><li><a href="/tcm/history/"><span class="no">01</span><span class="tt">中医舌诊源流编年</span><span class="bl">从甲骨卜辞到《敖氏伤寒金镜录》，再到清代舌鉴与今天的 ISO 标准。</span><span class="wc">3,803 字</span></a></li><li><a href="/tcm/mechanism/"><span class="no">02</span><span class="tt">中医舌诊的理论机制</span><span class="bl">舌凭什么能反映脏腑：经络连线、胃气生苔、舌面分区的几种说法。</span><span class="wc">2,985 字</span></a></li><li><a href="/tcm/signs/"><span class="no">03</span><span class="tt">中医舌象分类体系</span><span class="bl">舌色、舌形、舌态、舌下络脉、苔质、苔色，逐条写表现、成因与意义。</span><span class="wc">3,873 字</span></a></li><li><a href="/tcm/practice/"><span class="no">04</span><span class="tt">中医舌诊操作与临床应用</span><span class="bl">光线、姿势、染苔、生理变异，以及病程里舌象怎样一步步变。</span><span class="wc">2,564 字</span></a></li></ol></section><section class="grp" id="western"><div class="gh"><h2>西医读法</h2><p>西医把舌头当成一个器官来查</p></div><ol class="rows"><li><a href="/western/anatomy/"><span class="no">06</span><span class="tt">舌的解剖、组织与胚胎发生</span><span class="bl">肌肉、五对脑神经、四种乳头、味觉分区图的误会，以及舌从哪里长出来。</span><span class="wc">3,507 字</span></a></li><li><a href="/western/mechanism/"><span class="no">07</span><span class="tt">西医视角下的舌象形成机制</span><span class="bl">舌色的三层来源、舌苔的生成与清除、萎缩、草莓舌、舌脂肪。</span><span class="wc">3,535 字</span></a></li><li><a href="/western/signs/"><span class="no">08</span><span class="tt">西医临床舌征图谱</span><span class="bl">良性变异、营养缺乏、感染、系统病、神经病变与八条警示信号。</span><span class="wc">3,807 字</span></a></li><li><a href="/western/history/"><span class="no">09</span><span class="tt">西医舌检查史</span><span class="bl">十九世纪医生人人看舌，二十世纪为什么退场，今天又为什么回来。</span><span class="wc">2,692 字</span></a></li></ol></section><section class="grp" id="interface"><div class="gh"><h2>两套之间</h2><p>同一个舌象，两边各怎么读</p></div><ol class="rows"><li><a href="/interface/"><span class="no">10</span><span class="tt">两套机制对照与接口</span><span class="bl">二十五个舌象逐项对照：哪里接得上，哪里接不上，为什么。</span><span class="wc">3,099 字</span></a></li></ol></section><section class="grp" id="genesis"><div class="gh"><h2>发生学</h2><p>舌象是怎样一步步显露出来的</p></div><p class="gnote">舌苔像浴室镜子上的雾：洗澡时起、开门就退，一天起落好几回。镜子上从来不是「一层雾」，而是起雾和散雾两股力量此刻的差。舌象也是这样一个差——这是「发生学」看舌的起点。清末刘恒瑞把无病者一日三变的苔叫「活苔」，说的正是这件事（原文见第 17 编）。</p><ol class="rows"><li><a href="/genesis/"><span class="no">11</span><span class="tt">发生学材料与候选命题</span><span class="bl">舌象是怎样发生的：三维读法、日常案例，以及六条待裁的候选命题。</span><span class="wc">4,129 字</span></a></li></ol></section><section class="grp" id="data"><div class="gh"><h2>研究与数据</h2><p>现代研究、文献与数字</p></div><ol class="rows"><li><a href="/research/"><span class="no">05</span><span class="tt">中医舌诊的现代研究</span><span class="bl">客观化设备、ISO 20498、可靠性研究、舌苔菌群与 AI 舌象诊断。</span><span class="wc">3,705 字</span></a></li><li><a href="/data/"><span class="no">12</span><span class="tt">文献目录与数据表</span><span class="bl">全部文献按证据级别分列，关键数字表与子站数据结构草案。</span><span class="wc">1,833 字</span></a></li></ol></section><section class="grp" id="classics"><div class="gh"><h2>古籍原文</h2><p>六种公有领域古籍，原文照录</p></div><p class="gnote">六种古籍都来自公有领域的数字底本，未经校订：舌图全缺，个别处缺字、脱文。每编卷首写明底本出处，并有一篇编者导读，交代它和前面哪几编的论点相关。</p><ol class="rows"><li><a href="/classics/jinjinglu/"><span class="no">13</span><span class="tt">敖氏伤寒金镜录</span><span class="bl">元代，三十六舌，现存最早的舌诊专书。</span><span class="wc">17,489 字</span></a></li><li><a href="/classics/shejian/"><span class="no">14</span><span class="tt">伤寒舌鉴</span><span class="bl">清 1668 年，以舌色为纲，一百二十图；自序里有舌图的增删史。</span><span class="wc">8,053 字</span></a></li><li><a href="/classics/bianzheng/"><span class="no">15</span><span class="tt">舌鉴辨正</span><span class="bl">清 1894 年，一百四十九舌，几乎每条都在驳旧说。</span><span class="wc">21,181 字</span></a></li><li><a href="/classics/yanshefa/"><span class="no">16</span><span class="tt">临症验舌法</span><span class="bl">把舌诊从伤寒推到内外杂病：以舌分虚实、阴阳、脏腑。</span><span class="wc">12,040 字</span></a></li><li><a href="/classics/chashe/"><span class="no">17</span><span class="tt">察舌辨症新法</span><span class="bl">清末民初，用新学名词讲舌苔的早期尝试。</span><span class="wc">3,991 字</span></a></li><li><a href="/classics/xingse/"><span class="no">18</span><span class="tt">形色外诊简摩（舌诊部分）</span><span class="bl">把舌质与舌苔明确分开讲的一个文献节点。</span><span class="wc">12,747 字</span></a></li></ol></section><section class="grp" id="guide"><div class="gh"><h2>凡例</h2><p>先读这一篇</p></div><ol class="rows"><li><a href="/guide/"><span class="no">00</span><span class="tt">总说明与凡例</span><span class="bl">这套材料为什么这样分、证据怎么标、术语怎么用、哪些还没核。</span><span class="wc">2,215 字</span></a></li></ol></section>
+</main>
+<footer><div class="wrap">
+<div><h4>这里不是看病的地方</h4><p>本站材料只用于思想研究和知识普及，不构成诊断或治疗建议。舌头上的任何持续改变——尤其是两周以上不愈的溃疡、白斑、红斑、硬结、出血，伸舌偏斜，舌肌萎缩或颤动，吞咽和说话困难——都应及时到正规医疗机构就诊，不能靠自己对着镜子判断。中医舌诊须由执业中医师四诊合参，西医舌部病变须由口腔科、耳鼻喉科、神经科等专科医师评估。古籍所载方药只作史料，不作用药依据。</p></div>
+<div><h4>证据怎么标</h4><div class="legend"><span><span class="ev ev-a">A</span> 编写时实搜见到原文献</span><span><span class="ev ev-b">B</span> 古籍原文</span><span><span class="ev ev-cc">C</span> 教材通识</span><span><span class="ev ev-p">待核</span> 上站后仍须补核</span></div>
+<p style="margin-top:14px">舌诊材料库 v1.0 · 2026-09-25<br>Claude 编纂 · 依王德生令 · <a href="https://sdeuniverses.com/">SDE Universes</a> 子站</p></div>
+</div></footer>
+<script>
+(function(){var f=document.getElementById('fig');if(!f)return;var bs=f.querySelectorAll('.switch button');
+function set(m){f.setAttribute('data-mode',m);for(var i=0;i<bs.length;i++){bs[i].setAttribute('aria-pressed',bs[i].getAttribute('data-m')===m?'true':'false');}
+var cs=f.querySelectorAll('.cap');for(var j=0;j<cs.length;j++){cs[j].hidden=cs[j].getAttribute('data-m')!==m;}}
+for(var i=0;i<bs.length;i++){bs[i].addEventListener('click',function(){set(this.getAttribute('data-m'));});}
+set('tcm');})();
+</script>
+</body>
+</html>
