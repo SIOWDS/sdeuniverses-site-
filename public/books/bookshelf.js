@@ -29,6 +29,8 @@
   matched.sort((a,b)=>{
    if(sort.value==='number')return (Number(a.dataset.number)||9999)-(Number(b.dataset.number)||9999)||initialOrder.get(a)-initialOrder.get(b);
    if(sort.value==='title')return a.dataset.title.localeCompare(b.dataset.title,'zh-CN');
+   if(sort.value==='online-new')return (b.dataset.online||'').localeCompare(a.dataset.online||'')||initialOrder.get(a)-initialOrder.get(b);
+   if(sort.value==='online-old')return (a.dataset.online||'').localeCompare(b.dataset.online||'')||initialOrder.get(b)-initialOrder.get(a);
    return initialOrder.get(a)-initialOrder.get(b);
   });
   cards.forEach(c=>{c.hidden=true;});
