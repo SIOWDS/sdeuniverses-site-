@@ -37,6 +37,14 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
 footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
+.mono{display:flex;gap:22px;align-items:flex-start;text-decoration:none;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:24px 26px;margin-top:8px;transition:.2s}
+.mono:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(0,0,0,.35)}
+.mono img{width:120px;border:1px solid rgba(228,198,117,.35);flex:none;border-radius:4px}
+.mono small{color:var(--gold);letter-spacing:.2em;font-size:11px}
+.mono h2{color:#F5EFE0;font-size:24px;margin:8px 0;line-height:1.4}
+.mono p{margin:0;color:var(--ink2);font-size:14.5px;line-height:1.85}
+.mono .go{display:inline-block;margin-top:12px;color:var(--gold);font-size:14px;letter-spacing:.04em}
+@media(max-width:640px){.mono{flex-direction:column}.mono img{width:140px}}
 @media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
 </style></head>
 <body class="zh">
@@ -70,12 +78,16 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">02</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
 </div>
 <div class="works">
-  <div class="panel">
-    <div class="tag zh-only">作 品 陆 续 上 线</div>
-    <div class="tag en-only">WORKS COMING SOON</div>
-    <p class="zh-only">借一双「事物如何发生」的眼，在自己的领域里落笔——把 SDE 作为隐性的引擎，用本行的母语写作。作品通过合宪性审读后，将署名发表于此。</p>
-    <p class="en-only">Borrowing an eye trained on how things come to be, and writing in the native idiom of one’s own field — with SDE as a hidden engine. Once a piece passes its constitutionality review, it will be published here under this name.</p>
-  </div>
+  <div style="font-size:12px;letter-spacing:.28em;color:var(--gold);margin:6px 0 12px" class="zh-only">最 新 作 品 · 2026年9月26日 · 1 部</div>
+  <div style="font-size:12px;letter-spacing:.28em;color:var(--gold);margin:6px 0 12px" class="en-only">LATEST WORK · 26 SEPTEMBER 2026 · 1 BOOK</div>
+  <a class="mono" href="/books/m/221/">
+    <img src="/books/m/221/cover.jpg?v=20260926a" alt="《邬燕琴讲陶行知：普通人都能懂》封面">
+    <div><small>DEMAI INTERNATIONAL PRESS · MONOGRAPH NO. 221</small>
+    <h2>邬燕琴讲陶行知：普通人都能懂</h2>
+    <p class="zh-only">德麦国际出版社 · 专著第 221 号 · 一个人、一只放出笼的鸟，与 SDE 的解构 · 十三编五十五章 · 547 页 · 约 24.7 万字 · ISBN 979-8-90690-335-8。<br>判词：他把关在笼里的鸟放回了天空，又在天空和课堂之间画了一个等号。</p>
+    <p class="en-only">Demai International Press · Monograph No.221 · 55 chapters · 547 pp · ISBN 979-8-90690-335-8.<br>Verdict: he let the caged bird back into the sky, then drew an equals sign between the sky and the classroom.</p>
+    <span class="go zh-only">进入书页 · 全文网页 · 在线翻页 · 下载 PDF →</span><span class="go en-only">Book page · full text · flip reader · PDF →</span></div>
+  </a>
   <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
 </div>
 
