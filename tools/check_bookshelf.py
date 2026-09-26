@@ -35,27 +35,70 @@ def local_of(url):
     return p + 'index.html' if p.endswith('/') else p
 
 
+def path_only(u):
+    """去掉站点前缀、查询串与锚点，只留路径"""
+    if u.startswith(SITE):
+        u = u[len(SITE):]
+    return u.split('#', 1)[0].split('?', 1)[0]
+
+
+def is_r2_pdf(u):
+    """Worker 从 R2 取的那一类：/students/**.pdf（与 src/worker.js 的拦截同口径，大小写不敏感）。
+    必须先去掉 ?v= 缓存参数再判：2026-09-26 查出，#165、#195 的 pdfUrl 带 ?v=20260925，
+    旧写法 u.endswith('.pdf') 因此不成立，两本 R2 上完好的 PDF 被 ① 反复误报为「本地文件不存在」。"""
+    p = path_only(u)
+    return p.startswith('/students/') and p.lower().endswith('.pdf')
+
+
+def r2_code(u):
+    """去线上真取前 1KB，返回 HTTP 码（桶里没有时 Worker 回落 ASSETS，得 404）"""
+    import subprocess
+    e = SITE + urllib.parse.quote(path_only(u), safe='/%')
+    try:
+        return subprocess.run(
+            ['curl', '-s', '-o', os.devnull, '-w', '%{http_code}', '-r', '0-1023', e],
+            capture_output=True, text=True, timeout=40).stdout
+    except Exception:
+        return 'ERR'
+
+
 def check_catalog():
-    """① catalog.json 与本地文件一致性"""
+    """① catalog.json 与本地文件一致性；走 R2 的 PDF 不在本地，改为线上真取"""
+    import concurrent.futures
     print('① catalog.json 与本地文件')
     cat = json.load(open(os.path.join(PUB, 'books/catalog.json'), encoding='utf-8'))
     items = cat['books']
     bad = 0
+    r2 = []
     for it in items:
         for k in ('detailUrl', 'readUrl', 'chapterUrl', 'articlesUrl', 'pdfUrl', 'coverUrl'):
             u = it.get(k)
             p = local_of(u)
             if not p:
                 continue
-            # /students/**.pdf 走 R2，本地不存在是正常的
-            if '/students/' in u and u.endswith('.pdf'):
+            # /students/**.pdf 走 R2，本地必然没有——但不能就此免检，留到下面去线上真取
+            if is_r2_pdf(u):
+                r2.append((it, k, u))
                 continue
             if not os.path.exists(p):
                 print(f'   ✗ #{it.get("number")} {it["title"][:16]} {k} → {u[-56:]}')
                 bad += 1
-    print(f'   {len(items)} 条，缺失 {bad}')
+    r2_bad = 0
+    if r2 and not os.environ.get('SKIP_R2'):
+        with concurrent.futures.ThreadPoolExecutor(8) as ex:
+            codes = list(ex.map(lambda t: r2_code(t[2]), r2))
+        for (it, k, u), code in zip(r2, codes):
+            if code not in ('200', '206'):
+                print(f'   ✗ #{it.get("number")} {it["title"][:16]} {k} R2 取不到（{code}）→ {u[-56:]}')
+                r2_bad += 1
+        note = f'（R2 上的 PDF {len(r2)} 个已线上真取，取不到 {r2_bad}）'
+    else:
+        note = f'（R2 上的 PDF {len(r2)} 个未查：SKIP_R2）' if r2 else ''
+    print(f'   {len(items)} 条，缺失 {bad + r2_bad}{note}')
     if bad:
         fails.append(f'catalog 指向不存在的本地文件 {bad} 处')
+    if r2_bad:
+        fails.append(f'catalog 指向 R2 上取不到的 PDF {r2_bad} 处')
 
 
 
@@ -97,17 +140,13 @@ def check_pdf_url():
         if any(ord(c) > 127 for c in u) and not wrapped:
             print(f'   ! {rel(r)} 中文路径未 encodeURI：{u}')
             raw += 1
-        if u.startswith('/students/') and u.endswith('.pdf'):
+        if is_r2_pdf(u):
             # 走 R2，本地必然没有——但不能就此免检：
             # 2026-09-19 那次坏的正是「迁移后 read.html 没跟改」，
             # 本地查不出来，只能去线上真取一次。
             if os.environ.get('SKIP_R2'):
                 continue
-            import subprocess
-            e = SITE + urllib.parse.quote(u, safe='/%')
-            code = subprocess.run(
-                ['curl', '-s', '-o', os.devnull, '-w', '%{http_code}', '-r', '0-1023', e],
-                capture_output=True, text=True, timeout=40).stdout
+            code = r2_code(u)
             if code not in ('200', '206'):
                 print(f'   ✗ {rel(r)} R2 取不到（{code}）：{u[:58]}')
                 bad += 1
