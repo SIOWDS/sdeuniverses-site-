@@ -31,7 +31,7 @@
    if(sort.value==='title')return a.dataset.title.localeCompare(b.dataset.title,'zh-CN');
    if(sort.value==='online-new')return (b.dataset.online||'').localeCompare(a.dataset.online||'')||initialOrder.get(a)-initialOrder.get(b);
    if(sort.value==='online-old')return (a.dataset.online||'').localeCompare(b.dataset.online||'')||initialOrder.get(b)-initialOrder.get(a);
-   return initialOrder.get(a)-initialOrder.get(b);
+   return (Number(b.dataset.number)||-1)-(Number(a.dataset.number)||-1)||initialOrder.get(a)-initialOrder.get(b);
   });
   cards.forEach(c=>{c.hidden=true;});
   matched.forEach((c,i)=>{grid.appendChild(c);c.hidden=i>=limit;});

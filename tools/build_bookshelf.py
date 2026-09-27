@@ -4,7 +4,7 @@ from pathlib import Path
 import json,html,collections
 ROOT=Path(__file__).resolve().parents[1]
 DATA=json.loads((ROOT/'public/books/catalog.json').read_text())
-BOOKS=DATA['books'];CATS=DATA['categories'];VERSION='20260926-bookshelf-v4'
+BOOKS=DATA['books'];CATS=DATA['categories'];VERSION='20260927-bookshelf-v5'
 # 上线时间：catalog 里的 publishedAt（UTC）。新书若没填，就取它下面那一本（更早插入的）的时间，
 # 排序时再用 catalog 位置分先后——新书总是插在最前面，所以位置越靠前越新。
 _carry=''
@@ -44,7 +44,7 @@ def page(reading_house=False):
 <section class="tools js-tools" aria-label="查找图书" hidden><div class="search-row"><div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input type="search" id="book-search" aria-label="搜索书名、作者、关键词或ISBN" placeholder="搜索书名、作者、关键词或 ISBN" autocomplete="off"><button class="clear-search" type="button" id="clear-search" aria-label="清空搜索" hidden>×</button></div><label class="control" for="author-filter"><span>作者</span><select id="author-filter">'''+options+'''</select></label><label class="control" for="reading-filter"><span>阅读</span><select id="reading-filter"><option value="">全部图书</option><option value="flip">在线翻页（'''+str(sum(bool(b.get('flipUrl')) for b in BOOKS))+'''）</option><option value="full">全文可读（'''+str(modes['full'])+'''）</option><option value="preview">试读版（'''+str(modes['preview'])+'''）</option><option value="info">书籍介绍（'''+str(modes['info'])+'''）</option></select></label></div><div class="categories" role="group" aria-label="按主题筛选">'''+chips+'''</div></section>
 <noscript><p class="no-js">下方列出全部图书，可直接点击阅读。启用 JavaScript 后可按主题与作者筛选。</p></noscript>
 <div class="results-bar"><div class="result-left"><h2 id="result-title">全部图书</h2><span id="result-count" class="result-count" role="status" aria-live="polite">'''+str(len(BOOKS))+''' 部</span><button type="button" id="reset-filters" class="reset" hidden>清除筛选</button></div><div class="result-tools js-tools" hidden><label class="sort control" for="sort-books"><span>排序</span><select id="sort-books"><option value="latest">最新编号在前</option><option value="online-new">最新上线在前</option><option value="online-old">最早上线在前</option><option value="number">编号从小到大</option><option value="title">按书名排序</option></select></label><div class="view-toggle" role="group" aria-label="显示方式"><button type="button" data-view="grid" aria-pressed="true">书架</button><button type="button" data-view="list" aria-pressed="false">目录</button></div></div></div>
-<div id="book-grid" class="book-grid">'''+''.join(card(b) for b in BOOKS)+'''</div>
+<div id="book-grid" class="book-grid">'''+''.join(card(b) for b in sorted(BOOKS,key=lambda b:-(b.get('number') or -1)))+'''</div>
 <div id="empty-state" class="empty" hidden><h3>暂时没有符合条件的图书</h3><p>试试较短的关键词，或清除主题与作者筛选。</p><button id="empty-reset" type="button">查看全部图书</button></div><div class="load-area js-tools" hidden><button id="load-more" type="button" class="load-more">查看更多图书</button><div id="load-progress" class="load-progress"></div></div></main>
 <footer><div class="wrap"><span>德麦国际出版社 · Demai International Press · Singapore</span><span>含专著与文学作品 · <a href="https://sdeuniverses.com/browse/">返回首页</a> · <a href="#">回到顶部</a></span></div></footer></body></html>'''
 for name,reading_house in [('public/books/index.html',False),('public/monographs/index.html',False),('public/sites/read/library/index.html',True)]:
