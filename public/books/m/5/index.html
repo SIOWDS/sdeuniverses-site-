@@ -1,138 +1,79 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>特征纠缠解码 · Decoding Feature Entanglement | 德麦国际专著</title>
-<meta name="description" content="特征纠缠解码（Decoding Feature Entanglement）· 本体论核心 · 深入解析E维度——特征如何通过构建、稳定、触发、释放的循环成为可行动的模块。">
-<meta property="og:title" content="特征纠缠解码 · Decoding Feature Entanglement">
-<meta property="og:type" content="book">
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>特征纠缠解码 · 德麦国际专著第 5 号</title>
+<meta name="description" content="《特征纠缠解码——知识·技术·艺术的典范转移》· 王德生、石奇志 著 · 德麦国际 · ISBN 978-1-970820-27-0。2025 年卷，总序、首发文、三编十章、压尾文、总结与金句，约 28 万汉字。世界不是特征的集合，而是特征纠缠的生成。">
+<meta name="tier" content="L0"><meta name="cite_ok" content="true"><meta name="source" content="自撰">
+<meta name="isbn" content="978-1-970820-27-0"><meta name="book_no" content="5"><meta name="tier_set_at" content="编定">
+<meta property="og:title" content="特征纠缠解码 · 德麦国际专著">
+<meta property="og:description" content="世界不是特征的集合，而是特征纠缠的生成。">
+<meta property="og:image" content="https://sdeuniverses.com/books/m/5/cover.jpg?v=20260930">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/5/">
 <style>
-:root{--bg:#F6F2E9;--card:#FCF9F1;--accent:#C9A15A;--text:#241E12;--muted:#8A7C5E;--border:rgba(94,71,16,0.15);--ink:#161009}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{max-width:100%;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:1.95;font-size:16.5px}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:760px;width:100%;margin:0 auto;padding:0 24px}
-nav.top{position:sticky;top:0;background:rgba(246,242,233,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:20}
-nav.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px}
-.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
-.nav-back{font-size:13.5px;color:var(--muted)}
-header.hero{position:relative;background:linear-gradient(155deg,#1c1710,#0e0b06);color:#F3ECD9;padding:56px 0 52px;overflow:hidden}
-.st{position:absolute;background:#FFF5DC;border-radius:50%;opacity:0;box-shadow:0 0 5px 1px rgba(255,245,220,0.5);animation:tw var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s)}
-@keyframes tw{0%,100%{opacity:0;transform:scale(0.5)}50%{opacity:var(--o,0.8);transform:scale(1)}}
-.hero-inner{position:relative;z-index:2;display:flex;gap:32px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:760px;margin:0 auto;padding:0 24px}
-.hero-cover{width:172px;flex:0 0 auto;border-radius:3px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,0.5);border:1px solid rgba(212,178,94,0.25)}
-.hero-cover img{width:100%;display:block}
-.hero-txt{flex:1;min-width:260px}
-.hero-domain{font-size:11.5px;letter-spacing:0.34em;color:#C9A15A;margin-bottom:14px}
-.hero-title{font-size:clamp(24px,4vw,34px);font-weight:700;letter-spacing:0.04em;line-height:1.4;color:#F5EFDE}
-.hero-en{font-size:15px;color:#C9BB94;margin-top:14px;font-style:italic;line-height:1.5}
-.hero-sub{font-size:13px;color:#9C8F6C;margin-top:6px;line-height:1.5}
-main{padding:44px 0 20px}
-.lede{font-size:17.5px;line-height:2;color:#3A3320;border-left:3px solid var(--accent);padding:4px 0 4px 20px;margin-bottom:38px}
-.pubcard{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:22px 24px;margin-bottom:38px;font-size:14.5px;line-height:1.9}
-.pubcard .row{display:flex;gap:10px;flex-wrap:wrap;padding:3px 0}
-.pubcard .k{color:var(--muted);min-width:92px;flex:0 0 auto}
-.pubcard .v{color:var(--text);flex:1;min-width:200px}
-.sec-label{font-size:11.5px;letter-spacing:0.34em;color:var(--accent);margin:0 0 16px}
-.endesc p{margin-bottom:16px;text-align:justify;color:#3A3320;font-size:15.5px;line-height:1.95}.cnbody p{margin-bottom:16px;text-align:justify;color:#2E2818;font-size:16px;line-height:2.0}.cnbody p b{color:var(--accent)}.expand-lead{font-size:11.5px;letter-spacing:0.34em;color:var(--accent);margin:38px 0 16px}
-.grouplink{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:40px 0 0;padding:18px 22px;border:1px solid var(--border);border-radius:4px;background:rgba(201,161,90,0.05)}
-.grouplink .gl-t{flex:1;min-width:220px;font-size:14.5px;color:var(--text)}
-.btn{display:inline-block;padding:10px 22px;border-radius:3px;font-size:14px;letter-spacing:0.06em;font-weight:700}
-.btn-solid{background:var(--accent);color:#160F08}
-.btn-ghost{border:1px solid var(--accent);color:var(--accent)}
-footer{background:var(--ink);color:#8C7E5C;text-align:center;padding:30px 0 40px;font-size:12.5px;letter-spacing:0.08em;margin-top:40px}
-footer a{color:#D4B25E}
-@media(max-width:560px){.hero-cover{width:140px}}
-</style>
-</head>
-<body>
-<nav class="top"><div class="wrap">
-  <a class="nav-logo" href="/browse/">SDE Universes</a>
-  <a class="nav-back" href="/philosophy/#books">← 五十余部跨域专著</a>
-</div></nav>
-
-<header class="hero">
-  <i class="st" style="left:63.7%;top:42.3%;width:1.9px;height:1.1px;--o:0.70;--d:3.6s;--dl:2.4s"></i><i class="st" style="left:17.7%;top:34.4%;width:1.3px;height:1.4px;--o:0.72;--d:3.9s;--dl:3.9s"></i><i class="st" style="left:58.1%;top:23.0%;width:1.7px;height:1.6px;--o:0.34;--d:4.0s;--dl:0.0s"></i><i class="st" style="left:37.7%;top:52.4%;width:1.8px;height:2.2px;--o:0.65;--d:2.5s;--dl:1.9s"></i><i class="st" style="left:25.5%;top:72.2%;width:2.1px;height:1.1px;--o:0.75;--d:3.3s;--dl:0.7s"></i><i class="st" style="left:45.4%;top:41.4%;width:1.3px;height:1.3px;--o:0.53;--d:4.5s;--dl:0.7s"></i><i class="st" style="left:37.5%;top:24.5%;width:1.9px;height:1.3px;--o:0.73;--d:2.5s;--dl:3.4s"></i><i class="st" style="left:42.9%;top:89.8%;width:2.0px;height:2.0px;--o:0.27;--d:4.7s;--dl:2.1s"></i><i class="st" style="left:87.8%;top:55.3%;width:1.4px;height:2.1px;--o:0.90;--d:3.1s;--dl:0.6s"></i><i class="st" style="left:44.3%;top:63.8%;width:1.2px;height:1.7px;--o:0.60;--d:4.9s;--dl:0.6s"></i><i class="st" style="left:14.8%;top:50.7%;width:1.9px;height:1.7px;--o:0.73;--d:3.2s;--dl:0.1s"></i><i class="st" style="left:68.6%;top:62.8%;width:1.0px;height:1.1px;--o:0.70;--d:4.5s;--dl:0.8s"></i><i class="st" style="left:26.6%;top:41.3%;width:1.0px;height:1.4px;--o:0.41;--d:2.5s;--dl:2.1s"></i><i class="st" style="left:93.2%;top:9.3%;width:1.8px;height:1.7px;--o:0.44;--d:4.4s;--dl:3.1s"></i><i class="st" style="left:26.5%;top:40.5%;width:1.8px;height:1.5px;--o:0.37;--d:3.6s;--dl:2.8s"></i><i class="st" style="left:58.4%;top:32.5%;width:1.3px;height:1.2px;--o:0.68;--d:4.8s;--dl:1.0s"></i><i class="st" style="left:61.9%;top:8.5%;width:1.2px;height:1.7px;--o:0.49;--d:3.7s;--dl:0.2s"></i><i class="st" style="left:50.6%;top:46.5%;width:1.3px;height:1.8px;--o:0.40;--d:3.5s;--dl:0.4s"></i><i class="st" style="left:85.9%;top:54.5%;width:2.1px;height:1.4px;--o:0.75;--d:4.5s;--dl:0.2s"></i><i class="st" style="left:91.3%;top:49.6%;width:1.4px;height:1.4px;--o:0.43;--d:4.8s;--dl:1.7s"></i><i class="st" style="left:41.9%;top:43.7%;width:1.8px;height:1.7px;--o:0.40;--d:4.2s;--dl:3.9s"></i><i class="st" style="left:36.4%;top:82.4%;width:2.0px;height:1.5px;--o:0.88;--d:3.2s;--dl:0.9s"></i><i class="st" style="left:40.8%;top:13.0%;width:1.1px;height:1.4px;--o:0.57;--d:4.2s;--dl:3.5s"></i><i class="st" style="left:56.5%;top:51.8%;width:1.0px;height:1.0px;--o:0.58;--d:3.2s;--dl:4.0s"></i><i class="st" style="left:82.0%;top:15.4%;width:1.1px;height:2.0px;--o:0.88;--d:4.7s;--dl:0.3s"></i><i class="st" style="left:89.1%;top:66.6%;width:2.1px;height:1.8px;--o:0.70;--d:5.2s;--dl:1.7s"></i><i class="st" style="left:18.2%;top:18.1%;width:1.4px;height:2.0px;--o:0.80;--d:3.7s;--dl:0.8s"></i><i class="st" style="left:13.0%;top:29.6%;width:2.0px;height:1.1px;--o:0.66;--d:5.4s;--dl:2.2s"></i><i class="st" style="left:71.2%;top:5.4%;width:1.5px;height:1.8px;--o:0.34;--d:3.3s;--dl:2.0s"></i><i class="st" style="left:82.6%;top:56.7%;width:1.7px;height:1.6px;--o:0.42;--d:5.4s;--dl:3.0s"></i><i class="st" style="left:6.2%;top:95.3%;width:1.9px;height:1.1px;--o:0.75;--d:5.4s;--dl:1.5s"></i><i class="st" style="left:60.7%;top:13.2%;width:1.4px;height:1.2px;--o:0.37;--d:3.3s;--dl:1.0s"></i><i class="st" style="left:59.0%;top:66.7%;width:2.2px;height:2.2px;--o:0.26;--d:5.0s;--dl:1.1s"></i><i class="st" style="left:38.9%;top:92.0%;width:1.2px;height:2.1px;--o:0.44;--d:5.4s;--dl:1.2s"></i><i class="st" style="left:51.2%;top:4.9%;width:2.0px;height:2.0px;--o:0.43;--d:4.8s;--dl:3.2s"></i><i class="st" style="left:76.8%;top:11.7%;width:2.1px;height:1.4px;--o:0.34;--d:2.6s;--dl:3.7s"></i><i class="st" style="left:36.5%;top:15.2%;width:2.1px;height:1.2px;--o:0.38;--d:4.2s;--dl:0.5s"></i><i class="st" style="left:91.1%;top:6.3%;width:1.6px;height:1.0px;--o:0.61;--d:5.0s;--dl:0.2s"></i><i class="st" style="left:84.2%;top:81.0%;width:2.0px;height:1.6px;--o:0.80;--d:3.1s;--dl:3.4s"></i><i class="st" style="left:45.4%;top:95.7%;width:1.1px;height:2.2px;--o:0.75;--d:2.8s;--dl:2.6s"></i><i class="st" style="left:34.2%;top:3.7%;width:1.6px;height:2.1px;--o:0.28;--d:4.5s;--dl:0.1s"></i><i class="st" style="left:98.8%;top:60.2%;width:2.2px;height:1.4px;--o:0.80;--d:3.9s;--dl:3.4s"></i><i class="st" style="left:67.6%;top:48.1%;width:2.1px;height:1.3px;--o:0.52;--d:4.2s;--dl:3.1s"></i><i class="st" style="left:70.5%;top:25.1%;width:1.6px;height:1.9px;--o:0.87;--d:4.0s;--dl:2.1s"></i><i class="st" style="left:5.2%;top:32.9%;width:1.9px;height:1.5px;--o:0.29;--d:5.2s;--dl:0.5s"></i><i class="st" style="left:18.7%;top:90.9%;width:2.0px;height:1.4px;--o:0.28;--d:3.5s;--dl:1.2s"></i>
-  <div class="hero-inner">
-    <div class="hero-cover"><img src="/books/covers/5.jpg" alt="特征纠缠解码 封面"></div>
-    <div class="hero-txt">
-      <div class="hero-domain">本体论核心 · 德麦国际专著</div>
-      <h1 class="hero-title">特征纠缠解码</h1>
-      <div class="hero-en">Decoding Feature Entanglement</div>
-      <div class="hero-sub">A Paradigm Shift for Knowledge, Technology, and the Arts</div>
-    </div>
-  </div>
-</header>
-
-<main>
-  <div class="wrap">
-    <div class="lede">深入解析E维度——特征如何通过构建、稳定、触发、释放的循环成为可行动的模块。</div>
-
-    <div id="cn-content">
-    <div class="sec-label">内 容 简 介</div>
-    <div class="cnbody">
-<p>本书引入一个开创性的本体论框架，重新定义知识、技术与艺术如何涌现、互动与演化。承 SIO 本体论（主体—互动—客体）之脉，它以「特征纠缠」取代把「实体」当作静止之物的古典观念——特征纠缠，是持续生成稳定、意义与形式的动态互动之网。作者由此论证：现代世界的碎片化——知识被化约为数据点，技术被化约为功能模块，艺术被化约为表达碎片——源于同一个错误假设：以为世界由可分离的属性拼成。</p>
-    </div>
-    <div class="expand-lead">展 开 · 这本书在讲什么</div>
-    <div class="cnbody">
-<p>本书反过来主张：现实本身，就是特征纠缠的持续生成——主体、客体与互动在张力、转化、释放的节律中共同创造存在。在知识领域，纠缠表现为特征的粒子态稳定；在技术领域，表现为效率、速度与融贯的波态样式；在艺术领域，表现为情感、语境与意义的场态共振。这三种模态不是彼此隔绝的学科，而是同一个本体论过程互相连通的表达——从「特征文明」向「特征纠缠文明」的跃迁。</p>
-<p>以哲学的深度融合科学与艺术的洞见，本书为理解创造力、意识与创新提供了一套统一语言。它把科学革命——如燃素说的崩塌与量子力学的兴起——重新解读为稳定纠缠的转化，而非真理的替换；同样，它把 AI 与虚拟现实看作同一张纠缠之网中涌现的存在。这既是一份哲学宣言，也是一本实践指南，写给一切想在科学、技术与艺术的十字路口重建意义的人。它深入 SDE 三维中最难的 E 维，给出的是「解结」的手艺。</p>
-    </div>
-    </div>
-
-    <!-- 文章精选阅读 · picks v1 -->
-    <section id="picks" class="picks">
-<style>
-.picks{margin:6px 0 40px}
-.picks .pk-note{font-size:14.5px;color:var(--muted);line-height:1.9;margin:0 0 16px}
-.picks a.pick{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:12px;color:var(--text);text-decoration:none}
-.picks a.pick:hover{border-color:var(--accent)}
-.picks .pk-n{flex:0 0 auto;font-size:13px;letter-spacing:0.2em;color:var(--accent);padding-top:3px}
-.picks .pk-b{flex:1;min-width:0}
-.picks .pk-t{display:block;font-size:17px;font-weight:700;line-height:1.6}
-.picks .pk-m{display:block;font-size:12.5px;color:var(--muted);letter-spacing:0.04em;margin:2px 0 6px}
-.picks .pk-d{display:block;font-size:14.5px;line-height:1.85;color:#3A3320}
-</style>
-    <div class="sec-label">文 章 精 选 阅 读</div>
-    <p class="pk-note">本书全文尚未上线。下面三篇选自它的原稿《特征纠缠探秘：知识·技术·艺术的典范转移》（王德生、邹军令 著，2025），可以先读。</p>
-<a class="pick" href="/books/m/5/articles/01/"><span class="pk-n">壹</span><span class="pk-b"><span class="pk-t">点亮数学之灯：特征纠缠</span><span class="pk-m">约 3.3 万字 · 原载「三二一智慧」2025-09-09</span><span class="pk-d">几千年来，人类一直把数学视为“真理的语言”，把函数与方程当作揭示世界本质的钥匙。然而，这种“发现学”的幻觉让我们误以为：数学公式是世界的真理，而科学规律是客体的必然属性。</span></span></a>
-<a class="pick" href="/books/m/5/articles/02/"><span class="pk-n">贰</span><span class="pk-b"><span class="pk-t">技术的终极解构：特征纠缠的轨迹·速度·粘性</span><span class="pk-m">约 1.6 万字 · 原载「三二一智慧」2025-09-10</span><span class="pk-d">有人说技术是工具的制造，有人说是知识的应用，有人说是人类改造自然的手段。这些回答都触及了现象，却没有进入本质。</span></span></a>
-<a class="pick" href="/books/m/5/articles/03/"><span class="pk-n">叁</span><span class="pk-b"><span class="pk-t">艺术三内核的特征纠缠解构</span><span class="pk-m">约 3.1 万字 · 原载「321互动吧」2025-09-10</span><span class="pk-d">人类文明的三大支流——科学、技术、艺术，并非三个孤立的系统，而是特征纠缠的三种生成方式。……</span></span></a>
-    </section>
-
-    <div class="sec-label">出 版 信 息 · PUBLICATION</div>
-    <div class="pubcard">
-      <div class="row"><span class="k">作者 Author</span><span class="v">Wang, Desheng; Shi, Qizhi</span></div>
-      <div class="row"><span class="k">出版方</span><span class="v">德麦国际有限公司 · Demai International Pte. Ltd.</span></div>
-      <div class="row"><span class="k">ISBN</span><span class="v">978-1-970820-27-0（Bowker authorId 26927366）</span></div>
-      <div class="row"><span class="k">检索</span><span class="v"><a href="https://bookwire.bowker.com/" target="_blank" rel="noopener">Bowker / Bookwire</a> · 可按 ISBN 9781970820270 查询</span></div>
-    </div>
-
-    <div class="sec-label">内 容 简 介 · BOOK DESCRIPTION</div>
-    <div class="endesc">
-<p>Decoding Feature Entanglement introduces a groundbreaking ontological framework that redefines how knowledge, technology, and art emerge, interact, and evolve. Drawing from the SIO Ontology (Subject-Interaction-Object), the book replaces the classical notion of &quot;entities&quot; as static objects with &quot;feature entanglement&quot; - dynamic networks of interaction that continuously generate stability, meaning, and form. Through this paradigm, the author argues that the modern world\&#x27;s fragmentation-knowledge reduced to data points, technology to functional modules, and art to expressive fragments-originates from the same root: the false assumption that the world is composed of separable properties. Instead, the book proposes that reality itself is the ongoing generation of feature entanglements, where subjects, objects, and interactions co-create existence in rhythmic patterns of tension, transformation, and release.</p>
-<p>In the realm of knowledge, entanglement appears as particle-like stabilization of features; in technology, as wave-like patterns of efficiency, speed, and coherence; and in art, as field-like resonances of emotion, context, and meaning. These three modes are not isolated disciplines but interconnected expressions of the same ontological process - the shift from &quot;feature civilization&quot; to &quot;feature-entanglement civilization.&quot; By integrating philosophical depth with scientific and artistic insight, Decoding Feature Entanglement provides a unified language for understanding creativity, consciousness, and innovation. It reinterprets scientific revolutions, such as the fall of the phlogiston and the rise of quantum mechanics, not as replacements of truth but as transformations of stable entanglements. Similarly, it offers a vision for AI and virtual reality as authentic ontological entities - emergent beings within the same web of entanglement that sustains human reality.</p>
-<p>This book is not merely a theoretical treatise; it is a blueprint for a new epoch of civilization, where creation, happiness, and freedom are regenerated through entangled existence. Decoding Feature Entanglement stands as both a philosophical manifesto and a practical guide for those seeking to rebuild meaning at the crossroads of science, technology, and art.</p>
-    </div>
-
-    <div class="grouplink">
-      <div class="gl-t">本书属「本体论核心」群 · 存在的第一性原理</div>
-      <a class="btn btn-ghost" href="/philosophy/clusters/core/">读这一群的深读 →</a>
-      <a class="btn btn-solid" href="/philosophy/#books">看全部专著 →</a>
-    </div>
-  </div>
-</main>
-
-<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
-<footer><div class="wrap">德麦国际 · SDE Universes · <a href="/philosophy/#books">返回专著全景</a> · <a href="/browse/">首页</a></div></footer>
-
-<!-- SDE 陪读浮层 -->
-<script>window.WDS_READ={selector:"main"};</script>
-<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
-
-<script src="/wds-mode.js?v=20260916a" defer></script>
-<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
-</body>
-</html>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2.4rem 1.2rem 4rem}
+.crumb{color:var(--dim);font-size:.82rem;margin-bottom:1.6rem}
+.hero{display:grid;grid-template-columns:260px 1fr;gap:2.2rem;align-items:start}
+.hero img{width:100%;border-radius:6px;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+h1{margin:.2rem 0 .3rem;font-size:2.1rem;letter-spacing:.02em}
+.sub{color:var(--dim);margin:0 0 1rem}
+.line{font-size:1.05rem;border-left:3px solid var(--gold);padding-left:.9rem;margin:1.2rem 0}
+.meta{margin:1.4rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.9rem 0}
+.meta div{display:flex;gap:1rem;font-size:.9rem;padding:.16rem 0}
+.meta b{color:var(--dim);font-weight:400;min-width:5.2rem;flex:none}
+.btns{display:flex;flex-wrap:wrap;gap:.7rem;margin:1.4rem 0 0}
+.btn{display:inline-block;padding:.6rem 1.2rem;border:1px solid var(--gold);border-radius:8px;
+  color:var(--gold);font-size:.94rem}
+.btn.solid{background:var(--gold);color:#0B0E12;font-weight:600}
+.btn:hover{text-decoration:none;opacity:.88}
+h2{margin:2.6rem 0 .8rem;font-size:1.22rem;color:var(--gold);letter-spacing:.04em}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem}
+.card b{display:block;color:var(--gold);font-size:.9rem;margin-bottom:.3rem;font-weight:600}
+.card span{color:var(--dim);font-size:.86rem;line-height:1.75}
+ol.vols{padding-left:1.4rem;color:var(--dim)}
+ol.vols li{margin:.25rem 0}
+ol.vols b{color:var(--fg);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.6rem 0}
+th,td{border-bottom:1px solid var(--line);padding:.42rem .5rem;text-align:left}
+th{color:var(--dim);font-weight:400}
+.foot{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--line);color:var(--dim);font-size:.84rem}
+@media(max-width:720px){.hero{grid-template-columns:1fr}.hero img{max-width:230px}}
+</style></head><body>
+<div class="wrap">
+<div class="crumb"><a href="/browse/">SDE Universes</a> · <a href="/books/">德麦国际专著</a> · 第 5 号 · 特征纠缠解码</div>
+<div class="hero">
+<img src="/books/m/5/cover.jpg?v=20260930" alt="《特征纠缠解码》封面">
+<div>
+<h1>特征纠缠解码</h1>
+<p class="sub">知识·技术·艺术的典范转移 · Decoding Feature Entanglement</p>
+<div class="line">世界不是特征的集合，而是特征纠缠的生成。</div>
+<p>我们习惯把世界看成一堆东西，再把每样东西看成一串属性。本书换掉这个起点：承 SIO 本体论（主体—互动—客体）之脉，它以「特征纠缠」取代把「实体」当作静止之物的古典观念——<b>一个实体之所以显得坚实，是因为许多特征在反复的互动中缠在一起、稳定下来，又在意识里被认成一个东西。</b></p>
+<p>全书由「实体发生学」立地基，再把特征纠缠用到三大领域：在知识里，它是特征的粒子态稳定（学习、逻辑、数学、知识论）；在技术里，它是效率、速度与粘性的波态运行（科技的自由律、自动化、技术的终极解构）；在艺术里，它是情感、语境与意义的场态共振（艺术三内核、虚拟与真实）。最后回到生命本身：生命之丰富，在于特征纠缠。</p>
+<div class="meta"><div><b>著者</b><span>王德生、石奇志</span></div><div><b>出版</b><span>德麦国际出版社 · Demai International Press · 新加坡</span></div><div><b>编号</b><span>德麦国际专著第 5 号</span></div><div><b>ISBN</b><span>978-1-970820-27-0（Bowker authorId 26927366）</span></div><div><b>规模</b><span>作者介绍 · 前言 · 写作目标 · 总序 · 首发文 · 三编十章 · 压尾文 · 总结 · 金句总结 · 约 28 万汉字 · 印刷版 812 页</span></div><div><b>卷别</b><span>2025 年卷 · SIO 本体论时期著作，保留原貌；原稿题为《特征纠缠探秘》</span></div><div><b>完稿</b><span>初稿 2025 年 8—9 月 · 2026 年 9 月编定</span></div></div>
+<div class="halfopen" style="margin:.9rem 0 .2rem;font-size:.86rem;color:#b8913e;letter-spacing:.04em">★ 全文开放 · 网页、在线翻页与两版 PDF 均为全书</div>
+<div class="btns">
+<a class="btn solid" href="/books/m/5/read.html">友好阅读 · 在线翻页</a>
+<a class="btn" href="/books/m/5/text/">全文网页阅读</a>
+<a class="btn" href="/books/m/5/tezheng-jiuchan-reader.pdf?v=20260930" target="_blank" rel="noopener">全书 PDF（阅读版）</a>
+<a class="btn" href="/books/m/5/tezheng-jiuchan-print.pdf?v=20260930" target="_blank" rel="noopener">全书 PDF（印刷版）</a>
+</div>
+</div>
+</div>
+<h2>三大转移</h2>
+<div class="cards"><div class="card"><b>知识 · 粒子模态</b><span>学习即纠缠；逻辑、数学与知识论在特征纠缠中重生——让纠缠稳定为可验证的单位</span></div><div class="card"><b>技术 · 波动模态</b><span>科技的自由律、自动化原理、技术的轨迹·速度·粘性——让纠缠运行为链条</span></div><div class="card"><b>艺术 · 场域模态</b><span>艺术三内核、虚拟与真实——让纠缠扩展为整体场，生发情之真</span></div></div>
+<h2>全书结构</h2>
+<ol class="vols"><li><b>作者介绍 · 前言 · 写作目标 · 总序</b>　从特征文明到特征纠缠文明</li><li><b>首发文</b>　实体发生的内核：特征纠缠聚合体</li><li><b>第一编</b> 知识与科学的转移（第 1—4 章）：学习即纠缠 · 形式逻辑三大推理的重生 · 点亮数学之灯 · 从奎因到特征纠缠</li><li><b>第二编</b> 技术与自动化的转移（第 5—8 章）：科技的自由律发生学 · 自动化原理解构 · 技术的终极解构 · 科技的哲学内核</li><li><b>第三编</b> 艺术·虚拟·文明的转移（第 9—10 章）：艺术三内核 · 虚拟和真实</li><li><b>压尾文 · 总结 · 金句总结</b>　生命之丰富在于特征纠缠</li></ol>
+<h2 id="picks">文章精选</h2>
+<p style="color:var(--dim);font-size:.9rem">全书已全文开放，下面三篇是原稿中先行发表的单篇，可作入口。</p>
+<div class="cards"><div class="card"><b><a href="/books/m/5/articles/01/">壹 · 点亮数学之灯：特征纠缠</a></b><span>约 3.3 万字 · 原载「三二一智慧」2025-09-09</span></div><div class="card"><b><a href="/books/m/5/articles/02/">贰 · 技术的终极解构：特征纠缠的轨迹·速度·粘性</a></b><span>约 1.6 万字 · 原载「三二一智慧」2025-09-10</span></div><div class="card"><b><a href="/books/m/5/articles/03/">叁 · 艺术三内核的特征纠缠解构</a></b><span>约 3.1 万字 · 原载「321互动吧」2025-09-10</span></div></div>
+<h2>Book Description</h2>
+<p style="font-family:Georgia,serif;font-size:.95rem;line-height:1.8">Decoding Feature Entanglement introduces a groundbreaking ontological framework that redefines how knowledge, technology, and art emerge, interact, and evolve. Drawing from the SIO Ontology (Subject-Interaction-Object), the book replaces the classical notion of &quot;entities&quot; as static objects with &quot;feature entanglement&quot; - dynamic networks of interaction that continuously generate stability, meaning, and form. Through this paradigm, the author argues that the modern world\&#x27;s fragmentation-knowledge reduced to data points, technology to functional modules, and art to expressive fragments-originates from the same root: the false assumption that the world is composed of separable properties. Instead, the book proposes that reality itself is the ongoing generation of feature entanglements, where subjects, objects, and interactions co-create existence in rhythmic patterns of tension, transformation, and release.</p>
+<h2>作者简介</h2>
+<p>王德生，SDE（显露 Show · 差异序列 Difference · 特征纠缠 Entanglement）本体论的创立者，德麦国际（Demai International Pte. Ltd.，新加坡）首席执行官。生长于中国农村，1990 年进入湘潭大学，后获中国科学院计算数学博士学位，曾在英国斯旺西大学与新加坡南洋理工大学工作。</p>
+<h3>第二作者　石奇志</h3><p>石奇志，笔名葡萄。2006 年毕业于郑州大学软件开发专业，此后在 IT 行业工作十余年。2022 年起跟随王德生博士研习本体论，关注语言、关系与行动怎样一起长出意义、身份和秩序。著有《教会的智慧》（德麦国际专著第 85 号）、《葡萄讲杜威的教育哲学》（第 170 号）。</p>
+<p style="color:var(--dim);font-size:.86rem">编辑说明：本书为 2025 年卷，原稿题为《特征纠缠探秘：知识·技术·艺术的典范转移》，按 ISBN 登记定名为《特征纠缠解码》。编定时按原稿目录编排：总序、首发文、三编十章（各编有编序与编结）、压尾文、总结与金句总结；统一体例与标题层级，删去写作过程话，修正提取造成的断句、重复公式与标题错位；正文论断一仍其旧，保留 SIO 本体论时期的原貌。</p>
+<div class="foot">德麦国际出版社 · Demai International Press · Singapore · <a href="/books/">专著书架</a> · <a href="/books/m/170/">葡萄讲杜威（第 170 号）</a> · <a href="/browse/">返回首页</a></div>
+</div></body></html>
