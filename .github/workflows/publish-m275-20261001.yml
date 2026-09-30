@@ -1,0 +1,88 @@
+name: Publish monograph 275 complete edition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-m275-20261001.yml']
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: publication-m275
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Receive the authorized publication payload
+        env:
+          PAYLOAD_URL: 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-7d4c-81fa-813d-290a46548d5e/raw?se=2026-09-30T22%3A23%3A17Z&sp=r&sv=2026-02-06&sr=b&scid=3211b14e-31c6-54a4-9811-3d2c66adfc18&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-30T22%3A10%3A56Z&ske=2026-10-01T22%3A10%3A56Z&sks=b&skv=2026-02-06&sig=wa%2BZGCvihAW5PkcIfIREJxSUsFz5d4bT/M%2BrCBEYHZE%3D'
+          PAYLOAD_SHA: '41166ac34e560629b6d721882e8160421d156fb2fdf79a3782510cdd792762f2'
+        run: |
+          python - <<'PY'
+          import os,urllib.request,hashlib,zipfile,io,pathlib
+          data=urllib.request.urlopen(os.environ['PAYLOAD_URL'],timeout=120).read()
+          assert hashlib.sha256(data).hexdigest()==os.environ['PAYLOAD_SHA'],'Payload digest mismatch'
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'m275-payload';dest.mkdir()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+            for name in z.namelist():
+              assert not name.startswith('/') and '..' not in pathlib.PurePosixPath(name).parts
+            z.extractall(dest)
+          print('Verified publication payload:',len(data),'bytes')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/m/275/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap.xml
+            /tools/build_bookshelf.py
+            /.github/workflows/publish-m275-20261001.yml
+      - name: Merge the new book into the current catalogue
+        run: python "$RUNNER_TEMP/m275-payload/release-install.py" "$RUNNER_TEMP/m275-payload" "$GITHUB_WORKSPACE"
+      - name: Prepare browser verification
+        run: |
+          python -m pip install -q playwright==1.55.0
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null && ! command -v chromium-browser >/dev/null; then
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Verify desktop, mobile and actual PDF page rendering
+        run: python "$RUNNER_TEMP/m275-payload/browser-check.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/m275-qa"
+      - name: Commit only the authorized publication paths
+        run: |
+          git config user.name 'SDE Publication Build'
+          git config user.email 'publication-build@users.noreply.github.com'
+          rm .github/workflows/publish-m275-20261001.yml
+          git add --sparse public/books/m/275 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html public/sitemap.xml public/sitemap-m275.xml .github/workflows/publish-m275-20261001.yml
+          git diff --cached --stat
+          git commit -m 'Publish monograph 275: Marx complete edition, 220-style typesetting and all reading entrances'
+          git push origin HEAD:main
+      - name: Request the existing search index workflow
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import urllib.request,json,os
+          req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/workflows/search-index.yml/dispatches',data=json.dumps({'ref':'main'}).encode(),headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'},method='POST')
+          with urllib.request.urlopen(req,timeout=30) as resp:print('Search workflow requested:',resp.status)
+          PY
+      - name: Verify deployed bytes and the three bookshelf entrances
+        run: python "$RUNNER_TEMP/m275-payload/live-check.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/m275-qa"
+      - name: Preserve publication verification records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monograph-275-publication-verification
+          retention-days: 3
+          path: |
+            ${{ runner.temp }}/m275-qa/
+            ${{ github.workspace }}/public/books/m/275/release-check.json
+            ${{ github.workspace }}/public/books/m/275/publication-manifest.json
