@@ -1,138 +1,76 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>学习发生学导论 · Introduction to Learning Generativics | 德麦国际专著</title>
-<meta name="description" content="学习发生学导论（Introduction to Learning Generativics）· 教育革命 · 学习不是知识传递而是意义生成——GPT时代教育重生的地基之作。（Introduction to Learning Generativics，ISBN 978-1">
-<meta property="og:title" content="学习发生学导论 · Introduction to Learning Generativics">
-<meta property="og:type" content="book">
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>学习发生学导论 · 德麦国际专著第 22 号</title>
+<meta name="description" content="《学习发生学导论——基于GPT的学习发生学革命》· 王德生、阳涌 著 · 德麦国际 · ISBN 978-1-970820-17-1。导论与三编二十一章，约 22 万字。学习不是拥有知识，而是成为结构。">
+<meta name="tier" content="L0"><meta name="cite_ok" content="true"><meta name="source" content="自撰">
+<meta name="isbn" content="978-1-970820-17-1"><meta name="book_no" content="22"><meta name="tier_set_at" content="统稿">
+<meta property="og:title" content="学习发生学导论 · 德麦国际专著">
+<meta property="og:description" content="学习不是拥有知识，而是成为结构。">
+<meta property="og:image" content="https://sdeuniverses.com/books/m/22/cover.jpg?v=20260930c">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/22/">
 <style>
-:root{--bg:#F6F2E9;--card:#FCF9F1;--accent:#C69A3A;--text:#241E12;--muted:#8A7C5E;--border:rgba(94,71,16,0.15);--ink:#161009}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{max-width:100%;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:1.95;font-size:16.5px}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:760px;width:100%;margin:0 auto;padding:0 24px}
-nav.top{position:sticky;top:0;background:rgba(246,242,233,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:20}
-nav.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px}
-.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
-.nav-back{font-size:13.5px;color:var(--muted)}
-header.hero{position:relative;background:linear-gradient(155deg,#1c1710,#0e0b06);color:#F3ECD9;padding:56px 0 52px;overflow:hidden}
-.st{position:absolute;background:#FFF5DC;border-radius:50%;opacity:0;box-shadow:0 0 5px 1px rgba(255,245,220,0.5);animation:tw var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s)}
-@keyframes tw{0%,100%{opacity:0;transform:scale(0.5)}50%{opacity:var(--o,0.8);transform:scale(1)}}
-.hero-inner{position:relative;z-index:2;display:flex;gap:32px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:760px;margin:0 auto;padding:0 24px}
-.hero-cover{width:172px;flex:0 0 auto;border-radius:3px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,0.5);border:1px solid rgba(212,178,94,0.25)}
-.hero-cover img{width:100%;display:block}
-.hero-txt{flex:1;min-width:260px}
-.hero-domain{font-size:11.5px;letter-spacing:0.34em;color:#C69A3A;margin-bottom:14px}
-.hero-title{font-size:clamp(24px,4vw,34px);font-weight:700;letter-spacing:0.04em;line-height:1.4;color:#F5EFDE}
-.hero-en{font-size:15px;color:#C9BB94;margin-top:14px;font-style:italic;line-height:1.5}
-.hero-sub{font-size:13px;color:#9C8F6C;margin-top:6px;line-height:1.5}
-main{padding:44px 0 20px}
-.lede{font-size:17.5px;line-height:2;color:#3A3320;border-left:3px solid var(--accent);padding:4px 0 4px 20px;margin-bottom:38px}
-.pubcard{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:22px 24px;margin-bottom:38px;font-size:14.5px;line-height:1.9}
-.pubcard .row{display:flex;gap:10px;flex-wrap:wrap;padding:3px 0}
-.pubcard .k{color:var(--muted);min-width:92px;flex:0 0 auto}
-.pubcard .v{color:var(--text);flex:1;min-width:200px}
-.sec-label{font-size:11.5px;letter-spacing:0.34em;color:var(--accent);margin:0 0 16px}
-.endesc p{margin-bottom:16px;text-align:justify;color:#3A3320;font-size:15.5px;line-height:1.95}.cnbody p{margin-bottom:16px;text-align:justify;color:#2E2818;font-size:16px;line-height:2.0}.cnbody p b{color:var(--accent)}.expand-lead{font-size:11.5px;letter-spacing:0.34em;color:var(--accent);margin:38px 0 16px}
-.grouplink{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:40px 0 0;padding:18px 22px;border:1px solid var(--border);border-radius:4px;background:rgba(201,161,90,0.05)}
-.grouplink .gl-t{flex:1;min-width:220px;font-size:14.5px;color:var(--text)}
-.btn{display:inline-block;padding:10px 22px;border-radius:3px;font-size:14px;letter-spacing:0.06em;font-weight:700}
-.btn-solid{background:var(--accent);color:#160F08}
-.btn-ghost{border:1px solid var(--accent);color:var(--accent)}
-footer{background:var(--ink);color:#8C7E5C;text-align:center;padding:30px 0 40px;font-size:12.5px;letter-spacing:0.08em;margin-top:40px}
-footer a{color:#D4B25E}
-@media(max-width:560px){.hero-cover{width:140px}}
-</style>
-</head>
-<body>
-<nav class="top"><div class="wrap">
-  <a class="nav-logo" href="/browse/">SDE Universes</a>
-  <a class="nav-back" href="/philosophy/#books">← 五十余部跨域专著</a>
-</div></nav>
-
-<header class="hero">
-  <i class="st" style="left:60.9%;top:23.1%;width:1.0px;height:1.4px;--o:0.40;--d:4.9s;--dl:0.4s"></i><i class="st" style="left:23.0%;top:11.9%;width:1.1px;height:1.8px;--o:0.82;--d:3.6s;--dl:1.5s"></i><i class="st" style="left:30.1%;top:66.6%;width:1.1px;height:1.6px;--o:0.36;--d:5.1s;--dl:2.6s"></i><i class="st" style="left:72.3%;top:33.1%;width:1.4px;height:2.1px;--o:0.62;--d:4.2s;--dl:1.0s"></i><i class="st" style="left:87.1%;top:83.9%;width:2.1px;height:2.0px;--o:0.47;--d:5.1s;--dl:2.2s"></i><i class="st" style="left:51.2%;top:4.8%;width:1.2px;height:1.9px;--o:0.88;--d:4.8s;--dl:3.0s"></i><i class="st" style="left:71.3%;top:15.1%;width:1.8px;height:1.4px;--o:0.85;--d:4.6s;--dl:1.9s"></i><i class="st" style="left:53.1%;top:17.1%;width:1.3px;height:1.8px;--o:0.44;--d:3.7s;--dl:0.2s"></i><i class="st" style="left:32.6%;top:89.0%;width:1.9px;height:1.8px;--o:0.70;--d:4.6s;--dl:2.9s"></i><i class="st" style="left:20.7%;top:40.1%;width:1.4px;height:1.5px;--o:0.74;--d:2.8s;--dl:1.0s"></i><i class="st" style="left:88.2%;top:47.8%;width:1.4px;height:1.7px;--o:0.50;--d:2.6s;--dl:3.1s"></i><i class="st" style="left:97.5%;top:78.6%;width:1.7px;height:1.4px;--o:0.38;--d:4.1s;--dl:3.0s"></i><i class="st" style="left:88.0%;top:3.0%;width:1.8px;height:2.1px;--o:0.80;--d:2.6s;--dl:0.6s"></i><i class="st" style="left:93.6%;top:54.6%;width:1.4px;height:1.4px;--o:0.52;--d:2.8s;--dl:3.8s"></i><i class="st" style="left:52.2%;top:87.2%;width:1.3px;height:1.9px;--o:0.45;--d:4.3s;--dl:1.0s"></i><i class="st" style="left:40.9%;top:24.6%;width:1.9px;height:1.6px;--o:0.79;--d:3.4s;--dl:2.1s"></i><i class="st" style="left:97.7%;top:31.3%;width:2.1px;height:1.2px;--o:0.38;--d:2.4s;--dl:3.5s"></i><i class="st" style="left:31.8%;top:87.7%;width:1.7px;height:1.9px;--o:0.39;--d:5.4s;--dl:2.1s"></i><i class="st" style="left:75.7%;top:83.9%;width:1.3px;height:1.7px;--o:0.65;--d:4.9s;--dl:1.9s"></i><i class="st" style="left:84.4%;top:93.6%;width:1.4px;height:1.5px;--o:0.69;--d:4.5s;--dl:3.9s"></i><i class="st" style="left:45.3%;top:30.4%;width:1.1px;height:1.4px;--o:0.72;--d:4.5s;--dl:1.5s"></i><i class="st" style="left:94.0%;top:30.2%;width:1.7px;height:1.1px;--o:0.39;--d:4.6s;--dl:0.1s"></i><i class="st" style="left:41.3%;top:10.3%;width:1.2px;height:1.0px;--o:0.54;--d:5.4s;--dl:3.0s"></i><i class="st" style="left:31.3%;top:45.1%;width:1.9px;height:1.7px;--o:0.47;--d:3.6s;--dl:3.8s"></i><i class="st" style="left:56.9%;top:56.8%;width:1.7px;height:1.9px;--o:0.57;--d:3.8s;--dl:1.4s"></i><i class="st" style="left:43.1%;top:53.9%;width:1.3px;height:1.2px;--o:0.45;--d:4.1s;--dl:0.6s"></i><i class="st" style="left:5.3%;top:42.2%;width:1.3px;height:1.0px;--o:0.88;--d:5.3s;--dl:2.2s"></i><i class="st" style="left:76.6%;top:54.0%;width:1.7px;height:1.1px;--o:0.77;--d:3.5s;--dl:0.3s"></i><i class="st" style="left:79.9%;top:84.3%;width:2.0px;height:1.6px;--o:0.47;--d:4.1s;--dl:1.0s"></i><i class="st" style="left:44.6%;top:75.8%;width:1.6px;height:1.6px;--o:0.70;--d:5.4s;--dl:2.1s"></i><i class="st" style="left:90.0%;top:80.2%;width:2.1px;height:1.4px;--o:0.42;--d:3.4s;--dl:1.5s"></i><i class="st" style="left:26.3%;top:44.7%;width:1.3px;height:1.3px;--o:0.83;--d:3.6s;--dl:1.5s"></i><i class="st" style="left:16.8%;top:82.9%;width:2.1px;height:1.3px;--o:0.77;--d:3.6s;--dl:1.2s"></i><i class="st" style="left:23.4%;top:35.3%;width:1.7px;height:1.4px;--o:0.79;--d:3.1s;--dl:3.9s"></i><i class="st" style="left:29.1%;top:60.1%;width:1.3px;height:1.5px;--o:0.79;--d:3.9s;--dl:3.5s"></i><i class="st" style="left:36.9%;top:21.4%;width:2.1px;height:1.5px;--o:0.37;--d:3.1s;--dl:3.4s"></i><i class="st" style="left:96.4%;top:71.4%;width:1.9px;height:1.5px;--o:0.89;--d:4.1s;--dl:0.0s"></i><i class="st" style="left:73.4%;top:92.8%;width:1.7px;height:1.1px;--o:0.31;--d:5.0s;--dl:1.9s"></i><i class="st" style="left:63.8%;top:15.1%;width:1.6px;height:1.2px;--o:0.70;--d:2.9s;--dl:2.9s"></i><i class="st" style="left:85.1%;top:16.4%;width:1.5px;height:2.2px;--o:0.55;--d:3.7s;--dl:0.2s"></i><i class="st" style="left:41.0%;top:37.1%;width:2.2px;height:1.1px;--o:0.59;--d:3.1s;--dl:0.0s"></i><i class="st" style="left:91.6%;top:78.4%;width:1.1px;height:1.9px;--o:0.28;--d:4.5s;--dl:2.2s"></i><i class="st" style="left:65.2%;top:74.3%;width:1.3px;height:1.4px;--o:0.38;--d:3.9s;--dl:2.1s"></i><i class="st" style="left:3.0%;top:80.1%;width:1.7px;height:1.8px;--o:0.67;--d:3.4s;--dl:3.2s"></i><i class="st" style="left:29.9%;top:2.4%;width:1.0px;height:1.6px;--o:0.74;--d:5.2s;--dl:2.9s"></i><i class="st" style="left:45.1%;top:33.6%;width:1.9px;height:1.7px;--o:0.71;--d:4.7s;--dl:0.7s"></i>
-  <div class="hero-inner">
-    <div class="hero-cover"><img src="/books/covers/22.jpg" alt="学习发生学导论 封面"></div>
-    <div class="hero-txt">
-      <div class="hero-domain">教育革命 · 德麦国际专著</div>
-      <h1 class="hero-title">学习发生学导论</h1>
-      <div class="hero-en">Introduction to Learning Generativics</div>
-      <div class="hero-sub">Meaning Generation and the Rebirth of Education in the GPT Era</div>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2.4rem 1.2rem 4rem}
+.crumb{color:var(--dim);font-size:.82rem;margin-bottom:1.6rem}
+.hero{display:grid;grid-template-columns:260px 1fr;gap:2.2rem;align-items:start}
+.hero img{width:100%;border-radius:6px;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+h1{margin:.2rem 0 .3rem;font-size:2.1rem;letter-spacing:.02em}
+.sub{color:var(--dim);margin:0 0 1rem}
+.line{font-size:1.05rem;border-left:3px solid var(--gold);padding-left:.9rem;margin:1.2rem 0}
+.meta{margin:1.4rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.9rem 0}
+.meta div{display:flex;gap:1rem;font-size:.9rem;padding:.16rem 0}
+.meta b{color:var(--dim);font-weight:400;min-width:5.2rem;flex:none}
+.btns{display:flex;flex-wrap:wrap;gap:.7rem;margin:1.4rem 0 0}
+.btn{display:inline-block;padding:.6rem 1.2rem;border:1px solid var(--gold);border-radius:8px;
+  color:var(--gold);font-size:.94rem}
+.btn.solid{background:var(--gold);color:#0B0E12;font-weight:600}
+.btn:hover{text-decoration:none;opacity:.88}
+h2{margin:2.6rem 0 .8rem;font-size:1.22rem;color:var(--gold);letter-spacing:.04em}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem}
+.card b{display:block;color:var(--gold);font-size:.9rem;margin-bottom:.3rem;font-weight:600}
+.card span{color:var(--dim);font-size:.86rem;line-height:1.75}
+ol.vols{padding-left:1.4rem;color:var(--dim)}
+ol.vols li{margin:.25rem 0}
+ol.vols b{color:var(--fg);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.6rem 0}
+th,td{border-bottom:1px solid var(--line);padding:.42rem .5rem;text-align:left}
+th{color:var(--dim);font-weight:400}
+.foot{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--line);color:var(--dim);font-size:.84rem}
+@media(max-width:720px){.hero{grid-template-columns:1fr}.hero img{max-width:230px}}
+</style></head><body>
+<div class="wrap">
+<div class="crumb"><a href="/browse/">SDE Universes</a> · <a href="/books/">德麦国际专著</a> · 第 22 号 · 学习发生学导论</div>
+<div class="hero">
+  <img src="/books/m/22/cover.jpg?v=20260930c" alt="《学习发生学导论》封面">
+  <div>
+    <h1>学习发生学导论</h1>
+    <p class="sub">基于GPT的学习发生学革命 · Introduction to Learning Generativics</p>
+    <div class="line">学习不是拥有知识，而是成为结构。</div>
+    <p>当 GPT 这样的生成式人工智能进入课堂，现代教育的地基正被悄然动摇：知识不再稀缺，作业可以在没有真正理解的情况下完成，传统评估难以把“学习”与单纯的“产出”区分开。本书不追问“如何更高效地学”，而追问一个更根本的问题——<b>学习究竟是如何发生的？</b></p>
+    <p>作者把学习重新定义为主体—互动—客体（SIO）结构之内的意义生成：先拆解三大教学法的“空、乱、虚”、“传道授业解惑”的师道传统与“高分低能”的逻辑教育，一路追到苏格拉底的学习悖论；再以<b>主体革命、机制革命、存在革命</b>重建学习本体——真正的学习者是 SIO，特征律、自由律、幸福律协奏出知识、技术与艺术的学习，并提出“学习即纠缠”；最后落到学科 SIO 化、基于 GPT 的发生式教学五步模型，以及 GPT 时代教师、教材、学生的重生。GPT 不是学习的替代品，而是揭示、加速并追踪学习过程的催化剂。</p>
+    <div class="meta"><div><b>著者</b><span>王德生　阳涌</span></div><div><b>出版</b><span>德麦国际出版社 · Demai International Press · 新加坡</span></div><div><b>编号</b><span>德麦国际专著第 22 号</span></div><div><b>ISBN</b><span>978-1-970820-17-1（Bowker authorId 26927366）</span></div><div><b>定价</b><span>US$30.00</span></div><div><b>规模</b><span>导论 · 三编二十一章（每编有编序）· 约 22 万汉字 · 印刷版 461 页</span></div><div><b>写作</b><span>正文写于 2024 年 7 月至 2025 年 8 月，2026 年 9 月编定</span></div></div>
+    <div class="halfopen" style="margin:.9rem 0 .2rem;font-size:.86rem;color:#b8913e;letter-spacing:.04em">★ 全文开放 · 网页、在线翻页与两版 PDF 均为全书</div>
+    <div class="btns">
+      <a class="btn solid" href="/books/m/22/read.html">友好阅读 · 在线翻页</a>
+      <a class="btn" href="/books/m/22/text/">全文网页阅读</a>
+      <a class="btn" href="/books/m/22/xuexi-fashengxue-reader.pdf?v=20260930c" target="_blank" rel="noopener">全书 PDF（阅读版）</a>
+      <a class="btn" href="/books/m/22/xuexi-fashengxue-print.pdf?v=20260930c" target="_blank" rel="noopener">全书 PDF（印刷版）</a>
     </div>
   </div>
-</header>
-
-<main>
-  <div class="wrap">
-    <div class="lede">学习不是知识传递而是意义生成——GPT时代教育重生的地基之作。（Introduction to Learning Generativics，ISBN 978-1-970820-17-1）</div>
-
-    <div id="cn-content">
-    <div class="sec-label">内 容 简 介</div>
-    <div class="cnbody">
-<p>当 GPT 这样的生成式人工智能进入全球课堂，现代教育的地基正被悄然动摇：知识不再稀缺，作业可以在没有真正理解的情况下完成，传统评估难以把「学习」与单纯的「产出」区分开。在这个语境里，本书不追问「如何更高效地学」，而追问一个更根本的问题——学习究竟是如何发生的？</p>
-    </div>
-    <div class="expand-lead">展 开 · 这本书在讲什么</div>
-    <div class="cnbody">
-<p>本书提出「学习发生学」，作为理解 GPT 时代学习的新基础框架。越过「学习即知识获取」的主流看法，作者把学习重新定义为一个在主体—互动—客体（SIO）结构之内的意义生成过程：学习不是信息或技能的累积，而是结构经由张力、互动、节律与反思的涌现。基于这套本体论，本书推进三重教育思想的挪移——从孤立的学习者到整合的 SIO 系统；从结果驱动的表现到由创造、自由、幸福统辖的意义动力学；从以传递为基础的讲授到「结构被主动生产」的生成式学习环境。</p>
-<p>书中引入一个可操作的生成式课堂模型，展示 GPT 如何不作为学习的替代品，而作为一个催化剂——揭示、加速并追踪学习过程本身。本书不提供技巧或工具，而是为「智能不再是人类专属」的时代重构学习的哲学地基。它主张：教育的未来不在于与人工智能竞争，而在于夺回机器无法替代之物——意义、结构与自我的生成。作为「学习发生学」系列的奠基之作，本书为一切想把学习重新想象为「个体、机构乃至文明的生成性力量」的教育者、研究者与思想者，开出一条新路。</p>
-    </div>
-    </div>
-
-    <!-- 文章精选阅读 · picks v1 -->
-    <section id="picks" class="picks">
-<style>
-.picks{margin:6px 0 40px}
-.picks .pk-note{font-size:14.5px;color:var(--muted);line-height:1.9;margin:0 0 16px}
-.picks a.pick{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:12px;color:var(--text);text-decoration:none}
-.picks a.pick:hover{border-color:var(--accent)}
-.picks .pk-n{flex:0 0 auto;font-size:13px;letter-spacing:0.2em;color:var(--accent);padding-top:3px}
-.picks .pk-b{flex:1;min-width:0}
-.picks .pk-t{display:block;font-size:17px;font-weight:700;line-height:1.6}
-.picks .pk-m{display:block;font-size:12.5px;color:var(--muted);letter-spacing:0.04em;margin:2px 0 6px}
-.picks .pk-d{display:block;font-size:14.5px;line-height:1.85;color:#3A3320}
-</style>
-    <div class="sec-label">文 章 精 选 阅 读</div>
-    <p class="pk-note">本书全文尚未上线。下面三篇选自它的原稿《万物皆SIO：看身体、课堂、生活、科学的全新眼光》（王德生、邹军令 著，2025），可以先读。</p>
-<a class="pick" href="/books/m/22/articles/01/"><span class="pk-n">壹</span><span class="pk-b"><span class="pk-t">课堂也是 SIO</span><span class="pk-m">约 1.8 万字 · 原载「SIO教育学」2025-08-09</span><span class="pk-d">在过去一个多世纪的教育学理论与实践中，课堂设计与教育理念长期陷入两大阵营的对立与摇摆：客体中心主义（O中心主义）与主体中心主义（S中心主义）。</span></span></a>
-<a class="pick" href="/books/m/22/articles/02/"><span class="pk-n">贰</span><span class="pk-b"><span class="pk-t">新课堂：从发现幻觉到结构生成</span><span class="pk-m">约 2.6 万字 · 原载「华智慧泉」2025-08-03</span><span class="pk-d">课堂已经成为教育危机的核心现场。学生失去兴趣，教师陷入疲惫，知识成为焦虑的源头，而意义早已从教室中蒸发。</span></span></a>
-<a class="pick" href="/books/m/22/articles/03/"><span class="pk-n">叁</span><span class="pk-b"><span class="pk-t">GPT 时代一切教育范式的终结与重建</span><span class="pk-m">约 1.5 万字 · 原载「321互动吧」2025-08-04</span><span class="pk-d">在生成式人工智能（Generative AI）全面渗透人类知识系统的时代，以ChatGPT为代表的语言模型技术，正悄然终结以“教师—教材—学生”三元结构为核心的传统教育范式。</span></span></a>
-    </section>
-
-    <div class="sec-label">出 版 信 息 · PUBLICATION</div>
-    <div class="pubcard">
-      <div class="row"><span class="k">作者 Author</span><span class="v">Wang, Desheng; Yang, Yong</span></div>
-      <div class="row"><span class="k">出版方</span><span class="v">德麦国际有限公司 · Demai International Pte. Ltd.</span></div>
-      <div class="row"><span class="k">ISBN</span><span class="v">978-1-970820-17-1（Bowker authorId 26927366）</span></div>
-      <div class="row"><span class="k">检索</span><span class="v"><a href="https://bookwire.bowker.com/" target="_blank" rel="noopener">Bowker / Bookwire</a> · 可按 ISBN 9781970820171 查询</span></div>
-    </div>
-
-    <div class="sec-label">内 容 简 介 · BOOK DESCRIPTION</div>
-    <div class="endesc">
-<p>As generative artificial intelligence such as GPT enters classrooms worldwide, the foundations of modern education are being quietly destabilized. Knowledge is no longer scarce, assignments can be completed without genuine understanding, and traditional assessments struggle to distinguish learning from mere output. In this context, Introduction to Learning Generativics does not ask how to learn more efficiently-it asks a far more fundamental question: how does learning actually happen? This book proposes Learning Generativics as a new foundational framework for understanding learning in the GPT era.</p>
-<p>Moving beyond the dominant view of learning as knowledge acquisition, the authors redefine learning as a process of meaning generation within a Subject-Interaction-Object (SIO) structure. Learning, in this view, is not the accumulation of information or skills, but the emergence of structure through tension, interaction, rhythm, and reflection. Building on this ontology, the book advances three core shifts in educational thought: from isolated learners to integrated SIO systems; from outcome-driven performance to meaning dynamics governed by creativity, freedom, and well-being; and from transmission-based instruction to generative learning environments where structure is actively produced. A practical generative classroom model is introduced, demonstrating how GPT can function not as a substitute for learning, but as a catalyst that reveals, accelerates, and traces the learning process itself.</p>
-<p>Rather than offering techniques or tools, Introduction to Learning Generativics reconstructs the philosophical foundations of learning for an age in which intelligence is no longer exclusively human. It argues that the future of education lies not in competing with artificial intelligence, but in reclaiming what machines cannot replace: the generation of meaning, structure, and self. This book serves as the foundational volume of the Learning Generativics series, opening a new path for educators, researchers, and thinkers seeking to reimagine learning as a generative force for individuals, institutions, and civilization itself.</p>
-    </div>
-
-    <div class="grouplink">
-      <div class="gl-t">本书属「教育革命」群 · 学习作为意义生成</div>
-      <a class="btn btn-ghost" href="/philosophy/clusters/edu/">读这一群的深读 →</a>
-      <a class="btn btn-solid" href="/philosophy/#books">看全部专著 →</a>
-    </div>
-  </div>
-</main>
-
-<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
-<footer><div class="wrap">德麦国际 · SDE Universes · <a href="/philosophy/#books">返回专著全景</a> · <a href="/browse/">首页</a></div></footer>
-
-<!-- SDE 陪读浮层 -->
-<script>window.WDS_READ={selector:"main"};</script>
-<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
-
-<script src="/wds-mode.js?v=20260916a" defer></script>
-<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
-</body>
-</html>
+</div>
+<h2>三大革命</h2>
+<div class="cards"><div class="card"><b>主体革命</b><span>从“S”到“SIO”：真正的学习者不是孤立的我，而是主—互—客复合体</span></div><div class="card"><b>机制革命</b><span>从“内容”到“三律结构”：特征律、自由律、幸福律协奏出知识、技术与艺术</span></div><div class="card"><b>存在革命</b><span>从“占有”到“发生”：我们不是在学习知识，而是在生成自己</span></div></div>
+<h2>全书二十一章</h2>
+<table><tr><th>章</th><th>题</th><th>所在</th></tr><tr><td>第 1 章</td><td><b style="color:var(--fg)">三大教学法的空、乱、虚</b></td><td>旧学习的解构</td></tr><tr><td>第 2 章</td><td><b style="color:var(--fg)">“传道授业解惑”的当代缺陷</b></td><td>旧学习的解构</td></tr><tr><td>第 3 章</td><td><b style="color:var(--fg)">高分低能的终极解构</b></td><td>旧学习的解构</td></tr><tr><td>第 4 章</td><td><b style="color:var(--fg)">逻辑帝国与生成文明</b></td><td>旧学习的解构</td></tr><tr><td>第 5 章</td><td><b style="color:var(--fg)">学习如何可能</b></td><td>旧学习的解构</td></tr><tr><td>第 6 章</td><td><b style="color:var(--fg)">学习如何发生</b></td><td>旧学习的解构</td></tr><tr><td>第 7 章</td><td><b style="color:var(--fg)">学习的SIO本体论革命</b></td><td>学习本体的重构</td></tr><tr><td>第 8 章</td><td><b style="color:var(--fg)">学科知识的救赎</b></td><td>学习本体的重构</td></tr><tr><td>第 9 章</td><td><b style="color:var(--fg)">概念的SIO重生</b></td><td>学习本体的重构</td></tr><tr><td>第 10 章</td><td><b style="color:var(--fg)">主体革命</b></td><td>学习本体的重构</td></tr><tr><td>第 11 章</td><td><b style="color:var(--fg)">机制革命</b></td><td>学习本体的重构</td></tr><tr><td>第 12 章</td><td><b style="color:var(--fg)">存在革命</b></td><td>学习本体的重构</td></tr><tr><td>第 13 章</td><td><b style="color:var(--fg)">学习即纠缠</b></td><td>学习本体的重构</td></tr><tr><td>第 14 章</td><td><b style="color:var(--fg)">纠缠的展开</b></td><td>学习本体的重构</td></tr><tr><td>第 15 章</td><td><b style="color:var(--fg)">学科SIO化</b></td><td>基于GPT的学习发生学革命</td></tr><tr><td>第 16 章</td><td><b style="color:var(--fg)">学科SIO化的实践与路径</b></td><td>基于GPT的学习发生学革命</td></tr><tr><td>第 17 章</td><td><b style="color:var(--fg)">学科SIO化的未来与难点</b></td><td>基于GPT的学习发生学革命</td></tr><tr><td>第 18 章</td><td><b style="color:var(--fg)">基于GPT的学习发生学</b></td><td>基于GPT的学习发生学革命</td></tr><tr><td>第 19 章</td><td><b style="color:var(--fg)">发生式教学五步模型</b></td><td>基于GPT的学习发生学革命</td></tr><tr><td>第 20 章</td><td><b style="color:var(--fg)">教师、教材、学生的重生</b></td><td>基于GPT的学习发生学革命</td></tr><tr><td>第 21 章</td><td><b style="color:var(--fg)">制度与未来</b></td><td>基于GPT的学习发生学革命</td></tr></table>
+<h2>作者简介</h2>
+<p>王德生，SDE（显露·差异序列·特征纠缠）本体论思想体系的创立者，德麦国际（新加坡）创始人、首席执行官。生长于中国农村，1990 年进入湘潭大学，后获中国科学院计算数学博士学位，曾在英国斯旺西大学与新加坡南洋理工大学工作。</p>
+<p>阳涌，教育研究者、一线教育实践者，英语语言文学硕士，拥有 16 年基础教育教学、课程研发与学校管理经验。自 2019 年起跟随王德生博士学习其原创思想体系，构建了“AI＋创新教育”体系，并持续开发小学与初中数学、英语及跨学科原创专著与教材。</p>
+<p style="color:var(--dim);font-size:.86rem">编辑说明：本书由作者的书稿《论学习：基于GPT的学习发生学革命》（初稿）编成，初稿汇集作者 2024—2025 年写成的十二篇长文；出版沿用 ISBN 登记书名《学习发生学导论》。正文论断、例证与文风一仍其旧；编辑只做分编分章、标题分级、条目并段、表格复原、错字与标点修订、重复与公众号痕迹删除。</p>
+<h2>Book Description</h2>
+<p style="color:var(--dim);font-size:.9rem">As generative artificial intelligence such as GPT enters classrooms worldwide, the foundations of modern education are being quietly destabilized. Knowledge is no longer scarce, assignments can be completed without genuine understanding, and traditional assessments struggle to distinguish learning from mere output. In this context, Introduction to Learning Generativics does not ask how to learn more efficiently-it asks a far more fundamental question: how does learning actually happen? This book proposes Learning Generativics as a new foundational framework for understanding learning in the GPT era.</p><p style="color:var(--dim);font-size:.9rem">Moving beyond the dominant view of learning as knowledge acquisition, the authors redefine learning as a process of meaning generation within a Subject-Interaction-Object (SIO) structure. Learning, in this view, is not the accumulation of information or skills, but the emergence of structure through tension, interaction, rhythm, and reflection. Building on this ontology, the book advances three core shifts in educational thought: from isolated learners to integrated SIO systems; from outcome-driven performance to meaning dynamics governed by creativity, freedom, and well-being; and from transmission-based instruction to generative learning environments where structure is actively produced. A practical generative classroom model is introduced, demonstrating how GPT can function not as a substitute for learning, but as a catalyst that reveals, accelerates, and traces the learning process itself.</p><p style="color:var(--dim);font-size:.9rem">Rather than offering techniques or tools, Introduction to Learning Generativics reconstructs the philosophical foundations of learning for an age in which intelligence is no longer exclusively human. It argues that the future of education lies not in competing with artificial intelligence, but in reclaiming what machines cannot replace: the generation of meaning, structure, and self. This book serves as the foundational volume of the Learning Generativics series, opening a new path for educators, researchers, and thinkers seeking to reimagine learning as a generative force for individuals, institutions, and civilization itself.</p>
+<div class="foot">德麦国际出版社 · Demai International Press · Singapore · <a href="/books/">专著书架</a> · <a href="/books/m/17/">SIO经济学导论（第 17 号）</a> · <a href="/browse/">返回首页</a></div>
+</div></body></html>
