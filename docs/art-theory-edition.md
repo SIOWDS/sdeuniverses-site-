@@ -1,13 +1,15 @@
-# SDE艺术论 · 2026年9月重修版
+# SDE艺术论 · 2026年9月增订版
 
-本版依用户要求对照第220号《我的三个宝贝》，同时修正文风与成书版式。
+本版依用户要求在第220号《我的三个宝贝》的成书风格上，为全部32章增加案例与大白话解释。
 
-- 正文仍为三部32章、两份附录、47项参考资料；171处表述重新组织，移除堆积的审稿口吻，保留史实、出处与概念适用条件。
-- 32章均有原创场景开篇、章首引句、章末“带走的话”；这些句子不是冒充史料或名人引言。
-- PDF采用190×250毫米版面、暖纸色、深蓝标题、金色大号章码、金线引句、花饰及章末菱形；封面、封底与网页采用同一视觉体系。
-- 当前PDF共154页。`content/art-theory/page-map.json`是翻页目录的页码依据；印刷页1对应PDF物理页2，offset=2。
-- 单一正文源：`content/art-theory/revised-2026-09.json`。PDF、全文网页、封面及封底由`tools/build_art_theory.py`生成。
-- 重建：`python3 tools/build_art_theory.py --source content/art-theory/revised-2026-09.json --out /tmp/art-book --fonts /path/to/fonts`。
-- 字体目录需有NotoSerifSC-Regular.ttf与NotoSerifSC-Semibold.ttf；依赖reportlab、pypdf、PyMuPDF。重建PDF后必须按生成页码重建翻页目录。
-- 网站仍走本仓库main分支的Cloudflare发布流程。目录只修改art-theory条目，再用tools/build_bookshelf.py生成三个书架；保留其他书籍并发更新。
+- 新增正文 **50,179 个汉字**，不含96个新增小节标题；计入小节标题共 51,579 个汉字。逐章统计保存在 `content/art-theory/expansion-counts.json`。
+- 采用 Unicode U+4E00–U+9FFF 统计汉字，不把标点、字母、数字和空白计入5万字目标。统计只覆盖32章的新增段落，前言说明另计。
+- 保留原有三部32章、两份附录、47项参考资料、32个章首引句与32个章末提炼。各章新增3节，原收束节顺延；第20章顺延至第7节，其余顺延至第8节。
+- 新增日常人物、对话、课堂、工作与家庭场景均为构造案例，前言统一说明；历史作品与思想文本依据原作及书后资料。自拟诗与假设改写明确标示。
+- 暖纸色、深蓝标题、金色章码、引句和章末菱形沿用上一版。190×250毫米，当前PDF **226页**。
+- 单一正文源：`content/art-theory/revised-2026-09.json`。PDF、全文网页、封面和封底由 `tools/build_art_theory.py` 生成。
+- 重建：`python3 tools/build_art_theory.py --source content/art-theory/revised-2026-09.json --out /tmp/art-book --fonts /path/to/fonts`。字体需有NotoSerifSC-Regular.ttf、NotoSerifSC-Semibold.ttf；依赖reportlab、pypdf、PyMuPDF。
+- `content/art-theory/page-map.json` 是翻页目录依据；印刷页1对应PDF物理页2，offset=2。重新排版后必须用新page-map重建read.html。
+- PDF与封面缓存版本 `20260930-expanded50k`；阅读进度键同版更新，避免旧页码误定位。
+- 网站继续使用本仓库main分支的Cloudflare发布流程。只更新art-theory目录条目，再通过tools/build_bookshelf.py生成书架；保留其他书籍的并发更新。
 - 未分配新的专著编号、ISBN或售价。
