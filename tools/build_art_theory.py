@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the art monograph in the warm paper/navy/gold design of monograph 220.
+"""Build the art monograph with expressive covers and monograph 220's interior.
 
 Source is canonical JSON. PDF, HTML, covers and page-map share its exact text.
 Requires reportlab, pypdf, PyMuPDF and the two Noto Serif SC static TTF fonts.
@@ -20,6 +20,8 @@ ap=argparse.ArgumentParser();ap.add_argument('--source',type=Path,required=True)
 a=ap.parse_args();a.out.mkdir(parents=True,exist_ok=True)
 B=json.loads(a.source.read_text());P=B['paragraphs'];T=B['title'];SUB=B['subtitle'];CH={x['id']:x for x in B['chapter_design']}
 EDITION=B['edition'];CACHE=B.get('cache_version','20260930-expanded50k');HAN=len(re.findall(r'[\u4e00-\u9fff]',''.join(p['text'] for p in P)));HAN_LABEL=f'{HAN/10000:.1f}'
+COVER_ART={side:a.source.parent/B['cover_art'][side] for side in ('front','back')}
+assert all(p.is_file() for p in COVER_ART.values()), 'Both cover artwork files must accompany the manuscript'
 for name,filename in [('Book','NotoSerifSC-Regular.ttf'),('BookBold','NotoSerifSC-Semibold.ttf')]:pdfmetrics.registerFont(TTFont(name,str(a.fonts/filename)))
 pdfmetrics.registerFontFamily('Book',normal='Book',bold='BookBold',italic='Book',boldItalic='BookBold')
 PW,PH=190*mm,250*mm;M=17*mm;TOP=22*mm;BOTTOM=22*mm;WIDTH=PW-2*M
@@ -88,30 +90,13 @@ class GoldQuote(Flowable):
   self.p.drawOn(c,14,7);c.restoreState()
 
 def coverpaint(c,back=False):
- c.saveState();c.setFillColor(HexColor('#14223e'));c.rect(0,0,PW,PH,stroke=0,fill=1)
- # Fine rules and a line-drawn window/moving stroke echo the series' book design.
- for n in range(24):
-  c.setStrokeColor(HexColor('#182947'));c.setLineWidth(.28);c.line(0,PH-n*26,PW,PH-n*26)
- c.setFillColor(HexColor('#f4ead1'));c.setFont('BookBold',26);c.drawString(M+6,PH-51*mm,'SDE')
- c.setFont('BookBold',48 if not back else 34);c.drawString(M+6,PH-75*mm,'艺术论')
- c.setFillColor(HexColor('#dab85e'));c.setFont('Book',12);c.drawString(M+6,PH-91*mm,SUB)
- if not back:
-  c.setStrokeColor(HexColor('#a88b4d'));c.setLineWidth(1);c.rect(PW*.31,PH*.235,PW*.53,PH*.30,stroke=1,fill=0)
-  c.setStrokeColor(HexColor('#d3b366'));c.setLineWidth(2)
-  p=c.beginPath();p.moveTo(PW*.22,PH*.275);p.curveTo(PW*.54,PH*.43,PW*.43,PH*.15,PW*.75,PH*.42);c.drawPath(p)
-  c.setStrokeColor(HexColor('#66a7af'));c.setLineWidth(3)
-  p=c.beginPath();p.moveTo(PW*.43,PH*.25);p.curveTo(PW*.32,PH*.56,PW*.81,PH*.50,PW*.78,PH*.29);c.drawPath(p)
-  c.setFillColor(HexColor('#efe6cf'));c.circle(PW*.61,PH*.415,12,fill=1,stroke=0)
-  diamond(c,PW*.75,PH*.42,4,HexColor('#d3b366'))
-  c.setFillColor(HexColor('#f4ead1'));c.setFont('Book',14);c.drawString(M+6,45*mm,'王德生  著')
- else:
-  st=ParagraphStyle('back',fontName='Book',fontSize=12,leading=23,textColor=HexColor('#eee5d0'),wordWrap='CJK')
-  q=Paragraph('一首诗、一幅画、一段旋律，<br/>怎样在某个现场，<br/>进入一个人的生活？',st);_,h=q.wrap(WIDTH-35,200);q.drawOn(c,M+6,PH*.44)
-  c.setStrokeColor(GOLD);c.line(M+6,PH*.385,PW-M-6,PH*.385)
-  q=Paragraph('三部三十二章<br/>从理论框架到六门艺术<br/>再与西方美学展开六场对话',st);_,h=q.wrap(WIDTH-35,150);q.drawOn(c,M+6,PH*.25)
-  c.setFillColor(HexColor('#d3b366'));c.setFont('Book',9);c.drawString(M+6,47*mm,'全文开放 · 网页、在线翻页与 PDF')
- c.setFillColor(HexColor('#d7d4ca'));c.setFont('Book',10);c.drawString(M+6,26*mm,'德麦国际出版社')
- c.setFont('Times-Roman',7.5);c.drawString(M+6,20*mm,'Demai International Press  ·  Singapore')
+ c.saveState();c.drawImage(str(COVER_ART['back' if back else 'front']),0,0,width=PW,height=PH)
+ # Keep bibliographic text searchable without painting it over the finished art.
+ text=c.beginText(M,PH-M);text.setFont('Book',12);text.setTextRenderMode(3)
+ lines=[T,SUB]
+ if back:lines+=['一首诗、一幅画、一段旋律，','怎样在某个现场，','进入一个人的生活？','三部三十二章','从理论框架到六门艺术','再与西方美学展开六场对话','全文开放 · 网页、在线翻页与 PDF']
+ else:lines+=[B['author']+' 著',EDITION]
+ text.textLines('\n'.join(lines+[B['publisher']]));c.drawText(text)
  c.restoreState();c._book_fullbleed=True
 
 class BackCover(Flowable):
@@ -195,6 +180,7 @@ pages=len(PdfReader(str(pdf)).pages)
 import fitz
 d=fitz.open(pdf)
 for index,name in [(0,'cover.jpg'),(pages-1,'backcover.jpg')]:d[index].get_pixmap(matrix=fitz.Matrix(1.5,1.5),alpha=False).save(a.out/name)
+(a.out/'cover.svg').write_text(d[0].get_svg_image())
 
 nav=[];body=[];partactive=False;sectionopen=False;pendingdivision=''
 for x in P:
