@@ -13,3 +13,4 @@
 - PDF与封面缓存版本 `20260930-expanded50k`；阅读进度键同版更新，避免旧页码误定位。
 - 网站继续使用本仓库main分支的Cloudflare发布流程。只更新art-theory目录条目，再通过tools/build_bookshelf.py生成书架；保留其他书籍的并发更新。
 - 未分配新的专著编号、ISBN或售价。
+- 书架保留 `publishedAt` 的首次上线日期，以 `editionPublishedAt=2026-09-30T12:28:12Z` 记录增订版实际上线时间；`tools/build_bookshelf.py` 取两者中较晚的一次排序，确保新版出现在默认书架前列。三个书架入口均由同一目录生成。

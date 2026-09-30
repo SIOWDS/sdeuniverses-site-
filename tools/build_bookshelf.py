@@ -5,12 +5,13 @@ import json,html,collections
 ROOT=Path(__file__).resolve().parents[1]
 DATA=json.loads((ROOT/'public/books/catalog.json').read_text())
 BOOKS=DATA['books'];CATS=DATA['categories'];VERSION='20260927-bookshelf-v6'
-# 上线时间：catalog 里的 publishedAt（UTC）。新书若没填，就取它下面那一本（更早插入的）的时间，
+# 上线时间：取 publishedAt 与 editionPublishedAt 中较晚的一次（UTC），让增订版按新版上线时间展示。
+# publishedAt 保留首次上线日期。新书若没填，就取它下面那一本（更早插入的）的时间，
 # 排序时再用 catalog 位置分先后——新书总是插在最前面，所以位置越靠前越新。
 _carry=''
 for _b in reversed(BOOKS):
  _carry=_b.get('publishedAt') or _carry
- _b['_online']=_b.get('publishedAt') or _carry
+ _b['_online']=max(_b.get('publishedAt') or _carry, _b.get('editionPublishedAt') or '')
 assert len({b['id'] for b in BOOKS})==len(BOOKS)
 assert len({b['detailUrl'] for b in BOOKS})==len(BOOKS)
 assert all(not b.get('flipUrl') or b['readUrl']==b['flipUrl'] for b in BOOKS), 'Keep flip readers as the primary reading action'
