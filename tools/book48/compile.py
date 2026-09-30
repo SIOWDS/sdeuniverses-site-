@@ -5,6 +5,7 @@
 输出 book.json（网页用）与 manuscript.md（排版用）。正文论断与文字不改。"""
 import copy, json, re
 from bs4 import BeautifulSoup, NavigableString, Tag
+from polish import polish
 
 SRC = '/home/user/sdeuniverses-site-/public/books/m/48/quanben/text/'
 UNITS = json.load(open('units.json'))
@@ -219,19 +220,19 @@ def clean(blocks, n):
 
 book = {'front': [], 'parts': [], 'back': []}
 for n, title in FRONT:
-    book['front'].append({'src': n, 'title': title, 'html': clean(pick(n, 'all'), n)})
+    book['front'].append({'src': n, 'title': title, 'html': polish(clean(pick(n, 'all'), n))})
 chapno = 0
 for label, ptitle, xu, jie, chaps in PARTS:
-    part = {'label': label, 'title': ptitle, 'xu': clean(pick(xu, 'all'), xu), 'jie': clean(pick(jie, 'all'), jie), 'chapters': []}
+    part = {'label': label, 'title': ptitle, 'xu': polish(clean(pick(xu, 'all'), xu)), 'jie': polish(clean(pick(jie, 'all'), jie)), 'chapters': []}
     for ctitle, srcs in chaps:
         chapno += 1
         html = []
         for n, spec in srcs:
             html += clean(pick(n, spec), n)
-        part['chapters'].append({'no': chapno, 'title': ctitle, 'src': [s[0] for s in srcs], 'html': html})
+        part['chapters'].append({'no': chapno, 'title': ctitle, 'src': [s[0] for s in srcs], 'html': polish(html, chapno)})
     book['parts'].append(part)
 for n, title in BACK:
-    book['back'].append({'src': n, 'title': title, 'html': clean(pick(n, 'all'), n)})
+    book['back'].append({'src': n, 'title': title, 'html': polish(clean(pick(n, 'all'), n))})
 book['backcover'] = BeautifulSoup(open(SRC + '51/index.html').read(), 'html.parser').find('article').get_text('\n').strip()
 
 def count(h):

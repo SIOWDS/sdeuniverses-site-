@@ -71,12 +71,22 @@ def to_md(frags, chapter_mode=True):
             lines += ['', f'#### {t.get_text().strip()}', '']
         elif t.name == 'p' and 'subtitle' in cls:
             lines += ['', f'## {t.get_text().strip()}', '']
+        elif t.name == 'p' and 'dash' in cls:
+            lines += ['', '*' + t.get_text().strip() + '*', '']
         elif t.name == 'p' and 'key' in cls:
             lines += ['', '> ' + inline(t), '']
         elif t.name == 'p':
             s = inline(t)
             if s:
                 lines += [safe(s), '']
+        elif t.name == 'table':
+            rows = [[c.get_text().strip().replace('|', '｜') for c in tr.find_all(['th', 'td'])] for tr in t.find_all('tr')]
+            lines.append('')
+            lines.append('| ' + ' | '.join(rows[0]) + ' |')
+            lines.append('|' + '---|' * len(rows[0]))
+            for r in rows[1:]:
+                lines.append('| ' + ' | '.join(c or '　' for c in r) + ' |')
+            lines.append('')
         elif t.name in ('ul', 'ol'):
             for li in t.find_all('li'):
                 s = inline(li)

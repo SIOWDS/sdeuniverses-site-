@@ -25,7 +25,18 @@ def folio(title_start):
 
 # 页面样式直接沿用全本网页版
 tpl = (QB / '06/index.html').read_text()
-CSS = tpl[tpl.index('<style>'):tpl.index('</style>') + 8]
+CSS = tpl[tpl.index('<style>'):tpl.index('</style>')] + '''
+article table{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.7;margin:22px 0 26px}
+@media(max-width:560px){article table{display:block;overflow-x:auto}}
+article th{background:#2A3A5E;color:#fff;font-weight:700;text-align:left;padding:8px 10px;white-space:nowrap}
+article td{border-bottom:1px solid var(--border);padding:8px 10px;vertical-align:top}
+article tbody tr:nth-child(even) td{background:rgba(94,71,16,0.05)}
+article td:first-child{font-weight:700;color:var(--accent)}
+article p.num{padding-left:1.6em;text-indent:-1.6em}
+article p.dash{text-indent:0;color:var(--muted);letter-spacing:.04em;margin-top:-6px}
+article p.tcap{text-indent:0;margin:26px 0 0}
+article h2{font-size:22px;margin:52px 0 18px}
+</style>'''
 TAIL = '''<script>window.WDS_READ={selector:"article"};</script>
 <script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
 <script src="/wds-mode.js?v=20260916a" defer></script>
