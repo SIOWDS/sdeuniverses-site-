@@ -82,7 +82,7 @@ def restore_tables(blocks):
 def fix_text_nodes(html):
     soup = BeautifulSoup(html, 'html.parser')
     for node in soup.find_all(string=True):
-        new = clean_text(str(node))
+        new = typo(clean_text(str(node)))
         if new != str(node):
             node.replace_with(new)
     return str(soup)
@@ -147,6 +147,7 @@ def polish(blocks, no=None):
     blocks = key_labels(blocks)
     blocks = list_heads(blocks)
     blocks = join_into_list(blocks)
+    blocks = join_unbalanced(blocks)
     blocks = short_heads(blocks)
     out = []
     for b in blocks:
@@ -155,6 +156,7 @@ def polish(blocks, no=None):
             out.append(fix_text_nodes(x))
     out = [re.sub(r'^<p>(金句[一二三四五六七八九十]+：.*)</p>$', r'<h4>\1</h4>', b, flags=re.S) for b in out]
     out = [re.sub(r'^<p>(\d+[.．、]\s*\S)', r'<p class="num">\1', b) if len(b) < 400 else b for b in out]
+    out = [re.sub(r'^(<(?:p|h4)[^>]*>)\s*[：:]+\s*', r'\1', b) for b in out]
     out = after_select(out, no)
     # 去掉清理后变空的段落
     return [b for b in out if BeautifulSoup(b, 'html.parser').get_text().strip() or '<table' in b]
@@ -343,3 +345,53 @@ def list_heads(blocks):
                 continue
         out.append(b)
     return out
+
+
+def _open(t):
+    return t.count('（') > t.count('）') or t.count('“') > t.count('”') or t.count('《') > t.count('》')
+
+
+def join_unbalanced(blocks):
+    """括号、引号未闭合且行尾无句末标点的段落，与下一段（或下一列表的首项）接回。"""
+    out = []
+    for b in blocks:
+        if out:
+            p = next(iter(BeautifulSoup(out[-1], 'html.parser').children))
+            pt = p.get_text().strip() if p.name else ''
+            if p.name == 'p' and _open(pt) and not re.search(r'[。！？；]$', pt):
+                t = next(iter(BeautifulSoup(b, 'html.parser').children))
+                if t.name == 'p' and not t.get('class'):
+                    p.append(BeautifulSoup(t.decode_contents(), 'html.parser'))
+                    out[-1] = str(p)
+                    continue
+                if t.name == 'ul':
+                    lis = t.find_all('li', recursive=False)
+                    if lis:
+                        p.append(BeautifulSoup(lis[0].decode_contents(), 'html.parser'))
+                        lis[0].decompose()
+                        out[-1] = str(p)
+                        if t.find('li'):
+                            out.append(str(t))
+                        continue
+        out.append(b)
+    return out
+
+
+def typo(s):
+    """排印细节：中文之间的半角逗号改全角；中文标点后的多余空格去掉；副题开头的冒号去掉。"""
+    for a, b in FORMULA_FIX:
+        s = s.replace(a, b)
+    s = re.sub(r'(?<=[一-鿿]),(?=[一-鿿/])', '，', s)
+    s = re.sub(r'([。，；：、！？])[ 　]+(?=[一-鿿“（《A-Za-zΔ])', r'\1', s)
+    # 西文字母与汉字之间的空格去掉（数字与汉字之间按体例保留）
+    s = re.sub(r'(?<=[A-Za-zΔ]) +(?=[一-鿿])', '', s)
+    s = re.sub(r'(?<=[一-鿿]) +(?=[A-Za-zΔ])', '', s)
+    return s
+
+
+# 原稿公式残留（同一式子以 LaTeX 与纯文本重复出现、求和式被压扁）
+FORMULA_FIX = [
+    ('(S1,I1,O1)(S_1, I_1, O_1)(S1,I1,O1)', '(S1,I1,O1)'),
+    ('(S2,I2,O2)(S_2, I_2, O_2)(S2,I2,O2)', '(S2,I2,O2)'),
+    ('∑i=1n(纠缠度i×激发度i)', '∑(纠缠度i × 激发度i)，i = 1, …, n'),
+]
