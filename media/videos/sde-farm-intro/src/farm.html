@@ -1,0 +1,204 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#0f1f3d;overflow:hidden}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W=1920,H=1080,cv=document.getElementById('c'),G0=cv.getContext('2d');let g=G0;
+const off=document.createElement('canvas');off.width=W;off.height=H;const G1=off.getContext('2d');
+const FONT='"WenQuanYi Zen Hei","Noto Sans CJK SC",sans-serif';
+const NAVY='#0f1f3d',GOLD='#d9ae45',CREAM='#f6efdc';
+let TL=null;
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const ease=x=>{x=clamp(x);return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2};
+const lerp=(a,b,t)=>a+(b-a)*t;
+// seeded random
+function rng(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+
+function text(s,x,y,size,color,opts={}){
+  g.save();g.font=`${opts.weight||'normal'} ${size}px ${FONT}`;g.fillStyle=color;
+  g.textAlign=opts.align||'center';g.textBaseline='middle';g.globalAlpha*=opts.alpha??1;
+  if(opts.shadow){g.shadowColor='rgba(0,0,0,.45)';g.shadowBlur=opts.shadow}
+  g.fillText(s,x,y);g.restore();
+}
+function rrect(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+
+// ---------- landscape ----------
+function sky(top,bot){const gr=g.createLinearGradient(0,0,0,H*.6);gr.addColorStop(0,top);gr.addColorStop(1,bot);g.fillStyle=gr;g.fillRect(0,0,W,H)}
+function sun(x,y,r,col,glow){g.save();const gr=g.createRadialGradient(x,y,r*.2,x,y,r*3);gr.addColorStop(0,glow);gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(x-r*3,y-r*3,r*6,r*6);g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();g.restore()}
+function hills(y,c1,c2){g.fillStyle=c1;g.beginPath();g.moveTo(0,y);for(let x=0;x<=W;x+=20)g.lineTo(x,y-60*Math.sin(x/380)-30*Math.sin(x/170+1));g.lineTo(W,H);g.lineTo(0,H);g.fill();
+  g.fillStyle=c2;g.beginPath();g.moveTo(0,y+40);for(let x=0;x<=W;x+=20)g.lineTo(x,y+40-40*Math.sin(x/300+2));g.lineTo(W,H);g.lineTo(0,H);g.fill()}
+function field(y,col,furrow){g.fillStyle=col;g.fillRect(0,y,W,H-y);g.strokeStyle=furrow;g.lineWidth=3;
+  for(let i=-12;i<=12;i++){g.beginPath();g.moveTo(W/2+i*18,y);g.lineTo(W/2+i*190,H);g.stroke()}}
+function barn(x,y,s){g.save();g.translate(x,y);g.scale(s,s);g.fillStyle='#9c3b2e';g.fillRect(-60,-70,120,70);g.fillStyle='#7a2a20';g.beginPath();g.moveTo(-72,-70);g.lineTo(0,-120);g.lineTo(72,-70);g.fill();g.fillStyle=CREAM;g.fillRect(-20,-45,40,45);g.restore()}
+function cloud(x,y,s,a=1){g.save();g.globalAlpha*=a;g.fillStyle='#fff';g.beginPath();[[0,0,40],[40,-15,50],[85,0,38],[40,12,42]].forEach(([dx,dy,r])=>{g.moveTo(x+dx*s+r*s,y+dy*s);g.arc(x+dx*s,y+dy*s,r*s,0,7)});g.fill();g.restore()}
+
+function farmBase(t,mood){
+  // mood 0=spring,1=autumn,2=drought
+  const skyT=['#8fc6ec','#f3c77a','#e8a15a'][mood],skyB=['#dff1fb','#fbe6b8','#f6d7a0'][mood];
+  sky(skyT,skyB);
+  sun(1550,200,mood==2?80:60,mood==2?'#fff2c0':'#fff7d6',mood==2?'rgba(255,170,60,.7)':'rgba(255,230,150,.55)');
+  if(mood!=2){cloud(200+((t*25)%2200)-200,170,1.1,.9);cloud(900+((t*15)%2200)-400,110,.8,.8)}
+  hills(560,mood==2?'#b99a5c':mood==1?'#b7a55a':'#7fb069',mood==2?'#a88a4c':mood==1?'#a8964c':'#6a9c55');
+  barn(1680,610,1);
+}
+
+// ---------- plants ----------
+function sprout(x,y,h,col='#4f9a3a'){g.strokeStyle=col;g.lineWidth=5;g.lineCap='round';g.beginPath();g.moveTo(x,y);g.lineTo(x,y-h);g.stroke();
+  if(h>15){g.fillStyle=col;[-1,1].forEach(sd=>{g.beginPath();g.ellipse(x+sd*h*.22,y-h*.7,h*.25,h*.09,sd*-.5,0,7);g.fill()})}}
+function wheat(x,y,h,sway,col){g.save();g.translate(x,y);g.rotate(sway);g.strokeStyle=col;g.lineWidth=4;g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(4,-h*.5,0,-h);g.stroke();
+  g.fillStyle=col;for(let i=0;i<6;i++){[-1,1].forEach(s=>{g.beginPath();g.ellipse(s*6,-h+8+i*9,8,4,s*.6,0,7);g.fill()})}
+  g.beginPath();g.ellipse(0,-h-4,5,10,0,0,7);g.fill();g.restore()}
+function millet(x,y,h,sway){g.save();g.translate(x,y);g.rotate(sway);g.strokeStyle='#6f8f3a';g.lineWidth=4;g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(10,-h*.7,h*.35,-h);g.stroke();
+  g.fillStyle='#d9a441';g.beginPath();g.ellipse(h*.38,-h+h*.18,11,h*.22,.35,0,7);g.fill();g.restore()}
+
+// ---------- chrome ----------
+function brand(a){g.save();g.globalAlpha=a;rrect(40,36,470,64,32);g.fillStyle='rgba(15,31,61,.78)';g.fill();
+  text('SDE本体论入门',160,68,30,GOLD,{weight:'bold'});text('王德生 讲',400,68,28,CREAM);g.restore()}
+function label(letter,title,sub,col,a,x=90,y=170){g.save();g.globalAlpha=a;rrect(x,y,720,150,24);g.fillStyle='rgba(15,31,61,.82)';g.fill();
+  g.fillStyle=col;g.beginPath();g.arc(x+85,y+75,52,0,7);g.fill();text(letter,x+85,y+78,64,NAVY,{weight:'bold'});
+  text(title,x+165,y+55,44,CREAM,{align:'left',weight:'bold'});text(sub,x+165,y+108,28,'#c9d3e6',{align:'left'});g.restore()}
+function subtitle(t){if(!TL)return;const s=TL.subs.find(s=>t>=s.s&&t<s.e+.15);if(!s)return;
+  g.save();g.font=`bold 50px ${FONT}`;const w=g.measureText(s.text).width+80;
+  rrect(W/2-w/2,H-150,w,86,18);g.fillStyle='rgba(0,0,0,.58)';g.fill();text(s.text,W/2,H-106,50,'#fff',{weight:'bold'});g.restore()}
+
+// ---------- scenes ----------
+function sTitle(t,d){ // t local
+  g.fillStyle=NAVY;g.fillRect(0,0,W,H);
+  // faint furrows
+  g.save();g.globalAlpha=.18;field(700,'#1b3160','#2c4a86');g.restore();
+  for(let i=0;i<40;i++){const r=rng(i+3);const x=r()*W;wheat(x,1080,200+r()*140,Math.sin(t*1.5+i)*.05,'rgba(217,174,69,.35)')}
+  const a=ease(t/1.2);
+  text('世界不是被发现的，',W/2,300,62,CREAM,{alpha:a});
+  text('而是发生的。',W/2,390,62,GOLD,{alpha:ease((t-1.2)/1),weight:'bold'});
+  const b=ease((t-3.2)/1);
+  g.save();g.globalAlpha=b;g.strokeStyle=GOLD;g.lineWidth=2;g.beginPath();g.moveTo(W/2-360,480);g.lineTo(W/2+360,480);g.stroke();g.restore();
+  text('SDE本体论入门',W/2,580,110,GOLD,{alpha:b,weight:'bold',shadow:20});
+  text('一座农场里的第一课 · 主讲 王德生',W/2,700,44,CREAM,{alpha:ease((t-4)/1)});
+}
+
+const E_NODES=[['泥土',560,700,'#8b5a2b'],['雨水',960,640,'#4a90d9'],['阳光',1360,700,'#f0b429'],['种子',740,845,'#6aa84f'],['农人的经验',1180,845,'#c0703a']];
+function sE(t,d){
+  farmBase(t,0);
+  // soil cross-section
+  const top=560;const gr=g.createLinearGradient(0,top,0,H);gr.addColorStop(0,'#7a5230');gr.addColorStop(1,'#3e2616');g.fillStyle=gr;g.fillRect(0,top,W,H-top);
+  g.fillStyle='#6aa84f';g.fillRect(0,top-8,W,14);
+  const R=rng(7);for(let i=0;i<140;i++){g.fillStyle='rgba(255,230,190,.10)';g.beginPath();g.arc(R()*W,top+20+R()*500,2+R()*5,0,7);g.fill()}
+  // nodes appear in sync with narration (~ first 45% of line)
+  const show=E_NODES.map((_,i)=>ease((t-0.9-i*0.55)/0.5));
+  // entangled threads
+  g.save();g.lineWidth=4;
+  for(let i=0;i<E_NODES.length;i++)for(let j=i+1;j<E_NODES.length;j++){
+    const a=Math.min(show[i],show[j])*ease((t-3.2)/1.2);if(a<=0)continue;
+    const [,x1,y1]=E_NODES[i],[,x2,y2]=E_NODES[j];
+    for(let k=0;k<2;k++){g.strokeStyle=`rgba(255,${210-k*40},${120+k*60},${.55*a})`;g.beginPath();g.moveTo(x1,y1);
+      const mx=(x1+x2)/2,my=(y1+y2)/2,ph=t*2+i+j+k*2;
+      g.bezierCurveTo(mx+Math.sin(ph)*120,my-80+Math.cos(ph)*60,mx-Math.sin(ph)*120,my+80-Math.cos(ph)*60,x2,y2);g.stroke()}
+  }g.restore();
+  E_NODES.forEach(([n,x,y,c],i)=>{const a=show[i];if(a<=0)return;const r=58*(.6+.4*a)+Math.sin(t*3+i)*3;
+    g.save();g.globalAlpha=a;g.shadowColor=c;g.shadowBlur=30;g.fillStyle=c;g.beginPath();g.arc(x,y,r,0,7);g.fill();g.restore();
+    text(n,x,y,n.length>2?26:34,'#fff',{alpha:a,weight:'bold'})});
+  label('E','纠缠网络 · Entanglement','一切发生的土壤：缠绕在先，端点在后','#b77b45',ease((t-4.8)/.8));
+}
+
+const D_STEPS=['翻地','播种','浇水','除草','看长势','再调整'];
+function sD(t,d){
+  farmBase(t,0);field(600,'#9a6a3c','#86592f');
+  const k=clamp((t-0.6)/5.2)*D_STEPS.length; // step progress
+  // plants grow with steps
+  const R=rng(11);for(let row=0;row<5;row++)for(let i=0;i<16;i++){const y=680+row*80,x=160+i*105+(row%2)*50+R()*20;
+    const h=Math.max(0,(k-1.2))*14*(.8+R()*.4)*(1+row*.12);if(h>0)sprout(x,y,Math.min(h,70+row*10))}
+  // step cards
+  D_STEPS.forEach((s,i)=>{const x=260+i*280,y=470,on=clamp(k-i),a=.35+.65*on;
+    g.save();g.globalAlpha=a;rrect(x-105,y-44,210,88,20);g.fillStyle=on>=1?'#1f4d8f':'rgba(15,31,61,.85)';g.fill();
+    g.strokeStyle=GOLD;g.lineWidth=on>0?4:1;g.stroke();g.restore();text(s,x,y+2,40,on>0?'#fff':'#9fb0cf',{weight:'bold'});
+    if(i<D_STEPS.length-1)text('→',x+140,y,40,GOLD,{alpha:a})});
+  // convergence zigzag: compare / try / correct
+  const za=ease((t-5.2)/.8);if(za>0){g.save();g.globalAlpha=za;rrect(1220,170,620,240,20);g.fillStyle='rgba(15,31,61,.82)';g.fill();
+    g.strokeStyle='rgba(255,255,255,.25)';g.setLineDash([8,8]);g.beginPath();g.moveTo(1250,300);g.lineTo(1810,300);g.stroke();g.setLineDash([]);
+    g.strokeStyle=GOLD;g.lineWidth=5;g.beginPath();const pr=clamp((t-5.2)/2.5);
+    for(let x=0;x<=pr*540;x+=4){const y=300+Math.sin(x/28)*90*Math.exp(-x/170);x?g.lineTo(1260+x,y):g.moveTo(1260,y)}g.stroke();
+    text('比较 · 试探 · 修正 → 收敛',1530,200,30,CREAM);g.restore()}
+  label('D','差异序列 · Difference','不是“变化”，是一步步推出路径','#4a90d9',ease((t-5.6)/.8),90,170);
+}
+
+function sS(t,d){
+  farmBase(t,1);field(600,'#c9a34e','#b89140');
+  const rise=ease((t-.3)/3.2);
+  const R=rng(21);const items=[];for(let row=0;row<9;row++)for(let i=0;i<46;i++)items.push([row,i,R(),R()]);
+  items.forEach(([row,i,a,b])=>{const y=620+row*52,x=-20+i*44+(row%2)*22+a*16,sc=.55+row*.12;
+    const h=(110+b*40)*sc*rise;if(h<4)return;
+    const col=`hsl(${42+b*6},${70}%,${48+row*2}%)`;wheat(x,y,h,Math.sin(t*1.6+x/180)*.12*rise,col)});
+  label('S','显露 · Show','存在被看见、被维持、被识别的方式','#d9ae45',ease((t-3.3)/.8));
+  const na=ease((t-5.4)/.7);if(na>0){g.save();g.globalAlpha=na;rrect(1150,170,680,150,24);g.fillStyle='rgba(15,31,61,.85)';g.fill();
+    text('S = Show 显露',1490,220,46,GOLD,{weight:'bold'});text('Structure 现成结构',1490,285,34,'#c9d3e6');
+    g.strokeStyle='#e25b4a';g.lineWidth=5;g.beginPath();g.moveTo(1330,285);g.lineTo(1650,285);g.stroke();g.restore()}
+}
+
+function circleNode(x,y,r,col,letter,cap,a){g.save();g.globalAlpha=a;g.shadowColor=col;g.shadowBlur=40;g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill();g.restore();
+  text(letter,x,y+4,r*1.05,NAVY,{alpha:a,weight:'bold'});text(cap,x,y+r+50,36,CREAM,{alpha:a})}
+function arrow(x1,y1,x2,y2,a,col=GOLD){g.save();g.globalAlpha=a;g.strokeStyle=col;g.fillStyle=col;g.lineWidth=6;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();
+  const an=Math.atan2(y2-y1,x2-x1);g.beginPath();g.moveTo(x2,y2);g.lineTo(x2-24*Math.cos(an-.4),y2-24*Math.sin(an-.4));g.lineTo(x2-24*Math.cos(an+.4),y2-24*Math.sin(an+.4));g.fill();g.restore()}
+function sFormula(t,d){
+  g.fillStyle=NAVY;g.fillRect(0,0,W,H);
+  const a1=ease(t/.4),a2=ease((t-.8)/.4),a3=ease((t-1.6)/.4);
+  circleNode(480,420,110,'#b77b45','E','土壤 · 纠缠',a1);arrow(610,420,820,420,a2);
+  circleNode(960,420,110,'#4a90d9','D','农时 · 差异',a2);arrow(1090,420,1300,420,a3);
+  circleNode(1440,420,110,GOLD,'S','麦浪 · 显露',a3);
+  text('在 E 中，经 D，成 S',W/2,720,84,GOLD,{weight:'bold',alpha:ease((t-.2)/.6),shadow:24});
+  text('S = F(D, E)　　D = G(S, E)　　E = H(S, D)',W/2,830,36,'#9fb0cf',{alpha:ease((t-1.8)/.8)});
+}
+
+function crack(R,x,y,len,dep){if(dep<=0)return;const an=R()*6.28;const x2=x+Math.cos(an)*len,y2=y+Math.sin(an)*len*.35;g.moveTo(x,y);g.lineTo(x2,y2);crack(R,x2,y2,len*.75,dep-1);if(R()<.5)crack(R,x2,y2,len*.6,dep-1)}
+function sLoop(t,d){
+  const ph=t/d; // 0..1
+  const dry=ease(t/1.2);
+  farmBase(t,2);
+  g.fillStyle='#b98a52';g.fillRect(0,600,W,H-600);
+  g.save();g.globalAlpha=dry;g.strokeStyle='#6b4a24';g.lineWidth=3;const R=rng(5);g.beginPath();for(let i=0;i<26;i++)crack(R,R()*1100,640+R()*420,60,4);g.stroke();g.restore();
+  // withered wheat early, then millet grows
+  const R2=rng(9);for(let i=0;i<18;i++){const x=60+i*60,y=700+(i%3)*110;
+    const wA=1-ease((t-4)/1.5);if(wA>0){g.save();g.globalAlpha=wA;wheat(x,y,90,.5+R2()*.3,'#8a7550');g.restore()}
+    const mg=ease((t-4.2)/3);if(mg>0)millet(x+25,y+10,130*mg,Math.sin(t*1.4+i)*.06)}
+  // loop diagram
+  const cx=1420,cy=560,rad=200;
+  g.save();g.globalAlpha=ease((t-.4)/.6);g.beginPath();g.arc(cx,cy,rad+150,0,7);g.fillStyle='rgba(15,31,61,.95)';g.fill();
+  g.strokeStyle='rgba(217,174,69,.5)';g.lineWidth=6;g.beginPath();g.arc(cx,cy,rad,0,7);g.stroke();g.restore();
+  const nodes=[['①','D–E 矛盾','旱灾 × 老办法',-Math.PI/2,1.0,'#e25b4a'],['②','S 改变','改种耐旱谷子',Math.PI/6,4.0,GOLD],['③','回写 D、E','养土壤 · 改农时',5*Math.PI/6,7.2,'#4a90d9']];
+  // rotating highlight after all shown
+  const spin=t>9.6?(t-9.6)*2.2:null;
+  if(spin!==null){g.save();g.strokeStyle=GOLD;g.lineWidth=12;g.lineCap='round';g.beginPath();g.arc(cx,cy,rad,spin-.9-Math.PI/2,spin-Math.PI/2);g.stroke();g.restore()}
+  nodes.forEach(([n,a,b,an,ts,col],i)=>{const al=ease((t-ts)/.6);if(al<=0)return;const x=cx+Math.cos(an)*rad,y=cy+Math.sin(an)*rad;
+    g.save();g.globalAlpha=al;g.fillStyle=col;g.beginPath();g.arc(x,y,62,0,7);g.fill();g.restore();text(n,x,y+2,54,NAVY,{alpha:al,weight:'bold'});
+    const ly=y+(i==0?-105:100);text(a,x,ly,34,'#fff',{alpha:al,weight:'bold'});text(b,x,ly+42,26,'#c9d3e6',{alpha:al})});
+  if(spin!==null)text('循环不止',cx,cy,48,GOLD,{weight:'bold',alpha:ease((t-9.6)/.6)});
+  const la=ease((t-.4)/.6);g.save();g.globalAlpha=la;rrect(90,170,720,120,24);g.fillStyle='rgba(15,31,61,.84)';g.fill();g.restore();
+  text('123原理：矛盾是引擎，不是故障',450,230,38,CREAM,{alpha:la,weight:'bold'});
+}
+
+function sEnd(t,d){
+  g.fillStyle=NAVY;g.fillRect(0,0,W,H);
+  for(let i=0;i<60;i++){const r=rng(i+50);const x=r()*W;wheat(x,1080,160+r()*160,Math.sin(t*1.3+i)*.06,'rgba(217,174,69,.28)')}
+  text('麦子不是从地里被发现的，',W/2,320,64,CREAM,{alpha:ease(t/.8)});
+  text('是在土里发生的。',W/2,420,72,GOLD,{weight:'bold',alpha:ease((t-2)/.8),shadow:20});
+  const b=ease((t-4.2)/.8);
+  text('SDE本体论入门 · 第一课',W/2,600,54,CREAM,{alpha:b,weight:'bold'});
+  text('主讲　王德生　｜　德麦国际',W/2,680,38,'#c9d3e6',{alpha:b});
+  text('sdeuniverses.com',W/2,760,36,GOLD,{alpha:ease((t-5)/.8)});
+}
+
+const SCENES={title:sTitle,E:sE,D:sD,S:sS,formula:sFormula,loop:sLoop,end:sEnd};
+function drawScene(i,t){const L=TL.lines[i];const st=i==0?0:L.start-0.25;const lt=t-st;SCENES[L.scene](lt,L.dur+.25)}
+window.renderAt=function(t){
+  g.globalAlpha=1;g.clearRect(0,0,W,H);
+  const L=TL.lines;let i=0;for(let k=0;k<L.length;k++)if(t>=(k==0?0:L[k].start-.25))i=k;
+  drawScene(i,t);
+  // crossfade from previous scene
+  if(i>0){const fs=L[i].start-.25,f=clamp((t-fs)/.5);if(f<1){g=G1;g.globalAlpha=1;G1.clearRect(0,0,W,H);drawScene(i-1,t);g=G0;g.save();g.globalAlpha=1-f;g.drawImage(off,0,0);g.restore()}}
+  const sc=L[i].scene;brand(sc=='title'||sc=='end'?0:1);
+  subtitle(t);
+  // global fade in/out
+  const fo=Math.min(clamp(t/.5),clamp((TL.total-t)/.8));if(fo<1){g.fillStyle=`rgba(0,0,0,${1-fo})`;g.fillRect(0,0,W,H)}
+};
+window.setTL=o=>{TL=o};
+</script></body></html>
