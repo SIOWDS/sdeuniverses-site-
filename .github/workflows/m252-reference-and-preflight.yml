@@ -1,0 +1,44 @@
+name: Book 252 reference and preflight
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/m252-reference-and-preflight.yml'
+permissions:
+  contents: read
+jobs:
+  references:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/220/
+            /public/students/wang-desheng/my-three-treasures/
+            /public/books/index.html
+            /public/books/bookshelf.js
+            /public/books/bookshelf.css
+            /tools/
+            /scripts/
+            /package.json
+      - name: Collect publication design references
+        run: |
+          mkdir -p reference-bundle
+          cp -a public/books/m/220 reference-bundle/book220
+          if [ -d public/students/wang-desheng/my-three-treasures ]; then cp -a public/students/wang-desheng/my-three-treasures reference-bundle/three-treasures; fi
+          cp public/books/index.html reference-bundle/bookshelf-index.html
+          cp public/books/bookshelf.js reference-bundle/ 2>/dev/null || true
+          cp public/books/bookshelf.css reference-bundle/ 2>/dev/null || true
+          if [ -d tools ]; then cp -a tools reference-bundle/; fi
+          if [ -d scripts ]; then cp -a scripts reference-bundle/; fi
+          if [ -f package.json ]; then cp package.json reference-bundle/; fi
+          find reference-bundle -type f -printf '%p %s bytes\n' > reference-bundle/manifest.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m252-book220-design-reference
+          path: reference-bundle/
+          retention-days: 3
+          if-no-files-found: error
