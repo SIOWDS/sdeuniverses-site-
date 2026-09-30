@@ -1,0 +1,82 @@
+name: Book 252 public source check
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m252-public-source-check.yml']
+permissions:
+  contents: read
+jobs:
+  sources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch public sources for editorial checking
+        shell: python
+        run: |
+          import urllib.request, pathlib, json, concurrent.futures, hashlib
+          out=pathlib.Path('editorial-sources');out.mkdir()
+          base='https://www.marxists.org/'
+          paths='''archive/marx/works/1867-c1/ch07.htm
+          chinese/marx-engels/31/167.htm
+          chinese/marx-engels/31/165.htm
+          chinese/marx-engels/31/154.htm
+          chinese/marx-engels/31/156.htm
+          archive/marx/works/1867-c1/appendix.htm
+          archive/marx/works/1867-c1/p3.htm
+          archive/marx/works/1859/critique-pol-economy/preface.htm
+          archive/marx/works/1867-c1/p1.htm
+          archive/marx/works/1845/theses/index.htm
+          archive/marx/works/1857/grundrisse/ch01.htm
+          archive/marx/works/1852/18th-brumaire/ch01.htm
+          archive/marx/works/1881/zasulich/zasulich.htm
+          archive/marx/works/1881/zasulich/draft-1.htm
+          archive/marx/works/1881/zasulich/draft-2.htm
+          archive/marx/works/1881/zasulich/draft-3.htm
+          archive/marx/works/1881/zasulich/draft-4.htm
+          archive/marx/works/1881/zasulich/reply.htm
+          archive/marx/works/1877/11/russia.htm
+          archive/marx/works/1867-c1/ch32.htm
+          archive/marx/works/1875/gotha/ch01.htm
+          archive/marx/works/1894-c3/ch48.htm
+          subject/economy/authors/bohm/ch03.htm
+          archive/hilferding/1904/criticism/ch01.htm
+          https://megadigital.bbaw.de/
+          archive/marx/works/1867-c1/ch01.htm
+          chinese/marx-engels/31/168.htm
+          chinese/marx-engels/31/169.htm
+          archive/marx/works/1867-c1/ch06.htm
+          archive/marx/works/1867-c1/ch15.htm
+          archive/marx/works/1844/manuscripts/labour.htm
+          archive/marx/works/1867-c1/ch19.htm
+          archive/hilferding/1904/criticism/ch02.htm
+          archive/marx/works/1894-c3/ch09.htm
+          archive/marx/works/1867-c1/ch13.htm
+          archive/marx/works/1867-c1/ch14.htm
+          archive/marx/works/1867-c1/ch03.htm
+          archive/marx/works/1885-c2/ch08.htm
+          archive/marx/works/1885-c2/ch00.htm
+          archive/marx/works/1867-c1/ch23.htm
+          archive/marx/works/1843/letters/43_09.htm
+          archive/marx/works/1868/letters/68_07_11-abs.htm
+          chinese/marx-engels/31/155.htm
+          subject/economy/authors/bohm/ch04.htm'''
+          tasks=[(f'source-{i:02}.html',s if s.startswith('https:') else base+s) for i,s in enumerate([p.strip() for p in paths.splitlines() if p.strip()],1)]
+          tasks += [('book220-print.pdf','https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-v3.pdf'),('book220-reader.pdf','https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf')]
+          def get(task):
+            name,url=task
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Book252EditorialSourceVerification/1.0'})
+              with urllib.request.urlopen(req,timeout=60) as r:
+                b=r.read();final=r.url;ct=r.headers.get('Content-Type','')
+              (out/name).write_bytes(b)
+              return {'file':name,'url':url,'final_url':final,'bytes':len(b),'content_type':ct,'sha256':hashlib.sha256(b).hexdigest(),'status':'downloaded-not-yet-reviewed'}
+            except Exception as e:
+              return {'file':name,'url':url,'status':'failed','error':str(e)}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool: result=list(pool.map(get,tasks))
+          (out/'source-manifest.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+          print(json.dumps([{'file':r['file'],'status':r['status'],'bytes':r.get('bytes')} for r in result]))
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m252-editorial-public-sources
+          path: editorial-sources/
+          retention-days: 1
+          if-no-files-found: error
