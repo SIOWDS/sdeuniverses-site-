@@ -29,8 +29,8 @@
 
 - `public/books/sde-ontology-intro/sde-farm-intro.mp4`：成片（已上站，见专著页）（AI 合成旁白 + 字幕 + 轻背景音）
 - `sde-farm-intro.srt`：字幕文件
-- `src/`：动画源文件（`farm.html` 画面、`render.js` 逐帧渲染、`tts.py` 离线语音 Kokoro/sherpa-onnx、`timeline.json` 时间轴）
+- `src/`：动画源文件（`farm.html` 画面、`render.js` 逐帧渲染、`voices.py`/`build_audio.py` 离线语音（sherpa-onnx）、`timeline.json` 时间轴）
 
 ## 说明
 
-旁白是离线 AI 合成男声，并非王德生本人声音。若换成本人录音：按上面脚本录一条约 60 秒音频，替换音轨即可（`ffmpeg -i sde-farm-intro.mp4 -i 本人录音.wav -map 0:v -map 1:a -c:v copy -c:a aac out.mp4`），字幕时间可能需微调。
+旁白是离线 AI 合成的标准普通话女声（标贝 Baker 播音员语料训练的 Matcha-TTS 模型，经 sherpa-onnx 运行；字母读作 S=艾斯、D=低、E=伊），并非王德生本人声音。重新生成配音：`python3 src/build_audio.py 1.0`（需下载 matcha-icefall-zh-baker 与 vocos-22khz-univ 模型）。若换成本人录音：按上面脚本录一条约 60 秒音频，替换音轨即可（`ffmpeg -i sde-farm-intro.mp4 -i 本人录音.wav -map 0:v -map 1:a -c:v copy -c:a aac out.mp4`），字幕时间可能需微调。
