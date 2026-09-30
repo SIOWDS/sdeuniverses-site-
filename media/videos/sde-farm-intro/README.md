@@ -27,7 +27,7 @@
 
 ## 文件
 
-- `sde-farm-intro.mp4`：成片（AI 合成旁白 + 字幕 + 轻背景音）
+- `public/books/sde-ontology-intro/sde-farm-intro.mp4`：成片（已上站，见专著页）（AI 合成旁白 + 字幕 + 轻背景音）
 - `sde-farm-intro.srt`：字幕文件
 - `src/`：动画源文件（`farm.html` 画面、`render.js` 逐帧渲染、`tts.py` 离线语音 Kokoro/sherpa-onnx、`timeline.json` 时间轴）
 

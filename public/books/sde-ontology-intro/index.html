@@ -60,6 +60,11 @@ p.lead{font-size:19px;color:var(--text)}
 .toc-desc{color:var(--muted);font-size:14px;margin-left:auto;text-align:right}
 @media(max-width:640px){.toc-desc{display:none}}
 
+/* 视频 */
+.video-box{background:var(--ink);border:1px solid var(--border);box-shadow:0 10px 30px rgba(26,20,16,.18)}
+.video-box video{display:block;width:100%;aspect-ratio:16/9;background:var(--ink)}
+.video-note{font-size:13.5px;color:var(--muted);text-align:center;margin-top:14px}
+
 /* 下载区 */
 .download{background:var(--ink);color:#EDE4CF;text-align:center;padding:72px 0;margin-top:64px}
 .download h2{color:#EDE4CF}
@@ -90,6 +95,7 @@ footer a{color:#B4A780}
       <a class="btn solid" href="https://books.sdeuniverses.com/SDE-Ontology-Intro-Preview-2026.pdf" target="_blank">下载试读版（509页 PDF）</a>
       <a class="btn ghost" href="/books/sde-ontology-intro/read.html">一页页在线阅读</a>
       <a class="btn ghost" href="/column/reading-sde-ontology-intro/">十页解读 →</a>
+      <a class="btn ghost" href="#video">▶ 一分钟视频</a>
     </div>
   </div>
 </header>
@@ -105,6 +111,19 @@ footer a{color:#B4A780}
 </div>
 
 <main class="wrap">
+
+<section id="video">
+  <div class="sec-label">Video · 一分钟入门</div>
+  <h2>一座农场里的第一课</h2>
+  <p>先不读书，先看一分钟：土壤是 E，农时是 D，麦浪是 S——在 E 中，经 D，成 S。一场大旱，再把 123 原理走一遍。</p>
+  <div class="video-box">
+    <video controls playsinline preload="metadata" poster="/books/sde-ontology-intro/sde-farm-intro-poster.jpg">
+      <source src="/books/sde-ontology-intro/sde-farm-intro.mp4" type="video/mp4">
+      您的浏览器不支持视频播放，<a href="/books/sde-ontology-intro/sde-farm-intro.mp4">点此下载观看</a>。
+    </video>
+  </div>
+  <p class="video-note">王德生 讲 · SDE本体论入门 · 农场篇（约 1 分钟，旁白为 AI 合成配音）</p>
+</section>
 
 <section>
   <div class="sec-label">Abstract · 摘要导读</div>
