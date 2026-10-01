@@ -36,7 +36,7 @@ jobs:
           s=s.replace("page.wait_for_timeout(1500);assert page.locator('#cR').evaluate", "page.wait_for_timeout(1500);canvas=page.locator('#cR' if mode=='desktop' else '#cL');assert canvas.evaluate")
           s=s.replace("metrics=page.locator('#cR').evaluate", "metrics=page.locator('#cL').evaluate")
           p.write_text(s)
-          print('Verified package; QA uses printed-page count 332 plus front cover = 333 physical pages.')
+          print('Verified package; printed-page count 332 plus front cover = 333 physical pages.')
           PY
       - uses: actions/checkout@v4
         with:
@@ -54,9 +54,12 @@ jobs:
             /tools/build_bookshelf.py
       - name: Prepare candidate against current catalogue without committing
         run: python "$RUNNER_TEMP/education-payload/release-install.py" "$RUNNER_TEMP/education-payload" "$GITHUB_WORKSPACE"
-      - name: Prepare browser verification
+      - name: Prepare browser verification with Chinese font coverage
         run: |
           python -m pip install -q playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
           if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null && ! command -v chromium-browser >/dev/null; then
             python -m playwright install --with-deps chromium
           fi
