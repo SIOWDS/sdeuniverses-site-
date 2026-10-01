@@ -1,0 +1,53 @@
+name: Book 295 complete publication candidate
+on:
+  push:
+    branches: ['publish/book-295-20261002']
+    paths: ['.github/workflows/book295-candidate-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Import the authorized book payload and verify its exact hash
+        env:
+          BOOK_URL: 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-20a8-81fa-9c25-40572c736dc2/raw?se=2026-10-01T22%3A27%3A12Z&sp=r&sv=2026-02-06&sr=b&scid=fe4674be-8879-521e-ab6f-a6466c7f28fb&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T20%3A43%3A37Z&ske=2026-10-02T20%3A43%3A37Z&sks=b&skv=2026-02-06&sig=SX/YcjzmU2tOPHhPemJjtXoxADef76bUmEIIxRPFWVU%3D'
+        run: |
+          python - <<'PY'
+          import os,urllib.request,pathlib,hashlib,zipfile
+          u=os.environ['BOOK_URL'];print('::add-mask::'+u)
+          data=urllib.request.urlopen(u,timeout=90).read()
+          assert hashlib.sha256(data).hexdigest()=='3b24485d06b8a68067b53b7d56a8a98f847c05a0084cef343cdbd11c2420b320'
+          root=pathlib.Path(os.environ['RUNNER_TEMP']);z=root/'book295-package.zip';z.write_bytes(data)
+          out=root/'book295';out.mkdir()
+          with zipfile.ZipFile(z) as archive:
+              for n in archive.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              archive.extractall(out)
+          print('Payload hash verified. Only the authorized book assets are included.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book295-candidate-v1.1
+          path: ${{ runner.temp }}/book295-package.zip
+          retention-days: 7
+      - name: Validate all package files and chapter links
+        run: python "$RUNNER_TEMP/book295/tools/verify_package.py"
+      - name: Prepare the browser and Chinese text coverage
+        run: |
+          python -m pip install -q playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Exercise desktop and mobile readers before any publication
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/book295/public" >/tmp/book295-http.log 2>&1 &
+          sleep 2
+          python "$RUNNER_TEMP/book295/tools/browser_check.py" http://127.0.0.1:8765/books/m/295/ "$RUNNER_TEMP/book295-qa"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book295-reader-candidate-qa
+          path: ${{ runner.temp }}/book295-qa/
+          retention-days: 7
