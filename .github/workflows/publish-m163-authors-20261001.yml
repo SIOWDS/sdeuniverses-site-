@@ -1,0 +1,78 @@
+name: Monograph 163 author-credit publication
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-m163-authors-20261001.yml
+      - tools/publish_m163_authors_20261001.py
+permissions:
+  contents: write
+concurrency:
+  group: publication-m163-authors
+  cancel-in-progress: false
+env:
+  PUBLISH_EDITION: 'false'
+jobs:
+  prepare-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/163/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/publish_m163_authors_20261001.py
+            /.github/workflows/publish-m163-authors-20261001.yml
+      - name: Refresh the current production source
+        run: git pull --rebase origin main
+      - name: Install the bounded PDF publication toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+          python -m pip install -q pymupdf==1.26.4 Pillow==11.3.0 fonttools==4.59.2 beautifulsoup4==4.13.4
+      - name: Prepare author credits, render both editions, verify unchanged body and pagination
+        run: python tools/publish_m163_authors_20261001.py --qa "$RUNNER_TEMP/m163-qa"
+      - name: Confirm the change set is limited to this book and its existing shelf links
+        run: |
+          git diff --stat
+          git diff --name-only | while IFS= read -r path; do
+            case "$path" in
+              public/books/m/163/*|public/books/catalog.json|public/books/index.html|public/monographs/index.html|public/sites/read/library/index.html) ;;
+              *) echo "Unexpected change: $path"; exit 1 ;;
+            esac
+          done
+      - name: Publish the visually approved edition
+        if: env.PUBLISH_EDITION == 'true'
+        run: |
+          git config user.name 'SDE Publication Build'
+          git config user.email 'publication-build@users.noreply.github.com'
+          git add --sparse public/books/m/163 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+          git commit -m 'Publish monograph 163: Wang Desheng and Yang Bide author credits across cover, PDFs and reading entrances'
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main || exit 1
+          done
+          exit 1
+      - name: Verify public deployment against the published file hashes
+        if: env.PUBLISH_EDITION == 'true'
+        run: python tools/publish_m163_authors_20261001.py --live --qa "$RUNNER_TEMP/m163-qa"
+      - name: Preserve publication previews and validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monograph-163-authorship-proof
+          retention-days: 3
+          path: |
+            ${{ runner.temp }}/m163-qa/*.png
+            ${{ runner.temp }}/m163-qa/*.jpg
+            ${{ runner.temp }}/m163-qa/*.json
+            ${{ github.workspace }}/public/books/m/163/civilization-history.pdf
+            ${{ github.workspace }}/public/books/m/163/civilization-history-reader.pdf
