@@ -11,7 +11,7 @@ from pathlib import Path
 
 SITE = Path(__file__).resolve().parents[2] / 'public'
 NO = 263
-V = '20261001b'
+V = '20261001c'
 T, SUB = '教育的新使命', '从「一个人全包」到「人与 AI 分层分工」'
 
 
