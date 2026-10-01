@@ -1,0 +1,45 @@
+name: Book 295 reference preflight
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book295-reference-preflight.yml']
+permissions:
+  contents: read
+jobs:
+  references:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Collect book 220 layout and existing publishing conventions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import urllib.request,json,pathlib,os
+          out=pathlib.Path('references');out.mkdir()
+          api='https://api.github.com/repos/SIOWDS/sdeuniverses-site-'
+          def get(u):
+              r=urllib.request.Request(u,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'} if u.startswith(api) else {'User-Agent':'Book295-preflight'})
+              return urllib.request.urlopen(r,timeout=90).read()
+          for path in ['public/books/m/220/index.html','public/books/m/220/read.html','public/books/m/220/cover.jpg','public/books/m/220/backcover.jpg','public/books/m/220/text/index.html','public/books/catalog.json','tools/build_bookshelf.py','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html']:
+              try:
+                  data=get('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/'+path)
+                  p=out/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
+              except Exception as e: print('reference unavailable:',path,type(e).__name__)
+          u='https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf'
+          try:(out/'book220-reader.pdf').write_bytes(get(u))
+          except Exception as e:print('PDF reference unavailable',type(e).__name__)
+          workflows=json.loads(get(api+'/contents/.github/workflows'))
+          (out/'workflows.json').write_text(json.dumps([{'name':x['name'],'path':x['path']} for x in workflows],ensure_ascii=False,indent=2))
+          for x in workflows:
+              if any(s in x['name'] for s in ['deploy','publish','pages']):
+                  try:
+                      p=out/x['path'];p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(get(x['download_url']))
+                  except Exception as e:print('workflow reference unavailable',x['name'],type(e).__name__)
+          print('Read-only reference collection finished. No reindex, credentials export, or book publication performed.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book295-reference-preflight
+          path: references/
+          retention-days: 3
