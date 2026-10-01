@@ -1,0 +1,124 @@
+name: Publish SIO monograph 2 complete edition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-sio-m2-20261001.yml']
+permissions:
+  contents: write
+concurrency:
+  group: publication-sio-m2
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Receive and authenticate the authorized book payload
+        env:
+          PAYLOAD_URL: 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-22b8-81fa-abb5-fe7a49a3a78c/raw?se=2026-10-01T14%3A00%3A31Z&sp=r&sv=2026-02-06&sr=b&scid=85b43018-b02d-5715-84c4-a18297c1a000&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T12%3A42%3A10Z&ske=2026-10-02T12%3A42%3A10Z&sks=b&skv=2026-02-06&sig=zN6bcwK2tKIikRTWoVrUALkqQdtj9iKiFhNggGVzhtA%3D'
+          PAYLOAD_SHA: '297d12b80f66a66f2f4e06d68703c0fdbd6ba243c0b9b95ba9626587d68e2e70'
+        run: |
+          python - <<'PY'
+          import os,urllib.request,hashlib,zipfile,io,pathlib
+          data=urllib.request.urlopen(os.environ['PAYLOAD_URL'],timeout=120).read()
+          assert hashlib.sha256(data).hexdigest()==os.environ['PAYLOAD_SHA'],'Payload digest mismatch'
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'sio-m2-payload';dest.mkdir()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+            for name in z.namelist():
+              assert not name.startswith('/') and '..' not in pathlib.PurePosixPath(name).parts
+            z.extractall(dest)
+          print('Verified SIO book payload:',len(data),'bytes')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/m/2/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /.github/workflows/publish-sio-m2-20261001.yml
+      - name: Prepare exact PDF preview renderer
+        run: python -m pip install -q PyMuPDF==1.26.7 Pillow==12.3.0
+      - name: Install complete book and update only the existing catalogue record
+        run: python "$RUNNER_TEMP/sio-m2-payload/release-install.py" "$RUNNER_TEMP/sio-m2-payload" "$GITHUB_WORKSPACE"
+      - name: Verify full text, all page previews and catalogue invariants
+        run: |
+          python - <<'PY'
+          import pathlib,json,re,hashlib
+          root=pathlib.Path('public/books/m/2');m=json.loads((root/'publication-manifest.json').read_text())
+          assert len(list((root/'pages').glob('*.webp')))==431
+          text=(root/'text/index.html').read_text()
+          assert len(re.findall(r'<section class="chapter"',text))==13
+          for key in ['appendix-a','appendix-b','appendix-c','memoir','references']:
+            assert 'id="'+key+'"' in text,key
+          for n in [1,22,119,394,401,412,431]:
+            assert (root/'pages'/f'{n:04d}.webp').stat().st_size>5000
+          for f in m['files']:
+            if f['path'].startswith('pages/'):continue
+            assert hashlib.sha256((root/f['path']).read_bytes()).hexdigest()==f['sha256'],f['path']
+          assert m['reindex_requested'] is False
+          print('431 full pages; 13 chapters; all appendices and non-image digests verified.')
+          PY
+      - name: Publish a narrow commit, preserving concurrent edits
+        run: |
+          git config user.name 'SDE Publication Build'
+          git config user.email 'publication-build@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            rm -f .github/workflows/publish-sio-m2-20261001.yml
+            git add --sparse public/books/m/2 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html .github/workflows/publish-sio-m2-20261001.yml
+            git diff --cached --stat
+            git commit -m 'Publish SIO monograph 2: complete 431-page edition in book 220 style; no reindex'
+            if git push origin HEAD:main; then
+              git rev-parse HEAD > "$RUNNER_TEMP/sio-m2-publication-commit.txt"
+              break
+            fi
+            test "$attempt" -lt 3 || exit 1
+            git fetch origin main
+            git reset --hard origin/main
+            python "$RUNNER_TEMP/sio-m2-payload/release-install.py" "$RUNNER_TEMP/sio-m2-payload" "$GITHUB_WORKSPACE"
+          done
+      - name: Verify deployed website bytes and all three bookshelf entrances
+        run: |
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib,json,time
+          root=pathlib.Path('public/books/m/2');base='https://sdeuniverses.com/books/m/2/'
+          targets=['index.html','text/index.html','read.html','page-data.js','sio-ontology-reader-v1.pdf','sio-ontology-print-v1.pdf','sio-ontology-v1.docx','pages/0001.webp','pages/0431.webp']
+          expected={n:hashlib.sha256((root/n).read_bytes()).hexdigest() for n in targets}
+          result={'book':2,'reindex_requested':False,'checks':{},'shelves':{}}
+          for attempt in range(48):
+            for n in targets:
+              if result['checks'].get(n,{}).get('match'):continue
+              try:
+                req=urllib.request.Request(base+n+'?sio_release=20261001v1',headers={'User-Agent':'SDE-Publication-Verification/1.0','Cache-Control':'no-cache'})
+                with urllib.request.urlopen(req,timeout=25) as r:data=r.read();status=r.status
+                result['checks'][n]={'status':status,'bytes':len(data),'match':hashlib.sha256(data).hexdigest()==expected[n]}
+              except Exception as e:result['checks'][n]={'error':str(e)}
+            for path in ['/books/','/monographs/','/sites/read/library/']:
+              try:
+                with urllib.request.urlopen('https://sdeuniverses.com'+path+'?sio_release=20261001v1',timeout=25) as r:s=r.read().decode()
+                result['shelves'][path]={'has_book':s.count('data-id="m-2"')==1,'has_flip':base+'read.html' in s,'has_fulltext':base+'text/' in s}
+              except Exception as e:result['shelves'][path]={'error':str(e)}
+            ok=all(result['checks'].get(n,{}).get('match') for n in targets) and all(all(result['shelves'].get(p,{}).get(k) for k in ['has_book','has_flip','has_fulltext']) for p in ['/books/','/monographs/','/sites/read/library/'])
+            result['verified_live']=bool(ok);result['attempt']=attempt+1
+            pathlib.Path('sio-m2-live-check.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+            if ok:print(json.dumps(result,ensure_ascii=False));break
+            time.sleep(10)
+          else:raise SystemExit('Commit published, but live verification has not passed. See artifact; do not claim live success.')
+          PY
+      - name: Preserve publication verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sio-monograph-2-publication-verification
+          retention-days: 3
+          path: |
+            sio-m2-live-check.json
+            public/books/m/2/release-check.json
+            public/books/m/2/publication-manifest.json
+            ${{ runner.temp }}/sio-m2-publication-commit.txt
