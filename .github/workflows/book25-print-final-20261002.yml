@@ -33,7 +33,7 @@ jobs:
         run: |
           sudo apt-get install -y fonts-noto-cjk libpango-1.0-0 libpangoft2-1.0-0
           python -m pip install weasyprint==68.0 beautifulsoup4==4.13.5 pymupdf==1.26.4
-      - name: Polish PDF and compact mobile toolbar, preserving the entire text
+      - name: Polish PDF and mobile layouts, preserving the entire text
         env:
           RELEASE: ${{ runner.temp }}/book25-reviewed-release
           OUTPUT: ${{ runner.temp }}/book25-final-print
@@ -47,7 +47,7 @@ jobs:
           reportfile=release/'release-report.json'
           assert hashlib.sha256(reportfile.read_bytes()).hexdigest()=='b06a92b35012524c2a10c22b49ce902c5d0e3a1514776f5cb3e5d358c2ea25cb'
           initial=json.loads(reportfile.read_text());original=release/'public/books/m/25'
-          for name in ('book25-rebuilt-master.md','book25-reader-v1.pdf','print.html','read.html','toc.json','edition.json'):
+          for name in ('book25-rebuilt-master.md','book25-reader-v1.pdf','print.html','read.html','toc.json','edition.json','index.html'):
             assert (site/name).read_bytes()==(original/name).read_bytes(),'Book 25 changed since reviewed release: '+name
           oldpdf=fitz.open(original/'book25-reader-v1.pdf');oldtoc=oldpdf.get_toc()
           def body(d):return re.sub(r'\s+','',''.join(p.get_text(clip=fitz.Rect(0,43,p.rect.width,p.rect.height-32)) for p in d))
@@ -81,13 +81,15 @@ jobs:
           mobile_css='\n/* Book 25 compact mobile toolbar, final acceptance pass. */\n@media(max-width:860px){.top{gap:6px;padding:6px 8px;height:48px;min-height:48px;font-size:14px}.top .ttl,.top .sub{display:none!important}.top button,.top a{white-space:nowrap;flex-shrink:0}.top button{padding:.25rem .4rem}.top .spacer{flex:1;margin-left:0}.stage{top:48px}}\n@media(max-width:360px){.top a[href="/books/m/25/"]{display:none}}\n'
           assert reader_text.count('</style>')==1
           reader.write_text(reader_text.replace('</style>',mobile_css+'</style>'),encoding='utf-8')
+          landing=site/'index.html';landing_text=landing.read_text();assert landing_text.count('</style>')==1
+          landing.write_text(landing_text.replace('</style>','\n@media(max-width:720px){.hero h1{font-size:clamp(1.4rem,6.4vw,1.7rem);line-height:1.6;text-wrap:balance}}\n</style>'),encoding='utf-8')
           edition=json.loads((site/'edition.json').read_text());edition['typesettingRevision']='20261002-p2';edition['mobileToolbarRevision']='20261002-p2';(site/'edition.json').write_text(json.dumps(edition,ensure_ascii=False,indent=2),encoding='utf-8')
-          allowed=['public/books/m/25/book25-reader-v1.pdf','public/books/m/25/print.html','public/books/m/25/edition.json','public/books/m/25/read.html']
+          allowed=['public/books/m/25/book25-reader-v1.pdf','public/books/m/25/print.html','public/books/m/25/edition.json','public/books/m/25/read.html','public/books/m/25/index.html']
           base_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();branch='book25-print-final-'+os.environ['GITHUB_RUN_ID']
           subprocess.run(['git','add',*allowed],check=True)
           changed=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines();assert set(changed)<=set(allowed)
           subprocess.run(['git','checkout','-b',branch],check=True)
-          subprocess.run(['git','-c','user.name=Book Publication','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Refine book 25 PDF and mobile toolbar; manuscript and page map unchanged'],check=True)
+          subprocess.run(['git','-c','user.name=Book Publication','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Refine book 25 PDF and mobile layout; manuscript and page map unchanged'],check=True)
           sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();subprocess.run(['git','push','origin','HEAD:refs/heads/'+branch],check=True)
           final=initial.copy();final.update(base_sha=base_sha,release_sha=sha,release_branch=branch,changed_files=changed,stats=edition,main_updated=False,manuscript_unchanged=True,page_map_unchanged=True,balanced_headings=balanced,closing_paragraphs_kept=tails,mobile_toolbar_compacted=True,word_draft_touched=False,reindex_called=False)
           final['book_files']=[]
