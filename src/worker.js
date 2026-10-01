@@ -412,9 +412,12 @@ export class VisitCounter {
 // ⚠️ kimi 深度档一度写成 kimi-k3 —— Kimi 平台的模型表里**没有**这个名字（2026-07-31 实查：
 //    现存 kimi-k2.7-code / kimi-k2.7-code-highspeed / kimi-k2.6 / kimi-k2.5；下线的是 kimi-k2-*-preview 那一批）。
 //    发一个不存在的型号＝这家深度档一直在 400。改回 k2.6（Kimi 自己标的"迄今最智能"）。
-/* 2026-09-01 加 Claude 与 GPT 两家（见 WDS_VENDORS 的头注释）。深度档取各自的旗舰：
-   claude-opus-5（Anthropic 当前最强）／gpt-5.6-sol（OpenAI 旗舰，别名 gpt-5.6）。 */
-const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3", anthropic: "claude-opus-5", openai: "gpt-5.6-sol",
+/* 2026-10-01 用户指定 ChatSDE 的 GPT 默认使用 GPT-6 Luna。
+   轻档、标准档、深度档与看图共用这一处型号；难度仍由 reasoning_effort 和预算调节，
+   不因深度或图片自动换到更贵的型号。读者手动填写的型号继续优先。
+   官方型号与参数：https://developers.openai.com/api/docs/models/gpt-6-luna */
+const WDS_GPT_MODEL = "gpt-6-luna";
+const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3", anthropic: "claude-opus-5", openai: WDS_GPT_MODEL,
   openrouter: "nvidia/nemotron-3-ultra-550b-a55b:free",
   /* 2026-09-10 加 NVIDIA 免费档：深度档＝DeepSeek V4 Pro（型号名带日期后缀，取自 GET integrate.api.nvidia.com/v1/models 当日实拉）。 */
   nvidia: "deepseek-ai/deepseek-v4-pro-0813" };
@@ -889,8 +892,8 @@ function wdsMMFlush(st) {
    · Claude：Anthropic 官方兼容层，base 就是 https://api.anthropic.com/v1/，Bearer 认证，型号名用 Anthropic 自己的
      （claude-opus-5 / claude-sonnet-5）。它是**兼容层不是原生**：思考、prompt caching、PDF 这些拿不到，
      纯文本对话与看图够用。Anthropic 侧 temperature 上限是 1.0（OpenAI 是 2.0）——超了会 400，见 wdsUpFix。
-   · GPT：gpt-5.6 系（sol 旗舰 / terra 均衡 / luna 便宜）。**推理模型在 chat/completions 上不认 max_tokens**，
-     只认 max_completion_tokens，temperature/top_p/penalty 一律报错不是忽略——同样在 wdsUpFix 里一次性抹平。
+   · GPT：2026-10-01 起默认 gpt-6-luna；仍用 max_completion_tokens，思考档使用 reasoning_effort。
+     wdsUpFix 继续移除采样参数，兼容非 none 的思考档；普通短调用默认 low，探针/成文可显式 none。
    两家都不需要读者过 CORS（服务端转发），所以不必像浏览器直连那样另配测试页。 */
 const WDS_VENDORS = {
   deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-flash", name: "DeepSeek", apply: "platform.deepseek.com" },
@@ -903,7 +906,7 @@ const WDS_VENDORS = {
   minimax: { url: "https://api.minimax.io/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax", apply: "platform.minimax.io" },
   minimax_cn: { url: "https://api.minimaxi.com/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax\uff08\u56fd\u5185\uff09", apply: "platform.minimaxi.com" },
   anthropic: { url: "https://api.anthropic.com/v1/chat/completions", model: "claude-sonnet-5", name: "Claude", apply: "platform.claude.com" },
-  openai: { url: "https://api.openai.com/v1/chat/completions", model: "gpt-5.6-terra", name: "GPT", apply: "platform.openai.com" },
+  openai: { url: "https://api.openai.com/v1/chat/completions", model: WDS_GPT_MODEL, name: "GPT", apply: "platform.openai.com" },
   /* 【2026-09-01 加 OpenRouter】一把 Key 通到几百个型号的转发站，OpenAI 兼容口，仍由 Worker 服务端再转发一次。
      接它的理由是**退路**：站上七家各自的免费档一挤住就没别的地方去，而这一家的 `:free` 一族是横跨多个
      供应商的，同一时刻全挤住的概率低得多。
@@ -2024,7 +2027,7 @@ const WDS_VISION = {
   // 2026-09-01：Claude 与 GPT 两家的当代型号都吃 OpenAI 式 image_url（含 base64 data URL），
   // 所以看图不必另挑视觉专用型号，退一格给同系的另一个型号即可。
   anthropic: ["claude-sonnet-5", "claude-opus-5"],
-  openai: ["gpt-5.6-terra", "gpt-5.6-sol"],
+  openai: [WDS_GPT_MODEL],
   // OpenRouter：gemma-4 与 minimax-m3 的 :free 两档都吃 OpenAI 式 image_url；退一格给后者（1M 上下文，也收视频帧）
   openrouter: ["google/gemma-4-31b-it:free", "minimax/minimax-m3:free"],
 };
@@ -2250,7 +2253,7 @@ function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
    （30B-A3B 混合思考，200K 上下文；2026-01 起接替已下线的 glm-4.5-flash，老名字会被自动路由过去）。
    ⚠ 名字里带 x 的 glm-4.7-flashx 是付费轻量档，只差一个字母，抄错就开始走账。
    放在轻档而不是标准档：免费档的并发很紧，产线那些多路并发的道次不该默认压到它头上。 */
-const WDS_LITE_MODEL = { openai: "gpt-5.6-luna", anthropic: "claude-haiku-4-5-20251001", zhipu: "glm-4.7-flash",
+const WDS_LITE_MODEL = { openai: WDS_GPT_MODEL, anthropic: "claude-haiku-4-5-20251001", zhipu: "glm-4.7-flash",
   openrouter: "google/gemma-4-31b-it:free" };
 function wdsLiteModel(vd) { return WDS_LITE_MODEL[vd] || (WDS_VENDORS[vd] && WDS_VENDORS[vd].model); }
 function wdsPickModel(vd, want, top) {
@@ -18439,3 +18442,4 @@ export default {
     return resp;
   },
 };
+
