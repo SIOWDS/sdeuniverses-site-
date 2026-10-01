@@ -1,0 +1,60 @@
+name: Book 25 reference and publication audit
+on:
+  push:
+    branches: [book25-rebuild-20261002]
+    paths: ['.github/workflows/book25-reference-audit-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/workflows/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/m/25/
+            /public/books/m/220/
+            /public/books/cluster/health/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap.xml
+            /tools/build_bookshelf.py
+            /package.json
+            /wrangler.toml
+            /README.md
+      - name: Copy read-only reference material and inspect publication routing
+        run: |
+          python - <<'PY'
+          import os,pathlib,shutil,json,urllib.request,hashlib,re
+          root=pathlib.Path(os.environ['GITHUB_WORKSPACE']);out=pathlib.Path(os.environ['RUNNER_TEMP'])/'book25-reference';out.mkdir()
+          paths=['.github/workflows','public/books/catalog.json','public/books/index.html','public/books/m/25','public/books/m/220','public/books/cluster/health','public/monographs/index.html','public/sites/read/library/index.html','tools/build_bookshelf.py','package.json','wrangler.toml','README.md']
+          for rel in paths:
+            src=root/rel;dst=out/'repository'/rel
+            if not src.exists():continue
+            dst.parent.mkdir(parents=True,exist_ok=True)
+            if src.is_dir():shutil.copytree(src,dst,ignore=shutil.ignore_patterns('video','*.mp4','*.mp3'))
+            else:shutil.copy2(src,dst)
+          report={'branch':os.environ.get('GITHUB_REF'),'commit':os.environ.get('GITHUB_SHA'),'reindex_called':False,'requests':[]}
+          urls=['https://sdeuniverses.com/books/m/25/','https://sdeuniverses.com/books/m/220/','https://sdeuniverses.com/books/m/220/read.html','https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf','https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']
+          for i,url in enumerate(urls):
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'SDE-Book25-Publication-Verification/1.0'})
+              with urllib.request.urlopen(req,timeout=45) as r:data=r.read(30000000);ct=r.headers.get('Content-Type','');status=r.status
+              ext='.pdf' if 'pdf' in ct else '.html';p=out/('live-'+str(i)+ext);p.write_bytes(data)
+              report['requests'].append({'url':url,'status':status,'content_type':ct,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'file':p.name})
+            except Exception as e:report['requests'].append({'url':url,'error':str(e)})
+          (out/'audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book25-reference-audit
+          retention-days: 3
+          path: ${{ runner.temp }}/book25-reference/
