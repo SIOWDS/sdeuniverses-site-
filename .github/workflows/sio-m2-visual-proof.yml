@@ -1,0 +1,83 @@
+name: SIO live Chinese typography proof
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/sio-m2-visual-proof.yml']
+permissions:
+  contents: write
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Install Chinese fonts in the test browser environment
+        timeout-minutes: 3
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          fc-list :lang=zh family | head
+          python -m pip install -q playwright
+      - name: Render actual live pages with Chinese glyphs available
+        run: |
+          python - <<'PY'
+          import os,pathlib,json,shutil,subprocess,datetime
+          from playwright.sync_api import sync_playwright
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'sio-typography';out.mkdir()
+          fonts=subprocess.check_output(['fc-list',':lang=zh','family'],text=True);assert 'Noto Serif CJK SC' in fonts
+          report={'live_website':'https://sdeuniverses.com/books/m/2/','test_environment_cjk_fonts_installed':True,'manuscript_or_site_content_modified':False,'reindex_requested':False,'checks':{}}
+          chrome=shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
+          assert chrome,'Browser unavailable'
+          with sync_playwright() as p:
+            browser=p.chromium.launch(executable_path=chrome,headless=True,args=['--no-sandbox'])
+            for name,w,h in [('desktop',1440,1050),('mobile',390,844)]:
+              ctx=browser.new_context(viewport={'width':w,'height':h});page=ctx.new_page();base=report['live_website']
+              page.goto(base,wait_until='networkidle');page.evaluate('document.fonts.ready');assert page.locator('h1').inner_text()=='SIO本体论'
+              page.wait_for_function('document.querySelector(".cover").complete && document.querySelector(".cover").naturalWidth>0')
+              assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
+              page.screenshot(path=str(out/f'{name}-detail.png'),full_page=True)
+              page.goto(base+'text/',wait_until='networkidle');page.evaluate('document.fonts.ready');assert page.locator('section.chapter').count()==13
+              assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
+              page.screenshot(path=str(out/f'{name}-text.png'))
+              page.goto(base+'read.html#page=1',wait_until='networkidle');page.evaluate('document.fonts.ready')
+              for n in [1,119,430]:
+                page.locator('#page').fill(str(n));page.locator('#page').dispatch_event('change')
+                page.wait_for_function('(n)=>document.getElementById("left").src.includes(String(n).padStart(4,"0")+".webp") && document.getElementById("left").complete && document.getElementById("left").naturalWidth>0',arg=n)
+                page.screenshot(path=str(out/f'{name}-page-{n}.png'))
+              report['checks'][name]={'title':'SIO本体论','chapter_count':13,'no_horizontal_overflow':True,'page_images_rendered':[1,119,430],'screenshots_saved':True};ctx.close()
+            browser.close()
+          report['verified_at_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();(out/'typography-verification.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Save independent live typography evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sio-m2-live-chinese-typography
+          retention-days: 7
+          path: ${{ runner.temp }}/sio-typography/
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/2/online-verification.json
+            /.github/workflows/sio-m2-visual-proof.yml
+      - name: Record test-environment typography verification and remove temporary workflow
+        run: |
+          git config user.name 'SDE Publication Build'
+          git config user.email 'publication-build@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            python - <<'PY'
+          import pathlib,json,os
+          p=pathlib.Path('public/books/m/2/online-verification.json');r=json.loads(p.read_text());v=json.loads(pathlib.Path(os.environ['RUNNER_TEMP'],'sio-typography/typography-verification.json').read_text());assert r['verified_live'] and v['test_environment_cjk_fonts_installed']
+          r['typography_verification']=v;p.write_text(json.dumps(r,ensure_ascii=False,indent=2));pathlib.Path('.github/workflows/sio-m2-visual-proof.yml').unlink(missing_ok=True)
+          PY
+            git add --sparse public/books/m/2/online-verification.json .github/workflows/sio-m2-visual-proof.yml
+            git commit -m 'Record live SIO Chinese typography proof; publication content unchanged; no reindex'
+            if git push origin HEAD:main; then break; fi
+            test "$attempt" -lt 3 || exit 1
+            git fetch origin main
+            git reset --hard origin/main
+          done
