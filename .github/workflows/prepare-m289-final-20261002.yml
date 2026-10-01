@@ -1,0 +1,104 @@
+name: Prepare volume 289 final ISBN edition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/prepare-m289-final-20261002.yml']
+permissions:
+  contents: read
+concurrency:
+  group: education-monograph-publication
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/education-subject-rebirth/
+            /public/books/catalog.json
+            /tools/m289-publication-v11.py
+            /tools/m289-browser-check.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded Python publication dependencies
+        timeout-minutes: 4
+        run: |
+          python --version
+          timeout 190s python -m pip install --disable-pip-version-check --no-input --timeout 20 --retries 1 python-docx==1.2.0 Pillow==11.3.0 beautifulsoup4==4.13.5 reportlab==4.4.4 PyMuPDF==1.26.7 playwright==1.55.0
+      - name: Install book rendering tools with bounded network waits
+        timeout-minutes: 5
+        run: |
+          if ! command -v libreoffice >/dev/null || ! fc-list :lang=zh | grep -q .; then
+            timeout 70s sudo apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20
+            timeout 190s sudo apt-get install -y --no-install-recommends -o Acquire::Retries=1 -o Acquire::http::Timeout=20 libreoffice-writer fonts-noto-cjk fonts-liberation fonts-crosextra-carlito
+          fi
+          fc-cache -f
+          libreoffice --version
+      - name: Apply latest ISBN and verify the source, without deploying
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os,shutil
+          root=Path(os.environ['RUNNER_TEMP'])/'m289-final';root.mkdir()
+          c=json.loads(Path('public/books/catalog.json').read_text());key='education-subject-rebirth'
+          assert len([x for x in c['books'] if x['id']==key])==1
+          assert not [x for x in c['books'] if x.get('number')==289 and x['id']!=key]
+          digits='9798906903730';assert (-sum(int(x)*(1 if i%2==0 else 3) for i,x in enumerate(digits[:-1])))%10==int(digits[-1])
+          assert not [x for x in c['books'] if str(x.get('isbn','')).replace('-','')==digits and x['id']!=key]
+          source=Path('public/books/education-subject-rebirth');manifest=json.loads((source/'publication-manifest.json').read_text())
+          assert manifest['release_sha256']=='c89c9531ddda73c38d67c7c00686742e181daf416e4b718ecbb68715c78c3770'
+          for name,item in manifest['files'].items():assert hashlib.sha256((source/name).read_bytes()).hexdigest()==item['sha256'],name
+          code=Path('tools/m289-publication-v11.py').read_text().replace('979-8-90690-365-5','979-8-90690-373-0')
+          Path('tools/m289-publication-v11.py').write_text(code)
+          check=Path('tools/m289-browser-check.py');check.write_text(check.read_text().replace('979-8-90690-365-5','979-8-90690-373-0'))
+          shutil.copytree('tools',root/'build-tools');print('Volume 289 / ISBN 979-8-90690-373-0 / US$20.00 confirmed; source verified.')
+          PY
+      - name: Build editable document and revised covers
+        run: |
+          python - <<'PY'
+          import importlib.util,os,json
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('book','tools/m289-publication-v11.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          root=Path(os.environ['RUNNER_TEMP'])/'m289-final';src=Path('public/books/education-subject-rebirth');build=root/'build'
+          m.cover_assets(src,build/'assets')
+          changes=m.edit_docx(src/'downloads/education-subject-rebirth.docx',build/'education-subject-rebirth.docx',build/'assets')
+          (build/'front-matter-changes.json').write_text(json.dumps(changes,ensure_ascii=False,indent=2))
+          PY
+          mkdir -p "$RUNNER_TEMP/m289-final/build/front"
+          timeout 150s libreoffice "-env:UserInstallation=file://$RUNNER_TEMP/m289-lo-final" --headless --convert-to 'pdf:writer_pdf_Export:{"PageRange":{"type":"string","value":"1-4"}}' --outdir "$RUNNER_TEMP/m289-final/build/front" "$RUNNER_TEMP/m289-final/build/education-subject-rebirth.docx"
+      - name: Assemble and inspect candidate before any publication
+        run: |
+          python - <<'PY'
+          import importlib.util,os,json,fitz,shutil
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('book','tools/m289-publication-v11.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          root=Path(os.environ['RUNNER_TEMP'])/'m289-final';src=Path('public/books/education-subject-rebirth');out=root/'site/public/books/m/289';build=root/'build'
+          audit=m.finalize_site(src,out,build,build/'front/education-subject-rebirth.pdf')
+          qa=root/'qa';qa.mkdir()
+          old=fitz.open(src/'downloads/education-subject-rebirth-print.pdf');new=fitz.open(out/'downloads/education-subject-rebirth-print.pdf')
+          changed=[]
+          for i in range(len(new)):
+            if old[i].get_pixmap(matrix=fitz.Matrix(.6,.6),alpha=False).samples!=new[i].get_pixmap(matrix=fitz.Matrix(.6,.6),alpha=False).samples:changed.append(i+1)
+          assert set(changed)<={1,2,3,4,333},changed
+          audit['changed_render_pages']=changed
+          for i in [0,1,2,3,8,26,126,163,299,332]:new[i].get_pixmap(matrix=fitz.Matrix(1.5,1.5),alpha=False).save(qa/f'pdf-page-{i+1}.png')
+          (qa/'publication-audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2));print(json.dumps(audit,ensure_ascii=False,indent=2))
+          PY
+      - name: Verify candidate desktop and mobile readers
+        run: |
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+          python tools/m289-browser-check.py "$RUNNER_TEMP/m289-final/site/public" "$RUNNER_TEMP/m289-final/qa/browser"
+      - name: Preserve candidate for visual review, not publication
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m289-final-isbn-candidate
+          retention-days: 7
+          path: ${{ runner.temp }}/m289-final/
