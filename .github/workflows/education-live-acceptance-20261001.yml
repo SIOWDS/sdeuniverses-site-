@@ -1,0 +1,137 @@
+name: Education monograph live acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/education-live-acceptance-20261001.yml']
+permissions:
+  contents: write
+concurrency:
+  group: education-monograph-publication
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/education-subject-rebirth/
+      - name: Correct the book-specific reader subtitle without changing any manuscript text
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          b=Path('public/books/education-subject-rebirth');p=b/'read.html'
+          old='一个理论、一个工具、一声呼喊，与未来的主体经济学';new='从封闭学生到人—智能器具复合主体'
+          s=p.read_text();assert s.count(old)==1;p.write_text(s.replace(old,new))
+          mf=b/'publication-manifest.json';m=json.loads(mf.read_text())
+          m['files']['read.html'].update(sha256=hashlib.sha256(p.read_bytes()).hexdigest(),bytes=len(p.read_bytes()))
+          m['release_sha256']=hashlib.sha256(json.dumps(m['files'],sort_keys=True).encode()).hexdigest()
+          assert m['release_sha256']=='c89c9531ddda73c38d67c7c00686742e181daf416e4b718ecbb68715c78c3770'
+          mf.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/books/education-subject-rebirth/read.html public/books/education-subject-rebirth/publication-manifest.json
+          git commit -m 'Correct education monograph reader subtitle and refresh manifest'
+          git push origin HEAD:main
+      - name: Prepare public-site verification
+        run: |
+          python -m pip install -q beautifulsoup4 playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Verify deployed manuscript, exact binary files and bookshelf entrances
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,time,urllib.request,hashlib,re,difflib,concurrent.futures
+          from bs4 import BeautifulSoup
+          b=Path('public/books/education-subject-rebirth');m=json.loads((b/'publication-manifest.json').read_text());out=Path(os.environ['RUNNER_TEMP'])/'live-final';out.mkdir()
+          base='https://sdeuniverses.com/books/education-subject-rebirth/'
+          def get(url):
+            q='&' if '?' in url else '?'
+            req=urllib.request.Request(url+q+'publication_check='+str(time.time_ns()),headers={'User-Agent':'SDE-Publication-Acceptance/1.0','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=60) as r:return r.status,r.read(),dict(r.headers)
+          for attempt in range(40):
+            try:
+              status,data,h=get(base+'publication-manifest.json')
+              if json.loads(data).get('release_sha256')==m['release_sha256']:break
+              print('Waiting for the current public manifest',attempt+1)
+            except Exception as e:print('Deployment wait:',str(e))
+            time.sleep(12)
+          else:raise RuntimeError('New manifest not deployed in verification window')
+          def signature(raw):
+            soup=BeautifulSoup(raw,'html.parser');main=soup.find('main');assert main is not None
+            for x in main.select('script,style'):x.decompose()
+            texts=re.sub(r'\s+','',main.get_text())
+            paragraphs=[(x.get('data-source-paragraph'),re.sub(r'\s+','',x.get_text())) for x in soup.select('[data-source-paragraph]')]
+            links=[x.get('href') for x in main.find_all('a')]
+            return texts,paragraphs,links
+          def check(name):
+            status,data,h=get(base+name);expected=(b/name).read_bytes();same=hashlib.sha256(data).hexdigest()==m['files'][name]['sha256'];item={'path':name,'status':status,'bytes':len(data),'sha256_matches':same}
+            assert status==200
+            if name.endswith('.html'):
+              sem=signature(data)==signature(expected);item['manuscript_and_main_navigation_match']=sem
+              if not same:
+                diff=''.join(difflib.unified_diff(expected.decode().splitlines(True),data.decode().splitlines(True),fromfile='repository',tofile='live'))
+                (out/(name.replace('/','_')+'.diff.txt')).write_text(diff[:40000])
+              assert sem,('main book content differs',name)
+            else:assert same,('binary or static asset differs',name)
+            return item
+          report={'live':True,'release_sha256':m['release_sha256'],'files':[],'shelves':[]}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            for item in pool.map(check,m['files']):report['files'].append(item);print(json.dumps(item,ensure_ascii=False))
+          for u in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+            status,data,h=get(u);assert status==200 and 'data-id="education-subject-rebirth"' in data.decode();report['shelves'].append({'url':u,'book_present':True,'status':status})
+          (out/'live-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print('Live manuscript, binary downloads and three entrances verified.')
+          PY
+      - name: Read the actual production pages on desktop and mobile
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python - <<'PY'
+          import os,json,shutil
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          out=Path(os.environ['RUNNER_TEMP'])/'live-final';out.mkdir(exist_ok=True);base='https://sdeuniverses.com/books/education-subject-rebirth/';report=[]
+          with sync_playwright() as pw:
+            exe=shutil.which('google-chrome') or shutil.which('chromium')
+            browser=pw.chromium.launch(executable_path=exe,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+            for mode,w,h in [('desktop',1440,1000),('mobile',390,844)]:
+              ctx=browser.new_context(viewport={'width':w,'height':h});page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+              r=page.goto(base,wait_until='domcontentloaded');assert r.status==200;page.wait_for_timeout(1200)
+              assert page.locator('h1').inner_text()=='AI时代教育对象的重生';assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
+              page.screenshot(path=str(out/f'live-detail-{mode}.png'),full_page=True)
+              page.goto(base+'text/',wait_until='domcontentloaded');page.wait_for_timeout(600)
+              assert page.locator('section.chapter').count()==30;assert page.locator('[data-source-paragraph]').count()==1684
+              page.locator('a[href="#ch16"]').first.click();page.wait_for_timeout(400);page.screenshot(path=str(out/f'live-text-{mode}.png'))
+              page.locator('#theme').click();assert page.locator('html.dark').count()==1;page.locator('#theme').click()
+              page.goto(base+'read.html',wait_until='domcontentloaded');page.wait_for_function("document.querySelector('#pt').textContent==='332'",timeout=90000)
+              page.wait_for_function("document.querySelector('#msg').classList.contains('hide')",timeout=90000)
+              assert '从封闭学生到人—智能器具复合主体' in page.locator('header').inner_text()
+              page.screenshot(path=str(out/f'live-flip-cover-{mode}.png'))
+              page.locator('#pi').fill('164');page.locator('#pi').press('Enter');page.wait_for_timeout(2000)
+              pixels=page.locator('#cL').evaluate('(c)=>{let d=c.getContext("2d").getImageData(0,0,c.width,c.height).data,n=0;for(let i=0;i<d.length;i+=128)if(d[i]<130)n++;return n}')
+              assert pixels>50;page.screenshot(path=str(out/f'live-flip-math-{mode}.png'))
+              report.append({'mode':mode,'production_navigation':True,'chapters':30,'source_blocks':1684,'pdf_physical_pages':333,'actual_canvas_text':True,'runtime_errors':errors});ctx.close()
+            browser.close()
+          (out/'live-browser-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False,indent=2))
+          assert all(not x['runtime_errors'] for x in report)
+          PY
+      - name: Preserve public-site verification records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: education-monograph-live-final
+          retention-days: 7
+          path: ${{ runner.temp }}/live-final/
