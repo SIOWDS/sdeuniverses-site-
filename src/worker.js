@@ -62,12 +62,12 @@ function seoHomeSchema(site, catalog) {
         inLanguage: "zh-CN",
         publisher: { "@type": "Organization", name: publisher.name, url: publisher.url }
       },
-      {
+      ...(owner.name ? [{
         "@type": "Person",
-        name: owner.name || "",
+        name: owner.name,
         alternateName: owner.alternate_name || "",
         url: "https://" + site.host + "/"
-      }
+      }] : [])
     ]
   };
 }
@@ -18349,19 +18349,25 @@ export default {
     // 内容 301 回裸域名。母站访问一篇已划归正式分站的文章，也 301 到该分站。
     const SUBSITES = { read: "/sites/read", health: "/sites/health", lang: "/sites/lang", liter: "/sites/liter", edu: "/sites/edu", math: "/sites/math", comp: "/sites/comp", mpc: "/sites/mpc", tongue: "/sites/tongue" };
     const subHost = url.hostname.toLowerCase();
-    const subPrefix = /\.sdeuniverses\.com$/.test(subHost) ? (SUBSITES[subHost.split(".")[0]] || null) : null;
     const seoCatalog = await seoSiteCatalog(env);
-    const formalSubKey = seoSiteKeyForHost(subHost, seoCatalog);
+    // Teaching has an exact multi-level hostname. The parent entry remains usable
+    // while Cloudflare provisions its DNS and certificate; both share one source.
+    const teachingEntry = subHost === "lang.sdeuniverses.com" && /^\/teaching(?:\/(?:index\.html)?)?$/.test(url.pathname);
+    const contentHost = teachingEntry ? "teaching.lang.sdeuniverses.com" : subHost;
+    const contentPath = teachingEntry ? "/" : url.pathname;
+    const formalSubKey = seoSiteKeyForHost(contentHost, seoCatalog);
+    const legacySub = contentHost.match(/^([^.]+)\.sdeuniverses\.com$/);
+    const subPrefix = formalSubKey ? "/sites/" + formalSubKey : (legacySub ? SUBSITES[legacySub[1]] || null : null);
     const ownerKey = seoOwnerForPath(url.pathname, seoCatalog);
     const ownerSite = ownerKey && seoCatalog && seoCatalog.subsites ? seoCatalog.subsites[ownerKey] : null;
-    const previewMatch = url.pathname.match(/^\/sites\/(liter|lang|edu|health)(\/.*)?$/);
+    const previewMatch = url.pathname.match(/^\/sites\/(liter|lang|edu|health|teaching-lang)(\/.*)?$/);
     if (seoCatalog && previewMatch && seoCatalog.subsites[previewMatch[1]]) {
       return seoPermanentRedirect(seoCatalog.subsites[previewMatch[1]].host, url, previewMatch[2] || "/");
     }
     let resp = null;
     let subLocal = false;
     if (subPrefix && url.pathname.indexOf(subPrefix + "/") !== 0) {
-      const cand = await env.ASSETS.fetch(new Request(new URL(subPrefix + url.pathname, url), assetReq));
+      const cand = await env.ASSETS.fetch(new Request(new URL(subPrefix + contentPath, url), assetReq));
       if (cand.status < 400) { resp = cand; subLocal = true; }
       else { try { if (cand.body) await cand.body.cancel(); } catch (e) {} }
     }
@@ -18405,10 +18411,10 @@ export default {
       // 版本可验证：每次响应盖实时时间戳，线上一眼看出服务的是不是最新版。
       r.headers.set("x-served-at", new Date().toISOString());
       let canonicalHost = "sdeuniverses.com";
-      if (formalSubKey && (subLocal || ownerKey === formalSubKey)) canonicalHost = subHost;
-      const canonical = "https://" + canonicalHost + url.pathname;
+      if (formalSubKey && (subLocal || ownerKey === formalSubKey)) canonicalHost = contentHost;
+      const canonical = "https://" + canonicalHost + contentPath;
       const site = formalSubKey && seoCatalog && seoCatalog.subsites ? seoCatalog.subsites[formalSubKey] : null;
-      return seoDecorateHtml(r, canonical, site, seoCatalog, url.pathname);
+      return seoDecorateHtml(r, canonical, site, seoCatalog, contentPath);
     }
     // 图片/字体/媒体：内容几乎不变，给 30 天缓存，省掉每次访问的 304 协商往返。
     // 故意不用 immutable、不用一年——同名替换（换封面、改配图）时最多 30 天见新版；
