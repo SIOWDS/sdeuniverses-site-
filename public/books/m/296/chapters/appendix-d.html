@@ -1,0 +1,125 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>附录D　知识事件、版本与回写的最小数据结构 · 出版是知识发生的开始</title><meta name="description" content="出版是知识发生的开始：从静态出版到知识发生智能体的出版革命。第296号专著，ISBN 979-8-90690-363-1。"><meta name="book_no" content="296"><meta name="isbn" content="979-8-90690-363-1"><meta name="tier" content="L0"><meta name="cite_ok" content="true"><link rel="canonical" href="https://sdeuniverses.com/books/m/296/chapters/appendix-d.html"><meta property="og:image" content="https://sdeuniverses.com/books/m/296/cover.jpg?v=m296-v1-20261002"><link rel="stylesheet" href="/books/m/296/reader.css?v=m296-v1-20261002"><script src="/books/m/296/reader.js?v=m296-v1-20261002" defer></script></head><body><div id="progress"></div><nav class="bar" aria-label="阅读导航"><a href="/books/m/296/">← 书籍详情</a><a href="/books/m/296/chapters.html">目录</a><a href="/books/m/296/read.html">在线翻页</a><a href="/books/m/296/downloads/publishing-genesis-m296-reader.pdf">PDF</a><span class="spacer"></span><button id="fontsize" type="button" aria-label="调整阅读字号">字号</button><button id="theme" type="button" aria-label="切换日间与夜间">夜间</button></nav><main class="wrap"><section id="appendix-d" class="book-section appendix"><div class="chapter-label">DEMAI · 296</div><h2>附录D　知识事件、版本与回写的最小数据结构</h2><div class="rule" aria-hidden="true"></div><h3 id="appendix-d-p000" data-source-id="appendix-d-p000"><span class="diamond" aria-hidden="true">◆</span>一、从抽象原则进入可保存的对象</h3>
+<p data-source-id="appendix-d-p001">本附录提出一种最小数据结构，用来说明出版项目怎样保存来源、运行与知识变化。它是研究性设计，不是已被行业采用的标准，也不要求所有平台使用同一种数据库。</p>
+<p data-source-id="appendix-d-p002">结构的目标不是记录一切，而是保留足以支持核查的关键关系。一次生成用了哪个版本，某条主张来自哪里，哪些内容已经公开，谁确认了什么，以及后来怎样改变，应当能够被重建。</p>
+<p data-source-id="appendix-d-p003">同时，结构必须避免一个常见错误：把技术记录的存在当作知识真实性的证明。系统保存了某条结论，不等于结论成立；文件具有校验值，也不等于内容正确。数据结构支持责任，不代替责任。</p>
+<p data-source-id="appendix-d-p004">下面的对象、字段与状态可以根据项目调整，但调整应当说明是否仍然保留来源、知识身份、权限与版本这些核心区别。</p>
+<h3 id="appendix-d-p005" data-source-id="appendix-d-p005"><span class="diamond" aria-hidden="true">◆</span>二、先分清六类对象</h3>
+<p data-source-id="appendix-d-p006">第一类是文献对象，保存正式文本、附件与稳定版本。它回答作者在某个时刻公开了什么，而不是系统今天可能怎样解释。</p>
+<p data-source-id="appendix-d-p007">第二类是规则对象，包括 Skill 及其相关资源。它回答系统在某个版本中怎样组织任务，哪些规则来自原文，哪些是实施设计。</p>
+<p data-source-id="appendix-d-p008">第三类是运行对象，记录一次具体任务使用什么材料、规则、工具与许可，以及实际完成了哪些步骤。它不能被原文版本替代，也不能只用模型名称代表。</p>
+<p data-source-id="appendix-d-p009">第四类是主张对象，保存一个可以讨论的命题及其来源、条件、证据状态。第五类是变化事件，说明某项主张或规则怎样被提出、检查、修订或撤回。第六类是发布对象，组合某次正式交付包含哪些版本与能力声明。</p>
+<p data-source-id="appendix-d-p010">六类对象可以在同一系统中实现，也可以分布在不同服务。关键是身份可关联而不混同。例如，一次运行生成了一条候选主张，并不意味着文献对象已经修改，也不意味着新的发布对象已经成立。</p>
+<h3 id="appendix-d-p011" data-source-id="appendix-d-p011"><span class="diamond" aria-hidden="true">◆</span>三、一个名称不够，需要可辨认的身份</h3>
+<p data-source-id="appendix-d-p012">每个重要对象应当有稳定标识、类型和版本。标识用于指认对象，版本用于区别变化；标题则服务阅读，不应承担全部技术身份。</p>
+<p data-source-id="appendix-d-p013">同名论文可能有不同版本，同一 Skill 也可能被不同机构修改。若只用标题关联，系统容易把来源和派生物混在一起。稳定标识并不必然采用某种特定技术，但必须在项目范围内能够清楚区分。</p>
+<p data-source-id="appendix-d-p014">可以为文件保存完整性校验值，以便发现内容是否发生变化。但校验值只比较字节状态，不判断学术正确性，也不自动解决署名和授权。技术功能应当按其实际范围解释。</p>
+<p data-source-id="appendix-d-p015">对象身份还应当包含当前责任接口。不是要求每条记录都附上个人隐私，而是让使用者知道需要向谁或哪个机构提出更正与使用问题。</p>
+<p data-source-id="appendix-d-p016">有了这些身份，后续关系才不会依赖记忆和猜测。知识谱系可以从具体对象开始，而不是从一组容易重名的标题开始。</p>
+<h3 id="appendix-d-p017" data-source-id="appendix-d-p017"><span class="diamond" aria-hidden="true">◆</span>四、三个状态轴不能合成一个状态</h3>
+<p data-source-id="appendix-d-p018">本书建议把证据状态、编辑状态和分发状态分开。证据状态说明主张受到怎样的支持，例如尚未检验、通过特定逻辑检查、在指定经验范围内获得支持、存在争议或已被后续材料取代。</p>
+<p data-source-id="appendix-d-p019">编辑状态说明项目如何处理它，例如草案、已提交、审读中、接受发布、暂缓或不接受。作者或编辑接受发布，不等于主张从此获得无条件真理地位。</p>
+<p data-source-id="appendix-d-p020">分发状态说明谁可以访问，例如私人、受限合作或公开。一项候选假说可以公开讨论，但仍然保持候选证据身份；一项经过较充分检查的内部结果，也可能因为材料边界而只在受限空间使用。</p>
+<p data-source-id="appendix-d-p021">如果只设置一个“已通过”字段，这三种含义就容易混淆。读者可能把获准公开理解成已经验证，系统也可能把私人结果自动排除在知识积累之外。</p>
+<p data-source-id="appendix-d-p022">三个轴的区分，使发布与确认不再互相冒充。它尤其适合发生型出版，因为知识需要有公开探索的空间，同时又不能让探索身份在传播中消失。</p>
+<h3 id="appendix-d-p023" data-source-id="appendix-d-p023"><span class="diamond" aria-hidden="true">◆</span>五、主张记录的最小内容</h3>
+<p data-source-id="appendix-d-p024">一条主张应当尽量以可以检查的句子表达，而不是只有主题标签。记录还需要指向来源位置、适用范围、证据类型和未决问题。具体精度取决于主张的重要性与使用风险。</p>
+<p data-source-id="appendix-d-p025">对于理论命题，可以记录关键前提与可能反例；对于经验结论，可以记录材料与推断范围；对于工程设计，可以记录目的、依赖和测试状态。不能要求所有知识都使用同一种证据字段。</p>
+<p data-source-id="appendix-d-p026">主张与原文也不是一一对应。一段文字可能包含多项主张，同一项主张也可能在不同位置展开。抽取过程需要保留这种复杂性，避免把一段漂亮摘要当作原著完整论证。</p>
+<p data-source-id="appendix-d-p027">当系统无法确定主张边界时，可以保存待审状态。可靠结构不必假装自动抽取已经完成全部解释工作。</p>
+<p data-source-id="appendix-d-p028">以下示例只展示字段关系，不代表某项真实研究结果。</p>
+<pre data-source-id="appendix-d-p029" tabindex="0"><code>{
+  &quot;claim_id&quot;: &quot;example-claim-006&quot;,
+  &quot;text&quot;: &quot;谱系连续性不要求所有成果并入同一主干&quot;,
+  &quot;kind&quot;: &quot;conceptual_proposal&quot;,
+  &quot;source_id&quot;: &quot;appendix-B&quot;,
+  &quot;source_version&quot;: &quot;draft-0.1&quot;,
+  &quot;scope&quot;: &quot;本书的版本治理练习&quot;,
+  &quot;evidence_status&quot;: &quot;reasoned_proposal&quot;,
+  &quot;editorial_status&quot;: &quot;submitted&quot;,
+  &quot;visibility&quot;: &quot;restricted&quot;,
+  &quot;limitations&quot;: [&quot;未完成更广泛文献比较&quot;],
+  &quot;related_claims&quot;: [&quot;example-source-P6&quot;]
+}</code></pre>
+<h3 id="appendix-d-p030" data-source-id="appendix-d-p030"><span class="diamond" aria-hidden="true">◆</span>六、运行记录首先说明实际做了什么</h3>
+<p data-source-id="appendix-d-p031">运行状态至少应当区分计划、开始、完成、部分完成、失败与停止。计划写得再完整，也不能被记录为执行成功；某个步骤完成，也不意味着整个任务已经达到知识目标。</p>
+<p data-source-id="appendix-d-p032">运行记录可以关联输入材料、采用规则、工具版本、关键输出和错误信息。需要保存的是与重建结果有关的条件，不是无限收集用户个人数据。</p>
+<p data-source-id="appendix-d-p033">若某项工具返回失败，系统应当保留失败的身份，而不是自动用语言模型生成一个替代结果后仍称为原工具输出。可以提供替代分析，但必须另行说明。</p>
+<p data-source-id="appendix-d-p034">运行成功也不等于知识已经确认。代码正常结束，只说明某个过程按当前条件执行；输入、方法、解释与适用性仍可能需要检查。把技术成功与知识成立分开，是整个数据结构的重要目的。</p>
+<p data-source-id="appendix-d-p035">因此，运行对象应当与主张对象建立关系，而不直接合并。运行可以支持、挑战或产生候选主张，但这些关系需要具体说明。</p>
+<h3 id="appendix-d-p036" data-source-id="appendix-d-p036"><span class="diamond" aria-hidden="true">◆</span>七、变化事件保存理由，而不是只保存新文本</h3>
+<p data-source-id="appendix-d-p037">一项修订事件至少需要知道改动对象、前后版本、提出者或责任接口、改变理由、相关材料与处理状态。只保存新的文本，后来者仍然无法理解为什么改。</p>
+<p data-source-id="appendix-d-p038">事件可以是新增限制、修复解释、调整规则、暂停工具、纠正归因或形成分支。不同事件影响不同对象，不能全部叫作知识升级。</p>
+<p data-source-id="appendix-d-p039">事件的理由应当具体。例如，“原规则把完成表格当作判断能力证据，因此增加任务变化检查”，比“优化体验”更能说明知识关系。技术修复则可以如实写成技术修复，不需要冒充理论创新。</p>
+<p data-source-id="appendix-d-p040">事件还可以记录没有改变的部分。某个反例只影响一类情境，原命题在其他条件下仍然保留。范围说明使修订避免从局部差异跳到整体否定。</p>
+<pre data-source-id="appendix-d-p041" tabindex="0"><code>{
+  &quot;event_id&quot;: &quot;example-event-012&quot;,
+  &quot;event_type&quot;: &quot;propose_scope_revision&quot;,
+  &quot;target_id&quot;: &quot;example-source-P6&quot;,
+  &quot;before_version&quot;: &quot;0.1&quot;,
+  &quot;proposed_version&quot;: &quot;0.2&quot;,
+  &quot;reason&quot;: &quot;连续性与主干归属需要分别判断&quot;,
+  &quot;basis&quot;: [&quot;example-claim-006&quot;],
+  &quot;editorial_status&quot;: &quot;under_review&quot;,
+  &quot;release_action&quot;: &quot;none&quot;,
+  &quot;unchanged&quot;: [&quot;保留来源与稳定历史的要求&quot;]
+}</code></pre>
+<h3 id="appendix-d-p042" data-source-id="appendix-d-p042"><span class="diamond" aria-hidden="true">◆</span>八、允许的变化不必是一条直线</h3>
+<p data-source-id="appendix-d-p043">许多流程图把知识成长画成草案、审核、通过、发布的一条直线。实际工作可能返回修改，可能暂缓，也可能形成独立分支。一条主张公开以后仍然可能受到新材料挑战。</p>
+<p data-source-id="appendix-d-p044">因此，状态转换应当允许往返，但每次转换需要相应理由。被暂缓的提案在材料补充后可以重新进入审读；被接受发布的主张在新证据出现后可以增加争议标记；原项目不接受的分支，也可能由独立责任人继续研究。</p>
+<p data-source-id="appendix-d-p045">关键不是禁止一切回退，而是避免无记录的身份跳跃。候选主张不能因为被另一个系统引用，就自动变成已确认结论；私人材料不能因为被用于一次任务，就自动变成公共来源。</p>
+<p data-source-id="appendix-d-p046">状态转换规则是治理工具，不是自然规律。不同项目可以采用不同程序，但必须能够解释谁有权改变什么，以及改变以后会影响哪些下游对象。</p>
+<h3 id="appendix-d-p047" data-source-id="appendix-d-p047"><span class="diamond" aria-hidden="true">◆</span>九、发布包而不是散落的新版本</h3>
+<p data-source-id="appendix-d-p048">一次正式发布可以把文献版本、Skill 版本、相关资源、测试说明和能力声明组合成发布包。发布包不要求所有组件版本号相同，但应当说明哪些组合被当前项目接受。</p>
+<p data-source-id="appendix-d-p049">例如，正文的逻辑区分没有变化，Skill 增加了更清楚的任务分流，工具则修复了一个读取错误。发布说明可以分别列出，不必为了编号整齐而把全部内容都说成新理论。</p>
+<p data-source-id="appendix-d-p050">发布包还应当说明尚未提供的能力。某些方法只完成阅读支持，某些工具尚不能运行，某些测试仍未完成。明确缺口比用统一的已上线标签更有解释力。</p>
+<p data-source-id="appendix-d-p051">旧发布包可以保留以支持历史重建，但当前入口应当避免把已暂停能力继续推荐为可用。保存历史与管理当前使用，是两个相互连接的工作。</p>
+<h3 id="appendix-d-p052" data-source-id="appendix-d-p052"><span class="diamond" aria-hidden="true">◆</span>十、依赖图怎样支持修订传播</h3>
+<p data-source-id="appendix-d-p053">对象之间可以建立不同依赖关系：某个 Skill 依据一项主张，某个组合 Skill 调用另一个 Skill，某次运行使用某个工具版本，某项发布包含一组组件。这些关系使变化能够被定位。</p>
+<p data-source-id="appendix-d-p054">当来源修订时，系统可以查找哪些下游对象依赖受影响部分。但不能仅凭存在一条连接就宣布全部失效。需要辨认依赖类型与范围：背景引用与核心前提，具有不同影响。</p>
+<p data-source-id="appendix-d-p055">对重要依赖，可以记录影响说明。例如，原命题的限制改变后，某项应用分支需要重新测试；另一项只使用概念定义的 Skill 不受直接影响。这样的说明需要专业判断，不能完全由图形结构代替。</p>
+<p data-source-id="appendix-d-p056">依赖图也能帮助识别循环。多个输出反复引用彼此而没有新材料时，可以提示缺少独立根据。但循环关系并不必然错误，关键在于它是否被误用为额外证据。</p>
+<h3 id="appendix-d-p057" data-source-id="appendix-d-p057"><span class="diamond" aria-hidden="true">◆</span>十一、最小一致性检查能做什么</h3>
+<p data-source-id="appendix-d-p058">系统可以自动检查某些形式错误：公开发布是否缺少来源版本，正式修订是否没有责任接口，运行声称完成却没有输出记录，候选主张是否被错误标记为已验证，依赖是否指向不存在的对象。</p>
+<p data-source-id="appendix-d-p059">这些检查具有实际价值，却只能检查记录一致性。一个来源标识存在，不代表来源真的支持主张；一个审核者字段非空，也不代表审核充分。形式检查应当帮助人发现遗漏，而不是替代内容判断。</p>
+<p data-source-id="appendix-d-p060">下面给出一个最小示范。它只验证少量结构条件，不访问网络，不调用模型，也不声称完成知识验证。实际系统需要更完整的类型、权限与安全设计。</p>
+<pre data-source-id="appendix-d-p061" tabindex="0"><code>from typing import Any, Mapping
+
+
+def check_release(record: Mapping[str, Any]) -&gt; list[str]:
+    errors: list[str] = []
+    for key in (&quot;release_id&quot;, &quot;source_version&quot;, &quot;skill_version&quot;):
+        if not isinstance(record.get(key), str) or not record[key].strip():
+            errors.append(f&quot;缺少有效字段：{key}&quot;)
+
+    if record.get(&quot;editorial_status&quot;) == &quot;accepted&quot;:
+        if not record.get(&quot;responsible_party&quot;):
+            errors.append(&quot;接受发布的记录缺少责任接口&quot;)
+
+    if record.get(&quot;run_status&quot;) == &quot;completed&quot;:
+        if not record.get(&quot;output_refs&quot;):
+            errors.append(&quot;声称完成运行，但没有输出引用&quot;)
+
+    if record.get(&quot;visibility&quot;) == &quot;public&quot;:
+        if not record.get(&quot;permission_checked&quot;):
+            errors.append(&quot;公开发布前尚未记录权限检查&quot;)
+
+    if record.get(&quot;evidence_status&quot;) == &quot;unexamined&quot;:
+        if record.get(&quot;claim_label&quot;) == &quot;validated_result&quot;:
+            errors.append(&quot;证据状态与结果标签冲突&quot;)
+    return errors</code></pre>
+<p data-source-id="appendix-d-p062">程序没有错误地把所有公开内容都要求为已验证结果，因为公开探索可以是合理状态。它要求的是身份一致：公开的候选仍然标明候选，正式接受也仍然保留其证据范围。</p>
+<h3 id="appendix-d-p063" data-source-id="appendix-d-p063"><span class="diamond" aria-hidden="true">◆</span>十二、人工审查应当进入哪里</h3>
+<p data-source-id="appendix-d-p064">人工审查不应只放在最后一个按钮上。来源抽取是否忠实、规则是否超出原文、测试是否覆盖关键边界、修订是否真正受到材料支持，都可能需要不同阶段的判断。</p>
+<p data-source-id="appendix-d-p065">系统可以把需要判断的部分组织成问题包，减少重复劳动。评审者看到的不应只是一个最终答案，还应能进入相关来源、差异和未决问题。但也不必被海量原始日志淹没。</p>
+<p data-source-id="appendix-d-p066">不同任务需要不同专业人员。技术人员能够判断工具是否正常运行，不一定能够确认哲学论证；领域专家能够审查主张，也不一定熟悉权限实现。责任应当按工作内容分配。</p>
+<p data-source-id="appendix-d-p067">人工审查的结果同样需要留下依据。只写某专家已看过，并不足以解释为什么接受。恰当记录可以简短，但应当说明决定涉及什么问题。</p>
+<h3 id="appendix-d-p068" data-source-id="appendix-d-p068"><span class="diamond" aria-hidden="true">◆</span>十三、私人保护与知识保全怎样并存</h3>
+<p data-source-id="appendix-d-p069">数据结构应当支持不同访问层，而不是假设所有记录都公开。私人案例可以只保存于个人空间，公共谱系可以保留必要的贡献关系与知识变化，而不暴露全部细节。</p>
+<p data-source-id="appendix-d-p070">删除与限制访问也需要按对象处理。错误归因可以更正，过度收集的私人材料可以按相应规则处理，正式文献的变化关系则应当尽可能保持可解释性。不存在一种简单的永不删除原则适合所有材料。</p>
+<p data-source-id="appendix-d-p071">项目应当在开始时说明保存目的与范围。若后来需要新的用途，应当重新检查许可，而不是因为数据已经在服务器里就认为可以继续使用。</p>
+<p data-source-id="appendix-d-p072">这种安排使谱系服务知识，而不是使人服务档案。发生型出版所需要的记忆，是足以支持可靠工作与合理合作的记忆。</p>
+<h3 id="appendix-d-p073" data-source-id="appendix-d-p073"><span class="diamond" aria-hidden="true">◆</span>十四、数据结构也可以被修订</h3>
+<p data-source-id="appendix-d-p074">本附录的字段并不是最后答案。实际试点可能发现某些字段无助于判断，某些重要关系却没有位置。结构应当允许在保留核心身份的前提下调整。</p>
+<p data-source-id="appendix-d-p075">调整需要考虑迁移。旧记录怎样解释，新旧字段怎样对应，哪些信息无法恢复，都应当说明。不能为了让新系统看起来整齐，就假装历史记录具有当时没有保存的内容。</p>
+<p data-source-id="appendix-d-p076">一份成熟的数据结构，还应当能够导出为较开放、可理解的形式，使参与者在更换服务时保留必要知识关系。具体格式可以不同，但不可迁移不应被当作天然价值。</p>
+<p data-source-id="appendix-d-p077">最终，数据结构只是使知识发生可追踪的一种工具。它的成功不在字段数量，而在后来者能否更准确地理解来源、行动、变化与责任。若结构不能帮助这些工作，就应当被重新设计。</p></section><div class="jump"><a href="/books/m/296/text/#appendix-d">在全书中阅读</a><a href="/books/m/296/read.html#page=364">转到书页</a></div><nav class="chapter-nav" aria-label="前后章节"><a rel="prev" href="/books/m/296/chapters/appendix-c.html">← 附录C　发布前审读与运行测试：三十二个案例</a><a rel="next" href="/books/m/296/chapters/appendix-e.html">附录E　怎样检验发生型出版是否真的增加价值 →</a></nav><footer class="foot"><p>出版是知识发生的开始 · 王德生 著</p><p>德麦国际专著第296号 · ISBN 979-8-90690-363-1 · US$21.00</p><p><a href="/books/m/296/">书籍详情</a> · <a href="/books/">专著书架</a> · <a href="/books/m/296/text/">全书长文</a></p></footer></main></body></html>

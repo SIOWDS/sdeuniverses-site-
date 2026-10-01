@@ -1,0 +1,83 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第十四章　RAG 为什么还不是知识发生 · 出版是知识发生的开始</title><meta name="description" content="出版是知识发生的开始：从静态出版到知识发生智能体的出版革命。第296号专著，ISBN 979-8-90690-363-1。"><meta name="book_no" content="296"><meta name="isbn" content="979-8-90690-363-1"><meta name="tier" content="L0"><meta name="cite_ok" content="true"><link rel="canonical" href="https://sdeuniverses.com/books/m/296/chapters/chapter-14.html"><meta property="og:image" content="https://sdeuniverses.com/books/m/296/cover.jpg?v=m296-v1-20261002"><link rel="stylesheet" href="/books/m/296/reader.css?v=m296-v1-20261002"><script src="/books/m/296/reader.js?v=m296-v1-20261002" defer></script></head><body><div id="progress"></div><nav class="bar" aria-label="阅读导航"><a href="/books/m/296/">← 书籍详情</a><a href="/books/m/296/chapters.html">目录</a><a href="/books/m/296/read.html">在线翻页</a><a href="/books/m/296/downloads/publishing-genesis-m296-reader.pdf">PDF</a><span class="spacer"></span><button id="fontsize" type="button" aria-label="调整阅读字号">字号</button><button id="theme" type="button" aria-label="切换日间与夜间">夜间</button></nav><main class="wrap"><section id="chapter-14" class="book-section chapter"><div class="chapter-label">14</div><h2>RAG 为什么还不是知识发生</h2><div class="rule" aria-hidden="true"></div><blockquote class="chapter-quote">检索把根据带进来，发生要求根据继续面对新问题。</blockquote><h3 id="chapter-14-p000" data-source-id="chapter-14-p000"><span class="diamond" aria-hidden="true">◆</span>一、先纠正标题可能造成的误解</h3>
+<p data-source-id="chapter-14-p001">本章标题中的“还不是”，指的是一种只把任务停在检索与回答上的产品安排，而不是对 RAG 作能力禁令。检索增强生成把外部检索与语言生成联系起来，相关研究已经把它用于需要知识依据的任务。<a class="cite" href="/books/m/296/references.html#ref-5" aria-label="参考文献5">[5]</a> 使用检索的系统完全可以参与推理、应用和新问题研究。</p>
+<p data-source-id="chapter-14-p002">因此，不能说“RAG 属于发现学，所以必然不能发生知识”。这样的说法把技术组件与整个知识过程混为一谈。检索可以为新推论提供必要材料，也可以帮助系统发现原主张与新证据之间的差异。</p>
+<p data-source-id="chapter-14-p003">本章真正追问的是：如果一个出版产品把成功定义为找到相关段落并生成回答，它是否已经充分支持应用边界、反例处理、验证与回写？答案通常需要进一步分析，而不能只看产品是否使用向量数据库。</p>
+<p data-source-id="chapter-14-p004">SDE 智能体也可以使用 RAG。二者不是必然竞争的方案。区别在于检索被放进怎样的任务结构，检索结果获得什么身份，后续判断怎样被约束，以及新发生能否形成持久记录。</p>
+<p data-source-id="chapter-14-p005">把这个边界说清楚，才能既避免低估已有技术，也避免把一个必要组件误认成完整出版发生系统。</p>
+<h3 id="chapter-14-p006" data-source-id="chapter-14-p006"><span class="diamond" aria-hidden="true">◆</span>二、找到相关文字，不等于找到可以支持当前结论的证据</h3>
+<p data-source-id="chapter-14-p007">用户问：“这项方法是否适合基础较弱的学习者？”检索系统找到一段讨论学习者差异的文字，看起来高度相关。但相关并不等于支持。原文可能恰好说该群体尚未被研究，也可能只是列出未来问题。</p>
+<p data-source-id="chapter-14-p008">若模型只把相关段落当成肯定依据，就可能生成“研究表明适合”的回答。错误不是因为没有检索，而是因为没有辨认材料与主张之间的关系。来源出现在答案旁边，也不能自动保证来源支持答案。</p>
+<p data-source-id="chapter-14-p009">因此，发生型出版需要从相关性进一步进入支持关系。材料是在报告结果、提出假设、说明限制，还是讨论反对意见？它支持的是当前问题的全部结论，还是其中一个前提？这些身份应当在回答中得到反映。</p>
+<p data-source-id="chapter-14-p010">SDE Skill 可以规定，在应用判断之前先识别证据角色，并检查当前问题与来源任务之间的差异。规则是否有效仍需要测试，但其目标非常具体：防止把“找到了相近词语”误认为“获得了充分根据”。</p>
+<p data-source-id="chapter-14-p011">检索解决的是材料进入问题的一部分困难，知识判断还需要说明材料怎样进入论证。二者连接起来，来源才不会变成装饰性引用。</p>
+<h3 id="chapter-14-p012" data-source-id="chapter-14-p012"><span class="diamond" aria-hidden="true">◆</span>三、分块可能切断论证</h3>
+<p data-source-id="chapter-14-p013">一篇论文为了进入检索系统，往往需要被组织成较小单元。这种组织便于定位，但论证关系未必恰好服从单元边界。一个结论在本段出现，关键限定却在前一段；一个表格列出结果，解释其范围的注释又在别处。</p>
+<p data-source-id="chapter-14-p014">如果系统只取回孤立片段，原文中相互限制的关系可能被拆开。模型得到一条结论，却没有得到“仅在这些条件下”的说明；得到一项反对意见，却没有得到作者随后对它的回应。片段本身并非伪造，组合后的知识却可能失真。</p>
+<p data-source-id="chapter-14-p015">因此，分块应当尽量尊重论证单元，并保留可以向上展开的结构。检索到一句话后，系统应有能力进入所属段落、章节、表格说明或相关定义。不能为了减少输入长度，把必要条件永久切掉。</p>
+<p data-source-id="chapter-14-p016">这也说明，检索粒度需要随任务变化。查术语可以较细，判断方法适用可能需要较大范围，比较全书结构则需要跨章关系。单一固定粒度难以适合所有出版任务。</p>
+<p data-source-id="chapter-14-p017">发生学在这里并不提供某个万能分块长度，而提出一个判断标准：当前组织是否保留了使主张获得意义的关键关系？若没有，检索效率提高也可能以知识完整性为代价。</p>
+<h3 id="chapter-14-p018" data-source-id="chapter-14-p018"><span class="diamond" aria-hidden="true">◆</span>四、相似度不是概念一致性</h3>
+<p data-source-id="chapter-14-p019">两个领域使用同一个词，未必讨论同一个概念；两个作者使用不同词，也可能指向相近问题。词语或表达相似能够帮助发现候选材料，却不能单独决定概念是否可以互换。</p>
+<p data-source-id="chapter-14-p020">例如，“主体”在不同理论中可能承担不同位置。若系统只因为词语相同，就把几段文字拼成一个统一解释，读者可能得到一套任何作者都没有主张过的理论。跨学科阅读尤其需要保留这种差异。</p>
+<p data-source-id="chapter-14-p021">SDE Skill 可以先要求说明每个概念在来源中的定义与关系，再判断它们能否进入共同任务。若不能直接对齐，可以建立比较说明，而不是强行融合。差异本身可能是新知识的入口，不应为了生成连贯答案而被抹去。</p>
+<p data-source-id="chapter-14-p022">同样，本书的E不能因为常被讨论为环境关系，就直接被替换成背景资料。SDE 的S也不能因为与主体常用字母相同，就混为一谈。检索获得术语之后，仍需要遵守体系内部的概念约束。</p>
+<p data-source-id="chapter-14-p023">因此，检索增强不只是增加材料数量。它还应当帮助概念在来源中保持身份，只有经过明确转换才进入新的组合。否则，材料越多，拼接错误也可能越难发现。</p>
+<h3 id="chapter-14-p024" data-source-id="chapter-14-p024"><span class="diamond" aria-hidden="true">◆</span>五、没有找到，不等于不存在</h3>
+<p data-source-id="chapter-14-p025">检索系统没有返回某项限制，可能有多种原因：原文没有说明，资料尚未收入，索引未更新，分块方式不合适，或者查询没有触及相应表达。不能把这些情况都解释为“论文没有限制”。</p>
+<p data-source-id="chapter-14-p026">同样，用户问某个结论是否已经被更正，系统如果只检索旧版本，便可能给出过时回答。此时问题不是模型知识不够丰富，而是来源状态没有进入检索范围。</p>
+<p data-source-id="chapter-14-p027">发生型出版应当让系统知道自己正在搜索什么集合。只有正文，还是包括补充材料、正式更新、案例和候选分支？这些空间的确认身份不同，也不能为了覆盖更广就混在一起。</p>
+<p data-source-id="chapter-14-p028">当检索范围不足时，回答应当说明限制。可以说“在当前可访问的正式文本中未找到”，而不能直接说“作者从未讨论”。这种范围意识不应依赖模型临时谨慎，而应写进 Skill 和运行规则。</p>
+<p data-source-id="chapter-14-p029">因此，检索中的缺席也是一种需要解释的结果。发生学要求追问结果如何形成，对“没有结果”同样适用。</p>
+<h3 id="chapter-14-p030" data-source-id="chapter-14-p030"><span class="diamond" aria-hidden="true">◆</span>六、索引更新不等于知识更新</h3>
+<p data-source-id="chapter-14-p031">一本书增加了新章节，系统需要让检索材料与文件保持一致。这个过程可以称为索引维护。但索引发生变化，并不意味着新内容已经获得知识确认，也不意味着所有旧结论都应被替换。</p>
+<p data-source-id="chapter-14-p032">发生型出版应当把内容状态与检索状态分开。正式版本进入正式检索空间，候选修订进入候选空间，私人笔记进入相应授权空间。某段文字被成功索引，只说明它可以被找到，不说明它可以被当作正式依据。</p>
+<p data-source-id="chapter-14-p033">维护策略也需要与变更性质相称。文字修正、来源失效、方法更新和新增案例可能触发不同范围的检查。项目可以采用有计划的批量维护，也可以对关键更正及时处理，但不能把更新频率本身当成知识质量。</p>
+<p data-source-id="chapter-14-p034">若每次微小编辑都触发整个资料库重建，可能增加不必要成本；若关键更正长期无法进入查询，又可能损害可靠性。这里需要的是明确的更新规则与状态检查，而不是一味追求实时或一味追求节省。</p>
+<p data-source-id="chapter-14-p035">因此，索引是知识交通设施的一部分。它负责让材料可进入，但材料以何种身份进入、是否应当改变判断，还需要出版治理来决定。</p>
+<h3 id="chapter-14-p036" data-source-id="chapter-14-p036"><span class="diamond" aria-hidden="true">◆</span>七、RAG 可以支持新知识，但不能替它完成全部验证</h3>
+<p data-source-id="chapter-14-p037">设想用户提出一个原论文没有讨论的问题。系统检索多个相关来源，比较其中条件，提出一个新的解释。这个解释可能有真实研究价值，不能因为使用了 RAG 就被排除在知识发生之外。</p>
+<p data-source-id="chapter-14-p038">但是，新解释仍然需要检查。引用了几篇论文，不意味着它们共同支持新结论；来源之间可能使用不同对象、不同方法和不同评价标准。把材料并排放在一起，不会自动形成有效推论。</p>
+<p data-source-id="chapter-14-p039">发生型系统应当明确新增推论发生在哪里。哪些部分直接来自来源，哪些关系由本次任务提出，哪些前提尚未验证，都应当可见。这样，读者才能区分材料可靠性与新推论可靠性。</p>
+<p data-source-id="chapter-14-p040">对于某些任务，进一步验证可以通过形式推导、代码运行或数据比较完成；对于另一些任务，则需要新的观察、实验或专业讨论。系统不能把“根据文献看起来合理”当成所有验证的终点。</p>
+<p data-source-id="chapter-14-p041">因此，RAG 能够成为知识发生的重要材料机制，但知识发生系统还需要组织推论、检验与责任。不是检索太低级，而是完整知识过程比任何单个组件都更大。</p>
+<h3 id="chapter-14-p042" data-source-id="chapter-14-p042"><span class="diamond" aria-hidden="true">◆</span>八、SDE 怎样把检索放入任务循环</h3>
+<p data-source-id="chapter-14-p043">在阅读任务中，检索首先帮助定位显露的原文结构。用户问某个概念，系统寻找定义、例子和相关争议。此时不必强行生成新理论，忠实理解已经是恰当结果。</p>
+<p data-source-id="chapter-14-p044">在应用任务中，检索需要服务于差异判断。系统不仅找方法步骤，还找适用条件、失败案例和相关限定。当前情境与原研究之间的差异，决定哪些材料必须进入，哪些只是背景。</p>
+<p data-source-id="chapter-14-p045">在知识再发生任务中，检索还需要帮助检查新的候选主张。它应寻找支持与反对材料，辨认同一证据被多次转述的情况，并防止把自己的先前输出重新检索为独立支持。</p>
+<p data-source-id="chapter-14-p046">这三种任务可以使用相同底层检索技术，却具有不同的调用规则与结果处理。SDE 的潜在贡献在于组织这些规则，使检索围绕知识关系工作，而不只是围绕相近词语工作。</p>
+<p data-source-id="chapter-14-p047">因此，技术流程不应被写成简单的“问题—检索—答案”。更完整的结构是：明确任务，识别所需关系，检索合适材料，判断其身份与支持范围，完成相称操作，再决定结果如何保存。检索位于循环中，而不是循环的全部。</p>
+<h3 id="chapter-14-p048" data-source-id="chapter-14-p048"><span class="diamond" aria-hidden="true">◆</span>九、证据数量可能被重复来源放大</h3>
+<p data-source-id="chapter-14-p049">一个结论出现在原论文、新闻介绍、作者博客和模型摘要中，表面上有四份材料支持。实际上，它们可能都来自同一项研究。若系统把四个页面当成四次独立验证，便会高估证据强度。</p>
+<p data-source-id="chapter-14-p050">发生型出版需要追踪材料之间的来源关系。转述可以帮助理解，但不能自动增加独立证据。不同论文如果共享同一数据或方法，也需要说明相关依赖，而不是只按文献数量计算支持。</p>
+<p data-source-id="chapter-14-p051">这并不意味着必须完整重建全部知识史。系统可以优先追踪对当前判断有实质影响的依赖：关键结论来自哪里，后续材料是否只是重复，是否存在真正不同的观察或分析。</p>
+<p data-source-id="chapter-14-p052">SDE 中的差异序列也不能被表面多样性欺骗。五个不同说法可能没有增加新的差异，反而掩盖它们共享同一前提。新的知识交通需要异质关系，而不只是更多链接。</p>
+<p data-source-id="chapter-14-p053">因此，一个好系统有时会减少用户看见的“支持数量”，因为它把重复来源合并到同一根据之下。这不是降低知识价值，而是使证据的真实结构显露出来。</p>
+<h3 id="chapter-14-p054" data-source-id="chapter-14-p054"><span class="diamond" aria-hidden="true">◆</span>十、知识库里的旧错误怎样继续传染</h3>
+<p data-source-id="chapter-14-p055">如果某条错误主张已经进入多个 Skill 和应用记录，修正原文并不保证所有后续调用自动恢复正确。旧片段可能仍在索引中，派生摘要可能没有更新，用户的个人版本也可能继续保留旧规则。</p>
+<p data-source-id="chapter-14-p056">这说明知识更新需要依赖意识。重要主张被哪些能力使用，哪些结果可能受影响，哪些地方需要重新检查，应当尽可能有可追踪关系。不是所有修改都需要大规模通知，但关键条件变化不能只停留在原页面。</p>
+<p data-source-id="chapter-14-p057">同时，更新不能无差别覆盖所有派生工作。有些独立分支已经采用其他根据，未必受同样影响；有些应用只使用了不相关部分，也不必全部重做。影响分析需要具体到关系，而不是只按书名或文件名传播警报。</p>
+<p data-source-id="chapter-14-p058">发生型出版由此增加一种维护任务：不仅保存新知识，也检查旧知识在网络中怎样继续起作用。知识的生命史包括错误的后代，不能只记录成功的后代。</p>
+<p data-source-id="chapter-14-p059">RAG 在这里可以帮助寻找相关依赖，但仍需要版本与状态治理。检索到旧内容时，系统应当知道它是否已被更正，而不是把可找到性误认为当前可用性。</p>
+<h3 id="chapter-14-p060" data-source-id="chapter-14-p060"><span class="diamond" aria-hidden="true">◆</span>十一、怎样比较一个检索系统是否真的改善了知识工作</h3>
+<p data-source-id="chapter-14-p061">评估不应只问系统是否找到了包含关键词的段落。可以进一步设计几类任务：定位准确来源，识别来源不支持结论，找到相隔较远的限定条件，区分正式与候选材料，以及在没有足够来源时正确收缩回答。</p>
+<p data-source-id="chapter-14-p062">对于应用任务，还可以检查系统是否能够发现当前情境与原研究不匹配。对于知识再发生任务，则可以检查它是否明确新增推论的位置，是否主动寻找反对材料，是否避免把重复来源当成独立证据。</p>
+<p data-source-id="chapter-14-p063">这些评估可以与普通检索、通用问答和加入 SDE 规则的系统进行比较。材料范围、模型条件和人工帮助应尽可能相称，避免把资源差异误当成框架差异。</p>
+<p data-source-id="chapter-14-p064">成本也需要记录。更完整的检索与检查可能提高可靠性，也可能增加等待与维护负担。实际产品需要决定哪些任务值得更深入检查，哪些任务可以采用轻量模式。</p>
+<p data-source-id="chapter-14-p065">因此，检索质量不是一个脱离任务的绝对分数。它应当根据当前知识工作需要保留哪些关系来评价。发生学提供的是评价方向，不是免于测量的优越性宣言。</p>
+<h3 id="chapter-14-p066" data-source-id="chapter-14-p066"><span class="diamond" aria-hidden="true">◆</span>十二、用户界面应当显示推论的接缝</h3>
+<p data-source-id="chapter-14-p067">许多回答为了读起来顺畅，会把原文、解释和新推论融合成连续段落。流畅有助阅读，却可能隐藏知识身份的变化。发生型界面应当在必要时显示这些接缝。</p>
+<p data-source-id="chapter-14-p068">例如，回答可以先说明原文主张，再给出针对用户情境的应用推断，最后指出尚待检验的部分。三部分不必写得机械，但读者应当能够辨认哪句话由来源直接支持，哪句话由当前任务提出。</p>
+<p data-source-id="chapter-14-p069">接缝的可见性尤其重要，因为用户往往会把带有引用的整个段落都理解为来源结论。系统不能在段末放一个来源标记，就让新增推断借用来源权威。</p>
+<p data-source-id="chapter-14-p070">同样，模型把多篇文章组合成一个方案时，应当说明组合规则由谁提出，冲突怎样处理，哪些条件尚未协调。拼接后的连续性不能替代方法上的相容性。</p>
+<p data-source-id="chapter-14-p071">一个显示接缝的回答，可能不如无缝叙述显得神奇，却更适合进入真实工作。知识发生不是把生成过程藏得越深越好，而是让关键转换能够被理解和检查。</p>
+<h3 id="chapter-14-p072" data-source-id="chapter-14-p072"><span class="diamond" aria-hidden="true">◆</span>十三、检索不是敌人，终点幻觉才是问题</h3>
+<p data-source-id="chapter-14-p073">本章最终需要明确：发生学出版不反对检索，也不把 RAG 排除在智能体之外。保存、定位与引用已有知识，都是新知识能够可靠发生的重要条件。</p>
+<p data-source-id="chapter-14-p074">需要改变的是把检索命中当成理解完成，把带引用的回答当成应用成立，把生成新句子当成知识贡献，以及把保存聊天当成回写完成。这些错误都不是某个技术名称必然造成，而是任务设计与责任组织中的终点幻觉。</p>
+<p data-source-id="chapter-14-p075">当检索被放回更完整的循环，它可以帮助差异显露、支持新推论，也可以在来源不足时阻止系统过度声称。它从一个寻找答案的组件，成为组织知识发生条件的组件之一。</p>
+<p data-source-id="chapter-14-p076">因此，SDE 知识发生 Skill 与 RAG 的关系可以很清楚：前者规定当前知识怎样工作，后者帮助合适材料进入工作；模型与工具完成相应操作，验证与治理决定结果如何获得后续身份。它们共同构成系统，而不是互相取代。</p>
+<p data-source-id="chapter-14-p077">下一章将进入全书最具体的转换现场。我们将以一篇分析性虚构论文为例，把“论文—Skill—LLM—智能体”展开成可以审读、可以测试、也可以指出缺口的完整路线。</p>
+<div class="takeaway_label" data-source-id="chapter-14-p078">带走的话</div>
+<p class="takeaway" data-source-id="chapter-14-p079">检索把根据带进来，发生要求根据继续面对新问题。</p>
+<p class="takeaway" data-source-id="chapter-14-p080">RAG 可以为解释、推理和应用提供材料，因此不是发生学的对立面。真正的区别在任务是否止于找到原句。面对陌生环境，系统还需辨认适用条件、替代解释与新的差异，并区分哪些输出只是表述变化，哪些可能改变知识关系。</p>
+<div class="question_label" data-source-id="chapter-14-p081">继续发生的一问</div>
+<p class="question" data-source-id="chapter-14-p082">当系统已经找到正确原文，哪一个问题仍然不能靠复制那段原文回答？</p></section><div class="jump"><a href="/books/m/296/text/#chapter-14">在全书中阅读</a><a href="/books/m/296/read.html#page=149">转到书页</a></div><nav class="chapter-nav" aria-label="前后章节"><a rel="prev" href="/books/m/296/chapters/chapter-13.html">← 第十三章　Paper2Agent：Nature打开的一扇门</a><a rel="next" href="/books/m/296/chapters/chapter-15.html">第十五章　一篇论文如何变成 SDE 知识发生 Skill →</a></nav><footer class="foot"><p>出版是知识发生的开始 · 王德生 著</p><p>德麦国际专著第296号 · ISBN 979-8-90690-363-1 · US$21.00</p><p><a href="/books/m/296/">书籍详情</a> · <a href="/books/">专著书架</a> · <a href="/books/m/296/text/">全书长文</a></p></footer></main></body></html>
