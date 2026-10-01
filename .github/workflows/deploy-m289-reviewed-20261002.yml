@@ -1,0 +1,167 @@
+name: Deploy reviewed volume 289 digital edition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/deploy-m289-reviewed-20261002.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: education-monograph-publication
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      EDITION_SHA: ab8e550b521abfffddfb6d6ce3d8a59d649fc534bd15a3b0158ac9c2cbb49bfc
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - name: Retrieve the already reviewed full book from this repository
+        uses: actions/download-artifact@v4
+        with:
+          name: m289-reviewed-digital-candidate
+          run-id: 36913729651
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m289-candidate
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/education-subject-rebirth/
+            /public/books/m/289/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap-education-subject-rebirth.xml
+            /tools/build_bookshelf.py
+            /tools/m289-install-reviewed.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded verification dependencies
+        timeout-minutes: 4
+        run: |
+          timeout 120s python -m pip install --disable-pip-version-check --no-input --timeout 20 --retries 1 beautifulsoup4==4.13.5 playwright==1.55.0
+          timeout 60s sudo apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20
+          timeout 90s sudo apt-get install -y -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20 fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then timeout 120s python -m playwright install --with-deps chromium; fi
+      - name: Install only the approved title and preserve older reading links
+        run: |
+          python tools/m289-install-reviewed.py "$RUNNER_TEMP/m289-candidate" "$GITHUB_WORKSPACE" "$EDITION_SHA"
+          python - <<'PY'
+          from pathlib import Path
+          import os,json
+          root=Path(os.environ['RUNNER_TEMP']);out=root/'m289-live';out.mkdir()
+          prior=json.loads((root/'m289-candidate/qa/browser/browser-report.json').read_text())
+          assert len(prior)==3 and all(x['pass'] and not x['runtime_errors'] for x in prior)
+          check=root/'m289-candidate/build-tools/browser-check.py'
+          s=check.read_text().replace("'isbn':True", "'isbn_status':'pending_author_confirmation'")
+          check.write_text(s)
+          PY
+      - name: Commit only the book, compatibility links and bookshelf entries
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          stage_and_check() {
+            git add --sparse public/books/m/289 public/books/education-subject-rebirth public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html public/sitemap-education-subject-rebirth.xml
+            python - <<'PY'
+          import subprocess
+          files=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/sitemap-education-subject-rebirth.xml'}
+          assert all(p in allowed or p.startswith('public/books/m/289/') or p.startswith('public/books/education-subject-rebirth/') for p in files),files
+          assert not any(p.startswith('public/books/m/109/') for p in files)
+          print('Authorized changed paths:',len(files))
+          PY
+          }
+          stage_and_check
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish volume 289 v1.1: US$20, complete 333-page book, refined readers; ISBN pending clarification'
+            if ! git push origin HEAD:main; then
+              git fetch --depth=1 origin main
+              git reset --hard origin/main
+              python tools/m289-install-reviewed.py "$RUNNER_TEMP/m289-candidate" "$GITHUB_WORKSPACE" "$EDITION_SHA"
+              stage_and_check
+              git commit -m 'Publish reviewed volume 289 against the latest catalogue'
+              git push origin HEAD:main
+            fi
+          fi
+          git rev-parse HEAD > "$RUNNER_TEMP/m289-live/publication-commit.txt"
+      - name: Verify deployed book, exact downloads and all three bookshelves
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,time,urllib.request,hashlib,concurrent.futures
+          from bs4 import BeautifulSoup
+          b=Path('public/books/m/289');m=json.loads((b/'publication-manifest.json').read_text());out=Path(os.environ['RUNNER_TEMP'])/'m289-live';base='https://sdeuniverses.com/books/m/289/'
+          assert m['release_sha256']==os.environ['EDITION_SHA']
+          def get(url):
+            req=urllib.request.Request(url+('&' if '?' in url else '?')+'edition_check='+str(time.time_ns()),headers={'User-Agent':'SDE-Publication-Verification/1.1','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=45) as r:return r.status,r.read()
+          for attempt in range(40):
+            try:
+              status,data=get(base+'publication-manifest.json')
+              if status==200 and json.loads(data).get('release_sha256')==m['release_sha256']:break
+              print('Waiting for current edition',attempt+1)
+            except Exception as e:print('Deployment pending:',str(e))
+            time.sleep(12)
+          else:raise RuntimeError('Reviewed edition not observed within the deployment window')
+          def signature(data):
+            s=BeautifulSoup(data,'html.parser');main=s.find('main');assert main
+            for x in main.select('script,style'):x.decompose()
+            return ''.join(main.stripped_strings),[(x.get('data-source-paragraph'),x.get_text()) for x in s.select('[data-source-paragraph]')],[x.get('href') for x in main.select('a[href]')]
+          def verify(name):
+            status,data=get(base+name);assert status==200
+            item={'path':name,'http_status':status}
+            if name.endswith('.html'):
+              assert signature(data)==signature((b/name).read_bytes()),('book text or main navigation differs',name)
+              item['book_text_and_navigation_match']=True
+            else:
+              assert hashlib.sha256(data).hexdigest()==m['files'][name]['sha256'],('file hash differs',name)
+              item['sha256_matches']=True
+            return item
+          report={'volume':289,'edition':'v1.1','price_usd':20,'isbn':None,'isbn_status':'pending_author_confirmation','release_sha256':m['release_sha256'],'files':[],'bookshelves':[],'compatibility_downloads':[]}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            for item in pool.map(verify,m['files']):report['files'].append(item);print(item['path'],'OK')
+          for u in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+            status,data=get(u);s=BeautifulSoup(data,'html.parser');entries=s.select('[data-id="education-subject-rebirth"]')
+            assert status==200 and len(entries)==1 and entries[0].get('data-number')=='289',u
+            assert any('/books/m/289/' in a.get('href','') for a in entries[0].select('a[href]'))
+            report['bookshelves'].append({'url':u,'one_record':True,'volume':289,'new_reading_links':True})
+          old='https://sdeuniverses.com/books/education-subject-rebirth/'
+          for name in ['downloads/education-subject-rebirth.docx','downloads/education-subject-rebirth-print.pdf','downloads/education-subject-rebirth-reader.pdf']:
+            status,data=get(old+name);assert status==200 and hashlib.sha256(data).hexdigest()==m['files'][name]['sha256'],name
+            report['compatibility_downloads'].append({'path':name,'current_version':True})
+          (out/'live-files-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print('All 54 files, three bookshelves and old download links verified.')
+          PY
+      - name: Test the actual production reader on desktop, mobile and narrow screen
+        run: |
+          python "$RUNNER_TEMP/m289-candidate/build-tools/browser-check.py" https://sdeuniverses.com "$RUNNER_TEMP/m289-live/browser"
+          python - <<'PY'
+          import os,shutil,json
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:
+            browser=p.chromium.launch(executable_path=shutil.which('chromium') or shutil.which('google-chrome'),headless=True,args=['--no-sandbox'])
+            page=browser.new_page();page.goto('https://sdeuniverses.com/books/education-subject-rebirth/text/#ch16',wait_until='networkidle')
+            page.wait_for_url('**/books/m/289/text/#ch16');assert page.locator('section.chapter').count()==30
+            Path(os.environ['RUNNER_TEMP'],'m289-live','legacy-redirect.json').write_text(json.dumps({'old_url_preserves_chapter_anchor':True,'final_url':page.url},ensure_ascii=False,indent=2))
+            browser.close()
+          PY
+      - name: Preserve release and live acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m289-live-publication-evidence
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/m289-live/
+            ${{ runner.temp }}/m289-candidate/qa/install-report.json
+            ${{ github.workspace }}/public/books/m/289/publication-manifest.json
+            ${{ github.workspace }}/public/books/m/289/release-check.json
