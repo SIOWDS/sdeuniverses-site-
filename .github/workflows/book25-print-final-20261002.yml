@@ -1,0 +1,99 @@
+name: Book 25 final print typography
+on:
+  push:
+    branches: [book25-rebuild-20261002]
+    paths: ['.github/workflows/book25-print-final-20261002.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/25/
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '11188668326'
+          run-id: '36914961912'
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book25-reviewed-release
+          merge-multiple: true
+      - name: Install PDF typesetting dependencies
+        run: |
+          sudo apt-get install -y fonts-noto-cjk libpango-1.0-0 libpangoft2-1.0-0
+          python -m pip install weasyprint==68.0 beautifulsoup4==4.13.5 pymupdf==1.26.4
+      - name: Polish PDF headings and closing paragraphs, preserving the entire text
+        env:
+          RELEASE: ${{ runner.temp }}/book25-reviewed-release
+          OUTPUT: ${{ runner.temp }}/book25-final-print
+        run: |
+          from_placeholder='This step uses only the reviewed book 25 public files.'
+          python - <<'PY'
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          from weasyprint import HTML
+          import fitz,os,re,json,hashlib,shutil,subprocess
+          root=Path.cwd();site=root/'public/books/m/25';release=Path(os.environ['RELEASE']);out=Path(os.environ['OUTPUT']);out.mkdir()
+          reportfile=release/'release-report.json'
+          assert hashlib.sha256(reportfile.read_bytes()).hexdigest()=='b06a92b35012524c2a10c22b49ce902c5d0e3a1514776f5cb3e5d358c2ea25cb'
+          initial=json.loads(reportfile.read_text());original=release/'public/books/m/25'
+          for name in ('book25-rebuilt-master.md','book25-reader-v1.pdf','print.html','read.html','toc.json','edition.json'):
+            assert (site/name).read_bytes()==(original/name).read_bytes(),'Book 25 changed since reviewed release: '+name
+          oldpdf=fitz.open(original/'book25-reader-v1.pdf');oldtoc=oldpdf.get_toc()
+          def body(d):return re.sub(r'\s+','',''.join(p.get_text(clip=fitz.Rect(0,43,p.rect.width,p.rect.height-32)) for p in d))
+          soup=BeautifulSoup((site/'print.html').read_text(),'html.parser');style=soup.style.string
+          assert 'line-height:1.85;color:#2c2d30' in style
+          style=style.replace('line-height:1.85;color:#2c2d30','line-height:1.80;color:#2c2d30').replace('margin-top:8mm;padding:4mm 0','margin-top:4mm;padding:3mm 0')
+          style+='\n.keep-tail{break-after:avoid}.unit h1,.unit h2{bookmark-label:attr(data-book-title)}\n';soup.style.string=style
+          balanced=0;tails=0
+          for unit in soup.select('section.unit'):
+            h=unit.find(['h1','h2']);title=h.get_text();h['data-book-title']=title
+            if '：' in title and ('part' in unit.get('class',[]) or len(title)>=22):
+              left,right=title.split('：',1);h.clear();h.append(left+'：');h.append(soup.new_tag('br'));h.append(right);balanced+=1
+            q=unit.select_one('blockquote.takeaway')
+            if q:
+              prev=q.find_previous_sibling()
+              if prev and prev.name=='p':prev['class']=prev.get('class',[])+['keep-tail'];tails+=1
+          text=str(soup);(site/'print.html').write_text(text,encoding='utf-8')
+          HTML(string=text,base_url=str(site)).write_pdf(site/'book25-reader-v1.pdf',pdf_tags=True)
+          newpdf=fitz.open(site/'book25-reader-v1.pdf')
+          assert len(newpdf)==129 and newpdf.get_toc()==oldtoc,'Unexpected page map change; review required'
+          assert body(newpdf)==body(oldpdf),'Manuscript text changed during layout correction'
+          sparse=[]
+          for i,p in enumerate(newpdf):
+            t=re.sub(r'\s+','',p.get_text())
+            if '带走的话' in t and len(t)<100:sparse.append(i+1)
+          assert not sparse,'A closing quotation still occupies a page alone'
+          toc=json.loads((site/'toc.json').read_text())
+          for item in toc:
+            if item['t'] not in ('封面','封底'):assert re.sub(r'\s+','',item['t']) in re.sub(r'\s+','',newpdf[item['g']-1].get_text())
+          edition=json.loads((site/'edition.json').read_text());edition['typesettingRevision']='20261002-p2';(site/'edition.json').write_text(json.dumps(edition,ensure_ascii=False,indent=2),encoding='utf-8')
+          allowed=['public/books/m/25/book25-reader-v1.pdf','public/books/m/25/print.html','public/books/m/25/edition.json']
+          base_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();branch='book25-print-final-'+os.environ['GITHUB_RUN_ID']
+          subprocess.run(['git','add',*allowed],check=True)
+          changed=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines();assert set(changed)<=set(allowed)
+          subprocess.run(['git','checkout','-b',branch],check=True)
+          subprocess.run(['git','-c','user.name=Book Publication','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Refine book 25 PDF headings and closing paragraphs; text and page map unchanged'],check=True)
+          sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip();subprocess.run(['git','push','origin','HEAD:refs/heads/'+branch],check=True)
+          final=initial.copy();final.update(base_sha=base_sha,release_sha=sha,release_branch=branch,changed_files=changed,stats=edition,main_updated=False,manuscript_unchanged=True,page_map_unchanged=True,balanced_headings=balanced,closing_paragraphs_kept=tails,word_draft_touched=False,reindex_called=False)
+          final['book_files']=[]
+          for item in initial['book_files']:
+            path=item['path'];p=root/path;dst=out/path;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,dst)
+            final['book_files'].append({'path':path,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+          (out/'release-report.json').write_text(json.dumps(final,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps({k:v for k,v in final.items() if k not in ('book_files','changed_files')},ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book25-final-print
+          retention-days: 7
+          path: ${{ runner.temp }}/book25-final-print/
