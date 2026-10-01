@@ -1,0 +1,52 @@
+name: M296 publication reference
+on:
+  push:
+    branches: ['publish/m296-20261002']
+    paths: ['.github/workflows/m296-publication-reference.yml']
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/m/220/
+            /public/books/education-subject-rebirth/index.html
+            /public/books/education-subject-rebirth/read.html
+            /public/books/education-subject-rebirth/chapters.html
+            /public/books/education-subject-rebirth/reader.css
+            /public/students/wang-desheng/my-three-treasures/m220/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap.xml
+            /tools/build_bookshelf.py
+            /wrangler.toml
+      - name: Package exact reference files, without fonts or credentials
+        run: |
+          python - <<'PY'
+          import pathlib,zipfile,os,json,hashlib
+          root=pathlib.Path('.');out=pathlib.Path(os.environ['RUNNER_TEMP'])/'m296-reference';out.mkdir()
+          chosen=[]
+          for base in ['public/books/m/220','public/students/wang-desheng/my-three-treasures/m220']:
+            p=root/base
+            if p.exists():
+              chosen += [f for f in p.rglob('*') if f.is_file() and f.suffix.lower() in ['.html','.css','.js','.pdf','.jpg','.png','.json'] and 'video' not in f.parts]
+          for n in ['public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/sitemap.xml','tools/build_bookshelf.py','wrangler.toml','public/books/education-subject-rebirth/index.html','public/books/education-subject-rebirth/read.html','public/books/education-subject-rebirth/chapters.html','public/books/education-subject-rebirth/reader.css']:
+            if (root/n).is_file():chosen.append(root/n)
+          with zipfile.ZipFile(out/'reference.zip','w',zipfile.ZIP_DEFLATED) as z:
+            for f in sorted(set(chosen)):z.write(f,str(f))
+          print(json.dumps({'reference_files':len(set(chosen)),'sha256':hashlib.sha256((out/'reference.zip').read_bytes()).hexdigest(),'no_reindex':True}))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m296-reference-220
+          path: ${{ runner.temp }}/m296-reference/reference.zip
+          retention-days: 2
