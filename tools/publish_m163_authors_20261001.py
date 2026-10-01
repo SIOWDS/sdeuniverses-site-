@@ -58,8 +58,8 @@ def prepare(qa):
     assert font_source.is_file()
     collection=TTCollection(str(font_source))
     font=collection.fonts[2]
-    needed=''.join(paragraphs)+BIO+AUTHOR+'作者介绍王德生 · 第一作者杨彼得 · 第二作者著者： 著'+''.join(chr(i) for i in range(32,127))
-    opt=subset.Options(); opt.name_IDs=['*']; opt.name_legacy=True; opt.name_languages=['*']
+    needed='\u3000'+''.join(paragraphs)+BIO+AUTHOR+'作者介绍王德生 · 第一作者杨彼得 · 第二作者著者： 著'+''.join(chr(i) for i in range(32,127))
+    opt=subset.Options(); opt.retain_gids=True; opt.name_IDs=['*']; opt.name_legacy=True; opt.name_languages=['*']
     sub=subset.Subsetter(options=opt); sub.populate(text=needed);sub.subset(font)
     font_path=qa/'working-font.otf';font.save(str(font_path))
     measure=fitz.Font(fontfile=str(font_path))
@@ -85,7 +85,10 @@ def prepare(qa):
         for ch in text:
             allowed=width-(indent if first else 0)
             if line and measure.text_length(line+ch,fontsize=fs)>allowed:
-                if ch in '，。；：、！？）》】」』' and len(line)>1:
+                tail=re.search(r'[A-Za-z0-9]+$',line)
+                if ch.isascii() and ch.isalnum() and tail and tail.start()>0 and len(tail[0])<16:
+                    result.append((line[:tail.start()],first));line=tail[0]+ch
+                elif ch in '，。；：、！？）》】」』' and len(line)>1:
                     result.append((line[:-1],first));line=line[-1]+ch
                 else: result.append((line,first));line=ch
                 first=False
@@ -156,6 +159,10 @@ def prepare(qa):
             b=updated[i].get_pixmap(matrix=fitz.Matrix(.8,.8),alpha=False).samples
             assert a==b,('Unexpected page rendering change',name,i)
         for i in (0,2,3,5):updated[i].get_pixmap(matrix=fitz.Matrix(1.5,1.5),alpha=False).save(str(qa/f'{path.stem}-after-{i}.png'))
+        hp=updated[5].get_pixmap(clip=fitz.Rect(x,ph*.13,x+125,ph*.185),colorspace=fitz.csRGB,alpha=False)
+        samples_rgb=hp.samples
+        dark=sum(1 for k in range(0,len(samples_rgb),3) if sum(samples_rgb[k:k+3])<400)
+        assert dark/(hp.width*hp.height)>.015, 'CJK heading did not render visibly'
         pdf_checks[name]={'pages':len(updated),'metadata_author':updated.metadata['author'],'bylines':changes,'biography_font_size':chosen[0],'biography_bottom_pt':chosen[2],'body_text_unchanged':True,'body_sha256':old_body,'pixel_identical_unmodified_page_indices':samples,'toc_unchanged':True,'sha256':digest(out.read_bytes())}
         old.close();updated.close();out.replace(path)
     def own_versions(s):
