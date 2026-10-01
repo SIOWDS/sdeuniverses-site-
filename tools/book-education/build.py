@@ -24,8 +24,8 @@ FILES = (['front/00-前置.md'] + sorted('parts/' + p.name for p in (Path(__file
          + ['back/09-结语.md', 'back/10-后置.md'])
 META = dict(
     title='教育的新使命', name='教育的新使命',
-    subtitle='从「一个人全包」到「人与 AI 分层分工」', author='王德生', no=263,
-    isbn='979-8-90690-248-1', price='US$20.00', version='20261001a',
+    subtitle='从「一个人全包」到「人与 AI 分层分工」', author='王德生　付自文　胡志英　李佳城', no=263,
+    isbn='979-8-90690-248-1', price='US$20.00', version='20261001b',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
