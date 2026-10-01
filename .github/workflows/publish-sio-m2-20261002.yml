@@ -1,0 +1,177 @@
+name: Publish SIO book 2 verified 430-page edition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-sio-m2-20261002.yml']
+permissions:
+  contents: write
+concurrency:
+  group: publication-sio-m2
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Prepare lossless transfer and PDF validation
+        run: python -m pip install -q Pillow PyMuPDF playwright
+      - name: Receive the exact authorized publication payload
+        run: |
+          python - <<'PY'
+          import urllib.request,hashlib,zipfile,io,pathlib,os
+          from PIL import Image
+          parts=[
+          (3145728,'deb96fceec13bc0b01deceb570e5e1479c853104075a49de1c1ea6f2f20ef99a','https://oaisdmntpraustraliaeast.blob.core.windows.net/files/00000000-55c8-81fa-854e-5376c276d47c/raw?se=2026-10-01T18%3A12%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=01a0f8a0-4f22-7dc6-9c2a-f08ec522a976&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T17%3A51%3A48Z&ske=2026-10-02T17%3A51%3A48Z&sks=b&skv=2026-02-06&sig=K6uxQfHaQZv4GSB9eOuJV7asVaNTgFoYGSv2cda/BXM%3D','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUcvPa_O0tup8gijI-QVkOUU6UZ3h6GXJeD-d1ftJPZfgoCpng-scC7c4Ty5BJ6-brZkjtqyS6d05iAE4dqVgy23dq3MBu2GQDvb-l0yWBxB1mRMPZRSHDQIZ8RmDP3nWzqLrkp42RSebY1ED72D7eAL1m6aS1svUBK15IKh0hQ9E46LOk0=s2048?key=S8ltyf1mBNyHcFMPYoT8EQ'),
+          (3145728,'dccca89521ad236a604920554739b4e818d9be428dfbda2b4153ea5fdf2b2b0d','https://oaisdmntpraustraliaeast.blob.core.windows.net/files/00000000-1e88-81fa-aebc-d069e723e062/raw?se=2026-10-01T18%3A12%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=01a0f8a0-4f22-7dc6-9c2a-f08ec522a976&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T16%3A38%3A58Z&ske=2026-10-02T16%3A38%3A58Z&sks=b&skv=2026-02-06&sig=frbkz3UDSYTOUS9T6hg4/p3ivYSH8rL9dIVbNMnrslM%3D','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUdinxzDebGM1ZENMPRin4RYWxwDvtFZjZu0iu5X7E3l7yaPAMX01CrirT8RME4SqIVBWhpkXWWPAVCAmxixQHsYFejdtSnE5AnYWVxZ2vm6pLTqvp9NHeqlYIFWgB58APISKGKBh4HqE_8vD17Ig66xf6quY4wJHZ43U0n_O4H4yukzKeM=s2048?key=S8ltyf1mBNyHcFMPYoT8EQ'),
+          (1929533,'a261e1a00b7a2cfba37478e4a6ea923b0628f5e5a7eebea78c73fb01a567d801','https://oaisdmntpraustraliaeast.blob.core.windows.net/files/00000000-ef04-81fa-bb5b-57039d8e1f81/raw?se=2026-10-01T18%3A12%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=01a0f8a0-4f22-7dc6-9c2a-f08ec522a976&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T16%3A11%3A08Z&ske=2026-10-02T16%3A11%3A08Z&sks=b&skv=2026-02-06&sig=C0em11Cxk6SLAwIeCzxfPKawrfAKSzOBdD3U9dLln2s%3D','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUdJtTcScK94hhUtTHzbw_8E6Ch_NA-XfPFhNbhSvPC3LCqstlz-6ll6IgoYixlAfoN4WUX9FXrnQo_ML1tkqAa45R9INqUXqiahlBHBQXGVV9lS_0Ru4ymOIMMWFtXg6zVNtEuqbwfSLgBS8D4ZihZeSiDWf5bkHqP_gSJXE9nPOkfv=s2048?key=S8ltyf1mBNyHcFMPYoT8EQ')]
+          data=bytearray()
+          for i,(size,digest,*urls) in enumerate(parts,1):
+            for url in urls:
+              try:
+                req=urllib.request.Request(url,headers={'User-Agent':'SDE-Authorized-Publication/1.0'})
+                with urllib.request.urlopen(req,timeout=90) as r:raw=r.read()
+                image=Image.open(io.BytesIO(raw));assert image.size==(1024,1024)
+                chunk=image.convert('RGB').tobytes()[:size]
+                assert hashlib.sha256(chunk).hexdigest()==digest,'Lossless chunk verification failed'
+                data.extend(chunk);print('Verified chunk',i,size);break
+              except Exception as e:print('Transfer candidate failed:',type(e).__name__)
+            else:raise SystemExit('No verified transfer; website remains unchanged')
+          assert len(data)==8220989
+          assert hashlib.sha256(data).hexdigest()=='6beefb7d03e97f8418ed4f03019e7766ca603945255969b60ee5b33c5c3fb836'
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'sio-m2-payload';dest.mkdir()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+            z.extractall(dest)
+          print('Exact final 430-page payload authenticated and extracted')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/m/2/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /.github/workflows/publish-sio-m2-20261002.yml
+      - name: Prepare narrow publication and current catalogue merge
+        run: |
+          cat > "$RUNNER_TEMP/install-sio.py" <<'PY'
+          import pathlib,os,sys,json,hashlib,subprocess,datetime
+          root=pathlib.Path(os.environ['GITHUB_WORKSPACE']);payload=pathlib.Path(os.environ['RUNNER_TEMP'])/'sio-m2-payload';book=root/'public/books/m/2'
+          old=json.loads((root/'public/books/catalog.json').read_text());others={b['id']:b for b in old['books'] if b['id']!='m-2'}
+          excerpts={str(p.relative_to(book)):hashlib.sha256(p.read_bytes()).hexdigest() for p in (book/'articles').rglob('*') if p.is_file()}
+          subprocess.run([sys.executable,str(payload/'release-install.py'),str(payload),str(root)],check=True)
+          new=json.loads((root/'public/books/catalog.json').read_text());assert others=={b['id']:b for b in new['books'] if b['id']!='m-2'}
+          assert excerpts=={str(p.relative_to(book)):hashlib.sha256(p.read_bytes()).hexdigest() for p in (book/'articles').rglob('*') if p.is_file()}
+          m=json.loads((book/'publication-manifest.json').read_text());m.pop('deployment_attempt',None);m['deployment_status']='validated-awaiting-deployment';m['reindex_requested']=False
+          m['release_id']='sio-m2-430-v1-20261002';m['published_files_verified']=True
+          (book/'publication-manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          c=json.loads((book/'release-check.json').read_text());c['deployment']={'status':'validated-awaiting-deployment','reindex_requested':False,'articles_preserved':excerpts};c['reindex']=False
+          (book/'release-check.json').write_text(json.dumps(c,ensure_ascii=False,indent=2))
+          print('Only existing m-2 catalogue entry updated; all three original excerpts preserved')
+          PY
+          python "$RUNNER_TEMP/install-sio.py"
+      - name: Validate complete PDFs, webpage sections, and all 430 images
+        run: |
+          python - <<'PY'
+          import pathlib,json,hashlib,re,fitz
+          from PIL import Image
+          b=pathlib.Path('public/books/m/2');m=json.loads((b/'publication-manifest.json').read_text())
+          assert m['pdf_pages']==430 and m['reindex_requested'] is False
+          for n in ['sio-ontology-reader-v1.pdf','sio-ontology-print-v1.pdf']:
+            d=fitz.open(b/n);assert len(d)==430;assert len(d.get_toc())==491
+          assert len(list((b/'pages').glob('*.webp')))==430
+          for i in range(1,431):
+            with Image.open(b/'pages'/f'{i:04d}.webp') as im:assert im.size==(864,1296);im.verify()
+          s=(b/'text/index.html').read_text();assert len(re.findall(r'<section class="chapter"',s))==13
+          for key in ['appendix-a','appendix-b','appendix-c','memoir','references']:
+            assert 'id="'+key+'"' in s,key
+          for f in m['files']:
+            if f['path'].startswith('pages/'):continue
+            assert hashlib.sha256((b/f['path']).read_bytes()).hexdigest()==f['sha256'],f['path']
+          print('Exact documents and webpage hashes verified; 430 readable pages; 491 PDF bookmarks; 13 chapters')
+          PY
+      - name: Publish only the authorized book and three bookshelf entrances
+        run: |
+          git config user.name 'SDE Publication Build'
+          git config user.email 'publication-build@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            rm -f .github/workflows/publish-sio-m2-20261002.yml
+            git add --sparse public/books/m/2 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html .github/workflows/publish-sio-m2-20261002.yml
+            git diff --cached --stat
+            git commit -m 'Publish SIO monograph 2: verified complete 430-page edition in 220 style; no reindex'
+            if git push origin HEAD:main; then git rev-parse HEAD > "$RUNNER_TEMP/sio-m2-publication-commit.txt"; break; fi
+            test "$attempt" -lt 3 || exit 1
+            git fetch origin main
+            git reset --hard origin/main
+            python "$RUNNER_TEMP/install-sio.py"
+          done
+      - name: Verify deployed exact bytes and bookshelf entrances
+        run: |
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib,json,time,datetime,concurrent.futures,os
+          b=pathlib.Path('public/books/m/2');base='https://sdeuniverses.com/books/m/2/';out=pathlib.Path(os.environ['RUNNER_TEMP'])/'sio-m2-qa';out.mkdir(exist_ok=True)
+          targets=['index.html','text/index.html','read.html','page-data.js','sio-ontology-reader-v1.pdf','sio-ontology-print-v1.pdf','sio-ontology-v1.docx','cover.svg','cover.png','pages/0001.webp','pages/0430.webp']
+          expected={n:hashlib.sha256((b/n).read_bytes()).hexdigest() for n in targets};report={'release_id':'sio-m2-430-v1-20261002','reindex_requested':False,'checks':{},'shelves':{},'pages':430}
+          def get(url):
+            req=urllib.request.Request(url,headers={'User-Agent':'SDE-Publication-Verification/1.0','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=25) as r:return r.read()
+          for attempt in range(55):
+            for n in targets:
+              if report['checks'].get(n,{}).get('match'):continue
+              try:
+                data=get(base+n+'?release=sio430v1');report['checks'][n]={'status':200,'bytes':len(data),'match':hashlib.sha256(data).hexdigest()==expected[n]}
+              except Exception as e:report['checks'][n]={'error':type(e).__name__}
+            for p in ['/books/','/monographs/','/sites/read/library/']:
+              try:
+                s=get('https://sdeuniverses.com'+p+'?release=sio430v1').decode();report['shelves'][p]={'unique_book':s.count('data-id="m-2"')==1,'flip':base+'read.html' in s,'full_text':base+'text/' in s}
+              except Exception as e:report['shelves'][p]={'error':type(e).__name__}
+            ok=all(report['checks'].get(n,{}).get('match') for n in targets) and all(all(report['shelves'].get(p,{}).get(k) for k in ['unique_book','flip','full_text']) for p in ['/books/','/monographs/','/sites/read/library/'])
+            report['verified_live']=bool(ok);report['attempt']=attempt+1;(out/'live-check.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+            if ok:break
+            time.sleep(10)
+          else:raise SystemExit('Committed, but live checks have not passed; do not claim deployment success')
+          def checkpage(i):
+            n=f'pages/{i:04d}.webp';return hashlib.sha256(get(base+n)).hexdigest()==hashlib.sha256((b/n).read_bytes()).hexdigest()
+          with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:flags=list(ex.map(checkpage,range(1,431)))
+          assert all(flags),'At least one deployed page image differs'
+          report['all_page_images_verified']=sum(flags);report['verified_at_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();report['commit']=pathlib.Path(os.environ['RUNNER_TEMP'],'sio-m2-publication-commit.txt').read_text().strip()
+          (out/'live-check.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Verify real desktop and mobile reading
+        run: |
+          python - <<'PY'
+          import os,pathlib,json,shutil
+          from playwright.sync_api import sync_playwright
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'sio-m2-qa';checks={};chrome=shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
+          with sync_playwright() as p:
+            browser=p.chromium.launch(executable_path=chrome,headless=True,args=['--no-sandbox'])
+            for label,w,h in [('desktop',1440,1050),('mobile',390,844)]:
+              ctx=browser.new_context(viewport={'width':w,'height':h});page=ctx.new_page();base='https://sdeuniverses.com/books/m/2/'
+              page.goto(base,wait_until='domcontentloaded');page.wait_for_selector('h1');assert 'SIO' in page.locator('h1').inner_text();page.screenshot(path=str(out/f'{label}-detail.png'))
+              page.goto(base+'text/',wait_until='domcontentloaded');assert page.locator('section.chapter').count()==13
+              assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
+              page.goto(base+'read.html#page=1',wait_until='domcontentloaded');page.wait_for_function('document.getElementById("left").complete && document.getElementById("left").naturalWidth>0')
+              page.locator('#next').click();assert int(page.locator('#page').input_value())>1
+              page.locator('#page').fill('430');page.locator('#page').dispatch_event('change');page.wait_for_function('document.getElementById("left").src.includes("0430.webp") && document.getElementById("left").complete && document.getElementById("left").naturalWidth>0')
+              page.screenshot(path=str(out/f'{label}-lastpage.png'));page.locator('#theme').click();page.locator('#tocBtn').click();page.locator('#q').fill('三律');page.locator('#find').click();assert page.locator('#toc button').count()>0
+              checks[label]={'detail':True,'full_chapters':13,'text_no_overflow':True,'next_and_last_page':True,'theme':True,'search':True};ctx.close()
+            browser.close()
+          (out/'browser-check.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2));print(json.dumps(checks,ensure_ascii=False))
+          PY
+      - name: Preserve publication verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sio-m2-430-publication-verification
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/sio-m2-qa/
+            ${{ runner.temp }}/sio-m2-publication-commit.txt
+            public/books/m/2/release-check.json
+            public/books/m/2/publication-manifest.json
