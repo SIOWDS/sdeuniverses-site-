@@ -1,0 +1,1 @@
+PDF.js 3.11.174 distribution from Mozilla/pdf.js, Apache License 2.0. Source: https://github.com/mozilla/pdf.js/tree/v3.11.174 . Fixed trusted book PDF only; isEvalSupported=false. No font files are distributed separately.
