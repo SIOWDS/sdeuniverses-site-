@@ -1,0 +1,61 @@
+name: Book 295 exact publication candidate and reader verification
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book295-candidate-transfer.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Prepare exact-byte verification
+        run: python -m pip install -q Pillow PyMuPDF playwright==1.55.0
+      - name: Receive only the authorized book publication files
+        run: |
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,os
+          from PIL import Image
+          chunks=[
+           (3145728,'649c27a349a4f102961cbc30793a7c1c766f5f36cd2e36e0213f154b27d6220b','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUcBJfJIdCHLA6We_hHfSihNTPQsLrmSImVm-7FWZNMktpWmfY25wEgpNM5LH76uc-VSCzjdjo-r7EbHgz7Lp9iiQQI542Y74ON4yopds4dLgx81So-XDzMDEeM1J8k2l0ZheHC_8BDm20tK-upCjxBCd0aHTJEh6E_ixob9L_UjToM9Yic=s2048?key=l_OgBhXVTMTHr10sR8lalg'),
+           (2169390,'48b2decd0ad46b221eaa9cc9db36709bb7dd3b4a2bc60fa517093911f0fab4f4','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUeKFenXjGvKceRq_Is5vVoIkUhmbfR8ED9EgjvDVyz9zIMAsb6ufzFimrV3ER2lOzO2aDsY8kH4cEx68DNFm4hBpq6cjzAEA9cYlS-Ozw5HRbjEtCwnLlUUyK_l8UyiEWT5FmUWyKYZbaxgA_MSqwdBHzV2xI3TemdBm2TsxcQFfrhS1K0=s2048?key=l_OgBhXVTMTHr10sR8lalg')]
+          data=bytearray()
+          for i,(size,digest,url) in enumerate(chunks,1):
+              raw=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'SDE-Book295-Publication'}),timeout=90).read()
+              im=Image.open(io.BytesIO(raw));assert im.size==(1024,1024)
+              part=im.convert('RGB').tobytes()[:size]
+              assert hashlib.sha256(part).hexdigest()==digest,'Transfer is not lossless; stop without publishing'
+              data.extend(part);print('Exact chunk verified',i,size)
+          assert len(data)==5315118 and hashlib.sha256(data).hexdigest()=='739a95d5c20274e382d38acd62c99fd7f840d858cbb97681f1c90b131516ce6a'
+          root=pathlib.Path(os.environ['RUNNER_TEMP']);(root/'book295-candidate.zip').write_bytes(data)
+          dest=root/'book295-payload';dest.mkdir()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+              for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              z.extractall(dest)
+          site=root/'book295-testsite/public/books/m';site.mkdir(parents=True);(site/'295').symlink_to(dest/'book',target_is_directory=True)
+          import json,fitz
+          m=json.loads((dest/'payload-manifest.json').read_text())
+          for f in m['files']:assert hashlib.sha256((dest/f['path']).read_bytes()).hexdigest()==f['sha256'],f['path']
+          pdf=fitz.open(dest/'book/nihility-not-the-end-reader-v1.1.pdf');assert len(pdf)==305 and len(pdf.get_toc())==335
+          assert not list((dest/'book').rglob('*.ttf')) and not list((dest/'book').rglob('*.otf')) and not list((dest/'book').rglob('*.pfb'))
+          print('Complete 35-chapter book authenticated; no site write or reindex performed.')
+          PY
+      - name: Prepare Chinese-capable browser
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Verify complete desktop and mobile readers before publication
+        run: python "$RUNNER_TEMP/book295-payload/browser-check.py" "$RUNNER_TEMP/book295-testsite" "$RUNNER_TEMP/book295-qa"
+      - name: Preserve authenticated candidate and verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book295-verified-publication-candidate
+          retention-days: 3
+          path: |
+            ${{ runner.temp }}/book295-candidate.zip
+            ${{ runner.temp }}/book295-qa/
