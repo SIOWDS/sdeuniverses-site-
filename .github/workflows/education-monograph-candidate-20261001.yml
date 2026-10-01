@@ -1,0 +1,65 @@
+name: Verify education monograph publication candidate
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/education-monograph-candidate-20261001.yml']
+permissions:
+  contents: read
+concurrency:
+  group: education-monograph-publication
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Receive authorized complete publication package
+        env:
+          PAYLOAD_URL: 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-df70-81fa-894d-ad3d3cfff794/raw?se=2026-10-01T13%3A08%3A54Z&sp=r&sv=2026-02-06&sr=b&scid=375af5a4-853f-5d81-bab5-f68845f1b3f2&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T13%3A03%3A49Z&ske=2026-10-02T13%3A03%3A49Z&sks=b&skv=2026-02-06&sig=bCy7lhsYa0sVSChshZL/Pz2DPZrc9V2MjIXdOWnngMQ%3D'
+          PAYLOAD_SHA: '2780433694d5dd0f148758d3943c08761c15efa46f28a9ea24323b1f84264f40'
+        run: |
+          python - <<'PY'
+          import os,urllib.request,hashlib,zipfile,io,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP']);data=urllib.request.urlopen(os.environ['PAYLOAD_URL'],timeout=120).read()
+          assert hashlib.sha256(data).hexdigest()==os.environ['PAYLOAD_SHA']
+          (root/'publication.zip').write_bytes(data)
+          dest=root/'education-payload';dest.mkdir()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+            z.extractall(dest)
+          print('Complete publication package verified:',len(data),'bytes')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/education-subject-rebirth/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap.xml
+            /tools/build_bookshelf.py
+      - name: Prepare candidate against current catalogue without committing
+        run: python "$RUNNER_TEMP/education-payload/release-install.py" "$RUNNER_TEMP/education-payload" "$GITHUB_WORKSPACE"
+      - name: Prepare browser verification
+        run: |
+          python -m pip install -q playwright==1.55.0
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null && ! command -v chromium-browser >/dev/null; then
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Verify desktop and mobile full text, navigation and actual PDF rendering
+        run: python "$RUNNER_TEMP/education-payload/browser-check.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/education-qa"
+      - name: Preserve verified package and screenshots for release review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: education-monograph-candidate-v1
+          retention-days: 2
+          path: |
+            ${{ runner.temp }}/publication.zip
+            ${{ runner.temp }}/education-qa/
+            ${{ github.workspace }}/public/books/education-subject-rebirth/release-check.json
