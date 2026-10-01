@@ -11,7 +11,7 @@ from pathlib import Path
 
 SITE = Path(__file__).resolve().parents[2] / 'public'
 NO = 263
-V = '20261001a'
+V = '20261001b'
 T, SUB = '教育的新使命', '从「一个人全包」到「人与 AI 分层分工」'
 
 
@@ -64,7 +64,7 @@ def main():
     assert not any(x.get('number') == NO and x['id'] != f'm-{NO}' for x in books), '263 号已被别的书占用'
     old = next((x for x in books if x['id'] == f'm-{NO}'), None)
     url = f'https://sdeuniverses.com/books/m/{NO}/'
-    entry = dict(id=f'm-{NO}', number=NO, title=T, authors=['王德生'], category='edu',
+    entry = dict(id=f'm-{NO}', number=NO, title=T, authors=['王德生', '付自文', '胡志英', '李佳城'], category='edu',
                  description=SUB + '——机器都会了，学校还教什么？车来了，腿退出走路，人进入交通那一层；机器接管「想」的下面那一层，人往上走一层。讲学生—AI 复合思维体、思维颗粒度、合成与元判断，讲判断也分两层、链条停在定标准与担后果，再落到课堂、考试与老师。七篇加尾篇五十二章。',
                  detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
                  pdfUrl=url + f'education-print.pdf?v={V}', coverUrl=url + f'cover.jpg?v={V}', isbn='9798906902481',
