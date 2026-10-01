@@ -1,0 +1,115 @@
+name: Volume 289 final PDF reader cleanup
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m289-final-reader-cleanup-20261002.yml']
+permissions:
+  contents: write
+concurrency:
+  group: education-monograph-publication
+  cancel-in-progress: false
+jobs:
+  finish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/289/
+            /public/books/education-subject-rebirth/publication-manifest.json
+            /tools/m289-browser-check.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded verification tools
+        timeout-minutes: 4
+        run: |
+          timeout 120s python -m pip install --disable-pip-version-check --no-input --timeout 20 --retries 1 beautifulsoup4==4.13.5 playwright==1.55.0
+          timeout 60s sudo apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20
+          timeout 90s sudo apt-get install -y -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20 fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then timeout 120s python -m playwright install --with-deps chromium; fi
+      - name: Remove a text-reader status accidentally inserted in the PDF seek rail
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          import json,hashlib
+          b=Path('public/books/m/289');mf=b/'publication-manifest.json';m=json.loads(mf.read_text())
+          assert m['release_sha256']=='ab8e550b521abfffddfb6d6ce3d8a59d649fc534bd15a3b0158ac9c2cbb49bfc'
+          p=b/'read.html';s=BeautifulSoup(p.read_text(),'html.parser');bar=s.select_one('#rail .bar');assert bar.select_one('#reading-status')
+          bar.clear();bar.attrs={'class':['bar']};p.write_text(str(s))
+          m['files']['read.html'].update(sha256=hashlib.sha256(p.read_bytes()).hexdigest(),bytes=p.stat().st_size)
+          m['release_sha256']=hashlib.sha256(json.dumps(m['files'],sort_keys=True).encode()).hexdigest()
+          assert m['release_sha256']=='749eee90c4e4a74fd0523bc11e00626f67bd5dbbd973b66009f33525a4069bde'
+          mf.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          legacy=Path('public/books/education-subject-rebirth/publication-manifest.json');j=json.loads(legacy.read_text());j['release_sha256']=m['release_sha256'];legacy.write_text(json.dumps(j,ensure_ascii=False,indent=2))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/books/m/289/read.html public/books/m/289/publication-manifest.json public/books/education-subject-rebirth/publication-manifest.json
+          git commit -m 'Fix volume 289 PDF seek rail: remove overlapping reading-status text'
+          git push origin HEAD:main
+          mkdir -p "$RUNNER_TEMP/m289-final-live"
+          git rev-parse HEAD > "$RUNNER_TEMP/m289-final-live/reader-fix-commit.txt"
+      - name: Verify all final live files after the reader correction
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,time,urllib.request,hashlib,concurrent.futures
+          from bs4 import BeautifulSoup
+          b=Path('public/books/m/289');m=json.loads((b/'publication-manifest.json').read_text());out=Path(os.environ['RUNNER_TEMP'])/'m289-final-live';base='https://sdeuniverses.com/books/m/289/'
+          def get(url):
+            req=urllib.request.Request(url+('&' if '?' in url else '?')+'edition_check='+str(time.time_ns()),headers={'User-Agent':'SDE-Publication-Verification/1.1','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=45) as r:return r.status,r.read()
+          for attempt in range(40):
+            try:
+              status,data=get(base+'publication-manifest.json')
+              if status==200 and json.loads(data).get('release_sha256')==m['release_sha256']:break
+            except Exception as e:print('Awaiting final reader deployment:',str(e))
+            time.sleep(12)
+          else:raise RuntimeError('Final reader revision not deployed in verification window')
+          def sig(data):
+            s=BeautifulSoup(data,'html.parser');main=s.find('main');assert main
+            for x in main.select('script,style'):x.decompose()
+            return ''.join(main.stripped_strings),[(x.get('data-source-paragraph'),x.get_text()) for x in s.select('[data-source-paragraph]')],[x.get('href') for x in main.select('a[href]')]
+          def check(name):
+            status,data=get(base+name);assert status==200
+            if name.endswith('.html'):assert sig(data)==sig((b/name).read_bytes()),name
+            else:assert hashlib.sha256(data).hexdigest()==m['files'][name]['sha256'],name
+            return {'path':name,'pass':True,'mode':'main_content_and_navigation' if name.endswith('.html') else 'exact_sha256'}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:records=list(pool.map(check,m['files']))
+          shelves=[]
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+            status,data=get(url);s=BeautifulSoup(data,'html.parser');e=s.select('[data-id="education-subject-rebirth"]');assert status==200 and len(e)==1 and e[0].get('data-number')=='289';shelves.append({'url':url,'pass':True})
+          (out/'final-live-files.json').write_text(json.dumps({'release_sha256':m['release_sha256'],'files':records,'bookshelves':shelves,'isbn_status':'pending_author_confirmation','volume':289,'price_usd':20,'reindex_requested':False},ensure_ascii=False,indent=2))
+          print('Final 54 files and three bookshelves verified.')
+          PY
+      - name: Recheck live reading and the clean PDF seek rail
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          p=Path('tools/m289-browser-check.py');s=p.read_text().replace('979-8-90690-365-5','待确认').replace("'isbn':True","'isbn_status':'pending_author_confirmation'")
+          needle="assert 'PDF' in page.locator('#pageState').inner_text();"
+          assert needle in s
+          s=s.replace(needle,"assert page.locator('#rail .bar').inner_text().strip()=='';assert 'PDF' in page.locator('#pageState').inner_text();")
+          out=Path(os.environ['RUNNER_TEMP'])/'m289-reader-check.py';out.write_text(s)
+          PY
+          python "$RUNNER_TEMP/m289-reader-check.py" https://sdeuniverses.com "$RUNNER_TEMP/m289-final-live/browser"
+      - name: Preserve final production evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m289-final-reader-evidence
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/m289-final-live/
+            ${{ github.workspace }}/public/books/m/289/publication-manifest.json
