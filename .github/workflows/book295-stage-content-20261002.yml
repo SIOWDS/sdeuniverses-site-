@@ -1,0 +1,96 @@
+name: Stage verified book 295 content
+on:
+  push:
+    branches: ['publish/book-295-20261002']
+    paths: ['.github/workflows/book295-stage-content-20261002.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: book295-stage-content
+  cancel-in-progress: false
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Retrieve the already verified artifact from this repository
+        uses: actions/download-artifact@v4
+        with:
+          name: book295-candidate-v1.1
+          run-id: 36934923822
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book295-import
+      - name: Check the approved package and extract to a temporary directory
+        run: |
+          python - <<'PY'
+          import os,pathlib,zipfile,hashlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])
+          files=list((root/'book295-import').rglob('book295-package.zip'))
+          assert len(files)==1,'Expected exactly one approved archive'
+          raw=files[0].read_bytes()
+          assert hashlib.sha256(raw).hexdigest()=='3b24485d06b8a68067b53b7d56a8a98f847c05a0084cef343cdbd11c2420b320'
+          target=root/'book295-approved';target.mkdir()
+          with zipfile.ZipFile(files[0]) as z:
+              for n in z.namelist():
+                  p=pathlib.PurePosixPath(n)
+                  assert not p.is_absolute() and '..' not in p.parts
+              z.extractall(target)
+          print('Approved package hash matched. No external download links or account credentials are used.')
+          PY
+      - name: Check out the isolated content branch, not production
+        uses: actions/checkout@v4
+        with:
+          ref: publish/book295-content-20261002
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/m/295/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap.xml
+            /tools/build_bookshelf.py
+      - name: Verify and install only the requested book
+        run: |
+          python "$RUNNER_TEMP/book295-approved/tools/verify_package.py"
+          python "$RUNNER_TEMP/book295-approved/tools/install.py" "$GITHUB_WORKSPACE"
+      - name: Validate the exact change scope
+        run: |
+          git add public/books/m/295 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html public/sitemap.xml
+          git diff --cached --check
+          python - <<'PY'
+          import subprocess,json,pathlib,os
+          names=subprocess.check_output(['git','diff','--cached','--name-only','-z']).decode().split('\0')
+          names=[n for n in names if n]
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/sitemap.xml'}
+          assert names and all(n.startswith('public/books/m/295/') or n in allowed for n in names)
+          assert not subprocess.check_output(['git','diff','--cached','--name-only','--diff-filter=D']).strip()
+          before=json.loads(subprocess.check_output(['git','show','HEAD:public/books/catalog.json']))
+          after=json.loads(pathlib.Path('public/books/catalog.json').read_text())
+          others=lambda x:[b for b in x['books'] if b.get('id')!='m-295']
+          assert others(before)==others(after),'Unrelated catalogue entries changed'
+          book=[b for b in after['books'] if b.get('id')=='m-295'];assert len(book)==1
+          assert book[0]['number']==295 and book[0]['priceUSD']==24 and book[0]['isbn']=='9798906903624'
+          assert book[0]['chapters']==35 and book[0]['pdfPages']==299
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'book295-stage-report';out.mkdir()
+          report={'changed_files':names,'other_books_preserved':len(others(after)),'target_branch':'publish/book295-content-20261002','main_modified':False,'reindex':False}
+          (out/'scope.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+      - name: Commit the reviewed content to its isolated branch
+        run: |
+          git config user.name SIOWDS
+          git config user.email wangdesheng1234567@gmail.com
+          git commit -m "Add complete volume 295 and its three bookshelf entries"
+          git push origin HEAD:refs/heads/publish/book295-content-20261002
+          git rev-parse HEAD > "$RUNNER_TEMP/book295-stage-report/commit.txt"
+      - name: Preserve review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book295-staged-content-review
+          path: ${{ runner.temp }}/book295-stage-report/
+          retention-days: 7
