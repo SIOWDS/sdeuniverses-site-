@@ -1,0 +1,111 @@
+name: Book 25 live publication acceptance
+on:
+  push:
+    branches: [book25-rebuild-20261002]
+    paths: ['.github/workflows/book25-live-acceptance-20261002.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '11188668326'
+          run-id: '36914961912'
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book25-reviewed-release
+          merge-multiple: true
+      - name: Install verification dependencies
+        run: |
+          python -m pip install beautifulsoup4==4.13.5 playwright==1.55.0
+          python -m playwright install --with-deps chromium
+      - name: Inspect actual public HTTPS publication
+        env:
+          RELEASE: ${{ runner.temp }}/book25-reviewed-release
+          OUTPUT: ${{ runner.temp }}/book25-live-acceptance
+        run: |
+          python - <<'PY'
+          import os,json,hashlib,re,time,urllib.request,concurrent.futures
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          from playwright.sync_api import sync_playwright
+          release=Path(os.environ['RELEASE']);out=Path(os.environ['OUTPUT']);out.mkdir()
+          report_path=release/'release-report.json'
+          assert hashlib.sha256(report_path.read_bytes()).hexdigest()=='b06a92b35012524c2a10c22b49ce902c5d0e3a1514776f5cb3e5d358c2ea25cb'
+          expected=json.loads(report_path.read_text());report={'release_sha':expected['release_sha'],'public_https_only':True,'reindex_called':False,'files':[],'shelves':[],'browser':[]}
+          def get(url):
+            req=urllib.request.Request(url,headers={'User-Agent':'SDE-Book25-Publication-Verification/1.0'})
+            with urllib.request.urlopen(req,timeout=40) as r:return r.status,r.headers.get('Content-Type',''),r.read(25000000)
+          for wait in (0,20,40):
+            if wait:time.sleep(wait)
+            try:
+              status,ct,data=get('https://sdeuniverses.com/books/m/25/edition.json')
+              if json.loads(data).get('version')=='20261002-v1':break
+            except Exception as e:report['edition_wait_error']=str(e)
+          else:
+            (out/'live-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));raise RuntimeError('Reviewed edition not yet available on public production URL')
+          def check(item):
+            rel=item['path'];url='https://sdeuniverses.com/'+rel.removeprefix('public/')
+            rec={'path':rel,'url':url}
+            try:
+              status,ct,data=get(url);rec.update(status=status,content_type=ct,bytes=len(data),sha256=hashlib.sha256(data).hexdigest())
+              if rel.endswith('.html'):
+                exp=BeautifulSoup((release/rel).read_text(),'html.parser');live=BeautifulSoup(data,'html.parser')
+                units_exp=[re.sub(r'\s+','',x.get_text()) for x in exp.select('section.unit')]
+                units_live=[re.sub(r'\s+','',x.get_text()) for x in live.select('section.unit')]
+                if units_exp:rec['content_matches']=units_exp==units_live
+                elif rel.endswith('/read.html'):
+                  rec['content_matches']=json.loads(live.select_one('#toc').string)==json.loads(exp.select_one('#toc').string) and json.loads(live.select_one('#cfg').string)==json.loads(exp.select_one('#cfg').string)
+                else:rec['content_matches']=live.title is not None and live.title.get_text()==exp.title.get_text() and '心血管健康的发生学重建' in live.get_text()
+              else:rec['content_matches']=rec['sha256']==item['sha256']
+            except Exception as e:rec['error']=str(e);rec['content_matches']=False
+            return rec
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:report['files']=list(pool.map(check,expected['book_files']))
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+            rec={'url':url}
+            try:
+              status,ct,data=get(url);soup=BeautifulSoup(data,'html.parser');card=soup.select_one('[data-id="m-25"]')
+              rec.update(status=status,found=card is not None,full_readable=card is not None and card.get('data-reading')=='full',flip_link=card is not None and any(a.get('href')=='https://sdeuniverses.com/books/m/25/read.html' for a in card.select('a[href]')))
+            except Exception as e:rec['error']=str(e)
+            report['shelves'].append(rec)
+          with sync_playwright() as p:
+            browser=p.chromium.launch()
+            for name,w,h in [('desktop',1440,1000),('mobile',390,844)]:
+              context=browser.new_context(viewport={'width':w,'height':h},device_scale_factor=1)
+              page=context.new_page();record={'viewport':name,'errors':[]}
+              page.on('pageerror',lambda err:record['errors'].append(str(err)))
+              try:
+                page.goto('https://sdeuniverses.com/books/m/25/',wait_until='networkidle',timeout=60000)
+                record['landing_overflow']=page.evaluate('document.documentElement.scrollWidth>innerWidth+2')
+                page.screenshot(path=str(out/(name+'-landing.png')),full_page=True)
+                page.goto('https://sdeuniverses.com/books/m/25/text/',wait_until='domcontentloaded',timeout=60000)
+                record['full_text_units']=page.locator('section.unit').count();record['text_overflow']=page.evaluate('document.documentElement.scrollWidth>innerWidth+2')
+                page.screenshot(path=str(out/(name+'-text.png')))
+                page.goto('https://sdeuniverses.com/books/m/25/read.html',wait_until='domcontentloaded',timeout=60000)
+                page.wait_for_function("document.getElementById('pt') && document.getElementById('pt').textContent.trim()==='129'",timeout=60000)
+                page.wait_for_timeout(3500)
+                record['reader_pages']=page.locator('#pt').inner_text();record['reader_canvas']=page.locator('#cL').evaluate('(e)=>({width:e.width,height:e.height})')
+                page.screenshot(path=str(out/(name+'-reader-cover.png')))
+                page.locator('#pi').fill('14');page.locator('#pi').dispatch_event('change');page.wait_for_timeout(3500)
+                record['reader_jump']=page.locator('#pi').input_value();page.screenshot(path=str(out/(name+'-reader-chapter.png')))
+                page.locator('#btnToc').click();page.wait_for_timeout(400);record['toc_open']=page.locator('#drawer').evaluate("e=>e.classList.contains('open')")
+                page.screenshot(path=str(out/(name+'-reader-toc.png')))
+              except Exception as e:record['exception']=str(e)
+              report['browser'].append(record);context.close()
+            browser.close()
+          report['all_book_files_match']=all(x.get('content_matches') for x in report['files'])
+          report['all_three_shelves']=all(x.get('found') and x.get('full_readable') and x.get('flip_link') for x in report['shelves'])
+          report['browser_passed']=all(x.get('reader_pages')=='129' and x.get('reader_jump')=='14' and x.get('toc_open') and not x.get('landing_overflow') and not x.get('text_overflow') and not x.get('exception') for x in report['browser'])
+          (out/'live-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps({k:v for k,v in report.items() if k not in ('files',)},ensure_ascii=False,indent=2))
+          assert report['all_book_files_match'] and report['all_three_shelves'] and report['browser_passed'],'Review live acceptance findings'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book25-live-acceptance
+          retention-days: 7
+          path: ${{ runner.temp }}/book25-live-acceptance/
