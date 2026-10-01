@@ -14,21 +14,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - name: Receive the already transferred publication package
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Retrieve this repository's previously authorized book artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: education-monograph-candidate-v1
+          run-id: 36866719297
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/candidate-import
+      - name: Validate and unpack the book without publishing it
         run: |
           python - <<'PY'
-          import os,urllib.request,hashlib,zipfile,io,pathlib
+          import os,hashlib,zipfile,pathlib
           root=pathlib.Path(os.environ['RUNNER_TEMP'])
-          req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/artifacts/11163438557/zip',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
-          outer=urllib.request.urlopen(req,timeout=120).read()
-          with zipfile.ZipFile(io.BytesIO(outer)) as z:
-            names=[n for n in z.namelist() if n.endswith('/publication.zip')];assert len(names)==1;data=z.read(names[0])
+          candidates=list((root/'candidate-import').rglob('publication.zip'))
+          assert len(candidates)==1
+          data=candidates[0].read_bytes()
           assert hashlib.sha256(data).hexdigest()=='2780433694d5dd0f148758d3943c08761c15efa46f28a9ea24323b1f84264f40'
-          (root/'publication.zip').write_bytes(data)
           dest=root/'education-payload';dest.mkdir()
-          with zipfile.ZipFile(io.BytesIO(data)) as z:
+          with zipfile.ZipFile(candidates[0]) as z:
             for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
             z.extractall(dest)
           p=dest/'browser-check.py';s=p.read_text()
@@ -36,7 +39,7 @@ jobs:
           s=s.replace("page.wait_for_timeout(1500);assert page.locator('#cR').evaluate", "page.wait_for_timeout(1500);canvas=page.locator('#cR' if mode=='desktop' else '#cL');assert canvas.evaluate")
           s=s.replace("metrics=page.locator('#cR').evaluate", "metrics=page.locator('#cL').evaluate")
           p.write_text(s)
-          print('Verified package; printed-page count 332 plus front cover = 333 physical pages.')
+          print('Book bytes verified; no external signed URL or credentials stored in this workflow.')
           PY
       - uses: actions/checkout@v4
         with:
@@ -54,7 +57,8 @@ jobs:
             /tools/build_bookshelf.py
       - name: Prepare candidate against current catalogue without committing
         run: python "$RUNNER_TEMP/education-payload/release-install.py" "$RUNNER_TEMP/education-payload" "$GITHUB_WORKSPACE"
-      - name: Prepare browser verification with Chinese font coverage
+      - name: Prepare browser with Chinese font coverage
+        timeout-minutes: 5
         run: |
           python -m pip install -q playwright==1.55.0
           sudo apt-get update -qq
@@ -63,16 +67,14 @@ jobs:
           if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null && ! command -v chromium-browser >/dev/null; then
             python -m playwright install --with-deps chromium
           fi
-      - name: Verify desktop and mobile full text, navigation and actual PDF rendering
+      - name: Verify desktop and mobile reading and actual PDF pages
         run: python "$RUNNER_TEMP/education-payload/browser-check.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/education-qa"
-      - name: Preserve verified package and screenshots for release review
+      - name: Preserve verification records
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: education-monograph-candidate-v1
+          name: education-monograph-reader-verification
           retention-days: 2
           path: |
-            ${{ runner.temp }}/publication.zip
-            ${{ runner.temp }}/education-payload/browser-check.py
             ${{ runner.temp }}/education-qa/
             ${{ github.workspace }}/public/books/education-subject-rebirth/release-check.json
