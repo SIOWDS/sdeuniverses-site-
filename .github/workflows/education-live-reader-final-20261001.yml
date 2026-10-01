@@ -1,0 +1,71 @@
+name: Education book production reader acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/education-live-reader-final-20261001.yml']
+permissions:
+  contents: read
+concurrency:
+  group: education-monograph-publication
+  cancel-in-progress: false
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Prepare a Chinese-capable browser
+        run: |
+          python -m pip install -q playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Test the public production site without modifying it
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python - <<'PY'
+          import json,shutil,os,urllib.request
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          base='https://sdeuniverses.com/books/education-subject-rebirth/'
+          manifest=json.load(urllib.request.urlopen(base+'publication-manifest.json',timeout=60))
+          assert manifest['release_sha256']=='c89c9531ddda73c38d67c7c00686742e181daf416e4b718ecbb68715c78c3770'
+          out=Path(os.environ['RUNNER_TEMP'])/'live-reader';out.mkdir();report=[]
+          with sync_playwright() as pw:
+            browser=pw.chromium.launch(executable_path=shutil.which('google-chrome') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+            for mode,w,h in [('desktop',1440,1000),('mobile',390,844)]:
+              ctx=browser.new_context(viewport={'width':w,'height':h});page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+              try:
+                r=page.goto(base,wait_until='domcontentloaded');assert r.status==200;page.wait_for_timeout(1000)
+                assert page.locator('h1').inner_text()=='AI时代教育对象的重生';assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
+                page.screenshot(path=str(out/f'detail-{mode}.png'),full_page=True)
+                page.goto(base+'text/',wait_until='domcontentloaded');page.wait_for_timeout(700)
+                assert page.locator('section.chapter').count()==30;assert page.locator('[data-source-paragraph]').count()==1684
+                page.locator('a[href="#ch16"]').first.click();page.wait_for_timeout(500);page.screenshot(path=str(out/f'text-{mode}.png'))
+                page.locator('#theme').click();assert page.locator('html.dark').count()==1;page.locator('#theme').click()
+                page.goto(base+'text/ch30/',wait_until='domcontentloaded');assert '第三十章' in page.locator('section h2').first.inner_text()
+                assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2');page.screenshot(path=str(out/f'chapter30-{mode}.png'))
+                page.goto(base+'read.html',wait_until='domcontentloaded');page.wait_for_function("document.querySelector('#pt').textContent==='332'",timeout=90000)
+                page.wait_for_function("document.querySelector('#msg').classList.contains('hide')",timeout=90000)
+                assert '从封闭学生到人—智能器具复合主体' in page.locator('header').text_content()
+                page.wait_for_timeout(1000);page.screenshot(path=str(out/f'flip-cover-{mode}.png'))
+                page.locator('#pi').fill('164');page.locator('#pi').press('Enter');page.wait_for_timeout(2500)
+                dark=page.locator('#cL').evaluate('(c)=>{let d=c.getContext("2d").getImageData(0,0,c.width,c.height).data,n=0;for(let i=0;i<d.length;i+=128)if(d[i]<130)n++;return n}')
+                assert dark>50;page.screenshot(path=str(out/f'flip-math-{mode}.png'))
+                report.append({'mode':mode,'live':True,'chapters':30,'source_blocks':1684,'last_chapter':True,'no_horizontal_overflow':True,'night_mode':True,'pdf_physical_pages':333,'actual_pdf_canvas':True,'runtime_errors':errors})
+              except Exception as exc:
+                report.append({'mode':mode,'live':False,'error':str(exc),'runtime_errors':errors});page.screenshot(path=str(out/f'failure-{mode}.png'))
+              finally:
+                (out/'live-browser-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));ctx.close()
+            browser.close()
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          assert len(report)==2 and all(x.get('live') and not x['runtime_errors'] for x in report)
+          PY
+      - name: Preserve public reader evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: education-monograph-live-reader-final
+          retention-days: 7
+          path: ${{ runner.temp }}/live-reader/
