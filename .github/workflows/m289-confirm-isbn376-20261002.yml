@@ -1,0 +1,176 @@
+name: Confirm ISBN 979-8-90690-376-1 for volume 289
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m289-confirm-isbn376-20261002.yml']
+permissions:
+  contents: write
+concurrency:
+  group: education-monograph-publication
+  cancel-in-progress: false
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/289/
+            /public/books/education-subject-rebirth/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /tools/m289-browser-check.py
+            /tools/m289-isbn376-finalize.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded publication dependencies
+        run: |
+          timeout 180s python -m pip install --disable-pip-version-check --no-input --timeout 20 --retries 1 python-docx==1.2.0 Pillow==11.3.0 beautifulsoup4==4.13.5 reportlab==4.4.4 PyMuPDF==1.26.7 playwright==1.55.0
+          timeout 90s sudo apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20
+          timeout 210s sudo apt-get install -y -qq --no-install-recommends -o Acquire::Retries=1 -o Acquire::http::Timeout=20 libreoffice-writer fonts-noto-cjk fonts-dejavu-core fonts-crosextra-carlito
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then timeout 150s python -m playwright install --with-deps chromium; fi
+      - name: Recheck book identity and unique catalogue assignment
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,shutil,re
+          root=Path(os.environ['RUNNER_TEMP'])/'isbn376';root.mkdir()
+          c=json.loads(Path('public/books/catalog.json').read_text());key='education-subject-rebirth'
+          assert len([b for b in c['books'] if b['id']==key and b.get('number')==289])==1
+          for b in c['books']:
+            if b['id']!=key:
+              assert all(re.sub(r'\D','',str(b.get(k,'')))!='9798906903761' for k in ['isbn','isbnDisplay']),('ISBN conflict',b['id'])
+          shutil.copytree('public/books/m/289',root/'source')
+          (root/'browser-check.py').write_text(Path('tools/m289-browser-check.py').read_text().replace('979-8-90690-365-5','979-8-90690-376-1'))
+          print('Confirmed volume 289, author-assigned ISBN 979-8-90690-376-1, US$20; no other catalogue assignment.')
+          PY
+      - name: Build the ISBN-confirmed edition and render editable Word
+        run: |
+          ROOT="$RUNNER_TEMP/isbn376"
+          python tools/m289-isbn376-finalize.py "$ROOT/source" "$ROOT/candidate/public/books/m/289" "$ROOT/qa"
+          mkdir -p "$ROOT/render"
+          timeout 150s libreoffice "-env:UserInstallation=file://$ROOT/lo-profile" --headless --convert-to pdf --outdir "$ROOT/render" "$ROOT/candidate/public/books/m/289/downloads/education-subject-rebirth.docx"
+          python - <<'PY'
+          import os,fitz
+          from pathlib import Path
+          p=Path(os.environ['RUNNER_TEMP'])/'isbn376/render/education-subject-rebirth.pdf';d=fitz.open(p)
+          assert len(d)==333,('Unexpected Word pagination',len(d))
+          assert '979-8-90690-376-1' in d[2].get_text()
+          d[2].get_pixmap(matrix=fitz.Matrix(1.5,1.5),alpha=False).save(p.parent/'word-copyright.png')
+          print('Word rendering: 333 pages, confirmed ISBN on copyright page.')
+          PY
+          python tools/m289-isbn376-finalize.py "$ROOT/source" "$ROOT/candidate/public/books/m/289" "$ROOT/qa" --rendered "$ROOT/render/education-subject-rebirth.pdf"
+          python "$ROOT/browser-check.py" "$ROOT/candidate/public" "$ROOT/qa/browser-candidate"
+      - name: Synchronize this book and its existing legacy downloads
+        run: |
+          git fetch --depth=1 origin main
+          git reset --hard origin/main
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,re,shutil,datetime,subprocess,sys
+          root=Path(os.environ['RUNNER_TEMP'])/'isbn376';source=root/'candidate/public/books/m/289';dest=Path('public/books/m/289');legacy=Path('public/books/education-subject-rebirth')
+          current=json.loads((dest/'publication-manifest.json').read_text())
+          assert current['release_sha256']=='749eee90c4e4a74fd0523bc11e00626f67bd5dbbd973b66009f33525a4069bde','Source edition changed since review'
+          cp=Path('public/books/catalog.json');c=json.loads(cp.read_text());key='education-subject-rebirth';records=[b for b in c['books'] if b['id']==key];assert len(records)==1
+          others={b['id']:b.copy() for b in c['books'] if b['id']!=key}
+          for b in others.values():assert all(re.sub(r'\D','',str(b.get(k,'')))!='9798906903761' for k in ['isbn','isbnDisplay']),b['id']
+          shutil.copytree(source,dest,dirs_exist_ok=True)
+          m=json.loads((dest/'publication-manifest.json').read_text());entry=records[0];now=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          entry.update(isbn='979-8-90690-376-1',isbnDisplay='979-8-90690-376-1',isbnStatus='作者确认；校验位通过',metadataRevision='20261002-isbn376',updatedAt=now)
+          entry['coverUrl']='https://sdeuniverses.com/books/m/289/cover.jpg?v=20261002-isbn376'
+          for k in ['pdfUrl','docxUrl']:
+            if entry.get(k):entry[k]=entry[k].split('?')[0]+'?v=20261002-isbn376'
+          assert entry['number']==289 and entry['price']==20
+          assert others=={b['id']:b for b in c['books'] if b['id']!=key}
+          c['updated']=now[:10];cp.write_text(json.dumps(c,ensure_ascii=False,indent=2)+'\n')
+          subprocess.run([sys.executable,'tools/build_bookshelf.py'],check=True)
+          for n in ['cover.jpg','backcover.jpg','downloads/education-subject-rebirth.docx','downloads/education-subject-rebirth-reader.pdf','downloads/education-subject-rebirth-print.pdf']:
+            shutil.copy2(dest/n,legacy/n)
+          lp=legacy/'publication-manifest.json';lm=json.loads(lp.read_text());lm.update(isbn='979-8-90690-376-1',isbn_status='author_confirmed',metadata_revision='20261002-isbn376',release_sha256=m['release_sha256']);lp.write_text(json.dumps(lm,ensure_ascii=False,indent=2))
+          (root/'qa/catalogue-audit.json').write_text(json.dumps({'isbn':'979-8-90690-376-1','number':289,'price_usd':20,'other_records_unchanged':True,'other_record_count':len(others),'old_downloads_synchronized':True,'reindex_triggered':False},ensure_ascii=False,indent=2))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --sparse public/books/m/289 public/books/education-subject-rebirth public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+          git commit -m 'Confirm ISBN 979-8-90690-376-1 for volume 289: Word, PDFs, covers and catalogue synchronized'
+          git push origin HEAD:main
+          git rev-parse HEAD > "$RUNNER_TEMP/isbn376/qa/publication-commit.txt"
+      - name: Verify exact live downloads, full text and three bookshelf entrances
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,time,hashlib,urllib.request,concurrent.futures
+          from bs4 import BeautifulSoup
+          root=Path(os.environ['RUNNER_TEMP'])/'isbn376';b=Path('public/books/m/289');m=json.loads((b/'publication-manifest.json').read_text());base='https://sdeuniverses.com/books/m/289/'
+          def get(u):
+            req=urllib.request.Request(u+('&' if '?' in u else '?')+'isbn376check='+str(time.time_ns()),headers={'User-Agent':'SDE-Publication-Verification/1.1','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=60) as r:return r.status,r.read()
+          for n in range(45):
+            try:
+              _,data=get(base+'publication-manifest.json')
+              if json.loads(data).get('release_sha256')==m['release_sha256']:break
+            except Exception as e:print('Waiting for deployment:',str(e))
+            time.sleep(12)
+          else:raise RuntimeError('ISBN edition not observed live during verification window')
+          def sig(data):
+            s=BeautifulSoup(data,'html.parser');main=s.find('main');assert main
+            for x in main.select('script,style'):x.decompose()
+            return ''.join(main.stripped_strings),[(x.get('data-source-paragraph'),x.get_text()) for x in s.select('[data-source-paragraph]')]
+          def check(name):
+            status,data=get(base+name);assert status==200
+            if name.endswith('.html'):
+              assert sig(data)==sig((b/name).read_bytes()),name
+              assert BeautifulSoup(data,'html.parser').find('meta',attrs={'name':'isbn'})['content']=='979-8-90690-376-1',name
+            else:assert hashlib.sha256(data).hexdigest()==m['files'][name]['sha256'],name
+            return {'path':name,'pass':True}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:files=list(pool.map(check,m['files']))
+          shelves=[]
+          for u in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+            _,data=get(u);s=BeautifulSoup(data,'html.parser');els=s.select('[data-id="education-subject-rebirth"]');assert len(els)==1 and els[0].get('data-number')=='289',u;shelves.append({'url':u,'single_entry':True})
+          for name in ['downloads/education-subject-rebirth.docx','downloads/education-subject-rebirth-reader.pdf','downloads/education-subject-rebirth-print.pdf']:
+            _,data=get('https://sdeuniverses.com/books/education-subject-rebirth/'+name);assert hashlib.sha256(data).hexdigest()==m['files'][name]['sha256']
+          _,data=get('https://sdeuniverses.com/books/catalog.json');c=json.loads(data);e=next(x for x in c['books'] if x['id']=='education-subject-rebirth');assert e['isbn']=='979-8-90690-376-1' and e['number']==289 and e['price']==20
+          (root/'qa/live-files.json').write_text(json.dumps({'release_sha256':m['release_sha256'],'isbn':e['isbn'],'files':files,'shelves':shelves,'legacy_downloads_match':True},ensure_ascii=False,indent=2))
+          print('All 54 live files, confirmed catalogue ISBN and three entrances verified.')
+          PY
+          python "$RUNNER_TEMP/isbn376/browser-check.py" https://sdeuniverses.com "$RUNNER_TEMP/isbn376/qa/browser-live"
+      - name: Collect actual published book and acceptance records
+        if: always()
+        run: |
+          python - <<'PY'
+          import os,shutil,zipfile
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'isbn376';out=root/'delivery';out.mkdir(parents=True,exist_ok=True)
+          book=root/'candidate/public/books/m/289'
+          if book.exists():
+            shutil.copytree(book,out/'book',dirs_exist_ok=True)
+            for f,label in [('education-subject-rebirth.docx','出版排版版.docx'),('education-subject-rebirth-reader.pdf','阅读版.pdf'),('education-subject-rebirth-print.pdf','印刷校样.pdf')]:
+              if (book/'downloads'/f).exists():shutil.copy2(book/'downloads'/f,out/('AI时代教育对象的重生_第289卷_ISBN376确认版_'+label))
+            with zipfile.ZipFile(out/'AI时代教育对象的重生_第289卷_ISBN376确认版_上站包.zip','w',zipfile.ZIP_DEFLATED) as z:
+              for p in book.rglob('*'):
+                if p.is_file():
+                  assert p.suffix.lower() not in ['.ttf','.ttc','.otf','.woff','.woff2']
+                  z.write(p,'public/books/m/289/'+str(p.relative_to(book)))
+          if (root/'qa').exists():
+            shutil.copytree(root/'qa',out/'qa',dirs_exist_ok=True)
+            shutil.rmtree(out/'qa/assets',ignore_errors=True)
+          if (root/'render/word-copyright.png').exists():shutil.copy2(root/'render/word-copyright.png',out/'qa/word-copyright.png')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m289-isbn376-confirmed-edition
+          retention-days: 7
+          path: ${{ runner.temp }}/isbn376/delivery/
