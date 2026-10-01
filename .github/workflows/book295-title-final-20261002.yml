@@ -1,0 +1,58 @@
+name: Book 295 final visual check
+on:
+  push:
+    branches: ['publish/book-295-20261002']
+    paths: ['.github/workflows/book295-title-final-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Wait for the title-only accessibility correction
+        run: |
+          python - <<'PY'
+          import urllib.request,time
+          u='https://sdeuniverses.com/books/m/295/'
+          for i in range(32):
+              try:
+                  req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0 (Book295 final visual check)','Cache-Control':'no-cache'})
+                  with urllib.request.urlopen(req,timeout=20) as r:t=r.read().decode('utf-8');assert r.status==200
+                  if '<h1 style="color:#e6e4de">虚无不是终点</h1>' in t:print('Final title style is live.');break
+              except Exception as e:print(type(e).__name__,flush=True)
+              if i==31:raise RuntimeError('Final title update not yet visible')
+              time.sleep(15)
+          PY
+      - name: Prepare browser
+        run: |
+          python -m pip install -q playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Inspect final desktop and mobile titles
+        run: |
+          python - <<'PY'
+          import os,json,shutil,pathlib
+          from playwright.sync_api import sync_playwright
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'book295-final';out.mkdir();report=[]
+          with sync_playwright() as p:
+              b=p.chromium.launch(executable_path=shutil.which('google-chrome') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+              for mode,w,h in [('desktop',1440,1000),('mobile',390,844)]:
+                  c=b.new_context(viewport={'width':w,'height':h});page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+                  r=page.goto('https://sdeuniverses.com/books/m/295/',wait_until='networkidle')
+                  color=page.locator('h1').evaluate('e=>getComputedStyle(e).color');assert color=='rgb(230, 228, 222)'
+                  assert page.locator('h1').inner_text()=='虚无不是终点' and r.status==200
+                  assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
+                  page.screenshot(path=str(out/f'detail-{mode}.png'),full_page=True)
+                  report.append({'mode':mode,'http_status':r.status,'title_color':color,'horizontal_overflow':False,'runtime_errors':errors,'success':not errors});c.close()
+              b.close()
+          (out/'final-visual-check.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False,indent=2));assert all(x['success'] for x in report)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book295-final-visual-check
+          path: ${{ runner.temp }}/book295-final/
+          retention-days: 14
