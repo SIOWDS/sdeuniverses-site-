@@ -28,6 +28,10 @@
 name: search-index
 
 on:
+  # One-time user-requested reindex; removed immediately after startup.
+  push:
+    branches: [main]
+    paths: ['.github/workflows/search-index.yml']
   # 【2026-07-29 二改·又改回】曾短暂恢复过 push 触发（迁 R2 之后，"每次重建都往 git
   #   写 218MB 速朽副本"这个当初砍它的理由已不存在）。但账算下来不划算：文档编号是
   #   url_list 排序后 enumerate 出来的，插一篇新文章会把其后所有编号整体后移，于是
@@ -73,6 +77,7 @@ concurrency:
 
 jobs:
   reindex:
+    if: github.event_name != 'push' || github.event.head_commit.message == 'Run requested reindex for education mission book 263 (2026-10-01)'
     runs-on: ubuntu-latest
     # 【2026-08-19 加】整个 job 一道总闸。此前**一步都没有超时**，于是 2026-08-19 那趟
     # 卡在 apt 上挂了二十分钟还在挂——而 concurrency 是 search-index 独一份，
