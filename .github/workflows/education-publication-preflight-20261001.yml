@@ -10,33 +10,37 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Collect public style references and current publication structure
+      - name: Collect pinned reader distribution and publication workflow names
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p refs
+          mkdir -p refs/vendor
           python - <<'PY'
-          import urllib.request,pathlib,json
-          base='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/'
-          paths=['public/books/m/220/cover.jpg','public/books/m/220/backcover.jpg','public/books/m/220/index.html','public/books/m/220/read.html','public/books/m/220/text/index.html','public/books/catalog.json','tools/build_bookshelf.py','public/sitemap.xml','.github/workflows/search-index.yml']
-          for p in paths:
-            try:
-              data=urllib.request.urlopen(base+p,timeout=90).read()
-              out=pathlib.Path('refs')/p;out.parent.mkdir(parents=True,exist_ok=True);out.write_bytes(data)
-              print(p,len(data))
-            except Exception as e: print('UNAVAILABLE',p,str(e))
-          for name in ['my-three-treasures-reader-v3.pdf','my-three-treasures-v3.pdf']:
-            u='https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/'+name
-            try:
-              data=urllib.request.urlopen(u,timeout=120).read()
-              if data[:5]!=b'%PDF-': raise ValueError('Not PDF')
-              (pathlib.Path('refs')/name).write_bytes(data);print(name,len(data))
-            except Exception as e: print('REFERENCE PDF UNAVAILABLE',str(e))
-          catalog=json.loads(pathlib.Path('refs/public/books/catalog.json').read_text())
-          summary={'categories':catalog.get('categories'),'matches':[b for b in catalog['books'] if '教育对象' in b.get('title','')],'books':len(catalog['books']),'max_number':max(b.get('number') or 0 for b in catalog['books'])}
-          pathlib.Path('refs/preflight.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2))
+          import urllib.request,pathlib,json,tarfile,io,os,hashlib,base64
+          root=pathlib.Path('refs')
+          meta=json.load(urllib.request.urlopen('https://registry.npmjs.org/pdfjs-dist/3.11.174',timeout=30))
+          data=urllib.request.urlopen(meta['dist']['tarball'],timeout=90).read()
+          expected=meta['dist']['integrity'].split('-',1)[1]
+          assert base64.b64encode(hashlib.sha512(data).digest()).decode()==expected
+          with tarfile.open(fileobj=io.BytesIO(data),mode='r:gz') as tf:
+            for m in tf.getmembers():
+              p=m.name
+              if not m.isfile():continue
+              dest=None
+              if p in ['package/build/pdf.min.js','package/build/pdf.worker.min.js']:dest=root/'vendor'/pathlib.PurePosixPath(p).name
+              elif p.startswith('package/cmaps/') or p.startswith('package/standard_fonts/'):dest=root/'vendor'/p.removeprefix('package/')
+              elif p=='package/LICENSE':dest=root/'vendor/LICENSE-pdfjs.txt'
+              if dest:
+                dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(tf.extractfile(m).read())
+          req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/workflows?per_page=100',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          w=json.load(urllib.request.urlopen(req,timeout=30))
+          summary=[{'id':x['id'],'name':x['name'],'path':x['path'],'state':x['state']} for x in w.get('workflows',[])]
+          (root/'workflows.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2))
+          print('Verified PDF.js 3.11.174; files:',len(list((root/'vendor').rglob('*'))))
           print(json.dumps(summary,ensure_ascii=False))
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: education-publication-style-references
+          name: education-publication-reader-assets
           path: refs/
           retention-days: 2
