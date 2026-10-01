@@ -47,7 +47,7 @@ button.on{border-color:var(--gold);color:var(--gold)}
 .ico{font-size:1rem;line-height:1}
 
 /* ── 舞台 ── */
-.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:center;overflow:hidden}
+.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:start;place-items:safe center;overflow:auto;overscroll-behavior:contain}
 .book{position:relative;display:flex;gap:0;filter:drop-shadow(0 24px 60px rgba(0,0,0,.5));
   transform-style:preserve-3d;perspective:2600px}
 .leaf{position:relative;background:var(--paper);overflow:hidden}
@@ -416,7 +416,7 @@ $('btnNext').onclick=function(){ step(1); };
 $('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
 $('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
 $('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
-$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'%'); };
+$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'% · 可滚动查看'); };
 $('btnZoomOut').onclick=function(){ zoom=Math.max(.5, zoom/1.15); show(); hint('缩小 '+Math.round(zoom*100)+'%'); };
 $('btnThumbs').onclick=function(){ $('thumbs').classList.toggle('open'); if($('thumbs').classList.contains('open')) buildThumbs(); };
 $('btnTheme').onclick=function(){ ti=(ti+1)%3; document.documentElement.className=themes[ti];
@@ -440,6 +440,7 @@ document.addEventListener('keydown',function(e){
 var sx=0, sy=0;
 $('stage').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
 $('stage').addEventListener('touchend',function(e){
+  if(zoom>1) return;
   var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
   if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.4){ step(dx<0?1:-1); }
 },{passive:true});
