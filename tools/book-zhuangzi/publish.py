@@ -46,7 +46,45 @@ def main():
                  lambda m: '<script type="application/json" id="toc">%s</script>' % json.dumps(toc['toc'], ensure_ascii=False), tpl, flags=re.S)
     assert '259' not in tpl.replace('#259', ''), [l for l in tpl.splitlines() if '259' in l][:3]
     (d / 'read.html').write_text(tpl)
-    print('published to', d)
+    # 书籍详情页
+    import pymupdf
+    pages = len(pymupdf.open(str(b / 'zhuangzi-print.pdf')))
+    han = sum(len(re.findall(r'[一-鿿]', (Path(__file__).parent / f).read_text()))
+              for f in ['front/00-前置.md'] + sorted(str(x.relative_to(Path(__file__).parent)) for x in (Path(__file__).parent / 'parts').glob('*.md'))
+              + ['back/09-结语.md', 'back/10-后置.md'])
+    det = (Path(__file__).parent / 'detail.html').read_text()
+    det = det.replace('__V__', V).replace('__PAGES__', str(pages)).replace('__WAN__', '%.0f' % (han / 10000))
+    assert '__' not in det.replace('__agentproxy', '')
+    (d / 'index.html').write_text(det)
+    # 书目
+    cat_p = SITE / 'books' / 'catalog.json'
+    data = json.loads(cat_p.read_text())
+    books = data['books']
+    assert not any(x.get('number') == NO and x['id'] != f'm-{NO}' for x in books), '274 号已被别的书占用'
+    old = next((x for x in books if x['id'] == f'm-{NO}'), None)
+    url = f'https://sdeuniverses.com/books/m/{NO}/'
+    entry = dict(id=f'm-{NO}', number=NO, title=T, authors=['王德生'], category='core',
+                 description=SUB + '——逍遥怎样在有限的生活里一点一点长出来？从《庄子》原文出发，读自由、分别、技艺、情感与共同生活，再走进教育、照护和工作。八编三十八章。',
+                 detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
+                 pdfUrl=url + f'zhuangzi-print.pdf?v={V}', coverUrl=url + f'cover.jpg?v={V}', isbn='9798906902337',
+                 publishedAt=old['publishedAt'] if old else __import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                 flipUrl=url + 'read.html', chapterUrl=url + 'text/', openness='full')
+    if old:
+        books[books.index(old)] = entry
+    else:
+        books.insert(0, entry)
+    cat_p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+    # 站点地图（同第 275 号：独立分图挂进索引）
+    locs = [url, url + 'text/', url + 'read.html']
+    (SITE / f'sitemap-m{NO}.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        + ''.join('<url><loc>%s</loc><lastmod>2026-10-01</lastmod></url>' % u for u in locs) + '</urlset>\n')
+    sm = SITE / 'sitemap.xml'; t = sm.read_text()
+    for u in locs:
+        if '<loc>%s</loc>' % u not in t:
+            assert '</urlset>' in t
+            t = t.replace('</urlset>', '<url><loc>%s</loc><lastmod>2026-10-01</lastmod></url>\n</urlset>' % u)
+    sm.write_text(t)
+    print('published to', d, 'pages', pages, 'han', han)
 
 
 if __name__ == '__main__':
