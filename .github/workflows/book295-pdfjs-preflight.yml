@@ -1,0 +1,35 @@
+name: Book 295 self-hosted reader assets
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book295-pdfjs-preflight.yml']
+permissions:
+  contents: read
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify pinned PDF.js distribution
+        run: |
+          python - <<'PY'
+          import urllib.request,json,tarfile,io,pathlib,hashlib,base64
+          meta=json.load(urllib.request.urlopen('https://registry.npmjs.org/pdfjs-dist/3.11.174',timeout=30))
+          data=urllib.request.urlopen(meta['dist']['tarball'],timeout=90).read()
+          assert base64.b64encode(hashlib.sha512(data).digest()).decode()==meta['dist']['integrity'].split('-',1)[1]
+          out=pathlib.Path('vendor');out.mkdir()
+          with tarfile.open(fileobj=io.BytesIO(data),mode='r:gz') as tf:
+            for m in tf.getmembers():
+              if not m.isfile():continue
+              p=m.name;dest=None
+              if p in ['package/build/pdf.min.js','package/build/pdf.worker.min.js']:dest=out/pathlib.PurePosixPath(p).name
+              elif p.startswith('package/cmaps/') or p.startswith('package/standard_fonts/'):dest=out/p.removeprefix('package/')
+              elif p=='package/LICENSE':dest=out/'LICENSE-pdfjs.txt'
+              if dest:dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(tf.extractfile(m).read())
+          print('Self-hosted PDF.js 3.11.174 verified; no reindex or book publication.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book295-self-hosted-pdfjs
+          path: vendor/
+          retention-days: 3
