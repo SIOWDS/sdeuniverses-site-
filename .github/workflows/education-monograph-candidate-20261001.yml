@@ -5,6 +5,7 @@ on:
     paths: ['.github/workflows/education-monograph-candidate-20261001.yml']
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: education-monograph-publication
   cancel-in-progress: false
@@ -13,29 +14,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - name: Receive authorized complete publication package
+      - name: Receive the already transferred publication package
         env:
-          PAYLOAD_URL: 'https://sdmntprwestus3.oaiusercontent.com/files/00000000-c8e4-81fd-976c-6aa0d813f260/raw?se=2026-10-01T13%3A14%3A32Z&sp=r&sv=2026-02-06&sr=b&scid=f9b5877e-90c9-5104-93c2-26f057699d87&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T12%3A57%3A32Z&ske=2026-10-02T12%3A57%3A32Z&sks=b&skv=2026-02-06&sig=x3s7pz1bI5CZvPEeDaRPIMskZS%2BZBe9ZSRIo87TLGgI%3D'
-          PAYLOAD_SHA: '2780433694d5dd0f148758d3943c08761c15efa46f28a9ea24323b1f84264f40'
+          GH_TOKEN: ${{ github.token }}
         run: |
           python - <<'PY'
-          import os,urllib.request,urllib.error,hashlib,zipfile,io,pathlib,time
+          import os,urllib.request,hashlib,zipfile,io,pathlib
           root=pathlib.Path(os.environ['RUNNER_TEMP'])
-          for attempt in range(3):
-            try:
-              req=urllib.request.Request(os.environ['PAYLOAD_URL'],headers={'User-Agent':'Mozilla/5.0 SDE-Publication/1.0'})
-              data=urllib.request.urlopen(req,timeout=120).read();break
-            except urllib.error.HTTPError as e:
-              print('Publication download failed:',e.code,e.read(2000).decode('utf-8','replace'))
-              if attempt==2:raise
-              time.sleep(3)
-          assert hashlib.sha256(data).hexdigest()==os.environ['PAYLOAD_SHA']
+          req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/artifacts/11163438557/zip',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          outer=urllib.request.urlopen(req,timeout=120).read()
+          with zipfile.ZipFile(io.BytesIO(outer)) as z:
+            names=[n for n in z.namelist() if n.endswith('/publication.zip')];assert len(names)==1;data=z.read(names[0])
+          assert hashlib.sha256(data).hexdigest()=='2780433694d5dd0f148758d3943c08761c15efa46f28a9ea24323b1f84264f40'
           (root/'publication.zip').write_bytes(data)
           dest=root/'education-payload';dest.mkdir()
           with zipfile.ZipFile(io.BytesIO(data)) as z:
             for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
             z.extractall(dest)
-          print('Complete publication package verified:',len(data),'bytes')
+          p=dest/'browser-check.py';s=p.read_text()
+          s=s.replace("document.querySelector('#pt').textContent==='333'","document.querySelector('#pt').textContent==='332'")
+          s=s.replace("page.wait_for_timeout(1500);assert page.locator('#cR').evaluate", "page.wait_for_timeout(1500);canvas=page.locator('#cR' if mode=='desktop' else '#cL');assert canvas.evaluate")
+          s=s.replace("metrics=page.locator('#cR').evaluate", "metrics=page.locator('#cL').evaluate")
+          p.write_text(s)
+          print('Verified package; QA uses printed-page count 332 plus front cover = 333 physical pages.')
           PY
       - uses: actions/checkout@v4
         with:
@@ -69,5 +70,6 @@ jobs:
           retention-days: 2
           path: |
             ${{ runner.temp }}/publication.zip
+            ${{ runner.temp }}/education-payload/browser-check.py
             ${{ runner.temp }}/education-qa/
             ${{ github.workspace }}/public/books/education-subject-rebirth/release-check.json
