@@ -1,0 +1,93 @@
+name: Book 25 scoped publication preparation
+on:
+  push:
+    branches: [book25-rebuild-20261002]
+    paths: ['.github/workflows/book25-release-20261002.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/25/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '11188890493'
+          run-id: '36913635835'
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book25-reviewed
+          merge-multiple: true
+      - name: Install only reviewed book files and update only catalog entry m-25
+        env:
+          CANDIDATE: ${{ runner.temp }}/book25-reviewed/build/book25
+          REPORT_DIR: ${{ runner.temp }}/book25-release-report
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,shutil,subprocess,datetime,copy
+          root=Path.cwd();candidate=Path(os.environ['CANDIDATE']);report_dir=Path(os.environ['REPORT_DIR']);report_dir.mkdir()
+          manifest_path=candidate/'publication-manifest.json'
+          assert hashlib.sha256(manifest_path.read_bytes()).hexdigest()=='700565c38d34882ede14bf5a058ef1a9d666575b230c65630db13fff75f5bb8c','Unreviewed candidate manifest'
+          manifest=json.loads(manifest_path.read_text());assert manifest['reader_destinations_verified'] is True
+          base_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          original_articles={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in (root/'public/books/m/25/articles').rglob('*') if p.is_file()}
+          copied=[]
+          for item in manifest['files']:
+            rel=Path(item['path']);assert rel.parts[:4]==('public','books','m','25') and '..' not in rel.parts
+            src=candidate/rel;assert hashlib.sha256(src.read_bytes()).hexdigest()==item['sha256']
+            if src.suffix=='.docx':continue
+            assert src.suffix.lower() in ('.html','.pdf','.md','.jpg','.json','.js','.txt')
+            dst=root/rel;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst);copied.append(str(rel))
+          landing=root/'public/books/m/25/index.html';text=landing.read_text()
+          old='<a href="book25-editable-v1.docx">Word母稿</a>';assert text.count(old)==1
+          text=text.replace(old,'<a href="book25-rebuilt-master.md">可编辑全文</a>');landing.write_text(text,encoding='utf-8')
+          catalog_path=root/'public/books/catalog.json';data=json.loads(catalog_path.read_text());before=copy.deepcopy(data)
+          targets=[b for b in data['books'] if b.get('id')=='m-25'];assert len(targets)==1
+          book=targets[0];assert book['number']==25 and book['title']=='心血管健康的发生学重建' and book['authors']==['王德生','秦莉']
+          now=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+          url='https://sdeuniverses.com/books/m/25/'
+          book.update(description='从风险控制到调节能力与生活重建。六编三十章与五个附录，以三律和SDE组织问题，以医学证据约束临床结论，重建血脂、血压、血糖管理与人的生活之间的联系。',readUrl=url+'read.html',flipUrl=url+'read.html',readMode='full',readLabel='友好阅读 · 在线翻页',chapterUrl=url+'text/',pdfUrl=url+'book25-reader-v1.pdf',coverUrl=url+'cover.jpg?v=20261002-v1',openness='full',editionPublishedAt=now,edition='数字重编版 v1.0')
+          assert [b for b in data['books'] if b.get('id')!='m-25']==[b for b in before['books'] if b.get('id')!='m-25']
+          if 'updated' in data:data['updated']=now
+          catalog_path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          builder=root/'tools/build_bookshelf.py'
+          assert hashlib.sha256(builder.read_bytes()).hexdigest()=='3f76af6b624872ada47668a0b5ad77bb873af4db8bbb5753161069d2fa03e52e','Bookshelf builder changed; review before running'
+          subprocess.run(['python','tools/build_bookshelf.py'],check=True)
+          shelves=['public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html']
+          for name in shelves:
+            page=(root/name).read_text();assert 'data-id="m-25"' in page and url+'read.html' in page and url+'book25-reader-v1.pdf' in page
+          for name,sha in original_articles.items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+          allowed=set(copied+['public/books/catalog.json']+shelves)
+          subprocess.run(['git','add','public/books/m/25','public/books/catalog.json',*shelves],check=True)
+          changed=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines();assert changed and set(changed)<=allowed
+          branch='book25-release-'+os.environ['GITHUB_RUN_ID'];subprocess.run(['git','checkout','-b',branch],check=True)
+          subprocess.run(['git','-c','user.name=Book Publication','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Publish reconstructed book 25 in book 220 reading style; no reindex'],check=True)
+          release_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          subprocess.run(['git','push','origin','HEAD:refs/heads/'+branch],check=True)
+          files=[{'path':name,'bytes':(root/name).stat().st_size,'sha256':hashlib.sha256((root/name).read_bytes()).hexdigest()} for name in copied]
+          report={'base_sha':base_sha,'release_sha':release_sha,'release_branch':branch,'candidate_artifact_id':11188890493,'stats':manifest['stats'],'changed_files':changed,'book_files':files,'shelves':shelves,'other_catalog_entries_unchanged':True,'legacy_articles_preserved':len(original_articles),'reindex_called':False,'main_updated':False,'draft_word_excluded':True}
+          (report_dir/'release-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          for name in copied+['public/books/catalog.json']+shelves:
+            dst=report_dir/name;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(root/name,dst)
+          print(json.dumps({k:v for k,v in report.items() if k not in ('book_files','changed_files')},ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book25-reviewed-release
+          retention-days: 7
+          path: ${{ runner.temp }}/book25-release-report/
