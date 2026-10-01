@@ -1,5 +1,13 @@
 # sdeuniverses.com 站内搜索系统 · 维护文档
 
+> **当前索引更新规则（王德生 2026-10-01 指令）**：每天一次，北京时间 23:20 开始。
+> GitHub `search-index` 完成构建、坐标、R2 上传和校验后，再同步 `IndexMemory`。
+> 同一北京时间自然日已构建则跳过；数据库也持久记录当天已排队/已完成状态。
+> 发布文章、上线专著、推送代码、普通检索都不得另行触发 reindex。
+> 不接收 `repository_dispatch`；手动 Run workflow 也受每日限制。
+> 访客检索遇到数据库版本落后时使用 R2 同源检索，不自动重建。
+> 管理口令 `force` 只保留为用户明确要求的故障恢复入口，不能用于绕过日常频率。
+
 > 本文是仓库内的持久副本；权威运维参考是 `sde-website-ops` skill 第九节（本文即其内容）。
 > 一切对 sdeuniverses.com 的搜索系统改动，先读这里 + skill。
 
@@ -10,7 +18,7 @@
 ### A. 索引(地基,必须懂)
 - 位置:`public/search/` = `manifest.json`(元数据+文档列表 docs[{i,u,t,s}]) + `shard-<栏目>.json`(分片正文块 {d,t}) + `sde-coords.json`(SDE坐标,可选,见 D/F)。
 - 构建:`python3 tools/build_search_index.py` —— 抽 HTML 可见正文 + PDF 正文(`pdftotext -nopgbrk`),chunk 级去重(栏目文章 HTML=PDF 镜像丢弃、专著薄壳保留 PDF),按栏目分片。**规模不写死在本文** —— 它天天在长,写死的数字只会变成下一个骗人的数字(本文上一版把 204 篇/228 万字挂了很久,实际早已三倍于此)。要实数就读 `public/search/manifest.json` 的 `counts` 字段,或跑 `python3 tools/build_search_index.py --check`。
-- **已自动化(2026-07-18):不必再记着手动跑。** `.github/workflows/search-index.yml`:push 改了 `public/**`(排除 `public/search/**`,否则自触发)或两个打标/构建脚本 → GitHub Actions 自动重建索引+坐标 → 自检 → 提交回 main → 触发 Cloudflare 构建。人零操作,约 3 分钟上线。
+- **每日自动更新（2026-10-01）**：`.github/workflows/search-index.yml` 仅在北京时间 23:20 定时启动，也保留受每日次数限制的手动按钮。先由 `tools/search_index_daily.py check` 核验 R2 manifest 的北京时间构建日；今日已有索引则跳过。需要构建时依次完成索引、坐标、自检、R2 上传和回读，再由 `tools/search_index_daily.py sync` 请求一次数据库同步并等待完成。索引不写回 Git，日常发布不触发 reindex。
   - **为什么挂在 push 上而不是"打开搜索页时"**:索引是派生数据,只有内容变了才过期,而内容只在 push 那一刻变。访客打开搜索页一万次,站里一个字都不会变——挂在"打开"上等于重算一万次同一个结果(且浏览器/Worker 里都没有 pdftotext,更做不了)。对所有访客完全相同的东西 = 预先生成、直接调用(第二铁律第一类)。
   - 手动仍可跑(本地或 Actions 页面 Run workflow),自检闸门:孤儿块/空块/无正文文档/孤儿坐标键任一出现即失败,坏索引进不了 main;末尾 `--check` 兜底,防生成器与筛选规则漂移。
   - ⚠️ **改 workflow 文件必须走 GitHub 网页**:GitHub 拒绝无 `workflow` scope 的 PAT 写 `.github/workflows/`,也拒绝其 `actions:write`(手动触发)。**不要为此给 PAT 扩权**——该 PAT 明文存于 skill,加 workflow scope = 该 token 可在仓库跑任意代码。workflow 自身用 GITHUB_TOKEN,与该 PAT 无关。
@@ -48,7 +56,7 @@
 ### F. 会过期的东西,改了内容记得同步(最容易忘)
 | 改了什么 | 必须同步 |
 |---|---|
-| 发/改文章、上专著 | ~~重跑索引~~ **已自动**(push 即重建索引+坐标,见 A 节)。只在 workflow 失败时才需手动 `build_search_index.py` + `label_sde_coords_rules.py`(两个必须同跑,见 D 节陷阱)。想要 LLM 精度坐标仍需手动跑 `label_sde_coords.py` |
+| 发/改文章、上专著 | 等待北京时间每天 23:20 的统一索引任务，不另行触发 reindex。每日任务同时重建索引、坐标并同步检索数据库。故障恢复或临时加跑必须有用户新的明确指令。 |
 | 改 `sde-neigong.txt` 或心得字数 | ⚙️ 管理设置「重写心得」(凭口令清缓存,否则旧心得继续复用) |
 | 想换答题基底默认 | GLM-5(默认,中文凝缩,避DeepSeek话题自审)/ DeepSeek(数学严谨) |
 

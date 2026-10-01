@@ -4118,6 +4118,10 @@ export class IndexMemory {
   }
   _get(k) { const r = [...this.sql.exec("SELECT v FROM meta WHERE k=?", k)]; return r.length ? r[0].v : ""; }
   _set(k, v) { this.sql.exec("INSERT INTO meta(k,v) VALUES(?,?) ON CONFLICT(k) DO UPDATE SET v=excluded.v", k, String(v)); }
+  _dayKey(at) {
+    const ms = at ? Date.parse(at) : Date.now();
+    return Number.isFinite(ms) ? new Date(ms + 8 * 3600000).toISOString().slice(0, 10) : "";
+  }
 
   async fetch(request) {
     this._init();
@@ -4126,19 +4130,9 @@ export class IndexMemory {
     if (op === "status") return this._json(this._status());
     if (op === "ensure") return this._json(await this._ensure(b.force === true));
     if (op === "query") {
-      /* 🔴🔴 【2026-08-21：查询不再触发重建 —— 这是把 Durable Object 额度写爆的那个口子】
-         [stated] 用户令：「每天 reindex 一次，自动的，每天固定时间。」
-         旧写法是每次查询都 fire-and-forget 触发一次指纹复验，而复验的判据只有一条：
-         R2 上 `search/manifest.json` 的 etag 变没变。**而每一次 push 之后 CI 都会重建搜索索引
-         并 sync 到 R2 —— 指纹必变。** 于是：推一次站 ⇒ 下一个检索的人替全站扛一次全量重建。
-         这张表的实测规模是 docs 4488 / **terms 29 万行**（见下面 alarm 里那段血案注释），
-         而免费档的额度是 **10 万行/天** —— **一次重建就是当天额度的 2.9 倍，一次就爆。**
-         2026-08-21 一天推了八次，站上计数、留言、系统密钥、心得存储全跟着躺下，
-         而症状是「智能问答很快就停止」，谁也想不到根子在这里。
-         💡 心法：**「源头变了就重建」这种判据，要先算一遍「源头一天变几次、一次重建多贵」。**
-            两个数一乘，才知道它是省事还是灾难。
-         ⇒ 现在只留一处冷启动兜底：**表是空的**才建（不然新部署后永远建不起来，
-           而定时那一趟要等到明天）。日常重建交给每日定时器（见 scheduled）。 */
+      /* 2026-10-01 用户决定每天只更新一次。日常更新统一由 search-index 工作流
+         在北京时间 23:20 开始，R2 上传完成后再同步本数据库。查询不触发版本追赶。
+         仅保留空库的首次初始化；它同样受 _ensure 中持久化的每日次数限制。 */
       let _n0 = 0;
       try { _n0 = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n; } catch (e) {}
       if (!_n0) this._ensure(false).catch(() => {});
@@ -4152,7 +4146,9 @@ export class IndexMemory {
     const n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
     const t = [...this.sql.exec("SELECT count(*) AS n FROM terms")][0].n;
     return { ok: true, docs: n, terms: t, stamp: this._get("stamp"), built: this._get("built"),
-             pending: this._get("pending") ? JSON.parse(this._get("pending")).length : 0, err: this._get("err") };
+             pending: this._get("pending") ? JSON.parse(this._get("pending")).length : 0, err: this._get("err"),
+             updatePolicy: "once-per-day", timezone: "Asia/Shanghai", scheduledLocal: "23:20",
+             lastQueuedDay: this._get("queuedDay") };
   }
 
   /* ── 指纹复验：manifest 的 etag 没变就什么都不做 ── */
@@ -4167,24 +4163,32 @@ export class IndexMemory {
     if (!this.env.PDFS) return { ok: false, why: "no bucket" };
     if (this._get("pending")) return { ok: true, why: "rebuilding" };
     const st = await this._stamp();
+    // R2 HEAD 会让出执行权，必须重新检查，防止两个 ensure 同时排入一轮重建。
+    if (this._get("pending")) return { ok: true, why: "rebuilding" };
     /* 🔴 「指纹相同」只说明**源头没变**，不说明**我这份是好的**（2026-08-19 当场吃到）：
        上一趟重建在第一件事就失败，却照样把 stamp 推到了新值，于是表空着（docs 0）
        还自称 fresh，此后再也不肯重建 —— 只能靠 force 破，而 force 是要口令的。
        ⇒ fresh 的判据必须三条同时成立：指纹没变 **且** 表里真有东西 **且** 上一趟没留错。
        💡 心法：**判「新不新」不能只看源头的指纹，还要看自己手里那份成不成立。**
        退避：留着错时不许一遍遍重试，十分钟一次足够自愈，又不会把 R2 打成筛子。
-       ⚠ 2026-08-21 起 `_query` **不再**每次触发这里（那是写爆 DO 额度的口子，见 query 分支），
-         只剩三个入口：每日定时器、冷启动兜底（表空）、以及带口令的手动 force。 */
+       2026-10-01 起：只保留每日工作流、空库初始化和明确授权的管理口令 force。
+       queuedDay 写入持久存储，重新部署、多个 isolate 或重复请求都不能重置次数。 */
     const _n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
     const _err = this._get("err");
+    if (!force && _n > 0 && !_err && st && st === this._get("stamp")) return { ok: true, why: "fresh" };
+    const day = this._dayKey();
+    const built = this._get("built");
+    if (!force && (this._get("queuedDay") === day || (built && this._dayKey(built) === day))) {
+      return { ok: true, why: "daily_limit", day, timezone: "Asia/Shanghai", scheduledLocal: "23:20" };
+    }
     if (_err) {
       const at = parseInt(this._get("errAt") || "0", 10) || 0;
       if (Date.now() - at < 600000) return { ok: false, why: "上一趟失败，等退避窗过去再重试", err: _err };
     }
-    if (!force && _n > 0 && !_err && st && st === this._get("stamp")) return { ok: true, why: "fresh" };
     if (_err) this._set("errAt", String(Date.now()));
     // 任务清单：先 manifest（它给出版块名单），再逐个 kw 分片，最后坐标。分片跑，一次 alarm 一件。
     this._set("newstamp", st);
+    this._set("queuedDay", day);
     this._set("pending", JSON.stringify(["man"]));
     this._set("err", "");
     await this.ctx.storage.setAlarm(Date.now() + 50);
@@ -5308,16 +5312,7 @@ function _scoreKeys(list, baseKeys, exp, prev) {
    IndexMemory 是**一个**全站单例（idFromName("global")）：倒排表只建一份，所有请求共用。
    失败一律吞掉并回 null —— 长期记忆不可用时必须能退回旧路，宁可慢一点、宁可多占一点堆，
    也不要整站问不出话。走 _do() ⇒ 连绑定脱开都只是回 null，不抛。 */
-/* 倒排表落后于 R2 索引时，催它重建一次。**节流 15 分钟**——_ensure 自己是分片跑的
-   （一次 alarm 一件），但重复叫它开工既费 DO 写入额度也没有意义。
-   不 await：这一趟问答该走的是退路，不该等重建。失败一概吞掉（检索不能因为它红）。 */
-let IDX_HEAL_AT = 0;
-function idxHeal(env) {
-  const now = Date.now();
-  if (now - IDX_HEAL_AT < 900000) return;
-  IDX_HEAL_AT = now;
-  try { const p = idxAsk(env, { op: "ensure" }); if (p && p.catch) p.catch(() => {}); } catch (e) {}
-}
+// 2026-10-01：索引过期时只走同源的 R2 检索退路，不由访客请求触发全量重建。
 async function idxAsk(env, body) {
   try {
     const ns = _do(env, "IDXMEM");
@@ -5361,7 +5356,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
       const doSt = String((lt && lt.stamp) || "");
       if (r2st && doSt && r2st !== doSt) {
         idxOk = false;
-        idxHeal(env);        // 顺手催它追上去；节流在函数里，不会每问一次就重建一遍
+        // 等待每日工作流同步；本次使用下方 R2 同源检索，避免编号错配。
       }
     }
     if (idxOk) {
@@ -11588,15 +11583,7 @@ export default {
     if (env) { IM_ENV = env; if (env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
     const r = await wxSweep(env, Date.now());
     console.log("[wx-lib-sweep]", JSON.stringify(r));
-    /* 【每日一次的索引重建 —— 2026-08-21 用户令】
-       从前它挂在「每次检索」上，一天推八次站就重建八次，每次 29 万行，把 DO 额度写爆
-       （详见 IndexMemory 的 query 分支那段）。现在整条日常重建路只剩这一趟。
-       · 用 `op:"ensure"` 而**不是** force：它仍是指纹复验式的——源头没变就什么都不做，
-         所以这一趟本身是幂等的、廉价的，多跑一次也不会多写一行。
-       · 排队即返回（真正的活在 DO 自己的 alarm 里分片跑），不占这次定时任务的时间。
-       · 失败不抛：idxAsk 内部吞掉并回 null，定时任务不能因为它而整个红掉。 */
-    const ir = await idxAsk(env, { op: "ensure" });
-    console.log("[idx-daily]", JSON.stringify(ir));
+    // 索引同步已统一交给每日 23:20 的 GitHub 工作流；本 cron 只清理微信库。
   },
   async fetch(request, env, ctx) {
     if (new URL(request.url).pathname === "/api/chatprimary") {
@@ -18442,4 +18429,3 @@ export default {
     return resp;
   },
 };
-
