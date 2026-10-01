@@ -15,12 +15,20 @@ jobs:
     steps:
       - name: Receive authorized complete publication package
         env:
-          PAYLOAD_URL: 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-df70-81fa-894d-ad3d3cfff794/raw?se=2026-10-01T13%3A08%3A54Z&sp=r&sv=2026-02-06&sr=b&scid=375af5a4-853f-5d81-bab5-f68845f1b3f2&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T13%3A03%3A49Z&ske=2026-10-02T13%3A03%3A49Z&sks=b&skv=2026-02-06&sig=bCy7lhsYa0sVSChshZL/Pz2DPZrc9V2MjIXdOWnngMQ%3D'
+          PAYLOAD_URL: 'https://sdmntprwestus3.oaiusercontent.com/files/00000000-c8e4-81fd-976c-6aa0d813f260/raw?se=2026-10-01T13%3A14%3A32Z&sp=r&sv=2026-02-06&sr=b&scid=f9b5877e-90c9-5104-93c2-26f057699d87&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T12%3A57%3A32Z&ske=2026-10-02T12%3A57%3A32Z&sks=b&skv=2026-02-06&sig=x3s7pz1bI5CZvPEeDaRPIMskZS%2BZBe9ZSRIo87TLGgI%3D'
           PAYLOAD_SHA: '2780433694d5dd0f148758d3943c08761c15efa46f28a9ea24323b1f84264f40'
         run: |
           python - <<'PY'
-          import os,urllib.request,hashlib,zipfile,io,pathlib
-          root=pathlib.Path(os.environ['RUNNER_TEMP']);data=urllib.request.urlopen(os.environ['PAYLOAD_URL'],timeout=120).read()
+          import os,urllib.request,urllib.error,hashlib,zipfile,io,pathlib,time
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])
+          for attempt in range(3):
+            try:
+              req=urllib.request.Request(os.environ['PAYLOAD_URL'],headers={'User-Agent':'Mozilla/5.0 SDE-Publication/1.0'})
+              data=urllib.request.urlopen(req,timeout=120).read();break
+            except urllib.error.HTTPError as e:
+              print('Publication download failed:',e.code,e.read(2000).decode('utf-8','replace'))
+              if attempt==2:raise
+              time.sleep(3)
           assert hashlib.sha256(data).hexdigest()==os.environ['PAYLOAD_SHA']
           (root/'publication.zip').write_bytes(data)
           dest=root/'education-payload';dest.mkdir()
