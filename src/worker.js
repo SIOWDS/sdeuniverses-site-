@@ -1090,10 +1090,11 @@ function johnComposeSys(kind, part, N, per, prevTail, ctx) {
    后果不是报错，是**出处栏里混进一篇读者当场看得出不相干的文章**：
    线上实测问「什么是语感」，回来的六段里有《蚀先于生：为什么形态的耗散比生成更原始》。
    题域闸挡得住**答什么**，挡不住**取什么料**——闸在提示语层，取料在检索层，是两道。
-   ⇒ 白名单收到语言站自己那份选目上：十二篇 ＋ 两个频道页 ＋ 四部专著 ＋ 站上其余语言篇目。
+   ⇒ 白名单收到语言站自己那份选目上：十二篇 ＋ 两个频道页 ＋ 他名下全部专著 ＋ 站上其余语言篇目与语言类专著。
    ⚠ 他若发了新的语言篇，**两处一起加**：这里，与 public/sites/lang/all/index.html。
      漏一处的表现是「站上读得到、John 引不到」，没人会当场发现——
-     所以 `node tools/sim_lang_scope.js` 把两处逐条对账，改这张表必跑它。
+     所以 `node tools/sim_lang_scope.js` 把两处逐条对账，改这张表必跑它
+     （它另查一件：书目里署名胡志英的每一部专著都必须在这张表上）。
    ⚠ 只有一种写法：**网址前缀，且每条带结尾斜杠**。它要同时喂 SQLite 的 `u LIKE %前缀%`
      与 JS 的 substring；少了斜杠，/books/m/62/ 会把 /books/m/620/ 一起收进来。
    为什么用前缀而不用版块（section）：语言这条线横跨 students／confluence／column／
@@ -1117,12 +1118,28 @@ const LANG_PRE = [
   // 两个频道页（含落选理由与分工地图，答「这一栏还有什么」时用得上）
   "/students/hu-zhiying/language-sense/",
   "/students/hu-zhiying/grammar-talk/",
-  // 四部专著：正文在 /books/m/，学员栏那四张是它们的落地页
+  // 他的专著：正文在 /books/m/，学员栏那几张是它们的落地页
+  //   2026-10-01 补收 105／108／183：三部都在 9 月出版，一个多月没进白名单——
+  //   全站索引里有，ChatJohn 一个字也取不到。tools/sim_lang_scope.js 从此按书目对账。
   "/books/m/60/", "/books/m/62/", "/books/m/71/", "/books/m/77/",
+  "/books/m/105/", "/books/m/108/", "/books/m/183/",
   "/students/hu-zhiying/wisdom-of-language/",
   "/students/hu-zhiying/one-flower-one-world/",
   "/students/hu-zhiying/unity-of-knowing-and-acting/",
   "/students/hu-zhiying/the-ledger-of-acquisition/",
+  "/students/hu-zhiying/next-step-counts/",
+  // 与王德生合著的奠基书（含 articles/ 下三篇）
+  "/books/m/41/",
+  // 别人写的语言类专著（2026-10-01 收入）：语言教学、翻译，与语言哲学六卷——
+  // 同一题域，也是他要划界的对手。正文都在 /books/m/<号>/text/ 或同目录 PDF。
+  "/books/m/119/",   // 英语教学的智慧（张丹丹）
+  "/books/m/151/",   // 翻译信达雅三大原理（宋欣雄、王德生）
+  "/books/m/64/",    // 普通人都能懂的维特根斯坦
+  "/books/m/133/",   // 普通人都能懂的皮尔斯
+  "/books/m/141/",   // 普通人都能明白的弗雷格
+  "/books/m/142/",   // 普通人都能明白的塞尔
+  "/books/m/167/",   // 普通人都能懂的奎因
+  "/books/m/203/",   // 普通人都能明白的布兰顿
   // 站上其余语言篇目（别人写的，但在同一题域里，且是他必须划界的对手）
   "/column/pike-linguistics/",
   "/confluence/evidence-responsibility-alignment/",
@@ -1134,7 +1151,7 @@ const LANG_PRE = [
   "/paradigm/civil-war-scar/",
   "/paradigm/who-gets-to-settle/",
 ];
-/* 「与 John 对话」的站内取料。语言站的语料＝胡志英全部作品 ＋ 站上其余语言篇目 ＋ 他的四部专著。
+/* 「与 John 对话」的站内取料。语言站的语料＝胡志英全部作品 ＋ 站上其余语言篇目 ＋ 他名下全部专著 ＋ 站上其余语言类专著。
    为什么用白名单而不用 scope：scope 只能限定 manifest 里的**版块**（如 frontier），
    而语言这条线横跨 students / confluence / column / paradigm / books 五个版块，没有自己的版块 key。
    取不到料不算错——退化成「只凭底本作答」；绝不能让检索失败把整场对话拖挂，故整体 try/catch 吞掉。 */
@@ -7608,7 +7625,7 @@ const LANG_PLATFORM_BLOCK = "\n\n════ 你所在的地方：语言分站�
   + "\n\n──【站里有什么】──"
   + "\n· **分站首页** https://lang.sdeuniverses.com/ ——语言这条线的入口。"
   + "\n· **全部篇目** https://lang.sdeuniverses.com/all/ ——要清点、要找某一篇，让读者去这里；**你手上没有全站名册**，凡是数数与排名的问题一律直说数不了。"
-  + "\n· 胡志英的文章与他的四部专著；站上其余谈语言的篇目（语言习得、语感、语法、写作、修辞这几路）。"
+  + "\n· 胡志英的文章与他名下的专著；站上其余谈语言的篇目（语言习得、语感、语法、写作、修辞这几路），以及别人写的语言类专著（英语教学、翻译，与维特根斯坦、皮尔斯、弗雷格、塞尔、奎因、布兰顿几卷语言哲学）。"
   + "\n· 每一轮我可能会给你几段这些篇目的原文（标着编号并附网址）——那才是你能指名引用的全部；**名录与材料之外的篇名、网址、分数一律不许编**。"
   + "\n\n──【你手上的工序】──"
   + "\n读者可以在输入框直接敲斜杠命令，也可以从「⊞ 语言工序」菜单里选。每道工序是一次性的：这一轮走它，下一轮不走。"
@@ -16511,7 +16528,7 @@ export default {
               /* 2026-08-22：这道闸原来只对语言档开（`prof.id === "lang"`），于是**主站 ChatSDE 的两万字论文
                  一趟也没取过站内料**——而站内同题划界正是那两份真跑（121.8 / 132.7）失分最集中的地方之一。
                  现在两条路都通，按档案分流取料源，不是把语言白名单让给别人：
-                   · 语言档 → johnRag（JOHN_SCOPE 白名单：胡志英全部作品＋站上语言篇目＋四部专著）
+                   · 语言档 → johnRag（JOHN_SCOPE 白名单：胡志英全部作品＋站上语言篇目＋语言类专著）
                    · 其余档 → wdsRag（主站全站检索，与答题那一路同一个 /api/wds/rag 子请求）
                  ⚠ 白名单绝不许被继承：别的档拿到语言白名单＝检索范围张冠李戴。
                  取料失败一律退化成「只凭对话与底本写」，绝不能让检索把整节拖挂。 */
