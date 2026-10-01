@@ -1,0 +1,32 @@
+name: Book 295 pinned reader assets
+on:
+  push:
+    branches: ['publish/book-295-20261002']
+    paths: ['.github/workflows/book295-vendor-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify and extract PDF.js distribution
+        run: |
+          python - <<'PY'
+          import urllib.request,json,tarfile,io,pathlib,base64,hashlib
+          v='6.3.289'
+          meta=json.load(urllib.request.urlopen('https://registry.npmjs.org/pdfjs-dist/'+v,timeout=30))
+          data=urllib.request.urlopen(meta['dist']['tarball'],timeout=90).read()
+          assert 'sha512-'+base64.b64encode(hashlib.sha512(data).digest()).decode()==meta['dist']['integrity']
+          out=pathlib.Path('vendor');out.mkdir()
+          wanted={'package/build/pdf.min.mjs':'pdf.min.mjs','package/build/pdf.worker.min.mjs':'pdf.worker.min.mjs','package/LICENSE':'LICENSE.txt'}
+          with tarfile.open(fileobj=io.BytesIO(data),mode='r:gz') as t:
+              for src,dest in wanted.items():(out/dest).write_bytes(t.extractfile(src).read())
+          (out/'version.json').write_text(json.dumps({'version':v,'npm_integrity':meta['dist']['integrity'],'files':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in out.iterdir()}},indent=2))
+          print('Verified reader distribution',v)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book295-pdfjs-6.3.289
+          path: vendor/
+          retention-days: 7
