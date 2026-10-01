@@ -12,19 +12,25 @@ jobs:
     steps:
       - name: Import the authorized book payload and verify its exact hash
         env:
-          BOOK_URL: 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-20a8-81fa-9c25-40572c736dc2/raw?se=2026-10-01T22%3A27%3A12Z&sp=r&sv=2026-02-06&sr=b&scid=fe4674be-8879-521e-ab6f-a6466c7f28fb&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T20%3A43%3A37Z&ske=2026-10-02T20%3A43%3A37Z&sks=b&skv=2026-02-06&sig=SX/YcjzmU2tOPHhPemJjtXoxADef76bUmEIIxRPFWVU%3D'
+          BOOK_URL: 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-dd1c-81fa-8470-517d14d250ae/raw?se=2026-10-01T22%3A29%3A33Z&sp=r&sv=2026-02-06&sr=b&scid=fadf0412-2806-58bc-86e6-f01053f3d727&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-01T20%3A48%3A22Z&ske=2026-10-02T20%3A48%3A22Z&sks=b&skv=2026-02-06&sig=tEGHb/Ohy8kQTZGZiufKoJPiGnoIcdX7Oo4AZhgoQBQ%3D'
         run: |
           python - <<'PY'
-          import os,urllib.request,pathlib,hashlib,zipfile
+          import os,urllib.request,urllib.error,pathlib,hashlib,zipfile
           u=os.environ['BOOK_URL'];print('::add-mask::'+u)
-          data=urllib.request.urlopen(u,timeout=90).read()
+          try:
+              req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0','Accept':'application/zip,application/octet-stream,*/*'})
+              data=urllib.request.urlopen(req,timeout=90).read()
+          except urllib.error.HTTPError as e:
+              print('Transfer failed:',e.code,e.reason)
+              print(e.read(1500).decode(errors='replace').replace(u,'[authorized book URL]'))
+              raise SystemExit(1)
           assert hashlib.sha256(data).hexdigest()=='3b24485d06b8a68067b53b7d56a8a98f847c05a0084cef343cdbd11c2420b320'
           root=pathlib.Path(os.environ['RUNNER_TEMP']);z=root/'book295-package.zip';z.write_bytes(data)
           out=root/'book295';out.mkdir()
           with zipfile.ZipFile(z) as archive:
               for n in archive.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
               archive.extractall(out)
-          print('Payload hash verified. Only the authorized book assets are included.')
+          print('Payload hash verified.')
           PY
       - uses: actions/upload-artifact@v4
         with:
