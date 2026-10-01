@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>语言浏览 · 语言发生学 · 胡志英</title>
+<meta name="description" content="关于语言的新思想生产平台：语感、语法、语言教学与习得。胡志英主持，SDE Universes 子平台。一部专著与十二篇长论文，创新智商 135–143。">
+<link rel="canonical" href="https://lang.sdeuniverses.com/site/">
+<meta property="og:title" content="语言发生学 · 胡志英">
+<meta property="og:description" content="一句话，怎样在两个人之间活起来？从形式、用法与场合重新发现语言。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#050A12">
+<style>
+:root{
+  --night:#0B0E14; --night2:#121722; --bone:#E8E4DA; --bone2:#8E94A3;
+  --edge:rgba(232,228,218,.16);
+  --paper:#F2F1ED; --card:#FBFAF7; --ink:#171A22; --ink2:#5C6272; --line:#CBCCD4;
+  --indigo:#1F3A5F; --indigo-l:#6E9BD8; --vermilion:#A63A2B; --vermilion-l:#D2604A;
+  --jade:#6FA98C;
+  --serif:"Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.75}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+
+/* ══ 深色门面 ══ */
+.dark{background:var(--night);color:var(--bone);position:relative;overflow:hidden}
+.dark::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(58% 42% at 12% 0%,rgba(110,155,216,.13),transparent 70%),
+    radial-gradient(46% 40% at 92% 22%,rgba(210,96,74,.10),transparent 72%),
+    radial-gradient(70% 50% at 50% 100%,rgba(111,169,140,.07),transparent 70%)}
+.dark::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(90deg,rgba(232,228,218,.05) 1px,transparent 1px);
+  background-size:34px 100%}
+.dark .wrap{position:relative;z-index:1}
+
+.top{border-bottom:1px solid var(--edge);position:sticky;top:0;z-index:30;
+  background:rgba(11,14,20,.86);backdrop-filter:saturate(140%) blur(8px)}
+.top .wrap{display:flex;align-items:baseline;gap:18px;height:58px}
+.brand{font-family:var(--serif);font-size:19.5px;letter-spacing:.14em;color:var(--bone)}
+.brand em{font-style:normal;color:var(--bone2);font-size:11.5px;letter-spacing:.26em;margin-left:10px}
+.top nav{margin-left:auto;display:flex;gap:19px;font-size:13.5px;color:var(--bone2)}
+.top nav a:hover{color:var(--indigo-l)}
+.top nav a.out{font-family:var(--mono);font-size:11.5px}
+
+.hero{padding:76px 0 64px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--indigo-l);text-transform:uppercase}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(31px,6vw,58px);line-height:1.24;
+  letter-spacing:.02em;margin:.52em 0 .4em;max-width:14em;color:#F4F2EC}
+h1 .hl{color:var(--vermilion-l)}
+.lede{max-width:37em;color:#B9BECB;font-size:16.5px}
+.lede b{color:var(--bone);font-weight:600}
+
+/* 签名件：校对单 */
+.proof{margin:42px 0 0;background:var(--night2);border:1px solid var(--edge);
+  max-width:720px;position:relative}
+.proof .cap{display:flex;justify-content:space-between;align-items:baseline;
+  padding:13px 20px;border-bottom:1px solid rgba(232,228,218,.3);
+  font-family:var(--serif);letter-spacing:.22em;font-size:14.5px}
+.proof .cap span{font-family:var(--mono);font-size:11px;color:var(--bone2);letter-spacing:.08em}
+.sent{padding:24px 20px 20px;border-bottom:1px solid var(--edge)}
+.sent q{font-family:var(--serif);font-size:clamp(19px,3.6vw,27px);letter-spacing:.06em;
+  quotes:"「" "」";color:#F4F2EC;line-height:1.6}
+.sent .mk{display:block;margin-top:10px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.16em;color:var(--bone2)}
+table.chk{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px}
+table.chk th{text-align:left;font-weight:400;color:var(--bone2);font-size:10.5px;letter-spacing:.16em;
+  padding:9px 20px;border-bottom:1px solid var(--edge)}
+table.chk td{padding:9px 20px;border-bottom:1px solid rgba(232,228,218,.07);white-space:nowrap;color:#C8CCD6}
+table.chk td:first-child{font-family:var(--sans);font-size:13.5px;white-space:normal;color:var(--bone)}
+table.chk td.j{color:var(--jade)}
+table.chk td.j::before{content:"✓ ";font-size:11px}
+table.chk tr.miss td{border-bottom:none;color:var(--vermilion-l);padding-top:18px;padding-bottom:20px}
+table.chk tr.miss td:first-child{font-family:var(--serif);font-size:18px;letter-spacing:.2em;color:var(--vermilion-l)}
+.stamp{display:inline-block;border:1.5px solid var(--vermilion-l);color:var(--vermilion-l);
+  padding:3px 10px;font-size:11.5px;letter-spacing:.2em;transform:rotate(-4deg);
+  animation:drop .45s cubic-bezier(.2,1.5,.4,1) .95s both}
+@keyframes drop{from{opacity:0;transform:rotate(-16deg) scale(1.7)}to{opacity:1;transform:rotate(-4deg) scale(1)}}
+.proof tbody tr{opacity:0;animation:rise .5s ease forwards}
+@keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.pnote{margin:16px 2px 0;max-width:44em;font-size:13px;color:var(--bone2);font-family:var(--mono);line-height:1.85}
+.pnote b{color:var(--bone)}
+@media (prefers-reduced-motion:reduce){.proof tbody tr{opacity:1;animation:none}.stamp{animation:none}}
+
+/* 三入口 */
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:16px;margin:52px 0 0}
+.gate{display:block;padding:20px 20px 18px;border:1px solid var(--edge);
+  background:rgba(255,255,255,.028);border-left-width:3px;border-left-style:solid}
+.gate.g1{border-left-color:var(--indigo-l)}
+.gate.g2{border-left-color:var(--vermilion-l)}
+.gate.g3{border-left-color:var(--jade)}
+a.gate:hover{background:rgba(255,255,255,.06)}
+.gate b{display:block;font-family:var(--serif);font-size:17.5px;letter-spacing:.1em;font-weight:600;color:#F4F2EC}
+.gate span{display:block;font-size:12.5px;color:var(--bone2);margin-top:6px;line-height:1.65}
+.gate .soon{display:inline-block;margin-top:11px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.2em;color:var(--bone2);border:1px solid var(--edge);padding:1px 7px}
+.gate.wait{opacity:.72}
+
+.band{display:flex;flex-wrap:wrap;gap:36px;border-top:1px solid var(--edge);
+  padding:20px 0 0;margin:48px 0 0}
+.band div{font-family:var(--mono);font-size:11.5px;color:var(--bone2);letter-spacing:.12em}
+.band b{display:block;font-size:25px;color:var(--bone);font-weight:500;font-variant-numeric:tabular-nums;margin-bottom:2px}
+
+/* ══ 纸色阅读面 ══ */
+.light{background:var(--paper);
+  background-image:linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:34px 100%;background-position:-1px 0}
+.light>.wrap{background:linear-gradient(var(--paper),var(--paper));box-shadow:0 0 0 22px var(--paper)}
+section{padding:56px 0 8px}
+.col-h{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:9px}
+.col-h .no{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--indigo)}
+.col-h h2{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.08em;margin:0}
+.col-h .ct{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.col-d{color:var(--ink2);font-size:14.5px;margin:12px 0 4px}
+
+/* 主持人 */
+.host{display:grid;grid-template-columns:184px 1fr;gap:28px;align-items:start;margin-top:26px}
+.host img{width:100%;border:1px solid var(--line);display:block;filter:saturate(.92)}
+.host .hb p{margin:0 0 13px;font-size:15px}
+.host .hb p:last-child{margin-bottom:0}
+.host .hb .nm{font-family:var(--serif);font-size:23px;letter-spacing:.1em;font-weight:600;margin:0 0 4px}
+.host .hb .nm em{font-style:normal;font-size:12.5px;color:var(--ink2);letter-spacing:.16em;margin-left:10px}
+.host a{color:var(--indigo);border-bottom:1px solid var(--line)}
+@media(max-width:640px){.host{grid-template-columns:1fr}.host img{max-width:200px}}
+
+.row{display:flex;gap:14px;align-items:baseline;padding:11px 4px;border-bottom:1px dashed var(--line)}
+.row:hover{background:var(--card)}
+.row:hover .r-t{color:var(--indigo)}
+.r-n{font-family:var(--mono);font-size:11.5px;color:var(--ink2);min-width:2.4em;
+  font-variant-numeric:tabular-nums;flex:none}
+.r-t{font-size:15px;line-height:1.6}
+.r-h{font-family:var(--serif);font-weight:600;letter-spacing:.06em;margin-right:.55em}
+.r-h::after{content:"·";margin-left:.55em;color:var(--line);font-weight:400}
+.iq{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+  font-variant-numeric:tabular-nums;padding-left:12px}
+.cnt{margin-left:auto;flex:none;font-family:var(--mono);font-size:11.5px;color:var(--ink2);
+  font-variant-numeric:tabular-nums;padding-left:12px;white-space:nowrap}
+.cnt b{font-weight:500;color:var(--indigo)}
+.more{display:inline-block;margin:16px 0 0;font-family:var(--mono);font-size:12.5px;color:var(--indigo);
+  border-bottom:1px solid var(--indigo);padding-bottom:2px}
+
+.books{display:grid;grid-template-columns:repeat(auto-fit,minmax(206px,1fr));gap:20px;margin-top:26px}
+.bk{background:var(--card);border:1px solid var(--line);padding:0 0 18px;display:flex;flex-direction:column}
+.bk.lead{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(31,58,95,.07)}
+.bk img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;border-bottom:1px solid var(--line);background:#E6E7EC}
+.bk .no{font-family:var(--mono);font-size:10.5px;color:var(--vermilion);letter-spacing:.16em;margin:14px 16px 0}
+.bk h3{font-family:var(--serif);font-size:19px;letter-spacing:.08em;margin:6px 16px 2px;font-weight:600}
+.bk .sub{font-size:12.5px;color:var(--ink2);margin:0 16px 10px}
+.bk p{font-size:13.5px;color:var(--ink2);margin:0 16px 12px;line-height:1.7}
+.bk .lk{margin:auto 16px 0;display:flex;gap:13px;font-family:var(--mono);font-size:11.5px;flex-wrap:wrap}
+.bk .lk a{color:var(--indigo);border-bottom:1px solid var(--line);padding-bottom:2px}
+.bk .lk a:hover{border-color:var(--indigo)}
+
+.plat{background:var(--card);border:1px solid var(--line);padding:28px 26px;margin-top:24px}
+.plat p{margin:0 0 14px;font-size:15px}
+.plat p:last-child{margin-bottom:0}
+.plat a{color:var(--indigo);border-bottom:1px solid var(--line)}
+.tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin:24px 0 0}
+.tk{border:1px solid var(--line);background:var(--card);padding:18px 18px 16px}
+.tk .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--indigo)}
+.tk h3{font-family:var(--serif);font-size:17.5px;letter-spacing:.08em;margin:7px 0 6px;font-weight:600}
+.tk p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.7}
+
+footer{background:var(--night);color:var(--bone2);margin-top:64px;
+  border-top:1px solid var(--edge);padding:30px 0 62px;font-size:13px}
+footer a{color:#A9B6CB;border-bottom:1px solid var(--edge)}
+footer p{margin:0 0 8px}
+a:focus-visible{outline:2px solid var(--indigo-l);outline-offset:3px}
+@media(max-width:640px){
+  .hero{padding:46px 0 40px}
+  table.chk td,table.chk th{padding-left:13px;padding-right:13px}
+  table.chk td.ref,table.chk th.ref{display:none}
+  .band{gap:24px}
+  .iq,.cnt{display:none}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   2026-08-23 · 语言星河 / 话语发生场
+   系列语言继承主站“暗场＋发光节点”，以形式—用法—场合构成语言自己的发生图。
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --void:#050A12;--void2:#0A1422;--cyan:#58D5E8;--coral:#FF776B;
+  --lime:#AADB8D;--violet:#B49CFF;--gold:#FFD37A;--white:#F8F6EF;
+}
+body{overflow-x:hidden;background:#EAECEF}
+.wrap{max-width:1120px;padding-left:30px;padding-right:30px}
+.dark{
+  background:
+    radial-gradient(circle at 12% 18%,rgba(88,213,232,.11),transparent 30rem),
+    radial-gradient(circle at 88% 30%,rgba(255,119,107,.10),transparent 28rem),
+    radial-gradient(circle at 54% 83%,rgba(180,156,255,.09),transparent 30rem),
+    linear-gradient(145deg,#040913 0,#07131F 52%,#100B19 100%)
+}
+.dark::before{
+  background:
+    radial-gradient(circle at 7% 12%,rgba(88,213,232,.75) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 19% 34%,rgba(255,211,122,.65) 0 1px,transparent 2.5px),
+    radial-gradient(circle at 32% 9%,rgba(180,156,255,.75) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 48% 44%,rgba(170,219,141,.55) 0 1px,transparent 2.5px),
+    radial-gradient(circle at 67% 15%,rgba(88,213,232,.65) 0 1px,transparent 2.5px),
+    radial-gradient(circle at 82% 50%,rgba(255,119,107,.65) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 94% 24%,rgba(255,211,122,.55) 0 1px,transparent 2.5px)
+}
+.dark::after{
+  opacity:.28;
+  background-image:
+    linear-gradient(rgba(88,213,232,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(88,213,232,.07) 1px,transparent 1px);
+  background-size:54px 54px
+}
+.top{
+  border-bottom:1px solid rgba(88,213,232,.16);
+  background:rgba(4,9,19,.88);backdrop-filter:saturate(150%) blur(14px);
+  box-shadow:0 8px 28px rgba(0,0,0,.2)
+}
+.top .wrap{height:62px}.brand{color:#F7F5EE}.brand em{color:rgba(88,213,232,.62)}
+.top nav{gap:21px;white-space:nowrap}
+.top nav a{color:rgba(248,246,239,.62);position:relative;transition:color .25s ease}
+.top nav a:after{content:"";position:absolute;left:50%;right:50%;bottom:-9px;height:1px;
+  background:linear-gradient(90deg,var(--cyan),var(--coral));transition:left .25s ease,right .25s ease}
+.top nav a:hover{color:#fff}.top nav a:hover:after{left:0;right:0}
+.top nav a.out{color:var(--gold)}
+.hero{padding:20px 0 68px}
+.genesis-hero{
+  min-height:calc(100svh - 82px);display:grid;grid-template-columns:minmax(0,1.03fr) minmax(390px,.97fr);
+  gap:34px;align-items:center;padding:64px 0 52px;position:relative
+}
+.genesis-copy{position:relative;z-index:3}
+.genesis-copy .eyebrow{display:inline-flex;align-items:center;gap:12px;color:var(--cyan)}
+.genesis-copy .eyebrow:before{content:"";width:34px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+.genesis-copy h1{max-width:none;margin:20px 0 20px;letter-spacing:.02em;font-weight:500;
+  font-size:clamp(39px,5.6vw,67px);line-height:1.16;color:#F8F6EF}
+.genesis-copy h1 .name{display:block;font-family:var(--mono);font-size:13px;letter-spacing:.34em;
+  color:rgba(248,246,239,.45);margin-bottom:22px}
+.genesis-copy h1 em{font-style:normal;color:var(--coral);
+  text-shadow:0 0 35px rgba(255,119,107,.18)}
+.genesis-copy .lede{font-size:16px;line-height:1.95;color:rgba(248,246,239,.68);max-width:39em}
+.genesis-copy .lede b{color:#F8F6EF}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:27px}
+.hero-actions a{font-size:13px;letter-spacing:.05em;padding:11px 20px;border-radius:999px;
+  border:1px solid rgba(248,246,239,.18);color:#F8F6EF;background:rgba(255,255,255,.035);
+  backdrop-filter:blur(8px);transition:.25s ease}
+.hero-actions a.primary{color:#06131A;background:linear-gradient(135deg,#73E0EC,#56C4D8);
+  border-color:transparent;box-shadow:0 10px 32px rgba(88,213,232,.22)}
+.hero-actions a:hover{transform:translateY(-3px);border-color:rgba(88,213,232,.5);
+  box-shadow:0 12px 30px rgba(0,0,0,.24)}
+.genesis-map{aspect-ratio:1/1;position:relative;z-index:2;max-width:520px;width:100%;margin:auto}
+.genesis-map:before{content:"";position:absolute;inset:9%;border-radius:50%;
+  background:radial-gradient(circle,rgba(88,213,232,.11),rgba(180,156,255,.045) 44%,transparent 70%);
+  filter:blur(4px)}
+.map-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.map-lines .orbit{fill:none;stroke:rgba(88,213,232,.18);stroke-width:1}
+.map-lines .tri{fill:none;stroke:url(#langFlow);stroke-width:2;stroke-dasharray:8 12;
+  animation:flow 10s linear infinite}
+.map-lines .wave{fill:none;stroke:rgba(255,211,122,.42);stroke-width:1.5;stroke-dasharray:4 8;
+  animation:flow 7s linear reverse infinite}
+.map-lines text{fill:rgba(248,246,239,.40);font:14px var(--mono);letter-spacing:.08em}
+@keyframes flow{to{stroke-dashoffset:-120}}
+.lang-node{
+  position:absolute;width:118px;height:118px;border-radius:50%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:#F8F6EF;border:1px solid var(--node);
+  background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--node) 30%,transparent),rgba(5,10,18,.86) 68%);
+  box-shadow:0 0 42px color-mix(in srgb,var(--node) 20%,transparent),inset 0 0 24px rgba(255,255,255,.025);
+  backdrop-filter:blur(8px)
+}
+.lang-node b{font-family:var(--serif);font-size:22px;letter-spacing:.18em;font-weight:500}
+.lang-node small{font-family:var(--mono);font-size:9px;letter-spacing:.24em;color:rgba(248,246,239,.47);margin-top:5px}
+.lang-node.form{--node:var(--cyan);left:50%;top:2%;transform:translateX(-50%)}
+.lang-node.use{--node:var(--coral);left:4%;bottom:7%}
+.lang-node.scene{--node:var(--violet);right:4%;bottom:7%}
+.utterance{
+  position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);width:190px;min-height:108px;
+  border-radius:26px;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:17px;
+  color:#F8F6EF;border:1px solid rgba(255,211,122,.35);
+  background:rgba(8,16,26,.82);box-shadow:0 0 46px rgba(255,211,122,.12);
+  backdrop-filter:blur(14px)
+}
+.utterance:before,.utterance:after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 16px var(--gold);top:50%;transform:translateY(-50%)}
+.utterance:before{left:-5px}.utterance:after{right:-5px}
+.utterance b{font-family:var(--serif);font-size:25px;letter-spacing:.08em;font-weight:500}
+.utterance span{font-size:10.5px;color:rgba(248,246,239,.48);margin-top:7px;letter-spacing:.08em}
+.token{position:absolute;font-family:var(--mono);font-size:11px;color:rgba(248,246,239,.42);
+  animation:float-token 5s ease-in-out infinite}
+.token.t1{left:12%;top:25%;color:rgba(88,213,232,.7)}
+.token.t2{right:9%;top:29%;color:rgba(255,119,107,.7);animation-delay:-1.2s}
+.token.t3{left:40%;bottom:4%;color:rgba(170,219,141,.7);animation-delay:-2.5s}
+.token.t4{right:23%;bottom:36%;color:rgba(180,156,255,.7);animation-delay:-3.2s}
+@keyframes float-token{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-9px);opacity:.9}}
+.genesis-ribbon{
+  margin:-28px auto 0;max-width:830px;text-align:center;font-family:var(--serif);font-size:18px;
+  line-height:1.9;color:rgba(248,246,239,.70);position:relative;padding:17px 28px;
+  border-top:1px solid rgba(88,213,232,.18);border-bottom:1px solid rgba(180,156,255,.16)
+}
+.genesis-ribbon b{font-weight:500;color:var(--gold)}
+/* 校对单由首屏退至第二层，成为“规则不能解释一切”的证据 */
+.proof{
+  max-width:900px;margin:58px auto 0;border-radius:26px;overflow:hidden;
+  border:1px solid rgba(88,213,232,.18);
+  background:
+    radial-gradient(circle at 0 0,rgba(88,213,232,.08),transparent 18rem),
+    radial-gradient(circle at 100% 100%,rgba(255,119,107,.07),transparent 18rem),
+    rgba(10,20,34,.82);
+  box-shadow:0 24px 58px rgba(0,0,0,.2)
+}
+.proof .cap{border-bottom-color:rgba(88,213,232,.19);padding:16px 24px}
+.sent{padding:26px 24px 22px}.sent q{color:#F8F6EF}
+table.chk th,table.chk td{padding-left:24px;padding-right:24px}
+table.chk td.j{color:var(--lime)}
+.pnote{max-width:900px;margin:16px auto 0;text-align:center;color:rgba(248,246,239,.48)}
+.pnote b{color:rgba(248,246,239,.82)}
+.three{gap:16px;margin-top:44px}
+.gate{
+  min-height:152px;border:1px solid rgba(248,246,239,.11);border-left:1px solid rgba(248,246,239,.11);
+  border-radius:22px;padding:23px;position:relative;overflow:hidden;
+  background:rgba(255,255,255,.035);transition:.26s ease
+}
+.gate:before{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-75px;top:-75px;
+  background:var(--gate);opacity:.16;filter:blur(6px)}
+.gate.g1{--gate:var(--violet)}.gate.g2{--gate:var(--cyan)}.gate.g3{--gate:var(--lime)}
+.gate.g1,.gate.g2,.gate.g3{border-left-color:rgba(248,246,239,.11)}
+a.gate:hover{background:rgba(255,255,255,.065);transform:translateY(-5px);
+  border-color:color-mix(in srgb,var(--gate) 48%,transparent);box-shadow:0 16px 36px rgba(0,0,0,.17)}
+.gate b{font-size:19px}.gate span{margin-top:9px;color:rgba(248,246,239,.53)}
+.band{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;border-top:0;padding:0;margin-top:20px}
+.band div{padding:16px 18px;border-radius:18px;border:1px solid rgba(248,246,239,.09);
+  background:rgba(255,255,255,.025)}
+.band b{font-size:26px;color:var(--gold)}
+/* 阅读面：由表格纸升级成“语言图谱” */
+.light{
+  position:relative;background:
+    radial-gradient(circle at 8% 12%,rgba(88,213,232,.13),transparent 26rem),
+    radial-gradient(circle at 91% 32%,rgba(255,119,107,.11),transparent 28rem),
+    radial-gradient(circle at 40% 72%,rgba(180,156,255,.10),transparent 30rem),
+    linear-gradient(180deg,#EEF2F1,#F6F3ED 40%,#ECECF2)
+}
+.light:before{content:"“ ？ 语 / meaning / 声 / relation / ∅ / 话 / use / ”";
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;color:rgba(24,50,66,.035);
+  font-family:var(--mono);font-size:48px;line-height:3.3;word-spacing:1.5em;letter-spacing:.35em}
+.light>.wrap{position:relative;background:transparent;box-shadow:none;padding-top:38px;padding-bottom:12px}
+section{
+  position:relative;padding:66px 44px 42px;margin:30px 0 0;border-radius:30px;overflow:hidden;
+  border:1px solid rgba(30,52,64,.11);background:rgba(255,255,255,.78);
+  box-shadow:0 20px 55px rgba(30,44,54,.075)
+}
+section:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;
+  background:linear-gradient(90deg,var(--cyan),var(--gold),var(--coral))}
+.light section:nth-of-type(2):before{background:linear-gradient(90deg,var(--gold),var(--coral),var(--violet))}
+.light section:nth-of-type(3):before{background:linear-gradient(90deg,var(--cyan),var(--lime),var(--gold))}
+.light section:nth-of-type(4):before{background:linear-gradient(90deg,var(--coral),var(--violet),var(--cyan))}
+.light section:nth-of-type(5):before{background:linear-gradient(90deg,var(--lime),var(--cyan),var(--violet))}
+.light section:nth-of-type(6):before{background:linear-gradient(90deg,var(--violet),var(--gold),var(--cyan))}
+.col-h{position:relative;border-bottom:0;padding-bottom:14px}
+.col-h:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:linear-gradient(90deg,rgba(23,26,34,.72),rgba(23,26,34,.08),transparent)}
+.col-h h2{font-size:24px}.col-h .no{font-weight:700;color:#1C7081}
+.host{
+  margin-top:28px;padding:24px;border-radius:24px;border:1px solid rgba(88,213,232,.20);
+  background:linear-gradient(135deg,rgba(88,213,232,.08),rgba(180,156,255,.08),rgba(255,119,107,.07))
+}
+.host img{border:4px solid rgba(255,255,255,.8);border-radius:18px;box-shadow:0 16px 30px rgba(24,41,52,.15)}
+.books{gap:17px}
+.bk{
+  border:1px solid rgba(35,57,68,.12);border-radius:20px;overflow:hidden;padding-bottom:20px;
+  box-shadow:0 12px 28px rgba(30,44,54,.07);transition:.25s ease;background:#FBFBF9
+}
+.bk:nth-child(1){background:linear-gradient(180deg,#F3FBFC,#FBFBF9 52%)}
+.bk:nth-child(2){background:linear-gradient(180deg,#FAF8FF,#FBFBF9 52%)}
+.bk:nth-child(3){background:linear-gradient(180deg,#FFF7F4,#FBFBF9 52%)}
+.bk:nth-child(4){background:linear-gradient(180deg,#F6FBF2,#FBFBF9 52%)}
+.bk.lead{border-color:rgba(88,213,232,.55);box-shadow:0 0 0 3px rgba(88,213,232,.07),0 12px 28px rgba(30,44,54,.08)}
+.bk:hover{transform:translateY(-6px);box-shadow:0 20px 38px rgba(30,44,54,.13)}
+.bk img{border-bottom:0}.bk .no{color:#B54C43}.bk .lk a{color:#1C7081}
+.row{border-bottom-color:rgba(57,72,82,.14);border-radius:12px;padding-left:10px;padding-right:10px;transition:.22s ease}
+.row:hover{transform:translateX(5px);background:linear-gradient(90deg,rgba(88,213,232,.10),transparent)}
+.r-n{color:#1C7081}.iq{color:#7B609E}.cnt{color:#7B609E}.cnt b{color:#58D5E8}.more{color:#1C7081;border-color:#1C7081;
+  border:1px solid rgba(28,112,129,.25);border-radius:999px;padding:7px 13px;margin-top:18px}
+.plat{
+  border:1px solid rgba(88,213,232,.16);border-radius:24px;padding:30px;
+  color:rgba(248,246,239,.72);
+  background:
+    radial-gradient(circle at 90% 20%,rgba(255,119,107,.13),transparent 20rem),
+    radial-gradient(circle at 8% 85%,rgba(88,213,232,.12),transparent 20rem),
+    linear-gradient(145deg,#07131F,#110D19);
+  box-shadow:0 18px 42px rgba(5,10,18,.17)
+}
+.plat a{color:var(--gold);border-bottom-color:rgba(255,211,122,.30)}
+.tracks{gap:15px}
+.tk{border:1px solid rgba(35,57,68,.12);border-radius:18px;background:linear-gradient(145deg,#FFFFFF,#F2F5F4)}
+.tk:nth-child(2){background:linear-gradient(145deg,#FFFFFF,#F7F0F1)}
+.tk:nth-child(3){background:linear-gradient(145deg,#FFFFFF,#F2F0F9)}
+.tk .n{color:#1C7081}
+footer{
+  margin-top:40px;border-top-color:rgba(88,213,232,.16);padding:34px 0 58px;
+  background:
+    radial-gradient(circle at 10% 50%,rgba(88,213,232,.10),transparent 20rem),
+    linear-gradient(145deg,#040913,#0A1422);color:rgba(248,246,239,.48)
+}
+footer a{color:var(--gold)}
+@supports(animation-timeline:view()){
+  .light section{animation:lang-rise both linear;animation-timeline:view();animation-range:entry 3% cover 19%}
+  @keyframes lang-rise{from{opacity:.42;transform:translateY(26px)}to{opacity:1;transform:none}}
+}
+@media(max-width:900px){
+  .genesis-hero{grid-template-columns:1fr;gap:10px;padding-top:58px}
+  .genesis-copy{text-align:center}.genesis-copy .eyebrow{justify-content:center}
+  .genesis-copy .lede{margin-left:auto;margin-right:auto}.hero-actions{justify-content:center}
+  .genesis-map{max-width:490px}
+  .band{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .wrap{padding-left:16px;padding-right:16px}
+  .top .wrap{gap:10px}.brand{font-size:17px;white-space:nowrap}.brand em{display:none}
+  .top nav{overflow-x:auto;gap:16px;scrollbar-width:none}.top nav::-webkit-scrollbar{display:none}
+  .top nav a{font-size:12.5px}.top nav a.out{display:none}
+  .hero{padding-top:0}.genesis-hero{min-height:auto;padding:48px 0 34px}
+  .genesis-copy h1{font-size:39px}.genesis-copy h1 .name{font-size:11px}
+  .genesis-map{max-width:360px}.lang-node{width:90px;height:90px}
+  .lang-node b{font-size:18px}.utterance{width:154px;min-height:90px}.utterance b{font-size:21px}
+  .token{display:none}.genesis-ribbon{margin-top:2px;padding:15px 8px;font-size:16px}
+  .proof{margin-top:40px;border-radius:20px}.proof .cap{padding:14px 15px}
+  .sent{padding:22px 15px 18px}.sent q{font-size:19px}
+  table.chk td,table.chk th{padding-left:12px;padding-right:12px}
+  .pnote{text-align:left}.three{grid-template-columns:1fr}.gate{min-height:auto}
+  .band{gap:9px}.band div{padding:13px}.band b{font-size:22px}
+  .light>.wrap{padding-top:16px}section{padding:52px 20px 32px;border-radius:24px;margin-top:22px}
+  .col-h{gap:9px}.col-h h2{font-size:21px}.col-h .ct{font-size:10.5px}
+  .host{padding:16px}.books{grid-template-columns:1fr 1fr}.bk h3{font-size:17px}
+}
+@media(max-width:430px){
+  .books{grid-template-columns:1fr}.genesis-copy h1{font-size:35px}
+}
+@media(prefers-reduced-motion:reduce){
+  .map-lines .tri,.map-lines .wave,.token{animation:none}
+  .hero-actions a,.gate,.bk,.row{transition:none}
+}
+
+</style>
+</head>
+<body>
+
+<div class="dark">
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">语言发生学<em>HU ZHIYING</em></a>
+  <nav>
+    <a href="/site/#host">主持人</a>
+    <a href="/site/#books">账册</a>
+    <a href="/site/#cols">栏目</a>
+    <a href="/all/">全部篇目</a>
+    <a href="/works/">作品全集</a>
+    <a href="/wechat/">约翰专栏</a>
+    <a href="/teaching/">语言教学</a>
+    <a href="/chatjohn/">ChatJohn</a>
+    <a href="/community/">语言社区</a>
+    <a class="out" href="https://sdeuniverses.com/">SDE Universes ↗</a>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<div class="hero">
+  <div class="genesis-hero">
+    <div class="genesis-copy">
+      <div class="eyebrow">SDE · LANGUAGE GENESIS · 新思想生产平台</div>
+      <h1><span class="name">语言发生学</span>一句话，怎样在两个人之间<br><em>活起来？</em></h1>
+      <p class="lede">同样一句“我懂了”，可以是理解、敷衍、安慰，也可以是结束对话。语言不只装在句子里；它在<b>形式、用法与场合</b>相遇时发生，在另一个人的回应中获得下一步。</p>
+      <div class="hero-actions">
+        <a class="primary" href="/chatjohn/">和 ChatJohn 谈一句</a>
+        <a href="/all/">浏览十二篇新判断</a>
+        <a href="/site/#books">进入语言书架</a>
+        <a href="/works/">作品全集 <span data-sde-stat="author_works">96</span> 件</a>
+        <a href="/wechat/">翻五年公众号存档</a>
+      </div>
+    </div>
+
+    <div class="genesis-map" role="img" aria-label="形式、用法、场合共同使一句话获得意义">
+      <svg class="map-lines" viewBox="0 0 520 520" aria-hidden="true">
+        <defs>
+          <linearGradient id="langFlow" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#58D5E8"/><stop offset=".5" stop-color="#FFD37A"/><stop offset="1" stop-color="#FF776B"/>
+          </linearGradient>
+        </defs>
+        <circle class="orbit" cx="260" cy="260" r="226"/>
+        <circle class="orbit" cx="260" cy="260" r="174"/>
+        <path class="tri" d="M260 78 L102 407 L418 407 Z"/>
+        <path class="wave" d="M102 407 C170 330 188 300 260 260 C331 220 350 167 418 407"/>
+        <text x="125" y="244">说者</text><text x="358" y="244">听者</text>
+        <text x="232" y="484">回应</text>
+      </svg>
+      <div class="lang-node form"><b>形 式</b><small>FORM</small></div>
+      <div class="lang-node use"><b>用 法</b><small>USE</small></div>
+      <div class="lang-node scene"><b>场 合</b><small>SITUATION</small></div>
+      <div class="utterance"><b>“我懂了”</b><span>理解 · 敷衍 · 安慰 · 结束</span></div>
+      <span class="token t1">你 / I / 他</span>
+      <span class="token t2">？ / 吗 / meaning</span>
+      <span class="token t3">关系 · relation</span>
+      <span class="token t4">未说 · ∅</span>
+    </div>
+  </div>
+  <div class="genesis-ribbon">语言的生命，不在词典给出的那一刻；它在<b>一个人说、另一个人接住或改写</b>的那一刻。</div>
+
+<div class="proof">
+  <div class="cap">校　对　单<span>逐项检查 · 结果如下</span></div>
+  <div class="sent"><q>他对这件事情进行了一个认真的思考。</q>
+    <span class="mk">送检句 · 无错别字 · 无病句标记</span></div>
+  <table class="chk">
+    <thead><tr><th>检查项</th><th>结果</th><th class="ref">依据</th><th>判读</th></tr></thead>
+    <tbody>
+      <tr style="animation-delay:0ms"><td>主谓宾完整</td><td>齐全</td><td class="ref">句法成分</td><td class="j">通过</td></tr>
+      <tr style="animation-delay:110ms"><td>动宾搭配</td><td>进行 + 思考</td><td class="ref">搭配词典</td><td class="j">通过</td></tr>
+      <tr style="animation-delay:220ms"><td>量词与修饰</td><td>一个 + 认真的</td><td class="ref">规范用法</td><td class="j">通过</td></tr>
+      <tr style="animation-delay:330ms"><td>时体标记</td><td>了</td><td class="ref">完成体</td><td class="j">通过</td></tr>
+      <tr style="animation-delay:440ms"><td>标点与字形</td><td>无误</td><td class="ref">校对规则</td><td class="j">通过</td></tr>
+      <tr class="miss" style="animation-delay:820ms"><td>语　感</td><td>（无此项）</td><td class="ref">—</td><td><span class="stamp">本栏未开</span></td></tr>
+    </tbody>
+  </table>
+</div>
+<p class="pnote">每一项都通过了，而没有人会这样说话——<b>判定它不对的那个东西，检查表上没有它的位置。</b><br>本站要做的，就是把这一栏开出来：给它名目，给它读数，给它可以被推翻的说法。</p>
+
+<div class="three">
+  <a class="gate g1" href="/all/"><b>语言浏览</b><span>专著 · 语感 · 语法 · 语言教学与习得，十二篇长论文的详目与摘要</span></a>
+  <a class="gate g2" href="/chatjohn/"><b>ChatJohn</b><span>语言发生对话智能体。语言学 · 语言教育 · 语言文学——把一句「说不上来就是不对」交给它，顺着 John（胡志英）的路子往下追</span></a>
+  <a class="gate g3" href="/community/"><b>语言社区</b><span>群聊 · 私聊 · 社区动态 · 通讯录。与同路人交流语言、教学和写作中的具体问题</span></a>
+</div>
+
+<div class="band">
+  <div><b data-sde-stat="language_papers">12</b>语言长论文</div>
+  <div><b data-sde-stat="author_books">4</b>部专著</div>
+  <div><b data-sde-stat="language_words_wan">28.5</b>万汉字</div>
+  <div><b data-sde-stat="iq_range">135–143</b>创新智商区间</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="light">
+<div class="wrap">
+
+<section id="host">
+  <div class="col-h"><span class="no">主 持 人</span><h2>胡志英与语言</h2></div>
+  <div class="host">
+    <img src="/students/hu-zhiying/hu-zhiying.jpg" alt="胡志英" loading="lazy">
+    <div class="hb">
+      <p class="nm">胡志英<em>约翰 · John</em></p>
+      <p>英语教学与语言学习的长期实践者，SDE 学员，跟随王德生博士研究 SDE 发生学。已发表作品九十六件，其中语言方向十二篇长论文、专著七部。</p>
+      <p>他的语言写作从一个具体的困惑起步：一句话每条规则都对，母语者仍然会说「不是这么说的」——那么被违反的究竟是什么。由此长出两条线，一条追问「顺」的判定凭什么发生，一条追问规则本身怎样立起又怎样退役；近年延伸到 AI 时代的语言教学，追问算法即时纠错在孩子身上换走了什么。</p>
+      <p><a href="/students/hu-zhiying/">作者主页与全部作品 →</a></p>
+    </div>
+  </div>
+</section>
+
+<section id="books">
+  <div class="col-h"><span class="no">栏 一</span><h2>账册</h2><span class="ct">7 部</span></div>
+  <p class="col-d">七部专著，四部在语言上——语法的接力、语言的十个判据、语言符号的资格线、乔姆斯基；三部在与语言相邻的地方——知与行、注意与世界、习得与归属。站上别人写的语言类专著见<a href="/all/#lang-books" style="color:var(--indigo);border-bottom:1px solid var(--line)">全部篇目</a>。</p>
+  <div class="books">
+    <article class="bk lead">
+      <img src="/books/m/62/cover.jpg" alt="语言的智慧 封面" loading="lazy">
+      <div class="no">专著第 62 号 · 本站主件</div>
+      <h3>语言的智慧</h3>
+      <div class="sub">语法不是规则的集合，是差异的接力</div>
+      <p>一条规则怎样立起来、怎样把差异交给下一个载体、又怎样好好地死去——语法的智慧不在守成，在交接。</p>
+      <div class="lk"><a href="/students/hu-zhiying/wisdom-of-language/">导读</a><a href="/books/m/62/">书页</a><a href="/books/m/62/text/">分章读</a><a href="/books/m/62/read">翻页读</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/60/cover.jpg" alt="一花一世界 封面" loading="lazy">
+      <div class="no">专著第 60 号</div>
+      <h3>一花一世界</h3>
+      <div class="sub">注意力如何构成一个世界</div>
+      <p>被看见的那一朵与没有被看见的那一片，差别不在花上，在看的那一次是怎么发生的。</p>
+      <div class="lk"><a href="/students/hu-zhiying/one-flower-one-world/">导读</a><a href="/books/m/60/">书页</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/71/cover.jpg" alt="知行合一 封面" loading="lazy">
+      <div class="no">专著第 71 号</div>
+      <h3>知行合一</h3>
+      <div class="sub">知道模式与知行断裂的发生学重判</div>
+      <p>知道了却做不到，不是意志薄弱——是「知道」这件事本身被做成了一种可以不通向行动的模式。</p>
+      <div class="lk"><a href="/students/hu-zhiying/unity-of-knowing-and-acting/">导读</a><a href="/books/m/71/">书页</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/77/cover.jpg" alt="记到谁的账上 封面" loading="lazy">
+      <div class="no">专著第 77 号</div>
+      <h3>记到谁的账上</h3>
+      <div class="sub">习得的归属与代价</div>
+      <p>一个人学会的东西最后记在谁的账上，决定了他还愿不愿意再学第二次。</p>
+      <div class="lk"><a href="/students/hu-zhiying/the-ledger-of-acquisition/">导读</a><a href="/books/m/77/">书页</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/105/cover.jpg" alt="下一步才算数 封面" loading="lazy">
+      <div class="no">专著第 105 号</div>
+      <h3>下一步才算数</h3>
+      <div class="sub">语言的十个判据</div>
+      <p>话说完不算数，下一步接住才算数——一句话的公共身份不在说出的那一刻，而在别人的下一步里。</p>
+      <div class="lk"><a href="/students/hu-zhiying/next-step-counts/">导读</a><a href="/books/m/105/">书页</a><a href="/books/m/105/text/">分章读</a><a href="/books/m/105/read">翻页读</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/108/cover.jpg" alt="语言符号的智慧 封面" loading="lazy">
+      <div class="no">专著第 108 号</div>
+      <h3>语言符号的智慧</h3>
+      <div class="sub">十个对象，十条可撤回的资格线</div>
+      <p>十个对象、十条读数、十条带固定日期的撤回赌注——一个符号凭什么算数，又在什么时候不再算数。</p>
+      <div class="lk"><a href="/books/m/108/">书页</a><a href="/books/m/108/text/">分章读</a><a href="/books/m/108/read">翻页读</a></div>
+    </article>
+    <article class="bk">
+      <img src="/books/m/183/cover.jpg" alt="胡志英讲乔姆斯基 封面" loading="lazy">
+      <div class="no">专著第 183 号</div>
+      <h3>胡志英讲乔姆斯基</h3>
+      <div class="sub">普通人都能懂</div>
+      <p>他看见了语言在每个孩子身上长出来，却把这件事写成了一道天赋公式的参数赋值。</p>
+      <div class="lk"><a href="/books/m/183/">书页</a><a href="/books/m/183/text/">分章读</a><a href="/books/m/183/read">翻页读</a></div>
+    </article>
+  </div>
+</section>
+
+<div id="cols"></div>
+
+<section>
+  <div class="col-h"><span class="no">栏 二</span><h2>语　感</h2><span class="ct">5 篇</span></div>
+  <p class="col-d">「顺」不是一种感觉，是一批还没有被删掉的判断。同一个问题问了十遍，上线五篇——五篇撤销的前提各不相同，因此是五件事。</p>
+  <a class="row" href="/students/hu-zhiying/post-hand-slot/"><span class="r-n">1</span><span class="r-t"><b class="r-h">后手生位</b>一句话说完之后，对方还剩几条路</span><span class="iq">137</span></a>
+  <a class="row" href="/students/hu-zhiying/deformation-reserve/"><span class="r-n">2</span><span class="r-t"><b class="r-h">承变余裕</b>还能变多少，才是能力</span><span class="iq">137</span></a>
+  <a class="row" href="/students/hu-zhiying/heterochronic-layering/"><span class="r-n">3</span><span class="r-t"><b class="r-h">异时共层</b>此刻说话的，是你哪一层的语言</span><span class="iq">137</span></a>
+  <a class="row" href="/students/hu-zhiying/relational-landing/"><span class="r-n">4</span><span class="r-t"><b class="r-h">关系落类</b>一句话为什么会在不同关系中落成不同的东西</span><span class="iq">136</span></a>
+  <a class="row" href="/students/hu-zhiying/coadaptive-homing/"><span class="r-n">5</span><span class="r-t"><b class="r-h">共适归航</b>语言不是不偏航，而是能够在变化中归航</span><span class="iq">135</span></a>
+  <a class="more" href="/all/#sense">五篇详目与摘要 →</a>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">栏 三</span><h2>语　法</h2><span class="ct">4 篇</span></div>
+  <p class="col-d">四篇合起来是一条规则的一生：证据先到、取得改判权、把差异交给新载体、最后退役。</p>
+  <a class="row" href="/students/hu-zhiying/context-threshold/"><span class="r-n">1</span><span class="r-t"><b class="r-h">语法境阈体</b>环境从哪里开始有改判权，又从哪里失去</span><span class="iq">141</span></a>
+  <a class="row" href="/students/hu-zhiying/evidence-before-rule/"><span class="r-n">2</span><span class="r-t"><b class="r-h">语法先证体</b>规则尚未成立时，证据已经先到了</span><span class="iq">139</span></a>
+  <a class="row" href="/students/hu-zhiying/carrier-handover/"><span class="r-n">3</span><span class="r-t"><b class="r-h">语法载差体</b>语法不是守住形式，而是让差异找到新的载体</span><span class="iq">138</span></a>
+  <a class="row" href="/students/hu-zhiying/grammar-retirement/"><span class="r-n">4</span><span class="r-t"><b class="r-h">语法退役体</b>一条规则怎样好好地死去</span><span class="iq">138</span></a>
+  <a class="more" href="/all/#grammar">四篇详目与摘要 →</a>
+</section>
+
+<section>
+  <div class="col-h"><span class="no">栏 四</span><h2>语言教学与习得</h2><span class="ct">3 篇</span></div>
+  <p class="col-d">教得越准、纠得越快，学的人反而越早停下——这一栏追的是教学动作本身的代价。</p>
+  <a class="row" href="/students/hu-zhiying/algorithmic-entrenchment/"><span class="r-n">1</span><span class="r-t"><b class="r-h">算法闭环与生物代价</b>AI 时代幼少儿英语学习的神经语言学诊断</span><span class="iq">141</span></a>
+  <a class="row" href="/students/hu-zhiying/operational-enclosure/"><span class="r-n">2</span><span class="r-t"><b class="r-h">操作性收编</b>继承不可继承者的智识代价——以皮尔斯遗产为例</span><span class="iq">143</span></a>
+  <a class="row" href="/students/hu-zhiying/shelter-as-cage/"><span class="r-n">3</span><span class="r-t"><b class="r-h">庇护所即牢笼</b>语言石化现象的制度性生产机制</span><span class="iq">136</span></a>
+  <a class="more" href="/all/#teaching">三篇详目与摘要 →</a>
+</section>
+
+<section id="wechat">
+  <div class="col-h"><span class="no">栏 五</span><h2>约翰专栏</h2><span class="ct">418 篇</span></div>
+  <p class="col-d">公众号「五宝爸约翰聊英语」五年原文存档。长论文是把一个判断立到能被推翻的程度，这一栏是他每天面对家长时，把同一批问题讲给用得上的人听。原文一字未改，只做归类、排序与检索。</p>
+<!-- wechat-rows:start -->
+  <a class="row" href="/wechat/genesis/"><span class="r-n">1</span><span class="r-t"><b class="r-h">语言发生学</b>语感、语法、语用、意义与输出</span><span class="cnt"><b>49</b> 篇</span></a>
+  <a class="row" href="/wechat/enlighten/"><span class="r-n">2</span><span class="r-t"><b class="r-h">英语启蒙</b>三条线、看听线、听指、跟读与复述、敏感期</span><span class="cnt"><b>78</b> 篇</span></a>
+  <a class="row" href="/wechat/vocabulary/"><span class="r-n">3</span><span class="r-t"><b class="r-h">词汇之路</b>一个词怎样长出来，又怎样被取出来</span><span class="cnt"><b>23</b> 篇</span></a>
+  <a class="row" href="/wechat/materials/"><span class="r-n">4</span><span class="r-t"><b class="r-h">素材与分级</b>RAZ、BrainPOP 与 ELL、原版动画与绘本</span><span class="cnt"><b>57</b> 篇</span></a>
+  <a class="row" href="/wechat/ai/"><span class="r-n">5</span><span class="r-t"><b class="r-h">AI 与语言教育</b>工具进课堂之后，能力被换走了什么</span><span class="cnt"><b>42</b> 篇</span></a>
+  <a class="row" href="/wechat/school/"><span class="r-n">6</span><span class="r-t"><b class="r-h">课堂与制度</b>翻转课堂、家校共学、考试与评价</span><span class="cnt"><b>41</b> 篇</span></a>
+  <a class="row" href="/wechat/lineage/"><span class="r-n">7</span><span class="r-t"><b class="r-h">思想谱系</b>克拉申、维果茨基、索绪尔、洪堡、林语堂</span><span class="cnt"><b>27</b> 篇</span></a>
+  <a class="row" href="/wechat/notes/"><span class="r-n">8</span><span class="r-t"><b class="r-h">奶爸手记</b>五个孩子、郊区的院子、父亲与儿子</span><span class="cnt"><b>45</b> 篇</span></a>
+  <a class="row" href="/wechat/camp/"><span class="r-n">9</span><span class="r-t"><b class="r-h">营地与公告</b>训练营、开班、公开课与学员见证</span><span class="cnt"><b>25</b> 篇</span></a>
+<!-- wechat-rows:end -->
+  <a class="more" href="/wechat/">九个频道门厅，或一页翻完全部 418 篇 →</a>
+</section>
+
+<section id="works">
+  <div class="col-h"><span class="no">栏 六</span><h2>作品全集</h2><span class="ct">96 件</span></div>
+  <p class="col-d">上面几栏是语言这一条线上的十二篇。而他在学员专栏已发表的全部作品有 96 件——四部专著、十组并蒂文，以及跨到教育、神经发展、制度病理、认知与存在的七十件研究。本站把它们按八组重新编次，每组一段导语、每件一句摘要，正文仍在主站原处。</p>
+<!-- works-rows:start -->
+  <a class="row" href="/works/#lang"><span class="r-n">1</span><span class="r-t"><b class="r-h">语言这一条线</b>语感五篇 · 语法四篇 · 教学三篇，每篇真跑过一条证伪条款</span><span class="cnt"><b>12</b> 件</span></a>
+  <a class="row" href="/works/#books"><span class="r-n">2</span><span class="r-t"><b class="r-h">账册 · 四部专著</b>语言的智慧 · 一花一世界 · 知行合一 · 记到谁的账上</span><span class="cnt"><b>4</b> 件</span></a>
+  <a class="row" href="/works/#edu"><span class="r-n">3</span><span class="r-t"><b class="r-h">教育与评价</b>凡担保成功的，那件事已经不再是教育</span><span class="cnt"><b>9</b> 件</span></a>
+  <a class="row" href="/works/#neuro"><span class="r-n">4</span><span class="r-t"><b class="r-h">神经发展与身体</b>ADHD 与自闭症不是两种病，是同一个缺口上的两种住法</span><span class="cnt"><b>10</b> 件</span></a>
+  <a class="row" href="/works/#institution"><span class="r-n">5</span><span class="r-t"><b class="r-h">制度病理与知识生产</b>制度不是在失效时崩塌，是在忠实执行时崩塌</span><span class="cnt"><b>21</b> 件</span></a>
+  <a class="row" href="/works/#ontology"><span class="r-n">6</span><span class="r-t"><b class="r-h">认知、因果与存在</b>先有积木后有搭法——这条先验被逐一撤掉</span><span class="cnt"><b>16</b> 件</span></a>
+  <a class="row" href="/works/#gss"><span class="r-n">7</span><span class="r-t"><b class="r-h">全球系统科学</b>不确定性怎样被三道正当工序加工成无害的残余</span><span class="cnt"><b>4</b> 件</span></a>
+  <a class="row" href="/works/#twin"><span class="r-n">8</span><span class="r-t"><b class="r-h">并蒂文 · 一题两写</b>同一个判断写两遍：诠释文不用术语，实用文给步骤</span><span class="cnt"><b>20</b> 件</span></a>
+<!-- works-rows:end -->
+  <a class="more" href="/survey/">先读总结文《九十六件作品，问的是同一件事》 →</a>
+</section>
+
+<section id="platform">
+  <div class="col-h"><span class="no">栏 七</span><h2>这是一个平台，不是一个文集</h2></div>
+  <div class="plat">
+    <p>语言发生学是 <a href="https://sdeuniverses.com/">SDE Universes</a> 的<b>垂直思想创新子平台</b>。它与主站共用同一套生产方法与同一条评分通道：一个判断要在这里立住，得先经过敌意拓宽（谁已经站在这个位置上）、可裁决预测（哪一种结果会推翻它）、以及独立盲评。</p>
+    <p>它做的不是把语言学已有的结论讲得更好懂，而是<b>生产此前不存在的语言判断</b>——给一个还没有名目的东西起名，给它一个可以被算出来的读数，再把它交给能推翻它的证据。做法的通俗讲解见 <a href="https://sdeuniverses.com/confluence/confluence-method/">《SDE 多学科通融创新法》</a>。</p>
+  </div>
+  <div class="tracks">
+    <div class="tk"><div class="n">线 一</div><h3>语言理论</h3><p>语感、语法、意义与话轮：把「说不上来但就是不对」变成可陈述、可推翻的命题。</p></div>
+    <div class="tk"><div class="n">线 二</div><h3>语言教学</h3><p>纠错、反馈、教材与课堂节奏：每一个教学动作都在取走一点什么，先把它算清楚。</p></div>
+    <div class="tk"><div class="n">线 三</div><h3>语言学习</h3><p>习得、石化、母语与二语：学习者身上真正在变的是什么，而考试量的是哪一个。</p></div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<footer><div class="wrap">
+  <p>语言发生学 · 胡志英 —— <a href="https://sdeuniverses.com/">SDE Universes</a> 的语言分站。全部篇目与主站同源，作者主页在 <a href="/students/hu-zhiying/">学员专栏 · 胡志英</a>。</p>
+  <p>德麦国际 · Demai International Press</p>
+</div></footer>
+<script>
+/* 分站页面的自家链接写的是分站根（/、/all/、/#栏）。在二级域名下这就是对的；
+   若从主站以 /sites/lang/… 预览，则就地补上前缀，两处都能正常点。 */
+(function(){var b="/sites/lang";if(location.pathname.indexOf(b)!==0)return;
+var as=document.querySelectorAll("a[href]");
+for(var i=0;i<as.length;i++){var h=as[i].getAttribute("href");
+if(h==="/"){as[i].setAttribute("href",b+"/");}
+else if(h.indexOf("/#")===0||h.indexOf("/all/")===0){as[i].setAttribute("href",b+h);}}})();
+</script>
+</body></html>
