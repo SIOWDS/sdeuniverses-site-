@@ -1,0 +1,62 @@
+name: Book 295 final style and download acceptance
+on:
+  push:
+    branches: ['publish/book-295-20261002']
+    paths: ['.github/workflows/book295-style-acceptance-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify final production CSS, downloads and bookshelf entrances
+        run: |
+          python - <<'PY'
+          import urllib.request, hashlib, json, time, pathlib, datetime
+          base='https://sdeuniverses.com/books/m/295/'
+          expected={
+            'assets/book.css':'34b259edf5592482205bb82264867557ab9d5b180a6e07897ce53accb3a9ef39',
+            'downloads/xuwu-b295-reader-v1.1.pdf':'0881280f9347af573c31b7f95f549db947c48a878c02927b54fe6bbdf74758d6',
+            'downloads/xuwu-b295-v1.1.docx':'616da57d5962ddb0031035d5d586986ae8dea15a2725d917c6e7dbfdde87194c',
+            'cover.jpg':'8df76d5dc40e905afdd6d53496ae2dadd2e3b0d43e3a2f53b21be5cb15444e41',
+            'backcover.jpg':'69992422d741820a59ead45abedb466a529307eca4430390ed5eefa53455cee7',
+            'toc.json':'8a87fad2ba6a28f56bfd7426c2b8a688376b4dd4577b5664d74b06bbf14f9a8e'}
+          def get(url):
+            req=urllib.request.Request(url,headers={'User-Agent':'SDE-Book295-Publication-Acceptance','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=45) as r:
+              assert r.status==200
+              return r.read()
+          out=pathlib.Path('evidence');out.mkdir()
+          result={'book':295,'production':True,'mutations':False,'reindex':False,'style_commit':'c1a3cbde44cd3fa87fd3a82829a47b2a228ba528','checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'files':[]}
+          for i in range(48):
+            try:
+              raw=get(base+'assets/book.css?v=1.1')
+              if hashlib.sha256(raw).hexdigest()==expected['assets/book.css']:break
+            except Exception: pass
+            if i==47:raise AssertionError('Final style is not yet served; do not call it deployed')
+            time.sleep(5)
+          for path,sha in expected.items():
+            raw=get(base+path+('?v=1.1' if path=='assets/book.css' else ''))
+            actual=hashlib.sha256(raw).hexdigest()
+            assert actual==sha,(path,sha,actual)
+            result['files'].append({'path':path,'status':200,'bytes':len(raw),'sha256':actual})
+          html=get(base).decode();assert '<h1>虚无不是终点</h1>' in html and '979-8-90690-362-4' in html
+          text=get(base+'text/').decode();assert text.count('data-source-paragraph=')==1770
+          assert text.count('class="chapter"')==35
+          last=get(base+'text/ch35/').decode();assert '第三十五章' in last and '不要急着选择' in last
+          toc=json.loads(get(base+'toc.json'));assert len(toc)==49
+          entrances=['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']
+          for url in entrances:
+            page=get(url).decode();assert 'm-295' in page and '虚无不是终点' in page
+          result.update({'source_blocks':1770,'chapters':35,'toc_entries':49,'bookshelf_entrances':entrances,'success':True})
+          (out/'production-style-acceptance.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+      - name: Preserve read-only acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book295-final-style-acceptance
+          path: evidence/
+          retention-days: 7
