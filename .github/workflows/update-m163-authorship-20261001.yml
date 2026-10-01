@@ -1,0 +1,150 @@
+name: Update monograph 163 authorship
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/update-m163-authorship-20261001.yml']
+permissions:
+  contents: write
+concurrency:
+  group: authorship-m163
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/m/163/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /.github/workflows/update-m163-authorship-20261001.yml
+      - name: Update only the authorized author fields and biography
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,re,html,hashlib,datetime
+          root=Path('.')
+          book=root/'public/books/m/163'
+          bio='杨彼得，1970年生，山西万荣人。自2018年起，长期跟随王德生老师学习三视角、321智慧、SIO主客互动及SDE本体论，持续开展跨学科领域的研究与写作。近年在王德生老师指导下完善“发生学”框架，重建“从发现到发生”的认知体系。著有《创造力发生机制入门》，由德麦国际出版社出版。'
+          authors=['王德生','杨彼得']
+          report={'book':'人类文明史：发生对发现的替代','number':163,'authors':authors,'biography':bio,'pdf_updated':False,'cover_updated':False}
+          report['unchanged_pdf_sha256']={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in book.glob('*.pdf')}
+          catpath=root/'public/books/catalog.json'
+          original=json.loads(catpath.read_text(encoding='utf-8'))
+          cat=json.loads(json.dumps(original))
+          items=[b for b in cat['books'] if b.get('id')=='m-163']
+          assert len(items)==1 and items[0]['title']=='人类文明史'
+          assert items[0]['authors'] in (['王德生'],authors),items[0]['authors']
+          items[0]['authors']=authors
+          cat['updated']=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds').replace('+00:00','Z')
+          assert [b for b in original['books'] if b['id']!='m-163']==[b for b in cat['books'] if b['id']!='m-163']
+          indexpath=book/'index.html'
+          s=indexpath.read_text(encoding='utf-8')
+          old='<b>著者</b><span>王德生</span>'
+          assert old in s or '<b>著者</b><span>王德生、杨彼得</span>' in s
+          s=s.replace(old,'<b>著者</b><span>王德生、杨彼得</span>')
+          s=s.replace('· 王德生 著 ·','· 王德生、杨彼得 著 ·')
+          if 'name="author"' not in s:
+              s=s.replace('<meta name="viewport"','<meta name="author" content="王德生、杨彼得">\n<meta name="viewport"',1)
+          if 'id="author-yang-bide"' not in s:
+              block='<section id="author-yang-bide"><h2>第二作者 · 杨彼得</h2><p>'+bio+'</p></section>\n\n'
+              assert '<div class="foot">' in s
+              s=s.replace('<div class="foot">',block+'<div class="foot">',1)
+          textpath=book/'text/index.html'
+          t=textpath.read_text(encoding='utf-8')
+          assert '人类文明史' in t
+          heads=[]
+          for m in re.finditer(r'<h([1-6])\b[^>]*>(.*?)</h\1>',t,re.I|re.S):
+              plain=html.unescape(re.sub(r'<[^>]+>','',m.group(2))).strip()
+              if '作者' in plain:
+                  print('AUTHOR HEADING:',plain)
+              if '作者介绍' in plain or '作者简介' in plain:
+                  heads.append(m)
+          assert len(heads)==1,'Expected one author section; found '+str(len(heads))
+          a=heads[0]
+          level=int(a.group(1));end=len(t)
+          for m in re.finditer(r'<h([1-6])\b[^>]*>',t[a.end():],re.I):
+              if int(m.group(1))<=level:
+                  end=a.end()+m.start();break
+          segment=t[a.end():end]
+          report['original_author_section_text']=html.unescape(re.sub(r'<[^>]+>',' ',segment))[:4000]
+          print('ORIGINAL AUTHOR SECTION:',report['original_author_section_text'])
+          if 'id="author-yang-bide"' not in t:
+              closing=segment.rfind('</section>')
+              pos=a.end()+closing if closing>=0 else end
+              sub=min(level+1,6)
+              block='\n<section id="author-yang-bide"><h'+str(sub)+'>杨彼得 · 第二作者</h'+str(sub)+'><p>'+bio+'</p></section>\n'
+              t=t[:pos]+block+t[pos:]
+          t,n1=re.subn(r'(?<=>)([\s　]*)王德生([\s　]*)著([\s　]*)(?=<)',r'\1王德生、杨彼得\2著\3',t)
+          t,n2=re.subn(r'((?:著者|作者)[：:\s　]+)王德生(?=[\s　<，。、]|$)',r'\1王德生、杨彼得',t)
+          report['byline_replacements']=n1+n2
+          print('BYLINE REPLACEMENTS:',n1+n2)
+          if not re.search(r'<meta\s+name=["\']author["\']',t,re.I):
+              assert '</head>' in t
+              t=t.replace('</head>','<meta name="author" content="王德生、杨彼得">\n</head>',1)
+          else:
+              t=re.sub(r'(<meta\s+name=["\']author["\']\s+content=["\'])王德生(["\'])',r'\1王德生、杨彼得\2',t,flags=re.I)
+          assert bio in t and bio in s
+          assert len(t)>=len(textpath.read_text(encoding='utf-8'))
+          catpath.write_text(json.dumps(cat,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          indexpath.write_text(s,encoding='utf-8')
+          textpath.write_text(t,encoding='utf-8')
+          report['timestamp']=cat['updated']
+          (book/'authorship-update-20261001.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+      - name: Regenerate the three existing bookshelf entrances
+        run: python tools/build_bookshelf.py
+      - name: Verify scope and unchanged PDFs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,subprocess
+          root=Path('.')
+          book=root/'public/books/m/163'
+          report=json.loads((book/'authorship-update-20261001.json').read_text())
+          cat=json.loads((root/'public/books/catalog.json').read_text())
+          target=next(b for b in cat['books'] if b['id']=='m-163')
+          assert target['authors']==['王德生','杨彼得']
+          for name,digest in report['unchanged_pdf_sha256'].items():
+              assert hashlib.sha256((book/name).read_bytes()).hexdigest()==digest
+          for path in ['public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html']:
+              text=(root/path).read_text(encoding='utf-8')
+              i=text.find('人类文明史')
+              assert i>=0
+              near=text[max(0,i-1200):i+2500]
+              assert '杨彼得' in near and '王德生' in near,path
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/books/m/163/index.html','public/books/m/163/text/index.html'}
+          changed=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()
+          assert set(changed)<=allowed,changed
+          report['verified_bookshelves']=['/books/','/monographs/','/sites/read/library/']
+          report['changed_paths']=changed
+          (book/'authorship-update-20261001.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print('Verified authors, biography, all three shelves, unchanged PDFs, and limited write scope.')
+          PY
+      - name: Commit the authorized author update
+        run: |
+          git config user.name 'SDE Publication Build'
+          git config user.email 'publication-build@users.noreply.github.com'
+          rm .github/workflows/update-m163-authorship-20261001.yml
+          git add --sparse public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html public/books/m/163/index.html public/books/m/163/text/index.html public/books/m/163/authorship-update-20261001.json .github/workflows/update-m163-authorship-20261001.yml
+          git diff --cached --stat
+          git commit -m 'Add Yang Bide as second author of monograph 163 and publish supplied biography'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Preserve the authorship verification record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monograph-163-authorship-verification
+          retention-days: 3
+          path: public/books/m/163/authorship-update-20261001.json
