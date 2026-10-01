@@ -1,0 +1,141 @@
+name: M296 final publication and live verification
+on:
+  push:
+    branches: ['publish/m296-20261002']
+    paths: ['.github/workflows/m296-release-final.yml']
+permissions:
+  contents: write
+  issues: write
+  actions: read
+concurrency:
+  group: m296-final-publication
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Receive exact final public publication archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -u - <<'PY'
+          import os,json,time,hashlib,pathlib,urllib.request,urllib.parse,urllib.error,zipfile
+          api='https://api.github.com/repos/SIOWDS/sdeuniverses-site-/issues/24'
+          hdr={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
+          expected='1e74995bdcb95eec6c3f5fd918d68b0875cac710e2145fa4512602ff2ad701f0'
+          root=pathlib.Path(os.environ['RUNNER_TEMP']);archive=root/'m296-final-publication.zip'
+          for _ in range(72):
+            obj=json.load(urllib.request.urlopen(urllib.request.Request(api,headers=hdr),timeout=20))
+            body=json.loads(obj['body']);assert obj['user']['login']=='SIOWDS' and body['volume']==296 and body['sha256']==expected
+            if body.get('ready'):break
+            time.sleep(5)
+          else:raise RuntimeError('Final publication transfer not ready')
+          url=body['url'];u=urllib.parse.urlparse(url);assert u.scheme=='https' and u.hostname.endswith('.oaiusercontent.com')
+          print('::add-mask::'+url)
+          data=None
+          for attempt in range(3):
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+              data=urllib.request.urlopen(req,timeout=90).read(25*1024*1024);break
+            except urllib.error.HTTPError as exc:
+              print('File transfer HTTP status:',exc.code)
+              if attempt==2:raise RuntimeError('Final publication transfer failed; no link logged') from None
+              time.sleep(5)
+          assert data and len(data)==13075980 and hashlib.sha256(data).hexdigest()==expected
+          archive.write_bytes(data)
+          clean={'volume':296,'ready':False,'sha256':expected,'status':'Final publication bytes verified; temporary transfer link removed. Release QA in progress. No reindex.'}
+          req=urllib.request.Request(api,data=json.dumps({'body':json.dumps(clean)}).encode(),headers={**hdr,'Content-Type':'application/json'},method='PATCH');urllib.request.urlopen(req,timeout=20).read()
+          dest=root/'m296-final';dest.mkdir()
+          with zipfile.ZipFile(archive) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+            z.extractall(dest)
+          print('Final archive verified:',len(data),'bytes; SHA256:',expected)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m296-final-publication-v1
+          path: ${{ runner.temp }}/m296-final-publication.zip
+          retention-days: 2
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/m/296/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap.xml
+            /tools/build_bookshelf.py
+      - name: Prepare current catalogue and publication files
+        run: python "$RUNNER_TEMP/m296-final/release-install.py" "$RUNNER_TEMP/m296-final" "$GITHUB_WORKSPACE"
+      - name: Prepare browser and Chinese fonts
+        timeout-minutes: 5
+        run: |
+          python -m pip install -q playwright==1.55.0 beautifulsoup4
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null && ! command -v chromium-browser >/dev/null; then
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Verify final edition before publishing
+        run: |
+          node --check public/books/m/296/reader.js
+          python "$RUNNER_TEMP/m296-final/browser-check.py" --root "$GITHUB_WORKSPACE/public" --out "$RUNNER_TEMP/m296-evidence/preflight"
+      - name: Commit only the authorized book and generated entrances
+        id: publish
+        run: |
+          python -u - <<'PY'
+          import pathlib,subprocess,os,json,sys
+          root=pathlib.Path(os.environ['GITHUB_WORKSPACE']);tmp=pathlib.Path(os.environ['RUNNER_TEMP']);payload=tmp/'m296-final'
+          def git(*args):return subprocess.check_output(['git',*args],cwd=root,text=True).strip()
+          git('config','user.name','SIOWDS');git('config','user.email','wangdesheng1234567@gmail.com')
+          allowed=['public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/sitemap.xml']
+          for attempt in range(3):
+            git('fetch','origin','main')
+            if git('rev-parse','HEAD')!=git('rev-parse','origin/main'):
+              git('reset','--hard','origin/main')
+              subprocess.run([sys.executable,str(payload/'release-install.py'),str(payload),str(root)],check=True)
+            git('add','--','public/books/m/296',*allowed)
+            changed=git('diff','--cached','--name-only').splitlines()
+            assert changed and all(p.startswith('public/books/m/296/') or p in allowed for p in changed),changed
+            git('commit','-m','Publish M296: publication genesis, ISBN 979-8-90690-363-1, US$21; complete 413-page edition; no reindex')
+            push=subprocess.run(['git','push','origin','HEAD:main'],cwd=root)
+            if push.returncode==0:break
+          else:raise RuntimeError('Concurrent changes prevented safe publication')
+          commit=git('rev-parse','HEAD');evidence=tmp/'m296-evidence';evidence.mkdir(exist_ok=True)
+          report={'commit':commit,'changed_files':changed,'no_reindex':True,'isbn':'979-8-90690-363-1','volume':296,'price_usd':21}
+          (evidence/'publication-commit.json').write_text(json.dumps(report,indent=2))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('commit='+commit+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Wait for the new Cloudflare publication to be served
+        run: |
+          python -u - <<'PY'
+          import urllib.request,time
+          url='https://sdeuniverses.com/books/m/296/book-metadata.json'
+          for attempt in range(12):
+            try:
+              req=urllib.request.Request(url+'?verify=m296-v1-'+str(attempt),headers={'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'})
+              text=urllib.request.urlopen(req,timeout=30).read().decode()
+              if '979-8-90690-363-1' in text and '201980' in text:print('New edition is served.');break
+            except Exception:pass
+            time.sleep(25)
+          else:raise RuntimeError('Publication did not become available within verification window')
+          PY
+      - name: Verify all live files, content, three entrances and real readers
+        run: |
+          python "$RUNNER_TEMP/m296-final/verify-content.py" "$RUNNER_TEMP/m296-final" https://sdeuniverses.com "$RUNNER_TEMP/m296-evidence/live-content"
+          python "$RUNNER_TEMP/m296-final/browser-check.py" --base https://sdeuniverses.com --out "$RUNNER_TEMP/m296-evidence/live-browser"
+      - name: Preserve final publication and verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m296-final-publication-evidence
+          path: ${{ runner.temp }}/m296-evidence/
+          retention-days: 2
