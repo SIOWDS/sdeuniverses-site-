@@ -1,0 +1,59 @@
+name: Book 295 reader startup correction and candidate verification
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book295-reader-candidate-v2.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book295-verified-publication-candidate
+          run-id: 36907998693
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/import
+      - name: Validate original payload and correct deferred reader startup
+        run: |
+          python - <<'PY'
+          import pathlib,os,hashlib,zipfile,json
+          root=pathlib.Path(os.environ['RUNNER_TEMP']);zips=list((root/'import').rglob('book295-candidate.zip'));assert len(zips)==1
+          data=zips[0].read_bytes();assert hashlib.sha256(data).hexdigest()=='739a95d5c20274e382d38acd62c99fd7f840d858cbb97681f1c90b131516ce6a'
+          dest=root/'book295-payload';dest.mkdir()
+          with zipfile.ZipFile(zips[0]) as z:
+              for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              z.extractall(dest)
+          mf=dest/'payload-manifest.json';m=json.loads(mf.read_text())
+          for f in m['files']:assert hashlib.sha256((dest/f['path']).read_bytes()).hexdigest()==f['sha256'],f['path']
+          p=dest/'book/read.html';s=p.read_text();old='<script src="vendor/pdf.min.js" defer></script>';assert s.count(old)==1
+          p.write_text(s.replace(old,'<script src="vendor/pdf.min.js"></script>'))
+          digest=hashlib.sha256(p.read_bytes()).hexdigest();assert digest=='b9c4be2eaf5623b20e87b425360d7e4c4778f664ebf24106ec04fb95fd77501f'
+          f=next(x for x in m['files'] if x['path']=='book/read.html');f['sha256']=digest;f['size']=p.stat().st_size;mf.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          site=root/'book295-testsite/public/books/m';site.mkdir(parents=True);(site/'295').symlink_to(dest/'book',target_is_directory=True)
+          with zipfile.ZipFile(root/'book295-candidate-v2.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+              for p in sorted(dest.rglob('*')):
+                  if p.is_file():z.write(p,p.relative_to(dest))
+          print('Only PDF.js startup ordering changed; full book bytes and metadata unchanged.')
+          PY
+      - name: Prepare Chinese-capable browser
+        timeout-minutes: 5
+        run: |
+          python -m pip install -q Pillow PyMuPDF playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Verify actual PDF rendering and all reading modes
+        run: python "$RUNNER_TEMP/book295-payload/browser-check.py" "$RUNNER_TEMP/book295-testsite" "$RUNNER_TEMP/book295-qa"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book295-publication-candidate-v2
+          retention-days: 3
+          path: |
+            ${{ runner.temp }}/book295-candidate-v2.zip
+            ${{ runner.temp }}/book295-qa/
