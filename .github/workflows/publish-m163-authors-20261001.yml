@@ -38,14 +38,33 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y fonts-noto-cjk
           python -m pip install -q pymupdf==1.26.4 Pillow==11.3.0 fonttools==4.59.2 beautifulsoup4==4.13.4
+      - name: Apply the visually tested CJK font and line-break correction
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/publish_m163_authors_20261001.py')
+          s=p.read_text()
+          if 'opt.retain_gids=True' not in s:
+              assert 'opt=subset.Options(); opt.name_IDs' in s
+              s=s.replace('opt=subset.Options(); opt.name_IDs','opt=subset.Options(); opt.retain_gids=True; opt.name_IDs',1)
+              s=s.replace("needed=''.join(paragraphs)","needed='\\u3000'+''.join(paragraphs)",1)
+              a="                if ch in '，。；：、！？）》】」』' and len(line)>1:"
+              b="                tail=re.search(r'[A-Za-z0-9]+$',line)\n                if ch.isascii() and ch.isalnum() and tail and tail.start()>0 and len(tail[0])<16:\n                    result.append((line[:tail.start()],first));line=tail[0]+ch\n                elif ch in '，。；：、！？）》】」』' and len(line)>1:"
+              assert a in s;s=s.replace(a,b,1)
+              a='        pdf_checks[name]={'
+              b="        hp=updated[5].get_pixmap(clip=fitz.Rect(x,ph*.13,x+125,ph*.185),colorspace=fitz.csRGB,alpha=False)\n        samples_rgb=hp.samples\n        dark=sum(1 for k in range(0,len(samples_rgb),3) if sum(samples_rgb[k:k+3])<400)\n        assert dark/(hp.width*hp.height)>.015, 'CJK heading did not render visibly'\n        pdf_checks[name]={"
+              assert a in s;s=s.replace(a,b,1)
+              p.write_text(s)
+          compile(s,str(p),'exec')
+          PY
       - name: Prepare author credits, render both editions, verify unchanged body and pagination
         run: python tools/publish_m163_authors_20261001.py --qa "$RUNNER_TEMP/m163-qa"
-      - name: Confirm the change set is limited to this book and its existing shelf links
+      - name: Confirm the change set is limited to this publication
         run: |
           git diff --stat
           git diff --name-only | while IFS= read -r path; do
             case "$path" in
-              public/books/m/163/*|public/books/catalog.json|public/books/index.html|public/monographs/index.html|public/sites/read/library/index.html) ;;
+              public/books/m/163/*|public/books/catalog.json|public/books/index.html|public/monographs/index.html|public/sites/read/library/index.html|tools/publish_m163_authors_20261001.py) ;;
               *) echo "Unexpected change: $path"; exit 1 ;;
             esac
           done
@@ -54,7 +73,7 @@ jobs:
         run: |
           git config user.name 'SDE Publication Build'
           git config user.email 'publication-build@users.noreply.github.com'
-          git add --sparse public/books/m/163 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+          git add --sparse public/books/m/163 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html tools/publish_m163_authors_20261001.py
           git commit -m 'Publish monograph 163: Wang Desheng and Yang Bide author credits across cover, PDFs and reading entrances'
           for attempt in 1 2 3; do
             if git push origin HEAD:main; then exit 0; fi
