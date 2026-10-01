@@ -8,7 +8,7 @@ permissions:
 jobs:
   reference:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
         with:
@@ -16,37 +16,27 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            /public/books/catalog.json
-            /public/books/index.html
-            /public/books/m/220/
-            /public/books/education-subject-rebirth/index.html
-            /public/books/education-subject-rebirth/read.html
-            /public/books/education-subject-rebirth/chapters.html
-            /public/books/education-subject-rebirth/reader.css
-            /public/students/wang-desheng/my-three-treasures/m220/
-            /public/monographs/index.html
-            /public/sites/read/library/index.html
-            /public/sitemap.xml
-            /tools/build_bookshelf.py
-            /wrangler.toml
-      - name: Package exact reference files, without fonts or credentials
+            /public/books/education-subject-rebirth/vendor/
+      - name: Preserve the existing reader library and source reference
         run: |
           python - <<'PY'
-          import pathlib,zipfile,os,json,hashlib
+          import pathlib,zipfile,os,urllib.request,json
           root=pathlib.Path('.');out=pathlib.Path(os.environ['RUNNER_TEMP'])/'m296-reference';out.mkdir()
-          chosen=[]
-          for base in ['public/books/m/220','public/students/wang-desheng/my-three-treasures/m220']:
-            p=root/base
-            if p.exists():
-              chosen += [f for f in p.rglob('*') if f.is_file() and f.suffix.lower() in ['.html','.css','.js','.pdf','.jpg','.png','.json'] and 'video' not in f.parts]
-          for n in ['public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/sitemap.xml','tools/build_bookshelf.py','wrangler.toml','public/books/education-subject-rebirth/index.html','public/books/education-subject-rebirth/read.html','public/books/education-subject-rebirth/chapters.html','public/books/education-subject-rebirth/reader.css']:
-            if (root/n).is_file():chosen.append(root/n)
+          vendor=root/'public/books/education-subject-rebirth/vendor'
+          files=[f for f in vendor.rglob('*') if f.is_file() and f.suffix in ['.js','.txt']]
+          assert any(f.name=='pdf.min.js' for f in files)
           with zipfile.ZipFile(out/'reference.zip','w',zipfile.ZIP_DEFLATED) as z:
-            for f in sorted(set(chosen)):z.write(f,str(f))
-          print(json.dumps({'reference_files':len(set(chosen)),'sha256':hashlib.sha256((out/'reference.zip').read_bytes()).hexdigest(),'no_reindex':True}))
+            for f in files:z.write(f,'vendor/'+str(f.relative_to(vendor)))
+            url='https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf'
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (M296-publication-reference)'})
+              data=urllib.request.urlopen(req,timeout=35).read(24*1024*1024)
+              if data.startswith(b'%PDF'):z.writestr('220-reader.pdf',data)
+            except Exception as exc:print('PDF reference retrieval:',type(exc).__name__)
+          print(json.dumps({'vendor_files':len(files),'no_reindex':True}))
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: m296-reference-220
+          name: m296-vendor-and-print-reference
           path: ${{ runner.temp }}/m296-reference/reference.zip
           retention-days: 2
