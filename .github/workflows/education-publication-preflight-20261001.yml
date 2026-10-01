@@ -1,0 +1,42 @@
+name: Education monograph publication preflight
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/education-publication-preflight-20261001.yml']
+permissions:
+  contents: read
+jobs:
+  references:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Collect public style references and current publication structure
+        run: |
+          mkdir -p refs
+          python - <<'PY'
+          import urllib.request,pathlib,json
+          base='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/'
+          paths=['public/books/m/220/cover.jpg','public/books/m/220/backcover.jpg','public/books/m/220/index.html','public/books/m/220/read.html','public/books/m/220/text/index.html','public/books/catalog.json','tools/build_bookshelf.py','public/sitemap.xml','.github/workflows/search-index.yml']
+          for p in paths:
+            try:
+              data=urllib.request.urlopen(base+p,timeout=90).read()
+              out=pathlib.Path('refs')/p;out.parent.mkdir(parents=True,exist_ok=True);out.write_bytes(data)
+              print(p,len(data))
+            except Exception as e: print('UNAVAILABLE',p,str(e))
+          for name in ['my-three-treasures-reader-v3.pdf','my-three-treasures-v3.pdf']:
+            u='https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/'+name
+            try:
+              data=urllib.request.urlopen(u,timeout=120).read()
+              if data[:5]!=b'%PDF-': raise ValueError('Not PDF')
+              (pathlib.Path('refs')/name).write_bytes(data);print(name,len(data))
+            except Exception as e: print('REFERENCE PDF UNAVAILABLE',str(e))
+          catalog=json.loads(pathlib.Path('refs/public/books/catalog.json').read_text())
+          summary={'categories':catalog.get('categories'),'matches':[b for b in catalog['books'] if '教育对象' in b.get('title','')],'books':len(catalog['books']),'max_number':max(b.get('number') or 0 for b in catalog['books'])}
+          pathlib.Path('refs/preflight.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2))
+          print(json.dumps(summary,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: education-publication-style-references
+          path: refs/
+          retention-days: 2
