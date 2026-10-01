@@ -74,10 +74,8 @@ def main():
     else:
         books.insert(0, entry)
     cat_p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
-    # 站点地图（同第 275 号：独立分图挂进索引）
+    # 站点地图：三条网址直接加进 sitemap.xml
     locs = [url, url + 'text/', url + 'read.html']
-    (SITE / f'sitemap-m{NO}.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        + ''.join('<url><loc>%s</loc><lastmod>2026-10-01</lastmod></url>' % u for u in locs) + '</urlset>\n')
     sm = SITE / 'sitemap.xml'; t = sm.read_text()
     for u in locs:
         if '<loc>%s</loc>' % u not in t:
