@@ -1,0 +1,204 @@
+name: Publish volume 289 - 220-style v1.1
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-m289-v11.yml']
+permissions:
+  contents: write
+concurrency:
+  group: education-monograph-publication
+  cancel-in-progress: false
+jobs:
+  publication:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/education-subject-rebirth/
+            /public/books/m/289/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap-education-subject-rebirth.xml
+            /tools/build_bookshelf.py
+            /tools/m289-publication-v11.py
+            /tools/m289-browser-check.py
+      - name: Prepare publication tools and Chinese typography
+        timeout-minutes: 7
+        run: |
+          python -m pip install -q python-docx==1.2.0 Pillow==11.3.0 beautifulsoup4==4.13.5 reportlab==4.4.4 PyMuPDF==1.26.7 playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends libreoffice-writer fonts-noto-cjk fonts-noto-core fonts-liberation fonts-crosextra-carlito
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Check exclusive volume allocation and preserve the source edition
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,os,shutil
+          c=json.loads(Path('public/books/catalog.json').read_text());key='education-subject-rebirth'
+          original=[x for x in c['books'] if x['id']==key];assert len(original)==1
+          assert not [x for x in c['books'] if x.get('number')==289 and x['id']!=key],'Volume 289 is already assigned to another title'
+          assert not [x for x in c['books'] if str(x.get('isbn','')).replace('-','')=='9798906903655' and x['id']!=key],'ISBN already assigned'
+          source=Path('public/books/education-subject-rebirth');m=json.loads((source/'publication-manifest.json').read_text())
+          assert m['release_sha256']=='c89c9531ddda73c38d67c7c00686742e181daf416e4b718ecbb68715c78c3770','The source edition changed; stop and reconcile'
+          for name,item in m['files'].items():assert hashlib.sha256((source/name).read_bytes()).hexdigest()==item['sha256'],name
+          dest=Path(os.environ['RUNNER_TEMP'])/'m289-source';shutil.copytree(source,dest)
+          print('Unique volume and ISBN checked; accepted source edition verified.')
+          PY
+      - name: Produce the editable book and exact cover annotations
+        run: |
+          python - <<'PY'
+          import importlib.util,os,json
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('book','tools/m289-publication-v11.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          root=Path(os.environ['RUNNER_TEMP']);src=root/'m289-source';build=root/'m289-build';m.cover_assets(src,build/'assets')
+          changes=m.edit_docx(src/'downloads/education-subject-rebirth.docx',build/'education-subject-rebirth.docx',build/'assets')
+          (build/'front-matter-changes.json').write_text(json.dumps(changes,ensure_ascii=False,indent=2))
+          PY
+          mkdir -p "$RUNNER_TEMP/m289-build/front"
+          libreoffice "-env:UserInstallation=file://$RUNNER_TEMP/m289-lo" --headless --convert-to 'pdf:writer_pdf_Export:{"PageRange":{"type":"string","value":"1-4"}}' --outdir "$RUNNER_TEMP/m289-build/front" "$RUNNER_TEMP/m289-build/education-subject-rebirth.docx"
+      - name: Assemble the complete edition and verify all preserved manuscript blocks
+        run: |
+          python - <<'PY'
+          import importlib.util,os,json,re
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          from urllib.parse import urlparse,unquote
+          from collections import Counter
+          spec=importlib.util.spec_from_file_location('book','tools/m289-publication-v11.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          root=Path(os.environ['RUNNER_TEMP']);pub=root/'m289-candidate/public';dest=pub/'books/m/289';build=root/'m289-build'
+          audit=m.finalize_site(root/'m289-source',dest,build,build/'front/education-subject-rebirth.pdf')
+          for f in dest.rglob('*.html'):
+            soup=BeautifulSoup(f.read_text(),'html.parser');ids=Counter(x['id'] for x in soup.select('[id]'));assert all(v==1 for v in ids.values()),str(f)
+            for a in soup.select('a[href]'):
+              u=urlparse(a['href'])
+              if u.netloc not in ['', 'sdeuniverses.com']:continue
+              if not u.path:target=f
+              elif u.path.startswith('/books/m/289/'):target=pub/u.path.lstrip('/')
+              else:continue
+              if target.is_dir():target=target/'index.html'
+              assert target.exists(),(str(f),a['href'])
+              if u.fragment and target.suffix=='.html':assert BeautifulSoup(target.read_text(),'html.parser').find(id=unquote(u.fragment)),(str(f),a['href'])
+          # Whole-book visual regression: only the two covers and three preliminary pages may differ.
+          import fitz
+          old=fitz.open(root/'m289-source/downloads/education-subject-rebirth-print.pdf');new=fitz.open(dest/'downloads/education-subject-rebirth-print.pdf');changed=[]
+          for i in range(333):
+            a=old[i].get_pixmap(matrix=fitz.Matrix(.75,.75),alpha=False).samples;b=new[i].get_pixmap(matrix=fitz.Matrix(.75,.75),alpha=False).samples
+            if a!=b:changed.append(i+1)
+          assert set(changed)<={1,2,3,4,333},changed
+          audit['changed_render_pages']=changed;audit['all_manuscript_pages_pixel_identical']=True
+          qa=root/'m289-qa';qa.mkdir()
+          for i in [0,1,2,3,8,26,126,163,299,332]:new[i].get_pixmap(matrix=fitz.Matrix(1.5,1.5),alpha=False).save(qa/f'pdf-page-{i+1}.png')
+          (qa/'publication-audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2));print(json.dumps(audit,ensure_ascii=False,indent=2))
+          PY
+      - name: Check desktop, mobile, narrow-screen and actual PDF reading before publication
+        run: python tools/m289-browser-check.py "$RUNNER_TEMP/m289-candidate/public" "$RUNNER_TEMP/m289-qa/browser"
+      - name: Install one catalogue record and preserve old reading links
+        run: |
+          git fetch --depth=1 origin main
+          git reset --hard origin/main
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,shutil,datetime,html,subprocess
+          root=Path(os.environ['RUNNER_TEMP']);new=root/'m289-candidate/public/books/m/289';target=Path('public/books/m/289');old=Path('public/books/education-subject-rebirth')
+          cpath=Path('public/books/catalog.json');c=json.loads(cpath.read_text());key='education-subject-rebirth';entry=next(x for x in c['books'] if x['id']==key)
+          assert not [x for x in c['books'] if x.get('number')==289 and x['id']!=key]
+          assert json.loads((old/'publication-manifest.json').read_text())['release_sha256']=='c89c9531ddda73c38d67c7c00686742e181daf416e4b718ecbb68715c78c3770'
+          if target.exists():assert json.loads((target/'publication-manifest.json').read_text()).get('book_id')==key
+          others={x['id']:x.copy() for x in c['books'] if x['id']!=key};shutil.copytree(new,target,dirs_exist_ok=True)
+          base='https://sdeuniverses.com/books/m/289/';now=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          entry.update(number=289,isbn='979-8-90690-365-5',price=20,priceCurrency='USD',priceLabel='US$20.00',edition='2026年10月第1版 · 校订v1.1',editionPublishedAt=now,updatedAt=now,detailUrl=base,readUrl=base+'read.html',flipUrl=base+'read.html',pdfUrl=base+'downloads/education-subject-rebirth-reader.pdf',coverUrl=base+'cover.jpg?v=1.1',chapterUrl=base+'chapters.html',description='第289卷 · US$20 · 六编三十章 · 333页。以SDE发生学研究复合主体、关系历史、可重构连续性与个人知识生态。正文20万字及五个方法附录，全文开放。')
+          c['books']=[entry]+[x for x in c['books'] if x['id']!=key];assert others=={x['id']:x for x in c['books'] if x['id']!=key};assert len({x['id'] for x in c['books']})==len(c['books'])
+          cpath.write_text(json.dumps(c,ensure_ascii=False,indent=2)+'\n');subprocess.run(['python','tools/build_bookshelf.py'],check=True)
+          # HTML compatibility pages redirect with query and fragment; old direct downloads remain current.
+          for f in target.rglob('*'):
+            if not f.is_file():continue
+            rel=f.relative_to(target);p=old/rel;p.parent.mkdir(parents=True,exist_ok=True)
+            if f.suffix=='.html':
+              u=base+str(rel);u=u.removesuffix('index.html') if f.name=='index.html' else u
+              p.write_text('<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第289卷 · AI时代教育对象的重生</title><link rel="canonical" href="'+html.escape(u)+'"><meta http-equiv="refresh" content="0;url='+html.escape(u)+'"><main><p>本书现为德麦国际专著第289卷。</p><a href="'+html.escape(u)+'">进入完整阅读版</a></main><script>location.replace('+json.dumps(u)+'+location.search+location.hash)</script></html>')
+            elif f.name not in ['publication-manifest.json','release-check.json']:shutil.copy2(f,p)
+          manifest=json.loads((target/'publication-manifest.json').read_text())
+          (old/'publication-manifest.json').write_text(json.dumps({'book_id':key,'number':289,'isbn':'979-8-90690-365-5','price':20,'priceCurrency':'USD','edition':'v1.1','canonical_url':base,'manifest_url':base+'publication-manifest.json','release_sha256':manifest['release_sha256']},ensure_ascii=False,indent=2))
+          (old/'release-check.json').write_text(json.dumps({'compatibility_entry':True,'canonical_url':base,'downloads_match_current_edition':True},ensure_ascii=False,indent=2))
+          sm=Path('public/sitemap-education-subject-rebirth.xml');sm.write_text(sm.read_text().replace('/books/education-subject-rebirth/','/books/m/289/'))
+          (root/'m289-qa/catalogue-audit.json').write_text(json.dumps({'one_book_record':True,'number':289,'isbn':'979-8-90690-365-5','price_usd':20,'other_records_unchanged':True,'legacy_links_preserved':True,'catalogue_count':len(c['books']),'reindex_triggered':False},ensure_ascii=False,indent=2))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --sparse public/books/m/289 public/books/education-subject-rebirth public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html public/sitemap-education-subject-rebirth.xml
+          git diff --cached --stat
+          git commit -m 'Publish volume 289 v1.1: confirmed ISBN 979-8-90690-365-5, US$20, refined full readers'
+          git push origin HEAD:main
+          git rev-parse HEAD > "$RUNNER_TEMP/m289-qa/publication-commit.txt"
+      - name: Confirm public deployment and exact downloads
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python - <<'PY'
+          import os,json,time,urllib.request,hashlib
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          root=Path(os.environ['RUNNER_TEMP']);b=Path('public/books/m/289');m=json.loads((b/'publication-manifest.json').read_text());base='https://sdeuniverses.com/books/m/289/'
+          def get(u):
+            u+=('&' if '?' in u else '?')+'m289check='+str(time.time_ns())
+            req=urllib.request.Request(u,headers={'User-Agent':'SDE-Publication-Verification/1.1','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=60) as r:return r.status,r.read()
+          for n in range(45):
+            try:
+              _,d=get(base+'publication-manifest.json')
+              if json.loads(d).get('release_sha256')==m['release_sha256']:break
+            except Exception as e:print('Awaiting deployment:',str(e))
+            time.sleep(12)
+          else:raise RuntimeError('New edition not observed in deployment window')
+          report=[]
+          for name,item in m['files'].items():
+            status,d=get(base+name);assert status==200
+            if name.endswith('.html'):
+              def sig(data):
+                s=BeautifulSoup(data,'html.parser');main=s.find('main');assert main
+                for x in main.select('script,style'):x.decompose()
+                return ''.join(main.stripped_strings),[(x.get('data-source-paragraph'),x.get_text()) for x in s.select('[data-source-paragraph]')]
+              assert sig(d)==sig((b/name).read_bytes()),name
+            else:assert hashlib.sha256(d).hexdigest()==item['sha256'],name
+            report.append({'path':name,'pass':True})
+          for u in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+            _,d=get(u);s=BeautifulSoup(d,'html.parser');e=s.find(attrs={'data-id':'education-subject-rebirth'});assert e and e.get('data-number')=='289',u
+          (root/'m289-qa/live-files.json').write_text(json.dumps({'files':report,'three_bookshelves_verified':True,'number':289,'isbn':'979-8-90690-365-5','price_usd':20},ensure_ascii=False,indent=2));print('All edition files and three entrances verified.')
+          PY
+          python tools/m289-browser-check.py https://sdeuniverses.com "$RUNNER_TEMP/m289-qa/live-browser"
+      - name: Package the actual edition and evidence for delivery
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,shutil,zipfile
+          root=Path(os.environ['RUNNER_TEMP']);out=root/'m289-deliverables';out.mkdir(exist_ok=True);book=Path('public/books/m/289')
+          if not book.exists():book=root/'m289-candidate/public/books/m/289'
+          if book.exists():
+            for f,label in [('education-subject-rebirth.docx','出版排版版.docx'),('education-subject-rebirth-print.pdf','印刷校样.pdf'),('education-subject-rebirth-reader.pdf','阅读版.pdf')]:
+              p=book/'downloads'/f
+              if p.exists():shutil.copy2(p,out/('AI时代教育对象的重生_第289卷_v1.1_'+label))
+            for n in ['cover.jpg','backcover.jpg','publication-manifest.json','release-check.json']:
+              if (book/n).exists():shutil.copy2(book/n,out/n)
+            with zipfile.ZipFile(out/'AI时代教育对象的重生_第289卷_v1.1_上站包.zip','w',zipfile.ZIP_DEFLATED) as z:
+              for p in book.rglob('*'):
+                if p.is_file():
+                  assert p.suffix.lower() not in ['.ttf','.otf','.ttc','.woff','.woff2']
+                  z.write(p,'public/books/m/289/'+str(p.relative_to(book)))
+          if (root/'m289-qa').exists():shutil.copytree(root/'m289-qa',out/'验收记录',dirs_exist_ok=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: monograph-289-v11-publication
+          retention-days: 7
+          path: ${{ runner.temp }}/m289-deliverables/
