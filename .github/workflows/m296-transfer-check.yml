@@ -1,0 +1,55 @@
+name: M296 publication transfer check
+on:
+  push:
+    branches: ['publish/m296-20261002']
+    paths: ['.github/workflows/m296-transfer-check.yml']
+permissions:
+  contents: read
+  issues: write
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Receive and verify publication bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -u - <<'PY'
+          import os,json,time,hashlib,pathlib,urllib.request,urllib.parse,urllib.error,xml.etree.ElementTree as E
+          api='https://api.github.com/repos/SIOWDS/sdeuniverses-site-/issues/24'
+          hdr={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}
+          expected='a0ab73f34a085cf119f31607114d8e26fc6ecd422f9d58f76fb0dd3230052f39'
+          for _ in range(36):
+            obj=json.load(urllib.request.urlopen(urllib.request.Request(api,headers=hdr),timeout=20))
+            b=json.loads(obj['body']);assert obj['user']['login']=='SIOWDS' and b['volume']==296 and b['sha256']==expected
+            if b.get('ready'):break
+            time.sleep(5)
+          else:raise RuntimeError('Transfer not ready')
+          url=b['url'];u=urllib.parse.urlparse(url);assert u.scheme=='https' and u.hostname.endswith('.oaiusercontent.com')
+          print('::add-mask::'+url)
+          try:
+            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+            with urllib.request.urlopen(req,timeout=90) as res:data=res.read(25*1024*1024)
+          except urllib.error.HTTPError as exc:
+            err=exc.read(16000)
+            print('HTTP status:',exc.code)
+            try:
+              e=E.fromstring(err)
+              for key in ['Code','AuthenticationErrorDetail']:
+                val=e.findtext(key)
+                if val:print(key,val[:1000])
+            except Exception:print('Error response not XML; bytes:',len(err))
+            raise RuntimeError('File transfer refused; no secret or link logged') from None
+          assert len(data)==13075734 and hashlib.sha256(data).hexdigest()==expected
+          (pathlib.Path(os.environ['RUNNER_TEMP'])/'m296-publication.zip').write_bytes(data)
+          clean={'volume':296,'ready':False,'sha256':expected,'status':'Publication archive received and verified. Temporary link removed. No reindex.'}
+          req=urllib.request.Request(api,data=json.dumps({'body':json.dumps(clean)}).encode(),headers={**hdr,'Content-Type':'application/json'},method='PATCH')
+          urllib.request.urlopen(req,timeout=20).read()
+          print('Publication bytes:',len(data),'SHA256:',expected)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m296-publication-candidate-v1
+          path: ${{ runner.temp }}/m296-publication.zip
+          retention-days: 2
