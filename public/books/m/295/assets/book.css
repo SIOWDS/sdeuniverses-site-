@@ -71,3 +71,14 @@ p.note2 .nl{background:#b8913e}
 body.detail{background:#0b0e12;color:#e6e4de;font-size:17px}.detail a{color:#d9a441}.detail .wrap{max-width:1000px}.detail h1{font-size:2.6rem;line-height:1.45;letter-spacing:.02em}.detail h2{color:#d9a441;margin-top:45px}.detail p{text-indent:0}.detail .hero{display:grid;grid-template-columns:300px 1fr;gap:40px;text-align:left;align-items:start;padding:20px 0 0}.detail .hero img{width:100%;border-radius:4px}.detail .hero p{color:#d0cec8;text-align:left;font-size:1rem}.detail .kicker{font:12px/1.8 sans-serif;letter-spacing:.14em;color:#d9a441}.detail .sub{font-size:1.15rem!important;margin:4px 0 22px}.detail .tagline{border-left:3px solid #d9a441;padding:8px 0 8px 18px;margin:20px 0}.detail .meta{border-top:1px solid #30373f;border-bottom:1px solid #30373f;padding:14px 0;font-size:.9rem;line-height:1.9}.detail .meta b{display:inline-block;min-width:5em;color:#9da5ad;font-weight:400}.buttons{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}.btn{border:1px solid #b08a3c;padding:9px 14px;border-radius:6px;text-decoration:none;font:15px/1.4 sans-serif;display:inline-block}.btn.solid{background:#d9a441;color:#111}.detail .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.detail .card{background:#131920;border:1px solid #29313a;padding:18px;border-radius:8px}.detail .card h3{font-size:1.06rem;color:#d9a441;margin:0 0 10px}.detail .card p{color:#bac1c7;font-size:.9rem;margin:0}.detail .back{display:grid;grid-template-columns:1fr 230px;gap:35px;align-items:center}.detail .back img{width:100%;border-radius:5px}.detail .foot{border-color:#29313a;color:#a2a8ad}.booklist{list-style:none;padding:0}.booklist li{padding:12px 0;border-bottom:1px solid var(--line)}.booklist .part-item{color:var(--gold);font-weight:700;padding-top:26px}.booklist a{text-decoration:none}.booklist small{display:block;color:var(--dim)}
 @media(max-width:700px){.detail .hero{grid-template-columns:1fr;gap:24px}.detail .hero img{max-width:240px;margin:auto}.detail h1{font-size:2rem}.detail .cards{grid-template-columns:1fr}.detail .back{grid-template-columns:1fr}.detail .back img{max-width:200px;margin:auto}.bar{padding:9px 10px;gap:8px}.bar .mini{display:none}.wrap{padding-left:18px;padding-right:18px}.chap-number{font-size:58px}}
 @media print{.bar,#prog,.pager,.skip,.buttons{display:none}.wrap{max-width:none;padding:0}.chapter,.front-sec,.back-sec,.part{break-before:page}.chapter h2,h3{break-after:avoid}body{font-size:11pt;background:white;color:black}a{color:inherit}}
+
+/* Volume 295 final contrast correction */
+.detail .hero h1{color:#f4efe4}
+
+/* Accessible reading refinements; scoped to volume 295 only. */
+:root{--dim:#69665e;--gold:#8b6927}
+html.dark{--dim:#a5adb5;--gold:#d9b45c}
+.detail .hero h1{color:#f4efe4}
+.detail .hero img,.detail .back img{height:auto}
+.detail .hero>div{min-width:0}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
