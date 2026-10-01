@@ -1,0 +1,69 @@
+name: M296 complete reader validation
+on:
+  push:
+    branches: ['publish/m296-20261002']
+    paths: ['.github/workflows/m296-reader-check.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: m296-publication-candidate-v1
+          run-id: 36910111988
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m296-import
+      - name: Verify exact candidate and unpack safely
+        run: |
+          python - <<'PY'
+          import pathlib,os,hashlib,zipfile
+          root=pathlib.Path(os.environ['RUNNER_TEMP']);zs=list((root/'m296-import').rglob('m296-publication.zip'));assert len(zs)==1
+          assert hashlib.sha256(zs[0].read_bytes()).hexdigest()=='a0ab73f34a085cf119f31607114d8e26fc6ecd422f9d58f76fb0dd3230052f39'
+          dest=root/'m296-payload';dest.mkdir()
+          with zipfile.ZipFile(zs[0]) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+            z.extractall(dest)
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/m/296/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap.xml
+            /tools/build_bookshelf.py
+      - name: Prepare current candidate without publishing or reindexing
+        run: python "$RUNNER_TEMP/m296-payload/release-install.py" "$RUNNER_TEMP/m296-payload" "$GITHUB_WORKSPACE"
+      - name: Prepare browser and Chinese fonts
+        timeout-minutes: 5
+        run: |
+          python -m pip install -q playwright==1.55.0 beautifulsoup4
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null && ! command -v chromium-browser >/dev/null; then
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Check full reading experience and actual PDF page content
+        run: |
+          node --check public/books/m/296/reader.js
+          python "$RUNNER_TEMP/m296-payload/browser-check.py" --root "$GITHUB_WORKSPACE/public" --out "$RUNNER_TEMP/m296-browser-qa"
+      - name: Save evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m296-reader-verification
+          retention-days: 2
+          path: |
+            ${{ runner.temp }}/m296-browser-qa/
+            ${{ github.workspace }}/public/books/m/296/release-check.json
