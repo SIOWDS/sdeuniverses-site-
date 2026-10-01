@@ -1,0 +1,52 @@
+name: Book 295 publication references
+on:
+  push:
+    branches: ['publish/book-295-20261002']
+    paths: ['.github/workflows/book295-reference-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  references:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/220/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap.xml
+            /tools/build_bookshelf.py
+            /.github/workflows/search-index.yml
+      - name: Collect public reference material without changing production
+        run: |
+          python - <<'PY'
+          import pathlib,shutil,urllib.request,json,hashlib
+          root=pathlib.Path('book295-references');root.mkdir()
+          for p in ['public/books/m/220','public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/sitemap.xml','tools/build_bookshelf.py','.github/workflows/search-index.yml']:
+              src=pathlib.Path(p);dst=root/p;dst.parent.mkdir(parents=True,exist_ok=True)
+              if src.is_dir():shutil.copytree(src,dst,dirs_exist_ok=True)
+              elif src.exists():shutil.copy2(src,dst)
+          report={}
+          urls={'reference-reader.pdf':'https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf','live-220.html':'https://sdeuniverses.com/books/m/220/','live-295.html':'https://sdeuniverses.com/books/m/295/','pdf.min.js':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdf.worker.min.js':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}
+          for name,url in urls.items():
+              try:
+                  r=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (Book 295 publication verification)'}),timeout=90);data=r.read();(root/name).write_bytes(data)
+                  report[name]={'status':r.status,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+              except Exception as e:report[name]={'error':str(e)}
+          (root/'reference-check.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False,indent=2))
+          assert (root/'public/books/m/220/index.html').exists()
+          assert (root/'pdf.min.js').exists() and (root/'pdf.worker.min.js').exists()
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book295-publication-references
+          path: book295-references/
+          retention-days: 2
