@@ -1,0 +1,109 @@
+name: Publish education monograph - verified 220-style edition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-education-monograph-20261001.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: education-monograph-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - name: Retrieve the already authorized publication artifact from this repository
+        uses: actions/download-artifact@v4
+        with:
+          name: education-monograph-candidate-v1
+          run-id: 36866719297
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book-import
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/education-subject-rebirth/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/sitemap.xml
+            /public/sitemap-education-subject-rebirth.xml
+            /tools/build_bookshelf.py
+            /tools/apply-education-reviewed-layout.py
+            /tools/education-reviewed-layout.z85
+      - name: Prepare the publication verifier
+        timeout-minutes: 6
+        run: |
+          python -m pip install -q PyMuPDF==1.26.7 playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null && ! command -v chromium-browser >/dev/null; then
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Verify base bytes and apply reviewed title-layout corrections
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,zipfile,hashlib
+          root=Path(os.environ['RUNNER_TEMP']);sources=list((root/'book-import').rglob('publication.zip'));assert len(sources)==1
+          assert hashlib.sha256(sources[0].read_bytes()).hexdigest()=='2780433694d5dd0f148758d3943c08761c15efa46f28a9ea24323b1f84264f40'
+          dest=root/'education-payload';dest.mkdir()
+          with zipfile.ZipFile(sources[0]) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in Path(n).parts
+            z.extractall(dest)
+          PY
+          python tools/apply-education-reviewed-layout.py "$RUNNER_TEMP/education-payload" tools/education-reviewed-layout.z85
+          python - <<'PY'
+          import os,json,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'education-payload/reviewed-layout-check.json'
+          m=json.loads(p.read_text());assert m['release_sha256']=='abccda0579ef3ef1aced0950c84c17acc5b991eedcae8b23177dc8303bf3a9ad',m
+          print('Matches the locally pixel-verified final edition:',m)
+          PY
+      - name: Merge only this title into the current catalogue
+        run: python "$RUNNER_TEMP/education-payload/release-install.py" "$RUNNER_TEMP/education-payload" "$GITHUB_WORKSPACE"
+      - name: Verify complete reading on desktop and mobile before publication
+        run: python "$RUNNER_TEMP/education-payload/browser-check.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/education-qa"
+      - name: Commit only the authorized book and its entrances
+        run: |
+          git config user.name 'SDE Publication'
+          git config user.email 'publication@users.noreply.github.com'
+          git add public/books/education-subject-rebirth public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html public/sitemap.xml public/sitemap-education-subject-rebirth.xml
+          python - <<'PY'
+          import subprocess
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/sitemap.xml','public/sitemap-education-subject-rebirth.xml'}
+          paths=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          assert paths and all(p in allowed or p.startswith('public/books/education-subject-rebirth/') for p in paths),paths
+          print('Authorized publication files:',len(paths))
+          PY
+          git commit -m 'Publish AI时代教育对象的重生: complete 30 chapters, 333-page PDFs, Word and verified readers'
+          if ! git push origin HEAD:main; then
+            git fetch --depth=1 origin main
+            git reset --hard origin/main
+            python "$RUNNER_TEMP/education-payload/release-install.py" "$RUNNER_TEMP/education-payload" "$GITHUB_WORKSPACE"
+            git add public/books/education-subject-rebirth public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html public/sitemap.xml public/sitemap-education-subject-rebirth.xml
+            git commit -m 'Publish complete education monograph against refreshed catalogue'
+            git push origin HEAD:main
+          fi
+          git rev-parse HEAD > "$RUNNER_TEMP/education-qa/publication-commit.txt"
+      - name: Verify live deployment, complete files and three bookshelf entrances
+        run: python "$RUNNER_TEMP/education-payload/live-check.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/education-live"
+      - name: Preserve publication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: education-monograph-publication-v1
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/education-qa/
+            ${{ runner.temp }}/education-live/
+            ${{ runner.temp }}/education-payload/reviewed-layout-check.json
+            ${{ github.workspace }}/public/books/education-subject-rebirth/publication-manifest.json
+            ${{ github.workspace }}/public/books/education-subject-rebirth/release-check.json
