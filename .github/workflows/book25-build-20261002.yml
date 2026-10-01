@@ -1,0 +1,44 @@
+name: Book 25 publication candidate
+on:
+  push:
+    branches: [book25-rebuild-20261002]
+    paths:
+      - 'tools/book25/**'
+      - '.github/workflows/book25-build-20261002.yml'
+permissions:
+  contents: read
+concurrency:
+  group: book25-publication-candidate
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/book25/
+            /public/books/m/220/index.html
+            /public/books/m/220/read.html
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install typesetting dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk libpango-1.0-0 libpangoft2-1.0-0
+          python -m pip install weasyprint==66.0 pillow==11.3.0 python-docx==1.2.0 pymupdf==1.26.4
+      - name: Build book 25 only
+        run: python tools/book25/build_book25.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book25-publication-candidate
+          retention-days: 7
+          path: |
+            build/book25/
+            tools/book25/
