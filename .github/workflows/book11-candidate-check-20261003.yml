@@ -19,7 +19,7 @@ jobs:
           path: ${{ runner.temp }}/book11-candidate
       - name: Install isolated verification tools
         run: python -m pip install -q Pillow PyMuPDF beautifulsoup4 PyYAML playwright==1.55.0
-      - name: Check exact source and narrowly scoped publication triggers
+      - name: Check exact source and disjoint explicit index trigger paths
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -28,7 +28,7 @@ jobs:
           root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book11-candidate'
           p=root/'build-tools/prepare_remote.py';s=p.read_text()
           old="  assert not (isinstance(on,dict) and 'push' in on),'Push-triggered indexing requires review before publication: '+w['path']"
-          new="  assert not (isinstance(on,dict) and 'push' in on) or (w['path']=='.github/workflows/three-views-longform-20260920.yml' and isinstance(on['push'],dict) and set(on['push'].get('paths',[]))=={'tools/three_views_longform_20260920.py','.github/workflows/three-views-longform-20260920.yml'}),'Unreviewed indexing trigger: '+w['path']"
+          new="  assert not (isinstance(on,dict) and 'push' in on) or (isinstance(on['push'],dict) and on['push'].get('paths') and all(not any(c in p for c in '*?[') and p not in {'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'} and not p.startswith(('public/books/m/11/','.github/workflows/book11-','tools/book11_')) for p in on['push']['paths'])),'Overlapping or unbounded index trigger: '+w['path']"
           assert s.count(old)==1
           sys.argv=[str(p),str(root)]
           exec(compile(s.replace(old,new),str(p),'exec'))
