@@ -1,0 +1,69 @@
+name: Book11 landscape cover Wang Desheng v1.3 publication
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book11-landscape-v13-publish-20261003.yml']
+permissions:
+  contents: write
+  actions: read
+  checks: read
+  statuses: read
+concurrency:
+  group: book11-cover-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book11-approved-cover-v12-final
+          run-id: 37075221993
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book11-landscape-v13
+      - name: Install verification dependencies
+        run: python -m pip install -q Pillow PyMuPDF==1.26.4 beautifulsoup4 PyYAML playwright==1.55.0
+      - name: Receive exact approved image and preserve all 676 body pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COVER_SOURCE_URL: 'https://lh7-rt.googleusercontent.com/slidesz/AGV_vUfy8VH1UMWP9hx5njEtwp6idwmCPUhtkh4JER4K3TRgLmd1vvFzlUOZivEeiY3pDhHDYLxEDgHhjC9gmtcGQ7KAWTUg_m21xJyd_vGB5YW9K7KWXXBDCzAAU27mWMI8FbxJA5WPqrVi0HYbHA61FKQG_RnNxsbbdFNdWKlPVAWWvNMz=s2048?key=sReyhu7edNb09mh5xyrfaw'
+        run: |
+          python - <<'PY'
+          import urllib.request,pathlib,os,subprocess
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book11-landscape-v13'
+          source='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/220bc0144c993b6fa3902e7c967ea715c7e510c2/tools/book11_landscape_v13.py'
+          p=root/'tools/landscape_patch.py';p.write_bytes(urllib.request.urlopen(source,timeout=60).read())
+          subprocess.run(['python',str(p),str(root)],check=True)
+          PY
+      - name: Prepare Chinese-capable browser
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Verify desktop and mobile cover and full reader before publication
+        run: |
+          mkdir -p "$RUNNER_TEMP/book11-landscape-test/books/m"
+          ln -s "$RUNNER_TEMP/book11-landscape-v13/book" "$RUNNER_TEMP/book11-landscape-test/books/m/11"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/book11-landscape-test" > "$RUNNER_TEMP/book11-landscape-http.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          python "$RUNNER_TEMP/book11-landscape-v13/tools/browser_check.py" http://127.0.0.1:8765/books/m/11 "$RUNNER_TEMP/book11-landscape-v13/qa/browser-local"
+      - name: Publish only book 11 and its three existing bookshelf cards atomically
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python "$RUNNER_TEMP/book11-landscape-v13/tools/publish.py" "$RUNNER_TEMP/book11-landscape-v13"
+      - name: Verify Cloudflare deployment and live asset hashes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python "$RUNNER_TEMP/book11-landscape-v13/tools/verify_live.py" "$RUNNER_TEMP/book11-landscape-v13"
+      - name: Verify live desktop and mobile book readers and corrected cover
+        run: python "$RUNNER_TEMP/book11-landscape-v13/tools/browser_check.py" https://sdeuniverses.com/books/m/11 "$RUNNER_TEMP/book11-landscape-v13/qa/browser-live"
+      - name: Preserve publication receipt and actual screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book11-landscape-v13-publication
+          retention-days: 7
+          path: ${{ runner.temp }}/book11-landscape-v13/
