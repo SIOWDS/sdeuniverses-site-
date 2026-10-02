@@ -1,3 +1,20 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>友好阅读 · 实非实</title>
-<style>*{box-sizing:border-box}html,body{height:100%;margin:0;background:#0c0f13;color:#e9e6de;font:14px/1.6 sans-serif}.top{height:52px;display:flex;align-items:center;gap:.8rem;padding:.5rem 1rem;border-bottom:1px solid #29313a;background:#0c0f13}.top a{color:#d9a441;text-decoration:none}.top b{font-size:1rem}.sp{margin-left:auto}.top button{background:none;color:#e9e6de;border:1px solid #29313a;border-radius:6px;padding:.3rem .6rem}.frame{height:calc(100% - 52px);max-width:1000px;margin:auto;background:#fbf8f0}iframe{width:100%;height:100%;border:0;background:#fbf8f0}@media(max-width:700px){.sub{display:none}}</style></head>
-<body><header class="top"><a href="/books/m/291/">← 详情</a><b>实非实</b><span class="sub">实用主义的实践理想化悖论</span><span class="sp"></span><a href="/books/m/291/chapters.html">目录</a><a href="/books/m/291/text/">全文</a></header><main class="frame"><iframe src="/books/m/291/text/" title="《实非实》全文阅读"></iframe></main></body></html>
+<style>*{box-sizing:border-box}html,body{height:100%;margin:0;background:#0c0f13;color:#e9e6de;font:14px/1.6 sans-serif}.top{height:52px;display:flex;align-items:center;gap:.8rem;padding:.5rem 1rem;border-bottom:1px solid #29313a;background:#0c0f13}.top a,.top button{color:#d9a441;text-decoration:none}.top b{font-size:1rem}.sp{margin-left:auto}.top button{background:none;border:1px solid #29313a;border-radius:6px;padding:.3rem .6rem;cursor:pointer}.frame{height:calc(100% - 52px);max-width:1100px;margin:auto;background:#fbf8f0}.frame iframe{width:100%;height:100%;border:0;background:#fbf8f0}.msg{padding:2rem;text-align:center;color:#aaa}@media(max-width:700px){.sub{display:none}}</style></head>
+<body><header class="top"><a href="/books/m/291/">← 详情</a><b>实非实</b><span class="sub">实用主义的实践理想化悖论</span><span class="sp"></span><button id="web">网页</button><button id="pdf">PDF</button><a href="/books/m/291/chapters.html">目录</a></header>
+<main class="frame" id="frame"><iframe id="reader" src="/books/m/291/text/" title="《实非实》全文阅读"></iframe></main>
+<script>
+const paths=Array.from({length:8},(_,i)=>'/books/m/291/pdf/part'+String(i+1).padStart(2,'0')+'.bin');
+let pdfUrl=null;
+async function loadPdf(){
+ if(pdfUrl){document.getElementById('reader').src=pdfUrl;return;}
+ const frame=document.getElementById('frame');frame.innerHTML='<div class="msg">正在装订 360 页 PDF…</div>';
+ const abs=await Promise.all(paths.map(p=>fetch(p).then(r=>{if(!r.ok)throw new Error(p);return r.arrayBuffer()})));
+ const total=abs.reduce((n,b)=>n+b.byteLength,0), all=new Uint8Array(total);let off=0;
+ for(const b of abs){all.set(new Uint8Array(b),off);off+=b.byteLength;}
+ pdfUrl=URL.createObjectURL(new Blob([all],{type:'application/pdf'}));
+ frame.innerHTML='<iframe id="reader" title="《实非实》PDF阅读"></iframe>';document.getElementById('reader').src=pdfUrl;
+}
+document.getElementById('pdf').onclick=loadPdf;
+document.getElementById('web').onclick=()=>{document.getElementById('frame').innerHTML='<iframe id="reader" src="/books/m/291/text/" title="《实非实》全文阅读"></iframe>'};
+if(new URLSearchParams(location.search).get('pdf')==='1')loadPdf();
+</script></body></html>
