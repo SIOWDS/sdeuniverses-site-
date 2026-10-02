@@ -86,7 +86,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           if [ -f ops/pdf-offload/ledger.tsv ]; then
-            pip install -q boto3
+            pip install -q --upgrade --user boto3 botocore
             python3 tools/pdf_offload.py rehydrate
           else
             echo "还没有迁出过 PDF，跳过"

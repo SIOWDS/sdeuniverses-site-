@@ -55,7 +55,7 @@ jobs:
           AWS_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          pip install -q boto3
+          pip install -q --upgrade --user boto3 botocore
           python3 tools/pdf_offload.py upload --min-age-hours "${{ inputs.min_age_hours || '24' }}" \
             --only "${{ inputs.only }}" --limit "${{ inputs.limit || '0' }}"
 

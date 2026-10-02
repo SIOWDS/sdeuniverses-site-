@@ -82,13 +82,15 @@ def md5(path):
 
 
 def s3():
+    os.environ.setdefault('AWS_REQUEST_CHECKSUM_CALCULATION', 'when_required')
+    os.environ.setdefault('AWS_RESPONSE_CHECKSUM_VALIDATION', 'when_required')
     import boto3
     from botocore.config import Config
     return boto3.client('s3', endpoint_url=ENDPOINT, region_name='auto',
                         config=Config(retries={'max_attempts': 6, 'mode': 'standard'},
-                                      max_pool_connections=32,
-                                      request_checksum_calculation='when_required',
-                                      response_checksum_validation='when_required'))
+                                      max_pool_connections=32))
+    # 新版 botocore 默认给每次 PUT 打 CRC64 校验头，R2 不认会回 501——关掉它靠环境变量
+    # AWS_REQUEST_CHECKSUM_CALCULATION=when_required（老版本不认这个 Config 参数，写进 Config 会直接报错）
 
 
 def head(c, key):
