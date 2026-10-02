@@ -201,18 +201,21 @@ def ledger_rows():
 
 
 def live_probe(k, size):
+    """跟随跳转（分站 PDF 会被 301 到 <名>.sdeuniverses.com），只认最后一跳的响应头。"""
     u = SITE + '/' + urllib.parse.quote(k, safe='/')
     r = subprocess.run(['curl', '-sL', '-o', os.devnull, '-D', '-', '-r', '0-1023', '-A', 'Mozilla/5.0 (pdf-offload)',
                         '--max-time', '60', u], capture_output=True, text=True)
-    hdr = r.stdout.lower()
-    blocks = [b for b in hdr.split('\r\n\r\n') if b.strip()]
-    last = blocks[-1] if blocks else ''
-    code = last.split(' ', 2)[1] if last.startswith('http') else 'ERR'
-    total = None
-    for line in last.splitlines():
-        if line.startswith('content-range:') and '/' in line:
-            total = line.rsplit('/', 1)[1].strip()
-    via = 'r2' if 'x-served-from: r2' in last else ('edge' if 'x-served-from: edge' in last else 'assets')
+    lines = r.stdout.replace('\r', '').split('\n')
+    starts = [i for i, l in enumerate(lines) if l.lower().startswith('http/')]
+    last = lines[starts[-1]:] if starts else []
+    code = last[0].split()[1] if last and len(last[0].split()) > 1 else 'ERR'
+    total, via = None, 'assets'
+    for line in last:
+        ll = line.lower()
+        if ll.startswith('content-range:') and '/' in ll:
+            total = ll.rsplit('/', 1)[1].strip()
+        if ll.startswith('x-served-from:'):
+            via = ll.split(':', 1)[1].strip()
     good = code == '206' and total == str(size)
     return k, code, total, via, good
 
