@@ -1,0 +1,76 @@
+name: Book11 approved minimalist cover v1.2 publication
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book11-cover-v12-publish-20261003.yml']
+permissions:
+  contents: write
+  actions: read
+  checks: read
+concurrency:
+  group: book11-cover-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Install isolated verification dependencies
+        run: python -m pip install -q Pillow PyMuPDF beautifulsoup4 PyYAML playwright==1.55.0
+      - name: Receive exact author-approved PDF and cover package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,io,json,hashlib,urllib.request,zipfile
+          from PIL import Image
+          chunks=[(3145728,'b3ff28294c8aaf2b8c681e33abe26f26e236b72cc42f0dd3fe85cac003e11bea','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUeFsDLZxm8yt3ADwNUUbgIVI_vk_ek1ZeXsrK9YLK5og4G8owlwE71FDZTokRM9YP3UPOTH9dBOSWjnmQAYW7o3Hk69NpsINyRYjXlYj_tKrCnaPn9n6uNCy11Zga_S4AmK1DYp_9FkR4gv78pEcN9Ht8Sn2AxNegVRa9A_PBjUsoXJM2w=s2048?key=ASb6YIMEVgU-o7A5RhEgvw'),(3145728,'ff09803ef566874723a7e10d76961f80b3809715caf1e85464d29136806e3259','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUfh7UARvz-5WQKgeqyua2-fkb4ZQYCwpUa2iJMnYAvhDPpTBcMrgwI2VxLLehutesEuILstVYLVSULhP6z-rDfZb9z_aPr1_Sel3isYeAEX0aTwghb7E_Da_8hqWu02vxCXnzgeRifSVWsnWbMQcbHO_72iFuqQnrc2hG6o37_3ZJpfVLc=s2048?key=ASb6YIMEVgU-o7A5RhEgvw'),(1322162,'8bbf0ec8b989a2915342eeceb808d4ef819cb05d68ff209d32d84842b3d91bea','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUdTgJZQquHkrrRbp7A-6B0tR1Mrr1-evYotTqdDZxGXrU1JKk-AeHWXeSnd0cGaMO7FPaEh0fCAm9vO01p3VLHqAwKXraf3dcrXwv9UkO7GadeOf_6KDImfRII5bXDJVjTIuGN4LggcufJQqVoeKmdfBY0w6bnUvy5rMrwrpT3aD9Mn=s2048?key=ASb6YIMEVgU-o7A5RhEgvw')]
+          data=bytearray()
+          for length,expected,url in chunks:
+            raw=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'SDE-Book11-Cover-Publication'}),timeout=90).read()
+            im=Image.open(io.BytesIO(raw));assert im.size==(1024,1024)
+            part=im.convert('RGB').tobytes()[:length];assert hashlib.sha256(part).hexdigest()==expected,'Transfer changed bytes; stop without publication'
+            data.extend(part)
+          assert len(data)==7613618 and hashlib.sha256(data).hexdigest()=='db88e6176e9e6be3e85e6b47d14bdcc60f9c757113540166d5cbf33f4d8eab29'
+          root=Path(os.environ['RUNNER_TEMP'])/'book11-cover-v12';root.mkdir()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in Path(n).parts
+            z.extractall(root)
+          for f in json.loads((root/'payload-manifest.json').read_text())['files']:
+            assert hashlib.sha256((root/f['path']).read_bytes()).hexdigest()==f['sha256'],f['path']
+          print('Exact approved PDF and cover authenticated; no production files changed yet.')
+          PY
+      - name: Check every retained PDF page and all indexing triggers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python "$RUNNER_TEMP/book11-cover-v12/tools/prepare.py" "$RUNNER_TEMP/book11-cover-v12"
+      - name: Prepare Chinese-capable browser
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Verify real desktop and mobile reading before publishing
+        run: |
+          mkdir -p "$RUNNER_TEMP/book11-cover-test/books/m"
+          ln -s "$RUNNER_TEMP/book11-cover-v12/book" "$RUNNER_TEMP/book11-cover-test/books/m/11"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/book11-cover-test" > "$RUNNER_TEMP/book11-cover-http.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          python "$RUNNER_TEMP/book11-cover-v12/tools/browser_check.py" http://127.0.0.1:8765/books/m/11 "$RUNNER_TEMP/book11-cover-v12/qa/browser-local"
+      - name: Publish only the approved book and three existing shelf cards atomically
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python "$RUNNER_TEMP/book11-cover-v12/tools/publish.py" "$RUNNER_TEMP/book11-cover-v12"
+      - name: Verify Cloudflare deployment and exact live files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python "$RUNNER_TEMP/book11-cover-v12/tools/verify_live.py" "$RUNNER_TEMP/book11-cover-v12"
+      - name: Verify production browser readers and cover
+        run: python "$RUNNER_TEMP/book11-cover-v12/tools/browser_check.py" https://sdeuniverses.com/books/m/11 "$RUNNER_TEMP/book11-cover-v12/qa/browser-live"
+      - name: Preserve publication receipts and actual screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book11-approved-cover-v12-publication
+          retention-days: 7
+          path: ${{ runner.temp }}/book11-cover-v12/
