@@ -1,0 +1,55 @@
+name: Book11 exact source transfer and publication preflight
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book11-source-transfer-20261003.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Receive the exact authorized complete book before link expiration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,os,json
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book11-source';root.mkdir()
+          url='https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-5708-81fa-948b-0bc20189627b/raw?se=2026-10-02T22%3A00%3A12Z&sp=r&sv=2026-02-06&sr=b&scid=7453e851-94c4-565f-bbb0-c203957b15a2&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T18%3A54%3A25Z&ske=2026-10-03T18%3A54%3A25Z&sks=b&skv=2026-02-06&sig=tR2Lr%2BhGyU8PgO8BVQK9feliG4zrJDl0UrVA228RXbc%3D'
+          raw=urllib.request.urlopen(url,timeout=90).read()
+          assert len(raw)==5408106 and hashlib.sha256(raw).hexdigest()=='c54c3fe8081dc1d3955aa33bcf74f52680c31a2da17d28165963c8bdd5075242','Source byte verification failed'
+          (root/'book11-source.zip').write_bytes(raw)
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+            for n in z.namelist(): assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+            z.extractall(root)
+          payload=root/'第11号上站替换包';m=json.loads((payload/'manifest.json').read_text())
+          for e in m['files']:
+            p=payload/e['path'];assert len(p.read_bytes())==e['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256']
+          def gh(path):
+            req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/'+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+            return json.load(urllib.request.urlopen(req,timeout=45))
+          import base64
+          cat=json.loads(base64.b64decode(gh('contents/public/books/catalog.json?ref=main')['content']))
+          matches=[b for b in cat['books'] if b.get('number')==11 or b.get('id')=='m-11'];assert len(matches)==1
+          audit={'source_sha256':hashlib.sha256(raw).hexdigest(),'source_files_verified':len(m['files']),'catalog_entry':matches[0],'reindex_executed':False,'site_written':False,'workflows':[],'configs':{}}
+          for w in gh('contents/.github/workflows?ref=main'):
+            if w['type']!='file':continue
+            text=urllib.request.urlopen(w['download_url'],timeout=30).read().decode()
+            audit['workflows'].append({'path':w['path'],'sha':w['sha'],'text':text})
+          for path in ['wrangler.toml','wrangler.jsonc','package.json','tools/build_bookshelf.py']:
+            try:audit['configs'][path]=base64.b64decode(gh('contents/'+path+'?ref=main')['content']).decode()
+            except Exception:pass
+          (root/'preflight.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2))
+          print('Exact complete book source authenticated; six files verified; no site write; no index operation.')
+          print('CATALOG_ENTRY',json.dumps(matches[0],ensure_ascii=False))
+          for w in audit['workflows']:
+            if 'reindex' in w['text'].lower() or 'build_search_index' in w['text']:
+              print('INDEX_MENTION',w['path'],w['text'][:500].replace('\n',' | '))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book11-exact-source-v1
+          retention-days: 7
+          path: ${{ runner.temp }}/book11-source/
