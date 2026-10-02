@@ -142,7 +142,7 @@ html.day .drawer{background:rgba(242,239,231,.97)}
 <span class="ttl">第289卷 · AI时代教育对象的重生</span><span class="sub hideS">从封闭学生到人—智能器具复合主体</span>
 <span class="spacer"></span>
 <button aria-label="单页 / 双页 (D)" class="hideS" id="btnSpread" title="单页 / 双页 (D)" type="button">双页</button>
-<button aria-label="渲染模式：矢量源 / 高清位图 (V)" id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)" type="button">矢量</button>
+<button aria-label="渲染模式：矢量源 / 高清位图 (V)" id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)" type="button">高清</button>
 <button aria-label="缩小" id="btnZoomOut" title="缩小" type="button">A−</button>
 <button aria-label="放大" id="btnZoomIn" title="放大" type="button">A＋</button>
 <button aria-label="缩略图" class="hideS" id="btnThumbs" title="缩略图" type="button">▤</button>
@@ -180,7 +180,7 @@ var CFG = JSON.parse(document.getElementById('cfg').textContent);
 var TOC = JSON.parse(document.getElementById('toc').textContent);
 var $ = function(id){ return document.getElementById(id); };
 
-var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var doc=null, total=0, cur=1, spread=true, zoom=1, vector=false, rendering=false;
 var themes=['','day','sepia'], ti=0;
 var cache={}, textCache={}, vecOK=0, vecFail=0;
 /* —— 接入 SDE 陪读（WDS）：把当前可见页的文本与页码喂给助手；文字层可选中某句作焦点 —— */
