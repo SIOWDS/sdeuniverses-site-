@@ -1,0 +1,90 @@
+name: Build volume 288 full-page refined edition candidate
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m288-v11-candidate-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/288/
+            /tools/m288-v11-sources/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded document build tools
+        timeout-minutes: 6
+        run: |
+          timeout 120s python -m pip install --quiet --disable-pip-version-check --no-input --timeout 20 --retries 1 python-docx==1.2.0 PyMuPDF==1.26.4 beautifulsoup4==4.13.5 Pillow==11.3.0
+          timeout 90s sudo apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20
+          timeout 210s sudo apt-get install -y -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20 libreoffice-writer fonts-noto-cjk
+          fc-cache -f
+      - name: Restore exact reviewed UTF-8 source and author-provided biography
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib,zlib,base64,os
+          from docx import Document
+          expected=[('part1.b64','f1fb1dc2ed562ab48141894cda5613a4e7464ea7d26778d38e0df055168319cb'),('chunk08000.b64','ff0d484a50646f9fd7abf344cd42c25e91cde71db0d22a532b38d893f5174916'),('chunk11000.b64','c3319b6e50b693847932e39abd1565e0f2ea9a5d8d62fae5dec1b0bdedf94d60'),('chunk14000.b64','5f9fc426487923d7d8623ed82094bd255157469317ab4d42aa4f29eafe878c18'),('chunk17000.b64','cd3be94eebe569a3a829e57106835bef1b2ab496275ac3339674e042fb377660'),('chunk20000.b64','56a8b441d919bcd7f99be5f2f6e5c0dc842a7dd6316f1972cb00381db63b881a'),('chunk23000.b64','c1379dbe1d05785f4f7da323e7d95a0ac8dea9b670531934d3ae72a0cc501971'),('chunk26000.b64','c5792ef53b1e3ee23e4a070bca5041d2f521c72fc2f12ea989e87e6344063db3'),('chunk29000.b64','b18cec7fab65f3ab32cf8b1d6604777c52d85b7ac338a7476ecf3341a7c2f602')]
+          root=Path(os.environ['RUNNER_TEMP'])/'m288-v11';src=root/'build-tools';src.mkdir(parents=True)
+          pieces=[]
+          for name,h in expected:
+              text=(Path('tools/m288-v11-sources')/name).read_text().strip()
+              observed=hashlib.sha256(text.encode()).hexdigest();print(name,len(text),observed)
+              assert observed==h,('Source segment changed',name,observed)
+              pieces.append(text)
+          raw=zlib.decompress(base64.b64decode(''.join(pieces),validate=True))
+          assert hashlib.sha256(raw).hexdigest()=='1561116fd4669df7731867a626aea3a6719eee7377d13fa451cbb4ae443aeadc'
+          bundle=json.loads(raw);assert set(bundle)=={'build_v11.py','finalize_v11.py','edits-compact.json'}
+          for n,t in bundle.items():(src/n).write_text(t)
+          old=Path('public/books/m/288');m=json.loads((old/'publication-manifest.json').read_text())
+          assert m['release_sha256']=='5dd6f024e72b8a77661266f5e863a4ee4f0186c7718d39e0220c9e0a6ee2d720'
+          for n,v in m['files'].items():assert hashlib.sha256((old/n).read_bytes()).hexdigest()==v['sha256'],n
+          d=Document(old/'downloads/chen-feng-beauvoir-v1.0.docx');ed=json.loads((src/'edits-compact.json').read_text())
+          for e in ed['paragraph_edits']:e['old']=d.paragraphs[e['index']].text
+          (src/'edits.json').write_text(json.dumps(ed,ensure_ascii=False,indent=2))
+          print('Verified source code, 64 editorial instructions, and exact old edition. Public files unchanged.')
+          PY
+      - name: Rebuild every page and converge printed contents
+        run: |
+          python "$RUNNER_TEMP/m288-v11/build-tools/build_v11.py" public/books/m/288 "$RUNNER_TEMP/m288-v11/candidate" "$RUNNER_TEMP/m288-v11/build-tools/edits.json"
+          python "$RUNNER_TEMP/m288-v11/build-tools/finalize_v11.py" public/books/m/288 "$RUNNER_TEMP/m288-v11/candidate" "$RUNNER_TEMP/m288-v11/build-tools/edits.json"
+      - name: Record whole-book rendering metrics for independent visual acceptance
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,fitz,hashlib,subprocess
+          r=Path(os.environ['RUNNER_TEMP'])/'m288-v11/candidate';m=json.loads((r/'book/publication-manifest.json').read_text())
+          p=fitz.open(r/'book/downloads/chen-feng-beauvoir-print-v1.1.pdf')
+          pages=[]
+          for i,pg in enumerate(p):
+              spans=[]
+              for b in pg.get_text('dict')['blocks']:
+                  for line in b.get('lines',[]):
+                      for s in line['spans']:spans.append({'text':s['text'],'bbox':[round(x,3) for x in s['bbox']],'size':round(s['size'],3),'font':s['font']})
+              pages.append({'page':i+1,'spans':spans})
+          (r/'qa/all-page-span-metrics.json').write_text(json.dumps(pages,ensure_ascii=False))
+          (r/'qa/render-environment.txt').write_text(subprocess.check_output(['libreoffice','--version'],text=True)+subprocess.check_output(['fc-match','Noto Serif CJK SC'],text=True))
+          assert m['chapters']==68 and m['appendices']==13 and 330<=len(p)<=400
+          assert not any(q.suffix.lower() in ['.ttf','.otf','.ttc','.woff','.woff2','.env'] for q in (r/'book').rglob('*'))
+          print('Candidate ready, not published:',m['edition_id'],len(p),'pages',m['release_sha256'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m288-v11-page-refined-candidate
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/m288-v11/candidate/book/
+            ${{ runner.temp }}/m288-v11/candidate/qa/
+            ${{ runner.temp }}/m288-v11/build-tools/
