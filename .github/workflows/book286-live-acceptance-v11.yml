@@ -1,0 +1,81 @@
+name: Volume286 v1.1 live publication acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book286-live-acceptance-v11.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book286-v11-verified-candidate
+          run-id: 36981167799
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book286-candidate
+      - name: Check live bytes and all public entrances without invoking search indexing
+        run: |
+          python -m pip install --quiet beautifulsoup4
+          python - <<'PY'
+          import os,time,json,hashlib,urllib.request,concurrent.futures,re
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          cand=Path(os.environ['RUNNER_TEMP'])/'book286-candidate';out=Path(os.environ['RUNNER_TEMP'])/'book286-live';out.mkdir()
+          m=json.loads((cand/'book/publication-manifest.json').read_text());base='https://sdeuniverses.com/books/m/286/'
+          def get(url):
+            with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'SDE-Book286-ReadOnly-Acceptance','Cache-Control':'no-cache'}),timeout=80) as r:return r.status,r.read(),r.headers.get('Content-Type','')
+          for attempt in range(20):
+            try:
+              status,raw,ct=get(base+'publication-manifest.json?acceptance=286v11')
+              assert json.loads(raw)['release_sha256']==m['release_sha256'];break
+            except Exception:
+              if attempt==19:raise
+              time.sleep(20)
+          def check(item):
+            n,v=item;url=base+n
+            if n=='index.html':url=base
+            if n=='text/index.html':url=base+'text/'
+            for attempt in range(3):
+              try:
+                status,data,ct=get(url)
+                if n.endswith('.html'):
+                  original=BeautifulSoup((cand/'book'/n).read_text(),'html.parser');live=BeautifulSoup(data.decode('utf-8'),'html.parser')
+                  main=original.find('main');other=live.find('main')
+                  assert main is not None and other is not None
+                  assert re.sub(r'\s+','',main.get_text())==re.sub(r'\s+','',other.get_text()),'HTML body differs'
+                  assert live.find('meta',attrs={'name':'isbn'})['content']=='979-8-90690-166-8'
+                  mode='main-text-and-metadata'
+                else:
+                  assert hashlib.sha256(data).hexdigest()==v['sha256'],'Exact file mismatch';mode='sha256'
+                return {'file':n,'status':status,'bytes':len(data),'content_type':ct,'verification':mode,'passed':True}
+              except Exception as e:
+                if attempt==2:return {'file':n,'passed':False,'error':str(e)}
+                time.sleep(3)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=6) as ex:results=list(ex.map(check,m['files'].items()))
+          failed=[r for r in results if not r['passed']]
+          shelves=[]
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+            status,data,ct=get(url);s=BeautifulSoup(data.decode('utf-8'),'html.parser');cards=s.select('article[data-id="m-286"]');assert len(cards)==1,(url,len(cards));assert cards[0].find('a',href=base+'read.html');shelves.append({'url':url,'status':status,'entries':len(cards)})
+          status,data,ct=get('https://sdeuniverses.com/books/catalog.json');entries=[b for b in json.loads(data)['books'] if str(b.get('number'))=='286'];assert len(entries)==1 and entries[0]['isbn']=='979-8-90690-166-8' and entries[0]['priceUsd']==20
+          report={'release_sha256':m['release_sha256'],'files_checked':len(results),'failed':failed,'files':results,'shelves':shelves,'catalog_entry':entries[0],'reindex_triggered':False,'checked_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())}
+          (out/'live-acceptance.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print('Checked',len(results),'live files; failures',failed,'; 3 bookshelf entries and publication metadata verified. No reindex.')
+          assert not failed,failed
+          PY
+      - name: Install browser for live reading tests
+        run: |
+          python -m pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Test actual public readers on desktop and phone
+        run: python "$RUNNER_TEMP/book286-candidate/build-tools/browser_check.py" "$RUNNER_TEMP/book286-candidate" "$RUNNER_TEMP/book286-live/browser" "https://sdeuniverses.com"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book286-v11-live-acceptance
+          retention-days: 14
+          path: ${{ runner.temp }}/book286-live/
