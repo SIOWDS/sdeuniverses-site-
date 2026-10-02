@@ -30,17 +30,24 @@ jobs:
       - name: Install document and browser verification tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq libreoffice-writer fonts-noto-cjk
+          sudo apt-get install -y -qq libreoffice-writer fonts-noto-cjk > /tmp/m299-apt.log 2>&1
           python -m pip install --quiet PyMuPDF==1.26.7 Pillow python-docx lxml beautifulsoup4 playwright
-          python -m playwright install --with-deps chromium
+          python -m playwright install --with-deps chromium > /tmp/m299-browser-install.log 2>&1
       - name: Build the full metadata edition from the actual original
         run: |
           python - <<'PY'
           from pathlib import Path
           import os,urllib.request,subprocess
           p=Path(os.environ['RUNNER_TEMP'])/'build-isbn167.py'
-          p.write_bytes(urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/d8086d151546530cc6559bd8294ff1bc65744228/tools/religion-metadata-20261002/build-isbn167.py',timeout=45).read())
-          subprocess.run(['python',str(p),os.environ['GITHUB_WORKSPACE'],os.environ['RUNNER_TEMP']+'/religion-original',os.environ['RUNNER_TEMP']+'/religion-isbn167'],check=True)
+          src=urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/d8086d151546530cc6559bd8294ff1bc65744228/tools/religion-metadata-20261002/build-isbn167.py',timeout=45).read().decode()
+          old="sitecode=sitecode.replace('统稿排版版','数字阅读版')"
+          assert src.count(old)==1
+          src=src.replace(old,"sitecode=sitecode.replace('统稿排版版 v{V}','数字阅读版 v{V}')")
+          p.write_text(src)
+          result=subprocess.run(['python',str(p),os.environ['GITHUB_WORKSPACE'],os.environ['RUNNER_TEMP']+'/religion-original',os.environ['RUNNER_TEMP']+'/religion-isbn167'],capture_output=True,text=True)
+          qa=Path(os.environ['RUNNER_TEMP'])/'religion-isbn167/qa';qa.mkdir(exist_ok=True,parents=True)
+          (qa/'build.stdout.txt').write_text(result.stdout);(qa/'build.stderr.txt').write_text(result.stderr)
+          print(result.stdout[-7000:]);print(result.stderr[-5000:]);assert result.returncode==0,result.returncode
           PY
       - name: Test desktop and mobile full readers
         run: |
