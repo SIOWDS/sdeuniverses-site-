@@ -1,0 +1,66 @@
+name: Book 288 exact-byte publication candidate and browser test
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book288-candidate-transfer-v2.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Prepare lossless transfer integrity verification
+        run: python -m pip install --quiet Pillow playwright beautifulsoup4 pypdf
+      - name: Receive only this authorized book publication package
+        run: |
+          python - <<'PY'
+          import os,urllib.request,hashlib,zipfile,io,json
+          from pathlib import Path,PurePosixPath
+          from PIL import Image
+          chunks=[
+          (3145728,'de5f15eaeb8c1b2bae978932b9d1caa3cf0be01d86f9d537483db21b437ddfca','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUfdvJkMOy2yYLJVP97rP11bQE_Gjp3DMTSAyZtM_55irX-6MwJF-5qH3R7QdSB-iE5mEjYTjPNVX-Q83ucDJIfDRL7RjBcbZ7D-RzUVYspWj-XcHg7pI7ixvx411S-L_ko3YG5aaA0AtPBuMuJOMH-zSPegFMT6Vgcf8E5nC-Rf6ML4wDQ=s2048?key=wW0WCK4ZboE6S__9zcn73w'),
+          (3145728,'ce1f74c5a51db618e9212daf30214b41f41f86404b44d29cb331711c3b56f09c','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUeWf2q8MK1f4jICcklh7LeUTf3Q6fRJ5hvQLfPWSupGy3yev41UwmfTKxDlEbXdDAdP7ktIUSzZKkqFomQqeBAEkkGDpEC7B92YFAazF245KzbJ7J_0FPlzxScdMlfU0exAqQVzfk0gfVwuNnCCApApVbBV49fJcs4BcFCH8bUDeAipPz8=s2048?key=wW0WCK4ZboE6S__9zcn73w'),
+          (2442097,'631eb7c10e8cf5be785adba01450497bfbf5355ecd00059e25b2bcf2097ff898','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUdecn74llAFFnG0mZX4ELdrdr-TAD6bnqpSxQ8jtLrBTr4fkT0xjGDjUh_KMJ9T26Cemk6pYapZDrU7TcbPQ6fP3LYfZnhhL0dCsAjvN66l8n_8CJJGc4NnBY33wIwtzTqgiHCFRxzuyPOrNu9W3WKRkNKtiYuzFTQ5qJQqtyyYJx2w7EQ=s2048?key=wW0WCK4ZboE6S__9zcn73w')]
+          raw=bytearray()
+          for size,digest,url in chunks:
+              content=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'SDE-Book288-Publication'}),timeout=90).read()
+              im=Image.open(io.BytesIO(content));assert im.size==(1024,1024)
+              part=im.convert('RGB').tobytes()[:size]
+              assert hashlib.sha256(part).hexdigest()==digest,'Transfer changed bytes: stop before publishing'
+              raw.extend(part)
+          assert len(raw)==8733553 and hashlib.sha256(raw).hexdigest()=='2221bfe228b917b13a3617edb7fa8a32256948d52023ae62e062db1e26f4f8ca'
+          root=Path(os.environ['RUNNER_TEMP'])/'book288-candidate';root.mkdir()
+          z=zipfile.ZipFile(io.BytesIO(raw))
+          for n in z.namelist():
+              p=PurePosixPath(n)
+              assert not p.is_absolute() and '..' not in p.parts
+              assert p.suffix.lower() not in ['.ttf','.otf','.ttc','.woff','.woff2','.env']
+              assert p.parts[0] in ['book','qa','build-tools','README.txt']
+          z.extractall(root)
+          book=root/'book';m=json.loads((book/'publication-manifest.json').read_text())
+          assert (m['volume'],m['author'],m['isbn'],m['price_usd'],m['pdf_pages'])==(288,'陈凤','979-8-90690-433-1',20,383)
+          assert m['release_sha256']=='5dd6f024e72b8a77661266f5e863a4ee4f0186c7718d39e0220c9e0a6ee2d720'
+          for n,v in m['files'].items():
+              data=(book/n).read_bytes();assert len(data)==v['bytes'];assert hashlib.sha256(data).hexdigest()==v['sha256'],n
+          site=Path(os.environ['RUNNER_TEMP'])/'book288-preview/books/m';site.mkdir(parents=True)
+          (site/'288').symlink_to(book)
+          print('68 chapters, 13 appendices, 383 PDF pages; exact bytes verified. Public site unchanged. No reindex.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book288-verified-candidate
+          retention-days: 14
+          path: ${{ runner.temp }}/book288-candidate/
+      - name: Prepare Chinese browser rendering
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Test desktop and mobile readers including actual PDF rendering
+        run: python "$RUNNER_TEMP/book288-candidate/build-tools/browser-check.py" "$RUNNER_TEMP/book288-preview" "$RUNNER_TEMP/book288-browser-evidence" --with-pdf
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book288-candidate-browser-evidence
+          retention-days: 14
+          path: ${{ runner.temp }}/book288-browser-evidence/
