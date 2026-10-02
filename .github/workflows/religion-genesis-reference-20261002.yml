@@ -1,0 +1,46 @@
+name: Religion genesis reference preflight
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/religion-genesis-reference-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Collect authorized design and publication references only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import urllib.request,json,pathlib,os
+          out=pathlib.Path('references');out.mkdir()
+          api='https://api.github.com/repos/SIOWDS/sdeuniverses-site-'
+          raw='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/'
+          def get(u):
+              headers={'User-Agent':'Religion-Genesis-Reference'}
+              if u.startswith(api):headers.update({'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              return urllib.request.urlopen(urllib.request.Request(u,headers=headers),timeout=90).read()
+          def collect(path):
+              try:
+                  b=get(raw+path);p=out/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)
+                  print('Reference',path,len(b))
+              except Exception as e:print('Unavailable reference',path,type(e).__name__)
+          for p in ['public/books/m/220/index.html','public/books/m/220/read.html','public/books/m/220/cover.jpg','public/books/m/220/backcover.jpg','public/books/m/220/text/index.html','public/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf','public/books/catalog.json','tools/build_bookshelf.py','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/books/m/296/index.html','public/books/m/296/read.html','public/books/m/296/chapters.html','wrangler.jsonc','wrangler.toml','package.json']:collect(p)
+          for folder in ['.github/workflows','tools','scripts']:
+              try:
+                  listing=json.loads(get(api+'/contents/'+folder))
+                  (out/(folder.replace('/','_').strip('.')+'.json')).write_text(json.dumps([{'name':x['name'],'path':x['path'],'type':x['type']} for x in listing],ensure_ascii=False,indent=2))
+                  if folder=='.github/workflows':
+                      for x in listing:
+                          if any(w in x['name'] for w in ['deploy','publish','pages']):collect(x['path'])
+              except Exception as e:print('Unavailable listing',folder,type(e).__name__)
+          print('Reference collection only. No site publication or search indexing.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: religion-genesis-design-references
+          path: references/
+          retention-days: 3
