@@ -1,0 +1,97 @@
+name: Volume 295 v1.2 substantive revision candidate
+on:
+  push:
+    branches: [book295-review-v12-20261002]
+    paths: ['.github/workflows/book295-review-v12-candidate.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            public/books/m/295
+            tools/m295-v12
+      - name: Prepare book renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libreoffice-writer fonts-noto-cjk
+          python -m pip install --disable-pip-version-check -q python-docx==1.2.0 beautifulsoup4==4.13.5 Pillow==11.3.0 PyMuPDF==1.26.4 playwright==1.55.0
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Authenticate source and build the complete revised edition
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          mkdir -p "$RUNNER_TEMP/m295-candidate/site/books/m" "$RUNNER_TEMP/m295-candidate/qa"
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib
+          src=Path('public/books/m/295')
+          baseline={str(p.relative_to(src)):hashlib.sha256(p.read_bytes()).hexdigest() for p in src.rglob('*') if p.is_file()}
+          Path(os.environ['RUNNER_TEMP'],'m295-candidate','source-files.json').write_text(json.dumps(baseline,indent=2))
+          PY
+          python tools/m295-v12/revision_data.py
+          python tools/m295-v12/build.py public/books/m/295 "$RUNNER_TEMP/m295-candidate/site/books/m/295" tools/m295-v12/revision.json
+          cp tools/m295-v12/revision.json "$RUNNER_TEMP/m295-candidate/revision.json"
+      - name: Verify PDF structure and actual desktop/mobile reader functions
+        run: |
+          python - <<'PY'
+          import os,json,hashlib,threading,shutil,re
+          from pathlib import Path
+          from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
+          from functools import partial
+          import fitz
+          from playwright.sync_api import sync_playwright
+          root=Path(os.environ['RUNNER_TEMP'])/'m295-candidate';book=root/'site/books/m/295';qa=root/'qa'
+          m=json.loads((book/'publication-manifest.json').read_text());pdf=fitz.open(book/'downloads/xuwu-b295-reader-v1.2.pdf')
+          assert len(pdf)==m['pdfPages'] and len(pdf)>299
+          outliers=[]
+          for i,page in enumerate(pdf):
+              if i not in (0,len(pdf)-1):
+                  for b in page.get_text('blocks'):
+                      if b[6]==0 and (b[0]<-1 or b[1]<-1 or b[2]>page.rect.width+1 or b[3]>page.rect.height+1):outliers.append((i+1,b[:4]))
+          assert not outliers,outliers
+          titles=pdf.get_toc();assert len([t for t in titles if re.match(r'^第[一二三四五六七八九十]+章',t[1])])==35
+          assert all(t['pdf_page']<=len(pdf) for t in json.loads((book/'toc.json').read_text()))
+          for i in [0,1,5,6,len(pdf)-1]+[t[2]-1 for t in titles if any(x in t[1] for x in ['四处对照','六个可以复核','让加缪改变','附录二','附录三'])]:
+              pdf[i].get_pixmap(matrix=fitz.Matrix(1.6,1.6)).save(qa/f'pdf-page-{i+1}.png')
+          server=ThreadingHTTPServer(('127.0.0.1',8765),partial(SimpleHTTPRequestHandler,directory=str(root/'site')))
+          threading.Thread(target=server.serve_forever,daemon=True).start()
+          url='http://127.0.0.1:8765/books/m/295';report=[]
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=shutil.which('google-chrome') or shutil.which('chromium'),args=['--no-sandbox'])
+              for name,w,h in [('desktop',1440,1000),('mobile',390,844)]:
+                  ctx=browser.new_context(viewport={'width':w,'height':h},device_scale_factor=1);page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+                  for path,term in [('/', 'v1.2 实质修订说明'),('/text/', '四处对照的撤回与保留'),('/text/ch25/', '六个可以复核的字段'),('/text/ch33/', '让加缪改变路径'),('/text/appendix3/','近邻能否无损重述')]:
+                      response=page.goto(url+path,wait_until='networkidle');assert response.status==200,(name,path,response.status)
+                      assert term in page.locator('body').inner_text(),(name,path,term)
+                      assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'),(name,path,'overflow')
+                      if path=='/text/':assert page.locator('section.chapter').count()==35
+                      page.screenshot(path=str(qa/f'{name}-{path.strip("/").replace("/","-") or "home"}.png'),full_page=False)
+                  page.goto(url+'/read.html',wait_until='networkidle');page.wait_for_function('document.body.dataset.renderedPage==="1"',timeout=60000)
+                  assert page.locator('#total').inner_text().strip()==str(len(pdf))
+                  assert page.locator('#canvas-left').evaluate('(c)=>c.width>100&&c.height>100')
+                  page.screenshot(path=str(qa/f'{name}-pdf-cover.png'))
+                  page.locator('#pi').fill('38');page.locator('#jump').evaluate('(f)=>f.requestSubmit()');page.wait_for_function('document.body.dataset.renderedPage==="38"')
+                  page.screenshot(path=str(qa/f'{name}-pdf-body.png'))
+                  page.locator('#last').click();page.wait_for_function('(n)=>Number(document.body.dataset.renderedPage)===n',arg=len(pdf))
+                  page.screenshot(path=str(qa/f'{name}-pdf-back.png'))
+                  page.locator('#toc-btn').click();assert page.locator('#toc a[href*="#page="]').count()==49
+                  assert not errors,errors;report.append({'device':name,'pdf_pages':len(pdf),'chapters':35,'pdf_render_and_jump':True,'runtime_errors':errors,'passed':True});ctx.close()
+              browser.close()
+          server.shutdown();(qa/'candidate-browser-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Preserve complete candidate and verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book295-v12-reviewed-candidate
+          retention-days: 14
+          path: ${{ runner.temp }}/m295-candidate/
