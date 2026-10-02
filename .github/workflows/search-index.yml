@@ -75,6 +75,23 @@ jobs:
           echo "::error::装不上 poppler-utils —— 专著 PDF 的正文会进不了索引，本趟停在这里，别把半份索引传上去"
           exit 1
 
+      # 【2026-10-02 加】PDF 迁出仓库后（tools/pdf_offload.py，台账 ops/pdf-offload/ledger.tsv），
+      #   专著 PDF 不在工作树里了；不取回来，build_search_index.py 就抽不到它们的正文、整批掉出索引。
+      #   取不回来就红——宁可红一趟，也别把缺了专著正文的半份索引传上去。
+      - name: 按台账从 R2 取回已迁出的 PDF（索引要抽正文）
+        if: steps.daily.outputs.run == 'true'
+        timeout-minutes: 20
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          if [ -f ops/pdf-offload/ledger.tsv ]; then
+            pip install -q boto3
+            python3 tools/pdf_offload.py rehydrate
+          else
+            echo "还没有迁出过 PDF，跳过"
+          fi
+
       - name: 重建索引
         if: steps.daily.outputs.run == 'true'
         run: python3 tools/build_search_index.py

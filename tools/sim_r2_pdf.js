@@ -31,7 +31,7 @@ console.log("\n[一] 供给：R2 优先、落空回落、URL 不变");
   ok(!/return new Response\(null, \{ status: 404/.test(seg) && !/return env\.ASSETS/.test(seg),
      "R2 落空时既不自己回 404、也不在这里终结请求——落到函数末尾原有的 ASSETS 分支（两边并存的关键）");
   const tail = W.slice(W.indexOf("// Everything else: serve static assets"));
-  ok(/const resp = await env\.ASSETS\.fetch\(request\);/.test(tail), "原有的静态资源兜底分支一字未动");
+  ok(/if \(!resp\) resp = await env\.ASSETS\.fetch\(assetReq\);/.test(tail), "原有的静态资源兜底分支仍在（分站改写后改为 assetReq；R2_OFFLOAD 只在它 404 之后才接手，见 sim_r2_offload.js）");
   ok(/x-served-from", "r2"/.test(seg) && /x-served-from", "edge"/.test(seg), "响应带记号（r2 / edge），线上一眼看得出这一次走的哪条路");
   // ——最容易踩空的一脚：Worker 用 R2 binding 读出来的响应**不会自动进 CDN 缓存**（静态资源本来就在边缘上）。
   // 没有这层，每次点开 PDF 都要回桶所在区域取一趟，读者那边就是肉眼可见的变慢。

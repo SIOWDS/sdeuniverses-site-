@@ -1,0 +1,90 @@
+# PDF 迁出仓库（2026-10-02 起，王德生令）。
+# public/ 下的 PDF 进 R2 桶，仓库里删掉；读者网址一个字不变（Worker 的 R2_OFFLOAD 段在 ASSETS 落空时问桶）。
+# 每天跑一次＝防回流护栏：并行工作线照旧把新 PDF 提交进仓库也不要紧，满 24 小时没人再动，就被这里收走。
+# 次序是硬的：进桶 → 逐个核 MD5 → 才许删 → 上线后逐个线上真取 → 有一份取不到就整笔 revert。
+# 工具与纪律见 tools/pdf_offload.py；台账 ops/pdf-offload/ledger.tsv 是唯一真相源。
+
+name: pdf-offload
+
+on:
+  schedule:
+    - cron: '10 19 * * *'      # 北京时间 03:10，错开 23:20 的索引与白天的出版高峰
+  workflow_dispatch:
+    inputs:
+      only:
+        description: '只迁路径匹配这个正则的（试点用，空＝全部）'
+        required: false
+        default: ''
+      limit:
+        description: '最多迁几份（0＝不限）'
+        required: false
+        default: '0'
+      min_age_hours:
+        description: '只迁这么多小时内没人动过的'
+        required: false
+        default: '24'
+
+concurrency:
+  group: pdf-offload
+  cancel-in-progress: false
+
+jobs:
+  offload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 拉够判断「24 小时内动过没有」的历史
+        run: |
+          git fetch -q --shallow-since="$(date -u -d '3 days ago' +%F)" origin main
+          git reset -q --hard FETCH_HEAD
+          echo "可见提交 $(git log --oneline | wc -l) 个"
+
+      - name: 计划
+        run: |
+          python3 tools/pdf_offload.py plan --min-age-hours "${{ inputs.min_age_hours || '24' }}" \
+            --only "${{ inputs.only }}" --limit "${{ inputs.limit || '0' }}"
+
+      - name: 进桶并逐个核 MD5
+        env:
+          AWS_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          pip install -q boto3
+          python3 tools/pdf_offload.py upload --min-age-hours "${{ inputs.min_age_hours || '24' }}" \
+            --only "${{ inputs.only }}" --limit "${{ inputs.limit || '0' }}"
+
+      - name: 从仓库删掉核过的那批并推送
+        id: push
+        run: |
+          git config user.name  "SIOWDS"
+          git config user.email "wangdesheng1234567@gmail.com"
+          python3 tools/pdf_offload.py remove
+          if git diff --cached --quiet; then echo "nothing=1" >> "$GITHUB_OUTPUT"; echo "本轮没有要删的"; exit 0; fi
+          N=$(git diff --cached --name-only --diff-filter=D | wc -l)
+          git add ops/pdf-offload/ledger.tsv
+          git commit -q -m "Offload $N PDFs to R2 (served unchanged via R2_OFFLOAD)"
+          for i in 1 2 3 4 5; do
+            if git push -q origin HEAD:main; then break; fi
+            echo "推送被并发提交挡住，第 $i 次重来"
+            git fetch -q origin main && git rebase -q FETCH_HEAD || { git rebase --abort; echo "::error::rebase 冲突，停手"; exit 1; }
+            [ "$i" = 5 ] && { echo "::error::五次都没推上去"; exit 1; }
+          done
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: 上线后逐个线上真取（取不到就整笔撤回）
+        if: steps.push.outputs.nothing != '1'
+        run: |
+          sleep 90
+          if ! python3 tools/pdf_offload.py verify-live --only-new --wait 900; then
+            echo "::error::有 PDF 迁出后线上取不到——整笔撤回"
+            git fetch -q origin main && git reset -q --hard FETCH_HEAD
+            git revert --no-edit "${{ steps.push.outputs.sha }}"
+            git push -q origin HEAD:main
+            exit 1
+          fi

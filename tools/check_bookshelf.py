@@ -42,12 +42,31 @@ def path_only(u):
     return u.split('#', 1)[0].split('?', 1)[0]
 
 
+_OFFLOADED = None
+
+
+def offloaded():
+    """ops/pdf-offload/ledger.tsv 登记过的 PDF：已迁 R2、仓库里没有（2026-10-02 起，见 tools/pdf_offload.py）。"""
+    global _OFFLOADED
+    if _OFFLOADED is None:
+        f = os.path.join(os.path.dirname(PUB), 'ops', 'pdf-offload', 'ledger.tsv')
+        _OFFLOADED = set()
+        if os.path.exists(f):
+            for l in open(f, encoding='utf-8'):
+                if l.strip() and not l.startswith('#'):
+                    _OFFLOADED.add('/' + l.split('\t', 1)[0])
+    return _OFFLOADED
+
+
 def is_r2_pdf(u):
     """Worker 从 R2 取的那一类：/students/**.pdf（与 src/worker.js 的拦截同口径，大小写不敏感）。
     必须先去掉 ?v= 缓存参数再判：2026-09-26 查出，#165、#195 的 pdfUrl 带 ?v=20260925，
     旧写法 u.endswith('.pdf') 因此不成立，两本 R2 上完好的 PDF 被 ① 反复误报为「本地文件不存在」。"""
     p = path_only(u)
-    return p.startswith('/students/') and p.lower().endswith('.pdf')
+    if p.startswith('/students/') and p.lower().endswith('.pdf'):
+        return True
+    # 迁出仓库的 PDF 同样只能线上真取（Worker 的 R2_OFFLOAD 段在 ASSETS 落空时问桶）
+    return urllib.parse.unquote(p) in offloaded()
 
 
 def r2_code(u):
@@ -154,7 +173,18 @@ def check_pdf_url():
             continue
         p = os.path.join(PUB, u.lstrip('/')) if u.startswith('/') \
             else os.path.join(os.path.dirname(r), u)
-        if not os.path.exists(urllib.parse.unquote(p)):
+        _pp = urllib.parse.unquote(p).split('?', 1)[0]
+        _rel = '/' + os.path.relpath(os.path.normpath(_pp), PUB).replace(os.sep, '/')
+        if not os.path.exists(_pp) and _rel in offloaded():
+            # 迁出仓库的 PDF：本地必然没有，改去线上真取
+            if os.environ.get('SKIP_R2'):
+                continue
+            code = r2_code(_rel)
+            if code not in ('200', '206'):
+                print(f'   ✗ {rel(r)} 已迁 R2 却取不到（{code}）：{_rel[:58]}')
+                bad += 1
+            continue
+        if not os.path.exists(_pp):   # 先去掉 ?v= 再查（#259 essay 曾因此被误报断链）
             print(f'   ✗ {rel(r)} 指向不存在：{u[:60]}')
             bad += 1
             if '/students/' in u:

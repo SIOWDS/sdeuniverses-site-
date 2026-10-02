@@ -11577,6 +11577,59 @@ async function wxSweep(env, now) {
   return { ok: true, scanned, removed, kept, ttlDays: 7, gone: gone.slice(0, 20) };
 }
 
+// ===== R2_OFFLOAD：仓库里删掉的 PDF，从 R2 接着供给（2026-10-02 起）=====
+// 与上面 /students/ 那段（R2 优先）方向相反：这里是**ASSETS 落空才问桶**。
+// 为什么反过来：全站 PDF 散在 books/、three-views/、sites/<分站>/ 等几十个目录，
+// 分站还要先把路径改写成 /sites/<名>/…——只有"静态资源已经找过一遍、确实没有"
+// 这一个点，路径才是最终的那个。在这里接，迁移期两边并存零风险：
+// 仓库里还在的照旧走 ASSETS，删掉的（ops/pdf-offload/ledger.tsv 里登记过的）由桶接上。
+// 键＝资源路径去掉开头的 /（与 git 里 public/ 之下的相对路径逐字相同）。
+// Range、304、边缘缓存三件与 /students/ 段同口径（理由见那段注释）。
+async function _r2PdfOnAssetMiss(request, env, ctx, assetPath, url) {
+  if (!env || !env.PDFS) return null;
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  if (!/\.pdf$/i.test(assetPath)) return null;
+  let key;
+  try { key = decodeURIComponent(assetPath.replace(/^\/+/, "")); } catch (e) { return null; }
+  if (!key || key.indexOf("..") >= 0 || /^(plib|search|live|moments)\//.test(key)) return null;
+  const hasRange = !!request.headers.get("range");
+  const cache = (typeof caches !== "undefined" && caches.default) ? caches.default : null;
+  const ck = new Request(url.origin + "/__r2off/" + key.split("/").map(encodeURIComponent).join("/"), { method: "GET" });
+  if (cache && !hasRange) {
+    try {
+      const hit = await cache.match(ck);
+      if (hit) {
+        const hh = new Headers(hit.headers);
+        hh.set("x-served-from", "edge");
+        return new Response(request.method === "HEAD" ? null : hit.body, { status: hit.status, headers: hh });
+      }
+    } catch (e) {}
+  }
+  try {
+    const obj = await env.PDFS.get(key, { range: hasRange ? request.headers : undefined, onlyIf: request.headers });
+    if (!obj) return null;
+    const h = new Headers();
+    obj.writeHttpMetadata(h);
+    h.set("etag", obj.httpEtag);
+    h.set("accept-ranges", "bytes");
+    h.set("content-type", "application/pdf");
+    h.set("cache-control", "public, max-age=3600, stale-while-revalidate=86400");
+    h.set("x-served-from", "r2");
+    if (!("body" in obj)) return new Response(null, { status: 304, headers: h });
+    if (hasRange && obj.range && obj.range.offset !== undefined) {
+      const st = obj.range.offset, ln = obj.range.length === undefined ? (obj.size - st) : obj.range.length;
+      h.set("content-range", "bytes " + st + "-" + (st + ln - 1) + "/" + obj.size);
+      h.set("content-length", String(ln));
+      return new Response(request.method === "HEAD" ? null : obj.body, { status: 206, headers: h });
+    }
+    h.set("content-length", String(obj.size));
+    if (request.method === "HEAD") { try { obj.body.cancel(); } catch (e) {} return new Response(null, { status: 200, headers: h }); }
+    const resp = new Response(obj.body, { status: 200, headers: h });
+    if (cache && ctx) { try { ctx.waitUntil(cache.put(ck, resp.clone())); } catch (e) {} }
+    return resp;
+  } catch (e) { return null; }   // 桶出岔子：交回原来的 404，不比迁移前更坏
+}
+
 export default {
   // 定时清库：每天 04:17 UTC 跑一次（cron 写在 wrangler.jsonc 的 triggers.crons）
   async scheduled(event, env, ctx) {
@@ -18359,7 +18412,14 @@ export default {
     if (subPrefix && url.pathname.indexOf(subPrefix + "/") !== 0) {
       const cand = await env.ASSETS.fetch(new Request(new URL(subPrefix + contentPath, url), assetReq));
       if (cand.status < 400) { resp = cand; subLocal = true; }
-      else { try { if (cand.body) await cand.body.cancel(); } catch (e) {} }
+      else {
+        try { if (cand.body) await cand.body.cancel(); } catch (e) {}
+        // R2_OFFLOAD：分站目录里的 PDF 已迁桶——按改写后的 /sites/<名>/… 路径问一次
+        if (cand.status === 404) {
+          const _off = await _r2PdfOnAssetMiss(request, env, ctx, subPrefix + contentPath, url);
+          if (_off) { resp = _off; subLocal = true; }
+        }
+      }
     }
 
     // 这些是四站共用的运行资产，不是文章，维持同源读取；其余非本站 HTML/PDF
@@ -18386,6 +18446,11 @@ export default {
       // ownerKey === formalSubKey：正文物理文件仍在 public/，但唯一公开域名是本分站。
     }
     if (!resp) resp = await env.ASSETS.fetch(assetReq);
+    // R2_OFFLOAD：静态资源里没有这份 PDF ＝ 已迁桶（或本来就没有）——问一次桶，没有就照旧 404
+    if (resp.status === 404 && /\.pdf$/i.test(new URL(assetReq.url).pathname)) {
+      const _off = await _r2PdfOnAssetMiss(request, env, ctx, new URL(assetReq.url).pathname, url);
+      if (_off) { try { if (resp.body) await resp.body.cancel(); } catch (e) {} return _off; }
+    }
     const ct = resp.headers.get("content-type") || "";
     if (ct.includes("text/html")) {
       const r = new Response(resp.body, resp);
