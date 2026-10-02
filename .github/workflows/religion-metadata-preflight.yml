@@ -21,7 +21,7 @@ jobs:
             /public/books/religion-genesis/
             /tools/build_bookshelf.py
             /public/_redirects
-      - name: Compare canonical catalog, numbered directories and live endpoints
+      - name: Report ISBN conflicts and identify unused numbered slots without writes
         run: |
           python - <<'PY'
           import json,subprocess,re,os,urllib.request,urllib.error,hashlib,shutil,datetime
@@ -30,30 +30,32 @@ jobs:
           catalog=json.loads((repo/'public/books/catalog.json').read_text());books=catalog['books']
           matches=[b for b in books if b['id']=='religion-genesis'];assert len(matches)==1
           isbn='979-8-90690-164-4';digits=re.sub(r'\D','',isbn);assert sum(int(c)*(1 if i%2==0 else 3) for i,c in enumerate(digits))%10==0
-          duplicate=[b for b in books if re.sub(r'\D','',str(b.get('isbn','')))==digits and b['id']!='religion-genesis'];assert not duplicate,duplicate
+          duplicate=[b for b in books if re.sub(r'\D','',str(b.get('isbn','')))==digits and b['id']!='religion-genesis']
+          print('ISBN must remain unassigned pending owner clarification:',[(b['number'],b['title']) for b in duplicate])
           numbers={int(b['number']) for b in books if b.get('number') is not None}
           paths=subprocess.check_output(['git','ls-tree','-r','--name-only','HEAD','--','public/books'],text=True).splitlines()
           directory_numbers={int(m.group(1)) for p in paths if (m:=re.match(r'public/books/m/(\d+)/',p))}
           redirects=(repo/'public/_redirects').read_text() if (repo/'public/_redirects').exists() else ''
           reserved={int(n) for n in re.findall(r'/books/m/(\d+)(?:/|\s)',redirects)}
           free=sorted(set(range(1,300))-numbers-directory_numbers-reserved)
-          assert free,'No unused number under 300.'
-          candidate=free[-1]
+          candidate=free[-1] if free else None
           urls={}
-          for url in ['https://sdeuniverses.com/books/catalog.json',f'https://sdeuniverses.com/books/m/{candidate}/','https://sdeuniverses.com/books/religion-genesis/publication-manifest.json']:
+          for url in ['https://sdeuniverses.com/books/catalog.json','https://sdeuniverses.com/books/religion-genesis/publication-manifest.json']+([f'https://sdeuniverses.com/books/m/{candidate}/'] if candidate else []):
               try:
                   response=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 SDE-Metadata-Check'}),timeout=60);body=response.read();status=response.status
               except urllib.error.HTTPError as e:status=e.code;body=e.read()
               urls[url]={'status':status,'bytes':len(body),'sha256':hashlib.sha256(body).hexdigest()}
               if url.endswith('catalog.json') and status==200:
-                  live=json.loads(body);assert candidate not in {b.get('number') for b in live['books']};assert not any(re.sub(r'\D','',str(b.get('isbn','')))==digits and b['id']!='religion-genesis' for b in live['books'])
-              if f'/m/{candidate}/' in url:assert status==404,(url,status,'Cannot treat existing response as empty volume')
-          report={'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'main_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'unused_under_300':free,'selected_volume':candidate,'isbn':isbn,'isbn_checksum_valid':True,'isbn_catalog_duplicates':duplicate,'price_usd':20,'existing_book':matches[0],'catalog_count':len(books),'numbered_directory_count':len(directory_numbers),'live_checks':urls,'no_reindex':True}
+                  live=json.loads(body);assert candidate not in {b.get('number') for b in live['books']} if candidate else True
+                  (out/'live-catalog.json').write_bytes(body)
+              if candidate and f'/m/{candidate}/' in url:assert status==404,(url,status,'Cannot treat existing response as empty volume')
+          report={'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'main_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'unused_under_300':free,'selected_volume':candidate,'isbn_requested':isbn,'isbn_checksum_valid':True,'isbn_catalog_duplicates':duplicate,'isbn_assignment_blocked':bool(duplicate),'price_usd':20,'existing_book':matches[0],'catalog_count':len(books),'numbered_directory_count':len(directory_numbers),'live_checks':urls,'no_reindex':True}
           (out/'preflight.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False,indent=2))
           shutil.copy(repo/'public/books/catalog.json',out/'catalog.json');shutil.copy(repo/'tools/build_bookshelf.py',out/'build_bookshelf.py')
           shutil.copytree(repo/'public/books/religion-genesis',out/'book')
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: religion-metadata-preflight
           retention-days: 14
