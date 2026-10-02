@@ -1,0 +1,93 @@
+name: Publish ISBN187 with preserved reader cache fix
+on:
+  push:
+    branches: [religion-isbn187-20261002]
+    paths: ['.github/workflows/religion-isbn187-reconciled-publish.yml']
+permissions:
+  contents: write
+  actions: read
+  checks: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      ACCEPTED_RUN: '36978155302'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/religion-genesis/
+            /public/books/m/299/
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-isbn187-candidate
+          run-id: 36978155302
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/religion-isbn187-candidate
+      - name: Install verification tools
+        run: |
+          python -m pip install --quiet PyMuPDF==1.26.7 beautifulsoup4 requests playwright PyYAML
+          python -m playwright install --with-deps chromium > /tmp/isbn187-reconcile-install.log 2>&1
+          sudo apt-get install -y -qq fonts-noto-cjk > /tmp/isbn187-reconcile-fonts.log 2>&1
+      - name: Reconcile only the inspected cache change, publish and verify
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,hashlib,json,urllib.request,subprocess,yaml
+          repo=Path(os.environ['GITHUB_WORKSPACE']);root=Path(os.environ['RUNNER_TEMP'])/'religion-isbn187-candidate'
+          qa=Path(os.environ['RUNNER_TEMP'])/'religion-isbn187-live';qa.mkdir()
+          doc=yaml.safe_load(urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/b9da914189d4d76b36d643f12cf8cf1381a838aa/.github/workflows/religion-isbn187-publish.yml',timeout=45).read())
+          steps=doc['jobs']['publish']['steps']
+          # Require the original exact successful candidate, not an inferred completion.
+          require=next(s['run'] for s in steps if s.get('name')=='Require exact successful candidate')
+          subprocess.run(['bash','-e','-c',require],check=True)
+          m=json.loads((root/'book/publication-manifest.json').read_text());base=json.loads((root/'qa/base-publication-manifest.json').read_text())
+          current=json.loads((repo/'public/books/religion-genesis/publication-manifest.json').read_text())
+          assert m['release_sha256']=='9bd4d5a423cd1c9444a47a71c2ca0d3c05fbac8db9107cf06a15fa22ab6f2000'
+          assert current['release_sha256']=='aa9419c57fdbe0819c48cdeec839977b35ab120a4d2f9ebf99a2992ebfc07ec9'
+          assert current['isbn']=='979-8-90690-167-5' and current['formal_volume']==299
+          assert set(base['files'])==set(current['files'])
+          changes=[n for n in base['files'] if base['files'][n]!=current['files'][n]];assert changes==['read.html'],changes
+          reader=(repo/'public/books/religion-genesis/read.html').read_bytes()
+          assert hashlib.sha1(b'blob '+str(len(reader)).encode()+b'\0'+reader).hexdigest()=='44e00087170894a8fce4280a5b63d1f96a8dd5ab'
+          script=root/'source/publish-isbn187.py'
+          assert hashlib.sha256(script.read_bytes()).hexdigest()=='5cc13e7ae899a79674cdd095c697657e846614294a494b4ced846c560b0084de'
+          # Carry forward BOTH cache fixes with this edition's version, not the old edition's value.
+          p=root/'book/read.html';h=p.read_text();rev='m299-isbn187-v1.3-20261002'
+          patches={"+'.svg';":"+'.svg?v="+rev+"';","fetch('page-text.json')":"fetch('page-text.json?v="+rev+"')"}
+          for a,b in patches.items():assert h.count(a)==1,(a,h.count(a));h=h.replace(a,b)
+          p.write_text(h)
+          for i,s in enumerate(__import__('bs4').BeautifulSoup(h,'html.parser').find_all('script')):
+              if s.string:
+                  f=qa/f'inline-{i}.js';f.write_text(s.string);subprocess.run(['node','--check',str(f)],check=True)
+          m['files']['read.html']={'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+          m['release_sha256']=hashlib.sha256(json.dumps(m['files'],ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          m['resource_cache_version']=rev;m['cache_fix_reason']='Preserve concurrent page-image and full-text-search cache versioning for the ISBN187 edition.'
+          (root/'book/publication-manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          (root/'qa/base-publication-manifest.json').write_text(json.dumps(current,ensure_ascii=False,indent=2))
+          report={'original_candidate_release':'9bd4d5a423cd1c9444a47a71c2ca0d3c05fbac8db9107cf06a15fa22ab6f2000','concurrent_commit':'7fef53741b67565794d5c19e4cb0b87c8ccd7e1b','concurrent_files':changes,'carried_forward_patches':patches,'new_release':m['release_sha256'],'book_pdf_docx_and_body_unchanged_from_reviewed_candidate':True,'no_reindex':True}
+          (qa/'cache-reconciliation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));(root/'qa/cache-reconciliation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          selected=['Apply only this book and three shelves against fresh main','Require actual Cloudflare deployment success','Verify all live files and mobile desktop active downloads']
+          for name in selected:
+              code=next(s['run'] for s in steps if s.get('name')==name)
+              print('Executing:',name,flush=True);subprocess.run(['bash','-e','-c',code],check=True)
+          print('ISBN187 published with BOTH concurrent cache fixes retained; every live asset and both device readers verified.')
+          PY
+      - name: Preserve actual publication and acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-isbn187-live-accepted
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-isbn187-live/
