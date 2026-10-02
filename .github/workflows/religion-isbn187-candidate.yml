@@ -1,0 +1,112 @@
+name: Religion299 ISBN187 correction candidate
+on:
+  push:
+    branches: [religion-isbn187-20261002]
+    paths: ['.github/workflows/religion-isbn187-candidate.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/religion-genesis/
+            /public/books/m/299/
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-genesis-v11-verified-candidate
+          run-id: 36971964561
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/religion-original
+      - name: Install layout and verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libreoffice-writer fonts-noto-cjk > /tmp/isbn187-apt.log 2>&1
+          python -m pip install --quiet PyMuPDF==1.26.7 Pillow python-docx lxml beautifulsoup4 playwright PyYAML
+          python -m playwright install --with-deps chromium > /tmp/isbn187-browser-install.log 2>&1
+      - name: Apply only the newly confirmed ISBN using the reviewed layout source
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,urllib.request,subprocess,json,hashlib,re,unicodedata
+          from bs4 import BeautifulSoup
+          repo=Path(os.environ['GITHUB_WORKSPACE']);out=Path(os.environ['RUNNER_TEMP'])/'religion-isbn187';out.mkdir()
+          oldsite=repo/'public/books/religion-genesis'
+          src=urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/d8086d151546530cc6559bd8294ff1bc65744228/tools/religion-metadata-20261002/build-isbn167.py',timeout=45).read().decode()
+          assert hashlib.sha1(b'blob '+str(len(src.encode())).encode()+b'\0'+src.encode()).hexdigest()=='2577f008f55132a09b4e6208ffb35d86f1ad0697'
+          def patch(a,b):
+              global src
+              assert src.count(a)==1,(a,src.count(a))
+              src=src.replace(a,b)
+          src=src.replace('979-8-90690-167-5','979-8-90690-187-3').replace('isbn167','isbn187').replace('ISBN167','ISBN187').replace('v1.2','v1.3')
+          patch("V='1.2'","V='1.3'")
+          patch("entry.get('isbn') is None","entry.get('isbn') == '979-8-90690-167-5'")
+          patch("oldmanifest.get('metadata_revision')=='m299-price20-isbn-pending-20261002'","oldmanifest.get('metadata_revision')=='m299-isbn167-v1.2-20261002'")
+          patch("digest=hashlib.sha256((oldsite/n).read_bytes()).hexdigest()","digest=hashlib.sha256((previous/'public/books/religion-genesis'/n).read_bytes()).hexdigest()")
+          patch("sitecode=sitecode.replace('统稿排版版','数字阅读版')","sitecode=sitecode.replace('统稿排版版 v{V}','数字阅读版 v{V}')")
+          p=Path(os.environ['RUNNER_TEMP'])/'build-isbn187.py';p.write_text(src)
+          result=subprocess.run(['python',str(p),str(repo),os.environ['RUNNER_TEMP']+'/religion-original',str(out)],capture_output=True,text=True)
+          qa=out/'qa';qa.mkdir(exist_ok=True)
+          (qa/'build.stdout.txt').write_text(result.stdout);(qa/'build.stderr.txt').write_text(result.stderr)
+          print(result.stdout[-6000:]);print(result.stderr[-3000:]);assert result.returncode==0,result.returncode
+          # Never replace newer substantive changes with the older source used for layout.
+          norm=lambda s:re.sub(r'\s+','',unicodedata.normalize('NFKC',s))
+          checked=[]
+          for f in sorted((oldsite/'chapters').glob('*.html')):
+              if f.name=='publication.html':continue
+              new=out/'book/chapters'/f.name;assert new.exists()
+              a=BeautifulSoup(f.read_text(),'html.parser');b=BeautifulSoup(new.read_text(),'html.parser')
+              assert [norm(p.get_text()) for p in a.select('p.prose')]==[norm(p.get_text()) for p in b.select('p.prose')],('Substantive text changed',f.name)
+              checked.append(f.name)
+          import fitz
+          old=fitz.open(oldsite/'downloads/book-reader-v1.2.pdf');new=fitz.open(out/'book/downloads/book-reader-v1.3.pdf')
+          assert len(old)==len(new)==365
+          changed=[i+1 for i in range(365) if norm(old[i].get_text())!=norm(new[i].get_text())]
+          assert set(changed)<=set([1,2,365]),changed
+          assert len(new.get_toc())==504
+          (qa/'latest-edition-comparison.json').write_text(json.dumps({'baseline_version':'1.2','new_version':'1.3','old_isbn':'979-8-90690-167-5','new_isbn':'979-8-90690-187-3','prose_files_unchanged':checked,'pdf_text_changed_pages':changed,'all_other_pdf_text_pages_unchanged':True,'no_reindex':True},ensure_ascii=False,indent=2))
+          # Save the audited publication script with only ISBN/version and previous-ISBN guards changed.
+          pub=urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/4dcf144ddee6848129e94f606c729b9b41847bb5/tools/religion-metadata-20261002/publish-isbn167.py',timeout=45).read().decode()
+          assert hashlib.sha1(b'blob '+str(len(pub.encode())).encode()+b'\0'+pub.encode()).hexdigest()=='12cb39f549e34a2e5f181a2f2b7da2a8f3b72561'
+          pub=pub.replace('979-8-90690-167-5','979-8-90690-187-3').replace('isbn167','isbn187').replace('ISBN167','ISBN187').replace('v1.2','v1.3').replace("'1.2'","'1.3'")
+          oldguard="b.get('isbn') is None";assert pub.count(oldguard)==1
+          pub=pub.replace(oldguard,"b.get('isbn') == '979-8-90690-167-5'")
+          (out/'source/publish-isbn187.py').write_text(pub)
+          print('ISBN checksum and no-collision guards passed; current v1.2 prose unchanged; 365 pages; new ISBN187 in all active formats.')
+          PY
+      - name: Test the new desktop and mobile readers
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,subprocess,json,urllib.request,yaml
+          out=Path(os.environ['RUNNER_TEMP'])/'religion-isbn187'
+          doc=yaml.safe_load(urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/d034b8ec32e15fff0787ca5515404f1c4181c3cf/.github/workflows/religion-isbn167-candidate.yml',timeout=45).read())
+          tests=[s['run'] for s in doc['jobs']['candidate']['steps'] if s.get('name')=='Test desktop and mobile full readers'];assert len(tests)==1
+          code=tests[0].replace('religion-isbn167','religion-isbn187')
+          subprocess.run(['bash','-e','-c',code],check=True)
+          PY
+      - name: Preserve review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-isbn187-review
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-isbn187/qa/
+      - name: Preserve exact publication candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-isbn187-candidate
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/religion-isbn187/book/
+            ${{ runner.temp }}/religion-isbn187/source/
+            ${{ runner.temp }}/religion-isbn187/qa/
