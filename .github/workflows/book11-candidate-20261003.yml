@@ -1,0 +1,59 @@
+name: Book11 complete manuscript and reader candidate
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book11-candidate-20261003.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Install isolated candidate verification tools
+        run: python -m pip install -q Pillow PyMuPDF beautifulsoup4 PyYAML playwright==1.55.0
+      - name: Receive and authenticate only the authorized book publication bytes
+        run: |
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,os,json
+          from PIL import Image
+          chunks=[(3145728,'1ae462046297c3e6301ca8530171b4e70da4baf14594431500b56b50eb59a61f','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUcnfdRPuIkquVQhXrCQT_A75N5bS6BKRHbJrt8wy6OjYZeKoDGD5EQ8akfDcKa5o7aOMPQOzfQpYcP_Afk_8IxkUTg13vorcPdYzeLw9p9UrGzxrwlqkg-gvRXLWPojWDlgIoIfHhNsnGWvF81plaWWhuLg826e5n4ZvEvj8hZKQ-QBdl8=s2048?key=cNXmbFyCvAKodPtyOqmE3w'),(2870916,'109218ea95985d59f1d8dfbd7aa6ea8e2fab9349024242832a18163db727bacb','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUffIkaFCW9lWFzZzKeSWI8sBdiC1leckTLliuCdbrgq5PLiZ0f4EQjaPJYVJKf4YZUj1SBHY-Aer09kIiMniBLfbiu1z9MUuwZ8XR-KYISHSko8AtE2XSL8DKWj72_9DyHGhzyTUgn0cBJF-wY-w8r0RZowLIG5JS7LQMFMNuCfHeVdZes=s2048?key=cNXmbFyCvAKodPtyOqmE3w')]
+          data=bytearray()
+          for length,sha,url in chunks:
+            raw=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'SDE-Book11-Publication'}),timeout=90).read()
+            im=Image.open(io.BytesIO(raw));assert im.size==(1024,1024)
+            part=im.convert('RGB').tobytes()[:length];assert hashlib.sha256(part).hexdigest()==sha,'Transfer changed the bytes; stop without publishing'
+            data.extend(part)
+          assert len(data)==6016644 and hashlib.sha256(data).hexdigest()=='078e4be8e567bd30c6a5e79f9df30c75408df27efba6080df4825697caea3dd5'
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book11-candidate';root.mkdir()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+            z.extractall(root)
+          m=json.loads((root/'payload-manifest.json').read_text())
+          for f in m['files']:assert hashlib.sha256((root/f['path']).read_bytes()).hexdigest()==f['sha256'],f['path']
+          print('Exact complete book candidate authenticated. No production write or index operation.')
+          PY
+      - name: Check immutable manuscript, matching PDF.js modules and publication triggers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python "$RUNNER_TEMP/book11-candidate/build-tools/prepare_remote.py" "$RUNNER_TEMP/book11-candidate"
+      - name: Prepare Chinese-capable browser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Check real desktop and mobile PDF readers
+        run: |
+          mkdir -p "$RUNNER_TEMP/book11-testsite/books/m"
+          ln -s "$RUNNER_TEMP/book11-candidate/book" "$RUNNER_TEMP/book11-testsite/books/m/11"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/book11-testsite" > "$RUNNER_TEMP/book11-http.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          python "$RUNNER_TEMP/book11-candidate/build-tools/browser_check.py" http://127.0.0.1:8765/books/m/11 "$RUNNER_TEMP/book11-candidate/qa/browser-local"
+      - name: Preserve candidate and actual verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book11-verified-candidate-v1
+          retention-days: 7
+          path: ${{ runner.temp }}/book11-candidate/
