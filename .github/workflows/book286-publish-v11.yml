@@ -1,0 +1,79 @@
+name: Publish accepted volume286 v1.1 without reindex
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book286-publish-v11.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: book286-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/286/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: book286-v11-verified-candidate
+          run-id: 36981167799
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book286-candidate
+      - name: Reconcile latest catalog and atomically publish only this title
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import os,json,subprocess,urllib.request,time
+          from pathlib import Path
+          root=Path(os.environ['GITHUB_WORKSPACE']);cand=Path(os.environ['RUNNER_TEMP'])/'book286-candidate'
+          req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/runs/36981167799',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          checked=json.load(urllib.request.urlopen(req));assert checked['conclusion']=='success' and checked['head_sha']=='310322162343d896a7ad600ebda5ade78f1df844'
+          manifest=json.loads((cand/'book/publication-manifest.json').read_text());assert manifest['release_sha256']=='8f86485cfe37c20b8fe573406ec131e51cf9b35502a60c0ba4dc966a6b92b206'
+          def git(*args,check=True):return subprocess.run(['git',*args],cwd=root,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,check=check)
+          git('config','user.name','github-actions[bot]');git('config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          for attempt in range(4):
+            git('fetch','--filter=blob:none','--depth=1','origin','main');git('reset','--hard','FETCH_HEAD')
+            base=git('rev-parse','HEAD').stdout.strip()
+            target=root/'public/books/m/286/publication-manifest.json'
+            if target.exists():
+              assert json.loads(target.read_text())['release_sha256']==manifest['release_sha256'],'A different volume286 release exists; stopped safely.'
+              commit=base;break
+            subprocess.run(['python',str(cand/'build-tools/install.py'),str(cand),str(root)],check=True)
+            git('add','--sparse','public/books/m/286',*sorted(allowed))
+            paths=git('diff','--cached','--name-only').stdout.splitlines()
+            assert paths and all(p in allowed or p.startswith('public/books/m/286/') for p in paths),paths
+            assert not any(p.endswith(('.ttf','.ttc','.otf','.woff','.woff2','.env')) for p in paths)
+            git('commit','-m','Publish volume286: isms and self-exemption; ISBN 979-8-90690-166-8; US$20; full text and 295-page reader; no reindex')
+            commit=git('rev-parse','HEAD').stdout.strip()
+            result=git('push','origin','HEAD:main',check=False)
+            print(result.stdout)
+            if result.returncode==0:
+              (cand/'qa/changed-paths.json').write_text(json.dumps(paths,ensure_ascii=False,indent=2));break
+            if attempt==3:raise RuntimeError('Concurrent main changes prevented publication; never force-push.')
+            time.sleep(3)
+          (cand/'qa/publication-result.json').write_text(json.dumps({'commit':commit,'base_commit':base,'volume':286,'release_sha256':manifest['release_sha256'],'isbn':manifest['isbn'],'price_usd':20,'reindex_triggered':False},ensure_ascii=False,indent=2))
+          print('Publication commit',commit,'; no reindex.')
+          PY
+      - name: Preserve publication result and catalog entry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book286-v11-publication-result
+          retention-days: 14
+          path: ${{ runner.temp }}/book286-candidate/qa/
