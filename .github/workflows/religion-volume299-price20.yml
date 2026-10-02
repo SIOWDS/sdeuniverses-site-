@@ -1,0 +1,144 @@
+name: Religion Genesis volume 299 and price 20
+on:
+  push:
+    branches: [religion-metadata-20261002]
+    paths: ['.github/workflows/religion-volume299-price20.yml']
+permissions:
+  contents: write
+jobs:
+  publish-metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/religion-genesis/
+            /public/books/m/299/
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+      - name: Prepare narrowly scoped metadata changes
+        run: |
+          cat > "$RUNNER_TEMP/assign-volume.py" <<'PY'
+          from pathlib import Path
+          import os,json,subprocess,hashlib,datetime,re,copy,html
+          repo=Path(os.environ['GITHUB_WORKSPACE']);qa=Path(os.environ['RUNNER_TEMP'])/'religion-volume299';qa.mkdir(exist_ok=True)
+          path=repo/'public/books/catalog.json';catalog=json.loads(path.read_text());original=copy.deepcopy(catalog);books=catalog['books']
+          found=[b for b in books if b['id']=='religion-genesis'];assert len(found)==1;entry=found[0]
+          assert entry['number'] is None,'Volume already assigned; reconcile instead of overwriting.'
+          assert not any(b.get('number')==299 for b in books)
+          existing=subprocess.check_output(['git','ls-tree','-r','--name-only','HEAD','--','public/books/m/299'],text=True).splitlines();assert not existing,existing
+          requested='979-8-90690-164-4';digits=re.sub(r'\D','',requested)
+          conflicts=[{'number':b.get('number'),'title':b['title'],'isbn':b.get('isbn')} for b in books if b['id']!='religion-genesis' and re.sub(r'\D','',str(b.get('isbn','')))==digits]
+          assert {b['number'] for b in conflicts}=={213,280},'ISBN conflict state changed; recheck with owner.'
+          stamp=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds').replace('+00:00','Z')
+          marker='m299-price20-isbn-pending-20261002'
+          entry.update(number=299,price=20,priceUsd=20,priceUSD=20,currency='USD',priceLabel='US$20.00',isbn=None,isbnStatus='pending-owner-confirmation',metadataRevision=marker,metadataUpdatedAt=stamp,numberedUrl='https://sdeuniverses.com/books/m/299/')
+          site=repo/'public/books/religion-genesis';mf=site/'publication-manifest.json';manifest=json.loads(mf.read_text())
+          assert manifest['release_sha256']=='4f6c6aa8776f2acb09e4d49e5defb17bec46d28f3d3786b4a01032af53b46700','Book content changed; never overwrite a newer edition.'
+          downloads_before={str(p.relative_to(site)):hashlib.sha256(p.read_bytes()).hexdigest() for p in (site/'downloads').iterdir() if p.is_file()}
+          changed=[]
+          old_notice='研究专著 · 正式卷号、ISBN与定价尚待核定；不借用第220号的出版标识。'
+          new_notice='德麦国际专著第299卷 · 定价US$20 · ISBN待核定。现有Word/PDF为v1.1，出版信息页将在书号确认后统一更新。'
+          old_front='正式卷号、ISBN与定价尚未指定，本版不代表已完成出版登记或网站部署。'
+          new_front='网页书目已定为德麦国际专著第299卷，定价US$20。ISBN待核定；下载文件出版信息页将在书号确认后统一更新。'
+          for f in sorted(site.rglob('*.html')):
+              text=f.read_text();old=text
+              assert text.count('</head>')==1
+              text=text.replace('</head>','<meta name="book_no" content="299"><meta name="price" content="20"><meta name="price_currency" content="USD"><meta name="isbn_status" content="pending-owner-confirmation"><meta name="metadata_revision" content="'+marker+'"></head>')
+              if f==site/'index.html':
+                  assert text.count(old_notice)==1
+                  text=text.replace(old_notice,new_notice)
+                  anchor='<div class="meta">';assert text.count(anchor)==1
+                  text=text.replace(anchor,anchor+'<div><strong>德麦国际专著第299卷</strong> · 定价 US$20</div>')
+                  text=text.replace('<title>宗教信仰何以发生？ · SDE Universes</title>','<title>宗教信仰何以发生？ · 德麦国际专著第299卷</title>')
+              if f in [site/'chapters/publication.html',site/'text/index.html']:
+                  assert text.count(old_front)==1
+                  text=text.replace(old_front,new_front)
+              if text!=old:f.write_text(text);changed.append(str(f.relative_to(repo)))
+          aliases={'index.html':'','read.html':'read.html','chapters.html':'chapters.html','text/index.html':'text/'}
+          for filename,target in aliases.items():
+              url='https://sdeuniverses.com/books/religion-genesis/'+target
+              p=repo/'public/books/m/299'/filename;p.parent.mkdir(parents=True,exist_ok=True)
+              p.write_text('<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>宗教信仰何以发生？ · 第299卷</title><link rel="canonical" href="'+url+'"><meta http-equiv="refresh" content="0;url='+url+'"><meta name="book_no" content="299"></head><body><p>德麦国际专著第299卷 · 定价US$20</p><p><a href="'+url+'">进入《宗教信仰何以发生？》</a></p><script>location.replace('+json.dumps(url)+'+location.hash)</script></body></html>')
+          catalog['updated']=stamp;path.write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+'\n')
+          builder=repo/'tools/build_bookshelf.py';data=builder.read_bytes();assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()=='2e091a13d40b1a066b43708af7f7bcfd4a41308d'
+          subprocess.run(['python',str(builder)],check=True)
+          after=json.loads(path.read_text())
+          before_other=[b for b in original['books'] if b['id']!='religion-genesis'];after_other=[b for b in after['books'] if b['id']!='religion-genesis'];assert before_other==after_other
+          assert len(original['books'])==len(after['books'])
+          assert downloads_before=={str(p.relative_to(site)):hashlib.sha256(p.read_bytes()).hexdigest() for p in (site/'downloads').iterdir() if p.is_file()}
+          for f in ['public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html']:
+              s=(repo/f).read_text();assert s.count('data-id="religion-genesis"')==1 and 'data-number="299"' in s
+          records={str(p.relative_to(site)):{'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(site.rglob('*')) if p.is_file() and p!=mf}
+          manifest.update(formal_volume=299,price_usd=20,isbn=None,isbn_status='pending-owner-confirmation',metadata_revision=marker,metadata_updated_at=stamp,download_metadata_status='v1.1-publication-page-pending-isbn-confirmation',files=records,previous_release_sha256=manifest['release_sha256'])
+          manifest['release_sha256']=hashlib.sha256(json.dumps(records,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          mf.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+          report={'volume':299,'price_usd':20,'isbn_requested':requested,'isbn_assigned':None,'isbn_conflicts':conflicts,'volume_availability_rechecked_against_fresh_main':True,'metadata_revision':marker,'catalog_count_unchanged':len(books),'other_books_unchanged':True,'download_files_unchanged_pending_isbn_confirmation':downloads_before,'html_files_updated':len(changed),'release_sha256':manifest['release_sha256'],'no_reindex':True,'updated_at':stamp,'base_main':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()}
+          (qa/'metadata-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));(qa/'publication-manifest.json').write_bytes(mf.read_bytes());(qa/'catalog-entry.json').write_text(json.dumps(entry,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+      - name: Reconcile fresh main and publish only the authorized book metadata
+        run: |
+          git config user.name 'SIOWDS'
+          git config user.email 'wangdesheng1234567@gmail.com'
+          success=0
+          for attempt in 1 2 3; do
+            git fetch --filter=blob:none --depth=2 origin main
+            git checkout --detach FETCH_HEAD
+            python "$RUNNER_TEMP/assign-volume.py"
+            git add --sparse public/books/religion-genesis public/books/m/299 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+            python - <<'PY'
+          import subprocess
+          paths=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          assert paths and all(p in allowed or p.startswith(('public/books/religion-genesis/','public/books/m/299/')) for p in paths),paths
+          assert not any('/downloads/' in p or '/pages/' in p or '/search/' in p for p in paths)
+          PY
+            git commit -m 'Assign Religion Genesis volume299 and USD20; retain conflicting ISBN for owner confirmation; no reindex'
+            if git push origin HEAD:main; then success=1; break; fi
+            echo 'Main moved concurrently; recheck all claims and rebuild without force push.'
+          done
+          test "$success" = 1
+          git rev-parse HEAD > "$RUNNER_TEMP/religion-volume299/published-commit.txt"
+      - name: Verify public metadata and all three shelves after deployment
+        run: |
+          python - <<'PY'
+          import os,json,time,urllib.request
+          from pathlib import Path
+          qa=Path(os.environ['RUNNER_TEMP'])/'religion-volume299';expected=json.loads((qa/'metadata-result.json').read_text());base='https://sdeuniverses.com/books/religion-genesis/'
+          def get(url):
+              r=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 SDE-Metadata-Acceptance'}),timeout=45);return r.status,r.read().decode('utf-8')
+          for attempt in range(45):
+              try:
+                  status,text=get(base+'publication-manifest.json');live=json.loads(text)
+                  if live.get('metadata_revision')==expected['metadata_revision'] and live.get('release_sha256')==expected['release_sha256']:break
+              except Exception:pass
+              time.sleep(12)
+          else:raise AssertionError('Publication metadata not live within acceptance window')
+          urls=[base,base+'text/',base+'chapters/publication.html','https://sdeuniverses.com/books/m/299/','https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']
+          results=[]
+          for url in urls:
+              status,text=get(url)
+              if '/books/m/299/' in url:assert '第299卷' in text and 'religion-genesis/' in text
+              elif url.endswith(('/books/','/monographs/','/library/')):
+                  start=text.index('data-id="religion-genesis"');end=text.index('</article>',start);card=text[start:end]
+                  assert 'data-number="299"' in card and '宗教信仰何以发生' in card
+              else:assert '第299卷' in text and 'US$20' in text and 'ISBN待核定' in text
+              results.append({'url':url,'status':status,'passed':True})
+          _,raw=get('https://sdeuniverses.com/books/catalog.json');b=[b for b in json.loads(raw)['books'] if b['id']=='religion-genesis'][0];assert b['number']==299 and b['price']==20 and b['isbn'] is None
+          (qa/'live-acceptance.json').write_text(json.dumps({'passed':True,'checks':results,'metadata':b,'no_reindex':True},ensure_ascii=False,indent=2));print('Volume299 and US$20 verified live; duplicate ISBN not assigned; all three shelves present.')
+          PY
+      - name: Preserve publication and metadata acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-volume299-price20-evidence
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-volume299/
