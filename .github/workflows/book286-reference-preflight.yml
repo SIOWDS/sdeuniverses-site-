@@ -1,0 +1,56 @@
+name: Book 286 read-only reference and publication preflight
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book286-reference-preflight.yml']
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Collect only public reference pages and book catalog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import os,json,re,hashlib,urllib.request,urllib.parse
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'book286-reference';root.mkdir()
+          report={}
+          def get(url,name,auth=False):
+            headers={'User-Agent':'SDE-Book286-Reference-Check'}
+            if auth: headers['Authorization']='Bearer '+os.environ['GH_TOKEN']
+            try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=60) as r:
+                data=r.read();report[name]={'url':r.url,'status':r.status,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+              (root/name).write_bytes(data);return data
+            except Exception as e: report[name]={'url':url,'error':str(e)};return b''
+          base='https://sdeuniverses.com'
+          home=get(base+'/books/m/220/','220-index.html')
+          get(base+'/books/m/220/read.html','220-read.html')
+          get(base+'/books/m/220/text/','220-text.html')
+          get(base+'/books/m/220/cover.jpg','220-cover.jpg')
+          get(base+'/books/m/220/backcover.jpg','220-backcover.jpg')
+          get(base+'/books/m/286/','286-before.html')
+          get(base+'/books/','books-index.html')
+          get(base+'/monographs/','monographs-index.html')
+          get('https://read.sdeuniverses.com/library/','read-library.html')
+          get(base+'/books/catalog.json','catalog-live.json')
+          pdfs=list(dict.fromkeys(re.findall(r'href=[\"\']([^\"\']+\.pdf(?:\?[^\"\']*)?)[\"\']',home.decode('utf-8','replace'))))
+          for i,u in enumerate(pdfs[:2]): get(urllib.parse.urljoin(base,u),'220-reference-'+str(i)+'.pdf')
+          api='https://api.github.com/repos/SIOWDS/sdeuniverses-site-'
+          get(api+'/git/ref/heads/main','main-ref.json',True)
+          get(api+'/contents?ref=main','repo-root.json',True)
+          for p,n in [('public/books/catalog.json','catalog-github.json'),('public/books/index.html','books-github.json'),('public/monographs/index.html','monographs-github.json'),('wrangler.toml','wrangler-github.json'),('package.json','package-github.json')]:get(api+'/contents/'+p+'?ref=main',n,True)
+          (root/'reference-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          print('Read-only. No content publication and no reindex.')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book286-reference-preflight
+          retention-days: 7
+          path: ${{ runner.temp }}/book286-reference/
