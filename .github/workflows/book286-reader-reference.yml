@@ -1,0 +1,49 @@
+name: Book286 exact reader and publisher references
+on:
+  push:
+    branches: ['publish/book286-isms-v1-1-20261002']
+    paths: ['.github/workflows/book286-reader-reference.yml']
+permissions:
+  contents: read
+jobs:
+  refs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/build_bookshelf.py
+            /wrangler.jsonc
+            /src/index.js
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+          persist-credentials: false
+      - name: Obtain exact public references and reader dependencies
+        run: |
+          python - <<'PY'
+          import urllib.request,pathlib,os,shutil,json
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'refs';root.mkdir()
+          for n in ['tools/build_bookshelf.py','wrangler.jsonc','src/index.js','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html']:
+              p=pathlib.Path(n)
+              if p.exists(): q=root/n;q.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,q)
+          urls={
+           '220-reader.pdf':'https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf',
+           '220-print.pdf':'https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-v3.pdf',
+           'pdf.min.js':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+           'pdf.worker.min.js':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}
+          out={}
+          for n,u in urls.items():
+              try:
+                  r=urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':'SDE-Book286-Reference-Audit'}),timeout=75);b=r.read();(root/n).write_bytes(b);out[n]={'status':r.status,'bytes':len(b),'type':r.headers.get('Content-Type')}
+              except Exception as e:out[n]={'error':str(e)}
+          (root/'fetch-results.json').write_text(json.dumps(out,indent=2));print(out)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book286-reader-references
+          path: ${{ runner.temp }}/refs/
+          retention-days: 1
