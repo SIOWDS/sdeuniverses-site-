@@ -1,0 +1,59 @@
+name: Book11 final isolated candidate verification
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book11-candidate-check-20261003.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book11-verified-candidate-v1
+          run-id: 37070581123
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book11-candidate
+      - name: Install isolated verification tools
+        run: python -m pip install -q Pillow PyMuPDF beautifulsoup4 PyYAML playwright==1.55.0
+      - name: Check exact source and narrowly scoped publication triggers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import pathlib,os,sys
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book11-candidate'
+          p=root/'build-tools/prepare_remote.py';s=p.read_text()
+          old="  assert not (isinstance(on,dict) and 'push' in on),'Push-triggered indexing requires review before publication: '+w['path']"
+          new="""  if isinstance(on,dict) and 'push' in on:
+            push=on['push'] or {}
+            allowed={'tools/three_views_longform_20260920.py','.github/workflows/three-views-longform-20260920.yml'}
+            assert w['path']=='.github/workflows/three-views-longform-20260920.yml' and isinstance(push,dict) and set(push.get('paths',[]))==allowed,'Unreviewed index trigger: '+w['path']
+            item['publication_paths_do_not_match']=True"""
+          assert s.count(old)==1
+          sys.argv=[str(p),str(root)]
+          exec(compile(s.replace(old,new),str(p),'exec'))
+          PY
+      - name: Prepare Chinese-capable browser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Check real desktop and mobile PDF readers
+        run: |
+          mkdir -p "$RUNNER_TEMP/book11-testsite/books/m"
+          ln -s "$RUNNER_TEMP/book11-candidate/book" "$RUNNER_TEMP/book11-testsite/books/m/11"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/book11-testsite" > "$RUNNER_TEMP/book11-http.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          python "$RUNNER_TEMP/book11-candidate/build-tools/browser_check.py" http://127.0.0.1:8765/books/m/11 "$RUNNER_TEMP/book11-candidate/qa/browser-local"
+      - name: Preserve final candidate and actual verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book11-final-candidate-v1
+          retention-days: 7
+          path: ${{ runner.temp }}/book11-candidate/
