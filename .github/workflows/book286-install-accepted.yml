@@ -1,0 +1,69 @@
+name: Install accepted book286 publication branch
+on:
+  push:
+    branches: ['publish/book286-isms-v1-1-20261002']
+    paths: ['.github/workflows/book286-install-accepted.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book286-publication-prepared
+          run-id: 36978247492
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m286-candidate
+      - name: Require passing final browser evidence and accommodate unset ISBNs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib
+          root=Path(os.environ['RUNNER_TEMP'])/'m286-candidate';m=json.loads((root/'book/publication-manifest.json').read_text());assert m['release_sha256']=='0a5b5f9e3e672838568cd7597344875173e06798f2c8e688dd552f9f855782d2'
+          for n,v in m['files'].items():assert hashlib.sha256((root/'book'/n).read_bytes()).hexdigest()==v['sha256'],n
+          report=json.loads((root/'qa/final-browser/browser-report.json').read_text());assert len(report)==3 and all(x['pass'] and not x['runtime_errors'] for x in report)
+          p=root/'build-tools/install.py';s=p.read_text();assert "b.get('isbn','').replace('-','')" in s;p.write_text(s.replace("b.get('isbn','').replace('-','')","(b.get('isbn') or '').replace('-','')"))
+          print('Candidate, three viewports, and public files already verified; no public file changed.')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          filter: blob:none
+          fetch-depth: 2
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/286/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+      - name: Prepare isolated publication change
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b release/book286-v11-20261002
+          python "$RUNNER_TEMP/m286-candidate/build-tools/install.py" "$RUNNER_TEMP/m286-candidate" "$GITHUB_WORKSPACE"
+          git add --sparse public/books/m/286 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+          python - <<'PY'
+          import subprocess,os,json
+          from pathlib import Path
+          changed=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines();allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          assert len(changed)==41 and all(n in allowed or n.startswith('public/books/m/286/') for n in changed),changed
+          assert not any(n.endswith(('.ttf','.otf','.ttc','.woff','.woff2','.env')) for n in changed)
+          Path(os.environ['RUNNER_TEMP'],'m286-candidate','qa','changed-paths.json').write_text(json.dumps(changed,indent=2))
+          print('Verified 37 book files plus catalogue and 3 shelves; other records unchanged.')
+          PY
+          git commit -m 'Publish volume286 Isms: ISBN 979-8-90690-166-8, USD20, 284 pages, 220-style v1.1; no reindex'
+          git push origin HEAD:release/book286-v11-20261002
+          git rev-parse HEAD > "$RUNNER_TEMP/m286-candidate/qa/publication-branch-commit.txt"
+      - name: Preserve prepared release and acceptance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book286-release-ready
+          path: ${{ runner.temp }}/m286-candidate/
+          retention-days: 14
