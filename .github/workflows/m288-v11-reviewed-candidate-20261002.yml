@@ -1,0 +1,76 @@
+name: Volume 288 final visual corrections and complete publication candidate
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m288-v11-reviewed-candidate-20261002.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    container: debian:13
+    timeout-minutes: 16
+    steps:
+      - name: Prepare matching CJK document environment
+        timeout-minutes: 7
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          timeout 90s apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20
+          timeout 270s apt-get install -y -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20 git ca-certificates python3 python3-venv libreoffice-writer fonts-noto-cjk fontconfig
+          python3 -m venv /tmp/m288-venv
+          timeout 120s /tmp/m288-venv/bin/pip install --quiet --disable-pip-version-check --no-input --timeout 20 --retries 1 python-docx==1.2.0 PyMuPDF==1.26.4 beautifulsoup4==4.13.5 Pillow==11.3.0
+          fc-cache -f
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/288/
+            /tools/m288-v11-layout-patch.py
+            /tools/m288-v11-final-visual-patch.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: m288-v11-page-refined-candidate
+          run-id: 36967566861
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m288-verified-sources
+      - name: Apply reviewed corrections and rebuild all pages
+        run: |
+          /tmp/m288-venv/bin/python tools/m288-v11-layout-patch.py "$RUNNER_TEMP/m288-verified-sources/build-tools"
+          /tmp/m288-venv/bin/python tools/m288-v11-final-visual-patch.py "$RUNNER_TEMP/m288-verified-sources/build-tools"
+          /tmp/m288-venv/bin/python "$RUNNER_TEMP/m288-verified-sources/build-tools/build_v11.py" public/books/m/288 "$RUNNER_TEMP/m288-v11-reviewed" "$RUNNER_TEMP/m288-verified-sources/build-tools/edits.json"
+          /tmp/m288-venv/bin/python "$RUNNER_TEMP/m288-verified-sources/build-tools/finalize_v11.py" public/books/m/288 "$RUNNER_TEMP/m288-v11-reviewed" "$RUNNER_TEMP/m288-verified-sources/build-tools/edits.json"
+      - name: Record exact geometry and public-file integrity
+        run: |
+          /tmp/m288-venv/bin/python - <<'PY'
+          from pathlib import Path
+          import json,os,fitz,hashlib,subprocess,shutil
+          root=Path(os.environ['RUNNER_TEMP'])/'m288-v11-reviewed';m=json.loads((root/'book/publication-manifest.json').read_text())
+          p=fitz.open(root/'book/downloads/chen-feng-beauvoir-print-v1.1.pdf');pages=[]
+          for i,pg in enumerate(p):
+              spans=[]
+              for b in pg.get_text('dict')['blocks']:
+                  for line in b.get('lines',[]):
+                      for s in line['spans']:spans.append({'text':s['text'],'bbox':[round(x,3) for x in s['bbox']],'size':round(s['size'],3),'font':s['font']})
+              pages.append({'page':i+1,'spans':spans})
+          (root/'qa/all-page-span-metrics.json').write_text(json.dumps(pages,ensure_ascii=False))
+          font=Path(subprocess.check_output(['fc-match','-f','%{file}','Noto Serif CJK SC'],text=True))
+          (root/'qa/render-environment.json').write_text(json.dumps({'libreoffice':subprocess.check_output(['libreoffice','--version'],text=True).strip(),'serif_font_sha256':hashlib.sha256(font.read_bytes()).hexdigest()},indent=2))
+          shutil.copytree(Path(os.environ['RUNNER_TEMP'])/'m288-verified-sources/build-tools',root/'build-tools',dirs_exist_ok=True)
+          assert m['volume']==288 and m['isbn']=='979-8-90690-433-1' and m['price_usd']==20
+          assert len(p)==m['pdf_pages']==354
+          assert not any(q.suffix.lower() in ['.ttf','.otf','.ttc','.woff','.woff2','.env'] for q in (root/'book').rglob('*'))
+          print('Unpublished reviewed candidate:',len(p),'pages',m['release_sha256'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m288-v11-reviewed-publication-candidate
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/m288-v11-reviewed/book/
+            ${{ runner.temp }}/m288-v11-reviewed/qa/
+            ${{ runner.temp }}/m288-v11-reviewed/build-tools/
