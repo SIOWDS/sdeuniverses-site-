@@ -1,0 +1,167 @@
+name: Publish reviewed volume 288 and verify production readers
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-m288-reviewed-20261002.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: volume-288-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      PYTHONUNBUFFERED: '1'
+      EDITION_SHA: 5dd6f024e72b8a77661266f5e863a4ee4f0186c7718d39e0220c9e0a6ee2d720
+    steps:
+      - name: Recover the exact reviewed complete book
+        uses: actions/download-artifact@v4
+        with:
+          name: book288-verified-candidate
+          run-id: 36959770461
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m288-candidate
+      - name: Recover successful candidate browser evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: book288-candidate-browser-evidence
+          run-id: 36959770461
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m288-candidate-browser
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/288/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /tools/m288-install-reviewed-20261002.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare bounded verification dependencies
+        timeout-minutes: 4
+        run: |
+          timeout 120s python -m pip install --disable-pip-version-check --no-input --timeout 20 --retries 1 beautifulsoup4==4.13.5 playwright==1.55.0 pypdf==6.1.1
+          timeout 60s sudo apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20
+          timeout 90s sudo apt-get install -y -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20 fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then timeout 120s python -m playwright install --with-deps chromium; fi
+      - name: Verify candidate acceptance and install only this title
+        run: |
+          mkdir -p "$RUNNER_TEMP/m288-live"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          r=json.loads(Path(os.environ['RUNNER_TEMP'],'m288-candidate-browser','browser-report.json').read_text())
+          assert len(r)==3 and all(x['pass'] and not x['runtime_errors'] and x['pdf_loaded_pages']==383 and x['pdf_page_change'] for x in r)
+          PY
+          python tools/m288-install-reviewed-20261002.py "$RUNNER_TEMP/m288-candidate" "$GITHUB_WORKSPACE"
+      - name: Commit the book and three bookshelf entrances without reindex
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git add --sparse public/books/m/288 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+            python - <<'PY'
+          import subprocess,json,os
+          from pathlib import Path
+          paths=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          assert all(p in allowed or p.startswith('public/books/m/288/') for p in paths),paths
+          assert not any(p.endswith(('.ttf','.otf','.ttc','.woff','.woff2','.env')) for p in paths)
+          Path(os.environ['RUNNER_TEMP'],'m288-live','changed-paths.json').write_text(json.dumps(paths,indent=2))
+          print('Authorized publication paths:',len(paths))
+          PY
+            if git diff --cached --quiet; then break; fi
+            git commit -m 'Publish volume 288: Chen Feng on Beauvoir, US$20, complete 383-page edition and full readers; no reindex'
+            if git push origin HEAD:main; then break; fi
+            if [ "$attempt" = 3 ]; then exit 1; fi
+            git fetch --depth=1 origin main
+            git reset --hard origin/main
+            python tools/m288-install-reviewed-20261002.py "$RUNNER_TEMP/m288-candidate" "$GITHUB_WORKSPACE"
+          done
+          git rev-parse HEAD > "$RUNNER_TEMP/m288-live/publication-commit.txt"
+          cp "$RUNNER_TEMP/m288-candidate/qa/install-report.json" "$RUNNER_TEMP/m288-live/install-report.json"
+      - name: Verify exact deployed files and all three bookshelves
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from datetime import datetime,timezone
+          import os,json,time,urllib.request,hashlib,concurrent.futures
+          from bs4 import BeautifulSoup
+          book=Path('public/books/m/288');m=json.loads((book/'publication-manifest.json').read_text())
+          out=Path(os.environ['RUNNER_TEMP'])/'m288-live';base='https://sdeuniverses.com/books/m/288/'
+          assert m['release_sha256']==os.environ['EDITION_SHA']
+          def get(url):
+              url+=('&' if '?' in url else '?')+'edition_check='+str(time.time_ns())
+              req=urllib.request.Request(url,headers={'User-Agent':'SDE-Volume288-Publication-Verification/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=45) as r:return r.status,r.read()
+          for attempt in range(40):
+              try:
+                  status,data=get(base+'publication-manifest.json')
+                  if status==200 and json.loads(data).get('release_sha256')==m['release_sha256']:break
+              except Exception as e:print('Deployment pending:',str(e))
+              time.sleep(12)
+          else:raise RuntimeError('Reviewed volume 288 not observed in production deployment window')
+          def signature(data):
+              s=BeautifulSoup(data,'html.parser');main=s.find('main');assert main
+              title=s.title.get_text()
+              blocks=[(x.get('data-source-paragraph'),x.get_text()) for x in main.select('[data-source-paragraph]')]
+              links=[a.get('href') for a in main.select('a[href]')]
+              for node in main.select('script,style'):node.decompose()
+              return title,''.join(main.stripped_strings),blocks,links
+          def verify(name):
+              expected=(book/name).read_bytes()
+              last=None
+              for trial in range(3):
+                  try:
+                      status,data=get(base+name);assert status==200
+                      if name.endswith('.html'):
+                          assert signature(data)==signature(expected),('semantic HTML mismatch',name)
+                          local=BeautifulSoup(expected,'html.parser');live=BeautifulSoup(data,'html.parser')
+                          live_inline=[s.get_text().strip() for s in live.select('script:not([src])')]
+                          for s in local.select('script:not([src])'):
+                              if s.get_text().strip():assert s.get_text().strip() in live_inline,('inline reader logic mismatch',name)
+                          assert {s.get('src') for s in local.select('script[src]')} <= {s.get('src') for s in live.select('script[src]')}
+                          return {'path':name,'http_status':200,'book_text_navigation_and_reader_logic_match':True}
+                      assert hashlib.sha256(data).hexdigest()==hashlib.sha256(expected).hexdigest(),('byte mismatch',name)
+                      return {'path':name,'http_status':200,'sha256_matches':True}
+                  except Exception as e:last=e;time.sleep(3)
+              raise last
+          report={'volume':288,'title':m['title'],'author':'陈凤','isbn':m['isbn'],'price_usd':20,
+                  'release_sha256':m['release_sha256'],'pdf_pages':383,'files':[],'bookshelves':[],
+                  'reindex_requested':False}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              for item in pool.map(verify,list(m['files'])+['publication-manifest.json']):
+                  report['files'].append(item);print(item['path'],'OK')
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+              status,data=get(url);s=BeautifulSoup(data,'html.parser');items=s.select('article.book[data-id="m288"]')
+              assert status==200 and len(items)==1 and items[0].get('data-number')=='288',url
+              assert items[0].select_one('a.read-button')['href']==base+'read.html'
+              assert '陈凤' in items[0].get_text()
+              report['bookshelves'].append({'url':url,'http_status':200,'one_record':True,'volume':288,'flip_reader_primary':True})
+          report['checked_at']=datetime.now(timezone.utc).isoformat()
+          (out/'live-files-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print('14 exact/semantic title assets and 3 live bookshelves verified; no reindex.')
+          PY
+      - name: Test actual production PDF rendering and mobile readers
+        run: python "$RUNNER_TEMP/m288-candidate/build-tools/browser-check.py" https://sdeuniverses.com "$RUNNER_TEMP/m288-live/browser" --with-pdf
+      - name: Preserve complete live publication acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m288-live-publication-evidence
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/m288-live/
+            ${{ github.workspace }}/public/books/m/288/publication-manifest.json
