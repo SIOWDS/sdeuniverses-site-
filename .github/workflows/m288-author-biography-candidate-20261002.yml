@@ -1,0 +1,67 @@
+name: Volume288 author biography candidate
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m288-author-biography-candidate-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/288/
+            /tools/m288-author-biography-20261002.py
+      - name: Install bounded document tools and existing book fonts
+        timeout-minutes: 5
+        run: |
+          timeout 90s python -m pip install --quiet --disable-pip-version-check --timeout 20 --retries 1 python-docx==1.2.0 PyMuPDF==1.26.7 beautifulsoup4==4.14.3 playwright==1.55.0
+          timeout 60s sudo apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20
+          timeout 180s sudo apt-get install -y -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20 libreoffice-writer fonts-noto-cjk fonts-noto-core
+          fc-cache -f
+      - name: Change only the author introduction and prove 382 PDF pages unchanged
+        run: |
+          mkdir -p "$RUNNER_TEMP/m288-bio-candidate"
+          cp -a public/books/m/288 "$RUNNER_TEMP/m288-bio-candidate/book"
+          python tools/m288-author-biography-20261002.py "$RUNNER_TEMP/m288-bio-candidate/book" "$RUNNER_TEMP/m288-bio-candidate/qa"
+      - name: Check author introduction on desktop and mobile
+        run: |
+          python - <<'PY'
+          import os,json,shutil,threading,functools,http.server
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          root=Path(os.environ['RUNNER_TEMP'])/'m288-bio-candidate';preview=Path(os.environ['RUNNER_TEMP'])/'bio-preview/books/m';preview.mkdir(parents=True)
+          (preview/'288').symlink_to(root/'book')
+          handler=functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(preview.parents[1]))
+          server=http.server.ThreadingHTTPServer(('127.0.0.1',8765),handler);threading.Thread(target=server.serve_forever,daemon=True).start()
+          bio=json.loads((root/'qa/author-biography.json').read_text());reports=[]
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=shutil.which('google-chrome') or shutil.which('chromium'),headless=True,args=['--no-sandbox'])
+              for label,width,height in [('desktop',1365,950),('mobile',390,844),('narrow',320,740)]:
+                  page=browser.new_page(viewport={'width':width,'height':height});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+                  for suffix in ['', 'text/']:
+                      page.goto('http://127.0.0.1:8765/books/m/288/'+suffix+'#author',wait_until='networkidle');page.evaluate('document.fonts.ready');page.locator('#author').scroll_into_view_if_needed()
+                      assert page.locator('#author > p').all_text_contents()==bio
+                      assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 2')
+                      page.locator('#author').screenshot(path=str(root/'qa'/f'{label}-{suffix.replace("/","") or "detail"}-author.png'))
+                  assert not errors,errors
+                  reports.append({'viewport':label,'exact_bio':True,'no_overflow':True,'runtime_errors':errors});page.close()
+              browser.close()
+          server.shutdown();(root/'qa/browser-bio-report.json').write_text(json.dumps(reports,ensure_ascii=False,indent=2))
+          shutil.rmtree(root/'qa/lo-profile',ignore_errors=True)
+          (root/'qa/baseline.docx').unlink()
+          print('Author text and responsive layout verified. Published site unchanged.')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m288-author-biography-candidate
+          retention-days: 14
+          path: ${{ runner.temp }}/m288-bio-candidate/
