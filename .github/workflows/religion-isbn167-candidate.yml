@@ -1,0 +1,79 @@
+name: Religion volume299 ISBN167 full candidate
+on:
+  push:
+    branches: [religion-metadata-20261002]
+    paths: ['.github/workflows/religion-isbn167-candidate.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/religion-genesis/
+            /public/books/m/299/
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-genesis-v11-verified-candidate
+          run-id: 36971964561
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/religion-original
+      - name: Install document and browser verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libreoffice-writer fonts-noto-cjk
+          python -m pip install --quiet PyMuPDF==1.26.7 Pillow python-docx lxml beautifulsoup4 playwright
+          python -m playwright install --with-deps chromium
+      - name: Build the full metadata edition from the actual original
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,urllib.request,subprocess
+          p=Path(os.environ['RUNNER_TEMP'])/'build-isbn167.py'
+          p.write_bytes(urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/d8086d151546530cc6559bd8294ff1bc65744228/tools/religion-metadata-20261002/build-isbn167.py',timeout=45).read())
+          subprocess.run(['python',str(p),os.environ['GITHUB_WORKSPACE'],os.environ['RUNNER_TEMP']+'/religion-original',os.environ['RUNNER_TEMP']+'/religion-isbn167'],check=True)
+          PY
+      - name: Test desktop and mobile full readers
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,subprocess,json
+          out=Path(os.environ['RUNNER_TEMP'])/'religion-isbn167';previous=Path(os.environ['RUNNER_TEMP'])/'religion-original'
+          src=(previous/'source/test_site.py').read_text()
+          old="R=Path('/mnt/data/work');O=Path('/mnt/data/final');B=json.loads((R/'book.json').read_text());V=B['version'];PKG=O/f'宗教信仰何以发生_完整发布包_v{V}';PUBLIC=PKG/'public';SITE=PUBLIC/'books/religion-genesis'"
+          assert src.count(old)==1
+          new="R=Path("+repr(str(out/'work'))+");O=Path("+repr(str(out/'editions'))+");B=json.loads((R/'book.json').read_text());V=B['version'];PKG=O/f'宗教信仰何以发生_完整发布包_v{V}';PUBLIC=PKG/'public';SITE=PUBLIC/'books/religion-genesis'"
+          src=src.replace(old,new).replace("executable_path='/usr/bin/chromium',",'')
+          count=json.loads((out/'qa/build-report.json').read_text())['pages']
+          src=src.replace('[1,22,94,169,210,285,293,335,360,365]',str(sorted({1,2,22,94,169,210,285,293,count-5,count})))
+          p=out/'work/test_site.py';p.write_text(src);subprocess.run(['python',str(p)],check=True)
+          import shutil
+          shutil.copytree(out/'work/browser',out/'qa/browser');shutil.copy2(out/'editions/网页与阅读器核对.json',out/'qa/browser-check.json')
+          report=json.loads((out/'qa/browser-check.json').read_text());assert all(not t.get('overflow',False) for t in report['browser_tests'])
+          print('New ISBN and volume validated; body unchanged; all active formats and desktop/mobile readers verified. No live writes yet; no reindex.')
+          PY
+      - name: Save review evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-isbn167-review
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-isbn167/qa/
+      - name: Save the exact publication candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-isbn167-candidate
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/religion-isbn167/book/
+            ${{ runner.temp }}/religion-isbn167/source/
+            ${{ runner.temp }}/religion-isbn167/qa/
