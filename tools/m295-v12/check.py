@@ -40,9 +40,11 @@ with sync_playwright() as p:
         assert page.locator('#pt').inner_text().strip()==str(len(pdf))
         assert page.locator('#canvas-left').evaluate('(c)=>c.width>100&&c.height>100')
         page.screenshot(path=str(qa/f'{name}-pdf-cover.png'))
-        page.locator('#pi').fill('38');page.locator('#jump').evaluate('(f)=>f.requestSubmit()');page.wait_for_function('document.body.dataset.renderedPage==="38"')
+        page.locator('#pi').fill('38');page.locator('#pi').press('Enter');page.wait_for_function('document.body.dataset.renderedPage==="38"')
         page.screenshot(path=str(qa/f'{name}-pdf-body.png'))
-        page.locator('#last').click();page.wait_for_function('(n)=>Number(document.body.dataset.renderedPage)===n',arg=len(pdf))
+        if name=='desktop':page.locator('#last').click()
+        else:page.locator('#pi').fill(str(len(pdf)));page.locator('#pi').press('Enter')
+        page.wait_for_function('(n)=>Number(document.body.dataset.renderedPage)===n',arg=len(pdf))
         page.screenshot(path=str(qa/f'{name}-pdf-back.png'))
         page.locator('#toc-btn').click();assert page.locator('#toc-list button').count()==49
         page.locator('#toc-close').click();before=page.locator('body').get_attribute('class');page.locator('#theme').click();assert before!=page.locator('body').get_attribute('class')
