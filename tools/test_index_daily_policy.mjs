@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const source = fs.readFileSync(new URL('../src/worker.js', import.meta.url), 'utf8');
-const start = source.indexOf('export class IndexMemory {');
+const start = source.indexOf('const IDX_CAP_AUTO');   // 月度闸的常量在类之前，一并载入
 const end = source.indexOf('export class ConfigVault {', start);
 let now = Date.parse('2026-10-01T15:20:00Z');
 class Clock extends Date { static now() { return now; } }
@@ -13,7 +13,7 @@ const IndexMemory = vm.runInNewContext(
 );
 
 function fixture(values = {}, docs = 7489) {
-  const meta = new Map(Object.entries(values));
+  const meta = new Map(Object.entries({ capCycle: '2026-09', capRows: '0', ...values }));
   const alarms = [];
   const sql = { exec(q, ...args) {
     if (q.startsWith('SELECT v FROM meta')) return meta.has(args[0]) ? [{ v: meta.get(args[0]) }] : [];

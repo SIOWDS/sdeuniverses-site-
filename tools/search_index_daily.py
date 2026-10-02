@@ -24,7 +24,26 @@ def needs_build(manifest, now=None):
     return built.astimezone(ZONE).date() < now.astimezone(ZONE).date()
 
 
+def cap_gate():
+    """月度写入闸（2026-10-02）：数据库本周期自动写入已达上限就整趟不开工——连构建、上传都省了。
+    旧版本的 Worker 没有 cap 字段时不拦；读不到状态则停止本趟（宁可红一趟，也不在不知道用量时写库）。"""
+    r = read_json(STATUS).get("r", {})
+    cap = r.get("cap") or {}
+    if cap.get("capped"):
+        print("::warning::数据库本周期（%s）写入已记 %s 行，再同步一趟预计 %s 行，将超过自动上限 %s；"
+              "本趟不构建、不上传、不同步。需要人手操作：管理口令 force，且最多到 %s 行。"
+              % (cap.get("cycle"), format(cap.get("used", 0), ","), format(cap.get("estimate", 0), ","),
+                 format(cap.get("capAuto", 0), ","), format(cap.get("capHard", 0), ",")))
+        return cap
+    return None
+
+
 def check():
+    capped = cap_gate()
+    if capped:
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+            out.write("run=false\n")
+        return
     result = subprocess.run(
         ["aws", "s3", "cp", MANIFEST, "-", "--endpoint-url", ENDPOINT, "--only-show-errors"],
         capture_output=True, text=True, timeout=90,
@@ -112,6 +131,8 @@ def sync():
     result = first.get("r", {})
     if not first.get("bound") or not result.get("ok"):
         raise RuntimeError("检索数据库未接受每日同步：" + json.dumps(first, ensure_ascii=False))
+    if result.get("why") in ("monthly_cap", "hard_cap"):
+        raise RuntimeError("数据库因月度写入上限拒绝同步（%s）：%s" % (result["why"], json.dumps(result, ensure_ascii=False)))
     if result.get("why") == "daily_limit":
         print("今日数据库已同步；每日限额生效，下一次更新在明晚。")
         return

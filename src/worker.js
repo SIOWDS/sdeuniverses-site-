@@ -4101,6 +4101,15 @@ export class AskLimiter {
 
    🔴 上线纪律（吃过一次亏）：**先只加绑定、不接任何调用点**，部署后逐个复验五个 DO，
    健康了再单独一笔接线。绝不把「动 DO 配置」和「改检索逻辑」混进同一次部署。 */
+/* 【2026-10-02 王德生令】Durable Objects 写入行数的月度闸（Workers Paid 含量 5000 万行/周期，超出 $1/百万行）。
+   本周期（9/9–10/8）因每次发文都整库重写，已写 68.52M、超额约 $19。规矩：
+   ① 自动同步累计到 IDX_CAP_AUTO（4000 万）就停——再也不自己写，必须人手操作；
+   ② 人手 force 也只许到 IDX_CAP_HARD（4800 万）为止，超过一律拒绝，给站里其他写入（计数/留言/密钥）留 200 万；
+   ③ 预检用「预计一趟写多少行」：已用 ＋ 预计 ＞ 上限就不开工，而不是写完了才发现超线。
+   账期按 Cloudflare 的账单周期：每月 IDX_CYCLE_DAY 日（UTC）起算——来源是 2026-10-02 账单页 “Sep 9 – Oct 8”。
+   ⚠ 只数得到本类自己写的行；站里其他 DO 的写入不在内，所以上限留了 1000 万余量。 */
+const IDX_CAP_AUTO = 40000000, IDX_CAP_HARD = 48000000, IDX_CYCLE_DAY = 9, IDX_SYNC_ESTIMATE = 1600000;
+const IDX_CAP_SEED = { "2026-09": 68520000 };   // 本周期账单实读（2026-10-02）：已写 68.52M，直接封死到 10/9 新周期
 export class IndexMemory {
   constructor(ctx, env) { this.ctx = ctx; this.env = env; this.sql = ctx.storage.sql; }
 
@@ -4118,6 +4127,45 @@ export class IndexMemory {
   }
   _get(k) { const r = [...this.sql.exec("SELECT v FROM meta WHERE k=?", k)]; return r.length ? r[0].v : ""; }
   _set(k, v) { this.sql.exec("INSERT INTO meta(k,v) VALUES(?,?) ON CONFLICT(k) DO UPDATE SET v=excluded.v", k, String(v)); }
+  /* ── 月度写入闸（见文件上方 IDX_CAP_*）── */
+  _cycleKey(at) {
+    const d = new Date(at || Date.now());
+    const cd = parseInt((this.env && this.env.IDX_CYCLE_DAY) || IDX_CYCLE_DAY, 10) || IDX_CYCLE_DAY;
+    let y = d.getUTCFullYear(), m = d.getUTCMonth();
+    if (d.getUTCDate() < cd) { m -= 1; if (m < 0) { m = 11; y -= 1; } }
+    return y + "-" + String(m + 1).padStart(2, "0");
+  }
+  _capRows() {
+    const key = this._cycleKey();
+    if (this._get("capCycle") !== key) { this._set("capCycle", key); this._set("capRows", String(IDX_CAP_SEED[key] || 0)); }
+    return parseInt(this._get("capRows") || "0", 10) || 0;
+  }
+  _addRows(n) {
+    n = Math.max(0, Math.round(n) || 0);
+    if (!n) return;
+    this._set("capRows", String(this._capRows() + n));
+  }
+  _capState() {
+    const used = this._capRows();
+    const estimate = Math.max(parseInt(this._get("lastSyncRows") || "0", 10) || 0, IDX_SYNC_ESTIMATE);
+    return { cycle: this._cycleKey(), used, estimate, capAuto: IDX_CAP_AUTO, capHard: IDX_CAP_HARD,
+             capped: used + estimate > IDX_CAP_AUTO, hardCapped: used + estimate > IDX_CAP_HARD };
+  }
+  /* 带计数的写：执行并读出 cursor.rowsWritten（含索引行），累加到 this._rw，由 _flushRows 落账。 */
+  _w(text, ...args) {
+    const c = this.sql.exec(text, ...args);
+    let n = 0;
+    try { for (const _r of c) { /* drain */ } n = typeof c.rowsWritten === "number" ? c.rowsWritten : 0; } catch (e) {}
+    this._rw = (this._rw || 0) + n;
+    return c;
+  }
+  _flushRows() {
+    const n = this._rw || 0;
+    if (!n) return;
+    this._rw = 0;
+    this._addRows(n);
+    this._set("runRows", String((parseInt(this._get("runRows") || "0", 10) || 0) + n));
+  }
   _dayKey(at) {
     const ms = at ? Date.parse(at) : Date.now();
     return Number.isFinite(ms) ? new Date(ms + 8 * 3600000).toISOString().slice(0, 10) : "";
@@ -4148,7 +4196,8 @@ export class IndexMemory {
     return { ok: true, docs: n, terms: t, stamp: this._get("stamp"), built: this._get("built"),
              pending: this._get("pending") ? JSON.parse(this._get("pending")).length : 0, err: this._get("err"),
              updatePolicy: "once-per-day", timezone: "Asia/Shanghai", scheduledLocal: "23:20",
-             lastQueuedDay: this._get("queuedDay") };
+             lastQueuedDay: this._get("queuedDay"), lastSyncRows: parseInt(this._get("lastSyncRows") || "0", 10) || 0,
+             cap: this._capState() };
   }
 
   /* ── 指纹复验：manifest 的 etag 没变就什么都不做 ── */
@@ -4181,6 +4230,12 @@ export class IndexMemory {
     if (!force && (this._get("queuedDay") === day || (built && this._dayKey(built) === day))) {
       return { ok: true, why: "daily_limit", day, timezone: "Asia/Shanghai", scheduledLocal: "23:20" };
     }
+    /* 月度写入闸：自动路径累计到 4000 万就不开工；人手 force 也不许越过 4800 万。 */
+    {
+      const cap = this._capState();
+      if (!force && cap.capped) return { ok: true, why: "monthly_cap", ...cap };
+      if (force && cap.hardCapped) return { ok: false, why: "hard_cap", ...cap };
+    }
     if (_err) {
       const at = parseInt(this._get("errAt") || "0", 10) || 0;
       if (Date.now() - at < 600000) return { ok: false, why: "上一趟失败，等退避窗过去再重试", err: _err };
@@ -4188,6 +4243,7 @@ export class IndexMemory {
     if (_err) this._set("errAt", String(Date.now()));
     // 任务清单：先 manifest（它给出版块名单），再逐个 kw 分片，最后坐标。分片跑，一次 alarm 一件。
     this._set("newstamp", st);
+    this._set("runRows", "0");
     this._set("queuedDay", day);
     this._set("pending", JSON.stringify(["man"]));
     this._set("err", "");
@@ -4203,8 +4259,10 @@ export class IndexMemory {
     const task = q.shift();
     try {
       await this._runTask(task, q);
+      this._flushRows();
       this._set("pending", JSON.stringify(q));
     } catch (e) {
+      try { this._flushRows(); } catch (e2) {}   // 失败的任务写过的行照样计费，照样入账
       // 一件失败不许把整次重建卡死在半路：记下来、跳过它、继续下一件。
       this._set("err", String(task) + "：" + ((e && e.message) || e));
       this._set("errAt", String(Date.now()));   // 退避窗的起点（见 _ensure）
@@ -4240,7 +4298,17 @@ export class IndexMemory {
       s.exec("ALTER TABLE docs RENAME TO docs_old"); s.exec("ALTER TABLE terms RENAME TO terms_old"); s.exec("ALTER TABLE secs RENAME TO secs_old");
       s.exec("ALTER TABLE docs_new RENAME TO docs"); s.exec("ALTER TABLE terms_new RENAME TO terms"); s.exec("ALTER TABLE secs_new RENAME TO secs");
       s.exec("DROP TABLE IF EXISTS docs_old"); s.exec("DROP TABLE IF EXISTS terms_old"); s.exec("DROP TABLE IF EXISTS secs_old");
-      s.exec("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
+      this._w("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
+      /* 入账：实测行数（rowsWritten）与保守下限取大——下限＝文档行 ＋ 词条行 ×2（插入一次、建索引一次）。
+         取不到 rowsWritten 时只剩下限，不会少记。 */
+      this._flushRows();
+      {
+        const nT = [...s.exec("SELECT count(*) AS n FROM terms")][0].n;
+        const floor = nNew + 2 * nT;
+        const run = parseInt(this._get("runRows") || "0", 10) || 0;
+        this._addRows(Math.max(0, floor - run));
+        this._set("lastSyncRows", String(Math.max(run, floor)));
+      }
       this._set("stamp", this._get("newstamp"));
       this._set("built", new Date().toISOString());
       this._set("pending", "");
@@ -4270,7 +4338,7 @@ export class IndexMemory {
       const flush = () => {
         if (!batch.length) return;
         const ph = batch.map(() => "(?,?,?,?,?)").join(",");
-        s.exec("INSERT OR REPLACE INTO docs_new(i,u,t,tl,sec) VALUES " + ph, ...batch.flat());
+        this._w("INSERT OR REPLACE INTO docs_new(i,u,t,tl,sec) VALUES " + ph, ...batch.flat());
         batch = [];
       };
       _scanTopLevel(txt, "docs", (dTxt) => {
@@ -4281,7 +4349,7 @@ export class IndexMemory {
       flush();
       const secs = [];
       _scanTopLevel(txt, "sections", (sTxt) => { try { secs.push(JSON.parse(sTxt)); } catch (e) {} });
-      for (const se of secs) s.exec("INSERT OR REPLACE INTO secs_new(sec,label) VALUES(?,?)", se.key, se.label || se.key);
+      for (const se of secs) this._w("INSERT OR REPLACE INTO secs_new(sec,label) VALUES(?,?)", se.key, se.label || se.key);
       // 后面的活：每个版块一份 kw 分片，最后坐标
       for (const se of secs) queue.push("kw:" + se.key);
       queue.push("coords");
@@ -4295,7 +4363,7 @@ export class IndexMemory {
       const flush = () => {
         if (!batch.length) return;
         const ph = batch.map(() => "(?,?,'k')").join(",");
-        s.exec("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
+        this._w("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
         batch = [];
       };
       _scanTopLevel(txt, "rows", (rowTxt) => {
@@ -4312,7 +4380,7 @@ export class IndexMemory {
       const flush = () => {
         if (!batch.length) return;
         const ph = batch.map(() => "(?,?,'c')").join(",");
-        s.exec("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
+        this._w("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
         batch = [];
       };
       _scanObjEntries(txt, (k, vTxt) => {

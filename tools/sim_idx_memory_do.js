@@ -17,7 +17,7 @@ const sect = (t) => console.log("\n" + t);
 
 /* ── 抠出扫描器 + DO 类，真跑 ── */
 const sA = SRC.indexOf("function _scanTopLevel("), sB = SRC.indexOf("const _IDX_INFLIGHT");
-const dA = SRC.indexOf("export class IndexMemory {"), dB = SRC.indexOf("// ===== 密钥保险箱");
+const dA = SRC.indexOf("const IDX_CAP_AUTO"), dB = SRC.indexOf("// ===== 密钥保险箱");
 if (sA < 0 || sB < 0 || dA < 0 || dB < 0 || dA > dB) { console.log("锚点找不到"); process.exit(1); }
 const BLOCK = SRC.slice(sA, sB) + "\n" + SRC.slice(dA, dB).replace(/^export class/m, "class");
 ok("抠出来的是完整可跑的一段", (() => { try { new Function(BLOCK); return true; } catch (e) { return false; } })());
@@ -92,6 +92,7 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   const ctx = makeCtx();
   const im = new IndexMemory(ctx, ENV);
   im._init();
+  im._set("capCycle", im._cycleKey()); im._set("capRows", "0");   // 本脚本测的是重建机制，给它一个干净的月度账户（月度闸另有 test_index_cap.mjs）
   const q0 = await im._ensure(false);
   ok("首次问指纹后把任务排进队列", q0.ok && q0.why === "queued");
   ok("排完队就挂了 alarm", ctx.storage._alarm() !== null);
