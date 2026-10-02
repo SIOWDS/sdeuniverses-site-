@@ -1,0 +1,57 @@
+name: Book286 final reader review with safe mobile bootstrap
+on:
+  push:
+    branches: ['publish/book286-isms-v1-1-20261002']
+    paths: ['.github/workflows/book286-reader-final-review.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book286-authenticated-candidate
+          run-id: 36977703250
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m286-candidate
+      - name: Apply exact mobile bootstrap correction to verified candidate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib
+          root=Path(os.environ['RUNNER_TEMP'])/'m286-candidate';book=root/'book';mp=book/'publication-manifest.json';m=json.loads(mp.read_text())
+          assert m['release_sha256']=='1c147fc4be3d59a95d9f205b93e71d2acaae746043fac6cc0c97a84c76e77622'
+          for n,v in m['files'].items():assert hashlib.sha256((book/n).read_bytes()).hexdigest()==v['sha256'],n
+          p=book/'read.html';s=p.read_text()
+          old='function show(cb){\n  if(rendering){ return; }'
+          new='var pendingShow=false;\nfunction show(cb){\n  if(!doc){return;}\n  if(rendering){ pendingShow=true; return; }'
+          assert old in s;s=s.replace(old,new)
+          old='function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }'
+          new='function fin(){ if(++done>=need){ rendering=false; if(pendingShow){pendingShow=false;show(cb);return;} sync(); window.m286Reader={pages:total,ready:true,current:cur}; cb&&cb(); hideMsg(); } }'
+          assert old in s;s=s.replace(old,new)
+          old='window.m286Reader={pages:total,ready:true};';assert old in s;s=s.replace(old,'window.m286Reader={pages:total,ready:false};')
+          p.write_text(s);m['files']['read.html']={'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size}
+          m['release_sha256']=hashlib.sha256(json.dumps(m['files'],sort_keys=True).encode()).hexdigest()
+          assert m['release_sha256']=='c6bdf25ef194ed2a5cff2ad6b8b5bd85b637010b8ea92880b9fe418bef1dcba7'
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          (root/'qa/reader-correction.json').write_text(json.dumps({'correction':'Do not render on resize before PDF is loaded; readiness waits for page render; queue resize redraw','final_release_sha256':m['release_sha256'],'body_unchanged':True,'pdf_unchanged':True,'reindex_called':False},indent=2))
+          preview=Path(os.environ['RUNNER_TEMP'])/'m286-preview/public/books/m';preview.mkdir(parents=True);(preview/'286').symlink_to(book,target_is_directory=True)
+          PY
+      - name: Prepare browser
+        run: |
+          python -m pip install -q playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Repeat desktop, mobile, narrow browser tests
+        run: python "$RUNNER_TEMP/m286-candidate/build-tools/browser-check.py" "$RUNNER_TEMP/m286-preview" "$RUNNER_TEMP/m286-candidate/qa/browser"
+      - name: Preserve candidate and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book286-final-review-candidate
+          path: ${{ runner.temp }}/m286-candidate/
+          retention-days: 7
