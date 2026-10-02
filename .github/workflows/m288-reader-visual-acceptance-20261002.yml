@@ -1,0 +1,61 @@
+name: Volume 288 visible chapter landing acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m288-reader-visual-acceptance-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Prepare browser and screenshot verification
+        run: |
+          timeout 90s python -m pip install --quiet playwright==1.55.0 Pillow
+          timeout 45s sudo apt-get update -qq
+          timeout 60s sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Inspect real visible chapter landings without changing the public book
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from datetime import datetime,timezone
+          import os,json,shutil,time
+          from PIL import Image,ImageStat
+          from playwright.sync_api import sync_playwright
+          out=Path(os.environ['RUNNER_TEMP'])/'m288-visible';out.mkdir()
+          base='https://sdeuniverses.com/books/m/288/'
+          reports=[]
+          with sync_playwright() as p:
+              b=p.chromium.launch(executable_path=shutil.which('google-chrome') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+              for name,w,h in [('desktop',1365,950),('mobile',390,844),('narrow',320,740)]:
+                  page=b.new_page(viewport={'width':w,'height':h});errors=[]
+                  page.on('pageerror',lambda e:errors.append(str(e)))
+                  page.goto(base+'chapters.html',wait_until='networkidle',timeout=60000)
+                  page.locator('#tocSearch').fill('第四十五章');page.locator('.toc li:visible a').click()
+                  page.wait_for_url('**/text/#ch45')
+                  rows=[]
+                  for i,delay in enumerate([300,1200,2000]):
+                      page.wait_for_timeout(delay)
+                      d=page.evaluate("""()=>{let h=document.querySelector('#ch45 h3'),r=h.getBoundingClientRect();return {ready:document.readyState,y:scrollY,height:innerHeight,scrollHeight:document.documentElement.scrollHeight,fonts:document.fonts.status,heading:{top:r.top,bottom:r.bottom,left:r.left,width:r.width,text:h.textContent},bar:document.querySelector('.bar').getBoundingClientRect().toJSON(),hit:document.elementFromPoint(150,250)?.outerHTML?.slice(0,200)}}""")
+                      f=out/f'{name}-landing-{i}.png';page.screenshot(path=str(f));d['pixel_stddev']=ImageStat.Stat(Image.open(f).convert('RGB')).stddev;rows.append(d)
+                  page.wait_for_load_state('networkidle');page.evaluate('document.fonts.ready');page.wait_for_timeout(1000)
+                  f=out/f'{name}-settled.png';page.screenshot(path=str(f))
+                  settled={'heading':page.locator('#ch45 h3').bounding_box(),'pixel_stddev':ImageStat.Stat(Image.open(f).convert('RGB')).stddev,'scrollY':page.evaluate('scrollY')}
+                  page.goto(base+'text/#ch68',wait_until='networkidle');page.evaluate('document.fonts.ready');page.wait_for_timeout(1500)
+                  f=out/f'{name}-direct-ch68.png';page.screenshot(path=str(f))
+                  direct={'heading':page.locator('#ch68 h3').bounding_box(),'pixel_stddev':ImageStat.Stat(Image.open(f).convert('RGB')).stddev,'scrollY':page.evaluate('scrollY')}
+                  reports.append({'viewport':name,'steps':rows,'settled':settled,'direct_ch68':direct,'runtime_errors':errors})
+                  page.close()
+              b.close()
+          (out/'visible-landing-report.json').write_text(json.dumps({'checked_at':datetime.now(timezone.utc).isoformat(),'read_only':True,'reports':reports},ensure_ascii=False,indent=2))
+          print(json.dumps(reports,ensure_ascii=False,indent=2))
+          assert all(sum(r['settled']['pixel_stddev'])>20 and 0<=r['settled']['heading']['y']<500 for r in reports),'Chapter must really paint and land in viewport'
+          assert all(sum(r['direct_ch68']['pixel_stddev'])>20 and 0<=r['direct_ch68']['heading']['y']<500 for r in reports),'Direct anchors must really paint and land in viewport'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m288-visible-chapter-acceptance
+          retention-days: 14
+          path: ${{ runner.temp }}/m288-visible/
