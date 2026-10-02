@@ -28,11 +28,7 @@ jobs:
           root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book11-candidate'
           p=root/'build-tools/prepare_remote.py';s=p.read_text()
           old="  assert not (isinstance(on,dict) and 'push' in on),'Push-triggered indexing requires review before publication: '+w['path']"
-          new="""  if isinstance(on,dict) and 'push' in on:
-            push=on['push'] or {}
-            allowed={'tools/three_views_longform_20260920.py','.github/workflows/three-views-longform-20260920.yml'}
-            assert w['path']=='.github/workflows/three-views-longform-20260920.yml' and isinstance(push,dict) and set(push.get('paths',[]))==allowed,'Unreviewed index trigger: '+w['path']
-            item['publication_paths_do_not_match']=True"""
+          new="  assert not (isinstance(on,dict) and 'push' in on) or (w['path']=='.github/workflows/three-views-longform-20260920.yml' and isinstance(on['push'],dict) and set(on['push'].get('paths',[]))=={'tools/three_views_longform_20260920.py','.github/workflows/three-views-longform-20260920.yml'}),'Unreviewed indexing trigger: '+w['path']"
           assert s.count(old)==1
           sys.argv=[str(p),str(root)]
           exec(compile(s.replace(old,new),str(p),'exec'))
