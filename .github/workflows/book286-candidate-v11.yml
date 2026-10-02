@@ -1,0 +1,58 @@
+name: Book 286 v1.1 exact-byte candidate and browser acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book286-candidate-v11.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Receive the authorized publication archive before link expiry
+        run: |
+          python - <<'PY'
+          import os,urllib.request,hashlib,zipfile,io,json
+          from pathlib import Path,PurePosixPath
+          url='https://sdmntprwestus.oaiusercontent.com/files/00000000-879c-8230-b6d2-1a133f7116f2/raw?se=2026-10-02T08%3A00%3A12Z&sp=r&sv=2026-02-06&sr=b&scid=9cbd4ab1-8a28-542f-a26b-831b7270cab6&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T02%3A28%3A53Z&ske=2026-10-03T02%3A28%3A53Z&sks=b&skv=2026-02-06&sig=FuJIVtDRsT08ZxwQFA2cz33LFxvCKA2k8trhWz2GHOk%3D'
+          raw=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'SDE-Book286-Authorized-Publication'}),timeout=180).read()
+          assert len(raw)==64193039
+          assert hashlib.sha256(raw).hexdigest()=='341a3f5bd6bd2c104dadd71b3bdb72635e46505c412dfb18d920935787cfd266'
+          root=Path(os.environ['RUNNER_TEMP'])/'book286-candidate';root.mkdir()
+          z=zipfile.ZipFile(io.BytesIO(raw))
+          for n in z.namelist():
+            p=PurePosixPath(n)
+            assert not p.is_absolute() and '..' not in p.parts
+            assert p.parts[0] in ['book','qa','build-tools','README.txt']
+            assert p.suffix.lower() not in ['.ttf','.otf','.ttc','.woff','.woff2','.env']
+          z.extractall(root)
+          book=root/'book';m=json.loads((book/'publication-manifest.json').read_text())
+          assert (m['volume'],m['isbn'],m['price_usd'],m['pdf_pages'],m['body_hanzi'])==(286,'979-8-90690-166-8',20,295,206087)
+          assert m['release_sha256']=='8f86485cfe37c20b8fe573406ec131e51cf9b35502a60c0ba4dc966a6b92b206'
+          for n,v in m['files'].items():
+            data=(book/n).read_bytes();assert len(data)==v['bytes'];assert hashlib.sha256(data).hexdigest()==v['sha256'],n
+          site=Path(os.environ['RUNNER_TEMP'])/'book286-preview/books/m';site.mkdir(parents=True)
+          (site/'286').symlink_to(book)
+          print('Verified all 326 payload files, 10 chapters / 100 sections, 295 reader pages; live publication untouched; no reindex.')
+          PY
+      - name: Install browser verification dependencies
+        run: |
+          python -m pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Exercise full text, references, page turning, search and real PDF bytes
+        run: python "$RUNNER_TEMP/book286-candidate/build-tools/browser_check.py" "$RUNNER_TEMP/book286-preview" "$RUNNER_TEMP/book286-browser-evidence"
+      - name: Preserve verified candidate only after tests succeed
+        uses: actions/upload-artifact@v4
+        with:
+          name: book286-v11-verified-candidate
+          retention-days: 14
+          path: ${{ runner.temp }}/book286-candidate/
+      - name: Preserve browser evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book286-v11-browser-evidence
+          retention-days: 14
+          path: ${{ runner.temp }}/book286-browser-evidence/
