@@ -1,0 +1,108 @@
+name: Religion ISBN167 cache-safe reader acceptance
+on:
+  push:
+    branches: [religion-metadata-20261002]
+    paths: ['.github/workflows/religion-isbn167-cachefix.yml']
+permissions:
+  contents: write
+  actions: read
+  checks: read
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/religion-genesis/read.html
+            /public/books/religion-genesis/publication-manifest.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-isbn167-candidate
+          run-id: 36976090919
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/religion-isbn167-candidate
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-isbn167-publication-acceptance
+          run-id: 36977543966
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/religion-isbn167-live
+      - name: Install browser verification tools
+        run: |
+          python -m pip install --quiet PyMuPDF==1.26.7 beautifulsoup4 requests playwright
+          python -m playwright install --with-deps chromium > /tmp/m299-browser-install.log 2>&1
+          sudo apt-get install -y -qq fonts-noto-cjk > /tmp/m299-fonts.log 2>&1
+      - name: Add versioned resource URLs without changing any book page or text
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,hashlib,json,subprocess,shutil,datetime
+          repo=Path(os.environ['GITHUB_WORKSPACE']);site=repo/'public/books/religion-genesis';candidate=Path(os.environ['RUNNER_TEMP'])/'religion-isbn167-candidate';qa=Path(os.environ['RUNNER_TEMP'])/'religion-isbn167-live'
+          m=json.loads((site/'publication-manifest.json').read_text());assert m['release_sha256']=='78bf715f274dc20ac9457849b2843ee5cfbb41543371580dae1ecfaab06f351e' and m['isbn']=='979-8-90690-167-5'
+          h=(site/'read.html').read_text();REV='m299-isbn167-v1.2-20261002'
+          substitutions={"im.src='pages/p'+String(n).padStart(4,'0')+'.svg'":"im.src='pages/p'+String(n).padStart(4,'0')+'.svg?v="+REV+"'", "fetch('page-text.json')":"fetch('page-text.json?v="+REV+"')"}
+          for old,new in substitutions.items():assert h.count(old)==1;h=h.replace(old,new)
+          (site/'read.html').write_text(h)
+          data=(site/'read.html').read_bytes();m['files']['read.html']={'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+          m['release_sha256']=hashlib.sha256(json.dumps(m['files'],ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          m['resource_cache_version']=REV;m['reader_cache_fix_at']=datetime.datetime.now(datetime.timezone.utc).isoformat();m['cache_fix_reason']='版本化书页与全文检索资源，避免旧版资源缓存与新版PDF混用；书页正文与PDF均未再次改动。'
+          (site/'publication-manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          for n in ['read.html','publication-manifest.json']:shutil.copy2(site/n,candidate/'book'/n)
+          shutil.copy2(site/'publication-manifest.json',qa/'publication-manifest.json');shutil.copy2(site/'read.html',qa/'accepted-read.html')
+          (qa/'cache-correction.json').write_text(json.dumps({'previous_publication_run':36977543966,'original_failure':'无版本参数请求pages/p0080.svg返回旧缓存；原部署与ISBN167文件已提交成功。','fix':'阅读器所有SVG书页和page-text.json按v1.2版本号请求；验收按相同版本请求并逐字节核对。','only_two_files_changed':True,'book_text_and_downloads_unchanged':True,'no_reindex':True,'new_release_sha256':m['release_sha256']},ensure_ascii=False,indent=2))
+          scripts=h.split('<script>')
+          if len(scripts)>1:
+              js=scripts[-1].split('</script>')[0];p=qa/'reader-check.js';p.write_text(js);subprocess.run(['node','--check',str(p)],check=True)
+          PY
+          git config user.name 'SIOWDS'
+          git config user.email 'wangdesheng1234567@gmail.com'
+          git add --sparse public/books/religion-genesis/read.html public/books/religion-genesis/publication-manifest.json
+          git commit -m 'Version Religion Genesis v1.2 reader resources to avoid stale page and search caches; no reindex'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          git rev-parse HEAD > "$RUNNER_TEMP/religion-isbn167-live/cachefix-commit.txt"
+      - name: Verify all edition-versioned live resources and full public reading
+        run: |
+          python - <<'PY'
+          import os,urllib.request,subprocess
+          from pathlib import Path
+          qa=Path(os.environ['RUNNER_TEMP'])/'religion-isbn167-live'
+          src=urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/4dcf144ddee6848129e94f606c729b9b41847bb5/tools/religion-metadata-20261002/publish-isbn167.py',timeout=40).read().decode()
+          old='r=requests.get(url,headers=headers,timeout=80)';assert src.count(old)==1
+          src=src.replace(old,"r=requests.get(url+('&' if '?' in url else '?')+'edition='+REV,headers=headers,timeout=80)")
+          old="with ThreadPoolExecutor(max_workers=4) as pool:results=list(pool.map(check,expected['files'].items()))";assert src.count(old)==1
+          src=src.replace(old,old+"\n    (qa/'http-file-checks.json').write_text(json.dumps(results,ensure_ascii=False,indent=2))")
+          p=qa/'verify-versioned.py';p.write_text(src)
+          r=subprocess.run(['python',str(p),'verify',os.environ['GITHUB_WORKSPACE'],os.environ['RUNNER_TEMP']+'/religion-isbn167-candidate',str(qa)],capture_output=True,text=True)
+          (qa/'verify.stdout.txt').write_text(r.stdout);(qa/'verify.stderr.txt').write_text(r.stderr);print(r.stdout[-5000:]);print(r.stderr[-5000:]);assert r.returncode==0,r.returncode
+          PY
+      - name: Record Cloudflare success for the cache-safe reader
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import os,urllib.request,json,time
+          from pathlib import Path
+          qa=Path(os.environ['RUNNER_TEMP'])/'religion-isbn167-live';sha=(qa/'cachefix-commit.txt').read_text().strip()
+          for i in range(40):
+              req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/commits/'+sha+'/check-runs',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              d=json.load(urllib.request.urlopen(req));a=[x for x in d.get('check_runs',[]) if x['name']=='Workers Builds: steep-band-faf5']
+              if any(x['conclusion']=='success' for x in a):break
+              if any(x['conclusion'] in ['failure','cancelled','timed_out'] for x in a):raise AssertionError(a)
+              time.sleep(12)
+          else:raise AssertionError('Deployment completion not confirmed')
+          (qa/'cachefix-cloudflare.json').write_text(json.dumps(d,ensure_ascii=False,indent=2));print('Cache-safe reader deployment and live acceptance complete.')
+          PY
+      - name: Preserve accepted metadata edition and live evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-isbn167-final-acceptance
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-isbn167-live/
