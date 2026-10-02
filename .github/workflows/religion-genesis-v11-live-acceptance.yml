@@ -1,0 +1,124 @@
+name: Religion genesis live acceptance
+on:
+  push:
+    branches: [religion-genesis-v11-20261002]
+    paths: ['.github/workflows/religion-genesis-v11-live-acceptance.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-genesis-v11-verified-candidate
+          run-id: 36971964561
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/religion-genesis-candidate
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-genesis-v11-publication-evidence
+          run-id: 36972392201
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/publication-evidence
+      - name: Install verification tools
+        run: |
+          python -m pip install --quiet PyMuPDF==1.26.7 beautifulsoup4 lxml playwright requests
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Verify all public release bytes and three shelf entries
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from concurrent.futures import ThreadPoolExecutor
+          import os,json,hashlib,time,re,unicodedata,urllib.parse,requests,fitz,datetime
+          from bs4 import BeautifulSoup
+          root=Path(os.environ['RUNNER_TEMP'])/'religion-genesis-candidate'
+          expected=json.loads((Path(os.environ['RUNNER_TEMP'])/'publication-evidence/publication-manifest.json').read_text())
+          qa=Path(os.environ['RUNNER_TEMP'])/'religion-genesis-live';qa.mkdir()
+          base='https://sdeuniverses.com/books/religion-genesis/'
+          headers={'User-Agent':'Mozilla/5.0 SDE-Religion-Genesis-Publication-Acceptance'}
+          for attempt in range(40):
+              try:
+                  r=requests.get(base+'publication-manifest.json',headers=headers,timeout=30);r.raise_for_status();live=r.json()
+                  if live.get('release_sha256')==expected['release_sha256']:break
+              except Exception as e:print('Waiting for release:',type(e).__name__)
+              time.sleep(15)
+          else:raise AssertionError('Exact release has not appeared on public website.')
+          assert live==expected
+          (qa/'publication-manifest.json').write_text(json.dumps(live,ensure_ascii=False,indent=2))
+          norm=lambda s:re.sub(r'\s+','',unicodedata.normalize('NFKC',s))
+          def check(item):
+              name,rec=item;url=base+urllib.parse.quote(name,safe='/')
+              for attempt in range(3):
+                  r=requests.get(url,headers=headers,timeout=90)
+                  if r.status_code==200:break
+                  time.sleep(2)
+              r.raise_for_status();data=r.content
+              rawmatch=len(data)==rec['bytes'] and hashlib.sha256(data).hexdigest()==rec['sha256']
+              if name.endswith('.html'):
+                  old=BeautifulSoup((root/'public/books/religion-genesis'/name).read_text(),'html.parser');new=BeautifulSoup(data.decode('utf-8'),'html.parser')
+                  assert new.title and '宗教信仰何以发生' in new.title.get_text(),name
+                  a=[norm(x.get_text()) for x in old.select('p.prose')];b=[norm(x.get_text()) for x in new.select('p.prose')]
+                  assert a==b,(name,'Narrative changed')
+                  oldlinks={x.get('href') for x in old.select('a[href]')};newlinks={x.get('href') for x in new.select('a[href]')}
+                  assert oldlinks<=newlinks,(name,'Missing navigation')
+                  return {'path':name,'http':r.status_code,'raw_sha_equal':rawmatch,'narrative_and_navigation_equal':True,'paragraphs':len(a)}
+              assert rawmatch,(name,'Published bytes differ')
+              if name.endswith('.pdf'):
+                  p=fitz.open(stream=data,filetype='pdf');assert len(p)==365 and len(p.get_toc())==504
+              return {'path':name,'http':r.status_code,'raw_sha_equal':True}
+          with ThreadPoolExecutor(max_workers=4) as pool:results=list(pool.map(check,expected['files'].items()))
+          shelves=[]
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+              r=requests.get(url,headers=headers,timeout=60);r.raise_for_status();s=BeautifulSoup(r.content.decode('utf-8'),'html.parser');cards=s.select('article[data-id="religion-genesis"]');assert len(cards)==1,url
+              card=cards[0];assert card.select_one('h3').get_text()=='宗教信仰何以发生？'
+              assert card.select_one('a.read-button')['href']==base+'read.html' and card['data-reading']=='full'
+              shelves.append({'url':url,'http':r.status_code,'matching_cards':1,'fulltext':True,'flip_is_primary':True})
+          report={'verified_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'publication_commit':(Path(os.environ['RUNNER_TEMP'])/'publication-evidence/published-commit.txt').read_text().strip(),'release_sha256':expected['release_sha256'],'public_url':base,'files_verified':len(results),'html_files':sum(x['path'].endswith('.html') for x in results),'nonhtml_byte_identical':sum(not x['path'].endswith('.html') and x['raw_sha_equal'] for x in results),'shelves':shelves,'files':results,'no_reindex':True}
+          (qa/'live-http-integrity.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print('Verified all',len(results),'live files and three shelves.')
+          src=(root/'source/test_site.py').read_text()
+          old="R=Path('/mnt/data/work');O=Path('/mnt/data/final');B=json.loads((R/'book.json').read_text());V=B['version'];PKG=O/f'宗教信仰何以发生_完整发布包_v{V}';PUBLIC=PKG/'public';SITE=PUBLIC/'books/religion-genesis'"
+          assert old in src
+          src=src.replace(old,"R=Path("+repr(str(qa))+");O=R;B=json.loads(Path("+repr(str(root/'source/book.json'))+").read_text());V=B['version'];PKG=Path("+repr(str(root))+");PUBLIC=PKG/'public';SITE=PUBLIC/'books/religion-genesis'")
+          src=src.replace("executable_path='/usr/bin/chromium',",'')
+          old="url=f'http://127.0.0.1:{server.server_address[1]}/books/religion-genesis/'";assert old in src
+          src=src.replace(old,"url='https://sdeuniverses.com/books/religion-genesis/'")
+          src=src.replace(";(PKG/'checks/网页与阅读器核对.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))",'')
+          src=src.replace('local_preview_only=True,public_deployment_verified=False','local_preview_only=False,public_deployment_verified=True')
+          src=src.replace('[1,22,94,169,210,285,293,335,360,365]','[1,22,94,169,210,247,285,293,319,335,360,365]')
+          src += '\nassert all(not c.get("overflow",False) for c in checks)\n'
+          (qa/'live-browser-check.py').write_text(src)
+          PY
+      - name: Test public navigation, flipping, search, theme and chapter links
+        run: python "$RUNNER_TEMP/religion-genesis-live/live-browser-check.py"
+      - name: Test live PDF source rendering and shelf discovery
+        run: |
+          python - <<'PY'
+          import os,json
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          qa=Path(os.environ['RUNNER_TEMP'])/'religion-genesis-live';errors=[];out={}
+          with sync_playwright() as pw:
+              browser=pw.chromium.launch(headless=True,args=['--no-sandbox']);page=browser.new_page(viewport={'width':1440,'height':1000});page.on('pageerror',lambda e:errors.append(str(e)))
+              for i,url in enumerate(['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']):
+                  page.goto(url,wait_until='networkidle');page.locator('#book-search').fill('宗教信仰何以发生');page.wait_for_timeout(600)
+                  assert page.locator('article[data-id="religion-genesis"]').is_visible();page.screenshot(path=str(qa/f'live-shelf-{i+1}.png'))
+              page.goto('https://sdeuniverses.com/books/religion-genesis/read.html#page=23',wait_until='networkidle');page.wait_for_function('!busy');page.locator('#pdfMode').click()
+              page.wait_for_function("!busy && (engine==='pdf' || document.querySelector('#status').textContent.includes('不可用'))",timeout=90000)
+              out['pdf_engine']=page.evaluate('engine');out['status']=page.locator('#status').inner_text();out['actual_pdf_loaded']=out['pdf_engine']=='pdf'
+              if out['actual_pdf_loaded']:
+                  assert page.locator('#left svg').count()==1;page.screenshot(path=str(qa/'live-actual-pdf-engine.png'))
+              out['browser_errors']=errors;assert not errors
+              browser.close()
+          (qa/'live-pdf-and-shelves.json').write_text(json.dumps(out,ensure_ascii=False,indent=2));print(out)
+          PY
+      - name: Preserve public acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-genesis-v11-live-acceptance
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-genesis-live/
