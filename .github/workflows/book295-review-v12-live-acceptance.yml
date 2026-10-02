@@ -1,0 +1,38 @@
+name: Volume295 v1.2 actual production acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book295-review-v12-live-acceptance.yml']
+permissions:
+  contents: read
+jobs:
+  live-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/295/
+            /tools/m295-v12/
+      - name: Prepare actual reader verification
+        run: |
+          python -m pip install --disable-pip-version-check -q beautifulsoup4==4.13.5 PyMuPDF==1.26.4 playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          if ! command -v google-chrome >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Verify deployed files, three shelves and actual PDF/mobile reading
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: python tools/m295-v12/verify_live.py "$GITHUB_WORKSPACE" "$RUNNER_TEMP/m295-live"
+      - name: Save actual production evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book295-v12-live-acceptance
+          retention-days: 14
+          path: ${{ runner.temp }}/m295-live/
