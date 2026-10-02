@@ -1,0 +1,58 @@
+name: Book 288 candidate integrity and browser verification
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book288-candidate-20261002.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Receive the authorized book-only package and verify SHA256
+        env:
+          TRANSFER_URL: 'https://sdmntprnznorth.oaiusercontent.com/files/00000000-b310-820b-9ed0-3fa447160a0f/raw?se=2026-10-02T03%3A20%3A08Z&sp=r&sv=2026-02-06&sr=b&scid=f28caa96-b211-57a2-877d-7b74c00f3f90&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-02T02%3A28%3A53Z&ske=2026-10-03T02%3A28%3A53Z&sks=b&skv=2026-02-06&sig=hsoQXqQQWYvpVpyWRc7OVGLhIyogH%2B2pCATBkS9MUn0%3D'
+        run: |
+          python - <<'PY'
+          import os,urllib.request,hashlib,zipfile,io,json
+          from pathlib import Path,PurePosixPath
+          raw=urllib.request.urlopen(os.environ['TRANSFER_URL'],timeout=90).read(16000000)
+          assert len(raw)==8733553
+          assert hashlib.sha256(raw).hexdigest()=='2221bfe228b917b13a3617edb7fa8a32256948d52023ae62e062db1e26f4f8ca'
+          root=Path(os.environ['RUNNER_TEMP'])/'book288-candidate';root.mkdir()
+          z=zipfile.ZipFile(io.BytesIO(raw))
+          for n in z.namelist():
+              p=PurePosixPath(n)
+              assert not p.is_absolute() and '..' not in p.parts
+              assert p.suffix.lower() not in ['.ttf','.otf','.ttc','.woff','.woff2','.env']
+              assert p.parts[0] in ['book','qa','build-tools','README.txt']
+          z.extractall(root)
+          book=root/'book';m=json.loads((book/'publication-manifest.json').read_text())
+          assert (m['volume'],m['author'],m['isbn'],m['price_usd'],m['pdf_pages'])==(288,'陈凤','979-8-90690-433-1',20,383)
+          assert m['release_sha256']=='5dd6f024e72b8a77661266f5e863a4ee4f0186c7718d39e0220c9e0a6ee2d720'
+          for n,v in m['files'].items():
+              data=(book/n).read_bytes();assert len(data)==v['bytes'];assert hashlib.sha256(data).hexdigest()==v['sha256'],n
+          site=Path(os.environ['RUNNER_TEMP'])/'book288-preview/books/m';site.mkdir(parents=True)
+          (site/'288').symlink_to(book)
+          print('Authorized candidate: 68 chapters, 13 appendices, 383 PDF pages; all file hashes verified. Public site unchanged. No reindex.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book288-verified-candidate
+          retention-days: 14
+          path: ${{ runner.temp }}/book288-candidate/
+      - name: Browser and Chinese fonts
+        run: |
+          python -m pip install --quiet playwright beautifulsoup4 pypdf
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Test desktop and mobile readers including actual PDF rendering
+        run: |
+          python "$RUNNER_TEMP/book288-candidate/build-tools/browser-check.py" "$RUNNER_TEMP/book288-preview" "$RUNNER_TEMP/book288-browser-evidence" --with-pdf
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book288-candidate-browser-evidence
+          retention-days: 14
+          path: ${{ runner.temp }}/book288-browser-evidence/
