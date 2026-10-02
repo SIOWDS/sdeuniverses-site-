@@ -1,0 +1,132 @@
+name: Publish volume 288 v1.1 exact reviewed 353-page edition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m288-v11-final-publish-20261002.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: volume-288-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    container: debian:13
+    timeout-minutes: 18
+    steps:
+      - name: Prepare matching typesetting and verification environment
+        timeout-minutes: 6
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          timeout 90s apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20
+          timeout 210s apt-get install -y -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=20 git ca-certificates python3 python3-venv libreoffice-writer fonts-noto-cjk fontconfig
+          python3 -m venv /tmp/m288-venv
+          timeout 90s /tmp/m288-venv/bin/pip install --quiet --disable-pip-version-check --no-input --timeout 20 --retries 1 python-docx==1.2.0 PyMuPDF==1.26.4 beautifulsoup4==4.13.5
+          fc-cache -f
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/288/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /tools/m288-v11-finish-appendix.py
+            /tools/m288-v11-install.py
+            /tools/m288-v11-stabilize-toc.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: m288-v11-reviewed-publication-candidate
+          run-id: 36968764172
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m288-incoming
+      - name: Verify every page against the visually approved edition before publication
+        run: |
+          /tmp/m288-venv/bin/python tools/m288-v11-stabilize-toc.py
+          /tmp/m288-venv/bin/python tools/m288-v11-finish-appendix.py "$RUNNER_TEMP/m288-incoming" "$RUNNER_TEMP/m288-page-final"
+          /tmp/m288-venv/bin/python tools/m288-v11-install.py "$RUNNER_TEMP/m288-page-final" "$GITHUB_WORKSPACE"
+      - name: Commit only this book and its three existing bookshelf records
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git add --sparse public/books/m/288 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+            /tmp/m288-venv/bin/python - <<'PY'
+          import subprocess,os,json
+          from pathlib import Path
+          files=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          assert all(n in allowed or n.startswith('public/books/m/288/') for n in files),files
+          assert not any(Path(n).suffix.lower() in ['.ttf','.otf','.ttc','.woff','.woff2','.env'] for n in files)
+          Path(os.environ['RUNNER_TEMP'],'m288-page-final/qa/changed-paths.json').write_text(json.dumps(files,ensure_ascii=False,indent=2))
+          PY
+            if git diff --cached --quiet; then break; fi
+            git commit -m 'Update vol288 v1.1: all-page refined 353-page edition, author-provided biography, full readers; no reindex'
+            if git push origin HEAD:main; then break; fi
+            if [ "$attempt" = 3 ]; then exit 1; fi
+            git fetch --depth=1 origin main
+            git reset --hard origin/main
+            /tmp/m288-venv/bin/python tools/m288-v11-stabilize-toc.py
+            /tmp/m288-venv/bin/python tools/m288-v11-install.py "$RUNNER_TEMP/m288-page-final" "$GITHUB_WORKSPACE"
+          done
+          git rev-parse HEAD > "$RUNNER_TEMP/m288-page-final/qa/publication-commit.txt"
+      - name: Verify all live title files and the three bookshelves
+        run: |
+          /tmp/m288-venv/bin/python - <<'PY'
+          from pathlib import Path
+          from datetime import datetime,timezone
+          import os,json,urllib.request,time,hashlib,concurrent.futures
+          from bs4 import BeautifulSoup
+          root=Path(os.environ['RUNNER_TEMP'])/'m288-page-final';b=root/'book';m=json.loads((b/'publication-manifest.json').read_text());base='https://sdeuniverses.com/books/m/288/'
+          def get(url):
+              req=urllib.request.Request(url+('&' if '?' in url else '?')+'v11check='+str(time.time_ns()),headers={'User-Agent':'SDE-Vol288-Page-Acceptance/1.1','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=40) as r:return r.status,r.read()
+          for attempt in range(40):
+              try:
+                  status,data=get(base+'publication-manifest.json')
+                  if status==200 and json.loads(data).get('release_sha256')==m['release_sha256']:break
+              except Exception as e:print('Deployment pending',str(e),flush=True)
+              time.sleep(10)
+          else:raise RuntimeError('Current edition not observed live')
+          def sig(data):
+              s=BeautifulSoup(data,'html.parser');main=s.find('main');assert main
+              blocks=[(p.get('data-source-paragraph'),p.get_text()) for p in main.select('[data-source-paragraph]')]
+              links=[p.get('href') for p in main.select('a[href]')]
+              for p in main.select('script,style'):p.decompose()
+              return s.title.get_text(),''.join(main.stripped_strings),blocks,links
+          def check(n):
+              status,data=get(base+n);assert status==200,n
+              if n.endswith('.html'):
+                  assert sig(data)==sig((b/n).read_bytes()),n
+                  return {'path':n,'http_status':200,'content_and_navigation_match':True}
+              assert hashlib.sha256(data).hexdigest()==hashlib.sha256((b/n).read_bytes()).hexdigest(),n
+              return {'path':n,'http_status':200,'exact_bytes':True}
+          report={'volume':288,'edition':'1.1','pdf_pages':353,'isbn':m['isbn'],'price_usd':20,'release_sha256':m['release_sha256'],'files':[],'bookshelves':[],'reindex_requested':False}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              for item in pool.map(check,list(m['files'])+['publication-manifest.json']):report['files'].append(item);print(item['path'],'OK',flush=True)
+          for u in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+              status,data=get(u);s=BeautifulSoup(data,'html.parser');rows=s.select('article.book[data-id="m288"]');assert len(rows)==1 and rows[0]['data-number']=='288'
+              assert rows[0].select_one('a.read-button')['href']==base+'read.html'
+              report['bookshelves'].append({'url':u,'one_record':True,'primary_flip_reader':True})
+          report['checked_at']=datetime.now(timezone.utc).isoformat()
+          (root/'qa/live-files-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+      - name: Gather final publication assets and exact-page acceptance
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/m288-export"
+          if [ -d "$RUNNER_TEMP/m288-page-final/book" ]; then cp -a "$RUNNER_TEMP/m288-page-final/book" "$RUNNER_TEMP/m288-export/"; fi
+          if [ -d "$RUNNER_TEMP/m288-page-final/qa" ]; then cp -a "$RUNNER_TEMP/m288-page-final/qa" "$RUNNER_TEMP/m288-export/"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m288-v11-published-page-refined
+          retention-days: 14
+          path: ${{ runner.temp }}/m288-export/
