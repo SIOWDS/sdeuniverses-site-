@@ -1,0 +1,132 @@
+name: Publish complete book11 and verify real production readers
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book11-publish-complete-20261003.yml']
+permissions:
+  contents: write
+  actions: read
+  checks: read
+concurrency:
+  group: book11-complete-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    env:
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .github/workflows
+            tools/book11_publish_20261003.py
+            tools/book11_live_verify_20261003.py
+            tools/build_bookshelf.py
+            public/books/m/11
+            public/books/catalog.json
+            public/books/index.html
+            public/monographs/index.html
+            public/sites/read/library/index.html
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: book11-final-candidate-v1
+          run-id: 37071029596
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book11-candidate
+      - name: Check the accepted candidate and finish two display-only fixes
+        run: |
+          python -m pip install -q beautifulsoup4 playwright==1.55.0
+          python - <<'PY'
+          import pathlib,os,json,hashlib
+          from bs4 import BeautifulSoup
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book11-candidate'
+          book=root/'book';qa=root/'qa';m=json.loads((book/'publication.json').read_text())
+          assert json.loads((qa/'browser-local/browser-result.json').read_text())['passed']
+          for f in m['files']:assert hashlib.sha256((book/f['path']).read_bytes()).hexdigest()==f['sha256'],f['path']
+          edits=[]
+          for name in ['index.html','chapters.html']:
+              p=book/name;s=p.read_text();old=s
+              if name=='index.html':
+                  assert s.count('.cover{width:100%;')==1
+                  s=s.replace('.cover{width:100%;','.cover{width:100%;height:auto;display:block;')
+              assert s.count('<body><div class="wrap">')==1 and s.count('</div></body>')==1
+              s=s.replace('<body><div class="wrap">','<body><main class="wrap">').replace('</div></body>','</main></body>')
+              assert BeautifulSoup(s,'html.parser').body.get_text()==BeautifulSoup(old,'html.parser').body.get_text()
+              p.write_text(s);edits.append({'file':name,'display_only':True,'text_unchanged':True,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+          for f in m['files']:
+              p=book/f['path'];f.update(bytes=p.stat().st_size,sha256=hashlib.sha256(p.read_bytes()).hexdigest())
+          (book/'publication.json').write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          (qa/'final-display-fixes.json').write_text(json.dumps(edits,ensure_ascii=False,indent=2))
+          p=root/'build-tools/browser_check.py';s=p.read_text()
+          old="    assert page.locator('img.cover').evaluate('(im)=>im.complete&&im.naturalWidth>100')"
+          new=old+"\n    assert page.locator('img.cover').evaluate('(im)=>Math.abs(im.getBoundingClientRect().width/im.getBoundingClientRect().height-im.naturalWidth/im.naturalHeight)<0.01')"
+          assert s.count(old)==1;p.write_text(s.replace(old,new))
+          (qa/'browser-local/browser-result.json').unlink()
+          print('Manuscript bytes unchanged; display-only cover proportion and main landmarks repaired.')
+          PY
+      - name: Prepare Chinese-capable browser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Recheck final visual proportions and complete reader interactions
+        run: |
+          mkdir -p "$RUNNER_TEMP/book11-testsite/books/m"
+          ln -s "$RUNNER_TEMP/book11-candidate/book" "$RUNNER_TEMP/book11-testsite/books/m/11"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/book11-testsite" > "$RUNNER_TEMP/book11-http.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          python "$RUNNER_TEMP/book11-candidate/build-tools/browser_check.py" http://127.0.0.1:8765/books/m/11 "$RUNNER_TEMP/book11-candidate/qa/browser-local"
+      - name: Publish only book11 and its existing shelf cards, without indexing
+        run: |
+          python - <<'PY'
+          import os,pathlib,subprocess,json,shutil,time
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book11-candidate';repo=pathlib.Path.cwd()
+          def git(*args):return subprocess.check_output(['git',*args],text=True).strip()
+          assert git('hash-object','tools/book11_publish_20261003.py')=='cfcf7757f4a904234968d8a9f56dc5b9ce6ea4e4'
+          helper=root/'build-tools/install-accepted.py';shutil.copyfile(repo/'tools/book11_publish_20261003.py',helper)
+          verifier=root/'build-tools/live-verify.py';shutil.copyfile(repo/'tools/book11_live_verify_20261003.py',verifier)
+          m=json.loads((root/'book/publication.json').read_text())
+          allowed={'public/books/m/11/'+x['path'] for x in m['files']}
+          allowed.update(['public/books/m/11/publication.json','public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'])
+          pre=json.loads((root/'qa/preflight.json').read_text())
+          index_names={x['path'] for x in pre['index_workflows']}
+          index_shas={x['path']:x['sha'] for x in pre['workflows'] if x['path'] in index_names}
+          git('config','user.name','SDE Book11 Publisher');git('config','user.email','book11-publisher@users.noreply.github.com')
+          for attempt in range(3):
+              git('fetch','origin','main');git('checkout','--detach','FETCH_HEAD');parent=git('rev-parse','HEAD')
+              for path,sha in index_shas.items():assert git('rev-parse','HEAD:'+path)==sha,'Index trigger changed; stop for review'
+              protected=git('rev-parse','HEAD:public/search')
+              subprocess.run(['python',str(helper),str(root),str(repo)],check=True)
+              git('add','--',*sorted(allowed));changed=git('diff','--cached','--name-only').splitlines()
+              assert changed and set(changed)<=allowed,changed
+              git('commit','-m','Publish complete book11: 677-page manuscript, full reader and shelf entrances; no reindex')
+              commit=git('rev-parse','HEAD');assert git('rev-parse','HEAD:public/search')==protected
+              result=subprocess.run(['git','push','origin','HEAD:main'],text=True,capture_output=True)
+              if result.returncode==0:
+                  receipt={'commit':commit,'parent':parent,'changed_files':changed,'protected_search_tree':protected,'reindex_executed':False,'reader_candidate_passed':True}
+                  (root/'qa/publication-result.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))
+                  print('PUBLISHED_COMMIT',commit);break
+              print('Non-force push rejected; rebuilding the same allowlisted change on latest main.',attempt)
+              time.sleep(2)
+          else:raise RuntimeError('No publication after three non-force attempts')
+          PY
+      - name: Wait for Cloudflare and verify the exact live files and shelves
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python "$RUNNER_TEMP/book11-candidate/build-tools/live-verify.py" "$RUNNER_TEMP/book11-candidate"
+      - name: Verify real production desktop and mobile PDF rendering
+        run: python "$RUNNER_TEMP/book11-candidate/build-tools/browser_check.py" https://sdeuniverses.com/books/m/11 "$RUNNER_TEMP/book11-candidate/qa/browser-live"
+      - name: Preserve publication and live acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book11-complete-publication-v1
+          retention-days: 30
+          path: ${{ runner.temp }}/book11-candidate/
