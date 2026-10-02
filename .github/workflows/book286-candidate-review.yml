@@ -1,0 +1,70 @@
+name: Book286 exact publication candidate and browser review
+on:
+  push:
+    branches: ['publish/book286-isms-v1-1-20261002']
+    paths: ['.github/workflows/book286-candidate-review.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Prepare verification tools
+        run: python -m pip install -q Pillow PyMuPDF beautifulsoup4 playwright==1.55.0
+      - name: Receive only authorized volume286 files and verify every byte
+        run: |
+          python - <<'PY'
+          from pathlib import Path,PurePosixPath
+          import urllib.request,os,io,zipfile,hashlib,json
+          from PIL import Image
+          chunks=[
+          (3145728,'c9998bcf7d7bfda5b9f7a2174f237a071d56af1a6508ad908a8f4b3db8839db8','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUdehPpI_K-Iqp56D7CSSSFovs8wiSZyX8KIZ09fpGBZnEjVLcQmRe9z_cQGOeawcgw1xds_is7AgaMUZURbq8rDU_wfRTQWxnKuT4K_3MU2SKYsmFowmgzHzfMEKqBiNmzYBflFPD3dvJU-e3BQR7ekXjHbubm9BUGfNJdH26DHHElT=s2048?key=NaO_DNuop4sC8wKWbaAdAw'),
+          (3145728,'cd822a917fa840e96465d03646201cb05cab5c6ccfe566e900bb2f1d95ea8e90','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUdTUv1rGXAD5x9qV8URlel_IzxDfYWcI2S6qgQI6UQLI5_J7m7yzfUwgv6ViNr-qXaKL2j_oSsVzm7PueWtlCsxZY8VKkn-FDYuEd7EQDOQG_42h98HpxGiTH-QyL8bL1Uv8FSaLEwQjwPx_98b4e7u3wHZiF0N0SD3T2iDXpbqR74b=s2048?key=NaO_DNuop4sC8wKWbaAdAw'),
+          (1669490,'84c01ef12f829f01abf8e4ea88ed1fd937e9808f755494fbad03b11b3ff73f43','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUcY7xQPWjNPKeaVHzaNwuKc_g_kOSUmfZ9zt6i5qXSgYfn1mAbkRKTFU9ZpR2apnJi_mGcJtVaEXhIk2LUoqzh572GZNm4pOHUEzkD7dGN6mFTSvZUlAJPxYxOGDYAV2tOtTFm1lgyX8239EIW14XqNDXrEYPW5HACMDWoFIHma8cQXCac=s2048?key=NaO_DNuop4sC8wKWbaAdAw')]
+          data=bytearray()
+          for i,(size,digest,url) in enumerate(chunks,1):
+              b=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'SDE-Book286-Authorized-Publication'}),timeout=90).read()
+              im=Image.open(io.BytesIO(b));assert im.size==(1024,1024)
+              part=im.convert('RGB').tobytes()[:size]
+              assert hashlib.sha256(part).hexdigest()==digest,'Transfer changed bytes: stop without publishing'
+              data.extend(part);print('Verified transfer part',i,size)
+          assert len(data)==7960946 and hashlib.sha256(data).hexdigest()=='3fcb1b234d0492fdd164be734ebd57a572eac8bec6a9027c022397cdbc8aca1b'
+          root=Path(os.environ['RUNNER_TEMP'])/'m286-candidate';root.mkdir()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+              for n in z.namelist():
+                  p=PurePosixPath(n);assert not p.is_absolute() and '..' not in p.parts
+                  assert p.parts[0] in ['book','qa','build-tools','README.txt']
+                  assert p.suffix.lower() not in ['.ttf','.otf','.ttc','.woff','.woff2','.env']
+              z.extractall(root)
+          m=json.loads((root/'book/publication-manifest.json').read_text())
+          assert m['release_sha256']=='1c147fc4be3d59a95d9f205b93e71d2acaae746043fac6cc0c97a84c76e77622'
+          for n,v in m['files'].items():
+              b=(root/'book'/n).read_bytes();assert len(b)==v['bytes'] and hashlib.sha256(b).hexdigest()==v['sha256'],n
+          import fitz
+          pdf=fitz.open(root/'book/downloads/isms-reader-v1.1.pdf');assert len(pdf)==284 and len(pdf.get_toc())==164
+          preview=Path(os.environ['RUNNER_TEMP'])/'m286-preview/public/books/m';preview.mkdir(parents=True)
+          (preview/'286').symlink_to(root/'book',target_is_directory=True)
+          (root/'qa/transfer.json').write_text(json.dumps({'exact_bytes':True,'zip_sha256':hashlib.sha256(data).hexdigest(),'release_sha256':m['release_sha256'],'book_files':37,'reindex_called':False},indent=2))
+          print('All 37 book assets verified. No publication, no reindex.')
+          PY
+      - name: Preserve authenticated candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: book286-authenticated-candidate
+          path: ${{ runner.temp }}/m286-candidate/
+          retention-days: 7
+      - name: Prepare Chinese-capable browser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Verify desktop and two mobile widths including PDF rendering
+        run: python "$RUNNER_TEMP/m286-candidate/build-tools/browser-check.py" "$RUNNER_TEMP/m286-preview" "$RUNNER_TEMP/m286-browser"
+      - name: Preserve browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book286-candidate-browser-evidence
+          path: ${{ runner.temp }}/m286-browser/
+          retention-days: 7
