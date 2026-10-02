@@ -75,7 +75,8 @@ def r2_code(u):
     e = SITE + urllib.parse.quote(path_only(u), safe='/%')
     try:
         return subprocess.run(
-            ['curl', '-s', '-o', os.devnull, '-w', '%{http_code}', '-r', '0-1023', e],
+            # -L：划归分站的专著 PDF 会先 301 到 <名>.sdeuniverses.com，跟到最后一跳再判
+            ['curl', '-sL', '-A', 'Mozilla/5.0', '-o', os.devnull, '-w', '%{http_code}', '-r', '0-1023', e],
             capture_output=True, text=True, timeout=40).stdout
     except Exception:
         return 'ERR'
