@@ -137,12 +137,26 @@ jobs:
         if: steps.daily.outputs.run == 'true'
         run: python3 tools/build_search_index.py --check
 
+      # 【2026-10-02】内容没变就不上传、不同步。此前 manifest 的 built 时间戳每趟都变，
+      #   于是即使一篇文章没发，每天也整份重传 R2、整库重写 DO（约百万行/趟，超出部分 $1/百万行）。
+      #   指纹排除 built 之外的一切都参与；上传与同步都成功之后才记录指纹。
+      - name: 内容指纹（与已发布索引完全一致则跳过上传与同步）
+        id: content
+        if: steps.daily.outputs.run == 'true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: python3 tools/search_index_daily.py content
+
       # ===== 写入侧：索引不再进 git，改上 R2 =====
       # 次序是硬的：上面两道自检全过，才允许碰桶。坏索引进了桶就是线上答案被污染，
       # 而 R2 一旦有 search/ 前缀的对象就永远压过 ASSETS，回滚只能靠快照。
       # 凭证是 Object Read & Write、只绑 sdeuniverses-pdf 的 R2 令牌，建不了桶也删不了桶。
       - name: 上传索引到 R2（search/ 覆盖 + search-snap/<日期>/ 快照）
-        if: steps.daily.outputs.run == 'true'
+        if: steps.daily.outputs.run == 'true' && steps.content.outputs.changed == 'true'
         env:
           AWS_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -186,7 +200,7 @@ jobs:
           fi
 
       - name: 核对桶里的对象数与本地分片数一致
-        if: steps.daily.outputs.run == 'true'
+        if: steps.daily.outputs.run == 'true' && steps.content.outputs.changed == 'true'
         env:
           AWS_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -207,6 +221,16 @@ jobs:
           python3 -c 'import json;c=json.load(open("/tmp/m.json"))["counts"];print("回读 manifest 成功 ·",c["docs"],"篇 /",c["chunks"],"块")'
 
       - name: 同步检索数据库（上传成功后一次，等待完成）
-        if: steps.daily.outputs.run == 'true'
+        if: steps.daily.outputs.run == 'true' && steps.content.outputs.changed == 'true'
         timeout-minutes: 8
         run: python3 tools/search_index_daily.py sync
+
+      - name: 记录内容指纹（上传与同步都成功之后才记）
+        if: steps.daily.outputs.run == 'true' && steps.content.outputs.changed == 'true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: python3 tools/search_index_daily.py record

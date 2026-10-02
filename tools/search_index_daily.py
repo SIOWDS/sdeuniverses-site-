@@ -12,6 +12,8 @@ ZONE = dt.timezone(dt.timedelta(hours=8))
 ENDPOINT = "https://d3ea22f828ce19cf113a457ceba2c930.r2.cloudflarestorage.com"
 MANIFEST = "s3://sdeuniverses-pdf/search/manifest.json"
 STATUS = "https://sdeuniverses.com/api/idx/status"
+HASH_KEY = "s3://sdeuniverses-pdf/search-meta/content-hash.txt"   # 放在 search/ 之外：sync --delete 不会误删它
+SEARCH_DIR = "public/search"
 
 
 def needs_build(manifest, now=None):
@@ -38,6 +40,64 @@ def check():
         out.write("run=" + str(run).lower() + "\n")
     print("R2 索引构建时间：", built)
     print("本日尚未更新，继续。" if run else "北京时间今天已经更新，跳过本轮构建和同步。")
+
+
+def content_fingerprint(root=SEARCH_DIR):
+    """索引内容指纹：manifest 里唯一会自己变的 `built` 不参与，其余每个文件的路径与字节都参与。
+    index.html 是搜索页本身，不在索引里，排除。"""
+    import hashlib
+    top = hashlib.sha256()
+    for dirpath, _, names in sorted(os.walk(root)):
+        for name in sorted(names):
+            path = os.path.join(dirpath, name)
+            rel = os.path.relpath(path, root).replace(os.sep, "/")
+            if rel == "index.html":
+                continue
+            with open(path, "rb") as fh:
+                data = fh.read()
+            if rel == "manifest.json":
+                obj = json.loads(data.decode("utf-8"))
+                obj.pop("built", None)
+                data = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            top.update(rel.encode("utf-8") + b"\0" + hashlib.sha256(data).digest())
+    return top.hexdigest()
+
+
+def read_remote_hash():
+    result = subprocess.run(
+        ["aws", "s3", "cp", HASH_KEY, "-", "--endpoint-url", ENDPOINT, "--only-show-errors"],
+        capture_output=True, text=True, timeout=90,
+    )
+    if result.returncode:
+        if any(marker in result.stderr for marker in ("NoSuchKey", "Not Found", "(404)")):
+            return None
+        raise RuntimeError("无法读取已记录的内容指纹；停止本趟，避免误传：" + result.stderr[:200])
+    return result.stdout.strip() or None
+
+
+def content():
+    """内容没变就不上传、不同步数据库（每天省一整轮 R2 写入与约百万行 DO 写入）。"""
+    local = content_fingerprint()
+    remote = read_remote_hash()
+    changed = local != remote
+    with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+        out.write("changed=" + str(changed).lower() + "\n")
+        out.write("hash=" + local + "\n")
+    print("本地内容指纹：", local)
+    print("已发布指纹：  ", remote or "（无）")
+    print("内容有变化，继续上传并同步。" if changed else "内容与已发布索引完全一致：跳过上传与数据库同步。")
+
+
+def record():
+    """上传与数据库同步都成功之后才记录指纹——中途失败就不记，下一趟会重来。"""
+    local = content_fingerprint()
+    result = subprocess.run(
+        ["aws", "s3", "cp", "-", HASH_KEY, "--endpoint-url", ENDPOINT, "--only-show-errors"],
+        input=local, capture_output=True, text=True, timeout=90,
+    )
+    if result.returncode:
+        raise RuntimeError("记录内容指纹失败：" + result.stderr[:200])
+    print("已记录内容指纹：", local)
 
 
 def read_json(url):
@@ -68,6 +128,6 @@ def sync():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] not in ("check", "sync"):
-        raise SystemExit("Usage: search_index_daily.py check|sync")
-    {"check": check, "sync": sync}[sys.argv[1]]()
+    if len(sys.argv) != 2 or sys.argv[1] not in ("check", "sync", "content", "record"):
+        raise SystemExit("Usage: search_index_daily.py check|content|sync|record")
+    {"check": check, "sync": sync, "content": content, "record": record}[sys.argv[1]]()
