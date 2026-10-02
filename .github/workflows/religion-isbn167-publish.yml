@@ -1,0 +1,115 @@
+name: Publish religion volume299 ISBN167
+on:
+  push:
+    branches: [religion-metadata-20261002]
+    paths: ['.github/workflows/religion-isbn167-publish.yml']
+permissions:
+  contents: write
+  actions: read
+  checks: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ACCEPTED_RUN: '36976090919'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/religion-genesis/
+            /public/books/m/299/
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+      - name: Require the exact reviewed successful candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json,urllib.request,os
+          req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/runs/36976090919',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          run=json.load(urllib.request.urlopen(req));assert run['conclusion']=='success' and run['head_sha']=='d034b8ec32e15fff0787ca5515404f1c4181c3cf'
+          print('The exact candidate passed: ISBN167, volume299, USD20; cover and publication-page visual review completed.')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-isbn167-candidate
+          run-id: 36976090919
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/religion-isbn167-candidate
+      - name: Install verification tools and pin publication script
+        run: |
+          python -m pip install --quiet PyMuPDF==1.26.7 beautifulsoup4 requests playwright
+          python -m playwright install --with-deps chromium > /tmp/m299-verification-install.log 2>&1
+          sudo apt-get install -y -qq fonts-noto-cjk > /tmp/m299-font-install.log 2>&1
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,os,json
+          p=Path(os.environ['RUNNER_TEMP'])/'publish-isbn167.py'
+          p.write_bytes(urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/4dcf144ddee6848129e94f606c729b9b41847bb5/tools/religion-metadata-20261002/publish-isbn167.py',timeout=40).read())
+          root=Path(os.environ['RUNNER_TEMP'])/'religion-isbn167-candidate'
+          m=json.loads((root/'book/publication-manifest.json').read_text())
+          assert m['release_sha256']=='78bf715f274dc20ac9457849b2843ee5cfbb41543371580dae1ecfaab06f351e'
+          assert json.loads((root/'qa/build-report.json').read_text())['pages']==365
+          print('Pinned reviewed content hash and 365 pages.')
+          PY
+      - name: Publish this title against fresh main without force or index changes
+        run: |
+          git config user.name 'SIOWDS'
+          git config user.email 'wangdesheng1234567@gmail.com'
+          success=0
+          for attempt in 1 2 3; do
+            git fetch --filter=blob:none --depth=2 origin main
+            git checkout --detach FETCH_HEAD
+            python "$RUNNER_TEMP/publish-isbn167.py" prepare "$GITHUB_WORKSPACE" "$RUNNER_TEMP/religion-isbn167-candidate" "$RUNNER_TEMP/religion-isbn167-live"
+            git add --sparse public/books/religion-genesis public/books/m/299 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+            python - <<'PY'
+          import os,json,subprocess
+          from pathlib import Path
+          paths=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          assert paths and all(p in allowed or p.startswith(('public/books/religion-genesis/','public/books/m/299/')) for p in paths)
+          assert not any('/search/' in p or p.endswith(('.ttf','.otf','.ttc','.woff','.woff2','.env')) for p in paths)
+          Path(os.environ['RUNNER_TEMP'],'religion-isbn167-live','changed-paths.json').write_text(json.dumps(paths,ensure_ascii=False,indent=2))
+          print('Scoped title, downloads, numeric aliases and three shelves:',len(paths),'files; no reindex.')
+          PY
+            git commit -m 'Publish Religion Genesis volume299 v1.2 with ISBN9798906901675 and USD20 across covers, downloads and shelves; no reindex'
+            if git push origin HEAD:main; then success=1; break; fi
+            echo 'Concurrent main changed; rebuild only this title on the fresh base without force-pushing.'
+          done
+          test "$success" = 1
+          git rev-parse HEAD > "$RUNNER_TEMP/religion-isbn167-live/published-commit.txt"
+      - name: Require actual Cloudflare deployment success
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,urllib.request,json,time
+          q=Path(os.environ['RUNNER_TEMP'])/'religion-isbn167-live';sha=(q/'published-commit.txt').read_text().strip()
+          url='https://api.github.com/repos/SIOWDS/sdeuniverses-site-/commits/'+sha+'/check-runs'
+          for attempt in range(60):
+              req=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              data=json.load(urllib.request.urlopen(req));runs=[r for r in data.get('check_runs',[]) if r['name']=='Workers Builds: steep-band-faf5']
+              if any(r['status']=='completed' and r['conclusion']=='success' for r in runs):break
+              if any(r['status']=='completed' and r['conclusion'] in ['failure','cancelled','timed_out'] for r in runs):raise AssertionError('Cloudflare deployment failed; inspect build before claiming success.')
+              time.sleep(12)
+          else:raise AssertionError('Cloudflare deployment did not complete in this acceptance window.')
+          (q/'cloudflare-build.json').write_text(json.dumps(data,ensure_ascii=False,indent=2));print('Cloudflare completed success for',sha)
+          PY
+      - name: Verify every live file, active downloads and mobile/desktop reading
+        run: python "$RUNNER_TEMP/publish-isbn167.py" verify "$GITHUB_WORKSPACE" "$RUNNER_TEMP/religion-isbn167-candidate" "$RUNNER_TEMP/religion-isbn167-live"
+      - name: Preserve publication, scope and live acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-isbn167-publication-acceptance
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-isbn167-live/
