@@ -1,6 +1,8 @@
 # 2026-10-01 用户决定：索引每天更新一次，以控制全量入库的 Durable Objects 写入费用。
 # 北京时间 23:20 开始：构建与坐标 → R2 上传/校验 → IndexMemory 同步。
-# 不接受 push/repository_dispatch 自动触发。手动按钮也受北京时间每日一次检查约束。
+# 【2026-10-02 硬性规定】不接受任何手动触发，也不接受 push/repository_dispatch：只有每天一次的定时任务。
+#   已删除 workflow_dispatch（Actions 页面不再有 Run workflow 按钮）。任何人、任何对话、任何出版流程都不得绕开；
+#   要改这条规矩，只能由王德生本人明确下令后修改本文件。
 # 新发布内容随下一次每日任务进入检索，不在出版或检索请求中另行 reindex。
 
 name: search-index
@@ -8,7 +10,6 @@ name: search-index
 on:
   schedule:
     - cron: '20 15 * * *'   # 北京时间 23:20；GitHub 调度可能稍有延迟
-  workflow_dispatch:
 
 concurrency:
   group: search-index
@@ -16,8 +17,8 @@ concurrency:
 
 jobs:
   reindex:
-    # 出版工作流不得使用 GITHUB_TOKEN 顺手触发；保留真人手动按钮与每日定时。
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' && github.actor != 'github-actions[bot]'
+    # 出版工作流不得使用 GITHUB_TOKEN 顺手触发；只保留每日定时（2026-10-02 起连手动按钮也取消）。
+    if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     # 【2026-08-19 加】整个 job 一道总闸。此前**一步都没有超时**，于是 2026-08-19 那趟
     # 卡在 apt 上挂了二十分钟还在挂——而 concurrency 是 search-index 独一份，
