@@ -1,0 +1,52 @@
+name: Book 288 read-only reference and publication preflight
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book288-reference-preflight.yml']
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/220/
+            /public/students/wang-desheng/my-three-treasures/m220/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /package.json
+            /wrangler.toml
+            /wrangler.jsonc
+            /.github/workflows/
+      - name: Collect only publishing references and current catalogue
+        run: |
+          mkdir -p "$RUNNER_TEMP/book288-reference"
+          python - <<'PY'
+          from pathlib import Path
+          import shutil,json,os
+          root=Path('.'); out=Path(os.environ['RUNNER_TEMP'])/'book288-reference'
+          selected=['public/books/m/220','public/students/wang-desheng/my-three-treasures/m220','public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','tools/build_bookshelf.py','package.json','wrangler.toml','wrangler.jsonc','.github/workflows']
+          for n in selected:
+              p=root/n
+              if not p.exists():continue
+              q=out/n;q.parent.mkdir(parents=True,exist_ok=True)
+              if p.is_dir():shutil.copytree(p,q)
+              else:shutil.copy2(p,q)
+          c=json.loads(Path('public/books/catalog.json').read_text())
+          print('Catalogue container type:',type(c).__name__)
+          print('Reference archive prepared. No public content modified; no reindex requested.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book288-reference
+          retention-days: 3
+          path: ${{ runner.temp }}/book288-reference/
