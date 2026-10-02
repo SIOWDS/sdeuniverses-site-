@@ -1,0 +1,111 @@
+name: Publish verified religion genesis v1.1
+on:
+  push:
+    branches: [religion-genesis-v11-20261002]
+    paths: ['.github/workflows/religion-genesis-v11-publish.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/religion-genesis/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+      - name: Require the exact successful acceptance run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import urllib.request,json,os
+          req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/runs/36971964561',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          run=json.load(urllib.request.urlopen(req))
+          assert run['conclusion']=='success' and run['head_sha']=='8fb1e8f70353463eadb8cf4281b8613883405e69'
+          print('Exact candidate acceptance run succeeded.')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-genesis-v11-verified-candidate
+          run-id: 36971964561
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/religion-genesis-candidate
+      - name: Prepare a constrained installer and revalidate publication bytes
+        run: |
+          cat > "$RUNNER_TEMP/install-religion-genesis.py" <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,shutil,subprocess,datetime,unicodedata
+          root=Path(os.environ['RUNNER_TEMP'])/'religion-genesis-candidate';repo=Path(os.environ['GITHUB_WORKSPACE'])
+          for f in json.loads((root/'manifest.json').read_text())['files']:
+              p=(root/f['path']).resolve();assert root.resolve() in p.parents
+              data=p.read_bytes();assert len(data)==f['bytes'] and hashlib.sha256(data).hexdigest()==f['sha256'],f['path']
+          builder=repo/'tools/build_bookshelf.py';data=builder.read_bytes()
+          assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()=='2e091a13d40b1a066b43708af7f7bcfd4a41308d','Bookshelf generator changed: review before executing.'
+          catalog=repo/'public/books/catalog.json';payload=json.loads(catalog.read_text());before=payload['books']
+          norm=lambda s:''.join(unicodedata.normalize('NFKC',s).split()).rstrip('?？')
+          assert not any(b['id']=='religion-genesis' or norm(b['title'])==norm('宗教信仰何以发生？') for b in before),'A new or competing publication already exists: stop without overwriting.'
+          dest=repo/'public/books/religion-genesis';assert not dest.exists()
+          entry=json.loads((root/'catalog-entry.json').read_text());assert entry['number'] is None and 'isbn' not in entry and 'price' not in entry
+          assert entry['category'] in payload['categories']
+          stamp=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds').replace('+00:00','Z')
+          entry['publishedAt']=stamp;entry['onlineEdition']='v1.1';entry['publicationStatus']='manuscript'
+          shutil.copytree(root/'public/books/religion-genesis',dest)
+          records={str(p.relative_to(dest)):{'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(dest.rglob('*')) if p.is_file()}
+          release=hashlib.sha256(json.dumps(records,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          manifest={'title':entry['title'],'author':'王德生','version':'1.1','onlineEditionPreparedAt':stamp,'status':'online-manuscript','formal_volume':None,'isbn':None,'price_usd':None,'parts':8,'chapters':43,'appendices':5,'references':37,'main_prose_han':189259,'appendix_prose_han':13953,'total_prose_han':203212,'pdf_pages':365,'format_mm':[170,240],'style_reference':220,'reference_not_borrowed_metadata':True,'candidate_run':36971964561,'release_sha256':release,'files':records,'no_reindex':True}
+          (dest/'publication-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
+          payload['books']=[entry]+before;payload['updated']=stamp
+          catalog.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
+          subprocess.run(['python',str(builder)],check=True)
+          for path in ['public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html']:
+              assert (repo/path).read_text().count('data-id="religion-genesis"')==1
+          check=json.loads(catalog.read_text());assert check['books'][1:]==before and len(check['books'])==len(before)+1
+          qa=root/'live-preflight';(qa/'publication-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+          (qa/'catalog-entry-published.json').write_text(json.dumps(entry,ensure_ascii=False,indent=2))
+          print('Ready: exact book bytes; 43 chapters, 5 appendices, 365 pages; one new catalog entry and all three shelves; no reindex.')
+          PY
+      - name: Commit only this title and canonical shelf changes against fresh main
+        run: |
+          git config user.name 'SIOWDS'
+          git config user.email 'wangdesheng1234567@gmail.com'
+          success=0
+          for attempt in 1 2 3; do
+            git fetch --filter=blob:none --depth=2 origin main
+            git checkout --detach FETCH_HEAD
+            git rev-parse HEAD > "$RUNNER_TEMP/religion-genesis-candidate/live-preflight/base-main.txt"
+            python "$RUNNER_TEMP/install-religion-genesis.py"
+            git add --sparse public/books/religion-genesis public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+            python - <<'PY'
+          import os,subprocess,json
+          from pathlib import Path
+          paths=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          assert paths and all(p in allowed or p.startswith('public/books/religion-genesis/') for p in paths),paths
+          assert not any(p.endswith(('.ttf','.otf','.ttc','.woff','.woff2','.env')) for p in paths)
+          Path(os.environ['RUNNER_TEMP'],'religion-genesis-candidate','live-preflight','changed-paths.json').write_text(json.dumps(paths,ensure_ascii=False,indent=2))
+          print('Authorized changed paths:',len(paths))
+          PY
+            git commit -m 'Publish Religion Genesis v1.1: 43 chapters, five appendices, 365 pages and three shelves; no reindex'
+            if git push origin HEAD:main; then success=1; break; fi
+            echo 'Concurrent main moved; rebuild only this title on current main, never force-push.'
+          done
+          test "$success" = 1
+          git rev-parse HEAD > "$RUNNER_TEMP/religion-genesis-candidate/live-preflight/published-commit.txt"
+      - name: Preserve publication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-genesis-v11-publication-evidence
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-genesis-candidate/live-preflight/
