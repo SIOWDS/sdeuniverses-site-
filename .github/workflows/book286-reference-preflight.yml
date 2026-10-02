@@ -1,0 +1,48 @@
+name: Book 286 reference-only preflight
+on:
+  push:
+    branches: ['publish/book286-isms-v1-1-20261002']
+    paths: ['.github/workflows/book286-reference-preflight.yml']
+permissions:
+  contents: read
+jobs:
+  references:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/workflows/
+            /scripts/
+            /public/books/catalog.json
+            /public/books/m/220/
+            /public/students/wang-desheng/my-three-treasures/m220/
+          persist-credentials: false
+      - name: Collect only book layout and publishing references
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil,json,os
+          out=Path(os.environ['RUNNER_TEMP'])/'book286-reference';out.mkdir()
+          paths=['.github/workflows','scripts','public/books/catalog.json','public/books/m/220','public/students/wang-desheng/my-three-treasures/m220']
+          for s in paths:
+              p=Path(s);q=out/s
+              if not p.exists():continue
+              q.parent.mkdir(parents=True,exist_ok=True)
+              if p.is_dir():shutil.copytree(p,q,dirs_exist_ok=True)
+              else:shutil.copy2(p,q)
+          catalog=json.loads(Path('public/books/catalog.json').read_text())
+          rows=catalog.get('books',catalog.get('items',[])) if isinstance(catalog,dict) else catalog
+          matches=[x for x in rows if str(x.get('no',x.get('book_no',x.get('number',''))))=='286' or '9798906901668' in json.dumps(x,ensure_ascii=False).replace('-','') or '主义都是小偷' in json.dumps(x,ensure_ascii=False)]
+          (out/'286-catalog-conflict-check.json').write_text(json.dumps({'matches':matches,'catalog_type':type(catalog).__name__,'keys':list(catalog)[:10] if isinstance(catalog,dict) else [],'count':len(rows)},ensure_ascii=False,indent=2))
+          print('Reference collection complete. No site write, no index endpoint, no deployment.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book286-reference-only
+          path: ${{ runner.temp }}/book286-reference/
+          include-hidden-files: true
+          retention-days: 1
