@@ -1,0 +1,59 @@
+name: Book11 approved minimal cover v1.2 candidate
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book11-cover-v12-candidate-20261003.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Install isolated verification tools
+        run: python -m pip install -q Pillow PyMuPDF==1.26.4 beautifulsoup4 PyYAML playwright==1.55.0
+      - name: Authenticate the exact approved publication bytes
+        run: |
+          python - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,os,json
+          from PIL import Image
+          chunks=[(3145728,'2a398bdb2cd237b25fe3d2dc65b55331c0e4f869d051cdc47af123decf003861','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUdDnVamJWIKTmxEUrkGT9yaDDKLQek2ZuWIbXbPyq2z0vNZi7qwRiN2PMMLExvcES8W2VU2T4Wu5Gr8eTTFqfo2CnO4oxRZFQ0pruH5vrKveVzfNhHP7GV3TLBcLxEfNWIMjoYTjtx85cKkUeY6EVXBs8lBC2Mb7r5Vfxnur8V2NIx1e-g=s2048?key=uMXJotcGs7_nJxLX_gyrzw'),(3145728,'d9e144683257d87120c4f815d23d6b4f4c9633e6138f957781afcc58d1fb3ac2','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUe8P6QK6WNQEnU2B_B7I-EfgIJcYiqqSD0rrQZ8Hp5Qufnzf034kOZ_bXUCM_nCvr1d6mCI-WvCSyE-JBhPrHPpZgs4MLM8Y29AqmWGPd_2_c68oGWo3NWP1gYh3p0m1TJsSUjklS5rKoidkuOYH9e_nnUetqNzzfpSfKP-R5AanXQmud4=s2048?key=uMXJotcGs7_nJxLX_gyrzw'),(1307730,'4307575992d264c51fdf1eb04f8c17bb2c3afcc0baea43ceecca84ad396ae2a6','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUd7vBL9VQBxulUpIFeCzdLK0123WLor3sy3Usq1eyHAZMl6Iw0DrwCV0PN2V4tTr1KUagbqFOkzWdYVui_UMwxngKxAhh_d-mWrWLp5tPXq4vaHg2siOHTOizafaHwzjV61ce3NtvQJv46X3pkIqdiBVobvR_wWl1aNJLDQT2ttJl6O6qM=s2048?key=uMXJotcGs7_nJxLX_gyrzw')]
+          data=bytearray()
+          for length,digest,url in chunks:
+            raw=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'SDE-Book11-Cover-Publication'}),timeout=90).read()
+            im=Image.open(io.BytesIO(raw));assert im.size==(1024,1024)
+            part=im.convert('RGB').tobytes()[:length];assert hashlib.sha256(part).hexdigest()==digest
+            data.extend(part)
+          assert len(data)==7599186 and hashlib.sha256(data).hexdigest()=='69d50f8b85b5e107532ab9eb8cb8cb7a5d7f621c7d63310d151ea2ce19ed67b2'
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book11-cover-v12';root.mkdir()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+            z.extractall(root)
+          for e in json.loads((root/'payload-manifest.json').read_text()):
+            raw=(root/e['path']).read_bytes();assert len(raw)==e['bytes'] and hashlib.sha256(raw).hexdigest()==e['sha256']
+          print('Exact approved PDF and cover authenticated; no site write.')
+          PY
+      - name: Preserve complete body and verify no automatic indexing trigger
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python "$RUNNER_TEMP/book11-cover-v12/tools/prepare.py" "$RUNNER_TEMP/book11-cover-v12"
+      - name: Prepare browser with Chinese fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Test desktop and mobile cover and PDF navigation
+        run: |
+          mkdir -p "$RUNNER_TEMP/book11-cover-test/books/m"
+          ln -s "$RUNNER_TEMP/book11-cover-v12/book" "$RUNNER_TEMP/book11-cover-test/books/m/11"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/book11-cover-test" > "$RUNNER_TEMP/book11-cover-http.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          python "$RUNNER_TEMP/book11-cover-v12/tools/browser_check.py" http://127.0.0.1:8765/books/m/11 "$RUNNER_TEMP/book11-cover-v12/qa/browser-local"
+      - name: Preserve publication candidate and actual verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book11-approved-cover-v12-candidate
+          retention-days: 7
+          path: ${{ runner.temp }}/book11-cover-v12/
