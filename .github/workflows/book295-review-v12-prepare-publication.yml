@@ -1,0 +1,64 @@
+name: Prepare accepted volume295 v1.2 publication branch
+on:
+  push:
+    branches: [book295-review-v12-20261002]
+    paths: ['.github/workflows/book295-review-v12-prepare-publication.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: book295-review-v12-20261002
+          fetch-depth: 100
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/295/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /tools/m295-v12/
+            /.github/workflows/book295-review-v12*.yml
+      - uses: actions/download-artifact@v4
+        with:
+          name: book295-v12-verified-candidate
+          run-id: 36970144953
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m295-candidate
+      - name: Reconcile current main and install only the accepted title
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch --filter=blob:none --depth=200 origin main
+          git merge --no-edit origin/main
+          python tools/m295-v12/install.py "$RUNNER_TEMP/m295-candidate" "$GITHUB_WORKSPACE"
+          git add --sparse public/books/m/295 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+          python - <<'PY'
+          import subprocess,json,os
+          from pathlib import Path
+          paths=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          assert paths and all(p in allowed or p.startswith('public/books/m/295/') for p in paths),paths
+          assert not any(p.endswith(('.ttf','.otf','.ttc','.woff','.woff2','.env')) for p in paths)
+          Path(os.environ['RUNNER_TEMP'],'m295-candidate','qa','changed-paths.json').write_text(json.dumps(paths,indent=2))
+          print('Only authorized title/catalog/shelf changes:',len(paths))
+          PY
+          git commit -m 'Revise volume295 v1.2: original-source withdrawals, six-field record, Camus path switch; 306 pages; no reindex'
+          git push origin HEAD:book295-review-v12-20261002
+          git rev-parse HEAD > "$RUNNER_TEMP/m295-candidate/qa/publication-branch-commit.txt"
+          cp public/books/m/295/book.json "$RUNNER_TEMP/m295-candidate/site/books/m/295/book.json"
+          cp public/books/m/295/publication-manifest.json "$RUNNER_TEMP/m295-candidate/site/books/m/295/publication-manifest.json"
+      - name: Preserve prepared publication and acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book295-v12-publication-prepared
+          retention-days: 14
+          path: ${{ runner.temp }}/m295-candidate/
