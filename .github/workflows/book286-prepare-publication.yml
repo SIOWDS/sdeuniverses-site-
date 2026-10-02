@@ -1,0 +1,84 @@
+name: Book286 final visual checks and isolated publication branch
+on:
+  push:
+    branches: ['publish/book286-isms-v1-1-20261002']
+    paths: ['.github/workflows/book286-prepare-publication.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book286-final-review-candidate
+          run-id: 36977955022
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m286-candidate
+      - name: Preserve exact cover aspect ratio and require visual geometry check
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib
+          root=Path(os.environ['RUNNER_TEMP'])/'m286-candidate';book=root/'book';mp=book/'publication-manifest.json';m=json.loads(mp.read_text())
+          assert m['release_sha256']=='c6bdf25ef194ed2a5cff2ad6b8b5bd85b637010b8ea92880b9fe418bef1dcba7'
+          for n,v in m['files'].items():assert hashlib.sha256((book/n).read_bytes()).hexdigest()==v['sha256'],n
+          old_report=json.loads((root/'qa/browser/browser-report.json').read_text());assert len(old_report)==3 and all(x['pass'] for x in old_report)
+          p=book/'book.css';s=p.read_text();assert '.cover{width:100%;box-shadow' in s;p.write_text(s.replace('.cover{width:100%;box-shadow','.cover{width:100%;height:auto;box-shadow'))
+          m['files']['book.css']={'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size};m['release_sha256']=hashlib.sha256(json.dumps(m['files'],sort_keys=True).encode()).hexdigest()
+          assert m['release_sha256']=='0a5b5f9e3e672838568cd7597344875173e06798f2c8e688dd552f9f855782d2';mp.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          p=root/'build-tools/browser-check.py';s=p.read_text();needle="   page.screenshot(path=str(out/f'{label}-detail.png'),full_page=False)";assert needle in s
+          s=s.replace(needle,"   page.wait_for_function('document.querySelector(\"img.cover\").complete && document.querySelector(\"img.cover\").naturalWidth>0')\n   assert page.locator('img.cover').evaluate('(e)=>Math.abs(e.getBoundingClientRect().width/e.getBoundingClientRect().height-e.naturalWidth/e.naturalHeight)<.005'), 'Cover aspect ratio distortion'\n"+needle);p.write_text(s)
+          preview=Path(os.environ['RUNNER_TEMP'])/'m286-preview/public/books/m';preview.mkdir(parents=True);(preview/'286').symlink_to(book,target_is_directory=True)
+          (root/'qa/final-correction.json').write_text(json.dumps({'cover_aspect_ratio_preserved':True,'final_release_sha256':m['release_sha256'],'body_and_pdf_unchanged':True},indent=2))
+          PY
+      - name: Prepare browser
+        run: |
+          python -m pip install -q playwright==1.55.0
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null && ! command -v chromium >/dev/null; then python -m playwright install --with-deps chromium; fi
+      - name: Repeat exact final candidate browser acceptance
+        run: python "$RUNNER_TEMP/m286-candidate/build-tools/browser-check.py" "$RUNNER_TEMP/m286-preview" "$RUNNER_TEMP/m286-candidate/qa/final-browser"
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          filter: blob:none
+          fetch-depth: 2
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/286/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+      - name: Install only volume286 and catalogue-driven shelves
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b release/book286-v11-20261002
+          python "$RUNNER_TEMP/m286-candidate/build-tools/install.py" "$RUNNER_TEMP/m286-candidate" "$GITHUB_WORKSPACE"
+          git add --sparse public/books/m/286 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+          python - <<'PY'
+          import subprocess,os,json
+          from pathlib import Path
+          changed=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          assert changed and all(n in allowed or n.startswith('public/books/m/286/') for n in changed),changed
+          assert not any(n.endswith(('.ttf','.otf','.ttc','.woff','.woff2','.env')) for n in changed)
+          Path(os.environ['RUNNER_TEMP'],'m286-candidate','qa','changed-paths.json').write_text(json.dumps(changed,indent=2))
+          print('Only this book and its three shelf records:',len(changed))
+          PY
+          git commit -m 'Publish volume286 Isms: 220-style edition v1.1, ISBN 979-8-90690-166-8, USD20, 284 pages; no reindex'
+          git push origin HEAD:release/book286-v11-20261002
+          git rev-parse HEAD > "$RUNNER_TEMP/m286-candidate/qa/publication-branch-commit.txt"
+      - name: Preserve exact final candidate and verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book286-publication-prepared
+          path: ${{ runner.temp }}/m286-candidate/
+          retention-days: 14
