@@ -1,0 +1,58 @@
+name: Religion genesis exact-title live recheck
+on:
+  push:
+    branches: [religion-genesis-v11-20261002]
+    paths: ['.github/workflows/religion-genesis-v11-live-recheck.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  recheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-genesis-v11-verified-candidate
+          run-id: 36971964561
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/religion-genesis-candidate
+      - uses: actions/download-artifact@v4
+        with:
+          name: religion-genesis-v11-publication-evidence
+          run-id: 36972392201
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/publication-evidence
+      - name: Install verification tools
+        run: |
+          python -m pip install --quiet PyMuPDF==1.26.7 beautifulsoup4 lxml playwright requests PyYAML
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Reuse the pinned acceptance checks with exact per-page title equality
+        run: |
+          python - <<'PY'
+          import urllib.request,yaml,subprocess,os,json
+          from pathlib import Path
+          url='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/f98a97b1eb8af74e32d556e27802626872a77814/.github/workflows/religion-genesis-v11-live-acceptance.yml'
+          doc=yaml.safe_load(urllib.request.urlopen(url,timeout=40).read())
+          steps=doc['jobs']['verify-live']['steps']
+          selected=[s for s in steps if s.get('name') in ['Verify all public release bytes and three shelf entries','Test public navigation, flipping, search, theme and chapter links','Test live PDF source rendering and shelf discovery']]
+          assert len(selected)==3
+          old="assert new.title and '宗教信仰何以发生' in new.title.get_text(),name"
+          new="assert old.title and new.title and norm(old.title.get_text())==norm(new.title.get_text()),(name,'Changed page title')"
+          assert selected[0]['run'].count(old)==1
+          selected[0]['run']=selected[0]['run'].replace(old,new)
+          for step in selected:
+              print('Executing:',step['name'],flush=True)
+              subprocess.run(['bash','-e','-c',step['run']],check=True)
+          qa=Path(os.environ['RUNNER_TEMP'])/'religion-genesis-live'
+          (qa/'verification-script-correction.json').write_text(json.dumps({'original_run':36972857576,'reason':'Chapter HTML uses its own exact chapter title, not the overall book title. The assertion now compares each live title to that exact source title.','published_assets_changed':False,'source_workflow_commit':'f98a97b1eb8af74e32d556e27802626872a77814'},ensure_ascii=False,indent=2))
+          print('Exact published titles, narrative, all assets, desktop/mobile readers and all three shelves verified. No reindex.')
+          PY
+      - name: Preserve live acceptance and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-genesis-v11-live-accepted
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-genesis-live/
