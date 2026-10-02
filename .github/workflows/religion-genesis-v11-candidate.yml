@@ -1,0 +1,106 @@
+name: Religion genesis v1.1 exact-byte candidate
+on:
+  push:
+    branches: [religion-genesis-v11-20261002]
+    paths: ['.github/workflows/religion-genesis-v11-candidate.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Install document and browser verification tools
+        run: |
+          python -m pip install --quiet Pillow PyMuPDF==1.26.7 beautifulsoup4 lxml playwright
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Receive only the authorized book and reconstruct exact SVG pages
+        run: |
+          python - <<'PY'
+          import os,urllib.request,hashlib,zipfile,io,json
+          from pathlib import Path,PurePosixPath
+          from PIL import Image
+          import fitz
+          chunks=[
+          (3145728,'ae4ada7ab28f47c65a8f10fc258abad9d29cd83664adb9751c5b858bb88676f1','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUeYIQ4WRhq2QUz7zgZInPLXKKsBwn6nMYtH5aGmasAf6997jayUDrq3Lif3Z8QXJvqUVN9UHJKbDXIV8H4Ft8hyayHxiJgjnFBwDmsdjaG2k0zPwu5x5wSDXUWBz9do58hQQ_4yhgd62BTjZjfocTY1H9zimRH8pfoIzSzGWXyeF8BE=s2048?key=l-92ffbJIX-k1VXFOQvOtw'),
+          (3145728,'b1efc0dca67fdd52671924283d2a8b7619c9c340190637e25f67520ff1a223f6','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUemi668sWoa_z7weEmGIGcKV169YDq4OndwGPLrCpMZpCnwgIbw8RoEGo6HCK1iSVvzrYqoQBkYzYl5oI-zXVENve5n1qWK9UVYdFPqIHpH041UeJP3uz-fsjuBXOkWonVac1z6B-vvfBZmjV9GpyXtl8slXZgFhXpGyYTpk2xFuQyC=s2048?key=l-92ffbJIX-k1VXFOQvOtw'),
+          (2087233,'7c63b03b7258878335b8381b6b1c70599cbb9784e11ae5d98d1e275030e3268e','https://lh7-rt.googleusercontent.com/slidesz/AGV_vUeQrd9XG2KGs0kx0LnskWuW25FKOg79KZVtZHjj1pOifATBgmc89cN0DG-1JKqu-pABCvhxncqJyZu4A0kRZ7swFVbQMsdJpnViDW2R_GQL7mm7aMI18E50ijZsOqvTfJOR7kK9Yo-AO5xHByMeThTfyuHU0TsPMWl2cW351vhxI7Afgfo=s2048?key=l-92ffbJIX-k1VXFOQvOtw')]
+          raw=bytearray()
+          for size,digest,url in chunks:
+              content=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'SDE-Religion-Genesis-Publication'}),timeout=90).read()
+              im=Image.open(io.BytesIO(content));assert im.size==(1024,1024)
+              part=im.convert('RGB').tobytes()[:size]
+              assert hashlib.sha256(part).hexdigest()==digest,'Changed transfer bytes: stop before publication'
+              raw.extend(part)
+          assert len(raw)==8378689 and hashlib.sha256(raw).hexdigest()=='683b773b63e26d2989c95274d09781c5f0329b7df617d8d6fffee83f0f130e01'
+          root=Path(os.environ['RUNNER_TEMP'])/'religion-genesis-candidate';root.mkdir()
+          z=zipfile.ZipFile(io.BytesIO(raw))
+          for name in z.namelist():
+              p=PurePosixPath(name)
+              assert not p.is_absolute() and '..' not in p.parts
+              assert p.suffix.lower() not in ['.ttf','.otf','.ttc','.woff','.woff2','.env']
+              assert p.parts[0] in ['README.md','apply_to_repo.py','catalog-entry.json','manifest.json','checks','source','public','统稿与交付记录.md']
+          z.extractall(root)
+          site=root/'public/books/religion-genesis';book=json.loads((root/'source/book.json').read_text())
+          assert book['title']=='宗教信仰何以发生？' and book['version']=='1.1'
+          pdf=fitz.open(site/'downloads/book-reader-v1.1.pdf');assert len(pdf)==365
+          (site/'pages').mkdir()
+          for n,page in enumerate(pdf):
+              (site/'pages'/f'p{n+1:04d}.svg').write_text(page.get_svg_image(text_as_path=True))
+          manifest=json.loads((root/'manifest.json').read_text())
+          for f in manifest['files']:
+              path=root/f['path'];data=path.read_bytes()
+              assert len(data)==f['bytes'] and hashlib.sha256(data).hexdigest()==f['sha256'],f['path']
+          stats=json.loads((root/'checks/字数核对.json').read_text())
+          assert (stats['total'],stats['chapters'],stats['parts'],stats['appendices'],stats['references'])==(203212,43,8,5,37)
+          qa=root/'live-preflight';qa.mkdir()
+          (qa/'transfer-integrity.json').write_text(json.dumps({'all_original_files_verified':len(manifest['files']),'regenerated_svg_pages':365,'source_bytes':8378689,'pymupdf':fitz.VersionBind,'no_reindex':True,'main_unchanged':True},indent=2))
+          src=(root/'source/test_site.py').read_text()
+          src=src.replace("R=Path('/mnt/data/work');O=Path('/mnt/data/final');B=json.loads((R/'book.json').read_text());V=B['version'];PKG=O/f'宗教信仰何以发生_完整发布包_v{V}';PUBLIC=PKG/'public';SITE=PUBLIC/'books/religion-genesis'", "R=Path("+repr(str(qa))+ ");O=R;B=json.loads(Path("+repr(str(root/'source/book.json'))+").read_text());V=B['version'];PKG=Path("+repr(str(root))+");PUBLIC=PKG/'public';SITE=PUBLIC/'books/religion-genesis'")
+          src=src.replace("executable_path='/usr/bin/chromium',",'')
+          src=src.replace(";(PKG/'checks/网页与阅读器核对.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))",'')
+          src=src.replace('[1,22,94,169,210,285,293,335,360,365]','[1,22,94,169,210,247,285,293,319,335,360,365]')
+          (qa/'http-browser-check.py').write_text(src)
+          print('458 source and publication files verified exactly, including 365 SVG pages. Main and all search indexes remain unchanged.')
+          PY
+      - name: Test unmodified HTTP readers on desktop and mobile
+        run: python "$RUNNER_TEMP/religion-genesis-candidate/live-preflight/http-browser-check.py"
+      - name: Verify reference edition and actual optional PDF engine
+        run: |
+          python - <<'PY'
+          import os,urllib.request,json,threading,http.server,functools,fitz
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          root=Path(os.environ['RUNNER_TEMP'])/'religion-genesis-candidate';qa=root/'live-preflight'
+          ref='https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf'
+          data=urllib.request.urlopen(urllib.request.Request(ref,headers={'User-Agent':'Mozilla/5.0 SDE-Layout-Verification'}),timeout=120).read()
+          pdf=fitz.open(stream=data,filetype='pdf')
+          for n in [1,2,3,15,30]:
+              if n<=len(pdf):pdf[n-1].get_pixmap(matrix=fitz.Matrix(1.2,1.2)).save(qa/f'reference220-{n:03}.png')
+          (qa/'reference220.json').write_text(json.dumps({'url':ref,'pages':len(pdf),'page_size_points':list(pdf[0].rect),'used_only_for_style':True},indent=2))
+          handler=functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(root/'public'))
+          server=http.server.ThreadingHTTPServer(('127.0.0.1',0),handler);threading.Thread(target=server.serve_forever,daemon=True).start()
+          report={}
+          with sync_playwright() as pw:
+              browser=pw.chromium.launch(headless=True,args=['--no-sandbox'])
+              page=browser.new_page(viewport={'width':1440,'height':1000})
+              page.goto(f'http://127.0.0.1:{server.server_port}/books/religion-genesis/read.html#page=23',wait_until='networkidle')
+              page.wait_for_function('!busy');page.locator('#pdfMode').click()
+              page.wait_for_function("!busy && (engine==='pdf' || document.querySelector('#status').textContent.includes('不可用'))",timeout=90000)
+              report['engine']=page.evaluate('engine');report['status']=page.locator('#status').inner_text()
+              if report['engine']=='pdf':
+                  assert page.locator('#left svg').count()==1
+                  page.screenshot(path=str(qa/'actual-pdf-engine.png'))
+                  report['actual_pdf_loaded']=True
+              else: report['actual_pdf_loaded']=False
+              browser.close()
+          server.shutdown();(qa/'pdf-engine.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(report)
+          PY
+      - name: Preserve verified candidate and acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: religion-genesis-v11-verified-candidate
+          retention-days: 14
+          path: ${{ runner.temp }}/religion-genesis-candidate/
