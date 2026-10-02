@@ -177,6 +177,15 @@ def render(blocks, bib=False):
     return '\n'.join(h)
 
 
+def with_endmark(inner):
+    """章末「带走的话＋小账＋◆」绑成一块，禁止拆页——否则会掉出只有一个 ◆ 或只有小账的孤页。"""
+    end = '<div class="endmark">◆</div>'
+    m = re.search(r'(<div class="takeaway">.*?</div>)\s*(<div class="ledger">.*?</div>)\s*$', inner, re.S)
+    if m:
+        return inner[:m.start()] + '<div class="chapend">' + m.group(0) + end + '</div>'
+    return inner + end
+
+
 EMB = ('<svg class="emb" viewBox="0 0 40 40"><circle cx="20" cy="20" r="13" fill="none" stroke="#B08A3C" stroke-width="1.3"/>'
        '<line x1="20" y1="3" x2="20" y2="37" stroke="#B08A3C" stroke-width="0.9"/><line x1="3" y1="20" x2="37" y2="20" stroke="#B08A3C" stroke-width="0.9"/>'
        '<path d="M20 12 L24.5 18 L20 27 L15.5 18 Z" fill="none" stroke="#1F3A5F" stroke-width="1.1"/>'
@@ -247,16 +256,16 @@ def build_sections():
             num = int(cm[1])
             secs.append(('chapter', sid(), '第 %d 章　%s' % (num, cm[2]), 2,
                          '<div class="chapnum">%02d</div><div class="chap-label">第 %d 章</div>'
-                         '<h2 class="chap-title">%s</h2><div class="rule"></div>%s<div class="endmark">◆</div>'
-                         % (num, num, inline(cm[2]), render(body))))
+                         '<h2 class="chap-title">%s</h2><div class="rule"></div>%s'
+                         % (num, num, inline(cm[2]), with_endmark(render(body)))))
             i = j
 
     # ── 结语 ──
     bl = blocks_of((ROOT / FILES[1 + NPARTS]).read_text())
     name, _, sub = bl[0][1][0].partition('　')
     secs.append(('back', sid(), '结语　' + sub, 1,
-                 '<h1 class="fs-title">结语</h1><div class="fs-sub">%s</div><div class="rule"></div>%s<div class="endmark">◆</div>'
-                 % (inline(sub), render(bl[1:]))))
+                 '<h1 class="fs-title">结语</h1><div class="fs-sub">%s</div><div class="rule"></div>%s'
+                 % (inline(sub), with_endmark(render(bl[1:])))))
 
     # ── 参考书目、附录、后记 ──
     bl = blocks_of((ROOT / FILES[2 + NPARTS]).read_text())
@@ -348,6 +357,7 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 BS;color:#1F3A5F;margin:6mm 0 2.5m
 .ledger .lab{{display:block;font:700 7.2pt BH;color:#5A554A;letter-spacing:.3em;margin-bottom:1.2mm}}
 .ledger p{{text-indent:0;margin:0 0 .6mm;font-size:{body_pt*0.86:.2f}pt;line-height:1.75;color:#5A554A}}
 .ledger .lk{{color:#1F3A5F;font-weight:700}}
+.chapend{{break-inside:avoid}}
 .endmark{{text-align:center;color:#B08A3C;font-size:8pt;margin-top:6mm}}
 .orn{{text-align:center;color:#B08A3C;font-size:7.5pt;margin:3mm 0}}
 .pull{{margin:5mm 6%;padding:3mm 0;border-top:.8pt solid #B08A3C;border-bottom:.8pt solid #B08A3C;text-align:center;break-inside:avoid}}
