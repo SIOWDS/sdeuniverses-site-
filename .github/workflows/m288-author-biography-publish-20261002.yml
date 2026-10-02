@@ -1,0 +1,137 @@
+name: Publish volume288 author biography and verify live copies
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m288-author-biography-publish-20261002.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: volume-288-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      EDITION_SHA: 5116f51d1c7a88c584a7ee91684be4ea9ea2bf9a6ab35c5138da5b9aaaf15a25
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: m288-author-biography-candidate
+          run-id: 36971805295
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m288-bio-candidate
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/288/
+            /public/books/catalog.json
+            /tools/m288-install-author-bio-20261002.py
+      - name: Install only the reviewed biography revision and preserve other books
+        run: |
+          mkdir -p "$RUNNER_TEMP/m288-bio-live"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            python tools/m288-install-author-bio-20261002.py "$RUNNER_TEMP/m288-bio-candidate" "$GITHUB_WORKSPACE" "$EDITION_SHA"
+            git add --sparse public/books/m/288 public/books/catalog.json
+            python - <<'PY'
+          import subprocess,os,json
+          from pathlib import Path
+          names=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          assert all(n=='public/books/catalog.json' or n.startswith('public/books/m/288/') for n in names),names
+          assert len(names)==11,names
+          Path(os.environ['RUNNER_TEMP'],'m288-bio-live','changed-paths.json').write_text(json.dumps(names,indent=2))
+          PY
+            git commit -m 'Update volume288 author biography exactly as supplied; retain 383 pages, all chapters and original publication date; no reindex'
+            if git push origin HEAD:main; then break; fi
+            if [ "$attempt" = 3 ]; then exit 1; fi
+            git fetch --depth=1 origin main
+            git reset --hard origin/main
+          done
+          git rev-parse HEAD > "$RUNNER_TEMP/m288-bio-live/publication-commit.txt"
+          cp "$RUNNER_TEMP/m288-bio-candidate/qa/install-author-bio-report.json" "$RUNNER_TEMP/m288-bio-live/"
+      - name: Prepare live document verification
+        timeout-minutes: 3
+        run: |
+          timeout 90s python -m pip install --quiet --disable-pip-version-check --timeout 20 --retries 1 beautifulsoup4==4.14.3 playwright==1.55.0 PyMuPDF==1.26.7
+          timeout 45s sudo apt-get update -qq -o Acquire::Retries=1 -o Acquire::http::Timeout=15
+          timeout 60s sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Verify publication files and exact biography on the real website
+        run: |
+          python - <<'PY'
+          import os,json,time,urllib.request,hashlib,concurrent.futures,re,shutil
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          from playwright.sync_api import sync_playwright
+          import fitz
+          root=Path(os.environ['RUNNER_TEMP'])/'m288-bio-candidate';book=root/'book';out=Path(os.environ['RUNNER_TEMP'])/'m288-bio-live'
+          m=json.loads((book/'publication-manifest.json').read_text());bio=json.loads((root/'qa/author-biography.json').read_text());base='https://sdeuniverses.com/books/m/288/'
+          def get(url):
+              req=urllib.request.Request(url+('&' if '?' in url else '?')+'bio_check='+str(time.time_ns()),headers={'User-Agent':'SDE-Author-Biography-Verification/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=35) as r:return r.status,r.read()
+          for attempt in range(30):
+              try:
+                  status,data=get(base+'publication-manifest.json')
+                  if status==200 and json.loads(data).get('release_sha256')==os.environ['EDITION_SHA']:break
+              except Exception as e:print('Waiting for publication:',str(e))
+              time.sleep(10)
+          else:raise RuntimeError('Updated biography edition not yet visible')
+          def main_signature(data):
+              s=BeautifulSoup(data,'html.parser');a=s.find('main')
+              if a is None:return None
+              return ''.join(a.stripped_strings),[x.get('href') for x in a.select('a[href]')],[(p.get('data-source-paragraph'),p.get_text()) for p in a.select('[data-source-paragraph]')]
+          def check(name):
+              status,data=get(base+name);assert status==200
+              local=(book/name).read_bytes()
+              if not name.endswith('.html'):
+                  assert hashlib.sha256(data).hexdigest()==hashlib.sha256(local).hexdigest(),name
+              else:
+                  s=BeautifulSoup(data,'html.parser');t=BeautifulSoup(local,'html.parser')
+                  assert main_signature(data)==main_signature(local),name
+                  if name in ['index.html','text/index.html']:assert [p.get_text() for p in s.select('#author > p')]==bio
+                  if name=='read.html':assert json.loads(s.select_one('#cfg').get_text())==json.loads(t.select_one('#cfg').get_text())
+              if name.endswith('.pdf'):
+                  p=fitz.open(stream=data,filetype='pdf');assert len(p)==383
+                  assert re.sub(r'\s+','',''.join(bio)) in re.sub(r'\s+','',p[3].get_text())
+              return {'path':name,'http_status':200,'content_verified':True}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:files=list(pool.map(check,list(m['files'])+['publication-manifest.json']))
+          shelves=[]
+          for u in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+              status,data=get(u);s=BeautifulSoup(data,'html.parser');x=s.select('article.book[data-id="m288"]');assert status==200 and len(x)==1 and x[0].get('data-number')=='288'
+              shelves.append({'url':u,'volume288_present_once':True})
+          browsers=[]
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=shutil.which('google-chrome') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+              for label,w,h in [('desktop',1365,950),('mobile',390,844)]:
+                  page=browser.new_page(viewport={'width':w,'height':h});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+                  for suffix in ['', 'text/']:
+                      page.goto(base+suffix+'#author',wait_until='networkidle',timeout=60000);page.evaluate('document.fonts.ready');assert page.locator('#author > p').all_text_contents()==bio
+                      page.locator('#author').scroll_into_view_if_needed();page.locator('#author').screenshot(path=str(out/f'{label}-{suffix.replace("/","") or "detail"}-author.png'))
+                      assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2')
+                  page.goto(base+'read.html',wait_until='domcontentloaded',timeout=60000)
+                  page.wait_for_function("document.querySelector('#pt')?.textContent.trim()==='383'",timeout=90000)
+                  page.wait_for_function("document.querySelector('#msg')?.classList.contains('hide')",timeout=90000)
+                  page.locator('#pi').fill('4');page.locator('#pi').press('Enter');page.wait_for_timeout(1600)
+                  assert page.locator('#pi').input_value()=='4'
+                  assert 'rev=m288-author-bio-20261002' in page.locator('#cfg').text_content()
+                  page.screenshot(path=str(out/f'{label}-pdf-author-page4.png'))
+                  assert not errors,errors
+                  browsers.append({'viewport':label,'exact_bio':True,'pdf_pages':383,'author_page4_loaded':True,'runtime_errors':errors});page.close()
+              browser.close()
+          report={'volume':288,'revision_id':m['revision_id'],'release_sha256':m['release_sha256'],'author_bio_exact':True,'files':files,'bookshelves':shelves,'browser_tests':browsers,'reindex_requested':False}
+          (out/'live-author-biography-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m288-author-biography-live-evidence
+          retention-days: 14
+          path: ${{ runner.temp }}/m288-bio-live/
