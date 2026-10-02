@@ -1,142 +1,77 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIO三大公理 · The Three Axioms of SIO | 德麦国际专著</title>
-<meta name="description" content="SIO三大公理（The Three Axioms of SIO）· 本体论核心 · 意义三律的奠基之作：特征律、自由律、幸福律，构成意义文明的社会算法。">
-<meta property="og:title" content="SIO三大公理 · The Three Axioms of SIO">
-<meta property="og:type" content="book">
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SIO三大公理 · 德麦国际专著第 3 号</title>
+<meta name="description" content="《SIO三大公理——走出当代文明危机的根基》· 王德生 著 · 德麦国际 · ISBN 978-1-970820-05-8。四编十三章，约 8.4 万汉字。空目标、乱路径、迷动力是同一个误判的三处折射：把影子当本体，把复写当起源，把价值当发动机。">
+<meta name="tier" content="L0"><meta name="cite_ok" content="true"><meta name="source" content="自撰">
+<meta name="isbn" content="978-1-970820-05-8"><meta name="book_no" content="3"><meta name="tier_set_at" content="统稿"><meta name="tier_reason" content="Q1：本书书号、ISBN 与中英简介早已公开在站；且 2026-09-27 裁定 250 号之前的专著全部开放、全书公开">
+<meta property="og:title" content="SIO三大公理 · 德麦国际专著">
+<meta property="og:description" content="把影子当本体，把复写当起源，把价值当发动机。">
+<meta property="og:image" content="https://sdeuniverses.com/books/m/3/cover.jpg?v=20261003a">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/3/">
 <style>
-:root{--bg:#F6F2E9;--card:#FCF9F1;--accent:#C9A15A;--text:#241E12;--muted:#8A7C5E;--border:rgba(94,71,16,0.15);--ink:#161009}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{max-width:100%;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:1.95;font-size:16.5px}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:760px;width:100%;margin:0 auto;padding:0 24px}
-nav.top{position:sticky;top:0;background:rgba(246,242,233,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:20}
-nav.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px}
-.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
-.nav-back{font-size:13.5px;color:var(--muted)}
-header.hero{position:relative;background:linear-gradient(155deg,#1c1710,#0e0b06);color:#F3ECD9;padding:56px 0 52px;overflow:hidden}
-.st{position:absolute;background:#FFF5DC;border-radius:50%;opacity:0;box-shadow:0 0 5px 1px rgba(255,245,220,0.5);animation:tw var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s)}
-@keyframes tw{0%,100%{opacity:0;transform:scale(0.5)}50%{opacity:var(--o,0.8);transform:scale(1)}}
-.hero-inner{position:relative;z-index:2;display:flex;gap:32px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:760px;margin:0 auto;padding:0 24px}
-.hero-cover{width:172px;flex:0 0 auto;border-radius:3px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,0.5);border:1px solid rgba(212,178,94,0.25)}
-.hero-cover img{width:100%;display:block}
-.hero-txt{flex:1;min-width:260px}
-.hero-domain{font-size:11.5px;letter-spacing:0.34em;color:#C9A15A;margin-bottom:14px}
-.hero-title{font-size:clamp(24px,4vw,34px);font-weight:700;letter-spacing:0.04em;line-height:1.4;color:#F5EFDE}
-.hero-en{font-size:15px;color:#C9BB94;margin-top:14px;font-style:italic;line-height:1.5}
-.hero-sub{font-size:13px;color:#9C8F6C;margin-top:6px;line-height:1.5}
-main{padding:44px 0 20px}
-.lede{font-size:17.5px;line-height:2;color:#3A3320;border-left:3px solid var(--accent);padding:4px 0 4px 20px;margin-bottom:38px}
-.pubcard{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:22px 24px;margin-bottom:38px;font-size:14.5px;line-height:1.9}
-.pubcard .row{display:flex;gap:10px;flex-wrap:wrap;padding:3px 0}
-.pubcard .k{color:var(--muted);min-width:92px;flex:0 0 auto}
-.pubcard .v{color:var(--text);flex:1;min-width:200px}
-.sec-label{font-size:11.5px;letter-spacing:0.34em;color:var(--accent);margin:0 0 16px}
-.endesc p{margin-bottom:16px;text-align:justify;color:#3A3320;font-size:15.5px;line-height:1.95}.cnbody p{margin-bottom:16px;text-align:justify;color:#2E2818;font-size:16px;line-height:2.0}.cnbody p b{color:var(--accent)}.expand-lead{font-size:11.5px;letter-spacing:0.34em;color:var(--accent);margin:38px 0 16px}
-.grouplink{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:40px 0 0;padding:18px 22px;border:1px solid var(--border);border-radius:4px;background:rgba(201,161,90,0.05)}
-.grouplink .gl-t{flex:1;min-width:220px;font-size:14.5px;color:var(--text)}
-.btn{display:inline-block;padding:10px 22px;border-radius:3px;font-size:14px;letter-spacing:0.06em;font-weight:700}
-.btn-solid{background:var(--accent);color:#160F08}
-.btn-ghost{border:1px solid var(--accent);color:var(--accent)}
-footer{background:var(--ink);color:#8C7E5C;text-align:center;padding:30px 0 40px;font-size:12.5px;letter-spacing:0.08em;margin-top:40px}
-footer a{color:#D4B25E}
-@media(max-width:560px){.hero-cover{width:140px}}
-</style>
-</head>
-<body>
-<nav class="top"><div class="wrap">
-  <a class="nav-logo" href="/browse/">SDE Universes</a>
-  <a class="nav-back" href="/philosophy/#books">← 五十余部跨域专著</a>
-</div></nav>
-
-<header class="hero">
-  <i class="st" style="left:70.8%;top:80.9%;width:1.2px;height:2.2px;--o:0.38;--d:4.5s;--dl:0.4s"></i><i class="st" style="left:75.3%;top:16.2%;width:1.8px;height:1.9px;--o:0.75;--d:3.8s;--dl:3.5s"></i><i class="st" style="left:97.8%;top:12.9%;width:1.6px;height:2.1px;--o:0.73;--d:3.8s;--dl:1.2s"></i><i class="st" style="left:94.4%;top:10.0%;width:1.9px;height:2.0px;--o:0.35;--d:3.4s;--dl:1.2s"></i><i class="st" style="left:54.1%;top:36.5%;width:2.1px;height:2.1px;--o:0.46;--d:5.2s;--dl:0.3s"></i><i class="st" style="left:10.5%;top:64.5%;width:2.0px;height:2.0px;--o:0.89;--d:5.1s;--dl:1.1s"></i><i class="st" style="left:73.8%;top:88.9%;width:1.1px;height:1.6px;--o:0.35;--d:2.8s;--dl:1.9s"></i><i class="st" style="left:66.7%;top:93.5%;width:1.2px;height:1.6px;--o:0.90;--d:4.8s;--dl:2.1s"></i><i class="st" style="left:24.8%;top:61.3%;width:1.3px;height:1.8px;--o:0.67;--d:3.6s;--dl:3.2s"></i><i class="st" style="left:40.5%;top:46.1%;width:2.0px;height:1.3px;--o:0.37;--d:4.2s;--dl:1.7s"></i><i class="st" style="left:86.7%;top:25.4%;width:1.4px;height:1.1px;--o:0.54;--d:3.4s;--dl:1.8s"></i><i class="st" style="left:75.9%;top:5.5%;width:2.2px;height:1.9px;--o:0.78;--d:4.1s;--dl:2.3s"></i><i class="st" style="left:41.1%;top:39.2%;width:1.3px;height:1.4px;--o:0.44;--d:3.4s;--dl:3.6s"></i><i class="st" style="left:79.2%;top:62.3%;width:1.0px;height:1.3px;--o:0.60;--d:4.5s;--dl:1.7s"></i><i class="st" style="left:63.0%;top:87.1%;width:1.3px;height:1.5px;--o:0.74;--d:3.4s;--dl:2.9s"></i><i class="st" style="left:39.9%;top:3.8%;width:1.6px;height:1.1px;--o:0.76;--d:5.0s;--dl:2.1s"></i><i class="st" style="left:89.1%;top:22.0%;width:1.5px;height:1.2px;--o:0.28;--d:5.0s;--dl:0.2s"></i><i class="st" style="left:92.6%;top:54.3%;width:1.8px;height:1.1px;--o:0.84;--d:4.9s;--dl:0.4s"></i><i class="st" style="left:18.9%;top:15.2%;width:1.6px;height:1.1px;--o:0.77;--d:3.9s;--dl:2.8s"></i><i class="st" style="left:26.0%;top:63.5%;width:1.5px;height:1.8px;--o:0.52;--d:5.5s;--dl:3.4s"></i><i class="st" style="left:82.6%;top:34.1%;width:1.2px;height:1.2px;--o:0.34;--d:5.4s;--dl:1.1s"></i><i class="st" style="left:86.3%;top:23.8%;width:1.7px;height:1.3px;--o:0.45;--d:4.7s;--dl:2.4s"></i><i class="st" style="left:93.7%;top:24.3%;width:1.3px;height:1.1px;--o:0.39;--d:5.4s;--dl:2.3s"></i><i class="st" style="left:47.6%;top:34.0%;width:1.9px;height:1.8px;--o:0.35;--d:2.5s;--dl:0.7s"></i><i class="st" style="left:81.1%;top:70.9%;width:1.3px;height:1.3px;--o:0.45;--d:4.5s;--dl:3.0s"></i><i class="st" style="left:24.4%;top:32.9%;width:1.3px;height:2.1px;--o:0.61;--d:5.3s;--dl:1.0s"></i><i class="st" style="left:63.0%;top:55.5%;width:2.1px;height:1.4px;--o:0.40;--d:4.9s;--dl:3.8s"></i><i class="st" style="left:50.9%;top:33.3%;width:1.1px;height:1.5px;--o:0.85;--d:3.5s;--dl:1.8s"></i><i class="st" style="left:56.3%;top:24.4%;width:1.1px;height:1.6px;--o:0.88;--d:5.1s;--dl:1.2s"></i><i class="st" style="left:77.9%;top:80.2%;width:1.7px;height:1.4px;--o:0.38;--d:4.6s;--dl:2.7s"></i><i class="st" style="left:21.9%;top:15.3%;width:1.1px;height:2.0px;--o:0.83;--d:4.0s;--dl:2.4s"></i><i class="st" style="left:70.3%;top:16.7%;width:1.6px;height:1.5px;--o:0.82;--d:2.9s;--dl:3.4s"></i><i class="st" style="left:14.9%;top:59.4%;width:2.1px;height:1.1px;--o:0.56;--d:2.4s;--dl:2.0s"></i><i class="st" style="left:48.6%;top:92.2%;width:1.6px;height:2.1px;--o:0.72;--d:5.0s;--dl:1.4s"></i><i class="st" style="left:10.4%;top:61.9%;width:1.1px;height:1.8px;--o:0.37;--d:4.3s;--dl:3.1s"></i><i class="st" style="left:95.2%;top:20.9%;width:1.2px;height:1.5px;--o:0.88;--d:3.2s;--dl:1.9s"></i><i class="st" style="left:38.4%;top:7.8%;width:1.6px;height:1.4px;--o:0.56;--d:4.7s;--dl:2.7s"></i><i class="st" style="left:25.0%;top:62.9%;width:1.6px;height:1.9px;--o:0.25;--d:3.3s;--dl:2.7s"></i><i class="st" style="left:55.6%;top:49.4%;width:1.6px;height:1.7px;--o:0.73;--d:5.0s;--dl:3.1s"></i><i class="st" style="left:89.8%;top:56.1%;width:1.2px;height:1.4px;--o:0.81;--d:4.8s;--dl:2.5s"></i><i class="st" style="left:13.5%;top:17.1%;width:1.8px;height:1.5px;--o:0.37;--d:5.4s;--dl:0.9s"></i><i class="st" style="left:91.8%;top:60.4%;width:2.1px;height:1.9px;--o:0.38;--d:3.1s;--dl:3.5s"></i><i class="st" style="left:43.6%;top:49.3%;width:1.9px;height:1.7px;--o:0.72;--d:4.0s;--dl:1.1s"></i><i class="st" style="left:71.7%;top:13.9%;width:1.9px;height:2.0px;--o:0.34;--d:2.4s;--dl:3.7s"></i><i class="st" style="left:19.3%;top:52.1%;width:1.3px;height:1.2px;--o:0.42;--d:2.6s;--dl:3.4s"></i><i class="st" style="left:76.4%;top:75.7%;width:1.2px;height:1.4px;--o:0.31;--d:5.0s;--dl:3.9s"></i>
-  <div class="hero-inner">
-    <div class="hero-cover"><img src="/books/covers/3.jpg" alt="SIO三大公理 封面"></div>
-    <div class="hero-txt">
-      <div class="hero-domain">本体论核心 · 德麦国际专著</div>
-      <h1 class="hero-title">SIO三大公理</h1>
-      <div class="hero-en">The Three Axioms of SIO</div>
-      <div class="hero-sub">Foundations for Exiting the Crisis of Contemporary Civilization</div>
+:root{--bg:#0B0E12;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31;--card:#11161B}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto;padding:2.4rem 1.2rem 4rem}
+.crumb{color:var(--dim);font-size:.82rem;margin-bottom:1.6rem}
+.hero{display:grid;grid-template-columns:260px 1fr;gap:2.2rem;align-items:start}
+.hero img{width:100%;border-radius:6px;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+h1{margin:.2rem 0 .3rem;font-size:2.1rem;letter-spacing:.02em}
+.sub{color:var(--dim);margin:0 0 1rem}
+.line{font-size:1.05rem;border-left:3px solid var(--gold);padding-left:.9rem;margin:1.2rem 0}
+.meta{margin:1.4rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.9rem 0}
+.meta div{display:flex;gap:1rem;font-size:.9rem;padding:.16rem 0}
+.meta b{color:var(--dim);font-weight:400;min-width:5.2rem;flex:none}
+.btns{display:flex;flex-wrap:wrap;gap:.7rem;margin:1.4rem 0 0}
+.btn{display:inline-block;padding:.6rem 1.2rem;border:1px solid var(--gold);border-radius:8px;
+  color:var(--gold);font-size:.94rem}
+.btn.solid{background:var(--gold);color:#0B0E12;font-weight:600}
+.btn:hover{text-decoration:none;opacity:.88}
+h2{margin:2.6rem 0 .8rem;font-size:1.22rem;color:var(--gold);letter-spacing:.04em}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem}
+.card b{display:block;color:var(--gold);font-size:.9rem;margin-bottom:.3rem;font-weight:600}
+.card span{color:var(--dim);font-size:.86rem;line-height:1.75}
+ol.vols{padding-left:1.4rem;color:var(--dim)}
+ol.vols li{margin:.25rem 0}
+ol.vols b{color:var(--fg);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:.6rem 0}
+th,td{border-bottom:1px solid var(--line);padding:.42rem .5rem;text-align:left}
+th{color:var(--dim);font-weight:400}
+.foot{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--line);color:var(--dim);font-size:.84rem}
+@media(max-width:720px){.hero{grid-template-columns:1fr}.hero img{max-width:230px}}
+</style></head><body>
+<div class="wrap">
+<div class="crumb"><a href="/browse/">SDE Universes</a> · <a href="/books/">德麦国际专著</a> · 第 3 号 · SIO三大公理</div>
+<div class="hero">
+  <img src="/books/m/3/cover.jpg?v=20261003a" alt="《SIO三大公理》封面">
+  <div>
+    <h1>SIO三大公理</h1>
+    <p class="sub">走出当代文明危机的根基</p>
+    <div class="line">空目标、乱路径、迷动力，是同一个误判的三处折射：把影子当本体，把复写当起源，把价值当发动机。</div>
+    <p>这是德麦国际专著的<b>第三号</b>，写于 SIO 本体论时期。它不把当代文明危机当作一堆互不相干的问题，而是追到同一个源头，再用三条最低限度的「公理」去校正：<b>影子回归本体，发现回归发生，价值回归意义</b>。目标因此回到整体生成，路径因此回到发生中段，动力因此回到意义三律。</p><p>全书四编十三章：前三编依次立起三条公理，第四编让三条公理合用，并放进教育、健康、组织/商业三条前线检验。<b>2026 年 10 月的修订版保留 SIO 原貌，不改成后出的 SDE 口径</b>：它是一份历史见证，起点原样留住，后来那几步才看得见。</p>
+    <div class="meta"><div><b>著者</b><span>王德生</span></div><div><b>执笔</b><span>王德生著；2026 年 10 月修订版由 Claude 协作统稿、校订与排版，经作者审定</span></div><div><b>出版</b><span>德麦国际出版社 · Demai International Press · 新加坡</span></div><div><b>编号</b><span>德麦国际专著第 3 号</span></div><div><b>ISBN</b><span>978-1-970820-05-8</span></div><div><b>定价</b><span>US$20</span></div><div><b>规模</b><span>出版信息 · 作者介绍 · 前言 · 目录 · 导论 · 四编十三章 · 结语 · 附录五件 · 约 8.4 万字 · 印刷版 160 页（170×240 mm）</span></div><div><b>系列</b><span>德麦国际专著第三号 · SIO 本体论阶段的公理陈述 · 与《SIO 哲学导论》（第 1 号）对照而读</span></div><div><b>完稿</b><span>原稿 2025 年前后；2026 年 10 月 3 日修订版</span></div></div>
+    <div class="btns">
+      <a class="btn solid" href="/books/m/3/read.html">友好阅读 · 在线翻页</a>
+      <a class="btn" href="/books/m/3/text/">全文网页阅读</a>
+      <a class="btn" href="https://sdeuniverses.com/students/wang-desheng/sio-three-axioms/m3/sio-three-axioms-reader.pdf?v=20261003a" target="_blank" rel="noopener">阅读版 PDF（含封面）</a>
+      <a class="btn" href="https://sdeuniverses.com/students/wang-desheng/sio-three-axioms/m3/sio-three-axioms.pdf?v=20261003a" target="_blank" rel="noopener">印刷版 PDF</a>
     </div>
   </div>
-</header>
-
-<main>
-  <div class="wrap">
-    <div class="lede">意义三律的奠基之作：特征律、自由律、幸福律，构成意义文明的社会算法。</div>
-
-    <div id="cn-content">
-    <div class="sec-label">内 容 简 介</div>
-    <div class="cnbody">
-<p>本书写给一个看上去强大、却喘不过气的时代：进步在加速，意义却在变薄；目标沦为仪表盘与 KPI 清单，路径沦为「落地」与「最佳实践」，动机则化装成生产力的压力、焦虑与倦怠。王德生博士主张，这些并非彼此独立的危机，而是同一个深层哲学错误的症状——现代文明把影子错当成了存在：我们把「主体」「客体」「互动」当作各自独立、自我存在的实体，再在这个虚构之上建起知识、伦理、科学与制度。而没有任何东西孤立存在，存在的是 SIO——主体·互动·客体，一个共生的整体。</p>
-    </div>
-    <div class="expand-lead">展 开 · 这本书在讲什么</div>
-    <div class="cnbody">
-<p>全书为「修复」提出一部最小宪法，三条公理各校准现实、方法与动机的一维。公理一·影子归于存在：主体、互动、客体不是在先的实体，而是同一 SIO 整体里被侧重的不同面向——把现实的单位复原，目标就重新有了密度与方向。公理二·发现归于发生：所谓「发现」往往是事后的追写，真正的创造诞生在发生的中段——不确定、失败、张力、重组、转化在那里产出新结构；重建这个中段，战略就从一条线性神话变回一条可迭代的路。公理三·价值归于意义：真善美能稳定系统，却不是引擎；燃料是意义动力学——创生、自由、幸福在活生生的互动中循环。把价值错当燃料，社会就滑入「越控制、越无力」的补偿式衰退。</p>
-<p>本书不止是哲学，更是一部诊断与设计手册：它教你定位一个系统究竟在目标、路径还是动机层面失败，并通过复原 SIO 单位、发生路径与意义引擎来重建它。书中一个健康领域的示范，把西医、中医与交互医学重构为互补的「位置专精」，为慢性病与现代倦怠给出蓝图。凝练，且为「今天就能动手」而写。</p>
-    </div>
-    </div>
-
-    <!-- 文章精选阅读 · picks v1 -->
-    <section id="picks" class="picks">
-<style>
-.picks{margin:6px 0 40px}
-.picks .pk-note{font-size:14.5px;color:var(--muted);line-height:1.9;margin:0 0 16px}
-.picks a.pick{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:12px;color:var(--text);text-decoration:none}
-.picks a.pick:hover{border-color:var(--accent)}
-.picks .pk-n{flex:0 0 auto;font-size:13px;letter-spacing:0.2em;color:var(--accent);padding-top:3px}
-.picks .pk-b{flex:1;min-width:0}
-.picks .pk-t{display:block;font-size:17px;font-weight:700;line-height:1.6}
-.picks .pk-m{display:block;font-size:12.5px;color:var(--muted);letter-spacing:0.04em;margin:2px 0 6px}
-.picks .pk-d{display:block;font-size:14.5px;line-height:1.85;color:#3A3320}
-</style>
-    <div class="sec-label">文 章 精 选 阅 读</div>
-    <p class="pk-note">本书全文尚未上线。下面三篇选自它的原稿《SIO新文明：目标·路径·动力三重生》（王德生 著，2025），可以先读。</p>
-<a class="pick" href="/books/m/3/articles/01/"><span class="pk-n">壹</span><span class="pk-b"><span class="pk-t">特征纠缠下的目标、路径、动力的救赎</span><span class="pk-m">约 4.2 万字 · 原载「三二一智慧」2025-09-11</span><span class="pk-d">人类文明走到今天，依然普遍活在一种“特征文明”的逻辑之中。所谓特征文明，就是把世界、把人、把社会……</span></span></a>
-<a class="pick" href="/books/m/3/articles/02/"><span class="pk-n">贰</span><span class="pk-b"><span class="pk-t">罗马在路上发生（上）</span><span class="pk-m">约 4.1 万字 · 原载「创造力321」2025-09-12</span><span class="pk-d">人类文明最深的幻觉之一，名为“发现”。从科学的“大发现”到日常生活的“我发现了”，我们几乎全盘接受了这样一种叙事：世界的真理早已存在，只是被遮蔽，而主体的任务是揭开面纱……</span></span></a>
-<a class="pick" href="/books/m/3/articles/03/"><span class="pk-n">叁</span><span class="pk-b"><span class="pk-t">价值的动力学悖论与意义救赎</span><span class="pk-m">约 4.0 万字 · 原载「华智慧泉」2025-09-12</span><span class="pk-d">在人类文明的长期叙事中，“真、善、美”被奉为最高价值。无论是西方的理念传统，还是中国的仁义礼智，几乎都认定：科学的求真、伦理的求善、艺术的求美，是推动历史进步的动力之源。</span></span></a>
-    </section>
-
-    <div class="sec-label">出 版 信 息 · PUBLICATION</div>
-    <div class="pubcard">
-      <div class="row"><span class="k">作者 Author</span><span class="v">Wang, Desheng</span></div>
-      <div class="row"><span class="k">出版方</span><span class="v">德麦国际有限公司 · Demai International Pte. Ltd.</span></div>
-      <div class="row"><span class="k">ISBN</span><span class="v">978-1-970820-05-8（Bowker authorId 26927366）</span></div>
-      <div class="row"><span class="k">检索</span><span class="v"><a href="https://bookwire.bowker.com/" target="_blank" rel="noopener">Bowker / Bookwire</a> · 可按 ISBN 9781970820058 查询</span></div>
-    </div>
-
-    <div class="sec-label">内 容 简 介 · BOOK DESCRIPTION</div>
-    <div class="endesc">
-<p>The Three Axioms of SIO is written for an age that looks powerful yet feels out of breath. Progress accelerates, but meaning thins. Goals become dashboards and KPI checklists; pathways become &quot;implementation&quot; and &quot;best practices&quot;; motivation turns into pressure, anxiety, and burnout disguised as productivity. Dr.</p>
-<p>Desheng Wang argues these are not separate crises-they are symptoms of one deep philosophical error: modern civilization mistakes shadows for being. We treat &quot;subject,&quot; &quot;object,&quot; and &quot;interaction&quot; as independent, self-existing entities, then build knowledge, ethics, science, and institutions on that fiction. But nothing exists in isolation. What exists is SIO-Subject-Interaction-Object as one co-generative whole.</p>
-<p>When we forget this, goals lose weight, paths lose their middle section, and engines run on the wrong fuel. The result is stalled innovation, chronic conflict, compensatory overwork, and unfinished projects at every scale. The book proposes a minimal constitution for repair: three axioms that realign reality, method, and motivation. Axiom I: Shadow Returns to Being.</p>
-<p>Subject, interaction, and object are not prior substances. They are different emphases within one SIO unity. Restore the unit of reality, and goals regain density and direction. Axiom II: Discovery Returns to Genesis.</p>
-<p>&quot;Discovery&quot; is often a rewrite after the fact. True creation is born in the middle of genesis-where uncertainty, failure, tension, reorganization, and transformation produce new structures. Rebuilding this middle turns strategy into an iterable path rather than a linear myth. Axiom III: Value Returns to Meaning.</p>
-<p>Truth, goodness, and beauty stabilize systems, but they are not engines. The fuel is meaning dynamics-creation, freedom, and happiness cycling through lived interaction. When values are mistaken as fuel, society enters a cycle of weakening compensation: more control, less vitality. Beyond philosophy, this book is a diagnostic and design manual.</p>
-<p>It shows how to locate whether a system is failing at the level of goal, path, or motivation-and how to rebuild it by restoring the SIO unit, the genesis pathway, and the meaning engine. A featured application in health reframes Western medicine, Chinese medicine, and interactive medicine as complementary position-specializations, offering a blueprint for chronic conditions and modern burnout. Concise, and built for action today.</p>
-    </div>
-
-    <div class="grouplink">
-      <div class="gl-t">本书属「本体论核心」群 · 存在的第一性原理</div>
-      <a class="btn btn-ghost" href="/philosophy/clusters/core/">读这一群的深读 →</a>
-      <a class="btn btn-solid" href="/philosophy/#books">看全部专著 →</a>
-    </div>
-  </div>
-</main>
-
-<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
-<footer><div class="wrap">德麦国际 · SDE Universes · <a href="/philosophy/#books">返回专著全景</a> · <a href="/browse/">首页</a></div></footer>
-
-<!-- SDE 陪读浮层 -->
-<script>window.WDS_READ={selector:"main"};</script>
-<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
-
-<script src="/wds-mode.js?v=20260916a" defer></script>
-<script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
-</body>
-</html>
+</div>
+<h2>三条公理，对三个症状</h2>
+<div class="cards"><div class="card"><b>空目标 → 影子回归本体</b><span>目标越写越清楚、越像一张表格，却说不出要生成什么。存在的单位是一阶 SIO 整体，S、I、O 只是它在不同号位侧重下显出的影子。</span></div><div class="card"><b>乱路径 → 发现回归发生</b><span>理论与实践隔着银河，因为路径被写成「先发现、后应用」，省掉了中间的发生。发现只是发生之后的复写与沉淀。</span></div><div class="card"><b>迷动力 → 价值回归意义</b><span>真善美是极好的护壳，却当不了发动机。价值越位，会清扫混沌、纠缠、张力这些意义三律的燃料。</span></div></div>
+<h2>全书的四编</h2>
+<div class="cards"><div class="card"><b>第一编 · 公理一</b><span>第 1–3 章：空目标的诊断；公理一正文；目标重生，从特征清单到特征纠缠体。</span></div><div class="card"><b>第二编 · 公理二</b><span>第 4–6 章：乱路径；公理二正文，发现只是复写，发生才是起源；发生学三论接口（目标·路径·约束）。</span></div><div class="card"><b>第三编 · 公理三</b><span>第 7–9 章：价值神坛的错误；价值动力学悖论；价值下神坛的工程学。</span></div><div class="card"><b>第四编 · 合用</b><span>第 10–13 章：三重幻觉总解除与六步重启法；教育、健康、组织/商业三条前线示范。</span></div></div>
+<h2>本次修订做了什么、没做什么</h2>
+<table><tr><th>原稿的问题</th><th>本次修订的处理</th><th>没有动的</th></tr><tr><td>分次写作留下的过程痕迹：分篇提示、「下半部分将……」之类的衔接句、重复的收束句</td><td>清除</td><td>正文判断与论证一处未改</td></tr><tr><td>上下两篇拼成的各章，标题不统一</td><td>合为整章，统一章节标题</td><td>篇名章名全照原文</td></tr><tr><td>四编没有编序</td><td>各补一段编序（本次所拟，取材于各编正文）</td><td>各编的章次与内容</td></tr><tr><td>个别错字；附录零散</td><td>改正；附录归为五件</td><td>附录论文全文照原稿</td></tr><tr><td>原稿的推荐语十二则</td><td>按体例另行处理，不排入正文</td><td>—</td></tr></table>
+<h2>这本书的位置：起点，不是定论</h2>
+<p>它写于 SIO 本体论时期，用的是那个时期的术语：主体（S）、互动（I）、客体（O）、号位侧重显影、意义三律。书里的「特征律」就是后来 SDE 发生学里的「创造律」；书里的 S 读作「主体」，与 SDE 里 S 读作「显露」不是一回事。这些变化不在这本书里，在后面的书里。读者要看这套思想后来走到哪，可接着读《发生学哲学的萌芽》（第 118 号）与《SDE 本体论入门》。</p>
+<h2>作者简介</h2>
+<p>王德生，博士，SIO 本体论与 SDE 发生学的创立者，新加坡德麦国际（Demai International Pte. Ltd.）创始人、董事长，SDE Universes 平台主持人。</p><p>他是计算数学出身：湘潭大学数学系本科与硕士，中国科学院数学研究所博士，中国科学院计算数学研究所博士后。此后他在英国威尔士大学斯旺西分校任高级研究员，又在新加坡南洋理工大学数学系任教与研究十三年，任博士生导师。他在国际期刊发表计算数学与图形学论文四十余篇。</p><p>他的思想走过四站：三视角（2017 年 1 月起）、321 智慧系统（2022 年 10 月起）、SIO 本体论（2024 年 7 月起）、SDE 本体论（2026 年 1 月起）。本书写于第三站。</p>
+<h2>全书结构</h2>
+<ol class="vols"><li><b>前置</b>　作者介绍 · 前言「为什么必须写一部"公理书"」· 导论「文明危机三表征与三公理的严格对应」</li><li><b>第一编</b>　公理一：影子回归本体（三章）</li><li><b>第二编</b>　公理二：发现回归发生（三章）</li><li><b>第三编</b>　公理三：价值回归意义（三章）</li><li><b>第四编</b>　三公理合用：文明重启按钮（四章）</li><li><b>后置</b>　结语「从救赎到重生——文明不是被发现的，而是被发生的」· 附录五件（实存幻觉；客观属性；科学典范转移；中华文明原创；全书金句十条）</li></ol>
+<p style="color:var(--dim);font-size:.86rem">修订版注释：编序为 2026 年 10 月修订时所加，其余全部为原稿。原稿的推荐语十二则按体例另行处理，不排入正文。</p>
+<div class="foot">德麦国际出版社 · Demai International Press · Singapore · <a href="/books/">专著书架</a> · <a href="/books/m/1/">SIO 哲学导论（第 1 号）</a> · <a href="/browse/">返回首页</a></div>
+</div></body></html>
