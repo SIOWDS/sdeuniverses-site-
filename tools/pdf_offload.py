@@ -57,18 +57,20 @@ def recently_touched(hours):
     sp = os.path.join(ROOT, '.git', 'shallow')
     if os.path.exists(sp):
         shallow = {l.strip() for l in open(sp) if l.strip()}
-    log = sh('git', '-c', 'core.quotepath=off', 'log', '--format=@%H %ct', '--name-only', 'HEAD').stdout
-    touched, cur = set(), None
+    log = sh('git', '-c', 'core.quotepath=off', 'log', '--format=@%H %ct %s', '--name-only', 'HEAD').stdout
+    touched, cur, own = set(), None, False
     for line in log.splitlines():
         if line.startswith('@'):
-            sha, ts = line[1:].split()
+            sha, ts, subj = (line[1:].split(' ', 2) + [''])[:3]
             cur = int(ts)
             if cur < cutoff:
                 break
             if sha in shallow:
                 raise SystemExit(f'拉到的历史不够深：浅克隆边界 {sha[:8]} 还在 {hours} 小时之内，'
                                  '分不清哪些 PDF 最近动过。加大 fetch-depth 再跑。')
-        elif line.strip() and cur is not None:
+            # 迁移自己的提交（及其撤回）不算「有人动过」——否则撤回一次就得白等 24 小时
+            own = subj.startswith('Offload ') or subj.startswith('Revert "Offload ')
+        elif line.strip() and cur is not None and not own:
             touched.add(line.strip())
     return {p[len('public/'):] for p in touched if p.startswith('public/')}
 
@@ -221,6 +223,9 @@ def live_probe(k, size):
 
 
 def cmd_verify_live(a):
+    """硬失败（404、5xx、字节数不对）＝读者打不开 → 退出码 1，工作流据此整笔撤回。
+    「仍由静态资源出 200」＝边缘还压着删除前的旧副本：读者照样能读，只是还没轮到桶——
+    隔一分钟复查一次，最多 --stale-wait 秒；到时仍是旧副本只报告、不撤回。"""
     rows = ledger_rows()
     if a.only_new:
         ver = {v['k'] for v in json.load(open(STATE))}
@@ -236,16 +241,33 @@ def cmd_verify_live(a):
             print(f'等了 {a.wait}s 线上仍未由 R2 供给：{k} {code} {total} {via}')
             break
         time.sleep(15)
-    with cf.ThreadPoolExecutor(12) as ex:
-        res = list(ex.map(lambda r: live_probe(r[0], r[1]), rows))
-    bad = [r for r in res if not r[4]]
+
+    def probe_all(rs):
+        with cf.ThreadPoolExecutor(12) as ex:
+            return list(ex.map(lambda r: live_probe(r[0], r[1]), rs))
+
+    size = {r[0]: r[1] for r in rows}
+    res = probe_all(rows)
+    stale = lambda r: (not r[4]) and r[1] == '200' and r[3] == 'assets'
+    t_end = time.time() + a.stale_wait
+    while any(stale(r) for r in res) and time.time() < t_end:
+        n = sum(1 for r in res if stale(r))
+        print(f'  … {n} 份仍由静态资源旧副本供给（读者可读），60 秒后复查')
+        time.sleep(60)
+        again = {r[0]: r for r in probe_all([(r[0], size[r[0]]) for r in res if stale(r)])}
+        res = [again.get(r[0], r) for r in res]
+    hard = [r for r in res if not r[4] and not stale(r)]
+    left = [r for r in res if stale(r)]
     vias = {}
     for r in res:
         vias[r[3]] = vias.get(r[3], 0) + 1
-    print(f'线上真取 {len(res)} 份：合格 {len(res) - len(bad)}，不合格 {len(bad)}；供给来源 {vias}')
-    for r in bad[:40]:
+    print(f'线上真取 {len(res)} 份：由桶供给 {len(res) - len(hard) - len(left)}，'
+          f'旧副本未过期 {len(left)}（可读），硬失败 {len(hard)}；供给来源 {vias}')
+    for r in left[:20]:
+        print('  ~', r)
+    for r in hard[:40]:
         print('  ✗', r)
-    if bad:
+    if hard:
         sys.exit(1)
 
 
@@ -295,6 +317,7 @@ def main():
     s.add_argument('--only-new', action='store_true', help='只查本轮刚删的那批')
     s.add_argument('--sample', type=int, default=0)
     s.add_argument('--wait', type=int, default=600, help='等新部署生效的最长秒数')
+    s.add_argument('--stale-wait', type=int, default=1200, help='旧副本最多再等多少秒')
     sp.add_parser('rehydrate')
     s = sp.add_parser('fetch')
     s.add_argument('paths', nargs='+')
