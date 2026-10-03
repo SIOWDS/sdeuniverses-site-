@@ -2169,8 +2169,8 @@
     "@media(max-width:760px){.wdsm-du{flex-direction:column;gap:18px}}" +
     "@media(max-width:900px){.wdsm-cv{position:absolute;inset:0;width:auto;z-index:30;border-left:none}}";
   var CSS =
-    ":root{--wbg:#0F0B07;--wbg2:#12100C;--wside:#0A0806;--wpanel:#161B22;--wtx:#E8E4DA;--wtx2:#F5EFE0;--wdim:#8B98A5;--wdim2:#5f6a7a;--wline:rgba(255,255,255,.10);--wline2:rgba(212,178,94,.18);--wgold:#D4B25E;--wgold2:#C9A227;--wteal:#3DA5A5;--wfill:rgba(255,255,255,.05);--wfill2:rgba(255,255,255,.09);--wuser:rgba(212,178,94,.13);--wsh:rgba(0,0,0,.5);--wmask:rgba(10,8,5,.74)}" +
-    "html.wdsm-lt{--wbg:#FBF9F3;--wbg2:#F5F1E7;--wside:#F1ECE0;--wpanel:#FFFDF8;--wtx:#2C2822;--wtx2:#17140F;--wdim:#6E685D;--wdim2:#948C7E;--wline:rgba(0,0,0,.11);--wline2:rgba(140,106,58,.26);--wgold:#8C6A3A;--wgold2:#7A5A2C;--wteal:#2C7C7C;--wfill:rgba(0,0,0,.04);--wfill2:rgba(0,0,0,.075);--wuser:rgba(140,106,58,.13);--wsh:rgba(60,45,20,.18);--wmask:rgba(244,240,232,.82)}" +
+    ":root{--wbg:#0F0B07;--wbg2:#12100C;--wside:#0A0806;--wpanel:#161B22;--wtx:#E8E4DA;--wtx2:#F5EFE0;--wdim:#8B98A5;--wdim2:#5f6a7a;--wline:rgba(255,255,255,.10);--wline2:rgba(212,178,94,.18);--wgold:#D4B25E;--wgold2:#C9A227;--wteal:#3DA5A5;--wfill:rgba(255,255,255,.05);--wfill2:rgba(255,255,255,.09);--wuser:rgba(212,178,94,.13);--wsh:rgba(0,0,0,.5);--wmask:rgba(10,8,5,.74);--won-tx:#1A1307}" +
+    "html.wdsm-lt{--wbg:#FBF9F3;--wbg2:#F5F1E7;--wside:#F1ECE0;--wpanel:#FFFDF8;--wtx:#2C2822;--wtx2:#17140F;--wdim:#6E685D;--wdim2:#948C7E;--wline:rgba(0,0,0,.11);--wline2:rgba(140,106,58,.26);--wgold:#8C6A3A;--wgold2:#7A5A2C;--wteal:#2C7C7C;--wfill:rgba(0,0,0,.04);--wfill2:rgba(0,0,0,.075);--wuser:rgba(140,106,58,.13);--wsh:rgba(60,45,20,.18);--wmask:rgba(244,240,232,.82);--won-tx:#FFFDF8}" +
     ".wdsm-open{overflow:hidden}" +
     /* 外层由「一列」改为「侧栏＋主区」两列（Claude 式） */
     ".wdsm-layer{position:fixed;inset:0;z-index:100000;background:var(--wbg);display:none;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--wtx)}" +
@@ -2389,7 +2389,7 @@
     ".wdsm-tobot:hover{border-color:var(--wgold)}" +
     ".wdsm-modes{max-width:760px;margin:0 auto 9px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}" +
     ".wdsm-mode{background:var(--wfill);border:1px solid var(--wline);color:var(--wdim);font:12.5px/1 inherit;padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}" +
-    ".wdsm-mode.on{background:var(--wfill2);border-color:var(--wgold);color:var(--wgold)}" +
+    ".wdsm-mode.on{background:var(--wgold);border-color:var(--wgold);color:var(--won-tx);font-weight:600}" +
     ".wdsm-mode-tip{color:var(--wdim2);font-size:11.5px;margin-left:2px}" +
     /* ⭐ 难度条（2026-08-30）：深度思考不再是一颗开关，是一条 1–5 档的条。「自动」按站内检索定档，
        点数字钉死一档。lit＝这一答（或上一答）自动定到的档；on＝读者钉的档／自动。 */
@@ -2397,7 +2397,7 @@
     ".wdsm-grade i{font-style:normal;font-size:11px;color:var(--wdim2);margin-right:3px;white-space:nowrap}" +
     ".wdsm-grade button{background:none;border:1px solid transparent;color:var(--wdim);font:11.5px/1 inherit;padding:5px 7px;border-radius:999px;cursor:pointer;white-space:nowrap}" +
     ".wdsm-grade button.lit{background:var(--wfill2);color:var(--wgold2)}" +
-    ".wdsm-grade button.on{border-color:var(--wgold);color:var(--wgold)}" +
+    ".wdsm-grade button.on{background:var(--wgold);border-color:var(--wgold);color:var(--won-tx);font-weight:600}" +
     ".wdsm-grade em{font-style:normal;font-size:11px;color:var(--wgold);margin-left:4px;white-space:nowrap}" +
     ".wdsm-gline{color:#8B7B5E;font-size:12px;line-height:1.6;margin:-6px 0 10px}" +
     ".wdsm-gline b{font-weight:600;color:var(--wgold)}" +
