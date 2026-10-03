@@ -124,3 +124,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 /* 页脚 */
 footer{border-top:1px solid var(--line);color:var(--muted)}
 footer a{color:var(--gold2)}
+
+/* 书生 · 2026-10-03：每本有全文的专著配一个智能体入口（只追加） */
+.agent-link{flex-basis:100%;order:9;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px;padding:7px 10px;border:1px dashed rgba(212,178,94,.55);border-radius:6px;color:var(--gold,#D4B25E);font-size:13px;letter-spacing:.06em;white-space:nowrap}
+.agent-link::before{content:"✦";font-size:11px;opacity:.85}
+.agent-link:hover{border-style:solid;background:rgba(212,178,94,.08)}
+.list-view .agent-link{flex-basis:auto;order:0;margin-top:0}

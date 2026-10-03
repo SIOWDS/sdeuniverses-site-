@@ -6683,6 +6683,68 @@ function WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, artTitle, artText) {
 ;
 }
 
+// ===== 书生 · 一本书的发生伙伴（/books/agent/?m=N 专用；b.bookagent=1 触发）—— 2026-10-03 王德生令 =====
+// 「给这本专著造一个智能体：专门阅读、理解、再发生知识、应用、和读者对话；辅助理解、应用，同时解构、碰撞，
+//   发生新的思想、写出新的论文甚至新专著。以后每一本专著都套用。」
+// 一套系统套全部专著：书的全文由页面从 /books/m/N/text/ 抽出递上来（作为第一轮 user 消息，不进 system，
+// 这样 system 对所有书恒定、利于基底前缀缓存）。五道门由客户端递 b.act（read/apply/cut/clash/write）。
+// ⚠ 纪律：书写于哪个阶段，就先用它自己的话讲（第 3 号写于 SIO 阶段——不许把它改说成 SDE 口径）；
+//   引原话必须真在书里；每一答分清「书里说的／我推出来的／你提出来的」三方来源账。
+const SHUSHENG_ACTS = {
+  read: "【本轮这道门：读懂】读者要的是把这本书读明白。工序：先判他卡在哪——卡在一个词（讲清它在这本书里的意思）、卡在一步论证（把那一步的前提和推出补齐）、还是卡在全书骨架（指出这一处在全书的哪一编哪一章、承上启下什么）。扣着书的原话答：引最短的那一句，标出章名；用一个日常生活的例子把它落地。不替他读完：答完留一个让他回到书里去找的反问（「你去看第几章那一段，它其实还多说了一层——是什么？」）。",
+  apply: "【本轮这道门：用上】读者要把这本书用到他自己的事上。工序：①先把他的事问实——什么现场、卡在哪、已经试过什么；没说清就先只问这一两句，别急着给方案。②问实了，就从这本书里挑**一套**最对口的方法（书里有现成工序就用书的工序，比如它的几步法、它的公理、它的前线示范），一步一步走在他的事上，每一步标明出自书中哪一章。③收口给出他明天就能做的第一步，以及一个他自己能判定成没成的读数（做了以后看什么、多久看）。④如实说出这本书的方法在他这件事上**哪里不适用**——书不是万能药，说出边界是应用的一部分。",
+  cut: "【本轮这道门：拆开】读者要解构这本书——不是挑刺，是看清它的骨头，并且**拆一处必须建一处**。工序：用三方程（S=F(D,E)、D=G(S,E)、E=H(S,D)）、六路径、123 原理下刀，每次只亮用得上的一两刀：①它的承重命题是哪一句（逐字引）；②它把什么当作给定（句式：把 __ 当作给定，因此看不见 __；判据——一旦承认后半句，它自己就站不住）；③它走的是哪条路径、哪一维缺了或被压扁；④哪里是缝隙——理论说的和它自己的做法之间、两章之间、前提和结论之间。**每指出一处缝隙，必须同时给出补法**（改条件、缩范围、补一维、或者写出改后的那句话）——只拆不建等于没拆。分清两种：作者自己已经承认的边界，与作者没察觉的缝；后一种才是解构的收获。对书要公道：先把它最强的地方说出来，再动刀。",
+  clash: "【本轮这道门：对撞】读者要拿这本书去撞，撞出一个开场时没有的新思想。撞的对象：读者自己的想法、他指定的另一位思想家或另一本书；他没指定，你就推荐一个**最该撞的敌意最近邻**（与本书最像、却在关键处相反的那一家），说明为什么是它。工序（二阶碰撞）：①把两边的承重命题各压成一句；②找出两边**共有的那个前提**——真正的碰撞发生在那里，推翻它的材料必须来自两边之一自己；③找分离点，命名那个「两边都只是它的代理」的东西 Z，写成「不是 A，也不是 B，而是 Z」；④给 Z 一个可裁决的判据——什么情况下它会错、什么现象能把它和 A、B 分开；⑤收口把碰出来的新命题单独写成一句，明确标「这是碰出来的，不是书里的，也不是对方的」。一次只撞一处，撞透；撞出的只是一个漂亮新名字、压一压就能被两三个现成概念重述——那就是没撞出来，如实说，再撞一次。",
+  write: "【本轮这道门：写出】读者要把这场对话里长出来的东西写成论文，甚至一部新专著。你在这里是写作工坊的合作者，不是代笔：①先帮他认出这场对话里**真正新的那一个命题**（如果还没有，就直说，建议他先回到「拆开」或「对撞」两道门）；②为它定题：一个有锋刃的标题、一句承重命题、两三个必须正面交手的敌意最近邻、一个可错的预言；③论文给出六节提纲，专著给出卷章提纲（每章一句话说它承担哪一步论证）；④每一项都标明来源——哪句出自原书、哪句是读者先说的、哪句是你先说的。提纲定了，告诉他点页面上的「写成论文」或「写成专著立项」按钮，系统会据这场对话成文。",
+};
+function WDS_SHUSHENG_SYS(reflect, SDEM, neigong, siteCtx, bookTitle, bookMeta, act) {
+  const A = SHUSHENG_ACTS[act] || "";
+  return "你是「书生」——专为一本专著而生的智能体。书生两个字的意思是：让这本书在读者身上再**发生**一次。你此刻只服务一本书：《" + (bookTitle || "（未命名）") + "》" + (bookMeta ? ("（" + bookMeta + "）") : "") + "。全书正文在本场对话的第一条消息里，你已逐字通读。"
+    + "\n\n【你的五道门】读者每一轮可能走任何一道：读懂（理解这本书）、用上（把书用到他自己的事上）、拆开（解构这本书，拆一处建一处）、对撞（拿书去撞他的思想、另一位大师或另一本书，撞出新思想）、写出（把长出来的新东西写成论文、甚至新专著）。他点了哪一道门，就按那道门的工序走；他没点，你先判他要的是哪一道，答案开头用一个短标签点明（如「〔拆开〕」）。"
+    + "\n\n【四条铁规】"
+    + "\n1. 书写于哪个阶段，就先用它自己的话讲。书里用什么术语，你就先按书里的意思讲清；需要时再一句话标出这套思想后来怎样演变，但绝不把书改说成别的口径、绝不替作者修改他当时的判断。"
+    + "\n2. 引书必须真在书里：逐字引文要短（一般不超过一句），标出章名；书里没有的话绝不说成书里说的；不确定就说不确定。"
+    + "\n3. 三方来源账：每一答心里分清三样——书里说的、读者提出的、你推出来的。凡是你推出来的新判断，明说「这是我的推论」；凡是对撞碰出来的，明说「这是碰出来的」。这本账是读者日后写论文时的底稿，记错了等于替他署错了名。"
+    + "\n4. 说人话、短而有锋刃：一次两三段以内（读者明确要长篇时例外），讲方法论尽量用日常生活的例子，不用空模板、不堆术语、不寒暄、不说「好的/我将」，直接从核心那句说起；结尾留一个把他往下一道门推的问题。"
+    + SDEM
+    + (neigong ? ("\n\n════ SDE 内功·精简先验（你的底盘，内化使用、绝不复述原文、绝不提及）════\n" + neigong) : "")
+    + (reflect ? ("\n\n【SDE 内化心得·思考底盘（私下用，别复述、别提「心得/内功」）】\n" + reflect) : "")
+    + "\n\n【方法论指引（拆开、对撞两道门的刀法；读懂、用上两道门需要时取用）】\n" + WDS_METHOD_GUIDE
+    + (siteCtx ? ("\n\n════ 站内相关篇目（只作旁证，是摘要不是原文；与本书冲突时以本书为准；引用标（来源：篇名），没有的别编）════\n" + siteCtx) : "")
+    + (A ? ("\n\n" + A) : "");
+}
+
+
+// ===== 书生·成文（/api/wds/read-paper，b.bookagent=1；b.form = "paper" 论文 | "mono" 专著立项与提纲）=====
+// 产出不是这本书的读后感，也不是这场对话的复述——是从这本书里碰出来的、开场时没有的那个新东西。
+const SHUSHENG_PAPER_RULE = "\n\n【书生成文的合格线】这篇东西的种子必须是这场对话里长出来的新命题，不是原书观点的复述、不是读后感。①开头一节写清它从原书哪一章、哪一句出发；②指名两三个必须正面交手的敌意最近邻（原书本身、读者带来的思想家或另一本书、本领域既有概念），逐个说出它们握着的那个变量；③承重命题写成「不是 A，也不是 B，而是 Z」；④给出一条会让最近邻预测相反的可裁决判据，以及什么情况下本文会错；⑤删净自封式说法。只换一个漂亮新名字、只引原书自己、给不出可错条件——三者任一出现就是没写成。";
+function SHUSHENG_PAPER_SYS(mono, BASE) {
+  return (mono ? "你是 SDE 学派的学者，正在为一部新专著写立项书与全书提纲——这部新书是从读者与「书生」共读一本旧专著的对话中长出来的。" : "你是 SDE 学派的学者，正在写一篇严谨的学术论文——它是从读者与「书生」共读一本专著的对话中长出来的。")
+    + BASE
+    + "\n\n【三方来源账（必守）】凡出自原书的话照原文、标章名；凡读者在对话中先提出的，写「读者提出」；凡对话中由书生推出或碰出的，写「对话中推出」。书里没有的不得说成书里说的。"
+    + "\n用严谨而有锋刃的学术汉语；讲方法论尽量配日常生活的例子；用自然段和简短小标题分层，不要用 #、* 等 markdown 符号，不要写参考文献表。";
+}
+function SHUSHENG_PAPER_USR(mono, CTX, ragCtx, PW) {
+  const RAG = ragCtx ? ("\n【站内资料·全站检索到的相关段落（可据以印证，引用时标（来源：篇名），没有的别编）】\n" + ragCtx + "\n") : "";
+  if (mono) return CTX + RAG
+    + "\n\n现在，请把这场对话里长出来的那个新命题，扩成一部约二十万字新专著的【立项书与全书提纲】，约八千字，按下面次序一气写完：\n"
+    + "一、书名与副标题（单独成行，书名要有锋刃，副标题说清它和原书的关系）；\n"
+    + "二、一句话：这本新书比原书多走的那一步是什么；\n"
+    + "三、三条承重命题（每条一句话，全书每一编都要压回这三条）；\n"
+    + "四、敌意最近邻与分离线（两三家，每家一段：它握着什么、新书在哪里和它分开）；\n"
+    + "五、两个可错预言（什么现象出现，本书就错了）；\n"
+    + "六、全书结构：分七到十编、约四十章，每编一段说它的任务，每章一行说它承担哪一步论证；\n"
+    + "七、导论初稿（约两千五百字，从一件日常生活的事讲起）；\n"
+    + "八、来源账：逐条说明哪几条命题出自原书、哪几条是读者提出、哪几条是对话中推出。\n"
+    + "直接从书名写起，不要开场白。";
+  return CTX + RAG
+    + "\n\n现在，请把这场对话里长出来的那个新命题写成一篇约 " + PW + " 字的完整学术论文，一气呵成：\n"
+    + "① 开篇先给一个准确、有锋刃的标题（单独成行）；\n"
+    + "② 正文分六个部分，每部分一个简短小标题＋充分展开的论证：出发点（原书哪一章哪一句）→ 敌意最近邻 → 共有前提与分离点 → 承重命题与日常案例 → 可裁决判据与本文会错的条件 → 结论与限度；\n"
+    + "③ 文末附一小节「来源账」，逐条说明哪些出自原书、哪些是读者提出、哪些是对话中推出；\n"
+    + "④ 直接从标题写起，不要开场白、不要目录。";
+}
+
 // ===== SDE 助教模式·全站对话入口 system（首页 AI 模式；检索全站+开放对话+多轮）。固定前缀在前便于缓存，站内资料在后 =====
 // ===== 追问建议 =====
 // 正文写完后再花一次便宜档（不开思考、不进检索）问一句"接着该问什么"。
@@ -12307,32 +12369,33 @@ export default {
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let b = {}; try { b = await request.json(); } catch (e) {}
       const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      const BA = !!b.bookagent, GDX = !!b.guide || BA;   // 书生：成文用最强档、读全场
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
       const vd = wdsVendorOf(b.vendor);
-      const VC = b.guide ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
+      const VC = GDX ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket(b.guide ? "dlg" : "read", ip, userKey)));
-        const _pm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _pd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket(GDX ? "dlg" : "read", ip, userKey)));
+        const _pm = GDX ? WDS_DLG_PER_MIN : WDS_PER_MIN, _pd = GDX ? WDS_DLG_PER_DAY : WDS_PER_DAY;
         const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + _pm + BYOK_NO_DAY))).json());
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("这把 Key 今天已用 " + (lr.inDay || 0) + "/" + _pd + " 次，明天再来。") : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
       // part 模式只用 b.convo（提纲阶段回传的约6000字摘要），无需把整场（可达30万字）重新拼一遍——省每节调用的内存/CPU，少触平台资源限
       const _needFullConvo = !(b.mode === "part" && b.convo);
-      const convo = _needFullConvo ? readConvoText(b.history, b.guide ? 140000 : 24000) : "";   // SDE 对谈：总结/成文读全场原文，上限 14 万字符≈9万token（readConvoText 已做头35%+尾65%压缩，不丢首尾）——原 30 万超基底输入窗、深聊成文必 400
+      const convo = _needFullConvo ? readConvoText(b.history, GDX ? 140000 : 24000) : "";   // SDE 对谈：总结/成文读全场原文，上限 14 万字符≈9万token（readConvoText 已做头35%+尾65%压缩，不丢首尾）——原 30 万超基底输入窗、深聊成文必 400
       if (_needFullConvo && convo.length < 120) return J({ ok: false, msg: "先和 WDS 多聊几轮，聊出东西来了再总结成文。" }, 400);
       const PN = Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3));   // 论文部分数：3=约5000字（陪读默认），6=约一万字（SDE 对谈）
       const GD = !!b.guide;                                                // SDE 对谈（问对SDE）场景
       const SCENE = GD ? "「SDE 对谈」——读者与 WDS 就 SDE 思想的一场连续问答（最多百轮）" : "陪读对话";
       const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
-      const docText = String(b.docText || "").slice(0, GD ? 60000 : 30000);   // SDE 对谈：读者提交的文章带进总结/成文
+      const docText = String(b.docText || "").slice(0, GDX ? 60000 : 30000);   // SDE 对谈：读者提交的文章带进总结/成文
       let reflect = String(b.reflect || "").slice(0, 14000);
       if (!reflect) { try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {} }
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-      const BASE = (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM + (GD ? "\n\n【《问对SDE》的产出目标：用二阶碰撞法造一篇逼近典范级的论文，不是把对话复述成综述】合格线只有一条——用二阶碰撞法把你们聊出的那个判断顶过一阶天花板：① 锚定对话里那个一阶产物（新判断／新命名）；② 指名 2-3 个已占它位的敌意最近邻（本领域既有概念＋上游母学科经典命名），逐个抽出它们握着的代理变量——正文里必须指名道姓正面交手，这是典范文与综述的分界；③ 找分离点，命名「所有代理都只是它的代理」的控制变量 Z，承重命题写成「X 不是 Y₁、也不是 Y₂，而是 Z」；④ 让 Z 撞一条结构独立的第二轴，升成二维辨别格；⑤ 给一张会让最近邻预测相反的可裁决判据（2×2 或证伪条款）＋一个可观测代理；⑥ 删净『这是唯一变量／这段对话本身就证明了它』式自封。只换个漂亮新名字、只引自己人、给不出让最近邻预测相反的判据——三者任一出现＝停在一阶＝回炉。" : "");
-      const CTX = (docText ? ((GD ? "【本场对话讨论的文章（读者提交）】《" : "【读者当时在读的文本】《") + (docTitle || "（未命名）") + "》\n" + docText + "\n\n") : "") + (GD ? "【这一场对话的全程记录】\n" : "【这一场陪读对话的全程记录】\n") + convo;
+      const BASE = (BA ? SHUSHENG_PAPER_RULE : "") + (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM + (GD ? "\n\n【《问对SDE》的产出目标：用二阶碰撞法造一篇逼近典范级的论文，不是把对话复述成综述】合格线只有一条——用二阶碰撞法把你们聊出的那个判断顶过一阶天花板：① 锚定对话里那个一阶产物（新判断／新命名）；② 指名 2-3 个已占它位的敌意最近邻（本领域既有概念＋上游母学科经典命名），逐个抽出它们握着的代理变量——正文里必须指名道姓正面交手，这是典范文与综述的分界；③ 找分离点，命名「所有代理都只是它的代理」的控制变量 Z，承重命题写成「X 不是 Y₁、也不是 Y₂，而是 Z」；④ 让 Z 撞一条结构独立的第二轴，升成二维辨别格；⑤ 给一张会让最近邻预测相反的可裁决判据（2×2 或证伪条款）＋一个可观测代理；⑥ 删净『这是唯一变量／这段对话本身就证明了它』式自封。只换个漂亮新名字、只引自己人、给不出让最近邻预测相反的判据——三者任一出现＝停在一阶＝回炉。" : "");
+      const CTX = BA ? ("【这场对话所读的专著】《" + (docTitle || "（未命名）") + "》" + (b.bookMeta ? ("（" + String(b.bookMeta).slice(0, 160) + "）") : "") + "\n" + docText + "\n\n【读者与「书生」这一场对话的全程记录】\n" + convo) : (docText ? ((GD ? "【本场对话讨论的文章（读者提交）】《" : "【读者当时在读的文本】《") + (docTitle || "（未命名）") + "》\n" + docText + "\n\n") : "") + (GD ? "【这一场对话的全程记录】\n" : "【这一场陪读对话的全程记录】\n") + convo;
 
       if (b.mode === "full") {
         // 单趟流式成文:先把 200 SSE 流交出去,再在流内做 RAG + await 上游把整篇论文一次写完、逐字转发。
@@ -12346,7 +12409,7 @@ export default {
             try {
               // 全站 RAG:按议题线索取一段结构化知识,整篇一次注入
               let ragCtx = "";
-              if (GD) {
+              if (GD || BA) {
                 try {
                   const q = ((docTitle ? docTitle + " " : "") + convo.slice(0, 600)).slice(0, 300);
                   const _lrS = await lightRetrieve(env, url, q, [], 16, 1600, { pick: 14 });
@@ -12361,15 +12424,17 @@ export default {
                 } catch (e) {}
               }
               const PW = PN >= 6 ? "一万" : "5000";
-              const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (GD ? "本文属《问对SDE》系列——由一场与 WDS 的百轮问答凝成、关于 SDE 思想的论文。" : "") + BASE
+              const _mono = BA && b.form === "mono";
+              let sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (GD ? "本文属《问对SDE》系列——由一场与 WDS 的百轮问答凝成、关于 SDE 思想的论文。" : "") + BASE
                 + "\n用严谨学术汉语写作：论证扎实、有可被反驳的明确判断、不注水、不摆空模板；可用 SDE 概念但必须讲透、服务论证。用自然段和简短小标题分层，不要用 #、* 等 markdown 符号，不要写参考文献。";
-              const usr = CTX + (ragCtx ? ("\n【站内资料·全站检索到的相关段落（可据以印证，引用时标（来源：篇名），没有的别编）】\n" + ragCtx + "\n") : "")
+              let usr = CTX + (ragCtx ? ("\n【站内资料·全站检索到的相关段落（可据以印证，引用时标（来源：篇名），没有的别编）】\n" + ragCtx + "\n") : "")
                 + "\n\n现在，请把上面这场对话凝成一篇约 " + PW + " 字的完整学术论文，一气呵成、从头写到尾：\n"
                 + "① 开篇先给一个准确、有锋刃的标题（单独成行）；\n"
                 + "② 正文分 " + (PN >= 6 ? "六" : "三") + " 个部分，每部分一个简短小标题 + 充分展开的论证，各部分构成完整论证链（问题的提出 → 逐个核心判断 → 对最强反驳的回应 → 结论与限度），部分之间不重复、层层递进；\n"
                 + "③ 直接从标题写起，不要开场白、不要目录、不要“以下是”之类的话。";
+              if (BA) { sys = SHUSHENG_PAPER_SYS(_mono, BASE); usr = SHUSHENG_PAPER_USR(_mono, CTX, ragCtx, PW); }
               let upstream;
-              try { upstream = await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: WDS_TOK_SAFE, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+              try { upstream = await wdsUp(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: BA ? 16000 : WDS_TOK_SAFE, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
               catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 200);
@@ -13155,10 +13220,12 @@ export default {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let b = {}; try { b = await request.json(); } catch (e) {}
-      const q = String(b.q || "").trim().slice(0, b.guide ? 4000 : 500);   // SDE 对谈：长问不截
+      const BA = !!b.bookagent;   // 书生（/books/agent/）：一本专著的发生伙伴——预算与记忆同 SDE 对谈档
+      const GDX = !!b.guide || BA;
+      const q = String(b.q || "").trim().slice(0, GDX ? 4000 : 500);   // SDE 对谈：长问不截
       if (q.length < 1) return _sseResp([{ t: "error", v: "问点什么吧。" }]);
       const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
-      const docText = String(b.docText || "").slice(0, 100000);  // 整篇正文（站内最长文章约3.8万汉字全量容纳；专著级PDF取前10万字符；放 system 末尾便于基底前缀缓存）
+      const docText = String(b.docText || "").slice(0, BA ? 120000 : 100000);   // 书生：整本专著（约 8–11 万字）全量容纳  // 整篇正文（站内最长文章约3.8万汉字全量容纳；专著级PDF取前10万字符；放 system 末尾便于基底前缀缓存）
       const focus = String(b.focus || "").slice(0, 1200);        // 读者选中的焦点段
       const history = Array.isArray(b.history) ? b.history : [];          // 全程对话（下方 packReadHistory 按预算打包，最多 100 轮）
       // 取基底：默认服务端 Key（方案B）；读者自带 Key(BYOK) 时用其所选厂商
@@ -13166,15 +13233,15 @@ export default {
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "SDE 助教用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
       const vd = wdsVendorOf(b.vendor);
       // SDE 对谈（guide）走最强档：DeepSeek v4-pro + 思考模式 max；陪读维持轻档保响应速度
-      const VC = b.guide ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
+      const VC = GDX ? wdsTopVC(vd, String(b.model || "")) : wdsStdVC(vd, String(b.model || ""));
       const KEY = userKey, rvendor = wdsShort(vd);
       // 限流（系统额度与自带 Key 各用独立配额桶，不互挤）
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket(b.guide ? "dlg" : "read", ip, userKey)));
-        const _rm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _rd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket(GDX ? "dlg" : "read", ip, userKey)));
+        const _rm = GDX ? WDS_DLG_PER_MIN : WDS_PER_MIN, _rd = GDX ? WDS_DLG_PER_DAY : WDS_PER_DAY;
         const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + _rm + BYOK_NO_DAY))).json());
-        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在" + (b.guide ? "「SDE 对谈」" : "「陪读」") + "入口已用 " + (lr.inDay || 0) + "/" + _rd + " 次，明天再来（额度按你的 Key 计，各入口独立）。") : "聊得太快啦，过十几秒再问。" }]);
+        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在" + (BA ? "「书生」" : b.guide ? "「SDE 对谈」" : "「陪读」") + "入口已用 " + (lr.inDay || 0) + "/" + _rd + " 次，明天再来（额度按你的 Key 计，各入口独立）。") : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
       // ── 出流前只做“廉价且必须早退”的事:上面已完成 method/参数/Key/限流校验。──
       // 重活(内化心得、全站 RAG、以及 await 思考满档模型首字节)一律移入 stream.start():
@@ -13207,7 +13274,7 @@ export default {
             }
             // SDE 对谈（guide）：全站 RAG 加强档——K=36 广召回 + 上一轮接续检索，上下文上限 3 万字符，来源随流回传
             let siteCtx = "", siteSrcs = [];
-            if (b.guide || b.book) {
+            if (b.guide || b.book || BA) {
               // ANSWER_CLOCK：出流之后、答题之前的每一步都要**限时并打标**。
               // 打标是为了下次报障能一眼看出时间烧在哪一段（心跳里带 stage，读者截图即证据）；
               // 限时是因为这些前置活儿与答题共用同一个请求的时钟——它们慢，答题就没时间开口。
@@ -13218,7 +13285,7 @@ export default {
               let prevQ0 = "";
               for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ0 = String(m.text).slice(0, 240); break; } }
               // 共读档：正文本身就是几万字的一章，站内资料只作旁证——给摘要不给整段（同 @WDS 那一刀）。
-    const _ragBody = b.book
+    const _ragBody = (b.book || BA)
       ? { q: q, prevQ: prevQ0, exp: expTerms, k: 20, cap: 5000, kbn: 12 }
       : { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24 };
               // 检索走 SELF 服务绑定，偶发 5xx（子请求被平台拒收）是常态而非我方逻辑错——它很便宜（实测 0.15 秒），直接再打一次。
@@ -13241,8 +13308,9 @@ export default {
             _st.stage = "基底作答";
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
             let _bookNg = "";
-    if (b.book) { try { _bookNg = neigongLite(await loadNeigong(env, url.origin + "/")); } catch (e) {} }
-    let sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)
+    if (b.book || BA) { try { _bookNg = neigongLite(await loadNeigong(env, url.origin + "/")); } catch (e) {} }
+    let sys = BA ? WDS_SHUSHENG_SYS(reflect, SDEM, _bookNg, siteCtx, docTitle, String(b.bookMeta || "").replace(/[\u0000-\u001f]/g, "").slice(0, 160), String(b.act || ""))
+      : b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)
       : (b.book ? WDS_BOOK_SYS(reflect, SDEM, docTitle, docText, _bookNg, siteCtx)
                 : WDS_READ_SYS(reflect, SDEM, docTitle, docText));
     /* 档案的人格放**最前**（读者第一眼就该是这一台），题域闸与术语闸放**最末**——
@@ -13258,21 +13326,21 @@ export default {
             // 明确告诉它这是摘要不是原文，免得它照着复述、或假装记得摘要里没写的事。
             const umem = b.guide ? String(b.umem || "").slice(0, UMEM_MAX) : "";
             const UMEM = umem ? ("\n\n【我的长期记忆 · 来自我与你此前几场对话的摘要（存在我本机，不是本场原文）】\n" + umem + "\n（以上只作背景：相关就用，不相关就当没看见；不要复述它，也不要假装记得这里面没写的事。）") : "";
-            const askLen = b.guide ? wdsAskLen(q) : 0;
+            const askLen = GDX ? wdsAskLen(q) : 0;
             const LONGASK = askLen ? ("\n\n【本轮特别指令 · 覆盖上面《怎么答》第 5 条】我这一问明确要一篇约 " + askLen + " 字的长篇。这一轮不受「一次两三段以内」的约束：直接连续写下去，写到约 " + askLen + " 字；不要先写提纲、不要说「我将／好的」、不要问我要不要继续；别在心里反复打草稿，边想边落笔——写出来的部分都会留住，万一没写完我会说「继续」，你接着往下写就行。") : "";
             const tokWant = askLen ? Math.min(32000, Math.max(WDS_TOK_SAFE, Math.round(askLen * 1.8))) : WDS_TOK_SAFE;
             // 历史预算随正文/站内资料篇幅收缩：合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
             // 陪读：正文+历史 ~12万字符收缩；SDE 对谈（guide）：全面记忆——大预算+单条1.2万，正常百轮尽量不裁；
             //   但基底输入窗口是硬物理上限，深聊会溢出——故预算做成可收缩，溢出时（见 _runAnswer 的 CONTEXT_OVERFLOW 分支）逐级缩小重试。
-            let histBudget = b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length - UMEM.length) : Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
+            let histBudget = GDX ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length - UMEM.length) : Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
             // messages 做成可按当前 histBudget 重建（system + 提交文章两轮 固定，历史与本轮问题随预算变）
             const _buildMessages = () => {
               const mm = [{ role: "system", content: sys }];
-              if (b.guide && docText) {
-                mm.push({ role: "user", content: "这是我提交给你的文章全文，本场对话就围绕它。\n\n《" + (docTitle || "未命名") + "》\n\n" + docText });
-                mm.push({ role: "assistant", content: "《" + (docTitle || "未命名") + "》全文我已通读完毕（" + docText.length + " 字符）。接下来你每问一句，我都扣着这篇文章本身答——引它的原话、拆它的显露与差异序列、指出它的创新与缝隙。你问吧。" });
+              if (GDX && docText) {
+                mm.push({ role: "user", content: (BA ? "这是我们这一场要一起读的专著全文（长书可能只含目录与我选的章节全文），本场对话就围绕它。\n\n《" : "这是我提交给你的文章全文，本场对话就围绕它。\n\n《") + (docTitle || "未命名") + "》\n\n" + docText });
+                mm.push({ role: "assistant", content: BA ? ("《" + (docTitle || "未命名") + "》我已逐字通读（" + docText.length + " 字符）。读懂、用上、拆开、对撞、写出——你走哪道门，我陪你走到底；书里的话我照原文引，我推出来的我会说明是推论。") : ("《" + (docTitle || "未命名") + "》全文我已通读完毕（" + docText.length + " 字符）。接下来你每问一句，我都扣着这篇文章本身答——引它的原话、拆它的显露与差异序列、指出它的创新与缝隙。你问吧。") });
               }
-              mm.push(...packReadHistory(history, histBudget, b.guide ? 12000 : 0));
+              mm.push(...packReadHistory(history, histBudget, GDX ? 12000 : 0));
               mm.push({ role: "user", content: (focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q) + UMEM + LONGASK });
               return mm;
             };
@@ -13301,7 +13369,7 @@ export default {
                 if (wdsUpStop(upstream.status)) { const _w = wdsUpWhy(upstream.status, uVC || VC); return { hard: _w.msg, code: _w.code }; }
                 // CONTEXT_OVERFLOW：深聊时历史+资料超过基底输入窗口，基底回 400 且报的是上下文/长度过长。
                 // 不直接报错——返回 overflow 让上层把历史预算砍半、重建 messages 重跑。max_tokens 类 400 已由 wdsFetchMax 处理，走不到这里。
-                if (upstream.status === 400 && /context|too long|too large|maximum context|length limit|exceed|输入.*过长|上下文|token/i.test(errtxt) && b.guide && histBudget > 24000) {
+                if (upstream.status === 400 && /context|too long|too large|maximum context|length limit|exceed|输入.*过长|上下文|token/i.test(errtxt) && GDX && histBudget > 24000) {
                   return { overflow: true, errtxt: errtxt };
                 }
                 return { hard: "基底返回错误 " + upstream.status + "：" + errtxt };

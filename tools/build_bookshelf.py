@@ -4,7 +4,7 @@ from pathlib import Path
 import json,html,collections
 ROOT=Path(__file__).resolve().parents[1]
 DATA=json.loads((ROOT/'public/books/catalog.json').read_text())
-BOOKS=DATA['books'];CATS=DATA['categories'];VERSION='20260927-bookshelf-v6'
+BOOKS=DATA['books'];CATS=DATA['categories'];VERSION='20261003-bookshelf-v7-shusheng'
 # 上线时间：取 publishedAt 与 editionPublishedAt 中较晚的一次（UTC），让增订版按新版上线时间展示。
 # publishedAt 保留首次上线日期。新书若没填，就取它下面那一本（更早插入的）的时间，
 # 排序时再用 catalog 位置分先后——新书总是插在最前面，所以位置越靠前越新。
@@ -29,6 +29,9 @@ def card(b):
  if b.get('chapterUrl'):action+='<a class="detail-button chapter-link" href="'+esc(b['chapterUrl'])+'" aria-label="'+title+'：章节阅读">章节阅读</a>'
  if b.get('articlesUrl'):action+='<a class="detail-button chapter-link" href="'+esc(b['articlesUrl'])+'" aria-label="'+title+'：文章精选阅读">文章精选</a>'
  if b.get('readUrl') and b['readUrl']!=b['detailUrl']:action+='<a class="detail-button" href="'+detail+'" aria-label="'+title+'：书籍详情">详情</a>'
+ # 书生（2026-10-03 王德生令）：每一本有全文的专著都配一个「书生」智能体——读懂、用上、拆开、对撞、写出。
+ # 判据＝catalog 有 textUrl/chapterUrl，或仓库里有 /books/m/N/text/；新书照此自动带上，不用逐本挂。
+ if b.get('number') and (b.get('textUrl') or b.get('chapterUrl') or (ROOT/('public/books/m/%s/text/index.html'%b['number'])).exists()):action+='<a class="agent-link" href="https://sdeuniverses.com/books/agent/?m='+str(b['number'])+'" aria-label="'+title+'：书生智能体">书生 · 和这本书对话</a>'
  if b.get('pdfUrl') and b['pdfUrl']!=b.get('readUrl'):action+='<a class="pdf-link" href="'+esc(b['pdfUrl'])+'" aria-label="'+title+'：'+('试读版 PDF' if reading=='preview' else 'PDF')+'">PDF ↗</a>'
  return '<article class="book" '+attrs+'><div class="book-main"><a class="cover" href="'+detail+'" tabindex="-1" aria-hidden="true">'+cover+'</a><div class="book-copy"><p class="book-tag"><span>'+esc(cat)+'</span><span class="ordinal">'+('#'+str(b['number']) if b['number'] else '')+'</span></p><h3><a href="'+detail+'">'+title+'</a></h3><p class="byline">'+esc(author)+'</p><p class="description">'+esc(b.get('description'))+'</p></div></div><div class="book-meta"><span class="reading-state '+reading+'">'+state+'</span><span class="format">'+('PDF 全本' if b.get('pdfUrl') and b['pdfUrl']==b.get('readUrl') else '网页 / PDF' if b.get('pdfUrl') and reading=='full' else '在线阅读' if reading=='full' else ('导读 · 精选三篇' if b.get('articlesUrl') else '摘要与导读') if reading=='info' else '在线试读')+'</span></div><div class="book-actions">'+action+'</div></article>'
 def page(reading_house=False):
@@ -51,3 +54,6 @@ def page(reading_house=False):
 for name,reading_house in [('public/books/index.html',False),('public/monographs/index.html',False),('public/sites/read/library/index.html',True)]:
  p=ROOT/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(page(reading_house))
 print('Built 3 bookshelf entrances,',len(BOOKS),'unique books.')
+# 书生入口同步到详情页（幂等）：每次上新书都要跑本脚本，于是新书的详情页也自动挂上「书生」。
+import subprocess,sys as _sys
+subprocess.run([_sys.executable,str(ROOT/'tools/inject_book_agent.py'),'--apply'],check=True)
