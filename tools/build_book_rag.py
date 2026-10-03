@@ -76,7 +76,27 @@ def title_of(h):
 
 
 # ---------- 专著：按章 ----------
+# 全文不在 /books/m/N/text/ 下的几本：直接给出它们的章节文件
+ALT = {14: "books/logic/*/index.html", 34: "column/gadamer-for-everyone/index.html", 134: "books/m/134/web.html", 299: "books/religion-genesis/chapters/*.html"}
+
+
+def alt_chapters(n):
+    out = []
+    for f in sorted(glob.glob(os.path.join(PUB, ALT[n]))):
+        h = clean(io.open(f, encoding="utf-8", errors="replace").read())
+        u = "/" + os.path.relpath(f, PUB).replace(os.sep, "/").replace("index.html", "")
+        marks = [(m.start(), text_of(m.group(2))[:60]) for m in re.finditer(r"(?is)<(h1|h2)\b[^>]*>(.*?)</\1>", h)] or [(0, title_of(h))]
+        for i, (pos, t) in enumerate(marks):
+            end = marks[i + 1][0] if i + 1 < len(marks) else len(h)
+            ps = paras(h[pos:end])
+            if sum(len(x) for _, x in ps) > 200:
+                out.append({"t": t, "u": u, "ps": ps})
+    return out
+
+
 def book_chapters(n):
+    if n in ALT:
+        return alt_chapters(n)
     tp = os.path.join(PUB, "books", "m", str(n), "text", "index.html")
     if not os.path.exists(tp):
         return []
@@ -89,15 +109,17 @@ def book_chapters(n):
                 continue
             href = base + href.lstrip("./")
         rest = href[len(base):].strip("/")
-        if rest and "/" not in rest and rest not in subs and os.path.exists(os.path.join(PUB, href.strip("/"), "index.html")):
+        if rest and "/" not in rest and rest not in subs and (os.path.exists(os.path.join(PUB, href.strip("/"), "index.html")) or os.path.exists(os.path.join(PUB, href.strip("/") + ".html")) or (rest.endswith(".html") and os.path.exists(os.path.join(PUB, href.strip("/"))))):
             subs.append(rest)
     if len(CJK.findall(text_of(h))) < 20000 and subs:
         chs = []
         for s in subs:
-            sh = clean(io.open(os.path.join(PUB, "books", "m", str(n), "text", s, "index.html"), encoding="utf-8", errors="replace").read())
+            d0 = os.path.join(PUB, "books", "m", str(n), "text")
+            fp = next(x for x in (os.path.join(d0, s, "index.html"), os.path.join(d0, s + ".html"), os.path.join(d0, s)) if os.path.isfile(x))
+            sh = clean(io.open(fp, encoding="utf-8", errors="replace").read())
             ps = [p for p in paras(sh)]
             t = title_of(sh) or s
-            chs.append({"t": t, "u": base + s + "/", "ps": ps})
+            chs.append({"t": t, "u": base + (s if s.endswith(".html") else s + ("/" if os.path.isdir(os.path.join(d0, s)) else "")), "ps": ps})
         return [c for c in chs if sum(len(t) for _, t in c["ps"]) > 200]
     # 单页全文：h1.front-title / h2.chap-title 作章；没有这两种就用 h2
     has = re.search(r'class="(chap-title|front-title)"', h)
@@ -144,7 +166,7 @@ def articles(book_text_urls):
 def main(only):
     t0 = time.time()
     cat = json.load(io.open(os.path.join(PUB, "books", "catalog.json"), encoding="utf-8"))["books"]
-    books = {b["number"]: b for b in cat if b.get("number") and os.path.exists(os.path.join(PUB, "books", "m", str(b["number"]), "text", "index.html"))}
+    books = {b["number"]: b for b in cat if b.get("number") and (b["number"] in ALT or os.path.exists(os.path.join(PUB, "books", "m", str(b["number"]), "text", "index.html")))}
     docs, meta = [], []   # 每一段：文本；meta：(kind, srcid, title, url, chapter)
     chapter_ix = defaultdict(list)   # book -> [(chapter title, [chunk idx])]
     book_urls = set()

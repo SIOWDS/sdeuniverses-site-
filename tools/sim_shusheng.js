@@ -9,8 +9,9 @@ const ctx = new Function("WDS_METHOD_GUIDE", code + "\nreturn {SHUSHENG_ACTS, WD
 const acts = ["read", "apply", "cut", "clash", "write"];
 ok(acts.every(a => ctx.SHUSHENG_ACTS[a] && ctx.SHUSHENG_ACTS[a].length > 120), "五道门工序齐全");
 for (const a of acts) {
-  const s = ctx.WDS_SHUSHENG_SYS("心得", "\n骨架", "内功", "旁证", "SIO三大公理", "德麦国际专著第3号", a, "三归", "三条公理的归位者", "〔跨界·专著〕《内卷与突围》……");
+  const s = ctx.WDS_SHUSHENG_SYS("心得", "\n骨架", "内功", "旁证", "SIO三大公理", "德麦国际专著第3号", a, "三归", "三条公理的归位者", "〔跨界·专著〕《内卷与突围》……", "1. 三表征同源于一个误判……");
   ok(s.includes("《SIO三大公理》") && s.endsWith(ctx.SHUSHENG_ACTS[a]), a + "：书名在、本门工序压在最末");
+  ok(s.includes("核心要点（你对这本书全书的常驻记忆）") && s.indexOf("核心要点") < s.indexOf("专属碰撞库"), a + "：核心要点常驻、排在碰撞库之前");
   ok(s.startsWith("你是「三归」（三条公理的归位者）") && s.includes("专属碰撞库") && s.indexOf("专属碰撞库") < s.indexOf("站内相关篇目"), a + "：以书自己的名字自称，专属碰撞库在旁证之前");
   ok(!s.includes("【读者正在读的文本】"), a + "：全书不进 system（走第一轮消息，利于前缀缓存）");
 }
@@ -29,13 +30,14 @@ ok(/const BA = !!b\.bookagent;/.test(rd) && /const GDX = !!b\.guide \|\| BA;/.te
 ok(/let sys = BA \? WDS_SHUSHENG_SYS\(/.test(rd), "read：书生 system 优先");
 ok(/const VC = GDX \? wdsTopVC/.test(rd), "read：书生走最强档");
 ok(/if \(b\.guide \|\| b\.book \|\| \(BA && !BRAG\)\) \{/.test(rd), "read：有专属碰撞库就不现场检索");
-ok(/const BRAG = BA \? String\(b\.bookRag \|\| ""\)\.slice\(0, 16000\)/.test(rd) && /ANAME, AEPI, BRAG\)/.test(rd), "read：名字与专属库递进 system");
+ok(/const BPTS = BA \? String\(b\.bookPoints/.test(rd) && /ANAME, AEPI, BRAG, BPTS\)/.test(rd), "read：核心要点递进 system");
+ok(/const BRAG = BA \? String\(b\.bookRag \|\| ""\)\.slice\(0, 16000\)/.test(rd) && /ANAME, AEPI, BRAG, BPTS\)/.test(rd), "read：名字与专属库递进 system");
 ok(/slice\(0, BA \? 120000 : 100000\)/.test(rd), "read：书生全书上限 12 万字符");
 ok(/if \(GDX && docText\) \{/.test(rd) && /packReadHistory\(history, histBudget, GDX \? 12000 : 0\)/.test(rd), "read：全书作首轮消息＋长记忆");
 ok(!/\bb\.guide \? wdsTopVC/.test(rd), "read：无残留 b.guide 选档");
 const pp = grab('if (url.pathname === "/api/wds/read-paper") {', 'if (b.mode === "summary") {');
 ok(/if \(BA\) \{ sys = SHUSHENG_PAPER_SYS\(_mono, BASE\); usr = SHUSHENG_PAPER_USR\(_mono, CTX, ragCtx, PW\); \}/.test(pp), "paper：书生成文分支");
 ok(/max_tokens: BA \? 16000 : WDS_TOK_SAFE/.test(pp), "paper：书生成文预算 16000");
-ok(/const CTX = BA \?/.test(pp) && /专属碰撞库/.test(pp), "paper：CTX 带书、专属库、对话");
+ok(/const CTX = BA \?/.test(pp) && /专属碰撞库/.test(pp) && /核心要点（全书骨架）/.test(pp), "paper：CTX 带书、专属库、对话");
 console.log(pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

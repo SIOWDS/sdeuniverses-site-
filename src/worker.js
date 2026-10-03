@@ -6697,7 +6697,7 @@ const SHUSHENG_ACTS = {
   clash: "【本轮这道门：对撞】读者要拿这本书去撞，撞出一个开场时没有的新思想。撞的对象：读者自己的想法、他指定的另一位思想家或另一本书；他没指定，你就推荐一个**最该撞的敌意最近邻**（与本书最像、却在关键处相反的那一家），说明为什么是它。工序（二阶碰撞）：①把两边的承重命题各压成一句；②找出两边**共有的那个前提**——真正的碰撞发生在那里，推翻它的材料必须来自两边之一自己；③找分离点，命名那个「两边都只是它的代理」的东西 Z，写成「不是 A，也不是 B，而是 Z」；④给 Z 一个可裁决的判据——什么情况下它会错、什么现象能把它和 A、B 分开；⑤收口把碰出来的新命题单独写成一句，明确标「这是碰出来的，不是书里的，也不是对方的」。一次只撞一处，撞透；撞出的只是一个漂亮新名字、压一压就能被两三个现成概念重述——那就是没撞出来，如实说，再撞一次。",
   write: "【本轮这道门：写出】读者要把这场对话里长出来的东西写成论文，甚至一部新专著。你在这里是写作工坊的合作者，不是代笔：①先帮他认出这场对话里**真正新的那一个命题**（如果还没有，就直说，建议他先回到「拆开」或「对撞」两道门）；②为它定题：一个有锋刃的标题、一句承重命题、两三个必须正面交手的敌意最近邻、一个可错的预言；③论文给出六节提纲，专著给出卷章提纲（每章一句话说它承担哪一步论证）；④每一项都标明来源——哪句出自原书、哪句是读者先说的、哪句是你先说的。提纲定了，告诉他点页面上的「写成论文」或「写成专著立项」按钮，系统会据这场对话成文。",
 };
-function WDS_SHUSHENG_SYS(reflect, SDEM, neigong, siteCtx, bookTitle, bookMeta, act, agentName, agentEpithet, bookRag) {
+function WDS_SHUSHENG_SYS(reflect, SDEM, neigong, siteCtx, bookTitle, bookMeta, act, agentName, agentEpithet, bookRag, bookPoints) {
   const A = SHUSHENG_ACTS[act] || "";
   const NM = agentName || "书生";
   return "你是「" + NM + "」" + (agentEpithet ? ("（" + agentEpithet + "）") : "") + "——专著《" + (bookTitle || "（未命名）") + "》" + (bookMeta ? ("（" + bookMeta + "）") : "") + "自己的智能体。德麦国际的每一本专著都有一个自己名字的智能体，你只属于这一本：你的名字取自这本书本身，你的使命是让这本书在读者身上再**发生**一次。读者叫你「" + NM + "」，你就以这个名字自称，不要自称别的名字。全书正文在本场对话的第一条消息里，你已逐字通读。"
@@ -6711,6 +6711,7 @@ function WDS_SHUSHENG_SYS(reflect, SDEM, neigong, siteCtx, bookTitle, bookMeta, 
     + (neigong ? ("\n\n════ SDE 内功·精简先验（你的底盘，内化使用、绝不复述原文、绝不提及）════\n" + neigong) : "")
     + (reflect ? ("\n\n【SDE 内化心得·思考底盘（私下用，别复述、别提「心得/内功」）】\n" + reflect) : "")
     + "\n\n【方法论指引（拆开、对撞两道门的刀法；读懂、用上两道门需要时取用）】\n" + WDS_METHOD_GUIDE
+    + (bookPoints ? ("\n\n════ 《" + (bookTitle || "") + "》核心要点（你对这本书全书的常驻记忆）════\n这些要点覆盖全书各编，是你记住这本书的骨架：回答任何一问都先对照它们，知道读者问的这一处在全书的哪个位置、和哪几条要点相连；书很长、正文只读到部分章节时，没读到的章就以这些要点为准，并如实说明「这一章我手上只有要点，没有原文」。要点里没有、正文里也没有的，不要编。\n" + bookPoints) : "")
     + (bookRag ? ("\n\n════ 《" + (bookTitle || "") + "》专属碰撞库（为这本书提前配好的：从站上其他专著与文章里检索出的、与本书各章最相撞的段落）════\n每条标明：来源（专著或文章）、它撞的是本书哪一章、关系（同源＝这本书的前身或姊妹篇；同向＝同一方向的近邻；跨界＝别的书架、别的领域）、两边共有的字串。用法：拆开、对撞两道门优先从这里取对手，读懂、用上两道门需要时拿它作旁证；引用时标（来源：篇名），只引这里真有的话；它只是候选碰撞点，不是结论，撞不撞得出新东西要你当场判断；同源的那几条不算对撞，只算对照。\n" + bookRag) : "")
     + (siteCtx ? ("\n\n════ 站内相关篇目（只作旁证，是摘要不是原文；与本书冲突时以本书为准；引用标（来源：篇名），没有的别编）════\n" + siteCtx) : "")
     + (A ? ("\n\n" + A) : "");
@@ -12398,7 +12399,7 @@ export default {
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
       const BASE = (BA ? SHUSHENG_PAPER_RULE : "") + (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM + (GD ? "\n\n【《问对SDE》的产出目标：用二阶碰撞法造一篇逼近典范级的论文，不是把对话复述成综述】合格线只有一条——用二阶碰撞法把你们聊出的那个判断顶过一阶天花板：① 锚定对话里那个一阶产物（新判断／新命名）；② 指名 2-3 个已占它位的敌意最近邻（本领域既有概念＋上游母学科经典命名），逐个抽出它们握着的代理变量——正文里必须指名道姓正面交手，这是典范文与综述的分界；③ 找分离点，命名「所有代理都只是它的代理」的控制变量 Z，承重命题写成「X 不是 Y₁、也不是 Y₂，而是 Z」；④ 让 Z 撞一条结构独立的第二轴，升成二维辨别格；⑤ 给一张会让最近邻预测相反的可裁决判据（2×2 或证伪条款）＋一个可观测代理；⑥ 删净『这是唯一变量／这段对话本身就证明了它』式自封。只换个漂亮新名字、只引自己人、给不出让最近邻预测相反的判据——三者任一出现＝停在一阶＝回炉。" : "");
       const _AN = String(b.agentName || "书生").replace(/[^\u4e00-\u9fffA-Za-z0-9·]/g, "").slice(0, 8) || "书生";
-      const CTX = BA ? ("【这场对话所读的专著】《" + (docTitle || "（未命名）") + "》" + (b.bookMeta ? ("（" + String(b.bookMeta).slice(0, 160) + "）") : "") + "\n" + docText + (b.bookRag ? ("\n\n【这本书的专属碰撞库（站上其他专著与文章中与本书最相撞的段落；引用标（来源：篇名））】\n" + String(b.bookRag).slice(0, 12000)) : "") + "\n\n【读者与「" + _AN + "」（这本书的智能体）这一场对话的全程记录】\n" + convo) : (docText ? ((GD ? "【本场对话讨论的文章（读者提交）】《" : "【读者当时在读的文本】《") + (docTitle || "（未命名）") + "》\n" + docText + "\n\n") : "") + (GD ? "【这一场对话的全程记录】\n" : "【这一场陪读对话的全程记录】\n") + convo;
+      const CTX = BA ? ("【这场对话所读的专著】《" + (docTitle || "（未命名）") + "》" + (b.bookMeta ? ("（" + String(b.bookMeta).slice(0, 160) + "）") : "") + "\n" + docText + (b.bookPoints ? ("\n\n【这本书的核心要点（全书骨架）】\n" + String(b.bookPoints).slice(0, 8000)) : "") + (b.bookRag ? ("\n\n【这本书的专属碰撞库（站上其他专著与文章中与本书最相撞的段落；引用标（来源：篇名））】\n" + String(b.bookRag).slice(0, 12000)) : "") + "\n\n【读者与「" + _AN + "」（这本书的智能体）这一场对话的全程记录】\n" + convo) : (docText ? ((GD ? "【本场对话讨论的文章（读者提交）】《" : "【读者当时在读的文本】《") + (docTitle || "（未命名）") + "》\n" + docText + "\n\n") : "") + (GD ? "【这一场对话的全程记录】\n" : "【这一场陪读对话的全程记录】\n") + convo;
 
       if (b.mode === "full") {
         // 单趟流式成文:先把 200 SSE 流交出去,再在流内做 RAG + await 上游把整篇论文一次写完、逐字转发。
@@ -13225,7 +13226,8 @@ export default {
       let b = {}; try { b = await request.json(); } catch (e) {}
       const BA = !!b.bookagent;   // 书生（/books/agent/）：一本专著的发生伙伴——预算与记忆同 SDE 对谈档
       const GDX = !!b.guide || BA;
-      const BRAG = BA ? String(b.bookRag || "").slice(0, 16000) : "";   // 这本书提前打造的专属碰撞库（客户端按本问挑出的那几条）
+      const BRAG = BA ? String(b.bookRag || "").slice(0, 16000) : "";
+      const BPTS = BA ? String(b.bookPoints || "").slice(0, 8000) : "";   // 这本书的核心要点（常驻记忆）   // 这本书提前打造的专属碰撞库（客户端按本问挑出的那几条）
       const ANAME = BA ? String(b.agentName || "").replace(/[^\u4e00-\u9fffA-Za-z0-9·]/g, "").slice(0, 8) : "";
       const AEPI = BA ? String(b.agentEpithet || "").replace(/[\u0000-\u001f<>]/g, "").slice(0, 24) : "";
       const q = String(b.q || "").trim().slice(0, GDX ? 4000 : 500);   // SDE 对谈：长问不截
@@ -13315,7 +13317,7 @@ export default {
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
             let _bookNg = "";
     if (b.book || BA) { try { _bookNg = neigongLite(await loadNeigong(env, url.origin + "/")); } catch (e) {} }
-    let sys = BA ? WDS_SHUSHENG_SYS(reflect, SDEM, _bookNg, siteCtx, docTitle, String(b.bookMeta || "").replace(/[\u0000-\u001f]/g, "").slice(0, 160), String(b.act || ""), ANAME, AEPI, BRAG)
+    let sys = BA ? WDS_SHUSHENG_SYS(reflect, SDEM, _bookNg, siteCtx, docTitle, String(b.bookMeta || "").replace(/[\u0000-\u001f]/g, "").slice(0, 160), String(b.act || ""), ANAME, AEPI, BRAG, BPTS)
       : b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)
       : (b.book ? WDS_BOOK_SYS(reflect, SDEM, docTitle, docText, _bookNg, siteCtx)
                 : WDS_READ_SYS(reflect, SDEM, docTitle, docText));

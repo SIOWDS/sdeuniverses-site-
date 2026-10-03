@@ -18,12 +18,12 @@ var CFG=window.BOOK_AGENT||{};
 var mno=parseInt(CFG.no||new URLSearchParams(location.search).get("m"),10);
 if(!mno){fail('没有指定书号。请从<a href="/books/">专著书架</a>里任选一本进来。');return}
 HK="sde_shusheng_m"+mno;
-var AG={name:"书生",epithet:"",intro:"",starts:{}},RAG=null;
+var AG={name:"书生",epithet:"",intro:"",starts:{}},RAG=null,KP=null;
 
 /* —— 1. 找书：catalog.json —— */
 function J(u){return fetch(u,{cache:"no-cache"}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}
-Promise.all([J("/books/catalog.json"),J("/books/agents.json"),J("/books/m/"+mno+"/rag.json")]).then(function(a){
- var c=a[0]||{};if(a[1]&&a[1].agents&&a[1].agents[mno])AG=a[1].agents[mno];RAG=a[2];
+Promise.all([J("/books/catalog.json"),J("/books/agents.json"),J("/books/m/"+mno+"/rag.json"),J("/books/m/"+mno+"/keypoints.json")]).then(function(a){
+ var c=a[0]||{};if(a[1]&&a[1].agents&&a[1].agents[mno])AG=a[1].agents[mno];RAG=a[2];KP=a[3];
  return c;
 }).then(function(c){
  var b=(c.books||[]).filter(function(x){return x.number===mno})[0];
@@ -114,7 +114,7 @@ function boot(){
  document.title=AG.name+" · 《"+b.title+"》的智能体 | 德麦国际专著第 "+b.number+" 号";
  $("agName").textContent=AG.name;$("agEpi").textContent=AG.epithet||"这本书的智能体";
  $("agTag").textContent=AG.intro||("我只为《"+b.title+"》而生：陪你读懂它、用上它、拆开它、拿它去对撞，再把碰出来的新东西写成论文，甚至一部新专著。");
- ragInfo();
+ ragInfo();kpInfo();
  $("bt").textContent=b.title; $("bs").textContent=(b.subtitle?b.subtitle+" · ":"")+(b.authors||[]).join("、")+" 著 · 德麦国际专著第 "+b.number+" 号";
  if(b.coverUrl){$("cov").src=path(b.coverUrl);$("cov").hidden=false}
  $("detailA").href=path(b.detailUrl); $("readA").href=path(b.readUrl||b.textUrl||b.detailUrl);
@@ -173,6 +173,22 @@ function ragPick(q,a,k){
  var idx="【本书碰撞库总目（共 "+items.length+" 条）】"+items.map(function(it){return "《"+it.t.replace(/[｜|].*$/,"").slice(0,24)+"》"}).join("、");
  var text=pick.map(function(it){return "〔"+it.rel+"·"+(it.kind==="book"?"专著":"文章")+"〕《"+it.t+"》"+(it.sch?"「"+it.sch+"」":"")+"——撞本书「"+it.ch+"」；共有："+(it.kw||[]).join("、")+"\n"+it.x}).join("\n\n");
  return{text:(idx+"\n\n"+text).slice(0,15500),items:pick};
+}
+function kpText(){var it=(KP&&KP.items)||[];return it.map(function(x,i){return (i+1)+".【"+x.t+"】（"+x.ch+"）"+x.x}).join("\n").slice(0,8000)}
+function kpInfo(){
+ var it=(KP&&KP.items)||[],box=$("kpInfo");if(!box)return;
+ if(!it.length){box.hidden=true;return}
+ box.innerHTML="「"+esc(AG.name)+"」记着这本书的 <b>"+it.length+"</b> 条核心要点，每一问都带着它们答。<button type='button' id='kpBtn'>看要点 ›</button>";
+ $("kpBtn").onclick=kpList;
+}
+function kpList(){
+ var it=(KP&&KP.items)||[];
+ var o=document.createElement("div");o.className="ov";
+ o.innerHTML="<div class='box' role='dialog' aria-label='核心要点'><div class='hd'><b>《"+esc(BOOK.title)+"》的核心要点</b><button class='tbtn' data-x>×</button></div><div class='bd rgl'><p class='rgn'>「"+esc(AG.name)+"」对全书的常驻记忆：依据全书各章提炼，用书本身的说法，标出主要出自哪一章。</p>"
+  +it.map(function(x,i){return "<div class='rg'><div class='rgh'><i>"+(i+1)+"</i><b style='color:var(--fg)'>"+esc(x.t)+"</b><em>"+esc(x.ch)+"</em></div><div class='rgx'>"+esc(x.x)+"</div><button type='button' class='chip rgb' data-i='"+i+"'>就这一条问它</button></div>"}).join("")+"</div></div>";
+ document.body.appendChild(o);
+ o.querySelector("[data-x]").onclick=function(){o.remove()};
+ o.querySelectorAll(".rgb").forEach(function(b){b.onclick=function(){var x=it[+b.dataset.i];o.remove();$("q").value="讲讲这一条：「"+x.t+"」——它在书里是怎么论证的？它最经不起追问的地方在哪？";$("q").focus();grow()}});
 }
 function ragInfo(){
  var items=(RAG&&RAG.items)||[],box=$("ragInfo");
@@ -272,7 +288,7 @@ function send(){
  busy=true;paint();scroll();
  var ans="",srcs=[],notes=[];
  var rp=ragPick(q+" "+lastAns(),a,10);
- var body={q:q,bookagent:1,act:a,agentName:AG.name,agentEpithet:AG.epithet||"",bookRag:rp.text,bookMeta:meta(),docTitle:BOOK.title,docText:docText(),history:hist.slice(0,-1).map(function(m){return{role:m.role,text:m.text}}),key:kv.key,vendor:kv.vendor};
+ var body={q:q,bookagent:1,act:a,agentName:AG.name,agentEpithet:AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:BOOK.title,docText:docText(),history:hist.slice(0,-1).map(function(m){return{role:m.role,text:m.text}}),key:kv.key,vendor:kv.vendor};
  fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)}).then(function(r){
   return sse(r,function(j){
    if(j.t==="token"){ans+=j.v;tx.innerHTML=fmt(ans);scroll()}
@@ -314,7 +330,7 @@ function writeOut(form){
  var M=modal(form==="mono"?"正在写新专著的立项书与全书提纲……":"正在把这场对话写成论文……");
  M.pg.textContent="「"+AG.name+"」在用你的 Key 写，约需两三分钟，请别关掉这一页。";
  busy=true;paint();var out="";
- fetch(PAPER,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({mode:"full",bookagent:1,form:form,paperN:6,agentName:AG.name,bookRag:ragPick(hist.map(function(m){return m.text}).join(" ").slice(-6000),"clash",14).text,bookMeta:meta(),docTitle:BOOK.title,docText:docText(58000),history:convo(),key:kv.key,vendor:kv.vendor})})
+ fetch(PAPER,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({mode:"full",bookagent:1,form:form,paperN:6,agentName:AG.name,bookPoints:kpText(),bookRag:ragPick(hist.map(function(m){return m.text}).join(" ").slice(-6000),"clash",14).text,bookMeta:meta(),docTitle:BOOK.title,docText:docText(58000),history:convo(),key:kv.key,vendor:kv.vendor})})
  .then(function(r){
   if(r.headers.get("content-type")&&r.headers.get("content-type").indexOf("json")>=0)return r.json().then(function(j){throw new Error(j.msg||("HTTP "+r.status))});
   return sse(r,function(j){if(j.t==="token"){out+=j.v;M.bd.textContent=out;M.bd.scrollTop=M.bd.scrollHeight}else if(j.t==="think"&&!out){M.bd.textContent="「"+AG.name+"」在构思……"}else if(j.t==="error"){M.pg.textContent=j.v}});

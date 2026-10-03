@@ -18,7 +18,7 @@ from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, "public")
-V = "20261003c"
+V = "20261003d"
 BODY = io.open(os.path.join(ROOT, "tools", "book_agent_body.html"), encoding="utf-8").read()
 cat = json.load(io.open(os.path.join(PUB, "books", "catalog.json"), encoding="utf-8"))
 reg = json.load(io.open(os.path.join(PUB, "books", "agents.json"), encoding="utf-8"))["agents"]
