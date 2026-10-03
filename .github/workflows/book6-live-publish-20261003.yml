@@ -32,7 +32,7 @@ jobs:
                       and ('49篇' in index or '49 篇' in index)
                       and '本书全文尚未上线' not in index
                       and '49篇目录' in index
-                      and '49篇完整目录' in chapters
+                      and ('49篇目录' in chapters or '49 篇目录' in chapters)
                       and '意义驱动文明' in last)
                   print('attempt',attempt+1,'status',s0,s1,s2,'ok',ok,flush=True)
                   if ok:
