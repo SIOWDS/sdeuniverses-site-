@@ -1,0 +1,46 @@
+name: Publish and verify monograph 6 complete edition
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book6-live-publish-20261003.yml']
+permissions:
+  contents: read
+concurrency:
+  group: book6-live-publication
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Wait for Cloudflare Workers Git deployment and verify volume 6
+        run: |
+          python - <<'PY'
+          import urllib.request,time
+          base='https://sdeuniverses.com/books/m/6/'
+          def get(path):
+              url=base+path+('?' if '?' not in path else '&')+'book6_verify='+str(time.time_ns())
+              req=urllib.request.Request(url,headers={'User-Agent':'SDE-Book6-Live-Verification/1.0','Cache-Control':'no-cache','Pragma':'no-cache'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  return r.status,r.read().decode('utf-8','replace')
+          for attempt in range(50):
+              try:
+                  s0,index=get('')
+                  s1,chapters=get('chapters.html')
+                  s2,last=get('articles/49/')
+                  ok=(s0==200 and s1==200 and s2==200
+                      and ('49篇' in index or '49 篇' in index)
+                      and '本书全文尚未上线' not in index
+                      and '49篇目录' in index
+                      and '49篇完整目录' in chapters
+                      and '意义驱动文明' in last)
+                  print('attempt',attempt+1,'status',s0,s1,s2,'ok',ok,flush=True)
+                  if ok:
+                      print('BOOK6_LIVE_VERIFIED',flush=True)
+                      break
+              except Exception as e:
+                  print('deployment pending',attempt+1,repr(e),flush=True)
+              time.sleep(10)
+          else:
+              raise SystemExit('Book 6 complete edition was not observed on production within verification window')
+          PY
