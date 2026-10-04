@@ -1731,6 +1731,14 @@
       duPick: "第二家用谁？", duNoKey: "（还没填 Key）", duOff: "不并排",
       duCmp: "⇄ 让 WDS 对照这两份", duCmpQ: "下面是同一个问题交给两家基底得到的两份回答。请对照它们，只说四件事：①两边各自看见了对方没看见的什么；②它们在哪一点上正面矛盾（指到具体句子）；③哪一份更经得起反驳、为什么；④两份都漏掉的是什么。不要复述它们的内容。",
       duNeed: "并排需要两家都填了 Key（在设置里填）。",
+      cmpBtn: "⚖ 同题对照", cmpOn: "⚖ 同题对照：开",
+      cmpTip: "同一个问题、同一家基底，同时跑两路：左＝有 SDE（完整内功＋SDE 方法论），右＝无 SDE（传统方法论＋基底本功）；各约 2000 字，各出一份 Word",
+      cmpSde: "有 SDE", cmpSdeS: "完整内功＋SDE 方法论", cmpPlain: "无 SDE", cmpPlainS: "传统方法论＋基底本功",
+      cmpLen: "\n\n【篇幅】写成一篇完整的报告，约 2000 字（1800–2200 字），分节、有小标题、有结论。",
+      cmpCnt: "字", cmpHan: "汉字", cmpDocx: "⤓ Word", cmpBoth: "⤓ 两份 Word 一起存",
+      cmpWait: "Word 生成器还在加载，过两秒再点", cmpMeta: "同题对照", cmpQ: "题目", cmpBase: "基底", cmpDate: "生成时间",
+      cmpFair: "两路不带对话历史、不带记忆，题面与篇幅要求逐字相同；差别只在内核。",
+      cmpIq: "⚖ 给两份打创新智商", cmpIqQ: "下面是同一个问题、同一家基底、在两种内核下各写出的一份报告（A＝有 SDE，B＝无 SDE）。请按创新智商五维（S/D/E/I/F）分别给两份打分，各维附一句原文证据与一句扣分句，算出综合分，并说清差距主要出在哪几维、各自最该补哪一维。",
       triBtn: "⚔ 三家对撞", triOn: "⚔ 三家对撞：开",
       triMore: "↻ 继续对撞", triRd: "第 {n} 轮 · 座位左轮一格",
       triMoreT: "拿这一轮的结算当下一轮的靶子，三席各挪一位——出判断的改结算、攻的改出判断。撞不动了它会直说撞到底了。",
@@ -1924,6 +1932,14 @@
       duPick: "Which second model?", duNoKey: "(no key yet)", duOff: "Single model",
       duCmp: "⇄ Have SDE compare these", duCmpQ: "Below are two answers to the same question from two different models. Compare them and say only four things: (1) what each saw that the other missed; (2) where they flatly contradict each other (point to the sentences); (3) which holds up better under attack, and why; (4) what both missed. Do not restate their content.",
       duNeed: "Side-by-side needs a key for both models (add them in settings).",
+      cmpBtn: "⚖ SDE vs no-SDE", cmpOn: "⚖ SDE vs no-SDE: on",
+      cmpTip: "Same question, same model, two runs at once: left = with SDE (full kernel + SDE method), right = without SDE (conventional method + the model's own skill); ~2,000 characters each, one Word file each",
+      cmpSde: "With SDE", cmpSdeS: "full kernel + SDE method", cmpPlain: "Without SDE", cmpPlainS: "conventional method + own skill",
+      cmpLen: "\n\n[Length] Write one complete report of about 1,300 words (1,200–1,500), with sections, subheadings and a conclusion.",
+      cmpCnt: "chars", cmpHan: "CJK", cmpDocx: "⤓ Word", cmpBoth: "⤓ Save both Word files",
+      cmpWait: "The Word builder is still loading; try again in a moment", cmpMeta: "SDE vs no-SDE", cmpQ: "Question", cmpBase: "Model", cmpDate: "Generated",
+      cmpFair: "Neither run sees chat history or memory; question and length line are identical. Only the kernel differs.",
+      cmpIq: "⚖ Score both (Innovation IQ)", cmpIqQ: "Below are two reports on the same question from the same model under two kernels (A = with SDE, B = without SDE). Score each on the five Innovation IQ dimensions (S/D/E/I/F) with one quoted piece of evidence and one deduction per dimension, compute the composite, and say which dimensions account for the gap and what each should fix first.",
       triBtn: "\u2694 Three-way clash", triOn: "\u2694 Three-way clash: on",
       triMore: "\u21bb Collide again", triRd: "Round {n} · seats rotate one place",
       triMoreT: "Take this round's verdict as the next round's target and shift every seat by one. If it cannot be pushed further it will say so.",
@@ -2643,6 +2659,7 @@
           "<button class='wdsm-mode wdsm-dubtn'></button>" +
           "<button class='wdsm-mode wdsm-tribtn'></button>" +
           "<button class='wdsm-mode wdsm-mobbtn'></button>" +
+          "<button class='wdsm-mode wdsm-cmpbtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
@@ -3345,7 +3362,7 @@
     try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
     q(".wdsm-newbtn").textContent = t("bNew");
     try { q(".wdsm-topshow").title = t("topShowT"); } catch (e) {}
-    try { rsPaint(); lnkPaint(); fdPaint(); cvPaint(); compPaint(); duPaint(); pjPaint(); } catch (e) {}
+    try { rsPaint(); lnkPaint(); fdPaint(); cvPaint(); compPaint(); duPaint(); cmpPaint(); pjPaint(); } catch (e) {}
     q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
     var g = function (sel) { return q(sel) || {}; };   // 防空取：桩环境里某些节点不存在，别为文案崩掉整页
     g(".wdsm-nc").textContent = t("sbNew");
@@ -5508,6 +5525,13 @@
       if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       return;
     }
+    // 同题对照挂着时：一问走两路（有 SDE ／无 SDE），排在最前——与群碰、对撞、并排四者互斥
+    if (cmpOn && !PROFILE && !streaming) {
+      var kcp = wdsKeyGet(); if (!kcp) { wdsKeyPanel(function () { send(q); }); return; }
+      if (turns() >= MAX) { updTurns(); return; }
+      if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      if (sendCmp(q, addTurn(q))) return;
+    }
     // 群碰挂着时：一问走 N 席（排在最前——三者互斥，群碰最重）
     if (mobOn && !streaming) {
       var kmb = wdsKeyGet(); if (!kmb) { wdsKeyPanel(function () { send(q); }); return; }
@@ -5895,7 +5919,7 @@
         b.onclick = function () {
           closeMenu();
           if (!has) { wdsKeyPanel(function () {}); return; }      // 没 Key 就直接把设置面板端出来
-          duV = v.v; duPaint();
+          duV = v.v; duPaint(); cmpOn = false; cmpPaint();
         };
         menu.appendChild(b);
       });
@@ -5950,6 +5974,131 @@
             send(t("duCmpQ") + "\n\n" + both);
           };
           row.appendChild(cmp);
+          var c2 = el("button", "wdsm-act", tx("cvDrop"));
+          c2.onclick = function () { cvAdd("md", q.slice(0, 24), "# " + q + "\n\n" + both); };
+          row.appendChild(c2);
+          cell.turn.appendChild(row); cell.acts = row;
+        });
+    }
+    cols.forEach(one);
+    return true;
+  }
+
+  /* ══════════════ 同题对照（有 SDE ／ 无 SDE）══════════════
+     2026-10-04 王德生令：「同样的问题，一个是有 SDE（内功完全＋SDE 方法论），一个是无 SDE（传统方法论＋
+     自己的基本功），输出是两个 Word，都是 2000 字。」
+       左：有 SDE ＝ 深度档钉第 5 档（完整内功先验＋SDE 方法论完整工序＋站内语料）；
+       右：无 SDE ＝ nosde 整段改道（不装人格／内功／心得／方法论／站内语料）＋服务端 CMP_TRAD_BLOCK 传统方法论。
+     三条公平纪律（前两轮人工对照吃过的亏）：
+       ① **两路都不带对话历史、不带读者记忆、不带「关于我」。** 第一轮恩格斯题，有 SDE 那份是同场接着写的，
+          看见了无 SDE 那份（"我上一场……三条都对，但都是症状"），连比喻和证伪条件都搬了过去——那不是对照，是接力。
+       ② **同一家、同一型号、同一档功率**（两路都 mode=deep、grade=5）——差别只许出在内核上，不许出在基底上。
+       ③ **题面与篇幅要求两边逐字相同**（cmpLen 拼在题面后）；方法论的差别只放在服务端两份 system 里。 */
+  var cmpOn = false;
+  var cmpBtn = layer.querySelector(".wdsm-cmpbtn");
+  function cmpPaint() {
+    if (!cmpBtn) return;
+    /* 只在 ChatSDE 本体出现（同「无 SDE」开关）：分身页不认 nosde，右路会悄悄变回 SDE，对照就成了自己比自己。 */
+    cmpBtn.style.display = PROFILE ? "none" : "";
+    if (PROFILE) cmpOn = false;
+    cmpBtn.textContent = cmpOn ? t("cmpOn") : t("cmpBtn");
+    cmpBtn.title = t("cmpTip");
+    if (cmpOn) cmpBtn.classList.add("on"); else cmpBtn.classList.remove("on");
+    try { toolsPaint(); } catch (e) {}
+  }
+  cmpPaint();                        // 🔴 初始就要有字——不画一次就是一颗零宽空框（群碰 09-09 当场翻车的老漏法）
+  if (cmpBtn) cmpBtn.onclick = function () {
+    if (streaming) return;
+    cmpOn = !cmpOn;
+    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); }   // 四者互斥
+    cmpPaint();
+    toast(cmpOn ? t("cmpTip") : t("cmpBtn"));
+  };
+  // 字数：去掉 Markdown 符号与空白后数——「2000 字」按中文出版口径（含标点），另报纯汉字数
+  function cmpCount(s) {
+    var x = String(s || "").replace(/[#*>`|]/g, "").replace(/\s+/g, "");
+    return { all: x.length, han: (x.match(/[一-鿿]/g) || []).length };
+  }
+  function cmpDocx(side, q, text, vname, say) {
+    if (!window.SDEDocx) { say(t("cmpWait")); return false; }
+    var lab = side === "sde" ? t("cmpSde") : t("cmpPlain");
+    var sub = side === "sde" ? t("cmpSdeS") : t("cmpPlainS");
+    var c = cmpCount(text);
+    var title = t("cmpMeta") + " · " + lab + "：" + String(q).replace(/\s+/g, " ").slice(0, 60);
+    var meta = t("cmpQ") + "：" + String(q).replace(/\s+/g, " ") + "\n\n"
+      + lab + "（" + sub + "）　" + t("cmpBase") + "：" + vname + "　" + c.all + " " + t("cmpCnt") + "（" + t("cmpHan") + " " + c.han + "）　"
+      + t("cmpDate") + "：" + new Date().toLocaleString() + "\n\n" + t("cmpFair");
+    var md = "# " + title + "\n\n" + meta + "\n\n" + String(text || "");
+    var blob = window.SDEDocx.build({ title: title, author: BRAND, md: md });
+    saveBlobToDir(fileTag("WDS") + "-" + safeName(q) + "-" + lab + "-" + stampName() + ".docx", blob,
+      function (m) { if (m) say(m); });
+    return true;
+  }
+  function sendCmp(q, cell) {
+    var mine = wdsKeyGet();
+    if (!mine) return false;
+    history.push({ role: "reader", text: q }); updTurns();
+    streaming = true; stoppedByUser = false; RS.stop = false;
+    busyUI(true); stopBarShow(true);
+    var qq = q + t("cmpLen");                                   // 两路逐字相同
+    var vname = vinfo(mine.vendor).name + (mine.model ? (" · " + mine.model) : "");
+    var wrap = el("div", "wdsm-du");
+    var cols = ["sde", "plain"].map(function (side) {
+      var c = el("div", "wdsm-duc");
+      var hd = el("div", "wdsm-duh");
+      hd.appendChild(el("b", null, side === "sde" ? t("cmpSde") : t("cmpPlain")));
+      hd.appendChild(el("i", null, (side === "sde" ? t("cmpSdeS") : t("cmpPlainS")) + " · " + vname));
+      var nt = el("div", "wdsm-duh");
+      nt.style.cssText = "border:0;margin:0 0 6px;padding:0;color:var(--wdim);font-size:11px;display:block";
+      var bd = el("div", "wdsm-a");
+      bd.innerHTML = "<span class='cur'>▊</span>";
+      c.appendChild(hd); c.appendChild(nt); c.appendChild(bd); wrap.appendChild(c);
+      return { side: side, bd: bd, nt: nt, hd: hd, text: "", ok: false };
+    });
+    cell.a.innerHTML = ""; cell.a.appendChild(wrap);
+    var done = 0;
+    function one(col) {
+      var pl = {
+        q: qq, history: [], key: mine.key, vendor: mine.vendor, model: mine.model || "",
+        mode: "deep", grade: 5, web: webOn ? 1 : 0, skey: wdsSearchKey(), lang: LANG, tool: "", cmp: col.side,
+      };
+      if (col.side === "plain") pl.nosde = 1;
+      return rsStream(API, pl,
+        function (txt) { col.text = txt; col.bd.innerHTML = mdRender(txt) + "<span class='cur'>▊</span>"; },
+        function (v) { if (typeof v === "string" && v) col.nt.textContent = (col.nt.textContent ? col.nt.textContent + "　" : "") + v; })
+        .then(function (txt) { col.text = txt || ""; col.ok = !!col.text; col.bd.innerHTML = mdRender(col.text); })
+        .catch(function (e) { col.bd.className = "wdsm-a plain wdsm-err"; col.bd.textContent = (e && e.message) || "?"; })
+        .then(function () {
+          if (col.ok) { var n = cmpCount(col.text); col.hd.appendChild(el("i", null, n.all + " " + t("cmpCnt") + " · " + t("cmpHan") + " " + n.han)); }
+          done++;
+          if (done < 2) return;
+          streaming = false; curReader = null;
+          busyUI(false); stopBarShow(false);
+          var A = cols[0], B = cols[1];
+          var both = "【A · " + t("cmpSde") + "】\n" + A.text + "\n\n【B · " + t("cmpPlain") + "】\n" + B.text;
+          history.push({ role: "wds", text: both }); stSave(history); updTurns(); compTick();
+          var row = el("div", "wdsm-acts");
+          cols.forEach(function (c) {
+            if (!c.ok) return;
+            var b = el("button", "wdsm-act", t("cmpDocx") + " · " + (c.side === "sde" ? t("cmpSde") : t("cmpPlain")));
+            b.onclick = function () { cmpDocx(c.side, q, c.text, vname, toast); };
+            row.appendChild(b);
+          });
+          if (A.ok && B.ok) {
+            var b2 = el("button", "wdsm-act", t("cmpBoth"));
+            b2.onclick = function () {
+              if (!cmpDocx("sde", q, A.text, vname, toast)) return;
+              setTimeout(function () { cmpDocx("plain", q, B.text, vname, toast); }, 700);   // 连下两个文件，浏览器会拦第二个——错开一点
+            };
+            row.appendChild(b2);
+            var iq = el("button", "wdsm-act", t("cmpIq"));
+            iq.onclick = function () {
+              if (streaming) return;
+              cmpOn = false; cmpPaint();                        // 评分本身是一次普通问答，不再双跑
+              send(t("cmpIqQ") + "\n\n" + both);
+            };
+            row.appendChild(iq);
+          }
           var c2 = el("button", "wdsm-act", tx("cvDrop"));
           c2.onclick = function () { cvAdd("md", q.slice(0, 24), "# " + q + "\n\n" + both); };
           row.appendChild(c2);
@@ -6068,7 +6217,7 @@
     var go = el("button", null, mobOn ? t("mobStop") : t("mobGo"));
     go.onclick = function () {
       closeMenu(); mobOn = !mobOn;
-      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); }   // 三者互斥
+      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); }   // 四者互斥
       mobPaint();
     };
     menu.appendChild(go);
@@ -6329,7 +6478,7 @@
     go.onclick = function () {
       closeMenu();
       triOn = !triOn;
-      if (triOn) { duV = ""; duPaint(); }      // 并排与对撞是两种模式，不并存
+      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); }      // 并排与对撞是两种模式，不并存
       triPaint();
     };
     menu.appendChild(go);

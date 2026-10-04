@@ -189,7 +189,8 @@ ok("关思考只对关得掉的家（gPlain 带 wdsCanPlain）", /const gPlain =
 ok("标准档（knobs 的 default 一格）也关思考——它自称「快答档，够用且省」，没有理由替思考付账",
    /default: return \{ lv: 0, name: "标准", top: 0, plain: 1,/.test(SRC));
 ok("老深度档（无难度条时的 knobs(4)）不受影响，思考照开", /case 4: return \{ lv: 4[^}]*plain: 0/.test(SRC));
-const i5 = CHAT.indexOf("if (G.on && gK.ng && !prof && !(rs && rs.sde)) {");
+// 2026-10-04 起判据多一个 !noSde（无 SDE 档不装内功，见 sim_chatsde_compare.js）
+const i5 = CHAT.indexOf("if (G.on && gK.ng && !prof && !noSde && !(rs && rs.sde)) {");
 ok("第 5 档装完整内功：只在普通问答上、走 resPriorFit 预算闸、装不下退精简并说明", i5 > 0
   && CHAT.slice(i5, i5 + 2600).indexOf("resPriorFit(_ng5.length, 0, ctxText.length, webCtx.length, docCtx.length,") > 0
   && CHAT.slice(i5, i5 + 2600).indexOf("neigongLite(_ng5)") > 0

@@ -10086,6 +10086,28 @@ function wdsResearchSys(rs) {
 // 这一档换的是**内核本身**——不装人格、不装骨架 SDEM、不装内化心得、不挂站内 SDE 语料、不挂任何 SDE 工序。
 // 调用方（/api/wds/chat）已把 tool/duel/rs/prof 在这一档下强制清空、siteCtx 强制不检索——
 // 这里只接 webCtx/docCtx/about/lang 四样与 SDE 无关的通用能力，一个字都不多接。
+/* 【同题对照的「无 SDE」一路 · 传统方法论（2026-10-04 王德生令）】
+   有 SDE＝完整内功＋SDE 方法论；无 SDE＝传统方法论＋基底自己的基本功。这一块就是「传统方法论」——
+   学院里写一篇论证性报告的通行做法，零 SDE 术语。⚠ 公平：它和 SDE 方法论一样要求「说清自己在什么情况下会错」，
+   因为这条本来就是传统学术的要求（波普尔、同行评议），不给它，对照就成了拿一只手绑着的去比。 */
+const CMP_TRAD_BLOCK = "\n\n【这一路的方法论：传统学术方法（写一篇论证性报告的通行做法）】"
+  + "\n1. 先亮论题：开头一句给出你的中心判断，不铺背景。"
+  + "\n2. 界定概念：关键术语按通行学术用法界定；有争议的，说明你取哪一种用法。"
+  + "\n3. 梳理已有观点：交代这个问题上主要的学派或代表性看法，说清你站在哪里、与谁不同。"
+  + "\n4. 论证：分节推进，每节一个分论点；区分事实、推断与价值判断，推断要交代根据。"
+  + "\n5. 证据与反例：给出支持的证据，也主动处理最强的反例与反驳，并作回应。"
+  + "\n6. 局限与可证伪：说清这个判断在什么条件下会错、哪条证据出现就该放弃它，以及论证中最薄弱的一环。"
+  + "\n7. 结论：收束成一两句可以带走的判断。"
+  + "\n8. 史实、人名、年份、引文只写你有把握的；没把握就不写或明说不确定，绝不编造。";
+const CMP_TRAD_BLOCK_EN = "\n\n[Method for this answer: conventional academic method (how a standard argumentative report is written)]"
+  + "\n1. State the thesis in the first sentence; no background preamble."
+  + "\n2. Define key terms by standard scholarly usage; where contested, say which usage you take."
+  + "\n3. Survey the main existing positions and say where you stand and whom you disagree with."
+  + "\n4. Argue in sections, one sub-claim each; separate facts, inferences and value judgments."
+  + "\n5. Give supporting evidence, and take on the strongest counterexamples and objections."
+  + "\n6. Limits and falsifiability: say under what conditions the thesis fails, which evidence would make you drop it, and the weakest link."
+  + "\n7. Conclude in one or two sentences the reader can carry away."
+  + "\n8. Only state facts, names, dates and quotations you are sure of; otherwise omit or flag uncertainty. Never fabricate.";
 function WDS_PLAIN_SYS(webCtx, docCtx, about, lang, docNote) {
   return "你是一个称职、直接的通用助手，这一路是 SDE Universes 网站「ChatSDE」里的「无 SDE」问对入口。"
     + "\n\n【怎么答】"
@@ -14041,7 +14063,10 @@ export default {
                材料厚」，正是该拿完整先验去答的那一类题。预算闸与研究产线同一套（resPriorFit）：
                内功是固定成本，站内／站外／附件超出时按次序裁到地板并当场说明；装不下完整版就退精简版并说明。
                只在普通问答上做：研究产线自己装（上面那段）；领域档案有自己的底盘，不叠。 */
-            if (G.on && gK.ng && !prof && !(rs && rs.sde)) {
+            /* ⚠ 2026-10-04 补 `!noSde`：无 SDE 档钉第 5 档时，这里原来照样装内功——system 走 WDS_PLAIN_SYS 整段改道，
+               内功其实没进去，却①白白为它裁掉站外资料与附件、②在屏幕上报一条「已装完整内功先验」。
+               王德生拿「有 SDE ／无 SDE」做对照时，无 SDE 那份底下就挂着这条——读者会以为对照不干净。 */
+            if (G.on && gK.ng && !prof && !noSde && !(rs && rs.sde)) {
               let _ng5 = "";
               try { _ng5 = await loadNeigong(env, url, "/taste/assets/sde-neigong.txt"); } catch (e) {}
               if (_ng5) {
@@ -14094,7 +14119,12 @@ export default {
               extras += (prof && prof.term) ? COACH_BLOCK_PLAIN : SDE_COACH_BLOCK;
               controller.enqueue(_sseBytes({ t: "note", v: (lang === "en") ? "Coach mode: this round you think first; I will push back." : "陪练档：这一轮请你先说，我来碰。" }));
             }
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history), razTake(b, tool));
+            /* 【同题对照 · 2026-10-04】前端 cmp="plain" 且已走无 SDE 改道 ⇒ 在通用助手的 system 尾巴上补一份传统学术方法论。
+               只在这里补、只补这一路：方法论的差别只许出在两份 system 里，题面两边逐字相同（篇幅要求由前端拼在题面后）。 */
+            const cmpPlain = noSde && b.cmp === "plain";
+            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history), razTake(b, tool))
+              + (cmpPlain ? (lang === "en" ? CMP_TRAD_BLOCK_EN : CMP_TRAD_BLOCK) : "");
+            if (cmpPlain) controller.enqueue(_sseBytes({ t: "note", v: (lang === "en") ? "Comparison · no-SDE side: no SDE kernel, method or site corpus; conventional academic method only." : "同题对照 · 无 SDE 一路：不装内功、不装 SDE 方法论、不挂站内语料；只用传统学术方法论＋基底本功。" }));
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。
