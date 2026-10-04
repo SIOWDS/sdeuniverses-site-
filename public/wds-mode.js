@@ -1757,6 +1757,18 @@
       qacJargon: "【上一稿搬用了前文自造的说法：{w}。重出一问，把这些说法的意思用通行学术语言重说，让没读过前文的同行也看得懂。】\n\n",
       qacFlagDrift: "首稿跑题", qacFlagJargon: "首稿搬用前文自造词", qacFlagRetry: "已重出", qacFlagStill: "⚠ 重出后仍未合格：",
       qacPlainP: "\n\n【用词】论文里自造的概念或比喻，第一次出现时用一句通行学术语言下定义，此后用法保持一致；不要把问对里的口头比喻原样搬进论文。", qacPA: "论文 A · 有 SDE", qacPB: "论文 B · 无 SDE",
+      labBtn: "🧪 SDE 科研创新法", labOn: "🧪 SDE 科研创新法：开",
+      labTip: "输入一个问题：①无 SDE 经典科研（五轮问对＋万字论文，作底座）②独立评分员给底座打创新智商、出提升方向 ③按方向做 SDE 思想创新，五轮问对逐步细化 ④打磨成终稿，再评一次分、出逐维差值。全程一份 Word。约 30–40 分钟",
+      labS1: "第一步 · 立底（无 SDE 经典科研：五轮问对＋万字论文）", labS2: "第二步 · 称重（独立评分员：创新智商与提升方向）",
+      labS3: "第三步 · 发生（SDE 思想创新：五轮问对，评分卡驱动）", labS4: "第四步 · 打磨（终稿论文、事实核查、再评分、逐维差值）",
+      labScoring: "评分中…", labNoParse: "评分卡里读不出五维分数（原文照录，差值表从缺）", labDelta: "逐维差值（底座 → 终稿）",
+      labComp: "综合分", labWait: "等待上一步", labRefine: "🧪 按新评分卡再细化一轮", labWord: "⤓ 全过程 Word", labWordF: "⤓ 终稿 Word",
+      labDigest: "【底座论文要点】\n", labCard: "\n\n【评分卡要点】\n", labAsk: "\n\n【本轮要求】作答时写明这一答超出了底座论文的哪一句（引原句）；新命题一律写成「X 不是 Y，而是 Z」的形状。\n\n【本轮问题】",
+      labGenM: "\n\n【评分卡】\n", labGenL: "\n\n【已有 SDE 问对】\n",
+      labP1T: "【写作任务 · 终稿前半】以「{q}」为题写终稿论文，约 10000 字，分两次写完，这一次写前半（约 5000 字）：题目、摘要（300 字以内）、关键词、引言与正文前一半。要求：①中心论点是下面 SDE 问对里立起的新命题（X 不是 Y，而是 Z），不是底座论文的论点；②底座论文中核实过的史实、文献与论证可以继承，但要指名回应底座的主要观点、说清超出在哪里；③针对评分卡的扣分句逐条补强。写到前半结束处停下，最后单独一行写「【后半要写】」，接着列出后半各节标题。",
+      labP2X: "\n\n【后半必须包含】新命题的证伪条件与最脆一环；与底座论文的逐点对照（哪一点继承、哪一点超出、哪一点推翻）。",
+      labDocT: "SDE 科研创新法 · 全过程", labFair: "流程：①无 SDE 经典科研作底座 ②独立评分员称重 ③SDE 思想创新（评分卡驱动的五轮问对）④打磨成终稿并再评分。两次评分用同一个评分通道（不装 SDE 内核），差值由页面按权重 S0.20/D0.25/E0.20/I0.20/F0.15 计算。注意：评分员与写作者是同一家基底，分数宜视为待独立复核。",
+      labBase: "底座论文（无 SDE）", labCard1: "第一张评分卡（底座）", labDlg: "SDE 五轮问对", labFinal: "终稿论文（SDE 科研创新法）", labCard2: "第二张评分卡（终稿）", labRound: "细化第 {n} 轮",
       cmpIq: "⚖ 给两份打创新智商", cmpIqQ: "下面是同一个问题、同一家基底、在两种内核下各写出的一份报告（A＝有 SDE，B＝无 SDE）。请按创新智商五维（S/D/E/I/F）分别给两份打分，各维附一句原文证据与一句扣分句，算出综合分，并说清差距主要出在哪几维、各自最该补哪一维。",
       triBtn: "⚔ 三家对撞", triOn: "⚔ 三家对撞：开",
       triMore: "↻ 继续对撞", triRd: "第 {n} 轮 · 座位左轮一格",
@@ -1977,6 +1989,8 @@
       qacJargon: "[Your last draft reused coined phrases from earlier answers: {w}. Write a new one that restates them in ordinary scholarly language, so a peer who has not read the dialogue can follow.]\n\n",
       qacFlagDrift: "first draft drifted", qacFlagJargon: "first draft reused coined phrases", qacFlagRetry: "regenerated", qacFlagStill: "⚠ still failing after regeneration: ",
       qacPlainP: "\n\n[Wording] Define any concept or metaphor you coin in one sentence of ordinary scholarly language at first use, then keep the usage consistent; do not carry the dialogue\u2019s spoken metaphors into the paper as they are.", qacPA: "Paper A · with SDE", qacPB: "Paper B · without SDE",
+      labBtn: "🧪 SDE research method", labOn: "🧪 SDE research method: on",
+      labTip: "Enter a question: (1) conventional research without SDE (5-round dialogue + ~10k-character paper, the baseline) (2) an independent scorer rates it on Innovation IQ and names directions (3) SDE innovation along those directions in five refining rounds (4) polished final paper, re-scored, with per-dimension deltas. One Word file. Prompts run in Chinese. About 30–40 minutes",
       cmpIq: "⚖ Score both (Innovation IQ)", cmpIqQ: "Below are two reports on the same question from the same model under two kernels (A = with SDE, B = without SDE). Score each on the five Innovation IQ dimensions (S/D/E/I/F) with one quoted piece of evidence and one deduction per dimension, compute the composite, and say which dimensions account for the gap and what each should fix first.",
       triBtn: "\u2694 Three-way clash", triOn: "\u2694 Three-way clash: on",
       triMore: "\u21bb Collide again", triRd: "Round {n} · seats rotate one place",
@@ -2699,6 +2713,7 @@
           "<button class='wdsm-mode wdsm-mobbtn'></button>" +
           "<button class='wdsm-mode wdsm-cmpbtn'></button>" +
           "<button class='wdsm-mode wdsm-qacbtn'></button>" +
+          "<button class='wdsm-mode wdsm-labbtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
@@ -3401,7 +3416,7 @@
     try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
     q(".wdsm-newbtn").textContent = t("bNew");
     try { q(".wdsm-topshow").title = t("topShowT"); } catch (e) {}
-    try { rsPaint(); lnkPaint(); fdPaint(); cvPaint(); compPaint(); duPaint(); cmpPaint(); qacPaint(); pjPaint(); } catch (e) {}
+    try { rsPaint(); lnkPaint(); fdPaint(); cvPaint(); compPaint(); duPaint(); cmpPaint(); qacPaint(); labPaint(); pjPaint(); } catch (e) {}
     q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
     var g = function (sel) { return q(sel) || {}; };   // 防空取：桩环境里某些节点不存在，别为文案崩掉整页
     g(".wdsm-nc").textContent = t("sbNew");
@@ -5564,6 +5579,13 @@
       if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       return;
     }
+    // SDE 科研创新法挂着时：一问＝立底→称重→发生→打磨四步（排在最前，六种多路模式互斥）
+    if (labOn && !PROFILE && !streaming) {
+      var klb = wdsKeyGet(); if (!klb) { wdsKeyPanel(function () { send(q); }); return; }
+      if (turns() >= MAX) { updTurns(); return; }
+      if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      if (sendLab(q, addTurn(q))) return;
+    }
     // 五轮问对对照挂着时：一问＝两路各五轮自动问对＋各一篇万字论文（排在最前，五种多路模式互斥）
     if (qacOn && !PROFILE && !streaming) {
       var kqa = wdsKeyGet(); if (!kqa) { wdsKeyPanel(function () { send(q); }); return; }
@@ -5965,7 +5987,7 @@
         b.onclick = function () {
           closeMenu();
           if (!has) { wdsKeyPanel(function () {}); return; }      // 没 Key 就直接把设置面板端出来
-          duV = v.v; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint();
+          duV = v.v; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint();
         };
         menu.appendChild(b);
       });
@@ -6056,7 +6078,7 @@
   if (cmpBtn) cmpBtn.onclick = function () {
     if (streaming) return;
     cmpOn = !cmpOn;
-    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); qacOn = false; qacPaint(); }   // 五者互斥
+    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); }   // 六者互斥
     cmpPaint();
     toast(cmpOn ? t("cmpTip") : t("cmpBtn"));
   };
@@ -6240,7 +6262,7 @@
   if (qacBtn) qacBtn.onclick = function () {
     if (streaming) return;
     qacOn = !qacOn;
-    if (qacOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); }   // 五者互斥
+    if (qacOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); labOn = false; labPaint(); }   // 六者互斥
     qacPaint();
     toast(qacOn ? t("qacTip") : t("qacBtn"));
   };
@@ -6467,6 +6489,280 @@
     return true;
   }
 
+  /* ══════════════ SDE 科研创新法（四步）══════════════
+     2026-10-04 王德生令「一套 SDE 科研创新法诞生了：1. 开始用无 SDE 进行经典科研，5 次问对和形成论文；
+     2. 然后对此进行创新智商评分和提升方向；3. 根据方向进行 SDE 思想创新和 5 次问对不停地细化创新；4. 打磨成文。」
+     为什么是接力不是比赛：四轮对照的读数——无 SDE 一路稳定赢 S／F（史实、文献、证伪条件），SDE 一路稳定赢 D／I
+     （多切出一个新区分），正面比赛两边长短互相抵消。接力让底座先把「学界已有的说法」系统摆出来——
+     它就是 I 维要找的敌意最近邻：第③步立的新命题 Z 若能被底座里的某一句一比一还原，当场就露馅。
+     五条纪律：①评分员走 iq 通道（不装内功、不装心得）；②底座冻结，终稿逐维对它算差值（页面按权重算，不手写）；
+     ③第③步出题由评分卡驱动（WDS_QGEN_LAB_SYS）：第 1 问打最弱一维立 Z，之后每问要么磨 Z、要么拿 Z 撞底座；
+     ④打磨时继承底座核实过的史实与文献，终稿过同一道事实核查；⑤终稿再评一次，分数照实报，不到底座也照实写。
+     ⚠ 评分员与写作者是同一家基底（读者只有这一把 Key）——报告里明写「待独立复核」。 */
+  var labOn = false;
+  var labBtn = layer.querySelector(".wdsm-labbtn");
+  function labPaint() {
+    if (!labBtn) return;
+    labBtn.style.display = PROFILE ? "none" : "";
+    if (PROFILE) labOn = false;
+    labBtn.textContent = labOn ? t("labOn") : t("labBtn");
+    labBtn.title = t("labTip");
+    if (labOn) labBtn.classList.add("on"); else labBtn.classList.remove("on");
+    try { toolsPaint(); } catch (e) {}
+  }
+  labPaint();                        // 🔴 初始就要有字——零宽空框老漏法
+  if (labBtn) labBtn.onclick = function () {
+    if (streaming) return;
+    labOn = !labOn;
+    if (labOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); }   // 六者互斥
+    labPaint();
+    toast(labOn ? t("labTip") : t("labBtn"));
+  };
+  var LAB_W = { S: 0.20, D: 0.25, E: 0.20, I: 0.20, F: 0.15 };
+  // 评分卡 → 五维分。评分员按「维度 分数 — …」逐行写（WDS_IQ_SYS 输出①），但写法会漂：加粗、带权重括号、冒号。
+  // 判据：行首是维度字母，取这一行里第一个 60–200 之间、前后不挨小数点的整数（避开「权重 0.20」）。
+  function labParseIQ(text) {
+    var out = {}, lines = String(text || "").split("\n");
+    lines.forEach(function (ln) {
+      var m = /^\s*[#>*·\-|\s]*\**\s*([SDEIF])(?=[\s*：:（(｜|·结差纠不可跨])/.exec(ln);
+      if (!m || out[m[1]] != null) return;
+      var re = /(?:^|[^\d.])(\d{2,3})(?![\d.])/g, n;
+      while ((n = re.exec(ln.slice(m.index + m[0].length)))) {
+        var v = parseInt(n[1], 10);
+        if (v >= 60 && v <= 200) { out[m[1]] = v; break; }
+      }
+    });
+    var ok = ["S", "D", "E", "I", "F"].every(function (k) { return out[k] != null; });
+    if (!ok) return null;
+    out.comp = Math.round((out.S * LAB_W.S + out.D * LAB_W.D + out.E * LAB_W.E + out.I * LAB_W.I + out.F * LAB_W.F) * 100) / 100;
+    return out;
+  }
+  function labDeltaMd(a, b) {
+    if (!a || !b) return t("labNoParse");
+    var f = function (x) { return (x > 0 ? "+" : "") + (Math.round(x * 100) / 100); };
+    return ["S", "D", "E", "I", "F"].map(function (k) { return "- " + k + "：" + a[k] + " → " + b[k] + "（" + f(b[k] - a[k]) + "）"; }).join("\n")
+      + "\n- " + t("labComp") + "：" + a.comp + " → " + b.comp + "（" + f(b.comp - a.comp) + "）";
+  }
+  function labDigest(paper) {
+    var s = String(paper || "");
+    return s.length <= 3200 ? s : (s.slice(0, 2000) + "\n……\n" + s.slice(-1200));
+  }
+  function labScore(paper, mine) {
+    var pl = { q: "【来稿】\n\n" + String(paper || "").slice(0, 18000), history: [], key: mine.key, vendor: mine.vendor, model: mine.model || "",
+               mode: "deep", grade: 4, web: 1, skey: wdsSearchKey(), lang: LANG, tool: "iq" };
+    return qacCall(pl).then(function (r) { return { text: r.text, s: labParseIQ(r.text) }; });
+  }
+  // 第③步出题：材料＝总题＋底座要点＋评分卡＋已有 SDE 问对；锚题与术语自足两道检查照用，不合格重出一次
+  function labGenQ(k, q, base, card, turns, mine, onRetry) {
+    function once(prefix) {
+      var mat = (prefix || "") + t("qacMat") + q + "\n\n" + t("labDigest") + labDigest(base) + t("labGenM") + String(card || "").slice(0, 2500)
+        + t("labGenL") + turns.map(function (x, i) { return qacFmt(t("qacQn"), { i: i + 1 }) + x.q + "\n" + qacFmt(t("qacAn"), { i: i + 1 }) + String(x.a).slice(0, 1500); }).join("\n\n");
+      var pl = { q: mat.slice(0, 19500), history: [], key: mine.key, vendor: mine.vendor, model: mine.model || "",
+                 mode: "deep", grade: 3, web: 0, lang: LANG, tool: "", nosde: 1, qgen: "lab", qr: k };
+      return qacCall(pl).then(function (r) {
+        var meta = {}, nq = qacCleanQ(r.text, meta);
+        if (nq.length < 6) throw new Error("question generator returned nothing usable");
+        return { q: nq, tool: meta.tool || "" };
+      });
+    }
+    function check(g) {
+      var bad = [], jw = qacJargonOf(g.q, q, turns);
+      if (!qacAnchored(g.q, q)) bad.push("drift");
+      if (jw.length) bad.push("jargon");
+      return { bad: bad, jw: jw };
+    }
+    return once("").then(function (g) {
+      var c = check(g);
+      if (!c.bad.length) return g;
+      if (onRetry) onRetry();
+      var hint = (c.bad.indexOf("drift") >= 0 ? qacFmt(t("qacDrift"), { x: g.q }) : "")
+        + (c.jw.length ? qacFmt(t("qacJargon"), { w: c.jw.map(function (w) { return "「" + w + "」"; }).join("、") }) : "");
+      return once(hint).then(function (g2) { var c2 = check(g2); g2.retried = true; g2.first = c.bad; g2.still = c2.bad; return g2; });
+    });
+  }
+  function labSec(wrap, title) {
+    var sec = el("div", "wdsm-labsec");
+    sec.style.cssText = "border-top:1px solid var(--wline);padding-top:8px;margin-top:10px";
+    var hd = el("div", "wdsm-duh"); hd.appendChild(el("b", null, title));
+    var nt = el("div", "wdsm-duh"); nt.style.cssText = "border:0;margin:0 0 6px;padding:0;color:var(--wdim);font-size:11px;display:block";
+    nt.textContent = t("labWait");
+    var log = el("div", "wdsm-qaclog"); log.style.cssText = "font-size:12.5px;margin-bottom:8px";
+    var bd = el("div", "wdsm-a");
+    sec.appendChild(hd); sec.appendChild(nt); sec.appendChild(log); sec.appendChild(bd); wrap.appendChild(sec);
+    return { hd: hd, nt: nt, log: log, bd: bd };
+  }
+  function labRoundBox(sec, k, qk, tool) {
+    var box = el("details", null);
+    box.appendChild(el("summary", null, qacFmt(t("qacRnd"), { k: k }) + " · " + (tool ? ("〔" + tool + "〕") : "") + t("qacQ") + "：" + qk));
+    var ab = el("div", "wdsm-a"); ab.innerHTML = "<span class='cur'>▊</span>";
+    box.appendChild(ab); sec.log.appendChild(box);
+    return ab;
+  }
+  // 第①步：无 SDE 经典科研（与五轮问对对照的右路同一套：经典发生器＋传统方法论＋同一份成文指令）
+  function labStage1(q, mine, sec) {
+    var turns = [], k = 1, qk = q;
+    function round() {
+      sec.nt.textContent = qacFmt(t("qacRnd"), { k: k }) + t("qacAns");
+      var ab = labRoundBox(sec, k, qk, "");
+      var pl = qacBase("cls", mine); pl.q = t("qacLenR") + qk; pl.history = qacHist(turns);
+      return qacCall(pl, function (x) { ab.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; }).then(function (r) {
+        ab.innerHTML = mdRender(r.text); turns.push({ q: qk, a: r.text });
+        if (k >= 5) return;
+        sec.nt.textContent = qacFmt(t("qacRnd"), { k: k }) + t("qacGen");
+        return qacGenQ("cls", k + 1, q, turns, mine).then(function (g) { k++; qk = g.q; return round(); });
+      });
+    }
+    return round().then(function () {
+      sec.nt.textContent = t("qacP1");
+      var p1q = t("qacLenP") + qacFmt(t("qacP1T"), { q: q }) + t("qacPlainP") + "\n\n" + qacLog(q, turns, 2400).slice(0, 15500);
+      return qacWrite("cls", mine, p1q, function (x) { sec.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; });
+    }).then(function (p1) {
+      var head = qacStripTail(p1);
+      sec.nt.textContent = t("qacP2");
+      var brief = turns.map(function (x, i) { return qacFmt(t("qacQn"), { i: i + 1 }) + x.q + "\n" + String(x.a).slice(0, 500); }).join("\n\n");
+      var p2q = (t("qacLenP") + t("qacPlainP").trim() + "\n\n" + qacFmt(t("qacP2T"), { q: q }) + p1.slice(0, 12000) + t("qacP2M") + brief).slice(0, 19500);
+      return qacWrite("cls", mine, p2q, function (x) { sec.bd.innerHTML = mdRender(head + "\n\n" + x) + "<span class='cur'>▊</span>"; })
+        .then(function (p2) { var paper = head + "\n\n" + p2.trim(); sec.bd.innerHTML = mdRender(paper); sec.nt.textContent = ""; return { turns: turns, paper: paper }; });
+    });
+  }
+  // 第③④步：站在 base（论文）与 card（评分卡）上做 SDE 创新，五轮问对，再写终稿
+  function labStage34(q, mine, base, card, sec3, sec4) {
+    var turns = [], k = 1, qk = "", qtool = "";
+    function ask() {
+      sec3.nt.textContent = qacFmt(t("qacRnd"), { k: k }) + t("qacGen");
+      return labGenQ(k, q, base, card, turns, mine, function () { sec3.nt.textContent = qacFmt(t("qacRnd"), { k: k }) + t("qacReGen"); })
+        .then(function (g) { qk = g.q; qtool = g.tool; return answer(qacFlagText(g)); });
+    }
+    function answer(flag) {
+      sec3.nt.textContent = qacFmt(t("qacRnd"), { k: k }) + t("qacAns");
+      var ab = labRoundBox(sec3, k, qk, qtool);
+      var pl = qacBase("sde", mine);
+      pl.q = (t("qacLenR") + t("labDigest") + labDigest(base) + t("labCard") + String(card || "").slice(0, 1500) + t("labAsk") + qk).slice(0, 19500);
+      pl.history = qacHist(turns);
+      return qacCall(pl, function (x) { ab.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; }).then(function (r) {
+        ab.innerHTML = mdRender(r.text); turns.push({ q: qk, a: r.text, tool: qtool, flag: flag });
+        if (k >= 5) return;
+        k++; return ask();
+      });
+    }
+    return ask().then(function () {
+      sec3.nt.textContent = "";
+      sec4.nt.textContent = t("qacP1");
+      var p1q = (t("qacLenP") + qacFmt(t("labP1T"), { q: q }) + t("qacPlainP") + "\n\n" + t("labDigest") + labDigest(base)
+        + t("labGenM") + String(card || "").slice(0, 2500) + "\n\n" + qacLog(q, turns, 2000)).slice(0, 19500);
+      return qacWrite("sde", mine, p1q, function (x) { sec4.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; });
+    }).then(function (p1) {
+      var head = qacStripTail(p1);
+      sec4.nt.textContent = t("qacP2");
+      var brief = turns.map(function (x, i) { return qacFmt(t("qacQn"), { i: i + 1 }) + x.q + "\n" + String(x.a).slice(0, 500); }).join("\n\n");
+      var p2q = (t("qacLenP") + t("qacPlainP").trim() + t("labP2X") + "\n\n" + qacFmt(t("qacP2T"), { q: q }) + p1.slice(0, 12000) + t("qacP2M") + brief).slice(0, 19500);
+      return qacWrite("sde", mine, p2q, function (x) { sec4.bd.innerHTML = mdRender(head + "\n\n" + x) + "<span class='cur'>▊</span>"; })
+        .then(function (p2) { var paper = head + "\n\n" + p2.trim(); sec4.bd.innerHTML = mdRender(paper); return { turns: turns, paper: paper }; });
+    });
+  }
+  function labCardBox(sec, sc) {
+    sec.bd.innerHTML = mdRender(sc.text);
+    if (sc.s) sec.hd.appendChild(el("i", null, t("labComp") + " " + sc.s.comp + " · S" + sc.s.S + " D" + sc.s.D + " E" + sc.s.E + " I" + sc.s.I + " F" + sc.s.F));
+    else sec.hd.appendChild(el("i", null, t("labNoParse")));
+  }
+  function labStripTitle(p) { return String(p || "").replace(/^\s*#\s+[^\n]*\n/, ""); }
+  function labSave(which, q, st, vname) {
+    if (!window.SDEDocx) { toast(t("cmpWait")); return; }
+    var last = st.rounds[st.rounds.length - 1];
+    var md;
+    if (which === "final") {
+      md = "# " + q + "\n\n" + t("labFinal") + "　" + t("cmpBase") + "：" + vname + "\n\n" + labStripTitle(last.paper) + cmpFcMd(last.fc);
+    } else {
+      md = "# " + q + "\n\n" + t("labDocT") + "　" + t("cmpBase") + "：" + vname + "　" + t("cmpDate") + "：" + new Date().toLocaleString()
+        + "\n\n" + t("labFair") + "\n\n## " + t("labDelta") + "\n\n" + labDeltaMd(st.card1.s, last.card.s)
+        + "\n\n---\n\n# 一、" + t("labBase") + "\n\n" + labStripTitle(st.base.paper) + cmpFcMd(st.baseFc)
+        + "\n\n## " + t("qacAppQ") + "\n\n" + st.base.turns.map(function (x, i) { return (i + 1) + ". " + x.q; }).join("\n")
+        + "\n\n---\n\n# 二、" + t("labCard1") + "\n\n" + st.card1.text;
+      st.rounds.forEach(function (rd, i) {
+        var tag = st.rounds.length > 1 ? ("（" + qacFmt(t("labRound"), { n: i + 1 }) + "）") : "";
+        md += "\n\n---\n\n# 三、" + t("labDlg") + tag + "\n\n" + rd.turns.map(function (x, j) {
+            return "## " + (j + 1) + ". " + (x.tool ? ("〔" + x.tool + "〕") : "") + x.q + (x.flag ? ("（" + x.flag + "）") : "") + "\n\n" + x.a;
+          }).join("\n\n")
+          + "\n\n---\n\n# 四、" + t("labFinal") + tag + "\n\n" + labStripTitle(rd.paper) + cmpFcMd(rd.fc)
+          + "\n\n---\n\n# 五、" + t("labCard2") + tag + "\n\n" + rd.card.text;
+      });
+    }
+    var tag2 = which === "final" ? t("labFinal") : t("labDocT");
+    var blob = window.SDEDocx.build({ title: q + " · " + tag2, author: BRAND, md: md });
+    saveBlobToDir(fileTag("WDS") + "-" + safeName(q) + "-" + safeName(tag2) + "-" + stampName() + ".docx", blob,
+      function (m) { if (m) toast(m); });
+  }
+  function sendLab(q, cell) {
+    var mine = wdsKeyGet();
+    if (!mine) return false;
+    history.push({ role: "reader", text: q }); updTurns();
+    streaming = true; stoppedByUser = false; RS.stop = false;
+    busyUI(true); stopBarShow(true);
+    var vname = vinfo(mine.vendor).name + (mine.model ? (" · " + mine.model) : "");
+    var wrap = el("div", "wdsm-lab");
+    var s1 = labSec(wrap, t("labS1")), s2 = labSec(wrap, t("labS2"));
+    cell.a.innerHTML = ""; cell.a.appendChild(wrap);
+    var st = { rounds: [] };
+    function done(err) {
+      streaming = false; curReader = null; busyUI(false); stopBarShow(false);
+      if (err) wrap.appendChild(el("div", "wdsm-err", t("qacFail") + err));
+      var last = st.rounds[st.rounds.length - 1];
+      history.push({ role: "wds", text: "【" + t("labDocT") + "】" + q + (st.card1 && st.card1.s && last && last.card && last.card.s ? ("\n" + labDeltaMd(st.card1.s, last.card.s)) : "") });
+      stSave(history); updTurns(); compTick();
+      var row = el("div", "wdsm-acts");
+      if (st.base) { var bw = el("button", "wdsm-act", t("labWord")); bw.onclick = function () { labSave("all", q, st, vname); }; row.appendChild(bw); }
+      if (last && last.paper) { var bf = el("button", "wdsm-act", t("labWordF")); bf.onclick = function () { labSave("final", q, st, vname); }; row.appendChild(bf); }
+      if (last && last.paper && last.card && !err) {
+        var rf = el("button", "wdsm-act", t("labRefine"));
+        rf.onclick = function () {
+          if (streaming) return;
+          row.remove();
+          streaming = true; stoppedByUser = false; RS.stop = false; busyUI(true); stopBarShow(true);
+          refine(last.paper, last.card.text);
+        };
+        row.appendChild(rf);
+      }
+      cell.turn.appendChild(row); cell.acts = row;
+    }
+    function refine(base, card) {
+      var n = st.rounds.length + 1, tag = n > 1 ? (" · " + qacFmt(t("labRound"), { n: n })) : "";
+      var s3 = labSec(wrap, t("labS3") + tag), s4 = labSec(wrap, t("labS4") + tag);
+      var rd = {};
+      return labStage34(q, mine, base, card, s3, s4).then(function (r) {
+        rd.turns = r.turns; rd.paper = r.paper;
+        var c = { text: r.paper, ok: !!r.paper, nt: s4.nt, bd: s4.bd };
+        return cmpFc(c, mine).then(function () { rd.paper = c.text; rd.fc = c.fc; });
+      }).then(function () {
+        s4.nt.textContent = t("labScoring");
+        return labScore(rd.paper, mine);
+      }).then(function (sc) {
+        rd.card = sc; st.rounds.push(rd);
+        var box = el("div", "wdsm-labcard");
+        box.style.cssText = "margin-top:10px;border-top:1px dashed var(--wline);padding-top:8px";
+        var hd = el("div", "wdsm-duh"); hd.appendChild(el("b", null, t("labCard2") + tag));
+        var bd = el("div", "wdsm-a");
+        box.appendChild(hd); box.appendChild(bd); s4.bd.parentNode.appendChild(box);
+        labCardBox({ hd: hd, bd: bd }, sc);
+        var dl = el("div", "wdsm-a"); dl.innerHTML = mdRender("**" + t("labDelta") + "**\n\n" + labDeltaMd(st.card1.s, sc.s));
+        box.appendChild(dl);
+        s4.nt.textContent = "";
+        done();
+      }).catch(function (e) { done((e && e.message) || "?"); });
+    }
+    labStage1(q, mine, s1).then(function (b) {
+      st.base = b;
+      var c = { text: b.paper, ok: !!b.paper, nt: s1.nt, bd: s1.bd };
+      return cmpFc(c, mine).then(function () { st.base.paper = c.text; st.baseFc = c.fc; });
+    }).then(function () {
+      s2.nt.textContent = t("labScoring");
+      return labScore(st.base.paper, mine);
+    }).then(function (sc) {
+      st.card1 = sc; labCardBox(s2, sc); s2.nt.textContent = "";
+      return refine(st.base.paper, sc.text);
+    }).catch(function (e) { done((e && e.message) || "?"); });
+    return true;
+  }
+
   /* ══════════════ 群碰（N 席）══════════════
      三家对撞是定席定序：A 出判断 → B 攻 A → C 结算。群碰放开两处，而这两处各带一个必然的坑：
        ① **攻击席自选目标** ⇒ 每席都挑最脆的那个打，N 席全攻同一处，看着热闹只攻了一处。
@@ -6575,7 +6871,7 @@
     var go = el("button", null, mobOn ? t("mobStop") : t("mobGo"));
     go.onclick = function () {
       closeMenu(); mobOn = !mobOn;
-      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); }   // 五者互斥
+      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); }   // 六者互斥
       mobPaint();
     };
     menu.appendChild(go);
@@ -6836,7 +7132,7 @@
     go.onclick = function () {
       closeMenu();
       triOn = !triOn;
-      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); }      // 并排与对撞是两种模式，不并存
+      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); }      // 并排与对撞是两种模式，不并存
       triPaint();
     };
     menu.appendChild(go);

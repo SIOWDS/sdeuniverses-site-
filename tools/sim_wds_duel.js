@@ -69,7 +69,7 @@ ok(/step\(0, ""\)\.then\(function \(a\) \{/.test(F), "串行：第二步等第�
 ok(/return step\(1, a\)\.then\(function \(b\)/.test(F), "串行：第三步等前两步");
 ok(/duel: \{ role: ROLES\[i\], prior: prior \}/.test(F), "前端只递 role 与 prior，不拼角色正文");
 ok(!/你是三家对撞里的/.test(F), "角色正文没有泄露到前端（会被提问字数钳位吃掉，且顺序会被改动）");
-ok(/if \(triOn\) \{ duV = ""; duPaint\(\);( cmpOn = false; cmpPaint\(\);)?( qacOn = false; qacPaint\(\);)? \}/.test(F), "开对撞就关并排（两种模式互斥；2026-10-04 起顺带关同题对照）");
+ok(/if \(triOn\) \{ duV = ""; duPaint\(\);( cmpOn = false; cmpPaint\(\);)?( qacOn = false; qacPaint\(\);)?( labOn = false; labPaint\(\);)? \}/.test(F), "开对撞就关并排（两种模式互斥；2026-10-04 起顺带关同题对照）");
 ok(F.indexOf("if (triOn && !streaming)") < F.indexOf("if (duV && !streaming)"), "send 里对撞分支排在并排之前");
 ok(/rows\[1\]\.bd\.textContent = t\("triFail"\)/.test(F), "上一家空手就如实停下，不让空文本流下去凑满三栏");
 

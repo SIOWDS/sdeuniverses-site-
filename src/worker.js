@@ -10123,7 +10123,36 @@ const CMP_TRAD_BLOCK_EN = "\n\n[Method for this answer: conventional academic me
      · 经典发生器：苏格拉底式追问（Paul & Elder 的六类：澄清概念／追问假设／追问理由与证据／换视角与反方／
        追问推论与后果／追问问题本身），按轮次轮换，零 SDE 术语。
    轮换按轮次写死而不是让基底自选：自选的话两台都会挑最顺手的那一类，五问问成同一种。 */
+/* 【SDE 科研创新法 · 第三步「发生」的问题发生器（2026-10-04 王德生令）】
+   四步：①无 SDE 经典科研（五轮问对＋万字论文，作底座）②独立评分员给底座打创新智商、出提升方向
+   ③按方向做 SDE 思想创新，五轮问对不停细化 ④打磨成文、再评一次分、出逐维差值。
+   这台发生器管第③步。与「五轮问对对照」的 SDE 发生器分工不同：那一台从零出题；
+   这一台**站在底座论文与评分卡上**出题——第 1 问由评分卡驱动（最弱一维＋扣分句），逼出一个
+   「X 不是 Y（底座的说法），而是 Z」的新命题候选；第 2–5 问每一问都必须**要么把 Z 磨锐，要么拿 Z 去撞底座最强的那句**。
+   锚题、术语自足两条规矩照搬（第一次真跑吃过的两次亏，见 WDS_QGEN_SYS）。 */
+function WDS_QGEN_LAB_SYS(round, lang) {
+  const r = Math.max(1, Math.min(5, round | 0));
+  const step = {
+    1: ["评分卡驱动 · 立 Z", "从【评分卡】里挑最弱的那一维和它的扣分句，再对准【底座论文】里最承重的那条核心命题，问出一个能逼出新命题的问题："
+        + "答它的人必须写出「X 不是 Y（底座的说法），而是 Z（新说法）」。这一问要让底座的那条命题第一次显得不够。"],
+    2: ["What · 三大方程 · 磨 Z", "拿上一答立起的 Z，从下面三条里挑一条，问它经什么差异、在什么土壤里长成——把 Z 从一句口号磨成一个界定得出的概念：\n" + SDE_EQUATIONS],
+    3: ["How · 六路径 · 落 Z", "从下面六条里挑一条，问 Z 怎样落成一个可操作的判据或程序（别人照着就能用来判一个具体案例）：\n" + SDE_PATHS],
+    4: ["Why · 三原理 · 撞底座", "拿 Z 去撞【底座论文】里最强的那一句（点名它），从下面三条里挑一条，问：是什么张力让底座的说法在这里站不住、而 Z 站得住？\n" + SDE_PRINCIPLES],
+    5: ["收束 · 证伪", "逼出 Z 的证伪条件与最脆的一环：什么观察、什么案例出现，Z 就该被放弃？它最可能在哪一步被底座那一派反驳回去？"],
+  }[r];
+  if (lang === "en") return "You are the question generator for step 3 of the SDE research-innovation method. You stand on a finished baseline paper and an Innovation-IQ scorecard. Write question " + r + " of 5."
+    + "\n\n[" + step[0] + "] " + step[1]
+    + "\n\n[Anchor] Every question must be a sub-question of the [Topic] and name its core object. Every question must either sharpen the new claim Z or test it against the baseline's strongest claim."
+    + "\n[Self-contained wording] A peer who has not read the dialogue must understand the question; restate coined phrases in ordinary scholarly language."
+    + "\nOutput ONE line: `tool name｜question` (question 12–40 words). Nothing else.";
+  return "你是「SDE 科研创新法」第三步的问题发生器。你站在一篇已经写成的【底座论文】和一张【评分卡】上出题。写出第 " + r + " 问（共五问）。"
+    + "\n\n【" + step[0] + "】" + step[1]
+    + "\n\n【锚题规矩 · 压过上面一切】每一问都必须是【总题】的一个子问题，问句里点名总题的核心对象；每一问都必须要么把新命题 Z 磨得更锐，要么拿 Z 去撞底座论文最强的那一句。不许顺着上一答的旁支走开。"
+    + "\n【术语自足】问句要让没读过前面问对的同行也看得懂：不许原样搬用前几答自造的比喻（尤其加引号的），要用通行学术语言重说。"
+    + "\n规矩：只输出一行，格式为「工具名｜问句」，问句 15–60 字；别的什么都不要。";
+}
 function WDS_QGEN_SYS(kind, round, lang) {
+  if (kind === "lab") return WDS_QGEN_LAB_SYS(round, lang);
   const r = Math.max(2, Math.min(5, round | 0));
   const en = lang === "en";
   const tail = en
@@ -13565,7 +13594,7 @@ export default {
       /* 【五轮问对对照 · 出题道（2026-10-04）】nosde 且 qgen=sde|classic：这一趟只出下一问，不答题。
          两种发生器都走 nosde（不装内功、不检索站内）——差别只在出题的那套工具：SDE 发生器用三方程／六路径／三原理，
          经典发生器用苏格拉底式追问。材料里常有「约 1500 字」，同样要把 askLen 清零。 */
-      const qgKind = ((b.nosde === 1 || b.nosde === true) && (b.qgen === "sde" || b.qgen === "classic")) ? b.qgen : "";
+      const qgKind = ((b.nosde === 1 || b.nosde === true) && (b.qgen === "sde" || b.qgen === "classic" || b.qgen === "lab")) ? b.qgen : "";
       const askLen = (fcRun || qgKind) ? 0 : wdsAskLen(q);           // 读者点名要几千字：预算/口径/时限三件一起变
       // USER_RAG（全局记忆）：客户端在本机按这一问挑出的几条历史对话摘要＋画像。
       // 与 LONGASK 同一条纪律——挂在当轮 user 消息上、**不进 system**：
@@ -14205,7 +14234,7 @@ export default {
                只在这里补、只补这一路：方法论的差别只许出在两份 system 里，题面两边逐字相同（篇幅要求由前端拼在题面后）。 */
             const cmpPlain = noSde && b.cmp === "plain";
             const sys = fcRun ? WDS_FC_SYS(lang)        // 事实核查道整段改道：不装人格、内功、方法论、站内语料
-              : qgKind ? WDS_QGEN_SYS(qgKind, parseInt(b.qr, 10) || 2, lang)   // 出题道：只出一问
+              : qgKind ? WDS_QGEN_SYS(qgKind, parseInt(b.qr, 10) || (qgKind === "lab" ? 1 : 2), lang)   // 出题道：只出一问
               : (WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history), razTake(b, tool))
                 + (cmpPlain ? (lang === "en" ? CMP_TRAD_BLOCK_EN : CMP_TRAD_BLOCK) : ""));
             if (cmpPlain) controller.enqueue(_sseBytes({ t: "note", v: (lang === "en") ? "Comparison · no-SDE side: no SDE kernel, method or site corpus; conventional academic method only." : "同题对照 · 无 SDE 一路：不装内功、不装 SDE 方法论、不挂站内语料；只用传统学术方法论＋基底本功。" }));

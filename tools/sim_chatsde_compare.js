@@ -58,12 +58,12 @@ function checks(FE, BE, quiet) {
   });
   const iSend = FE.indexOf("if (cmpOn && !PROFILE && !streaming)"), iMob = FE.indexOf("if (mobOn && !streaming)");
   put(iSend > 0 && iMob > iSend, "C 送出时同题对照排在群碰之前（四者互斥，最先拦）");
-  put(/if \(cmpOn\) \{ duV = ""; duPaint\(\); triOn = false; triPaint\(\); mobOn = false; mobPaint\(\);( qacOn = false; qacPaint\(\);)? \}/.test(FE), "C 打开对照时关掉并排/对撞/群碰");
-  put(/if \(triOn\) \{ duV = ""; duPaint\(\); cmpOn = false; cmpPaint\(\);( qacOn = false; qacPaint\(\);)? \}/.test(FE), "C 打开对撞时关掉对照");
-  put(/triOn = false; triPaint\(\); cmpOn = false; cmpPaint\(\);( qacOn = false; qacPaint\(\);)? \}/.test(FE), "C 打开群碰时关掉对照");
+  put(/if \(cmpOn\) \{ duV = ""; duPaint\(\); triOn = false; triPaint\(\); mobOn = false; mobPaint\(\);( qacOn = false; qacPaint\(\);)?( labOn = false; labPaint\(\);)? \}/.test(FE), "C 打开对照时关掉并排/对撞/群碰");
+  put(/if \(triOn\) \{ duV = ""; duPaint\(\); cmpOn = false; cmpPaint\(\);( qacOn = false; qacPaint\(\);)?( labOn = false; labPaint\(\);)? \}/.test(FE), "C 打开对撞时关掉对照");
+  put(/triOn = false; triPaint\(\); cmpOn = false; cmpPaint\(\);( qacOn = false; qacPaint\(\);)?( labOn = false; labPaint\(\);)? \}/.test(FE), "C 打开群碰时关掉对照");
   put(/duV = v\.v; duPaint\(\); cmpOn = false; cmpPaint\(\);/.test(FE), "C 打开并排时关掉对照");
   put(/cmpBtn\.style\.display = PROFILE \? "none" : ""/.test(FE), "C 分身页不露这颗按钮（分身不认 nosde）");
-  put(/duPaint\(\); cmpPaint\(\);( qacPaint\(\);)? pjPaint\(\)/.test(FE), "C 换语言时按钮文案跟着重画");
+  put(/duPaint\(\); cmpPaint\(\);( qacPaint\(\);)?( labPaint\(\);)? pjPaint\(\)/.test(FE), "C 换语言时按钮文案跟着重画");
   put(/window\.SDEDocx\.build\(/.test(sliceFn(FE, "function cmpDocx(")), "C Word 走全站共用的 SDEDocx");
   // D. 事实核查道（2026-10-04「修改管道的事实核查」）
   const FC = sliceFn(FE, "function cmpFc(col, mine)");
@@ -117,9 +117,9 @@ try {
   ok(!/显露|差异序列|纠缠|内功|三大方程|六路径|三原理|SDE/.test(ctx.c.join("") + ctx.ce), "经典发生器零 SDE 术语");
   ok(ctx.s.concat(ctx.c).every(function (x) { return /只输出一个问题|只输出一行/.test(x); }), "两台都只出一问");
 } catch (e) { ok(false, "问题发生器实算抛错：" + e.message); }
-ok(/const qgKind = \(\(b\.nosde === 1 \|\| b\.nosde === true\) && \(b\.qgen === "sde" \|\| b\.qgen === "classic"\)\) \? b\.qgen : "";/.test(BE0), "出题道只在 nosde 下认（不装内功、不检索站内）");
+ok(/const qgKind = \(\(b\.nosde === 1 \|\| b\.nosde === true\) && \(b\.qgen === "sde" \|\| b\.qgen === "classic"( \|\| b\.qgen === "lab")?\)\) \? b\.qgen : "";/.test(BE0), "出题道只在 nosde 下认（不装内功、不检索站内）");
 ok(/const askLen = \(fcRun \|\| qgKind\) \? 0 : wdsAskLen\(q\);/.test(BE0), "出题道同样不被材料里的「1500 字」误判成长文");
-ok(/: qgKind \? WDS_QGEN_SYS\(qgKind, parseInt\(b\.qr, 10\) \|\| 2, lang\)/.test(BE0), "出题道 system 整段改道");
+ok(/: qgKind \? WDS_QGEN_SYS\(qgKind, parseInt\(b\.qr, 10\) \|\| (?:2|\(qgKind === "lab" \? 1 : 2\)), lang\)/.test(BE0), "出题道 system 整段改道");
 
 // 锚题约束（2026-10-04）
 console.log("── 锚题约束");
@@ -153,6 +153,27 @@ try {
     + "this.r = [qacJargonOf('奥卡姆剃刀下“可开发票的形状”怎样抗住删除？','解构奥卡姆剃刀',T).join(), qacJargonOf('奥卡姆剃刀里的「必要」由谁定义？','解构奥卡姆剃刀',T).join(), qacJargonOf('「奥卡姆剃刀」为什么常被误用？','解构奥卡姆剃刀',T).join(), qacJargonOf('“三遍死亡”之后怎样？','解构奥卡姆剃刀',T).join()];", c2);
   ok(c2.r[0] === "可开发票的形状" && c2.r[1] === "" && c2.r[2] === "" && c2.r[3] === "三遍死亡", "自造词检查：前文出现过的引号说法被抓；两字题内词与总题原词不抓（" + c2.r.join(" | ") + "）");
 } catch (e) { ok(false, "术语自足实算抛错：" + e.message); }
+
+// SDE 科研创新法（2026-10-04）
+console.log("── SDE 科研创新法");
+try {
+  const consts = ["SDE_PATHS", "SDE_EQUATIONS", "SDE_PRINCIPLES"].map(function (n) {
+    const i = BE0.indexOf("const " + n + " ="); return BE0.slice(i, BE0.indexOf("\n", BE0.indexOf("\";", i)) + 1);
+  }).join("\n");
+  const ctx = {}; vm.createContext(ctx);
+  vm.runInContext(consts + "\n" + sliceFn(BE0, "function WDS_QGEN_LAB_SYS(round, lang)") + "\nthis.r = [1,2,3,4,5].map(function(r){return WDS_QGEN_LAB_SYS(r,'zh');});", ctx);
+  ok(/评分卡驱动/.test(ctx.r[0]) && /最弱的那一维/.test(ctx.r[0]) && /X 不是 Y/.test(ctx.r[0]), "第③步第 1 问由评分卡驱动、逼出「X 不是 Y，而是 Z」");
+  ok(/三大方程/.test(ctx.r[1]) && /六路径/.test(ctx.r[2]) && /撞底座/.test(ctx.r[3]) && /证伪/.test(ctx.r[4]), "第 2–5 问：磨 Z → 落 Z → 撞底座 → 证伪");
+  ok(ctx.r.every(function (x) { return /锚题规矩/.test(x) && /术语自足/.test(x) && /工具名｜问句/.test(x); }), "五问都带锚题、术语自足与「工具名｜问句」");
+  const c2 = {}; vm.createContext(c2);
+  vm.runInContext("var LAB_W = { S: 0.20, D: 0.25, E: 0.20, I: 0.20, F: 0.15 };\n" + sliceFn(FE0, "function labParseIQ(text)") + "\n"
+    + "this.a = labParseIQ('**S 结构精确度（权重 0.20）：132** — x\\nD 差异锐度 112\\n- E：112\\nI 不可还原性（权重 0.20，闸门）106\\nF 可证伪性 134');"
+    + "this.b = labParseIQ('Dennett 1991 讨论过\\nS 结构精确度 130\\nD 差异锐度 138');", c2);
+  ok(c2.a && c2.a.S === 132 && c2.a.I === 106 && c2.a.comp === 118.1, "评分卡解析：加粗、权重括号、冒号都认得，综合分按权重算（" + (c2.a && c2.a.comp) + "）");
+  ok(c2.b === null, "五维不全就不出差值（不拿半张卡冒充）");
+} catch (e) { ok(false, "SDE 科研创新法实算抛错：" + e.message); }
+ok(/b\.qgen === "lab"\)\) \? b\.qgen : ""/.test(BE0), "lab 出题道同样只在 nosde 下认");
+ok(/qgKind === "lab" \? 1 : 2/.test(BE0), "lab 出题从第 1 问起");
 
 // 替换器实算
 try {
