@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>解构奥卡姆剃刀：复杂度不是模型的属性，而是搜索过程的预算支出 · 长文阅读 | 科研哲学 · SDE Universes</title>
+<meta name="description" content="「SDE 科研创新法」首篇完整论文。奥卡姆剃刀在预测性模型选择中没有独立内容；对简单性最强的辩护（编码长度）恰恰表明：复杂度不是模型的属性，而是搜索过程对一笔预先承诺之预算的支出。据此把剃刀改建为一本带作废条件的复杂度预算审计账本，并与 Lakatos、预注册、自适应数据分析划界，给出两条证伪路径。约 1.2 万字，42 条文献。">
+<style>
+:root{--sky:#4FC3F7;--blue:#2196F3;--link:#0A66B2;--btn:#0A66C2;--teal:#14B8A6;--teal2:#0E7C71;--head:#0F2C4A;--text:#1E293B;--muted:#5A6B80;--bg:#F8FCFF;--card:#FFFFFF;--line:rgba(79,195,247,0.40)}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(79,195,247,0.35)}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+a{color:var(--link);text-decoration:none}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(248,252,255,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:var(--muted);font-size:13px;letter-spacing:0.04em}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(33,150,243,0.45);color:var(--link);letter-spacing:0.03em}
+.rb-btn.cur{background:var(--btn);color:#fff;font-weight:700;border-color:var(--btn)}
+.art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
+.art-series{font-size:12px;letter-spacing:0.36em;color:var(--teal2);margin-bottom:22px}
+.art-title{font-size:clamp(24px,4.2vw,36px);font-weight:800;line-height:1.55;color:var(--head);letter-spacing:0.02em}
+.art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--link);margin-top:18px;line-height:1.85;letter-spacing:0.01em}
+.art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.12em}
+.wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
+.abstract{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--sky);padding:22px 26px;margin:20px 0 26px;font-size:15.5px;line-height:1.95;border-radius:4px}
+.abstract .ab-lbl{font-size:12px;letter-spacing:0.3em;color:var(--teal2);margin-bottom:10px}
+.abstract p{color:var(--text);text-align:justify}
+.keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 30px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.keywords strong{color:var(--teal2)}
+.wrap h2{font-size:22px;font-weight:800;color:var(--head);margin:44px 0 18px;letter-spacing:0.02em;padding-top:8px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.wrap h2.notes-head{font-size:20px}
+.wrap h3{font-size:18px;font-weight:700;color:var(--link);margin:30px 0 12px;letter-spacing:0.01em}
+.wrap p{margin-bottom:20px;text-align:justify;color:var(--text);text-indent:2em}
+.wrap p.ref{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:8px;text-indent:-2em;padding-left:2em;text-align:left}
+.wrap strong{color:var(--link);font-weight:700}
+.endbox{background:linear-gradient(135deg,#2196F3 0%,#0A66C2 55%,#0F2C4A 100%);text-align:center;padding:60px 24px;margin-top:40px;border-radius:4px}
+.endbox .lbl{font-size:12px;letter-spacing:0.4em;color:#BFE7FB;margin-bottom:16px}
+.endbox .big{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#FFFFFF;letter-spacing:0.06em;margin-bottom:14px}
+.endbox p{color:#DCEEFB;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:1.95}
+.endbox a{display:inline-block;padding:12px 30px;font-size:14.5px;letter-spacing:0.08em;border-radius:2px;margin:5px;text-decoration:none}
+.endbox .solid{background:#FFFFFF;color:#0A66C2;font-weight:700}
+.endbox .ghost{border:1px solid #FFFFFF;color:#FFFFFF}
+footer{background:#EAF6FE;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid var(--line)}
+footer a{color:var(--link)}
+@media(max-width:640px){body{font-size:16.5px}}
+.tblwrap{overflow-x:auto;margin:22px 0}
+.tbl{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.75}
+.tbl th,.tbl td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+.tbl th{background:rgba(79,195,247,0.12);font-weight:700}
+ul.pl{margin:14px 0 18px 1.6em}
+ul.pl li{margin:0 0 8px}
+blockquote{margin:20px 0;padding:12px 18px;border-left:3px solid var(--btn);background:rgba(79,195,247,0.08);border-radius:0 4px 4px 0}
+blockquote p{text-indent:0;margin:0}
+code{font-family:ui-monospace,Consolas,monospace;font-size:0.92em;background:rgba(79,195,247,0.12);padding:1px 5px;border-radius:3px}
+</style><style id="beautify-v1">
+body{background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%);font-size:18px;line-height:2.05}
+.art{padding-top:74px}
+.art-series{color:var(--teal2);font-size:12.5px;letter-spacing:.42em}
+.art-title{font-size:clamp(26px,4.4vw,38px);line-height:1.5;letter-spacing:.015em}
+.art-title::after{content:"";display:block;width:50px;height:3px;background:linear-gradient(90deg,var(--sky),var(--btn));margin:24px auto 0;border-radius:2px}
+.art-subtitle{font-size:clamp(15px,2.1vw,17.5px);color:var(--muted);line-height:1.95}
+.wrap{max-width:722px}
+.wrap h2{font-size:22.5px;margin:56px 0 20px;padding:0;border-bottom:none;position:relative;letter-spacing:.02em}
+.wrap h2::before{content:"";position:absolute;left:0;top:-20px;width:36px;height:3px;background:var(--btn);border-radius:2px}
+.wrap h2::after{content:"";display:block;height:1px;background:linear-gradient(90deg,var(--line),transparent);margin-top:12px}
+.wrap h2.refs-h{font-size:19px}
+.wrap h3{color:var(--link);font-size:18.5px;margin:36px 0 14px}
+.wrap p{margin-bottom:22px;line-height:2.05;letter-spacing:.006em}
+.wrap h2 + p::first-letter{font-size:2.5em;float:left;line-height:.84;color:var(--btn);font-weight:700;margin:.06em .16em 0 0;font-family:Georgia,"Songti SC",serif}
+.wrap p strong{color:var(--head);font-weight:700;background:linear-gradient(transparent 66%,rgba(79,195,247,.34) 0)}
+.abstract{background:linear-gradient(135deg,#f4fbff,#edf6ff);border:1px solid var(--line);border-left:3px solid var(--btn);border-radius:7px;box-shadow:0 8px 26px rgba(15,44,74,.07);padding:26px 30px}
+.abstract .ab-lbl{letter-spacing:.34em}
+.keywords{font-size:14px;padding-bottom:30px;margin-bottom:40px;border-bottom:1px dashed var(--line)}
+.wrap p.ref{font-size:13.5px;line-height:1.75;color:var(--muted)}
+@media(max-width:640px){body{font-size:17px}.wrap{max-width:100%}.wrap h2 + p::first-letter{font-size:2.15em}}
+.tblwrap{overflow-x:auto;margin:22px 0}
+.tbl{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.75}
+.tbl th,.tbl td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+.tbl th{background:rgba(79,195,247,0.12);font-weight:700}
+ul.pl{margin:14px 0 18px 1.6em}
+ul.pl li{margin:0 0 8px}
+blockquote{margin:20px 0;padding:12px 18px;border-left:3px solid var(--btn);background:rgba(79,195,247,0.08);border-radius:0 4px 4px 0}
+blockquote p{text-indent:0;margin:0}
+code{font-family:ui-monospace,Consolas,monospace;font-size:0.92em;background:rgba(79,195,247,0.12);padding:1px 5px;border-radius:3px}
+</style>
+<link rel="stylesheet" href="/assets/katex/katex.min.css">
+<script defer src="/assets/katex/katex.min.js"></script>
+<script defer src="/assets/katex/contrib/auto-render.min.js" onload="renderMathInElement(document.querySelector('.wrap'),{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script>
+<style>
+.provbox{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:4px;padding:20px 24px;margin:26px 0 30px}
+.provbox .pb-lbl{font-size:12px;letter-spacing:.28em;color:var(--teal2);margin-bottom:10px;font-weight:700}
+.provbox p{font-size:14.5px;line-height:1.9;margin:0 0 10px}
+.provbox p:last-child{margin-bottom:0}
+.abstract.en p{font-size:14px;line-height:1.85}
+.wrap .katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0}
+</style>
+</head>
+<body class="zh">
+<div class="readbar">
+  <a class="nav-back" href="/creation/research-philosophy/">‹ 科研哲学频道</a>
+  <div class="rb-modes" aria-label="阅读方式">
+    <span class="rb-btn cur">📖 长文阅读</span>
+  </div>
+</div>
+
+<div class="art">
+  <div class="art-series">SDE 科研哲学 · SDE 科研创新法首例</div>
+  <h1 class="art-title">解构预测性模型选择中的奥卡姆剃刀：从简单性偏好到带作废条件的复杂度预算审计</h1>
+  <div class="art-subtitle">复杂度不是模型的属性，而是搜索过程对一笔预先承诺之预算的支出。</div>
+  <div class="art-meta">王德生 ＋ Claude · 初稿由 ChatSDE「SDE 科研创新法」生成（基底 DeepSeek），Claude 修订 · 约 1.2 万字 · 42 条文献 · 发表于2026年10月4日 <span id="sde-pv-wrap">阅读 <span id="sde-pv-n">—</span> 次</span></div>
+</div>
+
+<div class="wrap">
+  <div class="abstract"><div class="ab-lbl">摘要 · ABSTRACT</div><p>本文论证：在以预测为目标的模型选择中，奥卡姆剃刀既不是一条普遍推理原则，也不是简单性偏好的一种应用，而是一个被旧名遮蔽的功能空位。模型复杂度惩罚的规范性内容从来不由“简单”提供，而由对泛化误差的显式估计提供——或者是解析上界（AIC、BIC、VC 界、Rademacher 复杂度、PAC-Bayes 界），或者是留出数据上的实测（交叉验证、独立测试集）。对“简单性即编码长度”这一最强辩护（MDL 与 Kolmogorov 复杂度），本文表明：编码长度之所以能被赋值，恰恰因为它以一个预先固定的前缀码进入泛化界，而 Kraft 不等式使这个前缀码成为一份总额为一的预算分配。由此本文提出中心论题：<strong>复杂度不是模型的属性，而是搜索过程对一笔预先承诺之预算的支出。</strong> 据此，剃刀之名不应被建制为“简单性考评条目”，而应被建制为一条复杂度预算审计项：一套记录每一笔复杂度增量的估计口径、批准人与到期修正预测的账本，并通过“归因核销”规则——新归因必须改动旧账、同类归因累计超限即整体作废——获得内生的作废条件。本文将该审计项与三个近邻（Lakatos 的退化研究纲领判据、预注册与研究者自由度、自适应数据分析中的错误预算）逐一划界，并给出两条相互独立的证伪路径。</p></div>
+  <div class="keywords"><b>关键词：</b>奥卡姆剃刀 · 简单性 · 泛化误差界 · 最小描述长度 · Kraft 不等式 · 结构风险最小化 · 搜索预算审计 · 可证伪性</div>
+  <div class="abstract en"><div class="ab-lbl">ABSTRACT · ENGLISH</div><p>This paper argues that Ockham's razor is neither a universal principle of inference nor an application of a preference for simplicity, but a functional vacancy hidden under an old name. The normative content of complexity penalties is supplied not by “simplicity” but by explicit estimates of generalization error—either analytic bounds (AIC, BIC, VC, Rademacher, PAC-Bayes) or held-out measurements. Against the strongest defence of simplicity, description length (MDL, Kolmogorov complexity), we show that code length becomes assignable only because it enters a generalization bound through a prefix code fixed in advance, and the Kraft inequality turns that code into an allocation of a unit budget. Hence our thesis: <em>complexity is not a property of a model but an expenditure, by a search process, of a budget committed in advance.</em> Accordingly, the razor should be institutionalized not as a simplicity criterion but as a complexity-budget audit: a ledger recording, for each complexity increment, its estimation instrument, its approver, and an expiring corrective prediction, with an “attribution write-off” rule that yields endogenous voiding conditions. We delimit the proposal against Lakatos's degenerating programmes, preregistration, and error budgets in adaptive data analysis, and state two independent routes by which it could be refuted.</p></div>
+<div class="provbox">
+<div class="pb-lbl">缘起 · 这篇论文是怎么来的</div>
+<p>这是「SDE 科研创新法」上线当天跑出的第一篇完整论文。初稿由站内 <a href="/taste/chatsde/">ChatSDE</a> 的「🧪 SDE 科研创新法」模式生成（基底 DeepSeek）：先不用 SDE 做五轮经典科研、写成底稿，再评创新智商、按提升方向做五轮 SDE 思想创新，最后打磨成文。</p>
+<p>此后 Claude 按创新智商评分对初稿做了一轮修订：补上对“简单性即编码长度”（MDL 与 Kolmogorov 复杂度）的正面回应，由此立起全文中心命题——<strong>复杂度不是模型的属性，而是搜索过程对一笔预先承诺之预算的支出</strong>；补写与 Lakatos、预注册、自适应数据分析三个近邻的划界；把两条证伪路径改成真能失败的形式；修正事实与引文，参考文献由 4 条扩至 42 条。</p>
+<p><strong>评分照实写出。</strong>初稿创新智商综合 131。修订稿交未参与修改的独立评分者盲评，综合约 130（S 135 ／ D 131 ／ E 127 ／ I 123 ／ F 134）：结构与可证伪性升了，不可还原性反而降了——把真实的先行工作补进来之后，“预算读法”在学习理论里本是标准写法，全文真正新的只剩“新归因必须改动旧账”的反向登记与归因超限作废两条。初稿的一部分分数，是文献太薄撑出来的。按评分规程，Claude 不为自己参与修改的文本认证分数，以上为独立评分者给出的数字。</p>
+</div>
+<h2 id="sec-1">引言</h2>
+<p>奥卡姆剃刀在当代方法论中处于一个奇特的位置：几乎无人不知，却几乎无人能说清它在一场具体争端中指令了什么。称它“简单性原则”的人，没有解释“简单”如何对应到可赋值的量；称它“模型选择准则”的人，没有解释它在损失函数与假设空间尚未选定时如何产生裁决；称它“本体论禁令”的人，没有解释一条中世纪的实体节制原则凭什么能迁移到深度网络的过拟合控制之上。</p>
+<p>先界定对象。奥卡姆本人反复使用的表述是 <em>pluralitas non est ponenda sine necessitate</em>，直译为“不应无必要地设定复多”；流行的“如无必要，勿增实体”（<em>entia non sunt multiplicanda praeter necessitatem</em>）并不见于奥卡姆的著作，一般认为出自十七世纪的 John Punch（Thorburn, 1918; Spade &amp; Panaccio, 2019）。这一历史事实本身就提示：现代方法论借用的是一个语用外壳，而不是它在中世纪语境中的本体论内容。因此本文讨论的始终是现代科学方法论中的那把“剃刀”——“在解释力相同的理论中偏好更简单者”的通行原则——以及它在统计模型选择中的各种形式化版本。本文不处理本体论简约性——关于“世界上存在多少种、多少个实体”的节制原则（参见 Baker, 2022 对质的简约与量的简约的区分）；本文的“取消”论题只针对以预测为目标的模型选择，不外推到本体论争论。</p>
+<p>关于这把剃刀，已有两类有代表性的立场。其一是<strong>还原立场</strong>：Domingos（1999）区分“第一剃刀”（同等训练误差下偏好简单模型，因简单本身可取）与“第二剃刀”（因简单模型泛化更好而偏好之），论证后者缺乏独立的经验支持，所谓 Occam 界对任何事先固定的假设排序都成立，并不偏袒“简单”。其二是<strong>局部化立场</strong>：Sober（2015）认为不存在一条全局的简单性原则，剃刀在每个领域的效力都要借助该领域的具体背景理论（似然论证或模型选择理论）来局部辩护；Forster 与 Sober（1994）以 AIC 为据，论证简单性的价值在于它估计了预测精度；Sterkenburg（2016）则论证，Solomonoff 预测对“简单”的偏好依赖于所选的通用机，并不提供与选择无关的辩护；Kelly（2007）从真理寻求效率角度给出一个不依赖“简单即真”的辩护。本文继承这两类立场的分辨成果，但拒绝停在“还原”或“局部化”上。还原立场留下一个未处理的问题：剃刀之名如果仍被保留，它该承担什么建制功能？局部化立场留下另一个问题：每个局部的辩护何时失效，失效时由谁、凭什么记录？</p>
+<p>本文的中心论点分三步。第一，在以预测为目标的模型选择中，简单性偏好不是一个模糊的供给者，而是一个空的供给者：惩罚的形式与系数都由泛化误差的显式估计给出（第一、三节）。第二，对简单性最强的辩护——编码长度——恰恰把复杂度显露为一份预先承诺的预算的支出（第二节）。第三，因此剃刀之名应被建制为一条复杂度预算审计项，它不裁决简单与否，只要求每一笔复杂度增量都不能匿名入场，并通过“归因核销”获得内生的作废条件（第四至六节）。第七节与三个近邻划界，第八节给出证伪路径，第九节收束并交代本方案最脆弱的一环。</p>
+<p>先界定两个术语。<strong>简单性偏好</strong>：一种未给出操作性赋值方法的、关于“参数更少或形式更简的模型更好”的倾向性表达，它既不能独立确定“简单”如何度量，也不能独立确定“偏好”的强度。<strong>泛化误差的显式估计</strong>：对期望预测误差与经验预测误差之差的、可被第三方重算的估计，包括两族：（a）解析上界，即经形式推导得出、以置信度、样本量与假设空间复杂度为变量的上界；（b）留出实测，即在未参与拟合的数据上直接测得的误差。二者的分界——简单性偏好与显式估计的分界——是本文的第一块地基。</p>
+<h2 id="sec-2">一、简单性偏好的空缺：它给不出惩罚系数</h2>
+<p>本节要证明一个比“简单性偏好不够清楚”更强的结论：它不提供规范性内容，不是因为说得太含糊，而是因为它要说的事情从来不在它所占据的那个逻辑位置上。</p>
+<p>给模型加复杂度惩罚，必须回答两个问题：惩罚什么，以及惩罚多重。设训练经验损失为 <span class="math inline">\(\hat{L}(h)\)</span>，样本量为 <span class="math inline">\(n\)</span>，候选模型 <span class="math inline">\(h\)</span> 来自假设空间 <span class="math inline">\(\mathcal{F}\)</span>，一般的惩罚形式可写作</p>
+<p><span class="math display">\[\min_{h \in \mathcal{F}} \; \hat{L}(h) + \lambda \cdot \mathrm{Complexity}(h)\]</span></p>
+<p>其中 <span class="math inline">\(\lambda\)</span> 是惩罚系数，<span class="math inline">\(\mathrm{Complexity}(h)\)</span> 是复杂度度量。这个式子已经把两个问题摆开：选哪个 <span class="math inline">\(\mathrm{Complexity}\)</span>，选哪个 <span class="math inline">\(\lambda\)</span>。</p>
+<p>简单性偏好在这两个问题上只能表态，不能赋值。对第一个问题，它回答“参数更少”——但“更少”对应的是 <span class="math inline">\(L_0\)</span> 范数（非零参数个数）、<span class="math inline">\(L_1\)</span> 范数（绝对值和）还是 <span class="math inline">\(L_2\)</span> 范数（平方和）？三者的统计行为截然不同：<span class="math inline">\(L_1\)</span> 产生稀疏解，<span class="math inline">\(L_2\)</span> 只做收缩（Tibshirani, 1996; Hastie et al., 2009）。对第二个问题，它连半个数字都给不出：<span class="math inline">\(\lambda = 10^{-4}\)</span> 与 <span class="math inline">\(\lambda = 10^{2}\)</span> 都符合“偏好简单”，前者几乎不惩罚，后者把一切非平凡模型压成常数。一个不能区分惩罚形式与惩罚强度的偏好，不具备为模型选择提供规范性内容的资格。</p>
+<p>一个立刻会来的反驳是：简单性偏好不必自己给出 <span class="math inline">\(\lambda\)</span>，它可以和交叉验证配合。但这条反驳恰好证明了本节的结论。一旦引入交叉验证，<span class="math inline">\(\lambda\)</span> 的来源就是留出数据上测得的泛化误差——即上文定义的第二族显式估计。简单性偏好被留在了符号位置，真正的赋值已由误差估计完成。它是贴在误差估计机器上的一个旧标签，机器运转时标签纹丝不动。</p>
+<p>再看第一族显式估计如何供给惩罚。以三个经典结果说明。</p>
+<p><strong>AIC</strong>（Akaike, 1973, 1974）。它以估计模型与真实分布之间的 Kullback–Leibler 散度为目标。参数个数为 <span class="math inline">\(d\)</span>、最大化对数似然为 <span class="math inline">\(\hat\ell\)</span> 时，</p>
+<p><span class="math display">\[\mathrm{AIC} = -2\hat\ell + 2d\]</span></p>
+<p>其中 <span class="math inline">\(2d\)</span> 是对“用同一批数据既拟合又评价”所产生的乐观偏倚的渐近校正。<span class="math inline">\(d\)</span> 在这里不是“简单性”的贡献，而是模型灵活性带来的估计偏倚：参数越多，用同一批数据拟合时高估自身表现的程度越重，要付的账也越多。</p>
+<p><strong>BIC</strong>（Schwarz, 1978）。它来自贝叶斯边际似然的 Laplace 近似：</p>
+<p><span class="math display">\[\mathrm{BIC} = -2\hat\ell + d \log n\]</span></p>
+<p>惩罚项 <span class="math inline">\(d\log n\)</span> 是后验模型概率在大样本下的渐近形式，来自“同一批数据下增加一个参数的边际概率代价随样本量增长”这一概率事实，而不是任何关于“简单”的直觉。</p>
+<p><strong>VC 界</strong>（Vapnik &amp; Chervonenkis, 1971; Vapnik, 1998）。对 VC 维为 <span class="math inline">\(d_{\mathrm{VC}}\)</span> 的假设空间，以至少 <span class="math inline">\(1-\delta\)</span> 的概率，对所有 <span class="math inline">\(h\in\mathcal{F}\)</span> 有（常见形式之一，常数因文献而异）</p>
+<p><span class="math display">\[L(h) \le \hat{L}(h) + \sqrt{\frac{d_{\mathrm{VC}}\left(\ln\frac{2n}{d_{\mathrm{VC}}} + 1\right) + \ln\frac{4}{\delta}}{n}}\]</span></p>
+<p>式中每一个量——<span class="math inline">\(d_{\mathrm{VC}}\)</span>、<span class="math inline">\(n\)</span>、<span class="math inline">\(\delta\)</span>——都在直接说话，没有一个量在说“简单更好”：假设空间容量越大，界越松；样本越多，界越紧；置信要求越高，留的余地越大。</p>
+<p>三个例子指向同一个结论：惩罚项的形式与系数都是从具体的误差估计中解出来的。简单性偏好唯一可能的工作方式，是作为这些结果的非正式缩写。但缩写有可逆性要求：应当能从缩写还原出被缩写的东西。给你“简单”二字，你无法还原出它指的是 AIC 的 <span class="math inline">\(2d\)</span>、BIC 的 <span class="math inline">\(d\log n\)</span>，还是 VC 界的平方根项——三者在 <span class="math inline">\(n\)</span> 增大时的行为都不相同。不可逆的缩写不是缩写，是占位符；占位符不提供内容。</p>
+<h2 id="sec-3">二、最强的反驳：简单性即编码长度</h2>
+<p>上一节的论证有一个显著的空档。存在一条传统，在那里“简单”并非占位符，而是一个精确的量：Kolmogorov 复杂度与最小描述长度（MDL）原则（Rissanen, 1978; Grünwald, 2007）。在 MDL 里，模型的复杂度就是在某个编码方案下描述它所需的比特数；BIC 本身也可从两段式 MDL 推出。如果简单性能被赋值为编码长度，第一节“简单性给不出系数”的结论似乎就被推翻了。本节正面处理这一反驳，并论证：它非但没有为简单性偏好翻案，反而是本文论点最纯粹的一个实例。</p>
+<p>先看编码长度是<strong>怎样</strong>进入泛化保证的。最直接的结果是所谓 Occam 界。Blumer 等（1987）最早在可实现情形（训练误差为零）下给出它；不可分情形的标准形式如下（Langford, 2005; Shalev-Shwartz &amp; Ben-David, 2014, 第 7 章）：设对可数假设空间事先固定一个前缀码，<span class="math inline">\(h\)</span> 的码长为 <span class="math inline">\(|h|\)</span> 比特，则以至少 <span class="math inline">\(1-\delta\)</span> 的概率，对所有 <span class="math inline">\(h\)</span> 同时有</p>
+<p><span class="math display">\[L(h) \le \hat{L}(h) + \sqrt{\frac{|h|\ln 2 + \ln(1/\delta)}{2n}}\]</span></p>
+<p>PAC-Bayes 界（McAllester, 1999）把同一结构推广到连续空间，以先验 <span class="math inline">\(P\)</span> 与后验 <span class="math inline">\(Q\)</span> 的 KL 散度代替码长；Barron 与 Cover（1991）的“可分辨性指数”给出 MDL 密度估计的风险界。贝叶斯传统中的“Occam 因子”（MacKay, 1992; Jefferys &amp; Berger, 1992）走的是同一条路：边际似然之所以自动惩罚复杂模型，是因为每个模型的先验预测分布在数据空间上的积分都恰好为一——复杂模型能解释的数据集更多，就只能把这份单位质量摊得更薄。这些结果中，编码长度之所以能被赋值、之所以能进入一个可检验的保证，依赖两个条件：第一，<strong>前缀码必须在看到数据之前固定</strong>；第二，分配给各假设的权重之和不超过一；对前缀码而言，这正是 Kraft 不等式</p>
+<p><span class="math display">\[\sum_{h} 2^{-|h|} \le 1\]</span></p>
+<p>正是这两个条件，把编码长度从“简单性的度量”改写成了别的东西。</p>
+<p>第一，码长对应的“简单”是相对于码本的。换一个码本，同一个模型的码长就变；Kolmogorov 复杂度的不变性定理只保证不同通用机之间相差一个加性常数，而在有限样本下这个常数可以压倒一切。Domingos（1999）已经指出 Occam 界对任何事先固定的排序都成立，因而它不偏袒“直觉上简单”的模型。这一点本文完全接受。</p>
+<p>第二，也是本文要推进的一步：联合界所需的只是这份“权重之和不超过一”的约束（Kraft 不等式是它在前缀码上的特例），而这份约束就是一份<strong>总额不超过一的预算</strong>。证明 Occam 界的标准手法，是把总置信预算 <span class="math inline">\(\delta\)</span> 按 <span class="math inline">\(\delta_h = \delta \cdot 2^{-|h|}\)</span> 分摊给每个假设，再做联合界；结构风险最小化中给假设类分配的权重 <span class="math inline">\(w(h)\)</span>、<span class="math inline">\(\sum_h w(h)\le 1\)</span>，是同一手法（Vapnik, 1998; Shalev-Shwartz &amp; Ben-David, 2014, 第 7 章）。把先验或码长读作“事先承诺的置信预算”，在这些界的证明与教学中是标准写法（Langford, 2005），本文并不声称这一读法本身是新的；本文要推进的，是把它从一个证明技巧提升为对“复杂度是什么”的回答。有人会反驳：数据依赖先验的 PAC-Bayes 界已经放松了“先验必须在看数据之前固定”的要求。但这些方法放松的方式恰恰是付费：或者把一部分数据单独划出用来构造先验、不再用于评估（Parrado-Hernández et al., 2012），或者要求先验通过差分隐私机制从数据中生成，并按隐私预算计价（Dziugaite &amp; Roy, 2018）。数据依赖并没有免费，它只是换了一种记账方式。在这一视角下，“短码”的含义是“事先分得了较大份额的预算”，“长码”的含义是“事先只分得很小份额”。一个模型复杂，不是它自身有什么属性，而是搜索过程为了把它纳入考虑，必须从一份有限的预算中支出一大笔——而且这笔支出必须在看到数据之前承诺。</p>
+<p>于是，简单性的最强辩护把我们带到了本文的中心论题：</p>
+<blockquote>
+<p><strong>复杂度不是模型的属性，而是搜索过程对一笔预先承诺之预算的支出。</strong></p>
+</blockquote>
+<p>这一命题与“简单模型更好”有判定性的分界。按简单性偏好，复杂度是模型身上的一个刻度，可以拿两个模型并排比较；按预算支出的读法，复杂度只在一个搜索过程中有意义：同一个模型，若在搜索开始前就被放进码本的前列，它便宜；若是在看过数据、试过二十种结构之后才被提出，它即使参数很少也极其昂贵——因为那二十次尝试已经消耗了预算。这正是归纳算法中的多重比较问题（Jensen &amp; Cohen, 2000）、自适应数据分析（Dwork et al., 2015）与“分岔小径花园”（Gelman &amp; Loken, 2014）揭示的现象：真正的过拟合风险来自搜索的自由度，而不只是终选模型的形式。</p>
+<p>还有一个不走预测误差路线的对手需要回应。Kelly（2007）把简单性定义为“经验复杂度”——世界可能依次揭示的反常的序——并证明：在收敛到真理的过程中，优先选择最简单的相容答案，能使最坏情形下的改口（retraction）次数最少。这一辩护不依赖“简单模型预测更准”，因此第一节的论证不能直接取消它。本文对此的立场是收窄而非否认：本文的取消论题限于以预测为目标的模型选择；对于 Kelly 意义上的求真效率，本文只指出一个结构上的一致之处——Kelly 的代价（改口次数）同样记在<strong>搜索过程</strong>上而非单个模型上，经验复杂度的序也必须相对于问题事先给定。在这个意义上，Kelly 的辩护与本文的中心论题并不冲突，反而是它在非预测情形下的一个旁证；而改口次数本身，正是一种可被账本登记的支出。</p>
+<p>MDL 因此不是本文的例外，而是本文的核心证据：在简单性唯一被精确赋值的地方，它被赋值为一份预算的支出。剩下的问题是：数学上的预算约束，在实际的建模过程中由谁、以什么形式来维护？这是第四节要回答的。</p>
+<h2 id="sec-4">三、简单性偏好的历史错觉：有偏采样的低维投影</h2>
+<p>一个看似支持简单性偏好的历史事实是：科学家历来偏好简单理论，而且经常选对了。如果简单性从不提供内容，这些成功如何解释？</p>
+<p>先看一个常被当作简单性胜利的案例：哥白尼体系取代托勒密体系。若“简单”指圆周的个数，哥白尼《天球运行论》所用的圆周并不明显少于托勒密体系（Kuhn, 1957）。哥白尼体系真正的优势在于：托勒密体系中每颗行星的本轮—均轮比例都是须由观测单独拟合的自由量，而在日心几何中，这些比例由行星到太阳的相对距离决定，行星的逆行也不再需要逐一调节的安排。换言之，被事后记为“简单性胜利”的东西，实际是需要从数据中付费拟合的自由量减少了——用本文的语言，是同一批数据上支出的预算更少。</p>
+<p>本文的一般回答是：这些成功不是简单性偏好的成功，而是“在某类模型族中，参数少的理论碰巧具有更紧的泛化误差估计”这一数学事实的成功。在参数个数恰好是有效容量主导项的模型族里——例如低维参数模型之间的竞争——“选参数少的那个”与“选显式估计更优的那个”在结果上重合，简单性偏好于是被当成了裁决者。但这是一个有偏采样的重叠，不是机制的重叠：它只在参数个数能代理有效容量的那一类模型族中成立。</p>
+<p>离开这一类模型族，简单性偏好就失效。第一个反例是高维稀疏模型。设线性模型有 <span class="math inline">\(p = 10^6\)</span> 个候选参数，而真实模型只有 <span class="math inline">\(s=10\)</span> 个非零系数。按参数个数，这是极复杂的模型；但在稀疏性条件下，lasso 一类方法的预测风险界随 <span class="math inline">\(s\log p\)</span> 而非 <span class="math inline">\(p\)</span> 增长（Bühlmann &amp; van de Geer, 2011），而 lasso 拟合结果的有效自由度可由其估计出的非零系数个数无偏估计（Zou et al., 2007）。简单性偏好看见 <span class="math inline">\(10^6\)</span> 个参数就拉响警报；显式估计看见的是低有效容量，放行。显式估计能区分这两个模型，简单性偏好把它们混成一团。</p>
+<p>第二个、也更深的裂缝，是过参数化模型的泛化现象与“双下降”：当模型参数远超训练样本量时，测试误差可以在越过插值点之后再次下降（Zhang et al., 2017; Belkin et al., 2019; Nakkiran et al., 2020）。这里必须小心。双下降不能用来推翻显式估计，更不能反过来给简单性偏好翻案。它暴露的是两件不同的事：其一，用参数个数代理容量的低维近似在过参数化区域彻底失效，这对简单性偏好是致命的；其二，以 VC 维为代表的、对整个假设空间一致成立的上界在这一区域过松，需要依赖数据与算法的更细工具（如基于范数或间隔的界、Rademacher 复杂度；Bartlett &amp; Mendelson, 2002）。后一点是工具的更新问题，不是“复杂度无代价”。本文不站在简单性偏好一边，也不站在“复杂度无所谓”一边，而站在显式估计一边，并要求这一边接受审计。</p>
+<p>那么，能否退一步，把简单性偏好界定为一个实用的经验启发式？这也站不住。一个启发式要被认为有效，必须有可剥离的独立经验支持。就本文所考察的案例（参数模型竞争、高维稀疏、过参数化与上述天文学案例）而言，简单性偏好的成功，剥离掉“简单理论同时具有更优显式估计”这个隐含条件之后，不剩任何独立支持。它的成立区域恰好是：显式估计运作良好、因而不需要它的那些模型族；而在显式估计需要更新的区域（如过参数化），它要么失效，要么给出错误警报。换言之，它只在不被需要的地方看起来有效。</p>
+<p>这一点决定了本文与还原立场的区别。还原立场说：简单性偏好可以被还原为某个更基本的机制（泛化保证或局部背景理论）。本文说：简单性偏好在历史案例中从未作为独立机制存在过，它只是一个低维投影的再命名。前者是<strong>还原</strong>，后者是<strong>取消</strong>。取消之后，剃刀之名所在的位置就成了一个空位；而第二节已经表明，能正当占据这个空位的不是任何新的简单性内容，而是一份预算的记账。把任何东西放回这个空位，都必须附带一条账目，否则放回去的只是一张新封面。</p>
+<h2 id="sec-5">四、复杂度预算审计项的建制</h2>
+<p>上一节表明，剃刀之名剩下的是一个空位。本节的回答是：这个空位不应由任何新的规范性内容占据，而应由一个只记录、不裁决的账本装置占据。它把第二节的数学预算约束，转写为建模过程中可被第三方查验的记录。</p>
+<p>一条复杂度预算审计项由三张互锁的表构成，且只有三张。</p>
+<p><strong>表一：复杂度增量台账。</strong> 每一次向模型加入一个自由度、一个交互项、一层网络、一个潜变量，或每一次在看过数据后更换模型结构，都必须登记一行，写明这一级增量的具体形式（加一个参数还是换一个核，<span class="math inline">\(L_1\)</span> 还是 <span class="math inline">\(L_2\)</span>），以及它对应的额外容量代价的显式估计。这个估计必须落在某个可指认的估计框架内——AIC、BIC、VC 界、Rademacher 复杂度、PAC-Bayes 界或留出实测均可——但不允许不落。在可行时，登记行还应记下本次增量从预算中支出的份额（例如在事先固定的码本或权重分配下的 <span class="math inline">\(-\log_2 w(h)\)</span>，或在可复用留出机制下消耗的查询预算）。</p>
+<p><strong>表二：归因台账。</strong> 这笔复杂度增量是谁批准的——可以是一位研究者、一条自动搜索流水线、一个先验分布——但必须具体到可复查的步骤，而不能是“我们觉得”。</p>
+<p><strong>表三：修正预测台账。</strong> 每批准一笔增量，批准者必须同时登记一条可检验的修正预测：加上这一级复杂度之后，在某个指定指标上、于某个指定的到期事件时，应当发生什么。到期事件须在登记时写明，例如：在一份登记之后才启用的独立测试集上评估；或再经过 <span class="math inline">\(m\)</span> 次复杂度增量之后复核。最自然的一类预测，是显式泛化估计的改善或至少不恶化。</p>
+<p>三张表合起来，与旧剃刀的分界可以用一句话立起来：<strong>旧剃刀问“你够不够简单”，审计项问“谁付的账，何时核销”。</strong> 前一个问题无法操作化；后一个问题在登记的那一刻就带着操作化条件。</p>
+<p>一个立刻会来的反驳是：这不就是把“简单性考评”换了个说法，从打分换成了记账？不是。考评必然隐含裁决：它要在两个模型之间判定一个优于另一个。审计项不裁决，它只保证一件事——任何复杂度增量都不能匿名入场。复杂模型可以入场，甚至可以赢，但它的每一级复杂度都必须连同估计口径、批准人和当时的修正预测摊开在账本上。在逻辑上，考评项的作用域是两个候选模型的优劣比较；审计项的作用域是单个搜索过程的可追溯性。它针对的是动作，不是对象——这正是“复杂度是搜索过程的支出”这一论题在建制层面的直接后果。</p>
+<p>由此，审计项获得了旧剃刀从未有过的一个立足点。旧剃刀作为原则，它的效力边界始终是外部标注的：某领域适用，某领域失灵，边界贴上去之后剃刀本身纹丝不动。审计项的效力边界则是内生生成的：它不宣称自己在哪里有效，只保证在每一次复杂度增量的现场都留下一笔记录；如果后来证明这笔增量使泛化估计恶化，那笔记录本身就构成作废账目。效力边界从一张地图，变成了一本可以追账的流水。</p>
+<h2 id="sec-6">五、失败状态与边界检验：估计恶化成为读数</h2>
+<p>本节处理一个关键问题：当一笔复杂度增量加上去，经验误差下降而泛化估计恶化时，审计项手里有没有读数？</p>
+<p>先界定“失败状态”。它不是指模型在测试集上表现差——那是预测失败，属于账本之外的事——而是指一个更细的动作失败：执行了正确的记账程序、批准了复杂度增量、登记了修正预测，然后修正预测落空。落空的方式至少有三类。</p>
+<p><strong>第一类：估计工具选错。</strong> 用 VC 界去管一个深度过参数化网络，界松到失去方向性：它告诉你几乎任何模型都“有风险”，却不区分多一层与少一层。这时账本上会连续出现这样的行：增量登记为“增加一个隐层”，登记的估计口径是 VC 界，修正预测是“验证风险不升”；到期时验证风险确实没升，但这一行的核销依据是留出实测，而不是登记时的上界。这暴露的不是模型错，而是估计工具错位。账本的好处是，这个错位是可读的：你能看见最近若干行都是“登记口径与核销口径不一致”，而不是在一片“模型有点复杂但还可以”的含糊中失焦。</p>
+<p><strong>第二类：嵌套方向搞反。</strong> 你以为自己在从简单到复杂地搜索，实际上是从一种低容量移动到另一种低容量。有些模型族根本不构成嵌套：换一个核，有效容量可能反而下降；换一个激活函数，有效自由度也会变。账本在这里暴露出旧剃刀永远暴露不了的东西：登记的复杂度增量可能与有效容量增量不共价。当连续几行显示名义复杂度在上升、有效容量却持平或下降，审计项不必说这个模型“不够简单”，它只说这几行账“货与名不符”。这仍是一个可读的失败，而且它的可读性不依赖任何关于简单性的哲学立场。</p>
+<p><strong>第三类：损失函数与预测目标错配。</strong> 账本上批准增量的理由是“降低经验风险”，而经验风险是按一个与最终目标不共价的损失计算的。增量加上去，这个损失确实降了，但在真正关心的指标上泛化估计恶化。此时账本能把“经验风险下降”与“目标指标上的泛化估计恶化”同时记录在同一行里，而不吞掉任何一个。旧剃刀在这一刻只能说“这模型经验上赢但泛化不好，所以太复杂了”——这等于什么都没说，因为“泛化不好”已被悄悄翻译回“复杂”。审计项不做这种翻译，它让两个读数并排，让矛盾自己显露。</p>
+<p>三类失败合起来给出本节的判断：对审计项而言，失败不是系统崩溃，而是读数。传统考评条目失败时没有痕迹——一个预测错了，“简单性”无处可归因，因为它从来不是以可归因的方式进入预测的。审计项的失败是带地址的：死在账本的哪一行、哪一栏，都能指出来。</p>
+<h2 id="sec-7">六、归因核销：账本如何长出作废条件</h2>
+<p>现在处理逻辑上最危险的一个反驳：如果每一次审计失败总能被归因于估计工具选错、嵌套方向搞反或损失函数错配，审计项岂不是重新获得了免疫？它只是把旧剃刀的“使用不当”豁免，换成了“口径选错”的豁免。账本再精致，若每一笔坏账都能被记成“记账口径选错了”，它就成了一张给自己续命的表格。</p>
+<p>这个反驳是成立的，必须正面回应。归因的完备性会杀死可证伪性：一个系统若能为每一次失败找到一个原因，而这个原因总落在系统之外，那么没有任何事能推翻它（Popper, 1959）。旧剃刀正是这样免于检验的——任何反例都可以被重述为“简单性没有定义好”。如果审计项只是把这句话换成“代价结构没有选对”，它就没有比旧剃刀多活一天。</p>
+<p>因此需要一条机制，让归因本身成为可作废的对象，而不是作废的终点。本文称之为<strong>归因核销</strong>，由三条规则组成。</p>
+<p><strong>规则一：归因必须附带反向登记。</strong> 每当把一次审计失败归因于某个估计口径或代价结构的选择错误，必须同时登记一条反向账目：“若这一新口径是对的，那么此前已核销的某一笔账应被改判。”即，一次新的归因必须改动至少一笔旧账的核销状态，否则它就不是真归因，只是给失败换了个说法。归因由此从自由解释变成一次有代价的账目调整：不能只把坏账的原因写到未来，必须同时触碰过去。</p>
+<p><strong>规则二：同类归因的连锁次数受限，累计超限即整体作废。</strong> 在同一搜索过程中，若同一类口径错误被归因了 <span class="math inline">\(k_0\)</span> 次，而每一次都只是把上一笔修正预测的落空解释为另一处口径错误，则第 <span class="math inline">\(k_0\)</span> 次之后，审计项产出一张整体作废条：它不宣称哪一笔账错，而是宣称这个搜索过程的复杂度管理在整体上已不可核销。<span class="math inline">\(k_0\)</span> 不是先验常数，而是待校准参数：可在公开的模型搜索日志上回放账本，选取使“误作废率”（被作废但在后续独立测试中并未退化的搜索过程所占比例）不超过事先约定水平的最小 <span class="math inline">\(k_0\)</span>。在缺乏校准数据时，本文以 <span class="math inline">\(k_0=3\)</span> 作为初始值；这一取值仅为占位，没有先验依据，应以校准结果取代。这条规则改变了归因的方向：在旧剃刀里，归因是模型的自保；在审计项里，归因是立账之后的自曝——用得越多，越接近作废。</p>
+<p><strong>规则三：核销由到期事件自动执行。</strong> 修正预测台账中的每一行都带有登记时写明的到期事件。到期时，若预测兑现，该行冲销，对应的复杂度增量正式结清；若预测落空，该行产生一条逆记，把批准这笔增量的那一行标为“归因未核销”，并给该批准者附加一项记账义务：下一次批准同类增量时，必须逐条列出历史上同类未核销的逆记，并说明本次为何不会因同一原因落空。这让错误有记忆，让预测有后续。</p>
+<p>三条规则合起来给出本节的判断：审计项的可证伪性不在于“何时遇到反例”，而在于“修改账本的手势何时失效”。它的作废不是因为遇到一个反例，而是因为反例迫使账本修改的次数达到阈值，而每一次修改都只是归因、没有任何一次兑现。到那一刻，审计项死得不体面，但死得可被第三方查账。</p>
+<h2 id="sec-8">七、与三个近邻的划界</h2>
+<p>审计项的若干要素在既有文献中各有近亲。本节逐一划界，以说明本文新增的是什么。</p>
+<p><strong>近邻一：Lakatos 的退化研究纲领。</strong> Lakatos（1970）以一个研究纲领能否预言新颖事实来区分进步与退化：若纲领只能靠不断追加特设性的辅助假说来消化反常，它就在退化。规则二与此最为接近。但有三点不同。其一，评价对象不同：Lakatos 评价的是一个理论序列；审计项评价的是一个搜索过程的复杂度管理，同一理论可以在不同搜索过程中得到不同的账。其二，Lakatos 明确拒绝“即时理性”，不给出退化的机械判据，一个纲领可以退化很久再复兴；审计项给出可校准的阈值与到期规则，作废可由第三方机械地执行。其三，Lakatos 的框架里没有对应规则一的东西：一个新辅助假说不必回头改动过去已被接受的解释，而审计项要求每一次新归因都改动至少一笔旧账。</p>
+<p><strong>近邻二：预注册与研究者自由度。</strong> 预注册（Nosek et al., 2018）要求在接触数据之前固定分析计划，以控制研究者自由度带来的假阳性（Simmons et al., 2011; Gelman &amp; Loken, 2014）。审计项与预注册共享“事先承诺”的精神，但方向不同：预注册是事前冻结，偏离计划只需披露，并不作废；审计项允许在搜索中途追加复杂度，但要求每一笔追加都附带到期预测，并对累计未兑现的归因执行作废。预注册适合验证性研究；审计项面向的是本质上探索性的模型搜索——那里事前冻结既不现实，也不可取。机器学习工程中的实验追踪工具与模型卡（Mitchell et al., 2019）是另一类近亲：它们记录每一次运行的配置与结果，相当于表一与表二的原料，但不要求登记修正预测，也没有作废规则。</p>
+<p><strong>近邻三：自适应数据分析中的错误预算。</strong> 序贯试验中的 <span class="math inline">\(\alpha\)</span> 消耗函数（Lan &amp; DeMets, 1983）与可复用留出集（Dwork et al., 2015）都把统计误差的控制写成一份有限预算，并精确计算每一次查看数据所消耗的份额。本文第二节的“预算支出”读法与它们同源。区别在于：这些方法控制的是在给定分析序列下的统计误差，它们不记录谁批准了哪一笔支出，不要求支出附带到期预测，也不处理“把失败归咎于口径错误”这一免疫通道。在审计项中，它们恰好可以作为表一的估计工具：可复用留出集给出的查询预算消耗，就是一种可登记的支出份额。</p>
+<p>下表汇总上述划界。</p>
+<div class="tblwrap"><table class="tbl">
+
+<thead>
+<tr class="header">
+<th>比较项</th>
+<th>还原／局部化立场（Domingos; Sober）</th>
+<th>Lakatos 退化纲领</th>
+<th>预注册</th>
+<th>自适应错误预算</th>
+<th>本文审计项</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>对简单性的定性</td>
+<td>可还原或须局部辩护</td>
+<td>不涉及</td>
+<td>不涉及</td>
+<td>不涉及</td>
+<td>取消；复杂度是预算支出</td>
+</tr>
+<tr class="even">
+<td>评价对象</td>
+<td>原则本身</td>
+<td>理论序列</td>
+<td>单项研究的分析计划</td>
+<td>分析序列的统计误差</td>
+<td>搜索过程的复杂度管理</td>
+</tr>
+<tr class="odd">
+<td>是否允许中途追加复杂度</td>
+<td>—</td>
+<td>允许</td>
+<td>须披露偏离</td>
+<td>允许，按预算计价</td>
+<td>允许，须登记与到期预测</td>
+</tr>
+<tr class="even">
+<td>作废条件</td>
+<td>无</td>
+<td>无机械判据</td>
+<td>无（只披露）</td>
+<td>预算耗尽即停止</td>
+<td>归因超限与到期落空</td>
+</tr>
+<tr class="odd">
+<td>是否要求新解释改动旧账</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>是（反向登记）</td>
+</tr>
+</tbody>
+</table></div>
+<p>由此，本文相对既有工作的增量可以收为两点：第一，从 Kraft 不等式与结构风险最小化中读出“复杂度是预算支出”，并把它从一条数学约束转写为一项建模过程的建制；第二，归因核销，特别是要求新归因改动旧账的反向登记规则。</p>
+<h2 id="sec-9">八、可证伪条件与检验路径</h2>
+<p>本文的主张分两层：一层是关于剃刀的描述性论题（第一至三节），一层是关于审计项的建制性主张（第四至六节）。二者各有一条独立的证伪路径。</p>
+<p><strong>路径一：检验“简单性无独立内容”这一论题。</strong> 取一组事先登记的预测型模型选择基准，在信息条件相同（同样的数据、同样的候选集、同样的计算预算）下比较两类规则：（a）只看参数计数、不读取任何留出数据的简单性规则，例如“在经验误差处于容许范围内的模型中选参数最少者”；（b）由同一数据计算的显式估计规则（AIC、BIC、交叉验证、上界最小化）。若（a）在样本外系统性地、显著地优于（b）中的每一种，则简单性提供了显式估计之外的独立内容，本文第一、三节的“取消”论题作废。本文预言这种情形不会出现；但它在原则上可以出现，因为（a）的成败完全取决于参数计数与真实泛化之间是否另有联系。</p>
+<p><strong>路径二：检验审计项的建制价值。</strong> 这必须是一项前瞻性实验，因为在既有搜索日志上补登修正预测，会违背审计项自身“事先承诺”的要求。设计如下：在若干公开的模型搜索基准（例如公开的神经结构搜索基准）上，组织多个独立的搜索过程（人工或自动流水线），从第一步起按三张表实时登记，按规则二、三执行核销；每个基准另留一份在全部搜索结束之后才启用的独立测试数据。既有日志的回放只用于校准 <span class="math inline">\(k_0\)</span>，不作为检验证据。本文预言：被整体作废的搜索过程，在独立测试数据上的泛化表现显著差于未被作废者，且作废条通常先于可观察的泛化退化出现。若被作废者在独立测试上并不更差，或作废条在统计上无法提前于退化出现，则审计项的作废机制不具诊断价值，本文的建制性主张作废。</p>
+<p>两条路径相互独立：路径一可能被推翻而路径二成立（简单性另有独立内容，但记账仍有用），反之亦然。本文对两者都不作豁免。</p>
+<h2 id="sec-10">九、结论：从普遍原则到带作废条件的局部审计项</h2>
+<p>回顾路径。第一、三节完成的是取消：简单性偏好不是一个待还原的机制，而是一个空位；惩罚的形式与系数从显式估计中解出，“简单”二字在这些式子里从未独立出现；它的历史成功是结构性寄生，只在不被需要的地方看起来有效。第二节表明，对简单性最强的辩护——编码长度——恰恰把复杂度显露为对一份预先承诺之预算的支出。第四节据此重建：把剃刀之名从考评条目的位置挪到审计项的位置，从“裁决简单与否”降格为“记录谁付的账”。第五节让审计失败成为读数。第六节以归因核销给出作废条件。第七节与近邻划界，第八节给出两条证伪路径。</p>
+<p>可以复述的承重句是：<strong>奥卡姆剃刀被解构之后剩下的是一个空位；复杂度不是模型的属性，而是搜索过程对一笔预先承诺之预算的支出；能放进这个空位的，是一本要求每一笔复杂度增量都附带估计口径、付款人与到期预测的账本，它的效力边界不是一张地图，而是一条由累计未核销归因触发作废的规则。</strong></p>
+<p>这个结局有令人不适的一面，需要说破。剃刀不再是一个可以安然引用的荣誉头衔。过去说“我用了奥卡姆剃刀”，听众会点头，因为这听起来像方法论上的谨慎；现在若引用这一审计项，工作量反而增加：要拿出复杂度增量账、归因账、修正预测与到期事件。它不是替人省事的工具，而是逼人留下痕迹的格式。</p>
+<p>最后交代本方案最脆弱的一环：不在逻辑，而在经济学。逐笔登记有执行成本；而它最该被使用的场合——高风险、小样本、复杂度快速膨胀的搜索——恰恰也是人手最紧、最无余力记账的场合。自动化搜索流水线可以部分缓解这一点，因为机器生成的搜索日志本身就是表一和表二的原料；但修正预测与到期事件仍须有人事先写下。如果一项建制在最需要它的条件下最不可能被执行，它就有退化为伦理姿态、再成为一张新封面的危险。这一问题本文无法在理论上解决，只能交给第八节路径二那样的前瞻实验来回答。</p>
+
+</div>
+
+<div class="endbox">
+  <div class="lbl">这篇论文的初稿，是一种方法跑出来的</div>
+  <div class="big">SDE 科研创新法</div>
+  <p>先不用 SDE 做五轮经典科研立底，再评创新智商、指出提升方向，然后按方向做五轮 SDE 思想创新，最后打磨成文。四步都在 ChatSDE 里，免费，浏览器直接用。</p>
+  <a class="solid" href="/taste/chatsde/">进入 ChatSDE →</a>
+  <a class="ghost" href="/creation/research-philosophy/">回科研哲学频道 →</a>
+</div>
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">参考文献 · References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">下列文献均为正文直接引用的原典与研究，卷期页码已逐条核对；本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+<li style="margin:0 0 9px;padding-left:6px">Akaike, H. (1973). Information theory and an extension of the maximum likelihood principle. In B. N. Petrov &amp; F. Csáki (Eds.), <em>Second International Symposium on Information Theory</em> (pp. 267–281). Budapest: Akadémiai Kiadó.</li>
+<li style="margin:0 0 9px;padding-left:6px">Akaike, H. (1974). A new look at the statistical model identification. <em>IEEE Transactions on Automatic Control</em>, 19(6), 716–723.</li>
+<li style="margin:0 0 9px;padding-left:6px">Baker, A. (2022). Simplicity. In E. N. Zalta (Ed.), <em>The Stanford Encyclopedia of Philosophy</em> (Summer 2022 ed.).</li>
+<li style="margin:0 0 9px;padding-left:6px">Barron, A. R., &amp; Cover, T. M. (1991). Minimum complexity density estimation. <em>IEEE Transactions on Information Theory</em>, 37(4), 1034–1054.</li>
+<li style="margin:0 0 9px;padding-left:6px">Bartlett, P. L., &amp; Mendelson, S. (2002). Rademacher and Gaussian complexities: Risk bounds and structural results. <em>Journal of Machine Learning Research</em>, 3, 463–482.</li>
+<li style="margin:0 0 9px;padding-left:6px">Belkin, M., Hsu, D., Ma, S., &amp; Mandal, S. (2019). Reconciling modern machine-learning practice and the classical bias–variance trade-off. <em>Proceedings of the National Academy of Sciences</em>, 116(32), 15849–15854.</li>
+<li style="margin:0 0 9px;padding-left:6px">Blumer, A., Ehrenfeucht, A., Haussler, D., &amp; Warmuth, M. K. (1987). Occam's razor. <em>Information Processing Letters</em>, 24(6), 377–380.</li>
+<li style="margin:0 0 9px;padding-left:6px">Bühlmann, P., &amp; van de Geer, S. (2011). <em>Statistics for High-Dimensional Data: Methods, Theory and Applications</em>. Berlin: Springer.</li>
+<li style="margin:0 0 9px;padding-left:6px">Domingos, P. (1999). The role of Occam's razor in knowledge discovery. <em>Data Mining and Knowledge Discovery</em>, 3(4), 409–425.</li>
+<li style="margin:0 0 9px;padding-left:6px">Dwork, C., Feldman, V., Hardt, M., Pitassi, T., Reingold, O., &amp; Roth, A. (2015). The reusable holdout: Preserving validity in adaptive data analysis. <em>Science</em>, 349(6248), 636–638.</li>
+<li style="margin:0 0 9px;padding-left:6px">Dziugaite, G. K., &amp; Roy, D. M. (2018). Data-dependent PAC-Bayes priors via differential privacy. In <em>Advances in Neural Information Processing Systems 31</em>.</li>
+<li style="margin:0 0 9px;padding-left:6px">Forster, M., &amp; Sober, E. (1994). How to tell when simpler, more unified, or less ad hoc theories will provide more accurate predictions. <em>The British Journal for the Philosophy of Science</em>, 45(1), 1–35.</li>
+<li style="margin:0 0 9px;padding-left:6px">Gelman, A., &amp; Loken, E. (2014). The statistical crisis in science. <em>American Scientist</em>, 102(6), 460–465.</li>
+<li style="margin:0 0 9px;padding-left:6px">Grünwald, P. D. (2007). <em>The Minimum Description Length Principle</em>. Cambridge, MA: MIT Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Hastie, T., Tibshirani, R., &amp; Friedman, J. (2009). <em>The Elements of Statistical Learning</em> (2nd ed.). New York: Springer.</li>
+<li style="margin:0 0 9px;padding-left:6px">Jefferys, W. H., &amp; Berger, J. O. (1992). Ockham's razor and Bayesian analysis. <em>American Scientist</em>, 80(1), 64–72.</li>
+<li style="margin:0 0 9px;padding-left:6px">Jensen, D. D., &amp; Cohen, P. R. (2000). Multiple comparisons in induction algorithms. <em>Machine Learning</em>, 38(3), 309–338.</li>
+<li style="margin:0 0 9px;padding-left:6px">Kelly, K. T. (2007). Ockham's razor, empirical complexity, and truth-finding efficiency. <em>Theoretical Computer Science</em>, 383(2–3), 270–289.</li>
+<li style="margin:0 0 9px;padding-left:6px">Kuhn, T. S. (1957). <em>The Copernican Revolution: Planetary Astronomy in the Development of Western Thought</em>. Cambridge, MA: Harvard University Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Lakatos, I. (1970). Falsification and the methodology of scientific research programmes. In I. Lakatos &amp; A. Musgrave (Eds.), <em>Criticism and the Growth of Knowledge</em> (pp. 91–196). Cambridge: Cambridge University Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Lan, K. K. G., &amp; DeMets, D. L. (1983). Discrete sequential boundaries for clinical trials. <em>Biometrika</em>, 70(3), 659–663.</li>
+<li style="margin:0 0 9px;padding-left:6px">Langford, J. (2005). Tutorial on practical prediction theory for classification. <em>Journal of Machine Learning Research</em>, 6, 273–306.</li>
+<li style="margin:0 0 9px;padding-left:6px">MacKay, D. J. C. (1992). Bayesian interpolation. <em>Neural Computation</em>, 4(3), 415–447.</li>
+<li style="margin:0 0 9px;padding-left:6px">McAllester, D. A. (1999). PAC-Bayesian model averaging. In <em>Proceedings of the Twelfth Annual Conference on Computational Learning Theory</em> (pp. 164–170). New York: ACM.</li>
+<li style="margin:0 0 9px;padding-left:6px">Mitchell, M., Wu, S., Zaldivar, A., Barnes, P., Vasserman, L., Hutchinson, B., Spitzer, E., Raji, I. D., &amp; Gebru, T. (2019). Model cards for model reporting. In <em>Proceedings of the Conference on Fairness, Accountability, and Transparency</em> (pp. 220–229). New York: ACM.</li>
+<li style="margin:0 0 9px;padding-left:6px">Nakkiran, P., Kaplun, G., Bansal, Y., Yang, T., Barak, B., &amp; Sutskever, I. (2020). Deep double descent: Where bigger models and more data hurt. In <em>International Conference on Learning Representations</em>.</li>
+<li style="margin:0 0 9px;padding-left:6px">Nosek, B. A., Ebersole, C. R., DeHaven, A. C., &amp; Mellor, D. T. (2018). The preregistration revolution. <em>Proceedings of the National Academy of Sciences</em>, 115(11), 2600–2606.</li>
+<li style="margin:0 0 9px;padding-left:6px">Parrado-Hernández, E., Ambroladze, A., Shawe-Taylor, J., &amp; Sun, S. (2012). PAC-Bayes bounds with data dependent priors. <em>Journal of Machine Learning Research</em>, 13, 3507–3531.</li>
+<li style="margin:0 0 9px;padding-left:6px">Popper, K. R. (1959). <em>The Logic of Scientific Discovery</em>. London: Hutchinson.</li>
+<li style="margin:0 0 9px;padding-left:6px">Rissanen, J. (1978). Modeling by shortest data description. <em>Automatica</em>, 14(5), 465–471.</li>
+<li style="margin:0 0 9px;padding-left:6px">Schwarz, G. (1978). Estimating the dimension of a model. <em>The Annals of Statistics</em>, 6(2), 461–464.</li>
+<li style="margin:0 0 9px;padding-left:6px">Shalev-Shwartz, S., &amp; Ben-David, S. (2014). <em>Understanding Machine Learning: From Theory to Algorithms</em>. Cambridge: Cambridge University Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Simmons, J. P., Nelson, L. D., &amp; Simonsohn, U. (2011). False-positive psychology: Undisclosed flexibility in data collection and analysis allows presenting anything as significant. <em>Psychological Science</em>, 22(11), 1359–1366.</li>
+<li style="margin:0 0 9px;padding-left:6px">Sober, E. (2015). <em>Ockham's Razors: A User's Manual</em>. Cambridge: Cambridge University Press.</li>
+<li style="margin:0 0 9px;padding-left:6px">Spade, P. V., &amp; Panaccio, C. (2019). William of Ockham. In E. N. Zalta (Ed.), <em>The Stanford Encyclopedia of Philosophy</em> (Spring 2019 ed.).</li>
+<li style="margin:0 0 9px;padding-left:6px">Sterkenburg, T. F. (2016). Solomonoff prediction and Occam's razor. <em>Philosophy of Science</em>, 83(4), 459–479.</li>
+<li style="margin:0 0 9px;padding-left:6px">Thorburn, W. M. (1918). The myth of Occam's razor. <em>Mind</em>, 27(107), 345–353.</li>
+<li style="margin:0 0 9px;padding-left:6px">Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. <em>Journal of the Royal Statistical Society: Series B</em>, 58(1), 267–288.</li>
+<li style="margin:0 0 9px;padding-left:6px">Vapnik, V. N. (1998). <em>Statistical Learning Theory</em>. New York: Wiley.</li>
+<li style="margin:0 0 9px;padding-left:6px">Vapnik, V. N., &amp; Chervonenkis, A. Y. (1971). On the uniform convergence of relative frequencies of events to their probabilities. <em>Theory of Probability and Its Applications</em>, 16(2), 264–280.</li>
+<li style="margin:0 0 9px;padding-left:6px">Zhang, C., Bengio, S., Hardt, M., Recht, B., &amp; Vinyals, O. (2017). Understanding deep learning requires rethinking generalization. In <em>International Conference on Learning Representations</em>.</li>
+<li style="margin:0 0 9px;padding-left:6px">Zou, H., Hastie, T., &amp; Tibshirani, R. (2007). On the "degrees of freedom" of the lasso. <em>The Annals of Statistics</em>, 35(5), 2173–2192.</li>
+</ol>
+</section>
+
+
+
+<footer>© 德麦国际 Demai International · 科研哲学 · <a href="/browse/">sdeuniverses.com</a></footer>
+<style id="sde-polish-v1">
+#sde-progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--link);z-index:99}
+.wrap h2{position:relative;scroll-margin-top:74px}
+.wrap h3{scroll-margin-top:74px}
+.wrap p strong{background:linear-gradient(transparent 74%,rgba(79,195,247,0.28) 0);padding:0 1px}
+.abstract{box-shadow:0 3px 16px rgba(15,44,74,.06)}
+#sde-toc{position:fixed;left:20px;top:112px;width:196px;max-height:calc(100vh - 170px);overflow-y:auto;font-size:12.5px;line-height:1.65;z-index:15;display:none}
+#sde-toc .t-h{font-size:11px;letter-spacing:.32em;color:var(--teal2);margin-bottom:9px}
+#sde-toc a{display:block;color:var(--muted);padding:3px 0 3px 10px;border-left:2px solid rgba(15,44,74,.10);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sde-toc a.on{color:var(--link);border-left-color:var(--link);font-weight:700}
+@media(min-width:1420px){#sde-toc{display:block}}
+#sde-top{position:fixed;right:22px;bottom:26px;width:42px;height:42px;border-radius:50%;background:var(--btn);color:#fff;border:none;font-size:18px;line-height:1;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;z-index:30;box-shadow:0 4px 14px rgba(15,44,74,.2)}
+#sde-top.show{opacity:.94;pointer-events:auto}
+@media print{.readbar,#sde-toc,#sde-top,#sde-progress,.endbox,footer{display:none!important}body{background:#fff!important}}
+</style>
+<script id="sde-polish-v1-js">
+(function(){
+if(document.getElementById('sde-progress'))return;
+var bar=document.createElement('div');bar.id='sde-progress';document.body.appendChild(bar);
+var top=document.createElement('button');top.id='sde-top';top.textContent='\u2191';top.setAttribute('aria-label','\u56de\u5230\u9876\u90e8');document.body.appendChild(top);
+top.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+var hs=[].slice.call(document.querySelectorAll('.wrap h2'));
+var toc=null,links=[];
+if(hs.length>=4){
+  toc=document.createElement('nav');toc.id='sde-toc';
+  var lb=document.createElement('div');lb.className='t-h';lb.textContent='\u76ee \u5f55';toc.appendChild(lb);
+  hs.forEach(function(h,i){
+    if(!h.id)h.id='sec-'+(i+1);
+    var a=document.createElement('a');a.href='#'+h.id;
+    a.textContent=h.textContent.replace(/^[\u4e00-\u9fff]{1,3}\u3001/,'');
+    links.push(a);toc.appendChild(a);
+  });
+  document.body.appendChild(toc);
+}
+function onScroll(){
+  var d=document.documentElement,max=d.scrollHeight-window.innerHeight,y=window.scrollY||d.scrollTop;
+  bar.style.width=(max>0?Math.min(100,y/max*100):0)+'%';
+  if(y>600){top.classList.add('show');}else{top.classList.remove('show');}
+  if(toc){var cur=-1;for(var i=0;i<hs.length;i++){if(hs[i].getBoundingClientRect().top<140)cur=i;}
+    links.forEach(function(a,i){a.className=(i===cur?'on':'');});}
+}
+window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);onScroll();
+})();
+</script>
+<script id="sde-pv-js">
+(function(){var el=document.getElementById("sde-pv-n");if(!el)return;
+var slug="creation/research-philosophy/occam-razor-audit",k="sde_pv_"+slug,day=new Date(Date.now()+288e5).toISOString().slice(0,10),m="POST";
+try{if(localStorage.getItem(k)===day)m="GET";}catch(e){}
+fetch("/api/pv?slug="+slug,{method:m}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){el.textContent=d.total.toLocaleString("zh-Hans-CN");
+if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
+.catch(function(){var w=document.getElementById("sde-pv-wrap");if(w)w.style.display="none";});
+})();
+</script>
+
+<!-- SDE 陪读浮层 -->
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+
+<script src="/wds-mode.js?v=20261004h" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>
