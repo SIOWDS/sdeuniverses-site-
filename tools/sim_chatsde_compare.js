@@ -65,6 +65,16 @@ function checks(FE, BE, quiet) {
   put(/cmpBtn\.style\.display = PROFILE \? "none" : ""/.test(FE), "C 分身页不露这颗按钮（分身不认 nosde）");
   put(/duPaint\(\); cmpPaint\(\); pjPaint\(\)/.test(FE), "C 换语言时按钮文案跟着重画");
   put(/window\.SDEDocx\.build\(/.test(sliceFn(FE, "function cmpDocx(")), "C Word 走全站共用的 SDEDocx");
+  // D. 事实核查道（2026-10-04「修改管道的事实核查」）
+  const FC = sliceFn(FE, "function cmpFc(col, mine)");
+  put(/nosde: 1, fc: 1/.test(FC) && /history: \[\]/.test(FC), "D 核查员走 nosde＋fc、不带历史（不装内功，不护短）");
+  put(/Promise\.all\(cols\.map\(function \(c\) \{ return cmpFc\(c, mine\); \}\)\)\.then\(finish\)/.test(S), "D 两份稿都写完才一起核查——同一道程序，公平");
+  put(/out\.split\(orig\)\.join\(fix\)/.test(sliceFn(FE, "function cmpFcApply(")) && !/q: col\.text \+/.test(FC), "D 只做逐字替换，不让核查员重写全文");
+  put(/if \(!sure \|\| !fix\) \{ o\.st = "doubt"; return; \}/.test(FE), "D 存疑的不改，只记");
+  put(/cmpFcMd\(fc\)/.test(sliceFn(FE, "function cmpDocx(")), "D Word 末尾附核查记录");
+  put(/const fcRun = \(b\.nosde === 1 \|\| b\.nosde === true\) && \(b\.fc === 1 \|\| b\.fc === true\);/.test(BE), "D 服务端认 fc 只在 nosde 下认");
+  put(/const askLen = fcRun \? 0 : wdsAskLen\(q\);/.test(BE), "D 核查道不被稿里的「2000 字」误判成长文请求");
+  put(/const sys = fcRun \? WDS_FC_SYS\(lang\)/.test(BE), "D 核查道 system 整段改道（不进 WDS_CHAT_SYS）");
   return R;
 }
 
@@ -82,6 +92,25 @@ try {
   ok(!/显露|差异序列|纠缠|内功|三大方程|六路径|123\s*原理|二阶碰撞|SDE/.test(ctx.blk), "传统方法论块本身零 SDE 术语");
   ok(/conventional academic method/.test(ctx.en), "英文一份也在");
 } catch (e) { ok(false, "右路 system 实算抛错：" + e.message); }
+
+// 核查员 system 实算：零 SDE 术语、只挑硬伤
+console.log("── 核查员 system 实算");
+try {
+  const fn = sliceFn(BE0, "function WDS_FC_SYS(lang)");
+  const ctx = {}; vm.createContext(ctx);
+  vm.runInContext(fn + "\nthis.zh = WDS_FC_SYS('zh'); this.en = WDS_FC_SYS('en');", ctx);
+  ok(/事实核查/.test(ctx.zh) && /JSON/.test(ctx.zh) && /不评论观点/.test(ctx.zh), "核查员只挑硬伤、交 JSON、不碰观点");
+  ok(!/显露|差异序列|纠缠|内功|三大方程|六路径|二阶碰撞|SDE/.test(ctx.zh + ctx.en), "核查员 system 零 SDE 术语");
+} catch (e) { ok(false, "核查员 system 实算抛错：" + e.message); }
+// 替换器实算
+try {
+  const ctx = {}; vm.createContext(ctx);
+  vm.runInContext(sliceFn(FE0, "function cmpFcParse(s)") + "\n" + sliceFn(FE0, "function cmpFcApply(text, items)") + "\n"
+    + "var it = cmpFcParse('好的，结果如下：[{\"orig\":\"九百年\",\"fix\":\"约七百年\",\"why\":\"奥卡姆是14世纪人\",\"level\":\"错\"},{\"orig\":\"莱布尼茨\",\"fix\":\"\",\"level\":\"存疑\"},{\"orig\":\"没这句\",\"fix\":\"x\",\"level\":\"错\"}]');"
+    + "this.out = cmpFcApply('九百年的使用……九百年前那个修士。莱布尼茨。', it); this.st = it.map(function(o){return o.st;}).join(',');", ctx);
+  ok(ctx.out === "约七百年的使用……约七百年前那个修士。莱布尼茨。", "同一错误出现两次全部替换；存疑的不动");
+  ok(ctx.st === "fix,doubt,miss", "三种结局都记下：已改／存疑／原句未找到（" + ctx.st + "）");
+} catch (e) { ok(false, "替换器实算抛错：" + e.message); }
 
 // 字数与 Word
 console.log("── 字数与 Word");

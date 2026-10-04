@@ -195,7 +195,7 @@ ok("第 5 档装完整内功：只在普通问答上、走 resPriorFit 预算闸
   && CHAT.slice(i5, i5 + 2600).indexOf("resPriorFit(_ng5.length, 0, ctxText.length, webCtx.length, docCtx.length,") > 0
   && CHAT.slice(i5, i5 + 2600).indexOf("neigongLite(_ng5)") > 0
   && CHAT.slice(i5, i5 + 2600).indexOf("内功文件没读到") > 0);
-ok("第 5 档内功装在 system 拼装之前", i5 > 0 && i5 < CHAT.indexOf("const sys = WDS_CHAT_SYS("));
+ok("第 5 档内功装在 system 拼装之前", i5 > 0 && i5 < CHAT.indexOf("WDS_CHAT_SYS(reflect, SDEM,"));
 ok("定档发生在检索之后、心得之前（读数从检索里来；心得键随型号变）", CHAT.indexOf("const G = wdsGradePick(") > CHAT.indexOf("const rr = await wdsRag(env, url, _ragBody);") && CHAT.indexOf("const G = wdsGradePick(") < CHAT.indexOf("reflect = await ensureReflect(env, url, rvendor, VC, KEY)"));
 ok("研究产线（rs.sde）自己的内功装载没被动", /if \(rs && rs\.sde && !prof\) \{\s*let _ng = "";/.test(CHAT));
 

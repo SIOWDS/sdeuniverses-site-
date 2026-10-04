@@ -55,7 +55,8 @@ ok(/DUEL_ROLES\[String\(duelRaw\.role \|\| ""\)\]/.test(W), "role 走白名单")
 ok(/\.slice\(0, 24000\)/.test(W), "prior 切长防撑爆输入窗");
 /* ⚠ 原来钉的是参数表**末尾**（`, tool, rs, duel);`）——于是后面每加一个参数都假红。
    要守的是「调用处递了 duel」，与它是不是最后一个无关。 */
-const _csCall = /const sys = WDS_CHAT_SYS\(([^;]*)\);/.exec(W);
+// 2026-10-04 起调用点前多了事实核查道的改道（const sys = fcRun ? WDS_FC_SYS(lang) : (WDS_CHAT_SYS(…) + …)）
+const _csCall = /const sys = (?:fcRun \? WDS_FC_SYS\(lang\)[^\n]*\n\s*: \()?WDS_CHAT_SYS\(([^;]*)\);/.exec(W);
 ok(!!_csCall && /\bduel\b/.test(_csCall[1]), "调用处补了 duel 参数");
 
 console.log("⑦ 前端：串行、异质、互斥、降级");

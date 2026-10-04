@@ -21,8 +21,15 @@ const calls = [];
 w.fetch = function (url, o) {
   if (String(url).indexOf("/api/wds/chat") < 0) return new Promise(() => {});
   const body = JSON.parse(o.body);
+  if (body.fc === 1) {                      // 事实核查道：对有 SDE 那份挑出「九百年」
+    calls.push(body);
+    const arr = /九百年/.test(body.q) ? '[{"orig":"九百年","fix":"约七百年","why":"奥卡姆是14世纪人","level":"错"}]' : "[]";
+    const ls = ['data: ' + JSON.stringify({ t: "token", v: arr }) + "\n", 'data: [DONE]\n'];
+    let k = 0; const en = new (require("util").TextEncoder)();
+    return Promise.resolve({ ok: true, status: 200, body: { getReader: () => ({ read: () => Promise.resolve(k < ls.length ? { done: false, value: en.encode(ls[k++]) } : { done: true }), cancel: () => {} }) } });
+  }
   const side = body.cmp;
-  const txt = side === "sde" ? "## 一、判断\n\n有 SDE 这一路的正文。" : "## 一、判断\n\n无 SDE 这一路的正文。";
+  const txt = side === "sde" ? "## 一、判断\n\n有 SDE 这一路的正文，九百年的使用。" : "## 一、判断\n\n无 SDE 这一路的正文。";
   const lines = [
     side === "sde" ? 'data: {"t":"note","v":"难度第 5 档：已装完整内功先验（78159 字，含二阶碰撞）。"}\n' : 'data: {"t":"note","v":"同题对照 · 无 SDE 一路"}\n',
     'data: ' + JSON.stringify({ t: "token", v: txt }) + "\n",
@@ -54,7 +61,8 @@ setTimeout(function () {
   if (sendBtn) sendBtn.click();
   else inEl.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
   setTimeout(function () {
-    ok(calls.length === 2, "一问发出两条请求（实际 " + calls.length + " 条）");
+    const main = calls.filter(c => c.fc !== 1);
+    ok(main.length === 2, "一问发出两条正文请求（实际 " + main.length + " 条）");
     const S = calls.find(c => c.cmp === "sde"), P = calls.find(c => c.cmp === "plain");
     ok(!!S && !!P, "一条 cmp=sde，一条 cmp=plain");
     if (S && P) {
@@ -74,8 +82,13 @@ setTimeout(function () {
       const acts = Array.from(d.querySelectorAll(".wdsm-acts .wdsm-act")).map(b => b.textContent);
       ok(acts.some(a => /Word · 有 SDE/.test(a)) && acts.some(a => /Word · 无 SDE/.test(a)), "收尾出两颗 Word 按钮：" + acts.join(" ｜ "));
       ok(acts.some(a => /两份 Word 一起存/.test(a)) && acts.some(a => /创新智商/.test(a)), "另有「两份一起存」与「打创新智商」");
+      const fcs = calls.filter(c => c.fc === 1);
+      ok(fcs.length === 2 && fcs.every(c => c.nosde === 1 && c.history.length === 0), "两份各过一道事实核查（nosde、无历史）");
+      ok(/约七百年的使用/.test(cols[0].textContent) && !/九百年/.test(cols[0].querySelector(".wdsm-a").textContent), "有 SDE 那份的「九百年」被改成「约七百年」");
+      const fcBox = d.querySelectorAll(".wdsm-cmpfc");
+      ok(fcBox.length === 2 && /改了 1 处/.test(fcBox[0].textContent) && /未发现/.test(fcBox[1].textContent), "两栏底下各挂核查记录：" + Array.from(fcBox).map(b => b.querySelector("summary").textContent).join(" ｜ "));
       console.log("\n===== " + pass + " PASS / " + fail + " FAIL =====");
       process.exit(fail ? 1 : 0);
-    }, 400);
+    }, 900);
   }, 300);
 }, 300);

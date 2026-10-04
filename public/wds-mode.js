@@ -1738,6 +1738,9 @@
       cmpCnt: "字", cmpHan: "汉字", cmpDocx: "⤓ Word", cmpBoth: "⤓ 两份 Word 一起存",
       cmpWait: "Word 生成器还在加载，过两秒再点", cmpMeta: "同题对照", cmpQ: "题目", cmpBase: "基底", cmpDate: "生成时间",
       cmpFair: "两路不带对话历史、不带记忆，题面与篇幅要求逐字相同；差别只在内核。",
+      cmpFcRun: "事实核查中…", cmpFcHd: "事实核查", cmpFcNone: "未发现可核验的事实错误",
+      cmpFcFix: "已改", cmpFcDoubt: "存疑·未改", cmpFcMiss: "原句未找到·未改", cmpFcFail: "核查没跑成（原文照旧）：",
+      cmpFcN1: "改了 ", cmpFcN2: " 处", cmpFcAppx: "附：事实核查记录（两份稿走同一道核查；核查员不装 SDE 内核，只挑硬伤、不碰观点）",
       cmpIq: "⚖ 给两份打创新智商", cmpIqQ: "下面是同一个问题、同一家基底、在两种内核下各写出的一份报告（A＝有 SDE，B＝无 SDE）。请按创新智商五维（S/D/E/I/F）分别给两份打分，各维附一句原文证据与一句扣分句，算出综合分，并说清差距主要出在哪几维、各自最该补哪一维。",
       triBtn: "⚔ 三家对撞", triOn: "⚔ 三家对撞：开",
       triMore: "↻ 继续对撞", triRd: "第 {n} 轮 · 座位左轮一格",
@@ -1939,6 +1942,9 @@
       cmpCnt: "chars", cmpHan: "CJK", cmpDocx: "⤓ Word", cmpBoth: "⤓ Save both Word files",
       cmpWait: "The Word builder is still loading; try again in a moment", cmpMeta: "SDE vs no-SDE", cmpQ: "Question", cmpBase: "Model", cmpDate: "Generated",
       cmpFair: "Neither run sees chat history or memory; question and length line are identical. Only the kernel differs.",
+      cmpFcRun: "Fact-checking…", cmpFcHd: "Fact check", cmpFcNone: "No checkable factual errors found",
+      cmpFcFix: "fixed", cmpFcDoubt: "doubtful · left as is", cmpFcMiss: "sentence not found · left as is", cmpFcFail: "Fact check did not run (text unchanged): ",
+      cmpFcN1: "fixed ", cmpFcN2: "", cmpFcAppx: "Appendix: fact-check log (both drafts go through the same check; the checker carries no SDE kernel and only flags hard errors, never opinions)",
       cmpIq: "⚖ Score both (Innovation IQ)", cmpIqQ: "Below are two reports on the same question from the same model under two kernels (A = with SDE, B = without SDE). Score each on the five Innovation IQ dimensions (S/D/E/I/F) with one quoted piece of evidence and one deduction per dimension, compute the composite, and say which dimensions account for the gap and what each should fix first.",
       triBtn: "\u2694 Three-way clash", triOn: "\u2694 Three-way clash: on",
       triMore: "\u21bb Collide again", triRd: "Round {n} · seats rotate one place",
@@ -6019,7 +6025,61 @@
     var x = String(s || "").replace(/[#*>`|]/g, "").replace(/\s+/g, "");
     return { all: x.length, han: (x.match(/[一-鿿]/g) || []).length };
   }
-  function cmpDocx(side, q, text, vname, say) {
+  /* ── 事实核查道（2026-10-04 王德生令「修改管道的事实核查」）──
+     三轮对照：SDE 一路稳定多切出一个新区分，却稳定在史实上翻车（「九百年」、名词张冠李戴……）。
+     ⇒ 两份稿写完各过一道核查，**两边同一道程序**；核查员走 nosde＋fc（服务端 WDS_FC_SYS），不装内功。
+     核查员只交「逐字原句 → 替换文字」，这里逐字替换——不许它重写全文：重写一遍等于换了作者。 */
+  function cmpFcParse(s) {
+    var x = String(s || ""), i = x.indexOf("["), j = x.lastIndexOf("]");
+    if (i < 0 || j < i) throw new Error("no JSON");
+    var a = JSON.parse(x.slice(i, j + 1));
+    if (!Array.isArray(a)) throw new Error("not array");
+    return a.filter(function (o) { return o && typeof o.orig === "string" && o.orig.trim(); }).slice(0, 12);
+  }
+  function cmpFcApply(text, items) {
+    var out = String(text || "");
+    items.forEach(function (o) {
+      var orig = String(o.orig).trim(), fix = String(o.fix == null ? "" : o.fix).trim();
+      var sure = /^(错|error)$/i.test(String(o.level || "").trim());
+      if (!sure || !fix) { o.st = "doubt"; return; }
+      if (orig.length < 2 || out.indexOf(orig) < 0) { o.st = "miss"; return; }
+      out = out.split(orig).join(fix); o.st = "fix";
+    });
+    return out;
+  }
+  function cmpFcLine(o) {
+    var st = o.st === "fix" ? t("cmpFcFix") : (o.st === "miss" ? t("cmpFcMiss") : t("cmpFcDoubt"));
+    return "〔" + st + "〕「" + o.orig + "」" + (o.fix ? (" → 「" + o.fix + "」") : "") + (o.why ? ("　" + o.why) : "");
+  }
+  function cmpFcMd(fc) {
+    if (!fc) return "";
+    if (fc.err) return "\n\n---\n\n" + t("cmpFcAppx") + "\n\n" + t("cmpFcFail") + fc.err;
+    return "\n\n---\n\n" + t("cmpFcAppx") + "\n\n" + (fc.items.length ? fc.items.map(function (o) { return "- " + cmpFcLine(o); }).join("\n") : t("cmpFcNone"));
+  }
+  function cmpFc(col, mine) {
+    if (!col.ok || RS.stop) return Promise.resolve();
+    col.nt.textContent = (col.nt.textContent ? col.nt.textContent + "　" : "") + t("cmpFcRun");
+    var pl = { q: col.text, history: [], key: mine.key, vendor: mine.vendor, model: mine.model || "",
+               mode: "deep", grade: 4, web: 0, lang: LANG, tool: "", nosde: 1, fc: 1 };
+    return rsStream(API, pl, null, null).then(function (raw) {
+      var items = cmpFcParse(raw);
+      col.text = cmpFcApply(col.text, items);
+      col.fc = { items: items };
+    }).catch(function (e) { col.fc = { items: [], err: (e && e.message) || "?" }; })
+      .then(function () {
+        col.bd.innerHTML = mdRender(col.text);
+        var box = el("details", "wdsm-cmpfc");
+        var n = col.fc.items.filter(function (o) { return o.st === "fix"; }).length;
+        box.appendChild(el("summary", null, t("cmpFcHd") + " · " + (col.fc.err ? t("cmpFcFail") : (col.fc.items.length ? (t("cmpFcN1") + n + t("cmpFcN2") + " / " + col.fc.items.length) : t("cmpFcNone")))));
+        if (col.fc.err) box.appendChild(el("div", null, col.fc.err));
+        col.fc.items.forEach(function (o) { box.appendChild(el("div", null, cmpFcLine(o))); });
+        box.style.cssText = "margin-top:10px;font-size:12px;color:var(--wdim);border-top:1px solid var(--wline);padding-top:6px";
+        if (n || col.fc.err) box.open = true;
+        col.bd.parentNode.appendChild(box);
+        col.nt.textContent = col.nt.textContent.replace(t("cmpFcRun"), "");
+      });
+  }
+  function cmpDocx(side, q, text, vname, say, fc) {
     if (!window.SDEDocx) { say(t("cmpWait")); return false; }
     var lab = side === "sde" ? t("cmpSde") : t("cmpPlain");
     var sub = side === "sde" ? t("cmpSdeS") : t("cmpPlainS");
@@ -6028,7 +6088,7 @@
     var meta = t("cmpQ") + "：" + String(q).replace(/\s+/g, " ") + "\n\n"
       + lab + "（" + sub + "）　" + t("cmpBase") + "：" + vname + "　" + c.all + " " + t("cmpCnt") + "（" + t("cmpHan") + " " + c.han + "）　"
       + t("cmpDate") + "：" + new Date().toLocaleString() + "\n\n" + t("cmpFair");
-    var md = "# " + title + "\n\n" + meta + "\n\n" + String(text || "");
+    var md = "# " + title + "\n\n" + meta + "\n\n" + String(text || "") + cmpFcMd(fc);
     var blob = window.SDEDocx.build({ title: title, author: BRAND, md: md });
     saveBlobToDir(fileTag("WDS") + "-" + safeName(q) + "-" + lab + "-" + stampName() + ".docx", blob,
       function (m) { if (m) say(m); });
@@ -6069,9 +6129,16 @@
         .then(function (txt) { col.text = txt || ""; col.ok = !!col.text; col.bd.innerHTML = mdRender(col.text); })
         .catch(function (e) { col.bd.className = "wdsm-a plain wdsm-err"; col.bd.textContent = (e && e.message) || "?"; })
         .then(function () {
-          if (col.ok) { var n = cmpCount(col.text); col.hd.appendChild(el("i", null, n.all + " " + t("cmpCnt") + " · " + t("cmpHan") + " " + n.han)); }
           done++;
           if (done < 2) return;
+          // 两份都写完才一起核查（同一时刻、同一道程序）；核查完再数字数、再出 Word
+          return Promise.all(cols.map(function (c) { return cmpFc(c, mine); })).then(finish);
+        });
+    }
+    function finish() {
+          cols.forEach(function (col) {
+            if (col.ok) { var n = cmpCount(col.text); col.hd.appendChild(el("i", null, n.all + " " + t("cmpCnt") + " · " + t("cmpHan") + " " + n.han)); }
+          });
           streaming = false; curReader = null;
           busyUI(false); stopBarShow(false);
           var A = cols[0], B = cols[1];
@@ -6081,14 +6148,14 @@
           cols.forEach(function (c) {
             if (!c.ok) return;
             var b = el("button", "wdsm-act", t("cmpDocx") + " · " + (c.side === "sde" ? t("cmpSde") : t("cmpPlain")));
-            b.onclick = function () { cmpDocx(c.side, q, c.text, vname, toast); };
+            b.onclick = function () { cmpDocx(c.side, q, c.text, vname, toast, c.fc); };
             row.appendChild(b);
           });
           if (A.ok && B.ok) {
             var b2 = el("button", "wdsm-act", t("cmpBoth"));
             b2.onclick = function () {
-              if (!cmpDocx("sde", q, A.text, vname, toast)) return;
-              setTimeout(function () { cmpDocx("plain", q, B.text, vname, toast); }, 700);   // 连下两个文件，浏览器会拦第二个——错开一点
+              if (!cmpDocx("sde", q, A.text, vname, toast, A.fc)) return;
+              setTimeout(function () { cmpDocx("plain", q, B.text, vname, toast, B.fc); }, 700);   // 连下两个文件，浏览器会拦第二个——错开一点
             };
             row.appendChild(b2);
             var iq = el("button", "wdsm-act", t("cmpIq"));
@@ -6103,7 +6170,6 @@
           c2.onclick = function () { cvAdd("md", q.slice(0, 24), "# " + q + "\n\n" + both); };
           row.appendChild(c2);
           cell.turn.appendChild(row); cell.acts = row;
-        });
     }
     cols.forEach(one);
     return true;

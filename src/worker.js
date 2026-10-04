@@ -10108,6 +10108,21 @@ const CMP_TRAD_BLOCK_EN = "\n\n[Method for this answer: conventional academic me
   + "\n6. Limits and falsifiability: say under what conditions the thesis fails, which evidence would make you drop it, and the weakest link."
   + "\n7. Conclude in one or two sentences the reader can carry away."
   + "\n8. Only state facts, names, dates and quotations you are sure of; otherwise omit or flag uncertainty. Never fabricate.";
+/* 【同题对照 · 事实核查道（2026-10-04 王德生令「修改管道的事实核查」）】
+   三轮人工对照的读数：SDE 一路稳定多切出一个新区分（D、I 升），却稳定在史实上翻车（S 降）——
+   「九百年」（实为约七百年）、「莱布尼茨的不可观测者同一性」（实为不可分辨者同一性）、达尔文「后来后悔」……
+   这些错任何一次自查都抓得到，抓到了综合分就回来四五分。
+   ⇒ 两份稿写完后各过一道核查，**两边同一道程序**（公平），核查员不装内功（装了会护短，见评分者五偏差）。
+   只挑硬伤、不碰观点；只给「逐字原句 → 替换文字」，由前端逐字替换——不让核查员重写全文，
+   重写一遍等于换了作者，对照就不干净了。 */
+function WDS_FC_SYS(lang) {
+  if (lang === "en") return "You are a strict fact-checking editor. The user message is a finished report. Your only job: find checkable factual errors — names, dates and lifespans, time spans (e.g. \"nine centuries\"), titles of works, quotations and their attribution, the names of concepts and principles, figures and numbers, sequences of events. Do not comment on arguments, do not rewrite, do not polish, do not add content."
+    + "\nRules: 1) Only mark errors you are sure of as level \"error\"; mark doubtful ones \"doubt\" (fix may be empty). 2) Ignore opinions, metaphors, inferences and value judgments. 3) \"orig\" must be copied verbatim from the report (2–40 characters) so it can be found exactly; \"fix\" replaces only the wrong part, similar length, same tone. 4) If one error recurs, list it once (all occurrences are replaced). 5) At most 12 items; if none, output []."
+    + "\nOutput only a JSON array, no other text and no code fences: [{\"orig\":\"…\",\"fix\":\"…\",\"why\":\"one-line basis\",\"level\":\"error\"}]";
+  return "你是一名严格的事实核查编辑。用户消息里是一篇已经写好的报告。你的唯一任务：找出其中可核验的事实性错误——人名、生卒年、年代与时间跨度（如「九百年」）、著作名、引文及其出处归属、学术概念与原理的名称、数据与数字、事件经过。不评论观点、不改论证、不润色、不添加任何新内容。"
+    + "\n判定纪律：1）只把你有把握的错误标为 level「错」；拿不准的标「存疑」（fix 可以留空）。2）观点、比喻、推断、价值判断一律不管。3）orig 必须从原文逐字复制（2–40 字），能在原文中原样找到；fix 只替换错处，长度与 orig 相近，保留原文语气。4）同一个错误在文中出现多次，只列一次（会全部替换）。5）最多 12 条；没有错误就输出 []。"
+    + "\n只输出一个 JSON 数组，不要任何其他文字、不要代码块标记：[{\"orig\":\"…\",\"fix\":\"…\",\"why\":\"一句话依据\",\"level\":\"错\"}]";
+}
 function WDS_PLAIN_SYS(webCtx, docCtx, about, lang, docNote) {
   return "你是一个称职、直接的通用助手，这一路是 SDE Universes 网站「ChatSDE」里的「无 SDE」问对入口。"
     + "\n\n【怎么答】"
@@ -13484,7 +13499,11 @@ export default {
       // 整场历史全量收下（原来只带最近 4 轮：第五轮起它就真的忘了开头）。
       // 长度不在这里砍——交给下面 packReadHistory 按 system 实际体量裁，且超预算才裁、裁了明标省略。
       const history = Array.isArray(b.history) ? b.history : [];
-      const askLen = wdsAskLen(q);                       // 读者点名要几千字：预算/口径/时限三件一起变
+      /* 【同题对照 · 事实核查道（2026-10-04）】nosde 且 fc=1：这一趟不是答题，是给一篇写好的稿子挑硬伤。
+         稿子里常出现「约 2000 字」之类字样——不在这里把 askLen 清零，就会被当成「读者要一篇两千字长文」，
+         预算、口径、长篇指令全套挂上去，核查员会开始写文章。 */
+      const fcRun = (b.nosde === 1 || b.nosde === true) && (b.fc === 1 || b.fc === true);
+      const askLen = fcRun ? 0 : wdsAskLen(q);           // 读者点名要几千字：预算/口径/时限三件一起变
       // USER_RAG（全局记忆）：客户端在本机按这一问挑出的几条历史对话摘要＋画像。
       // 与 LONGASK 同一条纪律——挂在当轮 user 消息上、**不进 system**：
       // ①system 是可被基底前缀缓存的固定段，每轮换内容会把缓存打散；②这几条只对这一问相关，不该长驻。
@@ -14122,8 +14141,9 @@ export default {
             /* 【同题对照 · 2026-10-04】前端 cmp="plain" 且已走无 SDE 改道 ⇒ 在通用助手的 system 尾巴上补一份传统学术方法论。
                只在这里补、只补这一路：方法论的差别只许出在两份 system 里，题面两边逐字相同（篇幅要求由前端拼在题面后）。 */
             const cmpPlain = noSde && b.cmp === "plain";
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history), razTake(b, tool))
-              + (cmpPlain ? (lang === "en" ? CMP_TRAD_BLOCK_EN : CMP_TRAD_BLOCK) : "");
+            const sys = fcRun ? WDS_FC_SYS(lang)        // 事实核查道整段改道：不装人格、内功、方法论、站内语料
+              : (WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history), razTake(b, tool))
+                + (cmpPlain ? (lang === "en" ? CMP_TRAD_BLOCK_EN : CMP_TRAD_BLOCK) : ""));
             if (cmpPlain) controller.enqueue(_sseBytes({ t: "note", v: (lang === "en") ? "Comparison · no-SDE side: no SDE kernel, method or site corpus; conventional academic method only." : "同题对照 · 无 SDE 一路：不装内功、不装 SDE 方法论、不挂站内语料；只用传统学术方法论＋基底本功。" }));
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
