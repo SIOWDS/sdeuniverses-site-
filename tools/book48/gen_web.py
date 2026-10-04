@@ -39,7 +39,7 @@ article h2{font-size:22px;margin:52px 0 18px}
 </style>'''
 TAIL = '''<script>window.WDS_READ={selector:"article"};</script>
 <script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
-<script src="/wds-mode.js?v=20261004d" defer></script>
+<script src="/wds-mode.js?v=20261004e" defer></script>
 <script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
 </body>
 </html>
@@ -182,7 +182,7 @@ index = f'''<!DOCTYPE html>
 </div></main>
 <!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
 <footer><div class="wrap">《三律心理学》（精选本） · {AUTH} 著 · 德麦国际出版社（新加坡） · <a href="/books/m/48/">导读页</a> · <a href="/philosophy/#books">专著全景</a> · <a href="/browse/">首页</a></div></footer>
-<script src="/wds-mode.js?v=20261004d" defer></script>
+<script src="/wds-mode.js?v=20261004e" defer></script>
 <script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
 </body>
 </html>

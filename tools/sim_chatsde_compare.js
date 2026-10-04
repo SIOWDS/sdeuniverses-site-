@@ -137,6 +137,23 @@ try {
   ok(c2.r[0] && c2.r[1] && !c2.r[2] && c2.r[3], "锚题检查：点名总题或其双字片段算回扣、旁支跑题被拦、英文也认（" + c2.r.join(",") + "）");
 } catch (e) { ok(false, "锚题约束实算抛错：" + e.message); }
 
+// 术语自足（2026-10-04）
+console.log("── 术语自足");
+try {
+  const consts = ["SDE_PATHS", "SDE_EQUATIONS", "SDE_PRINCIPLES"].map(function (n) {
+    const i = BE0.indexOf("const " + n + " ="); return BE0.slice(i, BE0.indexOf("\n", BE0.indexOf("\";", i)) + 1);
+  }).join("\n");
+  const ctx = {}; vm.createContext(ctx);
+  vm.runInContext(consts + "\n" + sliceFn(BE0, "function WDS_QGEN_SYS(kind, round, lang)") + "\nthis.s = WDS_QGEN_SYS('sde', 4, 'zh'); this.c = WDS_QGEN_SYS('classic', 4, 'zh'); this.e = WDS_QGEN_SYS('sde', 4, 'en');", ctx);
+  ok(/术语自足/.test(ctx.s) && /没读过前面问对的同行/.test(ctx.s) && /Self-contained wording/.test(ctx.e), "SDE 发生器带术语自足规矩（中英）");
+  ok(!/术语自足/.test(ctx.c), "经典发生器不加（基线不动）");
+  const c2 = {}; vm.createContext(c2);
+  vm.runInContext(sliceFn(FE0, "function qacJargonOf(question, topic, turns)") + "\n"
+    + "var T=[{a:'这给了新词一种可开发票的形状，也就是三遍死亡之后的样子。'}];"
+    + "this.r = [qacJargonOf('奥卡姆剃刀下“可开发票的形状”怎样抗住删除？','解构奥卡姆剃刀',T).join(), qacJargonOf('奥卡姆剃刀里的「必要」由谁定义？','解构奥卡姆剃刀',T).join(), qacJargonOf('「奥卡姆剃刀」为什么常被误用？','解构奥卡姆剃刀',T).join(), qacJargonOf('“三遍死亡”之后怎样？','解构奥卡姆剃刀',T).join()];", c2);
+  ok(c2.r[0] === "可开发票的形状" && c2.r[1] === "" && c2.r[2] === "" && c2.r[3] === "三遍死亡", "自造词检查：前文出现过的引号说法被抓；两字题内词与总题原词不抓（" + c2.r.join(" | ") + "）");
+} catch (e) { ok(false, "术语自足实算抛错：" + e.message); }
+
 // 替换器实算
 try {
   const ctx = {}; vm.createContext(ctx);

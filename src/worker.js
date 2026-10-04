@@ -10144,12 +10144,19 @@ function WDS_QGEN_SYS(kind, round, lang) {
     const anchor = en
       ? "\n\n[Anchor rule — overrides everything else] Every question must be a sub-question of the [Topic]: it must name the topic's core object and push the answer to the topic one layer deeper. A side issue mentioned in the latest answer may be used only to strike back at the topic, never followed for its own sake. Before writing, ask yourself: if the reader saw only the topic and this question, would they see this question as part of answering the topic? If not, rewrite."
       : "\n\n【锚题规矩 · 压过上面一切】每一问都必须是【总题】的一个子问题：问句里要点名总题的核心对象，把对总题的回答往下推一层。上一答顺带提到的旁支话题，只许拿来回打总题，不许顺着它走开。落笔前自问：读者只看总题和这一问，会不会认出这一问是在回答总题？认不出就重写。";
+    /* 【术语自足 · 2026-10-04 王德生令「加上，和完善」】锚题之后第二次真跑：五问都没离开剃刀，却越问越像黑话——
+       「未结算的词」「三遍死亡」「说出＋举证账」「可开发票的形状」「跨账联署」，全是前几答自造的比喻，被问句原样接着用。
+       话题没跑，读者跑了：只看总题和第 5 问，没人看得懂它在问什么，论文也会被这些口头比喻灌满。
+       ⇒ 问句只许用总题里的词和通行学术语言；前文自造的说法要用普通话重说一遍。 */
+    const plainRule = en
+      ? "\n\n[Self-contained wording] The question must be understandable to a peer who has NOT read the dialogue. Do not carry over metaphors or coined phrases from earlier answers (especially quoted ones); restate what they mean in ordinary scholarly language. Use only the topic's own words and standard academic vocabulary."
+      : "\n\n【术语自足】问句要让一个没读过前面问对的同行也看得懂：不许原样搬用前几答自造的比喻和说法（尤其是加了引号的那些），要把它们的意思用通行的学术语言重说一遍；问句里只用总题自己的词和学界通用的词。";
     const fmt = en
       ? "\nRules: output ONE line in the form `tool name｜question` (the tool name is the first few words of the line you picked above; the question 12–40 words); it must build on the specific content of the latest answer; it must not repeat or rephrase any earlier question; nothing else."
       : "\n规矩：只输出一行，格式为「工具名｜问句」——工具名照抄你从上面挑中那一条的开头几个字，问句 15–50 字；必须扣着最近那一答的具体内容问；不许重复或换说法重问前面任何一问；别的什么都不要。";
     return (en ? "You are the question generator of an SDE dialogue (Show–Difference–Entanglement). " : "你是一场 SDE 问对的问题发生器（显露 S—差异 D—纠缠 E）。")
       + (en ? "Read the topic and the dialogue so far, then write question " : "读完总题与已有问对，写出第 ") + r
-      + (en ? " of 5." : " 问（共五问）。") + "\n\n【" + step[0] + "】" + step[1] + anchor + fmt;
+      + (en ? " of 5." : " 问（共五问）。") + "\n\n【" + step[0] + "】" + step[1] + anchor + plainRule + fmt;
   }
   const C = en ? {
     2: ["Clarify & assumptions", "Ask what a key concept in the latest answer actually means, or which hidden assumption it rests on."],

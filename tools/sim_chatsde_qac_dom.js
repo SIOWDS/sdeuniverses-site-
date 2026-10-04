@@ -41,6 +41,8 @@ w.fetch = function (url, o) {
   if (b.qgen === "sde") {
     // 第 3 问首稿故意跑题（不点名总题），看锚题检查与重出一次
     if (b.qr === 3 && !/^【上一稿跑题了/.test(b.q)) return sse(["How · 六路径｜发表激励为什么让失败记录消失？"]);
+    // 第 4 问首稿搬用前文自造词（点了总题，但带引号的「可开发票的形状」出自前几答）
+    if (b.qr === 4 && !/^【上一稿搬用了前文自造的说法/.test(b.q)) return sse(["原理一 D×E｜奥卡姆剃刀下“可开发票的形状”怎样抗住删除？"]);
     return sse(["What · 三大方程｜奥卡姆剃刀里的「必要」是经什么差异长成的？S追问" + b.qr]);
   }
   if (/【写作任务 · 前半】/.test(b.q)) {
@@ -49,7 +51,7 @@ w.fetch = function (url, o) {
   }
   if (/【续写】/.test(b.q)) return sse(["）续写完了。"]);
   if (/【写作任务 · 后半】/.test(b.q)) return sse(["## 五、讨论\n\n" + side + " 后半。\n\n## 参考文献\n\n- 某书"]);
-  return sse([side + " 第" + (b.history.length / 2 + 1) + "轮答。"]);
+  return sse([side + " 第" + (b.history.length / 2 + 1) + "轮答。" + (side === "sde" ? "这给了新词一种可开发票的形状。" : "")]);
 };
 try { w.eval(SRC); } catch (e) { console.log("eval err:", e.message); }
 
@@ -79,8 +81,12 @@ let waited = 0;
   ok(A.every(c => !c.nosde && c.grade === 5 && c.mode === "deep") && B.every(c => c.nosde === 1 && c.grade === 5 && c.mode === "deep"), "左路完整内功（第 5 档、无 nosde），右路 nosde；同档");
   ok(A[0].q === B[0].q && /^【篇幅】约 1500 字。/.test(A[0].q) && /解构奥卡姆剃刀$/.test(A[0].q), "第 1 问＝读者原题，两路逐字相同");
   const GS = calls.filter(c => c.qgen === "sde"), GC = calls.filter(c => c.qgen === "classic");
-  ok(GS.length === 5 && GC.length === 4, "SDE 路出题 4 次＋跑题重出 1 次，经典路 4 次（" + GS.length + " / " + GC.length + "）");
-  ok(GS.map(c => c.qr).join() === "2,3,3,4,5" && GC.map(c => c.qr).join() === "2,3,4,5", "出题轮次 2..5；跑题那一轮重出同一轮");
+  ok(GS.length === 6 && GC.length === 4, "SDE 路出题 4 次＋重出 2 次（跑题一次、搬词一次），经典路 4 次（" + GS.length + " / " + GC.length + "）");
+  ok(GS.map(c => c.qr).join() === "2,3,3,4,4,5" && GC.map(c => c.qr).join() === "2,3,4,5", "出题轮次 2..5；不合格那一轮重出同一轮");
+  ok(/^【上一稿搬用了前文自造的说法：「可开发票的形状」/.test(GS[4].q), "搬词重出时把那个自造词点名递回去");
+  ok(!A.some(c => /可开发票/.test(c.q)), "搬了自造词的那一问没有进入作答");
+  const P1x = calls.filter(c => /【写作任务 · 前半】/.test(c.q)), P2x = calls.filter(c => /【写作任务 · 后半】/.test(c.q));
+  ok(P1x.concat(P2x).every(c => /【用词】论文里自造的概念或比喻/.test(c.q)), "成文两半、两路都带同一句【用词】规矩（逐字相同，公平）");
   ok(/^【上一稿跑题了：「发表激励为什么让失败记录消失？」/.test(GS[2].q), "重出时把跑题的那一稿点名递回去");
   ok(!A.some(c => /发表激励/.test(c.q)), "跑题的那一问没有进入作答");
   ok(A.slice(1).every(c => /奥卡姆剃刀/.test(c.q) && !/｜/.test(c.q)), "进入作答的问句都回扣总题，且工具名已剥掉");
@@ -114,7 +120,7 @@ let waited = 0;
       const xml = typeof buf === "string" ? buf : Buffer.from(buf).toString("utf8");
       ok(/论文 A · 有 SDE/.test(xml) && /论文 B · 无 SDE/.test(xml), "合订稿里两篇都在");
       ok(/S追问2/.test(xml) && /C追问5/.test(xml), "合订稿附了两组五问");
-      ok(/〔What · 三大方程〕/.test(xml) && /首稿跑题，已重出/.test(xml), "附录里写明每问用的工具与「首稿跑题，已重出」");
+      ok(/〔What · 三大方程〕/.test(xml) && /首稿跑题，已重出/.test(xml) && /首稿搬用前文自造词，已重出/.test(xml), "附录里写明每问用的工具，以及哪一问因跑题／搬词重出过");
       ok(/事实核查记录/.test(xml), "合订稿附了核查记录");
       ok(!/【后半要写】/.test(xml), "前半末尾的提纲行已摘掉");
     } else ok(false, "读不出文件内容");
