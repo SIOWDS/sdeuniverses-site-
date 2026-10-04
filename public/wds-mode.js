@@ -6435,6 +6435,8 @@
         var sm = el("summary", null, qacFmt(t("qacRnd"), { k: k }) + " · " + (qtool ? ("〔" + qtool + "〕") : "") + t("qacQ") + "：" + qk + (qwarn ? " ⚠" : ""));
         var ab = el("div", "wdsm-a");
         ab.innerHTML = "<span class='cur'>▊</span>";
+        Array.prototype.forEach.call(col.log.children, function (b) { b.open = false; });
+        box.open = true;                                  // 正在写的这一轮展开（同科研创新法）
         box.appendChild(sm); box.appendChild(ab); col.log.appendChild(box);
         var pl = qacBase(col.side, mine);
         pl.q = t("qacLenR") + qk; pl.history = qacHist(col.turns);
@@ -6595,6 +6597,10 @@
     var box = el("details", null);
     box.appendChild(el("summary", null, qacFmt(t("qacRnd"), { k: k }) + " · " + (tool ? ("〔" + tool + "〕") : "") + t("qacQ") + "：" + qk));
     var ab = el("div", "wdsm-a"); ab.innerHTML = "<span class='cur'>▊</span>";
+    /* 正在写的这一轮展开、前几轮收起（2026-10-04 王德生「好像没有动」）：原来每轮都是收起的 <details>，
+       第一步五轮都在折叠里流字，屏幕上只有一行 11px 的灰字——看上去就是不动。 */
+    Array.prototype.forEach.call(sec.log.children, function (b) { b.open = false; });
+    box.open = true;
     box.appendChild(ab); sec.log.appendChild(box);
     return ab;
   }
@@ -6700,11 +6706,25 @@
     busyUI(true); stopBarShow(true);
     var vname = vinfo(mine.vendor).name + (mine.model ? (" · " + mine.model) : "");
     var wrap = el("div", "wdsm-lab");
+    /* 顶部一行走表：总耗时＋当前在做什么。一趟三四十分钟，第 5 档满功率每一轮开头都要先想一两分钟才出字——
+       没有一行每秒在变的东西，读者分不清「在想」和「卡死」。 */
+    var clock = el("div", "wdsm-duh");
+    clock.style.cssText = "border:0;padding:6px 10px;margin:0 0 6px;border-radius:8px;background:var(--wfill);color:var(--wtx);font-size:12.5px;display:block";
+    wrap.appendChild(clock);
+    var t0 = Date.now(), secs = [];
+    function tick() {
+      var s = Math.round((Date.now() - t0) / 1000), cur = "";
+      secs.forEach(function (x) { var v = (x.nt.textContent || "").trim(); if (v && v !== t("labWait")) cur = v; });
+      clock.textContent = "⏱ " + Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2) + (cur ? ("　" + cur) : "") + (streaming ? "" : "　✓");
+    }
+    var clk = setInterval(function () { tick(); if (!streaming) clearInterval(clk); }, 1000);
     var s1 = labSec(wrap, t("labS1")), s2 = labSec(wrap, t("labS2"));
+    secs.push(s1, s2);
     cell.a.innerHTML = ""; cell.a.appendChild(wrap);
     var st = { rounds: [] };
     function done(err) {
       streaming = false; curReader = null; busyUI(false); stopBarShow(false);
+      try { tick(); } catch (e) {}
       if (err) wrap.appendChild(el("div", "wdsm-err", t("qacFail") + err));
       var last = st.rounds[st.rounds.length - 1];
       history.push({ role: "wds", text: "【" + t("labDocT") + "】" + q + (st.card1 && st.card1.s && last && last.card && last.card.s ? ("\n" + labDeltaMd(st.card1.s, last.card.s)) : "") });
@@ -6727,6 +6747,8 @@
     function refine(base, card) {
       var n = st.rounds.length + 1, tag = n > 1 ? (" · " + qacFmt(t("labRound"), { n: n })) : "";
       var s3 = labSec(wrap, t("labS3") + tag), s4 = labSec(wrap, t("labS4") + tag);
+      secs.push(s3, s4);
+      if (n > 1) { t0 = Date.now(); clk = setInterval(function () { tick(); if (!streaming) clearInterval(clk); }, 1000); }
       var rd = {};
       return labStage34(q, mine, base, card, s3, s4).then(function (r) {
         rd.turns = r.turns; rd.paper = r.paper;
@@ -6749,6 +6771,7 @@
         done();
       }).catch(function (e) { done((e && e.message) || "?"); });
     }
+    tick();
     labStage1(q, mine, s1).then(function (b) {
       st.base = b;
       var c = { text: b.paper, ok: !!b.paper, nt: s1.nt, bd: s1.bd };

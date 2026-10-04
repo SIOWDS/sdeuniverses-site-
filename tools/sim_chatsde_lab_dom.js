@@ -83,6 +83,10 @@ waitFor(() => Array.from(d.querySelectorAll(".wdsm-acts .wdsm-act")).some(b => /
   const txt = d.querySelector(".wdsm-lab").textContent;
   ok(/综合分 118\.1 · S132/.test(txt) && /综合分 129\.9 · S130/.test(txt), "两张评分卡都读出了五维分并按权重算出综合分");
   ok(/S：132 → 130（-2）/.test(txt) && /D：112 → 138（\+26）/.test(txt) && /综合分：118\.1 → 129\.9（\+11\.8）/.test(txt), "逐维差值表：底座 → 终稿");
+  const logs = d.querySelectorAll(".wdsm-lab .wdsm-qaclog");
+  ok(Array.from(logs).filter(l => l.children.length).every(l => l.querySelectorAll("details[open]").length === 1 && l.lastElementChild.open), "每一步只展开正在（最后）写的那一轮，前几轮收起");
+  const clockTxt = d.querySelector(".wdsm-lab").firstElementChild.textContent;
+  ok(/^⏱ \d+:\d\d/.test(clockTxt) && /✓$/.test(clockTxt), "顶部走表：总耗时＋完成标记（" + clockTxt + "）");
   const acts = Array.from(d.querySelectorAll(".wdsm-acts .wdsm-act")).map(a => a.textContent);
   ok(acts.join("|") === "⤓ 全过程 Word|⤓ 终稿 Word|🧪 按新评分卡再细化一轮", "收尾三颗按钮：" + acts.join(" ｜ "));
   // 再细化一轮
