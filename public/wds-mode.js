@@ -6583,7 +6583,7 @@
     });
   }
   function labSec(wrap, title) {
-    var sec = el("div", "wdsm-labsec");
+    var sec = el("div", "wdsm-rlabsec");
     sec.style.cssText = "border-top:1px solid var(--wline);padding-top:8px;margin-top:10px";
     var hd = el("div", "wdsm-duh"); hd.appendChild(el("b", null, title));
     var nt = el("div", "wdsm-duh"); nt.style.cssText = "border:0;margin:0 0 6px;padding:0;color:var(--wdim);font-size:11px;display:block";
@@ -6597,7 +6597,9 @@
     var box = el("details", null);
     box.appendChild(el("summary", null, qacFmt(t("qacRnd"), { k: k }) + " · " + (tool ? ("〔" + tool + "〕") : "") + t("qacQ") + "：" + qk));
     var ab = el("div", "wdsm-a"); ab.innerHTML = "<span class='cur'>▊</span>";
-    /* 正在写的这一轮展开、前几轮收起（2026-10-04 王德生「好像没有动」）：原来每轮都是收起的 <details>，
+    /* 🔴 类名不许用 wdsm-lab*：那是站上原有的另一块面板（.wdsm-lab{display:none…}），
+     第一版用了它，整块进度在真浏览器里被藏掉——jsdom 不算样式，模拟全绿、读者看到一片空白（2026-10-04）。
+     正在写的这一轮展开、前几轮收起（2026-10-04 王德生「好像没有动」）：原来每轮都是收起的 <details>，
        第一步五轮都在折叠里流字，屏幕上只有一行 11px 的灰字——看上去就是不动。 */
     Array.prototype.forEach.call(sec.log.children, function (b) { b.open = false; });
     box.open = true;
@@ -6705,7 +6707,7 @@
     streaming = true; stoppedByUser = false; RS.stop = false;
     busyUI(true); stopBarShow(true);
     var vname = vinfo(mine.vendor).name + (mine.model ? (" · " + mine.model) : "");
-    var wrap = el("div", "wdsm-lab");
+    var wrap = el("div", "wdsm-rlab");
     /* 顶部一行走表：总耗时＋当前在做什么。一趟三四十分钟，第 5 档满功率每一轮开头都要先想一两分钟才出字——
        没有一行每秒在变的东西，读者分不清「在想」和「卡死」。 */
     var clock = el("div", "wdsm-duh");
@@ -6759,7 +6761,7 @@
         return labScore(rd.paper, mine);
       }).then(function (sc) {
         rd.card = sc; st.rounds.push(rd);
-        var box = el("div", "wdsm-labcard");
+        var box = el("div", "wdsm-rlabcard");
         box.style.cssText = "margin-top:10px;border-top:1px dashed var(--wline);padding-top:8px";
         var hd = el("div", "wdsm-duh"); hd.appendChild(el("b", null, t("labCard2") + tag));
         var bd = el("div", "wdsm-a");

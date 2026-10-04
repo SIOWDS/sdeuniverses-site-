@@ -80,12 +80,16 @@ waitFor(() => Array.from(d.querySelectorAll(".wdsm-acts .wdsm-act")).some(b => /
   ok(F1.length === 1 && /不是底座论文的论点/.test(F1[0].q) && /【评分卡】/.test(F1[0].q) && F1[0].q.length <= 20000, "④打磨：终稿前半以新命题为中心、带评分卡、不超上限");
   ok(calls.filter(c => /【后半必须包含】新命题的证伪条件/.test(c.q)).length === 1, "④打磨：终稿后半必须写证伪条件与逐点对照");
   ok(calls.filter(c => c.fc === 1).length === 2, "底座与终稿各过一道事实核查");
-  const txt = d.querySelector(".wdsm-lab").textContent;
+  const txt = d.querySelector(".wdsm-rlab").textContent;
   ok(/综合分 118\.1 · S132/.test(txt) && /综合分 129\.9 · S130/.test(txt), "两张评分卡都读出了五维分并按权重算出综合分");
   ok(/S：132 → 130（-2）/.test(txt) && /D：112 → 138（\+26）/.test(txt) && /综合分：118\.1 → 129\.9（\+11\.8）/.test(txt), "逐维差值表：底座 → 终稿");
-  const logs = d.querySelectorAll(".wdsm-lab .wdsm-qaclog");
+  // 类名撞车防回归：站上原有面板 .wdsm-lab 自带 display:none——科研创新法的容器绝不许再用这个名字
+  ok(!d.querySelector(".wdsm-turn .wdsm-lab") && !!d.querySelector(".wdsm-turn .wdsm-rlab"), "进度容器用独有类名（不与原有 .wdsm-lab 面板撞车）");
+  const css = Array.from(d.querySelectorAll("style")).map(s => s.textContent).join("");
+  ok(!/\.wdsm-rlab[a-z]*\s*\{[^}]*display\s*:\s*none/.test(css), "全页样式里没有任何一条把 .wdsm-rlab* 藏起来");
+  const logs = d.querySelectorAll(".wdsm-rlab .wdsm-qaclog");
   ok(Array.from(logs).filter(l => l.children.length).every(l => l.querySelectorAll("details[open]").length === 1 && l.lastElementChild.open), "每一步只展开正在（最后）写的那一轮，前几轮收起");
-  const clockTxt = d.querySelector(".wdsm-lab").firstElementChild.textContent;
+  const clockTxt = d.querySelector(".wdsm-rlab").firstElementChild.textContent;
   ok(/^⏱ \d+:\d\d/.test(clockTxt) && /✓$/.test(clockTxt), "顶部走表：总耗时＋完成标记（" + clockTxt + "）");
   const acts = Array.from(d.querySelectorAll(".wdsm-acts .wdsm-act")).map(a => a.textContent);
   ok(acts.join("|") === "⤓ 全过程 Word|⤓ 终稿 Word|🧪 按新评分卡再细化一轮", "收尾三颗按钮：" + acts.join(" ｜ "));
@@ -95,7 +99,7 @@ waitFor(() => Array.from(d.querySelectorAll(".wdsm-acts .wdsm-act")).some(b => /
   waitFor(() => Array.from(d.querySelectorAll(".wdsm-acts .wdsm-act")).some(b => /再细化/.test(b.textContent)) && calls.length > n0 + 10, function () {
     const GL2 = calls.slice(n0).filter(c => c.qgen === "lab");
     ok(GL2.length === 5 && /终稿前半：剃刀不是 Y，而是 Z/.test(GL2[0].q) && /D 差异锐度 138/.test(GL2[0].q), "细化第 2 轮：站在上一轮终稿与第二张评分卡上出题");
-    const txt2 = d.querySelector(".wdsm-lab").textContent;
+    const txt2 = d.querySelector(".wdsm-rlab").textContent;
     ok(/细化第 2 轮/.test(txt2) && /综合分：118\.1 → 132\.65/.test(txt2), "第 2 轮的差值仍对着最初的底座算（118.1 → 132.65）");
     let saved = null;
     w.URL.createObjectURL = function (blob) { saved = blob; return "blob:x"; };
