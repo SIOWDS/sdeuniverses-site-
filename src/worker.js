@@ -10115,6 +10115,47 @@ const CMP_TRAD_BLOCK_EN = "\n\n[Method for this answer: conventional academic me
    ⇒ 两份稿写完后各过一道核查，**两边同一道程序**（公平），核查员不装内功（装了会护短，见评分者五偏差）。
    只挑硬伤、不碰观点；只给「逐字原句 → 替换文字」，由前端逐字替换——不让核查员重写全文，
    重写一遍等于换了作者，对照就不干净了。 */
+/* 【五轮问对对照 · 两台问题发生器（2026-10-04 王德生令）】
+   「自动产生问题，一个是用经典的问题发生器，一个是用 SDE 问题发生器」。两台都只出**一问**，都接着上一答问，
+   都必须往下走一层；差别只在用什么工具挑这一问：
+     · SDE 发生器：ChatSDE 三条追问那套工具（SDE_EQUATIONS／SDE_PATHS／SDE_PRINCIPLES），按轮次轮换——
+       第 2 问 What·三方程，第 3 问 How·六路径，第 4 问 Why·三原理，第 5 问 收束·三原理里最大的那处未结张力；
+     · 经典发生器：苏格拉底式追问（Paul & Elder 的六类：澄清概念／追问假设／追问理由与证据／换视角与反方／
+       追问推论与后果／追问问题本身），按轮次轮换，零 SDE 术语。
+   轮换按轮次写死而不是让基底自选：自选的话两台都会挑最顺手的那一类，五问问成同一种。 */
+function WDS_QGEN_SYS(kind, round, lang) {
+  const r = Math.max(2, Math.min(5, round | 0));
+  const en = lang === "en";
+  const tail = en
+    ? "\nRules: output ONE question only, one line, 12–40 words; it must build on the specific content of the latest answer and go one layer deeper; it must not repeat or rephrase any earlier question; no numbering, no label, no explanation."
+    : "\n规矩：只输出一个问题，一行，15–50 字；必须扣着最近那一答的具体内容问、往下走一层；不许重复或换说法重问前面任何一问；不编号、不加标签、不解释。";
+  if (kind === "sde") {
+    const step = {
+      2: ["What · 三大方程", "问「它是什么关系、什么结构」，从下面三条里挑最能撬动上一答的一条：\n" + SDE_EQUATIONS],
+      3: ["How · 六路径", "问「怎么走、从哪下手」，从下面六条里挑一条，避开前面几答已经走过的：\n" + SDE_PATHS],
+      4: ["Why · 三原理", "问「为什么会这样、为什么卡在这儿」，从下面三条里挑一条：\n" + SDE_PRINCIPLES],
+      5: ["收束 · 三原理", "看完前四轮，找出这场问对里**最大的那处还没结清的张力**，用下面三条之一把它问出来，逼出一个结算：\n" + SDE_PRINCIPLES],
+    }[r];
+    return (en ? "You are the question generator of an SDE dialogue (Show–Difference–Entanglement). " : "你是一场 SDE 问对的问题发生器（显露 S—差异 D—纠缠 E）。")
+      + (en ? "Read the topic and the dialogue so far, then write question " : "读完总题与已有问对，写出第 ") + r
+      + (en ? " of 5." : " 问（共五问）。") + "\n\n【" + step[0] + "】" + step[1] + tail;
+  }
+  const C = en ? {
+    2: ["Clarify & assumptions", "Ask what a key concept in the latest answer actually means, or which hidden assumption it rests on."],
+    3: ["Reasons & evidence", "Ask what evidence or reasoning supports the latest answer's central claim, and how we would know."],
+    4: ["Viewpoints & objections", "Ask how the strongest opposing view, or a different discipline, would challenge the answer."],
+    5: ["Implications & the question itself", "Ask what follows if the answer is right — consequences, limits — or whether the original question was well posed."],
+  } : {
+    2: ["澄清概念与追问假设", "追问上一答里某个关键概念到底指什么，或它暗中依赖了哪条没说出来的假设。"],
+    3: ["追问理由与证据", "追问上一答中心判断的理由与证据：凭什么这么说、怎么知道是这样。"],
+    4: ["换视角与反方", "追问最强的反方观点、或另一个学科的视角，会怎样挑战上一答。"],
+    5: ["追问推论与问题本身", "追问：如果上一答成立会推出什么、边界在哪；或者原来那个问题本身问得对不对。"],
+  };
+  const c = C[r];
+  return (en ? "You are a question generator using the classical Socratic method (Paul & Elder's six kinds of questions). Read the topic and the dialogue so far, then write question " + r + " of 5."
+             : "你是一台经典的问题发生器，用苏格拉底式追问法（Paul & Elder 的六类问题）。读完总题与已有问对，写出第 " + r + " 问（共五问）。")
+    + "\n\n【" + c[0] + "】" + c[1] + tail;
+}
 function WDS_FC_SYS(lang) {
   if (lang === "en") return "You are a strict fact-checking editor. The user message is a finished report. Your only job: find checkable factual errors — names, dates and lifespans, time spans (e.g. \"nine centuries\"), titles of works, quotations and their attribution, the names of concepts and principles, figures and numbers, sequences of events. Do not comment on arguments, do not rewrite, do not polish, do not add content."
     + "\nRules: 1) Only mark errors you are sure of as level \"error\"; mark doubtful ones \"doubt\" (fix may be empty). 2) Ignore opinions, metaphors, inferences and value judgments. 3) \"orig\" must be copied verbatim from the report (2–40 characters) so it can be found exactly; \"fix\" replaces only the wrong part, similar length, same tone. 4) If one error recurs, list it once (all occurrences are replaced). 5) At most 12 items; if none, output []."
@@ -13503,7 +13544,11 @@ export default {
          稿子里常出现「约 2000 字」之类字样——不在这里把 askLen 清零，就会被当成「读者要一篇两千字长文」，
          预算、口径、长篇指令全套挂上去，核查员会开始写文章。 */
       const fcRun = (b.nosde === 1 || b.nosde === true) && (b.fc === 1 || b.fc === true);
-      const askLen = fcRun ? 0 : wdsAskLen(q);           // 读者点名要几千字：预算/口径/时限三件一起变
+      /* 【五轮问对对照 · 出题道（2026-10-04）】nosde 且 qgen=sde|classic：这一趟只出下一问，不答题。
+         两种发生器都走 nosde（不装内功、不检索站内）——差别只在出题的那套工具：SDE 发生器用三方程／六路径／三原理，
+         经典发生器用苏格拉底式追问。材料里常有「约 1500 字」，同样要把 askLen 清零。 */
+      const qgKind = ((b.nosde === 1 || b.nosde === true) && (b.qgen === "sde" || b.qgen === "classic")) ? b.qgen : "";
+      const askLen = (fcRun || qgKind) ? 0 : wdsAskLen(q);           // 读者点名要几千字：预算/口径/时限三件一起变
       // USER_RAG（全局记忆）：客户端在本机按这一问挑出的几条历史对话摘要＋画像。
       // 与 LONGASK 同一条纪律——挂在当轮 user 消息上、**不进 system**：
       // ①system 是可被基底前缀缓存的固定段，每轮换内容会把缓存打散；②这几条只对这一问相关，不该长驻。
@@ -14142,6 +14187,7 @@ export default {
                只在这里补、只补这一路：方法论的差别只许出在两份 system 里，题面两边逐字相同（篇幅要求由前端拼在题面后）。 */
             const cmpPlain = noSde && b.cmp === "plain";
             const sys = fcRun ? WDS_FC_SYS(lang)        // 事实核查道整段改道：不装人格、内功、方法论、站内语料
+              : qgKind ? WDS_QGEN_SYS(qgKind, parseInt(b.qr, 10) || 2, lang)   // 出题道：只出一问
               : (WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, mFull, docCtx, about, lang, docNote, tool, rs, duel, prof, noSde, extras, sentryCtx, _rungOf(tool, history), razTake(b, tool))
                 + (cmpPlain ? (lang === "en" ? CMP_TRAD_BLOCK_EN : CMP_TRAD_BLOCK) : ""));
             if (cmpPlain) controller.enqueue(_sseBytes({ t: "note", v: (lang === "en") ? "Comparison · no-SDE side: no SDE kernel, method or site corpus; conventional academic method only." : "同题对照 · 无 SDE 一路：不装内功、不装 SDE 方法论、不挂站内语料；只用传统学术方法论＋基底本功。" }));

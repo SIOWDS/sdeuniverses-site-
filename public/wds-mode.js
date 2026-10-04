@@ -1741,6 +1741,19 @@
       cmpFcRun: "事实核查中…", cmpFcHd: "事实核查", cmpFcNone: "未发现可核验的事实错误",
       cmpFcFix: "已改", cmpFcDoubt: "存疑·未改", cmpFcMiss: "原句未找到·未改", cmpFcFail: "核查没跑成（原文照旧）：",
       cmpFcN1: "改了 ", cmpFcN2: " 处", cmpFcAppx: "附：事实核查记录（两份稿走同一道核查；核查员不装 SDE 内核，只挑硬伤、不碰观点）",
+      qacBtn: "⚖ 五轮问对对照", qacOn: "⚖ 五轮问对对照：开",
+      qacTip: "输入一个问题当论文题目：两路各自自动出题、自动作答五轮，再各写一篇约 1 万字的学术论文。左＝SDE 问题发生器＋完整内功＋SDE 方法论；右＝经典（苏格拉底式）问题发生器＋传统方法论＋基底本功。两篇合进一份 Word。约 15–25 分钟",
+      qacSdeS: "SDE 问题发生器＋完整内功＋SDE 方法论", qacClsS: "经典问题发生器＋传统方法论＋基底本功",
+      qacRnd: "第 {k}/5 轮", qacAns: " · 作答中", qacGen: " · 出下一问", qacP1: "成文 · 前半（约 5000 字）", qacP2: "成文 · 后半（约 5000 字）", qacCont: " · 被截断，续写一次",
+      qacQ: "问", qacA: "答", qacPaper: "论文", qacDone: "论文已成", qacFail: "这一路没跑完：",
+      qacLenR: "【篇幅】约 1500 字。\n\n", qacLenP: "【篇幅】约 5000 字。\n\n",
+      qacMat: "【总题】", qacLog: "【已有问对】", qacQn: "第 {i} 问：", qacAn: "第 {i} 答：",
+      qacP1T: "【写作任务 · 前半】以「{q}」为题写一篇约 10000 字的学术论文，分两次写完，这一次写前半（约 5000 字）：题目、摘要（300 字以内）、关键词、引言，以及正文前一半的章节。下面是你围绕这个题目已经做过的五轮问对记录——论文要吸收其中站得住的判断，但不是问答的拼接，要重新组织成一篇有中心论点、分节推进的论文。写到前半结束处停下，最后单独一行写「【后半要写】」，接着列出后半各节的标题。\n\n【五轮问对记录】\n",
+      qacP2T: "【写作任务 · 后半】下面是论文「{q}」的前半（末尾有你自己列的后半提纲）。接着写后半（约 5000 字）：从下一节开始，写完余下的正文、讨论与结论，最后列参考文献（只列你有把握真实存在的文献，宁缺毋滥）。不要重复前半，不要重写标题与摘要。\n\n【前半】\n",
+      qacP2M: "\n\n【五轮问对要点】\n", qacContT: "【续写】上文在下面这句之后断了。请紧接着最后一句往下写完这一部分，不要重复、不要回顾、不要另起标题：\n\n……",
+      qacWord: "⤓ 两篇合一 Word", qacWordA: "⤓ 论文 A（有 SDE）Word", qacWordB: "⤓ 论文 B（无 SDE）Word",
+      qacDocT: "同题对照 · 五轮问对 · 有 SDE／无 SDE", qacFair: "两路同一家基底、同一档功率，互不可见；题目、篇幅要求与成文指令逐字相同。差别只在：出题的发生器（SDE／经典）、作答与成文的内核（完整内功＋SDE 方法论／传统方法论）。两篇成文后走同一道事实核查（核查员不装 SDE 内核）。",
+      qacAppQ: "附：五轮问对的五个问题", qacPA: "论文 A · 有 SDE", qacPB: "论文 B · 无 SDE",
       cmpIq: "⚖ 给两份打创新智商", cmpIqQ: "下面是同一个问题、同一家基底、在两种内核下各写出的一份报告（A＝有 SDE，B＝无 SDE）。请按创新智商五维（S/D/E/I/F）分别给两份打分，各维附一句原文证据与一句扣分句，算出综合分，并说清差距主要出在哪几维、各自最该补哪一维。",
       triBtn: "⚔ 三家对撞", triOn: "⚔ 三家对撞：开",
       triMore: "↻ 继续对撞", triRd: "第 {n} 轮 · 座位左轮一格",
@@ -1945,6 +1958,19 @@
       cmpFcRun: "Fact-checking…", cmpFcHd: "Fact check", cmpFcNone: "No checkable factual errors found",
       cmpFcFix: "fixed", cmpFcDoubt: "doubtful · left as is", cmpFcMiss: "sentence not found · left as is", cmpFcFail: "Fact check did not run (text unchanged): ",
       cmpFcN1: "fixed ", cmpFcN2: "", cmpFcAppx: "Appendix: fact-check log (both drafts go through the same check; the checker carries no SDE kernel and only flags hard errors, never opinions)",
+      qacBtn: "⚖ 5-round dialogue compare", qacOn: "⚖ 5-round compare: on",
+      qacTip: "Your question becomes the paper title. Each side auto-generates and answers questions for five rounds, then writes a ~10,000-character academic paper. Left = SDE question generator + full kernel + SDE method; right = classical (Socratic) generator + conventional method. Both papers go into one Word file. About 15–25 minutes",
+      qacSdeS: "SDE question generator + full kernel + SDE method", qacClsS: "classical question generator + conventional method",
+      qacRnd: "Round {k}/5", qacAns: " · answering", qacGen: " · next question", qacP1: "Writing · first half", qacP2: "Writing · second half", qacCont: " · cut off, continuing once",
+      qacQ: "Q", qacA: "A", qacPaper: "Paper", qacDone: "Paper done", qacFail: "This side did not finish: ",
+      qacLenR: "[Length] about 1,000 words.\n\n", qacLenP: "[Length] about 3,500 words.\n\n",
+      qacMat: "[Topic] ", qacLog: "[Dialogue so far]", qacQn: "Q{i}: ", qacAn: "A{i}: ",
+      qacP1T: "[Writing task · first half] Write an academic paper of about 7,000 words titled \u201c{q}\u201d, in two parts. This time write the first half: title, abstract (under 200 words), keywords, introduction and the first half of the body. Below is your five-round dialogue on this topic: absorb the claims that hold up, but do not stitch the Q&A together; organize a paper with a central thesis. Stop at the end of the first half and add a final line \u201c[Second half]\u201d followed by the section titles still to write.\n\n[Five-round dialogue]\n",
+      qacP2T: "[Writing task · second half] Below is the first half of the paper \u201c{q}\u201d (ending with your outline of the rest). Write the second half: continue from the next section, finish the body, discussion and conclusion, then list references (only ones you are sure exist). Do not repeat the first half or rewrite the title and abstract.\n\n[First half]\n",
+      qacP2M: "\n\n[Dialogue highlights]\n", qacContT: "[Continue] The text was cut off after the line below. Continue straight on from the last sentence and finish this part; no repetition, no recap, no new heading:\n\n…",
+      qacWord: "⤓ Both papers in one Word file", qacWordA: "⤓ Paper A (SDE) Word", qacWordB: "⤓ Paper B (no SDE) Word",
+      qacDocT: "Same question · 5-round dialogue · SDE vs no-SDE", qacFair: "Same model and power on both sides, neither sees the other; title, length lines and writing instructions are identical. The only differences: the question generator (SDE / classical) and the answering and writing kernel (full kernel + SDE method / conventional method). Both papers then go through the same fact check (the checker carries no SDE kernel).",
+      qacAppQ: "Appendix: the five questions", qacPA: "Paper A · with SDE", qacPB: "Paper B · without SDE",
       cmpIq: "⚖ Score both (Innovation IQ)", cmpIqQ: "Below are two reports on the same question from the same model under two kernels (A = with SDE, B = without SDE). Score each on the five Innovation IQ dimensions (S/D/E/I/F) with one quoted piece of evidence and one deduction per dimension, compute the composite, and say which dimensions account for the gap and what each should fix first.",
       triBtn: "\u2694 Three-way clash", triOn: "\u2694 Three-way clash: on",
       triMore: "\u21bb Collide again", triRd: "Round {n} · seats rotate one place",
@@ -2666,6 +2692,7 @@
           "<button class='wdsm-mode wdsm-tribtn'></button>" +
           "<button class='wdsm-mode wdsm-mobbtn'></button>" +
           "<button class='wdsm-mode wdsm-cmpbtn'></button>" +
+          "<button class='wdsm-mode wdsm-qacbtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
@@ -3368,7 +3395,7 @@
     try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
     q(".wdsm-newbtn").textContent = t("bNew");
     try { q(".wdsm-topshow").title = t("topShowT"); } catch (e) {}
-    try { rsPaint(); lnkPaint(); fdPaint(); cvPaint(); compPaint(); duPaint(); cmpPaint(); pjPaint(); } catch (e) {}
+    try { rsPaint(); lnkPaint(); fdPaint(); cvPaint(); compPaint(); duPaint(); cmpPaint(); qacPaint(); pjPaint(); } catch (e) {}
     q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
     var g = function (sel) { return q(sel) || {}; };   // 防空取：桩环境里某些节点不存在，别为文案崩掉整页
     g(".wdsm-nc").textContent = t("sbNew");
@@ -5531,6 +5558,13 @@
       if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       return;
     }
+    // 五轮问对对照挂着时：一问＝两路各五轮自动问对＋各一篇万字论文（排在最前，五种多路模式互斥）
+    if (qacOn && !PROFILE && !streaming) {
+      var kqa = wdsKeyGet(); if (!kqa) { wdsKeyPanel(function () { send(q); }); return; }
+      if (turns() >= MAX) { updTurns(); return; }
+      if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      if (sendQac(q, addTurn(q))) return;
+    }
     // 同题对照挂着时：一问走两路（有 SDE ／无 SDE），排在最前——与群碰、对撞、并排四者互斥
     if (cmpOn && !PROFILE && !streaming) {
       var kcp = wdsKeyGet(); if (!kcp) { wdsKeyPanel(function () { send(q); }); return; }
@@ -5925,7 +5959,7 @@
         b.onclick = function () {
           closeMenu();
           if (!has) { wdsKeyPanel(function () {}); return; }      // 没 Key 就直接把设置面板端出来
-          duV = v.v; duPaint(); cmpOn = false; cmpPaint();
+          duV = v.v; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint();
         };
         menu.appendChild(b);
       });
@@ -6016,7 +6050,7 @@
   if (cmpBtn) cmpBtn.onclick = function () {
     if (streaming) return;
     cmpOn = !cmpOn;
-    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); }   // 四者互斥
+    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); qacOn = false; qacPaint(); }   // 五者互斥
     cmpPaint();
     toast(cmpOn ? t("cmpTip") : t("cmpBtn"));
   };
@@ -6175,6 +6209,193 @@
     return true;
   }
 
+  /* ══════════════ 五轮问对对照（有 SDE ／ 无 SDE）══════════════
+     2026-10-04 王德生令：「有 SDE 和无 SDE 的自动问对 5 次，即自动产生问题、然后回答问题，最后形成一个 1 万字的
+     学术论文。自动产生问题，一个是用经典的问题发生器，一个是用 SDE 问题发生器。输出两个学术论文，题目都是输入的问题。
+     同时输出进入一个 Word 文档。」
+       左（sde）：第 1 问＝读者原题；第 2–5 问由 SDE 发生器出（服务端 WDS_QGEN_SYS("sde")：三方程／六路径／三原理按轮轮换）；
+                  作答与成文＝深度档第 5 档（完整内功＋SDE 方法论＋站内语料）。
+       右（cls）：第 2–5 问由经典发生器出（苏格拉底式六类追问，按轮轮换，零 SDE 术语）；
+                  作答与成文＝nosde＋cmp=plain（传统方法论＋基底本功）。
+     万字一次写不完（单趟总时钟 420 秒）⇒ 成文分前后两半，各约 5000 字；任一半被截，就按本趟自己的 meta 续写一次。
+     公平纪律同「同题对照」：同家同档；两路互不可见；题目、篇幅行、成文指令逐字相同；两篇成文后走同一道事实核查。 */
+  var qacOn = false;
+  var qacBtn = layer.querySelector(".wdsm-qacbtn");
+  function qacPaint() {
+    if (!qacBtn) return;
+    qacBtn.style.display = PROFILE ? "none" : "";
+    if (PROFILE) qacOn = false;
+    qacBtn.textContent = qacOn ? t("qacOn") : t("qacBtn");
+    qacBtn.title = t("qacTip");
+    if (qacOn) qacBtn.classList.add("on"); else qacBtn.classList.remove("on");
+    try { toolsPaint(); } catch (e) {}
+  }
+  qacPaint();                        // 🔴 初始就要有字——零宽空框老漏法
+  if (qacBtn) qacBtn.onclick = function () {
+    if (streaming) return;
+    qacOn = !qacOn;
+    if (qacOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); }   // 五者互斥
+    qacPaint();
+    toast(qacOn ? t("qacTip") : t("qacBtn"));
+  };
+  function qacFmt(s, o) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return o[k] != null ? o[k] : m; }); }
+  // 一趟请求：拿回正文与本趟自己的 meta（cut 非空且不是读者按停 ⇒ 被截）
+  function qacCall(pl, onTok) {
+    var meta = null;
+    return rsStream(API, pl, onTok || null, null, function (m) { meta = m; })
+      .then(function (txt) {
+        if (RS.stop) throw new Error("stopped");
+        return { text: String(txt || ""), cut: !!(meta && meta.cut && meta.cut !== "stopped") };
+      });
+  }
+  function qacBase(side, mine) {
+    var pl = { history: [], key: mine.key, vendor: mine.vendor, model: mine.model || "", mode: "deep", grade: 5,
+               web: webOn ? 1 : 0, skey: wdsSearchKey(), lang: LANG, tool: "", cmp: side === "sde" ? "sde" : "plain" };
+    if (side !== "sde") pl.nosde = 1;
+    return pl;
+  }
+  function qacHist(turns) {
+    var h = [];
+    turns.forEach(function (x) { h.push({ role: "reader", text: x.q }); h.push({ role: "wds", text: String(x.a).slice(0, 3000) }); });
+    return h;
+  }
+  function qacLog(q, turns, per) {
+    var s = t("qacMat") + q + "\n\n" + t("qacLog") + "\n";
+    turns.forEach(function (x, i) {
+      s += qacFmt(t("qacQn"), { i: i + 1 }) + x.q + "\n" + qacFmt(t("qacAn"), { i: i + 1 }) + String(x.a).slice(0, per) + "\n\n";
+    });
+    return s;
+  }
+  // 出题：只要一行；去编号、去标签、去引号。出不来就停这一路（不拿兜底句冒充发生器的产出）
+  function qacCleanQ(s) {
+    var line = String(s || "").split("\n").map(function (x) { return x.trim(); }).filter(Boolean)[0] || "";
+    line = line.replace(/^[#>*\-\d.、)）\s]+/, "").replace(/^(第\s*\d+\s*问|问题|Question\s*\d*|Q\d*)\s*[:：]\s*/i, "")
+               .replace(/^[「“"']+|[」”"']+$/g, "").trim();
+    return line.slice(0, 160);
+  }
+  function qacGenQ(side, k, q, turns, mine) {
+    var pl = { q: qacLog(q, turns, 1800), history: [], key: mine.key, vendor: mine.vendor, model: mine.model || "",
+               mode: "deep", grade: 3, web: 0, lang: LANG, tool: "", nosde: 1, qgen: side === "sde" ? "sde" : "classic", qr: k };
+    return qacCall(pl).then(function (r) {
+      var nq = qacCleanQ(r.text);
+      if (nq.length < 6) throw new Error("question generator returned nothing usable");
+      return nq;
+    });
+  }
+  // 写一段；被截就续写一次（只续一次：再截就如实带着断口交出去，不无限追）
+  function qacWrite(side, mine, qtext, onTok) {
+    var pl = qacBase(side, mine); pl.q = qtext;
+    return qacCall(pl, onTok).then(function (r) {
+      if (!r.cut || !r.text) return r.text;
+      var pl2 = qacBase(side, mine); pl2.q = t("qacContT") + r.text.slice(-1500);
+      return qacCall(pl2, function (x) { if (onTok) onTok(r.text + x); }).then(function (r2) { return r.text + r2.text; });
+    });
+  }
+  function qacStripTail(p1) {
+    var i = p1.search(/【后半要写】|\[Second half\]/);
+    return (i >= 0 ? p1.slice(0, i) : p1).trim();
+  }
+  function qacDocMd(side, q, col) {
+    var paper = String(col.text || "").replace(/^\s*#\s+[^\n]*\n/, "");     // 论文自己的大标题＝题目，合订时去掉重复的那行
+    return "# " + (side === "sde" ? t("qacPA") : t("qacPB")) + "\n\n"
+      + (side === "sde" ? t("qacSdeS") : t("qacClsS")) + "\n\n" + paper + cmpFcMd(col.fc)
+      + "\n\n## " + t("qacAppQ") + "\n\n" + col.turns.map(function (x, i) { return (i + 1) + ". " + x.q; }).join("\n");
+  }
+  function qacSave(which, q, cols, vname) {
+    if (!window.SDEDocx) { toast(t("cmpWait")); return; }
+    var head = "# " + q + "\n\n" + t("qacDocT") + "　" + t("cmpBase") + "：" + vname + "　" + t("cmpDate") + "：" + new Date().toLocaleString()
+      + "\n\n" + t("qacFair") + "\n\n";
+    var parts = cols.filter(function (c) { return c.ok && (which === "both" || which === c.side); });
+    var md = head + parts.map(function (c) { return qacDocMd(c.side, q, c); }).join("\n\n---\n\n");
+    var tag = which === "both" ? t("qacDocT") : (which === "sde" ? t("qacPA") : t("qacPB"));
+    var blob = window.SDEDocx.build({ title: q + " · " + tag, author: BRAND, md: md });
+    saveBlobToDir(fileTag("WDS") + "-" + safeName(q) + "-" + safeName(tag) + "-" + stampName() + ".docx", blob,
+      function (m) { if (m) toast(m); });
+  }
+  function sendQac(q, cell) {
+    var mine = wdsKeyGet();
+    if (!mine) return false;
+    history.push({ role: "reader", text: q }); updTurns();
+    streaming = true; stoppedByUser = false; RS.stop = false;
+    busyUI(true); stopBarShow(true);
+    var vname = vinfo(mine.vendor).name + (mine.model ? (" · " + mine.model) : "");
+    var wrap = el("div", "wdsm-du");
+    var cols = ["sde", "cls"].map(function (side) {
+      var c = el("div", "wdsm-duc");
+      var hd = el("div", "wdsm-duh");
+      hd.appendChild(el("b", null, side === "sde" ? t("cmpSde") : t("cmpPlain")));
+      hd.appendChild(el("i", null, (side === "sde" ? t("qacSdeS") : t("qacClsS")) + " · " + vname));
+      var nt = el("div", "wdsm-duh");
+      nt.style.cssText = "border:0;margin:0 0 6px;padding:0;color:var(--wdim);font-size:11px;display:block";
+      var log = el("div", "wdsm-qaclog");
+      log.style.cssText = "font-size:12.5px;margin-bottom:8px";
+      var bd = el("div", "wdsm-a");
+      c.appendChild(hd); c.appendChild(nt); c.appendChild(log); c.appendChild(bd); wrap.appendChild(c);
+      return { side: side, hd: hd, nt: nt, log: log, bd: bd, turns: [], text: "", ok: false };
+    });
+    cell.a.innerHTML = ""; cell.a.appendChild(wrap);
+    function say(col, s) { col.nt.textContent = s; }
+    function run(col) {
+      var k = 1, qk = q;
+      function round() {
+        say(col, qacFmt(t("qacRnd"), { k: k }) + t("qacAns"));
+        var box = el("details", null);
+        var sm = el("summary", null, qacFmt(t("qacRnd"), { k: k }) + " · " + t("qacQ") + "：" + qk);
+        var ab = el("div", "wdsm-a");
+        ab.innerHTML = "<span class='cur'>▊</span>";
+        box.appendChild(sm); box.appendChild(ab); col.log.appendChild(box);
+        var pl = qacBase(col.side, mine);
+        pl.q = t("qacLenR") + qk; pl.history = qacHist(col.turns);
+        return qacCall(pl, function (x) { ab.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; }).then(function (r) {
+          ab.innerHTML = mdRender(r.text);
+          col.turns.push({ q: qk, a: r.text });
+          if (k >= 5) return;
+          say(col, qacFmt(t("qacRnd"), { k: k }) + t("qacGen"));
+          return qacGenQ(col.side, k + 1, q, col.turns, mine).then(function (nq) { k++; qk = nq; return round(); });
+        });
+      }
+      return round().then(function () {
+        say(col, t("qacP1"));
+        var p1q = t("qacLenP") + qacFmt(t("qacP1T"), { q: q }) + qacLog(q, col.turns, 2400).slice(0, 15500);
+        return qacWrite(col.side, mine, p1q, function (x) { col.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; });
+      }).then(function (p1) {
+        var head = qacStripTail(p1);
+        say(col, t("qacP2"));
+        var brief = col.turns.map(function (x, i) { return qacFmt(t("qacQn"), { i: i + 1 }) + x.q + "\n" + String(x.a).slice(0, 500); }).join("\n\n");
+        var p2q = (t("qacLenP") + qacFmt(t("qacP2T"), { q: q }) + p1.slice(0, 12000) + t("qacP2M") + brief).slice(0, 19500);
+        return qacWrite(col.side, mine, p2q, function (x) { col.bd.innerHTML = mdRender(head + "\n\n" + x) + "<span class='cur'>▊</span>"; })
+          .then(function (p2) { col.text = head + "\n\n" + p2.trim(); col.ok = !!p2.trim(); col.bd.innerHTML = mdRender(col.text); });
+      }).catch(function (e) {
+        var m = (e && e.message) || "?";
+        if (col.text) col.ok = true;
+        col.bd.appendChild(el("div", "wdsm-err", t("qacFail") + m));
+      }).then(function () { say(col, ""); });
+    }
+    Promise.all(cols.map(run)).then(function () {
+      return Promise.all(cols.map(function (c) { return cmpFc(c, mine); }));     // 同一道核查（见 cmpFc）
+    }).then(function () {
+      cols.forEach(function (col) {
+        if (col.ok) { var n = cmpCount(col.text); col.hd.appendChild(el("i", null, t("qacDone") + " · " + n.all + " " + t("cmpCnt") + " · " + t("cmpHan") + " " + n.han)); }
+      });
+      streaming = false; curReader = null;
+      busyUI(false); stopBarShow(false);
+      var A = cols[0], B = cols[1];
+      // 历史里只记题目与两路五问——两篇万字原文塞进上下文，下一问会被它挤爆
+      history.push({ role: "wds", text: "【" + t("qacDocT") + "】\n" + cols.map(function (c) {
+        return (c.side === "sde" ? t("qacPA") : t("qacPB")) + "：" + c.turns.map(function (x, i) { return (i + 1) + ". " + x.q; }).join(" ／ ");
+      }).join("\n") });
+      stSave(history); updTurns(); compTick();
+      var row = el("div", "wdsm-acts");
+      if (A.ok || B.ok) {
+        var bw = el("button", "wdsm-act", t("qacWord")); bw.onclick = function () { qacSave("both", q, cols, vname); }; row.appendChild(bw);
+      }
+      if (A.ok) { var ba = el("button", "wdsm-act", t("qacWordA")); ba.onclick = function () { qacSave("sde", q, cols, vname); }; row.appendChild(ba); }
+      if (B.ok) { var bb = el("button", "wdsm-act", t("qacWordB")); bb.onclick = function () { qacSave("cls", q, cols, vname); }; row.appendChild(bb); }
+      cell.turn.appendChild(row); cell.acts = row;
+    });
+    return true;
+  }
+
   /* ══════════════ 群碰（N 席）══════════════
      三家对撞是定席定序：A 出判断 → B 攻 A → C 结算。群碰放开两处，而这两处各带一个必然的坑：
        ① **攻击席自选目标** ⇒ 每席都挑最脆的那个打，N 席全攻同一处，看着热闹只攻了一处。
@@ -6283,7 +6504,7 @@
     var go = el("button", null, mobOn ? t("mobStop") : t("mobGo"));
     go.onclick = function () {
       closeMenu(); mobOn = !mobOn;
-      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); }   // 四者互斥
+      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); }   // 五者互斥
       mobPaint();
     };
     menu.appendChild(go);
@@ -6544,7 +6765,7 @@
     go.onclick = function () {
       closeMenu();
       triOn = !triOn;
-      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); }      // 并排与对撞是两种模式，不并存
+      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); }      // 并排与对撞是两种模式，不并存
       triPaint();
     };
     menu.appendChild(go);
@@ -8432,7 +8653,9 @@
   // 一趟流式请求 → 把 token 交给 onTok，结束时 resolve 全文。研究的每一步都用它。
   /* RS.lastMeta：上一趟流的收束读数（服务端 fin 帧＋流内 error），resolve 之前写好，
      step() 紧接着读。每一趟串行跑，所以一格够用；不改 rsStream 的返回契约（三处调用方都只认字符串）。 */
-  function rsStream(url, payload, onTok, onNote) {
+  /* onMeta（2026-10-04，可选）：本趟自己的 meta（fin/cut）。两路并行时 RS.lastMeta 是共用的一格，谁后收尾谁覆盖——
+     五轮问对对照要按「这一趟是不是被截了」决定续写，只能拿本趟自己的。 */
+  function rsStream(url, payload, onTok, onNote, onMeta) {
     return fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(P(payload)) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
@@ -8440,6 +8663,7 @@
         var dec = new TextDecoder(), buf = "", out = "", err = "", meta = { fin: "", cut: "", err: "", out: 0, seen: false };
         function settle() {
           meta.err = err; meta.out = out.length; RS.lastMeta = meta;
+          if (onMeta) try { onMeta(meta); } catch (e) {}
           return out || (err ? Promise.reject(new Error(err)) : "");
         }
         function pump() {
@@ -8470,7 +8694,7 @@
                  与 RS.lastMeta 同一个存法：写在这里、由调用方（研究主循环 step()）读一次即用即弃。 */
               else if (j.t === "reflectgen") RS.lastReflectGen = j.v;
             }
-            if (RS.stop) { try { reader.cancel(); } catch (e) {} meta.cut = meta.cut || "stopped"; RS.lastMeta = meta; return out; }
+            if (RS.stop) { try { reader.cancel(); } catch (e) {} meta.cut = meta.cut || "stopped"; RS.lastMeta = meta; if (onMeta) try { onMeta(meta); } catch (e) {} return out; }
             return pump();
           });
         }

@@ -58,12 +58,12 @@ function checks(FE, BE, quiet) {
   });
   const iSend = FE.indexOf("if (cmpOn && !PROFILE && !streaming)"), iMob = FE.indexOf("if (mobOn && !streaming)");
   put(iSend > 0 && iMob > iSend, "C 送出时同题对照排在群碰之前（四者互斥，最先拦）");
-  put(/if \(cmpOn\) \{ duV = ""; duPaint\(\); triOn = false; triPaint\(\); mobOn = false; mobPaint\(\); \}/.test(FE), "C 打开对照时关掉并排/对撞/群碰");
-  put(/if \(triOn\) \{ duV = ""; duPaint\(\); cmpOn = false; cmpPaint\(\); \}/.test(FE), "C 打开对撞时关掉对照");
-  put(/triOn = false; triPaint\(\); cmpOn = false; cmpPaint\(\); \}/.test(FE), "C 打开群碰时关掉对照");
+  put(/if \(cmpOn\) \{ duV = ""; duPaint\(\); triOn = false; triPaint\(\); mobOn = false; mobPaint\(\);( qacOn = false; qacPaint\(\);)? \}/.test(FE), "C 打开对照时关掉并排/对撞/群碰");
+  put(/if \(triOn\) \{ duV = ""; duPaint\(\); cmpOn = false; cmpPaint\(\);( qacOn = false; qacPaint\(\);)? \}/.test(FE), "C 打开对撞时关掉对照");
+  put(/triOn = false; triPaint\(\); cmpOn = false; cmpPaint\(\);( qacOn = false; qacPaint\(\);)? \}/.test(FE), "C 打开群碰时关掉对照");
   put(/duV = v\.v; duPaint\(\); cmpOn = false; cmpPaint\(\);/.test(FE), "C 打开并排时关掉对照");
   put(/cmpBtn\.style\.display = PROFILE \? "none" : ""/.test(FE), "C 分身页不露这颗按钮（分身不认 nosde）");
-  put(/duPaint\(\); cmpPaint\(\); pjPaint\(\)/.test(FE), "C 换语言时按钮文案跟着重画");
+  put(/duPaint\(\); cmpPaint\(\);( qacPaint\(\);)? pjPaint\(\)/.test(FE), "C 换语言时按钮文案跟着重画");
   put(/window\.SDEDocx\.build\(/.test(sliceFn(FE, "function cmpDocx(")), "C Word 走全站共用的 SDEDocx");
   // D. 事实核查道（2026-10-04「修改管道的事实核查」）
   const FC = sliceFn(FE, "function cmpFc(col, mine)");
@@ -73,7 +73,7 @@ function checks(FE, BE, quiet) {
   put(/if \(!sure \|\| !fix\) \{ o\.st = "doubt"; return; \}/.test(FE), "D 存疑的不改，只记");
   put(/cmpFcMd\(fc\)/.test(sliceFn(FE, "function cmpDocx(")), "D Word 末尾附核查记录");
   put(/const fcRun = \(b\.nosde === 1 \|\| b\.nosde === true\) && \(b\.fc === 1 \|\| b\.fc === true\);/.test(BE), "D 服务端认 fc 只在 nosde 下认");
-  put(/const askLen = fcRun \? 0 : wdsAskLen\(q\);/.test(BE), "D 核查道不被稿里的「2000 字」误判成长文请求");
+  put(/const askLen = (?:fcRun|\(fcRun \|\| qgKind\)) \? 0 : wdsAskLen\(q\);/.test(BE), "D 核查道不被稿里的「2000 字」误判成长文请求");
   put(/const sys = fcRun \? WDS_FC_SYS\(lang\)/.test(BE), "D 核查道 system 整段改道（不进 WDS_CHAT_SYS）");
   return R;
 }
@@ -102,6 +102,25 @@ try {
   ok(/事实核查/.test(ctx.zh) && /JSON/.test(ctx.zh) && /不评论观点/.test(ctx.zh), "核查员只挑硬伤、交 JSON、不碰观点");
   ok(!/显露|差异序列|纠缠|内功|三大方程|六路径|二阶碰撞|SDE/.test(ctx.zh + ctx.en), "核查员 system 零 SDE 术语");
 } catch (e) { ok(false, "核查员 system 实算抛错：" + e.message); }
+// 两台问题发生器实算（五轮问对对照）
+console.log("── 问题发生器实算");
+try {
+  const consts = ["SDE_PATHS", "SDE_EQUATIONS", "SDE_PRINCIPLES"].map(function (n) {
+    const i = BE0.indexOf("const " + n + " ="); const j = BE0.indexOf(";", BE0.indexOf("\n", BE0.lastIndexOf("+", BE0.indexOf("\n\n", i))) - 1);
+    return BE0.slice(i, BE0.indexOf("\n", BE0.indexOf("\";", i) ) + 1);
+  }).join("\n");
+  const fn = sliceFn(BE0, "function WDS_QGEN_SYS(kind, round, lang)");
+  const ctx = {}; vm.createContext(ctx);
+  vm.runInContext(consts + "\n" + fn + "\nthis.s = [2,3,4,5].map(function(r){return WDS_QGEN_SYS('sde', r, 'zh');}); this.c = [2,3,4,5].map(function(r){return WDS_QGEN_SYS('classic', r, 'zh');}); this.ce = WDS_QGEN_SYS('classic', 3, 'en');", ctx);
+  ok(/三大方程/.test(ctx.s[0]) && /六路径/.test(ctx.s[1]) && /三原理/.test(ctx.s[2]) && /收束/.test(ctx.s[3]), "SDE 发生器按轮轮换：What·三方程 → How·六路径 → Why·三原理 → 收束");
+  ok(/澄清概念/.test(ctx.c[0]) && /证据/.test(ctx.c[1]) && /反方/.test(ctx.c[2]) && /推论/.test(ctx.c[3]), "经典发生器按轮轮换：澄清/假设 → 证据 → 反方 → 推论");
+  ok(!/显露|差异序列|纠缠|内功|三大方程|六路径|三原理|SDE/.test(ctx.c.join("") + ctx.ce), "经典发生器零 SDE 术语");
+  ok(ctx.s.concat(ctx.c).every(function (x) { return /只输出一个问题/.test(x); }), "两台都只出一问");
+} catch (e) { ok(false, "问题发生器实算抛错：" + e.message); }
+ok(/const qgKind = \(\(b\.nosde === 1 \|\| b\.nosde === true\) && \(b\.qgen === "sde" \|\| b\.qgen === "classic"\)\) \? b\.qgen : "";/.test(BE0), "出题道只在 nosde 下认（不装内功、不检索站内）");
+ok(/const askLen = \(fcRun \|\| qgKind\) \? 0 : wdsAskLen\(q\);/.test(BE0), "出题道同样不被材料里的「1500 字」误判成长文");
+ok(/: qgKind \? WDS_QGEN_SYS\(qgKind, parseInt\(b\.qr, 10\) \|\| 2, lang\)/.test(BE0), "出题道 system 整段改道");
+
 // 替换器实算
 try {
   const ctx = {}; vm.createContext(ctx);
