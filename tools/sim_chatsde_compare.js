@@ -115,11 +115,27 @@ try {
   ok(/三大方程/.test(ctx.s[0]) && /六路径/.test(ctx.s[1]) && /三原理/.test(ctx.s[2]) && /收束/.test(ctx.s[3]), "SDE 发生器按轮轮换：What·三方程 → How·六路径 → Why·三原理 → 收束");
   ok(/澄清概念/.test(ctx.c[0]) && /证据/.test(ctx.c[1]) && /反方/.test(ctx.c[2]) && /推论/.test(ctx.c[3]), "经典发生器按轮轮换：澄清/假设 → 证据 → 反方 → 推论");
   ok(!/显露|差异序列|纠缠|内功|三大方程|六路径|三原理|SDE/.test(ctx.c.join("") + ctx.ce), "经典发生器零 SDE 术语");
-  ok(ctx.s.concat(ctx.c).every(function (x) { return /只输出一个问题/.test(x); }), "两台都只出一问");
+  ok(ctx.s.concat(ctx.c).every(function (x) { return /只输出一个问题|只输出一行/.test(x); }), "两台都只出一问");
 } catch (e) { ok(false, "问题发生器实算抛错：" + e.message); }
 ok(/const qgKind = \(\(b\.nosde === 1 \|\| b\.nosde === true\) && \(b\.qgen === "sde" \|\| b\.qgen === "classic"\)\) \? b\.qgen : "";/.test(BE0), "出题道只在 nosde 下认（不装内功、不检索站内）");
 ok(/const askLen = \(fcRun \|\| qgKind\) \? 0 : wdsAskLen\(q\);/.test(BE0), "出题道同样不被材料里的「1500 字」误判成长文");
 ok(/: qgKind \? WDS_QGEN_SYS\(qgKind, parseInt\(b\.qr, 10\) \|\| 2, lang\)/.test(BE0), "出题道 system 整段改道");
+
+// 锚题约束（2026-10-04）
+console.log("── 锚题约束");
+try {
+  const consts = ["SDE_PATHS", "SDE_EQUATIONS", "SDE_PRINCIPLES"].map(function (n) {
+    const i = BE0.indexOf("const " + n + " ="); return BE0.slice(i, BE0.indexOf("\n", BE0.indexOf("\";", i)) + 1);
+  }).join("\n");
+  const ctx = {}; vm.createContext(ctx);
+  vm.runInContext(consts + "\n" + sliceFn(BE0, "function WDS_QGEN_SYS(kind, round, lang)") + "\nthis.s = WDS_QGEN_SYS('sde', 3, 'zh'); this.c = WDS_QGEN_SYS('classic', 3, 'zh');", ctx);
+  ok(/锚题规矩/.test(ctx.s) && /点名总题的核心对象/.test(ctx.s) && /工具名｜问句/.test(ctx.s), "SDE 发生器带锚题规矩，并写明「工具名｜问句」");
+  ok(!/锚题/.test(ctx.c), "经典发生器不加锚题（它是基线，第一次真跑没跑题）");
+  const c2 = {}; vm.createContext(c2);
+  vm.runInContext(sliceFn(FE0, "function qacCore(topic)") + "\n" + sliceFn(FE0, "function qacAnchored(question, topic)") + "\n"
+    + "this.r = [qacAnchored('奥卡姆剃刀里的「必要」由谁定义？','解构奥卡姆剃刀'), qacAnchored('这把剃刀为什么只在事后成立？','解构奥卡姆剃刀'), qacAnchored('发表激励为什么让失败记录消失？','解构奥卡姆剃刀'), qacAnchored('Why does the razor only work after the fact?','Deconstruct Occam\\'s razor')];", c2);
+  ok(c2.r[0] && c2.r[1] && !c2.r[2] && c2.r[3], "锚题检查：点名总题或其双字片段算回扣、旁支跑题被拦、英文也认（" + c2.r.join(",") + "）");
+} catch (e) { ok(false, "锚题约束实算抛错：" + e.message); }
 
 // 替换器实算
 try {

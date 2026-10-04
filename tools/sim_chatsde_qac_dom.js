@@ -37,7 +37,12 @@ w.fetch = function (url, o) {
   calls.push(b);
   const side = b.cmp === "sde" ? "sde" : (b.cmp === "plain" ? "cls" : "");
   if (b.fc === 1) return sse([/十四世纪/.test(b.q) ? '[{"orig":"十四世纪","fix":"14 世纪","why":"统一写法","level":"错"}]' : "[]"]);
-  if (b.qgen) return sse([(b.qgen === "sde" ? "S追问" : "C追问") + b.qr + "：这一答里的关键判断靠什么站住？"]);
+  if (b.qgen === "classic") return sse(["C追问" + b.qr + "：这一答里的关键判断靠什么站住？"]);
+  if (b.qgen === "sde") {
+    // 第 3 问首稿故意跑题（不点名总题），看锚题检查与重出一次
+    if (b.qr === 3 && !/^【上一稿跑题了/.test(b.q)) return sse(["How · 六路径｜发表激励为什么让失败记录消失？"]);
+    return sse(["What · 三大方程｜奥卡姆剃刀里的「必要」是经什么差异长成的？S追问" + b.qr]);
+  }
   if (/【写作任务 · 前半】/.test(b.q)) {
     if (side === "sde" && cutOnce.sde) { cutOnce.sde = false; return sse(["# 题\n\n## 摘要\n\n前半（被截"], { fin: "length", cut: "length" }); }
     return sse(["# 题\n\n## 摘要\n\n" + side + " 前半，十四世纪。\n\n【后半要写】\n五、讨论"]);
@@ -74,8 +79,11 @@ let waited = 0;
   ok(A.every(c => !c.nosde && c.grade === 5 && c.mode === "deep") && B.every(c => c.nosde === 1 && c.grade === 5 && c.mode === "deep"), "左路完整内功（第 5 档、无 nosde），右路 nosde；同档");
   ok(A[0].q === B[0].q && /^【篇幅】约 1500 字。/.test(A[0].q) && /解构奥卡姆剃刀$/.test(A[0].q), "第 1 问＝读者原题，两路逐字相同");
   const GS = calls.filter(c => c.qgen === "sde"), GC = calls.filter(c => c.qgen === "classic");
-  ok(GS.length === 4 && GC.length === 4, "两路各出题 4 次（" + GS.length + " / " + GC.length + "）");
-  ok(GS.map(c => c.qr).join() === "2,3,4,5" && GC.map(c => c.qr).join() === "2,3,4,5", "出题轮次 2..5，按轮轮换");
+  ok(GS.length === 5 && GC.length === 4, "SDE 路出题 4 次＋跑题重出 1 次，经典路 4 次（" + GS.length + " / " + GC.length + "）");
+  ok(GS.map(c => c.qr).join() === "2,3,3,4,5" && GC.map(c => c.qr).join() === "2,3,4,5", "出题轮次 2..5；跑题那一轮重出同一轮");
+  ok(/^【上一稿跑题了：「发表激励为什么让失败记录消失？」/.test(GS[2].q), "重出时把跑题的那一稿点名递回去");
+  ok(!A.some(c => /发表激励/.test(c.q)), "跑题的那一问没有进入作答");
+  ok(A.slice(1).every(c => /奥卡姆剃刀/.test(c.q) && !/｜/.test(c.q)), "进入作答的问句都回扣总题，且工具名已剥掉");
   ok(GS.concat(GC).every(c => c.nosde === 1 && c.history.length === 0), "出题道走 nosde、不带历史（材料在题面里）");
   ok(/S追问2/.test(A[1].q) && /C追问5/.test(B[4].q), "SDE 发生器的题进左路、经典发生器的题进右路");
   const P1 = calls.filter(c => /【写作任务 · 前半】/.test(c.q)), P2 = calls.filter(c => /【写作任务 · 后半】/.test(c.q));
@@ -106,6 +114,7 @@ let waited = 0;
       const xml = typeof buf === "string" ? buf : Buffer.from(buf).toString("utf8");
       ok(/论文 A · 有 SDE/.test(xml) && /论文 B · 无 SDE/.test(xml), "合订稿里两篇都在");
       ok(/S追问2/.test(xml) && /C追问5/.test(xml), "合订稿附了两组五问");
+      ok(/〔What · 三大方程〕/.test(xml) && /首稿跑题，已重出/.test(xml), "附录里写明每问用的工具与「首稿跑题，已重出」");
       ok(/事实核查记录/.test(xml), "合订稿附了核查记录");
       ok(!/【后半要写】/.test(xml), "前半末尾的提纲行已摘掉");
     } else ok(false, "读不出文件内容");

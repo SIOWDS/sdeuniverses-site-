@@ -1753,7 +1753,7 @@
       qacP2M: "\n\n【五轮问对要点】\n", qacContT: "【续写】上文在下面这句之后断了。请紧接着最后一句往下写完这一部分，不要重复、不要回顾、不要另起标题：\n\n……",
       qacWord: "⤓ 两篇合一 Word", qacWordA: "⤓ 论文 A（有 SDE）Word", qacWordB: "⤓ 论文 B（无 SDE）Word",
       qacDocT: "同题对照 · 五轮问对 · 有 SDE／无 SDE", qacFair: "两路同一家基底、同一档功率，互不可见；题目、篇幅要求与成文指令逐字相同。差别只在：出题的发生器（SDE／经典）、作答与成文的内核（完整内功＋SDE 方法论／传统方法论）。两篇成文后走同一道事实核查（核查员不装 SDE 内核）。",
-      qacAppQ: "附：五轮问对的五个问题", qacPA: "论文 A · 有 SDE", qacPB: "论文 B · 无 SDE",
+      qacAppQ: "附：五轮问对的五个问题", qacDrift: "【上一稿跑题了：「{x}」看不出是在回答总题。重出一问，必须点名总题的核心对象、回扣总题。】\n\n", qacReGen: " · 跑题，重出一次", qacPA: "论文 A · 有 SDE", qacPB: "论文 B · 无 SDE",
       cmpIq: "⚖ 给两份打创新智商", cmpIqQ: "下面是同一个问题、同一家基底、在两种内核下各写出的一份报告（A＝有 SDE，B＝无 SDE）。请按创新智商五维（S/D/E/I/F）分别给两份打分，各维附一句原文证据与一句扣分句，算出综合分，并说清差距主要出在哪几维、各自最该补哪一维。",
       triBtn: "⚔ 三家对撞", triOn: "⚔ 三家对撞：开",
       triMore: "↻ 继续对撞", triRd: "第 {n} 轮 · 座位左轮一格",
@@ -1970,7 +1970,7 @@
       qacP2M: "\n\n[Dialogue highlights]\n", qacContT: "[Continue] The text was cut off after the line below. Continue straight on from the last sentence and finish this part; no repetition, no recap, no new heading:\n\n…",
       qacWord: "⤓ Both papers in one Word file", qacWordA: "⤓ Paper A (SDE) Word", qacWordB: "⤓ Paper B (no SDE) Word",
       qacDocT: "Same question · 5-round dialogue · SDE vs no-SDE", qacFair: "Same model and power on both sides, neither sees the other; title, length lines and writing instructions are identical. The only differences: the question generator (SDE / classical) and the answering and writing kernel (full kernel + SDE method / conventional method). Both papers then go through the same fact check (the checker carries no SDE kernel).",
-      qacAppQ: "Appendix: the five questions", qacPA: "Paper A · with SDE", qacPB: "Paper B · without SDE",
+      qacAppQ: "Appendix: the five questions", qacDrift: "[Your last draft drifted: \u201c{x}\u201d does not read as answering the topic. Write a new one that names the topic\u2019s core object and ties back to it.]\n\n", qacReGen: " · drifted, regenerating once", qacPA: "Paper A · with SDE", qacPB: "Paper B · without SDE",
       cmpIq: "⚖ Score both (Innovation IQ)", cmpIqQ: "Below are two reports on the same question from the same model under two kernels (A = with SDE, B = without SDE). Score each on the five Innovation IQ dimensions (S/D/E/I/F) with one quoted piece of evidence and one deduction per dimension, compute the composite, and say which dimensions account for the gap and what each should fix first.",
       triBtn: "\u2694 Three-way clash", triOn: "\u2694 Three-way clash: on",
       triMore: "\u21bb Collide again", triRd: "Round {n} · seats rotate one place",
@@ -6267,19 +6267,48 @@
     return s;
   }
   // 出题：只要一行；去编号、去标签、去引号。出不来就停这一路（不拿兜底句冒充发生器的产出）
-  function qacCleanQ(s) {
+  function qacCleanQ(s, keep) {
     var line = String(s || "").split("\n").map(function (x) { return x.trim(); }).filter(Boolean)[0] || "";
+    // SDE 发生器写「工具名｜问句」（锚题约束那次加的）：工具名剥下来另记，问句才进下一轮
+    var bar = line.search(/[｜|]/);
+    if (bar > 0 && bar <= 24) { if (keep) keep.tool = line.slice(0, bar).replace(/^[#>*\-\d.、)）\s]+/, "").trim(); line = line.slice(bar + 1).trim(); }
     line = line.replace(/^[#>*\-\d.、)）\s]+/, "").replace(/^(第\s*\d+\s*问|问题|Question\s*\d*|Q\d*)\s*[:：]\s*/i, "")
                .replace(/^[「“"']+|[」”"']+$/g, "").trim();
     return line.slice(0, 160);
   }
-  function qacGenQ(side, k, q, turns, mine) {
-    var pl = { q: qacLog(q, turns, 1800), history: [], key: mine.key, vendor: mine.vendor, model: mine.model || "",
-               mode: "deep", grade: 3, web: 0, lang: LANG, tool: "", nosde: 1, qgen: side === "sde" ? "sde" : "classic", qr: k };
-    return qacCall(pl).then(function (r) {
-      var nq = qacCleanQ(r.text);
-      if (nq.length < 6) throw new Error("question generator returned nothing usable");
-      return nq;
+  /* 锚题检查（2026-10-04）：问句与总题的「核心对象」有没有交集。中文按双字片段比，英文按 4 字母以上的词比。
+     只用在 SDE 一路——经典发生器第一次真跑没跑题，它是基线，不加闸。
+     判据宁宽勿严：总题核心只要有一个双字片段出现在问句里就算回扣（「剃刀」「奥卡姆」都算）。 */
+  function qacCore(topic) {
+    return String(topic || "").replace(/^\s*(请|试|谈谈|论|浅论|再论|解构|建构|分析|评析|为什么|如何|怎样)\s*/, "")
+      .replace(/[，。？！、：；“”「」《》（）()\[\]?!,.:;'"\s]/g, "").replace(/(是什么|为什么|怎么样|吗|呢)$/g, "");
+  }
+  function qacAnchored(question, topic) {
+    var core = qacCore(topic), qn = String(question || "");
+    if (!core) return true;
+    if (qn.indexOf(core) >= 0) return true;
+    var cjk = core.replace(/[^\u4e00-\u9fff]/g, "");
+    for (var i = 0; i + 2 <= cjk.length; i++) if (qn.indexOf(cjk.slice(i, i + 2)) >= 0) return true;
+    var STOP = /^(deconstruct|construct|analyse|analyze|explain|what|does|about|with|from|that|this|should|would|could|there|their|which|whose)$/;
+    var words = (String(topic || "").toLowerCase().match(/[a-z]{4,}/g) || []).filter(function (w) { return !STOP.test(w); });
+    for (var j = 0; j < words.length; j++) if (qn.toLowerCase().indexOf(words[j]) >= 0) return true;
+    return !cjk && !words.length;                       // 总题里抠不出可比的字面（极少见）就不拦
+  }
+  function qacGenQ(side, k, q, turns, mine, onRetry) {
+    function once(prefix) {
+      var pl = { q: (prefix || "") + qacLog(q, turns, 1800), history: [], key: mine.key, vendor: mine.vendor, model: mine.model || "",
+                 mode: "deep", grade: 3, web: 0, lang: LANG, tool: "", nosde: 1, qgen: side === "sde" ? "sde" : "classic", qr: k };
+      return qacCall(pl).then(function (r) {
+        var meta = {}, nq = qacCleanQ(r.text, meta);
+        if (nq.length < 6) throw new Error("question generator returned nothing usable");
+        return { q: nq, tool: meta.tool || "" };
+      });
+    }
+    return once("").then(function (g) {
+      if (side !== "sde" || qacAnchored(g.q, q)) return g;
+      if (onRetry) onRetry();
+      // 跑题只重出一次：第二稿仍跑题也照用，但记下来（附录里标「跑题」），不无限追
+      return once(qacFmt(t("qacDrift"), { x: g.q })).then(function (g2) { g2.drift = !qacAnchored(g2.q, q); g2.retried = true; return g2; });
     });
   }
   // 写一段；被截就续写一次（只续一次：再截就如实带着断口交出去，不无限追）
@@ -6299,7 +6328,9 @@
     var paper = String(col.text || "").replace(/^\s*#\s+[^\n]*\n/, "");     // 论文自己的大标题＝题目，合订时去掉重复的那行
     return "# " + (side === "sde" ? t("qacPA") : t("qacPB")) + "\n\n"
       + (side === "sde" ? t("qacSdeS") : t("qacClsS")) + "\n\n" + paper + cmpFcMd(col.fc)
-      + "\n\n## " + t("qacAppQ") + "\n\n" + col.turns.map(function (x, i) { return (i + 1) + ". " + x.q; }).join("\n");
+      + "\n\n## " + t("qacAppQ") + "\n\n" + col.turns.map(function (x, i) {
+        return (i + 1) + ". " + (x.tool ? ("〔" + x.tool + "〕") : "") + x.q + (x.flag === "drift" ? "（⚠ 重出后仍未回扣总题）" : (x.flag === "retried" ? "（首稿跑题，已重出）" : ""));
+      }).join("\n");
   }
   function qacSave(which, q, cols, vname) {
     if (!window.SDEDocx) { toast(t("cmpWait")); return; }
@@ -6336,11 +6367,11 @@
     cell.a.innerHTML = ""; cell.a.appendChild(wrap);
     function say(col, s) { col.nt.textContent = s; }
     function run(col) {
-      var k = 1, qk = q;
+      var k = 1, qk = q, qtool = "", qflag = "";
       function round() {
         say(col, qacFmt(t("qacRnd"), { k: k }) + t("qacAns"));
         var box = el("details", null);
-        var sm = el("summary", null, qacFmt(t("qacRnd"), { k: k }) + " · " + t("qacQ") + "：" + qk);
+        var sm = el("summary", null, qacFmt(t("qacRnd"), { k: k }) + " · " + (qtool ? ("〔" + qtool + "〕") : "") + t("qacQ") + "：" + qk + (qflag === "drift" ? " ⚠" : ""));
         var ab = el("div", "wdsm-a");
         ab.innerHTML = "<span class='cur'>▊</span>";
         box.appendChild(sm); box.appendChild(ab); col.log.appendChild(box);
@@ -6348,10 +6379,11 @@
         pl.q = t("qacLenR") + qk; pl.history = qacHist(col.turns);
         return qacCall(pl, function (x) { ab.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; }).then(function (r) {
           ab.innerHTML = mdRender(r.text);
-          col.turns.push({ q: qk, a: r.text });
+          col.turns.push({ q: qk, a: r.text, tool: qtool, flag: qflag });
           if (k >= 5) return;
           say(col, qacFmt(t("qacRnd"), { k: k }) + t("qacGen"));
-          return qacGenQ(col.side, k + 1, q, col.turns, mine).then(function (nq) { k++; qk = nq; return round(); });
+          return qacGenQ(col.side, k + 1, q, col.turns, mine, function () { say(col, qacFmt(t("qacRnd"), { k: k }) + t("qacReGen")); })
+            .then(function (g) { k++; qk = g.q; qtool = g.tool; qflag = g.drift ? "drift" : (g.retried ? "retried" : ""); return round(); });
         });
       }
       return round().then(function () {
