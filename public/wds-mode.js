@@ -3378,8 +3378,26 @@
   var topEl = layer.querySelector(".wdsm-top");
   var topShowBtn = layer.querySelector(".wdsm-topshow");
   var topHid = false, topLastY = 0;
+  /* 【2026-10-05 再查实的「闪影」：到顶必现 这一条漏了】
+     顶栏／档位条一收一放都会改正文区的高度，浏览器随即把 scrollTop 夹小；
+     夹出来的 y<40 被当成「读者滚回顶了」⇒ 弹出 ⇒ 下一帧贴底 ⇒ 又收……流式时每帧抖一次。
+     读者一拖滚动条，自动贴底就停了，所以「拖一下就不闪」。
+     修法三条：① 记下读者真手势（滚轮／触摸／按住滚动条／翻页键），只有手势才算数；
+     ② 程序贴底期间，y<40 不许触发「现」（那是夹出来的，不是手指）；
+     ③ 状态翻转后 500ms 内，非手势的滚动事件不许再翻回去（迟滞）。 */
+  var userScrollAt = 0, userHold = false;
+  function markUser() { userScrollAt = Date.now(); }
+  function userScrolling() { return userHold || Date.now() - userScrollAt < 800; }
+  ["wheel", "touchstart", "touchmove", "keydown"].forEach(function (ev) { try { bodyEl.addEventListener(ev, markUser, { passive: true }); } catch (e) {} });
+  try {
+    bodyEl.addEventListener("pointerdown", function () { userHold = true; markUser(); }, { passive: true });
+    window.addEventListener("pointerup", function () { userHold = false; markUser(); }, { passive: true });
+    window.addEventListener("pointercancel", function () { userHold = false; }, { passive: true });
+  } catch (e) {}
+  var topFlipAt = 0, toolsFlipAt = 0;
   function topSet(hide) {
     if (!topEl || topHid === !!hide) return;
+    topFlipAt = Date.now();
     topHid = !!hide;
     if (topHid) topEl.classList.add("hid"); else topEl.classList.remove("hid");
     if (topShowBtn) { if (topHid) topShowBtn.classList.add("on"); else topShowBtn.classList.remove("on"); }
@@ -3393,9 +3411,11 @@
        往上翻 24px 才现——阈值不对称，是为了防手指微抖把它抖出来。 */
     /* 到顶必现这一条照旧（读者真滚到最上面了）；「往上翻就现」在程序贴底期间**不算数**——
        那多半是重排把 scrollTop 夹出来的假上滚，不是读者的手指。 */
-    if (y < 40) topSet(false);
+    var guarded = progScrolling() && !userScrolling();          // 程序贴底、且读者没动手：这期间的 y 不可信
+    if (!userScrolling() && Date.now() - topFlipAt < 500) { topLastY = y; return; }   // 迟滞：刚翻过，别立刻翻回
+    if (y < 40) { if (!guarded) topSet(false); }
     else if (y > topLastY + 8) topSet(true);
-    else if (!progScrolling() && y < topLastY - 24) topSet(false);
+    else if (!guarded && y < topLastY - 24) topSet(false);
     topLastY = y;
   }
   bodyEl.addEventListener("scroll", function () { setStick(atBottom()); topOnScroll(); toolsOnScroll(); }, { passive: true });
@@ -3551,6 +3571,7 @@
     togEl.title = toolsOpen ? t("mtHideT") : (t("mtShowT") + (sum.length ? ("：" + sum.join("、")) : ""));
   }
   function toolsSet(on, byUser) {
+    if (!!on !== toolsOpen) toolsFlipAt = Date.now();
     toolsOpen = !!on;
     if (byUser) { toolsPinned = !!on; try { localStorage.setItem(LS_TOOLS, on ? "1" : "0"); } catch (e) {} }
     toolsPaint();
@@ -3571,9 +3592,11 @@
     if (toolsPinned !== null) return;
     var y = bodyEl.scrollTop || 0;
     // 与顶栏同一条：程序贴底期间的「上滚」是假动作，不许把工具条抖出来
-    if (y < 40) toolsSet(true, false);
+    var guarded = progScrolling() && !userScrolling();          // 同顶栏：夹出来的 y 不算读者
+    if (!userScrolling() && Date.now() - toolsFlipAt < 500) { toolsLastY = y; return; }
+    if (y < 40) { if (!guarded) toolsSet(true, false); }
     else if (y > toolsLastY + 8) toolsSet(false, false);
-    else if (!progScrolling() && y < toolsLastY - 24) toolsSet(true, false);
+    else if (!guarded && y < toolsLastY - 24) toolsSet(true, false);
     toolsLastY = y;
   }
   try { inEl.addEventListener("focus", function () { if (toolsPinned === null) toolsSet(true, false); }); } catch (e) {}
