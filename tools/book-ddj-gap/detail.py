@@ -7,8 +7,8 @@ src = (SITE / '290/index.html').read_text()
 css = re.search(r'<style>\n(:root.*?)</style></head>', src, re.S).group(1)
 V = '20261005a'
 NO = 311
-PRINT = 'https://sdeuniverses.com/students/wang-desheng/ddj-gap-fill/m311/ddj-gap-fill-v2.pdf'
-READER = 'https://sdeuniverses.com/students/wang-desheng/ddj-gap-fill/m311/ddj-gap-fill-reader-v2.pdf'
+PRINT = 'https://sdeuniverses.com/students/wang-desheng/ddj-gap-fill/m311/ddj-gap-fill-v3.pdf'
+READER = 'https://sdeuniverses.com/students/wang-desheng/ddj-gap-fill/m311/ddj-gap-fill-reader-v3.pdf'
 LINE = '《道德经》写“样子”和“判断”的多，写“怎么做”的少——这本书逐章盘点留白，再补上一条做法。'
 E = html.escape
 def cards(items):
