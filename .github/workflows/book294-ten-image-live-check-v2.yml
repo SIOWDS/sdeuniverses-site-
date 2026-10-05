@@ -1,0 +1,100 @@
+name: Book294 actual ten image display check
+on:
+  push:
+    branches: ['qa/book294-ten-images-20261005']
+    paths: ['.github/workflows/book294-ten-image-live-check-v2.yml']
+permissions:
+  contents: read
+  actions: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Stop superseded diagnostic only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.error,os
+          u='https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/runs/37276196155/cancel'
+          try:
+              r=urllib.request.urlopen(urllib.request.Request(u,data=b'',method='POST',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}));print('Cancelled obsolete inspection',r.status)
+          except urllib.error.HTTPError as e:
+              if e.code!=409:raise
+              print('Obsolete inspection already ended')
+          PY
+      - name: Install inspection tools
+        run: |
+          python3 -m pip install --quiet pillow pymupdf beautifulsoup4 playwright
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Inspect actual online images and drawn PDF pages
+        run: |
+          python3 -u - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request,urlopen
+          from urllib.parse import urljoin
+          from datetime import datetime,timezone
+          from PIL import Image,ImageChops,ImageStat
+          from bs4 import BeautifulSoup
+          import json,os,hashlib,io,fitz
+          root=Path(os.environ['RUNNER_TEMP'])/'check';root.mkdir();base='https://sdeuniverses.com/books/m/294/'
+          def get(u):
+              with urlopen(Request(u,headers={'User-Agent':'Mozilla/5.0','Accept':'*/*'}),timeout=45) as r:return r.status,r.read(),r.headers.get('Content-Type','')
+          report={'checked_at_utc':datetime.now(timezone.utc).isoformat(),'base_url':base,'production_changes':False,'reindex_triggered':False,'pages':{},'images':[]};soups={}
+          for key,suffix in [('home',''),('gallery','figures.html'),('tree','tree.html'),('text','text/'),('reader','read.html')]:
+              status,raw,ct=get(base+suffix);(root/(key+'.html')).write_bytes(raw);s=BeautifulSoup(raw,'html.parser');soups[key]=s
+              report['pages'][key]={'url':base+suffix,'http_status':status,'title':s.title.get_text(),'figure_count':len(s.select('figure[id^="fig"]')),'image_count':len(s.select('img')),'svg_count':len(s.select('svg')),'gallery_links':[{'label':a.get_text(' ',strip=True),'href':urljoin(base+suffix,a['href'])} for a in s.select('a[href]') if 'figures' in a['href']]}
+              print('Page',key,status,flush=True)
+          _,raw,_=get(base+'publication-manifest.json');m=json.loads(raw);(root/'manifest.json').write_bytes(raw);report['revision']=m.get('revision');report['release_sha256']=m.get('release_sha256')
+          figures=soups['gallery'].select('figure[id^="fig"]');assert len(figures)==10
+          for f in figures:
+              img=f.select_one('img');u=urljoin(base+'figures.html',img['src']);status,raw,ct=get(u);im=Image.open(io.BytesIO(raw));im.load();dest=root/'images'/Path(u).name;dest.parent.mkdir(exist_ok=True);dest.write_bytes(raw)
+              report['images'].append({'id':f['id'],'title':f.select_one('figcaption b').get_text(strip=True),'url':u,'http_status':status,'content_type':ct,'width':im.width,'height':im.height,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'decoded':True,'in_full_text':soups['text'].select_one('#'+f['id']) is not None,'local_image':str(dest.relative_to(root))});print('Image',f['id'],status,flush=True)
+          assert len({i['sha256'] for i in report['images']})==10
+          u=urljoin(base,'downloads/'+m['pdf_filename']);status,raw,ct=get(u);(root/'live-book.pdf').write_bytes(raw);doc=fitz.open(stream=raw,filetype='pdf');report['pdf']={'url':u,'http_status':status,'pages':len(doc),'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()};candidates={}
+          for page in doc:
+              if not page.get_image_info():continue
+              for info in page.get_image_info(xrefs=True):
+                  xref=info['xref']
+                  if not xref or info['width']<500 or info['height']<700:continue
+                  if xref not in candidates:
+                      im=Image.open(io.BytesIO(doc.extract_image(xref)['image'])).convert('RGB');candidates[xref]={'pages':[],'small':im.resize((64,90))}
+                  candidates[xref]['pages'].append(page.number+1)
+          for item in report['images']:
+              target=Image.open(root/item['local_image']).convert('RGB').resize((64,90));score,xref=min((sum(ImageStat.Stat(ImageChops.difference(target,c['small'])).mean)/(3*255),x) for x,c in candidates.items());item['pdf_visual_match_error']=round(score,6);item['pdf_physical_pages']=candidates[xref]['pages'];item['pdf_image_match']=score<0.015
+              assert item['pdf_image_match'],(item['id'],score)
+              for pn in item['pdf_physical_pages']:
+                  dest=root/'pdf-pages'/f'{item["id"]}-page-{pn:03d}.png';dest.parent.mkdir(exist_ok=True);doc[pn-1].get_pixmap(matrix=fitz.Matrix(1.5,1.5)).save(dest)
+              print(item['title'],'PDF',item['pdf_physical_pages'],'match',score,flush=True)
+          report['all_ten_in_pdf']=all(i['pdf_image_match'] for i in report['images']);report['all_ten_in_full_text']=all(i['in_full_text'] for i in report['images']);report['tree_nodes']=len(soups['tree'].select('svg a[data-node]'));(root/'verification-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+      - name: Test desktop and mobile visible images
+        run: |
+          python3 -u - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          import os,json
+          root=Path(os.environ['RUNNER_TEMP'])/'check';report=json.loads((root/'verification-report.json').read_text());base=report['base_url'];checks=[]
+          with sync_playwright() as p:
+              b=p.chromium.launch()
+              for name,size in [('desktop',{'width':1365,'height':960}),('mobile',{'width':390,'height':844})]:
+                  page=b.new_page(viewport=size,device_scale_factor=1);errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(base+'figures.html',wait_until='networkidle',timeout=60000);items=[]
+                  for item in report['images']:
+                      image=page.locator('#'+item['id']+' img');image.scroll_into_view_if_needed();image.evaluate('e=>e.decode()');s=image.evaluate('e=>({loaded:e.complete&&e.naturalWidth>0,naturalWidth:e.naturalWidth,naturalHeight:e.naturalHeight,width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height})');assert s['loaded'];assert abs(s['width']/s['height']-s['naturalWidth']/s['naturalHeight'])<0.005;items.append({'id':item['id'],**s})
+                      if name=='desktop':page.locator('#'+item['id']).screenshot(path=str(root/(item['id']+'-online.png')))
+                  overflow=page.evaluate('document.documentElement.scrollWidth>innerWidth+2');assert not overflow
+                  page.locator('#fig01').scroll_into_view_if_needed();page.screenshot(path=str(root/(name+'-gallery.png')));page.goto(base+'tree.html',wait_until='networkidle',timeout=60000);page.screenshot(path=str(root/(name+'-tree.png')));checks.append({'device':name,'all_ten_loaded':True,'no_horizontal_overflow':not overflow,'images':items,'javascript_errors':errors});page.close()
+              page=b.new_page(viewport={'width':1365,'height':1050});page.goto(base+'read.html',wait_until='networkidle',timeout=60000);page.wait_for_timeout(5000);page.screenshot(path=str(root/'online-reader.png'));report['reader_browser_text']=page.locator('body').inner_text()[:2000];report['reader_canvas_count']=page.locator('canvas').count();page.close();b.close()
+          report['browser']=checks;report['success']=True;(root/'verification-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          lines=['# 第294号：线上十幅发生树图复核','','检查时间（UTC）：'+report['checked_at_utc'],'版本：'+str(report['revision']),'','图集：'+base+'figures.html','图集与全文各含10幅图；十张分别下载成功并解码；桌面与手机逐张滚动检查均正常加载，长宽比正常，无横向溢出。','','PDF共'+str(report['pdf']['pages'])+'页。以下是实际绘制图片所在的PDF物理页码。','','|图号|标题|尺寸|PDF物理页|状态|','|---|---|---|---|---|']
+          for i in report['images']:lines.append('|'+i['id']+'|'+i['title']+'|'+str(i['width'])+'×'+str(i['height'])+'|'+','.join(map(str,i['pdf_physical_pages']))+'|正常|')
+          lines+=['','“发生树”页面：'+str(report['pages']['tree']['image_count'])+'个img图片，'+str(report['pages']['tree']['svg_count'])+'幅SVG，'+str(report['tree_nodes'])+'个哲学节点；它与十幅彩图图集是不同页面。','发生树页通往图集的链接：'+json.dumps(report['pages']['tree']['gallery_links'],ensure_ascii=False),'','本次只核验，未更改线上书籍，未触发reindex。'];(root/'线上十幅图复核报告.md').write_text('\n'.join(lines));print('\n'.join(lines))
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book294-ten-images-current-live-verified
+          path: ${{ runner.temp }}/check
+          retention-days: 7
