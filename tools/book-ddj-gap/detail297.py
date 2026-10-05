@@ -6,7 +6,7 @@ SITE = Path(__file__).resolve().parents[2] / 'public/books/m'
 src = (SITE / '290/index.html').read_text()
 css = re.search(r'<style>\n(:root.*?)</style></head>', src, re.S).group(1)
 V = '20261005b'
-PDF = 'https://sdeuniverses.com/students/wang-desheng/ddj-intro/m297/SDE-Daodejing-Intro-297.pdf'
+PDF = 'https://sdeuniverses.com/students/wang-desheng/ddj-intro/m297/SDE-Daodejing-Intro-297-v2.pdf'
 LINE = '道不是先在的神秘实体，而是显露、差异、纠缠联立发生本身——把《道德经》读成一部“道生学”。'
 E = html.escape
 def cards(items):
