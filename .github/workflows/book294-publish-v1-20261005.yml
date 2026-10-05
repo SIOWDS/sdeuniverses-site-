@@ -1,0 +1,125 @@
+name: Publish accepted book294 and verify live without reindex
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book294-publish-v1-20261005.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: book294-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book294-final-accepted
+          run-id: 37254200083
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book294-final
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/294/
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /.github/workflows/search-index.yml
+      - name: Verify provenance and atomically publish only this accepted edition
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os,json,subprocess,urllib.request,time,hashlib
+          from pathlib import Path
+          root=Path(os.environ['GITHUB_WORKSPACE']);cand=Path(os.environ['RUNNER_TEMP'])/'book294-final'
+          req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/runs/37254200083',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'book294-publisher'})
+          run=json.load(urllib.request.urlopen(req,timeout=45));assert run['conclusion']=='success' and run['head_sha']=='3495fcb4d88117099042d90b98ded46e95a63c8e'
+          manifest=json.loads((cand/'book/publication-manifest.json').read_text());expected='6726490f41e19b909030b1ae8e5f1c424653cd456f4a341a69a566cf3fc9e995';assert manifest['release_sha256']==expected
+          assert json.loads((cand/'qa/browser-qa.json').read_text())['success']
+          for e in manifest['files']:
+              p=cand/'book'/e['path'];assert hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256'],e['path']
+          def git(*args,check=True):return subprocess.run(['git',*args],cwd=root,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,check=check)
+          git('config','user.name','github-actions[bot]');git('config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
+          allowed={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          changed=[]
+          for attempt in range(4):
+              git('fetch','--filter=blob:none','--depth=1','origin','main');git('reset','--hard','FETCH_HEAD');base=git('rev-parse','HEAD').stdout.strip()
+              target=root/'public/books/m/294/publication-manifest.json'
+              if target.exists():
+                  existing=json.loads(target.read_text());assert existing.get('release_sha256')==expected,'A different edition now exists. No overwrite.'
+                  if existing.get('status')=='published':commit=base;break
+              index_before=hashlib.sha256((root/'.github/workflows/search-index.yml').read_bytes()).hexdigest()
+              installed=subprocess.run(['python3',str(cand/'build-tools/install.py'),str(cand),str(root)],check=True,text=True,stdout=subprocess.PIPE);print(installed.stdout)
+              (cand/'qa/install-result.txt').write_text(installed.stdout)
+              assert hashlib.sha256((root/'.github/workflows/search-index.yml').read_bytes()).hexdigest()==index_before
+              git('add','--sparse','public/books/m/294',*sorted(allowed));changed=git('diff','--cached','--name-only').stdout.splitlines()
+              assert changed and all(p in allowed or p.startswith('public/books/m/294/') for p in changed),changed
+              assert not any(p.lower().endswith(('.ttf','.ttc','.otf','.woff','.woff2','.env')) for p in changed)
+              git('commit','-m','Publish complete volume294: Qin Li and Wang Desheng; 72 chapters, 50 philosophy nodes, 10 illustrations, 499-page edition; no reindex')
+              commit=git('rev-parse','HEAD').stdout.strip();result=git('push','origin','HEAD:main',check=False);print(result.stdout)
+              if result.returncode==0:break
+              if attempt==3:raise RuntimeError('Concurrent main updates prevented publication; no force push.')
+              time.sleep(3)
+          published=json.loads((root/'public/books/m/294/publication-manifest.json').read_text());assert published['status']=='published' and published['release_sha256']==expected
+          (cand/'qa/published-manifest.json').write_text(json.dumps(published,ensure_ascii=False,indent=2))
+          (cand/'qa/publication-result.json').write_text(json.dumps({'success':True,'commit':commit,'base_commit':base,'release_sha256':expected,'published_at':published['published_at'],'number':294,'changed_paths':changed,'reindex_triggered':False},ensure_ascii=False,indent=2))
+          print('PUBLICATION_COMMIT',commit,'RELEASE',expected,'NO_REINDEX')
+          PY
+      - name: Prepare live browser verification
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Verify deployed manifest, all book assets and all three bookshelves
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.error,time,json,hashlib,os,concurrent.futures
+          from pathlib import Path
+          cand=Path(os.environ['RUNNER_TEMP'])/'book294-final';qa=cand/'qa';manifest=json.loads((qa/'published-manifest.json').read_text());base='https://sdeuniverses.com/books/m/294/'
+          def get(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Book294-Live-Acceptance','Accept':'*/*'})
+              with urllib.request.urlopen(req,timeout=90) as r:return r.status,r.read()
+          waits=[]
+          for attempt in range(36):
+              try:
+                  status,data=get(base+'publication-manifest.json?release='+manifest['release_sha256']);live=json.loads(data)
+                  assert live['release_sha256']==manifest['release_sha256'] and live['status']=='published'
+                  break
+              except Exception as e:
+                  waits.append(str(e));print('Waiting for accepted deployment',attempt+1,str(e));time.sleep(15)
+          else:raise RuntimeError('Publication committed but accepted deployment not live within verification window.')
+          def check(e):
+              status,data=get(base+e['path']);sha=hashlib.sha256(data).hexdigest();assert status==200 and sha==e['sha256'],(e['path'],status,sha,e['sha256'])
+              return {'path':e['path'],'status':status,'sha256':sha,'bytes':len(data)}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:checks=list(pool.map(check,manifest['files']))
+          shelves=[]
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+              for attempt in range(8):
+                  status,data=get(url);text=data.decode();ok='西方哲学SDE发生树' in text and '/books/m/294/' in text
+                  if ok:break
+                  time.sleep(10)
+              assert ok,('Shelf missing book294',url);shelves.append({'url':url,'status':status,'book294_present':True})
+          result={'success':True,'release_sha256':manifest['release_sha256'],'book_assets_checked':len(checks),'all_exact_hash_match':True,'assets':checks,'bookshelves':shelves,'deployment_wait_attempts':len(waits),'reindex_triggered':False}
+          (qa/'live-http-qa.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps({k:v for k,v in result.items() if k!='assets'},ensure_ascii=False,indent=2))
+          PY
+      - name: Exercise real desktop and mobile readers on the public site
+        run: |
+          python3 "${RUNNER_TEMP}/book294-final/build-tools/browser_qa.py" "${RUNNER_TEMP}/book294-final" "https://sdeuniverses.com/books/m/294/"
+      - name: Preserve live evidence and exact publication result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book294-publication-live-evidence-20261005
+          path: ${{ runner.temp }}/book294-final/qa
+          retention-days: 30
