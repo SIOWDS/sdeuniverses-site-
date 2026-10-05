@@ -1,0 +1,77 @@
+name: Book294 style preflight 20261005
+on:
+  push:
+    paths:
+      - '.github/workflows/book294-style-preflight-20261005.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/books/m/220/
+            /public/books/m/302/
+            /public/books/m/294/
+            /public/students/wang-desheng/my-three-treasures/m220/
+            /public/students/chen-feng/ai-death-dilemma/m302/
+            /.github/workflows/
+            /scripts/
+            /package.json
+            /wrangler.toml
+            /wrangler.jsonc
+      - name: Collect reference assets and latest publication state
+        shell: bash
+        run: |
+          mkdir -p /tmp/book294-preflight
+          python3 - <<'PY'
+          import pathlib, json, subprocess, shutil, urllib.request, re, hashlib
+          root=pathlib.Path('/tmp/book294-preflight')
+          paths=subprocess.check_output(['git','ls-tree','-r','--name-only','HEAD'],text=True).splitlines()
+          wanted=[p for p in paths if (p.startswith('public/books/m/294/') or p.startswith('public/books/m/220/') or p.startswith('public/books/m/302/') or p.startswith('.github/workflows/') or ('scripts/' in p and any(x in p.lower() for x in ['book','publish','deploy','reader']))) ]
+          (root/'relevant-repository-paths.json').write_text(json.dumps(wanted,ensure_ascii=False,indent=2))
+          for folder in ['public/books/m/294','public/books/m/220','public/books/m/302','public/students/wang-desheng/my-three-treasures/m220','public/students/chen-feng/ai-death-dilemma/m302','.github/workflows']:
+              p=pathlib.Path(folder)
+              if p.exists(): shutil.copytree(p,root/'repository'/folder,dirs_exist_ok=True)
+          for f in ['public/books/catalog.json','public/books/index.html','public/monographs/index.html','package.json','wrangler.toml','wrangler.jsonc']:
+              p=pathlib.Path(f)
+              if p.is_file():
+                  t=root/'repository'/f;t.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,t)
+          stat={'commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'reindex_requested':False,'book_content_modified':False,'live':{}}
+          for num in [220,302,294]:
+              for suffix in ['', 'read.html', 'text/']:
+                  url=f'https://sdeuniverses.com/books/m/{num}/'+suffix
+                  try:
+                      req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Book294-publication-preflight'})
+                      with urllib.request.urlopen(req,timeout=45) as r:
+                          data=r.read();stat['live'][url]={'status':r.status,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+                      dest=root/'live'/str(num)/(suffix.replace('/','_') or 'index.html');dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(data)
+                  except Exception as e:stat['live'][url]={'error':str(e)}
+          cat=pathlib.Path('public/books/catalog.json')
+          if cat.exists():
+              data=json.loads(cat.read_text());stat['catalog_top_type']=type(data).__name__
+              def walk(x):
+                  if isinstance(x,dict):
+                      if any(str(x.get(k,''))=='294' for k in ['id','no','number','book_no','volume']): stat.setdefault('catalog_294',[]).append(x)
+                      for v in x.values():walk(v)
+                  elif isinstance(x,list):
+                      for v in x:walk(v)
+              walk(data)
+          (root/'preflight.json').write_text(json.dumps(stat,ensure_ascii=False,indent=2))
+          print(json.dumps(stat,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book294-style-preflight-20261005
+          path: /tmp/book294-preflight
+          retention-days: 7
