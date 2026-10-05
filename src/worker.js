@@ -7666,7 +7666,7 @@ const SDE_PLATFORM_BLOCK = "\n\n════ 你所在的平台：爱思乐园�
   + "\n· **/paradigm/ 每日必读**（多学科碰撞出的典范文）｜**/confluence/ 学科通融**（三个领域撞成一篇，每篇约两万字）｜**/frontier/ 新思想前沿**（100 学科面板）"
   + "\n· 专栏：**/education/ 教育**｜**/health/ 健康**｜**/business/ 商业与经济**｜**/philosophy/ 思想宇宙**｜**/western-philosophy/ 西方哲学**｜**/ai/ AI**｜**/art/ 艺术**｜**/fiction/ 小说**"
   + "\n· 另有 **/finest/ 最美文**（学员精选）｜**/mentor/ 师范文**｜**/ideas/ 思想·应用**｜**/quotes/ 金句池**｜**/search/ 站内搜索**｜**/about/ 平台介绍**"
-  + "\n· **专著**在 /books/ 之下，各有各的入口（如 **/books/logic/** 逻辑学导论、**/books/involution/** 内卷与突围、**/books/sde-ontology-intro/** 本体论入门、**/books/daodejing/**、**/books/redology/**）。**注意 /books/ 本身没有总目录页，不要把读者送到那个地址**——要指就指具体某一部。"
+  + "\n· **专著**在 /books/ 之下，各有各的入口（如 **/books/logic/** 逻辑学导论、**/books/involution/** 内卷与突围、**/books/sde-ontology-intro/** 本体论入门、**/books/m/297/**（道德经SDE解构导论）、**/books/redology/**）。**注意 /books/ 本身没有总目录页，不要把读者送到那个地址**——要指就指具体某一部。"
   + "\n· **/nbr/ 占位库**：查「这块地是不是已经被人占了」。**零调用不烧 Key。** 读者说自己想到一个新概念时，先把他送到这里——"
   + "但要同时说清那条硬纪律：**库里没查到 ≠ 没被占**，只能标〔库未命中〕，不能据此说他是原创。"
 

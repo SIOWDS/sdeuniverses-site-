@@ -18,12 +18,14 @@ var CFG=window.BOOK_AGENT||{};
 var mno=parseInt(CFG.no||new URLSearchParams(location.search).get("m"),10);
 if(!mno){fail('没有指定书号。请从<a href="/books/">专著书架</a>里任选一本进来。');return}
 HK="sde_shusheng_m"+mno;
-var AG={name:"书生",epithet:"",intro:"",starts:{}},RAG=null,KP=null;
+var AG={name:"书生",epithet:"",intro:"",starts:{}},RAG=null,KP=null,DUI=null;
 
 /* —— 1. 找书：catalog.json —— */
 function J(u){return fetch(u,{cache:"no-cache"}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}
-Promise.all([J("/books/catalog.json"),J("/books/agents.json"),J("/books/m/"+mno+"/rag.json"),J("/books/m/"+mno+"/keypoints.json")]).then(function(a){
+Promise.all([J("/books/catalog.json"),J("/books/agents.json"),J("/books/m/"+mno+"/rag.json"),J("/books/m/"+mno+"/keypoints.json"),J("/books/m/"+mno+"/duilu.json")]).then(function(a){
  var c=a[0]||{};if(a[1]&&a[1].agents&&a[1].agents[mno])AG=a[1].agents[mno];RAG=a[2];KP=a[3];
+ /* 三本《道德经》互为 RAG（tools/build_ddj_duilu.py）：把兄弟书的对读段落并入本书碰撞库 */
+ DUI=a[4]||null;if(DUI&&DUI.items&&DUI.items.length){RAG=RAG||{items:[]};RAG.items=(RAG.items||[]).concat(DUI.items)}
  return c;
 }).then(function(c){
  var b=(c.books||[]).filter(function(x){return x.number===mno})[0];
@@ -162,15 +164,51 @@ function paint(){
 /* —— 3b. 专属碰撞库：每本书提前打造（tools/build_book_rag.py）；每一问按问题挑出最相撞的几条递上去 —— */
 function grams(s){var g={},t=String(s||"").replace(/[^\u4e00-\u9fff]/g,"");for(var i=0;i<t.length-1;i++)g[t.substr(i,2)]=1;return g}
 function lastAns(){for(var i=hist.length-1;i>=0;i--)if(hist[i].role==="wds")return String(hist[i].text).slice(0,600);return ""}
+function cnNum(t){var M={"零":0,"一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9};t=String(t);if(/^\d+$/.test(t))return +t;var b=t.indexOf("百"),r=0;if(b>=0){r=(b?M[t[0]]:1)*100;t=t.slice(b+1);if(!t)return r}var i=t.indexOf("十");if(i>=0)return r+(i?M[t[0]]:1)*10+(t.length>i+1?M[t[i+1]]:0);return r+(M[t]||0)}
+function qChapters(q){var o={},re=/第\s*([0-9一二三四五六七八九十百]+)\s*章/g,m;while((m=re.exec(q)))o[cnNum(m[1])]=1;return o}
 function ragPick(q,a,k){
  var items=(RAG&&RAG.items)||[];if(!items.length)return{text:"",items:[]};
- var g=grams(q),sc=items.map(function(it,i){
+ var g=grams(q),cs=qChapters(q),sc=items.map(function(it,i){
   var h=grams(it.t+it.ch+(it.kw||[]).join("")+it.x),o=0;for(var x in g)if(h[x])o++;
   var s=o+it.s*20;if((a==="clash"||a==="cut")&&it.rel==="跨界")s+=4;if((a==="clash"||a==="cut")&&it.rel==="同源")s-=6;
+  if(it.rel==="对读"&&it.n&&cs[it.n])s+=14;
   return{i:i,s:s};
- }).sort(function(x,y){return y.s-x.s}).slice(0,k);
- var pick=sc.map(function(x){return items[x.i]});
- var idx="【本书碰撞库总目（共 "+items.length+" 条）】"+items.map(function(it){return "《"+it.t.replace(/[｜|].*$/,"").slice(0,24)+"》"}).join("、");
+ }).sort(function(x,y){return y.s-x.s});
+ var cap7=Math.max(2,k-3),nd7=0,sel=sc.filter(function(x){if(items[x.i].rel!=="对读")return true;nd7++;return nd7<=cap7}).slice(0,k);
+ /* 三本《道德经》互为 RAG：每一问至少带上几条兄弟书的「对读」段落，两本兄弟书各占一半 */
+ var dui=sc.filter(function(x){return items[x.i].rel==="对读"});
+ if(dui.length){
+  var need=Math.min(a==="clash"||a==="cut"?6:4,dui.length),have=sel.filter(function(x){return items[x.i].rel==="对读"});
+  var per={};have.forEach(function(x){var n=items[x.i].no;per[n]=(per[n]||0)+1});
+  var seen={};sel.forEach(function(x){seen[x.i]=1});
+  var nos=[];dui.forEach(function(x){var n=items[x.i].no;if(nos.indexOf(n)<0)nos.push(n)});
+  var cap=Math.ceil(need/Math.max(1,nos.length)),add=[];
+  dui.forEach(function(x){if(seen[x.i])return;var n=items[x.i].no;if(have.length+add.length>=need)return;if((per[n]||0)>=cap)return;per[n]=(per[n]||0)+1;add.push(x)});
+  if(add.length){
+   var keep=[],drop=add.length;
+   for(var j=sel.length-1;j>=0;j--){if(drop>0&&items[sel[j].i].rel!=="对读"){drop--;continue}keep.unshift(sel[j])}
+   sel=keep.concat(add)
+  }
+ }
+ /* 每本兄弟书至少占 2 条（有的话）：从占得最多的一方、再从非对读里让出位置 */
+ if(dui.length){
+  var cn={},chosen={};sel.forEach(function(x){chosen[x.i]=1;var it=items[x.i];if(it.rel==="对读")cn[it.no]=(cn[it.no]||0)+1});
+  var sibs=[];dui.forEach(function(x){var n=items[x.i].no;if(sibs.indexOf(n)<0)sibs.push(n)});
+  sibs.forEach(function(n){
+   while((cn[n]||0)<2){
+    var cand=dui.filter(function(x){return items[x.i].no===n&&!chosen[x.i]})[0];if(!cand)break;
+    var vi=-1,mx=2,mn=null,tot=0;for(var m in cn){tot+=cn[m];if(+m!==n&&cn[m]>mx){mx=cn[m];mn=+m}}
+    if(mn!==null){for(var j2=sel.length-1;j2>=0;j2--){if(items[sel[j2].i].rel==="对读"&&items[sel[j2].i].no===mn){vi=j2;break}}}
+    if(vi<0&&tot<cap7){for(var j=sel.length-1;j>=0;j--){if(items[sel[j].i].rel!=="对读"){vi=j;break}}}
+    if(vi<0)break;
+    var out=items[sel[vi].i];if(out.rel==="对读")cn[out.no]--;
+    delete chosen[sel[vi].i];sel.splice(vi,1);sel.push(cand);chosen[cand.i]=1;cn[n]=(cn[n]||0)+1;
+   }
+  });
+ }
+ var pick=sel.map(function(x){return items[x.i]});
+ var idx="【本书碰撞库总目（共 "+items.length+" 条）】"+items.map(function(it){return "《"+it.t.replace(/[｜|].*$/,"").slice(0,24)+"》"}).filter(function(v,i,ar){return ar.indexOf(v)===i}).join("、");
+ if(DUI&&DUI.sibs&&DUI.sibs.length){idx+="\n【三本《道德经》互为对读】本书与"+DUI.sibs.map(function(b){return "《"+b.t+"》（第 "+b.no+" 号）——"+b.lens}).join("；与")+"。标「对读」的段落来自这两本兄弟书，请把本书的读法和它们的读法放在同一章上对读：说清同一章上谁讲到了什么、谁没讲、谁和谁补得上、顶得住或站不住。"}
  var text=pick.map(function(it){return "〔"+it.rel+"·"+(it.kind==="book"?"专著":"文章")+"〕《"+it.t+"》"+(it.sch?"「"+it.sch+"」":"")+"——撞本书「"+it.ch+"」；共有："+(it.kw||[]).join("、")+"\n"+it.x}).join("\n\n");
  return{text:(idx+"\n\n"+text).slice(0,15500),items:pick};
 }
@@ -193,14 +231,14 @@ function kpList(){
 function ragInfo(){
  var items=(RAG&&RAG.items)||[],box=$("ragInfo");
  if(!items.length){box.innerHTML="这本书的专属碰撞库还在打造；这期间对撞时会现场检索全站。";return}
- var nb=items.filter(function(x){return x.kind==="book"}).length,na=items.length-nb,cr=items.filter(function(x){return x.rel==="跨界"}).length;
- box.innerHTML="为这本书提前配好 <b>"+items.length+"</b> 个碰撞点：<b>"+nb+"</b> 本专著 · <b>"+na+"</b> 篇文章，其中跨界 "+cr+" 个。<button type='button' id='ragBtn'>看看撞谁 ›</button>";
+ var nb=items.filter(function(x){return x.kind==="book"}).length,na=items.length-nb,cr=items.filter(function(x){return x.rel==="跨界"}).length,du=items.filter(function(x){return x.rel==="对读"}).length;
+ box.innerHTML="为这本书提前配好 <b>"+items.length+"</b> 个碰撞点：<b>"+nb+"</b> 本专著 · <b>"+na+"</b> 篇文章，其中跨界 "+cr+" 个"+(du&&DUI?"；另有 <b>"+du+"</b> 段是和另外两本《道德经》专著按章对读的（"+DUI.sibs.map(function(b){return "《"+esc(b.t)+"》"}).join("、")+"，三本互为碰撞库）":"")+"。<button type='button' id='ragBtn'>看看撞谁 ›</button>";
  $("ragBtn").onclick=ragList;
 }
 function ragList(){
  var items=(RAG&&RAG.items)||[];
  var o=document.createElement("div");o.className="ov";
- var rows=items.map(function(it,i){return "<div class='rg'><div class='rgh'><i class='r-"+(it.rel==="跨界"?"x":it.rel==="同源"?"s":"t")+"'>"+esc(it.rel)+"</i><a href='"+esc(path(it.u))+"' target='_blank' rel='noopener'>"+esc(it.t)+"</a><em>"+(it.kind==="book"?"专著":"文章")+"</em></div><div class='rgc'>撞本书「"+esc(it.ch)+"」"+((it.kw||[]).length?" · 共有："+esc(it.kw.join("、")):"")+"</div><div class='rgx'>"+esc(it.x.slice(0,150))+"……</div><button type='button' class='chip rgb' data-i='"+i+"'>拿它来撞</button></div>"}).join("");
+ var rows=items.map(function(it,i){return "<div class='rg'><div class='rgh'><i class='r-"+(it.rel==="跨界"?"x":it.rel==="同源"?"s":it.rel==="对读"?"d":"t")+"'>"+esc(it.rel)+"</i><a href='"+esc(path(it.u))+"' target='_blank' rel='noopener'>"+esc(it.t)+"</a><em>"+(it.kind==="book"?"专著":"文章")+"</em></div><div class='rgc'>撞本书「"+esc(it.ch)+"」"+((it.kw||[]).length?" · 共有："+esc(it.kw.join("、")):"")+"</div><div class='rgx'>"+esc(it.x.slice(0,150))+"……</div><button type='button' class='chip rgb' data-i='"+i+"'>拿它来撞</button></div>"}).join("");
  o.innerHTML="<div class='box' role='dialog' aria-label='专属碰撞库'><div class='hd'><b>「"+esc(AG.name)+"」的专属碰撞库</b><button class='tbtn' data-x>×</button></div><div class='bd rgl'><p class='rgn'>从站上全部专著与文章里，按本书各章检索出的最相撞的段落（"+esc(RAG.built||"")+" 建）。<b>同源</b>＝这本书的前身或姊妹篇，<b>同向</b>＝同一方向的近邻，<b>跨界</b>＝别的书架、别的领域。</p>"+rows+"</div></div>";
  document.body.appendChild(o);
  o.querySelector("[data-x]").onclick=function(){o.remove()};
