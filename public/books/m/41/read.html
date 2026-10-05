@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>友好阅读 · 在线翻页 · 语言发生学 | SDE Universes</title>
+<meta name="description" content="《语言发生学》在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
+<meta name="tier" content="L0">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/41/read.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0C0F13; --bg2:#141A21; --fg:#E9E6DE; --dim:#8E97A1; --line:#242D36;
+  --gold:#D9A441; --paper:#FBF7EE; --paper2:#F2ECDF; --ink:#1A1713;
+  --shadow:0 30px 80px rgba(0,0,0,.55);
+}
+html.sepia{--paper:#F6ECD8;--paper2:#EEE1C7}
+html.day{--bg:#E8E4DB;--bg2:#F2EFE7;--fg:#22262B;--dim:#5C646D;--line:#CFC9BD}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,var(--bg2),var(--bg)) fixed;
+  color:var(--fg);font:15px/1.7 "Noto Serif SC","EB Garamond",Georgia,serif;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);
+  overflow:hidden}
+
+/* ── 顶栏 ── */
+.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;align-items:center;gap:.8rem;
+  padding:.55rem 1rem calc(.55rem);background:rgba(12,15,19,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding-top:calc(.55rem + env(safe-area-inset-top,0))}
+html.day .top{background:rgba(232,228,219,.8)}
+.top .ttl{font-weight:600;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{color:var(--dim);font-size:.78rem;margin-left:.2rem;white-space:nowrap}
+.spacer{margin-left:auto}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);
+  border-radius:8px;padding:.3rem .6rem;cursor:pointer;transition:.18s}
+button:hover:not(:disabled),select:hover{border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.on{border-color:var(--gold);color:var(--gold)}
+.ico{font-size:1rem;line-height:1}
+
+/* ── 舞台 ── */
+.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:center;overflow:hidden}
+.book{position:relative;display:flex;gap:0;filter:drop-shadow(0 24px 60px rgba(0,0,0,.5));
+  transform-style:preserve-3d;perspective:2600px}
+.leaf{position:relative;background:var(--paper);overflow:hidden}
+.leaf canvas{display:block;width:100%;height:100%}
+.leaf .svg{position:absolute;inset:0;display:none}
+.leaf .svg svg{display:block;width:100%;height:100%}
+.leaf.vec canvas{display:none}
+.leaf.vec .svg{display:block}
+.leaf.l{border-radius:4px 0 0 4px;box-shadow:inset -22px 0 34px -26px rgba(0,0,0,.55)}
+.leaf.r{border-radius:0 4px 4px 0;box-shadow:inset 22px 0 34px -26px rgba(0,0,0,.55)}
+.single .leaf{border-radius:4px}
+.gutter{position:absolute;top:0;bottom:0;left:50%;width:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.20),rgba(0,0,0,0));pointer-events:none;z-index:3}
+.single .gutter{display:none}
+.pno{position:absolute;bottom:6px;font-size:11px;color:#9a8f7c;letter-spacing:.08em;z-index:4}
+.leaf.l .pno{left:14px}.leaf.r .pno{right:14px}
+
+/* 翻页动画 */
+.flip{position:absolute;top:0;bottom:0;z-index:9;background:var(--paper);
+  transform-origin:left center;backface-visibility:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,.35);border-radius:0 4px 4px 0}
+.flip.back{transform-origin:right center;border-radius:4px 0 0 4px}
+.flip canvas{display:block;width:100%;height:100%}
+@keyframes fwd{from{transform:rotateY(0)}to{transform:rotateY(-178deg)}}
+@keyframes bwd{from{transform:rotateY(0)}to{transform:rotateY(178deg)}}
+.flip.go{animation:fwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+.flip.back.go{animation:bwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+@media (prefers-reduced-motion:reduce){.flip.go,.flip.back.go{animation-duration:.01s}}
+
+/* 文本层（可选可搜） */
+.tl{position:absolute;inset:0;overflow:hidden;opacity:.01;line-height:1;z-index:2}
+.tl span{position:absolute;white-space:pre;transform-origin:0 0;color:transparent;cursor:text}
+.tl ::selection{background:rgba(217,164,65,.35)}
+.tl mark{background:rgba(217,164,65,.55);color:transparent;border-radius:2px}
+
+/* ── 底栏 ── */
+.bot{position:fixed;inset:auto 0 0 0;z-index:40;display:flex;align-items:center;gap:.7rem;
+  padding:.5rem 1rem calc(.5rem + env(safe-area-inset-bottom,0));
+  background:rgba(12,15,19,.72);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+html.day .bot{background:rgba(232,228,219,.8)}
+.rail{position:relative;flex:1;height:22px;display:flex;align-items:center;cursor:pointer}
+.rail .bar{position:absolute;left:0;right:0;height:3px;background:var(--line);border-radius:3px}
+.rail .fill{position:absolute;left:0;height:3px;background:linear-gradient(90deg,var(--gold),#F0CE86);border-radius:3px}
+.rail .knob{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--gold);
+  transform:translateX(-50%);box-shadow:0 0 0 4px rgba(217,164,65,.18)}
+.pg{font-variant-numeric:tabular-nums;color:var(--dim);font-size:.82rem;white-space:nowrap}
+.pg input{width:3.4rem;text-align:center;background:transparent;border:1px solid var(--line);
+  border-radius:6px;color:var(--fg);font:inherit;padding:.12rem .2rem}
+
+/* ── 抽屉 ── */
+.drawer{position:fixed;top:52px;bottom:62px;left:0;width:min(330px,86vw);z-index:45;
+  background:rgba(16,21,27,.97);border-right:1px solid var(--line);
+  transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;backdrop-filter:blur(10px)}
+html.day .drawer{background:rgba(242,239,231,.97)}
+.drawer.open{transform:none}
+.drawer h3{margin:0;padding:.8rem 1rem .5rem;font-size:.8rem;letter-spacing:.24em;color:var(--dim);font-weight:400}
+.dlist{flex:1;overflow:auto;padding:0 .4rem 1rem}
+.dlist a{display:flex;gap:.5rem;align-items:baseline;padding:.32rem .6rem;border-radius:7px;
+  color:var(--fg);text-decoration:none;font-size:.86rem}
+.dlist a:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.dlist a.l1{font-weight:600;margin-top:.5rem}
+.dlist a.l2{padding-left:1.5rem;color:var(--dim);font-size:.8rem}
+.dlist a .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.76rem}
+.sbox{padding:.5rem 1rem}
+.sbox input{width:100%;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--fg);font:inherit;padding:.4rem .6rem}
+.hit{padding:.35rem .6rem;border-radius:7px;font-size:.8rem;color:var(--dim);cursor:pointer}
+.hit:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.hit b{color:var(--gold);font-weight:600}
+
+/* 缩略图 */
+.thumbs{position:fixed;left:0;right:0;bottom:62px;z-index:44;display:flex;gap:.5rem;
+  padding:.6rem 1rem;overflow-x:auto;background:rgba(12,15,19,.92);border-top:1px solid var(--line);
+  transform:translateY(120%);transition:transform .28s}
+.thumbs.open{transform:none}
+.thumbs canvas{height:112px;width:auto;border-radius:3px;cursor:pointer;opacity:.62;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);transition:.18s}
+.thumbs canvas:hover,.thumbs canvas.cur{opacity:1;outline:2px solid var(--gold)}
+
+.msg{position:fixed;inset:0;display:grid;place-items:center;z-index:60;color:var(--dim);
+  background:rgba(12,15,19,.9);text-align:center;padding:2rem}
+.msg.hide{display:none}
+.msg .sp{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--gold);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:50;
+  background:rgba(0,0,0,.66);border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .9rem;font-size:.76rem;color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
+.hint.show{opacity:1}
+@media (max-width:860px){.top .sub,.hideS{display:none}.stage{inset:48px 0 56px 0}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
+  <span class="ttl">语言发生学</span><span class="sub hideS">SIO 文明生成论的哲学原点</span>
+  <span class="spacer"></span>
+  <button id="btnSpread" class="hideS" title="单页 / 双页 (D)">双页</button>
+  <button id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)">矢量</button>
+  <button id="btnZoomOut" title="缩小">A−</button>
+  <button id="btnZoomIn" title="放大">A＋</button>
+  <button id="btnThumbs" class="hideS" title="缩略图">▤</button>
+  <button id="btnTheme" title="夜 / 日 / 纸 (N)">夜</button>
+  <button id="btnFull" class="hideS" title="全屏 (F)">⛶</button>
+  <a href="/books/m/41/" style="color:var(--dim);text-decoration:none;font-size:.82rem">详情</a>
+</header>
+
+<aside class="drawer" id="drawer">
+  <div class="sbox"><input id="q" type="search" placeholder="全书检索（回车）…"></div>
+  <h3 id="dHead">目　录</h3>
+  <div class="dlist" id="dlist"></div>
+</aside>
+
+<main class="stage" id="stage">
+  <div class="book" id="book">
+    <div class="leaf l" id="leafL"><canvas id="cL"></canvas><div class="svg" id="sL"></div><div class="tl" id="tL"></div><div class="pno" id="nL"></div></div>
+    <div class="leaf r" id="leafR"><canvas id="cR"></canvas><div class="svg" id="sR"></div><div class="tl" id="tR"></div><div class="pno" id="nR"></div></div>
+    <div class="gutter"></div>
+  </div>
+</main>
+
+<div class="thumbs" id="thumbs"></div>
+
+<footer class="bot">
+  <button id="btnPrev" title="上一页 (←)">‹</button>
+  <div class="rail" id="rail"><div class="bar"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
+  <button id="btnNext" title="下一页 (→)">›</button>
+  <span class="pg">第 <input id="pi" type="number" min="1" value="1"> / <span id="pt">…</span> 页</span>
+</footer>
+
+<div class="hint" id="hint"></div>
+<div class="msg" id="msg"><div><div class="sp"></div><div id="msgT">正在载入书页…</div></div></div>
+
+<script type="application/json" id="cfg">{"pdf": "/books/m/41/language-occurrence.pdf", "key": "books-m-41-v1", "offset": 5}</script>
+<script type="application/json" id="toc">[{"t": "作者介绍", "p": "2", "g": 6, "l": 1}, {"t": "总序", "p": "3", "g": 7, "l": 1}, {"t": "推荐语", "p": "5", "g": 9, "l": 1}, {"t": "导读", "p": "8", "g": 12, "l": 1}, {"t": "目录", "p": "12", "g": 16, "l": 1}, {"t": "第一编　语言的生成与哲学转向", "p": "17", "g": 21, "l": 1}, {"t": "第一篇　语言发生学——SIO文明生成论的哲学原点", "p": "18", "g": 22, "l": 1}, {"t": "第 1 章　引言：语言的再生与世界的重新呼吸", "p": "19", "g": 23, "l": 2}, {"t": "第 2 章　逻各斯的幻觉：光的暴政与思想的冷却", "p": "23", "g": 27, "l": 2}, {"t": "第 3 章　符号的玻璃牢笼：从索绪尔到乔姆斯基的困境", "p": "27", "g": 31, "l": 2}, {"t": "第 4 章　语言的DNA：特征与特征纠缠", "p": "31", "g": 35, "l": 2}, {"t": "第 5 章　语言的发生：ΔSIO的动力链", "p": "35", "g": 39, "l": 2}, {"t": "第 6 章　语言的三律：意义生成的动力学", "p": "39", "g": 43, "l": 2}, {"t": "第 7 章　语言—模型—世界：协同发生的系统", "p": "43", "g": 47, "l": 2}, {"t": "第 8 章　教育的语言学：从课堂到文明", "p": "48", "g": 52, "l": 2}, {"t": "第 9 章　文明发生学：语言的历史与未来", "p": "53", "g": 57, "l": 2}, {"t": "第 10 章　哲学总结与未来宣言：当语言成为存在", "p": "58", "g": 62, "l": 2}, {"t": "第 11 章　附：汉语发生学", "p": "62", "g": 66, "l": 2}, {"t": "第 12 章　附：英文的「光语言发生学」", "p": "66", "g": 70, "l": 2}, {"t": "第 13 章　附：GPT的语言发生学解构", "p": "71", "g": 75, "l": 2}, {"t": "第二篇　语言的原创机制入门", "p": "76", "g": 80, "l": 1}, {"t": "第 14 章　引言：语言的原创机制从符号代表论说起", "p": "77", "g": 81, "l": 2}, {"t": "第 15 章　符号代表论的终极局限", "p": "81", "g": 85, "l": 2}, {"t": "第 16 章　语言的生成条件：特征纠缠与差异稳定", "p": "86", "g": 90, "l": 2}, {"t": "第 17 章　从符号到语言：纠缠聚合体的诞生", "p": "91", "g": 95, "l": 2}, {"t": "第 18 章　语言的动力学：语义、语流与语法", "p": "96", "g": 100, "l": 2}, {"t": "第 19 章　语词的力量：知、意、情的三界运动", "p": "101", "g": 105, "l": 2}, {"t": "第 20 章　符号的传播机制：从复制到共振", "p": "106", "g": 110, "l": 2}, {"t": "第 21 章　语言与意识的同步生成", "p": "111", "g": 115, "l": 2}, {"t": "第 22 章　结论：语言的原创性与存在的呼吸", "p": "115", "g": 119, "l": 2}, {"t": "第 23 章　后记：对《意识发生学》的自我纠正与反思", "p": "118", "g": 122, "l": 2}, {"t": "第三篇　概念发生学", "p": "123", "g": 127, "l": 1}, {"t": "第 24 章　引言：从发现学到发生学——GPT时代的呼唤", "p": "124", "g": 128, "l": 2}, {"t": "第 25 章　存在论基础：SIO本体论与概念的生成场域", "p": "128", "g": 132, "l": 2}, {"t": "第 26 章　三律与概念生成机制：概念的生命动力学", "p": "132", "g": 136, "l": 2}, {"t": "第 27 章　三大传统的解构：理性主义、经验主义与康德加工主义", "p": "136", "g": 140, "l": 2}, {"t": "第 28 章　休谟的因果怀疑：哲学最高峰与概念发生学的超越", "p": "139", "g": 143, "l": 2}, {"t": "第 29 章　语言发生学的房角石：现代语言学与实证主义的限度", "p": "142", "g": 146, "l": 2}, {"t": "第 30 章　GPT的概念发生现实：时代的挑战与概念哲学的新使命", "p": "145", "g": 149, "l": 2}, {"t": "第 31 章　GPT 对传统概念哲学的冲击：旧哲学的崩塌与概念发生学的呼唤", "p": "148", "g": 152, "l": 2}, {"t": "第 32 章　迫切的必要：GPT、元宇宙与量子时代的文明呼唤", "p": "151", "g": 155, "l": 2}, {"t": "第 33 章　科学发生学：从发现学的幻象到发生学的真理", "p": "154", "g": 158, "l": 2}, {"t": "第 34 章　科学创造力的发生学解释：科学家的研究生活总纲", "p": "157", "g": 161, "l": 2}, {"t": "第 35 章　文明比较：天人合一与西方科学文化", "p": "160", "g": 164, "l": 2}, {"t": "第 36 章　概念发生学的细节解构与应用：从原理到实践", "p": "163", "g": 167, "l": 2}, {"t": "第 37 章　梦、虚拟、真实：三种SIO场景中的概念发生差异", "p": "166", "g": 170, "l": 2}, {"t": "第 38 章　概念工程学（一）：审计与去魅", "p": "169", "g": 173, "l": 2}, {"t": "第 39 章　概念工程学（二）：重构与应用", "p": "172", "g": 176, "l": 2}, {"t": "第 40 章　概念的历史发生学：生成、消亡与重生", "p": "175", "g": 179, "l": 2}, {"t": "第 41 章　结论：概念的必然发生与文明的新道路", "p": "178", "g": 182, "l": 2}, {"t": "第 42 章　后记：概念是文明的房角石——批判「发现学」，走向「发生学」", "p": "181", "g": 185, "l": 2}, {"t": "第 43 章　附：发现学如何阻碍GPT发生机制的研究", "p": "185", "g": 189, "l": 2}, {"t": "第 44 章　附：基于GPT的概念教学法的总纲", "p": "189", "g": 193, "l": 2}, {"t": "第 45 章　附：儿童教育的概念发生学：理论与实践", "p": "193", "g": 197, "l": 2}, {"t": "第 46 章　附：英语高效教学法：从发现学到发生学", "p": "197", "g": 201, "l": 2}, {"t": "第 47 章　附：全文金句总结：十句话与解释", "p": "203", "g": 207, "l": 2}, {"t": "编结（一）", "p": "207", "g": 211, "l": 1}, {"t": "第二编　语言结构的张力生成机制", "p": "208", "g": 212, "l": 1}, {"t": "第四篇　三律语言学：语言结构的张力生成机制", "p": "209", "g": 213, "l": 1}, {"t": "第 48 章　三律语言学：语言结构的张力生成机制", "p": "210", "g": 214, "l": 2}, {"t": "第五篇　语言的三性发生学：语义是如何生成的？", "p": "214", "g": 218, "l": 1}, {"t": "第 49 章　引言：语言的三性发生学——语义是如何产生的", "p": "215", "g": 219, "l": 2}, {"t": "第 50 章　SIO本体论：存在的真实结构", "p": "219", "g": 223, "l": 2}, {"t": "第 51 章　意识的影子与三性：知、意、情", "p": "221", "g": 225, "l": 2}, {"t": "第 52 章　情、意、知：三种语言的表达", "p": "223", "g": 227, "l": 2}, {"t": "第 53 章　三性差异分布与语言结构", "p": "225", "g": 229, "l": 2}, {"t": "第 54 章　语义的传统困境", "p": "227", "g": 231, "l": 2}, {"t": "第 55 章　语义的三性生成与类型", "p": "228", "g": 232, "l": 2}, {"t": "第 56 章　存在、意识、语言的统一链条", "p": "230", "g": 234, "l": 2}, {"t": "第 57 章　引言：批判四大语言哲学，回到差异的发生学", "p": "232", "g": 236, "l": 2}, {"t": "第 58 章　海德格尔：语言是存在的居所吗", "p": "235", "g": 239, "l": 2}, {"t": "第 59 章　维特根斯坦：语言游戏遮蔽了什么", "p": "238", "g": 242, "l": 2}, {"t": "第 60 章　表征论：语言是心灵表达的局限", "p": "241", "g": 245, "l": 2}, {"t": "第 61 章　结构主义：语言是符号差异的虚空化", "p": "244", "g": 248, "l": 2}, {"t": "第 62 章　总结与超越：语言是SIO差异，ΔSIO才有力量", "p": "247", "g": 251, "l": 2}, {"t": "第 63 章　总结：语义是如何生成的", "p": "250", "g": 254, "l": 2}, {"t": "第 64 章　后记：千古难题，语义是如何发生的", "p": "253", "g": 257, "l": 2}, {"t": "第 65 章　附：语义的三性发生学与GPT", "p": "255", "g": 259, "l": 2}, {"t": "第六篇　语法发生学三原理与实战案例", "p": "257", "g": 261, "l": 1}, {"t": "第 66 章　引言：语法的革命性转向，从发现到发生", "p": "258", "g": 262, "l": 2}, {"t": "第 67 章　内核原理：语法是幸福律的护行", "p": "262", "g": 266, "l": 2}, {"t": "第 68 章　着色原理：文明精神的语法投射", "p": "265", "g": 269, "l": 2}, {"t": "第 69 章　形式原理：语法的意义场模式", "p": "268", "g": 272, "l": 2}, {"t": "第 70 章　实战案例：语法发生学的应用", "p": "271", "g": 275, "l": 2}, {"t": "第 71 章　总结与展望：语法作为文明的护行", "p": "274", "g": 278, "l": 2}, {"t": "第 72 章　后记：语法发生三原理对语法教学的启示", "p": "277", "g": 281, "l": 2}, {"t": "第 73 章　附：娄底话的启示，语法是发生的", "p": "280", "g": 284, "l": 2}, {"t": "第 74 章　附：方言与语法学的关系——地方方言作为文明发生学的窗口", "p": "282", "g": 286, "l": 2}, {"t": "第 75 章　附：语法发生学视角下的方言保护与语言政策", "p": "284", "g": 288, "l": 2}, {"t": "第 76 章　附：AI 时代的方言保护——GPT 作为语法的记录者与护行者", "p": "287", "g": 291, "l": 2}, {"t": "第 77 章　附：原子语言与国际语实验的失败——语法发生三原理的验证", "p": "290", "g": 294, "l": 2}, {"t": "第 78 章　附：GPT 的语法学习——不是 UG，也不是约定俗成，而是三律发生学", "p": "293", "g": 297, "l": 2}, {"t": "编结（二）", "p": "296", "g": 300, "l": 1}, {"t": "第三编　语言的自由与文明再生", "p": "297", "g": 301, "l": 1}, {"t": "第七篇　普遍语法的倒塌与语法发生学的重建——从光的逻辑到气的呼吸", "p": "298", "g": 302, "l": 1}, {"t": "第 79 章　引言：语法的坍塌与语言的呼吸", "p": "299", "g": 303, "l": 2}, {"t": "第 80 章　光之牢笼：普遍语法的哲学幻觉", "p": "305", "g": 309, "l": 2}, {"t": "第 81 章　四柱崩塌：贫乏刺激与普遍习得的幻觉", "p": "310", "g": 314, "l": 2}, {"t": "第 82 章　沉睡的语言：光逻辑的极限与气逻辑的失语", "p": "315", "g": 319, "l": 2}, {"t": "第 83 章　SIO语法论：语法是世界在身体中的整体呼吸", "p": "320", "g": 324, "l": 2}, {"t": "第 84 章　ΔSIO语法论：差异链与句法的时间动力", "p": "325", "g": 329, "l": 2}, {"t": "第 85 章　特征纠缠语法论：结构的动力与意义的喷发", "p": "330", "g": 334, "l": 2}, {"t": "第 86 章　三律语法论：语言的自由、幸福与创造的呼吸律", "p": "335", "g": 339, "l": 2}, {"t": "第 87 章　结语：语法的重生——当语言重新成为世界的呼吸", "p": "341", "g": 345, "l": 2}, {"t": "第 88 章　后记：语言学的窒息——为何学界看不见乔姆斯基的错误", "p": "346", "g": 350, "l": 2}, {"t": "第 89 章　附：光与气的语法——中英文语法发生机制的三维差异", "p": "351", "g": 355, "l": 2}, {"t": "第 90 章　附：主谓宾的幻觉——为何不能用英文语法分析中文句子", "p": "356", "g": 360, "l": 2}, {"t": "第 91 章　附：SIO语言文明宣言：让语言重新呼吸", "p": "361", "g": 365, "l": 2}, {"t": "第八篇　为何语言习得理论是错误的？", "p": "365", "g": 369, "l": 1}, {"t": "第 92 章　引言：语言的幻觉——从「习得」到「生成」的世纪误解", "p": "366", "g": 370, "l": 2}, {"t": "第 93 章　语言习得理论的三大幻觉：天赋、经验与社会", "p": "371", "g": 375, "l": 2}, {"t": "第 94 章　语法的陷阱：主谓宾结构的本体性错误", "p": "376", "g": 380, "l": 2}, {"t": "第 95 章　语言的本体：SIO差异流与特征律", "p": "382", "g": 386, "l": 2}, {"t": "第 96 章　语言的三模态：符号之间互动的特征纠缠显现", "p": "387", "g": 391, "l": 2}, {"t": "第 97 章　婴儿语言的真实发生：双层级纠缠原理", "p": "393", "g": 397, "l": 2}, {"t": "第 98 章　GPT语言的人工重演：AI语言发生学原理", "p": "398", "g": 402, "l": 2}, {"t": "第 99 章　文明的语言：语言—语言的SIO与意义场的生成", "p": "402", "g": 406, "l": 2}, {"t": "第 100 章　结论：语言的呼吸——世界的再生", "p": "407", "g": 411, "l": 2}, {"t": "第九篇　主谓宾切死了中文", "p": "411", "g": 415, "l": 1}, {"t": "第 101 章　引言：语言的呼吸与被切断的世界", "p": "412", "g": 416, "l": 2}, {"t": "第 102 章　光之刀锋：主谓宾的诞生与陷阱", "p": "417", "g": 421, "l": 2}, {"t": "第 103 章　气的语言：中文的触觉本体", "p": "422", "g": 426, "l": 2}, {"t": "第 104 章　语法的暴力：视觉SIO如何切断感触", "p": "427", "g": 431, "l": 2}, {"t": "第 105 章　触觉SIO的语言生成：松下问童子", "p": "431", "g": 435, "l": 2}, {"t": "第 106 章　语言三模态文明比较：视觉、听觉与触觉SIO", "p": "435", "g": 439, "l": 2}, {"t": "第 107 章　中文学习必须回到触觉SIO为核心", "p": "439", "g": 443, "l": 2}, {"t": "第 108 章　结论：语言的复活与文明的再呼吸", "p": "443", "g": 447, "l": 2}, {"t": "第 109 章　后记：语言的流动与感悟学习法", "p": "445", "g": 449, "l": 2}, {"t": "第 110 章　附：在农场的SIO中感触中文的精义", "p": "449", "g": 453, "l": 2}, {"t": "第十篇　语感发生学：语言三模态的自由律建构", "p": "453", "g": 457, "l": 1}, {"t": "第 111 章　引言：语感的幽暗与光照", "p": "454", "g": 458, "l": 2}, {"t": "第 112 章　传统语感观的迷宫与崩塌", "p": "458", "g": 462, "l": 2}, {"t": "第 113 章　自由律与三模态：语感发生学的奠基", "p": "461", "g": 465, "l": 2}, {"t": "第 114 章　教育误区的瓦解", "p": "464", "g": 468, "l": 2}, {"t": "第 115 章　特征纠缠：语感建立的核心机制", "p": "466", "g": 470, "l": 2}, {"t": "第 116 章　语感的训练、测量与课堂", "p": "468", "g": 472, "l": 2}, {"t": "第 117 章　超越语言：语感与认知科学、人工智能", "p": "470", "g": 474, "l": 2}, {"t": "第 118 章　文学艺术与文明三态：语感的广阔意义", "p": "472", "g": 476, "l": 2}, {"t": "第 119 章　结论：语感的重生与文明的光照", "p": "475", "g": 479, "l": 2}, {"t": "第 120 章　后记：语感与特征纠缠的真实道路", "p": "478", "g": 482, "l": 2}, {"t": "第 121 章　附：语感发生学与儿童语言习得的奥秘", "p": "482", "g": 486, "l": 2}, {"t": "第 122 章　附：AI的语感发生学解构——特征纠缠与自由律运行", "p": "486", "g": 490, "l": 2}, {"t": "第 123 章　附：十二周语感训练方案——从特征纠缠到自由律运行", "p": "489", "g": 493, "l": 2}, {"t": "编结（三）", "p": "492", "g": 496, "l": 1}, {"t": "结语", "p": "493", "g": 497, "l": 1}, {"t": "金句十句", "p": "495", "g": 499, "l": 1}, {"t": "参考书目", "p": "497", "g": 501, "l": 1}, {"t": "附录一", "p": "498", "g": 502, "l": 1}, {"t": "附录二", "p": "499", "g": 503, "l": 1}, {"t": "附录三", "p": "501", "g": 505, "l": 1}]</script>
+
+<script>
+(function(){
+'use strict';
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var TOC = JSON.parse(document.getElementById('toc').textContent);
+var $ = function(id){ return document.getElementById(id); };
+
+var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var themes=['','day','sepia'], ti=0;
+var cache={}, textCache={}, vecOK=0, vecFail=0;
+/* —— 接入 SDE 陪读（WDS）：把当前可见页的文本与页码喂给助手；文字层可选中某句作焦点 —— */
+window.WDS_READ = {
+  title: '语言发生学',
+  bodyEl: function(){ return document.getElementById('book'); },
+  docTextFn: function(){
+    if(!doc) return '';
+    var l = spread ? (cur%2===0?cur:cur-1) : cur, ps = spread ? [l, l+1] : [cur];
+    var t = ps.filter(function(p){ return p>=1 && p<=total && textCache[p]; }).map(function(p){
+      var pr = p-CFG.offset+1; return '【第 '+(pr>0?pr:p)+' 页 / 共 '+total+' 页】\n'+textCache[p]; }).join('\n');
+    return t;
+  }
+};
+
+function msg(t, spin){ $('msgT').textContent=t; $('msg').classList.remove('hide');
+  $('msg').querySelector('.sp').style.display = spin===false?'none':''; }
+function hideMsg(){ $('msg').classList.add('hide'); }
+function hint(t){ var h=$('hint'); h.textContent=t; h.classList.add('show');
+  clearTimeout(h._t); h._t=setTimeout(function(){h.classList.remove('show');},1400); }
+
+/* ── 版心尺寸：按舞台可用空间算，双页则一半 ── */
+function box(){
+  var st=$('stage'), W=st.clientWidth-40, H=st.clientHeight-30;
+  var n = spread?2:1;
+  return {W:W, H:H, n:n};
+}
+function fit(vp){
+  var b=box();
+  var maxW=(b.W/b.n), maxH=b.H;
+  var s=Math.min(maxW/vp.width, maxH/vp.height)*zoom;
+  return s;
+}
+
+/* ── 渲染一页：优先矢量(SVG)，失败回落高清 canvas ── */
+function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
+  var leaf = canvasEl.parentNode;
+  if(pageNo<1||pageNo>total){ leaf.style.visibility='hidden'; if(tlEl) tlEl.innerHTML=''; cb&&cb(); return; }
+  leaf.style.visibility='visible';
+  doc.getPage(pageNo).then(function(pg){
+    var vp0=pg.getViewport({scale:1});
+    var sc=fit(vp0), vp=pg.getViewport({scale:sc});
+    leaf.style.width=Math.round(vp.width)+'px';
+    leaf.style.height=Math.round(vp.height)+'px';
+    if(vector && svgEl && window.pdfjsLib && pdfjsLib.SVGGraphics){
+      leaf.classList.add('vec');
+      pg.getOperatorList().then(function(ops){
+        var g=new pdfjsLib.SVGGraphics(pg.commonObjs, pg.objs);
+        g.embedFonts=true;
+        return g.getSVG(ops, vp);
+      }).then(function(svg){
+        vecOK++;
+        svg.setAttribute('width', Math.round(vp.width));
+        svg.setAttribute('height', Math.round(vp.height));
+        svgEl.innerHTML=''; svgEl.appendChild(svg);
+        if(tlEl) buildText(pg, vp, tlEl);
+        cb&&cb();
+      }).catch(function(){
+        /* 逐页回退：这一页含矢量后端不支持的内容（多为位图封面、插图），只这一页用高清位图；
+           其余页照旧矢量。连续失败过多才整本切到位图。 */
+        vecFail++;
+        if(vecFail>=6 && vecFail>vecOK){
+          vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
+          hint('此文档的矢量渲染不可用，已切回高清位图');
+        }
+        leaf.classList.remove('vec');
+        drawCanvas(pg, vp, canvasEl, tlEl, cb);
+      });
+    }else{
+      leaf.classList.remove('vec');
+      drawCanvas(pg, vp, canvasEl, tlEl, cb);
+    }
+  }).catch(function(){ cb&&cb(); });
+}
+
+function drawCanvas(pg, vp, canvasEl, tlEl, cb){
+  var dpr=Math.min(window.devicePixelRatio||1, 3);
+  canvasEl.width=Math.round(vp.width*dpr); canvasEl.height=Math.round(vp.height*dpr);
+  canvasEl.style.width=Math.round(vp.width)+'px'; canvasEl.style.height=Math.round(vp.height)+'px';
+  var ctx=canvasEl.getContext('2d',{alpha:false});
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#FBF7EE'; ctx.fillRect(0,0,vp.width,vp.height);
+  pg.render({canvasContext:ctx, viewport:vp, intent:'display'}).promise.then(function(){
+    if(tlEl) buildText(pg, vp, tlEl);
+    cb&&cb();
+  }).catch(function(){ cb&&cb(); });
+}
+
+function buildText(pg, vp, el){
+  el.innerHTML='';
+  pg.getTextContent().then(function(tc){
+    try{ textCache[pg.pageNumber]=tc.items.map(function(x){return x.str;}).join(''); }catch(e){}
+    var frag=document.createDocumentFragment();
+    tc.items.forEach(function(it){
+      if(!it.str) return;
+      var tx=pdfjsLib.Util.transform(vp.transform, it.transform);
+      var s=document.createElement('span');
+      s.textContent=it.str;
+      var h=Math.hypot(tx[2],tx[3]);
+      s.style.left=tx[4]+'px'; s.style.top=(tx[5]-h)+'px';
+      s.style.fontSize=h+'px'; s.style.fontFamily='sans-serif';
+      frag.appendChild(s);
+    });
+    el.appendChild(frag);
+  }).catch(function(){});
+}
+
+/* ── 展示当前跨页 ── */
+function show(cb){
+  if(rendering){ return; }
+  rendering=true;
+  document.getElementById('book').classList.toggle('single', !spread);
+  $('leafR').style.display = spread?'':'none';
+  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  if(left<1) left=0;
+  var right= left+1;
+  var done=0, need=spread?2:1;
+  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
+  if(spread){
+    $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
+    $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
+    renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
+    renderInto(right, $('cR'), $('tR'), fin, $('sR'));
+  }else{
+    $('nL').textContent = cur-CFG.offset+1>0?(cur-CFG.offset+1):'';
+    renderInto(cur, $('cL'), $('tL'), fin, $('sL'));
+  }
+}
+
+function sync(){
+  var printed = Math.max(1, cur-CFG.offset+1);
+  $('pi').value = printed;
+  $('pt').textContent = Math.max(1,total-CFG.offset+1);
+  var r = (cur-1)/Math.max(1,total-1);
+  $('fill').style.width=(r*100)+'%';
+  $('knob').style.left=(r*100)+'%';
+  try{ localStorage.setItem(CFG.key, String(cur)); }catch(e){}
+  Array.prototype.forEach.call($('thumbs').children, function(c){
+    c.classList.toggle('cur', +c.dataset.p===cur);
+  });
+}
+
+/* ── 翻页（带动画） ── */
+function step(dir){
+  var n = spread?2:1;
+  var t = cur + dir*n;
+  if(t<1) t=1; if(t>total) t=total;
+  if(t===cur) return;
+  animate(dir, function(){ cur=t; show(); });
+}
+function animate(dir, after){
+  var src = dir>0 ? $('leafR') : $('leafL');
+  if(!spread || !src || src.style.display==='none'){ after(); return; }
+  var fl=document.createElement('div');
+  fl.className='flip'+(dir>0?'':' back');
+  var w=src.offsetWidth, h=src.offsetHeight;
+  fl.style.width=w+'px'; fl.style.height=h+'px';
+  fl.style.left = dir>0 ? (w+'px') : '0px';
+  var live = src.classList.contains('vec') ? src.querySelector('.svg svg') : src.querySelector('canvas');
+  if(live){
+    var cl = live.cloneNode(true);
+    cl.style.width='100%'; cl.style.height='100%'; cl.style.display='block';
+    fl.appendChild(cl);
+  }
+  $('book').appendChild(fl);
+  requestAnimationFrame(function(){ fl.classList.add('go'); });
+  setTimeout(function(){ fl.remove(); after(); }, 620);
+}
+function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+
+/* ── 目录 ── */
+/* 目录兜底：TOC 为空时从 PDF 书签生成（新迁入的书多半没有手工目录） */
+function outlineToc(d){
+  return d.getOutline().then(function(ol){
+    var out=[]; if(!ol||!ol.length) return out;
+    function walk(items,l){
+      return items.reduce(function(p,it){
+        return p.then(function(){
+          var ds=it.dest;
+          return (typeof ds==='string'? d.getDestination(ds) : Promise.resolve(ds))
+            .then(function(x){ return x ? d.getPageIndex(x[0]) : null; })
+            .then(function(ix){
+              if(ix!=null){ var g=ix+1, pr=g-CFG.offset+1; out.push({t:it.title, p:pr>0?String(pr):'', g:g, l:l===1?1:2}); }
+              if(it.items && it.items.length && l<2) return walk(it.items,l+1);
+            }).catch(function(){});
+        });
+      }, Promise.resolve());
+    }
+    return walk(ol,1).then(function(){ return out; });
+  }).catch(function(){ return []; });
+}
+function buildToc(){
+  var box=$('dlist'); box.innerHTML='';
+  TOC.forEach(function(e){
+    var a=document.createElement('a');
+    a.className = e.l===1?'l1':'l2';
+    a.href='#'; a.innerHTML='<span>'+e.t.replace(/</g,'&lt;')+'</span><span class="n">'+e.p+'</span>';
+    a.onclick=function(ev){ ev.preventDefault(); go(e.g ? e.g : (+e.p)+CFG.offset-1); closeDrawer(); };
+    box.appendChild(a);
+  });
+}
+function closeDrawer(){ $('drawer').classList.remove('open'); }
+
+/* ── 全书检索 ── */
+function search(q){
+  if(!q){ $('dHead').textContent='目　录'; buildToc(); return; }
+  var box=$('dlist'); box.innerHTML=''; $('dHead').textContent='检索：'+q;
+  var found=0, scanned=0;
+  msg('正在检索全书…');
+  function scan(i){
+    if(i>total || found>=120){ hideMsg(); if(!found){ box.innerHTML='<div class="hit">没有找到。</div>'; } return; }
+    var pr = textCache[i] ? Promise.resolve(textCache[i])
+      : doc.getPage(i).then(function(p){ return p.getTextContent(); })
+          .then(function(tc){ var s=tc.items.map(function(x){return x.str;}).join(''); textCache[i]=s; return s; });
+    pr.then(function(s){
+      var k=s.indexOf(q);
+      if(k>=0){
+        found++;
+        var d=document.createElement('div'); d.className='hit';
+        var a=Math.max(0,k-16), b=Math.min(s.length,k+q.length+22);
+        d.innerHTML='<b>'+(i-CFG.offset+1)+'</b>　'+s.slice(a,k).replace(/</g,'&lt;')+
+          '<b>'+q.replace(/</g,'&lt;')+'</b>'+s.slice(k+q.length,b).replace(/</g,'&lt;');
+        d.onclick=function(){ go(i); closeDrawer(); };
+        box.appendChild(d);
+      }
+      scanned++;
+      if(scanned%12===0){ $('msgT').textContent='正在检索全书…  '+Math.round(i/total*100)+'%'; }
+      scan(i+1);
+    }).catch(function(){ scan(i+1); });
+  }
+  scan(1);
+}
+
+/* ── 缩略图 ── */
+var thumbsBuilt=false;
+function buildThumbs(){
+  if(thumbsBuilt) return; thumbsBuilt=true;
+  var wrap=$('thumbs');
+  var i=1;
+  function one(){
+    if(i>total) return;
+    var p=i;
+    doc.getPage(p).then(function(pg){
+      var vp=pg.getViewport({scale:1});
+      var s=150/vp.height, v=pg.getViewport({scale:s});
+      var c=document.createElement('canvas');
+      c.width=v.width; c.height=v.height; c.dataset.p=p;
+      c.onclick=function(){ go(p); };
+      wrap.appendChild(c);
+      return pg.render({canvasContext:c.getContext('2d'), viewport:v}).promise;
+    }).then(function(){ i++; setTimeout(one, 0); }).catch(function(){ i++; setTimeout(one,0); });
+  }
+  one();
+}
+
+/* ── 事件 ── */
+$('btnPrev').onclick=function(){ step(-1); };
+$('btnNext').onclick=function(){ step(1); };
+$('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
+$('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
+$('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);
+  this.textContent=vector?'矢量':'位图'; hint(vector?'矢量源渲染':'高清位图'); show(); };
+$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'%'); };
+$('btnZoomOut').onclick=function(){ zoom=Math.max(.5, zoom/1.15); show(); hint('缩小 '+Math.round(zoom*100)+'%'); };
+$('btnThumbs').onclick=function(){ $('thumbs').classList.toggle('open'); if($('thumbs').classList.contains('open')) buildThumbs(); };
+$('btnTheme').onclick=function(){ ti=(ti+1)%3; document.documentElement.className=themes[ti];
+  this.textContent=['夜','日','纸'][ti]; show(); };
+$('btnFull').onclick=function(){ if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); };
+$('q').onkeydown=function(e){ if(e.key==='Enter'){ search(this.value.trim()); } };
+$('rail').onclick=function(e){ var r=this.getBoundingClientRect();
+  go(Math.round((e.clientX-r.left)/r.width*(total-1))+1); };
+
+document.addEventListener('keydown',function(e){
+  if(/input|textarea|select/i.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){ step(-1); e.preventDefault(); }
+  else if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ step(1); e.preventDefault(); }
+  else if(e.key==='Home'){ go(1); } else if(e.key==='End'){ go(total); }
+  else if(e.key==='t'||e.key==='T'){ $('btnToc').click(); }
+  else if(e.key==='d'||e.key==='D'){ $('btnSpread').click(); }
+  else if(e.key==='v'||e.key==='V'){ $('btnVec').click(); }
+  else if(e.key==='n'||e.key==='N'){ $('btnTheme').click(); }
+  else if(e.key==='f'||e.key==='F'){ $('btnFull').click(); }
+});
+var sx=0, sy=0;
+$('stage').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+$('stage').addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.4){ step(dx<0?1:-1); }
+},{passive:true});
+var rt=null;
+window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ show(); },160); });
+
+/* ── 启动 ── */
+function boot(){
+  if(!window.pdfjsLib){ setTimeout(boot,120); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  $('btnVec').classList.add('on');
+  msg('正在载入《语言发生学》…');
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise.then(function(d){
+    doc=d; total=d.numPages;
+    buildToc();
+    if(!TOC.length){ outlineToc(d).then(function(t){ if(t.length){ TOC=t; buildToc(); } }); }
+    var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
+    cur = (saved>0&&saved<=total) ? saved : 1;
+    if(window.innerWidth<820) spread=false, $('btnSpread').textContent='单页';
+    show(function(){ if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
+  }).catch(function(err){
+    msg('书页载入失败。可直接打开原文 PDF：'+CFG.pdf, false);
+  });
+}
+boot();
+})();
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20261004h" defer></script>
+</body>
+</html>
