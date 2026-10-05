@@ -1,0 +1,63 @@
+name: Book294 live response and browser diagnostics
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book294-live-diagnostics-20261005.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book294-final-accepted
+          run-id: 37254200083
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book294-live
+      - name: Inspect exact public responses without modifying the book
+        run: |
+          python3 - <<'PY'
+          import pathlib,os,json,urllib.request,hashlib,concurrent.futures,difflib,time
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book294-live';qa=root/'qa';base='https://sdeuniverses.com/books/m/294/'
+          def get(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'*/*'})
+              with urllib.request.urlopen(req,timeout=90) as r:return r.status,r.read(),dict(r.headers)
+          _,raw,_=get(base+'publication-manifest.json');m=json.loads(raw);assert m['release_sha256']=='6726490f41e19b909030b1ae8e5f1c424653cd456f4a341a69a566cf3fc9e995' and m['status']=='published';(qa/'published-manifest.json').write_bytes(raw)
+          def check(e):
+              try:
+                  status,data,headers=get(base+e['path']);sha=hashlib.sha256(data).hexdigest();same=sha==e['sha256'];rec={'path':e['path'],'status':status,'sha256':sha,'expected_sha256':e['sha256'],'exact_match':same,'bytes':len(data)}
+                  if e['path'].endswith('.html'):
+                      p=qa/'live-html'/e['path'];p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
+                  if not same:
+                      rec['headers']=headers
+                      if e['path'].endswith('.html'):
+                          source=(root/'book'/e['path']).read_text();live=data.decode();diff='\n'.join(difflib.unified_diff(source.splitlines(),live.splitlines(),fromfile='source',tofile='live',n=1));p=qa/'diffs'/(e['path'].replace('/','__')+'.diff');p.parent.mkdir(parents=True,exist_ok=True);p.write_text(diff);rec['diff_preview']=diff[:2400]
+                  return rec
+              except Exception as e2:return {'path':e['path'],'error':str(e2),'exact_match':False}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:checks=list(pool.map(check,m['files']))
+          shelves=[]
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+              try:
+                  status,data,headers=get(url);shelves.append({'url':url,'status':status,'book294_present':'西方哲学SDE发生树' in data.decode() and '/books/m/294/' in data.decode()})
+              except Exception as e:shelves.append({'url':url,'error':str(e)})
+          result={'release_sha256':m['release_sha256'],'checks':checks,'bookshelves':shelves,'reindex_triggered':False};(qa/'live-response-diagnostics.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+          mismatches=[e for e in checks if not e['exact_match']];print('TOTAL',len(checks),'MISMATCHES',len(mismatches));print(json.dumps(mismatches[:3],ensure_ascii=False,indent=2));print('SHELVES',json.dumps(shelves,ensure_ascii=False))
+          assert all(e.get('exact_match') for e in checks if not e['path'].endswith('.html')),'Non-HTML resource differs or is inaccessible.'
+          PY
+      - name: Prepare live browser
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Exercise live desktop and mobile readers
+        run: |
+          python3 "${RUNNER_TEMP}/book294-live/build-tools/browser_qa.py" "${RUNNER_TEMP}/book294-live" "https://sdeuniverses.com/books/m/294/"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book294-live-response-diagnostics
+          path: ${{ runner.temp }}/book294-live/qa
+          retention-days: 30
