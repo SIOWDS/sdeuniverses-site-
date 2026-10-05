@@ -1,0 +1,56 @@
+name: Book294 complete illustrated candidate 20261005
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book294-candidate-20261005.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Receive exact authorized publication candidate
+        run: |
+          python3 - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,json,os
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book294-candidate';root.mkdir()
+          url='https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-2818-81fa-8a7a-149f7b904523/raw?se=2026-10-05T02%3A07%3A20Z&sp=r&sv=2026-02-06&sr=b&scid=a39c8907-c6b3-5671-9815-49e22773bc11&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-04T18%3A00%3A08Z&ske=2026-10-05T18%3A00%3A08Z&sks=b&skv=2026-02-06&sig=eozGh6YJ4MFW1jaI9uHk/ymRaASFJDnCQdGfKyFFYBg%3D'
+          raw=urllib.request.urlopen(url,timeout=120).read()
+          assert len(raw)==31875767 and hashlib.sha256(raw).hexdigest()=='e53f7be367f32639c3a7c0d6f79ccd212e15d2fc3683b59841d27389dda26c57'
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              z.extractall(root)
+          for e in json.loads((root/'input-inventory.json').read_text()):
+              p=root/e['path'];assert p.stat().st_size==e['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256'],e['path']
+          print('Exact complete input received and verified. No publication or reindex has occurred.')
+          PY
+      - name: Preserve received source before browser verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: book294-received-input-20261005
+          path: ${{ runner.temp }}/book294-candidate
+          retention-days: 7
+      - name: Prepare current PDF reader and browser
+        run: |
+          python3 "${RUNNER_TEMP}/book294-candidate/build-tools/vendor_pdfjs.py" "${RUNNER_TEMP}/book294-candidate"
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Verify desktop mobile chapters tree and actual PDF rendering
+        run: |
+          python3 "${RUNNER_TEMP}/book294-candidate/build-tools/browser_qa.py" "${RUNNER_TEMP}/book294-candidate"
+          python3 "${RUNNER_TEMP}/book294-candidate/build-tools/stamp_candidate.py" "${RUNNER_TEMP}/book294-candidate"
+      - name: Preserve browser evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book294-candidate-evidence-20261005
+          path: ${{ runner.temp }}/book294-candidate/qa
+          retention-days: 14
+      - name: Preserve verified publication-ready book
+        uses: actions/upload-artifact@v4
+        with:
+          name: book294-verified-candidate-20261005
+          path: ${{ runner.temp }}/book294-candidate
+          retention-days: 14
