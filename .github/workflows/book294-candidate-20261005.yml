@@ -13,10 +13,14 @@ jobs:
       - name: Receive exact authorized publication candidate
         run: |
           python3 - <<'PY'
-          import urllib.request,pathlib,hashlib,zipfile,io,json,os
+          import urllib.request,urllib.error,pathlib,hashlib,zipfile,io,json,os
           root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book294-candidate';root.mkdir()
           url='https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-2818-81fa-8a7a-149f7b904523/raw?se=2026-10-05T02%3A07%3A20Z&sp=r&sv=2026-02-06&sr=b&scid=a39c8907-c6b3-5671-9815-49e22773bc11&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-04T18%3A00%3A08Z&ske=2026-10-05T18%3A00%3A08Z&sks=b&skv=2026-02-06&sig=eozGh6YJ4MFW1jaI9uHk/ymRaASFJDnCQdGfKyFFYBg%3D'
-          raw=urllib.request.urlopen(url,timeout=120).read()
+          try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'application/zip,application/octet-stream,*/*'})
+              raw=urllib.request.urlopen(req,timeout=120).read()
+          except urllib.error.HTTPError as e:
+              print('SOURCE_HTTP_ERROR',e.code,dict(e.headers));print(e.read(2500).decode(errors='replace'));raise
           assert len(raw)==31875767 and hashlib.sha256(raw).hexdigest()=='e53f7be367f32639c3a7c0d6f79ccd212e15d2fc3683b59841d27389dda26c57'
           with zipfile.ZipFile(io.BytesIO(raw)) as z:
               for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
