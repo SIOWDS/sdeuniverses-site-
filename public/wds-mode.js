@@ -2314,6 +2314,7 @@
     ".wdsm-top-sp{flex:1}" +
     ".wdsm-tbtn{background:none;border:1px solid var(--wline2);color:var(--wgold);font:13px/1 inherit;padding:7px 11px;border-radius:8px;cursor:pointer;white-space:nowrap}" +
     ".wdsm-tbtn:hover{background:var(--wfill2)}" +
+    ".wdsm-langbtn{display:inline-flex;padding:0;overflow:hidden;cursor:default}.wdsm-langbtn .wdsm-lg{background:none;border:0;color:inherit;font:inherit;padding:7px 10px;cursor:pointer;line-height:1}.wdsm-langbtn .wdsm-lg.on{background:var(--wgold);color:#0F0B07;font-weight:700}" +
     ".wdsm-newbtn{background:none;border:1px solid var(--wline2);color:var(--wgold);font:13px/1 inherit;padding:7px 13px;border-radius:8px;cursor:pointer}" +
     ".wdsm-turns{font-size:12.5px;color:var(--wdim);white-space:nowrap;margin-right:6px}" +
     /* ── 对话区 ── */
@@ -2673,7 +2674,7 @@
       "<div class='wdsm-top'>" +
         "<button class='wdsm-burger'>\u2630</button>" +
         "<div class='wdsm-top-sp'></div><span class='wdsm-turns' id='wdsmTurns'>本场剩余 100 次</span>" +
-        "<button class='wdsm-tbtn wdsm-langbtn' title='中文 / English'>EN</button>" +
+        "<span class='wdsm-tbtn wdsm-langbtn' role='group' title='中文 / English'><button type='button' class='wdsm-lg' data-lang='zh'>中</button><button type='button' class='wdsm-lg' data-lang='en'>EN</button></span>" +
         "<button class='wdsm-tbtn wdsm-cvbtn'></button>" +
         "<button class='wdsm-tbtn wdsm-distbtn'></button>" +
         "<button class='wdsm-tbtn wdsm-pdfbtn'></button>" +
@@ -3417,7 +3418,8 @@
     q(".wdsm-newbtn").textContent = t("bNew");
     try { q(".wdsm-topshow").title = t("topShowT"); } catch (e) {}
     try { rsPaint(); lnkPaint(); fdPaint(); cvPaint(); compPaint(); duPaint(); cmpPaint(); qacPaint(); labPaint(); pjPaint(); } catch (e) {}
-    q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
+    try { layer.querySelectorAll(".wdsm-langbtn .wdsm-lg").forEach(function (b) { var on = b.getAttribute("data-lang") === LANG; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); }); } catch (e) {}
+    try { var _tb2 = layer.querySelector(".wdsm-tribtn"); if (_tb2) _tb2.title = t("triTip"); var _mb2 = layer.querySelector(".wdsm-mobbtn"); if (_mb2) _mb2.title = t("mobTip"); var _sk2 = layer.querySelector(".wdsm-stopk"); if (_sk2) _sk2.title = t("stopGen"); } catch (e) {}
     var g = function (sel) { return q(sel) || {}; };   // 防空取：桩环境里某些节点不存在，别为文案崩掉整页
     g(".wdsm-nc").textContent = t("sbNew");
     g(".wdsm-sch").placeholder = t("sbSearch");
@@ -3965,11 +3967,20 @@
     tipDeckHide(true);                                    // 点哪儿都不再提示——提示的使命是被用一次
     if (!onX) distill("deck");
   };
-  layer.querySelector(".wdsm-langbtn").onclick = function () {
-    LANG = LANG === "zh" ? "en" : "zh";
+  /* 语言钮：点「中」一定得中文、点「EN」一定得英文——显式设定，不再来回翻转。
+     applyLang 内任何一步抛错都不许挡住后面的刷新，更不许让钮状态与界面脱节。 */
+  function setLang(l) {
+    LANG = l === "en" ? "en" : "zh";
     try { localStorage.setItem(LS_LANG, LANG); } catch (e) {}
-    applyLang();
-  };
+    try { applyLang(); } catch (e) { try { console.error("applyLang", e); } catch (_) {} }
+    try { layer.querySelectorAll(".wdsm-langbtn .wdsm-lg").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-lang") === LANG); }); } catch (e) {}
+    try { document.documentElement.lang = LANG; } catch (e) {}
+  }
+  layer.querySelectorAll(".wdsm-langbtn .wdsm-lg").forEach(function (b) {
+    b.onclick = function (ev) { try { ev.stopPropagation(); } catch (e) {} setLang(b.getAttribute("data-lang")); };
+  });
+  /* 「⋯」菜单是代点 .wdsm-langbtn 本体：收起时点它＝切到另一种语言 */
+  layer.querySelector(".wdsm-langbtn").onclick = function () { setLang(LANG === "zh" ? "en" : "zh"); };
   /* ══════════════ 多场并行（2026-09-15 王德生令） ══════════════
      「新的对话和没有完成的对话互相独立，即可以并行进行对话」。
      旧版「＋新对话」是**就地清空**：history 清、DOM 抹掉、stSess.reset()。可那条还在跑的流
@@ -8926,6 +8937,7 @@
           var b = layer.querySelector(".wdsm-top " + sel);
           if (!b) return;
           var label = (b.querySelector(".mb") ? b.querySelector(".mb").textContent : b.textContent) || "";
+          if (sel === ".wdsm-langbtn") label = LANG === "zh" ? "EN" : "中文";
           label = String(label).replace(/\s+/g, " ").trim();
           if (!label) return;
           var mi = el("button");
