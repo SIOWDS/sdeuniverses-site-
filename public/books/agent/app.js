@@ -18,12 +18,12 @@ var CFG=window.BOOK_AGENT||{};
 var mno=parseInt(CFG.no||new URLSearchParams(location.search).get("m"),10);
 if(!mno){fail('没有指定书号。请从<a href="/books/">专著书架</a>里任选一本进来。');return}
 HK="sde_shusheng_m"+mno;
-var AG={name:"书生",epithet:"",intro:"",starts:{}},RAG=null,KP=null,DUI=null;
+var AG={name:"书生",epithet:"",intro:"",starts:{}},RAG=null,KP=null,DUI=null,CAT=null,AGS=null,CTX={},DDJ=[290,297,311];
 
 /* —— 1. 找书：catalog.json —— */
 function J(u){return fetch(u,{cache:"no-cache"}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}
 Promise.all([J("/books/catalog.json"),J("/books/agents.json"),J("/books/m/"+mno+"/rag.json"),J("/books/m/"+mno+"/keypoints.json"),J("/books/m/"+mno+"/duilu.json")]).then(function(a){
- var c=a[0]||{};if(a[1]&&a[1].agents&&a[1].agents[mno])AG=a[1].agents[mno];RAG=a[2];KP=a[3];
+ var c=a[0]||{};CAT=c;AGS=(a[1]&&a[1].agents)||{};if(AGS[mno])AG=AGS[mno];RAG=a[2];KP=a[3];
  /* 三本《道德经》互为 RAG（tools/build_ddj_duilu.py）：把兄弟书的对读段落并入本书碰撞库 */
  DUI=a[4]||null;if(DUI&&DUI.items&&DUI.items.length){RAG=RAG||{items:[]};RAG.items=(RAG.items||[]).concat(DUI.items)}
  return c;
@@ -116,7 +116,7 @@ function boot(){
  document.title=AG.name+" · 《"+b.title+"》的智能体 | 德麦国际专著第 "+b.number+" 号";
  $("agName").textContent=AG.name;$("agEpi").textContent=AG.epithet||"这本书的智能体";
  $("agTag").textContent=AG.intro||("我只为《"+b.title+"》而生：陪你读懂它、用上它、拆开它、拿它去对撞，再把碰出来的新东西写成论文，甚至一部新专著。");
- ragInfo();kpInfo();
+ ragInfo();kpInfo();sibBar();
  $("bt").textContent=b.title; $("bs").textContent=(b.subtitle?b.subtitle+" · ":"")+(b.authors||[]).join("、")+" 著 · 德麦国际专著第 "+b.number+" 号";
  if(b.coverUrl){$("cov").src=path(b.coverUrl);$("cov").hidden=false}
  $("detailA").href=path(b.detailUrl); $("readA").href=path(b.readUrl||b.textUrl||b.detailUrl);
@@ -261,7 +261,7 @@ function render(){
   +"<div class='starts' id='starts'></div>";
  col.appendChild(hello);
  fillStarts();
- hist.forEach(function(m){add(m.role,m.text,m.act,m.srcs)});
+ hist.forEach(function(m){add(m.role,m.text,m.act,m.srcs,m.who)});
  scroll();
 }
 function fillStarts(){
@@ -269,19 +269,24 @@ function fillStarts(){
  var own=AG.starts&&AG.starts[act],ss=gateOf(act).starts.slice();if(own){ss=[own].concat(ss.slice(0,2))}
  ss.forEach(function(s){var c=document.createElement("button");c.type="button";c.className="chip";c.textContent=s;c.onclick=function(){var t=$("q");if(/……$/.test(s)){t.value=s.replace(/……$/,"");t.focus();grow()}else{t.value=s;send()}};box.appendChild(c)});
 }
-function add(role,text,a,srcs){
+function add(role,text,a,srcs,who){
  var w=document.createElement("div");w.className="m "+(role==="reader"?"me":"ai");
  var bub=document.createElement("div");bub.className="bub";w.appendChild(bub);
  if(role==="reader")bub.textContent=text;
- else{bub.innerHTML=(a?"<span class='gtag'>"+esc(gateOf(a).t)+"</span>":"")+"<div class='tx'>"+fmt(text||"")+"</div>";if(srcs&&srcs.length)bub.appendChild(srcBox(srcs));if(text)bub.appendChild(actBox(text))}
+ else{
+  var sb=who&&who!==mno?sibOf(who):null;
+  if(sb){w.className+=" sib";bub.innerHTML="<span class='gtag sg'>「"+esc(sb.name)+"」接话 · 《"+esc(sb.title)+"》</span><div class='tx'>"+fmt(text||"")+"</div>"}
+  else bub.innerHTML=(a?"<span class='gtag'>"+esc(gateOf(a).t)+"</span>":"")+"<div class='tx'>"+fmt(text||"")+"</div>";
+  if(srcs&&srcs.length)bub.appendChild(srcBox(srcs));if(text)bub.appendChild(actBox(text,who||mno))}
  $("col").appendChild(w);return bub;
 }
 function srcBox(s){var d=document.createElement("div");d.className="srcs";d.innerHTML="这一问带上的碰撞点："+s.slice(0,6).map(function(x){return (x.rel?"<i>"+esc(x.rel)+"</i>":"")+"<a href='"+esc(path(x.u||x.url||"/books/"))+"' target='_blank' rel='noopener'>"+esc(x.t||x.title||"篇目")+"</a>"}).join(" · ");return d}
-function actBox(text){
+function actBox(text,who){
  var d=document.createElement("div");d.className="acts";
  var c=document.createElement("button");c.type="button";c.textContent="复制";c.onclick=function(){try{navigator.clipboard.writeText(text);c.textContent="已复制";setTimeout(function(){c.textContent="复制"},1500)}catch(e){}};
  d.appendChild(c);
  [["cut","拆开这一答"],["clash","拿这一答去对撞"]].forEach(function(p){var x=document.createElement("button");x.type="button";x.textContent=p[1];x.onclick=function(){setAct(p[0],false);$("q").value=p[0]==="cut"?"拆开你上一答：它把什么当作了给定？哪一句最经不起追问？":"拿你上一答去撞它最强的敌意最近邻，撞出一个新命题。";send()};d.appendChild(x)});
+ var tb=talkBar(who||mno);if(tb)d.appendChild(tb);
  return d;
 }
 function scroll(){var m=$("msgs");m.scrollTop=m.scrollHeight}
@@ -326,7 +331,7 @@ function send(){
  busy=true;paint();scroll();
  var ans="",srcs=[],notes=[];
  var rp=ragPick(q+" "+lastAns(),a,10);
- var body={q:q,bookagent:1,act:a,agentName:AG.name,agentEpithet:AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:BOOK.title,docText:docText(),history:hist.slice(0,-1).map(function(m){return{role:m.role,text:m.text}}),key:kv.key,vendor:kv.vendor};
+ var body={q:q,bookagent:1,act:a,agentName:AG.name,agentEpithet:AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:BOOK.title,docText:docText(),history:hist.slice(0,-1).map(function(m){return{role:m.role,text:tagged(m,mno)}}),key:kv.key,vendor:kv.vendor};
  fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)}).then(function(r){
   return sse(r,function(j){
    if(j.t==="token"){ans+=j.v;tx.innerHTML=fmt(ans);scroll()}
@@ -337,11 +342,81 @@ function send(){
   });
  }).catch(function(e){var x=document.createElement("div");x.className="err";x.textContent="接不上「"+AG.name+"」（"+(e&&e.message)+"）。检查网络后再问一次——你刚才那句已记下。";bub.appendChild(x)}).then(function(){
   if(rp.items.length&&(a==="clash"||a==="cut"))srcs=rp.items.slice(0,5).map(function(it){return{t:it.t,u:it.u,rel:it.rel}});
-  if(ans){hist.push({role:"wds",text:ans,act:a,srcs:srcs});save();if(srcs.length)bub.appendChild(srcBox(srcs));bub.appendChild(actBox(ans))}
+  if(ans){hist.push({role:"wds",text:ans,act:a,srcs:srcs,who:mno});save();if(srcs.length)bub.appendChild(srcBox(srcs));bub.appendChild(actBox(ans,mno))}
   else if(tx.querySelector(".think"))tx.innerHTML="";
   if(notes.length){var n=document.createElement("div");n.className="note";n.textContent=notes.join("；");bub.appendChild(n)}
   busy=false;paint();scroll();
  });
+}
+
+
+/* —— 9. 三本《道德经》的智能体彼此接话（圆桌）：每位用自己那本书的全文、要点、碰撞库、对读库回答，并读到别人刚说的话 —— */
+function sibOf(no){var b=((CAT&&CAT.books)||[]).filter(function(x){return x.number===no})[0],g=(AGS&&AGS[no])||{};return b?{no:no,name:g.name||("第"+no+"号"),epithet:g.epithet||"",title:b.title}:null}
+function tagged(m,me){if(m.role!=="wds")return m.text;var w=m.who||mno;if(w===me)return m.text;var s=sibOf(w);return "〔"+(s?s.name+"（《"+s.title+"》的智能体）":"另一位")+"说〕"+m.text}
+function loadCtx(no){
+ if(no===mno)return Promise.resolve({AG:AG,RAG:RAG,KP:KP,DUI:DUI,CH:CH,BOOK:BOOK});
+ if(CTX[no])return CTX[no];
+ var sb=((CAT&&CAT.books)||[]).filter(function(x){return x.number===no})[0];
+ if(!sb)return Promise.reject(new Error("书架里没有第 "+no+" 号"));
+ var tp=path(sb.textUrl||sb.chapterUrl||("/books/m/"+no+"/text/"));
+ CTX[no]=Promise.all([J("/books/m/"+no+"/rag.json"),J("/books/m/"+no+"/keypoints.json"),J("/books/m/"+no+"/duilu.json"),fetch(tp).then(function(r){return r.ok?r.text():""}).catch(function(){return ""})]).then(function(a){
+  var r=a[0]||{items:[]},du=a[2]||null,items=(r.items||[]).concat((du&&du.items)||[]);
+  var chs=[];if(a[3]){try{chs=chapters(new DOMParser().parseFromString(a[3],"text/html"))}catch(e){chs=[]}}
+  if(chs.length&&chs[0].t===sb.title&&chs[0].n<200)chs.shift();
+  return{AG:(AGS&&AGS[no])||{name:"第"+no+"号",epithet:"",intro:"",starts:{}},RAG:{items:items},KP:a[1],DUI:du,CH:chs,BOOK:sb};
+ }).catch(function(e){delete CTX[no];throw e});
+ return CTX[no];
+}
+function withCtx(c,fn){
+ var s=[AG,RAG,KP,DUI,CH,SEL,BOOK];
+ AG=c.AG;RAG=c.RAG;KP=c.KP;DUI=c.DUI;CH=c.CH;BOOK=c.BOOK;if(c.BOOK!==s[6])SEL=null;
+ try{return fn()}finally{AG=s[0];RAG=s[1];KP=s[2];DUI=s[3];CH=s[4];SEL=s[5];BOOK=s[6]}
+}
+function lastQ(){for(var i=hist.length-1;i>=0;i--)if(hist[i].role==="reader")return hist[i].text;return ""}
+function lastWds(){for(var i=hist.length-1;i>=0;i--)if(hist[i].role==="wds")return hist[i];return null}
+function talkBar(who){
+ var o=DDJ.filter(function(n){return n!==who}).map(sibOf).filter(Boolean);
+ if(!o.length||!CAT||DDJ.indexOf(mno)<0)return null;
+ var d=document.createElement("span");d.className="talk";
+ o.forEach(function(s){var x=document.createElement("button");x.type="button";x.className="tk";x.textContent="请「"+s.name+"」接话";x.title="让《"+s.title+"》的智能体读到这一答，从它自己的书里回应";x.onclick=function(){talk(s.no)};d.appendChild(x)});
+ if(o.length>1){var r=document.createElement("button");r.type="button";r.className="tk rt";r.textContent="圆桌：另两位依次接";r.onclick=function(){talk(o[0].no,function(){return talk(o[1].no)})};d.appendChild(r)}
+ return d;
+}
+function talk(no,done){
+ if(busy)return Promise.resolve();
+ var kv=keyGet();if(!kv){keyPanel(function(){talk(no,done)});return Promise.resolve()}
+ var last=lastWds(),q0=lastQ();if(!last||!q0)return Promise.resolve();
+ var sb=sibOf(no);if(!sb)return Promise.resolve();
+ busy=true;paint();
+ var bub=add("wds","",last.act||"clash",null,no),tx=bub.querySelector(".tx");
+ tx.innerHTML="<span class='think'>「"+esc(sb.name)+"」正在翻自己的书……</span>";scroll();
+ var speaker=sibOf(last.who||mno),ans="",srcs=[],A="clash";
+ return loadCtx(no).then(function(c){
+  var body=withCtx(c,function(){
+   var q="【三本《道德经》圆桌】读者原问：「"+q0.slice(0,600)+"」\n"+(speaker?speaker.name+"（《"+speaker.title+"》的智能体）":"另一位智能体")+"刚才这样答：「"+String(last.text).slice(0,1400)+"」\n现在轮到你——「"+c.AG.name+"」，《"+c.BOOK.title+"》的智能体，接话。要求：1）先用一两句话说清：你对上面这段话同意、补充还是反对哪一处；2）再从你自己这本书里拿出别人没有的东西——引具体章节、关键点或标「对读」的段落；3）最后给读者一个可以带走的判断。不要复述对方的话，不要冒充对方的书；两本书说法不同时，把分歧说透，不要和稀泥。";
+   var rp=ragPick(q0+" "+last.text.slice(0,600),A,10);
+   srcs=rp.items.slice(0,5).map(function(it){return{t:it.t,u:it.u,rel:it.rel}});
+   return{q:q,bookagent:1,act:A,agentName:c.AG.name,agentEpithet:c.AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:c.BOOK.title,docText:docText(),history:hist.map(function(m){return{role:m.role,text:tagged(m,no)}}),key:kv.key,vendor:kv.vendor};
+  });
+  return fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+ }).then(function(r){
+  return sse(r,function(j){
+   if(j.t==="token"){ans+=j.v;tx.innerHTML=fmt(ans);scroll()}
+   else if(j.t==="error"){var e=document.createElement("div");e.className="err";e.textContent=j.v;bub.appendChild(e);if(j.code==="need_key"||j.code==="bad_key")setTimeout(function(){keyPanel(null)},300)}
+  });
+ }).catch(function(e){var x=document.createElement("div");x.className="err";x.textContent="请不动「"+sb.name+"」（"+(e&&e.message)+"）。稍后再点一次。";bub.appendChild(x)}).then(function(){
+  if(ans){hist.push({role:"wds",text:ans,act:A,srcs:srcs,who:no});save();if(srcs.length)bub.appendChild(srcBox(srcs));bub.appendChild(actBox(ans,no))}
+  else if(tx.querySelector(".think"))tx.innerHTML="";
+  busy=false;paint();scroll();
+  if(ans&&done)return done();
+ });
+}
+function sibBar(){
+ if(!CAT||DDJ.indexOf(mno)<0)return;
+ var o=DDJ.filter(function(n){return n!==mno}).map(sibOf).filter(Boolean);if(!o.length)return;
+ var d=document.createElement("div");d.className="sibbar";
+ d.innerHTML="<b>三本《道德经》同桌</b>：每一答下面都能「请 "+o.map(function(s){return esc(s.name)}).join(" / ")+" 接话」——他们读自己那本书，读到你和「"+esc(AG.name)+"」说的话，从各自的书里同意、补充或反对。也可直接去 "+o.map(function(s){return "<a href='/books/m/"+s.no+"/agent/'>"+esc(s.name)+"</a>"}).join(" · ")+"。";
+ var m=$("msgs");if(m&&m.parentNode)m.parentNode.insertBefore(d,m);
 }
 
 /* —— 7. 写出来：论文 / 专著立项 / 小结 —— */
@@ -362,7 +437,7 @@ function printDoc(text){
  w.document.write("<!doctype html><html lang='zh-CN'><head><meta charset='utf-8'><title>"+esc(title)+"</title><style>@page{size:A4;margin:22mm 20mm}body{font-family:'Songti SC','Noto Serif SC',serif;color:#141A24;line-height:1.95;font-size:11.5pt}h1{text-align:center;font-size:19pt}.mt{text-align:center;color:#6B7684;font-size:9pt;border-bottom:1px solid #D8DEE6;padding-bottom:12px;margin-bottom:22px}h2{font-size:13pt;margin:20px 0 8px}p{text-indent:2em;margin:0 0 10px;text-align:justify}.f{margin-top:28px;border-top:1px solid #D8DEE6;padding-top:10px;color:#8B98A5;font-size:8.5pt;text-align:center}</style></head><body><h1>"+esc(title)+"</h1><div class='mt'>读者 × 「"+esc(AG.name)+"」（《"+esc(BOOK.title)+"》的智能体· 德麦国际专著第 "+BOOK.number+" 号）· "+new Date().toLocaleDateString("zh-CN")+"</div>"+body+"<div class='f'>SDE Universes · sdeuniverses.com —— 本文由读者与「"+esc(AG.name)+"」（这本书的智能体）在共读中碰撞而成，引文与观点请自行核实。</div></body></html>");
  w.document.close();setTimeout(function(){try{w.print()}catch(e){}},600);
 }
-function convo(){return hist.map(function(m){return{role:m.role,text:m.text}})}
+function convo(){return hist.map(function(m){return{role:m.role,text:tagged(m,mno)}})}
 function writeOut(form){
  if(busy)return;var kv=keyGet();if(!kv){keyPanel(function(){writeOut(form)});return}
  var M=modal(form==="mono"?"正在写新专著的立项书与全书提纲……":"正在把这场对话写成论文……");
