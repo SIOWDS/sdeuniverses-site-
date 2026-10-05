@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>主体间性的发生：从主客结构到三界交缠的范式转换 · 秦莉 · SDE 学员专栏</title>
+<meta name="description" content="主体间性不是两个先在主体之间的关系，而是主体诞生过程中差异结算的发生结构。本文以《诗经》从歌场到文本的用诗史作十九条记录的案例追踪，发现单有媒介闸值不够，还须加上场合这一变量：随媒介闸值变化的是裁断权的来源与归属，并据此把判别式修订为 D′；文中明说样本有限、单一编码者，多条证伪条款尚未执行。">
+<style>
+:root{--gold:#B5860F;--gold2:#D0A22A;--ink:#F0E9D8;--paper:#2A2013;--muted:#7C6E4E;--bg:#0E0B08;--panel:#171310}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(181,134,15,0.32)}
+body{background:var(--bg);color:#EAE2CE;font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+a{color:var(--gold);text-decoration:none}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(181,134,15,0.28);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#CBBE94;font-size:13px;letter-spacing:0.04em}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(181,134,15,0.5);color:#D9CDA0;letter-spacing:0.03em}
+.rb-btn.cur{background:var(--gold);color:#1A1410;font-weight:700;border-color:var(--gold)}
+.art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
+.art-series{font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:22px}
+.art-title{font-size:clamp(24px,4.2vw,36px);font-weight:800;line-height:1.55;color:#F5EFE0;letter-spacing:0.02em}
+.art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--gold2);margin-top:18px;line-height:1.85;letter-spacing:0.01em}
+.art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.12em}
+.wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
+.abstract{background:linear-gradient(160deg,#1C1712,#141009);border-left:3px solid var(--gold);padding:22px 26px;margin:20px 0 26px;font-size:15.5px;line-height:1.95}
+.abstract .ab-lbl{font-size:12px;letter-spacing:0.3em;color:var(--gold);margin-bottom:10px}
+.abstract p{color:#CFC6AE;text-align:justify}
+.keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 30px;padding-bottom:24px;border-bottom:1px solid rgba(181,134,15,0.2)}
+.keywords strong{color:var(--gold)}
+.wrap h2{font-size:22px;font-weight:800;color:#F2ECDC;margin:44px 0 18px;letter-spacing:0.02em;padding-top:8px;border-bottom:1px solid rgba(181,134,15,0.18);padding-bottom:8px}
+.wrap h3{font-size:18px;font-weight:700;color:#E6DCC2;margin:30px 0 12px;letter-spacing:0.01em}
+.wrap p{margin-bottom:20px;text-align:justify;color:#DED6BF;text-indent:2em}
+.wrap p.ref{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:8px;text-indent:-2em;padding-left:2em;text-align:left}
+.wrap blockquote.pull{margin:26px 0;padding:18px 24px;background:linear-gradient(160deg,#1C1712,#15100a);border-left:3px solid var(--gold2);color:#EDE3C6;font-size:16.5px;line-height:1.9;text-align:justify}
+.wrap blockquote.pull strong{color:var(--gold2)}
+.wrap strong{color:var(--gold2);font-weight:700}
+.wrap em{color:#E0D5B4;font-style:italic}
+.iqnote{max-width:760px;margin:0 auto;padding:0 24px}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a12 0%,#150f08 60%,#0c0805 100%);text-align:center;padding:60px 24px;margin-top:40px;border-radius:4px}
+.endbox .lbl{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:16px}
+.endbox .big{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.06em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:1.95}
+.endbox a{display:inline-block;padding:12px 30px;font-size:14.5px;letter-spacing:0.08em;border-radius:2px;margin:5px;text-decoration:none}
+.endbox .solid{background:var(--gold);color:#150F08;font-weight:700}
+.endbox .ghost{border:1px solid var(--gold);color:var(--gold)}
+footer{background:#120E07;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid rgba(181,134,15,0.15)}
+footer a{color:var(--gold)}
+@media(max-width:640px){body{font-size:16.5px}}
+
+/* ===== 统稿增补 ===== */
+.lead{max-width:760px;margin:0 auto;padding:30px 24px 0}
+.innov{background:linear-gradient(135deg,#3a2f18,#2a2212 60%,#1c1710);border:1px solid rgba(201,168,76,0.35);border-radius:12px;padding:24px 28px;margin:0 0 22px;box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.innov .lbl{font-size:12px;letter-spacing:0.28em;color:#D4B25E;margin-bottom:12px;font-weight:700}
+.innov .lbl::before{content:"✦ ";color:#F0C860}
+.innov .txt{font-size:16.5px;line-height:1.92;color:#EDE3CC}
+.innov .txt b{color:#F0C860;font-weight:700}
+.daodu{background:#181310;border:1px solid rgba(201,168,76,0.3);border-left:4px solid #C9A84C;border-radius:10px;padding:24px 28px;margin:0 0 6px}
+.daodu .lbl{display:inline-block;font-size:12px;letter-spacing:0.22em;color:#1a140c;background:#C9A84C;padding:5px 14px;border-radius:20px;margin-bottom:14px;font-weight:700}
+.daodu h4{font-size:17.5px;color:#EDE3CC;margin:0 0 16px;font-weight:800}
+.daodu .row{margin:12px 0;line-height:1.88;color:#CDC0A6;font-size:15.5px}
+.daodu .row .k{color:#D4B25E;font-weight:800}
+.hl2{background:rgba(201,168,76,0.16);border-bottom:2px solid #C9A84C;padding:1px 4px;font-weight:700;color:#F0E4C8;border-radius:2px}
+
+/* ── 阅读进度：顶部一线，长读时知道自己在哪 ───────────────── */
+#prog{position:fixed;top:0;left:0;height:2px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .12s linear}
+
+/* ── 摘要：原渲染器丢了这一块，恢复并给它应有的分量 ───────── */
+.abs{margin:26px 0 4px;padding:24px 28px;background:linear-gradient(158deg,#1C1712,#141009);
+  border-left:3px solid var(--gold);position:relative}
+.abs .lb{font-size:11.5px;letter-spacing:.44em;color:var(--gold2);display:block;margin-bottom:12px}
+.abs p{margin:0;text-indent:0;font-size:16.5px;line-height:2.0;color:#E4DCC6;text-align:justify}
+.kw{margin:14px 0 0;font-size:14px;color:var(--muted);letter-spacing:.04em;text-indent:0}
+.kw b{color:var(--gold);font-weight:400;letter-spacing:.16em}
+
+/* ── 签名元素 · 对手榜：把这篇论文画出的那条分离线渲成看得见的 ── */
+.cut{margin:30px 0 6px;border:1px solid rgba(181,134,15,0.22);background:#120E0A}
+.cut .cap{font-size:11px;letter-spacing:.42em;color:var(--gold2);padding:14px 20px 0}
+.cut .row{display:grid;grid-template-columns:minmax(0,auto) 1px minmax(0,1fr);
+  gap:0 22px;align-items:stretch;padding:14px 20px 18px}
+.cut .me{align-self:center;font-size:19px;font-weight:800;color:#F2ECDC;letter-spacing:.03em;
+  white-space:nowrap;padding-right:4px}
+.cut .sep{background:linear-gradient(180deg,transparent,var(--gold) 22%,var(--gold) 78%,transparent)}
+.cut ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 10px}
+.cut li{font-size:13px;color:#C8BC9C;border:1px solid rgba(181,134,15,0.26);padding:5px 11px;
+  line-height:1.5;background:rgba(181,134,15,0.05)}
+.cut li i{font-style:normal;color:var(--muted);margin-left:7px;font-size:12px}
+.cut li.add{border-style:dashed;border-color:rgba(142,134,116,0.5);color:#A9A18C;
+  background:rgba(142,134,116,0.06)}
+.cut .foot{font-size:12.5px;color:var(--muted);padding:0 20px 16px;line-height:1.8}
+.cut .foot b{color:#A9A18C;font-weight:400}
+@media(max-width:600px){.cut .row{grid-template-columns:1fr;gap:12px}
+  .cut .sep{height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+  .cut .me{white-space:normal}}
+
+/* ── 目录：长读的落脚点，纯 CSS 折叠 ─────────────────────── */
+.toc{margin:24px 0 8px;border:1px solid rgba(181,134,15,0.20);background:#120E0A}
+.toc>summary{cursor:pointer;list-style:none;padding:13px 20px;font-size:12.5px;
+  letter-spacing:.32em;color:var(--gold2)}
+.toc>summary::-webkit-details-marker{display:none}
+.toc>summary::after{content:"＋";float:right;letter-spacing:0;color:var(--muted)}
+.toc[open]>summary::after{content:"－"}
+.toc ol{margin:0;padding:2px 22px 18px 42px;columns:2;column-gap:30px}
+.toc li{font-size:14px;line-height:2.0;color:#C8BC9C;break-inside:avoid}
+.toc a{color:#C8BC9C}
+.toc a:hover{color:var(--gold2)}
+@media(max-width:640px){.toc ol{columns:1}}
+
+/* ── 正文节奏 ────────────────────────────────────────────── */
+.wrap h2[id]{scroll-margin-top:70px}
+.wrap article>p:first-of-type{text-indent:0}
+
+/* ── 编辑增补：另一个说话人，用羊皮灰而不是金色 ──────────── */
+.suppwrap{margin:56px 0 0;border-top:1px solid rgba(142,134,116,0.34);padding-top:6px}
+.supphead{font-size:12px;letter-spacing:.40em;color:#A9A18C;margin:18px 0 8px;
+  border:0;padding:0}
+.supptip{font-size:14px;color:var(--muted);line-height:1.95;text-indent:0;margin:0 0 6px;
+  max-width:40em}
+.supp{border:0;border-left:2px solid rgba(142,134,116,0.55);background:transparent;
+  border-radius:0;padding:2px 0 2px 22px;margin:26px 0}
+.supp h2{font-size:17.5px;color:#CFC6AE;border:0;padding:0;margin:0 0 10px;
+  font-weight:700;letter-spacing:.02em}
+.supp h2::before{content:"编辑增补";display:block;font-size:10.5px;letter-spacing:.34em;
+  color:#8E8674;font-weight:400;margin-bottom:7px}
+.supp p{text-indent:0;font-size:16px;line-height:2.0;color:#CEC5AD;text-align:justify;margin:0}
+
+/* ── 参考文献 ────────────────────────────────────────────── */
+.ref{font-size:14px;padding-left:2em;text-indent:-2em;color:#B3A98D;line-height:1.85;margin:0 0 7px}
+.refhead{font-size:12px;letter-spacing:.36em;color:var(--gold2);border:0;padding:0;margin:34px 0 12px}
+.refhead.ed{color:#A9A18C}
+
+/* ── 分数条 ──────────────────────────────────────────────── */
+.scorebox{border:0;border-left:3px solid var(--gold);background:linear-gradient(158deg,#1B1611,#130F0A);
+  padding:16px 24px;margin:22px 0 0;font-size:14.5px;color:#C8BC9C;line-height:1.9}
+.scorebox b{color:var(--gold2);font-size:15px;letter-spacing:.03em}
+.scorebox p{margin:6px 0 0;text-indent:0;font-size:13.5px;color:var(--muted)}
+
+.endbox{text-align:center;border-top:1px solid rgba(181,134,15,0.24);margin-top:52px;
+  padding:38px 20px;color:var(--muted);font-size:14px}
+.endbox a{color:var(--gold)}
+@media(prefers-reduced-motion:reduce){#prog{transition:none}*{scroll-behavior:auto}}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.wrap h3{font-size:17px;margin:22px 0 8px;color:#D4B25E;font-weight:700}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.wrap h3{font-size:17px;margin:22px 0 8px;color:#D4B25E;font-weight:700}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.kw{font-size:14.5px;margin:0 0 18px;opacity:.9}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+
+/* 组内上下篇 */
+.pnbar{display:flex;gap:14px;margin:44px 0 8px;padding-top:22px;border-top:1px solid currentColor;
+ border-top-color:rgba(138,104,23,.28)}
+.pnbar a,.pnbar span{flex:1;min-width:0;display:block;padding:14px 16px;border-radius:9px;
+ border:1px solid rgba(138,104,23,.26);text-decoration:none;color:inherit;font-size:14px;line-height:1.6}
+.pnbar a:hover{border-color:rgba(200,145,23,.62);background:rgba(200,145,23,.07)}
+.pnbar .pn-l{opacity:.6;font-size:12px;letter-spacing:.14em;display:block;margin-bottom:5px}
+.pnbar .pn-t{display:block;font-weight:600}
+.pnbar .pn-none{opacity:.34;border-style:dashed}
+.pnbar .pn-next{text-align:right}
+@media(max-width:640px){.pnbar{flex-direction:column;gap:10px}.pnbar .pn-next{text-align:left}}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.wrap h3{font-size:17px;margin:22px 0 8px;color:#D4B25E;font-weight:700}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.kw{font-size:14.5px;margin:0 0 18px;opacity:.9}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+</style><style id="sde-fm">.sde-fm-abs{border-left:3px solid currentColor;padding:16px 20px;margin:20px 0 18px;background:rgba(128,128,128,.07);border-radius:2px;font-size:.96em;line-height:1.95;opacity:.97}.sde-fm-abs p{margin:0 0 10px;text-align:justify}.sde-fm-abs p:last-child{margin-bottom:0}.sde-fm-lbl{font-size:12px;letter-spacing:.3em;opacity:.7;margin-bottom:9px}.sde-fm-kw{font-size:.9em;opacity:.75;margin:0 0 22px;padding-bottom:16px;border-bottom:1px solid rgba(128,128,128,.25);line-height:1.85}.sde-fm-note{font-size:.86em;opacity:.72;line-height:1.85;margin:0 0 24px;padding:11px 16px;border:1px dashed rgba(128,128,128,.35);border-radius:3px}.sde-fm-ref{font-size:.87em;line-height:1.75;opacity:.78;margin:0 0 9px;text-indent:-1.9em;padding-left:1.9em;text-align:left}
+.sde-fm-sub{font-size:1.02em;opacity:.85;margin:0 0 20px;line-height:1.8}</style>
+<link rel="stylesheet" href="/sde-read.css">
+
+<style>
+.wrap table.tbl{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px;line-height:1.75}
+.wrap table.tbl th{text-align:left;padding:10px 12px;border-bottom:2px solid rgba(181,134,15,.45);color:#F0C860;font-weight:700}
+.wrap table.tbl td{padding:10px 12px;border-bottom:1px solid rgba(181,134,15,.18);color:#DED6BF;vertical-align:top;text-indent:0}
+.wrap ul.lst,.wrap ol.lst{margin:0 0 20px 1.6em;color:#DED6BF}
+.wrap ul.lst li,.wrap ol.lst li{margin-bottom:10px;line-height:1.95;text-align:justify}
+.wrap code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;color:#F0C860;background:rgba(181,134,15,.12);padding:1px 5px;border-radius:3px}
+</style>
+<style>
+.wrap .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:22px 0}
+.wrap .tblwrap table.tbl{margin:0;min-width:760px;font-size:13.5px;line-height:1.6}
+.wrap .tblwrap table.tbl th,.wrap .tblwrap table.tbl td{padding:8px 9px}
+.wrap .abstract.en,.wrap .keywords.en{font-size:.93em;opacity:.92}
+.wrap .abstract.en p{text-indent:0}
+.wrap .entitle{font-style:italic;opacity:.8;margin:0 0 14px;font-size:.95em}
+</style>
+</head>
+<body class="sde-read">
+<div class="readbar">
+  <a class="nav-back" href="/students/qin-li/works/">‹ 秦莉 · 全部作品</a>
+  <div class="rb-modes" aria-label="三种阅读方式">
+    <span class="rb-btn cur">📖 长文阅读</span>
+    <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+    <a class="rb-btn" href="intersubjectivity-genesis.pdf" download>⬇ 下载 PDF</a>
+  </div>
+</div>
+<header class="art">
+  <div class="art-series">学员专栏 · 秦莉 · 主体间性研究 · 发生学论文</div>
+  <h1 class="art-title">主体间性的发生：从主客结构到三界交缠的范式转换</h1>
+  <div class="art-subtitle">The Genesis of Intersubjectivity: From Subject-Object Structure to the Entanglement of Three Worlds</div>
+  <div class="art-meta">作者 秦莉 · SDE 学员 · 约 3.0 万字 · 发表于2026年10月5日</div>
+</header>
+<div class="wrap">
+<div class="abstract"><span class="ab-lbl">摘 要</span><p>主体间性理论长期面临一个深层困难：它描述了自我与他人如何达成理解，却无法说明这种理解最初是如何发生的。现有理论将主体间性视为两个已完成主体之间的认知协调问题，预设了主体与客体、自我与他人的先在分离，因而无法解释主体如何在尚未成为主体的过程中已经与他人共在。本文提出一个承重命题：主体间性不是两个先在主体之间的关系属性，而是主体诞生过程中三界（现实界、自我界、理念界）相位变换的产物——主体之为主体的那个"我"，本身就是在与他人的差异序列中被反复结算出来的一种发生结构。本文采用概念分析与发生学方法，以《诗经》从唱诵到文本的媒介转换为典型案例，追踪主体间性从声音现场的三界同场到书写档案的三界重排的完整发生路径。研究表明：主体间性的根基不在认知协调而在三界相位结构，相位结构由媒介与用诗场合共同规定；对十九条用诗记录的追踪发现，理念界居前与当场裁断在没有任何文本的声音现场已经出现，媒介转换改变的不是理念界是否出场，而是裁断权的来源，即由在场者转向文本。这一发现将主体间性研究从"主体间如何理解"的认知论层面，推进到"主体如何在与他人的纠缠中诞生"的发生学层面。</p></div>
+<div class="keywords"><strong>关键词：</strong>主体间性；发生学；差异序列；三界结构；媒介转换；相位重组</div>
+<div class="abstract en"><span class="ab-lbl">Abstract</span><p>Theories of intersubjectivity have long faced a fundamental difficulty: they describe how selves achieve mutual understanding, yet cannot account for how such understanding initially comes into being. Existing theories treat intersubjectivity as a cognitive coordination problem between two already-completed subjects, presupposing a prior separation of subject and object, self and other, and therefore cannot explain how the subject, in the process of not-yet-becoming a subject, always already coexists with others. This paper advances a load-bearing proposition: intersubjectivity is not a relational property between two preexisting subjects, but a product of the phase transformation of three worlds (the real, the self, and the ideal) in the genesis of the subject—the "I" that makes the subject a subject is itself a genetic structure repeatedly settled through the differential sequences with others. Employing conceptual analysis and genetic method, this paper takes the media transition of the Book of Songs from chanting to text as a typical case, tracing the complete genetic path of intersubjectivity from the three-world co-presence in vocal presence to the three-world rearrangement in written archives. The research demonstrates that the foundation of intersubjectivity lies not in cognitive coordination but in a three-world phase structure that is jointly fixed by medium and occasion. A tracing of nineteen records of the use of the Songs shows that the ideal world already stands in the foreground, and adjudication by those present already occurs, in vocal settings with no text at all; what a media shift changes is therefore not whether the ideal world appears but where the authority to adjudicate resides, passing from those present to the text. This finding advances intersubjectivity research from the epistemological question of "how subjects understand each other" to the genetic question of "how the subject is born in entanglement with others."</p></div>
+<div class="keywords en"><strong>Keywords:</strong> intersubjectivity; genesis; differential sequence; three-world structure; media transition; phase reorganization</div>
+<h2>一、引言：一个被忽略的发生学缺口</h2>
+<p>1954年，现象学家阿尔弗雷德·舒茨在《符号、实在与社会》中写下一个令他不安的观察：当两个人在音乐厅里听同一段旋律，他们分享的究竟是什么？舒茨的答案指向"内在时间的共时性"——两个人的意识流在音乐的时间结构中彼此同步，由此产生一种"我们关系"（we-relationship）。这个答案精妙地描述了主体间性的一个截面，却在同一个动作里暴露了整个理论传统的盲区：它必须预设两个已经完成的主体，各自带着完整的意识流，走进音乐厅，然后才谈得上"共时"。</p>
+<p>问题恰恰出在这个"然后"上。如果主体间性只是两个成品之间的协调，那么所有关于主体间性的理论都只是在描述一座桥如何连接两岸，却从不追问两岸是如何成为岸的。胡塞尔晚年用"共现"（Appräsentation）来解释他人心灵的被给予方式，海德格尔用"共在"（Mitsein）来规定此在的存在结构，梅洛-庞蒂用"身体间性"（intercorporéité）来消解主客二分——这些概念各自深刻，却共同分享一个未经审视的前提：主体已经被给出了，主体的边界已经被划定了，剩下的问题是它们之间如何跨越那条边界。</p>
+<p>这个前提在《诗经》这个案例上暴露得最为彻底。当《毛诗序》说"在心为志，发言为诗"，它预设了一个先在于言说的"心志"，诗不过是这个内在实体向外部的表达。两千年的诗经学争论——毛序的比兴说、朱熹的淫诗说、孔子的诗教说——全部在这个预设上展开：他们都相信诗有一个"本来"的意义，争论的只是谁读出了那个本义。然而这个"本来"恰恰是主体间性理论最需要追问的东西：一个歌者在社群面前唱出"关关雎鸠"，那个"心动"是先在的私人体验然后被表达，还是在"唱出"这个动作里才第一次成为"志"？</p>
+<p>这正是本文试图占据的缺口：现有主体间性理论解释了主体如何理解他人，却没有解释主体如何在与他人的差异中被结算出来；现有诗经学研究解释了诗的意义如何被解释，却没有解释诗的存在方式如何规定的意义的发生条件。本文提出一个可被反驳的承重命题：主体间性不是两个先在主体之间的关系属性，而是主体在三界交缠中被差异序列结算出来的一种发生结构；这个结构的基本相位由媒介条件所规定，媒介转换改变主体间性形式的相位结构，改变的方式在第十节的案例追踪之后做了修订。</p>
+<p>本文以概念分析与发生学方法展开论证。研究问题有三个：</p>
+<p>RQ1：在主体尚未完成的阶段，"自我"与"他人"的差异序列如何生出主体间性？</p>
+<p>RQ2：《诗经》从唱诵到文本的媒介转换中，三界（现实界、自我界、理念界）的相位关系发生了怎样的重组？</p>
+<p>RQ3：主体间性的根基在认知协调还是媒介所规定的相位结构？如果是后者，这一结论对主体间性理论的既有范式构成何种修正？</p>
+<p>本文的贡献声明有三条。第一，本文证明了主体间性的发生学优先性：理解他人之所以可能，根源不在两个心的协调，而在于主体诞生过程的差异结算结构——这是对现象学、认知科学与社会理论中主体间性预设的釜底抽薪。第二，本文以《诗经》的媒介转换史为案例，揭示了"三界前台轮换"这一机制：主体间性的形式从声音现场的三界同场到书写档案的三界重排，不是意义解释的变化，而是主体诞生条件的结构性改变。第十节的案例追踪同时修正了这一机制的第一版表述：前台轮换由媒介与用诗场合共同规定，不由媒介单独规定。第三，本文交出一套可裁决的判据与证伪条件，使主体间性的发生学命题可以被经验研究检验或推翻。</p>
+<h2>二、文献述评与研究缺口</h2>
+<p>主体间性的研究脉络可以沿着三条路径来检视，每一条都握着一个不同的解释变量，每一条都在特定的条件下展现出解释力的边界。</p>
+<h3>2.1 现象学路径：意识共现作为解释变量</h3>
+<p>这条脉络的解释变量是意识的意向结构。胡塞尔在《笛卡尔式的沉思》中提出，他人心灵通过"结对"（Paarung）和"共现"被给予：我知觉到他人的身体，并通过类比统觉（analogische Apperzeption）将我的身体经验转渡给他人的身体，从而构成一个"他我"（alter ego）。这个模型的精妙处在于，它不把他人当作逻辑推理的产物——我不是从行为推断心灵，而是在知觉他人的那一刻就直接看到了一个有心灵的身体。胡塞尔由此将主体间性锚定在知觉结构的最底层：前反思地，我已经生活在一个有他人的世界里。</p>
+<p>但这条脉络能走到的地方恰好是它停下的地方。共现模型解释了他人如何被"给予"我，却从未解释我如何成为一个能够进行结对动作的主体。"结对"预设了"我对我自己身体的经验"，而这个"对我自己"的经验，在发生学上恰恰需要他人——婴儿无法从对自己身体的感觉中推出一面镜子。胡塞尔本人晚年在《欧洲科学的危机》中试图用"生活世界"来补救，但生活世界仍然是已经完成的共同体视域，没有回答这个视域在主体身上的诞生过程。这条脉络在"主体如何从与他人的纠缠中长出自己"这个问题上，从第一句话就迈不过去。</p>
+<h3>2.2 社会哲学路径：互动规则作为解释变量</h3>
+<p>这条脉络把解释变量从意识结构换成社会互动的规则系统。舒茨在《社会世界的意义构造》中把主体间性置于日常生活的"类型化"（Typisierung）过程中：我理解他人，靠的不是进入他人的意识，而是依靠"视角的可相互性"和"类型化知识"——我知道，如果我站在他的位置，我会以某种类型化的方式理解他的行为。社会互动由此不需要两个心灵的透明对接，只需要共享一套类型的库存。</p>
+<p>哈贝马斯在这条路径上往前推了一步。在《交往行动理论》中，他把主体间性锚定在语言使用的有效性要求上：任何一次言语行动都同时提出真实性、正确性、真诚性三重诉求，而说话者与听者通过理由的交换来承认或拒绝这些诉求。主体间性于是从意识内部被搬到话语实践的规则层面。这个转换有力地绕开了"他心问题"的经典困境——我们不必进入他人内心，我们只需在理由交换中达成共识。</p>
+<p>然而恰恰是这个"只需"暴露了这条脉络的缺口。规则、类型、角色——这一切都是已经完成的社会化产物。一个尚未进入语言游戏的婴儿，一个尚未掌握类型库的初学者，一个被排除在规则承认之外的外来者，他们与他人之间是否存在主体间性？如果存在，它靠什么运作？如果不存在，那么他们是如何从"没有主体间性"跨入"有主体间性"的门槛的？这条脉络对这个门槛的存在视而不见，因为它的解释变量永远是已经达成的规则，而不是规则达成之前的那个过程。更致命的是，规则本身也是被差异结算出来的——什么样的规则配什么样的互动，什么样的互动逼出什么样的规则，这个发生学问题在规则变量的框架内部无法被提出。</p>
+<h3>2.3 发展心理学路径：生物基质作为解释变量</h3>
+<p>这条脉络的解释变量是生物演化的产物：模仿、共情、共同注意。科尔文·特雷瓦森（Colwyn Trevarthen）在1979年发表的《婴儿的交流与主体间性的发展》中提出"初级主体间性"（primary intersubjectivity）概念，证明新生儿在出生后几小时内就能对成人的表情和声调做出有节律的匹配反应。他在实验中发现，两到三个月的婴儿与母亲之间能够进入一种"原始对话"（protoconversation）状态，双方轮流发出声音和微笑，节奏精确得如同两人在共同演奏一段旋律。这个发现把主体间性的起点下推到了语言出现之前的生命早期，对胡塞尔式的意识模型和舒茨式的规则模型都构成了根本挑战。</p>
+<p>特雷瓦森之后，发展心理学用"镜像神经元"的神经机制来解释这种早期共情能力，用"共同注意"（joint attention）来解释婴儿如何与他人共享一个指向对象。这条脉络无可辩驳地证明了：主体间性有着深远的生物基础，不是后天习得的建构物。</p>
+<p>但这条脉络恰恰在它最强的地方露出了它的边界。模仿、共情、共同注意——这些都是"前主体"的能力，它们发生在主体尚未将自己反思性地确立为"我"的阶段。在这条脉络的框架里，无法回答：从"前主体间性"（身体层面的节律匹配）到"主体间性"（两个自反性主体之间的理解），中间发生了什么？特雷瓦森的"初级主体间性"和"次级主体间性"之间的分界，恰恰就是本文所要追问的那个发生学缺口。生物基质给出了可能性的边界条件，却无法解释从可能性到现实性的跳转机制——那需要差异序列的结算，需要媒介条件的规定。</p>
+<p>三条脉络，三个变量：意识结构、互动规则、生物基质。它们各自在某个条件下有效，又在另一条件下失效。现象学路径在"知觉如何给出他我"上有效，在"我如何成为能知觉的主体"上失效；社会哲学路径在"规则如何协调互动"上有效，在"规则如何诞生"上失效；发展心理学路径在"生命早期是否存在对他人的节律性响应"上有效，在"从响应到自反性主体的跳转机制"上失效。</p>
+<p>三条脉络共同认定了一句话，这句话隐蔽到从未被说出：主体间性是"成品之间的协调关系"。无论成品是两个意识、两个角色还是两个有机体，理论的目光始终落在协调上，从不在"成品如何成为成品"上停留。本文的承重命题正是朝这句话开刀：主体间性首先是主体的诞生过程中与差异序列的纠缠结构，协调只是这个结构在特定媒介条件下的一种衍生形态。</p>
+<h2>三、理论框架与概念界定</h2>
+<h3>3.1 理论出发点</h3>
+<p>本文站在发生学（genetic analysis）的理论传统上。这个传统关注的核心问题不是"事物是什么"，而是"事物如何走到这一步"。发生学在此不等于历史叙述，不按时间顺序把事件串起来；它问的是结构性的生成：在哪些条件的共同作用下，一种关系形态必然替代另一种。皮亚杰晚年将发生学从儿童认知发展推广到科学概念史，福柯用"谱系学"（généalogie）将这一路径引入主体研究，两人共同处：主体不是一个设定好的起点，而是一个被描述成"已生成"的结果。</p>
+<p>选择发生学而非先验现象学，原因在于本文研究问题的性质。现象学可以描述音乐的共时经验的结构，却无法描述这个结构如何从无到有。选择发生学而非历史社会学，原因在于历史社会学关注制度与结构的外部变迁，却无法进入主体与差异序列之间的微观纠缠关系。发生学恰好位于两者之间：它追问"什么条件逼出什么结构"，追问"在哪一个关节点上一种形态必然转化为另一种形态"。这正是主体间性问题所需要的视角。</p>
+<h3>3.2 核心概念的名义定义</h3>
+<p>本文需要精确定义三个核心概念。</p>
+<p>主体间性（intersubjectivity）：一个人与一个差异者的差异序列中，因差异关系本身产生的特征纠缠结构，这个结构是主体自我区分的必要条件。请特别注意这个定义里省掉的东西：它不含"理解"一词，因为理解只是这个结构中某个相位下的测量外观；它不含"协调"，因为协调只在特定媒介条件下才成为主体间性的主导形态；它还省掉了"共享"，因为共享要求先在的两个主体各自持有一部分内容再合并，这与发生学前提相反。</p>
+<p>差异序列（differential sequence）：同一关系位点上，不同关系参与者在各自条件中的交互行为被排列、比较、结算后形成的次序结构。主体间的差异表现为两点：位置差异（同一时刻，你这里与我这里不同）和序列差异（同样的事情，你与我的行为派生了不同的后续序列）。没有差异序列的结存，任何标记动作都只是噪声，无从被识别为"他的"。</p>
+<p>三界相位（phase of three worlds）：现实界（身体在场的物质条件，用 R 表示）、自我界（主体内在的身体感受与欲动，用 S 表示）、理念界（规范、标准、可夸之物的形状，用 I 表示）在同一种媒介条件下的前台与后台排列关系。相位描述的不是三界是否存在——它们在任何正常状态中全勤——而是哪一种站前台、哪一种在后台记账、哪一种被赶入想象的后场。</p>
+<h3>3.3 操作性定义与读数</h3>
+<p>主体间性的发生学命题需要把抽象概念转化为可观测的读数。本文的核心读数如下：</p>
+<p>相位读数 P = (前台界, 后台记账界, 想象后场界)</p>
+<p>测量层次为类别数据（nominal）。在一次性可观测事件中取值方法：对目标文本（一首诗、一段唱诵记录、一次赋诗实例）进行三界标记，统计文中明确指涉的哪一界作为主体断言的有真值承担者（前台）；哪一界以否定或指令形式作为后台条件出现（后台记账）；哪一界以"一旦离开当前媒介就不可能被触及"的形式出现（想象后场）。例如《关雎》的原初唱诵中，前台是现实界的河洲雎鸠与自我界的寤寐思服，"值得夸"作为后台记账的理念规范的运作方式存在于唱诵的形式本身，而唯一可确认为离场界是"心志本义"——它在声音现场不可指涉。同一首诗在同一媒介条件下重复标记三次，三次读数一致方为稳定标记。</p>
+<p>差异结算密度 δ = 同一相位读数跨越代际不改变的条件下，该相位结构被以不同方式使用时出现的判断分支数</p>
+<p>该读数的最低值为 1（结构只有一个使用方式），最高值在本文案例中为 4（至少四个功能分支：祭、宴、谏、教）。测量层次为顺序数据（ordinal）。在单次可观测事件中的取值方法：对同一文本在同一媒介条件下，不同参与者对它进行不同的使用——分合、变义、移乐——的记录出现几次，δ 就计为几。注意：如果同一文本在第一次使用之后被改写为另一个文本（而不是以原文本被不同方式使用），则不计入 δ，因为这说明差异序列已经跨越媒介相位，进入新的土壤。</p>
+<p>媒介闸值 M = 从"现场发生"到"档案重放"的功能转换中，使前者无法维持的内部矛盾出现点</p>
+<p>M 的取值是类别的：0（无转换）、1（部分转换，如乐谱保留但演唱规定没有固定）、2（完全转换，如文字定本取代活人传习）。在单次事件中的取值方法：问"传"这个动作这次由谁对谁做——活人对活人（M=0）、活人对文本加活人对活人（M=1）、文本对人才是权威来源（M=2）。</p>
+<p>这三个读数合起来，构成主体间性发生学观察的操作层面。任何一个读数若无法在一次可观测事件中具体取到值，本文的相关论断就不算立住。</p>
+<h2>四、核心命题：主体间性是差异结算的发生结构</h2>
+<p>现在把本文的承重命题正式立起来。</p>
+<p>主体间性是主体诞生过程中差异结算的发生结构，不是两个已完成主体之间的属性（Y₁），也不是共有意向性、共情、共同注意这类结构中的关系派生量（Y₂），而是在主体间差异被序列化过程里产生的特征纠缠结构（Z），这个结构在媒介条件规定的三界相位中获得具体形式。</p>
+<p>要理解 Z 为什么不是 Y₁，需要回到主体的诞生过程中去。在主体尚未成为主体的阶段，没有两个边界清晰的"我"可以拿来协调。自我是在与他人的差异中第一次意识到"我这里"与"你那里"是两种不同的关系位点，在这个区分出现以前，思维中没有主客对立。传统哲学把主体间性看成是接在两个主体之间的桥，桥的两端是独立的主体，桥的主体间性只是关系属性。但在发生学上，主体的同一性是靠与他人的差异序列反复结算出来的——每一次结算都在重新划定"我"的边界，重划的方式是由他人及其反应给出的。所以主体间性不是关系，是出生过程本身。</p>
+<p>要理解 Z 为什么不是 Y₂，需要明白共有意向性、共情、共同注意这些结构本身仍然是在差异结算中产生出来的一种产品。特雷瓦森在实验室里观察到的"原始对话"，表面上是最底层的生物机制，但在更根本的分析上，它仍是双方在差异序列中的特征纠缠：婴儿发出声音，母亲用延迟和变化回应，婴儿再回应。每个回应的选择都被前一轮的差异推进，而这个来回本身已经将"我发出的"和"回应我的"编织在一起。Y₂ 的每个变体都是在差异序列已经发生了作用之后才可能被描述出来；它们不是底层，而是衍生的特定构造。</p>
+<p>Z 在什么条件下成立？Z 的成立需要两个条件。第一个条件是：主体必须在一个差异序列中活动，这个序列中有至少一个他人对这个主体的反应做出了差异性的标记。若 A 与 B 各自独立存在、从来不发生交互，或者发生交互但双方的反应没有差异（如同一段事先录好的音乐重复播放），则特征纠缠不会发生，主体间性也无法从这个关系位点上诞生。第二个条件是：这个差异序列的参与者的交互行为必须被一系列参考系比较过——这些参考系可以是本能的节律、身体的空间关系、语言的互指结构，也可以是理念规范。两种条件缺一不可。</p>
+<p>Z 在什么条件下不成立？当差异序列被冻结成没有参考系参与的自我重复时，Z 不成立。这里有一个关键的反例：当一个人孤独地面对完全重复的刺激（比如一个人造的恒定世界），这个世界的反应与他的动作没有差异，差异序列的"差异"本身消失了，他的"我"也就会随之消解。这解释了为什么独处是主体间性的衍生休止，而非主体间性的反面——独处中的主体仍携带着由过往差异结算出来的结构，但新的发生已经停止了，只留下维持系统的再生产。Z 因此在完全同质的重复世界中不成立；这同时也指明了 Z 成立的判据：差异序列必须由差异来维持，而非由重复来维持。</p>
+<p>Z 的成立判定条件有六条，每条可独立核验：</p>
+<p>判定条件一：对任何已给定的主体间关系，能追溯出一条差异序列，在这条序列中，非一方的输入对另一方的反应选择做出了差异性的约束——即 B 的反应依赖于 A 的输入，并且这种依赖不是恒等映射。</p>
+<p>判定条件二：在同一关系位点上，能发现至少一个"差异性标记"——即一个动作或痕迹，它只在差异序列中的某个位置上出现，并且这个标记在这个位置上有被参考系比较过的痕迹。</p>
+<p>判定条件三：在这个关系位点上的特征纠缠中，至少有一个特征值是由另一个参与者的差异行为决定的，而非由主体自身的内部状态决定的。</p>
+<p>判定条件四：这个特征纠缠结构在媒介相位发生转换时发生变化，且变化是可预测的。可预测的条件是：媒介转换改变了差异序列的保存和重放方式，而这个改变必然反映在三界相位的前后台排列上。</p>
+<p>判定条件五：当差异序列被切断（将两个参与者从同一参考系中移出），特征纠缠不会消失，而是降到维持水平——这表明特征纠缠有一个发生学来源，而非仅仅是两端的实际互动。</p>
+<p>判定条件六：如果一个参与者被从差异序列中移出，剩下的参与者的主体判断出现一种改变：他的同一性判断失去了原有的差异性参照物，表现出对新的差异来源的依赖。</p>
+<p>现在做一次两句复合测试。本文命题能否被两句现成文献拼起来无损重述？</p>
+<p>第一句来自特雷瓦森（Trevarthen 1979）的"初级主体间性"概念：婴儿与母亲之间的节律性互动是主体间性的生物基础。第二句来自舒茨（Schutz 1932）的"类型化"概念：人际理解依靠共享的类型库存来实现。把这两句拼起来，得到的命题是：主体间性以早期的节律性互动为生物基础，并依靠共享的类型库存来实现。&lt;/antml&gt;这个拼合命题与本文承重命题的区别是什么？拼合命题仍然把主体间性当作一个已经开动的机制——节律互动是起点，类型化是运作方式，它没有回答一个更深的问题：节律互动本身为什么会发生？类型库存从哪里来？本文承重命题的增量落在"结算"这个动作上：差异序列不是互动的外在支架，而是主体诞生的发生结构。如果两个系统只是匹配而没有差异的结算，它们就没有主体间性，只有耦合。本文的增量不在于否认节律互动或类型化，而在于证明它们只是差异结算这个更底层的发生结构在不同媒介条件下的相位形态。这个增量无法用特雷瓦森或舒茨的任何一句现有论断无损重述，因为两者都没有处理差异结算这个概念本身。</p>
+<h2>五、最近邻盘点与占位划界</h2>
+<p>本节未经站外检索。以下盘点基于本文作者可及的理论资源，以诚实陈述其结论为限，不作"据我所知尚无人提出"之类的全称断言。</p>
+<p>本文命题要立住，必须回答一个问题：既然特雷瓦森、舒茨、哈贝马斯、梅洛-庞蒂、胡塞尔、海德格尔、皮亚杰、维果茨基八个占位者都在不同方向上触及过主体间性或发生学问题，那么本文与他们之间的分离线究竟画在哪里？以下逐位盘点。</p>
+<p>特雷瓦森：他已经占了"初级主体间性"这个位置——母婴之间的节律匹配是主体间性的开端。分离线不在于研究对象（母婴）而在于判断：特雷瓦森判定这种匹配是主体间性的"基础"（即底层机制），本文判定它是差异结算在生物基质层面的一个相位形态，本身需要发生学解释。判决性反例：两个从未匹配过的自闭症儿童在同一房间各自拍手，他们的拍手节律未经调解却在二十分钟内出现互锁。按特雷瓦森的匹配理论，互锁需要双方共享节律调制机制，因此会判这个现象为不可能或需要解释为偶然；按本文差异结算理论，节律互锁正是差异序列在无理念界干涉时的一种基本结算，因为只要两个身体的动作节奏进入同一参考系，差异就会产生并驱动结存。现有自闭症研究对双人无引导互动的报告还不能给出这样一个二十钟节律互锁现象的系统记录；这一例是构想的判决实验，作未核验处理。</p>
+<p>舒茨：他已经占了"互惠视角与类型化"这个位置——理解他人靠共享类型库存和视角可互换性。分离线：舒茨判定主体间性的成立条件是类型库存的共享；本文判定主体间性的成立条件恰恰是类型库存被差异结算出来的过程，共享不是条件而是产物。判决性反例：一个新手进入陌生文化，既无共享类型库存也无视角可互换性，却能在数天之内与同样不共享类型库的当地人形成有效的理解。按舒茨的理论，这应该不可能或至少需要类型化先在其文化内部给出足够库存；按本文理论，这个过程中真正发生的是双方在差异序列中快速生成新的类型。这个例子有民族志中的大量松散支持（陌生人之间在没有共同语言时的即兴协作），正式的裁决性检验尚未执行。</p>
+<p>哈贝马斯：他已经占了"交往理性与有效性要求"这个位置——主体间性靠语言行动中的可批判的有效性要求来维系。分离线：哈贝马斯判定主体间性依赖规则性的理由交换；本文判定理由交换本身是差异结算在理念界占前台时的机制，它的发生条件必须由三界相位来说明。判决性反例：两个语言能力严重受损但身体在场的人之间，在不借助任何制度化言语行动的情况下，通过身体动作和表情完成了对同一对象的共同注意和情绪共享。按哈贝马斯的交往行动理论，这种关系不满足有效性要求的理性言说结构，因而不是完整意义上的主体间性；按本文理论，这是主体间性在同一差异序列中采用另一个三界相位的形式，理念界收缩到记账位置，前台由现实界与自我界占有，这种情形中的主体间性是真实发生而非缺陷形态。此反例有神经康复临床观察的松散支持。</p>
+<p>梅洛-庞蒂：他已经占了"身体间性"这个位置——主体间性先于反思，在身体图式的互通性中直接被给予。分离线：梅洛-庞蒂判定身体间性是先于任何差异序列的原始基础；本文判定身体间性本身需要在一个差异序列中才能发生——没有他者的差异性活动，身体的互通性是不存在的。判决性反例：一个婴儿在生命最初几周内，与一个无反应的身体接触（如一个静止的成人假体）不发生互仿动作；而一旦同一身体开始做出非对称、有节奏、会延迟的反应，婴儿就开始同步。按身体间性理论，身体图式的互通应该对有无反应不做区分，因为互通是先于反应性差异的；按本文理论，这种区分恰恰是差异序列启动的临界点，无反应假体不产生差异，因此不触发特征纠缠。这个反例在目前的发展心理学方法学中难以进行裁决性检验，因为无法排除假体与活体的其他共变量，故标记为未核验。</p>
+<p>胡塞尔：他已经占了"共现与结对"这个位置——他人通过身体知觉的类比统觉被给予，先于任何推理。分离线：胡塞尔判定主体间性根植于先验自我对另一个自我进行结对的意向结构；本文判定结对之可能是差异结算在先验主体尚未闭合时的发生效果。判决性反例：一个能对他人身体位置做出准确空间调配但不能识别他人面部表情的脑损伤病人，他是否能被判定为"共现"他人心灵？按胡塞尔模型，这意味着结对机制部分受损但空间统觉完好，主体间性因此部分成立；按本文模型，这种空间调配与表情识别的不对称，暴露的是差异序列的不同参考系分别结算——空间行动的参考系仍保留，而情绪容器的参考系已经不行——因此这不是一个统一"共现"的部分缺失，而是特征纠缠在不同维度的断裂。此反例有神经心理学的既有证据作为松散支持。</p>
+<p>海德格尔：他已经占了"共在"这个位置——此在的存在论结构在于与他人共同在世，共在先于主客二分。分离线：海德格尔判定共在是此在的实存论规定，本身不需要从差异中发生；本文判定共在本身是被差异序列结算出来的一种此在形态，它的发生学条件是"差异者先到场"。判决性反例：一个个体在完全与世隔绝的环境中成长（如历史上的极端隔离案例），其语言的缺失使与他人"共在"的存在论结构未能展开，这个结果证明共在的先验性不是无条件成立的，而是有发生学条件的。海德格尔会判定这本身就是在世的丧失，而不是共在的未发生；本文判定这个例子证明了共在必须有具体的差异序列输入来触发，其先验性仅是形式上的。此例的历史记录松散且混杂，不可作裁决性检验，仅作概念边界。</p>
+<p>皮亚杰：他已经占了"发生认识论"这个位置——逻辑运算阶段通过主体与环境的互动而从感知运动之中产生。分离线：皮亚杰判定发生的主体是单个认知主体，主体间性在这个格局中处于边缘；本文判定发生的基本单位是主体间的差异序列，单个主体的发生是差异序列被内化的结果。判决性反例：皮亚杰使用著名的"三山实验"来证明儿童在七岁前无法进行观点采择，但这个任务的设置中，儿童与观察目标之间、儿童与试验者之间的差异序列已经被固定在某个特定的语言和空间参考系之内；如果将同一个任务改成儿童熟悉的社会事件（如三个不同的人在同一场争执中的立场），观点采择在四岁即可出现。按皮亚杰的认知阶段理论，同一类运算在七岁前不会成熟，因此对同一逻辑结构的不同主体间条件下出现的不同结果需要一个特设的解释；按本文理论，这恰恰说明认知结构的建立本身受差异序列的具体条件规范，三山实验中失败的儿童不是缺乏运算能力，而是缺乏能在该实验参考系内结算出来的差异序列输入。此反例在皮亚杰范式的后学中有大量的偏离记录，可作为判据的分支来源，在本论文中不构成实验结果。</p>
+<p>维果茨基：他已经占了"最近发展区"这个位置——儿童通过与更有能力的他者的交互而获得自己尚未达到的认知能力。分离线：维果茨基判定主体间的差异（儿童与社会代理人之间的能力梯度）是认知发展的脚手架；本文判定这个差异本身不是脚手架，而是发生结构——脚手架的说法预设了要建的那栋楼已经以某种形式存在于儿童身上，而实际的发生过程是差异性参考系交互的结果，并非预先存在的潜能的实现。判决性反例：一个儿童通过与另一个不同能力但更低的同伴互动，其认知水平同样获得提升；按照最近发展区理论，这不应当发生，因为没有能力上的正向梯度；而按本文理论，这种情况下真正发生的是低能力同伴提供了不同的差异参考系，使儿童得以在新的差异序列中结算出新的结构。此反例有大量人际互动研究报告可以支持，但近侧发展区框架内对"交互者必须是更有能力的他人"这一假设已经受到很多批评，这些批评是本文可以引用的间接资源。此反例做未系统检索处理。</p>
+<p>以上八位占位者的分离线无一例外都画在判断层面：他们各自在不同方向上接近了主体间性的发生论地平线，但都没有把主体间性本身定义为差异结算的发生结构。这一节未经站外检索，因此不排除存在该命题的更近邻。本文只主张：在这八位可及的理论资源范围内，不存在可以无损重述本文命题的现成文本。</p>
+<h2>六、可裁决判据与可观测指标</h2>
+<h3>6.1 判别式</h3>
+<p>从上一节盘点的八位占位者出发，本文需要给出一个有效判别式。判别式必须让每一位占位者做出与本文相反的预测。</p>
+<p>用 SDE 的语言：主体间性的发生结构并不要求"理解他人"的观察结果在不同理论之间互相矛盾，而是要求"从无到有的过渡"这一现象的观测方式互不相同。本文判别式落在媒介闸值上，因为只有本文命题把媒介闸值视为三界相位变换的可预测条件。</p>
+<p>判别式 D：当媒介闸值从 M=0 升到 M=2——即"传"的主体从活人变为文本，权威来源不再由讲者而由文本对读者来执行时，有一类共同体的主体间性形式发生了从"相互激发"到"相互确认"的转变。</p>
+<p>这条判别式的观测方法不依赖于问人"你觉得你们之间更亲密还是更疏远"。它直接观测的是流程性记录：在 M=0 阶段，共同体的交流记录中出现大量差异性的即兴发挥和同步的交互（合唱、集体复调、身体节奏的互文）；而在 M=2 阶段，同一共同体的交流记录中出现的是规范性的确认——引用文本、核验解释、对错误解读的指控。这一转变是可记录的。</p>
+<p>三到五个具体场景各跑一遍：</p>
+<p>场景一：音乐排练。M=0：即兴段中的合奏，没有人去"核验"对方是否符合原谱，互动过程本身通过节奏差异来结算。M=2：按总谱排练，每个声部按谱核对，主体间性的形式从相互激发转为相互确认。判别式的两类指征在此场景中产生不同的分布。</p>
+<p>场景二：武术技击训练。M=0：师徒之间的口头指点与即兴对拆，徒弟的进步在与师傅互动中，但师傅的"传"需要师徒的当面对话。M=2：视频教学或拳谱学习，学习者按照影像和文字核对"架子"是否准确，权威来源不再是教练的当场解释，而是镜头的静态画面。判别式在此场景中分裂：口头训练仍保留 M=0，影像学习重复了 M=2 的自学特征，但训练成效不同于无媒介的亲身教学。</p>
+<p>场景三：文本注释传统。M=0：活着的口头传承中的对话，一个传统故事的师徒讲述是有节奏和情感起伏的现场；M=2：对同一个传统故事的注疏和版本校勘，主体间的核心动作是文本与文本之间的对齐，而不是身体与身体之间的触发。判别式在此场景中表现为"注释传统"本身的出现——没有 M=2，注释传统是不可发生的。</p>
+<p>场景四：日记与私我技术。M=0：作为对话的口头忏悔或修道实践，身体在场、指导者与受导者之间的肢体和声音差异；M=2：日记、书信、云端记录，主体间性以自我与文本之间的对话为特征，他人作为"想象中的读者"而存在。判别式在此场景中出现新的变化：M=2 的私我技术依然包含主体间性，但相位发生了改变——现实界与他人被推入想象的后台，文本和规范站到前台。</p>
+<p>场景五：数字媒介中的社交。M=0：面对面的身体互动、语音现场、即时的音色调制。M=2：社交平台上的文字帖与转发、引用、截图核验。判别式在此场景中表现最明显：M=2 的社交互动中"相互确认"（点赞、转发、引用）成为主要形式，而"相互激发"（即兴对话、身体同步）被压缩到需要实时视频或语音才能模拟出来的状态。</p>
+<p>五个场景跑下来答案互不相同，这正是判别式的价值所在：它不给出一个统一的"主体间性变少了"的结论，而是给出一个"主体间性从一种相位转向另一种相位"的结构性判断。</p>
+<h3>6.2 可观测指标</h3>
+<p>指标一：相互激发指数（MSI）。测的是在单次交互中，两个参与者之间的差异响应是否改变了交互的方向。测量方法是：对交互记录（音频、视频、文本日志）做事件切分，统计"回应偏离了对方预期但被对方接住"的次数除以总回应次数。MSI 值域为 0 到 1。在声音现场（M=0）中，健康的交互应出现 MSI &gt; 0.5；在文本交互（M=2）中，健康交互的 MSI 通常 &lt; 0.3，因为它的响应不靠偏离，而靠确认。两类媒介间的 MSI 差值至少需要 0.2 才算有效差异。若差值小于 0.2，则本文关于"媒介转换改变主体间性形式"的承诺不确证。</p>
+<p>指标二：确认偏向指数（CBI）。测的是互动中对"是否一致"的关注程度。测量方法：对交互记录做裁判性问句和引文引用行为的事件计数，除以交互总时长。CBI 值域为 0 到 1。在 M=2 的交互中，CBI 应显著高于 M=0 的交互中同样的值，至少高 0.3。若差值小于 0.3，本文关于"理念界升为前台"的推断不被支持。</p>
+<p>指标三：三界标记分布。对交互记录做三界标记，统计三个界分别出现在前台、后台、想象场的频次。若在 M=0 阶段出现理念界前台频次高于现实界，或者在 M=2 阶段出现理念界后台频次高于现实界，本文的相位轮换命题即被削弱。</p>
+<h3>6.3 读数的三条自我否决条款</h3>
+<p>信度否决：对同一批交互记录（同一批对象，同一套记录），同一位编码者按同一编码规则隔周重测，若 MSI 或 CBI 的重测信度低于 0.7，读数判为不稳，本轮分析所依赖的该读数作废。</p>
+<p>改名嫌疑否决：如果本文的 MSI 指标与已有的"联合注意时长比例"指标的相关系数高于 0.9，而 CBI 与"修正确认频率"相关系数也高于 0.9，则本文读数有改名嫌疑，应当在正文中写出"该指标与现成指标高度共线，本文的发生学解释并不为该指标增加可观测的分析价值"。若保留该指标但无法写出差别条件，该读数不成立。</p>
+<p>构念泄气否决：如果 MSI 在单次交互中与 CBI 的反向关系消失——即它们在某些本应相反的实验条件下同升同降——则说明"相互激发"与"相互确认"不是一个东西的两个相位，而只是同一情绪的两种表现，本文关于两者的相位锁定判断被否决。在此情形下，本文保留"主体间性是差异结算的发生结构"作为不受影响的模型，但放弃"相位重组是媒介转换的必然结果"这一较强承诺。</p>
+<h2>七、稳健性检验与证伪条件</h2>
+<p>本文命题的可证伪性需要两组检验条款，一组已经在本文论证过程中执行过，另一组尚未执行。</p>
+<h3>第一组：证伪条款</h3>
+<p>[未执行] 条款一：跨语言文本传统的比较证伪。如果本文的"媒介转换必然导致三界前台轮换"成立，那么在古希腊史诗从口头传统过渡到书面文本的过程中，应当同样观察到从"相互激发"到"相互确认"的转变。检验方法是：比较荷马史诗的早期口头表演阶段与后期书面阶段的诗学评论，看后者是否出现了对"一致性"的核验行为的显著增加。若没有出现相似的转变，或者出现了相反的转变——即书写过程使更多即兴变化变得被允许——则本文关于媒介闸值 M=2 必然把理念界推向前台的论点被削弱。现有解释预测不出这一结果，因为现有媒介研究通常把文本化描述为"标准化"，但不把标准化的出现理解为三界相位的重新排列；而本文预测的是：标准化只是相位重排的一个可观测后果，若标准化出现了但相位没有重排，本文就是错的。</p>
+<p>[未执行] 条款二：公共哲学教育中的交互日志检验。如果本文的差异结算命题成立，那么在一个不增加任何新知识的哲学培训项目中，单纯改变三界的相位安排（例如，把现场讨论改成文字批注，或将文字材料改成即兴对话）就足以改变参与者的主体判断方式。检验方法是：招募两组参与者，同样的哲学论题，一组用合成演练（M=0），一组用批注式文本（M=2），询问两组对"是否理解了队友"的回答分布。本文预测：M=2 组更多使用"他所说的论点与文本一致"这类确认式的描述。若统计上无差异则本文脆弱。现有解释预测不出这一结果，因为互动研究不把"理解"的自我报告内容作为指标。</p>
+<p>[未执行] 条款三：早期汉字文本的内部一致性检验。如果三界相位重组发生在采诗入宫之后的"用诗"阶段，那么在先秦的赋诗记录中，同一首诗被不同场合使用，其"被用"的具体动作中应当出现理念界从后台走上前台的过程性痕迹。检验方法是：对《左传》中所有赋诗实例逐条编码，看春秋早期的赋诗是否比春秋晚期更接近现场性即兴使用，之后是否出现文献核验式的确认性用法。如果这个变化不出现，或者出现的是从确认式使用到即兴式使用的变化，则本文对《诗经》案例的时间判断被推翻。现有注疏史研究多集中在义理争辩，不预测量化分布的时序变化，因此预测不出这一结果。第十节用十九条目的性取样的记录做了一次先导试跑：样本里春秋中期的记载（公元前557年、前546年）已经出现在场者的当场裁断，并未呈现"早期即兴、晚期核验"的时序，但样本既小又有偏倚，不能据此否定条款三，只记"本轮样本未见"；条款三所需的全部赋诗实例编码仍未执行。</p>
+<p>[未执行] 条款四：非人灵长类的差异结算实验。如果本文"主体间性是差异结算的发生结构"成立，并且在生物基质和媒介转换之间允许一个中间层次，那么在有限的意义上，非人灵长类应该具有最简形式的差异结算——即在两个个体之间，因对方的差异性反应而产生朝向对方反应的调整。但这个形式的差异结算不应当演化出理念界前台的主体间性，因为它们没有书写技术。检验方法是：比较猕猴与倭黑猩猩的互动记录中 MSI 指标是否达到 0.4，但在 CBI 指标上接近 0。如果非人灵长类的 MSI 与 CBI 指标都显著高于 0,则本文对"媒介条件作为理念界升台的必要条件"这一判断被削弱。现有动物认知研究不将 CBI 作为核心指标，因此预测不出这一结果。</p>
+<p>[已执行] 条款五：理论文献层面的最近邻检验。本文在第五节完成了这一检验：对特雷瓦森、舒茨、哈贝马斯、梅洛-庞蒂、胡塞尔、海德格尔、皮亚杰、维果茨基八位占位者进行了逐位盘点。结果：八位占位者的现有判断无一可直接推导出"主体间性是差异结算的发生结构"这一命题。未命中一个足以无损重述本文的核心判断的更近邻。必须指出：这一检验未经过站外系统检索，其结果只对本文作者可及的理论文献范围有效。</p>
+<p>条款六：本文核心命题自身的密度测试。这条检验要求问：如果把"差异结算"从本文命题中抽掉，命题还剩什么？答案是：剩下的是"主体间性不等于理解"这一平凡判断。如果只有这个判断能被文献支持，本文就没有论述增量。检验方法是：用两句现成文献中的句子拼合，看是否得到一个与本文命题不可分辨的复述。本节未检出这种拼合。在此判定上本文已执行检验，未发现拼合成立。</p>
+<h3>第二组：可执行设计说明</h3>
+<p>条款一可由古希腊口头传统与书面传统比较的学者执行，所需材料是现有荷马史诗文本与注释文献，时间约两年。条款二可由教育学科或临床研究者在三到六个月内完成，所需材料为小规模交互日志与问卷。条款三可由先秦文学研究者对《左传》赋诗记录进行系统编码，时间约一年。条款四可由比较认知研究者在已有非人灵长类互动记录上二次分析实现，时间约半年。</p>
+<h2>八、研究设计与方法</h2>
+<h3>8.1 方法论立场与研究类型</h3>
+<p>本文采用概念分析与发生学方法相结合的混合形态，其中以概念分析为主线，以发生学案例追踪为支撑。之所以不采用经验实验方法，原因在于本文研究的核心对象——主体间性的发生结构——无法在一次可观测实验中直接呈现，因为它的观察窗口是媒介转换的长时段过程。改用实验方法只能观察到某一个截面上的相位关系，而无法观察到相位从一个形态到另一个形态的转换。概念分析在本研究中不是为概念做语义梳理，而是做结构推演：从"主体尚未形成"这一前提出发，推演差异结算如何必然产生特征纠缠。发生学案例追踪则为这一结构推演提供了时间纵深——《诗经》从声音时代到文本时代的转换，作为一次实际的媒介转换，恰好构成了主体间性相位重组的自然档案。</p>
+<h3>8.2 材料来源与取样</h3>
+<p>本文所用材料分为概念材料和历史材料两类。概念材料取自特雷瓦森、舒茨、哈贝马斯、梅洛-庞蒂、胡塞尔、海德格尔、皮亚杰、维果茨基八位理论家的已公开著作，以及其对主体间性、发生认知、社会互动、共情等主题的成熟评论。历史材料取自《诗经》文本本身、《毛诗序》、《左传》中的赋诗记录、《国语·周语上》的献诗记载、《论语》与《墨子·公孟》中的用诗记述、《仪礼·乡饮酒礼》、《汉书·艺文志》与《后汉书·灵帝纪》，以及《诗经》学史上的重要注疏争议。第十节的取样与编码规则另有说明。概念材料覆盖现象学、社会哲学、发展心理学与发生学四个学科阵营，纳入标准是：一是该著作直接处理主体间性或主体发生的问题；二是该著作提出了一个明确的解释变量。八位占位者均符合这两个标准。历史材料以能够显示"用诗"方式变迁的记载为主，纳入标准是：该材料涉及同一文本在不同用法中的处理差异，可被用来观测差异结算密度的变化。</p>
+<p>必须如实说明：本节并未声称对先秦材料做了穷尽式统计，也未声称收集了某一类材料的全部既有证据。本文使用《诗经》案例属于说明性追踪，而非对先秦文献完整集的经验分析。</p>
+<h3>8.3 分析程序</h3>
+<p>本文的分析按三步走。第一步，占位检验：将前述八位占位者的核心命题逐位列明，提取各自最不可放弃的判断，再从本文命题出发指出分离线，为每位构造一个判决性反例，并区分已核验与未核验。第二步，案例追踪：对《诗经》从唱诵到文本的历史转换做发生学复构，按歌场、观乐、享宴赋诗、学堂、献诗与采诗、文本化六个节点逐段追踪，在每个节点上标记三界读数、媒介闸值与裁断来源（第十节）。采诗是否确有其制，史料上不能确认，故只作条件性节点。第三步，判别式与证伪设计：给出可裁决判据，构造三到五个具体场景的预测差异，并列出证伪条款。三个步骤可复现性最强的是第三步，因为它提供了明确的判据与否定条件。</p>
+<h3>8.4 信度与效度</h3>
+<p>本文概念分析的效度支持来自三层：第一层是理论层面的判别，即本文命题是否能在八位占位者的理论中还原，第五节交代了还原失败；第二层是案例层面的对应，即《诗经》案例中三界读数的转换是否照着本文预测的方式发生，第十节交代了检验细节；第三层是证伪层面的设计，即本文是否提供了他人可执行的否定条件，第七节交代了这组条件。凡是文中声称"未执行"的检验，一律不写为已做结论。这种保留增加了效度而不是降低效度，因为它避免了以推测冒充结果的危险。</p>
+<h2>九、分析（一）：竞争解释的检验</h2>
+<p>本节只交代结果，不作意义引申。对占位者的逐一检验方式如下：写出占位者最强的一版判断，承认其在理论内部是自洽的；然后给出一个它解释不了的现象；最后画出预测分离线。</p>
+<p>对特雷瓦森。 他的最强判断是：婴儿与照料者之间有先于任何语言和规范的节律性相互调节能力，这种能力构成了此后所有主体间理解的神经和行为基础。需要检验的现象是：一个从未受到抚育者调制的儿童（如某些早期机构的极低互动婴儿），在后期获得密集交互之后，其主体间性的形式和常人是否有差异。在特雷瓦森的理论框架内，初级主体间性是生物基质的直接展现,后期的密集互动只是恢复了它；因此预测：这种儿童的"恢复"将弥补初级机制，最终达到正常水平。本文预测：初级主体间性是差异结算在生物基质层的一种相位，早期缺乏不等于该相位从未出现，而是差异序列的输入长期未被序化，因此后期的密集互动不能简单"恢复"它，反而会表现为差异结算在特定维度上的不可完全补偿，这在认知上表现为主体间性成熟滞后于常人。预测分离：按特雷瓦森判恢复可补；按本文判不可完全补偿。</p>
+<p>对舒茨。 他的最强判断是：理解他人的必要条件是共享的类型化知识库存，没有这个库存，人际理解无法启动。需要检验的现象是：两个语言不通、类型库存几乎没有交叉的陌生人，在第一次面对同一个紧急任务时，出现迅速而有效的协作。按照舒茨的模型，这种现象缺乏类型化基础，如果真实发生，就必须说明类型库存在互动过程中高速生成或早已存在。本文预测：这种现象说明真正的解释变量是差异结算，而不是类型库存的共享——类型库存不是起点，而是结算的产物。预测分离：按舒茨判为类型化库存必须先在或有不可消除的门槛；按本文判差异结算可直接生成协作。</p>
+<p>对哈贝马斯。 他的最强判断是：主体间性必须依托于可批判的有效性要求，只有在言语行动中才可能成为理性交往关系。需要检验的现象是：失语症患者之间的非语言交互，在无声的符号性互动中能表达同意或拒绝，而这些同意或拒绝不具备命题式的内容。哈贝马斯模型需要处理的是，这种交互是否可以被纳入交往理性的范畴，如果纳入，它的有效性要求由什么承载？本文预测：主体间性可以在不发出任何命题有效性要求的条件下成立，因为差异结算在前语言层面即可发生，语言只是结算的一个高级相位。预测分离：按哈贝马斯判为非语言的交互要么不是完整的交往，要么只能属于次要的边缘形态；按本文判它是主体间性的合格例型。</p>
+<p>对梅洛-庞蒂。 他的最强判断是：身体间性使我和他人能够直接地、前反思地彼此通达，这种通达构成一切主体间性的根基。需要检验的现象是：在身体间性最突出的情境——如双人舞蹈、身体模仿或接触即兴——训练有素的舞者和身体麻木的成人相比，身体间性并非自动出现，而是需要长期训练（即差异序列的重复结算）才能达成。这一现象暴露出身体间性本身有发生学前提。梅洛-庞蒂主义可以回应说，所有人都有身体图式，训练使这个图式变得可通达。本文预测：训练改变的不是"图式是否可通达"，而是差异化响应能力；没有这项能力，身体图式是有的，但身体间性不出现。预测分离：按梅洛-庞蒂判为训练开发了已有的可通达性；按本文判为训练建立了一条新的差异结算通道。</p>
+<p>对胡塞尔。 他的最强判断是：通过结对和共现，我能在知觉他人身体时直接将其理解为有心灵的他人，因此主体间性根植于先验意识的内在成就。需要检验的现象是：有面孔失认症的人能识别他人身体位置并配合行动，却不能识别他人表情所载荷的情感意涵，这个不对称无法用"部分缺失"的统一能力来说清楚。本文预测：这表明"结对"不是一个统一的统觉，而是差异结算在不同参考系中分别建立的结构，表情识别根植于一条参考系中的差异反应，身体空间定位根植于另一条。预测分离：按胡塞尔判为意向结构的部分损伤；按本文判为不同参考系的结算互不统属。</p>
+<p>对海德格尔。 他的最强判断是：此在总是已经与他人共在，共在是此在的实存规定，不需要任何经验性的面对面事件来给予。需要检验的现象是：在极端隔离中成长的人，其存在论结构（如对他人的先验开放）虽然在形式意义上被保留了，但经验的自我和他人关系完全未展开。本文预测：共在的实存论条件本身仍需差异序列来激活，没有差异者，此在并不总是已经共在。预测分离：按海德格尔判为共在作为存在论规定不依赖经验激活；按本文判为共在的生成须有差异者到场。</p>
+<p>对皮亚杰。 他的最强判断是：认知发展从感知运动阶段进入形式运算阶段，有普遍的逻辑阶段序列，观点采择是形式运算成熟的标志之一。需要检验的现象是：用日常社会冲突情境替代几何空间任务，儿童在远比形式运算成熟的年龄之前就展现出了观点采择。本文预测：观点采择不是阶段成熟的产物，而是差异参考系发生了转换——当差异结算的现实参照系换成社会情绪参照系时，同一种认知能力不是被"提前"了，而是被不同的参考系重新结算了。预测分离：按皮亚杰判为任务过度简化或运算阶段提前；按本文判为不同参考系的结算产物不可拿同一把阶段尺来量。</p>
+<p>对维果茨基。 他的最强判断是：儿童的认知能力通过与"更有能力的他人"合作而在最近发展区中发展。需要检验的现象是：儿童与同样困惑甚至更迟疑的同伴共同摸索时，其认知可发展。本文预测：这里的机制不是脚手架，而是差异结算——另一同伴即便不是能力更强的他人，仍提供了另一个差异位置，使原本不可见的自我蒙昧得以显现。预测分离：按维果茨基判为交互对象不具正向能力梯度则发展难以解释；按本文判为只需差异位置，不需能力梯度。</p>
+<p>在上述八个检验中，预测分离线均落在占位者的判断与本文判断之间，而非落在研究对象的不同选择上。需要说明的是：这八个检验没有一个在本文中交付实验结果；每一个检验都写成了可被后续研究者执行的形态。若后续任何一种检验的结果反而支持占位者的预测，本文的承重命题将被削弱，而不是被拯救。</p>
+<h2>十、分析（二）：《诗经》案例追踪</h2>
+<p>本节兑现第八节许诺的案例追踪。先交代取样与编码，再按"歌场、观乐、享宴赋诗、学堂、献诗与采诗、文本化"的次序逐段判读，最后汇总读数，用它检验第六节的判别式。检验的结果先说在前面：追踪削弱了本文此前把"理念界升为前台"完全系于媒介闸值 M 的说法。这一点在 10.8 和 10.9 展开，判别式也据此做了修订。</p>
+<h3>10.1 取样与编码规则</h3>
+<p>取样。本节从八个文本来源取得十九条记录：《仪礼·乡饮酒礼》《论语》《墨子·公孟》《左传》《国语·周语上》《汉书·艺文志》《毛诗序》和《后汉书·灵帝纪》。其中《左传》襄公二十七年一条含七次赋诗，按七条分别计。取样是目的性的，取的是后世引用最多的用诗记载，不是对先秦用诗材料的穷尽。这带来两个偏倚，须在读数之前说明。第一，这些记载之所以被留下，多半因为有人对它们作了评断，所以叙事文本里"有当场裁断"的比例会被高估。第二，《左传》《国语》《论语》《墨子》的成书都晚于所记的事件，所记的"现场"是后来的叙述。本节把它们当作关于现场的最早可及的描述，而不当作现场录音。引文依通行本，关键词与大意已核对，页码与个别字句未逐条核对，凡有此情形的在文中标出"据通行本"。</p>
+<p>编码。沿用 3.3 的三个读数，并补充一栏。相位读数 P 的三个位置这样判：前台，是参与者的行为直接指向、并立刻被对方回应的那一界；后台记账，是使这个行为"合格"的参照所在的界；想象后场，是只能在场外指涉、在现场里无法被触及的界。媒介闸值 M 照 3.3 取 0、1、2：传的动作由活人对活人（0），活人与文本并用（1），文本对人成为权威来源（2）。差异结算密度 δ 只在 M 为 0 或 1 的范围内计，理由见 10.7。补充的一栏是裁断来源 A：对"这次用诗是否合格"作出裁断的是谁，取值为无、在场者、文本三类，依据是记载中是否出现"善哉""不类""不达"之类的评断词句及其发出者。</p>
+<p>加这一栏的原因，是追踪过程中暴露出一个问题：6.1 的判别式把"确认"与 M=2 绑在一起，可是《左传》里的当场评断，在没有任何文本参与的情形下就已经大量出现。必须先把"确认"拆成两个来源，才能判读。编码者只有一人，没有第二编码者，所以 6.3 的信度条款在本节无法执行；凡带判断成分的取值，下文逐条附依据，供他人复核。本节也不计算 MSI 与 CBI 的数值：这两个指标要求对交互记录做事件切分与计数，而这里的记录来自叙事文本，无法按 6.2 的口径切分，勉强给出小数只会制造虚假的精度。本节只做类别判读。</p>
+<h3>10.2 歌场：作为"诵弦歌舞"的《诗》</h3>
+<p>声音现场的《诗》首先是一个身体事件。《墨子·公孟》借对儒者的批评留下一句话："诵《诗》三百，弦《诗》三百，歌《诗》三百，舞《诗》三百。"上下文是墨子批评儒者在不办丧事的间隙还要从事这些活动，耽误了治事与生产。这是反对者的转述，所以它证明的不是儒者怎么想，而是在墨子眼里儒者怎么做：诗被诵、被弦、被歌、被舞，四种方式都要动用嗓子、手与脚，没有一种是只用眼睛读。</p>
+<p>《仪礼·乡饮酒礼》记合乐一节："合乐：《周南》：《关雎》《葛覃》《卷耳》；《召南》：《鹊巢》《采蘩》《采蘋》。"（据通行本，字句未逐字核对）这是《关雎》的一种已知的早期用法：它是一场饮酒礼仪节序列里的一环，次序、人位、升降都被规定，但唱的时候没有任何一个人在解释它。《论语·八佾》另记孔子的评语："《关雎》乐而不淫，哀而不伤。"这句评语说的是听的分寸，而不是诗的"意思"：乐到哪里为止，哀到哪里为止，量的是声音在听者身上引起的东西。</p>
+<p>三条记录的读数一致：M=0；前台是现实界与自我界，即嗓音、仪节与听者的乐与哀；理念界在后台，以"分寸"的方式记账，没有被说出来；想象后场是诗人之志，没有任何一条记录试图去指涉它。裁断来源 A：乡饮酒礼里没有对唱法的评断，孔子的话是听者对声音的评价，不是对"这次用得是否合格"的裁断，二者都记为无。这与 3.3 对《关雎》原初唱诵的读数相符。δ：《关雎》在这三条里出现两种用法，一是礼仪中的合乐，一是听者的评乐，δ=2。本节取样触到的功能分支是宴、谏、教三类，3.3 所列的"祭"没有取到可靠的材料，不作断言。</p>
+<h3>10.3 观乐：一场已有次序的声音现场</h3>
+<p>《左传》襄公二十九年（公元前544年）记吴公子札到鲁国聘问，请"观于周乐"。乐工依次为他歌《周南》《召南》，《邶》《鄘》《卫》，《王》，《郑》，《齐》，《豳》，《秦》，《魏》，《唐》，《陈》，然后是《小雅》《大雅》和《颂》。通行本在《陈》之后记"自郐以下无讥焉"，意思是郐以下的国风也歌了，只是季札没有再评（据通行本，未逐字核对）。除歌之外，同一段还记他观舞，评语多以"美哉"起头。</p>
+<p>这一条有三个读数上的特点。其一，这是一场 M=0 的活人对活人的现场：乐工歌，季札听，没有任何文本在场。其二，歌的次序已经近于今本《诗经》的编次：二南居首，邶鄘卫、王、郑、齐相继，雅、颂在后。但差别也很明显：豳排在齐之后，而不在国风之末；秦排在魏、唐之前；陈接在唐之后。今本十五国风的次序是周南、召南、邶、鄘、卫、王、郑、齐、魏、唐、秦、陈、桧、曹、豳。两相比较可知，公元前544年已经有一套被乐工掌握的、成组的、有次序的诗乐，但它并不等同于今本。按通行的说法孔子生于前551年，这一年他才七岁。本文不就孔子是否删诗表态，只记下一个时间上的事实：成组的次序先于孔子的活动。</p>
+<p>其三，季札的评语是理念界的判断："美哉，渊乎"是对卫风气质的品评，"国无主，其能久乎"是对陈的政治预言。也就是说，在 M=0 的现场里，理念界已经站到了前台，只是站在听者一边，唱者唱的仍然是声音。读数：前台，现实界（歌与舞）与理念界（评语）并列；后台，自我界；想象后场，各国风的作者之志。裁断来源 A：在场者（季札）。δ：这批诗在歌场里是被唱的，在这一场里又被用来"观"，由诗看一国的政治，是两种不同的用法，δ 记为 2。《论语·阳货》后来把这种用法列为"诗可以观"。</p>
+<h3>10.4 享宴赋诗：三组共十一条记录</h3>
+<p>先说"赋"。汉人以"不歌而诵"训赋（《汉书·艺文志》），则赋诗是把一首诗在场合中念出来，不需要乐工与乐器。这使它比歌场轻便，也更容易被挪作他用。下面三组记载共十一条，都是 M=0。</p>
+<p>第一组，《左传》僖公二十三年（公元前637年），秦伯享晋公子重耳。原文是："他日，公享之。子犯曰：'吾不如衰之文也。请使衰从。'公子赋《河水》，公赋《六月》。赵衰曰：'重耳拜赐。'公子降，拜，稽首，公降一级而辞焉。"这一条值得注意的有两点。一是子犯的那句话。"吾不如衰之文也"，是对两个人之间的差异的一次明说，它发生在享礼之前，却决定了谁来说话：在这场享礼中，公子的"我"由赵衰代位。差异结算在这里是外显的，不是隐含的。二是赵衰的"重耳拜赐"：秦伯赋《六月》之后，赵衰把公子的反应翻译成一个礼的动作，也就是拜。两首诗各自的所指，注家说法不一，本文不取其一。读数：M=0；前台，现实界（升降拜稽首）与理念界（借诗义达意）；后台，自我界（公子之志由赵衰代位）；想象后场，两首诗的"本来"之义（断章取义把它悬置了）；A：在场者（秦伯"降一级而辞"，是以礼接受并回应）。</p>
+<p>第二组，《左传》襄公十六年（公元前557年）："晋侯与诸侯宴于温，使诸大夫舞，曰：'歌诗必类。'齐高厚之诗不类。荀偃怒，且曰：'诸侯有异志矣！'使诸大夫盟高厚，高厚逃归。于是叔孙豹、晋荀偃、宋向戌、卫宁殖、郑公孙虿、小邾之大夫盟，曰：'同讨不庭。'"（据通行本，字句未逐字核对）这一条是整个追踪里对本文最不利的，也是最重要的。在一个没有任何文本的现场里，出现了一条明确的当场规则（"歌诗必类"）、一次当场的合格判断（"不类"），以及由此引发的后果：怒、盟、逃归、同讨。按 6.1 的判别式，这种"确认"应当到 M=2 才成为主导形态，这里它在 M=0 就已经是主导。"类"的确切所指，注家有不同的说法，本文取宽义：诗义须与场合所要求的相合。读数：M=0；前台，理念界（"类"的规范）与现实界（舞）；后台，自我界；想象后场，高厚的"本意"，荀偃由"不类"推断他"有异志"，可见志在这里是被推断的，不是被指涉的；A：在场者（荀偃代晋侯裁断）。</p>
+<p>第三组，《左传》襄公二十七年（公元前546年），郑伯在垂陇享晋国的赵孟，随行的七位郑国大夫各赋一诗，赵孟逐一回应（据通行本）：</p>
+<p>子展赋《草虫》，赵孟曰："善哉！民之主也。抑武也不足以当之。"伯有赋《鹑之贲贲》，赵孟曰："床笫之言不逾阈，况在野乎？非使人之所得闻也。"子西赋《黍苗》之四章，赵孟曰："寡君在，武何能焉？"子产赋《隰桑》，赵孟曰："武请受其卒章。"子大叔赋《野有蔓草》，赵孟曰："吾子之惠也。"印段赋《蟋蟀》，赵孟曰："善哉！保家之主也。吾有望矣。"公孙段赋《桑扈》，赵孟曰："匪交匪敖，福将焉往？若保是言也，欲辞福禄，得乎？"</p>
+<p>事后赵孟对叔向说："伯有将为戮矣！诗以言志，志诬其上而公怨之，以为宾荣，其能久乎？幸而后亡。"（后半句据通行本，未逐字核对）</p>
+<p>七条的读数大体一致：M=0；前台，理念界与现实界；后台，自我界；想象后场，诗的本义与赋者之志；A：在场者，发出者是权位最高的受享者赵孟。但仔细看赵孟的七句回应，会发现它们并不是七次"合格或不合格"的二分判断。子展与印段得到的是褒奖；伯有得到的是拒斥，赵孟把他的诗听成了私室之言；子西得到的是辞让；子产得到的是一个请求，赵孟要求再受其卒章，也就是请他把最后一章再唱一遍；子大叔得到的是致谢；公孙段得到的是一句引诗的戒勉。其中子产与赵孟的往来，是整个样本里最接近 6.2 所说的"回应偏离了对方预期但被对方接住"的一次，却发生在 M=0 的同一场里，和伯有被拒斥的那一次同场并存。</p>
+<p>这七条还有两处可以直接和本文的承重命题对读。第一，伯有与子大叔的结局不同，记载里的差别落在听者怎样接，不在诗的字面。伯有的出格没有被接住，而且被预言了后果；子大叔的诗被接住了，换来一句"吾子之惠也"。差异能否被结算成一次合格的交互，由对方的接法决定，这正是 3.2 对差异序列的定义所要求的东西。第二，赵孟的公式"诗以言志"在这里是一个事后的读法：志是从"赋"这个动作被听者接住或不接住之后推出来的（"志诬其上"），不是先摆在那里等着被表达的。《毛诗序》的"在心为志，发言为诗"预设了一个先在于言说的心志，引言里已经指出这一点；《左传》的现场则显示，志在场上是被结算出来的。这个对照不证明《毛诗序》错，只说明两种说法所对应的媒介条件不同，10.7 会回到这一点。</p>
+<h3>10.5 学堂：教与学的现场</h3>
+<p>《论语》里有三处与用诗直接相关。其一，《八佾》记子夏问："'巧笑倩兮，美目盼兮，素以为绚兮。'何谓也？"子曰："绘事后素。"曰："礼后乎？"子曰："起予者商也！始可与言《诗》已矣。"这是样本里最清楚的一次师生之间的相互激发：子夏从一句诗跳到礼，这一步不在孔子预设的路上，孔子接住了，并且明说"起予"，也就是这一步反过来启发了老师。读数：M=0；前台，自我界（领悟）与理念界（礼）；后台，现实界（绘事的比喻）；想象后场，诗句的原意；A：在场者（孔子）。</p>
+<p>其二，《子路》记孔子的话："诵《诗》三百，授之以政，不达；使于四方，不能专对；虽多，亦奚以为？"这句话的对象是"诵"：能背诵三百篇，却不能在政事与出使的场合中用它，背得再多也不算数。它把两种东西分开了：把诗装在身上（诵），和把诗用在场上（专对）。这是一次一般性的评断，不针对某一次用诗，A 记为无；M 记为 1，因为"诵三百"已经隐含了一个被记住的、固定的篇目集合，活人对活人的传习之外，有了一个相对稳定的文本集合在场。其三，《季氏》记陈亢问伯鱼："不学《诗》，无以言。"《阳货》记孔子对弟子说："《诗》，可以兴，可以观，可以群，可以怨。"这是对用诗功能的一次归纳。它按"诗对人起的作用"分为四类，与 3.3 按场合分的"祭宴谏教"不是同一种分法，δ 的计数应当按场合分以便复核，所以兴观群怨只作参照，不替换 3.3 的口径。</p>
+<p>这三处合起来的读数是：学堂是《诗》的前台里自我界位置最高的场合。原因不难理解，教学的目标指向学习者的自我，所以自我界在这里被拉到了前台，理念界不退场，而是成为通向自我界的通道（"礼后乎"）。这与朝聘场合里自我界被压入后台形成对照，也使 10.8 的"前台由场合分"有了第三种取值。</p>
+<h3>10.6 献诗与采诗：另一条进入宫廷的路径</h3>
+<p>《国语·周语上》记邵公谏厉王，说天子听政的办法是："使公卿至于列士献诗，瞽献曲，史献书，师箴，瞍赋，矇诵，百工谏，庶人传语……而后王斟酌焉。"（据通行本，字句未逐字核对）这里的献诗者是公卿列士，是知名的、在场的人，诗是他们当面献上的；献的目的是谏，裁断者是王（"王斟酌焉"）。读数：M=0；前台，理念界（谏的内容）与现实界（献的仪式）；后台，自我界；想象后场，献诗者的私意；A：在场者。这一条与赋诗的读数相近，说明在朝聘享宴之外，宫廷里还有一条以谏为目的的用诗路径，同样是现场的、有人裁断的。</p>
+<p>采诗是另一回事。《汉书·艺文志》说："古有采诗之官，王者所以观风俗，知得失，自考正也。"这是汉人的叙述，周代是否真有此官制，后世有不少争论，本文不表态，也不把它计作一条独立记录。它在本文里只能是一个条件性的节点：如果采诗制度成立，那么采诗官在"采"与"献"之间做了一次把声音交给另一批人的转手，诗由歌场里的歌者，交到了官署里掌管音律的人手上，M 在这一步从 0 移向 1。8.3 原先把"采诗入宫"当作一个已确认的换土节点，这样说证据不够，现改为条件性节点；有据可查的进入宫廷的路径是献诗与赋诗。</p>
+<h3>10.7 文本化：从"讽诵"到家法</h3>
+<p>《汉书·艺文志》说："孔子纯取周诗，上采殷，下取鲁，凡三百五篇，遭秦而全者，以其讽诵，不独在竹帛故也。"这句话的价值，不在孔子是否纯取，而在汉人自己承认：《诗》在秦火中保存下来，靠的是口头的讽诵，而不只是竹帛。也就是说，在已经有文本的时代，《诗》的承载方式仍然是口传与文本并用，M 的转换不是一个断点，而是一段过渡。这一条记为 M=1。</p>
+<p>接下来《艺文志》记："汉兴，鲁申公为《诗》训故，而齐辕固、燕韩生皆为之传。"又记："又有毛公之学，自谓子夏所传，而河间献王好之，未得立。"（三家立于学官的一段据通行本，未逐字核对）同一个文本，在汉初同时进入了鲁、齐、韩、毛四个解释系统。这里有一个对本文自己的规则的检验。3.3 规定：同一文本被改写成另一个文本，则不计入 δ，因为差异序列已经跨入新的土壤。训故、传、序，都是另一个文本，所以按照这条规则，δ 在这里必须停止计数。这不是方法上的漏洞，而是 M 越过 1 的一个可观测标志：用诗的单位，由"一次场合中的使用"，变成了"一个文本对另一个文本的注释"，δ 无法跨越这个换算。因此本文只在 M 为 0 或 1 的范围内报告 δ，也只有《关雎》一首能够跨记录计数，δ=2。</p>
+<p>《毛诗序》对《关雎》的断语是："《关雎》，后妃之德也，风之始也，所以风天下而正夫妇也。"与 10.2 的乡饮酒礼对照，同一首诗，由"仪节序列里的一环"，变成了"一句规定其用途的文本断言"。这句断言不依赖任何一次具体的场合，它规定任何场合中的使用应当怎样才算合格。读数：M=2；前台，理念界；后台，现实界（礼的仪节仍在，但已退为记账的参照）；想象后场，现场的声音与欲动；A：文本。</p>
+<p>最后一个节点是石经。《后汉书·灵帝纪》记熹平四年（公元175年）："诏诸儒正定五经文字，刻石立于太学门外。"（据通行本，字句与年份未逐字核对；石经刻成的年份取常见口径，约在光和六年，即公元183年，亦待核）通行的说法认为熹平石经所刻的《诗》是《鲁诗》（待核）。无论所刻为何家，这一步的意义在于：合格与否的裁断，从某一个在场者的口中，转到了立在门外的一块石头上。读者站在石前，对的是石上的字，不再需要任何在场的权威。读数：M=2；前台，理念界；后台，现实界；想象后场，现实界与自我界中一切不可复现的东西；A：文本。</p>
+<p>把这几步连起来，可以看到 M=2 带来的一个具体变化，本文称之为脱场性：合格的标准从场合里生出来、随场合而灭，变成可以脱离场合而独立存在、被携带、被引用。《左传》里荀偃的"不类"只在温地的宴会上有效，毛序与石经的断语在任何地方、任何时候都有效。</p>
+<h3>10.8 汇总与判读</h3>
+<p>下表汇总十九条记录的编码。表中"据"字后为编码的主要依据，供复核。</p>
+<div class="tblwrap"><table class="tbl"><thead><tr><th>编号</th><th>记录</th><th>M</th><th>前台</th><th>后台记账</th><th>想象后场</th><th>A</th><th>依据</th></tr></thead><tbody><tr><td>1</td><td>《仪礼·乡饮酒礼》合乐《关雎》等</td><td>0</td><td>现实界</td><td>理念界（仪节次序）</td><td>诗人之志</td><td>无</td><td>据：仪节序列，无评断</td></tr><tr><td>2</td><td>《论语·八佾》孔子评《关雎》</td><td>0</td><td>现实界、自我界</td><td>理念界（分寸）</td><td>诗人之志</td><td>无</td><td>据：评的是声音在听者身上的作用</td></tr><tr><td>3</td><td>《墨子·公孟》诵弦歌舞</td><td>0</td><td>现实界、自我界</td><td>理念界</td><td>诗人之志</td><td>无</td><td>据：四种身体方式，反对者转述</td></tr><tr><td>4</td><td>《左传》襄29 季札观乐</td><td>0</td><td>现实界、理念界</td><td>自我界</td><td>作者之志</td><td>在场者</td><td>据：季札逐国评语</td></tr><tr><td>5</td><td>《左传》僖23 秦伯享重耳</td><td>0</td><td>现实界、理念界</td><td>自我界（赵衰代位）</td><td>诗的本义</td><td>在场者</td><td>据：秦伯"降一级而辞"</td></tr><tr><td>6</td><td>《左传》襄16 宴于温</td><td>0</td><td>理念界、现实界</td><td>自我界</td><td>高厚之志（被推断）</td><td>在场者</td><td>据："歌诗必类""不类"</td></tr><tr><td>7</td><td>襄27 子展《草虫》</td><td>0</td><td>理念界、现实界</td><td>自我界</td><td>赋者之志（被推断）</td><td>在场者</td><td>据：赵孟褒奖</td></tr><tr><td>8</td><td>襄27 伯有《鹑之贲贲》</td><td>0</td><td>理念界、现实界</td><td>自我界</td><td>赋者之志（被推断）</td><td>在场者</td><td>据：赵孟拒斥，预言其祸</td></tr><tr><td>9</td><td>襄27 子西《黍苗》</td><td>0</td><td>理念界、现实界</td><td>自我界</td><td>赋者之志（被推断）</td><td>在场者</td><td>据：赵孟辞让</td></tr><tr><td>10</td><td>襄27 子产《隰桑》</td><td>0</td><td>理念界、现实界</td><td>自我界</td><td>赋者之志（被推断）</td><td>在场者</td><td>据：赵孟"请受其卒章"</td></tr><tr><td>11</td><td>襄27 子大叔《野有蔓草》</td><td>0</td><td>理念界、现实界</td><td>自我界</td><td>赋者之志（被推断）</td><td>在场者</td><td>据：赵孟致谢</td></tr><tr><td>12</td><td>襄27 印段《蟋蟀》</td><td>0</td><td>理念界、现实界</td><td>自我界</td><td>赋者之志（被推断）</td><td>在场者</td><td>据：赵孟褒奖</td></tr><tr><td>13</td><td>襄27 公孙段《桑扈》</td><td>0</td><td>理念界、现实界</td><td>自我界</td><td>赋者之志（被推断）</td><td>在场者</td><td>据：赵孟引诗戒勉</td></tr><tr><td>14</td><td>《论语·八佾》子夏问"巧笑倩兮"</td><td>0</td><td>自我界、理念界</td><td>现实界</td><td>诗句原意</td><td>在场者</td><td>据："起予者商也"</td></tr><tr><td>15</td><td>《论语·子路》"诵《诗》三百"</td><td>1</td><td>自我界、理念界</td><td>现实界</td><td>（无）</td><td>无</td><td>据：一般性评断，不针对某次用诗</td></tr><tr><td>16</td><td>《国语·周语上》献诗</td><td>0</td><td>理念界、现实界</td><td>自我界</td><td>献诗者私意</td><td>在场者</td><td>据："王斟酌焉"</td></tr><tr><td>17</td><td>《汉志》讽诵与采诗之说</td><td>1</td><td>理念界</td><td>现实界</td><td>自我界</td><td>无</td><td>据：口传与竹帛并用</td></tr><tr><td>18</td><td>三家训故、《毛诗序》</td><td>2</td><td>理念界</td><td>现实界</td><td>现场的声音与欲动</td><td>文本</td><td>据：序规定合格的解读</td></tr><tr><td>19</td><td>熹平石经</td><td>2</td><td>理念界</td><td>现实界</td><td>现实界与自我界中不可复现者</td><td>文本</td><td>据：裁断移到石上</td></tr></tbody></table></div>
+<p>表中的读数，可以得出下列判读。</p>
+<p>其一，三界全勤。十九条记录里，每一条的三界都在三个位置上各有归属，没有一条出现某一界完全缺席。但必须指出，这一条与其说是发现，不如说是编码规则的后果：P 的三个位置必有一界被安放其中，所以"全勤"在这个编码下近乎必然成立，不应记为对本文的支持。</p>
+<p>其二，前台由场合分，不由 M 分。按场合归类，歌场三条（乡饮酒合乐、孔子评《关雎》、墨子所述诵弦歌舞）的前台是现实界与自我界，理念界在后台，没有一条把理念界放在前台；朝聘享宴与献诗共十一条（季札观乐、僖公二十三年、襄公十六年、襄公二十七年七条、《国语》献诗），理念界全部在前台；学堂两条的前台是混合的；汉以后的三条，理念界在前台。而前两类全部是 M=0。同在 M=0 之下，理念界在歌场里退后，在朝聘享宴里居前，所以 M 不能解释前台是哪一界。能解释它的是用诗的场合：场合里有没有一个被授权对用诗作裁断的人，以及用诗的目的是不是要达成一件事（结盟、请求、谏、聘问）。</p>
+<p>其三，在场裁断不依赖文本。朝聘享宴与献诗的十一条记录里，十一条都出现了在场者对用诗的当场裁断或回应（A=在场者）。这个比例受到 10.1 所说的偏倚影响，叙事文本倾向于记录有评断的赋诗，所以它是上限而不是估计值，但它至少说明：确认型的互动在没有任何文本的 M=0 现场里就已经存在。汉以后三条中，A 为文本的有两条（毛序、石经），汉志一条记为无。</p>
+<p>其四，激发与确认同场并存。襄公二十七年的七条里，既有伯有被拒斥（确认型），又有子产与赵孟的往来、子大叔被接住（激发型），《论语》子夏一条是激发型。也就是说，6.1 把"相互激发"与 M=0、"相互确认"与 M=2 一一对应，样本不支持；两种形态在 M=0 里可以同时出现，区分它们的变量是对方怎样接，而不是 M。</p>
+<p>其五，志是被推断的。朝聘类里，赋者之志在每一条记录里都不是被指涉的对象，而是由听者根据赋诗的动作与场合推断出来的（"不类"所以"有异志"，"志诬其上"所以"将为戮"）。这与 3.2 把"心志本义"放在声音现场的想象后场相符，是样本中对本文最有利的一条读数。进入 M=2 之后，进入想象后场的东西变了：不再是赋者之志，而是现场本身，即声音、身体与欲动。</p>
+<p>其六，δ 只能在 M 为 0 或 1 时计。10.7 已经说明。δ 在样本中能够跨记录计数的只有《关雎》，取值为 2，不足以支持任何关于 δ 随媒介变化的结论。3.3 所说的最高值 4 在本节没有得到验证，只触到宴、谏、教三类。</p>
+<h3>10.9 对判别式的修订与本节的限度</h3>
+<p>追踪的结果可以直接用 6.3 的精神处理。6.1 的判别式 D 说：当 M 从 0 升到 2，共同体的主体间性形式发生从"相互激发"到"相互确认"的转变。10.8 的第二、三、四条表明，确认型互动在 M=0 的朝聘场合里已经是主导，激发与确认又在同一场里并存，D 以 M 单独作为解释变量，在样本上被削弱。样本很小，又有偏倚，不足以证伪 D，但按本文自己的立场，"被削弱"之后应当修订，而不是辩护。修订后的判别式 D′ 如下。</p>
+<p>D′：媒介闸值 M 不决定理念界是否升为前台，也不决定确认型互动是否出现；它决定的是裁断权的来源与归属。M=0 时，裁断权归在场者，随场合而生灭；M=2 时，裁断权归文本，脱离场合而常驻。场合类型（歌场、朝聘享宴、学堂）是与 M 并列的第二个解释变量，决定理念界在 M=0 时居前还是居后。D′ 有两项可观测的后果：其一，用诗记录的体裁由评语（当场，针对某一次使用）转为注疏与校勘（跨时，针对文本）；其二，差异结算密度 δ 失去可计性。</p>
+<p>相应地，6.2 的指标二也需要拆开：确认偏向指数 CBI 分为 CBI-场（由在场者作出的裁断）与 CBI-文（由文本作出的裁断）。M=2 的预测由"CBI 整体显著升高"改为"CBI-文 显著高于 CBI-场"，而不再断言 CBI 整体在 M=2 时更高。同时，前面各节中"必然导致""必然的相位重组"一类措辞，凡涉及理念界升台与 M 的关系处，都应读作"在 D′ 所述的意义上"。</p>
+<p>相应增补一条尚未执行的证伪条款。条款七：对《左传》全部赋诗及评断记载逐条编码，并选取汉代以后同一类型的用诗记载作对照。D′ 预测：春秋记载里以当场评语为裁断方式的占多数，汉代以后以引文本、校勘、立家法为裁断方式的占多数；两期的 CBI-文 比例应有显著差别。若春秋记载里 CBI-文 与汉代无显著差别，或者歌场类记录里理念界居前的比例与朝聘类无显著差别，D′ 即被削弱。此项可由先秦文学研究者在一至两年内完成，所需材料为《左传》《国语》及汉代经学文献。</p>
+<p>本节的限度，须一并写明。第一，样本十九条，目的性取样，偏重著名的记载；第二，单一编码者，P、A 的取值带判断成分，无法检验信度；第三，材料为叙事文本，对现场的记述经过了叙述者的选择；第四，祭这一类用诗没有取到可靠材料；第五，本节没有逐条核对页码。因此，本节的性质是一次说明性的追踪，它支持的是"需要修订"，不是"已经证明"。</p>
+<p>还要补一句对本文承重命题的影响。承重命题是：主体间性是主体诞生过程中差异结算的发生结构，其具体形式由三界相位规定。本节的追踪没有触及命题的前半，因为《诗经》案例处理的是成年社会里的用诗，不是主体的诞生过程。对命题的后半，追踪的结果是：三界相位确实随媒介与场合而变，但规定它的是媒介与场合两个变量，而不是媒介一个变量。命题的核心得以保留，媒介一元的表述需要放弃。</p>
+<h2>十一、分析（三）：类型学与辨别格</h2>
+<h3>11.1 候选轴的排除</h3>
+<p>要为本文的"三界相位"结构建立一个可用的二维辨别格，需要选出第一根轴和第二根轴。第一根轴已经由承重命题给出：媒介闸值 M（从 0 到 2，从活人传习到文本权威）。第二根轴候选者有二。</p>
+<p>候选轴一：理解与否。 这是将主体间性描述为"成功的理解"与"失败的理解"之间的梯度，但它与媒介闸值本身共变——M=0 中更容易把"理解"定义为过程的成功，M=2 中更容易把"理解"定义为与文本一致。把"理解与否"当作第二轴，不是确立一个独立维度，而是变相重述第一轴的后果。排除。</p>
+<p>候选轴二：主体成熟度。 这是将主体间性放在从儿童到成人的认知成熟梯度上。但它恰恰是核心变量（媒介闸值）的成因之一：成熟度在某种程度上决定了一个人能否进入文本权威的世界。拿成因当第二轴，等于自己跟自己相关。排除。</p>
+<h3>11.2 第二轴的确立</h3>
+<p>第二根轴必须与媒介闸值不共变，而且必须有一个两轴同时为高的具名真实案例。本文选择的第二轴是差异结算密度的自反程度（以下简称"自反度"）：主体在差异结算中对结算过程本身的标记、追踪和再结算的能力。低自反度的结算只产生结果；高自反度的结算是回头把结算过程本身当作对象再结算。</p>
+<p>这个轴与媒介闸值不共变。原因如下：M=0 的条件下存在高自反度的结算——如一首歌在反复口头传唱过程中被人追问"谁改了这个调"，这个追问把变迁本身变成了差异序列中的新元素；M=2 的条件下同样存在低自反度的结算——比如单纯背诵经文而不追问任何异文。本文可以给出的两轴同时为高的具名真实案例是：当代即兴音乐合奏中的"实时互评"团体（M=0，自反度高）。在这种团体中，乐手们在演奏过程中用动作和眼神即时回应对方的即兴选择，并且在演出结束后集体回听录音、对差异变化做第二轮结存。该案例不是构象，而是当代即兴音乐（如德里克·贝利传统中的自由即兴合奏）中的既有实践形态。在这个案例中，媒介闸值保持为 0（传是活人对活人），而自反度高（对结算过程本身再做结算），两轴同时为高。</p>
+<p>由于两轴不同时升高，本文不使用"正交"或"结构独立"来断言两根轴的关系；更准确的说法是：相关但不重合，媒介闸值上升不必然推高自反度，自反度上升也不必然推动媒介转换。这一表述的含义和证据将在下一小节的四格中分别呈现。</p>
+<h3>11.3 二维辨别格</h3>
+<p>第一格：M=0，低自反度——"即兴相生"。 坐标：媒介闸值 0，自反度低。在这一格中，主体间性呈现为当场交互中的双向激发，结算是自动进行的，参与者不把结算过程当作反思对象。典型现象：社群中的节日集体歌舞、母婴的咿呀互仿、日常对话中音高和节奏的相互内吸。这一格独特的预测之一是：当交互中断时，双方会感到明显的不完整感，但说不清缺失的是什么；他们不会去查任何外部记录来填补缺口，而只会寻求恢复交互本身。</p>
+<p>第二格：M=0，高自反度——"即兴相生且回头再结"。 坐标：媒介闸值 0，自反度高。这一格中，交互双方不仅投入当场激发，还对过程本身进行二次结存。典型现象：即兴合唱团体在演出后的复盘、师傅带徒弟时的当场矫正、竞技性对话中对自己上一轮策略的即时命名。这一格独特的预测之一是：互动过程中会出现"对交互的交互"——不是在话语中加入解释，而是在交互流中加入指向交互流本身的标记（如一个乐句的自我引用），但这种标记不会替代交互，只会加强它。</p>
+<p>第三格：M=2，低自反度——"确认依赖"。 坐标：媒介闸值 2，自反度低。这一格中，主体间性的形式以文本一致性的核验为主，结算是黑箱化的——文本规定了哪些差异算数，参与者只需对照执行，不需要知道文本为什么这样规定。典型现象：传统科举中的经文默写与规定疏解、教条主义政党的文献学习、字面主义宗教社团的经文背诵。这一格独特的预测之一是：当文本内部出现矛盾时，参与者不是回到现场经验或对话去寻找答案，而是诉诸另一个文本（注释、新版本、权威解读），且这种诉诸会在交互中制造出与外部活人的明显疏远。</p>
+<p>第四格：M=2，高自反度——"注解式的重新生成"。 坐标：媒介闸值 2，自反度高。这一格中，参与者在确认依赖的基础上对文本进行二次结存，把注释、校勘、诂训、义疏当作差异结算的新的序列元素。典型现象：考据学派对古籍的异文比对、后结构主义对文本裂隙的批评实践、圣经高等批判传统中的来源批评。这一格独特的预测之一是：参与者对同一文本的解释不会收敛到单一权威答案，而会产生更多的分化；文本本身没有被抛弃，而是被当作生成新差异的机器，而这种生成本身仍是文本间的，不与活人现场合并。</p>
+<p>四格两两比对：第一格与第三格同为低自反度，但媒介条件不同，二者均表现为对差异的外部依赖——第一格依赖活人的交互，第三格依赖文本的确认。第二格与第四格同为高自反度，但媒介条件不同，二者均表现对结算过程本身的再结算——第二格在活人交互中执行再结算，第四格在文本间执行再结算。第一格与第二格同为 M=0，但自反度不同，差异落在"有没有对交互的交互"。第三格与第四格同为 M=2，但自反度不同，差异落在"有没有从确认走向注解式的重新生成"。</p>
+<h2>十二、讨论</h2>
+<h3>12.1 理论意涵</h3>
+<p>本文的承重命题对主体间性理论的最大修正，在于把理论的基本问题从"我如何理解他人"转置为"我与他人如何一起发生"。这一转置的含义是：主体间性的基本单位不是"关系"，而是"发生"。关系是发生在冻结状态下的截图；发生才是关系当前的生命。把主体间性定义为差异结算的发生结构，意味着主体间性不可能被一个静止的模型完全覆盖——它总在流变中，因为结算从未终止。</p>
+<p>对三界相位这一层，理论意涵更为具体：如果主体间性的形式确实由媒介闸值规定，那么研究主体间性的方法就必须把媒介条件纳入第一层分析，而不是把它当作外部背景。舒茨在音乐厅里看到的"共时同步"，本文看出它的前提是音乐厅这个声音媒介条件：如果两个人读同一篇乐谱而不是听同一段演奏，那种"内在时间的共时性"就得退居后位，确认性的对齐成为主导。这个机制的提取对当代数字文化研究也有潜在价值。</p>
+<p>案例追踪还为理论意涵补上一层。第十节显示，《诗经》的用诗史不能被讲成一条由声音到文字、由激发到确认的直线。更准确的图景是：在声音现场里，场合先把理念界请上前台，裁断权由当时在场的人持有；文字与石经并没有发明确认，它们把确认从场合里取出来，使之可携带、可重复、可跨代。主体间性的形式因此不是随媒介单线改变，而是随"谁有权说这次合格"改变。这对三条既有路径都有后果。对现象学路径，它提示共现式的直接给予，至少在朝聘场合里已经由礼与当场评断所中介；对社会哲学路径，它显示有效性要求在没有文本时就已经存在，只是承担者是人而不是条文；对发展心理学路径，它没有直接的证据，因为案例处理的是成人社会，这一点须由后续研究补足。三界相位在这里始终是读数而不是实体，它们描述的是一次用诗在三个位置上的安排，不能被理解为三种彼此分离的东西。</p>
+<h3>12.2 实践意涵</h3>
+<p>本文对教育、临床和艺术实践都有可落实的含义。在教育中，一个容易犯的错误是把教学中的所有媒介都看成只是工具。但按本文的分析，媒介闸值改变的是主体间性的相位：从 M=0 的现场激发到 M=2 的文本确认，不只是教学工具变了，教与学之间发生的主体关系也不同了。教育者需要知道自己在一个特定的格子里做事——用文本权威做激发式教学并不自动成功，因为第三格的确认依赖是一种结构性倾向，不是教学技术能轻易覆盖的。</p>
+<p>在临床中，主体间性理论长期被用来指导心理治疗关系，特别是那些强调"当下相遇"的学派；在发展障碍的干预中，本文的四格可以提供一个不同的诊断与干预导向：干预的目标不是把它变成接近 M=0 或接近 M=2 的某个单一良态，而是帮助患者在不同的格子里获得过渡和循环的能力。</p>
+<p>对教育实践还可以补一句。第十节的学堂两条记录表明，教学场合把自我界拉到前台，理念界作为通向自我的通道而存在。若把教学搬到以文本为裁断来源的条件下，合格与否由文本说了算，自我界便有被压入后台的倾向。这只是由两条记录得出的假设，并不是结论，但它提示教学设计应当区分两件事：学习者是在场合里被接住，还是在文本前被核对。</p>
+<h3>12.3 适用边界与反向约束</h3>
+<p>本文的主张不成立的条件至少有两个。</p>
+<p>第一，当媒介转换的同时发生了意义解释环境的完全相同复制。如果出现一种技术使文本能够完整、不失真地复制声音现场的相位特征，包括身体在场、共时性、异质响应这些差异结算的核心特征，那么媒介闸值 M 与相位轮换之间的必然关联就不成立。这个条件削掉了本文原本想说的一句较强的话：媒介转换内在地、不可逆转地改变主体间性形式。事实上本文只能主张：在目前已知的媒介条件下，这种轮换是结构性的，但不是永恒必然的。</p>
+<p>第二，当差异序列本身消失之时。本文命题存在一个内限：它预设差异序列的持续存在是主体间性发生的必要条件。一旦两个交互者的行为完全同质化、不再有任何一方发出能被另一方消化的差异性响应，主体间性便降到维持模式。这时主体间性的质量接近于零，但体制性的确认互动可能仍然存在（如两个背诵同一文本的人）。这个条件削掉了本文原本可能的泛化：主体间性不是无论什么情况都有的，它需要差异来喂养。</p>
+<h3>12.4 反噬</h3>
+<p>如果照本文去做，最省事的做法是把"媒介闸值—自反度"四格做成一个分类框架，然后拿它去给人贴标签。这将恰恰毁掉本文想保住的东西：发生性。四格不是四个类型箱，而是两个参考系在四个媒介条件上的结存形态。任何把四格当成稳定的、可给人分箱的框架，都会把本文最核心的发生学动作冻成一个新的扫描装置。这是本文可能带来的最坏后果，而它恰好在最容易被接受的表面用法中出现。</p>
+<h2>十三、效度威胁与研究局限</h2>
+<h3>13.1 效度威胁</h3>
+<p>构念效度方面，本文最大的威胁是"差异结算"这个概念可能被理解为"互动"的换名。本文对此已做了改名嫌疑否决条款，但那只处理了指标共线性问题，没有处理概念本身的非冗余性。一个可执行的后续设计是概念还原实验：在完全由成对机械系统组成的微观环境中，比较"纯耦合系统"与"含差异结算装置的系统"两类情况下，主体间性判据是否给出不同的结果。该实验可由计算社会科学家完成，时间约十八个月。</p>
+<p>内部效度方面，本文对《诗经》案例的分析是单案例追踪，媒介转换与意义解释模式改变之间的因果顺序没有被交叉验证。一个可执行的后续设计是：选取三个历史上曾经历类似媒介转换而社会结构不同的文本传统，重复同样的三界相位标记，以检查媒介效应的稳健性。可由比较文学与媒介史研究者完成，预期两到三年。</p>
+<p>外部效度方面，本文的全部推理基于欧亚大陆的四到五种媒介转换类型，能否推广到没有文字书写传统的口传社会，尚未检验。可迁移性有限。后续设计：在南岛语族或西非口传社会做相应的三界相位标记研究，特别是检查没有书写前提下"确认型理念界前台"是否出现。若出现，则需要对媒介闸值的定义和范围做出修正。</p>
+<p>可靠性方面，本文的第三、第十一节属于理论性内容，换一位研究者完全可以对其提出不同解析。为此文本中所有原创判断都尽量写成了带否定条件的形态，以方便复核。后续设计：邀请对该议题持反对立场的学者逐一提出否证性重新解释，形成公开评注，预计六个月。</p>
+<p>案例追踪方面，第十节的威胁有四项。取样是目的性的，偏向著名的记载，因而高估当场裁断的比例；编码者只有一人，P 与 A 的取值无法检验信度；材料为叙事文本，现场经过叙述者的选择，《左传》的叙事尤其倾向于保存带有评断与预言的赋诗；十九条记录里，M=1 与 M=2 的记录合计只有四条，对文本化一端的判读比对声音现场一端更薄。后续设计：由两位独立编码者对《左传》《国语》全部用诗记载按 10.1 的规则编码，并加入出土文献（如战国楚简中论诗的篇章）作为文本化早期的对照，预计一至两年。</p>
+<h3>13.2 本文解释不了的两个洞</h3>
+<p>第一个洞：本文无法解释为什么某些书写传统（如古兰经的听觉—书写复合传统）中，M=0 与 M=2 竟然长期并存而不发生彻底的相位分离。在本文的模型里，相位轮换是媒介闸值变化的必然结果，但伊斯兰经学传统中咏诵（qirā'āt）与文本校勘并行不悖，没有出现西方文本史上那种确认型理念界对现场声音的全面驱逐。这个洞对本文的"被使用命运逼得换土"叙事构成一个实质反例：它说明至少有些土壤可以同时供养两种相位。</p>
+<p>第二个洞：本文无法解释自反度从一个低值为何突然跳到高值。在本文的辨别格中，自反度是第二轴，但与媒介闸值不共变。既然它不共变，那么一个即兴合唱团从低自反度到高自反度，其自反化的发生学条件是什么？本文的四格只描写了离散的输出状态，没有说明格位转换如何在自反度轴上完成。这两个洞的存在，正是本文"发生学"进路在自反度这一概念上还不够彻底发生的诚实标记。</p>
+<h2>十四、结论与研究启示</h2>
+<p>回应引言中的研究问题。</p>
+<p>RQ1 问：在主体尚未完成的阶段，"自我"与"他人"的差异序列如何生出主体间性？本文的回答分两层：差异序列通过"位置差异"和"序列差异"这两种观测关系，使主体在自己的动作与他人的反应之间第一次发现并非恒等映射；特征纠缠在此被启动，主体间性不是关系的属性，而是这种启动和持续的作用本身。</p>
+<p>RQ2 问：《诗经》从唱诵到文本的媒介转换中，三界的相位关系发生了怎样的重组？本文的回答分三层。第一，声音现场的前台由场合决定：在歌场里前台是现实界与自我界，理念界在后台以分寸的方式记账；在朝聘享宴与献诗的场合里，理念界即使在没有任何文本的现场也居前台，并且有在场者作当场裁断（十一条记录全部如此，但受取样偏倚影响，应作上限读）。第二，文本档案改变的是裁断权的来源，由在场者转向文本，使合格的标准脱离场合而常驻，本文称之为脱场性；差异结算密度 δ 也随之失去可计性。第三，由此，原先以 MSI 的下降和 CBI 整体上升为读数的表述应修订为 CBI-文 高于 CBI-场，三界标记的前台颠转应读作场合与媒介共同作用的结果。</p>
+<p>RQ3 问：主体间性的根基在认知协调还是媒介所规定的相位结构？本文的回答是有条件的偏向后者：在给定的媒介与场合条件下，主体间性的具体形式由相位结构规定的程度大于由认知协调规定的程度；而相位结构由媒介与场合两个变量共同规定，不由媒介单独规定。把主体间性从认知协调的框架中移到发生结构上，对现有理论范式构成一种系统性修正。</p>
+<p>研究启示落在三点。第一点是理论上的：主体间性研究的方法起点应是差异序列的相位结构，而不是两个已完成主体的关系属性。第二点是方法上的：一个可裁决、可证伪的判据比一个新名词更能推进主体间性研究。本文给出的判别式和四格工具，不是终极答案，但已具备被检验和被修改的形态。第三点是实践上的：任何改变人际交互媒介的技术设计，都必然是在重新排列三界相位，这个变化不能用"更方便"或"更高效"来一次划掉。</p>
+<p>必须诚实声明：本文没有声称任何一个经验检验被执行过。本文交出的是判据与证伪条件，尚未执行。第十节对《诗经》案例做了十九条记录的目的性追踪，那是说明性追踪，不是对先秦用诗材料的穷尽编码，也没有第二编码者。因此本文的结论只能说成"发生了充分的概念论证和说明性案例追踪"，而不能写成"实验给出裁决性证据"。</p>
+<p>结尾留一个开口。本文从《诗经》的案例出发，一路上都在试图论证主体间性是差异结算的发生结构。但到头来，"发生"这个动作本身，我们仍然只能通过一次一次的回溯来捕捉，无法在有生之年把它先验地写完。这意味着发生学的写作本身也处在一种发生中——本文也是这份还没结算完的差异序列里的一个动作。</p>
+<h2>注释与声明</h2>
+<p>【注释】本文无注释。</p>
+<p>【作者贡献】概念化：作者独立完成。方法：作者独立完成。调查：作者独立完成。写作—初稿：作者独立完成。写作—修订：作者独立完成。监督：作者独立完成。</p>
+<p>【利益冲突声明】本文作者声明不存在任何与研究内容相关的直接或间接经济利益或非经济利益冲突。</p>
+<p>【数据与材料可得性声明】本文全部材料来自已公开出版的学术著作与先秦文本通行版本。未使用档案材料，亦未使用未公开的实证调查数据。文中所有理论材料的原始出处信息可通过公开图书馆渠道获取，本文不提供任何专属数据库或受版权限制的数据库内容。</p>
+<p>【伦理声明】本研究不涉及人类被试，不涉及个人数据，未进行任何实验或问卷调查。</p>
+<p>【基金与致谢】本文未获任何基金资助。致谢所涉及的同领域学者对本研究的意见交换，均以匿名方式纳入，不在此处罗列。</p>
+<p>AI 使用声明：本文的初稿生成过程中使用了语言模型辅助起草结构与理顺段落之间的衔接，作者对全文的论点、论证、案例、判据与所有可核验陈述进行了逐句人工修订与最终确认。作者对全文承担全部学术责任。</p>
+<h2>参考文献</h2>
+<p class="ref">海德格尔的"共在"概念出自《存在与时间》（1927），本文仅引其最广为人知的存在论立场，未引具体页码。</p>
+<p class="ref">胡塞尔的"共现"与"结对"概念出自《笛卡尔式的沉思》（1931），本文仅引其最广为人知的现象学立场，未引具体页码。</p>
+<p class="ref">梅洛-庞蒂的"身体间性"概念出自《知觉现象学》（1945），本文仅引其最广为人知的现象学立场，未引具体页码。</p>
+<p class="ref">舒茨的"类型化"与"我们关系"概念出自《社会世界的意义构造》（1932），本文仅引其最广为人知的社会现象学立场，未引具体页码。</p>
+<p class="ref">舒茨关于音乐共时性的讨论见其论文《共同创造音乐》，本文仅引其最广为人知的现象学分析，未引具体页码。</p>
+<p class="ref">特雷瓦森关于初级主体间性的核心论断见其论文《婴儿的交流与主体间性的发展》，本文仅引其最广为人知的发展心理学立场，未引具体页码。</p>
+<p class="ref">哈贝马斯的交往行动理论出自《交往行动理论》（1981），本文仅引其最广为人知的交往理性概念，未引具体页码。</p>
+<p class="ref">皮亚杰的发生认识论立场出自《发生认识论原理》（1970），本文仅引其认知发展阶段论的最广为人知表述，未引具体页码。</p>
+<p class="ref">维果茨基的最近发展区概念出自《思维与语言》（1934），本文仅引其社会文化理论的最广为人知表述，未引具体页码。</p>
+<p class="ref">《毛诗序》关于"诗言志"的经典表述出自《诗大序》，本文引用通行本文字。</p>
+<p class="ref">《左传》中赋诗实例的引述，本文逐条引述的有僖公二十三年、襄公十六年、襄公二十七年与襄公二十九年四处，引文依通行本，字句与页码未逐条核对。</p>
+<p class="ref">《汉书·艺文志》六艺略"诗"类小序，以及《后汉书·灵帝纪》熹平四年刻石一事，本文引通行本文字，年份与字句待核。</p>
+<p class="ref">《国语·周语上》"邵公谏厉王弭谤"一节，本文引通行本文字，未引页码。</p>
+<p class="ref">《左传》僖公二十三年、襄公十六年、襄公二十七年、襄公二十九年的相关记载，本文引通行本文字，未引页码。</p>
+<p class="ref">《墨子·公孟》"诵《诗》三百，弦《诗》三百，歌《诗》三百，舞《诗》三百"一句，本文引通行本文字。</p>
+<p class="ref">《论语》的《八佾》《子路》《季氏》《阳货》诸章，本文引通行本文字，未引页码。</p>
+<p class="ref">《仪礼·乡饮酒礼》关于合乐的记载，本文引通行本文字，字句与页码未逐条核对。</p>
+<div class="endbox">
+  <div class="lbl">三 种 读 法</div>
+  <div class="big">网页长文 · 在线 PDF 翻页 · PDF 下载</div>
+  <p>本文声明：未执行任何经验检验，多条证伪条款标注为未执行；样本有限、单一编码者。</p>
+  <a class="solid" href="intersubjectivity-genesis.pdf" download>⬇ 下载 PDF</a>
+  <a class="ghost" href="/students/qin-li/works/">返回 秦莉 全部作品</a>
+</div>
+</div>
+<footer>© 德麦国际 · 作者 秦莉</footer>
+<script>window.WDS_READ={selector:".wrap",profile:"liter"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20261005a" defer></script>
+<script src="/assets/sde-talk.js?v=20260817c" defer></script>
+</body></html>
