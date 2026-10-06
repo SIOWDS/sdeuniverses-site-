@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>友好阅读 · 在线翻页 · AI时代的新教育 | SDE Universes</title>
+<meta name="description" content="《AI时代的新教育》在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
+<meta name="tier" content="L0">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/355/read.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0C0F13; --bg2:#141A21; --fg:#E9E6DE; --dim:#8E97A1; --line:#242D36;
+  --gold:#D9A441; --paper:#FBF7EE; --paper2:#F2ECDF; --ink:#1A1713;
+  --shadow:0 30px 80px rgba(0,0,0,.55);
+}
+html.sepia{--paper:#F6ECD8;--paper2:#EEE1C7}
+html.day{--bg:#E8E4DB;--bg2:#F2EFE7;--fg:#22262B;--dim:#5C646D;--line:#CFC9BD}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,var(--bg2),var(--bg)) fixed;
+  color:var(--fg);font:15px/1.7 "Noto Serif SC","EB Garamond",Georgia,serif;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);
+  overflow:hidden}
+
+/* ── 顶栏 ── */
+.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;align-items:center;gap:.8rem;
+  padding:.55rem 1rem calc(.55rem);background:rgba(12,15,19,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding-top:calc(.55rem + env(safe-area-inset-top,0))}
+html.day .top{background:rgba(232,228,219,.8)}
+.top .ttl{font-weight:600;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{color:var(--dim);font-size:.78rem;margin-left:.2rem;white-space:nowrap}
+.spacer{margin-left:auto}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);
+  border-radius:8px;padding:.3rem .6rem;cursor:pointer;transition:.18s}
+button:hover:not(:disabled),select:hover{border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.on{border-color:var(--gold);color:var(--gold)}
+.ico{font-size:1rem;line-height:1}
+
+/* ── 舞台 ── */
+.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:center;overflow:hidden}
+.book{position:relative;display:flex;gap:0;filter:drop-shadow(0 24px 60px rgba(0,0,0,.5));
+  transform-style:preserve-3d;perspective:2600px}
+.leaf{position:relative;background:var(--paper);overflow:hidden}
+.leaf canvas{display:block;width:100%;height:100%}
+.leaf .svg{position:absolute;inset:0;display:none}
+.leaf .svg svg{display:block;width:100%;height:100%}
+.leaf.vec canvas{display:none}
+.leaf.vec .svg{display:block}
+.leaf.l{border-radius:4px 0 0 4px;box-shadow:inset -22px 0 34px -26px rgba(0,0,0,.55)}
+.leaf.r{border-radius:0 4px 4px 0;box-shadow:inset 22px 0 34px -26px rgba(0,0,0,.55)}
+.single .leaf{border-radius:4px}
+.gutter{position:absolute;top:0;bottom:0;left:50%;width:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.20),rgba(0,0,0,0));pointer-events:none;z-index:3}
+.single .gutter{display:none}
+.pno{position:absolute;bottom:6px;font-size:11px;color:#9a8f7c;letter-spacing:.08em;z-index:4}
+.leaf.l .pno{left:14px}.leaf.r .pno{right:14px}
+
+/* 翻页动画 */
+.flip{position:absolute;top:0;bottom:0;z-index:9;background:var(--paper);
+  transform-origin:left center;backface-visibility:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,.35);border-radius:0 4px 4px 0}
+.flip.back{transform-origin:right center;border-radius:4px 0 0 4px}
+.flip canvas{display:block;width:100%;height:100%}
+@keyframes fwd{from{transform:rotateY(0)}to{transform:rotateY(-178deg)}}
+@keyframes bwd{from{transform:rotateY(0)}to{transform:rotateY(178deg)}}
+.flip.go{animation:fwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+.flip.back.go{animation:bwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+@media (prefers-reduced-motion:reduce){.flip.go,.flip.back.go{animation-duration:.01s}}
+
+/* 文本层（可选可搜） */
+.tl{position:absolute;inset:0;overflow:hidden;opacity:.01;line-height:1;z-index:2}
+.tl span{position:absolute;white-space:pre;transform-origin:0 0;color:transparent;cursor:text}
+.tl ::selection{background:rgba(217,164,65,.35)}
+.tl mark{background:rgba(217,164,65,.55);color:transparent;border-radius:2px}
+
+/* ── 底栏 ── */
+.bot{position:fixed;inset:auto 0 0 0;z-index:40;display:flex;align-items:center;gap:.7rem;
+  padding:.5rem 1rem calc(.5rem + env(safe-area-inset-bottom,0));
+  background:rgba(12,15,19,.72);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+html.day .bot{background:rgba(232,228,219,.8)}
+.rail{position:relative;flex:1;height:22px;display:flex;align-items:center;cursor:pointer}
+.rail .bar{position:absolute;left:0;right:0;height:3px;background:var(--line);border-radius:3px}
+.rail .fill{position:absolute;left:0;height:3px;background:linear-gradient(90deg,var(--gold),#F0CE86);border-radius:3px}
+.rail .knob{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--gold);
+  transform:translateX(-50%);box-shadow:0 0 0 4px rgba(217,164,65,.18)}
+.pg{font-variant-numeric:tabular-nums;color:var(--dim);font-size:.82rem;white-space:nowrap}
+.pg input{width:3.4rem;text-align:center;background:transparent;border:1px solid var(--line);
+  border-radius:6px;color:var(--fg);font:inherit;padding:.12rem .2rem}
+
+/* ── 抽屉 ── */
+.drawer{position:fixed;top:52px;bottom:62px;left:0;width:min(330px,86vw);z-index:45;
+  background:rgba(16,21,27,.97);border-right:1px solid var(--line);
+  transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;backdrop-filter:blur(10px)}
+html.day .drawer{background:rgba(242,239,231,.97)}
+.drawer.open{transform:none}
+.drawer h3{margin:0;padding:.8rem 1rem .5rem;font-size:.8rem;letter-spacing:.24em;color:var(--dim);font-weight:400}
+.dlist{flex:1;overflow:auto;padding:0 .4rem 1rem}
+.dlist a{display:flex;gap:.5rem;align-items:baseline;padding:.32rem .6rem;border-radius:7px;
+  color:var(--fg);text-decoration:none;font-size:.86rem}
+.dlist a:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.dlist a.l1{font-weight:600;margin-top:.5rem}
+.dlist a.l2{padding-left:1.5rem;color:var(--dim);font-size:.8rem}
+.dlist a .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.76rem}
+.sbox{padding:.5rem 1rem}
+.sbox input{width:100%;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--fg);font:inherit;padding:.4rem .6rem}
+.hit{padding:.35rem .6rem;border-radius:7px;font-size:.8rem;color:var(--dim);cursor:pointer}
+.hit:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.hit b{color:var(--gold);font-weight:600}
+
+/* 缩略图 */
+.thumbs{position:fixed;left:0;right:0;bottom:62px;z-index:44;display:flex;gap:.5rem;
+  padding:.6rem 1rem;overflow-x:auto;background:rgba(12,15,19,.92);border-top:1px solid var(--line);
+  transform:translateY(120%);transition:transform .28s}
+.thumbs.open{transform:none}
+.thumbs canvas{height:112px;width:auto;border-radius:3px;cursor:pointer;opacity:.62;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);transition:.18s}
+.thumbs canvas:hover,.thumbs canvas.cur{opacity:1;outline:2px solid var(--gold)}
+
+.msg{position:fixed;inset:0;display:grid;place-items:center;z-index:60;color:var(--dim);
+  background:rgba(12,15,19,.9);text-align:center;padding:2rem}
+.msg.hide{display:none}
+.msg .sp{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--gold);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:50;
+  background:rgba(0,0,0,.66);border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .9rem;font-size:.76rem;color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
+.hint.show{opacity:1}
+@media (max-width:860px){.top .sub,.hideS{display:none}.stage{inset:48px 0 56px 0}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
+  <span class="ttl">AI时代的新教育</span><span class="sub hideS">猜想和实现</span>
+  <span class="spacer"></span>
+  <button id="btnSpread" class="hideS" title="单页 / 双页 (D)">双页</button>
+  <button id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)">矢量</button>
+  <button id="btnZoomOut" title="缩小">A−</button>
+  <button id="btnZoomIn" title="放大">A＋</button>
+  <button id="btnThumbs" class="hideS" title="缩略图">▤</button>
+  <button id="btnTheme" title="夜 / 日 / 纸 (N)">夜</button>
+  <button id="btnFull" class="hideS" title="全屏 (F)">⛶</button>
+  <a href="/books/m/355/" style="color:var(--dim);text-decoration:none;font-size:.82rem">详情</a>
+</header>
+
+<aside class="drawer" id="drawer">
+  <div class="sbox"><input id="q" type="search" placeholder="全书检索（回车）…"></div>
+  <h3 id="dHead">目　录</h3>
+  <div class="dlist" id="dlist"></div>
+</aside>
+
+<main class="stage" id="stage">
+  <div class="book" id="book">
+    <div class="leaf l" id="leafL"><canvas id="cL"></canvas><div class="svg" id="sL"></div><div class="tl" id="tL"></div><div class="pno" id="nL"></div></div>
+    <div class="leaf r" id="leafR"><canvas id="cR"></canvas><div class="svg" id="sR"></div><div class="tl" id="tR"></div><div class="pno" id="nR"></div></div>
+    <div class="gutter"></div>
+  </div>
+</main>
+
+<div class="thumbs" id="thumbs"></div>
+
+<footer class="bot">
+  <button id="btnPrev" title="上一页 (←)">‹</button>
+  <div class="rail" id="rail"><div class="bar"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
+  <button id="btnNext" title="下一页 (→)">›</button>
+  <span class="pg">第 <input id="pi" type="number" min="1" value="1"> / <span id="pt">…</span> 页</span>
+</footer>
+
+<div class="hint" id="hint"></div>
+<div class="msg" id="msg"><div><div class="sp"></div><div id="msgT">正在载入书页…</div></div></div>
+
+<script type="application/json" id="cfg">{"pdf": "/books/m/355/xin-jiaoyu-caixiang-reader.pdf?v=20261006a", "key": "books-m-355-v1", "offset": 23}</script>
+<script type="application/json" id="toc">[{"t": "封面", "p": "", "g": 1, "l": 1}, {"t": "出版信息", "p": "", "g": 4, "l": 1}, {"t": "作者介绍", "p": "", "g": 5, "l": 1}, {"t": "前言 编纂说明", "p": "", "g": 6, "l": 1}, {"t": "导读 九个难题，一张咬合图", "p": "", "g": 8, "l": 1}, {"t": "导论 猜想为什么先于实现", "p": "1", "g": 23, "l": 1}, {"t": "第一章 一本不写愿景的教育书", "p": "2", "g": 24, "l": 2}, {"t": "第二章 为什么是九个难题，为什么是这九个", "p": "4", "g": 26, "l": 2}, {"t": "第三章 本书的三条写作纪律", "p": "6", "g": 28, "l": 2}, {"t": "第四章 读法", "p": "7", "g": 29, "l": 2}, {"t": "导论补章 本书与两部姊妹书的分工", "p": "8", "g": 30, "l": 2}, {"t": "卷一 地基：自然人独占判断王权的死亡", "p": "11", "g": 33, "l": 1}, {"t": "第五章 为什么要先证这一条", "p": "12", "g": 34, "l": 2}, {"t": "第六章 先划定：死的是哪一个世界里的", "p": "14", "g": 36, "l": 2}, {"t": "第七章 自然人主体性是什么：一个概念的发生", "p": "16", "g": 38, "l": 2}, {"t": "第八章 AI 做了什么：一次破掉三个条件", "p": "18", "g": 40, "l": 2}, {"t": "第九章 主定理：坚守的三条路都走不通", "p": "19", "g": 41, "l": 2}, {"t": "第十章 死亡的精确定义：不是灭绝，是失去独占的认领", "p": "22", "g": 44, "l": 2}, {"t": "第十一章 自然人仍在发生的地方", "p": "24", "g": 46, "l": 2}, {"t": "第十二章 归责：判断死了，责任为什么不死", "p": "26", "g": 48, "l": 2}, {"t": "第十三章 对教育的推论", "p": "28", "g": 50, "l": 2}, {"t": "加厚一 三种\"自然人\"互相冒充", "p": "30", "g": 52, "l": 2}, {"t": "加厚二 器具史：每一件器具改的是哪一处", "p": "32", "g": 54, "l": 2}, {"t": "加厚三 历史反例：代笔、幕僚与师门", "p": "34", "g": 56, "l": 2}, {"t": "加厚四 归责三操作在法律里的对应", "p": "36", "g": 58, "l": 2}, {"t": "加厚五 固化：迎合如何造出\"清晰\"", "p": "38", "g": 60, "l": 2}, {"t": "加厚三十九 三个世界，三个自然人", "p": "40", "g": 62, "l": 2}, {"t": "加厚四十 死亡的三种机制", "p": "42", "g": 64, "l": 2}, {"t": "加厚四十一 坚守派文献的分拣表", "p": "43", "g": 65, "l": 2}, {"t": "加厚六十七 王权三项：命名、判错、计算", "p": "45", "g": 67, "l": 2}, {"t": "加厚六十八 签收与签字", "p": "47", "g": 69, "l": 2}, {"t": "卷一补章四 与康德、尼采、延展心灵的分界", "p": "48", "g": 70, "l": 2}, {"t": "卷一补章五 四种误读本卷的方式", "p": "50", "g": 72, "l": 2}, {"t": "加厚八十二 缺席祖宗：卷一逐人划界", "p": "52", "g": 74, "l": 2}, {"t": "加厚一百〇二 最强的反对：一位坚守者的五个回合", "p": "54", "g": 76, "l": 2}, {"t": "加厚一百〇三 三条件的最小模型：一个可以手算的例子", "p": "57", "g": 79, "l": 2}, {"t": "加厚一百三十一 一次设想的误诊：归责三操作怎样同时落在复合体上", "p": "60", "g": 82, "l": 2}, {"t": "加厚一百四十二 维修账：一个学校一年花多少钱在\"消去\"上", "p": "63", "g": 85, "l": 2}, {"t": "第十四章 本卷可推翻处", "p": "66", "g": 88, "l": 2}, {"t": "卷二 难题一：受教育的主体是谁", "p": "67", "g": 89, "l": 1}, {"t": "第十五章 难题：给谁打分", "p": "68", "g": 90, "l": 2}, {"t": "第十六章 旧答案为什么不够：禁止与限额", "p": "69", "g": 91, "l": 2}, {"t": "第十七章 猜想：学席与教席", "p": "71", "g": 93, "l": 2}, {"t": "第十八章 论证：可消性与悬空判断", "p": "73", "g": 95, "l": 2}, {"t": "第十九章 两阶段律：为什么计算器没有引发这场危机", "p": "75", "g": 97, "l": 2}, {"t": "第二十章 三个场景里的同一件事", "p": "77", "g": 99, "l": 2}, {"t": "第二十一章 与近邻学说的分界", "p": "79", "g": 101, "l": 2}, {"t": "第二十二章 实现：登记席", "p": "81", "g": 103, "l": 2}, {"t": "加厚六 教席的四种类型", "p": "83", "g": 105, "l": 2}, {"t": "加厚七 席配置登记表样张", "p": "85", "g": 107, "l": 2}, {"t": "加厚八 社会端的先例：企业已经在按席选人", "p": "87", "g": 109, "l": 2}, {"t": "加厚九 法律上的席：第三种主体的登记需求", "p": "88", "g": 110, "l": 2}, {"t": "加厚四十二 学席的内部结构", "p": "89", "g": 111, "l": 2}, {"t": "加厚四十三 一次学席的诞生", "p": "90", "g": 112, "l": 2}, {"t": "加厚四十四 席与团队的区别", "p": "92", "g": 114, "l": 2}, {"t": "加厚六十九 悬空判断的历史先例：五次换位与着陆", "p": "93", "g": 115, "l": 2}, {"t": "卷二补章三 悬空判断在四种学校里", "p": "95", "g": 117, "l": 2}, {"t": "卷二补章四 公平问题的正面回答", "p": "97", "g": 119, "l": 2}, {"t": "卷二补章六 教席的诞生：一位老师的一学期", "p": "99", "g": 121, "l": 2}, {"t": "加厚八十三 缺席祖宗：卷二逐人划界", "p": "101", "g": 123, "l": 2}, {"t": "加厚八十四 一所大学的席登记", "p": "103", "g": 125, "l": 2}, {"t": "加厚一百〇四 四个\"作弊\"：这个词在哪里还成立", "p": "105", "g": 127, "l": 2}, {"t": "加厚一百〇五 学席的必要条件：什么不算一个席", "p": "107", "g": 129, "l": 2}, {"t": "加厚一百三十二 学席在小学、中学、大学里各是什么样", "p": "109", "g": 131, "l": 2}, {"t": "加厚一百四十三 教席的配置比学席强：老师赢不了自己的学生怎么办", "p": "111", "g": 133, "l": 2}, {"t": "第二十三章 本卷可推翻处", "p": "113", "g": 135, "l": 2}, {"t": "卷三 难题二：教育要教的东西是什么", "p": "115", "g": 137, "l": 1}, {"t": "第二十四章 难题：课程表上还剩什么", "p": "116", "g": 138, "l": 2}, {"t": "第二十五章 旧答案为什么不够：从知识转向能力", "p": "117", "g": 139, "l": 2}, {"t": "第二十六章 猜想：知识发生能力，与卡住的时间", "p": "118", "g": 140, "l": 2}, {"t": "第二十七章 卡住的时间为什么会被消灭", "p": "120", "g": 142, "l": 2}, {"t": "第二十八章 老知识与新知识用同一把刀", "p": "122", "g": 144, "l": 2}, {"t": "第二十九章 岔口册长什么样", "p": "124", "g": 146, "l": 2}, {"t": "第三十章 教育裂成两半：生产线与保健场", "p": "126", "g": 148, "l": 2}, {"t": "第三十一章 与近邻学说的分界", "p": "128", "g": 150, "l": 2}, {"t": "第三十二章 实现：岔口册、一半与未闭合时长", "p": "129", "g": 151, "l": 2}, {"t": "加厚十 光滑化的六种手法", "p": "131", "g": 153, "l": 2}, {"t": "加厚十一 \"一半\"怎么选", "p": "133", "g": 155, "l": 2}, {"t": "加厚十二 \"效率是收据\"的三个例子", "p": "135", "g": 157, "l": 2}, {"t": "加厚十三 家庭里的卡住", "p": "137", "g": 159, "l": 2}, {"t": "加厚四十五 岔口册编写规范", "p": "139", "g": 161, "l": 2}, {"t": "加厚四十六 卡住的三种", "p": "141", "g": 163, "l": 2}, {"t": "加厚四十七 小学的发生：识字与进位", "p": "143", "g": 165, "l": 2}, {"t": "加厚七十 知识发生能力与创造力的区别", "p": "145", "g": 167, "l": 2}, {"t": "加厚七十一 三种被误认为岔口的东西", "p": "147", "g": 169, "l": 2}, {"t": "卷三补章二 三门课的岔口册骨架", "p": "148", "g": 170, "l": 2}, {"t": "卷三补章三 迎合式消灭的识别", "p": "150", "g": 172, "l": 2}, {"t": "卷三补章六 高效获取的正当位置", "p": "152", "g": 174, "l": 2}, {"t": "加厚八十五 缺席祖宗：卷三逐人划界", "p": "154", "g": 176, "l": 2}, {"t": "加厚八十六 岔口册样张：初中语文二十个岔口", "p": "156", "g": 178, "l": 2}, {"t": "加厚一百〇六 光滑化的一次拆解：以分数加法为例", "p": "159", "g": 181, "l": 2}, {"t": "加厚一百〇七 知识发生能力不是什么：四个常见替身", "p": "162", "g": 184, "l": 2}, {"t": "加厚一百三十三 语文的岔口：一篇议论文背后的五个判决", "p": "165", "g": 187, "l": 2}, {"t": "加厚一百四十四 一份岔口册怎样被同行批评", "p": "168", "g": 190, "l": 2}, {"t": "第三十三章 本卷可推翻处", "p": "171", "g": 193, "l": 2}, {"t": "卷四 难题三：什么叫学会了", "p": "173", "g": 195, "l": 1}, {"t": "第三十四章 难题：一份完美的作业说明什么", "p": "174", "g": 196, "l": 2}, {"t": "第三十五章 旧答案为什么不够：三种产出证据", "p": "175", "g": 197, "l": 2}, {"t": "第三十六章 猜想：可重走与证据包", "p": "176", "g": 198, "l": 2}, {"t": "第三十七章 证据包里最硬的一类", "p": "177", "g": 199, "l": 2}, {"t": "第三十八章 学会有档位，有期限", "p": "178", "g": 200, "l": 2}, {"t": "第三十九章 一次新材料现场题", "p": "180", "g": 202, "l": 2}, {"t": "第四十章 学位分成两行", "p": "182", "g": 204, "l": 2}, {"t": "第四十一章 与近邻学说的分界", "p": "183", "g": 205, "l": 2}, {"t": "第四十二章 实现：新材料现场题、席籍与三行证书", "p": "184", "g": 206, "l": 2}, {"t": "加厚十四 证据包的结构样张", "p": "185", "g": 207, "l": 2}, {"t": "加厚十五 伪造与核验", "p": "187", "g": 209, "l": 2}, {"t": "加厚十六 档位的操作定义", "p": "188", "g": 210, "l": 2}, {"t": "加厚十七 期限怎么定", "p": "190", "g": 212, "l": 2}, {"t": "加厚四十八 席籍的一页样张", "p": "191", "g": 213, "l": 2}, {"t": "加厚四十九 三档在三门课上的样子", "p": "193", "g": 215, "l": 2}, {"t": "加厚七十二 可重走的三个陷阱", "p": "194", "g": 216, "l": 2}, {"t": "卷四补章五 改道记录的三个例子", "p": "195", "g": 217, "l": 2}, {"t": "加厚八十七 缺席祖宗：卷四逐人划界", "p": "197", "g": 219, "l": 2}, {"t": "加厚一百〇八 一份完美的作业有四种来历", "p": "198", "g": 220, "l": 2}, {"t": "加厚一百〇九 \"可重走\"的五个反驳与回答", "p": "200", "g": 222, "l": 2}, {"t": "加厚一百一十 证据包的最小样张：一个学生，一份作业，一页记录", "p": "202", "g": 224, "l": 2}, {"t": "加厚一百三十四 三档的样子：同一个问题，三种走法", "p": "204", "g": 226, "l": 2}, {"t": "第四十三章 本卷可推翻处", "p": "207", "g": 229, "l": 2}, {"t": "卷五 难题四：怎样让知识在课堂上发生", "p": "209", "g": 231, "l": 1}, {"t": "第四十四章 难题：一位普通老师，四十个学生，四十分钟", "p": "210", "g": 232, "l": 2}, {"t": "第四十五章 旧答案为什么不够：缺刀，缺秤", "p": "211", "g": 233, "l": 2}, {"t": "第四十六章 猜想：一台造岔口的机器", "p": "212", "g": 234, "l": 2}, {"t": "第四十七章 倒过来：三步工序", "p": "213", "g": 235, "l": 2}, {"t": "第四十八章 一节完整的课：函数", "p": "215", "g": 237, "l": 2}, {"t": "第四十九章 再一节课：浮力，以及三门课的岔口", "p": "217", "g": 239, "l": 2}, {"t": "第五十章 碰撞：新知识的工序", "p": "219", "g": 241, "l": 2}, {"t": "第五十一章 AI 在这台机器里的位置", "p": "221", "g": 243, "l": 2}, {"t": "第五十二章 秤：两个读数", "p": "223", "g": 245, "l": 2}, {"t": "第五十三章 与近邻学说的分界", "p": "225", "g": 247, "l": 2}, {"t": "第五十四章 实现", "p": "226", "g": 248, "l": 2}, {"t": "加厚十八 第四节完整课例：历史，赋税收不上来", "p": "227", "g": 249, "l": 2}, {"t": "加厚十九 碰撞题库：二十组三域", "p": "229", "g": 251, "l": 2}, {"t": "加厚五十 第五节完整课例：英语时态", "p": "231", "g": 253, "l": 2}, {"t": "加厚五十一 小学一节课：进位", "p": "233", "g": 255, "l": 2}, {"t": "加厚五十二 守岔口的十个动作", "p": "235", "g": 257, "l": 2}, {"t": "加厚七十三 第六节完整课例：化学，酸与碱", "p": "237", "g": 259, "l": 2}, {"t": "加厚七十四 第七节完整课例：地理，一条河的边界", "p": "239", "g": 261, "l": 2}, {"t": "卷五补章一 小学一节课：乘法", "p": "241", "g": 263, "l": 2}, {"t": "卷五补章二 大学一节课：统计推断", "p": "243", "g": 265, "l": 2}, {"t": "卷五补章三 教席的否决记录样张", "p": "245", "g": 267, "l": 2}, {"t": "卷五补章六 岔口课的常见问题", "p": "247", "g": 269, "l": 2}, {"t": "卷五补章七 碰撞法的选域规则", "p": "249", "g": 271, "l": 2}, {"t": "卷五补章八 岔口课的评课表", "p": "251", "g": 273, "l": 2}, {"t": "卷五补章九 地理一节课：为什么要有经纬度", "p": "252", "g": 274, "l": 2}, {"t": "加厚八十八 缺席祖宗：卷五逐人划界", "p": "254", "g": 276, "l": 2}, {"t": "加厚八十九 第八节完整课例：生物，物种的边界", "p": "255", "g": 277, "l": 2}, {"t": "加厚九十 第九节完整课例：政治，规则从哪里来", "p": "257", "g": 279, "l": 2}, {"t": "加厚九十一 第十节完整课例：美术，画一样东西还是画看见的", "p": "259", "g": 281, "l": 2}, {"t": "加厚一百一十一 一节课的分钟账：四十分钟里，岔口在哪里被打开，在哪里被守住", "p": "261", "g": 283, "l": 2}, {"t": "加厚一百一十二 AI 在课堂上的位置：三条规定", "p": "264", "g": 286, "l": 2}, {"t": "加厚一百一十三 岔口册的编写：一位教师的三个工作日", "p": "266", "g": 288, "l": 2}, {"t": "加厚一百三十五 碰撞的一次演练：三个互不相干的领域", "p": "268", "g": 290, "l": 2}, {"t": "加厚一百四十五 岔口被过早闭合的七种方式", "p": "270", "g": 292, "l": 2}, {"t": "第五十五章 本卷可推翻处", "p": "273", "g": 295, "l": 2}, {"t": "附章一 第二节完整课例：三角函数的周期", "p": "274", "g": 296, "l": 2}, {"t": "附章二 第三节完整课例：语文的比喻", "p": "276", "g": 298, "l": 2}, {"t": "附章三 一次完整的碰撞：高二课题实录", "p": "278", "g": 300, "l": 2}, {"t": "附章四 退化的六种形态与识别", "p": "280", "g": 302, "l": 2}, {"t": "附章五 教席怎样学会造岔口", "p": "282", "g": 304, "l": 2}, {"t": "卷六 难题五：怎样评估一个人—AI 复合主体", "p": "285", "g": 307, "l": 1}, {"t": "第五十六章 难题：谁的 AI 更强谁就得高分？", "p": "286", "g": 308, "l": 2}, {"t": "第五十七章 旧答案为什么不够：三种做法与一个共同缺陷", "p": "287", "g": 309, "l": 2}, {"t": "第五十八章 猜想：三句话和一个四元组", "p": "289", "g": 311, "l": 2}, {"t": "第五十九章 规定证据，不规定路径", "p": "290", "g": 312, "l": 2}, {"t": "第六十章 可核验，不可聚合", "p": "292", "g": 314, "l": 2}, {"t": "第六十一章 可升也可降", "p": "294", "g": 316, "l": 2}, {"t": "第六十二章 席的三个读数：显露物、分点、漂移", "p": "295", "g": 317, "l": 2}, {"t": "第六十三章 退单考", "p": "297", "g": 319, "l": 2}, {"t": "第六十四章 三权分立", "p": "299", "g": 321, "l": 2}, {"t": "第六十五章 证据接口条款样张", "p": "301", "g": 323, "l": 2}, {"t": "第六十六章 分点为什么会向下漂", "p": "303", "g": 325, "l": 2}, {"t": "第六十七章 与近邻学说的分界", "p": "305", "g": 327, "l": 2}, {"t": "第六十八章 实现", "p": "306", "g": 328, "l": 2}, {"t": "附章六 退单考出题规范", "p": "308", "g": 330, "l": 2}, {"t": "加厚二十 公平问题细论", "p": "310", "g": 332, "l": 2}, {"t": "加厚二十一 聚合之争：一个实验设计", "p": "312", "g": 334, "l": 2}, {"t": "加厚二十二 席籍的数据格式", "p": "313", "g": 335, "l": 2}, {"t": "加厚二十三 争议机制样张", "p": "314", "g": 336, "l": 2}, {"t": "加厚五十三 测量机构怎么建", "p": "315", "g": 337, "l": 2}, {"t": "加厚五十四 一次核验的实录", "p": "317", "g": 339, "l": 2}, {"t": "加厚五十五 分点四层的操作定义", "p": "319", "g": 341, "l": 2}, {"t": "加厚七十五 退单考三门课样题", "p": "320", "g": 342, "l": 2}, {"t": "加厚七十六 四元组的读法：给企业和大学的一页", "p": "322", "g": 344, "l": 2}, {"t": "卷六补章一 不可聚合下的录取怎么做", "p": "324", "g": 346, "l": 2}, {"t": "卷六补章三 漂移曲线怎样读", "p": "326", "g": 348, "l": 2}, {"t": "卷六补章五 一份语文问题域的证据接口", "p": "328", "g": 350, "l": 2}, {"t": "卷六补章六 独立机构的一年", "p": "330", "g": 352, "l": 2}, {"t": "加厚九十二 缺席祖宗：卷六逐人划界", "p": "332", "g": 354, "l": 2}, {"t": "加厚九十三 独立测量机构章程样张", "p": "333", "g": 355, "l": 2}, {"t": "加厚一百一十四 两个席同台：配置差异怎样被登记，而不被惩罚", "p": "335", "g": 357, "l": 2}, {"t": "加厚一百一十五 标准漂移：一个反面想象", "p": "337", "g": 359, "l": 2}, {"t": "加厚一百一十六 从\"四元组\"到一张证书：一份设想的样张", "p": "340", "g": 362, "l": 2}, {"t": "加厚一百三十六 一次退单考的演练：退回什么，为什么退回", "p": "342", "g": 364, "l": 2}, {"t": "加厚一百四十六 一个席要测几次：读数的诚实", "p": "345", "g": 367, "l": 2}, {"t": "第六十九章 本卷可推翻处", "p": "347", "g": 369, "l": 2}, {"t": "卷七 难题六：怎样重建学校、学制与大学", "p": "349", "g": 371, "l": 1}, {"t": "第七十章 难题：一百多年的阶梯还需要吗", "p": "350", "g": 372, "l": 2}, {"t": "第七十一章 旧答案为什么不够：在阶梯内部做加法", "p": "351", "g": 373, "l": 2}, {"t": "第七十二章 猜想：金字塔失去了分母", "p": "352", "g": 374, "l": 2}, {"t": "第七十三章 论证之一：分母是怎么被算出来的，又是怎么消失的", "p": "353", "g": 375, "l": 2}, {"t": "第七十四章 论证之二：双时钟", "p": "355", "g": 377, "l": 2}, {"t": "第七十五章 大学的形态：两年加两年", "p": "357", "g": 379, "l": 2}, {"t": "第七十六章 中小学：年级保留为社交单位", "p": "359", "g": 381, "l": 2}, {"t": "第七十七章 教师会怎样", "p": "361", "g": 383, "l": 2}, {"t": "第七十八章 转换的三步", "p": "363", "g": 385, "l": 2}, {"t": "第七十九章 四条底线", "p": "365", "g": 387, "l": 2}, {"t": "附章十一 两年加两年的一份课程表", "p": "366", "g": 388, "l": 2}, {"t": "第八十章 与近邻学说的分界", "p": "368", "g": 390, "l": 2}, {"t": "第八十一章 实现：一份路线图", "p": "369", "g": 391, "l": 2}, {"t": "附章七 一所学校第一年的分场细则", "p": "371", "g": 393, "l": 2}, {"t": "加厚二十四 反馈时钟的四种来源", "p": "373", "g": 395, "l": 2}, {"t": "加厚二十五 分轨的阶层风险与对策", "p": "375", "g": 397, "l": 2}, {"t": "加厚二十六 教师工作量的一笔账", "p": "376", "g": 398, "l": 2}, {"t": "加厚二十七 家长与社会端的接口", "p": "377", "g": 399, "l": 2}, {"t": "加厚五十六 小学一年的课表样张", "p": "379", "g": 401, "l": 2}, {"t": "加厚五十七 中学一天的课表", "p": "381", "g": 403, "l": 2}, {"t": "加厚五十八 \"研究状态\"证书样张", "p": "383", "g": 405, "l": 2}, {"t": "加厚七十七 转换失败的预案", "p": "385", "g": 407, "l": 2}, {"t": "加厚七十八 制度阻力：谁不愿意换", "p": "386", "g": 408, "l": 2}, {"t": "卷七补章五 大学自己怎样转换", "p": "388", "g": 410, "l": 2}, {"t": "加厚九十四 缺席祖宗：卷七逐人划界", "p": "390", "g": 412, "l": 2}, {"t": "加厚九十五 两年加两年的三个学科版本", "p": "391", "g": 413, "l": 2}, {"t": "加厚一百一十七 分母的算术：一个玩具模型", "p": "393", "g": 415, "l": 2}, {"t": "加厚一百一十八 转换期的三个人：一位老师，一位校长，一位家长", "p": "396", "g": 418, "l": 2}, {"t": "加厚一百一十九 两年加两年：第一批学校的试点怎样设计", "p": "398", "g": 420, "l": 2}, {"t": "加厚一百三十七 大学：一个系的四年，怎样改成档位", "p": "400", "g": 422, "l": 2}, {"t": "第八十二章 本卷可推翻处", "p": "402", "g": 424, "l": 2}, {"t": "卷八 难题七：旧教育为何两千年合理，今天失效", "p": "403", "g": 425, "l": 1}, {"t": "第八十三章 难题：为什么恰恰是今天", "p": "404", "g": 426, "l": 2}, {"t": "第八十四章 旧答案为什么不够：\"时代变了\"与\"AI 太强了\"", "p": "405", "g": 427, "l": 2}, {"t": "第八十五章 猜想：成本结构翻转", "p": "406", "g": 428, "l": 2}, {"t": "第八十六章 论证之一：发生式教育一直存在，只是贵", "p": "407", "g": 429, "l": 2}, {"t": "第八十七章 论证之二：印刷、广播、电视、互联网为什么没有换教育", "p": "408", "g": 430, "l": 2}, {"t": "第八十八章 论证之三：AI 做了两件相反的事", "p": "409", "g": 431, "l": 2}, {"t": "第八十九章 论证之四：第二根柱子", "p": "410", "g": 432, "l": 2}, {"t": "第九十章 包办与替代的区别", "p": "411", "g": 433, "l": 2}, {"t": "第九十一章 一条历史的对照线", "p": "412", "g": 434, "l": 2}, {"t": "第九十二章 成本翻转之后的选择，与改革的顺序", "p": "413", "g": 435, "l": 2}, {"t": "第九十三章 与近邻学说的分界", "p": "414", "g": 436, "l": 2}, {"t": "附章八 成本的一笔账", "p": "415", "g": 437, "l": 2}, {"t": "加厚二十八 计算器公案细论", "p": "417", "g": 439, "l": 2}, {"t": "加厚二十九 互联网教育史的一课", "p": "419", "g": 441, "l": 2}, {"t": "加厚三十 三所学校的画像", "p": "420", "g": 442, "l": 2}, {"t": "加厚五十九 旧教育的另外两根支撑", "p": "422", "g": 444, "l": 2}, {"t": "加厚六十 改革顺序的三个反例", "p": "423", "g": 445, "l": 2}, {"t": "加厚七十九 成本翻转之后三年内会发生什么", "p": "424", "g": 446, "l": 2}, {"t": "卷八补章一 与《AI 时代教育新使命》的划界", "p": "426", "g": 448, "l": 2}, {"t": "卷八补章二 包办的探测：一份自查表", "p": "428", "g": 450, "l": 2}, {"t": "卷八补章三 教育技术史的三个具体案例", "p": "429", "g": 451, "l": 2}, {"t": "卷八补章五 内卷在学校里的三种表现", "p": "431", "g": 453, "l": 2}, {"t": "加厚九十六 缺席祖宗：卷八逐人划界", "p": "433", "g": 455, "l": 2}, {"t": "加厚九十七 包办的诊断表", "p": "434", "g": 456, "l": 2}, {"t": "加厚一百二十 成本账：让一个判断在学生身上发生，贵在哪里", "p": "435", "g": 457, "l": 2}, {"t": "加厚一百二十一 为什么不是印刷术、广播、互联网：一张对照表", "p": "438", "g": 460, "l": 2}, {"t": "加厚一百二十二 包办：旧教育的核心环节是怎样被接管的", "p": "441", "g": 463, "l": 2}, {"t": "加厚一百三十八 替旧教育说话：四个回护的理由，与本书的回应", "p": "443", "g": 465, "l": 2}, {"t": "第九十四章 本卷可推翻处", "p": "445", "g": 467, "l": 2}, {"t": "卷九 难题八：AI 能回答一切，人为何仍须受教育", "p": "447", "g": 469, "l": 1}, {"t": "第九十五章 难题：教育会不会退化成一种爱好", "p": "448", "g": 470, "l": 2}, {"t": "第九十六章 旧答案为什么不够：两条会后撤的防线", "p": "449", "g": 471, "l": 2}, {"t": "第九十七章 猜想：不可复制的落点，与不可外包的体会", "p": "450", "g": 472, "l": 2}, {"t": "第九十八章 论证之一：题层与签收", "p": "451", "g": 473, "l": 2}, {"t": "第九十九章 论证之二：为什么能力边界是一条会后撤的防线，而落点不是", "p": "453", "g": 475, "l": 2}, {"t": "第一百章 论证之三：体会为什么不能外包", "p": "454", "g": 476, "l": 2}, {"t": "第一百〇一章 论证之四：尊严与纯人配置", "p": "455", "g": 477, "l": 2}, {"t": "附章十二 保健场的一周", "p": "456", "g": 478, "l": 2}, {"t": "第一百〇二章 与近邻学说的分界", "p": "458", "g": 480, "l": 2}, {"t": "第一百〇三章 实现", "p": "459", "g": 481, "l": 2}, {"t": "附章九 四个题层案例", "p": "460", "g": 482, "l": 2}, {"t": "加厚三十一 \"人在回路\"批评", "p": "462", "g": 484, "l": 2}, {"t": "加厚三十二 能力清单的后撤史", "p": "464", "g": 486, "l": 2}, {"t": "加厚三十三 纯人配置的制度形态", "p": "466", "g": 488, "l": 2}, {"t": "加厚六十一 一节题层训练课：水坝", "p": "467", "g": 489, "l": 2}, {"t": "加厚六十二 落点论证的哲学根：只划界，不重述", "p": "469", "g": 491, "l": 2}, {"t": "加厚八十 教育会不会退化成一种爱好：正面回答", "p": "471", "g": 493, "l": 2}, {"t": "卷九补章三 题层训练的一个学期", "p": "473", "g": 495, "l": 2}, {"t": "卷九补章四 体会的三个案例", "p": "475", "g": 497, "l": 2}, {"t": "卷九补章五 三种人的教育", "p": "477", "g": 499, "l": 2}, {"t": "加厚九十八 缺席祖宗：卷九逐人划界", "p": "479", "g": 501, "l": 2}, {"t": "加厚一百二十三 后撤防线的算术：能力边界为什么不能当根据", "p": "480", "g": 502, "l": 2}, {"t": "加厚一百二十四 落点的四个压力测试", "p": "482", "g": 504, "l": 2}, {"t": "加厚一百三十九 体会为什么不能外包：三个小例子", "p": "484", "g": 506, "l": 2}, {"t": "加厚一百四十七 给学生的一页：你为什么还要学", "p": "486", "g": 508, "l": 2}, {"t": "第一百〇四章 本卷可推翻处", "p": "488", "g": 510, "l": 2}, {"t": "卷十 难题九：教育为何必须朝向尚未发生的未来", "p": "489", "g": 511, "l": 1}, {"t": "第一百〇五章 难题：入学时学的，毕业时已被重写", "p": "490", "g": 512, "l": 2}, {"t": "第一百〇六章 旧答案为什么不够：\"打好基础\"", "p": "491", "g": 513, "l": 2}, {"t": "第一百〇七章 猜想：从已被证明到等待估价", "p": "492", "g": 514, "l": 2}, {"t": "第一百〇八章 论证之一：证明的稀缺性消失之后", "p": "493", "g": 515, "l": 2}, {"t": "第一百〇九章 论证之二：逻辑和谐与现实成立的区别", "p": "494", "g": 516, "l": 2}, {"t": "第一百一十章 论证之三：突然发生与储备", "p": "495", "g": 517, "l": 2}, {"t": "第一百一十一章 一篇猜想作业的样子", "p": "496", "g": 518, "l": 2}, {"t": "第一百一十二章 待估价库与席籍", "p": "498", "g": 520, "l": 2}, {"t": "第一百一十三章 与近邻学说的分界", "p": "499", "g": 521, "l": 2}, {"t": "第一百一十四章 实现", "p": "500", "g": 522, "l": 2}, {"t": "附章十 五份猜想作业：跨学科样张", "p": "501", "g": 523, "l": 2}, {"t": "加厚三十四 稀缺性转移的三个学科", "p": "503", "g": 525, "l": 2}, {"t": "加厚三十五 证据状态标记的实践", "p": "504", "g": 526, "l": 2}, {"t": "加厚三十六 储备的质量控制", "p": "505", "g": 527, "l": 2}, {"t": "加厚六十三 一个学校的待估价库三年后", "p": "506", "g": 528, "l": 2}, {"t": "加厚六十四 与科研诚信的接口", "p": "508", "g": 530, "l": 2}, {"t": "加厚八十一 猜想写作的评分量表", "p": "510", "g": 532, "l": 2}, {"t": "卷十补章一 待估价库的结构", "p": "511", "g": 533, "l": 2}, {"t": "卷十补章三 结算的仪式", "p": "513", "g": 535, "l": 2}, {"t": "卷十补章四 三档与猜想的对应", "p": "515", "g": 537, "l": 2}, {"t": "加厚九十九 缺席祖宗：卷十逐人划界", "p": "517", "g": 539, "l": 2}, {"t": "加厚一百 待估价库的十条结算：一所学校的样张", "p": "518", "g": 540, "l": 2}, {"t": "加厚一百二十五 待估价库：一个猜想的账是怎样记的", "p": "520", "g": 542, "l": 2}, {"t": "加厚一百二十六 四种猜想：区分有价值的与空想的", "p": "523", "g": 545, "l": 2}, {"t": "加厚一百二十七 地基的新图纸：什么变成了最基础的东西", "p": "525", "g": 547, "l": 2}, {"t": "加厚一百四十 一个初中生的猜想作业：从选题到检验", "p": "527", "g": 549, "l": 2}, {"t": "第一百一十五章 本卷可推翻处", "p": "529", "g": 551, "l": 2}, {"t": "卷十一 实验与证伪", "p": "531", "g": 553, "l": 1}, {"t": "第一百一十六章 本卷的用途", "p": "532", "g": 554, "l": 2}, {"t": "第一百一十七章 推翻处总表", "p": "533", "g": 555, "l": 2}, {"t": "第一百一十八章 实验一：可复验率", "p": "535", "g": 557, "l": 2}, {"t": "第一百一十九章 实验二：配置的解释力", "p": "536", "g": 558, "l": 2}, {"t": "第一百二十章 实验三：卡住的时间", "p": "537", "g": 559, "l": 2}, {"t": "第一百二十一章 实验四与五：现场题与退单考的追踪", "p": "538", "g": 560, "l": 2}, {"t": "第一百二十二章 实验六：分点的评分者一致性", "p": "539", "g": 561, "l": 2}, {"t": "第一百二十三章 实验七：未闭合时长与判据题", "p": "540", "g": 562, "l": 2}, {"t": "第一百二十三章之二 实验八：保健场是否保得住", "p": "541", "g": 563, "l": 2}, {"t": "加厚三十七 实验九与十：三权分立与反向配置", "p": "542", "g": 564, "l": 2}, {"t": "加厚三十八 数据伦理", "p": "543", "g": 565, "l": 2}, {"t": "加厚六十五 实验的通用规程", "p": "544", "g": 566, "l": 2}, {"t": "加厚六十六 若本书全错", "p": "546", "g": 568, "l": 2}, {"t": "卷十一补章三 本书自己的证据状态", "p": "548", "g": 570, "l": 2}, {"t": "加厚一百〇一 十个实验的预注册表", "p": "549", "g": 571, "l": 2}, {"t": "加厚一百二十八 实验二的完整设计：配置对产出有没有解释力", "p": "551", "g": 573, "l": 2}, {"t": "加厚一百二十九 结果的三种读法：成功、失败、模糊", "p": "553", "g": 575, "l": 2}, {"t": "加厚一百三十 谁来做、怎样公开：实验的组织办法", "p": "555", "g": 577, "l": 2}, {"t": "加厚一百四十一 八个实验的依赖：为什么先做实验六", "p": "557", "g": 579, "l": 2}, {"t": "加厚一百四十八 给认领者的一页纸", "p": "559", "g": 581, "l": 2}, {"t": "第一百二十四章 首批实验的顺序与停止条件", "p": "561", "g": 583, "l": 2}, {"t": "结语 新教育自己也是一个猜想", "p": "562", "g": 584, "l": 1}, {"t": "附录", "p": "565", "g": 587, "l": 1}, {"t": "附录一 岔口册样张：高中数学\"函数与变化\"二十个岔口", "p": "566", "g": 588, "l": 2}, {"t": "附录二 术语表", "p": "569", "g": 591, "l": 2}, {"t": "附录三 给一位校长的十二个月", "p": "572", "g": 594, "l": 2}, {"t": "附录四 岔口册样张：初中物理二十个岔口", "p": "574", "g": 596, "l": 2}, {"t": "附录五 教席自评清单", "p": "576", "g": 598, "l": 2}, {"t": "附录六 常见反对与本书的回答", "p": "577", "g": 599, "l": 2}, {"t": "附录七 给家长的十个问题", "p": "579", "g": 601, "l": 2}, {"t": "附录八 给一位大学系主任的一年", "p": "581", "g": 603, "l": 2}, {"t": "附录九 全书判断总表", "p": "583", "g": 605, "l": 2}, {"t": "附录十 给家长的十二个月", "p": "585", "g": 607, "l": 2}, {"t": "附录十一 给一位大学院长的十二个月", "p": "587", "g": 609, "l": 2}, {"t": "附录十二 九题一页纸", "p": "588", "g": 610, "l": 2}, {"t": "封底", "p": "", "g": 614, "l": 1}]</script>
+
+<script>
+(function(){
+'use strict';
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var TOC = JSON.parse(document.getElementById('toc').textContent);
+var $ = function(id){ return document.getElementById(id); };
+
+var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var themes=['','day','sepia'], ti=0;
+var cache={}, textCache={}, vecOK=0, vecFail=0;
+/* —— 接入 SDE 陪读（WDS）：把当前可见页的文本与页码喂给助手；文字层可选中某句作焦点 —— */
+window.WDS_READ = {
+  title: 'AI时代的新教育',
+  bodyEl: function(){ return document.getElementById('book'); },
+  docTextFn: function(){
+    if(!doc) return '';
+    var l = spread ? (cur%2===0?cur:cur-1) : cur, ps = spread ? [l, l+1] : [cur];
+    var t = ps.filter(function(p){ return p>=1 && p<=total && textCache[p]; }).map(function(p){
+      var pr = p-CFG.offset+1; return '【第 '+(pr>0?pr:p)+' 页 / 共 '+total+' 页】\n'+textCache[p]; }).join('\n');
+    return t;
+  }
+};
+
+function msg(t, spin){ $('msgT').textContent=t; $('msg').classList.remove('hide');
+  $('msg').querySelector('.sp').style.display = spin===false?'none':''; }
+function hideMsg(){ $('msg').classList.add('hide'); }
+function hint(t){ var h=$('hint'); h.textContent=t; h.classList.add('show');
+  clearTimeout(h._t); h._t=setTimeout(function(){h.classList.remove('show');},1400); }
+
+/* ── 版心尺寸：按舞台可用空间算，双页则一半 ── */
+function box(){
+  var st=$('stage'), W=st.clientWidth-40, H=st.clientHeight-30;
+  var n = spread?2:1;
+  return {W:W, H:H, n:n};
+}
+function fit(vp){
+  var b=box();
+  var maxW=(b.W/b.n), maxH=b.H;
+  var s=Math.min(maxW/vp.width, maxH/vp.height)*zoom;
+  return s;
+}
+
+/* ── 渲染一页：优先矢量(SVG)，失败回落高清 canvas ── */
+function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
+  var leaf = canvasEl.parentNode;
+  if(pageNo<1||pageNo>total){ leaf.style.visibility='hidden'; if(tlEl) tlEl.innerHTML=''; cb&&cb(); return; }
+  leaf.style.visibility='visible';
+  doc.getPage(pageNo).then(function(pg){
+    var vp0=pg.getViewport({scale:1});
+    var sc=fit(vp0), vp=pg.getViewport({scale:sc});
+    leaf.style.width=Math.round(vp.width)+'px';
+    leaf.style.height=Math.round(vp.height)+'px';
+    if(vector && svgEl && window.pdfjsLib && pdfjsLib.SVGGraphics){
+      leaf.classList.add('vec');
+      pg.getOperatorList().then(function(ops){
+        var g=new pdfjsLib.SVGGraphics(pg.commonObjs, pg.objs);
+        g.embedFonts=true;
+        return g.getSVG(ops, vp);
+      }).then(function(svg){
+        vecOK++;
+        svg.setAttribute('width', Math.round(vp.width));
+        svg.setAttribute('height', Math.round(vp.height));
+        svgEl.innerHTML=''; svgEl.appendChild(svg);
+        if(tlEl) buildText(pg, vp, tlEl);
+        cb&&cb();
+      }).catch(function(){
+        /* 逐页回退：这一页含矢量后端不支持的内容（多为位图封面、插图），只这一页用高清位图；
+           其余页照旧矢量。连续失败过多才整本切到位图。 */
+        vecFail++;
+        if(vecFail>=6 && vecFail>vecOK){
+          vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
+          hint('此文档的矢量渲染不可用，已切回高清位图');
+        }
+        leaf.classList.remove('vec');
+        drawCanvas(pg, vp, canvasEl, tlEl, cb);
+      });
+    }else{
+      leaf.classList.remove('vec');
+      drawCanvas(pg, vp, canvasEl, tlEl, cb);
+    }
+  }).catch(function(){ cb&&cb(); });
+}
+
+function drawCanvas(pg, vp, canvasEl, tlEl, cb){
+  var dpr=Math.min(window.devicePixelRatio||1, 3);
+  canvasEl.width=Math.round(vp.width*dpr); canvasEl.height=Math.round(vp.height*dpr);
+  canvasEl.style.width=Math.round(vp.width)+'px'; canvasEl.style.height=Math.round(vp.height)+'px';
+  var ctx=canvasEl.getContext('2d',{alpha:false});
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#FBF7EE'; ctx.fillRect(0,0,vp.width,vp.height);
+  pg.render({canvasContext:ctx, viewport:vp, intent:'display'}).promise.then(function(){
+    if(tlEl) buildText(pg, vp, tlEl);
+    cb&&cb();
+  }).catch(function(){ cb&&cb(); });
+}
+
+function buildText(pg, vp, el){
+  el.innerHTML='';
+  pg.getTextContent().then(function(tc){
+    try{ textCache[pg.pageNumber]=tc.items.map(function(x){return x.str;}).join(''); }catch(e){}
+    var frag=document.createDocumentFragment();
+    tc.items.forEach(function(it){
+      if(!it.str) return;
+      var tx=pdfjsLib.Util.transform(vp.transform, it.transform);
+      var s=document.createElement('span');
+      s.textContent=it.str;
+      var h=Math.hypot(tx[2],tx[3]);
+      s.style.left=tx[4]+'px'; s.style.top=(tx[5]-h)+'px';
+      s.style.fontSize=h+'px'; s.style.fontFamily='sans-serif';
+      frag.appendChild(s);
+    });
+    el.appendChild(frag);
+  }).catch(function(){});
+}
+
+/* ── 展示当前跨页 ── */
+function show(cb){
+  if(rendering){ return; }
+  rendering=true;
+  document.getElementById('book').classList.toggle('single', !spread);
+  $('leafR').style.display = spread?'':'none';
+  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  if(left<1) left=0;
+  var right= left+1;
+  var done=0, need=spread?2:1;
+  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
+  if(spread){
+    $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
+    $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
+    renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
+    renderInto(right, $('cR'), $('tR'), fin, $('sR'));
+  }else{
+    $('nL').textContent = cur-CFG.offset+1>0?(cur-CFG.offset+1):'';
+    renderInto(cur, $('cL'), $('tL'), fin, $('sL'));
+  }
+}
+
+function sync(){
+  var printed = Math.max(1, cur-CFG.offset+1);
+  $('pi').value = printed;
+  $('pt').textContent = Math.max(1,total-CFG.offset+1);
+  var r = (cur-1)/Math.max(1,total-1);
+  $('fill').style.width=(r*100)+'%';
+  $('knob').style.left=(r*100)+'%';
+  try{ localStorage.setItem(CFG.key, String(cur)); }catch(e){}
+  Array.prototype.forEach.call($('thumbs').children, function(c){
+    c.classList.toggle('cur', +c.dataset.p===cur);
+  });
+}
+
+/* ── 翻页（带动画） ── */
+function step(dir){
+  var n = spread?2:1;
+  var t = cur + dir*n;
+  if(t<1) t=1; if(t>total) t=total;
+  if(t===cur) return;
+  animate(dir, function(){ cur=t; show(); });
+}
+function animate(dir, after){
+  var src = dir>0 ? $('leafR') : $('leafL');
+  if(!spread || !src || src.style.display==='none'){ after(); return; }
+  var fl=document.createElement('div');
+  fl.className='flip'+(dir>0?'':' back');
+  var w=src.offsetWidth, h=src.offsetHeight;
+  fl.style.width=w+'px'; fl.style.height=h+'px';
+  fl.style.left = dir>0 ? (w+'px') : '0px';
+  var live = src.classList.contains('vec') ? src.querySelector('.svg svg') : src.querySelector('canvas');
+  if(live){
+    var cl = live.cloneNode(true);
+    cl.style.width='100%'; cl.style.height='100%'; cl.style.display='block';
+    fl.appendChild(cl);
+  }
+  $('book').appendChild(fl);
+  requestAnimationFrame(function(){ fl.classList.add('go'); });
+  setTimeout(function(){ fl.remove(); after(); }, 620);
+}
+function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+
+/* ── 目录 ── */
+/* 目录兜底：TOC 为空时从 PDF 书签生成（新迁入的书多半没有手工目录） */
+function outlineToc(d){
+  return d.getOutline().then(function(ol){
+    var out=[]; if(!ol||!ol.length) return out;
+    function walk(items,l){
+      return items.reduce(function(p,it){
+        return p.then(function(){
+          var ds=it.dest;
+          return (typeof ds==='string'? d.getDestination(ds) : Promise.resolve(ds))
+            .then(function(x){ return x ? d.getPageIndex(x[0]) : null; })
+            .then(function(ix){
+              if(ix!=null){ var g=ix+1, pr=g-CFG.offset+1; out.push({t:it.title, p:pr>0?String(pr):'', g:g, l:l===1?1:2}); }
+              if(it.items && it.items.length && l<2) return walk(it.items,l+1);
+            }).catch(function(){});
+        });
+      }, Promise.resolve());
+    }
+    return walk(ol,1).then(function(){ return out; });
+  }).catch(function(){ return []; });
+}
+function buildToc(){
+  var box=$('dlist'); box.innerHTML='';
+  TOC.forEach(function(e){
+    var a=document.createElement('a');
+    a.className = e.l===1?'l1':'l2';
+    a.href='#'; a.innerHTML='<span>'+e.t.replace(/</g,'&lt;')+'</span><span class="n">'+e.p+'</span>';
+    a.onclick=function(ev){ ev.preventDefault(); go(e.g ? e.g : (+e.p)+CFG.offset-1); closeDrawer(); };
+    box.appendChild(a);
+  });
+}
+function closeDrawer(){ $('drawer').classList.remove('open'); }
+
+/* ── 全书检索 ── */
+function search(q){
+  if(!q){ $('dHead').textContent='目　录'; buildToc(); return; }
+  var box=$('dlist'); box.innerHTML=''; $('dHead').textContent='检索：'+q;
+  var found=0, scanned=0;
+  msg('正在检索全书…');
+  function scan(i){
+    if(i>total || found>=120){ hideMsg(); if(!found){ box.innerHTML='<div class="hit">没有找到。</div>'; } return; }
+    var pr = textCache[i] ? Promise.resolve(textCache[i])
+      : doc.getPage(i).then(function(p){ return p.getTextContent(); })
+          .then(function(tc){ var s=tc.items.map(function(x){return x.str;}).join(''); textCache[i]=s; return s; });
+    pr.then(function(s){
+      var k=s.indexOf(q);
+      if(k>=0){
+        found++;
+        var d=document.createElement('div'); d.className='hit';
+        var a=Math.max(0,k-16), b=Math.min(s.length,k+q.length+22);
+        d.innerHTML='<b>'+(i-CFG.offset+1)+'</b>　'+s.slice(a,k).replace(/</g,'&lt;')+
+          '<b>'+q.replace(/</g,'&lt;')+'</b>'+s.slice(k+q.length,b).replace(/</g,'&lt;');
+        d.onclick=function(){ go(i); closeDrawer(); };
+        box.appendChild(d);
+      }
+      scanned++;
+      if(scanned%12===0){ $('msgT').textContent='正在检索全书…  '+Math.round(i/total*100)+'%'; }
+      scan(i+1);
+    }).catch(function(){ scan(i+1); });
+  }
+  scan(1);
+}
+
+/* ── 缩略图 ── */
+var thumbsBuilt=false;
+function buildThumbs(){
+  if(thumbsBuilt) return; thumbsBuilt=true;
+  var wrap=$('thumbs');
+  var i=1;
+  function one(){
+    if(i>total) return;
+    var p=i;
+    doc.getPage(p).then(function(pg){
+      var vp=pg.getViewport({scale:1});
+      var s=150/vp.height, v=pg.getViewport({scale:s});
+      var c=document.createElement('canvas');
+      c.width=v.width; c.height=v.height; c.dataset.p=p;
+      c.onclick=function(){ go(p); };
+      wrap.appendChild(c);
+      return pg.render({canvasContext:c.getContext('2d'), viewport:v}).promise;
+    }).then(function(){ i++; setTimeout(one, 0); }).catch(function(){ i++; setTimeout(one,0); });
+  }
+  one();
+}
+
+/* ── 事件 ── */
+$('btnPrev').onclick=function(){ step(-1); };
+$('btnNext').onclick=function(){ step(1); };
+$('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
+$('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
+$('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);
+  this.textContent=vector?'矢量':'位图'; hint(vector?'矢量源渲染':'高清位图'); show(); };
+$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'%'); };
+$('btnZoomOut').onclick=function(){ zoom=Math.max(.5, zoom/1.15); show(); hint('缩小 '+Math.round(zoom*100)+'%'); };
+$('btnThumbs').onclick=function(){ $('thumbs').classList.toggle('open'); if($('thumbs').classList.contains('open')) buildThumbs(); };
+$('btnTheme').onclick=function(){ ti=(ti+1)%3; document.documentElement.className=themes[ti];
+  this.textContent=['夜','日','纸'][ti]; show(); };
+$('btnFull').onclick=function(){ if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); };
+$('q').onkeydown=function(e){ if(e.key==='Enter'){ search(this.value.trim()); } };
+$('rail').onclick=function(e){ var r=this.getBoundingClientRect();
+  go(Math.round((e.clientX-r.left)/r.width*(total-1))+1); };
+
+document.addEventListener('keydown',function(e){
+  if(/input|textarea|select/i.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){ step(-1); e.preventDefault(); }
+  else if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ step(1); e.preventDefault(); }
+  else if(e.key==='Home'){ go(1); } else if(e.key==='End'){ go(total); }
+  else if(e.key==='t'||e.key==='T'){ $('btnToc').click(); }
+  else if(e.key==='d'||e.key==='D'){ $('btnSpread').click(); }
+  else if(e.key==='v'||e.key==='V'){ $('btnVec').click(); }
+  else if(e.key==='n'||e.key==='N'){ $('btnTheme').click(); }
+  else if(e.key==='f'||e.key==='F'){ $('btnFull').click(); }
+});
+var sx=0, sy=0;
+$('stage').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+$('stage').addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.4){ step(dx<0?1:-1); }
+},{passive:true});
+var rt=null;
+window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ show(); },160); });
+
+/* ── 启动 ── */
+function boot(){
+  if(!window.pdfjsLib){ setTimeout(boot,120); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  $('btnVec').classList.add('on');
+  msg('正在载入《AI时代的新教育》…');
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise.then(function(d){
+    doc=d; total=d.numPages;
+    buildToc();
+    if(!TOC.length){ outlineToc(d).then(function(t){ if(t.length){ TOC=t; buildToc(); } }); }
+    var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
+    cur = (saved>0&&saved<=total) ? saved : 1;
+    if(window.innerWidth<820) spread=false, $('btnSpread').textContent='单页';
+    show(function(){ if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
+  }).catch(function(err){
+    msg('书页载入失败。可直接打开原文 PDF：'+CFG.pdf, false);
+  });
+}
+boot();
+})();
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20261005a" defer></script>
+</body>
+</html>
