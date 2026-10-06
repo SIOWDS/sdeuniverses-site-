@@ -14,7 +14,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 SITE = HERE.resolve().parents[1] / 'public'
 NO = 231
-V = '20261006a'
+V = '20261006b'
 SLUG = 'kexue-shi-shenme'
 T, SUB = '科学是什么？', '从发现到发生：意义驱动下的实体创造机制'
 ISBN = '978-1-970820-08-9'
@@ -24,7 +24,6 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--build', type=Path, required=True)
     b = ap.parse_args().build
     d = SITE / 'books' / 'm' / str(NO)
-    assert not (d / 'index.html').exists(), f'{NO} 号目录已存在'
     (d / 'text').mkdir(parents=True, exist_ok=True)
     for f in [f'{SLUG}-print.pdf', f'{SLUG}-reader.pdf', 'cover.jpg', 'backcover.jpg']:
         shutil.copy(b / f, d / f)
@@ -68,7 +67,9 @@ def main():
     cat_p = SITE / 'books' / 'catalog.json'
     data = json.loads(cat_p.read_text())
     books = data['books']
-    assert not any(str(x.get('number')) == str(NO) for x in books), f'{NO} 号已被占用'
+    old = [x for x in books if str(x.get('number')) == str(NO)]   # 重排再版：沿用首次上线时间
+    pos = next((i for i, x in enumerate(books) if str(x.get('number')) == str(NO)), 0)
+    books[:] = [x for x in books if str(x.get('number')) != str(NO)]
     assert not ISBN or not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in books), 'ISBN 重号'
     url = f'https://sdeuniverses.com/books/m/{NO}/'
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -82,7 +83,9 @@ def main():
                  pdfPages=pages, publishedAt=now, publisher='德麦国际出版社', publisherEnglish='Demai International Press')
     if ISBN:
         entry['isbn'] = ISBN.replace('-', '')
-    books.insert(0, entry)
+    if old:
+        entry['publishedAt'] = old[0]['publishedAt']
+    books.insert(pos, entry)
     data['updated'] = now[:10]
     cat_p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
     # 站点地图

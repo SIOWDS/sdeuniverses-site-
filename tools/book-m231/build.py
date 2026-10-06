@@ -19,7 +19,7 @@ SLUG = 'kexue-shi-shenme'
 META = dict(
     title='科学是什么？', name='科学是什么？',
     subtitle='从发现到发生：意义驱动下的实体创造机制', author='王德生　牟军', no=231,
-    isbn='978-1-970820-08-9', price='US$55.00', version='20261006a',
+    isbn='978-1-970820-08-9', price='US$55.00', version='20261006b',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
@@ -100,6 +100,40 @@ def inline(s):
     return s
 
 
+CONN = ('因此', '然而', '于是', '所以', '由此', '换言之', '换句话说', '更重要的是', '更关键的是', '更进一步', '进一步', '与此同时', '同时', '相反', '反过来',
+        '但', '可是', '不过', '正因为', '正因如此', '这意味着', '这就是', '这也', '这并不', '这正是', '这一', '这种', '这套', '这条', '在这', '在此', '在本书', '本书', '本章', '本节',
+        '第一', '第二', '第三', '第四', '其一', '其二', '其三', '首先', '其次', '最后', '最终', '总之', '简言之', '一旦', '只要', '只有', '当', '如果', '若', '对', '从', '以', '例如', '比如', '所谓')
+
+
+def split_para(t, limit=250):
+    """版式动作，不动一个字：过长的段在句末断开（220 号的段落节奏）。不在引号、括号、加粗内断。"""
+    if len(t) <= limit:
+        return [t]
+    sents, cur, depth, i = [], '', 0, 0
+    while i < len(t):
+        ch = t[i]; cur += ch
+        if ch in '“（《「': depth += 1
+        elif ch in '”）》」': depth = max(0, depth - 1)
+        if ch in '。！？' and depth == 0 and cur.count('**') % 2 == 0:
+            while i + 1 < len(t) and t[i + 1] in '”’）':
+                i += 1; cur += t[i]
+            sents.append(cur); cur = ''
+        i += 1
+    if cur:
+        sents.append(cur)
+    out, buf = [], ''
+    for k, sn in enumerate(sents):
+        if buf and ((len(buf) >= 100 and sn.startswith(CONN) and len(buf) + len(sn) > 190) or len(buf) + len(sn) > 240):
+            out.append(buf); buf = ''
+        buf += sn
+    if buf:
+        if out and len(buf) < 70:
+            out[-1] += buf
+        else:
+            out.append(buf)
+    return out
+
+
 def table_html(rows, cls='tb'):
     cells = [[c.strip() for c in r.strip().strip('|').split('|')] for r in rows]
     cells = [r for r in cells if not all(re.fullmatch(r':?-{2,}:?', c) for c in r)]
@@ -137,21 +171,35 @@ def quote_html(lines):
     return '<blockquote class="verdict">%s</blockquote>' % ''.join('<p>%s</p>' % inline(l) for l in body)
 
 
-def render(blocks, bib=False):
+def render(blocks, bib=False, split=True):
     h = []
+    kit = False
+
+    def close():
+        nonlocal kit
+        if kit:
+            h.append('</div>'); kit = False
     for k, b in blocks:
         if k == 'p':
             t = b[0]
-            if re.fullmatch(r'〔[^〔〕]*〕', t):
-                h.append('<p class="srcnote">%s</p>' % inline(t))
+            if kit and t.startswith('至此'):
+                close()
+            if kit or not split:
+                h.append('<p>%s</p>' % inline(t))
             else:
-                h.append('<p%s>%s</p>' % (' class="bib"' if bib else '', inline(t)))
+                h.extend('<p>%s</p>' % inline(x) for x in split_para(t))
         elif k == 'h3':
             t = b[0]
-            if t.startswith('◆'):
-                h.append('<h3 class="sec"><span class="dia">◆</span>%s</h3>' % inline(t.lstrip('◆ ').strip()))
+            close()
+            if t.startswith('◆'):   # 产出物、模板：整块装进米底金线的工具卡
+                kit = True
+                h.append('<div class="kit"><div class="kit-lab">工 具 卡</div><h3 class="kit-h">%s</h3>' % inline(t.lstrip('◆ ').strip()))
             else:
-                h.append('<h3 class="sec">%s</h3>' % inline(t))
+                m = re.match(r'^(\d+\.\d+)[　 ]+(.*)$', t)
+                if m:
+                    h.append('<h3 class="sec"><span class="dia">◆</span><span class="secno">%s</span>%s</h3>' % (m[1], inline(m[2])))
+                else:
+                    h.append('<h3 class="sec"><span class="dia">◆</span>%s</h3>' % inline(t))
         elif k == 'h2':
             h.append('<h3 class="subhead">%s</h3>' % inline(b[0]))
         elif k == 'h4':
@@ -166,13 +214,41 @@ def render(blocks, bib=False):
             if bib:
                 h.append(''.join('<p class="bib"><span class="bn">%s.</span> %s</p>' % (re.match(r'^(\d+)\. ', x)[1], inline(re.sub(r'^\d+\. ', '', x))) for x in b))
             else:
-                start = int(re.match(r'^(\d+)\. ', b[0])[1])
-                h.append('<ol class="ls"%s>%s</ol>' % (' start="%d"' % start if start != 1 else '',
-                                                       ''.join('<li>%s</li>' % inline(re.sub(r'^\d+\. ', '', x)) for x in b)))
+                # WeasyPrint 不认 <ol start>，编号直接排出来
+                h.append(''.join('<p class="oli"><span class="on">%s.</span>%s</p>' % (re.match(r'^(\d+)\. ', x)[1], inline(re.sub(r'^\d+\. ', '', x))) for x in b))
         elif k == 'orn':
             h.append('<div class="orn">◆</div>')
         elif k == 'pre':
             h.append('<div class="card">%s</div>' % ''.join('<p>%s</p>' % inline(x.strip()) for x in b if x.strip()))
+    close()
+    return '\n'.join(h)
+
+
+def cards(bl, kind):
+    """专家推荐语 / 术语表 / 金句集锦：每条一张卡。"""
+    out, cur = [], None
+    for k, b in bl:
+        if k == 'h3':
+            cur = [re.sub(r'^\d+）\s*', '', b[0]), []]; out.append(cur)
+        elif cur is None:
+            out.append([None, [(k, b)]])
+        else:
+            cur[1].append((k, b))
+    h = []
+    for n, (t, body) in enumerate([o for o in out if o[0] is None]):
+        h.append(render(body, split=False))
+    n = 0
+    for t, body in out:
+        if t is None:
+            continue
+        n += 1
+        inner = render(body, split=False)
+        if kind == 'rec':
+            h.append('<div class="rec"><div class="rec-who"><span class="rn">%02d</span>%s</div>%s</div>' % (n, inline(t), inner))
+        elif kind == 'term':
+            h.append('<div class="term"><div class="term-h"><span class="rn">%02d</span>%s</div>%s</div>' % (n, inline(t), inner))
+        else:
+            h.append('<div class="gold"><div class="gn">%02d</div><div class="gq">%s</div>%s</div>' % (n, inline(t), inner))
     return '\n'.join(h)
 
 
@@ -226,7 +302,8 @@ def build_sections():
         kind = 'main' if name == '导论' else 'front'
         head = '<h1 class="fs-title">%s</h1>%s<div class="rule"></div>' % (
             name, '<div class="fs-sub">%s</div>' % inline(sub) if sub else '')
-        secs.append((kind, sid(), name + ('　' + sub if sub else ''), 1, head + render(bl)))
+        body = cards(bl, 'rec') if name == '专家推荐语' else cards(bl, 'term') if name == '术语表' else render(bl)
+        secs.append((kind, sid(), name + ('　' + sub if sub else ''), 1, head + body))
 
     # ── 基础编与四大编 ──
     for f in FILES[1:1 + NPARTS]:
@@ -237,12 +314,16 @@ def build_sections():
             if bl[i][0] == 'quote':
                 xu = bl[i][1][0].split('　', 1)[1]
             elif bl[i][0] == 'p':
-                intro.append('<p class="bianxu">%s</p>' % inline(bl[i][1][0]))
+                intro.append(bl[i])
             i += 1
+        chs = [x[1][0] for x in bl if x[0] == 'h2' and x[1][0].startswith('第 ')]
         secs.append(('part', sid(), '%s　%s' % (label, ptitle), 1,
                      '%s<div class="part-label">%s</div><h1 class="part-title">%s</h1><div class="rule"></div>'
-                     '<div class="daoyu">编　序</div><div class="xu-title">%s</div><div class="part-intro">%s</div>'
-                     % (EMB, spaced(label), inline(ptitle), inline(xu), ''.join(intro))))
+                     '<div class="daoyu">本 编 章 目</div><div class="part-chs">%s</div>'
+                     % (EMB, spaced(label), inline(ptitle), ''.join('<p>%s</p>' % inline(c) for c in chs))))
+        secs.append(('chapter', sid(), '%s编序　%s' % (label, xu), 2,
+                     '<div class="chap-label">%s　编 序</div><h2 class="chap-title">%s</h2><div class="rule"></div>%s'
+                     % (spaced(label), inline(xu), with_endmark(render(intro)))))
         while i < len(bl):
             t = bl[i][1][0]
             j = i + 1
@@ -274,7 +355,8 @@ def build_sections():
         nm, _, sb = title.partition('　')
         secs.append(('back', sid(), title, 1,
                      '<h1 class="fs-title">%s</h1>%s<div class="rule"></div>%s' % (
-                         nm, '<div class="fs-sub">%s</div>' % inline(sb) if sb else '', with_endmark(render(body)))))
+                         nm, '<div class="fs-sub">%s</div>' % inline(sb) if sb else '',
+                         with_endmark(cards(body, 'gold') if nm == '金句集锦' else render(body)))))
     return secs
 
 
@@ -322,6 +404,26 @@ h3.sec{{font:700 {body_pt*1.03:.2f}pt/1.6 'Noto Sans CJK SC';color:#1F3A5F;margi
 h3.sec .dia{{color:#B08A3C;font-size:.78em;margin-right:.45em;vertical-align:.08em}}
 h4.sub4{{font:700 {body_pt*0.98:.2f}pt/1.6 'Noto Serif CJK SC';color:#7A5E22;margin:4mm 0 1.6mm;break-after:avoid}}
 .xu-title{{font:700 11pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;margin:0 0 5mm}}
+h3.sec .secno{{color:#B08A3C;margin-right:.6em;font-family:'Noto Serif CJK SC'}}
+.kit{{background:#F6F1E4;border-top:1.6pt solid #B08A3C;border-bottom:.6pt solid #D8CFBB;padding:3.2mm 4.6mm 2.4mm;margin:7mm 0 5mm;box-decoration-break:clone}}
+.kit-lab{{font:700 6.8pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.5em;margin-bottom:1mm}}
+.kit-h{{font:700 {body_pt*1.08:.2f}pt/1.5 'Noto Serif CJK SC';color:#1F3A5F;margin:0 0 2.4mm;break-after:avoid}}
+.kit p{{text-indent:0;font-size:{body_pt*0.92:.2f}pt;line-height:1.75;margin:0 0 1mm;text-align:left}}
+.kit h4.sub4{{margin:3mm 0 1mm;color:#1F3A5F;font-family:'Noto Sans CJK SC';font-size:{body_pt*0.92:.2f}pt}}
+.kit ul.ls,.kit ol.ls{{font-size:{body_pt*0.92:.2f}pt;line-height:1.75;margin:.6mm 0 1.6mm}}
+.kit table.tb{{background:#FBF8F0}}
+.rec{{border-left:1.6pt solid #B08A3C;background:#F6F1E4;padding:2.8mm 4.4mm 2.4mm;margin:0 0 4mm;break-inside:avoid}}
+.rec-who,.term-h{{font:700 {body_pt*0.95:.2f}pt/1.5 'Noto Sans CJK SC';color:#1F3A5F;margin-bottom:1.2mm}}
+.rn{{color:#B08A3C;font-family:'Noto Serif CJK SC';margin-right:.7em;letter-spacing:.04em}}
+.rec p{{text-indent:0;font-size:{body_pt*0.9:.2f}pt;line-height:1.78;margin:0;color:#3A372F}}
+.term{{border-bottom:.5pt solid #E4DCCB;padding:2.2mm 0 1.6mm;break-inside:avoid}}
+.term p{{text-indent:0;font-size:{body_pt*0.93:.2f}pt;line-height:1.78;margin:0 0 .8mm}}
+.term blockquote.verdict{{margin:1.4mm 0}} .term blockquote.verdict p{{font-weight:400;color:#3A372F}}
+.gold{{margin:0 0 6.5mm;break-inside:avoid}}
+.gn{{font:300 20pt/1 'Noto Serif CJK SC';color:#D9C39A}}
+.gq{{font:700 {body_pt*1.22:.2f}pt/1.55 'Noto Serif CJK SC';color:#1F3A5F;border-top:.8pt solid #B08A3C;padding-top:1.6mm;margin:1mm 0 1.8mm}}
+.gold p{{text-indent:0;font-size:{body_pt*0.93:.2f}pt;line-height:1.8;color:#3A372F;margin:0}}
+.part-chs{{margin-top:2mm}} .part-chs p{{text-indent:0;text-align:center;font-size:{body_pt*0.92:.2f}pt;line-height:2.1;color:#4A463D;margin:0}}
 h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;margin:6mm 0 2.5mm;break-after:avoid}}
 .takeaway{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;padding:2.6mm 4mm 2.8mm;margin:6mm 0 3.5mm;break-inside:avoid}}
 .takeaway .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.5em;margin-bottom:1.4mm}}
@@ -346,6 +448,8 @@ table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 '
 table.tb td{{border-bottom:.5pt solid #E4DCCB;padding:1.3mm 1.6mm;vertical-align:top}}
 table.tb tr:nth-child(even) td{{background:#F6F1E4}}
 table.tb5 td:nth-child(-n+2),table.tb5 th:nth-child(-n+2){{white-space:nowrap;width:1%}}
+p.oli{{text-indent:-1.9em;padding-left:3.2em;margin:.5mm 0 .9mm;text-align:left}} p.oli .on{{display:inline-block;width:1.9em;text-indent:0;color:#B08A3C;font-weight:700}}
+.kit p.oli{{text-indent:-1.9em;padding-left:2.4em}}
 ul.ls,ol.ls{{margin:1mm 0 2.5mm;padding-left:2.2em}} ul.ls li,ol.ls li{{margin:.4mm 0}}
 p.bib{{text-indent:-2em;padding-left:2em;font-size:{body_pt*0.88:.2f}pt;line-height:1.75;margin-bottom:1.2mm;text-align:left}}
 p.bib .bn{{color:#B08A3C}}
@@ -382,6 +486,11 @@ table.cp tr:nth-child(odd){{background:#F4EFE3}}
 .toc li{{display:flex;font-size:{body_pt*0.86:.2f}pt;line-height:1.6}}
 .toc li a{{color:inherit;text-decoration:none}}
 .toc li .t{{flex:1}}
+.toc li .t{{flex:none;max-width:86%}}
+.toc li .dots{{flex:1;border-bottom:.7pt dotted #C9BFA8;margin:0 .5em .45em}}
+.toc li.p .dots,.toc li.f .dots{{border-bottom-color:transparent}}
+.kit-h,.kit-h + *,.kit-h + * + *{{break-before:avoid}}
+.kit-lab{{break-after:avoid}}
 .toc li .pg{{color:#8A8578;font-family:'Noto Serif CJK SC';min-width:9mm;text-align:right}}
 .toc li.p{{font-weight:700;color:#1F3A5F;margin-top:2.2mm}}
 .toc li.c{{padding-left:2em;color:#2A2824}}
@@ -407,7 +516,7 @@ def toc_block(secs, pages, roman_ids):
             cls = 'a'
         pg = pages.get(sid)
         pgs = '' if pg is None else (roman(pg) if sid in roman_ids else str(pg))
-        li.append('<li class="%s"><span class="t"><a href="#%s">%s</a></span><span class="pg">%s</span></li>'
+        li.append('<li class="%s"><span class="t"><a href="#%s">%s</a></span><span class="dots"></span><span class="pg">%s</span></li>'
                   % (cls, sid, inline(title), pgs))
     return '<section class="toc front-sec"><h1>目录</h1><div class="rule"></div><ul>%s</ul></section>' % ''.join(li)
 
@@ -544,6 +653,21 @@ table.cp th{background:none;color:var(--dim);font-weight:400;width:5rem}table.cp
 .card{background:var(--soft);border-left:3px solid var(--navy);padding:.8rem 1rem;margin:1rem 0;border-radius:4px}.card p{text-indent:0;margin:0 0 .2rem;font-family:sans-serif;font-size:.9rem}
 .part-intro p.bianxu{letter-spacing:0;font-size:1rem;font-family:inherit;text-align:justify;text-indent:2em;color:var(--ink);margin:0 0 .9em}
 h3.sec .dia{margin-right:.4em}
+h3.sec .secno{color:var(--gold);margin-right:.6em}
+p.oli{text-indent:-1.9em;padding-left:3.2em;margin:.2rem 0 .4rem}p.oli .on{display:inline-block;width:1.9em;text-indent:0;color:var(--gold);font-weight:700}
+.kit p.oli{text-indent:-1.9em;padding-left:2.4em}
+.kit{background:var(--soft);border-top:3px solid var(--gold);padding:1rem 1.2rem .6rem;margin:1.8rem 0;border-radius:0 0 6px 6px}
+.kit-lab{font:700 .72rem sans-serif;color:var(--gold);letter-spacing:.5em}
+.kit-h{color:var(--navy);font-size:1.12rem;margin:.2rem 0 .7rem}
+.kit p{text-indent:0;font-size:.95rem;margin:0 0 .35rem}
+.rec{border-left:3px solid var(--gold);background:var(--soft);padding:.9rem 1.1rem;margin:0 0 1rem;border-radius:0 6px 6px 0}
+.rec-who,.term-h{font:700 1rem sans-serif;color:var(--navy);margin-bottom:.35rem}
+.rn{color:var(--gold);margin-right:.7em;font-family:serif}
+.rec p,.term p,.gold p{text-indent:0;margin:0 0 .3rem;font-size:.96rem}
+.term{border-bottom:1px solid var(--line,#e4dccb);padding:.8rem 0 .5rem}
+.gold{margin:0 0 1.8rem}.gn{font-size:1.8rem;color:var(--gold);opacity:.5;line-height:1}
+.gq{font-weight:700;font-size:1.18rem;color:var(--navy);border-top:2px solid var(--gold);padding-top:.5rem;margin:.3rem 0 .5rem}
+.part-chs p{text-indent:0;text-align:center;color:var(--dim);margin:0;line-height:2.1}
 h4.sub4{font-size:1.02rem;color:#8a6a26;margin:1.4rem 0 .5rem}
 .xu-title{font-weight:700;color:var(--navy);margin:0 0 1rem;text-align:center}
 """
@@ -569,7 +693,7 @@ h4.sub4{font-size:1.02rem;color:#8a6a26;margin:1.4rem 0 .5rem}
 <div class="wrap">
 <div class="hero"><img src="/books/m/{META['no']}/cover.jpg?v={v}" alt="封面"><h1>{META['title']}</h1><p>{META['subtitle']}</p>
 <p style="color:var(--dim);margin-top:.5rem">{META['author']} 著 · 德麦国际专著第 {META['no']} 号 · ISBN {META['isbn']} · 约 {han/10000:.0f} 万汉字</p></div>
-<details class="toc" open><summary>目录（专家推荐语 · 革命宣言 · 导论 · 读者导读 · 术语表 · 基础编与四大编二十七章 · 附录四件 · 结语 · 金句集锦）</summary><ul>{''.join(toc)}</ul></details>
+<details class="toc" open><summary>目录（作者介绍 · 专家推荐语 · 革命宣言 · 导论 · 读者导读 · 术语表 · 基础编与四大编二十七章 · 附录四件 · 结语 · 金句集锦）</summary><ul>{''.join(toc)}</ul></details>
 """
     tail = f"""<div class="foot">德麦国际出版社 · Demai International Press · <a href="/books/">专著书架</a> · <a href="/books/m/{META['no']}/">书籍详情</a></div>
 </div>
