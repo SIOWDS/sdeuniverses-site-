@@ -14,54 +14,32 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pymupdf requests
-      - name: Collect actual 220 and 302 references and publication sources
+      - name: Inspect live PDF editions
         run: |
           python - <<'PY'
           import pathlib,json,requests,fitz,hashlib
-          d=pathlib.Path('m400-reference-audit');d.mkdir()
-          raw='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/'
-          paths={
-           '220-index.html':'public/books/m/220/index.html',
-           '302-index.html':'public/books/m/302/index.html',
-           '302-read.html':'public/books/m/302/read.html',
-           '220-text.html':'public/books/m/220/text/index.html',
-           '302-text.html':'public/books/m/302/text/index.html',
-           '220-reference.pdf':'public/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf',
-           '302-reference.pdf':'public/students/chen-feng/ai-death-dilemma/m302/ai-death-dilemma-reader-v2.pdf',
-           'sde-equations.html':'public/books/m/51/chapter-02/index.html',
-           'sde-paths.html':'public/column/ontology-grid/six-paths/index.html',
-           'sde-principles.html':'public/column/ontology-grid/123-to-three-principles/index.html',
-           'books-index.html':'public/books/index.html',
-           'books-en.html':'public/en-only/books/index.html',
-           'books-index-json.json':'public/books/index.json',
-           'books-json.json':'public/books/books.json',
-           'catalog.json':'public/books/catalog.json',
-           'search-workflow.yml':'.github/workflows/search-index.yml',
-           'wrangler.jsonc':'wrangler.jsonc',
-           'wrangler.toml':'wrangler.toml'
+          d=pathlib.Path('m400-pdf-references');d.mkdir()
+          urls={
+           '220':'https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf',
+           '302':'https://sdeuniverses.com/students/chen-feng/ai-death-dilemma/m302/ai-death-dilemma-reader-v2.pdf'
           }
           report=[]
-          for name,path in paths.items():
-            r=requests.get(raw+path,timeout=90)
-            item={'path':path,'status':r.status_code,'bytes':len(r.content)}
-            if r.status_code==200:
-              (d/name).write_bytes(r.content);item['sha256']=hashlib.sha256(r.content).hexdigest()
-              if name.endswith('.pdf'):
-                doc=fitz.open(stream=r.content,filetype='pdf');item['pages']=len(doc);item['size_pt']=list(doc[0].rect)
-                pages=sorted(set([0,1,2,3,4,5,6,7,8,9,10,min(30,len(doc)-1),min(80,len(doc)-1),len(doc)-1]))
-                for n in pages:
-                  doc[n].get_pixmap(matrix=fitz.Matrix(1.4,1.4),alpha=False).save(d/(name[:-4]+f'-{n+1:03}.png'))
-                (d/(name+'.toc.json')).write_text(json.dumps(doc.get_toc(),ensure_ascii=False))
+          for no,url in urls.items():
+            r=requests.get(url,timeout=120);item={'url':url,'status':r.status_code,'bytes':len(r.content)}
+            if r.status_code==200 and r.content.startswith(b'%PDF'):
+              (d/f'{no}.pdf').write_bytes(r.content);item['sha256']=hashlib.sha256(r.content).hexdigest()
+              doc=fitz.open(stream=r.content,filetype='pdf');item['pages']=len(doc);item['size_pt']=list(doc[0].rect)
+              toc=doc.get_toc();(d/f'{no}-toc.json').write_text(json.dumps(toc,ensure_ascii=False))
+              pages=sorted(set([0,1,2,3,4,5,6,7,8,9,10,min(30,len(doc)-1),min(80,len(doc)-1),len(doc)-1]))
+              for n in pages:doc[n].get_pixmap(matrix=fitz.Matrix(1.4,1.4),alpha=False).save(d/f'{no}-{n+1:03}.png')
+              (d/f'{no}-sample-text.txt').write_text('\n'.join(doc[n].get_text() for n in pages))
+              item['sample_fonts']=doc[min(30,len(doc)-1)].get_fonts()
             report.append(item)
-          for n in [220,302,400]:
-            r=requests.get(f'https://sdeuniverses.com/books/m/{n}/',timeout=60)
-            report.append({'live':n,'status':r.status_code,'bytes':len(r.content)})
-            if r.status_code==200:(d/f'live-{n}.html').write_bytes(r.content)
           (d/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
           print(json.dumps(report,ensure_ascii=False,indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: m400-reference-audit
-          path: m400-reference-audit/
+          name: m400-pdf-references
+          path: m400-pdf-references/
           retention-days: 3
