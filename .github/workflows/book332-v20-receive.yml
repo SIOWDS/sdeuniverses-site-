@@ -10,25 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Fetch refreshed authorized book publication bytes
+      - name: Transfer authorized publication package with curl
         run: |
+          mkdir -p "$RUNNER_TEMP/book332-transfer"
+          curl --fail --location --max-time 120 --output "$RUNNER_TEMP/book332-transfer/publication.zip" 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-7d7c-81fa-8937-c03de96c96be/raw?se=2026-10-07T18%3A15%3A29Z&sp=r&sv=2026-02-06&sr=b&scid=621c4851-4aa2-5681-93a2-97ffd9f7909d&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T07%3A21%3A27Z&ske=2026-10-08T07%3A21%3A27Z&sks=b&skv=2026-02-06&sig=o27CpSS9rCS0xjByGWkA4EFOjsZaizq/N94KlXlHzTw%3D'
           python - <<'PY'
-          import urllib.request,urllib.error,pathlib,os,hashlib,json
-          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'book332-transfer';out.mkdir()
-          url='https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-7d7c-81fa-8937-c03de96c96be/raw?se=2026-10-07T18%3A15%3A29Z&sp=r&sv=2026-02-06&sr=b&scid=621c4851-4aa2-5681-93a2-97ffd9f7909d&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T07%3A21%3A27Z&ske=2026-10-08T07%3A21%3A27Z&sks=b&skv=2026-02-06&sig=o27CpSS9rCS0xjByGWkA4EFOjsZaizq/N94KlXlHzTw%3D'
-          try:
-              r=urllib.request.urlopen(url,timeout=90);raw=r.read()
-          except urllib.error.HTTPError as e:
-              diagnostic={'status':e.code,'response':e.read(1500).decode('utf-8','replace'),'date':e.headers.get('Date'),'server':e.headers.get('Server')}
-              (out/'transfer-status.json').write_text(json.dumps(diagnostic,indent=2));print(json.dumps(diagnostic));raise SystemExit(1)
-          digest=hashlib.sha256(raw).hexdigest()
+          import pathlib,os,hashlib,json
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'book332-transfer';raw=(out/'publication.zip').read_bytes();digest=hashlib.sha256(raw).hexdigest()
           assert len(raw)==13220232 and digest=='b14713e3a43dd51811be32c34388ae3b681e20d14792075cfd5ebe4e1c7228f2'
-          (out/'publication.zip').write_bytes(raw)
           (out/'transfer-status.json').write_text(json.dumps({'status':200,'bytes':len(raw),'sha256':digest,'site_written':False,'reindex_executed':False}))
           print('Exact book332 publication package received and verified.')
           PY
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: book332-v20-transfer
           path: ${{ runner.temp }}/book332-transfer/
