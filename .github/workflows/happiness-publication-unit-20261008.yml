@@ -1,0 +1,56 @@
+name: Happiness reading-learning-dialogue publishing unit
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/happiness-publication-unit-20261008.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: happiness-secret-publication
+  cancel-in-progress: false
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/happiness_publication_unit_20261008.py
+            /tools/build_bookshelf.py
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/books/bookshelf.css
+            /public/books/bookshelf.js
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/happiness-secret/
+            /.github/workflows/search-index.yml
+      - name: Prepare bounded browser dependencies
+        timeout-minutes: 4
+        run: |
+          python3 -m pip install --quiet --timeout 25 --retries 1 beautifulsoup4 playwright
+          timeout 150s python3 -m playwright install chromium
+          timeout 40s sudo apt-get -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 -o Acquire::Retries=1 install -y -qq fonts-noto-cjk || echo 'Using system fonts'
+      - name: Audit historical volume and assemble explicit three-in-one entry
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/happiness_publication_unit_20261008.py patch
+      - name: Test all three entry types and learning-task handoff on desktop and mobile
+        run: python3 tools/happiness_publication_unit_20261008.py candidate
+      - name: Publish only scoped book UI and opted-in generator rule
+        run: python3 tools/happiness_publication_unit_20261008.py publish
+      - name: Verify three public shelves, eighteen entry clicks and unchanged PDFs
+        run: python3 tools/happiness_publication_unit_20261008.py live
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: happiness-publication-unit-acceptance
+          path: ${{ runner.temp }}/happiness-unit-evidence/
+          retention-days: 30
