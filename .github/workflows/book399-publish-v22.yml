@@ -14,20 +14,37 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
+      - name: Prepare document verification and standard browser
+        run: |
+          python -m pip install --quiet beautifulsoup4 pymupdf playwright
+          python -m playwright install --with-deps chromium
       - name: Receive exact authorized publication package
         run: |
           python - <<'PY'
-          import pathlib,urllib.request,hashlib,zipfile,io,os
-          url='https://sdmntprseasia.oaiusercontent.com/files/00000000-4840-8207-a791-6e68be5c1c0b/raw?se=2026-10-07T23%3A10%3A44Z&sp=r&sv=2026-02-06&sr=b&scid=6c963f3e-2731-5fe1-b266-8fd153638914&skoid=6fa9748a-b7b2-4b56-a932-8c1417549c47&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T05%3A37%3A21Z&ske=2026-10-08T05%3A37%3A21Z&sks=b&skv=2026-02-06&sig=IMjsZ6tq2q8H%2BXwoT2XfPtvt03jHopRK%2BhYlk/AXPXw%3D'
-          raw=urllib.request.urlopen(url,timeout=90).read()
-          assert len(raw)==6326451 and hashlib.sha256(raw).hexdigest()=='1b2d01b429da10e630d8544e755ddbf31796db91ceb08f047c3bb91cccccaa3b','Publication package mismatch'
+          import pathlib,hashlib,zipfile,io,os
+          from playwright.sync_api import sync_playwright,Error
+          url='https://sdmntprseasia.oaiusercontent.com/files/00000000-d174-8207-987c-41fcdcc2f662/raw?se=2026-10-07T23%3A15%3A13Z&sp=r&sv=2026-02-06&sr=b&scid=7db6ec66-4d36-5ba3-b92b-fe7666893f20&skoid=6fa9748a-b7b2-4b56-a932-8c1417549c47&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T01%3A50%3A27Z&ske=2026-10-08T01%3A50%3A27Z&sks=b&skv=2026-02-06&sig=Ys5%2BDvEGx3MaEoe3FINemrBfwABsIRD5s59WU3KjXYc%3D'
           target=pathlib.Path(os.environ['RUNNER_TEMP'])/'book399';target.mkdir()
+          with sync_playwright() as pw:
+            browser=pw.chromium.launch(headless=True)
+            page=browser.new_page(accept_downloads=True)
+            with page.expect_download(timeout=90000) as d:
+              try:page.goto(url,wait_until='domcontentloaded',timeout=60000)
+              except Error as e:
+                if 'Download is starting' not in str(e) and 'ERR_ABORTED' not in str(e):raise
+            download=d.value
+            assert download.failure() is None
+            download.save_as(str(target/'received.zip'))
+            browser.close()
+          raw=(target/'received.zip').read_bytes()
+          assert len(raw)==6326451 and hashlib.sha256(raw).hexdigest()=='1b2d01b429da10e630d8544e755ddbf31796db91ceb08f047c3bb91cccccaa3b','Publication package mismatch'
           with zipfile.ZipFile(io.BytesIO(raw)) as z:
             for n in z.namelist():
               assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
               assert not n.endswith(('.ttf','.ttc','.otf','.woff','.woff2','.env'))
             z.extractall(target)
-          print('Verified exact publication package: 6326451 bytes; no font files or credentials.')
+          (target/'received.zip').unlink()
+          print('Verified exact publication package: 6326451 bytes.')
           PY
       - uses: actions/checkout@v4
         with:
@@ -49,10 +66,6 @@ jobs:
             /public/students/putao/works/index.html
             /tools/build_bookshelf.py
             /tools/book_agent_body.html
-      - name: Install bounded verification dependencies
-        run: |
-          python -m pip install --quiet beautifulsoup4 pymupdf playwright
-          python -m playwright install --with-deps chromium
       - name: Build candidate from current templates and preserve other books
         run: |
           python "$RUNNER_TEMP/book399/build-tools/install.py" "$RUNNER_TEMP/book399" "$GITHUB_WORKSPACE"
