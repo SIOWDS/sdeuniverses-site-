@@ -1,0 +1,89 @@
+name: Final live acceptance for Happiness agent
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/happiness-agent-final-acceptance-20261008.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/happiness_agent_20261008.py
+            /public/books/happiness-secret/
+            /public/books/agents.json
+            /public/books/catalog.json
+            /public/books/agent/
+            /.github/workflows/search-index.yml
+      - uses: actions/download-artifact@v4
+        with:
+          name: happiness-agent-acceptance-20261008
+          run-id: 37700628513
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/happiness-agent-evidence
+      - name: Prepare bounded verification dependencies
+        timeout-minutes: 4
+        run: |
+          python3 -m pip install --quiet --timeout 25 --retries 1 beautifulsoup4 html5lib playwright
+          timeout 150s python3 -m playwright install chromium
+          timeout 40s sudo apt-get -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 -o Acquire::Retries=1 install -y -qq fonts-noto-cjk || echo 'Using system fonts'
+      - name: Verify exact JSON and scripts, HTML structure, and PDF hashes
+        run: |
+          python3 - <<'PY'
+          import runpy,json,hashlib,difflib
+          from urllib.request import Request,urlopen
+          from bs4 import BeautifulSoup
+          m=runpy.run_path('tools/happiness_agent_20261008.py');qa=m['QA'];pub=m['PUB'];base=m['BASE'];out=m['OUT']
+          def get(path):
+              with urlopen(Request('https://sdeuniverses.com'+path,headers={'User-Agent':'Happiness-Agent-Final-Acceptance'}),timeout=60) as r:return r.read(),r.status,r.geturl()
+          def norm(b):
+              soup=BeautifulSoup(b.decode('utf-8'),'html5lib')
+              for n in soup.select('link[rel="canonical"],meta[property="og:url"]'):n.decompose()
+              return str(soup).strip()
+          assets=[]
+          for p in sorted(out.iterdir()):
+              if not p.is_file():continue
+              path='/'+str(p.relative_to(pub));url=path[:-10] if path.endswith('index.html') else path
+              data,status,actual=get(url);expected=p.read_bytes();exact=data==expected
+              accepted=status==200 and (exact or (path.endswith('.html') and norm(data)==norm(expected)))
+              result={'path':path,'status':status,'url':actual,'exact_bytes':exact,'html_structure_equal':norm(data)==norm(expected) if path.endswith('.html') else None,'accepted':accepted}
+              assets.append(result);print('ASSET',json.dumps(result,ensure_ascii=False),flush=True)
+              if not accepted:
+                  (qa/('remote-'+p.name)).write_bytes(data);(qa/('expected-'+p.name)).write_bytes(expected)
+                  (qa/('diff-'+p.name+'.txt')).write_text('\n'.join(difflib.unified_diff(norm(expected).splitlines(),norm(data).splitlines())),encoding='utf-8')
+          registry=json.loads(get('/books/agents.json')[0]);assert registry['agents']['happiness-secret']['name']=='回甘'
+          for path in [base,'/books/agent/']:assert base+'agent/' in get(path)[0].decode('utf-8')
+          build=json.loads((qa/'build.json').read_text());pdfs=[]
+          for path,h in build['protected_files'].items():
+              assert m['sha'](m['ROOT']/path)==h,path
+              if path.startswith('public/') and path.endswith('.pdf'):
+                  remote,status,actual=get('/'+path[len('public/'):]);assert hashlib.sha256(remote).hexdigest()==h,path
+                  pdfs.append({'path':path,'unchanged':True,'status':status})
+          report={'success':all(a['accepted'] for a in assets),'assets':assets,'pdfs':pdfs,'registry_verified':True,'entry_links_verified':True,'protected_text_unchanged':True,'reindex_triggered':False,'real_llm_response_tested':False}
+          (qa/'live-http-final.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          assert report['success']
+          print('ALL_PUBLISHED_AGENT_ASSETS_ACCEPTED',flush=True)
+          PY
+      - name: Exercise public desktop and mobile agent with explicitly mocked model responses
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import runpy
+          m=runpy.run_path('tools/happiness_agent_20261008.py')
+          m['check']('https://sdeuniverses.com/books/happiness-secret/','live-final')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: happiness-agent-final-acceptance
+          path: ${{ runner.temp }}/happiness-agent-evidence/
+          retention-days: 30
