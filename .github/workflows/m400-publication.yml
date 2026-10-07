@@ -6,40 +6,37 @@ on:
 permissions:
   contents: read
 jobs:
-  reference-audit:
+  integration-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 8
     steps:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pymupdf requests
-      - name: Inspect live PDF editions
+      - run: pip install requests
+      - name: Read production integration files without changing them
         run: |
           python - <<'PY'
-          import pathlib,json,requests,fitz,hashlib
-          d=pathlib.Path('m400-pdf-references');d.mkdir()
-          urls={
-           '220':'https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf',
-           '302':'https://sdeuniverses.com/students/chen-feng/ai-death-dilemma/m302/ai-death-dilemma-reader-v2.pdf'
-          }
+          from pathlib import Path
+          import requests,json,hashlib
+          d=Path('m400-integration');d.mkdir()
+          raw='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/'
+          files=['src/worker.js','public/.assetsignore','tools/build_bookshelf.py','tools/build_book_agents.py','tools/build_book_rag.py','tools/book_agent_body.html','public/books/agent/app.js','public/books/agent/app.css','public/books/agents.json','public/books/m/302/rag.json','public/books/agent/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/taste/wds-companion/wds-read.js','public/wds-mode.js','public/books/bookshelf.js','public/books/bookshelf.css']
           report=[]
-          for no,url in urls.items():
-            r=requests.get(url,timeout=120);item={'url':url,'status':r.status_code,'bytes':len(r.content)}
-            if r.status_code==200 and r.content.startswith(b'%PDF'):
-              (d/f'{no}.pdf').write_bytes(r.content);item['sha256']=hashlib.sha256(r.content).hexdigest()
-              doc=fitz.open(stream=r.content,filetype='pdf');item['pages']=len(doc);item['size_pt']=list(doc[0].rect)
-              toc=doc.get_toc();(d/f'{no}-toc.json').write_text(json.dumps(toc,ensure_ascii=False))
-              pages=sorted(set([0,1,2,3,4,5,6,7,8,9,10,min(30,len(doc)-1),min(80,len(doc)-1),len(doc)-1]))
-              for n in pages:doc[n].get_pixmap(matrix=fitz.Matrix(1.4,1.4),alpha=False).save(d/f'{no}-{n+1:03}.png')
-              (d/f'{no}-sample-text.txt').write_text('\n'.join(doc[n].get_text() for n in pages))
-              item['sample_fonts']=doc[min(30,len(doc)-1)].get_fonts()
-            report.append(item)
+          for path in files:
+            r=requests.get(raw+path,timeout=90)
+            report.append({'path':path,'status':r.status_code,'bytes':len(r.content)})
+            if r.status_code==200:
+              target=d/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(r.content)
+          urls={'pdf.min.js':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdf.worker.min.js':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js','LICENSE':'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/LICENSE'}
+          for name,url in urls.items():
+            r=requests.get(url,timeout=90);r.raise_for_status();target=d/'vendor'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(r.content)
+            report.append({'url':url,'status':r.status_code,'bytes':len(r.content),'sha256':hashlib.sha256(r.content).hexdigest()})
           (d/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
           print(json.dumps(report,ensure_ascii=False,indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: m400-pdf-references
-          path: m400-pdf-references/
+          name: m400-integration
+          path: m400-integration/
           retention-days: 3
