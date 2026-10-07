@@ -1,0 +1,53 @@
+name: Book400 no-volume cover reader diagnostic
+on:
+  push:
+    branches: ['release/book400-cover-no-volume-20261008']
+    paths: ['.github/workflows/book400-cover-reader-diagnostic.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - run: |
+          pip -q install playwright
+          python -m playwright install --with-deps chromium
+      - name: Read canonical and cache-key routes with diagnostic captures
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          import os,json,hashlib,datetime
+          root=Path(os.environ['RUNNER_TEMP'])/'reader-diagnostic';root.mkdir();reports=[]
+          with sync_playwright() as p:
+            b=p.chromium.launch(args=['--no-sandbox'])
+            for width,suffix in [(1440,''),(390,'?cover=20261008-p3-cover')]:
+              page=b.new_page(viewport={'width':width,'height':900});events=[]
+              page.on('console',lambda x:events.append({'type':'console','level':x.type,'text':x.text}))
+              page.on('pageerror',lambda x:events.append({'type':'error','text':str(x)}))
+              page.on('requestfailed',lambda x:events.append({'type':'failed','url':x.url,'error':x.failure}))
+              page.on('response',lambda x:events.append({'type':'response','status':x.status,'url':x.url,'headers':x.headers}) if ('/books/m/400/' in x.url or x.status>=400) else None)
+              page.goto('https://sdeuniverses.com/books/m/400/read.html'+suffix,wait_until='domcontentloaded',timeout=60000)
+              loaded=False
+              try:
+                page.wait_for_function("document.getElementById('pt').textContent==='381'",timeout=30000);loaded=True
+              except Exception:pass
+              page.wait_for_timeout(2500)
+              state=page.evaluate("({cfg:document.getElementById('cfg').textContent,pt:document.getElementById('pt').textContent,msg:document.getElementById('msgT').textContent,pi:document.getElementById('pi').value,svgs:[...document.querySelectorAll('#sL svg,#sR svg')].map(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height})),pdfjs:!!window.pdfjsLib})")
+              page.screenshot(path=str(root/f'actual-{width}.png'));(root/f'actual-{width}.html').write_text(page.content())
+              cfg=json.loads(state['cfg']);pdfurl='https://sdeuniverses.com'+cfg['pdf']
+              request=page.request.get(pdfurl,timeout=60000);raw=request.body()
+              state['full_get']={'status':request.status,'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)}
+              # A separately-created PDF.js document from fully-fetched bytes isolates range caching without changing the site.
+              state['full_bytes_probe']=page.evaluate("""async(url)=>{try{let r=await fetch(url);let a=new Uint8Array(await r.arrayBuffer());let d=await pdfjsLib.getDocument({data:a,isOffscreenCanvasSupported:false}).promise;let p=await d.getPage(1);let op=await p.getOperatorList();return {pages:d.numPages,operators:op.fnArray.length}}catch(e){return {error:String(e),stack:e.stack}}}""",cfg['pdf'])
+              reports.append({'width':width,'url':page.url,'loaded':loaded,'state':state,'events':events});(root/'diagnostics.json').write_text(json.dumps(reports,ensure_ascii=False,indent=2));print(json.dumps(reports[-1],ensure_ascii=False));page.close()
+            b.close()
+          print('Diagnostic complete; production is unchanged.')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book400-cover-reader-diagnostic
+          retention-days: 3
+          path: ${{ runner.temp }}/reader-diagnostic/
