@@ -6,37 +6,59 @@ on:
 permissions:
   contents: read
 jobs:
-  integration-audit:
+  candidate-acceptance:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 15
     steps:
+      - name: Receive authorized publication package and verify digest
+        env:
+          CANDIDATE_URL: 'https://sdmntprnznorth.oaiusercontent.com/files/00000000-e464-820b-9f67-ae442d4202a6/raw?se=2026-10-07T18%3A59%3A35Z&sp=r&sv=2026-02-06&sr=b&scid=2ea66c90-7150-543b-8815-5304cd710c09&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T06%3A40%3A28Z&ske=2026-10-08T06%3A40%3A28Z&sks=b&skv=2026-02-06&sig=HW5S4Xp6Y2IwvrCQ1TXI1f7iI4RccGovTbqIVvKrDDw%3D'
+        run: |
+          python - <<'PY'
+          import urllib.request,os,hashlib,zipfile,io,pathlib
+          raw=urllib.request.urlopen(os.environ['CANDIDATE_URL'],timeout=90).read()
+          assert hashlib.sha256(raw).hexdigest()=='6d86ae2bf92a24ca292c80602cf8ff53e062238245668da5cf7e7801fbd65acb'
+          z=zipfile.ZipFile(io.BytesIO(raw));d=pathlib.Path(os.environ['RUNNER_TEMP'])/'m400-candidate';d.mkdir()
+          for n in z.namelist():
+            assert not pathlib.PurePosixPath(n).is_absolute() and '..' not in pathlib.PurePosixPath(n).parts
+            assert not n.lower().endswith(('.ttf','.ttc','.otf','.woff','.woff2','.env'))
+          z.extractall(d)
+          print('Accepted exact publication package:',len(raw),'bytes,',len(z.namelist()),'files')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/400/
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/index.html
+            /public/books/agent/
+            /public/books/bookshelf.css
+            /public/books/bookshelf.js
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/taste/wds-companion/wds-read.js
+            /public/wds-mode.js
+            /tools/build_bookshelf.py
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests
-      - name: Read production integration files without changing them
+      - run: pip install requests pymupdf python-docx beautifulsoup4 playwright
+      - run: python -m playwright install --with-deps chromium
+      - name: Build only volume400 entrances and preserve other catalog records
+        run: python "$RUNNER_TEMP/m400-candidate/build-tools/install.py" "$RUNNER_TEMP/m400-candidate" "$GITHUB_WORKSPACE"
+      - name: Desktop and mobile browser acceptance
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          import requests,json,hashlib
-          d=Path('m400-integration');d.mkdir()
-          raw='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/'
-          files=['src/worker.js','public/.assetsignore','tools/build_bookshelf.py','tools/build_book_agents.py','tools/build_book_rag.py','tools/book_agent_body.html','public/books/agent/app.js','public/books/agent/app.css','public/books/agents.json','public/books/m/302/rag.json','public/books/agent/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/taste/wds-companion/wds-read.js','public/wds-mode.js','public/books/bookshelf.js','public/books/bookshelf.css']
-          report=[]
-          for path in files:
-            r=requests.get(raw+path,timeout=90)
-            report.append({'path':path,'status':r.status_code,'bytes':len(r.content)})
-            if r.status_code==200:
-              target=d/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(r.content)
-          urls={'pdf.min.js':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdf.worker.min.js':'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js','LICENSE':'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/LICENSE'}
-          for name,url in urls.items():
-            r=requests.get(url,timeout=90);r.raise_for_status();target=d/'vendor'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(r.content)
-            report.append({'url':url,'status':r.status_code,'bytes':len(r.content),'sha256':hashlib.sha256(r.content).hexdigest()})
-          (d/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
-          print(json.dumps(report,ensure_ascii=False,indent=2))
-          PY
-      - uses: actions/upload-artifact@v4
+          python -m http.server 8765 --directory public > "$RUNNER_TEMP/http.log" 2>&1 &
+          python "$RUNNER_TEMP/m400-candidate/build-tools/test_web.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/m400-candidate/qa/browser"
+      - name: Retain candidate and visual acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: m400-integration
-          path: m400-integration/
+          name: m400-accepted-candidate
+          path: ${{ runner.temp }}/m400-candidate/
           retention-days: 3
