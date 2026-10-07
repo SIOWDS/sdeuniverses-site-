@@ -38,8 +38,31 @@ jobs:
         run: python3 tools/happiness_agent_20261008.py build
       - name: Verify desktop and mobile before publication without using a real model key
         run: python3 tools/happiness_agent_20261008.py candidate
-      - name: Publish only this agent, registry entries and book homepage link
-        run: python3 tools/happiness_agent_20261008.py publish
+      - name: Publish only this agent and reconcile concurrent updates without force
+        run: |
+          python3 - <<'PY'
+          import runpy, subprocess, json, time
+          m=runpy.run_path('tools/happiness_agent_20261008.py')
+          original=m['git']
+          def safe_git(*args):
+              if args != ('push','origin','HEAD:main'):
+                  return original(*args)
+              for attempt in range(4):
+                  try:
+                      return original(*args)
+                  except subprocess.CalledProcessError:
+                      if attempt == 3: raise
+                      original('fetch','--deepen=50','origin','main')
+                      original('rebase','origin/main')
+                      data=json.loads((m['QA']/'build.json').read_text())
+                      assert all(m['sha'](m['ROOT']/p)==h for p,h in data['protected_files'].items()), 'Protected book content changed concurrently; stop'
+                      reg=json.loads((m['PUB']/'books/agents.json').read_text())['agents']
+                      assert reg['happiness-secret']['name']=='回甘'
+                      assert sum(x.get('name')=='回甘' for x in reg.values())==1
+                      time.sleep(1)
+          m['publish'].__globals__['git']=safe_git
+          m['publish']()
+          PY
       - name: Verify public files, unchanged PDFs and live user interface
         run: python3 tools/happiness_agent_20261008.py live
       - uses: actions/upload-artifact@v4
