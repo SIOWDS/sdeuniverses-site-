@@ -1,14 +1,18 @@
-name: Happiness current bookshelf layout inspection
+name: Happiness bookshelf agent entry and real click acceptance
 on:
   push:
     branches: [main]
     paths: ['.github/workflows/happiness-bookshelf-agent-entry-20261008.yml']
 permissions:
-  contents: read
+  contents: write
+  actions: read
+concurrency:
+  group: happiness-secret-publication
+  cancel-in-progress: false
 jobs:
-  inspect:
+  fix:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -17,43 +21,34 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            /tools/
-            /.github/workflows/
+            /tools/happiness_shelf_entry_20261008.py
+            /tools/build_bookshelf.py
             /public/books/index.html
             /public/monographs/index.html
             /public/sites/read/library/index.html
             /public/books/bookshelf.css
             /public/books/bookshelf.js
             /public/books/catalog.json
-      - run: |
-          python3 -m pip install --quiet beautifulsoup4
-          python3 - <<'PY'
-          from pathlib import Path
-          from bs4 import BeautifulSoup
-          import os,json,shutil
-          root=Path(os.environ['GITHUB_WORKSPACE']);qa=Path(os.environ['RUNNER_TEMP'])/'shelf-current';qa.mkdir()
-          for rel in ['public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html']:
-              p=root/rel;soup=BeautifulSoup(p.read_text(),'html.parser'); print('SHELF',rel)
-              for sel in ['[data-id="happiness-secret"]','[data-number="220"]','[data-number="302"]']:
-                  n=soup.select_one(sel);print('CARD',sel,str(n))
-              q=qa/rel;q.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,q)
-          for rel in ['public/books/bookshelf.css','public/books/bookshelf.js','public/books/catalog.json']:
-              q=qa/rel;q.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/rel,q)
-          for directory in ['tools','.github/workflows']:
-              for p in (root/directory).rglob('*'):
-                  if p.suffix not in ('.py','.js','.yml','.yaml','.sh') or not p.is_file():continue
-                  s=p.read_text(errors='replace')
-                  if 'class="book-top"' in s or '20261008-v8' in s or ('bookshelf' in p.name and 'card(' in s):
-                      print('PRODUCER',str(p.relative_to(root)))
-                      lines=s.splitlines();indices=[i for i,l in enumerate(lines) if 'book-top' in l or 'agentUrl' in l or '20261008-v8' in l or 'def card' in l]
-                      for i in indices[:8]:print('CODE',i+1,'\n'.join(lines[max(0,i-3):i+4])[:2400])
-                      q=qa/p.relative_to(root);q.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,q)
-          print('READ_ONLY_INSPECTION_COMPLETE')
-          PY
+            /public/books/agents.json
+            /public/books/happiness-secret/
+            /.github/workflows/search-index.yml
+      - name: Prepare bounded browser dependencies
+        timeout-minutes: 4
+        run: |
+          python3 -m pip install --quiet --timeout 25 --retries 1 beautifulsoup4 playwright
+          timeout 150s python3 -m playwright install chromium
+          timeout 40s sudo apt-get -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 -o Acquire::Retries=1 install -y -qq fonts-noto-cjk || echo 'Using system fonts'
+      - name: Add the standard named-agent entry only to the Happiness card
+        run: python3 tools/happiness_shelf_entry_20261008.py patch
+      - name: Compare 220 style and verify real desktop/mobile clicks before publishing
+        run: python3 tools/happiness_shelf_entry_20261008.py candidate
+      - name: Publish three card entries and the durable generator rule without reindex
+        run: python3 tools/happiness_shelf_entry_20261008.py publish
+      - name: Verify all three live bookshelves, six real clicks and unchanged PDFs
+        run: python3 tools/happiness_shelf_entry_20261008.py live
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: happiness-current-bookshelf-source
-          path: ${{ runner.temp }}/shelf-current/
-          include-hidden-files: true
-          retention-days: 3
+          name: happiness-bookshelf-entry-acceptance
+          path: ${{ runner.temp }}/happiness-shelf-evidence/
+          retention-days: 30
