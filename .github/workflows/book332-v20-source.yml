@@ -1,0 +1,56 @@
+name: Book332 v2 publication preflight
+on:
+  push:
+    branches: [feature/book332-v20-20261008]
+    paths: ['.github/workflows/book332-v20-source.yml']
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/332/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/books-index.json
+            /public/monographs/index.html
+            /public/read/library/
+            /tools/build_bookshelf.py
+            /worker/wrangler.jsonc
+            /worker/package.json
+            /.github/workflows/
+      - name: Collect only publication content and workflow trigger summaries
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil, os, json, subprocess
+          out=Path(os.environ['RUNNER_TEMP'])/'book332-preflight';out.mkdir()
+          for name in ['public/books/m/332','public/books/catalog.json','public/books/index.html','public/books/books-index.json','public/monographs/index.html','public/read/library','tools/build_bookshelf.py','worker/wrangler.jsonc','worker/package.json']:
+              p=Path(name)
+              if not p.exists():continue
+              q=out/p;q.parent.mkdir(parents=True,exist_ok=True)
+              if p.is_dir():shutil.copytree(p,q)
+              else:shutil.copy2(p,q)
+          summary={'base_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'site_written':False,'reindex_executed':False,'workflow_triggers':{}}
+          for p in Path('.github/workflows').glob('*.y*ml'):
+              text=p.read_text();lines=text.splitlines();keep=[];active=False
+              for line in lines:
+                  if line.startswith('on:'):active=True
+                  elif active and line and not line.startswith((' ','#')):break
+                  if active:keep.append(line)
+              summary['workflow_triggers'][p.name]='\n'.join(keep)
+          (out/'preflight-summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2))
+          print('Book332 publication snapshot ready. No website or index writes.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book332-preflight-v20
+          path: ${{ runner.temp }}/book332-preflight/
+          retention-days: 7
