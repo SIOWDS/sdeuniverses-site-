@@ -1,0 +1,72 @@
+name: Update Happiness Secret v1.2 and verify public readers
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/happiness-v12-publish-20261008.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: happiness-secret-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Receive exact authorized v1.2 package
+        run: |
+          python3 - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,json,os
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'happiness-v12';root.mkdir()
+          url='https://sdmntprnznorth.oaiusercontent.com/files/00000000-4cc8-820b-bd79-7a3c44fa0565/raw?se=2026-10-07T17%3A56%3A39Z&sp=r&sv=2026-02-06&sr=b&scid=b4a46f4f-3302-57de-a6b5-b9ae3562ed24&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A42%3A49Z&ske=2026-10-08T00%3A42%3A49Z&sks=b&skv=2026-02-06&sig=clAu60NE/llEpqnX6Qh7Ipc5iyFZL4K7RnYHAQtxrTM%3D'
+          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'application/zip,application/octet-stream,*/*'})
+          raw=urllib.request.urlopen(req,timeout=120).read()
+          assert len(raw)==16194640 and hashlib.sha256(raw).hexdigest()=='7df8248f2ef5b67d15efd39a1835c01bb67fd54c2befce3f49fb828cb0b7491b'
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              z.extractall(root)
+          for e in json.loads((root/'input-inventory.json').read_text()):
+              p=root/e['path'];assert p.stat().st_size==e['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256'],e['path']
+          print('EXACT_V12_PACKAGE_RECEIVED',len(raw),'bytes')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: happiness-v12-received-candidate
+          path: ${{ runner.temp }}/happiness-v12
+          retention-days: 7
+      - name: Prepare browser and verification dependencies
+        run: |
+          python3 -m pip install --quiet playwright beautifulsoup4
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Accept v1.2 desktop and mobile readers before publication
+        run: python3 "${RUNNER_TEMP}/happiness-v12/build-tools/browser_qa.py" "${RUNNER_TEMP}/happiness-v12"
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/happiness-secret/
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /.github/workflows/search-index.yml
+      - name: Update exact book and shelf metadata, retain other books and old PDF bytes
+        run: python3 "${RUNNER_TEMP}/happiness-v12/build-tools/publish.py" "${RUNNER_TEMP}/happiness-v12" "${GITHUB_WORKSPACE}"
+      - name: Verify exact live edition, all assets and three bookshelves
+        run: python3 "${RUNNER_TEMP}/happiness-v12/build-tools/live_http_qa.py" "${RUNNER_TEMP}/happiness-v12"
+      - name: Exercise public desktop and mobile PDF readers
+        run: python3 "${RUNNER_TEMP}/happiness-v12/build-tools/browser_qa.py" "${RUNNER_TEMP}/happiness-v12" "https://sdeuniverses.com/books/happiness-secret/"
+      - name: Preserve publication and live acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: happiness-v12-live-evidence
+          path: ${{ runner.temp }}/happiness-v12/qa
+          retention-days: 30
