@@ -1,0 +1,110 @@
+name: Book400 v1.2 mobile finishing and final candidate acceptance
+on:
+  push:
+    branches: ['release/book400-earth-v12-20261008']
+    paths: ['.github/workflows/book400-mobile-final-v12.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 37695713581
+          name: book400-v12-scoped-candidate-acceptance
+          path: ${{ runner.temp }}/book400-final/source
+      - name: Read candidate and apply exact mobile-only polish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,subprocess,base64,json,hashlib
+          root=Path(os.environ['RUNNER_TEMP'])/'book400-final';site=root/'site'
+          env=os.environ.copy();env['GIT_CONFIG_COUNT']='1';env['GIT_CONFIG_KEY_0']='http.https://github.com/.extraheader';env['GIT_CONFIG_VALUE_0']='AUTHORIZATION: basic '+base64.b64encode(('x-access-token:'+env['GH_TOKEN']).encode()).decode()
+          def git(*a,**kw):return subprocess.run(['git',*a],env=env,check=True,**kw)
+          git('clone','--filter=blob:none','--depth=1','--no-checkout','--single-branch','--branch','publish/book400-v12-20261008','https://github.com/SIOWDS/sdeuniverses-site-.git',str(site))
+          paths=['/public/books/m/400/','/public/books/catalog.json','/public/books/agents.json','/public/books/agent/','/public/taste/wds-companion/','/public/wds-mode.js','/.gitignore']
+          git('-C',str(site),'sparse-checkout','init','--no-cone');git('-C',str(site),'sparse-checkout','set','--no-cone','--stdin',input='\n'.join(paths)+'\n',text=True);git('-C',str(site),'checkout','publish/book400-v12-20261008')
+          sha=subprocess.check_output(['git','-C',str(site),'rev-parse','HEAD'],text=True).strip();assert sha=='d95010f303494918715b035fb7f2d6766f617941','Candidate changed; re-review required'
+          book=site/'public/books/m/400';f=book/'read.html';old=f.read_text()
+          css='''/* Volume400 v1.2 mobile finishing: keep controls horizontal without squeezing the title. */
+          @media (max-width:560px){
+           .top{gap:.35rem;padding-left:.65rem;padding-right:.65rem}
+           .top .ttl{flex:1;min-width:0;font-size:.85rem;letter-spacing:0}
+           .top .spacer{display:none}
+           .top button{flex:0 0 auto;white-space:nowrap;padding:.25rem .42rem;font-size:.85rem;line-height:1.6;min-height:32px}
+           .top>a{flex:0 0 auto;white-space:nowrap}
+           #btnVec{font-size:.78rem}
+           .stage{inset:52px 0 56px 0}
+          }
+          '''
+          assert 'Volume400 v1.2 mobile finishing' not in old and old.count('</style>')==1
+          f.write_text(old.replace('</style>',css+'</style>'))
+          assert hashlib.sha256(f.read_bytes()).hexdigest()=='83eacf931dcdd8b242ea57c743af0328219ceeda9093bdd124753d32240e38d6'
+          m=json.loads((book/'publication-manifest.json').read_text())
+          for a in m['files']:
+            raw=(book/a['path']).read_bytes();a['bytes']=len(raw);a['sha256']=hashlib.sha256(raw).hexdigest()
+          m['release_sha256']=hashlib.sha256(json.dumps(m['files'],ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          assert m['release_sha256']=='734fee1ef18697cad79f5c1d7e15e278e79f09d53deeb389303291dde414b363'
+          (book/'publication-manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          print('Exact mobile finish verified; body, PDF and Word unchanged.')
+          PY
+      - name: Install browser dependencies
+        run: |
+          pip -q install playwright
+          python -m playwright install --with-deps chromium
+      - name: Repeat twelve routes and check narrow-screen controls
+        run: |
+          ROOT="$RUNNER_TEMP/book400-final"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$ROOT/site/public" > "$ROOT/http.log" 2>&1 &
+          PID=$!
+          trap 'kill "$PID" || true' EXIT
+          sleep 2
+          python "$ROOT/source/payload/我材发生_第400卷_上站包/build-tools/test_web.py" "$ROOT/site" "$ROOT/browser"
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          from pathlib import Path
+          import os,json
+          root=Path(os.environ['RUNNER_TEMP'])/'book400-final';out=root/'browser';report=[]
+          with sync_playwright() as p:
+            b=p.chromium.launch(args=['--no-sandbox'])
+            for width in [320,390,560]:
+              page=b.new_page(viewport={'width':width,'height':844})
+              page.goto('http://127.0.0.1:8765/books/m/400/read.html',wait_until='domcontentloaded');page.wait_for_function("document.getElementById('pt').textContent==='381'");page.wait_for_timeout(3000)
+              height=page.locator('.top').evaluate('(e)=>e.getBoundingClientRect().height');assert height<60,(width,height)
+              controls=page.locator('.top button:visible').evaluate_all('(els)=>els.map(e=>({id:e.id,height:e.getBoundingClientRect().height,wrap:getComputedStyle(e).whiteSpace}))')
+              assert all(x['height']<43 and x['wrap']=='nowrap' for x in controls),controls
+              assert not page.evaluate('document.documentElement.scrollWidth>innerWidth+2')
+              page.screenshot(path=str(out/f'mobile-final-{width}.png'));report.append({'width':width,'top_height':height,'controls':controls,'passed':True});page.close()
+            b.close()
+          (root/'mobile-final-report.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
+          PY
+      - name: Save only the verified candidate refinement
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import os,pathlib,subprocess,base64,json
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book400-final';site=root/'site';env=os.environ.copy();env['GIT_CONFIG_COUNT']='1';env['GIT_CONFIG_KEY_0']='http.https://github.com/.extraheader';env['GIT_CONFIG_VALUE_0']='AUTHORIZATION: basic '+base64.b64encode(('x-access-token:'+env['GH_TOKEN']).encode()).decode()
+          def git(*a):return subprocess.run(['git','-C',str(site),*a],env=env,check=True)
+          expected=['public/books/m/400/publication-manifest.json','public/books/m/400/read.html'];git('add','--',*expected)
+          staged=subprocess.check_output(['git','-C',str(site),'diff','--cached','--name-only'],text=True).splitlines();assert sorted(staged)==expected
+          git('-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Polish book400 mobile controls; preserve all book content and PDFs')
+          sha=subprocess.check_output(['git','-C',str(site),'rev-parse','HEAD'],text=True).strip();git('push','origin','HEAD:refs/heads/publish/book400-v12-20261008')
+          report={'candidate_commit':sha,'candidate_branch':'publish/book400-v12-20261008','source_commit':'d95010f303494918715b035fb7f2d6766f617941','release_sha256':'734fee1ef18697cad79f5c1d7e15e278e79f09d53deeb389303291dde414b363','production_main_written':False,'reindex':False,'browser_passed':True}
+          (root/'final-candidate.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book400-final-mobile-acceptance
+          retention-days: 3
+          path: |
+            ${{ runner.temp }}/book400-final/*.json
+            ${{ runner.temp }}/book400-final/browser/
+            ${{ runner.temp }}/book400-final/http.log
