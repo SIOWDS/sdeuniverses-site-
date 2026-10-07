@@ -35,12 +35,14 @@ jobs:
               for entry in entries:
                 if entry['type']=='file':save(entry['path'])
           catalog=json.loads((root/'public/books/catalog.json').read_text())
-          matches=[b for b in catalog['books'] if '幸福的奥秘' in b.get('title','') or b.get('isbn','').replace('-','')=='9781970820140']
+          matches=[b for b in catalog['books'] if '幸福的奥秘' in (b.get('title') or '') or (b.get('isbn') or '').replace('-','')=='9781970820140']
           print('HAPPINESS_CATALOG_MATCHES',json.dumps(matches,ensure_ascii=False))
           print('READ_ONLY_PREFLIGHT_COMPLETE_NO_REINDEX')
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: happiness-publication-preflight
           path: ${{ runner.temp }}/happiness-preflight/
+          include-hidden-files: true
           retention-days: 3
