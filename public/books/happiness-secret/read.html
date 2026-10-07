@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>友好阅读 · 在线翻页 · 幸福的奥秘 | SDE Universes</title>
+<meta name="description" content="《幸福的奥秘》在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
+<meta name="tier" content="L0">
+<link rel="canonical" href="https://sdeuniverses.com/books/happiness-secret/read.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0C0F13; --bg2:#141A21; --fg:#E9E6DE; --dim:#8E97A1; --line:#242D36;
+  --gold:#D9A441; --paper:#FBF7EE; --paper2:#F2ECDF; --ink:#1A1713;
+  --shadow:0 30px 80px rgba(0,0,0,.55);
+}
+html.sepia{--paper:#F6ECD8;--paper2:#EEE1C7}
+html.day{--bg:#E8E4DB;--bg2:#F2EFE7;--fg:#22262B;--dim:#5C646D;--line:#CFC9BD}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,var(--bg2),var(--bg)) fixed;
+  color:var(--fg);font:15px/1.7 "Noto Serif SC","EB Garamond",Georgia,serif;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);
+  overflow:hidden}
+
+/* ── 顶栏 ── */
+.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;align-items:center;gap:.8rem;
+  padding:.55rem 1rem calc(.55rem);background:rgba(12,15,19,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding-top:calc(.55rem + env(safe-area-inset-top,0))}
+html.day .top{background:rgba(232,228,219,.8)}
+.top .ttl{font-weight:600;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{color:var(--dim);font-size:.78rem;margin-left:.2rem;white-space:nowrap}
+.spacer{margin-left:auto}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);
+  border-radius:8px;padding:.3rem .6rem;cursor:pointer;transition:.18s}
+button:hover:not(:disabled),select:hover{border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.on{border-color:var(--gold);color:var(--gold)}
+.ico{font-size:1rem;line-height:1}
+
+/* ── 舞台 ── */
+.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:center;overflow:hidden}
+.book{position:relative;display:flex;gap:0;filter:drop-shadow(0 24px 60px rgba(0,0,0,.5));
+  transform-style:preserve-3d;perspective:2600px}
+.leaf{position:relative;background:var(--paper);overflow:hidden}
+.leaf canvas{display:block;width:100%;height:100%}
+.leaf .svg{position:absolute;inset:0;display:none}
+.leaf .svg svg{display:block;width:100%;height:100%}
+.leaf.vec canvas{display:none}
+.leaf.vec .svg{display:block}
+.leaf.l{border-radius:4px 0 0 4px;box-shadow:inset -22px 0 34px -26px rgba(0,0,0,.55)}
+.leaf.r{border-radius:0 4px 4px 0;box-shadow:inset 22px 0 34px -26px rgba(0,0,0,.55)}
+.single .leaf{border-radius:4px}
+.gutter{position:absolute;top:0;bottom:0;left:50%;width:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.20),rgba(0,0,0,0));pointer-events:none;z-index:3}
+.single .gutter{display:none}
+.pno{position:absolute;bottom:6px;font-size:11px;color:#9a8f7c;letter-spacing:.08em;z-index:4}
+.leaf.l .pno{left:14px}.leaf.r .pno{right:14px}
+
+/* 翻页动画 */
+.flip{position:absolute;top:0;bottom:0;z-index:9;background:var(--paper);
+  transform-origin:left center;backface-visibility:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,.35);border-radius:0 4px 4px 0}
+.flip.back{transform-origin:right center;border-radius:4px 0 0 4px}
+.flip canvas{display:block;width:100%;height:100%}
+@keyframes fwd{from{transform:rotateY(0)}to{transform:rotateY(-178deg)}}
+@keyframes bwd{from{transform:rotateY(0)}to{transform:rotateY(178deg)}}
+.flip.go{animation:fwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+.flip.back.go{animation:bwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+@media (prefers-reduced-motion:reduce){.flip.go,.flip.back.go{animation-duration:.01s}}
+
+/* 文本层（可选可搜） */
+.tl{position:absolute;inset:0;overflow:hidden;opacity:.01;line-height:1;z-index:2}
+.tl span{position:absolute;white-space:pre;transform-origin:0 0;color:transparent;cursor:text}
+.tl ::selection{background:rgba(217,164,65,.35)}
+.tl mark{background:rgba(217,164,65,.55);color:transparent;border-radius:2px}
+
+/* ── 底栏 ── */
+.bot{position:fixed;inset:auto 0 0 0;z-index:40;display:flex;align-items:center;gap:.7rem;
+  padding:.5rem 1rem calc(.5rem + env(safe-area-inset-bottom,0));
+  background:rgba(12,15,19,.72);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+html.day .bot{background:rgba(232,228,219,.8)}
+.rail{position:relative;flex:1;height:22px;display:flex;align-items:center;cursor:pointer}
+.rail .bar{position:absolute;left:0;right:0;height:3px;background:var(--line);border-radius:3px}
+.rail .fill{position:absolute;left:0;height:3px;background:linear-gradient(90deg,var(--gold),#F0CE86);border-radius:3px}
+.rail .knob{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--gold);
+  transform:translateX(-50%);box-shadow:0 0 0 4px rgba(217,164,65,.18)}
+.pg{font-variant-numeric:tabular-nums;color:var(--dim);font-size:.82rem;white-space:nowrap}
+.pg input{width:3.4rem;text-align:center;background:transparent;border:1px solid var(--line);
+  border-radius:6px;color:var(--fg);font:inherit;padding:.12rem .2rem}
+
+/* ── 抽屉 ── */
+.drawer{position:fixed;top:52px;bottom:62px;left:0;width:min(330px,86vw);z-index:45;
+  background:rgba(16,21,27,.97);border-right:1px solid var(--line);
+  transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;backdrop-filter:blur(10px)}
+html.day .drawer{background:rgba(242,239,231,.97)}
+.drawer.open{transform:none}
+.drawer h3{margin:0;padding:.8rem 1rem .5rem;font-size:.8rem;letter-spacing:.24em;color:var(--dim);font-weight:400}
+.dlist{flex:1;overflow:auto;padding:0 .4rem 1rem}
+.dlist a{display:flex;gap:.5rem;align-items:baseline;padding:.32rem .6rem;border-radius:7px;
+  color:var(--fg);text-decoration:none;font-size:.86rem}
+.dlist a:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.dlist a.l1{font-weight:600;margin-top:.5rem}
+.dlist a.l2{padding-left:1.5rem;color:var(--dim);font-size:.8rem}
+.dlist a .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.76rem}
+.sbox{padding:.5rem 1rem}
+.sbox input{width:100%;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--fg);font:inherit;padding:.4rem .6rem}
+.hit{padding:.35rem .6rem;border-radius:7px;font-size:.8rem;color:var(--dim);cursor:pointer}
+.hit:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.hit b{color:var(--gold);font-weight:600}
+
+/* 缩略图 */
+.thumbs{position:fixed;left:0;right:0;bottom:62px;z-index:44;display:flex;gap:.5rem;
+  padding:.6rem 1rem;overflow-x:auto;background:rgba(12,15,19,.92);border-top:1px solid var(--line);
+  transform:translateY(120%);transition:transform .28s}
+.thumbs.open{transform:none}
+.thumbs canvas{height:112px;width:auto;border-radius:3px;cursor:pointer;opacity:.62;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);transition:.18s}
+.thumbs canvas:hover,.thumbs canvas.cur{opacity:1;outline:2px solid var(--gold)}
+
+.msg{position:fixed;inset:0;display:grid;place-items:center;z-index:60;color:var(--dim);
+  background:rgba(12,15,19,.9);text-align:center;padding:2rem}
+.msg.hide{display:none}
+.msg .sp{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--gold);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:50;
+  background:rgba(0,0,0,.66);border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .9rem;font-size:.76rem;color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
+.hint.show{opacity:1}
+@media (max-width:860px){.top .sub,.hideS{display:none}.stage{inset:48px 0 56px 0}}
+</style>
+<meta name="book-edition" content="20261007-v11"></head>
+<body>
+
+<header class="top">
+  <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
+  <span class="ttl">幸福的奥秘</span><span class="sub hideS">数字永生之后，谁来接那个空位</span>
+  <span class="spacer"></span>
+  <button id="btnSpread" class="hideS" title="单页 / 双页 (D)">双页</button>
+  <button id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)">矢量</button>
+  <button id="btnZoomOut" title="缩小">A−</button>
+  <button id="btnZoomIn" title="放大">A＋</button>
+  <button id="btnThumbs" class="hideS" title="缩略图">▤</button>
+  <button id="btnTheme" title="夜 / 日 / 纸 (N)">夜</button>
+  <button id="btnFull" class="hideS" title="全屏 (F)">⛶</button>
+  <a href="/books/happiness-secret/" style="color:var(--dim);text-decoration:none;font-size:.82rem">详情</a>
+</header>
+
+<aside class="drawer" id="drawer">
+  <div class="sbox"><input id="q" type="search" placeholder="全书检索（回车）…"></div>
+  <h3 id="dHead">目　录</h3>
+  <div class="dlist" id="dlist"></div>
+</aside>
+
+<main class="stage" id="stage">
+  <div class="book" id="book">
+    <div class="leaf l" id="leafL"><canvas id="cL"></canvas><div class="svg" id="sL"></div><div class="tl" id="tL"></div><div class="pno" id="nL"></div></div>
+    <div class="leaf r" id="leafR"><canvas id="cR"></canvas><div class="svg" id="sR"></div><div class="tl" id="tR"></div><div class="pno" id="nR"></div></div>
+    <div class="gutter"></div>
+  </div>
+</main>
+
+<div class="thumbs" id="thumbs"></div>
+
+<footer class="bot">
+  <button id="btnPrev" title="上一页 (←)">‹</button>
+  <div class="rail" id="rail"><div class="bar"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
+  <button id="btnNext" title="下一页 (→)">›</button>
+  <span class="pg">第 <input id="pi" type="number" min="1" value="1"> / <span id="pt">…</span> 页</span>
+</footer>
+
+<div class="hint" id="hint"></div>
+<div class="msg" id="msg"><div><div class="sp"></div><div id="msgT">正在载入书页…</div></div></div>
+
+<noscript><a href="/books/happiness-secret/text/">JavaScript不可用时，阅读全书文字版</a></noscript>
+<script type="application/json" id="cfg">{"pdf": "/books/happiness-secret/downloads/happiness-reader-v1.1.pdf", "key": "happiness-secret-v11", "offset": 2}</script>
+<script type="application/json" id="toc">[{"t": "封面", "p": "", "g": 1, "l": 1}, {"t": "扉页", "p": "", "g": 2, "l": 1}, {"t": "出版信息", "p": "2", "g": 3, "l": 1}, {"t": "导读　这本书怎样读", "p": "3", "g": 4, "l": 1}, {"t": "目录", "p": "4", "g": 5, "l": 1}, {"t": "总序", "p": "5", "g": 6, "l": 1}, {"t": "第一编　幻觉的崩塌：虚假幸福的全面批判", "p": "8", "g": 9, "l": 1}, {"t": "编序　当幸福被流行劫持，我们如何重新辨认真与假", "p": "8", "g": 9, "l": 2}, {"t": "第一章　流行和流量：虚假幸福的流氓隐藏", "p": "10", "g": 11, "l": 2}, {"t": "摘要", "p": "10", "g": 11, "l": 2}, {"t": "第一部分：幸福律的真理", "p": "15", "g": 16, "l": 2}, {"t": "第二部分：流行的本质", "p": "17", "g": 18, "l": 2}, {"t": "第三部分：虚假幸福的三大方式", "p": "20", "g": 21, "l": 2}, {"t": "第四部分：快过程 vs 慢过程", "p": "23", "g": 24, "l": 2}, {"t": "第五部分：流行的社会与文明陷阱", "p": "26", "g": 27, "l": 2}, {"t": "第六部分：幸福律的革命与出路", "p": "30", "g": 31, "l": 2}, {"t": "结语：幸福与流行的终极对抗", "p": "33", "g": 34, "l": 2}, {"t": "后记：人类历史上，真正的幸福产品是无法流行的", "p": "36", "g": 37, "l": 2}, {"t": "附录一　GPT的流行与假幸福", "p": "39", "g": 40, "l": 2}, {"t": "一、GPT的流行现象", "p": "39", "g": 40, "l": 2}, {"t": "二、GPT与幸福律：潜力与现实的分离", "p": "39", "g": 40, "l": 2}, {"t": "三、GPT流行的假幸福三术", "p": "40", "g": 41, "l": 2}, {"t": "四、GPT与幸福律革命的分界线", "p": "41", "g": 42, "l": 2}, {"t": "五、结论：GPT的双重命运", "p": "41", "g": 42, "l": 2}, {"t": "附录二 GPT事业快速赚钱的秘诀：进入假幸福的隐藏提供之流行", "p": "42", "g": 43, "l": 2}, {"t": "一、GPT的商业奇迹", "p": "42", "g": 43, "l": 2}, {"t": "二、假幸福的供给逻辑", "p": "42", "g": 43, "l": 2}, {"t": "三、GPT流行的三大商业模式", "p": "43", "g": 44, "l": 2}, {"t": "四、流行与盈利的共谋", "p": "44", "g": 45, "l": 2}, {"t": "五、幸福律的批判", "p": "44", "g": 45, "l": 2}, {"t": "七、结论", "p": "45", "g": 46, "l": 2}, {"t": "附录三　GPT与幸福律的革命性结合：从流行到共创，是一种长久的慢事业", "p": "45", "g": 46, "l": 2}, {"t": "一、GPT的双重命运", "p": "45", "g": 46, "l": 2}, {"t": "二、幸福律的视角：慢事业的必然性", "p": "46", "g": 47, "l": 2}, {"t": "三、从流行到共创的转折", "p": "46", "g": 47, "l": 2}, {"t": "四、长久的慢事业", "p": "47", "g": 48, "l": 2}, {"t": "五、案例：共创如何在三界落地", "p": "47", "g": 48, "l": 2}, {"t": "六、未来的方向", "p": "47", "g": 48, "l": 2}, {"t": "七、结论", "p": "48", "g": 49, "l": 2}, {"t": "第二章　真假幸福大辨析", "p": "49", "g": 50, "l": 2}, {"t": "摘要", "p": "49", "g": 50, "l": 2}, {"t": "导论：从“欲沟为何难填？”出发", "p": "51", "g": 52, "l": 2}, {"t": "第一部分　欲望与满足的SIO解构", "p": "53", "g": 54, "l": 2}, {"t": "第二部分　假幸福的幻觉逻辑", "p": "56", "g": 57, "l": 2}, {"t": "第三部分　真幸福的发生学逻辑", "p": "59", "g": 60, "l": 2}, {"t": "第四部分　五福与八福的文明比较", "p": "61", "g": 62, "l": 2}, {"t": "第五部分　当代社会的真假幸福困境", "p": "64", "g": 65, "l": 2}, {"t": "第六部分　生活隐喻与幸福律", "p": "67", "g": 68, "l": 2}, {"t": "第七部分　真幸福的三大革命", "p": "70", "g": 71, "l": 2}, {"t": "后记", "p": "75", "g": 76, "l": 2}, {"t": "附录一：幸福的不可复制性", "p": "76", "g": 77, "l": 2}, {"t": "附录二：幸福的使命", "p": "77", "g": 78, "l": 2}, {"t": "附录三：判断真假幸福的黄金原则", "p": "78", "g": 79, "l": 2}, {"t": "第一编　编结　从被动轻松到真实发生", "p": "80", "g": 81, "l": 1}, {"t": "第二编　幸福的重建：从意义三律到幸福律", "p": "82", "g": 83, "l": 1}, {"t": "编序　当幸福不再被“拥有”，而开始发生", "p": "82", "g": 83, "l": 2}, {"t": "第三章　意义三律：创造、自由与幸福的奥秘", "p": "85", "g": 86, "l": 2}, {"t": "结语：拥抱意义的创造", "p": "101", "g": 102, "l": 2}, {"t": "第四章　幸福的发生机制揭秘", "p": "103", "g": 104, "l": 2}, {"t": "引言", "p": "103", "g": 104, "l": 2}, {"t": "第二编　编结　幸福回到发生之中", "p": "116", "g": 117, "l": 1}, {"t": "第三编　幸福的展开：艺术、医学与创造", "p": "118", "g": 119, "l": 1}, {"t": "编序　当幸福进入艺术、身体与创造的真实现场", "p": "118", "g": 119, "l": 2}, {"t": "第五章　文学艺术中的幸福律", "p": "121", "g": 122, "l": 2}, {"t": "第一节　莎士比亚《哈姆雷特》：幸福是“行动之前的痛感挣扎”", "p": "126", "g": 127, "l": 2}, {"t": "一、幸福律不是结局，而是决断之路", "p": "126", "g": 127, "l": 2}, {"t": "二、第一阶段：张力——存在的撕裂，不只是王国的，而是心灵的", "p": "126", "g": 127, "l": 2}, {"t": "三、第二阶段：转换——“疯癫”作为节奏转换仪式", "p": "127", "g": 128, "l": 2}, {"t": "四、第三阶段：释放——承担之后的沉静死去", "p": "128", "g": 129, "l": 2}, {"t": "五、语言节奏分析：为什么我们读《哈姆雷特》时感到“累”，却不能离开？", "p": "128", "g": 129, "l": 2}, {"t": "六、读者为什么动容：幸福不是结局，是我们也走了一遍张力之路", "p": "128", "g": 129, "l": 2}, {"t": "七、结语：幸福是承担节奏，不是获得结果", "p": "129", "g": 130, "l": 2}, {"t": "第二节　陀思妥耶夫斯基《罪与罚》：幸福是“罪的深井中重构自我节奏”", "p": "129", "g": 130, "l": 2}, {"t": "结语：幸福是“我愿意承受痛的节奏，并在其中找回自己”", "p": "132", "g": 133, "l": 2}, {"t": "第三节　歌德《浮士德》：幸福是“渴望之火转为存在之光”", "p": "133", "g": 134, "l": 2}, {"t": "一、第一阶段：张力——当知识、经验、信仰全部失效，生命变得空壳。", "p": "133", "g": 134, "l": 2}, {"t": "第四节　加西亚·马尔克斯《百年孤独》：幸福是“在宿命回旋中唤出自己的名字”", "p": "136", "g": 137, "l": 2}, {"t": "第五节　鲁迅《野草》幸福是“在沉默中，仍愿意写下一个字”", "p": "138", "g": 139, "l": 2}, {"t": "一、第一阶段：张力——清醒者面对沉睡者的绝望结构", "p": "139", "g": 140, "l": 2}, {"t": "二、第二阶段：转换——象征、梦语、断裂文体作为节奏转换技术", "p": "140", "g": 141, "l": 2}, {"t": "三、第三阶段：释放——在黑夜中，留下一个字，就是全部的幸福", "p": "141", "g": 142, "l": 2}, {"t": "四、读者共鸣机制：你不理解它，但你被它刺中", "p": "142", "g": 143, "l": 2}, {"t": "五、节奏分析图：鲁迅的幸福律时间模型", "p": "142", "g": 143, "l": 2}, {"t": "六、结语：幸福是“哪怕夜色沉沉，我仍写下这一笔”", "p": "143", "g": 144, "l": 2}, {"t": "第六节　博尔赫斯《小径分岔的花园》", "p": "143", "g": 144, "l": 2}, {"t": "——幸福是“在无限可能中承认此刻的我”", "p": "143", "g": 144, "l": 2}, {"t": "一、第一阶段：张力——当存在成为分岔树，选择即焦虑", "p": "144", "g": 145, "l": 2}, {"t": "二、第二阶段：转换——结构成为叙述的治疗装置", "p": "145", "g": 146, "l": 2}, {"t": "三、第三阶段：释放——不是确定，而是顿悟", "p": "146", "g": 147, "l": 2}, {"t": "四、节奏结构回响：为何短短一篇，却让人久久不能离开", "p": "146", "g": 147, "l": 2}, {"t": "五、读者共鸣机制：你也曾站在那条小径前", "p": "146", "g": 147, "l": 2}, {"t": "六、结语：幸福是“我不再纠结哪个我是我，而是我承认此刻之我”。", "p": "147", "g": 148, "l": 2}, {"t": "第七节　普鲁斯特《追忆似水年华》", "p": "147", "g": 148, "l": 2}, {"t": "——幸福是“曾感受过的现在再次发生”", "p": "147", "g": 148, "l": 2}, {"t": "一、第一阶段：张力——时间崩塌之后的存在碎片", "p": "148", "g": 149, "l": 2}, {"t": "二、第二阶段：转换——感官触发的非线性记忆重启", "p": "149", "g": 150, "l": 2}, {"t": "三、第三阶段：释放——“我重新活了一次我自己”", "p": "149", "g": 150, "l": 2}, {"t": "四、节奏结构分析：《追忆似水年华》的幸福律轨道图", "p": "150", "g": 151, "l": 2}, {"t": "五、读者共鸣机制：你也曾在某种气味中，活了一次旧我", "p": "150", "g": 151, "l": 2}, {"t": "六、结语：幸福是“曾经的感受没有消失，而是我愿意再次触碰”", "p": "151", "g": 152, "l": 2}, {"t": "第八节　川端康成 《雪国》", "p": "151", "g": 152, "l": 2}, {"t": "——幸福是“在相遇中感受到无言的节奏”", "p": "151", "g": 152, "l": 2}, {"t": "一、第一阶段：张力——“两个节奏系统”的偶遇", "p": "152", "g": 153, "l": 2}, {"t": "二、第二阶段：转换——在节奏中“感同”，而非在语言中“说出”", "p": "153", "g": 154, "l": 2}, {"t": "三、第三阶段：释放——“我们终将别离，但曾共享雪的节奏”", "p": "154", "g": 155, "l": 2}, {"t": "四、节奏结构分析：《雪国》的幸福律时间构型", "p": "154", "g": 155, "l": 2}, {"t": "五、读者的共鸣机制：你也曾在某个时刻，不说话，却全然在场", "p": "155", "g": 156, "l": 2}, {"t": "六、结语：幸福不是“在一起”，而是“曾一起进入那一刻的节奏”", "p": "155", "g": 156, "l": 2}, {"t": "第九节　但丁《神曲》", "p": "155", "g": 156, "l": 2}, {"t": "——幸福是“穿越地狱之后，我仍愿前行”", "p": "155", "g": 156, "l": 2}, {"t": "一、第一阶段：张力——“人生正中”，已然迷路", "p": "156", "g": 157, "l": 2}, {"t": "二、第二阶段：转换——灵魂获得引导，结构开始重建", "p": "157", "g": 158, "l": 2}, {"t": "三、第三阶段：释放——爱的结构、秩序的节奏、存在的和谐", "p": "158", "g": 159, "l": 2}, {"t": "四、节奏结构分析：《神曲》的幸福律宇宙模型", "p": "159", "g": 160, "l": 2}, {"t": "五、读者共鸣机制：你也曾“人生中途”，在寻找那条通往节奏的路", "p": "159", "g": 160, "l": 2}, {"t": "六、结语：幸福是“我穿越了一切痛，仍愿前行”", "p": "160", "g": 161, "l": 2}, {"t": "第十节　昆德拉《不能承受的生命之轻》", "p": "160", "g": 161, "l": 2}, {"t": "——幸福是“我愿意承受这一轻”", "p": "160", "g": 161, "l": 2}, {"t": "一、第一阶段：张力——当生活无重量，选择变成噪音", "p": "161", "g": 162, "l": 2}, {"t": "二、第二阶段：转换——不是爱情转化生活，而是承担激活结构", "p": "162", "g": 163, "l": 2}, {"t": "三、第三阶段：释放——幸福是“哪怕一切仍然轻，我愿意抱紧这一刻的重”", "p": "163", "g": 164, "l": 2}, {"t": "四、节奏结构分析：《不能承受的生命之轻》的幸福律之图", "p": "163", "g": 164, "l": 2}, {"t": "五、读者共鸣机制：你也曾对轻感到疲惫，你也曾渴望承担", "p": "164", "g": 165, "l": 2}, {"t": "六、结语：幸福不是确定了意义，而是“我自愿承担我的不确定”", "p": "164", "g": 165, "l": 2}, {"t": "一、我们重新遇见了“幸福”这个词", "p": "165", "g": 166, "l": 2}, {"t": "二、我们与十位文学大师一起，走完了十种幸福律的节奏", "p": "165", "g": 166, "l": 2}, {"t": "三、幸福不是状态，而是节奏；不是感觉，而是过程", "p": "166", "g": 167, "l": 2}, {"t": "四、幸福律是一种SIO整体的存在方式", "p": "167", "g": 168, "l": 2}, {"t": "五、我们每个人都处在幸福律之中", "p": "167", "g": 168, "l": 2}, {"t": "六、结尾：幸福是“你愿意，再走一次你的节奏”", "p": "168", "g": 169, "l": 2}, {"t": "后记文学不是逃避现实，而是进入张力之后的再生现场", "p": "168", "g": 169, "l": 2}, {"t": "一、人生就是一个“张力容器”", "p": "169", "g": 170, "l": 2}, {"t": "二、文学艺术：一种可以探索张力的空间", "p": "169", "g": 170, "l": 2}, {"t": "三、解构大师作品，是打开“幸福节奏疗愈装置”的钥匙", "p": "170", "g": 171, "l": 2}, {"t": "四、你读文学，不是为了感动，而是为了重启节奏", "p": "171", "g": 172, "l": 2}, {"t": "五、愿你从文学中，重新开始生成你的幸福节奏", "p": "171", "g": 172, "l": 2}, {"t": "第六章　音乐艺术的幸福律解构：三大文明的张力、节奏与存在之路", "p": "172", "g": 173, "l": 2}, {"t": "摘要", "p": "172", "g": 173, "l": 2}, {"t": "引言", "p": "174", "g": 175, "l": 2}, {"t": "第一节　西方音乐的幸福律解构：情感张力的结构性胜利", "p": "177", "g": 178, "l": 2}, {"t": "第二节　中华音乐的幸福律解构：气韵生成中的情境之安", "p": "179", "g": 180, "l": 2}, {"t": "第三节　印度音乐的幸福律解构：频率之中的感觉离场", "p": "182", "g": 183, "l": 2}, {"t": "结语音乐的幸福律：三种存在，三种节奏，三条通往生命本源的路", "p": "184", "g": 185, "l": 2}, {"t": "第七章　三律医学的WDS幸福律入门", "p": "187", "g": 188, "l": 2}, {"t": "前言　把健康放回生活，也把理论放回证据", "p": "187", "g": 188, "l": 2}, {"t": "第一节　什么是WDS幸福律？", "p": "188", "g": 189, "l": 2}, {"t": "第二节　SIO整体视角：不是把身体拆开，也不是把差异抹平", "p": "189", "g": 190, "l": 2}, {"t": "第三节　五个层级：把观察问题与治疗结论分开", "p": "190", "g": 191, "l": 2}, {"t": "第四节　三个说明性情境：怎样重建提问，而不是编造疗效", "p": "191", "g": 192, "l": 2}, {"t": "第五节　日常实践：建立可调整的节奏", "p": "193", "g": 194, "l": 2}, {"t": "第六节　实践要点：从个人责任走向共同承载", "p": "194", "g": 195, "l": 2}, {"t": "第七节　社会与AI：不要把支持系统变成监视系统", "p": "195", "g": 196, "l": 2}, {"t": "第八节　小结：一套能被修正的提问框架", "p": "196", "g": 197, "l": 2}, {"t": "第八章　幸福律：创造力枯树回春之解码", "p": "198", "g": 199, "l": 2}, {"t": "摘要", "p": "198", "g": 199, "l": 2}, {"t": "导论：为什么创造力会枯竭？ ——假幸福陷阱与幸福律的呼唤", "p": "199", "g": 200, "l": 2}, {"t": "第一部分　个体的困境", "p": "202", "g": 203, "l": 2}, {"t": "第一节　创造力高峰的秘密", "p": "202", "g": 203, "l": 2}, {"t": "第二节　假幸福如何杀死创造", "p": "204", "g": 205, "l": 2}, {"t": "第三节　枯树现象：科学家与艺术家的创造力衰退", "p": "207", "g": 208, "l": 2}, {"t": "第二部分　幸福律逻辑", "p": "210", "g": 211, "l": 2}, {"t": "第四节　幸福与创造的一体性", "p": "210", "g": 211, "l": 2}, {"t": "第五节　张力：创造的前提", "p": "213", "g": 214, "l": 2}, {"t": "第六节　混沌与纠缠：创造的孕育机制", "p": "216", "g": 217, "l": 2}, {"t": "第七节　转换与释放：幸福与创造的统一", "p": "218", "g": 219, "l": 2}, {"t": "第二部分　小结：幸福律与创造的同一逻辑", "p": "220", "g": 221, "l": 2}, {"t": "第三部分　假幸福的制度化陷阱： 批判中国科研的帽子文化", "p": "222", "g": 223, "l": 2}, {"t": "第八节　帽子的假幸福逻辑： 品牌、名誉、金钱", "p": "226", "g": 227, "l": 2}, {"t": "一、导言：科研幸福的错位", "p": "226", "g": 227, "l": 2}, {"t": "二、品牌幻觉：身份的假光环", "p": "227", "g": 228, "l": 2}, {"t": "三、名誉幻觉：掌声的假满足", "p": "227", "g": 228, "l": 2}, {"t": "四、金钱幻觉：资源的假保障", "p": "228", "g": 229, "l": 2}, {"t": "五、幸福律的批判：假幸福的三重罪行", "p": "229", "g": 230, "l": 2}, {"t": "六、训责与警醒", "p": "229", "g": 230, "l": 2}, {"t": "七、理解与包容", "p": "229", "g": 230, "l": 2}, {"t": "八、唤醒：回归真幸福", "p": "230", "g": 231, "l": 2}, {"t": "收束金句", "p": "230", "g": 231, "l": 2}, {"t": "第九节　帽子如何杀死特征律", "p": "230", "g": 231, "l": 2}, {"t": "一、特征律的意义：在混沌中发现稳定", "p": "230", "g": 231, "l": 2}, {"t": "二、帽子文化如何撤走混沌", "p": "231", "g": 232, "l": 2}, {"t": "三、特征律被扼杀的后果", "p": "232", "g": 233, "l": 2}, {"t": "四、历史的对比：有无混沌的差别", "p": "232", "g": 233, "l": 2}, {"t": "五、训责与警醒", "p": "233", "g": 234, "l": 2}, {"t": "六、理解与包容", "p": "233", "g": 234, "l": 2}, {"t": "七、唤醒：重建混沌的土壤", "p": "233", "g": 234, "l": 2}, {"t": "收束金句", "p": "234", "g": 235, "l": 2}, {"t": "第十节　帽子如何扼杀自由律", "p": "234", "g": 235, "l": 2}, {"t": "一、自由律的意义：在纠缠中点燃路径", "p": "234", "g": 235, "l": 2}, {"t": "二、帽子文化如何切断纠缠", "p": "235", "g": 236, "l": 2}, {"t": "三、自由律被扼杀的后果", "p": "236", "g": 237, "l": 2}, {"t": "四、历史的对比：勇敢进入纠缠 vs 回避矛盾", "p": "236", "g": 237, "l": 2}, {"t": "五、训责与警醒", "p": "237", "g": 238, "l": 2}, {"t": "六、理解与包容", "p": "237", "g": 238, "l": 2}, {"t": "七、唤醒：重建自由律的火种", "p": "237", "g": 238, "l": 2}, {"t": "收束金句", "p": "238", "g": 239, "l": 2}, {"t": "第十一节：科研中的特征律与自由律——当整体呼吸逼出新规律与新路径", "p": "238", "g": 239, "l": 2}, {"t": "一、科研不是“我发现了它”，而是整体呼吸在逼迫显影", "p": "238", "g": 239, "l": 2}, {"t": "二、特征律：混沌不是失败，而是新稳定的母体", "p": "239", "g": 240, "l": 2}, {"t": "三、自由律：纠缠不是麻烦，而是新路径的点火机制", "p": "239", "g": 240, "l": 2}, {"t": "四、特征律与自由律的统一：一个给“新规律”，一个给“新道路”", "p": "240", "g": 241, "l": 2}, {"t": "五、警醒与呼唤：当帽子撤走混沌、切断纠缠，科学就失去灵魂", "p": "240", "g": 241, "l": 2}, {"t": "收束金句", "p": "241", "g": 242, "l": 2}, {"t": "第十二节　帽子文化的社会与文明危害", "p": "241", "g": 242, "l": 2}, {"t": "一、导言：科学不是孤岛，假幸福的毒素会扩散", "p": "241", "g": 242, "l": 2}, {"t": "二、个体层面的危害：科学家的灵魂枯萎", "p": "241", "g": 242, "l": 2}, {"t": "三、群体层面的危害：青年学者的集体误导", "p": "242", "g": 243, "l": 2}, {"t": "四、国家层面的危害：创新力的空心化", "p": "243", "g": 244, "l": 2}, {"t": "五、文明层面的危害：意义系统的崩塌", "p": "243", "g": 244, "l": 2}, {"t": "六、训责与警醒", "p": "244", "g": 245, "l": 2}, {"t": "七、理解与包容", "p": "244", "g": 245, "l": 2}, {"t": "八、唤醒：重建幸福律的科学生态", "p": "245", "g": 246, "l": 2}, {"t": "收束金句", "p": "245", "g": 246, "l": 2}, {"t": "第十三节　幸福律的替代方案：科研的正道", "p": "245", "g": 246, "l": 2}, {"t": "一、导言：正道与歧路", "p": "245", "g": 246, "l": 2}, {"t": "二、个体层面的正道：科学家的幸福", "p": "246", "g": 247, "l": 2}, {"t": "三、群体层面的正道：青年学者的探索", "p": "247", "g": 248, "l": 2}, {"t": "四、制度层面的正道：科研管理的重建", "p": "247", "g": 248, "l": 2}, {"t": "五、国家层面的正道：创新体系的重建", "p": "248", "g": 249, "l": 2}, {"t": "六、文明层面的正道：意义系统的复兴", "p": "249", "g": 250, "l": 2}, {"t": "七、训责与警醒", "p": "249", "g": 250, "l": 2}, {"t": "八、理解与包容", "p": "250", "g": 251, "l": 2}, {"t": "九、唤醒：科研的幸福律正道", "p": "250", "g": 251, "l": 2}, {"t": "收束金句", "p": "250", "g": 251, "l": 2}, {"t": "第三部分　小结：从帽子幻觉到科研正道", "p": "250", "g": 251, "l": 2}, {"t": "一、帽子文化：假幸福的制度化", "p": "250", "g": 251, "l": 2}, {"t": "二、特征律与自由律的双重扼杀", "p": "251", "g": 252, "l": 2}, {"t": "三、四重危害：从个体到文明", "p": "252", "g": 253, "l": 2}, {"t": "四、训责与警醒", "p": "252", "g": 253, "l": 2}, {"t": "五、理解与包容", "p": "253", "g": 254, "l": 2}, {"t": "六、幸福律的替代方案：科研的正道", "p": "253", "g": 254, "l": 2}, {"t": "七、唤醒：从帽子幻觉到幸福律", "p": "254", "g": 255, "l": 2}, {"t": "收束金句", "p": "254", "g": 255, "l": 2}, {"t": "第四部分　重建创造的发生条件", "p": "254", "g": 255, "l": 2}, {"t": "第十四节　个体层面的回春：科学家的自我修炼", "p": "254", "g": 255, "l": 2}, {"t": "一、导言：创造力的死亡并非宿命", "p": "254", "g": 255, "l": 2}, {"t": "二、自我拷问：我是不是陷入了假幸福？", "p": "255", "g": 256, "l": 2}, {"t": "三、自我修炼之一：重新拥抱张力", "p": "255", "g": 256, "l": 2}, {"t": "四、自我修炼之二：守住混沌", "p": "256", "g": 257, "l": 2}, {"t": "六、自我修炼之四：等待转换与释放", "p": "257", "g": 258, "l": 2}, {"t": "七、训责与警醒", "p": "257", "g": 258, "l": 2}, {"t": "八、理解与包容", "p": "257", "g": 258, "l": 2}, {"t": "九、唤醒：科学家的幸福律修炼法则", "p": "258", "g": 259, "l": 2}, {"t": "收束金句", "p": "258", "g": 259, "l": 2}, {"t": "第十五节　群体层面的回春：青年学者的探索", "p": "258", "g": 259, "l": 2}, {"t": "一、导言：青年群体的困境", "p": "258", "g": 259, "l": 2}, {"t": "二、帽子逻辑如何误导青年", "p": "259", "g": 260, "l": 2}, {"t": "三、群体假幸福的后果", "p": "260", "g": 261, "l": 2}, {"t": "四、训责与警醒", "p": "260", "g": 261, "l": 2}, {"t": "五、理解与包容", "p": "261", "g": 262, "l": 2}, {"t": "六、群体层面的回春：探索的复兴", "p": "261", "g": 262, "l": 2}, {"t": "七、唤醒：青年群体的幸福律", "p": "262", "g": 263, "l": 2}, {"t": "收束金句", "p": "262", "g": 263, "l": 2}, {"t": "第十六节　群体氛围的重建：科研共同体的幸福律", "p": "262", "g": 263, "l": 2}, {"t": "一、导言：科研不是孤勇，而是共同体", "p": "262", "g": 263, "l": 2}, {"t": "二、科研共同体的堕落：假幸福的氛围", "p": "263", "g": 264, "l": 2}, {"t": "三、幸福律的批判：为什么这种氛围会杀死创造？", "p": "264", "g": 265, "l": 2}, {"t": "四、训责与警醒", "p": "264", "g": 265, "l": 2}, {"t": "五、理解与包容", "p": "265", "g": 266, "l": 2}, {"t": "六、科研共同体的回春：幸福律的氛围", "p": "265", "g": 266, "l": 2}, {"t": "七、唤醒：科研共同体的幸福律", "p": "266", "g": 267, "l": 2}, {"t": "收束金句", "p": "266", "g": 267, "l": 2}, {"t": "第十七节　教育的重建：从假幸福到真幸福", "p": "266", "g": 267, "l": 2}, {"t": "一、导言：教育是科研的摇篮", "p": "266", "g": 267, "l": 2}, {"t": "二、教育中的假幸福逻辑", "p": "267", "g": 268, "l": 2}, {"t": "三、幸福律的批判：教育如何扼杀创造", "p": "268", "g": 269, "l": 2}, {"t": "四、训责与警醒", "p": "269", "g": 270, "l": 2}, {"t": "五、理解与包容", "p": "269", "g": 270, "l": 2}, {"t": "六、教育的重建：从假幸福到真幸福", "p": "269", "g": 270, "l": 2}, {"t": "七、群体的回春：教育与科研的联动", "p": "270", "g": 271, "l": 2}, {"t": "八、唤醒：教育的幸福律", "p": "270", "g": 271, "l": 2}, {"t": "九、过渡：走向全文总结", "p": "271", "g": 272, "l": 2}, {"t": "收束金句", "p": "271", "g": 272, "l": 2}, {"t": "一、导言：从“繁荣幻觉”到“枯竭现实”，我们必须直面真相", "p": "271", "g": 272, "l": 2}, {"t": "二、假幸福：创造力的掘墓人——它不是安慰，而是慢性谋杀", "p": "272", "g": 273, "l": 2}, {"t": "三、幸福律：创造力的发生学——幸福与创造不是两回事，而是一条生命的同一条火焰", "p": "273", "g": 274, "l": 2}, {"t": "四、帽子文化：假幸福的制度化——当奖励异化为绑架，科学就变成了幻觉产业", "p": "273", "g": 274, "l": 2}, {"t": "五、回春之路：从个体到群体——让幸福律回到全过程，创造才会重新发生", "p": "274", "g": 275, "l": 2}, {"t": "六、训责与警醒：如果不醒来，我们会把未来亲手交给空心化", "p": "274", "g": 275, "l": 2}, {"t": "七、理解与包容：假幸福不是个人的罪，而是集体的陷阱", "p": "274", "g": 275, "l": 2}, {"t": "八、唤醒：幸福律的文明意义——它不仅关乎科研，更关乎文明能否继续生成意义", "p": "275", "g": 276, "l": 2}, {"t": "九、结论：保护创造力重新发生的条件", "p": "275", "g": 276, "l": 2}, {"t": "收束金句", "p": "276", "g": 277, "l": 2}, {"t": "后记：李约瑟之问与钱学森之问的幸福律回答", "p": "276", "g": 277, "l": 2}, {"t": "一、导言：两个问号，其实是一条文明的伤口", "p": "276", "g": 277, "l": 2}, {"t": "二、李约瑟之问：为什么近代科学没有在中国诞生——不是没有聪明，而是缺少“发生的土壤”", "p": "277", "g": 278, "l": 2}, {"t": "三、钱学森之问：为什么我们的大学无法培养大师——不是没有资源，而是“假幸福”接管了教育发生", "p": "278", "g": 279, "l": 2}, {"t": "四、讽刺与训责：一个文明两次错失，背后是同一套幸福结构的失血", "p": "279", "g": 280, "l": 2}, {"t": "五、理解与包容：假幸福不是某个人的罪，而是制度与文化的合谋", "p": "280", "g": 281, "l": 2}, {"t": "六、幸福律的文明回答：两问同源，因为创造同源", "p": "280", "g": 281, "l": 2}, {"t": "七、唤醒：未来仍有可能——只要我们肯把幸福律还给教育、还给科研、还给文明", "p": "280", "g": 281, "l": 2}, {"t": "八、收束：幸福律的历史责任——今天不回归，我们还会继续错失", "p": "281", "g": 282, "l": 2}, {"t": "收束金句", "p": "281", "g": 282, "l": 2}, {"t": "附录1：中国的科研复兴不能靠金钱和帽子——注定是竹篮打水", "p": "281", "g": 282, "l": 2}, {"t": "一、导言：虚假的繁荣与更深的空心", "p": "281", "g": 282, "l": 2}, {"t": "二、金钱堆不出创造力：可以买到器械，却买不到顿悟的火", "p": "282", "g": 283, "l": 2}, {"t": "三、帽子堆不出大师：看似加冕，实则提前枯竭", "p": "282", "g": 283, "l": 2}, {"t": "四、幸福律的批判：为什么必然是“竹篮打水”", "p": "283", "g": 284, "l": 2}, {"t": "五、训责与警醒：不要再把麻醉当成复兴", "p": "284", "g": 285, "l": 2}, {"t": "六、理解与包容：理解不是赦免，而是为了更精准地改革", "p": "284", "g": 285, "l": 2}, {"t": "七、唤醒：科研复兴的真正道路，是让幸福律重新运行", "p": "285", "g": 286, "l": 2}, {"t": "收束金句", "p": "285", "g": 286, "l": 2}, {"t": "金钱可以买实验室，却买不来顿悟。", "p": "285", "g": 286, "l": 2}, {"t": "帽子可以制造虚荣，却扼杀创造。", "p": "285", "g": 286, "l": 2}, {"t": "科研复兴不是堆积，而是孕育；不是幻觉，而是幸福律。", "p": "285", "g": 286, "l": 2}, {"t": "中国的科研复兴，如果沉迷金钱和帽子，注定是竹篮打水。", "p": "285", "g": 286, "l": 2}, {"t": "附录二：科研原创力不能寄希望在“AI+”上", "p": "285", "g": 286, "l": 2}, {"t": "二、AI的能力与边界：它能做得更快，但它无法替你活一次", "p": "286", "g": 287, "l": 2}, {"t": "三、幸福律的批判：原创力不是组合，而是“发生”", "p": "287", "g": 288, "l": 2}, {"t": "四、讽刺与训责：当“AI+”成为麻醉剂，科研会更快失去灵魂", "p": "288", "g": 289, "l": 2}, {"t": "五、理解与包容：AI的价值必须被承认，但位置必须被摆正", "p": "288", "g": 289, "l": 2}, {"t": "六、唤醒：科研原创力的真正道路，只能是“人+幸福律”", "p": "289", "g": 290, "l": 2}, {"t": "收束金句", "p": "289", "g": 290, "l": 2}, {"t": "AI可以买时间，却买不来顿悟。", "p": "289", "g": 290, "l": 2}, {"t": "AI能复制知识，却不能创造意义。", "p": "289", "g": 290, "l": 2}, {"t": "科研原创力不能寄希望在“AI+”，只能寄希望在幸福律。", "p": "289", "g": 290, "l": 2}, {"t": "科学的未来，不是“AI+”，而是“幸福律+”。", "p": "289", "g": 290, "l": 2}, {"t": "附录三　幸福律+AI：如何避免幻觉，真正合作", "p": "289", "g": 290, "l": 2}, {"t": "一、导言：两种极端，都在把人从“发生”里撤走", "p": "289", "g": 290, "l": 2}, {"t": "二、幸福律视角：人类科研的独特性，不是计算力，而是“承受力”", "p": "290", "g": 291, "l": 2}, {"t": "三、AI的价值：不是替代幸福律，而是把幸福律的土壤变得更辽阔、更尖锐、更可进入", "p": "291", "g": 292, "l": 2}, {"t": "2. AI可以拓展混沌的边界：让“可能性空间”变得巨大，但不替你孕育", "p": "292", "g": 293, "l": 2}, {"t": "3. AI可以放大纠缠的张力：让矛盾更尖锐，从而更可能点燃自由律", "p": "292", "g": 293, "l": 2}, {"t": "四、真正的危险：AI一旦进入“帽子逻辑”，它会成为更强的假幸福机器", "p": "293", "g": 294, "l": 2}, {"t": "五、理解与包容：人类想让AI替代，是因为我们害怕“幸福律的代价”", "p": "293", "g": 294, "l": 2}, {"t": "六、幸福律+AI：一套可执行的合作模型", "p": "294", "g": 295, "l": 2}, {"t": "七、唤醒：未来的科研图景，不是“AI取代人”，而是“AI把人送回创造现场”", "p": "295", "g": 296, "l": 2}, {"t": "收束金句", "p": "295", "g": 296, "l": 2}, {"t": "第三编　编结　幸福为何只能在真实中发生", "p": "296", "g": 297, "l": 1}, {"t": "第四编　幸福的科学：从解释框架到研究纲领", "p": "298", "g": 299, "l": 1}, {"t": "编序　当幸福律走向可检验的研究", "p": "298", "g": 299, "l": 2}, {"t": "第九章　幸福科学的诞生", "p": "300", "g": 301, "l": 2}, {"t": "摘要　从一个解释走向一项研究纲领", "p": "300", "g": 301, "l": 2}, {"t": "导论　幸福并非直到今天才成为研究对象", "p": "300", "g": 301, "l": 2}, {"t": "第一节　幸福的种类学：三界与三态是一张工作地图", "p": "301", "g": 302, "l": 2}, {"t": "第二节　幸福的量化学：保留符号，也交代符号尚未做到的事", "p": "303", "g": 304, "l": 2}, {"t": "第三节　从概念到记录：怎样识别一次转换", "p": "304", "g": 305, "l": 2}, {"t": "第四节　幸福的文明学：三色是一种比较隐喻", "p": "305", "g": 306, "l": 2}, {"t": "第五节　幸福的动力学：速度、轨迹与余效", "p": "306", "g": 307, "l": 2}, {"t": "第六节　三律耦合：理论结构怎样接受外部检验", "p": "307", "g": 308, "l": 2}, {"t": "第七节　五个候选检验与判负条件", "p": "308", "g": 309, "l": 2}, {"t": "后记　让幸福科学从可被纠正开始", "p": "309", "g": 310, "l": 2}, {"t": "第四编　编结　当幸福成为一种可被承担的科学", "p": "311", "g": 312, "l": 1}, {"t": "结语", "p": "312", "g": 313, "l": 1}, {"t": "附　全书要义二十则", "p": "314", "g": 315, "l": 1}, {"t": "一、分类是一张工作地图，不是经验必须服从的边界。三界、三态帮助我们描述差异，也要允许真实经历改变分类。", "p": "314", "g": 315, "l": 2}, {"t": "二、张力—转换—释放，是本书提出的发生学线索，不是已经完成验证的普遍公式。它的价值需要在具体问题中接受检验。", "p": "314", "g": 315, "l": 2}, {"t": "三、结果看起来相似，过程可能不同。即时轻松是否支持持续生活，需要从能力、选择与实际后果继续辨认。", "p": "314", "g": 315, "l": 2}, {"t": "四、减轻负担可以恢复生成条件。需要批判的，是长期以替代品冒充成长，而不是一切方便与帮助。", "p": "314", "g": 315, "l": 2}, {"t": "五、“麻醉、分散、抽走”在机制批评中是修辞性概括，不指医学麻醉、规范止痛或必要休息本身具有虚假性质。", "p": "314", "g": 315, "l": 2}, {"t": "六、止痛与成长不必敌对。及时治疗、获得安全与基本照护，可以为新的生活提供条件。", "p": "314", "g": 315, "l": 2}, {"t": "七、不能只用一个感受或一项指标判定全部幸福。体验、长期评价、实际功能与付出的代价，应当共同进入理解。", "p": "314", "g": 315, "l": 2}, {"t": "八、人不只是意义的接受者，也可以参与意义的生成。这里的生成不等于必须持续生产作品，也包含照护与关系的重建。", "p": "314", "g": 315, "l": 2}, {"t": "九、看见、选择与体验可以在同一个互动整体中共同发生。SIO不把主体、互动和客体当作事后才拼接的三个成品。", "p": "315", "g": 316, "l": 2}, {"t": "十、幸福可以被理解为旅程，但旅程应当允许停留。安宁不需要用不断突破来证明合法性。", "p": "315", "g": 316, "l": 2}, {"t": "十一、“张力可通行”是本书的生活比喻，不是疾病诊断。健康问题需要具体医学知识、专业判断与现实支持。", "p": "315", "g": 316, "l": 2}, {"t": "十二、结构与过程帮助解释幸福，却不能代替人的感受。一个让人更有产出却更不自由的安排，不应轻易被称为幸福提升。", "p": "315", "g": 316, "l": 2}, {"t": "十三、艺术中的尾音与沉默，可以帮助我们体会完成与安顿；这种读法不表示所有读者都必须有同样的体验。", "p": "315", "g": 316, "l": 2}, {"t": "十四、节律需要与实际生活协商。坚持一种不适合自己的安排，不会因为被称为节律就自动有益。", "p": "315", "g": 316, "l": 2}, {"t": "十五、能够继续生活，本身值得珍视。持续的支持不一定喧闹，也不一定呈现为高光时刻。", "p": "315", "g": 316, "l": 2}, {"t": "十六、泪流、宁静与兴奋都可能有不同含义。理论应当询问当事人，而不是替他宣布哪一种表现更深刻。", "p": "315", "g": 316, "l": 2}, {"t": "十七、幸福不是别人发放的成绩单。人的经历值得尊重，也值得拥有拒绝一种解释的权利。", "p": "315", "g": 316, "l": 2}, {"t": "十八、面对张力的能力，包括判断怎样减少它。求助、合作、改变任务与退出伤害，都是需要保留的选择。", "p": "316", "g": 317, "l": 2}, {"t": "十九、创造力重新发生需要多种条件。幸福律提供一条研究路径，不保证苦难换来顿悟，也不取消其他解释与方法。", "p": "316", "g": 317, "l": 2}, {"t": "二十、一个理论也需要回写。能够说明哪里尚未知道、什么结果会使自己改变，是本书所期待的持续发生。", "p": "316", "g": 317, "l": 2}, {"t": "附录一　参考资料与证据说明", "p": "317", "g": 318, "l": 1}, {"t": "原稿出处与作品说明", "p": "318", "g": 319, "l": 2}, {"t": "附录二　本版修订说明", "p": "319", "g": 320, "l": 1}]</script>
+
+<script>
+(function(){
+'use strict';
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var TOC = JSON.parse(document.getElementById('toc').textContent);
+var $ = function(id){ return document.getElementById(id); };
+
+var doc=null, total=0, cur=1, spread=true, zoom=1, vector=false, rendering=false;
+var themes=['','day','sepia'], ti=0;
+var cache={}, textCache={}, vecOK=0, vecFail=0;
+/* —— 接入 SDE 陪读（WDS）：把当前可见页的文本与页码喂给助手；文字层可选中某句作焦点 —— */
+window.WDS_READ = {
+  title: '幸福的奥秘',
+  bodyEl: function(){ return document.getElementById('book'); },
+  docTextFn: function(){
+    if(!doc) return '';
+    var l = spread ? (cur%2===0?cur:cur-1) : cur, ps = spread ? [l, l+1] : [cur];
+    var t = ps.filter(function(p){ return p>=1 && p<=total && textCache[p]; }).map(function(p){
+      var pr = p-CFG.offset+1; return '【第 '+(pr>0?pr:p)+' 页 / 共 '+total+' 页】\n'+textCache[p]; }).join('\n');
+    return t;
+  }
+};
+
+function msg(t, spin){ $('msgT').textContent=t; $('msg').classList.remove('hide');
+  $('msg').querySelector('.sp').style.display = spin===false?'none':''; }
+function hideMsg(){ $('msg').classList.add('hide'); }
+function hint(t){ var h=$('hint'); h.textContent=t; h.classList.add('show');
+  clearTimeout(h._t); h._t=setTimeout(function(){h.classList.remove('show');},1400); }
+
+/* ── 版心尺寸：按舞台可用空间算，双页则一半 ── */
+function box(){
+  var st=$('stage'), W=st.clientWidth-40, H=st.clientHeight-30;
+  var n = spread?2:1;
+  return {W:W, H:H, n:n};
+}
+function fit(vp){
+  var b=box();
+  var maxW=(b.W/b.n), maxH=b.H;
+  var s=Math.min(maxW/vp.width, maxH/vp.height)*zoom;
+  return s;
+}
+
+/* ── 渲染一页：优先矢量(SVG)，失败回落高清 canvas ── */
+function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
+  var leaf = canvasEl.parentNode;
+  if(pageNo<1||pageNo>total){ leaf.style.visibility='hidden'; if(tlEl) tlEl.innerHTML=''; cb&&cb(); return; }
+  leaf.style.visibility='visible';
+  doc.getPage(pageNo).then(function(pg){
+    var vp0=pg.getViewport({scale:1});
+    var sc=fit(vp0), vp=pg.getViewport({scale:sc});
+    leaf.style.width=Math.round(vp.width)+'px';
+    leaf.style.height=Math.round(vp.height)+'px';
+    if(vector && svgEl && window.pdfjsLib && pdfjsLib.SVGGraphics){
+      leaf.classList.add('vec');
+      pg.getOperatorList().then(function(ops){
+        var g=new pdfjsLib.SVGGraphics(pg.commonObjs, pg.objs);
+        g.embedFonts=true;
+        return g.getSVG(ops, vp);
+      }).then(function(svg){
+        vecOK++;
+        svg.setAttribute('width', Math.round(vp.width));
+        svg.setAttribute('height', Math.round(vp.height));
+        svgEl.innerHTML=''; svgEl.appendChild(svg);
+        if(tlEl) buildText(pg, vp, tlEl);
+        cb&&cb();
+      }).catch(function(){
+        /* 逐页回退：这一页含矢量后端不支持的内容（多为位图封面、插图），只这一页用高清位图；
+           其余页照旧矢量。连续失败过多才整本切到位图。 */
+        vecFail++;
+        if(vecFail>=6 && vecFail>vecOK){
+          vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
+          hint('此文档的矢量渲染不可用，已切回高清位图');
+        }
+        leaf.classList.remove('vec');
+        drawCanvas(pg, vp, canvasEl, tlEl, cb);
+      });
+    }else{
+      leaf.classList.remove('vec');
+      drawCanvas(pg, vp, canvasEl, tlEl, cb);
+    }
+  }).catch(function(){ cb&&cb(); });
+}
+
+function drawCanvas(pg, vp, canvasEl, tlEl, cb){
+  var dpr=Math.min(window.devicePixelRatio||1, 3);
+  canvasEl.width=Math.round(vp.width*dpr); canvasEl.height=Math.round(vp.height*dpr);
+  canvasEl.style.width=Math.round(vp.width)+'px'; canvasEl.style.height=Math.round(vp.height)+'px';
+  var ctx=canvasEl.getContext('2d',{alpha:false});
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#FBF7EE'; ctx.fillRect(0,0,vp.width,vp.height);
+  pg.render({canvasContext:ctx, viewport:vp, intent:'display'}).promise.then(function(){
+    if(tlEl) buildText(pg, vp, tlEl);
+    cb&&cb();
+  }).catch(function(){ cb&&cb(); });
+}
+
+function buildText(pg, vp, el){
+  el.innerHTML='';
+  pg.getTextContent().then(function(tc){
+    try{ textCache[pg.pageNumber]=tc.items.map(function(x){return x.str;}).join(''); }catch(e){}
+    var frag=document.createDocumentFragment();
+    tc.items.forEach(function(it){
+      if(!it.str) return;
+      var tx=pdfjsLib.Util.transform(vp.transform, it.transform);
+      var s=document.createElement('span');
+      s.textContent=it.str;
+      var h=Math.hypot(tx[2],tx[3]);
+      s.style.left=tx[4]+'px'; s.style.top=(tx[5]-h)+'px';
+      s.style.fontSize=h+'px'; s.style.fontFamily='sans-serif';
+      frag.appendChild(s);
+    });
+    el.appendChild(frag);
+  }).catch(function(){});
+}
+
+/* ── 展示当前跨页 ── */
+function show(cb){
+  if(rendering){ return; }
+  rendering=true;
+  document.getElementById('book').classList.toggle('single', !spread);
+  $('leafR').style.display = spread?'':'none';
+  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  if(left<1) left=0;
+  var right= left+1;
+  var done=0, need=spread?2:1;
+  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
+  if(spread){
+    $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
+    $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
+    renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
+    renderInto(right, $('cR'), $('tR'), fin, $('sR'));
+  }else{
+    $('nL').textContent = cur-CFG.offset+1>0?(cur-CFG.offset+1):'';
+    renderInto(cur, $('cL'), $('tL'), fin, $('sL'));
+  }
+}
+
+function sync(){
+  var printed = Math.max(1, cur-CFG.offset+1);
+  $('pi').value = printed;
+  $('pt').textContent = Math.max(1,total-CFG.offset+1);
+  var r = (cur-1)/Math.max(1,total-1);
+  $('fill').style.width=(r*100)+'%';
+  $('knob').style.left=(r*100)+'%';
+  try{ localStorage.setItem(CFG.key, String(cur)); }catch(e){}
+  Array.prototype.forEach.call($('thumbs').children, function(c){
+    c.classList.toggle('cur', +c.dataset.p===cur);
+  });
+}
+
+/* ── 翻页（带动画） ── */
+function step(dir){
+  var n = spread?2:1;
+  var t = cur + dir*n;
+  if(t<1) t=1; if(t>total) t=total;
+  if(t===cur) return;
+  animate(dir, function(){ cur=t; show(); });
+}
+function animate(dir, after){
+  var src = dir>0 ? $('leafR') : $('leafL');
+  if(!spread || !src || src.style.display==='none'){ after(); return; }
+  var fl=document.createElement('div');
+  fl.className='flip'+(dir>0?'':' back');
+  var w=src.offsetWidth, h=src.offsetHeight;
+  fl.style.width=w+'px'; fl.style.height=h+'px';
+  fl.style.left = dir>0 ? (w+'px') : '0px';
+  var live = src.classList.contains('vec') ? src.querySelector('.svg svg') : src.querySelector('canvas');
+  if(live){
+    var cl = live.cloneNode(true);
+    cl.style.width='100%'; cl.style.height='100%'; cl.style.display='block';
+    fl.appendChild(cl);
+  }
+  $('book').appendChild(fl);
+  requestAnimationFrame(function(){ fl.classList.add('go'); });
+  setTimeout(function(){ fl.remove(); after(); }, 620);
+}
+function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+
+/* ── 目录 ── */
+/* 目录兜底：TOC 为空时从 PDF 书签生成（新迁入的书多半没有手工目录） */
+function outlineToc(d){
+  return d.getOutline().then(function(ol){
+    var out=[]; if(!ol||!ol.length) return out;
+    function walk(items,l){
+      return items.reduce(function(p,it){
+        return p.then(function(){
+          var ds=it.dest;
+          return (typeof ds==='string'? d.getDestination(ds) : Promise.resolve(ds))
+            .then(function(x){ return x ? d.getPageIndex(x[0]) : null; })
+            .then(function(ix){
+              if(ix!=null){ var g=ix+1, pr=g-CFG.offset+1; out.push({t:it.title, p:pr>0?String(pr):'', g:g, l:l===1?1:2}); }
+              if(it.items && it.items.length && l<2) return walk(it.items,l+1);
+            }).catch(function(){});
+        });
+      }, Promise.resolve());
+    }
+    return walk(ol,1).then(function(){ return out; });
+  }).catch(function(){ return []; });
+}
+function buildToc(){
+  var box=$('dlist'); box.innerHTML='';
+  TOC.forEach(function(e){
+    var a=document.createElement('a');
+    a.className = e.l===1?'l1':'l2';
+    a.href='#'; a.innerHTML='<span>'+e.t.replace(/</g,'&lt;')+'</span><span class="n">'+e.p+'</span>';
+    a.onclick=function(ev){ ev.preventDefault(); go(e.g ? e.g : (+e.p)+CFG.offset-1); closeDrawer(); };
+    box.appendChild(a);
+  });
+}
+function closeDrawer(){ $('drawer').classList.remove('open'); }
+
+/* ── 全书检索 ── */
+function search(q){
+  if(!q){ $('dHead').textContent='目　录'; buildToc(); return; }
+  var box=$('dlist'); box.innerHTML=''; $('dHead').textContent='检索：'+q;
+  var found=0, scanned=0;
+  msg('正在检索全书…');
+  function scan(i){
+    if(i>total || found>=120){ hideMsg(); if(!found){ box.innerHTML='<div class="hit">没有找到。</div>'; } return; }
+    var pr = textCache[i] ? Promise.resolve(textCache[i])
+      : doc.getPage(i).then(function(p){ return p.getTextContent(); })
+          .then(function(tc){ var s=tc.items.map(function(x){return x.str;}).join(''); textCache[i]=s; return s; });
+    pr.then(function(s){
+      var k=s.indexOf(q);
+      if(k>=0){
+        found++;
+        var d=document.createElement('div'); d.className='hit';
+        var a=Math.max(0,k-16), b=Math.min(s.length,k+q.length+22);
+        d.innerHTML='<b>'+(i-CFG.offset+1)+'</b>　'+s.slice(a,k).replace(/</g,'&lt;')+
+          '<b>'+q.replace(/</g,'&lt;')+'</b>'+s.slice(k+q.length,b).replace(/</g,'&lt;');
+        d.onclick=function(){ go(i); closeDrawer(); };
+        box.appendChild(d);
+      }
+      scanned++;
+      if(scanned%12===0){ $('msgT').textContent='正在检索全书…  '+Math.round(i/total*100)+'%'; }
+      scan(i+1);
+    }).catch(function(){ scan(i+1); });
+  }
+  scan(1);
+}
+
+/* ── 缩略图 ── */
+var thumbsBuilt=false;
+function buildThumbs(){
+  if(thumbsBuilt) return; thumbsBuilt=true;
+  var wrap=$('thumbs');
+  var i=1;
+  function one(){
+    if(i>total) return;
+    var p=i;
+    doc.getPage(p).then(function(pg){
+      var vp=pg.getViewport({scale:1});
+      var s=150/vp.height, v=pg.getViewport({scale:s});
+      var c=document.createElement('canvas');
+      c.width=v.width; c.height=v.height; c.dataset.p=p;
+      c.onclick=function(){ go(p); };
+      wrap.appendChild(c);
+      return pg.render({canvasContext:c.getContext('2d'), viewport:v}).promise;
+    }).then(function(){ i++; setTimeout(one, 0); }).catch(function(){ i++; setTimeout(one,0); });
+  }
+  one();
+}
+
+/* ── 事件 ── */
+$('btnPrev').onclick=function(){ step(-1); };
+$('btnNext').onclick=function(){ step(1); };
+$('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
+$('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
+$('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);
+  this.textContent=vector?'矢量':'位图'; hint(vector?'矢量源渲染':'高清位图'); show(); };
+$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'%'); };
+$('btnZoomOut').onclick=function(){ zoom=Math.max(.5, zoom/1.15); show(); hint('缩小 '+Math.round(zoom*100)+'%'); };
+$('btnThumbs').onclick=function(){ $('thumbs').classList.toggle('open'); if($('thumbs').classList.contains('open')) buildThumbs(); };
+$('btnTheme').onclick=function(){ ti=(ti+1)%3; document.documentElement.className=themes[ti];
+  this.textContent=['夜','日','纸'][ti]; show(); };
+$('btnFull').onclick=function(){ if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); };
+$('q').onkeydown=function(e){ if(e.key==='Enter'){ search(this.value.trim()); } };
+$('rail').onclick=function(e){ var r=this.getBoundingClientRect();
+  go(Math.round((e.clientX-r.left)/r.width*(total-1))+1); };
+
+document.addEventListener('keydown',function(e){
+  if(/input|textarea|select/i.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){ step(-1); e.preventDefault(); }
+  else if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ step(1); e.preventDefault(); }
+  else if(e.key==='Home'){ go(1); } else if(e.key==='End'){ go(total); }
+  else if(e.key==='t'||e.key==='T'){ $('btnToc').click(); }
+  else if(e.key==='d'||e.key==='D'){ $('btnSpread').click(); }
+  else if(e.key==='v'||e.key==='V'){ $('btnVec').click(); }
+  else if(e.key==='n'||e.key==='N'){ $('btnTheme').click(); }
+  else if(e.key==='f'||e.key==='F'){ $('btnFull').click(); }
+});
+var sx=0, sy=0;
+$('stage').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+$('stage').addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.4){ step(dx<0?1:-1); }
+},{passive:true});
+var rt=null;
+window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ show(); },160); });
+
+/* ── 启动 ── */
+function boot(){
+  if(!window.pdfjsLib){ window._pdfWait=(window._pdfWait||0)+1; if(window._pdfWait>125){ $('msgT').innerHTML='阅读器暂未载入。<a style="color:#D9A441" href="/books/happiness-secret/text/">阅读全文</a> 或 <a style="color:#D9A441" href="/books/happiness-secret/downloads/happiness-reader-v1.1.pdf">打开PDF</a>'; $('msg').querySelector('.sp').style.display='none'; return;} setTimeout(boot,120); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  $('btnVec').classList.remove('on'); $('btnVec').textContent='高清';
+  msg('正在载入《幸福的奥秘》…');
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise.then(function(d){
+    doc=d; total=d.numPages;
+    buildToc();
+    if(!TOC.length){ outlineToc(d).then(function(t){ if(t.length){ TOC=t; buildToc(); } }); }
+    var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
+    cur = (saved>0&&saved<=total) ? saved : 1;
+    if(window.innerWidth<820) spread=false, $('btnSpread').textContent='单页';
+    show(function(){ if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
+  }).catch(function(err){
+    msg('书页载入失败。可直接打开原文 PDF：'+CFG.pdf, false);
+  });
+}
+boot();
+})();
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20261005a" defer></script>
+</body>
+</html>
