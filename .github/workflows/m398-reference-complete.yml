@@ -1,0 +1,47 @@
+name: M398 live reference assets
+on:
+  push:
+    branches: ['publish/m398-judgment-genesis-20261008']
+    paths: ['.github/workflows/m398-reference-complete.yml']
+permissions:
+  contents: read
+jobs:
+  references:
+    runs-on: ubuntu-latest
+    steps:
+      - run: python -m pip install --quiet pymupdf
+      - name: Read references
+        run: |
+          mkdir -p audit
+          cat > /tmp/get.py <<'PY'
+          import urllib.request,pathlib,json,fitz,concurrent.futures
+          out=pathlib.Path('audit');base='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/'
+          results={}
+          def get(url):
+              with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 M398-publication-review'}),timeout=120) as r:return r.read()
+          paths=['src/worker.js','.github/workflows/book399-publish-v22.yml','.github/workflows/book399-transfer-check.yml','.github/workflows/book294-publish-v1-20261005.yml','.github/workflows/search-index.yml','public/books/m/220/cover.jpg','public/books/m/302/cover.jpg','public/books/m/302/agent/index.html']
+          for path in paths:
+              try:
+                  b=get(base+path);t=out/'repo'/path;t.parent.mkdir(parents=True,exist_ok=True);t.write_bytes(b);results[path]={'bytes':len(b)}
+              except Exception as e:results[path]={'error':str(e)}
+          urls={220:'https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf',302:'https://sdeuniverses.com/students/chen-feng/ai-death-dilemma/m302/ai-death-dilemma-reader-v2.pdf'}
+          for n,u in urls.items():
+              try:
+                  b=get(u);d=fitz.open(stream=b,filetype='pdf');pages=sorted(set([*range(min(10,len(d))),min(20,len(d)-1),min(40,len(d)-1),min(100,len(d)-1),len(d)-1]));s=fitz.open()
+                  info={'pages':len(d),'size_points':list(d[0].rect),'sample_original_pages':[p+1 for p in pages],'font_samples':[]}
+                  for i in pages:
+                      s.insert_pdf(d,from_page=i,to_page=i)
+                      if i in [2,4,20,40,100]:info['font_samples'].append({'page':i+1,'spans':[{'font':a['font'],'size':a['size'],'color':a['color'],'text':a['text'][:80]} for bl in d[i].get_text('dict')['blocks'] if 'lines'in bl for l in bl['lines'] for a in l['spans']][:40]})
+                  s.save(out/f'reference-{n}-selected-pages.pdf');(out/f'reference-{n}-layout.json').write_text(json.dumps(info,ensure_ascii=False,indent=2));results[u]={'bytes':len(b),'pages':len(d)}
+              except Exception as e:results[u]={'error':str(e)}
+          try:
+              b=get('https://read.sdeuniverses.com/library/');(out/'read-library-live.html').write_bytes(b);results['read-library']={'bytes':len(b)}
+          except Exception as e:results['read-library']={'error':str(e)}
+          (out/'results.json').write_text(json.dumps(results,ensure_ascii=False,indent=2));print(json.dumps(results,ensure_ascii=False,indent=2))
+          PY
+          python /tmp/get.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m398-live-reference-assets
+          path: audit/
+          retention-days: 7
