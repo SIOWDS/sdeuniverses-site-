@@ -1,0 +1,70 @@
+name: M398 reference audit
+on:
+  push:
+    branches: ['publish/m398-judgment-genesis-20261008']
+    paths: ['.github/workflows/m398-reference-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  references:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PDF inspector
+        run: python -m pip install --quiet pymupdf
+      - name: Fetch exact reference files and public site configuration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p audit
+          cat > /tmp/audit.py <<'PY'
+          import os,json,urllib.request,pathlib,concurrent.futures,fitz
+          out=pathlib.Path('audit');repo='SIOWDS/sdeuniverses-site-'
+          def req(url):
+              headers={'User-Agent':'m398-publication-audit'}
+              if url.startswith('https://api.github.com/'):
+                  headers['Authorization']='Bearer '+os.environ['GH_TOKEN']
+              with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=120) as r:
+                  return r.read()
+          listings={}
+          for path in ['', '.github/workflows', 'public', 'public/books', 'public/monographs', 'public/books/m/398']:
+              try:
+                  data=json.loads(req('https://api.github.com/repos/'+repo+'/contents/'+path))
+                  listings[path]=[{k:x.get(k) for k in ('name','path','type','size')} for x in data] if isinstance(data,list) else data
+              except Exception as e:listings[path]={'error':str(e)}
+          (out/'directory-listings.json').write_text(json.dumps(listings,ensure_ascii=False,indent=2))
+          paths=['public/books/m/220/index.html','public/books/m/220/read.html','public/books/m/220/text/index.html','public/books/m/302/index.html','public/books/m/302/read.html','public/books/m/302/text/index.html','public/books/m/247/index.html','public/students/zhang-qiong/index.html','public/students/wang-desheng/index.html','public/books/index.html','public/monographs/index.html','public/books/catalog.json','public/read/library/index.html','public/library/index.html','read/public/library/index.html','wrangler.jsonc','wrangler.toml','package.json','README.md','public/_worker.js']
+          result={}
+          def download(path):
+              try:
+                  data=req('https://raw.githubusercontent.com/'+repo+'/main/'+path)
+                  target=out/'repo'/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+                  return path,{'bytes':len(data)}
+              except Exception as e:return path,{'error':str(e)}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+              result.update(pool.map(download,paths))
+          pdfs={220:'public/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf',302:'public/students/chen-feng/ai-death-dilemma/m302/ai-death-dilemma-reader-v2.pdf'}
+          for vol,path in pdfs.items():
+              try:
+                  data=req('https://raw.githubusercontent.com/'+repo+'/main/'+path)
+                  doc=fitz.open(stream=data,filetype='pdf')
+                  sample=fitz.open();pages=sorted(set([*range(min(10,len(doc))),min(20,len(doc)-1),min(40,len(doc)-1),min(100,len(doc)-1),len(doc)-1]))
+                  info={'pages':len(doc),'size_points':list(doc[0].rect),'metadata':doc.metadata,'sample_original_pages':[p+1 for p in pages],'font_samples':[]}
+                  for p in pages:
+                      sample.insert_pdf(doc,from_page=p,to_page=p)
+                      if p in [2,4,20,40,100]:
+                          spans=[{'font':s['font'],'size':s['size'],'color':s['color'],'text':s['text'][:80]} for b in doc[p].get_text('dict')['blocks'] if 'lines'in b for l in b['lines'] for s in l['spans']]
+                          info['font_samples'].append({'page':p+1,'spans':spans[:30]})
+                  sample.save(out/f'reference-{vol}-selected-pages.pdf')
+                  (out/f'reference-{vol}-layout.json').write_text(json.dumps(info,ensure_ascii=False,indent=2))
+                  result[path]={'bytes':len(data),'pages':len(doc)}
+              except Exception as e:result[path]={'error':str(e)}
+          (out/'fetch-results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+          python /tmp/audit.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m398-publication-reference-audit
+          path: audit/
+          retention-days: 7
