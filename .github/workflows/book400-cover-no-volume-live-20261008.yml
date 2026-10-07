@@ -1,0 +1,86 @@
+name: Book400 no-volume cover production verification
+on:
+  push:
+    branches: ['release/book400-cover-no-volume-20261008']
+    paths: ['.github/workflows/book400-cover-no-volume-live-20261008.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Wait for exact publication and verify the four public assets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,subprocess,time,hashlib,datetime,zipfile,re
+          root=Path(os.environ['RUNNER_TEMP'])/'book400-cover-live';root.mkdir()
+          rev='20261008-p3-cover';base='https://sdeuniverses.com/books/m/400/';release='de7cc66582a223a449426aa55c2fe247f474529b7e691a14694ac4071ca7f014'
+          expected={'cover.jpg':'f6db04b696e3ce0cee03eafe822a297b4990042e64ffc85717a0b99e035340cc','downloads/book-print-v1.2.pdf':'3816beb2efcbb6e98694dccdedc47ec6ead87769f7a8e355703ff196ce2d0354','downloads/book-reader-v1.2.pdf':'01567bd6b71f41d3252394b536950be3c2174d2aa7157f7dda5acbb25f1209dd','downloads/book-v1.2.docx':'0644d4b789db88c5428318d2c43e9f9e40cc124b6009a913e6e1a2c2a8a2c510'}
+          def get(url,path):
+            path.parent.mkdir(parents=True,exist_ok=True)
+            p=subprocess.run(['curl','-fsSL','--max-time','55','--user-agent','Mozilla/5.0','-o',str(path),url],capture_output=True,text=True)
+            if p.returncode:raise RuntimeError(p.stderr[:200])
+            return path.read_bytes()
+          attempts=[]
+          for i in range(24):
+            try:
+              m=json.loads(get(base+'publication-manifest.json?v='+rev,root/'manifest.json'));assert m['release_sha256']==release and m['revision']==rev
+              break
+            except Exception as e:attempts.append(str(e));print('Waiting for exact cover release',i+1,flush=True);time.sleep(10)
+          else:raise RuntimeError('New cover release is not live')
+          assert m['book_no']==400 and m['isbn']=='979-8-90690-866-7' and m['price_usd']==20 and m['pages']==381
+          assets=[]
+          for path,sha in expected.items():
+            raw=get(base+path+'?v='+rev,root/'assets'/path);assert hashlib.sha256(raw).hexdigest()==sha,path
+            assets.append({'url':base+path+'?v='+rev,'status':200,'sha256':sha})
+          with zipfile.ZipFile(root/'assets/downloads/book-v1.2.docx') as z:assert hashlib.sha256(z.read('word/media/image1.png')).hexdigest()=='e9c040e45272d806aae00d89ec227135c3241b18b0064a2791ef71a697758ca2'
+          shelves=[]
+          for i,url in enumerate(['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']):
+            text=get(url+'?cover='+rev,root/f'shelf-{i}.html').decode();card=re.search(r'<article class="book" data-id="m-400"[\s\S]*?</article>',text);assert card and '/books/m/400/cover.jpg?v='+rev in card.group(0),url;shelves.append({'url':url,'new_cover_url':True})
+          entry=json.loads(get('https://sdeuniverses.com/books/catalog.json?v='+rev,root/'catalog.json'));b=[x for x in entry['books'] if x.get('id')=='m-400'];assert len(b)==1 and b[0]['isbn']=='9798906908667'
+          report={'status':'asset verification passed','publication_commit':'0d527d134018f3abdebc9a1e440f42432d30f606','revision':rev,'release_sha256':release,'assets':assets,'shelves':shelves,'book_number_400_retained':True,'all_body_pages_unchanged_from_candidate_verification':True,'reindex_triggered':False,'verified_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (root/'live-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Prepare browser and document validation
+        run: |
+          pip -q install playwright pymupdf
+          python -m playwright install --with-deps chromium
+      - name: Check actual website and PDF cover on desktop and mobile
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          import os,json,fitz,hashlib,datetime
+          root=Path(os.environ['RUNNER_TEMP'])/'book400-cover-live';out=[]
+          for f in (root/'assets/downloads').glob('*.pdf'):
+            d=fitz.open(f);assert len(d)==381 and len(d.get_toc())==673;d[0].get_pixmap(matrix=fitz.Matrix(1.5,1.5)).save(root/(f.stem+'-live-cover.png'));d.close()
+          with sync_playwright() as p:
+            b=p.chromium.launch(args=['--no-sandbox'])
+            for width,height in [(1440,1000),(390,844)]:
+              page=b.new_page(viewport={'width':width,'height':height});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+              page.goto('https://sdeuniverses.com/books/m/400/?cover=20261008-p3-cover',wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_function("document.querySelector('.hero img').naturalWidth>1000",timeout=30000)
+              image_url=page.locator('.hero img').evaluate('(e)=>e.currentSrc');assert '20261008-p3-cover' in image_url
+              image=page.request.get(image_url);assert image.ok and hashlib.sha256(image.body()).hexdigest()=='f6db04b696e3ce0cee03eafe822a297b4990042e64ffc85717a0b99e035340cc'
+              page.screenshot(path=str(root/f'live-home-{width}.png'),full_page=True)
+              page.goto('https://sdeuniverses.com/books/m/400/read.html?cover=20261008-p3-cover',wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_function("document.getElementById('pt').textContent==='381'",timeout=60000)
+              page.wait_for_function("document.querySelector('#sL svg') && document.querySelector('#sL svg').getBoundingClientRect().width>100",timeout=60000)
+              page.wait_for_timeout(2500);page.screenshot(path=str(root/f'live-reader-cover-{width}.png'))
+              assert page.locator('#pi').input_value()=='1' and not page.evaluate('document.documentElement.scrollWidth>innerWidth+2')
+              assert not errors,errors
+              out.append({'width':width,'cover_sha256_verified':True,'pdf_first_page_rendered':True,'page_errors':errors});page.close()
+            b.close()
+          report=json.loads((root/'live-report.json').read_text());report['status']='passed';report['browser']=out;report['completed_at_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();(root/'live-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book400-no-volume-cover-live-verified
+          retention-days: 5
+          path: |
+            ${{ runner.temp }}/book400-cover-live/*.json
+            ${{ runner.temp }}/book400-cover-live/*.png
+            ${{ runner.temp }}/book400-cover-live/assets/cover.jpg
