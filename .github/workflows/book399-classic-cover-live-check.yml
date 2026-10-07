@@ -1,0 +1,91 @@
+name: Volume399 classical cover final live acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book399-classic-cover-live-check.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/399/
+      - run: |
+          python -m pip install --quiet beautifulsoup4 playwright
+          python -m playwright install --with-deps chromium
+      - name: Verify canonical asset URLs and exact book text
+        run: |
+          python -u - <<'PY'
+          import urllib.request,urllib.error,time,json,hashlib,re,concurrent.futures,datetime
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          base='https://sdeuniverses.com';bookpath='/books/m/399/';out=Path('qa399');out.mkdir()
+          expected=json.loads(Path('public/books/m/399/publication-manifest.json').read_text());assert expected['cover_revision']=='20261008-classic-c1'
+          report={'volume':399,'cover_revision':'20261008-classic-c1','assets':[],'errors':[]}
+          def get(path):
+            for attempt in range(5):
+              try:
+                req=urllib.request.Request(base+path,headers={'User-Agent':'SDE-399-cover-final-acceptance/1.0','Cache-Control':'no-cache'})
+                with urllib.request.urlopen(req,timeout=45) as r:
+                  assert r.status==200
+                  return r.read()
+              except Exception as e:
+                print('RETRY',path,attempt+1,str(e),flush=True)
+                if attempt==4:raise
+                time.sleep(3+attempt*2)
+          manifest=json.loads(get(bookpath+'publication-manifest.json'));assert manifest['release_sha256']==expected['release_sha256']
+          records={x['path']:x for x in expected['files']}
+          names=['cover.jpg','cover-classic-v2.2-c1.jpg','cover-mockup.jpg','downloads/book-reader-v2.2-c1.pdf','downloads/book-v2.2-c1.docx','downloads/book-print-v2.2.pdf','audit/cover-update-20261008.json','book.json']
+          for name in names:
+            try:
+              raw=get(bookpath+name);actual=hashlib.sha256(raw).hexdigest();assert actual==records[name]['sha256'],('HASH',name,actual,records[name]['sha256']);report['assets'].append({'path':name,'http':200,'hash_match':True});print('ASSET_OK',name,flush=True)
+            except Exception as e:report['errors'].append({'path':name,'error':str(e)});print('ASSET_FAILED',name,str(e),flush=True)
+          book=json.loads(Path('public/books/m/399/book.json').read_text());norm=lambda t:re.sub(r'\s+','',t)
+          def values(sec):return [norm(n.get_text()) for n in sec.select(':scope > h1,:scope > h2,:scope > h3,:scope > h4,:scope > p')]
+          sections=BeautifulSoup(get(bookpath+'text/'),'html.parser').select('main#book-text > section');assert len(sections)==len(book['units'])==50
+          for u,s in zip(book['units'],sections):assert values(s)==[norm(x['text']) for x in u['items']],u['title']
+          def check(u):
+            soup=BeautifulSoup(get(bookpath+'text/'+u['slug']+'/'),'html.parser');sec=soup.select_one('main#book-text > section') or soup.select_one('main > section');assert values(sec)==[norm(x['text']) for x in u['items']],u['title'];return u['slug']
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:units=list(pool.map(check,book['units']))
+          cat=json.loads(get('/books/catalog.json'));entry=next(x for x in cat['books'] if x.get('number')==399);assert 'cover-classic-v2.2-c1.jpg' in entry['coverUrl'] and 'book-reader-v2.2-c1.pdf' in entry['pdfUrl'];assert entry['authors']==['石奇志']
+          for name in ['/books/','/monographs/']:
+            card=BeautifulSoup(get(name),'html.parser').select_one('[data-id="m-399"]');assert card and 'cover-classic-v2.2-c1.jpg' in str(card),name
+          for name in ['/students/putao/','/students/putao/works/']:assert '/books/m/399/' in get(name).decode(),name
+          report.update({'fulltext_units_verified':50,'independent_text_pages_verified':len(units),'catalog_and_shelves_verified':True,'author_links_verified':True,'checked_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'site_modified':False})
+          (out/'live-acceptance.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          assert not report['errors'],report['errors']
+          print('ALL_LIVE_ASSETS_AND_TEXT_VERIFIED',json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Production desktop mobile and PDF reader verification
+        run: |
+          python -u - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          import json
+          out=Path('qa399');errors=[];result={};base='https://sdeuniverses.com'
+          with sync_playwright() as pw:
+            browser=pw.chromium.launch(headless=True);page=browser.new_page(viewport={'width':1440,'height':1000});page.on('pageerror',lambda e:errors.append(str(e)))
+            page.goto(base+'/books/m/399/',wait_until='networkidle',timeout=90000)
+            img=page.locator('.hero img').first;assert 'cover-classic-v2.2-c1.jpg' in img.get_attribute('src');assert img.evaluate('(el)=>el.complete&&el.naturalWidth>1000');page.screenshot(path=str(out/'live-detail-desktop.png'))
+            page.goto(base+'/books/m/399/read.html',wait_until='domcontentloaded',timeout=90000);page.wait_for_function("document.getElementById('pt').textContent.trim()==='273'",timeout=90000);assert 'book-reader-v2.2-c1.pdf' in page.locator('#cfg').text_content();page.wait_for_timeout(2200);page.screenshot(path=str(out/'live-flip-cover.png'))
+            page.click('#btnNext');page.wait_for_timeout(1000);page.click('#btnToc');page.locator('#dlist a').filter(has_text='第十五章').first.click();page.wait_for_timeout(1500);assert 127<=int(page.locator('#pi').input_value())<=129;page.screenshot(path=str(out/'live-chapter15.png'))
+            page.goto(base+'/books/m/399/agent/',wait_until='networkidle',timeout=90000);page.wait_for_selector('#app:not([hidden])',timeout=60000);result['agent_name']=page.inner_text('#agName');assert '材从哪里来' in page.inner_text('#bt')
+            phone=browser.new_page(viewport={'width':390,'height':844});phone.on('pageerror',lambda e:errors.append(str(e)));phone.goto(base+'/books/m/399/',wait_until='networkidle',timeout=90000);assert phone.evaluate('document.documentElement.scrollWidth<=innerWidth+2');phone.screenshot(path=str(out/'live-detail-mobile.png'))
+            phone.goto(base+'/books/m/399/read.html',wait_until='domcontentloaded',timeout=90000);phone.wait_for_function("document.getElementById('pt').textContent.trim()==='273'",timeout=90000);phone.wait_for_timeout(2200);phone.screenshot(path=str(out/'live-flip-mobile.png'))
+            result.update({'desktop_and_mobile_cover_visible':True,'pdf_pages':273,'chapter_navigation_verified':True,'javascript_errors':errors});assert not errors;browser.close()
+          (out/'browser-acceptance.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book399-classic-cover-final-live-evidence
+          retention-days: 14
+          path: qa399/
