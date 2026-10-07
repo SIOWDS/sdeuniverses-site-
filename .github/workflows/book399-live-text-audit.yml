@@ -1,0 +1,52 @@
+name: Volume399 final live full-text audit
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book399-live-text-audit.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - run: python -m pip install --quiet beautifulsoup4
+      - name: Compare live text paragraphs, chapter pages and publication identity
+        run: |
+          python - <<'PY'
+          import urllib.request,json,re,hashlib,concurrent.futures,pathlib,datetime
+          from bs4 import BeautifulSoup
+          base='https://sdeuniverses.com/books/m/399/'
+          def get(path):
+            req=urllib.request.Request(base+path,headers={'User-Agent':'SDE-book399-publication-audit/2.2','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=60) as r:
+              assert r.status==200
+              return r.read()
+          manifest=json.loads(get('publication-manifest.json'))
+          assert manifest['release_sha256']=='e8c4ca1839249677719fcd8cc73a6cdf306223c6a7f2835c33ef9951c4b7234b'
+          raw=get('book.json');record=next(x for x in manifest['files'] if x['path']=='book.json')
+          assert hashlib.sha256(raw).hexdigest()==record['sha256']
+          book=json.loads(raw);assert book['metadata']['author']=='石奇志' and book['metadata']['isbn']=='979-8-90690-867-4'
+          norm=lambda s:re.sub(r'\s+','',s)
+          def items(sec):return [norm(n.get_text()) for n in sec.select(':scope > h1,:scope > h2,:scope > h3,:scope > h4,:scope > p')]
+          full=BeautifulSoup(get('text/'),'html.parser').select('main#book-text > section')
+          assert len(full)==len(book['units'])==50
+          for u,s in zip(book['units'],full):
+            assert items(s)==[norm(x['text']) for x in u['items']],u['title']
+          def check(u):
+            soup=BeautifulSoup(get('text/'+u['slug']+'/'),'html.parser')
+            sec=soup.select_one('main#book-text > section') or soup.select_one('main > section')
+            assert sec is not None,u['slug']
+            assert items(sec)==[norm(x['text']) for x in u['items']],u['title']
+            return {'title':u['title'],'slug':u['slug'],'text_items':len(u['items']),'exact_normalized_match':True}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:results=list(pool.map(check,book['units']))
+          report={'volume':399,'author':'石奇志','isbn':'979-8-90690-867-4','fulltext_units':50,'chapter_pages':len(results),'text_items':sum(x['text_items'] for x in results),'all_live_text_matches_publication':True,'checked_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':results,'site_modified':False}
+          pathlib.Path('live-text-audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps({k:v for k,v in report.items() if k!='results'},ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book399-final-live-text-audit
+          path: live-text-audit.json
+          retention-days: 14
