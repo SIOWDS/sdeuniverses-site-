@@ -1,0 +1,21 @@
+name: Volume399 transfer diagnostics
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book399-transfer-check.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: |
+          python - <<'PY'
+          import urllib.request,urllib.error
+          u='https://sdmntprseasia.oaiusercontent.com/files/00000000-4840-8207-a791-6e68be5c1c0b/raw?se=2026-10-07T23%3A10%3A44Z&sp=r&sv=2026-02-06&sr=b&scid=6c963f3e-2731-5fe1-b266-8fd153638914&skoid=6fa9748a-b7b2-4b56-a932-8c1417549c47&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T05%3A37%3A21Z&ske=2026-10-08T05%3A37%3A21Z&sks=b&skv=2026-02-06&sig=IMjsZ6tq2q8H%2BXwoT2XfPtvt03jHopRK%2BhYlk/AXPXw%3D'
+          try:
+            r=urllib.request.urlopen(u,timeout=45);print('status',r.status,'length',len(r.read()))
+          except urllib.error.HTTPError as e:
+            print('status',e.code);print(dict(e.headers));print(e.read().decode(errors='replace')[:4000])
+          PY
