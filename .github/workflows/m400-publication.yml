@@ -1,65 +1,16 @@
-name: Volume 400 publication
+name: Volume 400 publication status
 on:
-  push:
-    branches: ['publish/m400-20261008']
-    paths: ['.github/workflows/m400-publication.yml']
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  candidate-acceptance:
+  status-only:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 2
     steps:
-      - name: Receive authorized publication package and verify digest
-        env:
-          CANDIDATE_URL: 'https://sdmntprnznorth.oaiusercontent.com/files/00000000-e564-820b-9df3-c29ee709b951/raw?se=2026-10-07T19%3A02%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=0624fca2-5282-58d6-9952-b72e029c0e44&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A52%3A32Z&ske=2026-10-08T00%3A52%3A32Z&sks=b&skv=2026-02-06&sig=u3xiurakQBavmapDmnOQBq4/7A8xtTzCpI46nxGlwsQ%3D'
+      - name: Report publication boundary
         run: |
-          python - <<'PY'
-          import urllib.request,urllib.error,os,hashlib,zipfile,io,pathlib
-          try:raw=urllib.request.urlopen(os.environ['CANDIDATE_URL'],timeout=90).read()
-          except urllib.error.HTTPError as e:
-            print('Transfer error',e.code,'date',e.headers.get('Date'),'body',e.read(1800).decode(errors='replace'));raise
-          assert hashlib.sha256(raw).hexdigest()=='6d86ae2bf92a24ca292c80602cf8ff53e062238245668da5cf7e7801fbd65acb'
-          z=zipfile.ZipFile(io.BytesIO(raw));d=pathlib.Path(os.environ['RUNNER_TEMP'])/'m400-candidate';d.mkdir()
-          for n in z.namelist():
-            assert not pathlib.PurePosixPath(n).is_absolute() and '..' not in pathlib.PurePosixPath(n).parts
-            assert not n.lower().endswith(('.ttf','.ttc','.otf','.woff','.woff2','.env'))
-          z.extractall(d);print('Accepted exact package',len(raw),'bytes')
-          PY
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 1
-          filter: blob:none
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /public/books/m/400/
-            /public/books/catalog.json
-            /public/books/agents.json
-            /public/books/index.html
-            /public/books/agent/
-            /public/books/bookshelf.css
-            /public/books/bookshelf.js
-            /public/monographs/index.html
-            /public/sites/read/library/index.html
-            /public/taste/wds-companion/wds-read.js
-            /public/wds-mode.js
-            /tools/build_bookshelf.py
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install requests pymupdf python-docx beautifulsoup4 playwright
-      - run: python -m playwright install --with-deps chromium
-      - name: Build only volume400 entrances
-        run: python "$RUNNER_TEMP/m400-candidate/build-tools/install.py" "$RUNNER_TEMP/m400-candidate" "$GITHUB_WORKSPACE"
-      - name: Desktop and mobile browser acceptance
-        run: |
-          python -m http.server 8765 --directory public > "$RUNNER_TEMP/http.log" 2>&1 &
-          python "$RUNNER_TEMP/m400-candidate/build-tools/test_web.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/m400-candidate/qa/browser"
-      - name: Retain candidate and evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: m400-accepted-candidate
-          path: ${{ runner.temp }}/m400-candidate/
-          retention-days: 3
+          echo 'Volume400 local publication assets and page QA are complete.'
+          echo 'Attachment transfer was denied. No production files were installed.'
+          echo 'An approved file upload must complete before candidate browser acceptance and publication.'
+          echo 'This workflow is read-only and performs no publication, no global reindex, and no scheduled monitoring.'
