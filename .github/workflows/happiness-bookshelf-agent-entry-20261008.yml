@@ -1,0 +1,198 @@
+name: Happiness bookshelf card agent entry and live click acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/happiness-bookshelf-agent-entry-20261008.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: happiness-secret-publication
+  cancel-in-progress: false
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/build_bookshelf.py
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/books/bookshelf.css
+            /public/books/bookshelf.js
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/happiness-secret/
+            /.github/workflows/search-index.yml
+      - name: Prepare bounded browser dependencies
+        timeout-minutes: 4
+        run: |
+          python3 -m pip install --quiet --timeout 25 --retries 1 beautifulsoup4 playwright
+          timeout 150s python3 -m playwright install chromium
+          timeout 40s sudo apt-get -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 -o Acquire::Retries=1 install -y -qq fonts-noto-cjk || echo 'Using existing system fonts'
+      - name: Compare standard cards, patch only this card, publish and verify real clicks
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: |
+          cat > "${RUNNER_TEMP}/happiness_shelf_fix.py" <<'PY'
+          from pathlib import Path
+          import os,re,json,hashlib,subprocess,threading,time,copy
+          from urllib.request import Request,urlopen
+          from urllib.parse import quote,urlparse
+          from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
+          from functools import partial
+          from bs4 import BeautifulSoup
+          from playwright.sync_api import sync_playwright
+
+          root=Path(os.environ['GITHUB_WORKSPACE']);pub=root/'public';qa=Path(os.environ['RUNNER_TEMP'])/'happiness-shelf-evidence';qa.mkdir(exist_ok=True)
+          target='happiness-secret';agent='https://sdeuniverses.com/books/happiness-secret/agent/'
+          shelf_files=['public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html']
+          allowed=['tools/build_bookshelf.py']+shelf_files
+          selector='.book-card[data-id="happiness-secret"]'
+          def dump(name,obj):(qa/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+          def git(*a):return subprocess.check_output(['git',*a],cwd=root,text=True).strip()
+          def get(u):
+              with urlopen(Request(u,headers={'User-Agent':'Happiness-Bookshelf-Acceptance'}),timeout=45) as r:return r.read(),r.status,r.geturl()
+          def card_snapshot(soup):
+              c=soup.select_one(selector);assert c is not None
+              return dict(title=c.h3.get_text(),cover=c.select_one('.book-cover')['href'],image=c.select_one('.book-cover img')['src'],number=c.get('data-number'),actions=[{'text':a.get_text(),'href':a.get('href'),'class':a.get('class',[])} for a in c.select('.book-actions a')])
+          catalog=json.loads((pub/'books/catalog.json').read_text());matches=[b for b in catalog['books'] if b.get('id')==target];assert len(matches)==1;b=matches[0]
+          assert b.get('agentUrl')==agent and b.get('agentName')=='回甘' and not b.get('number')
+          protected={str(p.relative_to(root)):sha(p) for p in (pub/'books/happiness-secret').rglob('*') if p.is_file()}
+          for s in ['public/books/catalog.json','public/books/agents.json','public/books/bookshelf.css','public/books/bookshelf.js','.github/workflows/search-index.yml']:protected[s]=sha(root/s)
+          originals={s:(root/s).read_text() for s in allowed}
+          before_soup=BeautifulSoup(originals[shelf_files[0]],'html.parser');before=card_snapshot(before_soup)
+          refs=[]
+          for n in [220,302,294]:
+              c=before_soup.select_one('.book-card[data-number="'+str(n)+'"]');assert c
+              a=c.select_one('a.agent-link');assert a and a.get_text()=='和这本书对话'
+              refs.append({'number':n,'title':c.h3.get_text(),'html':str(c),'agent_link':str(a)})
+          dump('before-and-reference-cards.json',{'happiness':before,'reference_cards':refs,'root_cause':'Legacy card builder emits agent entry only for a numeric book number, ignoring explicit agentUrl.'})
+          assert not before_soup.select(selector+' a.agent-link'),'Existing entry changed: inspect rather than duplicate'
+          # Fix generation for explicit agent URLs while preserving the numbered fallback.
+          gen=root/'tools/build_bookshelf.py';src=originals['tools/build_bookshelf.py'];old_globals={'__name__':'shelf_before','__file__':str(gen)};exec(compile(src,str(gen),'exec'),old_globals)
+          old='    if number and available:\n        buttons.append(f\'<a class="agent-link" href="https://sdeuniverses.com/books/m/{number}/agent/" target="_blank" rel="noopener" title="这本书的专属智能体：读懂、用上、拆开、对撞、写出">和这本书对话</a>\')'
+          new='    agent = b.get("agentUrl") or (f"https://sdeuniverses.com/books/m/{number}/agent/" if number else None)\n    if agent and available:\n        buttons.append(f\'<a class="agent-link" href="{esc(agent)}" target="_blank" rel="noopener" title="这本书的专属智能体：读懂、用上、拆开、对撞、写出">和这本书对话</a>\')'
+          assert src.count(old)==1,'Generator changed, refuse broad replacement'
+          src=src.replace(old,new);gen.write_text(src,encoding='utf-8');new_globals={'__name__':'shelf_after','__file__':str(gen)};exec(compile(src,str(gen),'exec'),new_globals)
+          make=new_globals['card'];newcard=make(b)
+          newdom=BeautifulSoup(newcard,'html.parser');a=newdom.select_one('a.agent-link');assert a and a['href']==agent
+          original_dom=BeautifulSoup(old_globals['card'](b),'html.parser');without=BeautifulSoup(newcard,'html.parser');without.select_one('a.agent-link').decompose();assert str(without)==str(original_dom),'Unexpected target-card changes'
+          probe=copy.deepcopy(b);probe.pop('agentUrl',None);assert not BeautifulSoup(make(probe),'html.parser').select('a.agent-link')
+          probe=copy.deepcopy(b);probe['available']=False;assert not BeautifulSoup(make(probe),'html.parser').select('a.agent-link')
+          for n in [220,302,294]:
+              rb=next(x for x in catalog['books'] if x.get('number')==n)
+              if not rb.get('agentUrl'):assert make(rb)==old_globals['card'](rb)
+          pattern=re.compile(r'<article\b(?=[^>]*\bdata-id="happiness-secret")[^>]*>.*?</article>',re.S)
+          change_report=[]
+          for f in shelf_files:
+              text=originals[f];ms=list(pattern.finditer(text));assert len(ms)==1,(f,len(ms));m=ms[0];oldcard=m.group()
+              olddom=BeautifulSoup(oldcard,'html.parser');assert not olddom.select('a.agent-link')
+              # Preserve all current card metadata and all bytes outside this new action.
+              action=str(a)
+              needle='</div></div>\n</article>'
+              actions_match=re.search(r'(<div class="book-actions">)(.*?)(</div>)',oldcard,re.S);assert actions_match
+              existing_actions=actions_match.group(2)
+              insertion=re.search(r'<a\b[^>]*class="treasure-practice-link"',existing_actions)
+              pos=insertion.start() if insertion else len(existing_actions)
+              newactions=existing_actions[:pos]+action+existing_actions[pos:]
+              patchedcard=oldcard[:actions_match.start(2)]+newactions+oldcard[actions_match.end(2):]
+              assert patchedcard.replace(action,'',1)==oldcard
+              updated=text[:m.start()]+patchedcard+text[m.end():]
+              assert updated.replace(patchedcard,oldcard,1)==text
+              (root/f).write_text(updated,encoding='utf-8')
+              change_report.append({'file':f,'target_card_only':True,'other_bytes_unchanged':True,'before':card_snapshot(BeautifulSoup(text,'html.parser')),'after':card_snapshot(BeautifulSoup(updated,'html.parser'))})
+          assert all(sha(root/p)==h for p,h in protected.items())
+          dump('scoped-change-report.json',{'changes':change_report,'protected_files':protected,'pdf_and_book_unchanged':True,'css_reused':True,'reindex_triggered':False})
+
+          server=ThreadingHTTPServer(('127.0.0.1',0),partial(SimpleHTTPRequestHandler,directory=str(pub)))
+          threading.Thread(target=server.serve_forever,daemon=True).start();local='http://127.0.0.1:'+str(server.server_port)
+          def style_of(loc):return loc.evaluate('(e)=>{let s=getComputedStyle(e);return {background:s.backgroundColor,color:s.color,font:s.fontSize,padding:s.padding,flex:s.flex,textAlign:s.textAlign}}')
+          with sync_playwright() as pw:
+              browser=pw.chromium.launch(headless=True,args=['--no-sandbox'])
+              tests=[]
+              for name,width,height in [('desktop',1366,900),('mobile',390,844)]:
+                  ctx=browser.new_context(viewport={'width':width,'height':height});page=ctx.new_page()
+                  page.goto(local+'/books/?q='+quote('我的三个宝贝'),wait_until='domcontentloaded',timeout=90000)
+                  ref=page.locator('.book-card[data-number="220"]');ref.wait_for(state='visible',timeout=30000);ref.scroll_into_view_if_needed();refstyle=style_of(ref.locator('a.agent-link'))
+                  page.evaluate('document.fonts.ready');ref.screenshot(path=str(qa/(name+'-reference-220.png')))
+                  page.goto(local+'/books/?q='+quote('幸福的奥秘'),wait_until='domcontentloaded',timeout=90000)
+                  card=page.locator(selector);card.wait_for(state='visible',timeout=30000);card.scroll_into_view_if_needed();link=card.locator('a.agent-link');assert link.is_visible();assert style_of(link)==refstyle
+                  assert card.locator('.book-cover').get_attribute('href')==before['cover']
+                  assert card.locator('.book-cover img').get_attribute('src')==before['image']
+                  assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
+                  link.scroll_into_view_if_needed();page.evaluate('document.fonts.ready');card.screenshot(path=str(qa/(name+'-candidate-happiness-card.png')))
+                  # An actual popup and real public agent boot; never send a model request or key.
+                  with page.expect_popup() as event:link.click()
+                  popup=event.value;popup.wait_for_load_state('domcontentloaded');popup.locator('#app').wait_for(state='visible',timeout=90000)
+                  assert urlparse(popup.url).path=='/books/happiness-secret/agent/' and popup.locator('#agName').inner_text()=='回甘'
+                  tests.append({'mode':'candidate','viewport':name,'same_gold_style_as_220':True,'entry_visible':True,'real_click_destination':popup.url,'agent_loaded':'回甘'})
+                  ctx.close()
+              dump('candidate-browser.json',{'success':True,'tests':tests,'llm_request_sent':False})
+              print('CANDIDATE_CARD_AND_REAL_CLICK_OK')
+              server.shutdown()
+              git('config','user.name','github-actions[bot]');git('config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
+              git('add','--sparse',*allowed);changed=git('diff','--cached','--name-only').splitlines();assert set(changed)==set(allowed),changed
+              git('commit','-m','Show Happiness Secret agent 回甘 on all three bookshelf cards; support explicit agentUrl without a volume number; no reindex')
+              for attempt in range(4):
+                  try:git('push','origin','HEAD:main');break
+                  except subprocess.CalledProcessError:
+                      if attempt==3:raise
+                      git('fetch','--deepen=50','origin','main');git('rebase','origin/main')
+                      assert all(sha(root/p)==h for p,h in protected.items()),'Protected content changed concurrently; stop'
+                      for f in shelf_files:assert BeautifulSoup((root/f).read_text(),'html.parser').select_one(selector+' a.agent-link')['href']==agent
+              commit=git('rev-parse','HEAD');dump('publication.json',{'commit':commit,'changed_files':changed,'reindex_triggered':False});print('PUBLISHED',commit)
+              urls=['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']
+              live_checks=[]
+              for url in urls:
+                  for attempt in range(48):
+                      try:
+                          data,status,actual=get(url);soup=BeautifulSoup(data,'html.parser');link=soup.select_one(selector+' a.agent-link')
+                          if status==200 and link and link.get('href')==agent:break
+                      except Exception as e:print('WAIT',url,type(e).__name__)
+                      time.sleep(8)
+                  else:raise RuntimeError('New bookshelf card not deployed at '+url)
+                  snapshot=card_snapshot(soup);assert snapshot['cover']==before['cover'] and snapshot['image']==before['image']
+                  for n in [220,302,294]:
+                      ref=soup.select_one('.book-card[data-number="'+str(n)+'"] a.agent-link');assert ref and ref.get('href')=='https://sdeuniverses.com/books/m/'+str(n)+'/agent/'
+                  live_checks.append({'url':actual,'status':status,'happiness':snapshot,'reference_entries_preserved':True})
+              # Verify all six live bookshelf+viewport paths; no simulated navigation.
+              live_browser=[]
+              for ui,url in enumerate(urls):
+                  for name,width,height in [('desktop',1366,900),('mobile',390,844)]:
+                      ctx=browser.new_context(viewport={'width':width,'height':height});page=ctx.new_page()
+                      page.goto(url+'?q='+quote('幸福的奥秘'),wait_until='domcontentloaded',timeout=90000)
+                      card=page.locator(selector);card.wait_for(state='visible',timeout=45000);link=card.locator('a.agent-link');link.wait_for(state='visible');link.scroll_into_view_if_needed()
+                      assert link.inner_text()=='和这本书对话' and link.get_attribute('href')==agent
+                      assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
+                      page.evaluate('document.fonts.ready');card.screenshot(path=str(qa/('live-'+str(ui)+'-'+name+'-card.png')))
+                      with page.expect_popup() as event:link.click()
+                      popup=event.value;popup.wait_for_load_state('domcontentloaded');popup.locator('#app').wait_for(state='visible',timeout=90000)
+                      assert urlparse(popup.url).path=='/books/happiness-secret/agent/' and popup.locator('#agName').inner_text()=='回甘'
+                      if ui==0:popup.screenshot(path=str(qa/('live-'+name+'-agent-open.png')),full_page=True)
+                      live_browser.append({'bookshelf':url,'viewport':name,'entry_visible':True,'real_click':True,'agent_loaded':'回甘','destination':popup.url,'no_horizontal_overflow':True})
+                      ctx.close()
+              browser.close()
+          pdfs=[]
+          for p in ['downloads/happiness-reader-v1.2.pdf','downloads/happiness-print-v1.2.pdf']:
+              body,status,url=get('https://sdeuniverses.com/books/happiness-secret/'+p);localfile=pub/'books/happiness-secret'/p;assert hashlib.sha256(body).hexdigest()==sha(localfile)
+              pdfs.append({'path':p,'status':status,'sha256':sha(localfile),'bytes_unchanged':True})
+          report={'success':True,'commit':commit,'bookshelves':live_checks,'browser':live_browser,'pdfs':pdfs,'agent_name':'回甘','same_standard_card_style':True,'reindex_triggered':False,'llm_request_sent':False}
+          dump('final-acceptance.json',report);print('ALL_THREE_SHELVES_AND_SIX_REAL_CLICKS_ACCEPTED',json.dumps(report,ensure_ascii=False))
+          PY
+          python3 "${RUNNER_TEMP}/happiness_shelf_fix.py"
+      - name: Preserve bookshelf entry and click evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: happiness-bookshelf-entry-acceptance
+          path: ${{ runner.temp }}/happiness-shelf-evidence/
+          retention-days: 30
