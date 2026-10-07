@@ -1,0 +1,78 @@
+name: Publish volume399 Shi Qizhi complete v2.2
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/book399-publish-v22.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: book399-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Receive exact authorized publication package
+        run: |
+          python - <<'PY'
+          import pathlib,urllib.request,hashlib,zipfile,io,os
+          url='https://sdmntprseasia.oaiusercontent.com/files/00000000-4840-8207-a791-6e68be5c1c0b/raw?se=2026-10-07T23%3A10%3A44Z&sp=r&sv=2026-02-06&sr=b&scid=6c963f3e-2731-5fe1-b266-8fd153638914&skoid=6fa9748a-b7b2-4b56-a932-8c1417549c47&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T05%3A37%3A21Z&ske=2026-10-08T05%3A37%3A21Z&sks=b&skv=2026-02-06&sig=IMjsZ6tq2q8H%2BXwoT2XfPtvt03jHopRK%2BhYlk/AXPXw%3D'
+          raw=urllib.request.urlopen(url,timeout=90).read()
+          assert len(raw)==6326451 and hashlib.sha256(raw).hexdigest()=='1b2d01b429da10e630d8544e755ddbf31796db91ceb08f047c3bb91cccccaa3b','Publication package mismatch'
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'book399';target.mkdir()
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+            for n in z.namelist():
+              assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              assert not n.endswith(('.ttf','.ttc','.otf','.woff','.woff2','.env'))
+            z.extractall(target)
+          print('Verified exact publication package: 6326451 bytes; no font files or credentials.')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/index.html
+            /public/books/agent/
+            /public/books/m/220/read.html
+            /public/books/m/302/text/index.html
+            /public/books/m/399/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/students/putao/index.html
+            /public/students/putao/works/index.html
+            /tools/build_bookshelf.py
+            /tools/book_agent_body.html
+      - name: Install bounded verification dependencies
+        run: |
+          python -m pip install --quiet beautifulsoup4 pymupdf playwright
+          python -m playwright install --with-deps chromium
+      - name: Build candidate from current templates and preserve other books
+        run: |
+          python "$RUNNER_TEMP/book399/build-tools/install.py" "$RUNNER_TEMP/book399" "$GITHUB_WORKSPACE"
+          python "$RUNNER_TEMP/book399/build-tools/verify.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/book399/qa"
+      - name: Verify desktop mobile full-text reader and book-agent frontend
+        run: |
+          python "$RUNNER_TEMP/book399/build-tools/browser_qa.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/book399/qa/candidate-browser"
+      - name: Reconcile latest main and publish only authorized paths
+        run: |
+          python "$RUNNER_TEMP/book399/build-tools/publish.py" "$RUNNER_TEMP/book399" "$GITHUB_WORKSPACE"
+      - name: Verify live deployment and exact public binary files
+        run: |
+          python "$RUNNER_TEMP/book399/build-tools/live.py" "$RUNNER_TEMP/book399" "$GITHUB_WORKSPACE"
+      - name: Verify production reader and mobile layout
+        run: |
+          python "$RUNNER_TEMP/book399/build-tools/browser_qa.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/book399/qa/live-browser" https://sdeuniverses.com
+      - name: Preserve publication and acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book399-v22-publication-evidence
+          retention-days: 14
+          path: ${{ runner.temp }}/book399/
