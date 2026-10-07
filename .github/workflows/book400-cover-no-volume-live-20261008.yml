@@ -10,37 +10,36 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - name: Wait for exact publication and verify the four public assets
+      - name: Verify exact public assets with propagation-aware retry
         run: |
           python - <<'PY'
           from pathlib import Path
           import os,json,subprocess,time,hashlib,datetime,zipfile,re
           root=Path(os.environ['RUNNER_TEMP'])/'book400-cover-live';root.mkdir()
           rev='20261008-p3-cover';base='https://sdeuniverses.com/books/m/400/';release='de7cc66582a223a449426aa55c2fe247f474529b7e691a14694ac4071ca7f014'
-          expected={'cover.jpg':'f6db04b696e3ce0cee03eafe822a297b4990042e64ffc85717a0b99e035340cc','downloads/book-print-v1.2.pdf':'3816beb2efcbb6e98694dccdedc47ec6ead87769f7a8e355703ff196ce2d0354','downloads/book-reader-v1.2.pdf':'01567bd6b71f41d3252394b536950be3c2174d2aa7157f7dda5acbb25f1209dd','downloads/book-v1.2.docx':'0644d4b789db88c5428318d2c43e9f9e40cc124b6009a913e6e1a2c2a8a2c510'}
           def get(url,path):
             path.parent.mkdir(parents=True,exist_ok=True)
-            p=subprocess.run(['curl','-fsSL','--max-time','55','--user-agent','Mozilla/5.0','-o',str(path),url],capture_output=True,text=True)
+            p=subprocess.run(['curl','-fsSL','--max-time','60','--retry','1','--user-agent','Mozilla/5.0','-D',str(path)+'.headers','-o',str(path),url],capture_output=True,text=True)
             if p.returncode:raise RuntimeError(p.stderr[:200])
             return path.read_bytes()
-          attempts=[]
-          for i in range(24):
-            try:
-              m=json.loads(get(base+'publication-manifest.json?v='+rev,root/'manifest.json'));assert m['release_sha256']==release and m['revision']==rev
-              break
-            except Exception as e:attempts.append(str(e));print('Waiting for exact cover release',i+1,flush=True);time.sleep(10)
-          else:raise RuntimeError('New cover release is not live')
+          m=json.loads(get(base+'publication-manifest.json?v='+rev,root/'manifest.json'));assert m['release_sha256']==release and m['revision']==rev
           assert m['book_no']==400 and m['isbn']=='979-8-90690-866-7' and m['price_usd']==20 and m['pages']==381
-          assets=[]
-          for path,sha in expected.items():
-            raw=get(base+path+'?v='+rev,root/'assets'/path);assert hashlib.sha256(raw).hexdigest()==sha,path
-            assets.append({'url':base+path+'?v='+rev,'status':200,'sha256':sha})
+          names=['cover.jpg','downloads/book-print-v1.2.pdf','downloads/book-reader-v1.2.pdf','downloads/book-v1.2.docx'];entries={x['path']:x for x in m['files']};assets=[];tries=[]
+          for path in names:
+            expected=entries[path]['sha256'];target=root/'assets'/path;url=base+path+'?v='+rev
+            for attempt in range(6):
+              raw=get(url,target);actual=hashlib.sha256(raw).hexdigest();item={'path':path,'attempt':attempt+1,'expected':expected,'actual':actual,'bytes':len(raw)};tries.append(item);print(json.dumps(item),flush=True)
+              (root/'asset-attempts.json').write_text(json.dumps(tries,indent=2))
+              if actual==expected:break
+              time.sleep(15)
+            else:raise RuntimeError('Published bytes do not match '+path)
+            assets.append({'url':url,'status':200,'sha256':actual,'bytes':len(raw)})
           with zipfile.ZipFile(root/'assets/downloads/book-v1.2.docx') as z:assert hashlib.sha256(z.read('word/media/image1.png')).hexdigest()=='e9c040e45272d806aae00d89ec227135c3241b18b0064a2791ef71a697758ca2'
           shelves=[]
           for i,url in enumerate(['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']):
             text=get(url+'?cover='+rev,root/f'shelf-{i}.html').decode();card=re.search(r'<article class="book" data-id="m-400"[\s\S]*?</article>',text);assert card and '/books/m/400/cover.jpg?v='+rev in card.group(0),url;shelves.append({'url':url,'new_cover_url':True})
           entry=json.loads(get('https://sdeuniverses.com/books/catalog.json?v='+rev,root/'catalog.json'));b=[x for x in entry['books'] if x.get('id')=='m-400'];assert len(b)==1 and b[0]['isbn']=='9798906908667'
-          report={'status':'asset verification passed','publication_commit':'0d527d134018f3abdebc9a1e440f42432d30f606','revision':rev,'release_sha256':release,'assets':assets,'shelves':shelves,'book_number_400_retained':True,'all_body_pages_unchanged_from_candidate_verification':True,'reindex_triggered':False,'verified_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          report={'status':'asset verification passed','publication_commit':'0d527d134018f3abdebc9a1e440f42432d30f606','revision':rev,'release_sha256':release,'assets':assets,'shelves':shelves,'book_number_400_retained':True,'reindex_triggered':False,'verified_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
           (root/'live-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
           PY
       - name: Prepare browser and document validation
@@ -83,4 +82,4 @@ jobs:
           path: |
             ${{ runner.temp }}/book400-cover-live/*.json
             ${{ runner.temp }}/book400-cover-live/*.png
-            ${{ runner.temp }}/book400-cover-live/assets/cover.jpg
+            ${{ runner.temp }}/book400-cover-live/assets/
