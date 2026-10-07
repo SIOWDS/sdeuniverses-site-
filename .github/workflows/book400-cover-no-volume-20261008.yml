@@ -1,0 +1,141 @@
+name: Book400 remove cover volume label - scoped candidate
+on:
+  push:
+    branches: ['release/book400-cover-no-volume-20261008']
+    paths: ['.github/workflows/book400-cover-no-volume-20261008.yml']
+permissions:
+  contents: write
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Receive exact author-approved cover patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,subprocess,zipfile,hashlib,json
+          root=Path(os.environ['RUNNER_TEMP'])/'book400-cover';root.mkdir()
+          url='https://sdmntprseasia.oaiusercontent.com/files/00000000-afe8-8207-a4e4-2527af86169f/raw?se=2026-10-07T23%3A00%3A42Z&sp=r&sv=2026-02-06&sr=b&scid=1a91908b-fbac-54ce-bbeb-32d5595415d3&skoid=6fa9748a-b7b2-4b56-a932-8c1417549c47&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T21%3A57%3A13Z&ske=2026-10-08T21%3A57%3A13Z&sks=b&skv=2026-02-06&sig=30BLqBHPVH7%2B8XrSsrdsEcHsCVpvhEPLgEVab5yWTbA%3D'
+          source=root/'patch.zip';subprocess.run(['curl','-fsSL','--max-time','90','--user-agent','Mozilla/5.0','-o',str(source),url],check=True)
+          data=source.read_bytes();assert len(data)==10936123 and hashlib.sha256(data).hexdigest()=='273c0636d5f07865a422faea20390b1ca89a0eda01b40a46fccb5c1530f442c6'
+          with zipfile.ZipFile(source) as z:
+            assert len(z.namelist())==len(set(z.namelist()))
+            for a in z.infolist():
+              p=Path(a.filename);assert not p.is_absolute() and '..' not in p.parts
+            z.extractall(root/'patch')
+          print('Approved no-volume cover and three synchronized publication files received.')
+          PY
+      - name: Prepare verification libraries
+        run: |
+          pip -q install pymupdf playwright
+          python -m playwright install --with-deps chromium
+      - name: Read current main, apply four binary updates and scoped cache keys
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,subprocess,base64,json,hashlib,zipfile,shutil,re,fitz
+          root=Path(os.environ['RUNNER_TEMP'])/'book400-cover';site=root/'site';patch=root/'patch'
+          env=os.environ.copy();env['GIT_CONFIG_COUNT']='1';env['GIT_CONFIG_KEY_0']='http.https://github.com/.extraheader';env['GIT_CONFIG_VALUE_0']='AUTHORIZATION: basic '+base64.b64encode(('x-access-token:'+env['GH_TOKEN']).encode()).decode()
+          def git(*a,**kw):return subprocess.run(['git',*a],env=env,check=True,**kw)
+          git('clone','--filter=blob:none','--depth=1','--no-checkout','--single-branch','--branch','main','https://github.com/SIOWDS/sdeuniverses-site-.git',str(site))
+          globals=['public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/books/agent/index.html','public/books/agents.json']
+          patterns=['/public/books/m/400/','/.gitignore']+['/'+s for s in globals]
+          git('-C',str(site),'sparse-checkout','init','--no-cone');git('-C',str(site),'sparse-checkout','set','--no-cone','--stdin',input='\n'.join(patterns)+'\n',text=True);git('-C',str(site),'checkout','main')
+          base=subprocess.check_output(['git','-C',str(site),'rev-parse','HEAD'],text=True).strip();(root/'base-sha.txt').write_text(base)
+          book=site/'public/books/m/400';mp=book/'publication-manifest.json';m=json.loads(mp.read_text());assert m['release_sha256']=='734fee1ef18697cad79f5c1d7e15e278e79f09d53deeb389303291dde414b363','Current book changed: inspect before updating'
+          assert m['book_no']==400 and m['isbn']=='979-8-90690-866-7' and m['price_usd']==20
+          spec=json.loads((patch/'patch.json').read_text());body_checks=[]
+          for a in spec['files']:
+            old=book/a['path'];new=patch/'payload'/a['path']
+            assert hashlib.sha256(old.read_bytes()).hexdigest()==a['old_sha256']
+            assert hashlib.sha256(new.read_bytes()).hexdigest()==a['new_sha256']
+            if old.suffix=='.pdf':
+              d=fitz.open(old);e=fitz.open(new);assert len(d)==len(e)==381 and d.get_toc()==e.get_toc() and d.metadata==e.metadata
+              for i in range(1,381):
+                assert d[i].get_text()==e[i].get_text(),i
+                assert d[i].get_pixmap(matrix=fitz.Matrix(.7,.7)).samples==e[i].get_pixmap(matrix=fitz.Matrix(.7,.7)).samples,i
+                assert len(d[i].get_links())==len(e[i].get_links()),i
+              e[0].get_pixmap(matrix=fitz.Matrix(1.4,1.4)).save(root/(old.stem+'-cover.png'));d.close();e.close();body_checks.append({'file':a['path'],'381_pages':True,'all_380_noncover_pages_unchanged':True})
+            if old.suffix=='.docx':
+              with zipfile.ZipFile(old) as d,zipfile.ZipFile(new) as e:
+                assert d.namelist()==e.namelist();changes=[n for n in d.namelist() if d.read(n)!=e.read(n)];assert changes==['word/media/image1.png']
+              body_checks.append({'file':a['path'],'only_changed_part':'word/media/image1.png'})
+            shutil.copyfile(new,old)
+          rev='20261008-p3-cover';asset=r'(?:cover\.jpg|downloads/book-(?:reader-|print-)?v1\.2\.(?:pdf|docx))'
+          global_rx=re.compile(r'(/books/m/400/'+asset+r')(?:\?[^\s\"\x27<>]*)?')
+          relative_rx=re.compile(r'(?<=[\"\x27])('+asset+r')(?:\?[^\s\"\x27<>]*)?')
+          edits=[]
+          for f in list(book.rglob('*.html'))+[site/g for g in globals]:
+            old=f.read_text();new=global_rx.sub(lambda x:x[1]+'?v='+rev,old)
+            if f.is_relative_to(book):new=relative_rx.sub(lambda x:x[1]+'?v='+rev,new)
+            if old!=new:
+              # Removing the scoped asset URLs from both versions proves all other text is unchanged.
+              def norm(s):return relative_rx.sub(lambda x:x[1],global_rx.sub(lambda x:x[1],s))
+              assert norm(old)==norm(new),str(f)
+              f.write_text(new);edits.append(str(f.relative_to(site)))
+          m['revision']=rev;m['cover_style']='Approved earth/seedling cover; front-cover volume label removed; bibliographic volume 400 retained'
+          for a in m['files']:
+            b=(book/a['path']).read_bytes();a['bytes']=len(b);a['sha256']=hashlib.sha256(b).hexdigest()
+          m['release_sha256']=hashlib.sha256(json.dumps(m['files'],ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          cat=json.loads((site/'public/books/catalog.json').read_text());entry=[b for b in cat['books'] if b.get('id')=='m-400'];assert len(entry)==1 and entry[0]['isbn']=='9798906908667'
+          report={'base_main_sha':base,'revision':rev,'release_sha256':m['release_sha256'],'body_checks':body_checks,'cache_only_text_files':edits,'new_assets':spec['files'],'metadata_400_preserved':True,'reindex':False,'production_written':False}
+          (root/'patch-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Verify website cover and PDF-reader cover on desktop and mobile
+        run: |
+          ROOT="$RUNNER_TEMP/book400-cover"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$ROOT/site/public" > "$ROOT/http.log" 2>&1 &
+          PID=$!
+          trap 'kill "$PID" || true' EXIT
+          sleep 2
+          python - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          import os,json,hashlib
+          root=Path(os.environ['RUNNER_TEMP'])/'book400-cover';rows=[]
+          with sync_playwright() as p:
+            b=p.chromium.launch(args=['--no-sandbox'])
+            for w,h in [(1440,1000),(390,844)]:
+              page=b.new_page(viewport={'width':w,'height':h})
+              page.goto('http://127.0.0.1:8765/books/m/400/',wait_until='domcontentloaded');page.locator('.hero img').wait_for();page.wait_for_function("document.querySelector('.hero img').naturalWidth>1000")
+              src=page.locator('.hero img').get_attribute('src');assert '20261008-p3-cover' in src,src
+              page.screenshot(path=str(root/f'homepage-{w}.png'),full_page=True)
+              page.goto('http://127.0.0.1:8765/books/m/400/read.html',wait_until='domcontentloaded');page.wait_for_function("document.getElementById('pt').textContent==='381'",timeout=60000)
+              page.wait_for_timeout(3500);assert page.locator('#pi').input_value()=='1';page.screenshot(path=str(root/f'reader-cover-{w}.png'))
+              assert not page.evaluate('document.documentElement.scrollWidth>innerWidth+2')
+              rows.append({'width':w,'new_cover_loaded':True,'reader_pages':381});page.close()
+            b.close()
+          (root/'browser-report.json').write_text(json.dumps(rows,indent=2));print(json.dumps(rows))
+          PY
+      - name: Commit a publication-only candidate with no workflow files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,subprocess,base64,json
+          root=Path(os.environ['RUNNER_TEMP'])/'book400-cover';site=root/'site';env=os.environ.copy();env['GIT_CONFIG_COUNT']='1';env['GIT_CONFIG_KEY_0']='http.https://github.com/.extraheader';env['GIT_CONFIG_VALUE_0']='AUTHORIZATION: basic '+base64.b64encode(('x-access-token:'+env['GH_TOKEN']).encode()).decode()
+          def git(*a):return subprocess.run(['git','-C',str(site),*a],env=env,check=True)
+          branch='publish/book400-cover-no-volume-20261008';git('switch','-c',branch)
+          globals=['public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/books/agent/index.html','public/books/agents.json']
+          git('add','--sparse','--','public/books/m/400',*globals)
+          files=subprocess.check_output(['git','-C',str(site),'diff','--cached','--name-only'],text=True).splitlines();assert files and all(f.startswith('public/books/m/400/') or f in globals for f in files)
+          git('-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Remove volume label from approved book400 cover; sync PDFs Word and cached previews')
+          sha=subprocess.check_output(['git','-C',str(site),'rev-parse','HEAD'],text=True).strip();git('push','origin','HEAD:refs/heads/'+branch)
+          report=json.loads((root/'patch-report.json').read_text());report.update({'candidate_sha':sha,'candidate_branch':branch,'changed_files':files,'browser_passed':True});(root/'candidate.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book400-cover-no-volume-candidate
+          retention-days: 3
+          path: |
+            ${{ runner.temp }}/book400-cover/*.json
+            ${{ runner.temp }}/book400-cover/*.png
+            ${{ runner.temp }}/book400-cover/base-sha.txt
+            ${{ runner.temp }}/book400-cover/patch/
+            ${{ runner.temp }}/book400-cover/site/public/books/m/400/publication-manifest.json
