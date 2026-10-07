@@ -1,0 +1,70 @@
+name: Final Happiness v1.2 reader subtitle correction and acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/happiness-v12-reader-title-fix-20261008.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: happiness-secret-publication
+  cancel-in-progress: false
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: happiness-v12-received-candidate
+          run-id: 37662393142
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/happiness-v12
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/happiness-secret/read.html
+            /public/books/happiness-secret/publication-manifest.json
+      - name: Correct one interface subtitle, preserve PDF bytes and book text
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,subprocess,datetime
+          root=Path(os.environ['GITHUB_WORKSPACE']);cand=Path(os.environ['RUNNER_TEMP'])/'happiness-v12';dest=root/'public/books/happiness-secret';p=dest/'read.html';mp=dest/'publication-manifest.json'
+          m=json.loads(mp.read_text());assert m['release_sha256']=='126f3cd8386384cb17074232fb86f8f5748ee8fc6030a5c377b2d7ed46189d14'
+          entry=next(e for e in m['files'] if e['path']=='read.html');assert hashlib.sha256(p.read_bytes()).hexdigest()==entry['sha256']
+          old='数字永生之后，谁来接那个空位';new='从张力、转换到释放的人生发生学'
+          text=p.read_text();assert text.count(old)==1;text=text.replace(old,new);p.write_text(text)
+          entry['bytes']=p.stat().st_size;entry['sha256']=hashlib.sha256(p.read_bytes()).hexdigest();m['release_sha256']=hashlib.sha256(json.dumps(m['files'],sort_keys=True).encode()).hexdigest();m['ui_revision']='20261008-v12-r1';m['updated_at']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          (cand/'book/read.html').write_text(text);(cand/'book/publication-manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          def git(*a):return subprocess.run(['git',*a],cwd=root,check=True,text=True,stdout=subprocess.PIPE)
+          git('config','user.name','github-actions[bot]');git('config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
+          git('add','--sparse','public/books/happiness-secret/read.html','public/books/happiness-secret/publication-manifest.json')
+          assert set(git('diff','--cached','--name-only').stdout.splitlines())=={'public/books/happiness-secret/read.html','public/books/happiness-secret/publication-manifest.json'}
+          git('commit','-m','Fix inherited template subtitle in Happiness v1.2 reader; no PDF or theory changes; no reindex');git('push','origin','HEAD:main')
+          q=cand/'qa';q.mkdir(exist_ok=True);(q/'publication-result.json').write_text(json.dumps({'success':True,'commit':git('rev-parse','HEAD').stdout.strip(),'release_sha256':m['release_sha256'],'reader_subtitle':new,'pdf_bytes_changed':False,'reindex_triggered':False},ensure_ascii=False,indent=2))
+          b=cand/'build-tools/browser_qa.py';s=b.read_text();needle="page.goto(base+'read.html',wait_until='domcontentloaded')";assert needle in s;s=s.replace(needle,needle+"\n   assert page.locator('.sub.hideS').inner_text()=='从张力、转换到释放的人生发生学'");b.write_text(s)
+          print('READER_SUBTITLE_FIXED',m['release_sha256'])
+          PY
+      - name: Prepare bounded browser dependencies
+        timeout-minutes: 4
+        run: |
+          python3 -m pip install --quiet --timeout 25 --retries 1 playwright beautifulsoup4
+          timeout 150s python3 -m playwright install chromium
+          timeout 45s sudo apt-get -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 -o Acquire::Retries=1 install -y -qq fonts-noto-cjk || echo 'Use system fonts; PDF fonts are embedded'
+      - name: Verify final exact edition and all 28 public assets
+        run: python3 "${RUNNER_TEMP}/happiness-v12/build-tools/live_http_qa.py" "${RUNNER_TEMP}/happiness-v12"
+      - name: Recheck final public desktop and mobile readers including subtitle
+        run: python3 "${RUNNER_TEMP}/happiness-v12/build-tools/browser_qa.py" "${RUNNER_TEMP}/happiness-v12" "https://sdeuniverses.com/books/happiness-secret/"
+      - name: Preserve final acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: happiness-v12-final-reader-evidence
+          path: ${{ runner.temp }}/happiness-v12/qa
+          retention-days: 30
