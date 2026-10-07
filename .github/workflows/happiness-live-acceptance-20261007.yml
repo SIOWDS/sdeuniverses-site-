@@ -1,0 +1,76 @@
+name: Verify deployed Happiness Secret canonical routes and readers
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/happiness-live-acceptance-20261007.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: happiness-v11-received-candidate
+          run-id: 37615135243
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/happiness-final
+      - uses: actions/download-artifact@v4
+        with:
+          name: happiness-publication-live-evidence-20261007
+          run-id: 37615135243
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/happiness-final/qa
+      - name: Probe every deployed asset and canonical directory route
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,json,urllib.request,urllib.error,hashlib,re,concurrent.futures,time
+          root=Path(os.environ['RUNNER_TEMP'])/'happiness-final';qa=root/'qa';m=json.loads((qa/'published-manifest.json').read_text());base='https://sdeuniverses.com/books/happiness-secret/'
+          def get(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 Happiness-Live-Acceptance','Accept':'*/*'})
+              try:
+                  with urllib.request.urlopen(req,timeout=90) as r:return r.status,r.read(),r.geturl()
+              except urllib.error.HTTPError as e:return e.code,e.read(),url
+          def norm(s):
+              s=re.sub(r'<link\b[^>]*rel=[\"\x27]canonical[\"\x27][^>]*>','',s,flags=re.I)
+              s=re.sub(r'<meta\b[^>]*property=[\"\x27]og:url[\"\x27][^>]*>','',s,flags=re.I)
+              return s.strip()
+          def check(e):
+              paths=[e['path']]
+              if e['path'].endswith('index.html'):paths.insert(0,e['path'][:-10])
+              attempts=[];accepted=False
+              for path in paths:
+                  status,data,url=get(base+path);sha=hashlib.sha256(data).hexdigest();exact=sha==e['sha256']
+                  accepted=status==200 and (exact or (e['path'].endswith('.html') and norm(data.decode())==norm((root/'book'/e['path']).read_text())))
+                  attempts.append({'url':url,'status':status,'bytes':len(data),'sha256':sha,'exact_hash_match':exact,'accepted':accepted})
+                  if accepted:break
+                  if status==200 and e['path'].endswith('.html'):(qa/('unexpected-'+e['path'].replace('/','_'))).write_bytes(data)
+              out={'path':e['path'],'accepted':accepted,'attempts':attempts};print('ASSET',json.dumps(out,ensure_ascii=False),flush=True);return out
+          status,data,url=get(base+'publication-manifest.json');live=json.loads(data);assert status==200 and live['release_sha256']==m['release_sha256'] and live['status']=='published'
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:assets=list(pool.map(check,m['files']))
+          shelves=[]
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+              status,data,actual=get(url);ok=status==200 and '幸福的奥秘' in data.decode() and '/books/happiness-secret/' in data.decode();shelves.append({'url':url,'status':status,'book_present':ok})
+          status,data,url=get('https://sdeuniverses.com/books/catalog.json');cat=json.loads(data);b=[b for b in cat['books'] if b['id']=='happiness-secret'];catok=status==200 and len(b)==1 and b[0]['authors']==['王德生','陈晓艳'] and b[0]['pdfPages']==320
+          result={'success':all(a['accepted'] for a in assets) and all(s['book_present'] for s in shelves) and catok,'release_sha256':m['release_sha256'],'assets_checked':len(assets),'assets':assets,'bookshelves':shelves,'catalogue_verified':catok,'reindex_triggered':False}
+          (qa/'live-http-qa.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print('LIVE_HTTP_SUMMARY',json.dumps({k:v for k,v in result.items() if k!='assets'},ensure_ascii=False));assert result['success']
+          PY
+      - name: Prepare real live browser
+        if: always()
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Exercise desktop and mobile public readers
+        if: always()
+        run: python3 "${RUNNER_TEMP}/happiness-final/build-tools/browser_qa.py" "${RUNNER_TEMP}/happiness-final" "https://sdeuniverses.com/books/happiness-secret/"
+      - name: Preserve exact HTTP and browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: happiness-live-acceptance-final
+          path: ${{ runner.temp }}/happiness-final/qa
+          retention-days: 30
