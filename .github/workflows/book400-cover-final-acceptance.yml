@@ -1,0 +1,70 @@
+name: Book400 no-volume cover final acceptance
+on:
+  push:
+    branches: ['release/book400-cover-no-volume-20261008']
+    paths: ['.github/workflows/book400-cover-final-acceptance.yml']
+permissions:
+  contents: read
+jobs:
+  accept:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - run: |
+          pip -q install playwright pymupdf
+          python -m playwright install --with-deps chromium
+      - name: Verify all publication assets and the actually visible cover page
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          import os,json,hashlib,datetime,zipfile,subprocess,fitz,re
+          root=Path(os.environ['RUNNER_TEMP'])/'book400-cover-final';root.mkdir()
+          base='https://sdeuniverses.com/books/m/400/';rev='20261008-p3-cover'
+          def get(url,dest):
+            dest.parent.mkdir(parents=True,exist_ok=True)
+            subprocess.run(['curl','-fsSL','--max-time','60','--retry','2','--user-agent','Mozilla/5.0','-o',str(dest),url],check=True)
+            return dest.read_bytes()
+          m=json.loads(get(base+'publication-manifest.json?v='+rev,root/'manifest.json'))
+          assert m['revision']==rev and m['release_sha256']=='de7cc66582a223a449426aa55c2fe247f474529b7e691a14694ac4071ca7f014'
+          assert m['book_no']==400 and m['isbn']=='979-8-90690-866-7' and m['price_usd']==20
+          names=['cover.jpg','downloads/book-reader-v1.2.pdf','downloads/book-print-v1.2.pdf','downloads/book-v1.2.docx'];entries={x['path']:x for x in m['files']};asset_checks=[]
+          for name in names:
+            f=root/name;raw=get(base+name+'?v='+rev,f);sha=hashlib.sha256(raw).hexdigest();assert sha==entries[name]['sha256'],name
+            row={'path':name,'status':200,'sha256':sha}
+            if name.endswith('.pdf'):
+              d=fitz.open(f);assert len(d)==381 and len(d.get_toc())==673;d[0].get_pixmap(matrix=fitz.Matrix(1.4,1.4)).save(root/(f.stem+'-cover.png'));row.update(pages=len(d),bookmarks=len(d.get_toc()));d.close()
+            asset_checks.append(row)
+          with zipfile.ZipFile(root/'downloads/book-v1.2.docx') as z:assert hashlib.sha256(z.read('word/media/image1.png')).hexdigest()=='e9c040e45272d806aae00d89ec227135c3241b18b0064a2791ef71a697758ca2'
+          browser_checks=[]
+          with sync_playwright() as p:
+            b=p.chromium.launch(args=['--no-sandbox'])
+            for width,height in [(1440,1000),(390,844)]:
+              page=b.new_page(viewport={'width':width,'height':height});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+              page.goto(base,wait_until='domcontentloaded',timeout=60000);page.wait_for_function("document.querySelector('.hero img').naturalWidth>1000",timeout=30000)
+              image_url=page.locator('.hero img').evaluate('(e)=>e.currentSrc');assert '?v='+rev in image_url
+              response=page.request.get(image_url);assert response.ok and hashlib.sha256(response.body()).hexdigest()==entries['cover.jpg']['sha256']
+              page.screenshot(path=str(root/f'home-{width}.png'),full_page=True)
+              page.goto(base+'read.html',wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_function("document.getElementById('pt').textContent==='381'",timeout=60000)
+              # Page 1 is on the RIGHT in desktop spreads and LEFT in mobile single-page mode.
+              page.wait_for_function("[...document.querySelectorAll('#sL svg,#sR svg')].some(e=>e.getBoundingClientRect().width>100)",timeout=60000)
+              page.wait_for_timeout(2000);assert page.locator('#pi').input_value()=='1'
+              page.screenshot(path=str(root/f'reader-{width}.png'))
+              assert not page.evaluate('document.documentElement.scrollWidth>innerWidth+2');assert not errors,errors
+              browser_checks.append({'width':width,'cover_visible':True,'page':1,'total_pages':381,'page_errors':errors});page.close()
+            b.close()
+          shelf_checks=[]
+          for i,url in enumerate(['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']):
+            s=get(url,root/f'shelf-{i}.html').decode();card=re.search(r'<article class="book" data-id="m-400"[\s\S]*?</article>',s);assert card and '/books/m/400/cover.jpg?v='+rev in card[0];shelf_checks.append({'url':url,'new_cover':True})
+          report={'status':'passed','revision':rev,'production_commit':'0d527d134018f3abdebc9a1e440f42432d30f606','release_sha256':m['release_sha256'],'assets':asset_checks,'browsers':browser_checks,'shelves':shelf_checks,'bibliographic_volume_400_preserved':True,'no_reindex':True,'verified_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          (root/'acceptance.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book400-no-volume-final-acceptance
+          retention-days: 5
+          path: |
+            ${{ runner.temp }}/book400-cover-final/*.json
+            ${{ runner.temp }}/book400-cover-final/*.png
