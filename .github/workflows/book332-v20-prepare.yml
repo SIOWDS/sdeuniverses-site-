@@ -5,20 +5,25 @@ on:
     paths: ['.github/workflows/book332-v20-prepare.yml']
 permissions:
   contents: write
+  actions: read
 jobs:
   prepare:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - name: Receive and authenticate the passive book332 publication package
+      - uses: actions/download-artifact@v4
+        with:
+          name: book332-v20-transfer
+          run-id: 37665112722
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/book332-release/
+      - name: Authenticate the passive book332 publication package
         run: |
           python - <<'PY'
-          import urllib.request, pathlib, hashlib, zipfile, io, json, os, stat
-          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book332-release';root.mkdir()
-          url='https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-56c8-81fa-8a3a-335a5561b85b/raw?se=2026-10-07T18%3A13%3A20Z&sp=r&sv=2026-02-06&sr=b&scid=16803b90-589f-5490-b520-2876ade1bb06&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T01%3A27%3A07Z&ske=2026-10-08T01%3A27%3A07Z&sks=b&skv=2026-02-06&sig=GzYgqvd2AhuIett99c4End0HLoDFuvZywnW2xPKruSg%3D'
-          raw=urllib.request.urlopen(url,timeout=100).read()
+          import pathlib, hashlib, zipfile, io, json, os, stat
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book332-release'
+          raw=(root/'publication.zip').read_bytes()
           assert len(raw)==13220232 and hashlib.sha256(raw).hexdigest()=='b14713e3a43dd51811be32c34388ae3b681e20d14792075cfd5ebe4e1c7228f2','Publication package mismatch'
-          (root/'publication.zip').write_bytes(raw)
           dest=root/'payload';dest.mkdir()
           with zipfile.ZipFile(io.BytesIO(raw)) as z:
               names=z.namelist();assert len(names)==74 and len(set(names))==74
