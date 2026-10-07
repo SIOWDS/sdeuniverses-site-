@@ -1,0 +1,98 @@
+name: Book400 v1.2 production acceptance - read only
+on:
+  push:
+    branches: ['release/book400-earth-v12-20261008']
+    paths: ['.github/workflows/book400-live-acceptance-v12.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 37695713581
+          name: book400-v12-scoped-candidate-acceptance
+          path: ${{ runner.temp }}/book400-live/source
+      - name: Wait for exact production release, then verify every book asset
+        run: |
+          python - <<'PY'
+          import pathlib,os,json,subprocess,hashlib,time,concurrent.futures,datetime
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book400-live';out=root/'live';out.mkdir(exist_ok=True)
+          origin='https://sdeuniverses.com';book=origin+'/books/m/400/';release='734fee1ef18697cad79f5c1d7e15e278e79f09d53deeb389303291dde414b363'
+          def get(url,path):
+            path.parent.mkdir(parents=True,exist_ok=True)
+            p=subprocess.run(['curl','-sS','-L','--max-time','65','--retry','1','--user-agent','Mozilla/5.0','-o',str(path),'-w','%{http_code}',url],capture_output=True,text=True)
+            if p.returncode or p.stdout!='200':raise RuntimeError('HTTP '+p.stdout+' '+url+' '+p.stderr[:100])
+            return path.read_bytes()
+          attempts=[];manifest=None
+          for i in range(24):
+            try:
+              data=get(book+'publication-manifest.json?verify=20261008-v12',out/'publication-manifest.json');m=json.loads(data)
+              assert m['release_sha256']==release
+              manifest=m;break
+            except Exception as e:attempts.append(str(e));print('Waiting for deployed release',i+1,str(e)[:130],flush=True);time.sleep(15)
+          (out/'deployment-poll.json').write_text(json.dumps(attempts,ensure_ascii=False,indent=2))
+          assert manifest,'Exact v1.2 release is not live'
+          assert manifest['book_no']==400 and manifest['isbn']=='979-8-90690-866-7' and manifest['price_usd']==20 and manifest['pages']==381
+          def verify(a):
+            data=get(book+a['path'],out/'assets'/a['path']);digest=hashlib.sha256(data).hexdigest();assert digest==a['sha256'],a['path']
+            return {'path':a['path'],'status':200,'bytes':len(data),'sha256':digest}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:assets=list(pool.map(verify,manifest['files']))
+          entrances=[]
+          for url,needle in [(origin+'/books/','data-id="m-400"'),(origin+'/monographs/','data-id="m-400"'),('https://read.sdeuniverses.com/library/','data-id="m-400"'),(origin+'/books/agent/','/books/m/400/agent/')]:
+            data=get(url+'?verify=20261008-v12',out/('entrance-'+str(len(entrances))+'.html')).decode();assert needle in data,url;entrances.append({'url':url,'status':200,'book400_present':True})
+          cat=json.loads(get(origin+'/books/catalog.json?verify=20261008-v12',out/'catalog.json'));matches=[b for b in cat['books'] if b.get('id')=='m-400'];assert len(matches)==1 and matches[0]['isbn']=='9798906908667'
+          report={'verified_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'production_commit':'941141bf00b75adc9da27a21f765189e3bfa6c13','release_sha256':release,'assets':assets,'entrances':entrances,'catalog_entry':matches[0],'no_global_reindex':True,'only_get_requests':True}
+          (root/'live-http-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps({'all_asset_count':len(assets),'all_hashes_match':True,'entrances':entrances},ensure_ascii=False))
+          PY
+      - name: Browser and PDF verification dependencies
+        run: |
+          pip -q install playwright pymupdf
+          python -m playwright install --with-deps chromium
+      - name: Actual production desktop and mobile reading
+        run: |
+          ROOT="$RUNNER_TEMP/book400-live"
+          python "$ROOT/source/payload/我材发生_第400卷_上站包/build-tools/test_web.py" "$ROOT" "$ROOT/browser" https://sdeuniverses.com
+      - name: Verify actual SVG rendering, PDF structure and download fidelity
+        run: |
+          python - <<'PY'
+          import pathlib,os,json,fitz,hashlib,datetime
+          from playwright.sync_api import sync_playwright
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book400-live';pdfs=[]
+          for f in (root/'live/assets/downloads').glob('*.pdf'):
+            d=fitz.open(f);assert len(d)==381 and len(d.get_toc())==673
+            for p in d:p.get_pixmap(matrix=fitz.Matrix(.2,.2))
+            pdfs.append({'file':f.name,'pages':len(d),'bookmarks':len(d.get_toc()),'sha256':hashlib.sha256(f.read_bytes()).hexdigest()})
+          render=[]
+          with sync_playwright() as p:
+            browser=p.chromium.launch(args=['--no-sandbox'])
+            for width,height in [(1440,1000),(390,844)]:
+              page=browser.new_page(viewport={'width':width,'height':height});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+              page.goto('https://sdeuniverses.com/books/m/400/read.html',wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_function("document.getElementById('pt').textContent==='381'",timeout=60000)
+              page.locator('#pi').fill('181');page.locator('#pi').press('Enter')
+              page.wait_for_function("document.querySelector('#sL svg') && document.querySelector('#sL svg').getBoundingClientRect().width>100",timeout=60000)
+              page.wait_for_timeout(2500);page.screenshot(path=str(root/f'live-vector-{width}.png'))
+              h=page.locator('.top').evaluate('(e)=>e.getBoundingClientRect().height');assert h<60
+              assert not page.evaluate('document.documentElement.scrollWidth>innerWidth+2')
+              render.append({'width':width,'svg_rendered':True,'toolbar_height':h,'page':page.locator('#pi').input_value(),'page_errors':errors});page.close()
+            browser.close()
+          (root/'live-pdf-and-svg-report.json').write_text(json.dumps({'pdfs':pdfs,'rendering':render,'verified_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2))
+          print(json.dumps({'pdfs':pdfs,'rendering':render}))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book400-v12-production-acceptance
+          retention-days: 5
+          path: |
+            ${{ runner.temp }}/book400-live/*.json
+            ${{ runner.temp }}/book400-live/*.png
+            ${{ runner.temp }}/book400-live/browser/
+            ${{ runner.temp }}/book400-live/live/publication-manifest.json
+            ${{ runner.temp }}/book400-live/live/deployment-poll.json
+            ${{ runner.temp }}/book400-live/live/entrance-*.html
