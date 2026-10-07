@@ -1,0 +1,75 @@
+name: Publish Happiness Secret v1.1 and verify all readers
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/happiness-publish-20261007.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: happiness-secret-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - name: Receive exact authorized publication package
+        run: |
+          python3 - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,json,os
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'happiness-final';root.mkdir()
+          url='https://sdmntprseasia.oaiusercontent.com/files/00000000-ca70-8207-825a-80de9224ff15/raw?se=2026-10-07T11%3A40%3A07Z&sp=r&sv=2026-02-06&sr=b&scid=5061a2e3-9757-5304-84e3-88dab7d1749e&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T06%3A59%3A36Z&ske=2026-10-08T06%3A59%3A36Z&sks=b&skv=2026-02-06&sig=%2Baz/8M6fg%2BaMDDY/WEtT/lAYKeOfPq0y2J8jLvn2gLY%3D'
+          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'application/zip,application/octet-stream,*/*'})
+          raw=urllib.request.urlopen(req,timeout=120).read()
+          assert len(raw)==4840764 and hashlib.sha256(raw).hexdigest()=='e2046f0e27843ae9e14e83ca4fc2c281deb1a863955d96013d8b00f4fb25f2c0'
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              z.extractall(root)
+          for e in json.loads((root/'input-inventory.json').read_text()):
+              p=root/e['path'];assert p.stat().st_size==e['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256'],e['path']
+          m=json.loads((root/'book/publication-manifest.json').read_text())
+          assert m['release_sha256']=='03356134e896c80a7a620efd90bfd978ceb0eb731dd5c81bcbe055423b9517cb'
+          print('EXACT_PACKAGE_RECEIVED',len(raw),'bytes',len(m['files']),'book assets')
+          PY
+      - name: Preserve received candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: happiness-v11-received-candidate
+          path: ${{ runner.temp }}/happiness-final
+          retention-days: 7
+      - name: Prepare real browser
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Accept desktop and mobile reading before publishing
+        run: python3 "${RUNNER_TEMP}/happiness-final/build-tools/browser_qa.py" "${RUNNER_TEMP}/happiness-final"
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/happiness-secret/
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /.github/workflows/search-index.yml
+      - name: Merge accepted book and three shelves without reindex
+        run: python3 "${RUNNER_TEMP}/happiness-final/build-tools/publish.py" "${RUNNER_TEMP}/happiness-final" "${GITHUB_WORKSPACE}"
+      - name: Verify deployed edition, every publication asset and three shelves
+        run: python3 "${RUNNER_TEMP}/happiness-final/build-tools/live_http_qa.py" "${RUNNER_TEMP}/happiness-final"
+      - name: Verify desktop and mobile readers on the public site
+        run: python3 "${RUNNER_TEMP}/happiness-final/build-tools/browser_qa.py" "${RUNNER_TEMP}/happiness-final" "https://sdeuniverses.com/books/happiness-secret/"
+      - name: Preserve publication and live verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: happiness-publication-live-evidence-20261007
+          path: ${{ runner.temp }}/happiness-final/qa
+          retention-days: 30
