@@ -4,7 +4,7 @@ from pathlib import Path
 import json,html,collections
 ROOT=Path(__file__).resolve().parents[1]
 DATA=json.loads((ROOT/'public/books/catalog.json').read_text())
-BOOKS=DATA['books'];CATS=DATA['categories'];VERSION='20261003-bookshelf-v8-agents'
+BOOKS=DATA['books'];CATS=DATA['categories'];VERSION='20261003-bookshelf-v8-agents-happiness-r1'
 # 上线时间：取 publishedAt 与 editionPublishedAt 中较晚的一次（UTC），让增订版按新版上线时间展示。
 # publishedAt 保留首次上线日期。新书若没填，就取它下面那一本（更早插入的）的时间，
 # 排序时再用 catalog 位置分先后——新书总是插在最前面，所以位置越靠前越新。
