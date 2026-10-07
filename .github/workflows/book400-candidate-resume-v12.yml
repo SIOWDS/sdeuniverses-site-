@@ -1,0 +1,119 @@
+name: Book400 v1.2 scoped publication candidate
+on:
+  push:
+    branches: ['release/book400-earth-v12-20261008']
+    paths: ['.github/workflows/book400-candidate-resume-v12.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: book400-v12-candidate
+  cancel-in-progress: false
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 37695438304
+          name: book400-v12-candidate-acceptance
+          path: ${{ runner.temp }}/book400-v12
+      - name: Scoped candidate installation from authenticated exact-source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import pathlib,os,subprocess,base64,json,hashlib,re
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book400-v12';site=root/'site';payload=root/'payload/我材发生_第400卷_上站包';book=payload/'public/books/m/400'
+          m=json.loads((book/'publication-manifest.json').read_text());assert m['release_sha256']=='d85ab2a5927012407c82e2168ba6565a35db5f126d4ad32e0222f32ea4058509'
+          for a in m['files']:assert hashlib.sha256((book/a['path']).read_bytes()).hexdigest()==a['sha256'],a['path']
+          env=os.environ.copy();env['GIT_CONFIG_COUNT']='1';env['GIT_CONFIG_KEY_0']='http.https://github.com/.extraheader';env['GIT_CONFIG_VALUE_0']='AUTHORIZATION: basic '+base64.b64encode(('x-access-token:'+env['GH_TOKEN']).encode()).decode()
+          def git(*a,**kw):return subprocess.run(['git',*a],env=env,check=True,**kw)
+          git('clone','--filter=blob:none','--depth=1','--no-checkout','--single-branch','--branch','main','https://github.com/SIOWDS/sdeuniverses-site-.git',str(site))
+          paths=['/public/books/catalog.json','/public/books/agents.json','/public/books/agent/','/public/books/bookshelf.css','/public/books/bookshelf.js','/public/books/index.html','/public/monographs/index.html','/public/sites/read/library/index.html','/tools/build_bookshelf.py','/.gitignore']
+          git('-C',str(site),'sparse-checkout','init','--no-cone');git('-C',str(site),'sparse-checkout','set','--no-cone','--stdin',input='\n'.join(paths)+'\n',text=True);git('-C',str(site),'checkout','main')
+          sha=subprocess.check_output(['git','-C',str(site),'rev-parse','HEAD'],text=True).strip();(root/'base-sha.txt').write_text(sha)
+          tree=subprocess.check_output(['git','-C',str(site),'ls-tree','-r','--name-only','HEAD','public/books/m'],text=True).splitlines();assert not any(p.startswith('public/books/m/400/') for p in tree),'Volume400 already occupied; stop'
+          shelves=['public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'];previous={rel:(site/rel).read_text() for rel in shelves}
+          # Use the authorized installer for book/catalog/agents. Revert its full shelf render below and apply only one-card insertion.
+          subprocess.run(['python',str(payload/'build-tools/install.py'),str(payload),str(site)],check=True)
+          changes=[]
+          for rel in shelves:
+            generated=(site/rel).read_text();match=re.search(r'<article class="book" data-id="m-400"[\s\S]*?</article>',generated);assert match
+            card=match.group(0);old=previous[rel];assert 'data-id="m-400"' not in old
+            anchor='<div id="book-grid" class="book-grid">';assert old.count(anchor)==1
+            current=old.replace(anchor,anchor+card,1)
+            patterns=[r'(<div class="shelf-total"><strong>)(\d+)(</strong>)',r'(data-category-filter="all"[^>]*>[^<]*<span>)(\d+)(</span>)',r'(data-category-filter="edu"[^>]*>[^<]*<span>)(\d+)(</span>)',r'(<option value="flip">在线翻页（)(\d+)(）)',r'(<option value="full">全文可读（)(\d+)(）)',r'(<span id="result-count"[^>]*>)(\d+)( 部)']
+            replacements=[]
+            for pattern in patterns:
+              found=re.search(pattern,current);assert found,(rel,pattern)
+              before=found.group(0);after=found[1]+str(int(found[2])+1)+found[3];current,n=re.subn(pattern,lambda x:x[1]+str(int(x[2])+1)+x[3],current,count=1);assert n==1;replacements.append((before,after))
+            check=current.replace(card,'',1)
+            for before,after in reversed(replacements):check=check.replace(after,before,1)
+            assert check==old,'An unrelated part of a shelf changed'
+            (site/rel).write_text(current);changes.append({'path':rel,'existing_page_preserved_except_six_counts':True})
+          report=json.loads((payload/'qa/install-report.json').read_text());report['shelves']=changes;report['base_main_sha']=sha
+          (root/'candidate-install-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Prepare PDF and browser checks
+        run: |
+          pip -q install playwright pymupdf
+          python -m playwright install --with-deps chromium
+      - name: Inspect actual 220 and 302 PDF references
+        run: |
+          python - <<'PY'
+          import pathlib,os,subprocess,fitz,json
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book400-v12';out=root/'references';out.mkdir(exist_ok=True)
+          urls={'220':'https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf','302':'https://sdeuniverses.com/students/chen-feng/ai-death-dilemma/m302/ai-death-dilemma-reader-v2.pdf?v=20261004c'};info=[]
+          for vol,url in urls.items():
+            f=out/f'{vol}-reader.pdf';subprocess.run(['curl','-f','-sS','-L','--max-time','100','--user-agent','Mozilla/5.0','-o',str(f),url],check=True)
+            d=fitz.open(f);info.append({'volume':vol,'pages':len(d),'dimensions':list(d[0].rect)})
+            for idx in [0,1,6,24]:d[idx].get_pixmap(matrix=fitz.Matrix(1.4,1.4)).save(out/f'{vol}-{idx+1:03}.png')
+          (out/'reference-report.json').write_text(json.dumps(info,indent=2));print(json.dumps(info))
+          PY
+      - name: Desktop and mobile browser acceptance
+        run: |
+          ROOT="$RUNNER_TEMP/book400-v12"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$ROOT/site/public" > "$ROOT/http-server.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          sleep 2
+          python "$ROOT/payload/我材发生_第400卷_上站包/build-tools/test_web.py" "$ROOT/site" "$ROOT/browser"
+      - name: Verify PDF pages, full asset hashes, and candidate-only commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import pathlib,os,subprocess,base64,json,hashlib,fitz
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book400-v12';site=root/'site';book=site/'public/books/m/400';m=json.loads((book/'publication-manifest.json').read_text())
+          for a in m['files']:assert hashlib.sha256((book/a['path']).read_bytes()).hexdigest()==a['sha256'],a['path']
+          pdfs=[]
+          for f in (book/'downloads').glob('*.pdf'):
+            d=fitz.open(f);assert len(d)==381 and len(d.get_toc())==673
+            for p in d:p.get_pixmap(matrix=fitz.Matrix(.3,.3))
+            pdfs.append({'file':f.name,'pages':len(d),'bookmarks':len(d.get_toc()),'sha256':hashlib.sha256(f.read_bytes()).hexdigest()})
+          (root/'pdf-report.json').write_text(json.dumps(pdfs,indent=2))
+          env=os.environ.copy();env['GIT_CONFIG_COUNT']='1';env['GIT_CONFIG_KEY_0']='http.https://github.com/.extraheader';env['GIT_CONFIG_VALUE_0']='AUTHORIZATION: basic '+base64.b64encode(('x-access-token:'+env['GH_TOKEN']).encode()).decode()
+          def git(*a,**kw):return subprocess.run(['git','-C',str(site),*a],env=env,check=True,**kw)
+          branch='publish/book400-v12-20261008';git('switch','-c',branch)
+          globals=['public/books/catalog.json','public/books/agents.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','public/books/agent/index.html'];git('add','--sparse','--','public/books/m/400',*globals)
+          staged=subprocess.check_output(['git','-C',str(site),'diff','--cached','--name-only'],text=True).splitlines();assert staged and all(p.startswith('public/books/m/400/') or p in globals for p in staged),staged;assert len([p for p in staged if p.startswith('public/books/m/400/')])==80
+          git('-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Publish volume400 v1.2: approved soil cover and verified 381-page edition; no reindex')
+          sha=subprocess.check_output(['git','-C',str(site),'rev-parse','HEAD'],text=True).strip();git('push','origin','HEAD:refs/heads/'+branch)
+          report={'candidate_branch':branch,'candidate_commit':sha,'base_main_sha':(root/'base-sha.txt').read_text(),'files':staged,'production_main_written':False,'global_reindex_triggered':False,'browser_passed':True,'approved_release_sha256':m['release_sha256']}
+          (root/'publication-candidate.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book400-v12-scoped-candidate-acceptance
+          retention-days: 3
+          path: |
+            ${{ runner.temp }}/book400-v12/*.json
+            ${{ runner.temp }}/book400-v12/base-sha.txt
+            ${{ runner.temp }}/book400-v12/http-server.log
+            ${{ runner.temp }}/book400-v12/browser/
+            ${{ runner.temp }}/book400-v12/references/
+            ${{ runner.temp }}/book400-v12/payload/
