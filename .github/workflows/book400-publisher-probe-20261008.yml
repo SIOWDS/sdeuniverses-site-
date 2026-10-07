@@ -1,0 +1,52 @@
+name: Book400 publishing client and reference PDF check
+on:
+  push:
+    branches: ['release/book400-earth-v12-20261008']
+    paths: ['.github/workflows/book400-publisher-probe-20261008.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check authorized transfer with standard client
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/book400-probe"
+          python - <<'PY'
+          import pathlib,os,subprocess,json,hashlib,urllib.request
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book400-probe'
+          source='https://sdmntprseasia.oaiusercontent.com/files/00000000-6644-8207-ac68-0cba8993b106/raw?se=2026-10-07T22%3A14%3A55Z&sp=r&sv=2026-02-06&sr=b&scid=91cab9ab-a95b-5a03-a3e8-9387def725b0&skoid=6fa9748a-b7b2-4b56-a932-8c1417549c47&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T06%3A49%3A40Z&ske=2026-10-08T06%3A49%3A40Z&sks=b&skv=2026-02-06&sig=57/AKwUdm7J7Mzl%2BbFuDkg9/KSZ%2BmFtvQ3qS5WBVR4A%3D'
+          report={'site_written':False,'reindex':False}
+          for name,url in [('cover',source),('site','https://sdeuniverses.com/books/m/220/')]:
+            p=subprocess.run(['curl','-sS','-L','--max-time','45','--user-agent','Mozilla/5.0','-D',str(root/(name+'-headers.txt')),'-o',str(root/(name+'-body.bin')),'-w','%{http_code}',url],capture_output=True,text=True)
+            raw=(root/(name+'-body.bin')).read_bytes();report[name]={'status':p.stdout,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
+            if name=='cover' and report[name]['sha256']=='8d5c057b30b92eebdc8287c773c698886e58e704dad56159cf3e0526001e21f6':(root/'approved-cover.jpg').write_bytes(raw)
+          paths={'reference220.pdf':'public/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf','reference302.pdf':'public/students/chen-feng/ai-death-dilemma/m302/ai-death-dilemma-reader-v2.pdf','agent-app.css':'public/books/agent/app.css','search-index.yml':'.github/workflows/search-index.yml'}
+          for name,path in paths.items():
+            try:
+              req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/contents/'+path+'?ref=main',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github.raw+json'})
+              raw=urllib.request.urlopen(req,timeout=120).read();(root/name).write_bytes(raw);report[name]={'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
+            except Exception as e:report[name]={'error':str(e)}
+          (root/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Render references
+        run: |
+          pip -q install pymupdf
+          python - <<'PY'
+          import fitz,pathlib,os,json
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book400-probe';out=root/'reference-pages';out.mkdir()
+          report=[]
+          for f in root.glob('reference*.pdf'):
+            d=fitz.open(f);report.append({'file':f.name,'pages':len(d),'size':list(d[0].rect)})
+            for i in [0,1,6,24]:d[i].get_pixmap(matrix=fitz.Matrix(1.4,1.4)).save(out/f'{f.stem}-{i+1:03}.png')
+          (out/'reference-info.json').write_text(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book400-publication-probe
+          retention-days: 2
+          path: ${{ runner.temp }}/book400-probe/
