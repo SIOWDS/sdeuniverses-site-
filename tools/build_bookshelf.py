@@ -19,6 +19,25 @@ assert len({b['id'] for b in BOOKS})==len(BOOKS)
 assert len({b['detailUrl'] for b in BOOKS})==len(BOOKS)
 assert all(not b.get('flipUrl') or b['readUrl']==b['flipUrl'] for b in BOOKS), 'Keep flip readers as the primary reading action'
 def esc(x):return html.escape(str(x or ''),quote=True)
+def publication_unit_card(markup,b):
+ import re
+ u=b.get('publicationUnit') or {}
+ if not (u.get('type')=='reading-learning-dialogue' and b.get('readUrl') and b.get('learnUrl') and b.get('agentUrl')):return markup
+ title=esc(b['title'])
+ m=re.search(r'<div class="book-actions">(.*?)</div>',markup,re.S)
+ if not m:raise ValueError('Missing book action group')
+ anchors=re.findall(r'<a\b[^>]*>.*?</a>',m.group(1),re.S)
+ secondary=''.join(a for a in anchors if not re.search(r'class="[^"]*(?:read-button|agent-link|learn-link)',a))
+ links='<p class="publication-unit-label">三位一体出版单元</p>'
+ for kind,cls,label,url in [('read','read-button','阅读 · 在线翻页',b['readUrl']),('learn','learn-link',b.get('learnLabel') or '学习包',b['learnUrl']),('agent','agent-link',b.get('agentLabel') or '智能问对',b['agentUrl'])]:
+  links+='<a class="'+cls+'" data-unit-action="'+kind+'" href="'+esc(url)+'" aria-label="'+title+'：'+esc(label)+'">'+esc(label)+'</a>'
+ links+='<div class="unit-secondary">'+secondary+'</div>'
+ markup=markup[:m.start()]+'<div class="book-actions publication-unit-actions" role="group" aria-label="阅读、学习、智能问对">'+links+'</div>'+markup[m.end():]
+ markup=markup.replace('<article class="book"','<article class="book" data-publication-unit="'+esc(u['id'])+'"',1)
+ if not b.get('number') and b.get('volumeLabel'):
+  markup=re.sub(r'(<span class="ordinal">).*?(</span>)',lambda x:x[1]+esc(b['volumeLabel'])+x[2],markup,count=1)
+ return markup
+
 def card(b):
  title=esc(b['title']);detail=esc(b['detailUrl']);author=' · '.join(b['authors']);cat=CATS[b['category']]
  reading=b['readMode'];state={'full':'全文可读','preview':'试读版','info':'书籍介绍'}[reading]
@@ -38,7 +57,8 @@ def card(b):
  agent_name=(b.get('agentName') if b.get('agentUrl') else None) or AGENTS.get(str(b.get('number') or b['id']),{}).get('name','书生')
  if agent_url and (b.get('agentUrl') or b.get('textUrl') or b.get('chapterUrl') or (b.get('number') and (ROOT/('public/books/m/%s/text/index.html'%b['number'])).exists())):action+='<a class="agent-link" href="'+esc(agent_url)+'" aria-label="'+title+'：这本书的智能体「'+esc(agent_name)+'」">「'+esc(agent_name)+'」· 和这本书对话</a>'
  if b.get('pdfUrl') and b['pdfUrl']!=b.get('readUrl'):action+='<a class="pdf-link" href="'+esc(b['pdfUrl'])+'" aria-label="'+title+'：'+('试读版 PDF' if reading=='preview' else 'PDF')+'">PDF ↗</a>'
- return '<article class="book" '+attrs+'><div class="book-main"><a class="cover" href="'+detail+'" tabindex="-1" aria-hidden="true">'+cover+'</a><div class="book-copy"><p class="book-tag"><span>'+esc(cat)+'</span><span class="ordinal">'+('#'+str(b['number']) if b['number'] else '')+'</span></p><h3><a href="'+detail+'">'+title+'</a></h3><p class="byline">'+esc(author)+'</p><p class="description">'+esc(b.get('description'))+'</p></div></div><div class="book-meta"><span class="reading-state '+reading+'">'+state+'</span><span class="format">'+('PDF 全本' if b.get('pdfUrl') and b['pdfUrl']==b.get('readUrl') else '网页 / PDF' if b.get('pdfUrl') and reading=='full' else '在线阅读' if reading=='full' else ('导读 · 精选三篇' if b.get('articlesUrl') else '摘要与导读') if reading=='info' else '在线试读')+'</span></div><div class="book-actions">'+action+'</div></article>'
+ markup='<article class="book" '+attrs+'><div class="book-main"><a class="cover" href="'+detail+'" tabindex="-1" aria-hidden="true">'+cover+'</a><div class="book-copy"><p class="book-tag"><span>'+esc(cat)+'</span><span class="ordinal">'+('#'+str(b['number']) if b['number'] else '')+'</span></p><h3><a href="'+detail+'">'+title+'</a></h3><p class="byline">'+esc(author)+'</p><p class="description">'+esc(b.get('description'))+'</p></div></div><div class="book-meta"><span class="reading-state '+reading+'">'+state+'</span><span class="format">'+('PDF 全本' if b.get('pdfUrl') and b['pdfUrl']==b.get('readUrl') else '网页 / PDF' if b.get('pdfUrl') and reading=='full' else '在线阅读' if reading=='full' else ('导读 · 精选三篇' if b.get('articlesUrl') else '摘要与导读') if reading=='info' else '在线试读')+'</span></div><div class="book-actions">'+action+'</div></article>'
+ return publication_unit_card(markup,b)
 def page(reading_house=False):
  counts=collections.Counter(b['category'] for b in BOOKS);authors=collections.Counter(a for b in BOOKS for a in b['authors']);modes=collections.Counter(b['readMode'] for b in BOOKS)
  chips='<button class="category" type="button" data-category-filter="all" data-label="全部图书" aria-pressed="true">全部<span>'+str(len(BOOKS))+'</span></button>'

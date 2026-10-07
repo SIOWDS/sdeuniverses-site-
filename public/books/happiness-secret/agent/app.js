@@ -488,7 +488,9 @@ function selectForQuestion(q){
  var used=0, chosen=[];ranked.forEach(function(r){var n=CH[r.i].n;if(used+n<BUDGET*.75){chosen.push(r.i);used+=n;}});
  if(chosen.length){SEL=chosen;readInfo();}
 }
+function unitVolumeLabel(){return BOOK&&BOOK.number?"第"+BOOK.number+"卷":(BOOK&&BOOK.volumeLabel)||"卷号待核";}
 function initLearning(){
+ var nav=document.createElement("nav");nav.id="publication-unit-nav";nav.style.cssText="line-height:1.8;margin:10px 0;font-size:13px";nav.innerHTML="<a href=\"https://sdeuniverses.com/books/happiness-secret/read.html\">阅读原文</a> · <a href=\"https://sdeuniverses.com/books/happiness-secret/agent/learning.html\">学习包</a> · <a href=\"https://sdeuniverses.com/books/happiness-secret/agent/\" aria-current=\"page\">智能问对</a><br>"+esc(unitVolumeLabel())+" · 底本v1.2";$("readInfo").parentNode.insertBefore(nav,$("readInfo"));
  var box=document.createElement('div');box.className='read';box.style.marginTop='12px';
  box.innerHTML='<a href="/books/happiness-secret/agent/learning.html" target="_blank" rel="noopener">九章学习包 · 打开任务与检验表</a><br><button id="exportSession" type="button">导出本场记录</button>';
  $('readInfo').parentNode.insertBefore(box,$('readInfo'));
