@@ -1,0 +1,134 @@
+name: Book332 v2 scoped publication preparation
+on:
+  push:
+    branches: [feature/book332-v20-20261008]
+    paths: ['.github/workflows/book332-v20-prepare.yml']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Receive and authenticate the passive book332 publication package
+        run: |
+          python - <<'PY'
+          import urllib.request, pathlib, hashlib, zipfile, io, json, os, stat
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book332-release';root.mkdir()
+          url='https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-56c8-81fa-8a3a-335a5561b85b/raw?se=2026-10-07T18%3A13%3A20Z&sp=r&sv=2026-02-06&sr=b&scid=16803b90-589f-5490-b520-2876ade1bb06&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T01%3A27%3A07Z&ske=2026-10-08T01%3A27%3A07Z&sks=b&skv=2026-02-06&sig=GzYgqvd2AhuIett99c4End0HLoDFuvZywnW2xPKruSg%3D'
+          raw=urllib.request.urlopen(url,timeout=100).read()
+          assert len(raw)==13220232 and hashlib.sha256(raw).hexdigest()=='b14713e3a43dd51811be32c34388ae3b681e20d14792075cfd5ebe4e1c7228f2','Publication package mismatch'
+          (root/'publication.zip').write_bytes(raw)
+          dest=root/'payload';dest.mkdir()
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              names=z.namelist();assert len(names)==74 and len(set(names))==74
+              assert sum(i.file_size for i in z.infolist())<80000000
+              for i in z.infolist():
+                  n=i.filename;p=pathlib.PurePosixPath(n)
+                  assert not p.is_absolute() and '..' not in p.parts and '\\' not in n
+                  assert n in {'package-manifest.json','shared-patches.json'} or n.startswith('public/books/m/332/')
+                  assert not stat.S_ISLNK(i.external_attr>>16)
+              z.extractall(dest)
+          m=json.loads((dest/'package-manifest.json').read_text())
+          assert m['book_number']==332 and m['version']=='2.0'
+          assert set(names)=={x['path'] for x in m['files']}|{'package-manifest.json'}
+          for x in m['files']:
+              b=(dest/x['path']).read_bytes();assert len(b)==x['bytes'] and hashlib.sha256(b).hexdigest()==x['sha256'],x['path']
+          print('Authenticated 74 passive book publication entries. No payload scripts are executed.')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/332/
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+      - name: Install document validation libraries
+        run: python -m pip install --quiet beautifulsoup4 pypdf
+      - name: Guard current sources and apply only the authorized book update
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,re,shutil,subprocess,copy,datetime
+          from bs4 import BeautifulSoup
+          from pypdf import PdfReader
+          root=Path(os.environ['RUNNER_TEMP'])/'book332-release';src=root/'payload';B='public/books/m/332/'
+          sha=lambda b:hashlib.sha256(b).hexdigest()
+          manifest=json.loads((src/B/'publication-manifest.json').read_text());patch=json.loads((src/'shared-patches.json').read_text())
+          assert manifest['source_block_count']==2145 and manifest['source_table_count']==7 and manifest['chapters']==32
+          conflicts=[]
+          for x in manifest['files']:
+              p=Path(x['path']);current=sha(p.read_bytes()) if p.exists() else None
+              if current not in {x['expected_previous_sha256'],x['sha256']}:conflicts.append(x['path'])
+          assert not conflicts,'Concurrent book changes: '+str(conflicts)
+          existing_manifest=Path(B)/'publication-manifest.json'
+          assert not existing_manifest.exists() or existing_manifest.read_bytes()==(src/B/'publication-manifest.json').read_bytes(),'Newer book manifest exists'
+          catp=Path('public/books/catalog.json');cat=json.loads(catp.read_text());other=copy.deepcopy(cat)
+          pos=[i for i,b in enumerate(cat['books']) if b.get('number')==332];assert len(pos)==1
+          assert cat['books'][pos[0]] in [patch['catalog']['before'],patch['catalog']['after']],'Book332 catalog changed concurrently'
+          agp=Path('public/books/agents.json');ags=json.loads(agp.read_text());otherags=copy.deepcopy(ags)
+          assert ags['agents']['332'] in [patch['agent']['before'],patch['agent']['after']],'Book332 agent changed concurrently'
+          for x in patch['shelves']:
+              assert x['path'] in {'public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+              text=Path(x['path']).read_text();assert text.count(x['before'])==1,'Book332 shelf changed concurrently: '+x['path']
+              assert sha(x['before'].encode())==x['before_sha256']
+          for p in (src/B).rglob('*'):
+              if p.is_file():q=Path(p.relative_to(src));q.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,q)
+          stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+          updated=copy.deepcopy(patch['catalog']['after']);updated['editionPublishedAt']=stamp
+          for k in ['id','number','title','subtitle','authors','isbn','price','priceUsd','publishedAt','coverUrl']:
+              assert updated[k]==patch['catalog']['before'][k],k
+          cat['books'][pos[0]]=updated
+          verify=copy.deepcopy(cat);verify['books'][pos[0]]=other['books'][pos[0]];assert verify==other
+          catp.write_text(json.dumps(cat,ensure_ascii=False,indent=2)+'\n')
+          ags['agents']['332']=patch['agent']['after'];verify=copy.deepcopy(ags);verify['agents']['332']=otherags['agents']['332'];assert verify==otherags
+          agp.write_text(json.dumps(ags,ensure_ascii=False,indent=2)+'\n')
+          for x in patch['shelves']:
+              p=Path(x['path']);text=p.read_text();replacement=x['after'].replace('2026-10-07T18:00:00Z',stamp)
+              p.write_text(text.replace(x['before'],replacement,1))
+          soup=BeautifulSoup(Path(B+'text/index.html').read_text(),'html.parser');nodes=soup.select('[data-source-block]')
+          assert len(nodes)==2145 and len(soup.select('table'))==7 and len(soup.select('h2.chap-title'))==32
+          for node,expected in zip(nodes,manifest['source_blocks']):
+              assert node['data-source-block']==expected['id'] and sha(re.sub(r'\s+','',node.get_text()).encode())==expected['sha256'],expected['id']
+          for section in manifest['sections']:
+              page=BeautifulSoup(Path(B+'text/'+section['slug']+'/index.html').read_text(),'html.parser')
+              assert [n['data-source-block'] for n in page.select('[data-source-block]')]==section['source_ids']
+          assert len(PdfReader(B+'downloads/book-v2.0.pdf').pages)==248
+          assert sha(Path(B+'downloads/book-v2.0.pdf').read_bytes())==manifest['source_pdf_sha256']
+          assert sha(Path(B+'downloads/book-v2.0.docx').read_bytes())==manifest['source_docx_sha256']
+          audit={'prepared_at':stamp,'base_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'book_number':332,'version':'2.0','pdf_pages':248,'source_blocks_verified':2145,'source_tables_verified':7,'chapters':32,'section_pages_verified':len(manifest['sections']),'other_catalog_entries_unchanged':True,'other_agent_entries_unchanged':True,'reindex_executed':False,'production_written':False,'catalog_entry':updated}
+          (root/'preparation-audit.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2))
+          print(json.dumps(audit,ensure_ascii=False))
+          PY
+      - name: Commit to a release branch for native pull request review
+        run: |
+          git switch -c release/book332-v20-20261008
+          git config user.name 'SDE Publication'
+          git config user.email 'publication@users.noreply.github.com'
+          git add public/books/m/332/ public/books/catalog.json public/books/agents.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html
+          python - <<'PY'
+          import subprocess, pathlib,os,json
+          paths=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          shared={'public/books/catalog.json','public/books/agents.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          assert paths and all(p.startswith('public/books/m/332/') or p in shared for p in paths),paths
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'book332-release'
+          (root/'changed-files.json').write_text(json.dumps(paths,indent=2));print('SCOPED_CHANGED_FILES',len(paths))
+          PY
+          git commit -m 'Publish book332 revised reading v2.0: exact 248-page sources, full text, reader and aligned agent; no reindex'
+          git push origin HEAD:refs/heads/release/book332-v20-20261008
+          git rev-parse HEAD > "$RUNNER_TEMP/book332-release/release-commit.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: book332-v20-preparation-audit
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/book332-release/preparation-audit.json
+            ${{ runner.temp }}/book332-release/changed-files.json
+            ${{ runner.temp }}/book332-release/release-commit.txt
+            ${{ runner.temp }}/book332-release/payload/package-manifest.json
