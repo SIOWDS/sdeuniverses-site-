@@ -12,18 +12,19 @@ jobs:
     steps:
       - name: Receive authorized publication package and verify digest
         env:
-          CANDIDATE_URL: 'https://sdmntprnznorth.oaiusercontent.com/files/00000000-e464-820b-9f67-ae442d4202a6/raw?se=2026-10-07T18%3A59%3A35Z&sp=r&sv=2026-02-06&sr=b&scid=2ea66c90-7150-543b-8815-5304cd710c09&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T06%3A40%3A28Z&ske=2026-10-08T06%3A40%3A28Z&sks=b&skv=2026-02-06&sig=HW5S4Xp6Y2IwvrCQ1TXI1f7iI4RccGovTbqIVvKrDDw%3D'
+          CANDIDATE_URL: 'https://sdmntprnznorth.oaiusercontent.com/files/00000000-e564-820b-9df3-c29ee709b951/raw?se=2026-10-07T19%3A02%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=0624fca2-5282-58d6-9952-b72e029c0e44&skoid=8cb40e9f-389f-4cf6-afaa-e5bd4c7fd98c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T00%3A52%3A32Z&ske=2026-10-08T00%3A52%3A32Z&sks=b&skv=2026-02-06&sig=u3xiurakQBavmapDmnOQBq4/7A8xtTzCpI46nxGlwsQ%3D'
         run: |
           python - <<'PY'
-          import urllib.request,os,hashlib,zipfile,io,pathlib
-          raw=urllib.request.urlopen(os.environ['CANDIDATE_URL'],timeout=90).read()
+          import urllib.request,urllib.error,os,hashlib,zipfile,io,pathlib
+          try:raw=urllib.request.urlopen(os.environ['CANDIDATE_URL'],timeout=90).read()
+          except urllib.error.HTTPError as e:
+            print('Transfer error',e.code,'date',e.headers.get('Date'),'body',e.read(1800).decode(errors='replace'));raise
           assert hashlib.sha256(raw).hexdigest()=='6d86ae2bf92a24ca292c80602cf8ff53e062238245668da5cf7e7801fbd65acb'
           z=zipfile.ZipFile(io.BytesIO(raw));d=pathlib.Path(os.environ['RUNNER_TEMP'])/'m400-candidate';d.mkdir()
           for n in z.namelist():
             assert not pathlib.PurePosixPath(n).is_absolute() and '..' not in pathlib.PurePosixPath(n).parts
             assert not n.lower().endswith(('.ttf','.ttc','.otf','.woff','.woff2','.env'))
-          z.extractall(d)
-          print('Accepted exact publication package:',len(raw),'bytes,',len(z.namelist()),'files')
+          z.extractall(d);print('Accepted exact package',len(raw),'bytes')
           PY
       - uses: actions/checkout@v4
         with:
@@ -49,13 +50,13 @@ jobs:
           python-version: '3.11'
       - run: pip install requests pymupdf python-docx beautifulsoup4 playwright
       - run: python -m playwright install --with-deps chromium
-      - name: Build only volume400 entrances and preserve other catalog records
+      - name: Build only volume400 entrances
         run: python "$RUNNER_TEMP/m400-candidate/build-tools/install.py" "$RUNNER_TEMP/m400-candidate" "$GITHUB_WORKSPACE"
       - name: Desktop and mobile browser acceptance
         run: |
           python -m http.server 8765 --directory public > "$RUNNER_TEMP/http.log" 2>&1 &
           python "$RUNNER_TEMP/m400-candidate/build-tools/test_web.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/m400-candidate/qa/browser"
-      - name: Retain candidate and visual acceptance evidence
+      - name: Retain candidate and evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
