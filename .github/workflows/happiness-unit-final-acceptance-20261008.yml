@@ -33,26 +33,81 @@ jobs:
           python3 -m pip install --quiet --timeout 25 --retries 1 beautifulsoup4 playwright
           timeout 150s python3 -m playwright install chromium
           timeout 40s sudo apt-get -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 -o Acquire::Retries=1 install -y -qq fonts-noto-cjk || echo 'Using system fonts'
-      - name: Wait for catalogue propagation without weakening metadata checks
+      - name: Verify live triad, reader page state, task handoffs and protected PDFs
         run: |
           python3 - <<'PY'
-          import runpy,json,time,hashlib
+          import runpy,json,time
           from urllib.request import Request,urlopen
-          m=runpy.run_path('tools/happiness_publication_unit_20261008.py');qa=m['QA'];attempts=[]
+          from urllib.parse import urlparse,parse_qs,quote
+          from playwright.sync_api import sync_playwright
+          m=runpy.run_path('tools/happiness_publication_unit_20261008.py');qa=m['QA'];attempts=[];navigation=[]
           def fresh_get(url):
               limit=12 if url=='https://sdeuniverses.com/books/catalog.json' else 1
               for i in range(limit):
                   with urlopen(Request(url,headers={'User-Agent':'Happiness-Unit-Final-Acceptance','Cache-Control':'no-cache','Pragma':'no-cache'}),timeout=60) as r:
-                      data=r.read();status=r.status;actual=r.geturl();headers={k:v for k,v in r.headers.items() if k.lower() in ('age','cache-control','cf-cache-status','etag','last-modified','date')}
+                      data=r.read();status=r.status;actual=r.geturl()
                   if limit==1:return data,status,actual
-                  cat=json.loads(data);b=next(x for x in cat['books'] if x['id']=='happiness-secret')
+                  b=next(x for x in json.loads(data)['books'] if x['id']=='happiness-secret')
                   ok=b.get('learnUrl')==m['BASE']+'agent/learning.html' and b.get('publicationUnit',{}).get('revision')==m['REV']
-                  attempts.append({'attempt':i,'url':actual,'status':status,'headers':headers,'book_record':b,'ready':ok})
+                  attempts.append({'attempt':i,'url':actual,'status':status,'book_record':b,'ready':ok})
                   (qa/'catalogue-propagation.json').write_text(json.dumps(attempts,ensure_ascii=False,indent=2))
                   if ok:return data,status,actual
                   time.sleep(5)
-              raise RuntimeError('Plain catalogue URL still lacks deployed unit metadata; evidence retained')
+              raise RuntimeError('Catalogue metadata not yet current')
+          def normal(url):
+              u=urlparse(str(url));return (u.netloc,u.path.rstrip('/').removesuffix('.html'))
+          def check(urls,label):
+              results=[];volume=json.loads((qa/'patch.json').read_text())['volumeLabel']
+              with sync_playwright() as p:
+                  browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+                  for si,shelf_url in enumerate(urls):
+                      for name,w,h in [('desktop',1366,900),('mobile',390,844)]:
+                          ctx=browser.new_context(viewport={'width':w,'height':h},reduced_motion='reduce');page=ctx.new_page();model_calls=[]
+                          page.on('request',lambda r:model_calls.append(r.url) if '/api/wds/' in r.url else None)
+                          shelf=shelf_url+'?q='+quote('幸福的奥秘');stage='shelf'
+                          def open_shelf():
+                              page.goto(shelf,wait_until='domcontentloaded',timeout=60000)
+                              c=page.locator('[data-id="happiness-secret"]');c.wait_for(state='visible',timeout=45000);return c
+                          def follow(link,expected):
+                              before=page.url;href=link.get_attribute('href');link.click(timeout=30000)
+                              navigation.append({'before':before,'href':href,'after_click':page.url,'expected':expected})
+                              (qa/'navigation.json').write_text(json.dumps(navigation,ensure_ascii=False,indent=2))
+                              page.wait_for_url(lambda u:normal(u)==normal(expected),wait_until='domcontentloaded',timeout=30000)
+                              navigation[-1]['accepted_destination']=page.url
+                          try:
+                              card=open_shelf();assert card.locator('[data-unit-action]').count()==3
+                              assert volume in card.locator('.ordinal').inner_text()
+                              for kind in ['read','learn','agent']:
+                                  a=card.locator('[data-unit-action="'+kind+'"]');a.scroll_into_view_if_needed();assert a.is_visible()
+                                  assert a.evaluate('(e)=>e.scrollWidth<=e.clientWidth+2');a.focus();assert a.evaluate('(e)=>e===document.activeElement')
+                              assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2')
+                              card.screenshot(path=str(qa/(label+'-'+str(si)+'-'+name+'-card.png')))
+                              stage='read';follow(card.locator('[data-unit-action="read"]'),m['BASE']+'read.html')
+                              assert '幸福的奥秘' in page.title();read_url=page.url
+                              stage='learn';card=open_shelf();follow(card.locator('[data-unit-action="learn"]'),m['BASE']+'agent/learning.html')
+                              assert page.locator('main>section').count()==9
+                              assert volume in page.locator('main').inner_text();learn_url=page.url
+                              if si==0:page.screenshot(path=str(qa/(label+'-'+name+'-learning.png')),full_page=True)
+                              stage='task-handoff';follow(page.locator('main>section').nth(3).locator('a').last,m['BASE']+'agent/?lesson=4')
+                              assert parse_qs(urlparse(page.url).query).get('lesson')==['4']
+                              page.locator('#app').wait_for(state='visible',timeout=60000)
+                              page.wait_for_function("document.querySelector('#q').value.includes('第4章配套学习任务')",timeout=45000)
+                              assert page.locator('#agName').inner_text()=='回甘' and volume in page.locator('#publication-unit-nav').inner_text()
+                              stage='agent';card=open_shelf();follow(card.locator('[data-unit-action="agent"]'),m['BASE']+'agent/')
+                              page.locator('#app').wait_for(state='visible',timeout=60000)
+                              assert page.locator('#agName').inner_text()=='回甘' and not model_calls
+                              results.append({'shelf':shelf_url,'viewport':name,'three_visible_links':True,'three_real_entry_clicks':True,'read_url':read_url,'learning_url':learn_url,'agent_url':page.url,'lesson_4_transferred':True,'volume_label_visible':volume,'model_calls':0})
+                              (qa/(label+'-browser.json')).write_text(json.dumps({'success':len(results)==len(urls)*2,'results':results,'realModelTested':False},ensure_ascii=False,indent=2))
+                          except Exception as e:
+                              (qa/'browser-failure.json').write_text(json.dumps({'stage':stage,'shelf':shelf_url,'viewport':name,'actual_url':page.url,'all_pages':[x.url for x in ctx.pages],'error':str(e)},ensure_ascii=False,indent=2))
+                              page.screenshot(path=str(qa/'failure.png'),full_page=True)
+                              (qa/'failure.html').write_text(page.content());raise
+                          finally:ctx.close()
+                  browser.close()
+              (qa/'navigation.json').write_text(json.dumps(navigation,ensure_ascii=False,indent=2))
+              print('LIVE_BROWSER_ACCEPTED',len(results),'views and',len(results)*3,'entry clicks',flush=True)
           m['live'].__globals__['get']=fresh_get
+          m['live'].__globals__['browser_check']=check
           m['live']()
           PY
       - uses: actions/upload-artifact@v4
