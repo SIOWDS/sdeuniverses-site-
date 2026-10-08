@@ -2,7 +2,7 @@
   "testsPassed": 27,
   "scope": "offline pure storage merge + source contracts + mocked transport",
   "realModelTested": false,
-  "notes": "IndexedDB transaction persistence and browser layout require live QA",
+  "notes": "Live browser navigation, source/page carry, material preview, task invalidation and confirmation guard passed. IndexedDB writes were not exercised in the user archive; storage merge tested offline. No real model call.",
   "sourceUnits": 95,
   "learningProblems": 33,
   "bodyUnchanged": true,
@@ -13,5 +13,14 @@
     "navigationOverlayPages": 8,
     "appendixPages": 2
   },
-  "reindexRequested": false
+  "reindexRequested": false,
+  "liveBrowserChecks": [
+    "33 questions rendered",
+    "source anchor to same problem",
+    "PDF page 15 of 278",
+    "PDF reading focus to same problem",
+    "zero private records in default preview",
+    "unconfirmed send blocked",
+    "task change invalidates preview"
+  ]
 }
