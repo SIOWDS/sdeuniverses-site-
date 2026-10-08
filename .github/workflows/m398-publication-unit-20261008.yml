@@ -50,6 +50,7 @@ jobs:
           assert hashlib.sha256(base64.b64decode(image,validate=True)).hexdigest()=='fe015500012893c0861b89c3243508fe596bfb4bce7cf3ec185a143b25e1edc3','image transfer checksum mismatch'
           (root/'tools/m398_unit/knife-scene.b64').write_text(image,encoding='utf-8')
           PY
+          python3 tools/m398_unit/patch_v1.py
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -66,7 +67,10 @@ jobs:
       - name: Build only book398 and its three shelf cards
         run: python tools/m398_unit/build.py
       - name: Browser engineering and synthetic protocol tests
-        run: python tools/m398_unit/test.py
+        run: |
+          mkdir -p m398-qa
+          set -o pipefail
+          python tools/m398_unit/test.py 2>&1 | tee m398-qa/test-output.txt
       - name: Commit verified candidate only to working branch
         run: |
           python - <<'PY'
