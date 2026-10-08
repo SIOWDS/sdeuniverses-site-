@@ -2,14 +2,15 @@ name: M398 publication unit build and acceptance
 on:
   push:
     branches: [sde/m398-publication-unit-20261008]
-    paths:
-      - .github/workflows/m398-publication-unit-20261008.yml
+    paths: [.github/workflows/m398-publication-unit-20261008.yml]
   workflow_dispatch:
 permissions:
   contents: write
 concurrency:
   group: m398-unit-candidate
   cancel-in-progress: false
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
 jobs:
   candidate:
     if: github.ref == 'refs/heads/sde/m398-publication-unit-20261008'
@@ -32,6 +33,7 @@ jobs:
             /public/books/agent/
             /public/monographs/index.html
             /public/sites/read/library/index.html
+            /ops/m398-unit/
             /.github/workflows/m398-publication-unit-20261008.yml
       - name: Verify and restore reviewed source
         run: |
@@ -39,15 +41,15 @@ jobs:
           import base64, hashlib, json, lzma, pathlib
           root=pathlib.Path('.'); stage=root/'.publish/m398-unit-v1'
           raw=base64.b64decode(''.join((stage/f'src{i:02}.b64').read_text().strip() for i in range(6)),validate=True)
-          assert hashlib.sha256(raw).hexdigest()=='95feaf1916f5d46961f16aa27aaca0873d76f54814f2585a3a1cbff5be339170','source transfer checksum mismatch'
+          assert hashlib.sha256(raw).hexdigest()=='95feaf1916f5d46961f16aa27aaca0873d76f54814f2585a3a1cbff5be339170'
           files=json.loads(lzma.decompress(raw))
           allowed={f'tools/m398_unit/{n}' for n in ['SKILL.md','app.js','build.py','core.js','page.html','tasks.py','test.py','unit.css']}
           assert set(files)==allowed
           for name,text in files.items():
               p=root/name;p.parent.mkdir(parents=True,exist_ok=True)
-              if not p.exists(): p.write_text(text,encoding='utf-8')
+              if not p.exists():p.write_text(text,encoding='utf-8')
           image=''.join((stage/f'img{i:02}.b64').read_text().strip() for i in range(6))
-          assert hashlib.sha256(base64.b64decode(image,validate=True)).hexdigest()=='fe015500012893c0861b89c3243508fe596bfb4bce7cf3ec185a143b25e1edc3','image transfer checksum mismatch'
+          assert hashlib.sha256(base64.b64decode(image,validate=True)).hexdigest()=='fe015500012893c0861b89c3243508fe596bfb4bce7cf3ec185a143b25e1edc3'
           (root/'tools/m398_unit/knife-scene.b64').write_text(image,encoding='utf-8')
           PY
           python3 tools/m398_unit/patch_v1.py
@@ -58,11 +60,11 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq fonts-noto-cjk
-          python -m pip install --disable-pip-version-check beautifulsoup4 pillow pymupdf reportlab playwright
+          python -m pip install --quiet beautifulsoup4 pillow pymupdf reportlab playwright
           python -m playwright install --with-deps chromium
           python - <<'PY' >> "$GITHUB_ENV"
           from playwright.sync_api import sync_playwright
-          with sync_playwright() as p: print('CHROMIUM_PATH='+p.chromium.executable_path)
+          with sync_playwright() as p:print('CHROMIUM_PATH='+p.chromium.executable_path)
           PY
       - name: Build only book398 and its three shelf cards
         run: python tools/m398_unit/build.py
@@ -74,7 +76,7 @@ jobs:
       - name: Commit verified candidate only to working branch
         run: |
           python - <<'PY'
-          import json,pathlib,subprocess
+          import json,pathlib
           report=json.loads(pathlib.Path('m398-build-report.json').read_text())
           assert report['realModelTested'] is False and report['reindexRequested'] is False
           result=json.loads(pathlib.Path('m398-qa/engineering-report.json').read_text())
@@ -82,19 +84,18 @@ jobs:
           out=pathlib.Path('ops/m398-unit/acceptance');out.mkdir(parents=True,exist_ok=True)
           for src in ['m398-build-report.json','m398-qa/engineering-report.json']:
               (out/pathlib.Path(src).name).write_bytes(pathlib.Path(src).read_bytes())
-          (out/'STATUS.md').write_text('Candidate: browser engineering and synthetic protocol tests only. No real model call, no learning-effect validation, no reindex. Source and current manuscript remain distinct. Production deployment and live verification are a later step.\n',encoding='utf-8')
+          (out/'STATUS.md').write_text('Candidate engineering and synthetic protocol tests passed. No real model call, no learning-effect validation, no reindex. Production deployment and live verification remain separate.\n',encoding='utf-8')
           PY
           git config user.name 'SDE publication automation'
           git config user.email 'actions@users.noreply.github.com'
-          git add tools/m398_unit public/books/m/398 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html ops/m398-unit/acceptance
+          git add --sparse tools/m398_unit public/books/m/398 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html ops/m398-unit/acceptance
           git diff --cached --check
           git diff --cached --name-only > m398-qa/changed-paths.txt
           git commit -m 'feat(m398): verified forty-chapter learning unit, scoped dialogue and knife cover' || test -z "$(git diff --cached --name-only)"
           git push origin HEAD:sde/m398-publication-unit-20261008
           git rev-parse HEAD > m398-qa/candidate-commit.txt
-      - name: Upload actual candidate and test evidence
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: m398-publication-unit-candidate
           path: |
