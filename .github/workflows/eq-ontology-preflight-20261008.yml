@@ -1,0 +1,56 @@
+name: EQ ontology publication reference preflight
+on:
+  push:
+    branches: [codex/eq-ontology-20261008]
+    paths: [.github/workflows/eq-ontology-preflight-20261008.yml]
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Read only reference layouts, catalog and deployment configuration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import os,json,pathlib,urllib.request,base64,re
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'eq-reference';root.mkdir()
+          api='https://api.github.com/repos/SIOWDS/sdeuniverses-site-/'
+          def gh(path):
+            r=urllib.request.Request(api+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+            return json.load(urllib.request.urlopen(r,timeout=60))
+          def save(path):
+            d=gh('contents/'+path+'?ref=main')
+            raw=base64.b64decode(d.get('content','')) if d.get('content') else urllib.request.urlopen(d['download_url'],timeout=90).read()
+            p=root/'repo'/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw)
+            return raw
+          info={'errors':[],'site_written':False,'reindex_executed':False}
+          for path in ['README.md','package.json','wrangler.toml','wrangler.jsonc','tools/build_bookshelf.py','public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/books/m/220/index.html','public/books/m/220/read.html','public/books/m/220/text/index.html','public/books/m/302/index.html','public/books/m/302/read.html','public/books/m/302/text/index.html']:
+            try:save(path)
+            except Exception as e:info['errors'].append([path,str(e)])
+          for w in gh('contents/.github/workflows?ref=main'):
+            if w['type']=='file':
+              try:save(w['path'])
+              except Exception as e:info['errors'].append([w['path'],str(e)])
+          for p in ['scripts','tools','public/books/happiness-secret']:
+            try:(root/(p.replace('/','_')+'-listing.json')).write_text(json.dumps(gh('contents/'+p+'?ref=main'),ensure_ascii=False,indent=2))
+            except Exception as e:info['errors'].append([p,str(e)])
+          cat=json.loads((root/'repo/public/books/catalog.json').read_text());books=cat['books'] if isinstance(cat,dict) else cat
+          info['catalog_matches']=[b for b in books if any(q in str(b) for q in ['情商的本体论革命','幸福的奥秘']) or b.get('number') in [220,302]]
+          info['catalog_count']=len(books)
+          pdfs={'220':'https://sdeuniverses.com/students/wang-desheng/my-three-treasures/m220/my-three-treasures-reader-v3.pdf','302':'https://sdeuniverses.com/students/chen-feng/ai-death-dilemma/m302/ai-death-dilemma-reader-v2.pdf?v=20261004c'}
+          for key,url in pdfs.items():
+            try:
+              raw=urllib.request.urlopen(url,timeout=100).read();assert raw[:5]==b'%PDF-';(root/(key+'-reference.pdf')).write_bytes(raw)
+            except Exception as e:info['errors'].append([key+'-reference.pdf',str(e)])
+          (root/'preflight.json').write_text(json.dumps(info,ensure_ascii=False,indent=2))
+          print('PREFLIGHT',json.dumps(info,ensure_ascii=False))
+          print('WORKFLOWS',json.dumps([p.name for p in (root/'repo/.github/workflows').glob('*')]))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eq-ontology-reference-20261008
+          path: ${{ runner.temp }}/eq-reference/
+          retention-days: 7
