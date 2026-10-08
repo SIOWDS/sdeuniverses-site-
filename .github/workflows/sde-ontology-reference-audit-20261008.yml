@@ -1,0 +1,42 @@
+name: SDE ontology reference and previous edition audit
+on:
+  push:
+    branches: [sde-ontology-complete-20261008]
+    paths: [.github/workflows/sde-ontology-reference-audit-20261008.yml]
+permissions:
+  contents: read
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Collect publication references only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import urllib.request,pathlib,os,json,base64,concurrent.futures
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'intro-reference';root.mkdir()
+          def gh(path):
+              req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/'+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              return json.load(urllib.request.urlopen(req,timeout=60))
+          paths=['public/books/m/220/index.html','public/books/m/220/read.html','public/books/m/302/index.html','public/books/m/302/read.html','public/books/sde-ontology-intro/index.html','public/books/sde-ontology-intro/read.html','public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','tools/build_bookshelf.py','wrangler.toml','package.json']
+          paths += [e['path'] for e in gh('contents/.github/workflows?ref=main') if e['type']=='file']
+          def get(path):
+              try:
+                  e=gh('contents/'+path+'?ref=main');raw=base64.b64decode(e['content']) if e.get('content') else urllib.request.urlopen(e['download_url'],timeout=90).read();p=root/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw)
+                  return {'path':path,'sha':e['sha'],'bytes':len(raw)}
+              except Exception as e:return {'path':path,'error':str(e)}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:result=list(ex.map(get,paths))
+          try:
+              raw=urllib.request.urlopen('https://books.sdeuniverses.com/SDE-Ontology-Intro-Preview-2026.pdf',timeout=120).read();(root/'previous-preview.pdf').write_bytes(raw)
+          except Exception as e:result.append({'previous_pdf_error':str(e)})
+          (root/'audit.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+          print('REFERENCES_COLLECTED',len(result),'LIVE_SITE_UNCHANGED','NO_REINDEX')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sde-ontology-reference-audit-20261008
+          path: ${{ runner.temp }}/intro-reference/
+          include-hidden-files: true
+          retention-days: 14
