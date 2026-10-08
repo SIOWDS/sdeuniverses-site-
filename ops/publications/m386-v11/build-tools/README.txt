@@ -1,0 +1,1 @@
+M386 publication workspace recipes. Run from a workspace containing downloads/, output/, qa/ and site/ checkout. Dependencies: python-docx, PyMuPDF, Pillow, lxml; Noto Serif/Sans CJK SC. Original DOCX source SHA and publication edits are recorded in ../editorial-report.json. Publication was a formatting and delivery operation; manuscript body was preserved.
