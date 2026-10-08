@@ -1,0 +1,65 @@
+name: M398 definitive publication acceptance
+on:
+  push:
+    branches: ['publish/m398-judgment-genesis-20261008']
+    paths: ['.github/workflows/m398-definitive-acceptance.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Prepare browser and Chinese font
+        run: |
+          python -m pip install --quiet --timeout 30 --retries 2 beautifulsoup4 pymupdf playwright pyyaml
+          python -m playwright install chromium
+          python - <<'PY'
+          import urllib.request,pathlib,subprocess
+          p=pathlib.Path.home()/'.local/share/fonts';p.mkdir(parents=True,exist_ok=True)
+          u='https://raw.githubusercontent.com/notofonts/noto-cjk/main/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-Regular.otf'
+          with urllib.request.urlopen(u,timeout=90) as r:b=r.read()
+          assert b[:4]==b'OTTO' and len(b)>1000000
+          (p/'NotoSerifCJKsc-Regular.otf').write_bytes(b);subprocess.run(['fc-cache','-f'],check=True)
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: book398-edition-v1-publication-evidence
+          run-id: 37707462677
+          github-token: ${{ github.token }}
+          repository: SIOWDS/sdeuniverses-site-
+          path: ${{ runner.temp }}/book398
+      - name: Apply exact committed reader amendment to expected snapshot
+        run: |
+          python - <<'PY'
+          import pathlib,os,urllib.request,json,hashlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'book398';q=p/'qa';sha='d179d7cfd5a806ab73ff3812e959bfd2bc3ad6bd'
+          u='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/'+sha+'/public/books/m/398/read.html'
+          with urllib.request.urlopen(u,timeout=60) as r:b=r.read()
+          assert hashlib.sha256(b).hexdigest()=='e1b56215b20653c3e9d3817af8c6e29a5d07d93cac34ab21ee3848d7289e5869'
+          assert '一个理论、一个工具、一声呼喊，与未来的主体经济学' not in b.decode()
+          (p/'public/books/m/398/read.html').write_bytes(b)
+          j=json.loads((q/'candidate-files.json').read_text());j['books/m/398/read.html']={'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()};(q/'candidate-files.json').write_text(json.dumps(j,indent=2))
+          j=json.loads((q/'publication-commit.json').read_text());j['content_commit']=j['sha'];j['sha']=sha;j['reader_subtitle']='从一把刀开始，重写判断力的问题';(q/'publication-commit.json').write_text(json.dumps(j,ensure_ascii=False,indent=2))
+          f=p/'build-tools/browser_qa.py';s=f.read_text();needle="assert page.locator('#pt').inner_text()=='342',page.locator('#pt').inner_text()";assert needle in s
+          f.write_text(s.replace(needle,needle+"\n   assert page.locator('.sub.hideS').inner_text()=='从一把刀开始，重写判断力的问题'"))
+          PY
+      - name: Verify full deployed book files and three shelves
+        run: |
+          python - <<'PY'
+          import urllib.request,yaml,subprocess,os
+          u='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/6f02e4ae74d1670bbc27b62e84427b58cda94971/.github/workflows/m398-live-acceptance-v1.yml'
+          with urllib.request.urlopen(u,timeout=60) as r:data=yaml.safe_load(r.read())
+          step=next(s for s in data['jobs']['verify']['steps'] if s['name']=='Verify live content and all binary hashes')
+          subprocess.run(step['run'],shell=True,executable='/bin/bash',check=True,env=os.environ)
+          PY
+      - name: Verify final desktop and mobile rendering
+        run: python "$RUNNER_TEMP/book398/build-tools/browser_qa.py" "$RUNNER_TEMP/book398" "$RUNNER_TEMP/book398/qa/live-browser" https://sdeuniverses.com
+      - name: Save definitive acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m398-definitive-publication-acceptance
+          retention-days: 14
+          path: ${{ runner.temp }}/book398/qa/
