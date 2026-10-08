@@ -1,3 +1,4 @@
+import { handleM7Read } from "./m7-publication.js";
 // SDE Universes site worker: visit counter + static assets
 import { handleChatPrimary } from "./chatprimary.js";
 
@@ -13376,6 +13377,7 @@ export default {
         const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + _rm + BYOK_NO_DAY))).json());
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在" + (BA ? "「书生」" : b.guide ? "「SDE 对谈」" : "「陪读」") + "入口已用 " + (lr.inDay || 0) + "/" + _rd + " 次，明天再来（额度按你的 Key 计，各入口独立）。") : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
+      if (b.unitId === "m-7") return handleM7Read(b, env, VC, KEY, _cors(), request.signal);
       // ── 出流前只做“廉价且必须早退”的事:上面已完成 method/参数/Key/限流校验。──
       // 重活(内化心得、全站 RAG、以及 await 思考满档模型首字节)一律移入 stream.start():
       // 先把 200 SSE 流交出去,再在流内干活——冷启动慢/首字节慢只会退化成流内一条温和提示,
@@ -18781,3 +18783,4 @@ export default {
     return resp;
   },
 };
+
