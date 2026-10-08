@@ -52,7 +52,7 @@ with sync_playwright() as p:
         if route.request.method!='GET':posts.append(route.request.url)
         route.abort()
     ctx.route('**/api/wds/**',no_model)
-    page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
+    page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)));page.on('dialog',lambda d:d.accept())
     page.goto(BASE+'/books/m/398/agent/learning.html?lesson=29',wait_until='networkidle');page.wait_for_selector('#workspace:not([hidden])',timeout=30000);page.wait_for_function("document.querySelector('#source-version').textContent.includes('指纹')")
     check('live learning chapter29 bound',page.locator('#source-link').get_attribute('href').endswith('#chapter-29'))
     page.locator('#initial').fill('生产验收合成文字：原猜想和修订命题必须分开。');page.locator('#save-initial').click();page.wait_for_function("document.querySelector('#initial').disabled")
