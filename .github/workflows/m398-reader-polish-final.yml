@@ -1,0 +1,101 @@
+name: M398 final reader polish and acceptance
+on:
+  push:
+    branches: ['publish/m398-judgment-genesis-20261008']
+    paths: ['.github/workflows/m398-reader-polish-final.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: book398-edition-v1-publication-evidence
+          run-id: 37707462677
+          github-token: ${{ github.token }}
+          repository: SIOWDS/sdeuniverses-site-
+          path: ${{ runner.temp }}/book398
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/398/read.html
+      - name: Correct only volume398 reader subtitle and commit
+        run: |
+          python - <<'PY'
+          import subprocess,pathlib,json,os,hashlib
+          root=pathlib.Path(os.environ['GITHUB_WORKSPACE']);p=root/'public/books/m/398/read.html'
+          pkg=pathlib.Path(os.environ['RUNNER_TEMP'])/'book398';q=pkg/'qa'
+          old='一个理论、一个工具、一声呼喊，与未来的主体经济学';new='从一把刀开始，重写判断力的问题'
+          def git(*args,check=True):return subprocess.run(['git',*args],cwd=root,text=True,capture_output=True,check=check)
+          git('config','user.name','SDE Publication');git('config','user.email','publication@users.noreply.github.com')
+          for attempt in range(4):
+              git('fetch','origin','main','--depth=1');git('reset','--hard','origin/main')
+              text=p.read_text()
+              if old not in text:
+                  assert new in text
+                  break
+              assert text.count(old)==1
+              p.write_text(text.replace(old,new))
+              git('add','public/books/m/398/read.html')
+              changed=git('diff','--cached','--name-only').stdout.splitlines();assert changed==['public/books/m/398/read.html'],changed
+              git('commit','-m','Polish volume398 reader subtitle; preserve book text and downloads [skip reindex]')
+              push=git('push','origin','HEAD:main',check=False)
+              if push.returncode==0:break
+          else:raise RuntimeError('Concurrent main updates prevented safe publication')
+          sha=git('rev-parse','HEAD').stdout.strip();raw=p.read_bytes()
+          (pkg/'public/books/m/398/read.html').write_bytes(raw)
+          hashes=json.loads((q/'candidate-files.json').read_text());hashes['books/m/398/read.html']={'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)};(q/'candidate-files.json').write_text(json.dumps(hashes,indent=2))
+          receipt=json.loads((q/'publication-commit.json').read_text());receipt['content_commit']=receipt['sha'];receipt['sha']=sha;receipt['reader_subtitle_patch']={'old':old,'new':new,'only_path':'public/books/m/398/read.html'}
+          (q/'publication-commit.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2));print('FINAL_READER_COMMIT='+sha)
+          PY
+      - name: Prepare browser and Chinese font for visual inspection
+        run: |
+          python -m pip install --quiet --timeout 30 --retries 2 beautifulsoup4 pymupdf playwright pyyaml
+          python -m playwright install chromium
+          python - <<'PY'
+          import urllib.request,pathlib,subprocess
+          p=pathlib.Path.home()/'.local/share/fonts';p.mkdir(parents=True,exist_ok=True)
+          u='https://raw.githubusercontent.com/notofonts/noto-cjk/main/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-Regular.otf'
+          with urllib.request.urlopen(u,timeout=90) as r:b=r.read()
+          assert len(b)>1000000 and b[:4]==b'OTTO'
+          (p/'NotoSerifCJKsc-Regular.otf').write_bytes(b)
+          subprocess.run(['fc-cache','-f'],check=True)
+          PY
+      - name: Wait for the exact reader revision and verify full live content
+        run: |
+          python - <<'PY'
+          import urllib.request,time,yaml,subprocess,os,pathlib
+          start=time.time()
+          while time.time()-start<600:
+              try:
+                  u='https://sdeuniverses.com/books/m/398/read.html?final398='+str(int(time.time()))
+                  with urllib.request.urlopen(u,timeout=45) as r:t=r.read().decode()
+                  if '从一把刀开始，重写判断力的问题' in t and '一个理论、一个工具、一声呼喊，与未来的主体经济学' not in t:break
+              except Exception:pass
+              time.sleep(15)
+          else:raise RuntimeError('Reader patch not yet deployed')
+          u='https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/6f02e4ae74d1670bbc27b62e84427b58cda94971/.github/workflows/m398-live-acceptance-v1.yml'
+          with urllib.request.urlopen(u,timeout=60) as r:data=yaml.safe_load(r.read())
+          step=next(s for s in data['jobs']['verify']['steps'] if s['name']=='Verify live content and all binary hashes')
+          subprocess.run(step['run'],shell=True,executable='/bin/bash',check=True,env=os.environ)
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'book398/build-tools/browser_qa.py'
+          s=p.read_text();needle="assert page.locator('#pt').inner_text()=='342',page.locator('#pt').inner_text()";assert needle in s
+          s=s.replace(needle,needle+"\n   assert page.locator('.sub.hideS').inner_text()=='从一把刀开始，重写判断力的问题'")
+          p.write_text(s)
+          PY
+      - name: Verify final desktop mobile reader and book-agent frontend
+        run: python "$RUNNER_TEMP/book398/build-tools/browser_qa.py" "$RUNNER_TEMP/book398" "$RUNNER_TEMP/book398/qa/live-browser" https://sdeuniverses.com
+      - name: Preserve final content and visual acceptance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m398-final-reader-publication-evidence
+          retention-days: 14
+          path: ${{ runner.temp }}/book398/qa/
