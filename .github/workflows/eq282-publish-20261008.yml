@@ -1,0 +1,85 @@
+name: Publish volume282 EQ ontology complete edition
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/eq282-publish-20261008.yml]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: volume282-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/282/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /.publish/volume-reservations/282.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: eq282-exact-candidate-v1
+          run-id: 37779304362
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/eq282
+      - name: Verify accepted candidate and apply exact final reader subtitle correction
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,urllib.request
+          req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/actions/runs/37779770270',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          v=json.load(urllib.request.urlopen(req));assert v['conclusion']=='success' and v['head_sha']=='d59f8316aa4f5212fe9a6f3d8091b58dd5f25cde'
+          r=Path(os.environ['RUNNER_TEMP'])/'eq282';b=r/'book';(r/'qa').mkdir(exist_ok=True)
+          m=json.loads((b/'publication-manifest.json').read_text());assert m['release_sha256']=='e7ec595280bf60907a7e19cc58d68041d13c2ecc7d210a8f3275985156b0e945'
+          for f in m['files']:
+            data=(b/f['path']).read_bytes();assert len(data)==f['bytes'] and hashlib.sha256(data).hexdigest()==f['sha256']
+          p=b/'read.html';s=p.read_text();old='一个理论、一个工具、一声呼喊，与未来的主体经济学';assert s.count(old)==1
+          p.write_text(s.replace(old,'从情绪管理到SDE幸福律的发生能力'))
+          for f in m['files']:
+            data=(b/f['path']).read_bytes();f['bytes']=len(data);f['sha256']=hashlib.sha256(data).hexdigest()
+          m['release_sha256']=hashlib.sha256(json.dumps(m['files'],ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+          assert m['release_sha256']=='083d10fa9962b8b554d4942da5fda6afbad4b58e1c497d1b71fab055b7bda3f3'
+          (b/'publication-manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          p=r/'build-tools/browser_qa.py';s=p.read_text();s=s.replace("page.goto(base+'read.html',wait_until='domcontentloaded',timeout=120000)","page.goto(base+'read.html',wait_until='domcontentloaded',timeout=120000)\n  assert '从情绪管理到SDE幸福律的发生能力' in page.locator('.sub').inner_text();assert '一声呼喊' not in page.content()")
+          p.write_text(s)
+          (r/'qa/final-correction.json').write_text(json.dumps({'scope':'read.html display subtitle only','body_unchanged':True,'pdf_unchanged':True,'release_sha256':m['release_sha256']},ensure_ascii=False,indent=2))
+          PY
+      - name: Prepare final browser validation
+        run: |
+          python3 -m pip install --quiet playwright beautifulsoup4 pymupdf
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Verify corrected candidate before site changes
+        run: python3 "$RUNNER_TEMP/eq282/build-tools/browser_qa.py" "$RUNNER_TEMP/eq282"
+      - name: Preserve corrected exact full edition
+        uses: actions/upload-artifact@v4
+        with:
+          name: eq282-final-edition-v1
+          path: ${{ runner.temp }}/eq282/
+          retention-days: 14
+      - name: Atomically add only this book and reconcile current shelves
+        run: python3 "$RUNNER_TEMP/eq282/build-tools/install.py" "$RUNNER_TEMP/eq282" "$GITHUB_WORKSPACE"
+      - name: Verify public files, metadata and three bookshelves
+        run: python3 "$RUNNER_TEMP/eq282/build-tools/live_qa.py" "$RUNNER_TEMP/eq282"
+      - name: Verify actual desktop and mobile public readers
+        run: python3 "$RUNNER_TEMP/eq282/build-tools/browser_qa.py" "$RUNNER_TEMP/eq282" "https://sdeuniverses.com/books/m/282/"
+      - name: Preserve publication and live verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eq282-publication-evidence-v1
+          path: ${{ runner.temp }}/eq282/qa/
+          retention-days: 14
