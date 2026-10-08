@@ -1,0 +1,53 @@
+name: EQ volume availability and deployment references
+on:
+  push:
+    branches: [codex/eq-ontology-20261008]
+    paths: [.github/workflows/eq-volume-check-20261008.yml]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check actual volume occupancy and relevant publication reservations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import os,json,pathlib,urllib.request,base64,re,concurrent.futures
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'eq-check';root.mkdir()
+          api='https://api.github.com/repos/SIOWDS/sdeuniverses-site-/'
+          def gh(path):
+            return json.load(urllib.request.urlopen(urllib.request.Request(api+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'}),timeout=120))
+          def raw(path):
+            d=gh('contents/'+path+'?ref=main');return base64.b64decode(d['content']) if d.get('content') else urllib.request.urlopen(d['download_url'],timeout=90).read()
+          cat=json.loads(raw('public/books/catalog.json')); books=cat['books']; tree=gh('git/trees/main?recursive=1')
+          assert not tree.get('truncated'),'Tree incomplete; do not allocate volume'
+          paths=[x['path'] for x in tree['tree']]
+          volume_paths=[p for p in paths if re.search(r'(^|[/_.-])(?:m[-_]?)?282(?:[/_.-]|$)',p,re.I)]
+          possible=[x for x in tree['tree'] if x['type']=='blob' and x.get('size',0)<200000 and ('reserv' in x['path'].lower() or x['path'].startswith('.publish/')) and x['path'].endswith(('.json','.md','.txt','.yml'))]
+          reservations=[]
+          for x in possible:
+            try:
+              s=raw(x['path']).decode();
+              if re.search(r'(?<!\d)282(?!\d)',s):reservations.append({'path':x['path'],'text':s})
+            except Exception as e:reservations.append({'path':x['path'],'error':str(e)})
+          workflows=[x for x in tree['tree'] if x['path'].startswith('.github/workflows/') and x['type']=='blob']
+          (root/'workflows').mkdir()
+          def save(x):
+            data=raw(x['path']);(root/'workflows'/pathlib.Path(x['path']).name).write_bytes(data)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:list(pool.map(save,workflows))
+          for path in ['src/worker.js','public/books/catalog.json','tools/build_bookshelf.py','public/monographs/index.html','public/sites/read/library/index.html']:
+            try:
+              p=root/'repo'/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw(path))
+            except Exception as e: print('REFERENCE_MISSING',path,str(e))
+          result={'head_tree':tree['sha'],'tree_complete':True,'catalog_match':[b for b in books if b.get('number')==282 or b.get('id')=='m-282' or '9798906904812' in str(b).replace('-','')],'matching_paths':volume_paths,'reservation_matches':reservations,'reservation_files_checked':len(possible),'workflow_count':len(workflows),'site_written':False}
+          (root/'availability.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eq-volume-check-20261008
+          path: ${{ runner.temp }}/eq-check/
+          include-hidden-files: true
+          retention-days: 7
