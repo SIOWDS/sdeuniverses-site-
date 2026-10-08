@@ -74,6 +74,7 @@ jobs:
           mkdir -p m398-qa
           set -o pipefail
           python tools/m398_unit/test.py 2>&1 | tee m398-qa/test-output.txt
+          python tools/m398_unit/rollback_check.py | tee m398-qa/rollback-output.txt
       - name: Commit verified candidate only to working branch
         run: |
           python - <<'PY'
@@ -82,13 +83,16 @@ jobs:
           assert report['realModelTested'] is False and report['reindexRequested'] is False
           result=json.loads(pathlib.Path('m398-qa/engineering-report.json').read_text())
           assert result['results'] and all(x['status']=='PASS' for x in result['results'])
+          rb=json.loads(pathlib.Path('m398-qa/rollback-rehearsal.json').read_text())
+          assert rb['results'] and all(x['status']=='PASS' for x in rb['results'])
           out=pathlib.Path('ops/m398-unit/acceptance');out.mkdir(parents=True,exist_ok=True)
-          for src in ['m398-build-report.json','m398-qa/engineering-report.json']:
+          for src in ['m398-build-report.json','m398-qa/engineering-report.json','m398-qa/rollback-rehearsal.json']:
               (out/pathlib.Path(src).name).write_bytes(pathlib.Path(src).read_bytes())
-          (out/'STATUS.md').write_text('Candidate engineering and synthetic protocol tests passed. No real model call, no learning-effect validation, no reindex. Production deployment and live verification remain separate.\n',encoding='utf-8')
+          (out/'STATUS.md').write_text('Candidate engineering, synthetic protocol and isolated rollback reconstruction tests passed. No real model call, no learning-effect validation, no reindex. Production deployment and live verification remain separate.\n',encoding='utf-8')
           PY
           git config user.name 'SDE publication automation'
           git config user.email 'actions@users.noreply.github.com'
+          git check-attr diff -- public/books/m/398/downloads/judgment-learning-v1.0.pdf
           git add --sparse tools/m398_unit public/books/m/398 public/books/catalog.json public/books/index.html public/monographs/index.html public/sites/read/library/index.html ops/m398-unit/acceptance
           git diff --cached --check
           git diff --cached --name-only > m398-qa/changed-paths.txt
