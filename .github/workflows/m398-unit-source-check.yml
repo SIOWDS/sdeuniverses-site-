@@ -8,52 +8,28 @@ permissions:
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-          sparse-checkout: |
-            public/books/m/398
-            public/books/happiness-secret
-            public/books/agent
-            public/books/catalog.json
-            public/books/agents.json
-            public/books/index.html
-            public/monographs/index.html
-            functions/api/wds
-            .github/workflows
-            package.json
           sparse-checkout-cone-mode: false
-      - name: Save scoped source and deployment baseline
+          sparse-checkout: |
+            /src/worker.js
+            /public/books/bookshelf.css
+            /public/books/bookshelf.js
+            /public/sites/read/library/index.html
+            /tools/build_bookshelf.py
+            /tools/happiness_publication_unit_20261008.py
+            /wrangler.jsonc
+      - name: Save scoped service and shelf source only
         run: |
-          mkdir -p /tmp/m398-baseline
-          cp -a public /tmp/m398-baseline/
-          [ ! -d functions ] || cp -a functions /tmp/m398-baseline/
-          cp -a .github /tmp/m398-baseline/
-          [ ! -f package.json ] || cp package.json /tmp/m398-baseline/
-          git rev-parse HEAD > /tmp/m398-baseline/base-commit.txt
-          python3 - <<'PY'
-          import pathlib, urllib.request, json
-          root=pathlib.Path('/tmp/m398-baseline')
-          checks=[]
-          for p in ['/books/m/398/','/books/m/398/read.html','/books/m/398/agent/','/books/happiness-secret/','/books/happiness-secret/agent/learning.html']:
-              try:
-                  req=urllib.request.Request('https://sdeuniverses.com'+p, headers={'User-Agent':'SDE-M398-Authorized-Read-Check/1.0'})
-                  with urllib.request.urlopen(req,timeout=45) as r:
-                      data=r.read()
-                      dest=root/'live'/p.strip('/')
-                      if p.endswith('/'): dest=dest/'index.html'
-                      dest.parent.mkdir(parents=True, exist_ok=True)
-                      dest.write_bytes(data)
-                      checks.append({'path':p,'status':r.status,'bytes':len(data)})
-              except Exception as e: checks.append({'path':p,'error':str(e)})
-          (root/'live-check.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2),encoding='utf-8')
-          print(json.dumps(checks,ensure_ascii=False,indent=2))
-          PY
+          mkdir -p /tmp/m398-service
+          cp -a src public tools /tmp/m398-service/
+          cp wrangler.jsonc /tmp/m398-service/
+          git rev-parse HEAD > /tmp/m398-service/base-commit.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: m398-publication-unit-baseline
-          path: /tmp/m398-baseline
+          name: m398-publication-unit-service
+          path: /tmp/m398-service
           retention-days: 7
-          include-hidden-files: true
