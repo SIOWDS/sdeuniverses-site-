@@ -1,0 +1,86 @@
+name: Publish volume398 Judgment Genesis edition v1
+on:
+  push:
+    branches: ['publish/m398-judgment-genesis-20261008']
+    paths: ['.github/workflows/m398-publish-edition-v1.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: book398-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Prepare reader and document verification
+        run: |
+          python -m pip install --quiet beautifulsoup4 pymupdf playwright
+          python -m playwright install --with-deps chromium
+      - name: Receive exact authorized publication package
+        run: |
+          python - <<'PY'
+          import pathlib,hashlib,zipfile,io,os
+          from playwright.sync_api import sync_playwright,Error
+          url='https://sdmntprseasia.oaiusercontent.com/files/00000000-f280-8207-9403-a271b55613ba/raw?se=2026-10-08T00%3A27%3A29Z&sp=r&sv=2026-02-06&sr=b&scid=4e596945-6980-5cbc-b9c7-2373b729d3bc&skoid=6fa9748a-b7b2-4b56-a932-8c1417549c47&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T02%3A47%3A31Z&ske=2026-10-08T02%3A47%3A31Z&sks=b&skv=2026-02-06&sig=qmYufhIKGo/5gfLGjfx6TFih624tPdcNHmnKge4z1Uk%3D'
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'book398';target.mkdir()
+          with sync_playwright() as pw:
+            browser=pw.chromium.launch(headless=True)
+            page=browser.new_page(accept_downloads=True)
+            with page.expect_download(timeout=90000) as d:
+              try:page.goto(url,wait_until='domcontentloaded',timeout=60000)
+              except Error as e:
+                if 'Download is starting' not in str(e) and 'ERR_ABORTED' not in str(e):raise
+            download=d.value
+            assert download.failure() is None
+            download.save_as(str(target/'received.zip'))
+            browser.close()
+          raw=(target/'received.zip').read_bytes()
+          assert len(raw)==6733898 and hashlib.sha256(raw).hexdigest()=='b193afad42dd30ae3b5be75782e6d64e751592357fa395fa30d1bec18ee43ae5','Publication package mismatch'
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+            for n in z.namelist():
+              assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              assert not n.endswith(('.ttf','.ttc','.otf','.woff','.woff2','.env'))
+            z.extractall(target)
+          (target/'received.zip').unlink()
+          print('Exact publication package verified: 6733898 bytes.')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/index.html
+            /public/books/bookshelf.css
+            /public/books/bookshelf.js
+            /public/books/agent/
+            /public/books/m/398/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/taste/wds-companion/wds-read.js
+            /public/wds-mode.js
+            /tools/build_bookshelf.py
+      - name: Assemble candidate and verify every book link
+        run: |
+          python "$RUNNER_TEMP/book398/build-tools/install.py" "$RUNNER_TEMP/book398" "$GITHUB_WORKSPACE"
+          python "$RUNNER_TEMP/book398/build-tools/verify.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/book398/qa"
+      - name: Check desktop mobile vector reader and agent loading
+        run: python "$RUNNER_TEMP/book398/build-tools/browser_qa.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/book398/qa/candidate-browser"
+      - name: Reconcile latest main and publish only authorized paths
+        run: python "$RUNNER_TEMP/book398/build-tools/publish.py" "$RUNNER_TEMP/book398" "$GITHUB_WORKSPACE"
+      - name: Verify exact live files and three bookshelves
+        run: python "$RUNNER_TEMP/book398/build-tools/live.py" "$RUNNER_TEMP/book398"
+      - name: Check production reader and mobile layout
+        run: python "$RUNNER_TEMP/book398/build-tools/browser_qa.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/book398/qa/live-browser" https://sdeuniverses.com
+      - name: Preserve publication package and acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book398-edition-v1-publication-evidence
+          retention-days: 14
+          path: ${{ runner.temp }}/book398/
