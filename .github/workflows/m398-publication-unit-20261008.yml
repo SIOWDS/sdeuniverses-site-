@@ -53,6 +53,7 @@ jobs:
           (root/'tools/m398_unit/knife-scene.b64').write_text(image,encoding='utf-8')
           PY
           python3 tools/m398_unit/patch_v1.py
+          python3 tools/m398_unit/patch_visual.py
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
