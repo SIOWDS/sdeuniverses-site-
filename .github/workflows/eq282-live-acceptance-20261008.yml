@@ -1,0 +1,81 @@
+name: Volume282 complete public acceptance
+on:
+  push:
+    branches: [codex/eq-ontology-20261008]
+    paths: [.github/workflows/eq282-live-acceptance-20261008.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: eq282-final-edition-v1
+          run-id: 37780530588
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/eq282
+      - uses: actions/download-artifact@v4
+        with:
+          name: eq282-final-publication-evidence-v1
+          run-id: 37780994108
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/eq282/publication-evidence
+      - name: Validate every public file with retry evidence
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,json,re,hashlib,time,urllib.request,urllib.error,concurrent.futures
+          r=Path(os.environ['RUNNER_TEMP'])/'eq282';b=r/'book';q=r/'qa';q.mkdir(exist_ok=True);m=json.loads((b/'publication-manifest.json').read_text());base='https://sdeuniverses.com/books/m/282/'
+          assert m['release_sha256']=='083d10fa9962b8b554d4942da5fda6afbad4b58e1c497d1b71fab055b7bda3f3'
+          def get(url):
+            try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 EQ-Publication-Acceptance','Accept':'*/*'}),timeout=100) as response:return response.status,response.read(),response.geturl(),dict(response.headers)
+            except urllib.error.HTTPError as e:return e.code,e.read(),url,dict(e.headers)
+          def norm(s):
+            s=re.sub(r'<link\b[^>]*rel=["\x27]canonical["\x27][^>]*>','',s,flags=re.I)
+            s=re.sub(r'<meta\b[^>]*property=["\x27]og:url["\x27][^>]*>','',s,flags=re.I)
+            return s.strip()
+          def check(f):
+            attempts=[];paths=[f['path']]
+            if f['path'].endswith('index.html'):paths.insert(0,f['path'][:-10])
+            for repeat in range(4):
+              for path in paths:
+                try:
+                  status,data,url,headers=get(base+path);actual=hashlib.sha256(data).hexdigest();exact=actual==f['sha256'];ok=status==200 and (exact or(f['path'].endswith('.html') and norm(data.decode())==norm((b/f['path']).read_text())))
+                  attempts.append({'attempt':repeat+1,'url':url,'status':status,'bytes':len(data),'sha256':actual,'exact':exact})
+                  if ok:return {'path':f['path'],'ok':True,'status':status,'sha256_exact':exact,'attempts':attempts}
+                  if repeat==3:
+                    out=q/'mismatches'/f['path'];out.parent.mkdir(parents=True,exist_ok=True);out.write_bytes(data);out.with_suffix(out.suffix+'.headers.json').write_text(json.dumps(headers,indent=2))
+                except Exception as e:attempts.append({'attempt':repeat+1,'url':base+path,'error':str(e)})
+              time.sleep(2**repeat)
+            return {'path':f['path'],'ok':False,'attempts':attempts}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:assets=list(pool.map(check,m['files']))
+          status,data,_,_=get(base+'publication-manifest.json');lm=json.loads(data);manifest_ok=status==200 and lm['release_sha256']==m['release_sha256']
+          shelves=[]
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+            status,data,final,_=get(url);s=data.decode();shelves.append({'url':url,'final_url':final,'status':status,'present':status==200 and 'data-id="m-282"' in s and '情商的本体论革命' in s})
+          status,data,_,_=get('https://sdeuniverses.com/books/catalog.json');c=json.loads(data);matches=[x for x in c['books'] if x.get('number')==282];catok=status==200 and len(matches)==1 and matches[0]['isbn']=='9798906904812' and matches[0]['priceUsd']==24 and matches[0]['pdfPages']==463
+          pub=json.loads((r/'publication-evidence/publication-result.json').read_text());assert pub['commit']=='1ae7f6d45fa867aa742953712865b4af4536cd23'
+          (q/'publication-result.json').write_text(json.dumps(pub,ensure_ascii=False,indent=2))
+          result={'success':all(x['ok'] for x in assets) and manifest_ok and catok and all(x['present'] for x in shelves),'volume':282,'body_han':251155,'chapters':60,'pages':463,'assets_checked':len(assets),'assets':assets,'shelves':shelves,'catalogue_verified':catok,'manifest_verified':manifest_ok,'release_sha256':m['release_sha256'],'publication_commit':pub['commit'],'reindex_triggered':False}
+          (q/'live-http.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps({k:v for k,v in result.items() if k!='assets'},ensure_ascii=False));assert result['success'],[x for x in assets if not x['ok']]
+          PY
+      - name: Prepare actual browser
+        if: always()
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Check public desktop and mobile readers
+        if: always()
+        run: python3 "$RUNNER_TEMP/eq282/build-tools/browser_qa.py" "$RUNNER_TEMP/eq282" "https://sdeuniverses.com/books/m/282/"
+      - name: Preserve all public evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eq282-public-acceptance-v1
+          path: ${{ runner.temp }}/eq282/qa/
+          retention-days: 30
