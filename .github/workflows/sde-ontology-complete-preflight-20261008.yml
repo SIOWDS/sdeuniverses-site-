@@ -1,0 +1,69 @@
+name: SDE ontology complete manuscript preflight
+on:
+  push:
+    branches: [sde-ontology-complete-20261008]
+    paths: [.github/workflows/sde-ontology-complete-preflight-20261008.yml]
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Receive the exact authorized manuscript
+        run: |
+          mkdir -p "$RUNNER_TEMP/intro-preflight"
+          python - <<'PY'
+          import urllib.request,pathlib,os,hashlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'intro-preflight/source.docx'
+          url='https://sdmntprnznorth.oaiusercontent.com/files/00000000-65d0-820b-ad42-701aaecf6963/raw?se=2026-10-08T08%3A21%3A10Z&sp=r&sv=2026-02-06&sr=b&scid=f5b2b3f4-3c98-5187-a3d7-4f72ddb0834e&skoid=f8b66c09-1aa0-4801-9884-173c5cef2b8c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T23%3A44%3A31Z&ske=2026-10-08T23%3A44%3A31Z&sks=b&skv=2026-02-06&sig=OhYkhU7goGApk3KYOJtdQdZXhpYDuEh44/zqg%2BbOZ9k%3D'
+          raw=urllib.request.urlopen(url,timeout=90).read()
+          assert len(raw)==4110944 and hashlib.sha256(raw).hexdigest()=='d6e7c7a294b13e89af290ffae18a7c0e2d03af873af8d874c12d7f24aa6588fd'
+          p.write_bytes(raw)
+          print('SOURCE_BYTES_VERIFIED',len(raw))
+          PY
+      - name: Inspect reference templates, exact catalog entry and previous reader
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -m pip install -q pymupdf python-docx
+          python - <<'PY'
+          import urllib.request,pathlib,os,json,base64,hashlib,re,zipfile
+          from docx import Document
+          import fitz
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'intro-preflight'
+          def gh(path,method='GET',data=None):
+              req=urllib.request.Request('https://api.github.com/repos/SIOWDS/sdeuniverses-site-/'+path,data=None if data is None else json.dumps(data).encode(),method=method,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
+              return json.load(urllib.request.urlopen(req,timeout=60))
+          cat=json.loads(base64.b64decode(gh('contents/public/books/catalog.json?ref=main')['content']))
+          books=cat.get('books',cat) if isinstance(cat,dict) else cat
+          found=[b for b in books if 'sde-ontology-intro' in json.dumps(b,ensure_ascii=False)]
+          audit={'source_sha256':hashlib.sha256((root/'source.docx').read_bytes()).hexdigest(),'catalog_entries':found,'site_written':False,'reindex_executed':False,'references':{},'workflows':[]}
+          paths=['public/books/m/220/index.html','public/books/m/220/read.html','public/books/m/302/index.html','public/books/m/302/read.html','public/books/sde-ontology-intro/index.html','public/books/sde-ontology-intro/read.html','tools/build_bookshelf.py','wrangler.toml','package.json']
+          for path in paths:
+              try:
+                  e=gh('contents/'+path+'?ref=main');raw=base64.b64decode(e['content']);dest=root/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(raw)
+                  audit['references'][path]={'sha':e['sha'],'bytes':len(raw)}
+              except Exception as e:audit['references'][path]={'error':str(e)}
+          for e in gh('contents/.github/workflows?ref=main'):
+              if e['type']!='file':continue
+              try:
+                  raw=urllib.request.urlopen(e['download_url'],timeout=20).read().decode()
+                  if 'reindex' in raw.lower() or 'build_search_index' in raw:audit['workflows'].append({'path':e['path'],'sha':e['sha'],'text':raw})
+              except Exception:pass
+          try:
+              raw=urllib.request.urlopen('https://books.sdeuniverses.com/SDE-Ontology-Intro-Preview-2026.pdf',timeout=90).read();(root/'previous-preview.pdf').write_bytes(raw)
+              pdf=fitz.open(stream=raw,filetype='pdf');txt=''.join(p.get_text() for p in pdf)
+              audit['previous_pdf']={'pages':len(pdf),'bytes':len(raw),'last_page':pdf[-1].get_text()[:1200],'cjk_chars':len(re.findall('[\u3400-\u9fff]',txt))}
+          except Exception as e:audit['previous_pdf']={'error':str(e)}
+          (root/'preflight.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2))
+          report_path='.publish/sde-ontology-complete-20261008/preflight.json'
+          gh('contents/'+report_path,'PUT',{'branch':'sde-ontology-complete-20261008','message':'Record ontology publication preflight without changing live site','content':base64.b64encode((root/'preflight.json').read_bytes()).decode()})
+          print('CATALOG',json.dumps(found,ensure_ascii=False));print('PREVIOUS_PDF',json.dumps(audit.get('previous_pdf'),ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sde-ontology-exact-source-preflight-20261008
+          path: ${{ runner.temp }}/intro-preflight/
+          retention-days: 14
