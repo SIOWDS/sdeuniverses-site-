@@ -1,0 +1,94 @@
+name: M398 production acceptance v1
+on:
+  push:
+    branches: ['publish/m398-judgment-genesis-20261008']
+    paths: ['.github/workflows/m398-live-acceptance-v1.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Prepare production browser
+        run: |
+          python -m pip install --quiet beautifulsoup4 pymupdf playwright
+          python -m playwright install --with-deps chromium
+      - name: Recover exact publication and candidate receipts
+        uses: actions/download-artifact@v4
+        with:
+          name: book398-edition-v1-publication-evidence
+          run-id: 37707462677
+          github-token: ${{ github.token }}
+          repository: SIOWDS/sdeuniverses-site-
+          path: ${{ runner.temp }}/book398
+      - name: Verify live content and all binary hashes
+        run: |
+          cat > /tmp/accept.py <<'PY'
+          from pathlib import Path
+          import urllib.request,urllib.parse,json,hashlib,time,sys,concurrent.futures,difflib,re
+          from bs4 import BeautifulSoup
+          P=Path(sys.argv[1]);Q=P/'qa';stamp=str(int(time.time()));files=json.loads((Q/'candidate-files.json').read_text())
+          def get(url):
+              sep='&' if '?' in url else '?'
+              req=urllib.request.Request(url+sep+'accept398='+stamp,headers={'User-Agent':'Mozilla/5.0 M398-publication-verification','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=90) as r:
+                  return r.read(),r.status,r.headers.get('content-type',''),r.geturl()
+          def normal_html(data):
+              s=BeautifulSoup(data,'html.parser')
+              for el in s.select('link[rel="canonical"],meta[property="og:url"]'):el.decompose()
+              return str(s)
+          def one(item):
+              path,expected=item
+              url='https://sdeuniverses.com/'+path
+              if url.endswith('/index.html'):url=url[:-10]
+              for trial in range(3):
+                  try:
+                      raw,status,ctype,final_url=get(url);assert status==200
+                      digest=hashlib.sha256(raw).hexdigest()
+                      row={'path':path,'url':url,'status':status,'bytes':len(raw),'sha256':digest,'candidate_sha256':expected['sha256'],'content_type':ctype}
+                      if path.endswith('.html'):
+                          expected_raw=(P/'public'/path).read_bytes();assert hashlib.sha256(expected_raw).hexdigest()==expected['sha256']
+                          soup=BeautifulSoup(raw,'html.parser');canon=soup.select('link[rel="canonical"]');og=soup.select('meta[property="og:url"]');assert len(canon)==1 and len(og)==1
+                          clean=urllib.parse.urlunsplit(urllib.parse.urlsplit(final_url)._replace(query='',fragment=''))
+                          assert canon[0].get('href')==clean,(path,'canonical',canon[0].get('href'),clean)
+                          assert og[0].get('content')==clean,(path,'og:url',og[0].get('content'),clean)
+                          a,b=normal_html(expected_raw),normal_html(raw)
+                          if a!=b:
+                              (Q/('live-diff-'+path.replace('/','_')+'.txt')).write_text('\n'.join(difflib.unified_diff(a.splitlines(),b.splitlines(),fromfile='candidate',tofile='live')),encoding='utf-8')
+                              raise AssertionError(('HTML changed beyond canonical/og:url tags',path))
+                          row.update(mode='full_html_after_only_canonical_and_og_url_removal',match=True,canonical=clean,normalized_sha256=hashlib.sha256(b.encode()).hexdigest())
+                          if path=='books/m/398/text/index.html':
+                              (Q/'live-fulltext.html').write_bytes(raw)
+                      else:
+                          assert digest==expected['sha256'],('Binary/content hash mismatch',path,digest,expected['sha256'])
+                          row.update(mode='exact_bytes',match=True)
+                      return row
+                  except Exception:
+                      if trial==2:raise
+                      time.sleep(3)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:results=list(pool.map(one,files.items()))
+          shelves=[]
+          for url in ['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']:
+              raw,status,ctype,final=get(url);assert status==200
+              soup=BeautifulSoup(raw,'html.parser');ns=soup.select('article.book[data-number="398"]');assert len(ns)==1,(url,len(ns))
+              text=ns[0].get_text(' ',strip=True);assert '王德生' in text and '张琼' in text and 'AI时代的判断力发生学导论' in text
+              links=[a.get('href') for a in ns[0].select('a[href]')]
+              assert any('/books/m/398/read.html' in x for x in links)
+              shelves.append({'url':url,'status':status,'volume398':True,'authors_correct':True,'reader_link':True})
+          raw,_,_,_=get('https://sdeuniverses.com/books/m/398/publication.json');meta=json.loads(raw)
+          assert meta.get('revision')=='20261008-m398-v1'
+          report={'status':'passed','at':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'commit':json.loads((Q/'publication-commit.json').read_text())['sha'],'files_verified':len(results),'exact_byte_files':sum(x['mode']=='exact_bytes' for x in results),'html_files_verified':sum(x['mode']!='exact_bytes' for x in results),'allowed_html_transformations':['link[rel=canonical] rewritten by existing Worker','meta[property=og:url] rewritten by existing Worker'],'all_other_html_identical':True,'files':results,'shelves':shelves}
+          (Q/'live-acceptance.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print('LIVE_ACCEPTANCE PASSED:',len(results),'files;',report['exact_byte_files'],'exact byte matches;',report['html_files_verified'],'complete HTML matches after two explicit metadata tags; 3 shelves.')
+          PY
+          python /tmp/accept.py "$RUNNER_TEMP/book398"
+      - name: Verify production desktop mobile reader and book agent
+        run: python "$RUNNER_TEMP/book398/build-tools/browser_qa.py" "$RUNNER_TEMP/book398" "$RUNNER_TEMP/book398/qa/live-browser" https://sdeuniverses.com
+      - name: Preserve final production acceptance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m398-final-production-acceptance-v1
+          retention-days: 14
+          path: ${{ runner.temp }}/book398/qa/
