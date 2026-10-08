@@ -1,0 +1,149 @@
+name: Publish complete SDE ontology book and verify production
+on:
+  push:
+    branches: [sde-ontology-complete-20261008]
+    paths: [.github/workflows/sde-ontology-full-publish-20261008.yml]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: sde-ontology-complete-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    env:
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: sde-ontology-full-candidate-tested-20261008
+          run-id: 37752281969
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/candidate
+      - name: Authenticate accepted book and polish one mobile button
+        run: |
+          python - <<'PY'
+          import pathlib,json,hashlib,os
+          r=pathlib.Path(os.environ['RUNNER_TEMP'])/'candidate';m=json.loads((r/'manifest.json').read_text())
+          assert m['source_sha256']=='d6e7c7a294b13e89af290ffae18a7c0e2d03af873af8d874c12d7f24aa6588fd'
+          assert json.loads((r/'qa/browser-accepted/browser-result.json').read_text())['passed']
+          assert json.loads((r/'qa/sequence-check.json').read_text())['cjk_sequence_exact_excluding_declared_note']
+          for f in m['published_files']:
+              p=r/'book'/f['path'];assert len(p.read_bytes())==f['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==f['sha256'],f['path']
+          p=r/'book/index.html';s=p.read_text();old='>完整阅读 · 在线翻页</a>';assert s.count(old)==1
+          oldsha=hashlib.sha256(p.read_bytes()).hexdigest();p.write_text(s.replace(old,'>完整在线翻页</a>'));newsha=hashlib.sha256(p.read_bytes()).hexdigest()
+          assert newsha=='a2cd03c16a4608ae7108eadbbd9d682122800433dd9cc8fcca808773b0715650'
+          for f in m['published_files']:
+              if f['path']=='index.html':f.update(sha256=newsha,bytes=p.stat().st_size)
+          (r/'manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          (r/'qa/final-ui-polish.json').write_text(json.dumps({'file':'index.html','change':'Shorten primary button to avoid mobile line wrap','before_sha256':oldsha,'after_sha256':newsha,'book_text_changed':False},ensure_ascii=False,indent=2))
+          print('ACCEPTED_SOURCE_AND_ALL_FILES_VERIFIED; 523-page book remains unchanged')
+          PY
+      - name: Prepare browser and Chinese fonts
+        timeout-minutes: 6
+        run: |
+          python -m pip install -q playwright pymupdf beautifulsoup4
+          if ! fc-list :lang=zh | grep -q .; then sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk; fi
+          command -v google-chrome || command -v chromium || python -m playwright install --with-deps chromium
+      - name: Recheck final reader before any production write
+        timeout-minutes: 5
+        run: |
+          mkdir -p "$RUNNER_TEMP/testsite/books"
+          ln -s "$RUNNER_TEMP/candidate/book" "$RUNNER_TEMP/testsite/books/sde-ontology-intro"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/testsite" > "$RUNNER_TEMP/candidate/qa/final-test-http.log" 2>&1 &
+          python "$RUNNER_TEMP/candidate/build-tools/browser_check.py" http://127.0.0.1:8765/books/sde-ontology-intro/ "$RUNNER_TEMP/candidate/qa/browser-final"
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            public/books/catalog.json
+            public/books/index.html
+            public/monographs/index.html
+            public/sites/read/library/index.html
+            public/books/sde-ontology-intro/index.html
+            public/books/sde-ontology-intro/read.html
+            .github/workflows/search-index.yml
+          sparse-checkout-cone-mode: false
+      - name: Publish only this book, its catalog entry and three shelf cards
+        run: |
+          python - <<'PY'
+          import os,pathlib,subprocess,json,time
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'candidate';repo=pathlib.Path.cwd()
+          def git(*args):return subprocess.check_output(['git',*args],text=True).strip()
+          m=json.loads((root/'manifest.json').read_text())
+          allowed={'public/books/sde-ontology-intro/'+x['path'] for x in m['published_files']}
+          allowed.update(['public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'])
+          assert json.loads((root/'qa/browser-final/browser-result.json').read_text())['passed']
+          guard={'public/books/sde-ontology-intro/index.html':'33364c53cb5b5a488f2aed644780ca2a106e1d6c','public/books/sde-ontology-intro/read.html':'1db09568240fab5608f7ff7ebc7cc2c98b6cc539'}
+          git('config','user.name','SDE Ontology Publication');git('config','user.email','ontology-publication@users.noreply.github.com')
+          for attempt in range(3):
+              git('fetch','origin','main');git('checkout','--detach','FETCH_HEAD');parent=git('rev-parse','HEAD')
+              for path,sha in guard.items():assert git('rev-parse','HEAD:'+path)==sha,'Target book changed concurrently: '+path
+              search_tree=git('rev-parse','HEAD:public/search');index_workflow=git('rev-parse','HEAD:.github/workflows/search-index.yml')
+              result=subprocess.check_output(['python',str(root/'build-tools/install.py'),str(root),str(repo)],text=True)
+              (root/'qa/installation-result.json').write_text(result)
+              git('add','--sparse','--',*sorted(allowed));changed=git('diff','--cached','--name-only').splitlines()
+              assert changed and set(changed)<=allowed,changed
+              git('commit','-m','Complete SDE ontology introduction: full 523-page reader, 97 chapter pages, restored cover and full-access shelves; no reindex')
+              commit=git('rev-parse','HEAD');assert git('rev-parse','HEAD:public/search')==search_tree
+              assert git('rev-parse','HEAD:.github/workflows/search-index.yml')==index_workflow
+              pushed=subprocess.run(['git','push','origin','HEAD:main'],text=True,capture_output=True)
+              if pushed.returncode==0:
+                  receipt={'published':True,'commit':commit,'parent':parent,'changed_files':changed,'source_sha256':m['source_sha256'],'revision':m['revision'],'pdf_pages':523,'protected_search_tree':search_tree,'protected_index_workflow':index_workflow,'manual_reindex':False,'other_catalog_entries_and_cards_preserved':True}
+                  (root/'qa/publication-result.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2));print('PUBLISHED_COMMIT',commit);break
+              print('Non-force push rejected; reapplying only the same allowed changes to fresh main.',pushed.stderr);time.sleep(2)
+          else:raise RuntimeError('Publication blocked by concurrent updates after three non-force attempts')
+          PY
+      - name: Await deployment and verify whole book on the production domain
+        timeout-minutes: 9
+        run: |
+          python - <<'PY'
+          import pathlib,os,json,urllib.request,time,hashlib,concurrent.futures
+          from bs4 import BeautifulSoup
+          import fitz
+          r=pathlib.Path(os.environ['RUNNER_TEMP'])/'candidate';root='https://sdeuniverses.com';base=root+'/books/sde-ontology-intro/'
+          def get(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=45) as resp:return resp.read()
+          last=''
+          for attempt in range(28):
+              try:
+                  meta=json.loads(get(base+'publication.json?rev=20261008-full-v1'))
+                  assert meta['revision']=='20261008-full-v1' and meta['source_sha256']=='d6e7c7a294b13e89af290ffae18a7c0e2d03af873af8d874c12d7f24aa6588fd'
+                  raw=get(base+'sde-ontology-intro-full.pdf');assert hashlib.sha256(raw).hexdigest()=='82aa61aed5ddb3ed9f9f181d7f7a11996cfc4ca1daed8749f915c54c7297f665'
+                  p=fitz.open(stream=raw,filetype='pdf');assert len(p)==523 and len(p.get_toc())==638
+                  text=BeautifulSoup(get(base+'text/'),'html.parser');assert len(text.select('#prose article'))==99 and len(text.select('#prose table'))==11 and len(text.select('#prose img'))==5
+                  assert text.select_one('#ch-63') and text.select_one('#appendix-08')
+                  homepage=BeautifulSoup(get(base),'html.parser');assert homepage.select_one('img.cover') and '完整在线翻页' in homepage.get_text()
+                  catalog=json.loads(get(root+'/books/catalog.json?rev=20261008-full-v1'));entries=[x for x in catalog['books'] if x['id']=='sde-ontology-intro'];assert len(entries)==1 and entries[0]['readMode']=='full' and entries[0]['pages']==523
+                  shelves={}
+                  for path in ['/books/','/monographs/','/sites/read/library/']:
+                      s=BeautifulSoup(get(root+path+'?rev=20261008-full-v1'),'html.parser');cards=s.select('article[data-id="sde-ontology-intro"]');assert len(cards)==1 and cards[0].get('data-reading')=='full' and '试读' not in cards[0].get_text()
+                      assert cards[0].select_one('img').get('src').startswith(base+'cover.jpg');shelves[path]=True
+                  result={'live_verified':True,'revision':meta['revision'],'pdf_pages':len(p),'pdf_bookmarks':len(p.get_toc()),'pdf_sha256':hashlib.sha256(raw).hexdigest(),'full_text_units':99,'tables':11,'images':5,'shelves':shelves,'manual_reindex':False}
+                  (r/'qa/live-http-result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print('LIVE_WHOLE_BOOK_VERIFIED',json.dumps(result,ensure_ascii=False));break
+              except Exception as e:last=repr(e);print('Awaiting exact production edition',attempt+1,last);time.sleep(15)
+          else:raise RuntimeError('Published commit not yet completely verifiable on live domain: '+last)
+          # Check every one of the 97 substantive chapter units resolves with its expected article ID.
+          unitfiles=sorted((r/'book/chapters').glob('*.html'))
+          def check(file):
+              soup=BeautifulSoup(get(base+'chapters/'+file.name),'html.parser');assert soup.select_one('article#'+file.stem),file.name
+              return file.name
+          with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:verified=list(ex.map(check,unitfiles))
+          (r/'qa/live-chapters.json').write_text(json.dumps({'verified_count':len(verified),'chapters':verified},ensure_ascii=False,indent=2));print('LIVE_CHAPTERS_VERIFIED',len(verified))
+          PY
+      - name: Verify real production desktop and mobile reader interactions
+        timeout-minutes: 5
+        run: python "$RUNNER_TEMP/candidate/build-tools/browser_check.py" https://sdeuniverses.com/books/sde-ontology-intro/ "$RUNNER_TEMP/candidate/qa/browser-live"
+      - name: Preserve publication and complete live acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sde-ontology-complete-publication-20261008
+          path: ${{ runner.temp }}/candidate/
+          include-hidden-files: true
+          retention-days: 30
