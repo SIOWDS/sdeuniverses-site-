@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>友好阅读 · 在线翻页 · SDE本体论入门：世界是如何发生的 | SDE Universes</title>
-<meta name="description" content="《SDE本体论入门：世界是如何发生的》在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
-<meta name="tier" content="L0">
+<title>完整阅读 · 在线翻页 · SDE本体论入门：世界是如何发生的 | SDE Universes</title>
+<meta name="description" content="《SDE本体论入门：世界是如何发生的》完整全书在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
+<meta name="tier" content="L0"><meta name="publication-revision" content="20261008-full-v1">
 <link rel="canonical" href="https://sdeuniverses.com/books/sde-ontology-intro/read.html">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" media="print" onload="this.media='all';this.onload=null">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+
+
+
+<script src="assets/vendor/pdf.min.js" defer></script>
 <style>
 *{box-sizing:border-box}
 :root{
@@ -134,9 +134,10 @@ html.day .drawer{background:rgba(242,239,231,.97)}
   padding:.3rem .9rem;font-size:.76rem;color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
 .hint.show{opacity:1}
 @media (max-width:860px){.top .sub,.hideS{display:none}.stage{inset:48px 0 56px 0}}
+@media(max-width:620px){.top{gap:.35rem;padding:.45rem .6rem}.top .ttl{min-width:0;flex:1}.top button{font-size:.82rem;padding:.3rem .4rem;flex-shrink:0}.top #btnVec{display:none}.top a{flex:none}.top .spacer{display:none}}
 </style>
 </head>
-<body>
+<body><noscript><p style="padding:2rem;color:#D9A441">翻页模式需要JavaScript。<a href="text/" style="color:inherit">点击阅读完整网页正文</a>，或<a href="sde-ontology-intro-full.pdf" style="color:inherit">打开全书PDF</a>。</p></noscript>
 
 <header class="top">
   <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
@@ -150,7 +151,7 @@ html.day .drawer{background:rgba(242,239,231,.97)}
   <button id="btnTheme" title="夜 / 日 / 纸 (N)">夜</button>
   <button id="btnFull" class="hideS" title="全屏 (F)">⛶</button>
   <a href="/books/sde-ontology-intro/" style="color:var(--dim);text-decoration:none;font-size:.82rem">详情</a>
-</header>
+<a href="text/" style="color:var(--gold);font-size:.78rem;white-space:nowrap">全文</a><a href="sde-ontology-intro-full.pdf" style="color:var(--gold);font-size:.78rem" target="_blank" rel="noopener">PDF</a></header>
 
 <aside class="drawer" id="drawer">
   <div class="sbox"><input id="q" type="search" placeholder="全书检索（回车）…"></div>
@@ -178,7 +179,7 @@ html.day .drawer{background:rgba(242,239,231,.97)}
 <div class="hint" id="hint"></div>
 <div class="msg" id="msg"><div><div class="sp"></div><div id="msgT">正在载入书页…</div></div></div>
 
-<script type="application/json" id="cfg">{"pdf": "/books/sde-ontology-intro/SDE-Ontology-Intro-Preview.pdf", "key": "sde-ontology-intro-flip-vec-v1", "offset": 1}</script>
+<script type="application/json" id="cfg">{"pdf": "sde-ontology-intro-full.pdf?v=20261008-full-v1", "key": "sde-ontology-intro-full-v1", "offset": 1}</script>
 <script type="application/json" id="toc">[]</script>
 
 <script>
@@ -484,12 +485,13 @@ var rt=null;
 window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ show(); },160); });
 
 /* ── 启动 ── */
+var bootStarted=Date.now();
 function boot(){
-  if(!window.pdfjsLib){ setTimeout(boot,120); return; }
-  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  if(!window.pdfjsLib){ if(Date.now()-bootStarted>15000){ $('msgT').innerHTML='翻页组件未能载入。<a href="text/">阅读全文</a> · <a href="sde-ontology-intro-full.pdf">全书PDF</a>'; return;} setTimeout(boot,120); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='assets/vendor/pdf.worker.min.js';
   $('btnVec').classList.add('on');
   msg('正在载入《SDE本体论入门：世界是如何发生的》…');
-  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise.then(function(d){
+  pdfjsLib.getDocument({url:CFG.pdf, isEvalSupported:false, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false, useSystemFonts:true}).promise.then(function(d){
     doc=d; total=d.numPages;
     buildToc();
     if(!TOC.length){ outlineToc(d).then(function(t){ if(t.length){ TOC=t; buildToc(); } }); }

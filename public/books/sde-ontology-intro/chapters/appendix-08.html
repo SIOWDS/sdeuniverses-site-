@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>附录八　退化定理的证明：伞模型如何严格地退回传统数学 · SDE本体论入门：世界是如何发生的</title><meta name="description" content="SDE本体论入门：世界是如何发生的，王德生著。十四篇、六十三章、三篇补章与八个附录，完整开放阅读。"><meta name="isbn" content="978-1-970820-56-0"><meta name="publication-revision" content="20261008-full-v1"><link rel="canonical" href="https://sdeuniverses.com/books/sde-ontology-intro/chapters/appendix-08.html"><link rel="stylesheet" href="../assets/book.css"></head><body><div class="wrap"><nav class="crumb"><a href="../">本书首页</a> · <a href="../read.html">完整翻页</a> · <a href="../text/index.html#appendix-08">连续全文</a></nav><nav class="chapter-nav"><a href="appendix-07.html">← 上一篇章</a><a href="../chapters.html">全书目录</a><a href="references.html">下一篇章 →</a></nav><main class="prose"><article class="unit-appendix" id="appendix-08" data-start="3492"><h2 class="unit-title">附录八　退化定理的证明：伞模型如何严格地退回传统数学</h2>
+<p class="" data-source-paragraph="3496">第六十三章立下了伞模型形式化的四步纲领，并宣称其中最承重的一根柱子——<strong>退化定理</strong>——已经不只是纲领，而是可以被真正证明的定理。这个附录，就把这根柱子当场浇筑起来。它要证明的是一句话：<strong>传统数学（以局域微分为核心）不是被伞模型推翻，而是作为伞模型在尺度 r→0 时的严格极限被精确包含。</strong>下面的证明只用到大学数学系一二年级的工具（泰勒展开与积分），任何读者都可以独立复算——这正是它区别于&quot;哲学宣告&quot;的地方。</p>
+<p class="" data-source-paragraph="3497"><strong>一、要证的命题。</strong>设一维情形（多维完全类似，见文末说明）。伞模型的核心运算是非局域算子</p>
+<p class="" data-source-paragraph="3498">　　(ℒ_r u)(x) = ∫ K_r(x, y) · [u(y) − u(x)] dy</p>
+<p class="" data-source-paragraph="3499">其中权重核取尺度化形式 K_r(x, y) = (1/r)·φ((y−x)/r)，φ 是一个固定的&quot;形状函数&quot;（一把伞的轮廓），r 是伞的半径（尺度）。要证明的定理是：</p>
+<p class="" data-source-paragraph="3500"><strong>退化定理。</strong>若形状函数 φ 满足三个条件——（归一）∫φ(z)dz = 1；（对称／一阶矩为零）∫z·φ(z)dz = 0；（二阶矩有限）∫z²·φ(z)dz = M₂ &lt; ∞——那么对任意二阶连续可微的 u，有</p>
+<p class="" data-source-paragraph="3501">　　lim_(r→0) (ℒ_r u)(x) / r² = c · u″(x)，　其中常数 c = M₂ / 2。</p>
+<p class="" data-source-paragraph="3502">也就是说，把非局域算子除以 r² 后，它在 r→0 时<strong>精确地退化为局域的二阶微分算子</strong>（在多维即拉普拉斯算子 Δ），比例常数 c 恰是形状函数二阶矩的一半。</p>
+<p class="" data-source-paragraph="3503"><strong>二、证明。</strong>做变量替换 z = (y−x)/r，则 y = x + rz，dy = r·dz，且 K_r(x,y)dy = φ(z)dz。于是</p>
+<p class="" data-source-paragraph="3504">　　(ℒ_r u)(x) = ∫ φ(z) · [u(x + rz) − u(x)] dz。</p>
+<p class="" data-source-paragraph="3505">对被积式里的 u(x + rz) 在 x 处做泰勒展开（u 二阶连续可微，故带皮亚诺余项）：</p>
+<p class="" data-source-paragraph="3506">　　u(x + rz) − u(x) = rz·u′(x) + (r²z²/2)·u″(x) + o(r²)。</p>
+<p class="" data-source-paragraph="3507">代回积分，并利用积分对 z 的线性性，逐阶拆开：</p>
+<p class="" data-source-paragraph="3508">　　(ℒ_r u)(x) = r·u′(x)·∫z·φ(z)dz + (r²/2)·u″(x)·∫z²·φ(z)dz + o(r²)。</p>
+<p class="" data-source-paragraph="3509">现在逐项检视这三项，三个条件正好在此处各司其职：</p>
+<p class="list-item" data-source-paragraph="3510">- <strong>第一项</strong>含 ∫z·φ(z)dz，由&quot;一阶矩为零&quot;的条件，此项 = 0。这一步是关键——它保证了非局域算子在领头阶不会退化成一个不该出现的<strong>一阶</strong>导数（那会破坏与拉普拉斯算子的对应）。对称核（φ(z)=φ(−z)）自动满足此条件，这也解释了为什么伞模型的自然选择是对称的伞。</p>
+<p class="list-item" data-source-paragraph="3511">- <strong>第二项</strong>含 ∫z²·φ(z)dz = M₂，于是此项 = (r²/2)·u″(x)·M₂。这是唯一存活的领头项。</p>
+<p class="list-item" data-source-paragraph="3512">- <strong>第三项</strong>是 o(r²)，除以 r² 后趋于零。</p>
+<p class="" data-source-paragraph="3513">于是</p>
+<p class="" data-source-paragraph="3514">　　(ℒ_r u)(x) = (r²/2)·M₂·u″(x) + o(r²)。</p>
+<p class="" data-source-paragraph="3515">两边除以 r²，令 r→0：</p>
+<p class="" data-source-paragraph="3516">　　lim_(r→0) (ℒ_r u)(x)/r² = (M₂/2)·u″(x) = c·u″(x)，　c = M₂/2。　∎</p>
+<p class="" data-source-paragraph="3517"><strong>三、多维情形与收敛率。</strong>在 n 维，取各向同性的形状函数 φ(z)=φ(|z|)，同样的泰勒展开（这次展到二阶的是梯度与海森矩阵）会让一阶项因对称性消失，二阶项中的交叉导数因各向同性而相互抵消，只剩下对角的二阶导数之和——<strong>正是拉普拉斯算子 Δ</strong>：lim_(r→0)(ℒ_r u)/r² = c·Δu，常数 c 由 φ 的二阶矩决定。至于<strong>收敛的速度</strong>：若 u 三阶可微且 φ 三阶矩存在，余项实为 O(r²)（对称核使 O(r) 项消失），即误差随 r 以二阶速度趋零——r 每减半，误差降到约四分之一。</p>
+<p class="" data-source-paragraph="3518"><strong>四、一次数值复算。</strong>取形状函数 φ(z) = ½·e^(−|z|)（一把两侧指数衰减的对称伞），其二阶矩 M₂ = 2，故理论上 c = 1。以 u(x)=sin x、在 x=1 处计算 (ℒ_r u)/r²，与 c·u″(1) = −sin 1 ≈ −0.8415 相比：</p>
+<div class="table-wrap" data-source-table="11"><table><thead><tr><th><strong>伞半径 r</strong></th><th><strong>(ℒ_r u)/r²</strong></th><th><strong>理论值 c·u″</strong></th><th><strong>相对误差</strong></th></tr></thead><tbody><tr><td>0.50</td><td>−0.6732</td><td>−0.8415</td><td>20.0%</td></tr><tr><td>0.20</td><td>−0.8091</td><td>−0.8415</td><td>3.85%</td></tr><tr><td>0.10</td><td>−0.8331</td><td>−0.8415</td><td>0.99%</td></tr><tr><td>0.05</td><td>−0.8394</td><td>−0.8415</td><td>0.25%</td></tr><tr><td>0.02</td><td>−0.8411</td><td>−0.8415</td><td>0.04%</td></tr></tbody></table></div>
+<p class="" data-source-paragraph="3520">误差随 r 减半而降到约四分之一（20%→3.85%→0.99%…），与定理预言的二阶收敛率严格吻合；r=0.02 时误差已低至 0.04%。这就把第六十三章提到的&quot;3.6% 数值巧合&quot;,还原成一条<strong>有条件、有常数、有收敛率、可被任何人独立复算</strong>的定理。</p>
+<p class="" data-source-paragraph="3521"><strong>五、这一步为什么重要。</strong>它兑现了全书对伞模型的核心承诺，也划清了一条界线。传统数学没有错——它是伞模型在 r→0 这个特定极限下、可被严格推导的领头阶，正如牛顿力学是相对论在 v/c→0 时的领头阶。伞模型不推翻微积分，它把微积分<strong>收编</strong>为自己的一个退化情形，并在 r&gt;0 的整片新大陆上（非局域、可重叠、带尺度）继续有效。这一根柱子立住，意味着&quot;传统数学是一种局域近似&quot;这句在全书里反复出现的判断，从此有了它第一块可以被踩上去的坚实地面。至于把伞模型其余几根柱子（共振算子的完整泛函分析、三态判据的动力系统理论）也一一浇筑起来，是后续专门论文的任务——但地基已经不再是空的。</p>
+<p class="" data-source-paragraph="3522"><strong>六、形式化路线图：从这一根柱子，到一座完整建筑。</strong>为免读者误以为&quot;证了退化定理就等于建成了新数学&quot;，这里把伞模型走向严格数学理论仍需完成的工作，诚实地列成一张路线图。它既是本书的自我边界，也是一份对未来研究者的邀请：</p>
+<p class="list-item" data-source-paragraph="3523">- <strong>定义层（对象公理化）。</strong>给出伞场、权重核族、尺度参数 r 与 N_SDE 的严格公理化定义，明确其所在的函数空间（如加权 Sobolev 空间或分数阶 Sobolev 空间），并界定伞算子 ℒ_r 的定义域与值域。</p>
+<p class="list-item" data-source-paragraph="3524">- <strong>命题层（算子性质）。</strong>证明共振算子 ℒ_r 的基本泛函性质：有界性、自伴性（对称核下）、谱的结构（特征值分布与本质谱）、以及与已知非局域算子（分数阶拉普拉斯、peridynamics 积分算子）的精确关系。</p>
+<p class="list-item" data-source-paragraph="3525">- <strong>证明层（本书已完成第一步）。</strong>退化定理（r→0 的局域极限）已在本附录严格证明；下一步是<strong>收敛率定理</strong>（在更弱的正则性假设下给出误差的最优阶）与<strong>逆向定理</strong>（r&gt;0 时非局域效应的下界估计，量化&quot;伞模型比传统数学多出多少&quot;）。</p>
+<p class="list-item" data-source-paragraph="3526">- <strong>算法层（三态判据）。</strong>把&quot;秩序—混沌—介生&quot;三态从概念落成可计算判据：以伞场的广义熵/广义能量泛函为序参量、以 ℒ_r 的谱隙为演化方向指标，给出三态分类与切换的判定算法及其复杂度分析。</p>
+<p class="list-item" data-source-paragraph="3527">- <strong>数值实验层（验证计划）。</strong>在标准测试问题（反常扩散、复杂网络传播、裂纹扩展）上，系统比较伞模型与分数阶方法、peridynamics、图神经网络的精度与代价，验证收敛阶、稳定性与（若存在）守恒律。</p>
+<p class="" data-source-paragraph="3528">这五层里，本书完成的是&quot;定义层的雏形 + 证明层的第一步&quot;。把其余各层一一补齐，正是一篇乃至一系列专门数学论文的工作。本书作为&quot;入门&quot;,立此路线图，是为了让每一个愿意接手的数学家，都清楚知道下一块砖该砌在哪里。</p></article></main><nav class="chapter-nav"><a href="appendix-07.html">← 上一篇章</a><a href="../chapters.html">全书目录</a><a href="references.html">下一篇章 →</a></nav></div></body></html>
