@@ -1,0 +1,85 @@
+name: M393 source receipt and 220-302 style preflight
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m393-source-style-preflight-20261008.yml']
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Receive exact authorized source package
+        run: |
+          python3 - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,os
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'m393-preflight';root.mkdir()
+          url='https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-f6f0-8211-9594-b984f4290fe8/raw?se=2026-10-08T06%3A03%3A59Z&sp=r&sv=2026-02-06&sr=b&scid=153d64d1-39fd-5a6f-b6e2-d72ca3d9b56a&skoid=6980ab1e-b994-4668-84de-ad0444c9d08b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-08T05%3A45%3A38Z&ske=2026-10-09T05%3A45%3A38Z&sks=b&skv=2026-02-06&sig=1q/SAXWxURtSaxGlL4mNhqjLMNY1WNSp9UlaxpFRwQg%3D'
+          raw=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=120).read()
+          assert len(raw)==3012953 and hashlib.sha256(raw).hexdigest()=='28e32aa31852757d672d5fb9616a187c13fb071d05225e07763384d98ec0d009'
+          (root/'source.zip').write_bytes(raw)
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              for n in z.namelist(): assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              z.extractall(root/'source')
+          print('AUTHORIZED_SOURCE_RECEIVED',len(raw))
+          PY
+      - name: Preserve exact source
+        uses: actions/upload-artifact@v4
+        with:
+          name: m393-authorized-source-v11
+          path: ${{ runner.temp }}/m393-preflight/source.zip
+          retention-days: 14
+      - name: Prepare PDF inspection
+        run: python3 -m pip install --quiet pymupdf
+      - name: Inspect reference styles, publication registry and shelves
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import urllib.request,pathlib,os,json,re,hashlib,fitz
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'m393-preflight'/'references';root.mkdir()
+          api='https://api.github.com/repos/SIOWDS/sdeuniverses-site-/'
+          def get(url,auth=False):
+              headers={'User-Agent':'m393-publication-preflight'}
+              if auth: headers.update({'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github.raw+json'})
+              return urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=90).read()
+          report={'title':'AI时代创造力必须的基础知识','number':393,'isbn':'979-8-90690-876-6','price':'US$20','reference_files':[],'site_probe':{}}
+          paths=['public/books/catalog.json','public/books/agents.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','tools/build_bookshelf.py','wrangler.toml','package.json']
+          for num in (220,302):
+              paths.extend([f'public/books/m/{num}/index.html',f'public/books/m/{num}/read.html',f'public/books/m/{num}/text/index.html'])
+          for path in paths:
+              try:
+                  raw=get(api+'contents/'+path,True); target=root/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw)
+                  report['reference_files'].append({'path':path,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()})
+              except Exception as e: report['reference_files'].append({'path':path,'error':str(e)})
+          cat=json.loads((root/'public/books/catalog.json').read_text())
+          collisions=[b for b in cat['books'] if str(b.get('number'))=='393' or b.get('id')=='m-393' or re.sub(r'\D','',str(b.get('isbn','')))=='9798906908766']
+          report['collisions']=collisions
+          for num in (220,302):
+              html=(root/f'public/books/m/{num}/index.html').read_text()
+              cover=re.search(r'<meta property="og:image" content="([^"]+)"',html)
+              if cover:
+                  raw=get(cover.group(1));(root/f'{num}-cover.jpg').write_bytes(raw)
+              pdfs=list(dict.fromkeys(re.findall(r'href="([^"<>]+\.pdf[^"<>]*)"',html)))
+              if pdfs:
+                  url=pdfs[0];url='https://sdeuniverses.com'+url if url.startswith('/') else url
+                  raw=get(url);doc=fitz.open(stream=raw,filetype='pdf');sel=fitz.open()
+                  chosen=sorted(set(list(range(min(15,len(doc))))+[len(doc)//2,min(len(doc)//2+1,len(doc)-1),len(doc)-2,len(doc)-1]))
+                  for p in chosen: sel.insert_pdf(doc,from_page=p,to_page=p)
+                  sel.save(root/f'{num}-selected-pages.pdf',garbage=4,deflate=True)
+                  report[str(num)]={'pdf_url':url,'page_count':len(doc),'page_size':list(doc[0].rect),'selected_pages':[p+1 for p in chosen]}
+          for url in ['https://sdeuniverses.com/books/m/220/','https://sdeuniverses.com/books/m/302/','https://sdeuniverses.com/books/m/393/']:
+              try: report['site_probe'][url]={'status':200,'bytes':len(get(url))}
+              except Exception as e: report['site_probe'][url]={'error':str(e)}
+          (root/'preflight.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          assert not collisions, 'Publication identity already exists; review before writing'
+          PY
+      - name: Return styles and preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m393-220302-style-references
+          path: ${{ runner.temp }}/m393-preflight/references
+          retention-days: 14

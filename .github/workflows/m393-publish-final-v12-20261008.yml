@@ -1,0 +1,75 @@
+name: M393 publish final v1.2 and live acceptance
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/m393-publish-final-v12-20261008.yml']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: m393-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Receive and verify exact authorized final package
+        run: |
+          python3 - <<'PY'
+          import pathlib,os,urllib.request,hashlib,zipfile,io,json
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'m393-final';root.mkdir()
+          url='https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-6050-8211-a581-1c9617d8b931/raw?se=2026-10-08T07%3A04%3A28Z&sp=r&sv=2026-02-06&sr=b&scid=33237334-c9e6-5c9f-bee6-5dff1db31f53&skoid=6980ab1e-b994-4668-84de-ad0444c9d08b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-08T00%3A13%3A56Z&ske=2026-10-09T00%3A13%3A56Z&sks=b&skv=2026-02-06&sig=uCC6Xzto9xPEGVvZM2VJ7d%2B8Xaxjd5zTMp5CfwkhOQk%3D'
+          raw=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=120).read()
+          assert len(raw)==13287036 and hashlib.sha256(raw).hexdigest()=='9eacb6d42df962142070448d7cdb20101c1ae1986dfdcf4da07f2051d04befb7'
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+              for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+              z.extractall(root)
+          for e in json.loads((root/'input-inventory.json').read_text()):
+              p=root/e['path'];assert p.stat().st_size==e['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256'],e['path']
+          m=json.loads((root/'site/public/books/m/393/publication-manifest.json').read_text())
+          assert m['release_id']=='54022e8805a3416abd50f83a5e5964a485ca9e2ef33cab752e7905219b486845'
+          assert m['main_hanzi']==202746 and m['reader_pages']==344 and m['print_pages']==343
+          assert m['isbn']=='979-8-90690-876-6' and m['price_usd']==20
+          print('EXACT_FINAL_PACKAGE_RECEIVED',len(raw),'bytes',len(m['files']),'book assets')
+          PY
+      - name: Preserve exact final package
+        uses: actions/upload-artifact@v4
+        with:
+          name: m393-published-v12-exact-package
+          path: ${{ runner.temp }}/m393-final
+          retention-days: 14
+      - name: Prepare real desktop and mobile browser
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Final pre-publication browser acceptance
+        run: python3 "$RUNNER_TEMP/m393-final/build-tools/browser_qa.py" "$RUNNER_TEMP/m393-final"
+      - name: Read current publication registry and shelves
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/393/
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+      - name: Merge m393 and three cards only; preserve concurrent changes
+        run: python3 "$RUNNER_TEMP/m393-final/build-tools/publish.py" "$RUNNER_TEMP/m393-final" "$GITHUB_WORKSPACE"
+      - name: Verify deployed release and every publication asset
+        run: python3 "$RUNNER_TEMP/m393-final/build-tools/live_http_qa.py" "$RUNNER_TEMP/m393-final"
+      - name: Verify public desktop and mobile readers and agent entry
+        run: python3 "$RUNNER_TEMP/m393-final/build-tools/browser_qa.py" "$RUNNER_TEMP/m393-final" --live
+      - name: Preserve commit, live hashes and browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m393-publication-live-acceptance-20261008
+          path: ${{ runner.temp }}/m393-final/qa
+          retention-days: 30
