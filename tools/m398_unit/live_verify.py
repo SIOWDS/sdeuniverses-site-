@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only production acceptance. No model request, no reindex, no user profile."""
 from pathlib import Path
-import concurrent.futures, hashlib, json, os, time, urllib.request
+import concurrent.futures, hashlib, json, os, re, time, urllib.request
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup, NavigableString
 from playwright.sync_api import sync_playwright
@@ -73,8 +73,12 @@ with sync_playwright() as p:
     page.locator('#initial').fill('生产验收合成文字：原猜想和修订命题必须分开。');page.locator('#save-initial').click();page.wait_for_function("document.querySelector('#initial').disabled")
     page.reload(wait_until='networkidle');page.wait_for_selector('#workspace:not([hidden])');page.wait_for_function("document.querySelector('#source-version').textContent.includes('指纹')")
     check('live initial persists across reload','生产验收合成文字' in page.locator('#initial').input_value())
-    page.locator('#dialogue-link').click();page.wait_for_url('**/dialogue.html?lesson=29');page.wait_for_selector('#workspace:not([hidden])');page.wait_for_function("document.querySelector('#source-version').textContent.includes('指纹')")
-    check('same node enters live dialogue',page.locator('#source-link').get_attribute('href').endswith('#chapter-29') and '生产验收合成文字' in page.locator('#initial').input_value())
+    page.locator('#dialogue-link').click()
+    # Production run37742556819 observed an intentional .html -> clean-path redirect.
+    # Accept only that exact path equivalence, keeping the same origin/book/lesson.
+    page.wait_for_url(re.compile(r'^https://sdeuniverses\.com/books/m/398/agent/dialogue(?:\.html)?\?lesson=29$'))
+    page.wait_for_selector('#workspace:not([hidden])');page.wait_for_function("document.querySelector('#source-version').textContent.includes('指纹')")
+    check('same node enters live dialogue',page.locator('#source-link').get_attribute('href').endswith('#chapter-29') and '生产验收合成文字' in page.locator('#initial').input_value(),{'actualUrl':page.url})
     page.locator('#mode').select_option('hint');page.locator('#preview-btn').click();page.wait_for_selector('dialog[open]')
     payload=json.loads(page.locator('#payload').inner_text());check('live request preview excludes opt-out personal text','生产验收合成文字' not in payload['docText'] and payload['history']==[])
     page.locator('#close-preview').click();page.screenshot(path=str(OUT/'live-dialogue-desktop.png'),full_page=True)
