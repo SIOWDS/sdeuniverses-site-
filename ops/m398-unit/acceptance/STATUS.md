@@ -1,0 +1,1 @@
+Candidate engineering, synthetic protocol and isolated rollback reconstruction tests passed. No real model call, no learning-effect validation, no reindex. Production deployment and live verification remain separate.
