@@ -1,0 +1,124 @@
+name: SDE ontology final cover polish and live acceptance
+on:
+  push:
+    branches: [sde-ontology-complete-20261008]
+    paths: [.github/workflows/sde-ontology-cover-finish-20261008.yml]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: sde-ontology-complete-publication
+  cancel-in-progress: false
+jobs:
+  finish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: sde-ontology-full-candidate-tested-20261008
+          run-id: 37752281969
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/candidate
+      - name: Set original cover artwork proportionally at full page height
+        run: |
+          python -m pip install -q pymupdf==1.26.7 playwright beautifulsoup4
+          python - <<'PY'
+          import pathlib,os,fitz,json,hashlib
+          r=pathlib.Path(os.environ['RUNNER_TEMP'])/'candidate';b=r/'book';pdf=b/'sde-ontology-intro-full.pdf'
+          assert hashlib.sha256(pdf.read_bytes()).hexdigest()=='82aa61aed5ddb3ed9f9f181d7f7a11996cfc4ca1daed8749f915c54c7297f665'
+          p=fitz.open(pdf);texts=[x.get_text() for x in p];toc=p.get_toc();links=[x.get_links() for x in p]
+          for i,name in [(0,'cover.jpg'),(-1,'back-cover.jpg')]:
+              page=p[i];rect=page.rect;page.draw_rect(rect,fill=(6/255,21/255,40/255),color=None,overlay=True)
+              width=rect.height*2/3;position=fitz.Rect((rect.width-width)/2,0,(rect.width+width)/2,rect.height)
+              page.insert_image(position,filename=str(b/'assets'/name),keep_proportion=True,overlay=True)
+          new=b/'cover-final.pdf';p.save(new,deflate=True,garbage=3,no_new_id=True);p.close();new.replace(pdf)
+          a=fitz.open(pdf);assert len(a)==523 and [x.get_text() for x in a]==texts and a.get_toc()==toc
+          digest=hashlib.sha256(pdf.read_bytes()).hexdigest();assert digest=='8e523e77dc4f78032d41d957f380234e32c37ee97004fa8843bd2e65c5a2e057'
+          for i,name in [(0,'front'),(-1,'back')]:a[i].get_pixmap(matrix=fitz.Matrix(1,1)).save(r/'qa'/('cover-final-'+name+'.png'))
+          p=b/'read.html';s=p.read_text();assert s.count('sde-ontology-intro-full.pdf?v=20261008-full-v1')==1
+          s=s.replace('sde-ontology-intro-full.pdf?v=20261008-full-v1','sde-ontology-intro-full.pdf?v=20261008-full-v1p2').replace('content="20261008-full-v1"','content="20261008-full-v1p2"');p.write_text(s)
+          p=b/'publication.json';m=json.loads(p.read_text());m.update(revision='20261008-full-v1p2',pdf_sha256=digest,cover_layout='Full-page proportional original front and back covers; 521 interior pages unchanged');p.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          receipt={'cover_polish':True,'pdf_sha256':digest,'pdf_pages':523,'bookmarks':638,'all_521_interior_text_pages_unchanged':True,'source_text_unchanged':True,'source_sha256':m['source_sha256']};(r/'qa/cover-polish.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2));print(json.dumps(receipt))
+          PY
+      - name: Prepare Chinese-capable browser
+        timeout-minutes: 5
+        run: |
+          if ! fc-list :lang=zh | grep -q .; then sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk; fi
+          command -v google-chrome || command -v chromium || python -m playwright install --with-deps chromium
+      - name: Test final PDF before production write
+        timeout-minutes: 4
+        run: |
+          mkdir -p "$RUNNER_TEMP/testsite/books"
+          ln -s "$RUNNER_TEMP/candidate/book" "$RUNNER_TEMP/testsite/books/sde-ontology-intro"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/testsite" > "$RUNNER_TEMP/candidate/qa/cover-http.log" 2>&1 &
+          python "$RUNNER_TEMP/candidate/build-tools/browser_check.py" http://127.0.0.1:8765/books/sde-ontology-intro/ "$RUNNER_TEMP/candidate/qa/browser-cover-final"
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            public/books/sde-ontology-intro/sde-ontology-intro-full.pdf
+            public/books/sde-ontology-intro/read.html
+            public/books/sde-ontology-intro/publication.json
+          sparse-checkout-cone-mode: false
+      - name: Commit only the three final cover and reader files
+        run: |
+          python - <<'PY'
+          import pathlib,os,subprocess,hashlib,json,shutil,time
+          r=pathlib.Path(os.environ['RUNNER_TEMP'])/'candidate';repo=pathlib.Path.cwd();base=repo/'public/books/sde-ontology-intro'
+          def git(*a):return subprocess.check_output(['git',*a],text=True).strip()
+          paths=['public/books/sde-ontology-intro/'+x for x in ['sde-ontology-intro-full.pdf','read.html','publication.json']]
+          git('config','user.name','SDE Ontology Publication');git('config','user.email','ontology-publication@users.noreply.github.com')
+          for attempt in range(3):
+              git('fetch','origin','main');git('checkout','--detach','FETCH_HEAD');parent=git('rev-parse','HEAD');search=git('rev-parse','HEAD:public/search');index=git('rev-parse','HEAD:.github/workflows/search-index.yml')
+              assert hashlib.sha256((base/'sde-ontology-intro-full.pdf').read_bytes()).hexdigest()=='82aa61aed5ddb3ed9f9f181d7f7a11996cfc4ca1daed8749f915c54c7297f665','Concurrent change to this book PDF; stop'
+              assert json.loads((base/'publication.json').read_text())['revision']=='20261008-full-v1'
+              for path in paths:shutil.copyfile(r/'book'/path.split('/')[-1],repo/path)
+              git('add','--sparse','--',*paths);assert set(git('diff','--cached','--name-only').splitlines())==set(paths)
+              git('commit','-m','Polish original ontology covers at full page height; preserve all 521 interior pages and 638 bookmarks; no reindex')
+              commit=git('rev-parse','HEAD');assert git('rev-parse','HEAD:public/search')==search and git('rev-parse','HEAD:.github/workflows/search-index.yml')==index
+              result=subprocess.run(['git','push','origin','HEAD:main'],text=True,capture_output=True)
+              if result.returncode==0:
+                  (r/'qa/final-publication-result.json').write_text(json.dumps({'published':True,'commit':commit,'parent':parent,'changed_files':paths,'manual_reindex':False},indent=2));print('FINAL_PUBLISHED_COMMIT',commit);break
+              print(result.stderr);time.sleep(2)
+          else:raise RuntimeError('Concurrent changes prevented non-force publication')
+          PY
+      - name: Verify final production files and three whole-book shelf entrances
+        timeout-minutes: 7
+        run: |
+          python - <<'PY'
+          import pathlib,os,urllib.request,json,time,hashlib,concurrent.futures
+          from bs4 import BeautifulSoup
+          r=pathlib.Path(os.environ['RUNNER_TEMP'])/'candidate';site='https://sdeuniverses.com';base=site+'/books/sde-ontology-intro/'
+          def get(url):return urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'}),timeout=30).read()
+          for attempt in range(24):
+              try:
+                  meta=json.loads(get(base+'publication.json?rev=20261008-full-v1p2'));assert meta['revision']=='20261008-full-v1p2'
+                  pdf=get(base+'sde-ontology-intro-full.pdf?v=20261008-full-v1p2');assert hashlib.sha256(pdf).hexdigest()=='8e523e77dc4f78032d41d957f380234e32c37ee97004fa8843bd2e65c5a2e057'
+                  shelves={}
+                  for url in [site+'/books/',site+'/monographs/','https://read.sdeuniverses.com/library/']:
+                      s=BeautifulSoup(get(url+'?rev=20261008-full-v1p2'),'html.parser');card=s.select_one('article[data-id="sde-ontology-intro"]');assert card and card.get('data-reading')=='full' and '试读' not in card.get_text(),url
+                      assert card.select_one('img').get('src').startswith(base+'cover.jpg');shelves[url]=True
+                  body=BeautifulSoup(get(base+'text/'),'html.parser');assert len(body.select('#prose article'))==99 and len(body.select('#prose table'))==11 and len(body.select('#prose img'))==5
+                  (r/'qa/final-live-http.json').write_text(json.dumps({'verified':True,'revision':meta['revision'],'pages':523,'bookmarks':638,'pdf_sha256':hashlib.sha256(pdf).hexdigest(),'shelves':shelves,'full_text_units':99,'tables':11,'images':5},ensure_ascii=False,indent=2));print('FINAL_LIVE_EDITION_VERIFIED');break
+              except Exception as e:print('Waiting for final live revision',attempt+1,repr(e));time.sleep(15)
+          else:raise RuntimeError('Final revision not fully verified before timeout')
+          def check(file):
+              s=BeautifulSoup(get(base+'chapters/'+file.name),'html.parser');assert s.select_one('article#'+file.stem),file.name;return file.name
+          with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:chapters=list(ex.map(check,sorted((r/'book/chapters').glob('*.html'))))
+          (r/'qa/final-live-chapters.json').write_text(json.dumps({'verified':len(chapters),'files':chapters},ensure_ascii=False,indent=2));print('FINAL_LIVE_CHAPTERS',len(chapters))
+          PY
+      - name: Test final real production desktop and mobile readers
+        timeout-minutes: 4
+        run: python "$RUNNER_TEMP/candidate/build-tools/browser_check.py" https://sdeuniverses.com/books/sde-ontology-intro/ "$RUNNER_TEMP/candidate/qa/browser-final-live"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sde-ontology-final-publication-20261008
+          path: ${{ runner.temp }}/candidate/
+          include-hidden-files: true
+          retention-days: 30
