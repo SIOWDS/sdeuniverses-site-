@@ -1,0 +1,58 @@
+name: Happiness unit v2 source snapshot
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/happiness-unit-v2-source-20261008.yml']
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/happiness-secret/
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /public/books/bookshelf.css
+            /public/books/bookshelf.js
+            /public/books/agent/
+            /public/taste/wds-companion/wds-read.js
+            /tools/build_bookshelf.py
+            /tools/happiness_publication_unit_20261008.py
+            /src/worker.js
+            /package.json
+            /.github/workflows/search-index.yml
+      - name: Record exact baseline without publishing
+        run: |
+          git rev-parse HEAD > baseline-commit.txt
+          python3 - <<'PY'
+          import pathlib,json,hashlib
+          rows=[]
+          for root in ['public','tools','src']:
+              for p in pathlib.Path(root).rglob('*'):
+                  if p.is_file():rows.append({'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size})
+          pathlib.Path('baseline-inventory.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2),encoding='utf-8')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: happiness-unit-v2-source
+          path: |
+            public/
+            tools/
+            src/
+            package.json
+            .github/workflows/search-index.yml
+            baseline-commit.txt
+            baseline-inventory.json
+          include-hidden-files: true
+          retention-days: 7
