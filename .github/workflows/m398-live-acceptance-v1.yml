@@ -28,8 +28,9 @@ jobs:
           cat > /tmp/accept.py <<'PY'
           from pathlib import Path
           import urllib.request,urllib.parse,json,hashlib,time,sys,concurrent.futures,difflib,re
-          from bs4 import BeautifulSoup
+          from bs4 import BeautifulSoup,NavigableString,Comment
           P=Path(sys.argv[1]);Q=P/'qa';stamp=str(int(time.time()));files=json.loads((Q/'candidate-files.json').read_text())
+          for old in Q.glob('live-diff-*'):old.unlink()
           def get(url):
               sep='&' if '?' in url else '?'
               req=urllib.request.Request(url+sep+'accept398='+stamp,headers={'User-Agent':'Mozilla/5.0 M398-publication-verification','Cache-Control':'no-cache'})
@@ -38,10 +39,23 @@ jobs:
           def normal_html(data):
               s=BeautifulSoup(data,'html.parser')
               for el in s.select('link[rel="canonical"],meta[property="og:url"]'):el.decompose()
+              # The CDN inserts its existing analytics beacon. Check its exact origin,
+              # public site id and integrity before omitting this known injected tag.
+              for el in s.select('script[data-cf-beacon]'):
+                  src=urllib.parse.urlsplit(el.get('src',''))
+                  assert src.scheme=='https' and src.netloc=='static.cloudflareinsights.com' and src.path.startswith('/beacon.min.js/')
+                  assert el.get('integrity')=='sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA=='
+                  assert json.loads(el['data-cf-beacon']).get('token')=='9618308f3e6d48c4945ee8b3cd39ba9f'
+                  el.decompose()
+              # Only ignore empty indentation at document/head/body level. Preserve
+              # all text and whitespace inside paragraphs, scripts, styles and pre.
+              for parent in [s,s.html,s.head,s.body]:
+                  if parent is None:continue
+                  for child in list(parent.children):
+                      if isinstance(child,NavigableString) and not isinstance(child,Comment) and not str(child).strip():child.extract()
               return str(s)
           def one(item):
-              path,expected=item
-              url='https://sdeuniverses.com/'+path
+              path,expected=item;url='https://sdeuniverses.com/'+path
               if url.endswith('/index.html'):url=url[:-10]
               for trial in range(3):
                   try:
@@ -57,12 +71,14 @@ jobs:
                           a,b=normal_html(expected_raw),normal_html(raw)
                           if a!=b:
                               (Q/('live-diff-'+path.replace('/','_')+'.txt')).write_text('\n'.join(difflib.unified_diff(a.splitlines(),b.splitlines(),fromfile='candidate',tofile='live')),encoding='utf-8')
-                              raise AssertionError(('HTML changed beyond canonical/og:url tags',path))
-                          row.update(mode='full_html_after_only_canonical_and_og_url_removal',match=True,canonical=clean,normalized_sha256=hashlib.sha256(b.encode()).hexdigest())
-                          if path=='books/m/398/text/index.html':
-                              (Q/'live-fulltext.html').write_bytes(raw)
+                              raise AssertionError(('Unexpected HTML change',path))
+                          ah=''.join(re.findall('[\u3400-\u9fff]',BeautifulSoup(expected_raw,'html.parser').get_text()))
+                          bh=''.join(re.findall('[\u3400-\u9fff]',soup.get_text()))
+                          assert ah==bh,('Han character sequence differs',path)
+                          row.update(mode='full_html_with_explicit_cdn_normalization',match=True,canonical=clean,normalized_sha256=hashlib.sha256(b.encode()).hexdigest(),all_han_sequence_matches=True,analytics_tags=len(soup.select('script[data-cf-beacon]')))
+                          if path=='books/m/398/text/index.html':(Q/'live-fulltext.html').write_bytes(raw)
                       else:
-                          assert digest==expected['sha256'],('Binary/content hash mismatch',path,digest,expected['sha256'])
+                          assert digest==expected['sha256'],('Byte hash mismatch',path,digest,expected['sha256'])
                           row.update(mode='exact_bytes',match=True)
                       return row
                   except Exception:
@@ -74,13 +90,11 @@ jobs:
               raw,status,ctype,final=get(url);assert status==200
               soup=BeautifulSoup(raw,'html.parser');ns=soup.select('article.book[data-number="398"]');assert len(ns)==1,(url,len(ns))
               text=ns[0].get_text(' ',strip=True);assert '王德生' in text and '张琼' in text and 'AI时代的判断力发生学导论' in text
-              links=[a.get('href') for a in ns[0].select('a[href]')]
-              assert any('/books/m/398/read.html' in x for x in links)
+              links=[a.get('href') for a in ns[0].select('a[href]')];assert any('/books/m/398/read.html' in x for x in links)
               shelves.append({'url':url,'status':status,'volume398':True,'authors_correct':True,'reader_link':True})
-          raw,_,_,_=get('https://sdeuniverses.com/books/m/398/publication.json');meta=json.loads(raw)
-          assert meta.get('revision')=='20261008-m398-v1'
-          report={'status':'passed','at':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'commit':json.loads((Q/'publication-commit.json').read_text())['sha'],'files_verified':len(results),'exact_byte_files':sum(x['mode']=='exact_bytes' for x in results),'html_files_verified':sum(x['mode']!='exact_bytes' for x in results),'allowed_html_transformations':['link[rel=canonical] rewritten by existing Worker','meta[property=og:url] rewritten by existing Worker'],'all_other_html_identical':True,'files':results,'shelves':shelves}
-          (Q/'live-acceptance.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print('LIVE_ACCEPTANCE PASSED:',len(results),'files;',report['exact_byte_files'],'exact byte matches;',report['html_files_verified'],'complete HTML matches after two explicit metadata tags; 3 shelves.')
+          raw,_,_,_=get('https://sdeuniverses.com/books/m/398/publication.json');meta=json.loads(raw);assert meta.get('revision')=='20261008-m398-v1'
+          report={'status':'passed','at':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'commit':json.loads((Q/'publication-commit.json').read_text())['sha'],'files_verified':len(results),'exact_byte_files':sum(x['mode']=='exact_bytes' for x in results),'html_files_verified':sum(x['mode']!='exact_bytes' for x in results),'allowed_html_transformations':['canonical and og:url tags rewritten by existing Worker','known Cloudflare analytics beacon with checked origin public site id and integrity','empty indentation nodes directly within document html head body only'],'all_other_html_dom_identical':True,'all_html_han_sequences_identical':True,'files':results,'shelves':shelves}
+          (Q/'live-acceptance.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print('LIVE_ACCEPTANCE PASSED:',len(results),'files;',report['exact_byte_files'],'exact byte matches;',report['html_files_verified'],'full HTML matches; 3 shelves.')
           PY
           python /tmp/accept.py "$RUNNER_TEMP/book398"
       - name: Verify production desktop mobile reader and book agent
