@@ -1,0 +1,41 @@
+name: SDE ontology verified source receipt
+on:
+  push:
+    branches: [sde-ontology-complete-20261008]
+    paths: [.github/workflows/sde-ontology-source-receipt-20261008.yml]
+permissions:
+  contents: read
+jobs:
+  receive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Receive source and record transport result
+        run: |
+          mkdir -p "$RUNNER_TEMP/intro-source"
+          python - <<'PY'
+          import urllib.request,urllib.error,pathlib,os,hashlib,json
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'intro-source'
+          url='https://sdmntprnznorth.oaiusercontent.com/files/00000000-f938-820b-85f2-543c53b71c9b/raw?se=2026-10-08T08%3A30%3A27Z&sp=r&sv=2026-02-06&sr=b&scid=68ae4baa-e132-5fd4-8bfe-1a5de382371d&skoid=f8b66c09-1aa0-4801-9884-173c5cef2b8c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-08T06%3A40%3A00Z&ske=2026-10-09T06%3A40%3A00Z&sks=b&skv=2026-02-06&sig=GdFpyr00et0/BRlKDmYTYZmHGzO7S8DIjxyCcP8w%2BuQ%3D'
+          try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'*/*'})
+              with urllib.request.urlopen(req,timeout=90) as response: raw=response.read()
+              assert len(raw)==4110944 and hashlib.sha256(raw).hexdigest()=='d6e7c7a294b13e89af290ffae18a7c0e2d03af873af8d874c12d7f24aa6588fd'
+              (root/'source.docx').write_bytes(raw);result={'verified':True,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
+          except urllib.error.HTTPError as e:result={'verified':False,'status':e.code,'reason':str(e),'body':e.read(3000).decode(errors='replace')}
+          (root/'receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False))
+          PY
+      - name: Retrieve the existing book PDF from its configured publisher bucket
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          EP=https://d3ea22f828ce19cf113a457ceba2c930.r2.cloudflarestorage.com
+          aws s3 cp s3://sdeuniverses-pdf/SDE-Ontology-Intro-Preview-2026.pdf "$RUNNER_TEMP/intro-source/previous-preview.pdf" --endpoint-url "$EP" --only-show-errors || true
+          aws s3 cp s3://sdeuniverses-pdf/books/sde-ontology-intro/SDE-Ontology-Intro-Preview.pdf "$RUNNER_TEMP/intro-source/previous-reader.pdf" --endpoint-url "$EP" --only-show-errors || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sde-ontology-source-receipt-20261008
+          path: ${{ runner.temp }}/intro-source/
+          retention-days: 14
