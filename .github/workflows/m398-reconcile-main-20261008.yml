@@ -1,0 +1,139 @@
+name: M398 preserve concurrent main and recheck
+on:
+  push:
+    branches: [sde/m398-publication-unit-20261008]
+    paths: [.github/workflows/m398-reconcile-main-20261008.yml]
+permissions:
+  contents: write
+concurrency:
+  group: m398-unit-candidate
+  cancel-in-progress: false
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sde/m398-publication-unit-20261008
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/398/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/books/bookshelf.css
+            /public/books/bookshelf.js
+            /public/books/agent/
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /tools/m398_unit/
+            /ops/m398-unit/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser checks
+        run: |
+          python -m pip install --quiet beautifulsoup4 playwright pymupdf
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python - <<'PY' >> "$GITHUB_ENV"
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:print('CHROMIUM_PATH='+p.chromium.executable_path)
+          PY
+      - name: Merge main preserving every non398 catalog entry and card
+        run: |
+          git config user.name 'SDE publication automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git fetch origin main
+          python - <<'PY'
+          import hashlib,json,pathlib,re,subprocess
+          R=pathlib.Path.cwd();paths=['public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html']
+          run=lambda *a:subprocess.check_output(['git',*a],text=True).strip()
+          main=run('rev-parse','origin/main');head=run('rev-parse','HEAD');base=run('merge-base',head,main)
+          changed=run('diff','--name-only',base,main,'--','public/books/m/398/')
+          assert not changed,('Concurrent book398 changes require manual review',changed)
+          ours={p:(R/p).read_text(encoding='utf-8') for p in paths}
+          latest={p:subprocess.check_output(['git','show',main+':'+p]) for p in paths}
+          m=subprocess.run(['git','merge','--no-commit','--no-ff',main],check=False)
+          conflicts=set(run('diff','--name-only','--diff-filter=U').splitlines())
+          assert conflicts.issubset(set(paths)),('Unexpected conflicts',conflicts)
+          assert m.returncode in [0,1]
+          pat=r'<article\b[^>]*\bdata-id="m-398"[^>]*>.*?</article>'
+          notes={'mainBaseline':main,'candidateBeforeMerge':head,'mergeBase':base,'resolved':[],'otherBookRecordsPreserved':True,'otherCardsPreserved':True}
+          sha=lambda b:hashlib.sha256(b).hexdigest()
+          report=json.loads((R/'ops/m398-unit/acceptance/m398-build-report.json').read_text())
+          for p in paths:
+              old=latest[p].decode('utf-8')
+              if p.endswith('.json'):
+                  data=json.loads(old);mine=json.loads(ours[p]);rec=next(x for x in mine['books'] if x.get('number')==398)
+                  others=[x for x in data['books'] if x.get('number')!=398]
+                  count=0
+                  for i,x in enumerate(data['books']):
+                      if x.get('number')==398:data['books'][i]=rec;count+=1
+                  assert count==1
+                  assert [x for x in data['books'] if x.get('number')!=398]==others
+                  new=json.dumps(data,ensure_ascii=False,indent=2)+'\n'
+              else:
+                  mine=re.findall(pat,ours[p],re.S);assert len(mine)==1
+                  assert len(re.findall(pat,old,re.S))==1
+                  new=re.sub(pat,lambda m:mine[0],old,flags=re.S)
+                  assert re.sub(pat,'',old,flags=re.S)==re.sub(pat,'',new,flags=re.S)
+              (R/p).write_text(new,encoding='utf-8')
+              item=next(x for x in report['changedFiles'] if x['path']==p)
+              item.update(before=sha(latest[p]),after=sha(new.encode()))
+              notes['resolved'].append({'path':p,'before':item['before'],'after':item['after']})
+          report['concurrentMainBaseline']=main
+          (R/'ops/m398-unit/acceptance/m398-build-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          (R/'ops/m398-unit/acceptance/concurrent-merge.json').write_text(json.dumps(notes,ensure_ascii=False,indent=2),encoding='utf-8')
+          subprocess.check_call(['git','add','--sparse',*paths,'ops/m398-unit/acceptance'])
+          assert not run('diff','--name-only','--diff-filter=U')
+          (R/'m398-build-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          (R/'m398-main-baseline.txt').write_text(main)
+          print(json.dumps(notes,ensure_ascii=False))
+          PY
+      - name: Recheck combined browser candidate and reconstruct rollback baseline
+        run: |
+          mkdir -p m398-qa
+          set -o pipefail
+          python tools/m398_unit/test.py 2>&1 | tee m398-qa/test-output.txt
+          python - <<'PY'
+          import hashlib,json,pathlib,subprocess,tempfile
+          r=json.loads(pathlib.Path('m398-build-report.json').read_text());base=pathlib.Path('m398-main-baseline.txt').read_text().strip();rows=[]
+          with tempfile.TemporaryDirectory() as td:
+              for x in r['changedFiles']:
+                  path=x['path'];data=pathlib.Path(path).read_bytes();assert hashlib.sha256(data).hexdigest()==x['after']
+                  p=pathlib.Path(td)/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
+                  if x['before'] is None:p.unlink();action='remove-new-file'
+                  else:
+                      original=subprocess.check_output(['git','show',base+':'+path]);assert hashlib.sha256(original).hexdigest()==x['before'];p.write_bytes(original);action='restore-matching-baseline'
+                  rows.append({'path':path,'action':action,'status':'PASS'})
+          o={'scope':'isolated reconstruction after concurrent-main merge; not production rollback','baselineCommit':base,'checks':len(rows),'results':rows,'productionModified':False,'personalRecordsTouched':False}
+          pathlib.Path('ops/m398-unit/acceptance/rollback-rehearsal.json').write_text(json.dumps(o,ensure_ascii=False,indent=2),encoding='utf-8')
+          pathlib.Path('ops/m398-unit/acceptance/engineering-report.json').write_bytes(pathlib.Path('m398-qa/engineering-report.json').read_bytes())
+          print(json.dumps({'rollbackChecks':len(rows),'all':'PASS'}))
+          PY
+      - name: Commit only a reviewed merge, never rewrite main
+        run: |
+          git add --sparse ops/m398-unit/acceptance
+          git diff --cached --check -- tools/m398_unit public/books/m/398
+          git diff --name-only origin/main -- public > m398-qa/merged-public-scope.txt
+          python - <<'PY'
+          from pathlib import Path
+          allow={'public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html'}
+          paths=Path('m398-qa/merged-public-scope.txt').read_text().splitlines()
+          assert all(p.startswith('public/books/m/398/') or p in allow for p in paths),paths
+          PY
+          git commit -m 'merge: retain concurrent publications and add only book398 unit changes'
+          git push origin HEAD:sde/m398-publication-unit-20261008
+          git rev-parse HEAD > m398-qa/candidate-commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m398-reconciled-candidate
+          path: |
+            m398-qa
+            ops/m398-unit/acceptance
+          retention-days: 14
