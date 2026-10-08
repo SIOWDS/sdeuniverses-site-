@@ -3,7 +3,7 @@
 from pathlib import Path
 import concurrent.futures, hashlib, json, os, time, urllib.request
 from datetime import datetime, timezone
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 from playwright.sync_api import sync_playwright
 ROOT=Path.cwd();OUT=ROOT/'m398-live-qa';OUT.mkdir(exist_ok=True)
 BASE='https://sdeuniverses.com';REV='20261008-m398-unit-v1';results=[]
@@ -13,12 +13,25 @@ def get(url):
     with urllib.request.urlopen(req,timeout=60) as r:
         assert r.status==200,(url,r.status)
         return r.read()
+def norm_html(data):
+    s=BeautifulSoup(data.decode('utf-8'),'html.parser')
+    for n in s.select('link[rel="canonical"],meta[property="og:url"]'):
+        url=n.get('href',n.get('content',''))
+        assert url.startswith(BASE+'/books/m/398/'),('unexpected canonical',url)
+        n.decompose()
+    for n in s.select('script[data-cf-beacon]'):
+        assert n.get('src','').startswith('https://static.cloudflareinsights.com/beacon.min.js/')
+        assert n.get('integrity')=='sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA=='
+        assert not n.get_text(strip=True)
+        n.decompose()
+    for n in list(s.find_all(string=True)):
+        if isinstance(n,NavigableString) and not n.strip() and n.parent.name in ('html','head','body','[document]'):n.extract()
+    return str(s).strip()
 def check(label,value,detail=None):
     results.append({'check':label,'status':'PASS' if value else 'FAIL','detail':detail})
-    save()
-    assert value,(label,detail)
+    save();assert value,(label,detail)
 def save():
-    (OUT/'production-report.json').write_text(json.dumps({'revision':REV,'checkedAt':datetime.now(timezone.utc).isoformat(),'commit':os.getenv('GITHUB_SHA'),'realModelTested':False,'learningEffectTested':False,'reindexRequested':False,'results':results},ensure_ascii=False,indent=2),encoding='utf-8')
+    (OUT/'production-report.json').write_text(json.dumps({'revision':REV,'checkedAt':datetime.now(timezone.utc).isoformat(),'commit':os.getenv('GITHUB_SHA'),'realModelTested':False,'learningEffectTested':False,'reindexRequested':False,'htmlNormalization':'Only verified canonical/og URLs, previously observed integrity-pinned Cloudflare beacon and top-level blank nodes; all other content compared.','results':results},ensure_ascii=False,indent=2),encoding='utf-8')
 manifest=None
 for attempt in range(32):
     try:
@@ -31,14 +44,16 @@ report=json.loads((ROOT/'ops/m398-unit/acceptance/m398-build-report.json').read_
 paths=[x['path'] for x in report['changedFiles'] if x['path'].startswith('public/books/m/398/')]
 def verify(path):
     expected=(ROOT/path).read_bytes();url=BASE+'/'+path.removeprefix('public/')
-    try:actual=get(url);return path,sha(actual)==sha(expected),{'bytes':len(actual),'sha256':sha(actual)}
+    try:
+        actual=get(url);exact=actual==expected;ok=exact or (path.endswith('.html') and norm_html(actual)==norm_html(expected))
+        if not ok:(OUT/('mismatch-'+path.replace('/','_'))).write_bytes(actual)
+        return path,ok,{'bytes':len(actual),'sha256':sha(actual),'expectedSha256':sha(expected),'exactBytes':exact,'knownEdgeNormalized':bool(ok and not exact)}
     except Exception as e:return path,False,str(e)
 with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
     checks=list(pool.map(verify,paths))
 for name,ok,detail in checks:check('live asset '+name,ok,detail)
 for path,expected in report['authorArticleHashesUnchanged'].items():
-    html=get(BASE+'/'+path.removeprefix('public/')).decode('utf-8')
-    body=BeautifulSoup(html,'html.parser').find('article')
+    html=get(BASE+'/'+path.removeprefix('public/')).decode('utf-8');body=BeautifulSoup(html,'html.parser').find('article')
     check('author text preserved '+path,body is not None and sha(body.get_text('\n',strip=True).encode())==expected)
 for url in [BASE+'/books/',BASE+'/monographs/','https://read.sdeuniverses.com/library/']:
     html=get(url).decode('utf-8');s=BeautifulSoup(html,'html.parser');card=s.find('article',attrs={'data-id':'m-398'})
