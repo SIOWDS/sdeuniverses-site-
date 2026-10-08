@@ -1,0 +1,60 @@
+name: SDE ontology complete reader acceptance
+on:
+  push:
+    branches: [sde-ontology-complete-20261008]
+    paths: [.github/workflows/sde-ontology-full-candidate-20261008.yml]
+permissions:
+  contents: read
+jobs:
+  accept:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Receive exact complete publication candidate
+        run: |
+          mkdir -p "$RUNNER_TEMP/candidate"
+          python - <<'PY'
+          import pathlib,os,urllib.request,hashlib,zipfile,io,json
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'candidate'
+          url='https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-02a8-81fa-8cba-717c22a1117e/raw?se=2026-10-08T08%3A51%3A24Z&sp=r&sv=2026-02-06&sr=b&scid=e978bea2-b6de-56d1-b26b-11b3a0e4ea19&skoid=f8b66c09-1aa0-4801-9884-173c5cef2b8c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-08T06%3A04%3A02Z&ske=2026-10-09T06%3A04%3A02Z&sks=b&skv=2026-02-06&sig=rw4lZxvTzYM7qbJPnxqZLNn1U0c1O2FTp8lkqPg9yOY%3D'
+          raw=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=90).read()
+          assert len(raw)==8789359 and hashlib.sha256(raw).hexdigest()=='743eb3b4b05b847f64b272d99248d919aa076823dded745994385dcc4d98c1c5'
+          z=zipfile.ZipFile(io.BytesIO(raw))
+          for f in z.infolist():
+              assert not pathlib.PurePosixPath(f.filename).is_absolute() and '..' not in pathlib.PurePosixPath(f.filename).parts
+          z.extractall(root)
+          m=json.loads((root/'manifest.json').read_text())
+          for f in m['published_files']:
+              data=(root/'book'/f['path']).read_bytes();assert len(data)==f['bytes'] and hashlib.sha256(data).hexdigest()==f['sha256']
+          print('EXACT_PAYLOAD_VERIFIED',len(m['published_files']),'published files; source SHA matches authorized full manuscript')
+          PY
+      - name: Install browser test dependencies and Chinese fonts
+        timeout-minutes: 6
+        run: |
+          python -m pip install -q playwright pymupdf beautifulsoup4
+          if ! fc-list :lang=zh | grep -q .; then sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk; fi
+          command -v google-chrome || command -v chromium || python -m playwright install --with-deps chromium
+      - name: Verify PDF, terminal content and source-preservation receipts
+        run: |
+          python - <<'PY'
+          import pathlib,os,fitz,json
+          r=pathlib.Path(os.environ['RUNNER_TEMP'])/'candidate';p=fitz.open(r/'book/sde-ontology-intro-full.pdf')
+          assert len(p)==523 and len(p.get_toc())>600
+          assert '十言说尽' in p[-2].get_text() or '发生没有终点' in p[-2].get_text()
+          q=json.loads((r/'qa/sequence-check.json').read_text());assert q['cjk_sequence_exact_excluding_declared_note']
+          print('FULL_PDF_VERIFIED',len(p),'pages',len(p.get_toc()),'bookmarks')
+          PY
+      - name: Exercise complete desktop and mobile readers
+        timeout-minutes: 6
+        run: |
+          mkdir -p "$RUNNER_TEMP/site/books"
+          ln -s "$RUNNER_TEMP/candidate/book" "$RUNNER_TEMP/site/books/sde-ontology-intro"
+          python -m http.server 8765 --bind 127.0.0.1 --directory "$RUNNER_TEMP/site" > "$RUNNER_TEMP/candidate/qa/http.log" 2>&1 &
+          python "$RUNNER_TEMP/candidate/build-tools/browser_check.py" http://127.0.0.1:8765/books/sde-ontology-intro/ "$RUNNER_TEMP/candidate/qa/browser-accepted"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sde-ontology-full-candidate-tested-20261008
+          path: ${{ runner.temp }}/candidate/
+          include-hidden-files: true
+          retention-days: 14
