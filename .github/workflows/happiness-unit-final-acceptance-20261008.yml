@@ -1,0 +1,63 @@
+name: Final acceptance of Happiness three-in-one publishing unit
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/happiness-unit-final-acceptance-20261008.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/happiness_publication_unit_20261008.py
+            /public/books/happiness-secret/
+            /public/books/catalog.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: happiness-publication-unit-acceptance
+          run-id: 37705084100
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/happiness-unit-evidence
+      - name: Prepare bounded acceptance dependencies
+        timeout-minutes: 4
+        run: |
+          python3 -m pip install --quiet --timeout 25 --retries 1 beautifulsoup4 playwright
+          timeout 150s python3 -m playwright install chromium
+          timeout 40s sudo apt-get -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 -o Acquire::Retries=1 install -y -qq fonts-noto-cjk || echo 'Using system fonts'
+      - name: Wait for catalogue propagation without weakening metadata checks
+        run: |
+          python3 - <<'PY'
+          import runpy,json,time,hashlib
+          from urllib.request import Request,urlopen
+          m=runpy.run_path('tools/happiness_publication_unit_20261008.py');qa=m['QA'];attempts=[]
+          def fresh_get(url):
+              limit=12 if url=='https://sdeuniverses.com/books/catalog.json' else 1
+              for i in range(limit):
+                  with urlopen(Request(url,headers={'User-Agent':'Happiness-Unit-Final-Acceptance','Cache-Control':'no-cache','Pragma':'no-cache'}),timeout=60) as r:
+                      data=r.read();status=r.status;actual=r.geturl();headers={k:v for k,v in r.headers.items() if k.lower() in ('age','cache-control','cf-cache-status','etag','last-modified','date')}
+                  if limit==1:return data,status,actual
+                  cat=json.loads(data);b=next(x for x in cat['books'] if x['id']=='happiness-secret')
+                  ok=b.get('learnUrl')==m['BASE']+'agent/learning.html' and b.get('publicationUnit',{}).get('revision')==m['REV']
+                  attempts.append({'attempt':i,'url':actual,'status':status,'headers':headers,'book_record':b,'ready':ok})
+                  (qa/'catalogue-propagation.json').write_text(json.dumps(attempts,ensure_ascii=False,indent=2))
+                  if ok:return data,status,actual
+                  time.sleep(5)
+              raise RuntimeError('Plain catalogue URL still lacks deployed unit metadata; evidence retained')
+          m['live'].__globals__['get']=fresh_get
+          m['live']()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: happiness-unit-final-acceptance
+          path: ${{ runner.temp }}/happiness-unit-evidence/
+          retention-days: 30
