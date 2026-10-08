@@ -1,0 +1,60 @@
+name: Volume282 full edition candidate and browser validation
+on:
+  push:
+    branches: [codex/eq-ontology-20261008]
+    paths: [.github/workflows/eq282-candidate-20261008.yml]
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Receive the exact author-authorized full edition
+        run: |
+          python3 - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,json,os
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'eq282';root.mkdir()
+          url='https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-1b6c-8211-9b0c-ecb77bb5de2f/raw?se=2026-10-08T12%3A50%3A53Z&sp=r&sv=2026-02-06&sr=b&scid=2138f112-f744-503c-9094-1fcc4ef78fe6&skoid=6980ab1e-b994-4668-84de-ad0444c9d08b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-07T22%3A41%3A10Z&ske=2026-10-08T22%3A41%3A10Z&sks=b&skv=2026-02-06&sig=LRZIZiWGVdKcmxOR26c/gwRnNwCCUDay5WSXbAPhwA4%3D'
+          raw=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'*/*'}),timeout=120).read()
+          assert len(raw)==6794844 and hashlib.sha256(raw).hexdigest()=='00ac15d771612ac273762bb626b2b33015b17077d3e24eedd49ffacf7b98e963'
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+            z.extractall(root)
+          m=json.loads((root/'book/publication-manifest.json').read_text());assert m['release_sha256']=='e7ec595280bf60907a7e19cc58d68041d13c2ecc7d210a8f3275985156b0e945' and m['body_han']==251155 and m['volume']==282
+          for f in m['files']:
+            p=root/'book'/f['path'];assert p.stat().st_size==f['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==f['sha256']
+          print('EXACT_SOURCE_VERIFIED',len(m['files']),'assets',m['body_han'],'Han')
+          PY
+      - name: Preserve exact candidate before further checks
+        uses: actions/upload-artifact@v4
+        with:
+          name: eq282-exact-candidate-v1
+          path: ${{ runner.temp }}/eq282/
+          retention-days: 14
+      - name: Prepare browser
+        run: |
+          python3 -m pip install --quiet playwright beautifulsoup4 pymupdf
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Check complete PDF and all chapter text
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,json,re,fitz
+          from bs4 import BeautifulSoup
+          r=Path(os.environ['RUNNER_TEMP'])/'eq282';b=r/'book';d=fitz.open(b/'downloads/eq-ontology-reader-v1.pdf');assert len(d)==463 and len(d.get_toc())==683
+          records=json.loads((b/'audit/chapter-audit.json').read_text());assert len(records)==60 and sum(x['body_han'] for x in records)==251155
+          for c in records:
+            a=BeautifulSoup((b/'chapters'/('%03d.html'%c['chapter'])).read_text(),'html.parser').select_one('article.chapter');n=sum(len(re.findall(r'[\u3400-\u4dbf\u4e00-\u9fff]',p.get_text())) for p in a.select('p'));assert n==c['body_han']
+          (r/'qa/text-pdf-validation.json').write_text(json.dumps({'pass':True,'chapters':60,'body_han':251155,'pages':463,'bookmarks':683,'isbn':'979-8-90690-481-2','volume':282,'price_usd':24},ensure_ascii=False,indent=2))
+          PY
+      - name: Validate desktop and mobile reading
+        run: python3 "$RUNNER_TEMP/eq282/build-tools/browser_qa.py" "$RUNNER_TEMP/eq282"
+      - name: Preserve validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eq282-candidate-evidence-v1
+          path: ${{ runner.temp }}/eq282/qa/
+          retention-days: 14
