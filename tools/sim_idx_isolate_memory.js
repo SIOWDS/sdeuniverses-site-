@@ -244,7 +244,7 @@ const FILES = Object.assign({
     M.reset();
     scan = await M.ragScan(mkEnv({ files }), URL0, "作文", ["作文"], "", 48, 1600, { pick: 6, keep: ["/books/m/7/"] });
     p = per(scan);
-    ok("书内检索（keep 只含一本书）：只剩这一本，每篇放宽到 6 段", Object.keys(p).join() === "1" && p[1] === 6, JSON.stringify(p));
+    ok("书内检索（keep 只含一本书）：只剩这一本，每篇放宽到 12 段（此处该页只有 10 段，全带回）", Object.keys(p).join() === "1" && p[1] === 10, JSON.stringify(p));
     ok("书号带两头斜杠：/books/m/7/ 不会误中 /books/m/77/", !(3 in p));
   }
 

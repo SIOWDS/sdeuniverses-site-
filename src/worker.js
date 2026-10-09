@@ -5733,12 +5733,13 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   }
   top.sort((a, b) => b.sc - a.sc);
   /* 专著页的块只有 220 字（其他栏目 420），同样的篇幅要多给一倍名额，否则一篇专著页最多只带回
-     440 字，比切小之前还少。书内检索（keep 只含一本书）时再放宽到 6 块：整场对话都在这本书里。 */
+     440 字，比切小之前还少。书内检索（keep 只含一本书）时放宽到 12 块：很多书的全文就是一个整页
+     （如第 3 号的 /text/），名额不放宽，一问最多只带回一千多字；总量仍由 k 与 cap 封顶。 */
   const perDoc = {}, picked = [];
   const bookOnly = !!(o.keep && o.keep.length === 1 && /^\/books\/m\/\d+\/$/.test(o.keep[0]));
   const limOf = (d) => {
     const dd = docsArr && docsArr[d];
-    if (dd && dd.u && String(dd.u).indexOf("/books/") === 0) return bookOnly ? 6 : PER_DOC * 2;
+    if (dd && dd.u && String(dd.u).indexOf("/books/") === 0) return bookOnly ? 12 : PER_DOC * 2;
     return PER_DOC;
   };
   for (const it of top) {
