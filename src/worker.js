@@ -4111,6 +4111,28 @@ export class AskLimiter {
    ⚠ 只数得到本类自己写的行；站里其他 DO 的写入不在内，所以上限留了 1000 万余量。 */
 const IDX_CAP_AUTO = 40000000, IDX_CAP_HARD = 48000000, IDX_CYCLE_DAY = 9, IDX_SYNC_ESTIMATE = 1600000;
 const IDX_CAP_SEED = { "2026-09": 68520000 };   // 本周期账单实读（2026-10-02）：已写 68.52M，直接封死到 10/9 新周期
+/* ── 增量同步的稳定键（2026-10-10）──────────────────────────────────────────────
+   旧做法：数据库里的篇号＝manifest 里的顺序号，每新增一篇，后面所有篇的号整体后移，
+   于是 50 多万条词条整张重写（每趟约 100 万行）。
+   新做法：库内词条挂在「网址的 53 位哈希」上，篇号 n 只留在 docs 表里当一个会变的属性。
+   R2 里的 doc/<i>.json、manifest、分片文件名一律不动。
+   指纹：每篇的「篇层词表」「坐标词表」各一个指纹，没变就一行都不写。 */
+function _idxHash53(str, seed) {
+  seed = seed || 0;
+  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+function _idxFp(words) {
+  const a = words.slice().sort();
+  return _idxHash53(a.join("\u0001")).toString(36) + "." + a.length;
+}
 export class IndexMemory {
   constructor(ctx, env) { this.ctx = ctx; this.env = env; this.sql = ctx.storage.sql; }
 
@@ -4118,12 +4140,24 @@ export class IndexMemory {
     if (this._ready) return;
     const s = this.sql;
     s.exec("CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT)");
-    s.exec("CREATE TABLE IF NOT EXISTS docs(i INTEGER PRIMARY KEY, u TEXT, t TEXT, tl TEXT, sec TEXT)");
-    /* src：'k'＝篇层关键词（每篇 64 个高频词），'c'＝SDE 坐标词。
-       两种来源的加分口径不同（坐标只在词义扩展命中时加分），所以必须分得开，不能合成一张。 */
-    s.exec("CREATE TABLE IF NOT EXISTS terms(term TEXT, i INTEGER, src TEXT)");
-    s.exec("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
-    s.exec("CREATE TABLE IF NOT EXISTS secs(sec TEXT PRIMARY KEY, label TEXT)");
+    /* schema=2：词条挂稳定键 h（网址哈希），篇号 n 只是 docs 的属性，见上方 _idxHash53。
+       没有这个标记的库仍是旧表，由 _queryLegacy 应答；下一趟同步会整体迁移一次（见 _runTask "man"）。 */
+    this._v2f = this._get("schema") === "2";
+    if (this._v2f) {
+      s.exec("CREATE TABLE IF NOT EXISTS docs(h INTEGER PRIMARY KEY, n INTEGER, u TEXT, t TEXT, tl TEXT, sec TEXT)");
+      s.exec("CREATE TABLE IF NOT EXISTS terms(h INTEGER, term TEXT, src TEXT, PRIMARY KEY(h, src, term)) WITHOUT ROWID");
+      s.exec("CREATE TABLE IF NOT EXISTS fp(h INTEGER PRIMARY KEY, fk TEXT, fc TEXT)");
+      s.exec("CREATE TABLE IF NOT EXISTS secs(sec TEXT PRIMARY KEY, label TEXT)");
+      s.exec("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
+      s.exec("CREATE INDEX IF NOT EXISTS docs_n ON docs(n)");
+    } else {
+      s.exec("CREATE TABLE IF NOT EXISTS docs(i INTEGER PRIMARY KEY, u TEXT, t TEXT, tl TEXT, sec TEXT)");
+      /* src：'k'＝篇层关键词（每篇 64 个高频词），'c'＝SDE 坐标词。
+         两种来源的加分口径不同（坐标只在词义扩展命中时加分），所以必须分得开，不能合成一张。 */
+      s.exec("CREATE TABLE IF NOT EXISTS terms(term TEXT, i INTEGER, src TEXT)");
+      s.exec("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
+      s.exec("CREATE TABLE IF NOT EXISTS secs(sec TEXT PRIMARY KEY, label TEXT)");
+    }
     this._ready = true;
   }
   _get(k) { const r = [...this.sql.exec("SELECT v FROM meta WHERE k=?", k)]; return r.length ? r[0].v : ""; }
@@ -4278,10 +4312,24 @@ export class IndexMemory {
        💡 心法（站里第三次撞同一条）：**回滚重来不该是丢稿/丢数据的方式。**
           凡「先建影子、再顶替」的地方，顶替之前都要有一道「新的这份确实比旧的好」的闸。 */
     const _err = this._get("err");
+    const _mig = this._get("mode") !== "inc";   // 迁移趟：整体建影子表再换手；增量趟：改动已就地写好
     if (_err) {
-      // 失败就地收工：老表原样留着，pending 清空，err 留给 status 看。下一次 ensure 再来一遍。
+      // 失败就地收工：迁移趟的老表原样留着，增量趟下一趟按指纹重新比对（没写完的那几篇指纹也没记，会补上）。
       this._set("pending", "");
-      try { this.sql.exec("DROP TABLE IF EXISTS docs_new"); this.sql.exec("DROP TABLE IF EXISTS terms_new"); this.sql.exec("DROP TABLE IF EXISTS secs_new"); } catch (e) {}
+      if (_mig) {
+        try {
+          for (const n of ["docs_new", "terms_new", "secs_new", "fp_new"]) this.sql.exec("DROP TABLE IF EXISTS " + n);
+        } catch (e) {}
+      }
+      return;
+    }
+    if (!_mig) {
+      this._flushRows();
+      this._set("lastSyncRows", String(parseInt(this._get("runRows") || "0", 10) || 0));
+      this._set("stamp", this._get("newstamp"));
+      this._set("built", new Date().toISOString());
+      this._set("pending", "");
+      this._set("err", ""); this._set("errAt", "0");
       return;
     }
     {
@@ -4289,19 +4337,24 @@ export class IndexMemory {
       /* 第二道闸：新表得真有东西。空的新表顶替非空的旧表，永远是事故不是升级。 */
       const nNew = [...s.exec("SELECT count(*) AS n FROM docs_new")][0].n;
       const nOld = [...s.exec("SELECT count(*) AS n FROM docs")][0].n;
-      if (!nNew || (nOld && nNew < nOld * 0.5)) {
-        this._set("err", "换手被拦下：新表 " + nNew + " 篇、旧表 " + nOld + " 篇，不顶替（老表原样留着）");
+      const tNew = [...s.exec("SELECT count(*) AS n FROM terms_new")][0].n;
+      const tOld = [...s.exec("SELECT count(*) AS n FROM terms")][0].n;
+      if (!nNew || (nOld && nNew < nOld * 0.5) || !tNew || (tOld && tNew < tOld * 0.5)) {
+        this._set("err", "换手被拦下：新表 " + nNew + " 篇/" + tNew + " 词条、旧表 " + nOld + " 篇/" + tOld + " 词条，不顶替（老表原样留着）");
         this._set("pending", "");
-        s.exec("DROP TABLE IF EXISTS docs_new"); s.exec("DROP TABLE IF EXISTS terms_new"); s.exec("DROP TABLE IF EXISTS secs_new");
+        for (const n of ["docs_new", "terms_new", "secs_new", "fp_new"]) s.exec("DROP TABLE IF EXISTS " + n);
         return;
       }
-      s.exec("DROP TABLE IF EXISTS docs_old"); s.exec("DROP TABLE IF EXISTS terms_old"); s.exec("DROP TABLE IF EXISTS secs_old");
+      for (const n of ["docs_old", "terms_old", "secs_old", "fp_old"]) s.exec("DROP TABLE IF EXISTS " + n);
       s.exec("ALTER TABLE docs RENAME TO docs_old"); s.exec("ALTER TABLE terms RENAME TO terms_old"); s.exec("ALTER TABLE secs RENAME TO secs_old");
-      s.exec("ALTER TABLE docs_new RENAME TO docs"); s.exec("ALTER TABLE terms_new RENAME TO terms"); s.exec("ALTER TABLE secs_new RENAME TO secs");
-      s.exec("DROP TABLE IF EXISTS docs_old"); s.exec("DROP TABLE IF EXISTS terms_old"); s.exec("DROP TABLE IF EXISTS secs_old");
+      try { s.exec("ALTER TABLE fp RENAME TO fp_old"); } catch (e) {}
+      s.exec("ALTER TABLE docs_new RENAME TO docs"); s.exec("ALTER TABLE terms_new RENAME TO terms");
+      s.exec("ALTER TABLE secs_new RENAME TO secs"); s.exec("ALTER TABLE fp_new RENAME TO fp");
+      for (const n of ["docs_old", "terms_old", "secs_old", "fp_old"]) s.exec("DROP TABLE IF EXISTS " + n);
       this._w("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
-      /* 入账：实测行数（rowsWritten）与保守下限取大——下限＝文档行 ＋ 词条行 ×2（插入一次、建索引一次）。
-         取不到 rowsWritten 时只剩下限，不会少记。 */
+      this._w("CREATE INDEX IF NOT EXISTS docs_n ON docs(n)");
+      this._set("schema", "2"); this._v2f = true;
+      /* 入账：实测行数（rowsWritten）与保守下限取大——下限＝文档行 ＋ 词条行 ×2（插入一次、建索引一次）。 */
       this._flushRows();
       {
         const nT = [...s.exec("SELECT count(*) AS n FROM terms")][0].n;
@@ -4322,75 +4375,132 @@ export class IndexMemory {
     if (!o) throw new Error("桶里没有 " + key);
     return await o.text();
   }
+  /* 一篇的词条整体换成新词表：增量趟先删旧的（同一事务里，要么全换要么全不换），迁移趟表是空的不用删。 */
+  _putTerms(S, h, src, words, fpv) {
+    const inc = S === "";
+    const col = src === "k" ? "fk" : "fc";
+    const run = () => {
+      if (inc) this._w("DELETE FROM terms WHERE h=? AND src=?", h, src);
+      for (let p = 0; p < words.length; p += 45) {      // 每条 2 个绑定变量，45 行＝90 个，不过上限
+        const part = words.slice(p, p + 45);
+        const args = [];
+        for (const w of part) args.push(h, w);
+        this._w("INSERT OR IGNORE INTO terms" + S + "(h,term,src) VALUES " + part.map(() => "(?,?,'" + src + "')").join(","), ...args);
+      }
+      this._w("INSERT INTO fp" + S + "(h," + col + ") VALUES(?,?) ON CONFLICT(h) DO UPDATE SET " + col + "=excluded." + col, h, fpv);
+    };
+    if (inc && this.ctx.storage && this.ctx.storage.transactionSync) this.ctx.storage.transactionSync(run); else run();
+  }
+
   async _runTask(task, queue) {
     const s = this.sql;
-    /* ⚠ SQLite 的绑定变量有条数上限（实测 Workers DO 上约 100）。
-       原来一批 120 行：docs 每行 5 个占位符 ⇒ 600 个 ⇒ 第一件事就 SQLITE_ERROR
-       （"too many SQL variables at offset 294"），而当时的换手闸没拦住，
-       一张空表直接顶掉了线上那份好用的。**按占位符数算批，不按行数算。** */
-    const MAX_VARS = 90, DOC_BATCH = Math.floor(MAX_VARS / 5), TERM_BATCH = Math.floor(MAX_VARS / 2);
+    /* ⚠ SQLite 的绑定变量有条数上限（实测 Workers DO 上约 100）。**按占位符数算批，不按行数算。** */
+    const MAX_VARS = 90, DOC_BATCH = Math.floor(MAX_VARS / 6);
     if (task === "man") {
-      s.exec("DROP TABLE IF EXISTS docs_new"); s.exec("DROP TABLE IF EXISTS terms_new"); s.exec("DROP TABLE IF EXISTS secs_new");
-      s.exec("CREATE TABLE docs_new(i INTEGER PRIMARY KEY, u TEXT, t TEXT, tl TEXT, sec TEXT)");
-      s.exec("CREATE TABLE terms_new(term TEXT, i INTEGER, src TEXT)");
-      s.exec("CREATE TABLE secs_new(sec TEXT PRIMARY KEY, label TEXT)");
+      const mig = this._get("schema") !== "2";        // 旧表库：整体迁移一次；v2 库：只写变化的
+      this._set("mode", mig ? "mig" : "inc");
+      const S = mig ? "_new" : "";
+      if (mig) {
+        for (const n of ["docs_new", "terms_new", "secs_new", "fp_new"]) s.exec("DROP TABLE IF EXISTS " + n);
+        s.exec("CREATE TABLE docs_new(h INTEGER PRIMARY KEY, n INTEGER, u TEXT, t TEXT, tl TEXT, sec TEXT)");
+        s.exec("CREATE TABLE terms_new(h INTEGER, term TEXT, src TEXT, PRIMARY KEY(h, src, term)) WITHOUT ROWID");
+        s.exec("CREATE TABLE fp_new(h INTEGER PRIMARY KEY, fk TEXT, fc TEXT)");
+        s.exec("CREATE TABLE secs_new(sec TEXT PRIMARY KEY, label TEXT)");
+      }
       const txt = await this._text("search/manifest.json");
+      const have = new Map();
+      if (!mig) for (const r of s.exec("SELECT h,n,t,sec FROM docs")) have.set(r.h, r);
+      const seen = new Set();
+      let dup = "";
       let batch = [];
       const flush = () => {
         if (!batch.length) return;
-        const ph = batch.map(() => "(?,?,?,?,?)").join(",");
-        this._w("INSERT OR REPLACE INTO docs_new(i,u,t,tl,sec) VALUES " + ph, ...batch.flat());
+        const ph = batch.map(() => "(?,?,?,?,?,?)").join(",");
+        this._w("INSERT OR REPLACE INTO docs" + S + "(h,n,u,t,tl,sec) VALUES " + ph, ...batch.flat());
         batch = [];
       };
       _scanTopLevel(txt, "docs", (dTxt) => {
         let d; try { d = JSON.parse(dTxt); } catch (e) { return; }
-        batch.push([d.i, d.u, d.t, String(d.t || "").toLowerCase(), d.s]);
+        const h = _idxHash53(String(d.u));
+        if (seen.has(h)) { dup = dup || String(d.u); return; }
+        seen.add(h);
+        const o = have.get(h);
+        if (o && o.n === d.i && o.t === d.t && o.sec === d.s) return;     // 一行都不写
+        batch.push([h, d.i, d.u, d.t, String(d.t || "").toLowerCase(), d.s]);
         if (batch.length >= DOC_BATCH) flush();
       });
       flush();
+      if (dup) throw new Error("manifest 里网址重复或哈希相撞：" + dup);
+      if (!mig) {
+        /* 消失的篇：连词条一起清。闸：manifest 只剩不到一半就不信它（比如读到半截文件）。 */
+        if (have.size && seen.size < have.size * 0.5) throw new Error("manifest 只有 " + seen.size + " 篇、库里有 " + have.size + " 篇，拒绝据此删除");
+        for (const h of have.keys()) {
+          if (seen.has(h)) continue;
+          this._w("DELETE FROM terms WHERE h=?", h);
+          this._w("DELETE FROM fp WHERE h=?", h);
+          this._w("DELETE FROM docs WHERE h=?", h);
+        }
+      }
       const secs = [];
       _scanTopLevel(txt, "sections", (sTxt) => { try { secs.push(JSON.parse(sTxt)); } catch (e) {} });
-      for (const se of secs) this._w("INSERT OR REPLACE INTO secs_new(sec,label) VALUES(?,?)", se.key, se.label || se.key);
+      const haveSec = new Map();
+      if (!mig) for (const r of s.exec("SELECT sec,label FROM secs")) haveSec.set(r.sec, r.label);
+      for (const se of secs) {
+        const lab = se.label || se.key;
+        if (haveSec.get(se.key) === lab) continue;
+        this._w("INSERT OR REPLACE INTO secs" + S + "(sec,label) VALUES(?,?)", se.key, lab);
+      }
       // 后面的活：每个版块一份 kw 分片，最后坐标
       for (const se of secs) queue.push("kw:" + se.key);
       queue.push("coords");
       return;
     }
+    const mig = this._get("mode") !== "inc";
+    const S = mig ? "_new" : "";
+    const numToHash = () => { const m = new Map(); for (const r of s.exec("SELECT n,h FROM docs" + S)) m.set(r.n, r.h); return m; };
     if (task.indexOf("kw:") === 0) {
       const sec = task.slice(3);
       let txt = "";
       try { txt = await this._text("search/kw/" + sec + ".json"); } catch (e) { return; }   // 没有这一份就跳过，不算失败
-      let batch = [];
-      const flush = () => {
-        if (!batch.length) return;
-        const ph = batch.map(() => "(?,?,'k')").join(",");
-        this._w("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
-        batch = [];
-      };
+      const nh = numToHash();
+      const fk = new Map();
+      if (!mig) for (const r of s.exec("SELECT h,fk FROM fp")) fk.set(r.h, r.fk);
       _scanTopLevel(txt, "rows", (rowTxt) => {
         let r0; try { r0 = JSON.parse(rowTxt); } catch (e) { return; }
-        for (const w of (r0.k || [])) { batch.push([String(w), r0.i]); if (batch.length >= TERM_BATCH) flush(); }
+        const h = nh.get(r0.i);
+        if (h === undefined) return;
+        const words = Array.from(new Set((r0.k || []).map((w) => String(w))));
+        const f = _idxFp(words);
+        if (!mig && fk.get(h) === f) return;                      // 词表没变：一行都不写
+        this._putTerms(S, h, "k", words, f);
       });
-      flush();
       return;
     }
     if (task === "coords") {
       let txt = "";
       try { txt = await this._text("search/sde-coords.json"); } catch (e) { return; }
-      let batch = [];
-      const flush = () => {
-        if (!batch.length) return;
-        const ph = batch.map(() => "(?,?,'c')").join(",");
-        this._w("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
-        batch = [];
-      };
+      const nh = numToHash();
+      const fc = new Map();
+      if (!mig) for (const r of s.exec("SELECT h,fc FROM fp")) fc.set(r.h, r.fc || "");
+      const done = new Set();
       _scanObjEntries(txt, (k, vTxt) => {
         let arr; try { arr = JSON.parse(vTxt); } catch (e) { return; }
         if (!Array.isArray(arr)) return;
-        const i = parseInt(k, 10);
-        for (const w of arr) { batch.push([String(w).toLowerCase(), i]); if (batch.length >= TERM_BATCH) flush(); }
+        const h = nh.get(parseInt(k, 10));
+        if (h === undefined) return;
+        const words = Array.from(new Set(arr.map((w) => String(w).toLowerCase())));
+        done.add(h);
+        const f = _idxFp(words);
+        if (!mig && fc.get(h) === f) return;
+        this._putTerms(S, h, "c", words, f);
       });
-      flush();
+      if (!mig) {
+        for (const [h, f] of fc) {                                // 以前有坐标、现在没有了
+          if (!f || done.has(h)) continue;
+          this._w("DELETE FROM terms WHERE h=? AND src='c'", h);
+          this._w("UPDATE fp SET fc='' WHERE h=?", h);
+        }
+      }
       return;
     }
   }
@@ -4399,7 +4509,8 @@ export class IndexMemory {
      旧口径：篇层关键词 base+1 / exp+1.2 / prev+0.4；标题子串 base+3 / exp+2；坐标只在 exp 命中时 +1.5。
      旧路还有一层"先选版块、再读那几份篇层"——那是为了少读文件才有的绕行；
      现在全站倒排就在手边，直接给全站打分，召回只会更全，不会更窄。 */
-  _query(b) {
+  _query(b) { return this._v2f ? this._queryV2(b) : this._queryLegacy(b); }
+  _queryLegacy(b) {
     const n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
     if (!n) return { ok: false, why: "empty" };       // 还没建好：调用方退回旧路，绝不回空名单
     const base = (b.baseKeys || []).slice(0, 80);
@@ -4469,6 +4580,63 @@ export class IndexMemory {
        而标题又来自本表 ⇒ **标题对、摘录张冠李戴**（2026-08-23 线上实测：kb/find 六条全错）。
        调用方据此判断能不能混用（见 ragScan 那处闸门）。 */
     return { ok: true, cand: cand, docs: docs, secLabel: this._secLabel(), stamp: this._get("stamp") };
+  }
+  /* v2 表的查询：打分口径与 _queryLegacy 逐条一致，只是词条与文档用稳定键 h 对上，
+     最后一步才用 docs.n 换回「本次构建的篇号」（调用方拿它去 R2 取 doc/<i>.json）。 */
+  _queryV2(b) {
+    const n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
+    if (!n) return { ok: false, why: "empty" };
+    const base = (b.baseKeys || []).slice(0, 80);
+    const exp = (b.exp || []).slice(0, 40);
+    const prev = (b.prev || []).slice(0, 40);
+    const only = String(b.only || "");
+    const keep = (Array.isArray(b.keep) ? b.keep : []).slice(0, 40)
+      .map((x) => String(x || "").slice(0, 200)).filter(Boolean);
+    const pick = Math.max(6, Math.min(64, b.pick | 0 || 16));
+    const sc = new Map();
+    const ns = new Map();      // h → 本次构建的篇号：同分时按篇号小的在前，结果可复现
+    const add = (h, v, n0) => { sc.set(h, (sc.get(h) || 0) + v); if (n0 !== undefined) ns.set(h, n0); };
+    const byTerm = (list, wk, wc) => {
+      for (const key of list) {
+        if (!key) continue;
+        for (const r of this.sql.exec("SELECT t.h AS h, t.src AS src, d.n AS n FROM terms t JOIN docs d ON d.h = t.h WHERE t.term=?", key)) add(r.h, r.src === "c" ? wc : wk, r.n);
+      }
+    };
+    byTerm(base, 1, 0);
+    byTerm(exp, 1.2, 1.5);
+    byTerm(prev, 0.4, 0);
+    const byTitle = (list, w) => {
+      for (const key of list) {
+        if (!key) continue;
+        for (const r of this.sql.exec("SELECT h,n FROM docs WHERE tl LIKE ? ESCAPE '\\'", "%" + String(key).replace(/[\\%_]/g, "\\$&") + "%")) add(r.h, w, r.n);
+      }
+    };
+    byTitle(base, 3);
+    byTitle(exp, 2);
+    if (!sc.size) return { ok: true, cand: [], docs: [], secLabel: this._secLabel(), stamp: this._get("stamp") };
+    let cand = Array.from(sc.entries()).map(([h, v]) => ({ h: h, sc: v })).sort((a, b2) => (b2.sc - a.sc) || ((ns.get(a.h) || 0) - (ns.get(b2.h) || 0)));
+    if (only) {
+      const keepSec = new Set();
+      for (const r of this.sql.exec("SELECT h FROM docs WHERE sec=?", only)) keepSec.add(r.h);
+      cand = cand.filter((c) => keepSec.has(c.h));
+    }
+    if (keep.length) {
+      const esc = (s) => String(s).replace(/[\\%_]/g, "\\$&");
+      const where = keep.map(() => "u LIKE ? ESCAPE '\\'").join(" OR ");
+      const args = keep.map((p) => "%" + esc(p) + "%");
+      const keepDoc = new Set();
+      try { for (const r of this.sql.exec("SELECT h FROM docs WHERE " + where, ...args)) keepDoc.add(r.h); } catch (e) {}
+      cand = cand.filter((c) => keepDoc.has(c.h));
+    }
+    cand = cand.slice(0, pick);
+    const docs = [], out = [];
+    for (const c of cand) {
+      const r = [...this.sql.exec("SELECT n,u,t,sec FROM docs WHERE h=?", c.h)];
+      if (!r.length) continue;
+      out.push({ i: r[0].n, sc: c.sc });
+      docs.push({ i: r[0].n, u: r[0].u, t: r[0].t, s: r[0].sec });
+    }
+    return { ok: true, cand: out, docs: docs, secLabel: this._secLabel(), stamp: this._get("stamp") };
   }
   _secLabel() { const m = {}; for (const r of this.sql.exec("SELECT sec,label FROM secs")) m[r.sec] = r.label; return m; }
 }

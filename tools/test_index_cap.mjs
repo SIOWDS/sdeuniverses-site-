@@ -23,6 +23,8 @@ function fixture(values = {}, o = {}) {
     if (q.startsWith('SELECT count(*) AS n FROM docs')) return [{ n: o.docs ?? 7000 }];
     if (q.startsWith('SELECT count(*) AS n FROM terms')) return [{ n: o.terms ?? 500000 }];
     if (q.startsWith('INSERT INTO terms_new') || q.startsWith('INSERT OR REPLACE INTO docs_new')) return cursor([], o.insertRows ?? 0);
+    if (q.startsWith('SELECT n,h FROM docs') || q.startsWith('SELECT h,fc FROM fp') || q.startsWith('SELECT h,fk FROM fp')) return [];
+    if (q.startsWith('CREATE INDEX IF NOT EXISTS docs_n')) return cursor([], 0);   // 篇号索引只有几千行，不是账里的大头
     if (q.startsWith('CREATE INDEX')) return cursor([], o.indexRows ?? 0);
     if (q.startsWith('DROP TABLE') || q.startsWith('ALTER TABLE')) return cursor([], 0);
     throw new Error('Unexpected SQL: ' + q);
@@ -104,5 +106,11 @@ now = Date.parse('2026-10-09T15:20:00Z');
   f.item.sql.exec = ((orig) => (q, ...a) => q.startsWith('SELECT count(*) AS n FROM terms') ? [{ n: 1 }] : orig(q, ...a))(f.item.sql.exec);
   const st = f.item._status();
   assert.equal(st.cap.capped, true); assert.equal(st.cap.used, 39000000); assert.equal(st.cap.capAuto, 40000000);
+}
+// 增量趟（mode=inc）结束的入账：没有换手，lastSyncRows ＝ 这一趟实测写入，不套「文档＋词条×2」的下限
+{
+  const f = fixture({ pending: JSON.stringify(['coords']), newstamp: 's3', mode: 'inc', capCycle: '2026-10', capRows: '0', runRows: '12000' }, { indexRows: 0 });
+  await f.item.alarm();
+  assert.equal(f.meta.get('lastSyncRows'), '12000'); assert.equal(f.meta.get('stamp'), 's3');
 }
 console.log('Index monthly write cap: cycle, thresholds, hard ceiling, accounting and settlement tests passed.');
