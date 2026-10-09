@@ -220,6 +220,34 @@ const FILES = Object.assign({
   ok("ChatSDE 那条 rag 失败把平台回执带回来", /_ragWhy = "HTTP " \+ rr\.status \+ \(_et \? \("：" \+ _et\) : ""\);/.test(SRC));
   ok("5xx 之后隔一拍再试", /await new Promise\(\(rs2\) => setTimeout\(rs2, 300\)\);/.test(SRC));
 
+  /* ═══ 六之二、专著页的每篇名额（2026-10-10：专著块切到 220 字，名额跟着翻倍；书内检索再放宽） ═══ */
+  console.log("\n六之二、专著页每篇名额");
+  {
+    M.reset();
+    const man = { built: "b2", sections: [{ key: "students", label: "学员" }, { key: "books", label: "专著" }],
+      docs: [{ i: 0, t: "学员文 作文", s: "students", u: "/a0/" }, { i: 1, t: "七号书 作文", s: "books", u: "/books/m/7/text/" },
+             { i: 2, t: "八号书 作文", s: "books", u: "/books/m/8/text/" }, { i: 3, t: "七十七号书 作文", s: "books", u: "/books/m/77/text/" }] };
+    const ch = (n) => { const a = []; for (let k = 0; k < 10; k++) a.push("第" + n + "号的第" + k + "段，作文作文作文。"); return a; };
+    const files = {
+      "search/manifest.json": man,
+      "search/sections.json": { sections: [{ s: "students", k: ["作文"] }, { s: "books", k: ["作文"] }] },
+      "search/kw/students.json": { rows: [{ i: 0, k: ["作文"] }] },
+      "search/kw/books.json": { rows: [{ i: 1, k: ["作文"] }, { i: 2, k: ["作文"] }, { i: 3, k: ["作文"] }] },
+      "search/sde-coords.json": {},
+      "search/doc/0.json": { c: ch(0) }, "search/doc/1.json": { c: ch(1) }, "search/doc/2.json": { c: ch(2) }, "search/doc/3.json": { c: ch(3) },
+    };
+    const per = (scan) => { const p = {}; for (const x of scan.picked) p[x.d] = (p[x.d] || 0) + 1; return p; };
+    let scan = await M.ragScan(mkEnv({ files }), URL0, "作文", ["作文"], "", 48, 1600, { pick: 6 });
+    let p = per(scan);
+    ok("非专著页仍是每篇 2 段", (p[0] || 0) === 2, JSON.stringify(p));
+    ok("专著页每篇最多 4 段（块小一半，名额翻倍）", (p[1] || 0) === 4 && (p[2] || 0) === 4, JSON.stringify(p));
+    M.reset();
+    scan = await M.ragScan(mkEnv({ files }), URL0, "作文", ["作文"], "", 48, 1600, { pick: 6, keep: ["/books/m/7/"] });
+    p = per(scan);
+    ok("书内检索（keep 只含一本书）：只剩这一本，每篇放宽到 6 段", Object.keys(p).join() === "1" && p[1] === 6, JSON.stringify(p));
+    ok("书号带两头斜杠：/books/m/7/ 不会误中 /books/m/77/", !(3 in p));
+  }
+
   /* ═══ 七、客户端：断流零正文自动重问一次 ═══ */
   console.log("\n七、客户端 wds-mode.js");
   const CLI = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");

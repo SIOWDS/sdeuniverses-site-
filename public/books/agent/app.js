@@ -331,7 +331,7 @@ function send(){
  busy=true;paint();scroll();
  var ans="",srcs=[],notes=[];
  var rp=ragPick(q+" "+lastAns(),a,10);
- var body={q:q,bookagent:1,act:a,agentName:AG.name,agentEpithet:AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:BOOK.title,docText:docText(),history:hist.slice(0,-1).map(function(m){return{role:m.role,text:tagged(m,mno)}}),key:kv.key,vendor:kv.vendor};
+ var body={q:q,bookagent:1,bookNo:BOOK.number,act:a,agentName:AG.name,agentEpithet:AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:BOOK.title,docText:docText(),history:hist.slice(0,-1).map(function(m){return{role:m.role,text:tagged(m,mno)}}),key:kv.key,vendor:kv.vendor};
  fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)}).then(function(r){
   return sse(r,function(j){
    if(j.t==="token"){ans+=j.v;tx.innerHTML=fmt(ans);scroll()}
@@ -396,7 +396,7 @@ function talk(no,done){
    var q="【三本《道德经》圆桌】读者原问：「"+q0.slice(0,600)+"」\n"+(speaker?speaker.name+"（《"+speaker.title+"》的智能体）":"另一位智能体")+"刚才这样答：「"+String(last.text).slice(0,1400)+"」\n现在轮到你——「"+c.AG.name+"」，《"+c.BOOK.title+"》的智能体，接话。要求：1）先用一两句话说清：你对上面这段话同意、补充还是反对哪一处；2）再从你自己这本书里拿出别人没有的东西——引具体章节、关键点或标「对读」的段落；3）最后给读者一个可以带走的判断。不要复述对方的话，不要冒充对方的书；两本书说法不同时，把分歧说透，不要和稀泥。";
    var rp=ragPick(q0+" "+last.text.slice(0,600),A,10);
    srcs=rp.items.slice(0,5).map(function(it){return{t:it.t,u:it.u,rel:it.rel}});
-   return{q:q,bookagent:1,act:A,agentName:c.AG.name,agentEpithet:c.AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:c.BOOK.title,docText:docText(),history:hist.map(function(m){return{role:m.role,text:tagged(m,no)}}),key:kv.key,vendor:kv.vendor};
+   return{q:q,bookagent:1,bookNo:c.BOOK.number,act:A,agentName:c.AG.name,agentEpithet:c.AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:c.BOOK.title,docText:docText(),history:hist.map(function(m){return{role:m.role,text:tagged(m,no)}}),key:kv.key,vendor:kv.vendor};
   });
   return fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
  }).then(function(r){

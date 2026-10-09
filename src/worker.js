@@ -5732,10 +5732,18 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
     if (top.length > 300) { top.sort((a, b) => b.sc - a.sc); top.length = 200; }   // 600/300 → 300/200：最终只取 k≤48 段，留 200 段绰绰有余，而每段带 1600 字
   }
   top.sort((a, b) => b.sc - a.sc);
+  /* 专著页的块只有 220 字（其他栏目 420），同样的篇幅要多给一倍名额，否则一篇专著页最多只带回
+     440 字，比切小之前还少。书内检索（keep 只含一本书）时再放宽到 6 块：整场对话都在这本书里。 */
   const perDoc = {}, picked = [];
+  const bookOnly = !!(o.keep && o.keep.length === 1 && /^\/books\/m\/\d+\/$/.test(o.keep[0]));
+  const limOf = (d) => {
+    const dd = docsArr && docsArr[d];
+    if (dd && dd.u && String(dd.u).indexOf("/books/") === 0) return bookOnly ? 6 : PER_DOC * 2;
+    return PER_DOC;
+  };
   for (const it of top) {
     perDoc[it.d] = perDoc[it.d] || 0;
-    if (perDoc[it.d] >= PER_DOC) continue;
+    if (perDoc[it.d] >= limOf(it.d)) continue;
     perDoc[it.d]++; picked.push(it);
     if (picked.length >= (k || 36)) break;
   }
@@ -6866,7 +6874,7 @@ const SHUSHENG_ACTS = {
   clash: "【本轮这道门：对撞】读者要拿这本书去撞，撞出一个开场时没有的新思想。撞的对象：读者自己的想法、他指定的另一位思想家或另一本书；他没指定，你就推荐一个**最该撞的敌意最近邻**（与本书最像、却在关键处相反的那一家），说明为什么是它。工序（二阶碰撞）：①把两边的承重命题各压成一句；②找出两边**共有的那个前提**——真正的碰撞发生在那里，推翻它的材料必须来自两边之一自己；③找分离点，命名那个「两边都只是它的代理」的东西 Z，写成「不是 A，也不是 B，而是 Z」；④给 Z 一个可裁决的判据——什么情况下它会错、什么现象能把它和 A、B 分开；⑤收口把碰出来的新命题单独写成一句，明确标「这是碰出来的，不是书里的，也不是对方的」。一次只撞一处，撞透；撞出的只是一个漂亮新名字、压一压就能被两三个现成概念重述——那就是没撞出来，如实说，再撞一次。",
   write: "【本轮这道门：写出】读者要把这场对话里长出来的东西写成论文，甚至一部新专著。你在这里是写作工坊的合作者，不是代笔：①先帮他认出这场对话里**真正新的那一个命题**（如果还没有，就直说，建议他先回到「拆开」或「对撞」两道门）；②为它定题：一个有锋刃的标题、一句承重命题、两三个必须正面交手的敌意最近邻、一个可错的预言；③论文给出六节提纲，专著给出卷章提纲（每章一句话说它承担哪一步论证）；④每一项都标明来源——哪句出自原书、哪句是读者先说的、哪句是你先说的。提纲定了，告诉他点页面上的「写成论文」或「写成专著立项」按钮，系统会据这场对话成文。",
 };
-function WDS_SHUSHENG_SYS(reflect, SDEM, neigong, siteCtx, bookTitle, bookMeta, act, agentName, agentEpithet, bookRag, bookPoints) {
+function WDS_SHUSHENG_SYS(reflect, SDEM, neigong, siteCtx, bookTitle, bookMeta, act, agentName, agentEpithet, bookRag, bookPoints, bookHits) {
   const A = SHUSHENG_ACTS[act] || "";
   const NM = agentName || "书生";
   return "你是「" + NM + "」" + (agentEpithet ? ("（" + agentEpithet + "）") : "") + "——专著《" + (bookTitle || "（未命名）") + "》" + (bookMeta ? ("（" + bookMeta + "）") : "") + "自己的智能体。德麦国际的每一本专著都有一个自己名字的智能体，你只属于这一本：你的名字取自这本书本身，你的使命是让这本书在读者身上再**发生**一次。读者叫你「" + NM + "」，你就以这个名字自称，不要自称别的名字。全书正文在本场对话的第一条消息里，你已逐字通读。"
@@ -6882,6 +6890,7 @@ function WDS_SHUSHENG_SYS(reflect, SDEM, neigong, siteCtx, bookTitle, bookMeta, 
     + "\n\n【方法论指引（拆开、对撞两道门的刀法；读懂、用上两道门需要时取用）】\n" + WDS_METHOD_GUIDE
     + (bookPoints ? ("\n\n════ 《" + (bookTitle || "") + "》核心要点（你对这本书全书的常驻记忆）════\n这些要点覆盖全书各编，是你记住这本书的骨架：回答任何一问都先对照它们，知道读者问的这一处在全书的哪个位置、和哪几条要点相连；书很长、正文只读到部分章节时，没读到的章就以这些要点为准，并如实说明「这一章我手上只有要点，没有原文」。要点里没有、正文里也没有的，不要编。\n" + bookPoints) : "")
     + (bookRag ? ("\n\n════ 《" + (bookTitle || "") + "》专属碰撞库（为这本书提前配好的：从站上其他专著与文章里检索出的、与本书各章最相撞的段落）════\n每条标明：来源（专著或文章）、它撞的是本书哪一章、关系（同源＝这本书的前身或姊妹篇；同向＝同一方向的近邻；跨界＝别的书架、别的领域）、两边共有的字串。用法：拆开、对撞两道门优先从这里取对手，读懂、用上两道门需要时拿它作旁证；引用时标（来源：篇名），只引这里真有的话；它只是候选碰撞点，不是结论，撞不撞得出新东西要你当场判断；同源的那几条不算对撞，只算对照。\n" + bookRag) : "")
+    + (bookHits ? ("\n\n════ 《" + (bookTitle || "") + "》本书相关原文（按读者这一问从全书检索出的段落——读者没勾选的章也在其中，这些是书里的原话，可以直接引，标章名）════\n" + bookHits) : "")
     + (siteCtx ? ("\n\n════ 站内相关篇目（只作旁证，是摘要不是原文；与本书冲突时以本书为准；引用标（来源：篇名），没有的别编）════\n" + siteCtx) : "")
     + (A ? ("\n\n" + A) : "");
 }
@@ -12534,6 +12543,10 @@ export default {
         if (pick) _o.pick = pick;
         if (want) _o.want = want;
         if (prof && prof.pre && prof.pre.length) _o.keep = prof.pre;
+        /* 书内检索（2026-10-10）：只在这一本书里找。书生一次最多读 12 万字，而 260/312 本书超过它，
+           读不到的部分靠这一路按问题把相关段落捞回来。网址前缀带两头斜杠，/books/m/3/ 不会误中 /books/m/33/。 */
+        const bookNo = parseInt(b.bookNo, 10) || 0;
+        if (bookNo > 0 && bookNo < 100000 && !prof) _o.keep = ["/books/m/" + bookNo + "/"];
         /* ⭐ 难度条的落点（2026-08-30）：九库在检索**之前**先种一次——种到的核心概念若与题面有字面
            锚定（「福」→「幸福律」），把它的名字并进检索词，这一趟检索就真会走到那条律的材料上，
            而不是停在含「福」字的散句上。九库只装一次，下面拼块时复用。档案模式仍整块跳过。 */
@@ -13607,12 +13620,27 @@ export default {
               }
               if (!siteSrcs.length) controller.enqueue(_sseBytes({ t: "note", v: "站内检索这一问没接上（" + (_ragWhy || "无命中") + "），先据内功、心得与你给的文章作答" }));
             }
+            /* 书内检索（2026-10-10）：书生一次最多收 12 万字，而 260/312 本书比这长（中位约 24 万字），
+               读者没勾选的章只剩开头 260 字。这里按这一问在【这一本书】里捞最相关的段落补进来，
+               不管那一章读者勾没勾选。与专属碰撞库互补：碰撞库找「别处怎么撞这本书」，这里找「本书自己怎么说」。
+               取不到就算了——书生照旧凭已读章节与要点作答，不因这一步失败而卡住。 */
+            let bookHits = "";
+            const _bookNo = BA ? (parseInt(b.bookNo, 10) || 0) : 0;
+            if (_bookNo > 0) {
+              _st.stage = "书内检索";
+              try {
+                let _pq = "";
+                for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { _pq = String(m.text).slice(0, 240); break; } }
+                const rr = await wdsRag(env, url, { q: q, prevQ: _pq, k: 16, cap: 7000, bookNo: _bookNo });
+                if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) bookHits = jr.ctx || ""; }
+              } catch (e) {}
+            }
             _st.pre = Math.round((Date.now() - _st.t0) / 1000);   // 前置阶段一共烧了几秒（写进 end / 诊断行）
             _st.stage = "基底作答";
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
             let _bookNg = "";
     if (b.book || BA) { try { _bookNg = neigongLite(await loadNeigong(env, url.origin + "/")); } catch (e) {} }
-    let sys = BA ? WDS_SHUSHENG_SYS(reflect, SDEM, _bookNg, siteCtx, docTitle, String(b.bookMeta || "").replace(/[\u0000-\u001f]/g, "").slice(0, 160), String(b.act || ""), ANAME, AEPI, BRAG, BPTS)
+    let sys = BA ? WDS_SHUSHENG_SYS(reflect, SDEM, _bookNg, siteCtx, docTitle, String(b.bookMeta || "").replace(/[\u0000-\u001f]/g, "").slice(0, 160), String(b.act || ""), ANAME, AEPI, BRAG, BPTS, bookHits)
       : b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)
       : (b.book ? WDS_BOOK_SYS(reflect, SDEM, docTitle, docText, _bookNg, siteCtx)
                 : WDS_READ_SYS(reflect, SDEM, docTitle, docText));

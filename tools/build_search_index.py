@@ -16,7 +16,7 @@ import base64, zlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, "public")
-OUT = os.path.join(PUB, "search")
+OUT = os.environ.get("SEARCH_OUT") or os.path.join(PUB, "search")   # SEARCH_OUT：本地试跑时写到别处，不碰 public/search
 
 SECTION_LABELS = {
     "three-views": "三视角专栏",
@@ -35,6 +35,24 @@ SKIP_URL_SUBSTR = ("/taste/idea-generator/", "/taste/glm-test", "/check/", "/dia
                    "/education/intro/")  # 跳转桩：栏目已迁至 /sde-education/，桩页仅作 301 用途
 
 CJK = re.compile(r"[\u4e00-\u9fff]")
+# 专著的检索口径（2026-10-10）：专著是索引的主体（约 64% 的块），也是 RAG 最看重的材料。
+#   · 块切小：420 → 220 字。块在句子边界上切，几乎没有重复内容，总字数不变、块数约翻一倍；
+#     一块只装一两个论点，问答时挑出来的段落更贴题。
+#   · 篇层关键词：从「前 4 万字、64 个」改成「整页、128 个」。数据库第一轮筛选只认这批词，
+#     一章的后半部分原来在筛选阶段根本不存在。
+# 其他栏目一律不变。
+BOOK_SECTION = "books"
+BOOK_CHUNK, BOOK_OVERLAP = 220, 40
+BOOK_KW_TOP, BOOK_KW_SPAN = 128, 400000
+DEFAULT_KW_TOP, DEFAULT_KW_SPAN = 64, 40000
+NAV_CH = re.compile(r"第\s*\d+\s*[章节编]")
+
+
+def is_nav_chunk(c):
+    """目录类的块：一串「第 N 章……第 N+1 章……」。块切小到 220 字之后，这种关键词堆得极密的块
+    会在按词频挑段时挤到正文前面（第 3 号书实测：前三名里一块是目录）。章名在正文页里本来就有标题，
+    丢掉目录块几乎不损失信息。只对专著用；抽样 300 篇专著里约占 2%，人工看过全是目录。"""
+    return c.lstrip().startswith("目录") or len(NAV_CH.findall(c)) >= 3
 HTML_ONLY = "--html-only" in sys.argv
 REUSE_PDF = "--reuse-pdf" in sys.argv
 
@@ -339,7 +357,10 @@ for idx, url in enumerate(url_list):
     seen = set()
     doc_chunks = []
     # HTML 先切、登记指纹
-    for c in chunk_text(d["html"]):
+    csize, cover = (BOOK_CHUNK, BOOK_OVERLAP) if d["section"] == BOOK_SECTION else (420, 40)
+    for c in chunk_text(d["html"], size=csize, overlap=cover):
+        if d["section"] == BOOK_SECTION and is_nav_chunk(c):
+            continue
         k = norm_key(c)
         if k and k in seen:
             continue
@@ -348,7 +369,9 @@ for idx, url in enumerate(url_list):
         doc_chunks.append(c)
     # PDF 补：指纹已见的丢掉（栏目 HTML=PDF 镜像会被这里清掉；专著薄壳会保留 PDF）
     for pt in d["pdf"]:
-        for c in chunk_text(pt):
+        for c in chunk_text(pt, size=csize, overlap=cover):
+            if d["section"] == BOOK_SECTION and is_nav_chunk(c):
+                continue
             k = norm_key(c)
             if k and k in seen:
                 continue
@@ -416,10 +439,10 @@ if os.path.isdir(DOC_DIR):
             os.remove(os.path.join(DOC_DIR, f))
 os.makedirs(DOC_DIR, exist_ok=True)
 
-def _doc_keywords(chunks, topn=64):
+def _doc_keywords(chunks, topn=DEFAULT_KW_TOP, span=DEFAULT_KW_SPAN):
     """每篇取高频中文 bigram + 英文词，作为第一段筛选的依据。"""
     freq = {}
-    txt = "".join(chunks)[:40000]
+    txt = "".join(chunks)[:span]
     zh = re.sub(r"[^\u4e00-\u9fff]", " ", txt)
     for seg in zh.split():
         for i in range(len(seg) - 1):
@@ -448,7 +471,10 @@ sec_cloud = {}
 for di, chunks in per_doc.items():
     with open(os.path.join(DOC_DIR, "%d.json" % di), "w", encoding="utf-8") as f:
         json.dump({"i": di, "c": chunks}, f, ensure_ascii=False, separators=(",", ":"))
-    ks = _doc_keywords(chunks)
+    if doc_sec.get(di) == BOOK_SECTION:
+        ks = _doc_keywords(chunks, BOOK_KW_TOP, BOOK_KW_SPAN)
+    else:
+        ks = _doc_keywords(chunks)
     row = {"i": di, "k": ks}
     kw_rows.append(row)
     sec = doc_sec.get(di, "_root")

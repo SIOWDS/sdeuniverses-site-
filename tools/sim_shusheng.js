@@ -30,8 +30,18 @@ ok(/const BA = !!b\.bookagent;/.test(rd) && /const GDX = !!b\.guide \|\| BA;/.te
 ok(/let sys = BA \? WDS_SHUSHENG_SYS\(/.test(rd), "read：书生 system 优先");
 ok(/const VC = GDX \? wdsTopVC/.test(rd), "read：书生走最强档");
 ok(/if \(b\.guide \|\| b\.book \|\| \(BA && !BRAG\)\) \{/.test(rd), "read：有专属碰撞库就不现场检索");
-ok(/const BPTS = BA \? String\(b\.bookPoints/.test(rd) && /ANAME, AEPI, BRAG, BPTS\)/.test(rd), "read：核心要点递进 system");
-ok(/const BRAG = BA \? String\(b\.bookRag \|\| ""\)\.slice\(0, 16000\)/.test(rd) && /ANAME, AEPI, BRAG, BPTS\)/.test(rd), "read：名字与专属库递进 system");
+ok(/const BPTS = BA \? String\(b\.bookPoints/.test(rd) && /ANAME, AEPI, BRAG, BPTS, bookHits\)/.test(rd), "read：核心要点递进 system");
+ok(/const BRAG = BA \? String\(b\.bookRag \|\| ""\)\.slice\(0, 16000\)/.test(rd) && /ANAME, AEPI, BRAG, BPTS, bookHits\)/.test(rd), "read：名字与专属库递进 system");
+// 书内检索（2026-10-10）：客户端递 bookNo，服务端按书号限定网址前缀检索，结果以单独一节进 system
+ok(/const _bookNo = BA \? \(parseInt\(b\.bookNo, 10\) \|\| 0\) : 0;/.test(rd) && /bookNo: _bookNo/.test(rd), "read：书内检索按书号发起");
+ok(/本书相关原文/.test(src) && /bookHits \? \(/.test(src), "system：本书相关原文单独成节");
+ok(/"\/books\/m\/" \+ bookNo \+ "\/"/.test(src), "rag：书号限定到 /books/m/N/ 前缀（两头斜杠，不误中 33 号）");
+{
+  const withHits = ctx.WDS_SHUSHENG_SYS("心得", "\n骨架", "内功", "旁证摘要", "SIO三大公理", "", "read", "三归", "", "碰撞库", "要点", "HITS原文段落");
+  const noHits = ctx.WDS_SHUSHENG_SYS("心得", "\n骨架", "内功", "旁证摘要", "SIO三大公理", "", "read", "三归", "", "碰撞库", "要点");
+  ok(withHits.includes("HITS原文段落") && withHits.indexOf("本书相关原文") < withHits.indexOf("站内相关篇目"), "有书内检索结果：本书原文排在站内旁证之前");
+  ok(!noHits.includes("本书相关原文"), "没有书内检索结果：不出这一节（不影响老调用）");
+}
 ok(/slice\(0, BA \? 120000 : 100000\)/.test(rd), "read：书生全书上限 12 万字符");
 ok(/if \(GDX && docText\) \{/.test(rd) && /packReadHistory\(history, histBudget, GDX \? 12000 : 0\)/.test(rd), "read：全书作首轮消息＋长记忆");
 ok(!/\bb\.guide \? wdsTopVC/.test(rd), "read：无残留 b.guide 选档");
