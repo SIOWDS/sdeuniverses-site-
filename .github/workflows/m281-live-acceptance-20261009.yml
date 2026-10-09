@@ -1,0 +1,96 @@
+name: Volume281 final live acceptance after deployment
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/m281-live-acceptance-20261009.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: m281-exact-candidate-v12
+          run-id: 37888469554
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/m281
+      - name: Verify exact candidate and successful production deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,json,hashlib,urllib.request
+          p=Path(os.environ['RUNNER_TEMP'])/'m281';m=json.loads((p/'book/publication-manifest.json').read_text())
+          assert m['release_sha256']=='ae89fbe9a64501b18a280ac9ff5b5e3f6d36c0f571ecc612422920c5d5d1893a'
+          for f in m['files']:assert hashlib.sha256((p/'book'/f['path']).read_bytes()).hexdigest()==f['sha256'],f['path']
+          u='https://api.github.com/repos/SIOWDS/sdeuniverses-site-/commits/3845215073d12e2ee6f7bdde5e464ba8b24fa932/check-runs'
+          req=urllib.request.Request(u,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          d=json.load(urllib.request.urlopen(req));checks=[x for x in d['check_runs'] if x['name']=='Workers Builds: steep-band-faf5'];assert checks and any(x['conclusion']=='success' for x in checks)
+          (p/'qa/production-deployment.json').write_text(json.dumps({'commit':'3845215073d12e2ee6f7bdde5e464ba8b24fa932','checks':checks},indent=2))
+          PY
+      - name: Recheck every canonical asset, ISBN and all three bookshelves
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,json,urllib.request,urllib.error,hashlib,re,time,concurrent.futures,difflib
+          C=Path(os.environ['RUNNER_TEMP'])/'m281';Q=C/'qa';M=json.loads((C/'book/publication-manifest.json').read_text());base='https://sdeuniverses.com/books/m/281/'
+          def get(u):
+            try:
+              r=urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0 m281-live-acceptance','Accept':'*/*'}),timeout=90)
+              with r:return r.status,r.read(),dict(r.headers),r.geturl()
+            except urllib.error.HTTPError as e:return e.code,e.read(),dict(e.headers),u
+            except Exception as e:return 0,str(e).encode(),{},u
+          def norm(s):
+            s=re.sub(r'<link\b[^>]*rel=["\x27]canonical["\x27][^>]*>','',s,flags=re.I)
+            s=re.sub(r'<meta\b[^>]*property=["\x27]og:url["\x27][^>]*>','',s,flags=re.I)
+            return s.strip()
+          def check(f):
+            path=f['path'][:-10] if f['path'].endswith('index.html') else f['path'];expected=(C/'book'/f['path']).read_bytes();attempts=[]
+            for i in range(4):
+              status,data,h,u=get(base+path);exact=hashlib.sha256(data).hexdigest()==f['sha256'];htmlmatch=f['path'].endswith('.html') and norm(data.decode('utf8','replace'))==norm(expected.decode('utf8','replace'));ok=status==200 and (exact or htmlmatch)
+              attempts.append({'status':status,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'headers':h,'url':u})
+              if ok:return {'path':f['path'],'ok':True,'status':status,'sha256_exact':exact,'normalization':'none' if exact else 'canonical and og:url only','attempts':len(attempts)}
+              if i==0:
+                st,dd,hh,uu=get(base+path+'?revision='+M['revision']);attempts.append({'cachebust_status':st,'cachebust_bytes':len(dd),'cachebust_sha256':hashlib.sha256(dd).hexdigest(),'headers':hh})
+              if i<3:time.sleep(12)
+            dest=Q/'failed-live';dest.mkdir(exist_ok=True);name=f['path'].replace('/','_');(dest/(name+'.response')).write_bytes(data[:250000]);(dest/(name+'.details.json')).write_text(json.dumps(attempts,indent=2))
+            if f['path'].endswith('.html'):(dest/(name+'.diff')).write_text('\n'.join(list(difflib.unified_diff(expected.decode('utf8','replace').splitlines(),data.decode('utf8','replace').splitlines()))[:250]))
+            return {'path':f['path'],'ok':False,'attempts':attempts}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:assets=list(pool.map(check,M['files']))
+          shelves=[]
+          for i,url in enumerate(['https://sdeuniverses.com/books/','https://sdeuniverses.com/monographs/','https://read.sdeuniverses.com/library/']):
+            for j in range(4):
+              st,d,h,u=get(url);s=d.decode('utf8','replace');ok=st==200 and 'data-id="m-281"' in s and 'AI时代思考的困境与出路' in s
+              if ok:break
+              if j<3:get(url+'?revision='+M['revision']);time.sleep(12)
+            (Q/('live-shelf-'+str(i)+'.html')).write_text(s);shelves.append({'url':url,'status':st,'present':ok,'headers':h})
+          for i in range(4):
+            st,d,h,u=get('https://sdeuniverses.com/books/catalog.json')
+            try:cat=json.loads(d);bs=[b for b in cat['books'] if str(b.get('number'))=='281'];ok=st==200 and len(bs)==1 and bs[0]['isbn']=='9798906905116' and bs[0]['priceUsd']==25 and bs[0]['pdfPages']==333
+            except Exception:bs=[];ok=False
+            if ok:break
+            if i<3:get('https://sdeuniverses.com/books/catalog.json?revision='+M['revision']);time.sleep(12)
+          (Q/'live-catalog-response.json').write_bytes(d)
+          result={'success':all(x['ok'] for x in assets) and all(x['present'] for x in shelves) and ok,'volume':281,'release_sha256':M['release_sha256'],'assets':assets,'assets_checked':len(assets),'shelves':shelves,'catalogue_verified':ok,'catalogue_entry':bs,'site_files_modified_by_this_workflow':False}
+          (Q/'live-http-final.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps({k:v for k,v in result.items() if k!='assets'},ensure_ascii=False));print('FAILED_ASSETS',[a['path'] for a in assets if not a['ok']]);assert result['success']
+          PY
+      - name: Prepare actual live browser acceptance
+        if: ${{ !cancelled() }}
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Verify public desktop and mobile reading
+        if: ${{ !cancelled() }}
+        run: python3 "$RUNNER_TEMP/m281/build-tools/browser_qa.py" "$RUNNER_TEMP/m281" "https://sdeuniverses.com/books/m/281/"
+      - name: Preserve exact live verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m281-final-live-acceptance-v12
+          path: ${{ runner.temp }}/m281/qa/
+          retention-days: 30
