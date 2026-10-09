@@ -1,0 +1,77 @@
+name: Publish volume281 Thinking Upgrade complete edition
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/m281-publish-20261009.yml]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: volume281-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Receive the exact authorized complete publication package
+        run: |
+          python3 - <<'PY'
+          import urllib.request,pathlib,hashlib,zipfile,io,json,os
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'m281';root.mkdir()
+          url='https://sdmntprkoreacentral.oaiusercontent.com/files/00000000-e788-8206-8cc8-20706e6ed5d0/raw?se=2026-10-09T05%3A28%3A59Z&sp=r&sv=2026-02-06&sr=b&scid=6b87dae3-0250-544c-9350-1b328a196448&skoid=ca37c3ec-ab43-496e-be5f-4684c5519a26&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-09T01%3A27%3A25Z&ske=2026-10-10T01%3A27%3A25Z&sks=b&skv=2026-02-06&sig=5gnmPVHJjyZyoMcHzux49JTaapTV7sL7mROCSm7XJTg%3D'
+          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Accept':'application/zip,application/octet-stream,*/*'})
+          raw=urllib.request.urlopen(req,timeout=120).read()
+          assert len(raw)==9659000 and hashlib.sha256(raw).hexdigest()=='8f9d2433b695c21fd5201717531c5152be500cda29fb4fdcc657a27bffd2b701'
+          with zipfile.ZipFile(io.BytesIO(raw)) as z:
+            for n in z.namelist():assert not n.startswith('/') and '..' not in pathlib.PurePosixPath(n).parts
+            z.extractall(root)
+          for e in json.loads((root/'input-inventory.json').read_text()):
+            p=root/e['path'];assert p.stat().st_size==e['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==e['sha256'],e['path']
+          m=json.loads((root/'book/publication-manifest.json').read_text())
+          assert m['release_sha256']=='ae89fbe9a64501b18a280ac9ff5b5e3f6d36c0f571ecc612422920c5d5d1893a'
+          assert m['bodyHan']==202578 and m['bodyParagraphs']==1714 and m['isbn']=='979-8-90690-511-6' and m['pdfPages']==333
+          p=root/'build-tools/install.py';s=p.read_text();assert s.count('cover.jpg')==1
+          p.write_text(s.replace('cover.jpg','cover-20261009-v12.jpg').replace('volume281 EQ ontology','volume281 Thinking Upgrade'))
+          (root/'qa/installation-script-correction.json').write_text(json.dumps({'change':'Shelf card uses the already verified cover-20261009-v12.jpg; corrected commit label. No publication asset changed.','publication_assets_unchanged':True},indent=2))
+          print('EXACT_PACKAGE_RECEIVED',len(raw),'bytes',len(m['files']),'assets')
+          PY
+      - name: Preserve the received candidate before external validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: m281-exact-candidate-v12
+          path: ${{ runner.temp }}/m281/
+          retention-days: 14
+      - name: Prepare actual browser validation
+        run: |
+          python3 -m pip install --quiet playwright beautifulsoup4 pymupdf
+          python3 -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Validate full text, links, mobile and desktop PDF readers before publishing
+        run: python3 "$RUNNER_TEMP/m281/build-tools/browser_qa.py" "$RUNNER_TEMP/m281"
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/281/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /.publish/volume-reservations/281.json
+      - name: Atomically install volume281 and update all three current bookshelves
+        run: python3 "$RUNNER_TEMP/m281/build-tools/install.py" "$RUNNER_TEMP/m281" "$GITHUB_WORKSPACE"
+      - name: Verify every deployed book asset, corrected ISBN and all three shelves
+        run: python3 "$RUNNER_TEMP/m281/build-tools/live_qa.py" "$RUNNER_TEMP/m281"
+      - name: Verify the public desktop and mobile reading experience
+        run: python3 "$RUNNER_TEMP/m281/build-tools/browser_qa.py" "$RUNNER_TEMP/m281" "https://sdeuniverses.com/books/m/281/"
+      - name: Preserve publication and live acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m281-publication-evidence-v12
+          path: ${{ runner.temp }}/m281/qa/
+          retention-days: 30
