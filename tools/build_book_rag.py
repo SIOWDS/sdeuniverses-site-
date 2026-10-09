@@ -24,7 +24,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, "public")
 CJK = re.compile(r"[一-鿿]")
-CHUNK = 600
+CHUNK = 300
 BOOK_QUOTA, ART_QUOTA, PER_CHAPTER = 12, 12, 3
 SAME_SRC = 0.62   # 高于此值多半是同一段文字的另一个版本
 CROSS_MIN = 5     # 专著配额里至少这么多本来自别的书类（跨界撞，不只在同一个书架里撞）
