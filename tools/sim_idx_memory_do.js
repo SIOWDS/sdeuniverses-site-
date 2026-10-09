@@ -23,54 +23,19 @@ const BLOCK = SRC.slice(sA, sB) + "\n" + SRC.slice(dA, dB).replace(/^export clas
 ok("抠出来的是完整可跑的一段", (() => { try { new Function(BLOCK); return true; } catch (e) { return false; } })());
 const IndexMemory = new Function(BLOCK + "\nreturn IndexMemory;")();
 
-/* ── 一个够用的 SQLite 桩：只实现本 DO 用到的那几种语句 ── */
+/* ── 真 SQLite（node:sqlite）：2026-10-10 增量同步起，库里有 WITHOUT ROWID、ON CONFLICT、JOIN、事务，
+      原来那个只认几种语句的桩撑不住了，也没必要——真库跑出来的才算数。 ── */
+const { DatabaseSync } = require("node:sqlite");
 function makeSql() {
-  const T = {};                                     // 表名 → 行数组
-  const idx = {};
-  const api = {
+  const db = new DatabaseSync(":memory:");
+  return {
     exec(q, ...a) {
-      const s = q.trim();
-      let m;
-      if (/^CREATE TABLE/i.test(s)) { const n = s.match(/CREATE TABLE (?:IF NOT EXISTS )?(\w+)/)[1]; if (!T[n]) T[n] = []; return []; }
-      if (/^CREATE INDEX/i.test(s)) { idx[s] = 1; return []; }
-      if ((m = s.match(/^DROP TABLE (?:IF EXISTS )?(\w+)/i))) { delete T[m[1]]; return []; }
-      if ((m = s.match(/^ALTER TABLE (\w+) RENAME TO (\w+)/i))) { if (T[m[1]]) { T[m[2]] = T[m[1]]; delete T[m[1]]; } return []; }
-      if ((m = s.match(/^INSERT (?:OR REPLACE )?INTO (\w+)\(([^)]+)\) VALUES/i))) {
-        const tbl = m[1], cols = m[2].split(",").map((x) => x.trim());
-        if (!T[tbl]) T[tbl] = [];
-        if (/ON CONFLICT/i.test(s)) {                 // meta 的 upsert
-          const row = {}; cols.forEach((c, ix) => row[c] = a[ix]);
-          const e = T[tbl].find((r) => r[cols[0]] === row[cols[0]]);
-          if (e) Object.assign(e, row); else T[tbl].push(row);
-          return [];
-        }
-        const lit = (s.match(/\((?:\?|'[^']*')(?:,(?:\?|'[^']*'))*\)/g) || [])[0] || "";
-        const perRow = (lit.match(/[?']/g) || []).filter((c) => c === "?" || c === "'").length;
-        const slots = lit.slice(1, -1).split(",").map((x) => x.trim());
-        const nQ = slots.filter((x) => x === "?").length;
-        for (let p = 0; p < a.length; p += nQ) {
-          const row = {}; let qi = 0;
-          slots.forEach((sl, ix) => { row[cols[ix]] = sl === "?" ? a[p + (qi++)] : sl.replace(/'/g, ""); });
-          if (/OR REPLACE/i.test(s)) { const e = T[tbl].find((r) => r[cols[0]] === row[cols[0]]); if (e) { Object.assign(e, row); continue; } }
-          T[tbl].push(row);
-        }
-        return [];
-      }
-      if ((m = s.match(/^SELECT count\(\*\) AS n FROM (\w+)/i))) return [{ n: (T[m[1]] || []).length }];
-      if ((m = s.match(/^SELECT v FROM meta WHERE k=\?/i))) return (T.meta || []).filter((r) => r.k === a[0]).map((r) => ({ v: r.v }));
-      if ((m = s.match(/^SELECT i,src FROM terms WHERE term=\?/i))) return (T.terms || []).filter((r) => String(r.term) === String(a[0])).map((r) => ({ i: r.i, src: r.src }));
-      if ((m = s.match(/^SELECT i FROM docs WHERE tl LIKE \?/i))) {
-        const pat = String(a[0]).replace(/^%|%$/g, "").replace(/\\(.)/g, "$1");
-        return (T.docs || []).filter((r) => String(r.tl || "").indexOf(pat) >= 0).map((r) => ({ i: r.i }));
-      }
-      if ((m = s.match(/^SELECT i FROM docs WHERE sec=\?/i))) return (T.docs || []).filter((r) => r.sec === a[0]).map((r) => ({ i: r.i }));
-      if ((m = s.match(/^SELECT i,u,t,sec FROM docs WHERE i=\?/i))) return (T.docs || []).filter((r) => r.i === a[0]);
-      if (/^SELECT sec,label FROM secs/i.test(s)) return (T.secs || []).map((r) => ({ sec: r.sec, label: r.label }));
-      throw new Error("桩不认识这条语句：" + s.slice(0, 70));
+      const st = db.prepare(q);
+      if (/^\s*(SELECT|PRAGMA)/i.test(q)) { const rows = st.all(...a); rows.rowsWritten = 0; return rows; }
+      const r = st.run(...a); const out = []; out.rowsWritten = Number(r.changes) || 0; return out;
     },
-    _T: T,
+    _db: db,
   };
-  return api;
 }
 const MAN = JSON.stringify({ built: "b1", counts: { docs: 3 },
   sections: [{ key: "col", label: "专栏", docs: 2 }, { key: "bk", label: "专著", docs: 1 }],
@@ -80,7 +45,9 @@ const KW = { col: JSON.stringify({ rows: [{ i: 0, k: ["显露", "差异", "sde"]
 const CO = JSON.stringify({ "0": ["显露"], "1": ["纠缠"] });
 function makeCtx() {
   let alarmAt = null;
-  return { storage: { sql: makeSql(), setAlarm: async (t) => { alarmAt = t; }, _alarm: () => alarmAt, _clr: () => { alarmAt = null; } } };
+  const sql = makeSql(); let inTx = false;
+  return { storage: { sql, setAlarm: async (t) => { alarmAt = t; }, _alarm: () => alarmAt, _clr: () => { alarmAt = null; },
+    transactionSync(fn) { if (inTx) return fn(); inTx = true; sql._db.exec("BEGIN"); try { const r = fn(); sql._db.exec("COMMIT"); return r; } catch (e) { sql._db.exec("ROLLBACK"); throw e; } finally { inTx = false; } } } };
 }
 const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   get: async (k) => { const map = { "search/manifest.json": MAN, "search/sde-coords.json": CO,
@@ -129,16 +96,16 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   ok("docs 只含候选（1 篇），不是全站 3 篇", r5.docs.length === 1 && r5.docs[0].u === "/a", JSON.stringify(r5.docs));
   ok("版块名照常回", r5.secLabel && r5.secLabel.col === "专栏");
 
-  sect("四、重建期间老表照常应答（影子表建好才换手）");
+  sect("四、同步进行中查询照常应答（增量趟就地写，没有换手；首次迁移趟才建影子表）");
   ENV.PDFS.head = async () => ({ etag: "E2" });      // 索引换了一版
-  await im._ensure(false);
-  ctx.storage._clr(); await im.alarm();               // 只跑第一件（建影子表 + 灌 manifest）
+  await im._ensure(true);                            // 同一天第二趟：要口令的 force 才能越过每日一次
+  ctx.storage._clr(); await im.alarm();               // 只跑第一件（灌 manifest）
   const mid = im._query({ baseKeys: ["显露"], exp: [], prev: [], pick: 10 });
-  ok("重建跑到一半，查询仍拿得到候选（走的是老表）", mid.ok && mid.cand.length === 1, JSON.stringify(mid.cand));
-  ok("此时指纹还没换（没换手就不算数）", im._get("stamp") === "E1");
+  ok("同步跑到一半，查询仍拿得到候选", mid.ok && mid.cand.length === 1, JSON.stringify(mid.cand));
+  ok("此时指纹还没换（没跑完就不算数）", im._get("stamp") === "E1");
   while (ctx.storage._alarm() !== null) { ctx.storage._clr(); await im.alarm(); }
-  ok("跑完才换手：指纹更新", im._get("stamp") === "E2");
-  ok("换手后数据仍完整", im._status().docs === 3 && im._status().terms === 9);
+  ok("跑完才推进指纹", im._get("stamp") === "E2");
+  ok("跑完后数据仍完整", im._status().docs === 3 && im._status().terms === 9);
 
   sect("五、表还没建好时必须说 ok:false（让调用方退回旧路，绝不回空名单）");
   const im2 = new IndexMemory(makeCtx(), ENV); im2._init();
@@ -192,25 +159,25 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   ok("失败时记下时刻供退避用", /this\._set\("errAt", String\(Date\.now\(\)\)\);/.test(SRC));
   ok("★ 只有真换手成功了才清 err（失败不许自己把账抹掉）", /this\._set\("pending", ""\);\s*\n\s*this\._set\("err", ""\); this\._set\("errAt", "0"\);/.test(SRC));
   ok("stamp 只在换手成功那一支推进（失败推进过一次，正是这次的病根）",
-    (SRC.match(/this\._set\("stamp", this\._get\("newstamp"\)\)/g) || []).length === 1);
+    (SRC.match(/this\._set\("stamp", this\._get\("newstamp"\)\)/g) || []).length === 2);   // 增量趟跑完一处、迁移换手成功一处，失败的都不推进
 
   console.log("── 换手闸与批量上限（2026-08-19 线上真事故）──");
   /* 事故经过：ensure 排的第一件 "man" 撞了 SQLite 绑定变量上限（120 行 × 5 列 = 600 个占位符，
      报 too many SQL variables at offset 294）。catch 记下 err 就继续走，而 "man" 失败意味着
      后面那些 kw:/coords 根本没被 push 进队列 ⇒ 队列空 ⇒ 直接进换手 ⇒
      一张空的 docs_new 改名盖掉了线上那份好用的：docs 4488 → 0、terms 299803 → 0。 */
-  ok("★ 批量按占位符数算，不按行数算", /MAX_VARS = (\d+), DOC_BATCH = Math\.floor\(MAX_VARS \/ 5\), TERM_BATCH = Math\.floor\(MAX_VARS \/ 2\)/.test(SRC));
+  ok("★ 批量按占位符数算，不按行数算", /MAX_VARS = (\d+), DOC_BATCH = Math\.floor\(MAX_VARS \/ 6\)/.test(SRC) && /p \+= 45/.test(SRC));
   {
     const mv = SRC.match(/MAX_VARS = (\d+)/); const v = mv ? +mv[1] : 999;
     ok("占位符上限取在 100 以下（实测 Workers DO 上约 100）", v <= 100);
-    ok("★ docs 一批 " + Math.floor(v / 5) + " 行 × 5 = " + Math.floor(v / 5) * 5 + " 个占位符，不超上限", Math.floor(v / 5) * 5 <= v);
-    ok("★ terms 一批 " + Math.floor(v / 2) + " 行 × 2 = " + Math.floor(v / 2) * 2 + " 个占位符，不超上限", Math.floor(v / 2) * 2 <= v);
+    ok("★ docs 一批 " + Math.floor(v / 6) + " 行 × 6 = " + Math.floor(v / 6) * 6 + " 个占位符，不超上限", Math.floor(v / 6) * 6 <= v);
+    ok("★ terms 一批 45 行 × 2 = 90 个占位符，不超上限", 45 * 2 <= v);
   }
   ok("没有残留写死 120 的批量", !/batch\.length >= 120/.test(SRC));
   ok("★ 有 err 就不许换手（老表原样留着）", /const _err = this\._get\("err"\);[\s\S]{0,500}if \(_err\) \{[\s\S]{0,400}return;/.test(SRC));
-  ok("★ 空的新表不许顶替非空的旧表", /if \(!nNew \|\| \(nOld && nNew < nOld \* 0\.5\)\)/.test(SRC));
+  ok("★ 空的新表不许顶替非空的旧表（篇数与词条数两道闸）", /if \(!nNew \|\| \(nOld && nNew < nOld \* 0\.5\) \|\| !tNew \|\| \(tOld && tNew < tOld \* 0\.5\)\)/.test(SRC));
   ok("被拦下时把原因写进 err，让 status 看得见", /换手被拦下：新表/.test(SRC));
-  ok("拦下之后清掉影子表", /换手被拦下[\s\S]{0,400}DROP TABLE IF EXISTS docs_new/.test(SRC));
+  ok("拦下之后清掉影子表", /换手被拦下[\s\S]{0,400}"docs_new", "terms_new", "secs_new", "fp_new"/.test(SRC));
   ok("每次 ensure 开工先清上一轮 err（否则一次失败永久卡住换手）", /JSON\.stringify\(\["man"\]\)\);\s*\n\s*this\._set\("err", ""\);/.test(SRC));
 
   console.log("\n──────── " + pass + " passed, " + fail + " failed ────────");
