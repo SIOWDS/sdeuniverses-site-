@@ -10,7 +10,6 @@ name: search-index
 on:
   schedule:
     - cron: '20 15 * * *'   # 北京时间 23:20；GitHub 调度可能稍有延迟
-  workflow_dispatch:   # 临时：2026-10-10 王德生本人下令补跑一次，跑完即删
 
 concurrency:
   group: search-index
@@ -19,7 +18,7 @@ concurrency:
 jobs:
   reindex:
     # 出版工作流不得使用 GITHUB_TOKEN 顺手触发；只保留每日定时（2026-10-02 起连手动按钮也取消）。
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     # 【2026-08-19 加】整个 job 一道总闸。此前**一步都没有超时**，于是 2026-08-19 那趟
     # 卡在 apt 上挂了二十分钟还在挂——而 concurrency 是 search-index 独一份，
