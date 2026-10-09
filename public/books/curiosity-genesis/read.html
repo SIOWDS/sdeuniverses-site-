@@ -140,7 +140,7 @@ html.day .drawer{background:rgba(242,239,231,.97)}
 
 <header class="top">
   <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
-  <span class="ttl">SDE好奇发生学</span><span class="sub hideS">数字永生之后，谁来接那个空位</span>
+  <span class="ttl">SDE好奇发生学</span><span class="sub hideS">AI时代的意义入口与核心竞争力</span>
   <span class="spacer"></span>
   <button id="btnSpread" class="hideS" title="单页 / 双页 (D)">双页</button>
   <button id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)">矢量</button>
@@ -448,6 +448,7 @@ function buildThumbs(){
 $('btnPrev').onclick=function(){ step(-1); };
 $('btnNext').onclick=function(){ step(1); };
 $('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('pi').onkeydown=function(e){ if(e.key==='Enter'){e.preventDefault();this.onchange();} };
 $('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
 $('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
 $('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);

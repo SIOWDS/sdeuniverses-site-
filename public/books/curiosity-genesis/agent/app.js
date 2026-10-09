@@ -231,7 +231,7 @@ function kpList(){
 function ragInfo(){
  var items=(RAG&&RAG.items)||[],box=$("ragInfo");
  if(!items.length){box.innerHTML="这本书的专属碰撞库还在打造；这期间对撞时会现场检索全站。";return}
- var nb=items.filter(function(x){return x.kind==="book"}).length,na=items.length-nb,cr=items.filter(function(x){return x.rel==="跨界"}).length,du=items.filter(function(x){return x.rel==="对读"}).length;
+ var nb=new Set(items.filter(function(x){return x.kind==="book"}).map(function(x){return x.no||x.u})).size,na=items.filter(function(x){return x.kind!=="book"}).length,cr=items.filter(function(x){return x.rel==="跨界"}).length,du=items.filter(function(x){return x.rel==="对读"}).length;
  box.innerHTML="为这本书提前配好 <b>"+items.length+"</b> 个碰撞点：<b>"+nb+"</b> 本专著 · <b>"+na+"</b> 篇文章，其中跨界 "+cr+" 个"+(du&&DUI?"；另有 <b>"+du+"</b> 段是和另外两本《道德经》专著按章对读的（"+DUI.sibs.map(function(b){return "《"+esc(b.t)+"》"}).join("、")+"，三本互为碰撞库）":"")+"。<button type='button' id='ragBtn'>看看撞谁 ›</button>";
  $("ragBtn").onclick=ragList;
 }
@@ -239,7 +239,7 @@ function ragList(){
  var items=(RAG&&RAG.items)||[];
  var o=document.createElement("div");o.className="ov";
  var rows=items.map(function(it,i){return "<div class='rg'><div class='rgh'><i class='r-"+(it.rel==="跨界"?"x":it.rel==="同源"?"s":it.rel==="对读"?"d":"t")+"'>"+esc(it.rel)+"</i><a href='"+esc(path(it.u))+"' target='_blank' rel='noopener'>"+esc(it.t)+"</a><em>"+(it.kind==="book"?"专著":"文章")+"</em></div><div class='rgc'>撞本书「"+esc(it.ch)+"」"+((it.kw||[]).length?" · 共有："+esc(it.kw.join("、")):"")+"</div><div class='rgx'>"+esc(it.x.slice(0,150))+"……</div><button type='button' class='chip rgb' data-i='"+i+"'>拿它来撞</button></div>"}).join("");
- o.innerHTML="<div class='box' role='dialog' aria-label='专属碰撞库'><div class='hd'><b>「"+esc(AG.name)+"」的专属碰撞库</b><button class='tbtn' data-x>×</button></div><div class='bd rgl'><p class='rgn'>从站上全部专著与文章里，按本书各章检索出的最相撞的段落（"+esc(RAG.built||"")+" 建）。<b>同源</b>＝这本书的前身或姊妹篇，<b>同向</b>＝同一方向的近邻，<b>跨界</b>＝别的书架、别的领域。</p>"+rows+"</div></div>";
+ o.innerHTML="<div class='box' role='dialog' aria-label='专属碰撞库'><div class='hd'><b>「"+esc(AG.name)+"」的专属碰撞库</b><button class='tbtn' data-x>×</button></div><div class='bd rgl'><p class='rgn'>从五部相关专著中选取的有出处段落，并非全站穷尽检索（"+esc(RAG.built||"")+" 建）。<b>同源</b>＝这本书的前身或姊妹篇，<b>同向</b>＝同一方向的近邻，<b>跨界</b>＝别的书架、别的领域。</p>"+rows+"</div></div>";
  document.body.appendChild(o);
  o.querySelector("[data-x]").onclick=function(){o.remove()};
  o.querySelectorAll(".rgb").forEach(function(b){b.onclick=function(){var it=items[+b.dataset.i];o.remove();setAct("clash",false);$("q").value="拿《"+it.t.replace(/[｜|].*$/,"")+"》里这一段，撞本书「"+it.ch+"」那一章：两边共有的前提是什么？撞出一个新命题。";send()}});
@@ -266,7 +266,7 @@ function render(){
 }
 function fillStarts(){
  var box=$("starts");if(!box)return;box.innerHTML="";
- var own=AG.starts&&AG.starts[act],ss=gateOf(act).starts.slice();if(own){ss=[own].concat(ss.slice(0,2))}
+ var own=AG.starts&&AG.starts[act],ss=gateOf(act).starts.slice();if(own){ss=(Array.isArray(own)?own:[own]).concat(ss.slice(0,2))}
  ss.forEach(function(s){var c=document.createElement("button");c.type="button";c.className="chip";c.textContent=s;c.onclick=function(){var t=$("q");if(/……$/.test(s)){t.value=s.replace(/……$/,"");t.focus();grow()}else{t.value=s;send()}};box.appendChild(c)});
 }
 function add(role,text,a,srcs,who){
