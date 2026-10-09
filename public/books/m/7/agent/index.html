@@ -1,1 +1,48 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>中华文化导论 · 阅读、学习与智能问对</title><meta name="book_no" content="7"><link rel="stylesheet" href="/books/m/7/agent/unit.css?v=triune1"></head><body><header><nav aria-label="三合一出版单元"><a class="brand" href="/books/m/7/">中华文化导论 · 第7号</a><a id="navRead" href="/books/m/7/text/">阅读原文</a><a id="navLearn" href="/books/m/7/agent/learning.html">学习包</a><a id="navAgent" href="/books/m/7/agent/">智能问对 · 共生</a><button id="theme" type="button">明暗</button></nav></header><main class="unit"><p class="eyebrow">DEMAI INTERNATIONAL PRESS / 阅读 · 学习 · 问对</p><h1>带着一个问题，读出自己的理解。</h1><p class="lede">原文给出依据，学习档案留下过程，「共生」接续追问。七篇、33个问题，同一份初答、复答与修订，来回都在。</p><p class="muted">王德生 著 · 第7号 · ISBN 978-1-970820-42-3 · 正文v1.0 · 学习包1.0.0</p><div class="row"><button id="export" type="button">导出完整学习档案</button><label class="button">导入档案<input id="import" type="file" accept="application/json" hidden></label><a class="button" href="/books/m/7/downloads/m7-learning-pack.zip">下载学习包</a><a class="button" href="/books/m/7/read.html">PDF翻页</a></div><p class="muted">记录只存在本机浏览器，请定期导出。导入前先下载现有备份。原通用WDS陪读历史未自动迁入；本页与阅读、学习入口共用同题档案。</p><div id="globalStatus" role="status" aria-live="polite">正在打开问题与原文……</div><div class="grid"><aside class="sidebar"><label>找问题<input id="filter" type="search" placeholder="概念、情境或篇名"></label><div id="questionList"></div></aside><article id="workspace" hidden><section class="pane"><p class="eyebrow" id="partTitle"></p><h2 id="questionTitle"></h2><p id="why"></p><p class="task" id="task"></p><p id="check"></p><p class="muted">编辑学习设计 · 理解、赞同与迁移分别记录；允许不知道、尚未实施和有据反对。</p><div id="sourceLinks" class="row"></div><details><summary>展开本题原文选段</summary><div id="quote" class="source"></div></details><div id="focusInfo"></div></section><section class="pane" id="learning"><h2>我的学习过程</h2><div class="steps">封存初答 → 带问阅读 → 复答或异议 → 智能问对 → 本人修订 → 实践回看</div><label for="recordType">这次记录</label><select id="recordType"><option value="initial">初答 · 只封存一次</option><option value="reanswer">读后复答 · 新增一版</option><option value="objection">异议或错题 · 保留疑问</option><option value="plan">行动计划 · 尚未实施</option><option value="observation">实践观察 · 本人自报</option><option value="review">延后回看 · 能力与未决事项</option></select><p class="muted">写下原文依据、自己的判断与仍不确定的地方；观察请注明日期和实际发生的事。</p><textarea id="recordText" aria-label="我的学习记录" placeholder="先写自己的理解，也可以写：我还不知道……"></textarea><div class="row"><button id="saveRecord" class="primary">保存这次记录</button><button id="refreshRecords">刷新记录，保留输入</button></div><div id="recordsStatus" role="status" aria-live="polite"></div></section><section class="pane" id="dialogue"><p class="eyebrow">智能问对 · 共生</p><h2>沿着这一个问题，往下问。</h2><div class="route" id="gates"></div><div class="row"><label>本轮任务<select id="route"><option value="hint">只给提示</option><option value="diagnose">比较初答与复答</option><option value="critique">检验异议</option><option value="transfer">迁移设计</option><option value="review">观察回看</option><option value="summarize">本题小结</option></select></label></div><textarea id="ask" aria-label="问共生" placeholder="针对本题，你还想追问什么？"></textarea><details open><summary>选择本次交给模型的材料</summary><p class="muted">本题对应原文默认选中。个人记录逐条勾选；不附带其他题目与旧陪读会话。选择跨书材料时，只交给模型列出的段落。</p><div id="sourceChoices"></div><div id="recordChoices"></div><div id="crossChoices"></div></details><div class="row"><label>模型服务<select id="vendor"><option value="ds">DeepSeek</option><option value="glm">智谱 GLM</option></select></label><label>自有Key<input id="key" type="password" autocomplete="off" placeholder="本轮使用"></label><label><input type="checkbox" id="rememberKey">保存在本机</label><button id="clearKey">清除此页保存的Key</button></div><p class="muted">发送时，确认的文字与Key经本站接口提交给所选模型服务，费用由该Key账户承担。每次确认只调用一次；不另做内功预读、隐藏检索或自动收费重试。</p><button id="prepare" class="primary">预览实际发送材料</button><section id="preview" hidden><h3>请核对本次材料</h3><p id="previewMeta"></p><details open><summary>实际模型输入（完整）</summary><pre id="previewText"></pre></details><label><input type="checkbox" id="confirmSend">我已核对材料，确认调用所选模型</label><div class="row"><button id="send" class="primary">确认发送这一问</button><button id="cancel" disabled>停止生成</button></div></section><div id="answerStatus" role="status" aria-live="polite"></div><div id="liveAnswer" class="source" hidden></div></section><section class="pane"><h2>本人确认修订</h2><p>模型完整答复先记为“未核对建议”。核对原文后，由你决定；未完成的回答不能作为完整建议采纳。</p><label>依据答复<select id="receiptSelect"><option value="">独立修订 · 不依赖某条模型答复</option></select></label><div class="row"><label>我的选择<select id="decision"><option value="independent">独立修订</option><option value="adopt">采纳</option><option value="modify">修改后采纳</option><option value="reject">保留反对</option><option value="undecided">暂不判断</option></select></label></div><textarea id="revision" aria-label="本人修订与理由" placeholder="用自己的话写出修订、依据或保留的异议。"></textarea><div class="row"><label><input type="checkbox" id="confirmRevision">这是我核对后作出的选择</label><button id="saveRevision" class="primary">登记本人修订</button></div></section><section class="pane"><h2>本题完整档案</h2><p class="muted">记录追加保存，初答不覆盖。模型建议与本人判断分开；中断、取消与失败按实际状态保留。</p><div id="history"></div><button id="publicDraft">导出我选定的增补草案</button><p class="muted">只导出本人修订供自己脱敏检查，不自动投稿或修改公开书稿；正式增补仍需作者审定。</p></section></article></div></main><footer class="footer">共生 · 《中华文化导论》的配套智能体，并非作者本人。正文、学习问题与模型推论各自标明身份。</footer><script src="/books/m/7/agent/core.js?v=triune1"></script><script src="/books/m/7/agent/app.js?v=triune1" defer></script></body></html>
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>共生 · 《中华文化导论》的智能体 | 德麦国际专著第 7 号</title>
+<meta name="description" content="我从《中华文化导论》中来，陪你辨认人情、面子与代际延续的发生，把初答、异议、修订与实践观察接在同一个问题上。">
+<meta name="sde-page-kind" content="tool">
+<meta name="book-agent" content="共生"><meta name="book_no" content="7">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/7/agent/">
+<meta property="og:title" content="共生 · 《中华文化导论》的智能体">
+<meta property="og:description" content="我从《中华文化导论》中来，陪你辨认人情、面子与代际延续的发生，把初答、异议、修订与实践观察接在同一个问题上。">
+<meta property="og:image" content="https://sdeuniverses.com/books/m/7/cover.jpg">
+<link rel="stylesheet" href="/books/agent/app.css?v=20261010a">
+</head>
+<body>
+<div id="loading" class="loading"><div>这本书的智能体正在翻开它…</div><div id="ldmsg" style="font-size:12px"></div></div>
+<div id="app" class="app" hidden>
+ <aside class="side">
+  <div class="crumb"><a href="/browse/">SDE Universes</a> · <a href="/books/">专著书架</a> · <a id="detailA" href="/books/">本书详情</a></div>
+  <div class="bk"><img id="cov" alt="" hidden><div><h1 id="bt"></h1><div class="sub" id="bs"></div></div></div>
+  <div class="brand"><b id="agName"></b><small id="agEpi"></small></div>
+  <p class="tag" id="agTag"></p>
+  <div class="read" id="readInfo"></div>
+  <div class="read" id="kpInfo" style="margin-top:8px"></div>
+  <div class="read" id="ragInfo" style="margin-top:8px"></div>
+  <div class="sec-t">五 道 门</div>
+  <div class="gates" id="gates"></div>
+  <div class="sec-t hide-m">写 出 来</div>
+  <div class="outs">
+   <button class="out" id="oPaper" type="button">写成论文（约一万字）</button>
+   <button class="out ghost" id="oMono" type="button">写成新专著 · 立项书与全书提纲</button>
+   <button class="out ghost" id="oSum" type="button">本场小结</button>
+  </div>
+  <div class="small">德麦国际的每一本专著都有自己名字的智能体。<a href="/books/agent/">看全部智能体 ›</a><br>用你自己的大模型 Key 运行（DeepSeek 或智谱），Key 保存在你的浏览器里；每次提问时会经本站接口转发给你选的模型服务商。<button id="keyBtn" type="button">设置 Key</button> · <button id="clrBtn" type="button">清空本场对话</button></div>
+ </aside>
+ <main class="main">
+  <div class="top"><div class="now" id="now"></div><a class="tbtn" id="readA" href="/books/" target="_blank" rel="noopener">打开原书</a></div>
+  <div class="msgs" id="msgs"><div class="col" id="col"></div></div>
+  <div class="dock"><div class="col">
+   <div class="gbar" id="gbar" role="group" aria-label="这一问走哪道门"></div>
+   <div class="inrow"><textarea id="q" rows="1" placeholder="问一句……（Enter 发送，Shift+Enter 换行）" aria-label="你的问题"></textarea><button class="send" id="send" type="button">发送</button></div>
+   <div class="hint" id="hint"></div>
+  </div></div>
+ </main>
+</div>
+<script>window.BOOK_AGENT={no:7};</script>
+<script src="/books/unit/unit.js?v=20261010a"></script>
+<script src="/books/agent/app.js?v=20261010a" defer></script>
+</body></html>

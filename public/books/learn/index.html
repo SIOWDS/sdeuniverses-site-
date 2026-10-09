@@ -70,6 +70,7 @@ details{margin:.4rem 0}summary{cursor:pointer;color:var(--gold)}
 <body>
 <div class="bar noprint"><a id="back" href="/books/">← 书籍</a><a id="home" href="#/">学习首页</a><span class="sp"></span><button id="exp">导出进度</button><button id="imp">导入进度</button><input id="impf" type="file" accept="application/json" hidden></div>
 <div class="wrap" id="app"><p class="dim">载入学习包……</p></div>
+<script src="/books/unit/unit.js?v=20261010a"></script>
 <script>
 (function(){
 "use strict";
@@ -83,6 +84,17 @@ var Q=null; // transient quiz state
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function lsGet(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function ULG(){try{if(!window.WDSUnit)return null;var t='__wds_probe';localStorage.setItem(t,'1');localStorage.removeItem(t);return new WDSUnit.Ledger(localStorage,+NO)}catch(e){return null}}
+function sealFirst(id){var st=S.p&&S.p[id];if(!st||!(st.a1||'').trim())return;var L=ULG();if(!L)return;try{L.append({type:'seal',node:id,text:st.a1})}catch(e){}}
+function dialogBox(id){
+  var L=ULG(),h='<div class="card"><b>问对（三位一体：阅读 · 学习包 · 智能问对）</b><p class="dim small">带着这一题去问这本书自己的智能体。发送前你会看到并勾选要附带的个人文字；它的回答只是“未核对建议”，采纳与否由你本人决定。</p><div class="row">';
+  [['hint','只给提示'],['diagnose','比较我的两次回答'],['critique','检验我的异议'],['transfer','设计迁移'],['review','观察回看'],['summarize','本题小结']].forEach(function(t){h+='<a class="btn" href="/books/m/'+NO+'/agent/?node='+id+'&task='+t[0]+'" target="_blank" rel="noopener">'+t[1]+'</a>'});
+  h+='</div>';
+  if(L){var v=WDSUnit.nodeView(L.forNode(id));
+    h+='<p class="small dim">本题问对 '+v.requests.length+' 次 · 我的修订 '+v.revisions.length+' 条</p>';
+    v.revisions.forEach(function(r){h+='<div class="quote"><span class="tag gold">'+esc({adopt:'采纳',modify:'修改后采纳',object:'反对',defer:'暂不判断',independent:'独立修订'}[r.stance])+'</span> '+esc(r.text||'')+'<br><span class="small dim">'+esc(r.ts.slice(0,16).replace('T',' '))+' · 由我本人确认</span></div>'});}
+  return h+'</div>';
+}
 function norm(){S.p=S.p||{};S.c=S.c||{};S.t=S.t||{};S.k=S.k||{};S.f=S.f||{};S.i=S.i||{}}
 function ymd(d){var m=d.getMonth()+1,dd=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(dd<10?'0':'')+dd}
 function today(){return ymd(new Date())}
@@ -161,6 +173,7 @@ function vProblem(id){
   h+='<div class="steps">';
   names.forEach(function(n,i){var k=i+1,cl=(k===step?'on':(k<st.s||st.done?'done':(k>st.s?'off':'')));h+='<a class="'+cl+'" href="#/p/'+id+'/'+k+'">'+k+' '+n+'</a>'});
   h+='</div>';
+  if(step>=2)h+=dialogBox(id);
   if(step===1){
     h+='<div class="card"><b>第一步：先答。</b><p class="dim small">不翻书，凭直觉写一两句。想不出就写“不知道”，这也是一个起点。</p><textarea data-f="a1" data-id="'+id+'" placeholder="我的第一反应是……">'+esc(st.a1)+'</textarea></div><button class="btn gold" data-act="step" data-id="'+id+'" data-to="2">下一步：带着问题去读</button>';
   }else if(step===2){
@@ -322,7 +335,7 @@ function rerender(){var y=window.scrollY;var app=document.getElementById('app');
 document.addEventListener('click',function(e){
   var el=e.target.closest('[data-act]');if(!el)return;
   var a=el.getAttribute('data-act'),id=el.getAttribute('data-id');
-  if(a==='step'){var p=pst(id),to=+el.getAttribute('data-to');if(to>p.s)p.s=to;save();location.hash='#/p/'+id+'/'+to;render()}
+  if(a==='step'){var p=pst(id),to=+el.getAttribute('data-to');if(to>p.s)p.s=to;save();if(to>=2)sealFirst(id);location.hash='#/p/'+id+'/'+to;render()}
   else if(a==='read'){pst(id).read[el.getAttribute('data-c')]=el.checked;save()}
   else if(a==='rub'){pst(id).r[+el.getAttribute('data-i')]=el.checked;save();rerender()}
   else if(a==='light'){var p2=pst(id);if(p2.t.replace(/\s/g,'').length<10){toast('再多写几个字，至少 10 个');return}p2.done=true;p2.s=5;save();rerender();toast('已点亮：'+id)}

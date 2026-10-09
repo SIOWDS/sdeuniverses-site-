@@ -18,7 +18,7 @@ from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, "public")
-V = "20261003d"
+V = "20261010a"
 BODY = io.open(os.path.join(ROOT, "tools", "book_agent_body.html"), encoding="utf-8").read()
 cat = json.load(io.open(os.path.join(PUB, "books", "catalog.json"), encoding="utf-8"))
 reg = json.load(io.open(os.path.join(PUB, "books", "agents.json"), encoding="utf-8"))["agents"]
@@ -55,6 +55,7 @@ for b in books:
 </head>
 <body>
 %(body)s<script>window.BOOK_AGENT={no:%(n)s};</script>
+<script src="/books/unit/unit.js?v=%(v)s"></script>
 <script src="/books/agent/app.js?v=%(v)s" defer></script>
 </body></html>
 """ % {"name": esc(a["name"]), "title": esc(b["title"]), "n": n, "desc": esc(desc), "v": V, "body": BODY,
@@ -84,7 +85,7 @@ idx = """<!doctype html>
 <title>专著智能体名录 · 每本书一个名字 | 德麦国际</title>
 <meta name="description" content="德麦国际的每一本专著都有一个自己名字的智能体，带着为它提前打造的碰撞库：读懂、用上、拆开、对撞、写出。">
 <link rel="canonical" href="https://sdeuniverses.com/books/agent/">
-<script>(function(){var m=new URLSearchParams(location.search).get("m");if(m&&/^\\d+$/.test(m))location.replace("/books/m/"+m+"/agent/");})();</script>
+<script>(function(){var m=new URLSearchParams(location.search).get("m");if(m&&/^\\d+$/.test(m))location.replace("/books/m/"+m+"/agent/"+(function(){var q=new URLSearchParams(location.search);q.delete("m");var t=q.toString();return t?"?"+t:""})());})();</script>
 <style>
 :root{--bg:#0B0E12;--bg2:#11161B;--fg:#E6E4DE;--dim:#8C949C;--gold:#D9A441;--line:#232A31}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}

@@ -141,6 +141,7 @@ function boot(){
  $("oMono").onclick=function(){writeOut("mono")};
  $("oSum").onclick=summary;
  paint();
+ unitBoot();
 }
 function grow(){var t=$("q");t.style.height="auto";t.style.height=Math.min(200,t.scrollHeight)+"px"}
 function gateOf(k){return GATES.filter(function(g){return g.k===k})[0]||GATES[0]}
@@ -322,6 +323,7 @@ function sse(resp,on){
  return pump();
 }
 function send(){
+ if(UN&&UL)return unitSend();
  var t=$("q"),q=t.value.trim();if(!q||busy)return;
  var kv=keyGet();if(!kv){keyPanel(send);return}
  t.value="";grow();
@@ -475,4 +477,125 @@ function pickChapters(){
  o.querySelector("[data-x]").onclick=function(){o.remove()};
  o.querySelector("[data-s]").onclick=function(){SEL=picked();ls(HK+"_sel",JSON.stringify(SEL));o.remove();readInfo()};
 }
+/* ===== 三位一体出版单元（2026-10-10）：问题节点 → 任务 → 预览确认 → 回执 → 本人修订 =====
+   入口：/books/m/N/agent/?node=P1&task=hint（学习包"带此题问对"按钮带来）。只有该书有 learn.json 且节点存在时才启用；
+   否则这一段什么也不做，书生照旧。个人材料（初答/复答/异议/观察）默认不发送，发送前逐项勾选并看到原文；
+   模型的回答只登记为「未核对建议」，采纳/修改/反对/暂不判断由读者本人点击。 */
+var UQ=new URLSearchParams(location.search),UL=null,UN=null,LRN=null,UTASK="ask",UABORT=null;
+var UStatusZh={complete:"完整",interrupted:"中断（不完整）",cancelled:"已取消",error:"出错"};
+function uStore(){try{var t="__wds_probe";localStorage.setItem(t,"1");localStorage.removeItem(t);return localStorage}catch(e){return null}}
+function uLearnState(){try{return JSON.parse(localStorage.getItem("wds_learn_"+mno))||{}}catch(e){return {}}}
+function uMaterials(){
+ var st=((uLearnState().p||{})[UN.id])||{},m=[];
+ if(st.a1)m.push({kind:"a1",text:st.a1});
+ if(st.a2)m.push({kind:"a2",text:st.a2});
+ if(st.t)m.push({kind:"t",text:st.t});
+ var sel=(UQ.get("sel")||"").slice(0,600);if(sel)m.push({kind:"selection",text:sel});
+ var ex=$("uExtra")?$("uExtra").value.trim():"";
+ if(ex)m.push({kind:UTASK==="review"?"observation":"objection",text:ex});
+ var last=uLastComplete();if(last)m.push({kind:"prior",text:last.text});
+ return m;
+}
+function uLastComplete(){var ev=UL.forNode(UN.id),r=null;ev.forEach(function(e){if(e.type==="receipt"&&e.status==="complete")r=e});return r}
+function uBar(){
+ var U=window.WDSUnit,a=document.createElement("div");a.id="unitBar";a.className="ubar";
+ var anchors=(UN.anchors||[]).map(function(x){return "<a href='"+esc(LRN.book.read+"#"+x.c)+"' target='_blank' rel='noopener'>"+esc(x.role)+"</a>"}).join(" · ");
+ a.innerHTML="<div class='uh'><b>本题 "+esc(UN.id)+"</b> "+esc(UN.title)+"<br><span class='uq'>"+esc(UN.q)+"</span></div>"
+  +"<div class='um'>原文依据："+anchors+" · <a href='/books/learn/?b="+mno+"#/p/"+esc(UN.id)+"'>回学习包这一题</a> · <a href='"+esc(LRN.book.read)+"' target='_blank' rel='noopener'>阅读原文</a></div>"
+  +"<div class='ut' role='group' aria-label='学习任务'></div><div class='uhint' id='uHint'></div>"
+  +"<textarea id='uExtra' rows='2' placeholder='（可选）你的异议或实际观察。只有在发送预览里勾选，才会发给模型。'></textarea>"
+  +"<div class='uk'><button type='button' class='tbtn' id='uExport'>导出本书学习记录</button> <label class='tbtn'>导入<input type='file' id='uImport' accept='application/json' hidden></label> <span class='small'>记录只存在这台电脑的这个浏览器里，不是云备份。</span></div>"
+  +"<div class='uhist' id='uHist'></div>";
+ $("gbar").parentNode.insertBefore(a,$("gbar"));
+ Object.keys(U.TASKS).forEach(function(k){var b=document.createElement("button");b.type="button";b.className="gb";b.dataset.k=k;b.textContent=U.TASKS[k].label;b.onclick=function(){uSetTask(k)};a.querySelector(".ut").appendChild(b)});
+ $("uExport").onclick=function(){var blob=new Blob([UL.export()],{type:"application/json"}),l=document.createElement("a");l.href=URL.createObjectURL(blob);l.download="wds-learning-m"+mno+".json";l.click()};
+ $("uImport").onchange=function(){var f=this.files[0];if(!f)return;f.text().then(function(t){try{var r=UL.import(t);alert("已导入 "+r.added+" 条。")}catch(e){alert(e.message)}uHist()})};
+ uSetTask(U.TASKS[UQ.get("task")]?UQ.get("task"):"ask");uHist();
+}
+function uSetTask(k){UTASK=k;var U=window.WDSUnit;document.querySelectorAll("#unitBar .ut button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.k===k?"true":"false")});$("uHint").textContent=U.TASKS[k].hint+(U.TASKS[k].needs.length?"（需要："+U.TASKS[k].needs.map(function(n){return U.MATERIAL_KINDS[n]}).join("、")+"）":"")}
+function uHist(){
+ var U=window.WDSUnit,v=U.nodeView(UL.forNode(UN.id)),el=$("uHist");
+ if(!v.requests.length&&!v.revisions.length){el.innerHTML="";return}
+ el.innerHTML="<details><summary>本题以往记录（问对 "+v.requests.length+" 次 · 本人修订 "+v.revisions.length+" 条）</summary>"+v.requests.map(function(x){return "<div class='ui'>"+esc(x.sent.ts.slice(0,16).replace("T"," "))+" · "+esc(U.TASKS[x.sent.task||"ask"].label)+" · "+(x.receipt?esc(UStatusZh[x.receipt.status]):"无回执")+"</div>"}).join("")+v.revisions.map(function(r){return "<div class='ui'>"+esc(r.ts.slice(0,16).replace("T"," "))+" · 我的修订（"+esc({adopt:"采纳",modify:"修改后采纳",object:"反对",defer:"暂不判断",independent:"独立修订"}[r.stance])+"）："+esc(r.text||"")+"</div>"}).join("")+"</details>";
+}
+function uPreview(q,cb){
+ var U=window.WDSUnit,mats=uMaterials(),need=U.TASKS[UTASK].needs;
+ mats.forEach(function(m){m.include=need.indexOf(m.kind)>=0||m.kind==="selection"});
+ var o=modal("发送前确认 · 将发给模型的全部内容");
+ o.bd.innerHTML="<p>本题：<b>"+esc(UN.q)+"</b><br>任务：<b>"+esc(U.TASKS[UTASK].label)+"</b>"+(q?"<br>你的话：<b>"+esc(q)+"</b>":"")+"</p><p class='small'>下面是你自己的文字。<b>只有勾选的才会发送</b>；没勾的不会离开这台电脑。不会附带别的题目，也不会附带普通聊天记录。</p><div id='uMats'></div><div id='uWarn' class='err'></div><p class='small'>注意：发送时，你的模型 Key 与上述内容会经本站服务器转发给你选的模型服务；本站不保存对话内容。</p><p><button class='tbtn' id='uOk' type='button'>确认发送</button> <button class='tbtn' id='uNo' type='button'>取消</button></p>";
+ var box=o.bd.querySelector("#uMats");
+ if(!mats.length)box.innerHTML="<p class='dim'>（目前没有可附带的个人文字——将只发本题公共问题。）</p>";
+ mats.forEach(function(m,i){var l=document.createElement("label");l.style.cssText="display:block;margin:.5rem 0";l.innerHTML="<input type='checkbox' data-i='"+i+"'"+(m.include?" checked":"")+"> <b>"+esc(U.MATERIAL_KINDS[m.kind])+"</b><br><span style='white-space:pre-wrap'>"+esc(m.text)+"</span>";box.appendChild(l)});
+ function sync(){box.querySelectorAll("input").forEach(function(c){mats[+c.dataset.i].include=c.checked});var miss=need.filter(function(k){return !mats.some(function(m){return m.kind===k&&m.include})});$("uWarn").textContent=miss.length?"缺少："+miss.map(function(k){return U.MATERIAL_KINDS[k]}).join("、")+"。缺的部分智能体会直接说明缺，不会替你编。":""}
+ box.addEventListener("change",sync);sync();
+ o.bd.querySelector("#uNo").onclick=function(){o.bd.closest(".ov").remove()};
+ o.bd.querySelector("#uOk").onclick=function(){sync();var ov=o.bd.closest(".ov");var req;try{req=U.prepare({no:mno,node:{id:UN.id,q:UN.q},task:UTASK,materials:mats})}catch(e){$("uWarn").textContent=e.message;return}ov.remove();cb(req)};
+}
+function unitSend(){
+ var t=$("q"),q=t.value.trim(),U=window.WDSUnit;if(busy)return;
+ var kv=keyGet();if(!kv){keyPanel(unitSend);return}
+ if(UTASK==="ask"&&!q){$("uHint").textContent="自由问对请先写一句话。";return}
+ uPreview(q,function(req){
+  var sentEv;
+  try{
+   UL.append({type:"prepared",node:UN.id,requestId:req.requestId,hash:req.hash,task:req.task});
+   var st=((uLearnState().p||{})[UN.id])||{};
+   sentEv=UL.append({type:"sent",node:UN.id,requestId:req.requestId,hash:req.hash,task:req.task,payload:req.payload,q:q});
+  }catch(e){alert(e.message);return}
+  t.value="";grow();
+  var shown=q||U.TASKS[req.task].label;add("reader","〔"+U.TASKS[req.task].label+"〕"+shown);
+  var bub=add("wds","",act),tx=bub.querySelector(".tx");tx.innerHTML="<span class='think'>「"+esc(AG.name)+"」正在想……</span>";
+  busy=true;paint();scroll();
+  var ans="",ended=false,trunc=false,errored="",cancelled=false,httpErr=0,srcs=[];
+  UABORT=new AbortController();
+  var stop=document.createElement("button");stop.type="button";stop.className="tbtn";stop.textContent="停止";stop.onclick=function(){cancelled=true;UABORT.abort()};bub.appendChild(stop);
+  var body={q:q||UN.q,bookagent:1,bookNo:BOOK.number,act:act,agentName:AG.name,agentEpithet:AG.epithet||"",bookRag:ragPick(UN.q,act,10).text,bookPoints:kpText(),bookMeta:meta(),docTitle:BOOK.title,docText:docText(),history:[],unit:{task:req.task,node:req.payload.node,materials:req.payload.materials,requestId:req.requestId},key:kv.key,vendor:kv.vendor};
+  fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body),signal:UABORT.signal}).then(function(r){
+   if(!r.ok)httpErr=r.status;
+   return sse(r,function(j){
+    if(j.t==="token"){ans+=j.v;tx.innerHTML=fmt(ans);scroll()}
+    else if(j.t==="sources"&&Array.isArray(j.v)){srcs=j.v}
+    else if(j.t==="end"){ended=true;if(j.v&&j.v.truncated)trunc=true}
+    else if(j.t==="error"){errored=String(j.v||"error");var e=document.createElement("div");e.className="err";e.textContent=j.v;bub.appendChild(e);if(j.code==="need_key"||j.code==="bad_key")setTimeout(function(){keyPanel(null)},300)}
+   });
+  }).catch(function(e){if(!cancelled){errored=errored||String(e&&e.message||"net");var x=document.createElement("div");x.className="err";x.textContent="接不上「"+AG.name+"」（"+errored+"）。这一次已记为未完成；重试会重新预览、重新确认。";bub.appendChild(x)}}).then(function(){
+   stop.remove();
+   var status=U.receiptStatus({text:ans,ended:ended,truncated:trunc,error:errored,httpError:httpErr,cancelled:cancelled});
+   var rc;try{rc=UL.append({type:"receipt",node:UN.id,requestId:req.requestId,status:status,text:ans,srcs:srcs.slice(0,8)})}catch(e){alert(e.message)}
+   if(srcs.length)bub.appendChild(srcBox(srcs));
+   if(rc&&ans)bub.appendChild(uSuggestion(rc,bub));
+   busy=false;paint();scroll();uHist();
+  });
+ });
+}
+function uSuggestion(rc,bub){
+ var d=document.createElement("div");d.className="usug";
+ var full=rc.status==="complete";
+ d.innerHTML="<div class='small'><b>未核对建议</b> · 状态："+esc(UStatusZh[rc.status])+(full?"":"（不完整的回答不能直接采纳，你仍可写下自己的修订）")+"<br>这是模型的回答，不是书里的话，也不是你的判断。是否采纳由你决定：</div><div class='ubt'></div>";
+ var row=d.querySelector(".ubt");
+ [["adopt","采纳",full],["modify","修改后采纳",full],["object","反对",true],["defer","暂不判断",true],["independent","我自己重写",true]].forEach(function(x){
+  if(!x[2])return;var b=document.createElement("button");b.type="button";b.className="tbtn";b.textContent=x[1];
+  b.onclick=function(){uRevise(x[0],x[1],rc,d)};row.appendChild(b)});
+ return d;
+}
+function uRevise(stance,label,rc,d){
+ var U=window.WDSUnit,o=modal("本人修订 · "+label);
+ var ask=stance==="defer"?"":"<p>用你自己的话写下："+({adopt:"你采纳了什么、为什么",modify:"你改成了什么、为什么",object:"你反对哪里、依据是什么",independent:"你自己的修订版本"}[stance])+"。</p><textarea id='uRev' rows='6' style='width:100%'></textarea>";
+ o.bd.innerHTML=ask+"<p class='small'>这条记录会标明：由你本人确认，依据这次回答的回执。系统和模型都不会替你写这一条。</p><p><button class='tbtn' id='uOk2' type='button'>保存</button></p>";
+ o.bd.querySelector("#uOk2").onclick=function(){
+  var txt=stance==="defer"?"":$("uRev").value.trim();
+  try{UL.append({type:"revision",node:UN.id,stance:stance,basisReceipt:stance==="independent"?undefined:rc.id,text:txt})}catch(e){alert(e.message);return}
+  o.bd.closest(".ov").remove();d.querySelector(".ubt").innerHTML="<span class='small'>已记下你的选择："+esc(label)+"</span>";uHist();
+ };
+}
+function unitBoot(){
+ var node=UQ.get("node");if(!node||!window.WDSUnit)return;
+ var st=uStore();if(!st){return}
+ J("/books/m/"+mno+"/learn.json").then(function(l){
+  if(!l||!l.problems)return;var p=l.problems.filter(function(x){return x.id===node})[0];if(!p)return;
+  LRN=l;UN=p;try{UL=new window.WDSUnit.Ledger(st,mno);UL.all()}catch(e){UL=null;UN=null;return}
+  uBar();
+ });
+}
+
 })();
