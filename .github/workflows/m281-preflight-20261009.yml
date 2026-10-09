@@ -1,0 +1,60 @@
+name: Volume281 publication preflight
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/m281-preflight-20261009.yml]
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/220/
+            /public/books/m/302/
+            /public/books/m/281/
+            /public/books/catalog.json
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /.publish/volume-reservations/281.json
+            /tools/build_bookshelf.py
+      - name: Validate identifiers and preserve relevant references
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,shutil,urllib.request,os
+          root=Path(os.environ['RUNNER_TEMP'])/'m281-preflight';root.mkdir()
+          cat=json.loads(Path('public/books/catalog.json').read_text())
+          isbn='9798906905116'
+          conflicts=[{'number':b.get('number'),'title':b.get('title')} for b in cat['books'] if re.sub(r'[^0-9X]','',str(b.get('isbn','')))==isbn and str(b.get('number'))!='281']
+          target=[b for b in cat['books'] if str(b.get('number'))=='281' or b.get('id')=='m-281']
+          rv=json.loads(Path('.publish/volume-reservations/281.json').read_text())
+          result={'isbn':isbn,'isbn_checksum_valid':sum(int(d)*(1 if i%2==0 else 3) for i,d in enumerate(isbn))%10==0,'isbn_conflicts':conflicts,'volume281_catalog':target,'reservation':rv,'canonical_directory_exists':Path('public/books/m/281').exists(),'catalog_count':len(cat['books'])}
+          assert not conflicts and not target and not result['canonical_directory_exists']
+          assert rv['title']=='AI时代思考的困境与出路' and rv['volume']==281
+          for name in ['public/books/catalog.json','public/books/index.html','public/monographs/index.html','public/sites/read/library/index.html','tools/build_bookshelf.py']:
+            p=Path(name)
+            if p.exists():q=root/name;q.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,q)
+          for n in ['220','302']:
+            src=Path('public/books/m')/n;dst=root/'references'/n;dst.mkdir(parents=True)
+            for p in src.rglob('*'):
+              if p.is_file() and p.suffix in ['.html','.css','.js','.json'] and p.stat().st_size<250000:
+                q=dst/p.relative_to(src);q.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,q)
+            pdfs=sorted(src.rglob('*.pdf'),key=lambda p:p.stat().st_size)
+            if pdfs:shutil.copy2(pdfs[0],dst/'reference.pdf')
+          (root/'preflight.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m281-preflight-references
+          path: ${{ runner.temp }}/m281-preflight/
+          retention-days: 7
