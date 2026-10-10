@@ -24,6 +24,12 @@ ROOT = Path(__file__).resolve().parent.parent
 PUBLIC = ROOT / "public"
 CATALOG_PATH = PUBLIC / "sites" / "site-data.json"
 SKIP = re.compile(r"^/(admin|diag|check)(/|$)|/test(/|$)")
+# What If has standalone reading pages as well as directory index pages.
+# Keep this exception narrow; only paths found by tracked_public_files() enter it.
+WHAT_IF_READING_PAGE = re.compile(
+    r"^public/books/what-if/(?:read|chapters|chapters/(?:intro|foundation|"
+    r"ch(?:0[1-9]|[1-3][0-9]|4[0-8])|conclusion|appendix|references))\.html$"
+)
 
 
 def load_catalog() -> dict:
@@ -50,6 +56,8 @@ def tracked_public_files() -> list[str]:
 
 
 def index_url(path: str) -> str | None:
+    if WHAT_IF_READING_PAGE.fullmatch(path):
+        return "/" + path[len("public/") : -len(".html")]
     if not path.endswith("/index.html") and path != "public/index.html":
         return None
     rel = path[len("public/") :]

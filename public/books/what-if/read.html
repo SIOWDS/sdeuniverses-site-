@@ -189,6 +189,7 @@ var TOC = JSON.parse(document.getElementById('toc').textContent);
 var $ = function(id){ return document.getElementById(id); };
 
 var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var showPending=false, showCallbacks=[], navigationId=0, pendingTurn=0;
 var themes=['','day','sepia'], ti=0;
 var cache={}, textCache={}, vecOK=0, vecFail=0;
 /* —— 接入 SDE 陪读（WDS）：把当前可见页的文本与页码喂给助手；文字层可选中某句作焦点 —— */
@@ -298,23 +299,35 @@ function buildText(pg, vp, el){
 
 /* ── 展示当前跨页 ── */
 function show(cb){
-  if(rendering){ return; }
+  if(cb) showCallbacks.push(cb);
+  if(!doc || !total) return;
+  // 合并渲染中的请求：cur/显示设置始终保留最新值，旧页完成后再绘制最新请求。
+  if(rendering){ showPending=true; return; }
   rendering=true;
-  document.getElementById('book').classList.toggle('single', !spread);
-  $('leafR').style.display = spread?'':'none';
-  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  showPending=false;
+  var page=cur, useSpread=spread;
+  document.getElementById('book').classList.toggle('single', !useSpread);
+  $('leafR').style.display = useSpread?'':'none';
+  var left = useSpread ? (page%2===0?page:page-1) : page;   // 偶数页在左，仿真书
   if(left<1) left=0;
   var right= left+1;
-  var done=0, need=spread?2:1;
-  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
-  if(spread){
+  var done=0, need=useSpread?2:1;
+  function fin(){
+    if(++done<need) return;
+    rendering=false;
+    if(showPending){ show(); return; }
+    sync(); hideMsg();
+    var callbacks=showCallbacks.splice(0);
+    callbacks.forEach(function(f){ f(); });
+  }
+  if(useSpread){
     $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
     $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
     renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
     renderInto(right, $('cR'), $('tR'), fin, $('sR'));
   }else{
-    $('nL').textContent = cur-CFG.offset+1>0?(cur-CFG.offset+1):'';
-    renderInto(cur, $('cL'), $('tL'), fin, $('sL'));
+    $('nL').textContent = page-CFG.offset+1>0?(page-CFG.offset+1):'';
+    renderInto(page, $('cL'), $('tL'), fin, $('sL'));
   }
 }
 
@@ -333,11 +346,17 @@ function sync(){
 
 /* ── 翻页（带动画） ── */
 function step(dir){
+  if(!doc || !total) return;
   var n = spread?2:1;
-  var t = cur + dir*n;
+  var from = pendingTurn || cur, t = from + dir*n;
   if(t<1) t=1; if(t>total) t=total;
-  if(t===cur) return;
-  animate(dir, function(){ cur=t; show(); });
+  if(t===from) return;
+  pendingTurn=t;
+  var request=++navigationId;
+  animate(dir, function(){
+    if(request!==navigationId) return;   // 较新的翻页或目录跳转已取代这次动画。
+    pendingTurn=0; cur=t; show();
+  });
 }
 function animate(dir, after){
   var src = dir>0 ? $('leafR') : $('leafL');
@@ -357,7 +376,13 @@ function animate(dir, after){
   requestAnimationFrame(function(){ fl.classList.add('go'); });
   setTimeout(function(){ fl.remove(); after(); }, 620);
 }
-function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+function go(p){
+  if(!doc || !total) return;
+  navigationId++; pendingTurn=0;
+  p=Math.max(1,Math.min(total,p|0));
+  if(p===cur) return;
+  cur=p; show();
+}
 
 /* ── 目录 ── */
 /* 目录兜底：TOC 为空时从 PDF 书签生成（新迁入的书多半没有手工目录） */
