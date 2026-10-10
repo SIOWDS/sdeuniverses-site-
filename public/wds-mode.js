@@ -1769,6 +1769,25 @@
       labP2X: "\n\n【后半必须包含】新命题的证伪条件与最脆一环；与底座论文的逐点对照（哪一点继承、哪一点超出、哪一点推翻）。",
       labDocT: "SDE 科研创新法 · 全过程", labFair: "流程：①无 SDE 经典科研作底座 ②独立评分员称重 ③SDE 思想创新（评分卡驱动的五轮问对）④打磨成终稿并再评分。两次评分用同一个评分通道（不装 SDE 内核），差值由页面按权重 S0.20/D0.25/E0.20/I0.20/F0.15 计算。注意：评分员与写作者是同一家基底，分数宜视为待独立复核。",
       labBase: "底座论文（无 SDE）", labCard1: "第一张评分卡（底座）", labDlg: "SDE 五轮问对", labFinal: "终稿论文（SDE 科研创新法）", labCard2: "第二张评分卡（终稿）", labRound: "细化第 {n} 轮",
+      /* 稿件提升（2026-10-10 王德生令「在 ChatSDE 上做一个稿件修改的智能体，比如专著修改和提升」）。见 sendMs 头注释。 */
+      msBtn: "✒ 稿件提升", msOn: "✒ 稿件提升：开",
+      msTip: "先用 📎 载入书稿（Word／PDF／文本），再在输入框里贴出版社要求或编辑的退改意见（没有就留空，它会按一般审稿标准预判）。一键走六步：①诊断与拆条 ②称重（创新智商）③主心骨与逐章方案 ④逐章修改 ⑤复评（同几章改前改后对比）⑥编辑意见对照表＋修改说明信。每次改 3 章，可接着改下一批。约 15–25 分钟",
+      msNeed: "先用 📎 载入书稿，再在输入框里贴编辑意见（可留空），然后发送。",
+      msS1: "第一步 · 诊断与拆条（在说什么 · 承重句 · 哪里脆 · 编辑意见清单）", msS2: "第二步 · 称重（改前：本批章节的创新智商）",
+      msS3: "第三步 · 主心骨与逐章修改方案", msS4: "第四步 · 逐章修改（第 {a}–{b} 单元，共 {n} 单元）",
+      msS5: "第五步 · 复评（同一批章节改后再评，逐维对比）", msS6: "第六步 · 编辑意见对照表与修改说明信",
+      msUnit: "第 {i} 单元 · {name}", msUnitRun: "正在改第 {i} 单元…", msNoteH: "【本章修改说明】",
+      msWord: "⤓ 修改稿 Word", msWordAll: "⤓ 全过程 Word", msNext: "↻ 接着改下一批（第 {a}–{b} 单元）", msAllDone: "全部单元已改完。",
+      msDocT: "稿件提升 · 全过程", msRevT: "修改稿", msFair: "说明：改前改后评的是同一批章节，评分员不装 SDE 内核；评分员与改稿者是同一家基底，分数宜视为待独立复核。书名、引文、数据、人名请人工逐条核对后再交出版社。",
+      msNoDemand: "（未提供编辑意见：请按出版社一般审稿标准，预判编辑最可能提的五条意见，逐条标「预判」。）",
+      msMap: "【书稿目录（自动切分的单元 · 字数）】\n", msSample: "【书稿样本（开头、中段、结尾）】\n", msDemand: "【出版社要求与编辑意见原文】\n", msAbout: "【项目常驻说明】\n",
+      msDiagT: "【篇幅】约 2000 字。\n\n【任务 · 稿件诊断与拆条】下面是一部待改书稿的目录与样本，以及出版社的要求。请按五段作答：\n一、它在说什么（三句话以内）；\n二、承重句（引原文两三句，说明全书靠它们立住）；\n三、哪里脆（最容易被编辑或读者驳倒的三处，各引原句）；\n四、没看见什么（同类书都会写、它却漏了的，或它自己没意识到的更好的写法）；\n五、编辑意见清单：把编辑意见逐条拆开编号 Y1、Y2……，每条写：原话 ｜ 硬要求还是方向性 ｜ 主要落在哪几个单元。\n只就这部书稿说话，不讲方法论。\n\n",
+      msPlanT: "【篇幅】约 2500 字。\n\n【任务 · 主心骨与逐章修改方案】下面是这部书稿的诊断、改前评分卡、目录与编辑意见清单。请按五段作答：\n一、家底：同类书已有的两三种说法（只说你有把握的，宁缺毋造）；\n二、缝隙：这部书稿与它们相比，空着的、能填的那一处；\n三、主心骨：用一句话写出全书的中心判断，句式必须是「它不是……，而是……」，单独成行，行首写「主心骨：」；\n四、逐单元修改方案：按目录顺序，每个单元一行：「单元序号 ｜ 处理（保留／改写／压缩／合并／删）｜ 依据（意见编号 Y? 或评分卡哪一维）｜ 要点」；\n五、不许动的东西：作者亲历的经历、场面与口吻，列出三五处。\n写给出版中介与作者看，用平常话，不用学派术语。\n\n",
+      msRevT0: "【任务 · 按方案修改本单元】你是出版社资深责任编辑，正和作者一起改这部书稿。下面依次是：项目常驻说明、编辑意见清单、全书主心骨、逐单元修改方案、本单元原文。\n改稿规矩：\n1. 先在修改方案里找到本单元那一行，照它的处理去改；方案里没有本单元，就按主心骨与编辑意见改。\n2. 让本单元回扣主心骨；删掉与主心骨无关的枝蔓；同一个意思只说一遍。\n3. 作者亲历的经历、场面、口吻一律保留，可以重排，不许替换成泛泛之谈。\n4. 不编造事实、数据、引文、人名；没把握的地方原样保留，并在句末加〔待核〕。\n5. 不加任何学派术语，不出现 SDE 字样。\n6. 处理是「删」或「合并」时，不写正文，只写一句「（建议删去／并入第 N 单元）」和理由。\n输出格式：先写本单元改后的完整正文（保留单元标题）；正文之后另起一行写「【本章修改说明】」，下面逐条写：意见编号 ｜ 怎么改的 ｜ 举一处「原句 → 新句」。\n\n",
+      msMot: "【全书主心骨】", msPlanH: "【逐单元修改方案】\n", msListH: "【编辑意见清单】\n", msOrig: "【本单元原文 · {name}】\n",
+      msLetT: "【篇幅】约 1500 字。\n\n【任务 · 编辑意见对照表与修改说明信】下面是编辑意见清单、全书主心骨、已修改各单元的修改说明、尚未修改的单元、改前改后的评分。请写两部分：\n一、编辑意见对照表：Markdown 表格，列为「编号 ｜ 意见 ｜ 处理（已改／部分改／未改）｜ 改在哪里（单元）｜ 说明」；每条意见都要有一行，没覆盖到的标「未改」并写理由或「下一批处理」。\n二、修改说明信：致责任编辑，约 800 字，函件体——开头一句说明本次交回的是哪几个单元；逐条说改了哪几条意见、哪条没改为什么；最后写下一步与交稿时间（日期写〔待填〕）。不要虚构已经发生的沟通。\n\n",
+      msDone: "【已改单元的修改说明】\n", msLeft: "【尚未修改的单元】", msScore: "【评分变化】\n",
+      msDelta: "逐维对比（本批改前 → 改后）",
       cmpIq: "⚖ 给两份打创新智商", cmpIqQ: "下面是同一个问题、同一家基底、在两种内核下各写出的一份报告（A＝有 SDE，B＝无 SDE）。请按创新智商五维（S/D/E/I/F）分别给两份打分，各维附一句原文证据与一句扣分句，算出综合分，并说清差距主要出在哪几维、各自最该补哪一维。",
       triBtn: "⚔ 三家对撞", triOn: "⚔ 三家对撞：开",
       triMore: "↻ 继续对撞", triRd: "第 {n} 轮 · 座位左轮一格",
@@ -1990,6 +2009,10 @@
       qacFlagDrift: "first draft drifted", qacFlagJargon: "first draft reused coined phrases", qacFlagRetry: "regenerated", qacFlagStill: "⚠ still failing after regeneration: ",
       qacPlainP: "\n\n[Wording] Define any concept or metaphor you coin in one sentence of ordinary scholarly language at first use, then keep the usage consistent; do not carry the dialogue\u2019s spoken metaphors into the paper as they are.", qacPA: "Paper A · with SDE", qacPB: "Paper B · without SDE",
       labBtn: "🧪 SDE research method", labOn: "🧪 SDE research method: on",
+      msBtn: "✒ Manuscript lift", msOn: "✒ Manuscript lift: on",
+      msTip: "Load the manuscript with 📎, paste the publisher's requirements or the editor's revision notes in the box (or leave it empty), then send. Six steps: diagnose, score, spine and per-chapter plan, revise chapter by chapter, re-score, editor-notes table and cover letter. Three chapters per batch. About 15–25 minutes.",
+      msNeed: "Load the manuscript with 📎 first, paste the editor's notes (optional), then send.",
+      msWord: "⤓ Revised Word", msWordAll: "⤓ Full process Word", msNext: "↻ Next batch (units {a}–{b})", msAllDone: "All units revised.",
       labTip: "Enter a question: (1) conventional research without SDE (5-round dialogue + ~10k-character paper, the baseline) (2) an independent scorer rates it on Innovation IQ and names directions (3) SDE innovation along those directions in five refining rounds (4) polished final paper, re-scored, with per-dimension deltas. One Word file. Prompts run in Chinese. About 30–40 minutes",
       cmpIq: "⚖ Score both (Innovation IQ)", cmpIqQ: "Below are two reports on the same question from the same model under two kernels (A = with SDE, B = without SDE). Score each on the five Innovation IQ dimensions (S/D/E/I/F) with one quoted piece of evidence and one deduction per dimension, compute the composite, and say which dimensions account for the gap and what each should fix first.",
       triBtn: "\u2694 Three-way clash", triOn: "\u2694 Three-way clash: on",
@@ -2715,6 +2738,7 @@
           "<button class='wdsm-mode wdsm-cmpbtn'></button>" +
           "<button class='wdsm-mode wdsm-qacbtn'></button>" +
           "<button class='wdsm-mode wdsm-labbtn'></button>" +
+          "<button class='wdsm-mode wdsm-msbtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
@@ -5595,6 +5619,8 @@
   var _keepVers = false;                 // 由 regen/editInline 置起：这一次 send 是「同一轮的另一版」
   function send(forceQ) {
     var q = String(forceQ != null ? forceQ : inEl.value).trim();
+    // 稿件提升：书稿已载入、输入框留空＝没有编辑意见，照样开跑（sendMs 认这句占位，当作「无编辑意见」）
+    if (!q && msOn && !PROFILE && !streaming && msHasSrc("")) q = MS_GO;
     if (!q) return;
     /* 运动手环：按钮点的记 btn，输入框打的记 own；其余程序转发（取 Key 后回调等）不记，免得一问记两次。 */
     if (SEND_VIA === "btn") { askStats.btn++; askRun++; }
@@ -5612,6 +5638,14 @@
     if (streaming) {
       if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       return;
+    }
+    // 稿件提升挂着时：一问＝诊断→称重→主心骨与方案→逐单元改→复评→对照表与回信（排在最前，七种多路模式互斥）
+    if (msOn && !PROFILE && !streaming) {
+      var kms = wdsKeyGet(); if (!kms) { wdsKeyPanel(function () { send(q); }); return; }
+      if (!msHasSrc(q)) { toast(t("msNeed")); return; }
+      if (turns() >= MAX) { updTurns(); return; }
+      if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      if (sendMs(q, addTurn(q))) return;
     }
     // SDE 科研创新法挂着时：一问＝立底→称重→发生→打磨四步（排在最前，六种多路模式互斥）
     if (labOn && !PROFILE && !streaming) {
@@ -6021,7 +6055,7 @@
         b.onclick = function () {
           closeMenu();
           if (!has) { wdsKeyPanel(function () {}); return; }      // 没 Key 就直接把设置面板端出来
-          duV = v.v; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint();
+          duV = v.v; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint();
         };
         menu.appendChild(b);
       });
@@ -6112,7 +6146,7 @@
   if (cmpBtn) cmpBtn.onclick = function () {
     if (streaming) return;
     cmpOn = !cmpOn;
-    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); }   // 六者互斥
+    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); }   // 六者互斥
     cmpPaint();
     toast(cmpOn ? t("cmpTip") : t("cmpBtn"));
   };
@@ -6296,7 +6330,7 @@
   if (qacBtn) qacBtn.onclick = function () {
     if (streaming) return;
     qacOn = !qacOn;
-    if (qacOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); labOn = false; labPaint(); }   // 六者互斥
+    if (qacOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); labOn = false; labPaint(); msOn = false; msPaint(); }   // 六者互斥
     qacPaint();
     toast(qacOn ? t("qacTip") : t("qacBtn"));
   };
@@ -6550,7 +6584,7 @@
   if (labBtn) labBtn.onclick = function () {
     if (streaming) return;
     labOn = !labOn;
-    if (labOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); }   // 六者互斥
+    if (labOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); msOn = false; msPaint(); }   // 六者互斥
     labPaint();
     toast(labOn ? t("labTip") : t("labBtn"));
   };
@@ -6822,6 +6856,290 @@
     return true;
   }
 
+  /* ══════════════ 稿件提升（六步）══════════════
+     2026-10-10 王德生令「我们应该在 ChatSDE 上做一个稿件修改的智能体，比如专著修改和提升」——
+     对象是出版中介（收稿、改稿、送出版社）：他们要学会①提升稿件质量 ②满足出版社的改稿要求。
+     一问＝①诊断与拆条 ②称重 ③主心骨与逐单元方案 ④逐单元修改（每批 3 单元）⑤复评 ⑥对照表＋修改说明信。
+     座次（照三家对撞「一吃两不吃」的口径）：
+       ①③ 走 SDE 一路（内功＋站内语料）——找缝、立主心骨要它；
+       ④⑥ 走无 SDE 一路——改的是作者的稿子、写给编辑的信，产出必须零术语、不带账本行；
+       ②⑤ 走 iq 评分通道（不装内功）。
+     🔴 改前改后评的是**同一批单元**（先评原文、改完再评改后），差值才有意义；评分员与改稿者同一家基底，明写待复核。
+     🔴 书稿来自 📎 附件（d.text 是全文，不走取段）；输入框里只放编辑意见。没载入书稿不跑。 */
+  var msOn = false, MS_BATCH = 3, MS_UNIT = 8000, MS_GO = "（开始稿件提升 · 无编辑意见）";
+  var msBtn = layer.querySelector(".wdsm-msbtn");
+  function msPaint() {
+    if (!msBtn) return;
+    msBtn.style.display = PROFILE ? "none" : "";
+    if (PROFILE) msOn = false;
+    msBtn.textContent = msOn ? t("msOn") : t("msBtn");
+    msBtn.title = t("msTip");
+    if (msOn) msBtn.classList.add("on"); else msBtn.classList.remove("on");
+    try { toolsPaint(); } catch (e) {}
+  }
+  msPaint();                         // 🔴 初始就要有字——零宽空框老漏法
+  if (msBtn) msBtn.onclick = function () {
+    if (streaming) return;
+    msOn = !msOn;
+    if (msOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); }   // 七者互斥
+    msPaint();
+    toast(msOn ? t("msTip") : t("msBtn"));
+  };
+  // 独立入口：/taste/chatsde/?mode=ms 或页面预设 window.WDSM_START="ms"，进门就挂上
+  try {
+    var msStart = window.WDSM_START || ((/[?&]mode=([a-z]+)/.exec(location.search) || [])[1]) || "";
+    if (msStart === "ms" && msBtn && !PROFILE) { msOn = true; msPaint(); setTimeout(function () { try { toast(t("msTip")); } catch (e) {} }, 800); }
+  } catch (e) {}
+  // 切单元：认章名（第N章／编／篇／部／讲／回、Chapter N、Markdown 一二级标题），认不出就按段落切；
+  // 太短的并进下一单元，太长的在段落处再切（每单元 ≤ MS_UNIT 字，一趟改得完、也装得进提问上限）。
+  function msSplit(text) {
+    var s = String(text || "").replace(/\r\n?/g, "\n");
+    var re = /^[ \t　]*(?:第[一二三四五六七八九十百零〇两\d]+[章编篇部讲回卷]|chapter\s+\d+|#{1,2}\s+\S)[^\n]{0,60}$/gim;
+    var cuts = [], m;
+    while ((m = re.exec(s))) cuts.push(m.index);
+    var parts = [];
+    if (cuts.length >= 2) {
+      if (cuts[0] > 0 && s.slice(0, cuts[0]).trim().length > 200) parts.push(s.slice(0, cuts[0]));
+      else if (cuts[0] > 0) cuts[0] = 0;
+      for (var i = 0; i < cuts.length; i++) parts.push(s.slice(cuts[i], i + 1 < cuts.length ? cuts[i + 1] : s.length));
+    } else parts = [s];
+    var merged = [];
+    parts.forEach(function (p) {
+      if (merged.length && merged[merged.length - 1].trim().length < 800) merged[merged.length - 1] += p;
+      else merged.push(p);
+    });
+    var out = [];
+    merged.forEach(function (p) {
+      p = p.trim(); if (!p) return;
+      var head = (p.split("\n")[0] || "").trim().slice(0, 40);
+      if (p.length <= MS_UNIT) { out.push({ name: head, text: p }); return; }
+      var paras = p.split(/\n+/), buf = "", k = 1;
+      paras.forEach(function (x) {
+        if (buf && (buf.length + x.length + 1) > MS_UNIT) { out.push({ name: head + "（" + k + "）", text: buf.trim() }); k++; buf = ""; }
+        if (x.length > MS_UNIT) {               // 一整段超长（PDF 抽字常见）：硬切
+          for (var j = 0; j < x.length; j += MS_UNIT) {
+            if (buf) { out.push({ name: head + "（" + k + "）", text: buf.trim() }); k++; buf = ""; }
+            buf = x.slice(j, j + MS_UNIT);
+          }
+          return;
+        }
+        buf += (buf ? "\n" : "") + x;
+      });
+      if (buf.trim()) out.push({ name: head + (k > 1 ? ("（" + k + "）") : ""), text: buf.trim() });
+    });
+    out.forEach(function (u, i) { if (!u.name) u.name = qacFmt(t("msUnit"), { i: i + 1, name: "" }).replace(/\s·\s$/, ""); });
+    return out;
+  }
+  function msMap(units) {
+    return units.map(function (u, i) { return (i + 1) + ". " + u.name + " · " + u.text.length + " 字"; }).join("\n");
+  }
+  function msSample(src) {
+    var s = String(src || "");
+    if (s.length <= 14000) return s;
+    var mid = Math.floor(s.length / 2);
+    return s.slice(0, 9000) + "\n……\n" + s.slice(mid - 1500, mid + 1500) + "\n……\n" + s.slice(-2000);
+  }
+  // 主心骨：认「主心骨：」那一行；认不出就取第一句「不是……而是……」
+  function msMotif(plan) {
+    var s = String(plan || "");
+    var m = /主心骨\s*[:：]\s*\**\s*([^\n]{6,200})/.exec(s);
+    if (m) return m[1].replace(/\*+/g, "").trim();
+    m = /([^\n。]{0,40}不是[^\n。]{1,80}而是[^\n。]{1,120}[。]?)/.exec(s);
+    return m ? m[1].replace(/^[#>*\-\s]+/, "").replace(/\*+/g, "").trim() : "";
+  }
+  // 改后正文与修改说明分家；正文末尾若还挂着基底自带的收尾客套，一并去掉
+  function msSplitOut(text) {
+    var s = String(text || ""), i = s.indexOf(t("msNoteH"));
+    if (i < 0) i = s.search(/【\s*本章修改说明\s*】|^#+\s*本章修改说明/m);
+    var body = (i >= 0 ? s.slice(0, i) : s).trim(), note = i >= 0 ? s.slice(i).replace(/^【[^】]*】\s*|^#+[^\n]*\n/, "").trim() : "";
+    return { body: body, note: note };
+  }
+  // 无 SDE 一路的写手：不挂 cmp（那会补一份学术方法论块）、不查站内；被截就续一次
+  function msPlain(mine, qtext, onTok) {
+    function pl0(q) {
+      return { q: q, history: [], key: mine.key, vendor: mine.vendor, model: mine.model || "", mode: "deep", grade: 4,
+               web: 0, lang: LANG, tool: "", nosde: 1, nosite: 1 };
+    }
+    return qacCall(pl0(qtext), onTok).then(function (r) {
+      if (!r.cut || !r.text) return r.text;
+      return qacCall(pl0(t("qacContT") + r.text.slice(-1500)), function (x) { if (onTok) onTok(r.text + x); })
+        .then(function (r2) { return r.text + r2.text; });
+    });
+  }
+  function msSde(mine, qtext, onTok) {
+    var pl = qacBase("sde", mine); pl.q = String(qtext).slice(0, 19500);
+    return qacCall(pl, onTok).then(function (r) { return r.text; });
+  }
+  // 单元框：正在改的这一单元展开、前几个收起（同科研创新法的轮次框；类名不用 wdsm-lab*，见 labRoundBox 注释）
+  function msUnitBox(sec, label) {
+    Array.prototype.forEach.call(sec.log.children, function (b) { b.open = false; });
+    var box = el("details", null); box.open = true;
+    box.appendChild(el("summary", null, label));
+    var ab = el("div", "wdsm-a"); ab.innerHTML = "<span class='cur'>▊</span>";
+    box.appendChild(ab); sec.log.appendChild(box);
+    return ab;
+  }
+  // 有没有书稿可改（发送前判，免得先开一格空回合）
+  function msHasSrc(q) {
+    return atts.some(function (d) { return !d.img && d.text && d.text.trim().length > 300; }) || String(q || "").length > 3000;
+  }
+  function msBatchText(units, a, b, key) {
+    var s = "";
+    for (var i = a; i < b && i < units.length; i++) s += (s ? "\n\n" : "") + (key === "rev" ? (units[i].rev || units[i].text) : units[i].text);
+    return s;
+  }
+  function msSave(which, st, vname) {
+    if (!window.SDEDocx) { toast(t("cmpWait")); return; }
+    var title = st.title, md;
+    if (which === "rev") {
+      md = "# " + title + " · " + t("msRevT") + "\n\n" + t("cmpBase") + "：" + vname + "　" + t("cmpDate") + "：" + new Date().toLocaleString()
+        + (st.motif ? ("\n\n**" + st.motif + "**") : "") + "\n\n" + t("msFair");
+      st.units.forEach(function (u, i) {
+        md += "\n\n---\n\n" + (u.rev != null ? u.rev : u.text) + (u.rev == null ? "\n\n（本单元尚未修改，以下为原文）" : "");
+      });
+    } else {
+      md = "# " + title + " · " + t("msDocT") + "\n\n" + t("cmpBase") + "：" + vname + "　" + t("cmpDate") + "：" + new Date().toLocaleString()
+        + "\n\n" + t("msFair") + (st.card1 && st.card2 ? ("\n\n## " + t("msDelta") + "\n\n" + labDeltaMd(st.card1.s, st.card2.s)) : "")
+        + "\n\n---\n\n# 一、" + t("msS1") + "\n\n" + (st.diag || "")
+        + "\n\n---\n\n# 二、" + t("msS2") + "\n\n" + (st.card1 ? st.card1.text : "")
+        + "\n\n---\n\n# 三、" + t("msS3") + "\n\n" + (st.plan || "")
+        + "\n\n---\n\n# 四、逐单元修改";
+      st.units.forEach(function (u, i) {
+        if (u.rev == null) return;
+        md += "\n\n## " + qacFmt(t("msUnit"), { i: i + 1, name: u.name }) + "\n\n" + u.rev + (u.note ? ("\n\n**" + t("msNoteH") + "**\n\n" + u.note) : "");
+      });
+      if (st.card2) md += "\n\n---\n\n# 五、" + t("msS5") + "\n\n" + st.card2.text;
+      if (st.letter) md += "\n\n---\n\n# 六、" + t("msS6") + "\n\n" + st.letter;
+    }
+    var tag = which === "rev" ? t("msRevT") : t("msDocT");
+    var blob = window.SDEDocx.build({ title: title + " · " + tag, author: BRAND, md: md });
+    saveBlobToDir(fileTag("WDS") + "-" + safeName(title) + "-" + safeName(tag) + "-" + stampName() + ".docx", blob,
+      function (m) { if (m) toast(m); });
+  }
+  function sendMs(q, cell) {
+    var mine = wdsKeyGet();
+    if (!mine) return false;
+    var docs = atts.filter(function (d) { return !d.img && d.text && d.text.trim().length > 300; });
+    var src = "", title = "";
+    if (docs.length) { src = docs.map(function (d) { return d.text; }).join("\n\n"); title = docs[0].name.replace(/\.[a-z0-9]{2,5}$/i, ""); }
+    else if (String(q || "").length > 3000) { src = q; q = ""; title = String(src).trim().split("\n")[0].slice(0, 30); }
+    if (!src) return false;
+    var demand = String(q || "").trim(); if (demand === MS_GO) demand = "";
+    history.push({ role: "reader", text: "【" + t("msBtn") + "】" + title + (demand ? ("\n" + demand.slice(0, 400)) : "") }); updTurns();
+    streaming = true; stoppedByUser = false; RS.stop = false;
+    busyUI(true); stopBarShow(true);
+    var vname = vinfo(mine.vendor).name + (mine.model ? (" · " + mine.model) : "");
+    var about = ""; try { about = pjAboutNow(); } catch (e) {}
+    var st = { title: title || t("msRevT"), units: msSplit(src), next: 0 };
+    var wrap = el("div", "wdsm-rlab");
+    var clock = el("div", "wdsm-duh");
+    clock.style.cssText = "border:0;padding:6px 10px;margin:0 0 6px;border-radius:8px;background:var(--wfill);color:var(--wtx);font-size:12.5px;display:block";
+    wrap.appendChild(clock);
+    var t0 = Date.now(), secs = [];
+    function tick() {
+      var s = Math.round((Date.now() - t0) / 1000), cur = "";
+      secs.forEach(function (x) { var v = (x.nt.textContent || "").trim(); if (v && v !== t("labWait")) cur = v; });
+      clock.textContent = "⏱ " + Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2) + "　" + st.title + " · " + st.units.length + " 单元" + (cur ? ("　" + cur) : "") + (streaming ? "" : "　✓");
+    }
+    var clk = setInterval(function () { tick(); if (!streaming) clearInterval(clk); }, 1000);
+    cell.a.innerHTML = ""; cell.a.appendChild(wrap);
+    var demandBlock = t("msDemand") + (demand || t("msNoDemand")) + "\n\n" + (about ? (t("msAbout") + about + "\n\n") : "");
+    function done(err) {
+      streaming = false; curReader = null; busyUI(false); stopBarShow(false);
+      try { tick(); } catch (e) {}
+      if (err) wrap.appendChild(el("div", "wdsm-err", t("qacFail") + err));
+      history.push({ role: "wds", text: "【" + t("msDocT") + "】" + st.title + (st.motif ? ("\n" + st.motif) : "")
+        + (st.card1 && st.card1.s && st.card2 && st.card2.s ? ("\n" + labDeltaMd(st.card1.s, st.card2.s)) : "") });
+      stSave(history); updTurns(); compTick();
+      if (cell.acts) { try { cell.acts.remove(); } catch (e) {} }
+      var row = el("div", "wdsm-acts");
+      var anyRev = st.units.some(function (u) { return u.rev != null; });
+      if (anyRev) { var bw = el("button", "wdsm-act", t("msWord")); bw.onclick = function () { msSave("rev", st, vname); }; row.appendChild(bw); }
+      if (st.diag) { var ba = el("button", "wdsm-act", t("msWordAll")); ba.onclick = function () { msSave("all", st, vname); }; row.appendChild(ba); }
+      if (!err && st.plan && st.next < st.units.length) {
+        var b2 = Math.min(st.next + MS_BATCH, st.units.length);
+        var nx = el("button", "wdsm-act", qacFmt(t("msNext"), { a: st.next + 1, b: b2 }));
+        nx.onclick = function () {
+          if (streaming) return;
+          row.remove(); cell.acts = null;
+          streaming = true; stoppedByUser = false; RS.stop = false; busyUI(true); stopBarShow(true);
+          t0 = Date.now(); clk = setInterval(function () { tick(); if (!streaming) clearInterval(clk); }, 1000);
+          batch(false).catch(function (e) { done((e && e.message) || "?"); });
+        };
+        row.appendChild(nx);
+      } else if (!err && st.plan) row.appendChild(el("span", "wdsm-duh", t("msAllDone")));
+      cell.turn.appendChild(row); cell.acts = row;
+    }
+    function rewrite(i, sec) {
+      var u = st.units[i];
+      var box = msUnitBox(sec, qacFmt(t("msUnit"), { i: i + 1, name: u.name }) + " · " + u.text.length + " 字");
+      sec.nt.textContent = qacFmt(t("msUnitRun"), { i: i + 1 });
+      var L = Math.max(1200, Math.min(9000, Math.round(u.text.length * 0.95)));
+      var qtext = "【篇幅】约 " + L + " 字。\n\n" + t("msRevT0") + demandBlock
+        + t("msListH") + String(st.list || "").slice(0, 2500) + "\n\n"
+        + t("msMot") + (st.motif || "（方案里未单列，按逐单元方案改）") + "\n\n"
+        + t("msPlanH") + String(st.plan || "").slice(0, 3500) + "\n\n"
+        + qacFmt(t("msOrig"), { name: (i + 1) + ". " + u.name }) + u.text;
+      return msPlain(mine, qtext.slice(0, 19800), function (x) { box.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
+        .then(function (r) { var o = msSplitOut(r); u.rev = o.body; u.note = o.note; box.innerHTML = mdRender(r); });
+    }
+    // 一批：逐单元改（串行，一家 Key 的分钟限流经不起并发）→（首批）复评 → 对照表与回信
+    function batch(first) {
+      var a = st.next, b = Math.min(a + MS_BATCH, st.units.length);
+      var sec = labSec(wrap, qacFmt(t("msS4"), { a: a + 1, b: b, n: st.units.length }));
+      secs.push(sec);
+      var chain = Promise.resolve();
+      for (var i = a; i < b; i++) (function (i) { chain = chain.then(function () { return rewrite(i, sec); }); })(i);
+      return chain.then(function () {
+        sec.nt.textContent = ""; st.next = b;
+        if (!first) return;
+        var s5 = labSec(wrap, t("msS5")); secs.push(s5);
+        s5.nt.textContent = t("labScoring");
+        return labScore(msBatchText(st.units, a, b, "rev"), mine).then(function (sc) {
+          st.card2 = sc; labCardBox(s5, sc);
+          var dl = el("div", "wdsm-a"); dl.innerHTML = mdRender("**" + t("msDelta") + "**\n\n" + labDeltaMd(st.card1 && st.card1.s, sc.s));
+          s5.bd.parentNode.appendChild(dl); s5.nt.textContent = "";
+        });
+      }).then(function () {
+        var s6 = labSec(wrap, t("msS6")); secs.push(s6);
+        s6.nt.textContent = t("qacP1");
+        var doneNotes = st.units.map(function (u, i) { return u.rev != null ? ((i + 1) + ". " + u.name + "\n" + String(u.note || "（无说明）").slice(0, 900)) : ""; }).filter(Boolean).join("\n\n");
+        var left = st.units.map(function (u, i) { return u.rev == null ? ((i + 1) + ". " + u.name) : ""; }).filter(Boolean).join("；");
+        var qtext = t("msLetT") + demandBlock + t("msListH") + String(st.list || "").slice(0, 3000) + "\n\n"
+          + t("msMot") + (st.motif || "") + "\n\n" + t("msDone") + doneNotes.slice(0, 9000) + "\n\n"
+          + t("msLeft") + (left || "无") + "\n\n"
+          + (st.card1 && st.card2 ? (t("msScore") + labDeltaMd(st.card1.s, st.card2.s)) : "");
+        return msPlain(mine, qtext.slice(0, 19800), function (x) { s6.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
+          .then(function (r) { st.letter = r; s6.bd.innerHTML = mdRender(r); s6.nt.textContent = ""; done(); });
+      });
+    }
+    var s1 = labSec(wrap, t("msS1")), s2 = labSec(wrap, t("msS2")), s3 = labSec(wrap, t("msS3"));
+    secs.push(s1, s2, s3);
+    tick();
+    s1.nt.textContent = t("qacP1");
+    var mapTxt = msMap(st.units);
+    msSde(mine, t("msDiagT") + demandBlock + t("msMap") + mapTxt.slice(0, 3000) + "\n\n" + t("msSample") + msSample(src),
+      function (x) { s1.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
+    .then(function (d) {
+      st.diag = d; s1.bd.innerHTML = mdRender(d); s1.nt.textContent = "";
+      var i5 = d.search(/五\s*[、.．]\s*编辑意见清单|编辑意见清单/);
+      st.list = i5 >= 0 ? d.slice(i5) : (demand || d.slice(-2500));
+      s2.nt.textContent = t("labScoring");
+      return labScore(msBatchText(st.units, 0, MS_BATCH, "orig"), mine);
+    }).then(function (sc) {
+      st.card1 = sc; labCardBox(s2, sc); s2.nt.textContent = "";
+      s3.nt.textContent = t("qacP1");
+      return msSde(mine, t("msPlanT") + demandBlock + t("msMap") + mapTxt.slice(0, 3000) + "\n\n"
+        + "【诊断】\n" + labDigest(st.diag) + "\n\n【改前评分卡】\n" + String(sc.text || "").slice(0, 2000),
+        function (x) { s3.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; });
+    }).then(function (p) {
+      st.plan = p; st.motif = msMotif(p); s3.bd.innerHTML = mdRender(p); s3.nt.textContent = "";
+      if (st.motif) { var mh = el("div", "wdsm-duh"); mh.style.cssText = "border:0;padding:6px 10px;margin:6px 0;border-radius:8px;background:var(--wfill);color:var(--wtx);display:block"; mh.appendChild(el("b", null, "主心骨：" + st.motif)); s3.bd.parentNode.insertBefore(mh, s3.bd); }
+      return batch(true);
+    }).catch(function (e) { done((e && e.message) || "?"); });
+    return true;
+  }
+
   /* ══════════════ 群碰（N 席）══════════════
      三家对撞是定席定序：A 出判断 → B 攻 A → C 结算。群碰放开两处，而这两处各带一个必然的坑：
        ① **攻击席自选目标** ⇒ 每席都挑最脆的那个打，N 席全攻同一处，看着热闹只攻了一处。
@@ -6930,7 +7248,7 @@
     var go = el("button", null, mobOn ? t("mobStop") : t("mobGo"));
     go.onclick = function () {
       closeMenu(); mobOn = !mobOn;
-      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); }   // 六者互斥
+      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); }   // 六者互斥
       mobPaint();
     };
     menu.appendChild(go);
@@ -7191,7 +7509,7 @@
     go.onclick = function () {
       closeMenu();
       triOn = !triOn;
-      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); }      // 并排与对撞是两种模式，不并存
+      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); }      // 并排与对撞是两种模式，不并存
       triPaint();
     };
     menu.appendChild(go);

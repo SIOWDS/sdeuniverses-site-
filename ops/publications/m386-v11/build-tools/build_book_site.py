@@ -98,7 +98,7 @@ reader=re.sub(r'(<script type="application/json" id="cfg">).*?(</script>)',lambd
 reader=re.sub(r'(<script type="application/json" id="toc">).*?(</script>)',lambda m:m[1]+json.dumps(toc,ensure_ascii=False)+m[2],reader,flags=re.S)
 reader=reader.replace('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',BASE+'vendor/pdf.min.js').replace('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',BASE+'vendor/pdf.worker.min.js')
 reader=reader.replace('</head>',f'<meta name="publication-revision" content="{REV}"><meta name="author" content="王德生、李佳城"></head>')
-reader=reader.replace('<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>','').replace('<script src="/wds-mode.js?v=20261005a" defer></script>','')
+reader=reader.replace('<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>','').replace('<script src="/wds-mode.js?v=20261010a" defer></script>','')
 # Keep a useful fallback even if the script cannot load.
 reader=reader.replace('<div id="msgT">正在载入书页…</div>',f'<div id="msgT">正在载入书页…</div><p><a style="color:#d9a441" href="{BASE}downloads/privacy-genesis-v1.1.pdf">打开全书 PDF</a> · <a style="color:#d9a441" href="{BASE}text/">网页全文</a></p>')
 # Front matter must be directly reachable: make the visible page input use physical pages.
