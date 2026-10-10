@@ -61,7 +61,11 @@ for b in books:
        "og": ('<meta property="og:image" content="%s">\n' % esc(b["coverUrl"])) if b.get("coverUrl") else ""}
     d = os.path.join(PUB, "books", "m", str(n), "agent")
     os.makedirs(d, exist_ok=True)
-    io.open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(page)
+    agent_path = os.path.join(d, "index.html")
+    if n == 271 and os.path.exists(agent_path) and '<meta name="sde-dedicated-agent" content="m271-unit-v1">' in io.open(agent_path, encoding="utf-8").read():
+        made += 1
+        continue  # preserve this edition's 51-unit source loader; the directory still lists book 271
+    io.open(agent_path, "w", encoding="utf-8").write(page)
     made += 1
 
 # —— 名录 /books/agent/ ——（带 ?m=N 的旧链接跳到那本书自己的智能体页）
