@@ -53,7 +53,7 @@ def card(b):
  if b.get('readUrl') and b['readUrl']!=b['detailUrl']:action+='<a class="detail-button" href="'+detail+'" aria-label="'+title+'：书籍详情">详情</a>'
  # 每本书自己名字的智能体（2026-10-03 王德生令）：读懂、用上、拆开、对撞、写出，带专属碰撞库。
  # 判据＝catalog 有 textUrl/chapterUrl，或仓库里有 /books/m/N/text/；新书照此自动带上，不用逐本挂。
- agent_url=b.get('agentUrl') or ('https://sdeuniverses.com/books/m/'+str(b['number'])+'/agent/' if b.get('number') else '')
+ agent_url=b.get('agentUrl') or ('https://sdeuniverses.com/books/m/'+str(b['number'])+'/agent/' if b.get('number') and ('/books/m/'+str(b['number'])+'/') in b.get('detailUrl','') else '')
  agent_name=(b.get('agentName') if b.get('agentUrl') else None) or AGENTS.get(str(b.get('number') or b['id']),{}).get('name','书生')
  if agent_url and (b.get('agentUrl') or b.get('textUrl') or b.get('chapterUrl') or (b.get('number') and (ROOT/('public/books/m/%s/text/index.html'%b['number'])).exists())):action+='<a class="agent-link" href="'+esc(agent_url)+'" aria-label="'+title+'：这本书的智能体「'+esc(agent_name)+'」">「'+esc(agent_name)+'」· 和这本书对话</a>'
  if b.get('pdfUrl') and b['pdfUrl']!=b.get('readUrl'):action+='<a class="pdf-link" href="'+esc(b['pdfUrl'])+'" aria-label="'+title+'：'+('试读版 PDF' if reading=='preview' else 'PDF')+'">PDF ↗</a>'
