@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>文学创造力的发生学机制 · PDF 在线阅读</title>
 <style>
-:root{--ink:#F0E9D8;--gold:#B5860F;--gold2:#D0A22A;--paper:#F0E9D8;--muted:#7C6E4E;--bg:#0E0B08;--panel:#171310}
+:root{--ink:#1E1A15;--gold:#9E3D30;--gold2:#9E3D30;--paper:#1E1A15;--muted:#8A7F6E;--bg:#E6DECD;--panel:#F3EDE0}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--paper);font-family:"Songti SC","Noto Serif SC",Georgia,serif;min-height:100vh}
 .topbar{position:sticky;top:0;z-index:20;background:var(--panel);backdrop-filter:blur(8px);border-bottom:1px solid color-mix(in srgb, var(--gold) 30%, transparent);display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:12px;flex-wrap:wrap}
@@ -21,7 +21,7 @@ body{background:var(--bg);color:var(--paper);font-family:"Songti SC","Noto Serif
 .zoom{display:flex;align-items:center;gap:4px}
 .zoom .btn{padding:6px 12px}
 .stage{display:flex;justify-content:center;padding:28px 16px 60px;min-height:60vh}
-#canvas-wrap{position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.4);background:#fff;border-radius:2px;overflow:hidden;max-width:100%}
+#canvas-wrap{position:relative;box-shadow:0 18px 50px rgba(60,40,20,0.22);background:#fff;border-radius:2px;overflow:hidden;max-width:100%}
 canvas{display:block;max-width:100%;height:auto}
 .loading{text-align:center;color:var(--muted);padding:80px 20px;font-size:16px}
 .spinner{width:40px;height:40px;border:3px solid color-mix(in srgb, var(--gold) 25%, transparent);border-top-color:var(--gold);border-radius:50%;margin:0 auto 20px;animation:spin 0.9s linear infinite}
@@ -42,7 +42,7 @@ canvas{display:block;max-width:100%;height:auto}
     <div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span class="total">/ <span id="totalPages">…</span></span></div>
     <button class="btn" id="next" disabled>下一页 ›</button>
     <div class="zoom"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomIn">＋</button></div>
-    <a class="btn" href="literary-creativity-genesis.pdf" target="_blank" style="text-decoration:none">下载 PDF</a>
+    <a class="btn" href="literary-creativity-genesis-book.pdf" target="_blank" style="text-decoration:none">下载 PDF</a>
   </div>
 </div>
 <div class="stage">
@@ -62,7 +62,7 @@ canvas{display:block;max-width:100%;height:auto}
 <div class="navhint">← → 方向键翻页 · 点击页面两侧翻页 · 可输入页码跳转</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-const PDF_URL = "literary-creativity-genesis.pdf";
+const PDF_URL = "literary-creativity-genesis-book.pdf";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 let pdfDoc=null, pageNum=1, rendering=false, pending=null, scale=1.3;
 const canvas=document.getElementById('pdfCanvas'), ctx=canvas.getContext('2d');
@@ -111,7 +111,7 @@ document.addEventListener('keydown',e=>{
 });
 </script>
 
-<script>window.WDS_PDF={url:"literary-creativity-genesis.pdf",curSel:"#pageInput",curAttr:"value"};</script>
+<script>window.WDS_PDF={url:"literary-creativity-genesis-book.pdf",curSel:"#pageInput",curAttr:"value"};</script>
 <script src="/taste/wds-companion/wds-pdf.js?v=20260817c" defer></script>
 <script>window.WDS_READ={bodyEl:function(){return document.getElementById("canvas-wrap")||document.body;,profile:"liter"},docTextFn:function(){return window.__wdsPdfText||"";}};</script>
 <script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
