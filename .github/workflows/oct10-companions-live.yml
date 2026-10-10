@@ -1,0 +1,59 @@
+name: October 10 companion production verification
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/oct10-companions-live.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify public learning packs, agents and shelves
+        run: |
+          python3 -u - <<'PY'
+          import urllib.request,json,time,concurrent.futures,zipfile,io
+          root='https://sdeuniverses.com'
+          books=[('m/337',337,'谱知',60),('m/338',338,'灯续',48),('m/277',277,'性生',48),('i-and-we',241,'共我',40),('what-if',348,'若思',52)]
+          def get(path):
+              req=urllib.request.Request(root+path,headers={'User-Agent':'SDE-Companion-Verification/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=40) as r:
+                  assert r.status==200
+                  return r.read()
+          for attempt in range(18):
+              try:
+                  cat=json.loads(get('/books/catalog.json'))
+                  for slug,no,name,count in books:
+                      b=next(b for b in cat['books'] if b.get('number')==no)
+                      assert b.get('publicationUnit',{}).get('revision')=='20261010-companions-v1'
+                  break
+              except Exception as e:
+                  print('Waiting for release',attempt+1,str(e),flush=True)
+                  time.sleep(20)
+          else: raise RuntimeError('New catalog did not appear')
+          def check(book):
+              slug,no,name,count=book;base='/books/'+slug+'/'
+              page=get(base+'learning.html').decode()
+              assert '逐章学习与发生手册' in page and 'data-save' in page
+              data=json.loads(get(base+'learning.json'));assert len(data['cards'])==count
+              agent=get(base+'agent/').decode();assert name in agent
+              js=get(base+'agent/app.js').decode();assert 'params.get' in js
+              corpus=json.loads(get(base+'agent/rag.json'));assert corpus['units']
+              package=get(base+'downloads/learning-agent-v1.zip')
+              z=zipfile.ZipFile(io.BytesIO(package));assert z.testzip() is None
+              for f in ['learning.html','learning.json','agent/rag.json','agent/app.js','README.txt']:assert f in z.namelist()
+              detail=get(base).decode();assert 'learning-unit-entry' in detail
+              print('PASS',no,name,count,'learning units;',len(corpus['units']),'source units; ZIP',len(package),flush=True)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:list(pool.map(check,books))
+          for path in ['/books/','/monographs/','/sites/read/library/']:
+              page=get(path).decode()
+              for slug,no,name,count in books:
+                  assert '/books/'+slug+'/learning.html' in page,(path,slug)
+                  assert '/books/'+slug+'/agent/' in page,(path,slug)
+              print('PASS shelf',path,flush=True)
+          for slug,learning in [('m/265','learning.html'),('m/271','agent/learning.html')]:
+              for suffix in [learning,'agent/']:assert get('/books/'+slug+'/'+suffix)
+              print('PASS existing unit',slug,flush=True)
+          print('ALL SEVEN BOOKS VERIFIED. Paid model generation not tested.',flush=True)
+          PY
