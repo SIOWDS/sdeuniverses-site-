@@ -27,14 +27,14 @@ Promise.all([J("/books/catalog.json"),J("/books/agents.json"),J("/books/m/265/ra
 }).catch(function(e){fail("没能打开续问："+esc(e&&e.message)+'。<a href="/books/m/265/text/">先读原文</a> · <a href="/books/m/265/agent/">重试</a>')});
 
 /* 原文由同版HTML离线提取并验证，加载42单元而非只读第一个article。 */
-var BUDGET=116000;   /* 服务端书生档收 12 万字符；留出目录与章名的余量 */
+var BUDGET=116000;   /* 服务端书生档收 12 万字符符；留出目录与章名的余量 */
 function total(){return CH.reduce(function(a,c){return a+c.n},0)}
 function defaultSel(){return [0,1]}
 function loadSel(){var v=ls(HK+"_sel");if(v){try{var a=JSON.parse(v);if(Array.isArray(a))return a.filter(function(i){return i>=0&&i<CH.length})}catch(e){}}return null}
 function docText(cap){return Core.docText(CH,SEL||defaultSel(),cap)}
 function readInfo(){
  var selected=SEL||defaultSel(),n=selected.reduce(function(sum,i){return sum+CH[i].n},0);
- $("readInfo").innerHTML="浏览器已载入 <b>42 个单元</b>（导论、40章及结语），约 "+(total()/10000).toFixed(1)+" 万字。每次发送提供所选 <b>"+selected.length+" 个单元</b>（约 "+(n/10000).toFixed(1)+" 万字）及问题相关的原文片段。<button type='button' id='pickBtn'>选择阅读单元 ›</button>";
+ $("readInfo").innerHTML="浏览器已载入 <b>42 个单元</b>（导论、40章及结语），约 "+(total()/10000).toFixed(1)+" 万字符。每次发送提供所选 <b>"+selected.length+" 个单元</b>（约 "+(n/10000).toFixed(1)+" 万字符）及问题相关的原文片段。<button type='button' id='pickBtn'>选择阅读单元 ›</button>";
  $("pickBtn").onclick=pickChapters;
 }
 /* —— 3. 起页 —— */
@@ -126,7 +126,7 @@ function render(){
 }
 function fillStarts(){
  var box=$("starts");if(!box)return;box.innerHTML="";
- var own=AG.starts&&AG.starts[act],ss=(Array.isArray(own)?own:own?[own]:[]).concat(gateOf(act).starts).slice(0,3);
+ var own=AG.starts&&AG.starts[act],ss=(Array.isArray(own)?own:own?[own]:[]).concat(gateOf(act).starts).filter(function(s,i,a){return a.indexOf(s)===i}).slice(0,3);
  ss.forEach(function(s){var c=document.createElement("button");c.type="button";c.className="chip";c.textContent=s;c.onclick=function(){$("q").value=s;$("q").focus();grow()};box.appendChild(c)});
 }
 function add(role,text,a,srcs,who){
@@ -262,11 +262,11 @@ function summary(){
 /* —— 8. 长书选章 —— */
 function pickChapters(){
  var selected=SEL||defaultSel(),o=document.createElement("div");o.className="ov";
- o.innerHTML="<div class='box' role='dialog' aria-label='选择原文范围'><div class='hd'><b>选择本轮提供的原文</b><button class='tbtn' data-x aria-label='关闭'>×</button></div><div class='bd' style='white-space:normal;font-family:var(--sans);font-size:13px'>可选择完整阅读单元（正文合计最多约10万字）。未选单元仍可按问题检索片段；目录不代表已提供正文。长篇写作的正文上限较低，将按选择顺序提供完整单元，并列出未提供的单元。<div class='chs'></div></div><div class='ft'><span class='pg'></span><button class='out' data-s type='button'>使用所选范围</button></div></div>";
+ o.innerHTML="<div class='box' role='dialog' aria-label='选择原文范围'><div class='hd'><b>选择本轮提供的原文</b><button class='tbtn' data-x aria-label='关闭'>×</button></div><div class='bd' style='white-space:normal;font-family:var(--sans);font-size:13px'>可选择完整阅读单元（正文合计最多约10万字符）。未选单元仍可按问题检索片段；目录不代表已提供正文。长篇写作的正文上限较低，将按选择顺序提供完整单元，并列出未提供的单元。<div class='chs'></div></div><div class='ft'><span class='pg'></span><button class='out' data-s type='button'>使用所选范围</button></div></div>";
  document.body.appendChild(o);var box=o.querySelector(".chs"),pg=o.querySelector(".pg"),saveBtn=o.querySelector("[data-s]");
  CH.forEach(function(c,i){var l=document.createElement("label");l.innerHTML="<input type='checkbox'"+(selected.includes(i)?" checked":"")+"><span>"+esc(c.t)+"</span><em>"+(c.n/1000).toFixed(1)+" 千字</em>";l.querySelector("input").onchange=count;box.appendChild(l)});
  function picked(){return Array.from(box.querySelectorAll("input")).map(function(x,i){return x.checked?i:-1}).filter(function(i){return i>=0})}
- function count(){var n=picked().reduce(function(sum,i){return sum+CH[i].n},0);pg.textContent="所选约 "+(n/10000).toFixed(1)+" 万字"+(n>100000?"，请减少单元":"");saveBtn.disabled=n>100000}
+ function count(){var n=picked().reduce(function(sum,i){return sum+CH[i].n},0);pg.textContent="所选约 "+(n/10000).toFixed(1)+" 万字符"+(n>100000?"，请减少单元":"");saveBtn.disabled=n>100000}
  count();o.querySelector("[data-x]").onclick=function(){o.remove()};saveBtn.onclick=function(){SEL=picked();ls(HK+"_sel",JSON.stringify(SEL));o.remove();readInfo()};
 }
 })();
