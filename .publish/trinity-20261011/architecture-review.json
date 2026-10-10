@@ -1,0 +1,127 @@
+{
+  "reviewer": "architecture subagent",
+  "status": "Final gate passed: all 12 manifests start, locate original sources, navigate first/last tasks and prefill five gates under Node DOM simulation.",
+  "runtimeFiles": [
+    "public/books/unit-runtime/core.js",
+    "public/books/unit-runtime/app.js",
+    "public/books/unit-runtime/unit.css",
+    "public/books/unit-runtime/README.md"
+  ],
+  "workerReview": {
+    "scopedBookNumbersIncludeAll12": true,
+    "selectedOriginalSkipsAdditionalBookHits": true,
+    "explicitComparisonExcerptsReachScopedSystemPrompt": true,
+    "clientAlwaysProvidesNonEmptyBookRagToPreventUnrequestedSiteRetrieval": true,
+    "paidProviderCallPerformed": false
+  },
+  "bodyIdentity": {
+    "method": "Compare current and git HEAD text/index.html text after removing script/style/nav/header/footer; exact string equality",
+    "passedBookNumbers": [
+      266,
+      330,
+      347,
+      401,
+      272,
+      276,
+      278,
+      281,
+      282,
+      386,
+      399,
+      400
+    ]
+  },
+  "assembledManifestAudit": {
+    "checkedBookNumbers": [
+      266,
+      330,
+      347,
+      401,
+      272,
+      276,
+      278,
+      281,
+      282,
+      386,
+      399,
+      400
+    ],
+    "checked": [
+      "manifest/source SHA256 match",
+      "chapter URL file exists",
+      "task part ID exists",
+      "comparison excerpt SHA256 match",
+      "download file exists",
+      "principles under client/service limits"
+    ],
+    "issues": [],
+    "notYetAssembledAtReview": [],
+    "finalSourceAudit": "source-validation.json (root full-source/link validation)"
+  },
+  "contentReadAgainstOriginal": [
+    {
+      "number": 266,
+      "lessons": [
+        1,
+        21
+      ],
+      "assessment": "Questions follow the bicycle error-learning loop and full visual SDE discussion; hypothetical mechanisms not presented as measured effects."
+    },
+    {
+      "number": 272,
+      "lessons": [
+        1,
+        23
+      ],
+      "assessment": "Tasks match rewrite/software identity and the five personalization levels; source uses an older S=Structure vocabulary and must remain identifiable as that source."
+    },
+    {
+      "number": 347,
+      "lessons": [
+        1,
+        25
+      ],
+      "assessment": "Share versus output exercise matches the four-account discussion; translation versus excavation design task matches the deceased-wife birthday example. Suggested wording change: replace re-discovering needs with needs arising further in dialogue."
+    },
+    {
+      "number": 386,
+      "lessons": [
+        1,
+        21
+      ],
+      "assessment": "Exercises accurately retain Xuyan's private sketchbook case, limited sharing, distinct participants, maintenance permissions, third-party materials and exit boundaries."
+    }
+  ],
+  "runtimeFailureFixes": [
+    "Consume preview before awaiting request persistence to prevent double-send of one confirmed preview.",
+    "Preserve different unsealed current input as a separate draft if another tab seals an initial answer.",
+    "An invalid optional comparison URL disables comparison inclusion but leaves valid current-book reading available.",
+    "Starter prompts automatically locate the first Arabic or Chinese numbered chapter and explicitly state other chapters are not loaded; global questions retain current source scope."
+  ],
+  "mockTestReport": "runtime-qa-result.json",
+  "browserTested": false,
+  "learningEffectTested": false,
+  "manifestSmokeReport": "manifest-smoke-result.json",
+  "manifestSmokeBooks": 12,
+  "manifestSmokeTasks": 525,
+  "originalBookPartCounts": {
+    "266": 8,
+    "330": 10,
+    "347": 9,
+    "401": 7,
+    "272": 5,
+    "276": 10,
+    "278": 8,
+    "281": 8,
+    "282": 10,
+    "386": 8,
+    "399": 5,
+    "400": 8
+  },
+  "qaScriptsPortable": true,
+  "testDependencies": [
+    "linkedom 0.18.13",
+    "fake-indexeddb 6.2.5"
+  ],
+  "paidProviderCallPerformed": false
+}
