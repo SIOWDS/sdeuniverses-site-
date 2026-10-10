@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>友好阅读 · 在线翻页 · 面对AI的冲击，数学家走向何处？ | SDE Universes</title>
+<meta name="description" content="《面对AI的冲击，数学家走向何处？》在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
+<meta name="tier" content="L0">
+<link rel="canonical" href="https://sdeuniverses.com/books/mathematicians-future/read.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0C0F13; --bg2:#141A21; --fg:#E9E6DE; --dim:#8E97A1; --line:#242D36;
+  --gold:#D9A441; --paper:#FBF7EE; --paper2:#F2ECDF; --ink:#1A1713;
+  --shadow:0 30px 80px rgba(0,0,0,.55);
+}
+html.sepia{--paper:#F6ECD8;--paper2:#EEE1C7}
+html.day{--bg:#E8E4DB;--bg2:#F2EFE7;--fg:#22262B;--dim:#5C646D;--line:#CFC9BD}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,var(--bg2),var(--bg)) fixed;
+  color:var(--fg);font:15px/1.7 "Noto Serif SC","EB Garamond",Georgia,serif;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);
+  overflow:hidden}
+
+/* ── 顶栏 ── */
+.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;align-items:center;gap:.8rem;
+  padding:.55rem 1rem calc(.55rem);background:rgba(12,15,19,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding-top:calc(.55rem + env(safe-area-inset-top,0))}
+html.day .top{background:rgba(232,228,219,.8)}
+.top .ttl{font-weight:600;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{color:var(--dim);font-size:.78rem;margin-left:.2rem;white-space:nowrap}
+.spacer{margin-left:auto}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);
+  border-radius:8px;padding:.3rem .6rem;cursor:pointer;transition:.18s}
+button:hover:not(:disabled),select:hover{border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.on{border-color:var(--gold);color:var(--gold)}
+.ico{font-size:1rem;line-height:1}
+
+/* ── 舞台 ── */
+.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:center;overflow:hidden}
+.book{position:relative;display:flex;gap:0;filter:drop-shadow(0 24px 60px rgba(0,0,0,.5));
+  transform-style:preserve-3d;perspective:2600px}
+.leaf{position:relative;background:var(--paper);overflow:hidden}
+.leaf canvas{display:block;width:100%;height:100%}
+.leaf .svg{position:absolute;inset:0;display:none}
+.leaf .svg svg{display:block;width:100%;height:100%}
+.leaf.vec canvas{display:none}
+.leaf.vec .svg{display:block}
+.leaf.l{border-radius:4px 0 0 4px;box-shadow:inset -22px 0 34px -26px rgba(0,0,0,.55)}
+.leaf.r{border-radius:0 4px 4px 0;box-shadow:inset 22px 0 34px -26px rgba(0,0,0,.55)}
+.single .leaf{border-radius:4px}
+.gutter{position:absolute;top:0;bottom:0;left:50%;width:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.20),rgba(0,0,0,0));pointer-events:none;z-index:3}
+.single .gutter{display:none}
+.pno{position:absolute;bottom:6px;font-size:11px;color:#9a8f7c;letter-spacing:.08em;z-index:4}
+.leaf.l .pno{left:14px}.leaf.r .pno{right:14px}
+
+/* 翻页动画 */
+.flip{position:absolute;top:0;bottom:0;z-index:9;background:var(--paper);
+  transform-origin:left center;backface-visibility:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,.35);border-radius:0 4px 4px 0}
+.flip.back{transform-origin:right center;border-radius:4px 0 0 4px}
+.flip canvas{display:block;width:100%;height:100%}
+@keyframes fwd{from{transform:rotateY(0)}to{transform:rotateY(-178deg)}}
+@keyframes bwd{from{transform:rotateY(0)}to{transform:rotateY(178deg)}}
+.flip.go{animation:fwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+.flip.back.go{animation:bwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+@media (prefers-reduced-motion:reduce){.flip.go,.flip.back.go{animation-duration:.01s}}
+
+/* 文本层（可选可搜） */
+.tl{position:absolute;inset:0;overflow:hidden;opacity:.01;line-height:1;z-index:2}
+.tl span{position:absolute;white-space:pre;transform-origin:0 0;color:transparent;cursor:text}
+.tl ::selection{background:rgba(217,164,65,.35)}
+.tl mark{background:rgba(217,164,65,.55);color:transparent;border-radius:2px}
+
+/* ── 底栏 ── */
+.bot{position:fixed;inset:auto 0 0 0;z-index:40;display:flex;align-items:center;gap:.7rem;
+  padding:.5rem 1rem calc(.5rem + env(safe-area-inset-bottom,0));
+  background:rgba(12,15,19,.72);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+html.day .bot{background:rgba(232,228,219,.8)}
+.rail{position:relative;flex:1;height:22px;display:flex;align-items:center;cursor:pointer}
+.rail .bar{position:absolute;left:0;right:0;height:3px;background:var(--line);border-radius:3px}
+.rail .fill{position:absolute;left:0;height:3px;background:linear-gradient(90deg,var(--gold),#F0CE86);border-radius:3px}
+.rail .knob{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--gold);
+  transform:translateX(-50%);box-shadow:0 0 0 4px rgba(217,164,65,.18)}
+.pg{font-variant-numeric:tabular-nums;color:var(--dim);font-size:.82rem;white-space:nowrap}
+.pg input{width:3.4rem;text-align:center;background:transparent;border:1px solid var(--line);
+  border-radius:6px;color:var(--fg);font:inherit;padding:.12rem .2rem}
+
+/* ── 抽屉 ── */
+.drawer{position:fixed;top:52px;bottom:62px;left:0;width:min(330px,86vw);z-index:45;
+  background:rgba(16,21,27,.97);border-right:1px solid var(--line);
+  transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;backdrop-filter:blur(10px)}
+html.day .drawer{background:rgba(242,239,231,.97)}
+.drawer.open{transform:none}
+.drawer h3{margin:0;padding:.8rem 1rem .5rem;font-size:.8rem;letter-spacing:.24em;color:var(--dim);font-weight:400}
+.dlist{flex:1;overflow:auto;padding:0 .4rem 1rem}
+.dlist a{display:flex;gap:.5rem;align-items:baseline;padding:.32rem .6rem;border-radius:7px;
+  color:var(--fg);text-decoration:none;font-size:.86rem}
+.dlist a:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.dlist a.l1{font-weight:600;margin-top:.5rem}
+.dlist a.l2{padding-left:1.5rem;color:var(--dim);font-size:.8rem}
+.dlist a .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.76rem}
+.sbox{padding:.5rem 1rem}
+.sbox input{width:100%;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--fg);font:inherit;padding:.4rem .6rem}
+.hit{padding:.35rem .6rem;border-radius:7px;font-size:.8rem;color:var(--dim);cursor:pointer}
+.hit:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.hit b{color:var(--gold);font-weight:600}
+
+/* 缩略图 */
+.thumbs{position:fixed;left:0;right:0;bottom:62px;z-index:44;display:flex;gap:.5rem;
+  padding:.6rem 1rem;overflow-x:auto;background:rgba(12,15,19,.92);border-top:1px solid var(--line);
+  transform:translateY(120%);transition:transform .28s}
+.thumbs.open{transform:none}
+.thumbs canvas{height:112px;width:auto;border-radius:3px;cursor:pointer;opacity:.62;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);transition:.18s}
+.thumbs canvas:hover,.thumbs canvas.cur{opacity:1;outline:2px solid var(--gold)}
+
+.msg{position:fixed;inset:0;display:grid;place-items:center;z-index:60;color:var(--dim);
+  background:rgba(12,15,19,.9);text-align:center;padding:2rem}
+.msg.hide{display:none}
+.msg .sp{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--gold);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:50;
+  background:rgba(0,0,0,.66);border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .9rem;font-size:.76rem;color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
+.hint.show{opacity:1}
+@media (max-width:860px){.top .sub,.hideS{display:none}.stage{inset:48px 0 56px 0}}
+</style>
+<style>@media(max-width:600px){.top{gap:.32rem;padding-left:.5rem;padding-right:.5rem}.top .ttl{max-width:calc(100vw - 235px)}.top button{padding:.25rem .4rem;font-size:.8rem}}</style></head>
+<body>
+
+<header class="top">
+  <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
+  <span class="ttl">面对AI的冲击，数学家走向何处？</span><span class="sub hideS">从常规解题到人—AI复合体的多元数学发生</span>
+  <span class="spacer"></span>
+  <button id="btnSpread" class="hideS" title="单页 / 双页 (D)">双页</button>
+  <button id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)">矢量</button>
+  <button id="btnZoomOut" title="缩小">A−</button>
+  <button id="btnZoomIn" title="放大">A＋</button>
+  <button id="btnThumbs" class="hideS" title="缩略图">▤</button>
+  <button id="btnTheme" title="夜 / 日 / 纸 (N)">夜</button>
+  <button id="btnFull" class="hideS" title="全屏 (F)">⛶</button>
+  <a href="/books/mathematicians-future/" style="color:var(--dim);text-decoration:none;font-size:.82rem">书页</a><a href="/books/mathematicians-future/text/" style="color:var(--dim);text-decoration:none;font-size:.82rem">全文</a>
+</header>
+
+<aside class="drawer" id="drawer">
+  <div class="sbox"><input id="q" type="search" placeholder="全书检索（回车）…"></div>
+  <h3 id="dHead">目　录</h3>
+  <div class="dlist" id="dlist"></div>
+</aside>
+
+<main class="stage" id="stage">
+  <div class="book" id="book">
+    <div class="leaf l" id="leafL"><canvas id="cL"></canvas><div class="svg" id="sL"></div><div class="tl" id="tL"></div><div class="pno" id="nL"></div></div>
+    <div class="leaf r" id="leafR"><canvas id="cR"></canvas><div class="svg" id="sR"></div><div class="tl" id="tR"></div><div class="pno" id="nR"></div></div>
+    <div class="gutter"></div>
+  </div>
+</main>
+
+<div class="thumbs" id="thumbs"></div>
+
+<footer class="bot">
+  <button id="btnPrev" title="上一页 (←)">‹</button>
+  <div class="rail" id="rail"><div class="bar"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
+  <button id="btnNext" title="下一页 (→)">›</button>
+  <span class="pg" title="PDF物理页码">PDF 第 <input id="pi" type="number" min="1" value="1"> / <span id="pt">…</span> 页</span>
+</footer>
+
+<div class="hint" id="hint"></div>
+<div class="msg" id="msg"><div><div class="sp"></div><div id="msgT">正在载入书页…</div></div></div>
+
+<script type="application/json" id="cfg">{"pdf": "/books/mathematicians-future/assets/mathematicians-future-reading.pdf", "key": "mathematicians-future-v1", "offset": 1}</script>
+<script type="application/json" id="toc">[{"t": "封面", "p": "1", "g": 1, "l": 1}, {"t": "出版与版本说明", "p": "2", "g": 2, "l": 1}, {"t": "作者简介", "p": "3", "g": 3, "l": 1}, {"t": "前言 工具把能力交给我们之后", "p": "4", "g": 4, "l": 1}, {"t": "一 让已经取得的能力成为新的起点", "p": "4", "g": 4, "l": 2}, {"t": "二 从交通的多元化想到理念的多元化", "p": "6", "g": 6, "l": 2}, {"t": "三 四条论证线索怎样相互约束", "p": "7", "g": 7, "l": 2}, {"t": "四 把写作放进人—AI共同研究之中", "p": "8", "g": 8, "l": 2}, {"t": "五 把未来写成可以继续的研究", "p": "9", "g": 9, "l": 2}, {"t": "导读　带着自己的问题进入本书", "p": "11", "g": 11, "l": 1}, {"t": "目录", "p": "14", "g": 14, "l": 1}, {"t": "导论 当一道难题不再能够安顿一段生涯", "p": "17", "g": 17, "l": 1}, {"t": "一 兴奋与焦虑发生在同一个人身上", "p": "17", "g": 17, "l": 2}, {"t": "二 工具意味着什么", "p": "18", "g": 18, "l": 2}, {"t": "三 封装之后的分岔", "p": "19", "g": 19, "l": 2}, {"t": "四 马车司机的启示及其限度", "p": "20", "g": 20, "l": 2}, {"t": "五 从研究者个人到复合研究活动", "p": "21", "g": 21, "l": 2}, {"t": "六 为什么要把典范猜想放在中心", "p": "22", "g": 22, "l": 2}, {"t": "七 本书的论证如何接受检验", "p": "23", "g": 23, "l": 2}, {"t": "八 把未来落实为下一次研究", "p": "23", "g": 23, "l": 2}, {"t": "AI冲击与数学家的生涯转折", "p": "25", "g": 25, "l": 1}, {"t": "第一章 一道难题怎样成为一种职业资源", "p": "26", "g": 26, "l": 1}, {"t": "一、难题的两种生命", "p": "26", "g": 26, "l": 2}, {"t": "二、稀缺性怎样进入评价", "p": "26", "g": 26, "l": 2}, {"t": "三、训练的价值不等于劳动量的保存", "p": "27", "g": 27, "l": 2}, {"t": "四、职业链条在哪里松动", "p": "28", "g": 28, "l": 2}, {"t": "五、成果的价值与研究者的价值", "p": "28", "g": 28, "l": 2}, {"t": "六、从守住难题到重组问题", "p": "29", "g": 29, "l": 2}, {"t": "七、保留什么，改变什么", "p": "29", "g": 29, "l": 2}, {"t": "第二章 当解题和证明能力进入工具", "p": "31", "g": 31, "l": 1}, {"t": "一、进入工具的不是同一种能力", "p": "31", "g": 31, "l": 2}, {"t": "二、两次竞赛结果说明了什么", "p": "31", "g": 31, "l": 2}, {"t": "三、证明搜索与证明核验", "p": "32", "g": 32, "l": 2}, {"t": "四、成本下降如何改变问题选择", "p": "33", "g": 33, "l": 2}, {"t": "五、成果越多，理解为什么可能越难", "p": "33", "g": 33, "l": 2}, {"t": "六、任务变化与职业变化之间", "p": "34", "g": 34, "l": 2}, {"t": "七、可靠封装需要能够重新展开", "p": "35", "g": 35, "l": 2}, {"t": "第三章 数学家为什么会感到自己的价值受到威胁", "p": "36", "g": 36, "l": 1}, {"t": "一、被改变的是一套生活安排", "p": "36", "g": 36, "l": 2}, {"t": "二、青年研究者的期限与风险", "p": "36", "g": 36, "l": 2}, {"t": "三、资深研究者失去的未必只是技能", "p": "37", "g": 37, "l": 2}, {"t": "四、正确性争论中的三种问题", "p": "38", "g": 38, "l": 2}, {"t": "五、从比较输赢到识别处境", "p": "38", "g": 38, "l": 2}, {"t": "六、把焦虑变成研究记录", "p": "39", "g": 39, "l": 2}, {"t": "七、共同体不能把转型责任全部交给个人", "p": "40", "g": 40, "l": 2}, {"t": "第四章 数学家不必与AI争夺每一道题", "p": "42", "g": 42, "l": 1}, {"t": "一、速度竞赛为何没有稳定终点", "p": "42", "g": 42, "l": 2}, {"t": "二、从个人能力到复合活动", "p": "43", "g": 43, "l": 2}, {"t": "三、AI也会参与猜想与解释", "p": "43", "g": 43, "l": 2}, {"t": "四、升级不只是把旧工作做得更快", "p": "44", "g": 44, "l": 2}, {"t": "五、怎样分配可被封装的工作", "p": "44", "g": 44, "l": 2}, {"t": "六、谁来承担判断与责任", "p": "45", "g": 45, "l": 2}, {"t": "七、给新方向建立有限的试验空间", "p": "46", "g": 46, "l": 2}, {"t": "八、把竞争转化为研究条件", "p": "46", "g": 46, "l": 2}, {"t": "第五章 数学生涯升级：研究、职业与人生的共同变化", "p": "48", "g": 48, "l": 1}, {"t": "一、三种升级为何需要区分", "p": "48", "g": 48, "l": 2}, {"t": "二、研究升级要表现为新增能力", "p": "48", "g": 48, "l": 2}, {"t": "三、职业升级需要稳定的承接条件", "p": "49", "g": 49, "l": 2}, {"t": "四、人生升级关乎怎样继续愿意研究", "p": "50", "g": 50, "l": 2}, {"t": "五、三种升级不同步时怎样判断", "p": "50", "g": 50, "l": 2}, {"t": "六、升级不是人人都要成为典范创始人", "p": "51", "g": 51, "l": 2}, {"t": "七、建立一份可以修订的生涯方案", "p": "52", "g": 52, "l": 2}, {"t": "八、本书需要证明什么", "p": "52", "g": 52, "l": 2}, {"t": "工具革命与新行业涌现的历史", "p": "54", "g": 54, "l": 1}, {"t": "第六章 印刷与纺织机械：产量增长之后，劳动者去了哪里", "p": "55", "g": 55, "l": 1}, {"t": "一、复制能力改变了什么", "p": "55", "g": 55, "l": 2}, {"t": "二、中国印刷：雕版为什么没有被活字简单淘汰", "p": "56", "g": 56, "l": 2}, {"t": "三、欧洲印刷：新系统从旧工艺内部生长", "p": "57", "g": 57, "l": 2}, {"t": "四、纺纱与织造：一个环节的封装怎样改变另一个环节", "p": "58", "g": 58, "l": 2}, {"t": "五、机器遭到反对时，人们究竟反对什么", "p": "59", "g": 59, "l": 2}, {"t": "六、扩张的产业，为何仍然有人被留在原地", "p": "60", "g": 60, "l": 2}, {"t": "七、从复制增长到研究活动的分化", "p": "61", "g": 61, "l": 2}, {"t": "八、把历史变成可以使用的问题", "p": "62", "g": 62, "l": 2}, {"t": "第七章 蒸汽与铁路：从新动力到新专业系统", "p": "65", "g": 65, "l": 1}, {"t": "一、从矿井里的一项困难开始", "p": "65", "g": 65, "l": 2}, {"t": "二、瓦特的改进：能力扩大来自问题的重新划分", "p": "66", "g": 66, "l": 2}, {"t": "三、从机器到工程专业：谁让能力能够重复发生", "p": "67", "g": 67, "l": 2}, {"t": "四、铁路：一台更强的机器为何还不足以运送社会", "p": "68", "g": 68, "l": 2}, {"t": "五、铁路时间：连接扩大怎样改变共同规则", "p": "69", "g": 69, "l": 2}, {"t": "六、信号与安全：封装如何经过反复检验成为可信条件", "p": "70", "g": 70, "l": 2}, {"t": "七、工具与科学之间不是单向输送", "p": "71", "g": 71, "l": 2}, {"t": "八、专业系统扩张中的职业去向与代价", "p": "72", "g": 72, "l": 2}, {"t": "九、为数学典范实验室准备基础设施", "p": "73", "g": 73, "l": 2}, {"t": "第八章 汽车与电气化：生涯升级为什么需要配套世界", "p": "75", "g": 75, "l": 1}, {"t": "一、没有马的车，先进入有马的世界", "p": "75", "g": 75, "l": 2}, {"t": "二、车夫、制造者与维修者走向不同道路", "p": "76", "g": 76, "l": 2}, {"t": "三、福特的失败与成功：造出汽车不等于造出可持续事业", "p": "77", "g": 77, "l": 2}, {"t": "四、道路与规则：配套条件也需要被发明", "p": "78", "g": 78, "l": 2}, {"t": "五、电灯背后的系统：使用方便建立在复杂协作之上", "p": "79", "g": 79, "l": 2}, {"t": "六、工厂布局：换了动力，还要换工作的组织方式", "p": "80", "g": 80, "l": 2}, {"t": "七、省下的时间，为什么未必成为自由时间", "p": "81", "g": 81, "l": 2}, {"t": "八、配套世界不是一个可以无限等待的借口", "p": "82", "g": 82, "l": 2}, {"t": "九、从“我有工具”到“我们能够开展新活动”", "p": "83", "g": 83, "l": 2}, {"t": "第九章 制冷与集装箱：旧服务退场，新需求怎样形成", "p": "85", "g": 85, "l": 1}, {"t": "一、窗口里的一张送冰牌", "p": "85", "g": 85, "l": 2}, {"t": "二、自然冰产业：被替代者曾经也是创新者", "p": "86", "g": 86, "l": 2}, {"t": "三、机械制冷：顾客从购买中间物转向调用一种状态", "p": "87", "g": 87, "l": 2}, {"t": "四、冷链与速冻：新的消费活动怎样被组织出来", "p": "88", "g": 88, "l": 2}, {"t": "五、集装箱之前：装卸是一种复杂的配合", "p": "89", "g": 89, "l": 2}, {"t": "六、麦克莱恩、海陆与美森：从一次航行到运输体系", "p": "90", "g": 90, "l": 2}, {"t": "七、一九六〇年协议：转型如何成为谈判对象", "p": "91", "g": 91, "l": 2}, {"t": "八、低运输成本打开新活动，也改变谁能够进入", "p": "92", "g": 92, "l": 2}, {"t": "九、送冰人陷阱与数学家的服务对象", "p": "93", "g": 93, "l": 2}, {"t": "第十章 电子计算机与互联网：知识能力的连续封装", "p": "95", "g": 95, "l": 1}, {"t": "一、当“计算机”还是一个人的职位", "p": "95", "g": 95, "l": 2}, {"t": "二、多萝西·沃恩与ENIAC程序员：转型的具体路径", "p": "96", "g": 96, "l": 2}, {"t": "三、编译器：把“怎样命令机器”再次封装", "p": "97", "g": 97, "l": 2}, {"t": "四、软件与科学计算：问题规模改变以后，工作也改变", "p": "98", "g": 98, "l": 2}, {"t": "五、互联网：连接能力如何成为新的公共条件", "p": "100", "g": 100, "l": 2}, {"t": "六、万维网：从科研交流工具到可扩展的信息活动", "p": "101", "g": 101, "l": 2}, {"t": "七、开放网络与平台集中：能力普及为何仍可能产生依赖", "p": "102", "g": 102, "l": 2}, {"t": "八、AI数学与计算机史：联系在哪里，差异在哪里", "p": "103", "g": 103, "l": 2}, {"t": "九、把连续封装变成连续发生", "p": "104", "g": 104, "l": 2}, {"t": "从职业替代到新研究阵地的发生", "p": "105", "g": 105, "l": 1}, {"t": "第十一章 扩大、内卷与价值转移：怎样读懂工具史", "p": "106", "g": 106, "l": 1}, {"t": "一、先把五种变化分开", "p": "106", "g": 106, "l": 2}, {"t": "二、一个有限的条件模型", "p": "106", "g": 106, "l": 2}, {"t": "三、扩大为何可能与内卷同在", "p": "107", "g": 107, "l": 2}, {"t": "四、价值如何从一个环节转向另一个环节", "p": "108", "g": 108, "l": 2}, {"t": "五、新行业怎样承接资源", "p": "108", "g": 108, "l": 2}, {"t": "六、主动寻找不符合叙事的案例", "p": "109", "g": 109, "l": 2}, {"t": "七、一份研究项目账的读法", "p": "110", "g": 110, "l": 2}, {"t": "八、把历史机制变成数学职业问题", "p": "111", "g": 111, "l": 2}, {"t": "第十二章 原来做不到的事情，怎样成为新行业", "p": "112", "g": 112, "l": 1}, {"t": "一、能力出现与活动成立之间", "p": "112", "g": 112, "l": 2}, {"t": "二、成本下降怎样改变需求", "p": "112", "g": 112, "l": 2}, {"t": "三、从特殊服务到日常活动", "p": "113", "g": 113, "l": 2}, {"t": "四、候选活动之一：持续的模型比较", "p": "114", "g": 114, "l": 2}, {"t": "五、候选活动之二：可核验知识的维护", "p": "114", "g": 114, "l": 2}, {"t": "六、工具市场与工具支持的活动", "p": "115", "g": 115, "l": 2}, {"t": "七、从需求存在到职业成立", "p": "116", "g": 116, "l": 2}, {"t": "八、新活动怎样反过来改变数学", "p": "116", "g": 116, "l": 2}, {"t": "第十三章 封装释放的时间，怎样成为新的创造空间", "p": "118", "g": 118, "l": 1}, {"t": "一、省时并不等于拥有时间", "p": "118", "g": 118, "l": 2}, {"t": "二、看见整个研究循环的瓶颈", "p": "118", "g": 118, "l": 2}, {"t": "三、把成熟过程变成下一层活动的条件", "p": "119", "g": 119, "l": 2}, {"t": "四、广度的扩展：让不同方案真正相遇", "p": "120", "g": 120, "l": 2}, {"t": "五、高度与颗粒度怎样改变", "p": "120", "g": 120, "l": 2}, {"t": "六、保护探索时间的组织安排", "p": "121", "g": 121, "l": 2}, {"t": "七、让失败成为节省时间的知识", "p": "122", "g": 122, "l": 2}, {"t": "八、从更多成果到新的研究组织", "p": "123", "g": 123, "l": 2}, {"t": "第十四章 为什么有些人能够转型，有些人被留在原地", "p": "124", "g": 124, "l": 1}, {"t": "一、成功故事隐藏了哪些条件", "p": "124", "g": 124, "l": 2}, {"t": "二、旧技能需要拆开才知道怎样迁移", "p": "124", "g": 124, "l": 2}, {"t": "三、失效部分为什么难以放下", "p": "125", "g": 125, "l": 2}, {"t": "四、年龄、地点与生活责任的作用", "p": "126", "g": 126, "l": 2}, {"t": "五、三种假想处境的不同道路", "p": "126", "g": 126, "l": 2}, {"t": "六、大学应承担哪些转型责任", "p": "127", "g": 127, "l": 2}, {"t": "七、共同体怎样避免把失败道德化", "p": "128", "g": 128, "l": 2}, {"t": "八、让转型成为可共同建设的过程", "p": "128", "g": 128, "l": 2}, {"t": "第十五章 数学家的新阵地如何建立", "p": "130", "g": 130, "l": 1}, {"t": "一、新阵地首先是一组能够持续的活动", "p": "130", "g": 130, "l": 2}, {"t": "二、四种入口怎样相互连接", "p": "130", "g": 130, "l": 2}, {"t": "三、把研究设想变成第一件作品", "p": "131", "g": 131, "l": 2}, {"t": "四、用共同比较避免各说各话", "p": "132", "g": 132, "l": 2}, {"t": "五、资源如何与探索的不确定性匹配", "p": "132", "g": 132, "l": 2}, {"t": "六、合作伙伴怎样共同改变问题", "p": "133", "g": 133, "l": 2}, {"t": "七、为多种路线保留空间", "p": "134", "g": 134, "l": 2}, {"t": "八、从新阵地走向典范问题", "p": "134", "g": 134, "l": 2}, {"t": "从库恩的常规科学到数学典范多元化", "p": "136", "g": 136, "l": 1}, {"t": "第十六章 常规科学为什么能够取得巨大成功", "p": "137", "g": 137, "l": 1}, {"t": "一、能够共同开始，比每次重新开始更困难", "p": "137", "g": 137, "l": 2}, {"t": "二、共同问题怎样产生积累", "p": "138", "g": 138, "l": 2}, {"t": "三、精密研究中的创造", "p": "138", "g": 138, "l": 2}, {"t": "四、范例怎样训练判断", "p": "139", "g": 139, "l": 2}, {"t": "五、稳定框架的收益与代价", "p": "140", "g": 140, "l": 2}, {"t": "六、新探索怎样使用旧积累", "p": "140", "g": 140, "l": 2}, {"t": "七、公共可靠性是一种共同生产", "p": "141", "g": 141, "l": 2}, {"t": "八、把常规研究变成可以上升的起点", "p": "142", "g": 142, "l": 2}, {"t": "第十七章 典范更替怎样改变科学家的工作", "p": "143", "g": 143, "l": 1}, {"t": "一、答案改变与问题改变", "p": "143", "g": 143, "l": 2}, {"t": "二、反常不会自行宣布自己的意义", "p": "143", "g": 143, "l": 2}, {"t": "三、改变框架，也改变研究者的能力结构", "p": "144", "g": 144, "l": 2}, {"t": "四、旧与新为什么可能长期共存", "p": "145", "g": 145, "l": 2}, {"t": "五、库恩框架进入数学时需要怎样调整", "p": "146", "g": 146, "l": 2}, {"t": "六、转变中的判断标准怎样接受检验", "p": "146", "g": 146, "l": 2}, {"t": "七、过渡时期为什么需要翻译者", "p": "147", "g": 147, "l": 2}, {"t": "八、从历史转折走向可以安排的探索", "p": "148", "g": 148, "l": 2}, {"t": "第十八章 从典范更替走向多元典范的持续发生", "p": "149", "g": 149, "l": 1}, {"t": "一、为什么不只等待下一个统一答案", "p": "149", "g": 149, "l": 2}, {"t": "二、封装怎样改变探索的成本结构", "p": "150", "g": 150, "l": 2}, {"t": "三、四种多元，不能混为一谈", "p": "151", "g": 151, "l": 2}, {"t": "四、竞争为什么仍然必要", "p": "151", "g": 151, "l": 2}, {"t": "五、翻译如何使差异变成共同财富", "p": "152", "g": 152, "l": 2}, {"t": "六、重组怎样超过观点折中", "p": "153", "g": 153, "l": 2}, {"t": "七、多元何以避免各说各话", "p": "153", "g": 153, "l": 2}, {"t": "八、把研究纲领写成能够被削弱的判断", "p": "154", "g": 154, "l": 2}, {"t": "九、从个人雄心到共同研究条件", "p": "155", "g": 155, "l": 2}, {"t": "第十九章 从模型猜想到形成中的数学典范", "p": "157", "g": 157, "l": 1}, {"t": "一、一个名称尚未决定贡献的层级", "p": "157", "g": 157, "l": 2}, {"t": "二、对象改变究竟改变了什么", "p": "157", "g": 157, "l": 2}, {"t": "三、运算使对象获得共同生活", "p": "159", "g": 159, "l": 2}, {"t": "四、第一批成果怎样建立可信度", "p": "159", "g": 159, "l": 2}, {"t": "五、问题族比单次演示更能说明方向", "p": "160", "g": 160, "l": 2}, {"t": "六、他人接续为何是一项独立检验", "p": "161", "g": 161, "l": 2}, {"t": "七、从个人数学到公共数学的转换", "p": "162", "g": 162, "l": 2}, {"t": "八、怎样使用“形成中的典范”这一称呼", "p": "163", "g": 163, "l": 2}, {"t": "第二十章 AI为什么成为多元典范探索的重要基础设施", "p": "164", "g": 164, "l": 1}, {"t": "一、一个猜想背后有多少展开工作", "p": "164", "g": 164, "l": 2}, {"t": "二、从生成答案到组织搜索", "p": "165", "g": 165, "l": 2}, {"t": "三、并行展开需要真正不同的路线", "p": "165", "g": 165, "l": 2}, {"t": "四、验证基础设施决定探索能够走多远", "p": "166", "g": 166, "l": 2}, {"t": "五、失败记录怎样成为下一轮能力", "p": "167", "g": 167, "l": 2}, {"t": "六、研究目标也会在互动中改变", "p": "167", "g": 167, "l": 2}, {"t": "七、速度之外的成本", "p": "168", "g": 168, "l": 2}, {"t": "八、一个可持续实验室的最低配置", "p": "169", "g": 169, "l": 2}, {"t": "九、从能力封装走向研究空间扩展", "p": "170", "g": 170, "l": 2}, {"t": "SDE视野中的多元数学发生", "p": "171", "g": 171, "l": 1}, {"t": "第二十一章 数学的SDE纲领：特征纠缠的场模态", "p": "172", "g": 172, "l": 1}, {"t": "一、从一个公式追问它的成立条件", "p": "172", "g": 172, "l": 2}, {"t": "二、为什么将数学放在特征纠缠的场模态", "p": "173", "g": 173, "l": 2}, {"t": "三、E为什么不能被简化为环境", "p": "174", "g": 174, "l": 2}, {"t": "四、符号、逻辑与数学怎样共同工作", "p": "175", "g": 175, "l": 2}, {"t": "五、数学对象的构成并不取消数学约束", "p": "176", "g": 176, "l": 2}, {"t": "六、研究纲领怎样接受检验", "p": "176", "g": 176, "l": 2}, {"t": "七、封装之后，数学家把注意力移向哪里", "p": "178", "g": 178, "l": 2}, {"t": "第二十二章 数学史中的多次对象诞生", "p": "179", "g": 179, "l": 1}, {"t": "一、历史不只是今天数学的预备课", "p": "179", "g": 179, "l": 2}, {"t": "二、数的扩充：缺口怎样成为新的对象", "p": "180", "g": 180, "l": 2}, {"t": "三、从变化问题到可持续的演算", "p": "181", "g": 181, "l": 2}, {"t": "四、几何改变：什么可以作为空间的起点", "p": "182", "g": 182, "l": 2}, {"t": "五、运算法则也可以成为选择对象", "p": "183", "g": 183, "l": 2}, {"t": "六、从具体物体到连接与结构", "p": "184", "g": 184, "l": 2}, {"t": "七、多条历史路径怎样进入今天的实验室", "p": "185", "g": 185, "l": 2}, {"t": "第二十三章 同一性、边界与单元怎样发生", "p": "186", "g": 186, "l": 1}, {"t": "一、两个东西什么时候算作同一个", "p": "186", "g": 186, "l": 2}, {"t": "二、表示、状态与观察的三个层次", "p": "187", "g": 187, "l": 2}, {"t": "三、把无法区分组织为一个新对象", "p": "187", "g": 187, "l": 2}, {"t": "四、边界不是只有一条线", "p": "188", "g": 188, "l": 2}, {"t": "五、范围性影响怎样改变单元理解", "p": "189", "g": 189, "l": 2}, {"t": "六、一个最小反例：相同总量为何不够", "p": "190", "g": 190, "l": 2}, {"t": "七、单元发生与研究能力的发生", "p": "191", "g": 191, "l": 2}, {"t": "八、把构成选择变成一项实际研究", "p": "192", "g": 192, "l": 2}, {"t": "第二十四章 不同SDE怎样打开不同数学入口", "p": "193", "g": 193, "l": 1}, {"t": "一、入口改变的是研究怎样开始", "p": "193", "g": 193, "l": 2}, {"t": "二、视觉入口：从可区分显露到组织规则", "p": "193", "g": 193, "l": 2}, {"t": "三、触觉入口：单次作用怎样留下范围", "p": "194", "g": 194, "l": 2}, {"t": "四、听觉入口：次序与节律怎样成为对象", "p": "195", "g": 195, "l": 2}, {"t": "五、跨入口翻译：哪些结构能够共同保留", "p": "196", "g": 196, "l": 2}, {"t": "六、与既有数学进行有内容的比较", "p": "197", "g": 197, "l": 2}, {"t": "七、一次三入口实验怎样组织", "p": "198", "g": 198, "l": 2}, {"t": "八、从入口差异到数学谱系", "p": "199", "g": 199, "l": 2}, {"t": "第二十五章 从“我的数学”到多元的“我们的数学”", "p": "200", "g": 200, "l": 1}, {"t": "一、一个问题为什么会成为我的问题", "p": "200", "g": 200, "l": 2}, {"t": "二、个人问题怎样获得数学形式", "p": "201", "g": 201, "l": 2}, {"t": "三、公共表达需要交出哪些东西", "p": "201", "g": 201, "l": 2}, {"t": "四、证明、复现与应用怎样形成共同约束", "p": "202", "g": 202, "l": 2}, {"t": "五、多元的“我们”怎样形成", "p": "203", "g": 203, "l": 2}, {"t": "六、理念、现实与自我三界中的研究机会", "p": "204", "g": 204, "l": 2}, {"t": "七、从一份私人笔记到可接续研究", "p": "205", "g": 205, "l": 2}, {"t": "八、让封装成为更多人的研究起点", "p": "206", "g": 206, "l": 2}, {"t": "人—AI典范实验室：发明新的数模型", "p": "208", "g": 208, "l": 1}, {"t": "第二十六章 典范猜想：如果“数”包含影响范围", "p": "209", "g": 209, "l": 1}, {"t": "一、把一个触觉提问变成研究任务", "p": "209", "g": 209, "l": 2}, {"t": "二、建立有限度量空间上的伞事件", "p": "210", "g": 210, "l": 2}, {"t": "三、为什么必须区分三种同一性", "p": "211", "g": 211, "l": 2}, {"t": "四、单个伞不闭合，状态空间为何必须扩大", "p": "212", "g": 212, "l": 2}, {"t": "五、从空间范围转向时间范围", "p": "213", "g": 213, "l": 2}, {"t": "六、让候选模型与既有理论正面相遇", "p": "215", "g": 215, "l": 2}, {"t": "七、单位、观察者与研究边界", "p": "216", "g": 216, "l": 2}, {"t": "八、预先写下能够失败的条件", "p": "217", "g": 217, "l": 2}, {"t": "第二十七章 执行与评估：让猜想产生数学后果", "p": "219", "g": 219, "l": 1}, {"t": "一、从定义表进入命题表", "p": "219", "g": 219, "l": 2}, {"t": "二、非负剖面的加法结构", "p": "220", "g": 220, "l": 2}, {"t": "命题二十七之一：非负剖面的组合结构", "p": "220", "g": 220, "l": 2}, {"t": "证明", "p": "220", "g": 220, "l": 2}, {"t": "三、最小算例怎样暴露不同层次", "p": "221", "g": 221, "l": 2}, {"t": "四、历史展开式与次序效应", "p": "222", "g": 222, "l": 2}, {"t": "命题二十七之二：衰减更新的历史展开式", "p": "222", "g": 222, "l": 2}, {"t": "证明", "p": "222", "g": 222, "l": 2}, {"t": "命题二十七之三：更新次序的差异", "p": "222", "g": 222, "l": 2}, {"t": "五、让影响在位置之间传播", "p": "223", "g": 223, "l": 2}, {"t": "命题二十七之四：空间传递的历史公式", "p": "224", "g": 224, "l": 2}, {"t": "六、范围扩张与稳定性可以同时成立", "p": "224", "g": 224, "l": 2}, {"t": "命题二十七之五：有界输入与状态上界", "p": "224", "g": 224, "l": 2}, {"t": "七、重叠、范围和参数误差的进一步后果", "p": "225", "g": 225, "l": 2}, {"t": "八、证明、程序和图形各自承担什么", "p": "227", "g": 227, "l": 2}, {"t": "九、评估什么，暂时不能评估什么", "p": "228", "g": 228, "l": 2}, {"t": "第二十八章 反馈、修正与迭代：让反例改变模型", "p": "230", "g": 230, "l": 1}, {"t": "一、一个传感器怎样推翻一项封装", "p": "230", "g": 230, "l": 2}, {"t": "二、观测闭合究竟是什么意思", "p": "231", "g": 231, "l": 2}, {"t": "三、观测商闭合定理及证明", "p": "231", "g": 231, "l": 2}, {"t": "命题二十八之一：闭合的等价条件", "p": "231", "g": 231, "l": 2}, {"t": "证明", "p": "232", "g": 232, "l": 2}, {"t": "定理的研究含义", "p": "232", "g": 232, "l": 2}, {"t": "四、三条修复路径：表示、适用域与目标", "p": "233", "g": 233, "l": 2}, {"t": "五、把一次反例推广为观察设计", "p": "234", "g": 234, "l": 2}, {"t": "六、近似闭合怎样保留误差账目", "p": "235", "g": 235, "l": 2}, {"t": "七、不要为保住结论而无限添加条件", "p": "236", "g": 236, "l": 2}, {"t": "八、把结构识别与状态识别分开", "p": "237", "g": 237, "l": 2}, {"t": "九、一次修订怎样改变研究者的能力", "p": "238", "g": 238, "l": 2}, {"t": "第二十九章 分化、重组与升维：让多种数学共同发生", "p": "240", "g": 240, "l": 1}, {"t": "一、不相容要求怎样产生研究分支", "p": "240", "g": 240, "l": 2}, {"t": "二、累积与覆盖：两个不能合并的基本要求", "p": "241", "g": 241, "l": 2}, {"t": "三、饱和分支：上限改变什么", "p": "242", "g": 242, "l": 2}, {"t": "命题二十九之一：饱和组合的结合律", "p": "242", "g": 242, "l": 2}, {"t": "四、归一化为什么会悄悄改变结合律", "p": "243", "g": 243, "l": 2}, {"t": "命题二十九之二：质量—形状表示恢复结合", "p": "243", "g": 243, "l": 2}, {"t": "五、分支之间怎样翻译，怎样不能翻译", "p": "244", "g": 244, "l": 2}, {"t": "六、重组：把不同作用通道放进一个系统", "p": "245", "g": 245, "l": 2}, {"t": "七、让传递规则本身发生变化", "p": "246", "g": 246, "l": 2}, {"t": "八、把模型本身变成下一层对象", "p": "247", "g": 247, "l": 2}, {"t": "九、什么才算本章完成的升维", "p": "248", "g": 248, "l": 2}, {"t": "第三十章 完成一次可接续的数学发生", "p": "250", "g": 250, "l": 1}, {"t": "一、什么样的结果能够交给下一位研究者", "p": "250", "g": 250, "l": 2}, {"t": "二、一项能够精确计算的重建任务", "p": "251", "g": 251, "l": 2}, {"t": "命题三十之一：总量记录的误差下界", "p": "252", "g": 252, "l": 2}, {"t": "三、与同等能力的基线比较", "p": "252", "g": 252, "l": 2}, {"t": "四、让已有理论成为接续资源", "p": "254", "g": 254, "l": 2}, {"t": "五、从合成案例走向装置实验", "p": "255", "g": 255, "l": 2}, {"t": "六、一个真正可以继续的数学问题", "p": "256", "g": 256, "l": 2}, {"t": "命题三十之二：非局域生成约束的表达后果", "p": "256", "g": 256, "l": 2}, {"t": "七、封装对所有变化都可靠吗", "p": "257", "g": 257, "l": 2}, {"t": "命题三十之三：任意传递下不存在非平凡统一压缩", "p": "257", "g": 257, "l": 2}, {"t": "八、研究作品怎样进入共同体", "p": "257", "g": 257, "l": 2}, {"t": "九、从一个小模型返回多元数学发生", "p": "258", "g": 258, "l": 2}, {"t": "数学生涯、教育与共同体的升级", "p": "260", "g": 260, "l": 1}, {"t": "第三十一章 年轻数学家的研究生涯怎样重新设计", "p": "261", "g": 261, "l": 1}, {"t": "一、从真实处境开始，而不是从理想身份开始", "p": "261", "g": 261, "l": 2}, {"t": "二、把研究方向变成可以结束的小型试验", "p": "262", "g": 262, "l": 2}, {"t": "三、专业积累怎样进入复合研究能力", "p": "263", "g": 263, "l": 2}, {"t": "四、从论文清单到可接续的研究作品", "p": "264", "g": 264, "l": 2}, {"t": "五、学位期限与长期问题之间的桥梁", "p": "265", "g": 265, "l": 2}, {"t": "六、让探索成为自由，而不是新的统一竞赛", "p": "266", "g": 266, "l": 2}, {"t": "第三十二章 成熟数学家怎样组织人—AI研究", "p": "268", "g": 268, "l": 1}, {"t": "一、经验的价值怎样迁移", "p": "268", "g": 268, "l": 2}, {"t": "二、从一条主线到有边界的多路线协作", "p": "269", "g": 269, "l": 2}, {"t": "三、可靠封装与分层核验", "p": "270", "g": 270, "l": 2}, {"t": "四、让跨学科合作从问题构成开始", "p": "271", "g": 271, "l": 2}, {"t": "五、贡献归属与团队中的学习机会", "p": "272", "g": 272, "l": 2}, {"t": "六、从效率增长到研究方向更新", "p": "273", "g": 273, "l": 2}, {"t": "第三十三章 多元数学怎样形成职业与服务", "p": "275", "g": 275, "l": 1}, {"t": "一、新研究机会与新职业之间还有多远", "p": "275", "g": 275, "l": 2}, {"t": "二、从一次建模委托到持续的问题共同体", "p": "276", "g": 276, "l": 2}, {"t": "三、把数学成果变成能够使用的作品", "p": "277", "g": 277, "l": 2}, {"t": "四、价值形成、付费意愿与公共支持", "p": "278", "g": 278, "l": 2}, {"t": "五、新理论方向怎样形成共同体", "p": "279", "g": 279, "l": 2}, {"t": "六、辨认服务升级与新一轮内卷", "p": "280", "g": 280, "l": 2}, {"t": "第三十四章 数学教育怎样培养典范发生能力", "p": "282", "g": 282, "l": 1}, {"t": "一、把基础知识放回能够产生问题的活动", "p": "282", "g": 282, "l": 2}, {"t": "二、一次改变定义的教学实验", "p": "283", "g": 283, "l": 2}, {"t": "三、证明训练与模型比较如何共同展开", "p": "285", "g": 285, "l": 2}, {"t": "四、AI参与条件下怎样观察真实能力", "p": "286", "g": 286, "l": 2}, {"t": "五、博士训练怎样评价持续研究", "p": "286", "g": 286, "l": 2}, {"t": "六、让课程成为可以修订的教育研究", "p": "287", "g": 287, "l": 2}, {"t": "第三十五章 建设能够支持多元数学的共同体", "p": "289", "g": 289, "l": 1}, {"t": "一、从要求个人转型到改变共同条件", "p": "289", "g": 289, "l": 2}, {"t": "二、典范实验室怎样嵌入数学系", "p": "290", "g": 290, "l": 2}, {"t": "三、论文之外的贡献怎样接受评价", "p": "291", "g": 291, "l": 2}, {"t": "四、开放交流与过程保护怎样并存", "p": "292", "g": 292, "l": 2}, {"t": "五、工具接入与平台依赖", "p": "293", "g": 293, "l": 2}, {"t": "六、让失败、分歧与路线调整具有位置", "p": "294", "g": 294, "l": 2}, {"t": "七、怎样判断生涯升级已经发生", "p": "294", "g": 294, "l": 2}, {"t": "结语 数学家的未来 在新的数学发生中展开", "p": "297", "g": 297, "l": 1}, {"t": "一 回到那个面对证明的人", "p": "297", "g": 297, "l": 2}, {"t": "二 封装使已有能力成为起点", "p": "298", "g": 298, "l": 2}, {"t": "三 多元数学必须留下可接续的作品", "p": "298", "g": 298, "l": 2}, {"t": "四 人与AI共同研究也需要共同体", "p": "299", "g": 299, "l": 2}, {"t": "五 一个保持开放的研究承诺", "p": "300", "g": 300, "l": 2}, {"t": "附录一　多元科学发生", "p": "303", "g": 303, "l": 1}, {"t": "第一节　从多元数学发生到多元科学发生", "p": "303", "g": 303, "l": 2}, {"t": "第二节　物理学：基本对象与相互作用描述的重新建构", "p": "305", "g": 305, "l": 2}, {"t": "第三节　化学：从物质描述到反应与材料的多路径发生", "p": "309", "g": 309, "l": 2}, {"t": "第四节　生物学：生命研究单元与组织层级的多元探索", "p": "312", "g": 312, "l": 2}, {"t": "第五节　跨学科碰撞：典范怎样分化、翻译与重组", "p": "315", "g": 315, "l": 2}, {"t": "第六节　人—AI多元科学实验室", "p": "318", "g": 318, "l": 2}, {"t": "第七节　科学典范多元化的未来与检验", "p": "321", "g": 321, "l": 2}, {"t": "附录二　从交通多元化到理念多元化——对库恩科学哲学的发生学超越", "p": "323", "g": 323, "l": 1}, {"t": "第一节　车的意义：活动可以脱离一种实现方式而继续扩大", "p": "323", "g": 323, "l": 2}, {"t": "第二节　理念生产不必永久依附于一种既定典范", "p": "325", "g": 325, "l": 2}, {"t": "第三节　从解释革命到组织发生：超越的准确位置", "p": "326", "g": 326, "l": 2}, {"t": "第四节　当典范本身成为可以研究和构造的对象", "p": "328", "g": 328, "l": 2}, {"t": "第五节　AI使典范猜想获得快速展开与反馈的条件", "p": "330", "g": 330, "l": 2}, {"t": "第六节　从单一研究者到复合主体：谁在发生新的理念", "p": "332", "g": 332, "l": 2}, {"t": "第七节　持续多元发生需要怎样的共同体", "p": "333", "g": 333, "l": 2}, {"t": "第八节　发生学拓展的贡献与开放检验", "p": "335", "g": 335, "l": 2}, {"t": "参考文献与资料", "p": "337", "g": 337, "l": 1}, {"t": "主题索引", "p": "347", "g": 347, "l": 1}]</script>
+
+<script>
+(function(){
+'use strict';
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var TOC = JSON.parse(document.getElementById('toc').textContent);
+var $ = function(id){ return document.getElementById(id); };
+
+var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var themes=['','day','sepia'], ti=0;
+var cache={}, textCache={}, vecOK=0, vecFail=0;
+/* —— 接入 SDE 陪读（WDS）：把当前可见页的文本与页码喂给助手；文字层可选中某句作焦点 —— */
+window.WDS_READ = {
+  title: '面对AI的冲击，数学家走向何处？',
+  bodyEl: function(){ return document.getElementById('book'); },
+  docTextFn: function(){
+    if(!doc) return '';
+    var l = spread ? (cur%2===0?cur:cur-1) : cur, ps = spread ? [l, l+1] : [cur];
+    var t = ps.filter(function(p){ return p>=1 && p<=total && textCache[p]; }).map(function(p){
+      var pr = p-CFG.offset+1; return '【第 '+(pr>0?pr:p)+' 页 / 共 '+total+' 页】\n'+textCache[p]; }).join('\n');
+    return t;
+  }
+};
+
+function msg(t, spin){ $('msgT').textContent=t; $('msg').classList.remove('hide');
+  $('msg').querySelector('.sp').style.display = spin===false?'none':''; }
+function hideMsg(){ $('msg').classList.add('hide'); }
+function hint(t){ var h=$('hint'); h.textContent=t; h.classList.add('show');
+  clearTimeout(h._t); h._t=setTimeout(function(){h.classList.remove('show');},1400); }
+
+/* ── 版心尺寸：按舞台可用空间算，双页则一半 ── */
+function box(){
+  var st=$('stage'), W=st.clientWidth-40, H=st.clientHeight-30;
+  var n = spread?2:1;
+  return {W:W, H:H, n:n};
+}
+function fit(vp){
+  var b=box();
+  var maxW=(b.W/b.n), maxH=b.H;
+  var s=Math.min(maxW/vp.width, maxH/vp.height)*zoom;
+  return s;
+}
+
+/* ── 渲染一页：优先矢量(SVG)，失败回落高清 canvas ── */
+function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
+  var leaf = canvasEl.parentNode;
+  if(pageNo<1||pageNo>total){ leaf.style.visibility='hidden'; if(tlEl) tlEl.innerHTML=''; cb&&cb(); return; }
+  leaf.style.visibility='visible';
+  doc.getPage(pageNo).then(function(pg){
+    var vp0=pg.getViewport({scale:1});
+    var sc=fit(vp0), vp=pg.getViewport({scale:sc});
+    leaf.style.width=Math.round(vp.width)+'px';
+    leaf.style.height=Math.round(vp.height)+'px';
+    if(vector && svgEl && window.pdfjsLib && pdfjsLib.SVGGraphics){
+      leaf.classList.add('vec');
+      pg.getOperatorList().then(function(ops){
+        var g=new pdfjsLib.SVGGraphics(pg.commonObjs, pg.objs);
+        g.embedFonts=true;
+        return g.getSVG(ops, vp);
+      }).then(function(svg){
+        vecOK++;
+        svg.setAttribute('width', Math.round(vp.width));
+        svg.setAttribute('height', Math.round(vp.height));
+        svgEl.innerHTML=''; svgEl.appendChild(svg);
+        if(tlEl) buildText(pg, vp, tlEl);
+        cb&&cb();
+      }).catch(function(){
+        /* 逐页回退：这一页含矢量后端不支持的内容（多为位图封面、插图），只这一页用高清位图；
+           其余页照旧矢量。连续失败过多才整本切到位图。 */
+        vecFail++;
+        if(vecFail>=6 && vecFail>vecOK){
+          vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
+          hint('此文档的矢量渲染不可用，已切回高清位图');
+        }
+        leaf.classList.remove('vec');
+        drawCanvas(pg, vp, canvasEl, tlEl, cb);
+      });
+    }else{
+      leaf.classList.remove('vec');
+      drawCanvas(pg, vp, canvasEl, tlEl, cb);
+    }
+  }).catch(function(){ cb&&cb(); });
+}
+
+function drawCanvas(pg, vp, canvasEl, tlEl, cb){
+  var dpr=Math.min(window.devicePixelRatio||1, 3);
+  canvasEl.width=Math.round(vp.width*dpr); canvasEl.height=Math.round(vp.height*dpr);
+  canvasEl.style.width=Math.round(vp.width)+'px'; canvasEl.style.height=Math.round(vp.height)+'px';
+  var ctx=canvasEl.getContext('2d',{alpha:false});
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#FBF7EE'; ctx.fillRect(0,0,vp.width,vp.height);
+  pg.render({canvasContext:ctx, viewport:vp, intent:'display'}).promise.then(function(){
+    if(tlEl) buildText(pg, vp, tlEl);
+    cb&&cb();
+  }).catch(function(){ cb&&cb(); });
+}
+
+function buildText(pg, vp, el){
+  el.innerHTML='';
+  pg.getTextContent().then(function(tc){
+    try{ textCache[pg.pageNumber]=tc.items.map(function(x){return x.str;}).join(''); }catch(e){}
+    var frag=document.createDocumentFragment();
+    tc.items.forEach(function(it){
+      if(!it.str) return;
+      var tx=pdfjsLib.Util.transform(vp.transform, it.transform);
+      var s=document.createElement('span');
+      s.textContent=it.str;
+      var h=Math.hypot(tx[2],tx[3]);
+      s.style.left=tx[4]+'px'; s.style.top=(tx[5]-h)+'px';
+      s.style.fontSize=h+'px'; s.style.fontFamily='sans-serif';
+      frag.appendChild(s);
+    });
+    el.appendChild(frag);
+  }).catch(function(){});
+}
+
+/* ── 展示当前跨页 ── */
+function show(cb){
+  if(rendering){ return; }
+  rendering=true;
+  document.getElementById('book').classList.toggle('single', !spread);
+  $('leafR').style.display = spread?'':'none';
+  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  if(left<1) left=0;
+  var right= left+1;
+  var done=0, need=spread?2:1;
+  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
+  if(spread){
+    $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
+    $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
+    renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
+    renderInto(right, $('cR'), $('tR'), fin, $('sR'));
+  }else{
+    $('nL').textContent = cur-CFG.offset+1>0?(cur-CFG.offset+1):'';
+    renderInto(cur, $('cL'), $('tL'), fin, $('sL'));
+  }
+}
+
+function sync(){
+  var printed = Math.max(1, cur-CFG.offset+1);
+  $('pi').value = printed;
+  $('pt').textContent = Math.max(1,total-CFG.offset+1);
+  var r = (cur-1)/Math.max(1,total-1);
+  $('fill').style.width=(r*100)+'%';
+  $('knob').style.left=(r*100)+'%';
+  try{ localStorage.setItem(CFG.key, String(cur)); }catch(e){}
+  Array.prototype.forEach.call($('thumbs').children, function(c){
+    c.classList.toggle('cur', +c.dataset.p===cur);
+  });
+}
+
+/* ── 翻页（带动画） ── */
+function step(dir){
+  var n = spread?2:1;
+  var t = cur + dir*n;
+  if(t<1) t=1; if(t>total) t=total;
+  if(t===cur) return;
+  animate(dir, function(){ cur=t; show(); });
+}
+function animate(dir, after){
+  var src = dir>0 ? $('leafR') : $('leafL');
+  if(!spread || !src || src.style.display==='none'){ after(); return; }
+  var fl=document.createElement('div');
+  fl.className='flip'+(dir>0?'':' back');
+  var w=src.offsetWidth, h=src.offsetHeight;
+  fl.style.width=w+'px'; fl.style.height=h+'px';
+  fl.style.left = dir>0 ? (w+'px') : '0px';
+  var live = src.classList.contains('vec') ? src.querySelector('.svg svg') : src.querySelector('canvas');
+  if(live){
+    var cl = live.cloneNode(true);
+    cl.style.width='100%'; cl.style.height='100%'; cl.style.display='block';
+    fl.appendChild(cl);
+  }
+  $('book').appendChild(fl);
+  requestAnimationFrame(function(){ fl.classList.add('go'); });
+  setTimeout(function(){ fl.remove(); after(); }, 620);
+}
+function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+
+/* ── 目录 ── */
+/* 目录兜底：TOC 为空时从 PDF 书签生成（新迁入的书多半没有手工目录） */
+function outlineToc(d){
+  return d.getOutline().then(function(ol){
+    var out=[]; if(!ol||!ol.length) return out;
+    function walk(items,l){
+      return items.reduce(function(p,it){
+        return p.then(function(){
+          var ds=it.dest;
+          return (typeof ds==='string'? d.getDestination(ds) : Promise.resolve(ds))
+            .then(function(x){ return x ? d.getPageIndex(x[0]) : null; })
+            .then(function(ix){
+              if(ix!=null){ var g=ix+1, pr=g-CFG.offset+1; out.push({t:it.title, p:pr>0?String(pr):'', g:g, l:l===1?1:2}); }
+              if(it.items && it.items.length && l<2) return walk(it.items,l+1);
+            }).catch(function(){});
+        });
+      }, Promise.resolve());
+    }
+    return walk(ol,1).then(function(){ return out; });
+  }).catch(function(){ return []; });
+}
+function buildToc(){
+  var box=$('dlist'); box.innerHTML='';
+  TOC.forEach(function(e){
+    var a=document.createElement('a');
+    a.className = e.l===1?'l1':'l2';
+    a.href='#'; a.innerHTML='<span>'+e.t.replace(/</g,'&lt;')+'</span><span class="n">'+e.p+'</span>';
+    a.onclick=function(ev){ ev.preventDefault(); go(e.g ? e.g : (+e.p)+CFG.offset-1); closeDrawer(); };
+    box.appendChild(a);
+  });
+}
+function closeDrawer(){ $('drawer').classList.remove('open'); }
+
+/* ── 全书检索 ── */
+function search(q){
+  if(!q){ $('dHead').textContent='目　录'; buildToc(); return; }
+  var box=$('dlist'); box.innerHTML=''; $('dHead').textContent='检索：'+q;
+  var found=0, scanned=0;
+  msg('正在检索全书…');
+  function scan(i){
+    if(i>total || found>=120){ hideMsg(); if(!found){ box.innerHTML='<div class="hit">没有找到。</div>'; } return; }
+    var pr = textCache[i] ? Promise.resolve(textCache[i])
+      : doc.getPage(i).then(function(p){ return p.getTextContent(); })
+          .then(function(tc){ var s=tc.items.map(function(x){return x.str;}).join(''); textCache[i]=s; return s; });
+    pr.then(function(s){
+      var k=s.indexOf(q);
+      if(k>=0){
+        found++;
+        var d=document.createElement('div'); d.className='hit';
+        var a=Math.max(0,k-16), b=Math.min(s.length,k+q.length+22);
+        d.innerHTML='<b>'+(i-CFG.offset+1)+'</b>　'+s.slice(a,k).replace(/</g,'&lt;')+
+          '<b>'+q.replace(/</g,'&lt;')+'</b>'+s.slice(k+q.length,b).replace(/</g,'&lt;');
+        d.onclick=function(){ go(i); closeDrawer(); };
+        box.appendChild(d);
+      }
+      scanned++;
+      if(scanned%12===0){ $('msgT').textContent='正在检索全书…  '+Math.round(i/total*100)+'%'; }
+      scan(i+1);
+    }).catch(function(){ scan(i+1); });
+  }
+  scan(1);
+}
+
+/* ── 缩略图 ── */
+var thumbsBuilt=false;
+function buildThumbs(){
+  if(thumbsBuilt) return; thumbsBuilt=true;
+  var wrap=$('thumbs');
+  var i=1;
+  function one(){
+    if(i>total) return;
+    var p=i;
+    doc.getPage(p).then(function(pg){
+      var vp=pg.getViewport({scale:1});
+      var s=150/vp.height, v=pg.getViewport({scale:s});
+      var c=document.createElement('canvas');
+      c.width=v.width; c.height=v.height; c.dataset.p=p;
+      c.onclick=function(){ go(p); };
+      wrap.appendChild(c);
+      return pg.render({canvasContext:c.getContext('2d'), viewport:v}).promise;
+    }).then(function(){ i++; setTimeout(one, 0); }).catch(function(){ i++; setTimeout(one,0); });
+  }
+  one();
+}
+
+/* ── 事件 ── */
+$('btnPrev').onclick=function(){ step(-1); };
+$('btnNext').onclick=function(){ step(1); };
+$('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
+$('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
+$('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);
+  this.textContent=vector?'矢量':'位图'; hint(vector?'矢量源渲染':'高清位图'); show(); };
+$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'%'); };
+$('btnZoomOut').onclick=function(){ zoom=Math.max(.5, zoom/1.15); show(); hint('缩小 '+Math.round(zoom*100)+'%'); };
+$('btnThumbs').onclick=function(){ $('thumbs').classList.toggle('open'); if($('thumbs').classList.contains('open')) buildThumbs(); };
+$('btnTheme').onclick=function(){ ti=(ti+1)%3; document.documentElement.className=themes[ti];
+  this.textContent=['夜','日','纸'][ti]; show(); };
+$('btnFull').onclick=function(){ if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); };
+$('q').onkeydown=function(e){ if(e.key==='Enter'){ search(this.value.trim()); } };
+$('rail').onclick=function(e){ var r=this.getBoundingClientRect();
+  go(Math.round((e.clientX-r.left)/r.width*(total-1))+1); };
+
+document.addEventListener('keydown',function(e){
+  if(/input|textarea|select/i.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){ step(-1); e.preventDefault(); }
+  else if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ step(1); e.preventDefault(); }
+  else if(e.key==='Home'){ go(1); } else if(e.key==='End'){ go(total); }
+  else if(e.key==='t'||e.key==='T'){ $('btnToc').click(); }
+  else if(e.key==='d'||e.key==='D'){ $('btnSpread').click(); }
+  else if(e.key==='v'||e.key==='V'){ $('btnVec').click(); }
+  else if(e.key==='n'||e.key==='N'){ $('btnTheme').click(); }
+  else if(e.key==='f'||e.key==='F'){ $('btnFull').click(); }
+});
+var sx=0, sy=0;
+$('stage').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+$('stage').addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.4){ step(dx<0?1:-1); }
+},{passive:true});
+var rt=null;
+window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ show(); },160); });
+
+/* ── 启动 ── */
+function boot(){
+  if(!window.pdfjsLib){ setTimeout(boot,120); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  $('btnVec').classList.add('on');
+  msg('正在载入《面对AI的冲击，数学家走向何处？》…');
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise.then(function(d){
+    doc=d; total=d.numPages;
+    buildToc();
+    if(!TOC.length){ outlineToc(d).then(function(t){ if(t.length){ TOC=t; buildToc(); } }); }
+    var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
+    var target=parseInt((location.hash.match(/p=(\d+)/)||[])[1]||'0',10); cur = target>0&&target<=total ? target : ((saved>0&&saved<=total) ? saved : 1); window.addEventListener('hashchange',function(){var p=parseInt((location.hash.match(/p=(\d+)/)||[])[1]||'0',10);if(p>0&&p<=total)go(p);});
+    if(window.innerWidth<820) spread=false, $('btnSpread').textContent='单页';
+    show(function(){ if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
+  }).catch(function(err){
+    msg('书页载入失败。可直接打开原文 PDF：'+CFG.pdf, false);
+  });
+}
+boot();
+})();
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20261010a" defer></script>
+</body>
+</html>
+
