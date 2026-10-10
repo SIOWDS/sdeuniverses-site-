@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>若思 · 与《What If？》一起探索 | 德麦国际</title>
+<meta name="description" content="从三类What If进入D2六步与九步。检索《What If？》完整原文，带着条件、反例与核验，与AI一起探索教育、健康和事业。">
+<meta name="sde-page-kind" content="tool"><meta name="book-agent" content="若思"><meta name="book_id" content="what-if">
+<link rel="canonical" href="https://sdeuniverses.com/books/what-if/agent/">
+<meta property="og:title" content="若思 · 《What If？》的探索伙伴"><meta property="og:image" content="https://sdeuniverses.com/books/what-if/cover.png">
+<link rel="stylesheet" href="/books/agent/app.css?v=20261003d"><link rel="stylesheet" href="./style.css?v=20261010">
+</head><body>
+<div class="loading" id="loading" role="status"><div>若思正在打开本书原文…</div><div id="ldmsg"></div></div>
+<div class="app" id="app" hidden>
+<aside class="side">
+<div class="crumb"><a href="/browse/">SDE Universes</a> · <a href="/books/">专著书架</a> · <a href="/books/what-if/">本书详情</a></div>
+<div class="bk"><img src="/books/what-if/cover.png" alt="《What If？》封面"><div><h1>What If？</h1><div class="sub">和 AI 一起进入思想探索与乐趣升级<br>王德生 著</div></div></div>
+<div class="brand"><b>若思</b><small>与AI一起，让如果开始发生</small></div>
+<p class="tag">从一件在意的小事出发。让猜想有条件，让推理能受检验，让下一步仍值得探索。</p>
+<div class="read" id="readInfo"></div>
+<div class="sec-t">选 一 个 阅 读 入 口</div>
+<label class="sr-only" for="chapter">章节范围</label><select id="chapter"><option value="">全书检索 · 自动找相关片段</option></select>
+<div class="chapter-note" id="chapterNote"></div>
+<a class="chapter-link" id="chapterLink" href="/books/what-if/chapters.html">打开全书目录 ↗</a>
+<div class="sec-t">从 这 一 问 开 始</div><div class="chapter-questions" id="questions"></div>
+<details class="mode-details"><summary>三类 What If 与D2</summary><div class="gates" id="gates"></div></details>
+<div class="outs"><button class="out ghost" type="button" id="exportBtn">保存本场探索记录</button></div>
+<p class="small">原文检索与阅读不需密钥。AI对话需要配置你自己的模型API Key（DeepSeek或智谱），由所选服务按你的账户计费。Key保存在当前浏览器，请求经本站接口转发给所选模型服务。<br><button id="keyBtn" type="button">配置自己的模型</button> · <button id="clearBtn" type="button">清空本场对话</button><br><a href="/books/agent/">全部书籍智能体 ›</a></p>
+</aside>
+<main class="main">
+<div class="top"><div class="now" id="now">若思 · 从一句如果开始</div><a class="tbtn" href="/books/what-if/text/" target="_blank" rel="noopener">打开原书</a></div>
+<div class="msgs" id="msgs"><div class="col" id="col">
+<section class="hello"><h2>你的下一句 What If？</h2><p>改变做法，会显露什么？新的发现，会怎样改变后续？继续这样探索，又会形成怎样的关系与能力？</p><p>先写一件具体的小事。你可以只查原文，也可以配置自己的模型后，和若思一起走一轮猜想、推理与核验。</p><div class="starts" id="starts"></div><p class="scope-note">本页可检索全书。每轮只向模型提供下方列出的原文范围与编辑摘要；AI回答仍需核对。书中生活故事主要是分析设例。</p></section>
+</div></div>
+<div class="dock"><div class="col">
+<div class="gbar" id="gbar" role="group" aria-label="本次探索入口"></div>
+<div class="inrow"><textarea id="q" aria-label="问题或原文检索词" rows="2" maxlength="3300" placeholder="如果我改变……，可能会怎样？"></textarea><button class="send" id="searchBtn" type="button">查原文</button><button class="send" id="send" type="button">与若思讨论</button></div>
+<div class="hint" id="hint" role="status">查原文不调用模型。Enter发送，Shift+Enter换行。</div>
+</div></div></main></div>
+<dialog id="keyDialog" class="key-dialog" aria-labelledby="keyTitle"><form method="dialog"><div class="hd"><h2 id="keyTitle">配置自己的模型</h2><button class="tbtn" value="cancel" aria-label="关闭配置">关闭</button></div>
+<p>对话经本站接口转发给你选择的模型服务，费用按该服务账户计算。请使用你自己的API Key；它会保存在当前浏览器。不要在公用设备上保存。</p>
+<label for="vendor">模型服务</label><select id="vendor"><option value="ds">DeepSeek</option><option value="glm">智谱</option></select>
+<label for="apiKey">API Key</label><input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="输入自己的API Key">
+<p id="keyStatus" class="small" role="status"></p><div class="key-actions"><button type="button" id="saveKey" class="send">保存设置</button><button type="button" id="forgetKey" class="tbtn">移除已保存的Key</button></div></form></dialog>
+<script defer src="./context.js?v=20261010"></script><script defer src="./app.js?v=20261010"></script></body></html>
