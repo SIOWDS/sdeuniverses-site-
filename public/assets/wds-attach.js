@@ -20,7 +20,7 @@
     mammoth: "https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js",
     tesseract: "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js",
   };
-  var MAX_CHARS = 200000;     // 单篇文字上限 20 万字（后端仍按每轮预算取段，这里只是别把浏览器撑爆）
+  var MAX_CHARS = 400000;     // 单篇文字上限 40 万字（2026-10-10 王德生令由 20 万提到 40 万：20 万汉字的专著连标点约 22 万字符，原上限会截掉书尾；与后端「全篇全带」上限 DOC_CAP 400000 一致。后端仍按每轮预算取段）
   var MAX_BYTES = 100 * 1024 * 1024;  // 单个文件上限 100 MB——再大浏览器读不动，早退比卡死好
   var OCR_MAX_PAGES = 20;     // 扫描件兜底只 OCR 前若干页——再多读者早不耐烦了
   var loaded = {};
