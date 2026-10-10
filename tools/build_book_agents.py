@@ -62,6 +62,9 @@ for b in books:
     d = os.path.join(PUB, "books", "m", str(n), "agent")
     os.makedirs(d, exist_ok=True)
     agent_path = os.path.join(d, "index.html")
+    if n == 265 and os.path.exists(agent_path) and '<meta name="sde-dedicated-agent" content="m265-unit-v1">' in io.open(agent_path, encoding="utf-8").read():
+        made += 1
+        continue  # preserve volume 265's 42-unit source loader and evidence contract
     if n == 271 and os.path.exists(agent_path) and '<meta name="sde-dedicated-agent" content="m271-unit-v1">' in io.open(agent_path, encoding="utf-8").read():
         made += 1
         continue  # preserve this edition's 51-unit source loader; the directory still lists book 271
