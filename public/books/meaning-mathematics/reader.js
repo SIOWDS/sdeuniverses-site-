@@ -1,0 +1,16 @@
+(function(){'use strict';
+const root=document.documentElement,units=[...document.querySelectorAll('.paper[data-unit]')],paged=document.body.dataset.mode==='paged',key='meaning-mathematics-v1';let active=0;
+function get(k){try{return localStorage.getItem(key+k)}catch(e){return null}}function set(k,v){try{localStorage.setItem(key+k,v)}catch(e){}}
+root.classList.add('enhanced');
+const toc=[...document.querySelectorAll('.toc a')],progress=document.getElementById('reader-position');
+function indexFor(id){return units.findIndex(u=>u.id===id||[...u.querySelectorAll('[id]')].some(x=>x.id===id))}
+function activate(i,scroll,id){if(!units.length)return;active=Math.max(0,Math.min(units.length-1,i));units.forEach((u,n)=>{if(paged)u.hidden=n!==active});if(progress)progress.textContent=(active+1)+' / '+units.length+' · '+units[active].dataset.title;document.querySelectorAll('[data-direction]').forEach(b=>b.disabled=Number(b.dataset.direction)<0?active===0:active===units.length-1);toc.forEach(a=>a.setAttribute('aria-current',String(a.hash==='#'+(id||units[active].id))));set('-position',id||units[active].id);if(scroll){const el=document.getElementById(id)||units[active];el.scrollIntoView({block:'start'});}}
+function hash(){let id;try{id=decodeURIComponent(location.hash.slice(1))}catch(e){id=''}const ix=indexFor(id);if(ix>=0)activate(ix,true,id)}
+if(units.length){const id=location.hash.slice(1)||(paged?get('-position'):null),i=indexFor(id);activate(i>=0?i:0,false,id);if(location.hash)hash();window.addEventListener('hashchange',hash);}
+document.querySelectorAll('[data-direction]').forEach(b=>b.addEventListener('click',()=>{const i=Math.max(0,Math.min(units.length-1,active+Number(b.dataset.direction)));location.hash=units[i].id}));
+if(paged)document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey||/INPUT|SELECT|TEXTAREA|BUTTON/.test(e.target.tagName))return;const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(d&&active+d>=0&&active+d<units.length){location.hash=units[active+d].id;e.preventDefault()}});
+let size=Math.max(16,Math.min(28,Number(get('-font'))||19));function font(){root.style.setProperty('--text-size',size+'px');set('-font',String(size))}font();document.querySelectorAll('[data-font]').forEach(b=>b.addEventListener('click',()=>{size=Math.max(16,Math.min(28,size+Number(b.dataset.font)));font()}));
+const theme=document.getElementById('theme');if(get('-theme')==='day')root.classList.add('day');function themeLabel(){if(theme){theme.textContent=root.classList.contains('day')?'切换夜间':'切换日间';theme.setAttribute('aria-pressed',String(root.classList.contains('day')))}}themeLabel();if(theme)theme.addEventListener('click',()=>{root.classList.toggle('day');set('-theme',root.classList.contains('day')?'day':'night');themeLabel()});
+const search=document.getElementById('toc-search'),none=document.getElementById('no-results');if(search)search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();let count=0;toc.forEach(a=>{a.hidden=!!q&&!a.textContent.toLowerCase().includes(q);if(!a.hidden)count++});if(none)none.hidden=count!==0});
+document.querySelectorAll('[data-print]').forEach(b=>b.addEventListener('click',()=>window.print()));
+})();
