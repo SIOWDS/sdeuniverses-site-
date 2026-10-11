@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>教材AIGC化 · 把一本教材变成 AIGC 赋能版 | SDE Universes</title>
+<meta name="description" content="ChatSDE 的教材 AIGC 化智能体：输入一本现有教材，输出一本 AIGC 赋能版新教材。总原则是两个三合一——老师·AI·教材、学生·AI·教材——再让两者互动：老师侧下发，学生侧回流，汇入教材下一版。原文一字不改，增补稿接在每个单元之后。">
+<link rel="canonical" href="https://sdeuniverses.com/taste/textbook/">
+<style>
+:root{--gold:#C9A84C;--gold2:#E4CB7E;--ink:#F0E9D8;--ink2:#B8AE96;--mute:#8A8170;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.85}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .w{max-width:880px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
+.hero{max-width:760px;margin:0 auto;padding:56px 24px 6px;text-align:center}
+.eyebrow{font-size:11px;letter-spacing:0.42em;color:var(--gold);margin-bottom:16px}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;line-height:1.25;margin-bottom:16px;color:#F5EFE0}
+.lead{font-size:15.5px;color:var(--ink2);max-width:620px;margin:0 auto}
+.go{display:inline-block;margin-top:26px;background:var(--gold);color:#1A1410;border-radius:10px;font-size:16px;font-weight:700;letter-spacing:0.05em;padding:13px 28px;text-decoration:none}
+.go.ghost{background:transparent;color:var(--gold);border:1px solid rgba(201,168,76,0.55);margin-left:10px}
+.wrap{max-width:880px;margin:0 auto;padding:10px 24px 90px}
+.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:26px 24px;margin-top:24px}
+.card h2{font-size:18px;color:var(--gold);letter-spacing:0.06em;margin-bottom:12px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.step{border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.step b{display:block;color:var(--gold2);font-size:15px;margin-bottom:4px}
+.step p{font-size:13.5px;color:var(--ink2)}
+ol.how{padding-left:1.4em;font-size:14.5px}
+ol.how li{margin:8px 0}
+ul.dots{padding-left:1.2em;font-size:14px;color:var(--ink2)}
+ul.dots li{margin:6px 0}
+.note{font-size:13px;color:var(--mute);margin-top:14px;line-height:1.85}
+code{font-family:inherit;color:var(--gold2)}
+footer{text-align:center;font-size:12.5px;color:var(--mute);padding:30px 24px 50px;border-top:1px solid var(--line)}
+footer a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><div class="w"><a href="/taste/">← 品尝系列</a><a href="/taste/chatsde/">✦ ChatSDE</a></div></nav>
+
+<header class="hero">
+  <div class="eyebrow">CHATSDE · 教材AIGC化</div>
+  <h1>让教材、老师、学生、AI，互相发生</h1>
+  <p class="lead">给教材加 AI，最容易做成每章后面贴几个提示词。可那样的教材，老师照旧只是传话的人，学生照旧只是读书的人，AI 只是旁边一个替人交作业的工具。教材 AIGC 化做的是另一件事：把一本现有教材改成两个三合一——老师·AI·教材，学生·AI·教材——再让它们互动起来：老师侧下发任务和评价标准，学生侧回流作品和 AI 使用记录，汇进教材的下一版。输入一本教材，输出一本 AIGC 赋能版新教材。</p>
+  <a class="go" href="/taste/chatsde/?mode=tb">开始教材 AIGC 化 →</a><a class="go ghost" href="#how">怎么用</a>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h2>总原则：两个三合一，再让它们互动</h2>
+    <div class="steps">
+      <div class="step"><b>老师 · AI · 教材</b><p>公共教材是“我们的知识”。老师借 AI 把它变成“我的课”：备课、把案例换成本地行业的、习题出变式、评价量表按班情调整、课堂上随时应变。AI 起草，老师核对并拍板。</p></div>
+      <div class="step"><b>学生 · AI · 教材</b><p>学生读同一本书，AI 在场陪练、追问、对照、反馈，帮学生长出“我的理解”。规则只有一条：先自己做，再让 AI 对照；AI 不替学生下结论。</p></div>
+      <div class="step"><b>两者互动：下发与回流</b><p>老师侧的任务、案例、评价标准下发给学生侧；学生侧的作品、提问、错误和 AI 使用记录回流到老师侧，成为课堂诊断的依据，再汇总成教材下一版的增补。没有回流，就不算三合一。</p></div>
+    </div>
+    <p class="note">AI 在每一个环节只做三件事：产生（发散出候选）、分析（拆解、聚类、比对、查漏）、设计（把选中的东西做成可看可用的形态）。同理心、现场观察、价值判断、最后拍板，不外包。</p>
+  </section>
+
+  <section class="card">
+    <h2>教材分两层，原文一字不改</h2>
+    <div class="steps">
+      <div class="step"><b>锁定层</b><p>概念定义、史实人物、承重判断。AI 不许改，只能提示“待核”。想动锁定层，必须走人工审批。</p></div>
+      <div class="step"><b>发生层</b><p>案例、任务、提示词、习题变式、实训。AI 可以在这里生长，教师和学生也能在这里写下自己的版本。</p></div>
+    </div>
+    <p class="note">做法上，原文由系统原样接入新教材，模型只写“增补稿”，接在每个单元之后。锁定层靠这样的构造保住，而不是靠提示语求模型别乱动。</p>
+  </section>
+
+  <section class="card">
+    <h2>六步，一键走完</h2>
+    <div class="steps">
+      <div class="step"><b>① 教材体检</b><p>这本书是什么；现有结构；锁定层（L）、发生层（G）；AIGC 切入点（A）：哪一单元、AI 做产生／分析／设计中的哪件事、服务教师还是学生、人必须核什么；不该交给 AI 的地方（N）；风险与合规点（R）。</p></div>
+      <div class="step"><b>② 方案</b><p>一句主线（“AI 在这本书里不是……而是……”）；教师侧和学生侧各自的三合一设计；下发与回流怎么走；全书统一的栏目；逐单元方案（哪些增补、哪些保留）。</p></div>
+      <div class="step"><b>③ 新增篇章与附录</b><p>前言增补《AIGC 赋能版说明》；综合项目章（演示两个三合一完整走一轮）；附录：提示词库、AI 使用声明与记录模板、回流规范、教师侧智能体配置、学生侧智能体配置。</p></div>
+      <div class="step"><b>④ 逐单元增补</b><p>每个单元接一份增补稿，栏目统一：AIGC 工作台（教师版、学生版，各带可粘贴的提示词卡）、人机对照、AI 使用记录、风险提示与复核清单、回流；有实训的另加“实训的 AIGC 版”。每批 3 个单元，也可一键跑完全部。</p></div>
+      <div class="step"><b>⑤ 自检</b><p>用代码逐项核对，不问模型：每个单元有没有教师版、学生版、回流栏；提示词卡够不够；出现了几处“待核”；有没有混进学派术语或具体产品名；原文有没有被动过。</p></div>
+      <div class="step"><b>⑥ 导出</b><p>三份 Word：完整 AIGC 版（原文＋增补＋新增章与附录＋逐单元回流清单）、增补稿（给手里有原版排版文件的编辑，按锚点插入）、全过程（体检、方案、自检）。</p></div>
+    </div>
+  </section>
+
+  <section class="card" id="how">
+    <h2>怎么用</h2>
+    <ol class="how">
+      <li>点“开始教材 AIGC 化”进入 ChatSDE，模式条上的 <code>📘 教材AIGC化</code> 已经点亮。第一次用要先在设置里选基底、填你自己的 API Key。</li>
+      <li>用输入框下的 <code>📎 附件</code> 载入教材：Word、PDF、文本都可以，在你自己的浏览器里解析。</li>
+      <li>在输入框里写 <code>书名：设计思维与创意</code>（新书名会自动补上“（AIGC 赋能版）”）；也可以贴出版社要求；都没有就留空，直接发送。</li>
+      <li>走完体检、方案与新增篇章后，第一批单元会自动开始。点 <code>▶ 自动跑完全部单元</code> 可以一口气写完，也可以一批批点“接着写”。</li>
+      <li>随时可下载三份 Word。没写到的单元，在完整版里只保留原文。</li>
+    </ol>
+    <p class="note">小技巧：在 ChatSDE 侧栏新建一个“项目”，把课程名称、读者对象、学校或出版社的体例要求写进项目的常驻说明，每一步都会带上。</p>
+  </section>
+
+  <section class="card">
+    <h2>用之前要知道</h2>
+    <ul class="dots">
+      <li><b>一人一把 Key。</b>限流按 Key 计，多人共用一把会被卡住。一本十几万字的教材要几十次模型调用，预计要一小时上下，视基底速度而定，中途可停，下次接着写。</li>
+      <li><b>单份教材最多约 40 万字</b>（含标点）。教材自动切成单元，认“第 N 章”“第 N 节”等标题；目录、封面残片、方案里标“保留”的单元不调用模型。</li>
+      <li><b>手里有 Word 源文件，就用 Word 源文件。</b>PDF 载入的是抽出来的文字，版式、图片和表格都不会带进新教材；完整版适合通读审稿，正式排版请用“增补稿 Word”按锚点插进原版文件。</li>
+      <li><b>增补稿由模型起草，须人工核对。</b>书名、引文、数据、人名、工具名、合规条文，交出版社前请逐条核对；提示词卡不写具体产品名，只写工具类别。</li>
+      <li><b>两个智能体配置是初稿。</b>教师侧、学生侧智能体配置（附录 D、E）要在真实课堂里试跑、修订后才能定稿。</li>
+      <li><b>署名与授权。</b>改编他人教材前请先取得原作者和出版社的同意，署名方式在前言中如实写明；出版社要求声明 AI 参与的，如实说明用过的工具与改动范围。</li>
+    </ul>
+  </section>
+</main>
+
+<footer>SDE Universes · 德麦国际　·　<a href="/taste/chatsde/?mode=tb">进入教材AIGC化</a>　·　<a href="/taste/">品尝系列</a></footer>
+</body></html>

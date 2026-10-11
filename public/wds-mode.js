@@ -1789,6 +1789,30 @@
       msLetT: "【篇幅】约 2000 字。\n\n【任务 · 重生对照表、编辑意见对照表与修改说明信】下面是重生清单、编辑意见清单、全书主心骨、已修改各单元的修改说明、尚未修改的单元、改前改后的评分。请写三部分：\n一、重生对照表：Markdown 表格，列为「编号 ｜ 发现原句（压缩到一句）｜ 重生后的写法（一句话说它现在怎么来的）｜ 改在哪里（单元）｜ 处理（已重生／部分／未改）」；重生清单每条一行，没改到的写「下一批处理」或缺什么材料。\n二、编辑意见对照表：Markdown 表格，列为「编号 ｜ 意见 ｜ 处理（已改／部分改／未改）｜ 改在哪里（单元）｜ 说明」；每条意见都要有一行，没覆盖到的标「未改」并写理由或「下一批处理」。\n三、修改说明信：致责任编辑，约 900 字，函件体——开头一句说明本次交回的是哪几个单元；用平常话说清这一轮修改的主线：书里几处关键结论不再直接宣布，而是写出它们是怎么来的（举一处最有说服力的前后对比）；再逐条说改了哪几条意见、哪条没改为什么；最后写下一步与交稿时间（日期写〔待填〕）。不要虚构已经发生的沟通，不用学派术语。\n\n",
       msDone: "【已改单元的修改说明】\n", msLeft: "【尚未修改的单元】", msScore: "【评分变化】\n",
       msDelta: "逐维对比（本批改前 → 改后）",
+      /* 教材AIGC化（2026-10-11 王德生令「现在打造AIGC化的智能体，也放在ChatSDE上，输入的是一个教材，输出的是一个AIGC化的新教材」）。见 sendTb 头注释。 */
+      tbBtn: "📘 教材AIGC化", tbOn: "📘 教材AIGC化：开",
+      tbTip: "输入一本现有教材（先用 📎 载入 Word／PDF／文本），输出一本 AIGC 赋能版新教材。总原则是两个三合一：老师·AI·教材、学生·AI·教材，再让两者互动——老师侧下发任务与评价标准，学生侧回流作品与 AI 使用记录，汇入教材的下一版。AI 在每一环只做三件事：产生、分析、设计。教材分两层：锁定层（概念、史实、承重判断，AI 不许改）与发生层（案例、任务、提示词、习题、实训，AI 可生长）。输入框里写「书名：……」可指定新书名，也可贴出版要求（没有就留空）。一键走：①体检 ②方案 ③新增篇章与附录 ④逐单元增补（每批 3 个，可点「自动跑完全部」）⑤自检 ⑥导出完整 AIGC 版 Word。原文一字不改，增补稿接在每个单元之后。",
+      tbNeed: "先用 📎 载入教材，再在输入框写「书名：……」或贴出版要求（可留空），然后发送。",
+      tbS1: "第一步 · 教材体检（结构 · 锁定层 · 发生层 · AIGC 切入点 · 不该交给 AI 的地方 · 风险）",
+      tbS2: "第二步 · 方案（主线 · 教师侧三合一 · 学生侧三合一 · 互动与回流 · 统一栏目 · 逐单元方案）",
+      tbS3: "第三步 · 新增篇章与附录（前言增补 · 综合项目章 · 提示词库 · 记录模板 · 回流规范 · 两个智能体配置）",
+      tbS4: "第四步 · 逐单元增补（第 {a}–{b} 单元，共 {n} 单元）",
+      tbS5: "第五步 · 自检（覆盖 · 师生两侧是否齐 · 回流 · 待核与待补 · 术语与产品名）",
+      tbUnitRun: "正在写第 {i} 单元的增补稿…", tbNoteH: "【本单元增补说明】", tbSkip: "（本单元不增补）",
+      tbWordFull: "⤓ 完整 AIGC 版 Word", tbWordAdd: "⤓ 增补稿 Word", tbWordAll: "⤓ 全过程 Word", tbAuto: "▶ 自动跑完全部单元",
+      tbNext: "↻ 接着写下一批（第 {a}–{b} 单元）", tbAllDone: "全部单元已增补。",
+      tbDocT: "AIGC 化 · 全过程", tbAddT: "增补稿", tbSuffix: "（AIGC 赋能版）",
+      tbFair: "说明：原文一字未改，AIGC 增补稿接在各单元之后；增补稿由模型起草，书名、引文、数据、人名、工具名与合规条文请人工逐条核对，交出版社时如实声明 AI 辅助的范围。教师侧、学生侧智能体配置须在真实课堂试跑后定稿。",
+      tbNoDemand: "（未提供出版要求：请按职业本科教材的一般标准处理。）",
+      tbRule: "【总原则 · 教材的 AIGC 赋能：两个三合一】\n这本教材要改成 AIGC 赋能版。不是在每章后面贴几个「AI 提示词」，而是让教材、AI、人三者互相发生。要做成两个三合一，再让它们互动：\n·老师—AI—教材：公共教材是「我们的知识」，老师借 AI 把它变成「我的课」——备课、案例换成本地行业的、习题换变式、评价量表按班情调整、课堂上随时应变。\n·学生—AI—教材：学生读同一本书，AI 在场陪练、追问、对照、反馈，让学生长出「我的理解」；AI 不替学生下结论，学生先自己做，再让 AI 对照。\n·两者互动：老师侧的任务、案例、评价标准下发给学生侧；学生侧的作品、提问、错误和 AI 使用记录回流到老师侧，成为课堂诊断的依据，并汇总为教材下一版的增补依据。没有回流，就不算三合一。\nAI 在每一个环节只做三种事：产生（发散出候选）、分析（拆解、聚类、比对、查漏）、设计（把选中的东西做成可看可用的形态）。\n教材分两层：锁定层（概念定义、史实、承重判断——AI 不得改动，只能提示待核）与发生层（案例、任务、提示词、习题变式、实训——AI 可以在这里生长）。\n铁律：责任在人。同理心、现场观察、价值判断不外包；AI 的输出只是二次材料，必须逐项核对原始证据，并记录模型、时间、提示和人工修订。工具名与合规条文只写类别与要点，标〔待核：以出版时现行文本为准〕，不得凭记忆写条款号与产品功能。\n\n",
+      tbMap: "【教材目录（自动切分的单元 · 字数）】\n", tbSample: "【教材样本（开头、中段、结尾）】\n", tbDemandH: "【书名与出版要求原文】\n",
+      tbDiagT: "【篇幅】约 3600 字。\n\n【任务 · 教材体检：为 AIGC 赋能找地基】下面是一本现有教材的目录与样本，以及书名与出版要求。请按七段作答，只就这本教材说话，用平常话：\n一、这本教材是什么（三句话以内：课程定位、读者、全书主线）；\n二、现有结构：按目录列出章节与每章的体例（学习目标、实训、评价等），并指出书里现有的 AI 相关内容在哪里（原文摘一句），它是把 AI 当工具、当风险、还是没提；\n三、锁定层候选（编号 L1、L2……）：概念定义、史实与人物、承重判断，每条写：原文摘一句 ｜ 单元序号 ｜ 为什么必须锁定（错了会误导什么）｜ 有没有待核之处（年份、人名、数据、机构）；\n四、发生层候选（编号 G1、G2……）：案例、实训任务、习题、评价表、思考题中，可由师生与 AI 续写的部分，每条写：位置（单元序号）｜ 类型 ｜ 哪里固定、哪里可换；\n五、AIGC 切入点（编号 A1、A2……）：每条写：单元序号 ｜ AI 动作（产生／分析／设计）｜ 服务谁（教师／学生／两者）｜ 做什么 ｜ 产出什么 ｜ 人必须核什么；\n六、不该交给 AI 的地方（编号 N1、N2……）：这门课里必须由人亲自做的事（比如现场观察、同理、价值判断、最后拍板），每条写：位置 ｜ 为什么不能外包；\n七、风险与合规点（编号 R1、R2……）：事实与案例待核、数据与隐私、版权与署名、方案同质化、对 AI 的过度依赖，只写这本教材真会遇到的，看不见的写「待全文检查」，不许替作者编出处、数据、案例。\n只指问题与做法，不用学派术语，不讲方法论。\n\n",
+      tbPlanT: "【篇幅】约 3600 字。\n\n【任务 · AIGC 赋能方案】下面是这本教材的体检（含锁定层 L、发生层 G、切入点 A、不该交给 AI 的 N、风险 R）与目录。请按八段作答，写给教材作者、出版社与任课教师看，用平常话：\n一、主线：用一句话写出 AI 在这本书里扮演什么角色，句式必须是「AI 在这本书里不是……（一个替人交作业的工具），而是……（在哪一环、怎样陪教师和学生）」，单独成行，行首写「主线：」；\n二、教师侧三合一（老师—AI—教材）：老师拿这本书用 AI 做哪几件事（备课、案例本地化、习题变式、评价量表、课堂应变等，取这门课真用得上的），每件写：输入 ｜ AI 做什么 ｜ 老师核什么 ｜ 产出归谁；\n三、学生侧三合一（学生—AI—教材）：学生读这本书用 AI 做哪几件事（陪练、追问、对照、反馈、复盘等），每件同样写四项；并写出「先自己做、再让 AI 对照」的规则，以及 AI 不得代替学生下什么结论；\n四、两侧互动与回流：老师侧下发什么给学生侧；学生侧回流什么（列字段）；回流怎样进入教材下一版增补（谁审、多久汇总一次、锁定层的改动走什么审批）；\n五、统一栏目：全书固定用哪几个栏目（名称、位置、篇幅），建议六个：AIGC 工作台·教师版、AIGC 工作台·学生版、人机对照、AI 使用记录、风险提示与复核清单、回流；可增删，但全书必须统一，并说明有实训的单元另加「实训的 AIGC 版」；\n六、逐单元方案：按目录顺序每单元一行：「单元序号 ｜ 处理（增补全套／增补部分栏目／仅改实训／保留不增补）｜ 依据（A? L? G? N? R?）｜ 要点」；目录、参考文献、致谢这类单元写「保留不增补」；\n七、新增篇章：建议新增的章与附录（标题 ｜ 作用 ｜ 约多少字），至少含：综合项目章（演示两个三合一的完整一轮）、提示词库、AI 使用声明与记录模板、回流规范、教师侧智能体配置、学生侧智能体配置；\n八、锁定层清单：沿用体检的 L 编号，补上遗漏，这些内容 AIGC 增补不得改动。\n另：要作者提供出处或材料的写〔待作者补〕，不许替作者编。不用学派术语。\n\n",
+      tbAddT0: "【任务 · 为本单元写 AIGC 增补稿】你是教材编辑兼课程设计师，正在把一本现有教材改成「AIGC 赋能版」。下面依次是：总原则、书名与出版要求、全书主线、统一栏目、本单元的处理方案、体检里落在本单元的条目、本单元原文。\n规矩：\n1. 不改原文，一个字都不改。你只写「增补稿」，由编辑把它接在本单元之后。\n2. 先看本单元的处理方案，照它去写；若是「保留不增补」，只写一句「（本单元不增补）」和理由。\n3. 增补稿按固定栏目写，每个栏目用二级标题，标题照抄：\n## AIGC 工作台 · 教师版：本单元教师可让 AI 帮的 2–3 件事。每件写：做什么 ｜ AI 能做 ｜ AI 不能代替 ｜ 教师必须核。再给一张「提示词卡」：放在代码块里，含 角色／任务／输入（用{花括号}占位）／输出格式／限制 五行，能直接粘贴使用。\n## AIGC 工作台 · 学生版：本单元学生可让 AI 帮的 2–3 件事，写法同上；必须写明「先自己做，再让 AI 对照」的步骤，AI 不替学生下结论；同样给一张提示词卡。\n## 人机对照：从本单元内容里设计一个小任务，让「学生独做、AI 独做、人机协同」三种做法各出一份，再按三条具体的维度比较（如证据来源、遗漏、可落地性）。\n## AI 使用记录：用表格给出记录栏位（模型 ｜ 时间 ｜ 提示 ｜ AI 输出摘要 ｜ 人工修订 ｜ 核对了哪些证据），并写一行示例。\n## 风险提示与复核清单：3–5 条，只写本单元真会遇到的（比如本单元里哪些事实容易被 AI 编造、哪些资料不能上传），清单用「□」开头。\n## 回流：本单元产出哪些东西回流（学生侧→教师侧），教师据此调整什么，哪类产出进入教材下一版增补。\n本单元原书若有「思考与实训」或实训任务，另加：## 实训的 AIGC 版：在原任务基础上写出 AIGC 版任务（目标 ｜ 要求 ｜ 人机分工 ｜ 输出形式 ｜ 评分要点），评分要点必须含「AI 使用的核查与记录」一项。\n4. 提示词卡里不得写具体产品名；需要举工具时只写类别（如文本生成、文生图、图像转线稿、语音转写），可附一句「示例工具以出版时核对为准」。\n5. 不编造事实、数据、引文、人名；没把握的写〔待核〕；材料缺的写〔待作者补：……〕。\n6. 不加任何学派术语，不出现 SDE 字样，全用平常话。\n输出格式：先写增补稿；之后另起一行写「【本单元增补说明】」，逐条写：对应的编号（A?／L?／G?／N?／R?）｜ 加了什么 ｜ 原文哪一处是锚点（摘一句，说明接在哪里最合适）。\n\n",
+      tbMotH: "【全书主线】", tbColH: "【统一栏目】\n", tbRowH: "【本单元处理方案】\n", tbHitH: "【体检里落在本单元的条目】\n", tbOrig: "【本单元原文 · {name}】\n", tbSecH: "【教师侧与学生侧设计、互动与回流】\n", tbNewH: "【新增篇章方案】\n", tbLockH: "【锁定层清单】\n",
+      tbEx1T: "【篇幅】约 5500 字。\n\n【任务 · 前言增补与综合项目章】下面是这本教材的 AIGC 赋能方案。请依次写两部分，各以一行标题起头，标题照抄：\n【前言增补】《AIGC 赋能版说明》约 1000 字，写给读者与任课教师：这一版为什么改、两个三合一是什么、教材怎样分锁定层与发生层、五六个栏目各怎么用、教师和学生各自怎样用这本书、AI 使用的诚信与记录要求、署名与版本〔待填〕。\n【综合章】《AIGC 协同设计项目》（章名可按本教材学科改写）约 4000 字，演示两个三合一的完整一轮：项目任务书（取这门课内一个真实可做的小项目）→ 教师侧备课与下发 → 学生与 AI 共创（给出各环节人机分工）→ 全程使用日志 → 回流给教师做课堂诊断 → 汇入教材下一版增补；最后给出一张评价量表（含 AI 使用的核查与记录一项）。要具体到这门课的内容，不得写成放之四海皆准的空话。\n不编造事实与数据，不用学派术语，不出现 SDE 字样；工具只写类别。\n\n",
+      tbEx2T: "【篇幅】约 6000 字。\n\n【任务 · 附录 A、B、C】请依次写三个附录，各以一行标题起头，标题照抄：\n附录 A　提示词库：按本教材的主线环节分类，共 12–16 张提示词卡，每张放在代码块里，含 角色／任务／输入（{花括号}占位）／输出格式／限制 五行，每张前加一句说明它用在哪一环、教师用还是学生用；不得出现具体产品名。\n附录 B　AI 使用声明与记录模板：给出一份可直接填写的《AI 使用声明》（用到哪些类别的工具、用在哪几步、哪些内容由人独立完成、核对了哪些证据）和一份《AI 使用记录表》。\n附录 C　回流规范：写清回流的字段、频率、谁汇总、谁审定；教材发生层的增补怎样进入下一版（含版本号规则）；锁定层的改动必须走的审批流程；学生与教师个人信息的保护要求。合规条文只写要点，标〔待核：以现行有效文本为准〕。\n要具体到这门课，不用学派术语，不出现 SDE 字样。\n\n",
+      tbEx3T: "【篇幅】约 4500 字。\n\n【任务 · 附录 D、E：两个智能体的配置】请依次写两个附录，各以一行标题起头，标题照抄：\n附录 D　教师侧智能体配置（老师—AI—教材）\n附录 E　学生侧智能体配置（学生—AI—教材）\n每个附录写六块：①角色定位 ②知识底座（这本教材的锁定层与发生层怎样当底座，锁定层只读）③能做什么／不能做什么 ④工作流程（分步，学生侧必须含「先自己做、再对照」）⑤记录与回流（输出什么字段、给谁）⑥边界与拒答（比如不替学生写作业结论、不碰个人敏感信息、遇到锁定层与 AI 说法冲突时以教材为准并提示待核）。最后各给一段可直接粘贴的「系统提示词」（放在代码块里，约 900 字）和一句开场白。要具体到这本教材，不出现 SDE 字样，不写具体产品名。\n\n",
       cmpIq: "⚖ 给两份打创新智商", cmpIqQ: "下面是同一个问题、同一家基底、在两种内核下各写出的一份报告（A＝有 SDE，B＝无 SDE）。请按创新智商五维（S/D/E/I/F）分别给两份打分，各维附一句原文证据与一句扣分句，算出综合分，并说清差距主要出在哪几维、各自最该补哪一维。",
       triBtn: "⚔ 三家对撞", triOn: "⚔ 三家对撞：开",
       triMore: "↻ 继续对撞", triRd: "第 {n} 轮 · 座位左轮一格",
@@ -2014,6 +2038,9 @@
       msTip: "Guiding principle: the manuscript's weighty \u201cdiscoveries\u201d are reborn as \u201cgenesis\u201d \u2014 instead of announcing a conclusion, show where it comes from, how it takes shape and how it can keep growing. Load the manuscript with 📎, paste the publisher's requirements or the editor's revision notes in the box (or leave it empty), then send. Six steps: diagnose (pick the key discoveries), score, spine and rebirth plan, rebirth and revise chapter by chapter, re-score, rebirth table + editor-notes table + cover letter. Three chapters per batch. About 15–25 minutes.",
       msNeed: "Load the manuscript with 📎 first, paste the editor's notes (optional), then send.",
       msWord: "⤓ Revised Word", msWordAll: "⤓ Full process Word", msNext: "↻ Next batch (units {a}–{b})", msAllDone: "All units revised.",
+      tbBtn: "📘 Textbook → AIGC", tbOn: "📘 Textbook → AIGC: on",
+      tbTip: "Input: an existing textbook (load it with 📎). Output: an AIGC-empowered edition. Principle: two triads — teacher·AI·textbook and student·AI·textbook — then let them interact: the teacher side issues tasks and criteria, the student side feeds back work and AI-use logs, which flow into the next edition. AI does only three things at each step: generate, analyse, design. The textbook has a locked layer (definitions, history, load-bearing judgements; AI may not change them) and a generative layer (cases, tasks, prompts, exercises). The original text is never altered; addenda follow each unit. Type \u201cTitle: \u2026\u201d to name the new edition. Steps: 1 audit, 2 plan, 3 new chapter and appendices, 4 per-unit addenda (3 per batch, or run all), 5 self-check, 6 Word export.",
+      tbNeed: "Load the textbook with 📎 first, then type \u201cTitle: \u2026\u201d or the publisher's requirements (optional) and send.",
       labTip: "Enter a question: (1) conventional research without SDE (5-round dialogue + ~10k-character paper, the baseline) (2) an independent scorer rates it on Innovation IQ and names directions (3) SDE innovation along those directions in five refining rounds (4) polished final paper, re-scored, with per-dimension deltas. One Word file. Prompts run in Chinese. About 30–40 minutes",
       cmpIq: "⚖ Score both (Innovation IQ)", cmpIqQ: "Below are two reports on the same question from the same model under two kernels (A = with SDE, B = without SDE). Score each on the five Innovation IQ dimensions (S/D/E/I/F) with one quoted piece of evidence and one deduction per dimension, compute the composite, and say which dimensions account for the gap and what each should fix first.",
       triBtn: "\u2694 Three-way clash", triOn: "\u2694 Three-way clash: on",
@@ -2740,6 +2767,7 @@
           "<button class='wdsm-mode wdsm-qacbtn'></button>" +
           "<button class='wdsm-mode wdsm-labbtn'></button>" +
           "<button class='wdsm-mode wdsm-msbtn'></button>" +
+          "<button class='wdsm-mode wdsm-tbbtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
@@ -5622,6 +5650,7 @@
     var q = String(forceQ != null ? forceQ : inEl.value).trim();
     // 稿件提升：书稿已载入、输入框留空＝没有编辑意见，照样开跑（sendMs 认这句占位，当作「无编辑意见」）
     if (!q && msOn && !PROFILE && !streaming && msHasSrc("")) q = MS_GO;
+    if (!q && tbOn && !PROFILE && !streaming && msHasSrc("")) q = TB_GO;
     if (!q) return;
     /* 运动手环：按钮点的记 btn，输入框打的记 own；其余程序转发（取 Key 后回调等）不记，免得一问记两次。 */
     if (SEND_VIA === "btn") { askStats.btn++; askRun++; }
@@ -5639,6 +5668,14 @@
     if (streaming) {
       if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       return;
+    }
+    // 教材 AIGC 化挂着时：一问＝体检→方案→新增篇章与附录→逐单元增补→自检（排在最前，与稿件提升等多路模式互斥）
+    if (tbOn && !PROFILE && !streaming) {
+      var ktb = wdsKeyGet(); if (!ktb) { wdsKeyPanel(function () { send(q); }); return; }
+      if (!msHasSrc(q)) { toast(t("tbNeed")); return; }
+      if (turns() >= MAX) { updTurns(); return; }
+      if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      if (sendTb(q, addTurn(q))) return;
     }
     // 稿件提升挂着时：一问＝诊断→称重→主心骨与方案→逐单元改→复评→对照表与回信（排在最前，七种多路模式互斥）
     if (msOn && !PROFILE && !streaming) {
@@ -6056,7 +6093,7 @@
         b.onclick = function () {
           closeMenu();
           if (!has) { wdsKeyPanel(function () {}); return; }      // 没 Key 就直接把设置面板端出来
-          duV = v.v; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint();
+          duV = v.v; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint();
         };
         menu.appendChild(b);
       });
@@ -6147,7 +6184,7 @@
   if (cmpBtn) cmpBtn.onclick = function () {
     if (streaming) return;
     cmpOn = !cmpOn;
-    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); }   // 六者互斥
+    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); }   // 六者互斥
     cmpPaint();
     toast(cmpOn ? t("cmpTip") : t("cmpBtn"));
   };
@@ -6331,7 +6368,7 @@
   if (qacBtn) qacBtn.onclick = function () {
     if (streaming) return;
     qacOn = !qacOn;
-    if (qacOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); labOn = false; labPaint(); msOn = false; msPaint(); }   // 六者互斥
+    if (qacOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); }   // 六者互斥
     qacPaint();
     toast(qacOn ? t("qacTip") : t("qacBtn"));
   };
@@ -6585,7 +6622,7 @@
   if (labBtn) labBtn.onclick = function () {
     if (streaming) return;
     labOn = !labOn;
-    if (labOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); msOn = false; msPaint(); }   // 六者互斥
+    if (labOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); }   // 六者互斥
     labPaint();
     toast(labOn ? t("labTip") : t("labBtn"));
   };
@@ -6885,7 +6922,7 @@
   if (msBtn) msBtn.onclick = function () {
     if (streaming) return;
     msOn = !msOn;
-    if (msOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); }   // 七者互斥
+    if (msOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); tbOn = false; tbPaint(); }   // 七者互斥
     msPaint();
     toast(msOn ? t("msTip") : t("msBtn"));
   };
@@ -7197,6 +7234,314 @@
     return true;
   }
 
+  /* ══════════════ 教材 AIGC 化（六步）══════════════
+     2026-10-11 王德生令「现在打造 AIGC 化的智能体，也放在 ChatSDE 上，输入的是一个教材，输出的是一个 AIGC 化的新教材」。
+     🔴 总原则（同日王德生令）：两个三合一再互动——①老师·AI·教材 ②学生·AI·教材 ③两者互动（老师侧下发、学生侧回流、汇入教材下一版）。
+        AI 在每一环只做三件事：产生／分析／设计。教材分锁定层（概念、史实、承重判断，AI 不许改）与发生层（案例、任务、提示词、习题、实训，AI 可生长）。
+     一问＝①体检 ②方案 ③新增篇章与附录（前言增补、综合章、附录 A–E）④逐单元增补（每批 3 单元，可「自动跑完全部」）⑤自检（代码判，不问模型）⑥导出 Word。
+     🔴 原文**一个字不改**：模型只写「增补稿」，由系统把原文与增补稿按单元顺序拼成完整 AIGC 版——锁定层是靠构造保住的，不是靠提示语求模型别动。
+     座次：①② 走 SDE 一路（找地基、立方案）；③④ 走无 SDE 一路（写给教师和学生看的东西，零术语）。
+     复用稿件提升的切单元、取 Key、流式写入与 Word 导出；互斥列表里与稿件提升同列。 */
+  var tbOn = false, TB_GO = "（开始教材 AIGC 化 · 无出版要求）";
+  var tbBtn = layer.querySelector(".wdsm-tbbtn");
+  function tbPaint() {
+    if (!tbBtn) return;
+    tbBtn.style.display = PROFILE ? "none" : "";
+    if (PROFILE) tbOn = false;
+    tbBtn.textContent = tbOn ? t("tbOn") : t("tbBtn");
+    tbBtn.title = t("tbTip");
+    if (tbOn) tbBtn.classList.add("on"); else tbBtn.classList.remove("on");
+    try { toolsPaint(); } catch (e) {}
+  }
+  tbPaint();                         // 🔴 初始就要有字——零宽空框老漏法
+  if (tbBtn) tbBtn.onclick = function () {
+    if (streaming) return;
+    tbOn = !tbOn;
+    if (tbOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); }   // 八者互斥
+    tbPaint();
+    toast(tbOn ? t("tbTip") : t("tbBtn"));
+  };
+  try {
+    var tbStart = window.WDSM_START || ((/[?&]mode=([a-z]+)/.exec(location.search) || [])[1]) || "";
+    if (tbStart === "tb" && tbBtn && !PROFILE) { tbOn = true; tbPaint(); setTimeout(function () { try { toast(t("tbTip")); } catch (e) {} }, 800); }
+  } catch (e) {}
+  // 按「一、二、……」切方案与体检的段：{一: "一、……", 二: …}
+  function tbSecs(text) {
+    var s = String(text || ""), re = /^[ \t]*(?:#{1,4}[ \t]*)?\**[ \t]*([一二三四五六七八九十])[ \t]*[、.．]/gm, m, idx = [], out = {};
+    while ((m = re.exec(s))) idx.push({ k: m[1], i: m.index });
+    idx.forEach(function (x, j) { var seg = s.slice(x.i, j + 1 < idx.length ? idx[j + 1].i : s.length); if (!(x.k in out)) out[x.k] = seg.trim(); });
+    return out;
+  }
+  // 主线：认「主线：」那一行；认不出就取第一句「不是……而是……」
+  function tbMotif(plan) {
+    var s = String(plan || ""), m = /主线\s*[:：]\s*\**\s*([^\n]{6,220})/.exec(s);
+    if (m) return m[1].replace(/\*+/g, "").trim();
+    m = /(AI[^\n。]{0,40}不是[^\n。]{1,80}而是[^\n。]{1,120}[。]?)/.exec(s);
+    return m ? m[1].replace(/^[#>*\-\s]+/, "").replace(/\*+/g, "").trim() : "";
+  }
+  // 本单元在逐单元方案里的那一行（认「3 ｜ …」「单元 3 ｜ …」「| 3 | …」）；找不到回空串
+  function tbRow(plan, n) {
+    var six = tbSecs(plan)["六"] || String(plan || ""), re = new RegExp("^\\s*[-*|]*\\s*\\**\\s*(?:单元|第)?\\s*" + n + "\\s*(?:单元)?\\s*[｜|:：.．、]");
+    var ls = six.split("\n");
+    for (var i = 0; i < ls.length; i++) if (re.test(ls[i])) return ls[i].replace(/^[\s*|-]+/, "").trim();
+    return "";
+  }
+  // 方案行里「处理」一栏是不是「保留不增补」（是就不花一次调用）
+  function tbRowSkip(row) {
+    if (!row) return false;
+    var cells = row.split(/[｜|]/);
+    return cells.length >= 2 && /^\s*\**\s*保留/.test(cells[1]);   // 「保留不增补」「保留」都算；「增补全套」「仅改实训」不算
+  }
+  // 体检里落在第 n 单元的条目（L/G/A/N/R 开头的行，且除开编号后仍出现数字 n）
+  function tbHits(diag, n) {
+    var out = [], re = new RegExp("(^|[^0-9])" + n + "([^0-9]|$)");
+    String(diag || "").split("\n").forEach(function (ln) {
+      var m = /^\s*[-*|]*\s*\**[LGANR]\d+\**/.exec(ln);
+      if (!m) return;
+      if (re.test(ln.slice(m[0].length))) out.push(ln.replace(/^[\s|]+/, "").slice(0, 420));
+    });
+    return out.join("\n");
+  }
+  function tbSplitOut(text) {
+    var s = String(text || ""), i = s.indexOf(t("tbNoteH"));
+    if (i < 0) i = s.search(/【\s*本单元增补说明\s*】/);
+    var body = (i >= 0 ? s.slice(0, i) : s).trim(), note = i >= 0 ? s.slice(i).replace(/^【[^】]*】\s*/, "").trim() : "";
+    return { body: body, note: note };
+  }
+  // 书名：输入框里写了「书名：……」就用它；否则用文件名。统一补「（AIGC 赋能版）」。
+  function tbTitle(demand, fallback) {
+    var m = /书名\s*[:：]\s*([^\n]+)/.exec(String(demand || "")), base = (m ? m[1] : fallback) || "";
+    base = base.replace(/[（(]\s*AIGC[^）)]*[）)]\s*$/i, "").replace(/^[\s"“「]+|[\s"”」。]+$/g, "").trim();
+    return (base || "教材") + t("tbSuffix");
+  }
+  // 自检（代码判，不问模型）：返回 {md, bad}
+  var TB_PRODUCT = /(ChatGPT|GPT-?\d|Midjourney|Stable ?Diffusion|DALL[-·]?E|Copilot|Gemini|Claude|文心|通义|豆包|Kimi|DeepSeek|即梦|可灵|Figma|Sora|Runway)/;
+  function tbCheck(st) {
+    var done = st.units.filter(function (u) { return u.add != null; }), real = done.filter(function (u) { return !u.skipped; });
+    var noT = [], noS = [], noB = [], noCard = [], sde = [], prod = [], todoV = 0, todoA = 0;
+    st.units.forEach(function (u, i) {
+      if (u.add == null) return;
+      var a = String(u.add || "");
+      todoV += (a.match(/〔待核/g) || []).length; todoA += (a.match(/〔待作者补/g) || []).length;
+      if (/SDE/i.test(a)) sde.push(i + 1);
+      if (TB_PRODUCT.test(a)) prod.push(i + 1);
+      if (u.skipped) return;
+      var n = i + 1;
+      if (!/##\s*AIGC 工作台\s*[·・.]\s*教师版/.test(a)) noT.push(n);
+      if (!/##\s*AIGC 工作台\s*[·・.]\s*学生版/.test(a)) noS.push(n);
+      if (!/##\s*回流/.test(a)) noB.push(n);
+      if ((a.match(/```/g) || []).length < 4) noCard.push(n);
+    });
+    function lst(x) { return x.length ? ("第 " + x.slice(0, 40).join("、") + " 单元" + (x.length > 40 ? " 等 " + x.length + " 个" : "")) : "无"; }
+    var body = st.units.filter(function (u) { return !u.toc; }).length;
+    var md = "| 项目 | 结果 |\n|---|---|\n"
+      + "| 已写增补稿的单元 | " + done.length + " / " + body + "（其中实写 " + real.length + "，方案标「保留」跳过 " + (done.length - real.length) + "）|\n"
+      + "| 缺教师版的单元 | " + lst(noT) + " |\n| 缺学生版的单元 | " + lst(noS) + " |\n| 缺回流栏的单元 | " + lst(noB) + " |\n"
+      + "| 提示词卡不足两张的单元 | " + lst(noCard) + " |\n"
+      + "| 〔待核〕／〔待作者补〕条数 | " + todoV + " ／ " + todoA + " |\n"
+      + "| 出现 SDE 字样的单元 | " + lst(sde) + " |\n| 出现具体产品名的单元 | " + lst(prod) + " |\n"
+      + "| 原文改动 | 无——原文由系统原样接入，模型只写增补稿 |\n";
+    return { md: md, bad: noT.length + noS.length + noB.length + noCard.length + sde.length + prod.length };
+  }
+  // 逐单元回流清单：从各单元「## 回流」栏自动汇编，作为附录 F
+  function tbFlowMd(st) {
+    var out = "";
+    st.units.forEach(function (u, i) {
+      if (u.add == null || u.skipped) return;
+      var m = /##\s*回流[^\n]*\n([\s\S]*?)(?=\n##\s|$)/.exec(String(u.add));
+      if (m && m[1].trim()) out += "\n\n**" + qacFmt(t("msUnit"), { i: i + 1, name: u.name }) + "**\n\n" + m[1].trim();
+    });
+    return out || "（尚无）";
+  }
+  function tbSave(which, st, vname) {
+    if (!window.SDEDocx) { toast(t("cmpWait")); return; }
+    var md, tag;
+    if (which === "full") {
+      var ex1 = String(st.ex1 || ""), j = ex1.search(/【\s*综合章\s*】/);
+      var pre = (j >= 0 ? ex1.slice(0, j) : ex1).replace(/^\s*【\s*前言增补\s*】\s*/, "").trim(), chap = j >= 0 ? ex1.slice(j).replace(/^\s*【\s*综合章\s*】\s*/, "").trim() : "";
+      md = "# " + st.bookTitle + "\n\n" + (pre ? ("## 前言增补\n\n" + pre + "\n\n---\n\n") : "");
+      st.units.forEach(function (u) {
+        md += u.text + "\n\n";
+        if (u.toc) md += "（目录待按本版新增章节与附录重排页码）\n\n";
+        else if (u.add != null && !u.skipped) md += "---\n\n### 【AIGC 赋能版增补】\n\n" + u.add + "\n\n---\n\n";
+      });
+      if (chap) md += "# 综合章\n\n" + chap + "\n\n";
+      md += String(st.ex2 || "") + "\n\n" + String(st.ex3 || "") + "\n\n# 附录 F　逐单元回流清单\n" + tbFlowMd(st);
+      tag = "AIGC版";
+    } else if (which === "add") {
+      md = "# " + st.bookTitle + " · " + t("tbAddT") + "\n\n" + t("cmpBase") + "：" + vname + "　" + t("cmpDate") + "：" + new Date().toLocaleString() + "\n\n" + t("tbFair");
+      st.units.forEach(function (u, i) {
+        if (u.add == null || u.skipped) return;
+        md += "\n\n---\n\n## " + qacFmt(t("msUnit"), { i: i + 1, name: u.name }) + "\n\n" + u.add + (u.note ? ("\n\n**" + t("tbNoteH") + "**\n\n" + u.note) : "");
+      });
+      tag = t("tbAddT");
+    } else {
+      md = "# " + st.bookTitle + " · " + t("tbDocT") + "\n\n" + t("cmpBase") + "：" + vname + "　" + t("cmpDate") + "：" + new Date().toLocaleString()
+        + (st.motif ? ("\n\n**主线：" + st.motif + "**") : "") + "\n\n" + t("tbFair")
+        + "\n\n---\n\n# 一、" + t("tbS1") + "\n\n" + (st.diag || "")
+        + "\n\n---\n\n# 二、" + t("tbS2") + "\n\n" + (st.plan || "")
+        + "\n\n---\n\n# 三、" + t("tbS3") + "\n\n" + [st.ex1, st.ex2, st.ex3].filter(Boolean).join("\n\n")
+        + "\n\n---\n\n# 四、逐单元增补说明";
+      st.units.forEach(function (u, i) {
+        if (u.add == null || u.skipped) return;
+        md += "\n\n## " + qacFmt(t("msUnit"), { i: i + 1, name: u.name }) + "\n\n" + (u.note || "（无说明）");
+      });
+      md += "\n\n---\n\n# 五、" + t("tbS5") + "\n\n" + tbCheck(st).md;
+      tag = t("tbDocT");
+    }
+    var blob = window.SDEDocx.build({ title: st.bookTitle + " · " + tag, author: BRAND, md: md });
+    saveBlobToDir(fileTag("WDS") + "-" + safeName(st.bookTitle) + "-" + safeName(tag) + "-" + stampName() + ".docx", blob,
+      function (m) { if (m) toast(m); });
+  }
+  function sendTb(q, cell) {
+    var mine = wdsKeyGet();
+    if (!mine) return false;
+    var docs = atts.filter(function (d) { return !d.img && d.text && d.text.trim().length > 300; });
+    var src = "", title = "";
+    if (docs.length) { src = docs.map(function (d) { return d.text; }).join("\n\n"); title = docs[0].name.replace(/\.[a-z0-9]{2,5}$/i, ""); }
+    else if (String(q || "").length > 3000) { src = q; q = ""; title = String(src).trim().split("\n")[0].slice(0, 30); }
+    if (!src) return false;
+    var demand = String(q || "").trim(); if (demand === TB_GO) demand = "";
+    history.push({ role: "reader", text: "【" + t("tbBtn") + "】" + title + (demand ? ("\n" + demand.slice(0, 400)) : "") }); updTurns();
+    streaming = true; stoppedByUser = false; RS.stop = false;
+    busyUI(true); stopBarShow(true);
+    var vname = vinfo(mine.vendor).name + (mine.model ? (" · " + mine.model) : "");
+    var about = ""; try { about = pjAboutNow(); } catch (e) {}
+    var st = { title: title || "教材", units: msSplit(src), next: 0, auto: false };
+    st.bookTitle = tbTitle(demand, st.title);
+    var wrap = el("div", "wdsm-rlab");
+    var clock = el("div", "wdsm-duh");
+    clock.style.cssText = "border:0;padding:6px 10px;margin:0 0 6px;border-radius:8px;background:var(--wfill);color:var(--wtx);font-size:12.5px;display:block";
+    wrap.appendChild(clock);
+    var t0 = Date.now(), secs = [], chk = null;
+    function tick() {
+      var s = Math.round((Date.now() - t0) / 1000), cur = "";
+      secs.forEach(function (x) { var v = (x.nt.textContent || "").trim(); if (v && v !== t("labWait")) cur = v; });
+      clock.textContent = "⏱ " + Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2) + "　" + st.bookTitle + " · " + st.units.length + " 单元" + (cur ? ("　" + cur) : "") + (streaming ? "" : "　✓");
+    }
+    var clk = setInterval(function () { tick(); if (!streaming) clearInterval(clk); }, 1000);
+    cell.a.innerHTML = ""; cell.a.appendChild(wrap);
+    var demandBlock = t("tbRule") + t("tbDemandH") + (demand || t("tbNoDemand")) + "\n\n" + (about ? (t("msAbout") + about + "\n\n") : "");
+    function paintCheck() {
+      var c = tbCheck(st);
+      if (!chk) { chk = labSec(wrap, t("tbS5")); secs.push(chk); }
+      chk.nt.textContent = "";
+      chk.bd.innerHTML = mdRender(c.md + (c.bad ? "\n\n⚠ 上表有未达标项：把对应单元重写一遍，或在导出的 Word 里人工补齐。" : "\n\n✓ 各项齐备。"));
+    }
+    function done(err) {
+      var wasAuto = st.auto; st.auto = false;
+      streaming = false; curReader = null; busyUI(false); stopBarShow(false);
+      try { tick(); } catch (e) {}
+      if (err) wrap.appendChild(el("div", "wdsm-err", t("qacFail") + err));
+      try { if (st.units.some(function (u) { return u.add != null; })) paintCheck(); } catch (e) {}
+      history.push({ role: "wds", text: "【" + t("tbDocT") + "】" + st.bookTitle + (st.motif ? ("\n" + st.motif) : "") });
+      stSave(history); updTurns(); compTick();
+      if (cell.acts) { try { cell.acts.remove(); } catch (e) {} }
+      var row = el("div", "wdsm-acts");
+      var anyAdd = st.units.some(function (u) { return u.add != null && !u.skipped; });
+      if (anyAdd) {
+        var bf = el("button", "wdsm-act", t("tbWordFull")); bf.onclick = function () { tbSave("full", st, vname); }; row.appendChild(bf);
+        var bd2 = el("button", "wdsm-act", t("tbWordAdd")); bd2.onclick = function () { tbSave("add", st, vname); }; row.appendChild(bd2);
+      }
+      if (st.diag) { var ba = el("button", "wdsm-act", t("tbWordAll")); ba.onclick = function () { tbSave("all", st, vname); }; row.appendChild(ba); }
+      var nIdx = nextIdx(st.next);
+      function resume(auto) {
+        if (streaming) return;
+        row.remove(); cell.acts = null;
+        streaming = true; stoppedByUser = false; RS.stop = false; busyUI(true); stopBarShow(true);
+        st.auto = auto;
+        t0 = Date.now(); clk = setInterval(function () { tick(); if (!streaming) clearInterval(clk); }, 1000);
+        batch().catch(function (e) { done((e && e.message) || "?"); });
+      }
+      if (!err && st.plan && nIdx.length) {
+        var nx = el("button", "wdsm-act", qacFmt(t("tbNext"), { a: nIdx[0] + 1, b: nIdx[nIdx.length - 1] + 1 }));
+        nx.onclick = function () { resume(false); }; row.appendChild(nx);
+        var au = el("button", "wdsm-act", t("tbAuto")); au.onclick = function () { resume(true); }; row.appendChild(au);
+      } else if (err && st.plan && nIdx.length) {
+        var rt = el("button", "wdsm-act", qacFmt(t("tbNext"), { a: nIdx[0] + 1, b: nIdx[nIdx.length - 1] + 1 }));
+        rt.onclick = function () { resume(wasAuto); }; row.appendChild(rt);
+      } else if (!err && st.plan) row.appendChild(el("span", "wdsm-duh", t("tbAllDone")));
+      cell.turn.appendChild(row); cell.acts = row;
+    }
+    function addendum(i, sec) {
+      var u = st.units[i], n = i + 1, row = tbRow(st.plan, n);
+      var box = msUnitBox(sec, qacFmt(t("msUnit"), { i: n, name: u.name }) + " · " + u.text.length + " 字");
+      if (tbRowSkip(row) || u.text.trim().length < 200) {    // 方案标「保留不增补」，或只是封面、书名这类残片：不花一次调用
+        u.add = t("tbSkip"); u.note = row ? ("方案：" + row) : "过短的残片，不增补"; u.skipped = true;
+        box.innerHTML = mdRender(t("tbSkip") + "　（" + (row ? ("方案：" + row) : "过短的残片") + "）");
+        return Promise.resolve();
+      }
+      sec.nt.textContent = qacFmt(t("tbUnitRun"), { i: n });
+      var L = Math.max(1200, Math.min(2800, Math.round(u.text.length * 0.35)));
+      var hits = tbHits(st.diag, n);
+      var qtext = "【篇幅】约 " + L + " 字。\n\n" + t("tbAddT0") + demandBlock
+        + t("tbMotH") + (st.motif || "（方案里未单列）") + "\n\n"
+        + t("tbColH") + String(st.cols || "（按教师版、学生版、人机对照、AI 使用记录、风险提示与复核清单、回流六栏）").slice(0, 1500) + "\n\n"
+        + t("tbRowH") + (row || "（方案里没有本单元这一行：按增补全套处理）") + "\n\n"
+        + t("tbHitH") + (hits ? hits.slice(0, 2400) : "（体检里没有直接落在本单元的条目，按方案行与主线增补）") + "\n\n"
+        + qacFmt(t("tbOrig"), { name: n + ". " + u.name }) + u.text;
+      return msPlain(mine, qtext.slice(0, 19800), function (x) { box.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
+        .then(function (r) { var o = tbSplitOut(r); u.add = o.body; u.note = o.note; u.skipped = /^\s*[（(]\s*本单元不增补/.test(o.body); box.innerHTML = mdRender(r); });
+    }
+    // 一批＝3 个「真要调用模型」的单元；方案标「保留」的单元顺路带过、不占名额
+    function nextIdx(from) {
+      var out = [], calls = 0;
+      for (var i = from; i < st.units.length && calls < MS_BATCH; i++) {
+        if (st.units[i].toc) continue;
+        out.push(i);
+        if (!tbRowSkip(tbRow(st.plan, i + 1)) && st.units[i].text.trim().length >= 200) calls++;
+      }
+      return out;
+    }
+    // 一批：逐单元写增补稿（串行，一家 Key 的分钟限流经不起并发）；自动档则接着跑下一批直到写完
+    function batch() {
+      var idx = nextIdx(st.next);
+      if (!idx.length) { done(); return Promise.resolve(); }
+      var a = idx[0], b = idx[idx.length - 1] + 1;
+      var sec = labSec(wrap, qacFmt(t("tbS4"), { a: a + 1, b: b, n: st.units.length }));
+      secs.push(sec);
+      var chain = Promise.resolve();
+      idx.forEach(function (i) { chain = chain.then(function () { return addendum(i, sec); }); });
+      return chain.then(function () {
+        sec.nt.textContent = ""; st.next = b;
+        if (st.auto && nextIdx(st.next).length && !RS.stop) return batch();
+        done();
+      });
+    }
+    var s1 = labSec(wrap, t("tbS1")), s2 = labSec(wrap, t("tbS2")), s3 = labSec(wrap, t("tbS3"));
+    secs.push(s1, s2, s3);
+    tick();
+    s1.nt.textContent = t("qacP1");
+    var mapTxt = msMap(st.units);
+    msSde(mine, t("tbDiagT") + demandBlock + t("tbMap") + mapTxt.slice(0, 3200) + "\n\n" + t("tbSample") + msSample(src),
+      function (x) { s1.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
+    .then(function (d) {
+      st.diag = d; s1.bd.innerHTML = mdRender(d); s1.nt.textContent = "";
+      s2.nt.textContent = t("qacP1");
+      return msSde(mine, t("tbPlanT") + demandBlock + t("tbMap") + mapTxt.slice(0, 3200) + "\n\n【教材体检】\n" + String(d).slice(0, 9000),
+        function (x) { s2.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; });
+    }).then(function (p) {
+      st.plan = p; st.motif = tbMotif(p); s2.bd.innerHTML = mdRender(p); s2.nt.textContent = "";
+      var sc = tbSecs(p); st.cols = sc["五"] || "";
+      if (st.motif) { var mh = el("div", "wdsm-duh"); mh.style.cssText = "border:0;padding:6px 10px;margin:6px 0;border-radius:8px;background:var(--wfill);color:var(--wtx);display:block"; mh.appendChild(el("b", null, "主线：" + st.motif)); s2.bd.parentNode.insertBefore(mh, s2.bd); }
+      // 第三步：新增篇章与附录——三次调用，只依赖方案，与逐单元增补互不相干，先做完
+      var base = demandBlock + "【书名】" + st.bookTitle + "\n\n" + t("tbMotH") + (st.motif || "") + "\n\n"
+        + t("tbSecH") + [sc["二"], sc["三"], sc["四"]].filter(Boolean).join("\n\n").slice(0, 4200) + "\n\n"
+        + t("tbColH") + String(st.cols || "").slice(0, 1500) + "\n\n" + t("tbNewH") + String(sc["七"] || "").slice(0, 1500) + "\n\n" + t("tbLockH") + String(sc["八"] || "").slice(0, 2000) + "\n\n";
+      var shown = "";
+      function ex(key, T, label) {
+        s3.nt.textContent = label;
+        return msPlain(mine, (T + base).slice(0, 19800), function (x) { s3.bd.innerHTML = mdRender(shown + x) + "<span class='cur'>▊</span>"; })
+          .then(function (r) { st[key] = r; shown += r + "\n\n"; s3.bd.innerHTML = mdRender(shown); });
+      }
+      return ex("ex1", t("tbEx1T"), "前言增补与综合项目章…")
+        .then(function () { return ex("ex2", t("tbEx2T"), "附录 A、B、C…"); })
+        .then(function () { return ex("ex3", t("tbEx3T"), "附录 D、E（两个智能体配置）…"); })
+        .then(function () { s3.nt.textContent = ""; return batch(); });
+    }).catch(function (e) { done((e && e.message) || "?"); });
+    return true;
+  }
+
   /* ══════════════ 群碰（N 席）══════════════
      三家对撞是定席定序：A 出判断 → B 攻 A → C 结算。群碰放开两处，而这两处各带一个必然的坑：
        ① **攻击席自选目标** ⇒ 每席都挑最脆的那个打，N 席全攻同一处，看着热闹只攻了一处。
@@ -7305,7 +7650,7 @@
     var go = el("button", null, mobOn ? t("mobStop") : t("mobGo"));
     go.onclick = function () {
       closeMenu(); mobOn = !mobOn;
-      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); }   // 六者互斥
+      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); }   // 六者互斥
       mobPaint();
     };
     menu.appendChild(go);
@@ -7566,7 +7911,7 @@
     go.onclick = function () {
       closeMenu();
       triOn = !triOn;
-      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); }      // 并排与对撞是两种模式，不并存
+      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); }      // 并排与对撞是两种模式，不并存
       triPaint();
     };
     menu.appendChild(go);
