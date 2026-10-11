@@ -6898,7 +6898,8 @@
   // 太短的并进下一单元，太长的在段落处再切（每单元 ≤ MS_UNIT 字，一趟改得完、也装得进提问上限）。
   function msSplit(text) {
     var s = String(text || "").replace(/\r\n?/g, "\n");
-    var re = /^[ \t　]*(?:第[一二三四五六七八九十百零〇两\d]+[章编篇部讲回卷]|chapter\s+\d+|#{1,2}\s+\S)[^\n]{0,60}$/gim;
+    // 2026-10-11：加「节」——教材、专著常是「第 N 章 › 第 N 节」，只认章的话一章几万字只能按字数硬切
+    var re = /^[ \t　]*(?:第[一二三四五六七八九十百零〇两\d]+[章编篇部讲回卷节]|chapter\s+\d+|#{1,2}\s+\S)[^\n]{0,60}$/gim;
     var cuts = [], m;
     while ((m = re.exec(s))) cuts.push(m.index);
     var parts = [];
@@ -6907,14 +6908,38 @@
       else if (cuts[0] > 0) cuts[0] = 0;
       for (var i = 0; i < cuts.length; i++) parts.push(s.slice(cuts[i], i + 1 < cuts.length ? cuts[i + 1] : s.length));
     } else parts = [s];
-    var merged = [];
+    /* 合并（2026-10-11 改）：①连成一片的「纯标题」片段＝目录，整体成一个目录单元；
+       ②其余太短的片段（如单独一行的章名）往后并——章名属于它下面的正文，不属于上一节的尾巴。
+       旧规则「短的并到前一个」会把目录尾巴和第一章开头拼成一个单元。 */
+    function hdLine(x) {
+      return /^\s*(?:第[一二三四五六七八九十百零〇两\d]+[章编篇部讲回卷节]|[一二三四五六七八九十]+[、.．]|\d+(?:\.\d+)+\s|[●○■□◆▪·]|目\s*录|contents|参考文献|致\s*谢|后\s*记|附\s*录)/i.test(x) || /[.．·…]{4,}\s*\d+\s*$/.test(x);
+    }
+    function tocLike(p) {
+      var ls = p.split(/\n+/).filter(function (x) { return x.trim(); });
+      if (!ls.length) return 0;
+      var hd = ls.filter(hdLine).length;
+      return (hd / ls.length >= 0.75 && p.trim().length / ls.length < 30) ? ls.length : 0;
+    }
+    var merged = [], buf = "", grp = "", grpN = 0;
+    function flushGrp() {
+      if (!grp) return;
+      if (grpN >= 8) { if (buf.trim()) { merged.push({ t: buf }); buf = ""; } merged.push({ t: grp, toc: true }); }
+      else buf += grp;                               // 只有零星几行标题：当普通短片段往后并
+      grp = ""; grpN = 0;
+    }
     parts.forEach(function (p) {
-      if (merged.length && merged[merged.length - 1].trim().length < 800) merged[merged.length - 1] += p;
-      else merged.push(p);
+      var n = tocLike(p);
+      if (n) { grp += p; grpN += n; return; }
+      flushGrp();
+      buf += p;
+      if (buf.trim().length >= 800) { merged.push({ t: buf }); buf = ""; }
     });
+    flushGrp();
+    if (buf.trim()) { if (merged.length && !merged[merged.length - 1].toc) merged[merged.length - 1].t += buf; else merged.push({ t: buf }); }
     var out = [];
-    merged.forEach(function (p) {
-      p = p.trim(); if (!p) return;
+    merged.forEach(function (mp) {
+      var p = mp.t.trim(); if (!p) return;
+      if (mp.toc) { out.push({ name: (p.split("\n")[0] || "").trim().slice(0, 40), text: p, toc: true }); return; }
       var head = (p.split("\n")[0] || "").trim().slice(0, 40);
       if (p.length <= MS_UNIT) { out.push({ name: head, text: p }); return; }
       var paras = p.split(/\n+/), buf = "", k = 1;
@@ -6931,11 +6956,23 @@
       });
       if (buf.trim()) out.push({ name: head + (k > 1 ? ("（" + k + "）") : ""), text: buf.trim() });
     });
-    out.forEach(function (u, i) { if (!u.name) u.name = qacFmt(t("msUnit"), { i: i + 1, name: "" }).replace(/\s·\s$/, ""); });
+    out.forEach(function (u, i) {
+      if (!u.name) u.name = qacFmt(t("msUnit"), { i: i + 1, name: "" }).replace(/\s·\s$/, "");
+      // 目录、标题清单：行多、行短、大半是「第 N 章／节、一、二、、●」这类标题行——原样保留，不改、不评
+      var ls = u.text.split(/\n+/).filter(function (x) { return x.trim(); });
+      var hd = ls.filter(function (x) { return /^\s*(?:第[一二三四五六七八九十百零〇两\d]+[章编篇部讲回卷节]|[一二三四五六七八九十]+[、.．]|\d+(?:\.\d+)+\s|[●○■□◆▪·]|目\s*录|contents)/i.test(x) || /[.．·…]{4,}\s*\d+\s*$/.test(x); }).length;
+      if (u.toc || (ls.length >= 8 && hd / ls.length >= 0.6 && u.text.length / ls.length < 30)) { u.toc = true; u.rev = u.text; u.note = "目录／标题清单，原样保留（正文改定后再随之调整）"; u.name = "目录 · " + u.name; }
+    });
+    return out;
+  }
+  // 下一批要改的单元序号：从 from 起跳过目录，取 MS_BATCH 个
+  function msNextIdx(units, from) {
+    var out = [];
+    for (var i = from; i < units.length && out.length < MS_BATCH; i++) if (!units[i].toc) out.push(i);
     return out;
   }
   function msMap(units) {
-    return units.map(function (u, i) { return (i + 1) + ". " + u.name + " · " + u.text.length + " 字"; }).join("\n");
+    return units.map(function (u, i) { return (i + 1) + ". " + u.name + " · " + u.text.length + " 字" + (u.toc ? "（目录，原样保留）" : ""); }).join("\n");
   }
   function msSample(src) {
     var s = String(src || "");
@@ -6996,9 +7033,9 @@
   function msHasSrc(q) {
     return atts.some(function (d) { return !d.img && d.text && d.text.trim().length > 300; }) || String(q || "").length > 3000;
   }
-  function msBatchText(units, a, b, key) {
+  function msBatchText(units, idx, key) {
     var s = "";
-    for (var i = a; i < b && i < units.length; i++) s += (s ? "\n\n" : "") + (key === "rev" ? (units[i].rev || units[i].text) : units[i].text);
+    idx.forEach(function (i) { s += (s ? "\n\n" : "") + (key === "rev" ? (units[i].rev || units[i].text) : units[i].text); });
     return s;
   }
   function msSave(which, st, vname) {
@@ -7069,9 +7106,9 @@
       var anyRev = st.units.some(function (u) { return u.rev != null; });
       if (anyRev) { var bw = el("button", "wdsm-act", t("msWord")); bw.onclick = function () { msSave("rev", st, vname); }; row.appendChild(bw); }
       if (st.diag) { var ba = el("button", "wdsm-act", t("msWordAll")); ba.onclick = function () { msSave("all", st, vname); }; row.appendChild(ba); }
-      if (!err && st.plan && st.next < st.units.length) {
-        var b2 = Math.min(st.next + MS_BATCH, st.units.length);
-        var nx = el("button", "wdsm-act", qacFmt(t("msNext"), { a: st.next + 1, b: b2 }));
+      var nIdx = msNextIdx(st.units, st.next);
+      if (!err && st.plan && nIdx.length) {
+        var nx = el("button", "wdsm-act", qacFmt(t("msNext"), { a: nIdx[0] + 1, b: nIdx[nIdx.length - 1] + 1 }));
         nx.onclick = function () {
           if (streaming) return;
           row.remove(); cell.acts = null;
@@ -7101,17 +7138,19 @@
     }
     // 一批：逐单元改（串行，一家 Key 的分钟限流经不起并发）→（首批）复评 → 对照表与回信
     function batch(first) {
-      var a = st.next, b = Math.min(a + MS_BATCH, st.units.length);
+      var idx = msNextIdx(st.units, st.next);
+      if (!idx.length) { done(); return Promise.resolve(); }
+      var a = idx[0], b = idx[idx.length - 1] + 1;
       var sec = labSec(wrap, qacFmt(t("msS4"), { a: a + 1, b: b, n: st.units.length }));
       secs.push(sec);
       var chain = Promise.resolve();
-      for (var i = a; i < b; i++) (function (i) { chain = chain.then(function () { return rewrite(i, sec); }); })(i);
+      idx.forEach(function (i) { chain = chain.then(function () { return rewrite(i, sec); }); });
       return chain.then(function () {
         sec.nt.textContent = ""; st.next = b;
         if (!first) return;
         var s5 = labSec(wrap, t("msS5")); secs.push(s5);
         s5.nt.textContent = t("labScoring");
-        return labScore(msBatchText(st.units, a, b, "rev"), mine).then(function (sc) {
+        return labScore(msBatchText(st.units, idx, "rev"), mine).then(function (sc) {
           st.card2 = sc; labCardBox(s5, sc);
           var dl = el("div", "wdsm-a"); dl.innerHTML = mdRender("**" + t("msDelta") + "**\n\n" + labDeltaMd(st.card1 && st.card1.s, sc.s));
           s5.bd.parentNode.appendChild(dl); s5.nt.textContent = "";
@@ -7143,7 +7182,7 @@
       var ih = d.search(/五\s*[、.．]\s*可出版性体检|可出版性体检/);
       if (ih >= 0) { var rh = d.slice(ih), jh = rh.search(/\n\s*(?:#+\s*)?\**\s*六\s*[、.．]/); st.hyg = (jh > 0 ? rh.slice(0, jh) : rh.slice(0, 3000)).trim(); }
       s2.nt.textContent = t("labScoring");
-      return labScore(msBatchText(st.units, 0, MS_BATCH, "orig"), mine);
+      return labScore(msBatchText(st.units, msNextIdx(st.units, 0), "orig"), mine);
     }).then(function (sc) {
       st.card1 = sc; labCardBox(s2, sc); s2.nt.textContent = "";
       s3.nt.textContent = t("qacP1");

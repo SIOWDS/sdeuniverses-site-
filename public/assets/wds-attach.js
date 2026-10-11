@@ -19,6 +19,7 @@
     pdfWorker: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
     mammoth: "https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js",
     tesseract: "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js",
+    fflate: "https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js",   // 旧内核浏览器（没有 deflate-raw 解压）的退路，8 KB
   };
   var MAX_CHARS = 400000;     // 单篇文字上限 40 万字（2026-10-10 王德生令由 20 万提到 40 万：20 万汉字的专著连标点约 22 万字符，原上限会截掉书尾；与后端「全篇全带」上限 DOC_CAP 400000 一致。后端仍按每轮预算取段）
   /* 文件大小（2026-10-11 王德生报「输入 100M 就不行了」）：原先一刀切 100 MB 拒收。
@@ -96,33 +97,68 @@
        任何一步不认（zip64、加密、浏览器太旧）就抛错，由调用处回落到 mammoth。 */
   function u16(b, o) { return b[o] | (b[o + 1] << 8); }
   function u32(b, o) { return (b[o] | (b[o + 1] << 8) | (b[o + 2] << 16) | (b[o + 3] << 24)) >>> 0; }
+  // 浏览器自带的 deflate-raw 解压（Chrome 103+、Safari 16.4+、Firefox 113+）；
+  // 国内常见的 360／QQ／搜狗等旧内核没有它——退到 fflate 小库，只解压正文那一块，照样不整份读
   function inflateRaw(bytes) {
-    if (typeof DecompressionStream === "undefined") return Promise.reject(new Error("no DecompressionStream"));
-    var ds = new DecompressionStream("deflate-raw");
+    function viaFflate() {
+      return script(CDN.fflate).then(function () {
+        var F = window.fflate;
+        if (!F || !F.inflateSync) throw new Error("解压库没起来");
+        return F.inflateSync(bytes);
+      });
+    }
+    var ds = null;
+    try { if (typeof DecompressionStream !== "undefined") ds = new DecompressionStream("deflate-raw"); } catch (e) { ds = null; }
+    if (!ds) return viaFflate();
     var out = new Blob([bytes]).stream().pipeThrough(ds);
-    return new Response(out).arrayBuffer().then(function (ab) { return new Uint8Array(ab); });
+    return new Response(out).arrayBuffer().then(function (ab) { return new Uint8Array(ab); }, viaFflate);
   }
-  function zipEntry(file, want) {
-    var size = file.size, tailLen = Math.min(size, 65557);
-    return readSlice(file, size - tailLen, size).then(function (tail) {
+  function u64(b, o) { return u32(b, o) + u32(b, o + 4) * 4294967296; }
+  // 读 zip 中央目录（含 zip64：大文件或某些导出工具会写 64 位的目录），返回 {名字: 条目}
+  function zipDir(file) {
+    var size = file.size, tailLen = Math.min(size, 65557), base = size - tailLen;
+    return readSlice(file, base, size).then(function (tail) {
       var e = -1;
       for (var i = tail.length - 22; i >= 0; i--) if (u32(tail, i) === 0x06054b50) { e = i; break; }
-      if (e < 0) throw new Error("not a zip");
+      if (e < 0) throw new Error("不是有效的 .docx（压缩包目录找不到）");
       var cdSize = u32(tail, e + 12), cdOff = u32(tail, e + 16);
-      if (cdOff === 0xFFFFFFFF || cdSize === 0xFFFFFFFF) throw new Error("zip64");
-      return readSlice(file, cdOff, cdOff + cdSize);
+      if (cdOff !== 0xFFFFFFFF && cdSize !== 0xFFFFFFFF) return readSlice(file, cdOff, cdOff + cdSize);
+      // zip64：EOCD 前 20 字节是定位器，指向 64 位目录记录
+      if (e < 20 || u32(tail, e - 20) !== 0x07064b50) throw new Error("zip64 定位器缺失");
+      var z64 = u64(tail, e - 20 + 8);
+      return readSlice(file, z64, z64 + 56).then(function (r) {
+        if (u32(r, 0) !== 0x06064b50) throw new Error("zip64 目录损坏");
+        var sz = u64(r, 40), off = u64(r, 48);
+        return readSlice(file, off, off + sz);
+      });
     }).then(function (cd) {
-      var p = 0, dec = new TextDecoder("utf-8"), hit = null;
+      var p = 0, dec = new TextDecoder("utf-8"), dir = {};
       while (p + 46 <= cd.length && u32(cd, p) === 0x02014b50) {
-        var flags = u16(cd, p + 8), method = u16(cd, p + 10), csize = u32(cd, p + 20);
+        var flags = u16(cd, p + 8), method = u16(cd, p + 10), csize = u32(cd, p + 20), usize = u32(cd, p + 24);
         var nl = u16(cd, p + 28), xl = u16(cd, p + 30), cl = u16(cd, p + 32), loff = u32(cd, p + 42);
         var name = dec.decode(cd.subarray(p + 46, p + 46 + nl));
-        if (want.test(name)) { hit = { flags: flags, method: method, csize: csize, loff: loff, name: name }; break; }
+        if (usize === 0xFFFFFFFF || csize === 0xFFFFFFFF || loff === 0xFFFFFFFF) {
+          // 64 位尺寸放在扩展字段 0x0001 里，只出现被置为 0xFFFFFFFF 的那几项，次序固定
+          var x = p + 46 + nl, xe = x + xl;
+          while (x + 4 <= xe) {
+            var id = u16(cd, x), ln = u16(cd, x + 2), q = x + 4;
+            if (id === 1) {
+              if (usize === 0xFFFFFFFF) { usize = u64(cd, q); q += 8; }
+              if (csize === 0xFFFFFFFF) { csize = u64(cd, q); q += 8; }
+              if (loff === 0xFFFFFFFF) { loff = u64(cd, q); q += 8; }
+              break;
+            }
+            x += 4 + ln;
+          }
+        }
+        dir[name] = { flags: flags, method: method, csize: csize, loff: loff, name: name };
         p += 46 + nl + xl + cl;
       }
-      if (!hit) throw new Error("no " + want);
-      if (hit.flags & 1) throw new Error("encrypted");
-      if (hit.csize === 0xFFFFFFFF || hit.loff === 0xFFFFFFFF) throw new Error("zip64");
+      return dir;
+    });
+  }
+  function zipRead(file, hit) {
+      if (hit.flags & 1) return Promise.reject(new Error("这份 Word 设了打开密码，请先在 Word 里去掉密码再传"));
       return readSlice(file, hit.loff, hit.loff + 30).then(function (lh) {
         if (u32(lh, 0) !== 0x04034b50) throw new Error("bad local header");
         var start = hit.loff + 30 + u16(lh, 26) + u16(lh, 28);
@@ -130,10 +166,10 @@
       }).then(function (raw) {
         if (hit.method === 0) return raw;
         if (hit.method === 8) return inflateRaw(raw);
-        throw new Error("method " + hit.method);
+        throw new Error("不认识的压缩方式 " + hit.method);
       });
-    });
   }
+  function zipText(file, hit) { return zipRead(file, hit).then(function (b) { return new TextDecoder("utf-8").decode(b); }); }
   var ENT = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" };
   function xmlUnesc(s) {
     return s.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos);/gi, function (m, k) {
@@ -156,10 +192,180 @@
     if (para) out.push(para);
     return out.join("\n\n");
   }
+  // 正文在哪个部件，以 _rels/.rels 里 officeDocument 那条关系为准（多数是 word/document.xml，WPS 等偶有别名）
   function docxFast(file) {
-    return zipEntry(file, /^word\/document\d*\.xml$/).then(function (bytes) {
-      return docxXmlText(new TextDecoder("utf-8").decode(bytes));
+    return zipDir(file).then(function (dir) {
+      var rel = dir["_rels/.rels"];
+      var pick = function (target) {
+        var k = String(target || "").replace(/^\/+/, "");
+        return dir[k] || null;
+      };
+      var guess = function () {
+        if (dir["word/document.xml"]) return dir["word/document.xml"];
+        for (var k in dir) if (/^word\/document\d*\.xml$/i.test(k)) return dir[k];
+        for (var k2 in dir) if (/\/document\d*\.xml$/i.test(k2)) return dir[k2];
+        return null;
+      };
+      var findMain = rel ? zipText(file, rel).then(function (x) {
+        var m = /<Relationship\b[^>]*Type="[^"]*\/officeDocument"[^>]*>/i.exec(x);
+        var t = m && /Target="([^"]+)"/i.exec(m[0]);
+        return (t && pick(t[1])) || guess();
+      }, guess) : Promise.resolve(guess());
+      return findMain.then(function (main) {
+        if (!main) {
+          if (dir["EncryptedPackage"] || dir["EncryptionInfo"]) throw new Error("这份 Word 设了打开密码，请先在 Word 里去掉密码再传");
+          throw new Error("这份 .docx 里找不到正文部件");
+        }
+        return zipText(file, main).then(docxXmlText);
+      });
     });
+  }
+
+  /* ── 老式 .doc／.wps（Word 97–2003 二进制，复合文档 CFB）──
+       只抽正文文字：读 FIB 找片段表（piece table），按片段取 UTF-16 或 8 位字符；
+       域代码去掉、只留域结果；图片、表格格式不读。加密的直说。 */
+  var CP1252 = { 0x80: 0x20AC, 0x82: 0x201A, 0x83: 0x0192, 0x84: 0x201E, 0x85: 0x2026, 0x86: 0x2020, 0x87: 0x2021, 0x88: 0x02C6, 0x89: 0x2030, 0x8A: 0x0160, 0x8B: 0x2039, 0x8C: 0x0152, 0x8E: 0x017D, 0x91: 0x2018, 0x92: 0x2019, 0x93: 0x201C, 0x94: 0x201D, 0x95: 0x2022, 0x96: 0x2013, 0x97: 0x2014, 0x98: 0x02DC, 0x99: 0x2122, 0x9A: 0x0161, 0x9B: 0x203A, 0x9C: 0x0153, 0x9E: 0x017E, 0x9F: 0x0178 };
+  function cfbOpen(b) {
+    if (u32(b, 0) !== 0xE011CFD0 || u32(b, 4) !== 0xE11AB1A1) throw new Error("不是有效的 .doc 文件");
+    var ss = 1 << u16(b, 0x1E), mss = 1 << u16(b, 0x20);
+    var dirStart = u32(b, 0x30), miniCut = u32(b, 0x38), miniFatStart = u32(b, 0x3C), difatNext = u32(b, 0x44), nDifat = u32(b, 0x48);
+    function off(s) { return (s + 1) * ss; }
+    var fatSecs = [], i;
+    for (i = 0; i < 109; i++) { var v = u32(b, 0x4C + i * 4); if (v < 0xFFFFFFFA) fatSecs.push(v); }
+    var per = ss / 4 - 1, guard = 0;
+    while (difatNext < 0xFFFFFFFA && nDifat-- > 0 && guard++ < 100000) {
+      var o = off(difatNext);
+      for (i = 0; i < per; i++) { var w = u32(b, o + i * 4); if (w < 0xFFFFFFFA) fatSecs.push(w); }
+      difatNext = u32(b, o + per * 4);
+    }
+    var fat = new Uint32Array(fatSecs.length * (ss / 4));
+    fatSecs.forEach(function (s, k) { var o = off(s); for (var j = 0; j < ss / 4; j++) fat[k * (ss / 4) + j] = u32(b, o + j * 4); });
+    function chain(start, table) {
+      var out = [], s = start, g = 0;
+      while (s < 0xFFFFFFFA && s < table.length && g++ < 50000000) { out.push(s); s = table[s]; }
+      return out;
+    }
+    function readBig(start, size) {
+      var secs = chain(start, fat), out = new Uint8Array(Math.min(size, secs.length * ss)), p = 0;
+      for (var k = 0; k < secs.length && p < out.length; k++) {
+        var o = off(secs[k]), n = Math.min(ss, out.length - p);
+        out.set(b.subarray(o, o + n), p); p += n;
+      }
+      return out;
+    }
+    // 目录
+    var dirBytes = readBig(dirStart, 1 << 30), dirs = [];
+    for (var d = 0; d + 128 <= dirBytes.length; d += 128) {
+      var nlen = u16(dirBytes, d + 64), type = dirBytes[d + 66];
+      if (!type) { dirs.push(null); continue; }
+      var nm = ""; for (var c = 0; c + 2 <= nlen - 2; c += 2) nm += String.fromCharCode(u16(dirBytes, d + c));
+      dirs.push({ name: nm, type: type, start: u32(dirBytes, d + 116), size: u32(dirBytes, d + 120) });
+    }
+    var root = dirs[0], mini = null, miniFat = null;
+    function readMini(start, size) {
+      if (!mini) {
+        mini = readBig(root.start, root.size);
+        var mf = readBig(miniFatStart, 1 << 30); miniFat = new Uint32Array(mf.length / 4);
+        for (var q = 0; q < miniFat.length; q++) miniFat[q] = u32(mf, q * 4);
+      }
+      var secs = chain(start, miniFat), out = new Uint8Array(size), p = 0;
+      for (var k = 0; k < secs.length && p < size; k++) {
+        var o = secs[k] * mss, n = Math.min(mss, size - p);
+        out.set(mini.subarray(o, o + n), p); p += n;
+      }
+      return out;
+    }
+    return {
+      names: dirs.filter(Boolean).map(function (x) { return x.name; }),
+      stream: function (name) {
+        for (var k = 0; k < dirs.length; k++) {
+          var e = dirs[k];
+          if (e && e.type === 2 && e.name === name) return e.size < miniCut ? readMini(e.start, e.size) : readBig(e.start, e.size);
+        }
+        return null;
+      },
+    };
+  }
+  function docBinText(b) {
+    var cfb = cfbOpen(b), wd = cfb.stream("WordDocument");
+    if (!wd) {
+      if (cfb.names.indexOf("EncryptedPackage") >= 0) throw new Error("这份 Word 设了打开密码，请先在 Word 里去掉密码再传");
+      throw new Error("这个文件不是 Word 文档（找不到正文流）");
+    }
+    if (u16(wd, 0) !== 0xA5EC) throw new Error("这份 .doc 的版本太老（Word 6／95），请在 Word 里另存为 .docx 再传");
+    var flags = u16(wd, 0x0A);
+    if (flags & 0x0100) throw new Error("这份 Word 设了打开密码，请先在 Word 里去掉密码再传");
+    var tbl = cfb.stream((flags & 0x0200) ? "1Table" : "0Table");
+    if (!tbl) throw new Error("这份 .doc 缺了表格流，读不了");
+    // FIB：32 字节基础 → csw 个 u16 → cslw 个 u32 → cbRgFcLcb 对 (fc,lcb)
+    var p = 32, csw = u16(wd, p); p += 2 + csw * 2;
+    var cslw = u16(wd, p); p += 2;
+    var lw = p; p += cslw * 4;
+    var cbRg = u16(wd, p); p += 2;
+    // 文字流的字符位置依次是：正文、脚注、页眉页脚、（宏）、批注、尾注、文本框、页眉文本框
+    var ccp = function (k) { return k < cslw ? u32(wd, lw + k * 4) : 0; };
+    var ccpText = ccp(3), ccpFtn = ccp(4), ccpHdd = ccp(5), ccpMcr = ccp(6), ccpAtn = ccp(7), ccpEdn = ccp(8), ccpTxbx = ccp(9);
+    if (cbRg <= 33) throw new Error("这份 .doc 的结构读不懂");
+    var fcClx = u32(wd, p + 33 * 8), lcbClx = u32(wd, p + 33 * 8 + 4);
+    var q = fcClx, end = fcClx + lcbClx, pcdt = -1, g = 0;
+    while (q < end && g++ < 100000) {
+      if (tbl[q] === 1) { q += 3 + u16(tbl, q + 1); continue; }
+      if (tbl[q] === 2) { pcdt = q; break; }
+      break;
+    }
+    if (pcdt < 0) throw new Error("这份 .doc 的片段表找不到");
+    var lcb = u32(tbl, pcdt + 1), plc = pcdt + 5, n = (lcb - 4) / 12;
+    // 取字符位置 [A, B) 的文字：跨几个片段就拼几段
+    function cpText(A, B) {
+      var out = [];
+      for (var k = 0; k < n; k++) {
+        var cp0 = u32(tbl, plc + k * 4), cp1 = u32(tbl, plc + (k + 1) * 4);
+        if (cp1 <= A) continue;
+        if (cp0 >= B) break;
+        var a0 = Math.max(cp0, A), b0 = Math.min(cp1, B), len = b0 - a0;
+        var pcd = plc + (n + 1) * 4 + k * 8, fcv = u32(tbl, pcd + 2);
+        var comp = (fcv & 0x40000000) !== 0, fc = fcv & 0x3FFFFFFF, s = "";
+        if (comp) {
+          var o = fc / 2 + (a0 - cp0), arr = [];
+          for (var j = 0; j < len; j++) { var ch = wd[o + j]; arr.push(CP1252[ch] || ch); if (arr.length >= 8192) { s += String.fromCharCode.apply(null, arr); arr = []; } }
+          if (arr.length) s += String.fromCharCode.apply(null, arr);
+        } else {
+          var o2 = fc + (a0 - cp0) * 2;
+          s = new TextDecoder("utf-16le").decode(wd.subarray(o2, o2 + len * 2));
+        }
+        out.push(s);
+      }
+      return docCtrl(out.join(""));
+    }
+    var main = cpText(0, Math.min(ccpText, MAX_CHARS * 1.2));
+    // 脚注、尾注、文本框里的字接在正文后面（页眉页脚每页重复，不要；批注不是正文，不要）
+    var p0 = ccpText, extra = [];
+    var fn = cpText(p0, p0 + ccpFtn); p0 += ccpFtn + ccpHdd + ccpMcr + ccpAtn;
+    var en = cpText(p0, p0 + ccpEdn); p0 += ccpEdn;
+    var tb = cpText(p0, p0 + ccpTxbx);
+    if (clean(fn)) extra.push("【脚注】\n" + fn.trim());
+    if (clean(en)) extra.push("【尾注】\n" + en.trim());
+    if (clean(tb)) extra.push("【文本框】\n" + tb.trim());
+    return main + (extra.length ? ("\n\n" + extra.join("\n\n")) : "");
+  }
+  // .doc 里的控制字符：\r 段落、\x0B 软回车、\x07 表格单元结束、\x0C 分页；
+  // 域：\x13 代码 \x14 结果 \x15 —— 去掉代码、留结果；\x01 图片、\x08 绘图、\x02 脚注号等去掉
+  function docCtrl(s) {
+    var r = "", depth = [], i, c;
+    for (i = 0; i < s.length; i++) {
+      c = s.charCodeAt(i);
+      if (c === 0x13) { depth.push(1); continue; }                 // 进入域代码
+      if (c === 0x14) { if (depth.length) depth[depth.length - 1] = 0; continue; }   // 进入域结果
+      if (c === 0x15) { depth.pop(); continue; }
+      if (depth.length && depth[depth.length - 1]) continue;       // 域代码里的字不要
+      if (c === 0x0D) r += "\n\n";
+      else if (c === 0x0B || c === 0x0C || c === 0x0E) r += "\n";
+      else if (c === 0x07) r += "\t";
+      else if (c === 0x09 || c === 0x0A) r += s[i];
+      else if (c < 0x20) continue;
+      else r += s[i];
+    }
+    return r;
   }
 
   /* ── PDF：先抽文字层；文字层几乎空（扫描件）才退到 OCR ── */
@@ -260,34 +466,61 @@
     var low = name.toLowerCase();
     var P;
     if (/\.(txt|md|markdown|csv|json|log)$/.test(low)) P = readText(file).then(function (t) { return { text: t, note: "" }; });
-    else if (/\.docx$/.test(low)) {
-      var mb = file.size / 1048576;
+    else if (/\.(docx|docm|dotx|dotm|doc|dot|wps)$/.test(low)) P = wordAny(file, prog);
+    else if (/\.pdf$/.test(low)) P = pdfText(file, prog);
+    else if (/\.(png|jpe?g|webp|bmp|gif)$/.test(low)) P = readDataURL(file).then(function (d) { return { text: "", note: "图片", img: d }; });
+    else P = readText(file).then(function (t) { return { text: t, note: "按纯文本读" }; });
+    return P.then(function (r) { return finishDoc(name, r); });
+  }
+  // Word 不看扩展名，看文件头：PK＝新式 .docx，D0CF11E0＝老式 .doc／.wps（改过扩展名的也认得）
+  function wordAny(file, prog) {
+    return readSlice(file, 0, 8).then(function (h8) {
+      if (h8[0] === 0x50 && h8[1] === 0x4B) return wordX(file, prog);
+      if (u32(h8, 0) === 0xE011CFD0) return wordBin(file, prog);
+      if (h8[0] === 0x7B && h8[1] === 0x5C && h8[2] === 0x72) throw new Error("这是 RTF 格式（扩展名写成了 Word），请在 Word 里另存为 .docx 再传");
+      return readText(file).then(function (t) {
+        if (/<w:document|<html/i.test(t.slice(0, 4000))) throw new Error("这是网页／XML 格式另存的 Word，请在 Word 里另存为 .docx 再传");
+        throw new Error("认不出这份 Word 的格式，请在 Word 里另存为 .docx 再传");
+      });
+    });
+  }
+  function wordBin(file, prog) {
+    var mb = file.size / 1048576;
+    if (file.size > PDF_BUF_MAX) return Promise.reject(new Error("这份 .doc 太大（" + Math.round(mb) + " MB），请在 Word 里另存为 .docx 再传（.docx 多大都能读）"));
+    if (prog) prog("读取正文", 0, 1);
+    return readBuf(file).then(function (ab) {
+      var t = docBinText(new Uint8Array(ab));
+      return { text: t, note: "Word（老式 .doc）" + (mb >= 20 ? (" · " + Math.round(mb) + " MB，只读正文、未读图片") : "") };
+    });
+  }
+  function wordX(file, prog) {
+      var mb = file.size / 1048576, P;
       if (prog) prog("读取正文", 0, 1);
       P = docxFast(file).then(function (t) {
-        if (!clean(t)) throw new Error("empty");
+        if (!clean(t)) throw new Error("这份 Word 里没读出文字（可能全是图片或扫描页）");
         return { text: t, note: "Word" + (mb >= 20 ? (" · " + Math.round(mb) + " MB，只读正文、未读图片") : "") };
-      }).catch(function () {
-        // 快读不认这份（zip64、旧浏览器等）：回落 mammoth 整份读，但太大的整份读会卡死浏览器，宁可早说
-        if (file.size > 300 * 1048576) throw new Error("这份 Word 太大（" + Math.round(mb) + " MB），这台浏览器读不了；请用新版 Chrome／Edge，或在 Word 里删掉图片另存一份再传");
+      }).catch(function (e1) {
+        var why = (e1 && e1.message) || "";
+        if (/密码|没读出文字/.test(why)) throw e1;                 // 这两种换读法也没用，直说
+        // 快读不认这份：回落 mammoth 整份读，但太大的整份读会卡死浏览器，宁可早说，并把快读的原因带上便于排查
+        if (file.size > 300 * 1048576) throw new Error("这份 Word（" + Math.round(mb) + " MB）读不了：" + why + "；请在 Word 里另存一份 .docx 再传");
         return readBuf(file).then(function (ab) {
           return needMammoth().then(function (M) {
             return M.extractRawText({ arrayBuffer: ab }).then(function (r) { return { text: (r && r.value) || "", note: "Word" }; });
           });
-        });
+        }).catch(function (e2) { throw new Error("这份 Word 读不了：" + why + "／" + ((e2 && e2.message) || "?")); });
       });
-    } else if (/\.pdf$/.test(low)) P = pdfText(file, prog);
-    else if (/\.(png|jpe?g|webp|bmp|gif)$/.test(low)) P = readDataURL(file).then(function (d) { return { text: "", note: "图片", img: d }; });
-    else if (/\.doc$/.test(low)) P = Promise.reject(new Error("旧版 .doc 读不了，请在 Word 里另存为 .docx 再上传"));
-    else P = readText(file).then(function (t) { return { text: t, note: "按纯文本读" }; });
-
-    return P.then(function (r) {
+      return P;
+  }
+  function finishDoc(name, r) {
+    {
       var t = clean(r.text);
       // 图片没有文字是正常的（它本来就不是拿来读字的），不能按"读不出文字"退回
       if (r.img) return { name: name, text: t, note: r.note || "图片", img: r.img };
       if (!t) throw new Error("这个文件里没读出文字");
       var cut = t.length > MAX_CHARS;
       return { name: name, text: cut ? t.slice(0, MAX_CHARS) : t, note: (r.note || "") + (cut ? " · 太长，只取了前 " + MAX_CHARS + " 字" : "") };
-    });
+    }
   }
 
   // 弹文件选择框 → 逐个解析。单个失败不连坐，其余照常返回，失败的挂在 .failed 上。
@@ -296,7 +529,7 @@
     return new Promise(function (res) {
       var inp = document.createElement("input");
       inp.type = "file";
-      inp.accept = ".txt,.md,.markdown,.csv,.json,.log,.docx,.pdf,.png,.jpg,.jpeg,.webp,.bmp,.gif";
+      inp.accept = ".txt,.md,.markdown,.csv,.json,.log,.docx,.docm,.dotx,.doc,.dot,.wps,.pdf,.png,.jpg,.jpeg,.webp,.bmp,.gif";
       if (opts.multiple !== false) inp.multiple = true;
       inp.style.cssText = "position:fixed;left:-9999px;top:0";
       document.body.appendChild(inp);
