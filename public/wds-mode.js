@@ -1771,21 +1771,22 @@
       labBase: "底座论文（无 SDE）", labCard1: "第一张评分卡（底座）", labDlg: "SDE 五轮问对", labFinal: "终稿论文（SDE 科研创新法）", labCard2: "第二张评分卡（终稿）", labRound: "细化第 {n} 轮",
       /* 稿件提升（2026-10-10 王德生令「在 ChatSDE 上做一个稿件修改的智能体，比如专著修改和提升」）。见 sendMs 头注释。 */
       msBtn: "✒ 稿件提升", msOn: "✒ 稿件提升：开",
-      msTip: "先用 📎 载入书稿（Word／PDF／文本），再在输入框里贴出版社要求或编辑的退改意见（没有就留空，它会按一般审稿标准预判）。一键走六步：①诊断与拆条 ②称重（创新智商）③主心骨与逐章方案 ④逐章修改 ⑤复评（同几章改前改后对比）⑥编辑意见对照表＋修改说明信。每次改 3 章，可接着改下一批。约 15–25 分钟",
+      msTip: "总原则：把书稿里有分量的「发现」重生为「发生」——不再只宣布结论，而让读者看见它从哪里来、怎样成形、还能怎样接着长。先用 📎 载入书稿（Word／PDF／文本），再在输入框里贴出版社要求或编辑的退改意见（没有就留空，它会按一般审稿标准预判）。一键走六步：①诊断（挑出重要的发现）②称重（创新智商）③主心骨与重生方案 ④逐章重生与修改 ⑤复评（同几章改前改后对比）⑥重生对照表＋编辑意见对照表＋修改说明信。每次改 3 章，可接着改下一批。约 15–25 分钟",
       msNeed: "先用 📎 载入书稿，再在输入框里贴编辑意见（可留空），然后发送。",
-      msS1: "第一步 · 诊断与拆条（在说什么 · 承重句 · 哪里脆 · 编辑意见清单）", msS2: "第二步 · 称重（改前：本批章节的创新智商）",
-      msS3: "第三步 · 主心骨与逐章修改方案", msS4: "第四步 · 逐章修改（第 {a}–{b} 单元，共 {n} 单元）",
-      msS5: "第五步 · 复评（同一批章节改后再评，逐维对比）", msS6: "第六步 · 编辑意见对照表与修改说明信",
+      msS1: "第一步 · 诊断（在说什么 · 重要的发现 · 哪里脆 · 藏起来的来路 · 编辑意见清单）", msS2: "第二步 · 称重（改前：本批章节的创新智商）",
+      msS3: "第三步 · 主心骨与重生方案（哪几条发现重生为发生 · 逐章方案）", msS4: "第四步 · 逐章重生与修改（第 {a}–{b} 单元，共 {n} 单元）",
+      msS5: "第五步 · 复评（同一批章节改后再评，逐维对比）", msS6: "第六步 · 重生对照表、编辑意见对照表与修改说明信",
       msUnit: "第 {i} 单元 · {name}", msUnitRun: "正在改第 {i} 单元…", msNoteH: "【本章修改说明】",
       msWord: "⤓ 修改稿 Word", msWordAll: "⤓ 全过程 Word", msNext: "↻ 接着改下一批（第 {a}–{b} 单元）", msAllDone: "全部单元已改完。",
       msDocT: "稿件提升 · 全过程", msRevT: "修改稿", msFair: "说明：改前改后评的是同一批章节，评分员不装 SDE 内核；评分员与改稿者是同一家基底，分数宜视为待独立复核。书名、引文、数据、人名请人工逐条核对后再交出版社。",
+      msRule: "【总原则 · 发现重生为发生】这部书稿要改的根本，不是把句子改顺，而是把书里几条有分量的「发现」重生为「发生」。\n·「发现」的写法：把结论当成本来就在那里、被作者找到的东西直接宣布——读者只能信或不信，拿到的是一个现成的答案。这样的答案，今天任何一台机器都能写出来，书也就没有非读不可的理由。\n·「发生」的写法：让读者看见这个结论是怎么来的——它从什么处境出发，在哪一处转折、哪一个差别上被推动，哪几样东西缠在一起才使它成形，它发生出了什么，以后还会怎样接着发生。读者跟着走一遍，就能自己再走下去。\n·只重生真正承重的那几条，不是每句都改；结论可以保留，但要长出它的来路与去路。每一步都要落在书里具体的人、事、场面、材料上，不许用「在多种因素作用下」「经过长期发展」这类空话冒充发生。\n\n",
       msNoDemand: "（未提供编辑意见：请按出版社一般审稿标准，预判编辑最可能提的五条意见，逐条标「预判」。）",
       msMap: "【书稿目录（自动切分的单元 · 字数）】\n", msSample: "【书稿样本（开头、中段、结尾）】\n", msDemand: "【出版社要求与编辑意见原文】\n", msAbout: "【项目常驻说明】\n",
-      msDiagT: "【篇幅】约 2000 字。\n\n【任务 · 稿件诊断与拆条】下面是一部待改书稿的目录与样本，以及出版社的要求。请按五段作答：\n一、它在说什么（三句话以内）；\n二、承重句（引原文两三句，说明全书靠它们立住）；\n三、哪里脆（最容易被编辑或读者驳倒的三处，各引原句）；\n四、没看见什么（同类书都会写、它却漏了的，或它自己没意识到的更好的写法）；\n五、编辑意见清单：把编辑意见逐条拆开编号 Y1、Y2……，每条写：原话 ｜ 硬要求还是方向性 ｜ 主要落在哪几个单元。\n只就这部书稿说话，不讲方法论。\n\n",
-      msPlanT: "【篇幅】约 2500 字。\n\n【任务 · 主心骨与逐章修改方案】下面是这部书稿的诊断、改前评分卡、目录与编辑意见清单。请按五段作答：\n一、家底：同类书已有的两三种说法（只说你有把握的，宁缺毋造）；\n二、缝隙：这部书稿与它们相比，空着的、能填的那一处；\n三、主心骨：用一句话写出全书的中心判断，句式必须是「它不是……，而是……」，单独成行，行首写「主心骨：」；\n四、逐单元修改方案：按目录顺序，每个单元一行：「单元序号 ｜ 处理（保留／改写／压缩／合并／删）｜ 依据（意见编号 Y? 或评分卡哪一维）｜ 要点」；\n五、不许动的东西：作者亲历的经历、场面与口吻，列出三五处。\n写给出版中介与作者看，用平常话，不用学派术语。\n\n",
-      msRevT0: "【任务 · 按方案修改本单元】你是出版社资深责任编辑，正和作者一起改这部书稿。下面依次是：项目常驻说明、编辑意见清单、全书主心骨、逐单元修改方案、本单元原文。\n改稿规矩：\n1. 先在修改方案里找到本单元那一行，照它的处理去改；方案里没有本单元，就按主心骨与编辑意见改。\n2. 让本单元回扣主心骨；删掉与主心骨无关的枝蔓；同一个意思只说一遍。\n3. 作者亲历的经历、场面、口吻一律保留，可以重排，不许替换成泛泛之谈。\n4. 不编造事实、数据、引文、人名；没把握的地方原样保留，并在句末加〔待核〕。\n5. 不加任何学派术语，不出现 SDE 字样。\n6. 处理是「删」或「合并」时，不写正文，只写一句「（建议删去／并入第 N 单元）」和理由。\n输出格式：先写本单元改后的完整正文（保留单元标题）；正文之后另起一行写「【本章修改说明】」，下面逐条写：意见编号 ｜ 怎么改的 ｜ 举一处「原句 → 新句」。\n\n",
-      msMot: "【全书主心骨】", msPlanH: "【逐单元修改方案】\n", msListH: "【编辑意见清单】\n", msOrig: "【本单元原文 · {name}】\n",
-      msLetT: "【篇幅】约 1500 字。\n\n【任务 · 编辑意见对照表与修改说明信】下面是编辑意见清单、全书主心骨、已修改各单元的修改说明、尚未修改的单元、改前改后的评分。请写两部分：\n一、编辑意见对照表：Markdown 表格，列为「编号 ｜ 意见 ｜ 处理（已改／部分改／未改）｜ 改在哪里（单元）｜ 说明」；每条意见都要有一行，没覆盖到的标「未改」并写理由或「下一批处理」。\n二、修改说明信：致责任编辑，约 800 字，函件体——开头一句说明本次交回的是哪几个单元；逐条说改了哪几条意见、哪条没改为什么；最后写下一步与交稿时间（日期写〔待填〕）。不要虚构已经发生的沟通。\n\n",
+      msDiagT: "【篇幅】约 2500 字。\n\n【任务 · 稿件诊断：找出值得重生的发现】下面是一部待改书稿的目录与样本，以及出版社的要求。请按五段作答：\n一、它在说什么（三句话以内）；\n二、重要的发现：书稿里用「本来如此、被我找到」的口气交代的结论、规律、判断，挑出最有分量的三到七条，编号 F1、F2……，每条写：原句（照引）｜ 所在单元 ｜ 为什么重要（全书靠它立住哪一块）｜ 发现口气在哪（是只给结论、只给定义、只报结果，还是只引权威）；\n三、哪里脆：这几条发现里，哪几条最容易被编辑或读者一句「凭什么」驳倒，或者随便一台机器也能写出同样的话，各说理由；\n四、藏起来的来路：这几条发现原本是从什么处境、哪一个转折、哪几样东西缠在一起才冒出来的——书稿里有材料却没写出来的，指出材料在哪个单元；书稿里根本没有的，直说「缺」；\n五、编辑意见清单：把编辑意见逐条拆开编号 Y1、Y2……，每条写：原话 ｜ 硬要求还是方向性 ｜ 主要落在哪几个单元 ｜ 跟哪条 F 有关（没有就写「无」）。\n只就这部书稿说话，用平常话，不讲方法论，不用学派术语。\n\n",
+      msPlanT: "【篇幅】约 3000 字。\n\n【任务 · 主心骨与重生方案】下面是这部书稿的诊断（含发现清单 F 与编辑意见清单 Y）、改前评分卡与目录。请按六段作答：\n一、家底：同类书对同一题目的两三种说法，它们多半也是发现式的结论（只说你有把握的，宁缺毋造）；\n二、缝隙：同类书和这部书稿都只给了结论、没写出来路的那一处——哪一条发现一旦重生为发生，这本书就有了别人没有的东西；\n三、主心骨：用一句话写出全书的中心判断，句式必须是「它不是……（一个被找到的现成结论），而是……（在什么之中、怎样发生出来的什么）」，单独成行，行首写「主心骨：」；\n四、重生清单：从发现清单里选出要重生的条目（承重的必选，可删可并），每条一段，行首写编号：「F? ｜ 发现原句 → 发生的写法：从什么处境出发 ／ 在哪一处转折或差别上被推动 ／ 哪几样东西缠在一起使它成形 ／ 发生出了什么 ／ 还会怎样接着发生 ｜ 用书里哪些材料（单元序号）｜ 缺什么材料要作者补（没有写「无」）」；\n五、逐单元修改方案：按目录顺序，每个单元一行：「单元序号 ｜ 处理（重生／保留／改写／压缩／合并／删）｜ 依据（F? 、Y? 或评分卡哪一维）｜ 要点」；\n六、不许动的东西：作者亲历的经历、场面与口吻，列出三五处——重生正要靠它们落地。\n写给出版中介与作者看，用平常话，不用学派术语。\n\n",
+      msRevT0: "【任务 · 按方案重生并修改本单元】你是出版社资深责任编辑，正和作者一起改这部书稿。下面依次是：总原则、项目常驻说明、编辑意见清单、全书主心骨、重生清单、逐单元修改方案、本单元原文。\n改稿规矩：\n1. 先在修改方案里找到本单元那一行，照它的处理去改；方案里没有本单元，就按主心骨、重生清单与编辑意见改。\n2. 重生清单里落在本单元的每一条发现，都要重生为发生：不再只宣布结论，而是把它的来路写出来——从什么处境出发、在哪一处转折或差别上被推动、哪几样东西缠在一起使它成形、发生出什么、还会怎样接着发生；原来的结论可以留作这一段的落点。每一步都落在本单元或书里已有的人、事、场面、材料上；材料不够的地方写〔待作者补：……〕，不许自己编。正文里不必出现「发现」「发生」这两个词本身。\n3. 不在清单里的句子照常改顺：回扣主心骨，删掉与主心骨无关的枝蔓，同一个意思只说一遍。\n4. 作者亲历的经历、场面、口吻一律保留，可以重排，不许替换成泛泛之谈——重生正要靠它们落地。\n5. 不编造事实、数据、引文、人名；没把握的地方原样保留，并在句末加〔待核〕。\n6. 不加任何学派术语，不出现 SDE 字样。\n7. 处理是「删」或「合并」时，不写正文，只写一句「（建议删去／并入第 N 单元）」和理由。\n输出格式：先写本单元改后的完整正文（保留单元标题）；正文之后另起一行写「【本章修改说明】」，下面逐条写：编号（F? 或 Y?）｜ 怎么改的 ｜ 举一处「原句 → 新句」；F 条的「新句」要摘出写出来路的那一两句。\n\n",
+      msMot: "【全书主心骨】", msRebH: "【重生清单（发现 → 发生）】\n", msPlanH: "【逐单元修改方案】\n", msListH: "【编辑意见清单】\n", msOrig: "【本单元原文 · {name}】\n",
+      msLetT: "【篇幅】约 2000 字。\n\n【任务 · 重生对照表、编辑意见对照表与修改说明信】下面是重生清单、编辑意见清单、全书主心骨、已修改各单元的修改说明、尚未修改的单元、改前改后的评分。请写三部分：\n一、重生对照表：Markdown 表格，列为「编号 ｜ 发现原句（压缩到一句）｜ 重生后的写法（一句话说它现在怎么来的）｜ 改在哪里（单元）｜ 处理（已重生／部分／未改）」；重生清单每条一行，没改到的写「下一批处理」或缺什么材料。\n二、编辑意见对照表：Markdown 表格，列为「编号 ｜ 意见 ｜ 处理（已改／部分改／未改）｜ 改在哪里（单元）｜ 说明」；每条意见都要有一行，没覆盖到的标「未改」并写理由或「下一批处理」。\n三、修改说明信：致责任编辑，约 900 字，函件体——开头一句说明本次交回的是哪几个单元；用平常话说清这一轮修改的主线：书里几处关键结论不再直接宣布，而是写出它们是怎么来的（举一处最有说服力的前后对比）；再逐条说改了哪几条意见、哪条没改为什么；最后写下一步与交稿时间（日期写〔待填〕）。不要虚构已经发生的沟通，不用学派术语。\n\n",
       msDone: "【已改单元的修改说明】\n", msLeft: "【尚未修改的单元】", msScore: "【评分变化】\n",
       msDelta: "逐维对比（本批改前 → 改后）",
       cmpIq: "⚖ 给两份打创新智商", cmpIqQ: "下面是同一个问题、同一家基底、在两种内核下各写出的一份报告（A＝有 SDE，B＝无 SDE）。请按创新智商五维（S/D/E/I/F）分别给两份打分，各维附一句原文证据与一句扣分句，算出综合分，并说清差距主要出在哪几维、各自最该补哪一维。",
@@ -2010,7 +2011,7 @@
       qacPlainP: "\n\n[Wording] Define any concept or metaphor you coin in one sentence of ordinary scholarly language at first use, then keep the usage consistent; do not carry the dialogue\u2019s spoken metaphors into the paper as they are.", qacPA: "Paper A · with SDE", qacPB: "Paper B · without SDE",
       labBtn: "🧪 SDE research method", labOn: "🧪 SDE research method: on",
       msBtn: "✒ Manuscript lift", msOn: "✒ Manuscript lift: on",
-      msTip: "Load the manuscript with 📎, paste the publisher's requirements or the editor's revision notes in the box (or leave it empty), then send. Six steps: diagnose, score, spine and per-chapter plan, revise chapter by chapter, re-score, editor-notes table and cover letter. Three chapters per batch. About 15–25 minutes.",
+      msTip: "Guiding principle: the manuscript's weighty \u201cdiscoveries\u201d are reborn as \u201cgenesis\u201d \u2014 instead of announcing a conclusion, show where it comes from, how it takes shape and how it can keep growing. Load the manuscript with 📎, paste the publisher's requirements or the editor's revision notes in the box (or leave it empty), then send. Six steps: diagnose (pick the key discoveries), score, spine and rebirth plan, rebirth and revise chapter by chapter, re-score, rebirth table + editor-notes table + cover letter. Three chapters per batch. About 15–25 minutes.",
       msNeed: "Load the manuscript with 📎 first, paste the editor's notes (optional), then send.",
       msWord: "⤓ Revised Word", msWordAll: "⤓ Full process Word", msNext: "↻ Next batch (units {a}–{b})", msAllDone: "All units revised.",
       labTip: "Enter a question: (1) conventional research without SDE (5-round dialogue + ~10k-character paper, the baseline) (2) an independent scorer rates it on Innovation IQ and names directions (3) SDE innovation along those directions in five refining rounds (4) polished final paper, re-scored, with per-dimension deltas. One Word file. Prompts run in Chinese. About 30–40 minutes",
@@ -6859,7 +6860,10 @@
   /* ══════════════ 稿件提升（六步）══════════════
      2026-10-10 王德生令「我们应该在 ChatSDE 上做一个稿件修改的智能体，比如专著修改和提升」——
      对象是出版中介（收稿、改稿、送出版社）：他们要学会①提升稿件质量 ②满足出版社的改稿要求。
-     一问＝①诊断与拆条 ②称重 ③主心骨与逐单元方案 ④逐单元修改（每批 3 单元）⑤复评 ⑥对照表＋修改说明信。
+     🔴 总原则（2026-10-11 王德生令）：稿件提升＝把书稿里有分量的「发现」重生为「发生」——不再只宣布结论，
+        而写出它从什么处境出发、在哪一处转折被推动、哪几样东西缠在一起使它成形、发生出什么、还会怎样接着发生。
+        msRule 常驻块递进①③④⑥每一步；①挑发现清单 F，③出重生清单（msRebirth 抽出递给④⑥），⑥多一张重生对照表。
+     一问＝①诊断（发现清单 F＋意见清单 Y）②称重 ③主心骨与重生方案 ④逐单元重生与修改（每批 3 单元）⑤复评 ⑥重生对照表＋意见对照表＋修改说明信。
      座次（照三家对撞「一吃两不吃」的口径）：
        ①③ 走 SDE 一路（内功＋站内语料）——找缝、立主心骨要它；
        ④⑥ 走无 SDE 一路——改的是作者的稿子、写给编辑的信，产出必须零术语、不带账本行；
@@ -6946,6 +6950,15 @@
     if (m) return m[1].replace(/\*+/g, "").trim();
     m = /([^\n。]{0,40}不是[^\n。]{1,80}而是[^\n。]{1,120}[。]?)/.exec(s);
     return m ? m[1].replace(/^[#>*\-\s]+/, "").replace(/\*+/g, "").trim() : "";
+  }
+  // 重生清单：方案第四段「重生清单」到第五段之前；认不出就收集以 F 编号开头的行
+  function msRebirth(plan) {
+    var s = String(plan || ""), i = s.search(/重生清单/);
+    if (i >= 0) {
+      var rest = s.slice(i), j = rest.search(/\n\s*(?:#+\s*)?\**\s*五\s*[、.．]/);
+      return (j > 0 ? rest.slice(0, j) : rest.slice(0, 4000)).trim();
+    }
+    return s.split("\n").filter(function (x) { return /^\s*[-*|]?\s*\**F\d+/.test(x); }).join("\n");
   }
   // 改后正文与修改说明分家；正文末尾若还挂着基底自带的收尾客套，一并去掉
   function msSplitOut(text) {
@@ -7043,7 +7056,7 @@
     }
     var clk = setInterval(function () { tick(); if (!streaming) clearInterval(clk); }, 1000);
     cell.a.innerHTML = ""; cell.a.appendChild(wrap);
-    var demandBlock = t("msDemand") + (demand || t("msNoDemand")) + "\n\n" + (about ? (t("msAbout") + about + "\n\n") : "");
+    var demandBlock = t("msRule") + t("msDemand") + (demand || t("msNoDemand")) + "\n\n" + (about ? (t("msAbout") + about + "\n\n") : "");
     function done(err) {
       streaming = false; curReader = null; busyUI(false); stopBarShow(false);
       try { tick(); } catch (e) {}
@@ -7078,7 +7091,8 @@
       var qtext = "【篇幅】约 " + L + " 字。\n\n" + t("msRevT0") + demandBlock
         + t("msListH") + String(st.list || "").slice(0, 2500) + "\n\n"
         + t("msMot") + (st.motif || "（方案里未单列，按逐单元方案改）") + "\n\n"
-        + t("msPlanH") + String(st.plan || "").slice(0, 3500) + "\n\n"
+        + t("msRebH") + String(st.reb || "（方案里未单列，按诊断里的发现清单重生落在本单元的条目）").slice(0, 3000) + "\n\n"
+        + t("msPlanH") + String(st.plan || "").slice(0, 3000) + "\n\n"
         + qacFmt(t("msOrig"), { name: (i + 1) + ". " + u.name }) + u.text;
       return msPlain(mine, qtext.slice(0, 19800), function (x) { box.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
         .then(function (r) { var o = msSplitOut(r); u.rev = o.body; u.note = o.note; box.innerHTML = mdRender(r); });
@@ -7105,7 +7119,7 @@
         s6.nt.textContent = t("qacP1");
         var doneNotes = st.units.map(function (u, i) { return u.rev != null ? ((i + 1) + ". " + u.name + "\n" + String(u.note || "（无说明）").slice(0, 900)) : ""; }).filter(Boolean).join("\n\n");
         var left = st.units.map(function (u, i) { return u.rev == null ? ((i + 1) + ". " + u.name) : ""; }).filter(Boolean).join("；");
-        var qtext = t("msLetT") + demandBlock + t("msListH") + String(st.list || "").slice(0, 3000) + "\n\n"
+        var qtext = t("msLetT") + demandBlock + t("msRebH") + String(st.reb || "").slice(0, 3000) + "\n\n" + t("msListH") + String(st.list || "").slice(0, 2500) + "\n\n"
           + t("msMot") + (st.motif || "") + "\n\n" + t("msDone") + doneNotes.slice(0, 9000) + "\n\n"
           + t("msLeft") + (left || "无") + "\n\n"
           + (st.card1 && st.card2 ? (t("msScore") + labDeltaMd(st.card1.s, st.card2.s)) : "");
@@ -7133,7 +7147,7 @@
         + "【诊断】\n" + labDigest(st.diag) + "\n\n【改前评分卡】\n" + String(sc.text || "").slice(0, 2000),
         function (x) { s3.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; });
     }).then(function (p) {
-      st.plan = p; st.motif = msMotif(p); s3.bd.innerHTML = mdRender(p); s3.nt.textContent = "";
+      st.plan = p; st.motif = msMotif(p); st.reb = msRebirth(p); s3.bd.innerHTML = mdRender(p); s3.nt.textContent = "";
       if (st.motif) { var mh = el("div", "wdsm-duh"); mh.style.cssText = "border:0;padding:6px 10px;margin:6px 0;border-radius:8px;background:var(--wfill);color:var(--wtx);display:block"; mh.appendChild(el("b", null, "主心骨：" + st.motif)); s3.bd.parentNode.insertBefore(mh, s3.bd); }
       return batch(true);
     }).catch(function (e) { done((e && e.message) || "?"); });
