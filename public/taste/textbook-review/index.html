@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>教材审校 · 结构与概念层把关 | SDE Universes</title>
+<meta name="description" content="ChatSDE 的教材审校：逐单元检查教材的概念与结构（先用后定义、术语前后不一、例题跳步、章节断档），同时按国标做表层核对，输出分级审校意见与全书汇总。只出审校意见，不替代人工终审，不构成符合出版要求的结论。">
+<link rel="canonical" href="https://sdeuniverses.com/taste/textbook-review/">
+<style>
+:root{--gold:#C9A84C;--gold2:#E4CB7E;--ink:#F0E9D8;--ink2:#B8AE96;--mute:#8A8170;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.85}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .w{max-width:880px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
+.hero{max-width:760px;margin:0 auto;padding:56px 24px 6px;text-align:center}
+.eyebrow{font-size:11px;letter-spacing:0.42em;color:var(--gold);margin-bottom:16px}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;line-height:1.25;margin-bottom:16px;color:#F5EFE0}
+.lead{font-size:15.5px;color:var(--ink2);max-width:620px;margin:0 auto}
+.go{display:inline-block;margin-top:26px;background:var(--gold);color:#1A1410;border-radius:10px;font-size:16px;font-weight:700;letter-spacing:0.05em;padding:13px 28px;text-decoration:none}
+.go.ghost{background:transparent;color:var(--gold);border:1px solid rgba(201,168,76,0.55);margin-left:10px}
+.wrap{max-width:880px;margin:0 auto;padding:10px 24px 90px}
+.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:26px 24px;margin-top:24px}
+.card h2{font-size:18px;color:var(--gold);letter-spacing:0.06em;margin-bottom:12px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.step{border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.step b{display:block;color:var(--gold2);font-size:15px;margin-bottom:4px}
+.step p{font-size:13.5px;color:var(--ink2)}
+ol.how{padding-left:1.4em;font-size:14.5px}
+ol.how li{margin:8px 0}
+ul.dots{padding-left:1.2em;font-size:14px;color:var(--ink2)}
+ul.dots li{margin:6px 0}
+.note{font-size:13px;color:var(--mute);margin-top:14px;line-height:1.85}
+code{font-family:inherit;color:var(--gold2)}
+footer{text-align:center;font-size:12.5px;color:var(--mute);padding:30px 24px 50px;border-top:1px solid var(--line)}
+footer a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+<nav><div class="w"><a href="/taste/">← 品尝系列</a><a href="/taste/chatsde/">✦ ChatSDE</a></div></nav>
+
+<header class="hero">
+  <div class="eyebrow">CHATSDE · 教材审校</div>
+  <h1>先查概念和结构，再核字词和标点</h1>
+  <p class="lead">教材最怕的不是错别字，而是学生读不懂的地方：概念没讲就用、同一个术语前后两个叫法、例题跳了一步、前一章埋的伏笔后面没人接。教材审校把重点放在这两层，逐单元给出带原文位置的分级意见；字词、标点、数字、量和单位、参考文献格式等表层问题按国家标准顺带核对。最后汇总成全书审校报告。</p>
+  <a class="go" href="/taste/chatsde/?mode=rv">开始教材审校 →</a><a class="go ghost" href="#how">怎么用</a>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h2>审什么</h2>
+    <div class="steps">
+      <div class="step"><b>概念层（重点）</b><p>先用后定义、术语前后不一、定义与例子对不上、同一符号两种含义、与前序章节的概念冲突。</p></div>
+      <div class="step"><b>结构层（重点）</b><p>单元内部的讲解顺序、例题梯度、练习是否覆盖所讲内容、章节之间是否断档，每个单元给出「有／弱／缺」的体检结论并引原文为证。</p></div>
+      <div class="step"><b>表层</b><p>字词、标点、数字用法、量和单位、外文与公式、参考文献格式、图表引用、语病。每条标明规则编号和级别（必改／统一／裁决／提示）。</p></div>
+      <div class="step"><b>合规提示</b><p>比较性断言无来源、疑似未标注出处的引用等，只提请人工核对，不下结论。</p></div>
+    </div>
+  </section>
+
+  <section class="card" id="how">
+    <h2>怎么用</h2>
+    <ol class="how">
+      <li>点「开始教材审校」进入 ChatSDE，模式条上的 <code>🔎 教材审校</code> 已点亮。第一次用要先在设置里选基底、填你自己的 API Key。</li>
+      <li>用输入框下的 <code>📎 附件</code> 载入教材稿：Word、PDF、文本都可以，在你自己的浏览器里解析。</li>
+      <li>发送后按单元逐个审，每批 4 个；前面单元的术语、图表、公式编号会记入台账，带给后面的单元对照。</li>
+      <li>点「↻ 继续审」审完余下单元，审完自动生成全书汇总；也可以随时点「现在生成全书汇总」。</li>
+      <li>随时可下载 <code>⤓ 导出审校报告 Word</code>：汇总、逐单元审校意见和全书台账。</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>用之前要知道</h2>
+    <ul class="dots">
+      <li><b>它只出审校意见。</b>不替代人工终审，也不构成「符合出版要求」的结论；重大修改与取舍由责任编辑裁决。</li>
+      <li><b>纯文本会丢字体信息。</b>正斜体、粗体、上下标在粘贴或转文本时已经丢失，相关检查会在报告里标「未检」。</li>
+      <li><b>没有社内体例。</b>本模式按通行国家标准核对，不知道你社的内部体例；与社内规定不一致处请以社内为准。</li>
+      <li><b>一人一把 Key。</b>限流按 Key 计，审校用的是你自己的 Key。</li>
+      <li><b>事实要人核。</b>书名、引文、数据、人名和标准的现行状态，交出版前请逐条核对。</li>
+      <li><b>稿子是作者的。</b>载入未出版稿件前请征得作者同意。</li>
+    </ul>
+  </section>
+</main>
+
+<footer>SDE Universes · 德麦国际　·　<a href="/taste/chatsde/?mode=rv">进入教材审校</a>　·　<a href="/taste/">品尝系列</a></footer>
+</body></html>
