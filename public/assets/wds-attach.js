@@ -151,7 +151,7 @@
             x += 4 + ln;
           }
         }
-        dir[name] = { flags: flags, method: method, csize: csize, loff: loff, name: name };
+        dir[name] = { flags: flags, method: method, csize: csize, usize: usize, loff: loff, name: name };
         p += 46 + nl + xl + cl;
       }
       return dir;
@@ -218,6 +218,151 @@
         }
         return zipText(file, main).then(docxXmlText);
       });
+    });
+  }
+
+  /* ── Word 结构体检（2026-10-11，来稿初审用）──
+       正文文字之外，初审还要看：图片有几幅、分辨率够不够、公式是不是图片或老公式编辑器做的、
+       表格是不是真表格、标题层级、外链网址、修订痕迹与批注。全部只读压缩包目录与几个小部件，
+       图片只读文件头（存储式读前 64 KB，压缩式 4 MB 以内才解压），不整份载入。
+       只在「来稿初审」模式里按需调用（docxMeta(file)），其他模式载入 Word 一字不多读。 */
+  function imgDims(b, ext) {
+    try {
+      if (b[0] === 0x89 && b[1] === 0x50) return { w: (b[16] << 24 | b[17] << 16 | b[18] << 8 | b[19]) >>> 0, h: (b[20] << 24 | b[21] << 16 | b[22] << 8 | b[23]) >>> 0 };
+      if (b[0] === 0x47 && b[1] === 0x49) return { w: u16(b, 6), h: u16(b, 8) };
+      if (b[0] === 0x42 && b[1] === 0x4D) return { w: u32(b, 18), h: Math.abs(u32(b, 22) | 0) };
+      if (b[0] === 0xFF && b[1] === 0xD8) {
+        var i = 2;
+        while (i + 9 < b.length) {
+          if (b[i] !== 0xFF) { i++; continue; }
+          var mk = b[i + 1];
+          if (mk >= 0xC0 && mk <= 0xCF && mk !== 0xC4 && mk !== 0xC8 && mk !== 0xCC) return { h: (b[i + 5] << 8) | b[i + 6], w: (b[i + 7] << 8) | b[i + 8] };
+          if (mk === 0xD8 || mk === 0x01 || (mk >= 0xD0 && mk <= 0xD7)) { i += 2; continue; }
+          i += 2 + ((b[i + 2] << 8) | b[i + 3]);
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+  function docxMeta(file) {
+    var M = { images: [], drawings: 0, omml: 0, ole: {}, tables: 0, tblCaps: [], headings: [], links: [], embeds: [], ins: 0, del: 0, comments: 0, alt: [], styles: 0 };
+    return zipDir(file).then(function (dir) {
+      var main = dir["word/document.xml"] || null;
+      if (!main) for (var k in dir) if (/^word\/document\d*\.xml$/i.test(k)) { main = dir[k]; break; }
+      if (!main) throw new Error("no main part");
+      var sty = dir["word/styles.xml"], rel = dir["word/_rels/document.xml.rels"], com = dir["word/comments.xml"];
+      var lvOf = {};
+      var pSty = sty ? zipText(file, sty).then(function (x) {
+        var re = /<w:style\b[^>]*w:styleId="([^"]+)"[^>]*>([\s\S]*?)<\/w:style>/g, m;
+        while ((m = re.exec(x))) {
+          var nm = /<w:name w:val="([^"]+)"/.exec(m[2]), ol = /<w:outlineLvl w:val="(\d)"/.exec(m[2]);
+          var lv = ol ? (+ol[1] + 1) : 0;
+          if (!lv && nm) { var hm = /^(?:heading|标题)\s*(\d)$/i.exec(nm[1]); if (hm) lv = +hm[1]; }
+          if (lv) lvOf[m[1]] = lv;
+        }
+      }).catch(function () {}) : Promise.resolve();
+      var pRel = rel ? zipText(file, rel).then(function (x) {
+        var re = /<Relationship\b[^>]*>/g, m;
+        while ((m = re.exec(x))) {
+          if (/TargetMode="External"/i.test(m[0]) && /\/hyperlink"/i.test(m[0])) { var tg = /Target="([^"]+)"/.exec(m[0]); if (tg) M.links.push(xmlUnesc(tg[1])); }
+        }
+      }).catch(function () {}) : Promise.resolve();
+      var pCom = com ? zipText(file, com).then(function (x) { M.comments = (x.match(/<w:comment\b/g) || []).length; }).catch(function () {}) : Promise.resolve();
+      return Promise.all([pSty, pRel, pCom]).then(function () { return zipText(file, main); }).then(function (xml) {
+        xml = xml.replace(/<mc:Fallback\b[\s\S]*?<\/mc:Fallback>/g, "");
+        M.drawings = (xml.match(/<w:drawing\b/g) || []).length + (xml.match(/<v:imagedata\b/g) || []).length;
+        M.omml = (xml.match(/<m:oMath[\s>]/g) || []).length;
+        M.tables = (xml.match(/<w:tbl>/g) || []).length;
+        M.ins = (xml.match(/<w:ins\b/g) || []).length; M.del = (xml.match(/<w:del\b/g) || []).length;
+        var re = /<o:OLEObject\b[^>]*ProgID="([^"]+)"/g, m;
+        while ((m = re.exec(xml))) M.ole[m[1]] = (M.ole[m[1]] || 0) + 1;
+        re = /<wp:docPr\b[^>]*?descr="([^"]*)"/g;
+        while ((m = re.exec(xml))) if (m[1]) M.alt.push(xmlUnesc(m[1]).slice(0, 80));
+        // 段落顺序扫一遍：标题（样式级别或段落大纲级别）＋ 表格前后紧邻的段落（表题）
+        var ptxt = function (px) { var s = "", r2 = /<w:t(?=[\s>])[^>]*>([^<]*)<\/w:t>/g, q; while ((q = r2.exec(px))) s += xmlUnesc(q[1]); return s.trim(); };
+        var tok = /<w:tbl>|<\/w:tbl>|<w:p\b[^>]*\/>|<w:p\b[\s\S]*?<\/w:p>/g, depth = 0, last = "", pend = null, t2;
+        while ((t2 = tok.exec(xml))) {
+          var s = t2[0];
+          if (s === "<w:tbl>") { if (depth === 0) pend = { before: last, after: "" }; depth++; continue; }
+          if (s === "</w:tbl>") { depth--; if (depth === 0 && pend) { M.tblCaps.push(pend); pend = "wait"; } continue; }
+          if (depth > 0) continue;
+          var tx = ptxt(s);
+          if (pend === "wait") { if (tx) { M.tblCaps[M.tblCaps.length - 1].after = tx.slice(0, 60); pend = null; } }
+          if (!tx) continue;
+          last = tx.slice(0, 60);
+          var st = /<w:pStyle w:val="([^"]+)"/.exec(s), ol = /<w:outlineLvl w:val="(\d)"/.exec(s);
+          var lv = ol ? (+ol[1] + 1) : (st && lvOf[st[1]]) || 0;
+          if (lv && lv <= 6 && M.headings.length < 3000) M.headings.push({ lv: lv, t: tx.slice(0, 80) });
+        }
+        M.styles = Object.keys(lvOf).length;
+        for (var n in dir) if (/^word\/embeddings\//i.test(n)) M.embeds.push(n.replace(/^word\/embeddings\//i, ""));
+        var media = Object.keys(dir).filter(function (n) { return /^word\/media\//i.test(n); }).slice(0, 400);
+        var chain = Promise.resolve();
+        media.forEach(function (n) {
+          chain = chain.then(function () {
+            var e = dir[n], ext = (n.split(".").pop() || "").toLowerCase(), rec = { n: n.replace(/^word\/media\//i, ""), ext: ext, size: e.usize || e.csize };
+            M.images.push(rec);
+            if (/^(emf|wmf|svg)$/.test(ext)) { rec.vec = 1; return; }
+            if (e.flags & 1) return;
+            return readSlice(file, e.loff, e.loff + 30).then(function (lh) {
+              var start = e.loff + 30 + u16(lh, 26) + u16(lh, 28);
+              if (e.method === 0) return readSlice(file, start, start + Math.min(e.csize, 65536));
+              if (e.method === 8 && e.csize <= 4194304) return readSlice(file, start, start + e.csize).then(inflateRaw);
+              return null;
+            }).then(function (b) { if (b) { var d = imgDims(b, ext); if (d && d.w && d.h) { rec.w = d.w; rec.h = d.h; } } }).catch(function () {});
+          });
+        });
+        return chain.then(function () { return M; });
+      });
+    });
+  }
+  /* 资源文件（视频、音频、课件、模型、图纸……）：初审只要清单——名字、大小、格式；
+     MP4／MOV 再嗅一下编码（H.264？）、时长与画面尺寸；PPT 数页数。内容不解析、不上传。 */
+  var RES_EXT = /\.(mp4|m4v|mov|avi|wmv|flv|mkv|webm|mpg|mpeg|mp3|wav|m4a|aac|flac|ppt|pptx|pps|ppsx|xls|xlsx|xlsm|csv0|psd|eps|xmind|eml|tif|tiff|vsd|vsdx|glb|gltf|stp|step|ifc|dwg|dxf|dwf|dwfx|dwt|dcm|ofd|rtf|zip|rar|7z|pages|et|dps|ett|wpt|swf|obj|fbx|stl)$/i;
+  function findAscii(b, s, from) {
+    var c0 = s.charCodeAt(0);
+    outer: for (var i = from || 0; i + s.length <= b.length; i++) {
+      if (b[i] !== c0) continue;
+      for (var j = 1; j < s.length; j++) if (b[i + j] !== s.charCodeAt(j)) continue outer;
+      return i;
+    }
+    return -1;
+  }
+  function be32(b, o) { return ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0; }
+  function mp4Sniff(b, rec) {
+    var mv = findAscii(b, "mvhd");
+    if (mv > 0) {
+      var v = b[mv + 4];
+      var ts = v === 1 ? be32(b, mv + 24) : be32(b, mv + 16), du = v === 1 ? (be32(b, mv + 28) * 4294967296 + be32(b, mv + 32)) : be32(b, mv + 20);
+      if (ts > 0 && du > 0) rec.dur = Math.round(du / ts);
+    }
+    var codecs = [["avc1", "H.264"], ["avc3", "H.264"], ["hvc1", "H.265"], ["hev1", "H.265"], ["av01", "AV1"], ["vp09", "VP9"], ["mp4v", "MPEG-4"]];
+    for (var i = 0; i < codecs.length; i++) {
+      var p = findAscii(b, codecs[i][0]);
+      if (p > 0) { rec.codec = codecs[i][1]; var w = (b[p + 28] << 8) | b[p + 29], h = (b[p + 30] << 8) | b[p + 31]; if (w > 0 && h > 0 && w < 10000 && h < 10000) { rec.w = w; rec.h = h; } break; }
+    }
+  }
+  function resFile(file) {
+    var name = file.name || "未命名", ext = (name.split(".").pop() || "").toLowerCase(), rec = { ext: ext, size: file.size };
+    var P = Promise.resolve();
+    if (/^(mp4|m4v|mov)$/.test(ext)) {
+      var N = 4194304, sz = file.size;
+      P = readSlice(file, 0, Math.min(sz, N)).then(function (a) { mp4Sniff(a, rec); if (rec.codec && rec.dur) return; if (sz > N) return readSlice(file, Math.max(N, sz - N), sz).then(function (z) { var r2 = {}; mp4Sniff(z, r2); for (var k in r2) if (!(k in rec)) rec[k] = r2[k]; }); }).catch(function () {});
+    } else if (/^(pptx|ppsx|xlsx|xlsm)$/.test(ext)) {
+      P = zipDir(file).then(function (dir) {
+        var n = 0; for (var k in dir) { if (/^ppt\/slides\/slide\d+\.xml$/i.test(k)) n++; if (/^xl\/worksheets\/sheet\d+\.xml$/i.test(k)) n++; }
+        if (/^pp/.test(ext)) rec.slides = n; else rec.sheets = n;
+      }).catch(function () {});
+    }
+    return P.then(function () {
+      var mb = file.size / 1048576;
+      var bits = [ext.toUpperCase(), (mb >= 1 ? mb.toFixed(1) + " MB" : Math.max(1, Math.round(file.size / 1024)) + " KB")];
+      if (rec.codec) bits.push(rec.codec);
+      if (rec.w) bits.push(rec.w + "×" + rec.h);
+      if (rec.dur) bits.push(Math.floor(rec.dur / 60) + "分" + (rec.dur % 60) + "秒");
+      if (rec.slides != null) bits.push(rec.slides + " 页");
+      if (rec.sheets != null) bits.push(rec.sheets + " 个工作表");
+      return { text: "〔资源文件〕" + name + " · " + bits.join(" · "), note: "资源文件（只登记，不解析内容）", res: rec };
     });
   }
 
@@ -469,8 +614,14 @@
     else if (/\.(docx|docm|dotx|dotm|doc|dot|wps)$/.test(low)) P = wordAny(file, prog);
     else if (/\.pdf$/.test(low)) P = pdfText(file, prog);
     else if (/\.(png|jpe?g|webp|bmp|gif)$/.test(low)) P = readDataURL(file).then(function (d) { return { text: "", note: "图片", img: d }; });
+    else if (RES_EXT.test(low)) P = resFile(file);
     else P = readText(file).then(function (t) { return { text: t, note: "按纯文本读" }; });
-    return P.then(function (r) { return finishDoc(name, r); });
+    return P.then(function (r) {
+      var d = finishDoc(name, r);
+      // 留住原文件的引用（不复制、不读），来稿初审要按需再看 Word 的结构；其他模式用不着它
+      try { if (/\.(docx|docm|dotx|dotm)$/.test(low)) d.file = file; d.size = file.size; } catch (e) {}
+      return d;
+    });
   }
   // Word 不看扩展名，看文件头：PK＝新式 .docx，D0CF11E0＝老式 .doc／.wps（改过扩展名的也认得）
   function wordAny(file, prog) {
@@ -517,6 +668,7 @@
       var t = clean(r.text);
       // 图片没有文字是正常的（它本来就不是拿来读字的），不能按"读不出文字"退回
       if (r.img) return { name: name, text: t, note: r.note || "图片", img: r.img };
+      if (r.res) return { name: name, text: t, note: r.note, res: r.res };
       if (!t) throw new Error("这个文件里没读出文字");
       var cut = t.length > MAX_CHARS;
       return { name: name, text: cut ? t.slice(0, MAX_CHARS) : t, note: (r.note || "") + (cut ? " · 太长，只取了前 " + MAX_CHARS + " 字" : "") };
@@ -529,12 +681,12 @@
     return new Promise(function (res) {
       var inp = document.createElement("input");
       inp.type = "file";
-      inp.accept = ".txt,.md,.markdown,.csv,.json,.log,.docx,.docm,.dotx,.doc,.dot,.wps,.pdf,.png,.jpg,.jpeg,.webp,.bmp,.gif";
+      inp.accept = opts.accept || ".txt,.md,.markdown,.csv,.json,.log,.docx,.docm,.dotx,.doc,.dot,.wps,.pdf,.png,.jpg,.jpeg,.webp,.bmp,.gif";
       if (opts.multiple !== false) inp.multiple = true;
       inp.style.cssText = "position:fixed;left:-9999px;top:0";
       document.body.appendChild(inp);
       inp.onchange = function () {
-        var files = Array.prototype.slice.call(inp.files || []).slice(0, 5);
+        var files = Array.prototype.slice.call(inp.files || []).slice(0, opts.max || 5);
         if (inp.parentNode) inp.parentNode.removeChild(inp);
         if (!files.length) { res([]); return; }
         var out = [], failed = [], i = 0;
@@ -601,7 +753,7 @@
     return { text: text, take: idxs.length, total: chunks.length };
   }
 
-  var API = { _docxXmlText: docxXmlText, _docxFast: docxFast, pick: pick, parseFile: parseFile, MAX_CHARS: MAX_CHARS, chunk: chunk, selectChunks: selectChunks, ocrDataUrl: ocrDataUrl };
+  var API = { _docxXmlText: docxXmlText, _docxFast: docxFast, docxMeta: docxMeta, resFile: resFile, _imgDims: imgDims, _mp4Sniff: mp4Sniff, RES_EXT: RES_EXT, pick: pick, parseFile: parseFile, MAX_CHARS: MAX_CHARS, chunk: chunk, selectChunks: selectChunks, ocrDataUrl: ocrDataUrl };
   window.WDSAttach = {
     load: function (cb) {
       var okEnv = !!(window.FileReader && window.Promise);
