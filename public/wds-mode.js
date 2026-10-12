@@ -1804,6 +1804,11 @@
       csTip: "按《来稿初审指导书》逐条初审一部教材来稿，输出初审意见书 Word。先用 📎 载入书稿（最好是 .docx，才能查图片分辨率、公式、表格）；查重报告、Word／PDF 附件、视频与课件可以一起载入（视频只登记大小、格式与编码）。输入框写稿件信息：「书名：…　主编：…　类型：职业教育／本科理工／本科文管／专著　数字教材」，也可列资源「微课1.mp4 120MB」，可留空。流程：①机检全稿 ②逐单元审读（每批 5 单元，自动审完）③逐项结论（指导书全部条目，一条不漏）④初审意见 ⑤导出意见书 Word。政治性、图片与视频画面、事实核定提请人工。",
       csNeed: "先用 📎 载入书稿，再在输入框写书名、主编、类型（可留空），然后发送。",
       csWord: "⤓ 初审意见书 Word",
+      /* SDE三审（2026-10-12 王德生令「打造一个 SDE三审智能体，来对传媒公司的文本处理的高效高质量化」）。见 sendSa 头注释。 */
+      saBtn: "⚖ SDE三审", saOn: "⚖ SDE三审：只审", saOn2: "⚖ SDE三审：审＋改",
+      saTip: "按出版社三审制审一部书稿（教材、专著、小说都行），输出三审意见书 Word；选「审＋改」还会按三审意见逐单元改稿，另出一份修改稿 Word。再点一次按钮在「只审／审＋改／关」之间切换。初审＝规范与概念（字词标点数字、体例、引文出处、事实待核、修订残留、前后矛盾）；复审＝洪流体检（起手、接力、结算、出口——构成洪流才叫书，否则只是库存）；终审＝读者、领域与出版决定（读者能否被卷入、领域位置、导向与合规、出版形态）。先用 📎 载入书稿（Word／PDF／文本），输入框可写「书名：…　作者：…　类型：教材／专著／小说　出版社：…」和编辑意见，都可留空。结论有统计底线，基底只能维持或从严。政治性、事实核定、图片画面提请人工。",
+      saNeed: "先用 📎 载入书稿，再在输入框写书名、作者、类型或编辑意见（可留空），然后发送。",
+      saWord: "⤓ 三审意见书 Word", saWordRev: "⤓ 修改稿 Word",
       /* 教材AIGC化（2026-10-11 王德生令「现在打造AIGC化的智能体，也放在ChatSDE上，输入的是一个教材，输出的是一个AIGC化的新教材」）。见 sendTb 头注释。 */
       tbBtn: "📘 教材AIGC化", tbOn: "📘 教材AIGC化：开",
       tbTip: "输入一本现有教材（先用 📎 载入 Word／PDF／文本），输出一本 AIGC 赋能版新教材。总原则是两个三合一：老师·AI·教材、学生·AI·教材，再让两者互动——老师侧下发任务与评价标准，学生侧回流作品与 AI 使用记录，汇入教材的下一版。AI 在每一环只做三件事：产生、分析、设计。教材分两层：锁定层（概念、史实、承重判断，AI 不许改）与发生层（案例、任务、提示词、习题、实训，AI 可生长）。输入框里写「书名：……」可指定新书名，也可贴出版要求（没有就留空）。一键走：①体检 ②方案 ③新增篇章与附录 ④逐单元增补（每批 3 个，可点「自动跑完全部」）⑤自检 ⑥导出完整 AIGC 版 Word。原文一字不改，增补稿接在每个单元之后。",
@@ -2066,6 +2071,10 @@
       csTip: "First-round review of a textbook submission against the publisher's intake guide, item by item, with a Word opinion letter. Load the manuscript with 📎 (ideally .docx); a plagiarism report, attachments, videos and slides can be loaded too. Type \u201c书名：… 主编：… 类型：…\u201d in the box (optional). Steps: machine check of the whole manuscript, unit-by-unit reading (5 per batch, runs to the end), a verdict on every item of the guide, the opinion, Word export. Prompts and report are in Chinese.",
       csNeed: "Load the manuscript with 📎 first, then type the title, editor and type (optional) and send.",
       csWord: "⤓ Opinion letter (Word)",
+      saBtn: "⚖ SDE three-tier review", saOn: "⚖ Three-tier review: review only", saOn2: "⚖ Three-tier review: review + revise",
+      saTip: "Runs a publisher-style three-tier review of a manuscript (textbook, monograph or novel) and exports a Word report; in \u201creview + revise\u201d it also revises unit by unit and exports the revised manuscript. Click again to cycle review only / review + revise / off. Tier 1: norms and concepts. Tier 2: flow check (opening, relay, payoff, outlet \u2014 a book is a flow, otherwise it is only stock). Tier 3: readers, field and publishing decision. Load the manuscript with 📎; optionally type \u201c书名：… 作者：… 类型：教材／专著／小说\u201d. Verdicts have a statistical floor the model may only tighten. Prompts and report are in Chinese.",
+      saNeed: "Load the manuscript with 📎 first, then type the title, author, type or editor notes (optional) and send.",
+      saWord: "⤓ Three-tier report (Word)", saWordRev: "⤓ Revised manuscript (Word)",
       tbBtn: "📘 Textbook → AIGC", tbOn: "📘 Textbook → AIGC: on",
       tbTip: "Input: an existing textbook (load it with 📎). Output: an AIGC-empowered edition. Principle: two triads — teacher·AI·textbook and student·AI·textbook — then let them interact: the teacher side issues tasks and criteria, the student side feeds back work and AI-use logs, which flow into the next edition. AI does only three things at each step: generate, analyse, design. The textbook has a locked layer (definitions, history, load-bearing judgements; AI may not change them) and a generative layer (cases, tasks, prompts, exercises). The original text is never altered; addenda follow each unit. Type \u201cTitle: \u2026\u201d to name the new edition. Steps: 1 audit, 2 plan, 3 new chapter and appendices, 4 per-unit addenda (3 per batch, or run all), 5 self-check, 6 Word export.",
       tbNeed: "Load the textbook with 📎 first, then type \u201cTitle: \u2026\u201d or the publisher's requirements (optional) and send.",
@@ -2798,6 +2807,7 @@
           "<button class='wdsm-mode wdsm-tbbtn'></button>" +
           "<button class='wdsm-mode wdsm-rvbtn'></button>" +
           "<button class='wdsm-mode wdsm-csbtn'></button>" +
+          "<button class='wdsm-mode wdsm-sabtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
@@ -5683,6 +5693,7 @@
     if (!q && tbOn && !PROFILE && !streaming && msHasSrc("")) q = TB_GO;
     if (!q && rvOn && !PROFILE && !streaming && msHasSrc("")) q = RV_GO;
     if (!q && csOn && !PROFILE && !streaming && msHasSrc("")) q = CS_GO;
+    if (!q && saOn && !PROFILE && !streaming && msHasSrc("")) q = SA_GO;
     if (!q) return;
     /* 运动手环：按钮点的记 btn，输入框打的记 own；其余程序转发（取 Key 后回调等）不记，免得一问记两次。 */
     if (SEND_VIA === "btn") { askStats.btn++; askRun++; }
@@ -5700,6 +5711,14 @@
     if (streaming) {
       if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       return;
+    }
+    // SDE三审挂着时：一问＝机检→逐单元三审→复审→终审（→审＋改：逐单元改稿）→三审意见书 Word（排在最前，与其他多路模式互斥）
+    if (saOn && !PROFILE && !streaming) {
+      var ksa = wdsKeyGet(); if (!ksa) { wdsKeyPanel(function () { send(q); }); return; }
+      if (!msHasSrc(q)) { toast(t("saNeed")); return; }
+      if (turns() >= MAX) { updTurns(); return; }
+      if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      if (sendSa(q, addTurn(q))) return;
     }
     // 来稿初审挂着时：一问＝机检全稿→逐单元审读→逐项结论→初审意见→意见书 Word（排在最前，与其他多路模式互斥）
     if (csOn && !PROFILE && !streaming) {
@@ -6141,7 +6160,7 @@
         b.onclick = function () {
           closeMenu();
           if (!has) { wdsKeyPanel(function () {}); return; }      // 没 Key 就直接把设置面板端出来
-          duV = v.v; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint();
+          duV = v.v; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); saOn = false; saFix = false; saPaint();
         };
         menu.appendChild(b);
       });
@@ -6232,7 +6251,7 @@
   if (cmpBtn) cmpBtn.onclick = function () {
     if (streaming) return;
     cmpOn = !cmpOn;
-    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); }   // 六者互斥
+    if (cmpOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); saOn = false; saFix = false; saPaint(); }   // 六者互斥
     cmpPaint();
     toast(cmpOn ? t("cmpTip") : t("cmpBtn"));
   };
@@ -6416,7 +6435,7 @@
   if (qacBtn) qacBtn.onclick = function () {
     if (streaming) return;
     qacOn = !qacOn;
-    if (qacOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); }   // 六者互斥
+    if (qacOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); saOn = false; saFix = false; saPaint(); }   // 六者互斥
     qacPaint();
     toast(qacOn ? t("qacTip") : t("qacBtn"));
   };
@@ -6670,7 +6689,7 @@
   if (labBtn) labBtn.onclick = function () {
     if (streaming) return;
     labOn = !labOn;
-    if (labOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); }   // 六者互斥
+    if (labOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); saOn = false; saFix = false; saPaint(); }   // 六者互斥
     labPaint();
     toast(labOn ? t("labTip") : t("labBtn"));
   };
@@ -6970,7 +6989,7 @@
   if (msBtn) msBtn.onclick = function () {
     if (streaming) return;
     msOn = !msOn;
-    if (msOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); }   // 七者互斥
+    if (msOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); saOn = false; saFix = false; saPaint(); }   // 七者互斥
     msPaint();
     toast(msOn ? t("msTip") : t("msBtn"));
   };
@@ -7320,7 +7339,7 @@
   if (rvBtn) rvBtn.onclick = function () {
     if (streaming) return;
     rvOn = !rvOn;
-    if (rvOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); csOn = false; csPaint(); }   // 十者互斥
+    if (rvOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); csOn = false; csPaint(); saOn = false; saFix = false; saPaint(); }   // 十者互斥
     rvPaint();
     toast(rvOn ? t("rvTip") : t("rvBtn"));
   };
@@ -7480,7 +7499,7 @@
   if (csBtn) csBtn.onclick = function () {
     if (streaming) return;
     csOn = !csOn;
-    if (csOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); }   // 十者互斥
+    if (csOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); saOn = false; saFix = false; saPaint(); }   // 十一者互斥
     csPaint();
     toast(csOn ? t("csTip") : t("csBtn"));
   };
@@ -7670,6 +7689,218 @@
     return true;
   }
 
+  /* ══════════════ SDE三审（初审·规范与概念／复审·洪流体检／终审·读者领域与出版决定；可选审＋改）══════════════
+     2026-10-12 王德生令：「我们要打造一个 SDE三审智能体，来对传媒公司的『文本处理的高效高质量化』」；
+     同日裁定：ChatSDE 里一个模式＋独立入口页；稿件都做（教材、专著、小说）；输出 Word，同时可以附上改好的稿件；选择：只审，或审和改。
+     按钮三态循环：关 → 只审 → 审＋改 → 关。入口：/taste/chatsde/?mode=sa（只审）、?mode=sar（审＋改）。
+     一问＝①机检全稿（代码算）②逐单元三审（每批 5 单元，自动审完；一单元一次调用，三审各出一段）
+          ③复审报告（全书洪流图、库存段落、对初审的复核）④终审报告（读者、领域位置、合规、出版形态、终审决定、必改清单与致作者信）
+          ⑤（审＋改）逐单元按三审意见改稿（每批 3 单元，自动改完）⑥三审意见书 Word ＋（审＋改）修改稿 Word。
+     🔴 数由代码算；三审结论各有统计底线（SDESanshen.floors），基底只能维持或从严。
+     🔴 座次：全程走无 SDE 一路（msPlain），报告与改稿零学派术语。「洪流／库存」是对外定义过的两个平常词。
+     🔴 规则、提示语、解析、Word 全在 /assets/sde-sanshen.js（SDESanshen，按需载入）。 */
+  var saOn = false, saFix = false, SA_BATCH = 5, SA_RBATCH = 3, SA_GO = "（开始 SDE三审 · 未填稿件信息）";
+  var saBtn = layer.querySelector(".wdsm-sabtn");
+  function saPaint() {
+    if (!saBtn) return;
+    saBtn.style.display = PROFILE ? "none" : "";
+    if (PROFILE) { saOn = false; saFix = false; }
+    if (!saOn) saFix = false;
+    saBtn.textContent = saOn ? (saFix ? t("saOn2") : t("saOn")) : t("saBtn");
+    saBtn.title = t("saTip");
+    if (saOn) saBtn.classList.add("on"); else saBtn.classList.remove("on");
+    try { toolsPaint(); } catch (e) {}
+  }
+  saPaint();                         // 🔴 初始就要有字——零宽空框老漏法
+  if (saBtn) saBtn.onclick = function () {
+    if (streaming) return;
+    if (!saOn) { saOn = true; saFix = false; }
+    else if (!saFix) saFix = true;
+    else { saOn = false; saFix = false; }
+    if (saOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); }   // 十一者互斥
+    saPaint();
+    toast(saOn ? (saFix ? t("saOn2") : t("saOn")) : t("saBtn"));
+  };
+  try {
+    var saStart = window.WDSM_START || ((/[?&]mode=([a-z]+)/.exec(location.search) || [])[1]) || "";
+    if ((saStart === "sa" || saStart === "sar") && saBtn && !PROFILE) { saOn = true; saFix = saStart === "sar"; saPaint(); setTimeout(function () { try { toast(t("saTip")); } catch (e) {} }, 800); }
+  } catch (e) {}
+  function saEngine() {
+    if (window.SDESanshen) return Promise.resolve(window.SDESanshen);
+    return new Promise(function (res, rej) {
+      var sc = document.createElement("script");
+      sc.src = "/assets/sde-sanshen.js?v=20261012a"; sc.async = true;
+      sc.onload = function () { window.SDESanshen ? res(window.SDESanshen) : rej(new Error("三审引擎没起来")); };
+      sc.onerror = function () { rej(new Error("三审引擎载入失败，请刷新再试")); };
+      document.head.appendChild(sc);
+    });
+  }
+  function saDate() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function saSave(which, st, vname) {
+    var E = window.SDESanshen;
+    if (!E || !window.SDEDocx) { toast(t("cmpWait")); return; }
+    try {
+      var S = E.stats(st), F = E.floors(S), R = { st: st, S: S, F: F, base: vname, date: saDate(), fix: st.units.some(function (u) { return u.rev != null; }) };
+      var blob = which === "rev" ? E.buildRevDocx(R) : E.buildDocx(R);
+      saveBlobToDir(fileTag("WDS") + "-" + safeName(st.title) + "-" + (which === "rev" ? "修改稿" : "三审意见书") + "-" + stampName() + ".docx", blob, function (m) { if (m) toast(m); });
+    } catch (e) { toast("Word 生成失败：" + ((e && e.message) || "?")); }
+  }
+  function sendSa(q, cell) {
+    var mine = wdsKeyGet();
+    if (!mine) return false;
+    var docs = atts.filter(function (d) { return !d.img && !d.res && d.text && d.text.trim().length > 300; });
+    var main = null, typed = "";
+    if (docs.length) main = docs.slice().sort(function (a, b) { return b.text.length - a.text.length; })[0];
+    else if (String(q || "").length > 3000) { main = { name: String(q).trim().split("\n")[0].slice(0, 30), text: q }; q = ""; }
+    if (!main) return false;
+    typed = String(q || "").trim(); if (typed === SA_GO) typed = "";
+    var fixMode = !!saFix;
+    history.push({ role: "reader", text: "【" + t("saBtn") + (fixMode ? " · 审＋改" : " · 只审") + "】" + main.name + (typed ? ("\n" + typed.slice(0, 400)) : "") }); updTurns();
+    streaming = true; stoppedByUser = false; RS.stop = false;
+    busyUI(true); stopBarShow(true);
+    var vname = vinfo(mine.vendor).name + (mine.model ? (" · " + mine.model) : "");
+    var st = { title: "", info: null, units: [], next: 0, rnext: 0, ledger: "", mc: null, v1: null, v2: null, v3: null, rev2: "", rev3: "", auto: true, fix: fixMode,
+      files: docs.map(function (d) { return d.name; }).join("；") || main.name };
+    var wrap = el("div", "wdsm-rlab");
+    var clock = el("div", "wdsm-duh");
+    clock.style.cssText = "border:0;padding:6px 10px;margin:0 0 6px;border-radius:8px;background:var(--wfill);color:var(--wtx);font-size:12.5px;display:block";
+    wrap.appendChild(clock);
+    var t0 = Date.now(), secs = [];
+    function body() { return st.units.filter(function (u) { return !u.toc; }); }
+    function tick() {
+      var s = Math.round((Date.now() - t0) / 1000), cur = "", n = body().length, dn = st.units.filter(function (u) { return u.p; }).length, rv = st.units.filter(function (u) { return u.rev != null && !u.toc; }).length;
+      secs.forEach(function (x) { var v = (x.nt.textContent || "").trim(); if (v && v !== t("labWait")) cur = v; });
+      clock.textContent = "⏱ " + Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2) + "　" + (st.title || main.name) + (n ? " · 已审 " + dn + "/" + n + " 单元" : "") + (st.fix && rv ? " · 已改 " + rv + "/" + n : "") + (cur ? ("　" + cur) : "") + (streaming ? "" : "　✓");
+    }
+    var clk = setInterval(function () { tick(); if (!streaming) clearInterval(clk); }, 1000);
+    cell.a.innerHTML = ""; cell.a.appendChild(wrap);
+    var s0 = labSec(wrap, "① 机检全稿（字数 · 单元 · 修订残留 · 重复段落 · 标点 · 篇幅）"); secs.push(s0);
+    s0.nt.textContent = "正在载入三审引擎…";
+    function machineStep() {
+      return saEngine().then(function (E) {
+        st.info = E.parseInfo(typed, main.text, main.name);
+        st.title = st.info.title || String(main.name || "书稿").replace(/\.[a-z0-9]{2,5}$/i, "");
+        st.units = msSplit(main.text);
+        // 书名页、单独一行的扉页语这类不足 120 个汉字的碎片：原样保留，不占一次三审
+        st.units.forEach(function (u) { if (!u.toc && (String(u.text).match(/[\u4e00-\u9fff]/g) || []).length < 120) { u.toc = true; u.name = "短单元 · " + u.name; } });
+        st.mc = E.machine(main.text, st.units);
+        var f = st.mc.facts;
+        s0.bd.innerHTML = mdRender("**机检完成**（全稿，程序计算）：《" + st.title + "》· " + E.KIND_NAME[st.info.kind] + (st.info.kindGuess ? "（由正文推断；不对请在输入框写「类型：教材／专著／小说」重来）" : "")
+          + "；汉字约 " + E.fmtWan(f.cjk) + "，切成 " + f.units + " 个单元" + (st.units.length > f.units ? "（另有目录 " + (st.units.length - f.units) + " 个，原样保留）" : "")
+          + "。\n\n机检发现 " + st.mc.finds.length + " 条：" + (st.mc.finds.length ? st.mc.finds.slice(0, 8).map(function (x) { return x.lvl + " 级 · " + x.issue + "（" + x.pos + "）"; }).join("；") : "未见修订残留、重复段落与标点类问题")
+          + "\n\n工作方式：**" + (st.fix ? "审＋改" : "只审") + "**。接着逐单元三审，每单元出初审意见、洪流体检、终审线索。");
+        s0.nt.textContent = "";
+      });
+    }
+    function review(i, sec) {
+      var E = window.SDESanshen, u = st.units[i];
+      var box = msUnitBox(sec, "第 " + (i + 1) + " 单元 · " + u.name + " · " + u.text.length + " 字");
+      sec.nt.textContent = "正在三审第 " + (i + 1) + " 单元…";
+      var qtext = E.unitPrompt({ info: st.info, title: st.title, i: i, n: st.units.length, name: u.name, body: u.text, ledger: st.ledger });
+      return msPlain(mine, qtext, function (x) { box.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
+        .then(function (r) {
+          u.rep = String(r || ""); box.innerHTML = mdRender(u.rep);
+          u.p = E.parseUnit(u.rep, i);
+          if (u.p.ledger) st.ledger = (st.ledger + "\n[" + (i + 1) + "] " + u.p.ledger.replace(/\s+/g, " ")).slice(-6000);
+        });
+    }
+    function remain() { var out = []; for (var k = st.next; k < st.units.length && out.length < SA_BATCH; k++) if (!st.units[k].toc) out.push(k); return out; }
+    function rremain() { var out = []; for (var k = st.rnext; k < st.units.length && out.length < SA_RBATCH; k++) if (!st.units[k].toc) out.push(k); return out; }
+    // 复审＋终审（全书各一次调用）
+    function finalize() {
+      var E = window.SDESanshen, S = E.stats(st), F = E.floors(S);
+      st.v1 = E.verdict(E.V1, "", F.f1, "【初审结论】");
+      var s2 = labSec(wrap, "③ 复审报告（全书洪流图 · 库存段落与改法 · 对初审的复核）"); secs.push(s2);
+      s2.nt.textContent = "初审结论：" + st.v1.v + "；正在写复审报告…";
+      return msPlain(mine, E.reviewPrompt(st, S, F), function (x) { s2.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
+        .then(function (r) {
+          st.rev2 = String(r || ""); st.v2 = E.verdict(E.V2, st.rev2, F.f2, "【复审结论】");
+          s2.bd.innerHTML = mdRender("**初审结论：" + st.v1.v + "**（" + F.why1 + "）　**复审结论：" + st.v2.v + "**（" + F.why2 + (st.v2.raised ? "；基底给的「" + st.v2.model + "」比统计底线宽，已从严" : "") + "）\n\n---\n\n" + st.rev2);
+          s2.nt.textContent = "";
+          var s3 = labSec(wrap, "④ 终审报告（读者 · 领域位置 · 导向与合规 · 出版形态 · 终审决定 · 必改清单）"); secs.push(s3);
+          s3.nt.textContent = "正在写终审报告…";
+          return msPlain(mine, E.finalPrompt(st, S, F), function (x) { s3.bd.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
+            .then(function (r3) {
+              st.rev3 = String(r3 || ""); st.v3 = E.verdict(E.V3, st.rev3, F.f3, "【终审结论】");
+              s3.bd.innerHTML = mdRender("**终审结论：" + st.v3.v + "**（" + F.why3 + (st.v3.raised ? "；基底给的「" + st.v3.model + "」比统计底线宽，已从严" : "") + "）\n\n---\n\n" + st.rev3);
+              s3.nt.textContent = "";
+            });
+        });
+    }
+    function revise(i, sec) {
+      var E = window.SDESanshen, u = st.units[i];
+      var box = msUnitBox(sec, "第 " + (i + 1) + " 单元 · " + u.name + " · 改稿");
+      sec.nt.textContent = "正在改第 " + (i + 1) + " 单元…";
+      return msPlain(mine, E.revisePrompt(st, i), function (x) { box.innerHTML = mdRender(x) + "<span class='cur'>▊</span>"; })
+        .then(function (r) { var o = E.splitRev(r); u.rev = o.body; u.note = o.note; box.innerHTML = mdRender(String(r || "")); });
+    }
+    function rbatch() {
+      var idx = rremain();
+      if (!idx.length) return Promise.resolve();
+      var sec = labSec(wrap, "⑤ 按三审意见改稿（第 " + (idx[0] + 1) + "–" + (idx[idx.length - 1] + 1) + " 单元，共 " + body().length + " 单元）"); secs.push(sec);
+      var chain = Promise.resolve();
+      idx.forEach(function (i) { chain = chain.then(function () { return revise(i, sec); }).then(function () { st.rnext = i + 1; }); });
+      return chain.then(function () {
+        sec.nt.textContent = "";
+        if (rremain().length && st.auto && !RS.stop) return rbatch();
+      });
+    }
+    function afterReview() {
+      if (!st.fix || !st.v3) return Promise.resolve();
+      return rbatch();
+    }
+    function batch() {
+      var idx = remain();
+      if (!idx.length) return (st.v3 ? Promise.resolve() : finalize()).then(afterReview).then(function () { done(); });
+      var sec = labSec(wrap, "② 逐单元三审（第 " + (idx[0] + 1) + "–" + (idx[idx.length - 1] + 1) + " 单元，共 " + body().length + " 单元）"); secs.push(sec);
+      var chain = Promise.resolve();
+      idx.forEach(function (i) { chain = chain.then(function () { return review(i, sec); }).then(function () { st.next = i + 1; }); });
+      return chain.then(function () {
+        sec.nt.textContent = "";
+        if (remain().length && st.auto && !RS.stop) return batch();
+        if (!remain().length) return finalize().then(afterReview).then(function () { done(); });
+        done();
+      });
+    }
+    function done(err) {
+      streaming = false; curReader = null; busyUI(false); stopBarShow(false);
+      try { tick(); } catch (e) {}
+      if (err) wrap.appendChild(el("div", "wdsm-err", t("qacFail") + err));
+      var dn = st.units.filter(function (u) { return u.p; }).length, rv = st.units.filter(function (u) { return u.rev != null && !u.toc; }).length;
+      history.push({ role: "wds", text: "【SDE三审意见书】" + (st.title || main.name) + "（已审 " + dn + "/" + body().length + " 单元" + (st.v3 ? "；初审 " + st.v1.v + "、复审 " + st.v2.v + "、终审 " + st.v3.v : "") + (rv ? "；已改 " + rv + " 单元" : "") + "）" });
+      stSave(history); updTurns(); compTick();
+      if (cell.acts) { try { cell.acts.remove(); } catch (e) {} }
+      var row = el("div", "wdsm-acts");
+      function resume(fn) {
+        if (streaming) return;
+        row.remove(); cell.acts = null;
+        streaming = true; stoppedByUser = false; RS.stop = false; busyUI(true); stopBarShow(true);
+        t0 = Date.now(); clk = setInterval(function () { tick(); if (!streaming) clearInterval(clk); }, 1000);
+        fn().catch(function (e) { done((e && e.message) || "?"); });
+      }
+      if (st.mc) { var bw = el("button", "wdsm-act", t("saWord")); bw.onclick = function () { saSave("all", st, vname); }; row.appendChild(bw); }
+      if (rv) { var br = el("button", "wdsm-act", t("saWordRev")); br.onclick = function () { saSave("rev", st, vname); }; row.appendChild(br); }
+      if (!st.mc) { var rm = el("button", "wdsm-act", "↻ 重新机检"); rm.onclick = function () { resume(function () { return machineStep().then(batch); }); }; row.appendChild(rm); }
+      else if (remain().length) {
+        var nIdx = remain();
+        var nx = el("button", "wdsm-act", "↻ 接着三审（第 " + (nIdx[0] + 1) + "–" + (nIdx[nIdx.length - 1] + 1) + " 单元）");
+        nx.onclick = function () { st.auto = false; resume(batch); }; row.appendChild(nx);
+        var au = el("button", "wdsm-act", "▶ 自动审完全部"); au.onclick = function () { st.auto = true; resume(batch); }; row.appendChild(au);
+        if (dn) { var fz = el("button", "wdsm-act", "▣ 现在出复审与终审（未审单元只有机检）"); fz.onclick = function () { resume(function () { return finalize().then(function () { done(); }); }); }; row.appendChild(fz); }
+      } else if (!st.v3) { var fz2 = el("button", "wdsm-act", "▣ 生成复审与终审报告"); fz2.onclick = function () { resume(function () { return finalize().then(afterReview).then(function () { done(); }); }); }; row.appendChild(fz2); }
+      else if (rremain().length) {
+        var rIdx = rremain();
+        var lab = rv ? ("↻ 接着改稿（第 " + (rIdx[0] + 1) + "–" + (rIdx[rIdx.length - 1] + 1) + " 单元）") : "✎ 按三审意见改稿";
+        var rx = el("button", "wdsm-act", lab); rx.onclick = function () { st.fix = true; st.auto = false; resume(rbatch); }; row.appendChild(rx);
+        var ra = el("button", "wdsm-act", "▶ 自动改完全部"); ra.onclick = function () { st.fix = true; st.auto = true; resume(rbatch); }; row.appendChild(ra);
+      } else row.appendChild(el("span", "wdsm-duh", st.fix ? "三审与改稿已全部完成，两份 Word 都可导出。" : "三审已全部完成，意见书已可导出。"));
+      cell.turn.appendChild(row); cell.acts = row;
+    }
+    tick();
+    machineStep().then(batch).catch(function (e) { done((e && e.message) || "?"); });
+    return true;
+  }
+
   /* ══════════════ 教材 AIGC 化（六步）══════════════
      2026-10-11 王德生令「现在打造 AIGC 化的智能体，也放在 ChatSDE 上，输入的是一个教材，输出的是一个 AIGC 化的新教材」。
      🔴 总原则（同日王德生令）：两个三合一再互动——①老师·AI·教材 ②学生·AI·教材 ③两者互动（老师侧下发、学生侧回流、汇入教材下一版）。
@@ -7693,7 +7924,7 @@
   if (tbBtn) tbBtn.onclick = function () {
     if (streaming) return;
     tbOn = !tbOn;
-    if (tbOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); }   // 九者互斥
+    if (tbOn) { duV = ""; duPaint(); triOn = false; triPaint(); mobOn = false; mobPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); saOn = false; saFix = false; saPaint(); }   // 九者互斥
     tbPaint();
     toast(tbOn ? t("tbTip") : t("tbBtn"));
   };
@@ -8086,7 +8317,7 @@
     var go = el("button", null, mobOn ? t("mobStop") : t("mobGo"));
     go.onclick = function () {
       closeMenu(); mobOn = !mobOn;
-      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); }   // 六者互斥
+      if (mobOn) { duV = ""; duPaint(); triOn = false; triPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); saOn = false; saFix = false; saPaint(); }   // 六者互斥
       mobPaint();
     };
     menu.appendChild(go);
@@ -8347,7 +8578,7 @@
     go.onclick = function () {
       closeMenu();
       triOn = !triOn;
-      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); }      // 并排与对撞是两种模式，不并存
+      if (triOn) { duV = ""; duPaint(); cmpOn = false; cmpPaint(); qacOn = false; qacPaint(); labOn = false; labPaint(); msOn = false; msPaint(); tbOn = false; tbPaint(); rvOn = false; rvPaint(); csOn = false; csPaint(); saOn = false; saFix = false; saPaint(); }      // 并排与对撞是两种模式，不并存
       triPaint();
     };
     menu.appendChild(go);
