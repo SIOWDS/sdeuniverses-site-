@@ -27,7 +27,7 @@ SLUG = 'keyi-chucuo-de-gongwei'
 META = dict(
     title='可以出错的工位', name='可以出错的工位',
     subtitle='德国职业教育为什么成功', author='王德生', no=335,
-    isbn='979-8-90690-753-0', price='US$20.00', version='20261012a',
+    isbn='979-8-90690-753-0', price='US$20.00', version='20261012b',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
@@ -111,6 +111,13 @@ def table_html(rows, cls='tb'):
     cells = [[c.strip() for c in r.strip().strip('|').split('|')] for r in rows]
     cells = [r for r in cells if not all(re.fullmatch(r':?-{2,}:?', c) for c in r)]
     head, body = cells[0], cells[1:]
+    if len(head) >= 5:
+        cls += ' w5'
+    for ci in (0, 1):
+        if body and all(len(re.sub(r'[*\s]', '', r[ci])) <= 12 for r in body if len(r) > ci):
+            cls += ' n%d' % (ci + 1)
+    if len(body) > 20:
+        cls += ' dense'
     h = ['<div class="tw"><table class="%s"><thead><tr>' % cls]
     h += ['<th>%s</th>' % inline(c) for c in head]
     h.append('</tr></thead><tbody>')
@@ -367,26 +374,41 @@ section.part{{break-before:right;text-align:center;padding-top:26mm}}
 h3.sec{{font:700 {body_pt*1.03:.2f}pt/1.6 'Noto Sans CJK SC';color:#1F3A5F;margin:5.5mm 0 2.4mm;break-after:avoid}}
 h3.sec .dia{{color:#B08A3C;font-size:.78em;margin-right:.45em;vertical-align:.08em}}
 h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;margin:6mm 0 2.5mm;break-after:avoid}}
-.takeaway{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;padding:2.6mm 4mm 2.8mm;margin:6mm 0 3.5mm;break-inside:avoid}}
+.takeaway{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;padding:2.2mm 4mm 2.4mm;margin:4.5mm 0 3mm;break-inside:avoid}}
 .takeaway .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.5em;margin-bottom:1.4mm}}
 .takeaway p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F;font-size:{body_pt*1.02:.2f}pt}}
-.ledger{{background:#F4EFE3;border-left:1.6pt solid #D8CFBB;padding:2.4mm 4mm 2.6mm;margin:3mm 0 2mm;break-inside:avoid}}
+.ledger{{background:#F4EFE3;border-left:1.6pt solid #D8CFBB;padding:2mm 4mm 2.2mm;margin:3mm 0 2mm;break-inside:avoid;display:flex;gap:4mm;flex-wrap:wrap}}
+.ledger .lab{{flex:0 0 100%;margin-bottom:.4mm!important}}
+.ledger p{{flex:1 1 44%}}
 .ledger .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#5A554A;letter-spacing:.3em;margin-bottom:1.2mm}}
 .ledger p{{text-indent:0;margin:0 0 .6mm;font-size:{body_pt*0.86:.2f}pt;line-height:1.75;color:#5A554A}}
 .ledger .lk{{color:#1F3A5F;font-weight:700}}
 .chapend{{break-inside:avoid}}
-.endmark{{text-align:center;color:#B08A3C;font-size:8pt;margin-top:6mm}}
+.endmark{{text-align:center;color:#B08A3C;font-size:8pt;margin-top:3.5mm}}
 .orn{{text-align:center;color:#B08A3C;font-size:7.5pt;margin:3mm 0}}
 .pull{{margin:5mm 6%;padding:3mm 0;border-top:.8pt solid #B08A3C;border-bottom:.8pt solid #B08A3C;text-align:center;break-inside:avoid}}
 .pull p{{text-indent:0;text-align:center;font-weight:700;color:#1F3A5F;font-size:{body_pt*1.12:.2f}pt;margin:0}}
 /*Q*/.qbox{{background:#F7F3E8;border-left:1.6pt solid #58A9B5;padding:2.2mm 4mm;margin:2mm 0 4mm;break-inside:avoid}}
 .qbox .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.3em;margin-bottom:1mm}}
 .qbox p{{text-indent:0;margin:0;font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
+.chapter.t1 p,.chapter.t1 li{{line-height:{lh-0.05:.3f}}}
+.chapter.t2 p,.chapter.t2 li{{line-height:{lh-0.10:.3f}}}
+.chapter.t2 h3.sec{{margin-top:4.5mm}}
+.chapter.t3 p,.chapter.t3 li{{line-height:{lh-0.15:.3f};margin-bottom:.3em}}
+.chapter.t3 h3.sec{{margin-top:4mm}}
+.chapter.t4 p,.chapter.t4 li{{line-height:{lh-0.2:.3f};margin-bottom:.25em}}
+.chapter.t4 h3.sec{{margin-top:3.5mm}}
 blockquote.verdict{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;margin:4mm 0;padding:2.6mm 4mm;break-inside:avoid}}
 blockquote.verdict p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F}}
-.tw{{margin:3.5mm 0;break-inside:avoid}}
+.tw{{margin:3.5mm 0}}
 table.tb{{width:100%;border-collapse:collapse;font-size:{body_pt*0.8:.2f}pt;line-height:1.6}}
 table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left}}
+table.tb tr{{break-inside:avoid}}
+table.tb.n1 th:nth-child(1),table.tb.n1 td:nth-child(1){{white-space:nowrap}}
+table.tb.n2 th:nth-child(2),table.tb.n2 td:nth-child(2){{white-space:nowrap}}
+table.tb.w5 th:nth-child(-n+2),table.tb.w5 td:nth-child(-n+2){{white-space:nowrap}}
+table.tb.w5 td{{font-size:{body_pt*0.74:.2f}pt;line-height:1.55}}
+table.tb.dense td{{padding-top:.7mm;padding-bottom:.7mm}}
 table.tb td{{border-bottom:.5pt solid #E4DCCB;padding:1.3mm 1.6mm;vertical-align:top}}
 table.tb tr:nth-child(even) td{{background:#F6F1E4}}
 ul.ls,ol.ls{{margin:1mm 0 2.5mm;padding-left:2.2em}} ul.ls li,ol.ls li{{margin:.4mm 0}}
@@ -466,14 +488,54 @@ def html_doc(css, inner):
             % (css, inner))
 
 
+TIGHT = {}
+
+
 def sec_html(kind, sid, title, lvl, body):
     cls = {'part': 'part', 'chapter': 'chapter'}.get(kind, 'front-sec' if kind in ('front', 'main', 'cp') else 'back-sec')
+    if kind == 'chapter' and TIGHT.get(sid):
+        cls += ' ' + TIGHT[sid]
     return '<section class="%s" id="%s">%s</section>' % (cls, sid, body)
 
+
+
+def tune_chapters(secs, css_args, fonts, label):
+    """逐章单独试排：若章末「带走的话＋小账」孤零零占一页，就逐级收紧该章行距，直到孤页消失。"""
+    import weasyprint, pymupdf
+    css = print_css(fonts, *css_args)
+    import hashlib, json as _j
+    cpath = Path('/tmp/tight-%s.json' % hashlib.md5(css.encode()).hexdigest()[:8])
+    cache = _j.loads(cpath.read_text()) if cpath.exists() else {}
+    TIGHT.clear()
+    fixed = []
+    for s in secs:
+        if s[0] != 'chapter':
+            continue
+        key = hashlib.md5(sec_html(*s).encode()).hexdigest()
+        if key in cache:
+            if cache[key]:
+                TIGHT[s[1]] = cache[key]
+            continue
+        for lvl in ['', 't1', 't2', 't3', 't4']:
+            if lvl:
+                TIGHT[s[1]] = lvl
+            else:
+                TIGHT.pop(s[1], None)
+            pdf = weasyprint.HTML(string=html_doc(css, sec_html(*s)), base_url=str(ROOT)).write_pdf()
+            d = pymupdf.open(stream=pdf, filetype='pdf')
+            lone = len(d) > 1 and d[len(d) - 1].get_text().lstrip().startswith('带走的话')
+            if not lone:
+                break
+        cache[key] = lvl if not lone or lvl else ''
+        cpath.write_text(_j.dumps(cache))
+        if lvl:
+            fixed.append((s[2], lvl, lone))
+    print(label, 'tightened', len(fixed), [(t[:8], l, x) for t, l, x in fixed])
 
 def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     import weasyprint
     import pymupdf
+    tune_chapters(secs, css_args, fonts, 'tune')
     css = print_css(fonts, *css_args)
     css_front = print_css(fonts, *css_args, fol='lower-roman')
     # 第 1 遍：正文（导论起），拿每节的页码

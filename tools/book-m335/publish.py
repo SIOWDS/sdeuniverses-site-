@@ -14,7 +14,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 SITE = HERE.resolve().parents[1] / 'public'
 NO = 335
-V = '20261012a'
+V = '20261012b'
 SLUG = 'keyi-chucuo-de-gongwei'
 T, SUB = '可以出错的工位', '德国职业教育为什么成功'
 ISBN = '979-8-90690-753-0'
