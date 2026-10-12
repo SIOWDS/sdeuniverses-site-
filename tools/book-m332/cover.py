@@ -172,7 +172,7 @@ def front(Wmm, Hmm, F):
 <div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 332 号</div>
 <div class="t"><div class="pre">美是怎样发生的</div><div class="big">音乐之美</div>
 <div class="sub">听觉吸引</div><div class="rule"></div></div>
-<div class="b"><div class="au">王德生　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
+<div class="b"><div class="au">王德生　胡敏　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
 
