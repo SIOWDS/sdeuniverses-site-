@@ -176,7 +176,7 @@ def front(Wmm, Hmm, F):
 <div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 326 号</div>
 <div class="t"><div class="pre">欲望发生学专著</div><div class="big">“我要”</div>
 <div class="sub2">之前没有我</div><div class="sub" style="margin-top:3mm">欲望发生学与<br>弗洛伊德学派的解构</div><div class="rule"></div></div>
-<div class="b"><div class="au">王德生　李佳城　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
+<div class="b"><div class="au">王德生　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
 

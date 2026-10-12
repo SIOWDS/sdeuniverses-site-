@@ -73,7 +73,7 @@ def main():
     url = f'https://sdeuniverses.com/books/m/{NO}/'
     R2 = f'https://sdeuniverses.com/students/wang-desheng/{SLUG}/m{NO}/'
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-    entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=['王德生', '李佳城'], category='core',
+    entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=['王德生'], category='core',
                  description='弗洛伊德学派看见了欲望的全部 D 现象（张力、压抑、改道、对象替代），却把它们安放在一个先在的主体上。欲望发生学把次序倒过来：幸福律的张力临界时，分布、场、美三号位侧重显影，回写出一个“我”。全书先立论，再逐家解构弗洛伊德、荣格、阿德勒、克莱因、赖希、拉康、弗洛姆、霍妮、马尔库塞，以德勒兹与加塔利为对照，最后落到怎样把一次“要”转换成一个会长大的“我”。七编三十章。',
                  detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
                  pdfUrl=R2 + f'{SLUG}-reader-v1.pdf?v={V}', readPdfUrl=R2 + f'{SLUG}-reader-v1.pdf?v={V}', printPdfUrl=R2 + f'{SLUG}-v1.0.pdf?v={V}',
@@ -102,8 +102,8 @@ def main():
             '<div class="en-only" style="font-size:12.5px;letter-spacing:0.18em;color:#D9B45C;margin-bottom:14px">★ NEW BOOK · DEMAI MONOGRAPH No.%d · ~%s CHARS · %d PP · US$ 20</div>'
             '<h3 class="zh-only" style="color:#F1EBDC;font-size:25px;line-height:1.5;margin:0 0 14px">“我要”之前没有我：欲望发生学与弗洛伊德学派的解构</h3>'
             '<h3 class="en-only" style="color:#F1EBDC;font-size:23px;line-height:1.5;margin:0 0 14px">Before “I Want”, There Is No I: The Genesis of Desire and a Deconstruction of the Freudian School</h3>'
-            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">王德生、李佳城著。小孩喊“我要冰淇淋”之前，并没有一个“要冰淇淋的他”在等着。欲望是张力临界时的一次发生，“我”是这次发生的产物。全书逐家解构弗洛伊德学派“主体发出欲望”的理论，落到怎样把一次“要”转换成一个会长大的“我”。</p>'
-            '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">By Wang Desheng and Li Jiacheng. Before a child cries “I want ice cream”, there is no one waiting to want it. Desire is an event at the threshold of tension, and the “I” is its product. The book takes apart the Freudian idea of a subject that emits desire.</p></div></a>'
+            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">王德生著。小孩喊“我要冰淇淋”之前，并没有一个“要冰淇淋的他”在等着。欲望是张力临界时的一次发生，“我”是这次发生的产物。全书逐家解构弗洛伊德学派“主体发出欲望”的理论，落到怎样把一次“要”转换成一个会长大的“我”。</p>'
+            '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">By Wang Desheng. Before a child cries “I want ice cream”, there is no one waiting to want it. Desire is an event at the threshold of tension, and the “I” is its product. The book takes apart the Freudian idea of a subject that emits desire.</p></div></a>'
             % (NO, NO, han / 10000, pages, NO, format(han, ','), pages))
     h = h[:a0] + card + h[a0:]
     tp.write_text(h)

@@ -26,7 +26,7 @@ NPARTS = 7
 SLUG = 'wo-yao-zhiqian'
 META = dict(
     title='“我要”之前没有我：欲望发生学与弗洛伊德学派的解构', name='“我要”之前没有我',
-    subtitle='欲望发生学与弗洛伊德学派的解构', author='王德生、李佳城', author_title='王德生　李佳城', no=326,
+    subtitle='欲望发生学与弗洛伊德学派的解构', author='王德生', no=326,
     isbn='979-8-90690-778-3', price='US$20.00', version='20261012a',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
@@ -430,7 +430,7 @@ def toc_block(secs, pages, roman_ids):
 
 
 TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著</div><div class="big">{META['name']}</div>
-{('<div class="sub">%s</div>' % META['subtitle']) if META['subtitle'] else ''}<div class="rule"></div><div class="au">{META.get('author_title', META['author'])}　　著</div>
+{('<div class="sub">%s</div>' % META['subtitle']) if META['subtitle'] else ''}<div class="rule"></div><div class="au">{META['author']}　　著</div>
 <div class="pub">{META['publisher']}<span>{META['publisher_en']} · Singapore</span></div></div>"""
 EPIGRAPH = ''
 
