@@ -2254,7 +2254,7 @@ function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
    （30B-A3B 混合思考，200K 上下文；2026-01 起接替已下线的 glm-4.5-flash，老名字会被自动路由过去）。
    ⚠ 名字里带 x 的 glm-4.7-flashx 是付费轻量档，只差一个字母，抄错就开始走账。
    放在轻档而不是标准档：免费档的并发很紧，产线那些多路并发的道次不该默认压到它头上。 */
-const WDS_LITE_MODEL = { openai: WDS_GPT_MODEL, anthropic: "claude-haiku-4-5-20251001", zhipu: "glm-4.7-flash",
+const WDS_LITE_MODEL = { openai: WDS_GPT_MODEL, anthropic: "claude-haiku-5-5", zhipu: "glm-4.7-flash",
   openrouter: "google/gemma-4-31b-it:free" };
 function wdsLiteModel(vd) { return WDS_LITE_MODEL[vd] || (WDS_VENDORS[vd] && WDS_VENDORS[vd].model); }
 function wdsPickModel(vd, want, top) {
