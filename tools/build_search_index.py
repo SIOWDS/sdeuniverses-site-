@@ -106,7 +106,17 @@ def _check_stale():
             raw = re.sub(r"<%s[^>]*>.*?</%s>" % (tag, tag), " ", raw, flags=re.S | re.I)
         raw = re.sub(r"<!--.*?-->", " ", raw, flags=re.S)
         body = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", raw))).strip()
-        return len(body) < 24 or (len(CJK.findall(body)) < 6 and len(re.findall(r"[A-Za-z]", body)) < 20)
+        if len(body) < 24 or (len(CJK.findall(body)) < 6 and len(re.findall(r"[A-Za-z]", body)) < 20):
+            return True
+        # 2026-10-12：专著的纯目录页。生成器对专著丢掉一切目录块（is_nav_chunk），
+        # 一页只有目录（如 /books/m/291/chapters.html、/books/m/293/chapters.html）就切不出一块、合法缺席；
+        # 原判据只认「几乎没字」，于是 10-10、10-11 两趟定时都红在这一步、整趟不上传。
+        # 这里直接调用生成器自己的提取与切块函数，免得两套规则再次脱节。
+        if section_of(os.path.relpath(cand, PUB)) == BOOK_SECTION:
+            _t = html_title_and_text(cand)[1]
+            if all(is_nav_chunk(c) for c in chunk_text(_t, size=BOOK_CHUNK, overlap=BOOK_OVERLAP)):
+                return True
+        return False
 
     hollow = [u for u in missing if _no_body(u)]
     missing = [u for u in missing if u not in set(hollow)]
@@ -150,9 +160,6 @@ def section_of(relpath):
     top = relpath.replace(os.sep, "/").split("/")[0]
     return top if top in SECTION_LABELS else "_root"
 
-# --check 在此拦截：canon_url / SKIP_* 已定义，且尚未开始构建
-if "--check" in sys.argv:
-    sys.exit(_check_stale())
 
 
 def clean_text(t):
@@ -287,6 +294,12 @@ def chunk_text(t, size=420, overlap=40):
             continue
         out.append(c)
     return out
+
+# --check 在此拦截：canon_url / SKIP_* / html_title_and_text / chunk_text / is_nav_chunk 都已定义，且尚未开始构建。
+# 2026-10-12 从 section_of 之后挪到这里：自检要调用生成器自己的切块函数（见 _no_body），
+# 而那几个函数定义在 section_of 之后，原位置调用会 NameError。
+if "--check" in sys.argv:
+    sys.exit(_check_stale())
 
 # ---- 收集 ----
 old_pdf_text = {}
