@@ -417,8 +417,8 @@ export class VisitCounter {
    轻档、标准档、深度档与看图共用这一处型号；难度仍由 reasoning_effort 和预算调节，
    不因深度或图片自动换到更贵的型号。读者手动填写的型号继续优先。
    官方型号与参数：https://developers.openai.com/api/docs/models/gpt-6-luna */
-const WDS_GPT_MODEL = "gpt-6-luna";
-const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3", anthropic: "claude-opus-5", openai: WDS_GPT_MODEL,
+const WDS_GPT_MODEL = "gpt-6.1-sol";
+const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3", minimax_cn: "MiniMax-M3", anthropic: "claude-opus-5-5", openai: "gpt-6-astra",
   openrouter: "nvidia/nemotron-3-ultra-550b-a55b:free",
   /* 2026-09-10 加 NVIDIA 免费档：深度档＝DeepSeek V4 Pro（型号名带日期后缀，取自 GET integrate.api.nvidia.com/v1/models 当日实拉）。 */
   nvidia: "deepseek-ai/deepseek-v4-pro-0813" };
@@ -906,7 +906,7 @@ const WDS_VENDORS = {
   qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen", apply: "bailian.console.aliyun.com" },
   minimax: { url: "https://api.minimax.io/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax", apply: "platform.minimax.io" },
   minimax_cn: { url: "https://api.minimaxi.com/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax\uff08\u56fd\u5185\uff09", apply: "platform.minimaxi.com" },
-  anthropic: { url: "https://api.anthropic.com/v1/chat/completions", model: "claude-sonnet-5", name: "Claude", apply: "platform.claude.com" },
+  anthropic: { url: "https://api.anthropic.com/v1/chat/completions", model: "claude-sonnet-5-5", name: "Claude", apply: "platform.claude.com" },
   openai: { url: "https://api.openai.com/v1/chat/completions", model: WDS_GPT_MODEL, name: "GPT", apply: "platform.openai.com" },
   /* 【2026-09-01 加 OpenRouter】一把 Key 通到几百个型号的转发站，OpenAI 兼容口，仍由 Worker 服务端再转发一次。
      接它的理由是**退路**：站上七家各自的免费档一挤住就没别的地方去，而这一家的 `:free` 一族是横跨多个
@@ -2027,8 +2027,8 @@ const WDS_VISION = {
   kimi: ["kimi-k2.6", "moonshot-v1-32k-vision-preview"],
   // 2026-09-01：Claude 与 GPT 两家的当代型号都吃 OpenAI 式 image_url（含 base64 data URL），
   // 所以看图不必另挑视觉专用型号，退一格给同系的另一个型号即可。
-  anthropic: ["claude-sonnet-5", "claude-opus-5"],
-  openai: [WDS_GPT_MODEL],
+  anthropic: ["claude-sonnet-5-5", "claude-opus-5-5"],
+  openai: ["gpt-6.1-sol", "gpt-6-luna"],
   // OpenRouter：gemma-4 与 minimax-m3 的 :free 两档都吃 OpenAI 式 image_url；退一格给后者（1M 上下文，也收视频帧）
   openrouter: ["google/gemma-4-31b-it:free", "minimax/minimax-m3:free"],
 };
@@ -2254,7 +2254,7 @@ function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
    （30B-A3B 混合思考，200K 上下文；2026-01 起接替已下线的 glm-4.5-flash，老名字会被自动路由过去）。
    ⚠ 名字里带 x 的 glm-4.7-flashx 是付费轻量档，只差一个字母，抄错就开始走账。
    放在轻档而不是标准档：免费档的并发很紧，产线那些多路并发的道次不该默认压到它头上。 */
-const WDS_LITE_MODEL = { openai: WDS_GPT_MODEL, anthropic: "claude-haiku-5-5", zhipu: "glm-4.7-flash",
+const WDS_LITE_MODEL = { openai: "gpt-6-luna", anthropic: "claude-haiku-5-5", zhipu: "glm-4.7-flash",
   openrouter: "google/gemma-4-31b-it:free" };
 function wdsLiteModel(vd) { return WDS_LITE_MODEL[vd] || (WDS_VENDORS[vd] && WDS_VENDORS[vd].model); }
 function wdsPickModel(vd, want, top) {
@@ -17256,7 +17256,7 @@ export default {
                  （length）、**上游自己收的口**（stop）、还是**流被掐断**（空）。
                  wdsFetchMax 这一趟本来就带着 withUsage=true，上游的用量帧一直在发，
                  只是没人接。现在接住，并随 meta 帧交给前端。 */
-              let pfin = "", pusage = null;
+              let pfin = "", pusage = null, pmodel = "";
               const stok = WDS_TOK_MAX;
               /* 时钟随之放宽：顶配预算下单趟可能写得久一些，别让它刚要收尾就被自己的表掐掉——
                  那会把「预算顶穿」换成「时钟顶穿」，断稿的样子一模一样。 */
@@ -17314,6 +17314,7 @@ export default {
                     let j; try { j = JSON.parse(pl); } catch (e) { continue; }
                     if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
                     if (j.usage) pusage = j.usage;                                  // 上游自报用量（include_usage 一直开着）
+                    if (j.model) pmodel = String(j.model).slice(0, 80);             // 上游实际答题的型号（回显给读者）
                     if (j.choices && j.choices[0] && j.choices[0].finish_reason) pfin = j.choices[0].finish_reason;
                     const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
                     /* ⚠ 同上：思考帧也撤首帧护栏。原来只有 d.content 撤，于是思考关不掉的那两家
@@ -17336,7 +17337,7 @@ export default {
               const _rtok = (pusage && pusage.completion_tokens_details
                 && pusage.completion_tokens_details.reasoning_tokens) || 0;
               controller.enqueue(_sseBytes({ t: "meta", v: {
-                idx: partIdx + 1, out: wrote, think: _st.think, want: want, fin: pfin,
+                idx: partIdx + 1, out: wrote, think: _st.think, want: want, fin: pfin, model: pmodel,
                 ptok: (pusage && pusage.prompt_tokens) || 0,
                 ctok: (pusage && pusage.completion_tokens) || 0,
                 htok: wdsCacheTok(pusage),
@@ -17502,7 +17503,7 @@ export default {
             }
             const reader = upstream.body.getReader();
             const dec = new TextDecoder();
-            let buf = "", wrote = 0, finish = "", usage = null;
+            let buf = "", wrote = 0, finish = "", usage = null, fmodel = "";
             try {
             while (true) {
               const { done: rdone, value } = await reader.read();
@@ -17518,6 +17519,7 @@ export default {
                 let j; try { j = JSON.parse(p); } catch (e) { continue; }
                 if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
                 if (j.usage) usage = j.usage;                                   // 上游自报用量（include_usage）
+                if (j.model) fmodel = String(j.model).slice(0, 80);             // 上游实际答题的型号（回显给读者）
                 if (j.choices && j.choices[0] && j.choices[0].finish_reason) finish = j.choices[0].finish_reason;
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
                 // 首帧闸**只认正文**。原来思考也算"来了第一帧"，于是"只思考不写字"这种死法
@@ -17547,7 +17549,7 @@ export default {
                正是在一切正常、我们最需要知道省了多少钱的时候沉默。 */
             try {
               controller.enqueue(_sseBytes({ t: "meta", v: {
-                idx: 1, out: wrote, think: _st.think, fin: finish,
+                idx: 1, out: wrote, think: _st.think, fin: finish, model: fmodel,
                 ptok: (usage && usage.prompt_tokens) || 0,
                 ctok: (usage && usage.completion_tokens) || 0,
                 htok: wdsCacheTok(usage), secs: 1 } }));

@@ -11975,7 +11975,7 @@
        step() 就停在那一节上，不报错、不收尾、不存稿。有了它才掐得动。
        dCutAny：这一整篇里有没有哪一趟被掐过（dTimedOut 现在每趟复位——否则一趟被掐，
        此后每一节的死因都被写成"被掐断"，读数就废了）。 */
-    var dAC = null, dCutAny = false, lastMeta = null;
+    var dAC = null, dCutAny = false, lastMeta = null, usedModel = "";
     /* 【缓存账 —— 2026-09-02】每一道 SDE 工序都带着 7 万多字的内功＋方法论，这份前缀逐字不变，
        各家的上下文缓存正按前缀命中（DeepSeek 命中价是未命中的 1/30，OpenAI 约 1/10）。
        此前**一处也没量过命中率**——省没省下来全靠推断。这三个数逐趟累加，收尾报一次。
@@ -12348,7 +12348,7 @@
       if (!_want) _want = wsel || 0;   // 读者选的那一档；没选过时 wsel 已退回档位表的默认体量
       var _floor = _want ? Math.round(_want * 0.9) : 400;
       stat.textContent = !text ? t("dFail")
-        : (text.length < _floor ? (t("dPartial") + text.length + (_want ? ("/" + _want) : "")) : (t("dDone") + text.length));
+        : (text.length < _floor ? (t("dPartial") + text.length + (_want ? ("/" + _want) : "")) : (t("dDone") + text.length)) + (usedModel ? " \u00b7 " + usedModel : "");
       /* 状态栏那一行容易被略过（它就在角落里）。写短了另发一条 note，把差多少说清、把下一步给出来。 */
       if (text && _want && text.length < _floor) dNote(t("dShortW1") + text.length + "/" + _want + t("dShortW2"), 1);
       if (dCutAny) dNote(t("dCut"), 1);
@@ -12882,6 +12882,7 @@
                      终于说得出凭什么这么判——追了一整天没拿到的就是这一行。 */
                   else if (j.t === "meta") {
                     res.meta = j.v; lastMeta = j.v;
+                    if (j.v && j.v.model) usedModel = String(j.v.model).slice(0, 80);   // 实际答题的型号，状态栏回显
                     try {
                       if (j.v && j.v.ptok) {
                         dPtok += j.v.ptok;
