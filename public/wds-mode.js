@@ -2871,9 +2871,10 @@
   var HIST_PERMSG = 12000, HIST_BUDGET = 120000;
   // from＝从第几条开始带（已压进账本的那几轮不再上送原文，账本走 payload.comp）。
   // 刻意收成参数而不是伸手够 COMP：这个函数会被单独抠出来做模拟，够外面的变量就跑不起来。
-  function histPack(from) {
+  function histPack(from, nsOnly) {
     var out = [], total = 0, i;
     for (i = (from || 0); i < history.length; i++) {
+      if (nsOnly && !history[i].ns) continue;   // 无血：只带本场在无 SDE 档下问答的那几轮
       var txt = String(history[i].text || "").slice(0, HIST_PERMSG);
       if (txt) out.push({ role: history[i].role, text: txt });
     }
@@ -4351,8 +4352,8 @@
     var cell = null;
     (rec.turns || []).forEach(function (t) {
       if (!t || !t.text) return;
-      if (t.role === "reader") { cell = addTurn(t.text); cell.a.innerHTML = ""; history.push({ role: "reader", text: t.text }); }
-      else { if (cell) { cell.a.innerHTML = mdRender(t.text); progRender(cell, progParse(t.text)); mountActs(cell, t.text); } history.push({ role: "wds", text: t.text }); }
+      if (t.role === "reader") { cell = addTurn(t.text); cell.a.innerHTML = ""; history.push(t.ns ? { role: "reader", text: t.text, ns: 1 } : { role: "reader", text: t.text }); }
+      else { if (cell) { cell.a.innerHTML = mdRender(t.text); progRender(cell, progParse(t.text)); mountActs(cell, t.text); } history.push(t.ns ? { role: "wds", text: t.text, ns: 1 } : { role: "wds", text: t.text }); }
     });
     razRestore();                               // 底册在历史里，捡回来，否则此后各轮静悄悄不再注入宪法
     VERS = [];                                  // 换了一场，上一场的版本堆作废
@@ -5877,7 +5878,7 @@
     var SL = sesHere(), H = history, SS = stSess;
     function fgSL() { return !SL || SL === sesCur(); }
     function stopMine() { return fgSL() ? stoppedByUser : !!(SL && SL.stopReq); }
-    history.push({ role: "reader", text: q }); updTurns(); stSave(history);
+    history.push(_ns ? { role: "reader", text: q, ns: 1 } : { role: "reader", text: q }); updTurns(); stSave(history);
     if (_razNew) razBadge(cell, _razNew);
     streaming = true; stoppedByUser = false;
     if (SL) { SL.streaming = true; SL.stopReq = false; SL.hist = H; SL.sess = SS; }
@@ -5895,6 +5896,12 @@
     var payload = { q: q, history: histPack(compFrom()), umem: _m3 ? "" : memRecall(q), umem3: _m3 || undefined, key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1), coach: coachOn ? 1 : undefined, raz: (curTool === "book9" && RAZ.text) ? razSlice(RAZ.text, razCurQ(), RAZ.turn++) : undefined };
     if (thinkMode === "deep") payload.grade = gradePin ? gradePin : "auto";   // 难度条：自动按检索定档，或读者钉死的档
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
+    /* 【无血 · 2026-10-12 王德生令「一个要满血，一个要无血」】无 SDE 一路此前只换了 system，
+       却照旧递上：本场全部历史（含刚才 SDE 那一答）、跨场长期记忆、「关于我」、前情账本——
+       冰滑那一题的无 SDE 稿开头就复述了 SDE 稿的核心论点。现在四样一起断：历史只带本场无 SDE 档的那几轮。
+       服务端对 umem/umem3/about/comp 另有一道兜底（老缓存客户端也拦得住），历史这一道只能在这里做。 */
+    var _ns = payload.nosde ? 1 : 0;
+    if (_ns) { payload.history = histPack(0, true); payload.umem = ""; delete payload.umem3; payload.about = ""; delete payload.comp; }
     var pics = imgsForSend();
     if (pics.length) { payload.imgs = pics; payload.vmodel = vmodelVis(kv.vendor); }
     var packed = docsForQuery(q);
@@ -6004,7 +6011,7 @@
             // 三角互消这一道另加两把程序尺子（环三·评估）：交付件数不出「三段是不是真独立」。
             if (toolSpec && toolSpec.k === "three" && !stopMine()) { try { triEchoRender(cell, answer); } catch (e) {} }
             flushSrcs();                                  // 先正文，后文献
-            H.push({ role: "wds", text: answer }); sesSave(SL, H, SS); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RZT)); mountActs(cell, answer); renderSeq(cell, answer, seqV);
+            H.push(_ns ? { role: "wds", text: answer, ns: 1 } : { role: "wds", text: answer }); sesSave(SL, H, SS); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RZT)); mountActs(cell, answer); renderSeq(cell, answer, seqV);
             if (_led) ledgerRender(cell, _led, answer);      // 记分牌挂在正文之外，不进导出稿
             if (_preg && !_preg.empty) pregRender(cell, _preg);   // 预注册卡→判断账（正文之外）
             if (fgSL()) cvTake(answer);                     // 先看是不是「就地改」的回稿（收成下一版），否则扫围栏块（画布只归前台）
@@ -6095,7 +6102,7 @@
       .catch(function (e) {
         clearTimeout(wd);
         if (!stoppedByUser) { cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = t("errNet") + (e && e.message) + t("errNetEnd"); }
-        else if (answer) { cell.a.innerHTML = mdRender(answer); history.push({ role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer); renderSeq(cell, answer, seqV); }
+        else if (answer) { cell.a.innerHTML = mdRender(answer); history.push(_ns ? { role: "wds", text: answer, ns: 1 } : { role: "wds", text: answer }); stSave(history); progRender(cell, progParse(answer)); razRender(cell, razAudit(answer, RAZ.text)); mountActs(cell, answer); renderSeq(cell, answer, seqV); }
         endUI();
       });
   }

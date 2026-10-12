@@ -221,7 +221,8 @@
       put({
         id: rec.id, agent: rec.agent, scope: rec.scope, scopeLabel: rec.scopeLabel,
         title: rec.title, createdAt: rec.createdAt, updatedAt: rec.updatedAt,
-        turns: rec.turns.map(function (t) { return { role: t.role, text: t.text }; })
+        // ns＝这一轮是在「无 SDE」档下问答的（2026-10-12 无血）：重开旧场后无 SDE 一路仍只带这几轮
+        turns: rec.turns.map(function (t) { return t.ns ? { role: t.role, text: t.text, ns: 1 } : { role: t.role, text: t.text }; })
       }).then(function () { trim(rec.agent); }).catch(function () {});
     }
 

@@ -167,7 +167,7 @@ ok("定档：deep／请求／读数／不适用三条路一起递进 wdsGradePic
 ok("按档改 VC 时看图那条路不碰", /if \(G\.on && !canSee\) \{/.test(CHAT)
    && /VC\.top = gK\.top \? 1 : 0;/.test(CHAT) && /VC\.model = wdsPickModel\(vd, umodel,/.test(CHAT));
 ok("功率档随档给（3 档 high／4–5 档 max），非顶配时不留 effort", /if \(gK\.top && gK\.effort\) VC\.effort = gK\.effort; else delete VC\.effort;/.test(CHAT));
-ok("方法论块按档给（mFull），不再直接看 deep", /WDS_CHAT_SYS\(reflect, SDEM, \(nbrCtx \? nbrCtx \+ "\\n" : ""\) \+ ctxText, webCtx, mFull,/.test(CHAT) && /const mFull = G\.on \? !!gK\.method : deep;/.test(CHAT));
+ok("方法论块按档给（mFull），不再直接看 deep", /WDS_CHAT_SYS\(reflect, SDEM, \(nbrCtx \? nbrCtx \+ "\\n" : ""\) \+ ctxText, webCtx, mFull,/.test(CHAT) && /const mFull = \(!noSde && !prof && !duel\) \? true : \(G\.on \? !!gK\.method : deep\);/.test(CHAT));   // 2026-10-12 满血：本体一律完整工序
 /* 2026-09-01：预算不再抄第二份字面量。G.on 为假时 gK 就是 knobs(0)／knobs(4)，
    这一行读 gK.tok 即可——抄两份的代价刚付过一次（表里改了 tok，这行还写着 2600）。 */
 ok("预算一律读 gK.tok，工序保底 4000（不再有第二份字面量）",
@@ -190,7 +190,8 @@ ok("标准档（knobs 的 default 一格）也关思考——它自称「快答�
    /default: return \{ lv: 0, name: "标准", top: 0, plain: 1,/.test(SRC));
 ok("老深度档（无难度条时的 knobs(4)）不受影响，思考照开", /case 4: return \{ lv: 4[^}]*plain: 0/.test(SRC));
 // 2026-10-04 起判据多一个 !noSde（无 SDE 档不装内功，见 sim_chatsde_compare.js）
-const i5 = CHAT.indexOf("if (G.on && gK.ng && !prof && !noSde && !(rs && rs.sde)) {");
+// 2026-10-12 满血：完整内功不再限第 5 档——ChatSDE 本体的 SDE 一路一律装（见 sim_chatsde_blood.js）
+const i5 = CHAT.indexOf("if (!prof && !noSde && !rs && !duel && tool !== \"iq\") {");
 ok("第 5 档装完整内功：只在普通问答上、走 resPriorFit 预算闸、装不下退精简并说明", i5 > 0
   && CHAT.slice(i5, i5 + 2600).indexOf("resPriorFit(_ng5.length, 0, ctxText.length, webCtx.length, docCtx.length,") > 0
   && CHAT.slice(i5, i5 + 2600).indexOf("neigongLite(_ng5)") > 0

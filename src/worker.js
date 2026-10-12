@@ -13873,10 +13873,13 @@ export default {
       // 与 LONGASK 同一条纪律——挂在当轮 user 消息上、**不进 system**：
       // ①system 是可被基底前缀缓存的固定段，每轮换内容会把缓存打散；②这几条只对这一问相关，不该长驻。
       // 明确告诉它这是摘要不是原文，免得它照着复述、或假装记得摘要里没写的事。
-      let umem = String(b.umem || "").slice(0, UMEM_MAX);
+      /* 【无血 · 2026-10-12 王德生令「一个要满血，一个要无血」】无 SDE 档不收读者长期记忆——那里面几乎全是
+         此前 SDE 对话的摘要，带进来就是让「无 SDE」从记忆里抄 SDE 的结论。noSde 在下面才声明（TDZ），这里直接读 b.nosde。 */
+      const _noBlood = b.nosde === 1 || b.nosde === true;
+      let umem = _noBlood ? "" : String(b.umem || "").slice(0, UMEM_MAX);
       /* 分层记忆（2026-09-01）：新客户端递 umem3 三段，等定完档再按档配给（见 wdsMemByGrade）。
          这里先接住，档还没算出来——自动档要等站内检索跑完才知道深浅。 */
-      const umem3 = (b && b.umem3 && typeof b.umem3 === "object") ? b.umem3 : null;
+      const umem3 = (!_noBlood && b && b.umem3 && typeof b.umem3 === "object") ? b.umem3 : null;
       let memPick = null;
       /* ── nosite：跳过全站检索 ────────────────────────────────
          作文共创那四台（共创／修改／编辑／接着写）改的是**读者自己的稿子**，
@@ -13955,7 +13958,7 @@ export default {
         ? "\n\n注意：上面带「节选」的文件，你手上**不是全篇**，是按这一问从长文里取出的若干段（段号已标）。"
           + "凡是需要通篇才能下的判断（全文结构、有没有提到某事、作者最终立场），要么明说你只看到了这些段、请读者换个问法把相关部分调出来，要么就别下。绝不要把节选当全篇讲。"
         : "";
-      const about = String(b.about || "").trim().slice(0, 1200);   // 读者写的自定义指令
+      const about = noSde ? "" : String(b.about || "").trim().slice(0, 1200);   // 读者写的自定义指令（无血档不收：「关于我」里写的多是 SDE 身份与口径）
       /* 陪练档（2026-09-16）：只认读者自己打开的明确信号，缺省＝代劳档，老客户端行为一字不变。 */
       const coach = (b.coach === 1 || b.coach === "1" || b.coach === true);
       const lang = b.lang === "en" ? "en" : "zh";                 // 界面语言：决定用哪种语言作答
@@ -13976,7 +13979,7 @@ export default {
       // COMPACTION：本场更早的对话已在读者本机压成一份「账本」（只留判断/否决/分离线/悬案）。
       // 它替代的是被裁掉的原文，所以位置在历史之前、且必须**标明它是账本不是原文**——
       // 否则它会照着账本复述，把压缩过的结论当成自己刚说过的话。
-      const comp = String(b.comp || "").slice(0, 8000);
+      const comp = noSde ? "" : String(b.comp || "").slice(0, 8000);   // 无血档不收前情账本：账本是 SDE 轮次压出来的
       // RESEARCH：深度研究的一步。走同一条产线（检索/联网/流式/时钟全都现成），只换口径与预算。
       const rsRaw = (b.rs && typeof b.rs === "object") ? b.rs : null;
       /* 🔴🔴 【白名单是一把双刃】这里逐字段重建 rs，是对的——外部输入不许原样进 system。
@@ -14181,7 +14184,8 @@ export default {
               VC.model = wdsPickModel(vd, umodel, 1);
               VC.effort = "max";
             }
-            const mFull = G.on ? !!gK.method : deep;                      // 方法论块：完整工序还是精简工序
+            /* 【满血 · 2026-10-12 王德生令】ChatSDE 本体的 SDE 一路一律给完整工序，不再看档位。 */
+            const mFull = (!noSde && !prof && !duel) ? true : (G.on ? !!gK.method : deep);   // 方法论块：完整工序还是精简工序
             /* 关思考的档：难度条 1–2 档，以及**标准档**（G.on 为假时 gK 就是 knobs(0)）。
                ⚠ 2026-09-01 第二张同款报障：标准档写着「快答档，够用且省」、预算只有 2600，
                  却把思考开关留白＝随基底默认。在思考默认开着的家，2600 先被想掉 2382 字，
@@ -14450,7 +14454,11 @@ export default {
             /* ⚠ 2026-10-04 补 `!noSde`：无 SDE 档钉第 5 档时，这里原来照样装内功——system 走 WDS_PLAIN_SYS 整段改道，
                内功其实没进去，却①白白为它裁掉站外资料与附件、②在屏幕上报一条「已装完整内功先验」。
                王德生拿「有 SDE ／无 SDE」做对照时，无 SDE 那份底下就挂着这条——读者会以为对照不干净。 */
-            if (G.on && gK.ng && !prof && !noSde && !(rs && rs.sde)) {
+            /* 【满血 · 2026-10-12 王德生令「一个要满血，一个要无血」】完整内功（含二阶碰撞）原来只在深度档第 5 档才装，
+               标准档与 1–4 档只挂一行骨架——读者以为在跟内功附体的 ChatSDE 说话，其实只拿到名字。现在 ChatSDE 本体的
+               SDE 一路一律满装：不看标准／深度、不看档位。不在这里装的：无 SDE（无血）、领域档案（自带内功）、
+               研究产线 rs（自己装）、三家对撞（总结席另装、其余席刻意不装）、评分工序 iq（盲评刻意裸机）。 */
+            if (!prof && !noSde && !rs && !duel && tool !== "iq") {
               let _ng5 = "";
               try { _ng5 = await loadNeigong(env, url, "/taste/assets/sde-neigong.txt"); } catch (e) {}
               if (_ng5) {
@@ -14461,14 +14469,14 @@ export default {
                 if (fit5.docKeep < docCtx.length) { _cuts5.push("读者附件 " + docCtx.length + "→" + fit5.docKeep); docCtx = resTrimTail(docCtx, fit5.docKeep, "读者附件"); }
                 if (fit5.mode === "full") {
                   SDEM = "\n\n════ SDE 内功 · 完整先验（你的底盘：内化使用，绝不复述原文、绝不提「内功」二字）════\n" + _ng5;
-                  controller.enqueue(_sseBytes({ t: "note", v: "难度第 5 档：已装完整内功先验（" + _ng5.length + " 字，含二阶碰撞）" + (_cuts5.length ? ("；为装下它裁了：" + _cuts5.join("；")) : "") + "。" }));
+                  controller.enqueue(_sseBytes({ t: "note", v: "满血：已装完整内功先验（" + _ng5.length + " 字，含二阶碰撞）＋完整工序" + (_cuts5.length ? ("；为装下它裁了：" + _cuts5.join("；")) : "") + "。" }));
                 } else {
                   const _lite5 = neigongLite(_ng5);
                   SDEM = "\n\n════ SDE 内功 · 精简先验（读物裁到地板仍装不下完整先验）════\n" + _lite5;
-                  controller.enqueue(_sseBytes({ t: "note", v: "难度第 5 档：内功按精简版装载（" + _lite5.length + " 字，完整版 " + _ng5.length + " 字）——精简版不含三大方程／123 原理／六路径的完整节与二阶碰撞。" }));
+                  controller.enqueue(_sseBytes({ t: "note", v: "满血未满：内功按精简版装载（" + _lite5.length + " 字，完整版 " + _ng5.length + " 字）——精简版不含三大方程／123 原理／六路径的完整节与二阶碰撞。" }));
                 }
               } else {
-                controller.enqueue(_sseBytes({ t: "note", v: "难度第 5 档本该装完整内功，这次内功文件没读到，退回一行骨架作答——这一答按第 4 档看待。" }));
+                controller.enqueue(_sseBytes({ t: "note", v: "本该满血装完整内功，这次内功文件没读到，退回一行骨架作答——这一答不算满血。" }));
               }
             }
             /* ⭐ 交付规格随流下发（2026-08-28）。前端拿**同一份**规格跑审计——
