@@ -68,7 +68,7 @@ def main():
 
     # chapter anchors in text/index.html
     tx = (BOOK / 'text/index.html').read_text(encoding='utf-8')
-    anchors = {int(m.group(2)): m.group(1) for m in re.finditer(r'<div class="chapter" id="(s\d+)"><div class="chap-label">第 ?(\d+) ?章', tx)}
+    anchors = {int(m.group(2)): m.group(1) for m in re.finditer(r'<(?:div|section) class="chapter" id="(s\d+)">(?:<div class="chapnum[^"]*">[^<]*</div>)?<div class="chap-label">第 ?(\d+) ?章', tx)}
     assert len(anchors) == nch, 'text page anchors: %d' % len(anchors)
 
     def w(rel, content):
