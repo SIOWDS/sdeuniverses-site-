@@ -1172,7 +1172,7 @@
       attFull: "全文常驻本场", attIdx: "按问题取段", attSegs: " 段", attStay: "附件会跟着这一场对话，直到你去掉它或开新对话",
       attFullOn: "✓ 全篇全带", attToggleHint: "点这里切换：按问题取段（只挑相关的几段·省额度）⇄ 整篇全带（评全书、通读全文用；顶配型号（如 deepseek-v4-pro，1M 上下文）放得下整本，但每一轮都把全文发一遍、更费额度也更慢）",
     attGone: "附件只在本页有效，刷新会丢（对话文字会自动续上）",
-    sbCap: "本机只保留最近 60 场，更旧的会自动淘汰——想长期留着就用 ⤓ 导出",
+    sbCap: "本机只保留最近 300 场，更旧的会自动淘汰——想长期留着就用 ⤓ 导出",
     dCut: "成文这一步断了（上面已写出的部分仍可复制/导出）",
       micLocal: "本机转写（免费）", micDl: "首次要下载模型 ",
       micLocalAsk: "本机转写完全免费、不用任何 Key，音频也不出这台机器。代价是首次要下载约 80 MB 的模型（之后浏览器会记住，不再重下），没有独立显卡的机器转一句话可能要等十几秒。现在下吗？",
@@ -1485,7 +1485,7 @@
       attFull: "kept in full for this chat", attIdx: "excerpted per question", attSegs: " segments", attStay: "Attachments stay with this conversation until you remove them or start a new one",
       attFullOn: "✓ whole document", attToggleHint: "Click to switch: excerpt per question (only the relevant segments — cheaper) \u21c4 send the whole document (for reviewing or reading the full text; top models such as deepseek-v4-pro have a 1M context and hold a whole book, but it is re-sent every turn, so it costs more and is slower)",
     attGone: "Attachments live on this page only — a refresh drops them (the transcript comes back)",
-    sbCap: "Only the latest 60 chats are kept locally; older ones are dropped — export (⤓) to keep them",
+    sbCap: "Only the latest 300 chats are kept locally; older ones are dropped — export (⤓) to keep them",
     dShortW1: "\u26a0 This draft came in at only ", dShortW2: " characters, short of this format's target. Hit \u21bb Rewrite for another pass, or ask below for one more concrete scene — don't let it pad by restating what it already said.",
     dCut: "This write-up was cut off (what's above can still be copied or exported)",
       micLocal: "On-device (free)", micDl: "Downloading the model ",
@@ -4234,7 +4234,13 @@
   /* 就地重开（老行为）：这一场没在跑时不攒空场，省得侧栏堆一排白纸。 */
   function sesBlank() {
     try { memAutoRun(); } catch (e) {}          // 开新的之前，先把刚谈完这一场炼进记忆（只在自动档开着时）
-    history = []; askReset(); compReset(); cvReset(); if (stSess) stSess.reset(); msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
+    /* 【独立性 2026-10-12】不再 stSess.reset()——那会把**同一个句柄**挪到新 id 上，
+       谁手里还攥着它（刚停下的流、尚未落盘的防抖），写进来的就成了新场的内容。
+       旧句柄先落盘、就此放下；新场一律拿新句柄。 */
+    if (stSess) { try { stSess.flush(); } catch (e) {} }
+    stSess = null; try { stMakeSession(); } catch (e) {}
+    QUEUE = []; qPaused = false; try { qPaint(); } catch (e) {}
+    history = []; askReset(); compReset(); cvReset(); msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
     atts = []; paintAtts();                          // 附件跟着这一场，新开一场就该清干净
     inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph"); updTurns();   // dayLeft 不复位：今日额度按本机计
     layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = ""; inEl.focus();
@@ -4314,6 +4320,33 @@
     };
   }
   function stRestore(rec) {
+    if (!rec) return;
+    /* 【独立性 2026-10-12 王德生令「一旦发起一个对话，就不应该受到新的对话的影响」】
+       旧版直接在当前这一场上 stSess.adopt(rec)：若这一场还在答，那条流收尾时攥着的正是
+       这个句柄——它的答案就写进了刚打开的旧对话，把旧对话整条覆盖。三条规矩：
+       ① 这条记录已在某一场里开着 → 直接切过去，不再开第二份（两份同 id 会互相覆盖）；
+       ② 当前这一场在答 → 收进后台，另开一场来装旧对话；
+       ③ 一律给旧对话一个**新句柄**，绝不复用别场的。 */
+    for (var _i = 0; _i < SES.length; _i++) {
+      var _s = (_i === SESi) ? stSess : SES[_i].sess;
+      if (_s && _s.id && _s.id() === rec.id) { if (_i !== SESi) sesShow(_i); drawer(false); return; }
+    }
+    if (SESi < 0 && stSess && stSess.id && stSess.id() === rec.id && history.length) return;
+    if (streaming) {
+      if (RS && RS.running) { toast(t("sesRs")); return; }
+      if (SES.length >= SES_CAP) { toast(t("sesFull")); return; }
+      sesHere(); sesPark();
+      var _n = sesMake(); SES.push(_n); SESi = SES.length - 1;
+      history = _n.hist; VERS = _n.vers; QUEUE = _n.queue;
+      streaming = false; curReader = null; stoppedByUser = false;
+      COMP.busy = false; RAZ.text = ""; RAZ.turn = 0;
+      busyUI(false); stopBarShow(false);
+    } else if (stSess) { try { stSess.flush(); } catch (e) {} }
+    stSess = null;
+    if (stApi) { try { stSess = stApi.session({ agent: AGENT_CHAT, scope: rec.scope || "", scopeLabel: rec.scopeLabel || "" }); stSess.adopt(rec); } catch (e) { stSess = null; } }
+    atts = []; try { paintAtts(); } catch (e) {}          // 附件属于上一场，不跟着进旧对话
+    QUEUE = []; qPaused = false; try { qPaint(); } catch (e) {}
+    try { var _hero = layer.querySelector(".wdsm-hero"); if (_hero) _hero.style.display = "none"; msgsEl.style.display = ""; bodyEl.classList.remove("empty"); } catch (e) {}
     history = []; askReset(); compReset(); cvReset(); msgsEl.innerHTML = "";
     var cell = null;
     (rec.turns || []).forEach(function (t) {
@@ -4322,7 +4355,6 @@
       else { if (cell) { cell.a.innerHTML = mdRender(t.text); progRender(cell, progParse(t.text)); mountActs(cell, t.text); } history.push({ role: "wds", text: t.text }); }
     });
     razRestore();                               // 底册在历史里，捡回来，否则此后各轮静悄悄不再注入宪法
-    if (stSess) stSess.adopt(rec);
     VERS = [];                                  // 换了一场，上一场的版本堆作废
     inEl.disabled = false; sendEl.disabled = false; updTurns(); sbRender();
     sesSync(); sesPaint();                      // history 是新数组、session 已改指——这一场里记的那两个引用得跟上
@@ -13841,7 +13873,15 @@
           if (ev && ev.stopPropagation) ev.stopPropagation();
           if (window.confirm && !window.confirm(t("sbDelAsk"))) return;
           stApi.remove(m.id).then(function () {
-            if (m.id === curId && stSess) { stSess.reset(); newChat(); }
+            if (m.id === curId && stSess) {
+              /* 删的是眼前这一场：先作废它的句柄（还在答的流收尾时不许把它写回来），再停流、开新场 */
+              try { stSess.drop(); } catch (e) {}
+              if (streaming) { try { doStop(); } catch (e) {} }
+              stSess = null; try { stMakeSession(); } catch (e) {}
+              newChat();
+            } else {
+              SES.forEach(function (s) { if (s.sess && s.sess.id && s.sess.id() === m.id) { try { s.sess.drop(); } catch (e) {} } });
+            }
             sbRender();
           });
         };
@@ -13854,7 +13894,7 @@
         };
         sbListEl.appendChild(it);
       });
-      if ((metas || []).length >= 50) {           // 快到 wds-store 的 60 场上限了，先打招呼
+      if ((metas || []).length >= 280) {          // 快到 wds-store 的 300 场上限了，先打招呼
         var cap = el("div", "wdsm-snone", t("sbCap"));
         cap.style.cssText = "font-size:11.5px;line-height:1.6;opacity:.75";
         sbListEl.appendChild(cap);

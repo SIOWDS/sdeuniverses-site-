@@ -18,7 +18,7 @@
   // DB_VER 2（2026-07-29）：新增「用户RAG」两个仓——MEMO 存每场对话的摘要条目，KV 存用户画像与开关。
   // 升级只新建缺的仓，convos 里已有的对话原样保留（onupgradeneeded 不动既有数据）。
   var DB_NAME = "wds-store", DB_VER = 2, ST = "convos", MEMO = "memos", KV = "kv";
-  var MAX_SESSIONS = 60;          // 每个智能体保留的会话上限，超出淘汰最旧
+  var MAX_SESSIONS = 300;         // 每个智能体保留的会话上限，超出淘汰最旧（2026-10-12 王德生令「对话要有保存性」：60→300）
   var SAVE_DEBOUNCE = 400;
 
   var dbP = null;
@@ -210,7 +210,7 @@
       updatedAt: Date.now(),
       turns: []
     };
-    var timer = null, dirty = false;
+    var timer = null, dirty = false, dead = false;
 
     function flush() {
       timer = null;
@@ -229,22 +229,28 @@
       id: function () { return rec.id; },
       // 每轮结束调用；turns 直接传智能体自己的 history 数组
       save: function (turns) {
-        if (!turns || !turns.length) return;
+        if (dead || !turns || !turns.length) return;
         rec.turns = turns.slice();
         dirty = true;
         clearTimeout(timer);
         timer = setTimeout(flush, SAVE_DEBOUNCE);
       },
       flush: flush,
+      // 作废这个句柄：此后它的 save 一律不落盘（删掉了的那一场，后台流收尾时不许把它写回来）
+      drop: function () { clearTimeout(timer); timer = null; dirty = false; dead = true; },
       // 开新一场：换 id，旧的已落盘不受影响
+      /* 【2026-10-12】reset／adopt 换落点之前，先把还在防抖里没落盘的那一版写掉。
+         旧写法是 clearTimeout＋dirty=false——答完 0.4 秒内点「新对话」，最后一轮就永远丢了。 */
       reset: function () {
-        clearTimeout(timer); timer = null; dirty = false;
+        if (dirty) flush(); else clearTimeout(timer);
+        timer = null; dirty = false;
         rec = { id: uid(), agent: rec.agent, scope: rec.scope, scopeLabel: rec.scopeLabel,
                 title: "", createdAt: Date.now(), updatedAt: Date.now(), turns: [] };
       },
       // 接管一条已存在的记录（从历史里恢复后继续聊，续写同一条）
       adopt: function (r) {
-        clearTimeout(timer); timer = null; dirty = false;
+        if (dirty) flush(); else clearTimeout(timer);
+        timer = null; dirty = false;
         rec = { id: r.id, agent: r.agent, scope: r.scope, scopeLabel: r.scopeLabel || "",
                 title: r.title, createdAt: r.createdAt, updatedAt: r.updatedAt, turns: (r.turns || []).slice() };
       }
