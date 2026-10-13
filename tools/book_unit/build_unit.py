@@ -39,7 +39,7 @@ def parse_manuscript(path):
         blk = blk.strip('\n')
         if not blk: continue
         head, _, body = blk.partition('\n')
-        m = re.match(r'# (第[一二三四五六七八九十]+编|卷[一二三四五六七八九十]+|终章|[上中下尾]篇(?:（[一二三]）)?)　(.*)', head)
+        m = re.match(r'# (第[一二三四五六七八九十]+[编篇]|卷[一二三四五六七八九十]+|终章|[上中下尾]篇(?:（[一二三]）)?)　(.*)', head)
         if m:
             parts.append(m.group(1) + '　' + m.group(2)); cur = len(parts); continue
         m = re.match(r'## 第 ?(\d+) ?章　(.*)', head)
