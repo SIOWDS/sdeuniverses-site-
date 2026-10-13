@@ -63,6 +63,14 @@
       cost: "\u8981\u4f60\u81ea\u5df1\u7684 Key \u00b7 \u534a\u5c0f\u65f6\u8d77"
     },
     {
+      /* 智能体生成器（2026-10-13 王德生令「做一个能写智能体的智能体，挂在 ChatSDE 上」）：
+         交过去的这一句当「需求」，产物是一个解压即可在 Python 里运行的智能体 ZIP。 */
+      id: "agentmaker", name: "\u667a\u80fd\u4f53\u751f\u6210\u5668", icon: "\uD83E\uDDE9",
+      url: "/taste/agent-maker/", sel: ["need"],
+      what: "\u628a\u8fd9\u4e00\u95ee\u5f53\u9700\u6c42\uff0c\u8bbe\u8ba1\u51fa\u4e00\u4e2a\u667a\u80fd\u4f53\uff0c\u6d4f\u89c8\u5668\u5185\u81ea\u68c0\u81ea\u4fee\uff0c\u4e0b\u8f7d ZIP \u89e3\u538b\u5373\u8dd1",
+      cost: "\u8981\u4f60\u81ea\u5df1\u7684 Key \u00b7 2\u20136 \u5206\u949f"
+    },
+    {
       id: "search", name: "\u6d8c\u73b0\u6863\uff08\u5341\u8f6e\u95ee\u5bf9\uff09", icon: "\uD83C\uDF00",
       url: "/search/", sel: ["qa"],
       what: "\u6bcf\u8f6e\u4e09\u4e2a\u89c2\u70b9\u3001\u4e8c\u9636\u78b0\u649e\u62e9\u4f18\uff0c\u518d\u7efc\u5408\u63d0\u70bc\u6210\u8bba\u6587\u5165\u53e3\u8d44\u6599",

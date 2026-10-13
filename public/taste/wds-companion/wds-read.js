@@ -368,7 +368,7 @@
     var fq = q1(".wdsr-fq", pan);
     fq.value = (focusSeg || lastAsk || "").slice(0, 500);
     q1(".wdsr-cx", pan).onclick = function () { pan.parentNode.removeChild(pan); };
-    lazyJs("/taste/assets/sde-handoff.js?v=20260817c").then(function () {
+    lazyJs("/taste/assets/sde-handoff.js?v=20261013a").then(function () {
       var H = window.SDEHandoff; if (!H || !H.AGENTS) throw new Error("no_mod");
       var list = q1(".wdsr-list", pan);
       H.AGENTS.forEach(function (a) {

@@ -6724,6 +6724,51 @@ const REVIEW_STYLE = "\n用严谨的汉语学术语言；不摆空模板、不�
 const WDS_DLG_PER_DAY = 300, WDS_DLG_PER_MIN = 25;
 // 用户RAG（记忆更新）单独一个桶：一次"全量更新"可能连做几十场，走对话桶会把当天的问答额度吃光。
 // 记忆是离线的批活儿，慢一点没关系，但不能因为它把人当天不能再聊天。
+/* ══ 智能体生成器：设计师提示词（/api/wds/agentgen 的 system，只在服务端）══
+   产出格式用分节标记而不用 JSON：工具代码动辄几百行，塞进 JSON 字符串要逐字转义，
+   基底在长代码上漏一个反斜杠整份就解析不了；分节标记里代码原样写，页面按行切分即可。
+   运行框架（template/）改了这里要同步：内置工具名、tools.py 约定、knowledge/ 的接法。 */
+const AGENTGEN_PER_MIN = 10, AGENTGEN_MSG_MAX = 160000, AGENTGEN_TOTAL_MAX = 240000;
+const AGENTGEN_SYS = `你是「智能体设计师」。用户给你一段需求，你要设计一个能在用户电脑上用 Python 运行的智能体，一次性交出全部内容。
+
+## 运行框架（已存在，你不用写）
+智能体包里已有固定内核，只用 Python 标准库：
+- run.py：启动入口（命令行对话 / 一问一答 / --web 本地网页界面），首次运行自动索取 API Key。
+- core/agent.py：大模型工具调用循环（OpenAI 兼容的 function calling）。模型每一轮可以调用工具，工具结果自动回传，直到给出最终回答。厂商与型号由生成器页面决定，你不用管。
+- core/builtins.py：可开启的内置工具：read_file、write_file、list_files（只限智能体目录下 workspace/）、fetch_url（抓网页正文）、now（当前时间）。用到哪个就在 builtin_tools 里列出哪个，不要在 tools.py 里重写它们。
+- knowledge/ 目录：用户附带的资料放在这里，运行时自动接在系统提示词后面。
+
+## 你要交出的内容
+1. **系统提示词**：智能体的「内功」——最重要的部分。写清楚它是谁、为谁服务、要达成什么、工作步骤、判断标准、输出格式、什么情况下必须先问清楚、不能做什么。要具体、可执行，像给一位能干的新员工写的岗位手册，不是一句口号。通常 800–3000 字。语言与需求一致。
+2. **tools.py**：完整 Python 源码。约定：
+   - 定义列表 TOOLS，每项是 dict：{"name": 英文名, "description": 中文说明（写清何时用、返回什么）, "input_schema": JSON Schema（type 必须是 "object"）, "function": 对应的 Python 函数}。
+   - 函数参数名与 input_schema 的 properties 一一对应；返回 str，或可 JSON 序列化的 dict/list。
+   - 只在确实需要「计算、查数据、读写结构化文件、调外部服务」时才写工具。纯写作、分析、对话类智能体写 TOOLS = []，把本事放在系统提示词里。
+   - 尽量只用 Python 标准库；确需第三方包就在 extra_requirements 里声明。
+   - 需要外部服务密钥时一律从 os.environ 读取，取不到就返回清楚的中文提示，不要抛异常；并在 README 里说明怎么设置。
+   - 文件读写放在 os.path.join(os.path.dirname(os.path.abspath(__file__)), "workspace") 下。
+   - 模块必须能直接 import：顶层不要做网络请求或耗时操作。
+3. **tool_tests**：为每个自定义工具写 1–3 条测试 {"tool", "input", "expect_contains": [输出里应包含的子串]}。测试必须离线、无需任何密钥即可通过；依赖网络或密钥的工具只测「缺密钥时的提示」或参数校验路径。没有自定义工具就给 []。
+4. **README**：Markdown，写给不懂编程的人：它能做什么、怎么用、示例、注意事项。（启动方法生成器会自动附上，你不用写。）
+
+## 输出格式（严格遵守，不要输出任何其他文字，不要用 \`\`\` 包裹整份）
+===META===
+{"name": "显示名（可中文）", "slug": "小写英文-连字符", "description": "一句话说明", "builtin_tools": [], "extra_requirements": [], "example_questions": ["示例问题1", "示例问题2", "示例问题3"], "tool_tests": []}
+===SYSTEM_PROMPT===
+（系统提示词全文）
+===TOOLS_PY===
+（tools.py 全文，原样 Python 代码）
+===README===
+（README 全文）
+===END===
+
+META 必须是合法 JSON（只放短字段，代码与长文放在后面各节）。
+
+## 质量要求
+- 先在心里把需求拆清楚：用户、输入、输出、步骤、成败标准，再动笔。
+- 需求含糊时，取最合理的理解，并在系统提示词里让智能体在关键处向用户确认。
+- 不要编造不存在的 API 或包。
+- 收到自检报错时，找出根因，修好后按同一格式重新交出**完整**内容（不是只交改动部分）。`;
 const WDS_MEMO_PER_DAY = 400, WDS_MEMO_PER_MIN = 30;
 // 一场对话喂进去做摘要的上限（字符）；超长的场由客户端"取头尾、中间明标省略"后再送来。
 const MEMO_IN_MAX = 24000;
@@ -12297,6 +12342,59 @@ export default {
     //   mode=l1：把最近一轮问答(Q→A)压成约 200 字要点摘要；
     //   mode=l2：把 5 段 l1 摘要(约1000字)再压成约 500 字的合并摘要。
     //   纯 BYOK、非流式、单次 llmText 调用；失败返回空串（前端退回带原文，不影响可用）。
+    /* ══ 智能体生成器（2026-10-13，王德生令「做一个能写智能体的智能体，挂在 ChatSDE 上」）══
+       页面 /taste/agent-maker/：读者写需求 → 本端点用**读者自己的 Key**、按 ChatSDE 同一张厂商表转发，
+       设计师提示词写死在服务端（AGENTGEN_SYS）→ 页面在浏览器里用 Pyodide 自检、出错把报错递回本端点重做 → 浏览器打 ZIP。
+       三条纪律：
+       ① 流式原样回传（不在 Worker 里攒整份），长稿不撞平台墙；
+       ② 关思考、预算全归正文（plain）：交付物是一份分节的文件稿，思考吃预算会把正文饿成零字；
+       ③ messages 只收 user/assistant 两种角色、总量封顶——system 永远是服务端这一份，读者传不进来。 */
+    if (url.pathname === "/api/wds/agentgen") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      const KEY = String(b.key || "").trim();
+      if (KEY.length < 8) return J({ ok: false, code: "need_key", msg: "智能体生成器用你自己的 API Key 运行（在 ChatSDE 的 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
+      const vd = wdsVendorOf(b.vendor);
+      const want = String(b.model || "").trim();
+      const okName = want && want.length <= 80 && /^[A-Za-z0-9._:\/-]+$/.test(want);
+      const model = okName ? want : (b.deep ? (WDS_TOP_MODEL[vd] || WDS_VENDORS[vd].model) : WDS_VENDORS[vd].model);
+      const VC = { url: WDS_VENDORS[vd].url, model, name: WDS_VENDORS[vd].name };
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(wdsBucket("agentgen", ip, KEY)));
+        const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/?w=" + AGENTGEN_PER_MIN + BYOK_NO_DAY))).json());
+        if (!lr.ok) return J({ ok: false, code: "rate", msg: "生成太频繁了，等一分钟再试。" }, 429);
+      } catch (e) {}
+      const msgs = [];
+      let total = 0;
+      for (const m of (Array.isArray(b.messages) ? b.messages : []).slice(-12)) {
+        const role = m && (m.role === "assistant" ? "assistant" : (m.role === "user" ? "user" : ""));
+        const c = String((m && m.content) || "");
+        if (!role || !c.trim()) continue;
+        total += c.length;
+        msgs.push({ role, content: c.slice(0, AGENTGEN_MSG_MAX) });
+      }
+      if (!msgs.length || msgs[0].role !== "user") return J({ ok: false, msg: "需求为空。" }, 400);
+      if (total > AGENTGEN_TOTAL_MAX) return J({ ok: false, msg: "需求与附件加起来太长了（上限约 " + Math.round(AGENTGEN_TOTAL_MAX / 10000) + " 万字），请删减附件。" }, 400);
+      const messages = [{ role: "system", content: AGENTGEN_SYS }].concat(msgs);
+      let resp;
+      try {
+        resp = await wdsFetchMax(VC, KEY, messages, true, 0, null, false, [24000, 16000, 8000], true);
+      } catch (e) {
+        return J({ ok: false, msg: "连不上 " + VC.name + "：" + String(e && e.message || e).slice(0, 200) }, 502);
+      }
+      if (!resp.ok) {
+        let t = ""; try { t = (await resp.text()).slice(0, 400); } catch (e) {}
+        const why = resp.status === 401 || resp.status === 403 ? "Key 无效或没有这个型号的权限" : (resp.status === 429 ? "厂商限流，稍后再试" : ("上游返回 " + resp.status));
+        return J({ ok: false, msg: VC.name + "：" + why + (t ? "（" + t + "）" : "") }, 502);
+      }
+      const h = new Headers({ "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store", "x-agentgen-model": model });
+      for (const [k, v] of Object.entries(_cors())) h.set(k, v);
+      h.set("access-control-expose-headers", "x-agentgen-model");
+      return new Response(resp.body, { status: 200, headers: h });
+    }
     if (url.pathname === "/api/wds/summarize") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });

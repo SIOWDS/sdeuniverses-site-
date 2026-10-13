@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智能体生成器 · 写需求，出一个能跑的智能体 | SDE Universes</title>
+<meta name="description" content="写下需求，大模型设计出一个智能体：内功、工具、测试一次交齐，在你的浏览器里自检、出错自动修，最后打成 ZIP。解压双击就能在 Python 里运行。用你自己的大模型 Key。">
+<link rel="canonical" href="https://sdeuniverses.com/taste/agent-maker/">
+<style>
+:root{--bg:#0F0B07;--panel:#161B22;--panel2:#11161D;--bord:rgba(255,255,255,0.09);--ink:#E8E4DA;--ink2:#B9B2A3;--muted:#8B98A5;--gold:#D4B25E;--gold2:#E5C86E;--ok:#5FBF7F;--bad:#E8897B;--warn:#E8B14C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+a{color:var(--gold)}
+.top{border-bottom:1px solid var(--bord);padding:10px 20px;font-size:13px;display:flex;gap:16px;flex-wrap:wrap}
+.top a{color:var(--muted);text-decoration:none}.top a:hover{color:var(--gold)}
+.wrap{max-width:940px;margin:0 auto;padding:30px 20px 100px}
+h1{font-size:27px;line-height:1.4;margin:0 0 6px;font-weight:700}
+.sub{color:var(--gold2);font-size:15px;margin:0 0 22px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 22px}
+@media(max-width:760px){.three{grid-template-columns:1fr}}
+.card{background:var(--panel2);border:1px solid var(--bord);border-radius:10px;padding:14px 15px}
+.card .k{font-size:12px;color:var(--gold);letter-spacing:.08em;margin-bottom:4px}
+.card .t{font-size:13.5px;font-weight:600;margin-bottom:4px}
+.card .g{font-size:12.5px;color:var(--muted);line-height:1.75}
+.ctl{background:var(--panel);border:1px solid var(--bord);border-radius:12px;padding:20px;margin:0 0 18px}
+label{display:block;font-size:13px;color:var(--ink2);margin:0 0 6px}
+input[type=text],input[type=password],textarea,select{width:100%;background:#0A0806;color:var(--ink);border:1px solid var(--bord);border-radius:8px;padding:10px 12px;font:inherit;font-size:14px}
+textarea{min-height:150px;resize:vertical;line-height:1.75}
+.row{display:grid;grid-template-columns:1.1fr 1.6fr .9fr;gap:12px}
+@media(max-width:720px){.row{grid-template-columns:1fr}}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.7}
+.egs{margin:9px 0 0;display:flex;gap:7px;flex-wrap:wrap}
+.eg{background:transparent;border:1px solid var(--bord);color:var(--muted);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.eg:hover{border-color:var(--gold);color:var(--gold2)}
+.opts{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:14px;font-size:13px;color:var(--ink2)}
+.opts label{display:inline;margin:0}
+.btns{margin-top:18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{font:inherit;cursor:pointer}
+button.main{background:var(--gold);color:#1a1206;border:none;border-radius:8px;padding:11px 28px;font-size:15px;font-weight:700}
+button.main:disabled{background:#5a5140;color:#999;cursor:default}
+button.ghost{background:none;border:1px solid var(--bord);color:var(--ink2);border-radius:8px;padding:9px 16px;font-size:13.5px}
+button.ghost:hover{border-color:var(--gold);color:var(--gold2)}
+#prog{display:none}
+.steps{list-style:none;margin:0;padding:0}
+.steps li{padding:5px 0 5px 26px;position:relative;font-size:14px;color:var(--ink2)}
+.steps li:before{content:"○";position:absolute;left:4px;color:var(--muted)}
+.steps li.run:before{content:"◐";color:var(--gold)}.steps li.run{color:var(--ink)}
+.steps li.ok:before{content:"✓";color:var(--ok)}.steps li.bad:before{content:"✗";color:var(--bad)}
+.steps li.warn:before{content:"!";color:var(--warn)}
+.steps li small{display:block;color:var(--muted);font-size:12.5px;white-space:pre-wrap;line-height:1.6}
+#live{margin-top:10px;background:#0A0806;border:1px solid var(--bord);border-radius:8px;padding:10px 12px;font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;color:#9a917f;max-height:160px;overflow:auto;white-space:pre-wrap;display:none}
+#out{display:none}
+.res-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.res-h h2{margin:0;font-size:20px}.res-h p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+.dl{background:var(--gold);color:#1a1206;border-radius:8px;padding:11px 22px;font-weight:700;text-decoration:none;display:inline-block}
+.tabs{display:flex;gap:4px;margin:18px 0 0;border-bottom:1px solid var(--bord);flex-wrap:wrap}
+.tab{background:none;border:none;color:var(--muted);padding:8px 14px;font-size:13.5px;border-bottom:2px solid transparent}
+.tab.on{color:var(--gold2);border-bottom-color:var(--gold)}
+pre.view{margin:0;background:#0A0806;border:1px solid var(--bord);border-top:none;border-radius:0 0 8px 8px;padding:14px;max-height:460px;overflow:auto;white-space:pre-wrap;font:12.5px/1.65 ui-monospace,Menlo,Consolas,monospace;color:#d6cfbf}
+.how{font-size:13.5px;color:var(--ink2);line-height:1.9;margin-top:16px}
+.how code{background:#0A0806;padding:1px 6px;border-radius:4px;color:var(--gold2)}
+.err{color:var(--bad);font-size:13.5px;margin-top:10px;white-space:pre-wrap}
+.files{font-size:12.5px;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="top"><a href="/">SDE Universes</a><a href="/taste/">品尝</a><a href="/taste/chatsde/">ChatSDE</a></div>
+<div class="wrap">
+  <h1>智能体生成器</h1>
+  <p class="sub">写下需求，出一个解压就能在 Python 里运行的智能体</p>
+
+  <div class="three">
+    <div class="card"><div class="k">① 设计</div><div class="t">内功、工具、测试一次交齐</div><div class="g">大模型按需求写出智能体的岗位手册（系统提示词）、专用工具代码和工具测试。</div></div>
+    <div class="card"><div class="k">② 自检与修复</div><div class="t">在你的浏览器里跑 Python</div><div class="g">逐个试跑工具测试；不通过就把报错交回大模型重做，最多三轮。代码不上传任何服务器。</div></div>
+    <div class="card"><div class="k">③ 打包</div><div class="t">下载 ZIP，双击就跑</div><div class="g">解压后 Windows 双击 start.bat（Mac 运行 start.sh），自动建环境、问一次 Key，就能对话。</div></div>
+  </div>
+
+  <div class="ctl">
+    <div class="row">
+      <div><label for="vend">用哪家大模型</label><select id="vend"></select></div>
+      <div><label for="key">API Key（与 ChatSDE 共用，只存你的浏览器本地）</label><input id="key" type="password" autocomplete="off" placeholder="粘贴 Key"></div>
+      <div><label for="tier">档位</label><select id="tier"><option value="std">标准</option><option value="deep">深度（更强、更慢）</option></select></div>
+    </div>
+    <div class="hint" id="keyHint"></div>
+
+    <div style="margin-top:16px">
+      <label for="need">需求：这个智能体为谁、做什么、输入什么、输出什么、怎样算做好</label>
+      <textarea id="need" placeholder="例：做一个「论文审稿助手」。我粘贴一篇中文论文，它按选题价值、论证结构、证据、原创性、文字五个维度各打 0–20 分，指出三处最大问题并给出改写示范，最后给出录用 / 修改 / 退稿建议。"></textarea>
+      <div class="egs" id="egs"></div>
+    </div>
+
+    <div class="opts">
+      <span>附带资料（txt / md / docx，会成为它的知识库）：<input type="file" id="files" multiple accept=".txt,.md,.markdown,.docx"></span>
+      <span><input type="checkbox" id="neigong"> <label for="neigong">附上 SDE 内功（让它用 SDE 方法论工作）</label></span>
+    </div>
+    <div class="files" id="fileList"></div>
+
+    <div class="btns">
+      <button class="main" id="go">生成智能体</button>
+      <button class="ghost" id="stop" style="display:none">停止</button>
+      <span class="hint" id="goHint" style="margin:0">通常 2–6 分钟</span>
+    </div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="ctl" id="prog">
+    <ul class="steps" id="steps"></ul>
+    <div id="live"></div>
+  </div>
+
+  <div class="ctl" id="out">
+    <div class="res-h">
+      <div><h2 id="oName"></h2><p id="oDesc"></p></div>
+      <a class="dl" id="oDl" href="#">⤓ 下载 ZIP</a>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <pre class="view" id="view"></pre>
+    <div class="how">
+      <b>怎么运行：</b>安装 Python 3.9 以上（Windows 安装时勾选 <i>Add Python to PATH</i>）→ 解压 ZIP → Windows 双击 <code>start.bat</code>（命令行对话）或 <code>start_web.bat</code>（网页界面）；Mac / Linux 运行 <code>./start.sh</code> 或 <code>./start_web.sh</code>。首次会请你输入 <span id="oVend"></span> 的 API Key，之后不再问。<br>
+      想改它的脾气：直接改 ZIP 里的 <code>system_prompt.md</code>；想换型号：改 <code>agent_config.json</code>。
+    </div>
+    <div style="margin-top:18px">
+      <label for="revise">还想改什么？（在这一版基础上重做，例：再加一个导出 Markdown 报告的功能）</label>
+      <textarea id="revise" style="min-height:70px"></textarea>
+      <div class="btns"><button class="main" id="reGo">按这个改</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="/taste/assets/sde-handoff.js?v=20261013a"></script>
+<script>
+(function () {
+  "use strict";
+  var STAMP = "20261013a";
+  var PYODIDE = "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/";
+  var MAMMOTH = "https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js";
+  var MAX_REPAIR = 3, ATTACH_SHOW = 60000, TEST_MS = 90000;
+
+  /* ChatSDE 的厂商短码 ↔ 运行内核的厂商名；Key 存在同一组 localStorage 键里，两边互通 */
+  var VENDORS = [
+    { v: "ds", p: "deepseek", name: "DeepSeek", ks: "sde_ds_key", apply: "https://platform.deepseek.com" },
+    { v: "glm", p: "zhipu", name: "智谱 GLM", ks: "sde_glm_key", apply: "https://open.bigmodel.cn" },
+    { v: "kimi", p: "kimi", name: "Kimi", ks: "sde_kimi_key", apply: "https://platform.moonshot.cn" },
+    { v: "qwen", p: "qwen", name: "千问 Qwen", ks: "sde_qwen_key", apply: "https://bailian.console.aliyun.com" },
+    { v: "mm", p: "minimax", name: "MiniMax", ks: "sde_mm_key", apply: "https://platform.minimax.io" },
+    { v: "mmcn", p: "minimax_cn", name: "MiniMax（国内）", ks: "sde_mmcn_key", apply: "https://platform.minimaxi.com" },
+    { v: "cl", p: "anthropic", name: "Claude", ks: "sde_cl_key", apply: "https://platform.claude.com" },
+    { v: "gpt", p: "openai", name: "GPT", ks: "sde_gpt_key", apply: "https://platform.openai.com" },
+    { v: "or", p: "openrouter", name: "OpenRouter", ks: "sde_or_key", apply: "https://openrouter.ai/keys" },
+    { v: "nv", p: "nvidia", name: "NVIDIA 免费", ks: "sde_nv_key", apply: "https://build.nvidia.com/settings/api-keys" }
+  ];
+  var TEMPLATE = ["run.py", "selftest.py", "webui.py", "start.sh", "start_web.sh", "start.bat", "start_web.bat",
+    "env.example", "core/__init__.py", "core/agent.py", "core/builtins.py"];
+  var EXAMPLES = [
+    ["论文审稿助手", "做一个「论文审稿助手」。我粘贴一篇中文论文，它按选题价值、论证结构、证据、原创性、文字五个维度各打 0–20 分，指出三处最大问题并给出改写示范，最后给出录用 / 修改 / 退稿建议，并把审稿意见保存成 Markdown 文件。"],
+    ["家庭记账", "做一个家庭记账助手。我用大白话说「昨天超市买菜 86 块」，它记进本地账本（CSV），能按月、按类别汇总，回答「这个月吃饭花了多少」「比上个月多还是少」。"],
+    ["网页资料员", "做一个资料员：我给它几个网址，它抓取正文，提炼要点，比较几篇的异同，最后写成一份 1500 字以内的综述，标明每条要点出自哪个网址。"],
+    ["课堂出题官", "做一个出题助手：我给一段教材内容和年级，它出 10 道题（选择、填空、简答各有），附答案与解析，难度分三档，并能按我的要求换题。"]
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k) || ""; if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) { return ""; } }
+  function vinfo(v) { for (var i = 0; i < VENDORS.length; i++) if (VENDORS[i].v === v) return VENDORS[i]; return VENDORS[0]; }
+
+  /* ── 厂商与 Key ── */
+  VENDORS.forEach(function (x) { var o = document.createElement("option"); o.value = x.v; o.textContent = x.name; $("vend").appendChild(o); });
+  (function pickVendor() {
+    var cur = ls("sde_wds_vendor") || "ds";
+    if ((ls(vinfo(cur).ks) || "").trim().length < 8) {
+      for (var i = 0; i < VENDORS.length; i++) if (ls(VENDORS[i].ks).trim().length >= 8) { cur = VENDORS[i].v; break; }
+    }
+    $("vend").value = vinfo(cur).v;
+  })();
+  function showKey() {
+    var V = vinfo($("vend").value), k = ls(V.ks).trim();
+    $("key").value = k;
+    $("keyHint").innerHTML = k.length >= 8
+      ? "已读到你在 ChatSDE 存过的 " + V.name + " Key。生成出来的智能体默认也用 " + V.name + "。"
+      : "还没有 " + V.name + " 的 Key：<a href='" + V.apply + "' target='_blank' rel='noopener'>去申请</a>，粘贴进上面的框即可（与 ChatSDE 共用）。";
+  }
+  $("vend").onchange = showKey;
+  $("key").onchange = function () { var V = vinfo($("vend").value), k = $("key").value.trim(); if (k.length >= 8) { ls(V.ks, k); ls("sde_wds_vendor", V.v); } showKey(); };
+  showKey();
+
+  EXAMPLES.forEach(function (e) {
+    var b = document.createElement("button"); b.className = "eg"; b.textContent = e[0];
+    b.onclick = function () { $("need").value = e[1]; $("need").focus(); };
+    $("egs").appendChild(b);
+  });
+  try { if (window.SDEHandoff) SDEHandoff.receive("agentmaker"); } catch (e) {}
+
+  /* ── 附件 ── */
+  function loadScript(src) {
+    return new Promise(function (res, rej) { var s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = function () { rej(new Error("加载失败 " + src)); }; document.head.appendChild(s); });
+  }
+  function readFile(f) {
+    if (/\.docx$/i.test(f.name)) {
+      return (window.mammoth ? Promise.resolve() : loadScript(MAMMOTH)).then(function () { return f.arrayBuffer(); })
+        .then(function (buf) { return window.mammoth.extractRawText({ arrayBuffer: buf }); }).then(function (r) { return r.value; });
+    }
+    return f.text();
+  }
+  $("files").onchange = function () {
+    var n = [].map.call($("files").files, function (f) { return f.name + "（" + Math.round(f.size / 1024) + " KB）"; });
+    $("fileList").textContent = n.length ? "已选：" + n.join("、") : "";
+  };
+  function gatherAttachments() {
+    var fs = [].slice.call($("files").files), jobs = fs.map(function (f) {
+      return readFile(f).then(function (t) { return { name: f.name.replace(/\.(docx|txt|markdown|md)$/i, "") + ".md", text: t }; });
+    });
+    if ($("neigong").checked) jobs.push(fetch("/taste/assets/sde-neigong.txt", { cache: "force-cache" })
+      .then(function (r) { if (!r.ok) throw new Error("SDE 内功取不到（" + r.status + "）"); return r.text(); })
+      .then(function (t) { return { name: "sde-neigong.md", text: t }; }));
+    return Promise.all(jobs);
+  }
+
+  /* ── 进度 ── */
+  var stepEls = {};
+  function step(id, text, cls, note) {
+    var li = stepEls[id];
+    if (!li) { li = document.createElement("li"); stepEls[id] = li; $("steps").appendChild(li); }
+    li.className = cls || "run";
+    li.innerHTML = "";
+    li.appendChild(document.createTextNode(text));
+    if (note) { var s = document.createElement("small"); s.textContent = note; li.appendChild(s); }
+  }
+  function live(t) { var d = $("live"); d.style.display = t ? "block" : "none"; d.textContent = t; d.scrollTop = d.scrollHeight; }
+
+  /* ── 调设计师（流式） ── */
+  var ctrl = null;
+  function design(messages, onText) {
+    var V = vinfo($("vend").value);
+    ctrl = new AbortController();
+    var body = { vendor: V.v, key: ls(V.ks).trim(), deep: $("tier").value === "deep" ? 1 : 0, model: ls("sde_wds_model_" + V.v).trim(), messages: messages };
+    return fetch("/api/wds/agentgen", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: ctrl.signal })
+      .then(function (r) {
+        var model = r.headers.get("x-agentgen-model") || "";
+        if (!r.ok || !/event-stream/.test(r.headers.get("content-type") || "")) {
+          return r.text().then(function (t) { var m = t; try { m = JSON.parse(t).msg || t; } catch (e) {} throw new Error(m || ("HTTP " + r.status)); });
+        }
+        var rd = r.body.getReader(), dec = new TextDecoder(), buf = "", out = "", think = 0;
+        function pump() {
+          return rd.read().then(function (x) {
+            if (x.done) return { text: out, model: model };
+            buf += dec.decode(x.value, { stream: true });
+            var lines = buf.split("\n"); buf = lines.pop();
+            lines.forEach(function (ln) {
+              ln = ln.trim();
+              if (ln.indexOf("data:") !== 0) return;
+              var d = ln.slice(5).trim();
+              if (!d || d === "[DONE]") return;
+              try {
+                var j = JSON.parse(d), dl = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                if (j.error) throw new Error(j.error.message || "上游报错");
+                if (dl.content) out += dl.content;
+                else if (dl.reasoning_content || dl.reasoning) think += String(dl.reasoning_content || dl.reasoning).length;
+              } catch (e) { if (e.message && /上游|error/i.test(e.message)) throw e; }
+            });
+            onText(out, think);
+            return pump();
+          });
+        }
+        return pump();
+      });
+  }
+
+  /* ── 解析分节稿 ── */
+  function unfence(s) {
+    s = String(s || "").replace(/^\s*\n/, "").replace(/\s+$/, "");
+    var m = s.match(/^```[a-zA-Z]*\n([\s\S]*?)\n```$/);
+    return m ? m[1] : s;
+  }
+  function parseSpec(text) {
+    var sec = {}, cur = null, lines = String(text).replace(/\r/g, "").split("\n");
+    lines.forEach(function (ln) {
+      var m = ln.match(/^\s*===\s*([A-Z_]+)\s*===\s*$/);
+      if (m) { cur = m[1]; sec[cur] = []; return; }
+      if (cur) sec[cur].push(ln);
+    });
+    var need = ["META", "SYSTEM_PROMPT", "TOOLS_PY", "README"], miss = need.filter(function (k) { return !sec[k]; });
+    if (miss.length) throw new Error("交稿格式不对：缺少 " + miss.map(function (k) { return "===" + k + "==="; }).join("、") + " 段");
+    var metaTxt = unfence(sec.META.join("\n")), a = metaTxt.indexOf("{"), b = metaTxt.lastIndexOf("}");
+    var meta;
+    try { meta = JSON.parse(metaTxt.slice(a, b + 1)); } catch (e) { throw new Error("META 段不是合法 JSON：" + e.message); }
+    var spec = {
+      name: String(meta.name || "我的智能体"), slug: String(meta.slug || ""), description: String(meta.description || ""),
+      builtin_tools: (meta.builtin_tools || []).filter(function (x) { return ["read_file", "write_file", "list_files", "fetch_url", "now"].indexOf(x) >= 0; }),
+      extra_requirements: (meta.extra_requirements || []).map(String).filter(function (x) { return x.trim() && !/^anthropic|^openai$/i.test(x.trim()); }),
+      example_questions: (meta.example_questions || []).map(String).slice(0, 6),
+      tool_tests: Array.isArray(meta.tool_tests) ? meta.tool_tests : [],
+      system_prompt: unfence(sec.SYSTEM_PROMPT.join("\n")), tools_code: unfence(sec.TOOLS_PY.join("\n")), readme: unfence(sec.README.join("\n"))
+    };
+    if (spec.system_prompt.trim().length < 50) throw new Error("系统提示词太短");
+    if (spec.tools_code.indexOf("TOOLS") < 0) throw new Error("tools.py 里没有 TOOLS 列表");
+    return spec;
+  }
+  function slugOf(s) { s = String(s || "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, ""); return s.slice(0, 40) || "my-agent"; }
+
+  /* ── 组装 ── */
+  var tplCache = null;
+  function loadTemplate() {
+    if (tplCache) return Promise.resolve(tplCache);
+    return Promise.all(TEMPLATE.map(function (p) {
+      return fetch("/taste/agent-maker/template/" + p + "?v=" + STAMP).then(function (r) {
+        if (!r.ok) throw new Error("取运行框架文件失败：" + p + "（" + r.status + "）");
+        return r.text();
+      });
+    })).then(function (arr) { tplCache = {}; TEMPLATE.forEach(function (p, i) { tplCache[p] = arr[i]; }); return tplCache; });
+  }
+  function assemble(spec, tpl, V, model, atts) {
+    var f = {};
+    Object.keys(tpl).forEach(function (p) { f[p === "env.example" ? ".env.example" : p] = tpl[p]; });
+    f["system_prompt.md"] = spec.system_prompt.trim() + "\n";
+    f["tools.py"] = spec.tools_code.replace(/\s+$/, "") + "\n";
+    f["tests.json"] = JSON.stringify(spec.tool_tests, null, 2);
+    f["agent_config.json"] = JSON.stringify({
+      name: spec.name, description: spec.description, provider: V.p, model: model,
+      max_tokens: 8000, max_steps: 20, builtin_tools: spec.builtin_tools, example_questions: spec.example_questions,
+      generated_by: "sdeuniverses.com/taste/agent-maker", generated_at: (function (d) { var z = function (n) { return (n < 10 ? "0" : "") + n; }; return d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate()) + " " + z(d.getHours()) + ":" + z(d.getMinutes()); })(new Date())
+    }, null, 2);
+    f["requirements.txt"] = spec.extra_requirements.join("\n") + (spec.extra_requirements.length ? "\n" : "# 只用 Python 标准库，无需安装任何包\n");
+    f["README.md"] = spec.readme.trim() + "\n\n---\n" + quickstart(V, model);
+    f["workspace/.keep"] = "";
+    (atts || []).forEach(function (a) { f["knowledge/" + a.name.replace(/[\\\/:*?"<>|]/g, "_")] = a.text; });
+    return f;
+  }
+  function quickstart(V, model) {
+    return "## 快速启动\n1. 安装 Python 3.9 或更高版本（Windows 安装时勾选 *Add Python to PATH*）。\n2. 解压本 ZIP。\n"
+      + "3. Windows：双击 `start.bat`（命令行对话）或 `start_web.bat`（网页界面）。\n   Mac / Linux：终端里运行 `./start.sh` 或 `./start_web.sh`。\n"
+      + "4. 首次运行会请你输入 " + V.name + " 的 API Key（保存在本目录 `.env`，之后不再询问）。申请地址：" + V.apply + "\n\n"
+      + "不用一键脚本也可以：`python run.py`（一问一答：`python run.py \"你的问题\"`；网页界面：`python run.py --web`）。\n"
+      + "自检（不耗 API 额度）：`python selftest.py`。\n\n"
+      + "## 文件说明\n- `system_prompt.md`：智能体的内功，可直接修改。\n- `knowledge/`：附带资料，运行时自动接在内功后面。\n"
+      + "- `tools.py`：它的专用工具。\n- `agent_config.json`：厂商（当前 " + V.name + "）、型号（当前 " + model + "）、最大步数等。\n"
+      + "- 换厂商：在 `.env` 里写 `AGENT_PROVIDER=deepseek`（或 zhipu / kimi / qwen / minimax / minimax_cn / anthropic / openai / openrouter / nvidia）、`AGENT_MODEL=型号名`、`AGENT_API_KEY=对应的 Key`。\n\n"
+      + "由 SDE Universes「智能体生成器」生成：https://sdeuniverses.com/taste/agent-maker/\n";
+  }
+
+  /* ── 浏览器里自检：Pyodide 跑在 Web Worker 里，超时就整台掐掉 ── */
+  var WORKER_SRC = [
+    "importScripts('" + PYODIDE + "pyodide.js');",
+    "var ready = loadPyodide({ indexURL: '" + PYODIDE + "' });",
+    "var RUN = " + JSON.stringify([
+      "import sys, os, io, json, contextlib, runpy",
+      "for _m in [k for k in list(sys.modules) if k in ('tools', 'run', 'webui', 'core') or k.startswith('core.')]:",
+      "    del sys.modules[_m]",
+      "os.chdir('/agent')",
+      "sys.path[:] = ['/agent'] + [p for p in sys.path if p != '/agent']",
+      "_buf = io.StringIO()",
+      "sys.argv = ['selftest.py', '--json']",
+      "with contextlib.redirect_stdout(_buf):",
+      "    try:",
+      "        runpy.run_path('/agent/selftest.py', run_name='__main__')",
+      "    except SystemExit:",
+      "        pass",
+      "_buf.getvalue()"].join("\n")) + ";",
+    "onmessage = async function (e) {",
+    "  try {",
+    "    var py = await ready, warn = [], failed = [];",
+    "    py.runPython('import shutil, os\\nshutil.rmtree(\"/agent\", ignore_errors=True)');",
+    "    var files = e.data.files;",
+    "    Object.keys(files).forEach(function (p) {",
+    "      var full = '/agent/' + p, dir = full.slice(0, full.lastIndexOf('/'));",
+    "      py.FS.mkdirTree(dir); py.FS.writeFile(full, files[p]);",
+    "    });",
+    "    if (e.data.extras.length) {",
+    "      try { await py.loadPackage('micropip'); var mp = py.pyimport('micropip');",
+    "        for (var i = 0; i < e.data.extras.length; i++) { try { await mp.install(e.data.extras[i]); } catch (x) { failed.push(e.data.extras[i]); } }",
+    "      } catch (x) { failed = e.data.extras.slice(); }",
+    "    }",
+    "    var out = String(py.runPython(RUN) || '').trim().split('\\n').pop();",
+    "    postMessage({ ok: true, out: out, failed: failed });",
+    "  } catch (err) { postMessage({ ok: false, error: String(err && err.message || err).slice(-2000) }); }",
+    "};"].join("\n");
+  var pyw = null;
+  function pyWorker() { if (!pyw) pyw = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: "text/javascript" }))); return pyw; }
+  function selftest(files, extras, firstLoad) {
+    return new Promise(function (resolve) {
+      var w = pyWorker(), done = false;
+      var tm = setTimeout(function () {
+        if (done) return; done = true;
+        try { w.terminate(); } catch (e) {} pyw = null;
+        resolve({ ok: false, errors: [{ check: "自检超时", error: "超过 " + Math.round((TEST_MS + (firstLoad ? 60000 : 0)) / 1000) + " 秒没跑完：工具测试可能在等网络、等输入或死循环。测试必须离线、立即返回。" }] });
+      }, TEST_MS + (firstLoad ? 60000 : 0));
+      w.onmessage = function (e) {
+        if (done) return; done = true; clearTimeout(tm);
+        var d = e.data;
+        if (!d.ok) {
+          if (/importScripts|NetworkError|Failed to fetch|loadPyodide/i.test(d.error)) return resolve({ skip: true, why: "浏览器里的 Python 没加载上（" + d.error.slice(0, 120) + "）" });
+          return resolve({ ok: false, errors: [{ check: "自检进程", error: d.error }] });
+        }
+        var rep; try { rep = JSON.parse(d.out); } catch (x) { return resolve({ ok: false, errors: [{ check: "自检输出", error: d.out.slice(0, 1500) }] }); }
+        rep.warnings = [];
+        if (d.failed && d.failed.length) {   // 浏览器里装不上的第三方包：缺它导致的报错只记警告，不算失败、不拿去返工
+          var keep = [];
+          (rep.errors || []).forEach(function (er) { if (/No module named|ModuleNotFoundError/.test(er.error)) rep.warnings.push(er.check + "：依赖 " + d.failed.join("、") + " 在浏览器里装不上，这一项到你电脑上再验"); else keep.push(er); });
+          rep.errors = keep; rep.ok = !keep.length;
+        }
+        resolve(rep);
+      };
+      w.onerror = function (e) { if (done) return; done = true; clearTimeout(tm); try { w.terminate(); } catch (x) {} pyw = null; resolve({ skip: true, why: "浏览器里的 Python 起不来（" + (e.message || "未知错误") + "）" }); };
+      var payload = {}; Object.keys(files).forEach(function (p) { if (!/^knowledge\//.test(p)) payload[p] = files[p]; });
+      w.postMessage({ files: payload, extras: extras });
+    });
+  }
+
+  /* ── ZIP（store 方式，零依赖；.sh 带可执行位）── */
+  var CRC = (function () { var t = [], c, n, k; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(u) { var c = 0xFFFFFFFF; for (var i = 0; i < u.length; i++) c = CRC[(c ^ u[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  function makeZip(files, root) {
+    var enc = new TextEncoder(), parts = [], central = [], off = 0, d = new Date();
+    var dt = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)) & 0xFFFF;
+    var dd = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xFFFF;
+    Object.keys(files).sort().forEach(function (p) {
+      var name = enc.encode(root + "/" + p), data = enc.encode(files[p]), crc = crc32(data);
+      var lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true);
+      lh.setUint16(10, dt, true); lh.setUint16(12, dd, true); lh.setUint32(14, crc, true);
+      lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true); lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+      parts.push(new Uint8Array(lh.buffer), name, data);
+      var ch = new DataView(new ArrayBuffer(46)), mode = /\.sh$/.test(p) ? 0o100755 : 0o100644;
+      ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 0x0314, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+      ch.setUint16(12, dt, true); ch.setUint16(14, dd, true); ch.setUint32(16, crc, true); ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true);
+      ch.setUint16(28, name.length, true); ch.setUint16(30, 0, true); ch.setUint16(32, 0, true); ch.setUint16(34, 0, true); ch.setUint16(36, 0, true);
+      ch.setUint32(38, (mode << 16) >>> 0, true); ch.setUint32(42, off, true);
+      central.push(new Uint8Array(ch.buffer), name);
+      off += 30 + name.length + data.length;
+    });
+    var csize = central.reduce(function (s, a) { return s + a.length; }, 0), n = Object.keys(files).length;
+    var end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(8, n, true); end.setUint16(10, n, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+    return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), { type: "application/zip" });
+  }
+
+  /* ── 主流程 ── */
+  var busy = false, convo = null, lastSpec = null, lastAtts = [], lastUrl = null;
+  function errText(rep) { return (rep.errors || []).map(function (e) { return "· " + e.check + "：" + String(e.error).slice(0, 600); }).join("\n"); }
+  function repairMsg(rep) {
+    return "自检未通过。下面是报错，请找出根因、修好后按同一格式（===META=== … ===END===）重新交出完整内容：\n"
+      + JSON.stringify((rep.errors || []).map(function (e) { return { check: e.check, error: e.error, trace: e.trace || "" }; }), null, 1).slice(0, 12000);
+  }
+  function firstMessage(need, atts) {
+    var t = "## 需求\n" + need;
+    atts.forEach(function (a) {
+      var body = a.text.length > ATTACH_SHOW ? a.text.slice(0, ATTACH_SHOW) + "\n……（以下省略；完整内容会原样放进 knowledge/）" : a.text;
+      t += "\n\n## 附件：" + a.name + "（将放入 knowledge/，运行时自动接在系统提示词之后；系统提示词里只需说明何时、如何用它，不必复述）\n" + body;
+    });
+    return t;
+  }
+
+  function run(messages, atts) {
+    var V = vinfo($("vend").value);
+    if (ls(V.ks).trim().length < 8) { $("err").textContent = "先填 " + V.name + " 的 API Key。"; $("key").focus(); return; }
+    busy = true; $("go").disabled = true; $("reGo").disabled = true; $("stop").style.display = ""; $("err").textContent = "";
+    $("prog").style.display = "block"; $("steps").innerHTML = ""; stepEls = {};
+    var firstPy = !pyw, tpl, model = "", spec, files, round = 0;
+    var t0 = Date.now();
+
+    function designRound(label) {
+      step("d" + round, label, "run");
+      return design(messages, function (text, think) {
+        var n = text.length;
+        step("d" + round, label, "run", (n ? "已写 " + n + " 字" : (think ? "思考中…（" + think + " 字）" : "等待模型开写…")) + " · " + Math.round((Date.now() - t0) / 1000) + " 秒");
+        live(text.slice(-1200));
+      }).then(function (r) {
+        model = r.model || model;
+        messages.push({ role: "assistant", content: r.text });
+        try { spec = parseSpec(r.text); }
+        catch (e) { step("d" + round, label, "bad", e.message); return checkFail({ ok: false, errors: [{ check: "交稿格式", error: e.message }] }); }
+        step("d" + round, label + "：「" + spec.name + "」", "ok", "用 " + V.name + (model ? "（" + model + "）" : "") + " · " + r.text.length + " 字");
+        live("");
+        return check();
+      });
+    }
+    function check() {
+      files = assemble(spec, tpl, V, model || "", atts);
+      step("t" + round, "自检：在你的浏览器里跑 Python" + (firstPy && round === 0 ? "（首次要下载约 10MB 的运行环境）" : ""), "run");
+      return selftest(files, spec.extra_requirements, firstPy && round === 0).then(function (rep) {
+        if (rep.skip) { step("t" + round, "自检跳过", "warn", rep.why + "。ZIP 照常打出，到你电脑上运行 python selftest.py 再验。"); return finish(null); }
+        if (rep.ok) {
+          step("t" + round, "自检通过（" + (rep.passed || []).length + " 项）", (rep.warnings && rep.warnings.length) ? "warn" : "ok", (rep.warnings || []).join("\n"));
+          return finish(rep);
+        }
+        step("t" + round, "自检未通过", "bad", errText(rep));
+        return checkFail(rep);
+      });
+    }
+    function checkFail(rep) {
+      if (round >= MAX_REPAIR) {
+        if (!spec) throw new Error("模型连续几次都没按格式交稿。换「深度」档或换一家模型再试。");
+        step("x", "修了 " + MAX_REPAIR + " 轮仍有问题——照样打包，问题写在 README 末尾", "warn");
+        spec.readme += "\n\n## ⚠ 自检未全部通过\n```\n" + errText(rep) + "\n```\n";
+        files = assemble(spec, tpl, V, model || "", atts);
+        return finish(rep);
+      }
+      round++;
+      messages.push({ role: "user", content: repairMsg(rep) });
+      return designRound("第 " + round + " 轮修复");
+    }
+    function finish(rep) {
+      var slug = slugOf(spec.slug || spec.name);
+      var spec2 = JSON.parse(JSON.stringify(spec)); spec2.selftest = rep;
+      files["agent_spec.json"] = JSON.stringify(spec2, null, 2);
+      var blob = makeZip(files, slug);
+      if (lastUrl) URL.revokeObjectURL(lastUrl);
+      lastUrl = URL.createObjectURL(blob);
+      $("oDl").href = lastUrl; $("oDl").download = slug + ".zip";
+      $("oName").textContent = spec.name; $("oDesc").textContent = spec.description + "　·　" + Object.keys(files).length + " 个文件 · " + Math.round(blob.size / 1024) + " KB";
+      $("oVend").textContent = V.name;
+      showTabs(files);
+      $("out").style.display = "block";
+      step("z", "打包完成：" + slug + ".zip", "ok", "共用时 " + Math.round((Date.now() - t0) / 1000) + " 秒");
+      convo = messages; lastSpec = spec; lastAtts = atts;
+      $("out").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    loadTemplate().then(function (t) { tpl = t; return designRound("设计"); })
+      .catch(function (e) {
+        if (e && e.name === "AbortError") { step("s", "已停止", "warn"); return; }
+        $("err").textContent = "出错了：" + (e && e.message || e);
+        Object.keys(stepEls).forEach(function (k) { if (stepEls[k].className === "run") stepEls[k].className = "bad"; });
+      })
+      .then(function () { busy = false; $("go").disabled = false; $("reGo").disabled = false; $("stop").style.display = "none"; live(""); });
+  }
+
+  var TABS = [["system_prompt.md", "内功"], ["tools.py", "工具"], ["README.md", "说明"], ["tests.json", "测试"], ["agent_config.json", "配置"]];
+  function showTabs(files) {
+    $("tabs").innerHTML = "";
+    TABS.forEach(function (t, i) {
+      var b = document.createElement("button"); b.className = "tab" + (i ? "" : " on"); b.textContent = t[1];
+      b.onclick = function () { [].forEach.call($("tabs").children, function (x) { x.className = "tab"; }); b.className = "tab on"; $("view").textContent = files[t[0]] || ""; };
+      $("tabs").appendChild(b);
+    });
+    $("view").textContent = files["system_prompt.md"];
+  }
+
+  $("go").onclick = function () {
+    if (busy) return;
+    var need = $("need").value.trim();
+    if (need.length < 10) { $("err").textContent = "需求写得再具体一点：为谁、做什么、输入输出是什么。"; $("need").focus(); return; }
+    $("out").style.display = "none";
+    gatherAttachments().then(function (atts) { run([{ role: "user", content: firstMessage(need, atts) }], atts); })
+      .catch(function (e) { $("err").textContent = "读附件出错：" + e.message; });
+  };
+  $("reGo").onclick = function () {
+    if (busy || !convo) return;
+    var r = $("revise").value.trim();
+    if (!r) { $("revise").focus(); return; }
+    var lastA = null;
+    for (var i = convo.length - 1; i >= 0; i--) if (convo[i].role === "assistant") { lastA = convo[i]; break; }
+    var msgs = [convo[0]].concat(lastA ? [lastA] : []);   // 原始需求 ＋ 最新一版完整交稿 ＋ 修改要求，角色严格交替
+    msgs.push({ role: "user", content: "在上一版基础上修改：" + r + "\n请按同一格式（===META=== … ===END===）重新交出完整内容。" });
+    $("revise").value = "";
+    run(msgs, lastAtts);
+  };
+  $("stop").onclick = function () { if (ctrl) try { ctrl.abort(); } catch (e) {} };
+
+  window.__AGENTMAKER__ = { parseSpec: parseSpec, assemble: assemble, makeZip: makeZip, slugOf: slugOf, quickstart: quickstart, TEMPLATE: TEMPLATE, VENDORS: VENDORS, WORKER_SRC: WORKER_SRC };
+})();
+</script>
+</body>
+</html>
