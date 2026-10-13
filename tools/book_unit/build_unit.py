@@ -39,7 +39,7 @@ def parse_manuscript(path):
         blk = blk.strip('\n')
         if not blk: continue
         head, _, body = blk.partition('\n')
-        m = re.match(r'# (第[一二三四五六七八九十]+编|卷[一二三四五六七八九十]+|终章)　(.*)', head)
+        m = re.match(r'# (第[一二三四五六七八九十]+编|卷[一二三四五六七八九十]+|终章|[上中下尾]篇(?:（[一二三]）)?)　(.*)', head)
         if m:
             parts.append(m.group(1) + '　' + m.group(2)); cur = len(parts); continue
         m = re.match(r'## 第 ?(\d+) ?章　(.*)', head)
@@ -48,7 +48,7 @@ def parse_manuscript(path):
     return parts, chaps
 
 def plain(body):
-    t = body.replace('**', '')
+    t = re.sub(r'^#{1,6} ', '', body, flags=re.M).replace('**', '')
     t = re.sub(r'^> ?', '', t, flags=re.M)
     return re.sub(r'\n{3,}', '\n\n', t).strip()
 
@@ -64,7 +64,7 @@ def main():
     parts, chaps = parse_manuscript(C['manuscript'])
     assert len(chaps) == nch and [c['lesson'] for c in chaps] == list(range(1, nch + 1)), 'chapters vs tasks mismatch'
     part_names = [p.split('　', 1)[1] for p in parts]
-    NUMW = cn(nch)
+    NUMW = cn(nch); PW = C.get('partWord', '编')
 
     # chapter anchors in text/index.html
     tx = (BOOK / 'text/index.html').read_text(encoding='utf-8')
@@ -109,6 +109,7 @@ def main():
     app = sub1(app, "+' / 40 章 ·", "+' / %d 章 ·" % nch)
     app = sub1(app, "n>40)throw Error('题号不在本书四十章范围内。')", "n>%d)throw Error('题号不在本书%s章范围内。')" % (nch, NUMW))
     # part grouping by task.part instead of 5 per part
+    app = sub1(app, "'第'+(i+1)+'编 · '", "'第'+(i+1)+'%s · '" % PW)
     app = sub1(app, "manifest.tasks.slice(i*5,i*5+5).forEach(", "manifest.tasks.filter(t=>t.part===i+1).forEach(")
     # agent identity and book points
     m = re.search(r"return \{q,bookagent:1,act:MODES\[mode\]\[1\],agentName:'判生',agentEpithet:'[^']*',bookMeta:'[^']*',docTitle", app)
@@ -154,7 +155,7 @@ def main():
         ('/books/m/398/', U),
         ('学习包 · 四十章实践', '学习包 · %s章实践' % NUMW),
         ('下载四十章学习包 PDF', '下载%s章学习包 PDF' % NUMW),
-        ('aria-label="四十章任务"><h2>八编 · 四十章</h2>', 'aria-label="%s章任务"><h2>%s编 · %s章</h2>' % (NUMW, cn(len(parts)), NUMW)),
+        ('aria-label="四十章任务"><h2>八编 · 四十章</h2>', 'aria-label="%s章任务"><h2>%s%s · %s章</h2>' % (NUMW, cn(len(parts)), PW, NUMW)),
         ('智能问对 · 判生', '智能问对 · ' + C['agentName']),
         ('带着材料进入判生', '带着材料进入' + C['agentName']),
         ('原有判生入口', '原有' + C['agentName'] + '入口'),
@@ -212,7 +213,7 @@ def main():
         cover = BOOK / 'cover.jpg'
         if cover.exists(): c.drawImage(str(cover), 44, 220, width=179.6, height=253.6)
         c.setFillColor(HexColor('#ead5a6')); c.setFont('STSong-Light', 25); c.drawString(43, 640, C['title'] + ' · 学习包')
-        c.setFont('STSong-Light', 15); c.drawString(43, 602, '%s编%s章 · 阅读、学习、智能问对' % (cn(len(parts)), NUMW))
+        c.setFont('STSong-Light', 15); c.drawString(43, 602, '%s%s%s章 · 阅读、学习、智能问对' % (cn(len(parts)), PW, NUMW))
         c.setFillColor(HexColor('#f4eddc')); c.setFont('STSong-Light', 12)
         c.drawString(250, 450, '原书作者：' + '、'.join(C['authors'])); c.drawString(250, 420, 'ISBN ' + C['isbn']); c.drawString(250, 390, '第%d卷 · %s' % (N, C['price']))
         c.setFont('STSong-Light', 11)
@@ -220,7 +221,7 @@ def main():
         c.linkURL(URL + 'agent/learning.html', (40, 64, 500, 100), relative=0); c.drawString(43, 80, '在线学习：sdeuniverses.com' + U + 'agent/learning.html'); c.showPage()
         for t in manifest['tasks']:
             c.setFillColor(HexColor('#f8f5ed')); c.rect(0, 0, 538.58, 708.66, fill=1, stroke=0); y = 656
-            c.setFillColor(HexColor('#8a6b22')); c.setFont('STSong-Light', 11); c.drawString(43, y, '第%d编 · %s' % (t['part'], part_names[t['part'] - 1])); y -= 26
+            c.setFillColor(HexColor('#8a6b22')); c.setFont('STSong-Light', 11); c.drawString(43, y, '第%d%s · %s' % (t['part'], PW, part_names[t['part'] - 1])); y -= 26
             y = para('%02d  %s' % (t['lesson'], t['title']), 43, y, size=21)
             y = para(t['chapterTitle'], 43, y, size=10)
             y = para(t['question'], 43, y, size=12)
