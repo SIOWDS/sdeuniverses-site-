@@ -60,6 +60,7 @@ for b in SEL:
  assert tasks,(b['title'],'no tasks')
  ident=b['id'];agent=agents.get(str(b.get('number')),{});name=agent.get('name') or b.get('agentName') or b['title']+'·研读'
  manifest=dict(schemaVersion='1.0',book=ident,number=b.get('number'),title=b['title'],authors=b.get('authors',[]),base=base,agentName=name,agentEpithet=agent.get('epithet','原文、异议与实践'),bookMeta='《'+b['title']+'》 · '+'、'.join(b.get('authors',[])),bookPoints=b.get('description',''),sourceEdition=b.get('revision',b.get('edition','在线正文'))+' / '+hashlib.sha256(raw.encode()).hexdigest()[:12],sourceHtmlSha256=hashlib.sha256(raw.encode()).hexdigest(),taskVersion=REV,parts=['逐单元阅读、论证与迁移'],tasks=tasks,companionDesign=True,realModelTested=False,learningEffectTested=False)
+ manifest['sourceBodySha256']=hashlib.sha256(re.search(r'<body\b[^>]*>([\s\S]*)</body>',raw,re.I).group(1).encode()).hexdigest()
  dump(p/'unit/learning.json',manifest)
  # Portable workbook is standalone HTML, printable and usable without an account.
  if not (p/'agent/index.html').exists():
