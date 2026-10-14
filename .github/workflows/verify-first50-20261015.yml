@@ -21,7 +21,7 @@ jobs:
                   return r.read()
           for attempt in range(16):
               try:
-                  assert b'sourceBodySha256' in get('/books/unit-20261015/app.js')
+                  assert b'cloudflareinsights' in get('/books/unit-20261015/app.js')
                   audit=json.loads(get('/books/unit-20261015/audit.json'))
                   assert audit['count']==50
                   break
@@ -34,13 +34,8 @@ jobs:
               m=json.loads(get(base+'unit/learning.json'))
               raw=get(base+'text/').decode('utf-8')
               body=re.search(r'<body\b[^>]*>([\s\S]*)</body>',raw,re.I).group(1)
-              if hashlib.sha256(body.encode()).hexdigest()!=m['sourceBodySha256']:
-                  original=urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/public'+base+'text/index.html',timeout=45).read().decode('utf-8')
-                  original=re.search(r'<body\b[^>]*>([\s\S]*)</body>',original,re.I).group(1)
-                  pos=next((i for i,(a,b) in enumerate(zip(original,body)) if a!=b),min(len(original),len(body)))
-                  diffs=[('first-difference',original[max(0,pos-100):pos+1200],body[max(0,pos-100):pos+1200]),('tail',original[-1200:],body[-1200:])]
-                  print('BODY-DIFF',b['id'],json.dumps(diffs[:5],ensure_ascii=False),flush=True)
-                  raise AssertionError((b['title'],'body mismatch'))
+              body=re.sub(r"""<script\b[^>]*src=["']https://static\.cloudflareinsights\.com/beacon\.min\.js[^>]*>[\s\S]*?</script>\s*""",'',body,flags=re.I)
+              assert hashlib.sha256(body.encode()).hexdigest()==m['sourceBodySha256'],(b['title'],'body hash mismatch')
               assert len(m['tasks'])==b['tasks']
               for t in m['tasks']:
                   assert ('id="'+t['sourceId']+'"') in raw or ("id='"+t['sourceId']+"'") in raw,(b['title'],t['sourceId'])
@@ -50,6 +45,6 @@ jobs:
               workbook=get(base+'unit/workbook.html').decode()
               assert b['title'] in workbook
               print('PASS',b['id'],b['title'],len(m['tasks']),'units',flush=True)
-          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as p:list(p.map(check,audit['books'][:1]))
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as p:list(p.map(check,audit['books']))
           print('ALL 50 LIVE: pages, workbooks, source anchors and body fingerprints. No paid model calls.',flush=True)
           PY
