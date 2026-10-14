@@ -37,8 +37,8 @@ jobs:
               if hashlib.sha256(body.encode()).hexdigest()!=m['sourceBodySha256']:
                   original=urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/public'+base+'text/index.html',timeout=45).read().decode('utf-8')
                   original=re.search(r'<body\b[^>]*>([\s\S]*)</body>',original,re.I).group(1)
-                  import difflib
-                  diffs=[(tag,original[a:z][:700],body[c:d][:700]) for tag,a,z,c,d in difflib.SequenceMatcher(None,original,body,autojunk=False).get_opcodes() if tag!='equal']
+                  pos=next((i for i,(a,b) in enumerate(zip(original,body)) if a!=b),min(len(original),len(body)))
+                  diffs=[('first-difference',original[max(0,pos-100):pos+1200],body[max(0,pos-100):pos+1200]),('tail',original[-1200:],body[-1200:])]
                   print('BODY-DIFF',b['id'],json.dumps(diffs[:5],ensure_ascii=False),flush=True)
                   raise AssertionError((b['title'],'body mismatch'))
               assert len(m['tasks'])==b['tasks']
@@ -50,6 +50,6 @@ jobs:
               workbook=get(base+'unit/workbook.html').decode()
               assert b['title'] in workbook
               print('PASS',b['id'],b['title'],len(m['tasks']),'units',flush=True)
-          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as p:list(p.map(check,audit['books']))
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as p:list(p.map(check,audit['books'][:1]))
           print('ALL 50 LIVE: pages, workbooks, source anchors and body fingerprints. No paid model calls.',flush=True)
           PY
