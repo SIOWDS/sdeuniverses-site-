@@ -13690,7 +13690,7 @@ export default {
       let b = {}; try { b = await request.json(); } catch (e) {}
       const BA = !!b.bookagent;   // 书生（/books/agent/）：一本专著的发生伙伴——预算与记忆同 SDE 对谈档
       const WIF = BA && b.bookId === "what-if";
-      const SCOPED_BOOK = BA && b.sourceMode === "selected-original" && [241,266,272,276,277,278,281,282,322,330,336,337,338,347,386,388,394,399,400,401].includes(Number(b.bookNo));
+      const SCOPED_BOOK = BA && b.sourceMode === "selected-original" && [241,266,272,276,277,278,281,282,322,330,336,337,338,347,382,386,388,394,399,400,401].includes(Number(b.bookNo));
       const M271 = BA && Number(b.bookNo) === 271;
       const M265 = BA && Number(b.bookNo) === 265;
       const GDX = !!b.guide || BA;
