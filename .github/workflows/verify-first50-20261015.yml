@@ -34,7 +34,13 @@ jobs:
               m=json.loads(get(base+'unit/learning.json'))
               raw=get(base+'text/').decode('utf-8')
               body=re.search(r'<body\b[^>]*>([\s\S]*)</body>',raw,re.I).group(1)
-              assert hashlib.sha256(body.encode()).hexdigest()==m['sourceBodySha256'],(b['title'],'body hash mismatch')
+              if hashlib.sha256(body.encode()).hexdigest()!=m['sourceBodySha256']:
+                  original=urllib.request.urlopen('https://raw.githubusercontent.com/SIOWDS/sdeuniverses-site-/main/public'+base+'text/index.html',timeout=45).read().decode('utf-8')
+                  original=re.search(r'<body\b[^>]*>([\s\S]*)</body>',original,re.I).group(1)
+                  import difflib
+                  diffs=[(tag,original[a:z][:700],body[c:d][:700]) for tag,a,z,c,d in difflib.SequenceMatcher(None,original,body,autojunk=False).get_opcodes() if tag!='equal']
+                  print('BODY-DIFF',b['id'],json.dumps(diffs[:5],ensure_ascii=False),flush=True)
+                  raise AssertionError((b['title'],'body mismatch'))
               assert len(m['tasks'])==b['tasks']
               for t in m['tasks']:
                   assert ('id="'+t['sourceId']+'"') in raw or ("id='"+t['sourceId']+"'") in raw,(b['title'],t['sourceId'])
