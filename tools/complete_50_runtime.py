@@ -12,4 +12,6 @@ s=s.replace("agentName:'判生',agentEpithet:'判断力的复合发生',bookMeta
 s=s.replace('这是第398卷配套学习任务','这是本书配套学习任务').replace('三方程对应真，六路径对应善，三原理对应美；E是特征纠缠而非简单环境。工具封装判断不等于工具具有意识。','SDE的S是显露、D是差异序列、E是特征纠缠，三者相互规定、共同发生。不得把SDE改写成主体、行动、环境，也不得把旧版本措辞当作最新理论。阅读到旧表述应指出版本语境。健康内容只作文本研读，不提供诊疗处方。')
 s=s.replace("'m398-个人学习档案-'","C.BOOK+'-个人学习档案-'").replace("'m398-救援记录-'","C.BOOK+'-救援记录-'").replace("'sde-m398-learning'","'sde-'+C.BOOK+'-learning'")
 s=s.replace('本章完整文本已载入浏览器','本阅读单元文本已载入浏览器').replace('第'+"'+lesson+'"+'章','阅读单元'+"'+lesson+'")
+s=s.replace("(raw.match(/<body\\b[^>]*>([\\s\\S]*)<\\/body>/i)||[])[1]||''",'((raw.match(/<body\\b[^>]*>([\\s\\S]*)<\\/body>/i)||[])[1]||\'\').replace(/<script\\b[^>]*src=["\']https:\\/\\/static\\.cloudflareinsights\\.com\\/beacon\\.min\\.js[^>]*>[\\s\\S]*?<\\/script>\\s*/gi,\'\')')
+s=s.replace('context.length>110000','context.length>119900')
 (O/'app.js').write_text(s);(O/'unit.css').write_text((T/'unit.css').read_text())
