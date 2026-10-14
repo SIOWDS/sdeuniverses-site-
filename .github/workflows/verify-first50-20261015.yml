@@ -1,0 +1,49 @@
+name: Verify first 50 publication units
+on:
+  push:
+    branches: [codex/verify-first50-20261015]
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check live pages and body fingerprints
+        run: |
+          python3 -u - <<'PY'
+          import urllib.request,json,hashlib,re,time,concurrent.futures
+          root='https://sdeuniverses.com'
+          def get(path):
+              req=urllib.request.Request(root+path,headers={'User-Agent':'SDE-Publication-Verification/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=45) as r:
+                  assert r.status==200
+                  return r.read()
+          for attempt in range(16):
+              try:
+                  assert b'sourceBodySha256' in get('/books/unit-20261015/app.js')
+                  audit=json.loads(get('/books/unit-20261015/audit.json'))
+                  assert audit['count']==50
+                  break
+              except Exception as e:
+                  print('Awaiting final deployment',attempt+1,str(e),flush=True)
+                  time.sleep(25)
+          else: raise RuntimeError('Final version unavailable')
+          def check(b):
+              base=b['learningUrl'].split(root)[1].split('/agent/')[0]+'/'
+              m=json.loads(get(base+'unit/learning.json'))
+              raw=get(base+'text/').decode('utf-8')
+              body=re.search(r'<body\b[^>]*>([\s\S]*)</body>',raw,re.I).group(1)
+              assert hashlib.sha256(body.encode()).hexdigest()==m['sourceBodySha256'],(b['title'],'body hash mismatch')
+              assert len(m['tasks'])==b['tasks']
+              for t in m['tasks']:
+                  assert ('id="'+t['sourceId']+'"') in raw or ("id='"+t['sourceId']+"'") in raw,(b['title'],t['sourceId'])
+              for suffix in ['agent/learning.html','agent/dialogue.html']:
+                  page=get(base+suffix).decode()
+                  assert 'UNIT_CONFIG' in page and '/books/unit-20261015/app.js' in page
+              workbook=get(base+'unit/workbook.html').decode()
+              assert b['title'] in workbook
+              print('PASS',b['id'],b['title'],len(m['tasks']),'units',flush=True)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as p:list(p.map(check,audit['books']))
+          print('ALL 50 LIVE: pages, workbooks, source anchors and body fingerprints. No paid model calls.',flush=True)
+          PY
