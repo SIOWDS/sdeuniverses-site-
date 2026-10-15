@@ -1,0 +1,35 @@
+name: M380 publication live acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/m380-publication-acceptance-20261015.yml'
+      - '.publish/m380/verify_live.py'
+      - 'public/books/m/380/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: m380-publication-live-acceptance
+  cancel-in-progress: false
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            .publish/m380
+      - name: Verify published three-in-one unit
+        run: |
+          python3 .publish/m380/verify_live.py --origin https://sdeuniverses.com --revision 20261015-m380-unit-v1 --wait-seconds 600 --output m380-acceptance/live-report.json
+      - name: Preserve live acceptance report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m380-publication-live-acceptance-${{ github.run_id }}
+          path: m380-acceptance/
+          if-no-files-found: warn
+          retention-days: 14
