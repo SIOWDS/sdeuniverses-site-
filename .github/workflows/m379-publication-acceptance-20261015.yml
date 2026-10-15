@@ -1,0 +1,32 @@
+name: M379 publication live acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/m379-publication-acceptance-20261015.yml'
+      - '.publish/m379/verify_live.py'
+      - 'public/books/m/379/publication.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: m379-publication-live-acceptance
+  cancel-in-progress: false
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            .publish/m379
+      - name: Verify published monograph and three-in-one unit
+        run: python3 .publish/m379/verify_live.py --wait-seconds 600 --output m379-acceptance/live-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m379-publication-live-acceptance-${{ github.run_id }}
+          path: m379-acceptance/
+          retention-days: 14
