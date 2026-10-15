@@ -81,5 +81,6 @@ for name,reading_house in [('public/books/index.html',False),('public/monographs
 print('Built 3 bookshelf entrances,',len(BOOKS),'unique books.')
 # 书生入口同步到详情页（幂等）：每次上新书都要跑本脚本，于是新书的详情页也自动挂上「书生」。
 import subprocess,sys as _sys
-subprocess.run([_sys.executable,str(ROOT/'tools/build_book_agents.py')],check=True)
-subprocess.run([_sys.executable,str(ROOT/'tools/inject_book_agent.py'),'--apply'],check=True)
+if '--shelf-only' not in _sys.argv:
+ subprocess.run([_sys.executable,str(ROOT/'tools/build_book_agents.py')],check=True)
+ subprocess.run([_sys.executable,str(ROOT/'tools/inject_book_agent.py'),'--apply'],check=True)
