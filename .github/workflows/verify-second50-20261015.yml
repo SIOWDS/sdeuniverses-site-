@@ -24,6 +24,7 @@ jobs:
                   assert b'cloudflareinsights' in get('/books/unit-20261015/app.js')
                   audit=json.loads(get('/books/unit-20261015-batch2/audit.json'))
                   assert audit['count']==50 and audit['revision']=='20261015-second50-v1'
+                  assert b'cover-v1.1.jpg' in get('/books/m/49/agent/learning.html')
                   break
               except Exception as e:
                   print('Awaiting final deployment',attempt+1,str(e),flush=True)
@@ -42,6 +43,10 @@ jobs:
               for suffix in ['agent/learning.html','agent/dialogue.html']:
                   page=get(base+suffix).decode()
                   assert 'UNIT_CONFIG' in page and '/books/unit-20261015/app.js' in page
+                  if suffix=='agent/learning.html':
+                      for src in re.findall(r'<img[^>]*src="([^"]+)"',page):
+                          src=html.unescape(src)
+                          get(src.split(root)[-1])
               workbook=get(base+'unit/workbook.html').decode()
               assert b['title'] in html.unescape(workbook)
               unit=json.loads(get(base+'publication-unit.json'))
