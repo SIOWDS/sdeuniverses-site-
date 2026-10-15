@@ -1,0 +1,114 @@
+name: M030 build print-ready PDF from approved full text
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/m030-reader-pdf-build-20261016.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: m030-reader-pdf-build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/30/
+            /public/books/covers/30.jpg
+            /.github/workflows/m030-reader-pdf-build-20261016.yml
+      - name: Prepare a browser and CJK fonts
+        run: |
+          python3 -m pip install -q playwright pymupdf
+          python3 -m playwright install chromium
+          sudo apt-get -qq update
+          sudo apt-get -y -qq install fonts-noto-cjk
+      - name: Render verified full-book PDF
+        run: |
+          python3 - <<'PY'
+          import pathlib,base64,hashlib,os
+          import fitz
+          from playwright.sync_api import sync_playwright
+          root=pathlib.Path.cwd()
+          html=root/'public/books/m/30/text/index.html'
+          cover=root/'public/books/covers/30.jpg'
+          output=root/'public/books/m/30/running-health-v11-online-reader.pdf'
+          assert html.stat().st_size > 250000, 'Full original book text is incomplete'
+          source=html.read_text(encoding='utf-8')
+          assert source.count('id="s') == 84, 'Missing chapter anchors'
+          assert '方法论补充校核来源' in source and '第八十四章' in source
+          cover_url='data:image/jpeg;base64,'+base64.b64encode(cover.read_bytes()).decode('ascii')
+          with sync_playwright() as pw:
+            browser=pw.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=browser.new_page(viewport={'width':1200,'height':960},device_scale_factor=1)
+            page.goto(html.as_uri(),wait_until='domcontentloaded',timeout=60000)
+            page.evaluate("""(u) => {
+                const x=document.querySelector('#text');
+                const head=document.createElement('section');
+                head.className='bookcover';
+                head.innerHTML='<img alt="跑步与健康封面" src="'+u+'"><div class="covlabel">德麦国际专著第30号 · 王德生、秦莉</div>';
+                x.parentElement.insertBefore(head,x);
+                const notice=document.createElement('p');
+                notice.className='version';
+                notice.textContent='数字阅读配套PDF · 根据2026年10月学术强化修订版v1.1全文制作。以正式出版前医学专家审阅为准。';
+                x.insertBefore(notice,x.children[3]||null);
+              }""",cover_url)
+            page.add_style_tag(content="""
+              @page {size:190mm 250mm; margin:15mm 16mm 17mm}
+              html,body {background:white!important;overflow:visible!important}
+              .top,.toc{display:none!important}
+              .wrap{display:block!important;margin:0!important;padding:0!important}
+              .paper{display:block;border:0!important;box-shadow:none!important;background:white!important;padding:0!important;min-height:0!important}
+              .bookcover{break-after:page;display:flex;flex-flow:column;align-items:center;justify-content:center;height:210mm}
+              .bookcover img{height:185mm;max-width:100%;object-fit:contain}
+              .bookcover .covlabel{text-align:center;letter-spacing:2px;font-size:10pt;margin-top:6mm;color:#6c5231}
+              .version{text-indent:0!important;font-size:9pt;color:#696560}
+              body{font:11pt/1.72 'Noto Serif CJK SC','Noto Serif SC',serif!important}
+              p{margin:0 0 9pt!important;text-align:justify;orphans:2;widows:2}
+              .front-title,.part-title,.chap-title,.subhead{break-after:avoid}
+              .part-title{break-before:page!important;padding-top:0!important}
+              h2.chap-title{margin-top:16pt!important;padding-top:0!important}
+              """)
+            page.pdf(path=str(output),print_background=True,prefer_css_page_size=True,tagged=True,outline=True)
+            browser.close()
+          d=fitz.open(output)
+          n=len(d)
+          print('PDF_PAGES',n,'PDF_BYTES',output.stat().st_size,'SHA256',hashlib.sha256(output.read_bytes()).hexdigest())
+          assert 190<n<800, 'Unexpected number of pages'
+          assert output.stat().st_size > 700000, 'PDF output unexpectedly small'
+          covertext=d[0].get_text()
+          print('COVER_TEXT',covertext[:200])
+          bodytext=''.join(d[i].get_text() for i in [min(4,n-1),min(70,n-1),min(160,n-1),min(240,n-1)])
+          assert len(bodytext)>800,'Text appears to be missing or unsearchable'
+          assert any('跑步' in d[i].get_text() for i in range(min(n,20))), 'Chinese text missing'
+          d.close()
+          PY
+      - name: Commit only the newly rendered reading PDF
+        run: |
+          set -e
+          git config user.name "SDE Digital Publication"
+          git config user.email "sde-publication@users.noreply.github.com"
+          git add --sparse public/books/m/30/running-health-v11-online-reader.pdf
+          git diff --cached --stat
+          git commit -m "Publish full monograph 030 companion online-reader PDF"
+          for i in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "Failed to publish PDF after retries"; exit 1
+      - name: Save render manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m030-reader-pdf-build
+          path: public/books/m/30/running-health-v11-online-reader.pdf
+          retention-days: 7
