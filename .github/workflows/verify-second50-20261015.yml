@@ -1,0 +1,65 @@
+name: Verify second 50 publication units
+on:
+  push:
+    branches: [codex/verify-second50-20261015]
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Check live pages and body fingerprints
+        run: |
+          python3 -u - <<'PY'
+          import urllib.request,json,hashlib,re,time,concurrent.futures,html
+          root='https://sdeuniverses.com'
+          def get(path):
+              req=urllib.request.Request(root+path,headers={'User-Agent':'SDE-Publication-Verification/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=45) as r:
+                  assert r.status==200
+                  return r.read()
+          for attempt in range(16):
+              try:
+                  assert b'cloudflareinsights' in get('/books/unit-20261015/app.js')
+                  audit=json.loads(get('/books/unit-20261015-batch2/audit.json'))
+                  assert audit['count']==50 and audit['revision']=='20261015-second50-v1'
+                  break
+              except Exception as e:
+                  print('Awaiting final deployment',attempt+1,str(e),flush=True)
+                  time.sleep(25)
+          else: raise RuntimeError('Final version unavailable')
+          def check(b):
+              base=b['learningUrl'].split(root)[1].split('/agent/')[0]+'/'
+              m=json.loads(get(base+'unit/learning.json'))
+              raw=get(base+'text/').decode('utf-8')
+              body=re.search(r'<body\b[^>]*>([\s\S]*)</body>',raw,re.I).group(1)
+              body=re.sub(r"""<script\b[^>]*src=["']https://static\.cloudflareinsights\.com/beacon\.min\.js[^>]*>[\s\S]*?</script>\s*""",'',body,flags=re.I)
+              assert hashlib.sha256(body.encode()).hexdigest()==m['sourceBodySha256'],(b['title'],'body hash mismatch')
+              assert len(m['tasks'])==b['tasks']
+              for t in m['tasks']:
+                  assert ('id="'+t['sourceId']+'"') in raw or ("id='"+t['sourceId']+"'") in raw,(b['title'],t['sourceId'])
+              for suffix in ['agent/learning.html','agent/dialogue.html']:
+                  page=get(base+suffix).decode()
+                  assert 'UNIT_CONFIG' in page and '/books/unit-20261015/app.js' in page
+              workbook=get(base+'unit/workbook.html').decode()
+              assert b['title'] in html.unescape(workbook)
+              unit=json.loads(get(base+'publication-unit.json'))
+              get(unit['readingUrl'].split(root)[1])
+              home=get(base).decode()
+              assert '阅读、学习、智能体' in home and base+'agent/learning.html' in home and base+'agent/dialogue.html' in home
+              print('PASS',b['id'],b['title'],len(m['tasks']),'units',flush=True)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as p:list(p.map(check,audit['books']))
+          print('ALL 50 LIVE: pages, workbooks, source anchors and body fingerprints. No paid model calls.',flush=True)
+          first=json.loads(get('/books/unit-20261015/audit.json'))
+          catalog={b['id']:b for b in json.loads(get('/books/catalog.json'))['books']}
+          for path in ['/books/','/monographs/','/sites/read/library/']:
+              markup=get(path).decode()
+              for b in first['books']+audit['books']:
+                  card=next((a for a in re.findall(r'<article\b[^>]*>.*?</article>',markup,re.S) if 'data-id="'+b['id']+'"' in a),None)
+                  assert card is not None,(path,b['id'],'missing card')
+                  for action,field in [('read','readUrl'),('learn','learnUrl'),('agent','agentUrl')]:
+                      match=re.search(r'<a\b[^>]*data-unit-action="'+action+r'"[^>]*href="([^"]+)"',card)
+                      assert match and html.unescape(match.group(1))==catalog[b['id']][field],(path,b['id'],action)
+              print('PASS SHELF',path,'100 books with corresponding reading, learning and agent entries',flush=True)
+          PY
