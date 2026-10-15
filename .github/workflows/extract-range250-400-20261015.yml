@@ -1,0 +1,42 @@
+name: Extract published PDF sources for book companions
+on:
+  push:
+    branches: [codex/extract-range250-400-20261015]
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools
+          fetch-depth: 1
+      - run: python3 -m pip install pymupdf
+      - name: Read published PDFs with page numbers
+        run: |
+          python3 - <<'PY'
+          import urllib.request,json,hashlib,pathlib,pymupdf
+          sources=[
+          (256,'main','https://sdeuniverses.com/books/buddhism-sde/buddhism-sde-complete.pdf'),
+          (258,'main','https://sdeuniverses.com/students/qin-li/lion-city-glory/lcg.pdf'),
+          (260,'main','https://sdeuniverses.com/column/pdf/negation-sequence.pdf'),
+          (260,'supplement','https://sdeuniverses.com/column/pdf/negation-sequence-supplement.pdf'),
+          (262,'main','https://sdeuniverses.com/books/the-rift/The-Rift.pdf')]
+          out=pathlib.Path('tools/extracted-range250-400');out.mkdir(exist_ok=True)
+          for n,part,url in sources:
+              req=urllib.request.Request(url,headers={'User-Agent':'SDE-Publication-Companions/1.0'})
+              raw=urllib.request.urlopen(req,timeout=120).read()
+              doc=pymupdf.open(stream=raw,filetype='pdf')
+              data={'number':n,'part':part,'sourceUrl':url,'pdfSha256':hashlib.sha256(raw).hexdigest(),'toc':doc.get_toc(),'pages':[{'page':i+1,'text':p.get_text(sort=True)} for i,p in enumerate(doc)]}
+              assert sum(len(p['text']) for p in data['pages'])>10000
+              (out/(str(n)+'-'+part+'.json')).write_text(json.dumps(data,ensure_ascii=False,indent=2))
+              print(n,part,len(data['pages']),'pages',sum(len(p['text']) for p in data['pages']),'characters')
+          PY
+      - name: Preserve extracted sources on the dedicated working branch
+        run: |
+          git config user.name "SDE publication preparation"
+          git config user.email "publication-preparation@users.noreply.github.com"
+          git add tools/extracted-range250-400
+          git commit -m "Extract original published PDF text with page references for companion preparation"
+          git push origin HEAD:refs/heads/codex/sources-range250-400-20261015
