@@ -75,6 +75,7 @@ for b in SEL:
  page=re.sub(r'<script src="[^"]+/unit/core.js[^>]+></script><script src="[^"]+/unit/app.js[^>]+></script>', '<script>window.UNIT_CONFIG='+json.dumps({'book':ident,'base':base,'count':len(tasks)},ensure_ascii=False)+'</script><script src="/books/unit-20261015/core.js" defer></script><script src="/books/unit-20261015/app.js" defer></script>',page)
  page=page.replace(base+'unit/unit.css?v=20261008u1','/books/unit-20261015/unit.css')
  page=page.replace(base+'read.html',b.get('readUrl',base+'text/'))
+ page=page.replace('src="'+base+'cover.jpg"','src="'+esc(b.get('coverUrl',base+'cover.jpg'))+'"')
  for f,view,title in [('learning.html','learning','学习包 · '+b['title']),('dialogue.html','dialogue','智能问对 · '+name)]:
   out=page
   for k,v in dict(PAGE_TITLE=esc(title),FILE=f,VIEW=view,LEARN_CURRENT='aria-current="page"' if view=='learning' else '',DIALOGUE_CURRENT='aria-current="page"' if view=='dialogue' else '').items():out=out.replace('@@'+k+'@@',v)
