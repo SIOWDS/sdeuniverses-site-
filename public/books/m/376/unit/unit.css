@@ -6,3 +6,10 @@
 /* mobile cover and non-overlapping status */
 .hero img{height:auto;object-fit:contain}.row.download{display:flex;gap:10px;align-items:stretch}.row.download>a,.row.download>label{display:inline-flex;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:9px;min-height:44px;cursor:pointer}
 #status{position:static;left:auto;transform:none;width:auto;margin:12px 0}.lesson-link.active{color:var(--ink);background:#302919;border-left:3px solid var(--gold)}
+
+/* Keep intrinsic select widths inside the reading column, including long chapter titles. */
+.layout>.content,.hero>*,.row>.field{min-width:0}
+label.field{max-width:100%}
+.field>select{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+.row>.field{flex:1 1 240px}
+textarea,input[type=text],input[type=password]{min-width:0;max-width:100%}
