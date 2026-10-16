@@ -47,6 +47,7 @@ jobs:
           python3 -m http.server 8765 --directory public > /tmp/m374-server.log 2>&1 &
           node .publish/m374/qa.cjs
       - name: Verify the published release
+        if: always()
         env:
           QA_OUT: m374-qa-results
         run: python3 .publish/m374/verify_live.py
