@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>友好阅读 · 在线翻页 · 政治学学派解构入门 | SDE Universes</title>
+<meta name="description" content="《政治学学派解构入门》在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
+<meta name="tier" content="L0">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/360/read.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0C0F13; --bg2:#141A21; --fg:#E9E6DE; --dim:#8E97A1; --line:#242D36;
+  --gold:#D9A441; --paper:#FBF7EE; --paper2:#F2ECDF; --ink:#1A1713;
+  --shadow:0 30px 80px rgba(0,0,0,.55);
+}
+html.sepia{--paper:#F6ECD8;--paper2:#EEE1C7}
+html.day{--bg:#E8E4DB;--bg2:#F2EFE7;--fg:#22262B;--dim:#5C646D;--line:#CFC9BD}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,var(--bg2),var(--bg)) fixed;
+  color:var(--fg);font:15px/1.7 "Noto Serif SC","EB Garamond",Georgia,serif;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);
+  overflow:hidden}
+
+/* ── 顶栏 ── */
+.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;align-items:center;gap:.8rem;
+  padding:.55rem 1rem calc(.55rem);background:rgba(12,15,19,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding-top:calc(.55rem + env(safe-area-inset-top,0))}
+html.day .top{background:rgba(232,228,219,.8)}
+.top .ttl{font-weight:600;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{color:var(--dim);font-size:.78rem;margin-left:.2rem;white-space:nowrap}
+.spacer{margin-left:auto}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);
+  border-radius:8px;padding:.3rem .6rem;cursor:pointer;transition:.18s}
+button:hover:not(:disabled),select:hover{border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.on{border-color:var(--gold);color:var(--gold)}
+.ico{font-size:1rem;line-height:1}
+
+/* ── 舞台 ── */
+.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:center;overflow:hidden}
+.book{position:relative;display:flex;gap:0;filter:drop-shadow(0 24px 60px rgba(0,0,0,.5));
+  transform-style:preserve-3d;perspective:2600px}
+.leaf{position:relative;background:var(--paper);overflow:hidden}
+.leaf canvas{display:block;width:100%;height:100%}
+.leaf .svg{position:absolute;inset:0;display:none}
+.leaf .svg svg{display:block;width:100%;height:100%}
+.leaf.vec canvas{display:none}
+.leaf.vec .svg{display:block}
+.leaf.l{border-radius:4px 0 0 4px;box-shadow:inset -22px 0 34px -26px rgba(0,0,0,.55)}
+.leaf.r{border-radius:0 4px 4px 0;box-shadow:inset 22px 0 34px -26px rgba(0,0,0,.55)}
+.single .leaf{border-radius:4px}
+.gutter{position:absolute;top:0;bottom:0;left:50%;width:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.20),rgba(0,0,0,0));pointer-events:none;z-index:3}
+.single .gutter{display:none}
+.pno{position:absolute;bottom:6px;font-size:11px;color:#9a8f7c;letter-spacing:.08em;z-index:4}
+.leaf.l .pno{left:14px}.leaf.r .pno{right:14px}
+
+/* 翻页动画 */
+.flip{position:absolute;top:0;bottom:0;z-index:9;background:var(--paper);
+  transform-origin:left center;backface-visibility:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,.35);border-radius:0 4px 4px 0}
+.flip.back{transform-origin:right center;border-radius:4px 0 0 4px}
+.flip canvas{display:block;width:100%;height:100%}
+@keyframes fwd{from{transform:rotateY(0)}to{transform:rotateY(-178deg)}}
+@keyframes bwd{from{transform:rotateY(0)}to{transform:rotateY(178deg)}}
+.flip.go{animation:fwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+.flip.back.go{animation:bwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+@media (prefers-reduced-motion:reduce){.flip.go,.flip.back.go{animation-duration:.01s}}
+
+/* 文本层（可选可搜） */
+.tl{position:absolute;inset:0;overflow:hidden;opacity:.01;line-height:1;z-index:2}
+.tl span{position:absolute;white-space:pre;transform-origin:0 0;color:transparent;cursor:text}
+.tl ::selection{background:rgba(217,164,65,.35)}
+.tl mark{background:rgba(217,164,65,.55);color:transparent;border-radius:2px}
+
+/* ── 底栏 ── */
+.bot{position:fixed;inset:auto 0 0 0;z-index:40;display:flex;align-items:center;gap:.7rem;
+  padding:.5rem 1rem calc(.5rem + env(safe-area-inset-bottom,0));
+  background:rgba(12,15,19,.72);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+html.day .bot{background:rgba(232,228,219,.8)}
+.rail{position:relative;flex:1;height:22px;display:flex;align-items:center;cursor:pointer}
+.rail .bar{position:absolute;left:0;right:0;height:3px;background:var(--line);border-radius:3px}
+.rail .fill{position:absolute;left:0;height:3px;background:linear-gradient(90deg,var(--gold),#F0CE86);border-radius:3px}
+.rail .knob{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--gold);
+  transform:translateX(-50%);box-shadow:0 0 0 4px rgba(217,164,65,.18)}
+.pg{font-variant-numeric:tabular-nums;color:var(--dim);font-size:.82rem;white-space:nowrap}
+.pg input{width:3.4rem;text-align:center;background:transparent;border:1px solid var(--line);
+  border-radius:6px;color:var(--fg);font:inherit;padding:.12rem .2rem}
+
+/* ── 抽屉 ── */
+.drawer{position:fixed;top:52px;bottom:62px;left:0;width:min(330px,86vw);z-index:45;
+  background:rgba(16,21,27,.97);border-right:1px solid var(--line);
+  transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;backdrop-filter:blur(10px)}
+html.day .drawer{background:rgba(242,239,231,.97)}
+.drawer.open{transform:none}
+.drawer h3{margin:0;padding:.8rem 1rem .5rem;font-size:.8rem;letter-spacing:.24em;color:var(--dim);font-weight:400}
+.dlist{flex:1;overflow:auto;padding:0 .4rem 1rem}
+.dlist a{display:flex;gap:.5rem;align-items:baseline;padding:.32rem .6rem;border-radius:7px;
+  color:var(--fg);text-decoration:none;font-size:.86rem}
+.dlist a:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.dlist a.l1{font-weight:600;margin-top:.5rem}
+.dlist a.l2{padding-left:1.5rem;color:var(--dim);font-size:.8rem}
+.dlist a .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.76rem}
+.sbox{padding:.5rem 1rem}
+.sbox input{width:100%;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--fg);font:inherit;padding:.4rem .6rem}
+.hit{padding:.35rem .6rem;border-radius:7px;font-size:.8rem;color:var(--dim);cursor:pointer}
+.hit:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.hit b{color:var(--gold);font-weight:600}
+
+/* 缩略图 */
+.thumbs{position:fixed;left:0;right:0;bottom:62px;z-index:44;display:flex;gap:.5rem;
+  padding:.6rem 1rem;overflow-x:auto;background:rgba(12,15,19,.92);border-top:1px solid var(--line);
+  transform:translateY(120%);transition:transform .28s}
+.thumbs.open{transform:none}
+.thumbs canvas{height:112px;width:auto;border-radius:3px;cursor:pointer;opacity:.62;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);transition:.18s}
+.thumbs canvas:hover,.thumbs canvas.cur{opacity:1;outline:2px solid var(--gold)}
+
+.msg{position:fixed;inset:0;display:grid;place-items:center;z-index:60;color:var(--dim);
+  background:rgba(12,15,19,.9);text-align:center;padding:2rem}
+.msg.hide{display:none}
+.msg .sp{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--gold);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:50;
+  background:rgba(0,0,0,.66);border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .9rem;font-size:.76rem;color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
+.hint.show{opacity:1}
+@media (max-width:860px){.top .sub,.hideS{display:none}.stage{inset:48px 0 56px 0}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
+  <span class="ttl">政治学学派解构入门</span><span class="sub hideS">普通人都能读懂的</span>
+  <span class="spacer"></span>
+  <button id="btnSpread" class="hideS" title="单页 / 双页 (D)">双页</button>
+  <button id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)">矢量</button>
+  <button id="btnZoomOut" title="缩小">A−</button>
+  <button id="btnZoomIn" title="放大">A＋</button>
+  <button id="btnThumbs" class="hideS" title="缩略图">▤</button>
+  <button id="btnTheme" title="夜 / 日 / 纸 (N)">夜</button>
+  <button id="btnFull" class="hideS" title="全屏 (F)">⛶</button>
+  <a href="/books/m/360/" style="color:var(--dim);text-decoration:none;font-size:.82rem">详情</a>
+</header>
+
+<aside class="drawer" id="drawer">
+  <div class="sbox"><input id="q" type="search" placeholder="全书检索（回车）…"></div>
+  <h3 id="dHead">目　录</h3>
+  <div class="dlist" id="dlist"></div>
+</aside>
+
+<main class="stage" id="stage">
+  <div class="book" id="book">
+    <div class="leaf l" id="leafL"><canvas id="cL"></canvas><div class="svg" id="sL"></div><div class="tl" id="tL"></div><div class="pno" id="nL"></div></div>
+    <div class="leaf r" id="leafR"><canvas id="cR"></canvas><div class="svg" id="sR"></div><div class="tl" id="tR"></div><div class="pno" id="nR"></div></div>
+    <div class="gutter"></div>
+  </div>
+</main>
+
+<div class="thumbs" id="thumbs"></div>
+
+<footer class="bot">
+  <button id="btnPrev" title="上一页 (←)">‹</button>
+  <div class="rail" id="rail"><div class="bar"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
+  <button id="btnNext" title="下一页 (→)">›</button>
+  <span class="pg">第 <input id="pi" type="number" min="1" value="1"> / <span id="pt">…</span> 页</span>
+</footer>
+
+<div class="hint" id="hint"></div>
+<div class="msg" id="msg"><div><div class="sp"></div><div id="msgT">正在载入书页…</div></div></div>
+
+<script type="application/json" id="cfg">{"pdf": "/students/wang-desheng/politics-schools-deconstruction/m360/politics-schools-deconstruction-reader.pdf", "key": "books-m-360-v1", "offset": 22}</script>
+<script type="application/json" id="toc">[{"t": "封面", "p": "", "g": 1, "l": 1}, {"t": "出版信息", "p": "", "g": 3, "l": 1}, {"t": "作者介绍", "p": "", "g": 4, "l": 1}, {"t": "前言", "p": "", "g": 5, "l": 1}, {"t": "导读", "p": "", "g": 11, "l": 1}, {"t": "目录", "p": "", "g": 17, "l": 1}, {"t": "导论　小区业主群里的一次投票：六种解释", "p": "1", "g": 22, "l": 1}, {"t": "第一编　方法：路径依赖是怎样发生的", "p": "7", "g": 28, "l": 1}, {"t": "第 1 章　学派的出生证：主体预设 × 客体预设", "p": "8", "g": 29, "l": 2}, {"t": "第 2 章　意义的预设：创造、自由、幸福", "p": "15", "g": 36, "l": 2}, {"t": "第 3 章　两条起手的路：S→D→E 与 S→E→D", "p": "21", "g": 42, "l": 2}, {"t": "第 4 章　被堵住的原理：异象为什么改不动起点", "p": "28", "g": 49, "l": 2}, {"t": "第 5 章　三种吸收：免检、改名、先验", "p": "35", "g": 56, "l": 2}, {"t": "第 6 章　分叉：多元化是从哪里来的", "p": "42", "g": 63, "l": 2}, {"t": "第 7 章　三层与三种依赖：本书怎样算错", "p": "49", "g": 70, "l": 2}, {"t": "第二编　古典：共同体与善", "p": "56", "g": 77, "l": 1}, {"t": "第 8 章　柏拉图与亚里士多德：城邦先在于个人", "p": "57", "g": 78, "l": 2}, {"t": "第 9 章　奥古斯丁与阿奎那：两座城", "p": "64", "g": 85, "l": 2}, {"t": "第 10 章　马基雅维利：政治从道德里脱出来", "p": "71", "g": 92, "l": 2}, {"t": "第 11 章　博丹与主权：权力第一次被写成“最高”", "p": "78", "g": 99, "l": 2}, {"t": "第三编　契约论：国家是造出来的", "p": "85", "g": 106, "l": 1}, {"t": "第 12 章　霍布斯：自利的人与利维坦", "p": "86", "g": 107, "l": 2}, {"t": "第 13 章　洛克：权利先于国家", "p": "93", "g": 114, "l": 2}, {"t": "第 14 章　卢梭：公意与“强迫自由”", "p": "100", "g": 121, "l": 2}, {"t": "第 15 章　休谟与边沁：对契约的批评与功利主义的吸收", "p": "107", "g": 128, "l": 2}, {"t": "第 16 章　康德与罗尔斯：契约的复活", "p": "114", "g": 135, "l": 2}, {"t": "第四编　十九世纪：国家、阶级与官僚", "p": "121", "g": 142, "l": 1}, {"t": "第 17 章　托克维尔：平等的路径", "p": "122", "g": 143, "l": 2}, {"t": "第 18 章　密尔：自由与代议", "p": "128", "g": 149, "l": 2}, {"t": "第 19 章　黑格尔：国家作为伦理实体", "p": "134", "g": 155, "l": 2}, {"t": "第 20 章　马克思：国家是阶级的工具", "p": "140", "g": 161, "l": 2}, {"t": "第 21 章　韦伯：合法性与官僚制", "p": "146", "g": 167, "l": 2}, {"t": "第五编　从旧制度主义到行为革命", "p": "152", "g": 173, "l": 1}, {"t": "第 22 章　旧制度主义：宪法与机构", "p": "153", "g": 174, "l": 2}, {"t": "第 23 章　团体论：本特利与杜鲁门", "p": "159", "g": 180, "l": 2}, {"t": "第 24 章　行为革命：政治学要做成科学", "p": "165", "g": 186, "l": 2}, {"t": "第 25 章　伊斯顿的系统论：政治是一只输入输出的黑箱", "p": "171", "g": 192, "l": 2}, {"t": "第 26 章　阿尔蒙德的结构功能论与现代化理论", "p": "177", "g": 198, "l": 2}, {"t": "第 27 章　后行为主义：科学的政治学，丢了什么", "p": "183", "g": 204, "l": 2}, {"t": "第六编　权力：精英、多元与三张面孔", "p": "190", "g": 211, "l": 1}, {"t": "第 28 章　精英理论：莫斯卡、帕累托、米歇尔斯", "p": "191", "g": 212, "l": 2}, {"t": "第 29 章　达尔与多元主义：权力分散在多个中心", "p": "198", "g": 219, "l": 2}, {"t": "第 30 章　无决策与卢克斯的三面孔：权力看不见的那一面", "p": "205", "g": 226, "l": 2}, {"t": "第 31 章　福柯：权力生产主体", "p": "212", "g": 233, "l": 2}, {"t": "第 32 章　葛兰西：霸权与同意", "p": "219", "g": 240, "l": 2}, {"t": "第七编　国家、结构与历史", "p": "226", "g": 247, "l": 1}, {"t": "第 33 章　马克思主义国家理论：相对自主与工具论之争", "p": "227", "g": 248, "l": 2}, {"t": "第 34 章　国家回归：斯考切波", "p": "233", "g": 254, "l": 2}, {"t": "第 35 章　摩尔与社会起源：通往民主与独裁的路", "p": "240", "g": 261, "l": 2}, {"t": "第 36 章　依附论与后殖民：从边缘看中心", "p": "247", "g": 268, "l": 2}, {"t": "第 37 章　发展型国家理论：追赶的政治", "p": "254", "g": 275, "l": 2}, {"t": "第八编　理性选择与制度", "p": "260", "g": 281, "l": 1}, {"t": "第 38 章　唐斯：选民是消费者", "p": "261", "g": 282, "l": 2}, {"t": "第 39 章　奥尔森：集体行动的逻辑", "p": "267", "g": 288, "l": 2}, {"t": "第 40 章　阿罗不可能定理与公共选择", "p": "273", "g": 294, "l": 2}, {"t": "第 41 章　理性选择制度主义：制度是激励结构", "p": "279", "g": 300, "l": 2}, {"t": "第 42 章　历史制度主义：路径依赖的本尊", "p": "285", "g": 306, "l": 2}, {"t": "第 43 章　社会学制度主义：制度是文化脚本", "p": "292", "g": 313, "l": 2}, {"t": "第 44 章　话语制度主义：观念也能当起点", "p": "299", "g": 320, "l": 2}, {"t": "第九编　民主与比较政治", "p": "306", "g": 327, "l": 1}, {"t": "第 45 章　熊彼特的最小民主，与参与式、协商式的反驳", "p": "307", "g": 328, "l": 2}, {"t": "第 46 章　利普哈特：共识型与多数型", "p": "313", "g": 334, "l": 2}, {"t": "第 47 章　转型与巩固：第三波民主化", "p": "319", "g": 340, "l": 2}, {"t": "第 48 章　政治文化与社会资本", "p": "326", "g": 347, "l": 2}, {"t": "第 49 章　民主衰退与民粹主义的理论", "p": "332", "g": 353, "l": 2}, {"t": "第十编　建构、话语与批判", "p": "339", "g": 360, "l": 1}, {"t": "第 50 章　建构主义：身份由互动造出来", "p": "340", "g": 361, "l": 2}, {"t": "第 51 章　女性主义与交叉性", "p": "347", "g": 368, "l": 2}, {"t": "第 52 章　后殖民与多元的世界：政治的“本体论转向”", "p": "354", "g": 375, "l": 2}, {"t": "第十一编　国家政治实践：意义权重的另一张表", "p": "361", "g": 382, "l": 1}, {"t": "第 53 章　理论与实践为什么要分开读", "p": "362", "g": 383, "l": 2}, {"t": "第 54 章　美国：实践押在创新与自由上", "p": "369", "g": 390, "l": 2}, {"t": "第 55 章　英国：议会主权与它的几次转向", "p": "376", "g": 397, "l": 2}, {"t": "第 56 章　德国与法国：欧洲大陆的两种国家", "p": "383", "g": 404, "l": 2}, {"t": "第 57 章　日本：官僚、政党与追赶之后", "p": "389", "g": 410, "l": 2}, {"t": "第 58 章　中国：从“建设”到“发展”，再到“美好生活需要”", "p": "395", "g": 416, "l": 2}, {"t": "第十二编　横读与解锁", "p": "401", "g": 422, "l": 1}, {"t": "第 59 章　一战、大萧条、法西斯：三张吸收表", "p": "402", "g": 423, "l": 2}, {"t": "第 60 章　冷战的终结与9·11：两个没有学派预测到的异象", "p": "408", "g": 429, "l": 2}, {"t": "第 61 章　2008到2016：金融危机、广场运动与民粹", "p": "414", "g": 435, "l": 2}, {"t": "第 62 章　AI 与政治：下一个大异象，各派会怎样吸收", "p": "421", "g": 442, "l": 2}, {"t": "第 63 章　什么算异象：理论替学派挑一遍，国家实践再挑一遍", "p": "427", "g": 448, "l": 2}, {"t": "第 64 章　让权力从“令”与“从”之间长出来：D→E→S 的政治学", "p": "433", "g": 454, "l": 2}, {"t": "第 65 章　让回写改写起点：一个学派怎样真正学习", "p": "439", "g": 460, "l": 2}, {"t": "第 66 章　SDE 自己的路径依赖，与本书的可错条款", "p": "446", "g": 467, "l": 2}, {"t": "下编导论　大事是学派的一次考试", "p": "453", "g": 474, "l": 1}, {"t": "第十三编　1977—1986：滞胀之后，市场与理性回到中心", "p": "459", "g": 480, "l": 1}, {"t": "第 67 章　1977　德国：德意志之秋", "p": "461", "g": 482, "l": 2}, {"t": "第 68 章　1978　中国：改革开放启动", "p": "464", "g": 485, "l": 2}, {"t": "第 69 章　1979　英国：撒切尔上台", "p": "467", "g": 488, "l": 2}, {"t": "第 70 章　1980　美国：里根当选", "p": "470", "g": 491, "l": 2}, {"t": "第 71 章　1981　法国：密特朗当选与1983年转向", "p": "473", "g": 494, "l": 2}, {"t": "第 72 章　1982　英国：马岛战争", "p": "476", "g": 497, "l": 2}, {"t": "第 73 章　1983　联邦德国：绿党进入联邦议院", "p": "479", "g": 500, "l": 2}, {"t": "第 74 章　1984　中国：中英联合声明与“一国两制”", "p": "482", "g": 503, "l": 2}, {"t": "第 75 章　1985　日本：广场协议", "p": "485", "g": 506, "l": 2}, {"t": "第 76 章　1986　法国：左右共治", "p": "488", "g": 509, "l": 2}, {"t": "第十四编　1987—1996：第三波的顶点与冷战之终", "p": "491", "g": 512, "l": 1}, {"t": "第 77 章　1987　英国：撒切尔三连任", "p": "492", "g": 513, "l": 2}, {"t": "第 78 章　1988　中国：价格闯关", "p": "495", "g": 516, "l": 2}, {"t": "第 79 章　1989　德国：柏林墙倒塌与统一", "p": "498", "g": 519, "l": 2}, {"t": "第 80 章　1990　日本：泡沫破裂", "p": "501", "g": 522, "l": 2}, {"t": "第 81 章　1991　跨国：苏联解体", "p": "504", "g": 525, "l": 2}, {"t": "第 82 章　1992　中国：南方谈话", "p": "507", "g": 528, "l": 2}, {"t": "第 83 章　1993　日本：五五年体制终结", "p": "510", "g": 531, "l": 2}, {"t": "第 84 章　1994　美国：共和党革命", "p": "513", "g": 534, "l": 2}, {"t": "第 85 章　1995　法国：冬季大罢工", "p": "516", "g": 537, "l": 2}, {"t": "第 86 章　1996　日本：小选区制下首次大选", "p": "519", "g": 540, "l": 2}, {"t": "第十五编　1997—2006：全球化与反恐", "p": "522", "g": 543, "l": 1}, {"t": "第 87 章　1997　中国：香港回归", "p": "523", "g": 544, "l": 2}, {"t": "第 88 章　1998　英国：北爱和平协议与权力下放", "p": "526", "g": 547, "l": 2}, {"t": "第 89 章　1999　德国：科索沃战争，和平主义的转折", "p": "529", "g": 550, "l": 2}, {"t": "第 90 章　2000　法国：五年任期公投", "p": "532", "g": 553, "l": 2}, {"t": "第 91 章　2001　美国：9·11", "p": "535", "g": 556, "l": 2}, {"t": "第 92 章　2002　中国：十六大与“三个代表”", "p": "538", "g": 559, "l": 2}, {"t": "第 93 章　2003　英国：伊拉克战争", "p": "541", "g": 562, "l": 2}, {"t": "第 94 章　2004　法国：头巾法与世俗原则", "p": "544", "g": 565, "l": 2}, {"t": "第 95 章　2005　德国：默克尔上台与大联合政府", "p": "547", "g": 568, "l": 2}, {"t": "第 96 章　2006　日本：安倍首次组阁", "p": "550", "g": 571, "l": 2}, {"t": "第十六编　2007—2016：危机、广场与民粹", "p": "553", "g": 574, "l": 1}, {"t": "第 97 章　2007　法国：萨科齐当选", "p": "554", "g": 575, "l": 2}, {"t": "第 98 章　2008　美国：雷曼倒下与奥巴马当选", "p": "557", "g": 578, "l": 2}, {"t": "第 99 章　2009　日本：民主党政权更替", "p": "560", "g": 581, "l": 2}, {"t": "第 100 章　2010　英国：联合政府", "p": "563", "g": 584, "l": 2}, {"t": "第 101 章　2011　日本：3·11与福岛", "p": "566", "g": 587, "l": 2}, {"t": "第 102 章　2012　法国：奥朗德当选", "p": "569", "g": 590, "l": 2}, {"t": "第 103 章　2013　中国：十八届三中全会与“一带一路”", "p": "572", "g": 593, "l": 2}, {"t": "第 104 章　2014　英国：苏格兰独立公投", "p": "575", "g": 596, "l": 2}, {"t": "第 105 章　2015　德国：难民危机", "p": "578", "g": 599, "l": 2}, {"t": "第 106 章　2016　英国：脱欧公投", "p": "581", "g": 602, "l": 2}, {"t": "第十七编　2017—2026：民粹之后，疫情、战争与 AI", "p": "584", "g": 605, "l": 1}, {"t": "第 107 章　2017　美国：特朗普就任与“美国优先”", "p": "586", "g": 607, "l": 2}, {"t": "第 108 章　2018　法国：黄背心", "p": "589", "g": 610, "l": 2}, {"t": "第 109 章　2019　日本：平成落幕、令和更替", "p": "592", "g": 613, "l": 2}, {"t": "第 110 章　2020　中国：疫情与国家能力", "p": "595", "g": 616, "l": 2}, {"t": "第 111 章　2021　美国：国会山事件", "p": "598", "g": 619, "l": 2}, {"t": "第 112 章　2022　德国：俄乌战争与“时代转折”", "p": "601", "g": 622, "l": 2}, {"t": "第 113 章　2023　跨国：以哈冲突", "p": "604", "g": 625, "l": 2}, {"t": "第 114 章　2024　美国：大选", "p": "607", "g": 628, "l": 2}, {"t": "第 115 章　2025　德国：联邦议院大选与债务刹车松绑", "p": "610", "g": 631, "l": 2}, {"t": "第 116 章　2026　美国：最高法院裁定IEEPA不授权关税", "p": "613", "g": 634, "l": 2}, {"t": "下编结语　五十年，六个国家", "p": "616", "g": 637, "l": 1}, {"t": "结语　再看一遍那次投票", "p": "621", "g": 642, "l": 1}, {"t": "参考书目", "p": "630", "g": 651, "l": 1}, {"t": "附录", "p": "638", "g": 659, "l": 1}, {"t": "附录一　AI 与政治：权力在“令”与“从”之间", "p": "638", "g": 659, "l": 2}, {"t": "附录二　学派总表", "p": "660", "g": 681, "l": 2}, {"t": "附录三　异象登记表", "p": "671", "g": 692, "l": 2}, {"t": "附录四　可错条款登记", "p": "687", "g": 708, "l": 2}, {"t": "附录五　术语的大白话对照", "p": "690", "g": 711, "l": 2}, {"t": "附录六　年表", "p": "693", "g": 714, "l": 2}, {"t": "附录七　引文核验表", "p": "704", "g": 725, "l": 2}, {"t": "附录八　五十年事件总表", "p": "737", "g": 758, "l": 2}, {"t": "封底", "p": "", "g": 763, "l": 1}]</script>
+
+<script>
+(function(){
+'use strict';
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var TOC = JSON.parse(document.getElementById('toc').textContent);
+var $ = function(id){ return document.getElementById(id); };
+
+var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var themes=['','day','sepia'], ti=0;
+var cache={}, textCache={}, vecOK=0, vecFail=0;
+/* —— 接入 SDE 陪读（WDS）：把当前可见页的文本与页码喂给助手；文字层可选中某句作焦点 —— */
+window.WDS_READ = {
+  title: '政治学学派解构入门',
+  bodyEl: function(){ return document.getElementById('book'); },
+  docTextFn: function(){
+    if(!doc) return '';
+    var l = spread ? (cur%2===0?cur:cur-1) : cur, ps = spread ? [l, l+1] : [cur];
+    var t = ps.filter(function(p){ return p>=1 && p<=total && textCache[p]; }).map(function(p){
+      var pr = p-CFG.offset+1; return '【第 '+(pr>0?pr:p)+' 页 / 共 '+total+' 页】\n'+textCache[p]; }).join('\n');
+    return t;
+  }
+};
+
+function msg(t, spin){ $('msgT').textContent=t; $('msg').classList.remove('hide');
+  $('msg').querySelector('.sp').style.display = spin===false?'none':''; }
+function hideMsg(){ $('msg').classList.add('hide'); }
+function hint(t){ var h=$('hint'); h.textContent=t; h.classList.add('show');
+  clearTimeout(h._t); h._t=setTimeout(function(){h.classList.remove('show');},1400); }
+
+/* ── 版心尺寸：按舞台可用空间算，双页则一半 ── */
+function box(){
+  var st=$('stage'), W=st.clientWidth-40, H=st.clientHeight-30;
+  var n = spread?2:1;
+  return {W:W, H:H, n:n};
+}
+function fit(vp){
+  var b=box();
+  var maxW=(b.W/b.n), maxH=b.H;
+  var s=Math.min(maxW/vp.width, maxH/vp.height)*zoom;
+  return s;
+}
+
+/* ── 渲染一页：优先矢量(SVG)，失败回落高清 canvas ── */
+function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
+  var leaf = canvasEl.parentNode;
+  if(pageNo<1||pageNo>total){ leaf.style.visibility='hidden'; if(tlEl) tlEl.innerHTML=''; cb&&cb(); return; }
+  leaf.style.visibility='visible';
+  doc.getPage(pageNo).then(function(pg){
+    var vp0=pg.getViewport({scale:1});
+    var sc=fit(vp0), vp=pg.getViewport({scale:sc});
+    leaf.style.width=Math.round(vp.width)+'px';
+    leaf.style.height=Math.round(vp.height)+'px';
+    if(vector && svgEl && window.pdfjsLib && pdfjsLib.SVGGraphics){
+      leaf.classList.add('vec');
+      pg.getOperatorList().then(function(ops){
+        var g=new pdfjsLib.SVGGraphics(pg.commonObjs, pg.objs);
+        g.embedFonts=true;
+        return g.getSVG(ops, vp);
+      }).then(function(svg){
+        vecOK++;
+        svg.setAttribute('width', Math.round(vp.width));
+        svg.setAttribute('height', Math.round(vp.height));
+        svgEl.innerHTML=''; svgEl.appendChild(svg);
+        if(tlEl) buildText(pg, vp, tlEl);
+        cb&&cb();
+      }).catch(function(){
+        /* 逐页回退：这一页含矢量后端不支持的内容（多为位图封面、插图），只这一页用高清位图；
+           其余页照旧矢量。连续失败过多才整本切到位图。 */
+        vecFail++;
+        if(vecFail>=6 && vecFail>vecOK){
+          vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
+          hint('此文档的矢量渲染不可用，已切回高清位图');
+        }
+        leaf.classList.remove('vec');
+        drawCanvas(pg, vp, canvasEl, tlEl, cb);
+      });
+    }else{
+      leaf.classList.remove('vec');
+      drawCanvas(pg, vp, canvasEl, tlEl, cb);
+    }
+  }).catch(function(){ cb&&cb(); });
+}
+
+function drawCanvas(pg, vp, canvasEl, tlEl, cb){
+  var dpr=Math.min(window.devicePixelRatio||1, 3);
+  canvasEl.width=Math.round(vp.width*dpr); canvasEl.height=Math.round(vp.height*dpr);
+  canvasEl.style.width=Math.round(vp.width)+'px'; canvasEl.style.height=Math.round(vp.height)+'px';
+  var ctx=canvasEl.getContext('2d',{alpha:false});
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#FBF7EE'; ctx.fillRect(0,0,vp.width,vp.height);
+  pg.render({canvasContext:ctx, viewport:vp, intent:'display'}).promise.then(function(){
+    if(tlEl) buildText(pg, vp, tlEl);
+    cb&&cb();
+  }).catch(function(){ cb&&cb(); });
+}
+
+function buildText(pg, vp, el){
+  el.innerHTML='';
+  pg.getTextContent().then(function(tc){
+    try{ textCache[pg.pageNumber]=tc.items.map(function(x){return x.str;}).join(''); }catch(e){}
+    var frag=document.createDocumentFragment();
+    tc.items.forEach(function(it){
+      if(!it.str) return;
+      var tx=pdfjsLib.Util.transform(vp.transform, it.transform);
+      var s=document.createElement('span');
+      s.textContent=it.str;
+      var h=Math.hypot(tx[2],tx[3]);
+      s.style.left=tx[4]+'px'; s.style.top=(tx[5]-h)+'px';
+      s.style.fontSize=h+'px'; s.style.fontFamily='sans-serif';
+      frag.appendChild(s);
+    });
+    el.appendChild(frag);
+  }).catch(function(){});
+}
+
+/* ── 展示当前跨页 ── */
+function show(cb){
+  if(rendering){ return; }
+  rendering=true;
+  document.getElementById('book').classList.toggle('single', !spread);
+  $('leafR').style.display = spread?'':'none';
+  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  if(left<1) left=0;
+  var right= left+1;
+  var done=0, need=spread?2:1;
+  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
+  if(spread){
+    $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
+    $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
+    renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
+    renderInto(right, $('cR'), $('tR'), fin, $('sR'));
+  }else{
+    $('nL').textContent = cur-CFG.offset+1>0?(cur-CFG.offset+1):'';
+    renderInto(cur, $('cL'), $('tL'), fin, $('sL'));
+  }
+}
+
+function sync(){
+  var printed = Math.max(1, cur-CFG.offset+1);
+  $('pi').value = printed;
+  $('pt').textContent = Math.max(1,total-CFG.offset+1);
+  var r = (cur-1)/Math.max(1,total-1);
+  $('fill').style.width=(r*100)+'%';
+  $('knob').style.left=(r*100)+'%';
+  try{ localStorage.setItem(CFG.key, String(cur)); }catch(e){}
+  Array.prototype.forEach.call($('thumbs').children, function(c){
+    c.classList.toggle('cur', +c.dataset.p===cur);
+  });
+}
+
+/* ── 翻页（带动画） ── */
+function step(dir){
+  var n = spread?2:1;
+  var t = cur + dir*n;
+  if(t<1) t=1; if(t>total) t=total;
+  if(t===cur) return;
+  animate(dir, function(){ cur=t; show(); });
+}
+function animate(dir, after){
+  var src = dir>0 ? $('leafR') : $('leafL');
+  if(!spread || !src || src.style.display==='none'){ after(); return; }
+  var fl=document.createElement('div');
+  fl.className='flip'+(dir>0?'':' back');
+  var w=src.offsetWidth, h=src.offsetHeight;
+  fl.style.width=w+'px'; fl.style.height=h+'px';
+  fl.style.left = dir>0 ? (w+'px') : '0px';
+  var live = src.classList.contains('vec') ? src.querySelector('.svg svg') : src.querySelector('canvas');
+  if(live){
+    var cl = live.cloneNode(true);
+    cl.style.width='100%'; cl.style.height='100%'; cl.style.display='block';
+    fl.appendChild(cl);
+  }
+  $('book').appendChild(fl);
+  requestAnimationFrame(function(){ fl.classList.add('go'); });
+  setTimeout(function(){ fl.remove(); after(); }, 620);
+}
+function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+
+/* ── 目录 ── */
+/* 目录兜底：TOC 为空时从 PDF 书签生成（新迁入的书多半没有手工目录） */
+function outlineToc(d){
+  return d.getOutline().then(function(ol){
+    var out=[]; if(!ol||!ol.length) return out;
+    function walk(items,l){
+      return items.reduce(function(p,it){
+        return p.then(function(){
+          var ds=it.dest;
+          return (typeof ds==='string'? d.getDestination(ds) : Promise.resolve(ds))
+            .then(function(x){ return x ? d.getPageIndex(x[0]) : null; })
+            .then(function(ix){
+              if(ix!=null){ var g=ix+1, pr=g-CFG.offset+1; out.push({t:it.title, p:pr>0?String(pr):'', g:g, l:l===1?1:2}); }
+              if(it.items && it.items.length && l<2) return walk(it.items,l+1);
+            }).catch(function(){});
+        });
+      }, Promise.resolve());
+    }
+    return walk(ol,1).then(function(){ return out; });
+  }).catch(function(){ return []; });
+}
+function buildToc(){
+  var box=$('dlist'); box.innerHTML='';
+  TOC.forEach(function(e){
+    var a=document.createElement('a');
+    a.className = e.l===1?'l1':'l2';
+    a.href='#'; a.innerHTML='<span>'+e.t.replace(/</g,'&lt;')+'</span><span class="n">'+e.p+'</span>';
+    a.onclick=function(ev){ ev.preventDefault(); go(e.g ? e.g : (+e.p)+CFG.offset-1); closeDrawer(); };
+    box.appendChild(a);
+  });
+}
+function closeDrawer(){ $('drawer').classList.remove('open'); }
+
+/* ── 全书检索 ── */
+function search(q){
+  if(!q){ $('dHead').textContent='目　录'; buildToc(); return; }
+  var box=$('dlist'); box.innerHTML=''; $('dHead').textContent='检索：'+q;
+  var found=0, scanned=0;
+  msg('正在检索全书…');
+  function scan(i){
+    if(i>total || found>=120){ hideMsg(); if(!found){ box.innerHTML='<div class="hit">没有找到。</div>'; } return; }
+    var pr = textCache[i] ? Promise.resolve(textCache[i])
+      : doc.getPage(i).then(function(p){ return p.getTextContent(); })
+          .then(function(tc){ var s=tc.items.map(function(x){return x.str;}).join(''); textCache[i]=s; return s; });
+    pr.then(function(s){
+      var k=s.indexOf(q);
+      if(k>=0){
+        found++;
+        var d=document.createElement('div'); d.className='hit';
+        var a=Math.max(0,k-16), b=Math.min(s.length,k+q.length+22);
+        d.innerHTML='<b>'+(i-CFG.offset+1)+'</b>　'+s.slice(a,k).replace(/</g,'&lt;')+
+          '<b>'+q.replace(/</g,'&lt;')+'</b>'+s.slice(k+q.length,b).replace(/</g,'&lt;');
+        d.onclick=function(){ go(i); closeDrawer(); };
+        box.appendChild(d);
+      }
+      scanned++;
+      if(scanned%12===0){ $('msgT').textContent='正在检索全书…  '+Math.round(i/total*100)+'%'; }
+      scan(i+1);
+    }).catch(function(){ scan(i+1); });
+  }
+  scan(1);
+}
+
+/* ── 缩略图 ── */
+var thumbsBuilt=false;
+function buildThumbs(){
+  if(thumbsBuilt) return; thumbsBuilt=true;
+  var wrap=$('thumbs');
+  var i=1;
+  function one(){
+    if(i>total) return;
+    var p=i;
+    doc.getPage(p).then(function(pg){
+      var vp=pg.getViewport({scale:1});
+      var s=150/vp.height, v=pg.getViewport({scale:s});
+      var c=document.createElement('canvas');
+      c.width=v.width; c.height=v.height; c.dataset.p=p;
+      c.onclick=function(){ go(p); };
+      wrap.appendChild(c);
+      return pg.render({canvasContext:c.getContext('2d'), viewport:v}).promise;
+    }).then(function(){ i++; setTimeout(one, 0); }).catch(function(){ i++; setTimeout(one,0); });
+  }
+  one();
+}
+
+/* ── 事件 ── */
+$('btnPrev').onclick=function(){ step(-1); };
+$('btnNext').onclick=function(){ step(1); };
+$('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
+$('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
+$('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);
+  this.textContent=vector?'矢量':'位图'; hint(vector?'矢量源渲染':'高清位图'); show(); };
+$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'%'); };
+$('btnZoomOut').onclick=function(){ zoom=Math.max(.5, zoom/1.15); show(); hint('缩小 '+Math.round(zoom*100)+'%'); };
+$('btnThumbs').onclick=function(){ $('thumbs').classList.toggle('open'); if($('thumbs').classList.contains('open')) buildThumbs(); };
+$('btnTheme').onclick=function(){ ti=(ti+1)%3; document.documentElement.className=themes[ti];
+  this.textContent=['夜','日','纸'][ti]; show(); };
+$('btnFull').onclick=function(){ if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); };
+$('q').onkeydown=function(e){ if(e.key==='Enter'){ search(this.value.trim()); } };
+$('rail').onclick=function(e){ var r=this.getBoundingClientRect();
+  go(Math.round((e.clientX-r.left)/r.width*(total-1))+1); };
+
+document.addEventListener('keydown',function(e){
+  if(/input|textarea|select/i.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){ step(-1); e.preventDefault(); }
+  else if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ step(1); e.preventDefault(); }
+  else if(e.key==='Home'){ go(1); } else if(e.key==='End'){ go(total); }
+  else if(e.key==='t'||e.key==='T'){ $('btnToc').click(); }
+  else if(e.key==='d'||e.key==='D'){ $('btnSpread').click(); }
+  else if(e.key==='v'||e.key==='V'){ $('btnVec').click(); }
+  else if(e.key==='n'||e.key==='N'){ $('btnTheme').click(); }
+  else if(e.key==='f'||e.key==='F'){ $('btnFull').click(); }
+});
+var sx=0, sy=0;
+$('stage').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+$('stage').addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.4){ step(dx<0?1:-1); }
+},{passive:true});
+var rt=null;
+window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ show(); },160); });
+
+/* ── 启动 ── */
+function boot(){
+  if(!window.pdfjsLib){ setTimeout(boot,120); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  $('btnVec').classList.add('on');
+  msg('正在载入《政治学学派解构入门》…');
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise.then(function(d){
+    doc=d; total=d.numPages;
+    buildToc();
+    if(!TOC.length){ outlineToc(d).then(function(t){ if(t.length){ TOC=t; buildToc(); } }); }
+    var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
+    cur = (saved>0&&saved<=total) ? saved : 1;
+    if(window.innerWidth<820) spread=false, $('btnSpread').textContent='单页';
+    show(function(){ if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
+  }).catch(function(err){
+    msg('书页载入失败。可直接打开原文 PDF：'+CFG.pdf, false);
+  });
+}
+boot();
+})();
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20261012b" defer></script>
+<a id="unit-reader-link" href="/books/m/360/agent/learning.html" style="position:fixed;right:14px;bottom:68px;z-index:30;background:#d6b663;color:#141611;padding:8px 13px;border-radius:8px;text-decoration:none;font:14px/1.7 sans-serif">学习包 · 带问读</a></body>
+</html>
