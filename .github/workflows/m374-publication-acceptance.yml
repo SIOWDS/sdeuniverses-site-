@@ -1,0 +1,56 @@
+name: M374 chemistry publication acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/books/m/374/**'
+      - '.publish/m374/**'
+      - '.github/workflows/m374-publication-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: m374-publication-acceptance
+  cancel-in-progress: false
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/374/
+            /public/books/index.html
+            /public/assets/lib/
+            /public/taste/wds-companion/wds-read.js
+            /public/wds-mode.js
+            /.publish/m374/
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check tasks, source fingerprints, links and JavaScript
+        run: python3 .publish/m374/check_static.py
+      - name: Install browser test dependencies
+        run: |
+          npm install --prefix /tmp/m374-tools --no-save playwright@1.56.1
+          /tmp/m374-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Check the publication unit locally
+        env:
+          NODE_PATH: /tmp/m374-tools/node_modules
+          QA_OUT: m374-qa-results
+        run: |
+          python3 -m http.server 8765 --directory public > /tmp/m374-server.log 2>&1 &
+          node .publish/m374/qa.cjs
+      - name: Preserve verification results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m374-publication-acceptance-${{ github.run_id }}
+          path: |
+            m374-qa-results/
+            .publish/m374/static-report.json
+          if-no-files-found: warn
+          retention-days: 14
