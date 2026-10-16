@@ -21,25 +21,34 @@ jobs:
           base='https://sdeuniverses.com'
           endpoints={
             '/books/m/30/':('三位一体出版','归跑','978-1-970820-47-8'),
-            '/books/m/30/read.html':('八十四','read.html'),
+            '/books/m/30/read.html':('八十四','上一章'),
             '/books/m/30/text/':('第一章','第八十四章','方法论补充校核来源'),
             '/books/m/30/agent/learning.html':('八十四章','unit/learning.json'),
             '/books/m/30/unit/learning.json':('"taskCount": 84','"agentName": "归跑"'),
             '/books/m/30/agent/':('归跑','BOOK_AGENT'),
-            '/books/m/30/publication-unit.json':('"unitId": "m-30"','"learningTasks": 84')
+            '/books/m/30/publication-unit.json':('"unitId": "m-30"','"learningTasks": 84'),
+            '/books/m/30/running-health-v11-online-reader.pdf':(),
+            '/books/':('m-30','归跑'),
+            '/monographs/':('m-30','归跑'),
+            '/sites/read/library/':('m-30','归跑')
           }
           out=[]
           success=False
-          for attempt in range(42):
+          for attempt in range(14):
               row={"attempt":attempt+1,"result":{}}
               for path, markers in endpoints.items():
                   url=base+path+'?m030v='+str(int(time.time()))+str(attempt)
                   req=urllib.request.Request(url,headers={'User-Agent':'SDE-M030-Publication-Acceptance/1.0','Cache-Control':'no-cache','Pragma':'no-cache'})
                   try:
                       with urllib.request.urlopen(req,timeout=17) as response:
-                          body=response.read().decode('utf-8','replace')
-                          missing=[m for m in markers if m not in body]
-                          row['result'][path]={'status':response.status,'bytes':len(body.encode()),'ok':not missing,'missing':missing,'sha256':hashlib.sha256(body.encode()).hexdigest()}
+                          raw=response.read()
+                          sha=hashlib.sha256(raw).hexdigest()
+                          if path.endswith('.pdf'):
+                              missing=[] if raw.startswith(b'%PDF-') and len(raw)>4000000 and sha=='cbda76cb9e2c5580ed3147838817867a1f39bf949d8489654612a31becb49d3c' else ['PDF header/length/digest']
+                          else:
+                              body=raw.decode('utf-8','replace')
+                              missing=[m for m in markers if m not in body]
+                          row['result'][path]={'status':response.status,'bytes':len(raw),'ok':not missing,'missing':missing,'sha256':sha}
                   except Exception as e:
                       row['result'][path]={'ok':False,'error':str(e)[:200]}
               out.append(row)
