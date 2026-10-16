@@ -24,6 +24,8 @@ jobs:
           sparse-checkout: |
             /public/books/m/374/
             /public/books/index.html
+            /public/books/catalog.json
+            /public/monographs/index.html
             /public/assets/lib/
             /public/taste/wds-companion/wds-read.js
             /public/wds-mode.js
@@ -44,6 +46,10 @@ jobs:
         run: |
           python3 -m http.server 8765 --directory public > /tmp/m374-server.log 2>&1 &
           node .publish/m374/qa.cjs
+      - name: Verify the published release
+        env:
+          QA_OUT: m374-qa-results
+        run: python3 .publish/m374/verify_live.py
       - name: Preserve verification results
         if: always()
         uses: actions/upload-artifact@v4
