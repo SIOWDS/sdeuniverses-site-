@@ -1,0 +1,48 @@
+name: M375 earth publication acceptance
+on:
+  push:
+    branches: [main, m375-publication-20261016]
+    paths:
+      - 'public/books/m/375/**'
+      - '.publish/m375/**'
+      - '.github/workflows/m375-publication-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: m375-publication-acceptance
+  cancel-in-progress: false
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            public/books/m/375
+            public/assets/lib
+            .publish/m375
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependencies
+        run: |
+          npm install --prefix /tmp/m375-tools --no-save playwright@1.56.1
+          /tmp/m375-tools/node_modules/.bin/playwright install --with-deps chromium
+      - name: Check the publication unit locally
+        env:
+          NODE_PATH: /tmp/m375-tools/node_modules
+          QA_OUT: m375-qa-results
+        run: |
+          python3 -m http.server 8765 --directory public > /tmp/m375-server.log 2>&1 &
+          node .publish/m375/qa.cjs
+      - name: Preserve verification results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m375-publication-acceptance-${{ github.run_id }}
+          path: m375-qa-results/
+          if-no-files-found: warn
+          retention-days: 14
