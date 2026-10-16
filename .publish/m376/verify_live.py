@@ -6,15 +6,18 @@ def fetch(p):
 for attempt in range(31):
  try:
   u=json.loads(fetch('/books/m/376/publication-unit.json'))
-  if u.get('revision')==rev:break
+  if u.get('revision')==rev and u.get('coverRevision')=='20261016-physics-cover-v12':break
  except Exception:pass
  if attempt==30:raise RuntimeError('Published revision not available after wait window')
  time.sleep(20)
 checks=[]
+cover=fetch('/books/m/376/cover-physics-v12.png')
+assert hashlib.sha256(cover).hexdigest()=='1b5c303618c13d28db1f3f436ecb4c73b2ba5a27e8b53930fcd2ea12d79e60f1'
+
 for p in ['/books/m/376/','/books/m/376/read.html','/books/m/376/text/','/books/m/376/chapters.html','/books/m/376/agent/learning.html','/books/m/376/agent/dialogue.html']:
  b=fetch(p);assert '物理学思想简史'.encode() in b,p;checks.append(p)
 for p in ['/books/','/monographs/']:
- b=fetch(p).decode();assert 'data-id="m-376"' in b and '/books/m/376/agent/learning.html' in b and '/books/m/376/agent/dialogue.html' in b;checks.append(p)
+ b=fetch(p).decode();assert 'data-id="m-376"' in b and '/books/m/376/agent/learning.html' in b and '/books/m/376/agent/dialogue.html' in b;assert '/books/m/376/cover-physics-v12.png' in b;checks.append(p)
 l=json.loads(fetch('/books/m/376/unit/learning.json'));assert len(l['tasks'])==60
 for t in l['tasks']:
  s=json.loads(fetch(t['sourceData']));assert hashlib.sha256(s['text'].encode()).hexdigest()==s['sha256']==t['sourceSha256']
