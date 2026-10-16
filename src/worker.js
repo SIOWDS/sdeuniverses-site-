@@ -7604,6 +7604,14 @@ const SDE_METHOD_BLOCK = "\n\n【深度档 · 必须真走的工序（不要复�
 /* 精简版：标准档每一轮都进。只留「使命 ＋ 起手三选一 ＋ 三原理三条 ＋ 结算」四样——
    这四样是「用工具做出创新」的最小可执行集，其余（三界、三模态、意义三律、逐路径排除）留给深度档。
    ⚠ 别把它写长：标准档的 system 已经很满，而这一块是每轮都要付的固定成本。 */
+// ChatSDE 有 SDE 模式的全部难度档共享的最低方法论义务：至少真用一法，不强迫三法并列或堆术语。
+const SDE_METHOD_MIN_ONE = "\n\n【ChatSDE 难度条·三法至少实用一项（每轮有 SDE 回答的强制交付要求）】"
+  + "\n每轮回答之前，必须从【三方程／六路径／三原理】里选出至少一个与本题最相关的方面，并据此真正形成这一次的判断。不是列举名称，不是只在结尾加一句术语；不得因问题简单、标准档、低难度而跳过。"
+  + "\n· 选三方程：具体说清这个现象的 S 显露、D 差异序列、E 特征纠缠至少一组彼此如何规定（S=F(D,E)、D=G(S,E)、E=H(S,D)），避免把某一项当孤立原因。"
+  + "\n· 选六路径：明确从 S／D／E 的哪一端起手、经过怎样的真实差异运行、哪一段关键转换发生，不能仅写一个排列符号代替机制。"
+  + "\n· 选三原理：明确哪一组张力（D×E、S×E、S×D）推动第三维改变，并追问这次改变怎样回写；只说‘矛盾产生变化’不算运行。"
+  + "\n正文必须至少交付一条本题特有、可检查的【具体条件→差异／张力机制→结果／回写】判断；写给非 SDE 读者可以只使用目标学科的自然语言，不强迫暴露三方程等名词。若读者正研究 SDE 本身，则可以明示所用的一法。"
+  + "\n这是一条最低要求，不是上限：必要时三法联动；没有事实依据时标注为假说并给反证条件。绝不因套用方法而编造事实。";
 const SDE_METHOD_LITE = SDE_METHOD_MISSION
   + SDE_METHOD_STOCK
   + "\n\n【三件工具 · 起手三选一，开局后按需调另两件】"
@@ -10608,6 +10616,7 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
        「两三段以内」答完就收手——而页面上与做全了长得一模一样。 */
     + wdsToolSys(tool, prof, rung)
     + ((rs && rs.forge) ? wdsForgeSys(rs) : wdsResearchSys(rs))
+    + (prof ? "" : SDE_METHOD_MIN_ONE)  // SDE ChatSDE 必走至少一法；无 SDE／盲评／对撞在 WDS_CHAT_SYS 入口已独立返回
     /* 刀②③ 远域结构 + 预注册卡：只在 _plain 时非空（调用方装配）。 */
     + (extras || "")
     + (prof ? prof.guard : "")
@@ -14347,6 +14356,7 @@ export default {
               model: VC.model, top: VC.top ? 1 : 0,
               think: canSee ? "看图档" : (duelPlain ? "关（结算席）" : gPlain ? "关" : ((G.on ? gK.plain : false) ? "关不掉（这家常开）" : (VC.top ? ((VC.effort || "max") === "max" ? "满功率" : "高") : "随基底默认"))),
               method: mFull ? "完整工序" : "精简工序", tok: tokGrade, ng: !!(G.on && gK.ng && !prof),
+              sdeRule: !!(!noSde && !prof && !duel && tool !== "iq" && !fcRun && !qgKind && !resIsJudge(rs)),
               mem: memPick ? { lv: memPick.lv, n: memPick.n, has: memPick.has } : null,   // 这一答带了哪几层记忆、共多少字
             } }));
             // 可点清单：把这一轮所有能引的篇目与真网址列成一份，附在站内资料末尾。

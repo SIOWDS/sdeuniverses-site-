@@ -1012,8 +1012,8 @@
       mtHide: "收起工具", mtShow: "工具", mtHideT: "把档位条收起来，把屏幕让给答案",
       topShowT: "把顶栏叫回来（往上翻一下也会回来）",
       mtShowT: "展开档位条（现在开着的）",
-      tipStd: "快答档，不烧思考、8000 预算全归正文", tipDeep: "难度条：按这一问在站内检索到的核心词材料多少与准确度自动定档——1 轻 2 常 3 深 4 满 5 极；1–2 档不烧思考（预算全归正文），思考从第 3 档起；落到核心律（如幸福律）且材料厚才到 4–5：顶配基底＋满功率思考＋完整工序，5 档再装完整内功。再点一次「深度思考」展开 1–5，可钉死一档。", tipWeb: " · 已开联网（需智谱 Key）",
-      gLab: "难度", gAuto: "自动", gPinShort: "钉", gNames: ["轻", "常", "深", "满", "极"],
+      tipStd: "快答档，不烧思考、8000 预算全归正文；有 SDE 模式每答必须实际运用三方程／六路径／三原理至少一项", tipDeep: "难度条：按这一问在站内检索到的核心词材料多少与准确度自动定档——1 轻 2 常 3 深 4 满 5 极；1–2 档不烧思考（预算全归正文），思考从第 3 档起；落到核心律（如幸福律）且材料厚才到 4–5：顶配基底＋满功率思考＋完整工序，有 SDE 模式各档均尝试装完整内功，且每答必须实际运用三方程／六路径／三原理至少一项，不能只报名称。再点一次「深度思考」展开 1–5，可钉死一档。", tipWeb: " · 已开联网（需智谱 Key）",
+      gLab: "难度", gRuleShort: "三法≥1", gRuleLong: "有 SDE 模式每答必须真实运用三方程、六路径、三原理至少一项；只说名称不合格。", gLineRule: "方法规则：三法至少实用一项", gAuto: "自动", gPinShort: "钉", gNames: ["轻", "常", "深", "满", "极"],
       gAutoT: "自动：按站内检索定档（这一问材料越厚、越准、越落在核心概念上，档越高）",
       gPinT: "钉死第 {n} 档（{name}）——不再按检索定档",
       gNow: "上一答 {n}·{name}", gPinNow: "钉 {n}·{name}",
@@ -1342,9 +1342,9 @@
       mtHide: "Hide tools", mtShow: "Tools", mtHideT: "Collapse the mode bar and give the screen to the answer",
       topShowT: "Bring the top bar back (scrolling up does it too)",
       mtShowT: "Show the mode bar (currently on)",
-      tipStd: "Fast tier \u2014 no reasoning pass; the whole 8000-token budget goes to the answer",
-      tipDeep: "Difficulty bar: the level is set automatically from how much accurate site material the retrieval finds on your question's core terms — 1 light … 5 max. Levels 1–2 spend nothing on reasoning (the whole budget goes to the answer); reasoning starts at level 3. Only a question that lands on a core law with thick material reaches 4–5: top model, full reasoning, full method stages; level 5 also loads the complete SDE groundwork. Click Deep again to unfold 1–5 and pin a level.",
-      gLab: "Level", gAuto: "Auto", gPinShort: "pin", gNames: ["light", "normal", "deep", "full", "max"],
+      tipStd: "Fast tier \u2014 no reasoning pass; the whole 8000-token budget goes to the answer. SDE-mode answers must actually apply at least one of the three equations, six paths or three principles",
+      tipDeep: "Difficulty bar: the level is set automatically from how much accurate site material the retrieval finds on your question's core terms — 1 light … 5 max. Levels 1–2 spend nothing on reasoning (the whole budget goes to the answer); reasoning starts at level 3. Only a question that lands on a core law with thick material reaches 4–5: top model, full reasoning, full method stages; SDE-mode answers at every level attempt to load the full groundwork and must apply at least one of the three equations, six paths or three principles, not merely name it. Click Deep again to unfold 1–5 and pin a level.",
+      gLab: "Level", gRuleShort: "method≥1", gRuleLong: "Every SDE-mode answer must actually apply at least one of the three equations, six paths or three principles. Naming a tool alone does not count.", gLineRule: "method rule: apply at least one", gAuto: "Auto", gPinShort: "pin", gNames: ["light", "normal", "deep", "full", "max"],
       gAutoT: "Auto: set from site retrieval (thicker, more accurate material on a core concept ⇒ higher level)",
       gPinT: "Pin level {n} ({name}) — retrieval no longer decides",
       gNow: "last {n}·{name}", gPinNow: "pin {n}·{name}",
@@ -2556,6 +2556,7 @@
     ".wdsm-grade button.lit{background:var(--wfill2);color:var(--wgold2)}" +
     ".wdsm-grade button.on{background:var(--wgold);border-color:var(--wgold);color:var(--won-tx);font-weight:600}" +
     ".wdsm-grade em{font-style:normal;font-size:11px;color:var(--wgold);margin-left:4px;white-space:nowrap}" +
+    ".wdsm-grade .wdsm-gmin{font-size:10px;color:var(--wteal);margin-left:4px;white-space:nowrap}" +
     ".wdsm-gline{color:#8B7B5E;font-size:12px;line-height:1.6;margin:-6px 0 10px}" +
     ".wdsm-gline b{font-weight:600;color:var(--wgold)}" +
     ".wdsm-gline i{font-style:normal;color:var(--wteal)}" +
@@ -2789,7 +2790,7 @@
           "<button class='wdsm-mode' data-k='deep'></button>" +
           "<span class='wdsm-grade' style='display:none'><i></i>" +
             "<button data-g='0'></button><button data-g='1'>1</button><button data-g='2'>2</button><button data-g='3'>3</button><button data-g='4'>4</button><button data-g='5'>5</button>" +
-            "<em></em></span>" +
+            "<em></em><span class='wdsm-gmin'></span></span>" +
           "<button class='wdsm-mode' data-k='web'></button>" +
           "<button class='wdsm-mode' data-k='nosentry'></button>" +
           "<button class='wdsm-mode' data-k='nosde'></button>" +
@@ -3721,7 +3722,9 @@
   function paintGrade() {
     if (!gradeEl) return;
     /* 钮上露当前档：折叠钮上的摘要（toolsSum）读的就是这段文字，所以收起档位条时也看得见「深度思考·5」。 */
-    if (deepBtn) deepBtn.textContent = t("mDeep") + (thinkMode === "deep" ? gradeSuffix() : "");
+    if (deepBtn) deepBtn.textContent = t("mDeep") + (thinkMode === "deep" ? gradeSuffix() + ((!noSdeOn && !PROFILE) ? (" · " + t("gRuleShort")) : "") : "");
+    var ruleEl = gradeEl.querySelector(".wdsm-gmin");
+    if (ruleEl) { ruleEl.textContent = t("gRuleShort"); ruleEl.title = t("gRuleLong"); ruleEl.style.display = (!noSdeOn && !PROFILE) ? "" : "none"; }
     if (thinkMode !== "deep" || !gradeOpen) { gradeEl.style.display = "none"; return; }
     gradeEl.style.display = "";
     var lab = gradeEl.querySelector("i"); if (lab) lab.textContent = t("gLab");
@@ -3779,6 +3782,7 @@
     if (v.hits) parts.push(gFmt("gLineHits", { docs: v.docs || 0, a: v.ahits || 0, h: v.hits || 0 }) + (v.chits ? ("·" + gFmt("gLineCore", { c: v.chits })) : "") + (v.exact ? ("·" + t("gLineExact")) : ""));
     else if (v.deep) parts.push(t("gLineNone"));
     if (v.on) parts.push((v.model || "") + (v.think ? (" · " + gFmt("gLineThink", { think: v.think })) : "") + (v.method ? (" · " + v.method) : "") + (v.ng ? (" " + t("gLineNg")) : ""));
+    if (v.sdeRule) parts.push(t("gLineRule"));
     /* 这一答带了哪几层记忆、共多少字，摆在难度读数同一行——
        读者看得见它读了什么，才谈得上信它；看不见的记忆是最难被信任的那一种。 */
     if (v.mem) parts.push(v.mem.n ? gFmt("gLineMem", { has: v.mem.has, n: v.mem.n }) : t("gLineMemNo"));
