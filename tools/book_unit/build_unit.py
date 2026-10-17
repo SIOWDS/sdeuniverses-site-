@@ -23,6 +23,10 @@ CN = '零一二三四五六七八九十'
 def cn(n):
     if n <= 10: return CN[n]
     if n < 20: return '十' + CN[n-10]
+    if n >= 100:
+        h, r = divmod(n, 100)
+        if r == 0: return CN[h] + '百'
+        return CN[h] + '百' + ('零' + cn(r) if r < 10 else (cn(r) if r >= 20 else '一' + cn(r)))
     t, o = divmod(n, 10)
     return CN[t] + '十' + (CN[o] if o else '')
 
