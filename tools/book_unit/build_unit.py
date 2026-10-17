@@ -103,6 +103,7 @@ def main():
     core = sub1(core, "BOOK='m-398'", "BOOK='m-%d'" % N)
     core = sub1(core, "sde-publication-m398-v1", "sde-publication-m%d-v1" % N)
     core = sub1(core, "e.lesson>40", "e.lesson>%d" % nch)
+    core = sub1(core, "d.lesson>40", "d.lesson>%d" % nch)
     core = sub1(core, "Book 398", "Book %d" % N)
     core = sub1(core, "M398Core", "BookUnitCore", 0)
     w('unit/core.js', core)
