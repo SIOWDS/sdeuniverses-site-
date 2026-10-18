@@ -94,6 +94,18 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .notes{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
 .notes .n{font-size:13px;color:var(--ink2);line-height:1.85;margin-bottom:8px;display:flex;gap:9px}
 .notes .n::before{content:"·";color:var(--gold);font-weight:700}
+.edit-bar{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:18px;background:rgba(255,255,255,0.02)}
+.edit-bar .eh{font-size:14px;color:var(--gold2);font-weight:700;margin-bottom:6px}
+.edit-bar .et{font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:10px}
+.edit-bar .er{display:flex;gap:8px}
+.edit-bar input{flex:1;min-width:0;background:rgba(0,0,0,0.28);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-family:inherit;font-size:15px;padding:9px 12px;letter-spacing:0.12em;text-transform:uppercase}
+.edit-bar input:focus{outline:none;border-color:rgba(201,168,76,0.65)}
+.edit-bar button,.btn2{flex:none;background:transparent;border:1px solid var(--gold);color:var(--gold);border-radius:10px;font-family:inherit;font-size:14px;padding:9px 16px;cursor:pointer}
+.edit-bar .es{font-size:13px;margin-top:8px;min-height:1em}
+.edit-bar .es.ok{color:var(--ok)}.edit-bar .es.err{color:var(--err)}
+.mode{display:none;border:1px solid rgba(127,183,126,0.5);background:rgba(127,183,126,0.07);color:#BFE0BE;border-radius:10px;padding:10px 14px;font-size:13.5px;line-height:1.8;margin-bottom:18px}
+.mode.show{display:block}
+.codebox{margin:18px auto 8px;display:inline-block;border:1px dashed var(--gold);border-radius:12px;padding:12px 26px;font-size:26px;letter-spacing:0.18em;color:#F5E6BF;font-weight:800;font-family:Georgia,monospace}
 .done{display:none;text-align:center;padding:30px 10px}
 .done.show{display:block}
 .done h4{font-size:22px;color:#F5EFE0;margin-bottom:12px}
@@ -102,6 +114,37 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .contact .q{font-size:20px;color:#F5EFE0;font-weight:800;letter-spacing:0.06em;margin-bottom:12px}
 .contact p{font-size:14.5px;color:var(--ink2);line-height:2}
 .contact b{color:var(--gold2)}
+/* 审核确认稿（屏幕上是浮层，打印时只印它） */
+.rv{display:none;position:fixed;inset:0;z-index:50;background:rgba(8,6,4,0.97);overflow:auto;padding:24px 12px 40px}
+.rv.show{display:block}
+.rv-bar{max-width:794px;margin:0 auto 12px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.rv-bar button{font-family:inherit;font-size:14.5px;border-radius:10px;padding:10px 18px;cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold)}
+.rv-bar button.main{background:var(--gold);color:#1A1410;font-weight:700}
+.rv-tip{max-width:794px;margin:0 auto 12px;text-align:center;font-size:13px;color:var(--ink2)}
+.sheet{max-width:794px;margin:0 auto;background:#FFFDF8;color:#1E1A14;border-radius:6px;padding:46px 54px;font-family:"Noto Serif SC","Songti SC",serif;line-height:1.85;font-size:14px}
+.sheet .sh-top{text-align:center;border-bottom:2px solid #8A6A1E;padding-bottom:14px;margin-bottom:20px}
+.sheet .sh-top .k{font-size:11px;letter-spacing:0.36em;color:#8A6A1E}
+.sheet .sh-top h1{font-size:22px;margin:6px 0 4px;letter-spacing:0.08em}
+.sheet .sh-top .m{font-size:12.5px;color:#6A5F4A}
+.sheet .sh-code{display:inline-block;margin-top:8px;border:1px dashed #8A6A1E;border-radius:6px;padding:3px 12px;font-weight:700;letter-spacing:0.14em;color:#5A4410}
+.sheet h2{font-size:14.5px;color:#8A6A1E;margin:20px 0 8px;padding-bottom:4px;border-bottom:1px solid #E2D6B8;letter-spacing:0.06em}
+.sheet h2.key{color:#7A3E1E}
+.sheet .it{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:5px 0;border-bottom:1px dotted #EAE0C8;page-break-inside:avoid}
+.sheet .it .q{color:#6A5F4A;font-size:13px}
+.sheet .it .a{white-space:pre-wrap;word-break:break-word}
+.sheet .it .a.empty{color:#B3A88E;font-style:italic}
+.sheet .sign{margin-top:28px;display:flex;justify-content:space-between;font-size:13.5px;gap:20px}
+.sheet .sign span{flex:1;border-bottom:1px solid #1E1A14;padding-bottom:4px}
+.sheet .foot{margin-top:24px;text-align:center;font-size:11.5px;color:#8E846C}
+@media(max-width:600px){.sheet{padding:26px 18px}.sheet .it{grid-template-columns:1fr;gap:0}}
+@media print{
+  @page{size:A4;margin:14mm 14mm 16mm}
+  body{background:#fff!important}
+  body>*:not(.rv){display:none!important}
+  .rv{display:block!important;position:static;background:none;padding:0;overflow:visible}
+  .rv-bar,.rv-tip{display:none!important}
+  .sheet{max-width:none;padding:0;border-radius:0;font-size:12pt}
+}
 footer{border-top:1px solid var(--line);margin-top:40px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
 @media(max-width:600px){.two,.row2{grid-template-columns:1fr}.mean{grid-template-columns:1fr 1fr}.form{padding:24px 16px}.part.key{padding:16px 12px 4px}.step{padding-left:44px}.teacher{flex-direction:column}}
@@ -185,13 +228,20 @@ footer a{color:var(--gold);text-decoration:none}
     <p class="t">请尽量写具体。不用写得漂亮，但要写真话。你写得越清楚，老师为你打造的大纲就越准。<b>填写内容会自动保存在你自己的浏览器里</b>，中途关掉页面也不会丢。</p>
 
     <div class="form" id="formBox">
+      <div class="edit-bar">
+        <div class="eh">已经投过？凭修改码调出原问卷，改完再提交</div>
+        <div class="et">每份问卷提交成功后都会给你一个修改码（形如 ABCDE-FGH23）。输入修改码，原来填的内容会回到下面的表里，改完点"保存修改"即可，不用再输投稿密码。</div>
+        <div class="er"><input type="text" id="ecode" maxlength="16" placeholder="输入修改码" autocomplete="off"><button type="button" id="eload">调出问卷</button></div>
+        <div class="es" id="estatus"></div>
+      </div>
+      <div class="mode" id="mode"></div>
       <div class="part">
         <div class="ph">一、作者信息</div>
         <div class="row2">
           <div class="field"><label for="name"><span class="n">1</span>姓名<span class="req">*</span></label><input type="text" id="name" maxlength="40" autocomplete="name"></div>
           <div class="field"><label for="pen"><span class="n">2</span>专著署名用名<span class="opt">（与姓名不同时填）</span></label><input type="text" id="pen" maxlength="40"></div>
         </div>
-        <div class="field"><label for="job"><span class="n">3</span>职业 / 专业 / 所在单位</label><input type="text" id="job" maxlength="120"></div>
+        <div class="field"><label for="job"><span class="n">3</span>职业 / 专业 / 所在单位</label><input type="text" id="job" autocomplete="off" maxlength="120"></div>
         <div class="field"><label for="contact"><span class="n">4</span>联系方式<span class="req">*</span></label><div class="hint">微信、电话、邮箱，至少留一个，老师会用它联系你。</div><input type="text" id="contact" maxlength="200" placeholder="微信号 / 电话 / 邮箱"></div>
         <div class="field"><label for="bio"><span class="n">5</span>作者简介<span class="opt">（约 200 字，将用于书中作者介绍）</span></label><textarea id="bio" maxlength="1200"></textarea></div>
       </div>
@@ -199,9 +249,9 @@ footer a{color:var(--gold);text-decoration:none}
       <div class="part">
         <div class="ph">二、你的问题与领域</div>
         <div class="field"><label for="problem"><span class="n">6</span>你最想通过这本书解决的问题是什么？<span class="req">*</span></label><div class="hint">请用一两句话说清楚。</div><textarea id="problem" maxlength="2000"></textarea></div>
-        <div class="field"><label for="domain"><span class="n">7</span>这个问题属于什么领域？</label><input type="text" id="domain" maxlength="120" placeholder="如教育、心理、管理、法律、医学、语言、哲学、经济……"></div>
+        <div class="field"><label for="domain"><span class="n">7</span>这个问题属于什么领域？</label><input type="text" id="domain" autocomplete="off" maxlength="120" placeholder="如教育、心理、管理、法律、医学、语言、哲学、经济……"></div>
         <div class="field"><label for="why"><span class="n">8</span>你为什么适合写这本书？</label><div class="hint">你在这个问题上有哪些经验、积累或亲身经历？</div><textarea id="why" maxlength="2000"></textarea></div>
-        <div class="field"><label for="title"><span class="n">9</span>你心中的专著方向或暂定书名<span class="opt">（可不填）</span></label><input type="text" id="title" maxlength="120"></div>
+        <div class="field"><label for="title"><span class="n">9</span>你心中的专著方向或暂定书名<span class="opt">（可不填）</span></label><input type="text" id="title" autocomplete="off" maxlength="120"></div>
       </div>
 
       <div class="part">
@@ -215,7 +265,7 @@ footer a{color:var(--gold);text-decoration:none}
             <label><input type="checkbox" value="讲义笔记案例">课程讲义、工作笔记、案例积累</label>
             <label><input type="checkbox" value="只有问题">暂时没有材料，只有问题</label>
           </div>
-          <input type="text" id="book" class="inline-other" maxlength="160" placeholder="想解构的书：书名、作者" style="display:none">
+          <input type="text" id="book" autocomplete="off" class="inline-other" maxlength="160" placeholder="想解构的书：书名、作者" style="display:none">
         </div>
         <div class="field"><label for="matnote"><span class="n">11</span>请简要说明材料内容<span class="opt">（可附链接）</span></label><textarea id="matnote" maxlength="2000"></textarea></div>
         <div class="field">
@@ -242,7 +292,7 @@ footer a{color:var(--gold);text-decoration:none}
             <label><input type="checkbox" value="学生">学生</label>
             <label><input type="checkbox" value="研究者">研究者</label>
           </div>
-          <input type="text" id="readersOther" class="inline-other" maxlength="80" placeholder="其他读者（选填）">
+          <input type="text" id="readersOther" autocomplete="off" class="inline-other" maxlength="80" placeholder="其他读者（选填）">
         </div>
         <div class="field">
           <div class="lb"><span class="n">17</span>写作风格</div>
@@ -266,8 +316,8 @@ footer a{color:var(--gold);text-decoration:none}
       <div class="part">
         <div class="ph">六、写作条件</div>
         <div class="row2">
-          <div class="field"><label for="hours"><span class="n">19</span>每周能投入写作的时间</label><input type="text" id="hours" maxlength="40" placeholder="约几小时"></div>
-          <div class="field"><label for="deadline"><span class="n">21</span>希望完成的时间</label><input type="text" id="deadline" maxlength="60" placeholder="如 2027 年 3 月"></div>
+          <div class="field"><label for="hours"><span class="n">19</span>每周能投入写作的时间</label><input type="text" id="hours" autocomplete="off" maxlength="40" placeholder="约几小时"></div>
+          <div class="field"><label for="deadline"><span class="n">21</span>希望完成的时间</label><input type="text" id="deadline" autocomplete="off" maxlength="60" placeholder="如 2027 年 3 月"></div>
         </div>
         <div class="field">
           <div class="lb"><span class="n">20</span>使用大模型（Claude、ChatGPT、DeepSeek 等）的经验</div>
@@ -289,24 +339,29 @@ footer a{color:var(--gold);text-decoration:none}
         </div>
       </div>
 
-      <div class="part" style="margin-top:26px">
+      <div class="part" id="passPart" style="margin-top:26px">
         <div class="field"><label for="pass">投稿密码<span class="req">*</span></label><div class="hint">由王德生老师提供。还没有密码的，请先加微信 jimmywang20061107 索取。</div><input type="password" id="pass" maxlength="60" autocomplete="off"></div>
       </div>
       <div class="hp"><label for="website">Website</label><input type="text" id="website" tabindex="-1" autocomplete="off"></div>
-      <button class="submit-btn" id="go" type="button">提交问卷，投进专著意向投稿箱</button>
+      <button class="submit-btn" id="go" type="button">审核问卷确认稿，然后提交</button>
       <div class="status" id="status"></div>
       <div class="draft" id="draft"></div>
 
       <div class="notes">
         <div class="n">带 * 的为必填项；第四部分"专著的意义"写得越具体，大纲越准。</div>
         <div class="n">问卷与附件只存进私有投稿箱，由王德生老师本人过目，不公开、不外传。</div>
+        <div class="n">提交后会得到一个修改码，凭它随时回来修改问卷；改过的内容会覆盖原稿。</div>
         <div class="n">老师审看后会用你留的联系方式与你联系，商定后续安排。</div>
       </div>
     </div>
 
     <div class="form done" id="doneBox">
-      <h4>问卷已投进专著意向投稿箱</h4>
-      <p>谢谢你把你的问题交给我们。<br>王德生老师审看后，会通过你留的联系方式与你联系。<br>你出意义，我们出方法。书，是你自己的。</p>
+      <h4 id="doneTitle">问卷已投进专著意向投稿箱</h4>
+      <div id="codeWrap"><p>这是你的<b style="color:#F5E6BF">修改码</b>，请截图或抄下来保存：</p>
+      <div class="codebox" id="codeShow"></div>
+      <p style="font-size:13.5px">以后想补充、修改问卷，回到本页，在问卷顶部输入修改码即可。<br>本机浏览器也已记住它。<button type="button" class="btn2" id="copyCode" style="margin-left:6px;padding:4px 12px;font-size:13px">复制修改码</button></p></div>
+      <p id="doneText" style="margin-top:14px">谢谢你把你的问题交给我们。<br>王德生老师审看后，会通过你留的联系方式与你联系。<br>你出意义，我们出方法。书，是你自己的。</p>
+      <p style="margin-top:16px"><button type="button" class="btn2" id="donePrint">保存 PDF 确认稿</button>　<button type="button" class="btn2" id="againEdit">再修改一次</button></p>
     </div>
   </section>
 
@@ -316,15 +371,29 @@ footer a{color:var(--gold);text-decoration:none}
   </section>
 </div>
 
+<div class="rv" id="rv" aria-hidden="true">
+  <div class="rv-bar">
+    <button type="button" id="rvBack">← 返回修改</button>
+    <button type="button" id="rvPrint">打印 / 保存为 PDF</button>
+    <button type="button" class="main" id="rvSend">确认无误，提交</button>
+  </div>
+  <div class="rv-tip" id="rvTip">请逐项审核下面的确认稿。要留底，点"打印 / 保存为 PDF"，在打印窗口里选择"另存为 PDF"即可。</div>
+  <div class="sheet" id="sheet"></div>
+</div>
+
 <footer>© 德麦国际 Demai International · <a href="/browse/">爱思乐园 sdeuniverses.com</a> · <a href="/monographs/">专著栏目</a></footer>
 
 <script>
 (function(){
-  var KEY='sde_cocreate_draft_v1';
+  var KEY='sde_cocreate_draft_v1', CKEY='sde_cocreate_code_v1';
   var TEXT=['name','pen','job','contact','bio','problem','domain','why','title','book','matnote','creation','freedom','happiness','solve','readersOther','hours','deadline'];
   var CHECKS=['materials','readers','confirms'];
   var RADIOS=['style','length','llm'];
+  var editCode='', lastCode='', lastAttach=null, sentAt='', revision=0;
   function $(id){return document.getElementById(id);}
+  function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+  function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
   function checked(id){return Array.prototype.slice.call($(id).querySelectorAll('input:checked')).map(function(i){return i.value;});}
   function collect(){
     var q={};
@@ -333,23 +402,88 @@ footer a{color:var(--gold);text-decoration:none}
     RADIOS.forEach(function(k){var c=document.querySelector('input[name="'+k+'"]:checked');q[k]=c?c.value:'';});
     return q;
   }
-  function toggleBook(){$('book').style.display=checked('materials').indexOf('想解构的书')>=0?'block':'none';}
-  // 草稿：只存在本人浏览器里；取不到存储就静默跳过
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(collect()));$('draft').textContent='草稿已自动保存在本机';}catch(e){}}
-  function restore(){
-    var d=null;try{d=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){}
-    if(!d)return;
-    TEXT.forEach(function(k){if(typeof d[k]==='string')$(k).value=d[k];});
+  function fill(d){
+    TEXT.forEach(function(k){$(k).value=typeof d[k]==='string'?d[k]:'';});
     CHECKS.forEach(function(k){var v=d[k]||[];$(k).querySelectorAll('input').forEach(function(i){i.checked=v.indexOf(i.value)>=0;});});
-    RADIOS.forEach(function(k){if(!d[k])return;document.querySelectorAll('input[name="'+k+'"]').forEach(function(i){i.checked=i.value===d[k];});});
-    $('draft').textContent='已恢复上次未提交的草稿';
+    RADIOS.forEach(function(k){document.querySelectorAll('input[name="'+k+'"]').forEach(function(i){i.checked=i.value===d[k];});});
+    toggleBook();
   }
+  function toggleBook(){$('book').style.display=checked('materials').indexOf('想解构的书')>=0?'block':'none';}
+  function save(){if(editCode)return;lsSet(KEY,JSON.stringify(collect()));$('draft').textContent='草稿已自动保存在本机';}
+  (function restore(){
+    var d=null;try{d=JSON.parse(lsGet(KEY)||'null');}catch(e){}
+    if(d){fill(d);$('draft').textContent='已恢复上次未提交的草稿';}
+    var c=lsGet(CKEY);if(c)$('ecode').value=c;
+  })();
   var t=null;
-  $('formBox').addEventListener('input',function(e){if(e.target.id==='pass'||e.target.type==='file')return;toggleBook();clearTimeout(t);t=setTimeout(save,600);});
-  $('formBox').addEventListener('change',function(e){if(e.target.id==='pass'||e.target.type==='file')return;toggleBook();save();});
-  restore();toggleBook();
+  $('formBox').addEventListener('input',function(e){if(e.target.id==='pass'||e.target.id==='ecode'||e.target.type==='file')return;toggleBook();clearTimeout(t);t=setTimeout(save,600);});
+  $('formBox').addEventListener('change',function(e){if(e.target.id==='pass'||e.target.id==='ecode'||e.target.type==='file')return;toggleBook();save();});
+  toggleBook();
 
   function status(kind,msg){var s=$('status');s.className='status show '+kind;s.textContent=msg;}
+  function goLabel(){return editCode?'审核修改后的确认稿，然后保存':'审核问卷确认稿，然后提交';}
+
+  // —— 修改模式：凭码调出原问卷 ——
+  function enterEdit(code,data){
+    editCode=code;revision=data.revision||1;lastAttach=data.attachment||null;sentAt=data.submitted_at||'';
+    fill(data.answers||{});
+    $('passPart').style.display='none';
+    var m=$('mode');m.className='mode show';
+    m.textContent='正在修改已投问卷（修改码 '+code+'，当前第 '+revision+' 版）。'+(lastAttach?'已有附件：'+lastAttach.original_name+'；如再上传新附件，将替换为新附件，旧附件保留在投稿箱里。':'')+' 改完点下方按钮保存。';
+    $('go').textContent=goLabel();
+    $('draft').textContent='';
+  }
+  $('eload').addEventListener('click',function(){
+    var code=$('ecode').value.trim().toUpperCase();
+    var es=$('estatus');
+    if(code.replace(/[^A-Z0-9]/g,'').length<8){es.className='es err';es.textContent='请输入完整的修改码。';return;}
+    es.className='es';es.textContent='正在调出…';
+    fetch('/api/cocreate/load',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:code})})
+      .then(function(r){return r.json();}).then(function(j){
+        if(j&&j.ok){enterEdit(code,j);lsSet(CKEY,code);es.className='es ok';es.textContent='已调出原问卷，请在下面修改。';$('formBox').classList.remove('done');}
+        else{es.className='es err';es.textContent=(j&&j.msg)||'没能调出问卷。';}
+      }).catch(function(){es.className='es err';es.textContent='网络出错，请稍后再试。';});
+  });
+
+  // —— 审核确认稿 ——
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function item(n,label,val){
+    var v=Array.isArray(val)?val.join('、'):(val||'');
+    return '<div class="it"><div class="q">'+n+'　'+esc(label)+'</div><div class="a'+(v?'':' empty')+'">'+(v?esc(v):'未填')+'</div></div>';
+  }
+  function fmtTime(s){if(!s)return '';var d=new Date(s);if(isNaN(d))return s;function p(x){return(x<10?'0':'')+x;}return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());}
+  function buildSheet(q,code,stateText){
+    var f=$('file').files[0];
+    var att=f?f.name+'（本次上传）':(lastAttach?lastAttach.original_name:'');
+    var readers=q.readers.slice();if(q.readersOther)readers.push(q.readersOther);
+    var mats=q.materials.slice();if(q.book)mats.push('想解构的书：'+q.book);
+    var CF={'流程':'了解打造流程','费用':'同意支付 100 元打造费','原创':'材料为原创或已获授权','署名':'单独署名，注明"王德生 指导"'};
+    var h='<div class="sh-top"><div class="k">SDE UNIVERSES · 专著共创</div><h1>《专著输入问卷表》确认稿</h1>'
+      +'<div class="m">王德生博士指导 · 德麦国际 Demai International　|　'+esc(stateText)+'</div>'
+      +(code?'<div class="sh-code">修改码　'+esc(code)+'</div>':'')+'</div>';
+    h+='<h2>一、作者信息</h2>'+item(1,'姓名',q.name)+item(2,'署名用名',q.pen||q.name)+item(3,'职业 / 专业 / 单位',q.job)+item(4,'联系方式',q.contact)+item(5,'作者简介',q.bio);
+    h+='<h2>二、问题与领域</h2>'+item(6,'最想解决的问题',q.problem)+item(7,'所属领域',q.domain)+item(8,'为什么适合写',q.why)+item(9,'专著方向 / 暂定书名',q.title);
+    h+='<h2>三、带来的材料</h2>'+item(10,'材料类型',mats)+item(11,'材料说明',q.matnote)+item('','附件',att);
+    h+='<h2 class="key">四、专著的意义</h2>'+item(12,'创造',q.creation)+item(13,'自由',q.freedom)+item(14,'幸福',q.happiness)+item(15,'问题解决',q.solve);
+    h+='<h2>五、读者与形态</h2>'+item(16,'目标读者',readers)+item(17,'写作风格',q.style)+item(18,'预期篇幅',q.length);
+    h+='<h2>六、写作条件</h2>'+item(19,'每周投入时间',q.hours)+item(20,'大模型使用经验',q.llm)+item(21,'希望完成时间',q.deadline);
+    h+='<h2>七、确认事项</h2>'+item('','已确认',q.confirms.map(function(c){return '☑ '+(CF[c]||c);}).join('\n'));
+    h+='<div class="sign"><span>作者签名：</span><span>日期：</span></div>';
+    h+='<div class="foot">打造流程：老师打造大纲 → 学员借助大模型写出初稿 → 自己打磨三次 → 师生往返修改三次 → 老师终稿、配书号、上站出版<br>sdeuniverses.com/cocreate/ · 你出意义，我们出方法。书，是你自己的。</div>';
+    $('sheet').innerHTML=h;
+  }
+  function openReview(mode){
+    $('rvSend').style.display=mode==='after'?'none':'';
+    $('rvBack').textContent=mode==='after'?'← 关闭':'← 返回修改';
+    $('rvTip').textContent=mode==='after'?'这是你已提交问卷的确认稿。点"打印 / 保存为 PDF"，在打印窗口里选择"另存为 PDF"即可留底。':'请逐项审核下面的确认稿。要留底，点"打印 / 保存为 PDF"，在打印窗口里选择"另存为 PDF"即可。';
+    $('rvSend').textContent=editCode?'确认无误，保存修改':'确认无误，提交';
+    $('rv').classList.add('show');$('rv').setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';$('rv').scrollTop=0;
+  }
+  function closeReview(){$('rv').classList.remove('show');$('rv').setAttribute('aria-hidden','true');document.body.style.overflow='';}
+  $('rvBack').addEventListener('click',closeReview);
+  $('rvPrint').addEventListener('click',function(){window.print();});
+
   $('go').addEventListener('click',function(){
     var q=collect();
     if(!q.name)return status('err','请填写第 1 项：姓名。');
@@ -357,28 +491,60 @@ footer a{color:var(--gold);text-decoration:none}
     if(!q.problem)return status('err','请填写第 6 项：你最想解决的问题。');
     if(!q.creation)return status('err','请填写第 12 项：这本书要创造什么。');
     if(q.confirms.length<4)return status('err','请勾选第七部分的全部四项确认。');
-    var pass=$('pass').value.trim();
-    if(!pass)return status('err','请输入投稿密码。');
+    if(!editCode&&!$('pass').value.trim())return status('err','请输入投稿密码。');
     var f=$('file').files[0];
     if(f&&f.size>20*1024*1024)return status('err','附件超过 20MB，请压缩或打成 ZIP 后再传。');
+    $('status').className='status';
+    buildSheet(q,editCode,editCode?'修改稿 · 待保存':'待提交');
+    openReview('before');
+  });
+
+  $('rvSend').addEventListener('click',function(){
+    var q=collect(), f=$('file').files[0];
     var fd=new FormData();
-    fd.append('pass',pass);fd.append('website',$('website').value);fd.append('q',JSON.stringify(q));
+    if(editCode)fd.append('code',editCode);else fd.append('pass',$('pass').value.trim());
+    fd.append('website',$('website').value);fd.append('q',JSON.stringify(q));
     if(f)fd.append('file',f);
-    var btn=$('go');btn.disabled=true;btn.textContent=f?'正在上传附件，请稍候…':'正在提交…';
-    status('ok','提交中…');
+    var b=$('rvSend');b.disabled=true;b.textContent=f?'正在上传附件，请稍候…':'正在提交…';
     fetch('/api/cocreate',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(j){
+      b.disabled=false;
       if(j&&j.ok){
-        try{localStorage.removeItem(KEY);}catch(e){}
+        var wasEdit=!!editCode;
+        lastCode=editCode||j.code||'';
+        if(lastCode)lsSet(CKEY,lastCode);
+        if(f)lastAttach={original_name:f.name};
+        lsDel(KEY);
+        revision=j.revision||1;
+        buildSheet(q,lastCode,(wasEdit?'已保存修改 · 第 '+revision+' 版':'已提交')+' · '+fmtTime(new Date().toISOString()));
+        closeReview();
         $('formBox').style.display='none';$('doneBox').classList.add('show');
+        $('doneTitle').textContent=wasEdit?'修改已保存（第 '+revision+' 版）':'问卷已投进专著意向投稿箱';
+        $('codeWrap').style.display=lastCode?'':'none';
+        $('codeShow').textContent=lastCode;
+        if(!lastCode&&j.note)$('doneText').textContent=j.note;
         $('form').scrollIntoView({behavior:'smooth'});
       }else{
+        closeReview();
         status('err',(j&&j.msg)||'提交失败，请稍后再试。');
-        btn.disabled=false;btn.textContent='提交问卷，投进专著意向投稿箱';
+        b.textContent=editCode?'确认无误，保存修改':'确认无误，提交';
       }
     }).catch(function(){
-      status('err','网络出错，提交没有成功。你填的内容已保存在本机，稍后再试即可。');
-      btn.disabled=false;btn.textContent='提交问卷，投进专著意向投稿箱';
+      b.disabled=false;b.textContent=editCode?'确认无误，保存修改':'确认无误，提交';
+      closeReview();
+      status('err','网络出错，提交没有成功。你填的内容还在，稍后再试即可。');
     });
+  });
+
+  $('donePrint').addEventListener('click',function(){openReview('after');});
+  $('copyCode').addEventListener('click',function(){
+    var c=lastCode;if(!c)return;
+    if(navigator.clipboard)navigator.clipboard.writeText(c).then(function(){$('copyCode').textContent='已复制';},function(){});
+  });
+  $('againEdit').addEventListener('click',function(){
+    $('doneBox').classList.remove('show');$('formBox').style.display='';
+    $('file').value='';
+    if(lastCode){$('ecode').value=lastCode;enterEdit(lastCode,{answers:collect(),attachment:lastAttach,revision:revision,submitted_at:sentAt});}
+    $('formBox').scrollIntoView({behavior:'smooth'});
   });
 })();
 </script>

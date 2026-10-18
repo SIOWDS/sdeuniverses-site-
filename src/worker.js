@@ -4921,22 +4921,79 @@ async function handleRegister(request, env) {
   return _subJson({ ok: true, msg: "已收到" }, CORS);
 }
 // ===== 专著共创 · 专著意向投稿箱（/cocreate/，2026-10-18 王德生令）=====
-// 学员填《专著输入问卷表》＋可选附件（论文、书稿、讲义）→ 校验共创投稿密码 → 存进私有收件仓 cocreate/ 下。
-// 与注册入口同理：不碰 Durable Object 存储（限流器取不到就放行）。密码只存不可逆哈希。
+// 学员填《专著输入问卷表》＋可选附件 → 校验共创投稿密码 → 存进私有收件仓 cocreate/ 下。
+// 已投可改（同日令）：首投回一个「修改码」，凭码调出原问卷、改完覆盖原稿（git 留历史）。
+// 修改码只存不可逆哈希：cocreate/_codes/<hash>.json → 指向原稿路径。丢了码，王德生可在仓里补发新码。
+// 与注册入口同理：不碰 Durable Object 存储（限流器取不到就放行）。
 const _COCREATE_HASH = "40d3440565b732bad1184a862c928aaa2163a4778a1a1e29937d938f109e5554";
-async function handleCocreate(request, env) {
-  const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
+const _CC_CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
+function _ccNormCode(s) { return String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16); }
+function _ccNewCode() {
+  const A = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // 去掉易混的 I L O 0 1
+  const r = crypto.getRandomValues(new Uint8Array(10));
+  let s = ""; for (let i = 0; i < 10; i++) s += A[r[i] % A.length];
+  return s.slice(0, 5) + "-" + s.slice(5);
+}
+async function _ccCodeHash(code) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-cocreate-edit-v1:" + _ccNormCode(code)));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+function _ccGh(token) {
+  const H = { "authorization": "Bearer " + token, "accept": "application/vnd.github+json", "content-type": "application/json", "user-agent": "sde-cocreate-worker", "x-github-api-version": "2022-11-28" };
+  const url = (path) => "https://api.github.com/repos/" + _SUBMIT_REPO + "/contents/" + path;
+  return {
+    put: (path, b64, message, sha) => fetch(url(path), { method: "PUT", headers: H, body: JSON.stringify(sha ? { message, content: b64, sha } : { message, content: b64 }) }),
+    getJson: async (path) => {
+      const r = await fetch(url(path) + "?ref=main", { headers: H });
+      if (!r.ok) return { status: r.status };
+      const j = await r.json();
+      const bin = atob(String(j.content || "").replace(/\s/g, ""));
+      const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      return { status: 200, sha: j.sha, data: JSON.parse(new TextDecoder().decode(u8)) };
+    },
+  };
+}
+async function _ccLimit(env, ip, tag) {
+  try {
+    const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName(tag + ":" + ip));
+    const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json());
+    return lr.ok;
+  } catch (e) { return true; }
+}
+// 凭修改码取回原稿：先查码索引，再取原稿
+async function _ccLookup(gh, code) {
+  const idx = await gh.getJson("cocreate/_codes/" + (await _ccCodeHash(code)) + ".json");
+  if (idx.status !== 200 || !idx.data || !idx.data.path) return null;
+  const rec = await gh.getJson(idx.data.path);
+  if (rec.status !== 200) return null;
+  return { path: idx.data.path, sha: rec.sha, rec: rec.data };
+}
+async function handleCocreateLoad(request, env) {
+  const CORS = _CC_CORS;
   if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
-  try {
-    const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("cocreate:" + ip));
-    const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json());
-    if (!lr.ok) return _subJson({ ok: false, msg: "提交太频繁，请过一会儿再试。" }, CORS);
-  } catch (e) {}
+  if (!(await _ccLimit(env, ip, "cocreate-load"))) return _subJson({ ok: false, msg: "尝试太频繁，请过一会儿再试。" }, CORS);
+  const b = await request.json().catch(() => ({}));
+  const code = _ccNormCode(b.code);
+  if (code.length < 8) return _subJson({ ok: false, msg: "请输入完整的修改码。" }, CORS);
+  const token = env.GH_SUBMIT_TOKEN || "";
+  if (!token) return _subJson({ ok: false, msg: "投稿箱尚未配置完成。请联系管理员。" }, CORS);
+  const hit = await _ccLookup(_ccGh(token), code);
+  if (!hit) return _subJson({ ok: false, code: "badcode", msg: "没有找到这个修改码对应的问卷。请核对，或联系王德生老师补发。" }, CORS);
+  const r = hit.rec || {};
+  return _subJson({ ok: true, answers: r.answers || {}, attachment: r.attachment ? { original_name: r.attachment.original_name, size: r.attachment.size } : null, submitted_at: r.submitted_at, updated_at: r.updated_at || "", revision: r.revision || 1 }, CORS);
+}
+async function handleCocreate(request, env) {
+  const CORS = _CC_CORS;
+  if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
+  const ip = request.headers.get("cf-connecting-ip") || "unknown";
+  if (!(await _ccLimit(env, ip, "cocreate"))) return _subJson({ ok: false, msg: "提交太频繁，请过一会儿再试。" }, CORS);
   let form;
   try { form = await request.formData(); } catch (e) { return _subJson({ ok: false, msg: "表单解析失败。" }, CORS); }
   if (String(form.get("website") || "")) return _subJson({ ok: true, msg: "已收到" }, CORS); // 蜜罐
-  if ((await _subHash(String(form.get("pass") || ""))) !== _COCREATE_HASH) return _subJson({ ok: false, code: "badpass", msg: "投稿密码不正确。" }, CORS);
+  const editCode = _ccNormCode(form.get("code"));
+  const isEdit = editCode.length >= 8;
+  if (!isEdit && (await _subHash(String(form.get("pass") || ""))) !== _COCREATE_HASH) return _subJson({ ok: false, code: "badpass", msg: "投稿密码不正确。" }, CORS);
   let q;
   try { q = JSON.parse(String(form.get("q") || "")); } catch (e) { q = null; }
   if (!q || typeof q !== "object" || Array.isArray(q)) return _subJson({ ok: false, msg: "问卷内容解析失败。" }, CORS);
@@ -4952,19 +5009,24 @@ async function handleCocreate(request, env) {
   if (!String(clean.problem || "").trim()) return _subJson({ ok: false, msg: "请写下你最想通过这本书解决的问题。" }, CORS);
   const token = env.GH_SUBMIT_TOKEN || "";
   if (!token) return _subJson({ ok: false, msg: "投稿箱尚未配置完成（缺少仓库令牌）。请联系管理员。" }, CORS);
-  const ts = new Date().toISOString().replace(/[:.]/g, "-").replace("Z", "");
-  const rand = crypto.randomUUID().slice(0, 8);
-  const safe = String(clean.name).replace(/[^\w.\-]+/g, "_").replace(/_+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40) || "author";
-  const base = "cocreate/" + ts + "__" + rand + "__" + safe;
-  const ghPut = async (path, contentB64, message) => fetch("https://api.github.com/repos/" + _SUBMIT_REPO + "/contents/" + path, {
-    method: "PUT",
-    headers: { "authorization": "Bearer " + token, "accept": "application/vnd.github+json", "content-type": "application/json", "user-agent": "sde-cocreate-worker", "x-github-api-version": "2022-11-28" },
-    body: JSON.stringify({ message, content: contentB64 }),
-  });
+  const gh = _ccGh(token);
   const ghFail = (r) => (r.status === 401 || r.status === 403)
     ? _subJson({ ok: false, msg: "投稿箱配置有误（仓库令牌无效或无权限）。请联系管理员。" }, CORS)
-    : _subJson({ ok: false, msg: "存档失败（GitHub " + r.status + "）。" }, CORS);
-  let attachment = null;
+    : (r.status === 409 ? _subJson({ ok: false, msg: "刚好有另一份修改同时保存，请刷新后再改一次。" }, CORS)
+    : _subJson({ ok: false, msg: "存档失败（GitHub " + r.status + "）。" }, CORS));
+  const safe = String(clean.name).replace(/[^\w.\-]+/g, "_").replace(/_+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40) || "author";
+  let hit = null, base, prev = null;
+  if (isEdit) {
+    hit = await _ccLookup(gh, editCode);
+    if (!hit) return _subJson({ ok: false, code: "badcode", msg: "修改码无效，没能找到原问卷。" }, CORS);
+    prev = hit.rec || {};
+    base = hit.path.replace(/\.json$/, "");
+  } else {
+    const ts = new Date().toISOString().replace(/[:.]/g, "-").replace("Z", "");
+    base = "cocreate/" + ts + "__" + crypto.randomUUID().slice(0, 8) + "__" + safe;
+  }
+  let attachment = prev ? (prev.attachment || null) : null;
+  const previous = prev && Array.isArray(prev.previous_attachments) ? prev.previous_attachments.slice(0, 20) : [];
   const file = form.get("file");
   if (file && typeof file !== "string" && (file.size || 0) > 0) {
     const rawName = String(file.name || "attachment");
@@ -4973,15 +5035,26 @@ async function handleCocreate(request, env) {
     if (!okExt.includes(ext)) return _subJson({ ok: false, msg: "附件格式不支持。请上传 PDF、Word、TXT 或 ZIP。" }, CORS);
     if (file.size > 20 * 1024 * 1024) return _subJson({ ok: false, msg: "附件超过 20MB 上限。多个文件请打成一个 ZIP，或压缩后再传。" }, CORS);
     const u8 = new Uint8Array(await file.arrayBuffer());
-    const path = base + "__attachment." + ext;
-    const r = await ghPut(path, _bytesToB64(u8), "cocreate attachment: " + safe);
+    const rev = prev ? (Number(prev.revision || 1) + 1) : 1;
+    const path = base + "__attachment" + (rev > 1 ? "_r" + rev : "") + "." + ext;
+    const r = await gh.put(path, _bytesToB64(u8), "cocreate attachment: " + safe);
     if (!r.ok) return ghFail(r);
+    if (attachment) previous.push(attachment);
     attachment = { original_name: rawName, size: file.size, path };
   }
-  const rec = { kind: "monograph-cocreate", answers: clean, attachment, submitted_at: new Date().toISOString(), ip };
-  const r2 = await ghPut(base + ".json", _bytesToB64(new TextEncoder().encode(JSON.stringify(rec, null, 2))), "cocreate: " + safe);
+  const now = new Date().toISOString();
+  let code = "";
+  const rec = isEdit
+    ? { ...prev, answers: clean, attachment, previous_attachments: previous, updated_at: now, revision: Number(prev.revision || 1) + 1, last_ip: ip }
+    : { kind: "monograph-cocreate", answers: clean, attachment, previous_attachments: [], submitted_at: now, revision: 1, ip };
+  if (!isEdit) { code = _ccNewCode(); rec.edit_hash = await _ccCodeHash(code); }
+  const r2 = await gh.put(base + ".json", _bytesToB64(new TextEncoder().encode(JSON.stringify(rec, null, 2))), (isEdit ? "cocreate edit r" + rec.revision + ": " : "cocreate: ") + safe, isEdit ? hit.sha : undefined);
   if (!r2.ok) return ghFail(r2);
-  return _subJson({ ok: true, msg: "已收到" }, CORS);
+  if (!isEdit) {
+    const r3 = await gh.put("cocreate/_codes/" + rec.edit_hash + ".json", _bytesToB64(new TextEncoder().encode(JSON.stringify({ path: base + ".json" }))), "cocreate code: " + safe);
+    if (!r3.ok) return _subJson({ ok: true, msg: "已收到", code: "", note: "问卷已收到，但修改码没能生成。需要修改时请联系王德生老师。" }, CORS);
+  }
+  return _subJson({ ok: true, msg: isEdit ? "已更新" : "已收到", code, revision: rec.revision }, CORS);
 }
 async function handleSubmit(request, env) {
   const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
@@ -18758,6 +18831,9 @@ export default {
     }
     if (url.pathname === "/api/cocreate" && (request.method === "POST" || request.method === "OPTIONS")) {
       return handleCocreate(request, env);
+    }
+    if (url.pathname === "/api/cocreate/load" && (request.method === "POST" || request.method === "OPTIONS")) {
+      return handleCocreateLoad(request, env);
     }
     // ===== 学员投稿收件箱 =====
     if (url.pathname === "/api/submit" && (request.method === "POST" || request.method === "OPTIONS")) {
