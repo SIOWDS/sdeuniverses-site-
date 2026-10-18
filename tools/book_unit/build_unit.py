@@ -206,7 +206,8 @@ def main():
         from reportlab.platypus import Paragraph
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.colors import HexColor
-        pdfmetrics.registerFont(UnicodeCIDFont('STSong-Light'))
+        from reportlab.pdfbase.ttfonts import TTFont
+        pdfmetrics.registerFont(TTFont('STSong-Light', '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc', subfontIndex=0))
         c = canvas.Canvas(a.out_pdf, pagesize=(538.58, 708.66)); c.setTitle(C['title'] + ' · 学习包'); c.setAuthor('、'.join(C['authors']) + '（原书）；配套学习设计')
         style = ParagraphStyle('Body', fontName='STSong-Light', fontSize=11.5, leading=20, textColor=HexColor('#263039'), wordWrap='CJK', spaceAfter=8)
         def para(s, x, y, wd=450, size=11.5):
