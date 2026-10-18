@@ -28,7 +28,7 @@ SLUG = 'guanlixue-xuepai-jiegou-rumen'
 META = dict(
     title='管理学学派解构入门', name='管理学学派解构入门',
     subtitle='最先当家的，总是最先被量成数的那一角价值', author='胡敏', mentor='王德生', no=356,
-    isbn='979-8-90690-517-8', price='US$20.00', version='20261018b',
+    isbn='979-8-90690-517-8', price='US$20.00', version='20261018c',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
@@ -112,8 +112,12 @@ def table_html(rows, cls='tb'):
     cells = [[c.strip() for c in r.strip().strip('|').split('|')] for r in rows]
     cells = [r for r in cells if not all(re.fullmatch(r':?-{2,}:?', c) for c in r)]
     head, body = cells[0], cells[1:]
+    if len(head) >= 5 and len(body) <= 4 and any(len(re.sub(r'[*\s]', '', c)) > 14 for r in body for c in r):
+        return cards_html(head, body)
     if len(head) >= 5:
         cls += ' w5'
+    if body and len(head) >= 4 and all(len(re.sub(r'[*\s]', '', r[-1])) <= 10 for r in body if r):
+        cls += ' nl'
     for ci in (0, 1):
         if body and all(len(re.sub(r'[*\s]', '', r[ci])) <= 12 for r in body if len(r) > ci):
             cls += ' n%d' % (ci + 1)
@@ -126,6 +130,19 @@ def table_html(rows, cls='tb'):
         h.append('<tr>' + ''.join('<td>%s</td>' % inline(c) for c in r) + '</tr>')
     h.append('</tbody></table></div>')
     return ''.join(h)
+
+
+def cards_html(head, body):
+    """宽表（出生证页等）改成卡片：首栏作卡名，其余栏一行一栏、栏名在左。"""
+    out = []
+    for r in body:
+        r = r + [''] * (len(head) - len(r))
+        name = re.sub(r'^\*\*(.*)\*\*$', r'\1', r[0].strip())
+        label0 = re.sub(r'^\*\*(.*)\*\*$', r'\1', head[0].strip())
+        rows = ''.join('<div class="bcr"><div class="bck">%s</div><div class="bcv">%s</div></div>'
+                       % (re.sub(r'^\*\*(.*)\*\*$', r'\1', h.strip()), inline(c)) for h, c in zip(head[1:], r[1:]) if c.strip())
+        out.append('<div class="bcard"><div class="bch"><span>%s</span>%s</div>%s</div>' % (label0, inline(name), rows))
+    return '<div class="bcards">%s</div>' % ''.join(out)
 
 
 def quote_html(lines):
@@ -405,22 +422,32 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 /*Q*/.qbox{{background:#F7F3E8;border-left:1.6pt solid #58A9B5;padding:2.2mm 4mm;margin:2mm 0 4mm;break-inside:avoid}}
 .qbox .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.3em;margin-bottom:1mm}}
 .qbox p{{text-indent:0;margin:0;font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
-.chapter.t1 p,.chapter.t1 li{{line-height:{lh-0.05:.3f}}}
-.chapter.t2 p,.chapter.t2 li{{line-height:{lh-0.10:.3f}}}
-.chapter.t2 h3.sec{{margin-top:4.5mm}}
-.chapter.t3 p,.chapter.t3 li{{line-height:{lh-0.15:.3f};margin-bottom:.3em}}
-.chapter.t3 h3.sec{{margin-top:4mm}}
-.chapter.t4 p,.chapter.t4 li{{line-height:{lh-0.2:.3f};margin-bottom:.25em}}
-.chapter.t4 h3.sec{{margin-top:3.5mm}}
+section.t1 p,section.t1 li{{line-height:{lh-0.05:.3f}}}
+section.t2 p,section.t2 li{{line-height:{lh-0.10:.3f}}}
+section.t2 h3.sec{{margin-top:4.5mm}}
+section.t3 p,section.t3 li{{line-height:{lh-0.15:.3f};margin-bottom:.3em}}
+section.t3 h3.sec{{margin-top:4mm}}
+section.t4 p,section.t4 li{{line-height:{lh-0.2:.3f};margin-bottom:.25em}}
+section.t4 h3.sec{{margin-top:3.5mm}}
 blockquote.verdict{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;margin:4mm 0;padding:2.6mm 4mm;break-inside:avoid}}
 blockquote.verdict p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F}}
 .tw{{margin:3.5mm 0}}
+.bcards{{margin:3mm 0}}
+.bcard{{border:.6pt solid #D8CDB0;border-left:2.2pt solid #B08A3C;background:#FDFBF4;margin:0 0 3mm;padding:0 0 1mm;break-inside:avoid}}
+.bch{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.86:.2f}pt/1.5 'Noto Sans CJK SC';padding:1.2mm 2.4mm}}
+.bch span{{font:400 {body_pt*0.62:.2f}pt 'Noto Sans CJK SC';color:#D9B45C;letter-spacing:.2em;margin-right:2.2mm}}
+.bcr{{display:flex;padding:.9mm 2.4mm;border-bottom:.4pt solid #EEE6D2}}
+.bcr:last-child{{border-bottom:0}}
+.bck{{flex:none;width:17mm;font:700 {body_pt*0.68:.2f}pt/1.7 'Noto Sans CJK SC';color:#9A7A2E;letter-spacing:.06em}}
+.bcv{{flex:1;font-size:{body_pt*0.8:.2f}pt;line-height:1.65;color:#2A2824;text-indent:0}}
 table.tb{{width:100%;border-collapse:collapse;font-size:{body_pt*0.8:.2f}pt;line-height:1.6}}
 table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left}}
 table.tb tr{{break-inside:avoid}}
+table.tb th strong,table.tb th em{{color:inherit;font-weight:700}}
+table.tb th{{vertical-align:middle}}
+table.tb.nl th:last-child,table.tb.nl td:last-child{{white-space:nowrap}}
 table.tb.n1 th:nth-child(1),table.tb.n1 td:nth-child(1){{white-space:nowrap}}
 table.tb.n2 th:nth-child(2),table.tb.n2 td:nth-child(2){{white-space:nowrap}}
-table.tb.w5 th:nth-child(-n+2),table.tb.w5 td:nth-child(-n+2){{white-space:nowrap}}
 table.tb.w5 td{{font-size:{body_pt*0.74:.2f}pt;line-height:1.55}}
 table.tb.dense td{{padding-top:.7mm;padding-bottom:.7mm}}
 table.tb td{{border-bottom:.5pt solid #E4DCCB;padding:1.3mm 1.6mm;vertical-align:top}}
@@ -508,7 +535,7 @@ TIGHT = {}
 
 def sec_html(kind, sid, title, lvl, body):
     cls = {'part': 'part', 'chapter': 'chapter'}.get(kind, 'front-sec' if kind in ('front', 'main', 'cp') else 'back-sec')
-    if kind == 'chapter' and TIGHT.get(sid):
+    if kind in ('chapter', 'front', 'part') and TIGHT.get(sid):
         cls += ' ' + TIGHT[sid]
     return '<section class="%s" id="%s">%s</section>' % (cls, sid, body)
 
@@ -524,7 +551,7 @@ def tune_chapters(secs, css_args, fonts, label):
     TIGHT.clear()
     fixed = []
     for s in secs:
-        if s[0] != 'chapter':
+        if s[0] not in ('chapter', 'front', 'part'):
             continue
         key = hashlib.md5(sec_html(*s).encode()).hexdigest()
         if key in cache:
@@ -655,6 +682,11 @@ blockquote.verdict{border-left:3px solid var(--gold)}blockquote.verdict p{color:
 .emb{width:44px;height:44px;display:block;margin:0 auto 1rem}
 p.bib{text-indent:-2em;padding-left:2em;font-size:.9rem;line-height:1.8}p.bib .bn{color:var(--gold)}
 p.srcnote{text-indent:0;font-size:.84rem;color:var(--dim);font-family:sans-serif}
+.bcard{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--soft);margin:.8rem 0;border-radius:4px;overflow:hidden}
+.bch{background:var(--navy);color:#fff;padding:.4rem .9rem;font:700 .95rem sans-serif}.bch span{color:#D9B45C;font-size:.72rem;letter-spacing:.2em;margin-right:.8rem;font-weight:400}
+.bcr{display:flex;gap:.8rem;padding:.35rem .9rem;border-bottom:1px solid var(--line)}.bcr:last-child{border-bottom:0}
+.bck{flex:none;width:5.2rem;font:700 .78rem sans-serif;color:var(--gold)}.bcv{flex:1;font-size:.9rem;line-height:1.7}
+html.dark .bch{color:#121518}
 .fs-title.appx{font-size:1.4rem}
 table.cp th{background:none;color:var(--dim);font-weight:400;width:5rem}table.cp tr:nth-child(odd){background:var(--soft)}
 .cp-title{text-align:center;letter-spacing:.6em;color:var(--navy);font-weight:700;margin:2rem 0 1rem}
