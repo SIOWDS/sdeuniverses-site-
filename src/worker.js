@@ -4920,6 +4920,69 @@ async function handleRegister(request, env) {
   }
   return _subJson({ ok: true, msg: "已收到" }, CORS);
 }
+// ===== 专著共创 · 专著意向投稿箱（/cocreate/，2026-10-18 王德生令）=====
+// 学员填《专著输入问卷表》＋可选附件（论文、书稿、讲义）→ 校验共创投稿密码 → 存进私有收件仓 cocreate/ 下。
+// 与注册入口同理：不碰 Durable Object 存储（限流器取不到就放行）。密码只存不可逆哈希。
+const _COCREATE_HASH = "40d3440565b732bad1184a862c928aaa2163a4778a1a1e29937d938f109e5554";
+async function handleCocreate(request, env) {
+  const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
+  if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
+  const ip = request.headers.get("cf-connecting-ip") || "unknown";
+  try {
+    const lim = _do(env, "ASK_LIMITER").get(_do(env, "ASK_LIMITER").idFromName("cocreate:" + ip));
+    const lr = limitRead(await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json());
+    if (!lr.ok) return _subJson({ ok: false, msg: "提交太频繁，请过一会儿再试。" }, CORS);
+  } catch (e) {}
+  let form;
+  try { form = await request.formData(); } catch (e) { return _subJson({ ok: false, msg: "表单解析失败。" }, CORS); }
+  if (String(form.get("website") || "")) return _subJson({ ok: true, msg: "已收到" }, CORS); // 蜜罐
+  if ((await _subHash(String(form.get("pass") || ""))) !== _COCREATE_HASH) return _subJson({ ok: false, code: "badpass", msg: "投稿密码不正确。" }, CORS);
+  let q;
+  try { q = JSON.parse(String(form.get("q") || "")); } catch (e) { q = null; }
+  if (!q || typeof q !== "object" || Array.isArray(q)) return _subJson({ ok: false, msg: "问卷内容解析失败。" }, CORS);
+  const clean = {};
+  for (const k of Object.keys(q).slice(0, 60)) {
+    const v = q[k];
+    const key = String(k).replace(/[^\w]/g, "").slice(0, 40);
+    if (!key) continue;
+    clean[key] = Array.isArray(v) ? v.slice(0, 12).map((x) => String(x).slice(0, 200)) : String(v == null ? "" : v).slice(0, 4000);
+  }
+  if (!String(clean.name || "").trim()) return _subJson({ ok: false, msg: "请填写姓名。" }, CORS);
+  if (!String(clean.contact || "").trim()) return _subJson({ ok: false, msg: "请留一个能联系到你的方式。" }, CORS);
+  if (!String(clean.problem || "").trim()) return _subJson({ ok: false, msg: "请写下你最想通过这本书解决的问题。" }, CORS);
+  const token = env.GH_SUBMIT_TOKEN || "";
+  if (!token) return _subJson({ ok: false, msg: "投稿箱尚未配置完成（缺少仓库令牌）。请联系管理员。" }, CORS);
+  const ts = new Date().toISOString().replace(/[:.]/g, "-").replace("Z", "");
+  const rand = crypto.randomUUID().slice(0, 8);
+  const safe = String(clean.name).replace(/[^\w.\-]+/g, "_").replace(/_+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40) || "author";
+  const base = "cocreate/" + ts + "__" + rand + "__" + safe;
+  const ghPut = async (path, contentB64, message) => fetch("https://api.github.com/repos/" + _SUBMIT_REPO + "/contents/" + path, {
+    method: "PUT",
+    headers: { "authorization": "Bearer " + token, "accept": "application/vnd.github+json", "content-type": "application/json", "user-agent": "sde-cocreate-worker", "x-github-api-version": "2022-11-28" },
+    body: JSON.stringify({ message, content: contentB64 }),
+  });
+  const ghFail = (r) => (r.status === 401 || r.status === 403)
+    ? _subJson({ ok: false, msg: "投稿箱配置有误（仓库令牌无效或无权限）。请联系管理员。" }, CORS)
+    : _subJson({ ok: false, msg: "存档失败（GitHub " + r.status + "）。" }, CORS);
+  let attachment = null;
+  const file = form.get("file");
+  if (file && typeof file !== "string" && (file.size || 0) > 0) {
+    const rawName = String(file.name || "attachment");
+    const ext = (rawName.match(/\.([A-Za-z0-9]{1,6})$/) || [, ""])[1].toLowerCase();
+    const okExt = ["pdf", "doc", "docx", "zip", "txt", "md", "rtf", "odt", "wps"];
+    if (!okExt.includes(ext)) return _subJson({ ok: false, msg: "附件格式不支持。请上传 PDF、Word、TXT 或 ZIP。" }, CORS);
+    if (file.size > 20 * 1024 * 1024) return _subJson({ ok: false, msg: "附件超过 20MB 上限。多个文件请打成一个 ZIP，或压缩后再传。" }, CORS);
+    const u8 = new Uint8Array(await file.arrayBuffer());
+    const path = base + "__attachment." + ext;
+    const r = await ghPut(path, _bytesToB64(u8), "cocreate attachment: " + safe);
+    if (!r.ok) return ghFail(r);
+    attachment = { original_name: rawName, size: file.size, path };
+  }
+  const rec = { kind: "monograph-cocreate", answers: clean, attachment, submitted_at: new Date().toISOString(), ip };
+  const r2 = await ghPut(base + ".json", _bytesToB64(new TextEncoder().encode(JSON.stringify(rec, null, 2))), "cocreate: " + safe);
+  if (!r2.ok) return ghFail(r2);
+  return _subJson({ ok: true, msg: "已收到" }, CORS);
+}
 async function handleSubmit(request, env) {
   const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
   if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
@@ -18692,6 +18755,9 @@ export default {
 
     if (url.pathname === "/api/register" && (request.method === "POST" || request.method === "OPTIONS")) {
       return handleRegister(request, env);
+    }
+    if (url.pathname === "/api/cocreate" && (request.method === "POST" || request.method === "OPTIONS")) {
+      return handleCocreate(request, env);
     }
     // ===== 学员投稿收件箱 =====
     if (url.pathname === "/api/submit" && (request.method === "POST" || request.method === "OPTIONS")) {

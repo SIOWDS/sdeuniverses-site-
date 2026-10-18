@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>专著共创 · 在王德生博士指导下写一本你自己的专著 | SDE Universes</title>
+<meta name="description" content="专著共创：你出意义，我们出方法。学员带来问题、论文或想解构的书，王德生博士用 Claude 与 SDE 系列思想创新方法论打造专著大纲，学员写作、往返打磨，最后配国际书号、上站出版，学员单独署名、注明王德生指导。">
+<meta property="og:title" content="专著共创 · 写一本属于你自己的专著 | SDE Universes">
+<meta property="og:description" content="你出意义，我们出方法。书，是你自己的。">
+<style>
+:root{--gold:#C9A84C;--gold2:#E4CB7E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--ok:#7FB77E;--err:#D98B7A}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.35)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .w{max-width:780px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em;white-space:nowrap}
+.nav-right{display:flex;gap:18px}
+.hero{max-width:700px;margin:0 auto;padding:64px 24px 8px;text-align:center}
+.eyebrow{font-size:11px;letter-spacing:0.42em;color:var(--gold);margin-bottom:18px}
+.hero h1{font-size:clamp(28px,5.4vw,42px);font-weight:800;line-height:1.25;margin-bottom:14px;color:#F5EFE0;letter-spacing:0.04em}
+.hero .sub{font-size:15px;color:var(--gold2);letter-spacing:0.12em;margin-bottom:22px}
+.hero .lead{font-size:15.5px;color:var(--ink2);line-height:2;max-width:580px;margin:0 auto}
+.hero .lead b{color:#F5E6BF}
+.cta{display:inline-block;margin-top:28px;background:var(--gold);color:#1A1410;text-decoration:none;font-weight:700;letter-spacing:0.08em;padding:12px 30px;border-radius:24px;font-size:15px}
+.wrap{max-width:700px;margin:0 auto;padding:10px 24px 90px}
+.sec{margin-top:52px}
+.sec>h2{font-size:13px;letter-spacing:0.32em;color:var(--gold);font-weight:700;margin-bottom:6px}
+.sec>h3{font-size:22px;color:#F5EFE0;font-weight:800;margin-bottom:18px;letter-spacing:0.03em}
+.sec p.t{font-size:15px;color:var(--ink2);line-height:2;margin-bottom:12px}
+.sec p.t b{color:#F5E6BF}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.box{border:1px solid var(--line);border-radius:16px;padding:22px 22px;background:rgba(255,255,255,0.015)}
+.box h4{font-size:15px;color:var(--gold2);margin-bottom:8px;letter-spacing:0.06em}
+.box p{font-size:14px;color:var(--ink2);line-height:1.9}
+.mean{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.mean div{border:1px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center;background:rgba(201,168,76,0.04)}
+.mean b{display:block;color:var(--gold2);font-size:17px;letter-spacing:0.2em;margin-bottom:4px}
+.mean span{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.steps{counter-reset:s;margin-top:6px}
+.step{position:relative;padding:4px 0 22px 58px;border-left:1px solid var(--line);margin-left:18px}
+.step:last-child{border-left-color:transparent;padding-bottom:4px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;left:-18px;top:0;width:36px;height:36px;border-radius:50%;background:var(--panel2);border:1px solid var(--gold);color:var(--gold);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px}
+.step h4{font-size:16px;color:#F5EFE0;margin-bottom:4px}
+.step h4 small{font-size:12px;color:var(--gold);letter-spacing:0.12em;margin-left:8px;font-weight:400}
+.step p{font-size:14.5px;color:var(--ink2);line-height:1.9}
+.gets .g{display:flex;gap:12px;font-size:14.5px;color:var(--ink2);line-height:1.85;margin-bottom:10px}
+.gets .g::before{content:"—";color:var(--gold);flex:none}
+.gets .g b{color:#F5E6BF}
+.who{display:flex;flex-wrap:wrap;gap:8px}
+.who span{border:1px solid var(--line);border-radius:18px;padding:5px 14px;font-size:13.5px;color:var(--ink2)}
+.teacher{display:flex;gap:18px;align-items:flex-start}
+.teacher .av{flex:none;width:58px;height:58px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:22px;font-weight:800}
+.teacher p{font-size:14.5px;color:var(--ink2);line-height:1.95}
+.teacher p b{color:#F5E6BF}
+/* 问卷 */
+.form{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:32px 28px;margin-top:8px}
+.part{margin-bottom:34px}
+.part:last-of-type{margin-bottom:10px}
+.part>.ph{font-size:15px;color:var(--gold2);font-weight:800;letter-spacing:0.08em;padding-bottom:10px;margin-bottom:18px;border-bottom:1px dashed var(--line)}
+.part>.ph small{font-weight:400;color:var(--ink2);font-size:12.5px;letter-spacing:0.02em;margin-left:6px}
+.part.key{border:1px solid rgba(201,168,76,0.45);border-radius:14px;padding:20px 18px 6px;background:rgba(201,168,76,0.035)}
+.part.key>.ph{border-bottom-color:rgba(201,168,76,0.45)}
+.field{margin-bottom:20px}
+.field>label,.field>.lb{display:block;font-size:14.5px;color:#EDE3CB;margin-bottom:8px;line-height:1.7}
+.field>label .n,.field>.lb .n{color:var(--gold);font-weight:700;margin-right:6px}
+.field>label .req,.field>.lb .req{color:var(--err);margin-left:3px}
+.field>label .opt,.field>.lb .opt{color:var(--ink2);font-size:12px;margin-left:4px}
+.field .hint{font-size:12.5px;color:#8E856C;margin:-4px 0 8px;line-height:1.7}
+.field input[type=text],.field input[type=password],.field textarea{width:100%;background:rgba(0,0,0,0.28);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-family:inherit;font-size:15px;padding:11px 14px;line-height:1.7;transition:border-color .15s}
+.field input:focus,.field textarea:focus{outline:none;border-color:rgba(201,168,76,0.65)}
+.field textarea{resize:vertical;min-height:92px}
+.field input::placeholder,.field textarea::placeholder{color:#6E664F}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:20px;padding:6px 14px;font-size:14px;color:var(--ink2);cursor:pointer;transition:all .15s;user-select:none}
+.opts input{accent-color:var(--gold)}
+.opts label:has(input:checked){border-color:var(--gold);color:#F5E6BF;background:rgba(201,168,76,0.1)}
+.opts.col{flex-direction:column;align-items:stretch}
+.opts.col label{border-radius:10px}
+.inline-other{margin-top:8px}
+.file{border:1px dashed var(--line);border-radius:10px;padding:14px;font-size:14px;color:var(--ink2)}
+.file input{color:var(--ink2);font-family:inherit;font-size:13.5px;max-width:100%}
+.confirm label{align-items:flex-start;line-height:1.7}
+.confirm input{margin-top:5px;flex:none}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.submit-btn{width:100%;margin-top:8px;background:var(--gold);color:#1A1410;border:none;border-radius:10px;font-family:inherit;font-size:16px;font-weight:700;letter-spacing:0.08em;padding:15px;cursor:pointer;transition:filter .15s,opacity .15s}
+.submit-btn:hover{filter:brightness(1.06)}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed}
+.status{margin-top:16px;font-size:14.5px;line-height:1.8;display:none}
+.status.show{display:block}
+.status.ok{color:var(--ok)}
+.status.err{color:var(--err)}
+.draft{font-size:12.5px;color:#8E856C;text-align:right;margin-top:10px;min-height:1em}
+.notes{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
+.notes .n{font-size:13px;color:var(--ink2);line-height:1.85;margin-bottom:8px;display:flex;gap:9px}
+.notes .n::before{content:"·";color:var(--gold);font-weight:700}
+.done{display:none;text-align:center;padding:30px 10px}
+.done.show{display:block}
+.done h4{font-size:22px;color:#F5EFE0;margin-bottom:12px}
+.done p{font-size:15px;color:var(--ink2);line-height:2}
+.contact{margin-top:52px;text-align:center;border:1px solid var(--line);border-radius:18px;padding:28px 20px}
+.contact .q{font-size:20px;color:#F5EFE0;font-weight:800;letter-spacing:0.06em;margin-bottom:12px}
+.contact p{font-size:14.5px;color:var(--ink2);line-height:2}
+.contact b{color:var(--gold2)}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:600px){.two,.row2{grid-template-columns:1fr}.mean{grid-template-columns:1fr 1fr}.form{padding:24px 16px}.part.key{padding:16px 12px 4px}.step{padding-left:44px}.teacher{flex-direction:column}}
+</style></head>
+<body>
+<nav><div class="w">
+  <a href="/browse/">SDE Universes</a>
+  <div class="nav-right">
+    <a href="/monographs/">专著栏目</a>
+    <a href="#form">填写问卷 ↓</a>
+  </div>
+</div></nav>
+
+<div class="hero">
+  <div class="eyebrow">专 著 共 创 · MONOGRAPH CO-CREATION</div>
+  <h1>在王德生博士指导下<br>写一本属于你自己的专著</h1>
+  <div class="sub">让每个人都有自己的思想和知识工厂</div>
+  <p class="lead">你心里有一个放不下的问题，一个想说清楚的领域，一篇压在抽屉里的论文，或者一本你想拆开看透的书。过去，把它变成一本专著，要几年时间、要导师、要出版门路。现在，用 <b>Claude</b> 加 <b>SDE 系列思想创新方法论</b>，我们一起把它变成一本<b>有国际书号、能上站、正式出版</b>的专著。</p>
+  <a class="cta" href="#form">填写《专著输入问卷表》</a>
+</div>
+
+<div class="wrap">
+
+  <section class="sec">
+    <h2>YOU BRING</h2>
+    <h3>你出什么？</h3>
+    <div class="two">
+      <div class="box"><h4>一、100 元打造费</h4><p>用于 Claude 研究与写作所需的 Token 费用。</p></div>
+      <div class="box"><h4>二、专著的意义</h4><p>你想解决的问题、关心的领域、想写的方向；也可以带来期刊论文、旧稿，或一本想解构的书。</p></div>
+    </div>
+    <p class="t" style="margin-top:18px">一本好专著，起点不是题目，是<b>意义</b>。这四件事由你来出：</p>
+    <div class="mean">
+      <div><b>创造</b><span>它要带来什么以前没有的新东西</span></div>
+      <div><b>自由</b><span>读者能走出什么困境、多出什么选择</span></div>
+      <div><b>幸福</b><span>谁会因为这本书过得更好</span></div>
+      <div><b>解题</b><span>它解决的是哪个具体问题</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>HOW WE WRITE</h2>
+    <h3>我们怎么一起写？</h3>
+    <div class="steps">
+      <div class="step"><h4>填写问卷，老师打造大纲<small>老师</small></h4><p>你先填写下方的《专著输入问卷表》，说清楚你的问题、材料和专著的意义。王德生博士据此用 Claude 和系列思想创新方法论（缝隙与填补、六路径、三原理、创新智商测评等）做深度研究，找到真正的缝隙，为你打造一份专著大纲。</p></div>
+      <div class="step"><h4>你用大纲，写出初稿<small>学员</small></h4><p>你拿着大纲，借助大模型学习和写作，完成初稿。在这个过程中，你学到的是一整套思想生产的方法，不只是一本书。</p></div>
+      <div class="step"><h4>自己打磨三次<small>学员</small></h4><p>初稿完成后，你自己反复打磨三轮，把它从"AI 写的"变成"我想的"。</p></div>
+      <div class="step"><h4>师生往返修改三次<small>师生</small></h4><p>老师逐轮审读、指出问题、提出提升方向，你修改，来回三次。</p></div>
+      <div class="step"><h4>老师终稿，书号出版<small>老师</small></h4><p>老师最后打磨统稿，配国际书号（ISBN），在 SDE Universes 平台上线，由新加坡德麦国际（Demai International）出版。<b style="color:#F5E6BF">专著由你本人单独署名，并注明"王德生 指导"。</b></p></div>
+    </div>
+  </section>
+
+  <section class="sec gets">
+    <h2>YOU GET</h2>
+    <h3>你得到什么？</h3>
+    <div class="g"><span>一本<b>由你单独署名</b>、有国际书号的专著（封面与版权页注明"王德生 指导"）</span></div>
+    <div class="g"><span>在 SDE Universes 平台上线展示</span></div>
+    <div class="g"><span>一套可以反复使用的思想创新方法：这一本写完，你就会写下一本</span></div>
+    <div class="g"><span>一段和老师一对一往返打磨的学习经历</span></div>
+  </section>
+
+  <section class="sec">
+    <h2>FOR WHOM</h2>
+    <h3>适合谁？</h3>
+    <div class="who">
+      <span>想把经验写成体系的老师、医生、律师</span><span>企业家与工程师</span><span>想把论文扩写成专著的研究者、研究生</span><span>读了一本书有话要说的读书人</span><span>想在 AI 时代拥有自己思想作品的每一个普通人</span>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>MENTOR</h2>
+    <h3>指导老师</h3>
+    <div class="teacher">
+      <div class="av">王</div>
+      <p><b>王德生博士</b>　中科院数学博士，前新加坡南洋理工大学博导，国际期刊论文 47 篇；SIO 本体论与 SDE 发生学创立者，新加坡德麦国际创始人，已出版并指导出版专著数百部。</p>
+    </div>
+  </section>
+
+  <section class="sec" id="form">
+    <h2>MONOGRAPH INTAKE</h2>
+    <h3>专著意向投稿箱 ·《专著输入问卷表》</h3>
+    <p class="t">请尽量写具体。不用写得漂亮，但要写真话。你写得越清楚，老师为你打造的大纲就越准。<b>填写内容会自动保存在你自己的浏览器里</b>，中途关掉页面也不会丢。</p>
+
+    <div class="form" id="formBox">
+      <div class="part">
+        <div class="ph">一、作者信息</div>
+        <div class="row2">
+          <div class="field"><label for="name"><span class="n">1</span>姓名<span class="req">*</span></label><input type="text" id="name" maxlength="40" autocomplete="name"></div>
+          <div class="field"><label for="pen"><span class="n">2</span>专著署名用名<span class="opt">（与姓名不同时填）</span></label><input type="text" id="pen" maxlength="40"></div>
+        </div>
+        <div class="field"><label for="job"><span class="n">3</span>职业 / 专业 / 所在单位</label><input type="text" id="job" maxlength="120"></div>
+        <div class="field"><label for="contact"><span class="n">4</span>联系方式<span class="req">*</span></label><div class="hint">微信、电话、邮箱，至少留一个，老师会用它联系你。</div><input type="text" id="contact" maxlength="200" placeholder="微信号 / 电话 / 邮箱"></div>
+        <div class="field"><label for="bio"><span class="n">5</span>作者简介<span class="opt">（约 200 字，将用于书中作者介绍）</span></label><textarea id="bio" maxlength="1200"></textarea></div>
+      </div>
+
+      <div class="part">
+        <div class="ph">二、你的问题与领域</div>
+        <div class="field"><label for="problem"><span class="n">6</span>你最想通过这本书解决的问题是什么？<span class="req">*</span></label><div class="hint">请用一两句话说清楚。</div><textarea id="problem" maxlength="2000"></textarea></div>
+        <div class="field"><label for="domain"><span class="n">7</span>这个问题属于什么领域？</label><input type="text" id="domain" maxlength="120" placeholder="如教育、心理、管理、法律、医学、语言、哲学、经济……"></div>
+        <div class="field"><label for="why"><span class="n">8</span>你为什么适合写这本书？</label><div class="hint">你在这个问题上有哪些经验、积累或亲身经历？</div><textarea id="why" maxlength="2000"></textarea></div>
+        <div class="field"><label for="title"><span class="n">9</span>你心中的专著方向或暂定书名<span class="opt">（可不填）</span></label><input type="text" id="title" maxlength="120"></div>
+      </div>
+
+      <div class="part">
+        <div class="ph">三、你带来的材料<small>可多选</small></div>
+        <div class="field">
+          <div class="lb"><span class="n">10</span>你手上有哪些材料？</div>
+          <div class="opts col" id="materials">
+            <label><input type="checkbox" value="期刊论文">已发表或未发表的期刊论文</label>
+            <label><input type="checkbox" value="书稿或专著">已有书稿或专著</label>
+            <label><input type="checkbox" value="想解构的书">一本想要解构的书</label>
+            <label><input type="checkbox" value="讲义笔记案例">课程讲义、工作笔记、案例积累</label>
+            <label><input type="checkbox" value="只有问题">暂时没有材料，只有问题</label>
+          </div>
+          <input type="text" id="book" class="inline-other" maxlength="160" placeholder="想解构的书：书名、作者" style="display:none">
+        </div>
+        <div class="field"><label for="matnote"><span class="n">11</span>请简要说明材料内容<span class="opt">（可附链接）</span></label><textarea id="matnote" maxlength="2000"></textarea></div>
+        <div class="field">
+          <div class="lb">上传附件<span class="opt">（选填，PDF / Word / TXT / ZIP，20MB 以内；多个文件请打成一个 ZIP）</span></div>
+          <div class="file"><input type="file" id="file" accept=".pdf,.doc,.docx,.zip,.txt,.md,.rtf,.odt,.wps"></div>
+        </div>
+      </div>
+
+      <div class="part key">
+        <div class="ph">四、专著的意义<small>本表最重要的部分</small></div>
+        <div class="field"><label for="creation"><span class="n">12</span><b>创造</b>：这本书要带来什么以前没有的新东西？<span class="req">*</span></label><div class="hint">你觉得现有的书、理论或做法缺了什么？</div><textarea id="creation" maxlength="3000"></textarea></div>
+        <div class="field"><label for="freedom"><span class="n">13</span><b>自由</b>：读者读完后，能走出什么困境，摆脱什么束缚，多出什么选择？</label><textarea id="freedom" maxlength="3000"></textarea></div>
+        <div class="field"><label for="happiness"><span class="n">14</span><b>幸福</b>：谁会因为这本书过得更好？</label><div class="hint">请具体描述你心中的读者。</div><textarea id="happiness" maxlength="3000"></textarea></div>
+        <div class="field"><label for="solve"><span class="n">15</span><b>问题解决</b>：这本书解决的是哪个具体问题？</label><div class="hint">请举一个真实的例子或案例。</div><textarea id="solve" maxlength="3000"></textarea></div>
+      </div>
+
+      <div class="part">
+        <div class="ph">五、读者与形态</div>
+        <div class="field">
+          <div class="lb"><span class="n">16</span>目标读者<span class="opt">（可多选）</span></div>
+          <div class="opts" id="readers">
+            <label><input type="checkbox" value="普通大众">普通大众</label>
+            <label><input type="checkbox" value="行业从业者">行业从业者</label>
+            <label><input type="checkbox" value="学生">学生</label>
+            <label><input type="checkbox" value="研究者">研究者</label>
+          </div>
+          <input type="text" id="readersOther" class="inline-other" maxlength="80" placeholder="其他读者（选填）">
+        </div>
+        <div class="field">
+          <div class="lb"><span class="n">17</span>写作风格</div>
+          <div class="opts" id="style">
+            <label><input type="radio" name="style" value="通俗版">普通人都能懂的通俗版</label>
+            <label><input type="radio" name="style" value="学术版">专业学术版</label>
+            <label><input type="radio" name="style" value="两者兼顾">两者兼顾</label>
+          </div>
+        </div>
+        <div class="field">
+          <div class="lb"><span class="n">18</span>预期篇幅</div>
+          <div class="opts" id="length">
+            <label><input type="radio" name="length" value="约10万字">约 10 万字</label>
+            <label><input type="radio" name="length" value="约20万字">约 20 万字</label>
+            <label><input type="radio" name="length" value="约30万字">约 30 万字</label>
+            <label><input type="radio" name="length" value="请老师建议">请老师建议</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="part">
+        <div class="ph">六、写作条件</div>
+        <div class="row2">
+          <div class="field"><label for="hours"><span class="n">19</span>每周能投入写作的时间</label><input type="text" id="hours" maxlength="40" placeholder="约几小时"></div>
+          <div class="field"><label for="deadline"><span class="n">21</span>希望完成的时间</label><input type="text" id="deadline" maxlength="60" placeholder="如 2027 年 3 月"></div>
+        </div>
+        <div class="field">
+          <div class="lb"><span class="n">20</span>使用大模型（Claude、ChatGPT、DeepSeek 等）的经验</div>
+          <div class="opts" id="llm">
+            <label><input type="radio" name="llm" value="熟练">熟练</label>
+            <label><input type="radio" name="llm" value="用过一些">用过一些</label>
+            <label><input type="radio" name="llm" value="从未用过">从未用过</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="part">
+        <div class="ph">七、确认事项<small>四项都需勾选</small></div>
+        <div class="opts col confirm" id="confirms">
+          <label><input type="checkbox" value="流程">我已了解打造流程：老师打造大纲 → 我用大纲借助大模型写出初稿 → 自己打磨三次 → 与老师往返修改三次 → 老师终稿、配书号、上站出版</label>
+          <label><input type="checkbox" value="费用">我同意支付 100 元打造费（用于 Claude Token 费用）</label>
+          <label><input type="checkbox" value="原创">我保证提供的材料为本人原创或已获授权</label>
+          <label><input type="checkbox" value="署名">我了解专著由我本人单独署名，并注明"王德生 指导"</label>
+        </div>
+      </div>
+
+      <div class="part" style="margin-top:26px">
+        <div class="field"><label for="pass">投稿密码<span class="req">*</span></label><div class="hint">由王德生老师提供。还没有密码的，请先加微信 jimmywang20061107 索取。</div><input type="password" id="pass" maxlength="60" autocomplete="off"></div>
+      </div>
+      <div class="hp"><label for="website">Website</label><input type="text" id="website" tabindex="-1" autocomplete="off"></div>
+      <button class="submit-btn" id="go" type="button">提交问卷，投进专著意向投稿箱</button>
+      <div class="status" id="status"></div>
+      <div class="draft" id="draft"></div>
+
+      <div class="notes">
+        <div class="n">带 * 的为必填项；第四部分"专著的意义"写得越具体，大纲越准。</div>
+        <div class="n">问卷与附件只存进私有投稿箱，由王德生老师本人过目，不公开、不外传。</div>
+        <div class="n">老师审看后会用你留的联系方式与你联系，商定后续安排。</div>
+      </div>
+    </div>
+
+    <div class="form done" id="doneBox">
+      <h4>问卷已投进专著意向投稿箱</h4>
+      <p>谢谢你把你的问题交给我们。<br>王德生老师审看后，会通过你留的联系方式与你联系。<br>你出意义，我们出方法。书，是你自己的。</p>
+    </div>
+  </section>
+
+  <section class="contact">
+    <div class="q">你出意义，我们出方法。书，是你自己的。</div>
+    <p>报名咨询　微信 <b>jimmywang20061107</b>　·　电话 <b>19573829566</b></p>
+  </section>
+</div>
+
+<footer>© 德麦国际 Demai International · <a href="/browse/">爱思乐园 sdeuniverses.com</a> · <a href="/monographs/">专著栏目</a></footer>
+
+<script>
+(function(){
+  var KEY='sde_cocreate_draft_v1';
+  var TEXT=['name','pen','job','contact','bio','problem','domain','why','title','book','matnote','creation','freedom','happiness','solve','readersOther','hours','deadline'];
+  var CHECKS=['materials','readers','confirms'];
+  var RADIOS=['style','length','llm'];
+  function $(id){return document.getElementById(id);}
+  function checked(id){return Array.prototype.slice.call($(id).querySelectorAll('input:checked')).map(function(i){return i.value;});}
+  function collect(){
+    var q={};
+    TEXT.forEach(function(k){q[k]=$(k).value.trim();});
+    CHECKS.forEach(function(k){q[k]=checked(k);});
+    RADIOS.forEach(function(k){var c=document.querySelector('input[name="'+k+'"]:checked');q[k]=c?c.value:'';});
+    return q;
+  }
+  function toggleBook(){$('book').style.display=checked('materials').indexOf('想解构的书')>=0?'block':'none';}
+  // 草稿：只存在本人浏览器里；取不到存储就静默跳过
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(collect()));$('draft').textContent='草稿已自动保存在本机';}catch(e){}}
+  function restore(){
+    var d=null;try{d=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){}
+    if(!d)return;
+    TEXT.forEach(function(k){if(typeof d[k]==='string')$(k).value=d[k];});
+    CHECKS.forEach(function(k){var v=d[k]||[];$(k).querySelectorAll('input').forEach(function(i){i.checked=v.indexOf(i.value)>=0;});});
+    RADIOS.forEach(function(k){if(!d[k])return;document.querySelectorAll('input[name="'+k+'"]').forEach(function(i){i.checked=i.value===d[k];});});
+    $('draft').textContent='已恢复上次未提交的草稿';
+  }
+  var t=null;
+  $('formBox').addEventListener('input',function(e){if(e.target.id==='pass'||e.target.type==='file')return;toggleBook();clearTimeout(t);t=setTimeout(save,600);});
+  $('formBox').addEventListener('change',function(e){if(e.target.id==='pass'||e.target.type==='file')return;toggleBook();save();});
+  restore();toggleBook();
+
+  function status(kind,msg){var s=$('status');s.className='status show '+kind;s.textContent=msg;}
+  $('go').addEventListener('click',function(){
+    var q=collect();
+    if(!q.name)return status('err','请填写第 1 项：姓名。');
+    if(!q.contact)return status('err','请填写第 4 项：联系方式。');
+    if(!q.problem)return status('err','请填写第 6 项：你最想解决的问题。');
+    if(!q.creation)return status('err','请填写第 12 项：这本书要创造什么。');
+    if(q.confirms.length<4)return status('err','请勾选第七部分的全部四项确认。');
+    var pass=$('pass').value.trim();
+    if(!pass)return status('err','请输入投稿密码。');
+    var f=$('file').files[0];
+    if(f&&f.size>20*1024*1024)return status('err','附件超过 20MB，请压缩或打成 ZIP 后再传。');
+    var fd=new FormData();
+    fd.append('pass',pass);fd.append('website',$('website').value);fd.append('q',JSON.stringify(q));
+    if(f)fd.append('file',f);
+    var btn=$('go');btn.disabled=true;btn.textContent=f?'正在上传附件，请稍候…':'正在提交…';
+    status('ok','提交中…');
+    fetch('/api/cocreate',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(j){
+      if(j&&j.ok){
+        try{localStorage.removeItem(KEY);}catch(e){}
+        $('formBox').style.display='none';$('doneBox').classList.add('show');
+        $('form').scrollIntoView({behavior:'smooth'});
+      }else{
+        status('err',(j&&j.msg)||'提交失败，请稍后再试。');
+        btn.disabled=false;btn.textContent='提交问卷，投进专著意向投稿箱';
+      }
+    }).catch(function(){
+      status('err','网络出错，提交没有成功。你填的内容已保存在本机，稍后再试即可。');
+      btn.disabled=false;btn.textContent='提交问卷，投进专著意向投稿箱';
+    });
+  });
+})();
+</script>
+</body></html>
