@@ -102,6 +102,7 @@ def blocks_of(text):
 
 def inline(s):
     s = re.sub(r'(?<=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]) (?=[A-Za-z0-9$])|(?<=[A-Za-z0-9%$.)]) (?=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef])', '\u2009', s)
+    s = re.sub(r'\\([.\-_#()\[\]])', r'\1', s)
     s = html.escape(s, quote=False)
     s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
     s = re.sub(r'(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?!\*)', r'<em>\1</em>', s)
@@ -429,6 +430,13 @@ section.t3 p,section.t3 li{{line-height:{lh-0.15:.3f};margin-bottom:.3em}}
 section.t3 h3.sec{{margin-top:4mm}}
 section.t4 p,section.t4 li{{line-height:{lh-0.2:.3f};margin-bottom:.25em}}
 section.t4 h3.sec{{margin-top:3.5mm}}
+section.t5 p,section.t5 li{{line-height:{lh-0.3:.3f};margin-bottom:.15em;letter-spacing:-.01em}}
+section.t5 h3.sec{{margin-top:3mm;margin-bottom:1.5mm}}
+section.t5 .orn,section.t5 .endmark{{margin:0;line-height:.9}}
+section.t6 p,section.t6 li{{line-height:{lh-0.38:.3f};margin-bottom:.1em;letter-spacing:-.015em}}
+section.t6 h3.sec{{margin-top:2.5mm;margin-bottom:1mm}}
+section.t6 .orn,section.t6 .endmark{{margin:0;line-height:.8}}
+section.t6 .chapend{{margin-top:1mm}}
 blockquote.verdict{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;margin:4mm 0;padding:2.6mm 4mm;break-inside:avoid}}
 blockquote.verdict p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F}}
 .tw{{margin:3.5mm 0}}
@@ -558,14 +566,15 @@ def tune_chapters(secs, css_args, fonts, label):
             if cache[key]:
                 TIGHT[s[1]] = cache[key]
             continue
-        for lvl in ['', 't1', 't2', 't3', 't4']:
+        for lvl in ['', 't1', 't2', 't3', 't4', 't5', 't6']:
             if lvl:
                 TIGHT[s[1]] = lvl
             else:
                 TIGHT.pop(s[1], None)
             pdf = weasyprint.HTML(string=html_doc(css, sec_html(*s)), base_url=str(ROOT)).write_pdf()
             d = pymupdf.open(stream=pdf, filetype='pdf')
-            lone = len(d) > 1 and len(d[len(d) - 1].get_text().strip()) < 140
+            _lt = d[len(d) - 1].get_text().strip()
+            lone = len(d) > 1 and (len(_lt) < 140 or _lt.startswith('带走的话'))
             if not lone:
                 break
         cache[key] = lvl if not lone or lvl else ''
