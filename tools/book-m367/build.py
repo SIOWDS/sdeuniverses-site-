@@ -563,7 +563,7 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     css = print_css(fonts, *css_args)
     css_front = print_css(fonts, *css_args, fol='lower-roman')
     # 第 1 遍：正文（导论起），拿每节的页码
-    main_idx = next(i for i, s in enumerate(secs) if s[2].startswith('导论'))
+    main_idx = next(i for i, s in enumerate(secs) if s[2].startswith('导言'))
     front, main = secs[:main_idx], secs[main_idx:]
     main_html = ''.join(sec_html(*s) for s in main)
     # 导论不要求右页起，但正文第 1 页放在右页：前置页数补成偶数
