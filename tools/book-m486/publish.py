@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""第 488 号《一口气是怎样发生的——普通人都能明白的肺发生学》：装进 public/books/m/488/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡。
-用法：python3 tools/book-m450/publish.py --build /home/claude/b450 --agent 不算 --ms 全稿.md
+"""第 486 号《浑沌的七窍——庄子三十三篇的缝隙与填补》：装进 public/books/m/486/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡。
+用法：python3 tools/book-m486/publish.py --build /home/claude/b486 --agent 运斤 --ms 全稿.md
 """
 import argparse, datetime, json, re, shutil, subprocess
 from pathlib import Path
 
 HERE = Path(__file__).parent
 SITE = HERE.resolve().parents[1] / 'public'
-NO = 488
-V = '20261019a'
-SLUG = 'fei-fashengxue'
-T, SUB = '一口气是怎样发生的', '普通人都能明白的肺发生学'
-ISBN = '979-8-90690-678-6'
+NO = 486
+V = '20261020a'
+SLUG = 'hundun-qiqiao'
+T, SUB = '浑沌的七窍', '庄子三十三篇的缝隙与填补'
+ISBN = '979-8-90690-689-2'
 
 
 def pages_of(pdf):
@@ -65,19 +65,19 @@ def main():
     assert not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in books), 'ISBN 重号'
     url = f'https://sdeuniverses.com/books/m/{NO}/'
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-    entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=['李秋金'], category='health',
-                 description='外婆和八岁的外孙比憋气，先输的是外婆。外孙问：是不是氧气用完了？做呼吸治疗师的女儿说：不是，是二氧化碳在催你。本书不问肺「怎样运行」，而问「为什么非得是肺」：肺交出的价值取决于交换面积除以屏障厚度，最优的肺是尽可能少的肺；它外包做功、自留分配；它在出生前被还不能执行的呼吸写出形状；它的一生不是库存，是对损伤的持续结算。李秋金著；七编三十一章；含阅读、学习包、智能体三位一体。',
+    entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=['王德生'], category='core',
+                 description='浑沌待人很好，朋友替他凿开七窍，一天凿一窍，七天，浑沌死了。两千年来这个故事被读成一句警告：别凿别人的本来。可《庄子》这部书是一窍一窍凿出来的：十九年的刀，一场一场跟惠施的辩，十句话里借来的九句。本书逐篇拆三十三篇，从《逍遥游》读到《天下》，看一个人的看见怎样在一代代门人手里被拉宽成口号；判语一句：他教的是不凿，他靠的是凿。王德生著；导论、六编四十四章、结语；含阅读、学习包、智能体三位一体。',
                  detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
                  pdfUrl=url + f'{SLUG}-reader.pdf?v={V}', printPdfUrl=url + f'{SLUG}-print.pdf?v={V}',
                  coverUrl=url + f'cover.jpg?v={V}', backcoverUrl=url + f'backcover.jpg?v={V}',
                  flipUrl=url + 'read.html', chapterUrl=url + 'text/', openness='full',
-                 price='US$20.00', priceUsd=20, currency='USD', priceLabel='US$20.00', edition='2026年10月第1版',
+                 price='US$30.00', priceUsd=30, currency='USD', priceLabel='US$30.00', edition='2026年10月第1版',
                  pdfPages=pages, publishedAt=now, publisher='德麦国际出版社', publisherEnglish='Demai International Press',
                  isbn=ISBN.replace('-', ''),
                  agentUrl=url + 'agent/dialogue.html', agentName=AG, agentLabel='智能问对 · ' + AG,
-                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 31个学习单元',
+                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 44个学习单元',
                  learningPackUrl=url + f'downloads/{SLUG}-learning-v1.0.pdf',
-                 publicationUnit={'id': f'm-{NO}', 'type': 'reading-learning-dialogue', 'revision': '20261019-m488-unit-v1'})
+                 publicationUnit={'id': f'm-{NO}', 'type': 'reading-learning-dialogue', 'revision': '20261020-m486-unit-v1'})
     books.insert(0, entry)
     data['updated'] = now[:10]
     cat_p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
@@ -91,12 +91,12 @@ def main():
     i = h.index('★ 新书 · 德麦国际专著第')
     a0 = h.rindex('<a href="/books/m/', 0, i)
     card = ('<a href="/books/m/%d/" style="display:block;text-decoration:none;margin-bottom:16px"><div style="border:1px solid rgba(217,180,92,0.85);border-radius:3px;background:linear-gradient(135deg,rgba(14,31,49,0.98),rgba(9,18,30,0.98));padding:34px 32px;box-shadow:0 0 0 1px rgba(217,180,92,0.16) inset,0 0 40px rgba(217,180,92,0.10)">'
-            '<div class="zh-only" style="font-size:12.5px;letter-spacing:0.18em;color:#D9B45C;margin-bottom:14px">★ 新书 · 德麦国际专著第 %d 号 · 约 %.0f 万字 · %d 页 · US$ 20.00</div>'
-            '<div class="en-only" style="font-size:12.5px;letter-spacing:0.18em;color:#D9B45C;margin-bottom:14px">★ NEW BOOK · DEMAI MONOGRAPH No.%d · ~%s CHARS · %d PP · US$ 20.00</div>'
-            '<h3 class="zh-only" style="color:#F1EBDC;font-size:25px;line-height:1.5;margin:0 0 14px">一口气是怎样发生的——普通人都能明白的肺发生学</h3>'
-            '<h3 class="en-only" style="color:#F1EBDC;font-size:23px;line-height:1.5;margin:0 0 14px">How a Breath Happens: Lung Genesis for Everyone</h3>'
-            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">李秋金著。肺交出的价值取决于交换面积除以墙的厚度：最优的肺，是尽可能少的肺。它外包做功，自留分配；它的一生不是库存，是结算。含阅读、学习包、智能体三位一体出版单元。</p>'
-            '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">By Li Qiujin. The lung is the organ whose value sits in the denominator: area over barrier thickness. It outsources the work and keeps the allocation; its life is a running settlement, not a stock.</p></div></a>'
+            '<div class="zh-only" style="font-size:12.5px;letter-spacing:0.18em;color:#D9B45C;margin-bottom:14px">★ 新书 · 德麦国际专著第 %d 号 · 约 %.0f 万字 · %d 页 · US$ 30.00</div>'
+            '<div class="en-only" style="font-size:12.5px;letter-spacing:0.18em;color:#D9B45C;margin-bottom:14px">★ NEW BOOK · DEMAI MONOGRAPH No.%d · ~%s CHARS · %d PP · US$ 30.00</div>'
+            '<h3 class="zh-only" style="color:#F1EBDC;font-size:25px;line-height:1.5;margin:0 0 14px">浑沌的七窍——庄子三十三篇的缝隙与填补</h3>'
+            '<h3 class="en-only" style="color:#F1EBDC;font-size:23px;line-height:1.5;margin:0 0 14px">The Seven Apertures of Hundun: Gaps and Mending in the Thirty-Three Chapters of the Zhuangzi</h3>'
+            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">王德生著。一部劝人别凿的书，是一窍一窍凿成的：他教的是不凿，他靠的是凿。逐篇拆《庄子》三十三篇，看一个人的看见怎样在一代代门人手里被拉宽成口号。含阅读、学习包、智能体三位一体出版单元。</p>'
+            '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">By Wang Desheng. A book that warns against boring holes into Hundun was itself bored, aperture by aperture: it teaches not-chiselling and lives by the chisel. A chapter-by-chapter reading of all thirty-three chapters of the Zhuangzi.</p></div></a>'
             % (NO, NO, han / 10000, pages, NO, format(han, ','), pages))
     h = h[:a0] + card + h[a0:]
     tp.write_text(h)
