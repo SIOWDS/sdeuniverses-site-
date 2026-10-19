@@ -545,6 +545,8 @@ def sec_html(kind, sid, title, lvl, body):
 
 def tune_chapters(secs, css_args, fonts, label):
     """逐章单独试排：若章末「带走的话＋小账」孤零零占一页，就逐级收紧该章行距，直到孤页消失。"""
+    TIGHT.clear()
+    return  # 第 445 号：章末没有「带走的话」类框，不会出孤页，免去逐章试排
     import weasyprint, pymupdf
     css = print_css(fonts, *css_args)
     import hashlib, json as _j
