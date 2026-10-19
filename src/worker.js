@@ -41,6 +41,37 @@ function seoOwnerForPath(pathname, catalog) {
   }
   return null;
 }
+// ── 个人知识发生站登记表（public/sites/p/registry.json）──────────────
+// live 的站：母站上它名下的文章与专著 301 到 <名>.sdeuniverses.com。
+let PERSONAL_REG = null;
+let PERSONAL_REG_AT = 0;
+async function personalRegistry(env) {
+  const now = Date.now();
+  if (PERSONAL_REG && now - PERSONAL_REG_AT < 300000) return PERSONAL_REG;
+  try {
+    const r = await env.ASSETS.fetch(new Request("https://sdeuniverses.com/sites/p/registry.json"));
+    if (!r.ok) return PERSONAL_REG;
+    const data = await r.json();
+    if (!data || !data.sites) return PERSONAL_REG;
+    PERSONAL_REG = data;
+    PERSONAL_REG_AT = now;
+  } catch (e) {}
+  return PERSONAL_REG;
+}
+function personalOwnerForPath(pathname, reg) {
+  if (!reg || !reg.sites) return null;
+  const path = String(pathname || "/");
+  for (const key of Object.keys(reg.sites)) {
+    const s = reg.sites[key];
+    if (!s || s.live !== true) continue;
+    const own = s.owns || {};
+    if ((own.path_prefixes || []).some((prefix) => path.indexOf(String(prefix)) === 0)) return key;
+    for (const bookId of (own.book_ids || [])) {
+      if (new RegExp("^/books/m/" + String(bookId).replace(/[^0-9]/g, "") + "(?:/|$)").test(path)) return key;
+    }
+  }
+  return null;
+}
 function seoPermanentRedirect(host, url, pathname) {
   const target = new URL(url.toString());
   target.protocol = "https:";
@@ -19255,6 +19286,11 @@ export default {
       || url.pathname === "/sites/site-data.json"
       || /^\/(favicon\.ico|manifest\.webmanifest)$/.test(url.pathname);
 
+    const personalReg = await personalRegistry(env);
+    const personalOwner = personalOwnerForPath(url.pathname, personalReg);
+    if (personalOwner && (isMainHost || (personalKey && personalOwner !== personalKey) || formalSubKey)) {
+      return seoPermanentRedirect(personalOwner + ".sdeuniverses.com", url);
+    }
     if (seoCatalog && isMainHost && ownerSite) {
       return seoPermanentRedirect(ownerSite.host, url);
     }
@@ -19293,7 +19329,7 @@ export default {
       r.headers.set("x-served-at", new Date().toISOString());
       let canonicalHost = "sdeuniverses.com";
       if (formalSubKey && (subLocal || ownerKey === formalSubKey)) canonicalHost = contentHost;
-      if (personalKey && subLocal) canonicalHost = contentHost;
+      if (personalKey && (subLocal || personalOwner === personalKey)) canonicalHost = contentHost;
       const canonical = "https://" + canonicalHost + contentPath;
       const site = formalSubKey && seoCatalog && seoCatalog.subsites ? seoCatalog.subsites[formalSubKey] : null;
       return seoDecorateHtml(r, canonical, site, seoCatalog, contentPath);
