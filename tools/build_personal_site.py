@@ -117,8 +117,8 @@ def hero(d, small=False):
     return "".join(out)
 
 
-def tabs(on):
-    items = [("/", "首页"), ("/books/", "专著"), ("/papers/", "论文"), ("/#ai", "我的 SDE-AI"),
+def tabs(on, d):
+    items = [("/", "首页"), ("/books/", "专著"), ("/papers/", "论文"), (d.get("chat", {}).get("url", "/chat/"), d.get("chat", {}).get("brand", "Chat")),
              ("https://sdeuniverses.com/", "德麦国际主站 ↗")]
     return '<nav class="tabs" aria-label="本站栏目"><div class="wrap">%s</div></nav>' % "".join(
         '<a href="%s"%s>%s</a>' % (h, ' class="on"' if h == on else "", t) for h, t in items)
@@ -152,7 +152,7 @@ def build(slug):
     agent = next((b for b in d["books"] if b["number"] == 440), d["books"][0])
 
     # 首页
-    h = [head(d, "%s · 个人知识发生站" % name, "%s的个人知识发生站：%s" % (name, d["lead"]), "/"), hero(d), tabs("/"),
+    h = [head(d, "%s · 个人知识发生站" % name, "%s的个人知识发生站：%s" % (name, d["lead"]), "/"), hero(d), tabs("/", d),
          '<main class="wrap">',
          '<section id="stream"><h2><span class="no">01</span>发生流<a class="more" href="/papers/">全部 %d 篇 →</a></h2>' % len(d["papers"]),
          '<p class="lead">判断是一条一条长出来的。这里按时间倒序，放最新的几条。</p><div class="stream">']
@@ -164,12 +164,14 @@ def build(slug):
         h.append('<a href="%s"><img src="%s" alt="%s" loading="lazy"><div class="n">№%d</div><div class="t">%s</div></a>'
                  % (E(b["url"]), E(b["cover"] or ""), E(b["title"]), b["number"], E(b["title"])))
     h.append("</div></section>")
-    h.append('<section id="ai"><h2><span class="no">03</span>我的 SDE-AI</h2>'
-             '<p class="lead">这个站跟着主人一起长。现在先开放的，是和已出版作品对话的入口。</p>'
-             '<div class="ai"><div class="k">MY SDE-AI · %s</div><h3>带着问题来，带着判断走</h3>'
-             '<p>问它家与国、礼与法、道德怎样变成判决。它只按%s书里的论证回答，答不了的会直说。</p>'
-             '<div class="btns"><a class="btn pri" href="%sagent/dialogue.html">开始对话</a>'
-             '<a class="btn" href="%sagent/">智能体首页</a></div></div></section>' % (E(name), E(name), E(agent["url"]), E(agent["url"])))
+    chat = d.get("chat") or {}
+    h.append('<section id="ai"><h2><span class="no">03</span>我的 SDE-AI · %s</h2>'
+             '<p class="lead">这个站跟着主人一起长。它读过这里的全部论文与专著，回答时会指出是哪一篇。</p>'
+             '<div class="ai"><div class="k">MY SDE-AI · %s</div><h3>%s</h3><p>%s</p>'
+             '<div class="btns"><a class="btn pri" href="%s">开始对话</a>'
+             '<a class="btn" href="%sagent/dialogue.html">只和《%s》对话</a></div></div></section>'
+             % (E(chat.get("brand", "Chat")), E(name), E(chat.get("headline", "带着问题来，带着判断走")),
+                E(chat.get("blurb", "")), E(chat.get("url", "/chat/")), E(agent["url"]), E(agent["title"])))
     h.append("</main>" + foot(d))
     open(os.path.join(base, "index.html"), "w", encoding="utf-8").write("".join(h))
 
@@ -177,7 +179,7 @@ def build(slug):
     os.makedirs(os.path.join(base, "papers"), exist_ok=True)
     nc = sum(len(p["companions"]) for p in d["papers"])
     h = [head(d, "论文 · %s · 个人知识发生站" % name, "%s的全部论文 %d 篇与并蒂文 %d 篇。" % (name, len(d["papers"]), nc), "/papers/"),
-         hero(d, small=True), tabs("/papers/"), '<main class="wrap"><section>',
+         hero(d, small=True), tabs("/papers/", d), '<main class="wrap"><section>',
          '<h2><span class="no">%d</span>论文</h2>' % len(d["papers"]),
          '<p class="lead">按发表先后倒序。母文下面挂着它的并蒂文（诠释、实用、实践、解释），共 %d 篇。</p>' % nc,
          '<input class="filter" id="q" type="search" placeholder="搜标题、领域或摘要……" aria-label="筛选论文">',
@@ -192,7 +194,7 @@ def build(slug):
     # 专著页
     os.makedirs(os.path.join(base, "books"), exist_ok=True)
     h = [head(d, "专著 · %s · 个人知识发生站" % name, "%s的全部专著 %d 部（德麦国际）。" % (name, len(d["books"])), "/books/"),
-         hero(d, small=True), tabs("/books/"), '<main class="wrap"><section>',
+         hero(d, small=True), tabs("/books/", d), '<main class="wrap"><section>',
          '<h2><span class="no">%d</span>专著</h2>' % len(d["books"]),
          '<p class="lead">德麦国际出版。按书号倒序。</p>']
     for b in d["books"]:
