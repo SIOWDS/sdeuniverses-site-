@@ -14,7 +14,7 @@ HERE = Path(__file__).resolve().parent
 src = (HERE / 'build_unit.py').read_text(encoding='utf-8')
 reps = [
     ("(第[一二三四五六七八九十]+[编篇]|卷", "(导论|第[一二三四五六七八九十]+[编篇]|卷"),
-    ("\"'第'+(i+1)+'%s · '\" % PW", "\"(i===0?'导论 · ':'第'+i+'%s · ')\" % PW"),
+    ("\"'第'+(i+1)+'%s · '\" % PW", "\"(i===0?'导论 · ':'第'+'一二三四五六七八九十'[i-1]+'%s · ')\" % PW"),
     ("'第%d%s · %s' % (t['part'], PW, part_names[t['part'] - 1])",
      "(('导论 · %s' % part_names[0]) if t['part'] == 1 else ('第%s%s · %s' % (cn(t['part'] - 1), PW, part_names[t['part'] - 1])))"),
 ]
@@ -23,7 +23,7 @@ for a, b in reps:
     src = src.replace(a, b)
 n = src.count("cn(len(parts)), PW, NUMW)")
 assert n == 2, n
-src = src.replace("cn(len(parts)), PW, NUMW)", "'导论' + cn(len(parts) - 1), PW, NUMW)")
+src = src.replace("cn(len(parts)), PW, NUMW)", "'导论与' + cn(len(parts) - 1), PW, NUMW)")
 tmp = Path(tempfile.gettempdir()) / '_build_unit_m447.py'
 tmp.write_text(src, encoding='utf-8')
 spec = importlib.util.spec_from_file_location('build_unit', tmp)
