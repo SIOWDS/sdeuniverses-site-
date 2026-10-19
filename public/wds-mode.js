@@ -370,12 +370,12 @@
         en: { ph: "Describe something concrete — a lab report, a follow-up visit…", srcSite: "From the health subsite" }
       }
     },
-    /* ── 个人站分身：gaopeng（ChatGP，2026-10-19）── */
+    /* ── 个人站分身：gaopeng（ChatLaw，2026-10-19）── */
     gaopeng: {
       id: "gaopeng",
-      brand: "ChatGP",
-      url: "/chatgp/",
-      sig: "ChatGP · gaopeng.sdeuniverses.com",
+      brand: "ChatLaw",
+      url: "/chatlaw/",
+      sig: "ChatLaw · gaopeng.sdeuniverses.com",
       who: "高鹏",
       kicker: "GAOPENG.SDEUNIVERSES.COM",
       home: "/",
@@ -388,12 +388,12 @@
       ],
       hero: {
         zh: {
-          title: "ChatGP",
+          title: "ChatLaw",
           sub: "法律何以真正站立 · 高鹏。条文、判断与处境——从你手上那一件具体的事、那一桩具体的案子开始。",
           foot: "它不是律师，不对具体案件出具法律意见；以当地现行法律与执业律师意见为准。用你自己的大模型 Key 运行。"
         },
         en: {
-          title: "ChatGP",
+          title: "ChatLaw",
           sub: "How law really stands, with Gao Peng. Statutes, decisions and circumstances — starting from one concrete case you have in hand.",
           foot: "Not a lawyer: no legal advice on specific cases; local law and a licensed lawyer prevail. Runs on your own model key."
         }
@@ -401,7 +401,7 @@
       copy: {
         zh: {
           ph: "说一件具体的事——一桩案子、一条新规、一次申诉没人理…",
-          note: "ChatGP 只答法律、司法与制度、权利与秩序，答案扣着高鹏的论文与专著原文。**它不是律师：不对具体案件出具法律意见、不预判胜负**；遇到人身危险请先报警或求助。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写入数据库、不写进日志。",
+          note: "ChatLaw 只答法律、司法与制度、权利与秩序，答案扣着高鹏的论文与专著原文。**它不是律师：不对具体案件出具法律意见、不预判胜负**；遇到人身危险请先报警或求助。用你自己的大模型 Key 运行：Key 存在你这台机器上，本站不写入数据库、不写进日志。",
           tlBtn: "⊞ 法律工序", tlTitle: "这一轮走哪道工序", tlNone: "不用工序（普通对话）",
           tipDeep: "满血基底＋满功率思考＋整套工序，慢但深",
           srcSite: "高鹏的论文与专著"
