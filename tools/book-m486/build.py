@@ -20,15 +20,15 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-PART_FILES = ['01-第一编','02-第二编','03-第三编','04-第四编','05-第五编','06-第六编','07-第七编']
+PART_FILES = ['01-第一编','02-第二编','03-第三编','04-第四编','05-第五编','06-第六编']
 FILES = ['front/00-前置.md'] + ['parts/%s.md' % x for x in PART_FILES] + ['back/09-结语.md', 'back/10-后置.md']
 LUN = 'front/01-导论.md'
 NPARTS = len(PART_FILES)
-SLUG = 'fei-fashengxue'
+SLUG = 'hundun-qiqiao'
 META = dict(
-    title='一口气是怎样发生的', name='一口气是怎样发生的',
-    subtitle='普通人都能明白的肺发生学', author='李秋金', advisor='', no=488,
-    isbn='979-8-90690-678-6', price='US$20.00', version='20261019a',
+    title='浑沌的七窍', name='浑沌的七窍',
+    subtitle='庄子三十三篇的缝隙与填补', author='王德生', advisor='', no=486,
+    isbn='979-8-90690-689-2', price='US$30.00', version='20261020a',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
@@ -514,7 +514,7 @@ def toc_block(secs, pages, roman_ids):
     return '<section class="toc front-sec"><h1>目录</h1><div class="rule"></div><ul>%s</ul></section>' % ''.join(li)
 
 
-TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著 · 第 {META['no']} 号</div><div class="big" style="font-size:27pt;line-height:1.35;letter-spacing:.04em">一口气是<br>怎样发生的</div>
+TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著 · 第 {META['no']} 号</div><div class="big" style="font-size:27pt;line-height:1.35;letter-spacing:.04em">浑沌的<br>七窍</div>
 <div class="sub">{META['subtitle']}</div><div class="rule"></div><div class="au">{META['author']}　著</div>
 <div class="pub">{META['publisher']}<span>{META['publisher_en']} · Singapore</span></div></div>"""
 EPIGRAPH = ''
@@ -720,7 +720,7 @@ h3.sec .dia{margin-right:.4em}
 <div class="wrap">
 <div class="hero"><img src="/books/m/{META['no']}/cover.jpg?v={v}" alt="封面"><h1>{META['title']}</h1><p>{META['subtitle']}</p>
 <p style="color:var(--dim);margin-top:.5rem">{META['author']} 著 · 德麦国际专著第 {META['no']} 号 · ISBN {META['isbn']} · 约 {han/10000:.0f} 万汉字</p></div>
-<details class="toc" open><summary>目录（出版信息 · 作者介绍 · 题词 · 导读 · 第一编至第七编 · 结语 · 附录一至五 · 参考文献）</summary><ul>{''.join(toc)}</ul></details>
+<details class="toc" open><summary>目录（出版信息 · 作者介绍 · 题词 · 前言 · 导读 · 导论 · 第一编至第六编 · 结语 · 参考书目 · 附录 · 后记）</summary><ul>{''.join(toc)}</ul></details>
 """
     tail = f"""<div class="foot">德麦国际出版社 · Demai International Press · <a href="/books/">专著书架</a> · <a href="/books/m/{META['no']}/">书籍详情</a> · <a href="/books/m/{META['no']}/read.html">在线翻页</a></div>
 </div>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 488 号《一口气是怎样发生的》封面与封底（由第 425 号改来，220 系列版式）：主图为气道树与肺泡。
+"""第 486 号《浑沌的七窍》封面与封底（由第 488 号改来，220 系列版式）：主图为七窍浑沌与凿子。
 主图是力的九格：粒子、波、场三行，一串一模一样的「一度」走进来，第三行一格比一格亮。
 
 用法：python3 cover.py --fonts /home/claude/fonts --out /home/claude/mengzi/build
@@ -13,7 +13,7 @@ from pathlib import Path
 
 NAVY_TOP, NAVY_MID, NAVY_LOW = '#0B1830', '#1B3158', '#142746'
 GOLD, GOLD2, CYAN, CREAM, DIM = '#C9A857', '#E3C77E', '#58BDCA', '#EFE8D6', '#9FB0C8'
-ISBN = '979-8-90690-678-6'
+ISBN = '979-8-90690-689-2'
 
 L = ['0001101', '0011001', '0010011', '0111101', '0100011', '0110001', '0101111', '0111011', '0110111', '0001011']
 G = ['0100111', '0110011', '0011011', '0100001', '0011101', '0111001', '0000101', '0010001', '0001001', '0010111']
@@ -94,31 +94,33 @@ def rings(cx, cy, r):
 
 
 def art(W, H, uid):
-    """主图：一棵倒长的气道树，二分叉十级，末梢是一圈圈薄薄的肺泡；外面一道刻度环。"""
+    """主图：一团浑圆（浑沌），木纹般的同心细线；上面七个窍，前三个已被凿开（金实心），后四个还只是虚线圈；一把凿子从右下斜进来。"""
     s = W / 1700
-    cx, cy, r = W * 0.58, H * 0.60, 520 * s
-    out = [rings(cx, cy, r).replace('{uid}', uid)]
-    segs, buds = [], []
-    def grow(x, y, ang, L, w, depth):
-        x2 = x + L * math.cos(math.radians(ang)); y2 = y + L * math.sin(math.radians(ang))
-        segs.append((x, y, x2, y2, w, depth))
-        if depth == 0:
-            buds.append((x2, y2)); return
-        sp = 24 if depth > 5 else 30
-        grow(x2, y2, ang - sp, L * 0.76, w * 0.68, depth - 1)
-        grow(x2, y2, ang + sp, L * 0.76, w * 0.68, depth - 1)
-    tx, ty = cx, cy - r * 0.95
-    segs.append((tx, ty, tx, cy - r * 0.42, 34 * s, 9))
-    grow(tx, cy - r * 0.42, 90 - 40, r * 0.28, 24 * s, 8)
-    grow(tx, cy - r * 0.42, 90 + 40, r * 0.28, 24 * s, 8)
-    for x1, y1, x2, y2, w, d in segs:
-        col = GOLD2 if d >= 5 else GOLD
-        op = 0.95 if d >= 5 else 0.55 + d * 0.08
-        out.append(f'<line x1="{x1:.0f}" y1="{y1:.0f}" x2="{x2:.0f}" y2="{y2:.0f}" stroke="{col}" stroke-opacity="{op:.2f}" stroke-width="{max(w,1.4*s):.1f}" stroke-linecap="round"/>')
-    for i, (x, y) in enumerate(buds):
-        out.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{9*s:.1f}" fill="none" stroke="{CYAN}" stroke-opacity=".75" stroke-width="{1.6*s:.1f}"/>')
-        if i % 3 == 0:
-            out.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{3.2*s:.1f}" fill="{CREAM}" fill-opacity=".9"/>')
+    cx, cy, r = W * 0.57, H * 0.60, 470 * s
+    out = [rings(cx, cy, r * 1.08).replace('{uid}', uid)]
+    out.append(f'<defs><radialGradient id="orb{uid}" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="{CREAM}" stop-opacity=".30"/>'
+               f'<stop offset=".6" stop-color="{GOLD}" stop-opacity=".10"/><stop offset="1" stop-color="{GOLD}" stop-opacity=".02"/></radialGradient></defs>')
+    out.append(f'<circle cx="{cx:.0f}" cy="{cy:.0f}" r="{r:.0f}" fill="url(#orb{uid})" stroke="{GOLD2}" stroke-opacity=".7" stroke-width="{2.4*s:.1f}"/>')
+    # 木纹：偏心的同心椭圆
+    for k in range(1, 9):
+        rr = r * (1 - k * 0.1)
+        out.append(f'<ellipse cx="{cx + k*6*s:.0f}" cy="{cy + k*9*s:.0f}" rx="{rr:.0f}" ry="{rr*0.93:.0f}" fill="none" stroke="{GOLD}" stroke-opacity="{0.10 + k*0.012:.3f}" stroke-width="{1.1*s:.1f}"/>')
+    # 七窍：一道弧上排开
+    for n in range(7):
+        a = math.radians(205 + n * 21.5)
+        x = cx + r * 0.62 * math.cos(a); y = cy + r * 0.62 * math.sin(a)
+        if n < 3:
+            out.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{17*s:.1f}" fill="{GOLD2}" fill-opacity=".92"/>'
+                       f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{7*s:.1f}" fill="{NAVY_TOP}"/>')
+        else:
+            out.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{17*s:.1f}" fill="none" stroke="{CREAM}" stroke-opacity="{0.75 - (n-3)*0.14:.2f}" stroke-width="{1.8*s:.1f}" stroke-dasharray="{5*s:.1f} {6*s:.1f}"/>')
+    # 凿子：从右下斜进来，刃口对着第四窍
+    a = math.radians(205 + 3 * 21.5)
+    tx = cx + r * 0.62 * math.cos(a) + 30 * s; ty = cy + r * 0.62 * math.sin(a) + 34 * s
+    hx, hy = cx + r * 0.78, cy + r * 0.42
+    pts = [(hx + (tx - hx) * k / 20, hy + (ty - hy) * k / 20) for k in range(21)]
+    out.append(f'<path d="{tapered(pts, 58*s, 22*s, 0.8)}" fill="url(#handle{uid})" fill-opacity=".92"/>')
+    out.append(f'<line x1="{tx:.0f}" y1="{ty:.0f}" x2="{tx - 22*s:.0f}" y2="{ty - 25*s:.0f}" stroke="{CREAM}" stroke-width="{5*s:.1f}" stroke-linecap="round"/>')
     return ''.join(out)
 
 
@@ -165,10 +167,10 @@ def front(Wmm, Hmm, F):
 .pe{{font:400 {6.6*s:.1f}pt 'Noto Sans CJK SC';color:{DIM};letter-spacing:.08em;margin-top:{.8*s:.1f}mm}}
 .no{{position:absolute;right:{15*s:.1f}mm;top:{16*s:.1f}mm;font:400 {6.6*s:.1f}pt 'Noto Sans CJK SC';color:{DIM};letter-spacing:.2em;text-align:right}}
 </style></head><body><div class="pg">{svg}
-<div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 488 号</div>
-<div class="t"><div class="pre">普通人都能明白的肺发生学</div><div class="big big2">一口气是<br>怎样发生的</div>
-<div class="sub">自己在分母上的器官</div><div class="rule"></div></div>
-<div class="b"><div class="au">李秋金　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
+<div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 486 号</div>
+<div class="t"><div class="pre">庄子三十三篇的缝隙与填补</div><div class="big">浑沌的<br>七窍</div>
+<div class="sub">他教的是不凿，他靠的是凿</div><div class="rule"></div></div>
+<div class="b"><div class="au">王德生　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
 
@@ -206,13 +208,13 @@ def back(Wmm, Hmm, F):
 .f{{position:absolute;left:{17*s:.1f}mm;bottom:{17*s:.1f}mm;font:400 {7.2*s:.1f}pt/1.85 'Noto Sans CJK SC';color:{DIM}}}
 .f b{{color:{CREAM};font-weight:700;letter-spacing:.12em}}
 </style></head><body><div class="pg">{svg}
-<div class="c"><div class="lab">判 词</div>
-<div class="q">别的器官，越多越好；<br>肺交出的价值，<br>取决于面积除以墙的厚度——<br>最优的肺，是尽可能少的肺。</div><div class="by">——本书判词</div><div class="rule"></div>
-<div class="bl"><p>外婆和八岁的外孙比憋气，先输的是外婆。外孙问：是不是氧气用完了？做呼吸治疗师的女儿说：不是，是二氧化碳在催你。</p>
-<p>本书把肺读成一场发生：它把推气、推血、节律、感受都外包出去，只留下一道不到一微米的墙和气血两条路的分配；它在出生前被还不能执行的呼吸写出形状，出生时一口气让一切翻转。</p>
-<p>它的一生不是一座被消耗的仓库，而是一本对损伤持续结算的账。真正的危险，常在读数最平的时候。</p></div>
-<div class="gold">外包做功，自留分配。</div></div>
-<div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 488 号 · 七编三十一章 · 约 __WAN__ 万字<br>定价 US$20.00</div>
+<div class="c"><div class="lab">判 语</div>
+<div class="q">一部劝人别凿的书，<br>是一窍一窍凿成的。<br>他教的是不凿，<br>他靠的是凿。</div><div class="by">——本书总判语</div><div class="rule"></div>
+<div class="bl"><p>浑沌待人很好。朋友想报答他，替他凿开七窍，一天凿一窍，七天，浑沌死了。两千年来，这个故事被读成一句警告：别凿别人的本来。</p>
+<p>可《庄子》这部书，是一窍一窍凿出来的：十九年的刀，一场一场跟惠施的辩，十句话里借来的九句。本书逐篇拆三十三篇，从内篇读到天下篇，看一个人的看见怎样在一代代门人手里被拉宽成口号。</p>
+<p>凿，要慢；凿的时候，要有一块磨刀石；凿完了，要回头看土。</p></div>
+<div class="gold">吾无以为质矣。</div></div>
+<div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 486 号 · 六编四十四章 · 约 50 万字<br>定价 US$30.00</div>
 </div></body></html>"""
 
 
