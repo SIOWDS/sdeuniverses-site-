@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>高鹏 · 个人知识发生站</title>
+<meta name="description" content="高鹏的个人知识发生站：我在追问什么、判断怎样一条条长出来、写成了哪些书。著有德麦国际第 440 号《家国不分——〈春秋决狱〉与道德的直接国家化》。">
+<link rel="canonical" href="https://gaopeng.sdeuniverses.com/">
+<meta property="og:title" content="高鹏 · 个人知识发生站">
+<meta property="og:url" content="https://gaopeng.sdeuniverses.com/">
+<meta property="og:description" content="家与国之间，法律站在哪里？——高鹏的判断、作品与对话入口。">
+<meta property="og:type" content="profile">
+<meta name="theme-color" content="#14213D">
+<style>
+  :root{
+    --paper:#F6F3EC; --card:#FFFDF8; --ink:#16202F; --ink2:#4E5A6B; --ink3:#8A93A0;
+    --line:#D9D2C3; --navy:#14213D; --gold:#A8842B; --gold2:#C9A85A; --chop:#A63A2B;
+    --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC","SimSun",serif;
+    --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#0F1522; --card:#161E2E; --ink:#ECE6D8; --ink2:#B7B0A2; --ink3:#7E8796;
+           --line:#2A3448; --navy:#0A1020; --gold:#C9A85A; --gold2:#E0C47F; --chop:#D06A58; }
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--paper);color:var(--ink)}
+  body{font-family:var(--serif);line-height:1.85;font-size:17px}
+  a{color:inherit}
+  .wrap{max-width:780px;margin:0 auto;padding:0 20px}
+
+  /* 门楣 */
+  header.hero{background:var(--navy);color:#F3EBD8;padding:64px 0 56px;position:relative;overflow:hidden}
+  header.hero::after{content:"";position:absolute;inset:auto -10% -1px -10%;height:4px;background:linear-gradient(90deg,transparent,var(--gold2),transparent)}
+  .addr{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;color:var(--gold2);margin-bottom:18px;word-break:break-all}
+  .name{font-size:3rem;letter-spacing:.18em;font-weight:700;line-height:1.2}
+  .role{font-family:var(--sans);font-size:.92rem;color:#C9C2B2;margin-top:10px;letter-spacing:.06em}
+  .motif{margin-top:34px;padding-left:18px;border-left:3px solid var(--gold2)}
+  .motif .k{font-family:var(--sans);font-size:.75rem;letter-spacing:.3em;color:var(--gold2)}
+  .motif .q{font-size:1.45rem;line-height:1.6;margin-top:6px}
+
+  nav.tabs{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+  nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
+  nav.tabs a{font-family:var(--sans);font-size:.9rem;text-decoration:none;color:var(--ink2);padding:14px 12px;white-space:nowrap;border-bottom:2px solid transparent}
+  nav.tabs a:hover{color:var(--ink);border-bottom-color:var(--gold)}
+
+  section{padding:52px 0 8px}
+  h2{font-size:1.35rem;letter-spacing:.12em;display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  h2 .no{font-family:var(--mono);font-size:.8rem;color:var(--gold)}
+  .lead{color:var(--ink2);font-size:.95rem;margin-bottom:24px}
+
+  /* 发生流 */
+  .stream{position:relative;padding-left:26px}
+  .stream::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:var(--line)}
+  .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:20px 22px;margin-bottom:18px}
+  .card::before{content:"";position:absolute;left:-25px;top:26px;width:11px;height:11px;border-radius:50%;background:var(--paper);border:2px solid var(--gold)}
+  .card .meta{font-family:var(--sans);font-size:.78rem;color:var(--ink3);letter-spacing:.05em;margin-bottom:8px}
+  .card .judge{font-size:1.12rem;line-height:1.75}
+  .card .from{font-family:var(--sans);font-size:.82rem;color:var(--ink2);margin-top:10px}
+  .card.next{border-style:dashed;background:transparent}
+  .card.next::before{border-style:dashed}
+  .card.next .judge{color:var(--ink2)}
+
+  /* 作品 */
+  .work{display:grid;grid-template-columns:96px 1fr;gap:20px;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px;margin-bottom:18px}
+  .spine{background:var(--navy);color:#F3EBD8;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 6px;min-height:140px;box-shadow:inset -6px 0 0 rgba(0,0,0,.18)}
+  .spine .t{writing-mode:vertical-rl;letter-spacing:.3em;font-size:1rem}
+  .spine .n{font-family:var(--mono);font-size:.7rem;color:var(--gold2)}
+  .spine.draft{background:transparent;border:1px dashed var(--ink3);color:var(--ink2);box-shadow:none}
+  .work h3{font-size:1.15rem;line-height:1.5}
+  .work .sub{font-family:var(--sans);font-size:.8rem;color:var(--ink3);margin:4px 0 10px}
+  .work p{font-size:.96rem;color:var(--ink2)}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .btn{font-family:var(--sans);font-size:.85rem;text-decoration:none;padding:7px 14px;border:1px solid var(--line);border-radius:3px;background:var(--paper)}
+  .btn:hover{border-color:var(--gold)}
+  .btn.pri{background:var(--navy);color:#F3EBD8;border-color:var(--navy)}
+  .tag{display:inline-block;font-family:var(--sans);font-size:.72rem;color:var(--chop);border:1px solid var(--chop);border-radius:2px;padding:0 6px;margin-left:8px;vertical-align:middle}
+
+  /* 我的 SDE-AI */
+  .ai{background:var(--navy);color:#F3EBD8;border-radius:4px;padding:30px 26px}
+  .ai .k{font-family:var(--sans);font-size:.75rem;letter-spacing:.3em;color:var(--gold2)}
+  .ai h3{font-size:1.4rem;margin:8px 0 10px;letter-spacing:.08em}
+  .ai p{color:#C9C2B2;font-size:.96rem}
+  .ai .btns .btn{background:transparent;color:#F3EBD8;border-color:#4A5672}
+  .ai .btns .btn.pri{background:var(--gold);border-color:var(--gold);color:#14213D}
+
+  footer{margin-top:64px;border-top:1px solid var(--line);padding:26px 0 40px;font-family:var(--sans);font-size:.82rem;color:var(--ink3)}
+  footer a{color:var(--ink2)}
+
+  @media (max-width:560px){
+    body{font-size:16px}
+    .name{font-size:2.3rem}
+    .motif .q{font-size:1.2rem}
+    .work{grid-template-columns:64px 1fr;gap:14px;padding:18px}
+    .spine{min-height:110px}
+    .spine .t{font-size:.85rem}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="addr">gaopeng.sdeuniverses.com</div>
+    <div class="name">高鹏</div>
+    <div class="role">个人知识发生站 · 法律与伦理 · 指导老师 王德生</div>
+    <div class="motif">
+      <div class="k">我在追问</div>
+      <div class="q">家和国之间，法律站在哪里？<br>它是谁的意志，又替谁出手？</div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="本站栏目">
+  <div class="wrap">
+    <a href="#stream">发生流</a>
+    <a href="#works">作品</a>
+    <a href="#ai">我的 SDE-AI</a>
+    <a href="https://sdeuniverses.com/">德麦国际主站 ↗</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section id="stream">
+    <h2><span class="no">01</span>发生流</h2>
+    <p class="lead">不是收藏夹。这里只放一件事：一条判断是什么时候、从哪本书里长出来的。</p>
+    <div class="stream">
+
+      <article class="card next">
+        <div class="meta">下一条 · 写作中</div>
+        <div class="judge">法律到底是谁？——当一个国家说「我」的时候，说话的是谁？</div>
+        <div class="from">正在长成第二本书《法律是谁？——普通人都能明白的法律》</div>
+      </article>
+
+      <article class="card">
+        <div class="meta">2026-10-19 · 成书上线</div>
+        <div class="judge">国家的手，家长招得来，卑幼招不到。这就叫家国不分。</div>
+        <div class="from">出自《家国不分》· 德麦国际第 440 号</div>
+      </article>
+
+      <article class="card">
+        <div class="meta">2026-10-19 · 书的总问题</div>
+        <div class="judge">《春秋决狱》做的事，是让道德不经过中间环节，直接变成国家的判决。</div>
+        <div class="from">出自《家国不分——〈春秋决狱〉与道德的直接国家化》</div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="works">
+    <h2><span class="no">02</span>作品</h2>
+    <p class="lead">每一本都是「阅读 · 学习包 · 智能体」三件套：可以读，可以自测，也可以直接和书对话。</p>
+
+    <article class="work">
+      <div class="spine"><span class="t">家国不分</span><span class="n">№440</span></div>
+      <div>
+        <h3>家国不分——《春秋决狱》与道德的直接国家化</h3>
+        <div class="sub">高鹏 著 · 王德生 指导 · 德麦国际第 440 号 · ISBN 979-8-90690-608-3 · 五编十九章 约 17 万字</div>
+        <p>汉代以《春秋》经义断案，看上去是以德治国；细看，是把家里的尊卑直接搬进国家的刑罚。谁能把国家这只手招到自己家门口，谁就握有了法律。</p>
+        <div class="btns">
+          <a class="btn pri" href="https://sdeuniverses.com/books/m/440/">进入本书</a>
+          <a class="btn" href="https://sdeuniverses.com/books/m/440/jiaguo-bufen-reader.pdf?v=20261019a">阅读版 PDF</a>
+          <a class="btn" href="https://sdeuniverses.com/books/m/440/agent/learning.html">学习包</a>
+          <a class="btn" href="https://sdeuniverses.com/books/m/440/agent/dialogue.html">和这本书对话</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="work">
+      <div class="spine draft"><span class="t">法律是谁</span><span class="n">写作中</span></div>
+      <div>
+        <h3>法律是谁？——普通人都能明白的法律<span class="tag">写作中</span></h3>
+        <div class="sub">高鹏 著 · 王德生 定题 · 约 20 万字</div>
+        <p>不专讲哪一国，讲抽象的国家：法律不是国家的一套条文，而是国家开口说「我」的那种方式。</p>
+      </div>
+    </article>
+  </section>
+
+  <section id="ai">
+    <h2><span class="no">03</span>我的 SDE-AI</h2>
+    <p class="lead">这个站会跟着主人一起长。现在先开放的，是和已出版作品对话的入口。</p>
+    <div class="ai">
+      <div class="k">MY SDE-AI · 高鹏</div>
+      <h3>带着问题来，带着判断走</h3>
+      <p>问它家与国、礼与法、道德怎样变成判决。它只按高鹏书里的论证回答，答不了的会直说。</p>
+      <div class="btns">
+        <a class="btn pri" href="https://sdeuniverses.com/books/m/440/agent/dialogue.html">开始对话</a>
+        <a class="btn" href="https://sdeuniverses.com/books/m/440/agent/">智能体首页</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    gaopeng.sdeuniverses.com · 个人知识发生站 · 属于 <a href="https://sdeuniverses.com/">SDE Universes</a> · 德麦国际出版社 Demai International Press
+  </div>
+</footer>
+
+</body>
+</html>

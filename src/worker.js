@@ -19220,7 +19220,13 @@ export default {
     const contentPath = teachingEntry ? "/" : url.pathname;
     const formalSubKey = seoSiteKeyForHost(contentHost, seoCatalog);
     const legacySub = contentHost.match(/^([^.]+)\.sdeuniverses\.com$/);
-    const subPrefix = formalSubKey ? "/sites/" + formalSubKey : (legacySub ? SUBSITES[legacySub[1]] || null : null);
+    // ── 个人知识发生站（2026-10-19 起，My SDE-AI for everyone）──────────
+    // <名>.sdeuniverses.com → public/sites/p/<名>/。一人一个文件夹，加站不改代码。
+    // 只在该文件夹里真有这份文件时才接管；找不到就照旧落回母站资产，
+    // 所以任何既有子域名的行为都不变。DNS 需在 Cloudflare 加该子域名（或一次性加通配符）。
+    const legacyKey = legacySub ? legacySub[1] : null;
+    const personalKey = (!formalSubKey && legacyKey && !SUBSITES[legacyKey] && /^[a-z0-9][a-z0-9-]{1,30}$/.test(legacyKey)) ? legacyKey : null;
+    const subPrefix = formalSubKey ? "/sites/" + formalSubKey : (legacyKey && SUBSITES[legacyKey] ? SUBSITES[legacyKey] : (personalKey ? "/sites/p/" + personalKey : null));
     const ownerKey = seoOwnerForPath(url.pathname, seoCatalog);
     const ownerSite = ownerKey && seoCatalog && seoCatalog.subsites ? seoCatalog.subsites[ownerKey] : null;
     const previewMatch = url.pathname.match(/^\/sites\/(liter|lang|edu|health|teaching-lang)(\/.*)?$/);
@@ -19287,6 +19293,7 @@ export default {
       r.headers.set("x-served-at", new Date().toISOString());
       let canonicalHost = "sdeuniverses.com";
       if (formalSubKey && (subLocal || ownerKey === formalSubKey)) canonicalHost = contentHost;
+      if (personalKey && subLocal) canonicalHost = contentHost;
       const canonical = "https://" + canonicalHost + contentPath;
       const site = formalSubKey && seoCatalog && seoCatalog.subsites ? seoCatalog.subsites[formalSubKey] : null;
       return seoDecorateHtml(r, canonical, site, seoCatalog, contentPath);
