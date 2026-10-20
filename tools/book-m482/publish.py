@@ -8,7 +8,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 SITE = HERE.resolve().parents[1] / 'public'
 NO = 482
-V = '20261020a'
+V = '20261020c'
 SLUG = 'fengshui-fashengxue'
 T, SUB = '风水发生学', '空间与人的共生智慧'
 ISBN = '979-8-90690-173-6'
@@ -23,7 +23,6 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--build', type=Path, required=True); ap.add_argument('--agent', required=True); ap.add_argument('--ms', required=True)
     A = ap.parse_args(); b = A.build; AG = A.agent
     d = SITE / 'books' / 'm' / str(NO)
-    assert not (d / 'index.html').exists(), f'{NO} 号目录已存在'
     (d / 'text').mkdir(parents=True, exist_ok=True)
     shutil.copy(b / f'{SLUG}-print.pdf', d / f'{SLUG}-print.pdf')
     shutil.copy(b / f'{SLUG}-reader.pdf', d / f'{SLUG}-reader.pdf')
@@ -61,12 +60,13 @@ def main():
     cat_p = SITE / 'books' / 'catalog.json'
     data = json.loads(cat_p.read_text())
     books = data['books']
-    assert not any(str(x.get('number')) == str(NO) for x in books), f'{NO} 号已被占用'
+    old = [x for x in books if str(x.get('number')) == str(NO)]
+    books[:] = [x for x in books if str(x.get('number')) != str(NO)]
     assert not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in books), 'ISBN 重号'
     url = f'https://sdeuniverses.com/books/m/{NO}/'
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=['邬燕琴'], advisor='王德生', category='culture',
-                 description='县城老街口，杜明远一家为一套住了二十多年的旧房要不要卖犯难。本书不问风水灵不灵，而问：新的 E 能不能与已有的 D、目标的 S 写成一条和谐的方程。风水好，是三方程不走向不等式、E 高度促进六条路径顺利运行；风水不在地里，是 S 一遍遍回写 E 的沉淀；E 一旦冻住，就把 D 和 S 一起冻住，人们管这个叫命。所以风水不只能看，还能写。邬燕琴著，王德生指导；八编二十五章；含阅读、学习包、智能体三位一体。',
+                 description='县城老街口，杜明远一家为一套住了二十多年的旧房要不要卖犯难。本书不问风水灵不灵，而问：新的 E 能不能与已有的 D、目标的 S 写成一条和谐的方程。风水好，是三方程不走向不等式、E 高度促进六条路径顺利运行；风水不在地里，是 S 一遍遍回写 E 的沉淀；E 一旦冻住，就把 D 和 S 一起冻住，人们管这个叫命。所以风水不只能看，还能写。邬燕琴著，王德生指导；九编二十八章；含阅读、学习包、智能体三位一体。',
                  detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
                  pdfUrl=url + f'{SLUG}-reader.pdf?v={V}', printPdfUrl=url + f'{SLUG}-print.pdf?v={V}',
                  coverUrl=url + f'cover.jpg?v={V}', backcoverUrl=url + f'backcover.jpg?v={V}',
@@ -75,9 +75,10 @@ def main():
                  pdfPages=pages, publishedAt=now, publisher='德麦国际出版社', publisherEnglish='Demai International Press',
                  isbn=ISBN.replace('-', ''),
                  agentUrl=url + 'agent/dialogue.html', agentName=AG, agentLabel='智能问对 · ' + AG,
-                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 27个学习单元',
+                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 30个学习单元',
                  learningPackUrl=url + f'downloads/{SLUG}-learning-v1.0.pdf',
                  publicationUnit={'id': f'm-{NO}', 'type': 'reading-learning-dialogue', 'revision': '20261020-m482-unit-v1'})
+    if old and old[0].get('publishedAt'): entry['publishedAt'] = old[0]['publishedAt']
     books.insert(0, entry)
     data['updated'] = now[:10]
     cat_p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
@@ -88,6 +89,8 @@ def main():
             t = t.replace('</urlset>', '<url><loc>%s</loc><lastmod>%s</lastmod></url>\n</urlset>' % (u, now[:10]))
     sm.write_text(t)
     tp = SITE / 'today' / 'index.html'; h = tp.read_text()
+    if '/books/m/%d/' % NO in h:
+        tp.write_text(h); print('today card exists'); print('published to', d, 'pages', pages, 'han', han); return
     i = h.index('★ 新书 · 德麦国际专著第')
     a0 = h.rindex('<a href="/books/m/', 0, i)
     card = ('<a href="/books/m/%d/" style="display:block;text-decoration:none;margin-bottom:16px"><div style="border:1px solid rgba(217,180,92,0.85);border-radius:3px;background:linear-gradient(135deg,rgba(14,31,49,0.98),rgba(9,18,30,0.98));padding:34px 32px;box-shadow:0 0 0 1px rgba(217,180,92,0.16) inset,0 0 40px rgba(217,180,92,0.10)">'

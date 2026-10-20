@@ -213,7 +213,7 @@ def back(Wmm, Hmm, F):
 <p>本书不看吉凶断语，看它们是怎样被写成的：历代住户的结局，一笔笔沉进土里，又被当成了先天的规律。</p>
 <p>写得下去，就还有得改。从看风水，到写风水。</p></div>
 <div class="gold">解冻，然后重写。</div></div>
-<div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 482 号 · 八编二十五章 · 约 26 万字<br>定价 US$20.00</div>
+<div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 482 号 · 九编二十八章 · 约 28 万字<br>定价 US$20.00</div>
 </div></body></html>"""
 
 
