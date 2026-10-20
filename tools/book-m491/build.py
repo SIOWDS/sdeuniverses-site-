@@ -567,7 +567,7 @@ def tune_chapters(secs, css_args, fonts, label):
                 TIGHT.pop(s[1], None)
             pdf = weasyprint.HTML(string=html_doc(css, sec_html(*s)), base_url=str(ROOT)).write_pdf()
             d = pymupdf.open(stream=pdf, filetype='pdf')
-            lone = len(d) > 1 and d[len(d) - 1].get_text().lstrip().startswith(('九格卡','带走的话','本章判错句','想一想'))
+            lone = len(d) > 1 and (d[len(d) - 1].get_text().lstrip().startswith(('九格卡','带走的话','本章判错句','想一想')) or len(re.findall(r'[一-鿿]', d[len(d) - 1].get_text())) < 55)
             if not lone:
                 break
         cache[key] = lvl if not lone or lvl else ''
