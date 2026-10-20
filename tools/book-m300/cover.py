@@ -278,7 +278,7 @@ def front(Wmm, Hmm, F):
 <div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 300 号</div>
 <div class="t"><div class="pre">差在入场那一步</div><div class="big">圣经中女子智慧的<br>缝隙和补缺</div>
 <div class="sub">用耶稣的全丰满智慧照亮她们</div><div class="rule"></div></div>
-<div class="b"><div class="au">李佳城　著</div><div class="pe" style="letter-spacing:.2em;margin-top:1.4mm">王德生　指导</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
+<div class="b"><div class="au">李佳城　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
 

@@ -165,7 +165,7 @@ def front(Wmm, Hmm, F):
 <div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 478 号</div>
 <div class="t"><div class="pre">形状 · 路 · 土</div><div class="big big2">癌是怎样<br>发生的？</div>
 <div class="sub">癌症 SDE 发生学导论</div><div class="rule"></div></div>
-<div class="b"><div class="au">李秋金　著</div><div class="pe" style="font-size:8.2pt;letter-spacing:.28em;color:#EFE8D6;margin-top:1.5mm">王德生　指导</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
+<div class="b"><div class="au">李秋金　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
 

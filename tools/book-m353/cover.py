@@ -174,7 +174,7 @@ def front(Wmm, Hmm, F):
 <div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 353 号</div>
 <div class="t"><div class="pre">普通人都能懂的</div><div class="big">教育学学派解构入门</div>
 <div class="sub">每个学派都把“长”收回成了“装”或“挖”</div><div class="rule"></div></div>
-<div class="b"><div class="au">阳涌　著</div><div class="gd">王德生　指导</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
+<div class="b"><div class="au">阳涌　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
 

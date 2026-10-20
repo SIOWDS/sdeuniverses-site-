@@ -169,7 +169,7 @@ def front(Wmm, Hmm, F):
 <div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 482 号</div>
 <div class="t"><div class="pre">空间与人的共生智慧</div><div class="big big2">风水<br>发生学</div>
 <div class="sub">E 怎样进入方程<br>又怎样被写成命</div><div class="rule"></div></div>
-<div class="b"><div class="au">邬燕琴　著</div><div class="pe" style="margin-top:2mm;letter-spacing:.24em">王德生　指导</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
+<div class="b"><div class="au">邬燕琴　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
 

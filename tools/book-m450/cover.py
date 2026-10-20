@@ -183,7 +183,7 @@ def front(Wmm, Hmm, F):
 <div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 450 号</div>
 <div class="t"><div class="pre">能再来 · 能长进 · 不欠账</div><div class="big big2">为什么人人<br>都想重开？</div>
 <div class="sub">游戏发生学</div><div class="rule"></div></div>
-<div class="b"><div class="au">阳涌　著</div><div class="au" style="font-size:.78em;margin-top:2mm">王德生　指导</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
+<div class="b"><div class="au">阳涌　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
 
