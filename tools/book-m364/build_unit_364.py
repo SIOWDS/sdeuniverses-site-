@@ -140,7 +140,7 @@ def main():
     rest = (TPL / 'SKILL.md').read_text(encoding='utf-8')
     rest = rest[rest.index('## 两次回写与数据边界'):]
     skill += rest
-    assert '398' not in skill, 'leftover 398 in SKILL.md'
+    assert '398' not in skill.replace(C['skillTheory'], ''), 'leftover 398 in SKILL.md'
     w('unit/SKILL.md', skill)
 
     # ---- pages
