@@ -1,0 +1,33 @@
+name: M451 live publication acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/books/m/451/index.html'
+      - '.publish/m451/live-manifest.json'
+      - '.publish/m451/verify_live.py'
+      - '.github/workflows/m451-live-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: m451-live-acceptance
+  cancel-in-progress: false
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: .publish/m451
+      - name: Wait for production and verify book, shelves, and PDF downloads
+        run: python .publish/m451/verify_live.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m451-live-publication-acceptance
+          path: m451-live-result.json
+          if-no-files-found: warn
+          retention-days: 14
