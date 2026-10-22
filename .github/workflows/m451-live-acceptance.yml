@@ -21,7 +21,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           filter: blob:none
-          sparse-checkout: .publish/m451
+          sparse-checkout: |
+            .publish/m451
+            public/books/m/451
       - name: Wait for production and verify book, shelves, and PDF downloads
         run: python .publish/m451/verify_live.py
       - uses: actions/upload-artifact@v4
