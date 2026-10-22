@@ -7,9 +7,9 @@ from botocore.exceptions import ClientError
 ROOT = Path(__file__).parent
 manifest = json.loads((ROOT / "pdf-manifest.json").read_text())
 expected = {
-    "books/m/451/fasheng-shicha-reader.pdf",
-    "books/m/451/fasheng-shicha-print.pdf",
-    "books/m/451/downloads/fasheng-shicha-learning-v1.0.pdf",
+    "books/m/451/fasheng-shicha-reader-v1.1.pdf",
+    "books/m/451/fasheng-shicha-print-v1.1.pdf",
+    "books/m/451/downloads/fasheng-shicha-learning-v1.1.pdf",
 }
 assert {x["key"] for x in manifest} == expected and len(manifest) == 3
 os.environ.setdefault("AWS_REQUEST_CHECKSUM_CALCULATION", "when_required")
