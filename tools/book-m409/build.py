@@ -294,7 +294,7 @@ def build_sections():
         secs.append(('part', sid(), '%s　%s' % (m[1].replace('　', ''), m[2]), 1,
                      '%s<div class="part-label">%s</div><h1 class="part-title">%s</h1><div class="rule"></div>'
                      '<div class="daoyu">导　语</div><div class="part-intro">%s</div>'
-                     % (EMB, spaced(m[1].replace('　', '')), inline(m[2]), ''.join(intro))))
+                     % (EMB, spaced(m[1].replace('　', '')), inline(m[2]).replace('：', '：<br>', 1) if len(m[2]) > 11 else inline(m[2]), ''.join(intro))))
         # 章
         while i < len(bl):
             t = bl[i][1][0]
