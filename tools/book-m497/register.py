@@ -19,7 +19,7 @@ today = datetime.date.today().isoformat()
 for k in ('updatedAt', 'updated'):
     if k in reg:
         reg[k] = today
-p.write_text(json.dumps(reg, ensure_ascii=False, indent=1), encoding='utf-8')
+p.write_text(json.dumps(reg, ensure_ascii=False, indent=2), encoding='utf-8')
 
 kp = {'no': 497, 'title': '释经学的典范革命——从发现学到发生学', 'built': today, 'items': X['keypoints']}
 (PUB / 'books' / 'm' / '497' / 'keypoints.json').write_text(json.dumps(kp, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
