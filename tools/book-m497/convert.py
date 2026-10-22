@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""第 498 号《释经学的典范革命——从发现学到发生学》：把三审定稿各章（00a_前言.md、00b_导读.md、chNN.md、99a_结语.md、99b_后记.md）
+"""第 497 号《释经学的典范革命——从发现学到发生学》：把三审定稿各章（00a_前言.md、00b_导读.md、chNN.md、99a_结语.md、99b_后记.md）
 转成 220 版式工具链的分卷稿（front/、parts/、back/），并合出学习单元用的 book.md。
-用法：python3 tools/book-m498/convert.py <定稿目录> <附录与书目所在的 book.md>
+用法：python3 tools/book-m497/convert.py <定稿目录> <附录与书目所在的 book.md>
 """
 import re, sys
 from pathlib import Path
@@ -9,7 +9,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 SRC = Path(sys.argv[1])
 APPX = Path(sys.argv[2]).read_text(encoding='utf-8')
-NO, ISBN, PRICE = 498, '979-8-90690-498-0', 'US$23.00'
+NO, ISBN, PRICE = 497, '979-8-90690-497-3', 'US$23.00'
 
 PARTS = [
     ('01-第一编', '第一编　两套语法：同一本书，两种“圣经是什么”', range(1, 6)),

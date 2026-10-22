@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""第 498 号《释经学的典范革命》：装进 public/books/m/498/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡（由第 488 号改来）。
-用法：python3 tools/book-m498/publish.py --build /home/claude/b498 --content tools/book-m498/content.json --ms tools/book-m498/book.md
+"""第 497 号《释经学的典范革命》：装进 public/books/m/497/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡（由第 488 号改来）。
+用法：python3 tools/book-m497/publish.py --build /home/claude/b497 --content tools/book-m497/content.json --ms tools/book-m497/book.md
 """
 import argparse, datetime, json, re, shutil, subprocess
 from pathlib import Path
 
 HERE = Path(__file__).parent
 SITE = HERE.resolve().parents[1] / 'public'
-NO = 498
+NO = 497
 V = '20261022a'
 SLUG = 'shijingxue-geming'
 T, SUB = '释经学的典范革命', '从发现学到发生学'
-ISBN = '979-8-90690-498-0'
+ISBN = '979-8-90690-497-3'
 
 
 def pages_of(pdf):
@@ -79,7 +79,7 @@ def main():
                  agentUrl=url + 'agent/dialogue.html', agentName=AG, agentLabel='智能问对 · ' + AG,
                  learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 74个学习单元',
                  learningPackUrl=url + f'downloads/{SLUG}-learning-v1.0.pdf',
-                 publicationUnit={'id': f'm-{NO}', 'type': 'reading-learning-dialogue', 'revision': '20261022-m498-unit-v1'})
+                 publicationUnit={'id': f'm-{NO}', 'type': 'reading-learning-dialogue', 'revision': '20261022-m497-unit-v1'})
     books.insert(0, entry)
     data['updated'] = now[:10]
     cat_p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')

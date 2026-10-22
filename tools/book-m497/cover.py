@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 498 号《释经学的典范革命》封面与封底（由第 427 号改来，220 系列版式）：主图「缝里结晶」——石版裂开一道缝，缝里长出晶体，一缕气吹过。
+"""第 497 号《释经学的典范革命》封面与封底（由第 427 号改来，220 系列版式）：主图「缝里结晶」——石版裂开一道缝，缝里长出晶体，一缕气吹过。
 用法：python3 cover.py --fonts /home/claude/fonts --out <dir>
 """
 import argparse
@@ -9,7 +9,7 @@ from pathlib import Path
 
 NAVY_TOP, NAVY_MID, NAVY_LOW = '#0B1830', '#1B3158', '#142746'
 GOLD, GOLD2, CYAN, CREAM, DIM = '#C9A857', '#E3C77E', '#58BDCA', '#EFE8D6', '#9FB0C8'
-ISBN = '979-8-90690-498-0'
+ISBN = '979-8-90690-497-3'
 
 L = ['0001101', '0011001', '0010011', '0111101', '0100011', '0110001', '0101111', '0111011', '0110111', '0001011']
 G = ['0100111', '0110011', '0011011', '0100001', '0011101', '0111001', '0000101', '0010001', '0001001', '0010111']
@@ -206,7 +206,7 @@ def front(Wmm, Hmm, F):
 .pe{{font:400 {6.6*s:.1f}pt 'Noto Sans CJK SC';color:{DIM};letter-spacing:.08em;margin-top:{.8*s:.1f}mm}}
 .no{{position:absolute;right:{15*s:.1f}mm;top:{16*s:.1f}mm;font:400 {6.6*s:.1f}pt 'Noto Sans CJK SC';color:{DIM};letter-spacing:.2em;text-align:right}}
 </style></head><body><div class="pg">{svg}
-<div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 498 号</div>
+<div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 497 号</div>
 <div class="t"><div class="pre">S D E 释 经 学</div><div class="big">释经学的<br>典范革命</div>
 <div class="sub">从发现学到发生学</div><div class="rule"></div></div>
 <div class="b"><div class="au">王德生　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
@@ -253,7 +253,7 @@ def back(Wmm, Hmm, F):
 <p>可是一节经文，常常是两样东西对不上时留下的刻痕：理念与现实，现实与自我。本书从“起初”读到“我将一切都更新了”，六十六卷，一卷一章，看每一卷的那条缝在哪里，结晶出了什么，今天又在读的人身上逼出了什么。</p>
 <p>它也写清边界：缝要事先从经文里指认，读法要能被检验，发生学不等于怎么读都行。</p></div>
 <div class="gold">经文每次被读，都又发生一次。</div></div>
-<div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 498 号 · 十编七十四章 · 约 50 万字<br>定价 US$23.00</div>
+<div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 497 号 · 十编七十四章 · 约 50 万字<br>定价 US$23.00</div>
 </div></body></html>"""
 
 
