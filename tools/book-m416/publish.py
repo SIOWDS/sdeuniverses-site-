@@ -8,7 +8,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 SITE = HERE.resolve().parents[1] / 'public'
 NO = 416
-V = '20261022b'
+V = '20261022c'
 SLUG = 'shoukou'
 T, SUB = '收口', 'AI 时代谁来结这一笔账'
 ISBN = '979-8-90690-416-4'
@@ -65,8 +65,8 @@ def main():
     assert not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in books), 'ISBN 重号'
     url = f'https://sdeuniverses.com/books/m/{NO}/'
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-    entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=['胡东吧'], category='ai',
-                 description='夜里十一点，一家人里有三个在按同一种按钮：重新生成。作文、海报、一句没事，按一下不花钱，也不欠谁；可是最后一步谁走、错了谁买单、尺子谁能改回来？本书从德麦国际书架教育、健康、事业三类挑出十部专著两两碰撞，提出母题「收口」：AI 把开口变得几乎免费，在少数被法规点名的高风险场合之外，却几乎没有给收口留下位置。收口三件（收尾、认账、改尺）加收口时距；四格中的靶格是空重开；读数是收口率与写进率；第八编推出收口产业的十个新行业（初判）。第 46 章在公开记录上真跑两条，把本书的话改小；第 47 章押四条赌注到 2029 年底。胡东吧著，王德生 SDE 发生学为方法底盘；九编四十八章；含阅读、学习包、智能体三位一体。',
+    entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=['王德生'], category='ai',
+                 description='夜里十一点，一家人里有三个在按同一种按钮：重新生成。作文、海报、一句没事，按一下不花钱，也不欠谁；可是最后一步谁走、错了谁买单、尺子谁能改回来？本书从德麦国际书架教育、健康、事业三类挑出十部专著两两碰撞，提出母题「收口」：AI 把开口变得几乎免费，在少数被法规点名的高风险场合之外，却几乎没有给收口留下位置。收口三件（收尾、认账、改尺）加收口时距；四格中的靶格是空重开；读数是收口率与写进率；第八编推出收口产业的十个新行业（初判）。第 46 章在公开记录上真跑两条，把本书的话改小；第 47 章押四条赌注到 2029 年底。王德生著；九编四十八章；含阅读、学习包、智能体三位一体。',
                  detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
                  pdfUrl=url + f'{SLUG}-reader.pdf?v={V}', printPdfUrl=url + f'{SLUG}-print.pdf?v={V}',
                  coverUrl=url + f'cover.jpg?v={V}', backcoverUrl=url + f'backcover.jpg?v={V}',
@@ -95,8 +95,8 @@ def main():
             '<div class="en-only" style="font-size:12.5px;letter-spacing:0.18em;color:#D9B45C;margin-bottom:14px">★ NEW BOOK · DEMAI MONOGRAPH No.%d · ~%s CHARS · %d PP · US$ 23.00</div>'
             '<h3 class="zh-only" style="color:#F1EBDC;font-size:25px;line-height:1.5;margin:0 0 14px">收口——AI 时代谁来结这一笔账</h3>'
             '<h3 class="en-only" style="color:#F1EBDC;font-size:23px;line-height:1.5;margin:0 0 14px">Closing: Who Settles the Account in the Age of AI</h3>'
-            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">胡东吧著，王德生 SDE 发生学为方法底盘。教育、健康、事业十部专著两两碰撞：AI 把开口变得几乎免费，却几乎没有给收口留下位置。收口三件、空重开、收口率，与 AI 时代的收口产业。含阅读、学习包、智能体三位一体出版单元。</p>'
-            '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">By Hu Dongba, on Wang Desheng\'s SDE genesis method. Ten monographs on education, health and work collide: AI makes opening nearly free yet leaves almost no registered place for closing.</p></div></a>'
+            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">王德生著。教育、健康、事业十部专著两两碰撞：AI 把开口变得几乎免费，却几乎没有给收口留下位置。收口三件、空重开、收口率，与 AI 时代的收口产业。含阅读、学习包、智能体三位一体出版单元。</p>'
+            '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">By Wang Desheng. Ten monographs on education, health and work collide: AI makes opening nearly free yet leaves almost no registered place for closing.</p></div></a>'
             % (NO, NO, han / 10000, pages, NO, format(han, ','), pages))
     h = h[:a0] + card + h[a0:]
     tp.write_text(h)
