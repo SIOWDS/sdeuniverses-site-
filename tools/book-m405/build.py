@@ -284,14 +284,21 @@ def build_sections():
         m = re.match(r'^(.+?)　(.*)$', part_title)
         intro = []
         i = 1
+        _n = 0
         while i < len(bl) and bl[i][0] != 'h2':
             if bl[i][0] == 'p':
-                intro.append('<p class="bianxu">%s</p>' % inline(bl[i][1][0]))
+                _n += len(HAN.findall(bl[i][1][0]))
+            i += 1
+        _sty = 'font-size:.85em;line-height:1.66' if _n > 475 else 'font-size:.9em;line-height:1.72'
+        i = 1
+        while i < len(bl) and bl[i][0] != 'h2':
+            if bl[i][0] == 'p':
+                intro.append('<p class="bianxu" style="%s">%s</p>' % (_sty, inline(bl[i][1][0])))
             i += 1
         secs.append(('part', sid(), '%s　%s' % (m[1].replace('　', ''), m[2]), 1,
-                     '%s<div class="part-label">%s</div><h1 class="part-title">%s</h1><div class="rule"></div>'
+                     '<div style="margin-top:%s"></div>%s<div class="part-label">%s</div><h1 class="part-title">%s</h1><div class="rule"></div>'
                      '<div class="daoyu">编　序</div><div class="part-intro">%s</div>'
-                     % (EMB, spaced(m[1].replace('　', '')), inline(m[2]), ''.join(intro))))
+                     % ('-24mm' if _n > 440 else '-13mm', EMB, spaced(m[1].replace('　', '')), inline(m[2]), ''.join(intro))))
         # 章
         while i < len(bl):
             t = bl[i][1][0]
