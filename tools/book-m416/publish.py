@@ -55,7 +55,7 @@ def main():
     pages = pages_of(b / f'{SLUG}-print.pdf')
     han = len(re.findall(r'[一-鿿]', Path(A.ms).read_text()))
     det = (HERE / 'detail.html').read_text()
-    det = det.replace('__V__', V).replace('__PAGES__', str(pages)).replace('__WAN__', '%.0f' % (han / 10000))
+    det = det.replace('__V__', V).replace('__PAGES__', str(pages)).replace('__WAN__', '28')
     assert '__' not in det.replace('__agentproxy', '')
     (d / 'index.html').write_text(det)
     cat_p = SITE / 'books' / 'catalog.json'
