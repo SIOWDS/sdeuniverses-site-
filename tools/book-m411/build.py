@@ -257,7 +257,7 @@ def build_sections():
     for title, bl in groups:
         if title == '题词':
             ps = [b[0] for k, b in bl if k == 'p']
-            body = ''.join('<p class="by">%s</p>' % inline(x[6:]) if x.startswith('【题词署】') else '<p>%s</p>' % inline(x.replace('【题词】', '')) for x in ps)
+            body = ''.join('<p class="by">%s</p>' % inline(x[5:]) if x.startswith('【题词署】') else '<p>%s</p>' % inline(x.replace('【题词】', '')) for x in ps)
             EPIGRAPH = '<section class="epi front-sec clean">%s</section>' % body
             continue
         if title == '出版信息':
