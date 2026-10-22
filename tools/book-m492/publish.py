@@ -8,7 +8,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 SITE = HERE.resolve().parents[1] / 'public'
 NO = 492
-V = '20261022a'
+V = '20261022b'
 SLUG = 'yidian-sanmen'
 T, SUB = '一店三门', '从作坊、实验室到书房，每个人一生的知识发生'
 ISBN = '979-8-90690-152-1'

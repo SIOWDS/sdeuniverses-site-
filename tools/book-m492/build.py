@@ -28,7 +28,7 @@ SLUG = 'yidian-sanmen'
 META = dict(
     title='一店三门', name='一店三门',
     subtitle='从作坊、实验室到书房，每个人一生的知识发生', author='王德生', advisor='', no=492,
-    isbn='979-8-90690-152-1', price='US$20.00', version='20261022a',
+    isbn='979-8-90690-152-1', price='US$20.00', version='20261022b',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')

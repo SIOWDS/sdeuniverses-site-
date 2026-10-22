@@ -6,7 +6,7 @@ C = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
 cfg = {
  'number': 492, 'slug': 'yidian-sanmen', 'title': '一店三门', 'subtitle': '从作坊、实验室到书房，每个人一生的知识发生', 'authors': ['王德生'],
  'isbn': '979-8-90690-152-1', 'price': 'US$20.00', 'partWord': '编', 'sourceEdition': '初版（2026-10-22）',
- 'unitRev': '20261022-m492-unit-v1', 'assetVersion': '20261022a', 'manuscript': 'tools/book-m492/book.md',
+ 'unitRev': '20261022-m492-unit-v1', 'assetVersion': '20261022b', 'manuscript': 'tools/book-m492/book.md',
  'agentName': C['agent']['name'], 'agentEpithet': C['agentEpithet'], 'bookMeta': C['bookMeta'], 'heroTagline': C['heroTagline'],
  'practiceWord': C['practiceWord'], 'pdfBg': '#16253d',
  'learningPdfUrl': 'https://sdeuniverses.com/books/m/492/downloads/yidian-sanmen-learning-v1.0.pdf',
