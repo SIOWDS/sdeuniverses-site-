@@ -28,7 +28,7 @@ SLUG = 'fasheng-shicha'
 META = dict(
     title='发生的时差', name='发生的时差',
     subtitle='普通人都能懂的快慢之学', author='王德生', advisor='', no=451,
-    isbn='979-8-90690-451-5', price='US$23.00', version='20261022a',
+    isbn='979-8-90690-451-5', price='US$23.00', version='20261022b',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
@@ -106,6 +106,9 @@ def inline(s):
     s = html.escape(s, quote=False)
     s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
     s = re.sub(r'(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?!\*)', r'<em>\1</em>', s)
+    s = re.sub(r'（\d+\s*号(?:第[^（）<]{1,14}章[^（）<]{0,8}|导言◆[一二三四五六七八九十]+)）',
+               r'<span class="inline-ref">\g<0></span>', s)
+    s = re.sub(r'\bS\s*[＝=]\s*F\([^()<>]{1,15}\)', r'<span class="inline-ref">\g<0></span>', s)
     return s
 
 
@@ -113,6 +116,7 @@ def table_html(rows, cls='tb'):
     cells = [[c.strip() for c in r.strip().strip('|').split('|')] for r in rows]
     cells = [r for r in cells if not all(re.fullmatch(r':?-{2,}:?', c) for c in r)]
     head, body = cells[0], cells[1:]
+    conclusion_table = head == ['在哪里', '卡档的样子', '换档的样子']
     if len(head) >= 5:
         cls += ' w5'
     for ci in (0, 1):
@@ -120,13 +124,32 @@ def table_html(rows, cls='tb'):
             cls += ' n%d' % (ci + 1)
     if len(body) > 20:
         cls += ' dense'
-    h = ['<div class="tw"><table class="%s"><thead><tr>' % cls]
+    if head == ['编', '讲什么', '章']:
+        cls += ' book-map'
+    elif head == ['词', '意思', '一句话例子', '首次讲到']:
+        cls += ' glossary'
+    elif head == ['编号', '书名', '作者', '主要用在']:
+        cls += ' booklist'
+    h = ['<div class="tw%s"><table class="%s"><thead><tr>' %
+         (' short' if len(body) <= 8 and not conclusion_table else '', cls)]
     h += ['<th>%s</th>' % inline(c) for c in head]
-    h.append('</tr></thead><tbody>')
-    for r in body:
+    h.append('</tr></thead><tbody%s>' % (' class="row-group"' if conclusion_table else ''))
+    for row_idx, r in enumerate(body):
+        if conclusion_table and row_idx == 2:
+            h.append('</tbody><tbody class="row-group">')
         h.append('<tr>' + ''.join('<td>%s</td>' % inline(c) for c in r) + '</tr>')
     h.append('</tbody></table></div>')
     return ''.join(h)
+
+
+def tail_inline(s, count=8):
+    """Keep a short ending together without changing source words or punctuation."""
+    if '*' in s or len(s) <= count:
+        return inline(s)
+    split = len(s) - count
+    while split > 0 and (s[split] in '，。！？；：、）】》」』' or s[split-1] in '（【《「『'):
+        split -= 1
+    return inline(s[:split]) + '<span class="phrase-tail">' + inline(s[split:]) + '</span>'
 
 
 def quote_html(lines):
@@ -135,12 +158,13 @@ def quote_html(lines):
     rest = [l for l in lines[1:] if l.strip()]
     if first == '**带走的话**':
         return '<div class="takeaway"><span class="lab">带走的话</span>%s</div>' % ''.join(
-            '<p>%s</p>' % inline(l) for l in rest)
+            '<p>%s</p>' % ''.join('<span class="phrase-tail">%s</span>' % inline(c) if len(c) <= 26 else tail_inline(c)
+                                  for c in re.findall(r'[^，；]+[，；]?', l)) for l in rest)
     if first == '**小账**':
         ps = []
         for l in rest:
             m = re.match(r'^(.{2,30}？)——(.*)$', l)
-            ps.append('<p><span class="lk">%s</span>%s</p>' % (inline(m[1]), inline(m[2])) if m else '<p>%s</p>' % inline(l))
+            ps.append('<p><span class="lk">%s</span>%s</p>' % (inline(m[1]), tail_inline(m[2], 6)) if m else '<p>%s</p>' % tail_inline(l, 6))
         return '<div class="ledger"><span class="lab">小　账</span>%s</div>' % ''.join(ps)
     if first == '**九格卡**':
         ps = []
@@ -167,24 +191,44 @@ def quote_html(lines):
 
 def render(blocks, bib=False):
     h = []
+    section_lead = False
+    lead_chars = 0
     for k, b in blocks:
         if k == 'p':
             t = b[0]
             if re.fullmatch(r'〔[^〔〕]*〕', t):
                 h.append('<p class="srcnote">%s</p>' % inline(t))
             else:
-                h.append('<p%s>%s</p>' % (' class="bib"' if bib else '', inline(t)))
+                classes = ['bib'] if bib else []
+                if re.fullmatch(r'\*\*.+\*\*', t):
+                    classes.append('ref-heading')
+                    section_lead = True
+                    lead_chars = 0
+                elif section_lead:
+                    classes.append('section-lead')
+                    lead_chars += len(re.sub(r'[*\s]', '', t))
+                    if lead_chars < 70:
+                        classes.append('keep-next')
+                    else:
+                        section_lead = False
+                h.append('<p%s>%s</p>' % (' class="%s"' % ' '.join(classes) if classes else '', inline(t)))
         elif k == 'h3':
+            section_lead = True
+            lead_chars = 0
             t = b[0]
             if t.startswith('◆'):
                 h.append('<h3 class="sec"><span class="dia">◆</span>%s</h3>' % inline(t.lstrip('◆ ').strip()))
             else:
                 h.append('<h3 class="sec">%s</h3>' % inline(t))
         elif k == 'h2':
+            section_lead = True
+            lead_chars = 0
             h.append('<h3 class="subhead">%s</h3>' % inline(b[0]))
         elif k == 'quote':
+            section_lead = False
             h.append(quote_html(b))
         elif k == 'table':
+            section_lead = False
             h.append(table_html(b))
         elif k == 'ul':
             h.append('<ul class="ls">%s</ul>' % ''.join('<li>%s</li>' % inline(x) for x in b))
@@ -377,6 +421,10 @@ def print_css(fonts, W, H, body_pt, lh, margin, fol='decimal'):
 @page opener:right{{@top-right{{content:none}}}}
 body{{font-family:'Noto Serif CJK SC';font-size:{body_pt}pt;line-height:{lh};color:#2A2824;margin:0;string-set:book "{META['title']}"}}
 p{{margin:0 0 .42em;text-indent:2em;text-align:justify;orphans:2;widows:2}}
+p.section-lead{{orphans:3}}
+p.keep-next{{break-after:avoid;break-inside:avoid}}
+p.ref-heading{{text-indent:0;text-align:left;break-inside:avoid;break-after:avoid}}
+.inline-ref,.phrase-tail{{display:inline-block;white-space:nowrap}}
 strong{{color:#1F3A5F;font-weight:700}}
 em{{font-style:italic}}
 .clean{{page:clean}}
@@ -403,7 +451,7 @@ h3.sec .dia{{color:#B08A3C;font-size:.78em;margin-right:.45em;vertical-align:.08
 h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;margin:6mm 0 2.5mm;break-after:avoid}}
 .takeaway{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;padding:2.2mm 4mm 2.4mm;margin:4.5mm 0 3mm;break-inside:avoid}}
 .takeaway .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.5em;margin-bottom:1.4mm}}
-.takeaway p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F;font-size:{body_pt*1.02:.2f}pt}}
+.takeaway p{{text-indent:0;text-align:left;margin:0;font-weight:700;color:#1F3A5F;font-size:{body_pt*1.02:.2f}pt}}
 .ledger{{background:#F4EFE3;border-left:1.6pt solid #D8CFBB;padding:2mm 4mm 2.2mm;margin:3mm 0 2mm;break-inside:avoid;display:flex;gap:4mm;flex-wrap:wrap}}
 .ledger .lab{{flex:0 0 100%;margin-bottom:.4mm!important}}
 .ledger p{{flex:1 1 44%}}
@@ -411,14 +459,15 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 .ledger p{{text-indent:0;margin:0 0 .6mm;font-size:{body_pt*0.86:.2f}pt;line-height:1.75;color:#5A554A}}
 .ledger .lk{{color:#1F3A5F;font-weight:700}}
 .chapend{{break-inside:avoid}}
+.chapter.tail-unit .deep{{break-after:avoid}}
 section.backm .chapend{{break-before:avoid}} section.backm p:last-of-type{{widows:3}}
 .wonder{{border-left:1.6pt solid #58A9B5;padding:1.8mm 4mm;margin:2mm 0 1mm;break-inside:avoid}}
 .wonder .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.4em;margin-bottom:1mm}}
 .wonder p{{text-indent:0;margin:0;font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
 .ledger.nine{{display:block}}
 .ledger.nine p{{margin:0 0 .5mm}}
-.deep{{background:#F4F1EA;border:.6pt solid #DDD5C3;padding:2.4mm 4mm 2.2mm;margin:5mm 0 2mm}}
-.deep .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#1F3A5F;letter-spacing:.3em;margin-bottom:1.2mm}}
+.deep{{background:#F4F1EA;border:.6pt solid #DDD5C3;padding:2.4mm 4mm 2.2mm;margin:5mm 0 2mm;break-inside:avoid}}
+.deep .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#1F3A5F;letter-spacing:.3em;margin-bottom:1.2mm;break-after:avoid}}
 .deep p{{text-indent:2em;margin:0 0 .5mm;font:{body_pt*0.84:.2f}pt/1.75 'Noto Sans CJK SC';color:#4A463D}}
 .judge{{border-left:1.6pt solid #8A6E3A;padding:1.8mm 4mm;margin:2mm 0 1mm;break-inside:avoid}}
 .judge .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#8A6E3A;letter-spacing:.3em;margin-bottom:1mm}}
@@ -440,9 +489,11 @@ section.backm .chapend{{break-before:avoid}} section.backm p:last-of-type{{widow
 blockquote.verdict{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;margin:4mm 0;padding:2.6mm 4mm;break-inside:avoid}}
 blockquote.verdict p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F}}
 .tw{{margin:3.5mm 0}}
+.tw.short{{break-inside:avoid}}
 table.tb{{width:100%;border-collapse:collapse;font-size:{body_pt*0.8:.2f}pt;line-height:1.6}}
-table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left}}
+table.tb th{{box-sizing:border-box;background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left}}
 table.tb tr{{break-inside:avoid}}
+table.tb tbody.row-group{{break-inside:avoid}}
 table.tb.n1 th:nth-child(1),table.tb.n1 td:nth-child(1){{white-space:nowrap}}
 table.tb.n2 th:nth-child(2),table.tb.n2 td:nth-child(2){{white-space:nowrap}}
 table.tb.w5 th:nth-child(-n+2),table.tb.w5 td:nth-child(-n+2){{white-space:nowrap}}
@@ -450,6 +501,31 @@ table.tb.w5 td{{font-size:{body_pt*0.74:.2f}pt;line-height:1.55}}
 table.tb.dense td{{padding-top:.7mm;padding-bottom:.7mm}}
 table.tb td{{border-bottom:.5pt solid #E4DCCB;padding:1.3mm 1.6mm;vertical-align:top}}
 table.tb tr:nth-child(even) td{{background:#F6F1E4}}
+table.tb.book-map{{table-layout:fixed}}
+table.tb.book-map th:nth-child(1){{width:30%}}
+table.tb.book-map th:nth-child(2){{width:52%}}
+table.tb.book-map th:nth-child(3){{width:18%}}
+table.tb.book-map td:nth-child(3){{white-space:nowrap}}
+table.tb.booklist,table.tb.glossary{{table-layout:fixed;font-size:{min(body_pt*.8,9):.2f}pt;line-height:1.55}}
+table.tb.booklist td,table.tb.glossary td{{padding:.8mm 1.6mm;white-space:normal!important;overflow-wrap:break-word}}
+table.tb.booklist th:nth-child(1){{width:8%}}
+table.tb.booklist th:nth-child(2){{width:31%}}
+table.tb.booklist th:nth-child(3){{width:25%}}
+table.tb.booklist th:nth-child(4){{width:36%}}
+table.tb.glossary th:nth-child(1){{width:13%}}
+table.tb.glossary th:nth-child(2){{width:35%}}
+table.tb.glossary th:nth-child(3){{width:32%}}
+table.tb.glossary th:nth-child(4){{width:20%}}
+.compact-appx .fs-title,.conclusion .fs-title{{margin-top:4mm}}
+.compact-appx .rule,.conclusion .rule{{margin-bottom:4mm}}
+.chapter.conclusion p{{font-size:{body_pt*.96:.2f}pt;line-height:1.72;margin-bottom:.2em}}
+.chapter.conclusion h3.sec{{margin-top:2.5mm;margin-bottom:1.8mm}}
+.conclusion table.tb{{font-size:{body_pt*.76:.2f}pt;line-height:1.5}}
+.conclusion table.tb td{{padding:.75mm 1.6mm}}
+.conclusion .tw{{margin:2.5mm 0}}
+.appendix-front{{padding-top:35mm}}
+.appendix-front .fs-title{{font-size:25pt;letter-spacing:.25em}}
+.appendix-front p{{margin-top:9mm;text-indent:0;line-height:2.1}}
 ul.ls,ol.ls{{margin:1mm 0 2.5mm;padding-left:2.2em}} ul.ls li,ol.ls li{{margin:.4mm 0}}
 p.bib{{text-indent:-2em;padding-left:2em;font-size:{body_pt*0.86:.2f}pt;line-height:1.62;margin-bottom:.8mm;text-align:left}}
 p.bib .bn{{color:#B08A3C}}
@@ -542,8 +618,12 @@ def sec_html(kind, sid, title, lvl, body):
         cls += ' chapter t2'
     if kind == 'back' and lvl == 2:
         cls += ' chapter t4'
+        if title.startswith(('附录一', '附录四')):
+            cls += ' compact-appx'
     if kind == 'back' and title.startswith('结语'):
-        cls += ' chapter t4'
+        cls += ' chapter t4 conclusion'
+    if kind == 'back' and title == '附录':
+        cls += ' appendix-front'
     if kind == 'front' and title.startswith('前言'):
         cls += ' chapter t1'
     if kind == 'chapter' and TIGHT.get(sid):
@@ -574,11 +654,15 @@ def tune_chapters(secs, css_args, fonts, label):
                 TIGHT[s[1]] = lvl
             else:
                 TIGHT.pop(s[1], None)
-            pdf = weasyprint.HTML(string=html_doc(css, sec_html(*s)), base_url=str(ROOT)).write_pdf()
-            d = pymupdf.open(stream=pdf, filetype='pdf')
-            lone = len(d) > 1 and (d[len(d) - 1].get_text().lstrip().startswith(('九格卡','带走的话','本章判错句','想一想')) or len(re.findall(r'[一-鿿]', d[len(d) - 1].get_text())) < 55)
+            doc = weasyprint.HTML(string=html_doc(css, sec_html(*s)), base_url=str(ROOT)).render()
+            last = ''.join(getattr(box, 'text', '') for box in doc.pages[-1]._page_box.children[0].descendants())
+            lone = len(doc.pages) > 1 and (last.lstrip().startswith(('九格卡','带走的话','本章判错句','想一想')) or len(HAN.findall(last)) < 55)
             if not lone:
                 break
+        if lone:
+            # 大卡组仍单独成尾页时，带上前面的查证框；不继续压缩正文。
+            lvl = 'tail-unit'
+            TIGHT[s[1]] = lvl
         cache[key] = lvl if not lone or lvl else ''
         cpath.write_text(_j.dumps(cache))
         if lvl:
@@ -647,9 +731,10 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     main_start = len(book) + 1
     m = pymupdf.open(stream=mbytes, filetype='pdf')
     book.insert_pdf(m)
-    if len(book) % 2:
-        book.new_page(width=m[0].rect.width, height=m[0].rect.height)
-    book.new_page(width=m[0].rect.width, height=m[0].rect.height)  # 封三
+    if not raster_cover:
+        if len(book) % 2:
+            book.new_page(width=m[0].rect.width, height=m[0].rect.height)
+        book.new_page(width=m[0].rect.width, height=m[0].rect.height)  # 印刷封三
     add_cover(back)
     # 书签与翻页器目录
     toc, flip = [], []
@@ -669,10 +754,43 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     for L, t, g in toc:
         L = min(L, prev + 1); fixed.append([L, t, g]); prev = L
     book.set_toc(fixed)
+    # 前置和正文分别排版后合并，重新接上跨文档的纸面目录链接。
+    global_pages = {sid: front_off + pg for sid, pg in pf.items()}
+    global_pages.update({sid: main_start - 1 + pg for sid, pg in pages.items()})
+    for pno, pg in enumerate(fdoc.pages):
+        target_page = book[front_off + pno]
+        for link in list(target_page.get_links()):
+            target_page.delete_link(link)
+        for link_type, target, rect, *_ in pg.links:
+            if link_type == 'internal' and target in global_pages:
+                target_page.insert_link({'kind': pymupdf.LINK_GOTO,
+                    'from': pymupdf.Rect(rect) * .75, 'page': global_pages[target] - 1,
+                    'to': pymupdf.Point(0, 0)})
+    book.set_page_labels([
+        {'startpage': 0, 'prefix': '封面'}, {'startpage': 1, 'prefix': '封二'},
+        {'startpage': 2, 'style': 'r', 'firstpagenum': 1},
+        {'startpage': main_start - 1, 'style': 'D', 'firstpagenum': 1},
+        {'startpage': len(book) - 1, 'prefix': '封底'}])
     book.set_metadata({'title': META['title'] + '——' + META['subtitle'], 'author': META['author'] + ' 著',
                        'subject': '德麦国际专著第 %d 号 · ISBN %s' % (META['no'], META['isbn']),
                        'creator': 'WeasyPrint 70.0', 'producer': 'WeasyPrint 70.0 + PyMuPDF'})
     book.save(str(out), garbage=4, deflate=True)
+    # 可复查的分页记录：确保短卡片、书目标题没有被拆到两页。
+    layout = []
+    for label, doc, off in [('front', fdoc, front_off), ('main', mdoc, main_start - 1)]:
+        elements = {}
+        for pno, pg in enumerate(doc.pages, 1):
+            for box in pg._page_box.descendants():
+                el = box.element
+                if el is None or type(box).__name__ not in ('BlockBox', 'TableBox'):
+                    continue
+                cls = el.get('class', '')
+                if any(c in cls.split() for c in ('deep', 'takeaway', 'ref-heading', 'short')):
+                    rec = elements.setdefault(id(el), {'class': cls, 'pages': [], 'text': ''.join(el.itertext())[:80]})
+                    if off + pno not in rec['pages']:
+                        rec['pages'].append(off + pno)
+        layout.extend(elements.values())
+    out.with_suffix('.layout.json').write_text(json.dumps(layout, ensure_ascii=False, indent=2))
     return flip, main_start
 
 

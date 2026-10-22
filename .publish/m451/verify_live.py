@@ -10,11 +10,13 @@ def fetch(path, headers=None):
     with urllib.request.urlopen(req,timeout=45) as r:
         return r.status,r.headers,r.read()
 def html_body(data):
-    # Exclude only the known Cloudflare Web Analytics script, not surrounding
-    # whitespace or any other page content. A remaining difference stays fatal.
+    # Exclude the known Cloudflare Web Analytics script. The measured edge
+    # response also adds one newline before </body>; normalize only that
+    # final whitespace in both source manifests and received HTML.
     cleaned, beacon_count=re.subn(rb"(?is)<script\b(?=[^>]*\bsrc=[\"']https://static\.cloudflareinsights\.com/beacon\.min\.js[^\"']*[\"'])[^>]*>.*?</script\s*>",b"",data)
     match=re.search(rb"(?is)<body\b[^>]*>.*?</body\s*>",cleaned)
-    return (match.group() if match else None),beacon_count
+    body=re.sub(rb"[ \t\r\n]+(?=</body\s*>$)",b"",match.group(),flags=re.I) if match else None
+    return body,beacon_count
 
 def html_diagnostic(item, received_body, beacon_count):
     source=root/"public"/item["path"].lstrip("/")
