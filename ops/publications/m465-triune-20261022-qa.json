@@ -1,0 +1,17 @@
+{
+  "book": "m-465",
+  "title": "答案住在哪里——希腊三哲与两千年哲学的纠缠史",
+  "isbn": "979-8-90690-465-2",
+  "price": "US$23.00",
+  "numbering": "卷号取站内 500 以内空号（原定 407 已被并发发书占用，改取 465 并先提交工具链占号）；书号尾段取卷号，经全站检索未被占用",
+  "layout": "第 220 号版式工具链（由第 492 号改来）：印刷版 170×240 mm 342 页，阅读版 190×250 mm 382 页",
+  "chars": {"bodyHan": 212161, "allHan": 224569},
+  "triune": {"reading": "read.html + text/", "learning": "24 章任务 + 学习包 PDF", "agent": "火候（agents.json 新登记，keypoints 12 条，rag 专著 12 + 文章 12）"},
+  "checks": [
+    "本地 Playwright：翻页器矢量模式保持「矢量」，382 页；详情页、全文、学习包、问对、智能体页均可打开，无页面错误（pdf.js 由本地 pdfjs-dist@3.11.174 代替 CDN）",
+    "check_bookshelf.py 静态检查：465 无报错；其余报错为既有问题（373 chapterUrl、六本书目页封面、259/293/sde-ontology-intro 阅读器）",
+    "build_bookshelf.py 顺带改写的 86 个他书页面已还原，本次只改本书目录与共享书架"
+  ],
+  "realModelTested": false,
+  "learningEffectTested": false
+}
