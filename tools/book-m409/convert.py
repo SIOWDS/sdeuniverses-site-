@@ -32,6 +32,31 @@ PARTS = [
 NOTE = re.compile(r'^〔(本章约|本文约|前言约|导读约|后置|本节约)')
 
 
+def smart_quotes(md):
+    """半角引号成对转中文引号；内层单引号只转紧挨中文的（英文撇号不动）。"""
+    out = []
+    cjk = lambda c: bool(c) and ('\u4e00' <= c <= '\u9fff' or c in '“”，。、：；？（）《》—…·')
+    for line in md.splitlines():
+        parts = line.split('"')
+        if len(parts) > 1:
+            assert len(parts) % 2 == 1, '引号不成对：' + line[:60]
+            s = parts[0]
+            for i, p in enumerate(parts[1:]):
+                s += ('“' if i % 2 == 0 else '”') + p
+            line = s
+        ch = list(line)
+        idx = [i for i, c in enumerate(ch) if c == "'" and (cjk(ch[i - 1] if i else '') or cjk(ch[i + 1] if i + 1 < len(ch) else ''))]
+        if len(idx) % 2 == 0:
+            for k, i in enumerate(idx):
+                ch[i] = '‘' if k % 2 == 0 else '’'
+        out.append(''.join(ch))
+    return '\n'.join(out) + ('\n' if md.endswith('\n') else '')
+
+
+def W(path, text):
+    path.write_text(smart_quotes(text), encoding='utf-8')
+
+
 def src(prefix):
     fs = sorted(CH.glob(prefix + '*.md'))
     assert len(fs) == 1, (prefix, fs)
@@ -99,7 +124,7 @@ def main():
     for k, (name, rng) in enumerate(PARTS):
         txt = '# %s\n\n%s\n\n' % (titles[k], '\n\n'.join(intros[titles[k]]))
         txt += '\n\n'.join(chapter(n) for n in rng)
-        (ROOT / 'parts' / (name + '.md')).write_text(txt, encoding='utf-8')
+        W(ROOT / 'parts' / (name + '.md'), txt)
     # 前置：出版信息、作者介绍、题词、前言、导读
     qian = endblocks(src('00a'))
     dao = endblocks(src('00b'))
@@ -108,7 +133,7 @@ def main():
     ap = h2_blocks((BOOK / 'appendix3.md').read_text(encoding='utf-8'))
     ap4 = (BOOK / 'front' / '附录四.md').read_text(encoding='utf-8').strip()
     jieyu = endblocks(hou['结语']).replace('## 结语', '# 结语', 1)
-    (ROOT / 'back' / '09-结语.md').write_text(jieyu, encoding='utf-8')
+    W(ROOT / 'back' / '09-结语.md', jieyu)
 
     def body(block):
         return block.split('\n', 1)[1].strip()
@@ -117,7 +142,7 @@ def main():
             '本书附录四件：附录一是术语表，把书里的工作词与大白话对照起来；附录二是一节课的“三条件×五段”检查单，可直接打印；附录三列出仍待对原书原刊核对的引文与研究；附录四交代本书的成稿、审校与三审经过。', '',
             hou['附录一'].strip(), '', hou['附录二'].strip(), '', ap['附录三'].strip(), '', ap4, '',
             '# 后记', '', endblocks(body(hou['后记']))]
-    (ROOT / 'back' / '10-后置.md').write_text(re.sub(r'\n{3,}', '\n\n', '\n'.join(back)), encoding='utf-8')
+    W(ROOT / 'back' / '10-后置.md', re.sub(r'\n{3,}', '\n\n', '\n'.join(back)))
 
     allmd = [qian, dao] + [(ROOT / 'parts' / (n + '.md')).read_text(encoding='utf-8') for n, _ in PARTS] + [jieyu, '\n'.join(back)]
     han = sum(len(re.findall(r'[一-鿿]', x)) for x in allmd)
@@ -126,7 +151,7 @@ def main():
     front = (front.replace('__WAN__', wan).replace('__NO__', '第 %d 号' % NO)
              .replace('__ISBN__', ISBN).replace('__PRICE__', PRICE))
     front = front.rstrip() + '\n\n' + qian.strip() + '\n\n' + dao.strip() + '\n'
-    (ROOT / 'front' / '00-前置.md').write_text(front, encoding='utf-8')
+    W(ROOT / 'front' / '00-前置.md', front)
     (ROOT / 'book.md').write_text('\n\n'.join((ROOT / 'parts' / (n + '.md')).read_text(encoding='utf-8') for n, _ in PARTS), encoding='utf-8')
     (ROOT / 'han.txt').write_text(str(han))
     print('han', han, 'wan', wan)

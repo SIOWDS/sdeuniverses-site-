@@ -71,7 +71,7 @@ function render(bl, K) {
       else if (first === '**带走的话**') { K.push(gap()); K.push(box('带走的话', rest, GOLD, 'F6F1E4', { bold: true, color: NAVY, size: 21 })); }
       else if (first === '**想一想**') { K.push(box('想一想', rest, CYAN, 'F7F3E8', { size: 19, color: '4A463D' })); }
       else if (first === '**小账**') { K.push(gap()); K.push(box('小　账', rest, 'D8CFBB', 'F4EFE3', { size: 18, color: '5A554A' })); }
-      else { K.push(box('', b.filter(x => x.trim()), GOLD, 'F6F1E4', { bold: true, color: NAVY })); K.push(gap()); }
+      else { const ls = b.filter(x => x.trim()); const allb = ls.every(x => /^\*\*.+\*\*$/.test(x.trim())); K.push(box('', ls, GOLD, allb ? 'F6F1E4' : 'FBF8F0', allb ? { bold: true, color: NAVY } : { size: 20, color: '4A463D' })); K.push(gap()); }
     } else if (k === 'ul') {
       b.forEach(x => K.push(new Paragraph({ numbering: { reference: 'b', level: 0 }, spacing: { after: 80, line: 360 }, children: runs(x, body) })));
     } else if (k === 'ol') {

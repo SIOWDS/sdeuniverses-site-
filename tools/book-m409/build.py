@@ -155,7 +155,9 @@ def quote_html(lines):
         return '<div class="qbox"><span class="lab">这一章的问题</span><p>%s</p></div>' % inline(mq[1])
     if len(body) == 1 and re.fullmatch(r'\*\*.+\*\*', body[0].strip()):
         return '<div class="pull"><p>%s</p></div>' % inline(body[0].strip()[2:-2])
-    return '<blockquote class="verdict">%s</blockquote>' % ''.join('<p>%s</p>' % inline(l) for l in body)
+    if all(re.fullmatch(r'\*\*.+\*\*', l.strip()) for l in body):
+        return '<blockquote class="verdict">%s</blockquote>' % ''.join('<p>%s</p>' % inline(l) for l in body)
+    return '<blockquote class="cite">%s</blockquote>' % ''.join('<p>%s</p>' % inline(l) for l in body)
 
 
 def render(blocks, bib=False):
@@ -432,6 +434,8 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 .chapter.t4 h3.sec{{margin-top:3.5mm}}
 blockquote.verdict{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;margin:4mm 0;padding:2.6mm 4mm;break-inside:avoid}}
 blockquote.verdict p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F}}
+blockquote.cite{{border-left:.9pt solid #B08A3C;margin:3mm 0 3.5mm 1.5em;padding:.6mm 0 .6mm 3.5mm;break-inside:avoid}}
+blockquote.cite p{{text-indent:0;margin:0 0 .3em;font-size:{body_pt*0.95:.2f}pt;color:#4A463D;font-family:'Noto Serif CJK SC'}}
 .tw{{margin:3.5mm 0}}
 table.tb{{width:100%;border-collapse:collapse;font-size:{body_pt*0.8:.2f}pt;line-height:1.6}}
 table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left}}
@@ -682,6 +686,7 @@ def web_page(secs):
 .chapnum{font-size:2.6rem;color:var(--gold);opacity:.45;line-height:1;margin-top:1rem}.chapnum.spacer{opacity:0;font-size:1rem}
 .chap-label{margin:.3rem 0 .2rem}
 blockquote.verdict{border-left:3px solid var(--gold)}blockquote.verdict p{color:var(--navy);font-weight:700}
+blockquote.cite{border-left:2px solid var(--gold);margin:1rem 0 1rem 1.5rem;padding:.2rem 0 .2rem 1rem}blockquote.cite p{text-indent:0;margin:.2rem 0;color:var(--dim)}
 .emb{width:44px;height:44px;display:block;margin:0 auto 1rem}
 p.bib{text-indent:-2em;padding-left:2em;font-size:.9rem;line-height:1.8}p.bib .bn{color:var(--gold)}
 p.srcnote{text-indent:0;font-size:.84rem;color:var(--dim);font-family:sans-serif}
