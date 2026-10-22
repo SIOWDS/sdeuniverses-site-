@@ -16,7 +16,10 @@ while True:
             status,headers,data=fetch(x["path"])
             assert status==200, x["path"]
             if x.get("htmlBodySha256"):
-                body=re.search(rb"(?is)<body\b[^>]*>.*?</body\s*>",data)
+                # Cloudflare Web Analytics inserts its own beacon at the edge.
+                # Only this known platform script is excluded from the body hash.
+                html=re.sub(rb"(?is)<script\b(?=[^>]*\bsrc=[\"']https://static\.cloudflareinsights\.com/beacon\.min\.js[^\"']*[\"'])[^>]*>.*?</script\s*>",b"",data)
+                body=re.search(rb"(?is)<body\b[^>]*>.*?</body\s*>",html)
                 assert body and hashlib.sha256(body.group()).hexdigest()==x["htmlBodySha256"], "HTML body not current: "+x["path"]
                 title=re.search(r"(?is)<title[^>]*>(.*?)</title>",data.decode("utf-8"))
                 assert title and title.group(1)==x["title"], "HTML title differs: "+x["path"]
