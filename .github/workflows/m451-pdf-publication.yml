@@ -1,0 +1,38 @@
+name: M451 reviewed PDF publication
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.publish/m451/pdf-manifest.json'
+      - '.publish/m451/upload_pdfs.py'
+      - '.github/workflows/m451-pdf-publication.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: m451-pdf-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: .publish/m451
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --quiet boto3
+      - name: Publish reviewed PDFs and verify full bytes from R2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python .publish/m451/upload_pdfs.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m451-r2-verification
+          path: m451-r2-result.json
+          retention-days: 14
