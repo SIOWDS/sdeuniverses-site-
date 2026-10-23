@@ -70,7 +70,7 @@ def main():
     assert not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in books), 'ISBN 重号'
     url = f'https://sdeuniverses.com/books/m/{NO}/'
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-    entry = dict(id=f'm-{NO}', number=NO, title=T_FULL, subtitle=SERIES, authors=['王德生'], category='core',
+    entry = dict(id=f'm-{NO}', number=NO, title=T_FULL, subtitle=SERIES, authors=['胡志英'], advisor='王德生', category='core',
                  description=CT['description'],
                  detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
                  pdfUrl=url + f'{SLUG}-reader.pdf?v={V}', printPdfUrl=url + f'{SLUG}-print.pdf?v={V}',

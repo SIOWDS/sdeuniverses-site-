@@ -146,9 +146,10 @@ def main():
     # ---- pages
     pg = (TPL / 'page.html').read_text(encoding='utf-8')
     full_title = '《%s》' % C['title']
-    byline = ' · '.join(C['authors'])
+    byline = ' · '.join(C['authors']) + (' · 指导老师 ' + C['advisor'] if C.get('advisor') else '')
     reps = [
         ('AI时代的判断力发生学导论', C['title']),
+        ('© 王德生 · 张琼', '© ' + ' · '.join(C['authors'])),
         ('王德生、张琼', '、'.join(C['authors'])),
         ('王德生 · 张琼', byline),
         ('content="398"', 'content="%d"' % N),

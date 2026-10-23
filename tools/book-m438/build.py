@@ -28,7 +28,7 @@ NPARTS = len(PART_FILES)
 SLUG = 'dialogue-semiogenesis'
 META = dict(
     title='大模型是索绪尔的网、皮尔斯的链', name='大模型是索绪尔的网、皮尔斯的链',
-    subtitle='符号在对话中才发生', author='王德生', advisor='', no=438,
+    subtitle='符号在对话中才发生', author='胡志英', advisor='王德生', no=438,
     isbn='979-8-90690-614-4', price='US$23.00', version='20261022a',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )

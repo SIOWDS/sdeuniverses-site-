@@ -4,7 +4,7 @@ import json, sys
 from pathlib import Path
 C = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
 cfg = {
- 'number': 438, 'slug': 'dialogue-semiogenesis', 'title': '大模型是索绪尔的网、皮尔斯的链：符号在对话中才发生', 'subtitle': 'SDE 符号学系列 · 理论卷四', 'authors': ['王德生'],
+ 'number': 438, 'slug': 'dialogue-semiogenesis', 'title': '大模型是索绪尔的网、皮尔斯的链：符号在对话中才发生', 'subtitle': 'SDE 符号学系列 · 理论卷四', 'authors': ['胡志英'], 'advisor': '王德生',
  'isbn': '979-8-90690-614-4', 'price': 'US$23.00', 'partWord': '编', 'sourceEdition': '初版（2026-10-22）',
  'unitRev': '20261022-m438-unit-v1', 'assetVersion': '20261022a', 'manuscript': 'tools/book-m438/book.md',
  'agentName': C['agent']['name'], 'agentEpithet': C['agentEpithet'], 'bookMeta': C['bookMeta'], 'heroTagline': C['heroTagline'],
