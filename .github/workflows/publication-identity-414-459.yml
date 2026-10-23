@@ -1,0 +1,61 @@
+name: Publication identity — 414 and 459
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/books/**'
+      - 'public/monographs/index.html'
+      - 'tools/book-m414/**'
+      - 'tools/book-m459/**'
+      - 'tools/book_unit/m414.json'
+      - 'tools/book_unit/m459.json'
+      - 'tools/check_publication_identity.py'
+      - 'tools/test_publication_identity.py'
+      - 'tools/test_publication_payload.cjs'
+      - '.github/workflows/publication-identity-414-459.yml'
+  pull_request:
+    paths:
+      - 'public/books/**'
+      - 'public/monographs/index.html'
+      - 'tools/**'
+      - '.github/workflows/publication-identity-414-459.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            public/books/catalog.json
+            public/books/agents.json
+            public/books/index.html
+            public/books/agent/app.js
+            public/books/m/414/
+            public/books/m/459/
+            public/books/m/*/rag.json
+            public/books/m/*/agent/rag.json
+            public/books/m/*/keypoints.json
+            public/monographs/index.html
+            tools/book-m459/
+            tools/book_unit/m414.json
+            tools/book_unit/m459.json
+            tools/check_publication_identity.py
+            tools/test_publication_identity.py
+            tools/test_publication_payload.cjs
+            .publish/volume-reservations/459.json
+      - name: Ensure PDF inspection tools are available
+        run: |
+          if ! command -v pdfinfo >/dev/null || ! command -v pdftotext >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq poppler-utils
+          fi
+      - name: Check identity, chapter hashes, shelves, RAG and PDF metadata
+        run: python3 tools/check_publication_identity.py 414 459 --pdf
+      - name: Reject stale imports before any registry write
+        run: python3 tools/test_publication_identity.py
+      - name: Verify request payloads and cross-book archive rejection (mock network)
+        run: node tools/test_publication_payload.cjs
