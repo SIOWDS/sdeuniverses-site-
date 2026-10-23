@@ -226,21 +226,23 @@ def main():
         for yy, s in [(178, '先答、带问阅读、再答、讨论、本人修订、迁移与观察。'), (150, '初答不覆盖；建议待核对；理解、赞同和现实应用分别记录。'), (122, '本包是配套设计，不是著者原文或已验证训练量表。')]: c.drawString(43, yy, s)
         c.linkURL(URL + 'agent/learning.html', (40, 64, 500, 100), relative=0); c.drawString(43, 80, '在线学习：sdeuniverses.com' + U + 'agent/learning.html'); c.showPage()
         for t in manifest['tasks']:
-            c.setFillColor(HexColor('#f8f5ed')); c.rect(0, 0, 538.58, 708.66, fill=1, stroke=0); y = 656
-            c.setFillColor(HexColor('#8a6b22')); c.setFont('STSong-Light', 11); c.drawString(43, y, '第%d%s · %s' % (t['part'], PW, part_names[t['part'] - 1])); y -= 26
-            y = para('%02d  %s' % (t['lesson'], t['title']), 43, y, size=21)
-            y = para(t['chapterTitle'], 43, y, size=10)
-            y = para(t['question'], 43, y, size=12)
-            y = para('先答：保留自己的起点；不知道也可以如实记录。', 43, y, size=11)
-            for _ in range(3): c.setStrokeColor(HexColor('#d3cdbf')); c.line(43, y - 8, 495, y - 8); y -= 24
-            y -= 12; y = para('读后追问：' + t['checkpoint'], 43, y, size=11)
-            y = para('复答／异议：什么改变，什么仍不同意？原文依据在哪里？', 43, y, size=11)
-            for _ in range(3): c.line(43, y - 8, 495, y - 8); y -= 24
-            y -= 10; y = para('下一步与回看：行动、观察、失败条件；未实施就写未实施。', 43, y, size=11)
-            for _ in range(2): c.line(43, y - 8, 495, y - 8); y -= 24
-            assert y > 55, (t['lesson'], y)
-            c.setFont('STSong-Light', 9); c.setFillColor(HexColor('#8a6b22')); c.drawString(43, 59, '点击进入本章学习、原文与%s：第%d章' % (C['agentName'], t['lesson']))
-            c.linkURL(URL + 'agent/learning.html?lesson=%d' % t['lesson'], (40, 49, 500, 75), relative=0); footer(t['lesson'] + 1); c.showPage()
+          for nl, fs in ((3, 11), (2, 11), (2, 10), (1, 10), (1, 9)):
+                c.setFillColor(HexColor('#f8f5ed')); c.rect(0, 0, 538.58, 708.66, fill=1, stroke=0); y = 656
+                c.setFillColor(HexColor('#8a6b22')); c.setFont('STSong-Light', 11); c.drawString(43, y, '第%d%s · %s' % (t['part'], PW, part_names[t['part'] - 1])); y -= 26
+                y = para('%02d  %s' % (t['lesson'], t['title']), 43, y, size=21)
+                y = para(t['chapterTitle'], 43, y, size=10)
+                y = para(t['question'], 43, y, size=fs + 1)
+                y = para('先答：保留自己的起点；不知道也可以如实记录。', 43, y, size=fs)
+                for _ in range(nl): c.setStrokeColor(HexColor('#d3cdbf')); c.line(43, y - 8, 495, y - 8); y -= 24
+                y -= 12; y = para('读后追问：' + t['checkpoint'], 43, y, size=fs)
+                y = para('复答／异议：什么改变，什么仍不同意？原文依据在哪里？', 43, y, size=fs)
+                for _ in range(nl): c.line(43, y - 8, 495, y - 8); y -= 24
+                y -= 10; y = para('下一步与回看：行动、观察、失败条件；未实施就写未实施。', 43, y, size=fs)
+                for _ in range(max(1, nl - 1)): c.line(43, y - 8, 495, y - 8); y -= 24
+                if y > 55: break
+          assert y > 55, (t['lesson'], y)
+          c.setFont('STSong-Light', 9); c.setFillColor(HexColor('#8a6b22')); c.drawString(43, 59, '点击进入本章学习、原文与%s：第%d章' % (C['agentName'], t['lesson']))
+          c.linkURL(URL + 'agent/learning.html?lesson=%d' % t['lesson'], (40, 49, 500, 75), relative=0); footer(t['lesson'] + 1); c.showPage()
         c.save()
     # ---- wire into existing pages (idempotent; author text untouched)
     nav = ('<nav data-unit="v1" aria-label="阅读学习智能问对" style="display:flex;gap:1rem;flex-wrap:wrap;padding:.7rem 1rem;border:1px solid #a88b43;background:#141611;color:#e7ce91;border-radius:8px;margin:1rem auto;max-width:980px;font:14px/1.8 sans-serif">'
