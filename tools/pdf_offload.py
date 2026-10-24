@@ -280,13 +280,18 @@ def cmd_rehydrate(a):
         p = os.path.join(PUB, k)
         if os.path.exists(p) and os.path.getsize(p) == size:
             return 'have'
+        if os.path.exists(p):
+            # 仓库里有同路径的新版（重出新版提交进 public/，线上静态资源优先于桶）：
+            # 读者拿到的就是这一份，索引也该抽这一份；不去桶里取旧账、更不因台账字节数对不上而判坏。
+            # 2026-10-24：第 186、383 号重出新版后台账未更新，10-22/23 两趟索引因此在这一步红掉。
+            return 'repo'
         os.makedirs(os.path.dirname(p), exist_ok=True)
         c.download_file(BUCKET, k, p)
         return 'ok' if os.path.getsize(p) == size else 'bad'
 
     with cf.ThreadPoolExecutor(16) as ex:
         res = list(ex.map(one, rows))
-    print(f'按台账取回 {len(rows)} 份：新取 {res.count("ok")}，本地已有 {res.count("have")}，坏 {res.count("bad")}')
+    print(f'按台账取回 {len(rows)} 份：新取 {res.count("ok")}，本地已有 {res.count("have")}，仓库有新版 {res.count("repo")}，坏 {res.count("bad")}')
     if res.count('bad'):
         sys.exit(1)
 
