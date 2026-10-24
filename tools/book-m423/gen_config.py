@@ -5,8 +5,8 @@ from pathlib import Path
 C = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
 cfg = {
  'number': 423, 'slug': 'gai-lai-de', 'title': '该来的', 'subtitle': '等待的发生学', 'authors': ['王德生'],
- 'isbn': '979-8-90690-423-2', 'price': 'US$20.00', 'partWord': '编', 'sourceEdition': '初版（2026-10-24）',
- 'unitRev': '20261024-m423-unit-v1', 'assetVersion': '20261024b', 'manuscript': 'tools/book-m423/book.md',
+ 'isbn': '979-8-90690-423-2', 'price': 'US$20.00', 'partWord': '编', 'sourceEdition': '第二稿（2026-10-24）',
+ 'unitRev': '20261024-m423-unit-v2', 'assetVersion': '20261024c', 'manuscript': 'tools/book-m423/book.md',
  'agentName': C['agent']['name'], 'agentEpithet': C['agentEpithet'], 'bookMeta': C['bookMeta'], 'heroTagline': C['heroTagline'],
  'practiceWord': C['practiceWord'], 'pdfBg': '#16253d',
  'learningPdfUrl': 'https://sdeuniverses.com/books/m/423/downloads/gai-lai-de-learning-v1.0.pdf',

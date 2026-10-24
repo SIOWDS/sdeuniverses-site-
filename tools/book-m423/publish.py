@@ -9,7 +9,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 SITE = HERE.resolve().parents[1] / 'public'
 NO = 423
-V = '20261024b'
+V = '20261024c'
 SLUG = 'gai-lai-de'
 T, SUB = '该来的', '等待的发生学'
 ISBN = '979-8-90690-423-2'
