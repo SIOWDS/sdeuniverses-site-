@@ -102,9 +102,12 @@ def blocks_of(text):
 
 def inline(s):
     s = s.replace('AI for Science', 'AI\u00a0for\u00a0Science')
-    s = re.sub(r'(?<=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]) (?=[A-Za-z0-9$])|(?<=[A-Za-z0-9%$.)]) (?=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef])', '\u2009', s)
+    s = re.sub(r'(?<=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]) (?=[A-Za-z0-9$\-])|(?<=[A-Za-z0-9%$.)\-?!\x27’"”…:;,]) (?=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef])', '\u2009', s)
     s = html.escape(s, quote=False)
     s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
+    s = re.sub(r'</strong>[ \u2009](?=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef])', '</strong>', s)
+    s = re.sub(r'(?<=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef])[ \u2009]<strong>', '<strong>', s)
+    s = re.sub(r'(?<![A-Za-z>])(-(?:ing|ed|es|ly|s))\b', r'<span class="nw">\1</span>', s)
     s = re.sub(r'(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?!\*)', r'<em>\1</em>', s)
     return s
 
@@ -120,7 +123,17 @@ def table_html(rows, cls='tb'):
             cls += ' n%d' % (ci + 1)
     if len(body) > 20:
         cls += ' dense'
-    h = ['<div class="tw"><table class="%s"><thead><tr>' % cls]
+    cg = ''
+    if len(head) == 4 and body and all(len(re.sub(r'[*\s]', '', r[0])) <= 3 for r in body):
+        cls = cls.replace(' n1', '').replace(' n2', '') + ' fx3'
+        if all(re.fullmatch(r'\d+', re.sub(r'[*\s]', '', r[0])) for r in body):
+            cg = '<colgroup><col style="width:7%"><col style="width:27%"><col style="width:30%"><col style="width:36%"></colgroup>'
+        else:
+            cg = '<colgroup><col style="width:12%"><col style="width:16%"><col style="width:32%"><col style="width:40%"></colgroup>'
+    elif len(head) == 3:
+        cls = cls.replace(' n1', '').replace(' n2', '') + ' fx3'
+        cg = '<colgroup><col style="width:28%"><col style="width:34%"><col style="width:38%"></colgroup>'
+    h = ['<div class="tw%s"><table class="%s">%s<thead><tr>' % (' small' if len(body) <= 6 else '', cls, cg)]
     h += ['<th>%s</th>' % inline(c) for c in head]
     h.append('</tr></thead><tbody>')
     for r in body:
@@ -164,7 +177,21 @@ def quote_html(lines):
         return '<div class="qbox"><span class="lab">这一章的问题</span><p>%s</p></div>' % inline(mq[1])
     if len(body) == 1 and re.fullmatch(r'\*\*.+\*\*', body[0].strip()):
         return '<div class="pull"><p>%s</p></div>' % inline(body[0].strip()[2:-2])
-    return '<blockquote class="verdict">%s</blockquote>' % ''.join('<p>%s</p>' % inline(l) for l in body)
+    return '<blockquote class="verdict ex%s">%s</blockquote>' % (' long' if len(body) > 6 else '', ''.join('<p>%s</p>' % ex_line(l) for l in body))
+
+
+_LAT = re.compile(r"[A-Za-z][A-Za-z0-9'’,.!?;:\-–—\"“”/ \u2009\u00a0]*[A-Za-z0-9.!?'’\"”)]|[A-Za-z]")
+
+
+def ex_line(l):
+    """例句框一行：英文加粗藏青，中文用常规字重；短的全角括号译文整体不断行。"""
+    h = inline(l)
+    def seg(m):
+        x = m.group(1)
+        x = _LAT.sub(lambda k: '<b class="en">%s</b>' % k.group(0), x)
+        x = re.sub(r'（[^（）]{1,14}）', lambda k: '<span class="nw">%s</span>' % k.group(0), x)
+        return '>' + x + '<'
+    return re.sub(r'>([^<]+)<', seg, '>' + h + '<')[1:-1]
 
 
 def render(blocks, bib=False):
@@ -174,8 +201,15 @@ def render(blocks, bib=False):
             t = b[0]
             if re.fullmatch(r'〔[^〔〕]*〕', t):
                 h.append('<p class="srcnote">%s</p>' % inline(t))
+            elif t == '麦子':
+                h.append('<p class="sign sign1">%s</p>' % inline(t))
+            elif re.fullmatch(r'\d{4} 年 \d{1,2} 月', t):
+                h.append('<p class="sign">%s</p>' % inline(t))
             else:
-                h.append('<p%s>%s</p>' % (' class="bib"' if bib else '', inline(t)))
+                cls = 'bib' if bib and re.match(r'^\d', t) else ''
+                if not cls and t.endswith('：'):
+                    cls = 'lead'
+                h.append('<p%s>%s</p>' % (' class="%s"' % cls if cls else '', inline(t)))
         elif k == 'h3':
             t = b[0]
             if t.startswith('◆'):
@@ -368,10 +402,10 @@ def print_css(fonts, W, H, body_pt, lh, margin, fol='decimal'):
 @page{{size:{W}mm {H}mm;margin:{t}mm {o}mm {b}mm {i}mm;background:#FBF8F0;
   @top-left{{content:none}} @top-right{{content:none}}}}
 @page :left{{margin-left:{o}mm;margin-right:{i}mm;
-  @top-left{{content:string(book);font:6.8pt 'Noto Sans CJK SC';color:#9A917E;vertical-align:bottom;padding-bottom:4mm}}
+  @top-left{{content:string(bk, first-except);font:6.8pt 'Noto Sans CJK SC';color:#9A917E;vertical-align:bottom;padding-bottom:4mm}}
   @bottom-left{{content:counter(page,{fol});font:7.6pt 'Noto Serif CJK SC';color:#8A8578}}}}
 @page :right{{
-  @top-right{{content:string(chap);font:6.8pt 'Noto Sans CJK SC';color:#9A917E;vertical-align:bottom;padding-bottom:4mm}}
+  @top-right{{content:string(chap, first-except);font:6.8pt 'Noto Sans CJK SC';color:#9A917E;vertical-align:bottom;padding-bottom:4mm}}
   @bottom-right{{content:counter(page,{fol});font:7.6pt 'Noto Serif CJK SC';color:#8A8578}}}}
 @page :blank{{@top-left{{content:none}} @top-right{{content:none}} @bottom-left{{content:none}} @bottom-right{{content:none}}}}
 @page clean{{@top-left{{content:none}} @top-right{{content:none}} @bottom-left{{content:none}} @bottom-right{{content:none}}}}
@@ -387,7 +421,7 @@ section.part,section.front-sec,section.back-sec,section.toc{{page:opener}}
 section.part{{break-before:right;text-align:center;padding-top:26mm}}
 .emb{{width:15mm;height:15mm;display:block;margin:0 auto 7mm}}
 .part-label{{font:700 9.5pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.9em;margin-bottom:5mm;text-indent:.9em}}
-.part-title{{font:700 18.5pt/1.5 'Noto Serif CJK SC';color:#1F3A5F;margin:0 12mm 4mm;string-set:chap content()}}
+.part-title{{font:700 18.5pt/1.5 'Noto Serif CJK SC';color:#1F3A5F;margin:0 12mm 4mm;string-set:chap content(), bk \"{META['title']}\"}}
 .part .rule{{margin:0 auto 9mm}}
 .daoyu{{font:700 8.5pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.6em;margin-bottom:5mm}}
 .part-intro{{text-align:left}}
@@ -395,8 +429,8 @@ section.part{{break-before:right;text-align:center;padding-top:26mm}}
 .rule{{width:13mm;border-top:.9pt solid #B08A3C;margin:3mm 0 7mm}}
 .chapnum{{font:300 34pt/1 'Noto Serif CJK SC';color:#D9C39A;margin-top:6mm;letter-spacing:.02em}}
 .chap-label{{font:700 8.4pt 'Noto Sans CJK SC';color:#B08A3C;margin:2mm 0 1.5mm;letter-spacing:.08em}}
-.chap-title{{font:700 16pt/1.45 'Noto Serif CJK SC';color:#1F3A5F;margin:0;string-set:chap content();bookmark-level:2;bookmark-label:content()}}
-.fs-title{{font:700 18pt/1.4 'Noto Serif CJK SC';color:#1F3A5F;margin:14mm 0 1mm;letter-spacing:.12em;string-set:chap content();bookmark-level:1;bookmark-label:content()}}
+.chap-title{{font:700 16pt/1.45 'Noto Serif CJK SC';color:#1F3A5F;margin:0;string-set:chap content(), bk \"{META['title']}\";bookmark-level:2;bookmark-label:content()}}
+.fs-title{{font:700 18pt/1.4 'Noto Serif CJK SC';color:#1F3A5F;margin:14mm 0 1mm;letter-spacing:.12em;string-set:chap content(), bk \"{META['title']}\";bookmark-level:1;bookmark-label:content()}}
 .fs-title.appx{{bookmark-level:2;font-size:15pt;letter-spacing:.06em}}
 .part-title{{bookmark-level:1;bookmark-label:content()}}
 .fs-sub{{font:400 10.4pt 'Noto Serif CJK SC';color:#B08A3C;margin-top:1.5mm}}
@@ -404,30 +438,32 @@ h3.sec{{font:700 {body_pt*1.03:.2f}pt/1.6 'Noto Sans CJK SC';color:#1F3A5F;margi
 h3.sec .dia{{color:#B08A3C;font-size:.78em;margin-right:.45em;vertical-align:.08em}}
 h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;margin:6mm 0 2.5mm;break-after:avoid}}
 .takeaway{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;padding:2.2mm 4mm 2.4mm;margin:4.5mm 0 3mm;break-inside:avoid}}
-.takeaway .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.5em;margin-bottom:1.4mm}}
+.takeaway .lab{{display:block;font:700 8pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.5em;margin-bottom:1.4mm}}
 .takeaway p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F;font-size:{body_pt*1.02:.2f}pt}}
 .ledger{{background:#F4EFE3;border-left:1.6pt solid #D8CFBB;padding:2mm 4mm 2.2mm;margin:3mm 0 2mm;break-inside:avoid;display:flex;gap:4mm;flex-wrap:wrap}}
 .ledger .lab{{flex:0 0 100%;margin-bottom:.4mm!important}}
 .ledger p{{flex:1 1 44%}}
-.ledger .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#5A554A;letter-spacing:.3em;margin-bottom:1.2mm}}
+.ledger .lab{{display:block;font:700 8pt 'Noto Sans CJK SC';color:#5A554A;letter-spacing:.3em;margin-bottom:1.2mm}}
 .ledger p{{text-indent:0;margin:0 0 .6mm;font-size:{body_pt*0.86:.2f}pt;line-height:1.75;color:#5A554A}}
 .ledger .lk{{color:#1F3A5F;font-weight:700}}
-.chapend{{break-inside:auto}}
+.chapend{{break-inside:avoid}}
 .wonder{{border-left:1.6pt solid #58A9B5;padding:1.8mm 4mm;margin:2mm 0 1mm;break-inside:avoid}}
-.wonder .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.4em;margin-bottom:1mm}}
+.wonder .lab{{display:block;font:700 8pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.4em;margin-bottom:1mm}}
 .wonder p{{text-indent:0;margin:0;font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
 .ledger.nine{{display:block}}
 .ledger.nine p{{margin:0 0 1.1mm}}
 .judge{{border-left:1.6pt solid #8A6E3A;padding:1.8mm 4mm;margin:2mm 0 1mm}}
 .judge p{{margin:0 0 1.4mm!important}}
-.judge .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#8A6E3A;letter-spacing:.3em;margin-bottom:1mm}}
+.judge .lab{{display:block;font:700 8pt 'Noto Sans CJK SC';color:#8A6E3A;letter-spacing:.3em;margin-bottom:1mm}}
 .judge p{{text-indent:0;margin:0;font-size:{body_pt*0.9:.2f}pt;color:#4A463D}}
-.endmark{{text-align:center;color:#B08A3C;font-size:8pt;margin-top:3.5mm}}
+.endmark{{text-align:center;color:#B08A3C;font-size:8pt;margin-top:3.5mm;break-before:avoid}}
+.sign{{text-indent:0;text-align:right;margin:0;break-before:avoid}}
+p.sign1{{margin-top:6mm}}
 .orn{{text-align:center;color:#B08A3C;font-size:7.5pt;margin:3mm 0}}
 .pull{{margin:5mm 6%;padding:3mm 0;border-top:.8pt solid #B08A3C;border-bottom:.8pt solid #B08A3C;text-align:center;break-inside:avoid}}
 .pull p{{text-indent:0;text-align:center;font-weight:700;color:#1F3A5F;font-size:{body_pt*1.12:.2f}pt;margin:0}}
 /*Q*/.qbox{{background:#F7F3E8;border-left:1.6pt solid #58A9B5;padding:2.2mm 4mm;margin:2mm 0 4mm;break-inside:avoid}}
-.qbox .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.3em;margin-bottom:1mm}}
+.qbox .lab{{display:block;font:700 8pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.3em;margin-bottom:1mm}}
 .qbox p{{text-indent:0;margin:0;font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
 .chapter.t1 p,.chapter.t1 li{{line-height:{lh-0.05:.3f}}}
 .chapter.t2 p,.chapter.t2 li{{line-height:{lh-0.10:.3f}}}
@@ -439,19 +475,28 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 blockquote.verdict{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;margin:4mm 0;padding:2.6mm 4mm;break-inside:avoid}}
 blockquote.verdict p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F}}
 .tw{{margin:3.5mm 0}}
-table.tb{{width:100%;border-collapse:collapse;font-size:{body_pt*0.8:.2f}pt;line-height:1.6}}
-table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left}}
+table.tb{{width:100%;border-collapse:collapse;font-size:{body_pt*0.88:.2f}pt;line-height:1.62}}
+table.tb.fx3{{table-layout:fixed}}
+.tw.small{{break-inside:avoid}}
+.ledger p,.takeaway p,.qbox p{{text-align:left}}
+p.lead{{break-after:avoid}}
+.nw{{white-space:nowrap}}
+blockquote.ex p{{text-align:left;font-weight:400;color:#4A463E}}
+blockquote.ex b.en{{font-weight:700;color:#1F3A5F}}
+blockquote.ex.long{{break-inside:auto}}
+table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.86:.2f}pt/1.6 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left}}
 table.tb tr{{break-inside:avoid}}
 table.tb.n1 th:nth-child(1),table.tb.n1 td:nth-child(1){{white-space:nowrap}}
 table.tb.n2 th:nth-child(2),table.tb.n2 td:nth-child(2){{white-space:nowrap}}
 table.tb.w5 th:nth-child(-n+2),table.tb.w5 td:nth-child(-n+2){{white-space:nowrap}}
-table.tb.w5 td{{font-size:{body_pt*0.74:.2f}pt;line-height:1.55}}
+table.tb.w5 td{{font-size:{body_pt*0.82:.2f}pt;line-height:1.55}}
 table.tb.dense td{{padding-top:.7mm;padding-bottom:.7mm}}
 table.tb td{{border-bottom:.5pt solid #E4DCCB;padding:1.3mm 1.6mm;vertical-align:top}}
 table.tb tr:nth-child(even) td{{background:#F6F1E4}}
 ul.ls,ol.ls{{margin:1mm 0 2.5mm;padding-left:2.2em}} ul.ls li,ol.ls li{{margin:.4mm 0}}
 p.bib{{text-indent:-2em;padding-left:2em;font-size:{body_pt*0.88:.2f}pt;line-height:1.75;margin-bottom:1.2mm;text-align:left}}
-p.bib .bn{{color:#B08A3C}}
+p.bib .bn{{color:#B08A3C;display:inline-block;min-width:1.6em}}
+p.bib em{{font-style:italic}}
 .card{{background:#F6F1E4;border:.6pt solid #D8CFBB;border-left:1.6pt solid #1F3A5F;padding:2.6mm 4mm;margin:4mm 0;break-inside:avoid}}
 .card p{{text-indent:0;margin:0 0 .5mm;font:{body_pt*0.86:.2f}pt/1.75 'Noto Sans CJK SC';color:#2A2824;text-align:left}}
 p.srcnote{{text-indent:0;font:{body_pt*0.8:.2f}pt/1.7 'Noto Sans CJK SC';color:#8A8578;margin:1mm 0 2.6mm}}
@@ -525,7 +570,16 @@ TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著 · �
 EPIGRAPH = ''
 
 
+_EN_SP = re.compile(r"(?<=[A-Za-z0-9,.'’!?;:%)])\x20(?=[A-Za-z0-9'‘\"(])")
+
+
+def _pdf_spaces(h):
+    """只用于 PDF：英文词间空格换成四分之一字空（U+2005），两端对齐时不被拉伸，中英混排行不再出现大缝。"""
+    return re.sub(r'>([^<]+)<', lambda m: '>' + _EN_SP.sub('\u2005', m.group(1)) + '<', h)
+
+
 def html_doc(css, inner):
+    inner = _pdf_spaces(inner)
     return ('<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><style>%s</style></head><body>%s</body></html>'
             % (css, inner))
 
@@ -565,14 +619,15 @@ def tune_chapters(secs, css_args, fonts, label):
             if cache[key]:
                 TIGHT[s[1]] = cache[key]
             continue
-        for lvl in ['', 't1', 't2', 't3', 't4']:
+        for lvl in ['', 't1']:
             if lvl:
                 TIGHT[s[1]] = lvl
             else:
                 TIGHT.pop(s[1], None)
             pdf = weasyprint.HTML(string=html_doc(css, sec_html(*s)), base_url=str(ROOT)).write_pdf()
             d = pymupdf.open(stream=pdf, filetype='pdf')
-            lone = len(d) > 1 and len(d[len(d) - 1].get_text().strip()) < 330 and d[len(d) - 1].get_text().lstrip().startswith(('九格卡','带走的话','本章判错句','想一想','小　账','小账','可检验的小预言'))
+            last = d[len(d) - 1].get_text().strip()
+            lone = len(d) > 1 and ((len(last) < 330 and last.lstrip().startswith(('九格卡','带走的话','本章判错句','想一想','小　账','小账','可检验的小预言'))) or len(re.sub(r'\s|◆', '', last)) < 30)
             if not lone:
                 break
         cache[key] = lvl if not lone or lvl else ''
@@ -625,6 +680,11 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     mbytes = mdoc.write_pdf()
     book = pymupdf.open()
 
+    def _blank(bk, width, height):
+        pg = bk.new_page(width=width, height=height)
+        pg.draw_rect(pg.rect, color=None, fill=(0xFB / 255, 0xF8 / 255, 0xF0 / 255))
+        return pg
+
     def add_cover(src):
         c = pymupdf.open(str(src))
         if raster_cover:   # 阅读版给翻页器用：pdf.js 矢量模式不支持渐变，封面封底嵌高清图
@@ -635,17 +695,17 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
         else:
             book.insert_pdf(c)
     add_cover(cover)
-    book.new_page(width=book[0].rect.width, height=book[0].rect.height)  # 封二
+    _blank(book, width=book[0].rect.width, height=book[0].rect.height)  # 封二
     f = pymupdf.open(stream=fbytes, filetype='pdf')
     book.insert_pdf(f)
     if len(f) % 2:
-        book.new_page(width=f[0].rect.width, height=f[0].rect.height)
+        _blank(book, width=f[0].rect.width, height=f[0].rect.height)
     main_start = len(book) + 1
     m = pymupdf.open(stream=mbytes, filetype='pdf')
     book.insert_pdf(m)
     if len(book) % 2:
-        book.new_page(width=m[0].rect.width, height=m[0].rect.height)
-    book.new_page(width=m[0].rect.width, height=m[0].rect.height)  # 封三
+        _blank(book, width=m[0].rect.width, height=m[0].rect.height)
+    _blank(book, width=m[0].rect.width, height=m[0].rect.height)  # 封三
     add_cover(back)
     # 书签与翻页器目录
     toc, flip = [], []
