@@ -1,0 +1,45 @@
+name: M518 publication unit production acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/m518-publication-unit-live.yml
+      - tools/m518_unit/live_verify.py
+      - public/books/m/518/**
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: m518-publication-acceptance
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public/books/m/518/
+            /tools/m518_unit/live_verify.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser checks
+        run: |
+          python -m pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+          sudo apt-get install -y -qq fonts-noto-cjk
+      - name: Verify actual public pages and learning behavior
+        run: |
+          mkdir -p m518-live-qa
+          set -o pipefail
+          python tools/m518_unit/live_verify.py 2>&1 | tee m518-live-qa/output.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m518-publication-production-acceptance
+          path: m518-live-qa
+          retention-days: 14
