@@ -1263,6 +1263,7 @@
       fgJudge: "只到判断，不成文",
       tlGrid: "27 宫格定位", tlGridS: "C⊗M⊗V 与一二三号位，中心位轮到谁",
       tlNine: "九宫格取三格", tlNineS: "抽签取三格（同号位或 123 轮换），各问各答再撞成一条",
+      tlLens: "九宫格透镜", tlLensS: "问题分析先选镜：九格读数→按区分性特征选三角套（平谱不用、异维取桥）→三方程／六路径／三原理具体化→方子与判决（第513号）",
       nbrH: "站内近邻 · 待交代分离线", nbrFail: "这次没取到站内近邻名单——下面的近邻检测只凭它自己的记忆，请当心。",
       taMiss: "⚠ 本轮工序未交付（页面逐件扫过，不是它自己说的）：", taShort: "篇幅只有 {n} 字，这道工序的下限是 {m} 字——多半是被截短了，说一句「继续」让它补。",
       taOk: "✓ 本轮工序的 {n} 件交付件都在。", taPart: "（其余 {n} 件在）",
@@ -1564,6 +1565,7 @@
       fgJudge: "stop at the claim, no full draft",
       tlGrid: "27-cell placement", tlGridS: "C⊗M⊗V and positions one/two/three; whose turn at centre",
       tlNine: "Nine-cell, draw three", tlNineS: "Three cells drawn by rule (same tier, or a 1-2-3 rotation), each asked and answered, then struck together",
+      tlLens: "Nine-cell lens", tlLensS: "Choose the lens before analysing: read all nine cells, pick the triangle by the person's distinguishing traits (flat cells ruled out, cross-dimension pairs take their bridge), then equations / paths / principles, a remedy and a decisive prediction (book 513)",
       nbrH: "Site neighbours · dividing lines owed", nbrFail: "No site neighbour list came back this time — the check below runs on memory alone, so treat it with care.",
       taMiss: "⚠ Not delivered this turn (scanned item by item, not self-reported):", taShort: "Only {n} characters; this procedure's floor is {m} — it was probably cut short. Say \u300ccontinue\u300d to have it finish.",
       taOk: "\u2713 All {n} required items of this procedure are present.", taPart: "(the other {n} are present)",
@@ -13342,6 +13344,7 @@
     { k: "book9", n: "tlBook9", s: "tlBook9S", cmd: ["九问专著", "book9", "专著", "立题书"] },
     { k: "grid", n: "tlGrid", s: "tlGridS", cmd: ["坐标", "grid", "宫格"] },
     { k: "nine", n: "tlNine", s: "tlNineS", cmd: ["九宫", "nine"] },
+    { k: "lens", n: "tlLens", s: "tlLensS", cmd: ["透镜", "lens", "选镜", "九宫格透镜", "问题分析"] },
     { k: "map", n: "tlMap", s: "tlMapS", cmd: ["结构图", "map", "导图"] },
     { k: "genesis", n: "tlGenesis", s: "tlGenesisS", cmd: ["发生场", "genesis", "布场"] },
     { k: "davinci", n: "tlDavinci", s: "tlDavinciS", cmd: ["达芬奇", "davinci", "发生体", "童画"] }
