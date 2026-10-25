@@ -63,9 +63,9 @@ with sync_playwright() as pw:
  p.locator('#initial').fill('验收初答：我需要区分资源不足与解释封闭。');p.locator('#save-initial').click()
  p.wait_for_function("document.querySelector('#initial').disabled")
  p.locator('#reanswer').fill('验收复答：我将检验下一轮是否允许新的经验改变安排。');p.locator('#save-reanswer').click()
- p.wait_for_function("document.querySelector('#history').innerText.includes('验收复答')")
+ p.wait_for_function("document.querySelector('#history').textContent.includes('验收复答')")
  p.reload(wait_until='networkidle');p.wait_for_selector('#workspace:not([hidden])')
- assert p.locator('#initial').is_disabled();assert '验收复答' in p.locator('#history').inner_text()
+ assert p.locator('#initial').is_disabled();assert '验收复答' in p.locator('#history').text_content()
  archive=p.evaluate('BookUnitCore.archive()');assert len(archive['events'])==2
  p.evaluate('(a)=>BookUnitCore.importArchive(a)',archive)
  assert len(p.evaluate('BookUnitCore.archive()')['events'])==2
@@ -89,7 +89,7 @@ with sync_playwright() as pw:
  assert next(e for e in ar['events'] if e['type']=='reply')['data']['status']=='received-unverified'
  assert not any(e['type']=='revision' for e in ar['events'])
  p.locator('#revision').fill('验收修订：保留竞争解释，明确下一次观察。');p.locator('#confirm-revision').check();p.locator('#save-revision').click()
- p.wait_for_function("document.querySelector('#history').innerText.includes('验收修订')")
+ p.wait_for_function("document.querySelector('#history').textContent.includes('验收修订')")
  with p.expect_download() as dl:p.locator('#export').click()
  download=dl.value;download.save_as(str(OUT/'test-archive.json'))
  assert 'TEST-ONLY-INTERCEPTED' not in (OUT/'test-archive.json').read_text()
@@ -110,3 +110,4 @@ with sync_playwright() as pw:
  browser.close()
 (OUT/'result.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2))
 print('M518 PRODUCTION ACCEPTANCE PASSED',json.dumps(checks,ensure_ascii=False),flush=True)
+
