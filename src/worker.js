@@ -7589,7 +7589,7 @@ function _nbrKey(it) {                       // 去重：同一站点＋同一�
   try { host = new URL(it.u).hostname.replace(/^www\./, ""); } catch (e) {}
   return host + "|" + String(it.t || "").toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]/g, "").slice(0, 24);
 }
-async function nbrChain(env, seed, glmKey, extra) {
+async function nbrChain(env, seed, glmKey, extra, fq) {
   const base = String(seed || "").trim().slice(0, 34);
   const out = { items: [], passes: [], ok: false, reason: "" };
   if (!base) { out.reason = "no_seed"; return out; }
@@ -7598,7 +7598,13 @@ async function nbrChain(env, seed, glmKey, extra) {
   const lat = String(extra || "").match(/[A-Z][a-zA-Z][a-zA-Z .'-]{3,40}/g) || [];
   const passes = NBR_PASSES.map((p) => ({ k: p.k, q: (base + p.sfx).slice(0, 70) }));
   if (lat.length) passes.push({ k: "外文", q: (lat.slice(0, 2).join(" ") + " theory critique").slice(0, 70) });
+  /* fq（2026-10-25）：调用方替中文题目译好的英文检索词（只译题目本身的概念词，不编人名）。
+     有它就照跑外文一趟，并标成「外文(译)」——来路摆明，不冒充上游材料里本来就有的外文串。 */
+  else if (fq && String(fq).trim()) passes.push({ k: "外文(译)", q: String(fq).trim().slice(0, 70) });
   else out.passes.push({ k: "外文", n: 0, why: "skipped_no_latin" });
+  /* 中文原典一趟（2026-10-25）：《客气》实测，费孝通《乡土中国》原话就是本题主命题，四趟后缀式查询一条没召回。
+     只在种子是中文时加。 */
+  if (/[\u4e00-\u9fff]/.test(base)) passes.push({ k: "中文原典", q: (base + " 经典论述 原文 出处").slice(0, 70) });
   const rs = await Promise.all(passes.map((p) =>
     webSearch(env, p.q, glmKey, 5).then((r) => ({ p: p, r: r })).catch(() => ({ p: p, r: { ok: false, reason: "net", items: [] } }))));
   const seen = {};
@@ -7929,6 +7935,29 @@ function sentrySeedOf(q, history) {
   return s0.slice(0, 200);
 }
 
+/* 占位哨的检索词（2026-10-25）：读者那一问往往是一整段场景描写，拿前 34 字去搜几乎召回为零。
+   先抽题目词：「X是什么／为什么X／X怎么…」里的 X；抽不出就取第一个分句的前 12 字。 */
+function sentryTermOf(seed) {
+  const s = String(seed || "").replace(/^\s*(?:[A-Za-z]{0,6}\d{0,3}|[0-9一二三四五六七八九十]+)[.、．）)]\s*/, "").trim();
+  let m = s.match(/^[「『“"]?([^，,。？?！!、；;\s「」『』“”"]{1,12}?)[」』”"]?\s*(是什么|不是什么|到底是什么|究竟是什么|为何|为什么|怎么|如何|是否|有没有)/);
+  if (m && m[1]) return m[1];
+  m = s.match(/(?:为什么|为何|怎样|如何)([^，,。？?！!、；;\s]{2,12})/);
+  if (m && m[1]) return m[1];
+  m = s.match(/[「『“"]([^」』”"]{1,12})[」』”"]/);
+  if (m && m[1]) return m[1];
+  return (s.split(/[，,。？?！!；;\n]/)[0] || s).slice(0, 12);
+}
+/* 中文题目词 → 英文学术检索词（只译概念，不编人名与年份；5 秒截止，超时就跳过外文一趟）。 */
+async function sentryEnQuery(VC, KEY, term) {
+  if (!VC || !KEY || !term) return "";
+  const _m = (VC.vd && !VC.umodel) ? wdsLiteModel(VC.vd) : VC.model;
+  const LC = { url: VC.url, model: _m || VC.model, name: VC.name };
+  const sys = "You translate a Chinese everyday-life concept into an English academic search query. Output ONE line of 3-6 English keywords (concepts and the scholarly fields that study it), no names, no years, no explanation.";
+  const out = await llmText(LC, KEY, sys, "Concept: " + term, 300, 5000);
+  const line = String(out || "").split("\n").map((x) => x.trim()).filter(Boolean)[0] || "";
+  const clean = line.replace(/[^A-Za-z0-9 ,'\-]/g, " ").replace(/\s+/g, " ").trim();
+  return clean.length >= 6 ? clean.slice(0, 70) : "";
+}
 
 /* ═══════════ 三类问题：是什么 / 怎么办 / 为什么 ═══════════
    这一块是 ChatSDE 的常驻底盘，**每一轮都注入**（不像 SDE_METHOD_BLOCK 只在深度档进）。
@@ -8158,7 +8187,7 @@ const FOUR_TRI_BLOCK = "\n\n════ 异位四角交叉：每一答让四套
   + "\n【交叉点】读者问题里的一个具体的点——一个动作、一个瞬间、一件东西、一句话。四套异位三角都落在这同一个点上。"
   + "\n从六套异位里选四套（优先取一整组甲或乙，再从另一组补一套），各一行：哪两格在顶 → 哪一格被逼着变 → 回写了什么。**每一行都要落到一件能看见、能数的事上**（一句话出现在饭前还是饭后、谁先掏钱、隔了几天回礼）；只换了术语、没落到可观察之事的一行就是贴标签，删掉重写。"
   + "\n【近邻】写交叉判断之前，先列出 3–5 个与它最接近的已有研究（提出者＋年代＋一句话说它说了什么），**至少跨三个学科去找**：社会心理学、行为经济学、语用学与语言学、人类学与社会学、哲学、家庭治疗与临床、记忆与认知研究……只写你确定存在的；拿不准的标〔待核〕。常识词（礼貌、虚伪、念旧之类）不算近邻。"
-  + "\n【交叉判断】一条只有这四套同时交叉才推得出的判断，写成「X 不是 Y，而是 Z」，**Y 取上一行里最近的那一个近邻**，并用一句话说清：在什么局面下它与 Z 给出相反的预测。"
+  + "\n【交叉判断】一条只有这四套同时交叉才推得出的判断，写成「X 不是 Y，而是 Z」，**Y 取上一行里最近的那一个近邻**。先用一句话**承认它已经说中了什么**（能引原话就引），再说 Z 多出的那一层；只有近邻本人说过、或从它原文能直接推出相反预测时，才写「在什么局面下二者预测相反」，推不出就写「与它同向，此处无判别力」——**不许替近邻编一个它没说过的预测**。"
   + "\n【同位对照】一句：只看同位套（指名哪一套）时，这条判断会落回____（一个已有学科的说法）——落不回去，才说明它是新的。"
   + "\n然后才是正文：用大白话和日常的例子把这张卡讲透，篇幅照常。"
   + "\n\n**占位就拆套（方法论的全息性）：**每一套三角本身又是一个九宫格——它三个角各有三项。当交叉判断被指认能落回某个已有理论（同位对照落得回去），或某一套异位在这个点上本身已被占位，就把那一套拆开：三个角按序号取项，同序号的三项组成 3 套同位子三角（只作对照），序号互不相同的组成 6 套异位子三角。从 6 套异位子三角里选一到两套，落在同一个交叉点上再走三拍，用三方程、六路径、三原理把它跑实，写成一行【拆套】：拆的是哪一套、用了哪一套子三角（例：拆 S1·D2·E3，取异位子三角「对比·回写·势能」）、拆出的新判断。一答最多拆一层；拆不出新东西，就如实写「拆套未出新」，换交叉点。"
@@ -8185,10 +8214,11 @@ function wdsPaperAsk(q) {
 }
 const PAPER_ASK_BLOCK = "\n\n（本轮是成文请求，下面这几条与长度要求同等硬，任一条不过就当场返工，不要交半成品：）"
   + "\n① **字数写足**：正文汉字不少于读者要求的九成五（要 8000 就写到 7600 以上），不许用列表凑字，也不许为凑字重复前文。"
+  + "\n①b **先收窄**：动笔前先列出本场对话里**真正没人说过的新东西**（最多两条）——凡是近邻（含站外检索到的占位者）已经说过的，不许作主命题，只在交锋节里承认。全文压在这一两条上，不铺满整个现象。"
   + "\n② **主命题来自异位四角交叉**：从六套异位（S1·D2·E3、S1·D3·E2、S2·D1·E3、S2·D3·E1、S3·D1·E2、S3·D2·E1）里取四套，在同一个交叉点上各走三拍，写成「X 不是 Y，而是 Z」，Y 必须是一个真实存在的已有理论。"
   + "\n③ **单设一节「异位四角交叉」**：一张表写四套的三拍；再写「同位对照」——只看哪一套同位三角（S1·D1·E1／S2·D2·E2／S3·D3·E3）时，主命题会落回哪个已有理论。被占位的那一套按序号拆成子三角再交叉，写明拆了什么、拆出了什么。"
-  + "\n④ **单设一节「与最近邻居的交锋」，先做敌意拓宽**：动笔前把主命题压到 50 字，自问「世界上谁已经说过这件事」，至少跨三个学科去找（社会心理学、行为经济学、语用学与语言学、人类学与社会学、哲学、家庭治疗与临床、记忆与认知研究），**包括与本文预测方向相反的已有实验**。对重合最高的 4–6 家逐一写：它说对了什么、说不到什么、本文多出哪一层、在什么局面下二者给出相反预测。不许把近邻说成稻草人。"
-  + "\n⑤ **判别局面**：至少一个只有本文推得出、最近的那一家推不出（或推出相反结果）的局面；同向的预测不算判别。"
+  + "\n④ **单设一节「与最近邻居的交锋」，先做敌意拓宽**：动笔前把主命题压到 50 字，自问「世界上谁已经说过这件事」，至少跨三个学科去找（社会心理学、行为经济学、语用学与语言学、人类学与社会学、哲学、家庭治疗与临床、记忆与认知研究），**包括与本文预测方向相反的已有实验**。对重合最高的 4–6 家逐一写：**先写它已经说中了什么、引原话**（本题若有经典原典直接说过，例如乡土社会研究、礼物研究里的原话，必须找出来摆在最前面），再写本文多出哪一层；近邻的预测**只许用它本人说过的或原文直接推得出的**，推不出相反预测就如实写「同向，无判别力」。不许替近邻编预测，不许把近邻说成稻草人，不许把他的立场说反。"
+  + "\n⑤ **判别局面**：至少一个只有本文推得出、最近的那一家推不出（或其原文推出相反结果）的局面；同向的预测不算判别。判别局面要落在①b 那一两条新东西上。"
   + "\n⑥ **「本文怎样会错」一节**：2–4 条大局面，各配一个能清点的读数，不留豁免口。"
   + "\n⑦ **借来的结构必须论证**：从别的学科借来的结构（电化学、会计、地质、精算……）要写清三个要件怎样一一对应、为什么在这里成立；说不清的整节删掉，不许只当比喻。SDE 术语用了就必须推进论证。"
   + "\n⑧ **文献三验**：只列你确定存在的文献，书名、出版社、年份要对得上同一版本；正文里出现的每个「作者＋年份」都要在文献表里，文献表里的每一条都要在正文被用到；拿不准的不列。"
@@ -14767,14 +14797,23 @@ export default {
               const _ck = "https://sentry.sdeuniverses/" + _lhash("sentry:" + _plainSeed, 2166136261) + "/" + rvendor; // 同题一场只搜一次
               try { const _hit = await caches.default.match(_ck); if (_hit) { ncS = await _hit.json(); _cachedS = true; } } catch (e) {}
               if (!ncS) {
-                try { ncS = await nbrChain(env, _plainSeed, (rvendor === "glm" ? KEY : skey), q); } catch (e) { ncS = null; }
+                /* 2026-10-25：①种子先压成题目词（「客气是什么、不是什么？……」→「客气」），整句去搜召回极差；
+                   ②中文题目替它译一组英文检索词，外文一趟不再一律跳过。 */
+                const _term = sentryTermOf(_plainSeed);
+                let _fq = "";
+                if (/[\u4e00-\u9fff]/.test(_term) && !/[A-Za-z]{4,}/.test(q)) {
+                  try { _fq = await sentryEnQuery(VC, KEY, _term); } catch (e) { _fq = ""; }
+                }
+                try { ncS = await nbrChain(env, _term, (rvendor === "glm" ? KEY : skey), q, _fq); } catch (e) { ncS = null; }
                 if (ncS && ncS.items && ncS.items.length) { try { await caches.default.put(_ck, new Response(JSON.stringify(ncS), { headers: { "content-type": "application/json", "cache-control": "max-age=1800" } })); } catch (e) {} } // 空结果不入缓存
               }
               if (ncS && ncS.items && ncS.items.length) {
                 sentryCtx = nbrSentryBlock(ncS, _cachedS);
                 controller.enqueue(_sseBytes({ t: "sentry", v: { items: ncS.items, ok: ncS.ok, cached: _cachedS, seed: _plainSeed } }));
               } else {
-                const _sw = (ncS && ncS.passes ? ncS.passes.map((p) => p.why).filter(Boolean)[0] : "") || (ncS ? ncS.reason : "net");
+                /* 报真因：跳过外文那一条不算失败原因，优先报真正跑了却落空的那一趟的原因（没 Key／HTTP 错误／搜索为空）。 */
+                const _whys = (ncS && ncS.passes ? ncS.passes.map((p) => p.why).filter(Boolean) : []);
+                const _sw = _whys.filter((w) => w !== "skipped_no_latin")[0] || _whys[0] || (ncS ? ncS.reason : "net");
                 controller.enqueue(_sseBytes({ t: "sentry", v: { items: [], ok: false, cached: false, seed: _plainSeed, why: _sw } }));
                 controller.enqueue(_sseBytes({ t: "note", v: "占位哨：这一问没查到站外占位者（" + (_sw === "need_search_key" ? "没有可用的搜索 Key" : _sw) + "）——『已有说法』这一栏本轮只能靠你的记忆库，按纪律不许写「据我所知无人提出」。" }));
               }
@@ -14927,7 +14966,12 @@ export default {
             // ── 刀②③ 远域结构 + 预注册卡（普通对话每轮；零 API 成本）──
             let extras = "";
             if (_plain) {
-              const _far = farPick(_plainSeed || q, (Array.isArray(history) ? history.length : 0), q);
+              /* 2026-10-25 两处修（王德生截图「远域结构·晶体学·位错滑移，好像无关学科，里面应该有Bug」）：
+                 ① 轮转步长按**读者轮数**算，不按历史条数——历史一轮两条（问＋答），按条数每轮跳两格，同一题只轮得到 24 门里的 12 门；
+                 ② 成文那一轮不挂远域结构：前两篇《客气》论文被盲评判为装饰、扣 E 分的「牺牲阳极」「位错塞积」都出自这张表——
+                    对话里借结构是试刀，成文时它会被原样写进正文当比喻。成文的跨学科要求另由 PAPER_ASK_BLOCK ⑦ 管。 */
+              const _rot = Array.isArray(history) ? history.filter((m) => m && (m.role === "reader" || m.role === "user")).length : 0;
+              const _far = wdsPaperAsk(q) ? null : farPick(_plainSeed || q, _rot, q);
               if (_far) { extras += farBlock(_far); controller.enqueue(_sseBytes({ t: "far", v: { d: _far.d, s: _far.s, j: _far.j } })); }
               extras += PREREG_BLOCK;
             }

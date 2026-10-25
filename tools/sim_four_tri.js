@@ -99,5 +99,24 @@ ok(PB.indexOf("产生」") >= 0 && PB.replace("用「发生」不用「产生」
 ok(/wdsPaperAsk\(q\)\) \? PAPER_ASK_BLOCK : ""/.test(src), "成文规矩挂在当轮 user 消息上");
 ok(/\(!tool \|\| \/\^\(what\|how\|why\)q\?\$\/\.test\(tool\)\)/.test(src), "工序里只放行 What/How/Why 问对");
 
+// ⑨ v5（2026-10-25「三处改」＋远域结构修）
+const tm = src.match(/function sentryTermOf\(seed\) \{[\s\S]*?\n\}/);
+let TERM = null; try { TERM = Function(tm[0] + "; return sentryTermOf;")(); } catch (e) {}
+ok(!!TERM, "sentryTermOf 可求值");
+if (TERM) {
+  ok(TERM("客气是什么、不是什么？亲戚来家里吃饭，主人一再说「没什么菜，随便吃」") === "客气", "占位哨检索词：整句→「客气」");
+  ok(TERM("1. 舍不得是什么、不是什么？母亲舍不得扔孩子小时候的一件毛衣") === "舍不得", "占位哨检索词：去编号→「舍不得」");
+  ok(TERM("「断舍离」很流行，很多人说「东西只是东西」") === "断舍离", "占位哨检索词：引号里的概念");
+}
+ok(/async function nbrChain\(env, seed, glmKey, extra, fq\)/.test(src), "nbrChain 收外文译词 fq（旧三处调用不受影响）");
+ok(/k: "外文\(译\)"/.test(src) && /k: "中文原典"/.test(src), "外文(译) 与 中文原典 两趟");
+ok(/_whys\.filter\(\(w\) => w !== "skipped_no_latin"\)/.test(src), "占位哨报真因：跳过外文不算失败原因");
+ok(/sentryEnQuery\(VC, KEY, _term\)/.test(src) && /no names, no years/.test(src), "中文题目译英文检索词，只译概念不编人名");
+ok(/不许替近邻编一个它没说过的预测/.test(B) && /与它同向，此处无判别力/.test(B), "四角卡：近邻预测只用它本人说过的");
+ok(/先收窄/.test(PB) && /真正没人说过的新东西/.test(PB), "成文：先收窄到真新的一两条");
+ok(/先写它已经说中了什么、引原话/.test(PB) && /不许把他的立场说反/.test(PB), "成文：先承认近邻、不许说反");
+ok(/wdsPaperAsk\(q\) \? null : farPick/.test(src), "成文那一轮不挂远域结构");
+ok(/m\.role === "reader" \|\| m\.role === "user"\)\)\.length : 0;\n\s*const _far/.test(src), "远域轮转按读者轮数（24 门全可达）");
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " PASS / " + fail + " FAIL");
 process.exit(fail ? 1 : 0);
