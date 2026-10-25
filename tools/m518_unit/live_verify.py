@@ -28,7 +28,12 @@ for p in sorted(local.rglob('*')):
   rendered=remote.decode('utf-8')
   assert '陪伴发生学' in rendered and ('/books/m/518/' in rendered or (rel=='agent/index.html' and 'dialogue.html' in rendered)),rel
  else:
-  assert hashlib.sha256(remote).digest()==hashlib.sha256(p.read_bytes()).digest(),rel
+  expected=hashlib.sha256(p.read_bytes()).digest()
+  while hashlib.sha256(remote).digest()!=expected:
+   assert time.time()<deadline,'Deployed asset differs: '+rel
+   print('Waiting for current asset:',rel,flush=True)
+   time.sleep(10)
+   remote=get(BASE+rel)
  checked.append(rel)
 checks['assetHashes']=len(checked)
 cat=json.loads(get(SITE+'/books/catalog.json'));book=next(x for x in cat['books'] if x['number']==518)

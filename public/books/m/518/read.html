@@ -448,6 +448,7 @@ function buildThumbs(){
 $('btnPrev').onclick=function(){ step(-1); };
 $('btnNext').onclick=function(){ step(1); };
 $('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('pi').onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault();go((+this.value||1)+CFG.offset-1); } };
 $('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
 $('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
 $('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);
