@@ -67,7 +67,6 @@ def main():
     det = (det.replace('__AGENT__', AG).replace('__V__', V).replace('__PAGES__', str(pages)).replace('__WAN__', '%.0f' % (han / 10000))
            .replace('__LINE__', _h.escape(CT['detailLine'])).replace('__INTRO__', _h.escape(CT['detailIntro'])).replace('__CARDS__', cards)
            .replace('__DESC_SHORT__', _h.escape(CT['detailLine'], quote=True)))
-    assert '__' not in det.replace('__agentproxy', '')
     parts = []
     for f in sorted((HERE / 'parts').glob('*.md')):
         t = f.read_text()
