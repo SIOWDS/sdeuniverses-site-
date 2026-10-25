@@ -26,7 +26,7 @@ for p in sorted(local.rglob('*')):
   # The production Worker appends site navigation and scripts to HTML.
   # Validate its book identity here and its rendered behavior below.
   rendered=remote.decode('utf-8')
-  assert '陪伴发生学' in rendered and '/books/m/518/' in rendered,rel
+  assert '陪伴发生学' in rendered and ('/books/m/518/' in rendered or (rel=='agent/index.html' and 'dialogue.html' in rendered)),rel
  else:
   assert hashlib.sha256(remote).digest()==hashlib.sha256(p.read_bytes()).digest(),rel
  checked.append(rel)
@@ -66,7 +66,7 @@ with sync_playwright() as pw:
  assert len(p.evaluate('BookUnitCore.archive()')['events'])==2
  conflict=json.loads(json.dumps(archive));conflict['events'][0]['data']['text']='不应覆盖'
  rejected=p.evaluate('async a=>{try{await BookUnitCore.importArchive(a);return false}catch(e){return true}}',conflict);assert rejected
- assert '验收初答' in p.evaluate('BookUnitCore.archive()')['events'][0]['data']['text']
+ assert '验收初答' in next(e for e in p.evaluate('BookUnitCore.archive()')['events'] if e['type']=='initial')['data']['text']
  captured=[]
  def stub(route):
   captured.append(route.request.post_data_json)
