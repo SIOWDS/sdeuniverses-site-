@@ -76,5 +76,28 @@ ok(src.indexOf("（十六）四角交叉：") < 0, "旧版（十六）已替换"
 ok(/前行·回写·跃层/.test(s16 + src.slice(src.indexOf("（十六）异位四角交叉："), src.indexOf("（十六）异位四角交叉：") + 2000)), "（十六）D2 已改三项");
 ok(/拆成子三角/.test(src.slice(src.indexOf("（十六）异位四角交叉："), src.indexOf("（十六）异位四角交叉：") + 2000)), "（十六）含占位拆套");
 
+// ⑧ v4（2026-10-25「改」）：近邻先行、可观察落点、轮换照实；成文请求接入成文规矩
+ok(/【近邻】/.test(B) && /至少跨三个学科/.test(B), "四角卡加【近邻】行，至少跨三个学科");
+ok(/Y 取上一行里最近的那一个近邻/.test(B), "交叉判断的 Y 取最近邻");
+ok(/能看见、能数的事/.test(B), "每行须落到可观察之事（防贴标签）");
+ok(/本轮未换/.test(B) && /不许写「全换」/.test(B), "轮换照实自报");
+const fm = src.match(/function wdsPaperAsk\(q\) \{[\s\S]*?\n\}/);
+ok(!!fm, "wdsPaperAsk 有定义");
+let PA = null; try { PA = Function(fm[0] + "; return wdsPaperAsk;")(); } catch (e) {}
+ok(!!PA, "wdsPaperAsk 可求值");
+if (PA) {
+  ok(PA("请将我们上面的问对进行提炼，打造一个创新智商分数超过140的论文，长度是 8000字。"), "识别：九问成书那句成文指令");
+  ok(PA("请将我们上面的讨论总结和提炼出一篇8000字的创新论文"), "识别：学员版成文指令");
+  ok(!PA("客气是什么、不是什么？"), "不误认：普通提问");
+  ok(!PA("这篇论文里的戈夫曼是谁？"), "不误认：只提到论文二字的提问");
+}
+const pm = src.match(/const PAPER_ASK_BLOCK = ([\s\S]*?);\n/);
+let PB = ""; try { PB = Function('"use strict";return (' + pm[1] + ");")(); } catch (e) {}
+ok(PB.length > 600, "PAPER_ASK_BLOCK 可求值（" + PB.length + " 字符）");
+for (const k of ["字数写足", "异位四角交叉", "同位对照", "敌意拓宽", "方向相反的已有实验", "判别局面", "本文怎样会错", "借来的结构必须论证", "文献三验"]) ok(PB.indexOf(k) >= 0, "成文规矩：" + k);
+ok(PB.indexOf("产生」") >= 0 && PB.replace("用「发生」不用「产生」", "").indexOf("产生") < 0, "成文规矩里「产生」只出现在禁用说明里");
+ok(/wdsPaperAsk\(q\)\) \? PAPER_ASK_BLOCK : ""/.test(src), "成文规矩挂在当轮 user 消息上");
+ok(/\(!tool \|\| \/\^\(what\|how\|why\)q\?\$\/\.test\(tool\)\)/.test(src), "工序里只放行 What/How/Why 问对");
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " PASS / " + fail + " FAIL");
 process.exit(fail ? 1 : 0);
