@@ -22,7 +22,13 @@ checked=[]
 for p in sorted(local.rglob('*')):
  if not p.is_file():continue
  rel=p.relative_to(local).as_posix();remote=get(BASE+rel)
- assert hashlib.sha256(remote).digest()==hashlib.sha256(p.read_bytes()).digest(),rel
+ if p.suffix=='.html':
+  # The production Worker appends site navigation and scripts to HTML.
+  # Validate its book identity here and its rendered behavior below.
+  rendered=remote.decode('utf-8')
+  assert '陪伴发生学' in rendered and '/books/m/518/' in rendered,rel
+ else:
+  assert hashlib.sha256(remote).digest()==hashlib.sha256(p.read_bytes()).digest(),rel
  checked.append(rel)
 checks['assetHashes']=len(checked)
 cat=json.loads(get(SITE+'/books/catalog.json'));book=next(x for x in cat['books'] if x['number']==518)
