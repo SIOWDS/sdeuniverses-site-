@@ -419,12 +419,12 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 /*Q*/.qbox{{background:#F7F3E8;border-left:1.6pt solid #58A9B5;padding:2.2mm 4mm;margin:2mm 0 4mm;break-inside:avoid}}
 .qbox .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.3em;margin-bottom:1mm}}
 .qbox p{{text-indent:0;margin:0;font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
-.chapter.t1 p,.chapter.t1 li{{line-height:{lh-0.05:.3f}}}
-.chapter.t2 p,.chapter.t2 li{{line-height:{lh-0.10:.3f}}}
+.chapter.t1 p,.chapter.t1 li,.backm.t1 p{{line-height:{lh-0.05:.3f}}}
+.chapter.t2 p,.chapter.t2 li,.backm.t2 p{{line-height:{lh-0.10:.3f}}}
 .chapter.t2 h3.sec{{margin-top:4.5mm}}
-.chapter.t3 p,.chapter.t3 li{{line-height:{lh-0.15:.3f};margin-bottom:.3em}}
+.chapter.t3 p,.chapter.t3 li,.backm.t3 p{{line-height:{lh-0.15:.3f};margin-bottom:.3em}}
 .chapter.t3 h3.sec{{margin-top:4mm}}
-.chapter.t4 p,.chapter.t4 li{{line-height:{lh-0.2:.3f};margin-bottom:.25em}}
+.chapter.t4 p,.chapter.t4 li,.backm.t4 p{{line-height:{lh-0.2:.3f};margin-bottom:.25em}}
 .chapter.t4 h3.sec{{margin-top:3.5mm}}
 blockquote.verdict{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;margin:4mm 0;padding:2.6mm 4mm;break-inside:avoid}}
 blockquote.verdict p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F}}
@@ -434,7 +434,8 @@ table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 '
 table.tb tr{{break-inside:avoid}}
 table.tb.n1 th:nth-child(1),table.tb.n1 td:nth-child(1){{white-space:nowrap}}
 table.tb.n2 th:nth-child(2),table.tb.n2 td:nth-child(2){{white-space:nowrap}}
-table.tb.w5 th:nth-child(-n+2),table.tb.w5 td:nth-child(-n+2){{white-space:nowrap}}
+table.tb.w5 th:nth-child(1),table.tb.w5 td:nth-child(1){{white-space:nowrap}}
+table.tb.w5 th{{font-size:{body_pt*0.74:.2f}pt}}
 table.tb.w5 td{{font-size:{body_pt*0.74:.2f}pt;line-height:1.55}}
 table.tb.dense td{{padding-top:.7mm;padding-bottom:.7mm}}
 table.tb td{{border-bottom:.5pt solid #E4DCCB;padding:1.3mm 1.6mm;vertical-align:top}}
@@ -532,7 +533,7 @@ def sec_html(kind, sid, title, lvl, body):
         cls += ' chapter t4'
     if kind == 'front' and title.startswith('前言'):
         cls += ' chapter t1'
-    if kind == 'chapter' and TIGHT.get(sid):
+    if TIGHT.get(sid):   # 修订版：结语也参与孤页收紧
         cls += ' ' + TIGHT[sid]
     return '<section class="%s" id="%s">%s</section>' % (cls, sid, body)
 
@@ -548,7 +549,7 @@ def tune_chapters(secs, css_args, fonts, label):
     TIGHT.clear()
     fixed = []
     for s in secs:
-        if s[0] != 'chapter':
+        if s[0] != 'chapter' and not (s[0] == 'back' and s[2].startswith('结语')):
             continue
         key = hashlib.md5(sec_html(*s).encode()).hexdigest()
         if key in cache:
