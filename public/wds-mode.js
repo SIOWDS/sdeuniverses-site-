@@ -5940,7 +5940,7 @@
     // 本场第一次挂底册时扣下来，此后每轮随 payload 送（只在九问专著里）
     var _razNew = 0;
     if (curTool === "book9" && !RAZ.text) { var _r = razDetect(q); if (_r) { RAZ.text = _r; RAZ.turn = history.length; _razNew = _r.length; } }
-    var payload = { q: q, history: histPack(compFrom()), umem: _m3 ? "" : memRecall(q), umem3: _m3 || undefined, key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1), coach: coachOn ? 1 : undefined, raz: (curTool === "book9" && RAZ.text) ? razSlice(RAZ.text, razCurQ(), RAZ.turn++) : undefined };
+    var payload = { q: q, orig: origQ(), history: histPack(compFrom()), umem: _m3 ? "" : memRecall(q), umem3: _m3 || undefined, key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, nosde: (!PROFILE && noSdeOn) ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool, nosentry: (sentryOnUI ? 0 : 1), coach: coachOn ? 1 : undefined, raz: (curTool === "book9" && RAZ.text) ? razSlice(RAZ.text, razCurQ(), RAZ.turn++) : undefined };
     if (thinkMode === "deep") payload.grade = gradePin ? gradePin : "auto";   // 难度条：自动按检索定档，或读者钉死的档
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
     /* 【无血 · 2026-10-12 王德生令「一个要满血，一个要无血」】无 SDE 一路此前只换了 system，
@@ -10474,6 +10474,8 @@
   var COMP_KEEP = 8;          // 最近 4 轮（8 条）永远留原文
   function compReset() { COMP.text = ""; COMP.upto = 0; COMP.busy = false; COMP.turns = 0; compPaint(); }
   // 账本有效时才跳过前面那几轮；账本没压出来就当没压过（绝不能因为指针动了而静默丢原文）
+  /* 本场原题（2026-10-25）：历史会被压缩、按预算砍掉最早几条，追问器却必须一直看得见第一问——单独递一份。 */
+  function origQ() { for (var i = 0; i < history.length; i++) if (history[i] && history[i].role === "reader") return String(history[i].text || "").slice(0, 600); return ""; }
   function compFrom() { return (COMP.text && COMP.upto <= history.length) ? COMP.upto : 0; }
   // 画布上的成品属于那一场对话，换场就该跟着走（要留下的走「存到本机」）
   function cvReset() {
@@ -13470,9 +13472,10 @@
   var PREG_RE = /\n*[\u3014\u3010\[]\s*预注册\s*[\u3015\u3011\]][^\n]*/;   // 刀③ 预注册卡
   function pregField(line, name) { var re = new RegExp(name + "\\s*[\uff1a:]\\s*([^\uff5c|]*)"); var m = line.match(re); return m ? String(m[1]).replace(/^\s+|\s+$/g, "") : ""; }
   function pregEmpty(v) { return !v || /^(无|none|-|—|视情况|有待|待定|待校准)$/i.test(v); }
+  var PREG_BARE = /\n*^[ \t]*(?:[\u3010\[\u3014]\s*)?(?:预注册卡|（压短）|\(压短\))\s*(?:[\u3011\]\u3015])?[ \t]*$/gm;   // 只剩栏名的空卡、过程标记
   function pregTake(text) {
-    var s2 = String(text || ""); var m = s2.match(PREG_RE);
-    if (!m) return null;
+    var s0 = String(text || ""); var s2 = s0.replace(PREG_BARE, ""); var m = s2.match(PREG_RE);
+    if (!m) return (s2 !== s0) ? { body: s2.replace(/^\s+/, "").replace(/\s+$/, ""), empty: true } : null;
     var line = m[0].replace(/^\s+/, "");
     var body = s2.replace(PREG_RE, "").replace(/\s+$/, "");
     var c = { body: body, line: line, hypo: pregField(line, "假设"), src: pregField(line, "数据源"),
