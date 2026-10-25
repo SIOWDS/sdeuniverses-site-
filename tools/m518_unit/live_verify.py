@@ -12,7 +12,7 @@ deadline=time.time()+900
 while True:
  try:
   unit=json.loads(get(BASE+'publication-unit.json'))
-  if unit['revision']=='20261025-m518-unit-v1':break
+  if unit['revision']=='20261025-m518-unit-v2':break
  except Exception as e:print('Waiting for deployment:',type(e).__name__,flush=True)
  if time.time()>deadline:raise RuntimeError('Correct m518 deployment did not become available')
  time.sleep(15)
@@ -33,6 +33,7 @@ assert len([v for v in agents.values() if v.get('name')=='共席'])==1
 for path in ['/books/','/monographs/','/sites/read/library/']:
  s=get(SITE+path).decode();assert 'data-publication-unit="m-518"' in s,path
 checks['catalogues']=3
+assert '/books/m/518/agent/' in get(SITE+'/books/agent/').decode()
 with sync_playwright() as pw:
  browser=pw.chromium.launch()
  context=browser.new_context(viewport={'width':1440,'height':1000})
