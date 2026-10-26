@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 458 号《科学共同体的退位和出版典范转移》（王德生著）封面与封底（由第 520 号改来，藏青底，220 系列版式）：主图是金环里一座城门——左段城墙完好、门洞里站着守门人，右段城墙塌成几截，青色的路从塌口穿进去；塌口外悬一杆秤。
+"""第 461 号《笃信的类比——人间十大心理的统一原理》（王德生著）封面与封底（由第 458 号改来，藏青底，220 系列版式）：主图是金环里同一块地上两棵同年栽的橘树，一棵果多一棵果少，上方一道虚线的拱是笃信的类比。
 用法：python3 cover.py --fonts /home/claude/fonts --out <dir>
 """
 import argparse
@@ -9,7 +9,7 @@ from pathlib import Path
 
 NAVY_TOP, NAVY_MID, NAVY_LOW = '#0C1A34', '#1B3158', '#16294A'
 GOLD, GOLD2, CYAN, CREAM, DIM = '#C9A857', '#E3C77E', '#7FA7C9', '#EFE8D6', '#A9B6C8'
-ISBN = '979-8-90690-458-4'
+ISBN = '979-8-90690-461-4'
 
 L = ['0001101', '0011001', '0010011', '0111101', '0100011', '0110001', '0101111', '0111011', '0110111', '0001011']
 G = ['0100111', '0110011', '0011011', '0100001', '0011101', '0111001', '0000101', '0010001', '0001001', '0010111']
@@ -103,54 +103,44 @@ def heart_pts(cx, cy, k, n=240):
 
 
 def art(W, H, uid):
-    """主图（第 458 号）：金环里一座城门。左墙完好带垛口，门楼、拱门，门洞里一个守门人；右墙塌成几截碎块，
-    两条青色虚线的路从塌口外绕进城里；塌口上方悬一杆秤（系统认证）。环下三点标「共同体 · 系统 · 部落」。"""
+    """主图（第 461 号）：金环里同一块地上两棵同年栽的橘树，一棵果多、一棵果少；两树之上一道金色虚线的拱，
+    是理念界里笃信的类比（「我们原来差不多」）；两树根下各有一个小方块，是各自那道看不见的工序（F）。
+    环下三点标「理念 · 现实 · 自我」。"""
     import random
-    rnd = random.Random(458)
+    rnd = random.Random(461)
     s = W / 1700
     cx, cy, r = W * 0.56, H * 0.60, 470 * s
     out = [rings(cx, cy, r).replace('{uid}', uid)]
     g = lambda x, y: (cx + x * s, cy + y * s)
-    def P(pts):
-        return ' '.join('%.0f,%.0f' % g(x, y) for x, y in pts)
-    gy = 210  # 地面
+    ORANGE = '#E9A23B'
+    gy = 230
     out.append(f'<line x1="%.0f" y1="%.0f" x2="%.0f" y2="%.0f" stroke="{CREAM}" stroke-opacity=".55" stroke-width="%.1f"/>' % (*g(-400, gy), *g(400, gy), 4*s))
-    # 左墙＋垛口
-    out.append(f'<polyline points="{P([(-380,gy),(-380,-20),(-150,-20),(-150,gy)])}" fill="none" stroke="{GOLD2}" stroke-width="{14*s:.0f}" stroke-linejoin="round"/>')
-    for k in range(4):
-        x0 = -380 + k * 60
-        out.append(f'<polyline points="{P([(x0,-20),(x0,-58),(x0+32,-58),(x0+32,-20)])}" fill="none" stroke="{GOLD2}" stroke-width="{10*s:.0f}" stroke-linejoin="round"/>')
-    # 门楼
-    out.append(f'<polyline points="{P([(-150,gy),(-150,-110),(150,-110),(150,gy)])}" fill="none" stroke="{GOLD2}" stroke-width="{16*s:.0f}" stroke-linejoin="round"/>')
-    out.append(f'<polyline points="{P([(-190,-110),(0,-215),(190,-110)])}" fill="none" stroke="{GOLD2}" stroke-width="{16*s:.0f}" stroke-linejoin="round"/>')
-    # 拱门
-    ax0, ay0 = g(-70, gy); ax1, ay1 = g(-70, 40); bx1, by1 = g(70, 40); bx0, by0 = g(70, gy)
-    out.append(f'<path d="M {ax0:.0f} {ay0:.0f} L {ax1:.0f} {ay1:.0f} A {70*s:.0f} {70*s:.0f} 0 0 1 {bx1:.0f} {by1:.0f} L {bx0:.0f} {by0:.0f}" fill="none" stroke="{CREAM}" stroke-width="{10*s:.0f}"/>')
-    hx, hy = g(0, 95)
-    out.append(f'<circle cx="{hx:.0f}" cy="{hy:.0f}" r="{17*s:.0f}" fill="{CREAM}"/>')
-    out.append(f'<line x1="{hx:.0f}" y1="{hy+20*s:.0f}" x2="{hx:.0f}" y2="{hy+95*s:.0f}" stroke="{CREAM}" stroke-width="{11*s:.0f}" stroke-linecap="round"/>')
-    # 右墙：完好一小段，然后塌
-    out.append(f'<polyline points="{P([(150,gy),(150,-20),(215,-20),(232,30)])}" fill="none" stroke="{GOLD2}" stroke-width="{14*s:.0f}" stroke-linejoin="round"/>')
-    out.append(f'<polyline points="{P([(262,gy),(270,95),(300,120)])}" fill="none" stroke="{GOLD}" stroke-opacity=".75" stroke-width="{11*s:.0f}" stroke-linejoin="round"/>')
-    out.append(f'<polyline points="{P([(340,gy),(334,160),(368,168)])}" fill="none" stroke="{GOLD}" stroke-opacity=".55" stroke-width="{9*s:.0f}" stroke-linejoin="round"/>')
-    for (x, y, w, h, rot) in [(232, 188, 26, 18, 14), (300, 194, 22, 15, -18), (372, 196, 18, 12, 6), (318, 176, 14, 10, 30)]:
-        X, Y = g(x, y)
-        out.append(f'<rect x="{X:.0f}" y="{Y:.0f}" width="{w*s:.0f}" height="{h*s:.0f}" fill="{GOLD}" fill-opacity=".6" transform="rotate({rot} {X:.0f} {Y:.0f})"/>')
-    # 路：从塌口外穿进来
-    for (pts, op, wd) in [([(470, 250), (400, 236), (330, 222), (270, 198), (220, 150)], .95, 9), ([(470, 290), (390, 272), (310, 250), (250, 228), (190, 200)], .7, 7)]:
-        d = 'M %.0f %.0f ' % g(*pts[0]) + ' '.join('L %.0f %.0f' % g(x, y) for x, y in pts[1:])
-        out.append(f'<path d="{d}" fill="none" stroke="{CYAN}" stroke-opacity="{op}" stroke-width="{wd*s:.0f}" stroke-dasharray="{4*s:.0f} {22*s:.0f}" stroke-linecap="round"/>')
-    # 秤
-    kx, ky = g(300, -150)
-    sw = 6 * s
-    out.append(f'<g fill="none" stroke="{CREAM}" stroke-width="{sw:.1f}" stroke-linecap="round" stroke-linejoin="round">'
-               f'<line x1="{kx:.0f}" y1="{ky-62*s:.0f}" x2="{kx:.0f}" y2="{ky+62*s:.0f}"/>'
-               f'<line x1="{kx-85*s:.0f}" y1="{ky-40*s:.0f}" x2="{kx+85*s:.0f}" y2="{ky-40*s:.0f}"/>'
-               f'<path d="M {kx-85*s:.0f} {ky-40*s:.0f} L {kx-112*s:.0f} {ky+12*s:.0f} L {kx-58*s:.0f} {ky+12*s:.0f} Z"/>'
-               f'<path d="M {kx+85*s:.0f} {ky-40*s:.0f} L {kx+58*s:.0f} {ky+12*s:.0f} L {kx+112*s:.0f} {ky+12*s:.0f} Z"/>'
-               f'<line x1="{kx-32*s:.0f}" y1="{ky+62*s:.0f}" x2="{kx+32*s:.0f}" y2="{ky+62*s:.0f}"/></g>')
+    def tree(x0, nfruit, seed):
+        rr = random.Random(seed)
+        tx, ty = g(x0, gy); topx, topy = g(x0, gy - 170)
+        out.append(f'<path d="M {tx:.0f} {ty:.0f} Q {tx+8*s:.0f} {ty-90*s:.0f} {topx:.0f} {topy:.0f}" fill="none" stroke="{GOLD2}" stroke-width="{16*s:.0f}" stroke-linecap="round"/>')
+        for (dx, dy, ang) in [(-55, -230, -1), (55, -235, 1)]:
+            bx, by = g(x0 + dx, gy + dy + 40)
+            out.append(f'<line x1="{topx:.0f}" y1="{topy:.0f}" x2="{bx:.0f}" y2="{by:.0f}" stroke="{GOLD2}" stroke-width="{9*s:.0f}" stroke-linecap="round"/>')
+        ccx, ccy = g(x0, gy - 245)
+        out.append(f'<ellipse cx="{ccx:.0f}" cy="{ccy:.0f}" rx="{135*s:.0f}" ry="{105*s:.0f}" fill="{GOLD}" fill-opacity=".10" stroke="{GOLD2}" stroke-width="{7*s:.0f}"/>')
+        for _ in range(nfruit):
+            a_ = rr.uniform(0, 6.283); d_ = rr.uniform(0.15, 0.85)
+            fx = ccx + math.cos(a_) * 118 * s * d_; fy = ccy + math.sin(a_) * 88 * s * d_
+            out.append(f'<circle cx="{fx:.0f}" cy="{fy:.0f}" r="{13*s:.0f}" fill="{ORANGE}"/>')
+        fx0, fy0 = g(x0 - 22, gy + 28)
+        out.append(f'<rect x="{fx0:.0f}" y="{fy0:.0f}" width="{44*s:.0f}" height="{44*s:.0f}" fill="none" stroke="{CYAN}" stroke-width="{4*s:.0f}" stroke-dasharray="{6*s:.0f} {6*s:.0f}"/>')
+        lx, ly = g(x0, gy + 60)
+        out.append(f'<text x="{lx:.0f}" y="{ly:.0f}" font-size="{26*s:.0f}" text-anchor="middle" font-family="Noto Serif CJK SC" font-style="italic" fill="{CYAN}">F</text>')
+    tree(-190, 17, 1)
+    tree(190, 5, 2)
+    # 理念界的拱：笃信的类比
+    ax, ay = g(-170, -150); bx, by = g(170, -150); mx, my = g(0, -330)
+    out.append(f'<path d="M {ax:.0f} {ay:.0f} Q {mx:.0f} {my:.0f} {bx:.0f} {by:.0f}" fill="none" stroke="{GOLD2}" stroke-width="{6*s:.0f}" stroke-dasharray="{14*s:.0f} {12*s:.0f}" stroke-linecap="round"/>')
+    ex, ey = g(0, -262)
+    out.append(f'<text x="{ex:.0f}" y="{ey+14*s:.0f}" font-size="{46*s:.0f}" text-anchor="middle" font-family="Noto Serif CJK SC" fill="{CREAM}">＝</text>')
     base = cy + r * 0.86
-    for (x, lab, col) in [(cx - r * 0.42, '共同体', GOLD2), (cx, '系统', CREAM), (cx + r * 0.42, '部落', CYAN)]:
+    for (x, lab, col) in [(cx - r * 0.42, '理念', GOLD2), (cx, '现实', CREAM), (cx + r * 0.42, '自我', CYAN)]:
         out.append(f'<circle cx="{x:.0f}" cy="{base:.0f}" r="{9*s:.0f}" fill="{col}"/>')
         out.append(f'<text x="{x:.0f}" y="{base + 52*s:.0f}" font-size="{30*s:.0f}" text-anchor="middle" font-family="Noto Sans CJK SC" fill="{CREAM}" fill-opacity=".88" letter-spacing="{6*s:.0f}">{lab}</text>')
     out.append(f'<line x1="{cx - r*0.62:.0f}" y1="{base:.0f}" x2="{cx + r*0.62:.0f}" y2="{base:.0f}" stroke="{GOLD}" stroke-opacity=".45" stroke-width="{1.4*s:.1f}"/>')
@@ -202,9 +192,9 @@ def front(Wmm, Hmm, F):
 .pe{{font:400 {6.6*s:.1f}pt 'Noto Sans CJK SC';color:{DIM};letter-spacing:.08em;margin-top:{.8*s:.1f}mm}}
 .no{{position:absolute;right:{15*s:.1f}mm;top:{16*s:.1f}mm;font:400 {6.6*s:.1f}pt 'Noto Sans CJK SC';color:{DIM};letter-spacing:.2em;text-align:right}}
 </style></head><body><div class="pg">{svg}
-<div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 458 号</div>
-<div class="t"><div class="pre">AI 时代的科研认证</div><div class="big" style="font-size:{33*s:.1f}pt">科学共同体的退位</div>
-<div class="sub" style="font-size:{14*s:.1f}pt">和出版典范转移</div><div class="rule"></div></div>
+<div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 461 号</div>
+<div class="t"><div class="pre">羡慕　懊悔　不服　嫉妒……</div><div class="big" style="font-size:{40*s:.1f}pt">笃信的类比</div>
+<div class="sub" style="font-size:{14*s:.1f}pt">人间十大心理的统一原理</div><div class="rule"></div></div>
 <div class="b"><div class="au">王德生　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
@@ -244,12 +234,12 @@ def back(Wmm, Hmm, F):
 .f b{{color:{CREAM};font-weight:700;letter-spacing:.12em}}
 </style></head><body><div class="pg">{svg}
 <div class="c"><div class="lab">判 词</div>
-<div class="q" style="font-size:{13.2*s:.1f}pt">认证没有消失，它搬了家：<br>统一性的知识交给系统，<br>同一性谱系的知识交给用它的群体；<br>夹在中间、靠一群人点头的科学共同体，<br>先反扑，再退位。</div><div class="by">——前言</div><div class="rule"></div>
-<div class="bl"><p>论文为什么一定要发期刊？因为期刊在一个门洞里捆了五件事：登记谁先想到，分发给人看到，存档以后查得到，替读者先筛一遍，再给职称和经费记账。</p>
-<p>AI 让前几件几乎不再花钱，却让「凭什么信这一篇」变得前所未有地稀缺。数学、工程这类统一性的知识，正在交给形式化证明、可复跑流水线和运行记录去点头，像高铁的安全不靠乘客投票；同一性谱系的知识，只能在用它的一群人手里被认下来。夹在中间的同行评审，先是反扑——拒收未核查的稿子、不许 AI 署名、一年禁投——再是退位。</p>
-<p>本书从一封拒稿信、1665 年的两份刊物、一杆菜市场的秤讲起，也老实摊开自己：一本在城门外出版的书，认证这一环还欠着。</p></div>
-<div class="gold">谁在点头？</div></div>
-<div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 458 号 · 五篇三十六章 · 约 22 万字<br>ISBN 979-8-90690-458-4 · 定价 US$20.00</div>
+<div class="q" style="font-size:{13.2*s:.1f}pt">笃信的理念类比和现实的差异发生，<br>形成矛盾，<br>导致不同的自我 SDE 的发生。</div><div class="by">——王德生</div><div class="rule"></div>
+<div class="bl"><p>1998 年 7 月，县一中门口贴出红榜。同一个班、成绩一直前后脚的两个同学，一个去了北大，一个去了湘大，差了 31 分。往后二十八年，这一道落差记出了羡慕、懊悔、不服、嫉妒、怨、认命、自卑、攀比、躲，也记出了结网。</p>
+<p>十种心理，一个原理。落差底下压着一句没说出口的话：「我们原来差不多。」它笃信的是一台输入—输出的机器：同样的路、同样的土，必出同样的样子，却忘了中间那道各人不同、而且藏着的工序。理念界开出一张期票，现实界没有兑现，自我界给出十种解释。</p>
+<p>本书从一张红榜、两棵同年栽的橘树、一顿湘江边的夜宵讲起，把十大心理放回同一个原理里，最后给出一张可以撕下来用的验信卡。</p></div>
+<div class="gold">我们原来差不多吗？</div></div>
+<div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 461 号 · 九编三十八章 · 约 50 万字<br>ISBN 979-8-90690-461-4 · 定价 US$30.00</div>
 </div>
 </div></body></html>"""
 

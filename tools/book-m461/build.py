@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""第 458 号《科学共同体的退位和出版典范转移》（王德生著）成书（工具链由第 520 号改来）：Markdown 分卷稿 → 印刷版／阅读版 PDF ＋ 全文网页。
+"""第 461 号《笃信的类比——人间十大心理的统一原理》（王德生著）成书（工具链由第 458 号改来）：Markdown 分卷稿 → 印刷版／阅读版 PDF ＋ 全文网页。
 
 版式照第 220 号、第 302 号：暖纸内页、藏青标题、浅金大号章码、金色「第 N 章」、金短线、◆ 金菱形小节、
 「这一章的问题」框、带走的话与小账米底金线框、章末金菱形、编首页金色花饰圆章与「编序」。
 
 用法：
-  python3 build.py --fonts /home/claude/fonts --out /home/claude/b458
-产物：<out>/tuiwei-print.pdf（170×240 mm）、<out>/tuiwei-reader.pdf（190×250 mm）、<out>/text.html、<out>/toc-reader.json
+  python3 build.py --fonts /home/claude/fonts --out /home/claude/b461
+产物：<out>/duxin-print.pdf（170×240 mm）、<out>/duxin-reader.pdf（190×250 mm）、<out>/text.html、<out>/toc-reader.json
 依赖：weasyprint 70、pymupdf；封面封底由 cover.py 先生成。分卷稿由 convert.py 从三审定稿各章生成。
 """
 import argparse
@@ -16,15 +16,15 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-PART_FILES = ['01-上篇','02-中篇','03-下篇','04-续篇','05-尾篇']
+PART_FILES = ['01-第一编','02-第二编','03-第三编','04-第四编','05-第五编','06-第六编','07-第七编','08-第八编','09-第九编']
 FILES = ['front/00-前置.md'] + ['parts/%s.md' % x for x in PART_FILES] + ['back/11-结语.md', 'back/12-后置.md']
 LUN = 'front/01-导论.md'
 NPARTS = len(PART_FILES)
-SLUG = 'tuiwei'
+SLUG = 'duxin'
 META = dict(
-    title='科学共同体的退位和出版典范转移', name='科学共同体的退位',
-    subtitle='和出版典范转移', author='王德生', no=458,
-    isbn='979-8-90690-458-4', price='US$20.00', version='20261026a',
+    title='笃信的类比', name='笃信的类比',
+    subtitle='人间十大心理的统一原理', author='王德生', no=461,
+    isbn='979-8-90690-461-4', price='US$30.00', version='20261026a',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
@@ -290,7 +290,7 @@ def build_sections():
             i += 1
         secs.append(('part', sid(), '%s　%s' % (m[1].replace('　', ''), m[2]), 1,
                      '%s<div class="part-label">%s</div><h1 class="part-title">%s</h1><div class="rule"></div>'
-                     '<div class="daoyu">篇　序</div><div class="part-intro">%s</div>'
+                     '<div class="daoyu">编　序</div><div class="part-intro">%s</div>'
                      % (EMB, spaced(m[1].replace('　', '')), inline(m[2]), ''.join(intro))))
         # 章
         while i < len(bl):
@@ -510,7 +510,7 @@ def toc_block(secs, pages, roman_ids):
     return '<section class="toc front-sec"><h1>目录</h1><div class="rule"></div><ul>%s</ul></section>' % ''.join(li)
 
 
-TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著 · 第 {META['no']} 号</div><div class="big" style="font-size:30pt;line-height:1.4;letter-spacing:.06em">科学共同体的退位</div><div class="sub" style="font-size:13pt">和出版典范转移</div><div class="rule"></div><div class="au">{META['author']}　著</div>
+TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著 · 第 {META['no']} 号</div><div class="big" style="font-size:34pt;line-height:1.4;letter-spacing:.08em">笃信的类比</div><div class="sub" style="font-size:13pt">人间十大心理的统一原理</div><div class="rule"></div><div class="au">{META['author']}　著</div>
 <div class="pub">{META['publisher']}<span>{META['publisher_en']} · Singapore</span></div></div>"""
 EPIGRAPH = ''
 
@@ -715,7 +715,7 @@ h3.sec .dia{margin-right:.4em}
 <div class="wrap">
 <div class="hero"><img src="/books/m/{META['no']}/cover.jpg?v={v}" alt="封面"><h1>{META['title']}</h1><p>谁在点头</p>
 <p style="color:var(--dim);margin-top:.5rem">{META['author']} 著 · 德麦国际专著第 {META['no']} 号 · ISBN {META['isbn']} · 约 {han/10000:.0f} 万汉字</p></div>
-<details class="toc" open><summary>目录（出版信息 · 作者介绍 · 前言 · 导读 · 上篇至尾篇 · 结语 · 附录一至四 · 参考书目 · 后记）</summary><ul>{''.join(toc)}</ul></details>
+<details class="toc" open><summary>目录（出版信息 · 作者介绍 · 十分钟读完这本书 · 前言 · 导论 · 第一编至第九编 · 结语 · 参考书目 · 附录一至三 · 后记）</summary><ul>{''.join(toc)}</ul></details>
 """
     tail = f"""<div class="foot">德麦国际出版社 · Demai International Press · <a href="/books/">专著书架</a> · <a href="/books/m/{META['no']}/">书籍详情</a> · <a href="/books/m/{META['no']}/read.html">在线翻页</a></div>
 </div>

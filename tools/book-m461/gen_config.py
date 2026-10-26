@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""第 458 号（由第 520 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m458.json（build_unit_458.py 的配置）。
-用法（仓库根目录）：python3 tools/book-m458/gen_config.py tools/book-m458/content.json
+"""第 461 号（由第 520 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m461.json（build_unit_461.py 的配置）。
+用法（仓库根目录）：python3 tools/book-m461/gen_config.py tools/book-m461/content.json
 """
 import json, sys
 from pathlib import Path
@@ -10,8 +10,8 @@ C = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
 U = 'https://sdeuniverses.com/books/m/%d/' % M.NO
 cfg = {
  'number': M.NO, 'slug': M.SLUG, 'title': M.TITLE, 'subtitle': M.SUBTITLE, 'authors': M.AUTHORS,
- 'isbn': M.ISBN, 'price': M.PRICE, 'partWord': '篇', 'sourceEdition': '初版（%s）' % M.DATE,
- 'unitRev': M.UNIT_REV, 'assetVersion': M.V, 'manuscript': 'tools/book-m458/book.md',
+ 'isbn': M.ISBN, 'price': M.PRICE, 'partWord': '编', 'sourceEdition': '初版（%s）' % M.DATE,
+ 'unitRev': M.UNIT_REV, 'assetVersion': M.V, 'manuscript': 'tools/book-m461/book.md',
  'agentName': C['agent']['name'], 'agentEpithet': C['agentEpithet'], 'bookMeta': C['bookMeta'], 'heroTagline': C['heroTagline'],
  'practiceWord': C['practiceWord'], 'pdfBg': '#16253d',
  'learningPdfUrl': U + 'downloads/%s-learning-v1.0.pdf' % M.SLUG,

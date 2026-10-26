@@ -2,7 +2,7 @@
 """第 458 号《科学共同体的退位和出版典范转移》（王德生著；由第 520 号 publish.py 改来）：
 装进 public/books/m/458/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡；
 并写书号预留档 .publish/volume-reservations/458.json（铁律14：写之前查号、查 ISBN、验校验位）。
-用法（仓库根目录）：python3 tools/book-m458/publish.py --build /home/claude/b458 --content tools/book-m458/content.json --ms tools/book-m458/book.md
+用法（仓库根目录）：python3 tools/book-m461/publish.py --build /home/claude/b461 --content tools/book-m461/content.json --ms tools/book-m461/book.md
 """
 import argparse, datetime, glob, json, re, shutil, subprocess, sys
 from pathlib import Path
@@ -123,7 +123,7 @@ def main():
                  pdfPages=pages, publishedAt=now, publisher='德麦国际出版社', publisherEnglish='Demai International Press',
                  isbn=ISBN.replace('-', ''),
                  agentUrl=url + 'agent/dialogue.html', agentName=AG, agentLabel='智能问对 · ' + AG,
-                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 36个学习单元',
+                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 38个学习单元',
                  learningPackUrl=url + f'downloads/{SLUG}-learning-v1.0.pdf',
                  publicationUnit={'id': f'm-{NO}', 'type': 'reading-learning-dialogue', 'revision': M.UNIT_REV})
     books.insert(0, entry)

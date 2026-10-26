@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""第 458 号（由第 520 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
-在仓库根目录运行：python3 tools/book-m458/register.py
+"""第 461 号（由第 520 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
+在仓库根目录运行：python3 tools/book-m461/register.py
 """
 import datetime
 import json
 from pathlib import Path
 
-NO = 458
-C = json.loads(Path('tools/book-m458/content.json').read_text(encoding='utf-8'))
+NO = 461
+C = json.loads(Path('tools/book-m461/content.json').read_text(encoding='utf-8'))
 today = datetime.date.today().isoformat()
 
-kp = {'no': NO, 'title': '科学共同体的退位和出版典范转移', 'built': today,
+kp = {'no': NO, 'title': '笃信的类比', 'built': today,
       'items': [{'t': x['t'], 'x': x['x'], 'ch': x['ch']} for x in C['keypoints']]}
 p = Path('public/books/m/%d/keypoints.json' % NO)
 p.parent.mkdir(parents=True, exist_ok=True)
