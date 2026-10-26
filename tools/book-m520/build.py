@@ -24,7 +24,7 @@ SLUG = 'qian'
 META = dict(
     title='欠：走了两步的发生', name='欠',
     subtitle='普通人都能明白的欠', author='王德生', no=520,
-    isbn='979-8-90690-520-8', price='US$20.00', version='20261026a',
+    isbn='979-8-90690-520-8', price='US$20.00', version='20261026b',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
