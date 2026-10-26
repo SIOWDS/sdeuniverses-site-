@@ -24,7 +24,7 @@ SLUG = 'ren'
 META = dict(
     title='忍：被更重要的意义盖住的改变', name='忍',
     subtitle='普通人都能明白的忍', author='王德生', no=467,
-    isbn='979-8-90690-467-6', price='US$20.00', version='20261026a',
+    isbn='979-8-90690-467-6', price='US$20.00', version='20261026b',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
