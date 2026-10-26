@@ -1,0 +1,19 @@
+"""第 467 号《忍：被更重要的意义盖住的改变——普通人都能明白的忍》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 467
+SLUG = 'ren'
+TITLE = '忍：被更重要的意义盖住的改变'
+TITLE_EN = 'Forbearance: A Change Covered by a Weightier Meaning'
+SUBTITLE = '普通人都能明白的忍'
+EPIGRAPH = '刃在心上'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+ISBN = '979-8-90690-467-6'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261026a'
+DATE = '2026-10-26'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261026-m467-unit-v1.0'
+SRC = '/home/claude/ren-book/chapters'
+TPL = '/home/claude/sdeuniverses-site-/tools/book-m520'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
