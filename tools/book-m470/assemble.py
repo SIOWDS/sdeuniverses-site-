@@ -90,7 +90,8 @@ def hezhi():
         num = '、'.join(str(REF[i]) for i in ids if i in REF) or '—'
         st = (r.get('status') or '').strip()
         note = (r.get('note') or '').strip()
-        claim = (r.get('claim') or '').replace('|', '／')
+        claim = (r.get('claim') or '').replace('|', '／').replace('“', '「').replace('”', '」')
+        note = note.replace('“', '「').replace('”', '」')
         out.append('| %s | %s | %s | %s | 〔%s〕%s |' % (r.get('chapter', ''), r.get('neighbor', ''), claim, num, st,
                                                      ('　' + note.replace('|', '／')) if note else ''))
     return '\n'.join(out) + '\n'
