@@ -1,0 +1,19 @@
+"""第 470 号《愧——一次只走了两步的发生》（秦莉著，王德生指导）工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 470
+SLUG = 'kui'
+TITLE = '愧'
+TITLE_EN = 'Kui: A Happening That Stopped at Two Steps'
+SUBTITLE = '一次只走了两步的发生'
+EPIGRAPH = '还清了钱，没还清位置'
+AUTHOR = '秦莉'
+AUTHORS = ['秦莉']
+ADVISOR = '王德生'
+ISBN = '979-8-90690-470-6'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261026a'
+DATE = '2026-10-26'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261026-m470-unit-v1'
+SRC = '/home/claude/kui'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
