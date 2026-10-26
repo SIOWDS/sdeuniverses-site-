@@ -73,6 +73,8 @@ if (B && !B._err) {
   ok("sentrySeedOf：『继续』退到本场第一句实问", B.sentrySeedOf("继续", [{ role: "reader", text: "什么是幸福律" }, { role: "wds", text: "..." }]) === "什么是幸福律");
   ok("sentrySeedOf：『嗯嗯』也算填充词、会回退", B.sentrySeedOf("嗯嗯", [{ role: "reader", text: "语言是如何发生的" }]) === "语言是如何发生的");
   ok("sentrySeedOf：全是填充、历史里也没实问 → 返回短串（外面会因 <6 跳过）", B.sentrySeedOf("嗯", []).length < 6);
+  ok("sentrySeedOf：短而完整的实问（愧是什么）原样用", B.sentrySeedOf("愧是什么", [{ role: "reader", text: "跑到底是什么在显露" }]) === "愧是什么");
+  ok("sentrySeedOf：短问号句也算实问", B.sentrySeedOf("爱？", []) === "爱？");
   ok("sentrySeedOf：认 user/content 两种字段名", B.sentrySeedOf("继续", [{ role: "user", content: "艺术为何需要边界" }]) === "艺术为何需要边界");
 }
 
@@ -121,7 +123,7 @@ console.log("\n\u4e09\u3001\u7aef\u70b9\u63a5\u7ebf");
 ok("端点定义 _plain（无 tool/产线/对撞/领域档案/无SDE）", /const _plain = !noSde && !tool && !duel && !prof && !\(rsRaw && \(rsRaw\.forge \|\| rsRaw\.sde\)\)/.test(SRC));
 ok("端点定义 noSentry 关阀（默认开）", /const noSentry = b\.nosentry === 1 \|\| b\.nosentry === true;/.test(SRC));
 ok("sentryOn = _plain && !noSite && !canSee && !noSentry", /const sentryOn = _plain && !noSite && !canSee && !noSentry;/.test(SRC));
-ok("占位哨真查：sentryOn 且种子≥6 才 nbrChain（普通对话真走链）", /if \(sentryOn && _plainSeed\.length >= 6\)/.test(SRC) && /nbrChain\(env, _plainSeed,/.test(SRC));
+ok("占位哨真查：sentryOn 且种子够格才 nbrChain（普通对话真走链）", /if \(sentryOn && sentrySeedOk\(_plainSeed\)/.test(SRC) && /nbrChain\(env, _term,/.test(SRC));
 ok("占位哨缓存：caches.default 30 分钟、空结果不入缓存", /caches\.default\.match\(_ck\)/.test(SRC) && /max-age=1800/.test(SRC) && SRC.indexOf("空结果不入缓存") >= 0);
 ok("占位哨发 t:sentry 帧", /t: "sentry"/.test(SRC));
 ok("远域/预注册只在 _plain 装配，发 t:far 帧", /if \(_plain\) \{\n\s*const _far = farPick\(_plainSeed \|\| q,/.test(SRC) && /t: "far"/.test(SRC));

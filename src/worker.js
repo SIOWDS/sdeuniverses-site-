@@ -7927,10 +7927,17 @@ function nbrSentryBlock(nc, cached) {
     + "\n（这些只作占位参照，不要求你逐条复述；正文里真用到某位就指名。）\n\n" + (list || "（这一趟一条也没召回。）");
 }
 // 占位哨/远域共用的种子：普通对话没有 rs.topic，用读者这一问；是「继续/嗯」这类就退到本场第一句实问
+/* 2026-10-26：种子够不够格，不再只看字数——「愧是什么」4 个字也是一道完整的题。
+   ≥6 字照旧算；不足 6 字时，只要带问法（是什么／为什么／怎么／如何／吗／问号…）也算。 */
+function sentrySeedOk(x) {
+  const s = String(x || "").trim();
+  if (s.length >= 6) return true;
+  return s.length >= 2 && /(是什么|什么是|不是什么|为什么|为何|怎么|怎样|如何|是否|有没有|吗|呢|[？?]|^(what|why|how)\b)/i.test(s);
+}
 function sentrySeedOf(q, history) {
   const filler = /^(继续|接着说?|接着|嗯+|哦+|好的?|go on|continue|请继续|往下说?|再说说?|然后呢?|接下来|展开说?说?|详细说?说?|说下去|多说点|ok|okay|yes|嗯嗯)[。.!！、,，\s]*$/i;
   const clean = (x) => String(x || "").trim();
-  const good = (x) => x.length >= 6 && !filler.test(x);
+  const good = (x) => sentrySeedOk(x) && !filler.test(x);
   const s0 = clean(q);
   if (good(s0)) return s0.slice(0, 200);
   const hist = Array.isArray(history) ? history : [];
@@ -14827,7 +14834,7 @@ export default {
             let sentryCtx = "";
             const _plainSeed = _plain ? sentrySeedOf(q, history) : "";
             const sentryOn = _plain && !noSite && !canSee && !noSentry;
-            if (sentryOn && _plainSeed.length >= 6) {
+            if (sentryOn && sentrySeedOk(_plainSeed) && !/^(继续|接着|嗯+|好的?|ok)$/i.test(_plainSeed.trim())) {
               let ncS = null, _cachedS = false;
               const _ck = "https://sentry.sdeuniverses/" + _lhash("sentry:" + _plainSeed, 2166136261) + "/" + rvendor; // 同题一场只搜一次
               try { const _hit = await caches.default.match(_ck); if (_hit) { ncS = await _hit.json(); _cachedS = true; } } catch (e) {}
@@ -14853,7 +14860,7 @@ export default {
                 controller.enqueue(_sseBytes({ t: "note", v: "占位哨：这一问没查到站外占位者（" + (_sw === "need_search_key" ? "没有可用的搜索 Key" : _sw) + "）——『已有说法』这一栏本轮只能靠你的记忆库，按纪律不许写「据我所知无人提出」。" }));
               }
             } else if (sentryOn) {
-              controller.enqueue(_sseBytes({ t: "note", v: "占位哨：这一问太短（多为「继续」这类），本轮跳过站外占位者检索。" }));
+              controller.enqueue(_sseBytes({ t: "note", v: "占位哨：这一问没有可检索的题目（多为「继续」这类），本轮跳过站外占位者检索。" }));
             }
             // 近邻工序：把真名单前置到 system（放在语料之前，否则会被两万字语料埋掉）。
             // 取不到就发 nbrfail 让前端如实说一句——静默失败等于把没做的检测记成做过了。
