@@ -1,0 +1,19 @@
+"""第 456 号《慌：心之荒——普通人都能明白的慌》（秦莉著，王德生指导）工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 456
+SLUG = 'huang'
+TITLE = '慌：心之荒'
+TITLE_EN = 'Flustered: When the Heart Lies Fallow'
+SUBTITLE = '普通人都能明白的慌'
+EPIGRAPH = '缺的是光，还是粮'
+AUTHOR = '秦莉'
+AUTHORS = ['秦莉']
+ADVISOR = '王德生'
+ISBN = '979-8-90690-456-0'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261026a'
+DATE = '2026-10-26'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261026-m456-unit-v1'
+SRC = '/home/claude/hang-book'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
