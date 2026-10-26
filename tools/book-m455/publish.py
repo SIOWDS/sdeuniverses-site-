@@ -46,7 +46,15 @@ def reserve(site_root, han, chapters):
          'authorization': '用户（王德生）令：按第 220、302 号排版风格打造，全套上站（阅读、学习包、智能体三位一体）；专著号、ISBN 一律从站里计算——取号与 ISBN 中段都空的最小号 455，ISBN 979-8-90690-455-3 校验位已核；定价按站内 50 万字巨著惯例暂取 US$30.00，待用户确认；署名王德生著。',
          'availabilityCheck': {'maxPublishedDirectory': max(pub), 'maxReservedVolume': max(vols), 'volumeAbsent': True,
                                'isbnAbsentInCatalogAndReservations': True, 'checkDigit': int(nisbn[-1]),
-                               'note': '455 号在已上站目录、书目与预留档中均为空号，ISBN 中段 455 站内未用；校验位检验不等于登记机关验证。', str(pdf)], capture_output=True, text=True).stdout
+                               'note': '455 号在已上站目录、书目与预留档中均为空号，ISBN 中段 455 站内未用；校验位检验不等于登记机关验证。'},
+         'manuscript': {'chapters': chapters, 'bodyHanzi': han, 'state': '已上站'},
+         'publishedAt': M.DATE, 'detailUrl': f'https://sdeuniverses.com/books/m/{NO}/'}
+    path.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
+    return d
+
+
+def pages_of(pdf):
+    o = subprocess.run(['pdfinfo', str(pdf)], capture_output=True, text=True).stdout
     return int(re.search(r'Pages:\s+(\d+)', o).group(1))
 
 
