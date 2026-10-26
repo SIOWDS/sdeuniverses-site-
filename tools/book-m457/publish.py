@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""第 520 号《欠：走了两步的发生》（王德生著；由第 513 号 publish.py 改来）：
-装进 public/books/m/520/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡；
-并写书号预留档 .publish/volume-reservations/520.json（铁律14：写之前查号、查 ISBN、验校验位）。
-用法（仓库根目录）：python3 tools/book-m520/publish.py --build /home/claude/b520 --content tools/book-m520/content.json --ms tools/book-m520/book.md
+"""第 457 号《AI对科研的冲击为何首先表现在数学上？》（王德生著；由第 520 号 publish.py 改来）：
+装进 public/books/m/457/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡；
+并写书号预留档 .publish/volume-reservations/457.json（铁律14：写之前查号、查 ISBN、验校验位）。
+用法（仓库根目录）：python3 tools/book-m457/publish.py --build /home/claude/b457 --content tools/book-m457/content.json --ms tools/book-m457/book.md
 """
 import argparse, datetime, glob, json, re, shutil, subprocess, sys
 from pathlib import Path
@@ -35,20 +35,24 @@ def reserve(site_root, han, chapters):
         others.append(d)
         assert str(d.get('volume') or d.get('number')) != str(NO), f'预留档 {f} 已占 {NO} 号'
         assert (d.get('isbnNormalized') or (d.get('isbn') or '')).replace('-', '') != nisbn, f'预留档 {f} 已用此 ISBN'
+    prev = None
     if path.exists():
-        d = json.loads(path.read_text())
-        assert d['title'] == T and d['isbnNormalized'] == nisbn, '预留档不是本书'
-        return d
+        prev = json.loads(path.read_text())
+        assert prev['title'] == T and prev['isbnNormalized'] == nisbn, '预留档不是本书'
+        if prev.get('status') == 'published':
+            return prev
     vols = [int(d.get('volume') or d.get('number')) for d in others if str(d.get('volume') or d.get('number') or '').isdigit()]
     pub = [int(x.name) for x in (site_root / 'public/books/m').iterdir() if x.name.isdigit()]
     d = {'volume': NO, 'title': T, 'subtitle': SUB, 'authors': AUTHORS, 'isbn': ISBN, 'isbnNormalized': nisbn,
          'isbnStatus': 'site-allocated-checksum-valid', 'priceUsd': PRICE_USD, 'status': 'published', 'date': M.DATE,
-         'authorization': '用户（王德生）令：照第 220、302 号体例做成阅读、学习包、智能体三位一体出版单元挂到站上；书号 520、ISBN 979-8-90690-520-8 由主会话按站内空号与连号规则计算、经用户认可，定价 US$20.00 由用户给定；署名王德生著。',
+         'authorization': '用户（王德生）令：按全套做法排版、统稿、三审，照第 220、302 号体例做成阅读、学习包、智能体三位一体出版单元上站；书号 457、ISBN 979-8-90690-457-7 由主会话按站内最小空号计算并预留，定价 US$20.00 由用户给定；署名王德生著。',
          'availabilityCheck': {'maxPublishedDirectory': max(pub), 'maxReservedVolume': max(vols), 'volumeAbsent': True,
                                'isbnAbsentInCatalogAndReservations': True, 'checkDigit': int(nisbn[-1]),
-                               'note': '520 号在已上站目录、书目与预留档中均为空号；沿用站内 979-8-90690 号段第 520 位计算并登记，校验位检验不等于登记机关验证。'},
+                               'note': '457 号在已上站目录与书目中均为空号，为预留时的最小空位；沿用站内 979-8-90690 号段第 457 位计算并登记，校验位检验不等于登记机关验证。'},
          'manuscript': {'chapters': chapters, 'bodyHanzi': han, 'state': '已上站'},
          'publishedAt': M.DATE, 'detailUrl': f'https://sdeuniverses.com/books/m/{NO}/'}
+    if prev:
+        d['reservedAt'] = prev.get('date')
     path.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
     return d
 
@@ -123,7 +127,7 @@ def main():
                  pdfPages=pages, publishedAt=now, publisher='德麦国际出版社', publisherEnglish='Demai International Press',
                  isbn=ISBN.replace('-', ''),
                  agentUrl=url + 'agent/dialogue.html', agentName=AG, agentLabel='智能问对 · ' + AG,
-                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 54个学习单元',
+                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 36个学习单元',
                  learningPackUrl=url + f'downloads/{SLUG}-learning-v1.0.pdf',
                  publicationUnit={'id': f'm-{NO}', 'type': 'reading-learning-dialogue', 'revision': M.UNIT_REV})
     books.insert(0, entry)

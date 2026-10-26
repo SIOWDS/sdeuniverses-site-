@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""三位一体出版单元生成器（阅读 · 学习包 · 智能问对）——第 520 号《欠：走了两步的发生》用（由第 513 号 build_unit_513.py 复制）；原由第398卷参考实现（tools/m398_unit）泛化。
+"""三位一体出版单元生成器（阅读 · 学习包 · 智能问对）——第 457 号《AI对科研的冲击为何首先表现在数学上？》用（由第 520 号 build_unit_520.py 复制）；原由第398卷参考实现（tools/m398_unit）泛化。
 
 只写 public/books/m/<号>/ 之下的这些东西，不碰别的书、不调用模型、不重建搜索索引：
   unit/{app.js,core.js,unit.css,SKILL.md,learning.json,sources/chapter-NN.json}
@@ -114,7 +114,7 @@ def main():
     app = sub1(app, "+' / 40 章 ·", "+' / %d 章 ·" % nch)
     app = sub1(app, "n>40)throw Error('题号不在本书四十章范围内。')", "n>%d)throw Error('题号不在本书%s章范围内。')" % (nch, NUMW))
     # part grouping by task.part instead of 5 per part
-    # 第 520 号：九编名为上篇、中篇、下篇，目录分组标签照原篇名，不写「第1篇」
+    # 第 457 号：四篇名为上篇、中篇、下篇、尾篇，目录分组标签照原篇名，不写「第1篇」
     plabels = json.dumps([p.split('　', 1)[0] for p in parts], ensure_ascii=False)
     app = sub1(app, "'第'+(i+1)+'编 · '", "(%s[i]||('第'+(i+1)+'%s'))+' · '" % (plabels, PW))
     app = sub1(app, "manifest.tasks.slice(i*5,i*5+5).forEach(", "manifest.tasks.filter(t=>t.part===i+1).forEach(")

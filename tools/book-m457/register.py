@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""第 520 号《欠》（由第 513 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
-在仓库根目录运行：python3 tools/book-m520/register.py
+"""第 457 号《AI对科研的冲击为何首先表现在数学上？》（由第 520 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
+在仓库根目录运行：python3 tools/book-m457/register.py
 """
 import datetime
 import json
 from pathlib import Path
 
-NO = 520
-C = json.loads(Path('tools/book-m520/content.json').read_text(encoding='utf-8'))
+NO = 457
+C = json.loads(Path('tools/book-m457/content.json').read_text(encoding='utf-8'))
 today = datetime.date.today().isoformat()
 
-kp = {'no': NO, 'title': '欠：走了两步的发生', 'built': today,
+kp = {'no': NO, 'title': 'AI对科研的冲击为何首先表现在数学上？', 'built': today,
       'items': [{'t': x['t'], 'x': x['x'], 'ch': x['ch']} for x in C['keypoints']]}
 p = Path('public/books/m/%d/keypoints.json' % NO)
 p.parent.mkdir(parents=True, exist_ok=True)

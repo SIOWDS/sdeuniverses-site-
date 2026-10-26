@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""第 520 号修订版（引文核验）就地更新：PDF、封面、全文网页、翻页器目录、详情页、书目条目；之后再跑 build_unit_520.py 与 register.py。
-用法（仓库根目录）：python3 tools/book-m520/update.py --build /home/claude/b520
+"""第 457 号就地更新：PDF、封面、全文网页、翻页器目录、详情页、书目条目；之后再跑 build_unit_457.py 与 register.py。
+用法（仓库根目录）：python3 tools/book-m457/update.py --build /home/claude/b457
 """
 import argparse, json, re, shutil, subprocess, html as _h, sys
 from pathlib import Path

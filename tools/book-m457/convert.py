@@ -62,7 +62,7 @@ def tsv_table():
     for f in sorted((S / 'review').glob('*.tsv')):
         for r in csv.reader(f.open(encoding='utf-8'), delimiter='\t'):
             r = [c.strip().replace('|', '／') for c in r]
-            if len(r) < 4 or not r[0] or r[0].startswith('章'):
+            if len(r) < 4 or not r[0] or r[0].startswith('章') or '书目' in r[0]:
                 continue
             rows.append(r[:4])
     def key(r):
