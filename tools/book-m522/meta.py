@@ -1,0 +1,19 @@
+"""第 522 号《走·跑·休：发生的三种步态——普通人都能明白的层级交替律》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 522
+SLUG = 'zoupaoxiu'
+TITLE = '走·跑·休'
+SUBTITLE = '发生的三种步态——普通人都能明白的层级交替律'
+FULL_TITLE = '走·跑·休：发生的三种步态——普通人都能明白的层级交替律'
+TITLE_EN = 'Walk, Run, Rest: Three Gaits of Happening'
+EPIGRAPH = '走维持，跑撕开，休回写'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+ISBN = '979-8-90690-522-2'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261027a'
+DATE = '2026-10-27'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261027-m522-unit-v1.0'
+SRC = '/home/claude/zpx/zpx.md'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
