@@ -121,7 +121,7 @@ def main():
                  coverUrl=url + f'cover.jpg?v={V}', backcoverUrl=url + f'backcover.jpg?v={V}',
                  flipUrl=url + 'read.html', chapterUrl=url + 'text/', openness='full',
                  price=PRICE, priceUsd=int(PRICE_USD) if PRICE_USD == int(PRICE_USD) else PRICE_USD, currency='USD', priceLabel=PRICE, edition=M.EDITION,
-                 pdfPages=pages, publishedAt=now, publisher='德麦国际出版社', publisherEnglish='Demai International Press',
+                 pdfPages=pages_of(b / f'{SLUG}-reader.pdf'), printPdfPages=pages, publishedAt=now, publisher='德麦国际出版社', publisherEnglish='Demai International Press',
                  isbn=ISBN.replace('-', ''),
                  agentUrl=url + 'agent/dialogue.html', agentName=AG, agentLabel='智能问对 · ' + AG,
                  learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · 36个学习单元',
