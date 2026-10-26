@@ -13,6 +13,6 @@ PRICE = 'US$%.2f' % PRICE_USD
 V = '20261026b'
 DATE = '2026-10-26'
 EDITION = '2026年10月第1版第1次修订'
-UNIT_REV = '20261026-m520-unit-v1'
+UNIT_REV = '20261026-m520-unit-v1.1'
 SRC = '/home/claude/qian/parts'
 PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
