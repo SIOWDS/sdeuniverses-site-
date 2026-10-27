@@ -72,7 +72,7 @@ def main():
     url = f'https://sdeuniverses.com/books/m/{NO}/'
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=['刘春华'], advisor='王德生', category='core',
-                 description='《大学》开篇的七个字，知、止、定、静、安、虑、得，两千年里被读成一个人修心的七级台阶：先觉察，再立志，再定心、静心。本书从原文、《说文》与郑玄、孔颖达、朱熹、王阳明的注讲起，一字三章：字与经、解构、日子里，把它解构成一个一在你身上走完的一条路。前两步是横向发展（1→1）：认出那个一，在你的土里给它定位；后五步是纵向发展（1→N）：站稳、守住、住下、用开、传下。教育、健康、事业，各走一遍。刘春华著，指导老师王德生；九编二十六章，「中华文明的发展之道」入门卷。',
+                 description='《大学》开篇的七个字，知、止、定、静、安、虑、得，两千年里被读成一个人修心的七级台阶：先觉察，再立志，再定心、静心。本书从原文、《说文》与郑玄、孔颖达、朱熹、王阳明的注讲起，一字三章：字与经、解构、日子里，把它解构成一个一在你身上走完的一条路。第一步是横向发展（1→1）：那个一在你的经历里发生，不是搬运；后六步是纵向发展（1→N）：停止变化、守一、正念、心安、评估反馈、平衡通畅充沛。教育、健康、事业，各走一遍。刘春华著，指导老师王德生；九编二十六章，「中华文明的发展之道」入门卷。',
                  detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
                  pdfUrl=url + f'{SLUG}-reader.pdf?v={V}', printPdfUrl=url + f'{SLUG}-print.pdf?v={V}',
                  coverUrl=url + f'cover.jpg?v={V}', backcoverUrl=url + f'backcover.jpg?v={V}',
@@ -100,7 +100,7 @@ def main():
             '<div class="en-only" style="font-size:12.5px;letter-spacing:0.18em;color:#D9B45C;margin-bottom:14px">★ NEW BOOK · DEMAI MONOGRAPH No.%d · ~%s CHARS · %d PP · US$ 20.00</div>'
             '<h3 class="zh-only" style="color:#F1EBDC;font-size:25px;line-height:1.5;margin:0 0 14px">大学之道解构入门——普通人都能明白的知止定静安虑得</h3>'
             '<h3 class="en-only" style="color:#F1EBDC;font-size:23px;line-height:1.5;margin:0 0 14px">Deconstructing the Way of the Great Learning: An Introduction</h3>'
-            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">刘春华著，指导老师王德生，「中华文明的发展之道」入门卷。知止定静安虑得，不是一个人往上爬的七级台阶，是一个一在你身上走完的一条路：前两步把它迁进你的土，后五步让它在那里长成、传下。一字三章，从原文与历代注讲起，落到教育、健康、事业。</p>'
+            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">刘春华著，指导老师王德生，「中华文明的发展之道」入门卷。知止定静安虑得，不是一个人往上爬的七级台阶，是一个一在你身上走完的一条路：第一步让它在你的经历里发生，后六步让它在那里守住、长成、传下。一字三章，从原文与历代注讲起，落到教育、健康、事业。</p>'
             '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">By Liu Chunhua, advised by Wang Desheng; the introductory volume of The Way of Development in Chinese Civilization. The seven steps of the Great Learning are not a ladder one climbs, but a path a core walks through you: two steps move it into your soil, five let it grow and pass on.</p></div></a>'
             % (NO, NO, pages, NO, format(han, ','), pages))
     h = h[:a0] + card + h[a0:]
