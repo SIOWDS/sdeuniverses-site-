@@ -6,15 +6,16 @@ from pathlib import Path
 HERE = Path(__file__).parent
 t = (HERE.parent / 'book-m470' / 'detail.html').read_text()
 rep = [
-    ('<title>愧——一次只走了两步的发生 · 德麦国际专著第 470 号</title>', '<title>愧——一次只走了两步的发生（文学版） · 德麦国际专著第 473 号</title>'),
-    ('content="《愧——一次只走了两步的发生》· 秦莉 著 · 王德生 指导 · 德麦国际 · ISBN 979-8-90690-470-6。', 'content="《愧——一次只走了两步的发生（文学版）》· 秦莉 著 · 王德生 指导 · 德麦国际 · ISBN 979-8-90690-473-7。'),
+    ('<title>愧——一次只走了两步的发生 · 德麦国际专著第 470 号</title>', '<title>还清了钱，没还清位置——愧，一次只走了两步的发生（文学版） · 德麦国际专著第 473 号</title>'),
+    ('content="《愧——一次只走了两步的发生》· 秦莉 著 · 王德生 指导 · 德麦国际 · ISBN 979-8-90690-470-6。', 'content="《还清了钱，没还清位置——愧，一次只走了两步的发生（文学版）》· 秦莉 著 · 王德生 指导 · 德麦国际 · ISBN 979-8-90690-473-7。'),
     ('<meta name="isbn" content="979-8-90690-470-6"><meta name="book_no" content="470">', '<meta name="isbn" content="979-8-90690-473-7"><meta name="book_no" content="473">'),
-    ('<meta property="og:title" content="愧——一次只走了两步的发生 · 德麦国际专著">', '<meta property="og:title" content="愧——一次只走了两步的发生（文学版） · 德麦国际专著">'),
-    ('"name":"愧——一次只走了两步的发生","alternateName":"Kui: A Happening That Stopped at Two Steps"', '"name":"愧——一次只走了两步的发生（文学版）","alternateName":"Kui: A Happening That Stopped at Two Steps (Literary Edition)"'),
+    ('<meta property="og:title" content="愧——一次只走了两步的发生 · 德麦国际专著">', '<meta property="og:title" content="还清了钱，没还清位置 · 德麦国际专著">'),
+    ('"name":"愧——一次只走了两步的发生","alternateName":"Kui: A Happening That Stopped at Two Steps"', '"name":"还清了钱，没还清位置——愧，一次只走了两步的发生（文学版）","alternateName":"Paid the Money, Not the Place (Literary Edition of Kui)"'),
     ('"isbn":"9798906904706"', '"isbn":"9798906904737"'),
-    ('第 470 号 · 愧</div>', '第 473 号 · 愧（文学版）</div>'),
+    ('第 470 号 · 愧</div>', '第 473 号 · 还清了钱，没还清位置</div>'),
     ('<p class="sub">一次只走了两步的发生 · Kui: A Happening That Stopped at Two Steps</p>',
-     '<p class="sub">一次只走了两步的发生 · 文学版 · Kui: A Happening That Stopped at Two Steps (Literary Edition)</p>\n    <p class="sub" style="font-size:.92rem">这是第 470 号的文学版：立论、近邻与失败条件不变，句子从头写成文学散文。散文版见 <a href="/books/m/470/">第 470 号</a>。</p>'),
+     '<p class="sub">愧，一次只走了两步的发生 · 文学版 · Paid the Money, Not the Place</p>\n    <p class="sub" style="font-size:.92rem">这是第 470 号《愧》的文学版：立论、近邻与失败条件不变，句子从头写成文学散文。散文版见 <a href="/books/m/470/">第 470 号</a>。</p>'),
+    ('<h1>愧</h1>', '<h1 style="font-size:2.1rem;line-height:1.35">还清了钱，没还清位置</h1>'), ('alt="《愧》封面"', 'alt="《还清了钱，没还清位置》封面"'),
     ('kui-reader.pdf', 'kui-wenxue-reader.pdf'), ('kui-print.pdf', 'kui-wenxue-print.pdf'),
     ('文字由 AI（Claude）协作成稿：十路并行执笔、两轮独立评分后定点修改、统稿、三审', '文字由 AI（Claude）协作成稿：十路并行执笔、两轮独立评分后定点修改、统稿、三审；文学版由二十一路逐节重写'),
 ]

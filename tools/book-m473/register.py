@@ -10,7 +10,7 @@ NO = 473
 C = json.loads(Path('tools/book-m473/content.json').read_text(encoding='utf-8'))
 today = datetime.date.today().isoformat()
 
-kp = {'no': NO, 'title': '愧', 'built': today,
+kp = {'no': NO, 'title': '还清了钱，没还清位置', 'built': today,
       'items': [{'t': x['t'], 'x': x['x'], 'ch': x['ch']} for x in C['keypoints']]}
 p = Path('public/books/m/%d/keypoints.json' % NO)
 p.parent.mkdir(parents=True, exist_ok=True)

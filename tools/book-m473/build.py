@@ -22,8 +22,8 @@ LUN = 'front/01-导论.md'
 NPARTS = len(PART_FILES)
 SLUG = 'kui-wenxue'
 META = dict(
-    title='愧', name='愧',
-    subtitle='一次只走了两步的发生 · 文学版', author='秦莉', no=473,
+    title='还清了钱，没还清位置', name='还清了钱，没还清位置',
+    subtitle='愧，一次只走了两步的发生（文学版）', author='秦莉', no=473,
     isbn='979-8-90690-473-7', price='US$20.00', version='20261027a',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
@@ -510,7 +510,7 @@ def toc_block(secs, pages, roman_ids):
     return '<section class="toc front-sec"><h1>目录</h1><div class="rule"></div><ul>%s</ul></section>' % ''.join(li)
 
 
-TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著 · 第 {META['no']} 号</div><div class="big" style="font-size:48pt;line-height:1.3;letter-spacing:.08em">愧</div><div class="sub" style="font-size:13pt">{META['subtitle']}</div><div class="rule"></div><div class="au">{META['author']}　著</div>
+TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著 · 第 {META['no']} 号</div><div class="big" style="font-size:30pt;line-height:1.45;letter-spacing:.06em">还清了钱，<br>没还清位置</div><div class="sub" style="font-size:13pt">{META['subtitle']}</div><div class="rule"></div><div class="au">{META['author']}　著</div>
 <div class="pub">{META['publisher']}<span>{META['publisher_en']} · Singapore</span></div></div>"""
 EPIGRAPH = ''
 

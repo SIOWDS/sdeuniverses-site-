@@ -205,7 +205,7 @@ def main():
         H = ['<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><title>%s · 学习包</title><style>%s</style></head><body>' % (M.TITLE, CSS)]
         # 封面
         H.append('''<section class="cover"><div class="band"><div class="kicker">德麦国际专著第 %d 号 · 配套学习包</div>
-    <h1>愧</h1><div class="sub">一次只走了两步的发生 · 文学版</div>
+    <h1 style="font-size:34pt;line-height:1.3">还清了钱，<br>没还清位置</h1><div class="sub">愧，一次只走了两步的发生 · 文学版</div>
     <div class="pack">学习包<small>三编 · 九章 · 八十一节<br>阅读　学习　智能问对</small></div></div>
     <div class="rule"></div>
     <img src="file://%s">
@@ -213,8 +213,8 @@ def main():
     <div class="foot">一节一页：先答，带问读，再答；核对判断、看清失败条件，留一个明天能做的小行动。<br>在线学习　sdeuniverses.com/books/m/%d/agent/learning.html</div></section>''' % (
             M.NO, BOOK / 'cover.jpg', M.ISBN, M.PRICE, M.NO))
         # 使用说明
-        H.append('''<section class="howto"><div class="runfoot">《愧》（文学版）学习包 · 德麦国际专著第 %d 号</div><div class="eyebrow">HOW TO USE</div><h2 class="pt">怎样用这本学习包</h2><div class="goldrule"></div>
-    <p>这本学习包把《愧》的三编九章拆成八十一节，一节一页。每一页都从你自己的一件事开始，再带着两三个问题回到书里那一节去读。读完，不急着同意，先核对这一节的判断站不站得住、在什么情况下会错，最后留下一个明天就能做的小行动。</p>
+        H.append('''<section class="howto"><div class="runfoot">《还清了钱，没还清位置》学习包 · 德麦国际专著第 %d 号</div><div class="eyebrow">HOW TO USE</div><h2 class="pt">怎样用这本学习包</h2><div class="goldrule"></div>
+    <p>这本学习包把《还清了钱，没还清位置》（《愧》文学版）的三编九章拆成八十一节，一节一页。每一页都从你自己的一件事开始，再带着两三个问题回到书里那一节去读。读完，不急着同意，先核对这一节的判断站不站得住、在什么情况下会错，最后留下一个明天就能做的小行动。</p>
     <p>请用笔写。愧这件事，最怕只在心里过一遍：想得越周全，越容易停在显露里。写下来的那一行，哪怕只有一句，也是一笔可以回看的记录。</p>
     <ol class="steps">
     <li><b>先答</b>读之前，凭自己的经验写下起点；不知道，也如实写「不知道」。</li>
@@ -260,7 +260,7 @@ def main():
                         if lab == '邻居':
                             v = re.sub(r'^邻居一节。', '', v)
                         rows.append('<div class="r%s"><span class="k">%s</span><span class="v">%s</span></div>' % (' act' if lab == '小行动' else '', k, esc(v)))
-                    H.append('''<section class="unit" id="u%d"><span class="rh">%s · 第 %d 章　%s</span><div class="runfoot">《愧》（文学版）学习包 · 德麦国际专著第 %d 号</div>
+                    H.append('''<section class="unit" id="u%d"><span class="rh">%s · 第 %d 章　%s</span><div class="runfoot">《还清了钱，没还清位置》学习包 · 德麦国际专著第 %d 号</div>
     <div class="head"><span class="num">%02d</span><span class="src"><b>第 %d 章 · 第 %s 节</b><br>%s</span></div>
     <h3>%s</h3><div class="hr"></div>
     <div class="blk ask"><span class="tag">先说一件事</span><p class="story">%s</p>%s<span class="tag gold">带着问读</span><ol>%s</ol></div>
@@ -279,7 +279,7 @@ def main():
         H.append('''<section class="back"><div class="in"><p class="q">愧，是欠在自己身上显露；<br>欠，是撞了、变了，回写却没有发生——<br>一次只走了两步的发生。</p>
     <p>八十一节读完，愿你手上留下的，不是一堆答对的题，而是几笔写清楚了的回写：改了什么，记在哪里，谁能说落定。</p>
     <p>还不上的那一份，先问缺的是哪一维；能落定的，就让它落定；不该背的，就把它放回原处。</p></div>
-    <div class="ft">《愧——一次只走了两步的发生（文学版）》　秦莉　著<br>德麦国际出版社 · 德麦国际专著第 %d 号 · ISBN %s · %s<br>配套学习设计，不是著者原文或能力认证；学习记录只留在你自己的纸上和浏览器里。</div></section>''' % (M.NO, M.ISBN, M.PRICE))
+    <div class="ft">《还清了钱，没还清位置——愧，一次只走了两步的发生（文学版）》　秦莉　著<br>德麦国际出版社 · 德麦国际专著第 %d 号 · ISBN %s · %s<br>配套学习设计，不是著者原文或能力认证；学习记录只留在你自己的纸上和浏览器里。</div></section>''' % (M.NO, M.ISBN, M.PRICE))
         H.append('</body></html>')
         doc = '\n'.join(H)
         if a.html:

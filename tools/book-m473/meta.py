@@ -1,9 +1,9 @@
 """第 473 号《愧——一次只走了两步的发生（文学版）》（秦莉著，王德生指导；第 470 号散文版的文学化改写本）工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
 NO = 473
 SLUG = 'kui-wenxue'
-TITLE = '愧'
-TITLE_EN = 'Kui: A Happening That Stopped at Two Steps (Literary Edition)'
-SUBTITLE = '一次只走了两步的发生（文学版）'
+TITLE = '还清了钱，没还清位置'
+TITLE_EN = 'Paid the Money, Not the Place: Kui, a Happening That Stopped at Two Steps (Literary Edition)'
+SUBTITLE = '愧，一次只走了两步的发生（文学版）'
 SUB0 = '一次只走了两步的发生'
 EDITION_LABEL = '文学版'
 SIBLING_NO = 470
@@ -14,7 +14,7 @@ ADVISOR = '王德生'
 ISBN = '979-8-90690-473-7'
 PRICE_USD = 20.00
 PRICE = 'US$%.2f' % PRICE_USD
-V = '20261027a'
+V = '20261027b'
 DATE = '2026-10-27'
 EDITION = '2026年10月第1版（文学版）'
 UNIT_REV = '20261027-m473-unit-v1'

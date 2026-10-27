@@ -217,8 +217,8 @@ def front(Wmm, Hmm, F):
 .no{{position:absolute;right:{15*s:.1f}mm;top:{16*s:.1f}mm;font:400 {6.6*s:.1f}pt 'Noto Sans CJK SC';color:{DIM};letter-spacing:.2em;text-align:right}}
 </style></head><body><div class="pg">{svg}
 <div class="no">SDE UNIVERSES<br>德麦国际专著 · 第 473 号</div>
-<div class="t"><div class="pre">九问 · 三十六位近邻</div><div class="big" style="font-size:{70*s:.1f}pt">愧</div>
-<div class="sub">一次只走了两步的发生</div><div class="ed">文 学 版</div></div>
+<div class="t"><div class="pre">九问 · 三十六位近邻</div><div class="big" style="font-size:{38*s:.1f}pt;line-height:1.38;letter-spacing:.04em">还清了钱，<br>没还清位置</div>
+<div class="sub">愧，一次只走了两步的发生</div><div class="ed">文 学 版</div></div>
 <div class="b"><div class="au">秦莉　著</div><div class="ph">德麦国际出版社</div><div class="pe">Demai International Press</div></div>
 </div></body></html>"""
 
@@ -262,7 +262,7 @@ def back(Wmm, Hmm, F):
 <div class="bl"><p>母亲加班错过了家长会，孩子说没关系，她却好几天不敢正眼看孩子；受了大恩的人，钱早还清了，反而越来越躲着恩人；也有人确实伤了人，心里却一点不愧。愧恐怕不是犯错之后的一张账单。</p>
 <p>本书说，一次完整的改变要走三步：撞，变，再回过头来改写、记账，这叫回写。欠，是前两步走完、第三步没有落下。愧，就是这一次只走了两步的发生，在自己身上显露出来。由此分出三种欠：停在显露里的检讨，路走完了位置没动的还钱，标准一路移动、永远落不定的「真惦记家总会有办法」；也分出三种外表相同、发生相反的无愧。</p>
 <p>九个问题，三十六位古今中外的近邻：顾炎武、戴震、项羽、王阳明、孟子、袁了凡，惭愧与布萨、亲鸾，新渡户稻造、太宰治、夏目漱石，尼采、弗洛伊德、萨特、列维纳斯、舍勒、图图，还有做实验的人。先把他们说中的写足，再摆出一个只有本书推得出、也可能被推翻的局面。</p>
-<p>这是第 470 号《愧》的文学版：立论、近邻与失败条件一字不让，语言从头写过——让道理从一盏没关的玄关灯、一扇没推开的房门里长出来。</p></div>
+<p>这是第 470 号《愧》的文学版，书名取自全书那句话：还清了钱，没还清位置：立论、近邻与失败条件一字不让，语言从头写过——让道理从一盏没关的玄关灯、一扇没推开的房门里长出来。</p></div>
 <div class="gold">还清了钱，没还清位置？</div></div>
 <div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 473 号 · 三编九章 · 约 21 万字<br>ISBN 979-8-90690-473-7 · 定价 US$20.00</div>
 </div>
