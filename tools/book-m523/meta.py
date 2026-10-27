@@ -1,0 +1,21 @@
+"""第 523 号《陈晓艳谈「懂」：从读懂报告到身体接着走》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 523
+SLUG = 'chen-dong'
+TITLE = '陈晓艳谈「懂」'
+SUBTITLE = '从读懂报告到身体接着走'
+FULL_TITLE = '陈晓艳谈「懂」：从读懂报告到身体接着走'
+TITLE_EN = 'Chen Xiaoyan on "Understanding": From Reading the Report to the Body Going On'
+EPIGRAPH = '懂身体，是下一步还由你的身体和你接着走'
+VERDICT = '懂身体，不是读懂了报告，是下一步还由你的身体和你接着走。'
+AUTHOR = '陈晓艳'
+AUTHORS = ['陈晓艳']
+CATEGORY = 'health'
+ISBN = '979-8-90690-523-9'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261027a'
+DATE = '2026-10-27'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261027-m523-unit-v1.0'
+SRC = '/tmp/claude-0/-home-claude/bad911e4-1416-5224-b8bb-5a2a8d8a37b3/scratchpad/chen-dong/chen-dong-full.md'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
