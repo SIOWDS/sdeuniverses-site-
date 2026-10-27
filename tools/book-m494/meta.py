@@ -1,0 +1,20 @@
+"""第 494 号《矛盾在哪里结算：法律、政治与经济中心的轮换》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 494
+SLUG = 'maodun-jiesuan'
+TITLE = '矛盾在哪里结算'
+SUBTITLE = '法律、政治与经济中心的轮换'
+FULL_TITLE = '矛盾在哪里结算：法律、政治与经济中心的轮换'
+SUBTITLE2 = '中国、美国、英国经济变革路径的属性纠缠解构'
+TITLE_EN = 'Where Contradictions Are Settled: Law, Politics and the Rotation of the Economic Centre'
+EPIGRAPH = '没有矛盾，就没有轮换'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+ISBN = '979-8-90690-494-2'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261027a'
+DATE = '2026-10-27'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261027-m494-unit-v1.0'
+SRC = '/home/claude/book'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
