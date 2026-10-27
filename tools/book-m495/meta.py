@@ -1,0 +1,20 @@
+"""第 495 号《为何CPI失灵了？——价格分层与经济信望爱的修复》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 495
+SLUG = 'cpi-shiling'
+TITLE = '为何CPI失灵了？'
+SUBTITLE = '价格分层与经济信望爱的修复'
+FULL_TITLE = '为何CPI失灵了？——价格分层与经济信望爱的修复'
+SUBTITLE2 = '普通人都能明白的'
+TITLE_EN = 'Why Has the CPI Stopped Working? Price Stratification and the Repair of an Economy\'s Faith, Hope and Love'
+EPIGRAPH = '差价不是成本的读数，是信心的读数'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+ISBN = '979-8-90690-495-9'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261027a'
+DATE = '2026-10-27'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261027-m495-unit-v1.0'
+SRC = '/home/claude/cpi-book'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
