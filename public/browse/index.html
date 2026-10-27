@@ -311,8 +311,198 @@ body{padding-top:230px}
 @media(max-width:640px){#daily-quotes{padding-top:3.6rem!important}}
 @media (prefers-reduced-motion:reduce){.dq-card,.dq-orb,.dq-crystal,.dq-card::before,.dq-inf .p2,.dq-net line,.dq-net circle,.dq-chips span{animation:none !important;opacity:1;transform:none}}
 </style>
+<style id="m-ver">
+/* ══ 手机版（2026-10-27）══
+   浏览页从此分两个版本：宽于 760px 走原来的电脑版顶栏（一个像素不动）；
+   窄于 760px 整块电脑顶栏隐藏，换成下面这套专为手机排的版式。
+   起因：电脑顶栏在手机上竖排成约 1170px 高、又是 position:fixed，比一屏还高，划不走，
+   正文与下半截栏目在手机上根本看不到、点不到。
+   改栏目时两处都要改：电脑版在 <nav> 里，手机版在 #m-ver-hub 里。 */
+.mv{display:none}
+@media(max-width:760px){
+  nav{display:none!important}
+  body{padding-top:0!important;margin:0!important}
+  .mv{display:block}
+  #daily-quotes{padding-top:2.6rem!important;min-height:0!important}
+
+  /* 顶条：只留站名、搜索、中英、菜单 */
+  .mv-bar{position:sticky;top:0;z-index:110;display:flex;align-items:center;gap:.5rem;height:54px;padding:0 14px 0 18px;
+    background:rgba(245,239,224,.94);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+  .mv-brand{display:flex;align-items:baseline;gap:.5rem;text-decoration:none;color:var(--text);margin-right:auto;min-width:0}
+  .mv-brand b{font-size:1.18rem;font-weight:700;letter-spacing:.08em;white-space:nowrap}
+  .mv-brand small{font-family:'Playfair Display',Georgia,serif;font-size:.72rem;color:var(--gold2);letter-spacing:.04em;white-space:nowrap}
+  .mv-ic{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:0;background:none;color:var(--text);border-radius:10px;cursor:pointer;text-decoration:none}
+  .mv-ic:active{background:var(--card2)}
+  .mv-ic svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round}
+  .mv-lang{display:flex;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+  .mv-lang button{font:inherit;font-size:.8rem;border:0;background:none;color:var(--text2);padding:.28rem .55rem;cursor:pointer}
+  .mv-lang button.on{background:var(--gold);color:#FAF6EC;font-weight:600}
+
+  /* 开头：站名、一句话、搜索、三个主入口 */
+  .mv-head{padding:1.6rem 18px 1.4rem}
+  .mv-head h1{font-size:2.15rem;font-weight:700;letter-spacing:.12em;line-height:1.2;color:var(--text)}
+  .mv-head p{margin-top:.35rem;font-size:.88rem;color:var(--text2);letter-spacing:.04em}
+  .mv-search{display:flex;align-items:center;gap:.6rem;margin-top:1.15rem;height:48px;padding:0 16px;border:1px solid var(--border);
+    border-radius:24px;background:var(--card);color:var(--muted);text-decoration:none;font-size:.92rem}
+  .mv-search svg{width:18px;height:18px;stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;flex:0 0 auto}
+  .mv-main3{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:8px;margin-top:10px}
+  .mv-main3 a{display:flex;align-items:center;justify-content:center;height:46px;border-radius:12px;text-decoration:none;
+    font-size:.92rem;font-weight:600;letter-spacing:.04em;border:1px solid var(--border);color:var(--text);background:var(--card)}
+  .mv-main3 a.gold{background:var(--gold);border-color:var(--gold);color:#FAF6EC}
+
+  /* 小节标题 */
+  .mv-sec{padding:1.5rem 18px 0}
+  .mv-sec h2{font-size:1.02rem;font-weight:700;letter-spacing:.1em;color:var(--text);margin-bottom:.8rem;display:flex;align-items:baseline;gap:.6rem}
+  .mv-sec h2 em{font-style:normal;font-size:.76rem;font-weight:400;letter-spacing:.02em;color:var(--muted)}
+
+  /* 精读四栏：两乘两，每格一句话说明这一栏是什么 */
+  .mv-four{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mv-four a{display:block;padding:.85rem .9rem .9rem;background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--c);
+    border-radius:4px 4px 10px 10px;text-decoration:none;color:var(--text)}
+  .mv-four b{display:block;font-size:1.02rem;font-weight:700;color:var(--c);letter-spacing:.06em}
+  .mv-four em{font-style:normal;display:block;margin-top:.3rem;font-size:.78rem;line-height:1.55;color:var(--text2)}
+
+  /* 智能体：整条深色带，是这一页唯一的重色块 */
+  .mv-agents{margin-top:1.7rem;padding:1.35rem 18px 1.5rem;background:#1A1410;color:#F3ECDA}
+  .mv-agents h2{font-size:1.02rem;font-weight:700;letter-spacing:.1em;margin-bottom:.85rem;color:#F3ECDA}
+  .mv-agents h2 em{font-style:normal;font-size:.76rem;font-weight:400;color:#B9A985;margin-left:.6rem;letter-spacing:.02em}
+  .mv-ag{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mv-ag a{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;min-height:76px;padding:.7rem .85rem;
+    border-radius:12px;text-decoration:none;color:#F3ECDA;background:linear-gradient(180deg,#2A1E15,#170F09);border:1px solid color-mix(in srgb,var(--a) 55%,transparent)}
+  .mv-ag a::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-60%;height:90%;pointer-events:none;
+    background:radial-gradient(50% 70% at 50% 100%,color-mix(in srgb,var(--a) 45%,transparent),transparent 70%)}
+  .mv-ag b{position:relative;z-index:1;font-size:.98rem;font-weight:700;letter-spacing:.04em}
+  .mv-ag i{position:relative;z-index:1;font-style:normal;font-size:.74rem;color:#C9BB98;margin-top:.15rem}
+  .mv-ag a.all{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;justify-content:center;padding:.7rem;background:none;border-style:dashed}
+  .mv-ag a.all::after{display:none}
+
+  /* 全部栏目：两列目录，每行一个完整栏目名，不再断词 */
+  .mv-cols{display:grid;grid-template-columns:1fr 1fr;column-gap:14px;border-top:1px solid var(--border2)}
+  .mv-cols a{display:flex;align-items:center;gap:.55rem;min-height:48px;padding:.35rem 0;border-bottom:1px solid var(--border2);
+    text-decoration:none;color:var(--text);font-size:.93rem;letter-spacing:.03em;line-height:1.35}
+  .mv-cols a::before{content:"";flex:0 0 3px;align-self:stretch;margin:.55rem 0;border-radius:2px;background:var(--c,var(--gold2))}
+
+  /* 子网站 */
+  .mv-subs{border-top:1px solid var(--border2)}
+  .mv-subs a{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:.8rem 0;border-bottom:1px solid var(--border2);text-decoration:none;color:var(--text)}
+  .mv-subs b{font-size:.95rem;font-weight:600}
+  .mv-subs i{font-style:normal;font-size:.8rem;color:var(--muted)}
+  .mv-gap{height:2rem}
+
+  /* 菜单抽屉 */
+  .mv-scrim{position:fixed;inset:0;z-index:300;background:rgba(26,20,16,.42);opacity:0;pointer-events:none;transition:opacity .2s}
+  .mv-drawer{position:fixed;top:0;right:0;bottom:0;z-index:301;width:min(84vw,330px);background:var(--bg);visibility:hidden;
+    transform:translateX(102%);transition:transform .22s ease,visibility 0s linear .22s;display:flex;flex-direction:column;overflow-y:auto}
+  body.mv-open .mv-scrim{opacity:1;pointer-events:auto}
+  body.mv-open .mv-drawer{transition:transform .22s ease;transform:none;visibility:visible;box-shadow:-12px 0 30px rgba(26,20,16,.18)}
+  body.mv-open{overflow:hidden}
+  .mv-drawer .mv-dh{display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 10px 0 20px;border-bottom:1px solid var(--border2)}
+  .mv-drawer .mv-dh b{font-size:1rem;letter-spacing:.1em}
+  .mv-dl a{display:flex;align-items:center;justify-content:space-between;padding:.95rem 20px;border-bottom:1px solid var(--border2);text-decoration:none;color:var(--text);font-size:.98rem}
+  .mv-dl a small{font-size:.76rem;color:var(--muted)}
+  .mv-dl a.reg{margin:1rem 20px .4rem;justify-content:center;border:0;border-radius:12px;background:var(--gold);color:#FAF6EC;font-weight:600;letter-spacing:.08em}
+  .mv-visit{padding:.6rem 20px 1.6rem;font-size:.8rem;color:var(--muted)}
+  .mv-visit b{color:var(--gold);font-variant-numeric:tabular-nums}
+}
+@media(max-width:760px) and (prefers-reduced-motion:reduce){.mv-drawer,.mv-scrim{transition:none}}
+.mv a:focus-visible,.mv button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+</style>
 </head>
 <body class="zh">
+<!-- ══ 手机版浏览页（窄于 760px 才显示；电脑版仍是上面的 <nav>）══ -->
+<div class="mv" id="m-ver-hub">
+<header class="mv-bar">
+  <a class="mv-brand" href="/browse/"><b><span class="zh-only">爱思乐园</span><span class="en-only">SDE Universes</span></b><small class="zh-only">SDE Universes</small></a>
+  <a class="mv-ic" href="/search/" aria-label="全站检索"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></a>
+  <div class="mv-lang"><button type="button" data-l="zh">中</button><button type="button" data-l="en">EN</button></div>
+  <button class="mv-ic" type="button" id="mv-menu" aria-label="菜单" aria-expanded="false" aria-controls="mv-drawer"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+</header>
+<section class="mv-head">
+  <h1><span class="zh-only">爱思乐园</span><span class="en-only">SDE Universes</span></h1>
+  <p><span class="zh-only">SDE 发生学平台 · 王德生博士创立 · 德麦国际</span><span class="en-only">The SDE genesis platform · founded by Dr. Wang Desheng · Demai International</span></p>
+  <a class="mv-search" href="/search/"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span class="zh-only">搜全站文章、专著与学员作品</span><span class="en-only">Search articles, books and student work</span></a>
+  <div class="mv-main3">
+    <a class="gold" href="/taste/chatsde/">✦ ChatSDE</a>
+    <a href="/sde-wechat/"><span class="zh-only">SDE 社区</span><span class="en-only">Community</span></a>
+    <a href="/register/"><span class="zh-only">注册</span><span class="en-only">Register</span></a>
+  </div>
+</section>
+<section class="mv-sec">
+  <h2><span class="zh-only">每天读什么</span><span class="en-only">What to read today</span></h2>
+  <div class="mv-four">
+    <a href="/paradigm/" style="--c:#B5714A"><b><span class="zh-only">每日必读</span><span class="en-only">Daily Must-Read</span></b><em><span class="zh-only">三篇站内学员论文撞出的典范文</span><span class="en-only">Exemplars forged from three in-house papers</span></em></a>
+    <a href="/confluence/" style="--c:#6E8A45"><b><span class="zh-only">学科通融</span><span class="en-only">Confluence</span></b><em><span class="zh-only">三个不同学科撞出的典范文</span><span class="en-only">Exemplars forged from three disciplines</span></em></a>
+    <a href="/frontier/" style="--c:#4B3FA0"><b><span class="zh-only">新思想前沿</span><span class="en-only">Frontier</span></b><em><span class="zh-only">近十年各领域最新思想摘要</span><span class="en-only">Ten years of new ideas, field by field</span></em></a>
+    <a href="/journals/" style="--c:#2F6E8F"><b><span class="zh-only">期刊论文</span><span class="en-only">Journals</span></b><em><span class="zh-only">中外 200 种顶刊近五年论文</span><span class="en-only">200 top journals, the last five years</span></em></a>
+  </div>
+</section>
+<section class="mv-agents">
+  <h2><span class="zh-only">SDE 智能体</span><span class="en-only">SDE Agents</span><em><span class="zh-only">免费品尝</span><span class="en-only">Free to try</span></em></h2>
+  <div class="mv-ag">
+    <a href="/taste/idea-generator/" style="--a:#7FC8FF"><b><span class="zh-only">SDE 金点子</span><span class="en-only">Idea Generator</span></b><i><span class="zh-only">一个问题，九个角度</span><span class="en-only">One question, nine angles</span></i></a>
+    <a href="/taste/zhiwen/" style="--a:#8FE0A0"><b><span class="zh-only">中华智问</span><span class="en-only">Zhiwen</span></b><i><span class="zh-only">向中华经典发问</span><span class="en-only">Ask the Chinese classics</span></i></a>
+    <a href="/taste/iq-scorer/" style="--a:#E7C349"><b><span class="zh-only">创新智商测试</span><span class="en-only">Innovation IQ</span></b><i><span class="zh-only">给一篇文章打分</span><span class="en-only">Score a piece of writing</span></i></a>
+    <a href="/taste/chatsde/" style="--a:#FF9A3C"><b>ChatSDE</b><i><span class="zh-only">全站问答与对谈</span><span class="en-only">Ask the whole site</span></i></a>
+    <a class="all" href="/taste/" style="--a:#B9A985"><span class="zh-only">查看全部智能体</span><span class="en-only">See all agents</span></a>
+  </div>
+</section>
+<section class="mv-sec">
+  <h2><span class="zh-only">全部栏目</span><span class="en-only">All columns</span><em><span class="zh-only">22 个</span><span class="en-only"></span></em></h2>
+  <div class="mv-cols">
+    <a href="/education-bubble/" style="--c:#A63D2F"><span class="zh-only">大学教育泡沫</span><span class="en-only">Education Bubble</span></a>
+    <a href="/today/" style="--c:#8A6A1E"><span class="zh-only">今日文章</span><span class="en-only">Today</span></a>
+    <a href="/monographs/" style="--c:#8A6A1E"><span class="zh-only">专著栏目</span><span class="en-only">Monographs</span></a>
+    <a href="/cocreate/" style="--c:#8A6A1E"><span class="zh-only">专著共创</span><span class="en-only">Co-create a Book</span></a>
+    <a href="/creation/" style="--c:#2A6B4A"><span class="zh-only">学术创造</span><span class="en-only">Academic Creation</span></a>
+    <a href="/thought/" style="--c:#8C3B32"><span class="zh-only">哲学与思想</span><span class="en-only">Thought</span></a>
+    <a href="/discovery-vs-genesis/" style="--c:#7A4A8C"><span class="zh-only">发现VS发生</span><span class="en-only">Discovery vs Genesis</span></a>
+    <a href="/nine-doorways/" style="--c:#4A5D23"><span class="zh-only">三维九宫</span><span class="en-only">Nine Doorways</span></a>
+    <a href="/three-views/" style="--c:#0F6E8C"><span class="zh-only">三视角专栏</span><span class="en-only">Three Views</span></a>
+    <a href="/new-education/" style="--c:#B08A16"><span class="zh-only">AI时代的新教育</span><span class="en-only">New Education</span></a>
+    <a href="/education/" style="--c:#336699"><span class="zh-only">教育专栏</span><span class="en-only">Education</span></a>
+    <a href="/health/" style="--c:#2E8B57"><span class="zh-only">健康专栏</span><span class="en-only">Health</span></a>
+    <a href="/ai/" style="--c:#1B6E7A"><span class="zh-only">AI 专栏</span><span class="en-only">AI</span></a>
+    <a href="/life/" style="--c:#7C4A3A"><span class="zh-only">人生与家庭</span><span class="en-only">Life &amp; Family</span></a>
+    <a href="/business/" style="--c:#A0651F"><span class="zh-only">商业与经济</span><span class="en-only">Business</span></a>
+    <a href="/business/operator-assistance/" style="--c:#2F5D7C"><span class="zh-only">工业应用</span><span class="en-only">Industrial</span></a>
+    <a href="/culture/" style="--c:#8C6A3A"><span class="zh-only">文化与艺术</span><span class="en-only">Culture &amp; Art</span></a>
+    <a href="/civilization/" style="--c:#8C6A3A"><span class="zh-only">文化与文明</span><span class="en-only">Culture &amp; Civilization</span></a>
+    <a href="/how/" style="--c:#1F7A72"><span class="zh-only">怎么做</span><span class="en-only">How To</span></a>
+    <a href="/games/" style="--c:#1F8FA8"><span class="zh-only">游戏实验室</span><span class="en-only">Games</span></a>
+    <a href="/wechat-picks/" style="--c:#247354"><span class="zh-only">公众号选读</span><span class="en-only">WeChat Picks</span></a>
+    <a href="/civilization-dilemma/" style="--c:#B8860B"><span class="zh-only">AI时代的文明困境和出路</span><span class="en-only">Civilizational Dilemmas</span></a>
+  </div>
+</section>
+<section class="mv-sec">
+  <h2><span class="zh-only">子网站</span><span class="en-only">Sub-sites</span></h2>
+  <div class="mv-subs">
+    <a href="https://read.sdeuniverses.com/"><b><span class="zh-only">德麦读书馆</span><span class="en-only">Reading House</span></b><i><span class="zh-only">读书 · 共读</span><span class="en-only">Read · Co-read</span></i></a>
+    <a href="https://health.sdeuniverses.com/"><b><span class="zh-only">健康发生学</span><span class="en-only">Health Genesis</span></b><i><span class="zh-only">胡敏</span><span class="en-only">Hu Min</span></i></a>
+    <a href="https://lang.sdeuniverses.com/"><b><span class="zh-only">语言发生学</span><span class="en-only">Language Genesis</span></b><i><span class="zh-only">胡志英</span><span class="en-only">Hu Zhiying</span></i></a>
+    <a href="https://liter.sdeuniverses.com/"><b><span class="zh-only">SDE 文学</span><span class="en-only">SDE Literature</span></b><i><span class="zh-only">斐索（秦莉）</span><span class="en-only">Feisuo (Qin Li)</span></i></a>
+    <a href="https://edu.sdeuniverses.com/"><b><span class="zh-only">教育发生学</span><span class="en-only">Education Genesis</span></b><i><span class="zh-only">阳涌</span><span class="en-only">Yang Yong</span></i></a>
+    <a href="https://mpc.sdeuniverses.com/"><b><span class="zh-only">SDE 数理化</span><span class="en-only">SDE Maths · Physics · Chemistry</span></b><i><span class="zh-only">数学 · 物理 · 化学</span><span class="en-only">Three sciences</span></i></a>
+    <a href="https://comp.sdeuniverses.com/"><b><span class="zh-only">作文发生学</span><span class="en-only">Composition Genesis</span></b><i><span class="zh-only">付自文</span><span class="en-only">Fu Ziwen</span></i></a>
+  </div>
+</section>
+<div class="mv-gap"></div>
+<div class="mv-scrim" id="mv-scrim"></div>
+<aside class="mv-drawer" id="mv-drawer" aria-label="菜单" aria-hidden="true">
+  <div class="mv-dh"><b><span class="zh-only">菜单</span><span class="en-only">Menu</span></b><button class="mv-ic" type="button" id="mv-close" aria-label="关闭菜单"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="mv-dl">
+    <a href="/drwang/"><span class="zh-only">王博士与SDE</span><span class="en-only">Dr. Wang &amp; SDE</span></a>
+    <a href="/students/"><span class="zh-only">学员专栏</span><span class="en-only">Students</span></a>
+    <a href="/books/"><span class="zh-only">专著书架</span><span class="en-only">Bookshelf</span></a>
+    <a href="/directory/"><span class="zh-only">栏目总目录</span><span class="en-only">Full directory</span></a>
+    <a href="/overview/"><span class="zh-only">总览长卷</span><span class="en-only">Overview scroll</span></a>
+    <a href="https://huazhi-sde.com" target="_blank" rel="noopener"><span class="zh-only">娄底华智</span><span class="en-only">Loudi Huazhi</span><small><span class="zh-only">外站</span><span class="en-only">external</span></small></a>
+    <a href="/home/"><span class="zh-only">回系统入口</span><span class="en-only">System entrance</span></a>
+    <a class="reg" href="/register/"><span class="zh-only">注册入口</span><span class="en-only">Register</span></a>
+  </div>
+  <p class="mv-visit"><span class="zh-only">访问总次数</span><span class="en-only">Total visits</span> <b id="mv-visit">—</b></p>
+</aside>
+</div>
+
 <nav>
   <div class="nav-bar-main">
   <a class="nav-logo" href="/browse/"><span class="nl-en">SDE Universes</span><span class="nl-cn">爱思乐园</span></a>
@@ -474,6 +664,25 @@ try{ var _l=localStorage.getItem('sde_wds_lang'); if(_l==='en') setLang('en'); }
   window.addEventListener('load',fit);
   try{ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fit); }catch(e){}
   try{ new MutationObserver(fit).observe(nav,{childList:true,subtree:true}); }catch(e){}
+})();
+</script>
+<script>
+/* 手机版：菜单抽屉开合、中英切换按钮状态、访问次数照抄电脑顶栏那一份 */
+(function(){
+  var hub=document.getElementById('m-ver-hub'); if(!hub) return;
+  var btn=document.getElementById('mv-menu'), dr=document.getElementById('mv-drawer');
+  function set(o){ document.body.classList.toggle('mv-open',o); btn.setAttribute('aria-expanded',o?'true':'false'); dr.setAttribute('aria-hidden',o?'false':'true'); }
+  btn.addEventListener('click',function(){ set(true); });
+  document.getElementById('mv-close').addEventListener('click',function(){ set(false); });
+  document.getElementById('mv-scrim').addEventListener('click',function(){ set(false); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') set(false); });
+  var lb=hub.querySelectorAll('.mv-lang button');
+  function mark(){ var en=document.body.classList.contains('en'); lb.forEach(function(b){ b.classList.toggle('on',(b.dataset.l==='en')===en); }); }
+  lb.forEach(function(b){ b.addEventListener('click',function(){ if(typeof setLang==='function') setLang(b.dataset.l); mark(); }); });
+  mark();
+  var src=document.getElementById('visitCount'), dst=document.getElementById('mv-visit');
+  function cp(){ if(src&&dst) dst.textContent=src.textContent; }
+  cp(); try{ new MutationObserver(cp).observe(src,{childList:true,characterData:true,subtree:true}); }catch(e){}
 })();
 </script>
 <script src="/js/home-4.js"></script>
