@@ -36,7 +36,7 @@ for (const p of PRE) {
 }
 
 // ②
-const allHtml = read("public/sites/lang/all/index.html");
+const allHtml = read("public/sites/lang/all/index.html") + read("public/sites/lang/library/index.html");   // 2026-10-27：专著选目页同算「列出」
 const CONTENT = /^\/(students|books\/m|column|confluence|paradigm)\//;
 const listed = new Set();
 for (const x of allHtml.matchAll(/href="([^"#?]+)/g)) {

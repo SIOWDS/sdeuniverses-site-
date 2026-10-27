@@ -824,6 +824,12 @@
     about.href = ABOUT;
     about.textContent = T("\u5e73\u53f0\u4ecb\u7ecd \u203a", "About the platform \u203a");
     foot.appendChild(about);
+    var library = document.createElement("a");
+    library.className = "sdep-skip";
+    library.style.marginLeft = "8px";
+    library.href = "/library/";
+    library.textContent = T("\u4e13\u8457\u9009\u76ee \u203a", "Book list \u203a");
+    foot.appendChild(library);
     var teaching = document.createElement("a");
     teaching.className = "sdep-skip";
     teaching.style.marginLeft = "8px";
