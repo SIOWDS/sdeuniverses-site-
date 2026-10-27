@@ -14,7 +14,7 @@ from pathlib import Path
 HERE = Path(__file__).parent
 SITE = HERE.resolve().parents[1] / 'public'
 NO = 484
-V = '20261027a'
+V = '20261027c'
 SLUG = 'rujia-fazhan-zonggang'
 T, SUB = '儒家发展之道总纲', '普通人都能明白的一以贯之'
 ISBN = '979-8-90690-484-3'
@@ -72,7 +72,7 @@ def main():
     url = f'https://sdeuniverses.com/books/m/{NO}/'
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=['刘春华'], advisor='王德生', category='core',
-                 description='一根从老家剪来的桂花枝插进城里的花盆，叶子黄了：枝没有错，土换了。本书把儒家的智慧读成发展的智慧，分出两个方向：纵向发展（1→N），一个一被守住、展开、传成很多；横向发展（1→1），一个一迁进另一种土，拆开、对土、重组，长成那里的一。《中庸》定守什么，《大学》排先后，《论语》因人展开，《孟子》往外推，《易经》六十四卦按处境走。儒家两千年练熟了纵向，却把横向留在了比兴、格义这些手艺里；本书定下先横后纵，落到教育、健康、事业三处。刘春华著，王德生指导；七编四十章与结编两章，「中华文明的发展之道」总纲，后有知、止、定、静、安、虑、得七卷。',
+                 description='一根从老家剪来的桂花枝插进城里的花盆，叶子黄了：枝没有错，土换了。本书把儒家的智慧读成发展的智慧，分出两个方向：纵向发展（1→N），一个一被守住、展开、传成很多；横向发展（1→1），一个一迁进另一种土，拆开、对土、重组，长成那里的一。《中庸》定守什么，《大学》排先后，《论语》因人展开，《孟子》往外推，《易经》六十四卦按处境走。儒家两千年练熟了纵向，却把横向留在了比兴、格义这些手艺里；本书定下先横后纵，落到教育、健康、事业三处。刘春华著，指导老师王德生；七编四十章与结编两章，「中华文明的发展之道」总纲，后有知、止、定、静、安、虑、得七卷。',
                  detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
                  pdfUrl=url + f'{SLUG}-reader.pdf?v={V}', printPdfUrl=url + f'{SLUG}-print.pdf?v={V}',
                  coverUrl=url + f'cover.jpg?v={V}', backcoverUrl=url + f'backcover.jpg?v={V}',
@@ -100,7 +100,7 @@ def main():
             '<div class="en-only" style="font-size:12.5px;letter-spacing:0.18em;color:#D9B45C;margin-bottom:14px">★ NEW BOOK · DEMAI MONOGRAPH No.%d · ~%s CHARS · %d PP · US$ 25.00</div>'
             '<h3 class="zh-only" style="color:#F1EBDC;font-size:25px;line-height:1.5;margin:0 0 14px">儒家发展之道总纲——普通人都能明白的一以贯之</h3>'
             '<h3 class="en-only" style="color:#F1EBDC;font-size:23px;line-height:1.5;margin:0 0 14px">The Confucian Way of Development: Threading Everything on One</h3>'
-            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">刘春华著，王德生指导，「中华文明的发展之道」总纲。发展有两个方向：纵向是把一个一守住、传成很多，横向是把它迁进另一种土、长成那里的一；儒家两千年练熟了纵向，却把横向留在了手艺里。四书分工加《易经》六十四卦为路径，先横后纵，落到教育、健康、事业。</p>'
+            '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">刘春华著，指导老师王德生，「中华文明的发展之道」总纲。发展有两个方向：纵向是把一个一守住、传成很多，横向是把它迁进另一种土、长成那里的一；儒家两千年练熟了纵向，却把横向留在了手艺里。四书分工加《易经》六十四卦为路径，先横后纵，落到教育、健康、事业。</p>'
             '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">By Liu Chunhua, advised by Wang Desheng; the general volume of The Way of Development in Chinese Civilization. Development runs two ways: vertically, one core is kept and passed on to many; horizontally, it is moved into new soil and regrown there. Confucianism mastered the first and left the second as a craft. First across, then down.</p></div></a>'
             % (NO, NO, han / 10000, pages, NO, format(han, ','), pages))
     h = h[:a0] + card + h[a0:]
