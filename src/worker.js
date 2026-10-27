@@ -1204,7 +1204,7 @@ const LANG_PRE = [
   "/books/m/55/",   // 课堂学习发生学
   "/books/m/352/",   // 学习兴趣发生学导论
   "/books/m/489/",   // 学习如何发生：SDE 三方程的教育思考与实践（阳涌子本）
-  "/books/m/192/",   // AI 时代最需要学习的是什么？
+  "/books/m/506/",   // 土·石·煤（作文的发生学；换下 192：实测「语法是什么」排第一的是 192，不相干）
   // 2026-10-27 补收：胡志英名下其余六部（书目对账④一直报缺）
   "/books/m/438/",   // 大模型是索绪尔的网、皮尔斯的链：符号在对话中才发生
   "/books/m/380/",   // SDE语义多元发生学导论
@@ -1251,7 +1251,7 @@ const LANG_PRE = [
 const JOHN_SCOPE = LANG_PRE;
 async function johnRag(env, url, q) {
   try {
-    const lr = await lightRetrieve(env, url, q, [], 24, 900, { pick: 20, perDoc: 2 });
+    const lr = await lightRetrieve(env, url, q, langEnExpand(q), 24, 900, { pick: 20, perDoc: 2 });
     const docs = (lr.corpus && lr.corpus.docs) || [];
     const out = []; const cnt = new Map();
     for (const ck of (lr.hits || [])) {
@@ -5548,6 +5548,58 @@ function synExpand(q){
     if(hit) for(const w of cl) out.push(w);
   }
   return out.filter((v,i,a)=>a.indexOf(v)===i);
+}
+/* ══ ChatJohn 的英文提问展开（2026-10-27）══════════════════════════════
+   语料是中文，检索按字面匹配：学习者用英文问 "Why can't I speak English after years of study?"，
+   一个中文关键词也对不上，实测 acc=7，取到的是学习包 PDF，而不是第 287 号《开口即纠缠》。
+   做法：只对 lang 档案生效，把英文里的语言学/语言学习词按词边界映射成站内真用的中文词，
+   并进 expTerms（加分项，不替换原词）。不进全局 SYN_CLUSTERS：那张表是子串匹配，
+   "sign" 会命中 "design"，而且会改动其余十几台智能体的检索。
+   ⚠ 每条正则都带词边界；表里只放站内中文语料里真出现的说法，别放造出来的词。 */
+const LANG_EN_ZH = [
+  [/\bgrammar(s|atical)?\b/i, ["语法", "语法教学"]],
+  [/\b(can'?t|cannot|unable to|afraid to|fail(s|ed)? to)\s+speak\b|\bspeak(ing)?\b|\bspoken\b|\boral\b/i, ["开口", "口语", "说话"]],
+  [/\bfluen(t|cy)\b/i, ["流利", "语感"]],
+  [/\b(sense of language|language sense|intuition)\b/i, ["语感"]],
+  [/\benglish\b/i, ["英语"]],
+  [/\bchinese\b|\bmandarin\b/i, ["汉语"]],
+  [/\btranslat(e|es|ed|ing|ion|ions|or)\b/i, ["翻译", "信达雅"]],
+  [/\bsaussure\b/i, ["索绪尔", "符号"]],
+  [/\bpeirce\b/i, ["皮尔斯", "符号"]],
+  [/\bsemiotic(s)?\b|\bthe sign\b|\bsigns\b/i, ["符号", "符号学"]],
+  [/\bfossili[sz](e|ed|ation)\b/i, ["石化"]],
+  [/\b(acquisition|acquire[sd]?|acquiring)\b/i, ["习得", "语言习得"]],
+  [/\b(second language|L2|SLA)\b/, ["二语", "习得"]],
+  [/\b(native language|mother tongue|L1)\b/, ["母语"]],
+  [/\b(learn(s|ed|ing|er|ers)?|stud(y|ies|ied|ying))\b/i, ["学习"]],
+  [/\b(teach(es|ing)?|taught|teacher(s)?|pedagog(y|ical))\b/i, ["教学", "教师"]],
+  [/\bclassroom(s)?\b/i, ["课堂"]],
+  [/\bmeaning(s)?\b/i, ["意义"]],
+  [/\bpragmatic(s)?\b/i, ["语用", "场合"]],
+  [/\bcontext(s|ual)?\b/i, ["语境", "场合"]],
+  [/\bvocabular(y|ies)\b|\bphrase(s)?\b|\bcollocation(s)?\b/i, ["词汇", "语块"]],
+  [/\bwrit(e|es|ing|ten)\b|\bessay(s)?\b|\bcomposition\b/i, ["写作", "作文"]],
+  [/\bread(ing)?\b/i, ["阅读"]],
+  [/\blisten(ing)?\b/i, ["听力", "听"]],
+  [/\bpronunciation\b|\baccent\b/i, ["发音", "口音"]],
+  [/\b(error(s)?|mistake(s)?|correct(ion|ing|s|ed)?|feedback)\b/i, ["纠错", "错误", "反馈"]],
+  [/\btense(s)?\b|\bpresent perfect\b|\bpast simple\b/i, ["时态", "现在完成时"]],
+  [/\blinguistic(s)?\b|\blinguist(s)?\b/i, ["语言学", "语言学派"]],
+  [/\bchomsky\b/i, ["乔姆斯基"]],
+  [/\bwittgenstein\b/i, ["维特根斯坦", "意义即用法"]],
+  [/\bfrege\b/i, ["弗雷格"]],
+  [/\bquine\b/i, ["奎因"]],
+  [/\bsearle\b/i, ["塞尔"]],
+  [/\bbrandom\b/i, ["布兰顿"]],
+  [/\bidiom(s|atic)?\b/i, ["习语"]],
+  [/\b(language|languages)\b/i, ["语言"]],
+];
+function langEnExpand(q) {
+  const s = String(q || "");
+  if (!/[A-Za-z]{3,}/.test(s)) return [];
+  const out = [];
+  for (const [re, zh] of LANG_EN_ZH) if (re.test(s)) for (const w of zh) if (out.indexOf(w) < 0) out.push(w);
+  return out.slice(0, 24);
 }
 function ragKeys(q, expTerms) {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
@@ -13138,6 +13190,7 @@ export default {
          按 URL 过滤一个已经拼成一整段的字符串是靠不住的（篇名可能重名、块间没有稳定边界）；
          而这里 d.u 还在手上，判据只有一处。 */
       const prof = wdsProfileOf(b.prof);
+      if (prof && prof.id === "lang") for (const w of langEnExpand(q)) if (expTerms.indexOf(w) < 0) expTerms.push(w);   // 英文提问展开，见 LANG_EN_ZH
       try {
         /* opts 原来只在传了 pick 时才建。现在白名单也要走 opts，
            所以按需拼一个——**别退回 undefined**，那会把 keep 一起丢掉（静默，且只在档案模式下发作）。 */
