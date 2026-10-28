@@ -1,0 +1,21 @@
+"""第 434 号《从 The Book 到 Our/My Book：AI时代学校教育的新使命》工具链共用常量（由第 523 号改来）——书号、ISBN、定价、版本都只在这里改。"""
+NO = 434
+SLUG = 'our-my-book'
+TITLE = '从 The Book 到 Our/My Book'
+SUBTITLE = 'AI时代学校教育的新使命'
+FULL_TITLE = '从 The Book 到 Our/My Book：AI时代学校教育的新使命'
+TITLE_EN = 'From The Book to Our/My Book: The New Mission of School Education in the Age of AI'
+EPIGRAPH = '教育的新使命，是让每个学生带走自己的那本书'
+VERDICT = '从 The Book 到 Our/My Book：学校不再只递出一本大家共用的书，而是帮每个班、每个学生长出自己的那一本。'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+CATEGORY = 'edu'
+ISBN = '979-8-90690-035-7'
+PRICE_USD = None  # 定价只从用户处取，未给定前不得填写
+PRICE = ''
+V = '20261028a'
+DATE = '2026-10-28'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261028-m434-unit-v1.0'
+SRC = '/home/claude/chapters'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
