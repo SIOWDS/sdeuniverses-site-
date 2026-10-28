@@ -1,0 +1,20 @@
+"""第 502 号《个人知识发生平台的数据基因：SDE母本＋子本系列》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 502
+SLUG = 'shuju-jiyin'
+TITLE = '个人知识发生平台的数据基因'
+SUBTITLE = 'SDE母本＋子本系列'
+FULL_TITLE = '个人知识发生平台的数据基因：SDE母本＋子本系列'
+TITLE_EN = 'The Data Gene of a Personal Knowledge-Genesis Platform: SDE Mother Books and Child-Book Series'
+EPIGRAPH = '子本是用来发生的'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+ISBN = '979-8-90690-502-4'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261028a'
+DATE = '2026-10-28'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261028-m502-unit-v1.0'
+SRC = '/tmp/claude-0/-home-claude/09839d20-414e-5fda-9fb5-6a898980f271/scratchpad/book'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
+CATEGORY = 'core'
