@@ -1,0 +1,20 @@
+"""第 524 号《如何产生解决个性化问题的知识？：从统一性认知到同一性谱系的知识发生》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 524
+SLUG = 'gexing-zhishi'
+TITLE = '如何产生解决个性化问题的知识？'
+SUBTITLE = '从统一性认知到同一性谱系的知识发生'
+FULL_TITLE = '如何产生解决个性化问题的知识？——从统一性认知到同一性谱系的知识发生'
+TITLE_EN = 'How Is Knowledge That Solves Personal Problems Produced? From Unified Cognition to the Genealogy of Identity'
+EPIGRAPH = '知识不在库里，在问对里'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+ISBN = '979-8-90690-524-6'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261028a'
+DATE = '2026-10-28'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261028-m524-unit-v1.0'
+SRC = '/home/claude/book524/chapters'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
+CATEGORY = 'core'
