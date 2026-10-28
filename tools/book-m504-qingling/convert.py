@@ -67,6 +67,29 @@ def split_head(name):
     return curly(first[2:].strip()), rest
 
 
+APP = {}
+for _f in sorted(Path('/home/claude/apparatus').glob('part*.json')):
+    APP.update(__import__('json').loads(_f.read_text()))
+
+
+def apparatus(key, txt):
+    """版面装置（第 504 号美化）：章首「这一章的问题」、章中金线引语（原文摘句）、章末「带走的话＋小账」。"""
+    a = APP.get(key)
+    if not a:
+        return txt
+    paras = txt.strip().split('\n\n')
+    for s in a.get('pulls', []):
+        s = curly(s.strip())
+        idx = next((i for i, x in enumerate(paras) if s in x and not x.startswith(('#', '>'))), None)
+        assert idx is not None, (key, s[:20])
+        paras.insert(idx + 1, '> **%s**' % s)
+    q = curly(a['question'].strip())
+    head = ['> **这一章的问题**：' + q]
+    tail = ['> **带走的话**\n> ' + curly(a['takeaway'].strip()),
+            '> **小账**\n' + '\n'.join('> ' + curly(x.strip()) for x in a['ledger'])]
+    return '\n\n'.join(head + paras + tail) + '\n'
+
+
 PREFACE_RAW = [
     '本书写给正在读博、刚刚毕业，或者正在犹豫要不要读博的人。它从一条在国内短视频平台流传的视频说起，那条视频的标题是"Anthropic 科学家宣布：全球博士生职业生涯一夜清零"。标题是夸张的，演讲本身却提出了一个真问题。本书的回答是：被清零的不是博士，是那条人人都走的路；AI 冲击的不是某种职业，而是统一性；出路在于看清自己在同一性谱系的哪一层，并把自己的来路重新长出来。',
     '全书分四编。第一编讲困境从哪里来，第二编讲两种看起来相反、其实同病的误诊，第三编讲这次典范转移换掉的是什么，第四编讲出路，个人与制度各担一半。每个观点都配了一个读者一看就懂的场景，可以从任何一章读起；但第四章提出的门槛问题，最好和第十章、第十三章连着读。',
@@ -114,7 +137,7 @@ def main():
     (HERE / 'front/00-前置.md').write_text(fr)
     title, rest = split_head('ch00.md')
     assert title.startswith('导论'), title
-    lun = '# %s\n\n%s' % (title, body_convert(rest))
+    lun = '# %s\n\n%s' % (title, apparatus('ch00', body_convert(rest)))
     (HERE / 'front/01-导论.md').write_text(lun)
     parts_txt = []
     for k, (pn, pt, rng, intro) in enumerate(PARTS, 1):
@@ -123,13 +146,13 @@ def main():
             title, rest = split_head('ch%02d.md' % c)
             m = re.match(r'^第(.+?)章　(.+)$', title)
             assert m and m[1] == CNUM[c], title
-            o += ['## 第 %d 章　%s' % (c, m[2]), '', body_convert(rest)]
+            o += ['## 第 %d 章　%s' % (c, m[2]), '', apparatus('ch%02d' % c, body_convert(rest))]
         txt = '\n'.join(o)
         (HERE / ('parts/%02d-%s.md' % (k, pn))).write_text(txt)
         parts_txt.append(txt)
     title, rest = split_head('ch14.md')
     assert title.startswith('结语'), title
-    jy = '# %s\n\n%s' % (title, body_convert(rest))
+    jy = '# %s\n\n%s' % (title, apparatus('ch14', body_convert(rest)))
     (HERE / 'back/11-结语.md').write_text(jy)
     hz = '# 后记　成书说明\n\n' + '\n\n'.join(POSTSCRIPT) + '\n'
     (HERE / 'back/12-后置.md').write_text(hz)

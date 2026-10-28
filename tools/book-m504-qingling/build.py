@@ -535,7 +535,7 @@ def sec_html(kind, sid, title, lvl, body):
         cls += ' chapter t4'
     if kind == 'front' and title.startswith(('前言', '导读')):
         cls += ' chapter t1'
-    if kind == 'chapter' and TIGHT.get(sid):
+    if TIGHT.get(sid):
         cls += ' ' + TIGHT[sid]
     return '<section class="%s" id="%s">%s</section>' % (cls, sid, body)
 
@@ -551,7 +551,7 @@ def tune_chapters(secs, css_args, fonts, label):
     TIGHT.clear()
     fixed = []
     for s in secs:
-        if s[0] != 'chapter':
+        if s[0] != 'chapter' and not s[2].startswith(('结语', '导论')):
             continue
         key = hashlib.md5(sec_html(*s).encode()).hexdigest()
         if key in cache:
