@@ -107,6 +107,17 @@ def main():
     det = (det.replace('__AGENT__', AG).replace('__V__', V).replace('__PAGES__', str(pages)).replace('__WAN__', '%.0f' % (han / 10000))
            .replace('__LINE__', _h.escape(CT['detailLine'])).replace('__INTRO__', _h.escape(CT['detailIntro'])).replace('__CARDS__', cards)
            .replace('__DESC_SHORT__', _h.escape(CT['detailLine'], quote=True)).replace('__PRICE_NUM__', '%.2f' % PRICE_USD).replace('__PRICE__', PRICE))
+    def _struct():
+        li = ['<li><b>前置</b>　出版信息 · 作者介绍 · 导论　%s</li>' % _h.escape((HERE / 'front/01-导论.md').read_text().split('\n', 1)[0].split('　', 1)[1])]
+        for f in sorted((HERE / 'parts').glob('0*.md')):
+            tx = f.read_text()
+            pt = tx.split('\n', 1)[0].lstrip('# ').strip()
+            chs = re.findall(r'^## (第(\d+)章)　(.*)$', tx, re.M)
+            li.append('<li><b>%s</b>（第 %s—%s 章）<span class="chs">%s</span></li>' % (_h.escape(pt), chs[0][1], chs[-1][1], ' · '.join('%s %s' % (a, _h.escape(c)) for a, _, c in chs)))
+        jy = (HERE / 'back/11-结语.md').read_text().split('\n', 1)[0].lstrip('# ').strip()
+        li.append('<li><b>后置</b>　%s · 参考书目 · 附录一至四 · 后记</li>' % _h.escape(jy))
+        return '<ol class="vols">\n%s\n</ol>' % '\n'.join(li)
+    det = det.replace('__STRUCT__', _struct())
     assert '__' not in det.replace('__agentproxy', '')
     (d / 'index.html').write_text(det)
     cat_p = SITE / 'books' / 'catalog.json'
