@@ -68,7 +68,7 @@ def split_head(name):
 
 
 APP = {}
-for _f in sorted(Path('/home/claude/apparatus').glob('part*.json')):
+for _f in sorted((HERE / 'apparatus').glob('part*.json')):
     APP.update(__import__('json').loads(_f.read_text()))
 
 
