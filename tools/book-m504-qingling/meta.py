@@ -1,0 +1,20 @@
+"""第 504 号《被清零的不是博士——AI时代博士生的困境与出路》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 504
+SLUG = 'bei-qingling'
+TITLE = '被清零的不是博士'
+SUBTITLE = 'AI时代博士生的困境与出路'
+FULL_TITLE = '被清零的不是博士：AI时代博士生的困境与出路'
+TITLE_EN = 'It Is Not the PhD That Was Zeroed Out: The Predicament and Way Forward of Doctoral Students in the Age of AI'
+EPIGRAPH = '被清零的不是博士，是那条人人都走的路'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+ISBN = '979-8-90690-504-8'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261028a'
+DATE = '2026-10-28'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261028-m504-unit-v1.0'
+SRC = '/home/claude/chapters'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
+CATEGORY = 'edu'
