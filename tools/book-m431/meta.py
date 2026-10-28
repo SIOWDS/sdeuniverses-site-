@@ -1,0 +1,20 @@
+"""第 431 号《大学的典范革命：从统一性到谱系发生——大学的重生》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 431
+SLUG = 'daxue-dianfan'
+TITLE = '大学的典范革命'
+SUBTITLE = '从统一性到谱系发生——大学的重生'
+FULL_TITLE = '大学的典范革命：从统一性到谱系发生——大学的重生'
+TITLE_EN = 'The Paradigm Revolution of the University: From Unity to Genealogical Genesis'
+EPIGRAPH = '深入E，发明D，涌现S'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+CATEGORY = 'edu'
+ISBN = '979-8-90690-436-2'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261028a'
+DATE = '2026-10-28'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261028-m431-unit-v1.0'
+SRC = '/home/claude/univ/book431.md'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
