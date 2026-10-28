@@ -1,0 +1,117 @@
+/* 德麦国际专著 · 第509号 · 版式（参照第220、302、497、502号） */
+:root { --navy:#1c2d52; --gold:#b38b3a; --ink:#2b2b2b; --mute:#8a8578; --cream:#fbf8f1; --cream2:#f3eddf; }
+@page { background: var(--cream);
+  @top-left { content: string(booktitle, first-except); font: 7pt "Noto Serif CJK SC"; color: var(--gold); }
+  @top-right { content: string(chap, first-except); font: 7pt "Noto Serif CJK SC"; color: var(--gold); }
+  @bottom-center { content: counter(page); font: 7.5pt "Noto Serif CJK SC"; color: var(--mute); }
+}
+@page:left  { @top-right { content: none } @top-left { content: string(booktitle, first-except); font: 7pt "Noto Serif CJK SC"; color: var(--gold); } }
+@page:right { @top-left { content: none } @top-right { content: string(chap, first-except); font: 7pt "Noto Serif CJK SC"; color: var(--gold); } }
+@page bare { @top-left { content: none } @top-right { content: none } @bottom-center { content: none } }
+@page cover { margin: 0; background: #14244a; @top-left { content: none } @top-right { content: none } @bottom-center { content: none } }
+@page divider { @top-left { content: none } @top-right { content: none } }
+@page frontp { @top-left { content: none } @top-right { content: none } @bottom-center { content: counter(page, lower-roman); font: 7.5pt "Noto Serif CJK SC"; color: var(--mute); } }
+
+html { }
+body { font-family: "Noto Serif CJK SC", serif; color: var(--ink); text-align: justify; margin: 0; }
+p { margin: 0; text-indent: 2em; orphans: 2; widows: 2; }
+section { break-before: page; }
+.runhead { string-set: chap content(); display: block; height: 0; overflow: hidden; visibility: hidden; font-size: 0; }
+
+/* cover */
+section.cover { page: cover; break-before: page; }
+section.cover img { display: block; object-fit: cover; }
+section.blank { page: bare; }
+section.blank::after { content: " "; }
+
+/* half title */
+section.halftitle { page: bare; padding-top: 22mm; }
+.ht-series { font-size: 8.5pt; letter-spacing: .25em; color: var(--mute); margin-bottom: 10mm; }
+.ht-pre { font-size: 13pt; color: var(--navy); letter-spacing: .08em; }
+.ht-title { font-size: 30pt; font-weight: 700; color: var(--navy); letter-spacing: .06em; margin: 3mm 0 6mm; }
+.ht-sub { font-size: 10.5pt; color: var(--gold); line-height: 1.8; }
+.ht-rule { width: 14mm; border-top: 1.2pt solid var(--gold); margin: 7mm 0 36mm; }
+.ht-author { font-size: 10pt; color: var(--ink); letter-spacing: .1em; margin-bottom: 40mm; }
+.ht-pub { font-size: 7.5pt; color: var(--navy); line-height: 1.6; }
+.ht-pub span { color: var(--mute); font-size: 6.5pt; }
+
+/* imprint */
+section.imprint { page: bare; padding-top: 6mm; }
+.imh { text-align: center; font-size: 12pt; color: var(--navy); letter-spacing: .5em; margin: 0 0 8mm; font-weight: 700; }
+.imprint table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.imprint th { width: 22mm; text-align: left; font-weight: 400; color: var(--mute); background: none; border: 0; padding: 2.2mm 3mm; vertical-align: top; }
+.imprint td { border: 0; background: none; padding: 2.2mm 3mm; color: var(--ink); line-height: 1.55; }
+.imprint tr:nth-child(odd) th, .imprint tr:nth-child(odd) td { background: var(--cream2); }
+.imnotes { margin-top: 7mm; font-size: 7pt; color: #5c5a52; line-height: 1.75; }
+.imnotes p { text-indent: 0; margin-bottom: 1.5mm; }
+.imnotes .rights { margin-top: 3mm; letter-spacing: .2em; }
+
+/* epigraph */
+section.epigraph { page: bare; padding-top: 70mm; text-align: center; }
+.ep { text-indent: 0; text-align: center; font-size: 13pt; color: var(--navy); line-height: 2; letter-spacing: .08em; }
+.ep-src { text-indent: 0; text-align: center; font-size: 9pt; color: var(--gold); margin-top: 5mm; letter-spacing: .1em; }
+
+/* front headings */
+section.preface, section.toc { page: frontp; }
+h1.fronth { font-size: 17pt; color: var(--navy); font-weight: 700; margin: 4mm 0 3mm; letter-spacing: .15em; bookmark-level: 1; }
+.rule { width: 12mm; border-top: 1.2pt solid var(--gold); margin: 3mm 0 8mm; }
+
+/* toc */
+.toc ul { list-style: none; padding: 0; margin: 0; font-size: 8.6pt; line-height: 1.55; }
+.toc li a { color: var(--ink); text-decoration: none; display: block; }
+.toc li a::after { content: leader(" ") target-counter(attr(href url), page); color: var(--mute); font-size: 7.5pt; }
+.toc li.t-part { margin-top: 5mm; font-size: 10pt; font-weight: 700; color: var(--navy); break-after: avoid; }
+.toc li.t-part a { color: var(--navy); }
+.toc li.t-bian { margin-top: 2.5mm; font-weight: 700; color: var(--navy); break-after: avoid; }
+.toc li.t-bian a { color: var(--navy); }
+.toc li.t-ch { padding-left: 6mm; }
+.toc li.t-ch b { font-weight: 400; color: var(--gold); }
+.toc li.t-front { margin-top: 1mm; }
+
+/* dividers */
+section.divider { page: divider; text-align: center; }
+section.part { padding-top: 42mm; }
+section.bian { padding-top: 34mm; }
+.emblem { display: block; margin: 0 auto 8mm; }
+.dlabel { font-size: 10pt; letter-spacing: .6em; color: var(--gold); margin-bottom: 5mm; }
+h1.dtitle { font-size: 20pt; color: var(--navy); font-weight: 700; margin: 0; line-height: 1.5; letter-spacing: .05em; }
+section.part h1.dtitle { bookmark-level: 1; }
+section.bian h1.dtitle { bookmark-level: 2; font-size: 17pt; }
+.drule { width: 12mm; border-top: 1.2pt solid var(--gold); margin: 7mm auto 9mm; }
+.dlead { text-align: justify; font-size: 9pt; line-height: 1.95; color: #4b4a45; margin: 0 8mm; }
+.blist { list-style: none; padding: 0; margin: 0 auto; width: 78%; text-align: left; font-size: 9pt; line-height: 2; color: #4b4a45; }
+.blist .bn { color: var(--gold); display: inline-block; width: 18mm; }
+
+/* chapters */
+section.chapter, section.appendix { padding-top: 6mm; }
+.chnum { font-size: 34pt; color: var(--gold); font-weight: 300; line-height: 1; opacity: .85; }
+.chlabel { font-size: 8pt; color: var(--gold); letter-spacing: .25em; margin: 2mm 0 1mm; }
+h1.chtitle { bookmark-label: attr(data-bm); font-size: 17pt; line-height: 1.45; color: var(--navy); font-weight: 700; margin: 0; bookmark-level: 3; }
+section.appendix h1.chtitle, section#ch0 h1.chtitle { bookmark-level: 1; }
+.keybox { background: var(--cream2); border-left: 2pt solid var(--gold); padding: 3mm 5mm; margin: 0 0 7mm; }
+.keybox .kl { font-size: 6.8pt; color: var(--gold); letter-spacing: .25em; margin-bottom: 1mm; }
+.keybox p { text-indent: 0; font-size: 8.8pt; line-height: 1.7; color: #46443e; }
+h2 { font-family: "Noto Sans CJK SC", sans-serif; font-weight: 700; color: var(--navy); margin: 8mm 0 3.5mm; line-height: 1.5; break-after: avoid; bookmark-level: none; }
+h2:not(.imh)::before { content: "◆ "; color: var(--gold); font-size: .85em; }
+h3 { font-weight: 700; color: var(--navy); margin: 5.5mm 0 2.5mm; line-height: 1.5; break-after: avoid; bookmark-level: none; }
+h4, h5, h6 { font-weight: 700; color: var(--ink); margin: 4mm 0 2mm; bookmark-level: none; }
+strong { font-weight: 700; color: #22222a; }
+blockquote { margin: 3.5mm 0 3.5mm 0; padding: 2.5mm 5mm; border-left: 1.5pt solid var(--gold); background: var(--cream2); color: #3d3c37; }
+blockquote p { text-indent: 0; }
+ul, ol { margin: 2mm 0 2mm 0; padding-left: 7mm; }
+li { margin-bottom: 1mm; }
+li p { text-indent: 0; }
+table { border-collapse: collapse; width: 100%; margin: 4mm 0; font-size: .82em; line-height: 1.5; break-inside: auto; }
+thead { display: table-header-group; }
+th { background: var(--navy); color: #fff; font-weight: 700; padding: 1.6mm 2mm; text-align: left; border: .4pt solid var(--navy); }
+td { padding: 1.5mm 2mm; border: .4pt solid #d8cfba; vertical-align: top; }
+tr { break-inside: avoid; }
+tbody tr:nth-child(even) td { background: #f7f2e6; }
+hr { border: 0; border-top: .5pt solid #d8cfba; margin: 5mm 20%; }
+.mk { color: #9a7a3a; font-size: .86em; }
+code { font-family: "Noto Sans Mono CJK SC", monospace; font-size: .9em; }
+ol.dh { font-size: .86em; line-height: 1.65; color: #46443e; }
+section.appendix h3 { font-size: 1em; }
+section.cover.back { break-before: page; }
+
+.bt1 { string-set: booktitle "儒家思想体系的六路径大解构"; height: 0; overflow: hidden; }
