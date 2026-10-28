@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-NO, QUOTA, PER_CH, MIN_SIM, SAME_SRC, CROSS_MIN = 504, 24, 3, 0.08, 0.62, 5
+NO, QUOTA, PER_CH, MIN_SIM, SAME_SRC, CROSS_MIN = 504, 24, 3, 0.035, 0.62, 5
 CJK = re.compile(r'[一-鿿]')
 
 ap = argparse.ArgumentParser(); ap.add_argument('--kp', required=True); ap.add_argument('--ms', required=True)
