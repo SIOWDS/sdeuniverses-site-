@@ -1,0 +1,20 @@
+"""第 527 号《子本打造法：从母本到每个人的学术专著》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 527
+SLUG = 'ziben-dazao'
+TITLE = '子本打造法'
+SUBTITLE = '从母本到每个人的学术专著'
+FULL_TITLE = '子本打造法：从母本到每个人的学术专著'
+TITLE_EN = 'Forging the Child Book: From a Mother Book to Each Reader\'s Own Monograph'
+EPIGRAPH = '母本给出判断，子本找回生成判断的 D 与 E'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+CATEGORY = 'core'
+ISBN = '979-8-90690-527-7'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261029a'
+DATE = '2026-10-29'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261029-m527-unit-v1.0'
+SRC = '/home/claude/book'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
