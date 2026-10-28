@@ -42,7 +42,7 @@ def main():
     a = ap.parse_args(); S = a.src
     rd = lambda n: (S / n).read_text()
     allbody = ''.join(rd(f) for f in sorted(p.name for p in S.glob('*.md')))
-    wan = round(han(allbody) / 10000)
+    wan = round(han(allbody + a.back.read_text()) / 10000)
     cp = ['## 出版信息', '| 项 | 内容 |', '|---|---|']
     for k, v in [('书名', '《%s》' % M.FULL_TITLE), ('英文书名', M.TITLE_EN), ('著者', M.AUTHOR),
                  ('执笔', '复合主体：王德生立题、口述承重命题与裁定，Claude 分编执笔、统稿与三审'),
