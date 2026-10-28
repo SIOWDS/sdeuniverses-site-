@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 431 号《走·跑·休：发生的三种步态——普通人都能明白的层级交替律》（王德生著；由第 520 号 publish.py 改来）：
+"""第 431 号《大学的典范革命：从统一性到谱系发生——大学的重生》（王德生著；由第 522 号 publish.py 改来）：
 装进 public/books/m/431/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡；
 并写书号预留档 .publish/volume-reservations/431.json（铁律14：写之前查号、查 ISBN、验校验位）。
 用法（仓库根目录）：python3 tools/book-m431/publish.py --build /home/claude/b431 --content tools/book-m431/content.json --ms tools/book-m431/book.md
@@ -38,15 +38,18 @@ def reserve(site_root, han, chapters):
     if path.exists():
         d = json.loads(path.read_text())
         assert d['title'] == T and d['isbnNormalized'] == nisbn, '预留档不是本书'
+        d.update(status='published', publishedAt=M.DATE, detailUrl=f'https://sdeuniverses.com/books/m/{NO}/',
+                 manuscript={'chapters': chapters, 'bodyHanzi': han, 'state': '已上站'})
+        path.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
         return d
     vols = [int(d.get('volume') or d.get('number')) for d in others if str(d.get('volume') or d.get('number') or '').isdigit()]
     pub = [int(x.name) for x in (site_root / 'public/books/m').iterdir() if x.name.isdigit()]
     d = {'volume': NO, 'title': T, 'subtitle': SUB, 'authors': AUTHORS, 'isbn': ISBN, 'isbnNormalized': nisbn,
          'isbnStatus': 'site-allocated-checksum-valid', 'priceUsd': PRICE_USD, 'status': 'published', 'date': M.DATE,
-         'authorization': '用户（王德生）令：照第 220、302、520 号体例做成阅读、学习包、智能体三位一体出版单元挂到站上；书号 431、ISBN 979-8-90690-436-2 由主会话按站内空号与连号规则计算、经用户认可，定价 US$20.00 由用户给定；署名王德生著，封面不写「王德生指导」。',
+         'authorization': '用户（WDS博士/王德生）令：统稿、三审，书号与 ISBN 从站里计算，按第 220、302 号版式排版，做三位一体出版单元并上站；署名王德生著。',
          'availabilityCheck': {'maxPublishedDirectory': max(pub), 'maxReservedVolume': max(vols), 'volumeAbsent': True,
                                'isbnAbsentInCatalogAndReservations': True, 'checkDigit': int(nisbn[-1]),
-                               'note': '431 号在已上站目录、书目与预留档中均为空号；沿用站内 979-8-90690 号段第 431 位计算并登记，校验位检验不等于登记机关验证。'},
+                               'note': '431 号为 500 以内最小空号；ISBN 中段 436 在书目、详情页、出版单元、预留档与发书工具链中均未出现；校验位检验不等于登记机关验证。'},
          'manuscript': {'chapters': chapters, 'bodyHanzi': han, 'state': '已上站'},
          'publishedAt': M.DATE, 'detailUrl': f'https://sdeuniverses.com/books/m/{NO}/'}
     path.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
@@ -67,7 +70,7 @@ def main():
     assert not any(str(x.get('number')) == str(NO) for x in _cat0), f'catalog 已有 {NO} 号'
     assert not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in _cat0), 'catalog 已有此 ISBN'
     _ms = Path(A.ms).read_text()
-    reserve(SITE.parent, len(re.findall(r'[一-鿿]', _ms)), len(re.findall(r'^## 第 \d+ 章　', _ms, re.M)))
+    reserve(SITE.parent, len(re.findall(r'[一-鿿]', _ms)), len(re.findall(r'^## 第 ?\d+ ?章　', _ms, re.M)))
     (d / 'text').mkdir(parents=True, exist_ok=True)
     shutil.copy(b / f'{SLUG}-print.pdf', d / f'{SLUG}-print.pdf')
     shutil.copy(b / f'{SLUG}-reader.pdf', d / f'{SLUG}-reader.pdf')
@@ -113,7 +116,7 @@ def main():
     assert not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in books), 'ISBN 重号'
     url = f'https://sdeuniverses.com/books/m/{NO}/'
     now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-    entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=AUTHORS, category='core', titleEn=CT['titleEn'],
+    entry = dict(id=f'm-{NO}', number=NO, title=T, subtitle=SUB, authors=AUTHORS, category=M.CATEGORY, titleEn=CT['titleEn'],
                  description=CT['description'],
                  detailUrl=url, readUrl=url + 'read.html', readMode='full', readLabel='友好阅读 · 在线翻页',
                  pdfUrl=url + f'{SLUG}-reader.pdf?v={V}', printPdfUrl=url + f'{SLUG}-print.pdf?v={V}',

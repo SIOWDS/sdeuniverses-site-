@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 431 号《走·跑·休》（由第 520 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
+"""第 431 号《大学的典范革命》（由第 522 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
 在仓库根目录运行：python3 tools/book-m431/register.py
 """
 import datetime
@@ -10,7 +10,7 @@ NO = 431
 C = json.loads(Path('tools/book-m431/content.json').read_text(encoding='utf-8'))
 today = datetime.date.today().isoformat()
 
-kp = {'no': NO, 'title': '走·跑·休', 'built': today,
+kp = {'no': NO, 'title': '大学的典范革命', 'built': today,
       'items': [{'t': x['t'], 'x': x['x'], 'ch': x['ch']} for x in C['keypoints']]}
 p = Path('public/books/m/%d/keypoints.json' % NO)
 p.parent.mkdir(parents=True, exist_ok=True)

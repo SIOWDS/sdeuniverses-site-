@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 431 号《走·跑·休》（由第 520 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m431.json（build_unit_431.py 的配置）。
+"""第 431 号《大学的典范革命》（由第 522 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m431.json（build_unit_431.py 的配置）。
 用法（仓库根目录）：python3 tools/book-m431/gen_config.py tools/book-m431/content.json
 """
 import json, sys
