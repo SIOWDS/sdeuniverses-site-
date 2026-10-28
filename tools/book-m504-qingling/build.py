@@ -24,7 +24,7 @@ SLUG = 'bei-qingling'
 META = dict(
     title='被清零的不是博士', name='被清零的不是博士',
     subtitle='AI时代博士生的困境与出路', author='王德生', no=504,
-    isbn='979-8-90690-504-8', price='US$20.00', version='20261028a',
+    isbn='979-8-90690-504-8', price='US$20.00', version='20261028b',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
