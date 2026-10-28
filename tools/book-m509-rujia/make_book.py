@@ -158,7 +158,7 @@ def front():
 <section class="halftitle"><div class="ht-series">德麦国际专著 · 第 {M["no"]} 号</div>
 <div class="ht-pre">儒家思想体系的</div><div class="ht-title">六路径大解构</div>
 <div class="ht-sub">从1到N的发展之道<br/>到0到1的典范发生之道</div><div class="ht-rule"></div>
-<div class="ht-author">WDS博士　著</div>
+<div class="ht-author">王德生　刘春华　著</div>
 <div class="ht-pub"><b>德麦国际出版社</b><br/><span>Demai International Press</span></div></section>
 <section class="imprint"><h2 class="imh">出　版　信　息</h2><table>{tr}</table><div class="imnotes">{notes}<p class="rights">版权所有　侵权必究</p></div></section>
 <section class="epigraph"><p class="ep">物有本末，事有终始，<br/>知所先后，则近道矣。</p><p class="ep-src">——《大学》</p></section>

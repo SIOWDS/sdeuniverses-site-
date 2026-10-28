@@ -164,7 +164,7 @@ for ch in chapters:
     tasks.append({'lesson': n, 'problemId': f'M{NO}-C{n:02d}', 'part': bian_index[(ch['pi'], ch['bi'])], 'title': L['title'], 'question': L['question'],
                   'checkpoint': L['checkpoint'], 'chapterTitle': ch['full'], 'sourceUrl': url,
                   'sourceData': f'/books/m/{NO}/unit/sources/chapter-{n:02d}.json', 'sourceSha256': sha})
-learning = {'schemaVersion': '1.0', 'book': f'm-{NO}', 'number': NO, 'title': TITLE, 'authors': [AUTHOR], 'sourceEdition': VERSION,
+learning = {'schemaVersion': '1.0', 'book': f'm-{NO}', 'number': NO, 'title': TITLE, 'authors': META['authors'], 'sourceEdition': VERSION,
             'taskVersion': TASKVER, 'parts': BIANS, 'tasks': tasks, 'companionDesign': True, 'realModelTested': False, 'learningEffectTested': False}
 json.dump(learning, open(OUT + '/unit/learning.json', 'w'), ensure_ascii=False, indent=2)
 
@@ -179,7 +179,7 @@ reps = [("B='/books/m/502/'", f"B='/books/m/{NO}/'"), ("n<1||n>32", "n<1||n>66")
         ("'m502-个人学习档案-'", f"'m{NO}-个人学习档案-'"), ("'m502-救援记录-'", f"'m{NO}-救援记录-'"), ("'sde-m502-learning'", f"'sde-m{NO}-learning'")]
 for a, b in reps:
     assert a in app, a; app = app.replace(a, b)
-assert '502' not in app and '快门' not in app and '王德生' not in app, [m.start() for m in re.finditer('502|快门|王德生', app)]
+assert '502' not in app and '快门' not in app, [m.start() for m in re.finditer('502|快门|王德生', app)]
 open(OUT + '/unit/app.js', 'w').write(app)
 core = open(REF + '/unit/core.js').read()
 for a, b in [('Book 502', f'Book {NO}'), ("BOOK='m-502'", f"BOOK='m-{NO}'"), ("NAME='sde-publication-m502-v1'", f"NAME='sde-publication-m{NO}-v1'"), ('e.lesson>32', 'e.lesson>66'), ('d.lesson>32', 'd.lesson>66')]:
@@ -217,7 +217,7 @@ open(OUT + '/agent/index.html', 'w').write(ag)
 kp = json.load(open(B + '/keypoints_src.json'))
 json.dump({'no': NO, 'title': TITLE, 'built': '2026-10-28', 'items': kp}, open(OUT + '/keypoints.json', 'w'), ensure_ascii=False, indent=1)
 pu = json.load(open(REF + '/publication-unit.json'))
-pu.update({'unitId': f'm-{NO}', 'number': NO, 'title': TITLE, 'authors': [AUTHOR], 'isbn': META['isbn'], 'price': META['price'],
+pu.update({'unitId': f'm-{NO}', 'number': NO, 'title': TITLE, 'authors': META['authors'], 'isbn': META['isbn'], 'price': META['price'],
            'sourceEdition': VERSION, 'revision': TASKVER, 'learningTasks': len(tasks), 'parts': len(BIANS), 'agentName': AGENT,
            'localStorage': f'IndexedDB / sde-publication-m{NO}-v1; append-only events; no silent trimming'})
 pu['components'] = [

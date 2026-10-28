@@ -25,7 +25,7 @@ for p in S['parts']:
         if 66 in ns: names = names.replace('第66章 ' + html.escape(b['chs'][-1][0].split('　', 1)[1].split('——')[0]), '第66章 结语：从开花到出新花')
         vols.append(f'<li><b>{html.escape(b["t"])}</b>（第 {ns[0]}—{ns[-1]} 章）<span class="chs">{names}</span></li>')
 vols.append('<li><b>后置</b>　附录一　本书的口径、读法与核查记录 · 附录二　待核引文与判断清单</li>')
-ld = {"@context": "https://schema.org", "@type": "Book", "name": TITLE, "alternateName": META['titleEn'], "author": [{"@type": "Person", "name": AUTHOR}],
+ld = {"@context": "https://schema.org", "@type": "Book", "name": TITLE, "alternateName": META['titleEn'], "author": [{"@type": "Person", "name": x} for x in META["authors"]],
       "inLanguage": "zh-CN", "isbn": META['isbnNormalized'], "publisher": {"@type": "Organization", "name": "德麦国际出版社"}, "url": BASE + '/',
       "image": f"{BASE}/cover.jpg?v={V}", "offers": {"@type": "Offer", "price": "50.00", "priceCurrency": "USD"}}
 page = f'''<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
@@ -82,7 +82,8 @@ page = f'''<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
 <p>本书的判词压成五句，越往后越容易错。末格规律只是位置层的弱假说：按三条纪律重做，独立于批评者的证据里命中不足三家，位置层撤回；“近现代与当代儒学仍在1到N”，若找到一位自觉做出0到1并经回写测试的当代儒者，要改为“大多在1到N”；“发生学儒学是新的一的候选”，是本书的提议，不是结论。各章末都写明“可错条件”，全部推翻条件与自认最弱的八处集中在第 66 章。正文标〔本书读法，待检〕的是本书的新判断；标〔待核〕的引文与史实尚未对照原书核实，汇于附录二。</p>
 <p>书中涉及中医只解构其路径结构，不判疗效、不作用药建议；涉及国家治理、法律与科技只作路径之学的结构解构，不作政策表态；对近现代与当代学者，只就其著作论其观点。</p>
 <h2>作者简介</h2>
-<p><b>WDS博士</b>，德麦国际 SDE 学派学者，长期从事 SDE（显露—差异—纠缠）发生学研究与写作十余年，在王德生博士指导下，以三方程、六路径、三原理解构思想史与现实问题。</p>
+<p><b>王德生</b>（Desheng Wang），博士，SIO 本体论与 SDE 发生学创立者。湘潭大学数学系本科、硕士，中国科学院数学研究所博士，中国科学院计算数学研究所博士后。曾任英国斯旺西大学高级研究员、新加坡南洋理工大学数学系助理教授（博士生导师）与资深研究科学家；在计算数学与图形学国际期刊发表论文 47 篇。现任德麦国际（Demai International Pte. Ltd.，新加坡）创始人、首席执行官，主持 SDE Universes 平台（sdeuniverses.com）。</p>
+<p><b>刘春华</b>，德麦国际 SDE 学派学者，与王德生合著《命运学》《读人》，著有德麦国际专著第 484 号《儒家发展之道总纲》、第 490 号《大学之道解构入门》、第 493 号《儒家七字》。</p>
 <p style="color:var(--dim);font-size:.86rem">成书说明：本书的总体构想、章目与各项取舍经 WDS博士 议定；纵向1到N、横向1到1之说出自第 484 号《儒家发展之道总纲》。六十六章由二十个写作智能体（Claude）并行执笔，再由 Claude 统稿，逐条核查引文与史实（约一千一百处核实撤标），并经审稿、校稿、终审三审定稿。</p>
 <div class="foot">德麦国际出版社 · Demai International Press · Singapore · <a href="/books/">专著书架</a> · <a href="/browse/">返回首页</a></div>
 </div>
