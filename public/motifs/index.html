@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>专著母题 · SDE Universes</title>
+<meta content="德麦国际全部专著的母题卡：一句话母题、核心构念、碰撞接口与边界，供 SDE 二阶碰撞与形式归纳快速出大纲。" name="description"/>
+<link href="https://sdeuniverses.com/motifs/" rel="canonical"/>
+<meta content="专著母题 · SDE Universes" property="og:title"/>
+<meta content="德麦国际全部专著的母题卡：一句话母题、核心构念、碰撞接口与边界，供 SDE 二阶碰撞与形式归纳快速出大纲。" property="og:description"/>
+<style>
+*{box-sizing:border-box}
+:root{--paper:#F4EEE1;--paper2:#EAE0C8;--ink:#272116;--muted:#73664F;--acc:#7A3E1D;--acc2:#5A2B12;--line:rgba(122,62,29,.22);--card:#FBF7EE}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Noto Serif SC','Songti SC',Georgia,serif;line-height:1.85}
+.zh-only,.en-only{}body.zh .en-only,body.en .zh-only{display:none}
+a{color:var(--acc)}
+header{position:sticky;top:0;z-index:10;background:rgba(244,238,225,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{max-width:1160px;margin:auto;padding:.75rem 16px;display:flex;align-items:center;gap:1.1rem;flex-wrap:wrap}
+.brand{margin-right:auto;color:var(--acc2);text-decoration:none;font-weight:600;letter-spacing:.08em}
+.nav>a:not(.brand){color:var(--muted);text-decoration:none;font-size:.88rem}.nav>a:hover{color:var(--acc)}
+.hero{padding:clamp(3rem,8vw,6rem) 16px clamp(2rem,5vw,3.5rem);border-bottom:1px solid var(--line);background:radial-gradient(circle at 85% 20%,rgba(122,62,29,.10),transparent 32%),linear-gradient(135deg,var(--paper),var(--paper2))}
+.wrap{max-width:1060px;margin:auto}
+.eyebrow{font-size:.72rem;letter-spacing:.32em;color:var(--acc);margin:0 0 .9rem}
+h1{margin:0;font-size:clamp(2.4rem,7vw,4.6rem);font-weight:600;letter-spacing:.08em;line-height:1.15}
+.lead{max-width:44em;color:var(--muted);font-size:clamp(.98rem,2.1vw,1.12rem);margin:1.2rem 0 0}
+.stats{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.4rem}
+.stats span{border:1px solid var(--line);background:rgba(255,255,255,.4);padding:.2rem .7rem;border-radius:999px;font-size:.85rem;color:var(--muted)}
+.tools{position:sticky;top:52px;z-index:5;background:var(--paper);border-bottom:1px solid var(--line);padding:.8rem 16px}
+.tools .wrap{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+.tools input{flex:1 1 260px;min-width:0;padding:.55rem .8rem;border:1px solid var(--line);border-radius:4px;background:var(--card);font:inherit;color:var(--ink)}
+.tools select{padding:.5rem .6rem;border:1px solid var(--line);border-radius:4px;background:var(--card);font:inherit;color:var(--ink);max-width:100%}
+.count{font-size:.85rem;color:var(--muted)}
+.list{padding:1.4rem 16px 4rem}
+.row{display:grid;grid-template-columns:4.2rem 1fr;gap:.2rem 1rem;padding:1rem 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+.row:hover .t{color:var(--acc)}
+.no{font-size:.82rem;color:var(--muted);padding-top:.25rem}
+.t{font-weight:600;font-size:1.06rem}
+.au{font-weight:400;font-size:.84rem;color:var(--muted);margin-left:.5rem}
+.mo{grid-column:2;color:var(--ink);font-size:.95rem}
+.tags{grid-column:2;display:flex;flex-wrap:wrap;gap:.35rem}
+.tags i{font-style:normal;font-size:.74rem;color:var(--acc);border:1px solid var(--line);border-radius:3px;padding:0 .4rem}
+.row.pending .mo{color:var(--muted)}
+article{max-width:780px;margin:auto;padding:2.2rem 16px 4rem}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:.25rem 1rem;font-size:.92rem;margin:1.4rem 0;padding:1rem 1.2rem;background:var(--card);border:1px solid var(--line);border-radius:4px}
+.meta dt{color:var(--muted)}.meta dd{margin:0}
+.motif{font-size:clamp(1.12rem,2.6vw,1.32rem);font-weight:600;line-height:1.7;border-left:4px solid var(--acc);padding:.3rem 0 .3rem 1rem;margin:1.6rem 0}
+article h2{font-size:1.18rem;margin:2.2rem 0 .6rem;color:var(--acc2)}
+article p{margin:.6rem 0}
+article ul{padding-left:1.2rem}article li{margin:.35rem 0}article li.sub{margin-left:1.2rem;list-style:circle}
+.pager{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--line);font-size:.92rem}
+.links{display:flex;flex-wrap:wrap;gap:.8rem;font-size:.9rem;margin-top:.4rem}
+footer{border-top:1px solid var(--line);padding:1.6rem 16px;text-align:center;color:var(--muted);font-size:.85rem}
+footer a{color:var(--muted)}
+@media (max-width:560px){.row{grid-template-columns:3.2rem 1fr}.tools{top:0;position:relative}}
+</style>
+</head>
+<body class="zh">
+<header>
+<nav aria-label="主导航" class="nav">
+<a class="brand" href="/browse/">SDE Universes · 爱思乐园</a>
+<a href="/browse/">首页</a>
+<a href="/motifs/">专著母题</a>
+<a href="/books/">专著书架</a>
+<a href="/directory/">栏目总目录</a>
+<a href="/search/">搜索</a>
+</nav>
+</header>
+<main>
+<section class="hero"><div class="wrap">
+<p class="eyebrow">MONOGRAPH MOTIFS · SDE UNIVERSES</p>
+<h1>专著母题</h1>
+<p class="lead">德麦国际每一部专著，压成一张约两千字的母题卡：一句话母题、它推翻的默认看法、母题怎样立起来、核心构念、全书骨架、关键案例、碰撞接口、边界。做 SDE 二阶碰撞或形式逻辑归纳时，先在这里选书、抽命题，就能很快出大纲，不必先通读全书。</p>
+<div class="stats"><span>母题卡 126 张</span><span>专著 510 部</span><span>What 62</span><span>How 19</span><span>Why 45</span><span>更新 2026-10-29</span></div>
+<div class="links"><a href="/motifs/motifs.json">机读总表 motifs.json</a><a href="/motifs/all.md">全部母题卡合订 all.md</a></div>
+</div></section>
+<section class="tools"><div class="wrap">
+<input id="q" type="search" placeholder="搜书名、作者、母题、构念…" aria-label="搜索母题"/>
+<select id="fc" aria-label="分类"><option value="">全部分类</option><option value="哲学与SDE">哲学与SDE</option><option value="教育与学习">教育与学习</option><option value="人工智能">人工智能</option><option value="健康与心理">健康与心理</option><option value="语言与写作">语言与写作</option><option value="文明与社会">文明与社会</option><option value="商业与管理">商业与管理</option><option value="数学与科学">数学与科学</option><option value="艺术与创造">艺术与创造</option><option value="小说与文学">小说与文学</option></select>
+<select id="fq" aria-label="题型"><option value="">全部题型</option><option>What</option><option>How</option><option>Why</option></select>
+<span class="count" id="cnt"></span>
+</div></section>
+<section class="list"><div class="wrap" id="list">
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第527号</span><span class="t">《子本打造法》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第524号</span><span class="t">《如何产生解决个性化问题的知识？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第523号</span><span class="t">《陈晓艳谈「懂」》<span class="au">陈晓艳</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第522号</span><span class="t">《走·跑·休》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第521号</span><span class="t">《累：改变不出来的发生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第520号</span><span class="t">《欠：走了两步的发生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第519号</span><span class="t">《一张全绿的体检单：刻痕、标准与日子为什么总对不上》<span class="au">胡敏著，王德生指导</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第518号</span><span class="t">《陪伴发生学》<span class="au">麦子著，王德生指导</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第516号</span><span class="t">《比的账本》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第514号</span><span class="t">《累的发生学》<span class="au">付自文</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第513号</span><span class="t">《SDE九宫格透镜问题分析法》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第512号</span><span class="t">《班级之美》<span class="au">柴翱、刘华杰</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第509号</span><span class="t">《儒家思想体系的六路径大解构》<span class="au">王德生、刘春华</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第508号</span><span class="t">《何谓公平？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第507号</span><span class="t">《在家还是在校？》<span class="au">王德生、麦子 著</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第506号</span><span class="t">《土·石·煤》<span class="au">柴翱著，王德生指导</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第505号</span><span class="t">《知识分子向何处去？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第504号</span><span class="t">《被清零的不是博士》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第503号</span><span class="t">《爱的箴言新解》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第502号</span><span class="t">《个人知识发生平台的数据基因》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第501号</span><span class="t">《道德经SDE新解》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第499号</span><span class="t">《走样》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="数学与科学" data-q=""><span class="no">第498号</span><span class="t">《借来的常数》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第497号</span><span class="t">《释经学的典范革命》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第496号</span><span class="t">《化冲突》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第495号</span><span class="t">《为何CPI失灵了？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第494号</span><span class="t">《矛盾在哪里结算》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第493号</span><span class="t">《儒家七字》<span class="au">刘春华</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第492号</span><span class="t">《一店三门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第491号</span><span class="t">《SDE平台：慧店的诞生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第490号</span><span class="t">《大学之道解构入门》<span class="au">刘春华</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第489号</span><span class="t">《学习如何发生：SDE 三方程的教育思考与实践（阳涌子本）》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第488号</span><span class="t">《一口气是怎样发生的》<span class="au">李秋金</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第486号</span><span class="t">《浑沌的七窍》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第485号</span><span class="t">《此发生不是彼发生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第484号</span><span class="t">《儒家发展之道总纲》<span class="au">刘春华</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第482号</span><span class="t">《风水发生学》<span class="au">邬燕琴</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第480号</span><span class="t">《感》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第478号</span><span class="t">《癌是怎样发生的？》<span class="au">李秋金</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第477号</span><span class="t">《发现的发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第475号</span><span class="t">《发生学的发生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第473号</span><span class="t">《还清了钱，没还清位置》<span class="au">秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第472号</span><span class="t">《书：洪流结出的粒子》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第471号</span><span class="t">《舍不得》<span class="au">高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第470号</span><span class="t">《愧》<span class="au">秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第469号</span><span class="t">《朋友发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第467号</span><span class="t">《忍：被更重要的意义盖住的改变》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第466号</span><span class="t">《普通人都能明白的「认」》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第465号</span><span class="t">《答案住在哪里》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第462号</span><span class="t">《傲慢发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/461/" data-c="哲学与SDE" data-q="Why"><span class="no">第461号</span><span class="t">《笃信的类比》<span class="au">王德生</span></span><span class="mo">羡慕、懊悔、嫉妒等十种心理不是十样东西，而是同一张未兑现的「笃信的类比」期票，在自我界的十种记账。</span><span class="tags"><i>Why</i><i>心理·情感</i><i>哲学与SDE</i></span></a>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第460号</span><span class="t">《虚幻的焦虑：AI 与我的文明》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第459号</span><span class="t">《病人不是一张化验单：检验单、指南与身体为什么总对不上》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第458号</span><span class="t">《科学共同体的退位和出版典范转移》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第457号</span><span class="t">《AI对科研的冲击为何首先表现在数学上？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第456号</span><span class="t">《慌：心之荒》<span class="au">秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第455号</span><span class="t">《晕痛苦》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第454号</span><span class="t">《回：第三笔回来，前两笔就不是原样了》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第453号</span><span class="t">《爱在创造中成全》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第452号</span><span class="t">《谁在给善记账》<span class="au">刘华杰</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第451号</span><span class="t">《发生的时差》<span class="au">王德生著，WDS博士立题与裁定</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第450号</span><span class="t">《为什么人人都想重开？》<span class="au">阳涌</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第449号</span><span class="t">《三只手》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第448号</span><span class="t">《何谓生理适应？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第447号</span><span class="t">《国家发生学导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第446号</span><span class="t">《法律是谁？》<span class="au">高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第445号</span><span class="t">《家庭保险管理发生学》<span class="au">李辰</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第444号</span><span class="t">《业力是什么》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第443号</span><span class="t">《惯》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第442号</span><span class="t">《懂的发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="数学与科学" data-q=""><span class="no">第441号</span><span class="t">《光伏有辐射吗？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第440号</span><span class="t">《家国不分》<span class="au">高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第439号</span><span class="t">《未来的知识经济主流产业：从母本到「我的……」》<span class="au">王德生著</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第438号</span><span class="t">《大模型是索绪尔的网、皮尔斯的链：符号在对话中才发生》<span class="au">胡志英</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第436号</span><span class="t">《好老师为什么做不动》<span class="au">刘华杰</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第435号</span><span class="t">《一间教室，六扇门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第434号</span><span class="t">《从 The Book 到 Our/My Book》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第433号</span><span class="t">《情绪价值发生学》<span class="au">秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第432号</span><span class="t">《健康的三个本来》<span class="au">王德生、胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第431号</span><span class="t">《大学的典范革命》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第430号</span><span class="t">《猪周期为何不周了？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第429号</span><span class="t">《急不是快：SDE方法论的简阉》<span class="au">王德生、邬燕琴著</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第428号</span><span class="t">《这把不算》<span class="au">柴翱著，王德生指导</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第427号</span><span class="t">《范畴的SDE解构入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第426号</span><span class="t">《读人》<span class="au">王德生、刘春华</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第425号</span><span class="t">《器官发生学导论》<span class="au">王德生、胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第424号</span><span class="t">《三律医学入门》<span class="au">王德生、秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第423号</span><span class="t">《该来的》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第422号</span><span class="t">《发生的身体》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第421号</span><span class="t">《光的科学之外》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="语言与写作" data-q=""><span class="no">第420号</span><span class="t">《一句话是怎么活起来的》<span class="au">麦子著，王德生指导</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第419号</span><span class="t">《这次谁去》<span class="au">刘春华著，指导老师王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第418号</span><span class="t">《用进身上的品牌》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第417号</span><span class="t">《婴儿符号发生学》<span class="au">秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第416号</span><span class="t">《收口》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第415号</span><span class="t">《钱是三界同时立住的符号：钱为什么会突然不值钱》<span class="au">高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第414号</span><span class="t">《SDE智能体到底能做什么？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第413号</span><span class="t">《点赞是借来的连接度：社交媒体时代，青少年的心为什么这么累》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第412号</span><span class="t">《谣言是没对过账的结晶》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第411号</span><span class="t">《车开出农场之后》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第410号</span><span class="t">《万物皆刻痕：从符号学到发生本体论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第409号</span><span class="t">《教育的产品是结晶》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第408号</span><span class="t">《熔不开的粒子：心的符号学》<span class="au">陈晓艳</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第407号</span><span class="t">《被刻进世界的公式》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第406号</span><span class="t">《易：符号的变化，不是符号的发生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第405号</span><span class="t">《SDE符号学：超越皮尔斯的三元与索绪尔的二元》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第404号</span><span class="t">《AI时代专著的价值典范转移》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="艺术与创造" data-q=""><span class="no">第403号</span><span class="t">《逻辑发生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第402号</span><span class="t">《新文明诞生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第401号</span><span class="t">《新文明的诞生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第400号</span><span class="t">《AI时代教育的新典范：从因材施教到我材发生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第399号</span><span class="t">《材从哪里来》<span class="au">石奇志</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第398号</span><span class="t">《AI时代的判断力发生学导论》<span class="au">王德生、张琼</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第397号</span><span class="t">《创造力在谁身上》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第396号</span><span class="t">《属性纠缠论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第395号</span><span class="t">《SDE思想体系入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="数学与科学" data-q=""><span class="no">第394号</span><span class="t">《一次闪光是谁的？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第393号</span><span class="t">《AI时代创造力必须的基础知识》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第392号</span><span class="t">《SDE ⊗ AI》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第391号</span><span class="t">《价值是谁创造的？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第390号</span><span class="t">《心在哪里？》<span class="au">秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第389号</span><span class="t">《病在哪里？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第388号</span><span class="t">《三缺一的身体》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="艺术与创造" data-q=""><span class="no">第387号</span><span class="t">《好听是谁的？》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第386号</span><span class="t">《隐私保护与“我”的诞生》<span class="au">王德生、李佳城</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="数学与科学" data-q=""><span class="no">第385号</span><span class="t">《生命是谁的作品？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="小说与文学" data-q=""><span class="no">第384号</span><span class="t">《谁在写？》<span class="au">秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第383号</span><span class="t">《身体在替谁运转？》<span class="au">李秋金</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第382号</span><span class="t">《中医是不是科学？》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第381号</span><span class="t">《SDE秩序发生学导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="语言与写作" data-q=""><span class="no">第380号</span><span class="t">《SDE语义多元发生学导论》<span class="au">王德生、胡志英</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第379号</span><span class="t">《属性纠缠与科研新典范》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第378号</span><span class="t">《内驱力的虚幻》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="数学与科学" data-q=""><span class="no">第377号</span><span class="t">《天文学思想史》<span class="au">阳涌</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="数学与科学" data-q=""><span class="no">第376号</span><span class="t">《物理学思想简史》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="数学与科学" data-q=""><span class="no">第375号</span><span class="t">《地球科学思想简史》<span class="au">高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="数学与科学" data-q=""><span class="no">第374号</span><span class="t">《化学思想史》<span class="au">胡志英</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="数学与科学" data-q=""><span class="no">第373号</span><span class="t">《生物学思想史》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第372号</span><span class="t">《社会学学派解构入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="语言与写作" data-q=""><span class="no">第371号</span><span class="t">《从派克教授的语言学到SDE语言学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第370号</span><span class="t">《人类学学派解构入门》<span class="au">王德生、高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第369号</span><span class="t">《典范发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第368号</span><span class="t">《关系发生学导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第367号</span><span class="t">《从马力到 Token》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第366号</span><span class="t">《思考是谁的？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="小说与文学" data-q=""><span class="no">第365号</span><span class="t">《作者死了吗？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第364号</span><span class="t">《AI赋能了谁？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第363号</span><span class="t">《中国 AI for Science 的困境》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第362号</span><span class="t">《传播学学派解构入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第361号</span><span class="t">《语言学学派解构入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第360号</span><span class="t">《政治学学派解构入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第359号</span><span class="t">《风动，幡动，还是心动？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第358号</span><span class="t">《马克思不用资本论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第357号</span><span class="t">《分割之错》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第356号</span><span class="t">《管理学学派解构入门》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第355号</span><span class="t">《AI时代的新教育》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第354号</span><span class="t">《心的发生学导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第353号</span><span class="t">《教育学学派解构入门》<span class="au">阳涌</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第352号</span><span class="t">《学习兴趣发生学导论》<span class="au">阳涌、胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第351号</span><span class="t">《AI时代大学毕业生的核心竞争力》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第350号</span><span class="t">《SDE 0-3岁婴儿教育发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第349号</span><span class="t">《婴儿：SDE活体发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第348号</span><span class="t">《What If？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第347号</span><span class="t">《我的面条》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第346号</span><span class="t">《人与 AI 一起发生新数学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第345号</span><span class="t">《SDE个性化教育新产业经济学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第344号</span><span class="t">《意义数学的诞生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第343号</span><span class="t">《卡路：AI时代职业教育的困境和出路》<span class="au">王德生、崔岩</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第342号</span><span class="t">《科学发生的结构》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第341号</span><span class="t">《AI时代的职教教材典范转移》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第340号</span><span class="t">《一的传心网络》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第339号</span><span class="t">《职场风云》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第338号</span><span class="t">《万灯》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第337号</span><span class="t">《知识的谱系发生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第336号</span><span class="t">《胜算》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第335号</span><span class="t">《可以出错的工位》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第334号</span><span class="t">《AI时代中国职业教育的困境和出路》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第333号</span><span class="t">《GPT时代的大学革命》<span class="au">王德生、胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="艺术与创造" data-q=""><span class="no">第332号</span><span class="t">《音乐之美》<span class="au">王德生、胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第331号</span><span class="t">《夫子之道》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第330号</span><span class="t">《AGI为何永远不可能》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第329号</span><span class="t">《技术的“我”》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第328号</span><span class="t">《美国职业教育特色的 SDE 解构》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第327号</span><span class="t">《补维史》<span class="au">王德生、邬燕琴</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第326号</span><span class="t">《“我要”之前没有我：欲望发生学与弗洛伊德学派的解构》<span class="au">王德生、李佳城</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第325号</span><span class="t">《单位犯罪的经济分析》<span class="au">高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第324号</span><span class="t">《SDE教育发生学导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第323号</span><span class="t">《意识，潜意识与无意识：普通人都能读懂的》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第322号</span><span class="t">《AI时代的商场风云与SDE智慧应对》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第321号</span><span class="t">《社会科学学派的SDE解构与思想创新》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第320号</span><span class="t">《法学学派解构入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第319号</span><span class="t">《经济学学派解构入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第318号</span><span class="t">《何谓大与小，宏观与微观？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第317号</span><span class="t">《未定之胜》<span class="au">石奇志、王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第316号</span><span class="t">《主体间性的发生学入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第315号</span><span class="t">《史记未完局》<span class="au">王帅</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第314号</span><span class="t">《一的总装线》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第313号</span><span class="t">《一的宪章》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第312号</span><span class="t">《一的原材料库》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第311号</span><span class="t">《道德经的缝隙与填补：普通人都能懂》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="语言与写作" data-q=""><span class="no">第310号</span><span class="t">《SDE 语言发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第309号</span><span class="t">《躺平的SDE解构》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第308号</span><span class="t">《轻重之间》<span class="au">王帅</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第307号</span><span class="t">《还是它吗？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第306号</span><span class="t">《心理学的典范革命》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第305号</span><span class="t">《AI时代信任的困境和出路》<span class="au">石奇志</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第304号</span><span class="t">《接纳就能解决问题吗？——SDE 揭开接纳主义隐藏的雷》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第303号</span><span class="t">《AI时代品味的困境和出路》<span class="au">许佳衡（Judy）</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第302号</span><span class="t">《AI时代死亡的困境和出路》<span class="au">陈凤</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第301号</span><span class="t">《我是道路、真理、生命》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第300号</span><span class="t">《圣经中女子智慧的缝隙和补缺》<span class="au">李佳城</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第299号</span><span class="t">《宗教信仰何以发生？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第298号</span><span class="t">《AI时代社区的困境和出路》<span class="au">付自文</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第297号</span><span class="t">《道德经SDE解构导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第296号</span><span class="t">《出版是知识发生的开始》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第295号</span><span class="t">《虚无不是终点》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第294号</span><span class="t">《西方哲学SDE发生树》<span class="au">秦莉、王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第293号</span><span class="t">《如何读懂一个大师？普通人都能掌握的方法》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第292号</span><span class="t">《发生哲学中的同路人》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第291号</span><span class="t">《实非实》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第290号</span><span class="t">《普通人都能懂的老子》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第289号</span><span class="t">《AI时代教育对象的重生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第288号</span><span class="t">《陈凤讲波伏娃：普通人都能懂》<span class="au">陈凤</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="语言与写作" data-q=""><span class="no">第287号</span><span class="t">《开口即纠缠》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第286号</span><span class="t">《主义都是小偷？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第285号</span><span class="t">《普通人都能懂的教育哲学导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第284号</span><span class="t">《普通人都能明白的阿伦特》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第283号</span><span class="t">《风雅颂发生学》<span class="au">秦莉、王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第282号</span><span class="t">《情商的本体论革命》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第281号</span><span class="t">《AI时代思考的困境与出路》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第280号</span><span class="t">《路加·约翰·使徒行传》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第279号</span><span class="t">《咖啡馆里的铁三角：存在与破裂》<span class="au">秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第278号</span><span class="t">《AI越强，人就越弱吗？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第277号</span><span class="t">《人性发生学导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="小说与文学" data-q=""><span class="no">第276号</span><span class="t">《文学的发生学典范转向》<span class="au">王德生、秦莉</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第275号</span><span class="t">《马克思的图纸从哪里来？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第274号</span><span class="t">《逍遥是怎样长出来的》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第273号</span><span class="t">《与神同乐同哭》<span class="au">燕群、王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第272号</span><span class="t">《SDE软件学和财富密码解开》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第271号</span><span class="t">《耶稣之善》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第270号</span><span class="t">《敌人发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第269号</span><span class="t">《我要努力：虚妄的呼喊》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第268号</span><span class="t">《人-AI 如何走向复合体的精益求精？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第267号</span><span class="t">《预案科学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第266号</span><span class="t">《何谓AI的训练与学习？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第265号</span><span class="t">《出版的发现到发生的典范转移》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="小说与文学" data-q=""><span class="no">第264号</span><span class="t">《两次签字》<span class="au">斐索（秦莉）</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第263号</span><span class="t">《教育的新使命》<span class="au">王德生、付自文、胡志英、李佳城</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="小说与文学" data-q=""><span class="no">第262号</span><span class="t">《裂隙》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第261号</span><span class="t">《SDE本体论入门：世界是如何发生的》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第260号</span><span class="t">《西方哲学2500年：发生对发现的否定序列》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第259号</span><span class="t">《谈尼采视角主义的错误》<span class="au">王德生、李昕</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="小说与文学" data-q=""><span class="no">第258号</span><span class="t">《狮城荣耀》<span class="au">斐索（秦莉）</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第257号</span><span class="t">《与 AI 一起成长》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第256号</span><span class="t">《佛法的SDE解构导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第255号</span><span class="t">《SDE价值发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第254号</span><span class="t">《SDE国富论入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第253号</span><span class="t">《普通人都能懂的朱熹》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第252号</span><span class="t">《胡敏讲维果茨基：普通人能懂的》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第251号</span><span class="t">《教人别靠字的人》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第250号</span><span class="t">《普通人都能读懂的华生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第249号</span><span class="t">《普通人都能明白的雅斯贝尔斯》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第248号</span><span class="t">《普通人都能读懂的桑代克》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第247号</span><span class="t">《张琼讲卢梭的自由与枷锁：普通人都能读懂》<span class="au">张琼</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第246号</span><span class="t">《教人超脱的守门人》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第245号</span><span class="t">《何谓中华，中国，中庸？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="艺术与创造" data-q=""><span class="no">第244号</span><span class="t">《SDE艺术论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第243号</span><span class="t">《幸福的奥秘》<span class="au">王德生、陈晓艳</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第242号</span><span class="t">《SDE好奇发生学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第241号</span><span class="t">《我和我们》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第240号</span><span class="t">《从因材施教到超材创造》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="艺术与创造" data-q=""><span class="no">第239号</span><span class="t">《幽默与原创人生》<span class="au">王德生、阎玉平</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第238号</span><span class="t">《特征律》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第237号</span><span class="t">《命运学》<span class="au">王德生、刘春华</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="艺术与创造" data-q=""><span class="no">第236号</span><span class="t">《从六步到九步》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第235号</span><span class="t">《教人动手的书生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第234号</span><span class="t">《普通人都能读懂的王阳明》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第233号</span><span class="t">《陈晓艳讲孔子的教育智慧：普通人都能读懂》<span class="au">陈晓艳</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="小说与文学" data-q=""><span class="no">第232号</span><span class="t">《SDE红学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第231号</span><span class="t">《科学是什么？》<span class="au">王德生、牟军</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第230号</span><span class="t">《三视角发生学导论》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第229号</span><span class="t">《胜利发生学》<span class="au">王德生、邹军令</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第228号</span><span class="t">《论语的缝隙与补缺》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第227号</span><span class="t">《人生的智慧源头》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第226号</span><span class="t">《超越波普尔》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="语言与写作" data-q=""><span class="no">第225号</span><span class="t">《SDE 语义发生三原理》<span class="au">王德生、胡志英</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第224号</span><span class="t">《我经济》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第223号</span><span class="t">《礼之前》<span class="au">王帅</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="艺术与创造" data-q=""><span class="no">第222号</span><span class="t">《戏剧发生学》<span class="au">王德生、秦莉、黄倩盈</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第221号</span><span class="t">《邬燕琴讲陶行知：普通人都能懂》<span class="au">邬燕琴</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第220号</span><span class="t">《我的三个宝贝》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第219号</span><span class="t">《哈特与富勒：普通人都能明白的一场法律论战》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第218号</span><span class="t">《被折叠的课堂》<span class="au">胡志英</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第217号</span><span class="t">《价值发生论》<span class="au">王德生、付自文</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第216号</span><span class="t">《普通人都能懂的荀子》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第215号</span><span class="t">《普通人都能懂的孟子》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第214号</span><span class="t">《再讲德鲁克》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第213号</span><span class="t">《剧本杀的发现和发生学》<span class="au">王德生、黄倩盈</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第212号</span><span class="t">《三视角方法论与实践应用》<span class="au">王德生、牟军</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第211号</span><span class="t">《321智慧》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第210号</span><span class="t">《高鹏讲贝卡利亚：普通人都能懂》<span class="au">高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第209号</span><span class="t">《三视角入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第208号</span><span class="t">《陈晓艳讲海德格尔：普通人也能明白》<span class="au">陈晓艳</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第207号</span><span class="t">《普通人都能读懂的德鲁克》<span class="au">王德生、邬燕琴</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第206号</span><span class="t">《普通人都能明白的夸美纽斯》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第205号</span><span class="t">《上帝掷不掷骰子？》<span class="au">王德生、阳涌</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第204号</span><span class="t">《普通人都能明白的齐泽克》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第203号</span><span class="t">《普通人都能明白的布兰顿》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第202号</span><span class="t">《普通人都能懂的詹姆斯》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第201号</span><span class="t">《普通人都能懂的拉康》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第200号</span><span class="t">《第三声喊：理念界的我》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第199号</span><span class="t">《普通人都能明白的阿甘本》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第198号</span><span class="t">《知识经济的诞生》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第197号</span><span class="t">《普通人都能读懂的贝克莱》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第196号</span><span class="t">《普通人都能明白的巴迪欧》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第195号</span><span class="t">《AI 时代为何发生学哲学必须成为每个人的主科》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第194号</span><span class="t">《意识的奥秘：SDE解构》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第193号</span><span class="t">《普通人都能明白的荣格》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第192号</span><span class="t">《AI 时代最需要学习的是什么？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第191号</span><span class="t">《何谓物》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第190号</span><span class="t">《普通人都能懂的小林宗作》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第189号</span><span class="t">《普通人都能明白的斯宾诺莎》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第188号</span><span class="t">《普通人都能懂的奥古斯丁》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第187号</span><span class="t">《普通人都能明白的弗莱雷》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第186号</span><span class="t">《秋金讲费尔巴哈：普通人都能懂》<span class="au">李秋金</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第185号</span><span class="t">《普通人都能懂的福柯》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第184号</span><span class="t">《高鹏讲加缪：普通人都能懂》<span class="au">高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第183号</span><span class="t">《胡志英讲乔姆斯基：普通人都能懂》<span class="au">胡志英</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第182号</span><span class="t">《普通人都能明白的波普尔》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第181号</span><span class="t">《普通人都能懂的弗洛伊德》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第180号</span><span class="t">《高鹏讲杜威：普通人都能懂》<span class="au">高鹏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第179号</span><span class="t">《为何他们会吵架？》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第178号</span><span class="t">《普通人都能明白的罗蒂》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第177号</span><span class="t">《普通人都能懂的海德格尔》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第176号</span><span class="t">《普通人都能明白的苏霍姆林斯基》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第175号</span><span class="t">《普通人都能明白的齐克果》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第174号</span><span class="t">《普通人都能懂的阿奎那》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第173号</span><span class="t">《普通人都能明白的帕斯卡》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第172号</span><span class="t">《普通人都能懂的哈贝马斯》<span class="au">王德生、黄倩盈</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第171号</span><span class="t">《胡敏讲莱布尼兹：普通人都能懂》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第170号</span><span class="t">《葡萄讲杜威的教育哲学：普通人都能懂》<span class="au">石奇志</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第169号</span><span class="t">《普通人都能明白的尼采》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第168号</span><span class="t">《与AI一起进行思想创新》<span class="au">王德生、邬燕琴</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第167号</span><span class="t">《普通人都能懂的奎因》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第166号</span><span class="t">《生活在缝隙和悖论中的大师》<span class="au">王德生、林凡昊</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第165号</span><span class="t">《普通人都能明白的罗素》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第164号</span><span class="t">《普通人都能明白的蒙台梭利》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="文明与社会" data-q=""><span class="no">第163号</span><span class="t">《人类文明史》<span class="au">王德生、杨彼得</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第162号</span><span class="t">《普通人都能明白的皮亚杰》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第161号</span><span class="t">《胡敏讲哈贝马斯：普通人能读懂的》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第160号</span><span class="t">《胡敏讲叔本华：普通人都能懂》<span class="au">胡敏</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第159号</span><span class="t">《普通人都能明白的韩炳哲》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第158号</span><span class="t">《普通人都懂的逻辑学》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第157号</span><span class="t">《哲学的使命是什么？》<span class="au">王德生、王涛</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第156号</span><span class="t">《主体发生学的开启》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/155/" data-c="哲学与SDE" data-q="Why"><span class="no">第155号</span><span class="t">《普通人都能明白的卢梭》<span class="au">王德生</span></span><span class="mo">卢梭比谁都先看见土在写人，却把土整片揭掉，让人站在无土之处，等不得，也不许被写。</span><span class="tags"><i>Why</i><i>哲学·教育</i><i>哲学与SDE</i></span></a>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第154号</span><span class="t">《普通人都能明白的梅洛-庞蒂》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第153号</span><span class="t">《普通人都能懂的萨特》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第152号</span><span class="t">《普通人都能懂的叔本华》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="语言与写作" data-q=""><span class="no">第151号</span><span class="t">《翻译信达雅三大原理》<span class="au">宋欣雄、王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第150号</span><span class="t">《普通人都能懂的康德》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第149号</span><span class="t">《普通人都能懂的胡塞尔》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第148号</span><span class="t">《普通人都能懂的洛克》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/147/" data-c="哲学与SDE" data-q="What"><span class="no">第147号</span><span class="t">《胡敏讲罗尔斯：普通人都能懂》<span class="au">胡敏</span></span><span class="mo">罗尔斯没有只讲自由，他把创造、自由、幸福三只脚锯成一根自由的柱子，再在理念、现实、自我三块地上各插一次。</span><span class="tags"><i>What</i><i>政治哲学·正义</i><i>哲学与SDE</i></span></a>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第146号</span><span class="t">《普通人都能懂的霍布斯》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第145号</span><span class="t">《普通人都能明白的柏格森》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第144号</span><span class="t">《普通人都能懂的休谟》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第143号</span><span class="t">《普通人都能懂的马克思》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第142号</span><span class="t">《普通人都能明白的塞尔》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第141号</span><span class="t">《普通人都能明白的弗雷格》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第140号</span><span class="t">《普通人都能懂的莱布尼兹》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/139/" data-c="哲学与SDE" data-q="Why"><span class="no">第139号</span><span class="t">《普通人都能懂的笛卡尔——一个人、一句「我思」，与 SDE 的解构》<span class="au">王德生</span></span><span class="mo">怀疑是一场发生，「我思」却被做成了发现；方法本是路，却被当成地基；坐标本是土，却只被看成点。</span><span class="tags"><i>Why</i><i>哲学·近代哲学·SDE解构</i><i>哲学与SDE</i></span></a>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第138号</span><span class="t">《普通人都能懂的柏拉图》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第137号</span><span class="t">《普通人都能懂的怀特海》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第136号</span><span class="t">《普通人都能懂的黑格尔》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第135号</span><span class="t">《苏格拉底和之前的那些人——普通人都能懂的哲学开端》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第134号</span><span class="t">《普通人都能懂的德里达》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第133号</span><span class="t">《普通人都能懂的皮尔斯》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第132号</span><span class="t">《亲近母亲》<span class="au">刘春华</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/131/" data-c="健康与心理" data-q="What"><span class="no">第131号</span><span class="t">《AI时代医生的困境和出路》<span class="au">王德生</span></span><span class="mo">机器夺走的只是医生「我先看出来」的位置；诊断从来是做出来的判定，诊断权在认账的人手上，不在看的人手上。</span><span class="tags"><i>What</i><i>医学·诊断权</i><i>健康与心理</i></span></a>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第130号</span><span class="t">《慧眼之死》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/129/" data-c="商业与管理" data-q="How"><span class="no">第129号</span><span class="t">《让每个人都有自己的思想和知识工厂》<span class="au">王德生</span></span><span class="mo">卖的不是知识而是一座能重复出货的工厂：知识价格已进地板，值钱的是写明何时会错、错了算他的那个人。</span><span class="tags"><i>How</i><i>商业·知识生意</i><i>商业与管理</i></span></a>
+<a class="row" href="/motifs/128/" data-c="商业与管理" data-q="How"><span class="no">第128号</span><span class="t">《上市公司会计造假的SDE神探》<span class="au">王德生</span></span><span class="mo">造假的人能改一个数字，改不动一张网：假数字总有一根与来路、邻居接不上的线，识破就是去找这根线。</span><span class="tags"><i>How</i><i>会计·财务造假</i><i>商业与管理</i></span></a>
+<a class="row" href="/motifs/127/" data-c="哲学与SDE" data-q="Why"><span class="no">第127号</span><span class="t">《AI 时代的哲学困境》<span class="au">王德生</span></span><span class="mo">被机器做没的不是哲学的结论，而是发现学的地位：判据靠先存物替代了承接，机器把对准做到极限，承接便必须被拿回来。</span><span class="tags"><i>Why</i><i>哲学·人工智能</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/126/" data-c="哲学与SDE" data-q="What"><span class="no">第126号</span><span class="t">《后现代的 SDE 解构》<span class="au">王德生</span></span><span class="mo">后现代只是主体发生学的萌芽：二十位都证明了“我”可拆，却无一人回答由谁受理；重装程序长在必须交账的位置上，不长在最深的思想里。</span><span class="tags"><i>What</i><i>哲学·主体</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/125/" data-c="哲学与SDE" data-q="What"><span class="no">第125号</span><span class="t">《番茄炒蛋是谁发现的？》<span class="au">王德生</span></span><span class="mo">知识、技术、艺术不是找到的、造出的、自己长出的三种东西，而是同一台引擎的三个出货口；“找到”与“造出”只是事后的两种记账法。</span><span class="tags"><i>What</i><i>哲学·知识与创造</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/124/" data-c="哲学与SDE" data-q="Why"><span class="no">第124号</span><span class="t">《可判性的到来》<span class="au">王德生</span></span><span class="mo">两千年判不了知识是发现还是发生，缺的不是论据而是能重跑过程的装置；装置到了，这道题才第一次有被判错的资格。</span><span class="tags"><i>Why</i><i>哲学·认识论</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/123/" data-c="哲学与SDE" data-q="How"><span class="no">第123号</span><span class="t">《普通人都能读懂的马哲》<span class="au">王德生</span></span><span class="mo">马哲不缺箭头，缺量具：马克思撬松了“世界是现成的”，又把体系冻回起点，补上看日子这把尺才读得出谁先动。</span><span class="tags"><i>How</i><i>哲学·马克思主义</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/122/" data-c="教育与学习" data-q="Why"><span class="no">第122号</span><span class="t">《AI 时代教育的认知变革》<span class="au">王德生</span></span><span class="mo">AI代走的那一段思考，既是考试的失地也是层级上移的用地；腾出是技术的后果，占住不是，腾出而未占住就是内卷。</span><span class="tags"><i>Why</i><i>教育·认知</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/121/" data-c="哲学与SDE" data-q="Why"><span class="no">第121号</span><span class="t">《发生落点》<span class="au">王德生</span></span><span class="mo">1920至1980年二十位哲学家各为发生找到落点，又各把它写成本来就在那儿的东西；没有一人答满修订程序的第三句：重议的结果记在哪儿。</span><span class="tags"><i>Why</i><i>哲学史·制度</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/120/" data-c="哲学与SDE" data-q="What"><span class="no">第120号</span><span class="t">《130年哲学思想史解读》<span class="au">王德生</span></span><span class="mo">1900年以来的一百三十年哲学只做了一件事：把以为本来就在那儿的东西逐样改判为后来长出来的，直到只剩正在想问题的“我”。</span><span class="tags"><i>What</i><i>哲学史·日常生活</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/119/" data-c="教育与学习" data-q="Why"><span class="no">第119号</span><span class="t">《英语教学的智慧》<span class="au">张丹丹</span></span><span class="mo">课堂上最要紧的十件事没人记下，不是记得不细，而是四本账以单次动作结算，效应却落在动作之间。</span><span class="tags"><i>Why</i><i>教育·英语教学</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/118/" data-c="哲学与SDE" data-q="Why"><span class="no">第118号</span><span class="t">《发生学哲学的萌芽》<span class="au">王德生</span></span><span class="mo">发生学的萌芽不是哲学天才的洞见突破，而是判据、标准、管道这套公共基础设施建成之后的观念后果；此前撬得再准也没有落点。</span><span class="tags"><i>Why</i><i>哲学史·发生学</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/117/" data-c="哲学与SDE" data-q="How"><span class="no">第117号</span><span class="t">《合拍》<span class="au">王德生</span></span><span class="mo">哲学、科学、存在学的三合一不是三个现成之物并成一个，而是三个读法在同一次发生上合拍；争位只有替代、划界、分工，没有发生。</span><span class="tags"><i>How</i><i>哲学·科学·存在学</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/116/" data-c="艺术与创造" data-q="What"><span class="no">第116号</span><span class="t">《理念艺术的诞生与实践》<span class="au">王德生</span></span><span class="mo">理念艺术不是以理念为题材的艺术，而是材料与主体完全同质的艺术；它的大众化靠人—基底复合体补齐程序，而出界只有人能做。</span><span class="tags"><i>What</i><i>艺术与创造·主体性</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/115/" data-c="人工智能" data-q="Why"><span class="no">第115号</span><span class="t">《从最强大脑到最强复合大脑》<span class="au">王德生</span></span><span class="mo">最强大脑不是被机器打败而是被普及；竞争力没有消失，只是迁到了“人—基底”复合体之间结算，最强在耦合不在两端。</span><span class="tags"><i>Why</i><i>人工智能·思想主体性</i><i>人工智能</i></span></a>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第114号</span><span class="t">《归属虚幻》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/113/" data-c="哲学与SDE" data-q="How"><span class="no">第113号</span><span class="t">《解释不完的那一部分》<span class="au">王德生</span></span><span class="mo">凡说「它本来就在那儿」的，都是一次指派封了口；来源者不是被发现的，而是被指派的。</span><span class="tags"><i>How</i><i>哲学·意义与来源</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/112/" data-c="教育与学习" data-q="Why"><span class="no">第112号</span><span class="t">《AI 时代教育新使命》<span class="au">王德生</span></span><span class="mo">赋能只作用于旧能力的结果而不作用于死因；教育的使命是打造一个可以被撤走的复合主体。</span><span class="tags"><i>Why</i><i>教育·复合主体</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/111/" data-c="教育与学习" data-q="What"><span class="no">第111号</span><span class="t">《学席和教席的诞生》<span class="au">王德生</span></span><span class="mo">评估从未评过孤立的人，评的一直是人与器具；AI 只是让这件事无法再装作评的是人。</span><span class="tags"><i>What</i><i>教育·评估</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/110/" data-c="哲学与SDE" data-q="What"><span class="no">第110号</span><span class="t">《主体性的典范革命》<span class="au">王德生</span></span><span class="mo">「我」不是一个东西，而是分布、场、美三项显现的同一性；AI 让这组读数第一次不再是常数。</span><span class="tags"><i>What</i><i>哲学·主体性·人机关系</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/109/" data-c="人工智能" data-q="What"><span class="no">第109号</span><span class="t">《AI 时代的个人知识》<span class="au">王德生</span></span><span class="mo">AI 让别人用上你的判断而不必懂它，于是知识第一次可以被很多人使用，却仍归你，并由你承担错误。</span><span class="tags"><i>What</i><i>人工智能·知识形态</i><i>人工智能</i></span></a>
+<a class="row" href="/motifs/108/" data-c="语言与写作" data-q="What"><span class="no">第108号</span><span class="t">《语言符号的智慧》<span class="au">胡志英</span></span><span class="mo">符号取得的不是共享的意义，而是在某共同体、任务、时刻上可被公开确认、否认或撤回的资格。</span><span class="tags"><i>What</i><i>语言·符号</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/107/" data-c="数学与科学" data-q="How"><span class="no">第107号</span><span class="t">《数学概念的发生学导论》<span class="au">王德生</span></span><span class="mo">一个数学概念有多新，不取决于它住在哪里，而取决于它出生时形、算、计三个位置里有几个在争。</span><span class="tags"><i>How</i><i>数学哲学·概念发生</i><i>数学与科学</i></span></a>
+<div class="row pending" data-c="人工智能" data-q=""><span class="no">第106号</span><span class="t">《发生差》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/105/" data-c="语言与写作" data-q="What"><span class="no">第105号</span><span class="t">《下一步才算数》<span class="au">胡志英</span></span><span class="mo">话说完不算数，下一步接住才算数；语言事件的公共身份在说者之外的行动者的下一步上，十个读数无一以说者为分母。</span><span class="tags"><i>What</i><i>语言·写作</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/104/" data-c="哲学与SDE" data-q="What"><span class="no">第104号</span><span class="t">《普通人都能明白的罗尔斯》<span class="au">王德生</span></span><span class="mo">罗尔斯把意义的三只脚锯成一根自由的柱子，再插进理念、现实、自我三块地，每块地上只长自由这一格。</span><span class="tags"><i>What</i><i>哲学·政治哲学</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/103/" data-c="教育与学习" data-q="Why"><span class="no">第103号</span><span class="t">《老路已被包办》<span class="au">王德生</span></span><span class="mo">教育唯一的原材料，是学习者卡住而无人供给的那段时间；它曾因昂贵被省略，如今因免费被消灭。</span><span class="tags"><i>Why</i><i>教育·学习</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/102/" data-c="艺术与创造" data-q="What"><span class="no">第102号</span><span class="t">《艺术初探》<span class="au">黄倩盈</span></span><span class="mo">艺术的决定性事件发生在无人有资格签收的那段时间里，而每套记录制度恰在这一段没有字段，且这一栏不能填。</span><span class="tags"><i>What</i><i>艺术·创造</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/101/" data-c="健康与心理" data-q="Why"><span class="no">第101号</span><span class="t">《认领之前》<span class="au">陈晓艳</span></span><span class="mo">健康生活里被结算的不是刚做完的那件事，而是它取得的资格；资格不由做的人签发，只有下一步用到它才被追认。</span><span class="tags"><i>Why</i><i>健康·心理</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/100/" data-c="哲学与SDE" data-q="What"><span class="no">第100号</span><span class="t">《每一步都对》<span class="au">王德生</span></span><span class="mo">道不在体系看错的地方，而在体系每一步都做对、却仍未为之设位的地方；它不是被忽略，而是被正确排除。</span><span class="tags"><i>What</i><i>哲学·道德经研究</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/99/" data-c="文明与社会" data-q="What"><span class="no">第99号</span><span class="t">《没有那一栏》<span class="au">高鹏</span></span><span class="mo">话的失落不记在「禁止」那一栏，而记在「没有栏」；取消那一栏的不是压制，是运转良好、加严与善意。</span><span class="tags"><i>What</i><i>言论·记录制度</i><i>文明与社会</i></span></a>
+<a class="row" href="/motifs/98/" data-c="哲学与SDE" data-q="Why"><span class="no">第98号</span><span class="t">《分解之前》<span class="au">王德生、Claude</span></span><span class="mo">二律背反不是理性越界，而是未说出口的承诺「关系不改变两端」的产物；总体不可达只是症状，账上没有那一栏。</span><span class="tags"><i>Why</i><i>哲学·认识论</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/97/" data-c="文明与社会" data-q="What"><span class="no">第97号</span><span class="t">《不是不爱了》<span class="au">孔凡鹤</span></span><span class="mo">夫妻关系先失效的通常不是爱，而是资格：对方的过去与未来还能否进入我的下一个决定。</span><span class="tags"><i>What</i><i>婚姻·家庭关系</i><i>文明与社会</i></span></a>
+<a class="row" href="/motifs/96/" data-c="商业与管理" data-q="What"><span class="no">第96号</span><span class="t">《股票探幽》<span class="au">琥珀</span></span><span class="mo">股票的身份与价格都靠不到场、不留痕的东西成立，而现行证券记录只记移动，这些处处无字段。</span><span class="tags"><i>What</i><i>金融·股票</i><i>商业与管理</i></span></a>
+<a class="row" href="/motifs/95/" data-c="语言与写作" data-q="What"><span class="no">第95号</span><span class="t">《沟通初探》<span class="au">李佳城</span></span><span class="mo">沟通的账不在当轮结清：原话与原人退场之后还必须被算进去的，才是已发生的部分。</span><span class="tags"><i>What</i><i>语言·沟通</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/94/" data-c="教育与学习" data-q="Why"><span class="no">第94号</span><span class="t">《下一轮由谁开始》<span class="au">陈晓艳</span></span><span class="mo">空心不是缺了什么，而是每一轮都做对了，却有一项权力在轮末没有换手，下一轮仍由上一轮的持有者开始。</span><span class="tags"><i>Why</i><i>教育·青少年发展</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/93/" data-c="语言与写作" data-q="How"><span class="no">第93号</span><span class="t">《文心探幽·卷二 作文如何发生？》<span class="au">付自文</span></span><span class="mo">作文的发生就是下一步由谁决定的换手；每一次被判为成功的结算，都在无声处收回决定权。</span><span class="tags"><i>How</i><i>语言·写作</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/92/" data-c="人工智能" data-q="Why"><span class="no">第92号</span><span class="t">《谁来陪伴我？》<span class="au">王德生、Claude</span></span><span class="mo">困境不是没人陪你，而是陪你的那个不会走；关系承重需要&quot;本可以不来而他来了&quot;的可撤性。</span><span class="tags"><i>Why</i><i>人工智能·婚姻关系</i><i>人工智能</i></span></a>
+<a class="row" href="/motifs/91/" data-c="语言与写作" data-q="What"><span class="no">第91号</span><span class="t">《文心探幽·卷一 何谓作文》<span class="au">付自文</span></span><span class="mo">作文不在成品上：凡直接读得出的都不是它，它落在账本没有设的那一格，动一下才显形。</span><span class="tags"><i>What</i><i>语言·写作</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/90/" data-c="语言与写作" data-q="Why"><span class="no">第90号</span><span class="t">《文心探幽·卷三 作文的意义是什么？》<span class="au">付自文</span></span><span class="mo">作文不结算：凡本轮能结清的都不是它做的事，它把结不清的部分留成下一轮的条件。</span><span class="tags"><i>Why</i><i>语言·写作</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/89/" data-c="艺术与创造" data-q="How"><span class="no">第89号</span><span class="t">《音乐初探·卷二 音乐是如何发生的？》<span class="au">许佳衡</span></span><span class="mo">音乐发生是一个事件改变后续事件的可接受条件并被再后续继承；发生时点随判据移动，读数须与判据同报。</span><span class="tags"><i>How</i><i>艺术·音乐</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/88/" data-c="艺术与创造" data-q="Why"><span class="no">第88号</span><span class="t">《音乐初探·卷三 为何需要音乐？》<span class="au">许佳衡</span></span><span class="mo">人需要音乐，因为很多事不能等条件齐了才做，音乐能在条件不齐时把事情往下推；需要不能按兑换率入账。</span><span class="tags"><i>Why</i><i>艺术·音乐</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/87/" data-c="艺术与创造" data-q="What"><span class="no">第87号</span><span class="t">《音乐初探·卷一 何谓音乐？》<span class="au">许佳衡</span></span><span class="mo">音乐不是待归类的东西，而是十个读数可清点、可判错的一组发生关系；不存在&quot;是不是音乐&quot;，只有连续的距离。</span><span class="tags"><i>What</i><i>艺术·音乐</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/86/" data-c="健康与心理" data-q="How"><span class="no">第86号</span><span class="t">《停下来不算结束》<span class="au">孔凡鹤</span></span><span class="mo">停下来不等于结束；休息失败多发生在休息开始之前，上一轮没被结清，九个&quot;我休息过了&quot;共用同一漏洞。</span><span class="tags"><i>How</i><i>健康·心理·恢复</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/85/" data-c="文明与社会" data-q="What"><span class="no">第85号</span><span class="t">《教会的智慧》<span class="au">石奇志（葡萄）</span></span><span class="mo">教会靠失配显露后责任重新归属并写入下一轮而延续；证明它健康的读数，恰在这一步缺席时最好看。</span><span class="tags"><i>What</i><i>教会论·组织·文明与社会</i><i>文明与社会</i></span></a>
+<a class="row" href="/motifs/84/" data-c="教育与学习" data-q="Why"><span class="no">第84号</span><span class="t">《越顺利，越没有你的位置》<span class="au">王德生、Claude</span></span><span class="mo">让人更顺利的安排取消了&quot;本人亲自穿越一次&quot;的动作，纠错信号照常产生，却寄到无人收件的位置。</span><span class="tags"><i>Why</i><i>AI与社会·组织理论·伦理学</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/83/" data-c="健康与心理" data-q="What"><span class="no">第83号</span><span class="t">《子宫癌探幽》<span class="au">陈晓艳</span></span><span class="mo">各本记录都对，本该有人持有的东西仍从记录之间掉下去；这不是知识缺口，是持有关系的失配。</span><span class="tags"><i>What</i><i>医学·记录制度</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/82/" data-c="教育与学习" data-q="What"><span class="no">第82号</span><span class="t">《山路会自己长回去》<span class="au">王德生、Claude</span></span><span class="mo">承重之物不是谁拥有的属性，而是须由本人反复付代价执行的动作；压成完成品后读数照常，它已不在。</span><span class="tags"><i>What</i><i>认识论·组织理论·教育</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/81/" data-c="教育与学习" data-q="What"><span class="no">第81号</span><span class="t">《答案随时可得之后》<span class="au">王德生、Claude</span></span><span class="mo">贬值的不是知识，而是「拥有知识」这本账；知识是每次被重新推出来的事件，而重新推出的那一段不入账。</span><span class="tags"><i>What</i><i>教育·学习与知识</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/80/" data-c="商业与管理" data-q="Why"><span class="no">第80号</span><span class="t">《判断的危机》<span class="au">王德生、Claude</span></span><span class="mo">生成成本归零而辨认成本一分未降，判断力无人生产、无账可记，只由低效活动顺带养成，所以它消失时不发出任何警报。</span><span class="tags"><i>Why</i><i>人工智能·制度与评价</i><i>商业与管理</i></span></a>
+<a class="row" href="/motifs/79/" data-c="商业与管理" data-q="Why"><span class="no">第79号</span><span class="t">《没有人违规》<span class="au">胡敏</span></span><span class="mo">决定谁出局的那一段，不在任何账上，也不在他自己手里，而且不随他离场而消失；没有人违规，他还是没了。</span><span class="tags"><i>Why</i><i>商业·内卷与淘汰</i><i>商业与管理</i></span></a>
+<a class="row" href="/motifs/78/" data-c="人工智能" data-q="Why"><span class="no">第78号</span><span class="t">《一直没出事》<span class="au">孔凡鹤</span></span><span class="mo">AI 持续代行之后，能力、判断与责任不是先失去，而是先失去可观测性；正常运行的成功销毁了证明它们仍在的证据。</span><span class="tags"><i>Why</i><i>人工智能·人机协作</i><i>人工智能</i></span></a>
+<a class="row" href="/motifs/77/" data-c="语言与写作" data-q="What"><span class="no">第77号</span><span class="t">《记到谁的账上》<span class="au">胡志英</span></span><span class="mo">语言习得的一次成功不能只记为1，它须被记到九个互不蕴含的户头上，现有测量只记金额、不记户头，九种记错还都让传统指标上升。</span><span class="tags"><i>What</i><i>语言·习得测量</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/76/" data-c="哲学与SDE" data-q="Why"><span class="no">第76号</span><span class="t">《发现与发生》<span class="au">王德生</span></span><span class="mo">发现不是发生的对立面，而是发生链被磨平后的时相；「发现还是发明」是磨平工序制造的问题，磨平的代价落在下一次发生上。</span><span class="tags"><i>Why</i><i>哲学·数学教育</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/75/" data-c="健康与心理" data-q="What"><span class="no">第75号</span><span class="t">《空白不是零》<span class="au">陈晓艳</span></span><span class="mo">「没有记录」被读成「没有发生」，这个空白反过来签发下一轮判断、干预与暴露，代价落在没有记账权的一边。</span><span class="tags"><i>What</i><i>肿瘤学·证据与决策</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/74/" data-c="艺术与创造" data-q="Why"><span class="no">第74号</span><span class="t">《创造的产程》<span class="au">王德生、胡敏</span></span><span class="mo">内卷不是终点意义上的病，而是创造发生的必要产程；同一场痛是产程还是酷刑，只看承受者盼不盼一个婴儿。</span><span class="tags"><i>Why</i><i>创造·内卷</i><i>艺术与创造</i></span></a>
+<div class="row pending" data-c="商业与管理" data-q=""><span class="no">第73号</span><span class="t">《无本之价》<span class="au">王德生、胡敏</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/72/" data-c="健康与心理" data-q="Why"><span class="no">第72号</span><span class="t">《照护的智慧》<span class="au">孔凡鹤</span></span><span class="mo">每次「完成」都由交出的一方宣布，没有随之交出的那一份落在无宣布权的一方身上，账上没有它。</span><span class="tags"><i>Why</i><i>健康·痴呆家庭照护</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/71/" data-c="语言与写作" data-q="What"><span class="no">第71号</span><span class="t">《知行合一》<span class="au">胡志英</span></span><span class="mo">知行合一不是知与行终于一致，而是它们之间有一样东西被交出去之后，仍能被指认为同一个。</span><span class="tags"><i>What</i><i>教育·知行与学习</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/70/" data-c="数学与科学" data-q="How"><span class="no">第70号</span><span class="t">《SDE数学解构导论》<span class="au">王德生</span></span><span class="mo">数学对象的每条同构不变特征，都由差异路径与纠缠系统共同给出，而这一对本身也在发生，且只走有限条通道。</span><span class="tags"><i>How</i><i>数学·数学哲学</i><i>数学与科学</i></span></a>
+<a class="row" href="/motifs/69/" data-c="健康与心理" data-q="Why"><span class="no">第69号</span><span class="t">《衰老初探》<span class="au">胡敏</span></span><span class="mo">账记得平不等于功能没在变坏；账要平，只需记账动作在九处之一没有发生，而这九处目前一处也没有字段。</span><span class="tags"><i>Why</i><i>健康·衰老与记录</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/68/" data-c="健康与心理" data-q="Why"><span class="no">第68号</span><span class="t">《睡觉的智慧》<span class="au">王德生</span></span><span class="mo">睡眠的缺口不是漏记，而是强制作答的代价；记录越齐整，缺口越大，因为扔掉的那一份不留痕迹。</span><span class="tags"><i>Why</i><i>健康·睡眠记录</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/67/" data-c="文明与社会" data-q="What"><span class="no">第67号</span><span class="t">《战争的资格》<span class="au">阳涌</span></span><span class="mo">战争不是暴力的累加，而是资格的换手；它常在指标最好看的时候完成，因为没有一本账设了那一栏。</span><span class="tags"><i>What</i><i>冲突·战争研究</i><i>文明与社会</i></span></a>
+<a class="row" href="/motifs/66/" data-c="商业与管理" data-q="Why"><span class="no">第66号</span><span class="t">《突破》<span class="au">陈晓艳</span></span><span class="mo">不是失效了才需要突破；一套安排正因为还在成功，才注销掉后来改写它的资格。</span><span class="tags"><i>Why</i><i>商业与管理·制度与认知</i><i>商业与管理</i></span></a>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第65号</span><span class="t">《家庭教育的智慧》<span class="au">陈晓艳</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/64/" data-c="哲学与SDE" data-q="What"><span class="no">第64号</span><span class="t">《普通人都能懂的维特根斯坦》<span class="au">王德生</span></span><span class="mo">维特根斯坦走完了从&quot;发现&quot;到&quot;发生&quot;的前半程；铲子弯了的地方，正是发生开始的地方。</span><span class="tags"><i>What</i><i>哲学·语言</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/63/" data-c="健康与心理" data-q="What"><span class="no">第63号</span><span class="t">《抑郁探究》<span class="au">胡敏</span></span><span class="mo">抑郁的判定、干预与记账，每做对一次都在账外扣掉一份不显影的量；越规范，扣得越干净。</span><span class="tags"><i>What</i><i>健康·心理</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/62/" data-c="语言与写作" data-q="What"><span class="no">第62号</span><span class="t">《语言的智慧》<span class="au">胡志英</span></span><span class="mo">语言最危险的形态不是错误而是不可修订的成功；一句话的智慧不在说得多对，而在关上之后还留不留得住回来的路。</span><span class="tags"><i>What</i><i>语言·沟通</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/61/" data-c="健康与心理" data-q="What"><span class="no">第61号</span><span class="t">《辨证结算学》<span class="au">胡敏</span></span><span class="mo">辨证不是一次读取而是一次动作，动作的九类产物被自己的结论吸收，账上只剩一个证名。</span><span class="tags"><i>What</i><i>健康·中医辨证</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/60/" data-c="语言与写作" data-q="What"><span class="no">第60号</span><span class="t">《一花一世界》<span class="au">胡志英</span></span><span class="mo">局部成为世界，仅当它引发的变化返回原对象、改变下一轮的某样东西；花不是缩影，是世界必须回来的地方。</span><span class="tags"><i>What</i><i>语言·学习理论</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/59/" data-c="教育与学习" data-q="What"><span class="no">第59号</span><span class="t">《答案之后》<span class="au">阳涌</span></span><span class="mo">答案变便宜之后，最危险的是做得又快又对、可正确里已没有任何东西能重新长出来；课堂越高效，这种正确越多。</span><span class="tags"><i>What</i><i>教育·数学学习</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/58/" data-c="健康与心理" data-q="Why"><span class="no">第58号</span><span class="t">《健康发生学导论》<span class="au">王德生</span></span><span class="mo">身体的每一次正常都由下一轮的接手能力垫付，垫付越成功越没有信号，因为报警所用的正是被垫掉的那样东西。</span><span class="tags"><i>Why</i><i>健康·复杂系统</i><i>健康与心理</i></span></a>
+<div class="row pending" data-c="教育与学习" data-q=""><span class="no">第57号</span><span class="t">《课堂的智慧》<span class="au">阳涌</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/56/" data-c="健康与心理" data-q="What"><span class="no">第56号</span><span class="t">《治未病立账学》<span class="au">胡敏</span></span><span class="mo">未病不是尚未发生的病，而是账本里不存在的一栏；先立账才有可治的对象。</span><span class="tags"><i>What</i><i>健康·预防医学</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/55/" data-c="教育与学习" data-q="What"><span class="no">第55号</span><span class="t">《课堂学习发生学》<span class="au">王德生</span></span><span class="mo">课堂里决定后果的东西多半是课堂自己造的，而账本只为外来物设字段，所以账本越完备，越看不见它。</span><span class="tags"><i>What</i><i>教育·课堂学习</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/54/" data-c="哲学与SDE" data-q="What"><span class="no">第54号</span><span class="t">《辩证法的SDE解构入门》<span class="au">王德生</span></span><span class="mo">辩证法的本质动作是禁止两端直连、强插中介；它要求两端已可辨认，故只在运动已经结束处才成立。</span><span class="tags"><i>What</i><i>哲学·辩证法</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/53/" data-c="数学与科学" data-q="What"><span class="no">第53号</span><span class="t">《SDE数学导论》<span class="au">王德生</span></span><span class="mo">传统数学不是数学的基础，只是伞撑不开（r→0、ω=1、v→∞）时的退化极限；数学是纠缠场的共振规律。</span><span class="tags"><i>What</i><i>数学·科学</i><i>数学与科学</i></span></a>
+<a class="row" href="/motifs/52/" data-c="哲学与SDE" data-q="How"><span class="no">第52号</span><span class="t">《六路径方法论入门》<span class="au">王德生</span></span><span class="mo">方法的首要能力是先辨认问题该从哪一维进入；通行的“先条件、再过程、后结果”只是六条入口中的一条。</span><span class="tags"><i>How</i><i>方法论·SDE理论</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/51/" data-c="哲学与SDE" data-q="What"><span class="no">第51号</span><span class="t">《SDE三方程导论》<span class="au">王德生</span></span><span class="mo">一次发生不是条件导致结果的单向链，而是结果、路径、条件三者互相生成、互相回写的闭环。</span><span class="tags"><i>What</i><i>哲学·SDE理论</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/50/" data-c="教育与学习" data-q="What"><span class="no">第50号</span><span class="t">《师德发生学导论》<span class="au">王德生</span></span><span class="mo">师德不是可传递、可评价的规范，而是教师在具体教育事件里一次次发生的成师；评价越完善，越看不见它。</span><span class="tags"><i>What</i><i>教育·师德</i><i>教育与学习</i></span></a>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第49号</span><span class="t">《互动医学入门》<span class="au">王德生</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/48/" data-c="健康与心理" data-q="What"><span class="no">第48号</span><span class="t">《三律心理学》<span class="au">王德生、刘春华</span></span><span class="mo">心理不是主体的内在属性，而是主体—互动—客体整体在三律运行中的显影；人没有智商、情商、意商，只有知格、意格、情格。</span><span class="tags"><i>What</i><i>心理·健康</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/47/" data-c="教育与学习" data-q="What"><span class="no">第47号</span><span class="t">《SDE教育发生学导论》<span class="au">王德生</span></span><span class="mo">任何学科的“本体发现”，本质上都是对某类重复发生的命名；教育学不是培养人，而是关系、影响、共存的共同发生。</span><span class="tags"><i>What</i><i>教育·学习</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/46/" data-c="健康与心理" data-q="Why"><span class="no">第46号</span><span class="t">《健康管理的代偿困境》<span class="au">王德生</span></span><span class="mo">“越管理越衰退”不是管理不足，而是外部确定性的供给本身，在每次成功回应的同一动作里挤出了人的内感受与关系耐受力。</span><span class="tags"><i>Why</i><i>健康·医学社会学</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/45/" data-c="哲学与SDE" data-q="Why"><span class="no">第45号</span><span class="t">《一的总装师》<span class="au">王德生、高鹏</span></span><span class="mo">帝制两千年不倒，因为每次倒掉的都是天子，从来不是天；董仲舒把“一”安放在任何王朝都陪葬不起的位置上。</span><span class="tags"><i>Why</i><i>哲学·中国思想史</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/44/" data-c="人工智能" data-q="What"><span class="no">第44号</span><span class="t">《SDE 智能体导论》<span class="au">王德生</span></span><span class="mo">智能体的高阶使命不是完成任务，而是由 SDE 指挥基底临时造出三界发生世界模型，并在其中发生新世界。</span><span class="tags"><i>What</i><i>人工智能·智能体</i><i>人工智能</i></span></a>
+<a class="row" href="/motifs/43/" data-c="人工智能" data-q="What"><span class="no">第43号</span><span class="t">《Palantir Ontology 的 SDE 解构》<span class="au">王德生</span></span><span class="mo">Palantir 不是数据语义层，而是固定 S、E 条件下的企业 D3 实现器；它是最优运行智能体，而非发生智能体。</span><span class="tags"><i>What</i><i>人工智能·企业智能化</i><i>人工智能</i></span></a>
+<a class="row" href="/motifs/42/" data-c="教育与学习" data-q="Why"><span class="no">第42号</span><span class="t">《大学的终结与重生》<span class="au">王德生</span></span><span class="mo">GPT终结的不是大学的功能，而是大学立足的“脑的节奏”；大学不灭，因为它承担的是意义的生成节奏，而不是知识的供给。</span><span class="tags"><i>Why</i><i>教育·大学</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/41/" data-c="语言与写作" data-q="What"><span class="no">第41号</span><span class="t">《语言发生学》<span class="au">王德生、胡志英</span></span><span class="mo">语言不是工具，而是生命与世界在张力中共同发生的事件；语义、语法、概念、语感都是生成的，不是习得或发现的。</span><span class="tags"><i>What</i><i>语言·语言学·教育</i><i>语言与写作</i></span></a>
+<a class="row" href="/motifs/40/" data-c="艺术与创造" data-q="Why"><span class="no">第40号</span><span class="t">《在突变中发生》<span class="au">王德生、林凡昊</span></span><span class="mo">突变不是混乱而是生成的秩序，稳定不是不变而是创造的周期性平衡；应对突变，靠与未来共生成，不靠抵抗。</span><span class="tags"><i>Why</i><i>哲学·艺术·生活</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/39/" data-c="文明与社会" data-q="What"><span class="no">第39号</span><span class="t">《人生的真谛》<span class="au">王德生、李佳城、王雅丽</span></span><span class="mo">人生不是梦：生命是整体，生活是差异，生存是纠缠；梦循环消散，人生螺旋累积，能留下文明的遗产。</span><span class="tags"><i>What</i><i>人生哲学·生命·文明</i><i>文明与社会</i></span></a>
+<a class="row" href="/motifs/38/" data-c="商业与管理" data-q="Why"><span class="no">第38号</span><span class="t">《内卷与突围》<span class="au">王德生</span></span><span class="mo">内卷不是竞争太狠，而是原创发生的缺席：价值越成功，意义输入的燃料越稀薄，用价值购买意义必然递减。</span><span class="tags"><i>Why</i><i>商业·管理·意义</i><i>商业与管理</i></span></a>
+<a class="row" href="/motifs/37/" data-c="人工智能" data-q="What"><span class="no">第37号</span><span class="t">《未来人类做什么？》<span class="au">王德生</span></span><span class="mo">机器接管可回答的一切之后，人的价值整体迁移到提问；创造新的问题空间，才是新产业与新角色的源头。</span><span class="tags"><i>What</i><i>人工智能·产业·教育</i><i>人工智能</i></span></a>
+<a class="row" href="/motifs/36/" data-c="人工智能" data-q="What"><span class="no">第36号</span><span class="t">《人—GPT超级复合智能体》<span class="au">王德生、秦衡峰</span></span><span class="mo">智能不是人或GPT的属性，而是人、GPT与具体场域在三体对话中生成的整体；GPT只是理念界的特征律引擎，不是主体。</span><span class="tags"><i>What</i><i>人工智能·教育·健康</i><i>人工智能</i></span></a>
+<a class="row" href="/motifs/35/" data-c="人工智能" data-q="Why"><span class="no">第35号</span><span class="t">《AGI：人工智能的巴别塔》<span class="au">王德生</span></span><span class="mo">AGI之梦的崩塌不是努力或工程的失败，而是内建于「完成」神话的结构性失败；出路不是终极机器，而是重开创造之窗的人机复合。</span><span class="tags"><i>Why</i><i>人工智能·文明诊断</i><i>人工智能</i></span></a>
+<a class="row" href="/motifs/34/" data-c="哲学与SDE" data-q="What"><span class="no">第34号</span><span class="t">《普通人都能懂的伽达默尔》<span class="au">王德生</span></span><span class="mo">理解是一场发生，而发生有三界：伽达默尔把回写写进了理解，却把世界收进语言一界，让差异只许走向融合。</span><span class="tags"><i>What</i><i>哲学·诠释学</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/33/" data-c="艺术与创造" data-q="Why"><span class="no">第33号</span><span class="t">《原创的突破》<span class="au">王德生、鲍锦朝</span></span><span class="mo">原创不是主体的创造，而是存在的生成；原创的突破首先是离开主客二分的本体论突破。</span><span class="tags"><i>Why</i><i>创造·本体论</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/32/" data-c="艺术与创造" data-q="Why"><span class="no">第32号</span><span class="t">《原创动力学解码》<span class="au">王德生、胡敏</span></span><span class="mo">原创不是出于兴趣、真善美或自我实现的选择，而是旧秩序死亡时被逼出来的重组。</span><span class="tags"><i>Why</i><i>创造·原创</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/31/" data-c="艺术与创造" data-q="How"><span class="no">第31号</span><span class="t">《创造力发生机制解码》<span class="au">王德生、Yang, Bide</span></span><span class="mo">创造力不是天赋或灵感，而是三律运转下可解码的发生机制；匮乏与约束是它的点火条件，不是它的敌人。</span><span class="tags"><i>How</i><i>创造·方法论</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/30/" data-c="健康与心理" data-q="How"><span class="no">第30号</span><span class="t">《跑步与健康》<span class="au">王德生、秦莉</span></span><span class="mo">跑步的健康不在跑得多快，而在跑完能否好好回来；指标只是地图，不该被抬上裁判席。</span><span class="tags"><i>How</i><i>健康·运动</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/29/" data-c="健康与心理" data-q="What"><span class="no">第29号</span><span class="t">《重返年轻》<span class="au">王德生</span></span><span class="mo">年轻不是年龄，也不是漂亮的指标，而是累了能回来：在发展中让发生持续大于形成，并使层级上移。</span><span class="tags"><i>What</i><i>健康·衰老</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/28/" data-c="健康与心理" data-q="What"><span class="no">第28号</span><span class="t">《穿越抑郁》<span class="au">王德生、孔凡鹤</span></span><span class="mo">抑郁不是功能障碍，而是节奏结构的本体性瘫痪；人在张力、路径、结构、回响整条链上断了，不是不想振作。</span><span class="tags"><i>What</i><i>心理·抑郁·文明</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/27/" data-c="健康与心理" data-q="How"><span class="no">第27号</span><span class="t">《逆转高血压之路》<span class="au">王德生</span></span><span class="mo">高血压不是要终身摁住的数字，而是升压的失衡互动，逆转要以再生能力来证明，不以低读数来证明。</span><span class="tags"><i>How</i><i>健康·高血压</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/26/" data-c="健康与心理" data-q="Why"><span class="no">第26号</span><span class="t">《逆转糖尿病》<span class="au">王德生</span></span><span class="mo">糖尿病首要不是血糖数值偏离，而是葡萄糖出口通路与时间结构化清除的失败；康复是结构修复，不是指标达标。</span><span class="tags"><i>Why</i><i>健康·慢性病医学</i><i>健康与心理</i></span></a>
+<a class="row" href="/motifs/25/" data-c="健康与心理" data-q="How"><span class="no">第25号</span><span class="t">《心血管健康的发生学重建》<span class="au">王德生、秦莉</span></span><span class="mo">指标改善与生活困难可以同时为真，健康不是把人送回正常值，而是在不删掉人的前提下让照护可被修正。</span><span class="tags"><i>How</i><i>健康·心血管</i><i>健康与心理</i></span></a>
+<div class="row pending" data-c="健康与心理" data-q=""><span class="no">第24号</span><span class="t">《SDE交互医学》<span class="au">王德生、Zhou, Long</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/23/" data-c="教育与学习" data-q="How"><span class="no">第23号</span><span class="t">《GPT时代的SDE批判性思维》<span class="au">王德生</span></span><span class="mo">批判不是给结论挑错，而是先揭示一个思考怎样发生，再做真善美的条件化判断；整齐不等于有人想过。</span><span class="tags"><i>How</i><i>思维·阅读</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/22/" data-c="教育与学习" data-q="What"><span class="no">第22号</span><span class="t">《学习发生学导论》<span class="au">王德生、阳涌</span></span><span class="mo">学习不是拥有知识，而是成为结构；学习者不是人，而是主体、互动、客体合起来的整体在发生。</span><span class="tags"><i>What</i><i>教育·学习</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/21/" data-c="教育与学习" data-q="What"><span class="no">第21号</span><span class="t">《AI时代的数学教育转型》<span class="au">王德生</span></span><span class="mo">AI接管了计算与标准解题，数学教育的地基已结构性坍塌；它的使命不再是执行的训练，而是结构创造、路径治理与意义生成。</span><span class="tags"><i>What</i><i>教育·数学</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/20/" data-c="教育与学习" data-q="What"><span class="no">第20号</span><span class="t">《GPT时代的大学革命》<span class="au">王德生、胡敏</span></span><span class="mo">大学的危机是制度身份的危机；它须从知识的看门机构变成知识平台、创业母机与数字身体，把阅读与创业焊接起来。</span><span class="tags"><i>What</i><i>教育·大学制度</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/19/" data-c="哲学与SDE" data-q="Why"><span class="no">第19号</span><span class="t">《普通人都能懂的亚里士多德》<span class="au">王德生</span></span><span class="mo">亚里士多德看见了发生，却把它写成了“实现”；实现只是终点已被预先规定的发生，这道缝把他劈成两半。</span><span class="tags"><i>Why</i><i>哲学·SDE解构</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/18/" data-c="教育与学习" data-q="How"><span class="no">第18号</span><span class="t">《基于GPT的中国教育改革》<span class="au">王德生、鲍锦朝</span></span><span class="mo">GPT拆掉的不是课堂而是教育的旧前提；教育从来不是传递知识，而是让学生在张力里发生，改革只能以GPT为支点。</span><span class="tags"><i>How</i><i>教育·学习</i><i>教育与学习</i></span></a>
+<a class="row" href="/motifs/17/" data-c="商业与管理" data-q="What"><span class="no">第17号</span><span class="t">《SIO经济学导论》<span class="au">王德生、阎凌波</span></span><span class="mo">经济的本体不是价值而是意义：价值只是意义的影子，财富是意义的自我繁殖，不是价值的堆积。</span><span class="tags"><i>What</i><i>经济学·商业与管理</i><i>商业与管理</i></span></a>
+<div class="row pending" data-c="哲学与SDE" data-q=""><span class="no">第16号</span><span class="t">《实践发生学》<span class="au">王德生、牟军</span></span><span class="mo">母题卡待写</span></div>
+<a class="row" href="/motifs/15/" data-c="哲学与SDE" data-q="How"><span class="no">第15号</span><span class="t">《知识发生论》<span class="au">王德生、付自文</span></span><span class="mo">知识不是被发现的，是发生出来的：整体稳定，差异裂开，特征纠缠，新的整体再生，知识因此是一个自我更新的螺旋。</span><span class="tags"><i>How</i><i>知识论·哲学</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/14/" data-c="哲学与SDE" data-q="What"><span class="no">第14号</span><span class="t">《SIO逻辑学导论》<span class="au">王德生、Wu, Yanqin</span></span><span class="mo">逻辑不是早已存在的天理，而是SIO整体运行中结构的产物；推理的失效不在规则不严，而在对象被换成了影子。</span><span class="tags"><i>What</i><i>逻辑·哲学</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/13/" data-c="文明与社会" data-q="What"><span class="no">第13号</span><span class="t">《三元法学》<span class="au">王德生、邹军令</span></span><span class="mo">逻辑、语法、道德、法律同称为&quot;法&quot;，不是因为都守护价值，而是因为都护行意义三律的运行：内核是幸福律，形式是连接、次序、结构，差异是文明着色。</span><span class="tags"><i>What</i><i>法学·逻辑道德语法</i><i>文明与社会</i></span></a>
+<a class="row" href="/motifs/12/" data-c="商业与管理" data-q="Why"><span class="no">第12号</span><span class="t">《意义管理学》<span class="au">王德生、王雅丽</span></span><span class="mo">管理不是监督影子，而是治理SIO整体的意义三律；计划、组织、控制、领导依次是轨迹、速度、粘性、权重的治理。</span><span class="tags"><i>Why</i><i>管理·组织</i><i>商业与管理</i></span></a>
+<a class="row" href="/motifs/11/" data-c="文明与社会" data-q="Why"><span class="no">第11号</span><span class="t">《三律治理学》<span class="au">王德生</span></span><span class="mo">治理失败不是执行不力，而是把运行留下的形态当成运行本身；权力是对意义三律运行的护栏化能力，而不是让人服从的力量。</span><span class="tags"><i>Why</i><i>治理·政治管理法律</i><i>文明与社会</i></span></a>
+<a class="row" href="/motifs/10/" data-c="哲学与SDE" data-q="What"><span class="no">第10号</span><span class="t">《论自由》<span class="au">王德生、燕群</span></span><span class="mo">自由不是你拥有的选择权，而是一条新路被点燃、走通并沉积为通道的发生；&quot;能不做&quot;只是发生枯竭后的补偿技能，自然则是自由的沉积。</span><span class="tags"><i>What</i><i>哲学·自由</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/9/" data-c="艺术与创造" data-q="How"><span class="no">第9号</span><span class="t">《艺术十论》<span class="au">王德生、秦莉</span></span><span class="mo">艺术不是被发现的对象，而是主客互动中经&quot;张力—转换—释放&quot;一次次发生的意义；艺术之死，就是这个节奏循环的失落。</span><span class="tags"><i>How</i><i>艺术·创造</i><i>艺术与创造</i></span></a>
+<a class="row" href="/motifs/8/" data-c="文明与社会" data-q="What"><span class="no">第8号</span><span class="t">《中华之气》<span class="au">王德生、秦莉</span></span><span class="mo">世界首先是被呼吸的，其次才是被看见的；气是第一逻辑，光逻辑只是触觉气逻辑的后起投影。</span><span class="tags"><i>What</i><i>文明·哲学</i><i>文明与社会</i></span></a>
+<a class="row" href="/motifs/7/" data-c="文明与社会" data-q="Why"><span class="no">第7号</span><span class="t">《中华文化导论》<span class="au">王德生</span></span><span class="mo">中华文化是偏置三号位的「我文化」，以「我如何在场」为根；人情、面子、子孙三项稳固工程因此兴，也因孤岛化而递弱代偿。</span><span class="tags"><i>Why</i><i>文明·中华文化</i><i>文明与社会</i></span></a>
+<a class="row" href="/motifs/6/" data-c="哲学与SDE" data-q="Why"><span class="no">第6号</span><span class="t">《西方哲学大解构》<span class="au">王德生、秦莉</span></span><span class="mo">西方哲学两千多年一直把「发生」误认成「发现」：理念、实体、先验形式，都是互动中生成的结构，被当成了恒在的本体。</span><span class="tags"><i>Why</i><i>哲学·西方哲学史</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/5/" data-c="哲学与SDE" data-q="What"><span class="no">第5号</span><span class="t">《特征纠缠解码》<span class="au">王德生、石奇志</span></span><span class="mo">世界不是特征的集合，而是特征纠缠的生成；实体、知识、技术、艺术都是纠缠在不同模态下的显影。</span><span class="tags"><i>What</i><i>哲学·知识技术艺术</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/4/" data-c="哲学与SDE" data-q="Why"><span class="no">第4号</span><span class="t">《SDE发生学》<span class="au">王德生</span></span><span class="mo">稳定不是起点，而是差异洪流与特征纠缠共同压出的阶段性成果；发生学等于底盘加回写。</span><span class="tags"><i>Why</i><i>哲学·发生学</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/3/" data-c="哲学与SDE" data-q="Why"><span class="no">第3号</span><span class="t">《SIO三大公理》<span class="au">王德生</span></span><span class="mo">目标空、路径乱、动力迷，不是三个问题而是一个误判的三处折射：把影子当本体、把复写当起源、把价值当发动机。</span><span class="tags"><i>Why</i><i>哲学·文明</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/2/" data-c="哲学与SDE" data-q="What"><span class="no">第2号</span><span class="t">《SIO本体论》<span class="au">王德生</span></span><span class="mo">「我—看见—它」不是世界的结构，只是语法对并行发生的压缩；存在是一阶整体运行，解释权须从主客互动叙事收回。</span><span class="tags"><i>What</i><i>哲学·本体论</i><i>哲学与SDE</i></span></a>
+<a class="row" href="/motifs/1/" data-c="哲学与SDE" data-q="What"><span class="no">第1号</span><span class="t">《SIO 哲学导论》<span class="au">王德生</span></span><span class="mo">存在不是由主体、互动、客体拼成的某物，而是一口没有分界的气；三者只是这场呼吸浮现的三个弯折。</span><span class="tags"><i>What</i><i>哲学·本体论</i><i>哲学与SDE</i></span></a>
+</div></section>
+</main>
+<footer>© 德麦国际 · <a href="/browse/">SDE Universes</a> · 专著母题</footer>
+<script>
+(function(){var q=document.getElementById('q'),fc=document.getElementById('fc'),fq=document.getElementById('fq'),cnt=document.getElementById('cnt');
+var rows=[].slice.call(document.querySelectorAll('#list .row'));
+function run(){var s=q.value.trim().toLowerCase(),c=fc.value,t=fq.value,k=0;
+rows.forEach(function(r){var ok=(!s||r.textContent.toLowerCase().indexOf(s)>=0)&&(!c||r.getAttribute('data-c')===c)&&(!t||r.getAttribute('data-q')===t);r.style.display=ok?'':'none';if(ok)k++});
+cnt.textContent=k+' 部';}
+q.addEventListener('input',run);fc.addEventListener('change',run);fq.addEventListener('change',run);run();})();
+</script>
+<script defer="" src="/wds-mode.js?v=20261025a"></script>
+</body>
+</html>
