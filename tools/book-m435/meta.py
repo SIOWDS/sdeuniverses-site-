@@ -1,0 +1,20 @@
+"""第 435 号《一间教室，六扇门——Mary 老师的六路径子本》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 435
+SLUG = 'six-doors'
+TITLE = '一间教室，六扇门'
+SUBTITLE = 'Mary 老师的六路径子本'
+FULL_TITLE = '一间教室，六扇门——Mary 老师的六路径子本'
+TITLE_EN = "One Classroom, Six Doors: Mary's Six-Path Companion"
+EPIGRAPH = '先认清这个孩子此刻从哪扇门进'
+VERDICT = '一间教室不止一扇门：先认清这个孩子此刻从哪扇门进，再决定老师从哪里下刀。'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+CATEGORY = 'edu'
+ISBN = '979-8-90690-048-7'
+PRICE_USD = 25.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261028a'
+DATE = '2026-10-28'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261028-m435-unit-v1.0'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
