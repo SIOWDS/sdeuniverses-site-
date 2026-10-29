@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>《SDE九宫格透镜问题分析法》母题卡 · 专著母题</title>
+<meta content="同一个问题没有同一双慧眼：先选在此人身上分得开的那一格透镜，再分析；在平谱的格上查得越细越乱。" name="description"/>
+<link href="https://sdeuniverses.com/motifs/513/" rel="canonical"/>
+<meta content="《SDE九宫格透镜问题分析法》母题卡 · 专著母题" property="og:title"/>
+<meta content="同一个问题没有同一双慧眼：先选在此人身上分得开的那一格透镜，再分析；在平谱的格上查得越细越乱。" property="og:description"/>
+<style>
+*{box-sizing:border-box}
+:root{--paper:#F4EEE1;--paper2:#EAE0C8;--ink:#272116;--muted:#73664F;--acc:#7A3E1D;--acc2:#5A2B12;--line:rgba(122,62,29,.22);--card:#FBF7EE}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Noto Serif SC','Songti SC',Georgia,serif;line-height:1.85}
+.zh-only,.en-only{}body.zh .en-only,body.en .zh-only{display:none}
+a{color:var(--acc)}
+header{position:sticky;top:0;z-index:10;background:rgba(244,238,225,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{max-width:1160px;margin:auto;padding:.75rem 16px;display:flex;align-items:center;gap:1.1rem;flex-wrap:wrap}
+.brand{margin-right:auto;color:var(--acc2);text-decoration:none;font-weight:600;letter-spacing:.08em}
+.nav>a:not(.brand){color:var(--muted);text-decoration:none;font-size:.88rem}.nav>a:hover{color:var(--acc)}
+.hero{padding:clamp(3rem,8vw,6rem) 16px clamp(2rem,5vw,3.5rem);border-bottom:1px solid var(--line);background:radial-gradient(circle at 85% 20%,rgba(122,62,29,.10),transparent 32%),linear-gradient(135deg,var(--paper),var(--paper2))}
+.wrap{max-width:1060px;margin:auto}
+.eyebrow{font-size:.72rem;letter-spacing:.32em;color:var(--acc);margin:0 0 .9rem}
+h1{margin:0;font-size:clamp(2.4rem,7vw,4.6rem);font-weight:600;letter-spacing:.08em;line-height:1.15}
+.lead{max-width:44em;color:var(--muted);font-size:clamp(.98rem,2.1vw,1.12rem);margin:1.2rem 0 0}
+.stats{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.4rem}
+.stats span{border:1px solid var(--line);background:rgba(255,255,255,.4);padding:.2rem .7rem;border-radius:999px;font-size:.85rem;color:var(--muted)}
+.tools{position:sticky;top:52px;z-index:5;background:var(--paper);border-bottom:1px solid var(--line);padding:.8rem 16px}
+.tools .wrap{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+.tools input{flex:1 1 260px;min-width:0;padding:.55rem .8rem;border:1px solid var(--line);border-radius:4px;background:var(--card);font:inherit;color:var(--ink)}
+.tools select{padding:.5rem .6rem;border:1px solid var(--line);border-radius:4px;background:var(--card);font:inherit;color:var(--ink);max-width:100%}
+.count{font-size:.85rem;color:var(--muted)}
+.list{padding:1.4rem 16px 4rem}
+.row{display:grid;grid-template-columns:4.2rem 1fr;gap:.2rem 1rem;padding:1rem 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+.row:hover .t{color:var(--acc)}
+.no{font-size:.82rem;color:var(--muted);padding-top:.25rem}
+.t{font-weight:600;font-size:1.06rem}
+.au{font-weight:400;font-size:.84rem;color:var(--muted);margin-left:.5rem}
+.mo{grid-column:2;color:var(--ink);font-size:.95rem}
+.tags{grid-column:2;display:flex;flex-wrap:wrap;gap:.35rem}
+.tags i{font-style:normal;font-size:.74rem;color:var(--acc);border:1px solid var(--line);border-radius:3px;padding:0 .4rem}
+.row.pending .mo{color:var(--muted)}
+article{max-width:780px;margin:auto;padding:2.2rem 16px 4rem}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:.25rem 1rem;font-size:.92rem;margin:1.4rem 0;padding:1rem 1.2rem;background:var(--card);border:1px solid var(--line);border-radius:4px}
+.meta dt{color:var(--muted)}.meta dd{margin:0}
+.motif{font-size:clamp(1.12rem,2.6vw,1.32rem);font-weight:600;line-height:1.7;border-left:4px solid var(--acc);padding:.3rem 0 .3rem 1rem;margin:1.6rem 0}
+article h2{font-size:1.18rem;margin:2.2rem 0 .6rem;color:var(--acc2)}
+article p{margin:.6rem 0}
+article ul{padding-left:1.2rem}article li{margin:.35rem 0}article li.sub{margin-left:1.2rem;list-style:circle}
+.pager{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--line);font-size:.92rem}
+.links{display:flex;flex-wrap:wrap;gap:.8rem;font-size:.9rem;margin-top:.4rem}
+footer{border-top:1px solid var(--line);padding:1.6rem 16px;text-align:center;color:var(--muted);font-size:.85rem}
+footer a{color:var(--muted)}
+@media (max-width:560px){.row{grid-template-columns:3.2rem 1fr}.tools{top:0;position:relative}}
+</style>
+</head>
+<body class="zh">
+<header>
+<nav aria-label="主导航" class="nav">
+<a class="brand" href="/browse/">SDE Universes · 爱思乐园</a>
+<a href="/browse/">首页</a>
+<a href="/motifs/">专著母题</a>
+<a href="/books/">专著书架</a>
+<a href="/directory/">栏目总目录</a>
+<a href="/search/">搜索</a>
+</nav>
+</header>
+<main>
+<article>
+<div class="links"><a href="/motifs/">← 返回专著母题总表</a><a href="/books/m/513/">读这本书</a></div>
+<p class="eyebrow" style="margin-top:1.6rem">专著母题 · 德麦国际专著第 513 号</p>
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">《SDE九宫格透镜问题分析法》</h1>
+<p class="motif">同一个问题没有同一双慧眼：先选在此人身上分得开的那一格透镜，再分析；在平谱的格上查得越细越乱。</p>
+<dl class="meta"><dt>副题</dt><dd>无</dd><dt>作者</dt><dd>王德生著</dd><dt>分类</dt><dd>哲学与SDE</dd><dt>题域</dt><dd>方法论·问题分析</dd><dt>题型</dt><dd>How</dd></dl>
+<h2>一、它推翻的默认看法</h2>
+<p>默认看法有两层。第一层是&quot;一双慧眼&quot;：把看得透当成一种可以送给每个人的通用本事，遇到问题，用动机、方法、奖惩中的某一副去看，所有拖拉的孩子都按同一种拖拉处理。书中小林、阿杰、小雨三个孩子同叫&quot;拖拉&quot;，一个在意&quot;由不由我&quot;，一个卡在动起来之前那一下，一个停在&quot;写得好不好看&quot;，同一片透镜必然有两个看偏。第二层更细：即使承认要因人而异，常见做法也是&quot;分不开就改条件重评&quot;，把清单越加越长。作者的判断是，错在跳过了选透镜这一步：透镜没有好坏，只有合不合这个人。书里说这不是说常见看法错了，而是它们默认了大家用同一片透镜。作者把前言概括为&quot;从推翻到往细里走&quot;：前一句讲要看得透，这一句讲怎样才看得透，因人而异，要先选。</p>
+<h2>二、母题怎样立起来</h2>
+<p>起点是一个感觉层的事实：摸布、听曲、看窗，每种感觉里S（显露）、D（差异序列）、E（特征纠缠）三样都在，没有差异序列就没有显露。三维各分三格得九格，每格再分三个分量（全息性），九格是第二刀，仍是假想性切割。</p>
+<p>第二步，每维各取一格合成三角套，只取下标之和被3整除的九组。这条规矩既让任意两个不同维的格恰好共用一组，又留下三个正位，且只有这一条，所以九组构成3阶仿射平面。三个正位对应学科已占的地盘，想出的东西多半对但不新；六个异位分甲乙两组，是新典范的入口，不是新典范本身。</p>
+<p>第三步，一组三角套可具体化为三方程（缺式，解法补式）、六路径（偏路，解法排路）、三原理（断拍，解法点火），九组各三种共27个分析单元，先选一格就只查其中9个。</p>
+<p>第四步，选格的依据是区分性特征：一格能给某人分类，当且仅当他在这一格三个分量上高低分明；高低接近的叫平谱，是换格的消息而不是坏消息。由此落到母题：分析的有效性是&quot;这个人在这一格上&quot;的性质，不是方法的性质。</p>
+<p>第五步是检验：回落刀先砍自己，拿掉异位看判断掉进哪门学科。拖拉作业盲评中，三个正位判断得92、89.5、105.5，异位&quot;符号零误差&quot;120，六阶交叉&quot;开始从来没被布置过&quot;130；同一评审连评五轮涨到142是锚定，换独立评审为130、135、131，真实水平在130至135，不宣称过145。</p>
+<h2>三、核心构念</h2>
+<ul><li><b>透镜</b>：看问题所选定的一格，先于分析；它让&quot;分析什么&quot;变成可学、可检验的选择。</li><li><b>区分性特征 / 平谱</b>：某人在一格三个分量上高低分明为有区分性，接近则为平谱；平谱是换格信号，用来决定透镜选在哪里。</li><li><b>三角套（正位与异位）</b>：每维一格的组合，下标之和被3整除；三个正位是已有学科的地盘，六个异位是新典范入口。</li><li><b>缺式 / 偏路 / 断拍</b>：三角套具体化后的三类病，分别对应方程问题、路径问题、动力问题，各配补式、排路、点火。</li><li><b>配置矩阵</b>：同一透镜内主导分量不同则三组轻重不同；对角像正位，新判断到非对角找。</li><li><b>桥</b>：不同维两格恰好共用的那一组；桥协同是由共用三角事先决定的待检猜想。</li><li><b>重启</b>：差异序列每一次重新起头的位置，由&quot;开始没被布置&quot;改写为&quot;重启没被布置&quot;。</li></ul>
+<h2>四、全书骨架</h2>
+<p>三篇二十四章，另有前言、导读、结语与附录A至D。上篇原理（第1至7章）从三大感觉讲清SDE，推出九格、三角套、仿射平面，再把三角套具体化为三方程、六路径、三原理。中篇方法（第8至17章）讲先选格再分析、九格透镜手册、配置矩阵、桥、动态多透镜，用三类问题的透镜分析，最后以回落刀到独立盲评收束。下篇案例（第18至24章）用拖拉作业做到底，再展开到学校、家庭、工作与社会三大领域。全书&quot;含阅读、学习包、智能体三位一体&quot;。</p>
+<h2>五、关键案例与证据</h2>
+<p>拖拉作业是主案：小林的&quot;开始&quot;从没被布置，林姐一晚记到十七次重启。四种记号的判决设计里，重启说独有的预言是&quot;允许相同的叙述也能维持&quot;。团团挑食缺的是第一口之前那一式；学了十几年英语开不了口，是话总要在符号层完工才肯出口。刘伯量血压要的是在不在轨（S3的&quot;真&quot;），郑老板对损耗敏感、对冗余无感，换透镜后当晚划掉九个菜；老周更适合E3（能量）一格，跟老伙计走路一个月不断。需注意这些人物与场景均为构想，书中明言不当证据。</p>
+<h2>六、碰撞接口</h2>
+<ul><li><b>可抽出的命题</b>：①若某人在一格三个分量上呈平谱，则针对该格不同分量的干预效果无差别（平谱失效，待检）；②分析不是依方法而定，而是依&quot;此人在此格上是否有区分&quot;而定；③协同不是从数据交互项事后发现，而是由共用三角事先决定（桥协同，待检）。</li><li><b>可相撞的方向</b>：个体差异与干预效果的研究（个体内动态、JITAI、功能行为评估）；任何&quot;一套理论解释一类人&quot;的学科，可撞点在&quot;分不开时换格而非改条件重评&quot;。也可与要求先给结构再谈内容的分类学相撞。</li><li><b>站内邻书</b>：<a href="/motifs/507/">第507号</a>《在家还是在校？》（教育场景可对撞）；<a href="/motifs/356/">第356号</a>《管理学学派解构入门》（学派各占一片透镜，可对撞）；<a href="/motifs/225/">第225号</a>《SDE 语义发生三原理》（三原理的另一个展开，同向）；<a href="/motifs/423/">第423号</a>《该来的》（站内检索列为同向）。</li></ul>
+<h2>七、边界：什么情况下算错</h2>
+<p>书中自己划了界：平谱失效、桥协同、九组共线优势均为待检猜想，尚无数据；若在平谱格上看到干预效果大差别，或2×2×2设计中桥上的干预不超过两边之和，这套方法即告失败。重启说若被实验推翻，本书要改。方法不是诊断工具，不替代医学，不做政策表态，读数不进考核；迁移的是方法而不是结论；同一种问题反复出现、常用办法都试过仍不灵，才值得选透镜。</p>
+<p>另外它依赖一个前提：区分性可被观测并稳定。若分量高低随情境剧烈漂移，选格就失去依据。</p>
+
+<div class="pager"><a href="/motifs/514/">← 第514号《累的发生学》</a><a href="/motifs/512/">第512号《班级之美》 →</a></div>
+</article>
+</main>
+<footer>© 德麦国际 · <a href="/browse/">SDE Universes</a> · 专著母题</footer>
+<script defer="" src="/wds-mode.js?v=20261025a"></script>
+</body>
+</html>
