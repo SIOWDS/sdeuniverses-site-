@@ -9,6 +9,8 @@ for p in sorted((R/'sources').glob('ch*.json')):
   url=(e.get('url') or '').strip()
   if not url.startswith('http'):continue
   u=urllib.parse.urlsplit(url);key=urllib.parse.urlunsplit((u.scheme,u.netloc.lower(),u.path.rstrip('/'),u.query,''))
+  doi=re.search(r'10\.\d{4,9}/[^\s?#]+',urllib.parse.unquote(url)) or re.search(r'10\.\d{4,9}/[^\s]+',e.get('title',''))
+  if doi:key='doi:'+doi[0].rstrip('.,。;；').lower()
   if key not in external:external[key]={'title':e.get('title',''),'url':url,'chapters':[],'read_scope':[]}
   a=external[key]
   if len(e.get('title',''))>len(a['title']):a['title']=e['title']
