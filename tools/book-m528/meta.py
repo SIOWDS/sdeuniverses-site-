@@ -1,0 +1,20 @@
+"""第 528 号《未来大学的课堂模式典范革命——九问模式》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 528
+SLUG = 'jiuwen-ketang'
+TITLE = '未来大学的课堂模式典范革命'
+SUBTITLE = '九问模式'
+FULL_TITLE = '未来大学的课堂模式典范革命——九问模式'
+TITLE_EN = 'The Paradigm Revolution of the Future University Classroom: The Nine-Question Mode'
+EPIGRAPH = '子本建造，就是未来大学的教学核心目标'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+CATEGORY = 'edu'
+ISBN = '979-8-90690-528-4'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261029'
+DATE = '2026-10-29'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261029-m528-unit-v1.0'
+SRC = '/home/claude/book/final'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
