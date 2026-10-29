@@ -1,0 +1,20 @@
+"""第 529 号《胡敏谈SDE本体论：健康九问里的显露、差异与纠缠》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 529
+SLUG = 'humin-sde-ontology'
+TITLE = '胡敏谈SDE本体论'
+SUBTITLE = '健康九问里的显露、差异与纠缠'
+FULL_TITLE = '胡敏谈SDE本体论：健康九问里的显露、差异与纠缠'
+TITLE_EN = 'Hu Min on SDE Ontology: Show, Difference and Entanglement in Nine Questions on Health'
+EPIGRAPH = '健康不在某一次读数，而在一本被本人经手记下、结清并回写的账'
+AUTHOR = '胡敏'
+AUTHORS = ['胡敏']
+CATEGORY = 'health'
+ISBN = '979-8-90690-529-1'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261029a'
+DATE = '2026-10-29'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261029-m529-unit-v1.0'
+SRC = '/tmp/claude-0/-home-claude/3b59c1f5-a59e-539e-a5c2-736ec31ce0ce/scratchpad/book'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
