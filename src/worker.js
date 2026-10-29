@@ -560,6 +560,13 @@ function wdsCacheSay(u) {
   if (!pt) return "；缓存命中 " + h + " tok";
   return "；缓存命中 " + h + "/" + pt + " tok（" + Math.round(h * 100 / pt) + "%）";
 }
+function wdsOaiFloor(u, body) {
+  if (String(u || "").indexOf("api.openai.com") < 0 || body.max_completion_tokens == null) return body;
+  const e = String(body.reasoning_effort || "medium");
+  const fl = (e in WDS_OAI_FLOOR) ? WDS_OAI_FLOOR[e] : 16000;
+  if (body.max_completion_tokens < fl) body.max_completion_tokens = Math.min(fl, WDS_TOK_CAP.openai);
+  return body;
+}
 function wdsUpFix(u, body) {
   if (u.indexOf("api.openai.com") >= 0) {
     if (body.max_tokens != null && body.max_completion_tokens == null) body.max_completion_tokens = body.max_tokens;
@@ -568,6 +575,7 @@ function wdsUpFix(u, body) {
     // 那十六处里有一半不经过 wdsTopBody/wdsPlainBody（各自现拼 body），给它们一个明确的默认档：
     // 不写这一句就是官方默认 medium——推理 token 照吃预算，而调用方以为自己要的是「快答一句」。
     if (body.reasoning_effort == null) body.reasoning_effort = "low";
+    wdsOaiFloor(u, body);
   } else if (u.indexOf("api.anthropic.com") >= 0) {
     // 官方支持表（2026-09-01 查证）：stream / stream_options / top_p / max_tokens 全支持，
     // reasoning_effort、presence/frequency_penalty 等是**静默忽略**不报错——所以这里不必剥字段。
@@ -591,15 +599,32 @@ function wdsUpFix(u, body) {
    并把这个型号的上限记在 isolate 里，同一台机器后面的请求直接按上限发，不再白撞一次。
    ⚠ 只在「上游明确报了 reasoning_effort 不支持」时才动，别的 400 一律原样回给调用方——
      wdsFetchMax 的预算阶梯还等着看那些 400 的原文。 */
-const WDS_EFFORT_CAP = new Map();   // model → 这个型号实际接受的最高投入档
-const WDS_EFFORT_ORDER = ["xhigh", "high", "medium", "low", "none"];
-function wdsEffortPick(txt) {
-  const m = String(txt || "").match(/Supported values are:([^"]+)/i);
-  if (!m) return "";
-  const okSet = (m[1].match(/'([a-z]+)'/gi) || []).map((x) => x.replace(/'/g, "").toLowerCase());
-  for (const e of WDS_EFFORT_ORDER) if (okSet.indexOf(e) >= 0) return e;
-  return "";
+/* ⚠⚠ 2026-10-29 改（WDS博士截图「白白消耗TOKEN」）：原来这里**一律退到最高档**——
+   专为 max 被拒写的，没想到 none 也会被拒。gpt-6.1-sol 只认 low/medium/high/xhigh/max（官方型号页），
+   于是「关思考重答」发 none → 400 → 被改成 xhigh 再发，3000 tok 全烧在思考上，两遍零字，钱照扣。
+   现在按**离原档最近**退：先往低处找（max→xhigh），低处没有才往高处找（none→low）。
+   记下的是这个型号**接受的整张表**，不是一个上限——上限只管得住往高撞，管不住往低撞。 */
+const WDS_EFFORT_OK = new Map();    // model → 这个型号实际接受的投入档列表（读自上游 400 原文）
+const WDS_EFFORT_ORDER = ["none", "minimal", "low", "medium", "high", "xhigh", "max"];
+function wdsEffortNear(want, okSet) {
+  if (!okSet || !okSet.length || okSet.indexOf(want) >= 0) return want;
+  const i = WDS_EFFORT_ORDER.indexOf(want);
+  if (i < 0) return okSet[okSet.length - 1];
+  for (let k = i - 1; k >= 0; k--) if (okSet.indexOf(WDS_EFFORT_ORDER[k]) >= 0) return WDS_EFFORT_ORDER[k];
+  for (let k = i + 1; k < WDS_EFFORT_ORDER.length; k++) if (okSet.indexOf(WDS_EFFORT_ORDER[k]) >= 0) return WDS_EFFORT_ORDER[k];
+  return want;
 }
+function wdsEffortSet(txt) {
+  const m = String(txt || "").match(/Supported values are:([^"]+)/i);
+  if (!m) return [];
+  return (m[1].match(/'([a-z]+)'/gi) || []).map((x) => x.replace(/'/g, "").toLowerCase());
+}
+/* 【GPT 的思考吃输出预算，而且看不见 —— 2026-10-29】OpenAI 的推理 token 计在 max_completion_tokens 里，
+   chat/completions 又不把思考流回来：预算不够时上游干干净净回 finish_reason=length、正文 0 字，
+   这一遍的输入（满血内功七万多字）与思考 token **照样计费**。官方建议给推理留足空间。
+   ⇒ 按投入档给地板：只抬不压（调用方要得更多就照给），封顶 128K（gpt-6 系最大输出）。
+   多给的预算不会多花钱——按实际用掉的 token 计费；预算不够才是真浪费，那一遍白烧。 */
+const WDS_OAI_FLOOR = { none: 0, minimal: 4000, low: 8000, medium: 16000, high: 24000, xhigh: 32000, max: 32000 };
 async function wdsUp(url, init) {
   const u = String(url || "");
   if (u.indexOf("api.openai.com") < 0 && u.indexOf("api.anthropic.com") < 0) return fetch(url, init);
@@ -607,11 +632,9 @@ async function wdsUp(url, init) {
   try {
     if (init && typeof init.body === "string" && init.body.charAt(0) === "{") {
       body = wdsUpFix(u, JSON.parse(init.body));
-      // 这台机器已经吃过一次亏的型号：直接按已知上限发，不再撞第二次
-      const cap = WDS_EFFORT_CAP.get(String(body.model || ""));
-      if (cap && body.reasoning_effort && body.reasoning_effort !== cap
-          && WDS_EFFORT_ORDER.indexOf(body.reasoning_effort) < 0) body.reasoning_effort = cap;
-      if (cap && body.reasoning_effort === "max") body.reasoning_effort = cap;
+      // 这台机器已经吃过一次亏的型号：直接按已知那张表就近换档，不再撞第二次
+      const okSet = WDS_EFFORT_OK.get(String(body.model || ""));
+      if (okSet && body.reasoning_effort) { body.reasoning_effort = wdsEffortNear(body.reasoning_effort, okSet); wdsOaiFloor(u, body); }
       init = Object.assign({}, init, { body: JSON.stringify(body) });
     }
   } catch (e) { body = null; }   // 解析不了就原样发：适配失败可以是一次 400，不能是把请求吃掉
@@ -619,10 +642,12 @@ async function wdsUp(url, init) {
   if (resp.ok || resp.status !== 400 || !body || !body.reasoning_effort) return resp;
   let txt = ""; try { txt = (await resp.clone().text()).slice(0, 600); } catch (e) { return resp; }
   if (!/reasoning_effort/i.test(txt) || !/unsupported_value|does not support/i.test(txt)) return resp;
-  const nx = wdsEffortPick(txt);
+  const okSet = wdsEffortSet(txt);
+  const nx = wdsEffortNear(body.reasoning_effort, okSet);
   if (!nx || nx === body.reasoning_effort) return resp;
-  WDS_EFFORT_CAP.set(String(body.model || ""), nx);
+  WDS_EFFORT_OK.set(String(body.model || ""), okSet);
   body.reasoning_effort = nx;
+  wdsOaiFloor(u, body);   // 档换了，地板跟着换（none→low 之后思考又回来了，预算得给它留出来）
   return fetch(url, Object.assign({}, init, { body: JSON.stringify(body) }));
 }
 async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage, ladderOverride, plain) {
