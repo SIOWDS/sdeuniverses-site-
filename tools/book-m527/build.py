@@ -24,7 +24,7 @@ SLUG = 'ziben-dazao'
 META = dict(
     title='子本打造法', name='子本打造法',
     subtitle='从母本到每个人的学术专著', author='王德生', no=527,
-    isbn='979-8-90690-527-7', price='US$20.00', version='20261029a',
+    isbn='979-8-90690-527-7', price='US$20.00', version='20261029b',
     publisher='德麦国际出版社', publisher_en='Demai International Press',
 )
 HAN = re.compile(r'[一-鿿]')
