@@ -1,0 +1,20 @@
+"""第 463 号《AI会取代老师吗？——教学的典范转移三维度》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 463
+SLUG = 'ai-qudai-laoshi'
+TITLE = 'AI会取代老师吗？'
+SUBTITLE = '教学的典范转移三维度'
+FULL_TITLE = 'AI会取代老师吗？——教学的典范转移三维度'
+TITLE_EN = 'Will AI Replace Teachers? Three Dimensions of a Paradigm Shift in Teaching'
+EPIGRAPH = '发现退位给发生，统一性退位给谱系，真善美退位给意义'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+CATEGORY = 'edu'
+ISBN = '979-8-90690-050-0'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261029b'
+DATE = '2026-10-29'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261029-m463-unit-v1.0'
+SRC = '/home/claude/book/chapters'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
