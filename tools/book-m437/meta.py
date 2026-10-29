@@ -1,0 +1,20 @@
+"""第 437 号《被替代的从来不是人——论AI替代的虚幻》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 437
+SLUG = 'bei-tidai'
+TITLE = '被替代的从来不是人'
+SUBTITLE = '论AI替代的虚幻'
+FULL_TITLE = '被替代的从来不是人——论AI替代的虚幻'
+TITLE_EN = 'It Was Never the Human That Was Replaced: On the Illusion of ‘AI Replacement’'
+EPIGRAPH = '越是约不掉的工具，越谈不上替代'
+AUTHOR = '王德生'
+AUTHORS = ['王德生']
+CATEGORY = 'core'
+ISBN = '979-8-90690-049-4'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261029a'
+DATE = '2026-10-29'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261029-m437-unit-v1.0'
+SRC = '/home/claude/book'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
