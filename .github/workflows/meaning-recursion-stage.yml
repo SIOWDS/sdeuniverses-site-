@@ -1,0 +1,72 @@
+name: Stage SDE meaning-recursion publication
+on:
+  push:
+    paths:
+      - '.github/workflows/meaning-recursion-stage.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: meaning-recursion-publication
+  cancel-in-progress: false
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Retrieve author-approved manuscript
+        env:
+          SOURCE_URL: 'https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-727c-8211-baab-0e7de1604476/raw?se=2026-10-30T05%3A18%3A11Z&sp=r&sv=2026-02-06&sr=b&scid=c87fd8bf-f3bb-5901-8f81-f7f3fa75d9aa&skoid=6fa9748a-b7b2-4b56-a932-8c1417549c47&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-30T03%3A13%3A15Z&ske=2026-10-31T03%3A13%3A15Z&sks=b&skv=2026-02-06&sig=oOpfAthxkG1p2cTTMYFoZE3BooYJu3SBdULDbv4ovNE%3D'
+        run: |
+          curl --fail --location --retry 2 --silent --show-error "$SOURCE_URL" -o /tmp/meaning-source.zip
+          echo '5b6903dfad8ffdd64e0252717741ca781cab4cee6bf2aea178e21f1a668c8c7f  /tmp/meaning-source.zip' | sha256sum --check
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .publish/meaning-recursion
+      - name: Audit existing book identities and runtime contracts
+        run: |
+          python3 - <<'PY'
+          import subprocess,json,re,pathlib,zipfile,shutil
+          root=pathlib.Path('.publish/meaning-recursion');root.mkdir(parents=True,exist_ok=True)
+          shutil.copyfile('/tmp/meaning-source.zip',root/'source-v1.1.zip')
+          paths=subprocess.check_output(['git','ls-tree','-r','--name-only','HEAD'],text=True).splitlines()
+          def read(p):
+            return subprocess.check_output(['git','show','HEAD:'+p])
+          candidates=[p for p in paths if re.search(r'isbn|reserv|book-number|publication-record',p,re.I) and p.endswith(('.json','.md','.csv','.py','.txt','.yml'))]
+          selected={'public/books/catalog.json','public/books/agents.json','docs/book-agents.md','docs/bookshelf-maintenance.md','tools/build_bookshelf.py','tools/build_flip_reader.py','tools/flip_reader_template.html','tools/check_publication_identity.py','tools/check_bookshelf.py'}
+          selected.update(candidates)
+          selected.update(p for p in paths if p.startswith('public/books/m/529/') and p.endswith(('.json','.html','.js','.css')) and '/text/' not in p)
+          selected.update(p for p in paths if p.startswith('public/books/unit-runtime/') and p.endswith(('.js','.css','.json')))
+          selected.update(p for p in paths if p.startswith('.github/workflows/') and p.endswith(('.yml','.yaml')) and ('deploy' in p or 'cloudflare' in p))
+          selected.update(p for p in paths if p.startswith('public/books/agent/') and p.count('/')<=3 and p.endswith(('.js','.css','.html')))
+          kept=[]; catalog=None
+          with zipfile.ZipFile(root/'repository-context.zip','w',zipfile.ZIP_DEFLATED) as z:
+            for p in sorted(selected):
+              if p not in paths: continue
+              b=read(p)
+              if len(b)>3000000: continue
+              z.writestr(p,b);kept.append(p)
+              if p=='public/books/catalog.json': catalog=json.loads(b)
+          numbers=sorted({int(m.group(1)) for p in paths if (m:=re.match(r'public/books/m/(\d+)/',p))})
+          audit={'head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'max_directory_number':max(numbers),'existing_directory_numbers':numbers,'identity_registry_paths':candidates,'context_paths':kept,'workflow_paths':[p for p in paths if p.startswith('.github/workflows/')],'publication_related_tools':[p for p in paths if p.startswith('tools/') and re.search(r'isbn|publication|unit|agent|book.*529|book.*528',p,re.I)],'catalog_type':type(catalog).__name__,'catalog_keys':list(catalog)[:20] if isinstance(catalog,dict) else None}
+          (root/'inventory.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps({k:v for k,v in audit.items() if k in ['head','max_directory_number','identity_registry_paths','catalog_type','catalog_keys']},ensure_ascii=False,indent=2))
+          PY
+      - name: Preserve only publication staging outputs
+        run: |
+          git config user.name 'SDE Publication'
+          git config user.email 'publication@sdeuniverses.com'
+          git add .publish/meaning-recursion
+          git diff --cached --quiet || git commit -m 'Stage reviewed meaning-recursion source and identity audit [skip ci]'
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        with:
+          name: meaning-recursion-repository-context
+          path: |
+            .publish/meaning-recursion/repository-context.zip
+            .publish/meaning-recursion/inventory.json
+          retention-days: 3
