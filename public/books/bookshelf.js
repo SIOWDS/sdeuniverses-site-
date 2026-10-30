@@ -1,7 +1,16 @@
-/* Progressive enhancement: every book and reading link is present without JS. */
+/* Existing catalogue cards remain static. Volume 530 has a deduplicated display supplement pending canonical catalogue merge. */
 (function(){
  'use strict';
  const grid=document.getElementById('book-grid'); if(!grid)return;
+ // Remove this supplement after m-530 is merged into catalog.json and the static shelves are regenerated.
+ if(!grid.querySelector('.book[data-number="530"]')){
+  const c=document.createElement('article');c.className='book';
+  Object.assign(c.dataset,{id:'m-530',number:'530',title:'SDE意义递归发生学',category:'core',reading:'full',authors:'["王德生"]',search:'SDE意义递归发生学 从人的全面发展到国家治理与文明升维 王德生 530 979-8-90690-530-7 创造 自由 幸福 教育 健康 事业 政治 经济 法律 递生',flip:'false',online:'2026-10-30',publicationUnit:'m-530',catalogSupplement:'true'});
+  c.innerHTML='<div class="book-main"><a class="cover" href="/books/m/530/" tabindex="-1" aria-hidden="true"><span class="no-cover">SDE意义递归发生学</span></a><div class="book-copy"><p class="book-tag"><span>SDE理论</span><span class="ordinal">#530</span></p><h3><a href="/books/m/530/">SDE意义递归发生学</a></h3><p class="byline">王德生</p><p class="description">从人的全面发展到国家治理与文明升维。九编47章、350页原稿、47项学习任务与专属研读智能体“递生”。</p></div></div><div class="book-meta"><span class="reading-state full">全文可读</span><span class="format">网页／原稿PDF</span></div><div class="book-actions publication-unit-actions" role="group" aria-label="阅读、学习、智能问对"><p class="publication-unit-label">三位一体 · 网站版</p><a class="read-button" data-unit-action="read" href="/books/m/530/read.html">阅读 · 完整原稿</a><a class="learn-link" data-unit-action="learn" href="/books/m/530/agent/learning.html">学习包 · 47项任务</a><a class="agent-link" data-unit-action="agent" href="/books/m/530/agent/dialogue.html">递生 · 智能问对</a><div class="unit-secondary"><a class="detail-button" href="/books/m/530/">详情</a><a class="detail-button" href="/books/m/530/unit/handbook.html">学习手册</a></div></div>';
+  grid.prepend(c);
+  const total=document.querySelector('.shelf-total strong');if(total)total.textContent=String(grid.querySelectorAll('.book').length);
+  for(const category of ['all','core']){const span=document.querySelector('[data-category-filter="'+category+'"] span');if(span&&/^\d+$/.test(span.textContent.trim()))span.textContent=String(Number(span.textContent)+1);}
+ }
  const cards=Array.from(grid.querySelectorAll('.book'));
  const q=document.getElementById('book-search'),author=document.getElementById('author-filter'),availability=document.getElementById('reading-filter'),sort=document.getElementById('sort-books');
  const chips=Array.from(document.querySelectorAll('[data-category-filter]')),views=Array.from(document.querySelectorAll('[data-view]'));
