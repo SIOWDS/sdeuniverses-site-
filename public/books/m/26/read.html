@@ -189,6 +189,7 @@ var TOC = JSON.parse(document.getElementById('toc').textContent);
 var $ = function(id){ return document.getElementById(id); };
 
 var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var renderPending=false, renderCallbacks=[], renderGeneration=0, navigationGeneration=0;
 var themes=['','day','sepia'], ti=0;
 var cache={}, textCache={}, vecOK=0, vecFail=0;
 /* —— 接入 SDE 陪读（WDS）：把当前可见页的文本与页码喂给助手；文字层可选中某句作焦点 —— */
@@ -278,9 +279,11 @@ function drawCanvas(pg, vp, canvasEl, tlEl, cb){
 }
 
 function buildText(pg, vp, el){
+  var generation=renderGeneration;
   el.innerHTML='';
   pg.getTextContent().then(function(tc){
     try{ textCache[pg.pageNumber]=tc.items.map(function(x){return x.str;}).join(''); }catch(e){}
+    if(generation!==renderGeneration) return;
     var frag=document.createDocumentFragment();
     tc.items.forEach(function(it){
       if(!it.str) return;
@@ -298,16 +301,28 @@ function buildText(pg, vp, el){
 
 /* ── 展示当前跨页 ── */
 function show(cb){
-  if(rendering){ return; }
+  if(typeof cb==='function') renderCallbacks.push(cb);
+  if(rendering){ renderPending=true; return; }
   rendering=true;
-  document.getElementById('book').classList.toggle('single', !spread);
-  $('leafR').style.display = spread?'':'none';
-  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  renderPending=false;
+  renderGeneration++;
+  var shownPage=cur, shownSpread=spread;
+  document.getElementById('book').classList.toggle('single', !shownSpread);
+  $('leafR').style.display = shownSpread?'':'none';
+  var left = shownSpread ? (shownPage%2===0?shownPage:shownPage-1) : shownPage;
   if(left<1) left=0;
   var right= left+1;
-  var done=0, need=spread?2:1;
-  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
-  if(spread){
+  var done=0, need=shownSpread?2:1;
+  function fin(){
+    if(++done<need) return;
+    rendering=false;
+    if(renderPending || cur!==shownPage || spread!==shownSpread){ show(); return; }
+    sync();
+    hideMsg();
+    var callbacks=renderCallbacks.splice(0);
+    callbacks.forEach(function(fn){ fn(); });
+  }
+  if(shownSpread){
     $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
     $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
     renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
@@ -337,7 +352,12 @@ function step(dir){
   var t = cur + dir*n;
   if(t<1) t=1; if(t>total) t=total;
   if(t===cur) return;
-  animate(dir, function(){ cur=t; show(); });
+  var generation=++navigationGeneration;
+  animate(dir, function(){
+    if(generation!==navigationGeneration) return;
+    cur=t;
+    show();
+  });
 }
 function animate(dir, after){
   var src = dir>0 ? $('leafR') : $('leafL');
@@ -357,7 +377,13 @@ function animate(dir, after){
   requestAnimationFrame(function(){ fl.classList.add('go'); });
   setTimeout(function(){ fl.remove(); after(); }, 620);
 }
-function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+function go(p){
+  navigationGeneration++;
+  p=Math.max(1,Math.min(total,p|0));
+  if(p===cur) return;
+  cur=p;
+  show();
+}
 
 /* ── 目录 ── */
 /* 目录兜底：TOC 为空时从 PDF 书签生成（新迁入的书多半没有手工目录） */
