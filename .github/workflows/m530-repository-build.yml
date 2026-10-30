@@ -1,0 +1,67 @@
+name: Volume 530 repository-source candidate
+on:
+  push:
+    branches: ['publication/m530-reviewed-20261030']
+    paths: ['tools/book-m530/release-request.json']
+permissions:
+  contents: read
+concurrency:
+  group: m530-reviewed-candidate
+  cancel-in-progress: false
+jobs:
+  candidate:
+    if: github.ref == 'refs/heads/publication/m530-reviewed-20261030'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: publication/m530-reviewed-20261030
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/
+            /public/books/catalog.json
+            /public/books/agents.json
+            /public/books/agent/index.html
+            /public/books/unit-runtime/
+            /public/books/m/530/
+            /public/books/index.html
+            /public/monographs/index.html
+            /public/sites/read/library/index.html
+            /.publish/volume-reservations/
+            /.publish/meaning-recursion/source-v1.1.zip
+      - name: Verify committed source data
+        run: |
+          echo '5b6903dfad8ffdd64e0252717741ca781cab4cee6bf2aea178e21f1a668c8c7f  .publish/meaning-recursion/source-v1.1.zip' | sha256sum --check
+      - name: Install build dependencies
+        run: |
+          python3 -m pip install --quiet pymupdf reportlab pillow markdown beautifulsoup4 pypdf numpy scikit-learn playwright
+          python3 -m playwright install --with-deps chromium
+      - name: Build this book from data only
+        run: python3 tools/book-m530/build_reviewed.py
+      - name: Verify local browser and publication contracts
+        run: python3 tools/book-m530/verify_reviewed.py
+      - name: Commit only to review branch
+        run: |
+          test "$(git branch --show-current)" = 'publication/m530-reviewed-20261030'
+          git config user.name 'SDE Publication'
+          git config user.email 'publication@sdeuniverses.com'
+          git add public/books/m/530 public/books/catalog.json public/books/agents.json public/books/agent/index.html public/books/index.html public/monographs/index.html public/sites/read/library/index.html .publish/volume-reservations/530.json .publish/meaning-recursion/reviewed-build-report.json
+          git diff --cached --check
+          git diff --cached --quiet || git commit -m 'Prepare verified volume 530 reading, learning package and Disheng agent'
+          git push origin HEAD:refs/heads/publication/m530-reviewed-20261030
+          git rev-parse HEAD > /tmp/m530-candidate-commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m530-reviewed-build
+          path: |
+            public/books/m/530/
+            .publish/meaning-recursion/reviewed-build-report.json
+            .publish/meaning-recursion/qa/
+            /tmp/m530-candidate-commit.txt
+          retention-days: 7
