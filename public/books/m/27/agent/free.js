@@ -93,20 +93,20 @@ function docText(cap){
  if(!CH.length)return "";
  var B=cap||BUDGET,T=total(),fmt=function(c){return "【"+c.t+"】\n"+c.x};
  if(T<=B)return CH.map(fmt).join("\n\n");
- /* 成文时只能带约 6 万字：优先保住读者选的章，再按章序补，余下读目录与开头 */
+ /* 成文时只能带约 6 万字符：优先保住读者选的章，再按章序补，余下读目录与开头 */
  var sel=(SEL||defaultSel()).slice(),on={},used=0;
  if(cap){var keep=[];sel.forEach(function(i){if(used+CH[i].n<=B*0.8){keep.push(i);used+=CH[i].n}});sel=keep}
  sel.forEach(function(i){on[i]=1});
- var toc="【全书目录（共 "+CH.length+" 章，约 "+Math.round(T/1000)+" 千字；本轮发送标★章节全文，其余只附开头）】\n"+CH.map(function(c,i){return(on[i]?"★ ":"· ")+c.t}).join("\n");
+ var toc="【全书目录（共 "+CH.length+" 章，约 "+Math.round(T/1000)+" 千字符；本轮发送标★章节全文，其余只附开头）】\n"+CH.map(function(c,i){return(on[i]?"★ ":"· ")+c.t}).join("\n");
  var body=CH.map(function(c,i){return on[i]?fmt(c):("【"+c.t+"（开头）】\n"+c.x.slice(0,260)+"……")}).join("\n\n");
  return (toc+"\n\n"+body).slice(0,cap?cap:119000);
 }
 function readInfo(){
  var T=total();
  if(!CH.length){$("readInfo").innerHTML="这本书在站上还没有全文网页，「"+esc(AG.name)+"」只能凭书目介绍和你聊。";return}
- if(T<=BUDGET){$("readInfo").innerHTML="「"+esc(AG.name)+"」已在浏览器载入<b>全书文本</b> · "+CH.length+" 章 · 约 "+(T/10000).toFixed(1)+" 万字";return}
+ if(T<=BUDGET){$("readInfo").innerHTML="「"+esc(AG.name)+"」已在浏览器载入<b>全书文本</b> · "+CH.length+" 章 · 约 "+(T/10000).toFixed(1)+" 万字符";return}
  var s=SEL||defaultSel(),u=s.reduce(function(a,i){return a+CH[i].n},0);
- $("readInfo").innerHTML="全书约 "+(T/10000).toFixed(1)+" 万字，超过一次能读的上限。「"+esc(AG.name)+"」逐字读<b>"+s.length+" 章</b>（约 "+(u/10000).toFixed(1)+" 万字），其余读目录与开头。<button type='button' id='pickBtn'>换章 ›</button>";
+ $("readInfo").innerHTML="全文约 "+(T/10000).toFixed(1)+" 万字符，超过单次发送上限。「"+esc(AG.name)+"」本轮选入<b>"+s.length+" 章</b>（约 "+(u/10000).toFixed(1)+" 万字符），其余仅附目录与开头；发送后模型才收到材料。<button type='button' id='pickBtn'>换章 ›</button>";
  $("pickBtn").onclick=pickChapters;
 }
 
@@ -256,7 +256,7 @@ function render(){
  var hello=document.createElement("div");hello.className="hello";
  hello.innerHTML="<h2>我是「"+esc(AG.name)+"」<small>《"+esc(b.title)+"》的智能体</small></h2>"
   +(AG.intro?"<p>"+esc(AG.intro)+"</p>":"")
-  +"<p>"+(CH.length?(total()<=BUDGET?"这本书我已逐字读过。":"这本书的目录、开头和左边标出的那几章，我已逐字读过；想深谈别的章，点左边「换章」。"):"")+"你可以从五道门里任走一道：<b>读懂</b>它，把它<b>用上</b>，把它<b>拆开</b>，拿它去<b>对撞</b>，最后把碰出来的新东西<b>写出</b>来——一篇论文，甚至一部新专著。</p>"
+  +"<p>"+(CH.length?(total()<=BUDGET?"浏览器已载入本书文本；确认发送后，模型才收到本轮材料。":"浏览器已载入本书文本。本轮将发送左边选定章节的全文与其余章节开头；想深谈别的章，点左边「换章」。"):"")+"你可以从五道门里任走一道：<b>读懂</b>它，把它<b>用上</b>，把它<b>拆开</b>，拿它去<b>对撞</b>，最后把碰出来的新东西<b>写出</b>来——一篇论文，甚至一部新专著。</p>"
   +"<p style='color:var(--dim);font-size:13px'>书里的话我照原文引，并标出章名；我推出来的，我会说明是推论；你提出来的，记在你名下。这本账就是你将来那篇论文的底稿。</p>"
   +"<div class='starts' id='starts'></div>";
  col.appendChild(hello);
@@ -396,7 +396,7 @@ function talk(no,done){
    var q="【三本《道德经》圆桌】读者原问：「"+q0.slice(0,600)+"」\n"+(speaker?speaker.name+"（《"+speaker.title+"》的智能体）":"另一位智能体")+"刚才这样答：「"+String(last.text).slice(0,1400)+"」\n现在轮到你——「"+c.AG.name+"」，《"+c.BOOK.title+"》的智能体，接话。要求：1）先用一两句话说清：你对上面这段话同意、补充还是反对哪一处；2）再从你自己这本书里拿出别人没有的东西——引具体章节、关键点或标「对读」的段落；3）最后给读者一个可以带走的判断。不要复述对方的话，不要冒充对方的书；两本书说法不同时，把分歧说透，不要和稀泥。";
    var rp=ragPick(q0+" "+last.text.slice(0,600),A,10);
    srcs=rp.items.slice(0,5).map(function(it){return{t:it.t,u:it.u,rel:it.rel}});
-   return{q:q,bookagent:1,bookNo:c.BOOK.number,act:A,agentName:c.AG.name,agentEpithet:c.AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:c.BOOK.title,docText:docText(),history:hist.map(function(m){return{role:m.role,text:tagged(m,no)}}),key:kv.key,vendor:kv.vendor};
+   return{q:q,bookagent:1,bookNo:c.BOOK.number,sourceMode:'selected-original',act:A,agentName:c.AG.name,agentEpithet:c.AG.epithet||"",bookRag:rp.text,bookPoints:kpText(),bookMeta:meta(),docTitle:c.BOOK.title,docText:docText(),history:hist.map(function(m){return{role:m.role,text:tagged(m,no)}}),key:kv.key,vendor:kv.vendor};
   });
   return fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
  }).then(function(r){
@@ -465,12 +465,12 @@ function summary(){
 function pickChapters(){
  var s=SEL||defaultSel(),on={};s.forEach(function(i){on[i]=1});
  var o=document.createElement("div");o.className="ov";
- o.innerHTML="<div class='box' role='dialog' aria-label='选章'><div class='hd'><b>让书生逐字读哪几章</b><button class='tbtn' data-x>×</button></div><div class='bd' style='white-space:normal;font-family:var(--sans);font-size:13px'>一次最多逐字读约 11 万字；没选的章，书生只读目录和开头。<div class='chs'></div></div><div class='ft'><span class='pg'></span><button class='out' data-s type='button'>就读这几章</button></div></div>";
+ o.innerHTML="<div class='box' role='dialog' aria-label='选章'><div class='hd'><b>本轮发送哪些章节</b><button class='tbtn' data-x>×</button></div><div class='bd' style='white-space:normal;font-family:var(--sans);font-size:13px'>一次最多发送约 11 万字符；未选章节仅附目录和开头。<div class='chs'></div></div><div class='ft'><span class='pg'></span><button class='out' data-s type='button'>选定这几章</button></div></div>";
  document.body.appendChild(o);
  var box=o.querySelector(".chs"),pg=o.querySelector(".pg");
- CH.forEach(function(c,i){var l=document.createElement("label");l.innerHTML="<input type='checkbox'"+(on[i]?" checked":"")+"><span>"+esc(c.t)+"</span><em>"+(c.n/1000).toFixed(1)+" 千字</em>";l.querySelector("input").onchange=cnt;l.dataset.i=i;box.appendChild(l)});
+ CH.forEach(function(c,i){var l=document.createElement("label");l.innerHTML="<input type='checkbox'"+(on[i]?" checked":"")+"><span>"+esc(c.t)+"</span><em>"+(c.n/1000).toFixed(1)+" 千字符</em>";l.querySelector("input").onchange=cnt;l.dataset.i=i;box.appendChild(l)});
  function picked(){return Array.prototype.map.call(box.querySelectorAll("input"),function(x,i){return x.checked?i:-1}).filter(function(i){return i>=0})}
- function cnt(){var u=picked().reduce(function(a,i){return a+CH[i].n},0);pg.textContent="已选 "+(u/10000).toFixed(1)+" 万字"+(u>BUDGET*0.9?"（超了，后面的章会被截掉）":"")}
+ function cnt(){var u=picked().reduce(function(a,i){return a+CH[i].n},0);pg.textContent="已选 "+(u/10000).toFixed(1)+" 万字符"+(u>BUDGET*0.9?"（超了，后面的章会被截掉）":"")}
  cnt();
  o.querySelector("[data-x]").onclick=function(){o.remove()};
  o.querySelector("[data-s]").onclick=function(){SEL=picked();ls(HK+"_sel",JSON.stringify(SEL));o.remove();readInfo()};
