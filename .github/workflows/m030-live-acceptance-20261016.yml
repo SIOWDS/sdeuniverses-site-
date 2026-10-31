@@ -5,7 +5,6 @@ on:
     paths:
       - '.github/workflows/m030-live-acceptance-20261016.yml'
       - 'public/books/m/30/**'
-      - 'public/books/catalog.json'
   workflow_dispatch:
 permissions:
   contents: read
@@ -28,9 +27,9 @@ jobs:
             '/books/m/30/agent/':('归跑','BOOK_AGENT'),
             '/books/m/30/publication-unit.json':('"unitId": "m-30"','"learningTasks": 84','"pdfPages": 349'),
             '/books/m/30/running-health-v11-online-reader.pdf':(),
-            '/books/':('m-30','跑步与健康：在线阅读PDF'),
-            '/monographs/':('m-30','跑步与健康：在线阅读PDF'),
-            '/sites/read/library/':('m-30','跑步与健康：在线阅读PDF')
+            '/books/':('m-30','跑步与健康：PDF'),
+            '/monographs/':('m-30','跑步与健康：PDF'),
+            '/sites/read/library/':('m-30','跑步与健康：PDF')
           }
           out=[]
           success=False
