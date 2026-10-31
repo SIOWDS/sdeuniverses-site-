@@ -1,0 +1,20 @@
+"""第 464 号《AI时代最需要的SDE思想：普通人都能懂的智慧》工具链共用常量——书号、ISBN、定价、版本都只在这里改。"""
+NO = 464
+SLUG = 'ai-era-sde-wisdom'
+TITLE = 'AI时代最需要的SDE思想'
+SUBTITLE = '普通人都能懂的智慧'
+FULL_TITLE = 'AI时代最需要的SDE思想：普通人都能懂的智慧'
+TITLE_EN = 'The SDE Thinking the AI Era Needs Most: Wisdom Everyone Can Understand'
+EPIGRAPH = '生成在机房，发生在对话；话说完不算数，下一步接住才算数'
+AUTHOR = '王德生　胡志英'
+AUTHORS = ['王德生', '胡志英']
+CATEGORY = 'core'
+ISBN = '979-8-90690-052-4'
+PRICE_USD = 20.00
+PRICE = 'US$%.2f' % PRICE_USD
+V = '20261031a'
+DATE = '2026-10-31'
+EDITION = '2026年10月第1版'
+UNIT_REV = '20261031-m464-unit-v1.0'
+SRC = '/home/claude/book-hzy-wisdom'
+PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
