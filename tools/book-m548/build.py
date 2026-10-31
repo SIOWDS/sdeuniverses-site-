@@ -380,6 +380,7 @@ def print_css(fonts, W, H, body_pt, lh, margin, fol='decimal'):
   @bottom-right{{content:counter(page,{fol});font:7.6pt 'Noto Serif CJK SC';color:#8A8578}}}}
 @page :blank{{@top-left{{content:none}} @top-right{{content:none}} @bottom-left{{content:none}} @bottom-right{{content:none}}}}
 @page clean{{@top-left{{content:none}} @top-right{{content:none}} @bottom-left{{content:none}} @bottom-right{{content:none}}}}
+@page partpage{{@top-left{{content:none}} @top-right{{content:none}} @bottom-left{{content:none}} @bottom-right{{content:none}}}}
 @page opener:left{{@top-left{{content:none}}}}
 @page opener:right{{@top-right{{content:none}}}}
 body{{font-family:'Noto Serif CJK SC';font-size:{body_pt}pt;line-height:{lh};color:#2A2824;margin:0;string-set:book "{META['title']}"}}
@@ -389,7 +390,7 @@ em{{font-style:italic}}
 .clean{{page:clean}}
 section{{break-before:page}}
 section.part,section.front-sec,section.back-sec,section.toc{{page:opener}}
-section.part{{break-before:right;text-align:center;padding-top:26mm}}
+section.part{{break-before:right;text-align:center;padding-top:26mm;page:partpage}}
 .emb{{width:15mm;height:15mm;display:block;margin:0 auto 7mm}}
 .part-label{{font:700 9.5pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.9em;margin-bottom:5mm;text-indent:.9em}}
 .part-title{{font:700 18.5pt/1.5 'Noto Serif CJK SC';color:#1F3A5F;margin:0 12mm 4mm;string-set:chap content()}}
