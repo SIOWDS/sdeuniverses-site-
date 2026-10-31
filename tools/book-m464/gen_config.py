@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""第 529 号《胡敏谈SDE本体论》（由第 527 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m529.json（build_unit_527.py 的配置）。
-用法（仓库根目录）：python3 tools/book-m529/gen_config.py tools/book-m529/content.json
+"""第 464 号《AI时代最需要的SDE思想》（由第 529 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m464.json（build_unit_527.py 的配置）。
+用法（仓库根目录）：python3 tools/book-m464/gen_config.py tools/book-m464/content.json
 """
 import json, sys
 from pathlib import Path
@@ -11,7 +11,7 @@ U = 'https://sdeuniverses.com/books/m/%d/' % M.NO
 cfg = {
  'number': M.NO, 'slug': M.SLUG, 'title': M.TITLE, 'subtitle': M.SUBTITLE, 'authors': M.AUTHORS,
  'isbn': M.ISBN, 'price': M.PRICE, 'partWord': '编', 'sourceEdition': '初版（%s）' % M.DATE,
- 'unitRev': M.UNIT_REV, 'assetVersion': M.V, 'manuscript': 'tools/book-m529/book.md',
+ 'unitRev': M.UNIT_REV, 'assetVersion': M.V, 'manuscript': 'tools/book-m464/book.md',
  'agentName': C['agent']['name'], 'agentEpithet': C['agentEpithet'], 'bookMeta': C['bookMeta'], 'heroTagline': C['heroTagline'],
  'practiceWord': C['practiceWord'], 'pdfBg': '#16253d',
  'learningPdfUrl': U + 'downloads/%s-learning-v1.0.pdf' % M.SLUG,

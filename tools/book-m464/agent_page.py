@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""第 529 号《胡敏谈SDE本体论》：只为本书生成 /books/m/529/agent/index.html，并在 /books/agent/ 名录里加一张卡。
+"""第 464 号《AI时代最需要的SDE思想》：只为本书生成 /books/m/464/agent/index.html，并在 /books/agent/ 名录里加一张卡。
 不跑 tools/build_book_agents.py——稀疏检出里它会按本地仅有的几本书重写整个名录。
 页面骨架取第 527 号的智能体页（共用 /books/agent/app.js 与 app.css），只换头部与书号。
-用法（仓库根目录）：python3 tools/book-m529/agent_page.py
+用法（仓库根目录）：python3 tools/book-m464/agent_page.py
 """
 import html
 import json
 import re
 import sys
 from pathlib import Path
-sys.path.insert(0, 'tools/book-m529')
+sys.path.insert(0, 'tools/book-m464')
 import meta as M  # noqa: E402
 
 NO = M.NO
-C = json.loads(Path('tools/book-m529/content.json').read_text(encoding='utf-8'))
+C = json.loads(Path('tools/book-m464/content.json').read_text(encoding='utf-8'))
 name, epi, intro = C['agent']['name'], C['agentEpithet'], C['agentIntro']
 esc = lambda s: html.escape(s, quote=True)
 

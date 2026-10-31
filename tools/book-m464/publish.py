@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""第 529 号《胡敏谈SDE本体论：健康九问里的显露、差异与纠缠》（胡敏著；由第 527 号 publish.py 改来）：
-装进 public/books/m/529/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡；
-并写书号预留档 .publish/volume-reservations/529.json（铁律14：写之前查号、查 ISBN、验校验位）。
-用法（仓库根目录）：python3 tools/book-m529/publish.py --build /home/claude/b529 --content tools/book-m529/content.json --ms tools/book-m529/book.md
+"""第 464 号《AI时代最需要的SDE思想：普通人都能懂的智慧》（王德生、胡志英著；由第 529 号 publish.py 改来）：
+装进 public/books/m/464/（PDF、封面、全文网页、翻页器、详情页）、书目、站点地图、/today/ 新书卡；
+并写书号预留档 .publish/volume-reservations/464.json（铁律14：写之前查号、查 ISBN、验校验位）。
+用法（仓库根目录）：python3 tools/book-m464/publish.py --build /home/claude/b464 --content tools/book-m464/content.json --ms tools/book-m464/book.md
 """
 import argparse, datetime, glob, json, re, shutil, subprocess, sys
 from pathlib import Path
@@ -46,10 +46,10 @@ def reserve(site_root, han, chapters):
     pub = [int(x.name) for x in (site_root / 'public/books/m').iterdir() if x.name.isdigit()]
     d = {'volume': NO, 'title': T, 'subtitle': SUB, 'authors': AUTHORS, 'isbn': ISBN, 'isbnNormalized': nisbn,
          'isbnStatus': 'site-allocated-checksum-valid', 'priceUsd': PRICE_USD, 'status': 'published', 'date': M.DATE,
-         'authorization': '用户（WDS博士）令：「开始统稿，三审，然后220/302风格进行排版，美化；然后计算卷号和ISBN，定价20美金，然后做三位一体（阅读，学习包，智能体）出版单元上站。」卷号由用户选定第 529 号。',
+         'authorization': '王德生令：成书、封面、PDF 和上站，按一贯严格要求（第220、302号风格；阅读、学习包、智能体三位一体）；书号与 ISBN 由站上空位推算，定价 US$20。',
          'availabilityCheck': {'maxPublishedDirectory': max(pub), 'maxReservedVolume': max(vols), 'volumeAbsent': True,
                                'isbnAbsentInCatalogAndReservations': True, 'checkDigit': int(nisbn[-1]),
-                               'note': '卷号与 ISBN 中段同号；预留档已于 2026-10-29 写入，本脚本只把状态改为 published。'},
+                               'note': '预留档已于 2026-10-31 写入（a9631df2），本脚本只把状态改为 published。'},
          'manuscript': {'chapters': chapters, 'bodyHanzi': han, 'state': '已上站'},
          'publishedAt': M.DATE, 'detailUrl': f'https://sdeuniverses.com/books/m/{NO}/'}
     path.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
@@ -108,14 +108,18 @@ def main():
            .replace('__LINE__', _h.escape(CT['detailLine'])).replace('__INTRO__', _h.escape(CT['detailIntro'])).replace('__CARDS__', cards)
            .replace('__DESC_SHORT__', _h.escape(CT['detailLine'], quote=True)).replace('__PRICE_NUM__', '%.2f' % PRICE_USD).replace('__PRICE__', PRICE))
     def _struct():
-        li = ['<li><b>前置</b>　出版信息 · 题词 · 作者介绍 · 前言 · 导言　%s</li>' % _h.escape((HERE / 'front/01-导言.md').read_text().split('\n', 1)[0].split('　', 1)[1])]
+        fr = (HERE / 'front/00-前置.md').read_text()
+        qy = re.search(r'^## 前言　(.*)$', fr, re.M)[1]; dd = re.search(r'^## 导读　(.*)$', fr, re.M)[1]
+        li = ['<li><b>前置</b>　出版信息 · 题词 · 作者介绍 · 前言　%s · 导读　%s</li>' % (_h.escape(qy), _h.escape(dd))]
         for f in sorted((HERE / 'parts').glob('0*.md')):
             tx = f.read_text()
             pt = tx.split('\n', 1)[0].lstrip('# ').strip()
             chs = re.findall(r'^## (第(\d+)章)　(.*)$', tx, re.M)
             li.append('<li><b>%s</b>（第 %s—%s 章）<span class="chs">%s</span></li>' % (_h.escape(pt), chs[0][1], chs[-1][1], ' · '.join('%s %s' % (a, _h.escape(c)) for a, _, c in chs)))
         jy = (HERE / 'back/11-结语.md').read_text().split('\n', 1)[0].lstrip('# ').strip()
-        li.append('<li><b>后置</b>　%s · 附录一　记账词表 · 附录二　九章判别局面与作废条件总表 · 附录三　近邻索引 · 附录四　给读者的撤回与慎用清单</li>' % _h.escape(jy))
+        bk = (HERE / 'back/12-后置.md').read_text()
+        ax = ' · '.join(_h.escape(x) for x in re.findall(r'^## (附录.*)$', bk, re.M))
+        li.append('<li><b>后置</b>　%s · 参考书目 · %s</li>' % (_h.escape(jy), ax))
         return '<ol class="vols">\n%s\n</ol>' % '\n'.join(li)
     det = det.replace('__STRUCT__', _struct())
     assert '__' not in det.replace('__agentproxy', '')
@@ -159,7 +163,7 @@ def main():
             '<h3 class="en-only" style="color:#F1EBDC;font-size:23px;line-height:1.5;margin:0 0 14px">%s</h3>'
             '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">%s</p>'
             '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">%s</p></div></a>'
-            % (NO, NO, han / 10000, pages, NO, format(round(han, -3), ','), pages, CT['titleEn'], CT['todayZh'], CT['todayEn'])).replace('__PRICE__', PRICE).replace('__TITLE__', T)
+            % (NO, NO, han / 10000, pages, NO, format(round(han, -3), ','), pages, CT['titleEn'], CT['todayZh'], CT['todayEn'])).replace('__PRICE__', PRICE).replace('__TITLE__', M.FULL_TITLE)
     h = h[:a0] + card + h[a0:]
     tp.write_text(h)
     print('published to', d, 'pages', pages, 'han', han)

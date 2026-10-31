@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""三位一体出版单元生成器（阅读 · 学习包 · 智能问对）——第 529 号《胡敏谈SDE本体论》用（由第 527 号 build_unit_527.py 复制）；原由第398卷参考实现（tools/m398_unit）泛化。
+"""三位一体出版单元生成器（阅读 · 学习包 · 智能问对）——第 464 号《AI时代最需要的SDE思想》用（由第 529 号 build_unit_529.py 复制）；原由第398卷参考实现（tools/m398_unit）泛化。
 
 只写 public/books/m/<号>/ 之下的这些东西，不碰别的书、不调用模型、不重建搜索索引：
   unit/{app.js,core.js,unit.css,SKILL.md,learning.json,sources/chapter-NN.json}

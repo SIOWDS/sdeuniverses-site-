@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""第 529 号《胡敏谈SDE本体论》（由第 527 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
-在仓库根目录运行：python3 tools/book-m529/register.py
+"""第 464 号《AI时代最需要的SDE思想》（由第 529 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
+在仓库根目录运行：python3 tools/book-m464/register.py
 """
 import datetime
 import json
 import sys
 from pathlib import Path
-sys.path.insert(0, 'tools/book-m529')
+sys.path.insert(0, 'tools/book-m464')
 import meta as M  # noqa: E402
 
 NO = M.NO
-C = json.loads(Path('tools/book-m529/content.json').read_text(encoding='utf-8'))
+C = json.loads(Path('tools/book-m464/content.json').read_text(encoding='utf-8'))
 today = datetime.date.today().isoformat()
 
 kp = {'no': NO, 'title': M.TITLE, 'built': today,
