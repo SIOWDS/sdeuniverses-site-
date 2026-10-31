@@ -104,6 +104,11 @@ def inline(s):
     s = s.replace('AI for Science', 'AI\u00a0for\u00a0Science')
     s = re.sub(r'(?<=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]) (?=[A-Za-z0-9$])|(?<=[A-Za-z0-9%$.)]) (?=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef])', '\u2009', s)
     s = html.escape(s, quote=False)
+    # 长网址／长西文串：在 / . - _ 后放零宽断点，免得撑出空行
+    s = re.sub(r'[A-Za-z0-9][A-Za-z0-9./\-_~%?=#:]{17,}', lambda m: re.sub(r'([/._\-])(?=.)', '\\1\u200b', m[0]), s)
+    # 西文词组：标 lang=en，两端对齐时可按英文断字，免得一行里拉出大空
+    s = re.sub(r"(?<![&#\w;])[A-Za-z][A-Za-z'’\-]+(?:[ \u00a0,:;&.()0-9–\-]+[A-Za-z][A-Za-z'’\-]+)+", lambda m: '<span lang="en">%s</span>' % m[0], s)
+    s = re.sub(r'&(amp|lt|gt)</span>;', r'&\1;</span>', s)
     s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
     s = re.sub(r'(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?!\*)', r'<em>\1</em>', s)
     return s
@@ -113,6 +118,8 @@ def table_html(rows, cls='tb'):
     cells = [[c.strip() for c in r.strip().strip('|').split('|')] for r in rows]
     cells = [r for r in cells if not all(re.fullmatch(r':?-{2,}:?', c) for c in r)]
     head, body = cells[0], cells[1:]
+    if head == ['章', '出处', '网址']:
+        cls += ' urls'
     if len(head) >= 5:
         cls += ' w5'
     for ci in (0, 1):
@@ -120,7 +127,7 @@ def table_html(rows, cls='tb'):
             cls += ' n%d' % (ci + 1)
     if len(body) > 20:
         cls += ' dense'
-    h = ['<div class="tw"><table class="%s"><thead><tr>' % cls]
+    h = ['<div class="tw%s"><table class="%s"><thead><tr>' % (' keep' if len(body) <= 9 and sum(len(c) for r in body for c in r) < 420 else '', cls)]
     h += ['<th>%s</th>' % inline(c) for c in head]
     h.append('</tr></thead><tbody>')
     for r in body:
@@ -152,6 +159,10 @@ def quote_html(lines):
         return '<div class="ledger nine"><span class="lab">九格卡</span>%s</div>' % ''.join(ps)
     if first == '**本章判错句**' or first == '**判错句**':
         return '<div class="judge"><span class="lab">本章判错句</span>%s</div>' % ''.join('<p>%s</p>' % inline(l) for l in rest)
+    if first == '**这一章的问题**':
+        return '<div class="qbox"><span class="lab">这一章的问题</span>%s</div>' % ''.join('<p>%s</p>' % inline(l) for l in rest)
+    if first == '**章判**':
+        return '<div class="chap-verdict">%s</div>' % ''.join('<p>%s</p>' % inline(l) for l in rest)
     if first == '**章旨**':
         return '<p class="chap-lead">%s</p>' % ''.join(inline(l) for l in rest)
     if first == '**想一想**':
@@ -180,6 +191,8 @@ def render(blocks, bib=False):
                 h.append('<p%s>%s</p>' % (' class="bib"' if bib else '', inline(t)))
         elif k == 'h3':
             t = b[0]
+            if re.match(r'^D4\u3000', t):
+                h.append('<h3 class="sec newpage">%s</h3>' % inline(t)); continue
             if t.startswith('◆'):
                 h.append('<h3 class="sec"><span class="dia">◆</span>%s</h3>' % inline(t.lstrip('◆ ').strip()))
             else:
@@ -247,6 +260,38 @@ def spaced(label):
     return label if '（' in label else ' '.join(label)
 
 
+def title_br(t):
+    """章首大标题：长标题在第一个冒号后断行，免得末行只剩一两个字。"""
+    h = inline(t)
+    if len(t) > 13 and '：' in t:
+        h = h.replace('：', '：<br>', 1)
+    return h
+
+
+def cn_label(lab):
+    """「第3章」→「第三章」（与正文写法一致）；序章等原样。"""
+    m = re.fullmatch(r'第 ?(\d+) ?章', lab)
+    if not m:
+        return lab
+    n = int(m[1])
+    return '第%s章' % (CN[n] if n <= 10 else '十' + CN[n - 10])
+
+
+def chap_info(body):
+    """九问各章开头的章旨／章判／这一章的问题 → 章首页要素；没有章旨返回 None。"""
+    qs = [x for x in body[:4] if x[0] == 'quote']
+    zh = next((x for x in qs if x[1][0].strip() == '**章旨**'), None)
+    if not zh:
+        return None
+    line = [l for l in zh[1][1:] if l.strip()][0].strip()
+    mm = re.match(r'^(第[一二三四五六七八九]问)　(.*?)（(.*)）$', line)
+    tri = mm[3].replace('，', ' · ')
+    vd = next((x for x in qs if x[1][0].strip() == '**章判**'), None)
+    qb = next((x for x in qs if x[1][0].strip() == '**这一章的问题**'), None)
+    return dict(qno=mm[1], q=mm[2], tri=tri, blocks=[b for b in (zh, vd, qb) if b],
+                verdict=quote_html(vd[1]) if vd else '', qbox=quote_html(qb[1]) if qb else '')
+
+
 def build_sections():
     """返回 [(kind, id, toc_title, level, html)]；kind: front/main/part/chapter/back。"""
     secs, n = [], 0
@@ -268,7 +313,7 @@ def build_sections():
     for title, bl in groups:
         if title == '题词':
             ps = [b[0] for k, b in bl if k == 'p']
-            body = ''.join('<p class="by">%s</p>' % inline(x[6:]) if x.startswith('【题词署】') else '<p>%s</p>' % inline(x.replace('【题词】', '')) for x in ps)
+            body = ''.join('<p class="by">%s</p>' % inline(x[6:]) if x.startswith('【题词署】') else '<p>%s</p>' % inline(x.replace('【题词】', '')).replace('，而是', '，<br>而是') for x in ps)
             EPIGRAPH = '<section class="epi front-sec clean">%s</section>' % body
             continue
         if title == '出版信息':
@@ -294,7 +339,6 @@ def build_sections():
     # ── 各篇 ──
     for f in FILES[1:1 + NPARTS]:
         bl = blocks_of((ROOT / f).read_text())
-        i = 0
         part_title = bl[0][1][0]
         m = re.match(r'^(.+?)　(.*)$', part_title)
         intro = []
@@ -303,27 +347,55 @@ def build_sections():
             if bl[i][0] == 'p':
                 intro.append('<p class="bianxu">%s</p>' % inline(bl[i][1][0]))
             i += 1
-        secs.append(('part', sid(), '%s　%s' % (m[1].replace('　', ''), m[2]), 1,
-                     '%s<div class="part-label">%s</div><h1 class="part-title">%s</h1><div class="rule"></div>'
-                     '<div class="daoyu">编　序</div><div class="part-intro">%s</div>'
-                     % (EMB, spaced(m[1].replace('　', '')), inline(m[2]).replace('：', '：<br>', 1), ''.join(intro))))
-        # 章
+        # 先把本篇各章切出来，篇名页要列章目
+        chaps = []
         while i < len(bl):
-            t = bl[i][1][0]
-            cm = re.match(r'^(.+?)　(.*)$', t)
             j = i + 1
             while j < len(bl) and bl[j][0] != 'h2':
                 j += 1
-            body = [x for x in bl[i + 1:j] if x[0] != 'hr']
+            chaps.append((bl[i][1][0], [x for x in bl[i + 1:j] if x[0] != 'hr']))
+            i = j
+        pname = m[1].replace('　', '')
+        latin, _, cnname = m[2].partition('：')
+        if not cnname:
+            latin, cnname = '', m[2]
+        rows = []
+        for t, body in chaps:
+            cm = re.match(r'^(.+?)　(.*)$', t)
+            info = chap_info(body)
+            lab = cn_label(cm[1])
+            q = ('<span class="pq">%s</span>' % inline(info['qno'] + '　' + info['q'])) if info else ''
+            tri = ('<span class="ptri">%s</span>' % inline(info['tri'])) if info else ''
+            rows.append('<li><span class="pl">%s</span><span class="pt">%s%s%s</span></li>' % (lab, inline(cm[2]), q, tri))
+        secs.append(('part', sid(), '%s　%s' % (pname, m[2]), 1,
+                     '<div class="part-top">%s<div class="part-label">%s</div>%s<h1 class="part-title">%s</h1><div class="rule"></div></div>'
+                     '<div class="part-intro">%s</div><ul class="part-toc">%s</ul>'
+                     % (EMB, ' '.join(pname), '<div class="part-latin">%s</div>' % latin if latin else '',
+                        inline(cnname), ''.join(intro), ''.join(rows))))
+        # 章
+        for t, body in chaps:
+            cm = re.match(r'^(.+?)　(.*)$', t)
             lab = cm[1]
             nm = re.fullmatch(r'第 ?(\d+) ?章', lab)
             num = int(nm[1]) if nm else None
+            clab = cn_label(lab)
+            info = chap_info(body)
             numhtml = '<div class="chapnum">%02d</div>' % num if num else '<div class="chapnum spacer">&nbsp;</div>'
-            secs.append(('chapter', sid(), '%s　%s' % (lab, cm[2]), 2,
-                         '%s<div class="chap-label">%s</div>'
-                         '<h2 class="chap-title">%s</h2><div class="rule"></div>%s'
-                         % (numhtml, lab, inline(cm[2]), with_endmark(render(body)))))
-            i = j
+            if info:   # 九问各章：单独一页章首
+                rest = [x for x in body if x not in info['blocks']]
+                op = ('<div class="opener">%s<div class="chap-label">%s<span class="sep">·</span>%s</div>'
+                      '<h2 class="chap-title">%s</h2><div class="rule"></div>'
+                      '<div class="qcard"><div class="qhead"><span class="qno">%s</span><span class="tri">%s</span></div>'
+                      '<p class="qtext">%s</p></div>%s%s</div>'
+                      % (numhtml, clab, inline(pname + (' ' + latin if latin else '')), title_br(cm[2]),
+                         inline(info['qno']), inline(info['tri']), inline(info['q']),
+                         info['verdict'], info['qbox']))
+                html_ = op + '<div class="chbody">%s</div>' % with_endmark(render(rest))
+            else:
+                html_ = ('<div class="inline-open">%s<div class="chap-label">%s</div>'
+                         '<h2 class="chap-title">%s</h2><div class="rule"></div></div>%s'
+                         % (numhtml, clab, title_br(cm[2]), with_endmark(render(body))))
+            secs.append(('chapter', sid(), '%s　%s' % (clab, cm[2]), 2, html_))
 
     # ── 结语 ──
     bl = blocks_of((ROOT / FILES[1 + NPARTS]).read_text())
@@ -365,6 +437,55 @@ def build_sections():
                          '<h1 class="fs-title">%s</h1>%s<div class="rule"></div>%s' % (
                              nm, '<div class="fs-sub">%s</div>' % inline(sb) if sb else '', render(body, bib=isbib))))
     return secs
+
+
+
+# ───────────── 中西混排的两端对齐 ─────────────
+# WeasyPrint 只拉伸空格：一行里有几个西文词时，整行余量全堆到这几个空格上，拉出大洞。
+# 这里把汉字与全角标点也算作可拉伸点（逐字均摊），西文空格照常；纯中文行余量本来就接近零，观感不变。
+def _patch_cjk_justify():
+    import weasyprint.layout.inline as WI
+    import weasyprint.text.line_break as LB
+    from weasyprint.formatting_structure import boxes as BX
+    if getattr(WI, '_cjk_patched', False):
+        return
+    CJK = re.compile('[\u2014\u2026\u3000-\u303f\u3400-\u9fff\uff00-\uffef]')
+    SPW = 3   # 一个西文空格分到的余量是一个汉字间隙的 3 倍：词距略宽、字距略松，两头都不出洞
+
+    def count(box):
+        if isinstance(box, BX.TextBox):
+            return SPW * (box.text.count(' ') + box.text.count('\u00a0')) + len(CJK.findall(box.text))
+        if isinstance(box, (BX.LineBox, BX.InlineBox)):
+            return sum(count(c) for c in box.children)
+        return 0
+    WI.count_expandable_spaces = count
+    orig = LB.Layout.set_text
+
+    def set_text(self, text, justify=False):
+        orig(self, text, justify)
+        js = self.justification_spacing
+        if not (justify and js and self.text):
+            return
+        ffi, pango = LB.ffi, LB.pango
+        attr_list = pango.pango_layout_get_attributes(self.layout)
+        if attr_list == ffi.NULL:
+            attr_list = ffi.gc(pango.pango_attr_list_new(), pango.pango_attr_list_unref)
+        sp = int(js * LB.TO_UNITS)
+        pos = 0
+        for ch in self.text:
+            n = len(ch.encode('utf-8'))
+            if ch in ' \u00a0':
+                a = pango.pango_attr_letter_spacing_new(SPW * sp + int(self.style['word_spacing'] * LB.TO_UNITS))
+                a.start_index, a.end_index = pos, pos + n
+                pango.pango_attr_list_change(attr_list, a)
+            elif CJK.match(ch):
+                a = pango.pango_attr_letter_spacing_new(sp)
+                a.start_index, a.end_index = pos, pos + n
+                pango.pango_attr_list_change(attr_list, a)
+            pos += n
+        pango.pango_layout_set_attributes(self.layout, attr_list)
+    LB.Layout.set_text = set_text
+    WI._cjk_patched = True
 
 
 # ───────────────────────── 印刷 CSS ─────────────────────────
@@ -454,7 +575,8 @@ table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 '
 table.tb tr{{break-inside:avoid}}
 table.tb.n1 th:nth-child(1),table.tb.n1 td:nth-child(1){{white-space:nowrap}}
 table.tb.n2 th:nth-child(2),table.tb.n2 td:nth-child(2){{white-space:nowrap}}
-table.tb.w5 th:nth-child(-n+2),table.tb.w5 td:nth-child(-n+2){{white-space:nowrap}}
+table.tb.w5 td:first-child{{width:24%}}
+.tw.keep{{break-inside:avoid}}
 table.tb.w5 td{{font-size:{body_pt*0.74:.2f}pt;line-height:1.55}}
 table.tb.dense td{{padding-top:.7mm;padding-bottom:.7mm}}
 table.tb td{{border-bottom:.5pt solid #E4DCCB;padding:1.3mm 1.6mm;vertical-align:top}}
@@ -496,7 +618,7 @@ table.cp tr:nth-child(odd){{background:#F4EFE3}}
 /* 目录 */
 .toc h1{{font:700 18pt 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.4em;margin:10mm 0 2mm}}
 .toc ul{{list-style:none;padding:0;margin:4mm 0 0}}
-.toc li{{display:flex;font-size:{body_pt*0.9:.2f}pt;line-height:1.72}}
+.toc li{{display:flex;font-size:{body_pt*0.9:.2f}pt;line-height:1.62}}
 .toc li a{{color:inherit;text-decoration:none}}
 .toc li .t{{flex:1}}
 .toc li .pg{{color:#8A8578;font-family:'Noto Serif CJK SC';min-width:9mm;text-align:right}}
@@ -504,6 +626,64 @@ table.cp tr:nth-child(odd){{background:#F4EFE3}}
 .toc li.c{{padding-left:2em;color:#2A2824}}
 .toc li.f{{margin-top:1mm;color:#1F3A5F}}
 .toc li.a{{padding-left:2em;color:#2A2824}}
+/* ── 第 532 号美化（2026-10-31）── */
+span[lang=en]{{hyphens:auto}}
+p{{hyphens:manual}}
+/* 篇名页 */
+section.part{{padding-top:22mm}}
+.part-top{{text-align:center}}
+.emb{{width:17mm;height:17mm;margin:0 auto 8mm}}
+.part-label{{font:700 10pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:1.1em;text-indent:1.1em;margin-bottom:4mm}}
+.part-latin{{font:400 30pt/1.1 'Noto Serif CJK SC';color:#B08A3C;letter-spacing:.08em;margin:2mm 0 3mm}}
+.part-title{{font:700 22pt/1.45 'Noto Serif CJK SC';color:#1F3A5F;margin:0 8mm 5mm;letter-spacing:.06em}}
+.part .rule{{width:18mm;margin:0 auto 9mm}}
+.part-intro{{margin:0 4mm;text-align:left}}
+.part-intro p{{font-size:{body_pt*0.95:.2f}pt;line-height:1.85;color:#4A463D;margin-bottom:.5em}}
+ul.part-toc{{list-style:none;margin:9mm 4mm 0;padding:0;border-top:.9pt solid #B08A3C;text-align:left}}
+ul.part-toc li{{display:flex;padding:2.6mm 0 2.4mm;border-bottom:.4pt solid #E4DCCB;break-inside:avoid}}
+ul.part-toc .pl{{flex:0 0 17mm;font:700 8.6pt/1.9 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.06em}}
+ul.part-toc .pt{{flex:1;font:700 {body_pt*1.0:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F}}
+ul.part-toc .pq{{display:block;font:400 {body_pt*0.82:.2f}pt/1.65 'Noto Serif CJK SC';color:#5A554B;margin-top:.8mm}}
+ul.part-toc .ptri{{display:block;font:700 6.9pt 'Noto Sans CJK SC';color:#8A6E3A;letter-spacing:.12em;margin-top:.8mm}}
+/* 九问章首页 */
+@page chopen{{@top-left{{content:none}} @top-right{{content:none}}}}
+.opener{{page:chopen;padding-top:12mm}}
+.chbody{{break-before:page}}
+.opener .chapnum{{font:300 50pt/1 'Noto Serif CJK SC';color:#D9C39A;margin:0}}
+.opener .chap-label{{font:700 9pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.22em;margin:3.5mm 0 2.5mm}}
+.chap-label .sep{{margin:0 .6em;color:#D9C39A}}
+.opener .chap-title{{font:700 19.5pt/1.42 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.02em}}
+.opener .rule{{width:18mm;margin:5mm 0 0;border-top-width:1.1pt}}
+.qcard{{margin:9mm 0 0;padding:0}}
+.qhead{{display:flex;gap:2.5mm;align-items:center;margin-bottom:2.6mm}}
+.qhead .qno{{font:700 8pt 'Noto Sans CJK SC';color:#FBF8F0;background:#1F3A5F;padding:.9mm 2.6mm .8mm;letter-spacing:.25em}}
+.qhead .tri{{font:700 7.6pt 'Noto Sans CJK SC';color:#8A6E3A;border:.6pt solid #C9AE76;padding:.6mm 2.2mm .5mm;letter-spacing:.1em}}
+p.qtext{{text-indent:0;text-align:left;font:700 {body_pt*1.12:.2f}pt/1.7 'Noto Serif CJK SC';color:#1F3A5F;margin:0}}
+.chap-verdict{{margin:8mm 0 0;padding:1mm 0 1mm 5mm;border-left:2pt solid #B08A3C;break-inside:avoid}}
+.chap-verdict p{{text-indent:0;text-align:left;font:400 {body_pt*1.0:.2f}pt/1.85 'Noto Serif CJK SC';color:#5B4A26;margin:0}}
+.chap-verdict p::before{{content:"判　";font:700 7.4pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.1em;vertical-align:.15em}}
+.opener .qbox{{margin:9mm 0 0;background:#F1EBDD;border-left:2pt solid #58A9B5;padding:3.4mm 4.6mm 3.6mm}}
+.qbox .lab{{font-size:7.6pt;letter-spacing:.35em;margin-bottom:1.6mm}}
+.opener .qbox p{{font-size:{body_pt*0.94:.2f}pt;line-height:1.85;color:#3E3A33;text-align:justify;margin:0 0 .5em}}
+.opener .qbox p:last-child{{margin-bottom:0}}
+/* 前篇各章（随文章首） */
+.inline-open{{padding-top:8mm;margin-bottom:6mm}}
+.inline-open .chapnum{{font-size:40pt;margin-top:0}}
+.inline-open .chap-label{{font-size:8.8pt;letter-spacing:.22em;margin:3mm 0 2mm}}
+.inline-open .chap-title{{font-size:18pt}}
+.inline-open .rule{{width:16mm;margin:4mm 0 0}}
+/* 作者介绍 */
+.author p{{margin-bottom:.9em}}
+/* 附录 */
+.appx-sec p{{text-align:left}}
+.appx-sec p.bib{{text-align:left}}
+h3.sec.newpage{{break-before:page;margin-top:0}}
+table.tb.urls{{table-layout:fixed;font-size:6.6pt;line-height:1.5}}
+table.tb.urls th{{font-size:7pt}}
+table.tb.urls th:nth-child(1),table.tb.urls td:nth-child(1){{width:7%;white-space:nowrap}}
+table.tb.urls th:nth-child(2),table.tb.urls td:nth-child(2){{width:45%}}
+table.tb.urls td{{padding:.8mm 1.4mm;font-size:6.6pt;line-height:1.5}}
+table.tb.urls td:nth-child(3){{word-break:break-all;color:#4A5A72;font-family:'Noto Sans CJK SC'}}
 """
 
 
@@ -549,6 +729,10 @@ def sec_html(kind, sid, title, lvl, body):
         cls += ' chapter t2'
     if kind == 'back' and lvl == 2:
         cls += ' chapter t4'
+    if kind == 'front' and title.startswith('作者介绍'):
+        cls += ' author'
+    if kind == 'back' and (title.startswith('附录') or lvl == 2):
+        cls += ' appx-sec'
     if kind == 'front' and title.startswith(('前言', '导读')):
         cls += ' chapter t1'
     if kind == 'chapter' and TIGHT.get(sid):
@@ -560,6 +744,7 @@ def sec_html(kind, sid, title, lvl, body):
 def tune_chapters(secs, css_args, fonts, label):
     """逐章单独试排：若章末「带走的话＋小账」孤零零占一页，就逐级收紧该章行距，直到孤页消失。"""
     import weasyprint, pymupdf
+    _patch_cjk_justify()
     css = print_css(fonts, *css_args)
     import hashlib, json as _j
     cpath = Path('/tmp/tight-%s.json' % hashlib.md5(css.encode()).hexdigest()[:8])
@@ -593,6 +778,7 @@ def tune_chapters(secs, css_args, fonts, label):
 def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     import weasyprint
     import pymupdf
+    _patch_cjk_justify()
     tune_chapters(secs, css_args, fonts, 'tune')
     css = print_css(fonts, *css_args)
     css_front = print_css(fonts, *css_args, fol='lower-roman')
@@ -634,6 +820,11 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     mbytes = mdoc.write_pdf()
     book = pymupdf.open()
 
+    def blank(w, h):   # 补页与内页同色（暖白），不留纯白页
+        np_ = book.new_page(width=w, height=h)
+        np_.draw_rect(np_.rect, color=None, fill=(0xFB/255, 0xF8/255, 0xF0/255), overlay=False)
+        return np_
+
     def add_cover(src):
         c = pymupdf.open(str(src))
         if raster_cover:   # 阅读版给翻页器用：pdf.js 矢量模式不支持渐变，封面封底嵌高清图
@@ -643,22 +834,25 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
             np.insert_image(np.rect, stream=pix.tobytes('jpeg', jpg_quality=90))
         else:
             book.insert_pdf(c)
-    add_cover(cover)
-    book.new_page(width=book[0].rect.width, height=book[0].rect.height)  # 封二
+    if cover:
+        add_cover(cover)
+        blank(book[0].rect.width, book[0].rect.height)  # 封二
     f = pymupdf.open(stream=fbytes, filetype='pdf')
     book.insert_pdf(f)
     if len(f) % 2:
-        book.new_page(width=f[0].rect.width, height=f[0].rect.height)
+        blank(f[0].rect.width, f[0].rect.height)
     main_start = len(book) + 1
     m = pymupdf.open(stream=mbytes, filetype='pdf')
     book.insert_pdf(m)
-    if len(book) % 2:
-        book.new_page(width=m[0].rect.width, height=m[0].rect.height)
-    book.new_page(width=m[0].rect.width, height=m[0].rect.height)  # 封三
-    add_cover(back)
+    if back:
+        if len(book) % 2 == 0:   # 封底落在偶数页（左页）；只在需要时补一张封三，不连留两张白页
+            blank(m[0].rect.width, m[0].rect.height)  # 封三
+        add_cover(back)
+    elif len(book) % 2:
+        blank(m[0].rect.width, m[0].rect.height)  # 印刷版：补成偶数页
     # 书签与翻页器目录
     toc, flip = [], []
-    front_off = 2  # 封面、封二
+    front_off = 2 if cover else 0  # 封面、封二
     for kind, sid, title, lvl, _ in secs:
         if sid in pf:
             g = front_off + pf[sid]; p = ''
@@ -713,6 +907,25 @@ p.chap-lead{text-indent:0;color:var(--dim);margin:-.2rem 0 1.4rem;font-size:.98e
 h3.sec .dia{margin-right:.4em}
 h4.ssec{font-size:1.02em;color:var(--navy);margin:1.4rem 0 .5rem;font-weight:700}
 h4.ssec::before{content:"";display:inline-block;width:.8em;border-top:1px solid var(--gold);vertical-align:.3em;margin-right:.45em}
+.part-latin{font-size:2.2rem;color:var(--gold);text-align:center;letter-spacing:.06em;margin:.3rem 0}
+ul.part-toc{list-style:none;padding:0;margin:1.6rem 0 0;border-top:1px solid var(--gold)}
+ul.part-toc li{display:flex;gap:1rem;padding:.7rem 0;border-bottom:1px solid var(--soft)}
+ul.part-toc .pl{flex:0 0 4.5rem;color:var(--gold);font-weight:700;font-size:.9rem}
+ul.part-toc .pt{flex:1;color:var(--navy);font-weight:700}
+ul.part-toc .pq{display:block;font-weight:400;color:var(--dim);font-size:.9rem;margin-top:.2rem}
+ul.part-toc .ptri{display:block;color:var(--gold);font-size:.78rem;letter-spacing:.1em;margin-top:.2rem}
+.opener{margin-bottom:2rem}.chap-label .sep{margin:0 .5em;opacity:.6}
+.qhead{display:flex;gap:.6rem;align-items:center;margin:1.6rem 0 .5rem}
+.qhead .qno{background:var(--navy);color:#fff;font-size:.78rem;padding:.15rem .6rem;letter-spacing:.2em}
+.qhead .tri{border:1px solid var(--gold);color:var(--gold);font-size:.78rem;padding:.1rem .5rem;letter-spacing:.08em}
+p.qtext{text-indent:0;font-weight:700;color:var(--navy);font-size:1.08em}
+.chap-verdict{border-left:3px solid var(--gold);padding:.2rem 0 .2rem 1rem;margin:1.4rem 0}
+.chap-verdict p{text-indent:0;color:var(--dim);margin:0}
+.chap-verdict p::before{content:"判　";color:var(--gold);font-weight:700;font-size:.8em}
+.qbox{background:var(--soft);border-left:3px solid #58A9B5;padding:.8rem 1rem;margin:1.2rem 0}
+.qbox .lab{display:block;font:700 .75rem sans-serif;color:#58A9B5;letter-spacing:.3em;margin-bottom:.3rem}
+.qbox p{text-indent:0;margin:.2rem 0}
+table.tb.urls td:nth-child(3){word-break:break-all;font-size:.8em}
 """
     v = META['version']
     toc = []
@@ -763,8 +976,9 @@ def main():
         (a.out / 'text.html').write_text(web_page(secs))
         print('web ok')
     if 'print' in only:
+        # 印刷版照规范不带封面封底（封面封底单独出图、阅读版首尾才有）
         flip, ms = render_pdf(secs, (170, 240, 10.3, 1.86, (20, 17, 19.5, 19)), a.fonts, a.out / f'{SLUG}-print.pdf',
-                              a.out / 'cover-print.pdf', a.out / 'back-print.pdf')
+                              None, None)
         (a.out / 'toc-print.json').write_text(json.dumps({'toc': flip, 'offset': ms}, ensure_ascii=False))
         print('print ok, main starts at physical page', ms)
     if 'reader' in only:

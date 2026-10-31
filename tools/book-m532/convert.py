@@ -18,6 +18,7 @@ import meta as M  # noqa
 
 SRC = Path(M.SRC)
 CNN = {'一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10, '十一': 11}
+CNR = {v: k for k, v in CNN.items()}
 han = lambda s: len(re.findall(r'[一-鿿]', s))
 
 PARTS = [
@@ -42,6 +43,74 @@ AUTHOR_INTRO = [
     '本书由胡志英在王德生指导下完成。母题由王德生口述定音：所谓语感很好，就是语言运行的 SDE 方法论的健康和高质量运行。',
     '**王德生**（指导），博士，SDE 发生学（显露·差异序列·纠缠）创立者，德麦国际创始人。',
 ]
+
+
+# ── 正文网址外移（只换版式）：正文只留书名／作者／年份，网址一律收进附录 D4 ──
+URL = r'https?://[^\s，。；、）〕」\]）]+'
+URLS = []          # [(章, 出处, 网址)]
+CUR_CH = ['']
+
+
+def strip_urls(text, chap):
+    """把一段文字里的网址拿掉、记账；返回新文字。"""
+    if 'http' not in text:
+        return text
+    out_lines = []
+    for line in text.split('\n'):
+        if 'http' not in line:
+            out_lines.append(line); continue
+        for m in re.finditer(URL, line):
+            URLS.append((chap, url_label(line, m.start()), m[0]))
+        # 1) Markdown 链接 [标签](网址) → 标签
+        line = re.sub(r'\[([^\]]+)\]\((' + URL + r')\)', lambda m: m[1], line)
+        # 2) 裸网址先换成占位符，再按前后的连接词处理（只动连接词，不动叙述文字）
+        X = '@@U@@'
+        line = re.sub(URL, X, line)
+        line = re.sub(r'(转述|原文另|书目|书评书目)见\s*' + X, r'\1见附录 D4', line)
+        line = re.sub(r'[，,]?\s*见\s*' + X, '', line)
+        line = re.sub(r'经\s*' + X + r'\s*(等)?\s*转引', lambda m: '经附录 D4 所列网页' + (m[1] or '') + '转引', line)
+        line = re.sub(r'，\s*' + X + r'\s*转载', '，附录 D4 所列网页转载', line)
+        line = re.sub(r'(：)?\s*' + X + r'\s*指向原文', lambda m: (m[1] or '，') + '附录 D4 所列网页指向原文', line)
+        line = re.sub(r'如\s*' + X, '如附录 D4 所列一篇', line)
+        line = re.sub(r'(书目存在|英译本|书评|二手转引|二手|讲义|转述|述评)\s*' + X, r'\1', line)
+        line = re.sub(r'[，,；]?\s*' + X + r'\s*', '', line)
+        line = re.sub(r'〔核：\s*〕', '〔核〕', line)
+        line = re.sub(r'〔核：\s*；', '〔核：', line)
+        line = re.sub(r'\s+〕', '〕', line)
+        line = re.sub(r'[，,]\s*〕', '〕', line)
+        line = re.sub(r'\s+；', '；', line)
+        out_lines.append(line)
+    return '\n'.join(out_lines)
+
+
+def url_label(line, pos):
+    """D4 的「出处」：取网址所在括注里网址之前的文字；太短就补上括注前的半句。只摘原文，不写新字。"""
+    clean = lambda x: re.sub(r'\[([^\]]+)\]\(\)?', r'\1', re.sub(URL, '', re.sub(r'\[([^\]]+)\]\(' + URL + r'\)', r'\1', x)))
+    before = line[:pos]
+    a = before.rfind('〔')
+    inside = a >= 0 and '〕' not in before[a:]
+    inner = clean(before[a + 1:]) if inside else ''
+    inner = re.sub(r'^(核|待核)：', '', inner)
+    inner = re.sub(r'(转述见|原文另见|书目见|书评书目见|见|经|如|，|,|；|：|\s)+$', '', inner)
+    meaningful = lambda x: len(re.findall(r'[A-Za-z一-鿿0-9]', x))
+    lab = inner
+    if meaningful(inner) < 10 or inner in ('二手', '二手转引', '书目存在', '英译本', '书评', '二手文献'):
+        pre = clean(before[:a] if inside else before)
+        pieces = [x.strip() for x in re.split(r'[。！？；]', pre)]
+        pre = next((x for x in reversed(pieces) if meaningful(x) >= 8), pieces[-1])
+        pre = re.sub(r'^[-*\s]+', '', pre)
+        if len(pre) > 44:
+            pre = '…' + pre[-44:]
+        pre = pre.lstrip('，、；：）」 ')
+        lab = pre + ('（' + inner + '）' if meaningful(inner) else '')
+    lab = re.sub(r'\*', '', lab).strip(' ，,；;：')
+    lab = re.sub(r'〔[^〔〕]*〕', '', lab)
+    lab = lab.replace('〔', '').replace('〕', '')
+    if lab.count('（') > lab.count('）'):
+        lab += '）'
+    if lab.count('(') > lab.count(')'):
+        lab += ')'
+    return lab or '（见正文）'
 
 
 def strip_writer_list(text):
@@ -98,10 +167,41 @@ def split_h2(text):
     return pre, res
 
 
+# 章首页判句：一律逐字取自本章「带走的话」（只摘句，不改字）。值：(段序, 摘法)；摘法 all＝整段，s1＝首句，或给出逐字子串
+CHAP_VERDICT = {3: (0, 'all'), 4: (0, 'all'), 5: (0, 's1'), 6: (1, '语感长在回写里。'), 7: (0, 'all'),
+                8: (1, '语感不是存货，是一句话在一个场里的运行读数。'), 9: (1, '「我」不是判断从这里起头的地方，而是判断走到最后、在这个场里没处可去时显影出来的样子。'),
+                10: (0, 's1'), 11: (0, 's1')}
+
+
+def chap_verdict(n, body):
+    if n not in CHAP_VERDICT:
+        return None
+    m = re.search(r'^#{2,4} [◆ ]*(?:\d+\.\d+\s*)?带走的话\n\n(.*?)(?=\n#{2,4} |\n> \*\*小账|\n本章新东西|\Z)', body, re.S | re.M)
+    paras = [x.strip() for x in m[1].split('\n\n') if x.strip()]
+    k, how = CHAP_VERDICT[n]
+    p = paras[k]
+    if how == 'all':
+        return p
+    if how == 's1':
+        return re.match(r'^.*?。', p)[0]
+    assert how in p, (n, how)
+    return how
+
+
 def chap_md(n, title, body):
-    # 章首副题「> 第N问　问题（三角套，位）」排成章旨小字（只换版式，不改字）
+    # 章首副题「> 第N问　问题（三角套，位）」排成章旨（只换版式，不改字）
     body = re.sub(r'\A\s*> (第[一二三四五六七八九]问[^\n]*)\n', lambda m: '> **章旨**\n> ' + m[1] + '\n', body, count=1)
-    return '## 第%d章　%s\n\n%s' % (n, title, body_of(ledger(body)))
+    v = chap_verdict(n, body)
+    out = body_of(ledger(body))
+    out = strip_urls(out, '第%s章' % CNR[n])
+    # 「这一章的问题」一节改排成章首引导框（段落原样）
+    def qbox(m):
+        ps = [x.strip() for x in m[1].split('\n\n') if x.strip()]
+        return '> **这一章的问题**\n' + '\n>\n'.join('> ' + x for x in ps) + '\n\n'
+    out = re.sub(r'^### ◆ 这一章的问题\n\n(.*?)\n(?=#{3,4} )', qbox, out, count=1, flags=re.S | re.M)
+    if v:
+        out = re.sub(r'(> \*\*章旨\*\*\n> [^\n]*\n)', lambda m: m[1] + '\n> **章判**\n> ' + v + '\n', out, count=1)
+    return '## 第%d章　%s\n\n%s' % (n, title, out)
 
 
 def main():
@@ -169,6 +269,17 @@ def main():
     ap = rd('13-附录.md').strip()
     ap = re.sub(r'^## 附录 ([A-D])　', r'## 附录\1　', ap, flags=re.M)
     ap = '\n'.join(l for l in ap.split('\n') if l.strip() != '---')
+    # 正文网址外移：D 的引言改一句（原「已核条目附链接于各章正文」），D4 收全部网址
+    s0 = '已核条目附链接于各章正文，这里只列要目。'
+    assert s0 in ap
+    ap = ap.replace(s0, '已核条目的网址统一收在 D4，正文只写作者、年份与刊名；这里只列要目。')
+    seen, rows = set(), []
+    for ch, lab, u in URLS:
+        if (ch, u) in seen:
+            continue
+        seen.add((ch, u))
+        rows.append('| %s | %s | %s |' % (ch.replace('第', '').replace('章', ''), lab.replace('|', '／'), u))
+    ap = ap.rstrip() + '\n\n### D4　正文所引网址\n\n按章序列出正文〔核〕括注所据的网页，共 %d 条。网址以查核时所见为准。\n\n| 章 | 出处 | 网址 |\n|---|---|---|\n%s\n' % (len(rows), '\n'.join(rows))
     (HERE / 'back/12-后置.md').write_text(ap + '\n')
     fl = ['front/00-前置.md'] + ['parts/%s.md' % p[0] for p in PARTS] + ['back/11-结语.md', 'back/12-后置.md']
     (HERE / 'book.md').write_text('\n'.join((HERE / f).read_text().strip() + '\n' for f in fl))
