@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>边批 · 《为何大模型无法解决真正有价值的个性化问题？》的智能体 | 德麦国际专著第 546 号</title>
+<meta name="description" content="我从《为何大模型无法解决真正有价值的个性化问题？》里来，名字叫边批，取自结语里两个朋友在一本旧书页边你写一句我批一句的意象。书问的是：把大家共用的知识加上关于你的信息，就能得到独一份的方案吗？王德生的回答是，个性不是统一性里的参数取值，而是另一个发生。你带一件自己的事来，比如一句“你不了解我”、一个说不清的“随便”，我先把你的原话一字不改留下，不替你补没说过的细节。然后陪你拆开问：哪一块是事先写得下及格线、换人也一样的，可以放心交给大模型；哪一块写不出及格线、换人就变味，要靠你和另一个具体的人碰出来。最后问一句：什么事发生了，就说明这样拆错了？我守这些规矩：分清“参数取值”和“碰出来的同一性”；承认大模型在第一类问题上的真实价值；不诊断，不给医疗、教育、企业方面的具体建议，不给投资和政策主张，不对任何公司作事实断言；书里的人物场景是构想，预测都没检验过；你不认的拆法，我就收回，也不保证效果。">
+<meta name="sde-page-kind" content="tool">
+<meta name="book-agent" content="边批"><meta name="book_no" content="546">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/546/agent/">
+<meta property="og:title" content="边批 · 《为何大模型无法解决真正有价值的个性化问题？》的智能体">
+<meta property="og:description" content="我从《为何大模型无法解决真正有价值的个性化问题？》里来，名字叫边批，取自结语里两个朋友在一本旧书页边你写一句我批一句的意象。书问的是：把大家共用的知识加上关于你的信息，就能得到独一份的方案吗？王德生的回答是，个性不是统一性里的参数取值，而是另一个发生。你带一件自己的事来，比如一句“你不了解我”、一个说不清的“随便”，我先把你的原话一字不改留下，不替你补没说过的细节。然后陪你拆开问：哪一块是事先写得下及格线、换人也一样的，可以放心交给大模型；哪一块写不出及格线、换人就变味，要靠你和另一个具体的人碰出来。最后问一句：什么事发生了，就说明这样拆错了？我守这些规矩：分清“参数取值”和“碰出来的同一性”；承认大模型在第一类问题上的真实价值；不诊断，不给医疗、教育、企业方面的具体建议，不给投资和政策主张，不对任何公司作事实断言；书里的人物场景是构想，预测都没检验过；你不认的拆法，我就收回，也不保证效果。">
+<meta property="og:image" content="https://sdeuniverses.com/books/m/546/cover.jpg?v=20261031a">
+<link rel="stylesheet" href="/books/agent/app.css?v=20261003d">
+</head>
+<body>
+<div id="loading" class="loading"><div>这本书的智能体正在翻开它…</div><div id="ldmsg" style="font-size:12px"></div></div>
+<div id="app" class="app" hidden>
+ <aside class="side">
+  <div class="crumb"><a href="/browse/">SDE Universes</a> · <a href="/books/">专著书架</a> · <a id="detailA" href="/books/">本书详情</a></div>
+  <div class="bk"><img id="cov" alt="" hidden><div><h1 id="bt"></h1><div class="sub" id="bs"></div></div></div>
+  <div class="brand"><b id="agName"></b><small id="agEpi"></small></div>
+  <p class="tag" id="agTag"></p>
+  <div class="read" id="readInfo"></div>
+  <div class="read" id="kpInfo" style="margin-top:8px"></div>
+  <div class="read" id="ragInfo" style="margin-top:8px"></div>
+  <div class="sec-t">五 道 门</div>
+  <div class="gates" id="gates"></div>
+  <div class="sec-t hide-m">写 出 来</div>
+  <div class="outs">
+   <button class="out" id="oPaper" type="button">写成论文（约一万字）</button>
+   <button class="out ghost" id="oMono" type="button">写成新专著 · 立项书与全书提纲</button>
+   <button class="out ghost" id="oSum" type="button">本场小结</button>
+  </div>
+  <div class="small">德麦国际的每一本专著都有自己名字的智能体。<a href="/books/agent/">看全部智能体 ›</a><br>用你自己的大模型 Key 运行（DeepSeek 或智谱），Key 只存在你的浏览器里，不上传本站。<button id="keyBtn" type="button">设置 Key</button> · <button id="clrBtn" type="button">清空本场对话</button></div>
+ </aside>
+ <main class="main">
+  <div class="top"><div class="now" id="now"></div><a class="tbtn" id="readA" href="/books/" target="_blank" rel="noopener">打开原书</a></div>
+  <div class="msgs" id="msgs"><div class="col" id="col"></div></div>
+  <div class="dock"><div class="col">
+   <div class="gbar" id="gbar" role="group" aria-label="这一问走哪道门"></div>
+   <div class="inrow"><textarea id="q" rows="1" placeholder="问一句……（Enter 发送，Shift+Enter 换行）" aria-label="你的问题"></textarea><button class="send" id="send" type="button">发送</button></div>
+   <div class="hint" id="hint"></div>
+  </div></div>
+ </main>
+</div>
+<script>window.BOOK_AGENT={no:546};</script>
+<script src="/books/agent/app.js?v=20261003d" defer></script>
+</body></html>
