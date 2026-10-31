@@ -213,7 +213,13 @@ def render(blocks, bib=False):
             h.append('<div class="orn">◆</div>')
         elif k == 'pre':
             h.append('<div class="card">%s</div>' % ''.join('<p>%s</p>' % inline(x.strip()) for x in b if x.strip()))
-    return '\n'.join(h)
+    out, i = [], 0
+    while i < len(h):
+        cur = h[i]
+        if (cur.startswith('<h3 class="sec') or cur.startswith('<h4 class="ssec')) and i + 1 < len(h) and h[i + 1].startswith('<p') and len(re.sub(r'<[^>]+>', '', h[i + 1])) < 160:
+            out.append('<div class="keep">%s\n%s</div>' % (cur, h[i + 1])); i += 2; continue
+        out.append(cur); i += 1
+    return '\n'.join(out)
 
 
 def with_endmark(inner):
@@ -384,7 +390,8 @@ def print_css(fonts, W, H, body_pt, lh, margin, fol='decimal'):
 @page opener:left{{@top-left{{content:none}}}}
 @page opener:right{{@top-right{{content:none}}}}
 body{{font-family:'Noto Serif CJK SC';font-size:{body_pt}pt;line-height:{lh};color:#2A2824;margin:0;string-set:book "{META['title']}"}}
-p{{margin:0 0 .42em;text-indent:2em;text-align:justify;orphans:2;widows:2}}
+p{{margin:0 0 .42em;text-indent:2em;text-align:justify;orphans:3;widows:2}}
+.keep{{break-inside:avoid}}
 strong{{color:#1F3A5F;font-weight:700}}
 em{{font-style:italic}}
 .clean{{page:clean}}
