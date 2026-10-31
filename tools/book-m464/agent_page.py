@@ -39,11 +39,11 @@ out = Path('public/books/m/%d/agent/index.html' % NO)
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(page, encoding='utf-8')
 
-# 名录：加在「健康与心理」分区的最前面，分区计数与总数各加一
+# 名录：加在「哲学与SDE」分区的最前面，分区计数与总数各加一
 dp = Path('public/books/agent/index.html')
 d = dp.read_text(encoding='utf-8')
 if '/books/m/%d/agent/' % NO not in d:
-    s = d.index('<section><h2>健康与心理<span>')   # 本书书类 health
+    s = d.index('<section><h2>哲学与SDE<span>')   # 本书书类 core
     m = re.match(r'<section><h2>([^<]*)<span>(\d+)</span></h2><div class="g">', d[s:])
     assert m, d[s:s + 120]
     card = '<a class="c" href="/books/m/%d/agent/"><b>%s</b><i>%s</i><span>《%s》 · 第 %d 号</span></a>' % (NO, esc(name), esc(epi), esc(M.TITLE), NO)
