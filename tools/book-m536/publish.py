@@ -68,7 +68,8 @@ def main():
     assert not any(str(x.get('number')) == str(NO) for x in others), f'catalog 已有 {NO} 号'
     assert not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in others), 'catalog 已有此 ISBN'
     _ms = Path(A.ms).read_text()
-    han = len(re.findall(r'[一-鿿]', _ms))
+    # 第 536 号：字数按九十六章正文（剔除标题行）计，与封面、出版信息页口径一致
+    han = sum(len(re.findall(r'[一-鿿]', '\n'.join(l for l in (HERE / 'parts' / f).read_text().split('\n## ', 1)[1].split('\n') if not l.lstrip().startswith('#')))) for f in sorted(x.name for x in (HERE / 'parts').glob('*.md')))
     reserve(han, len(re.findall(r'^## 第 ?\d+ ?章　', _ms, re.M)))
     (d / 'text').mkdir(parents=True, exist_ok=True)
     for f in (f'{SLUG}-print.pdf', f'{SLUG}-reader.pdf', f'{SLUG}.docx', 'cover.jpg', 'backcover.jpg'):
