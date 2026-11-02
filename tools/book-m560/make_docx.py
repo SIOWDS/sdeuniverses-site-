@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""第 558 号《悬着才成事——秩序为什么要靠悬着活着》：由分卷稿 book.md 出全书 Word（pandoc），中文用宋体／Noto Serif CJK SC，标题藏青。
-用法（仓库根目录）：python3 tools/book-m558/make_docx.py --out <b558>
+"""第 560 号《文学的同一性谱系——后现代之后，从卡夫卡到残雪》：由分卷稿 book.md 出全书 Word（pandoc），中文用宋体／Noto Serif CJK SC，标题藏青。
+用法（仓库根目录）：python3 tools/book-m560/make_docx.py --out <b560>
 产物：<out>/tool-happiness-genesis.docx
 """
 import argparse, re, subprocess, sys, tempfile
