@@ -125,13 +125,16 @@ def main():
                  price=PRICE, priceUsd=int(PRICE_USD) if PRICE_USD == int(PRICE_USD) else PRICE_USD, currency='USD', priceLabel=PRICE, edition=M.EDITION,
                  pdfPages=pages_of(b / f'{SLUG}-reader.pdf'), printPdfPages=pages, publishedAt=pubat, publisher='德麦国际出版社', publisherEnglish='Demai International Press',
                  isbn=ISBN.replace('-', ''), isbnDisplay=ISBN, isbnStatus='site-allocated-checksum-valid',
+                 agentUrl=url + 'agent/dialogue.html', agentName=AG, agentLabel='智能问对 · ' + AG,
+                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · %d个学习单元' % len(CT['tasks']),
+                 learningPackUrl=url + f'learning-pack.pdf?v={V}', learningPackDocxUrl=url + f'learning-pack.docx?v={V}',
                  tier=M.TIER['tier'], citeOk=True,
-                 publicationUnit={'id': f'm-{NO}', 'type': 'reading', 'revision': M.UNIT_REV})
+                 publicationUnit={'id': f'm-{NO}', 'type': 'reading-learning-dialogue', 'revision': M.UNIT_REV})
     data['books'] = [entry] + others
     data['updated'] = now[:10]
     cat_p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
     sm = SITE / 'sitemap.xml'; t = sm.read_text()
-    for u in [url, url + 'text/', url + 'read.html']:
+    for u in [url, url + 'text/', url + 'read.html', url + 'agent/', url + 'agent/learning.html', url + 'agent/dialogue.html']:
         if '<loc>%s</loc>' % u not in t:
             assert '</urlset>' in t
             t = t.replace('</urlset>', '<url><loc>%s</loc><lastmod>%s</lastmod></url>\n</urlset>' % (u, now[:10]))
