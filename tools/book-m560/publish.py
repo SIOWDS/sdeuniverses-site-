@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""第 558 号《悬着才成事——秩序为什么要靠悬着活着》（王德生、胡敏 著；由第 550 号 publish.py 改来）：
+"""第 560 号《文学的同一性谱系——后现代之后，从卡夫卡到残雪》（王德生 著；由第 558 号 publish.py 改来）：
 装进 public/books/m/557/（两版 PDF、Word、封面封底、全文网页、矢量翻页器、详情页）、书目、站点地图、/today/ 新书卡；
 并写书号预留档 .publish/volume-reservations/557.json（铁律14：写之前查号、查 ISBN、验校验位）。
 翻页器用 tools/build_flip_reader.py one 生成（不再改写第 259 号的旧模板）。
 可重跑：重跑时只替换本书自己的条目（catalog 里 m-557、/today/ 里本书那张卡），不碰别的书。
-用法（仓库根目录）：python3 tools/book-m558/publish.py --build <b558> --content tools/book-m558/content.json --ms tools/book-m558/book.md
+用法（仓库根目录）：python3 tools/book-m560/publish.py --build <b560> --content tools/book-m560/content.json --ms tools/book-m560/book.md
 """
 import argparse, datetime, glob, json, re, shutil, subprocess, sys
 from pathlib import Path
@@ -42,7 +42,7 @@ def reserve(han, chapters):
     pub = [int(x['number']) for x in _cat['books'] if isinstance(x, dict) and isinstance(x.get('number'), int) and x['number'] != NO]   # 稀疏检出里目录不全，按书目算
     d = {'volume': NO, 'title': T, 'subtitle': SUB, 'authors': AUTHORS, 'isbn': ISBN, 'isbnNormalized': nisbn,
          'isbnStatus': 'site-allocated-checksum-valid', 'priceUsd': PRICE_USD, 'status': 'published', 'date': M.DATE,
-         'authorization': '王德生出版令（2026-11-02 20:46）：「下一步是从站里计算书号和 ISBN，然后进行统稿，三审，然后排印刷版、阅读友好版、做封面，再上站。」——书号取已上站最大号 557 之后的 558；ISBN 取号段内 565 之后的下一个空位 566，校验位已核。定价未另行指定，暂按系列二十万字常价 US$20。',
+         'authorization': json.loads((REPO / '.publish/volume-reservations' / f'{NO}.json').read_text())['authorization'] + ' 2026-11-03 06:39 王德生令「上站」',
          'availabilityCheck': {'maxPublishedCatalogNumber': max(pub), 'maxReservedVolume': max(vols), 'volumeAbsent': True,
                                'isbnAbsentInCatalogAndReservations': True, 'checkDigit': int(nisbn[-1])},
          'tier': M.TIER,
@@ -100,14 +100,14 @@ def main():
            .replace('__DESC_SHORT__', _h.escape(CT['detailLine'], quote=True)).replace('__PRICE_NUM__', '%.2f' % PRICE_USD).replace('__PRICE__', PRICE))
 
     def _struct():
-        li = ['<li><b>前置</b>　出版信息 · 题词 · 作者介绍 · 成书说明 · 前言 · 导论　每一步都在倒</li>']
+        li = ['<li><b>前置</b>　出版信息 · 题词 · 作者介绍 · 成书说明 · 前言　三个词撞出来的一句话</li>']
         for f in sorted((HERE / 'parts').glob('*.md')):
             tx = f.read_text()
             pt = tx.split('\n', 1)[0].lstrip('# ').strip()
             chs = re.findall(r'^## 第 ?(\d+) ?章　(.*)$', tx, re.M)
             li.append('<li><b>%s</b>（第 %s—%s 章）<span class="chs">%s</span></li>' % (
                 _h.escape(pt), chs[0][0], chs[-1][0], ' · '.join('第 %s 章 %s' % (n, _h.escape(c)) for n, c in chs)))
-        li.append('<li><b>后置</b>　结语　难得糊涂 · 附录 · 后记 · 版本说明</li>')
+        li.append('<li><b>后置</b>　结语　后现代不是终点，是搬家的中途 · 版本说明</li>')
         return '<ol class="vols">\n%s\n</ol>' % '\n'.join(li)
     det = det.replace('__STRUCT__', _struct())
     assert '__' not in det
