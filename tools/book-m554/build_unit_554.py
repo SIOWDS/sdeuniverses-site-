@@ -19,6 +19,7 @@ import argparse, hashlib, html, json, re, sys
 from pathlib import Path
 
 ROOT = Path.cwd()
+sys.path.insert(0, str(Path(__file__).resolve().parent)); import meta as M
 TPL = ROOT / 'tools/m398_unit'
 CN = '零一二三四五六七八九十'
 
