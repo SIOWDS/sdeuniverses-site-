@@ -27,9 +27,9 @@ PUBLISHER, PUBLISHER_EN = '德麦国际出版社', 'Demai International Press'
 TIER = dict(tier='L0', tier_set_at='统稿', tier_set_reason='统稿复核时按出版令裁定',
             tier_reason='主张层为主——命题、判据、条件性论断、已证特定情形与标明的猜想、判决设计与撤回条件；不含真跑数据；王德生出版令明示三位一体上站',
             cite_ok='true', context_layers='判据、结论',
-            source='阳涌著，王德生指导（核心命题由王德生口述）；AI 协作成稿', rights='作者署名出版', tier_judge='Claude（依王德生出版令）',
+            source='阳涌著（核心命题由王德生口述）；AI 协作成稿', rights='作者署名出版', tier_judge='Claude（依王德生出版令）',
             tier_date='2026-11-02')
-AUTHORSHIP = '阳涌著，王德生指导：全书母题与核心命题由王德生口述提出；正文由 AI（Claude）协作撰写，经三审与统稿；无独立学术评审，无实测数据。'
+AUTHORSHIP = '阳涌著：全书母题与核心命题由王德生口述提出；正文由 AI（Claude）协作撰写，经三审与统稿；无独立学术评审，无实测数据。'
 
 
 def body_han(here=None):
