@@ -81,7 +81,10 @@ def end_zone(lines):
         elif cur == 'ledger':
             ledger.append(p)
         elif cur == 'think':
-            think.append(re.sub(r'^\s*>\s?', '', raw).rstrip())
+            q = re.sub(r'^\s*>\s?', '', raw).rstrip()
+            q = re.sub(r'^(\d)[.．、]\s*', lambda m: '一二三四五六七八九'[int(m.group(1)) - 1] + '、', q)
+            q = re.sub(r'^([一二三四五六七八九])[，,]\s*', r'\1、', q)
+            think.append(q)
         else:
             raise SystemExit('unparsed end-zone line: ' + raw)
     out = []
