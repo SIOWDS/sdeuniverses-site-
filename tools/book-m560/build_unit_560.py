@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""三位一体出版单元生成器（阅读 · 学习包 · 智能问对）——第 558 号《悬着才成事——秩序为什么要靠悬着活着》用（由第 550 号 build_unit 改写，承自第 532 号）；原由第398卷参考实现（tools/m398_unit）泛化。
-第 557 号：学习单元按章——二十二个单元，每章一个；文案一律称「单元」；
+"""三位一体出版单元生成器（阅读 · 学习包 · 智能问对）——第 560 号《文学的同一性谱系——后现代之后，从卡夫卡到残雪》用（由第 550 号 build_unit 改写，承自第 532 号）；原由第398卷参考实现（tools/m398_unit）泛化。
+第 560 号：学习单元按章——十三个单元，每章一个；文案一律称「单元」；
 另出 learning-pack.pdf 与 learning-pack.docx（放在书目录下，不再写 downloads/）。
 
 只写 public/books/m/<号>/ 之下的这些东西，不碰别的书、不调用模型、不重建搜索索引：
@@ -39,7 +39,7 @@ def sub1(text, old, new, count=1):
     return text.replace(old, new) if count == 0 else text.replace(old, new, count)
 
 def parse_manuscript(path):
-    """第 557 号：返回 (parts, units)。parts：五编；units：每章一个学习单元，锚点取该章。"""
+    """第 560 号：返回 (parts, units)。parts：三编；units：每章一个学习单元，锚点取该章。"""
     s = Path(path).read_text(encoding='utf-8')
     parts, units, cur = [], [], None
     for blk in re.split(r'\n(?=#{1,2} )', '\n' + s):
@@ -82,7 +82,7 @@ def main():
     # chapter anchors in text/index.html
     tx = (BOOK / 'text/index.html').read_text(encoding='utf-8')
     anchors = {int(m.group(2)): m.group(1) for m in re.finditer(r'<(?:div|section) class="chapter[^"]*" id="(s\d+)">(?:<div class="chapnum[^"]*">[^<]*</div>)?<div class="chap-label">第 ?(\d+) ?章', tx)}
-    assert len(anchors) == nch, 'text page anchors: %d' % len(anchors)   # 第 557 号：二十二章
+    assert len(anchors) == nch, 'text page anchors: %d' % len(anchors)   # 第 560 号：十三章
 
     def w(rel, content):
         p = BOOK / rel; p.parent.mkdir(parents=True, exist_ok=True)

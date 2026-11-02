@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""第 558 号《悬着才成事——秩序为什么要靠悬着活着》：只为本书生成 /books/m/557/agent/index.html，并在 /books/agent/ 名录里加一张卡。
+"""第 560 号《文学的同一性谱系——后现代之后，从卡夫卡到残雪》：只为本书生成 /books/m/560/agent/index.html，并在 /books/agent/ 名录里加一张卡。
 不跑 tools/build_book_agents.py——稀疏检出里它会按本地仅有的几本书重写整个名录。
 页面骨架取第 529 号的智能体页（共用 /books/agent/app.js 与 app.css），只换头部与书号。
-用法（仓库根目录）：python3 tools/book-m558/agent_page.py
+用法（仓库根目录）：python3 tools/book-m560/agent_page.py
 """
 import html
 import json
 import re
 import sys
 from pathlib import Path
-sys.path.insert(0, 'tools/book-m558')
+sys.path.insert(0, 'tools/book-m560')
 import meta as M  # noqa: E402
 
 NO = M.NO
-C = json.loads(Path('tools/book-m558/content.json').read_text(encoding='utf-8'))
+C = json.loads(Path('tools/book-m560/content.json').read_text(encoding='utf-8'))
 name, epi, intro = C['agent']['name'], C['agentEpithet'], C['agentIntro']
 esc = lambda s: html.escape(s, quote=True)
 

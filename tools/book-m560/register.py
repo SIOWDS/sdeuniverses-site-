@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""第 558 号《悬着才成事——秩序为什么要靠悬着活着》（由第 550 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
-在仓库根目录运行：python3 tools/book-m558/register.py
+"""第 560 号《文学的同一性谱系——后现代之后，从卡夫卡到残雪》（由第 550 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
+在仓库根目录运行：python3 tools/book-m560/register.py
 """
 import datetime
 import json
 import sys
 from pathlib import Path
-sys.path.insert(0, 'tools/book-m558')
+sys.path.insert(0, 'tools/book-m560')
 import meta as M  # noqa: E402
 
 NO = M.NO
-C = json.loads(Path('tools/book-m558/content.json').read_text(encoding='utf-8'))
+C = json.loads(Path('tools/book-m560/content.json').read_text(encoding='utf-8'))
 today = datetime.date.today().isoformat()
 
 kp = {'no': NO, 'title': M.TITLE, 'built': today,

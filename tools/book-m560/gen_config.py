@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""第 558 号《悬着才成事——秩序为什么要靠悬着活着》（由第 550 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m557.json（build_unit_557.py 的配置）。
-用法（仓库根目录）：python3 tools/book-m558/gen_config.py tools/book-m558/content.json
+"""第 560 号《文学的同一性谱系——后现代之后，从卡夫卡到残雪》（由第 550 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m560.json（build_unit_560.py 的配置）。
+用法（仓库根目录）：python3 tools/book-m560/gen_config.py tools/book-m560/content.json
 """
 import json, sys
 from pathlib import Path
@@ -11,7 +11,7 @@ U = 'https://sdeuniverses.com/books/m/%d/' % M.NO
 cfg = {
  'number': M.NO, 'slug': M.SLUG, 'title': M.TITLE, 'subtitle': M.SUBTITLE, 'authors': M.AUTHORS, 'advisor': '',
  'isbn': M.ISBN, 'price': M.PRICE, 'partWord': '编', 'sourceEdition': '三审稿（%s）' % M.DATE,
- 'unitRev': M.UNIT_REV, 'assetVersion': M.V, 'manuscript': 'tools/book-m558/book.md',
+ 'unitRev': M.UNIT_REV, 'assetVersion': M.V, 'manuscript': 'tools/book-m560/book.md',
  'agentName': C['agent']['name'], 'agentEpithet': C['agentEpithet'], 'bookMeta': C['bookMeta'], 'heroTagline': C['heroTagline'],
  'practiceWord': C['practiceWord'], 'pdfBg': '#16253d',
  'learningPdfUrl': U + 'learning-pack.pdf?v=' + M.V, 'learningDocxUrl': U + 'learning-pack.docx?v=' + M.V,
