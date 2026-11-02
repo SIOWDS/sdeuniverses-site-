@@ -107,6 +107,7 @@ def inline(s):
     s = html.escape(s, quote=False)
     s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
     s = re.sub(r'(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?!\*)', r'<em>\1</em>', s)
+    s = re.sub(r'〔(P\d\d[^〔〕]{0,24})〕', r'<span class="cs">〔\1〕</span>', s)
     return s
 
 
@@ -121,7 +122,16 @@ def table_html(rows, cls='tb'):
             cls += ' n%d' % (ci + 1)
     if len(body) > 20:
         cls += ' dense'
-    h = ['<div class="tw"><table class="%s"><thead><tr>' % cls]
+    avg = [sum(len(r[c]) if len(r) > c else 0 for r in body) / max(1, len(body)) for c in range(len(head))]
+    if (len(head) >= 5 and sum(a > 9 for a in avg[1:]) >= 2) or (len(head) == 4 and sum(a > 14 for a in avg[1:]) >= 3):
+        cards = []
+        for r in body:
+            kv = ''.join('<p><span class="ck">%s</span>%s</p>' % (inline(head[c]), inline(r[c])) for c in range(1, len(head)) if len(r) > c and r[c].strip())
+            cards.append('<div class="rc"><div class="rt">%s</div>%s</div>' % (inline(r[0]), kv))
+        return '<div class="rcards">%s</div>' % ''.join(cards)
+    if len(body) <= 7:
+        cls += ' keep'
+    h = ['<div class="tw%s"><table class="%s"><thead><tr>' % (' keep' if ' keep' in cls else '', cls)]
     h += ['<th>%s</th>' % inline(c) for c in head]
     h.append('</tr></thead><tbody>')
     for r in body:
@@ -169,7 +179,14 @@ def quote_html(lines):
         return '<div class="qbox"><span class="lab">这一章的问题</span><p>%s</p></div>' % inline(mq[1])
     if len(body) == 1 and re.fullmatch(r'\*\*.+\*\*', body[0].strip()):
         return '<div class="pull"><p>%s</p></div>' % inline(body[0].strip()[2:-2])
-    return '<blockquote class="verdict">%s</blockquote>' % ''.join('<p>%s</p>' % inline(l) for l in body)
+    if body and all(re.fullmatch(r'\*\*.+\*\*', l.strip()) for l in body):
+        return '<blockquote class="verdict">%s</blockquote>' % ''.join('<p>%s</p>' % inline(l) for l in body)
+    def ql(l):
+        m = re.match(r'^(- |(\d+)[.、] )(.*)$', l.strip())
+        if m:
+            return '<p class="li"><span class="tm">%s</span>%s</p>' % ('%s.' % m[2] if m[2] else '·', inline(m[3]))
+        return '<p>%s</p>' % inline(l)
+    return '<blockquote class="quote">%s</blockquote>' % ''.join(ql(l) for l in body)
 
 
 def render(blocks, bib=False):
@@ -181,7 +198,9 @@ def render(blocks, bib=False):
             continue
         if k == 'p':
             t = b[0]
-            if re.fullmatch(r'〔[^〔〕]*〕', t):
+            if t.startswith('【署】'):
+                h.append('<p class="sign">%s</p>' % '<br>'.join(inline(x) for x in t[3:].split('｜')))
+            elif re.fullmatch(r'〔[^〔〕]*〕', t):
                 h.append('<p class="srcnote">%s</p>' % inline(t))
             else:
                 if bib and t.startswith('核读与使用范围'):
@@ -220,6 +239,17 @@ def render(blocks, bib=False):
             h.append('<div class="card code">%s</div>' % ''.join(
                 '<p%s>%s</p>' % ((' style="padding-left:%.1fem"' % ((len(x) - len(x.lstrip(' '))) * 0.5)) if x.startswith(' ') else '',
                                  html.escape(x.strip(), quote=False)) for x in b if x.strip()))
+    out, ii = [], 0
+    while ii < len(h):
+        x = h[ii]
+        if (x.startswith('<h3') or x.startswith('<h4')) and ii + 1 < len(h) and not h[ii + 1].startswith('<h') \
+                and len(re.sub(r'<[^>]+>', '', h[ii + 1])) < 260:
+            out.append('<div class="kw">%s%s</div>' % (x, h[ii + 1])); ii += 2; continue
+        if (x.startswith('<p class="sign"') or x.startswith('<div class="takeaway"')) and out and out[-1].startswith('<p') \
+                and len(re.sub(r'<[^>]+>', '', out[-1])) < 420:
+            out[-1] = '<div class="kw">%s%s</div>' % (out[-1], x); ii += 1; continue
+        out.append(x); ii += 1
+    h = out
     return '\n'.join(h)
 
 
@@ -315,6 +345,9 @@ def build_sections():
             if bl[i][0] == 'p':
                 intro.append('<p class="bianxu">%s</p>' % inline(bl[i][1][0]))
             i += 1
+        chl = [x[1][0] for x in bl if x[0] == 'h2']
+        intro.append('<div class="pch">%s</div>' % ''.join(
+            '<p><span class="pn">%s</span>%s</p>' % (inline(c.split('　', 1)[0]), inline(c.split('　', 1)[1] if '　' in c else '')) for c in chl))
         secs.append(('part', sid(), '%s　%s' % (m[1].replace('　', ''), m[2]), 1,
                      '%s<div class="part-label">%s</div><h1 class="part-title">%s</h1><div class="rule"></div>'
                      '<div class="daoyu">编　序</div><div class="part-intro">%s</div>'
@@ -403,6 +436,9 @@ section.part{{break-before:right;text-align:center;padding-top:26mm}}
 .part .rule{{margin:0 auto 9mm}}
 .daoyu{{font:700 8.5pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.6em;margin-bottom:5mm}}
 .part-intro{{text-align:left}}
+.pch{{margin:7mm auto 0;width:82%;border-top:.6pt solid #D9C9A3;padding-top:3.5mm}}
+.pch p{{text-indent:0;text-align:left;margin:0 0 1.3mm;font:400 {body_pt*0.9:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F}}
+.pch .pn{{display:inline-block;min-width:4.6em;font:700 {body_pt*0.78:.2f}pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.05em}}
 .part-intro p{{font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
 .rule{{width:13mm;border-top:.9pt solid #B08A3C;margin:3mm 0 7mm}}
 .chapnum{{font:300 34pt/1 'Noto Serif CJK SC';color:#D9C39A;margin-top:6mm;letter-spacing:.02em}}
@@ -454,12 +490,27 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 .chapter.t3 h3.sec{{margin-top:4mm}}
 .chapter.t4 p,.chapter.t4 li{{line-height:{lh-0.2:.3f};margin-bottom:.25em}}
 .chapter.t4 h3.sec{{margin-top:3.5mm}}
+blockquote.quote{{margin:3.2mm 0 3.6mm 3mm;padding:.6mm 0 .6mm 4mm;border-left:1pt solid #D9C9A3;color:#3A3832;break-inside:avoid}}
+blockquote.quote p{{text-indent:0;margin:0 0 1mm;font-size:{body_pt*0.95:.2f}pt;line-height:1.7}}
+blockquote.quote p.li{{padding-left:1.4em;text-indent:-1.4em}}
+blockquote.quote .tm{{display:inline-block;width:1.4em;text-indent:0;color:#B08A3C}}
+.cs{{font-family:'Noto Sans CJK SC';font-size:.7em;color:#A08C62;white-space:nowrap;letter-spacing:0}}
+p.sign{{text-align:right;text-indent:0;margin-top:3mm;line-height:1.9;color:#3A3832}}
 blockquote.verdict{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;margin:4mm 0;padding:2.6mm 4mm;break-inside:avoid}}
 blockquote.verdict p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F}}
 .tw{{margin:3.5mm 0}}
 table.tb{{width:100%;border-collapse:collapse;font-size:{body_pt*0.8:.2f}pt;line-height:1.6}}
 table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left}}
 table.tb tr{{break-inside:avoid}}
+.tw.keep{{break-inside:avoid}}
+table.keep{{break-inside:avoid}}
+.kw{{break-inside:avoid}}
+.rcards{{margin:3mm 0 4mm}}
+.rc{{border-top:.6pt solid #D9C9A3;padding:2mm 0 1.6mm;break-inside:avoid}}
+.rc:last-child{{border-bottom:.6pt solid #D9C9A3}}
+.rc .rt{{font:700 {body_pt*0.92:.2f}pt/1.6 'Noto Sans CJK SC';color:#1F3A5F;margin-bottom:.8mm}}
+.rc p{{text-indent:0;margin:0 0 .6mm;font-size:{body_pt*0.86:.2f}pt;line-height:1.65}}
+.rc .ck{{display:inline-block;min-width:5.2em;font:700 {body_pt*0.78:.2f}pt 'Noto Sans CJK SC';color:#B08A3C;margin-right:1.5mm}}
 table.tb.n1 th:nth-child(1),table.tb.n1 td:nth-child(1){{white-space:nowrap}}
 table.tb.n2 th:nth-child(2),table.tb.n2 td:nth-child(2){{white-space:nowrap}}
 table.tb.w5 th:nth-child(-n+2),table.tb.w5 td:nth-child(-n+2){{white-space:nowrap}}
@@ -644,6 +695,10 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     fbytes = fdoc.write_pdf()
     mbytes = mdoc.write_pdf()
     book = pymupdf.open()
+    def blank(w, hh):
+        pg_ = book.new_page(width=w, height=hh)
+        pg_.draw_rect(pg_.rect, color=None, fill=(251/255, 248/255, 240/255))
+        return pg_
 
     def add_cover(src):
         c = pymupdf.open(str(src))
@@ -655,17 +710,17 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
         else:
             book.insert_pdf(c)
     add_cover(cover)
-    book.new_page(width=book[0].rect.width, height=book[0].rect.height)  # 封二
+    blank(book[0].rect.width, book[0].rect.height)  # 封二
     f = pymupdf.open(stream=fbytes, filetype='pdf')
     book.insert_pdf(f)
     if len(f) % 2:
-        book.new_page(width=f[0].rect.width, height=f[0].rect.height)
+        blank(f[0].rect.width, f[0].rect.height)
     main_start = len(book) + 1
     m = pymupdf.open(stream=mbytes, filetype='pdf')
     book.insert_pdf(m)
     if len(book) % 2:
-        book.new_page(width=m[0].rect.width, height=m[0].rect.height)
-    book.new_page(width=m[0].rect.width, height=m[0].rect.height)  # 封三
+        blank(m[0].rect.width, m[0].rect.height)
+    blank(m[0].rect.width, m[0].rect.height)  # 封三
     add_cover(back)
     # 书签与翻页器目录
     toc, flip = [], []
@@ -711,7 +766,7 @@ def web_page(secs):
 .judge{border-left:3px solid #8A6E3A;padding:.5rem 1rem;margin:1rem 0}.judge .lab{display:block;font:700 .75rem sans-serif;color:#8A6E3A;letter-spacing:.3em}.judge p{text-indent:0;margin:.2rem 0;color:var(--dim)}
 .chapnum{font-size:2.6rem;color:var(--gold);opacity:.45;line-height:1;margin-top:1rem}.chapnum.spacer{opacity:0;font-size:1rem}
 .chap-label{margin:.3rem 0 .2rem}
-blockquote.verdict{border-left:3px solid var(--gold)}blockquote.verdict p{color:var(--navy);font-weight:700}
+/*rc*/.rc{border-top:1px solid var(--line);padding:.5em 0}.rc .rt{font-weight:700;color:var(--navy)}.rc p{text-indent:0;margin:.15em 0}.rc .ck{color:var(--gold);font-size:.85em;margin-right:.5em}blockquote.quote{border-left:2px solid var(--line);margin:1em 0 1em .6em;padding-left:1em;color:var(--ink)}blockquote.quote p{text-indent:0;margin:.2em 0}.cs{font-size:.72em;color:var(--dim);white-space:nowrap}p.sign{text-align:right;text-indent:0}blockquote.verdict{border-left:3px solid var(--gold)}blockquote.verdict p{color:var(--navy);font-weight:700}
 .emb{width:44px;height:44px;display:block;margin:0 auto 1rem}
 p.bib{text-indent:-2em;padding-left:2em;font-size:.9rem;line-height:1.8;overflow-wrap:anywhere}p.bib .bn{color:var(--gold)}p.bib.sc{text-indent:0;color:var(--dim);font-size:.84rem;margin-bottom:.9rem}
 p.srcnote{text-indent:0;font-size:.84rem;color:var(--dim);font-family:sans-serif}
