@@ -116,6 +116,14 @@ export async function siteGate(request, env) {
     });
   }
 
+  // 退出：清掉过门凭证，回到关卡（测试用，也可发给要换设备的人）
+  if (url.pathname === "/__logout") {
+    const hs = new Headers({ location: "/", ...H_NOSTORE, "clear-site-data": "\"cache\"" });
+    hs.append("set-cookie", `${COOKIE}=; Path=/; Max-Age=0; Secure; SameSite=Lax${cookieDomain(host)}`);
+    hs.append("set-cookie", `${COOKIE}=; Path=/; Max-Age=0; Secure; SameSite=Lax`);
+    return new Response(null, { status: 303, headers: hs });
+  }
+
   // 已过门
   if (readCookie(request, COOKIE) === (await tokenFor(pwSha))) return null;
 
@@ -123,6 +131,13 @@ export async function siteGate(request, env) {
   if (url.pathname.startsWith("/api/") && fromOwnSite(request)) return null;
 
   if (request.method === "OPTIONS") return null;
+
+  // 浏览器里关卡上线前缓存下来的旧页面：它再去要脚本时，回一段跳转脚本把整页送回关卡。
+  if (request.headers.get("sec-fetch-dest") === "script" && !url.pathname.startsWith("/api/")) {
+    return new Response('try{top.location.replace("/")}catch(e){location.replace("/")}', {
+      status: 200, headers: { "content-type": "text/javascript; charset=utf-8", ...H_NOSTORE },
+    });
+  }
 
   const accept = request.headers.get("accept") || "";
   const isPage = !url.pathname.startsWith("/api/") && (request.method === "GET" || request.method === "HEAD") && (accept.includes("text/html") || accept === "" || accept === "*/*" && !url.pathname.includes("."));
