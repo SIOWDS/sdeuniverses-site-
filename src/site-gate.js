@@ -128,7 +128,7 @@ export async function siteGate(request, env) {
   const isPage = !url.pathname.startsWith("/api/") && (request.method === "GET" || request.method === "HEAD") && (accept.includes("text/html") || accept === "" || accept === "*/*" && !url.pathname.includes("."));
   if (isPage) {
     return new Response(request.method === "HEAD" ? null : gatePage(url.pathname + url.search, false), {
-      status: 401, headers: { "content-type": "text/html; charset=utf-8", ...H_NOSTORE },
+      status: 401, headers: { "content-type": "text/html; charset=utf-8", ...H_NOSTORE, "clear-site-data": "\"cache\"" },
     });
   }
   return new Response(JSON.stringify({ ok: false, msg: "SDE 平台封闭发展中，需要访问密码。" }), {
