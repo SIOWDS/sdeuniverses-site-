@@ -42,7 +42,7 @@ def reserve(han, chapters):
     pub = [int(x['number']) for x in _cat['books'] if isinstance(x, dict) and isinstance(x.get('number'), int) and x['number'] != NO]   # 稀疏检出里目录不全，按书目算
     d = {'volume': NO, 'title': T, 'subtitle': SUB, 'authors': AUTHORS, 'isbn': ISBN, 'isbnNormalized': nisbn,
          'isbnStatus': 'site-allocated-checksum-valid', 'priceUsd': PRICE_USD, 'status': 'published', 'date': M.DATE,
-         'authorization': json.loads((REPO / '.publish/volume-reservations' / f'{NO}.json').read_text())['authorization'] + ' 2026-11-03 06:39 王德生令「上站」',
+         'authorization': json.loads((REPO / '.publish/volume-reservations' / f'{NO}.json').read_text())['authorization'],
          'availabilityCheck': {'maxPublishedCatalogNumber': max(pub), 'maxReservedVolume': max(vols), 'volumeAbsent': True,
                                'isbnAbsentInCatalogAndReservations': True, 'checkDigit': int(nisbn[-1])},
          'tier': M.TIER,
@@ -125,8 +125,11 @@ def main():
                  price=PRICE, priceUsd=int(PRICE_USD) if PRICE_USD == int(PRICE_USD) else PRICE_USD, currency='USD', priceLabel=PRICE, edition=M.EDITION,
                  pdfPages=pages_of(b / f'{SLUG}-reader.pdf'), printPdfPages=pages, publishedAt=pubat, publisher='德麦国际出版社', publisherEnglish='Demai International Press',
                  isbn=ISBN.replace('-', ''), isbnDisplay=ISBN, isbnStatus='site-allocated-checksum-valid',
+                 agentUrl=url + 'agent/dialogue.html', agentName=AG, agentLabel='智能问对 · ' + AG,
+                 learnUrl=url + 'agent/learning.html', learningUrl=url + 'agent/learning.html', learnLabel='学习包 · %d个学习单元' % len(CT['tasks']),
+                 learningPackUrl=url + f'learning-pack.pdf?v={V}', learningPackDocxUrl=url + f'learning-pack.docx?v={V}',
                  tier=M.TIER['tier'], citeOk=True,
-                 publicationUnit={'id': f'm-{NO}', 'type': 'reading', 'revision': M.UNIT_REV})
+                 publicationUnit={'id': f'm-{NO}', 'type': 'reading-learning-dialogue', 'revision': M.UNIT_REV})
     data['books'] = [entry] + others
     data['updated'] = now[:10]
     cat_p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
