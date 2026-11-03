@@ -1,6 +1,7 @@
 import { handleM7Read } from "./m7-publication.js";
 // SDE Universes site worker: visit counter + static assets
 import { handleChatPrimary } from "./chatprimary.js";
+import { siteGate, GATE_INTERNAL_KEY } from "./site-gate.js";
 
 // ── 主站 / 四个正式子站：唯一归属、canonical 与统一统计 ────────────
 // 唯一数据源在 public/sites/site-data.json：Worker 用它判路由、改首页统计与
@@ -736,7 +737,7 @@ function limitRead(j) {
 
 async function wdsRag(env, url, body) {
   const req = new Request(new URL("/api/wds/rag", url).toString(), {
-    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
+    method: "POST", headers: { "content-type": "application/json", "x-sde-internal": GATE_INTERNAL_KEY }, body: JSON.stringify(body),
   });
   if (env.SELF && env.SELF.fetch) return env.SELF.fetch(req);
   return fetch(req);   // 没配自绑定时的退路（本地/预览环境）
@@ -12701,6 +12702,8 @@ export default {
     // 索引同步已统一交给每日 23:20 的 GitHub 工作流；本 cron 只清理微信库。
   },
   async fetch(request, env, ctx) {
+    // 全站密码门（2026-11-03 封闭发展半年）：先过门，再走一切原有路由。见 src/site-gate.js
+    { const _g = await siteGate(request, env); if (_g) return _g; }
     if (new URL(request.url).pathname === "/api/chatprimary") {
       return handleChatPrimary(request, env, { vendors: WDS_VENDORS, liteModel: wdsLiteModel, plainBody: wdsPlainBody, upstream: wdsUp });
     }
@@ -15795,7 +15798,7 @@ export default {
       const sec = Math.max(1, Math.min(300, parseInt(url.searchParams.get("sec"), 10) || 60));
       const _h = { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" };
       if (url.searchParams.get("via") === "self" && env.SELF && env.SELF.fetch) {
-        const inner = await env.SELF.fetch(new Request(new URL("/api/wds/hold?sec=" + sec, url).toString()));
+        const inner = await env.SELF.fetch(new Request(new URL("/api/wds/hold?sec=" + sec, url).toString(), { headers: { "x-sde-internal": GATE_INTERNAL_KEY } }));
         return new Response(inner.body, { headers: _h });
       }
       /* quiet=1：全程一个字节都不往外发，到点才收尾。用来分开两个嫌疑——
