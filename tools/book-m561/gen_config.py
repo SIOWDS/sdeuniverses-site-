@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 555 号《让经验长成思想》（由第 547 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m561.json（build_unit_561.py 的配置）。
+"""第 561 号《尺子发生学》（由第 547 号 gen_config.py 改来）：由 content.json 生成 tools/book_unit/m561.json（build_unit_561.py 的配置）。
 用法（仓库根目录）：python3 tools/book-m561/gen_config.py tools/book-m561/content.json
 """
 import json, sys

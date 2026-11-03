@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 555 号《让经验长成思想》：由分卷稿 book.md 出全书 Word（pandoc），中文用宋体／Noto Serif CJK SC，标题藏青。
+"""第 561 号《尺子发生学》：由分卷稿 book.md 出全书 Word（pandoc），中文用宋体／Noto Serif CJK SC，标题藏青。
 用法（仓库根目录）：python3 tools/book-m561/make_docx.py --out /tmp/b561
 产物：<out>/tao-reconcile-llm.docx
 """

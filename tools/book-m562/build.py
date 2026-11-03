@@ -538,7 +538,7 @@ def toc_block(secs, pages, roman_ids):
     return '<section class="toc front-sec"><h1>目录</h1><div class="rule"></div><ul>%s</ul></section>' % ''.join(li)
 
 
-TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著 · 第 {META['no']} 号</div><div class="big" style="font-size:27pt;line-height:1.5;letter-spacing:.06em">让经验<br>长成思想</div><div class="sub" style="font-size:12pt">{META['subtitle']}</div><div class="rule"></div><div class="au">{META['author']}　著</div>
+TITLEPAGE = f"""<div class="titlepage"><div class="pre">德麦国际专著 · 第 {META['no']} 号</div><div class="big" style="font-size:27pt;line-height:1.5;letter-spacing:.06em">缝隙<br>创新法</div><div class="sub" style="font-size:12pt">{META['subtitle']}</div><div class="rule"></div><div class="au">{META['author']}　著</div>
 <div class="pub">{META['publisher']}<span>{META['publisher_en']} · Singapore</span></div></div>"""
 EPIGRAPH = ''
 

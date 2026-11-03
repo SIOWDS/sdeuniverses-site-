@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 555 号《让经验长成思想》（由第 546 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
+"""第 561 号《尺子发生学》（由第 546 号 register.py 改来）：写 keypoints.json，并在 public/books/agents.json 登记本书的智能体。
 在仓库根目录运行：python3 tools/book-m561/register.py
 """
 import datetime
