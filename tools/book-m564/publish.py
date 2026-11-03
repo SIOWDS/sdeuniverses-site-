@@ -42,7 +42,7 @@ def reserve(han, chapters):
     pub = [int(x['number']) for x in _cat['books'] if isinstance(x, dict) and isinstance(x.get('number'), int) and x['number'] != NO]   # 稀疏检出里目录不全，按书目算
     d = {'volume': NO, 'title': T, 'subtitle': SUB, 'authors': AUTHORS, 'isbn': ISBN, 'isbnNormalized': nisbn,
          'isbnStatus': 'site-allocated-checksum-valid', 'priceUsd': PRICE_USD, 'status': 'published', 'date': M.DATE,
-         'authorization': '王德生出版令（2026-11-02 19:07）：“就用现在的10个行业；独著，定价25美金。开写。”（19:33）：“统稿：三审，做 220,302排版格式打造，然后进入三位一体出版单元：阅读，学习包，智能体，上站。”——《%s》为德麦国际专著第 %d 号，ISBN %s（书号与 ISBN 从站里计算，校验位已核），定价 %s；副题“%s”；署名“王德生 著”。按第 220、302 号风格排版，做成三位一体出版单元（阅读、学习包、智能体）并上站。' % (T, NO, ISBN, PRICE, SUB),
+         'authorization': '王德生出版令（2026-11-03 12:53）：“可以写了，书名叫做：先有蛋还是先有鸡？副标题用你的。20万字。”（12:56）：“王德生，阳涌 合著”。（13:13）：“进行统稿：三审，按照220,302 排版风格打造。计算卷号和ISBN，价格是20美金。”（14:06）：“开始按照三位一体出版单元打造：阅读，学习包，智能体，上站。”——《%s》为德麦国际专著第 %d 号，ISBN %s（书号与 ISBN 从站里计算，校验位已核），定价 %s；副题“%s”；署名“王德生、阳涌 著”。' % (T, NO, ISBN, PRICE, SUB),
          'availabilityCheck': {'maxPublishedCatalogNumber': max(pub), 'maxReservedVolume': max(vols), 'volumeAbsent': True,
                                'isbnAbsentInCatalogAndReservations': True, 'checkDigit': int(nisbn[-1])},
          'tier': M.TIER,
@@ -79,7 +79,7 @@ def main():
     toc = json.loads((b / 'toc-reader.json').read_text())   # 只取 offset 与总页数
     subprocess.run([sys.executable, str(REPO / 'tools/build_flip_reader.py'), 'one', '--read', str(d / 'read.html'),
                     '--pdf', f'/books/m/{NO}/{SLUG}-reader.pdf?v={V}', '--title', T,
-                    '--sub', f'{M.AUTHOR} 著 · 德麦国际专著第 {NO} 号',
+                    '--sub', f'王德生、阳涌 著 · 德麦国际专著第 {NO} 号',
                     '--detail', f'/books/m/{NO}/', '--offset', str(toc['offset']), '--key', f'books-m-{NO}-v1'], check=True)
     rd = (d / 'read.html').read_text()
     m_ = re.search(r'(<script type="application/json" id="toc">)(.*?)(</script>)', rd, flags=re.S)
@@ -97,17 +97,17 @@ def main():
     cards = ''.join('<div class="card"><b>%s</b><span>%s</span></div>' % (_h.escape(c['t']), _h.escape(c['x'])) for c in CT['loadBearing'])
     det = (det.replace('__AGENT__', AG).replace('__V__', V).replace('__PAGES__', str(pages)).replace('__WAN__', '%.0f' % (han / 10000))
            .replace('__LINE__', _h.escape(CT['detailLine'])).replace('__INTRO__', _h.escape(CT['detailIntro'])).replace('__CARDS__', cards)
-           .replace('__DESC_SHORT__', _h.escape(CT['detailLine'], quote=True)).replace('__PRICE_NUM__', '%.2f' % PRICE_USD).replace('__PRICE__', PRICE))
+           .replace('__DESC_SHORT__', _h.escape(CT['detailLine'], quote=True)).replace('__PRICE_NUM__', '%.2f' % PRICE_USD).replace('__PRICE__', PRICE).replace('__NTASK__', str(len(CT['tasks']))))
 
     def _struct():
-        li = ['<li><b>前置</b>　出版信息 · 题词 · 作者介绍 · 成书说明 · 前言</li>']
+        li = ['<li><b>前置</b>　出版信息 · 作者介绍 · 前言 · 导论</li>']
         for f in sorted((HERE / 'parts').glob('*.md')):
             tx = f.read_text()
             pt = tx.split('\n', 1)[0].lstrip('# ').strip()
             chs = re.findall(r'^## 第 ?(\d+) ?章　(.*)$', tx, re.M)
             li.append('<li><b>%s</b>（第 %s—%s 章）<span class="chs">%s</span></li>' % (
                 _h.escape(pt), chs[0][0], chs[-1][0], ' · '.join('第%s章 %s' % (n, _h.escape(c)) for n, c in chs)))
-        li.append('<li><b>后置</b>　结语 · 参考书目 · 版本说明</li>')
+        li.append('<li><b>后置</b>　结语 · 附录一　三则前瞻预注册 · 参考书目</li>')
         return '<ol class="vols">\n%s\n</ol>' % '\n'.join(li)
     det = det.replace('__STRUCT__', _struct())
     assert '__' not in det
