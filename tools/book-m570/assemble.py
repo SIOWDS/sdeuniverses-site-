@@ -101,7 +101,10 @@ def end_zone(lines):
             think.pop()
         while think and not think[0].strip():
             think.pop(0)
-        out += ['', '### ◆ 想一想', ''] + think
+        qs = [x for x in think if x.strip()]
+        out += ['', '### ◆ 想一想', '']
+        for q in qs:
+            out += [q, '']
     for l in tail:
         if l.startswith('### '):
             l = '#### ' + l[4:]
