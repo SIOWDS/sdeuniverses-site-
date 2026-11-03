@@ -10,7 +10,7 @@
    · /api/* 只放行来自本站页面的请求（Origin/Referer 是 sdeuniverses.com）或已过门的请求。 */
 
 export const GATE_ON = true;
-const GATE_PW_SHA = "08bda2cbd7632c5d2aa75eda2217e6ff544f9376c34a4010ab1566af088d1b9b";
+const GATE_PW_SHA = "1b11aabd82f8db3b2bc5210d7318ed4ccc8b999cffab71bee2d967a1da373bcb";
 export const GATE_INTERNAL_KEY = "6c66e73b4629df1c5040389c5edfc0bb";
 const COOKIE = "sde_gate";
 const MAX_AGE = 200 * 24 * 3600; // 覆盖整个封闭期
