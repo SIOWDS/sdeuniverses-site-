@@ -97,8 +97,12 @@ def blocks_of(text):
     for k, b in out:
         if k == 'p':
             res.append(('p', [''.join(b)]))
+        elif k == 'ol' and res and res[-1][0] == 'ol' and int(re.match(r'\d+', b[0])[0]) == int(re.match(r'\d+', res[-1][1][-1])[0]) + 1:
+            res[-1][1].extend(b)   # 空行隔开的编号项并回一张表：否则 WeasyPrint 不认 start，全排成「1.」
+        elif k == 'ul' and res and res[-1][0] == 'ul':
+            res[-1][1].extend(b)
         else:
-            res.append((k, b))
+            res.append((k, list(b)))
     return res
 
 
@@ -161,6 +165,10 @@ def table_html(rows, cls='tb'):
     cells = [[c.strip() for c in r.strip().strip('|').split('|')] for r in rows]
     cells = [r for r in cells if not all(re.fullmatch(r':?-{2,}:?', c) for c in r)]
     head, body = cells[0], cells[1:]
+    # 单元格里的竖线（如 |r|<0.1）被当成了分栏：多出来的格并回去，首尾两栏不动
+    for r in body:
+        while len(r) > len(head):
+            r[1:len(r) - len(head) + 2] = ['|'.join(r[1:len(r) - len(head) + 2])]
     if len(head) >= 6:
         cls += ' w5'
     if len(body) > 20:
@@ -314,6 +322,7 @@ def with_endmark(inner):
     m = re.search(r'(?:<div class="(?:ledger nine|takeaway|judge|wonder|ledger)">.*?</div>\s*)+$', inner, re.S)
     if m:
         pre = re.sub(r'<p>((?:(?!<p[ >]).)*</p>\s*)$', r'<p class="keepnext">\1', inner[:m.start()], flags=re.S)
+        pre = re.sub(r'<(ol|ul) class="ls"((?:(?!<(?:ol|ul) ).)*</\1>\s*)$', r'<\1 class="ls keepnext"\2', pre, flags=re.S)
         n_ = len(re.sub(r'<[^>]+>', '', m.group(0)))
         return pre + '<div class="chapend%s">' % (' open' if n_ > 300 else '') + m.group(0) + end + '</div>'
     return inner + end
@@ -559,6 +568,11 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 .ledger .lk{{color:#1F3A5F;font-weight:700}}
 .chapend{{break-inside:avoid}}
 .chapend.open{{break-inside:auto}}
+.chapend.open .takeaway{{break-inside:auto;box-decoration-break:clone}}
+.chapend.open .takeaway p{{break-inside:avoid}}
+.takeaway .lab{{break-after:avoid}}
+ol.keepnext,ul.keepnext{{break-after:avoid}}
+ol.keepnext li:last-child,ul.keepnext li:last-child{{break-after:avoid}}
 .chapend .endmark{{break-before:avoid}}
 .wonder{{border-left:1.6pt solid #58A9B5;padding:1.8mm 4mm;margin:2mm 0 1mm;break-inside:avoid}}
 .wonder .lab{{display:block;font:700 {body_pt*0.68:.2f}pt 'Noto Sans CJK SC';color:#2F7C88;letter-spacing:.4em;margin-bottom:1mm}}
