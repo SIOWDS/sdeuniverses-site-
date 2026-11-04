@@ -43,6 +43,21 @@ for f in sorted(glob.glob(str(HERE / 'src' / 'units' / 'part*.json'))):
     kps += d['keypoints']
 tasks.sort(key=lambda t: t['lesson'])
 assert [t['lesson'] for t in tasks] == list(range(1, 29)), [t['lesson'] for t in tasks]
+def curly(s):
+    out, o = '', True
+    for c in s:
+        if c == '"':
+            out += '“' if o else '”'; o = not o
+        else:
+            out += c
+    return out
+
+
+for x in tasks:
+    for k in ('name', 'question', 'checkpoint'):
+        x[k] = curly(x[k])
+for x in kps:
+    x['t'], x['x'] = curly(x['t']), curly(x['x'])
 C['tasks'] = tasks
 C['keypoints'] = kps
 Path(HERE / 'content.json').write_text(json.dumps(C, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
