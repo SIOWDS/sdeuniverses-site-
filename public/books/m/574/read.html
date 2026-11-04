@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>友好阅读 · 在线翻页 · 腐败与癌症 | SDE Universes</title>
+<meta name="description" content="《腐败与癌症》在线翻页阅读：双页对开、真实翻页、矢量源渲染、目录跳转、全文检索。">
+<meta name="tier" content="L0">
+<link rel="canonical" href="https://sdeuniverses.com/books/m/574/read.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" media="print" onload="this.media='all';this.onload=null">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0C0F13; --bg2:#141A21; --fg:#E9E6DE; --dim:#8E97A1; --line:#242D36;
+  --gold:#D9A441; --paper:#FBF7EE; --paper2:#F2ECDF; --ink:#1A1713;
+  --shadow:0 30px 80px rgba(0,0,0,.55);
+}
+html.sepia{--paper:#F6ECD8;--paper2:#EEE1C7}
+html.day{--bg:#E8E4DB;--bg2:#F2EFE7;--fg:#22262B;--dim:#5C646D;--line:#CFC9BD}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,var(--bg2),var(--bg)) fixed;
+  color:var(--fg);font:15px/1.7 "Noto Serif SC","EB Garamond",Georgia,serif;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0);
+  overflow:hidden}
+
+/* ── 顶栏 ── */
+.top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;align-items:center;gap:.8rem;
+  padding:.55rem 1rem calc(.55rem);background:rgba(12,15,19,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding-top:calc(.55rem + env(safe-area-inset-top,0))}
+html.day .top{background:rgba(232,228,219,.8)}
+.top .ttl{font-weight:600;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{color:var(--dim);font-size:.78rem;margin-left:.2rem;white-space:nowrap}
+.spacer{margin-left:auto}
+button,select{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);
+  border-radius:8px;padding:.3rem .6rem;cursor:pointer;transition:.18s}
+button:hover:not(:disabled),select:hover{border-color:var(--gold);color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.on{border-color:var(--gold);color:var(--gold)}
+.ico{font-size:1rem;line-height:1}
+
+/* ── 舞台 ── */
+.stage{position:fixed;inset:52px 0 62px 0;display:grid;place-items:center;overflow:hidden}
+.book{position:relative;display:flex;gap:0;filter:drop-shadow(0 24px 60px rgba(0,0,0,.5));
+  transform-style:preserve-3d;perspective:2600px}
+.leaf{position:relative;background:var(--paper);overflow:hidden}
+.leaf canvas{display:block;width:100%;height:100%}
+.leaf .svg{position:absolute;inset:0;display:none}
+.leaf .svg svg{display:block;width:100%;height:100%}
+.leaf.vec canvas{display:none}
+.leaf.vec .svg{display:block}
+.leaf.l{border-radius:4px 0 0 4px;box-shadow:inset -22px 0 34px -26px rgba(0,0,0,.55)}
+.leaf.r{border-radius:0 4px 4px 0;box-shadow:inset 22px 0 34px -26px rgba(0,0,0,.55)}
+.single .leaf{border-radius:4px}
+.gutter{position:absolute;top:0;bottom:0;left:50%;width:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.20),rgba(0,0,0,0));pointer-events:none;z-index:3}
+.single .gutter{display:none}
+.pno{position:absolute;bottom:6px;font-size:11px;color:#9a8f7c;letter-spacing:.08em;z-index:4}
+.leaf.l .pno{left:14px}.leaf.r .pno{right:14px}
+
+/* 翻页动画 */
+.flip{position:absolute;top:0;bottom:0;z-index:9;background:var(--paper);
+  transform-origin:left center;backface-visibility:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,.35);border-radius:0 4px 4px 0}
+.flip.back{transform-origin:right center;border-radius:4px 0 0 4px}
+.flip canvas{display:block;width:100%;height:100%}
+@keyframes fwd{from{transform:rotateY(0)}to{transform:rotateY(-178deg)}}
+@keyframes bwd{from{transform:rotateY(0)}to{transform:rotateY(178deg)}}
+.flip.go{animation:fwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+.flip.back.go{animation:bwd .62s cubic-bezier(.4,.02,.25,1) forwards}
+@media (prefers-reduced-motion:reduce){.flip.go,.flip.back.go{animation-duration:.01s}}
+
+/* 文本层（可选可搜） */
+.tl{position:absolute;inset:0;overflow:hidden;opacity:.01;line-height:1;z-index:2}
+.tl span{position:absolute;white-space:pre;transform-origin:0 0;color:transparent;cursor:text}
+.tl ::selection{background:rgba(217,164,65,.35)}
+.tl mark{background:rgba(217,164,65,.55);color:transparent;border-radius:2px}
+
+/* ── 底栏 ── */
+.bot{position:fixed;inset:auto 0 0 0;z-index:40;display:flex;align-items:center;gap:.7rem;
+  padding:.5rem 1rem calc(.5rem + env(safe-area-inset-bottom,0));
+  background:rgba(12,15,19,.72);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+html.day .bot{background:rgba(232,228,219,.8)}
+.rail{position:relative;flex:1;height:22px;display:flex;align-items:center;cursor:pointer}
+.rail .bar{position:absolute;left:0;right:0;height:3px;background:var(--line);border-radius:3px}
+.rail .fill{position:absolute;left:0;height:3px;background:linear-gradient(90deg,var(--gold),#F0CE86);border-radius:3px}
+.rail .knob{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--gold);
+  transform:translateX(-50%);box-shadow:0 0 0 4px rgba(217,164,65,.18)}
+.pg{font-variant-numeric:tabular-nums;color:var(--dim);font-size:.82rem;white-space:nowrap}
+.pg input{width:3.4rem;text-align:center;background:transparent;border:1px solid var(--line);
+  border-radius:6px;color:var(--fg);font:inherit;padding:.12rem .2rem}
+
+/* ── 抽屉 ── */
+.drawer{position:fixed;top:52px;bottom:62px;left:0;width:min(330px,86vw);z-index:45;
+  background:rgba(16,21,27,.97);border-right:1px solid var(--line);
+  transform:translateX(-102%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;backdrop-filter:blur(10px)}
+html.day .drawer{background:rgba(242,239,231,.97)}
+.drawer.open{transform:none}
+.drawer h3{margin:0;padding:.8rem 1rem .5rem;font-size:.8rem;letter-spacing:.24em;color:var(--dim);font-weight:400}
+.dlist{flex:1;overflow:auto;padding:0 .4rem 1rem}
+.dlist a{display:flex;gap:.5rem;align-items:baseline;padding:.32rem .6rem;border-radius:7px;
+  color:var(--fg);text-decoration:none;font-size:.86rem}
+.dlist a:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.dlist a.l1{font-weight:600;margin-top:.5rem}
+.dlist a.l2{padding-left:1.5rem;color:var(--dim);font-size:.8rem}
+.dlist a .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.76rem}
+.sbox{padding:.5rem 1rem}
+.sbox input{width:100%;background:transparent;border:1px solid var(--line);border-radius:8px;
+  color:var(--fg);font:inherit;padding:.4rem .6rem}
+.hit{padding:.35rem .6rem;border-radius:7px;font-size:.8rem;color:var(--dim);cursor:pointer}
+.hit:hover{background:rgba(217,164,65,.12);color:var(--gold)}
+.hit b{color:var(--gold);font-weight:600}
+
+/* 缩略图 */
+.thumbs{position:fixed;left:0;right:0;bottom:62px;z-index:44;display:flex;gap:.5rem;
+  padding:.6rem 1rem;overflow-x:auto;background:rgba(12,15,19,.92);border-top:1px solid var(--line);
+  transform:translateY(120%);transition:transform .28s}
+.thumbs.open{transform:none}
+.thumbs canvas{height:112px;width:auto;border-radius:3px;cursor:pointer;opacity:.62;
+  box-shadow:0 4px 14px rgba(0,0,0,.4);transition:.18s}
+.thumbs canvas:hover,.thumbs canvas.cur{opacity:1;outline:2px solid var(--gold)}
+
+.msg{position:fixed;inset:0;display:grid;place-items:center;z-index:60;color:var(--dim);
+  background:rgba(12,15,19,.9);text-align:center;padding:2rem}
+.msg.hide{display:none}
+.msg .sp{width:34px;height:34px;border:2px solid var(--line);border-top-color:var(--gold);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:50;
+  background:rgba(0,0,0,.66);border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .9rem;font-size:.76rem;color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
+.hint.show{opacity:1}
+@media (max-width:860px){.top .sub,.hideS{display:none}.stage{inset:48px 0 56px 0}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button id="btnToc" title="目录 (T)"><span class="ico">☰</span></button>
+  <span class="ttl">腐败与癌症</span><span class="sub hideS">王德生　著 · 德麦国际专著第 574 号</span>
+  <span class="spacer"></span>
+  <button id="btnSpread" class="hideS" title="单页 / 双页 (D)">双页</button>
+  <button id="btnVec" title="渲染模式：矢量源 / 高清位图 (V)">矢量</button>
+  <button id="btnZoomOut" title="缩小">A−</button>
+  <button id="btnZoomIn" title="放大">A＋</button>
+  <button id="btnThumbs" class="hideS" title="缩略图">▤</button>
+  <button id="btnTheme" title="夜 / 日 / 纸 (N)">夜</button>
+  <button id="btnFull" class="hideS" title="全屏 (F)">⛶</button>
+  <a href="/books/m/574/" style="color:var(--dim);text-decoration:none;font-size:.82rem">详情</a>
+</header>
+
+<aside class="drawer" id="drawer">
+  <div class="sbox"><input id="q" type="search" placeholder="全书检索（回车）…"></div>
+  <h3 id="dHead">目　录</h3>
+  <div class="dlist" id="dlist"></div>
+</aside>
+
+<main class="stage" id="stage">
+  <div class="book" id="book">
+    <div class="leaf l" id="leafL"><canvas id="cL"></canvas><div class="svg" id="sL"></div><div class="tl" id="tL"></div><div class="pno" id="nL"></div></div>
+    <div class="leaf r" id="leafR"><canvas id="cR"></canvas><div class="svg" id="sR"></div><div class="tl" id="tR"></div><div class="pno" id="nR"></div></div>
+    <div class="gutter"></div>
+  </div>
+</main>
+
+<div class="thumbs" id="thumbs"></div>
+
+<footer class="bot">
+  <button id="btnPrev" title="上一页 (←)">‹</button>
+  <div class="rail" id="rail"><div class="bar"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div></div>
+  <button id="btnNext" title="下一页 (→)">›</button>
+  <span class="pg">第 <input id="pi" type="number" min="1" value="1"> / <span id="pt">…</span> 页</span>
+</footer>
+
+<div class="hint" id="hint"></div>
+<div class="msg" id="msg"><div><div class="sp"></div><div id="msgT">正在载入书页…</div></div></div>
+
+<script type="application/json" id="cfg">{"pdf": "/books/m/574/corruption-and-cancer-reader.pdf?v=20261104m574", "key": "books-m-574-v1", "offset": 29}</script>
+<script type="application/json" id="toc">[{"t": "封面", "p": "", "g": 1, "l": 1}, {"t": "出版信息", "p": "", "g": 4, "l": 1}, {"t": "作者介绍", "p": "", "g": 6, "l": 1}, {"t": "修订版说明 这本书从哪里来", "p": "", "g": 7, "l": 1}, {"t": "本书写给谁 十二类读者的入口", "p": "", "g": 9, "l": 1}, {"t": "前言 发生学的统一——当反腐成为一种医学，治癌成为一种治理", "p": "", "g": 14, "l": 1}, {"t": "第一篇 复杂性科学的哲学原理：意义三律", "p": "1", "g": 29, "l": 1}, {"t": "摘要", "p": "2", "g": 30, "l": 2}, {"t": "导论（上） 复杂性科学的由来，与“意义三律”作为哲学原理的必要性", "p": "3", "g": 31, "l": 2}, {"t": "导论（下） 复杂性科学的谱系、关键概念的统一、以及本篇的结构安排", "p": "8", "g": 36, "l": 2}, {"t": "第一章 从0→1到1→N：复杂性发生之路、发展之路，与1→1解释学之路", "p": "13", "g": 41, "l": 2}, {"t": "第二章 特征律的数学解构：收敛条件与“张力×纠缠”输入", "p": "19", "g": 47, "l": 2}, {"t": "第三章 SIO三模态定义：粒子态、波态、场态——复杂性稳定态的三重显影", "p": "26", "g": 54, "l": 2}, {"t": "第四章 矛盾逻辑的发生学位置：稳定态对立如何逼迫第三态改变，并开启1→N的发展", "p": "32", "g": 60, "l": 2}, {"t": "第五章 意义三律的严格机制定义：特征、自由、幸福作为复杂性机制的三面显影", "p": "37", "g": 65, "l": 2}, {"t": "第六章 三律耦合：复杂性机制的最小发动机——从“并列三律”到“耦合发生”", "p": "43", "g": 71, "l": 2}, {"t": "第七章 形式逻辑与解释多元：静态照相学的边界，以及三律发生学的裁决标准", "p": "48", "g": 76, "l": 2}, {"t": "第八章 生命系统作为复杂性发生学：从细胞SIO到身体SIO，健康是三律运行的健康", "p": "53", "g": 81, "l": 2}, {"t": "第九章 社会系统作为复杂性发生学：政治、经济、法律SIO的三模态与三律耦合", "p": "59", "g": 87, "l": 2}, {"t": "第十章 病理学统一：腐败、癌变、增生的同构发生——三律耦合异常的稳定态复制", "p": "64", "g": 92, "l": 2}, {"t": "第十一章 免疫工程：分布式三号位与三律修复——让复杂性从病态复制转向创造与回稳", "p": "69", "g": 97, "l": 2}, {"t": "结语 复杂性科学的哲学原理为何必须是“意义三律”", "p": "73", "g": 101, "l": 2}, {"t": "附论 身体没有“总司令”——三大系统的耦合调控，本质是意义三律的生理化运行", "p": "76", "g": 104, "l": 2}, {"t": "第二篇 何谓腐败？", "p": "81", "g": 109, "l": 1}, {"t": "摘要", "p": "82", "g": 110, "l": 2}, {"t": "引言", "p": "83", "g": 111, "l": 2}, {"t": "第一章 概念清洗：腐败为何总被误读——从词源现象到发生学对象", "p": "88", "g": 116, "l": 2}, {"t": "第二章 SIO本体论与三界：世界不是名词，而是SIO集合体；腐败发生在三界纠缠处", "p": "90", "g": 118, "l": 2}, {"t": "第三章 腐败的本体定义：价值—意义断路；腐败度公式与免疫对偶", "p": "92", "g": 120, "l": 2}, {"t": "第四章 特征律与窗口密度：腐败的主要来源——价值固化如何压低意义发生", "p": "94", "g": 122, "l": 2}, {"t": "插入章 为何“独裁式治理”更易滋生腐败", "p": "100", "g": 128, "l": 2}, {"t": "第五章 微积分循环与腐败：微分的忠实与积分的伪造——当“整体叙事”吞噬了差异窗口", "p": "102", "g": 130, "l": 2}, {"t": "第六章 跨尺度同构：身体腐败与官场腐败是一回事——癌症作为“腐败极限样本”，免疫作为“反腐原型”", "p": "108", "g": 136, "l": 2}, {"t": "第七章 反腐工程＝免疫工程：修通路、拆断路器、恢复纠错——从“抓影子”到“治系统”的发生学跃迁", "p": "114", "g": 142, "l": 2}, {"t": "插入章 癌细胞“复制性发生”的本体不是细胞复制，而是“价值→意义断路”的复制", "p": "122", "g": 150, "l": 2}, {"t": "第八章 系统性腐败发生学：合法无监督化与“显影接口腐败”——合规搬运、免疫区、迁移变异", "p": "125", "g": 153, "l": 2}, {"t": "第九章 影子虚幻法的反腐悖论：为什么“改一个我”的道德治理会固化真善美，反而激发系统性腐败", "p": "131", "g": 159, "l": 2}, {"t": "插入章 再论癌症“复制性发生”——断路复制与通路治理", "p": "137", "g": 165, "l": 2}, {"t": "第十章 反腐智慧系统：通路工程学（总蓝图）——预先过滤断路器，恢复“价值→意义”链路", "p": "142", "g": 170, "l": 2}, {"t": "第十一章 反例与边界：技术越强，腐败未必越少——算法治理的“显影接口腐败”与免疫式约束", "p": "148", "g": 176, "l": 2}, {"t": "结语 腐败的终极定义、终极处方与文明展望", "p": "153", "g": 181, "l": 2}, {"t": "第三篇 腐败的根源：按客观规律行的叙事模式", "p": "157", "g": 185, "l": 1}, {"t": "摘要", "p": "158", "g": 186, "l": 2}, {"t": "引言", "p": "159", "g": 187, "l": 2}, {"t": "第一章 美好源头：为何“按客观规律行”会成为文明的共同起点", "p": "162", "g": 190, "l": 2}, {"t": "第二章 腐败在这里诞生：固化真善美如何杀死混沌、纠缠、张力", "p": "164", "g": 192, "l": 2}, {"t": "第三章 所谓客观规律并不存在无我形态：规律=“有我”的ΔSIO差异稳定性发生", "p": "166", "g": 194, "l": 2}, {"t": "第四章 普遍性腐败特征：掌权者之“我”如何吞噬公共意义——从“规律叙事”到“价值重定向”", "p": "169", "g": 197, "l": 2}, {"t": "第五章 身体的“腐败”：疾病、增生与癌变为何也源于“生理客观规律叙事”", "p": "174", "g": 202, "l": 2}, {"t": "第六章 转正：从“无我客观”到“可纠错的我”——反腐与治病的共同免疫起点", "p": "179", "g": 207, "l": 2}, {"t": "结论 腐败与疾病的共同根源，是“无我客观规律叙事”对发生的遮蔽", "p": "184", "g": 212, "l": 2}, {"t": "第四篇 揭开科学的“我”的面纱：从ΔSIO与微积分循环到分布式三号位", "p": "187", "g": 215, "l": 1}, {"t": "摘要", "p": "188", "g": 216, "l": 2}, {"t": "引言", "p": "189", "g": 217, "l": 2}, {"t": "第一章 叙事神：为何科学总以“让事实说话”的口吻说话", "p": "193", "g": 221, "l": 2}, {"t": "插入章 库恩与波普尔的共同盲点——仍是“无我客观科学论”", "p": "199", "g": 227, "l": 2}, {"t": "第二章 宏大叙事：从ΔSIO的间断到SIO的连续", "p": "201", "g": 229, "l": 2}, {"t": "第三章 微积分循环：科学叙事的发动机", "p": "206", "g": 234, "l": 2}, {"t": "第四章 特征律：同一性如何发生，现象为何能被记录", "p": "213", "g": 241, "l": 2}, {"t": "插入章 世界的三界定型——旧本体论的“世界”只是多义名词", "p": "219", "g": 247, "l": 2}, {"t": "第五章 公开“我”：科学作为符合三号位的叙事模式", "p": "221", "g": 249, "l": 2}, {"t": "第六章 范式＝显影系统：对库恩的细节化重写", "p": "229", "g": 257, "l": 2}, {"t": "第七章 走出神坛：把隐藏三号位公共化，走向民主与自由的科学", "p": "236", "g": 264, "l": 2}, {"t": "插入章 AEI——科学走向民主与自由之路", "p": "241", "g": 269, "l": 2}, {"t": "第八章 附录式解构：以“科学作底座”的体系为何必成内部矛盾体", "p": "243", "g": 271, "l": 2}, {"t": "结论 揭幕之后——让科学从神坛回到尊严，让“我”进入公共纠错（结语）", "p": "248", "g": 276, "l": 2}, {"t": "后记 科学底座的幻觉，终将滑向权力三号位的底座", "p": "250", "g": 278, "l": 2}, {"t": "第五篇 论腐败的系统性发生的“科学底座”根源", "p": "255", "g": 283, "l": 1}, {"t": "摘要", "p": "256", "g": 284, "l": 2}, {"t": "引言", "p": "257", "g": 285, "l": 2}, {"t": "第一章 概念清洗：什么叫“科学底座”——不是科学，而是科学主义的合法性语法", "p": "261", "g": 289, "l": 2}, {"t": "第二章 腐败的重新定义：从“违规行为”到“系统功能”——系统性腐败的判据与发生链", "p": "267", "g": 295, "l": 2}, {"t": "第三章 显影系统模型：权力如何“科学化”自身——从影子场到事实口吻的统治技术", "p": "273", "g": 301, "l": 2}, {"t": "第四章 科学底座的第一后果：监督的语法性剥夺——从“纠错机制”到“噪声标签”的转化", "p": "280", "g": 308, "l": 2}, {"t": "第五章 科学底座的第二后果：三号位的隐藏与垄断——合法无监督化的稳定机制", "p": "286", "g": 314, "l": 2}, {"t": "第六章 合法的无监督化：腐败如何从“道德失败”变成“系统自组织”——网络动力学与“越抓越多”的发生学", "p": "293", "g": 321, "l": 2}, {"t": "第七章 两套内部矛盾系统：为何“科学底座意识形态”天然自撕裂——自撕裂如何反过来滋养腐败", "p": "300", "g": 328, "l": 2}, {"t": "第八章 出路与方案：把“科学”从底座改造为公共机制——分布式三号位与“监督过滤规则”的制度工程", "p": "305", "g": 333, "l": 2}, {"t": "第九章 反例澄清：为什么“技术越强，腐败未必越少”——数据化治理的双刃剑与显影接口腐败", "p": "313", "g": 341, "l": 2}, {"t": "第六篇 从腐败的断路机制到SIO癌症学的诞生", "p": "319", "g": 347, "l": 1}, {"t": "摘要", "p": "320", "g": 348, "l": 2}, {"t": "导论 当腐败与癌症在同一条断路上相遇", "p": "322", "g": 350, "l": 2}, {"t": "第一章 断路哲学：何谓腐败——从“break together”的现象词源到“价值→意义断裂”的发生学定义", "p": "327", "g": 355, "l": 2}, {"t": "第二章 断路工程：系统性腐败如何发生——影子场、事实口吻与“合法无监督化”的免疫区", "p": "334", "g": 362, "l": 2}, {"t": "第三章 跨尺度跃迁：从系统性腐败到身体腐败——癌症为何是“断路模板”的极限样本", "p": "339", "g": 367, "l": 2}, {"t": "第四章 宏篇：SIO癌症学总纲——癌症不是“细胞坏了”，而是“意义三律失衡后的断路模板涌现”", "p": "345", "g": 373, "l": 2}, {"t": "第五章 SIO癌症学的分型心脏：意义三律×三步＝27种断路指纹——从A/B/C外观到(Tᵢ,Fⱼ,Hₖ)发动机，从基因标签到断路模板", "p": "352", "g": 380, "l": 2}, {"t": "第六章 三大癌症理论统一：基因/线粒体/细胞膜作为三大互动对象接口——信息接口、能量接口、信号接口在断路模板之下会合", "p": "360", "g": 388, "l": 2}, {"t": "第七章 中西结合通路诊断学：气智慧测“意义三律正常度”——触微器（触觉SIO显微镜）×光SIO毫秒级摄影：把断路模板从直觉带入证据链", "p": "365", "g": 393, "l": 2}, {"t": "第八章 治疗新典范：从“基因标签治疗”转向“断路模板治疗”——先拆模板、修通路、复位免疫，再清影子；以意义三律回正为疗效判据", "p": "371", "g": 399, "l": 2}, {"t": "结语 当我们终于抓住“断路复制”，腐败与癌症才从命运退位为工程", "p": "377", "g": 405, "l": 2}, {"t": "第七篇 细胞复制发生学：信号通路幻觉与复杂性引擎", "p": "381", "g": 409, "l": 1}, {"t": "摘要", "p": "382", "g": 410, "l": 2}, {"t": "引言 为什么必须批判 Pathway 叙事", "p": "383", "g": 411, "l": 2}, {"t": "第一章 Pathway 幻觉：形式逻辑在生命科学中的错位", "p": "385", "g": 413, "l": 2}, {"t": "第二章 从最小反应到生命：化学反应的复杂性证据链", "p": "387", "g": 415, "l": 2}, {"t": "第三章 意义三律的生物化学落点：把三律“钉在机制上”", "p": "389", "g": 417, "l": 2}, {"t": "第四章 DNA 复制叉：最硬的“复制发生学证据”", "p": "391", "g": 419, "l": 2}, {"t": "第五章 细胞周期开关：双稳态、振荡与“门槛”的生物化学证据", "p": "393", "g": 421, "l": 2}, {"t": "第六章 代谢与能量：复制不是信息问题，而是耗散结构问题", "p": "395", "g": 423, "l": 2}, {"t": "第七章 空间组织与相分离：通路图看不见的“第三种证据”", "p": "397", "g": 425, "l": 2}, {"t": "第八章 把三律嵌回“可检验的生物化学现象”：一组强例子", "p": "398", "g": 426, "l": 2}, {"t": "第九章 癌症复制的三律改写——复制之谜并非“节点坏了”，而是“耦合结构被重写了”", "p": "400", "g": 428, "l": 2}, {"t": "第十章 转移、复发、耐药——三律框架下的“同一种现象的三种显影”", "p": "402", "g": 430, "l": 2}, {"t": "第十一章 微环境是“选择场”——缺氧、炎症、免疫、基质力学如何成为三律的外部引擎", "p": "404", "g": 432, "l": 2}, {"t": "第十二章 治疗工程学的总纲——拆模板、修通路、建免疫", "p": "406", "g": 434, "l": 2}, {"t": "第十三章 把“细胞复制发生学”与“腐败复制发生学”对齐——跨尺度映射表", "p": "409", "g": 437, "l": 2}, {"t": "第十四章 本篇的最终落点——从“堵节点的理性”走向“生成稳定性的理性”", "p": "411", "g": 439, "l": 2}, {"t": "第八篇 癌组织多元异质性产生机制", "p": "413", "g": 441, "l": 1}, {"t": "摘要", "p": "414", "g": 442, "l": 2}, {"t": "引言 异质性不是“看起来复杂”，而是“机制必然”", "p": "415", "g": 443, "l": 2}, {"t": "第一章 两道关卡：健康复制的第一关不是免疫，而是差异稳定性的涌现", "p": "416", "g": 444, "l": 2}, {"t": "第二章 医学证据如何提示“分叉演化”：肿瘤不是一个点，而是一棵树", "p": "417", "g": 445, "l": 2}, {"t": "第三章 关键机制：Easy Copies（三律违背模板易复制）→ 三类发散 → 三模态异质性", "p": "418", "g": 446, "l": 2}, {"t": "第四章 粒子模态异质性：特征发散 → 基因Heter（Genetic heterogeneity）", "p": "419", "g": 447, "l": 2}, {"t": "第五章 路径异质性：路径发散 → 信号Heter（Pathway/Signaling heterogeneity）", "p": "420", "g": 448, "l": 2}, {"t": "第六章 动力异质性：动力发散 → 线粒体/代谢Heter（Mitochondrial/Metabolic heterogeneity）", "p": "421", "g": 449, "l": 2}, {"t": "第七章 三大“癌症来源学说”为何会出现：它们各抓住了三类发散的一个投影", "p": "422", "g": 450, "l": 2}, {"t": "第八章 为什么不同癌种/不同患者的异质性“形态不一样”：三律违背组合侧重点不同", "p": "423", "g": 451, "l": 2}, {"t": "第九章 结论：异质性是第一关卡失败后的必然产物，必须在模板层级解决", "p": "424", "g": 452, "l": 2}, {"t": "附录A 医学证据链速览——“异质性”不是观点，而是事实", "p": "425", "g": 453, "l": 2}, {"t": "附录B 发生学判据与分型工具——把“三律违背→异质性”变成可用框架", "p": "427", "g": 455, "l": 2}, {"t": "第九篇 组织增生：腐败与癌症发生学的预警与治疗", "p": "431", "g": 459, "l": 1}, {"t": "摘要", "p": "432", "g": 460, "l": 2}, {"t": "引言", "p": "433", "g": 461, "l": 2}, {"t": "第一章 理论底座：SIO发生学与“储备—突变—原创”", "p": "438", "g": 466, "l": 2}, {"t": "第二章 统一预警信号：组织增生的发生学定义与判据", "p": "443", "g": 471, "l": 2}, {"t": "第三章 突变三型：方向突变、路径突变、动力突变", "p": "449", "g": 477, "l": 2}, {"t": "第四章 机制章：供养专线与“储备型SIO”的增生营养", "p": "455", "g": 483, "l": 2}, {"t": "第五章 治疗总纲：矛盾之路——削过量储备与提原创力同步发生", "p": "461", "g": 489, "l": 2}, {"t": "第六章 加氧机制：维持矛盾之路走得下去（补呼吸·循序渐进·退出机制）", "p": "467", "g": 495, "l": 2}, {"t": "第七章 改道：从“储备型SIO主循环”回到“意义主循环”", "p": "472", "g": 500, "l": 2}, {"t": "第八章 痊愈标准：归回组织的正常意义之路——特征律、自由律、幸福律的丰满运行", "p": "477", "g": 505, "l": 2}, {"t": "结论 总结与展望", "p": "483", "g": 511, "l": 2}, {"t": "第十篇 癌组织的小我夺权", "p": "487", "g": 515, "l": 1}, {"t": "摘要", "p": "488", "g": 516, "l": 2}, {"t": "引言", "p": "489", "g": 517, "l": 2}, {"t": "第一章 我＝三号位：分布—场—美的严格定义", "p": "491", "g": 519, "l": 2}, {"t": "第二章 三号位的层级结构：大三号位与小三号位如何共存", "p": "494", "g": 522, "l": 2}, {"t": "第三章 癌细胞的“我”为何塌缩：小场/小分布/小美夺权的发生机制", "p": "496", "g": 524, "l": 2}, {"t": "第四章 边界—财政—军队：小三号位夺权的三大工程显影", "p": "499", "g": 527, "l": 2}, {"t": "第五章 为什么只消灭小我必然反弹：你在粒子态杀伤，小我在场态改场", "p": "503", "g": 531, "l": 2}, {"t": "第六章 治疗的转正：小我回到大我，但不消灭小我——层级三号位的复位三步", "p": "505", "g": 533, "l": 2}, {"t": "第七章 连接AEI：E＝大三号位复位与可纠错化——为何AEI是“主权免疫”的执行器", "p": "507", "g": 535, "l": 2}, {"t": "结论 癌症＝三号位层级塌缩；治疗＝层级三号位复位；AEI＝大我主权的人工护持器", "p": "509", "g": 537, "l": 2}, {"t": "第十一篇 基于AEI的三律医学工程：拆模板·修通路·建免疫", "p": "511", "g": 539, "l": 1}, {"t": "摘要", "p": "512", "g": 540, "l": 2}, {"t": "导论", "p": "513", "g": 541, "l": 2}, {"t": "第一章 统一对象：病态稳定态模板与“复制之谜”的重写", "p": "516", "g": 544, "l": 2}, {"t": "第二章 三律×三模态：把“模板”写成工程语言——从发生学到可诊断、可分型、可干预", "p": "523", "g": 551, "l": 2}, {"t": "第三章 AEI本体论：E*如何生成——“我智能体”作为三律医学工程的执行器", "p": "530", "g": 558, "l": 2}, {"t": "第四章 统一诊断尺：C、E、窗口密度与增生预警——让模板在爆发前被看见", "p": "536", "g": 564, "l": 2}, {"t": "第五章 AEI诊断引擎：过程性记忆/场记忆 + 四类日志——把早诊从“指标”变成“发生学追踪”", "p": "542", "g": 570, "l": 2}, {"t": "第六章 统一分型：四断路器×三接口→12格模板——把腐败与癌症装进同一张“工程图纸”", "p": "548", "g": 576, "l": 2}, {"t": "第七章 为何反腐和疗癌总是进入内卷？——递减滞留与剂量升级的共同命运", "p": "556", "g": 584, "l": 2}, {"t": "第八章 拆模板：打断病态稳定态的“可复制性”——先拆场态免疫区，再拆波态绕行，最后拆粒子态假稳态", "p": "561", "g": 589, "l": 2}, {"t": "第九章 修通路：把“价值→意义”重新接通——医学侧的三系统回稳工程 + 制度侧的三律发生工程", "p": "574", "g": 602, "l": 2}, {"t": "第十章 建免疫：分布式三号位与防复发结构——让模板“难以再次稳定化”", "p": "580", "g": 608, "l": 2}, {"t": "第十一章 AEI工程化部署：从理论到操作系统——三律医学工程的“驾驶舱、模板库与免疫循环”", "p": "585", "g": 613, "l": 2}, {"t": "结语 从“更用力”到“更会发生”——AEI三律医学工程为何能统一反腐与疗癌", "p": "591", "g": 619, "l": 2}, {"t": "结论 从“清除战争”走向“发生学免疫”——一份面向未来的挑战书", "p": "594", "g": 622, "l": 1}, {"t": "金句集锦 十句话带走全书", "p": "597", "g": 625, "l": 1}, {"t": "参考书目", "p": "601", "g": 629, "l": 1}, {"t": "附录", "p": "602", "g": 630, "l": 1}, {"t": "附录一 术语表", "p": "603", "g": 631, "l": 2}, {"t": "版本说明 本版字数、底稿与统稿", "p": "608", "g": 636, "l": 1}, {"t": "封底", "p": "", "g": 640, "l": 1}]</script>
+
+<script>
+(function(){
+'use strict';
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var TOC = JSON.parse(document.getElementById('toc').textContent);
+var $ = function(id){ return document.getElementById(id); };
+
+var doc=null, total=0, cur=1, spread=true, zoom=1, vector=true, rendering=false;
+var themes=['','day','sepia'], ti=0;
+var cache={}, textCache={}, vecOK=0, vecFail=0;
+/* —— 接入 SDE 陪读（WDS）：把当前可见页的文本与页码喂给助手；文字层可选中某句作焦点 —— */
+window.WDS_READ = {
+  title: '腐败与癌症',
+  bodyEl: function(){ return document.getElementById('book'); },
+  docTextFn: function(){
+    if(!doc) return '';
+    var l = spread ? (cur%2===0?cur:cur-1) : cur, ps = spread ? [l, l+1] : [cur];
+    var t = ps.filter(function(p){ return p>=1 && p<=total && textCache[p]; }).map(function(p){
+      var pr = p-CFG.offset+1; return '【第 '+(pr>0?pr:p)+' 页 / 共 '+total+' 页】\n'+textCache[p]; }).join('\n');
+    return t;
+  }
+};
+
+function msg(t, spin){ $('msgT').textContent=t; $('msg').classList.remove('hide');
+  $('msg').querySelector('.sp').style.display = spin===false?'none':''; }
+function hideMsg(){ $('msg').classList.add('hide'); }
+function hint(t){ var h=$('hint'); h.textContent=t; h.classList.add('show');
+  clearTimeout(h._t); h._t=setTimeout(function(){h.classList.remove('show');},1400); }
+
+/* ── 版心尺寸：按舞台可用空间算，双页则一半 ── */
+function box(){
+  var st=$('stage'), W=st.clientWidth-40, H=st.clientHeight-30;
+  var n = spread?2:1;
+  return {W:W, H:H, n:n};
+}
+function fit(vp){
+  var b=box();
+  var maxW=(b.W/b.n), maxH=b.H;
+  var s=Math.min(maxW/vp.width, maxH/vp.height)*zoom;
+  return s;
+}
+
+/* ── 渲染一页：优先矢量(SVG)，失败回落高清 canvas ── */
+function renderInto(pageNo, canvasEl, tlEl, cb, svgEl){
+  var leaf = canvasEl.parentNode;
+  if(pageNo<1||pageNo>total){ leaf.style.visibility='hidden'; if(tlEl) tlEl.innerHTML=''; cb&&cb(); return; }
+  leaf.style.visibility='visible';
+  doc.getPage(pageNo).then(function(pg){
+    var vp0=pg.getViewport({scale:1});
+    var sc=fit(vp0), vp=pg.getViewport({scale:sc});
+    leaf.style.width=Math.round(vp.width)+'px';
+    leaf.style.height=Math.round(vp.height)+'px';
+    if(vector && svgEl && window.pdfjsLib && pdfjsLib.SVGGraphics){
+      leaf.classList.add('vec');
+      pg.getOperatorList().then(function(ops){
+        var g=new pdfjsLib.SVGGraphics(pg.commonObjs, pg.objs);
+        g.embedFonts=true;
+        return g.getSVG(ops, vp);
+      }).then(function(svg){
+        vecOK++;
+        svg.setAttribute('width', Math.round(vp.width));
+        svg.setAttribute('height', Math.round(vp.height));
+        svgEl.innerHTML=''; svgEl.appendChild(svg);
+        if(tlEl) buildText(pg, vp, tlEl);
+        cb&&cb();
+      }).catch(function(){
+        /* 逐页回退：这一页含矢量后端不支持的内容（多为位图封面、插图），只这一页用高清位图；
+           其余页照旧矢量。连续失败过多才整本切到位图。 */
+        vecFail++;
+        if(vecFail>=6 && vecFail>vecOK){
+          vector=false; $('btnVec').classList.remove('on'); $('btnVec').textContent='位图';
+          hint('此文档的矢量渲染不可用，已切回高清位图');
+        }
+        leaf.classList.remove('vec');
+        drawCanvas(pg, vp, canvasEl, tlEl, cb);
+      });
+    }else{
+      leaf.classList.remove('vec');
+      drawCanvas(pg, vp, canvasEl, tlEl, cb);
+    }
+  }).catch(function(){ cb&&cb(); });
+}
+
+function drawCanvas(pg, vp, canvasEl, tlEl, cb){
+  var dpr=Math.min(window.devicePixelRatio||1, 3);
+  canvasEl.width=Math.round(vp.width*dpr); canvasEl.height=Math.round(vp.height*dpr);
+  canvasEl.style.width=Math.round(vp.width)+'px'; canvasEl.style.height=Math.round(vp.height)+'px';
+  var ctx=canvasEl.getContext('2d',{alpha:false});
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#FBF7EE'; ctx.fillRect(0,0,vp.width,vp.height);
+  pg.render({canvasContext:ctx, viewport:vp, intent:'display'}).promise.then(function(){
+    if(tlEl) buildText(pg, vp, tlEl);
+    cb&&cb();
+  }).catch(function(){ cb&&cb(); });
+}
+
+function buildText(pg, vp, el){
+  el.innerHTML='';
+  pg.getTextContent().then(function(tc){
+    try{ textCache[pg.pageNumber]=tc.items.map(function(x){return x.str;}).join(''); }catch(e){}
+    var frag=document.createDocumentFragment();
+    tc.items.forEach(function(it){
+      if(!it.str) return;
+      var tx=pdfjsLib.Util.transform(vp.transform, it.transform);
+      var s=document.createElement('span');
+      s.textContent=it.str;
+      var h=Math.hypot(tx[2],tx[3]);
+      s.style.left=tx[4]+'px'; s.style.top=(tx[5]-h)+'px';
+      s.style.fontSize=h+'px'; s.style.fontFamily='sans-serif';
+      frag.appendChild(s);
+    });
+    el.appendChild(frag);
+  }).catch(function(){});
+}
+
+/* ── 展示当前跨页 ── */
+function show(cb){
+  if(rendering){ return; }
+  rendering=true;
+  document.getElementById('book').classList.toggle('single', !spread);
+  $('leafR').style.display = spread?'':'none';
+  var left = spread ? (cur%2===0?cur:cur-1) : cur;   // 偶数页在左，仿真书
+  if(left<1) left=0;
+  var right= left+1;
+  var done=0, need=spread?2:1;
+  function fin(){ if(++done>=need){ rendering=false; sync(); cb&&cb(); hideMsg(); } }
+  if(spread){
+    $('nL').textContent = left>=1&&left<=total ? (left-CFG.offset+1>0? (left-CFG.offset+1):'') : '';
+    $('nR').textContent = right<=total ? (right-CFG.offset+1>0?(right-CFG.offset+1):'') : '';
+    renderInto(left,  $('cL'), $('tL'), fin, $('sL'));
+    renderInto(right, $('cR'), $('tR'), fin, $('sR'));
+  }else{
+    $('nL').textContent = cur-CFG.offset+1>0?(cur-CFG.offset+1):'';
+    renderInto(cur, $('cL'), $('tL'), fin, $('sL'));
+  }
+}
+
+function sync(){
+  var printed = Math.max(1, cur-CFG.offset+1);
+  $('pi').value = printed;
+  $('pt').textContent = Math.max(1,total-CFG.offset+1);
+  var r = (cur-1)/Math.max(1,total-1);
+  $('fill').style.width=(r*100)+'%';
+  $('knob').style.left=(r*100)+'%';
+  try{ localStorage.setItem(CFG.key, String(cur)); }catch(e){}
+  Array.prototype.forEach.call($('thumbs').children, function(c){
+    c.classList.toggle('cur', +c.dataset.p===cur);
+  });
+}
+
+/* ── 翻页（带动画） ── */
+function step(dir){
+  var n = spread?2:1;
+  var t = cur + dir*n;
+  if(t<1) t=1; if(t>total) t=total;
+  if(t===cur) return;
+  animate(dir, function(){ cur=t; show(); });
+}
+function animate(dir, after){
+  var src = dir>0 ? $('leafR') : $('leafL');
+  if(!spread || !src || src.style.display==='none'){ after(); return; }
+  var fl=document.createElement('div');
+  fl.className='flip'+(dir>0?'':' back');
+  var w=src.offsetWidth, h=src.offsetHeight;
+  fl.style.width=w+'px'; fl.style.height=h+'px';
+  fl.style.left = dir>0 ? (w+'px') : '0px';
+  var live = src.classList.contains('vec') ? src.querySelector('.svg svg') : src.querySelector('canvas');
+  if(live){
+    var cl = live.cloneNode(true);
+    cl.style.width='100%'; cl.style.height='100%'; cl.style.display='block';
+    fl.appendChild(cl);
+  }
+  $('book').appendChild(fl);
+  requestAnimationFrame(function(){ fl.classList.add('go'); });
+  setTimeout(function(){ fl.remove(); after(); }, 620);
+}
+function go(p){ p=Math.max(1,Math.min(total,p|0)); if(p===cur) return; cur=p; show(); }
+
+/* ── 目录 ── */
+/* 目录兜底：TOC 为空时从 PDF 书签生成（新迁入的书多半没有手工目录） */
+function outlineToc(d){
+  return d.getOutline().then(function(ol){
+    var out=[]; if(!ol||!ol.length) return out;
+    function walk(items,l){
+      return items.reduce(function(p,it){
+        return p.then(function(){
+          var ds=it.dest;
+          return (typeof ds==='string'? d.getDestination(ds) : Promise.resolve(ds))
+            .then(function(x){ return x ? d.getPageIndex(x[0]) : null; })
+            .then(function(ix){
+              if(ix!=null){ var g=ix+1, pr=g-CFG.offset+1; out.push({t:it.title, p:pr>0?String(pr):'', g:g, l:l===1?1:2}); }
+              if(it.items && it.items.length && l<2) return walk(it.items,l+1);
+            }).catch(function(){});
+        });
+      }, Promise.resolve());
+    }
+    return walk(ol,1).then(function(){ return out; });
+  }).catch(function(){ return []; });
+}
+function buildToc(){
+  var box=$('dlist'); box.innerHTML='';
+  TOC.forEach(function(e){
+    var a=document.createElement('a');
+    a.className = e.l===1?'l1':'l2';
+    a.href='#'; a.innerHTML='<span>'+e.t.replace(/</g,'&lt;')+'</span><span class="n">'+e.p+'</span>';
+    a.onclick=function(ev){ ev.preventDefault(); go(e.g ? e.g : (+e.p)+CFG.offset-1); closeDrawer(); };
+    box.appendChild(a);
+  });
+}
+function closeDrawer(){ $('drawer').classList.remove('open'); }
+
+/* ── 全书检索 ── */
+function search(q){
+  if(!q){ $('dHead').textContent='目　录'; buildToc(); return; }
+  var box=$('dlist'); box.innerHTML=''; $('dHead').textContent='检索：'+q;
+  var found=0, scanned=0;
+  msg('正在检索全书…');
+  function scan(i){
+    if(i>total || found>=120){ hideMsg(); if(!found){ box.innerHTML='<div class="hit">没有找到。</div>'; } return; }
+    var pr = textCache[i] ? Promise.resolve(textCache[i])
+      : doc.getPage(i).then(function(p){ return p.getTextContent(); })
+          .then(function(tc){ var s=tc.items.map(function(x){return x.str;}).join(''); textCache[i]=s; return s; });
+    pr.then(function(s){
+      var k=s.indexOf(q);
+      if(k>=0){
+        found++;
+        var d=document.createElement('div'); d.className='hit';
+        var a=Math.max(0,k-16), b=Math.min(s.length,k+q.length+22);
+        d.innerHTML='<b>'+(i-CFG.offset+1)+'</b>　'+s.slice(a,k).replace(/</g,'&lt;')+
+          '<b>'+q.replace(/</g,'&lt;')+'</b>'+s.slice(k+q.length,b).replace(/</g,'&lt;');
+        d.onclick=function(){ go(i); closeDrawer(); };
+        box.appendChild(d);
+      }
+      scanned++;
+      if(scanned%12===0){ $('msgT').textContent='正在检索全书…  '+Math.round(i/total*100)+'%'; }
+      scan(i+1);
+    }).catch(function(){ scan(i+1); });
+  }
+  scan(1);
+}
+
+/* ── 缩略图 ── */
+var thumbsBuilt=false;
+function buildThumbs(){
+  if(thumbsBuilt) return; thumbsBuilt=true;
+  var wrap=$('thumbs');
+  var i=1;
+  function one(){
+    if(i>total) return;
+    var p=i;
+    doc.getPage(p).then(function(pg){
+      var vp=pg.getViewport({scale:1});
+      var s=150/vp.height, v=pg.getViewport({scale:s});
+      var c=document.createElement('canvas');
+      c.width=v.width; c.height=v.height; c.dataset.p=p;
+      c.onclick=function(){ go(p); };
+      wrap.appendChild(c);
+      return pg.render({canvasContext:c.getContext('2d'), viewport:v}).promise;
+    }).then(function(){ i++; setTimeout(one, 0); }).catch(function(){ i++; setTimeout(one,0); });
+  }
+  one();
+}
+
+/* ── 事件 ── */
+$('btnPrev').onclick=function(){ step(-1); };
+$('btnNext').onclick=function(){ step(1); };
+$('pi').onchange=function(){ go((+this.value||1)+CFG.offset-1); };
+$('btnToc').onclick=function(){ $('drawer').classList.toggle('open'); };
+$('btnSpread').onclick=function(){ spread=!spread; this.textContent=spread?'双页':'单页'; show(); hint(spread?'双页对开':'单页'); };
+$('btnVec').onclick=function(){ vector=!vector; this.classList.toggle('on',vector);
+  this.textContent=vector?'矢量':'位图'; hint(vector?'矢量源渲染':'高清位图'); show(); };
+$('btnZoomIn').onclick=function(){ zoom=Math.min(2.4, zoom*1.15); show(); hint('放大 '+Math.round(zoom*100)+'%'); };
+$('btnZoomOut').onclick=function(){ zoom=Math.max(.5, zoom/1.15); show(); hint('缩小 '+Math.round(zoom*100)+'%'); };
+$('btnThumbs').onclick=function(){ $('thumbs').classList.toggle('open'); if($('thumbs').classList.contains('open')) buildThumbs(); };
+$('btnTheme').onclick=function(){ ti=(ti+1)%3; document.documentElement.className=themes[ti];
+  this.textContent=['夜','日','纸'][ti]; show(); };
+$('btnFull').onclick=function(){ if(document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); };
+$('q').onkeydown=function(e){ if(e.key==='Enter'){ search(this.value.trim()); } };
+$('rail').onclick=function(e){ var r=this.getBoundingClientRect();
+  go(Math.round((e.clientX-r.left)/r.width*(total-1))+1); };
+
+document.addEventListener('keydown',function(e){
+  if(/input|textarea|select/i.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){ step(-1); e.preventDefault(); }
+  else if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ step(1); e.preventDefault(); }
+  else if(e.key==='Home'){ go(1); } else if(e.key==='End'){ go(total); }
+  else if(e.key==='t'||e.key==='T'){ $('btnToc').click(); }
+  else if(e.key==='d'||e.key==='D'){ $('btnSpread').click(); }
+  else if(e.key==='v'||e.key==='V'){ $('btnVec').click(); }
+  else if(e.key==='n'||e.key==='N'){ $('btnTheme').click(); }
+  else if(e.key==='f'||e.key==='F'){ $('btnFull').click(); }
+});
+var sx=0, sy=0;
+$('stage').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+$('stage').addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)*1.4){ step(dx<0?1:-1); }
+},{passive:true});
+var rt=null;
+window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ show(); },160); });
+
+/* ── 启动 ── */
+function boot(){
+  if(!window.pdfjsLib){ setTimeout(boot,120); return; }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  $('btnVec').classList.add('on');
+  msg('正在载入《腐败与癌症》…');
+  pdfjsLib.getDocument({url:CFG.pdf, rangeChunkSize:262144, fontExtraProperties:true, isOffscreenCanvasSupported:false, cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/', cMapPacked:true, standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'}).promise.then(function(d){
+    doc=d; total=d.numPages;
+    buildToc();
+    if(!TOC.length){ outlineToc(d).then(function(t){ if(t.length){ TOC=t; buildToc(); } }); }
+    var saved=0; try{ saved=parseInt(localStorage.getItem(CFG.key)||'0',10)||0; }catch(e){}
+    cur = (saved>0&&saved<=total) ? saved : 1;
+    if(window.innerWidth<820) spread=false, $('btnSpread').textContent='单页';
+    show(function(){ if(saved>1) hint('已回到上次读到的第 '+Math.max(1,cur-CFG.offset+1)+' 页'); });
+  }).catch(function(err){
+    msg('书页载入失败。可直接打开原文 PDF：'+CFG.pdf, false);
+  });
+}
+boot();
+})();
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
+<script src="/wds-mode.js?v=20261103b" defer></script>
+<a id="unit-reader-link" href="/books/m/574/agent/learning.html" style="position:fixed;right:14px;bottom:68px;z-index:30;background:#d6b663;color:#141611;padding:8px 13px;border-radius:8px;text-decoration:none;font:14px/1.7 sans-serif">学习包 · 带问读</a></body>
+</html>
