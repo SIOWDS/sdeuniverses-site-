@@ -1,0 +1,257 @@
+# 参考书目
+
+本书只列实际用到的文献，也就是正文里引过、转述过或拿来对照过的那些，没有用到的不列。每条末尾用标记说明笔者读到什么程度：〔原文〕指读到文献原文；〔部分原文〕指读了所引的部分；〔摘要〕指只读摘要、书评、新闻稿或简介；〔二手〕指只据他人转述或词条；〔题录〕指只核到书名期刊。网页内容多经工具转述，故〔原文〕要从严，凡未能确认读到全篇的，一律降一档标注。出版信息只写核到的，没核到的写「未核」，不补。同一文献在不同章读法不同的，取最高的一档如实标出。
+
+## 一、经典与史料
+
+1. 马尔萨斯：《人口原理》（An Essay on the Principle of Population）1798年第一版。公版电子文本（Aldarondo 制作）。读了全文并逐处核对所引英文，第 2 章引文约 30 处、中国赡养法与遗弃子女两处、羽毛句等均核到；用于第 2、5、9、10、14、26 章。英文原本，非中译。〔原文〕
+2. 马尔萨斯：《人口原理》第六版（1826年，John Murray）。Econlib 网页版（https://www.econlib.org/library/Malthus/malPlong.html）。读了第一卷第一、二章所引处、第十二章（中国和日本）婚姻目的、长兄抚养弟妹、子女赡养父母三处，以及第二版序言的新约束引文；该章其余部分未通读，第六版是否逐一补过第 2 章所说四道缝未核；用于第 2、5、14 章。〔部分原文〕
+3. 《孟子·离娄上》「不孝有三，无后为大」一章。维基文库电子文本（https://zh.wikisource.org/wiki/孟子/離婁上），另核到 ctext 页面同章原文与理雅各英译；引句逐字相符。《孟子注疏》只读了维基文库页面上的提要，疏文未读，「无后不可」一句的提要未能复核（未核）。用于第 9、14 章。〔部分原文〕
+4. 赵岐：《孟子》注「不娶无子，绝先祖祀」。未读注本，据陈绍炎文章（儒家网转载，https://www.rujiazg.com/article/4840）与胡荧《文化闲谈》（新湖南 2023-10-30，https://m.voc.com.cn/xhn/news/202310/18888779.html）的转述；未对校本。用于第 9、14 章。〔二手〕
+5. 朱熹：「拙而不明」一说（《朱子语类》卷五十一）。未读原书，据陈绍炎文章对《文史天地》2013 年译法的反驳转述，另「后德」一说仅见一篇未署名网文（https://www.secretchina.com/news/gb/2021/05/28/972524.html），出处未查到。用于第 9 章。〔二手〕
+6. 《庄子·天地》华封人一段。中国哲学书电子化计划（https://ctext.org/zhuangzi/heaven-and-earth/zhs?en=on），原文「使圣人多男子」「多男子则多惧」均核到；「多子多福」出处未查到。用于第 9 章。〔部分原文〕
+7. 《天主教教理》第 2366、2367、2368、2379 条。梵蒂冈官网英文版（https://www.vatican.va/archive/ENG0015/__P86.HTM），条文与引句对照；中文为本书意译，非官方中译。用于第 5 章。〔部分原文〕
+8. 休谟：《人性论》第三卷第一部第一节（1739—1740）。原文未读，据维基百科「是—应该问题」词条转述。用于第 26 章。〔二手〕
+9. 维特根斯坦：《哲学研究》第 67 节（捻线一段）。原书未读，据维基百科「Family resemblance」词条所引英译（Blackwell 2001 版，未署译者）。用于第 1、26 章。〔二手〕
+10. 费孝通：《生育制度》。原书未读，据李婷文章（见本书目李婷条）转述，「社会需要如何转成个人动机，回答较模糊」为李婷的评语。用于第 1、4、5、14、21 章。〔二手〕
+11. 伯林：《自由的两个概念》（1958年10月31日牛津就职演讲）。原文未读，据维基百科「Two Concepts of Liberty」页概述。用于第 6 章。〔二手〕
+12. Hajnal, J.：《European Marriage Patterns in Perspective》（1965，载 Glass 与 Eversley 编《Population in History》，伦敦 Edward Arnold）。原文未读，题名编者出版社据维基百科 John Hajnal 词条，门槛数字据 Puur 等 2012 与维基百科 John Hajnal / Hajnal line 条目的 2009 年版转述。用于第 17 章。〔二手〕
+13. Coale, A. J.：1992 年关于欧洲婚姻格局的研究。原文未读，仅据 Puur 等 2012 转述。用于第 17 章。〔二手〕
+14. 博塞拉普（Boserup）：《农业增长的条件》（1965）。只读到书评转述。用于第 20 章。〔二手〕
+
+## 二、研究著作与论文
+
+15. Bearak 等：2018 年全球意外怀孕研究（《柳叶刀·全球健康》6(4):e380–e389；覆盖 1990–2014 年）。读了古特马赫研究所的图文页（https://www.guttmacher.org/node/29283）与摘要页（https://www.guttmacher.org/article/2018/03/unintended-pregnancy-and-its-outcomes-global-regional-and-subregional-trends-1990），2010–14 年全球约 44% 的怀孕属意外；论文本身未读，题名未核；「意外」含时间不对与不想要两类，系按一般用法写，定义页未核到。用于第 3、4、11 章。〔摘要〕
+16. Quesnel-Vallée、Morgan：2003，《人口研究与政策评论》22(5–6):497–525。杜克大学学者页摘要（https://scholars.duke.edu/publication/648489），美国 1979 年全国青年纵向调查中打算与实际的对照；全文未读。用于第 3、4 章。〔摘要〕
+17. Beaujouan、Berghammer：2019，《人口研究与政策评论》38(4):507–535（doi 10.1007/s11113-019-09516-3）。读了 https://core.ac.uk/download/187723778.pdf 的页面，核到 19 个欧洲国家加美国的实际数低于打算数、奥地利无子女 5.8% 对不要 19.9%、南欧缺口超过 0.6、教育分析只覆盖十一个国家等；逐表数字未核。用于第 3、12 章。〔部分原文〕
+18. Rackin、Morgan：2018，《人口研究》39(3)，事前与事后量法的不想要比例。据网页转述（https://www.demographic-research.org/volumes/vol39/3/39-3.pdf），未单独核。用于第 3 章。〔二手〕
+19. Philipov：2009，《欧洲人口杂志》25:355–361。出版社页面摘要（https://link.springer.com/article/10.1007/s10680-009-9202-1）。用于第 3 章。〔摘要〕
+20. Pritchett：1994（《人口与发展评论》20(1):1–55；世界银行工作论文 1273）。读了工作论文全文页面前约十万字符（https://documents1.worldbank.org/curated/pt/311251468766230197/pdf/multi0page.pdf），核到样本 42 至 71 国、决定系数、避孕普及率每升 10 个百分点约降 0.17、项目努力至多解释 3% 等；摘要页 https://econpapers.repec.org/RePEc:wbk:wbrwps:1273；期刊版页码以世界银行页面之外未核；题名未另核。结论有争议，书中不当定论用。用于第 3、4、8、12、22 章。〔部分原文〕
+21. Bongaarts：2024，《人口与发展评论》特刊，关于偏好是否影响南方国家生育转变。仅据 N-IUSSP 网页转述（https://www.niussp.org/fertility-and-reproduction/fertility-transitions-in-the-global-south-do-preferences-matter/），文中所提 Ibitoye 等 2022、Casterline 等 2009、Lam 2011 未单独核。用于第 3 章。〔二手〕
+22. Bongaarts：2021 年国际人口会议摘要（https://ipc2021.popconf.org/abstracts/211564）。只读摘要。用于第 3 章。〔摘要〕
+23. Bhushan、Hill：关于想要生育的工作论文（https://jscholarship.library.jhu.edu/bitstream/1774.2/953/1/WP95-01_Desired_Fertility.pdf）。出版年份页面未标明，书中写作「约 90 年代中期」，系据其引用文献推断；据网页转述。用于第 3 章。〔二手〕
+24. Bongaarts：1990，《人口与发展评论》，想要生育的量法。AcaWiki 摘要页（https://acawiki.org/The_Measurement_of_Wanted_Fertility），原文未读；理想数问卷偏差清单与「48 次调查里平均理想数接近总和生育率」措辞未能再回原页复核（未核）。用于第 3 章。〔二手〕
+25. Morgan、King：Why Have Children in the 21st Century? Biological Predisposition, Social Coercion, Rational Choice（2001，《欧洲人口杂志》17(1):3–20）。只读摘要（https://ideas.repec.org/a/spr/eurpop/v17y2001i1d10.1023_a1010784028474.html），书中只用题目里的三个角度。用于第 3、4、8 章。〔摘要〕
+26. Becker：An Economic Analysis of Fertility（1960，NBER 会议文集收录，https://www.nber.org/chapters/c2387.pdf）。读了该收录文本，核到耐用消费品、心理收入、质量指每个孩子的花费、避孕知识的作用、实际生育可偏离想要的生育及评论人 Duesenberry 与 Okun 的质疑；页码和各论点未逐页核对，英文引语未作逐字引用；第 24 章所涉其后论家庭的著作未读。用于第 4、8、10、20、24 章。〔部分原文〕
+27. Becker、Lewis：1973，《政治经济学杂志》81(2) 部分 II，279–288（https://ideas.repec.org/a/ucp/jpolec/v81y1973i2ps279-88.html）。只核到题录，无摘要，内容未读；题目讲孩子数量与质量的相互作用，系据题录所写，未核。用于第 4 章。〔题录〕
+28. Becker、Barro：A Reformulation of the Economic Theory of Fertility（1988，《经济学季刊》103(1):1–25，https://econpapers.repec.org/RePEc:oup:qjecon:v:103:y:1988:i:1:p:1-25.）。书目核到，原文未读，内容据 Doepke 转述。用于第 8 章。〔题录〕
+29. Hoffman、Hoffman：1973，孩子的价值九类。原文未读，九类名目据 Kohlmann 2002 与 Demographic Research 30(66) 的转述，文字为白话改写。用于第 4、5、8、10、21 章。〔二手〕
+30. Kohlmann：2002，MPIDR 工作论文 WP 2002-002（https://www.demogr.mpg.de/papers/working/wp-2002-002.pdf）。读了论文内容，核过数据集、样本量（日本 197）、条目措辞、家名一题的土耳其 37.2% 与日本 13.3%、心理收益边际递减等；最后模型没有报告家姓系数。用于第 4、5、8、10、21 章。〔部分原文〕
+31. Lesthaeghe：2014，《美国国家科学院院刊》111(51):18112–18115（https://pmc.ncbi.nlm.nih.gov/articles/PMC4280616）。读到页面概要，第二次人口转变的提出（1986 年，与 van de Kaa）、思想来路、批评均据此；措辞未逐字对照原文，未直接引用。用于第 4、6、9、17 章。〔摘要〕
+32. Kearney、Levine：Why Is Fertility So Low in High Income Countries?（2025，NBER 工作论文 33989，https://ideas.repec.org/p/nbr/nberwo/33989.html）。只读摘要，全文未读；摘要只说下降可能反映工作、养育、性别角色和闲暇规范的变化，「价格和政策作用至多很小」出自 VoxEU 介绍（见本书目 CEPR VoxEU 条）。用于第 4、8、10、12、13、17、20、22、24 章。〔摘要〕
+33. Margolis、Myrskylä：A Global Perspective on Happiness and Fertility（2011，《人口与发展评论》37(1):29–56）。读了 MPIDR 摘要页（https://www.demogr.mpg.de/en/publications_databases_6118/publications_1904/journal_articles/a_global_perspective_on_happiness_and_fertility_4061）。用于第 7 章。〔摘要〕
+34. Margolis、Myrskylä：2015，《人口统计》（Demography）52(4):1147–1166（doi 10.1007/s13524-015-0413-2）。读了摘要页（https://econpapers.repec.org/RePEc:spr:demogr:v:52:y:2015:i:4:p:1147-1166）与 MPIDR、EurekAlert 新闻稿（https://www.eurekalert.org/news-releases/865831 ；https://www.demogr.mpg.de/mediacms/4559_main_MPIDR-PR_happiness_and_second_births_EN.pdf），德国 SOEP 第一胎后满意度降 1.4 分、58%/66% 等核到新闻稿一层；论文全文未读。用于第 4、6、7、8、11、12、24 章。〔摘要〕
+35. Mehrotra、Morck、Shim、Wiwattanakantang：Adoptive expectations: Rising sons in Japanese family firms（2013，《金融经济学杂志》108(3):840–854，https://ideas.repec.org/a/eee/jfinec/v108y2013i3p840-854.html）。只读摘要。用于第 5 章。〔摘要〕
+36. 郭占锋等：《隐性冲突、制度调适与社会继替》（https://www.aisixiang.com/data/128746.html）。书中「新分子入社资格」一句据其对费孝通的转引，页码未核。用于第 4 章。〔二手〕
+37. 李婷：《从〈生育制度〉到当下中国的生育转变》（《学术月刊》2026 年第 7 期）。读了爱思想网转载全文（https://www.aisixiang.com/data/180430.html），生育从家族义务变为个人的人生选择、非主流叙事在数字空间传播两处已按转载全文核对，未对期刊版面。用于第 1、4、5、14、21 章。〔部分原文〕
+38. Heffernan、Stone：#regrettingmotherhood（2021，论文，https://mural.maynoothuniversity.ie/id/eprint/13763/1/2021-1Heffernan%26Stone-%23regrettingmotherhood.pdf）。重读该文页面，核到 23 位以色列母亲、Donath 未声称样本有代表性、后悔指向母职制度而非孩子、后悔在社会上是禁忌、2015 年德国《南德意志报》报道引发讨论；原稿所说「分两种后悔」等两处核不到，已删。用于第 6、11、25 章。〔部分原文〕
+39. Donath：Regretting Motherhood: A Sociopolitical Analysis（2015，《符号》Signs 40(2):343–367）。期刊页面付费，摘要不可见，原文未读；二十三位以色列母亲、深度访谈、批评与德国反应据 Heffernan 与 Stone 2021。用于第 6、11、25 章。〔二手〕
+40. Paul, L. A.：Is our ordinary way of choosing to have children rational?（2012 年 7 月预印本，PhilSci Archive，https://philsci-archive.pitt.edu/9209）。只读摘要页，三个前提据摘要。用于第 6、8、11、12 章。〔摘要〕
+41. Paul, L. A.：Transformative Experience（牛津大学出版社，2014）。原书与评论（含 Bykvist、Srinivasan）均未读，内容、吸血鬼例子、两条定义据维基百科「Transformative Experience」页概述（https://en.wikipedia.org/wiki/Transformative_Experience）；Paul 在耶鲁、师从刘易斯一节据维基百科 L. A. Paul 条目，未另核。用于第 6、11 章。〔二手〕
+42. Paul, L. A.：2015 年发表于 Res Philosophica 的文章。只核到题目与卷期线索，全文未读，卷期未核。用于第 11 章。〔题录〕
+43. Pettigrew：对 Moss 的回应论文（存档稿，https://philarchive.org/archive/PETTEA-8，年份未核）。据存档稿对 Pettigrew 细分法的概括转述。用于第 11 章。〔二手〕
+44. Pettigrew：Choosing for Changing Selves（牛津大学出版社，2019）。据出版社页面与 Bristol 大学书架页的简介。用于第 11 章。〔摘要〕
+45. Paul 对 Pettigrew、Barnes、Campbell 的回应（https://dc2.philarchive.org/rec/PAUTER）。只读到题录，内容未读，题名作者全名未核。用于第 11 章。〔题录〕
+46. Pollmann-Schult：2014，《婚姻与家庭杂志》（Journal of Marriage and Family）。摘要页（https://www.diw.de/de/diw_01.c.778246.de/s_8297.html）。用于第 7 章。〔摘要〕
+47. Aassve、Goisis、Sironi：2012，《社会指标研究》108(1):65–86。摘要页（https://discovery.ucl.ac.uk/id/eprint/1490241/）。用于第 7 章。〔摘要〕
+48. Clark、Diener、Georgellis、Lucas：Lags and leads in life satisfaction: a test of the baseline hypothesis（2008，《经济学杂志》118:F222–F243）。读了摘要（https://www.parisschoolofeconomics.eu/publications-hal/lags-and-leads-in-life-satisfaction-a-test-of-the-baseline-hypothesis），摘要写明不能拒绝对生育、结婚、离婚等完全适应；出生前后形状据一份全文转述（https://core.ac.uk/download/94331.pdf），系数未抄。用于第 7 章。〔摘要〕
+49. Herbst、Ifcher：The Increasing Happiness of US Parents（2016，《家庭经济学评论》14(3):529–551）。读了工作论文版（https://core.ac.uk/download/84118558.pdf），核到 GSS 1972–2008（N=42,298）、生活方式调查 1985–2005（N=75,237）、1995 年前有差距之后消失；期刊版未读。用于第 7 章。〔部分原文〕
+50. Deaton、Stone：2014，《美国国家科学院院刊》。读了普林斯顿新闻稿（https://www.princeton.edu/news/2014/01/13/americans-and-without-children-home-report-similar-life-satisfaction），样本约 180 万、34–46 岁、2008–2012 年；论文本身未读，题名未核。用于第 7 章。〔摘要〕
+51. Glass、Simon、Andersson：2016，《美国社会学杂志》122(3):886–929。读了新闻稿（https://news.wfu.edu/2016/06/17/parenting-and-happiness-in-22-countries/）与摘要页（https://read.qxmd.com/read/28082749/），数据来源为欧洲社会调查与国际社会调查项目，年份与样本量可读页面查不到；论文页面 https://www.journals.uchicago.edu/doi/pdfplus/10.1086/688892 未读内容。用于第 7 章。〔摘要〕
+52. Kahneman 等：2004 日重现法研究（《科学》Science，2004 年 12 月 3 日；作者核到 Schwarz、Kahneman、Krueger、Schkade、Stone；样本 909 位在职女性，便利样本）。读了新闻稿（https://www.eurekalert.org/news-releases/845630），论文未读，题名未核。用于第 7 章。〔摘要〕
+53. Nelson 等：In Defense of Parenthood（2013，《心理科学》Psychological Science）。读了新闻稿（https://www.eurekalert.org/news-releases/533712），三项研究、作者自称关联不是因果；新闻稿作者名单列 Nelson、Kushlev、English、Dunn，书中写「等人」。用于第 7 章。〔摘要〕
+54. Nelson、Kushlev、Lyubomirsky：2014。摘要转述（https://escholarship.org/uc/item/5rp9034f），题名与刊名未核。用于第 7 章。〔摘要〕
+55. Baumeister、Vohs、Aaker、Garbinsky：2013，《积极心理学杂志》。读了英国心理学会研究摘要（https://www.bps.org.uk/research-digest/whats-difference-between-happy-life-and-meaningful-one），样本 397 位成年人与 124 位学生；论文未读，题名未核。用于第 7 章。〔摘要〕
+56. 以色列日重现研究（https://link.springer.com/article/10.1007/s10902-021-00427-9）。读了摘要页；刊名与年份系据链接编号推断，作者未核。用于第 7 章。〔摘要〕
+57. GLO 讨论稿：More Children, More Happiness?: New Evidence from Elderly Parents in China（GLO DP 366，2019，https://ideas.repec.org/p/zbw/glodps/366.html；月度讨论稿页 https://glabor.org/glo-discussion-paper-of-the-month-july-more-children-happy-elderly-parents）。两页据题名对上，作者全名与年份以论文为准；论文本身未读。用于第 7 章。〔摘要〕
+58. Doepke：Gary Becker on the Quantity and Quality of Children（2014，IZA DP 8610，https://repec.iza.org/dp8610.pdf）。读到页面概述，Becker–Barro 的王朝效用、Becker–Lewis 1973、Becker–Tomes 1976 与双胞胎研究均据此转述，原文未读。用于第 8、10 章。〔摘要〕
+59. Basso、Bodenhorn、Cuberes：Fertility and Financial Development: Evidence from U.S. Counties in the 19th Century（2014，NBER 工作论文 20491，https://www.nber.org/papers/w20491.pdf）。读了页面，核到 196 个县、儿童—妇女比有银行县 0.62 对无银行县 0.79、最全控制下约降 3 个百分点等；页码未核。用于第 8 章。〔部分原文〕
+60. Guo、Huang、Wang：2025，《发展经济学杂志》172（文章号 103390）。读了香港大学介绍页（https://impact.hkubs.hku.hk/public-pensions-and-family-dynamics-eldercare-child-investment-and-son-preference-in-rural-china），彩礼降 55.4%、女婴概率升 2.8 个百分点、出生性别比降 12.7%；原文未读，题名未另核。用于第 8 章。〔摘要〕
+61. Mynarska、Rytel：from motives through desires to intentions: investigating the reproductive choices of childless men and women in Poland（《生物社会科学杂志》Journal of Biosocial Science；书中沿用 2018、50(3)，年份卷期页面未显示，待核；题名据页面网址）。读到摘要（https://www.cambridge.org/core/journals/journal-of-biosocial-science/article/from-motives-through-desires-to-intentions-investigating-the-reproductive-choices-of-childless-men-and-women-in-poland/D880788B47D7B385C4E768833E9C5107），314 位 30–39 岁波兰无子女者。用于第 8、12 章。〔摘要〕
+62. Brase、Brase：2012，《情绪》Emotion 12(5):1141–1154（PubMed 21842990）。图书馆记录页摘要：baby fever，样本 337 与 853；三个主要因素的名称未查到。用于第 8 章。〔摘要〕
+63. Bernardi：Channels of social influence on reproduction（2003，MPIDR 工作论文 WP 2003-019，https://www.demogr.mpg.de/papers/working/wp-2003-019.pdf）。读了页面，核到 54 位伦巴第 30–39 岁女性访谈、四条通道、父母的催在第一个孙辈出生后减轻；全文逐字未核。用于第 8、21 章。〔部分原文〕
+64. Miller：1995，《生物社会科学杂志》27(4):473–487。只读摘要，只用来说明动机研究的来路。用于第 8 章。〔摘要〕
+65. Miller：Childbearing motivations, desires, and intentions: a theoretical framework（1994，《遗传、社会与普通心理学专刊》120(2):223–258）。卷期页码据 Vasquez 与 Borsa 2022 的参考文献表，原文未读，链的内容据 Mynarska 与 Rytel、Brini 等转述。用于第 12 章。〔二手〕
+66. Vasquez、Borsa：2022，期刊页面（https://periodicos.ufjf.br/index.php/psicologiaempesquisa/article/view/31757）。只用其参考文献表与题名页（含 T-D-I-B 模型名称）。用于第 12 章。〔题录〕
+67. Caldwell：A Theory of Fertility: From High Plateau to Destabilization（1978）。仅据 AcaWiki 摘要页（https://acawiki.org/A_Theory_of_Fertility:_From_High_Plateau_to_Desestabilization），题名拼写按页面，卷期页码未核；1976 年原文未读。用于第 10、18 章。〔二手〕
+68. Caldwell：On net intergenerational wealth flows: an update（2005，《人口与发展评论》31(4):721–740）。读了摘要页（https://researchportalplus.anu.edu.au/en/publications/on-net-intergenerational-wealth-flows-an-update/）。用于第 10、18 章。〔摘要〕
+69. Snopkowski、Kaplan：Fertility Theory: Theory of Intergenerational Wealth Flows（2015，《国际社会与行为科学百科全书》第二版，35–39 页，https://experts.boisestate.edu/en/publications/fertility-theory-theory-of-intergenerational-wealth-flows/）。条目页摘要。用于第 10、18 章。〔摘要〕
+70. Ramey、Ramey：The Rug Rat Race（2010）。据 Brookings 页面概述（https://www.brookings.edu/articles/the-rug-rat-race/），原文未读。用于第 10 章。〔摘要〕
+71. Zelizer：Pricing the Priceless Child: The Changing Social Value of Children（Basic Books，1985；普林斯顿大学出版社 1994 年再版）。书名副题出版社核到柯克斯书评页（https://www.kirkusreviews.com/book-reviews/viviana-a-zelizer-2/pricing-the-priceless-child-the-changing-social/）与出版社页面（https://press.princeton.edu/books/paperback/9780691034591/pricing-the-priceless-child）；均为介绍页，书未读；出版社页写的时段是「十九世纪后期到 1930 年代」。用于第 10 章。〔摘要〕
+72. Kauppinen：What's So Great About Experience?（Res Philosophica 变革性经验专号，送审前稿，https://philarchive.org/archive/KAUWSG）。读到网页概述，未逐页核对。用于第 11 章。〔摘要〕
+73. Cath：Transformative Experiences and the Equivocation Objection（《探究》Inquiry，2022 年在线，https://philarchive.org/archive/CATTEA-2）。读到摘要与论证概述。用于第 11 章。〔摘要〕
+74. Reuter、Messerli：Transformative Decisions（《哲学杂志》Journal of Philosophy 115(6)，2018，313–335，稿件 https://eprints.whiterose.ac.uk/id/eprint/127035/1/Transformative-Decision_23.01.18.pdf）。读到稿件页面，百分比数字据转述，未核对原表。用于第 11 章。〔摘要〕
+75. Carel、Kidd：Expanding transformative experience（《欧洲哲学杂志》28(1)，2020，199–213，https://pmc.ncbi.nlm.nih.gov/articles/PMC7217260）。读到摘要。用于第 11 章。〔摘要〕
+76. Wilson、Gilbert：Affective Forecasting: Knowing What to Want（2005，《心理科学当前方向》，https://stafforini.com/works/wilson-2005-affective-forecasting-knowing/）。据摘要转述。用于第 11 章。〔摘要〕
+77. Hagewen、Morgan：Intended and Ideal Family Size in the United States, 1970–2002（2005，《人口与发展评论》31(3):507–527，https://ideas.repec.org/a/bla/popdev/v31y2005i3p507-527.html）。读到摘要。用于第 12 章。〔摘要〕
+78. Morgan、Rackin：The Correspondence Between Fertility Intentions and Behavior in the United States（2010，《人口与发展评论》36(1):91–118，https://econpapers.repec.org/RePEc:bla:popdev:v:36:y:2010:i:1:p:91-118）。读到摘要。用于第 12 章。〔摘要〕
+79. Sobotka、Beaujouan：Two Is Best? The Persistence of a Two-Child Family Ideal in Europe（2014，《人口与发展评论》40(3):391–419，https://econpapers.repec.org/RePEc:bla:popdev:v:40:y:2014:i:3:p:391-419）。读到摘要（168 份调查、37 国）。用于第 12、13 章。〔摘要〕
+80. Bongaarts：The End of the Fertility Transition in the Developed World（2002，《人口与发展评论》28(3):419–443，https://econpapers.repec.org/RePEc:bla:popdev:v:28:y:2002:i:3:p:419-443）。读到摘要。用于第 12 章。〔摘要〕
+81. Spéder、Kapitány：How are time-dependent childbearing intentions realized? Realization, postponement, abandonment, bringing forward（2009，《欧洲人口杂志》25(4):503–523，https://ideas.repec.org/a/spr/eurpop/v25y2009i4d10.1007_s10680-009-9189-7.html）。读到摘要，摘要里没有实现率等数字。用于第 12 章。〔摘要〕
+82. Toulemon、Testa：Fertility intentions and actual fertility: a complex relationship（2005，《人口与社会》Population & Societies 415，https://www.ined.fr/en/publications/editions/population-and-societies/fertility-intentions-and-actual-fertility-a-complex-relationship-en/）。只读到摘要页两句概括，正文结果未读。用于第 12 章。〔摘要〕
+83. Liefbroer：Changes in Family Size Intentions Across Young Adulthood（2009，《欧洲人口杂志》25(4)，https://link.springer.com/content/pdf/10.1007/s10680-008-9173-7.pdf）。回到论文页面核到女性 26 岁 2.42、39 岁 2.01、44 岁 1.95，男性 37%、48%、15% 等；起点差、终点差是本书自己的粗算，不是作者的结论。用于第 12 章。〔部分原文〕
+84. Iacovou、Tavares：Yearning, Learning and Conceding（ISER 工作论文 2010-22，https://www.iser.essex.ac.uk/wp-content/uploads/files/working-papers/iser/2010-22.pdf；正式版《人口与发展评论》37(1):89–123，2011）。读的是工作论文版的转述，正式版结论是否一致未核。用于第 12 章。〔二手〕
+85. Bongaarts：Fertility and reproductive preferences in post-transitional societies（Population Council 工作论文页，页面标 1998 年，https://knowledgecommons.popcouncil.org/departments_sbsr-pgy/253）。六个因素只读到摘要点名的一项；正式发表年份为记忆，未核。用于第 12 章。〔摘要〕
+86. Bongaarts：The Causes of Stalling Fertility Transitions（2005，Population Council 工作论文 204，https://core.ac.uk/download/229799032.pdf）。38 个国家等数字据转述。用于第 12 章。〔二手〕
+87. Brini 等：2026，《比较人口研究》Comparative Population Studies 51:49–72（https://www.comparativepopulationstudies.de/index.php/CPoS/article/download/650/453/3175）。据转述，该文只检验了动机到愿望一环。用于第 12 章。〔二手〕
+88. Zeman、Beaujouan、Brzozowska、Sobotka：2018，《人口研究》Demographic Research 38(25)，32 国、1940–1970 年出生队列的孩次递进比分解。据期刊页摘要（https://www.demographic-research.org/volumes/vol38/25/default.htm）。用于第 13 章。〔摘要〕
+89. Tan、Cui、Uchikoshi：2025，LSE 工作论文 127749，韩国、日本、台湾、新加坡婚内生育与结婚的分解；台湾 2010–2020 的 +0.303、−0.123，韩国 4.39 到 0.88 等据论文 PDF 的网页转述（https://eprints.lse.ac.uk/127749/1/The_increasing_importance_of_changes_in_nuptiality_policy_mismatch_and_fertility_decline_in_low-fertility_Asian_societies_JT_QC_FU.pdf），题名未另核。用于第 13 章。〔二手〕
+90. Kohler、Ortega、Billari：2001，MPIDR 工作论文 2001-032（题名据页面网址为 Towards a theory of lowest-low fertility，未另核）。摘要页（https://www.demogr.mpg.de/en/publications_databases_6118/publications_1904/mpidr_working_papers/towards_a_theory_of_lowest_low_fertility_856/）。用于第 13 章。〔摘要〕
+91. Cai、Zhang：彩礼研究（《经济建模》）。据财新 2026 年 5 月 18 日摘要转述（https://www.caixinglobal.com/2026-05-18/soaring-bride-prices-push-rural-chinese-men-out-of-the-marriage-market-study-shows-102445100.html），该摘要标注为机器生成，数字未回原文核对。用于第 13 章。〔二手〕
+92. Lee、Wang、Campbell：Infant and child mortality among the Qing nobility（1994，《人口研究》Population Studies 48(3):395–411）。摘要页（https://researchportal.hkust.edu.hk/en/publications/infant-and-child-mortality-among-the-qing-nobility-implications-f/），题名据页面网址、后半未核。用于第 14 章。〔摘要〕
+93. Lee、Wang：1999，《人口与发展评论》25(1):33–65。摘要页（https://ideas.repec.org/a/bla/popdev/v25y1999i1p33-65.html）。用于第 14 章。〔摘要〕
+94. Lee、Campbell：Fate and Fortune in Rural China（剑桥大学出版社，1997；年份据 Journal of Asian Studies 与 Continuity and Change 的书评标题）。读了两章的出版社摘要（https://www.cambridge.org/core/books/fate-and-fortune-in-rural-china/liaoning-demographic-system/80AACEABEE5B65EC611D5ABD4657DF2B ；https://www.cambridge.org/core/books/fate-and-fortune-in-rural-china/two-types-of-positive-check-infanticide-and-neglect/E8CB90B96AA8FE538112BD3B25F8B8B6），书未读。用于第 14 章。〔摘要〕
+95. Lee、Wang：One Quarter of Humanity（哈佛大学出版社，1999）。出版方简介（https://shss.hkust.edu.hk/node/223），书未读。用于第 14 章。〔摘要〕
+96. Wolf：1984，《人口与发展评论》10(3):443–470。摘要（https://bvbvf1.bib-bvb.de/vufind/PrimoRecord/cdi_proquest_miscellaneous_61045046）。用于第 14 章。〔摘要〕
+97. Wolf：2001，《人口与发展评论》27(1):133–154。摘要（https://ideas.repec.org/a/bla/popdev/v27y2001i1p133-154.html），题名卷期页点名四位作者已核。用于第 14 章。〔摘要〕
+98. Engelen、Wolf：导言，载 Chuang、Engelen、Wolf 编 Positive or Preventive? Reproduction in Taiwan and the Netherlands, 1850–1940（Aksant，2006）。只读到导言前部，生育率「约六对四至五」为转述数字（https://scispace.com/pdf/positive-or-preventive-reproduction-in-taiwan-and-the-3mlvhv5dbb.pdf）。用于第 14 章。〔部分原文〕
+99. Wolf、Gates：Marriage in Taipei City: Reasons for Rethinking Chinese Demography（2005，《国际亚洲研究杂志》2(1):111–133）。摘要（https://core-prod.cambridgecore.org/core/journals/international-journal-of-asian-studies/article/marriage-in-taipei-city-reasons-for-rethinking-chinese-demography/2CFC0D7ED4043D1F20C67ADB00A5A801），作者与卷期据书目页 https://bvbvf1.bib-bvb.de/vufind/PrimoRecord/cdi_proquest_miscellaneous_60530955。用于第 14 章。〔摘要〕
+100. Hu, Sijie：2020，LSE 经济史工作论文 307（https://www.lse.ac.uk/asset-library/information/wp307.pdf）。读了网页全文，核到 35691 人、六个家族、1400 至 1900 年、29.6% 终身未婚、士绅约三倍于平民、控制婚姻次数后差距基本消失。用于第 14 章。〔部分原文〕
+101. 贾萌萌、郑新蓉：2022，《中华女子学院学报》第 1 期。原文未读，经中文维基百科「三孩政策」转述。用于第 15 章。〔二手〕
+102. Rodriguez：2023 年田野研究。书名和原文未读，经维基百科「One-child policy」转述。用于第 15 章。〔二手〕
+103. Abbasi-Shavazi：Below replacement-level fertility in Iran: Progress and prospects（2001，IUSSP 东京研讨会论文，https://openresearch-repository.anu.edu.au/bitstream/1885/41476/3/PaperAbbasi.pdf）。取得论文全文并核对正文与表格数字；1996 年总和生育率表 2 为 2.52、正文为 2.69，论文未解释，书中并写。用于第 16 章。〔部分原文〕
+104. Abbasi-Shavazi、McDonald、Hosseini-Chavoshi：The Fertility Transition in Iran: Revolution and Reproduction（Springer，2009）。只读到内容简介（https://ebook.library.uitm.edu.my/Record/8242/Description），全书未读。用于第 16 章。〔摘要〕
+105. Hosseini-Chavoshi、Abbasi-Shavazi、McDonald：Fertility, Marriage, and Family Planning in Iran: Implications for Future Policy（2016，Population Horizons，https://minerva-access.unimelb.edu.au/server/api/core/bitstreams/f7837f8b-e9f1-4a38-897d-8a6f08443835/content）。据网页转述，全文未读。用于第 16 章。〔二手〕
+106. Ladier-Fouladi：2021，《伊朗研究》Iranian Studies 54(5–6)（https://cambridge.org/core/journals/iranian-studies/article/islamic-republic-of-irans-new-population-policy-and-recent-changes-in-fertility/E8F649B2DF4F2139EA44BC86AEA4BA46）。仅读摘要。用于第 16、22 章。〔摘要〕
+107. Roudi：Iran is reversing its population policy（2012，威尔逊中心 Viewpoints No. 7，https://www.wilsoncenter.org/sites/default/files/media/documents/publication/iran_is_reversing_its_population_policy.pdf）。据网页转述，成文年代较早；其农村 8.1 到 2.1 与 Abbasi-Shavazi 的农村数口径不同，未对齐。用于第 16、22 章。〔二手〕
+108. Boonstra：Islam, Women and Family Planning: A Primer（2001，《古特马赫政策评论》4(6)，https://www.guttmacher.org/node/13200）。据网页转述。用于第 16 章。〔二手〕
+109. Underwood：Islamic Precepts and Family Planning（2000，《国际计划生育展望》26(3)，https://www.guttmacher.org/sites/default/files/article_files/2611000.pdf）。据网页摘要转述。用于第 16 章。〔摘要〕
+110. Puur、Maslauskaitė、Rahnu、Stankūnienė：2012，《Filosofija. Sociologija》23(4):256–265（https://lmaleidykla.lt/ojs/index.php/filosofija-sociologija/article/download/6012/5180）。读到摘要与表，Hajnal 线门槛与对其的批评、Coale 1992 均经此转述。用于第 17 章。〔部分原文〕
+111. Okun：Faith and Fertility in Israel（2024，《Sapir》夏季号，https://sapirjournal.org/faith/2024/faith-and-fertility-in-israel/）。读了页面，核到 6.5、政党联盟中的资助与读经学院补贴、兵役豁免、宗教家庭法、劳动参与率 71%；其中结论多为作者解释，书中已区分。用于第 5、8、17 章。〔部分原文〕
+112. 以色列辅助生殖公共出资范围：BMC 2023 年论文（https://link.springer.com/doi/10.1186/s12939-023-01831-8）。只读到概括性文字，题名作者未核。用于第 17 章。〔摘要〕
+113. Taub 中心人口预测：经一篇新闻（Yahoo News）转述，原件未读。用于第 17 章。〔二手〕
+114. Bongaarts、Casterline：2013，《人口与发展评论》38(增刊):153–168（https://pmc.ncbi.nlm.nih.gov/articles/PMC4011385）。理想数偏差、中位数 4.6、停滞、「崇尚多子」判断据网页转述；联合国专家会议论文（2013）所述 Caldwell 等 1992 的四条解释同据转述，Caldwell 1992 原文未读。用于第 18 章。〔二手〕
+115. Price：1996，《非洲》Africa 66(3):411–436（https://www.cambridge.org/core/product/772FBABEEB984909C508F377B87F0E90）。读到摘要。用于第 18 章。〔摘要〕
+116. Yaya、Osanyintupin：2017，MPRA Paper 88824（https://mpra.ub.uni-muenchen.de/88824/1/MPRA_paper_88824.pdf）。加纳与尼日利亚 DHS 2013/2014、尼日利亚穆斯林女性 69.0% 等读到摘要式概述；其对 Westoff 的转引与 Westoff 报告的表不符，书中以报告为准；作者全名未核。用于第 18 章。〔摘要〕
+117. Ahinkorah 等：2020，《BMC 妊娠与分娩》20:778（https://pmc.ncbi.nlm.nih.gov/articles/PMC7734747），32 国合并分析。据网页转述。用于第 18 章。〔二手〕
+118. Yi、Chen：2014，《比较人口研究》39(4)（https://www.comparativepopulationstudies.de/index.php/CPoS/article/download/164/189）。读到摘要性的全文页。用于第 19 章。〔摘要〕
+119. Okui：2025，《社会科学》Social Sciences 14(6):330（https://www.mdpi.com/2076-0760/14/6/330）。读到摘要与主要结果。用于第 19 章。〔摘要〕
+120. Kan、Hertog、Kolpashnikova：2019，《人口研究》41(35):1021–1046（doi 10.4054/DemRes.2019.41.35，https://www.demographic-research.org/volumes/vol41/35/41-35.pdf）。读到摘要、数据与主要结果。用于第 19 章。〔部分原文〕
+121. Fang、Liu：The Confucian Fertility Paradox: Education Competition and Ultra-Low Fertility in East Asia（稿本，约 2026 年，https://bpb-us-w2.wpmucdn.com/web.sas.upenn.edu/dist/3/517/files/2026/07/2026-7-20-The-Confucian-Fertility-Paradox.pdf）。非正式出版稿本，据网页转述。用于第 19 章。〔二手〕
+122. Lutz、Skirbekk、Testa：The low fertility trap hypothesis（2006，《维也纳人口研究年鉴》4:167–192）。书目与摘要读自 https://econpapers.repec.org/RePEc:vid:yearbk:v:4:y:2006:i:1:p:167-192 与 https://research.wu.ac.at/en/publications/the-low-fertility-trap-hypothesis-forces-that-may-lead-to-further-5/ ，三部分结构与早期研究细节读自奥地利科学院出版社放出的 PDF（https://austriaca.at/0xc1aa5576%200x00144e25.pdf），据网页转述；作者所在 IIASA 页面被拦，未绕过。用于第 19、21 章。〔部分原文〕
+123. Li 等：2024，《科学报告》，大陆城乡总和生育率。据 news-medical 转述（https://www.news-medical.net:443/news/20240416/China-faces-continuing-fertility-drop-across-all-regions-new-study-finds.aspx），原文未读，题名未核。用于第 19 章。〔二手〕
+124. 《人口研究》2022 年 46 卷 4 期，2020 年普查总和生育率约 1.3（中国人民大学，https://rkyj.ruc.edu.cn/EN/Y2022/V46/I4/3）。读摘要，题名作者未核。用于第 19 章。〔摘要〕
+125. Kim、Lee：2020，《人口学》。高丽大学页面摘要（https://scholar.korea.ac.kr/handle/2021.sw.korea/55414?mode=full），题名未核。用于第 19 章。〔摘要〕
+126. Hsieh：2014 年 ISA 会议幻灯片（https://www.tsigeto.info/isa14/rc06-s6-1/Hsieh-2014-ISA-slide.pdf）。幻灯片摘要，题名未核。用于第 19 章。〔摘要〕
+127. 赵春兰、范丽珠：《少子化背景下的「两头婚」：浙北乡村婚育模式嬗变的田野观察》（《河北学刊》2020 年第 4 期）。读了儒家网 2021 年 1 月 8 日转载全文页（https://www.rujiazg.com/article/19966），杭州西郊、2017 至 2019 年田野、两个孩子分别随父母姓、「人是活的，传统是死的」等已回页核对；原稿「杭嘉湖平原」页面核不到已改；未对期刊版面。用于第 20、21 章。〔二手〕
+128. Dettling、Kearney：NBER 工作论文 17485（https://www.nber.org/papers/w17485）。仅读摘要，题名未核。用于第 20 章。〔摘要〕
+129. 张芬、方迎风、彭浩宸：《房价对家庭生育决策的作用机制》（《人口研究》2023 年第 2 期，https://rkyj.ruc.edu.cn/CN/Y2023/V47/I2/96）。仅读摘要。用于第 20 章。〔摘要〕
+130. Goldstein、Lutz、Testa：The emergence of sub-replacement family size ideals in Europe（2003，《人口研究与政策评论》22(5–6):479–496）。书目与「2001 年德语区年轻女性理想子女数 1.7」只见于 Lutz 等人转述，原文未读（IIASA 页面被拦，未绕过）。用于第 21 章。〔二手〕
+131. Testa、Grilli：2006，《人口》（法文版）61(1):107–137（https://econpapers.repec.org/RePEc:cai:popine:popu_601_0107）。读到摘要；「1.5」与两孩规范松动两处细节仅见 Lutz 等人转述。用于第 21 章。〔摘要〕
+132. Milligan：2005，《经济学与统计评论》87(3)；NBER 工作论文 8845（https://www.nber.org/papers/w8845）。仅读摘要。用于第 22 章。〔摘要〕
+133. Cohen、Dehejia、Romanov：2013，《经济学与统计评论》95(1)（https://econpapers.repec.org/RePEc:tpr:restat:v:95:y:2013:i:1:p:1-20）。仅读摘要。用于第 22 章。〔摘要〕
+134. Sorvachev、Yakovlev：IZA DP 13019（https://www.iza.org/index.php/publications/dp13019/1/citations/ris）、NBER 会议稿（https://conference.nber.org/conf_papers/f135922/f135922.pdf）、Free Policy Briefs 摘要页（https://freepolicybriefs.org/tag/maternity-capital/）。读到摘要与简报；俄罗斯约一万美元、88% 用于住房、短期约一成长期超两成、每多出生一个孩子约五万美元（该页说的是政府愿付的价格）已回简报页核对；幅度数字未回论文核。用于第 22 章。〔摘要〕
+135. Slonimczyk、Yurko：IZA DP 7705（https://www.iza.org/index.php/publications/dp7705/1/citations/ris）。仅读摘要，长期 0.15 已回页核对。用于第 22 章。〔摘要〕
+136. Chung 等：2025，《人口经济学杂志》38，第 34 篇（https://link.springer.com/article/10.1007/s00148-025-01092-5）。只读摘要页，格鲁吉亚 0.3、17%、3.8 万、3.5 个百分点、42% 已回页核对。用于第 22 章。〔摘要〕
+137. Ko、Lee、Pesuth：2026，Convergence of Low Fertility Policies Beyond Policy Transfer（后半题名、刊名与作者全名未核；检索到的文件名带 PublicAdminDevelopment；https://unipub.lib.uni-corvinus.hu/13240/）。只读到被截断的摘要，逐年数字未读。用于第 22、24 章。〔摘要〕
+138. Gauthier：2007，《人口研究与政策评论》26(3)（https://econpapers.repec.org/RePEc:kap:poprpr:v:26:y:2007:i:3:p:323-346）。仅读摘要，题名未核。用于第 22 章。〔摘要〕
+139. Thévenon、Gauthier：Family policies in developed countries（2011，题名后半未核，《社区、工作与家庭》14(2)，https://pure.knaw.nl/portal/en/publications/family-policies-in-developed-countries-a-fertility-booster-with-s/）。仅读摘要，题名后半据页面网址。用于第 22 章。〔摘要〕
+140. Hoem：2008，《人口研究》19，第 10 篇（https://www.demographic-research.org/volumes/vol19/10/19-10.pdf）。仅读摘要，题名未核。用于第 22 章。〔摘要〕
+141. Gauthier、Gietel-Basten：2025，《人口与发展评论》51(1):125–161（https://ideas.repec.org/a/bla/popdev/v51y2025i1p125-161.html）。仅读摘要。用于第 22 章。〔摘要〕
+142. Bergsvik、Fauske、Hart：2021，《人口与发展评论》47(4):913–964（https://econpapers.repec.org/RePEc:bla:popdev:v:47:y:2021:i:4:p:913-964）。只确认了题目与出处，摘要未读。用于第 22 章。〔题录〕
+143. Hellstrand 等：MPIDR 工作论文 2020-007（https://www.demogr.mpg.de/papers/working/wp-2020-007.pdf，书中记作 2021）与 MPIDR 工作论文 2025-029（https://www.demogr.mpg.de/papers/working/wp-2025-029.pdf）。读到摘要与要点，题名未核。用于第 22 章。〔摘要〕
+144. 新加坡 POPS 2014 调查研究：Springer 论文（https://link.springer.com/article/10.1007/s12546-023-09309-8）。页面未给出标题与作者，据网页转述，其引述的 Saw 2016 未见原文。用于第 22 章。〔二手〕
+145. Lovenheim、Mumford：Do Family Wealth Shocks Affect Fertility Choices? Evidence from the Housing Market（2013，《经济学与统计评论》95(2):464–475，https://econpapers.repec.org/RePEc:tpr:restat:v:95:y:2013:i:2:p:464-475）。只见检索结果给出的题名与出处，内容未读。用于第 24 章。〔题录〕
+146. Rosina、Testa：Couples' First Child Intentions and Disagreement: An Analysis of the Italian Case（2009，《欧洲人口杂志》25(4):487–502，https://link.springer.com/article/10.1007/s10680-009-9188-8）。摘要级。用于第 23 章。〔摘要〕
+147. Testa、Cavalli、Rosina：The Effect of Couple Disagreement about Child-Timing Intentions: A Parity-Specific Approach（2014，《人口与发展评论》40(1):31–53，https://ideas.repec.org/a/bla/popdev/v40y2014i1p31-53.html）。摘要级。用于第 23 章。〔摘要〕
+148. Doepke、Kindermann：Bargaining over Babies（2019，《美国经济评论》）。读了 NBER 摘要（https://www.nber.org/papers/w22072）与作者主页全文版前约十万字符（https://faculty.wcas.northwestern.edu/mdo738/research/Doepke_Kindermann_AER_2019.pdf）；模拟部分只读到引言，政策倍数依引言。用于第 23 章。〔部分原文〕
+149. Testa、Bolano：When partners' disagreement prevents childbearing: A couple-level analysis in Australia（2021，《人口研究》44(33):811–838，https://www.demographic-research.org/volumes/vol44/33/44-33.pdf）。读到全文，样本量、附表百分比、检验 p 值均据此；附表中「已有孩子一格」占比正文与表格有颠倒之处，本书只用差异格的占比。用于第 23、25 章。〔部分原文〕
+150. 卿石松、姜雨杉：《夫妻生育意愿及影响因素的差异分析》（《华东师范大学学报（哲学社会科学版）》2022，54(3):140–152，https://xbzs.ecnu.edu.cn/CN/Y2022/V54/I3/140）。读到期刊页面的摘要与描述统计，全文未读。用于第 23 章。〔摘要〕
+151. 卿石松、王嘉昊、陆曦：《家庭生育决策中的性别议价与生育意愿实现》（《人口研究》2025，49(5):115–128，https://rkyj.ruc.edu.cn/CN/Y2025/V49/I5/115）。读到摘要。用于第 23 章。〔摘要〕
+152. McDonald：Gender Equity in Theories of Fertility Transition（2000，《人口与发展评论》26(3):427–439，https://ideas.repec.org/a/bla/popdev/v26y2000i3p427-439.html）。读到完整摘要，全文未读。用于第 23 章。〔摘要〕
+153. Goldin：A Grand Gender Convergence: Its Last Chapter（2014，《美国经济评论》104(4):1091–1119，https://goldin.scholars.harvard.edu/publications/grand-gender-convergence-its-last-chapter）。读到页面概述，原文未读。用于第 23 章。〔摘要〕
+154. Esping-Andersen、Billari：Re-theorizing Family Demographics（2015，《人口与发展评论》41(1):1–31，https://econpapers.repec.org/RePEc:bla:popdev:v:41:y:2015:i:1:p:1-31）。读到摘要。用于第 23 章。〔摘要〕
+155. Aassve、Meroni、Pronzato：Grandparenting and Childbearing in the Extended Family（2012，《欧洲人口杂志》28:499–518，https://link.springer.com/article/10.1007/s10680-012-9273-2）。摘要级。用于第 23 章。〔摘要〕
+156. 李婉鑫、杨小军、杨雪燕：《儿童照料支持与二孩生育意愿》（《人口研究》2021，45(5):64–78，https://rkyj.ruc.edu.cn/CN/Y2021/V45/I5/64）。读到摘要。用于第 23 章。〔摘要〕
+157. Benatar：Better Never to Have Been。原书未读，出版信息本书未用；非对称论证概述据维基百科（https://en.wikipedia.org/wiki/Benatar%27s_asymmetry_argument），对存在者、法律权利的立场据一篇书评转述（https://www.utilitarianism.com/benatar/）。用于第 25 章。〔二手〕
+
+## 三、报告、统计与数据
+
+158. 国家统计局：2025 年全国人口数据（2026 年 1 月 19 日发布，https://www.stats.gov.cn/sj/zxfbhjd/202601/t20260119_1962338.html）。读到发布页：年末人口 140489 万、减少 339 万、出生 792 万、死亡 1131 万及各年龄段人数；0 至 15 岁人数、各差值与比例为本书据已列数字相减相除所得，已重算。用于第 1、15、18、19、21 章。〔部分原文〕
+159. 国家统计局：公报页（https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202602/t20260228_1962662.html）。检索结果列出，未能打开核对。用于第 15 章。〔题录〕
+160. 联合国人口司 2026 栏各国总和生育率。未读联合国原表，一律转引自维基百科「List of countries by total fertility rate」，口径与欧盟统计局等不同，与 2007 年的 1.71、Pew 的 2010—2015 估计来源不同，不连成曲线。用于第 1、3、4、12、16、17、18、19、21、22 章。〔二手〕
+161. 世界银行：World Development Indicators，总和生育率（SP.DYN.TFRT.IN）。读了经 api.worldbank.org 于 2026-11-04 取得的逐年值（例：https://api.worldbank.org/v2/country/HUN/indicator/SP.DYN.TFRT.IN?format=json ），匈牙利取数两次一致；第 22 章所用逐年值读自 FRED 转载页（fred.stlouisfed.org/data/SPDYNTFRTIN 加国家码），世界银行原站逐年值当时未核，FRED 页面复核时打不开。均为估计值。用于第 22、24 章。〔部分原文〕
+162. 经合组织家庭数据库 SF2.4：婚外出生比例（https://webfs.oecd.org/Els-com/Family_Database/SF_2_4_Share_births_outside_marriage.pdf）。读到原文页：2023 年婚外出生 43%，日本、韩国、土耳其 2%—4%，两国分别的数字在图里，未读到。用于第 13、19 章。〔部分原文〕
+163. 欧盟统计局：Fertility statistics 与 Marriage and divorce statistics 两页（ec.europa.eu/eurostat/statistics-explained），2024 年数。据官方页面转述，未逐表核对；未给瑞典、芬兰具体值，芬兰仅给出「低于 1.30」。用于第 17 章。〔二手〕
+164. 日本国立社会保障与人口问题研究所：第 17 次出生动向基本调查（2025 年 6 月）。英文摘要页（https://www.ipss.go.jp/ps-doukou/j/doukou17/doukou17_gaiyoEng.html）及摘要 PDF；该页未写上一轮调查的年份。用于第 13、19 章。〔摘要〕
+165. 《国务院 中共中央关于优化生育政策促进人口长期均衡发展的决定》（2021 年 6 月 26 日作出，7 月 20 日发布）。读到国务院网页（https://www.gov.cn/zhengce/2021-07/20/content_5626190.htm），三孩表述与配套措施均据此。用于第 15 章。〔部分原文〕
+166. 《国务院办公厅关于同意建立国务院优化生育政策工作部际联席会议制度的函》（成文 2022-07-28，发布 2022-08-19，https://www.gov.cn/zhengce/content/2022-08/19/content_5706022.htm）。读到网页。用于第 15 章。〔部分原文〕
+167. 国务院英文网：育儿补贴 3600 元（2025 年 7 月 30 日，https://english.www.gov.cn/news/202507/30/content_WS6889e474c6d0868f4e8f48d2.html）。据网页转述。用于第 13 章。〔二手〕
+168. 国家卫健委英文网转载的国家统计局数据：2017 年出生 1723 万、二孩占 51.2%、头胎 724 万（https://en.nhc.gov.cn/2018-01/30/c_73023.htm）。据网页转述。用于第 13 章。〔二手〕
+169. 匈牙利政府：Rétvári Bence 2013 年 5 月演讲稿（https://2010-2014.kormany.hu/download/e/95/e0000/Bence%20R%C3%A9tv%C3%A1ri%20wyklad_en_20130525.pdf）。2010 年夏起修正、2011 年家庭税收减免与基本法，核到政府原件的转述摘要。用于第 24 章。〔部分原文〕
+170. DHS 综述（dhsprogram.com/pubs/pdf/OD16/04ChildbearingChoices.pdf，1990 年代）：肯尼亚理想数 7.2（1977）至 3.9（1993）等。网页文字有部分错乱，据网页转述。用于第 18 章。〔二手〕
+171. 尼日尔 DHS 2012 概要 SR205（dhsprogram.com/pubs/pdf/SR205/SR205.pdf）：总和生育率 7.6、理想数女约 9 男约 11、教育分层 9.6 与 6.6。概要读到，未对原表。用于第 18 章。〔摘要〕
+172. 尼日尔 DHS 2012 完整报告 FR277。打开后只读到目录，未读到第七章表格。用于第 18 章。〔题录〕
+173. Westoff：Desired Number of Children: 2000–2008（2010，DHS Comparative Reports 25，ICF Macro，https://www.govinfo.gov/content/pkg/GOVPUB-ID-PURL-gpo116065/pdf/GOVPUB-ID-PURL-gpo116065.pdf）。表 2.1 全部在婚女性平均理想孩子数，乍得、尼日尔、加纳、佛得角四个数两次摘出一致，其余各国一次摘出，未对纸面原表。用于第 18 章。〔二手〕
+174. DHS 统计指南：Ideal Number of Children 页（https://dhsprogram.com/Data/Guide-to-DHS-Statistics/Ideal_Number_of_Children.htm）。概念、非数字回答的处理，据网页转述。用于第 18 章。〔二手〕
+175. 肯尼亚国家统计局：KDHS 2022 页面（https://www.knbs.or.ke/reports/kdhs-2022/）。总和生育率与分层，据网页转述。用于第 18 章。〔二手〕
+176. Pew Research Center：The Future of the Global Muslim Population: Main Factors（2011，https://www.pewresearch.org/religion/2011/01/27/future-of-the-global-muslim-population-main-factors/markdown）。据网页转述。用于第 16 章。〔二手〕
+177. Karim，载 PRB：Changes in Fertility Rates Among Muslims in India, Pakistan, and Bangladesh（2009，https://www.prb.org/resource/changes-in-fertility-rates-among-muslims-in-india-pakistan-and-bangladesh/）。据网页转述，Karim 原始研究未读。用于第 16 章。〔二手〕
+178. Pew Research Center：The Experiences of U.S. Adults Who Don't Have Children（2024-07-25，https://www.pewresearch.org/social-trends/2024/07/25/the-experiences-of-u-s-adults-who-dont-have-children/）。核到页面数据一级（47%、37%、各理由百分比、样本 770 与 2542、调查时间）；报告全文与问卷原题未读。用于第 25 章。〔部分原文〕
+179. 世界卫生组织：1 in 6 people globally affected by infertility（2023-04-04，https://www.who.int/news/item/04-04-2023-1-in-6-people-globally-affected-by-infertility）。核到新闻稿一级（17.5%、17.8%、16.5%、自费、呼吁）。用于第 25 章。〔部分原文〕
+180. 2023 年诺贝尔经济学奖新闻稿（https://www.nobelprize.org/prizes/economic-sciences/2023/press-release/）。只用「育儿效应」一句，据网页转述。用于第 23 章。〔摘要〕
+181. 育娲人口研究（YuWa）2024 年报告，养育孩子成本。原报告未读，成本构成不明；据 CNN 转述（https://abc17news.com/news/national-world/cnn-world/2024/02/21/china-is-one-of-worlds-most-expensive-places-to-raise-children-report-finds/）与中国服务信息网转述（2024 年 2 月 22 日，https://www.chinaservicesinfo.com/s/202402/22/WS662b4e9b498ed2d7b7eac9ef/report-raising-a-child-in-china-costs-6-3-times-per-capita-gdp.html），两处构成说法不同，已并列写明。用于第 10、21 章。〔二手〕
+182. ICMART 辅助生殖出生人数估计：据 ScienceAlert 对 2025 年《Fertility and Sterility》这项研究的报道（https://www.sciencealert.com/study-reveals-how-many-ivf-babies-have-been-born-worldwide），报道称主笔 Chambers、图注写 Adamson 等，署名未核清；英国冷冻胚胎周期妊娠率 7% 到 36% 同为转述，原论文未读。用于第 25 章。〔二手〕
+183. 犹太人民政策研究所：《2023 年度评估》5.4 节（https://jppi.org.il/en/%D7%94%D7%A2%D7%A8%D7%9B%D7%94-%D7%A9%D7%A0%D7%AA%D7%99%D7%AA-2023/s/5.4/）。世俗犹太人生育率，据网页转述，该节未给数据年份与出处。用于第 17 章。〔二手〕
+
+## 四、词条、报道与网页
+
+184. 第一财经转载（https://www.yicai.com/news/101115792.html），2021 年 7 月 20 日决定中「取消社会抚养费，清理和废止相关处罚规定」。读到转载页，1973 至 2015 年的节点未逐条核到官方文件。用于第 9 章。〔部分原文〕
+185. NBC News：China's population falls for a fourth straight year（https://www.nbcnews.com/news/amp/rcna254757）。读到转述的摘要，2024 年出生 954 万、死亡 1093 万，结婚约 610 多万对对 2023 年 768 万对；未读全文。用于第 1 章。〔摘要〕
+186. 澎湃新闻：2021 年 8 月 20 日报道（https://www.thepaper.cn/newsDetail_forward_14141000）。只核到人大常委会审议修改人口与计划生育法的日期与会次。用于第 15 章。〔二手〕
+187. 澎湃新闻回顾文章：1980 年 9 月 25 日公开信、次日《人民日报》头版。原页链接没有保存，待人工核对；公开信全题照回顾文章所写，原件未读（未核）；维基百科写 1980 年 9 月 18 日正式实施，与公开信的关系未核清。用于第 15 章。〔二手〕
+188. 《纽约时报》2014 年报道（卫计委单独二孩调查）。原报道未读，经维基百科「One-child policy」转引。用于第 15 章。〔二手〕
+189. 《经济学人》2018 年 2 月 8 日（2016、2017 年出生数）。原文未读，经维基百科「Two-child policy」转述。用于第 15 章。〔二手〕
+190. 《南华早报》2019 年 1 月 21 日、彭博 2019 年 1 月 3 日（2018 年出生数）。原文未读，经转述。用于第 15 章。〔二手〕
+191. 端木异评论（澎湃新闻「思想市场」，2020 年 5 月 22 日，https://www.thepaper.cn/newsDetail_forward_7495040）。成因分析与文中数据、人名均为评论内部转引，未核原始文献。用于第 20 章。〔二手〕
+192. 《环球邮报》：Paying the stork worked in Quebec（https://www.theglobeandmail.com/news/national/paying-the-stork-worked-in-quebec/article25431151，题名据页面网址）。回到页面核过魁北克 500 与 8000 加元、1988 至 1997 年、一成二与四分之一。用于第 22 章。〔部分原文〕
+193. Lanchava 的 CERGE-EI 博客（https://blog.cerge-ei.cz/?p=2804）。博士生博客，非同行评议；回页核到其用的是双重差分而非合成控制、结果近零。用于第 22 章。〔部分原文〕
+194. 《格鲁吉亚信使报》2008 年 2 月 12 日（https://messenger.com.ge/issues/1544_february_12_2008/1544_patriarch.html）。牧首承诺报道，据网页转述，未给承诺的具体日期与资助规模。用于第 22 章。〔二手〕
+195. NIUSSP：评估匈牙利鼓励生育政策的文章（https://www.niussp.org/fertility-and-reproduction/evaluating-pronatalist-policies-with-tfr-brings-misleading-conclusions-examples-fromhungary/）。回页核到 25.1、27.7、28.4、9 万与 9.2 万、1.5 至 1.6 等；署名未读到。用于第 22 章。〔部分原文〕
+196. 美国企业研究所：Hungary's fertility outcomes highlight pro-natal policy limitations（https://cosm.aei.org/hungarys-fertility-outcomes-highlight-pro-natal-policy-limitations/，题名据页面网址）。评论性文章，据网页转述；其中「每年二千五百亿美元抬高约 0.2」没有找到出处，不作独立证据。用于第 22 章。〔二手〕
+197. 《今日以色列报》2024 年 11 月 24 日（https://israelhayom.com/2024/11/24/why-is-irans-birth-rate-plummeting）。新闻报道，自述数字不一致，只当线索。用于第 22 章。〔二手〕
+198. 《台北时报》2026 年 5 月 11 日（https://www.taipeitimes.com/News/world/archives/2026/05/11/2003857133）。韩国 2024 年婚外生育 5.8%、总和生育率 0.75 到 0.80、2025 年回升及原因争议，专家姓名按报道英文拼写；报道数，与联合国 2026 栏的 0.76 口径不同。用于第 13、19、22、24 章。〔二手〕
+199. 韩国中央日报、星报 2026 年 3 月 15 日：韩国 2025 年出生、总和生育率、结婚数（https://www.koreajoongangdaily.com/korea/korea-sees-biggest-on-year-increase-in-number-of-births-in-15-years-in-2025/12137019 ；https://www.thestar.com.my/aseanplus/aseanplus-news/2026/03/15/birthrate-rebounds-from-record-lows）。据网页转述。用于第 13 章。〔二手〕
+200. 韩国时报 2025 年 12 月 12 日：新婚夫妇 2024 年数字（https://www.koreatimes.co.kr/southkorea/society/20251212/number-of-newlywed-couples-falls-below-1-mil-for-2nd-consecutive-year-in-2024）。据网页转述。用于第 13 章。〔二手〕
+201. 界面新闻（https://en.jiemian.com/article/13944923.html）与中国青年网英文版（https://en-cyd.youth.cn/society/202602/t20260212_808448.htm）：中国结婚登记 2024 年 610.6 万对、2025 年约 676 万对（称出自民政部）、2025 年 5 月登记规则变化与「双春年」。据网页转述。用于第 13 章。〔二手〕
+202. 中国日报经亚洲新闻网转述：2022 年二孩约 39%、三孩约 15%（https://asianews.network/?p=117827）。据网页转述。用于第 13 章。〔二手〕
+203. nippon.com 对日本厚生劳动省初步数的整理（https://www.nippon.com/en/japan-data/h02802/）。日本 2025 年出生、婚姻、东京与冲绳等县的总和生育率；读到网页，厚生劳动省原表未读。用于第 19 章。〔部分原文〕
+204. The Star 2026 年 2 月 25 日（https://www.thestar.com.my/aseanplus/aseanplus-news/2026/02/25/south-korea039s-birthrate-the-world039s-lowest-rises-again-amid-signs-of-easing-demographic-crisis）：韩国 2025 年总和生育率 0.80、出生 254,457、婚姻 +8.1%。据网页转述。用于第 19 章。〔二手〕
+205. 韩国时报 2026 年 1 月 28 日（https://www.koreatimes.co.kr/southkorea/society/20260128/childbirths-grow-at-fastest-pace-in-18-years-on-increased-marriages）：2025 年 1—11 月出生与婚姻的官方解释。据网页转述。用于第 19 章。〔二手〕
+206. The Star 2026 年 8 月 29 日（https://www.thestar.com.my/aseanplus/aseanplus-news/2026/08/29/seouls-fertility-rate-rebounds-for-second-year）：首尔 0.63/0.58/0.55。据网页转述。用于第 19 章。〔二手〕
+207. 台北时报 2026 年 3 月 17 日（https://www.taipeitimes.com/News/taiwan/archives/2026/03/17/2003853970）、Taiwan News（https://www.taiwannews.com.tw/en/news/6322100）、中央社（https://www.cna.com.tw/news/acn/202601090280.aspx）：台湾 2025 年出生 107,812、总和生育率估计与官方解释。据网页转述。用于第 19 章。〔二手〕
+208. 日本一家机构网站的专栏（https://isvd.or.jp/en/columns/birthrate-2025-671k-acceleration）：日本婚姻与出生的关系、初育年龄 31.0、婚内生育下降。据网页转述，机构与作者未核。用于第 19 章。〔二手〕
+209. Korea JoongAng Daily 三篇：韩国保健社会研究院五国调查（https://www.koreajoongangdaily.com/korea/young-koreans-want-spouses-but-not-kids-a-new-study-reveals-why/12457681 与 https://www.koreajoongangdaily.com/korea/survey-shows-koreans-likely-to-view-childbirth-as-blessing-but-financial-curse/12108304）；韩日三胎比重与无子女比例（https://www.koreajoongangdaily.com/korea/more-couples-in-korea-are-having-kids-than-japan-but-stop-at-first-child/12366105）。据网页转述。用于第 19 章。〔二手〕
+210. 韩国私教育开支：Korea Times 2025-03-13（https://www.koreatimes.co.kr/southkorea/society/20250313/private-education-spending-in-south-korea-hits-all-time-high-despite-falling-number-of-students）、Korea Times 2026-03-12（https://www.koreatimes.co.kr/amp/economy/20260312/private-education-spending-fell-after-hitting-record-high-in-2024）、Korea JoongAng Daily（https://www.koreajoongangdaily.com/korea/spending-on-private-education-jumps-60-percent-over-past-decade-data/12230869）。据网页转述，未读原始统计表。用于第 10、19 章。〔二手〕
+211. 韩国时报 2026 年 7 月 5 日（https://www.koreatimes.co.kr/southkorea/20260705/s-koreas-yearly-working-hours-fall-by-32-hours-last-year-but-remain-longer-than-oecd-average）与维基百科「List of countries by average annual labor hours」（转引经合组织）：年均实际工时 2025 年。据网页转述。用于第 19 章。〔二手〕
+212. 韩国国土研究院 2023 年 1 月房价与生育研究：亚洲新闻网转述（https://asianews.network/sky-high-home-prices-contribute-to-low-birth-rate-study/）。据网页转述。用于第 19 章。〔二手〕
+213. CEPR VoxEU 介绍文章（https://cepr.org/voxeu/columns/cohort-changes-fertility-patterns-and-role-shifting-priorities，另一写法 https://cepr.org/index.php/voxeu/columns/cohort-changes-fertility-patterns-and-role-shifting-priorities）：介绍 Kearney 与 Levine 2025，原文有 “at most, small”；2026 年 2 月短文，六国、1975–1995 年出生队列、下降集中在头胎。读到网页，未读原页全文；两篇文章各自用哪些国家、哪几年的理想数未核。用于第 4、8、10、12、13、20、21、24 章。〔部分原文〕
+214. 世界银行博文：Bakilana 与 Hasan，Combien d'enfants aimeriez-vous avoir（2016-05-02，https://blogs.worldbank.org/fr/africacan/combien-denfants-aimeriez-vous-avoir）。乍得与尼日尔理想数、想要与实际差距，据网页转述。用于第 18 章。〔二手〕
+215. Dataphyte 数据新闻：尼日利亚生育选择的安静转变（https://dataphyte.com/issue/senorrita/2025/10/the-quiet-transformation-of-fertility-choices-in-nigeria）。转述尼日利亚 2024 DHS 数据，非原始报告，可信度低于 DHS 原表；数家尼日利亚媒体标题同报总和生育率 4.8，只读到标题。用于第 18 章。〔二手〕
+216. Ynetnews 报道（https://www.ynetnews.com/article/hy2me1i00xe）：以色列 2023 年 2.9、极端正统派 2000 年 7.2 与 2022 年 6.5、另一估算 6.2。据网页转述。用于第 17 章。〔二手〕
+217. 耶路撒冷政策研究所博文（https://jerusaleminstitute.org.il/en/blog/fertility_rate/，2022 年 8 月）：世俗 2.0、宗教约 3.9、极端正统 6.6。据网页转述。用于第 17 章。〔二手〕
+218. 一份以色列教育危机汇总材料（israel-education-crisis.pages.dev 上的 PDF）。来源多处未注明，质量较低，仅作交叉对照。用于第 17 章。〔二手〕
+219. 欧洲婚姻格局综述：encyclopedia.com 词条与加州大学伯克利 Wachter 档案中的维基百科 2009 版。三成婚姻、仆佣与家户、婚姻推迟作为马尔萨斯式刹车等，据网页转述。用于第 17 章。〔二手〕
+220. Hosseini-Chavoshi 等 2025 年 3 月 ANU 研讨会摘要（https://demography.cass.anu.edu.au/sod/events/recent-fertility-trends-and-childbearing-patterns-iran-impact-marriage-and-policy）。读到摘要，无数字。用于第 16 章。〔摘要〕
+221. Khaleej Times（2011，https://www.khaleejtimes.com/uae/expats-form-88-of-population）：阿联酋外国人占比。据网页转述；与维基百科所给另一数矛盾，书中已说明取舍。用于第 16 章。〔二手〕
+222. Centre for Public Impact：日本少子化案例页（https://www.centreforpublicimpact.org/case-study/tackling-declining-birth-rate-japan/）：1990 部际会议、1991 首批措施、1994 年 12 月天使计划。据网页转述。用于第 24 章。〔二手〕
+223. Heinrich Böll Stiftung 韩国办事处文章（https://kr.boell.org/en/2023/05/24/population-control-reproductive-rights-feminist-perspectives-low-fertility-rates-south）：2005 年低出生率基本法。单一来源，据网页转述；PMC 的一篇韩国政策论文被验证页拦下，未读。用于第 24 章。〔二手〕
+224. Politeja 期刊文章页（https://journals.akademicka.pl/politeja/article/view/4471）：俄罗斯转折点是 2007 年母亲资本。据网页转述。用于第 24 章。〔二手〕
+225. 豆瓣读书笔记（https://www.douban.com/note/643252261）：对《生育制度》慈母严父一条的摘录。不同转述处措辞不一，故正文一律用转述，未逐字引用；这次没能再查到可读的原文页。用于第 4 章。〔二手〕
+226. 维基百科「Spinning (textiles)」「Staple (textiles)」词条：纺纱靠捻与纤维摩擦咬合；棉纤维按美国农业部分档；最早捻过的纤维出自法国南部，约公元前五万至四万年。用于第 1 章。〔二手〕
+227. 维基百科「Total fertility rate」「Net reproduction rate」「Population momentum」词条：更替水平约 2.1、时间效应、净再生产率等于 1 的含义、人口惯性；2.1 多出 0.1 的解释是词条的暗示，不是明文。用于第 1 章。〔二手〕
+228. 维基百科「Shakers」词条：禁欲教规、靠皈依和收养壮大、2025 年缅因州一处村落 2025 年 8 月共三人（词条引美国公共广播报道，搜索结果中 NPR/KUOW 标题 “The number of Shakers in the U.S. rises to 3” 相互印证）。用于第 1 章。〔二手〕
+229. 英文维基百科「Chinese surname」页：汉人姓氏父系、妇女婚后一般保留原姓、复姓人数（2018 年约 110 万，1990 年约 11.8 万）。原始统计未核。用于第 5 章。〔二手〕
+230. 英文维基百科「Japanese name」页：日本民法第 750 条、2019 年约 95.5% 女性从夫姓。法条与原始统计未核。用于第 5 章。〔二手〕
+231. 英文维基百科「Adult adoption」页：成年收养用于家业延续、婿养子。用于第 5 章。〔二手〕
+232. 维基百科「One-child policy」页（https://en.wikipedia.org/wiki/One-child_policy）：政策年份、陈云 1979 年 6 月 1 日与邓小平 1979 年 10 月 15 日的话（英文转述，脚注引 Yang 的著作和 Greenhalgh 2003，中文原话未读）、单独二孩数字、2021 年微博投票（与「Family planning in China」所引 hk01 数字不一致，只用比例）。未核官方文件。用于第 9、14、15 章。〔二手〕
+233. 维基百科「Family planning in China」页（https://en.wikipedia.org/wiki/Family_planning_in_China）：1954 年避孕禁令撤销、1957 和 1960 年马寅初、1970 到 1974 年节育措施、1982 年宪法等。用于第 15 章。〔二手〕
+234. 维基百科「Two-child policy」「Three-child policy」词条：2013 到 2016 年、2025 年育儿补贴及三孩政策节点。用于第 15 章。〔二手〕
+235. 维基百科「Population of China」「Demographics of China」词条（https://en.wikipedia.org/wiki/Demographics_of_China）：历年出生数和总和生育率表（1950、1963、1970、1979、1990、2000、2010、2016 到 2025）、2020 年普查总和生育率 1.301 及城镇乡分项。表格没有注明数据出处，书中口径：2000 年以后取普查数，2016 年起出生数以国家统计局年度数为准，其余只当线索。用于第 15 章。〔二手〕
+236. 中文维基百科「计划生育」「三孩政策」词条（https://zh.wikipedia.org/wiki/计划生育 ；https://zh.wikipedia.org/wiki/三孩政策）。用于第 15 章。〔二手〕
+237. 维基百科「Family planning in Iran」页（https://en.wikipedia.org/wiki/Family_planning_in_Iran）：伊朗政策转向、2012-07-25 谈话、2021-11-01 法律等节点。未核官方文件；其 2007 年 1.71 与世界银行序列 1.748 来源不同，不连成曲线。用于第 4、9、16、22、24 章。〔二手〕
+238. 维基百科「Demographics of the United Arab Emirates」「Islam and birth control」词条。其转引来源未逐一核对。用于第 16 章。〔二手〕
+239. 维基百科「Easterlin hypothesis」页（https://en.wikipedia.org/wiki/Easterlin_hypothesis）。用于第 20 章。〔二手〕
+240. 维基百科「Decree 770」「Abortion in Romania」词条（https://en.wikipedia.org/wiki/Decree_770）：出生率与死亡人数未核原始来源。用于第 22 章。〔二手〕
+241. 维基百科「Population planning in Singapore」页（https://en.wikipedia.org/wiki/Population_planning_in_Singapore）：1984、1986、1987 三个节点。海德堡大学相关论文页被验证页拦下，未读。用于第 24 章。〔二手〕
+242. 维基百科「Orna Donath」条目（https://en.wikipedia.org/wiki/Orna_Donath）。补充用。用于第 25 章。〔二手〕
