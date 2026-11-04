@@ -699,6 +699,7 @@ def web_page(secs):
 .ledger .lk{color:var(--navy);font-weight:700}
 .wonder{border-left:3px solid #58A9B5;padding:.5rem 1rem;margin:1rem 0}.wonder .lab{display:block;font:700 .75rem sans-serif;color:#58A9B5;letter-spacing:.3em}.wonder p{text-indent:0;margin:.2rem 0;color:var(--dim)}
 .endmark{text-align:center;color:var(--gold);margin:2rem 0 0}
+.takeaway.shoukou p{font-weight:400;color:inherit;font-size:inherit}
 .ledger.nine{display:block}.ledger.nine p{margin:.15rem 0}
 .judge{border-left:3px solid #8A6E3A;padding:.5rem 1rem;margin:1rem 0}.judge .lab{display:block;font:700 .75rem sans-serif;color:#8A6E3A;letter-spacing:.3em}.judge p{text-indent:0;margin:.2rem 0;color:var(--dim)}
 .chapnum{font-size:2.6rem;color:var(--gold);opacity:.45;line-height:1;margin-top:1rem}.chapnum.spacer{opacity:0;font-size:1rem}
