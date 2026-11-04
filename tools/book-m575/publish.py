@@ -166,7 +166,7 @@ def main():
             '<h3 class="en-only" style="color:#F1EBDC;font-size:23px;line-height:1.5;margin:0 0 14px">%s</h3>'
             '<p class="zh-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">%s</p>'
             '<p class="en-only" style="color:#C9BCA6;font-size:15px;line-height:1.95;margin:0">%s</p></div></a>'
-            % (NO, NO, han / 10000, pages, NO, format(round(han, -3), ','), pages, CT['titleEn'], CT['todayZh'], CT['todayEn'])).replace('__PRICE__', PRICE).replace('__TITLE__', '%s——%s' % (T, SUB)) + E0
+            % (NO, NO, (han + 8184) / 10000, pages, NO, format(round(han, -3), ','), pages, CT['titleEn'], CT['todayZh'], CT['todayEn'])).replace('__PRICE__', PRICE).replace('__TITLE__', '%s——%s' % (T, SUB)) + E0
     h = h[:a0] + card + h[a0:]
     tp.write_text(h)
     print('published to', d, 'pages', pages, 'han', han)
