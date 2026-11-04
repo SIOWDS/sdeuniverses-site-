@@ -3,6 +3,7 @@ import { handleM7Read } from "./m7-publication.js";
 import { handleChatPrimary } from "./chatprimary.js";
 import { siteGate, GATE_INTERNAL_KEY } from "./site-gate.js";
 import { withPdfLock } from "./pdf-lock.js";
+import { archiveDownload } from "./archive-download.js";
 
 // ── 主站 / 四个正式子站：唯一归属、canonical 与统一统计 ────────────
 // 唯一数据源在 public/sites/site-data.json：Worker 用它判路由、改首页统计与
@@ -12751,6 +12752,7 @@ const _siteHandlers = {
   async fetch(request, env, ctx) {
     // 全站密码门（2026-11-03 封闭发展半年）：先过门，再走一切原有路由。见 src/site-gate.js
     { const _g = await siteGate(request, env); if (_g) return _g; }
+    { const _a = await archiveDownload(request, env, new URL(request.url)); if (_a) return _a; }
     if (new URL(request.url).pathname === "/api/chatprimary") {
       return handleChatPrimary(request, env, { vendors: WDS_VENDORS, liteModel: wdsLiteModel, plainBody: wdsPlainBody, upstream: wdsUp });
     }

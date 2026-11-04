@@ -1,0 +1,40 @@
+# 专著 PDF 一次性打包下载。详见 tools/books_archive.py、src/archive-download.js。
+name: books-archive
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'build 或 delete'
+        required: true
+        default: 'build'
+      key_hash:
+        description: '下载密钥的 SHA-256（64 位十六进制）'
+        required: true
+
+concurrency:
+  group: books-archive
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            ops/pdf-offload
+      - name: 执行
+        env:
+          AWS_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          ACTION: ${{ inputs.action }}
+          KEY_HASH: ${{ inputs.key_hash }}
+        run: |
+          pip install -q --upgrade --user boto3 botocore
+          python3 tools/books_archive.py "$ACTION" "$KEY_HASH"
