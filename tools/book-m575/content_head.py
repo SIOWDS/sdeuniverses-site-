@@ -56,5 +56,6 @@ for f in sorted(glob.glob('/home/claude/golden/tasks/part*.json')):
 tasks.sort(key=lambda x: x['lesson'])
 assert [t['lesson'] for t in tasks] == list(range(1, 53)), 'tasks 不全'
 C['tasks'] = tasks
+C['keypoints'] = json.loads((HERE / 'keypoints_final.json').read_text(encoding='utf-8'))
 (HERE / 'content.json').write_text(json.dumps(C, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
 print('ok tasks', len(tasks))
