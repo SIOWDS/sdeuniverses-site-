@@ -167,9 +167,7 @@ def cmd_remove(a):
     if not ver:
         print('没有核过的 PDF，什么也不删'); return
     today = time.strftime('%Y-%m-%d', time.gmtime())
-    have = set()
-    if os.path.exists(LEDGER):
-        have = {l.split('\t')[0] for l in open(LEDGER, encoding='utf-8') if l.strip() and not l.startswith('#')}
+    have = {r[0]: r for r in ledger_rows()}
     rows, keys = [], []
     for v in ver:
         p = os.path.join(PUB, v['k'])
@@ -177,18 +175,39 @@ def cmd_remove(a):
         if not os.path.exists(p) or os.path.getsize(p) != v['size'] or md5(p) != v['md5']:
             print('  跳过（核过之后本地变了）', v['k']); continue
         keys.append('public/' + v['k'])
-        if v['k'] not in have:
+        old = have.get(v['k'])
+        if old is None or old[1] != v['size'] or old[2] != v['md5']:
             rows.append(f"{v['k']}\t{v['size']}\t{v['md5']}\t{today}\n")
     for i in range(0, len(keys), 200):
         r = sh('git', 'rm', '-q', '--', *keys[i:i + 200])
         if r.returncode:
             print(r.stderr); sys.exit(1)
     new = not os.path.exists(LEDGER)
+    # 改稿重出的 PDF：先删旧行再追加，否则 verify-live 永远按旧字节数核，整批被撤回。
+    changed = {r.split('\t')[0] for r in rows}
+    if changed and not new:
+        kept = [l for l in open(LEDGER, encoding='utf-8') if l.startswith('#') or l.split('\t')[0] not in changed]
+        with open(LEDGER, 'w', encoding='utf-8') as f:
+            f.writelines(kept)
     with open(LEDGER, 'a', encoding='utf-8') as f:
         if new:
             f.write('# path(相对 public/，即桶里的键)\tbytes\tmd5\toffloaded(UTC)\n')
         f.writelines(rows)
     print(f'已从 git 删除 {len(keys)} 份，台账新增 {len(rows)} 行 → {os.path.relpath(LEDGER, ROOT)}')
+
+
+def internal_header():
+    """站点有密码门和 PDF 下载锁（src/site-gate.js、src/pdf-lock.js），核验请求要带内部头才取得到文件。
+    优先用环境变量 SDE_INTERNAL_KEY；没有就从 src/site-gate.js 读。"""
+    key = os.environ.get('SDE_INTERNAL_KEY', '')
+    if not key:
+        import re
+        try:
+            m = re.search(r'GATE_INTERNAL_KEY\s*=\s*"([^"]+)"', open(os.path.join(ROOT, 'src', 'site-gate.js'), encoding='utf-8').read())
+            key = m.group(1) if m else ''
+        except OSError:
+            key = ''
+    return ['-H', 'x-sde-internal: ' + key] if key else []
 
 
 def ledger_rows():
@@ -206,7 +225,7 @@ def live_probe(k, size):
     """跟随跳转（分站 PDF 会被 301 到 <名>.sdeuniverses.com），只认最后一跳的响应头。"""
     u = SITE + '/' + urllib.parse.quote(k, safe='/')
     r = subprocess.run(['curl', '-sL', '-o', os.devnull, '-D', '-', '-r', '0-1023', '-A', 'Mozilla/5.0 (pdf-offload)',
-                        '--max-time', '60', u], capture_output=True, text=True)
+                        *internal_header(), '--max-time', '60', u], capture_output=True, text=True)
     lines = r.stdout.replace('\r', '').split('\n')
     starts = [i for i, l in enumerate(lines) if l.lower().startswith('http/')]
     last = lines[starts[-1]:] if starts else []
@@ -302,7 +321,7 @@ def cmd_fetch(a):
         p = os.path.join(PUB, k)
         os.makedirs(os.path.dirname(p), exist_ok=True)
         u = SITE + '/' + urllib.parse.quote(k, safe='/')
-        r = subprocess.run(['curl', '-sfL', '-A', 'Mozilla/5.0 (pdf-offload)', '-o', p, u])
+        r = subprocess.run(['curl', '-sfL', '-A', 'Mozilla/5.0 (pdf-offload)', *internal_header(), '-o', p, u])
         print(('✓ ' if r.returncode == 0 else '✗ ') + k)
     print('取回的只是工作副本，用完删掉，不要再提交进 git（台账里的 PDF 由桶供给）。')
 
