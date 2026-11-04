@@ -108,6 +108,7 @@ def blocks_of(text):
 
 def inline(s):
     s = s.replace('AI for Science', 'AI\u00a0for\u00a0Science')
+    s = re.sub(r'([。！？；：，、」』）]\*{0,2}) +(?=[\u4e00-\u9fff「『（])', r'\1', s)   # 中文标点后的空格（粗体句后常见）会撑出一块空白
     s = re.sub(r'(?<=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]) (?=[A-Za-z0-9$])|(?<=[A-Za-z0-9%$.)]) (?=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef])', '\u2009', s)
     s = html.escape(s, quote=False)
     s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
