@@ -259,7 +259,17 @@ def quote_html(lines):
 
 def render(blocks, bib=False):
     h = []
-    for k, b in blocks:
+    # 个别章的「带走的话」写成了普通段＋列表：排成和别章一样的方框（字不动）
+    merged, i_ = [], 0
+    while i_ < len(blocks):
+        k_, b_ = blocks[i_]
+        if k_ == 'p' and b_[0] == '**带走的话**' and i_ + 1 < len(blocks) and blocks[i_ + 1][0] == 'ul':
+            merged.append(('quote', [b_[0]] + ['- ' + x for x in blocks[i_ + 1][1]]))
+            i_ += 2
+            continue
+        merged.append(blocks[i_])
+        i_ += 1
+    for k, b in merged:
         if k == 'h3' and b[0].endswith('参考文献'):
             bib = True
             h.append('<h3 class="sec bibhead">%s</h3>' % inline(b[0]))
@@ -325,6 +335,8 @@ def with_endmark(inner):
         pre = re.sub(r'<(ol|ul) class="ls"((?:(?!<(?:ol|ul) ).)*</\1>\s*)$', r'<\1 class="ls keepnext"\2', pre, flags=re.S)
         n_ = len(re.sub(r'<[^>]+>', '', m.group(0)))
         return pre + '<div class="chapend%s">' % (' open' if n_ > 300 else '') + m.group(0) + end + '</div>'
+    # 章末没有方框的：末段至少带 5 行过页，不留两三行的尾页
+    inner = re.sub(r'<p>((?:(?!<p[ >]).)*</p>\s*)$', r'<p class="tailp">\1', inner, flags=re.S)
     return inner + end
 
 
@@ -520,6 +532,7 @@ ul.part-toc .pg{{flex:0 0 auto;width:3em;text-align:right;color:#D9B96E}}
 .chap-label{{font:700 {body_pt*0.72:.2f}pt 'Noto Sans CJK SC';color:#B08A3C;margin:2.5mm 0 1.5mm;letter-spacing:.12em}}
 .chap-title{{font:700 {body_pt*1.62:.2f}pt/1.42 'Noto Serif CJK SC';color:#1F3A5F;margin:0;string-set:chap attr(data-h),book "{META['title']}";bookmark-level:2;bookmark-label:content()}}
 p.keepnext{{break-after:avoid}}
+p.tailp{{widows:5;break-after:avoid}}
 .fs-title{{font:700 {body_pt*1.62:.2f}pt/1.4 'Noto Serif CJK SC';color:#1F3A5F;margin:14mm 0 1mm;letter-spacing:.12em;string-set:chap content(),book "{META['title']}";bookmark-level:1;bookmark-label:content()}}
 .fs-title.appx{{bookmark-level:2;font-size:15pt;letter-spacing:.06em}}
 .part-title{{bookmark-level:1;bookmark-label:content()}}
@@ -568,6 +581,9 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 .ledger .lk{{color:#1F3A5F;font-weight:700}}
 .chapend{{break-inside:avoid}}
 .chapend.open{{break-inside:auto}}
+.chapend.open>div{{break-after:avoid}}
+.chapend.open>div>p:last-child{{break-after:avoid}}
+.endmark{{break-before:avoid}}
 .chapend.open .takeaway{{break-inside:auto;box-decoration-break:clone}}
 .chapend.open .takeaway p{{break-inside:avoid}}
 .takeaway .lab{{break-after:avoid}}
@@ -752,7 +768,7 @@ def tail_fit(doc_html, css, key):
     TAIL_CACHE = TAIL_DIR / ('tail_fit_%s.json' % key)
     cache = json.loads(TAIL_CACHE.read_text()) if TAIL_CACHE.exists() else {}
     book = cache.setdefault(key, {})
-    paras = re.split(r'(?=<p(?: class="(?:keepnext|li)")?>)', doc_html)
+    paras = re.split(r'(?=<p(?: class="(?:keepnext|li|tailp)")?>)', doc_html)
 
     def hk(s):
         return hashlib.md5(s.split('</p>')[0].encode()).hexdigest()[:12]
