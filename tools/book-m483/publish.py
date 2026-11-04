@@ -46,7 +46,7 @@ def reserve(han, chapters):
     _cat = json.loads((SITE / 'books' / 'catalog.json').read_text())
     pub = [int(x['number']) for x in _cat['books'] if isinstance(x, dict) and isinstance(x.get('number'), int) and x['number'] != NO]
     # 第 540—571 号书页里也不许出现此 ISBN
-    pages = [SITE / 'books' / 'm' / str(n) / 'index.html' for n in range(540, NO)]
+    pages = [SITE / 'books' / 'm' / str(n) / 'index.html' for n in range(540, 600)]
     hit = [str(p) for p in pages if p.exists() and (ISBN in p.read_text() or nisbn in p.read_text())]
     assert not hit, f'书页已用此 ISBN：{hit}'
     chk = dict(prev.get('availabilityCheck') or {})

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""第 483 号《K线人生——跃迁无法设计，只能接住》（段君毅　王德生 著）封面与封底（工具链承自第 571 号，藏青底、金青奶白三色，220 系列版式）：
-主图：几条K线缠成的洪流——三条速度各异的线互相缠绕向前，挤进一团碰撞，旧线断成虚线散去，一条新线从碰撞里陡然升起，下面一道托弧（接住）。
+"""第 483 号《AI时代还能守正创新吗？》（王德生 著）封面与封底（工具链承自第 571 号，藏青底、金青奶白三色，220 系列版式）：
+主图：两座都在晃的桥，对岸上方一颗星；原注：新线从碰撞里陡然升起，下面一道托弧（接住）。
 全部矢量绘制、纯色，不用照片、不用渐变。封面不写「指导」字样，作者栏写「段君毅　王德生　著」。
 用法：python3 cover.py --fonts /usr/share/fonts/opentype/noto --out <dir>
 """
@@ -68,25 +68,31 @@ def art(W, H, uid):
 
     def bridge(x0, x1, top, col, tilt, seed):
         r = random.Random(seed)
-        n = 10
+        n = 16
         deck = []
         for j in range(n + 1):
             t_ = j / n
             x = x0 + (x1 - x0) * t_
-            y = wy - (wy - top) * 4 * t_ * (1 - t_) + tilt * s * math.sin(t_ * math.pi * 2.4 + seed) + r.uniform(-5, 5) * s
+            y = wy - (wy - top) * 4 * t_ * (1 - t_) + tilt * s * math.sin(t_ * math.pi * 5 + seed) + r.uniform(-7, 7) * s
             deck.append((x, y))
-        dd = 'M' + ' L'.join('%.1f %.1f' % p for p in deck)
-        out.append(f'<path d="{dd}" fill="none" stroke="{col}" stroke-width="{9*s:.1f}" stroke-linecap="round" stroke-linejoin="round"/>')
-        # 桥板之间留缝，栏杆歪斜
+        # 桥板一段一段，有的错位，中间留缝
+        for j in range(n):
+            (x1_, y1_), (x2_, y2_) = deck[j], deck[j + 1]
+            dy = r.uniform(-6, 6) * s
+            out.append(f'<line x1="{x1_+5*s:.0f}" y1="{y1_+dy:.0f}" x2="{x2_-5*s:.0f}" y2="{y2_+dy:.0f}" stroke="{col}" stroke-width="{10*s:.1f}" stroke-linecap="round"/>')
+        # 栏杆东倒西歪
+        tops = []
         for j in range(1, n):
             x, y = deck[j]
-            lean = r.uniform(-14, 14) * s
-            out.append(f'<line x1="{x:.0f}" y1="{y:.0f}" x2="{x+lean:.0f}" y2="{y-58*s:.0f}" stroke="{col}" stroke-opacity=".75" stroke-width="{3.2*s:.1f}" stroke-linecap="round"/>')
-        rail = 'M' + ' L'.join('%.1f %.1f' % (deck[j][0] + r.uniform(-9, 9) * s, deck[j][1] - 58 * s) for j in range(1, n))
-        out.append(f'<path d="{rail}" fill="none" stroke="{col}" stroke-opacity=".6" stroke-width="{2.6*s:.1f}" stroke-dasharray="{16*s:.0f} {9*s:.0f}"/>')
+            lean = r.uniform(-22, 22) * s
+            h_ = r.uniform(48, 74) * s
+            out.append(f'<line x1="{x:.0f}" y1="{y:.0f}" x2="{x+lean:.0f}" y2="{y-h_:.0f}" stroke="{col}" stroke-opacity=".8" stroke-width="{3.4*s:.1f}" stroke-linecap="round"/>')
+            tops.append((x + lean, y - h_))
+        rail = 'M' + ' L'.join('%.1f %.1f' % p for p in tops)
+        out.append(f'<path d="{rail}" fill="none" stroke="{col}" stroke-opacity=".55" stroke-width="{2.6*s:.1f}" stroke-dasharray="{18*s:.0f} {12*s:.0f}"/>')
 
-    bridge(W * 0.04, W * 0.50, H * 0.545, CREAM, 10, 2)
-    bridge(W * 0.46, W * 0.96, H * 0.50, GOLD2, 13, 5)
+    bridge(W * 0.04, W * 0.47, H * 0.62, CREAM, 9, 2)
+    bridge(W * 0.53, W * 0.96, H * 0.60, GOLD2, 11, 5)
     # 对岸上方的星：方向
     sx, sy = W * 0.80, H * 0.335
     pts = []
@@ -96,11 +102,6 @@ def art(W, H, uid):
         pts.append('%.1f,%.1f' % (sx + rr * math.cos(a_), sy + rr * math.sin(a_)))
     out.append(f'<polygon points="{" ".join(pts)}" fill="{GOLD2}"/>')
     out.append(f'<circle cx="{sx:.0f}" cy="{sy:.0f}" r="{104*s:.0f}" fill="none" stroke="{GOLD}" stroke-opacity=".35" stroke-width="{2*s:.1f}" stroke-dasharray="{6*s:.0f} {10*s:.0f}"/>')
-    # 注脚
-    ty2 = H * 0.875
-    for xx, anc, big, small, col in ((W * 0.08, 'start', '从前', '一边安全，一边危险', CREAM), (W * 0.92, 'end', '如今', '两边都危险，于是问哪边值得', GOLD2)):
-        out.append(f'<text x="{xx:.0f}" y="{ty2:.0f}" font-size="{36*s:.0f}" text-anchor="{anc}" font-family="Noto Serif CJK SC" font-weight="700" fill="{col}" letter-spacing="{4*s:.0f}">{big}</text>')
-        out.append(f'<text x="{xx:.0f}" y="{ty2 + 40*s:.0f}" font-size="{20*s:.0f}" text-anchor="{anc}" font-family="Noto Sans CJK SC" fill="{DIM}" letter-spacing="{3*s:.0f}">{small}</text>')
     return ''.join(out)
 
 def barcode(x, y, s):
@@ -186,12 +187,12 @@ def back(Wmm, Hmm, F):
 .f{{position:absolute;left:{17*s:.1f}mm;bottom:{17*s:.1f}mm;font:400 {7.2*s:.1f}pt/1.85 'Noto Sans CJK SC';color:{DIM}}}
 .f b{{color:{CREAM};font-weight:700;letter-spacing:.12em}}
 </style></head><body><div class="pg">{svg}
-<div class="c"><div class="lab">母 题</div>
-<div class="q">从前是一边安全、一边危险；<br>如今两边都危险，<br>于是选择的依据，<br>从“哪边安全”换成了“哪边值得”。</div><div class="by">—— 本书定音句</div><div class="rule"></div>
+<div class="c"><div class="lab">定 音 句</div>
+<div class="q">从前是一边安全、一边危险；<br>如今两边都危险，<br>于是选择的依据，<br>从“哪边安全”换成了“哪边值得”。</div><div class="rule"></div>
 <div class="bl"><p>一个认真了三十年、从不追热点的人，也可能一直在跟风：什么问题值得做，哪些路子算正路，怎样才算做好，都是别人先定好的。这种活法从前最安全，因为做到这一步要练很多年。</p>
 <p>基底正在拆掉这道门槛。可是另一边并没有变好，改写“一”的人仍然大概率失败。本书走过科学、技术、艺术，走过教育、健康、事业，回答书名之问：还能守，但守的是方向，不是别人立的“一”；还能新，但不能只新在路径，要走到“一”出问题的地方。</p>
 <p>全书没有做统计调查，提出的练法尚未验证，每章写明怎样算错，第 36 章请最强的反方发言。</p>
-<div class="gold">被端的是位置，不是人。</div></div>
+<div class="gold">被端的是位置，不是人。</div></div></div>
 <div class="f"><b>德麦国际出版社</b> · Demai International Press<br>德麦国际专著第 483 号 · 前言、导言、五部三十六章、结语、附录 · 约 {WAN} 万字<br>ISBN 979-8-90690-483-6 · 定价 US$20.00</div>
 </div></div></body></html>"""
 

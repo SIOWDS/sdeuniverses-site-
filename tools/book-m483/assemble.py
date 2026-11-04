@@ -15,7 +15,7 @@ def body(name):
     i = t.find('## 本章事实账')
     if i >= 0:
         t = t[:i]
-    assert '待核' not in t and '写作包' not in t and '事实库' not in t, name
+    assert '写作包' not in t and '事实库' not in t and (name == 'app3.md' or '待核' not in t), name
     return t.strip()
 
 

@@ -19,4 +19,4 @@ cp "$B/learning-pack.docx" public/books/m/483/learning-pack.docx
 python3 tools/book-m483/register.py
 python3 tools/book-m483/agent_page.py
 python3 tools/build_bookshelf.py --shelf-only
-python3 tools/build_book_rag.py 573
+python3 tools/build_book_rag.py 483
