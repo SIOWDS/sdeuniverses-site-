@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>在线阅读 · SDE</title>
+<style>
+:root{--bg:#f4f1ea;--bar:#fbf9f4;--ink:#2a2a2a;--mute:#77726a;--line:#ddd7ca}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1d20;--bar:#24272b;--ink:#e6e4df;--mute:#9a968e;--line:#3a3d42}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Serif SC","Source Han Serif SC","Songti SC",serif}
+header{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--bar);border-bottom:1px solid var(--line);font-size:14px}
+header a{color:inherit;text-decoration:none}
+#pos{margin-left:auto;color:var(--mute);white-space:nowrap}
+#msg{padding:48px 16px;text-align:center;color:var(--mute);line-height:1.8}
+#pages{max-width:980px;margin:0 auto;padding:16px}
+.pg{margin:0 auto 16px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.18);width:100%}
+.pg canvas{display:block;width:100%;height:100%}
+</style>
+</head>
+<body>
+<header><a href="javascript:history.back()">← 返回</a><span id="pos"></span></header>
+<div id="msg">正在打开…</div>
+<div id="pages"></div>
+<script src="/assets/lib/pdf.min.js"></script>
+<script>
+(function () {
+  var msg = document.getElementById("msg");
+  var pages = document.getElementById("pages");
+  var pos = document.getElementById("pos");
+  var f = new URLSearchParams(location.search).get("f") || "";
+  // 只读本站的文件：防止被人拿这页去开别处的地址。
+  var ok = /^\/(?!\/)/.test(f) && f.indexOf("\\") < 0 && (/\.pdf($|\?)/i.test(f) || /^\/api\/im\/doc\?/.test(f));
+  if (!ok) { msg.textContent = "这个地址打不开。"; return; }
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/lib/pdf.worker.min.js";
+  var m = /(?:^#|&)page=(\d+)/.exec(location.hash);
+  var want = m ? parseInt(m[1], 10) : 1;
+
+  pdfjsLib.getDocument({ url: f }).promise.then(function (pdf) {
+    msg.style.display = "none";
+    var total = pdf.numPages;
+    pos.textContent = "共 " + total + " 页";
+
+    function render(box) {
+      if (box.dataset.done) return;
+      box.dataset.done = "1";
+      pdf.getPage(+box.dataset.n).then(function (page) {
+        var w = box.clientWidth || 800;
+        var base = page.getViewport({ scale: 1 });
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        var vp = page.getViewport({ scale: (w / base.width) * dpr });
+        var c = document.createElement("canvas");
+        c.width = vp.width; c.height = vp.height;
+        box.appendChild(c);
+        return page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+      }).catch(function () { box.dataset.done = ""; });
+    }
+
+    var seen = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) {
+          render(e.target);
+          pos.textContent = "第 " + e.target.dataset.n + " / " + total + " 页";
+        }
+      });
+    }, { rootMargin: "600px 0px" });
+
+    return pdf.getPage(1).then(function (p1) {
+      var v = p1.getViewport({ scale: 1 });
+      var ratio = (v.width / v.height) || 0.707;
+      for (var i = 1; i <= total; i++) {
+        var box = document.createElement("div");
+        box.className = "pg"; box.dataset.n = i; box.id = "p" + i;
+        box.style.aspectRatio = String(ratio);
+        pages.appendChild(box);
+        seen.observe(box);
+      }
+      var t = document.getElementById("p" + Math.min(Math.max(want, 1), total));
+      if (t && want > 1) t.scrollIntoView();
+    });
+  }).catch(function () { msg.textContent = "这份 PDF 暂时打不开。"; });
+})();
+</script>
+</body>
+</html>

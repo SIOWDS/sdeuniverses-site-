@@ -2,6 +2,7 @@ import { handleM7Read } from "./m7-publication.js";
 // SDE Universes site worker: visit counter + static assets
 import { handleChatPrimary } from "./chatprimary.js";
 import { siteGate, GATE_INTERNAL_KEY } from "./site-gate.js";
+import { withPdfLock } from "./pdf-lock.js";
 
 // ── 主站 / 四个正式子站：唯一归属、canonical 与统一统计 ────────────
 // 唯一数据源在 public/sites/site-data.json：Worker 用它判路由、改首页统计与
@@ -12739,7 +12740,7 @@ async function _r2PdfOnAssetMiss(request, env, ctx, assetPath, url) {
   } catch (e) { return null; }   // 桶出岔子：交回原来的 404，不比迁移前更坏
 }
 
-export default {
+const _siteHandlers = {
   // 定时清库：每天 04:17 UTC 跑一次（cron 写在 wrangler.jsonc 的 triggers.crons）
   async scheduled(event, env, ctx) {
     if (env) { IM_ENV = env; if (env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
@@ -19793,3 +19794,8 @@ export default {
   },
 };
 
+// PDF 禁止下载（2026-11-04）：所有响应都过一道 src/pdf-lock.js。
+export default {
+  scheduled: (event, env, ctx) => _siteHandlers.scheduled(event, env, ctx),
+  fetch: (request, env, ctx) => withPdfLock(request, env, () => _siteHandlers.fetch(request, env, ctx)),
+};
