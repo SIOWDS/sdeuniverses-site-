@@ -97,13 +97,18 @@ def blocks_of(text):
     for k, b in out:
         if k == 'p':
             res.append(('p', [''.join(b)]))
+        elif k == 'ol' and res and res[-1][0] == 'ol' and int(re.match(r'\d+', b[0])[0]) == int(re.match(r'\d+', res[-1][1][-1])[0]) + 1:
+            res[-1][1].extend(b)   # 空行隔开的编号项并回一张表：否则 WeasyPrint 不认 start，全排成「1.」
+        elif k == 'ul' and res and res[-1][0] == 'ul':
+            res[-1][1].extend(b)
         else:
-            res.append((k, b))
+            res.append((k, list(b)))
     return res
 
 
 def inline(s):
     s = s.replace('AI for Science', 'AI\u00a0for\u00a0Science')
+    s = re.sub(r'([。！？；：，、」』）]\*{0,2}) +(?=[\u4e00-\u9fff「『（])', r'\1', s)   # 中文标点后的空格（粗体句后常见）会撑出一块空白
     s = re.sub(r'(?<=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]) (?=[A-Za-z0-9$])|(?<=[A-Za-z0-9%$.)]) (?=[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef])', '\u2009', s)
     s = html.escape(s, quote=False)
     s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
@@ -111,22 +116,102 @@ def inline(s):
     return s
 
 
+def _dw(s):
+    """单元格的显示宽度（以一个汉字宽为 1）。"""
+    s = re.sub(r'\*\*|(?<!\w)\*(?=\S)|(?<=\S)\*(?!\w)', '', s)
+    return sum(1.0 if ord(c) > 0x2E7F or 0xFF00 <= ord(c) <= 0xFFEF else 0.56 for c in s)
+
+
+def col_widths(head, body, total=43.0, pad=0.95):
+    """逐步挪宽度、把全表行数压到最少；每列不窄于「最长外文词」和「表头两行放得下」。返回 (百分比, 估计行数)。"""
+    import math
+    n = len(head)
+    rows = [head] + [r + [''] * (n - len(r)) for r in body]
+    T = total - n * pad
+    mins = []
+    for i in range(n):
+        tok = max([0.56 * len(t) for r in rows for t in re.findall(r'[A-Za-z0-9_.\-–—/%$+·≥≤]+', r[i])] or [0])
+        mins.append(max(min(tok, 13.0), math.ceil(_dw(head[i]) / 2), min(max(_dw(r[i]) for r in rows), 3.0), 2.0))
+    if sum(mins) > T:
+        k = T / sum(mins); mins = [m * k for m in mins]
+    weight = [math.sqrt(max(sum(_dw(r[i]) for r in rows) / len(rows), 1)) for i in range(n)]
+    free = T - sum(mins)
+    w = [mins[i] + free * weight[i] / sum(weight) for i in range(n)]
+
+    def lines(wd):
+        tot = lead = 0
+        for r in rows:
+            ls = [max(1, math.ceil(_dw(r[i]) / wd[i])) for i in range(n)]
+            tot += max(ls); lead += sum(ls)
+        return (tot, lead)
+    best, step = lines(w), 0.5
+    for _ in range(400):
+        moved = False
+        for i in range(n):
+            for j in range(n):
+                if i == j or w[j] - step < mins[j]:
+                    continue
+                w[i] += step; w[j] -= step
+                c = lines(w)
+                if c < best:
+                    best, moved = c, True
+                else:
+                    w[i] -= step; w[j] += step
+        if not moved:
+            break
+    return [(w[i] + pad) / total * 100 for i in range(n)], best[0]
+
+
 def table_html(rows, cls='tb'):
     cells = [[c.strip() for c in r.strip().strip('|').split('|')] for r in rows]
     cells = [r for r in cells if not all(re.fullmatch(r':?-{2,}:?', c) for c in r)]
     head, body = cells[0], cells[1:]
-    if len(head) >= 5:
+    # 单元格里的竖线（如 |r|<0.1）被当成了分栏：多出来的格并回去，首尾两栏不动
+    for r in body:
+        while len(r) > len(head):
+            r[1:len(r) - len(head) + 2] = ['|'.join(r[1:len(r) - len(head) + 2])]
+    if len(head) >= 6:
         cls += ' w5'
-    for ci in (0, 1):
-        if body and all(len(re.sub(r'[*\s]', '', r[ci])) <= 12 for r in body if len(r) > ci):
-            cls += ' n%d' % (ci + 1)
     if len(body) > 20:
         cls += ' dense'
-    h = ['<div class="tw"><table class="%s"><thead><tr>' % cls]
-    h += ['<th>%s</th>' % inline(c) for c in head]
+    pct, est = col_widths(head, body)
+    n = len(head)
+    ctr = [bool(body) and all(_dw(r[i]) <= 3 for r in body if len(r) > i) and _dw(head[i]) <= 6 for i in range(n)]
+    h = ['<div class="tw%s"><table class="%s"><colgroup>%s</colgroup><thead><tr>'
+         % (' short' if est <= 7 else '', cls, ''.join('<col style="width:%.2f%%">' % x for x in pct))]
+    h += ['<th%s>%s</th>' % (' class="ctr"' if ctr[i] else '', inline(c)) for i, c in enumerate(head)]
     h.append('</tr></thead><tbody>')
     for r in body:
-        h.append('<tr>' + ''.join('<td>%s</td>' % inline(c) for c in r) + '</tr>')
+        h.append('<tr>' + ''.join('<td%s>%s</td>' % (' class="ctr"' if i < n and ctr[i] else '', inline(c)) for i, c in enumerate(r)) + '</tr>')
+    h.append('</tbody></table></div>')
+    return ''.join(h)
+
+
+def fig_board(b):
+    """第 1 章白板图：字符画改成排好的框与箭头，字一个不动。"""
+    return ('<div class="fig board"><p class="note">（外圈：一个大圆，围住下面所有）</p>'
+            '<div class="node top">缝隙创新法</div><div class="stem">▲<br>│</div>'
+            '<div class="row"><span class="node">二阶碰撞法</span><span class="ar">◄──</span>'
+            '<span class="node core">SDE思想创新法</span><span class="ar">──►</span><span class="node">九宫透镜法</span></div></div>')
+
+
+def fig_grid(b):
+    """第 39 章九宫占位图：原来的字符表（在比例字体里对不齐）改成真正的九宫表，字一个不动。"""
+    ls = [x.strip() for x in b if x.strip()]
+    heads = ls[0].split()
+    rows = []
+    for k in range(0, 9, 3):
+        cs = [re.split(r'\s{2,}', re.sub(r'^D\d\s+', '', ls[1 + k + t])) for t in range(3)]
+        label = ls[1 + k].split()[0]
+        rows.append((label, [(re.sub(r'^\[|\]$', '', cs[0][i]), cs[1][i], cs[2][i]) for i in range(3)]))
+    h = ['<div class="fig ninegrid"><table><thead><tr><th></th>%s</tr></thead><tbody>' % ''.join('<th>%s</th>' % x for x in heads)]
+    for lab, cc in rows:
+        tds = []
+        for tag, l2, l3 in cc:
+            kind = 'g' if '正位' in tag else ('a' if ' 甲 ' in tag else 'b')
+            empty = ' empty' if '空' in l2 else ''
+            tds.append('<td class="%s%s"><b>%s</b><span>%s</span><i>%s</i></td>' % (kind, empty, html.escape(tag), html.escape(l2), html.escape(l3)))
+        h.append('<tr><th>%s</th>%s</tr>' % (lab, ''.join(tds)))
     h.append('</tbody></table></div>')
     return ''.join(h)
 
@@ -170,12 +255,22 @@ def quote_html(lines):
         return '<div class="qbox"><span class="lab">这一章的问题</span><p>%s</p></div>' % inline(mq[1])
     if len(body) == 1 and re.fullmatch(r'\*\*.+\*\*', body[0].strip()):
         return '<div class="pull"><p>%s</p></div>' % inline(body[0].strip()[2:-2])
-    return '<blockquote class="verdict">%s</blockquote>' % ''.join('<p>%s</p>' % inline(l) for l in body)
+    return '<blockquote class="verdict%s">%s</blockquote>' % (' long' if sum(len(l) for l in body) > 260 else '', ''.join('<p>%s</p>' % inline(l) for l in body))
 
 
 def render(blocks, bib=False):
     h = []
-    for k, b in blocks:
+    # 个别章的「带走的话」写成了普通段＋列表：排成和别章一样的方框（字不动）
+    merged, i_ = [], 0
+    while i_ < len(blocks):
+        k_, b_ = blocks[i_]
+        if k_ == 'p' and b_[0] == '**带走的话**' and i_ + 1 < len(blocks) and blocks[i_ + 1][0] == 'ul':
+            merged.append(('quote', [b_[0]] + ['- ' + x for x in blocks[i_ + 1][1]]))
+            i_ += 2
+            continue
+        merged.append(blocks[i_])
+        i_ += 1
+    for k, b in merged:
         if k == 'h3' and b[0].endswith('参考文献'):
             bib = True
             h.append('<h3 class="sec bibhead">%s</h3>' % inline(b[0]))
@@ -218,9 +313,17 @@ def render(blocks, bib=False):
         elif k == 'orn':
             h.append('<div class="orn">◆</div>')
         elif k == 'pre':
-            h.append('<div class="card code">%s</div>' % ''.join(
-                '<p%s>%s</p>' % ((' style="padding-left:%.1fem"' % ((len(x) - len(x.lstrip(' '))) * 0.5)) if x.startswith(' ') else '',
-                                 html.escape(x.strip(), quote=False)) for x in b if x.strip()))
+            if any('外圈：一个大圆' in x for x in b):
+                h.append(fig_board(b)); continue
+            if b and b[0].split() == ['S1', 'S2', 'S3']:
+                h.append(fig_grid(b)); continue
+            ls_ = [x for x in b if x.strip()]
+
+            def _p(x):
+                head = re.fullmatch(r'【.*】|母题卡（空组版）|第n(\+1)?轮', x.strip())
+                st = ' style="padding-left:%.1fem"' % ((len(x) - len(x.lstrip(' '))) * 0.5) if x.startswith(' ') else ''
+                return '<p class="%s"%s>%s</p>' % ('hd' if head else 'ln', st, re.sub(r'\s{2,}', '　', html.escape(x.strip(), quote=False)))
+            h.append('<div class="card code%s">%s</div>' % (' long' if len(ls_) > 12 else '', ''.join(_p(x) for x in ls_)))
     return '\n'.join(h)
 
 
@@ -229,7 +332,12 @@ def with_endmark(inner):
     end = '<div class="endmark">◆</div>'
     m = re.search(r'(?:<div class="(?:ledger nine|takeaway|judge|wonder|ledger)">.*?</div>\s*)+$', inner, re.S)
     if m:
-        return inner[:m.start()] + '<div class="chapend">' + m.group(0) + end + '</div>'
+        pre = re.sub(r'<p>((?:(?!<p[ >]).)*</p>\s*)$', r'<p class="keepnext">\1', inner[:m.start()], flags=re.S)
+        pre = re.sub(r'<(ol|ul) class="ls"((?:(?!<(?:ol|ul) ).)*</\1>\s*)$', r'<\1 class="ls keepnext"\2', pre, flags=re.S)
+        n_ = len(re.sub(r'<[^>]+>', '', m.group(0)))
+        return pre + '<div class="chapend%s">' % (' open' if n_ > 300 else '') + m.group(0) + end + '</div>'
+    # 章末没有方框的：末段至少带 5 行过页，不留两三行的尾页
+    inner = re.sub(r'<p>((?:(?!<p[ >]).)*</p>\s*)$', r'<p class="tailp">\1', inner, flags=re.S)
     return inner + end
 
 
@@ -316,11 +424,15 @@ def build_sections():
             if bl[i][0] == 'p':
                 intro.append('<p class="bianxu">%s</p>' % inline(bl[i][1][0]))
             i += 1
-        secs.append(('part', sid(), '%s　%s' % (m[1].replace('　', ''), m[2]), 1,
-                     '%s<div class="part-label">%s</div><h1 class="part-title">%s</h1><div class="rule"></div>'
-                     '%s'
-                     % (EMB, spaced(m[1].replace('　', '')), inline(m[2]).replace('：', '：<br>', 1),
-                        ('<div class="daoyu">编　序</div><div class="part-intro">%s</div>' % ''.join(intro)) if intro else '')))   # 第 566 号：各编无编序，编首页只留编题
+        part_i = len(secs)
+        secs.append(['part', sid(), '%s　%s' % (m[1].replace('　', ''), m[2]), 1,
+                     '%s<div class="part-label">%s</div><h1 class="part-title" data-h="%s">%s</h1><div class="rule"></div>'
+                     '%s@@PARTTOC@@'
+                     % (EMB.replace('#1F3A5F', '#FBF8F0'), spaced(m[1].replace('　', '')), html.escape(m[1].replace('　', '') + ' · ' + m[2].split('：')[0]),
+                        inline(m[2]).replace('：', '：<br>', 1),
+                        ('<div class="daoyu">编　序</div><div class="part-intro">%s</div>' % ''.join(intro)) if intro else '')])   # 第 566 号：各编无编序，编首页只留编题
+        kicker = m[1].replace('　', '') + ' · ' + m[2].split('：')[0]
+        ptoc = []
         # 章
         while i < len(bl):
             t = bl[i][1][0]
@@ -333,11 +445,15 @@ def build_sections():
             nm = re.fullmatch(r'第 ?(\d+) ?章', lab)
             num = int(nm[1]) if nm else None
             numhtml = '<div class="chapnum">%02d</div>' % num if num else '<div class="chapnum spacer">&nbsp;</div>'
-            secs.append(('chapter', sid(), '%s　%s' % (lab, cm[2]), 2,
-                         '%s<div class="chap-label">%s</div>'
-                         '<h2 class="chap-title">%s</h2><div class="rule"></div>%s'
-                         % (numhtml, lab, inline(cm[2]), with_endmark(render(body)))))
+            csid = sid()
+            ptoc.append('<li><span class="n">%s</span><span class="t">%s</span><span class="pg">@@PG:%s@@</span></li>' % (lab, inline(cm[2]), csid))
+            secs.append(('chapter', csid, '%s　%s' % (lab, cm[2]), 2,
+                         '<div class="chap-kicker">%s</div>%s<div class="chap-label">%s</div>'
+                         '<h2 class="chap-title" data-h="%s">%s</h2><div class="rule"></div>%s'
+                         % (html.escape(kicker), numhtml, lab, html.escape(lab + ' · ' + cm[2]), inline(cm[2]), with_endmark(render(body)))))
             i = j
+        secs[part_i][4] = secs[part_i][4].replace('@@PARTTOC@@', '<ul class="part-toc">%s</ul>' % ''.join(ptoc))
+        secs[part_i] = tuple(secs[part_i])
 
     # ── 结语、附录（四件）、版本说明（第 553 号） ──
     bl = blocks_of((ROOT / FILES[1 + NPARTS]).read_text())
@@ -382,39 +498,47 @@ def print_css(fonts, W, H, body_pt, lh, margin, fol='decimal'):
 @page{{size:{W}mm {H}mm;margin:{t}mm {o}mm {b}mm {i}mm;background:#FBF8F0;
   @top-left{{content:none}} @top-right{{content:none}}}}
 @page :left{{margin-left:{o}mm;margin-right:{i}mm;
-  @top-left{{content:string(book);font:6.8pt 'Noto Sans CJK SC';color:#9A917E;vertical-align:bottom;padding-bottom:4mm}}
-  @bottom-left{{content:counter(page,{fol});font:7.6pt 'Noto Serif CJK SC';color:#8A8578}}}}
+  @top-left{{content:string(book,first-except);width:100%;text-align:left;font:{body_pt*0.62:.2f}pt 'Noto Sans CJK SC';letter-spacing:.06em;color:#7E7664;vertical-align:bottom;padding-bottom:2mm;margin-bottom:4.5mm;border-bottom:.4pt solid #D8CFBB}}
+  @bottom-left{{content:counter(page,{fol});width:9mm;text-align:left;font:{body_pt*0.72:.2f}pt 'Noto Serif CJK SC';color:#6F6A5C;vertical-align:top;padding-top:1.6mm;margin-top:5mm;border-top:.8pt solid #B08A3C}}}}
 @page :right{{
-  @top-right{{content:string(chap);font:6.8pt 'Noto Sans CJK SC';color:#9A917E;vertical-align:bottom;padding-bottom:4mm}}
-  @bottom-right{{content:counter(page,{fol});font:7.6pt 'Noto Serif CJK SC';color:#8A8578}}}}
-@page :blank{{@top-left{{content:none}} @top-right{{content:none}} @bottom-left{{content:none}} @bottom-right{{content:none}}}}
-@page clean{{@top-left{{content:none}} @top-right{{content:none}} @bottom-left{{content:none}} @bottom-right{{content:none}}}}
-@page opener:left{{@top-left{{content:none}}}}
-@page opener:right{{@top-right{{content:none}}}}
+  @top-right{{content:string(chap,first-except);width:100%;text-align:right;font:{body_pt*0.62:.2f}pt 'Noto Sans CJK SC';letter-spacing:.06em;color:#7E7664;vertical-align:bottom;padding-bottom:2mm;margin-bottom:4.5mm;border-bottom:.4pt solid #D8CFBB}}
+  @bottom-right{{content:counter(page,{fol});width:9mm;text-align:right;font:{body_pt*0.72:.2f}pt 'Noto Serif CJK SC';color:#6F6A5C;vertical-align:top;padding-top:1.6mm;margin-top:5mm;border-top:.8pt solid #B08A3C}}}}
+@page :blank{{@top-left{{content:none;border:none}} @top-right{{content:none;border:none}} @bottom-left{{content:none;border:none}} @bottom-right{{content:none;border:none}}}}
+@page clean{{@top-left{{content:none;border:none}} @top-right{{content:none;border:none}} @bottom-left{{content:none;border:none}} @bottom-right{{content:none;border:none}}}}
+@page opener:left{{@top-left{{content:none;border:none}}}}
+@page opener:right{{@top-right{{content:none;border:none}}}}
+@page partpage{{background:#1F3A5F;@top-left{{content:none;border:none}} @top-right{{content:none;border:none}} @bottom-left{{content:none;border:none}} @bottom-right{{content:none;border:none}}}}
 body{{font-family:'Noto Serif CJK SC';font-size:{body_pt}pt;line-height:{lh};color:#2A2824;margin:0;string-set:book "{META['title']}"}}
 p{{margin:0 0 .42em;text-indent:2em;text-align:justify;orphans:2;widows:2}}
 strong{{color:#1F3A5F;font-weight:700}}
 em{{font-style:italic}}
 .clean{{page:clean}}
 section{{break-before:page}}
-section.part,section.front-sec,section.back-sec,section.toc{{page:opener}}
-section.part{{break-before:right;text-align:center;padding-top:26mm}}
-.emb{{width:15mm;height:15mm;display:block;margin:0 auto 7mm}}
-.part-label{{font:700 9.5pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.9em;margin-bottom:5mm;text-indent:.9em}}
-.part-title{{font:700 18.5pt/1.5 'Noto Serif CJK SC';color:#1F3A5F;margin:0 12mm 4mm;string-set:chap content()}}
-.part .rule{{margin:0 auto 9mm}}
+section.part{{page:partpage;break-before:right;text-align:center;padding-top:22mm;color:#EFE8D6}}
+.emb{{width:17mm;height:17mm;display:block;margin:0 auto 8mm}}
+.part-label{{font:700 {body_pt*0.86:.2f}pt 'Noto Sans CJK SC';color:#D9B96E;letter-spacing:.9em;margin-bottom:5mm;text-indent:.9em}}
+.part-title{{font:700 {body_pt*1.72:.2f}pt/1.5 'Noto Serif CJK SC';color:#FBF8F0;margin:0 10mm 5mm;string-set:chap attr(data-h)}}
+.part .rule{{margin:0 auto 11mm;border-top-color:#D9B96E;width:18mm}}
+ul.part-toc{{list-style:none;margin:0 6mm;padding:0;text-align:left}}
+ul.part-toc li{{display:flex;font-size:{body_pt*0.86:.2f}pt;line-height:1.6;padding:1.35mm 0;border-bottom:.35pt solid rgba(239,232,214,.22);color:#EFE8D6}}
+ul.part-toc .n{{flex:0 0 auto;width:4.6em;color:#D9B96E;font:400 {body_pt*0.74:.2f}pt/1.85 'Noto Sans CJK SC'}}
+ul.part-toc .t{{flex:1}}
+ul.part-toc .pg{{flex:0 0 auto;width:3em;text-align:right;color:#D9B96E}}
 .daoyu{{font:700 8.5pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.6em;margin-bottom:5mm}}
 .part-intro{{text-align:left}}
 .part-intro p{{font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
-.rule{{width:13mm;border-top:.9pt solid #B08A3C;margin:3mm 0 7mm}}
-.chapnum{{font:300 34pt/1 'Noto Serif CJK SC';color:#D9C39A;margin-top:6mm;letter-spacing:.02em}}
-.chap-label{{font:700 8.4pt 'Noto Sans CJK SC';color:#B08A3C;margin:2mm 0 1.5mm;letter-spacing:.08em}}
-.chap-title{{font:700 16pt/1.45 'Noto Serif CJK SC';color:#1F3A5F;margin:0;string-set:chap content();bookmark-level:2;bookmark-label:content()}}
-.fs-title{{font:700 18pt/1.4 'Noto Serif CJK SC';color:#1F3A5F;margin:14mm 0 1mm;letter-spacing:.12em;string-set:chap content();bookmark-level:1;bookmark-label:content()}}
+.rule{{width:15mm;border-top:1pt solid #B08A3C;margin:3.5mm 0 8mm}}
+.chap-kicker{{font:400 {body_pt*0.66:.2f}pt 'Noto Sans CJK SC';color:#8A8578;letter-spacing:.14em;margin-top:0}}
+.chapnum{{font:300 {body_pt*4.2:.2f}pt/1 'Noto Serif CJK SC';color:#CDB27A;margin-top:9mm;letter-spacing:.02em}}
+.chap-label{{font:700 {body_pt*0.72:.2f}pt 'Noto Sans CJK SC';color:#B08A3C;margin:2.5mm 0 1.5mm;letter-spacing:.12em}}
+.chap-title{{font:700 {body_pt*1.62:.2f}pt/1.42 'Noto Serif CJK SC';color:#1F3A5F;margin:0;string-set:chap attr(data-h),book "{META['title']}";bookmark-level:2;bookmark-label:content()}}
+p.keepnext{{break-after:avoid}}
+p.tailp{{widows:5;break-after:avoid}}
+.fs-title{{font:700 {body_pt*1.62:.2f}pt/1.4 'Noto Serif CJK SC';color:#1F3A5F;margin:14mm 0 1mm;letter-spacing:.12em;string-set:chap content(),book "{META['title']}";bookmark-level:1;bookmark-label:content()}}
 .fs-title.appx{{bookmark-level:2;font-size:15pt;letter-spacing:.06em}}
 .part-title{{bookmark-level:1;bookmark-label:content()}}
 .fs-sub{{font:400 10.4pt 'Noto Serif CJK SC';color:#B08A3C;margin-top:1.5mm}}
-h3.sec{{font:700 {body_pt*1.03:.2f}pt/1.6 'Noto Sans CJK SC';color:#1F3A5F;margin:5.5mm 0 2.4mm;break-after:avoid}}
+h3.sec{{font:700 {body_pt*1.04:.2f}pt/1.6 'Noto Sans CJK SC';color:#1F3A5F;margin:7mm 0 2.6mm;break-after:avoid}}
 h3.sec .dia{{color:#B08A3C;font-size:.78em;margin-right:.45em;vertical-align:.08em}}
 h3.sec.bibhead{{margin-top:9mm;padding-top:3mm;border-top:.5pt solid #D9CDB0;font-size:{body_pt*0.92:.2f}pt;color:#8A6E3A;letter-spacing:.2em}}
 p.bib{{text-indent:-2em;padding-left:2em;font-size:{body_pt*0.8:.2f}pt;line-height:1.62;margin:0 0 1.1mm;text-align:left;overflow-wrap:anywhere}}
@@ -422,32 +546,65 @@ h4.ssec{{font:700 {body_pt*0.97:.2f}pt/1.6 'Noto Serif CJK SC';color:#5B4A26;mar
 h4.ssec::before{{content:"";display:inline-block;width:2.4mm;border-top:.8pt solid #B08A3C;vertical-align:.3em;margin-right:1.6mm}}
 h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;margin:6mm 0 2.5mm;break-after:avoid}}
 .takeaway{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;padding:2.2mm 4mm 2.4mm;margin:4.5mm 0 3mm;break-inside:avoid}}
-.takeaway .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#B08A3C;letter-spacing:.5em;margin-bottom:1.4mm}}
-.takeaway p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F;font-size:{body_pt*1.02:.2f}pt}}
+.takeaway .lab{{display:block;font:700 {body_pt*0.68:.2f}pt 'Noto Sans CJK SC';color:#8A6E3A;letter-spacing:.5em;margin-bottom:1.6mm}}
+.takeaway p{{text-indent:0;margin:0 0 .5mm;font-weight:500;color:#1F3A5F;font-size:{body_pt*0.98:.2f}pt;line-height:1.82}}
+.takeaway p strong{{font-weight:700}}
 .takeaway p.li{{padding-left:1.3em;text-indent:-1.3em;margin:0 0 1mm}}
 .takeaway .tm{{display:inline-block;width:1.3em;text-indent:0;color:#B08A3C}}
-.card.code p{{font-size:{body_pt*0.8:.2f}pt;line-height:1.65;margin:0}}
+.card.code p{{font-size:{body_pt*0.82:.2f}pt;line-height:1.72;margin:0;text-align:left;overflow-wrap:anywhere}}
+.card.code p.hd{{font-weight:700;color:#1F3A5F;margin:0 0 1mm}}
+.card.code p.ln+p.hd{{margin-top:2.2mm}}
+.card.long{{break-inside:auto;box-decoration-break:clone}}
+.fig{{margin:4.5mm 0 5mm;break-inside:avoid}}
+.fig p{{text-indent:0}}
+.fig.board{{background:#F6F1E4;border:.6pt solid #D8CFBB;padding:4mm 4mm 5mm;text-align:center}}
+.fig.board .note{{text-align:center;font-size:{body_pt*0.8:.2f}pt;color:#7E7664;margin:0 0 3.5mm}}
+.fig.board .node{{display:inline-block;font:700 {body_pt*0.86:.2f}pt/1.5 'Noto Sans CJK SC';color:#1F3A5F;background:#FBF8F0;border:.7pt solid #B08A3C;padding:1.2mm 3mm}}
+.fig.board .node.core{{background:#1F3A5F;color:#FBF8F0;border-color:#1F3A5F}}
+.fig.board .stem{{color:#B08A3C;font-size:{body_pt*0.8:.2f}pt;line-height:1.15;margin:.8mm 0}}
+.fig.board .row{{display:flex;justify-content:center;align-items:center}}
+.fig.board .ar{{color:#B08A3C;font-size:{body_pt*0.8:.2f}pt;margin:0 1.2mm}}
+.fig.ninegrid table{{width:100%;border-collapse:collapse;table-layout:fixed}}
+.fig.ninegrid th{{font:700 {body_pt*0.8:.2f}pt 'Noto Sans CJK SC';color:#FBF8F0;background:#1F3A5F;padding:1.2mm;text-align:center}}
+.fig.ninegrid thead th:first-child{{width:9%}}
+.fig.ninegrid td{{border:.6pt solid #CFC4A8;padding:1.6mm 1.8mm;vertical-align:top;font-size:{body_pt*0.74:.2f}pt;line-height:1.55;background:#FBF8F0}}
+.fig.ninegrid td b,.fig.ninegrid td span,.fig.ninegrid td i{{display:block;font-style:normal}}
+.fig.ninegrid td b{{font:700 {body_pt*0.72:.2f}pt/1.5 'Noto Sans CJK SC';color:#1F3A5F;margin-bottom:.6mm}}
+.fig.ninegrid td i{{color:#7E7664}}
+.fig.ninegrid td.g{{background:#F1EAD6}}
+.fig.ninegrid td.empty{{background:#E9F3F1;border:1.1pt solid #58A9B5}}
+.fig.ninegrid td.empty span{{font-weight:700;color:#2F7C88}}
 .ledger{{background:#F4EFE3;border-left:1.6pt solid #D8CFBB;padding:2mm 4mm 2.2mm;margin:3mm 0 2mm;break-inside:avoid;display:flex;gap:4mm;flex-wrap:wrap}}
 .ledger .lab{{flex:0 0 100%;margin-bottom:.4mm!important}}
 .ledger p{{flex:1 1 100%}}
-.ledger .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#5A554A;letter-spacing:.3em;margin-bottom:1.2mm}}
+.ledger .lab{{display:block;font:700 {body_pt*0.68:.2f}pt 'Noto Sans CJK SC';color:#5A554A;letter-spacing:.3em;margin-bottom:1.2mm}}
 .ledger p{{text-indent:0;margin:0 0 .6mm;font-size:{body_pt*0.86:.2f}pt;line-height:1.75;color:#5A554A}}
 .ledger .lk{{color:#1F3A5F;font-weight:700}}
 .chapend{{break-inside:avoid}}
+.chapend.open{{break-inside:auto}}
+.chapend.open>div{{break-after:avoid}}
+.chapend.open>div>p:last-child{{break-after:avoid}}
+.endmark{{break-before:avoid}}
+.chapend.open .takeaway{{break-inside:auto;box-decoration-break:clone}}
+.chapend.open .takeaway p{{break-inside:avoid}}
+.takeaway .lab{{break-after:avoid}}
+ol.keepnext,ul.keepnext{{break-after:avoid}}
+ol.keepnext li:last-child,ul.keepnext li:last-child{{break-after:avoid}}
+.chapend .endmark{{break-before:avoid}}
 .wonder{{border-left:1.6pt solid #58A9B5;padding:1.8mm 4mm;margin:2mm 0 1mm;break-inside:avoid}}
-.wonder .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.4em;margin-bottom:1mm}}
+.wonder .lab{{display:block;font:700 {body_pt*0.68:.2f}pt 'Noto Sans CJK SC';color:#2F7C88;letter-spacing:.4em;margin-bottom:1mm}}
 .wonder p{{text-indent:0;margin:0;font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
 .ledger.nine{{display:block}}
 .ledger.nine p{{margin:0 0 .5mm}}
 .judge{{border-left:1.6pt solid #8A6E3A;padding:1.8mm 4mm;margin:2mm 0 1mm;break-inside:avoid}}
-.judge .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#8A6E3A;letter-spacing:.3em;margin-bottom:1mm}}
+.judge .lab{{display:block;font:700 {body_pt*0.68:.2f}pt 'Noto Sans CJK SC';color:#8A6E3A;letter-spacing:.3em;margin-bottom:1mm}}
 .judge p{{text-indent:0;margin:0;font-size:{body_pt*0.9:.2f}pt;color:#4A463D}}
 .endmark{{text-align:center;color:#B08A3C;font-size:8pt;margin-top:3.5mm}}
 .orn{{text-align:center;color:#B08A3C;font-size:7.5pt;margin:3mm 0}}
 .pull{{margin:5mm 6%;padding:3mm 0;border-top:.8pt solid #B08A3C;border-bottom:.8pt solid #B08A3C;text-align:center;break-inside:avoid}}
 .pull p{{text-indent:0;text-align:center;font-weight:700;color:#1F3A5F;font-size:{body_pt*1.12:.2f}pt;margin:0}}
 /*Q*/.qbox{{background:#F7F3E8;border-left:1.6pt solid #58A9B5;padding:2.2mm 4mm;margin:2mm 0 4mm;break-inside:avoid}}
-.qbox .lab{{display:block;font:700 7.2pt 'Noto Sans CJK SC';color:#58A9B5;letter-spacing:.3em;margin-bottom:1mm}}
+.qbox .lab{{display:block;font:700 {body_pt*0.68:.2f}pt 'Noto Sans CJK SC';color:#2F7C88;letter-spacing:.3em;margin-bottom:1mm}}
 .qbox p{{text-indent:0;margin:0;font-size:{body_pt*0.93:.2f}pt;color:#4A463D}}
 .chapter.t1 p,.chapter.t1 li{{line-height:{lh-0.05:.3f}}}
 .chapter.t2 p,.chapter.t2 li{{line-height:{lh-0.10:.3f}}}
@@ -458,13 +615,18 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 .chapter.t4 h3.sec{{margin-top:3.5mm}}
 blockquote.verdict{{background:#F6F1E4;border-left:1.6pt solid #B08A3C;margin:4mm 0;padding:2.6mm 4mm;break-inside:avoid}}
 blockquote.verdict p{{text-indent:0;margin:0;font-weight:700;color:#1F3A5F}}
+blockquote.verdict.long{{break-inside:auto;box-decoration-break:clone}}
+blockquote.verdict.long p{{font-weight:500;margin:0 0 1mm}}
+blockquote.verdict.long p strong{{font-weight:700}}
 .tw{{margin:3.5mm 0}}
-table.tb{{width:100%;border-collapse:collapse;font-size:{body_pt*0.8:.2f}pt;line-height:1.6}}
-table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.8:.2f}pt/1.6 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left}}
+table.tb{{width:100%;border-collapse:collapse;table-layout:fixed;font-size:{body_pt*0.8:.2f}pt;line-height:1.6;border-bottom:.8pt solid #1F3A5F}}
+.tw.short{{break-inside:avoid}}
+table.tb tbody tr:first-child{{break-after:avoid}}
+table.tb tbody tr:last-child{{break-before:avoid}}
+table.tb .ctr{{text-align:center}}
+table.tb th{{background:#1F3A5F;color:#FBF8F0;font:700 {body_pt*0.78:.2f}pt/1.5 'Noto Sans CJK SC';padding:1.4mm 1.6mm;text-align:left;vertical-align:bottom}}
+table.tb td{{overflow-wrap:anywhere}}
 table.tb tr{{break-inside:avoid}}
-table.tb.n1 th:nth-child(1),table.tb.n1 td:nth-child(1){{white-space:nowrap}}
-table.tb.n2 th:nth-child(2),table.tb.n2 td:nth-child(2){{white-space:nowrap}}
-table.tb.w5 th:nth-child(-n+2),table.tb.w5 td:nth-child(-n+2){{white-space:nowrap}}
 table.tb.w5 td{{font-size:{body_pt*0.74:.2f}pt;line-height:1.55}}
 table.tb.dense td{{padding-top:.7mm;padding-bottom:.7mm}}
 table.tb td{{border-bottom:.5pt solid #E4DCCB;padding:1.3mm 1.6mm;vertical-align:top}}
@@ -479,39 +641,43 @@ p.srcnote{{text-indent:0;font:{body_pt*0.8:.2f}pt/1.7 'Noto Sans CJK SC';color:#
 .titlepage .big2{{font:700 30pt/1.35 'Noto Serif CJK SC';color:#1F3A5F;margin:2mm 0 5mm;letter-spacing:.1em}}
 /* 书名页 */
 section.clean,section.epi{{page:clean}}
-.titlepage{{page:clean;padding-top:34mm}}
+.titlepage{{page:clean;padding-top:30mm;border-left:1.6pt solid #B08A3C;padding-left:7mm;height:190mm;position:relative}}
 section.epi{{break-before:page;padding-top:62mm;text-align:center}}
 section.epi p{{text-indent:0;text-align:center;font:400 12.4pt/2.1 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.12em;margin:0}}
 section.epi p.by{{font:400 9.5pt 'Noto Serif CJK SC';color:#8A8578;margin-top:6mm;letter-spacing:.2em}}
 p.chap-lead{{text-indent:0;text-align:left;font:400 {body_pt*0.98:.2f}pt/1.8 'Noto Serif CJK SC';color:#5A554B;margin:-1mm 0 6mm}}
-.titlepage .pre{{font:400 12pt 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.3em}}
+.titlepage .pre{{font:400 {body_pt*0.86:.2f}pt 'Noto Sans CJK SC';color:#8A6E3A;letter-spacing:.3em}}
 .titlepage .big{{font:700 40pt/1.2 'Noto Serif CJK SC';color:#1F3A5F;margin:3mm 0 5mm;letter-spacing:.12em}}
 .titlepage .sub{{font:400 10.5pt/1.7 'Noto Serif CJK SC';color:#B08A3C}}
 .titlepage .rule{{margin:6mm 0 0}}
-.titlepage .au{{margin-top:36mm;font:400 11pt 'Noto Serif CJK SC';color:#2A2824;letter-spacing:.2em}}
+.titlepage .au{{margin-top:30mm;font:400 {body_pt*1.05:.2f}pt 'Noto Serif CJK SC';color:#2A2824;letter-spacing:.2em}}
 .titlepage .pub{{position:absolute;bottom:0;font:700 8.5pt 'Noto Sans CJK SC';color:#1F3A5F;letter-spacing:.35em}}
 .titlepage .pub span{{display:block;font:400 6.8pt 'Noto Sans CJK SC';color:#8A8578;letter-spacing:.08em;margin-top:1mm}}
 /* 出版信息 */
 .cp-title{{font:700 11pt 'Noto Sans CJK SC';color:#1F3A5F;letter-spacing:.8em;text-align:center;margin:6mm 0 5mm}}
-table.cp{{width:100%;border-collapse:collapse;font-size:8.4pt;line-height:1.6}}
-table.cp th{{font:400 7.8pt 'Noto Sans CJK SC';color:#8A8578;text-align:left;width:17mm;padding:1.5mm 2mm;vertical-align:top}}
+table.cp{{width:100%;border-collapse:collapse;font-size:{body_pt*0.76:.2f}pt;line-height:1.65}}
+table.cp th{{font:400 {body_pt*0.7:.2f}pt/1.8 'Noto Sans CJK SC';color:#7E7664;text-align:left;width:17mm;padding:1.5mm 2mm;vertical-align:top}}
 table.cp td{{padding:1.5mm 2mm;color:#2A2824}}
 table.cp tr:nth-child(odd){{background:#F4EFE3}}
 .cp-notes{{margin-top:5mm}}
-.cp-notes p{{text-indent:0;font-size:7.2pt;line-height:1.7;color:#5A554A;margin-bottom:1.3mm}}
+.cp-notes p{{text-indent:0;font-size:{body_pt*0.68:.2f}pt;line-height:1.72;color:#5A554A;margin-bottom:1.3mm}}
 .cp-right{{margin-top:3mm!important;letter-spacing:.2em}}
 /* 题辞 */
 .epi{{page:clean;padding-top:60mm;text-align:center}}
 .epi p{{text-indent:0;text-align:center;font-size:11.5pt;line-height:2.1;color:#1F3A5F}}
 .epi .by{{font-size:8.6pt;color:#8A8578;margin-top:5mm}}
 /* 目录 */
-.toc h1{{font:700 18pt 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.4em;margin:10mm 0 2mm}}
+.toc h1{{string-set:chap "目录",book "{META['title']}";font:700 {body_pt*1.62:.2f}pt 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.4em;margin:10mm 0 2mm}}
 .toc ul{{list-style:none;padding:0;margin:4mm 0 0}}
-.toc li{{display:flex;font-size:{body_pt*0.9:.2f}pt;line-height:1.72}}
+.toc li{{display:flex;font-size:{body_pt*0.88:.2f}pt;line-height:1.7;align-items:baseline}}
 .toc li a{{color:inherit;text-decoration:none}}
-.toc li .t{{flex:1}}
-.toc li .pg{{color:#8A8578;font-family:'Noto Serif CJK SC';min-width:9mm;text-align:right}}
-.toc li.p{{font-weight:700;color:#1F3A5F;margin-top:2.6mm}}
+.toc li .t{{flex:0 1 auto}}
+.toc li::after{{content:none}}
+.toc li .pg{{order:3}}
+.toc li .t+.pg{{flex:1 1 auto;border:none;background:none}}
+.toc li .pg{{color:#6F6A5C;font-family:'Noto Serif CJK SC';min-width:9mm;text-align:right}}
+.toc li.p{{font-weight:700;color:#1F3A5F;margin-top:3.6mm;padding-bottom:.6mm;border-bottom:.5pt solid #CDB27A;break-after:avoid}}
+.toc li.p .pg{{color:#1F3A5F}}
 .toc li.c{{padding-left:2em;color:#2A2824}}
 .toc li.f{{margin-top:1mm;color:#1F3A5F}}
 .toc li.a{{padding-left:2em;color:#2A2824}}
@@ -556,16 +722,6 @@ TIGHT = {}
 def sec_html(kind, sid, title, lvl, body):
     cls = {'part': 'part', 'chapter': 'chapter'}.get(kind, 'front-sec' if kind in ('front', 'main', 'cp') else 'backm')
     # 第 363 号：后置照第 220 号带页眉（不进 opener 页）；导论与附录各件收一档行距，免得章尾孤页
-    if kind == 'main' and title.startswith('导论'):
-        cls += ' chapter t2'
-    if kind == 'front' and title.startswith('导言'):
-        cls += ' chapter t2'
-    if kind == 'back' and lvl == 2:
-        cls += ' chapter t4'
-    if kind == 'front' and title.startswith('前言'):
-        cls += ' chapter t1'
-    if kind == 'chapter' and TIGHT.get(sid):
-        cls += ' ' + TIGHT[sid]
     return '<section class="%s" id="%s">%s</section>' % (cls, sid, body)
 
 
@@ -603,23 +759,92 @@ def tune_chapters(secs, css_args, fonts, label):
             fixed.append((s[2], lvl, lone))
     print(label, 'tightened', len(fixed), [(t[:8], l, x) for t, l, x in fixed])
 
+TAIL_DIR = Path(__file__).parent
+
+
+def tail_fit(doc_html, css, key):
+    """段尾只剩一两个字的，给该段极小的负字距（-1.5%、-3%、-4.5%）把字收回上一行。结果按段落内容缓存。"""
+    import hashlib
+    import weasyprint
+    TAIL_CACHE = TAIL_DIR / ('tail_fit_%s.json' % key)
+    cache = json.loads(TAIL_CACHE.read_text()) if TAIL_CACHE.exists() else {}
+    book = cache.setdefault(key, {})
+    paras = re.split(r'(?=<p(?: class="(?:keepnext|li|tailp)")?>)', doc_html)
+
+    def hk(s):
+        return hashlib.md5(s.split('</p>')[0].encode()).hexdigest()[:12]
+
+    def apply(levels):
+        out, idx = [paras[0]], 0
+        for s in paras[1:]:
+            idx += 1
+            lv = levels.get(hk(s), 0)
+            head = re.match(r'<p( class="[^"]*")?>', s)
+            st = ' style="letter-spacing:%.3fem"' % (-0.015 * lv) if lv else ''
+            out.append('<p data-i="%d"%s%s>' % (idx, head[1] or '', st) + s[head.end():])
+        return ''.join(out)
+
+    def tails(htm):
+        d = weasyprint.HTML(string=html_doc(css, re.sub(r'@@PG:s\d+@@', '888', htm)), base_url=str(ROOT)).render()
+        last = {}
+        def walk(b):
+            el = getattr(b, 'element', None)
+            if type(b).__name__ == 'LineBox' and el is not None and el.get('data-i'):
+                last[int(el.get('data-i'))] = ''.join(t.text for t in iter_text(b))
+                return
+            for c in getattr(b, 'children', []):
+                walk(c)
+        def iter_text(b):
+            if type(b).__name__ == 'TextBox':
+                yield b
+            for c in getattr(b, 'children', []):
+                yield from iter_text(c)
+        for pg in d.pages:
+            walk(pg._page_box)
+        return last
+    hkeys = {i + 1: hk(s) for i, s in enumerate(paras[1:])}
+    levels = dict(book)
+    for round_ in range(4):
+        t = tails(apply(levels))
+        bad = [i for i, s in t.items() if len(re.sub(r'\s', '', s)) <= 2]
+        # 整段就一两个字的不算（不是真段落）
+        bad = [i for i in bad if len(re.sub(r'<[^>]+>', '', paras[i].split('</p>')[0])) > 12]
+        print(key, 'round', round_, 'short tails', len(bad), flush=True)
+        if not bad:
+            break
+        changed = False
+        for i in bad:
+            k = hkeys[i]
+            if levels.get(k, 0) < 3:
+                levels[k] = levels.get(k, 0) + 1; changed = True
+        if not changed:
+            break
+    book.clear(); book.update(levels)
+    TAIL_CACHE.write_text(json.dumps(cache))
+    return apply(levels)
+
+
 def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     import weasyprint
     import pymupdf
-    tune_chapters(secs, css_args, fonts, 'tune')
     css = print_css(fonts, *css_args)
     css_front = print_css(fonts, *css_args, fol='lower-roman')
     # 第 1 遍：正文（导论起），拿每节的页码
     main_idx = next(i for i, s in enumerate(secs) if s[0] in ('main', 'part'))
     front, main = secs[:main_idx], secs[main_idx:]
-    main_html = ''.join(sec_html(*s) for s in main)
+    main_raw = ''.join(sec_html(*s) for s in main)
+    tag = 'r' if css_args[0] == 190 else 'p'
+    main_tail = tail_fit(main_raw, css, tag + 'm')
     # 导论不要求右页起，但正文第 1 页放在右页：前置页数补成偶数
-    mdoc = weasyprint.HTML(string=html_doc(css, main_html), base_url=str(ROOT)).render()
+    probe = weasyprint.HTML(string=html_doc(css, re.sub(r'@@PG:s\d+@@', '888', main_tail)), base_url=str(ROOT)).render()
     pages = {}
-    for pno, pg in enumerate(mdoc.pages, 1):
+    for pno, pg in enumerate(probe.pages, 1):
         for a in pg.anchors:
             if re.fullmatch(r's\d+', a) and a not in pages:
                 pages[a] = pno
+    main_html = re.sub(r'@@PG:(s\d+)@@', lambda mm: str(pages.get(mm[1], '—')), main_tail)
+    mdoc = weasyprint.HTML(string=html_doc(css, main_html), base_url=str(ROOT)).render()
+    assert [sorted(a for a in pg.anchors if re.fullmatch(r's\d+', a)) for pg in mdoc.pages] == [sorted(a for a in pg.anchors if re.fullmatch(r's\d+', a)) for pg in probe.pages], '回填页码后分页变了'
     # 前置：书名页、出版信息、题辞、作者介绍、成书说明、前言、目录（罗马页码）
     roman_ids = set()
 
@@ -634,7 +859,7 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
                 inner += sec_html(*s)
         allp = dict(pages); allp.update(pages_front)
         inner += toc_block(secs, allp, roman_ids)
-        return weasyprint.HTML(string=html_doc(css_front, inner), base_url=str(ROOT)).render()
+        return weasyprint.HTML(string=html_doc(css_front, tail_fit(inner, css_front, tag + 'f') if pages_front else inner), base_url=str(ROOT)).render()
 
     fdoc = build_front({})
     pf = {}
@@ -647,6 +872,11 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     mbytes = mdoc.write_pdf()
     book = pymupdf.open()
 
+    def blank(w, h):   # 补页与封二封三也铺暖纸，别露白
+        pg = book.new_page(width=w, height=h)
+        pg.draw_rect(pg.rect, color=None, fill=(0xFB / 255, 0xF8 / 255, 0xF0 / 255))
+        return pg
+
     def add_cover(src):
         c = pymupdf.open(str(src))
         if raster_cover:   # 阅读版给翻页器用：pdf.js 矢量模式不支持渐变，封面封底嵌高清图
@@ -657,17 +887,17 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
         else:
             book.insert_pdf(c)
     add_cover(cover)
-    book.new_page(width=book[0].rect.width, height=book[0].rect.height)  # 封二
+    blank(book[0].rect.width, book[0].rect.height)  # 封二
     f = pymupdf.open(stream=fbytes, filetype='pdf')
     book.insert_pdf(f)
     if len(f) % 2:
-        book.new_page(width=f[0].rect.width, height=f[0].rect.height)
+        blank(f[0].rect.width, f[0].rect.height)
     main_start = len(book) + 1
     m = pymupdf.open(stream=mbytes, filetype='pdf')
     book.insert_pdf(m)
     if len(book) % 2:
-        book.new_page(width=m[0].rect.width, height=m[0].rect.height)
-    book.new_page(width=m[0].rect.width, height=m[0].rect.height)  # 封三
+        blank(m[0].rect.width, m[0].rect.height)
+    blank(m[0].rect.width, m[0].rect.height)  # 封三
     add_cover(back)
     # 书签与翻页器目录
     toc, flip = [], []
@@ -686,6 +916,11 @@ def render_pdf(secs, css_args, fonts, out, cover, back, raster_cover=False):
     fixed, prev = [], 0
     for L, t, g in toc:
         L = min(L, prev + 1); fixed.append([L, t, g]); prev = L
+    for kind, sid, *_ in secs:
+        if kind == 'part' and sid in pages:
+            pg = book[main_start - 2 + pages[sid]]
+            r = pg.rect
+            pg.draw_rect(pymupdf.Rect(r.x0 - 3, r.y0 - 3, r.x1 + 3, r.y1 + 3), color=None, fill=(0x1F / 255, 0x3A / 255, 0x5F / 255), overlay=False)
     book.set_toc(fixed)
     book.set_metadata({'title': META['title'] + '：' + META['subtitle'], 'author': META['author'] + ' 著',
                        'subject': '德麦国际专著第 %d 号 · ISBN %s' % (META['no'], META['isbn']),
@@ -772,9 +1007,12 @@ def main():
     ap.add_argument('--fonts', type=Path, required=True)
     ap.add_argument('--out', type=Path, required=True)
     ap.add_argument('--only', choices=['print', 'reader', 'web'], action='append')
+    ap.add_argument('--limit', type=int, default=0, help='试排：只排前若干节')
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     secs = build_sections()
+    if a.limit:
+        secs = secs[:a.limit]
     only = a.only or ['print', 'reader', 'web']
     if 'web' in only:
         (a.out / 'text.html').write_text(web_page(secs))
