@@ -733,10 +733,10 @@ h3.sec .dia{margin-right:.4em}
         if s[0] == 'cp':
             body.append(EPIGRAPH.replace('section', 'div'))
     han = sum(len(HAN.findall((ROOT / f).read_text())) for f in FILES + [LUN] if (ROOT / f).exists())
-    WAN = '%.0f' % (han / 10000)
+    WAN = '%.0f' % (json.loads((ROOT / 'han.json').read_text())['body'] / 10000)
     head = f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>全文网页阅读 · {META['title']} · 德麦国际专著第 {META['no']} 号</title>
-<meta name="description" content="《{META['title']}——{META['subtitle']}》全文网页版。{META['author']} 著，德麦国际专著第 {META['no']} 号，约 {WAN} 万字。">
+<meta name="description" content="《{META['title']}》全文网页版。{META['author']} 著，德麦国际专著第 {META['no']} 号，约 {WAN} 万字。">
 <meta name="tier" content="L0"><link rel="canonical" href="https://sdeuniverses.com/books/m/{META['no']}/text/">
 <style>{style}</style></head><body><div id="prog"></div>
 <div class="bar"><a href="/books/m/{META['no']}/">← 书籍详情</a><a href="/books/m/{META['no']}/read.html">在线翻页</a><a href="/books/m/{META['no']}/{SLUG}-print.pdf?v={v}" target="_blank" rel="noopener">PDF</a><span class="sp"></span><button id="fs">字号</button><button id="th">夜间</button></div>
