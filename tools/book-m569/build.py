@@ -188,11 +188,26 @@ def table_html(rows, cls='tb'):
 
 
 def fig_board(b):
-    """第 1 章白板图：字符画改成排好的框与箭头，字一个不动。"""
-    return ('<div class="fig board"><p class="note">（外圈：一个大圆，围住下面所有）</p>'
-            '<div class="node top">缝隙创新法</div><div class="stem">▲<br>│</div>'
-            '<div class="row"><span class="node">二阶碰撞法</span><span class="ar">◄──</span>'
-            '<span class="node core">SDE思想创新法</span><span class="ar">──►</span><span class="node">九宫透镜法</span></div></div>')
+    """第 1 章白板图：一个大圆围住中心与三个名字，三条箭头从中心指向三个名字。"""
+    import math
+    G, N, P = '#B08A3C', '#1F3A5F', '#FBF8F0'
+    F = "font-family='Noto Sans CJK SC' font-size='14' font-weight='700' text-anchor='middle'"
+
+    def node(x, y, w, t, core=False):
+        return ("<rect x='%g' y='%g' width='%g' height='30' rx='2' fill='%s' stroke='%s' stroke-width='1'/>"
+                "<text x='%g' y='%g' fill='%s' %s>%s</text>" % (x - w / 2, y - 15, w, N if core else P, N if core else G, x, y + 5, P if core else N, F, t))
+
+    def arrow(x1, y1, x2, y2):
+        d = math.hypot(x2 - x1, y2 - y1)
+        ux, uy = (x2 - x1) / d, (y2 - y1) / d
+        bx, by = x2 - 9 * ux, y2 - 9 * uy
+        return ("<line x1='%.1f' y1='%.1f' x2='%.1f' y2='%.1f' stroke='%s' stroke-width='1.4'/>"
+                "<polygon points='%.1f,%.1f %.1f,%.1f %.1f,%.1f' fill='%s'/>" % (x1, y1, bx, by, G, x2, y2, bx - 4.5 * uy, by + 4.5 * ux, bx + 4.5 * uy, by - 4.5 * ux, G))
+    return ("<div class='fig board'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 304'>"
+            "<circle cx='210' cy='152' r='150' fill='#F6F1E4' stroke='%s' stroke-width='2'/>" % G
+            + arrow(210, 148, 210, 75) + arrow(172, 178, 150, 205) + arrow(248, 178, 270, 205)
+            + node(210, 58, 86, '缝隙创新法') + node(132, 222, 86, '二阶碰撞法') + node(288, 222, 86, '九宫透镜法')
+            + node(210, 163, 140, 'SDE思想创新法', True) + '</svg></div>')
 
 
 def fig_grid(b):
@@ -557,13 +572,8 @@ h3.subhead{{font:700 {body_pt*1.05:.2f}pt/1.6 'Noto Serif CJK SC';color:#1F3A5F;
 .card.long{{break-inside:auto;box-decoration-break:clone}}
 .fig{{margin:4.5mm 0 5mm;break-inside:avoid}}
 .fig p{{text-indent:0}}
-.fig.board{{background:#F6F1E4;border:.6pt solid #D8CFBB;padding:4mm 4mm 5mm;text-align:center}}
-.fig.board .note{{text-align:center;font-size:{body_pt*0.8:.2f}pt;color:#7E7664;margin:0 0 3.5mm}}
-.fig.board .node{{display:inline-block;font:700 {body_pt*0.86:.2f}pt/1.5 'Noto Sans CJK SC';color:#1F3A5F;background:#FBF8F0;border:.7pt solid #B08A3C;padding:1.2mm 3mm}}
-.fig.board .node.core{{background:#1F3A5F;color:#FBF8F0;border-color:#1F3A5F}}
-.fig.board .stem{{color:#B08A3C;font-size:{body_pt*0.8:.2f}pt;line-height:1.15;margin:.8mm 0}}
-.fig.board .row{{display:flex;justify-content:center;align-items:center}}
-.fig.board .ar{{color:#B08A3C;font-size:{body_pt*0.8:.2f}pt;margin:0 1.2mm}}
+.fig.board{{text-align:center}}
+.fig.board svg{{width:66%;height:auto;display:block;margin:0 auto}}
 .fig.ninegrid table{{width:100%;border-collapse:collapse;table-layout:fixed}}
 .fig.ninegrid th{{font:700 {body_pt*0.8:.2f}pt 'Noto Sans CJK SC';color:#FBF8F0;background:#1F3A5F;padding:1.2mm;text-align:center}}
 .fig.ninegrid thead th:first-child{{width:9%}}
