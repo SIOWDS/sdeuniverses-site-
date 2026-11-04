@@ -82,7 +82,7 @@ def main():
     assert not any(str(x.get('number')) == str(NO) for x in others), f'catalog 已有 {NO} 号'
     assert not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in others), 'catalog 已有此 ISBN'
     _ms = Path(A.ms).read_text()
-    # 字数按前言、八编编序与二十七章、尾声、附录正文计（口径同 meta.body_han），与封面、出版信息页一致
+    # 字数按前言、九编编序与三十八章、结语、附录正文计（口径同 meta.body_han），与封面、出版信息页一致
     han = M.body_han(HERE)
     reserve(han, len(re.findall(r'^## 第 ?\d+ ?章　', _ms, re.M)))
     (d / 'text').mkdir(parents=True, exist_ok=True)
@@ -119,14 +119,14 @@ def main():
            .replace('__DESC_SHORT__', _h.escape(CT['detailLine'], quote=True)).replace('__PRICE_NUM__', '%.2f' % PRICE_USD).replace('__PRICE__', PRICE))
 
     def _struct():
-        li = ['<li><b>前置</b>　出版信息 · 题词（本书母题） · 作者介绍 · 凡例 · 前言　为什么问“想” · 导读　这本书怎么用</li>']
+        li = ['<li><b>前置</b>　出版信息 · 题词 · 作者介绍 · 凡例 · 修订说明 · 前言 · 导读</li>']
         for f in sorted((HERE / 'parts').glob('*.md')):
             tx = f.read_text()
             pt = tx.split('\n', 1)[0].lstrip('# ').strip()
             chs = re.findall(r'^## 第 ?(\d+) ?章　(.*)$', tx, re.M)
             li.append('<li><b>%s</b>（第 %s—%s 章）<span class="chs">%s</span></li>' % (
                 _h.escape(pt), chs[0][0], chs[-1][0], ' · '.join('第 %s 章 %s' % (n, _h.escape(c)) for n, c in chs)))
-        li.append('<li><b>后置</b>　结语　账结到这里 · 参考书目 · 附录甲 真跑一的预注册 · 附录乙 五道缝的配书表 · 附录丙 人工核查清单 · 附录丁 术语表</li>')
+        li.append('<li><b>后置</b>　结语　从思想寡头到发生文明 · 参考书目 · 附录 A 内卷的SIO解构和救赎 · 附录 B 原创动力学揭秘 · 附录 C 中华文明如何在AI时代进行思想原创的突破？ · 附录 D 意义工程学是思想原创的核心应用 · 附录 E 思想寡头时代的大学如何变革？ · 附录 F 这本书怎样算错 · 全书金句十条 · 术语表</li>')
         return '<ol class="vols">\n%s\n</ol>' % '\n'.join(li)
     det = det.replace('__STRUCT__', _struct())
     assert '__' not in det
