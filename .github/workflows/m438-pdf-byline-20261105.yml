@@ -1,0 +1,39 @@
+name: M438 byline PDF rebuild to R2
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/m438-pdf-byline-20261105.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: m438-pdf-byline
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: tools/book-m438
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install fonts and PDF tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk fonts-noto-cjk-extra libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+          python -m pip install --quiet weasyprint==70.0 pymupdf pillow boto3
+      - name: Rebuild, verify, upload to R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python tools/book-m438/publish_r2_pdfs.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m438-r2-result
+          path: m438-r2-result.json
+          retention-days: 14
