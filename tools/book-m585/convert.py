@@ -39,6 +39,25 @@ def conv(text):
     return re.sub(r'\n{3,}', '\n\n', '\n'.join(out)).strip() + '\n'
 
 
+def scholars(md):
+    """附录三近邻表五列排不下，转成一人一段。"""
+    out = []
+    for l in md.splitlines():
+        s = l.strip()
+        if s.startswith('| 学者 |') or re.fullmatch(r'\|[-\s|:]+\|', s) and out and out[-1] == '__H__':
+            if s.startswith('| 学者 |'):
+                out.append('__H__')
+            else:
+                out.pop()
+            continue
+        cells = [x.strip() for x in s.strip('|').split('|')] if s.startswith('|') else []
+        if len(cells) == 5:
+            out += ['**%s**（第 %s 章）：%s 说对了什么：%s 这本书多走的一步：%s' % (cells[0], cells[4].replace('第', '').replace('章', '').strip(), cells[1].rstrip('。') + '。', cells[2], cells[3]), '']
+            continue
+        out.append(l)
+    return '\n'.join(out)
+
+
 def body_han_of(md):
     return han('\n'.join(x for x in md.splitlines() if not x.startswith('#') and not x.startswith('|') and not x.startswith('〔出处')).replace('**', ''))
 
@@ -70,7 +89,7 @@ def main():
     t, b = split('jieyu.md')
     md = conv(b); total += body_han_of(md)
     backl = ['# %s\n\n%s' % (t, md), '# 附录\n']
-    fu = (SRC / 'fulu.md').read_text(encoding='utf-8')
+    fu = scholars((SRC / 'fulu.md').read_text(encoding='utf-8'))
     appx = 0
     for blk in re.split(r'\n(?=# )', '\n' + fu):
         blk = blk.strip()
