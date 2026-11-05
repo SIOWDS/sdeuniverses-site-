@@ -73,7 +73,7 @@ def art(W, H, uid):
     gy = H * 0.885
     out.append(f'<rect x="0" y="{gy:.0f}" width="{W}" height="{H-gy:.0f}" fill="{NAVY_LOW}"/>')
     out.append(f'<line x1="0" y1="{gy:.0f}" x2="{W}" y2="{gy:.0f}" stroke="{GOLD}" stroke-opacity=".55" stroke-width="{2.4*s:.1f}"/>')
-    cx, top, bot = W * 0.56, H * 0.46, gy
+    cx, top, bot = W * 0.625, H * 0.46, gy
     wt, wb = 400 * s, 330 * s
     lvl = top + (bot - top) * 0.20
     wl = wb + (wt - wb) * (bot - lvl) / (bot - top)
