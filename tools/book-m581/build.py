@@ -65,7 +65,7 @@ def blocks_of(text):
                 flush(); kind = 'quote'
             buf.append(line[2:] if line.startswith('> ') else '')
             continue
-        if line.startswith('|'):
+        if line.startswith('|') and not re.search(r'[=≠]', line):   # 第 581 号：|∂B/∂A| ≠ … 是公式，不是表格
             if kind != 'table':
                 flush(); kind = 'table'
             buf.append(line)
@@ -367,7 +367,7 @@ def build_sections():
                              '<h1 class="fs-title appx">%s</h1><div class="fs-sub">%s</div><div class="rule"></div>%s'
                              % (nm, inline(sb), render(bb))))
         else:
-            isbib = title.startswith('参考资料')
+            isbib = title.startswith(('参考资料', '参考文献'))
             nm, _, sb = title.partition('　')
             secs.append(('back', sid(), title, 1,
                          '<h1 class="fs-title">%s</h1>%s<div class="rule"></div>%s' % (

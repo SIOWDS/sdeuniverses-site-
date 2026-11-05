@@ -80,8 +80,6 @@ def main():
             apx.append('## %s　%s\n\n%s' % (m[1], m[2], md.replace('### ◆ ', '#### ')))
         else:
             name = re.sub(r'^后记[\s　]+', '后记　', name)
-            if name.startswith('参考文献'):
-                name = '参考资料　参考文献'
             others.append('# %s\n\n%s' % (name, md))
     backl = ['# 附录\n'] + apx + others
     rep = {'{HAN}': format(total, ','), '{WAN}': '%.1f' % (total / 10000), '{ALL}': '%.0f' % ((total + appx_han) / 10000)}

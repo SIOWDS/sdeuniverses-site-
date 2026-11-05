@@ -53,7 +53,7 @@ def main():
         src = td / 'book.md'
         src.write_text(head + md)
         out = a.out / ('%s.docx' % M.SLUG)
-        subprocess.run(['pandoc', str(src), '-f', 'markdown-auto_identifiers', '-o', str(out), '--toc', '--toc-depth=2',
+        subprocess.run(['pandoc', str(src), '-f', 'markdown-auto_identifiers-superscript-subscript-tex_math_dollars-strikeout', '-o', str(out), '--toc', '--toc-depth=2',
                         '--reference-doc', str(reference_docx(td)), '--metadata', 'toc-title=目录'], check=True)
     print('docx ok', out, out.stat().st_size)
 
