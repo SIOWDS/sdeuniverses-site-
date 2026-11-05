@@ -190,7 +190,7 @@ def main():
         if old in pg: pg = pg.replace(old, new)
     pg = sub1(pg, '<title>@@PAGE_TITLE@@ · ' + C['title'] + '</title>', '<title>@@PAGE_TITLE@@ · ' + C['title'] + '</title>')
     assert '398' not in pg.replace('@@', ''), 'leftover 398 in page.html: ' + str([m.group(0) for m in re.finditer('.{20}398.{20}', pg)][:3])
-    assert '判生' not in pg and '张琼' not in pg and '判断力' not in pg.replace(C['title'], ''), 'leftover m398 wording'
+    assert '判生' not in pg and '判断力' not in pg.replace(C['title'], ''), 'leftover m398 wording'   # 第 525 号作者即张琼，不再以姓名查残留
     for file, view, title in [('learning.html', 'learning', '学习包 · %s个单元%s实践' % (NUMW, C['practiceWord'])), ('dialogue.html', 'dialogue', '智能问对 · ' + C['agentName'])]:
         t = pg
         for k, v in {'PAGE_TITLE': title, 'FILE': file, 'VIEW': view,
