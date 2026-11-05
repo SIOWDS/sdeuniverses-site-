@@ -82,7 +82,7 @@ def main():
     _ms = Path(A.ms).read_text()
     # 字数按写在前面、导论、五编编首语、十四章与结语正文计（口径同 meta.body_han），与封面、出版信息页一致
     han = M.body_han(HERE)
-    reserve(han, len(re.findall(r'^## ', _ms, re.M)))
+    reserve(han, len(re.findall(r'^## 第 \d+ 章　', _ms, re.M)))
     (d / 'text').mkdir(parents=True, exist_ok=True)
     for f in (f'{SLUG}.docx', 'cover.jpg', 'backcover.jpg', f'{SLUG}-print.pdf', f'{SLUG}-reader.pdf'):   # PDF 先进仓库，由 pdf-offload 迁 R2
         shutil.copy(b / f, d / f)

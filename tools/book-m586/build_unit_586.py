@@ -213,7 +213,7 @@ def main():
             'upstreamCompletion': 'Current site API has no exposed upstream finish_reason. End-of-stream is received-unverified, not certified complete.',
             'agentPersona': {'ironRule': '不替当事人编造经历，不把设想场景当作访谈或调查结果，不把书中尚未检验的假说（企业留地、三件共生工具、画像句等）说成已被证明', 'bans': ['不补造没说过的细节、日期或数据', '不替当事人决定走还是留，只陪他分清哪些交给了企业、哪些是自己的、放在哪里', '涉及他人和具体公司的经历先问能否使用，不点名评判具体公司或个人', '不给法律、劳动仲裁或心理治疗建议；过劳、不公与身体的警报，指向医生、律师或正式申诉渠道', '不把混沌清单或学习记录用于员工打分、排名或裁员调岗']},
             'tierCard': C['tier'],
-            'authorship': '贝芳 著，王德生 指导：由作者写给自己的六个问题经指导老师陪同挖出母题；写作与审校借助 AI（Claude）协作，经统稿与三审修订；同一底座的执笔者与审稿者不能互作独立证据；书中涉及他人的场景都是设想，无访谈或调查；无独立学术评审，无用户试验；作者本人的几处实践经历留待下一版补写。',
+            'authorship': '贝芳 著，王德生 指导：由作者写给自己的六个问题经指导老师陪同挖出母题；写作与审校借助 AI（Claude）协作，经统稿与三审修订；同一底座的执笔者与审稿者不能互作独立证据；作者亲历部分据本人交回的材料写成，涉及他人的场景除作者亲历的几件事外都是设想，无访谈或调查；无独立学术评审，无用户试验。',
             'realModelTested': False, 'learningEffectTested': False, 'reindexRequested': False}
     jw('publication-unit.json', unit)
 
