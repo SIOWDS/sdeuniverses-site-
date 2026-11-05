@@ -24,7 +24,15 @@ print('author line', span['font'], span['size'], span['color'], box)
 p.add_redact_annot(box)
 p.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE, graphics=pymupdf.PDF_REDACT_LINE_ART_NONE)
 col = pymupdf.sRGB_to_pdf(span['color'])
-p.insert_font(fontname='nsans', fontfile=FONT)
+# 只把这一行用到的字做成小字库嵌入，否则整份思源黑体会把 PDF 撑到 14 MB
+from fontTools.ttLib import TTFont
+from fontTools import subset
+font = TTFont(FONT, fontNumber=2)
+opt = subset.Options(); opt.layout_features = []; opt.notdef_outline = True; opt.retain_gids = True; opt.desubroutinize = True
+sub = subset.Subsetter(opt); sub.populate(text=NEW); sub.subset(font)
+import io
+buf = io.BytesIO(); font.save(buf)
+p.insert_font(fontname='nsans', fontbuffer=buf.getvalue())
 p.insert_text(span['origin'], NEW, fontname='nsans', fontsize=span['size'], color=col)
 meta = dict(d.metadata)
 meta['author'] = '胡志英（原书）；配套学习设计'
