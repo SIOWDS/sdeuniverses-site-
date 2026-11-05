@@ -1,0 +1,243 @@
+# 参考文献
+
+本书引到的外部文献与站内专著，按章汇总，去掉重复。西文按第一作者姓氏排序，中文与法规在后，站内专著按书号排列；站内专著的著者与书名以德麦国际书目为准。各章末尾另列该章用到的条目。
+
+### 西文文献
+
+- Acquisti, A., Brandimarte, L., & Loewenstein, G. (2015). Privacy and human behavior in the age of information. *Science*, 347(6221), 509–514.
+- Adler, P. S., & Borys, B. (1996). Two types of bureaucracy: Enabling and coercive. *Administrative Science Quarterly*, 41(1), 61–89.
+- Adolf, J. K., & Fried, E. I. (2019). Ergodicity is sufficient but not necessary for group-to-individual generalizability. *Proceedings of the National Academy of Sciences*, 116(14), 6540–6541. https://doi.org/10.1073/pnas.1818675116
+- Aguinis, H., & Burgi-Tian, J. (2022). Performance reviews are dead, long live performance management! *Management and Business Review*, 2(1), 38–43.
+- Aguinis, H., & Kraiger, K. (2009). Benefits of training and development for individuals and teams, organizations, and society. Annual Review of Psychology, 60, 451–474.
+- Ajunwa, I., Crawford, K., & Schultz, J. (2017). Limitless worker surveillance. *California Law Review*, 105, 735.
+- Amabile, T. M., Hadley, C. N., & Kramer, S. J. (2002). Creativity under the gun. *Harvard Business Review*, 80(8), 52–61.
+- Amsterdam Court of Appeal. (2023, April 4). Uber and Ola drivers’ data access cases (Uber and Ola v. drivers).
+- Anderson, P. (1999). Perspective: Complexity theory and organization science. *Organization Science*, 10(3), 216–232.
+- Angrave, D., Charlwood, A., Kirkpatrick, I., Lawrence, M., & Stuart, M. (2016). HR and analytics: Why HR is set to fail the big data challenge. *Human Resource Management Journal*, 26(1), 1–11.
+- Aristotle. *Nicomachean Ethics*, Book V, ch. 3 (W. D. Ross 英译本).
+- Arthur, W., Jr., Bennett, W., Jr., Edens, P. S., & Bell, S. T. (2003). Effectiveness of training in organizations: A meta-analysis of design and evaluation features. *Journal of Applied Psychology*, 88(2), 234–245.
+- Article 29 Data Protection Working Party. (2017). Guidelines on the right to data portability (WP242).
+- Article 29 Data Protection Working Party. (2017). Opinion 2/2017 on data processing at work (WP249).
+- Autor, D. H., Levy, F., & Murnane, R. J. (2003). The Skill Content of Recent Technological Change: An Empirical Exploration. *Quarterly Journal of Economics*, 118(4), 1279–1333.
+- Azoulay, P., Graff Zivin, J. S., & Manso, G. (2009). *Incentives and Creativity: Evidence from the Academic Life Sciences* (NBER Working Paper No. 15466). Cambridge, MA: National Bureau of Economic Research.
+- Azoulay, P., Graff Zivin, J. S., & Manso, G. (2011). Incentives and creativity: Evidence from the academic life sciences. *RAND Journal of Economics*, 42(3), 527–554.
+- Baer, M., & Oldham, G. R. (2006). The curvilinear relation between experienced creative time pressure and creativity: Moderating effects of openness to experience and support for creativity. *Journal of Applied Psychology*, 91(4), 963–970.
+- Bailey, C., & Madden, A. (2016). What makes work meaningful — or meaningless. MIT Sloan Management Review, 57(4), 53–61.
+- Bainbridge, L. (1983). Ironies of automation. *Automatica*, 19(6), 775–779.
+- Baldwin, T. T., & Ford, J. K. (1988). Transfer of training: A review and directions for future research. *Personnel Psychology*, 41(1), 63–105.
+- Barrick, M. R., & Mount, M. K. (1991). The Big Five personality dimensions and job performance: A meta-analysis. *Personnel Psychology*, 44(1), 1–26.
+- Becker, J., Rush, N., Barnes, E., & Rein, D. (2025). Measuring the impact of early-2025 AI on experienced open-source developer productivity. arXiv:2507.09089.
+- Benner, M. J., & Tushman, M. L. (2003). Exploitation, exploration, and process management: The productivity dilemma revisited. *Academy of Management Review*, 28(2), 238–256.
+- Benner, M. J., & Tushman, M. L. (2002). Process management and technological innovation: A longitudinal study of the photography and paint industries. *Administrative Science Quarterly*, 47(4), 676–707.
+- Benson, A., Li, D., & Shue, K. (2019). Promotions and the Peter Principle. The Quarterly Journal of Economics, 134(4), 2085–2134.
+- Berg, J. M., Wrzesniewski, A., & Dutton, J. E. (2010). Perceiving and responding to challenges in job crafting at different ranks: When proactivity requires adaptivity. *Journal of Organizational Behavior*, 31(2–3), 158–186.
+- Berger, J., Harbring, C., & Sliwka, D. (2013). Performance appraisals and the impact of forced distribution: An experimental investigation. *Management Science*, 59(1), 54–68.
+- Bernstein, E. S. (2012). The transparency paradox: A role for privacy in organizational learning and operational control. *Administrative Science Quarterly*, 57(2), 181–216.
+- Bloom, N., Lemos, R., Sadun, R., Scur, D., & Van Reenen, J. (2014). The new empirical economics of management. *Journal of the European Economic Association*, 12(4), 835–876.
+- Blume, B. D., Ford, J. K., Baldwin, T. T., & Huang, J. L. (2010). Transfer of training: A meta-analytic review. Journal of Management, 36(4), 1065–1105.
+- Bol, J. C. (2011). The determinants and performance effects of managers' performance evaluation biases. *The Accounting Review*, 86(5), 1549–1575.
+- Bol, J. C., De Aguiar, A. B., & Lill, J. B. (2025). Calibration in the performance evaluation process. *Human Resource Management*, 64(4), 1141–1159.
+- Bol, J. C., De Aguiar, A. B., & Lill, J. B. (2026). Should you be calibrating your performance evaluations? *Compensation & Benefits Review*, 58(3), 311–319.
+- Brown, D. E. (1991). *Human Universals*. New York: McGraw-Hill.
+- Buckingham, M., & Goodall, A. (2015). Reinventing performance management. *Harvard Business Review*, April 2015.
+- Burawoy, M. (1979). *Manufacturing Consent: Changes in the Labor Process under Monopoly Capitalism*. Chicago: University of Chicago Press.
+- Campbell, D. T. (1979). Assessing the impact of planned social change. *Evaluation and Program Planning*, 2(1), 67–90.
+- Cappelli, P., & Conyon, M. J. (2018). What do performance appraisals do? ILR Review, 71(1), 88–116.
+- Cappelli, P. (2019). Data science can't fix hiring (yet). Harvard Business Review, May–June.
+- Cappelli, P., & Tavis, A. (2016). The performance management revolution. Harvard Business Review, October.
+- Cappelli, P. (2019). Your approach to hiring is all wrong. Harvard Business Review, May–June.
+- Chaplin, C.（导演）(1936). *Modern Times*（《摩登时代》）. United Artists.
+- Colquitt, J. A. (2001). On the dimensionality of organizational justice: A construct validation of a measure. *Journal of Applied Psychology*, 86(3), 386–400.
+- Costanza, D. P., Badger, J. M., Fraser, R. L., Severt, J. B., & Gade, P. A. (2012). Generational differences in work-related attitudes: A meta-analysis. Journal of Business and Psychology, 27(4), 375–394.
+- Dastin, J. (2018, October 10). Amazon scraps secret AI recruiting tool that showed bias against women. Reuters.
+- Deci, E. L., & Ryan, R. M. (2000). The “what” and “why” of goal pursuits: Human needs and the self-determination of behavior. *Psychological Inquiry*, 11(4), 227–268.
+- Deci, E. L., Koestner, R., & Ryan, R. M. (1999). A meta-analytic review of experiments examining the effects of extrinsic rewards on intrinsic motivation. *Psychological Bulletin*, 125(6), 627–668.
+- Delacroix, S., & Lawrence, N. D. (2019). Bottom-up data Trusts: Disturbing the “one size fits all” approach to data governance. *International Data Privacy Law*. https://doi.org/10.1093/idpl/ipz014
+- Demeré, B. W., Sedatole, K. L., & Woods, A. (2019). The role of calibration committees in subjective performance evaluation systems. *Management Science*, 65(4), 1562–1585.
+- Deutsch, M. (1975). Equity, equality, and need: What determines which value will be used as the basis of distributive justice? Journal of Social Issues, 31(3), 137–149.
+- District Court of Amsterdam. (2021, March 11). Uber drivers v. Uber B.V. (data access), ECLI:NL:RBAMS:2021:1020.
+- Dranove, D., Kessler, D., McClellan, M., & Satterthwaite, M. (2003). Is More Information Better? The Effects of “Report Cards” on Health Care Providers. Journal of Political Economy, 111(3): 555–588.
+- Drucker, P. F. (1999). Knowledge-worker productivity: The biggest challenge. *California Management Review*, 41(2), 79–94.
+- Drucker, P. F. (1959). *Landmarks of Tomorrow*. New York: Harper & Brothers.
+- Duarte, N. T., Goodson, J. R., & Klich, N. R. (1994). Effects of dyadic quality and duration on performance appraisal. *Academy of Management Journal*, 37(3), 499–521.
+- Dulebohn, J. H., Bommer, W. H., Liden, R. C., Brouer, R. L., & Ferris, G. R. (2012). A meta-analysis of antecedents and consequences of leader-member exchange. *Journal of Management*, 38(6), 1715–1759.
+- Ederer, F., & Manso, G. (2013). Is pay for performance detrimental to innovation? *Management Science*, 59(7), 1496–1513.
+- Edmondson, A. (1999). Psychological safety and learning behavior in work teams. *Administrative Science Quarterly*, 44(2), 350–383.
+- Edmondson, A. C. (1996). Learning from Mistakes Is Easier Said Than Done: Group and Organizational Influences on the Detection and Correction of Human Error. Journal of Applied Behavioral Science, 32(1): 5–28.
+- Elliott, R., Bohart, A. C., Watson, J. C., & Murphy, D. (2018). Therapist empathy and client outcome: An updated meta-analysis. *Psychotherapy*, 55(4), 399–410.
+- Epstein, S. (1979). The stability of behavior: I. On predicting most of the people much of the time. *Journal of Personality and Social Psychology*, 37(7), 1097–1126.
+- Ferraro, F., Pfeffer, J., & Sutton, R. I. (2005). Economics language and assumptions: How theories can become self-fulfilling. *Academy of Management Review*, 30(1), 8–24.
+- Festinger, L., & Carlsmith, J. M. (1959). Cognitive consequences of forced compliance. *Journal of Abnormal and Social Psychology*, 58(2), 203–210.
+- Fisher, A. J., Medaglia, J. D., & Jeronimus, B. F. (2018). Lack of group-to-individual generalizability is a threat to human subjects research. *Proceedings of the National Academy of Sciences*, 115(27), E6106–E6115.
+- Fleeson, W. (2001). Toward a structure- and process-integrated view of personality: Traits as density distributions of states. *Journal of Personality and Social Psychology*, 80(6), 1011–1027.
+- Flückiger, C., Del Re, A. C., Wampold, B. E., & Horvath, A. O. (2018). The alliance in adult psychotherapy: A meta-analytic synthesis. *Psychotherapy*, 55(4), 316–340.
+- Frey, C. B., & Osborne, M. A. (2017). The future of employment: How susceptible are jobs to computerisation? *Technological Forecasting and Social Change*, 114, 254–280.
+- Garvin, D. A. (2013). How Google sold its engineers on management. *Harvard Business Review*, December.
+- Georgenson, D. L. (1982). The problem of transfer calls for partnership. *Training and Development Journal*, 36(10), 75–78.
+- Ghoshal, S. (2005). Bad management theories are destroying good management practices. *Academy of Management Learning & Education*, 4(1), 75–91.
+- Gibbs, M., Merchant, K. A., Van der Stede, W. A., & Vargus, M. E. (2004). Determinants and effects of subjectivity in incentives. *The Accounting Review*, 79(2), 409–436.
+- Gibson, C. B., & Birkinshaw, J. (2002). *Contextual Determinants of Organizational Ambidexterity* (CEO Publication T 02-6). Los Angeles: Center for Effective Organizations, University of Southern California.
+- Gibson, C. B., & Birkinshaw, J. (2004). The antecedents, consequences, and mediating role of organizational ambidexterity. *Academy of Management Journal*, 47(2), 209–226.
+- Giermindl, L. M., Strich, F., Christ, O., Leicht-Deobald, U., & Redzepi, A. (2022). The dark sides of people analytics: Reviewing the perils for organisations and employees. *European Journal of Information Systems*, 31(3), 410–435.
+- Going Concern. (2015, March 17). Deloitte is trying to reinvent performance evaluation. goingconcern.com.
+- Graen, G. B., & Uhl-Bien, M. (1995). Relationship-based approach to leadership: Development of leader-member exchange (LMX) theory of leadership over 25 years: Applying a multi-level multi-domain perspective. *The Leadership Quarterly*, 6(2), 219–247.
+- Griffeth, R. W., Hom, P. W., & Gaertner, S. (2000). A meta-analysis of antecedents and correlates of employee turnover: Update, moderator tests, and research implications for the next millennium. *Journal of Management*, 26(3), 463–488.
+- Groysberg, B., Lee, L.-E., & Nanda, A. (2008). Can they take it with them? The portability of star knowledge workers' performance. *Management Science*, 54(7), 1213–1230.
+- Hacking, I. (2007). Kinds of people: Moving targets. *Proceedings of the British Academy*, 151, 285–318.
+- Hacking, I. (1995). The looping effects of human kinds. In D. Sperber, D. Premack & A. J. Premack (Eds.), *Causal Cognition: A Multidisciplinary Debate* (pp. 351–394). Oxford: Clarendon Press.
+- Hacking, I. (1999). *The Social Construction of What?* Cambridge, MA: Harvard University Press.
+- Hackman, J. R., & Oldham, G. R. (1976). Motivation through the design of work: Test of a theory. *Organizational Behavior and Human Performance*, 16(2), 250–279.
+- Harter, J. K., Schmidt, F. L., & Hayes, T. L. (2002). Business-unit-level relationship between employee satisfaction, employee engagement, and business outcomes: A meta-analysis. Journal of Applied Psychology, 87(2), 268–279.
+- Henrich, J., Heine, S. J., & Norenzayan, A. (2010). The weirdest people in the world? *Behavioral and Brain Sciences*, 33(2–3), 61–83.
+- Higgins, M. C., & Kram, K. E. (2001). Reconceptualizing mentoring at work: A developmental network perspective. *Academy of Management Review*, 26(2), 264–288.
+- Hindo, B. (2007, June 11). At 3M, a struggle between efficiency and creativity. *BusinessWeek*, Inside Innovation.
+- Hochschild, A. R. (1983). *The Managed Heart: Commercialization of Human Feeling*. University of California Press.
+- Hoffman, B. J., Lance, C. E., Bynum, B., & Gentry, W. A. (2010). Rater source effects are alive and well after all. *Personnel Psychology*, 63(1), 119–151.
+- Hofmann, S. G., & Hayes, S. C. (2019). The future of intervention science: Process-based therapy. *Clinical Psychological Science*, 7(1), 37–50.
+- Holtom, B. C., & Inderrieden, E. J. (2006). Integrating the unfolding model and job embeddedness model to better understand voluntary turnover. *Journal of Managerial Issues*, 18(4), 435–452.
+- Hornung, S., Rousseau, D. M., & Glaser, J. (2008). Creating flexible work arrangements through idiosyncratic deals. Journal of Applied Psychology, 93(3), 655–664.
+- Hornung, S., Rousseau, D. M., & Glaser, J. (2009). Why supervisors make idiosyncratic deals: Antecedents and outcomes of i-deals from a managerial perspective. *Journal of Managerial Psychology*, 24(8), 738–764.
+- Huckman, R. S., & Pisano, G. P. (2006). The firm specificity of individual performance: Evidence from cardiac surgery. *Management Science*, 52(4), 473–488.
+- Hülsheger, U. R., & Schewe, A. F. (2011). On the costs and benefits of emotional labor: A meta-analysis of three decades of research. *Journal of Occupational Health Psychology*, 16(3), 361–389.
+- Huselid, M. A. (1995). The impact of human resource management practices on turnover, productivity, and corporate financial performance. *Academy of Management Journal*, 38(3), 635–672.
+- Ibarra, H. (1999). Provisional selves: Experimenting with image and identity in professional adaptation. *Administrative Science Quarterly*, 44(4), 764–791.
+- International Labour Organization. (1951). Equal Remuneration Convention (No. 100).
+- Jackson, D. J. R., Michaelides, G., Dewberry, C., Schwencke, B., & Toms, S. (2020). The implications of unconfounding multisource performance ratings. *Journal of Applied Psychology*, 105(3), 312–329.
+- Jacob, B. A., & Levitt, S. D. (2003). Rotten Apples: An Investigation of the Prevalence and Predictors of Teacher Cheating. Quarterly Journal of Economics, 118(3): 843–877.
+- Jacobs, R., Kafry, D., & Zedeck, S. (1980). Expectations of behaviorally anchored rating scales. *Personnel Psychology*, 33(3), 595–640.
+- Kahneman, D., & Sibony, O. (2021). Sounding the alarm on system noise [Interview]. *McKinsey Quarterly*, 18 May 2021.
+- Kahneman, D., Sibony, O., & Sunstein, C. R. (2021). *Noise: A flaw in human judgment*. Little, Brown Spark.
+- Kaplan, R. S., & Norton, D. P. (1992). The balanced scorecard: Measures that drive performance. Harvard Business Review, 70(1).
+- Kellogg, K. C., Valentine, M. A., & Christin, A. (2020). Algorithms at work: The new contested terrain of control. *Academy of Management Annals*, 14(1), 366–410.
+- Kerr, S. (1975). On the folly of rewarding A, while hoping for B. Academy of Management Journal, 18(4), 769–783.
+- Kinni, T. (2021). How noisy is your company? *strategy+business*, 19 May 2021（《噪声》一书的评介）.
+- Kotey, B., & Slade, P. (2005). Formal human resource management practices in small growing firms. *Journal of Small Business Management*, 43(1), 16–40.
+- Kram, K. E., & Isabella, L. A. (1985). Mentoring alternatives: The role of peer relationships in career development. *Academy of Management Journal*, 28(1), 110–132.
+- Kram, K. E. (1985). *Mentoring at Work: Developmental Relationships in Organizational Life*. Scott, Foresman.
+- Kristof-Brown, A. L., Zimmerman, R. D., & Johnson, E. C. (2005). Consequences of individuals' fit at work: A meta-analysis of person–job, person–organization, person–group, and person–supervisor fit. *Personnel Psychology*, 58(2), 281–342.
+- Kuncel, N. R., Klieger, D. M., Connelly, B. S., & Ones, D. S. (2013). Mechanical versus clinical data combination in selection and admissions decisions: A meta-analysis. *Journal of Applied Psychology*, 98(6), 1060–1072.
+- Kunda, G. (1992). Engineering Culture: Control and Commitment in a High-Tech Corporation. Philadelphia: Temple University Press.
+- Lai, L., Rousseau, D. M., & Chang, K. T. T. (2009). Idiosyncratic deals: Coworkers as interested third parties. *Journal of Applied Psychology*, 94(2), 547–556.
+- Lawrence, P. R., & Lorsch, J. W. (1967). Differentiation and integration in complex organizations. *Administrative Science Quarterly*, 12(1), 1–47. 同年另有专著 *Organization and Environment: Managing Differentiation and Integration*（哈佛商学院出版）。
+- Lazazzara, A., Tims, M., & de Gennaro, D. (2020). The process of reinventing a job: A meta-synthesis of qualitative job crafting research. *Journal of Vocational Behavior*, 116, 103267.
+- Lazear, E. P. (2000). Performance pay and productivity. *American Economic Review*, 90(5), 1346–1361.
+- Lazear, E. P. (1996). *Performance pay and productivity* (NBER Working Paper No. 5672). National Bureau of Economic Research.
+- Lazear, E. P., Shaw, K. L., & Stanton, C. T. (2015). The value of bosses. *Journal of Labor Economics*, 33(4), 823–861.
+- Lee, M. K. (2018). Understanding perception of algorithmic decisions: Fairness, trust, and emotion in response to algorithmic management. *Big Data & Society*, 5(1).
+- Lee, T. W., & Mitchell, T. R. (1994). An alternative approach: The unfolding model of voluntary employee turnover. *Academy of Management Review*, 19(1), 51–89.
+- Lee, T. W., Mitchell, T. R., Holtom, B. C., McDaniel, L. S., & Hill, J. W. (1999). The unfolding model of voluntary turnover: A replication and extension. *Academy of Management Journal*, 42(4), 450–462.
+- Lee, T. W., Mitchell, T. R., Wise, L., & Fireman, S. (1996). An unfolding model of voluntary employee turnover. *Academy of Management Journal*, 39(1), 5–36.
+- Lefkowitz, J. (2000). The role of interpersonal affective regard in supervisory performance ratings: A literature review and proposed causal model. *Journal of Occupational and Organizational Psychology*, 73(1), 67–85.
+- Lepak, D. P., & Snell, S. A. (1999). The human resource architecture: Toward a theory of human capital allocation and development. Academy of Management Review, 24(1).
+- Leroy, S. (2009). Why is it so hard to do my work? The challenge of attention residue when switching between work tasks. *Organizational Behavior and Human Decision Processes*, 109(2), 168–181.
+- Leventhal, G. S. (1980). What should be done with equity theory? In K. J. Gergen, M. S. Greenberg, & R. H. Willis (Eds.), *Social Exchange: Advances in Theory and Research*. New York: Plenum.
+- Levitt, S. D., & List, J. A. (2011). Was there really a Hawthorne effect at the Hawthorne plant? An analysis of the original illumination experiments. *American Economic Journal: Applied Economics*, 3(1), 224–238.
+- Lewin, K. (1943). Defining the “field at a given time.” *Psychological Review*, 50(3), 292–310.
+- Liao, C., Wayne, S. J., & Rousseau, D. M. (2016). Idiosyncratic deals in contemporary organizations: A qualitative and meta-analytical review. *Journal of Organizational Behavior*, 37(S1).
+- Maertz, C. P., Jr., & Campion, M. A. (2004). Profiles in quitting: Integrating process and content turnover theory. *Academy of Management Journal*, 47(4), 566–582.
+- Mark, G., González, V. M., & Harris, J. (2005). No task left behind? Examining the nature of fragmented work. In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems (CHI ’05)* (pp. 321–330). New York: ACM.
+- Marler, J. H., & Boudreau, J. W. (2017). An evidence-based review of HR analytics. *International Journal of Human Resource Management*, 28(1), 3–26.
+- Martin, R., Guillaume, Y., Thomas, G., Lee, A., & Epitropaki, O. (2016). Leader–member exchange (LMX) and performance: A meta-analytic review. *Personnel Psychology*, 69(1), 67–121.
+- Marx, M., Strumsky, D., & Fleming, L. (2009). Mobility, skills, and the Michigan non-compete experiment. Management Science, 55(6), 875–889.
+- Maslow, A. H. (1943). A theory of human motivation. *Psychological Review*, 50(4), 370–396.
+- Mattoni, M., Fisher, A. J., Gates, K. M., Chein, J., & Olino, T. M. (2025). Group-to-individual generalizability and individual-level inferences in cognitive neuroscience. *Neuroscience & Biobehavioral Reviews*, 169, 106024.
+- McClelland, D. C. (1973). Testing for competence rather than for “intelligence.” *American Psychologist*, 28(1), 1–14.
+- McCrae, R. R., & Costa, P. T. (1989). Reinterpreting the Myers-Briggs Type Indicator from the perspective of the five-factor model of personality. Journal of Personality, 57(1), 17–40.
+- Mintzberg, H. (1975, July–August). The manager's job: Folklore and fact. *Harvard Business Review*.
+- Mintzberg, H. (1980). Structure in 5's: A Synthesis of the Research on Organization Design. Management Science, 26(3): 322–341.
+- Mintzberg, H. (1973). *The Nature of Managerial Work*. Harper & Row.
+- Mischel, W., & Shoda, Y. (1995). A cognitive-affective system theory of personality: Reconceptualizing situations, dispositions, dynamics, and invariance in personality structure. *Psychological Review*, 102(2), 246–268.
+- Mitchell, T. R., Holtom, B. C., Lee, T. W., Sablynski, C. J., & Erez, M. (2001). Why people stay: Using job embeddedness to predict voluntary turnover. *Academy of Management Journal*, 44(6), 1102–1121.
+- Molenaar, P. C. M. (2004). A Manifesto on Psychology as Idiographic Science: Bringing the Person Back Into Scientific Psychology, This Time Forever. Measurement: Interdisciplinary Research & Perspective, 2(4): 201–218.
+- Molenaar, P. C. M., & Campbell, C. G. (2009). The new person-specific paradigm in psychology. *Current Directions in Psychological Science*, 18(2), 112–117.
+- Morgeson, F. P., & Humphrey, S. E. (2006). The Work Design Questionnaire (WDQ): Developing and validating a comprehensive measure for assessing job design and the nature of work. *Journal of Applied Psychology*, 91(6), 1321–1339.
+- Morrell, K., Loan-Clarke, J., Arnold, J., & Wilkinson, A. (2008). Mapping the decision to quit: A refinement and test of the unfolding model of voluntary turnover. *Applied Psychology: An International Review*, 57(1), 128–150.
+- Müller, G. F. (1989). Menschenbilder in der Organisationspsychologie: Kritik und Perspektiven. *Psychologie und Gesellschaftskritik*, 13(3), 61–71.
+- Mulligan, M. L., & Bull Schaefer, R. A. (2011). A new hope for rank and yank: Modifications of forced distribution rating systems. *Journal of Leadership & Organizational Studies*, 18(3), 385–396.
+- NASA Aviation Safety Reporting System. (n.d.). *Immunity policy*. https://asrs.arc.nasa.gov/overview/immunity.html
+- Nohria, N., & Gulati, R. (1996). Is slack good or bad for innovation? *Academy of Management Journal*, 39(5), 1245–1264.
+- Nonaka, I., & Takeuchi, H. (1995). *The Knowledge-Creating Company: How Japanese Companies Create the Dynamics of Innovation*. New York: Oxford University Press.
+- Nonaka, I. (1991). The knowledge-creating company. *Harvard Business Review*, 69(6), 96–104.
+- O’Leary, M. B., Mortensen, M., & Woolley, A. W. (2011). Multiple team membership: A theoretical model of its effects on productivity and learning for individuals and teams. *Academy of Management Review*, 36(3), 461–478. https://doi.org/10.5465/AMR.2011.61031807
+- Oostrom, J. K., Pennings, M., & Bal, P. M. (2016). How do idiosyncratic deals contribute to the employability of older workers? *Career Development International*, 21(2), 176–192.
+- Ordóñez, L. D., Schweitzer, M. E., Galinsky, A. D., & Bazerman, M. H. (2009). Goals gone wild: The systematic side effects of overprescribing goal setting. Academy of Management Perspectives, 23(1), 6–16.
+- Ouchi, W. G. (1979). A conceptual framework for the design of organizational control mechanisms. *Management Science*, 25(9), 833–848.
+- Pachidi, S., Berends, H., Faraj, S., & Huysman, M. (2021). Make way for the algorithms: Symbolic actions and change in a regime of knowing. *Organization Science*, 32(1), 18–41.
+- Parasuraman, R., & Manzey, D. H. (2010). Complacency and bias in human use of automation: An attentional integration. *Human Factors*, 52(3), 381–410.
+- Peter, L. J., & Hull, R. (1969). The Peter Principle: Why Things Always Go Wrong. New York: William Morrow.
+- Putka, D. J., Le, H., McCloy, R. A., & Diaz, T. (2008). Ill-structured measurement designs in organizational research: Implications for estimating interrater reliability. *Journal of Applied Psychology*, 93(5), 959–981.
+- Raff, D. M. G., & Summers, L. H. (1987). Did Henry Ford pay efficiency wages? *Journal of Labor Economics*, 5(4, Pt. 2), S57–S86.
+- Regulation (EU) 2016/679 (GDPR), Article 20.
+- Roberts, B. W., & DelVecchio, W. F. (2000). The rank-order consistency of personality traits from childhood to old age: A quantitative review of longitudinal studies. *Psychological Bulletin*, 126(1), 3–25.
+- Roch, S. G., Woehr, D. J., Mishra, V., & Kieszczynska, U. (2012). Rater training revisited: An updated meta-analytic review of frame-of-reference training. *Journal of Occupational and Organizational Psychology*, 85(2), 370–395.
+- Roethlisberger, F. J., & Dickson, W. J. (1939). *Management and the Worker*. Cambridge, MA: Harvard University Press.
+- Rosales Sánchez, C., Díaz-Cabrera, D., & Hernández-Fernaud, E. (2019). Does effectiveness in performance appraisal improve with rater training? *PLoS ONE*, 14(9), e0222694.
+- Rosenblat, A., & Stark, L. (2016). Algorithmic labor and information asymmetries: A case study of Uber's drivers. *International Journal of Communication*, 10.
+- Ross, L. (1977). The intuitive psychologist and his shortcomings: Distortions in the attribution process. In L. Berkowitz (Ed.), *Advances in Experimental Social Psychology* (Vol. 10, pp. 173–220). Academic Press.
+- Ross, L., Amabile, T. M., & Steinmetz, J. L. (1977). Social roles, social control, and biases in social-perception processes. *Journal of Personality and Social Psychology*, 35(7), 485–494.
+- Rousseau, D. M. (2005). *I-deals: Idiosyncratic Deals Employees Bargain for Themselves*. M. E. Sharpe.
+- Rousseau, D. M., Ho, V. T., & Greenberg, J. (2006). I-deals: Idiosyncratic terms in employment relationships. *Academy of Management Review*, 31(4), 977–994.
+- Sackett, P. R., Zhang, C., Berry, C. M., & Lievens, F. (2022). Revisiting meta-analytic estimates of validity in personnel selection: Addressing systematic overcorrection for restriction of range. *Journal of Applied Psychology*, 107(11), 2040–2068.
+- Schectman, J. (2013, March 15). Book: HP piloted program to predict which workers would quit. *The Wall Street Journal*.
+- Schein, E. H. (1965). *Organizational Psychology*. Prentice-Hall.
+- Schleicher, D. J., Bull, R. A., & Green, S. G. (2009). Rater reactions to forced distribution rating systems. *Journal of Management*, 35(4), 899–927.
+- Schmidt, F. L., & Hunter, J. E. (1998). The validity and utility of selection methods in personnel psychology: Practical and theoretical implications of 85 years of research findings. Psychological Bulletin, 124(2), 262–274.
+- Schwaber, K., & Sutherland, J. (2020). The Scrum Guide.
+- Scullen, S. E., Bergey, P. K., & Aiman-Smith, L. (2005). Forced distribution rating systems and the improvement of workforce potential: A baseline simulation. *Personnel Psychology*, 58(1), 1–32.
+- Scullen, S. E., Mount, M. K., & Goff, M. (2000). Understanding the latent structure of job performance ratings. *Journal of Applied Psychology*, 85(6), 956–970.
+- Sen, A. (1980). Equality of what? In S. McMurrin (Ed.), *Tanner Lectures on Human Values*, Vol. 1. Cambridge: Cambridge University Press（讲于 1979 年）.
+- Sharma, M., Tong, M., Korbak, T., Duvenaud, D., Askell, A., Bowman, S. R., et al. (2023). Towards understanding sycophancy in language models. arXiv:2310.13548.
+- Shipp, A. J., Furst-Holloway, S., Harris, T. B., & Rosen, B. (2014). Gone today but here tomorrow: Extending the unfolding model of turnover to consider boomerang employees. Personnel Psychology, 67(2), 421–462.
+- Sinsky, C., et al. (2016). Allocation of Physician Time in Ambulatory Practice: A Time and Motion Study in 4 Specialties. Annals of Internal Medicine, 165(11): 753–760.
+- Smircich, L., & Morgan, G. (1982). Leadership: The management of meaning. The Journal of Applied Behavioral Science, 18(3), 257–273.
+- Spencer, D. A. (2020). Economics and “bad” management: The limits to performativity. *Cambridge Journal of Economics*, 44(1), 17–32.
+- Tambe, P., Cappelli, P., & Yakubovich, V. (2019). Artificial intelligence in human resources management: Challenges and a path forward. *California Management Review*, 61(4), 15–42.
+- Taylor, F. W. (1911). *The Principles of Scientific Management*. New York: Harper & Brothers.
+- Thompson, E. P. (1967). Time, work-discipline, and industrial capitalism. *Past & Present*, 38(1), 56–97.
+- Tooby, J., & Cosmides, L. (1992). The psychological foundations of culture. In J. H. Barkow, L. Cosmides, & J. Tooby (Eds.), *The Adapted Mind: Evolutionary Psychology and the Generation of Culture* (pp. 19–136). New York: Oxford University Press.
+- Townley, B. (1994). *Reframing Human Resource Management: Power, Ethics and the Subject at Work*. London: Sage.
+- Tsoukas, H., & Chia, R. (2002). On organizational becoming: Rethinking organizational change. *Organization Science*, 13(5), 567–582.
+- Ulrich, D., & Brockbank, W. (2005). *The HR Value Proposition*. Boston: Harvard Business School Press.
+- Ulrich, D. (1997). *Human Resource Champions: The Next Agenda for Adding Value and Delivering Results*. Boston: Harvard Business School Press.
+- 2 UW professors changed the way we look at workplace turnover. *UW Magazine*（University of Washington，无署名介绍文章，网络版）。
+- Viswesvaran, C., Ones, D. S., & Schmidt, F. L. (1996). Comparative analysis of the reliability of job performance ratings. *Journal of Applied Psychology*, 81(5), 557–574.
+- Waldron, J. (2017). *One Another’s Equals: The Basis of Human Equality*. Cambridge, MA: Harvard University Press (Belknap).
+- Weick, K. E. (1976). Educational Organizations as Loosely Coupled Systems. Administrative Science Quarterly, 21(1): 1–19.
+- Willmott, H. (1993). Strength is ignorance; slavery is freedom: Managing culture in modern organizations. *Journal of Management Studies*, 30(4), 515–552.
+- Woehr, D. J., & Huffcutt, A. I. (1994). Rater training for performance appraisal: A quantitative review. *Journal of Occupational and Organizational Psychology*, 67(3), 189–205.
+- Wrege, C. D., & Perroni, A. G. (1974). Taylor's pig-tale: A historical analysis of Frederick W. Taylor's pig-iron experiments. *Academy of Management Journal*, 17(1), 6–27.
+- Wrzesniewski, A., & Dutton, J. E. (2001). Crafting a job: Revisioning employees as active crafters of their work. *Academy of Management Review*, 26(2), 179–201.
+- Wu, L., Wang, D., & Evans, J. A. 2019. Large Teams Develop and Small Teams Disrupt Science and Technology. Nature, 566(7744): 378–382.
+- Zhang, F., & Parker, S. K. (2019). Reorienting job crafting research: A hierarchical structure of job crafting concepts and integrative review. *Journal of Organizational Behavior*, 40(2), 126–146.
+
+### 中文文献与法规
+
+- 《中华人民共和国劳动法》第四十六条.
+- 赵曙明, 张敏, 赵宜萱. (2019). 人力资源管理百年：演变与发展. *外国经济与管理*, 41(12), 50–73.
+
+### 德麦国际专著（站内）
+
+- 王德生、王雅丽：第 12 号《意义管理学》，德麦国际专著。
+- 王德生：第 38 号《内卷与突围》，德麦国际专著。
+- 王德生：第 43 号《Palantir Ontology 的 SDE 解构》，德麦国际专著。
+- 王德生、胡敏：第 74 号《创造的产程》，德麦国际专著。
+- 王德生：第 114 号《归属虚幻》，德麦国际专著。
+- 王德生：第 115 号《从最强大脑到最强复合大脑》，德麦国际专著。
+- 王德生：第 337 号《知识的谱系发生》，德麦国际专著。
+- 胡敏：第 356 号《管理学学派解构入门》，德麦国际专著。
+- 王德生：第 395 号《SDE思想体系入门》，德麦国际专著。
+- 王德生：第 402 号《新文明诞生》，德麦国际专著。
+- 王德生：第 414 号《SDE智能体到底能做什么？》，德麦国际专著。
+- 王德生：第 491 号《SDE平台：慧店的诞生》，德麦国际专著。
+- 王德生：第 492 号《一店三门》，德麦国际专著。
+- 王德生：第 500 号《AI是加速你的落地》，德麦国际专著。
+- 王德生：第 502 号《个人知识发生平台的数据基因》，德麦国际专著。
+- 胡志英：第 526 号《秩序独大》，德麦国际专著。
+- 阳涌：第 537 号《AI接管秩序之后》，德麦国际专著。
+- 王德生：第 542 号《知识同一性谱系递归发生学》，德麦国际专著。
+- 王德生：第 558 号《悬着才成事》，德麦国际专著。
+- 王德生：第 576 号《AI来了，你往哪里躲？》，德麦国际专著。
+- 王德生：第 581 号《权力为何物》，德麦国际专著。
+- 王德生：第 583 号《何谓内卷？》，德麦国际专著。
+- 贝芳：第 586 号《你没交给企业的那一半》，德麦国际专著。
+- 孔凡鹤：第 591 号《都做对了，怎么还没变》，德麦国际专著。
