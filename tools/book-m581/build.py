@@ -184,6 +184,8 @@ def render(blocks, bib=False):
             t = b[0]
             if re.fullmatch(r'〔[^〔〕]*〕', t):
                 h.append('<p class="srcnote">%s</p>' % inline(t))
+            elif not bib and len(HAN.findall(t)) <= 8 and re.search(r'[=≠≈≥≤∂ρσκΣ]', t):
+                h.append('<p class="eq">%s</p>' % inline(t))   # 第 581 号：公式独立成段，居中
             else:
                 if bib and t.startswith('核读与使用范围'):
                     h.append('<p class="bib sc">%s</p>' % inline(t))
@@ -479,6 +481,7 @@ section.clean,section.epi{{page:clean}}
 section.epi{{break-before:page;padding-top:62mm;text-align:center}}
 section.epi p{{text-indent:0;text-align:center;font:400 12.4pt/2.1 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.12em;margin:0}}
 section.epi p.by{{font:400 9.5pt 'Noto Serif CJK SC';color:#8A8578;margin-top:6mm;letter-spacing:.2em}}
+p.eq{{text-indent:0;text-align:center;margin:2.4mm 0;color:#1F3A5F;break-inside:avoid}}
 p.chap-lead{{text-indent:0;text-align:left;font:400 {body_pt*0.98:.2f}pt/1.8 'Noto Serif CJK SC';color:#5A554B;margin:-1mm 0 6mm}}
 .titlepage .pre{{font:400 12pt 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.3em}}
 .titlepage .big{{font:700 40pt/1.2 'Noto Serif CJK SC';color:#1F3A5F;margin:3mm 0 5mm;letter-spacing:.12em}}
@@ -558,7 +561,7 @@ def sec_html(kind, sid, title, lvl, body):
         cls += ' chapter t2'
     if kind == 'back' and lvl == 2:
         cls += ' chapter t4'
-    if kind == 'front' and title.startswith(('前言', '导读', '导论')):
+    if kind == 'front' and title.startswith(('序', '前言', '导读', '导论')):
         cls += ' chapter t1'
     if kind == 'chapter' and TIGHT.get(sid):
         cls += ' ' + TIGHT[sid]
@@ -706,6 +709,7 @@ def web_page(secs):
 .judge{border-left:3px solid #8A6E3A;padding:.5rem 1rem;margin:1rem 0}.judge .lab{display:block;font:700 .75rem sans-serif;color:#8A6E3A;letter-spacing:.3em}.judge p{text-indent:0;margin:.2rem 0;color:var(--dim)}
 .chapnum{font-size:2.6rem;color:var(--gold);opacity:.45;line-height:1;margin-top:1rem}.chapnum.spacer{opacity:0;font-size:1rem}
 .chap-label{margin:.3rem 0 .2rem}
+p.eq{text-indent:0;text-align:center;color:var(--navy);overflow-wrap:anywhere}
 blockquote.verdict{border-left:3px solid var(--gold)}blockquote.verdict p{color:var(--navy);font-weight:700}
 .emb{width:44px;height:44px;display:block;margin:0 auto 1rem}
 p.bib{text-indent:-2em;padding-left:2em;font-size:.9rem;line-height:1.8;overflow-wrap:anywhere}p.bib .bn{color:var(--gold)}p.bib.sc{text-indent:0;color:var(--dim);font-size:.84rem;margin-bottom:.9rem}

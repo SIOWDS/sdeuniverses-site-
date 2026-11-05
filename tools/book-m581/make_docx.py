@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """第 581 号《权力为何物》：由分卷稿 book.md 出全书 Word（pandoc），中文用宋体／Noto Serif CJK SC，标题藏青。
 用法（仓库根目录）：python3 tools/book-m581/make_docx.py --out <build>
-产物：<out>/why-goodness-hardly-happens-today.docx
+产物：<out>/what-is-power.docx
 """
 import argparse, re, subprocess, sys, tempfile
 from pathlib import Path
