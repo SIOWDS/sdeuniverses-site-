@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 import meta as M  # noqa: E402
-PART_FILES = ['%02d' % i for i in range(1, 4)]
+PART_FILES = ['%02d' % i for i in range(1, 7)]
 FILES = ['front/00-前置.md'] + ['parts/%s.md' % x for x in PART_FILES] + ['back/12-后置.md']
 LUN = 'front/01-导言.md'   # 不用（前言、导论在前置）
 NPARTS = len(PART_FILES)
