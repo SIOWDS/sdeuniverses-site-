@@ -10,15 +10,23 @@ han = lambda s: len(re.findall(r'[一-鿿]', s))
 
 
 def conv(text):
-    out = []
+    """## 节题 → ### ◆ 节题；「本章结论」收进章末框（去掉各章重复的起手语）。"""
+    out, box = [], False
     for l in text.splitlines():
         s = l.strip()
         m = re.match(r'^##\s+(.*)$', s)
         if m:
+            if m[1].strip() == '本章结论':
+                box = True; out += ['', '> **本章结论**']; continue
+            box = False
             out.append('### ◆ ' + m[1].strip()); continue
         m = re.match(r'^###\s+(.*)$', s)
         if m:
             out.append('#### ' + m[1].strip()); continue
+        if box:
+            if s:
+                out += ['>', '> ' + re.sub(r'^(本章的重构表明，|移交下一章：)', '', s)]
+            continue
         out.append(l.rstrip())
     return re.sub(r'\n{3,}', '\n\n', '\n'.join(out)).strip() + '\n'
 

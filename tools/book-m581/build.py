@@ -154,6 +154,8 @@ def quote_html(lines):
         return '<div class="takeaway shoukou"><span class="lab">说明书</span>%s</div>' % ''.join('<p>%s</p>' % inline(l) for l in rest)
     if first == '**这一章怎样算错**':
         return '<div class="judge"><span class="lab">这一章怎样算错</span>%s</div>' % ''.join('<p>%s</p>' % inline(l) for l in rest)
+    if first == '**本章结论**':
+        return '<div class="takeaway shoukou"><span class="lab">本章结论</span>%s</div>' % ''.join('<p>%s</p>' % inline(l) for l in rest if l.strip() != '>')
     if first == '**本编收口**':
         return '<div class="takeaway shoukou"><span class="lab">本编收口</span>%s</div>' % ''.join('<p>%s</p>' % inline(l) for l in rest)
     if first == '**本章判错句**' or first == '**判错句**':
