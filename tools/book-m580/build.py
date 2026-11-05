@@ -558,7 +558,9 @@ def sec_html(kind, sid, title, lvl, body):
         cls += ' chapter t2'
     if kind == 'back' and lvl == 2:
         cls += ' chapter t4'
-    if kind == 'front' and title.startswith(('前言', '导读', '导论')):
+    if kind == 'front' and title.startswith('前言'):
+        cls += ' chapter t3'
+    elif kind == 'front' and title.startswith(('导读', '导论')):
         cls += ' chapter t1'
     if kind == 'chapter' and TIGHT.get(sid):
         cls += ' ' + TIGHT[sid]
