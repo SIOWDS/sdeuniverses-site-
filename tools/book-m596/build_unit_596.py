@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""三位一体出版单元生成器（阅读 · 学习包 · 智能问对）——第 594 号《HR的SDE解构入门——交账要秩序，接着是介生》用（由第 550 号 build_unit 改写，承自第 532 号）；原由第398卷参考实现（tools/m398_unit）泛化。
-第 594 号：学习单元按章——五十三个单元，每章一个；文案一律称「单元」；
+"""三位一体出版单元生成器（阅读 · 学习包 · 智能问对）——第 596 号《AI时代中华智慧的困境和出路》用（由第 550 号 build_unit 改写，承自第 532 号）；原由第398卷参考实现（tools/m398_unit）泛化。
+第 596 号：学习单元按章——四十四个单元，每章一个；文案一律称「单元」；
 另出 learning-pack.pdf 与 learning-pack.docx（放在书目录下，不再写 downloads/）。
 
 只写 public/books/m/<号>/ 之下的这些东西，不碰别的书、不调用模型、不重建搜索索引：
@@ -82,7 +82,7 @@ def main():
     # chapter anchors in text/index.html
     tx = (BOOK / 'text/index.html').read_text(encoding='utf-8')
     anchors = {int(m.group(2)): m.group(1) for m in re.finditer(r'<(?:div|section) class="chapter[^"]*" id="(s\d+)">(?:<div class="chapnum[^"]*">[^<]*</div>)?<div class="chap-label">第 ?(\d+) ?章', tx)}
-    assert len(anchors) == nch, 'text page anchors: %d' % len(anchors)   # 第 594 号：五十三章
+    assert len(anchors) == nch, 'text page anchors: %d' % len(anchors)   # 第 594 号：四十四章
 
     def w(rel, content):
         p = BOOK / rel; p.parent.mkdir(parents=True, exist_ok=True)
@@ -211,9 +211,9 @@ def main():
             'localStorage': 'IndexedDB / sde-publication-m%d-v1; append-only events; no silent trimming' % N,
             'privacy': 'Key only supplied explicitly for current request; via site to selected provider; no key in learning archive; no automatic public manuscript writeback',
             'upstreamCompletion': 'Current site API has no exposed upstream finish_reason. End-of-stream is received-unverified, not certified complete.',
-            'agentPersona': {'ironRule': '不替当事人编造经历，不把构想案例当作调查或试验结果', 'bans': ['不补造没说过的细节、日期或数据', '不替当事人做决定，不作法律或劳动用工的判断，不诊断任何人', '涉及他人的经历先问能否使用', '不保证任何收入或效果']},
+            'agentPersona': {'ironRule': '不替当事人编造经历，不把构想案例当作调查或试验结果', 'bans': ['不补造没说过的细节、日期、数据或文献', '不把文化解释等同于民族性格，不捏造 DeepSeek 等时间敏感的新动态', '教育不代写、不评分认证；健康不诊疗、不开建议处方；事业不保证收益', '涉及他人的经历先问能否使用']},
             'tierCard': C['tier'],
-            'authorship': '王德生、胡志英 著；AI辅助统稿与内部三审，未进行独立实证检验。',
+            'authorship': '王德生、胡志英 著：王德生立题与口径；正文由 AI（Claude）协作成稿，经统稿与三轮审读；同一底座的起草与审读不能互作独立证据；无独立学术评审；三领域试点尚未实施；未评分。',
             'realModelTested': False, 'learningEffectTested': False, 'reindexRequested': False}
     jw('publication-unit.json', unit)
 
@@ -307,4 +307,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -29,4 +29,3 @@ buffer+=decoder.decode();if(buffer.trim())line(buffer);
 return serverError?'error':interrupted||!end||!done?'interrupted':'received-unverified';}
 root.BookUnitCore={BOOK,VERSION,uid,now,stable,read,write,append,event,archive,importArchive,removeDraft,parseSSE};
 })(window);
-
