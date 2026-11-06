@@ -9,7 +9,7 @@ full.raw.md 结构：书名行；# 前言　题；# 第 N 章　题（1–14）�
 独占一段、不长于 30 个汉字的整行加粗（如「**第一步：……**」「**第 3 章**」）→「#### T」；
 「**这一章的问题**：……」→ 引用块；「## 带走的话」下的列表 → 「带走的话」引用块（列表符号保留），
 其后两行「本章切开的差异：」「本章的场谱系读数：」→ 「小账」引用块；围栏代码块原样保留。
-前言放进前置（罗马页码）；结语与附录一至四放进后置，附录在目录里各占一行。
+前言放进前置（罗马页码）；结语与附录一至五放进后置，附录在目录里各占一行。
 产物：src/full.md、front/00-前置.md、parts/01–04.md、back/12-后置.md、book.md、han.json。
 用法：python3 convert.py（在本目录或仓库根目录都可）
 """
@@ -160,7 +160,7 @@ def main():
             cp[1].append(t)
     nums = [int(re.match(r'^第 ?(\d+) ?章', c[0])[1]) for p in parts for c in p[1]]
     assert len(parts) == 6 and nums == list(range(1, 25)), (len(parts), nums)
-    assert len(apps) == 4, [a[0] for a in apps]
+    assert len(apps) == 5, [a[0] for a in apps]
     for d in ('front', 'parts', 'back'):
         (HERE / d).mkdir(exist_ok=True)
 
@@ -198,8 +198,8 @@ def main():
     back = (HERE / 'back/12-后置.tpl.md').read_text(encoding='utf-8')
     for a, b in rep.items():
         back = back.replace(a, b)
-    appx = ('# 附录\n\n本书附录四件：' + '；'.join(a[0].replace('　', ' ') for a in apps)
-            + '。附录四写明本书的边界与最弱处，读者可先看。\n\n' + '\n'.join(app_md))
+    appx = ('# 附录\n\n本书附录五件：' + '；'.join(a[0].replace('　', ' ') for a in apps)
+            + '。附录四写明本书的边界与最弱处，读者可先看；附录五把本书同站内相近的专著对读。\n\n' + '\n'.join(app_md))
     (HERE / 'back/12-后置.md').write_text('# %s\n\n%s\n%s\n%s' % (jie[0], jie_md, appx, back), encoding='utf-8')
 
     fl = ['front/00-前置.md', 'front/01-导言.md'] + ['parts/%02d.md' % k for k in range(1, 7)] + ['back/12-后置.md']

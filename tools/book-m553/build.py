@@ -751,7 +751,7 @@ h4.ssec::before{content:"";display:inline-block;width:.8em;border-top:1px solid 
 <div class="wrap">
 <div class="hero"><img src="/books/m/{META['no']}/cover.jpg?v={v}" alt="封面"><h1>{META['title']}</h1><p>{META['subtitle']}</p>
 <p style="color:var(--dim);margin-top:.5rem">{META['author']} 著 · 德麦国际专著第 {META['no']} 号 · ISBN {META['isbn']} · 约 {han/10000:.0f} 万汉字</p></div>
-<details class="toc" open><summary>目录（出版信息 · 作者介绍 · 成书说明 · 前言 · 上编至终编 · 结语 · 附录一至四 · 版本说明）</summary><ul>{''.join(toc)}</ul></details>
+<details class="toc" open><summary>目录（出版信息 · 作者介绍 · 成书说明 · 前言 · 上编至终编 · 结语 · 附录一至五 · 版本说明）</summary><ul>{''.join(toc)}</ul></details>
 """
     tail = f"""<div class="foot">德麦国际出版社 · Demai International Press · <a href="/books/">专著书架</a> · <a href="/books/m/{META['no']}/">书籍详情</a> · <a href="/books/m/{META['no']}/read.html">在线翻页</a></div>
 </div>
