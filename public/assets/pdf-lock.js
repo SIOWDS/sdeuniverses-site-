@@ -4,6 +4,20 @@
   var PDF_HREF = /\.pdf($|[?#])/i;
   var DL_WORD = /下载|⬇|⤓|download/i;
 
+  /* ⚠ 本锁管的是**仓里现成的那些 PDF 文件**（专著、学习包、学员稿）。
+     「排版后交给浏览器打印框」是另一回事：ChatSDE 的 ⤓ PDF 不取任何现成文件，
+     它把这一场对话（或一篇成文、画布上的一件）排成印刷稿交给打印管线，
+     一个字节都不从本站下载 —— 那是**生成**，不是下载。
+     可它的按钮上恰好写着「⤓ PDF」，被下面那条**按文案**判的规则误伤成灰色不可点
+     （2026-11-07 王德生报：ChatSDE 顶栏 PDF 变灰点不动）。故一律豁免打印出口。
+     🔴 豁免只去掉界面上的灰：真闸在服务器侧 src/pdf-lock.js，
+        取仓里现成 PDF 那条路（导航 302 去阅读器、其余 403）一个字没松。
+     新增打印出口时，给按钮挂 data-pdf-print="1" 即可，不必再回来改这里。 */
+  var PRINT_OK = "[data-pdf-print],.wdsm-layer,.wdsm-menu";
+  function isPrintExit(el) {
+    try { return !!(el && el.closest && el.closest(PRINT_OK)); } catch (e) { return false; }
+  }
+
   function addStyle() {
     var s = document.createElement("style");
     s.textContent = ".pdf-locked,.pdf-locked:hover{opacity:.45!important;filter:grayscale(1)!important;cursor:not-allowed!important;text-decoration:none!important}";
@@ -11,6 +25,7 @@
   }
 
   function shouldLock(el) {
+    if (isPrintExit(el)) return false;        // 打印出口不是下载口（见上面那段）
     var text = el.textContent || "";
     if (el.tagName === "A") {
       var href = el.getAttribute("href") || "";

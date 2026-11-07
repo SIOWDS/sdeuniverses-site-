@@ -4,13 +4,15 @@
    · 站内阅读器（PDF.js）的同站 fetch → 放行，否则 2000 多个阅读页全部打不开。
    · 其余一律 403：<a download>、右键另存、跨站盗链、curl 之类没有 Sec-Fetch 头又不是站内来路的。
    · 所有 HTML 注入 /assets/pdf-lock.js，把下载入口灰掉（含 JS 后生成的）。
+     ⚠ **打印出口不算下载口**：ChatSDE 的 ⤓ PDF 是把稿子排版后交给浏览器打印框，
+       不取仓里任何文件，已在客户端那份里豁免（见其 PRINT_OK）。
    边界：阅读器要把文件读进浏览器才能显示，本层挡的是"下载入口"，不是字节本身；
    这些文件若仍在公开 GitHub 仓库里，从那里还是拿得到。
    恢复下载：把 PDF_LOCK_ON 改成 false，或在 Cloudflare 设环境变量 PDF_LOCK=off。 */
 import { GATE_INTERNAL_KEY } from "./site-gate.js";
 
 export const PDF_LOCK_ON = true;
-const LOCK_JS = "/assets/pdf-lock.js?v=1";
+const LOCK_JS = "/assets/pdf-lock.js?v=2";   // v2：打印出口（ChatSDE ⤓ PDF 等）不再被灰掉
 const VIEW_DESTS = new Set(["document", "iframe", "frame", "embed", "object"]);
 const H_NOSTORE = { "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" };
 

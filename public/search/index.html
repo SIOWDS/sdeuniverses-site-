@@ -282,7 +282,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
         <!-- 成文的实时正文：与提炼那个框同一套。没有它，读者只能盯着一个数字猜基底在做什么。 -->
         <div class="ans" id="paperLive" style="max-height:22em;overflow:auto;white-space:pre-wrap"></div>
         <div class="pdf-acts" id="pdfActs">
-          <button class="actbtn solidbtn" id="pdfBtn" onclick="doPdf('paper')">🖨 <span class="zh-only">导出 PDF · 矢量文字</span><span class="en-only">Export PDF (vector text)</span></button>
+          <button class="actbtn solidbtn" data-pdf-print="1" id="pdfBtn" onclick="doPdf('paper')">🖨 <span class="zh-only">导出 PDF · 矢量文字</span><span class="en-only">Export PDF (vector text)</span></button>
           <span class="act-hint"><span class="zh-only">打印框弹出后，目标请选「另存为 PDF」。出来的是真文字（可选、可搜、可复制、放大不糊），不是把稿子画成图片。</span><span class="en-only">Choose “Save as PDF” in the print dialog — real selectable text, not images.</span></span>
         </div>
         <!-- Word 出口：由正文直接造 docx，一次点击直接落盘，不经打印框。
@@ -305,7 +305,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
           <div class="pp-num"><span id="ppChars2">0</span> <span class="zh-only">字</span><span class="en-only">chars</span></div>
         </div>
         <div class="pdf-acts" id="polishActs">
-          <button class="actbtn solidbtn" id="pdfBtn2" onclick="doPdf('polish')">🖨 <span class="zh-only">导出 PDF · 矢量文字</span><span class="en-only">Export PDF (vector text)</span></button>
+          <button class="actbtn solidbtn" data-pdf-print="1" id="pdfBtn2" onclick="doPdf('polish')">🖨 <span class="zh-only">导出 PDF · 矢量文字</span><span class="en-only">Export PDF (vector text)</span></button>
           <button class="actbtn" onclick="doIq(true)">🎯 <span class="zh-only">对打磨稿复评</span><span class="en-only">Re-score</span></button>
         </div>
         <div class="pdf-acts" id="wordActs2">
