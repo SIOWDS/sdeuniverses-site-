@@ -15,6 +15,13 @@ export const GATE_INTERNAL_KEY = "6c66e73b4629df1c5040389c5edfc0bb";
 const COOKIE = "sde_gate";
 const MAX_AGE = 200 * 24 * 3600; // 覆盖整个封闭期
 
+/* ── 培训临时密码（2026-11-07 培训用，两天）──
+   与主密码并行：输对就能进，到 TEMP_EXPIRES_MS 自动失效（代码里每次请求都核对时间，不靠 cookie 过期）。
+   同样只存加盐 SHA-256。主密码、主 cookie、社区登录都不受影响。
+   到期后可整段删除（TEMP_PW_SHA / TEMP_EXPIRES_MS 与下面三处 temp 分支），留着也无害。 */
+const TEMP_PW_SHA = "5644ca7c83a8702ebc4fbcc04d0216f07ca4f76cf3b241e175623855e989523d";
+const TEMP_EXPIRES_MS = 1794153600000; // 2026-11-09 00:00 北京时间（周六周日两天）
+
 async function sha256hex(s) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -101,16 +108,20 @@ export async function siteGate(request, env) {
     if (request.method !== "POST") return Response.redirect(new URL("/", url).toString(), 303);
     let pw = "", next = "/";
     try { const f = await request.formData(); pw = String(f.get("pw") || ""); next = safeNext(f.get("next")); } catch (e) {}
-    const ok = pw && (await sha256hex("sde-gate-v1:" + pw.trim())) === pwSha;
-    if (!ok) {
+    const given = pw ? await sha256hex("sde-gate-v1:" + pw.trim()) : "";
+    const okMain = !!given && given === pwSha;
+    const tempLive = Date.now() < TEMP_EXPIRES_MS;
+    const okTemp = !okMain && !!given && tempLive && given === TEMP_PW_SHA;
+    if (!okMain && !okTemp) {
       return new Response(gatePage(next, true), { status: 401, headers: { "content-type": "text/html; charset=utf-8", ...H_NOSTORE } });
     }
-    const tok = await tokenFor(pwSha);
+    const tok = okMain ? await tokenFor(pwSha) : await tokenFor("tmp:" + TEMP_PW_SHA);
+    const maxAge = okMain ? MAX_AGE : Math.max(1, Math.min(MAX_AGE, Math.floor((TEMP_EXPIRES_MS - Date.now()) / 1000)));
     return new Response(null, {
       status: 303,
       headers: {
         location: next,
-        "set-cookie": `${COOKIE}=${tok}; Path=/; Max-Age=${MAX_AGE}; HttpOnly; Secure; SameSite=Lax${cookieDomain(host)}`,
+        "set-cookie": `${COOKIE}=${tok}; Path=/; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Lax${cookieDomain(host)}`,
         ...H_NOSTORE,
       },
     });
@@ -124,8 +135,10 @@ export async function siteGate(request, env) {
     return new Response(null, { status: 303, headers: hs });
   }
 
-  // 已过门
-  if (readCookie(request, COOKIE) === (await tokenFor(pwSha))) return null;
+  // 已过门（主密码凭证；或未到期的培训临时凭证）
+  const ck = readCookie(request, COOKIE);
+  if (ck === (await tokenFor(pwSha))) return null;
+  if (ck && Date.now() < TEMP_EXPIRES_MS && ck === (await tokenFor("tmp:" + TEMP_PW_SHA))) return null;
 
   // 本站页面里发出的 API 调用（含二级域名分站跨源调用主站）
   if (url.pathname.startsWith("/api/") && fromOwnSite(request)) return null;
