@@ -23,6 +23,38 @@ PARTS = [
 BOX = {'这一章的问题': '这一章的问题', '带走的话': '带走的话', '两行小账': '小账'}
 
 
+SHORT, MAXH = 26, 230
+
+
+def merge_short(text):
+    """版面用：把太短的段落并进相邻的正文段（不动 book/ 母本）。
+    只并「单行正文段」；标题、引用框、列表、表格、整段加粗的不并。"""
+    h = lambda x: len(re.findall(r'[一-鿿]', x))
+    def prose(b):
+        return ('\n' not in b and b and b[0] not in '#>|-*<【' and not re.match(r'\d+[.、]', b)
+                and not b.startswith('**') and h(b) > 0
+                and not (b[0] == '“' and b[-1] == '”' and h(b) < 60))   # 单独成行的对话不并（换人说话要换行）
+    blocks = [b.strip('\n') for b in re.split(r'\n\s*\n', text.strip()) if b.strip()]
+    out, pend = [], None   # pend：等着并进下一个正文段的短段
+    for b in blocks:
+        if prose(b):
+            if pend is not None:
+                b = pend + b; pend = None
+            if out and prose(out[-1]) and (h(b) < SHORT) and h(out[-1]) + h(b) <= MAXH:
+                out[-1] += b
+            elif h(b) < SHORT and not (out and prose(out[-1])):
+                pend = b      # 前面不是正文段：留给后面的段
+            else:
+                out.append(b)
+        else:
+            if pend is not None:
+                out.append(pend); pend = None
+            out.append(b)
+    if pend is not None:
+        out.append(pend)
+    return '\n\n'.join(out) + '\n'
+
+
 def conv_chapter(text):
     lines = text.rstrip().split('\n')
     while lines and not lines[0].strip():
@@ -63,7 +95,7 @@ def conv_chapter(text):
             continue
         out.append(l.rstrip())
         i += 1
-    return re.sub(r'\n{3,}', '\n\n', '\n'.join(out).strip() + '\n')
+    return merge_short(re.sub(r'\n{3,}', '\n\n', '\n'.join(out).strip() + '\n'))
 
 
 def main():
@@ -84,10 +116,13 @@ def main():
     qian = re.sub(r'(?m)^# 前言.*$', '## 前言', qian, count=1)
     qian = re.sub(r'(?m)^## (?!前言)(.*)$', r'### ◆ \1', qian)
     qian = re.sub(r'(?m)^### (?!◆)(.*)$', r'#### \1', qian)
+    qian = merge_short(qian).strip()
     dao = (BOOK / '01-导读.md').read_text(encoding='utf-8').strip()
     dao = re.sub(r'(?m)^# 导读[：:　 ]*(.*)$', r'# 导读　\1', dao, count=1)
+    dao = merge_short(dao).strip()
     jie = (BOOK / 'ch27-结语.md').read_text(encoding='utf-8').strip()
     jie = re.sub(r'(?m)^# 结语[：:　 ]*(.*)$', r'# 结语　\1', jie, count=1)
+    jie = merge_short(jie).strip()
     app = (BOOK / 'ch28-附录.md').read_text(encoding='utf-8').strip()
     app = re.sub(r'(?m)^## (附录[一二三四五六七八九十]) +(.*)$', r'## \1　\2', app)
     ban = (HERE / 'banben.md').read_text(encoding='utf-8').strip()
