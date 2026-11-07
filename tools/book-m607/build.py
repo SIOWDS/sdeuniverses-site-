@@ -502,8 +502,8 @@ def build_sections():
                 ptoc.append('<li><span class="n">%s</span><span class="t">%s</span><span class="pg">@@PG:%s@@</span></li>' % (lab, inline(cm[2]), csid))
                 secs.append(('chapter', csid, '%s　%s' % (lab, cm[2]), 2,
                              '<div class="chap-kicker">%s</div><div class="chapnum">%02d</div><div class="chap-label">%s</div>'
-                             '<h2 class="chap-title" data-h="%s">%s</h2><div class="rule"></div>%s%s'
-                             % (html.escape(kicker), num, lab, html.escape(lab + ' · ' + cm[2]), inline(cm[2]),
+                             '<h2 class="chap-title" data-h="%s" data-p="%s">%s</h2><div class="rule"></div>%s%s'
+                             % (html.escape(kicker), num, lab, html.escape(lab + ' · ' + cm[2]), html.escape(kicker), inline(cm[2]),
                                 with_endmark(render(body)), notes_html('ch%03d' % num))))
                 i = j
             secs[part_i][4] = secs[part_i][4].replace('@@PARTTOC@@', '<ul class="part-toc">%s</ul>' % ''.join(ptoc))
@@ -519,7 +519,7 @@ def print_css(fonts, W, H, body_pt, lh, margin, fol='decimal'):
 @page{{size:{W}mm {H}mm;margin:{t}mm {o}mm {b}mm {i}mm;background:#FBF8F0;
   @top-left{{content:none}} @top-right{{content:none}}}}
 @page :left{{margin-left:{o}mm;margin-right:{i}mm;
-  @top-left{{content:string(book,first-except);width:100%;text-align:left;font:{body_pt*0.62:.2f}pt 'Noto Sans CJK SC';letter-spacing:.06em;color:#7E7664;vertical-align:bottom;padding-bottom:2mm;margin-bottom:4.5mm;border-bottom:.4pt solid #D8CFBB}}
+  @top-left{{content:string(part,first-except);width:100%;text-align:left;font:{body_pt*0.62:.2f}pt 'Noto Sans CJK SC';letter-spacing:.06em;color:#7E7664;vertical-align:bottom;padding-bottom:2mm;margin-bottom:4.5mm;border-bottom:.4pt solid #D8CFBB}}
   @bottom-left{{content:counter(page,{fol});width:9mm;text-align:left;font:{body_pt*0.72:.2f}pt 'Noto Serif CJK SC';color:#6F6A5C;vertical-align:top;padding-top:1.6mm;margin-top:5mm;border-top:.8pt solid #B08A3C}}}}
 @page :right{{
   @top-right{{content:string(chap,first-except);width:100%;text-align:right;font:{body_pt*0.62:.2f}pt 'Noto Sans CJK SC';letter-spacing:.06em;color:#7E7664;vertical-align:bottom;padding-bottom:2mm;margin-bottom:4.5mm;border-bottom:.4pt solid #D8CFBB}}
@@ -538,7 +538,7 @@ section{{break-before:page}}
 section.part{{page:partpage;break-before:right;text-align:center;padding-top:22mm;color:#EFE8D6}}
 .emb{{width:17mm;height:17mm;display:block;margin:0 auto 8mm}}
 .part-label{{font:700 {body_pt*0.86:.2f}pt 'Noto Sans CJK SC';color:#D9B96E;letter-spacing:.9em;margin-bottom:5mm;text-indent:.9em}}
-.part-title{{font:700 {body_pt*1.72:.2f}pt/1.5 'Noto Serif CJK SC';color:#FBF8F0;margin:0 10mm 5mm;string-set:chap attr(data-h)}}
+.part-title{{font:700 {body_pt*1.72:.2f}pt/1.5 'Noto Serif CJK SC';color:#FBF8F0;margin:0 10mm 5mm;string-set:chap attr(data-h),part attr(data-h)}}
 .part .rule{{margin:0 auto 11mm;border-top-color:#D9B96E;width:18mm}}
 ul.part-toc{{list-style:none;margin:0 6mm;padding:0;text-align:left}}
 ul.part-toc li{{display:flex;font-size:{body_pt*0.86:.2f}pt;line-height:1.6;padding:1.35mm 0;border-bottom:.35pt solid rgba(239,232,214,.22);color:#EFE8D6}}
@@ -552,10 +552,10 @@ ul.part-toc .pg{{flex:0 0 auto;width:3em;text-align:right;color:#D9B96E}}
 .chap-kicker{{font:400 {body_pt*0.66:.2f}pt 'Noto Sans CJK SC';color:#8A8578;letter-spacing:.14em;margin-top:0}}
 .chapnum{{font:300 {body_pt*4.2:.2f}pt/1 'Noto Serif CJK SC';color:#CDB27A;margin-top:9mm;letter-spacing:.02em}}
 .chap-label{{font:700 {body_pt*0.72:.2f}pt 'Noto Sans CJK SC';color:#B08A3C;margin:2.5mm 0 1.5mm;letter-spacing:.12em}}
-.chap-title{{font:700 {body_pt*1.62:.2f}pt/1.42 'Noto Serif CJK SC';color:#1F3A5F;margin:0;string-set:chap attr(data-h),book "{META['title']}";bookmark-level:2;bookmark-label:content()}}
+.chap-title{{font:700 {body_pt*1.62:.2f}pt/1.42 'Noto Serif CJK SC';color:#1F3A5F;margin:0;string-set:chap attr(data-h),part attr(data-p),book "{META['title']}";bookmark-level:2;bookmark-label:content()}}
 p.keepnext{{break-after:avoid}}
 p.tailp{{widows:5;break-after:avoid}}
-.fs-title{{font:700 {body_pt*1.62:.2f}pt/1.4 'Noto Serif CJK SC';color:#1F3A5F;margin:14mm 0 1mm;letter-spacing:.12em;string-set:chap content(),book "{META['title']}";bookmark-level:1;bookmark-label:content()}}
+.fs-title{{font:700 {body_pt*1.62:.2f}pt/1.4 'Noto Serif CJK SC';color:#1F3A5F;margin:14mm 0 1mm;letter-spacing:.12em;string-set:chap content(),part "{META['title']}",book "{META['title']}";bookmark-level:1;bookmark-label:content()}}
 .fs-title.appx{{bookmark-level:2;font-size:15pt;letter-spacing:.06em}}
 .part-title{{bookmark-level:1;bookmark-label:content()}}
 .fs-sub{{font:400 10.4pt 'Noto Serif CJK SC';color:#B08A3C;margin-top:1.5mm}}
@@ -700,7 +700,7 @@ p.sn.cont{{text-indent:0;padding-left:0}}
 section.backm{{break-before:right}}
 .toc li.g{{font:700 {body_pt*0.78:.2f}pt 'Noto Sans CJK SC';letter-spacing:.3em;color:#B08A3C;margin-top:5mm;break-after:avoid}}
 /* 目录 */
-.toc h1{{string-set:chap "目录",book "{META['title']}";font:700 {body_pt*1.62:.2f}pt 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.4em;margin:10mm 0 2mm}}
+.toc h1{{string-set:chap "目录",part "{META['title']}",book "{META['title']}";font:700 {body_pt*1.62:.2f}pt 'Noto Serif CJK SC';color:#1F3A5F;letter-spacing:.4em;margin:10mm 0 2mm}}
 .toc ul{{list-style:none;padding:0;margin:4mm 0 0}}
 .toc li{{display:flex;font-size:{body_pt*0.88:.2f}pt;line-height:1.7;align-items:baseline}}
 .toc li a{{color:inherit;text-decoration:none}}
@@ -792,6 +792,11 @@ def _hk(s):
     return hashlib.md5(s.split('</p>')[0].encode()).hexdigest()[:12]
 
 
+def weasyprint_render(h, css):
+    import weasyprint
+    return weasyprint.HTML(string=html_doc(css, re.sub(r'@@PG:s\d+@@', '888', h)), base_url=str(ROOT)).render()
+
+
 def fit_chunk(args):
     """一块（一编）：段尾只剩一两个字的段落，给极小负字距收回；返回 (html, levels, 页数, 锚点页)。块内行宽与页码奇偶无关，可单独排。"""
     chunk, css, base = args
@@ -823,6 +828,59 @@ def fit_chunk(args):
                 levels[k] = nxt; changed = True
         if not changed:
             break
+    # ---- 章尾孤页：末页只剩几行（多为来源注），按章逐档收紧行距，把它收回上一页
+    def tier_apply(htm):
+        def rep(m):
+            t = max(levels.get('T:' + m.group(2), 0), 0)
+            return '<section class="chapter%s" id="%s">' % (' t%d' % t if t else '', m.group(2))
+        return re.sub(r'<section class="chapter( t\d)?" id="(s\d+)">', rep, htm)
+
+    def page_fill(pg):
+        pb = pg._page_box
+        top = pb.content_box_y(); hh = pb.height
+        low = [top]
+
+        def walk(b):
+            if type(b).__name__ == 'LineBox':
+                low.append(b.position_y + b.height); return
+            for c in getattr(b, 'children', []):
+                if 'Margin' not in type(c).__name__:
+                    walk(c)
+        walk(pb)
+        return (max(low) - top) / hh
+
+    h = tier_apply(h)
+    for round_ in range(5):
+        d = weasyprint_render(h, css)
+        anc = {}
+        for pno, pg in enumerate(d.pages, 1):
+            for a in pg.anchors:
+                if re.fullmatch(r's\d+', a) and a not in anc:
+                    anc[a] = pno
+        cids = re.findall(r'<section class="chapter(?: t\d)?" id="(s\d+)">', h)
+        allsec = [(anc[x], x) for x in re.findall(r'<section class="[^"]*" id="(s\d+)">', h) if x in anc]
+        allsec.sort()
+        stubs = []
+        for cid in cids:
+            st = anc.get(cid)
+            if st is None:
+                continue
+            nxt = [p for p, x in allsec if p > st]
+            en = (nxt[0] - 1) if nxt else len(d.pages)
+            if levels.get('T:' + cid, 0) >= 0 and en > st and page_fill(d.pages[en - 1]) < 0.30:
+                stubs.append(cid)
+        if not stubs:
+            break
+        ch = False
+        for cid in stubs:
+            k = 'T:' + cid; cur = levels.get(k, 0)
+            if cur < 4:
+                levels[k] = cur + 1; ch = True
+            elif cur == 4:
+                levels[k] = -1; ch = True   # 收到顶仍救不回：放弃收紧（-1），复原为原行距
+        if not ch:
+            break
+        h = tier_apply(h)
     anchors = {}
     for pno, pg in enumerate(d.pages, 1):
         for a in pg.anchors:
