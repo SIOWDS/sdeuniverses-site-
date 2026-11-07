@@ -87,7 +87,7 @@ def main():
     dao = (BOOK / '01-导读.md').read_text(encoding='utf-8').strip()
     dao = re.sub(r'(?m)^# 导读[：:　 ]*(.*)$', r'# 导读　\1', dao, count=1)
     jie = (BOOK / 'ch27-结语.md').read_text(encoding='utf-8').strip()
-    jie = re.sub(r'(?m)^# 结语[ 　]*(.*)$', r'# 结语　\1', jie, count=1)
+    jie = re.sub(r'(?m)^# 结语[：:　 ]*(.*)$', r'# 结语　\1', jie, count=1)
     app = (BOOK / 'ch28-附录.md').read_text(encoding='utf-8').strip()
     app = re.sub(r'(?m)^## (附录[一二三四五六七八九十]) +(.*)$', r'## \1　\2', app)
     ban = (HERE / 'banben.md').read_text(encoding='utf-8').strip()

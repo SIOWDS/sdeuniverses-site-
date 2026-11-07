@@ -14,7 +14,7 @@ ADVISOR = ''
 ISBN = '979-8-90690-636-6'
 PRICE_USD = 20.00
 PRICE = 'US$%.2f' % PRICE_USD
-V = '20261107m604'
+V = '20261107m604r2'
 DATE = '2026-11-07'
 EDITION = '2026年11月第1版'
 EDITION_SP = '2026 年 11 月第 1 版'
@@ -28,9 +28,9 @@ def body_han(here=None):
     here = here if here.is_dir() else here.parent
     return json.loads((here / 'han.json').read_text())['body']
 CATEGORY = 'core'
-UNIT_REV = '20261107-m604-unit-v1'
+UNIT_REV = '20261107-m604-unit-v2'
 TIER = dict(tier='L0', tier_set_at='统稿', tier_reason='公开命题：主张层（事实＝三态纠缠发生、九格分谱、可证伪的小账）为主，条件层不构成私密底本；作者令上站',
             cite_ok='true', context_layers='判据、结论',
             source='王德生、张琼著（「事实」的定义与承重命题由王德生口述或裁定）；AI 协作成稿', rights='作者署名出版', tier_judge='Claude（依王德生上站令）',
             tier_date='2026-11-07')
-AUTHORSHIP = '王德生、张琼著：「事实」的定义与承重命题由王德生口述或裁定，正文由 AI（Claude）协作撰写，经独立质检与统稿初审；复审与终审在上线后继续；无独立学术评审。'
+AUTHORSHIP = '王德生、张琼著：「事实」的定义与承重命题由王德生口述或裁定，正文由 AI（Claude）协作撰写，经独立质检，并经初审、复审、终审三轮审稿；无独立学术评审。'

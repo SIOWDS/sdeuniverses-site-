@@ -804,7 +804,7 @@ def tail_fit(doc_html, css, key):
         return last
     hkeys = {i + 1: hk(s) for i, s in enumerate(paras[1:])}
     levels = dict(book)
-    for round_ in range(4):
+    for round_ in range(8):
         t = tails(apply(levels))
         bad = [i for i, s in t.items() if len(re.sub(r'\s', '', s)) <= 2]
         # 整段就一两个字的不算（不是真段落）
@@ -815,8 +815,10 @@ def tail_fit(doc_html, css, key):
         changed = False
         for i in bad:
             k = hkeys[i]
-            if levels.get(k, 0) < 3:
-                levels[k] = levels.get(k, 0) + 1; changed = True
+            cur = levels.get(k, 0)
+            nxt = cur + 1 if 0 <= cur < 3 else (-1 if cur == 3 else (cur - 1 if -3 < cur < 0 else None))
+            if nxt is not None:
+                levels[k] = nxt; changed = True
         if not changed:
             break
     book.clear(); book.update(levels)
