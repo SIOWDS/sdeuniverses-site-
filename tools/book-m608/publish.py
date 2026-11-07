@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""第 608 号《SDE思想创新法导论》（王德生 著；由第 566 号 publish.py 改来）：
+"""第 608 号《彩超医生会被AI替代吗？——病症符号发生学》（杨莉 著，王德生 指导；由第 606 号 publish.py 改来）：
 装进 public/books/m/608/（两版 PDF、Word、封面封底、全文网页、矢量翻页器、详情页）、书目、站点地图、/today/ 新书卡；
 并把书号预留档 .publish/volume-reservations/608.json 改为 published（铁律14：写之前查号、查 ISBN、验校验位；保留预留时的授权原话）。
 翻页器用 tools/build_flip_reader.py one 生成。
@@ -45,11 +45,11 @@ def reserve(han, chapters):
     pub = [int(x['number']) for x in _cat['books'] if isinstance(x, dict) and isinstance(x.get('number'), int) and x['number'] != NO]   # 稀疏检出里目录不全，按书目算
     d = {'volume': NO, 'title': T, 'subtitle': SUB, 'authors': AUTHORS, 'isbn': ISBN, 'isbnNormalized': nisbn,
          'isbnStatus': 'site-allocated-checksum-valid', 'priceUsd': PRICE_USD, 'status': 'published', 'date': M.DATE,
-         'authorization': '王德生原话（2026-11-07）：「单独署名。学科增加英语、医学、工程、艺术、体育，扩充到 50万字。 定价 45美金。书号和 卷号从站里计算。」；「书号和卷号你可以算出来的，其他的线都能」；（13:01）：「开始做三位一体上站： 阅读，学习包，智能体问对」。原取 605 号与 ISBN 637-3，上站前发现已被另一条线占用，改取 608 号与 ISBN 638-0。',
+         'authorization': '王德生原话（2026-11-07 15:05）：「排版 569风格，然后三位一体打造上站   作者：杨莉」「指导老师 王德生」。书号、ISBN 由 Claude 从站里推算（先取 607，被《SDE思想大全》预留，改取 608）；定价 US$20 为按 20 万字同体量既有定价取的默认，待确认。',
          'availabilityCheck': {'maxPublishedCatalogNumber': max(pub), 'maxReservedVolume': max(vols), 'volumeAbsent': True,
                                'isbnAbsentInCatalogAndReservations': True, 'checkDigit': int(nisbn[-1])},
          'tier': M.TIER,
-         'manuscript': {'chapters': chapters, 'bodyHanzi': han, 'state': '已上站'},
+         'manuscript': {'chapters': chapters, 'bodyHanzi': han, 'state': '统稿并三审后上站；未经医学顾问审定'},
          'publishedAt': M.DATE, 'detailUrl': f'https://sdeuniverses.com/books/m/{NO}/'}
     path.write_text(json.dumps(d, ensure_ascii=False, indent=2) + '\n')
     return d
@@ -71,7 +71,7 @@ def main():
     assert not any(str(x.get('number')) == str(NO) for x in others), f'catalog 已有 {NO} 号'
     assert not any((x.get('isbn') or '').replace('-', '') == ISBN.replace('-', '') for x in others), 'catalog 已有此 ISBN'
     _ms = Path(A.ms).read_text()
-    # 第 608 号：字数按前言、导论、四编、合论与结语正文计（口径同 meta.body_han），与封面、出版信息页一致
+    # 第 608 号：字数按前言、三编九章与结语正文计（口径同 meta.body_han），与封面、出版信息页一致
     han = M.body_han(HERE)
     reserve(han, len(re.findall(r'^## 第 ?[\d.]+ ?章　', _ms, re.M)))
     (d / 'text').mkdir(parents=True, exist_ok=True)
@@ -82,7 +82,7 @@ def main():
     toc = json.loads((b / 'toc-reader.json').read_text())   # 只取 offset 与总页数
     subprocess.run([sys.executable, str(REPO / 'tools/build_flip_reader.py'), 'one', '--read', str(d / 'read.html'),
                     '--pdf', f'/books/m/{NO}/{SLUG}-reader.pdf?v={V}', '--title', T,
-                    '--sub', f'王德生 著 · 德麦国际专著第 {NO} 号',
+                    '--sub', f'杨莉 著 · 王德生 指导 · 德麦国际专著第 {NO} 号',
                     '--detail', f'/books/m/{NO}/', '--offset', str(toc['offset']), '--key', f'books-m-{NO}-v1'], check=True)
     rd = (d / 'read.html').read_text()
     m_ = re.search(r'(<script type="application/json" id="toc">)(.*?)(</script>)', rd, flags=re.S)
@@ -112,7 +112,7 @@ def main():
             chs = re.findall(r'^## 第 ?([\d.]+) ?章　(.*)$', blk, re.M)
             li.append('<li><b>%s　%s</b>（第 %s—%s 章）<span class="chs">%s</span></li>' % (
                 m.group(1), _h.escape(m.group(2)), chs[0][0], chs[-1][0], ' · '.join('第%s章 %s' % (n, _h.escape(c)) for n, c in chs)))
-        li.append('<li><b>后置</b>　结语 · 参考书目 · 附录（三大典范一页纸、十五个课例索引、术语表）</li>')
+        li.append('<li><b>后置</b>　结语 · 参考书目 · 附录（三条验收标准、作者病例手记位、自测清单、术语白话对照、〔待核〕清单）</li>')
         return '<ol class="vols">\n%s\n</ol>' % '\n'.join(li)
     det = det.replace('__STRUCT__', _struct())
     assert '__' not in det

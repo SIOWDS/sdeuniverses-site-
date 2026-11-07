@@ -46,10 +46,10 @@ def main():
     md = (HERE / 'book.md').read_text()
     md = md.replace('【题词署】', '').replace('【题词】', '')
     md = re.sub(r'^◆ ', '### ', md, flags=re.M)
-    md = re.sub(r'^【(.*)】\s*$', r'#### \1', md, flags=re.M)
+    md = re.sub(r'^【(?!作者案例位)(.*)】\s*$', r'#### \1', md, flags=re.M)
     md = re.sub(r'^# (作者介绍)', r'# \1', md, flags=re.M)
-    head = ('---\ntitle: "%s"\nsubtitle: "%s"\nauthor: "%s 著"\ndate: "德麦国际专著第 %d 号 · ISBN %s · %s · %s"\nlang: zh-CN\n---\n\n'
-            % (M.TITLE, M.SUBTITLE, M.AUTHOR, M.NO, M.ISBN, M.PRICE, M.EDITION_SP))
+    head = ('---\ntitle: "%s"\nsubtitle: "%s"\nauthor: "%s 著　%s 指导"\ndate: "德麦国际专著第 %d 号 · ISBN %s · %s · %s"\nlang: zh-CN\n---\n\n'
+            % (M.TITLE, M.SUBTITLE, M.AUTHOR, M.ADVISOR, M.NO, M.ISBN, M.PRICE, M.EDITION_SP))
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
         src = td / 'book.md'
